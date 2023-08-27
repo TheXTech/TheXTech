@@ -1,6 +1,7 @@
 TheXTech Changelog.
 
 Changelog for 1.3.7-dev
+-Added "opensesame" world map cheat to unlock paths from level (@ds-sloth)
 -<WIP>
 
 Changelog for 1.3.6.1

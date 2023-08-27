@@ -165,6 +165,28 @@ static void moonWalk()
 }
 
 /*!
+ * \brief Opens all exits for current world level
+ */
+static void openSesame()
+{
+    bool found = false;
+
+    for(WorldLevel_t &lev : treeWorldLevelQuery(WorldPlayer[1].Location, SORTMODE_ID))
+    {
+        if(CheckCollision(WorldPlayer[1].Location, lev.Location))
+        {
+            found = true;
+
+            for(int A = 1; A <= 4; A++)
+                LevelPath(lev, A);
+        }
+    }
+
+    if(!found)
+        PlaySound(SFX_BlockHit);
+}
+
+/*!
  * \brief Allow player walk everywhere
  */
 static void illParkWhereIWant()
@@ -1947,6 +1969,7 @@ static const CheatCodeDefault_t s_cheatsListWorldDefault[] =
 {
     {"imtiredofallthiswalking", moonWalk, true}, {"moonwalk", moonWalk, true}, {"skywalk", moonWalk, true},
     {"illparkwhereiwant", illParkWhereIWant, true}, {"parkinglot", illParkWhereIWant, true},
+    {"opensesame", openSesame, true},
     {nullptr, nullptr, false}
 };
 
