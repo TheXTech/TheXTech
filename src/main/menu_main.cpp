@@ -1572,9 +1572,7 @@ bool mainMenuUpdate()
 #ifndef RENDER_CUSTOM
             optionsMenuLength++; // Renderer
 #endif
-#ifndef FIXED_RES
             optionsMenuLength ++; // resolution
-#endif
             optionsMenuLength ++; // ScaleMode
 
             if(SharedCursor.Move)
@@ -1599,12 +1597,10 @@ bool mainMenuUpdate()
                         else if(A == i++)
                             menuLen = 18 * 25; // Render Mode: XXXXXXXX
 #endif
-#if !defined(FIXED_RES)
                         else if(A == i++)
                             menuLen = 18 * (7 + (int)ScaleMode_strings.at(g_videoSettings.scaleMode).length());
                         else if(A == i++)
                             menuLen = 18 * std::strlen("res: WWWxHHH (word)");
-#endif
                         else if(A == i++)
                             menuLen = 18 * 25; // Language: XXXXX (YY)
                         else
@@ -1717,7 +1713,6 @@ bool mainMenuUpdate()
                         UpdateWindowRes();
                         UpdateInternalRes();
                     }
-#if !defined(FIXED_RES)
                     else if(MenuCursor == i++)
                     {
                         PlaySoundMenu(SFX_Do);
@@ -1774,7 +1769,6 @@ bool mainMenuUpdate()
                         UpdateWindowRes();
                         UpdateInternalRes();
                     }
-#endif
                     else if(MenuCursor == i++)
                     {
                         XLanguage::rotateLanguage(g_config.language, leftPressed ? -1 : 1);
@@ -2332,7 +2326,6 @@ void mainMenuDraw()
 
         SuperPrint(fmt::format_ne("{0}: {1}", g_mainMenu.optionsScaleMode, *scale_str), 3, MenuX, MenuY + (30 * i++));
 
-#if !defined(FIXED_RES)
         std::string resString = fmt::format_ne("RES: {0}x{1}", g_config.InternalW, g_config.InternalH);
 
         if (g_config.InternalW == 480 && g_config.InternalH == 320)
@@ -2359,7 +2352,6 @@ void mainMenuDraw()
             resString += " (CUSTOM)";
 
         SuperPrint(resString, 3, MenuX, MenuY + (30 * i++));
-#endif
 
         SuperPrint(fmt::format_ne("{0}: {1} ({2})", g_mainMenu.wordLanguage, g_mainMenu.languageName, g_config.language), 3, MenuX, MenuY + (30 * i++));
         SuperPrint(g_mainMenu.optionsViewCredits, 3, MenuX, MenuY + (30 * i++));

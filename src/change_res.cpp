@@ -84,17 +84,9 @@ void UpdateInternalRes()
         {
             req_w = 800;
             req_h = 600;
-
-#ifdef THEXTECH_FIXED_RES
-            PlaySoundMenu(SFX_VillainKilled);
-            MessageText = "Sorry! The requested compatibility mode was not enabled because your copy of TheXTech was not built to support a resolution of 800x600.";
-            PauseGame(PauseCode::Message);
-            MessageText.clear();
-#endif
         }
     }
 
-#ifndef THEXTECH_FIXED_RES
     if(req_w == 0 || req_h == 0)
     {
         int int_w, int_h, orig_int_h;
@@ -218,7 +210,6 @@ void UpdateInternalRes()
         ScreenW = req_w;
         ScreenH = req_h;
     }
-#endif // #ifndef THEXTECH_FIXED_RES
 
     XRender::updateViewport();
 

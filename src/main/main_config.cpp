@@ -145,22 +145,23 @@ void OpenConfig_preSetup()
         bool scale_down_all;
         config.read("scale-down-all-textures", scale_down_all, false);
         config.readEnum("scale-down-textures", g_videoSettings.scaleDownTextures, scale_down_all ? (int)VideoSettings_t::SCALE_ALL : (int)VideoSettings_t::SCALE_SAFE, scaleDownTextures);
-#ifndef FIXED_RES
         config.read("internal-width", g_config.InternalW, 800);
         config.read("internal-height", g_config.InternalH, 600);
 
         ScreenW = g_config.InternalW;
         ScreenH = g_config.InternalH;
+        // default res for full dynamic res
         if(ScreenH == 0)
         {
             ScreenW = 1280;
             ScreenH = 720;
         }
+        // default res for dynamic width
         else if(ScreenW == 0)
         {
             ScreenW = 800;
         }
-#endif
+
         IniProcessing::StrEnumMap scaleModes =
         {
             {"linear", SCALE_DYNAMIC_LINEAR},
@@ -399,10 +400,8 @@ void SaveConfig()
         config.setValue("battery-status", batteryStatus[g_videoSettings.batteryStatus]);
         config.setValue("osk-fill-screen", g_config.osk_fill_screen);
         config.setValue("show-episode-title", showEpisodeTitle[g_config.show_episode_title]);
-#       ifndef FIXED_RES
         config.setValue("internal-width", g_config.InternalW);
         config.setValue("internal-height", g_config.InternalH);
-#       endif
         config.setValue("scale-mode", ScaleMode_strings.at(g_videoSettings.scaleMode));
     }
     config.endGroup();
