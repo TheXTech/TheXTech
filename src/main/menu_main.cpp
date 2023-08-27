@@ -724,6 +724,7 @@ bool mainMenuUpdate()
             {
                 MenuCursorCanMove = false;
                 MenuMode = MENU_MAIN;
+                MenuCursor = 0;
                 PlaySoundMenu(SFX_Do);
             }
         }
