@@ -405,7 +405,7 @@ void DynamicScreen(Screen_t& screen, bool mute)
 }
 
 // NEW: moves qScreen towards vScreen, now including the screen size
-bool Update_qScreen(int Z, int camRate, int resizeRate)
+bool Update_qScreen(int Z, double camRate, double resizeRate)
 {
     if(Z == 2 && !g_compatibility.modern_section_change)
         return false;

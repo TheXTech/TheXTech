@@ -66,7 +66,7 @@ void SetupScreens(bool reset = true);
 void DynamicScreen(Screen_t& screen, bool mute = false);
 
 // NEW: moves qScreen towards vScreen, now including the screen size
-bool Update_qScreen(int Z, int camRate = 2, int resizeRate = 2);
+bool Update_qScreen(int Z, double camRate = 2, double resizeRate = 2);
 
 // Public Sub SuperPrint(SuperWords As String, Font As Integer, X As Single, Y As Single) 'prints text to the screen
 // prints text to the screen
