@@ -97,7 +97,7 @@ void SetupScreens(Screen_t& screen, bool reset)
         SetupScreens(c_screen, reset);
 
         // if needed, defer to canonical screen logic
-        if(!g_compatibility.free_level_res)
+        if(!g_compatibility.allow_multires)
         {
             s_CopyScreen(screen, c_screen);
             return;
@@ -211,7 +211,7 @@ void DynamicScreen(Screen_t& screen, bool mute)
             c_screen.vScreen(2).Y = screen.vScreen(2).Y;
         }
 
-        if(!g_compatibility.free_level_res)
+        if(!g_compatibility.allow_multires)
         {
             DynamicScreen(c_screen, mute);
 
@@ -258,7 +258,7 @@ void DynamicScreen(Screen_t& screen, bool mute)
             const Location_t& section = level[p1.Section];
 
             // use canonical width for checks in NoTurnBack case
-            bool shrink_screen = (NoTurnBack[p1.Section] && g_compatibility.free_level_res);
+            bool shrink_screen = (NoTurnBack[p1.Section] && g_compatibility.allow_multires);
             const double check_W = shrink_screen ? screen.canonical_screen().W : screen.W;
 
             // a number of clauses check whether the section is larger than the screen
@@ -492,7 +492,7 @@ void CenterScreens(Screen_t& screen)
         CenterScreens(c_screen);
 
         // if needed, defer to canonical screen logic
-        if(!g_compatibility.free_level_res)
+        if(!g_compatibility.allow_multires)
         {
             s_CopyScreen(screen, c_screen);
 
@@ -543,7 +543,7 @@ void CenterScreens(Screen_t& screen)
         bool no_turn_back = NoTurnBack[p.Section];
 
         // restrict single vScreens on NoTurnBack sections
-        if(g_compatibility.free_level_res && no_turn_back)
+        if(g_compatibility.allow_multires && no_turn_back)
         {
             MaxWidth = SDL_min(MaxWidth, screen.canonical_screen().W);
 
@@ -552,8 +552,8 @@ void CenterScreens(Screen_t& screen)
                 MaxWidth = SDL_min(MaxWidth, screen.canonical_screen().W / 2);
         }
 
-        // allow the canonical vScreens to be a bit bigger during dynamic screen
-        if(g_compatibility.free_level_res && !screen.Visible && !no_turn_back)
+        // allow the canonical vScreens to approach normal screen size during dynamic screen
+        if(g_compatibility.allow_multires && !screen.Visible && !no_turn_back)
         {
             MinWidth = screen.W;
             MinHeight = screen.H;

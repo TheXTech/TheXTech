@@ -256,7 +256,7 @@ void GetvScreenAverage(vScreen_t& vscreen)
 
     // used ScreenW / ScreenH in VB6 code
     const Screen_t& screen = Screens[vscreen.screen_ref];
-    const Screen_t& use_screen = g_compatibility.free_level_res ? screen : screen.canonical_screen();
+    const Screen_t& use_screen = g_compatibility.allow_multires ? screen : screen.canonical_screen();
 
     const Location_t& section = level[Player[1].Section];
 
@@ -330,7 +330,7 @@ void GetvScreenAverage2(vScreen_t& vscreen)
         return;
 
     const Screen_t& screen = Screens[vscreen.screen_ref];
-    const Screen_t& use_screen = g_compatibility.free_level_res ? screen : screen.canonical_screen();
+    const Screen_t& use_screen = g_compatibility.allow_multires ? screen : screen.canonical_screen();
 
     const Location_t& section = level[Player[1].Section];
 
@@ -669,7 +669,7 @@ void GetvScreenCredits(vScreen_t& vscreen)
 
     // used ScreenW / ScreenH in VB6 code
     const Screen_t& screen = Screens[vscreen.screen_ref];
-    const Screen_t& use_screen = g_compatibility.free_level_res ? screen : screen.canonical_screen();
+    const Screen_t& use_screen = g_compatibility.allow_multires ? screen : screen.canonical_screen();
 
     const Location_t& section = level[Player[1].Section];
 

@@ -125,8 +125,7 @@ static void compatInit(Compatibility_t &c)
     c.modern_section_change = true;
     c.fix_frame_perfect_despawn = true;
     // 1.3.7
-    c.free_level_res = true;
-    c.free_world_res = true;
+    c.allow_multires = true;
     c.modern_npc_activation = true;
     c.disable_background2_tiling = false;
 
@@ -179,8 +178,7 @@ static void compatInit(Compatibility_t &c)
         c.modern_section_change = false;
         c.fix_frame_perfect_despawn = false;
         // 1.3.7
-        c.free_level_res = false;
-        c.free_world_res = false;
+        c.allow_multires = false;
         c.modern_npc_activation = false;
     }
 
@@ -431,8 +429,7 @@ static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
         compat.read("modern-section-change", c.modern_section_change, c.modern_section_change);
         compat.read("fix-frame-perfect-despawn", c.fix_frame_perfect_despawn, c.fix_frame_perfect_despawn);
         // 1.3.7 (but these will be changed in the Compat update)
-        compat.read("free-level-res", c.free_level_res, c.free_level_res);
-        compat.read("free-world-res", c.free_world_res, c.free_world_res);
+        compat.read("allow-multires", c.allow_multires, c.allow_multires);
         compat.read("modern-npc-activation", c.modern_npc_activation, c.modern_npc_activation);
         compat.read("disable-background2-tiling", c.disable_background2_tiling, c.disable_background2_tiling);
     }

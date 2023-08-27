@@ -678,7 +678,7 @@ void DrawBackground(int S, int Z)
                 GFXBackground2[A].ColorUpper.r, GFXBackground2[A].ColorUpper.g, GFXBackground2[A].ColorUpper.b);
         }
 
-        if(g_compatibility.free_level_res && (vScreen[Z].Height > GFXBackground2Height[A] || (vScreen[Z].Height == ScreenH / 2 && ScreenH > GFXBackground2Height[A])))
+        if(g_compatibility.allow_multires && (vScreen[Z].Height > GFXBackground2Height[A] || (vScreen[Z].Height == ScreenH / 2 && ScreenH > GFXBackground2Height[A])))
         {
             tempLocation.Y = level[S].Height - GFXBackground2Height[A];
         }

@@ -77,9 +77,9 @@ void UpdateInternalRes()
     int req_w = g_config.InternalW;
     int req_h = g_config.InternalH;
 
-    if((!g_compatibility.free_level_res && !LevelSelect && !GameMenu)
-        || (!g_compatibility.free_world_res && LevelSelect && !GameMenu))
+    if(!g_compatibility.allow_multires)
     {
+        // TODO: use the correct canonical screen's resolution here
         if((req_w != 0 && req_w < 800) || (req_h != 0 && req_h < 600))
         {
             req_w = 800;
@@ -173,8 +173,7 @@ void UpdateInternalRes()
         }
 
         // force >800x600 resolution if required
-        if((!g_compatibility.free_level_res && !LevelSelect && !GameMenu)
-            || (!g_compatibility.free_world_res && LevelSelect && !GameMenu))
+        if(!g_compatibility.allow_multires)
         {
             if(int_w < 800)
             {

@@ -1076,7 +1076,7 @@ void ProcEvent(eventindex_t index, int whichPlayer, bool NoEffect)
                         {
                             Screen_t& screen = Screens[screen_i];
                             // for width / height logic
-                            const Screen_t& use_screen = g_compatibility.free_level_res ? screen : screen.canonical_screen();
+                            const Screen_t& use_screen = g_compatibility.allow_multires ? screen : screen.canonical_screen();
 
                             int Z1 = screen.vScreen_refs[0];
                             int Z2 = screen.vScreen_refs[1];

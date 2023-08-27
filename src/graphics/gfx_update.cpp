@@ -1538,7 +1538,7 @@ void UpdateGraphics(bool skipRepaint)
             continue_qScreen = false;
 
         // noturningback
-        if(!LevelEditor && NoTurnBack[Player[plr_Z].Section] && g_compatibility.free_level_res)
+        if(!LevelEditor && NoTurnBack[Player[plr_Z].Section] && g_compatibility.allow_multires)
         {
             // goal: find vScreen currently on this section that is the furthest left
             // only do anything with the last vScreen (of a Visible screen) in the section
@@ -3116,12 +3116,12 @@ void UpdateGraphics(bool skipRepaint)
 //        Else
 
         // shake screen to tell player game is currently paused
-        if(g_compatibility.free_level_res && !continue_qScreen_local && (qScreen || qScreen_canonical) && !s_shakeScreen.active)
+        if(g_compatibility.allow_multires && !continue_qScreen_local && (qScreen || qScreen_canonical) && !s_shakeScreen.active)
         {
             s_forcedShakeScreen = true;
             doShakeScreen(1, 1, SHAKE_RANDOM, 0, 0.0);
         }
-        else if(g_compatibility.free_level_res && !(qScreen || qScreen_canonical) && s_forcedShakeScreen)
+        else if(g_compatibility.allow_multires && !(qScreen || qScreen_canonical) && s_forcedShakeScreen)
         {
             s_forcedShakeScreen = false;
             doShakeScreen(1, 1, SHAKE_RANDOM, 0, 0.1);

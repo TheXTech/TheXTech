@@ -269,7 +269,7 @@ static void s_SetvScreenWorld(double fx, double fy)
     vScreen[1].Y = -fy + vScreen[1].Height / 2.0;
 
     bool allowExpandedFrame = worldHasFrameAssets() /* || g_gameInfo.interface4_stretch*/;
-    if(s_currentWorldSection != 0 || !g_config.world_map_expand_view || !g_compatibility.free_world_res || !allowExpandedFrame)
+    if(s_currentWorldSection != 0 || !g_config.world_map_expand_view || !g_compatibility.allow_multires || !allowExpandedFrame)
     {
         const Location_t& sLoc = ((s_currentWorldSection != 0 && allowExpandedFrame)
             ? static_cast<Location_t>(WorldMusic[s_currentWorldSection].Location)

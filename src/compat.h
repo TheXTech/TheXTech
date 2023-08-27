@@ -94,8 +94,7 @@ struct Compatibility_t
     bool fix_frame_perfect_despawn; // if NPC comes onscreen later in the same frame it timed out, should still be able to spawn
     unsigned int bitblit_background_colour[3];
     // 1.3.7
-    bool free_level_res;
-    bool free_world_res;
+    bool allow_multires;
     bool disable_background2_tiling;
     bool modern_npc_activation;
 
