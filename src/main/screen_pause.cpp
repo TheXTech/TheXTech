@@ -521,7 +521,9 @@ bool Logic(int plr)
                     if(target != Player[A].Character)
                     {
                         SwapCharacter(A, target);
-                        SetupPlayers();
+
+                        if(LevelSelect)
+                            SetupPlayers();
                     }
                 }
             }
