@@ -18,7 +18,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <SDL2/SDL.h>
 #include <SDL2/SDL_version.h>
 #include <SDL2/SDL_render.h>
 #include <SDL2/SDL_opengl.h>
@@ -30,13 +29,11 @@
 
 #include "render_sdl.h"
 #include "video.h"
-#include "config.h"
 
 #include "core/window.h"
 #include "core/render.h"
 
 #include "main/cheat_code.h"
-#include "main/speedrunner.h"
 
 #include "sdl_proxy/sdl_stdinc.h"
 #include <fmt_format_ne.h>
@@ -170,10 +167,6 @@ void RenderSDL::close()
         SDL_DestroyTexture(m_tBuffer);
     m_tBuffer = nullptr;
 
-    if(m_t2xScreen)
-        SDL_DestroyTexture(m_t2xScreen);
-    m_t2xScreen = nullptr;
-
     if(m_gRenderer)
         SDL_DestroyRenderer(m_gRenderer);
     m_gRenderer = nullptr;
@@ -235,45 +228,6 @@ void RenderSDL::repaint()
     SDL_SetTextureColorMod(m_tBuffer, 255, 255, 255);
     SDL_SetTextureAlphaMod(m_tBuffer, 255);
     SDL_RenderCopyEx(m_gRenderer, m_tBuffer, &sourceRect, &destRect, 0.0, nullptr, SDL_FLIP_NONE);
-
-#ifndef THEXTECH_FIXED_RES
-    // emergency speedrun timer for very low-resolution devices rendering high-resolution levels
-    if(m_t2xScreen)
-    {
-        // set target to 2x map
-        setTarget2xScreen();
-
-        SDL_SetTextureBlendMode(m_t2xScreen, SDL_BLENDMODE_BLEND);
-        SDL_SetRenderDrawColor(m_gRenderer, 0, 0, 0, 0);
-        SDL_RenderClear(m_gRenderer);
-
-        // temporarily set ScreenW / H
-        int real_ScreenW = ScreenW;
-        int real_ScreenH = ScreenH;
-        ScreenW = w * 2;
-        ScreenH = h * 2;
-
-        // render content
-        if(PrintFPS > 0)
-            SuperPrint(fmt::format_ne("{0}", int(PrintFPS)), 1, 8, 8, 0.f, 1.f, 0.f);
-        speedRun_renderControls(1, -1, SPEEDRUN_ALIGN_LEFT);
-        speedRun_renderTimer();
-
-        // restore ScreenW / H
-        ScreenW = real_ScreenW;
-        ScreenH = real_ScreenH;
-
-        // draw 2x map to screen
-        setTargetScreen();
-
-        SDL_Rect destRect = {0, 0, w, h};
-        SDL_Rect sourceRect = {0, 0, w * 2, h * 2};
-
-        SDL_SetTextureColorMod(m_t2xScreen, 255, 255, 255);
-        SDL_SetTextureAlphaMod(m_t2xScreen, 255);
-        SDL_RenderCopyEx(m_gRenderer, m_t2xScreen, &sourceRect, &destRect, 0.0, nullptr, SDL_FLIP_NONE);
-    }
-#endif // #ifndef THEXTECH_FIXED_RES
 
     Controls::RenderTouchControls();
 
@@ -356,21 +310,6 @@ void RenderSDL::updateViewport()
         ScaleHeight = ScreenH;
         m_current_scale_mode = g_videoSettings.scaleMode;
     }
-
-    // TODO: remove this (deprecated, too specific of a case)
-    // if necessary, create / update the emergency 2x screen map
-    if(m_t2xScreen)
-    {
-        SDL_DestroyTexture(m_t2xScreen);
-        m_t2xScreen = nullptr;
-    }
-#ifndef THEXTECH_FIXED_RES
-    if(scale < 0.5f)
-    {
-        m_t2xScreen = SDL_CreateTexture(m_gRenderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, render_w * 2, render_h * 2);
-        SDL_SetRenderTarget(m_gRenderer, m_tBuffer);
-    }
-#endif // #ifndef THEXTECH_FIXED_RES
 }
 
 void RenderSDL::resetViewport()
@@ -465,14 +404,6 @@ void RenderSDL::setTargetScreen()
         return;
     SDL_SetRenderTarget(m_gRenderer, nullptr);
     m_recentTarget = nullptr;
-}
-
-void RenderSDL::setTarget2xScreen()
-{
-    if(!m_t2xScreen || m_recentTarget == m_t2xScreen)
-        return;
-    SDL_SetRenderTarget(m_gRenderer, m_t2xScreen);
-    m_recentTarget = m_t2xScreen;
 }
 
 void RenderSDL::loadTextureInternal(StdPicture &target, uint32_t width, uint32_t height, uint8_t *RGBApixels, uint32_t pitch)
