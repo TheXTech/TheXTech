@@ -454,26 +454,6 @@ bool vScreenCollision(int A, const SpeedlessLocation_t &Loc2)
            (-vScreen[A].Y + vScreen[A].Height >= Loc2.Y);
 }
 
-// vScreen collisions assuming the game is 800 x 600
-bool vScreenCollisionCanonical(double left, double top, const Location_t &Loc2)
-{
-    bool tempvScreenCollision = false;
-    if(-left <= Loc2.X + Loc2.Width)
-    {
-        if(-left + 800 >= Loc2.X)
-        {
-            if(-top <= Loc2.Y + Loc2.Height)
-            {
-                if(-top + 600 >= Loc2.Y)
-                {
-                    tempvScreenCollision = true;
-                }
-            }
-        }
-    }
-    return tempvScreenCollision;
-}
-
 // vScreen collisions 2
 bool vScreenCollision2(int A, const Location_t &Loc2)
 {
