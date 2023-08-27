@@ -7531,7 +7531,7 @@ void AddPlayer(int Character)
     SizeCheck(Player[numPlayers]);
 
     // the rest only matters during level play
-    if(LevelSelect && (StartLevel.empty() || !NoMap))
+    if(LevelSelect)
         return;
 
     int alivePlayer = CheckLiving();
@@ -7609,7 +7609,7 @@ void DropPlayer(const int A)
     numPlayers --;
 
     // the rest only matters during level play
-    if(LevelSelect && (StartLevel.empty() || !NoMap))
+    if(LevelSelect)
         return;
 
     SetupScreens();
