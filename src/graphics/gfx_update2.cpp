@@ -20,6 +20,8 @@
 
 #include <sdl_proxy/sdl_stdinc.h>
 
+#include <fontman/font_manager.h>
+
 #include "../globals.h"
 #include "../gfx.h"
 #include "../frame_timer.h"
@@ -45,72 +47,6 @@
 
 #include <fmt_format_ne.h>
 
-// based on Wohlstand's string-breaking algorithm (gfx_message.cpp)
-static void s_DrawLevelName(const std::string& name, int lX, int bY, int w)
-{
-    const int charWidth = 16;
-    const int lineHeight = 20;
-
-    int lineStart = 0; // start of current line
-    int lastWord = 0; // planned start of next line
-    int numLines = 0; // n lines
-    int maxChars = w/charWidth+1; // 27 by default
-
-    // PASS ONE: determine the number of lines
-    while(lineStart < int(name.size()))
-    {
-        lastWord = lineStart;
-
-        for(int i = lineStart + 1; i <= lineStart+maxChars; i++)
-        {
-            auto c = name[size_t(i) - 1];
-
-            if((lastWord == lineStart && i == lineStart+maxChars) || i == int(name.size()) || c == '\n')
-            {
-                lastWord = i;
-                break;
-            }
-            else if(c == ' ')
-            {
-                lastWord = i;
-            }
-        }
-
-        numLines ++;
-        lineStart = lastWord;
-    }
-
-    // PASS TWO: draw the lines
-    int Y = bY - (numLines - 1) * 20;
-    lineStart = 0; // start of current line
-
-    while(lineStart < int(name.size()))
-    {
-        lastWord = lineStart;
-        for(int i = lineStart + 1; i <= lineStart+maxChars; i++)
-        {
-            auto c = name[size_t(i) - 1];
-
-            if((lastWord == lineStart && i == lineStart+maxChars) || i == int(name.size()) || c == '\n')
-            {
-                lastWord = i;
-                break;
-            }
-            else if(c == ' ')
-            {
-                lastWord = i;
-            }
-        }
-
-        SuperPrint(size_t(lastWord) - size_t(lineStart), name.c_str() + size_t(lineStart),
-            2,
-            lX,
-            Y);
-
-        lineStart = lastWord;
-        Y += lineHeight;
-    }
-}
 
 // draws GFX to screen when on the world map/world map editor
 void UpdateGraphics2(bool skipRepaint)
@@ -688,7 +624,29 @@ void UpdateGraphics2(bool skipRepaint)
         // Print the level's name
         if(!WorldPlayer[1].LevelName.empty())
         {
-            s_DrawLevelName(WorldPlayer[1].LevelName, pX + 116, vScreen[Z].ScreenTop - 21, vScreen[Z].ScreenLeft + vScreen[Z].Width - (pX + 116));
+            int lnlx = pX + 116;
+            int lnrx = vScreen[Z].ScreenLeft + vScreen[Z].Width;
+
+            // could make these arrays if multiple world players ever supported
+            static std::string cache_LevelName;
+            static double cache_vScreen_W = 0.0;
+            static std::string cache_LevelName_Split;
+            static int cache_LevelName_H = 0;
+
+            int font = FontManager::fontIdFromSmbxFont(2);
+
+            if(cache_LevelName != WorldPlayer[1].LevelName || cache_vScreen_W != vScreen[Z].Width)
+            {
+                int max_width = lnrx - lnlx;
+
+                cache_LevelName_Split = cache_LevelName = WorldPlayer[1].LevelName;
+                // mutates cache_LevelName_Split
+                cache_LevelName_H = FontManager::optimizeTextPx(cache_LevelName_Split, max_width, font).h();
+            }
+
+            FontManager::printText(cache_LevelName_Split.c_str(), cache_LevelName_Split.size(),
+                                    lnlx, vScreen[Z].ScreenTop - 21 - cache_LevelName_H,
+                                    FontManager::fontIdFromSmbxFont(2));
         }
 
         g_worldScreenFader.draw();
