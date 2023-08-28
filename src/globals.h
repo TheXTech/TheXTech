@@ -1018,6 +1018,12 @@ struct WorldMusic_t
     // int64_t Z = 0;
 };
 
+//! NEW: a camera zone for the world map
+struct WorldArea_t
+{
+    IntegerLocation_t Location;
+};
+
 //Public Type EditorCursor 'The editor's cursor
 struct EditorCursor_t
 {
@@ -1060,6 +1066,9 @@ struct EditorCursor_t
     WorldMusic_t WorldMusic;
 //End Type
 
+//! NEW
+    WorldArea_t WorldArea;
+
     // clears any strings of objects stored by the world cursor
     void ClearStrings();
 };
@@ -1083,6 +1092,8 @@ struct WorldPlayer_t
     int Move3 = 0;
 // EXTRA: last move direction
     int LastMove = 0;
+// EXTRA: current world map section
+    int Section = 0;
 //    LevelName As String
     std::string LevelName;
 //End Type
@@ -1349,6 +1360,10 @@ extern RangeArr<WorldMusic_t, 1, maxWorldMusic> WorldMusic;
 DECLREF_T(WorldMusic);
 //Public numWorldMusic As Integer
 extern int numWorldMusic;
+//NEW
+extern RangeArr<WorldArea_t, 1, maxWorldAreas> WorldArea;
+DECLREF_T(WorldArea);
+extern int numWorldAreas;
 //Public WorldLevel(1 To maxWorldLevels) As WorldLevel
 extern RangeArr<WorldLevel_t, 1, maxWorldLevels> WorldLevel;
 DECLREF_T(WorldLevel);

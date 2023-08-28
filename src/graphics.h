@@ -62,6 +62,9 @@ void GetvScreenAuto(vScreen_t& vscreen);
 // NEW: get the fixed-res vScreen position for a player, and write the top-left coordinate to (left, top)
 void GetPlayerScreen(double W, double H, const Player_t& p, double& left, double& top);
 
+//! NEW: Get the vscreen for a world player, with world section bounds checking
+void GetvScreenWorld(vScreen_t& vscreen);
+
 // Public Sub SetupGraphics()
 //! DUMMY AND USELESS
 void SetupGraphics();
@@ -77,7 +80,7 @@ void DynamicScreen(Screen_t& screen, bool mute = false);
 // NEW: limit vScreens to playable section area and center them on the real screen
 void CenterScreens(Screen_t& screen);
 // NEW: moves qScreen towards vScreen, now including the screen size
-bool Update_qScreen(int Z, int camRate = 2, int resizeRate = 2);
+bool Update_qScreen(int Z, double camRate = 2, double resizeRate = 2);
 
 // Public Sub SuperPrint(SuperWords As String, Font As Integer, X As Single, Y As Single) 'prints text to the screen
 // prints text to the screen

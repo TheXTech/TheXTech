@@ -330,6 +330,7 @@ void initEditorStrings()
     g_editorStrings.tooltipLevels = "Levels";
     g_editorStrings.tooltipPaths = "Paths";
     g_editorStrings.tooltipMusic = "Music";
+    g_editorStrings.tooltipArea = "Area";
     g_editorStrings.tooltipFile = "File";
     g_editorStrings.tooltipShow = "Show";
 

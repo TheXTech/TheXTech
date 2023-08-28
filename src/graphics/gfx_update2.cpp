@@ -30,6 +30,7 @@
 #include "../player.h"
 #include "../compat.h"
 #include "../config.h"
+#include "../sound.h"
 #include "../main/speedrunner.h"
 #include "../main/trees.h"
 #include "../main/screen_pause.h"
@@ -46,6 +47,119 @@
 #include "gfx_special_frames.h"
 
 #include <fmt_format_ne.h>
+
+
+static void s_getMargins(const Screen_t& screen, double& margin, double& marginTop, double& marginBottom)
+{
+    margin = 66;
+    marginTop = 130;
+    marginBottom = 66;
+
+    if(screen.H < 400)
+    {
+        marginBottom = 24;
+        marginTop = 72;
+    }
+    else if(screen.H < 500)
+    {
+        marginBottom = 32;
+        marginTop = 96;
+    }
+
+    if(screen.W < 400)
+        margin = 24;
+    else if(screen.W < 600)
+        margin = 32;
+    else if(screen.W < 800)
+        margin = 48;
+}
+
+void GetvScreenWorld(vScreen_t& vscreen)
+{
+    const Screen_t& screen = Screens[vscreen.screen_ref];
+    const WorldPlayer_t& wp = WorldPlayer[vscreen.player];
+    const Location_t& wpLoc = wp.Location;
+
+    double margin, marginTop, marginBottom;
+    s_getMargins(screen, margin, marginTop, marginBottom);
+
+    vscreen.Top = marginTop;
+    vscreen.Height = screen.H - marginBottom - marginTop;
+    vscreen.Left = margin;
+    vscreen.Width = screen.W - (margin * 2);
+
+    // limit the vScreen to its 800x600 size (668x404) if the new world map frame assets are missing
+    const bool haveFrameAssets = worldHasFrameAssets();
+    if(!haveFrameAssets)
+    {
+        if(vscreen.Width > 668)
+        {
+            vscreen.Left += (vscreen.Width - 668) / 2;
+            vscreen.Width = 668;
+        }
+
+        if(vscreen.Height > 404)
+        {
+            vscreen.Left += (vscreen.Width - 404) / 2;
+            vscreen.Width = 404;
+        }
+    }
+
+    double fX = wpLoc.X + wpLoc.Width / 2;
+    double fY = wpLoc.Y + wpLoc.Height / 2;
+
+    // apply a temporary vScreen focus
+    if(vscreen.TempDelay)
+    {
+        fX = vscreen.tempX;
+        fY = vscreen.TempY;
+    }
+
+    vscreen.X = -fX + vscreen.Width / 2;
+    vscreen.Y = -fY + vscreen.Height / 2;
+
+    // begin bounds logic
+
+    // default bounds are the canonical vScreen
+    const Screen_t& c_screen = screen.canonical_screen();
+    double c_margin, c_marginTop, c_marginBottom;
+    s_getMargins(c_screen, c_margin, c_marginTop, c_marginBottom);
+
+    double c_width = c_screen.W - c_margin * 2;
+    double c_height = c_screen.H - c_marginTop - c_marginBottom;
+
+    const Location_t defaultBounds = newLoc(fX - c_width / 2, fY - c_height / 2, c_width, c_height);
+
+    // get the bounds from the player's section if possible, otherwise the defaults
+    const Location_t& bounds = (wp.Section != 0)
+        ? static_cast<Location_t>(WorldArea[wp.Section].Location)
+        : defaultBounds;
+
+    if(bounds.Width < vscreen.Width)
+    {
+        vscreen.Left += (vscreen.Width - bounds.Width) / 2;
+        vscreen.Width = bounds.Width;
+        vscreen.X = -bounds.X;
+    }
+    else if(-vscreen.X < bounds.X)
+        vscreen.X = -bounds.X;
+    else if(-vscreen.X > bounds.X + bounds.Width - vscreen.Width)
+        vscreen.X = -(bounds.X + bounds.Width - vscreen.Width);
+
+    if(bounds.Height < vscreen.Height)
+    {
+        vscreen.Top += (vscreen.Height - bounds.Height) / 2;
+        vscreen.Height = bounds.Height;
+        vscreen.Y = -bounds.Y;
+    }
+    else if(-vscreen.Y < bounds.Y)
+        vscreen.Y = -bounds.Y;
+    else if(-vscreen.Y > bounds.Y + bounds.Height - vscreen.Height)
+        vscreen.Y = -(bounds.Y + bounds.Height - vscreen.Height);
+
+    vscreen.ScreenTop = vscreen.Top;
+    vscreen.ScreenLeft = vscreen.Left;
+}
 
 
 // draws GFX to screen when on the world map/world map editor
@@ -86,6 +200,25 @@ void UpdateGraphics2(bool skipRepaint)
         vScreen[Z].ScreenTop = 0;
         vScreen[Z].Width = ScreenW;
         vScreen[Z].Height = ScreenH;
+    }
+    else
+    {
+        GetvScreenWorld(vScreen[Z]);
+
+        if(qScreen)
+        {
+            qScreen = Update_qScreen(1, g_worldCamSpeed, g_worldCamSpeed);
+
+            if(qScreen && g_worldPlayCamSound)
+                PlaySound(SFX_Camera);
+
+            // reset cam sound
+            g_worldPlayCamSound = false;
+
+            // reset cam speed
+            if(!qScreen)
+                g_worldCamSpeed = 1.5;
+        }
     }
 
     SpecialFrames();
@@ -392,6 +525,40 @@ void UpdateGraphics2(bool skipRepaint)
             }
         }
 
+        for(A = 1; A <= numWorldAreas; A++)
+        {
+            WorldArea_t &area = WorldArea[A];
+            if(vScreenCollision(Z, static_cast<Location_t>(area.Location)))
+            {
+                // single color for now
+                float r = 1.0f;
+                float g = 0.8f;
+                float b = 0.2f;
+
+                // draw rect with outline
+                XRender::renderRect(vScreen[Z].X + area.Location.X, vScreen[Z].Y + area.Location.Y,
+                    area.Location.Width, area.Location.Height,
+                    0.0f, 0.0f, 0.0f, 1.0f, false);
+                XRender::renderRect(vScreen[Z].X + area.Location.X + 1, vScreen[Z].Y + area.Location.Y + 1,
+                    area.Location.Width - 2, area.Location.Height - 2,
+                    0.0f, 0.0f, 0.0f, 1.0f, false);
+                XRender::renderRect(vScreen[Z].X + area.Location.X + 2, vScreen[Z].Y + area.Location.Y + 2,
+                    area.Location.Width - 4, area.Location.Height - 4,
+                    r, g, b, 1.0f, false);
+                XRender::renderRect(vScreen[Z].X + area.Location.X + 3, vScreen[Z].Y + area.Location.Y + 3,
+                    area.Location.Width - 6, area.Location.Height - 6,
+                    r, g, b, 1.0f, false);
+
+                // highlight selectable area
+                XRender::renderRect(vScreen[Z].X + area.Location.X + 4, vScreen[Z].Y + area.Location.Y + 4,
+                    28, 28,
+                    1.0f, 1.0f, 0.0f, 0.5f, true);
+
+                // label with index
+                SuperPrint(std::to_string(A), 1, vScreen[Z].X + area.Location.X + 4, vScreen[Z].Y + area.Location.Y + 4);
+            }
+        }
+
 #ifdef __3DS__
         XRender::setTargetLayer(3);
 #endif
@@ -464,7 +631,6 @@ void UpdateGraphics2(bool skipRepaint)
 
             RenderFrame(newLoc(0, 0, ScreenW, ScreenH), newLoc(vScreen[Z].ScreenLeft, vScreen[Z].ScreenTop, vScreen[Z].Width, vScreen[Z].Height),
                 GFX.WorldMapFrame_Tile, border_valid ? &GFX.WorldMapFrame_Border : nullptr, &g_worldMapFrameBorderInfo);
-
         }
         else
         {

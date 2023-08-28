@@ -121,6 +121,7 @@ bool OpenWorld(std::string FilePath)
     numWorldLevels = 0;
     numWorldPaths = 0;
     numWorldMusic = 0;
+    numWorldAreas = 0;
 
     WorldName = wld.EpisodeTitle;
     wld.charactersToS64();
@@ -347,35 +348,24 @@ bool OpenWorld(std::string FilePath)
 
     for(auto &m : wld.arearects)
     {
-        numWorldMusic++;
-        if(numWorldMusic > maxWorldMusic)
+        if(!(m.flags & WorldAreaRect::SETUP_SET_VIEWPORT))
+            continue;
+
+        numWorldAreas++;
+        if(numWorldAreas > maxWorldAreas)
         {
-            numWorldMusic = maxWorldMusic;
+            numWorldAreas = maxWorldAreas;
             break;
         }
 
-        auto &box = WorldMusic[numWorldMusic];
+        auto &area = WorldArea[numWorldAreas];
 
-        box = WorldMusic_t();
+        area = WorldArea_t();
 
-        box.Location.X = m.x;
-        box.Location.Y = m.y;
-        box.Location.Width = m.w;
-        box.Location.Height = m.h;
-
-        box.Type = 0;
-
-        if(m.flags & WorldAreaRect::SETUP_CHANGE_MUSIC)
-        {
-            box.Type = int(m.music_id);
-
-            // new:
-            std::string music_file = g_dirEpisode.resolveFileCase(m.music_file);
-            if(!music_file.empty())
-                SetS(box.MusicFile, music_file); // adds to LevelString
-        }
-
-        treeWorldMusicAdd(&box);
+        area.Location.X = m.x;
+        area.Location.Y = m.y;
+        area.Location.Width = m.w;
+        area.Location.Height = m.h;
     }
 
     if(!LevelEditor)
@@ -491,6 +481,7 @@ void ClearWorld(bool quick)
     numWorldLevels = 0;
     numWorldPaths = 0;
     numWorldMusic = 0;
+    numWorldAreas = 0;
     RestartLevel = false;
     WorldStarsShowPolicy = WorldData::STARS_UNSPECIFIED;
     NoMap = false;

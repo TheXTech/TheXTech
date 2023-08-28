@@ -58,6 +58,7 @@ struct OptCursor_t
         WLD_SCENES = 8,
         WLD_LEVELS = 9,
         WLD_TILES = 7,
+        WLD_AREA = 16,
     };
     int current = LVL_SELECT;
 };

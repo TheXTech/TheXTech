@@ -743,6 +743,29 @@ void UpdateEditor()
                     }
                 }
 
+                if(MouseRelease && !MagicHand) // World map areas
+                {
+                    for(int A = numWorldAreas; A >= 1; A--)
+                    {
+                        if(CursorCollision(EditorCursor.Location, newLoc(WorldArea[A].Location.X, WorldArea[A].Location.Y, 32, 32)))
+                        {
+                            PlaySound(SFX_Grab);
+                            optCursor.current = OptCursor_t::WLD_AREA;
+                            OptCursorSync();
+                            EditorCursor.Mode = OptCursor_t::WLD_AREA;
+                            EditorCursor.Location = static_cast<Location_t>(WorldArea[A].Location);
+                            SetCursor();
+                            EditorCursor.WorldArea = WorldArea[A];
+                            if(A != numWorldAreas)
+                                WorldArea[A] = WorldArea[numWorldAreas];
+                            numWorldAreas--;
+                            MouseRelease = false;
+                            MouseCancel = true; /* Simulate "Focus out" inside of SMBX Editor */
+                            break;
+                        }
+                    }
+                }
+
                 if(MouseRelease && !MagicHand) // World map music
                 {
                     for(int A : treeWorldMusicQuery(EditorCursor.Location, SORTMODE_NONE))
@@ -1109,6 +1132,39 @@ void UpdateEditor()
                             MouseRelease = false;
                             if(EditorCursor.SubMode == 0)
                                 EditorCursor.SubMode = OptCursor_t::LVL_WATER;
+                            break;
+                        }
+                    }
+                }
+
+                if((SharedCursor.Move || MouseRelease)
+                    && (EditorCursor.SubMode == -1 || EditorCursor.SubMode == 0
+                        || EditorCursor.SubMode == OptCursor_t::WLD_AREA))
+                {
+                    for(int A = numWorldAreas; A >= 1; A--)
+                    {
+                        if(CursorCollision(EditorCursor.Location, newLoc(WorldArea[A].Location.X, WorldArea[A].Location.Y, 32, 32)))
+                        {
+                            for(int X = 16; X < WorldArea[A].Location.Width; X += 32)
+                            {
+                                for(int Y = 16; Y < WorldArea[A].Location.Height; Y += 32)
+                                {
+                                    tempLocation = static_cast<Location_t>(WorldArea[A].Location);
+                                    tempLocation.X += X - EffectWidth[10] / 2;
+                                    tempLocation.Y += Y - EffectHeight[10] / 2;
+                                    NewEffect(EFFID_SMOKE_S3, tempLocation);
+                                }
+                            }
+
+                            PlaySound(SFX_ShellHit);
+                            if(A != numWorldAreas)
+                            {
+                                WorldArea[A] = WorldArea[numWorldAreas];
+                            }
+                            numWorldAreas--;
+                            MouseRelease = false;
+                            if(EditorCursor.SubMode == 0)
+                                EditorCursor.SubMode = OptCursor_t::WLD_AREA;
                             break;
                         }
                     }
@@ -1822,6 +1878,26 @@ void UpdateEditor()
                         SetS(WorldMusic[numWorldMusic].MusicFile, GetS(EditorCursor.WorldMusic.MusicFile));
                     }
                     treeWorldMusicAdd(&WorldMusic[numWorldMusic]);
+                }
+            }
+            else if(EditorCursor.Mode == OptCursor_t::WLD_AREA) // Areas
+            {
+                for(A = 1; A <= numWorldAreas; A++)
+                {
+                    if(CursorCollision(EditorCursor.Location,
+                        newLoc(WorldArea[A].Location.X, WorldArea[A].Location.Y, 32, 32)))
+                    {
+                        CanPlace = false;
+                        break;
+                    }
+                }
+
+                if(CanPlace)
+                {
+                    EditorCursor.WorldArea.Location.X = EditorCursor.Location.X;
+                    EditorCursor.WorldArea.Location.Y = EditorCursor.Location.Y;
+                    numWorldAreas++;
+                    WorldArea[numWorldAreas] = EditorCursor.WorldArea;
                 }
             }
         }
@@ -2687,6 +2763,19 @@ void SetCursor()
 //                break;
 //            }
 //        }
+    }
+    else if(EditorCursor.Mode == OptCursor_t::WLD_AREA) // World Area
+    {
+        EditorCursor.Location.Height = 32;
+        EditorCursor.Location.Width = 32;
+        EditorCursor.WorldArea.Location.X = EditorCursor.Location.X;
+        EditorCursor.WorldArea.Location.Y = EditorCursor.Location.Y;
+
+        if(EditorCursor.WorldArea.Location.Width < 32)
+            EditorCursor.WorldArea.Location.Width = 32;
+
+        if(EditorCursor.WorldArea.Location.Height < 32)
+            EditorCursor.WorldArea.Location.Height = 32;
     }
 }
 

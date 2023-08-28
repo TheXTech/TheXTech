@@ -24,8 +24,19 @@
 
 #include "../screen_fader.h"
 
+//! Holds the screen overlay for the world map
 extern ScreenFader g_worldScreenFader;
 
+//! Multiplier for world map qScreen
+extern double g_worldCamSpeed;
+
+//! Play sound if world map qScreen stays active next frame
+extern bool g_worldPlayCamSound;
+
+//! NEW: set the world player's section variable based on its position
+extern void worldCheckSection(WorldPlayer_t& wp);
+
+//! NEW: reset the world players' section variables without invoking qScreen
 extern void worldResetSection();
 
 extern void worldWaitForFade(int waitTicks = -1);

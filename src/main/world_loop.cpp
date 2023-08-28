@@ -49,13 +49,11 @@
 //! Holds the screen overlay for the world map
 ScreenFader g_worldScreenFader;
 
-// world music index of the current world section
-static int s_currentWorldSection = 0;
-static bool s_playCamSound = false;
-static int s_camMult = 1;
-static double s_pathX = 0;
-static double s_pathY = 0;
+//! Multiplier for world map qScreen
+double g_worldCamSpeed = 1.5;
 
+//! Play sound if world map qScreen stays active next frame
+bool g_worldPlayCamSound = false;
 
 void worldWaitForFade(int waitTicks)
 {
@@ -136,47 +134,27 @@ void g_playWorldMusic(WorldMusic_t &mus)
 }
 
 // returns size of largest box centered around loc contained in s
-static inline double s_worldSectionArea(WorldMusicRef_t s, const Location_t& loc)
+static inline double s_worldSectionArea(WorldAreaRef_t s, const Location_t& loc)
 {
-    double cx = loc.X + loc.Width / 2;
-    double cy = loc.Y + loc.Height / 2;
+    double fX = loc.X + loc.Width / 2;
+    double fY = loc.Y + loc.Height / 2;
 
-    double side_x = SDL_min(cx - s->Location.X, s->Location.X + s->Location.Width - cx);
-    double side_y = SDL_min(cy - s->Location.Y, s->Location.Y + s->Location.Height - cy);
+    double side_x = SDL_min(fX - s->Location.X, s->Location.X + s->Location.Width - fX);
+    double side_y = SDL_min(fY - s->Location.Y, s->Location.Y + s->Location.Height - fY);
 
     return side_x * side_y;
 }
 
-static inline bool s_worldUpdateMusic(const Location_t &loc, bool section_only = false)
+static inline bool s_worldUpdateMusic(const Location_t &loc)
 {
     bool ret = false;
 
-    int best_section = 0;
-    double best_section_area = 0;
-    double best_wasted_area = 0;
-
-    for(WorldMusicRef_t t : treeWorldMusicQuery(loc, false))
+    for(auto t : treeWorldMusicQuery(loc, false))
     {
         WorldMusic_t &mus = *t;
         if(CheckCollision(loc, mus.Location))
         {
-            if(mus.Location.Width >= 64 && mus.Location.Height >= 64)
-            {
-                double section_area = s_worldSectionArea(t, loc);
-                double wasted_area = mus.Location.Width * mus.Location.Height - section_area;
-
-                if(section_area >= best_section_area && (section_area > best_section_area || wasted_area < best_wasted_area))
-                {
-                    best_section = (int)t;
-                    best_section_area = section_area;
-                    best_wasted_area = wasted_area;
-                }
-
-                if(mus.Type == 0)
-                    continue;
-            }
-
-            if(!section_only && g_isWorldMusicNotSame(mus))
+            if(g_isWorldMusicNotSame(mus))
             {
                 g_playWorldMusic(mus);
                 ret = true;
@@ -184,19 +162,53 @@ static inline bool s_worldUpdateMusic(const Location_t &loc, bool section_only =
         }
     }
 
-    if(best_section != s_currentWorldSection)
-    {
-        s_currentWorldSection = best_section;
+    return ret;
+}
 
-        if(!qScreen)
+static void s_worldCheckSection(WorldPlayer_t& wp, const Location_t& loc)
+{
+    int best_section = 0;
+    double best_section_area = 0;
+    double best_wasted_area = 0;
+
+    for(int A = 1; A <= numWorldAreas; A++)
+    {
+        WorldArea_t &area = WorldArea[A];
+        if(CheckCollision(loc, static_cast<Location_t>(area.Location)))
         {
-            qScreen = true;
-            s_playCamSound = true;
-            qScreenLoc[1] = vScreen[1];
+            double section_area = s_worldSectionArea(A, loc);
+            double wasted_area = area.Location.Width * area.Location.Height - section_area;
+
+            if(section_area >= best_section_area && (section_area > best_section_area || wasted_area < best_wasted_area))
+            {
+                best_section = A;
+                best_section_area = section_area;
+                best_wasted_area = wasted_area;
+            }
         }
     }
 
-    return ret;
+    if(best_section != wp.Section)
+    {
+        wp.Section = best_section;
+
+        // enable a qScreen to the new section
+        if(!qScreen)
+        {
+            qScreen = true;
+            g_worldPlayCamSound = true;
+            qScreenLoc[1] = vScreen[1];
+
+            // move camera quickly for transitions!
+            if(g_worldCamSpeed < 4)
+                g_worldCamSpeed = 4;
+        }
+    }
+}
+
+void worldCheckSection(WorldPlayer_t& wp)
+{
+    s_worldCheckSection(wp, wp.Location);
 }
 
 static inline double getWPHeight()
@@ -213,6 +225,12 @@ static inline double getWPHeight()
         return 32.0;
         break;
     }
+}
+
+void worldResetSection()
+{
+    worldCheckSection(WorldPlayer[1]);
+    qScreen = false;
 }
 
 //static inline double getWorldPlayerX()
@@ -235,85 +253,6 @@ static inline double getWorldPlayerCenterY()
     return WorldPlayer[1].Location.Y - 10 + WorldPlayer[1].Location.Height - getWPHeight() / 2;
 }
 
-static void s_SetvScreenWorld(double fx, double fy)
-{
-    double margin = 66;
-    double marginTop = 130;
-    double marginBottom = 66;
-
-    if(ScreenH < 400)
-    {
-        marginBottom = 24;
-        marginTop = 72;
-    }
-    else if(ScreenH < 500)
-    {
-        marginBottom = 32;
-        marginTop = 96;
-    }
-
-    if(ScreenW < 400)
-        margin = 24;
-    else if(ScreenW < 600)
-        margin = 32;
-    else if(ScreenW < 800)
-        margin = 48;
-
-    vScreen[1].Top = marginTop;
-    vScreen[1].Height = ScreenH - marginBottom - marginTop;
-    vScreen[1].Left = margin;
-    vScreen[1].Width = ScreenW - (margin * 2);
-
-
-    vScreen[1].X = -fx + vScreen[1].Width / 2.0;
-    vScreen[1].Y = -fy + vScreen[1].Height / 2.0;
-
-    bool allowExpandedFrame = worldHasFrameAssets() /* || g_gameInfo.interface4_stretch*/;
-    if(s_currentWorldSection != 0 || !g_config.world_map_expand_view || !g_compatibility.allow_multires || !allowExpandedFrame)
-    {
-        const Location_t& sLoc = ((s_currentWorldSection != 0 && allowExpandedFrame)
-            ? static_cast<Location_t>(WorldMusic[s_currentWorldSection].Location)
-            : newLoc(fx - 334, fy - 202, 668, 404));
-
-        if(sLoc.Width < vScreen[1].Width)
-        {
-            vScreen[1].Left += (vScreen[1].Width - sLoc.Width) / 2;
-            vScreen[1].Width = sLoc.Width;
-            vScreen[1].X = -sLoc.X;
-        }
-        else if(-vScreen[1].X < sLoc.X)
-            vScreen[1].X = -sLoc.X;
-        else if(-vScreen[1].X > sLoc.X + sLoc.Width - vScreen[1].Width)
-            vScreen[1].X = -(sLoc.X + sLoc.Width - vScreen[1].Width);
-
-        if(sLoc.Height < vScreen[1].Height)
-        {
-            vScreen[1].Top += (vScreen[1].Height - sLoc.Height) / 2;
-            vScreen[1].Height = sLoc.Height;
-            vScreen[1].Y = -sLoc.Y;
-        }
-        else if(-vScreen[1].Y < sLoc.Y)
-            vScreen[1].Y = -sLoc.Y;
-        else if(-vScreen[1].Y > sLoc.Y + sLoc.Height - vScreen[1].Height)
-            vScreen[1].Y = -(sLoc.Y + sLoc.Height - vScreen[1].Height);
-    }
-
-    vScreen[1].ScreenTop = vScreen[1].Top;
-    vScreen[1].ScreenLeft = vScreen[1].Left;
-}
-
-static void s_SetvScreenWorld(const Location_t& loc)
-{
-    s_SetvScreenWorld(loc.X + loc.Width / 2, loc.Y + loc.Height / 2);
-}
-
-void worldResetSection()
-{
-    s_worldUpdateMusic(WorldPlayer[1].Location);
-    qScreen = false;
-    s_SetvScreenWorld(WorldPlayer[1].Location.X + WorldPlayer[1].Location.Width / 2.0, WorldPlayer[1].Location.Y + WorldPlayer[1].Location.Height / 2.0);
-}
-
 void WorldLoop()
 {
     bool musicReset = false;
@@ -325,20 +264,8 @@ void WorldLoop()
     if(SingleCoop > 0)
         SingleCoop = 1;
 
-    s_SetvScreenWorld(WorldPlayer[1].Location.X + WorldPlayer[1].Location.Width / 2.0, WorldPlayer[1].Location.Y + WorldPlayer[1].Location.Height / 2.0);
-
-    if(qScreen)
-    {
-        qScreen = Update_qScreen(1, 4 * s_camMult, 4 * s_camMult);
-
-        if(qScreen && s_playCamSound)
-            PlaySound(SFX_Camera);
-
-        if(!qScreen)
-            s_camMult = 1;
-
-        s_playCamSound = false;
-    }
+    // remove any temporary path focus
+    vScreen[1].TempDelay = 0;
 
     if(numPlayers > 2)
         numPlayers = 1;
@@ -373,8 +300,7 @@ void WorldLoop()
         if(LevelBeatCode > 0)
         {
             s_worldUpdateMusic(WorldPlayer[1].Location);
-            s_SetvScreenWorld(WorldPlayer[1].Location);
-            qScreen = false;
+            worldResetSection();
 
             for(A = 1; A <= 4; A++)
             {
@@ -396,8 +322,7 @@ void WorldLoop()
         else if(LevelBeatCode == -1)
         {
             s_worldUpdateMusic(WorldPlayer[1].Location);
-            s_SetvScreenWorld(WorldPlayer[1].Location);
-            qScreen = false;
+            worldResetSection();
 
             //for(A = 1; A <= numWorldLevels; A++)
             for(WorldLevelRef_t t : treeWorldLevelQuery(WorldPlayer[1].Location, SORTMODE_NONE))
@@ -821,6 +746,8 @@ void WorldLoop()
 //        }
         WorldPlayer[1].LastMove = 0;
 
+        worldCheckSection(WorldPlayer[1]);
+
         if(s_worldUpdateMusic(WorldPlayer[1].Location))
             musicReset = false;
 
@@ -916,6 +843,8 @@ void LevelPath(const WorldLevel_t &Lvl, int Direction, bool Skp)
     Location_t tempLocation;
 //    int A = 0;
 
+    bool hit = false;
+
     // Up
     if(Direction == 1 || Direction == 5)
     {
@@ -935,7 +864,10 @@ void LevelPath(const WorldLevel_t &Lvl, int Direction, bool Skp)
                 if(CheckCollision(tempLocation, path.Location))
                 {
                     PathPath(path, Skp);
-                    s_camMult = 3;
+                    hit = true;
+                    // move camera quickly for path branch switch
+                    if(g_worldCamSpeed < 4 && !Skp)
+                        g_worldCamSpeed = 4;
                 }
             }
         }
@@ -960,7 +892,10 @@ void LevelPath(const WorldLevel_t &Lvl, int Direction, bool Skp)
                 if(CheckCollision(tempLocation, path.Location))
                 {
                     PathPath(path, Skp);
-                    s_camMult = 3;
+                    hit = true;
+                    // move camera quickly for path branch switch
+                    if(g_worldCamSpeed < 4 && !Skp)
+                        g_worldCamSpeed = 4;
                 }
             }
         }
@@ -985,7 +920,10 @@ void LevelPath(const WorldLevel_t &Lvl, int Direction, bool Skp)
                 if(CheckCollision(tempLocation, path.Location))
                 {
                     PathPath(path, Skp);
-                    s_camMult = 3;
+                    hit = true;
+                    // move camera quickly for path branch switch
+                    if(g_worldCamSpeed < 4 && !Skp)
+                        g_worldCamSpeed = 4;
                 }
             }
         }
@@ -1010,14 +948,23 @@ void LevelPath(const WorldLevel_t &Lvl, int Direction, bool Skp)
                 if(CheckCollision(tempLocation, path.Location))
                 {
                     PathPath(path, Skp);
-                    s_camMult = 3;
+                    hit = true;
+                    // move camera quickly for path branch switch
+                    if(g_worldCamSpeed < 4 && !Skp)
+                        g_worldCamSpeed = 4;
                 }
             }
         }
     }
 
-    qScreen = true;
-    qScreenLoc[1] = vScreen[1];
+    // quickly return to player
+    if(g_config.EnableInterLevelFade && hit && !Skp)
+    {
+        qScreen = true;
+        qScreenLoc[1] = vScreen[1];
+        if(g_worldCamSpeed < 8)
+            g_worldCamSpeed = 8;
+    }
 }
 
 void PlayerPath(WorldPlayer_t &p)
@@ -1125,22 +1072,26 @@ void PathPath(WorldPath_t &Pth, bool Skp)
     {
         Pth.Active = true;
 
-        s_worldUpdateMusic(static_cast<Location_t>(Pth.Location), true);
+        // set a temporary vScreen focus
+        vScreen[1].tempX = Pth.Location.X + Pth.Location.Width / 2.0;
+        vScreen[1].TempY = Pth.Location.Y + Pth.Location.Height / 2.0;
+        vScreen[1].TempDelay = 1;
 
-        s_playCamSound = false;
+        // update section (no cam sound)
+        s_worldCheckSection(WorldPlayer[1], static_cast<Location_t>(Pth.Location));
+        g_worldPlayCamSound = false;
 
-        if(g_compatibility.modern_section_change)
+        // force qScreen in modern mode
+        if(g_config.EnableInterLevelFade)
         {
             qScreen = true;
             qScreenLoc[1] = vScreen[1];
         }
+        // fully disable otherwise
         else
         {
             qScreen = false;
         }
-
-        s_pathX = Pth.Location.X + Pth.Location.Width / 2.0;
-        s_pathY = Pth.Location.Y + Pth.Location.Height / 2.0;
 
         PlaySound(SFX_NewPath);
         PathWait();
@@ -1201,22 +1152,26 @@ void PathPath(WorldPath_t &Pth, bool Skp)
                     lev.Active = true;
                     if(!Skp)
                     {
-                        s_worldUpdateMusic(static_cast<Location_t>(lev.Location), true);
+                        // set a temporary vScreen focus
+                        vScreen[1].tempX = lev.Location.X + lev.Location.Width / 2.0;
+                        vScreen[1].TempY = lev.Location.Y + lev.Location.Height / 2.0;
+                        vScreen[1].TempDelay = 1;
 
-                        s_playCamSound = false;
+                        // update world map section (no cam sound)
+                        s_worldCheckSection(WorldPlayer[1], static_cast<Location_t>(lev.Location));
+                        g_worldPlayCamSound = false;
 
-                        if(g_compatibility.modern_section_change)
+                        // force qScreen in modern mode
+                        if(g_config.EnableInterLevelFade)
                         {
                             qScreen = true;
                             qScreenLoc[1] = vScreen[1];
                         }
+                        // fully disable it otherwise
                         else
                         {
                             qScreen = false;
                         }
-
-                        s_pathX = lev.Location.X + lev.Location.Width / 2.0;
-                        s_pathY = lev.Location.Y + lev.Location.Height / 2.0;
 
                         PlaySound(SFX_NewPath);
                         PathWait();
@@ -1239,18 +1194,6 @@ void PathWait()
         if(canProceedFrame())
         {
             speedRun_tick();
-
-            s_SetvScreenWorld(s_pathX, s_pathY);
-
-            if(qScreen)
-            {
-                D_pLogDebug("qScreen multiplier %d", s_camMult);
-                qScreen = Update_qScreen(1, 2 * s_camMult, 2 * s_camMult);
-
-                if(!qScreen)
-                    s_camMult = 1;
-            }
-
             UpdateGraphics2();
             UpdateSound();
             g_worldScreenFader.update();
