@@ -180,7 +180,7 @@ void ScreenFader::draw(bool fullscreen)
     int drawW = ScreenW;
     int drawH = ScreenH;
 
-    if(m_focusScreen != 0 && !fullscreen)
+    if(m_focusScreen > 0 && m_focusScreen <= c_vScreenCount && !fullscreen)
     {
         drawW = vScreen[m_focusScreen].Width;
         drawH = vScreen[m_focusScreen].Height;
@@ -189,7 +189,7 @@ void ScreenFader::draw(bool fullscreen)
     int focusX = m_focusSet ? m_focusX : (drawW / 2);
     int focusY = m_focusSet ? m_focusY : (drawH / 2);
 
-    if(m_focusSet && m_focusScreen >= 0)
+    if(m_focusSet && m_focusScreen > 0 && m_focusScreen <= c_vScreenCount)
     {
         focusX += vScreen[m_focusScreen].X;
         focusY += vScreen[m_focusScreen].Y;
