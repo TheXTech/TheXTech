@@ -21,6 +21,8 @@
 #include <algorithm>
 #include <array>
 
+#include <Logger/logger.h>
+
 #include "../globals.h"
 #include "../npc.h"
 #include "../sound.h"
@@ -5697,15 +5699,18 @@ void UpdateNPCs()
     });
 
     int last_NPC = numNPCs + 1;
-    for(int A : NPCQueues::Killed) // KILL THE NPCS <><><><><><><><><><><><><><><><><><><><><><><><><><><><><><
+    size_t KilledQueue_check = NPCQueues::Killed.size();
+    size_t KilledQueue_known = NPCQueues::Killed.size();
+
+    for(size_t i = 0; i < KilledQueue_check; i++) // KILL THE NPCS <><><><><><><><><><><><><><><><><><><><><><><><><><><><><><
     {
+        A = NPCQueues::Killed[i];
+
         // duplicated entry, no problem
         if(A == last_NPC)
             continue;
 
-        // something's wrong in the sort order
-        if(A > last_NPC)
-            break;
+        SDL_assert(A < last_NPC); // something's wrong in the sort order
 
         if(NPC[A].Killed > 0)
         {
@@ -5717,11 +5722,70 @@ void UpdateNPCs()
                 else
                     NPC[A].Location.SpeedX += 0.5;
             }
+
             KillNPC(A, NPC[A].Killed);
+
+            // KillNPC sometimes adds duplicate / unnecessary members to NPCQueues::Killed
+            bool real_new_killed = false;
+            if(NPCQueues::Killed.size() > KilledQueue_known)
+            {
+                for(size_t j = NPCQueues::Killed.size() - 1; j >= KilledQueue_known; j--)
+                {
+                    int K = NPCQueues::Killed[j];
+                    if(K != A && K >= 1 && K <= numNPCs)
+                    {
+                        real_new_killed = true;
+                        break;
+                    }
+                }
+
+                // ignore if no real new NPCs added
+                if(!real_new_killed)
+                    NPCQueues::Killed.resize(KilledQueue_known);
+                else
+                {
+                    pLogDebug("During KillNPC(%d), %d actual new killed NPC indexes added.", A, (int)(NPCQueues::Killed.size() - KilledQueue_known));
+                    KilledQueue_known = NPCQueues::Killed.size();
+                }
+            }
+
+            // rare cases exist where a real new NPC is killed (mostly events that hide layers)
+            // sort and check the ones smaller than A
+            if(real_new_killed)
+            {
+                size_t old_check = KilledQueue_check;
+
+                // partition to check all the ones < A this frame
+                auto first_bigger_it = std::partition(NPCQueues::Killed.begin() + KilledQueue_check, NPCQueues::Killed.end(),
+                [A](NPCRef_t a)
+                {
+                    return (int)a < A;
+                });
+
+                KilledQueue_check = first_bigger_it - NPCQueues::Killed.begin();
+
+                if(old_check != KilledQueue_check)
+                {
+                    pLogDebug("Found %d indexes lower than %d. Sorting to check this frame.", (int)(first_bigger_it - NPCQueues::Killed.begin()) - (int)old_check, A);
+
+                    // re-sort the range to check this frame
+                    std::sort(NPCQueues::Killed.begin() + i + 1, NPCQueues::Killed.begin() + KilledQueue_check,
+                    [](NPCRef_t a, NPCRef_t b)
+                    {
+                        return a > b;
+                    });
+                }
+            }
         }
     }
 
-    NPCQueues::Killed.clear();
+    if(NPCQueues::Killed.size() > KilledQueue_check)
+    {
+        NPCQueues::Killed.erase(NPCQueues::Killed.begin(), NPCQueues::Killed.begin() + KilledQueue_check);
+        pLogDebug("Checking %d newly killed NPC indexes next frame.", (int)NPCQueues::Killed.size());
+    }
+    else
+        NPCQueues::Killed.clear();
 
     //    if(nPlay.Online == true)
     //    {
