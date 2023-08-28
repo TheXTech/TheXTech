@@ -1085,6 +1085,8 @@ struct WorldPlayer_t
     int Move3 = 0;
 // EXTRA: last move direction
     int LastMove = 0;
+// EXTRA: current world map section
+    int Section = 0;
 //    LevelName As String
     std::string LevelName;
 //End Type

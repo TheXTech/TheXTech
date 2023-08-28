@@ -918,6 +918,8 @@ int GameMain(const CmdLineSetup_t &setup)
                 ResetSoundFX();
                 setMusicStartDelay(); // Don't start music until all gfx will be loaded
 
+                worldResetSection();
+
                 if(curWorldMusic > 0)
                     StartMusic(curWorldMusic);
 

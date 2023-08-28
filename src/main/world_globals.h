@@ -26,6 +26,12 @@
 
 extern ScreenFader g_worldScreenFader;
 
+//! NEW: set the world player's section variable based on its position
+extern void worldCheckSection(WorldPlayer_t& wp);
+
+//! NEW: reset the world players' section variables without invoking qScreen
+extern void worldResetSection();
+
 extern void worldWaitForFade(int waitTicks = -1);
 
 #endif // WORLD_GLOBALS_H

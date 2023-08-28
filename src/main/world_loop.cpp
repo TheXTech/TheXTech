@@ -120,6 +120,18 @@ void g_playWorldMusic(WorldMusic_t &mus)
     StartMusic(mus.Type);
 }
 
+// returns size of largest box centered around loc contained in s
+static inline double s_worldSectionArea(WorldAreaRef_t s, const Location_t& loc)
+{
+    double fX = loc.X + loc.Width / 2;
+    double fY = loc.Y + loc.Height / 2;
+
+    double side_x = SDL_min(fX - s->Location.X, s->Location.X + s->Location.Width - fX);
+    double side_y = SDL_min(fY - s->Location.Y, s->Location.Y + s->Location.Height - fY);
+
+    return side_x * side_y;
+}
+
 static inline bool s_worldUpdateMusic(const Location_t &loc)
 {
     bool ret = false;
@@ -140,6 +152,52 @@ static inline bool s_worldUpdateMusic(const Location_t &loc)
     return ret;
 }
 
+static void s_worldCheckSection(WorldPlayer_t& wp, const Location_t& loc)
+{
+    int best_section = 0;
+    double best_section_area = 0;
+    double best_wasted_area = 0;
+
+    for(int A = 1; A <= numWorldAreas; A++)
+    {
+        WorldArea_t &area = WorldArea[A];
+        if(CheckCollision(loc, static_cast<Location_t>(area.Location)))
+        {
+            double section_area = s_worldSectionArea(A, loc);
+            double wasted_area = area.Location.Width * area.Location.Height - section_area;
+
+            if(section_area >= best_section_area && (section_area > best_section_area || wasted_area < best_wasted_area))
+            {
+                best_section = A;
+                best_section_area = section_area;
+                best_wasted_area = wasted_area;
+            }
+        }
+    }
+
+    if(best_section != wp.Section)
+    {
+        wp.Section = best_section;
+
+        // enable a qScreen to the new section
+        if(!qScreen)
+        {
+            qScreen = true;
+            g_worldPlayCamSound = true;
+            qScreenLoc[1] = vScreen[1];
+
+            // move camera quickly for transitions!
+            if(g_worldCamSpeed < 4)
+                g_worldCamSpeed = 4;
+        }
+    }
+}
+
+void worldCheckSection(WorldPlayer_t& wp)
+{
+    s_worldCheckSection(wp, wp.Location);
+}
+
 static inline double getWPHeight()
 {
     switch(WorldPlayer[1].Type)
@@ -154,6 +212,12 @@ static inline double getWPHeight()
         return 32.0;
         break;
     }
+}
+
+void worldResetSection()
+{
+    worldCheckSection(WorldPlayer[1]);
+    qScreen = false;
 }
 
 //static inline double getWorldPlayerX()
@@ -223,6 +287,7 @@ void WorldLoop()
         if(LevelBeatCode > 0)
         {
             s_worldUpdateMusic(WorldPlayer[1].Location);
+            worldResetSection();
 
             for(A = 1; A <= 4; A++)
             {
@@ -244,6 +309,7 @@ void WorldLoop()
         else if(LevelBeatCode == -1)
         {
             s_worldUpdateMusic(WorldPlayer[1].Location);
+            worldResetSection();
 
             //for(A = 1; A <= numWorldLevels; A++)
             for(WorldLevelRef_t t : treeWorldLevelQuery(WorldPlayer[1].Location, SORTMODE_NONE))
@@ -666,6 +732,8 @@ void WorldLoop()
 //            PlaySound(SFX_Slide);
 //        }
         WorldPlayer[1].LastMove = 0;
+
+        worldCheckSection(WorldPlayer[1]);
 
         if(s_worldUpdateMusic(WorldPlayer[1].Location))
             musicReset = false;
