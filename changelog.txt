@@ -2,6 +2,8 @@ TheXTech Changelog.
 
 Changelog for 1.3.7-dev
 -Added "opensesame" world map cheat to unlock paths from level (@ds-sloth)
+-Added smooth path unlock animations at the world map (@ds-sloth)
+-Added full game and in-game editor support for world map sections that limit screen view (@ds-sloth)
 -<WIP>
 
 Changelog for 1.3.6.1
