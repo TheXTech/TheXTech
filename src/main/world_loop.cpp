@@ -225,6 +225,7 @@ void worldResetSection()
 {
     worldCheckSection(WorldPlayer[1]);
     qScreen = false;
+    GetvScreenWorld(vScreen[1]);
 }
 
 //static inline double getWorldPlayerX()
@@ -688,6 +689,8 @@ void WorldLoop()
                             WorldPlayer[1].Location.X = lvl.WarpX;
                         if(int(lvl.WarpY) != -1)
                             WorldPlayer[1].Location.Y = lvl.WarpY;
+
+                        worldResetSection();
 
                         LevelBeatCode = 6;
 
