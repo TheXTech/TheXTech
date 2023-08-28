@@ -79,6 +79,7 @@ struct ScreenFader
 
     void update();
 
+    // fullscreen should be false if the fader is being drawn inside a vScreen, otherwise true
     void draw(bool fullscreen = true);
 };
 

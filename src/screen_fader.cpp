@@ -177,6 +177,30 @@ void ScreenFader::draw(bool fullscreen)
 
     XRender::offsetViewportIgnore(true);
 
+    int drawW = ScreenW;
+    int drawH = ScreenH;
+
+    if(m_focusScreen != 0 && !fullscreen)
+    {
+        drawW = vScreen[m_focusScreen].Width;
+        drawH = vScreen[m_focusScreen].Height;
+    }
+
+    int focusX = m_focusSet ? m_focusX : (drawW / 2);
+    int focusY = m_focusSet ? m_focusY : (drawH / 2);
+
+    if(m_focusSet && m_focusScreen >= 0)
+    {
+        focusX += vScreen[m_focusScreen].X;
+        focusY += vScreen[m_focusScreen].Y;
+
+        if(fullscreen)
+        {
+            focusX += vScreen[m_focusScreen].ScreenLeft;
+            focusY += vScreen[m_focusScreen].ScreenTop;
+        }
+    }
+
     switch(m_shape)
     {
     default:
@@ -186,23 +210,9 @@ void ScreenFader::draw(bool fullscreen)
             StdPicture& effect = *s_loaded_effects[m_shape - S_CUSTOM]->get();
 
             if(m_focusUniform >= 0)
-            {
-                GLint focusX = m_focusSet ? m_focusX : (ScreenW / 2);
-                GLint focusY = m_focusSet ? m_focusY : (ScreenH / 2);
-
-                if(m_focusSet && m_focusScreen >= 0)
-                {
-                    focusX += vScreen[m_focusScreen].X;
-                    focusY += vScreen[m_focusScreen].Y;
-                }
-
                 XRender::assignUniform(effect, m_focusUniform, UniformValue_t((GLfloat)focusX, (GLfloat)focusY));
-            }
 
-            if(m_focusScreen > 0)
-                XRender::renderTextureScale(0, 0, vScreen[m_focusScreen].Width, vScreen[m_focusScreen].Height, effect, 1.0, 1.0, 1.0, m_scale);
-            else
-                XRender::renderTextureScale(0, 0, ScreenW, ScreenH, effect, 1.0, 1.0, 1.0, m_scale);
+            XRender::renderTextureScale(0, 0, drawW, drawH, effect, 1.0, 1.0, 1.0, m_scale);
 
             // if catastrophic failure, fallback to normal fader
             if(effect.inited)
@@ -212,84 +222,38 @@ void ScreenFader::draw(bool fullscreen)
 
     // fallthrough
     case S_FADE:
-        XRender::renderRect(0, 0, ScreenW, ScreenH, color_r, color_b, color_g, m_scale, true);
+        XRender::renderRect(0, 0, drawW, drawH, color_r, color_b, color_g, m_scale, true);
         break;
 
     case S_RECT:
         if(m_scale >= 1.0f)
-            XRender::renderRect(0, 0, ScreenW, ScreenH, color_r, color_b, color_g, m_scale, true);
+            XRender::renderRect(0, 0, drawW, drawH, color_r, color_b, color_g, m_scale, true);
         else
         {
-            int focusX = m_focusSet ? m_focusX : (ScreenW / 2);
-            int focusY = m_focusSet ? m_focusY : (ScreenH / 2);
-
-            int RenderW = ScreenW;
-            int RenderH = ScreenH;
-
-            if(m_focusScreen >= 0)
-            {
-                focusX += vScreen[m_focusScreen].X;
-                focusY += vScreen[m_focusScreen].Y;
-
-                if(fullscreen)
-                {
-                    focusX += vScreen[m_focusScreen].ScreenLeft;
-                    focusY += vScreen[m_focusScreen].ScreenTop;
-                }
-                else
-                {
-                    RenderW = vScreen[m_focusScreen].Width;
-                    RenderH = vScreen[m_focusScreen].Height;
-                }
-            }
-
-            float rightW = (RenderW - focusX),
-                    bottomH = (RenderH - focusY),
+            float rightW = (drawW - focusX),
+                    bottomH = (drawH - focusY),
                     leftW = focusX * m_scale, // left side
                     topY = focusY * m_scale, // top side
-                    rightX = RenderW - SDL_ceil(rightW * m_scale) + 1, // right side
-                    bottomY = RenderH - SDL_ceil(bottomH * m_scale) + 1; // bottom side
+                    rightX = drawW - SDL_ceil(rightW * m_scale) + 1, // right side
+                    bottomY = drawH - SDL_ceil(bottomH * m_scale) + 1; // bottom side
 
             // Left side
-            XRender::renderRect(0, 0, leftW, RenderH, color_r, color_b, color_g, 1.f, true);
+            XRender::renderRect(0, 0, leftW, drawH, color_r, color_b, color_g, 1.f, true);
             // right side
-            XRender::renderRect(rightX, 0, rightW * m_scale, RenderH, color_r, color_b, color_g, 1.f, true);
+            XRender::renderRect(rightX, 0, rightW * m_scale, drawH, color_r, color_b, color_g, 1.f, true);
             // Top side
-            XRender::renderRect(0, 0, RenderW, topY, color_r, color_b, color_g, 1.f, true);
+            XRender::renderRect(0, 0, drawW, topY, color_r, color_b, color_g, 1.f, true);
             // Bottom side
-            XRender::renderRect(0, bottomY, RenderW, bottomH * m_scale, color_r, color_b, color_g, 1.f, true);
+            XRender::renderRect(0, bottomY, drawW, bottomH * m_scale, color_r, color_b, color_g, 1.f, true);
         }
         break;
 
     case S_CIRCLE:
         if(m_scale >= 1.0f)
-            XRender::renderRect(0, 0, ScreenW, ScreenH, color_r, color_b, color_g, m_scale, true);
+            XRender::renderRect(0, 0, drawW, drawH, color_r, color_b, color_g, m_scale, true);
         else
         {
-            int focusX = m_focusSet ? m_focusX : (ScreenW / 2);
-            int focusY = m_focusSet ? m_focusY : (ScreenH / 2);
-
-            int RenderW = ScreenW;
-            int RenderH = ScreenH;
-
-            if(m_focusScreen >= 0)
-            {
-                focusX += vScreen[m_focusScreen].X;
-                focusY += vScreen[m_focusScreen].Y;
-
-                if(fullscreen)
-                {
-                    focusX += vScreen[m_focusScreen].ScreenLeft;
-                    focusY += vScreen[m_focusScreen].ScreenTop;
-                }
-                else
-                {
-                    RenderW = vScreen[m_focusScreen].Width;
-                    RenderH = vScreen[m_focusScreen].Height;
-                }
-            }
-
-            // int radius = ScreenH - (ScreenH * m_scale);
+            // int radius = drawH - (drawH * m_scale);
             int maxRadius = 0, maxRadiusPre;
 
             // top-left corner
@@ -298,17 +262,17 @@ void ScreenFader::draw(bool fullscreen)
                 maxRadius = maxRadiusPre;
 
             // top-right corner
-            maxRadiusPre = std::sqrt(SDL_pow(RenderW - focusX,  2) + SDL_pow(focusY, 2));
+            maxRadiusPre = std::sqrt(SDL_pow(drawW - focusX,  2) + SDL_pow(focusY, 2));
             if(maxRadius < maxRadiusPre)
                 maxRadius = maxRadiusPre;
 
             // bottom-left corner
-            maxRadiusPre = std::sqrt(SDL_pow(focusX, 2) + SDL_pow(RenderH - focusY, 2));
+            maxRadiusPre = std::sqrt(SDL_pow(focusX, 2) + SDL_pow(drawH - focusY, 2));
             if(maxRadius < maxRadiusPre)
                 maxRadius = maxRadiusPre;
 
             // bottom-right corner
-            maxRadiusPre = std::sqrt(SDL_pow(RenderW - focusX, 2) + SDL_pow(RenderH - focusY, 2));
+            maxRadiusPre = std::sqrt(SDL_pow(drawW - focusX, 2) + SDL_pow(drawH - focusY, 2));
             if(maxRadius < maxRadiusPre)
                 maxRadius = maxRadiusPre;
 
@@ -316,37 +280,37 @@ void ScreenFader::draw(bool fullscreen)
 
             XRender::renderCircleHole(focusX, focusY, radius, color_r, color_b, color_g, 1.f);
             // left side
-            XRender::renderRect(0, 0, focusX - radius, RenderH, color_r, color_b, color_g, 1.f, true);
+            XRender::renderRect(0, 0, focusX - radius, drawH, color_r, color_b, color_g, 1.f, true);
             // right side
-            XRender::renderRect(focusX + radius, 0, RenderW - (focusX + radius), RenderH, color_r, color_b, color_g, 1.f, true);
+            XRender::renderRect(focusX + radius, 0, drawW - (focusX + radius), drawH, color_r, color_b, color_g, 1.f, true);
             // Top side
-            XRender::renderRect(0, 0, RenderW, focusY - radius + 1, color_r, color_b, color_g, 1.f, true);
+            XRender::renderRect(0, 0, drawW, focusY - radius + 1, color_r, color_b, color_g, 1.f, true);
             // Bottom side
-            XRender::renderRect(0, focusY + radius, RenderW, RenderH - (focusY + radius), color_r, color_b, color_g, 1.f, true);
+            XRender::renderRect(0, focusY + radius, drawW, drawH - (focusY + radius), color_r, color_b, color_g, 1.f, true);
         }
         break;
 
     case S_FLIP_H:
         if(m_scale >= 1.0f)
-            XRender::renderRect(0, 0, ScreenW, ScreenH, color_r, color_b, color_g, m_scale, true);
+            XRender::renderRect(0, 0, drawW, drawH, color_r, color_b, color_g, m_scale, true);
         else
         {
-            float center = (ScreenH / 2);
+            float center = (drawH / 2);
             float sideHeight = SDL_ceil(center * m_scale);
-            XRender::renderRect(0, 0, ScreenW, sideHeight, color_r, color_b, color_g, 1.f, true);
-            XRender::renderRect(0, ScreenH - sideHeight, ScreenW, sideHeight, color_r, color_b, color_g, 1.f, true);
+            XRender::renderRect(0, 0, drawW, sideHeight, color_r, color_b, color_g, 1.f, true);
+            XRender::renderRect(0, drawH - sideHeight, drawW, sideHeight, color_r, color_b, color_g, 1.f, true);
         }
         break;
 
     case S_FLIP_V:
         if(m_scale >= 1.0f)
-            XRender::renderRect(0, 0, ScreenW, ScreenH, color_r, color_b, color_g, m_scale, true);
+            XRender::renderRect(0, 0, drawW, drawH, color_r, color_b, color_g, m_scale, true);
         else
         {
-            float center = (ScreenW / 2);
+            float center = (drawW / 2);
             float sideWidth = SDL_ceil(center * m_scale);
-            XRender::renderRect(0, 0, sideWidth, ScreenH, color_r, color_b, color_g, 1.f, true);
-            XRender::renderRect(ScreenW - sideWidth, 0, sideWidth, ScreenH, color_r, color_b, color_g, 1.f, true);
+            XRender::renderRect(0, 0, sideWidth, drawH, color_r, color_b, color_g, 1.f, true);
+            XRender::renderRect(drawW - sideWidth, 0, sideWidth, drawH, color_r, color_b, color_g, 1.f, true);
         }
         break;
     }
