@@ -193,6 +193,21 @@ void UpdateGraphics2(bool skipRepaint)
     else
     {
         GetvScreenWorld(vScreen[Z]);
+
+        if(qScreen)
+        {
+            qScreen = Update_qScreen(1, g_worldCamSpeed, g_worldCamSpeed);
+
+            if(qScreen && g_worldPlayCamSound)
+                PlaySound(SFX_Camera);
+
+            // reset cam sound
+            g_worldPlayCamSound = false;
+
+            // reset cam speed
+            if(!qScreen)
+                g_worldCamSpeed = 1.5;
+        }
     }
 
     SpecialFrames();

@@ -22,6 +22,7 @@
 #include <Integrator/integrator.h>
 #include <pge_delay.h>
 #include <fmt_format_ne.h>
+#include <sdl_proxy/sdl_stdinc.h>
 
 #include "../globals.h"
 #include "../frame_timer.h"
@@ -46,6 +47,12 @@
 
 //! Holds the screen overlay for the world map
 ScreenFader g_worldScreenFader;
+
+//! Multiplier for world map qScreen
+double g_worldCamSpeed = 1.5;
+
+//! Play sound if world map qScreen stays active next frame
+bool g_worldPlayCamSound = false;
 
 void worldWaitForFade(int waitTicks)
 {
@@ -830,6 +837,8 @@ void LevelPath(const WorldLevel_t &Lvl, int Direction, bool Skp)
     Location_t tempLocation;
 //    int A = 0;
 
+    bool hit = false;
+
     // Up
     if(Direction == 1 || Direction == 5)
     {
@@ -849,6 +858,10 @@ void LevelPath(const WorldLevel_t &Lvl, int Direction, bool Skp)
                 if(CheckCollision(tempLocation, path.Location))
                 {
                     PathPath(path, Skp);
+                    hit = true;
+                    // move camera quickly for path branch switch
+                    if(g_worldCamSpeed < 4 && !Skp)
+                        g_worldCamSpeed = 4;
                 }
             }
         }
@@ -873,6 +886,10 @@ void LevelPath(const WorldLevel_t &Lvl, int Direction, bool Skp)
                 if(CheckCollision(tempLocation, path.Location))
                 {
                     PathPath(path, Skp);
+                    hit = true;
+                    // move camera quickly for path branch switch
+                    if(g_worldCamSpeed < 4 && !Skp)
+                        g_worldCamSpeed = 4;
                 }
             }
         }
@@ -897,6 +914,10 @@ void LevelPath(const WorldLevel_t &Lvl, int Direction, bool Skp)
                 if(CheckCollision(tempLocation, path.Location))
                 {
                     PathPath(path, Skp);
+                    hit = true;
+                    // move camera quickly for path branch switch
+                    if(g_worldCamSpeed < 4 && !Skp)
+                        g_worldCamSpeed = 4;
                 }
             }
         }
@@ -921,9 +942,22 @@ void LevelPath(const WorldLevel_t &Lvl, int Direction, bool Skp)
                 if(CheckCollision(tempLocation, path.Location))
                 {
                     PathPath(path, Skp);
+                    hit = true;
+                    // move camera quickly for path branch switch
+                    if(g_worldCamSpeed < 4 && !Skp)
+                        g_worldCamSpeed = 4;
                 }
             }
         }
+    }
+
+    // quickly return to player
+    if(g_config.EnableInterLevelFade && hit && !Skp)
+    {
+        qScreen = true;
+        qScreenLoc[1] = vScreen[1];
+        if(g_worldCamSpeed < 8)
+            g_worldCamSpeed = 8;
     }
 }
 
@@ -1037,6 +1071,22 @@ void PathPath(WorldPath_t &Pth, bool Skp)
         vScreen[1].TempY = Pth.Location.Y + Pth.Location.Height / 2.0;
         vScreen[1].TempDelay = 1;
 
+        // update section (no cam sound)
+        s_worldCheckSection(WorldPlayer[1], static_cast<Location_t>(Pth.Location));
+        g_worldPlayCamSound = false;
+
+        // force qScreen in modern mode
+        if(g_config.EnableInterLevelFade)
+        {
+            qScreen = true;
+            qScreenLoc[1] = vScreen[1];
+        }
+        // fully disable otherwise
+        else
+        {
+            qScreen = false;
+        }
+
         PlaySound(SFX_NewPath);
         PathWait();
     }
@@ -1100,6 +1150,22 @@ void PathPath(WorldPath_t &Pth, bool Skp)
                         vScreen[1].tempX = lev.Location.X + lev.Location.Width / 2.0;
                         vScreen[1].TempY = lev.Location.Y + lev.Location.Height / 2.0;
                         vScreen[1].TempDelay = 1;
+
+                        // update world map section (no cam sound)
+                        s_worldCheckSection(WorldPlayer[1], static_cast<Location_t>(lev.Location));
+                        g_worldPlayCamSound = false;
+
+                        // force qScreen in modern mode
+                        if(g_config.EnableInterLevelFade)
+                        {
+                            qScreen = true;
+                            qScreenLoc[1] = vScreen[1];
+                        }
+                        // fully disable it otherwise
+                        else
+                        {
+                            qScreen = false;
+                        }
 
                         PlaySound(SFX_NewPath);
                         PathWait();
