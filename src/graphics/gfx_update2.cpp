@@ -214,10 +214,11 @@ void UpdateGraphics2(bool skipRepaint)
 
             // reset cam sound
             g_worldPlayCamSound = false;
-
-            // reset cam speed
-            if(!qScreen)
-                g_worldCamSpeed = 1.5;
+        }
+        // reset cam speed
+        else
+        {
+            g_worldCamSpeed = 1.5;
         }
     }
 

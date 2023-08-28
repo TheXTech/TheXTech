@@ -223,6 +223,10 @@ void UpdateInternalRes()
             GetvScreenAverage(Screens[0].canonical_screen().vScreen(1));
         GameMenu = true;
     }
+
+    // disable world map qScreen if active
+    if(LevelSelect && qScreen)
+        qScreen = false;
 }
 
 void UpdateWindowRes()
