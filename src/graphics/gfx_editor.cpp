@@ -18,6 +18,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <fmt_format_ne.h>
+
 #include "core/render.h"
 #include "globals.h"
 #include "graphics.h"
@@ -29,8 +31,11 @@
 #include "npc_id.h"
 #include "player.h"
 
+#include "main/trees.h"
+
 #include "editor.h"
 #include "editor/new_editor.h"
+#include "editor/editor_strings.h"
 #include "editor/magic_block.h"
 
 #ifdef THEXTECH_INTERPROC_SUPPORTED
@@ -811,6 +816,20 @@ void DrawEditorWorld()
         XRender::renderTexture(X, Y,
             32, 32,
             GFX.ECursor[2], 0, 0);
+
+        // show coordinates of nearby level for help making warps
+        for(WorldLevel_t* t : treeWorldLevelQuery(newLoc(EditorCursor.Location.X, EditorCursor.Location.Y, 1, 1), SORTMODE_NONE))
+        {
+            WorldLevel_t &lvl = *t;
+            if(CursorCollision(EditorCursor.Location, lvl.Location))
+            {
+                double at_X = lvl.Location.X + lvl.Location.Width / 2 + vScreen[Z].X;
+                double at_Y = lvl.Location.Y + vScreen[Z].Y - 40;
+                XRender::renderRect(at_X - 80, at_Y - 4, 160, 44, 0.0f, 0.0f, 0.0f, 0.5f, true);
+                SuperPrintCenter(fmt::format_ne("{0}: {1}", g_editorStrings.letterCoordX, static_cast<int>(lvl.Location.X)), 3, at_X, at_Y);
+                SuperPrintCenter(fmt::format_ne("{0}: {1}", g_editorStrings.letterCoordY, static_cast<int>(lvl.Location.Y)), 3, at_X, at_Y + 20);
+            }
+        }
     }
 
     editorScreen.UpdateEditorScreen(EditorScreen::CallMode::Render);

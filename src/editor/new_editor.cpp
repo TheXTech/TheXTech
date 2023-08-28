@@ -5231,14 +5231,6 @@ void EditorScreen::UpdateEditorScreen(CallMode mode, bool second_screen)
         UpdateLevelScreen(mode);
     else if(EditorCursor.Mode == OptCursor_t::WLD_PATHS)
         UpdatePathScreen(mode);
-    else if(WorldEditor)
-    {
-        SuperPrintR(mode, "THE CURSOR IS ON TILE...", 3, 40, 40);
-        SuperPrintR(mode, "X: "+std::to_string(32*(int)std::floor(EditorCursor.Location.X/32)), 3, 10, 80);
-        SuperPrintR(mode, "Y: "+std::to_string(32*(int)std::floor(EditorCursor.Location.Y/32)), 3, 10, 100);
-        SuperPrintR(mode, "IN WORLD COORDINATES.", 3, 40, 140);
-        SuperPrintR(mode, "(Deprecated)", 3, 40, 160);
-    }
 
     if(mode == CallMode::Render && e_CursorX >= 0 && GamePaused == PauseCode::None)
     {
