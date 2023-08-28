@@ -53,6 +53,8 @@ void GetvScreenAverage(vScreen_t& vscreen);
 // Public Sub GetvScreenAverage2() ' Get the average screen position for all players with no level edge detection
 //  Get the average screen position for all players with no level edge detection
 void GetvScreenAverage2(vScreen_t& vscreen);
+//! NEW: Get the vscreen for a world player, with world section bounds checking
+void GetvScreenWorld(vScreen_t& vscreen);
 // Public Sub SetupGraphics()
 //! DUMMY AND USELESS
 void SetupGraphics();
