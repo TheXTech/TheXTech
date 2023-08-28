@@ -763,6 +763,7 @@ void NPCHit(int A, int B, int C)
                     NPC[A].Damage += 5;
                     NPC[A].Immune = 20;
                     NPC[C].Killed = 9;
+                    NPCQueues::Killed.push_back(C);
                 }
             }
             else
