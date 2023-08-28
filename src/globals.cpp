@@ -141,6 +141,8 @@ int numPlayers = 0;
 int numWorldLevels = 0;
 RangeArr<WorldMusic_t, 1, maxWorldMusic> WorldMusic;
 int numWorldMusic = 0;
+RangeArr<WorldArea_t, 1, maxWorldAreas> WorldArea;
+int numWorldAreas = 0;
 RangeArr<WorldLevel_t, 1, maxWorldLevels> WorldLevel;
 RangeArr<Background_t, 1, (maxBackgrounds + maxWarps)> Background;
 RangeArr<Effect_t, 1, maxEffects> Effect;

@@ -375,6 +375,7 @@ void UpdateGraphics2(bool skipRepaint)
                     GFXEffect[Effect[A].Type], 0, Effect[A].Frame * EffectHeight[Effect[A].Type]);
             }
         }
+
         for(WorldMusic_t* t : treeWorldMusicQuery(sLeft, sTop, sRight, sBottom, true))
         {
             WorldMusic_t &music = *t;
@@ -383,6 +384,40 @@ void UpdateGraphics2(bool skipRepaint)
                 XRender::renderRect(vScreen[Z].X + music.Location.X, vScreen[Z].Y + music.Location.Y, 32, 32,
                     1.f, 0.f, 1.f, 1.f, false);
                 SuperPrint(std::to_string(music.Type), 1, vScreen[Z].X + music.Location.X + 2, vScreen[Z].Y + music.Location.Y + 2);
+            }
+        }
+
+        for(A = 1; A <= numWorldAreas; A++)
+        {
+            WorldArea_t &area = WorldArea[A];
+            if(vScreenCollision(Z, static_cast<Location_t>(area.Location)))
+            {
+                // single color for now
+                float r = 1.0f;
+                float g = 0.8f;
+                float b = 0.2f;
+
+                // draw rect with outline
+                XRender::renderRect(vScreen[Z].X + area.Location.X, vScreen[Z].Y + area.Location.Y,
+                    area.Location.Width, area.Location.Height,
+                    0.0f, 0.0f, 0.0f, 1.0f, false);
+                XRender::renderRect(vScreen[Z].X + area.Location.X + 1, vScreen[Z].Y + area.Location.Y + 1,
+                    area.Location.Width - 2, area.Location.Height - 2,
+                    0.0f, 0.0f, 0.0f, 1.0f, false);
+                XRender::renderRect(vScreen[Z].X + area.Location.X + 2, vScreen[Z].Y + area.Location.Y + 2,
+                    area.Location.Width - 4, area.Location.Height - 4,
+                    r, g, b, 1.0f, false);
+                XRender::renderRect(vScreen[Z].X + area.Location.X + 3, vScreen[Z].Y + area.Location.Y + 3,
+                    area.Location.Width - 6, area.Location.Height - 6,
+                    r, g, b, 1.0f, false);
+
+                // highlight selectable area
+                XRender::renderRect(vScreen[Z].X + area.Location.X + 4, vScreen[Z].Y + area.Location.Y + 4,
+                    28, 28,
+                    1.0f, 1.0f, 0.0f, 0.5f, true);
+
+                // label with index
+                SuperPrint(std::to_string(A), 1, vScreen[Z].X + area.Location.X + 4, vScreen[Z].Y + area.Location.Y + 4);
             }
         }
 
