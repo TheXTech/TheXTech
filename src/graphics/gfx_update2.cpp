@@ -722,6 +722,12 @@ void UpdateGraphics2(bool skipRepaint)
         XRender::setTargetLayer(3);
 #endif
 
+        // prepare for player draw
+        vScreen[0].X = 0;
+        vScreen[0].Y = 0;
+        vScreen[0].Width = ScreenW;
+        vScreen[0].Height = ScreenH;
+
         for(A = 1; A <= numPlayers; A++)
         {
             Player_t& p = Player[A];
@@ -746,8 +752,8 @@ void UpdateGraphics2(bool skipRepaint)
             p.Location.Width = Physics.PlayerWidth[p.Character][p.State];
             p.Location.Height = Physics.PlayerHeight[p.Character][p.State];
             SizeCheck(p);
-            p.Location.X = pX - vScreen[1].X;
-            p.Location.Y = pY - vScreen[1].Y - p.Location.Height;
+            p.Location.X = pX;
+            p.Location.Y = pY - p.Location.Height;
 
             if(p.MountType == 3)
             {
@@ -761,7 +767,7 @@ void UpdateGraphics2(bool skipRepaint)
                     p.YoshiWingsFrame += 2;
             }
 
-            DrawPlayer(p, 1);
+            DrawPlayer(p, 0);
 
             pX += 48;
         }
