@@ -1059,6 +1059,9 @@ struct EditorCursor_t
     WorldMusic_t WorldMusic;
 //End Type
 
+//! NEW
+    WorldArea_t WorldArea;
+
     // clears any strings of objects stored by the world cursor
     void ClearStrings();
 };

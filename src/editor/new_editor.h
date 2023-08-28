@@ -203,6 +203,7 @@ private:
     void UpdateBGOGrid(CallMode mode, int x, int y, const int* types, int n_bgos, int n_cols);
     void UpdateBGOScreen(CallMode mode);
 
+    void UpdateAreaScreen(CallMode mode);
     void UpdateWaterScreen(CallMode mode);
     void UpdateWarpScreen(CallMode mode);
 

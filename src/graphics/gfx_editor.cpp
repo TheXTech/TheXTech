@@ -778,6 +778,12 @@ void DrawEditorWorld()
             1.f, 0.f, 1.f, 1.f, false);
         SuperPrint(std::to_string(EditorCursor.WorldMusic.Type), 1, vScreen[Z].X + EditorCursor.WorldMusic.Location.X + 2, vScreen[Z].Y + EditorCursor.WorldMusic.Location.Y + 2);
     }
+    else if(EditorCursor.Mode == OptCursor_t::WLD_AREA)
+    {
+        XRender::renderRect(vScreen[Z].X + EditorCursor.WorldArea.Location.X, vScreen[Z].Y + EditorCursor.WorldArea.Location.Y,
+            EditorCursor.WorldArea.Location.Width, EditorCursor.WorldArea.Location.Height,
+            1.0f, 0.8f, 0.2f, 1.f, false);
+    }
 
     double X = EditorCursor.X;
     double Y = EditorCursor.Y;
