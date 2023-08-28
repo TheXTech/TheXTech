@@ -2396,43 +2396,70 @@ void PSwitch(bool enabled)
 
 void PowBlock()
 {
+    // For NetPlay: make this only affect screens where the earthquake block NPC is near at least one vScreen
+
     int numScreens = 0;
-    int A = 0;
     int Z = 0;
 
     PlaySound(SFX_Stone);
-    numScreens = 1;
 
-    if(!LevelEditor)
+    // Shake blocks. This isn't just cosmetic, it damages NPCs, so we should check the canonical screens here.
+
+    for(int screen_i = 0; screen_i < c_screenCount; screen_i++)
     {
-        if(ScreenType == 1)
-            numScreens = 2;
-        if(ScreenType == 4)
-            numScreens = 2;
+        Screen_t& screen = Screens[screen_i];
 
-        if(ScreenType == 5)
+        // use modern screen iteration bounds
+        if(g_compatibility.allow_multires)
         {
-            DynamicScreen(Screens[0]);
-            if(vScreen[2].Visible)
-                numScreens = 2;
-            else
-                numScreens = 1;
+            Z = screen.active_begin() + 1;
+            numScreens = screen.active_end();
         }
-    }
-
-    for(Z = 1; Z <= numScreens; Z++)
-    {
-        for(A = 1; A <= numBlock; A++)
+        // buggy original code
+        else
         {
-            if(vScreenCollision(Z, Block[A].Location))
+            Z = 1;
+            numScreens = 1;
+
+            if(!LevelEditor)
             {
-                if(!Block[A].Hidden)
+                if(ScreenType == 1)
+                    numScreens = 2;
+                if(ScreenType == 4)
+                    numScreens = 2;
+
+                if(ScreenType == 5)
                 {
-                    BlockShakeUpPow(A);
+                    DynamicScreen(screen);
+                    if(vScreen[2].Visible)
+                        numScreens = 2;
+                    else
+                        numScreens = 1;
                 }
             }
         }
+
+        for(; Z <= numScreens; Z++)
+        {
+            int vscreen_Z = screen.vScreen_refs[Z - 1];
+            const vScreen_t& vscreen = vScreen[vscreen_Z];
+            const Location_t query_loc = newLoc(-vscreen.X, -vscreen.Y, vscreen.Width, vscreen.Height);
+
+            for(int A : treeBlockQuery(query_loc, SORTMODE_COMPAT))
+            {
+                if(vScreenCollision(vscreen_Z, Block[A].Location))
+                {
+                    if(!Block[A].Hidden)
+                        BlockShakeUpPow(A);
+                }
+            }
+        }
+
+        if(!g_compatibility.allow_multires)
+            break;
     }
+
+    // would be neat to force-activate coins on the canonical screens
 
     for(int A : NPCQueues::Active.no_change)
     {
