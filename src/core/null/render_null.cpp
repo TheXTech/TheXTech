@@ -239,7 +239,7 @@ void lazyPreLoad(StdPicture &target)
 }
 
 
-void loadTexture(StdPicture &target, uint32_t width, uint32_t height, uint8_t *RGBApixels, uint32_t pitch)
+void loadTexture(StdPicture&, uint32_t, uint32_t, uint8_t*, uint32_t)
 {
 }
 
@@ -272,7 +272,7 @@ inline float FLOORDIV2(float x)
     return std::floor(x / 2.0f);
 }
 
-void renderRect(int x, int y, int w, int h, float red, float green, float blue, float alpha, bool filled)
+void renderRect(int, int, int, int, float, float, float, float, bool)
 {
 }
 
@@ -281,10 +281,10 @@ void renderRectBR(int _left, int _top, int _right, int _bottom, float red, float
     renderRect(_left, _top, _right-_left, _bottom-_top, red, green, blue, alpha, true);
 }
 
-void renderCircle(int cx, int cy,
-                  int radius,
-                  float red , float green, float blue, float alpha,
-                  bool filled)
+void renderCircle(int, int,
+                  int,
+                  float, float, float, float,
+                  bool)
 {
 }
 
@@ -321,11 +321,11 @@ void renderCircleHole(int cx, int cy,
     } while(dy + line_size <= radius);
 }
 
-inline void i_renderTexturePrivate(float xDst, float yDst, float wDst, float hDst,
-                             StdPicture &tx,
-                             float xSrc, float ySrc, float wSrc, float hSrc,
-                             float rotateAngle, FPoint_t *center, unsigned int flip,
-                             float red, float green, float blue, float alpha)
+inline void i_renderTexturePrivate(float, float, float, float,
+                             StdPicture&,
+                             float, float, float, float,
+                             float, FPoint_t*, unsigned int,
+                             float, float, float, float)
 {
 }
 
@@ -434,6 +434,9 @@ void renderTextureScaleEx(double xDst, double yDst, double wDst, double hDst,
         red, green, blue, alpha);
 }
 
+void splitFrame()
+{
+}
 
 size_t lazyLoadedBytes()
 {
