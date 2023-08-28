@@ -261,6 +261,8 @@ void WorldLoop()
 
     // remove any temporary path focus
     vScreen[1].TempDelay = 0;
+    vScreen[1].tempX = 0;
+    vScreen[1].TempY = 0;
 
     if(numPlayers > 2)
         numPlayers = 1;
