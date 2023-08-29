@@ -197,10 +197,10 @@ static const char *g_messageToUser =
     "- Build date:        " V_DATE_OF_BUILD "\n"
     "================================================\n"
 #ifndef THEXTECH_NO_SDL_BUILD
-    "SDL2 " STRR(SDL_MAJOR_VERSION) "." STRR(SDL_MINOR_VERSION) "." STRR(SDL_PATCHLEVEL) "\n"
+    "SDL2 version:        " STRR(SDL_MAJOR_VERSION) "." STRR(SDL_MINOR_VERSION) "." STRR(SDL_PATCHLEVEL) "\n"
 #endif
 #if !defined(THEXTECH_NO_SDL_BUILD) && !defined(THEXTECH_CLI_BUILD) && !defined(CUSTOM_AUDIO)
-    "SDL Mixer X " STRR(SDL_MIXER_MAJOR_VERSION) "." STRR(SDL_MIXER_MINOR_VERSION) "." STRR(SDL_MIXER_PATCHLEVEL) "\n"
+    "SDL Mixer X version: " STRR(SDL_MIXER_MAJOR_VERSION) "." STRR(SDL_MIXER_MINOR_VERSION) "." STRR(SDL_MIXER_PATCHLEVEL) "\n"
 #endif
     "================================================\n"
     " Please send this log file to the developers by one of ways:\n"
