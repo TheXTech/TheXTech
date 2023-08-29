@@ -188,11 +188,13 @@ static const char *g_messageToUser =
     "================================================\n"
     "            Additional information:\n"
     "================================================\n"
-    V_FILE_DESC " version: " V_FILE_VERSION V_FILE_RELEASE "\n"
-    "Architecture: " FILE_CPU "\n"
-    "GIT Revision code: " V_BUILD_VER "\n"
-    "GIT branch: " V_BUILD_BRANCH "\n"
-    "Build date: " V_DATE_OF_BUILD "\n"
+    V_FILE_DESC "\n"
+    "- Version:           " V_FILE_VERSION V_FILE_RELEASE "\n"
+    "- Architecture:      " FILE_CPU "\n"
+    "- Operating system:  " OPERATION_SYSTEM "\n"
+    "- GIT Revision code: #" V_BUILD_VER "\n"
+    "- GIT branch:        " V_BUILD_BRANCH "\n"
+    "- Build date:        " V_DATE_OF_BUILD "\n"
     "================================================\n"
 #ifndef THEXTECH_NO_SDL_BUILD
     "SDL2 " STRR(SDL_MAJOR_VERSION) "." STRR(SDL_MINOR_VERSION) "." STRR(SDL_PATCHLEVEL) "\n"
@@ -202,8 +204,9 @@ static const char *g_messageToUser =
 #endif
     "================================================\n"
     " Please send this log file to the developers by one of ways:\n"
-    " - Via contact form:          http://wohlsoft.ru/forum/memberlist.php?mode=contactadmin\n"
-    " - Official forums:           http://wohlsoft.ru/forum/\n"
+    " - Via contact form:          https://wohlsoft.ru/contacts/\n"
+    " - Official forums:           https://wohlsoft.ru/forum/\n"
+    " - Official Discord server:   https://wohlsoft.ru/chat/\n"
     " - Make issue at GitHub repo: https://github.com/Wohlstand/TheXTech\n\n"
     "================================================\n";
 
