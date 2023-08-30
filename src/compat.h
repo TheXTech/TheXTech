@@ -93,6 +93,7 @@ struct Compatibility_t
     bool modern_section_change; // fix glitches and improve animations for section resize
     bool fix_frame_perfect_despawn; // if NPC comes onscreen later in the same frame it timed out, should still be able to spawn
     unsigned int bitblit_background_colour[3];
+    bool easier_player_powerdown; // whenever the player should shrink like in modern Mario games or not
 
     // SpeedRun section
     enum

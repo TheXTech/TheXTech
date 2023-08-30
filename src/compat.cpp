@@ -123,6 +123,7 @@ static void compatInit(Compatibility_t &c)
     c.fix_held_item_cancel = true;
     c.modern_section_change = true;
     c.fix_frame_perfect_despawn = true;
+    c.easier_player_powerdown = false;
 
 
     if(s_compatLevel >= COMPAT_SMBX2) // Make sure that bugs were same as on SMBX2 Beta 4 on this moment

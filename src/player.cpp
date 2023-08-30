@@ -658,12 +658,33 @@ void PlayerHurt(const int A)
                         return;
                     }
                 }
-
-                if(p.State > 1)
+                
+                if(!g_compatibility.easier_player_powerdown)
                 {
-                    PlaySound(SFX_PlayerShrink);
-                    p.StateNPC = 0;
-                    p.Effect = 2;
+                    if(p.State > 1)
+                    {
+                        PlaySound(SFX_PlayerShrink);
+                        p.StateNPC = 0;
+                        p.Effect = 2;
+                    }
+                }
+                else
+                {
+                    if(p.State > 1)
+                    {
+                        if(p.State <= 2)
+                        {
+                            PlaySound(SFX_PlayerShrink);
+                            p.StateNPC = 0;
+                            p.Effect = 2;
+                        }
+                        else if(p.State >= 3)
+                        {
+                            PlaySound(SFX_PlayerShrink);
+                            p.StateNPC = 0;
+                            p.Effect = 551;
+                        }
+                    }
                 }
                 else
                 {
