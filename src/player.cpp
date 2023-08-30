@@ -662,7 +662,7 @@ void PlayerHurt(const int A)
                 }
                 if(p.State > 1)
                 {
-                    if(!g_compatibility.easier_player_powerdown)
+                    if(g_compatibility.easier_player_powerdown)
                     {
                         if(p.State <= 2)
                         {
