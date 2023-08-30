@@ -95,6 +95,7 @@ struct Compatibility_t
     unsigned int bitblit_background_colour[3];
     bool easier_player_powerdown; // whenever the player should shrink like in modern Mario games or not
     bool easier_player_physics; // whenever the player should have better physics or not
+    bool player_faster_climbing; // whenever the player should climb faster when holding run
 
     // SpeedRun section
     enum

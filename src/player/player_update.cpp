@@ -111,6 +111,7 @@ void UpdatePlayer()
 
     StealBonus(); // allows a dead player to come back to life by using a 1-up
     ClownCar(); // updates players in the clown car
+    UpdatePlayerPhysics(); // updates compat.ini better player physics
 
     // online stuff
 //    if(nPlay.Online == true)
@@ -596,18 +597,45 @@ void UpdatePlayer()
                     Player[A].CanFly2 = false;
                     Player[A].RunCount = 0;
                     Player[A].SpinJump = false;
-                    if(Player[A].Controls.Left)
-                        Player[A].Location.SpeedX = -1.5;
-                    else if(Player[A].Controls.Right)
-                        Player[A].Location.SpeedX = 1.5;
+                    if(!g_compatibility.player_faster_climbing)
+                    {
+                        if(Player[A].Controls.Left)
+                            Player[A].Location.SpeedX = -1.5;
+                        else if(Player[A].Controls.Right)
+                            Player[A].Location.SpeedX = 1.5;
+                        else
+                            Player[A].Location.SpeedX = 0;
+                        if(Player[A].Controls.Up && Player[A].Vine > 2)
+                            Player[A].Location.SpeedY = -2;
+                        else if(Player[A].Controls.Down)
+                            Player[A].Location.SpeedY = 3;
+                        else
+                            Player[A].Location.SpeedY = 0;
+                    }
                     else
-                        Player[A].Location.SpeedX = 0;
-                    if(Player[A].Controls.Up && Player[A].Vine > 2)
-                        Player[A].Location.SpeedY = -2;
-                    else if(Player[A].Controls.Down)
-                        Player[A].Location.SpeedY = 3;
-                    else
-                        Player[A].Location.SpeedY = 0;
+                    {
+                        if(Player[A].Controls.Left)
+                            if(!Player[A].Controls.Run)
+                                Player[A].Location.SpeedX = -1.5;
+                            else
+                                Player[A].Location.SpeedX = -3;
+                        else if(Player[A].Controls.Right)
+                            if(!Player[A].Controls.Run)
+                                Player[A].Location.SpeedX = 1.5;
+                            else
+                                Player[A].Location.SpeedX = 3;
+                        else
+                            Player[A].Location.SpeedX = 0;
+                        if(Player[A].Controls.Up && Player[A].Vine > 2)
+                            if(!Player[A].Controls.Run)
+                                Player[A].Location.SpeedY = -2;
+                            else
+                                Player[A].Location.SpeedY = -3;
+                        else if(Player[A].Controls.Down)
+                            Player[A].Location.SpeedY = 3;
+                        else
+                            Player[A].Location.SpeedY = 0;
+                    }
 
                     if(g_compatibility.fix_climb_bgo_speed_adding && Player[A].VineBGO > 0)
                     {

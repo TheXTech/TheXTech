@@ -125,6 +125,7 @@ static void compatInit(Compatibility_t &c)
     c.fix_frame_perfect_despawn = true;
     c.easier_player_powerdown = false;
     c.easier_player_physics = false;
+    c.player_faster_climbing = false;
 
 
     if(s_compatLevel >= COMPAT_SMBX2) // Make sure that bugs were same as on SMBX2 Beta 4 on this moment
