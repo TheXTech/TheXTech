@@ -4621,7 +4621,7 @@ void UpdatePlayer()
 
 void UpdatePlayerPhysics() //Basically playerPhysicsPatch.lua by Emral, now on TheXTech!
 {
-    if(g_compatibility.better_player_physics)
+    if(g_compatibility.easier_player_physics)
     {
         for(int tmpNumPlayers = numPlayers, A = 1; A <= tmpNumPlayers; A++)
         {
