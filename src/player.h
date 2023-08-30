@@ -31,6 +31,9 @@ void UpdatePlayer();
 // Public Sub UpdatePlayerPhysics()
 // This is used for the compat.ini setting where players have better physics
 void UpdatePlayerPhysics();
+// Public Sub PlayerGroundTouching(A As Integer)
+// Detects if the player is touching the ground or not
+bool PlayerGroundTouching(const int A);
 // Public Sub PlayerHurt(A As Integer) 'Player got hurt
 // Player got hurt
 void PlayerHurt(const int A);

@@ -7792,3 +7792,13 @@ bool SwapCharAllowed()
     else
         return false;
 }
+
+bool PlayerGroundTouching(const int A)
+{
+    if(Player[A].Pinched.Bottom1 != 0 || Player[A].Slope != 0 || Player[A].StandingOnNPC != 0)
+    {
+        return true;
+    }
+    
+    return false;
+}
