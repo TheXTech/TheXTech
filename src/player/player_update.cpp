@@ -4590,3 +4590,42 @@ void UpdatePlayer()
 
     NPCQueues::PlayerTemp.clear();
 }
+
+void UpdatePlayerPhysics() //Basically playerPhysicsPatch.lua by Emral, now on TheXTech!
+{
+    if(g_compatibility.better_player_physics)
+    {
+        for(int tmpNumPlayers = numPlayers, A = 1; A <= tmpNumPlayers; A++)
+        {
+            Player[A].lastXSpeed = Player[A].lastXSpeed or 0;
+            if(!Player[A].Slide)
+            {
+                if((!PlayerGroundTouching(A) && Player[A].Duck))
+                {
+                    int mod = 1;
+                    if(!PlayerGroundTouching(A))
+                        mod = 2;
+                    if(Player[A].Controls.Right)
+                    {
+                        if(Player[A].Location.SpeedX < 0)
+                            Player[A].Location.SpeedX = Player[A].Location.SpeedX + 0.08 * mod;
+                    }
+                    else if(Player[A].Controls.Left)
+                    {
+                        if(Player[A].Location.SpeedX > 0)
+                            Player[A].Location.SpeedX = Player[A].Location.SpeedX - 0.08 * mod;
+                    }
+                    else
+                        Player[A].Location.SpeedX = Player[A].Location.SpeedX * 0.98;
+                    int xSpeedDiff = Player[A].Location.SpeedX * Player[A].lastXSpeed;
+                    if(std::abs(Player[A].Location.SpeedX) < 2 && std::abs(Player[A].Location.SpeedX) > 0.1 && mathSign(Player[A].Location.SpeedX * xSpeedDiff) == 1 && std::abs(xSpeedDiff) < 0.2)
+                    {
+                        Player[A].Location.SpeedX = Player[A].Location.SpeedX - xSpeedDiff;
+                        Player[A].Location.SpeedX = Player[A].Location.SpeedX + xSpeedDiff * 1.5;
+                    }
+                }
+            }
+            Player[A].lastXSpeed = Player[A].Location.SpeedX;
+        }
+    }
+}

@@ -690,6 +690,8 @@ struct Player_t
     float SpeedFixY = 0.0f;
 //    previousPowerup As Int 'The previous powerup used when shrinking from a third tier powerup to a second tier powerup
     int previousPowerup = 0;
+//    lastXSpeed as Int 'The last XSpeed, used for the compat.ini setting for better player physics
+    int lastXSpeed = 0;
 //End Type
 };
 
