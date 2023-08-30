@@ -5843,6 +5843,76 @@ void PlayerEffects(const int A)
             p.StandUp = true;
         }
     }
+    else if(p.Effect == 551) // Player shrinking effect, current powerup to big
+    {
+        p.Effect2 += 1;
+        if(p.Effect2 == 1)
+        {
+            p.previousPowerup = p.State;
+        }
+        p.Frame = 1;
+        
+        if(p.Duck)
+        {
+            p.StandUp = true; // Fixes a block collision bug
+            p.Duck = false;
+            p.Location.Height = Physics.PlayerHeight[p.Character][p.State];
+            p.Location.Y += -Physics.PlayerHeight[p.Character][p.State] + Physics.PlayerDuckHeight[p.Character][p.State];
+        }
+        
+        if(p.Effect2 / 5 == static_cast<int>(floor(static_cast<double>(p.Effect2 / 5))))
+        {
+            if(p.State == p.previousPowerup)
+            {
+                p.State = 2;
+                if(p.Mount == 3)
+                {
+                    YoshiHeight(A);
+                }
+                else if(p.Mount != 2)
+                {
+                    p.Location.X += -Physics.PlayerWidth[p.Character][p.State] * 0.5 + Physics.PlayerWidth[p.Character][p.State] * 0.5;
+                    p.Location.Y += -Physics.PlayerHeight[p.Character][p.State] + Physics.PlayerHeight[p.Character][p.State];
+                    p.Location.Width = Physics.PlayerWidth[p.Character][p.State];
+                    p.Location.Height = Physics.PlayerHeight[p.Character][p.State];
+                }
+            }
+            else
+            {
+                p.State = p.previousPowerup;
+                if(p.Mount == 3)
+                {
+                    YoshiHeight(A);
+                }
+                else if(p.Mount != 2)
+                {
+                    p.Location.X += -Physics.PlayerWidth[p.Character][p.State] * 0.5 + Physics.PlayerWidth[p.Character][p.State] * 0.5;
+                    p.Location.Y += -Physics.PlayerHeight[p.Character][p.State] + Physics.PlayerHeight[p.Character][p.State];
+                    p.Location.Width = Physics.PlayerWidth[p.Character][p.State];
+                    p.Location.Height = Physics.PlayerHeight[p.Character][p.State];
+                }
+            }
+        }
+        if(p.Effect2 >= 50)
+        {
+            if(p.State == p.previousPowerup)
+            {
+                p.State = 2;
+                if(p.Mount != 2)
+                {
+                    p.Location.X += -Physics.PlayerWidth[p.Character][2] * 0.5 + Physics.PlayerWidth[p.Character][1] * 0.5;
+                    p.Location.Y += -Physics.PlayerHeight[p.Character][2] + Physics.PlayerHeight[p.Character][1];
+                    p.Location.Width = Physics.PlayerWidth[p.Character][p.State];
+                    p.Location.Height = Physics.PlayerHeight[p.Character][p.State];
+                }
+            }
+            p.Immune = 150;
+            p.Immune2 = true;
+            p.Effect = 0;
+            p.Effect2 = 0;
+            // If numPlayers <= 2 Then DropBonus A
+        }
+    }
     else if(p.Effect == 2) // Player shrinking effect
     {
         if(p.Duck)
