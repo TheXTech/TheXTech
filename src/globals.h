@@ -248,14 +248,84 @@ struct OldEditorControls_t
 //Public Type NPC 'The NPC Type
 struct NPC_t
 {
-//    AttLayer As String
-    layerindex_t AttLayer = LAYER_NONE;
+    // most important and frequently accessed fields at the top of the struct
+//    Type As Integer 'Defines what NPC this is.  1 for goomba, 2 for red goomba, etc.
+    vbint_t Type = 0;
+//    Killed As Integer 'Flags the NPC to die a specific way.
+    vbint_t Killed = 0;
+//    Frame As Integer 'The graphic to be shown
+    vbint_t Frame = 0;
+//    tempBlock As Integer
+    vbint_t tempBlock = 0;
+
+//    Active As Boolean 'If on screen
+    bool Active = false;
+//    Hidden As Boolean 'if the layer is hidden or not
+    bool Hidden = false;
+//    Inert As Boolean 'the friendly toggle. makes the NPC not do anything
+    bool Inert = false;
+//    Stuck As Boolean 'the 'don't move' toggle. forces the NPC not to move
+    bool Stuck = false;
+//    Shadow As Boolean 'if true turn the NPC black and allow it to pass through walls.  only used for a cheat code
+    bool Shadow = false;
+//    EXTRA: does the tempBlock have its own tree entry?
+    // To explain further: when an NPC is at the same location as its tempBlock,
+    //   its temp block is *not* added to the temp block quadtree
+    //   (saves time by only keeping one tree).
+    // Whenever the NPC is moved and temp block isn't, they split and the temp block needs to be added to the tree if it has not already been added. (treeNPCSplitTempBlock)
+    // Whenever the temp block is moved and the NPC isn't, they split and the temp block needs to be updated even if it is already added. (treeNPCUpdateTempBlock)
+    // Whenever the temp block is moved *to* the NPC's position, they re-join, and the temp block is removed if it was added.
+    bool tempBlockInTree = false;
+
+//    Reset(1 To 2) As Boolean 'If it can display the NPC
+    // IMPORTANT: in SMBX64 and compat mode, Reset[1] is whether the NPC was NOT on vScreen 1 during the last draw
+    //            and Reset[2] is whether it was NOT on vScreen 2 during the last draw.
+    //     Because TheXTech plans to support more than 2 vScreens, it uses Reset[1] to mark whether the NPC was on
+    //         NO screens during the last draw. Reset[1] is the only externally usable flag, and Reset[2] is used
+    //         internally during the NPC screen logic to mark whether Reset[1] was set prior to the screen logic.
+    RangeArrI<bool, 1, 2, false> Reset;
+
+//    Location As Location 'collsion detection information
+    Location_t Location;
+
+//'Secial - misc variables used for NPC AI
+//    Special As Double
+    double Special = 0.0;
+//    Special2 As Double
+    double Special2 = 0.0;
+//    Special3 As Double
+    double Special3 = 0.0;
+//    Special4 As Double
+    double Special4 = 0.0;
+//    Special5 As Double
+    double Special5 = 0.0;
+//    Special6 As Double
+    double Special6 = 0.0;
+
+    // Information about the NPC's current unusual state (reordered for alignment purposes)
+//    Effect2 As Double
+    double Effect2 = 0.0; // When Effect 4, Used to store a destination position, must be in double!
+//    Effect As Integer 'For starting / stopping effects
+    vbint_t Effect = 0;
+//    Effect3 As Integer
+    vbint_t Effect3 = 0;
+
+//    Direction As Single 'The direction the NPC is walking
+    float Direction = 0.0f;
+
+    // Moderately important integer variables
+//    Section As Integer 'what section of the level the NPC is in
+    vbint_t Section = 0;
+//    Wet As Integer ' greater then 0 of the NPC is in water
+    vbint_t Wet = 0;
 //    Quicksand As Integer
     vbint_t Quicksand = 0;
-//    RespawnDelay As Integeri
-    vbint_t RespawnDelay = 0;
-//    Bouce As Boolean
-    bool Bouce = false;
+//    TimeLeft As Integer 'Time left before reset when not on screen
+    vbint_t TimeLeft = 0;
+//    TailCD As Integer 'if greater then 0 the player can't hit with it's tail
+    vbint_t TailCD = 0;
+//    JustActivated As Integer 'The player that activated the NPC
+    vbint_t JustActivated = 0;
 
 //    Pinched1 As Integer  'getting smashed by a block
     // int Pinched1 = 0;
@@ -271,24 +341,16 @@ struct NPC_t
     // NEW: replaces above with bitfield
     PinchedInfo_t Pinched = PinchedInfo_t();
 
-//    NetTimeout As Integer 'for online
-    // int NetTimeout = 0;    // unused since SMBX64, removed
-//    RealSpeedX As Single 'the real speed of the NPC
-    float RealSpeedX = 0.0f;
-//    Wet As Integer ' greater then 0 of the NPC is in water
-    vbint_t Wet = 0;
-//    Settings As Integer
-    // int Settings = 0;    // unused since SMBX64, removed
-//    NoLavaSplash As Boolean 'true for no lava splash
-    bool NoLavaSplash = false;
+//    standingOnPlayer As Integer 'If this NPC is standing on a player in the clown car
+    vbint_t standingOnPlayer = 0;
+//    standingOnPlayerY As Integer
+    vbint_t standingOnPlayerY = 0;
 //    Slope As Integer 'the block that the NPC is on a slope with
     vbint_t Slope = 0;
 //    Multiplier As Integer 'for upping the points the player recieves
     vbint_t Multiplier = 0;
-//    TailCD As Integer 'if greater then 0 the player can't hit with it's tail
-    vbint_t TailCD = 0;
-//    Shadow As Boolean 'if true turn the NPC black and allow it to pass through walls.  only used for a cheat code
-    bool Shadow = false;
+
+    // indexes to layers / events / text
 //    TriggerActivate As String 'for events - triggers when NPC gets activated
     eventindex_t TriggerActivate = EVENT_NONE;
 //    TriggerDeath As String 'triggers when NPC dies
@@ -299,94 +361,41 @@ struct NPC_t
     eventindex_t TriggerLast = EVENT_NONE;
 //    Layer As String 'the layer name that the NPC is in
     layerindex_t Layer = LAYER_NONE;
-//    Hidden As Boolean 'if the layer is hidden or not
-    bool Hidden = false;
-//    Legacy As Boolean 'Legacy Boss
-    bool Legacy = false;
-//    Chat As Boolean 'for talking to the NPC
-    bool Chat = false;
-//    Inert As Boolean 'the friendly toggle. makes the NPC not do anything
-    bool Inert = false;
-//    Stuck As Boolean 'the 'don't move' toggle. forces the NPC not to move
-    bool Stuck = false;
-//    DefaultStuck As Boolean
-    bool DefaultStuck = false;
+//    AttLayer As String
+    layerindex_t AttLayer = LAYER_NONE;
 //    Text As String 'the text that is displayed when you talk to the NPC
     stringindex_t Text = STRINGINDEX_NONE;
-//    oldAddBelt As Single
-    float oldAddBelt = 0.0f;
-//    PinchCount As Integer 'obsolete
-    // int PinchCount = 0;    // unused since SMBX64, removed
-//    Pinched As Boolean 'obsolete
-    // bool Pinched = false;    // unused since SMBX64, removed
-//    PinchedDirection As Integer 'obsolete
-    // int PinchedDirection = 0;    // unused since SMBX64, removed
-//    BeltSpeed As Single 'The speed of the object this NPC is standing on
-    float BeltSpeed = 0.0f;
-//    standingOnPlayer As Integer 'If this NPC is standing on a player in the clown car
-    vbint_t standingOnPlayer = 0;
-//    standingOnPlayerY As Integer
-    vbint_t standingOnPlayerY = 0;
+
+//    Projectile As Boolean 'If the NPC is a projectile
+    bool Projectile = false;
+// EXTRA: Variant (previously Special7)
+    uint8_t Variant = 0;
+
+    // Information about Generator state (GeneratorActive in bitfield at the bottom of the struct)
 //    Generator As Boolean 'for spawning new NPCs
     bool Generator = false;
-//    GeneratorTimeMax As Single
-    float GeneratorTimeMax = 0.0f;
-//    GeneratorTime As Single
-    float GeneratorTime = 0.0f;
 //    GeneratorDirection As Integer
     vbint_t GeneratorDirection = 0;
 //    GeneratorEffect As Integer
     vbint_t GeneratorEffect = 0;
-//    GeneratorActive As Boolean
-    bool GeneratorActive = false;
-//    playerTemp As Boolean
-    bool playerTemp = false;
-//    Location As Location 'collsion detection information
-    Location_t Location;
-//'the default values are used when De-Activating an NPC when it goes on screen
-//    DefaultLocation As Location
-    Location_t DefaultLocation;
-//    DefaultDirection As Single
-    float DefaultDirection = 0.0f;
-//    DefaultType As Integer
-    vbint_t DefaultType = 0;
-//    DefaultSpecial As Integer
-    vbint_t DefaultSpecial = 0;
-//    DefaultSpecial2 As Integer
-    vbint_t DefaultSpecial2 = 0;
-//    Type As Integer 'Defines what NPC this is.  1 for goomba, 2 for red goomba, etc.
-    vbint_t Type = 0;
-//    Frame As Integer 'The graphic to be shown
-    vbint_t Frame = 0;
+//    GeneratorTimeMax As Single
+    float GeneratorTimeMax = 0.0f;
+//    GeneratorTime As Single
+    float GeneratorTime = 0.0f;
+
+    // Misc floating-point variables
+//    RealSpeedX As Single 'the real speed of the NPC
+    float RealSpeedX = 0.0f;
+//    BeltSpeed As Single 'The speed of the object this NPC is standing on
+    float BeltSpeed = 0.0f;
 //    FrameCount As Single 'The counter for incrementing the frames
     float FrameCount = 0.0f;
-//    Direction As Single 'The direction the NPC is walking
-    float Direction = 0.0f;
-//'Secial - misc variables used for NPC AI
-//    Special As Double
-    double Special = 0.0;
-//    Special2 As Double
-    double Special2 = 0.0;
-//    Special3 As Double
-    double Special3 = 0.0;
-//    Special4 As Double
-    double Special4 = 0.0;
-//    Special5 As Double
-    double Special5 = 0.0;
-//    Special6 As Double
-    double Special6 = 0.0;
-// EXTRA: Variant (previously Special7)
-    uint8_t Variant = 0;
-//    TurnAround As Boolean 'if the NPC needs to turn around
-    bool TurnAround = false;
-//    Killed As Integer 'Flags the NPC to die a specific way.
-    vbint_t Killed = 0;
-//    Active As Boolean 'If on screen
-    bool Active = false;
-//    Reset(1 To 2) As Boolean 'If it can display the NPC
-    RangeArrI<bool, 1, 2, false> Reset;
-//    TimeLeft As Integer 'Time left before reset when not on screen
-    vbint_t TimeLeft = 0;
+//    oldAddBelt As Single
+    float oldAddBelt = 0.0f;
+//    Damage As Single
+    float Damage = 0.0f;
+
+    // Misc integer variables
 //    HoldingPlayer As Integer 'Who is holding it
     vbint_t HoldingPlayer = 0;
 //    CantHurt As Integer 'Won't hurt the player
@@ -397,39 +406,65 @@ struct NPC_t
     vbint_t BattleOwner = 0;
 //    WallDeath As Integer
     vbint_t WallDeath = 0;
-//    Projectile As Boolean 'If the NPC is a projectile
-    bool Projectile = false;
-//    Effect As Integer 'For starting / stopping effects
-    vbint_t Effect = 0;
-//    Effect2 As Double
-    double Effect2 = 0.0; // When Effect 4, Used to store a destination position, must be in double!
-//    Effect3 As Integer
-    vbint_t Effect3 = 0;
-//    Section As Integer 'what section of the level the NPC is in
-    vbint_t Section = 0;
-//    Damage As Single
-    float Damage = 0.0f;
-//    JustActivated As Integer 'The player that activated the NPC
-    vbint_t JustActivated = 0;
+//    RespawnDelay As Integeri
+    vbint_t RespawnDelay = 0;
 //    Block As Integer 'Used when a P-Switch turns a block into a coint
     vbint_t Block = 0;
-//    tempBlock As Integer
-    vbint_t tempBlock = 0;
-//    EXTRA: does the tempBlock have its own tree entry?
-    // To explain further: when an NPC is at the same location as its tempBlock,
-    //   its temp block is *not* added to the temp block quadtree
-    //   (saves time by only keeping one tree).
-    // Whenever the NPC is moved and temp block isn't, they split and the temp block needs to be added to the tree if it has not already been added. (treeNPCSplitTempBlock)
-    // Whenever the temp block is moved and the NPC isn't, they split and the temp block needs to be updated even if it is already added. (treeNPCUpdateTempBlock)
-    // Whenever the temp block is moved *to* the NPC's position, they re-join, and the temp block is removed if it was added.
-    bool tempBlockInTree = false;
-//    onWall As Boolean
-    bool onWall = false;
-//    TurnBackWipe As Boolean
-    bool TurnBackWipe = false;
 //    Immune As Integer 'time that the NPC is immune
     vbint_t Immune = 0;
+
+    // rarely used bools turned into bitfields
+//    TurnAround As Boolean 'if the NPC needs to turn around
+    bool TurnAround : 1;
+//    onWall As Boolean
+    bool onWall : 1;
+//    TurnBackWipe As Boolean
+    bool TurnBackWipe : 1;
+//    GeneratorActive As Boolean
+    bool GeneratorActive : 1;
+//    playerTemp As Boolean
+    bool playerTemp : 1;
+//    Legacy As Boolean 'Legacy Boss
+    bool Legacy : 1;
+//    Chat As Boolean 'for talking to the NPC
+    bool Chat : 1;
+//    NoLavaSplash As Boolean 'true for no lava splash
+    bool NoLavaSplash : 1;
+//    Bouce As Boolean
+    bool Bouce : 1;
+//    DefaultStuck As Boolean
+    bool DefaultStuck : 1;
+
+//'the default values are used when De-Activating an NPC when it goes on screen
+//    DefaultType As Integer
+    vbint_t DefaultType = 0;
+//    DefaultLocation As Location
+    Location_t DefaultLocation;
+//    DefaultDirection As Single
+    float DefaultDirection = 0.0f;
+//    DefaultSpecial As Integer
+    vbint_t DefaultSpecial = 0;
+//    DefaultSpecial2 As Integer
+    vbint_t DefaultSpecial2 = 0;
+
+    // obsolete and removed fields
+//    PinchCount As Integer 'obsolete
+    // int PinchCount = 0;    // unused since SMBX64, removed
+//    Pinched As Boolean 'obsolete
+    // bool Pinched = false;    // unused since SMBX64, removed
+//    PinchedDirection As Integer 'obsolete
+    // int PinchedDirection = 0;    // unused since SMBX64, removed
+//    NetTimeout As Integer 'for online
+    // int NetTimeout = 0;    // unused since SMBX64, removed
+//    Settings As Integer
+    // int Settings = 0;    // unused since SMBX64, removed
+
 //End Type
+
+    NPC_t() : TurnAround(false), onWall(false), TurnBackWipe(false), GeneratorActive(false),
+        playerTemp(false), Legacy(false), Chat(false), NoLavaSplash(false),
+        Bouce(false), DefaultStuck(false) {}
+
 };
 
 //Public Type Player              'The player data type.
