@@ -674,6 +674,7 @@ set(THEXTECH_SRC
     src/frm_main.cpp
     src/player.cpp
     src/rand.cpp
+    src/math.cpp
     src/sorting.cpp
     src/screen.cpp
     src/screen_fader.cpp
