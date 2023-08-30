@@ -94,6 +94,7 @@ struct Compatibility_t
     bool fix_frame_perfect_despawn; // if NPC comes onscreen later in the same frame it timed out, should still be able to spawn
     unsigned int bitblit_background_colour[3];
     bool easier_player_powerdown; // whenever the player should shrink like in modern Mario games or not
+    bool easier_player_physics; // whenever the player should have better physics or not
 
     // SpeedRun section
     enum

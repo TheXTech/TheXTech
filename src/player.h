@@ -28,6 +28,9 @@ void SetupPlayers();
 // Public Sub UpdatePlayer() 'This is the main sub for the players
 // This is the main sub for the players
 void UpdatePlayer();
+// Public Sub UpdatePlayerPhysics()
+// This is used for the compat.ini setting where players have better physics
+void UpdatePlayerPhysics();
 // Public Sub PlayerHurt(A As Integer) 'Player got hurt
 // Player got hurt
 void PlayerHurt(const int A);
