@@ -630,9 +630,12 @@ void UpdatePlayer()
                             if(!Player[A].Controls.Run)
                                 Player[A].Location.SpeedY = -2;
                             else
-                                Player[A].Location.SpeedY = -3;
+                                Player[A].Location.SpeedY = -3.5;
                         else if(Player[A].Controls.Down)
-                            Player[A].Location.SpeedY = 3;
+                            if(!Player[A].Controls.Run)
+                                Player[A].Location.SpeedY = 3;
+                            else
+                                Player[A].Location.SpeedY = 4.5;
                         else
                             Player[A].Location.SpeedY = 0;
                     }
