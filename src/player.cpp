@@ -388,7 +388,7 @@ void SetupPlayers()
         Player[A].FloatTime = 0;
         Player[A].CanFloat = false;
         
-        Player[A].previousPowerup = 0;
+        Player[A].previousPowerup = Player[A].State;
 
         if(Player[A].Character == 3)
             Player[A].CanFloat = true;
