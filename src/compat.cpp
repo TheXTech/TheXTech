@@ -434,6 +434,10 @@ static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
     // 1.3.6
     compat.read("world-map-fast-move", c.world_map_fast_move, c.world_map_fast_move);
     compat.read("fix-framethrower-gravity", c.fix_flamethrower_gravity, c.fix_flamethrower_gravity);
+    // 1.3.6.1
+    compat.read("easier-player-powerdown", c.easier_player_powerdown, c.easier_player_powerdown);
+    compat.read("easier-player-physics", c.easier_player_physics, c.easier_player_physics);
+    compat.read("player-faster-climbing", c.player_faster_climbing, c.player_faster_climbing);
     compat.endGroup();
 }
 
