@@ -330,12 +330,12 @@
             "phraseChangeChar": "更換角色",
             "phraseDropMe": "離開遊戲",
             "phraseDropPX": "移除玩家{0}的遊戲",
-            "phraseForceResume": "強制恢復",
+            "phraseForceResume": "強制退出",
             "phraseHoldStart": "按住開始鍵",
             "phrasePressAButton": "按下一個按鍵",
             "phraseSetControls": "設置按鍵",
-            "phraseStartToForceRes": "按開始鍵強制恢復",
-            "phraseStartToResume": "按開始鍵恢復",
+            "phraseStartToForceRes": "按開始鍵強制退出",
+            "phraseStartToResume": "按開始鍵退出",
             "phraseTestControls": "測試按鍵",
             "phraseWaitingForInput": "等待玩家加入……",
             "reconnectTitle": "重新連接",
@@ -354,7 +354,7 @@
             "warpNeedStarCount": "你需要{0}{2}{1}才能進入此傳送點。"
         },
         "pause": {
-            "continue": "繼續",
+            "continue": "繼續遊戲",
             "dropAddPlayers": "加入/離開遊戲",
             "enterCode": "輸入指令",
             "quit": "退出",
@@ -590,7 +590,7 @@
         "wordOn": "開啓",
         "wordPlayer": "玩家",
         "wordProfile": "配置",
-        "wordResume": "恢復",
+        "wordResume": "退出",
         "wordShow": "顯示",
         "wordWaiting": "等待",
         "wordYes": "是"
