@@ -688,6 +688,8 @@ struct Player_t
     float mountBump = 0.0f;
 //    SpeedFixY As Single
     float SpeedFixY = 0.0f;
+//    previousPowerup As Int 'The previous powerup used when shrinking from a third tier powerup to a second tier powerup
+    int previousPowerup = 0;
 //End Type
 };
 
