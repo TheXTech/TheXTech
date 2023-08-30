@@ -140,11 +140,11 @@ static void dieCheater()
  */
 static void moonWalk()
 {
-    Location_t tempLocation;
+    TinyLocation_t tempLocation;
 
     for(int B = 1; B <= numWorldPaths; B++)
     {
-        tempLocation = static_cast<Location_t>(WorldPath[B].Location);
+        tempLocation = WorldPath[B].Location;
         tempLocation.X += 4;
         tempLocation.Y += 4;
         tempLocation.Width -= 8;

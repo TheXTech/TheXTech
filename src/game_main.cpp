@@ -1962,9 +1962,9 @@ void StartEpisode()
     {
         For(A, 1, numWorldPaths)
         {
-            SpeedlessLocation_t tempLocation = WorldPath[A].Location;
+            TinyLocation_t tempLocation = WorldPath[A].Location;
             {
-                SpeedlessLocation_t &l = tempLocation;
+                TinyLocation_t &l = tempLocation;
                 l.X += 4;
                 l.Y += 4;
                 l.Width -= 8;
