@@ -116,3 +116,13 @@ double dRand()
 
     return std::ldexp(g_random_engine(), -32);
 }
+
+int mathSign(int a)
+{
+    if(a > 0)
+        return (int)1;
+    else if (a == 0)
+        return (int)0;
+    else if (a < 0)
+        return (int)-1;
+}

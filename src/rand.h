@@ -103,5 +103,6 @@ inline int iRand_round(int max)
     return i/2;
 }
 
+extern int mathSign(int a);
 
 #endif // RAND_H
