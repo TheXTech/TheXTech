@@ -679,12 +679,9 @@ void PlayerHurt(const int A)
                     }
                     else
                     {
-                        if(p.State > 1)
-                        {
-                            PlaySound(SFX_PlayerShrink);
-                            p.StateNPC = 0;
-                            p.Effect = 2;
-                        }
+                        PlaySound(SFX_PlayerShrink);
+                        p.StateNPC = 0;
+                        p.Effect = 2;
                     }
                 }
                 else
