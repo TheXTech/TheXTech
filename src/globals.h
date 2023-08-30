@@ -434,6 +434,8 @@ struct NPC_t
     bool onWall = false;
 //    TurnBackWipe As Boolean
     bool TurnBackWipe = false;
+    // EXTRA (private to npc_activation.cpp): stores whether the NPC needs to use an event logic screen for activation
+    bool _priv_force_canonical = false;
 //    Immune As Integer 'time that the NPC is immune
     vbint_t Immune = 0;
 //End Type

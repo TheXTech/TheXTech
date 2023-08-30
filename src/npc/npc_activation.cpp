@@ -28,8 +28,6 @@
 
 #include "npc_id.h"
 
-static std::bitset<maxNPCs> s_canonicalNPCs;
-
 inline static bool s_Event_SoundOnly(const Events_t& evt, int test_section)
 {
     if(!(evt.Text == STRINGINDEX_NONE
@@ -83,7 +81,7 @@ static bool s_NPC_MustBeCanonical_internal(const NPC_t& n)
 
 bool NPC_MustBeCanonical(NPCRef_t n)
 {
-    return s_canonicalNPCs[n];
+    return n->_priv_force_canonical;
 }
 
 bool NPC_MustNotRenderInactive(const NPC_t& n)
@@ -136,13 +134,11 @@ void NPC_ConstructCanonicalSet()
     std::vector<int16_t> to_check;
     to_check.reserve(64);
 
-    s_canonicalNPCs.reset();
-
     for(int16_t n = 1; n <= numNPCs; n++)
     {
         if(s_NPC_MustBeCanonical_internal(NPC[n]))
         {
-            s_canonicalNPCs[n] = true;
+            NPC[n]._priv_force_canonical = true;
             to_check.push_back(n);
         }
     }
@@ -162,9 +158,9 @@ void NPC_ConstructCanonicalSet()
         {
             if(B != n && CheckCollision(tempLocation, NPC[B].Location))
             {
-                if(!s_canonicalNPCs[B])
+                if(!NPC[B]._priv_force_canonical)
                 {
-                    s_canonicalNPCs[B] = true;
+                    NPC[B]._priv_force_canonical = true;
                     to_check.push_back(B);
                 }
             }
