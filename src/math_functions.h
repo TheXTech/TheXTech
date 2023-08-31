@@ -19,11 +19,14 @@
  */
 
 #pragma once
-#ifndef MATH_H
-#define MATH_H
+#ifndef MATHFUNCTIONS_H
+#define MATHFUNCTIONS_H
 
 #include <cmath>
 
-extern int mathSign(int a);
+template <typename T> int mathSign(T val) 
+{
+    return (T(0) < val) - (val < T(0));
+}
 
 #endif // MATH_H
