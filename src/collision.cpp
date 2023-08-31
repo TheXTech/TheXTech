@@ -21,39 +21,6 @@
 #include "globals.h"
 #include "collision.h"
 
-// 'Normal collisions
-bool CheckCollision(const Location_t &Loc1, const Location_t &Loc2)
-{
-    return (Loc1.Y + Loc1.Height >= Loc2.Y) &&
-           (Loc1.Y <= Loc2.Y + Loc2.Height) &&
-           (Loc1.X <= Loc2.X + Loc2.Width) &&
-           (Loc1.X + Loc1.Width >= Loc2.X);
-}
-
-bool CheckCollision(const SpeedlessLocation_t &Loc1, const Location_t &Loc2)
-{
-    return (Loc1.Y + Loc1.Height >= Loc2.Y) &&
-           (Loc1.Y <= Loc2.Y + Loc2.Height) &&
-           (Loc1.X <= Loc2.X + Loc2.Width) &&
-           (Loc1.X + Loc1.Width >= Loc2.X);
-}
-
-bool CheckCollision(const Location_t &Loc1, const SpeedlessLocation_t &Loc2)
-{
-    return (Loc1.Y + Loc1.Height >= Loc2.Y) &&
-           (Loc1.Y <= Loc2.Y + Loc2.Height) &&
-           (Loc1.X <= Loc2.X + Loc2.Width) &&
-           (Loc1.X + Loc1.Width >= Loc2.X);
-}
-
-bool CheckCollision(const SpeedlessLocation_t &Loc1, const SpeedlessLocation_t &Loc2)
-{
-    return (Loc1.Y + Loc1.Height >= Loc2.Y) &&
-           (Loc1.Y <= Loc2.Y + Loc2.Height) &&
-           (Loc1.X <= Loc2.X + Loc2.Width) &&
-           (Loc1.X + Loc1.Width >= Loc2.X);
-}
-
 // Intersect collisions
 bool CheckCollisionIntersect(const Location_t &Loc1, const Location_t &Loc2)
 {
@@ -408,6 +375,13 @@ bool CursorCollision(const Location_t &Loc1, const SpeedlessLocation_t &Loc2)
            (Loc1.Y <= Loc2.Y + Loc2.Height - 1) &&
            (Loc1.Y + Loc1.Height >= Loc2.Y + 1);
 }
+bool CursorCollision(const Location_t &Loc1, const TinyLocation_t &Loc2)
+{
+    return (Loc1.X <= Loc2.X + Loc2.Width - 1) &&
+           (Loc1.X + Loc1.Width >= Loc2.X + 1) &&
+           (Loc1.Y <= Loc2.Y + Loc2.Height - 1) &&
+           (Loc1.Y + Loc1.Height >= Loc2.Y + 1);
+}
 
 // Shakey block collision
 bool ShakeCollision(const Location_t &Loc1, const Location_t &Loc2, int ShakeY3)
@@ -454,6 +428,17 @@ bool vScreenCollision(int A, const SpeedlessLocation_t &Loc2)
            (-vScreen[A].Y + vScreen[A].Height >= Loc2.Y);
 }
 
+bool vScreenCollision(int A, const TinyLocation_t &Loc2)
+{
+    if(A == 0)
+        return true;
+
+    return (-vScreen[A].X <= Loc2.X + Loc2.Width) &&
+           (-vScreen[A].X + vScreen[A].Width >= Loc2.X) &&
+           (-vScreen[A].Y <= Loc2.Y + Loc2.Height) &&
+           (-vScreen[A].Y + vScreen[A].Height >= Loc2.Y);
+}
+
 // vScreen collisions 2
 bool vScreenCollision2(int A, const Location_t &Loc2)
 {
@@ -464,6 +449,14 @@ bool vScreenCollision2(int A, const Location_t &Loc2)
 }
 
 bool vScreenCollision2(int A, const SpeedlessLocation_t &Loc2)
+{
+    return (-vScreen[A].X + 64 <= Loc2.X + Loc2.Width) &&
+           (-vScreen[A].X + vScreen[A].Width - 64 >= Loc2.X) &&
+           (-vScreen[A].Y + 96 <= Loc2.Y + Loc2.Height) &&
+           (-vScreen[A].Y + vScreen[A].Height - 64 >= Loc2.Y);
+}
+
+bool vScreenCollision2(int A, const TinyLocation_t &Loc2)
 {
     return (-vScreen[A].X + 64 <= Loc2.X + Loc2.Width) &&
            (-vScreen[A].X + vScreen[A].Width - 64 >= Loc2.X) &&

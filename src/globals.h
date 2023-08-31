@@ -886,7 +886,7 @@ struct Effect_t
 struct WorldLevel_t
 {
 //    Location As Location
-    SpeedlessLocation_t Location;
+    TinyLocation_t Location;
 
 //    FileName As String 'level's file
     std::string FileName;
@@ -994,7 +994,7 @@ struct Warp_t
 struct Tile_t
 {
 //    Location As Location
-    SpeedlessLocation_t Location;
+    TinyLocation_t Location;
 //    Type As Integer
     vbint_t Type = 0;
 //End Type
@@ -1008,7 +1008,7 @@ struct Tile_t
 struct Scene_t
 {
 //    Location As Location
-    SpeedlessLocation_t Location;
+    TinyLocation_t Location;
 //    Type As Integer
     vbint_t Type = 0;
 //    Active As Boolean 'if false this won't be shown. used for paths that become available on a scene
@@ -1022,7 +1022,7 @@ struct Scene_t
 struct WorldPath_t
 {
 //    Location As Location
-    SpeedlessLocation_t Location;
+    TinyLocation_t Location;
 //    Active As Boolean
     bool Active = false;
 //    Type As Integer
@@ -1036,7 +1036,7 @@ struct WorldPath_t
 struct WorldMusic_t
 {
 //    Location As Location
-    SpeedlessLocation_t Location;
+    TinyLocation_t Location;
 //    Type As Integer
     vbint_t Type = 0;
 //    EXTRA: Custom Music
