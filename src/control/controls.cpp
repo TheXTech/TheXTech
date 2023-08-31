@@ -109,10 +109,6 @@ void Hotkeys::Activate(size_t i, int player)
 #endif
 
 #ifdef DEBUG_BUILD
-    case Buttons::ToggleFontRender:
-        NewFontRender = !NewFontRender;
-        return;
-
     case Buttons::ReloadLanguage:
     {
         ReloadTranslations();
