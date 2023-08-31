@@ -40,6 +40,29 @@ struct Location_t
 //End Type
 };
 
+//NEW: 'Holds location information for an object without speed at integer coordinates, with width / height values below 32767
+struct TinyLocation_t
+{
+    int32_t X = 0;
+    int32_t Y = 0;
+    int16_t Height = 0;
+    int16_t Width = 0;
+
+    inline TinyLocation_t() = default;
+    inline explicit TinyLocation_t(const Location_t& loc) : X(loc.X), Y(loc.Y), Height(loc.Height), Width(loc.Width) {}
+
+    inline explicit operator Location_t() const
+    {
+        Location_t ret;
+        ret.X = X;
+        ret.Y = Y;
+        ret.Height = Height;
+        ret.Width = Width;
+
+        return ret;
+    }
+};
+
 //NEW: 'Holds location information for an object without speed
 struct SpeedlessLocation_t
 {
