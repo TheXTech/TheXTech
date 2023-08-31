@@ -17,12 +17,21 @@
  * or see <http://www.gnu.org/licenses/>.
  */
 
+#include <algorithm>
 #include "sdl_proxy/sdl_stdinc.h"
+
 #include "legacy_font.h"
 #include "gfx.h"
 #include "std_picture.h"
 #include "core/render.h"
 #include "font_manager_private.h"
+
+#if defined(_MSC_VER) && _MSC_VER <= 1900 // Workaround for MSVC 2015
+namespace std
+{
+    using ::toupper;
+}
+#endif
 
 
 LegacyFont::LegacyFont(int legacyFontId)
