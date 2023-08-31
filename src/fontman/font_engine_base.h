@@ -32,7 +32,8 @@ public:
     enum FontType
     {
         FONT_RASTER = 0,
-        FONT_TTF
+        FONT_TTF,
+        FONT_LEGACY
     };
 
     /*!
