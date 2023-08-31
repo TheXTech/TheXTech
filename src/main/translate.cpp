@@ -939,7 +939,7 @@ void XTechTranslate::updateLanguages(const std::string &outPath, bool noBlank)
 
 bool XTechTranslate::translate()
 {
-    if(!FontManager::isInitied())
+    if(!FontManager::isInitied() || FontManager::isLegacy())
     {
         pLogWarning("Translations aren't supported without new font engine loaded (the 'fonts' directory is required)");
         return false;

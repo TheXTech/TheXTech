@@ -302,10 +302,6 @@ InputMethodProfile_Keyboard::InputMethodProfile_Keyboard()
     this->m_hotkeys[Hotkeys::Buttons::Screenshot] = SDL_SCANCODE_F12;
     this->m_hotkeys2[Hotkeys::Buttons::Screenshot] = SDL_SCANCODE_F2;
 #ifdef DEBUG_BUILD
-    // This is a DEBUG ONLY hot key that can kill the overlook on localized versions
-    // It's primary use is a debugging of the font engine itself, comparing with the
-    // old font engine on the fly
-    this->m_hotkeys[Hotkeys::Buttons::ToggleFontRender] = SDL_SCANCODE_F4;
     this->m_hotkeys[Hotkeys::Buttons::ReloadLanguage] = SDL_SCANCODE_F5;
 #endif
 }

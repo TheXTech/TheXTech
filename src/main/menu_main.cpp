@@ -62,6 +62,7 @@
 #include "game_globals.h"
 #include "core/language.h"
 #include "main/translate.h"
+#include "fontman/font_manager.h"
 
 #include "video.h"
 #include "frm_main.h"
@@ -1645,8 +1646,14 @@ bool mainMenuUpdate()
                     }
                     else if(MenuCursor == i++)
                     {
-                        XLanguage::rotateLanguage(g_config.language, leftPressed ? -1 : 1);
-                        ReloadTranslations();
+                        if(!FontManager::isInitied() || FontManager::isLegacy())
+                            PlaySoundMenu(SFX_BlockHit);
+                        else
+                        {
+                            XLanguage::rotateLanguage(g_config.language, leftPressed ? -1 : 1);
+                            ReloadTranslations();
+                            PlaySoundMenu(SFX_Climbing);
+                        }
                     }
                     else if(MenuCursor == i++ && (menuDoPress || MenuMouseClick))
                     {
@@ -2143,8 +2150,14 @@ void mainMenuDraw()
             scale_str = &g_mainMenu.optionsScaleLinear;
 
         SuperPrint(fmt::format_ne("{0}: {1}", g_mainMenu.optionsScaleMode, *scale_str), 3, MenuX, MenuY + (30 * i++));
-        SuperPrint(fmt::format_ne("{0}: {1} ({2})", g_mainMenu.wordLanguage, g_mainMenu.languageName, g_config.language), 3, MenuX, MenuY + (30 * i++));
+
+        if(!FontManager::isInitied() || FontManager::isLegacy())
+            SuperPrint("Language: <missing \"fonts\">", 3, MenuX, MenuY + (30 * i++), 0.5f, 0.5f, 0.5f, 1.0f);
+        else
+            SuperPrint(fmt::format_ne("{0}: {1} ({2})", g_mainMenu.wordLanguage, g_mainMenu.languageName, g_config.language), 3, MenuX, MenuY + (30 * i++));
+
         SuperPrint(g_mainMenu.optionsViewCredits, 3, MenuX, MenuY + (30 * i++));
+
         XRender::renderTexture(MenuX - 20, MenuY + (MenuCursor * 30),
                                GFX.MCursor[0].w, GFX.MCursor[0].h, GFX.MCursor[0], 0, 0);
     }
