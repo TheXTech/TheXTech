@@ -126,6 +126,7 @@ static void compatInit(Compatibility_t &c)
     c.easier_player_powerdown = false;
     c.easier_player_physics = false;
     c.player_faster_climbing = false;
+    c.enable_kind_lava = false;
 
 
     if(s_compatLevel >= COMPAT_SMBX2) // Make sure that bugs were same as on SMBX2 Beta 4 on this moment
@@ -438,6 +439,7 @@ static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
     compat.read("easier-player-powerdown", c.easier_player_powerdown, c.easier_player_powerdown);
     compat.read("easier-player-physics", c.easier_player_physics, c.easier_player_physics);
     compat.read("player-faster-climbing", c.player_faster_climbing, c.player_faster_climbing);
+    compat.read("enable-kind-lava", c.enable_kind_lava, c.enable_kind_lava);
     compat.endGroup();
 }
 

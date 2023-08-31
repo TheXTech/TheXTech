@@ -2347,7 +2347,12 @@ void UpdatePlayer()
                                                 if(BlockKills[Block[B].Type])
                                                 {
                                                     if(!GodMode)
-                                                        PlayerDead(A);
+                                                    {
+                                                        if(!g_compatibility.enable_kind_lava)
+                                                            PlayerDead(A);
+                                                        else
+                                                            PlayerHurt(A);
+                                                    }
                                                 }
                                                 if(Player[A].Location.SpeedY == 0.0 ||
                                                    fEqual(float(Player[A].Location.SpeedY), Physics.PlayerGravity) || Player[A].Slope > 0 || Player[A].StandingOnNPC != 0)
@@ -2521,7 +2526,7 @@ void UpdatePlayer()
 
                                         // this is a fix to help the player deal with lava blocks a bit easier
                                         // it moves the blocks hitbox down a few pixels
-                                        if(BlockKills[Block[B].Type] && BlockSlope[Block[B].Type] == 0 && !GodMode && !(Player[A].Mount == 1 && Player[A].MountType == 2))
+                                        if(BlockKills[Block[B].Type] && BlockSlope[Block[B].Type] == 0 && !GodMode && !(Player[A].Mount == 1 && Player[A].MountType == 2) && !g_compatibility.enable_kind_lava)
                                         {
                                             if(Player[A].Location.Y + Player[A].Location.Height < Block[B].Location.Y + 6)
                                                 HitSpot = 0;
@@ -2534,13 +2539,25 @@ void UpdatePlayer()
                                             {
                                                 if(!(Player[A].Mount == 1 && Player[A].MountType == 2))
                                                 {
-                                                    PlayerDead(A);
-                                                    break;
+                                                    if(!g_compatibility.enable_kind_lava)
+                                                    {
+                                                        PlayerDead(A);
+                                                        break;
+                                                    }
+                                                    else
+                                                        PlayerHurt(A);
+                                                    
                                                 }
                                                 else if(HitSpot != 1 && BlockSlope[Block[B].Type] == 0)
                                                 {
-                                                    PlayerDead(A);
-                                                    break;
+                                                    if(!g_compatibility.enable_kind_lava)
+                                                    {
+                                                        PlayerDead(A);
+                                                        break;
+                                                    }
+                                                    else
+                                                        PlayerHurt(A);
+                                                    
                                                 }
                                                 else
                                                 {

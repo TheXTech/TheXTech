@@ -96,6 +96,7 @@ struct Compatibility_t
     bool easier_player_powerdown; // whenever the player should shrink like in modern Mario games or not
     bool easier_player_physics; // whenever the player should have better physics or not
     bool player_faster_climbing; // whenever the player should climb faster when holding run
+    bool enable_kind_lava; // enable this to let the player get hurt from lava, rather than just dying when tocuhing it
 
     // SpeedRun section
     enum
