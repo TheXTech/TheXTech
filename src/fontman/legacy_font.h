@@ -104,15 +104,13 @@ private:
      */
     struct RasChar
     {
-        uint32_t texId = 0; //!< Texture index in m_textures array
-        uint32_t tX = 0; //!< Horizontal pixel offset on texture
-        uint32_t tY = 0; //!< Vertical pixel offset on texture
-        uint32_t tW = 0; //!< Pixels width of the texture fragment
-        uint32_t tH = 0; //!< Pixels height of the texture fragment
-        uint32_t width = 0; //!< Width of glyph
-        bool valid = false; //!< Is a valid glyph
-        int32_t x = 0;//!< X pixel offset
-        int32_t y = 0;//!< Y pixel offset
+        uint8_t  texId = 0; //!< Texture index in m_textures array
+        bool     valid = false; //!< Is a valid glyph
+        uint16_t tX = 0; //!< Horizontal pixel offset on texture
+        uint16_t tY = 0; //!< Vertical pixel offset on texture
+        uint8_t  tW = 0; //!< Pixels width of the texture fragment
+        uint8_t  tH = 0; //!< Pixels height of the texture fragment
+        uint8_t  width = 0; //!< Width of glyph
     };
 
     //! Fallback width of glyph

@@ -133,12 +133,12 @@ private:
      */
     struct RasChar
     {
-        bool valid = false; //!< Is a valid glyph
+        bool        valid = false; //!< Is a valid glyph
         StdPicture* tx     = nullptr; //!< Pointer to the texture that contains this glyph
-        uint32_t padding_left    = 0; //!< Crop left
-        uint32_t padding_right   = 0; //!< Crop right
-        int32_t x = 0;//!< X pixel offset
-        int32_t y = 0;//!< Y pixel offset
+        uint8_t     padding_left    = 0; //!< Crop left
+        uint8_t     padding_right   = 0; //!< Crop right
+        int16_t     x = 0; //!< X pixel offset
+        int16_t     y = 0; //!< Y pixel offset
     };
 
 #ifdef LOW_MEM
