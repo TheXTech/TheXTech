@@ -47,7 +47,7 @@ RasterFont::RasterFont() : BaseFontEngine()
     m_matrixWidth    = 0;
     m_matrixHeight   = 0;
     m_isReady        = false;
-    m_ttfOutlines     = false;
+    m_ttfOutlines    = false;
     m_fontName       = fmt::format_ne("font{0}", fontNumberCount++);
 }
 

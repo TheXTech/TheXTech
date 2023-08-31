@@ -22,13 +22,20 @@
 #define RASTER_FONT_H
 
 #include <string>
-#include <unordered_map>
+#ifdef LOW_MEM
+#   include <map>
+#else
+#   include <unordered_map>
+#endif
 #include <Utils/vptrlist.h>
 #include "std_picture.h"
 #include <Graphics/size.h>
 
 #include "font_engine_base.h"
 
+/**
+ * @brief The raster fonts engine
+ */
 class RasterFont final : public BaseFontEngine
 {
 public:
@@ -131,7 +138,11 @@ private:
         int32_t y = 0;//!< Y pixel offset
     };
 
+#ifdef LOW_MEM
+    typedef std::map<char32_t, RasChar > CharMap;
+#else
     typedef std::unordered_map<char32_t, RasChar > CharMap;
+#endif
 
     //! Table of available characters
     CharMap m_charMap;
