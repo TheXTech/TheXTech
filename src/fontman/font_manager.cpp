@@ -84,8 +84,10 @@ static BaseFontEngine  *g_defaultRasterFont = nullptr;
 static BaseFontEngine  *g_defaultTtfFont = nullptr;
 #endif
 
-//! Is font manager initialized
+//! IS font manager initialized?
 static bool             g_fontManagerIsInit = false;
+//! Does font manager uses legacy fonts fallback?
+static bool             g_fontManagerIsLegacy = false;
 
 #ifdef LOW_MEM
 typedef std::map<std::string, vbint_t> FontsHash;
@@ -411,6 +413,7 @@ static void s_initFontsFallback()
     s_fontMapsDefault = true;
     s_fontMapsWorld = true;
     g_fontManagerIsInit = true;
+    g_fontManagerIsLegacy = true;
 }
 
 
@@ -460,6 +463,7 @@ void FontManager::initFull()
     s_fontMapsDefault = true;
     s_fontMapsWorld = true;
     g_fontManagerIsInit = true;
+    g_fontManagerIsLegacy = false;
 }
 
 void FontManager::quit()
@@ -559,6 +563,11 @@ void FontManager::clearLevelFonts()
 bool FontManager::isInitied()
 {
     return g_fontManagerIsInit;
+}
+
+bool FontManager::isLegacy()
+{
+    return g_fontManagerIsLegacy;
 }
 
 
