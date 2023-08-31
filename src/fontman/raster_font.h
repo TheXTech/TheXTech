@@ -25,12 +25,11 @@
 #include <unordered_map>
 #include <Utils/vptrlist.h>
 #include "std_picture.h"
-#include <Graphics/rect.h>
 #include <Graphics/size.h>
 
 #include "font_engine_base.h"
 
-class RasterFont : public BaseFontEngine
+class RasterFont final : public BaseFontEngine
 {
 public:
     RasterFont();

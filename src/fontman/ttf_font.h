@@ -43,7 +43,7 @@ extern FT_Library  g_ft;
 extern bool initializeFreeType();
 extern void closeFreeType();
 
-class TtfFont : public BaseFontEngine
+class TtfFont final : public BaseFontEngine
 {
 public:
     TtfFont();
