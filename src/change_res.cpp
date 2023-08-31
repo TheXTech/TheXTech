@@ -128,33 +128,35 @@ void UpdateInternalRes()
         // now, set width based on height and scaling mode
         if(g_videoSettings.scaleMode == SCALE_FIXED_05X)
         {
-            int_w = int_w * 2;
+            int_w *= 2;
         }
         else if(g_videoSettings.scaleMode == SCALE_FIXED_1X)
         {
-            int_w = int_w;
+            // keep as-is
+            // int_w = int_w;
         }
         else if(g_videoSettings.scaleMode == SCALE_FIXED_2X)
         {
-            int_w = int_w / 2;
+            int_w /= 2;
         }
         else if(g_videoSettings.scaleMode == SCALE_DYNAMIC_INTEGER)
         {
             int scale_factor = orig_int_h / int_h;
             if(scale_factor == 0)
             {
-                int_w = int_w;
+                // keep as-is
+                // int_w = int_w;
             }
             else if(int_w / scale_factor >= 800)
             {
-                int_w = int_w / scale_factor;
+                int_w /= scale_factor;
             }
             else
             {
                 // scale based on width
                 int scale_factor = int_w / 800;
                 if(scale_factor != 0)
-                    int_w = int_w / scale_factor;
+                    int_w /= scale_factor;
 
                 // rescale the height if possible
                 if(scale_factor != 0 && req_h == 0)
@@ -177,14 +179,14 @@ void UpdateInternalRes()
         {
             if(int_w < 800)
             {
-                int_h = int_h * 800 / int_w;
+                int_h = (int_h * 800) / int_w;
                 int_w = 800;
                 if(int_h > 720)
                     int_h = 720;
             }
             if(int_h < 600)
             {
-                int_w = int_w * 600 / int_h;
+                int_w = (int_w * 600) / int_h;
                 int_h = 600;
             }
         }
