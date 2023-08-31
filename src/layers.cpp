@@ -1122,8 +1122,8 @@ void ProcEvent(eventindex_t index, int whichPlayer, bool NoEffect)
                                 }
 
                                 // used ScreenW / H and FrmMain.ScaleWidth / Height in VB6 code
-                                double use_width  = SDL_min(use_screen.W, level[B].Width  - level[B].X);
-                                double use_height = SDL_min(use_screen.H, level[B].Height - level[B].Y);
+                                double use_width  = SDL_min(static_cast<double>(use_screen.W), level[B].Width  - level[B].X);
+                                double use_height = SDL_min(static_cast<double>(use_screen.H), level[B].Height - level[B].Y);
 
                                 // restrict to old level bounds
                                 if(-qScreenLoc[Z1].X < level[B].X)

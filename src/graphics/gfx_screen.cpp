@@ -545,11 +545,11 @@ void CenterScreens(Screen_t& screen)
         // restrict single vScreens on NoTurnBack sections
         if(g_compatibility.allow_multires && no_turn_back)
         {
-            MaxWidth = SDL_min(MaxWidth, screen.canonical_screen().W);
+            MaxWidth = SDL_min(MaxWidth, static_cast<double>(screen.canonical_screen().W));
 
             // limit Visible screens further during DynamicScreen
             if(screen.Visible && screen.Type == 5 && screen.vScreen(2).Visible)
-                MaxWidth = SDL_min(MaxWidth, screen.canonical_screen().W / 2);
+                MaxWidth = SDL_min(MaxWidth, static_cast<double>(screen.canonical_screen().W / 2));
         }
 
         // allow the canonical vScreens to approach normal screen size during dynamic screen
@@ -559,8 +559,8 @@ void CenterScreens(Screen_t& screen)
             MinHeight = screen.H;
 
             // allow to grow up to half the size of the visible screen
-            MinWidth = SDL_min(MinWidth, screen.visible_screen().W / 2);
-            MinHeight = SDL_min(MinHeight, screen.visible_screen().H / 2);
+            MinWidth = SDL_min(MinWidth, static_cast<double>(screen.visible_screen().W / 2));
+            MinHeight = SDL_min(MinHeight, static_cast<double>(screen.visible_screen().H / 2));
 
             // this ensures a gradual transition between canonical screen size / 2 and visible screen size / 2
             // (no need to use it if in different sections)
