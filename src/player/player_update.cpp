@@ -602,7 +602,6 @@ void UpdatePlayer()
                     {
                         if(Player[A].Controls.Left)
                             Player[A].Location.SpeedX = -1.5;
-                        
                         else if(Player[A].Controls.Right)
                             Player[A].Location.SpeedX = 1.5;
                         else
@@ -610,7 +609,6 @@ void UpdatePlayer()
                         
                         if(Player[A].Controls.Up && Player[A].Vine > 2)
                             Player[A].Location.SpeedY = -2;
-                        
                         else if(Player[A].Controls.Down)
                             Player[A].Location.SpeedY = 3;
                         else
@@ -625,7 +623,6 @@ void UpdatePlayer()
                             else
                                 Player[A].Location.SpeedX = -3;
                         }
-                        
                         else if(Player[A].Controls.Right)
                         {
                             if(!Player[A].Controls.Run)
@@ -635,6 +632,7 @@ void UpdatePlayer()
                         }
                         else
                             Player[A].Location.SpeedX = 0;
+                        
                         if(Player[A].Controls.Up && Player[A].Vine > 2)
                         {
                             if(!Player[A].Controls.Run)
@@ -642,7 +640,6 @@ void UpdatePlayer()
                             else
                                 Player[A].Location.SpeedY = -3.5;
                         }
-                        
                         else if(Player[A].Controls.Down)
                         {
                             if(!Player[A].Controls.Run)
