@@ -41,7 +41,7 @@
 #include "../graphics.h"
 #include "../controls.h"
 #include "../script/msg_preprocessor.h"
-#include "../math.h"
+#include "../math_functions.h"
 
 #include "npc_id.h"
 #include "eff_id.h"

@@ -21,7 +21,7 @@
 #include <cstdlib>
 
 #include "globals.h"
-#include "math.h"
+#include "math_functions.h"
 
 int mathSign(int a)
 {
