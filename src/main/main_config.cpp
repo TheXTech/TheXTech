@@ -257,7 +257,6 @@ void OpenConfig()
         config.readEnum("world-map-stars-show-policy", g_config.WorldMapStarShowPolicyGlobal, 0, starsShowPolicy);
         config.read("strict-drop-add", g_config.StrictDropAdd, false);
         config.read("no-pause-reconnect", g_config.NoPauseReconnect, false);
-        config.read("enter-cheats-menu-item", g_config.enter_cheats_menu_item, false);
         config.read("world-map-fast-move", g_config.worldMapFastMove, false);
 #ifdef ENABLE_XTECH_DISCORD_RPC
         config.read("discord-rpc", g_config.discord_rpc, false);
@@ -418,7 +417,6 @@ void SaveConfig()
     }
     config.setValue("strict-drop-add", g_config.StrictDropAdd);
     config.setValue("no-pause-reconnect", g_config.NoPauseReconnect);
-    config.setValue("enter-cheats-menu-item", g_config.enter_cheats_menu_item);
     config.setValue("world-map-fast-move", g_config.worldMapFastMove);
 #ifdef ENABLE_XTECH_DISCORD_RPC
     config.setValue("discord-rpc", g_config.discord_rpc);

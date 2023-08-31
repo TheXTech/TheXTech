@@ -66,8 +66,6 @@ extern struct Config_t
     bool    StrictDropAdd = false;
     //! Use the quick (non-pausing) reconnect screen
     bool    NoPauseReconnect = false;
-    //! Access the Cheat Screen from the pause menu
-    bool    enter_cheats_menu_item = false;
     //! Allow player quickly move through paths on the world map (works for compatibility Mode 1 only)
     bool    worldMapFastMove = false;
 #ifdef ENABLE_XTECH_DISCORD_RPC
