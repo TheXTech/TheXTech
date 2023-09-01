@@ -49,6 +49,7 @@ enum class Context
 struct CharInfo
 {
     int max_players;
+    int dead_count;
     bool char_present[5];
 
     bool accept(int c)
@@ -254,9 +255,12 @@ bool Player_Remove(int p)
         s_inputReady[p2] = s_inputReady[p2+1];
     }
     // in drop-add, remove the Player officially
-    if(p+1 <= numPlayers && s_context == Context::DropAdd)
+    if(p + 1 <= numPlayers && s_context == Context::DropAdd)
     {
-        DropPlayer(p+1);
+        if(Player[p + 1].Dead || Player[p + 1].TimeToLive > 0)
+            s_char_info.dead_count++;
+
+        DropPlayer(p + 1);
     }
 
     if(Controls::g_InputMethods.empty())
@@ -550,15 +554,18 @@ bool Player_Select(int p)
                 AddPlayer(g_charSelect[numPlayers]);
                 s_char_info.max_players = numPlayers;
 
-                // spend a life if StrictDropAdd enabled
-                if(g_config.StrictDropAdd && !LevelSelect)
+                // add as dead if dead player was dropped in this level
+                if(s_char_info.dead_count > 0)
                 {
-                    if(Lives <= 0)
-                        Player[numPlayers].Dead = true;
-                    else
-                        Lives -= 1;
+                    s_char_info.dead_count--;
+                    Player[numPlayers].Dead = true;
+                    PlaySound(SFX_ShellHit);
                 }
-                PlaySound(SFX_ItemEmerge);
+                else
+                {
+                    PlaySound(SFX_ItemEmerge);
+                }
+
                 do_sentinel.active = false;
             }
         }
@@ -1820,6 +1827,7 @@ void SaveChars()
         s_char_info.char_present[c] = false;
 
     s_char_info.max_players = numPlayers;
+    s_char_info.dead_count = 0;
 
     for(int A = 1; A <= numPlayers; A++)
     {
