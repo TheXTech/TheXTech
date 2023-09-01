@@ -62,8 +62,6 @@ extern struct Config_t
     bool    GameplayPoundByAltRun = false;
     //! Policy of stars showing at world map
     int     WorldMapStarShowPolicyGlobal = 0;
-    //! Use strict Drop/Add (lose life on Add after Drop, SwapCharacter)
-    bool    StrictDropAdd = false;
     //! Use the quick (non-pausing) reconnect screen
     bool    NoPauseReconnect = false;
     //! Allow player quickly move through paths on the world map (works for compatibility Mode 1 only)
