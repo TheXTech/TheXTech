@@ -949,7 +949,7 @@ void RenderGL::unloadTexture(StdPicture &tx)
     if(corpseIt != m_loadedPictures.end())
         m_loadedPictures.erase(corpseIt);
 
-    D_pLogDebug("RenderSDL: unloading texture at %p, new texture count %d...", &tx, (int)m_loadedPictures.size());
+    D_pLogDebug("RenderGL: unloading texture at %p, new texture count %d...", &tx, (int)m_loadedPictures.size());
 
     if(tx.d.texture_id)
         glDeleteTextures(1, &tx.d.texture_id);
@@ -984,7 +984,7 @@ void RenderGL::clearAllTextures()
 {
     for(StdPicture *tx : m_loadedPictures)
     {
-        D_pLogDebug("RenderSDL: unloading texture at %p on clearAllTextures()", tx);
+        D_pLogDebug("RenderGL: unloading texture at %p on clearAllTextures()", tx);
 
         if(tx->d.texture_id)
             glDeleteTextures(1, &tx->d.texture_id);
