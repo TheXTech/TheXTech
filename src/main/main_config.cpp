@@ -127,7 +127,6 @@ void OpenConfig_preSetup()
         IniProcessing config(configPath);
 
         config.beginGroup("main");
-        config.read("loading-debug", g_config.loading_show_debug, true);
         config.read("language", g_config.language, g_config.language);
         config.endGroup();
 
@@ -312,7 +311,6 @@ void SaveConfig()
     config.setValue("use-native-osk", g_config.use_native_osk);
     config.setValue("enable-editor", g_config.enable_editor);
     config.setValue("editor-edge-scroll", g_config.editor_edge_scroll);
-    config.setValue("loading-debug", g_config.loading_show_debug);
     config.setValue("language", g_config.language);
     config.endGroup();
 
