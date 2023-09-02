@@ -185,9 +185,9 @@ void InputMethodProfile::SaveConfig_All(IniProcessing* ctl)
 void InputMethodProfile::LoadConfig_All(IniProcessing* ctl)
 {
     if(this->Type->RumbleSupported())
-        ctl->read("enable-rumble", this->m_rumbleEnabled, g_config.JoystickEnableRumble);
+        ctl->read("enable-rumble", this->m_rumbleEnabled, this->m_rumbleEnabled);
 
-    ctl->read("ground-pound-by-alt-run", this->m_groundPoundByAltRun, g_config.GameplayPoundByAltRun);
+    ctl->read("ground-pound-by-alt-run", this->m_groundPoundByAltRun, this->m_groundPoundByAltRun);
     ctl->read("show-power-status", this->m_showPowerStatus, this->m_showPowerStatus);
     this->LoadConfig(ctl);
 }

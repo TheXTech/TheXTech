@@ -252,7 +252,6 @@ void OpenConfig()
         config.endGroup();
 
         config.beginGroup("gameplay");
-        config.read("ground-pound-by-alt-run", g_config.GameplayPoundByAltRun, false);
         config.readEnum("world-map-stars-show-policy", g_config.WorldMapStarShowPolicyGlobal, 0, starsShowPolicy);
         config.read("no-pause-reconnect", g_config.NoPauseReconnect, false);
         config.read("world-map-fast-move", g_config.worldMapFastMove, false);
@@ -408,7 +407,6 @@ void SaveConfig()
             {2, "smbx13"}
         };
 
-        config.setValue("ground-pound-by-alt-run", g_config.GameplayPoundByAltRun);
         config.setValue("world-map-stars-show-policy", starsShowPolicy[g_config.WorldMapStarShowPolicyGlobal]);
         config.setValue("compatibility-mode", compatMode[g_preSetup.compatibilityMode]);
     }

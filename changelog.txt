@@ -64,6 +64,7 @@ Changelog for 1.3.6.1-beta
 -Removed thextech.ini option to enter codes at pause menu; this ability is now unlocked by the input sequence LRLRRLRRRLRRRR (@0lhi, @ds-sloth)
 -Removed TheXTech 1.3.6 exploit where dead player could be respawned for free by dropping then adding them (@ds-sloth)
 -Removed "strict-drop-add" thextech.ini option (@ds-sloth)
+-Removed deprecated global controls settings "ground-pound-by-alt-run", "enable-rumble", and "enable-battery-status". Set these per-profile in the controls menu. (@ds-sloth)
 
 Changelog for 1.3.6
 -Added an ability to toggle drawing of the HUD and other on-screen meta data using F1 key (@Wohlstand)

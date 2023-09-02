@@ -57,7 +57,7 @@ extern struct Config_t
     /* ---- Gameplay ----*/
 
     //! Do ground-point by alt-run key instead of down
-    bool    GameplayPoundByAltRun = false;
+    // bool    GameplayPoundByAltRun = false;
     //! Policy of stars showing at world map
     int     WorldMapStarShowPolicyGlobal = 0;
     //! Use the quick (non-pausing) reconnect screen
@@ -86,7 +86,7 @@ extern struct Config_t
     /* ---- Joystick ----*/
 
     //! Enable usage of the rumble control. Only affects new controller profiles.
-    bool    JoystickEnableRumble = true;
+    // bool    JoystickEnableRumble = true;
     //! Show the battery status for wireless gamepads (if possible). Only affects new controller profiles.
     // bool    JoystickEnableBatteryStatus = false;
 
