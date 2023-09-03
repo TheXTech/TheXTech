@@ -34,7 +34,7 @@ public:
     TrWorldParser()
     {
         // Build the map of tr-id objects
-        for(int i = 1; i <= numWorldMusic; ++i)
+        for(int i = 1; i <= numWorldLevels; ++i)
         {
             auto &it = m_trIdMapLevel[WorldLevel[i].LevelName];
             it.push_back(i);
