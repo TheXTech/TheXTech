@@ -91,7 +91,7 @@ extern struct Config_t
         INACTIVE_NPC_SHADE,
         INACTIVE_NPC_SHOW,
     };
-    int render_inactive_NPC = INACTIVE_NPC_SHADE;
+    static constexpr int render_inactive_NPC = INACTIVE_NPC_SHADE;
     //! Translate the coordinates of autocode screen-space objects based on the HUD location
     bool autocode_translate_coords = true;
     //! Camera optimizations that improve the experience at low resolutions
