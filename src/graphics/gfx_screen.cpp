@@ -34,7 +34,7 @@
 #include "config.h"
 #include "core/render.h"
 
-// Copies all Screen and vScreen info, except size, from source to dest. Centers screens.
+// Copies all Screen and vScreen info, except size, from source to dest.
 void s_CopyScreen(Screen_t& dest, const Screen_t& source)
 {
     for(int v = 1; v <= maxLocalPlayers; v++)

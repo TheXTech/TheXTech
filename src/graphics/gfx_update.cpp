@@ -475,18 +475,6 @@ void DrawWarningNPC(int Z, int A)
     double total_off = (add_x > 0 ? add_x : -add_x)
         + (add_y > 0 ? add_y : -add_y);
 
-    // uncomment this code to disable warning when NPC is moving away from screen
-#if 0
-    // don't worry if it's moving away from the screen
-    if((add_x > 0 && NPC[A].Location.SpeedX < 0)
-        || (add_x < 0 && NPC[A].Location.SpeedX > 0)
-        || (add_y > 0 && NPC[A].Location.SpeedY < 0)
-        || (add_y < 0 && NPC[A].Location.SpeedY > 0))
-    {
-        return;
-    }
-#endif
-
     an *= (250.0 - total_off) / 500.0;
     if(an > 1.0f)
         an = 1.0f;
@@ -540,7 +528,7 @@ void DrawWarningNPC(int Z, int A)
 }
 
 // code to facilitate cached values for the onscreen blocks and BGOs
-// intentionally short initializers since >2P mode is rare
+// intentionally only initialize the vectors for the first 2 screens since >2P mode is rare
 
 // query results of last tree query
 static std::vector<BlockRef_t> s_drawMainBlocks[maxLocalPlayers] = {std::vector<BlockRef_t>(400), std::vector<BlockRef_t>(400)};
@@ -804,7 +792,7 @@ static std::bitset<maxNPCs> s_NPC_present;
 // does the classic ("onscreen") NPC activation / reset logic for vScreen Z, directly based on the many NPC loops of the original game
 void ClassicNPCScreenLogic(int Z, int numScreens, bool fill_draw_queue, NPC_Draw_Queue_t& NPC_Draw_Queue_p)
 {
-    // using bitset here instead of simpler set for checkNPCs because I benchmarked it to be faster -- ds-sloth
+    // using bitset here instead of simpler set because I benchmarked it to be faster -- ds-sloth
     std::bitset<maxNPCs>& NPC_present = s_NPC_present;
 
     // find the onscreen NPCs
@@ -1050,7 +1038,7 @@ void ModernNPCScreenLogic(Screen_t& screen, int vscreen_i, bool fill_draw_queue,
         }
     }
 
-    // using bitset here instead of simpler set for checkNPCs because I benchmarked it to be faster -- ds-sloth
+    // using bitset here instead of simpler set because I benchmarked it to be faster -- ds-sloth
     // the purpose of this logic is to avoid duplicates in the checkNPCs vector
     std::bitset<maxNPCs>& NPC_present = s_NPC_present;
 
@@ -1413,9 +1401,9 @@ void UpdateGraphics(bool skipRepaint)
 
     g_stats.reset();
 
-    bool continue_qScreen = false;
-    bool continue_qScreen_local = false;
-    bool continue_qScreen_canonical = false;
+    bool continue_qScreen = false; // will qScreen continue for any visible screen?
+    bool continue_qScreen_local = false; // will qScreen continue for a visible screen on the local machine? (NetPlay)
+    bool continue_qScreen_canonical = false; // will qScreen continue for any canonical screen?
 
     // prepare to fill this frame's NoReset queue
     std::swap(NPCQueues::NoReset, s_NoReset_NPCs_LastFrame);
@@ -1790,11 +1778,8 @@ void UpdateGraphics(bool skipRepaint)
 
     // No logic
     // Draw the screens!
-    for(int vscreen_i = 0; vscreen_i < numScreens; vscreen_i++)
+    for(int vscreen_i = screen.active_begin(); vscreen_i < screen.active_end(); vscreen_i++)
     {
-        if(SingleCoop == 2)
-            vscreen_i = 1;
-
         Z = screen.vScreen_refs[vscreen_i];
         int plr_Z = screen.players[vscreen_i];
 
