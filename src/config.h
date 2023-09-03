@@ -92,9 +92,6 @@ extern struct Config_t
         INACTIVE_NPC_SHOW,
     };
     int render_inactive_NPC = INACTIVE_NPC_SHADE;
-    //! Allow the view to grow beyond 800x600 in the world map (nearly duplicates Compatibility_t::free_world_res),
-    //  but does not enforce at least 800x600 render resolution when off.
-    bool world_map_expand_view = false;
     //! Translate the coordinates of autocode screen-space objects based on the HUD location
     bool autocode_translate_coords = true;
     //! Camera optimizations that improve the experience at low resolutions
