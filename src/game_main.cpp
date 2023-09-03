@@ -371,8 +371,15 @@ int GameMain(const CmdLineSetup_t &setup)
             BattleMode = false;
             BattleIntro = 0;
         }
-        GodMode = setup.testGodMode;
-        GrabAll = setup.testGrabAll;
+
+        if(!is_world)
+        {
+            GodMode = setup.testGodMode;
+            GrabAll = setup.testGrabAll;
+
+            if(GodMode || GrabAll)
+                Cheater = true;
+        }
 
         editorScreen.ResetCursor();
 
