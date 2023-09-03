@@ -2423,9 +2423,7 @@ void PowBlock()
 
             if(!LevelEditor)
             {
-                if(ScreenType == 1)
-                    numScreens = 2;
-                if(ScreenType == 4)
+                if(ScreenType == 1 || ScreenType == 4)
                     numScreens = 2;
 
                 if(ScreenType == 5)
@@ -2433,8 +2431,6 @@ void PowBlock()
                     DynamicScreen(screen);
                     if(vScreen[2].Visible)
                         numScreens = 2;
-                    else
-                        numScreens = 1;
                 }
             }
         }
