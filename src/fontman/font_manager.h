@@ -76,6 +76,12 @@ void clearLevelFonts();
  */
 bool isInitied();
 
+/*!
+ * \brief Checks if font manager uses legacy fonts fallback
+ * \return true when manager uses legacy fonts fallback
+ */
+bool isLegacy();
+
 int fontIdFromSmbxFont(int font);
 uint32_t fontSizeFromSmbxFont(int font);
 

@@ -32,6 +32,7 @@
 #include "layers.h"
 #endif
 
+#include "fontman/font_manager.h"
 #include "translate_episode.h"
 #define XTECH_TRANSLATE_EPISODE
 #include "translate/tr_title.h"
@@ -141,6 +142,12 @@ TranslateEpisode::TranslateEpisode()
 
 void TranslateEpisode::loadLevelTranslation(const std::string& key)
 {
+    if(!FontManager::isInitied() || FontManager::isLegacy())
+    {
+        pLogWarning("TranslateEpisode: Translations aren't supported without new font engine loaded (the 'fonts' directory is required)");
+        return;
+    }
+
     std::string langFile = getTrFile(FileName);
 
     if(langFile.empty())
@@ -161,6 +168,12 @@ void TranslateEpisode::loadLevelTranslation(const std::string& key)
 
 void TranslateEpisode::loadWorldTranslation(const std::string& key)
 {
+    if(!FontManager::isInitied() || FontManager::isLegacy())
+    {
+        pLogWarning("TranslateEpisode: Translations aren't supported without new font engine loaded (the 'fonts' directory is required)");
+        return;
+    }
+
     std::string langFile = getTrFile(FileNameWorld);
 
     if(langFile.empty())
@@ -183,6 +196,12 @@ void TranslateEpisode::loadLunaScript(const std::string& key)
 {
     m_scriptLines.clear();
     m_scriptTrId.clear();
+
+    if(!FontManager::isInitied() || FontManager::isLegacy())
+    {
+        pLogWarning("TranslateEpisode: Translations aren't supported without new font engine loaded (the 'fonts' directory is required)");
+        return;
+    }
 
     std::string langFile = getTrFile(FileName);
 
@@ -208,6 +227,12 @@ bool TranslateEpisode::tryTranslateTitle(const std::string& episodePath,
                                          const std::string& worldFile,
                                          std::string& output)
 {
+    if(!FontManager::isInitied() || FontManager::isLegacy())
+    {
+        pLogWarning("TranslateEpisode: Translations aren't supported without new font engine loaded (the 'fonts' directory is required)");
+        return false;
+    }
+
     std::string langFile = getTrFile(std::string(), episodePath);
 
     if(langFile.empty())
@@ -231,6 +256,12 @@ bool TranslateEpisode::tryTranslateTitle(const std::string& episodePath,
 
 void TranslateEpisode::trScriptLine(std::string& data, int line)
 {
+    if(!FontManager::isInitied() || FontManager::isLegacy())
+    {
+        pLogWarning("TranslateEpisode: Translations aren't supported without new font engine loaded (the 'fonts' directory is required)");
+        return;
+    }
+
     if(m_scriptLines.empty() && m_scriptTrId.empty())
         return;
 

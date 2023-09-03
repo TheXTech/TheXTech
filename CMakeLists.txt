@@ -690,6 +690,7 @@ set(THEXTECH_SRC
     src/fontman/font_manager.cpp
     src/fontman/font_manager_private.cpp
     src/fontman/raster_font.cpp
+    src/fontman/legacy_font.cpp
     src/fontman/utf8_helpers.cpp
 )
 
@@ -1008,7 +1009,8 @@ elseif(NINTENDO_WII OR NINTENDO_3DS OR NINTENDO_DS)
     set_target_properties(thextech PROPERTIES SUFFIX ".elf")
 
 else()
-    add_executable(thextech ${THEXTECH_SRC} ${LIB_SRC})
+    add_executable(thextech ${THEXTECH_SRC} ${LIB_SRC}
+        src/fontman/legacy_font.h src/fontman/legacy_font.cpp)
     pge_set_nopie(thextech)
 endif()
 

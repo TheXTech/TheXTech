@@ -22,7 +22,11 @@
 #define TTF_FONT_H
 
 
-#include <unordered_map>
+#ifdef LOW_MEM
+#   include <map>
+#else
+#   include <unordered_map>
+#endif
 #include <Utils/vptrlist.h>
 #include "std_picture.h"
 
@@ -43,7 +47,10 @@ extern FT_Library  g_ft;
 extern bool initializeFreeType();
 extern void closeFreeType();
 
-class TtfFont : public BaseFontEngine
+/**
+ * @brief The FreeType-based font engine
+ */
+class TtfFont final : public BaseFontEngine
 {
 public:
     TtfFont();
@@ -186,8 +193,13 @@ private:
     // version using an existing texture
     const TheGlyph &loadGlyph(StdPicture &texture, uint32_t fontSize, char32_t character);
 
+#ifdef LOW_MEM
+    typedef std::map<char32_t, TheGlyph> CharMap;
+    typedef std::map<uint32_t, CharMap>  SizeCharMap;
+#else
     typedef std::unordered_map<char32_t, TheGlyph> CharMap;
     typedef std::unordered_map<uint32_t, CharMap>  SizeCharMap;
+#endif
 
     SizeCharMap m_charMap;
     VPtrList<StdPicture > m_texturesBank;

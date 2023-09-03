@@ -94,7 +94,7 @@ void speedRun_renderTimer()
         return; // Don't draw things at Menu and Outro
 
     s_gamePlayTimer.render();
-    SuperPrintRightAlign(fmt::format_ne("Mode {0}", g_speedRunnerMode), 3, ScreenW - 2, 2, 1.f, 0.3f, 0.3f, 0.5f);
+    SuperPrintRightAlign(fmt::format_ne(Cheater ? "CMode {0}" : "Mode {0}", g_speedRunnerMode), 3, ScreenW - 2, 2, 1.f, 0.3f, 0.3f, 0.5f);
 }
 
 static void GetControllerColor(int player, float& r, float& g, float& b, bool* drawLabel = nullptr)
