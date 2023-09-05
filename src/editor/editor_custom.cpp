@@ -24,6 +24,7 @@
 #include <fmt_format_ne.h>
 
 #include "sdl_proxy/sdl_stdinc.h"
+#include "sdl_proxy/sdl_assert.h"
 
 #include "main/translate.h"
 
