@@ -1399,33 +1399,43 @@ void StackWalker::OnSymInit(LPCSTR szSearchPath, DWORD symOptions, LPCSTR szUser
     sprintf_s(buffer, STACKWALK_MAX_NAMELEN, "SymInit: Symbol-SearchPath: '%s', symOptions: %ld, UserName: '%s'\n", szSearchPath, symOptions, szUserName);
     ansi2utf8(buffer, STACKWALK_MAX_NAMELEN);
     OnOutput(buffer);
+
     // Also display the OS-version
-    #if _MSC_VER <= 1200
+#if !defined(_MSC_VER) || _MSC_VER <= 1200
     OSVERSIONINFOA ver;
     ZeroMemory(&ver, sizeof(OSVERSIONINFOA));
     ver.dwOSVersionInfoSize = sizeof(ver);
+
     if(GetVersionExA(&ver) != FALSE)
     {
         sprintf_s(buffer, STACKWALK_MAX_NAMELEN, "OS-Version: %ld.%ld.%ld (%s)\n",
-                  ver.dwMajorVersion, ver.dwMinorVersion, ver.dwBuildNumber,
+                  (int32_t)ver.dwMajorVersion,
+                  (int32_t)ver.dwMinorVersion,
+                  (int32_t)ver.dwBuildNumber,
                   ver.szCSDVersion);
         ansi2utf8(buffer, STACKWALK_MAX_NAMELEN);
         OnOutput(buffer);
     }
-    #else
+#else
     OSVERSIONINFOEXA ver;
     ZeroMemory(&ver, sizeof(OSVERSIONINFOEXA));
     ver.dwOSVersionInfoSize = sizeof(ver);
-#pragma warning(suppress: 28159) //API
+
+#pragma warning(suppress: 28159) // API
+#pragma warning(suppress: 4996)  // The "GetVersionExA" is deprecated
     if(GetVersionExA((OSVERSIONINFOA *) &ver) != FALSE)
     {
-        sprintf_s(buffer, STACKWALK_MAX_NAMELEN, "OS-Version: %d.%d.%d (%s) 0x%x-0x%x\n",
-                  ver.dwMajorVersion, ver.dwMinorVersion, ver.dwBuildNumber,
-                  ver.szCSDVersion, ver.wSuiteMask, ver.wProductType);
+        sprintf_s(buffer, STACKWALK_MAX_NAMELEN, "OS-Version: %u.%u.%u (%s) 0x%x-0x%x\n",
+                  (uint32_t)ver.dwMajorVersion,
+                  (uint32_t)ver.dwMinorVersion,
+                  (uint32_t)ver.dwBuildNumber,
+                  ver.szCSDVersion,
+                  ver.wSuiteMask,
+                  ver.wProductType);
         ansi2utf8(buffer, STACKWALK_MAX_NAMELEN);
         OnOutput(buffer);
     }
-    #endif
+#endif
 }
 
 void StackWalker::OnOutput(LPCSTR buffer)

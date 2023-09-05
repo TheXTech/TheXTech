@@ -632,7 +632,7 @@ int AbstractRender_t::registerUniform(StdPicture &target, const char* name)
         target.l.registeredUniforms.push_back(name);
         target.l.finalUniformState.push_back(UniformValue_t(0.0f));
 
-        return target.l.registeredUniforms.size() - 1;
+        return (int)target.l.registeredUniforms.size() - 1;
     }
 
     return it - target.l.registeredUniforms.begin();

@@ -155,7 +155,7 @@ void GLParticleSystem::fill_and_draw(GLfloat clock)
     // whole buffer
     if(m_modified_count >= m_particle_count)
     {
-        m_update_buffer_section(0, m_vertices_mutable.size());
+        m_update_buffer_section(0, (int)m_vertices_mutable.size());
     }
     // wraparound (start and finish of buffer)
     else if(m_modified_count > m_next_particle)
@@ -193,7 +193,7 @@ void GLParticleSystem::fill_and_draw(GLfloat clock)
     glEnableVertexAttribArray(4);
 
     // draw!
-    glDrawArrays(GL_TRIANGLES, 0, m_vertices_immutable.size());
+    glDrawArrays(GL_TRIANGLES, 0, (GLsizei)m_vertices_immutable.size());
 
     // disable the arrays (necessary for Emscripten and possibly also GL core)
     glDisableVertexAttribArray(3);

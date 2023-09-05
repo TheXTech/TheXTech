@@ -466,7 +466,7 @@ void GLProgramObject::restore_uniforms(StdPictureLoad& l)
 
     // assign all uniforms
     for(size_t i = 0; i < final_values.size(); i++)
-        assign_uniform(i, final_values[i], l);
+        assign_uniform((int)i, final_values[i], l);
 }
 
 /*!
@@ -552,7 +552,7 @@ int GLProgramObject::register_uniform(const char* name, StdPictureLoad& l)
 
     m_u_custom_loc.push_back(loc);
 
-    return m_u_custom_loc.size() - 1;
+    return (int)m_u_custom_loc.size() - 1;
 }
 
 /*!
