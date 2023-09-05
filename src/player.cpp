@@ -4384,8 +4384,8 @@ void PowerUps(const int A)
             p.TailCount += 1;
             if(p.TailCount == 25)
                 p.TailCount = 0;
-            if(p.TailCount % 7 == 0 || (p.SpinJump && p.TailCount) % 2 == 0)
 
+            if(p.TailCount % 7 == 0 || (p.SpinJump && (p.TailCount % 2) == 0))
                 TailSwipe(A, true);
             else
                 TailSwipe(A);
