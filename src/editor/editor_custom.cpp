@@ -24,6 +24,7 @@
 #include <fmt_format_ne.h>
 
 #include "sdl_proxy/sdl_stdinc.h"
+#include "sdl_proxy/sdl_assert.h"
 
 #include "main/translate.h"
 
@@ -395,7 +396,7 @@ void ItemFamily::make_layout_pods()
     }
 
     trash_pod.rows = 1;
-    trash_pod.cols = trash_pod.types.size();
+    trash_pod.cols = (int)trash_pod.types.size();
 
     // order the pods by size
     std::sort(temp_layout_pods.begin(), temp_layout_pods.end(),
@@ -421,7 +422,7 @@ bool ItemFamily::make_layout(int layout_width)
 {
     if(temp_layout_pods.empty())
     {
-        layout_pod.resize(types.size() / layout_width + 1, layout_width);
+        layout_pod.resize((int)types.size() / layout_width + 1, layout_width);
 
         layout_pod.types.resize(0);
         for(ItemType_t t : types)
@@ -510,7 +511,7 @@ bool ItemFamily::make_layout(int layout_width)
 void ItemList_t::make_layout(int rows)
 {
     // first, remove any existing padding
-    for(int i = indices.size() - 1; i >= 0; i--)
+    for(int i = (int)indices.size() - 1; i >= 0; i--)
     {
         if(indices[i] == -1 && names[i].empty())
         {
@@ -598,9 +599,9 @@ std::vector<ItemFamily*>::iterator make_page(std::vector<ItemFamily*>::iterator 
         {
             // try to fill a margin, if it exists
             okay = family.make_layout(width - main_width - 1);
-            int height = family.layout_pod.rows * 2 + 1;
+            int r_height = family.layout_pod.rows * 2 + 1;
 
-            if(okay && height <= current_row - start_section_row)
+            if(okay && r_height <= current_row - start_section_row)
             {
                 int min_width = family.layout_pod.cols;
                 int min_height = family.layout_pod.rows;
@@ -615,23 +616,23 @@ std::vector<ItemFamily*>::iterator make_page(std::vector<ItemFamily*>::iterator 
                         break;
                     }
                 }
-                height = family.layout_pod.rows * 2 + 1;
+                r_height = family.layout_pod.rows * 2 + 1;
 
                 family.X = main_width + 1;
                 family.Y = start_section_row;
 
-                int margin_size_tall = (width - main_width - 1) * (current_row - start_section_row - height);
+                int margin_size_tall = (width - main_width - 1) * (current_row - start_section_row - r_height);
                 int margin_size_wide = (width - main_width - family.layout_pod.cols - 2) * (current_row - start_section_row);
 
                 // pick the bigger continued margin
                 if(margin_size_tall >= margin_size_wide)
                 {
                     lost_margins.push_back({start_section_row, current_row, main_width + family.layout_pod.cols + 2, width});
-                    start_section_row += height;
+                    start_section_row += r_height;
                 }
                 else
                 {
-                    lost_margins.push_back({start_section_row + height, current_row, main_width + 1, main_width + 1 + family.layout_pod.cols});
+                    lost_margins.push_back({start_section_row + r_height, current_row, main_width + 1, main_width + 1 + family.layout_pod.cols});
                     main_width += family.layout_pod.cols + 1;
                 }
 
@@ -939,7 +940,7 @@ void make_pages(std::vector<ItemFamily*>& families, std::vector<ItemPage_t>& pag
             new_page.icon = (**unplaced).types[0].type;
 
         for(auto it = new_page.begin; it != new_page.end; ++it)
-            (**it).page = pages.size();
+            (**it).page = (int8_t)pages.size();
 
         unplaced = unplaced_new;
     }
@@ -1289,22 +1290,22 @@ void Load(XTechTranslate* translate)
                         {
                             pod.types.clear();
                             editor.read(key.c_str(), pod.types, pod.types);
-                            for(int i : pod.types)
+                            for(int j : pod.types)
                             {
                                 // add to family types if needed
-                                if(i > 0 && i <= max_item_type)
+                                if(j > 0 && j <= max_item_type)
                                 {
                                     bool found = false;
                                     for(ItemType_t& t_i : f.types)
                                     {
-                                        if(t_i.type == i)
+                                        if(t_i.type == j)
                                         {
                                             found = true;
                                             break;
                                         }
                                     }
                                     if(!found)
-                                        f.types.push_back(ItemType_t(i));
+                                        f.types.push_back(ItemType_t(j));
                                 }
                             }
 
@@ -1520,7 +1521,9 @@ void Load(XTechTranslate* translate)
         block_family_by_type[i] = FAMILY_NONE;
     }
 
-    for(uint8_t family = block_families.size() - 1; family != FAMILY_NONE; family--)
+    SDL_assert_release(block_families.size() < 255); // Max of uint8_t
+
+    for(uint8_t family = (uint8_t)block_families.size() - 1; family != FAMILY_NONE; family--)
     {
         for(ItemType_t t : block_families[family].types)
             block_family_by_type[t.type - 1] = family;
@@ -1560,7 +1563,9 @@ void Load(XTechTranslate* translate)
         bgo_family_by_type[i] = FAMILY_NONE;
     }
 
-    for(uint8_t family = bgo_families.size() - 1; family != FAMILY_NONE; family--)
+    SDL_assert_release(bgo_families.size() < 255); // Max of uint8_t
+
+    for(uint8_t family = (uint8_t)bgo_families.size() - 1; family != FAMILY_NONE; family--)
     {
         for(ItemType_t t : bgo_families[family].types)
             bgo_family_by_type[t.type - 1] = family;
@@ -1601,7 +1606,9 @@ void Load(XTechTranslate* translate)
         npc_family_by_type[i] = FAMILY_NONE;
     }
 
-    for(uint8_t family = npc_families.size() - 1; family != FAMILY_NONE; family--)
+    SDL_assert_release(npc_families.size() < 255); // Max of uint8_t
+
+    for(uint8_t family = (uint8_t)npc_families.size() - 1; family != FAMILY_NONE; family--)
     {
         for(ItemType_t t : npc_families[family].types)
             npc_family_by_type[t.type - 1] = family;
@@ -1645,7 +1652,9 @@ void Load(XTechTranslate* translate)
         tile_family_by_type[i] = FAMILY_NONE;
     }
 
-    for(uint8_t family = tile_families.size() - 1; family != FAMILY_NONE; family--)
+    SDL_assert_release(tile_families.size() < 255); // Max of uint8_t
+
+    for(uint8_t family = (uint8_t)tile_families.size() - 1; family != FAMILY_NONE; family--)
     {
         for(ItemType_t t : tile_families[family].types)
             tile_family_by_type[t.type - 1] = family;

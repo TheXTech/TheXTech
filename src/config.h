@@ -38,8 +38,6 @@ extern struct Config_t
     bool    editor_edge_scroll = false;
     //! Preferred file format for editor (0 is Moondust engine lvlx format)
     int     editor_preferred_file_format = 0;
-    //! Show debug string during the loading process
-    bool    loading_show_debug = false;
     //! User's preferred language / dialect
     std::string language = "auto";
 
@@ -59,11 +57,9 @@ extern struct Config_t
     /* ---- Gameplay ----*/
 
     //! Do ground-point by alt-run key instead of down
-    bool    GameplayPoundByAltRun = false;
+    // bool    GameplayPoundByAltRun = false;
     //! Policy of stars showing at world map
     int     WorldMapStarShowPolicyGlobal = 0;
-    //! Use strict Drop/Add (lose life on Add after Drop, SwapCharacter)
-    bool    StrictDropAdd = false;
     //! Use the quick (non-pausing) reconnect screen
     bool    NoPauseReconnect = false;
     //! Allow player quickly move through paths on the world map (works for compatibility Mode 1 only)
@@ -90,7 +86,7 @@ extern struct Config_t
     /* ---- Joystick ----*/
 
     //! Enable usage of the rumble control. Only affects new controller profiles.
-    bool    JoystickEnableRumble = true;
+    // bool    JoystickEnableRumble = true;
     //! Show the battery status for wireless gamepads (if possible). Only affects new controller profiles.
     // bool    JoystickEnableBatteryStatus = false;
 

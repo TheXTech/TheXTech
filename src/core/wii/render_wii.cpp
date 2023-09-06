@@ -257,7 +257,7 @@ void s_loadTexture(StdPicture& target, void* data, int width, int height, int pi
 
         if(w_i > 0 && h_i > 0)
         {
-            uint32_t wdst, hdst;
+            uint32_t wdst = 0, hdst = 0;
             target.d.backing_texture[i + 3 * mask] = s_RawTo4x4RGBA((uint8_t*)data + start_y * pitch + start_x * 4, w_i, h_i, pitch, &wdst, &hdst, downscale);
 
             if(target.d.backing_texture[i + 3 * mask])

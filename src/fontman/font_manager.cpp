@@ -23,6 +23,7 @@
 #include "font_manager.h"
 #include "font_manager_private.h"
 #include "raster_font.h"
+#include "legacy_font.h"
 #ifdef THEXTECH_ENABLE_TTF_SUPPORT
 #include "ttf_font.h"
 #endif
@@ -53,6 +54,7 @@ BaseFontEngine::~BaseFontEngine()
 
 typedef VPtrList<RasterFont> RasterFontsList;
 typedef VPtrList<TtfFont> TtfFontsList;
+typedef VPtrList<LegacyFont> LegacyFontsList;
 
 //! Complete array of available raster fonts
 static RasterFontsList g_rasterFonts;
@@ -66,6 +68,7 @@ static TtfFontsList    g_ttfFontsCustomLevel;
 #else
 #   define LOADFONTARG(x) false
 #endif
+static LegacyFontsList g_legacyFonts;
 
 typedef VPtrList<BaseFontEngine*> PtrFontsList;
 static PtrFontsList    g_anyFonts;
@@ -74,15 +77,17 @@ static PtrFontsList    g_anyFontsBackup;
 static PtrFontsList    g_anyFontsBackupWorld;
 
 //! Default raster font to render text
-static RasterFont      *g_defaultRasterFont = nullptr;
+static BaseFontEngine  *g_defaultRasterFont = nullptr;
 
 #ifdef THEXTECH_ENABLE_TTF_SUPPORT
 //! Default TTF font to render text
-static TtfFont         *g_defaultTtfFont = nullptr;
+static BaseFontEngine  *g_defaultTtfFont = nullptr;
 #endif
 
-//! Is font manager initialized
+//! IS font manager initialized?
 static bool             g_fontManagerIsInit = false;
+//! Does font manager uses legacy fonts fallback?
+static bool             g_fontManagerIsLegacy = false;
 
 #ifdef LOW_MEM
 typedef std::map<std::string, vbint_t> FontsHash;
@@ -213,7 +218,7 @@ uint32_t FontManager::fontSizeFromSmbxFont(int font)
 TtfFont* FontManager::getDefaultTtfFont()
 {
 #ifdef THEXTECH_ENABLE_TTF_SUPPORT
-    return g_defaultTtfFont;
+    return dynamic_cast<TtfFont*>(g_defaultTtfFont);
 #else
     return nullptr;
 #endif
@@ -239,12 +244,12 @@ TtfFont* FontManager::getTtfFontByName(const std::string& fontName)
 }
 
 #ifdef THEXTECH_ENABLE_TTF_SUPPORT
-static bool s_loadFintsFromDir(DirListCI &fonts_root,
+static bool s_loadFontsFromDir(DirListCI &fonts_root,
                                const std::string &subdir,
                                RasterFontsList &outRasterFonts,
                                TtfFontsList &outTtfFonts)
 #else
-static bool s_loadFintsFromDir(DirListCI &fonts_root,
+static bool s_loadFontsFromDir(DirListCI &fonts_root,
                                const std::string &subdir,
                                RasterFontsList &outRasterFonts,
                                bool)
@@ -383,6 +388,35 @@ static bool s_loadFintsFromDir(DirListCI &fonts_root,
     return true;
 }
 
+static void s_initFontsFallback()
+{
+    for(int i = 1; i <= 4; ++i)
+    {
+        g_legacyFonts.emplace_back(i);
+        LegacyFont& lf = g_legacyFonts.back();
+
+        if(!lf.isLoaded())   //Pop broken font from array
+        {
+            pLogWarning("Failed to load the legacy font %d", i);
+            g_legacyFonts.pop_back();
+        }
+        else   //Register font name in a table
+        {
+            registerFont(&lf);
+            s_smbxFontsMap[i] = FontManager::getFontID(lf.getFontName());
+        }
+    }
+
+    if(!g_legacyFonts.empty())
+        g_defaultRasterFont = &g_legacyFonts.front();
+
+    s_fontMapsDefault = true;
+    s_fontMapsWorld = true;
+    g_fontManagerIsInit = true;
+    g_fontManagerIsLegacy = true;
+}
+
+
 void FontManager::initFull()
 {
 #ifdef THEXTECH_ENABLE_TTF_SUPPORT
@@ -405,27 +439,31 @@ void FontManager::initFull()
     const std::string fonts_root = AppPathManager::assetsRoot() + "fonts";
     if(!DirMan::exists(fonts_root))
     {
-        pLogWarning("Can't load fonts as directory %s does not exists", fonts_root.c_str());
+        pLogWarning("Can't load fonts as directory %s does not exists. Built-in fallback fonts will be loaded.", fonts_root.c_str());
+        s_initFontsFallback();
         return;
     }
 
     DirListCI fontsRootCI(fonts_root);
 
-    if(!s_loadFintsFromDir(fontsRootCI, std::string(), g_rasterFonts, LOADFONTARG(g_ttfFonts)))
+    if(!s_loadFontsFromDir(fontsRootCI, std::string(), g_rasterFonts, LOADFONTARG(g_ttfFonts)))
     {
-        pLogWarning("Can't load any font from the directory %s", fonts_root.c_str());
+        pLogWarning("Can't load any font from the directory %s. Built-in fallback fonts will be loaded.", fonts_root.c_str());
+        s_initFontsFallback();
         return;
     }
 
     if(g_anyFonts.empty())
     {
-        pLogWarning("There is no available fonts at the directory %s", fonts_root.c_str());
+        pLogWarning("There is no available fonts at the directory %s. Fallback fonts will be loaded.", fonts_root.c_str());
+        s_initFontsFallback();
         return;
     }
 
     s_fontMapsDefault = true;
     s_fontMapsWorld = true;
     g_fontManagerIsInit = true;
+    g_fontManagerIsLegacy = false;
 }
 
 void FontManager::quit()
@@ -463,7 +501,7 @@ void FontManager::loadCustomFonts()
     else
         pLogDebug("Fonts at %sfonts already loaded", episodeRoot.c_str());
 
-    if(doLoadWorld && s_loadFintsFromDir(g_dirEpisode,
+    if(doLoadWorld && s_loadFontsFromDir(g_dirEpisode,
                                          "fonts",
                                          g_rasterFontsCustom,
                                          LOADFONTARG(g_ttfFontsCustom)))
@@ -486,7 +524,7 @@ void FontManager::loadCustomFonts()
     else
         pLogDebug("Fonts at %sfonts already loaded", dataSubDir.c_str());
 
-    if(doLoadCustom && s_loadFintsFromDir(g_dirCustom,
+    if(doLoadCustom && s_loadFontsFromDir(g_dirCustom,
                                          "fonts",
                                           g_rasterFontsCustomLevel,
                                           LOADFONTARG(g_ttfFontsCustomLevel)))
@@ -525,6 +563,11 @@ void FontManager::clearLevelFonts()
 bool FontManager::isInitied()
 {
     return g_fontManagerIsInit;
+}
+
+bool FontManager::isLegacy()
+{
+    return g_fontManagerIsLegacy;
 }
 
 
@@ -611,9 +654,7 @@ void FontManager::printText(const char* text, size_t text_size,
     if((font >= 0) && (static_cast<size_t>(font) < g_anyFonts.size()) && g_anyFonts[font])
     {
         if(g_anyFonts[font]->isLoaded())
-        {
             font_engine = g_anyFonts[font];
-        }
     }
 
     if(!font_engine)
@@ -633,6 +674,12 @@ void FontManager::printText(const char* text, size_t text_size,
                 font_engine = g_defaultTtfFont;
 #endif
             break;
+        }
+
+        if(!font_engine)
+        {
+            pLogWarning("Attempt to print text [%s] without any font being loaded", text);
+            return;
         }
     }
 

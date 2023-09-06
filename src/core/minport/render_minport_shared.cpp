@@ -253,6 +253,15 @@ void renderCircle(int cx, int cy,
                   float red , float green, float blue, float alpha,
                   bool filled)
 {
+    UNUSED(cx);
+    UNUSED(cy);
+    UNUSED(radius);
+    UNUSED(red);
+    UNUSED(green);
+    UNUSED(blue);
+    UNUSED(alpha);
+    UNUSED(filled);
+    // TODO: Implement this: it's needed for GIF recording status
 }
 
 void renderCircleHole(int cx, int cy,

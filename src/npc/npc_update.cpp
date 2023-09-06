@@ -5698,7 +5698,7 @@ void UpdateNPCs()
         return a > b;
     });
 
-    int last_NPC = numNPCs + 1;
+    int last_NPC = maxNPCs + 1;
     size_t KilledQueue_check = NPCQueues::Killed.size();
     size_t KilledQueue_known = NPCQueues::Killed.size();
 

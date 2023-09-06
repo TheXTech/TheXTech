@@ -732,31 +732,37 @@ bool GraphicsHelps::validateBitmaskRequired(FIBITMAP *image, FIBITMAP *mask, con
     BYTE *line1 = fimg_bits;
     BYTE *line2 = bimg_bits;
 
-    BYTE black[3] = {0x00, 0x00, 0x00};
-    BYTE white[3] = {0xFF, 0xFF, 0xFF};
-
     for(uint32_t y = 0; y < fh || y < bh; ++y)
     {
         for(uint32_t x = 0; x < fw || x < bw; ++x)
         {
+            bool bp_present = y < bh && x < bw;
+            bool fp_present = y < fh && x < fw;
+
             BYTE *fp = line1 + (y * fpitch) + (x * 4);
             BYTE *bp = line2 + (y * bpitch) + (x * 4);
 
+            // accept vanilla GIFs that target 16-bit color depth
+            // note that missing back pixels are white and absent front pixels are black
+            bool bp_is_white = !bp_present || (bp[0] >= 0xf8 && bp[1] >= 0xf8 && bp[2] >= 0xf8);
+            bool fp_is_white =  fp_present && (fp[0] >= 0xf8 && fp[1] >= 0xf8 && fp[2] >= 0xf8);
+            bool bp_is_black =  bp_present && (bp[0] <  0x08 && bp[1] <  0x08 && bp[2] <  0x08);
+            bool fp_is_black = !fp_present || (fp[0] <  0x08 && fp[1] <  0x08 && fp[2] <  0x08);
+
             // mask pixel is black: buffer replaced with front pixel
-            if(y < bh && x < bw && SDL_memcmp(bp, black, 3) == 0)
+            if(bp_is_black)
                 continue;
 
             // front pixel is white: buffer replaced with front pixel
-            if(y < fh && x < fh && SDL_memcmp(fp, white, 3) == 0)
+            if(fp_is_white)
                 continue;
 
             // back pixel is white and front pixel is black: buffer preserved
-            // BUGFIX: detect vanilla masks that use 0xf8 as their "white" color
-            if((y >= bh || x >= bh || (bp[0] >= 0xf8 && bp[1] >= 0xf8 && bp[2] >= 0xf8)) && (y >= fh || x >= fh || SDL_memcmp(fp, black, 3) == 0))
+            if(bp_is_white && fp_is_black)
                 continue;
 
             // pixel is matching with the front (i.e. is not an example of the lazily-made sprite)
-            if(y < bh && x < bh && y < fh && x < fh && SDL_memcmp(bp, fp, 3) == 0)
+            if(bp_present && fp_present && SDL_memcmp(bp, fp, 3) == 0)
                 continue;
 
             D_pLogDebug("Texture REQUIRES the bitmask render (%s)", origPath.c_str());

@@ -18,36 +18,32 @@
  */
 
 #pragma once
-#ifndef RASTER_FONT_H
-#define RASTER_FONT_H
+#ifndef LEGACYFONT_H
+#define LEGACYFONT_H
 
-#include <string>
 #ifdef LOW_MEM
 #   include <map>
 #else
 #   include <unordered_map>
 #endif
-#include <Utils/vptrlist.h>
-#include "std_picture.h"
-#include <Graphics/size.h>
-
 #include "font_engine_base.h"
 
+struct StdPicture;
+
 /**
- * @brief The raster fonts engine
+ * @brief Implementation of the legacy SMBX font engine as a part of the modern font engine
  */
-class RasterFont final : public BaseFontEngine
+class LegacyFont final : public BaseFontEngine
 {
 public:
-    RasterFont();
-    RasterFont(const RasterFont &rf) = delete;
-    RasterFont &operator=(const RasterFont &tf) = delete;
-    RasterFont(RasterFont &&tf) = default;
+    explicit LegacyFont(int legacyFontId);
+    LegacyFont(const LegacyFont &rf) = delete;
+    LegacyFont &operator=(const LegacyFont &tf) = delete;
+    LegacyFont(LegacyFont &&tf) = default;
 
-    virtual ~RasterFont() override;
+    virtual ~LegacyFont() override;
 
-    void  loadFont(const std::string& font_ini);
-    void  loadFontMap(const std::string &fontmap_ini);
+    void loadFont(int fontId);
 
     /*!
      * \brief Measure the size of the multiline text block in pixels
@@ -96,50 +92,32 @@ public:
 private:
     //! font is fine
     bool m_isReady = false;
-    //! The fallback TTF name to prefer to render a missing character [all unknown characters will be rendered as TTF]
-    std::string m_ttfFallback;
-    //! Enable outline borders on backup ttf font render
-    bool m_ttfOutlines = false;
-    uint32_t m_ttfOutLinesColour = 0x000000FF;
-    float    m_ttfOutlinesColourF[4] = {0.f, 0.f, 0.f, 1.f};
-    //! The fallback TTF size of the glyph to request
-    int  m_ttfSize = -1;
-    //! Width of one letter
-    uint32_t m_letterWidth = 0;
-    //! Height of one letter
-    uint32_t m_letterHeight = 0;
-    //! Space between printing letters
-    uint32_t m_interLetterSpace = 0;
-    //! Width of space symbol
-    uint32_t m_spaceWidth = 0;
-    //! Distance between top of one line and top of next
-    uint32_t m_newlineOffset = 0;
-
-    //! Offset all characters by X
-    int32_t m_glyphOffsetX = 0;
-    //! Offset all characters by Y
-    int32_t m_glyphOffsetY = 0;
-
-    //! Width of font matrix
-    uint32_t m_matrixWidth = 0;
-    //! Width of font matrix
-    uint32_t m_matrixHeight = 0;
 
     //! Handalable name of the font
     std::string m_fontName;
+
+    //! Bank of legacy font textures
+    StdPicture *m_textures[10];
 
     /**
      * @brief Raster font glyph
      */
     struct RasChar
     {
-        bool        valid = false; //!< Is a valid glyph
-        StdPicture* tx     = nullptr; //!< Pointer to the texture that contains this glyph
-        uint8_t     padding_left    = 0; //!< Crop left
-        uint8_t     padding_right   = 0; //!< Crop right
-        int16_t     x = 0; //!< X pixel offset
-        int16_t     y = 0; //!< Y pixel offset
+        uint8_t  texId = 0; //!< Texture index in m_textures array
+        bool     valid = false; //!< Is a valid glyph
+        uint16_t tX = 0; //!< Horizontal pixel offset on texture
+        uint16_t tY = 0; //!< Vertical pixel offset on texture
+        uint8_t  tW = 0; //!< Pixels width of the texture fragment
+        uint8_t  tH = 0; //!< Pixels height of the texture fragment
+        uint8_t  width = 0; //!< Width of glyph
     };
+
+    //! Fallback width of glyph
+    uint32_t m_glyphWidth = 0;
+
+    //! Height of glyph
+    uint32_t m_glyphHeight = 0;
 
 #ifdef LOW_MEM
     typedef std::map<char32_t, RasChar > CharMap;
@@ -150,8 +128,6 @@ private:
     //! Table of available characters
     CharMap m_charMap;
 
-    //! Bank of loaded textures
-    VPtrList<StdPicture> m_texturesBank;
 };
 
-#endif // RASTER_FONT_H
+#endif // LEGACYFONT_H

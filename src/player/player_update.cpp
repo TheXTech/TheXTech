@@ -343,10 +343,20 @@ void UpdatePlayer()
 
                 if(Player[A].GroundPound)
                 {
+                    bool groundPoundByAltRun = false;
+                    if(!ForcedControls &&
+                       A - 1 < (int)Controls::g_InputMethods.size() &&
+                       Controls::g_InputMethods[A - 1] &&
+                       Controls::g_InputMethods[A-1]->Profile &&
+                       Controls::g_InputMethods[A - 1]->Profile->m_groundPoundByAltRun)
+                    {
+                        groundPoundByAltRun = true;
+                    }
+
                     if(!Player[A].CanPound && Player[A].Location.SpeedY < 0)
                         Player[A].GroundPound = false;
 
-                    if(g_config.GameplayPoundByAltRun)
+                    if(groundPoundByAltRun)
                         Player[A].Controls.AltRun = true;
                     else
                         Player[A].Controls.Down = true;

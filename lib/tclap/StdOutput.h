@@ -440,7 +440,7 @@ inline void fmtPrintLine(std::ostream &os, const std::string &s, int maxWidth,
     std::string indentString(indentSpaces, ' ');
     int from = 0;
     int to = 0;
-    int end = s.length();
+    int end = (int)s.length();
     for (;;) {
         if (end - from <= maxChars) {
             // Rest of string fits on line, just print the remainder
@@ -455,7 +455,7 @@ inline void fmtPrintLine(std::ostream &os, const std::string &s, int maxWidth,
         while (tooFar - from <= maxChars &&
                static_cast<std::size_t>(tooFar) != std::string::npos) {
             to = tooFar;
-            tooFar = s.find_first_of(splitChars, to + 1);
+            tooFar = s.find_first_of(splitChars, (int)to + 1);
         }
 
         if (to == from) {

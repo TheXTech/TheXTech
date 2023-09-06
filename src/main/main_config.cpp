@@ -127,7 +127,6 @@ void OpenConfig_preSetup()
         IniProcessing config(configPath);
 
         config.beginGroup("main");
-        config.read("loading-debug", g_config.loading_show_debug, true);
         config.read("language", g_config.language, g_config.language);
         config.endGroup();
 
@@ -253,9 +252,7 @@ void OpenConfig()
         config.endGroup();
 
         config.beginGroup("gameplay");
-        config.read("ground-pound-by-alt-run", g_config.GameplayPoundByAltRun, false);
         config.readEnum("world-map-stars-show-policy", g_config.WorldMapStarShowPolicyGlobal, 0, starsShowPolicy);
-        config.read("strict-drop-add", g_config.StrictDropAdd, false);
         config.read("no-pause-reconnect", g_config.NoPauseReconnect, false);
         config.read("world-map-fast-move", g_config.worldMapFastMove, false);
 #ifdef ENABLE_XTECH_DISCORD_RPC
@@ -313,7 +310,6 @@ void SaveConfig()
     config.setValue("use-native-osk", g_config.use_native_osk);
     config.setValue("enable-editor", g_config.enable_editor);
     config.setValue("editor-edge-scroll", g_config.editor_edge_scroll);
-    config.setValue("loading-debug", g_config.loading_show_debug);
     config.setValue("language", g_config.language);
     config.endGroup();
 
@@ -411,11 +407,9 @@ void SaveConfig()
             {2, "smbx13"}
         };
 
-        config.setValue("ground-pound-by-alt-run", g_config.GameplayPoundByAltRun);
         config.setValue("world-map-stars-show-policy", starsShowPolicy[g_config.WorldMapStarShowPolicyGlobal]);
         config.setValue("compatibility-mode", compatMode[g_preSetup.compatibilityMode]);
     }
-    config.setValue("strict-drop-add", g_config.StrictDropAdd);
     config.setValue("no-pause-reconnect", g_config.NoPauseReconnect);
     config.setValue("world-map-fast-move", g_config.worldMapFastMove);
 #ifdef ENABLE_XTECH_DISCORD_RPC
