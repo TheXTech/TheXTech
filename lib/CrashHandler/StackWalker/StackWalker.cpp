@@ -84,6 +84,7 @@
 #include <wchar.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 //#pragma comment(lib, "version.lib")  // for "VerQueryValue"
 //#pragma warning(disable:4826)
 
