@@ -38,4 +38,5 @@
     <string name="setup_show_battery_status_label">Cihazın batarya durumu</string>
     <string name="setup_show_controller_state_label">Bir oyun kontrolcüsü durumu göster</string>
     <string name="cheat_dialog_ok">Çalıştır</string>
+    <string name="setup_renderer_label">Render sistemi</string>
 </resources>
