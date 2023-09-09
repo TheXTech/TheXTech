@@ -545,6 +545,7 @@ public:
         insert(0x00B25724, &StartLevel);
         insert(0x00B25728, &NoMap);
         insert(0x00B2572A, &RestartLevel);
+        insert(0x00B2D740, &BattleMode);
 
         // should all be read-only
         insert(0x00B257A4, &numTiles);
