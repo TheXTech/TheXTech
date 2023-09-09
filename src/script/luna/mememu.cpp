@@ -545,7 +545,6 @@ public:
         insert(0x00B25724, &StartLevel);
         insert(0x00B25728, &NoMap);
         insert(0x00B2572A, &RestartLevel);
-        insert(0x00B2D740, &BattleMode);
 
         // should all be read-only
         insert(0x00B257A4, &numTiles);
@@ -639,6 +638,7 @@ public:
         insert(0x00B2D6D2, &SharedCursor.Move);
         insert(0x00B2D710, &numEvents);
         insert(0x00B2D734, &noSound);
+        insert(0x00B2D740, &BattleMode);
     }
 
     double getValue(size_t address, FIELDTYPE ftype)
