@@ -26,6 +26,7 @@
 #endif
 
 #include "../globals.h"
+#include "../game_main.h" // SetupPhysics()
 #include "../frame_timer.h"
 #include "../npc.h"
 #include "../load_gfx.h"
@@ -986,6 +987,7 @@ void ClearLevel()
     RestoreWorldStrings();
     LevelName.clear();
     ResetCompat();
+    SetupPhysics();
     LoadNPCDefaults();
     LoadPlayerDefaults();
     noUpdate = true;
