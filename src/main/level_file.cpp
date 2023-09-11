@@ -1410,10 +1410,12 @@ bool CanConvertLevel(int format, std::string* reasons)
 void ConvertLevel(int format)
 {
     FileFormat = format;
+
     if(format == FileFormats::LVL_SMBX64 || format == FileFormats::LVL_SMBX38A)
     {
         if(!FileNameFull.empty() && FileNameFull.back() == 'x')
             FileNameFull.resize(FileNameFull.size() - 1);
+
         if(!FullFileName.empty() && FullFileName.back() == 'x')
             FullFileName.resize(FullFileName.size() - 1);
     }
@@ -1421,6 +1423,7 @@ void ConvertLevel(int format)
     {
         if(!FileNameFull.empty() && FileNameFull.back() != 'x')
             FileNameFull += "x";
+
         if(!FullFileName.empty() && FullFileName.back() != 'x')
             FullFileName += "x";
     }
@@ -1451,19 +1454,15 @@ void ConvertLevel(int format)
         for(int j = 0; j < numSections; ++j)
         {
             auto &ss = e.section[j];
-
             SetS(ss.music_file, "");
             ss.autoscroll = false;
         }
     }
 
     for(int i = 1; i <= numNPCs; i++)
-    {
         NPC[i].Variant = 0;
-    }
+
 
     for(int i = 1; i <= numBlock; i++)
-    {
         Block[i].forceSmashable = 0;
-    }
 }
