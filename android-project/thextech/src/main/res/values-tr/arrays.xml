@@ -13,4 +13,5 @@
     <string name="speedRunMode1">Mode 1 (TheXTech native)</string>
     <string name="touchPadStyle0">Oyun İçi Aksiyon</string>
     <string name="speedRunMode3">Mod 3 (SMBX 1.3 kodu, bütün buglar açık)</string>
+    <string name="rendererDefault">Varsayılan</string>
 </resources>

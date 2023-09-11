@@ -22,6 +22,8 @@
 #ifndef LOCATION_H
 #define LOCATION_H
 
+#include <cstdint>
+
 //Public Type Location    'Holds location information for objects
 struct Location_t
 {

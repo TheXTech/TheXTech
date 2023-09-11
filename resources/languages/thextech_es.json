@@ -1,7 +1,7 @@
 {
     "editor": {
         "block": {
-            "canBreak": "Se rompe",
+            "canBreak": "Puede romper",
             "canBreakTooltip": "Legado: Se rompe al ser golpeado",
             "inside": "Tiene:",
             "invis": "Invis",
@@ -43,7 +43,8 @@
                 "enter": "Ingreso",
                 "hit": "Golpe",
                 "next": "Siguiente",
-                "talk": "Conversación"
+                "talk": "Conversación",
+                "layerClear": "Capa transparente"
             },
             "sections": {
                 "phraseAllSections": "Todas las secciones",
@@ -97,7 +98,22 @@
                 "featureCustomWorldMusic": "Usa archivo de música de mundo personalizada.",
                 "featuresWillBeLost": "Las características de abajo se PERDERÁN:",
                 "_38aUnsupported": "El formato SMBX38-A no es soportado para conversión.",
-                "noIssues": "No hay problemas de compatibilidad."
+                "noIssues": "No hay problemas de compatibilidad.",
+                "formatUnknown": "El formato solicitado es desconocido.",
+                "featureWarpNeedsStand": "Un warp requiere que el jugador se ponga de pie.",
+                "featureWarpNoStartScene": "Un warp de nivel se salta la escena inicial.",
+                "featureWorldStarDisplay": "Utiliza la configuración del mundo para la visualización de las estrellas.",
+                "featureEventAutoscroll": "Un evento utiliza el autoscroll moderno.",
+                "featureEventCustomMusic": "Un evento pone música a un archivo.",
+                "featureNPCVariant": "Un NPC utiliza una variante de comportamiento.",
+                "featureBlockForceSmashable": "Un bloqueo giratorio utiliza el smash heredado.",
+                "featureLevelStarDisplay": "Un nivel utiliza el ajuste para la visualización de estrellas.",
+                "featureWarpCustomStarsMsg": "Una warp tiene un mensaje de estrellas personalizado.",
+                "featureWarpCannonExit": "Un warp tiene el efecto de salida de cañón.",
+                "featureWarpTransit": "Una warp utiliza un nuevo efecto de transición.",
+                "featureWarpNoPrintStars": "Una warp oculta las estrellas de nivel objetivo.",
+                "featureWarpPortal": "Una warp utiliza el efecto portal.",
+                "featureWarpEnterEvent": "Una warp desencadena un evento al entrar."
             },
             "formatLegacy": "Legado",
             "optionActionWithoutSave": "{0} sin guardar",
@@ -105,23 +121,244 @@
             "sectionLevel": "Nivel",
             "sectionWorld": "Mundo",
             "confirmConvertFormatTo": "Convertir formato a {0}?",
-            "confirmSaveBeforeAction": "Guardar antes que tú {0}?"
+            "confirmSaveBeforeAction": "Guardar antes que tú {0}?",
+            "labelFormat": "Formato:",
+            "optionCancelAction": "Cancelar: no {0}",
+            "optionYesSaveThenAction": "Sí: guardar entonces {0}",
+            "actionClearWorld": "Mundo terminado",
+            "actionClearLevel": "Nivel terminado",
+            "labelCurrentFile": "Archivo actual: "
         },
         "layers": {
             "deletion": {
                 "cancel": "Cancelar: No eliminar capa",
-                "header": "Eliminando capa {0}"
+                "header": "Eliminando capa {0}",
+                "confirmDelete": "No: *BORRAR TODO EL CONTENIDO*",
+                "preserveLayerContents": "¿Conservar el contenido de las capas?",
+                "confirmPreserve": "Sí: pasar a la capa por defecto"
             },
             "header": "Capas:",
             "itemNewLayer": "<Nueva capa>",
             "label": "Capa:",
-            "promptLayerName": "Nombre de la capa"
+            "promptLayerName": "Nombre de la capa",
+            "labelAttachedLayer": "Capa adjunta:",
+            "labelMoveLayer": "Mover capa:",
+            "desc": {
+                "att": "Cada vez que el NPC se mueve, la capa adjunta se mueve siguiéndolo"
+            },
+            "default": "Por defecto",
+            "abbrevAttLayer": "Att: ",
+            "labelAttached": "Adjunto:"
         },
         "level": {
-            "levelName": "Nombre del nivel"
+            "levelName": "Nombre del nivel",
+            "startPos": "Inicio Pos",
+            "pathBG": "Ruta BG",
+            "pathUnlocks": "Desbloqueo de rutas",
+            "gameStart": "Inicio del juego",
+            "alwaysVis": "Siempre Vis",
+            "bigBG": "Gran BG"
         },
         "wordEvent": {
-            "typeLabel": "Evento {0}:"
-        }
-    }
+            "typeLabel": "Evento {0}:",
+            "nominative": "Evento",
+            "genitive": "Evento"
+        },
+        "warp": {
+            "needStarCount": "Necesito {0} {1}",
+            "placing": "Colocación:",
+            "to": "Para: {0}",
+            "showStartScene": "Mostrar escena de inicio",
+            "twoWay": "Dos-vías",
+            "needFloor": "Necesita suelo",
+            "style": {
+                "door": "Puerta",
+                "pipe": "Tubería",
+                "portal": "Puerto",
+                "style": "Estilo: "
+            },
+            "cannonExit": "Salida del cañón",
+            "transit": {
+                "name1": "DESPLAZAMIENTO",
+                "name3": "CÍRCULO"
+            },
+            "allow": "Permitir:",
+            "starLockMessage": "Mensaje de bloqueo de estrella",
+            "showStarCount": "Mostrar recuento de estrellas",
+            "effect": "Efecto:",
+            "target": "Objetivo: ",
+            "speed": "Velocidad ",
+            "toMap": "Mapa"
+        },
+        "letterRight": "R",
+        "select": {
+            "warpTransitEffect": "Efecto de transición Warp",
+            "soundForEventN": "Sonido para Evento {0}",
+            "pathBlankUnlock": "Ruta {0} Desbloquear Por",
+            "worldMusic": "Música del mundo",
+            "sectionBlankPropBlank": "Sección {0} {1}"
+        },
+        "tooltip": {
+            "BGOs": "BGOs",
+            "events": "Eventos",
+            "eraseAll": "Borrar todo",
+            "music": "Música",
+            "erase": "Borrar",
+            "settings": "Ajustes",
+            "water": "Agua",
+            "show": "Mostrar",
+            "paths": "Caminos",
+            "levels": "Niveles",
+            "layers": "Capas",
+            "file": "Archivo",
+            "select": "Seleccione",
+            "scenes": "Escenas"
+        },
+        "npc": {
+            "ai": {
+                "aiIs": "AI: {0}",
+                "target": "Objetivo",
+                "swim": "Nadar",
+                "jump": "Saltar",
+                "leap": "Salto",
+                "UD": "UD",
+                "headerCustomAi": "IA personalizada:",
+                "use1_0Ai": "¿Usar IA 1.0?",
+                "LR": "LR"
+            },
+            "tooltipExpandSection": "Ampliar sección",
+            "stuckStop": "Detener",
+            "gen": {
+                "header": "Ajustes del generador",
+                "effectShoot": "Dispara a",
+                "direction": "Dirección",
+                "effectWarp": "Warp",
+                "effectIs": "Efecto: {0}"
+            },
+            "props": {
+                "attachSurface": "Adjuntar",
+                "facing": "Frente a",
+                "active": "Activo"
+            },
+            "abbrevGen": "Gen",
+            "inertNice": "Bonito",
+            "inContainer": "En"
+        },
+        "letterLeft": "L",
+        "testPlay": {
+            "magicHand": "Mano mágica",
+            "power": "Potencia"
+        },
+        "letterDown": "D",
+        "mapPos": "Mapa Pos:",
+        "letterCoordX": "X",
+        "water": {
+            "title": "Ajustes de agua"
+        },
+        "phraseTextOf": "{0} Texto",
+        "wordEnabled": "Activado",
+        "phraseSectionIndex": "Sección {0}",
+        "wordCoins": "Monedas",
+        "section": {
+            "setBounds": "Establecer límites",
+            "noTurnBack": "Sin vuelta atrás",
+            "underwater": "Bajo el agua",
+            "offscreenExit": "Salida fuera de pantalla",
+            "scroll": "Desplácese por"
+        },
+        "phraseGenericIndex": "Número {0}",
+        "letterUp": "U",
+        "phraseCountMore": "{0} Más",
+        "phraseRadiusIndex": "Radio {0}",
+        "pageBlankOfBlank": "Página {0} de {1}",
+        "phraseWarpIndex": "Warp {0}",
+        "phraseAreYouSure": "¿Seguro?",
+        "toggleMagicBlock": "Bloque mágico",
+        "phraseDelayIsMs": "Retraso: {0} ms",
+        "letterCoordY": "Y"
+    },
+    "menu": {
+        "game": {
+            "gameNoBattleLevels": "<Sin niveles de batalla>",
+            "gameSourceSlot": "Seleccione la ranura de origen",
+            "gameEraseSave": "Borrar guardar",
+            "gameBattleRandom": "Nivel aleatorio",
+            "gameTargetSlot": "Ahora seleccione el objetivo",
+            "gameSlotContinue": "SLOT {0} ... {1}%",
+            "gameSlotNew": "SLOT {0} ... NUEVO JUEGO",
+            "phraseScore": "Puntuación: {0}",
+            "gameNoEpisodesToPlay": "<Sin episodios que reproducir>",
+            "phraseTime": "Tiempo: {0}",
+            "gameEraseSlot": "Seleccione la ranura que desea borrar",
+            "gameCopySave": "Copiar guardar"
+        },
+        "editor": {
+            "errorResolution": "Lo sentimos. El editor del juego no es compatible con tu resolución actual.",
+            "newWorld": "<Nuevo Mundo>",
+            "errorMissingResources": "Lo sentimos. Te falta {0}, necesario para el editor del juego.",
+            "promptNewWorldName": "Nuevo nombre del mundo"
+        },
+        "wordHide": "Ocultar",
+        "options": {
+            "scale": {
+                "label": "Escala",
+                "linear": "Lineal",
+                "integer": "Entero",
+                "nearest": "Más cerca"
+            },
+            "restartEngine": "Reinicie el motor para que los cambios surtan efecto.",
+            "renderX": "Renderizar: {0} (X)",
+            "render": "Renderizar: {0}",
+            "optionsModeWindowed": "Modo ventana",
+            "optionsModeFullScreen": "Modo de pantalla completa",
+            "optionsViewCredits": "Ver créditos"
+        },
+        "wordWaiting": "En espera",
+        "main": {
+            "mainEditor": "Editor",
+            "mainStartGame": "Comenzar el juego",
+            "main1PlayerGame": "Juego para 1 jugador",
+            "mainMultiplayerGame": "Juego para 2 jugadores",
+            "mainBattleGame": "Juego de batalla",
+            "mainOptions": "Opciones",
+            "mainExit": "Salida"
+        },
+        "controls": {
+            "wii": {
+                "wiimote": {
+                    "caseIR": "(IR)",
+                    "buttonPlus": "+",
+                    "buttonMinus": "-",
+                    "buttonHome": "Inicio",
+                    "shake": "Agitar",
+                    "dPad": "D-Pad"
+                }
+            },
+            "wordProfiles": "Perfiles",
+            "wordButtons": "Botones"
+        },
+        "wordLanguage": "Idioma",
+        "wordPlayer": "Jugador",
+        "wordBack": "Volver",
+        "wordOn": "Encendido",
+        "wordProfile": "Perfil",
+        "loading": "Cargando...",
+        "wordShow": "Mostrar",
+        "wordNo": "No",
+        "wordYes": "Si",
+        "wordOff": "Apagado"
+    },
+    "outro": {
+        "originalBy": "Código original VB6 Por:",
+        "cppPortDevelopers": "Desarrolladores de puertos C++:",
+        "nameAndrewSpinks": "Andrew Spinks",
+        "customSprites": "Sprites personalizados:",
+        "specialThanks": "Agradecimientos especiales:",
+        "psVitaPortBy": "Puerto PS Vita Por:",
+        "engineCredits": "Créditos del motor:",
+        "levelDesign": "Diseño de niveles:",
+        "nameVitalyNovichkov": "Vitaly Novichkov",
+        "gameCredits": "Créditos del juego:"
+    },
+    "pluralRules": "one-is-singular"
 }
