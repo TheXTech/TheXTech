@@ -569,6 +569,23 @@ public:
         insert(0x00B2C630, &PSwitchPlayer); // P-Switch/Stopwatch Player
         insert(0x00B2C684, &FrameSkip);
 
+        insert(0x00B2C6DC, &Physics.PlayerJumpHeight);
+        insert(0x00B2C6DE, &Physics.PlayerBlockJumpHeight);
+        insert(0x00B2C6E0, &Physics.PlayerHeadJumpHeight);
+        insert(0x00B2C6E2, &Physics.PlayerNPCJumpHeight);
+        insert(0x00B2C6E4, &Physics.PlayerSpringJumpHeight);
+        insert(0x00B2C6E8, &Physics.PlayerJumpVelocity);
+        insert(0x00B2C6EC, &Physics.PlayerRunSpeed);
+        insert(0x00B2C6F0, &Physics.PlayerWalkSpeed);
+        insert(0x00B2C6F4, &Physics.PlayerTerminalVelocity);
+        insert(0x00B2C6F8, &Physics.PlayerGravity);
+        insert(0x00B2C860, &Physics.NPCShellSpeed);
+        insert(0x00B2C864, &Physics.NPCShellSpeedY);
+        insert(0x00B2C868, &Physics.NPCWalkingSpeed);
+        insert(0x00B2C86C, &Physics.NPCWalkingOnSpeed);
+        insert(0x00B2C870, &Physics.NPCMushroomSpeed);
+        insert(0x00B2C874, &Physics.NPCGravity);
+        insert(0x00B2C878, &Physics.NPCGravityReal);
         insert(0x00B2C87C, &Physics.NPCPSwitch); // P-Switch/Stopwatch Length
 
         insert(0x00B2C880, &MenuCursor); // Current menu choice
