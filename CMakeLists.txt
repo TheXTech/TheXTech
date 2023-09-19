@@ -554,6 +554,7 @@ if(NOT ANDROID
         lib/InterProcess/editor_pipe.cpp
         lib/InterProcess/intproc.h
         lib/InterProcess/intproc.cpp
+        src/capabilities.cpp
     )
     set(THEXTECH_INTERPROC_SUPPORTED ON)
 endif()

@@ -37,6 +37,10 @@
 #include "controls.h"
 #include <AppPath/app_path.h>
 
+#ifdef THEXTECH_INTERPROC_SUPPORTED
+#   include "capabilities.h"
+#endif
+
 #ifndef THEXTECH_NO_ARGV_HANDLING
 #   include <tclap/CmdLine.h>
 #endif
@@ -421,6 +425,7 @@ int main(int argc, char**argv)
         cmd.add(&switchTestEditor);
 #ifdef THEXTECH_INTERPROC_SUPPORTED
         cmd.add(&switchTestInterprocess);
+        cmd.add(&switchPrintCapabilities);
 #endif
         cmd.add(&switchVerboseLog);
         cmd.add(&switchSpeedRunSemiTransparent);
@@ -454,6 +459,15 @@ int main(int argc, char**argv)
             AppPathManager::initAppPath();
             AppPath = AppPathManager::assetsRoot();
         }
+
+#ifdef THEXTECH_INTERPROC_SUPPORTED
+        if(switchPrintCapabilities.isSet() && switchPrintCapabilities.getValue())
+        {
+            std::fprintf(stdout, "%s\n", g_capabilities);
+            std::fflush(stdout);
+            return 0;
+        }
+#endif
 
 #ifndef THEXTECH_DISABLE_LANG_TOOLS
         // Print the language template to the screen
