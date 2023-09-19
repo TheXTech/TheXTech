@@ -1007,8 +1007,7 @@ elseif(NINTENDO_WII OR NINTENDO_3DS OR NINTENDO_DS)
     set_target_properties(thextech PROPERTIES SUFFIX ".elf")
 
 else()
-    add_executable(thextech ${THEXTECH_SRC} ${LIB_SRC}
-        src/fontman/legacy_font.h src/fontman/legacy_font.cpp)
+    add_executable(thextech ${THEXTECH_SRC} ${LIB_SRC})
     pge_set_nopie(thextech)
 endif()
 
