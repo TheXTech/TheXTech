@@ -341,7 +341,10 @@ int main(int argc, char**argv)
         TCLAP::SwitchArg switchTestMaxFPS("x", "max-fps", "Run FPS as fast as possible", false);
         TCLAP::SwitchArg switchTestMagicHand("k", "magic-hand", "Enable magic hand functionality while level test running", false);
         TCLAP::SwitchArg switchTestEditor("e", "editor", "Open level in the editor", false);
+#ifdef THEXTECH_INTERPROC_SUPPORTED
         TCLAP::SwitchArg switchTestInterprocess("i", "interprocessing", "Enable an interprocessing mode with Editor", false);
+        TCLAP::SwitchArg switchPrintCapabilities(std::string(), "capabilities", "Print the JSON string of this build's capabilities", false);
+#endif
 
         TCLAP::ValueArg<std::string> compatLevel(std::string(), "compat-level",
                                                    "Enforce the specific gameplay compatibility level. Supported values:\n"
@@ -416,7 +419,9 @@ int main(int argc, char**argv)
         cmd.add(&switchTestMaxFPS);
         cmd.add(&switchTestMagicHand);
         cmd.add(&switchTestEditor);
+#ifdef THEXTECH_INTERPROC_SUPPORTED
         cmd.add(&switchTestInterprocess);
+#endif
         cmd.add(&switchVerboseLog);
         cmd.add(&switchSpeedRunSemiTransparent);
         cmd.add(&switchDisplayControls);
