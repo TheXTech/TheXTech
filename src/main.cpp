@@ -21,6 +21,8 @@
 #include <ctime>
 #include "sdl_proxy/sdl_head.h"
 
+#include "../version.h"
+
 #include "game_main.h"
 #include "frm_main.h"
 #include "gfx.h"
@@ -252,7 +254,7 @@ int main(int argc, char**argv)
         // Define the command line object.
         TCLAP::CmdLine  cmd("TheXTech Engine\n"
                             "Copyright (c) 2020-2023 Vitaly Novichkov <admin@wohlnet.ru>\n\n"
-                            "This program is distributed under the GPLv3 license\n\n", ' ', "1.3");
+                            "This program is distributed under the GPLv3 license\n\n", ' ', V_LATEST_STABLE " [" V_BUILD_BRANCH ", #" V_BUILD_VER "]");
 
         TCLAP::ValueArg<std::string> customAssetsPath("c", "assets-root", "Specify the different assets root directory to play",
                                                       false, "",

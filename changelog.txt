@@ -66,6 +66,7 @@ Changelog for 1.3.6.1-beta
 -Removed "strict-drop-add" thextech.ini option (@ds-sloth)
 -Removed deprecated global controls settings "ground-pound-by-alt-run", "enable-rumble", and "enable-battery-status". Set these per-profile in the controls menu. (@ds-sloth)
 -In speed run mode, indicate whether Cheater mode is active by showing "CMode" instead of "Mode" in the top-right. (@0lhi)
+-Fixed the version number being printed improperly via `--version` command-line argument. (@Wohlstand)
 
 Changelog for 1.3.6
 -Added an ability to toggle drawing of the HUD and other on-screen meta data using F1 key (@Wohlstand)
