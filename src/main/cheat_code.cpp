@@ -819,6 +819,7 @@ static void superbDemo200()
     if(B > 0)
     {
         numPlayers = 200;
+        g_ClonedPlayerMode = true;
 
         SetupScreens();
 
@@ -845,6 +846,7 @@ static void superbDemo128()
     if(B > 0)
     {
         numPlayers = 128;
+        g_ClonedPlayerMode = true;
 
         SetupScreens();
 
@@ -871,7 +873,10 @@ static void superbDemo64()
     if(B > 0)
     {
         numPlayers = 64;
+        g_ClonedPlayerMode = true;
+
         SetupScreens();
+
         if(Player[B].Effect == 9)
             Player[B].Effect = 0;
         Player[B].Immune = 1;
@@ -896,6 +901,7 @@ static void superbDemo32()
     {
         numPlayers = 32;
         SetupScreens();
+        g_ClonedPlayerMode = true;
 
         if(Player[B].Effect == 9)
             Player[B].Effect = 0;
@@ -922,6 +928,7 @@ static void superbDemo16()
     {
         numPlayers = 16;
         SetupScreens();
+        g_ClonedPlayerMode = true;
 
         if(Player[B].Effect == 9)
             Player[B].Effect = 0;
@@ -948,6 +955,7 @@ static void superbDemo8()
     {
         numPlayers = 8;
         SetupScreens();
+        g_ClonedPlayerMode = true;
 
         if(Player[B].Effect == 9)
             Player[B].Effect = 0;
@@ -974,6 +982,7 @@ static void superbDemo4()
     {
         numPlayers = 4;
         SetupScreens();
+        g_ClonedPlayerMode = true;
 
         if(Player[B].Effect == 9)
             Player[B].Effect = 0;
@@ -999,6 +1008,7 @@ static void superbDemo2()
 
     if(B > 0)
     {
+        g_ClonedPlayerMode = false;
         numPlayers = 2;
         SingleCoop = 1;
         SetupScreens();
@@ -1064,7 +1074,7 @@ static void onePlayer()
         }
 
         // set the living player to get the controls if not P1
-        if(B-1 < (int)Controls::g_InputMethods.size() && Controls::g_InputMethods[B-1])
+        if(!g_ClonedPlayerMode && !SingleCoop && B - 1 < (int)Controls::g_InputMethods.size() && Controls::g_InputMethods[B-1])
             std::swap(Controls::g_InputMethods[0], Controls::g_InputMethods[B-1]);
 
         // delete other control methods
@@ -1073,6 +1083,7 @@ static void onePlayer()
 
         numPlayers = 1;
         SingleCoop = 1;
+        g_ClonedPlayerMode = false;
         SetupScreens();
         if(Player[B].Effect == 9)
             Player[B].Effect = 0;
@@ -1116,6 +1127,7 @@ static void twoPlayer()
         }
 
         SingleCoop = 0;
+        g_ClonedPlayerMode = false;
         SetupScreens();
 
         if(Player[B].Effect == 9)

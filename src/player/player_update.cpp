@@ -280,6 +280,7 @@ void UpdatePlayer()
         }
         else if(Player[A].Dead)
         {
+            // actually strictly better than the below code, should always be used except for compatibility concerns
             if(numPlayers > 2)
             {
                 B = CheckLiving();

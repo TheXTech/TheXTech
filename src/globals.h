@@ -1936,6 +1936,8 @@ extern bool BlocksSorted;
 
 //Public SingleCoop As Integer 'cheat code
 extern int SingleCoop;
+//NEW: checks whether a superbdemo* cheat code is active
+extern bool g_ClonedPlayerMode;
 //Public CheatString As String 'logs keys for cheats
 //extern std::string CheatString; // Made static at cheat_code.cpp
 //Public GameOutro As Boolean 'true if showing credits

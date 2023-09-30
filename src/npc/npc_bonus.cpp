@@ -566,7 +566,7 @@ void TouchBonus(int A, int B)
             {
                 TurnNPCsIntoCoins();
                 FreezeNPCs = false;
-                if(numPlayers > 2 /*&& nPlay.Online == false*/)
+                if(g_ClonedPlayerMode)
                     Player[1] = Player[A];
             }
             if(NPC[B].Type == NPCID_ITEMGOAL)

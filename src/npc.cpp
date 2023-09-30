@@ -2990,7 +2990,7 @@ void NPCSpecial(int A)
                             FreezeNPCs = false;
                             TurnNPCsIntoCoins();
 
-                            if(numPlayers > 2 /*&& nPlay.Online == false*/)
+                            if(g_ClonedPlayerMode)
                                 Player[1] = Player[A];
 
                             LevelMacro = LEVELMACRO_GOAL_TAPE_EXIT;

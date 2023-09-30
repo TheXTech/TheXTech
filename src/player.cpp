@@ -399,7 +399,7 @@ void SetupPlayers()
                 Player[A].Hearts = 2;
         }
 
-        if(numPlayers > 2 && !GameMenu) // online stuff
+        if(numPlayers > 2 && !GameMenu) // find correct positions without start locations
         {
             /*if(nPlay.Online)
             {
@@ -767,7 +767,7 @@ void PlayerDead(int A)
     {
         if(BattleMode)
             PlaySound(SFX_PlayerDied2);
-        else if(numPlayers > 2)
+        else if(g_ClonedPlayerMode)
         {
             for(B = 1; B <= numPlayers; B++)
             {
@@ -3745,8 +3745,11 @@ void ClownCar()
     {
         // commenting out because:
         //   (1) misplaced; (2) doesn't work with abstract controls
+        // logic moved to Controls::Update()
+
         // if(numPlayers > 2 && GameMenu == false && LevelMacro == LEVELMACRO_OFF && nPlay.Online == false)
         //     Player[A].Controls = Player[1].Controls;
+
         if(Player[A].Mount == 2 && Player[A].Dead == false && Player[A].TimeToLive == 0)
         {
             if(Player[A].Effect == 0)
@@ -6273,7 +6276,7 @@ void PlayerEffects(const int A)
                 CheckSectionNPC(p.HoldingNPC);
             }
 
-            if(numPlayers > 2/* && nPlay.Online == false*/)
+            if(g_ClonedPlayerMode)
             {
                 for(B = 1; B <= numPlayers; B++)
                 {
@@ -6639,7 +6642,7 @@ void PlayerEffects(const int A)
             if(p.HoldingNPC > 0)
                 NPC[p.HoldingNPC].Effect = 0;
 
-            if(numPlayers > 2 /*&& nPlay.Online == false*/)
+            if(g_ClonedPlayerMode)
             {
                 for(B = 1; B <= numPlayers; B++)
                 {
@@ -6879,7 +6882,7 @@ void PlayerEffects(const int A)
                 p.Effect2 = 2970;
             }
 
-            if(numPlayers > 2 /*&& nPlay.Online == false*/)
+            if(g_ClonedPlayerMode)
             {
                 for(B = 1; B <= numPlayers; B++)
                 {

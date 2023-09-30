@@ -875,13 +875,11 @@ bool Update(bool check_lost_devices)
     {
         int A;
 
-        // if there is/was an input method bound to the player,
-        //   let them control themselves.
-        //   (same in spirit as old B == 2 && numPlayers == 2 case)
-        if(B - 1 < (int)g_InputMethods.size())
-            A = B;
-        else // otherwise, let Player 1 control them (blank controls later for SingleCoop)
+        // override in ClonedPlayerMode and SingleCoop mode (slightly different from original case which checked if numPlayers != 2)
+        if(g_ClonedPlayerMode || SingleCoop)
             A = 1;
+        else
+            A = B;
 
         // With Player(A).Controls
         {
@@ -909,16 +907,22 @@ bool Update(bool check_lost_devices)
             if(ForcedControls && GamePaused == PauseCode::None)
                 c = ForcedControl;
 
-            // new location for multi-mario (SingleCoop, "supermario128") code
+            // new location for cloned player code ("superbdemo128", was misplaced in ClownCar previously)
             if(A != B)
+            {
                 Player[B].Controls = c;
+
+                // allow pausing in SingleCoop
+                if(SingleCoop)
+                    Player[B].UnStart |= Player[A].UnStart;
+            }
         } // End With
     }
 
     // single coop code -- may want to revise
     if(SingleCoop > 0)
     {
-        if(numPlayers == 1 || numPlayers > 2)
+        if(numPlayers == 1 || g_ClonedPlayerMode)
             SingleCoop = 0;
 
         if(SingleCoop == 1)
@@ -937,7 +941,8 @@ bool Update(bool check_lost_devices)
         }
     }
 
-    if(((int)g_InputMethods.size() < numPlayers) && (numPlayers <= maxLocalPlayers)
+    // indicate if some control slots are missing
+    if(((int)g_InputMethods.size() < numPlayers) && !g_ClonedPlayerMode
        && !SingleCoop && !GameMenu && !Record::replay_file && check_lost_devices)
     {
         // fill with nullptrs

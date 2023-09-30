@@ -343,6 +343,7 @@ bool TestFullscreen = false;
 //bool keyDownEnter = false;
 bool BlocksSorted = false;
 int SingleCoop = 0;
+bool g_ClonedPlayerMode = false;
 //std::string CheatString;
 bool GameOutro = false;
 bool GameOutroDoQuit = false;
