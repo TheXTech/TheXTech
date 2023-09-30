@@ -320,6 +320,9 @@ void speedRun_renderControls(int player, int screenZ)
     if(player < 1 || player > maxLocalPlayers)
         return;
 
+    if(SingleCoop)
+        player = 1;
+
     const bool player_missing = (player - 1 >= (int)Controls::g_InputMethods.size() || !Controls::g_InputMethods[player - 1]);
     const bool player_newly_connected = !player_missing && QuickReconnectScreen::g_active && QuickReconnectScreen::g_toast_duration[player - 1];
 
