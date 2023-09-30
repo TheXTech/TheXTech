@@ -211,6 +211,8 @@ void TouchBonus(int A, int B)
 
         if(NPC[B].Type == NPCID_SWAP_POWER && numPlayers > 1) // ? mushroom
         {
+            // TODO: generalize this for >2P (find another living player besides A and swap A with it)
+
             if(!Player[1].Dead && Player[1].TimeToLive == 0 && !Player[2].Dead &&
                 Player[2].TimeToLive == 0 && Player[1].Immune == 0 && Player[2].Immune == 0)
             {
