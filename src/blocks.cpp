@@ -46,7 +46,7 @@
 void BlockHit(int A, bool HitDown, int whatPlayer)
 {
     // int tempPlayer = 0;
-    bool makeShroom = false; // if true make a mushroom
+    // bool makeShroom = false; // if true make a mushroom
     int newBlock = 0; // what the block should turn into if anything
     int C = 0;
 //    int B = 0;
@@ -619,94 +619,59 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
             if(is_ancient)
                 nn.TimeLeft = 100;
 
+            // always give char 5 or big player full power
+            bool player_gets_full = (whatPlayer > 0 && (Player[whatPlayer].State > 1 || Player[whatPlayer].Character == 5));
+
+            // replacement index if full powerup should not be received
+            int replacement = C;
+
+            if(g_ClonedPlayerMode || BattleMode || player_gets_full)
+            {
+                // never replace if cloned player, in battle mode, or the player that hit the block should get the full powerup
+            }
+            else if(C == NPCID_FIRE_POWER_S3 || C == NPCID_LEAF_POWER || C == NPCID_ICE_POWER_S3 || C == NPCID_ICE_POWER_S4)
+                replacement = NPCID_POWER_S3;
+            else if(C == NPCID_FIRE_POWER_S4)
+                replacement = NPCID_POWER_S4;
+            else if(C == NPCID_FIRE_POWER_S1)
+                replacement = NPCID_POWER_S1;
+
             if(NPCIsYoshi[C])
             {
-                nn.Type = 96;
+                nn.Type = NPCID_ITEM_POD;
                 nn.Special = C;
             }
-            else if(g_ClonedPlayerMode)
+            else if(replacement != C)
             {
-                nn.Type = C;
-            }
-            else if(C == 14 || C == 34 || C == 264 || C == 277)
-            {
+                // if any player is small, then replace the NPC
+                bool do_replace = false;
+
                 for(auto B = 1; B <= numPlayers; B++)
                 {
                     if(Player[B].State == 1 && Player[B].Character != 5)
                     {
-                        makeShroom = true;
+                        do_replace = true;
+                        break;
                     }
                 }
 
-                if(!makeShroom)
-                {
+                if(!do_replace)
                     nn.Type = C;
-                }
                 else
-                {
-                    nn.Type = 9;
-                }
-            }
-            else if(C == 183)
-            {
-                for(auto B = 1; B <= numPlayers; B++)
-                {
-                    if(Player[B].State == 1 && Player[B].Character != 5)
-                    {
-                        makeShroom = true;
-                    }
-                }
-
-                if(!makeShroom)
-                {
-                    nn.Type = C;
-                }
-                else
-                {
-                    nn.Type = 185;
-                }
-            }
-            else if(C == 182)
-            {
-                for(auto B = 1; B <= numPlayers; B++)
-                {
-                    if(Player[B].State == 1 && Player[B].Character != 5)
-                    {
-                        makeShroom = true;
-                    }
-                }
-
-                if(!makeShroom)
-                {
-                    nn.Type = C;
-                }
-                else
-                {
-                    nn.Type = 184;
-                }
+                    nn.Type = replacement;
             }
             else
             {
                 nn.Type = C;
             }
 
-            if(makeShroom && whatPlayer > 0 &&
-               (Player[whatPlayer].State > 1 || Player[whatPlayer].Character == 5)) // set the NPC type if the conditions are met
-            {
-                nn.Type = C;
-            }
-
-            if(makeShroom && BattleMode) // always spawn the item in battlemode
-            {
-                nn.Type = C;
-            }
-
-            if(nn.Type == 287)
-            {
+            // replace random power immediately
+            if(nn.Type == NPCID_RANDOM_POWER)
                 nn.Type = RandomBonus();
-            }
 
             CharStuff(numNPCs);
+
+            // note: minor bug, should be NPCWidth[nn.Type]
             nn.Location.Width = NPCWidth[C];
 
             // bug from ancient 101 case
@@ -714,7 +679,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
                 nn.Location.Width = NPCWidth[NPCID_POWER_S3];
 
             // Make block a bit smaller to allow player take a bonus easier (Redigit's idea)
-            if(!is_ancient && fEqual(b.Location.Width, 32)/* && !b.getShrinkResized()*/) // moved check above so that the width is not reset to 32 in the first place
+            if(!is_ancient && fEqual(b.Location.Width, 32))
             {
                 // make sure Location.Width == 31.9 heuristic works on low-mem builds
                 // b.Location.Width -= 0.1;
@@ -733,32 +698,20 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
             if(is_ancient && C == NPCID_GRN_BOOT)
                 nn.Direction = -1;
 
-            if(NPCIsYoshi[C]) // if the npc is yoshi then set the color of the egg
+            if(NPCIsYoshi[C]) // if the npc is pet then set the color of the pod
             {
-                if(C == 98)
-                {
+                if(C == NPCID_PET_BLUE)
                     nn.Frame = 1;
-                }
-                else if(C == 99)
-                {
+                else if(C == NPCID_PET_YELLOW)
                     nn.Frame = 2;
-                }
-                else if(C == 100)
-                {
+                else if(C == NPCID_PET_RED)
                     nn.Frame = 3;
-                }
-                else if(C == 148)
-                {
+                else if(C == NPCID_PET_BLACK)
                     nn.Frame = 4;
-                }
-                else if(C == 149)
-                {
+                else if(C == NPCID_PET_PURPLE)
                     nn.Frame = 5;
-                }
-                else if(C == 150)
-                {
+                else if(C == NPCID_PET_PINK)
                     nn.Frame = 6;
-                }
             }
 
             if(!HitDown)
