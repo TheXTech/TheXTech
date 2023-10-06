@@ -267,6 +267,7 @@ void GameLoop()
                     // only consider new start presses
                     if(!Player[p].UnStart || !Player[p].Controls.Start)
                         continue;
+
                     // use limited, buggy code for non-player 1 in compat case
                     if(p != 1 && !g_compatibility.multiplayer_pause_controls)
                     {
@@ -276,9 +277,11 @@ void GameLoop()
                             FreezeNPCs = !FreezeNPCs;
                             PlaySound(SFX_Pause);
                         }
+
                         // don't let double-pause or double-toggle happen
                         break;
                     }
+
                     // the special NPC freeze toggling functionality from CaptainN
                     if((CaptainN || FreezeNPCs) && PSwitchStop == 0)
                     {
@@ -302,6 +305,7 @@ void GameLoop()
                     {
                         PauseGame(PauseCode::PauseScreen, 0);
                     }
+
                     // don't let double-pause or double-toggle happen
                     break;
                 }
@@ -325,12 +329,7 @@ bool MessageScreen_Logic(int plr)
     bool menuDoPress = SharedControls.MenuDo || SharedControls.Pause;
     bool menuBackPress = SharedControls.MenuBack;
 
-    // this might no longer be necessary...
-    if(SingleCoop > 0 || numPlayers > 2)
-    {
-        for(int A = 1; A <= numPlayers; A++)
-            Player[A].Controls = Player[1].Controls;
-    }
+    // there was previously code to copy all players' controls from the main player, but this is no longer necessary (and actively harmful in the SingleCoop case)
 
     if(!g_compatibility.multiplayer_pause_controls && plr == 0)
         plr = 1;

@@ -270,8 +270,18 @@ void WorldLoop()
     vScreen[1].tempX = 0;
     vScreen[1].TempY = 0;
 
-    if(numPlayers > 2)
+    // disable cloned player mode
+    if(g_ClonedPlayerMode)
+    {
+        numPlayers = (int)Controls::g_InputMethods.size();
+        g_ClonedPlayerMode = false;
+    }
+
+    if(numPlayers < 1)
         numPlayers = 1;
+
+    if(numPlayers > maxLocalPlayers)
+        numPlayers = maxLocalPlayers;
 
     for(B = 1; B <= numPlayers; B++)
     {

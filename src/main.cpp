@@ -21,6 +21,8 @@
 #include <ctime>
 #include "sdl_proxy/sdl_head.h"
 
+#include "../version.h"
+
 #include "game_main.h"
 #include "frm_main.h"
 #include "gfx.h"
@@ -36,6 +38,10 @@
 #include "config.h"
 #include "controls.h"
 #include <AppPath/app_path.h>
+
+#ifdef THEXTECH_INTERPROC_SUPPORTED
+#   include "capabilities.h"
+#endif
 
 #ifndef THEXTECH_NO_ARGV_HANDLING
 #   include <tclap/CmdLine.h>
@@ -248,7 +254,7 @@ int main(int argc, char**argv)
         // Define the command line object.
         TCLAP::CmdLine  cmd("TheXTech Engine\n"
                             "Copyright (c) 2020-2023 Vitaly Novichkov <admin@wohlnet.ru>\n\n"
-                            "This program is distributed under the GPLv3 license\n\n", ' ', "1.3");
+                            "This program is distributed under the GPLv3 license\n\n", ' ', V_LATEST_STABLE " [" V_BUILD_BRANCH ", #" V_BUILD_VER "]");
 
         TCLAP::ValueArg<std::string> customAssetsPath("c", "assets-root", "Specify the different assets root directory to play",
                                                       false, "",
@@ -341,7 +347,10 @@ int main(int argc, char**argv)
         TCLAP::SwitchArg switchTestMaxFPS("x", "max-fps", "Run FPS as fast as possible", false);
         TCLAP::SwitchArg switchTestMagicHand("k", "magic-hand", "Enable magic hand functionality while level test running", false);
         TCLAP::SwitchArg switchTestEditor("e", "editor", "Open level in the editor", false);
+#ifdef THEXTECH_INTERPROC_SUPPORTED
         TCLAP::SwitchArg switchTestInterprocess("i", "interprocessing", "Enable an interprocessing mode with Editor", false);
+        TCLAP::SwitchArg switchPrintCapabilities(std::string(), "capabilities", "Print the JSON string of this build's capabilities", false);
+#endif
 
         TCLAP::ValueArg<std::string> compatLevel(std::string(), "compat-level",
                                                    "Enforce the specific gameplay compatibility level. Supported values:\n"
@@ -416,7 +425,10 @@ int main(int argc, char**argv)
         cmd.add(&switchTestMaxFPS);
         cmd.add(&switchTestMagicHand);
         cmd.add(&switchTestEditor);
+#ifdef THEXTECH_INTERPROC_SUPPORTED
         cmd.add(&switchTestInterprocess);
+        cmd.add(&switchPrintCapabilities);
+#endif
         cmd.add(&switchVerboseLog);
         cmd.add(&switchSpeedRunSemiTransparent);
         cmd.add(&switchDisplayControls);
@@ -449,6 +461,15 @@ int main(int argc, char**argv)
             AppPathManager::initAppPath();
             AppPath = AppPathManager::assetsRoot();
         }
+
+#ifdef THEXTECH_INTERPROC_SUPPORTED
+        if(switchPrintCapabilities.isSet() && switchPrintCapabilities.getValue())
+        {
+            std::fprintf(stdout, "%s\n", g_capabilities);
+            std::fflush(stdout);
+            return 0;
+        }
+#endif
 
 #ifndef THEXTECH_DISABLE_LANG_TOOLS
         // Print the language template to the screen

@@ -13,4 +13,5 @@
     <string name="batteryStatusShow0">不显示</string>
     <string name="batteryStatusShow2">显示</string>
     <string name="batteryStatusShow1">在电池电量低时显示</string>
+    <string name="rendererDefault">默认</string>
 </resources>

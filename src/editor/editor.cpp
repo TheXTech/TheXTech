@@ -2950,7 +2950,7 @@ void zTestLevel(bool magicHand, bool interProcess)
 
     if(Checkpoint.empty()) // Don't reset players when resume at the checkpoint
     {
-        if(numPlayers > 2 /* ||nPlay.Online == true*/)
+        if(g_ClonedPlayerMode)
         {
             for(A = 1; A <= numPlayers; A++)
             {

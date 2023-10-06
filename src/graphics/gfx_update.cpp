@@ -1594,10 +1594,10 @@ void UpdateGraphics(bool skipRepaint)
             }
         }
 
-        // In many-player (superbdemo128) mode, keep players onscreen
+        // Keep all players onscreen in clone mode
         if(!GameMenu && !LevelEditor)
         {
-            if(numPlayers > 2)
+            if(g_ClonedPlayerMode)
             {
                 int C = 0;
                 int D = 0;

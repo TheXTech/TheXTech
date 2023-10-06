@@ -744,6 +744,7 @@ int GameMain(const CmdLineSetup_t &setup)
             FlyForever = false;
             BeatTheGame = false;
             g_ForceBitmaskMerge = false;
+            g_ClonedPlayerMode = false;
             g_CheatLogicScreen = false;
             XRender::unloadGifTextures();
 

@@ -369,7 +369,7 @@ void RenderGL::flushUnorderedDrawQueue()
         // (2) draw!
 
         // load vertex attributes into current GL buffer
-        fillVertexBuffer(vertex_attribs.data(), vertex_attribs.size());
+        fillVertexBuffer(vertex_attribs.data(), (int)vertex_attribs.size());
 
         // bind texture if it exists
         if(texture)
@@ -484,17 +484,17 @@ void RenderGL::executeOrderedDrawQueue(bool clear)
         else if(use_gl_logic_op)
         {
             // load vertex attributes into current GL buffer
-            fillVertexBuffer(vertex_attribs.data(), vertex_attribs.size());
+            fillVertexBuffer(vertex_attribs.data(), (int)vertex_attribs.size());
 
             // draw mask
             prepareDrawMask();
             glBindTexture(GL_TEXTURE_2D, texture->d.mask_texture_id);
-            glDrawArrays(GL_TRIANGLES, 0, vertex_attribs.size());
+            glDrawArrays(GL_TRIANGLES, 0, (GLsizei)vertex_attribs.size());
 
             // draw image at same coordinates
             prepareDrawImage();
             glBindTexture(GL_TEXTURE_2D, texture->d.texture_id);
-            glDrawArrays(GL_TRIANGLES, 0, vertex_attribs.size());
+            glDrawArrays(GL_TRIANGLES, 0, (GLsizei)vertex_attribs.size());
 
             // return to standard LogicOp state
             leaveMaskContext();
@@ -502,7 +502,7 @@ void RenderGL::executeOrderedDrawQueue(bool clear)
         else
         {
             // load vertex attributes into current GL buffer
-            fillVertexBuffer(vertex_attribs.data(), vertex_attribs.size());
+            fillVertexBuffer(vertex_attribs.data(), (int)vertex_attribs.size());
 
             // bind image texture if it exists
             if(texture)
@@ -511,7 +511,7 @@ void RenderGL::executeOrderedDrawQueue(bool clear)
                 glBindTexture(GL_TEXTURE_2D, 0);
 
             // draw!
-            glDrawArrays(GL_TRIANGLES, 0, vertex_attribs.size());
+            glDrawArrays(GL_TRIANGLES, 0, (GLsizei)vertex_attribs.size());
         }
 
 

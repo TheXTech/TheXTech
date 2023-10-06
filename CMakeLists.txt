@@ -554,6 +554,7 @@ if(NOT ANDROID
         lib/InterProcess/editor_pipe.cpp
         lib/InterProcess/intproc.h
         lib/InterProcess/intproc.cpp
+        src/capabilities.cpp
     )
     set(THEXTECH_INTERPROC_SUPPORTED ON)
 endif()
@@ -947,6 +948,7 @@ file(GLOB THEXTECH_HEADS_SRC
 list(APPEND THEXTECH_SRC ${THEXTECH_HEADS_SRC})
 
 # For every file that includes "version.h", call this:
+add_git_version_defs(src/main.cpp)
 add_git_version_defs(src/frm_main.cpp)
 add_git_version_defs(src/main/game_info.cpp)
 add_git_version_defs(src/main/record.cpp)
@@ -1009,8 +1011,7 @@ elseif(NINTENDO_WII OR NINTENDO_3DS OR NINTENDO_DS)
     set_target_properties(thextech PROPERTIES SUFFIX ".elf")
 
 else()
-    add_executable(thextech ${THEXTECH_SRC} ${LIB_SRC}
-        src/fontman/legacy_font.h src/fontman/legacy_font.cpp)
+    add_executable(thextech ${THEXTECH_SRC} ${LIB_SRC})
     pge_set_nopie(thextech)
 endif()
 
