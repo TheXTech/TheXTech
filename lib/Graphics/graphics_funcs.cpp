@@ -182,6 +182,50 @@ FIBITMAP *GraphicsHelps::loadImage(std::vector<char> &raw, bool convertTo32bit)
     return img;
 }
 
+FIBITMAP *GraphicsHelps::loadMask(const std::string &file, bool maskIsPng, bool convertTo32bit)
+{
+    FIBITMAP *mask;
+
+    if(file.empty())
+        return nullptr; //Nothing to do
+    mask = loadImage(file, convertTo32bit);
+
+    if(!mask)
+        return nullptr;//Nothing to do
+
+    // this is the main reason that we have a separate call: extract a bitmask from a PNG RGBA image
+    if(maskIsPng)
+    {
+        FIBITMAP *front = FreeImage_Copy(mask, 0, 0, int(FreeImage_GetWidth(mask)), int(FreeImage_GetHeight(mask)));
+        getMaskFromRGBA(front, mask);
+        closeImage(front);
+    }
+
+    return mask;
+}
+
+FIBITMAP *GraphicsHelps::loadMask(std::vector<char> &raw, bool maskIsPng, bool convertTo32bit)
+{
+    FIBITMAP *mask;
+
+    if(raw.empty())
+        return nullptr; //Nothing to do
+    mask = loadImage(raw, convertTo32bit);
+
+    if(!mask)
+        return nullptr;//Nothing to do
+
+    // this is the main reason that we have a separate call: extract a bitmask from a PNG RGBA image
+    if(maskIsPng)
+    {
+        FIBITMAP *front = FreeImage_Copy(mask, 0, 0, int(FreeImage_GetWidth(mask)), int(FreeImage_GetHeight(mask)));
+        getMaskFromRGBA(front, mask);
+        closeImage(front);
+    }
+
+    return mask;
+}
+
 //FIBITMAP *GraphicsHelps::loadImageRC(const char *file)
 //{
 //    unsigned char *memory = nullptr;
@@ -666,6 +710,99 @@ FIBITMAP *GraphicsHelps::fastConvertTo32Bit(FIBITMAP *image)
     }
 
     return dest;
+}
+
+bool GraphicsHelps::validateBitmaskRequired(FIBITMAP *image, FIBITMAP *mask, const std::string &origPath)
+{
+    if(!image || !mask)
+        return false;
+
+    (void)origPath; // supress warning when build the release build
+
+    auto fw = static_cast<uint32_t>(FreeImage_GetWidth(image));
+    auto fh = static_cast<uint32_t>(FreeImage_GetHeight(image));
+    auto fpitch = static_cast<uint32_t>(FreeImage_GetPitch(image));
+    BYTE *fimg_bits  = FreeImage_GetBits(image);
+
+    auto bw = static_cast<uint32_t>(FreeImage_GetWidth(mask));
+    auto bh = static_cast<uint32_t>(FreeImage_GetHeight(mask));
+    auto bpitch = static_cast<uint32_t>(FreeImage_GetPitch(mask));
+    BYTE *bimg_bits  = FreeImage_GetBits(mask);
+
+    BYTE *line1 = fimg_bits;
+    BYTE *line2 = bimg_bits;
+
+    for(uint32_t y = 0; y < fh || y < bh; ++y)
+    {
+        for(uint32_t x = 0; x < fw || x < bw; ++x)
+        {
+            bool bp_present = y < bh && x < bw;
+            bool fp_present = y < fh && x < fw;
+
+            BYTE *fp = line1 + (y * fpitch) + (x * 4);
+            BYTE *bp = line2 + (y * bpitch) + (x * 4);
+
+            // accept vanilla GIFs that target 16-bit color depth
+            // note that missing back pixels are white and absent front pixels are black
+            bool bp_is_white = !bp_present || (bp[0] >= 0xf8 && bp[1] >= 0xf8 && bp[2] >= 0xf8);
+            bool fp_is_white =  fp_present && (fp[0] >= 0xf8 && fp[1] >= 0xf8 && fp[2] >= 0xf8);
+            bool bp_is_black =  bp_present && (bp[0] <  0x08 && bp[1] <  0x08 && bp[2] <  0x08);
+            bool fp_is_black = !fp_present || (fp[0] <  0x08 && fp[1] <  0x08 && fp[2] <  0x08);
+
+            // mask pixel is black: buffer replaced with front pixel
+            if(bp_is_black)
+                continue;
+
+            // front pixel is white: buffer replaced with front pixel
+            if(fp_is_white)
+                continue;
+
+            // back pixel is white and front pixel is black: buffer preserved
+            if(bp_is_white && fp_is_black)
+                continue;
+
+            // pixel is matching with the front (i.e. is not an example of the lazily-made sprite)
+            if(bp_present && fp_present && SDL_memcmp(bp, fp, 3) == 0)
+                continue;
+
+            D_pLogDebug("Texture REQUIRES the bitmask render (%s)", origPath.c_str());
+            return true;
+        }
+    }
+
+    D_pLogDebug("Texture doesn't require bitmask render (%s)", origPath.c_str());
+    return false;
+}
+
+bool GraphicsHelps::validateForDepthTest(FIBITMAP *image, const std::string &origPath)
+{
+    if(!image)
+        return false;
+
+    (void)origPath; // supress warning when build the release build
+
+    auto w = static_cast<uint32_t>(FreeImage_GetWidth(image));
+    auto h = static_cast<uint32_t>(FreeImage_GetHeight(image));
+    auto pitch = static_cast<uint32_t>(FreeImage_GetPitch(image));
+    BYTE *img_bits  = FreeImage_GetBits(image);
+
+    for(uint32_t y = 0; y < h; ++y)
+    {
+        for(uint32_t x = 0; x < w; ++x)
+        {
+            BYTE *alpha = img_bits + (y * pitch) + (x * 4) + 3;
+
+            // vanilla game used 5 bits per channel, so we set the alpha test as >= 0x08
+            if(*alpha < 0x08 || *alpha >= 0xf8)
+                continue;
+
+            D_pLogDebug("Texture CANNOT use depth test (%s)", origPath.c_str());
+            return false;
+        }
+    }
+
+    D_pLogDebug("Texture can use depth test (%s)", origPath.c_str());
+    return true;
 }
 
 FIBITMAP *GraphicsHelps::fastScaleDownAnd32Bit(FIBITMAP *image, bool do_scale_down)

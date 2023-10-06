@@ -596,7 +596,7 @@ void PlaySound(int A, int loops, int volume)
     else if(!s_useNewIceSfx && (A == SFX_Freeze || A == SFX_Icebreak))
         A = SFX_ShellHit; // Restore the old behavior
 
-    if(numPlayers > 2)
+    if(g_ClonedPlayerMode)
         SoundPause[10] = 1;
 
     UNUSED(volume);

@@ -26,6 +26,7 @@
 #endif
 
 #include "../globals.h"
+#include "../game_main.h" // SetupPhysics()
 #include "../frame_timer.h"
 #include "../npc.h"
 #include "../load_gfx.h"
@@ -54,9 +55,15 @@
 #include <PGE_File_Formats/file_formats.h>
 
 #include "global_dirs.h"
+#include "screen_fader.h"
 
 #include "editor/editor_custom.h"
 #include "editor/editor_strings.h"
+
+
+#ifdef THEXTECH_BUILD_GL_MODERN
+#    include "core/opengl/gl_program_bank.h"
+#endif
 
 
 void bgoApplyZMode(Background_t *bgo, int smbx64sp)
@@ -264,6 +271,14 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
             CustomMusic[B].clear();
         else
             CustomMusic[B] = g_dirEpisode.resolveFileCase(s.music_file);
+
+#if defined(THEXTECH_BUILD_GL_MODERN) && defined(THEXTECH_WIP_FEATURES)
+        // FIXME: allow sections to specify shaders by name
+        SectionEffect[B] = ResolveGLProgram("section-effect");
+        SectionParticlesBG[B] = ResolveGLParticleSystem("particles-bg");
+        SectionParticlesFG[B] = ResolveGLParticleSystem("particles-fg");
+#endif
+
         B++;
         if(B > maxSections)
             break;
@@ -821,6 +836,10 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         warp.Exit.Height = 32;
         warp.Exit.Width = 32;
 
+        // FIXME: allow warp object to specify a transit effect name as a string
+        if(warp.transitEffect >= ScreenFader::S_CUSTOM)
+            warp.transitEffect = ScreenFader::loadTransitEffect(std::to_string(warp.transitEffect));
+
         syncLayers_Warp(numWarps);
     }
 
@@ -974,6 +993,7 @@ void ClearLevel()
     RestoreWorldStrings();
     LevelName.clear();
     ResetCompat();
+    SetupPhysics();
     LoadNPCDefaults();
     LoadPlayerDefaults();
     noUpdate = true;
@@ -982,6 +1002,12 @@ void ClearLevel()
 
 #ifdef __16M__
     XRender::clearAllTextures();
+#endif
+
+#ifdef THEXTECH_BUILD_GL_MODERN
+    SectionEffect.fill(LoadedGLProgramRef_t());
+    SectionParticlesBG.fill(LoadedGLProgramRef_t());
+    SectionParticlesFG.fill(LoadedGLProgramRef_t());
 #endif
 
     UnloadCustomGFX();
@@ -1431,10 +1457,12 @@ bool CanConvertLevel(int format, std::string* reasons)
 void ConvertLevel(int format)
 {
     FileFormat = format;
+
     if(format == FileFormats::LVL_SMBX64 || format == FileFormats::LVL_SMBX38A)
     {
         if(!FileNameFull.empty() && FileNameFull.back() == 'x')
             FileNameFull.resize(FileNameFull.size() - 1);
+
         if(!FullFileName.empty() && FullFileName.back() == 'x')
             FullFileName.resize(FullFileName.size() - 1);
     }
@@ -1442,6 +1470,7 @@ void ConvertLevel(int format)
     {
         if(!FileNameFull.empty() && FileNameFull.back() != 'x')
             FileNameFull += "x";
+
         if(!FullFileName.empty() && FullFileName.back() != 'x')
             FullFileName += "x";
     }
@@ -1472,19 +1501,15 @@ void ConvertLevel(int format)
         for(int j = 0; j < numSections; ++j)
         {
             auto &ss = e.section[j];
-
             SetS(ss.music_file, "");
             ss.autoscroll = false;
         }
     }
 
     for(int i = 1; i <= numNPCs; i++)
-    {
         NPC[i].Variant = 0;
-    }
+
 
     for(int i = 1; i <= numBlock; i++)
-    {
         Block[i].forceSmashable = 0;
-    }
 }

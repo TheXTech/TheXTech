@@ -47,7 +47,7 @@ RasterFont::RasterFont() : BaseFontEngine()
     m_matrixWidth    = 0;
     m_matrixHeight   = 0;
     m_isReady        = false;
-    m_ttfOutlines     = false;
+    m_ttfOutlines    = false;
     m_fontName       = fmt::format_ne("font{0}", fontNumberCount++);
 }
 
@@ -237,8 +237,8 @@ void RasterFont::loadFontMap(const std::string& fontmap_ini)
             rch.padding_left    = (ucharX.size() > 1) ? char2int(ucharX[1]) : 0;
             rch.padding_right   = (ucharX.size() > 2) ? char2int(ucharX[2]) : 0;
             t                   =  std::stof(charPosX.c_str()) / m_matrixHeight;
-            rch.x               =  static_cast<int32_t>(fontTexture.w * l);
-            rch.y               =  static_cast<int32_t>(fontTexture.h * t);
+            rch.x               =  static_cast<int16_t>(fontTexture.w * l);
+            rch.y               =  static_cast<int16_t>(fontTexture.h * t);
             rch.valid = true;
         }
         catch(std::exception &e)

@@ -133,7 +133,7 @@ void FindSaves()
                 curActive++;
 
             // How much paths open
-            maxActive += f.visiblePaths.size();
+            maxActive += (int)f.visiblePaths.size();
             for(auto &p : f.visiblePaths)
             {
                 if(p.second)
@@ -141,7 +141,7 @@ void FindSaves()
             }
 
             // How much levels opened
-            maxActive += f.visibleLevels.size();
+            maxActive += (int)f.visibleLevels.size();
             for(auto &p : f.visibleLevels)
             {
                 if(p.second)

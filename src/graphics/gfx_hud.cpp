@@ -23,10 +23,13 @@
 #include "../globals.h"
 #include "../graphics.h"
 #include "../core/render.h"
+#include "../core/power.h"
 #include "../gfx.h"
 
-#include "config.h"
+#include "video.h"
+#include "main/speedrunner.h"
 
+#include "config.h"
 #include "main/level_medals.h"
 
 void DrawInterface(int Z, int numScreens)
@@ -454,7 +457,7 @@ static inline void s_DrawMedal(int x, int y, int coin_width, int coin_height, Me
     // render sparkles
     if(level == MedalDrawLevel::Best)
     {
-        int sparkle_1_idx = BlockFlash / 16; // on frame 3
+        int sparkle_1_idx = (CommonFrame % 256) / 16; // on frame 3
 
         for(int i = 0; i < 3; ++i)
         {
@@ -501,11 +504,6 @@ void DrawMedals(int X, int Y, bool center, uint8_t max, uint8_t prev, uint8_t ck
     if(max > 8)
         max = 8;
 
-    BlockFlash += 1;
-
-    if(BlockFlash >= 256)
-        BlockFlash = 0;
-
     if(g_config.medals_show_policy == Config_t::MEDALS_SHOW_FULL)
     {
         if(center)
@@ -522,7 +520,7 @@ void DrawMedals(int X, int Y, bool center, uint8_t max, uint8_t prev, uint8_t ck
                 s_DrawMedal(X_i, Y, coin_width, coin_height, MedalDrawLevel::Best);
             else if(got & bit)
                 s_DrawMedal(X_i, Y, coin_width, coin_height, MedalDrawLevel::Got);
-            else if(ckpt & bit && (BlockFlash % 64) < 32)
+            else if(ckpt & bit && (CommonFrame % 64) < 32)
                 s_DrawMedal(X_i, Y, coin_width, coin_height, MedalDrawLevel::Got);
             else if(prev & bit)
                 s_DrawMedal(X_i, Y, coin_width, coin_height, MedalDrawLevel::Prev);
@@ -603,5 +601,41 @@ void DrawMedals(int X, int Y, bool center, uint8_t max, uint8_t prev, uint8_t ck
         XRender::renderTexture(X, Y, GFX.Interface[1]);
         X += GFX.Interface[1].w + 4;
         SuperPrint(label_2, 3, X, Y);
+    }
+}
+
+void DrawDeviceBattery()
+{
+#ifdef RENDER_FULLSCREEN_ALWAYS
+    constexpr bool isFullScreen = true;
+#else
+    const bool isFullScreen = resChanged;
+#endif
+
+    if(g_videoSettings.batteryStatus == BATTERY_STATUS_OFF)
+        return;
+
+    XPower::StatusInfo status_info = XPower::devicePowerStatus();
+
+    if(status_info.power_status == XPower::StatusInfo::POWER_DISABLED || status_info.power_status == XPower::StatusInfo::POWER_UNKNOWN || status_info.power_status == XPower::StatusInfo::POWER_WIRED)
+        return;
+
+    bool isLow = (status_info.power_status <= 0.35f);
+
+    bool showBattery = false;
+
+    showBattery |= (g_videoSettings.batteryStatus == BATTERY_STATUS_ALWAYS_ON);
+    showBattery |= (g_videoSettings.batteryStatus == BATTERY_STATUS_ANY_WHEN_LOW && isLow);
+    showBattery |= (g_videoSettings.batteryStatus == BATTERY_STATUS_FULLSCREEN_WHEN_LOW && isLow && isFullScreen);
+    showBattery |= (g_videoSettings.batteryStatus == BATTERY_STATUS_FULLSCREEN_ON && isFullScreen);
+
+    if(showBattery)
+    {
+        int bw = 40;
+        int bh = 22;
+        int bx = ScreenW - (bw + 8);
+        int by = 24;
+
+        RenderPowerInfo(0, bx, by, bw, bh, 1.0f, &status_info);
     }
 }

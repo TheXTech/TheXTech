@@ -27,6 +27,7 @@
 #include "../version.h"
 
 #include "gfx.h"
+#include "video.h"
 
 #include "core/render.h"
 #include "core/window.h"
@@ -38,8 +39,11 @@
 #endif
 
 #ifdef CORE_EVERYTHING_SDL
+#   include "core/sdl/init_sdl.h"
+
 #   include "core/sdl/render_sdl.h"
-typedef RenderSDL RenderUsed;
+#   include "core/opengl/render_gl.h"
+
 #   define USE_CORE_RENDER_SDL
 
 #   include "core/sdl/window_sdl.h"
@@ -59,6 +63,7 @@ typedef EventsSDL EventsUsed;
 
 #include "frm_main.h"
 
+FrmMain g_frmMain;
 
 bool FrmMain::initSystem(const CmdLineSetup_t &setup)
 {
@@ -88,10 +93,28 @@ bool FrmMain::initSystem(const CmdLineSetup_t &setup)
     g_window = m_window.get();
 #endif
 
-#ifndef RENDER_CUSTOM
-    RenderUsed *render = new RenderUsed();
-    m_render.reset(render);
-    g_render = m_render.get();
+#ifdef USE_CORE_RENDER_SDL
+
+
+#   ifdef RENDERGL_SUPPORTED
+    bool try_gl = false;
+
+    if(setup.renderType == RENDER_ACCELERATED_OPENGL || setup.renderType == RENDER_ACCELERATED_OPENGL_ES || setup.renderType == RENDER_ACCELERATED_OPENGL_LEGACY || setup.renderType == RENDER_ACCELERATED_OPENGL_ES_LEGACY)
+    {
+        RenderGL *render = new RenderGL();
+        m_render.reset(render);
+        g_render = m_render.get();
+        try_gl = true;
+    }
+    else
+#   endif // #ifdef RENDERGL_SUPPORTED
+
+    {
+        RenderSDL *render = new RenderSDL();
+        m_render.reset(render);
+        g_render = m_render.get();
+    }
+
 #endif
 
 #ifndef MSGBOX_CUSTOM
@@ -112,7 +135,7 @@ bool FrmMain::initSystem(const CmdLineSetup_t &setup)
     D_pLogDebugNA("FrmMain: Loading XWindow...");
     res = XWindow::init();
 #elif defined(USE_CORE_WINDOW_SDL)
-    res = window->initSDL(render->SDL_InitFlags());
+    res = window->initSDL(g_render->SDL_InitFlags());
 #else
 #   error "FIXME: Implement supported window initialization here"
 #endif
@@ -156,7 +179,38 @@ bool FrmMain::initSystem(const CmdLineSetup_t &setup)
     D_pLogDebugNA("FrmMain: Loading XRender...");
     res &= XRender::init();
 #elif defined(USE_CORE_WINDOW_SDL) && defined(USE_CORE_RENDER_SDL)
-    res = render->initRender(setup, window->getWindow());
+    res = g_render->initRender(setup, window->getWindow());
+
+#   ifdef RENDERGL_SUPPORTED
+    if(try_gl && !res)
+    {
+        pLogDebug("FrmMain: closing Render GL");
+        m_render->clearAllTextures();
+        m_render->close();
+
+        msgbox->close();
+        window->close();
+
+        m_render.reset();
+        g_render = nullptr;
+
+        pLogDebug("FrmMain: retrying with Render SDL layer...");
+
+        RenderSDL *render = new RenderSDL();
+        m_render.reset(render);
+        g_render = m_render.get();
+
+        // make new window
+        res = window->initSDL(g_render->SDL_InitFlags());
+
+        if(res)
+        {
+            msgbox->init(window->getWindow());
+            res = g_render->initRender(setup, window->getWindow());
+        }
+    }
+#   endif // #ifdef RENDERGL_SUPPORTED
+
 #else
 #   error "FIXME: Implement supported render initialization here"
 #endif
@@ -233,15 +287,91 @@ void FrmMain::freeSystem()
 
 bool FrmMain::restartRenderer()
 {
+#ifndef THEXTECH_RESTART_RENDERER_SUPPORTED
+    return false;
+#else // #ifndef THEXTECH_RESTART_RENDERER_SUPPORTED
     pLogDebug("FrmMain: attempting to restart XRender...");
 
     bool res;
 
-#ifdef RENDER_CUSTOM
+#    ifdef RENDER_CUSTOM
+    // custom renderer
     XRender::quit();
 
     res = XRender::init();
-#else
+
+#    elif defined(RENDERGL_SUPPORTED)
+
+    if(m_render)
+    {
+        m_render->clearAllTextures();
+        m_render->close();
+    }
+
+    g_msgBox->close();
+    g_window->close();
+
+    m_render.reset();
+    g_render = nullptr;
+
+    bool try_gl = false;
+
+    CmdLineSetup_t setup;
+    setup.renderType = g_videoSettings.renderMode;
+    setup.vSync = g_videoSettings.vSync;
+
+    if(setup.renderType == RENDER_ACCELERATED_OPENGL || setup.renderType == RENDER_ACCELERATED_OPENGL_ES || setup.renderType == RENDER_ACCELERATED_OPENGL_LEGACY || setup.renderType == RENDER_ACCELERATED_OPENGL_ES_LEGACY)
+    {
+        m_render.reset(new RenderGL());
+        try_gl = true;
+    }
+    else
+    {
+        m_render.reset(new RenderSDL());
+    }
+
+    g_render = m_render.get();
+
+    res = reinterpret_cast<WindowUsed*>(g_window)->initSDL(g_render->SDL_InitFlags());
+
+    if(res)
+    {
+        reinterpret_cast<MsgBoxUsed*>(g_msgBox)->init(reinterpret_cast<WindowUsed*>(g_window)->getWindow());
+        res = m_render->initRender(setup, reinterpret_cast<WindowUsed*>(g_window)->getWindow());
+    }
+
+    if(try_gl && !res)
+    {
+        pLogDebug("FrmMain: closing Render GL");
+        m_render->clearAllTextures();
+        m_render->close();
+
+        g_msgBox->close();
+        g_window->close();
+
+        m_render.reset();
+        g_render = nullptr;
+
+        pLogDebug("FrmMain: retrying with Render SDL layer...");
+
+        RenderSDL *render = new RenderSDL();
+        m_render.reset(render);
+        g_render = m_render.get();
+
+        res = reinterpret_cast<WindowUsed*>(g_window)->initSDL(g_render->SDL_InitFlags());
+
+        if(res)
+        {
+            reinterpret_cast<MsgBoxUsed*>(g_msgBox)->init(reinterpret_cast<WindowUsed*>(g_window)->getWindow());
+            res = g_render->initRender(setup, reinterpret_cast<WindowUsed*>(g_window)->getWindow());
+        }
+
+        res = false;
+    }
+
+#    else
+    // SDL, no OpenGL
+
     if(m_render)
     {
         m_render->clearAllTextures();
@@ -251,13 +381,19 @@ bool FrmMain::restartRenderer()
     m_render.reset();
     g_render = nullptr;
 
-    RenderUsed *render = new RenderUsed();
-    m_render.reset(render);
+    m_render.reset(new RenderSDL());
+
     g_render = m_render.get();
 
-    const CmdLineSetup_t setup;
-    res = render->initRender(setup, reinterpret_cast<WindowUsed*>(g_window)->getWindow());
-#endif
+    CmdLineSetup_t setup;
+    setup.renderType = g_videoSettings.renderMode;
+    setup.vSync = g_videoSettings.vSync;
+
+    res = m_render->initRender(setup, reinterpret_cast<WindowUsed*>(g_window)->getWindow());
+#    endif
+
+    XWindow::show();
 
     return res;
+#endif // #ifndef THEXTECH_RESTART_RENDERER_SUPPORTED
 }

@@ -33,8 +33,9 @@
 
 #include "core/render.h"
 #include "core/window.h"
-#include "main/cheat_code.h"
+#include "core/power.h"
 
+#include "main/cheat_code.h"
 #include "main/menu_main.h"
 
 #include "control/controls_strings.h"
@@ -234,24 +235,7 @@ void InputMethod_Keyboard::Rumble(int ms, float strength)
 
 StatusInfo InputMethod_Keyboard::GetStatus()
 {
-    StatusInfo res;
-    int percent;
-    SDL_PowerState state = SDL_GetPowerInfo(nullptr, &percent);
-
-    if(state == SDL_POWERSTATE_UNKNOWN)
-        res.power_status = StatusInfo::POWER_UNKNOWN;
-    else if(state == SDL_POWERSTATE_ON_BATTERY)
-        res.power_status = StatusInfo::POWER_DISCHARGING;
-    else if(state == SDL_POWERSTATE_NO_BATTERY)
-        res.power_status = StatusInfo::POWER_WIRED;
-    else if(state == SDL_POWERSTATE_CHARGING)
-        res.power_status = StatusInfo::POWER_CHARGING;
-    else if(state == SDL_POWERSTATE_CHARGED)
-        res.power_status = StatusInfo::POWER_CHARGED;
-
-    res.power_level = percent / 100.f;
-
-    return res;
+    return XPower::devicePowerStatus();
 }
 
 /*====================================================*\
@@ -318,10 +302,6 @@ InputMethodProfile_Keyboard::InputMethodProfile_Keyboard()
     this->m_hotkeys[Hotkeys::Buttons::Screenshot] = SDL_SCANCODE_F12;
     this->m_hotkeys2[Hotkeys::Buttons::Screenshot] = SDL_SCANCODE_F2;
 #ifdef DEBUG_BUILD
-    // This is a DEBUG ONLY hot key that can kill the overlook on localized versions
-    // It's primary use is a debugging of the font engine itself, comparing with the
-    // old font engine on the fly
-    this->m_hotkeys[Hotkeys::Buttons::ToggleFontRender] = SDL_SCANCODE_F4;
     this->m_hotkeys[Hotkeys::Buttons::ReloadLanguage] = SDL_SCANCODE_F5;
 #endif
 }

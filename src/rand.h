@@ -67,6 +67,12 @@ extern double dRand();
  */
 extern int iRand(int max);
 
+template<class T>
+int iRandT(T max)
+{
+    return iRand(static_cast<int>(max));
+}
+
 /**
  * @brief Random number generator in integer format, between 0 to argument max (exclusive)
  * Distribution equivalent to `Int(dRand() * max)`
@@ -75,6 +81,12 @@ extern int iRand(int max);
  * @return random integer value
  */
 extern int iRand2(int max);
+
+template<class T>
+int iRand2T(T max)
+{
+    return iRand2(static_cast<int>(max));
+}
 
 /**
  * @brief Random number generator in integer format, between 0 to argument max (inclusive)

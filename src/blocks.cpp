@@ -564,7 +564,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
         if(NPCIsABonus[C] && C != 169 && C != 170) // check to see if it should spawn a dead player
         {
             tempPlayer = CheckDead();
-            if(numPlayers > 2 /*&& nPlay.Online == false*/)
+            if(g_ClonedPlayerMode)
             {
                 tempPlayer = 0;
             }
@@ -587,7 +587,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
                 nn.Type = 96;
                 nn.Special = C;
             }
-            else if(numPlayers > 2)
+            else if(g_ClonedPlayerMode)
             {
                 nn.Type = C;
             }
@@ -822,7 +822,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
 
         tempPlayer = CheckDead();
 
-        if(numPlayers > 2 /*&& nPlay.Online == false*/)
+        if(g_ClonedPlayerMode)
         {
             tempPlayer = 0;
         }
@@ -912,7 +912,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
 
         tempPlayer = CheckDead();
 
-        if(numPlayers > 2 /*&& nPlay.Online == false*/)
+        if(g_ClonedPlayerMode)
         {
             tempPlayer = 0;
         }
@@ -1018,7 +1018,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
 
         tempPlayer = CheckDead();
 
-        if(numPlayers > 2/*&& nPlay.Online == false*/)
+        if(g_ClonedPlayerMode)
         {
             tempPlayer = 0;
         }
@@ -1498,7 +1498,7 @@ void KillBlock(int A, bool Splode)
 
         if(Block[A].TriggerDeath != EVENT_NONE)
         {
-            ProcEvent(Block[A].TriggerDeath);
+            ProcEvent(Block[A].TriggerDeath, 0);
         }
 
         if(Block[A].TriggerLast != EVENT_NONE)
@@ -1531,7 +1531,7 @@ void KillBlock(int A, bool Splode)
 
             if(!tempBool)
             {
-                ProcEvent(Block[A].TriggerLast);
+                ProcEvent(Block[A].TriggerLast, 0);
             }
         }
 
@@ -1877,7 +1877,7 @@ void UpdateBlocks()
             {
                 if(ib.TriggerHit != EVENT_NONE)
                 {
-                    ProcEvent(ib.TriggerHit);
+                    ProcEvent(ib.TriggerHit, 0);
                 }
 
                 if(ib.Type == 282)
@@ -1903,7 +1903,7 @@ void UpdateBlocks()
             if(ib.ShakeY == 0)
             {
                 if(ib.TriggerHit != EVENT_NONE)
-                    ProcEvent(ib.TriggerHit);
+                    ProcEvent(ib.TriggerHit, 0);
 
                 if(ib.Type == 282)
                     ib.Type = 283;
@@ -2220,7 +2220,7 @@ void PSwitch(bool enabled)
             }
         }
 
-        ProcEvent(EVENT_PSWITCH_START, true);
+        ProcEvent(EVENT_PSWITCH_START, 0, true);
     }
     else
     {
@@ -2342,7 +2342,7 @@ void PSwitch(bool enabled)
             }
         }
 
-        ProcEvent(EVENT_PSWITCH_END, true);
+        ProcEvent(EVENT_PSWITCH_END, 0, true);
     }
 
     // qSortBlocksX(1, numBlock);

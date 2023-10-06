@@ -154,6 +154,11 @@ if(NINTENDO_3DS)
     option(THEXTECH_CUSTOM_AUDIO_LIBRARY "Use the custom audio library instead of MixerX" OFF)
 endif()
 
+option(THEXTECH_BUILD_GL_DESKTOP_MODERN "On SDL builds, include the OpenGL 2.0+ Core/Compatibility renderer" ON)
+option(THEXTECH_BUILD_GL_ES_MODERN "On SDL builds, include the OpenGL ES 2.0+ renderer" ON)
+option(THEXTECH_BUILD_GL_DESKTOP_LEGACY "On SDL builds, include the OpenGL 1.1+ renderer" ON)
+option(THEXTECH_BUILD_GL_ES_LEGACY "On SDL builds, include the OpenGL ES 1.1 renderer" OFF)
+
 option(RANGE_ARR_USE_HEAP "Store data of RangeArr<> template in a heap" OFF)
 option(RANGE_ARR_UNSAFE_MODE "Disable all range checks at RangeArr<> template" OFF)
 
@@ -171,6 +176,7 @@ option(THEXTECH_ENABLE_TTF_SUPPORT "Enable TTF fonts support (FreeType required)
 option(THEXTECH_CLI_BUILD "Minimal CLI build for testing and benchmarking on desktop platforms" OFF)
 option(THEXTECH_NO_SDL_BUILD "Do not use SDL in the CLI build; useful as a starting point for new ports" OFF)
 
+option(THEXTECH_ENABLE_NEW_USER_PATHS "Use new default paths for user directory (experimental)" OFF)
 option(THEXTECH_ENABLE_WIP_FEATURES "Enable experimental and incomplete features (disabled by default)" OFF)
 mark_as_advanced(THEXTECH_ENABLE_WIP_FEATURES)
 
@@ -239,6 +245,11 @@ if(VITA)
 
     # Disable annoying warning for Parameter passing.
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-psabi")
+
+    set(THEXTECH_BUILD_GL_DESKTOP_MODERN OFF CACHE BOOL "" FORCE)
+    set(THEXTECH_BUILD_GL_DESKTOP_LEGACY OFF CACHE BOOL "" FORCE)
+    set(THEXTECH_BUILD_GL_ES_MODERN OFF CACHE BOOL "" FORCE)
+    set(THEXTECH_BUILD_GL_ES_LEGACY OFF CACHE BOOL "" FORCE)
 endif()
 
 if(NINTENDO_SWITCH)
@@ -252,6 +263,18 @@ if(NINTENDO_WII OR NINTENDO_3DS OR NINTENDO_DS)
     set(PGE_MIN_PORT ON)
     set(THEXTECH_NO_ARGV_HANDLING ON)
     add_compile_definitions(PGE_MIN_PORT)
+
+    set(THEXTECH_BUILD_GL_DESKTOP_MODERN OFF CACHE BOOL "" FORCE)
+    set(THEXTECH_BUILD_GL_DESKTOP_LEGACY OFF CACHE BOOL "" FORCE)
+    set(THEXTECH_BUILD_GL_ES_MODERN OFF CACHE BOOL "" FORCE)
+    set(THEXTECH_BUILD_GL_ES_LEGACY OFF CACHE BOOL "" FORCE)
+endif()
+
+if(THEXTECH_CLI_BUILD)
+    set(THEXTECH_BUILD_GL_DESKTOP_MODERN OFF CACHE BOOL "" FORCE)
+    set(THEXTECH_BUILD_GL_DESKTOP_LEGACY OFF CACHE BOOL "" FORCE)
+    set(THEXTECH_BUILD_GL_ES_MODERN OFF CACHE BOOL "" FORCE)
+    set(THEXTECH_BUILD_GL_ES_LEGACY OFF CACHE BOOL "" FORCE)
 endif()
 
 if(THEXTECH_CLI_BUILD OR PGE_MIN_PORT OR EMSCRIPTEN)
@@ -261,6 +284,34 @@ endif()
 if(NINTENDO_DS)
     set(THEXTECH_ENABLE_AUDIO_FX OFF CACHE BOOL "" FORCE)
     set(THEXTECH_NO_SDL_BUILD ON CACHE BOOL "" FORCE)
+endif()
+
+if(ANDROID)
+    set(THEXTECH_BUILD_GL_DESKTOP_MODERN OFF CACHE BOOL "" FORCE)
+    set(THEXTECH_BUILD_GL_DESKTOP_LEGACY OFF CACHE BOOL "" FORCE)
+    set(THEXTECH_BUILD_GL_ES_LEGACY ON CACHE BOOL "")
+endif()
+
+if(APPLE OR WIN32)
+    set(THEXTECH_BUILD_GL_ES_MODERN OFF CACHE BOOL "" FORCE)
+    set(THEXTECH_BUILD_GL_ES_LEGACY OFF CACHE BOOL "" FORCE)
+endif()
+
+# 32-bit Android special case, temporarily disabled for some experiments
+# if(ANDROID AND CMAKE_SIZEOF_VOID_P EQUAL 4)
+#     set(THEXTECH_BUILD_GL_ES_MODERN OFF CACHE BOOL "" FORCE)
+# endif()
+
+if(EMSCRIPTEN)
+    set(THEXTECH_BUILD_GL_DESKTOP_MODERN OFF CACHE BOOL "" FORCE)
+    set(THEXTECH_BUILD_GL_DESKTOP_LEGACY OFF CACHE BOOL "" FORCE)
+    set(THEXTECH_BUILD_GL_ES_LEGACY      OFF CACHE BOOL "" FORCE)
+endif()
+
+if(NINTENDO_SWITCH)
+    set(THEXTECH_BUILD_GL_ES_MODERN      OFF CACHE BOOL "" FORCE)
+    set(THEXTECH_BUILD_GL_ES_LEGACY      OFF CACHE BOOL "" FORCE)
+    set(THEXTECH_BUILD_GL_DESKTOP_LEGACY OFF CACHE BOOL "" FORCE)
 endif()
 
 # ============ Platform-conf ==end=========
@@ -371,6 +422,8 @@ if(THEXTECH_ENABLE_LUA)
     list(APPEND A2XT_INCS script/include)
 endif()
 
+include(cmake/library_glew.cmake)
+
 if(USE_SYSTEM_LIBS)
     find_package(SDL2 REQUIRED)
 
@@ -411,6 +464,36 @@ elseif(NOT THEXTECH_NO_SDL_BUILD)
         list(APPEND A2XT_LIBS PGE_SDLMixerX)
     else()
         list(APPEND A2XT_LIBS PGE_SDLMixerX_static)
+    endif()
+
+# UNIX seems to be too general -- how to target desktop Linux specifically?
+#    if(UNIX AND (THEXTECH_BUILD_GL_DESKTOP_MODERN OR THEXTECH_BUILD_GL_DESKTOP_LEGACY OR THEXTECH_BUILD_GL_ES_MODERN OR THEXTECH_BUILD_GL_ES_LEGACY))
+#        list(APPEND A2XT_LIBS GL)
+#    endif()
+
+    if(THEXTECH_ENABLE_VENDORED_GLEW)
+        list(APPEND A2XT_DEPS GLEW_Local)
+        list(APPEND A2XT_LIBS PGE_GLEW)
+    endif()
+
+    if(WIN32 AND (THEXTECH_BUILD_GL_DESKTOP_MODERN OR THEXTECH_BUILD_GL_DESKTOP_LEGACY))
+        # glu32 not needed or provided on ARM
+        if("${TARGET_PROCESSOR}" STREQUAL "i386" OR "${TARGET_PROCESSOR}" STREQUAL "x86_64")
+            list(APPEND A2XT_LIBS glu32)
+        endif()
+
+        list(APPEND A2XT_LIBS opengl32 gdi32)
+    endif()
+
+    if(PGE_SHARED_SDLMIXER)
+        if(NOT WIN32 AND NOT EMSCRIPTEN AND NOT APPLE AND NOT ANDROID AND NOT NINTENDO_SWITCH)
+            find_library(_LIB_GL GL)
+            if(_LIB_GL)
+                list(APPEND A2XT_LIBS ${_LIB_GL})
+            endif()
+        else()
+            list(APPEND A2XT_LIBS shell32)
+        endif()
     endif()
 
     if(THEXTECH_CUSTOM_AUDIO_LIBRARY)
@@ -471,6 +554,7 @@ if(NOT ANDROID
         lib/InterProcess/editor_pipe.cpp
         lib/InterProcess/intproc.h
         lib/InterProcess/intproc.cpp
+        src/capabilities.cpp
     )
     set(THEXTECH_INTERPROC_SUPPORTED ON)
 endif()
@@ -579,6 +663,7 @@ set(THEXTECH_SRC
     src/graphics/gfx_keyhole.cpp
     src/control/duplicate.cpp
     src/control/controls.cpp
+    src/script/msg_preprocessor.cpp
     src/logic/object_graph.cpp
     src/change_res.cpp
     src/effect.cpp
@@ -607,6 +692,7 @@ set(THEXTECH_SRC
     src/fontman/font_manager.cpp
     src/fontman/font_manager_private.cpp
     src/fontman/raster_font.cpp
+    src/fontman/legacy_font.cpp
     src/fontman/utf8_helpers.cpp
 )
 
@@ -695,6 +781,7 @@ if(NINTENDO_3DS)
         src/core/3ds/events_3ds.cpp
 #        src/core/3ds/3ds-audio-lib.cpp
         src/core/sdl/sdl_core.cpp
+        src/core/power/power_3ds.cpp
     )
 elseif(NINTENDO_WII)
     add_definitions(-DWINDOW_CUSTOM -DMSGBOX_CUSTOM -DEVENTS_CUSTOM -DRENDER_CUSTOM)
@@ -706,6 +793,7 @@ elseif(NINTENDO_WII)
         src/core/wii/msgbox_wii.cpp
         src/core/wii/events_wii.cpp
         src/core/sdl/sdl_core.cpp
+        src/core/power/power_wii.cpp
     )
 elseif(NINTENDO_DS)
     add_definitions(-DWINDOW_CUSTOM -DMSGBOX_CUSTOM -DEVENTS_CUSTOM -DRENDER_CUSTOM -DTHEXTECH_NO_SDL_CORE)
@@ -720,6 +808,16 @@ elseif(NINTENDO_DS)
         src/core/null/events_null.cpp
         src/core/16m/sound_16m.cpp
         src/core/16m/packloader.cpp
+        src/core/power/power_null.cpp
+    )
+elseif(THEXTECH_NO_SDL_BUILD)
+    add_definitions(-DWINDOW_CUSTOM -DMSGBOX_CUSTOM -DEVENTS_CUSTOM -DRENDER_CUSTOM -DTHEXTECH_NO_SDL_CORE)
+    list(APPEND THEXTECH_SRC
+        src/core/null/render_null.cpp
+        src/core/null/window_null.cpp
+        src/core/null/msgbox_null.cpp
+        src/core/null/events_null.cpp
+        src/core/power/power_null.cpp
     )
 elseif(THEXTECH_CLI_BUILD)
     add_definitions(-DWINDOW_CUSTOM -DMSGBOX_CUSTOM -DEVENTS_CUSTOM -DRENDER_CUSTOM)
@@ -729,14 +827,7 @@ elseif(THEXTECH_CLI_BUILD)
         src/core/null/msgbox_null.cpp
         src/core/null/events_null.cpp
         src/core/sdl/sdl_core.cpp
-    )
-elseif(THEXTECH_NO_SDL_BUILD)
-    add_definitions(-DWINDOW_CUSTOM -DMSGBOX_CUSTOM -DEVENTS_CUSTOM -DRENDER_CUSTOM -DTHEXTECH_NO_SDL_CORE)
-    list(APPEND THEXTECH_SRC
-        src/core/null/render_null.cpp
-        src/core/null/window_null.cpp
-        src/core/null/msgbox_null.cpp
-        src/core/null/events_null.cpp
+        src/core/power/power_null.cpp
     )
 else()
     add_definitions(-DCORE_EVERYTHING_SDL)
@@ -748,12 +839,32 @@ else()
         src/core/base/window_base.cpp
         src/core/base/msgbox_base.cpp
         src/core/base/events_base.cpp
+        src/core/sdl/init_sdl.cpp
         src/core/sdl/render_sdl.cpp
         src/core/sdl/window_sdl.cpp
         src/core/sdl/msgbox_sdl.cpp
         src/core/sdl/events_sdl.cpp
         src/core/sdl/sdl_core.cpp
+        src/core/power/power_sdl.cpp
     )
+
+    if(THEXTECH_BUILD_GL_DESKTOP_MODERN OR THEXTECH_BUILD_GL_DESKTOP_LEGACY OR THEXTECH_BUILD_GL_ES_MODERN OR THEXTECH_BUILD_GL_ES_LEGACY)
+        list(APPEND THEXTECH_SRC
+            src/core/opengl/gl_program_object.cpp
+            src/core/opengl/render_gl_frontend.cpp
+            src/core/opengl/render_gl_backend.cpp
+            src/core/opengl/render_gl_init.cpp
+            src/core/opengl/render_gl_shaders.cpp
+        )
+    endif()
+
+    if(THEXTECH_BUILD_GL_DESKTOP_MODERN OR THEXTECH_BUILD_GL_ES_MODERN)
+        list(APPEND THEXTECH_SRC
+            src/core/opengl/gl_program_bank.cpp
+            src/core/opengl/gl_particle_system.cpp
+        )
+    endif()
+
 endif()
 
 
@@ -838,6 +949,7 @@ file(GLOB THEXTECH_HEADS_SRC
 list(APPEND THEXTECH_SRC ${THEXTECH_HEADS_SRC})
 
 # For every file that includes "version.h", call this:
+add_git_version_defs(src/main.cpp)
 add_git_version_defs(src/frm_main.cpp)
 add_git_version_defs(src/main/game_info.cpp)
 add_git_version_defs(src/main/record.cpp)
@@ -980,10 +1092,18 @@ endif()
 
 if(ANDROID)
     target_link_libraries(A2XT_Int INTERFACE log)
+
+    if(THEXTECH_BUILD_GL_ES_LEGACY OR THEXTECH_BUILD_GL_ES_MODERN)
+        target_link_libraries(A2XT_Int INTERFACE EGL)
+    endif()
 endif()
 
 if(NINTENDO_SWITCH)
     target_link_libraries(A2XT_Int INTERFACE nx)
+
+    if(THEXTECH_BUILD_GL_DESKTOP_MODERN)
+        target_link_libraries(A2XT_Int INTERFACE glad)
+    endif()
 
     # Set explicit flags for this project
     target_compile_definitions(thextech PRIVATE -D__SWITCH__ -DNO_INTPTROC)
@@ -1022,12 +1142,41 @@ if(NINTENDO_DS OR NINTENDO_3DS OR NINTENDO_WII OR NINTENDO_SWITCH OR ANDROID OR 
     target_compile_definitions(thextech PRIVATE -DTHEXTECH_DISABLE_LANG_TOOLS)
 endif()
 
+if(UNIX OR NINTENDO_SWITCH OR ANDROID OR APPLE)
+    # Allow hotswapping renderer on fully tested platforms
+    target_compile_definitions(thextech PRIVATE -DTHEXTECH_RESTART_RENDERER_SUPPORTED)
+endif()
+
 if(THEXTECH_NO_SDL_BUILD)
     target_compile_definitions(thextech PRIVATE -DPGE_NO_THREADING -DTHEXTECH_NO_SDL_BUILD)
 endif()
 
 if(THEXTECH_CLI_BUILD)
     target_compile_definitions(thextech PRIVATE -DTHEXTECH_CLI_BUILD)
+endif()
+
+if(THEXTECH_BUILD_GL_DESKTOP_MODERN)
+    target_compile_definitions(thextech PRIVATE -DTHEXTECH_BUILD_GL_DESKTOP_MODERN)
+endif()
+
+if(THEXTECH_BUILD_GL_ES_MODERN)
+    target_compile_definitions(thextech PRIVATE -DTHEXTECH_BUILD_GL_ES_MODERN)
+endif()
+
+if(THEXTECH_BUILD_GL_DESKTOP_MODERN OR THEXTECH_BUILD_GL_ES_MODERN)
+    target_compile_definitions(thextech PRIVATE -DTHEXTECH_BUILD_GL_MODERN)
+endif()
+
+if(THEXTECH_BUILD_GL_DESKTOP_LEGACY)
+    target_compile_definitions(thextech PRIVATE -DTHEXTECH_BUILD_GL_DESKTOP_LEGACY)
+endif()
+
+if(THEXTECH_BUILD_GL_ES_LEGACY)
+    target_compile_definitions(thextech PRIVATE -DTHEXTECH_BUILD_GL_ES_LEGACY)
+endif()
+
+if(THEXTECH_ENABLE_NEW_USER_PATHS)
+    target_compile_definitions(thextech PRIVATE -DTHEXTECH_NEW_USER_PATHS)
 endif()
 
 if(THEXTECH_ENABLE_WIP_FEATURES)
@@ -1116,11 +1265,7 @@ if(THEXTECH_CRASHHANDLER_SUPPORTED)
 endif()
 
 # ======================= Render specific global macros ========================
-if(NOT EMSCRIPTEN)
-    target_compile_definitions(thextech PRIVATE
-        -DUSE_DRAW_BATTERY_STATUS   # Battery status draw support
-    )
-else()
+if(EMSCRIPTEN)
     target_compile_definitions(thextech PRIVATE
         -DNO_WINDOW_FOCUS_TRACKING  # Don't track for window focus
     )

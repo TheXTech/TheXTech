@@ -13,4 +13,5 @@
     <string name="batteryStatusShow0">Скрывать</string>
     <string name="batteryStatusShow1">Показывать при слабом заряде</string>
     <string name="batteryStatusShow2">Показывать всегда</string>
+    <string name="rendererDefault">По-умолчанию</string>
 </resources>

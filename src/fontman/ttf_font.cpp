@@ -454,6 +454,9 @@ uint32_t TtfFont::drawGlyph(const char *u8char,
                 {0.0,  scaleSize}
             };
 
+            // take square of Alpha to match blend of normal text
+            float alpha_use = Alpha * Alpha * OL_Alpha;
+
             for(size_t i = 0; i < 4; ++i)
             {
                 XRender::renderTextureScale(
@@ -462,7 +465,7 @@ uint32_t TtfFont::drawGlyph(const char *u8char,
                     glyph.width * static_cast<float>(scaleSize),
                     glyph.height * static_cast<float>(scaleSize),
                     *glyph.tx,
-                    OL_Red, OL_Green, OL_Blue, (OL_Alpha * Alpha)
+                    OL_Red, OL_Green, OL_Blue, alpha_use
                 );
             }
         }

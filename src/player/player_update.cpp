@@ -18,6 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <algorithm>
 
 #include <Logger/logger.h>
 #include <Utils/maths.h>
@@ -39,6 +40,7 @@
 #include "../frame_timer.h"
 #include "../graphics.h"
 #include "../controls.h"
+#include "../script/msg_preprocessor.h"
 
 #include "npc_id.h"
 #include "eff_id.h"
@@ -278,6 +280,7 @@ void UpdatePlayer()
         }
         else if(Player[A].Dead)
         {
+            // actually strictly better than the below code, should always be used except for compatibility concerns
             if(numPlayers > 2)
             {
                 B = CheckLiving();
@@ -339,10 +342,20 @@ void UpdatePlayer()
 
                 if(Player[A].GroundPound)
                 {
+                    bool groundPoundByAltRun = false;
+                    if(!ForcedControls &&
+                       A - 1 < (int)Controls::g_InputMethods.size() &&
+                       Controls::g_InputMethods[A - 1] &&
+                       Controls::g_InputMethods[A-1]->Profile &&
+                       Controls::g_InputMethods[A - 1]->Profile->m_groundPoundByAltRun)
+                    {
+                        groundPoundByAltRun = true;
+                    }
+
                     if(!Player[A].CanPound && Player[A].Location.SpeedY < 0)
                         Player[A].GroundPound = false;
 
-                    if(g_config.GameplayPoundByAltRun)
+                    if(groundPoundByAltRun)
                         Player[A].Controls.AltRun = true;
                     else
                         Player[A].Controls.Down = true;
@@ -4432,11 +4445,12 @@ void UpdatePlayer()
                 if(MessageNPC > 0)
                 {
                     MessageText = GetS(NPC[MessageNPC].Text);
+                    preProcessMessage(MessageText, A);
                     PauseGame(PauseCode::Message, A);
                     MessageText.clear();
                     MessageTextMap.clear();
                     if(NPC[MessageNPC].TriggerTalk != EVENT_NONE)
-                        ProcEvent(NPC[MessageNPC].TriggerTalk);
+                        ProcEvent(NPC[MessageNPC].TriggerTalk, A);
                     MessageNPC = 0;
                 }
                 YoshiEatCode(A);

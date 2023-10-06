@@ -58,7 +58,7 @@ PauseCode GamePaused = PauseCode::None;
 
 //! Holds the screen overlay for the level
 ScreenFader g_levelScreenFader;
-RangeArr<ScreenFader, 0, 2> g_levelVScreenFader;
+RangeArr<ScreenFader, 0, c_vScreenCount> g_levelVScreenFader;
 
 void clearScreenFaders()
 {
@@ -134,10 +134,10 @@ void GameLoop()
 
     if(!Controls::Update())
     {
-        if(g_config.NoPauseReconnect || !g_compatibility.pause_on_disconnect || TestLevel)
-            QuickReconnectScreen::g_active = true;
-        else
-            PauseGame(PauseCode::Reconnect, 0);
+        QuickReconnectScreen::g_active = true;
+
+        if(!g_config.NoPauseReconnect && g_compatibility.pause_on_disconnect && !TestLevel)
+            PauseGame(PauseCode::PauseScreen, 0);
     }
 
     if(QuickReconnectScreen::g_active)
@@ -267,6 +267,7 @@ void GameLoop()
                     // only consider new start presses
                     if(!Player[p].UnStart || !Player[p].Controls.Start)
                         continue;
+
                     // use limited, buggy code for non-player 1 in compat case
                     if(p != 1 && !g_compatibility.multiplayer_pause_controls)
                     {
@@ -276,9 +277,11 @@ void GameLoop()
                             FreezeNPCs = !FreezeNPCs;
                             PlaySound(SFX_Pause);
                         }
+
                         // don't let double-pause or double-toggle happen
                         break;
                     }
+
                     // the special NPC freeze toggling functionality from CaptainN
                     if((CaptainN || FreezeNPCs) && PSwitchStop == 0)
                     {
@@ -300,8 +303,9 @@ void GameLoop()
                     // normally pause the game
                     else
                     {
-                        PauseGame(PauseCode::PauseScreen, p);
+                        PauseGame(PauseCode::PauseScreen, 0);
                     }
+
                     // don't let double-pause or double-toggle happen
                     break;
                 }
@@ -325,12 +329,7 @@ bool MessageScreen_Logic(int plr)
     bool menuDoPress = SharedControls.MenuDo || SharedControls.Pause;
     bool menuBackPress = SharedControls.MenuBack;
 
-    // this might no longer be necessary...
-    if(SingleCoop > 0 || numPlayers > 2)
-    {
-        for(int A = 1; A <= numPlayers; A++)
-            Player[A].Controls = Player[1].Controls;
-    }
+    // there was previously code to copy all players' controls from the main player, but this is no longer necessary (and actively harmful in the SingleCoop case)
 
     if(!g_compatibility.multiplayer_pause_controls && plr == 0)
         plr = 1;
@@ -389,11 +388,6 @@ int PauseGame(PauseCode code, int plr)
         MessageScreen_Init();
     else if(code == PauseCode::PauseScreen)
         PauseScreen::Init(plr, SharedControls.LegacyPause);
-    else if(code == PauseCode::Reconnect)
-    {
-        ConnectScreen::Reconnect_Start();
-        XWindow::showCursor(0);
-    }
     else if(code == PauseCode::DropAdd)
     {
         ConnectScreen::DropAdd_Start();
@@ -418,7 +412,7 @@ int PauseGame(PauseCode code, int plr)
             PauseMusic();
     }
 
-    resetFrameTimer();
+    // resetFrameTimer();
 
     // some pause games may return a status code
     int result = 0;
@@ -450,13 +444,7 @@ int PauseGame(PauseCode code, int plr)
 
             if(!Controls::Update())
             {
-                if(code != PauseCode::Reconnect)
-                {
-                    if(g_config.NoPauseReconnect || !g_compatibility.pause_on_disconnect || TestLevel)
-                        QuickReconnectScreen::g_active = true;
-                    else
-                        PauseGame(PauseCode::Reconnect, 0);
-                }
+                QuickReconnectScreen::g_active = true;
             }
 
             if(QuickReconnectScreen::g_active)
@@ -502,7 +490,7 @@ int PauseGame(PauseCode code, int plr)
                 if(PromptScreen::Logic())
                     break;
             }
-            else if(GamePaused == PauseCode::Reconnect || GamePaused == PauseCode::DropAdd)
+            else if(GamePaused == PauseCode::DropAdd)
             {
                 result = ConnectScreen::Logic();
                 if(result)
@@ -544,7 +532,7 @@ int PauseGame(PauseCode code, int plr)
             ResumeMusic();
     }
 
-    resetFrameTimer();
+    // resetFrameTimer();
 
     return result;
 }

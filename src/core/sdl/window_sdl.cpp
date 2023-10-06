@@ -18,7 +18,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <locale.h>
 #include <SDL2/SDL.h>
 
 #include <Logger/logger.h>
@@ -111,11 +110,13 @@ WindowSDL::~WindowSDL()
 
 bool WindowSDL::initSDL(uint32_t windowInitFlags)
 {
+    SDL_ClearError();
+
     bool res = true;
 
     m_windowTitle = g_gameInfo.titleWindow;
 
-    SDL_GL_ResetAttributes();
+    // SDL_GL_ResetAttributes();
 
 #if defined(__SWITCH__) /* On Switch, expect the initial size 1920x1080 */
     const int initWindowW = 1920;
@@ -128,6 +129,10 @@ bool WindowSDL::initSDL(uint32_t windowInitFlags)
 #if defined(RENDER_FULLSCREEN_ALWAYS)
     windowInitFlags |= SDL_WINDOW_FULLSCREEN | SDL_WINDOW_SHOWN;
 #endif
+
+    // restore fullscreen state
+    if(m_fullscreen)
+        windowInitFlags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
 
 #ifdef __EMSCRIPTEN__
     // don't use SDL fullscreen API on Emscripten
@@ -152,7 +157,12 @@ bool WindowSDL::initSDL(uint32_t windowInitFlags)
 
     if(isSdlError())
     {
-        pLogCritical("Unable to create window!");
+        const char *error = SDL_GetError();
+        if(*error != '\0')
+            pLogCritical("Unable to create window: %s", error);
+        else
+            pLogCritical("Unable to create window!");
+
         SDL_ClearError();
         return false;
     }
@@ -298,12 +308,7 @@ void WindowSDL::placeCursor(int window_x, int window_y)
 
 bool WindowSDL::isFullScreen()
 {
-#ifndef __EMSCRIPTEN__
-    Uint32 flags = SDL_GetWindowFlags(m_window);
-    return (flags & SDL_WINDOW_FULLSCREEN_DESKTOP) ? SDL_TRUE : SDL_FALSE;
-#else
     return m_fullscreen;
-#endif
 }
 
 int WindowSDL::setFullScreen(bool fs)
@@ -314,15 +319,15 @@ int WindowSDL::setFullScreen(bool fs)
     if((SDL_GetWindowFlags(m_window) & SDL_WINDOW_RESIZABLE) == 0)
         return -1; // Can't switch fullscreen mode when window is not resizable
 
-    if(fs != isFullScreen())
+    if(fs != m_fullscreen)
     {
+        m_fullscreen = fs;
+
 #ifdef __EMSCRIPTEN__
         if(fs)
             s_emscriptenRealFullscreen();
         else
             s_emscriptenLeaveRealFullscreen();
-
-        m_fullscreen = fs;
 
         return m_fullscreen;
 #else

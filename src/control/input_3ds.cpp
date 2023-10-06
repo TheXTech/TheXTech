@@ -19,6 +19,7 @@
  */
 
 #include <3ds.h>
+#include <algorithm>
 
 #include "globals.h"
 #include "game_main.h"
@@ -261,26 +262,7 @@ void InputMethod_3DS::Rumble(int ms, float strength)
 
 StatusInfo InputMethod_3DS::GetStatus()
 {
-    uint8_t percent;
-    uint8_t charging;
-    bool plugged;
-
-    MCUHWC_GetBatteryLevel(&percent);
-    PTMU_GetBatteryChargeState(&charging);
-    PTMU_GetAdapterState(&plugged);
-
-    StatusInfo res;
-
-    if(charging)
-        res.power_status = StatusInfo::POWER_CHARGING;
-    else if(plugged)
-        res.power_status = StatusInfo::POWER_CHARGED;
-    else
-        res.power_status = StatusInfo::POWER_DISCHARGING;
-
-    res.power_level = percent / 100.f;
-
-    return res;
+    return XPower::devicePowerStatus();
 }
 
 /*===============================================*\

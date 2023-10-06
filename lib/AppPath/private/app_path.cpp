@@ -31,6 +31,7 @@
 
 
 std::string AppPathManager::m_settingsPath;
+std::string AppPathManager::m_gamesavesPath;
 std::string AppPathManager::m_assetsPath;
 std::string AppPathManager::m_userPath;
 
@@ -40,8 +41,11 @@ std::string AppPathManager::m_logsPath;
 
 std::string AppPathManager::m_customAssetsRoot;
 std::string AppPathManager::m_customUserDirectory;
+std::string AppPathManager::m_customGameDirName;
 
 bool AppPathManager::m_isPortable = false;
+
+bool AppPathP::ignoreLegacyDebugDir = false;
 
 
 #if defined(USER_DIR_NAME)
@@ -52,8 +56,10 @@ bool AppPathManager::m_isPortable = false;
 #   define UserDirName "/3ds/thextech/"
 #elif defined(__WII__)
 #   define UserDirName "/thextech/"
+#elif defined(_WIN32)
+#   define UserDirName "/TheXTech/"
 #else
-#   define UserDirName "/.PGE_Project/thextech/"
+#   define UserDirName "/thextech/"
 #endif
 
 static void appendSlash(std::string &path)
@@ -80,9 +86,19 @@ void AppPathManager::setUserDirectory(const std::string& root)
     appendSlash(m_customUserDirectory);
 }
 
+void AppPathManager::setGameDirName(const std::string& dirName)
+{
+    m_customGameDirName = dirName;
+    appendSlash(m_customGameDirName);
+    // Also append to front
+    if(!m_customGameDirName.empty() && m_customGameDirName.front() != '/')
+        m_customGameDirName.insert(0, 1, '/');
+}
+
 void AppPathManager::initAppPath()
 {
-    AppPathP::initDefaultPaths(UserDirName);
+    AppPathP::ignoreLegacyDebugDir = !m_customGameDirName.empty();
+    AppPathP::initDefaultPaths(m_customGameDirName.empty() ? UserDirName : m_customGameDirName);
 
     // When user directory is redefined externally
     if(!m_customUserDirectory.empty())
@@ -170,22 +186,19 @@ bool AppPathManager::checkPortable()
 void AppPathManager::initSettingsPath()
 {
     // Default settings path
-    m_settingsPath = m_userPath + "settings/";
+    initString(m_settingsPath, AppPathP::settingsRoot(), m_userPath + "settings/");
+
+    // Default settings path
+    initString(m_gamesavesPath, AppPathP::gamesavesRoot(), m_settingsPath + "gamesaves/");
 
     // Check if need to use system-wide screenshots directory
-    m_screenshotsPath = AppPathP::screenshotsRoot();
-    if(m_screenshotsPath.empty())
-        m_screenshotsPath = m_userPath + "screenshots/";
+    initString(m_screenshotsPath, AppPathP::screenshotsRoot(), m_userPath + "screenshots/");
 
     // Check if need to use system-wide gif recording directory
-    m_gifrecordingsPath = AppPathP::gifRecsRoot();
-    if(m_gifrecordingsPath.empty())
-        m_gifrecordingsPath = m_userPath + "gif-recordings/";
+    initString(m_gifrecordingsPath, AppPathP::gifRecsRoot(), m_userPath + "gif-recordings/");
 
     // Check if need to use system-wide logs directory
-    m_logsPath = AppPathP::logsRoot();
-    if(m_logsPath.empty())
-        m_logsPath = m_userPath + "logs/";
+    initString(m_logsPath, AppPathP::logsRoot(), m_userPath + "logs/");
 
 #ifndef VITA
     // Just in case, avoid mad jokes with making name-sake file as a settings folder
@@ -206,6 +219,18 @@ void AppPathManager::initSettingsPath()
         DirMan::mkAbsPath(userWorldsRootDir());
     if(!DirMan::exists(userBattleRootDir()))
         DirMan::mkAbsPath(userBattleRootDir());
+}
+
+void AppPathManager::initString(std::string& text, const std::string& inValue, const std::string& defValue)
+{
+    if(m_isPortable)
+        text = defValue;
+    else
+    {
+        text = inValue;
+        if(text.empty())
+            text = defValue;
+    }
 }
 
 
@@ -256,7 +281,7 @@ std::string AppPathManager::gifRecordsDir() // Writable
 
 std::string AppPathManager::gameSaveRootDir() // Writable
 {
-    return m_settingsPath + "gamesaves/";
+    return m_gamesavesPath;
 }
 
 std::string AppPathManager::gameplayRecordsRootDir() // Writable

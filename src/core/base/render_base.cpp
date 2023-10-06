@@ -42,8 +42,11 @@
 
 #include <chrono>
 
-#include "render_base.h"
-#include "../render.h"
+#include "core/base/render_base.h"
+#include "core/render.h"
+
+#include "main/cheat_code.h"
+
 #include "video.h"
 #include "globals.h"
 #include "sound.h"
@@ -53,6 +56,10 @@
 #include <deque>
 #endif
 
+
+bool XRender::g_BitmaskTexturePresent = false;
+
+static const char blank_gif[] = "GIF89a\x01\x00\x01\x00\x80\x00\x00\xff\xff\xff\x00\x00\x00!\xf9\x04\x01\x00\x00\x00\x00,\x00\x00\x00\x00\x01\x00\x01\x00\x00\x02\2D\x01\x00;";
 
 AbstractRender_t* g_render = nullptr;
 
@@ -148,31 +155,7 @@ void AbstractRender_t::close()
 #endif
 }
 
-void AbstractRender_t::loadTextureMask(StdPicture &target,
-                         uint32_t mask_width,
-                         uint32_t mask_height,
-                         uint8_t *RGBApixels,
-                         uint32_t pitch,
-                         uint32_t image_width,
-                         uint32_t image_height)
-{
-    /* unimplemented */
-
-    UNUSED(target);
-    UNUSED(mask_width);
-    UNUSED(mask_height);
-    UNUSED(RGBApixels);
-    UNUSED(pitch);
-    UNUSED(image_width);
-    UNUSED(image_height);
-}
-
-bool AbstractRender_t::textureMaskSupported()
-{
-    return false;
-}
-
-static void dumpFullFile(std::vector<char> &dst, const std::string &path)
+void AbstractRender_t::dumpFullFile(std::vector<char> &dst, const std::string &path)
 {
     dst.clear();
     SDL_RWops *f;
@@ -194,6 +177,47 @@ static void dumpFullFile(std::vector<char> &dst, const std::string &path)
         pLogWarning("Failed to dump file on read operation: %s", path.c_str());
 
     SDL_RWclose(f);
+}
+
+void AbstractRender_t::loadTextureMask(StdPicture &target,
+                         uint32_t mask_width,
+                         uint32_t mask_height,
+                         uint8_t *RGBApixels,
+                         uint32_t pitch,
+                         uint32_t image_width,
+                         uint32_t image_height)
+{
+    /* unimplemented */
+
+    UNUSED(target);
+    UNUSED(mask_width);
+    UNUSED(mask_height);
+    UNUSED(RGBApixels);
+    UNUSED(pitch);
+    UNUSED(image_width);
+    UNUSED(image_height);
+}
+
+void AbstractRender_t::compileShaders(StdPicture &target)
+{
+    UNUSED(target);
+
+    /* unimplemented */
+}
+
+bool AbstractRender_t::textureMaskSupported()
+{
+    return false;
+}
+
+bool AbstractRender_t::userShadersSupported()
+{
+    return false;
+}
+
+bool AbstractRender_t::depthTestSupported()
+{
+    return false;
 }
 
 void AbstractRender_t::lazyLoadPicture(StdPicture_Sub& target,
@@ -249,6 +273,122 @@ void AbstractRender_t::lazyLoadPicture(StdPicture_Sub& target,
 
     target.inited = true;
     target.l.lazyLoaded = true;
+
+#ifdef THEXTECH_BUILD_GL_MODERN
+    // load fragment shader if it exists
+    if(Files::fileExists(path + ".frag"))
+    {
+        pLogDebug("Loading user shader [%s%s]...", path.c_str(), ".frag");
+        dumpFullFile(target.l.fragmentShaderSource, path + ".frag");
+
+        // must be null-terminated
+        target.l.fragmentShaderSource.push_back('\0');
+    }
+#endif
+}
+
+void AbstractRender_t::LoadPictureShader(StdPicture& target, const std::string &path)
+{
+    if(!GameIsActive)
+        return; // do nothing when game is closed
+
+    if(path.empty())
+        return;
+
+#ifdef DEBUG_BUILD
+    target.origPath = path;
+#endif
+
+    target.reset();
+
+#ifdef THEXTECH_BUILD_GL_MODERN
+    // load fragment shader if it exists
+    if(Files::fileExists(path))
+    {
+        target.w = 1;
+        target.h = 1;
+
+        target.inited = true;
+        target.l.lazyLoaded = true;
+
+        // blank GIF of 1 pixel
+        target.l.raw.resize(sizeof(blank_gif) - 1);
+        SDL_memcpy(target.l.raw.data(), blank_gif, sizeof(blank_gif) - 1);
+
+        pLogDebug("Loading user shader [%s]...", path.c_str());
+        dumpFullFile(target.l.fragmentShaderSource, path);
+        // must be null-terminated
+        target.l.fragmentShaderSource.push_back('\0');
+
+        // eagerly compile it to minimize stutter
+        g_render->compileShaders(target);
+    }
+#endif
+}
+
+void AbstractRender_t::LoadPictureParticleSystem(StdPicture& target, const std::string &vertexPath, const std::string& fragPath, const std::string& imagePath)
+{
+    if(!GameIsActive)
+        return; // do nothing when game is closed
+
+    if(vertexPath.empty())
+        return;
+
+#ifdef DEBUG_BUILD
+    target.origPath = vertexPath;
+#endif
+
+    target.reset();
+
+#ifdef THEXTECH_BUILD_GL_MODERN
+    bool valid = Files::fileExists(vertexPath)
+        && (fragPath.empty() || Files::fileExists(fragPath))
+        && (imagePath.empty() || Files::fileExists(imagePath));
+
+    // load fragment shader if it exists
+    if(valid)
+    {
+        if(!imagePath.empty())
+        {
+            lazyLoadPicture(target, imagePath);
+        }
+        else
+        {
+            target.w = 1;
+            target.h = 1;
+
+            target.inited = true;
+            target.l.lazyLoaded = true;
+
+            // blank GIF of 1 pixel
+            target.l.raw.resize(sizeof(blank_gif) - 1);
+            SDL_memcpy(target.l.raw.data(), blank_gif, sizeof(blank_gif) - 1);
+        }
+
+        pLogDebug("Loading particle system vertex shader [%s]...", vertexPath.c_str());
+        dumpFullFile(target.l.particleVertexShaderSource, vertexPath);
+        // must be null-terminated
+        target.l.particleVertexShaderSource.push_back('\0');
+
+        if(!fragPath.empty())
+        {
+            pLogDebug("Loading particle system fragment shader [%s]...", fragPath.c_str());
+            dumpFullFile(target.l.fragmentShaderSource, fragPath);
+            // must be null-terminated
+            target.l.fragmentShaderSource.push_back('\0');
+        }
+
+        // eagerly compile it to minimize stutter
+        g_render->compileShaders(target);
+
+        // immediately claim the first two uniform spots (so they can have constant engine-level locations)
+        g_render->registerUniform(target, "u_particle_z");
+        g_render->registerUniform(target, "u_camera_pos");
+    }
+#else
+    UNUSED(fragPath);
+    UNUSED(imagePath);
+#endif
 }
 
 void AbstractRender_t::setTransparentColor(StdPicture& target, uint32_t rgb)
@@ -257,6 +397,39 @@ void AbstractRender_t::setTransparentColor(StdPicture& target, uint32_t rgb)
     target.l.keyRgb[0] = (rgb >> 0) & 0xFF;
     target.l.keyRgb[1] = (rgb >> 8) & 0xFF;
     target.l.keyRgb[2] = (rgb >> 16) & 0xFF;
+}
+
+void AbstractRender_t::loadTexture(StdPicture &target, uint32_t width, uint32_t height, uint8_t *RGBApixels, uint32_t pitch)
+{
+    // validate for depth test before loading
+    if(depthTestSupported())
+    {
+        // check whether there are any transparent pixels
+        for(uint32_t y = 0; y < height; ++y)
+        {
+            for(uint32_t x = 0; x < width; ++x)
+            {
+                uint8_t *alpha = RGBApixels + (y * pitch) + (x * 4) + 3;
+
+                // vanilla game used 5 bits per channel, so we set the alpha test as >= 0x08
+                if(*alpha < 0x08 || *alpha >= 0xf8)
+                    continue;
+
+                D_pLogDebugNA("Externally loaded texture CANNOT use depth test");
+
+                target.d.invalidateDepthTest();
+
+                y = height - 1;
+                break;
+            }
+        }
+    }
+    else
+    {
+        target.d.invalidateDepthTest();
+    }
+
+    loadTextureInternal(target, width, height, RGBApixels, pitch);
 }
 
 void AbstractRender_t::lazyLoad(StdPicture &target)
@@ -274,13 +447,24 @@ void AbstractRender_t::lazyLoad(StdPicture &target)
     FIBITMAP *maskImage = nullptr;
     if(!target.l.rawMask.empty())
     {
-        if(g_render->textureMaskSupported() && !target.l.isMaskPng)
+        // load mask
+        maskImage = GraphicsHelps::loadMask(target.l.rawMask, target.l.isMaskPng);
+
+        if(!maskImage)
+            pLogWarning("lazyLoad: failed to load mask image for texture at address %p [%s]", &target, StdPictureGetOrigPath(target).c_str());
+
+        // check if GIF bitmask cannot be properly represented with RGBA
+        bool bitmask_required = maskImage && !target.l.isMaskPng && GraphicsHelps::validateBitmaskRequired(sourceImage, maskImage, StdPictureGetOrigPath(target));
+
+        XRender::g_BitmaskTexturePresent |= bitmask_required;
+
+        // merge it with image if PNG, masks are unsupported, merge is forced, or the mask could be properly represented with RGBA
+        if(maskImage && (target.l.isMaskPng || g_ForceBitmaskMerge || !g_render->textureMaskSupported() || !bitmask_required))
         {
-            maskImage = GraphicsHelps::loadImage(target.l.rawMask);
-            FreeImage_FlipVertical(maskImage);
+            GraphicsHelps::mergeWithMask(sourceImage, maskImage);
+            GraphicsHelps::closeImage(maskImage);
+            maskImage = nullptr;
         }
-        else
-            GraphicsHelps::mergeWithMask(sourceImage, target.l.rawMask, target.l.isMaskPng);
     }
 
     uint32_t w = static_cast<uint32_t>(FreeImage_GetWidth(sourceImage));
@@ -325,6 +509,8 @@ void AbstractRender_t::lazyLoad(StdPicture &target)
     }
 
     FreeImage_FlipVertical(sourceImage);
+    if(maskImage)
+        FreeImage_FlipVertical(maskImage);
 
     // don't touch texture info, that was set on original load
     // target.w = static_cast<int>(w);
@@ -383,7 +569,7 @@ void AbstractRender_t::lazyLoad(StdPicture &target)
 
         if(maskImage)
         {
-            d = FreeImage_Rescale(maskImage, int(w), int(h), FILTER_BOX);
+            d = (wLimitExcited || hLimitExcited) ? FreeImage_Rescale(maskImage, int(w), int(h), FILTER_BOX) : GraphicsHelps::fast2xScaleDown(maskImage);
             if(d)
             {
                 GraphicsHelps::closeImage(maskImage);
@@ -392,9 +578,12 @@ void AbstractRender_t::lazyLoad(StdPicture &target)
         }
     }
 
+    if(!g_render->depthTestSupported() || maskImage || !GraphicsHelps::validateForDepthTest(sourceImage, StdPictureGetOrigPath(target)))
+        target.d.invalidateDepthTest();
+
     uint8_t *textura = reinterpret_cast<uint8_t *>(FreeImage_GetBits(sourceImage));
 
-    g_render->loadTexture(target, w, h, textura, pitch);
+    g_render->loadTextureInternal(target, w, h, textura, pitch);
 
     GraphicsHelps::closeImage(sourceImage);
 
@@ -410,6 +599,11 @@ void AbstractRender_t::lazyLoad(StdPicture &target)
 
         GraphicsHelps::closeImage(maskImage);
     }
+
+#ifdef THEXTECH_BUILD_GL_MODERN
+    if(g_render->userShadersSupported() && (!target.l.particleVertexShaderSource.empty() || !target.l.fragmentShaderSource.empty()))
+        g_render->compileShaders(target);
+#endif
 }
 
 void AbstractRender_t::lazyPreLoad(StdPicture &target)
@@ -428,6 +622,60 @@ void AbstractRender_t::lazyLoadedBytesReset()
     m_lazyLoadedBytes = 0;
 }
 
+int AbstractRender_t::registerUniform(StdPicture &target, const char* name)
+{
+#ifdef THEXTECH_BUILD_GL_MODERN
+    auto it = std::find(target.l.registeredUniforms.begin(), target.l.registeredUniforms.end(), name);
+
+    if(it == target.l.registeredUniforms.end())
+    {
+        target.l.registeredUniforms.push_back(name);
+        target.l.finalUniformState.push_back(UniformValue_t(0.0f));
+
+        return (int)target.l.registeredUniforms.size() - 1;
+    }
+
+    return it - target.l.registeredUniforms.begin();
+
+#else
+    UNUSED(target);
+    UNUSED(name);
+
+    return -1;
+#endif
+}
+
+void AbstractRender_t::assignUniform(StdPicture &target, int index, const UniformValue_t& value)
+{
+#ifdef THEXTECH_BUILD_GL_MODERN
+    if(index >= 0 && index < (int)target.l.finalUniformState.size())
+        target.l.finalUniformState[index] = value;
+#else
+    UNUSED(target);
+    UNUSED(index);
+    UNUSED(value);
+#endif
+}
+
+void AbstractRender_t::spawnParticle(StdPicture &target, double worldX, double worldY, ParticleVertexAttrs_t attrs)
+{
+    // no-op
+
+    UNUSED(target);
+    UNUSED(worldX);
+    UNUSED(worldY);
+    UNUSED(attrs);
+}
+
+void AbstractRender_t::renderParticleSystem(StdPicture &tx, double camX, double camY)
+{
+    // no-op
+
+    UNUSED(tx);
+    UNUSED(camX);
+    UNUSED(camY);
+}
+
 
 #ifdef USE_RENDER_BLOCKING
 bool AbstractRender_t::renderBlocked()
@@ -440,89 +688,6 @@ void AbstractRender_t::setBlockRender(bool b)
     m_blockRender = b;
 }
 #endif // USE_RENDER_BLOCKING
-
-
-#ifdef USE_DRAW_BATTERY_STATUS
-void AbstractRender_t::drawBatteryStatus()
-{
-#ifdef USE_SDL_POWER
-    int secs, pct, status;
-    // Battery status
-    int bw = 40;
-    int bh = 22;
-    int bx = ScreenW - (bw + 8);
-    int by = 24;
-    int segmentsFullLen = 14;
-    int segments = 0;
-    float alhpa = 0.7f;
-    float alhpaB = 0.8f;
-    float r = 0.4f, g = 0.4f, b = 0.4f;
-    float br = 0.0f, bg = 0.0f, bb = 0.0f;
-    bool isLow = false;
-
-#ifndef RENDER_FULLSCREEN_ALWAYS
-    const bool isFullScreen = resChanged;
-#endif
-
-    if(g_videoSettings.batteryStatus == BATTERY_STATUS_OFF)
-        return;
-
-    status = SDL_GetPowerInfo(&secs, &pct);
-
-    if(status == SDL_POWERSTATE_NO_BATTERY || status == SDL_POWERSTATE_UNKNOWN)
-        return;
-
-    isLow = (pct <= 35);
-
-    if(status == SDL_POWERSTATE_CHARGED)
-    {
-        br = 0.f;
-        bg = 1.f;
-        bb = 0.f;
-    }
-    else if(status == SDL_POWERSTATE_CHARGING)
-    {
-        br = 1.f;
-        bg = 0.64f;
-        bb = 0.f;
-    }
-    else if(isLow)
-        br = 1.f;
-
-    segments = ((pct * segmentsFullLen) / 100) * 2;
-    if(segments == 0)
-        segments = 2;
-
-    bool showBattery = false;
-
-    showBattery |= (g_videoSettings.batteryStatus == BATTERY_STATUS_ALWAYS_ON);
-    showBattery |= (g_videoSettings.batteryStatus == BATTERY_STATUS_ANY_WHEN_LOW && isLow);
-#ifndef RENDER_FULLSCREEN_ALWAYS
-    showBattery |= (g_videoSettings.batteryStatus == BATTERY_STATUS_FULLSCREEN_WHEN_LOW && isLow && isFullScreen);
-    showBattery |= (g_videoSettings.batteryStatus == BATTERY_STATUS_FULLSCREEN_ON && isFullScreen);
-#else
-    showBattery |= (g_videoSettings.batteryStatus == BATTERY_STATUS_FULLSCREEN_WHEN_LOW && isLow);
-    showBattery |= (g_videoSettings.batteryStatus == BATTERY_STATUS_FULLSCREEN_ON);
-#endif
-
-    if(showBattery)
-    {
-        XRender::setTargetTexture();
-
-        XRender::offsetViewportIgnore(true);
-        XRender::renderRect(bx, by, bw - 4, bh, 0.f, 0.f, 0.f, alhpa, true);//Edge
-        XRender::renderRect(bx + 2, by + 2, bw - 8, bh - 4, r, g, b, alhpa, true);//Box
-        XRender::renderRect(bx + 36, by + 6, 4, 10, 0.f, 0.f, 0.f, alhpa, true);//Edge
-        XRender::renderRect(bx + 34, by + 8, 4, 6, r, g, b, alhpa, true);//Box
-        XRender::renderRect(bx + 4, by + 4, segments, 14, br, bg, bb, alhpaB / 2.f, true);//Level
-        XRender::offsetViewportIgnore(false);
-
-        XRender::setTargetScreen();
-    }
-#endif
-}
-#endif // USE_DRAW_BATTERY_STATUS
-
 
 /* --------------- Screenshots and GIF recording (not for Emscripten!) ----------------- */
 #ifdef USE_SCREENSHOTS_AND_RECS

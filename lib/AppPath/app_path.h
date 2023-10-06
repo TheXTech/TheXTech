@@ -46,6 +46,14 @@ public:
     static void setUserDirectory(const std::string &root);
 
     /*!
+     * \brief Custom game directory name for default locations
+     * \param dirName Name of directory name that will be used for game initialisation
+     *
+     * This function must be called BEFORE calling the initAppPath()
+     */
+    static void setGameDirName(const std::string &dirName);
+
+    /*!
      * \brief Initialise all paths
      */
     static void initAppPath();
@@ -135,8 +143,12 @@ private:
      */
     static void initSettingsPath();
 
-    //! Location for writable settings and game-saves
+    static void initString(std::string &text, const std::string& inValue, const std::string &defValue);
+
+    //! Location for writable settings
     static std::string m_settingsPath;
+    //! Location for writable gamesaves
+    static std::string m_gamesavesPath;
     //! Location for writable user directory
     static std::string m_userPath;
     //! Location for read-only assets directory
@@ -152,6 +164,8 @@ private:
     static std::string m_customAssetsRoot;
     //! Location for writable custom user directory
     static std::string m_customUserDirectory;
+    //! Custom name for the game directory name at default locations
+    static std::string m_customGameDirName;
     //! Is portable configuration active?
     static bool m_isPortable;
 };

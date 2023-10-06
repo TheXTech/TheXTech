@@ -188,22 +188,25 @@ static const char *g_messageToUser =
     "================================================\n"
     "            Additional information:\n"
     "================================================\n"
-    V_FILE_DESC " version: " V_FILE_VERSION V_FILE_RELEASE "\n"
-    "Architecture: " FILE_CPU "\n"
-    "GIT Revision code: " V_BUILD_VER "\n"
-    "GIT branch: " V_BUILD_BRANCH "\n"
-    "Build date: " V_DATE_OF_BUILD "\n"
+    V_FILE_DESC "\n"
+    "- Version:           " V_FILE_VERSION V_FILE_RELEASE "\n"
+    "- Architecture:      " FILE_CPU "\n"
+    "- Operating system:  " OPERATION_SYSTEM "\n"
+    "- GIT Revision code: #" V_BUILD_VER "\n"
+    "- GIT branch:        " V_BUILD_BRANCH "\n"
+    "- Build date:        " V_DATE_OF_BUILD "\n"
     "================================================\n"
 #ifndef THEXTECH_NO_SDL_BUILD
-    "SDL2 " STRR(SDL_MAJOR_VERSION) "." STRR(SDL_MINOR_VERSION) "." STRR(SDL_PATCHLEVEL) "\n"
+    "SDL2 version:        " STRR(SDL_MAJOR_VERSION) "." STRR(SDL_MINOR_VERSION) "." STRR(SDL_PATCHLEVEL) "\n"
 #endif
 #if !defined(THEXTECH_NO_SDL_BUILD) && !defined(THEXTECH_CLI_BUILD) && !defined(CUSTOM_AUDIO)
-    "SDL Mixer X " STRR(SDL_MIXER_MAJOR_VERSION) "." STRR(SDL_MIXER_MINOR_VERSION) "." STRR(SDL_MIXER_PATCHLEVEL) "\n"
+    "SDL Mixer X version: " STRR(SDL_MIXER_MAJOR_VERSION) "." STRR(SDL_MIXER_MINOR_VERSION) "." STRR(SDL_MIXER_PATCHLEVEL) "\n"
 #endif
     "================================================\n"
     " Please send this log file to the developers by one of ways:\n"
-    " - Via contact form:          http://wohlsoft.ru/forum/memberlist.php?mode=contactadmin\n"
-    " - Official forums:           http://wohlsoft.ru/forum/\n"
+    " - Via contact form:          https://wohlsoft.ru/contacts/\n"
+    " - Official forums:           https://wohlsoft.ru/forum/\n"
+    " - Official Discord server:   https://wohlsoft.ru/chat/\n"
     " - Make issue at GitHub repo: https://github.com/Wohlstand/TheXTech\n\n"
     "================================================\n";
 
@@ -397,7 +400,7 @@ static void removePersonalData(std::string &log)
 int ppc_backtrace(void **buffer, int size)
 {
     int depth;
-    uint32_t stackptr, lr, *addr;
+    uint32_t stackptr = 0, lr, *addr;
 
     // get link register
     asm volatile ("mflr %0" : "=r"(lr));
@@ -409,7 +412,7 @@ int ppc_backtrace(void **buffer, int size)
     asm volatile("stw %%sp, 0(%0)" : : "b" ((uint32_t)&stackptr));
 
     // assign stack ptr to address
-    addr = (uint32_t *)stackptr;
+    addr = reinterpret_cast<uint32_t *>(stackptr);
 
     // get the frames
     if (*addr)

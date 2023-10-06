@@ -182,12 +182,12 @@ std::vector<std::string> DirListCI::getFilesList(const std::string& subDir,
     {
         std::string sdName, sdir;
         // For sub-directory path, look deeply
-        auto subDir = name.find('/');
+        auto subDirI = name.find('/');
 
-        if(subDir != std::string::npos)
+        if(subDirI != std::string::npos)
         {
-            sdName = resolveDirCase(name.substr(0, subDir));
-            sdir = name.substr(subDir + 1);
+            sdName = resolveDirCase(name.substr(0, subDirI));
+            sdir = name.substr(subDirI + 1);
         }
         else
             sdName = name;

@@ -177,17 +177,17 @@ void KillNPC(int A, int B)
 
     if(NPC[A].TriggerDeath != EVENT_NONE && !LevelEditor)
     {
-        ProcEvent(NPC[A].TriggerDeath);
+        ProcEvent(NPC[A].TriggerDeath, 0);
     }
 
     if(NPC[A].TriggerLast != EVENT_NONE)
     {
         tempBool = false;
 
-        int C = NPC[A].Layer;
-        if(C != LAYER_NONE)
+        int lr = NPC[A].Layer;
+        if(lr != LAYER_NONE)
         {
-            for(int other_npc : Layer[C].NPCs)
+            for(int other_npc : Layer[lr].NPCs)
             {
                 if(other_npc != A && !NPC[other_npc].Generator)
                 {
@@ -195,12 +195,13 @@ void KillNPC(int A, int B)
                     break;
                 }
             }
-            if(!Layer[C].blocks.empty())
+
+            if(!Layer[lr].blocks.empty())
                 tempBool = true;
         }
 
         if(!tempBool)
-            ProcEvent(NPC[A].TriggerLast);
+            ProcEvent(NPC[A].TriggerLast, 0);
     }
 
     if(NPC[A].HoldingPlayer > 0)
@@ -1111,9 +1112,9 @@ void KillNPC(int A, int B)
                 }
                 else
                 {
-                    for(int C : NPCQueues::Active.no_change)
+                    for(int nc : NPCQueues::Active.no_change)
                     {
-                        if(NPC[C].Type == NPCID_SPIT_BOSS && NPC[C].Active && C != A)
+                        if(NPC[nc].Type == NPCID_SPIT_BOSS && NPC[nc].Active && nc != A)
                         {
                             DontResetMusic = true;
                             break;
@@ -1327,9 +1328,9 @@ void KillNPC(int A, int B)
                 {
                     NewEffect(EFFID_MINIBOSS_DIE, NPC[A].Location);
 
-                    for(int B : NPCQueues::Active.no_change)
+                    for(int nc : NPCQueues::Active.no_change)
                     {
-                        if(NPC[B].Type == NPCID_MINIBOSS && NPC[B].Active && B != A && NPC[B].Killed == 0)
+                        if(NPC[nc].Type == NPCID_MINIBOSS && NPC[nc].Active && nc != A && NPC[nc].Killed == 0)
                         {
                             DontResetMusic = true;
                             break;

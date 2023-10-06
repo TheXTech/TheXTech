@@ -22,6 +22,8 @@
 #ifndef LOCATION_H
 #define LOCATION_H
 
+#include <cstdint>
+
 //Public Type Location    'Holds location information for objects
 struct Location_t
 {
@@ -38,6 +40,29 @@ struct Location_t
 //    SpeedY As Double
     double SpeedY = 0.0;
 //End Type
+};
+
+//NEW: 'Holds location information for an object without speed at integer coordinates, with width / height values below 32767
+struct TinyLocation_t
+{
+    int32_t X = 0;
+    int32_t Y = 0;
+    int16_t Height = 0;
+    int16_t Width = 0;
+
+    inline TinyLocation_t() = default;
+    inline explicit TinyLocation_t(const Location_t& loc) : X(loc.X), Y(loc.Y), Height(loc.Height), Width(loc.Width) {}
+
+    inline explicit operator Location_t() const
+    {
+        Location_t ret;
+        ret.X = X;
+        ret.Y = Y;
+        ret.Height = Height;
+        ret.Width = Width;
+
+        return ret;
+    }
 };
 
 //NEW: 'Holds location information for an object without speed
@@ -84,6 +109,14 @@ struct PlayerStart_t
 
     inline PlayerStart_t() = default;
     inline PlayerStart_t(const Location_t& loc) : X(loc.X), Y(loc.Y), Height(loc.Height), Width(loc.Width) {}
+
+    inline bool isNull() const
+    {
+        return int(X * 100000) == 0 &&
+               int(Y * 100000) == 0 &&
+               int(Width * 100000) == 0 &&
+               int(Height * 100000) == 0;
+    }
 
     inline operator Location_t() const
     {

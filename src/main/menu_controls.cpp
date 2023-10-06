@@ -142,7 +142,7 @@ int menuControls_Mouse_Render(bool mouse, bool render)
     if(mouse && !SharedCursor.Move && !render && !SharedCursor.Primary)
         return 0;
 
-    const int n_types = Controls::g_InputMethodTypes.size();
+    const int n_types = (int)Controls::g_InputMethodTypes.size();
 
     // want 680px width. if not possible, use double-line mode on settable option screens
     int width = 680;
@@ -190,7 +190,7 @@ int menuControls_Mouse_Render(bool mouse, bool render)
             return 0;
         }
         Controls::InputMethodType* type = Controls::g_InputMethodTypes[s_curType];
-        const int n_profiles = type->GetProfiles().size();
+        const int n_profiles = (int)type->GetProfiles().size();
 
         if(s_curProfile < 0 || s_curProfile >= n_profiles)
         {
@@ -215,7 +215,7 @@ int menuControls_Mouse_Render(bool mouse, bool render)
         if(mouse)
         {
             // collision and click handling for "NO"
-            int menuLen = g_mainMenu.wordNo.size() * 18;
+            int menuLen = (int)g_mainMenu.wordNo.size() * 18;
             if(SharedCursor.X >= sX+width/4 && SharedCursor.X <= sX+width/4 + menuLen
                 && SharedCursor.Y >= sY+line*3 && SharedCursor.Y <= sY+line*3 + 16)
             {
@@ -233,8 +233,9 @@ int menuControls_Mouse_Render(bool mouse, bool render)
                     MenuMouseRelease = false;
                 }
             }
+
             // collision and click handling for "YES"
-            menuLen = g_mainMenu.wordYes.size() * 18;
+            menuLen = (int)g_mainMenu.wordYes.size() * 18;
             if(SharedCursor.X >= sX+width/4 && SharedCursor.X <= sX+width/4 + menuLen
                 && SharedCursor.Y >= sY+line*4 && SharedCursor.Y <= sY+line*4 + 16)
             {
@@ -287,8 +288,8 @@ int menuControls_Mouse_Render(bool mouse, bool render)
             SuperPrintScreenCenter(Controls::g_InputMethods[p]->Profile->Name, 3, sY+(top_line+3)*line);
 
         // display the test controls and profile reversion countdown (add more details)
-        RenderControls(p+1, ScreenW/2-38, sY+(top_line+4)*line, 76, 30);
-        SuperPrintScreenCenter(g_gameStrings.connectHoldStart, 3, sY+(top_line+6)*line);
+        RenderControls((int)p + 1, (ScreenW / 2) - 38, sY + (top_line + 4) * line, 76, 30, false, 1.0f);
+        SuperPrintScreenCenter(g_gameStrings.connectHoldStart, 3, sY + (top_line + 6) * line);
         int n_stars;
         int n_empty;
         if(s_profileChangeTimer < 66*3)
@@ -378,7 +379,7 @@ int menuControls_Mouse_Render(bool mouse, bool render)
                 if(MenuCursor == scroll_start + i)
                     XRender::renderTexture(sX + 24, sY+(3+i)*line, GFX.MCursor[0]);
             }
-            int item_width = Controls::g_InputMethodTypes[scroll_start + i]->LocalName().size()*18;
+            int item_width = (int)Controls::g_InputMethodTypes[scroll_start + i]->LocalName().size() * 18;
             if(mouse && SharedCursor.X >= sX+48 && SharedCursor.X <= sX+48 + item_width
                 && SharedCursor.Y >= sY+(3+i)*line && SharedCursor.Y <= sY+(3+i)*line + 16)
             {
@@ -406,7 +407,8 @@ int menuControls_Mouse_Render(bool mouse, bool render)
             {
                 if(!Controls::g_InputMethods[p])
                     continue;
-                int cX = sX + 100 + 200*p;
+
+                int cX = sX + 100 + (200 * (int)p);
                 SuperPrintCenter(Controls::g_InputMethods[p]->Name, 3, cX, sY+(max_line-4)*line);
 
                 // display the current profile
@@ -434,9 +436,9 @@ int menuControls_Mouse_Render(bool mouse, bool render)
             return 0;
         }
         Controls::InputMethodType* type = Controls::g_InputMethodTypes[s_curType];
-        const int n_options = type->GetOptionCount();
+        const int n_options = (int)type->GetOptionCount();
         std::vector<Controls::InputMethodProfile*> profiles = type->GetProfiles();
-        const int n_profiles = profiles.size();
+        const int n_profiles = (int)profiles.size();
 
         if(render)
         {
@@ -550,11 +552,12 @@ int menuControls_Mouse_Render(bool mouse, bool render)
                 {
                     int item_width;
                     if(i == n_profiles)
-                        item_width = g_mainMenu.controlsNewProfile.size()*18;
+                        item_width = (int)g_mainMenu.controlsNewProfile.size() * 18;
                     else
-                        item_width = profiles[i]->Name.size()*18;
-                    if(SharedCursor.X >= sX+48 && SharedCursor.X <= sX+48 + item_width
-                        && SharedCursor.Y >= start_y + (i + 1-scroll_start)*line && SharedCursor.Y <= start_y + (i + 1-scroll_start)*line + 16)
+                        item_width = (int)profiles[i]->Name.size() * 18;
+
+                    if(SharedCursor.X >= sX + 48 && SharedCursor.X <= sX + 48 + item_width
+                        && SharedCursor.Y >= start_y + (i + 1 - scroll_start)*line && SharedCursor.Y <= start_y + (i + 1 - scroll_start) * line + 16)
                     {
                         if(MenuCursor != i)
                         {
@@ -690,7 +693,7 @@ int menuControls_Mouse_Render(bool mouse, bool render)
             return 0;
         }
         Controls::InputMethodType* type = Controls::g_InputMethodTypes[s_curType];
-        const int n_profiles = type->GetProfiles().size();
+        const int n_profiles = (int)type->GetProfiles().size();
 
         if(s_curProfile < 0 || s_curProfile >= n_profiles)
         {
@@ -698,7 +701,7 @@ int menuControls_Mouse_Render(bool mouse, bool render)
         }
 
         Controls::InputMethodProfile* profile = type->GetProfiles()[s_curProfile];
-        const int n_options = profile->GetOptionCount();
+        const int n_options = (int)profile->GetOptionCount();
         const int n_stock = 7;
 
         if(render)
@@ -949,7 +952,7 @@ int menuControls_Mouse_Render(bool mouse, bool render)
             return 0;
         }
         Controls::InputMethodType* type = Controls::g_InputMethodTypes[s_curType];
-        const int n_profiles = type->GetProfiles().size();
+        const int n_profiles = (int)type->GetProfiles().size();
 
         if(s_curProfile < 0 || s_curProfile >= n_profiles)
         {
@@ -1175,7 +1178,7 @@ int menuControls_Logic()
     if(s_changingProfilePlayer == -1 && !g_pollingInput)
         Controls::PollInputMethod();
 
-    const int n_types = Controls::g_InputMethodTypes.size();
+    const int n_types = (int)Controls::g_InputMethodTypes.size();
 
     if(g_pollingInput)
     {
@@ -1185,7 +1188,8 @@ int menuControls_Logic()
             g_pollingInput = false;
             return 0;
         }
-        const int n_profiles = Controls::g_InputMethodTypes[s_curType]->GetProfiles().size();
+
+        const int n_profiles = (int)Controls::g_InputMethodTypes[s_curType]->GetProfiles().size();
 
         if(s_curProfile < 0 || s_curProfile >= n_profiles)
         {
@@ -1296,6 +1300,10 @@ int menuControls_Logic()
 
     bool delPressed = false;
 
+    // FIXME: Use or remove upPressed and downPressed
+    UNUSED(upPressed);
+    UNUSED(downPressed);
+
     for(int i = 0; i < maxLocalPlayers; i++)
     {
         if(s_changingProfilePlayer == i)
@@ -1348,7 +1356,7 @@ int menuControls_Logic()
             return 0;
         }
         Controls::InputMethodType* type = Controls::g_InputMethodTypes[s_curType];
-        const int n_profiles = type->GetProfiles().size();
+        const int n_profiles = (int)type->GetProfiles().size();
 
         if(s_curProfile < 0 || s_curProfile >= n_profiles)
         {
@@ -1422,8 +1430,8 @@ int menuControls_Logic()
             return 0;
         }
         Controls::InputMethodType* type = Controls::g_InputMethodTypes[s_curType];
-        const int n_options = type->GetOptionCount();
-        const int n_profiles = type->GetProfiles().size();
+        const int n_options = (int)type->GetOptionCount();
+        const int n_profiles = (int)type->GetProfiles().size();
 
         // keep things in range
         while(MenuCursor < 0)
@@ -1513,7 +1521,7 @@ int menuControls_Logic()
             return 0;
         }
         Controls::InputMethodType* type = Controls::g_InputMethodTypes[s_curType];
-        const int n_profiles = type->GetProfiles().size();
+        const int n_profiles = (int)type->GetProfiles().size();
 
         if(s_curProfile < 0 || s_curProfile >= n_profiles)
         {
@@ -1526,7 +1534,7 @@ int menuControls_Logic()
 
         Controls::InputMethodProfile* profile = type->GetProfiles()[s_curProfile];
         const int n_stock = 7;
-        const int n_options = profile->GetOptionCount();
+        const int n_options = (int)profile->GetOptionCount();
 
         // first come the stock options, then the profile options.
 
@@ -1600,8 +1608,9 @@ int menuControls_Logic()
             MenuCursorCanMove = false;
             return 0;
         }
+
         Controls::InputMethodType* type = Controls::g_InputMethodTypes[s_curType];
-        const int n_profiles = type->GetProfiles().size();
+        const int n_profiles = (int)type->GetProfiles().size();
 
         if(s_curProfile < 0 || s_curProfile >= n_profiles)
         {

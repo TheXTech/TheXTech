@@ -54,6 +54,10 @@
 #include "graphics/gfx_special_frames.h"
 #include "graphics/gfx_keyhole.h"
 
+#ifdef THEXTECH_BUILD_GL_MODERN
+#    include "core/opengl/gl_program_bank.h"
+#endif
+
 #include <fmt_format_ne.h>
 #include <Utils/maths.h>
 
@@ -674,10 +678,13 @@ void ClassicNPCScreenLogic(int Z, int numScreens, bool Do_FrameSkip, NPC_Draw_Qu
         }
 
 
+        const Player_t& hp = Player[NPC[A].HoldingPlayer];
+        bool hp_door_scroll = (NPC[A].HoldingPlayer > 0 && hp.Effect == 7 && hp.Effect2 >= 128);
+
         if(
             (
               (
-                (NPC[A].HoldingPlayer > 0 && Player[NPC[A].HoldingPlayer].Effect != 3) ||
+                (NPC[A].HoldingPlayer > 0 && hp.Effect != 3 && !hp_door_scroll) ||
                 (NPC[A].Type == NPCID_TOOTHY && NPC[A].standingOnPlayer == 0) ||
                 (NPC[A].Type == NPCID_BULLET && NPC[A].CantHurt > 0)
               ) || NPC[A].Effect == 5
@@ -800,8 +807,6 @@ void UpdateGraphics(bool skipRepaint)
     // (This code is a combination of the FrameSkip logic from before with the
     //   logic components of the full rendering code.)
     // NPC render queue formation is also here.
-    SetupScreens();
-
     int numScreens = 1;
     if(ScreenType == 1)
         numScreens = 2;
@@ -891,10 +896,10 @@ void UpdateGraphics(bool skipRepaint)
             }
         }
 
-        // Position swap code?
+        // Keep all players onscreen in clone mode
         if(!GameMenu && !LevelEditor)
         {
-            if(numPlayers > 2)
+            if(g_ClonedPlayerMode)
             {
                 int C = 0;
                 int D = 0;
@@ -1090,6 +1095,11 @@ void UpdateGraphics(bool skipRepaint)
             XRender::setViewport(vScreen[Z].Left, vScreen[Z].Top, vScreen[Z].Width, vScreen[Z].Height);
 
         DrawBackground(S, Z);
+
+#ifdef THEXTECH_BUILD_GL_MODERN
+        if(SectionParticlesBG[S])
+            XRender::renderParticleSystem(**SectionParticlesBG[S], vScreen[Z].X, vScreen[Z].Y);
+#endif
 
         // don't show background outside of the current section!
         if(LevelEditor)
@@ -1356,7 +1366,7 @@ void UpdateGraphics(bool skipRepaint)
             }
         }
 
-        for(int oBackground = screenBackgrounds.size() - 1; oBackground > 0 && (int)screenBackgrounds[oBackground] > numBackground; oBackground--)  // Locked doors
+        for(int oBackground = (int)screenBackgrounds.size() - 1; oBackground > 0 && (int)screenBackgrounds[oBackground] > numBackground; oBackground--)  // Locked doors
         {
             A = screenBackgrounds[oBackground];
 
@@ -1692,7 +1702,7 @@ void UpdateGraphics(bool skipRepaint)
         {
             g_stats.checkedBlocks++;
 
-            if(/*!BlockIsSizable[block.Type] &&*/ (!block.Invis || (LevelEditor && BlockFlash <= 30)) /*&& block.Type != 0 && !BlockKills[block.Type]*/)
+            if(/*!BlockIsSizable[block.Type] &&*/ (!block.Invis || (LevelEditor && (CommonFrame % 46) <= 30)) /*&& block.Type != 0 && !BlockKills[block.Type]*/)
             {
                 double sX = vScreen[Z].X + block.Location.X;
                 if(sX > vScreen[Z].Width)
@@ -2214,10 +2224,22 @@ void UpdateGraphics(bool skipRepaint)
 
             lunaRender(Z);
 
+#ifdef THEXTECH_BUILD_GL_MODERN
+            if(SectionParticlesFG[S])
+                XRender::renderParticleSystem(**SectionParticlesFG[S], vScreen[Z].X, vScreen[Z].Y);
+
+            if(SectionEffect[S])
+                XRender::renderTextureScale(0, 0, vScreen[Z].Width, vScreen[Z].Height, **SectionEffect[S]);
+#endif
+
+            XRender::splitFrame();
+
             // Always draw for single-player
             // And don't draw when many players at the same screen
             if(numPlayers == 1 || numScreens != 1)
-                g_levelVScreenFader[Z].draw();
+                g_levelVScreenFader[Z].draw(false);
+
+            XRender::splitFrame();
 
 #ifdef __3DS__
         XRender::setTargetLayer(3);
@@ -2265,7 +2287,7 @@ void UpdateGraphics(bool skipRepaint)
                 }
 
 #ifdef THEXTECH_ENABLE_LUNA_AUTOCODE
-                lunaRenderHud();
+                lunaRenderHud(Z);
 #endif
     //                DrawInterface Z, numScreens
                 if(ShowOnScreenHUD && !gSMBXHUDSettings.skip)
@@ -2286,7 +2308,7 @@ void UpdateGraphics(bool skipRepaint)
             else if(!GameOutro)
                 mainMenuDraw();
 
-            if(PrintFPS > 0)
+            if(PrintFPS > 0 && ShowFPS)
             {
                 XRender::offsetViewportIgnore(true);
                 SuperPrint(fmt::format_ne("{0}", int(PrintFPS)), 1, 8, 8, 0.f, 1.f, 0.f);
@@ -2383,6 +2405,8 @@ void UpdateGraphics(bool skipRepaint)
     if(LevelEditor || MagicHand)
         DrawEditorLevel_UI();
 
+    DrawDeviceBattery();
+
     // render special screens
     if(GamePaused == PauseCode::PauseScreen)
         PauseScreen::Render();
@@ -2395,10 +2419,7 @@ void UpdateGraphics(bool skipRepaint)
             DrawMessage(MessageTextMap);
     }
 
-    if(QuickReconnectScreen::g_active)
-        QuickReconnectScreen::Render();
-
-    if(GamePaused == PauseCode::Reconnect || GamePaused == PauseCode::DropAdd)
+    if(GamePaused == PauseCode::DropAdd)
     {
         ConnectScreen::Render();
         XRender::renderTexture(int(SharedCursor.X), int(SharedCursor.Y), GFX.ECursor[2]);
@@ -2411,12 +2432,6 @@ void UpdateGraphics(bool skipRepaint)
 
     if(!skipRepaint)
         XRender::repaint();
-
-    XRender::setTargetScreen();
-
-//    If TakeScreen = True Then ScreenShot
-    if(TakeScreen)
-        ScreenShot();
 
     // Update Coin Frames
     CoinFrame2[1] += 1;

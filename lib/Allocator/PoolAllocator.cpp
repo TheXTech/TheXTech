@@ -67,14 +67,14 @@ void PoolAllocator::Reset()
     m_used = 0;
     m_peak = 0;
     // Create a linked-list with all free positions
-    const int nChunks = m_totalSize / m_chunkSize;
+    const size_t nChunks = m_totalSize / m_chunkSize;
 
     std::size_t front = reinterpret_cast<std::size_t>(m_start_ptr);
     std::size_t back = reinterpret_cast<std::size_t>(m_start_ptr) + m_totalSize;
 
     m_freeList.set_edges(reinterpret_cast<Node*>(front), reinterpret_cast<Node*>(back));
 
-    for(int i = 0; i < nChunks; ++i)
+    for(size_t i = 0; i < nChunks; ++i)
     {
         std::size_t address = reinterpret_cast<std::size_t>(m_start_ptr) + i * m_chunkSize;
         m_freeList.push(reinterpret_cast<Node*>(address));

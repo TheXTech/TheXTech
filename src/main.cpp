@@ -21,6 +21,8 @@
 #include <ctime>
 #include "sdl_proxy/sdl_head.h"
 
+#include "../version.h"
+
 #include "game_main.h"
 #include "frm_main.h"
 #include "gfx.h"
@@ -36,6 +38,10 @@
 #include "config.h"
 #include "controls.h"
 #include <AppPath/app_path.h>
+
+#ifdef THEXTECH_INTERPROC_SUPPORTED
+#   include "capabilities.h"
+#endif
 
 #ifndef THEXTECH_NO_ARGV_HANDLING
 #   include <tclap/CmdLine.h>
@@ -218,7 +224,6 @@ int main(int argc, char**argv)
 #endif
 
     CmdLineSetup_t setup;
-    FrmMain frmMain;
 
 #if defined(__APPLE__) && defined(USE_APPLE_X11)
     char *x11_display_env = getenv("DISPLAY");
@@ -249,7 +254,7 @@ int main(int argc, char**argv)
         // Define the command line object.
         TCLAP::CmdLine  cmd("TheXTech Engine\n"
                             "Copyright (c) 2020-2023 Vitaly Novichkov <admin@wohlnet.ru>\n\n"
-                            "This program is distributed under the GPLv3 license\n\n", ' ', "1.3");
+                            "This program is distributed under the GPLv3 license\n\n", ' ', V_LATEST_STABLE " [" V_BUILD_BRANCH ", #" V_BUILD_VER "]");
 
         TCLAP::ValueArg<std::string> customAssetsPath("c", "assets-root", "Specify the different assets root directory to play",
                                                       false, "",
@@ -261,15 +266,37 @@ int main(int argc, char**argv)
                                                          "directory path",
                                                          cmd);
 
+        TCLAP::ValueArg<std::string> customGameDirName(std::string(), "game-dirname",
+                                                       "Specify the game directory name for default locations",
+                                                       false, "",
+                                                       "directory name",
+                                                       cmd);
+
+
         TCLAP::SwitchArg switchFrameSkip("f", "frameskip", "Enable frame skipping mode", false);
         TCLAP::SwitchArg switchDisableFrameSkip(std::string(), "no-frameskip", "Disable frame skipping mode", false);
         TCLAP::SwitchArg switchNoSound("s", "no-sound", "Disable sound", false);
         TCLAP::SwitchArg switchNoPause("p", "never-pause", "Never pause game when window losts a focus", false);
         TCLAP::SwitchArg switchBgInput(std::string(), "bg-input", "Allow background input for joysticks", false);
+        TCLAP::SwitchArg switchVSync(std::string(), "vsync", "Limit the framerate to the screen refresh rate", false);
         TCLAP::ValueArg<std::string> renderType("r", "render", "Sets the graphics mode:\n"
-                                                "  sw - software render (fallback)\n"
-                                                "  hw - hardware accelerated render [Default]\n"
-                                                "  vsync - hardware accelerated with the v-sync enabled",
+                                                "  sw - software SDL2 render (fallback)\n"
+                                                "  hw - generic hardware accelerated render (currently SDL2) [Default]\n"
+                                                "  vsync - generic hardware accelerated render with vSync [deprecated]\n"
+                                                "  sdl - hardware accelerated SDL2 render\n"
+#   ifdef THEXTECH_BUILD_GL_DESKTOP_MODERN
+                                                "  opengl - hardware accelerated OpenGL 2.1+ render\n"
+#   endif
+#   ifdef THEXTECH_BUILD_GL_ES_MODERN
+                                                "  opengles - hardware accelerated OpenGL ES (mobile) 2.0+ render\n"
+#   endif
+#   ifdef THEXTECH_BUILD_GL_DESKTOP_LEGACY
+                                                "  opengl11 - hardware accelerated OpenGL 1.1-2.0 render (legacy)\n"
+#   endif
+#   ifdef THEXTECH_BUILD_GL_ES_LEGACY
+                                                "  opengles11 - hardware accelerated OpenGL ES 1.1 render (legacy)"
+#   endif
+                                                ,
                                                 false, "",
                                                 "render type",
                                                 cmd);
@@ -320,7 +347,10 @@ int main(int argc, char**argv)
         TCLAP::SwitchArg switchTestMaxFPS("x", "max-fps", "Run FPS as fast as possible", false);
         TCLAP::SwitchArg switchTestMagicHand("k", "magic-hand", "Enable magic hand functionality while level test running", false);
         TCLAP::SwitchArg switchTestEditor("e", "editor", "Open level in the editor", false);
+#ifdef THEXTECH_INTERPROC_SUPPORTED
         TCLAP::SwitchArg switchTestInterprocess("i", "interprocessing", "Enable an interprocessing mode with Editor", false);
+        TCLAP::SwitchArg switchPrintCapabilities(std::string(), "capabilities", "Print the JSON string of this build's capabilities", false);
+#endif
 
         TCLAP::ValueArg<std::string> compatLevel(std::string(), "compat-level",
                                                    "Enforce the specific gameplay compatibility level. Supported values:\n"
@@ -369,6 +399,11 @@ int main(int argc, char**argv)
 #ifndef THEXTECH_DISABLE_LANG_TOOLS
         TCLAP::SwitchArg switchMakeLangTemplate(std::string(), "export-lang", "Exports the default language template", false);
         TCLAP::SwitchArg switchLangUpdate(std::string(), "lang-update", "Updated all language of assets package: missing lines will be added", false);
+        TCLAP::SwitchArg switchLangNoBlank(std::string(), "lang-no-blank", "Don't put blank lines into translation files", false);
+        TCLAP::ValueArg<std::string> langOutputPath(std::string(), "lang-output",
+                                                    "Path to the languages directory that needs to be updated (by default, the in-assets directory is used)",
+                                                    false, std::string(),
+                                                    "path to directory");
 #endif
         TCLAP::ValueArg<std::string> lang(std::string(), "lang", "Set the engine's language by code", false, "", "en, ru, zh-cn, etc.");
 
@@ -381,6 +416,7 @@ int main(int argc, char**argv)
         cmd.add(&switchNoSound);
         cmd.add(&switchNoPause);
         cmd.add(&switchBgInput);
+        cmd.add(&switchVSync);
         cmd.add(&switchBattleMode);
 
         cmd.add(&switchTestGodMode);
@@ -389,13 +425,18 @@ int main(int argc, char**argv)
         cmd.add(&switchTestMaxFPS);
         cmd.add(&switchTestMagicHand);
         cmd.add(&switchTestEditor);
+#ifdef THEXTECH_INTERPROC_SUPPORTED
         cmd.add(&switchTestInterprocess);
+        cmd.add(&switchPrintCapabilities);
+#endif
         cmd.add(&switchVerboseLog);
         cmd.add(&switchSpeedRunSemiTransparent);
         cmd.add(&switchDisplayControls);
 #ifndef THEXTECH_DISABLE_LANG_TOOLS
         cmd.add(&switchMakeLangTemplate);
         cmd.add(&switchLangUpdate);
+        cmd.add(&switchLangNoBlank);
+        cmd.add(&langOutputPath);
 #endif
         cmd.add(&lang);
         cmd.add(&inputFileNames);
@@ -406,6 +447,7 @@ int main(int argc, char**argv)
         {
             std::string customAssets = customAssetsPath.getValue();
             std::string customUserDir = customUserDirectory.getValue();
+            std::string customGameDir = customGameDirName.getValue();
 
             if(!customAssets.empty())
                 AppPathManager::setAssetsRoot(customAssets);
@@ -413,9 +455,21 @@ int main(int argc, char**argv)
             if(!customUserDir.empty())
                 AppPathManager::setUserDirectory(customUserDir);
 
+            if(!customGameDir.empty())
+                AppPathManager::setGameDirName(customGameDir);
+
             AppPathManager::initAppPath();
             AppPath = AppPathManager::assetsRoot();
         }
+
+#ifdef THEXTECH_INTERPROC_SUPPORTED
+        if(switchPrintCapabilities.isSet() && switchPrintCapabilities.getValue())
+        {
+            std::fprintf(stdout, "%s\n", g_capabilities);
+            std::fflush(stdout);
+            return 0;
+        }
+#endif
 
 #ifndef THEXTECH_DISABLE_LANG_TOOLS
         // Print the language template to the screen
@@ -432,7 +486,7 @@ int main(int argc, char**argv)
         {
             initGameInfo();
             XTechTranslate translate;
-            translate.updateLanguages();
+            translate.updateLanguages(langOutputPath.getValue(), switchLangNoBlank.isSet());
             return 0;
         }
 #endif
@@ -452,6 +506,7 @@ int main(int argc, char**argv)
         setup.noSound   = switchNoSound.isSet() ? switchNoSound.getValue() : g_audioSetup.disableSound;
         setup.neverPause = switchNoPause.isSet() ? switchNoPause.getValue() : g_videoSettings.allowBgWork;
         setup.allowBgInput = switchBgInput.isSet() ? switchBgInput.getValue() : g_videoSettings.allowBgControllerInput;
+        setup.vSync = switchVSync.isSet() ? switchVSync.getValue() : g_videoSettings.vSync;
 
         if(setup.allowBgInput) // The BG-input depends on the never-pause option
             setup.neverPause = setup.allowBgInput;
@@ -462,9 +517,22 @@ int main(int argc, char**argv)
             if(rt == "sw")
                 setup.renderType = RENDER_SOFTWARE;
             else if(rt == "vsync")
-                setup.renderType = RENDER_ACCELERATED_VSYNC;
+            {
+                setup.renderType = RENDER_ACCELERATED_SDL;
+                setup.vSync = true;
+            }
             else if(rt == "hw")
-                setup.renderType = RENDER_ACCELERATED;
+                setup.renderType = RENDER_ACCELERATED_SDL;
+            else if(rt == "sdl")
+                setup.renderType = RENDER_ACCELERATED_SDL;
+            else if(rt == "opengl")
+                setup.renderType = RENDER_ACCELERATED_OPENGL;
+            else if(rt == "opengl11")
+                setup.renderType = RENDER_ACCELERATED_OPENGL_LEGACY;
+            else if(rt == "opengles")
+                setup.renderType = RENDER_ACCELERATED_OPENGL_ES;
+            else if(rt == "opengles11")
+                setup.renderType = RENDER_ACCELERATED_OPENGL_ES_LEGACY;
             else
             {
                 std::cerr << "Error: Invalid value for the --render argument: " << rt << std::endl;
@@ -632,9 +700,9 @@ int main(int argc, char**argv)
     // set this flag before SDL initialization to allow game be quit when closing a window before a loading process will be completed
     GameIsActive = true;
 
-    if(frmMain.initSystem(setup))
+    if(g_frmMain.initSystem(setup))
     {
-        frmMain.freeSystem();
+        g_frmMain.freeSystem();
         return 1;
     }
 
@@ -670,7 +738,7 @@ int main(int argc, char**argv)
 
     Controls::Quit();
 
-    frmMain.freeSystem();
+    g_frmMain.freeSystem();
 
 #ifdef __EMSCRIPTEN__
     AppPathManager::syncFs();

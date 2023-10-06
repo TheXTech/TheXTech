@@ -565,10 +565,27 @@ public:
 
         insert(0x00B2C62C, &PSwitchTime); // P-Switch Timer
         insert(0x00B2C62E, &PSwitchStop); // Stopwatch Timer
-        insert(0x00B2C630, &PSwitchPlayer); // P-Switch/Stopwatch Player
 
+        insert(0x00B2C630, &PSwitchPlayer); // P-Switch/Stopwatch Player
         insert(0x00B2C684, &FrameSkip);
 
+        insert(0x00B2C6DC, &Physics.PlayerJumpHeight);
+        insert(0x00B2C6DE, &Physics.PlayerBlockJumpHeight);
+        insert(0x00B2C6E0, &Physics.PlayerHeadJumpHeight);
+        insert(0x00B2C6E2, &Physics.PlayerNPCJumpHeight);
+        insert(0x00B2C6E4, &Physics.PlayerSpringJumpHeight);
+        insert(0x00B2C6E8, &Physics.PlayerJumpVelocity);
+        insert(0x00B2C6EC, &Physics.PlayerRunSpeed);
+        insert(0x00B2C6F0, &Physics.PlayerWalkSpeed);
+        insert(0x00B2C6F4, &Physics.PlayerTerminalVelocity);
+        insert(0x00B2C6F8, &Physics.PlayerGravity);
+        insert(0x00B2C860, &Physics.NPCShellSpeed);
+        insert(0x00B2C864, &Physics.NPCShellSpeedY);
+        insert(0x00B2C868, &Physics.NPCWalkingSpeed);
+        insert(0x00B2C86C, &Physics.NPCWalkingOnSpeed);
+        insert(0x00B2C870, &Physics.NPCMushroomSpeed);
+        insert(0x00B2C874, &Physics.NPCGravity);
+        insert(0x00B2C878, &Physics.NPCGravityReal);
         insert(0x00B2C87C, &Physics.NPCPSwitch); // P-Switch/Stopwatch Length
 
         insert(0x00B2C880, &MenuCursor); // Current menu choice
@@ -638,6 +655,7 @@ public:
         insert(0x00B2D6D2, &SharedCursor.Move);
         insert(0x00B2D710, &numEvents);
         insert(0x00B2D734, &noSound);
+        insert(0x00B2D740, &BattleMode);
     }
 
     double getValue(size_t address, FIELDTYPE ftype)
@@ -1628,7 +1646,18 @@ public:
                     NPCQueues::RespawnDelay.erase(n);
             }
         );
-        insert(0x00000008, &NPC_t::Bouce);
+        insert(0x00000008, // Bouce
+            [](const NPC_t& n, FIELDTYPE ftype)->double
+            {
+                return valueToMem(n.Bouce, ftype);
+            },
+            [](NPC_t& n, double in, FIELDTYPE ftype)->void
+            {
+                bool temp = n.Bouce;
+                memToValue(temp, in, ftype);
+                n.Bouce = temp;
+            }
+        );
 
         // handler below
         // insert(0x0000000a, &NPC_t::Pinched1);
@@ -1651,7 +1680,18 @@ public:
         );
         insert(0x0000001c, &NPC_t::Wet);
         // insert(0x0000001e, &NPC_t::Settings); // unused since SMBX64, now removed
-        insert(0x00000020, &NPC_t::NoLavaSplash);
+        insert(0x00000020, // NoLavaSplash
+            [](const NPC_t& n, FIELDTYPE ftype)->double
+            {
+                return valueToMem(n.NoLavaSplash, ftype);
+            },
+            [](NPC_t& n, double in, FIELDTYPE ftype)->void
+            {
+                bool temp = n.NoLavaSplash;
+                memToValue(temp, in, ftype);
+                n.NoLavaSplash = temp;
+            }
+        );
         insert(0x00000022, &NPC_t::Slope);
         insert(0x00000024, // Multiplier
             [](const NPC_t& n, FIELDTYPE ftype)->double
@@ -1682,11 +1722,44 @@ public:
         // insert(0x00000038, &NPC_t::TriggerLast);
         // insert(0x0000003c, &NPC_t::Layer);
         insert(0x00000040, &NPC_t::Hidden);
-        insert(0x00000042, &NPC_t::Legacy);
-        insert(0x00000044, &NPC_t::Chat);
+        insert(0x00000042, // Legacy
+            [](const NPC_t& n, FIELDTYPE ftype)->double
+            {
+                return valueToMem(n.Legacy, ftype);
+            },
+            [](NPC_t& n, double in, FIELDTYPE ftype)->void
+            {
+                bool temp = n.Legacy;
+                memToValue(temp, in, ftype);
+                n.Legacy = temp;
+            }
+        );
+        insert(0x00000044, // Chat
+            [](const NPC_t& n, FIELDTYPE ftype)->double
+            {
+                return valueToMem(n.Chat, ftype);
+            },
+            [](NPC_t& n, double in, FIELDTYPE ftype)->void
+            {
+                bool temp = n.Chat;
+                memToValue(temp, in, ftype);
+                n.Chat = temp;
+            }
+        );
         insert(0x00000046, &NPC_t::Inert);
         insert(0x00000048, &NPC_t::Stuck);
-        insert(0x0000004a, &NPC_t::DefaultStuck);
+        insert(0x0000004a, // DefaultStuck
+            [](const NPC_t& n, FIELDTYPE ftype)->double
+            {
+                return valueToMem(n.DefaultStuck, ftype);
+            },
+            [](NPC_t& n, double in, FIELDTYPE ftype)->void
+            {
+                bool temp = n.DefaultStuck;
+                memToValue(temp, in, ftype);
+                n.DefaultStuck = temp;
+            }
+        );
         // insert(0x0000004c, &NPC_t::Text);
         insert(0x00000050, &NPC_t::oldAddBelt);
         // insert(0x00000054, &NPC_t::PinchCount); // unused since SMBX64, now removed
@@ -1714,7 +1787,18 @@ public:
         insert(0x0000006c, &NPC_t::GeneratorTime);
         insert(0x00000070, &NPC_t::GeneratorDirection);
         insert(0x00000072, &NPC_t::GeneratorEffect);
-        insert(0x00000074, &NPC_t::GeneratorActive);
+        insert(0x00000074, // GeneratorActive
+            [](const NPC_t& n, FIELDTYPE ftype)->double
+            {
+                return valueToMem(n.GeneratorActive, ftype);
+            },
+            [](NPC_t& n, double in, FIELDTYPE ftype)->void
+            {
+                bool temp = n.GeneratorActive;
+                memToValue(temp, in, ftype);
+                n.GeneratorActive = temp;
+            }
+        );
         insert(0x00000076, // playerTemp
             [](const NPC_t& n, FIELDTYPE ftype)->double
             {
@@ -1724,7 +1808,9 @@ public:
             {
                 bool prev = n.playerTemp;
 
-                memToValue(n.playerTemp, in, ftype);
+                bool temp = n.playerTemp;
+                memToValue(temp, in, ftype);
+                n.playerTemp = temp;
 
                 if(!prev && n.playerTemp)
                     NPCQueues::PlayerTemp.push_back(n);
@@ -1761,7 +1847,18 @@ public:
         insert(0x00000108, &NPC_t::Special4);
         insert(0x00000110, &NPC_t::Special5);
         insert(0x00000118, &NPC_t::Special6);
-        insert(0x00000120, &NPC_t::TurnAround);
+        insert(0x00000120, // TurnAround
+            [](const NPC_t& n, FIELDTYPE ftype)->double
+            {
+                return valueToMem(n.TurnAround, ftype);
+            },
+            [](NPC_t& n, double in, FIELDTYPE ftype)->void
+            {
+                bool temp = n.TurnAround;
+                memToValue(temp, in, ftype);
+                n.TurnAround = temp;
+            }
+        );
         insert(0x00000122, // Killed
             [](const NPC_t& n, FIELDTYPE ftype)->double
             {
@@ -1825,8 +1922,30 @@ public:
         );
         insert(0x0000014e, &NPC_t::Block);
         insert(0x00000150, &NPC_t::tempBlock);
-        insert(0x00000152, &NPC_t::onWall);
-        insert(0x00000154, &NPC_t::TurnBackWipe);
+        insert(0x00000152, // onWall
+            [](const NPC_t& n, FIELDTYPE ftype)->double
+            {
+                return valueToMem(n.onWall, ftype);
+            },
+            [](NPC_t& n, double in, FIELDTYPE ftype)->void
+            {
+                bool temp = n.onWall;
+                memToValue(temp, in, ftype);
+                n.onWall = temp;
+            }
+        );
+        insert(0x00000154, // TurnBackWipe
+            [](const NPC_t& n, FIELDTYPE ftype)->double
+            {
+                return valueToMem(n.TurnBackWipe, ftype);
+            },
+            [](NPC_t& n, double in, FIELDTYPE ftype)->void
+            {
+                bool temp = n.TurnBackWipe;
+                memToValue(temp, in, ftype);
+                n.TurnBackWipe = temp;
+            }
+        );
         insert(0x00000156, // Immune
             [](const NPC_t& n, FIELDTYPE ftype)->double
             {

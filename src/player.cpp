@@ -79,16 +79,16 @@ static void setupPlayerAtCheckpoints(NPC_t &npc, Checkpoint_t &cp)
     tempLocation.Height = 600;
 
     C = 0;
-    for(int B : treeBlockQuery(tempLocation, SORTMODE_COMPAT))
+    for(int bi : treeBlockQuery(tempLocation, SORTMODE_COMPAT))
     {
-        if(CheckCollision(tempLocation, Block[B].Location))
+        if(CheckCollision(tempLocation, Block[bi].Location))
         {
             if(C == 0)
-                C = B;
+                C = bi;
             else
             {
-                if(Block[B].Location.Y < Block[C].Location.Y)
-                    C = B;
+                if(Block[bi].Location.Y < Block[C].Location.Y)
+                    C = bi;
             }
         }
     }
@@ -403,7 +403,7 @@ void SetupPlayers()
                 Player[A].Hearts = 2;
         }
 
-        if(numPlayers > 2 && !GameMenu) // online stuff
+        if(numPlayers > 2 && !GameMenu) // find correct positions without start locations
         {
             /*if(nPlay.Online)
             {
@@ -751,7 +751,7 @@ void PlayerDeathEffect(int A)
 
 void PlayerDead(int A)
 {
-    Controls::Rumble(A, 400, 0.8);
+    Controls::Rumble(A, 400, 0.8f);
 
     g_curLevelMedals.on_any_death();
 
@@ -773,7 +773,7 @@ void PlayerDead(int A)
     {
         if(BattleMode)
             PlaySound(SFX_PlayerDied2);
-        else if(numPlayers > 2)
+        else if(g_ClonedPlayerMode)
         {
             for(B = 1; B <= numPlayers; B++)
             {
@@ -3752,8 +3752,11 @@ void ClownCar()
     {
         // commenting out because:
         //   (1) misplaced; (2) doesn't work with abstract controls
+        // logic moved to Controls::Update()
+
         // if(numPlayers > 2 && GameMenu == false && LevelMacro == LEVELMACRO_OFF && nPlay.Online == false)
         //     Player[A].Controls = Player[1].Controls;
+
         if(Player[A].Mount == 2 && Player[A].Dead == false && Player[A].TimeToLive == 0)
         {
             if(Player[A].Effect == 0)
@@ -4391,14 +4394,12 @@ void PowerUps(const int A)
             p.TailCount += 1;
             if(p.TailCount == 25)
                 p.TailCount = 0;
-            if(p.TailCount % 7 == 0 || (p.SpinJump && p.TailCount) % 2 == 0)
-            {
+
+            if(p.TailCount % 7 == 0 || (p.SpinJump && (p.TailCount % 2) == 0))
                 TailSwipe(A, true);
-            }
             else
-            {
                 TailSwipe(A);
-            }
+
             if(p.HoldingNPC > 0)
                 p.TailCount = 0;
         }
@@ -4501,6 +4502,29 @@ void PowerUps(const int A)
     }
 }
 
+static void s_TriggerDoorEffects(const Location_t& loc)
+{
+    for(Background_t& bgo : treeBackgroundQuery(loc, SORTMODE_ID))
+    {
+        if(CheckCollision(loc, bgo.Location))
+        {
+            if(bgo.Type == 88)
+                NewEffect(EFFID_DOOR_S2_OPEN, bgo.Location);
+            else if(bgo.Type == 87)
+                NewEffect(EFFID_DOOR_DOUBLE_S3_OPEN, bgo.Location);
+            else if(bgo.Type == 107)
+                NewEffect(EFFID_DOOR_SIDE_S3_OPEN, bgo.Location);
+            else if(bgo.Type == 141)
+            {
+                Location_t bLoc = bgo.Location;
+                bLoc.X += bLoc.Width / 2.0;
+                bLoc.Width = 104;
+                bLoc.X += -bLoc.Width / 2.0;
+                NewEffect(EFFID_BIG_DOOR_OPEN, bLoc);
+            }
+        }
+    }
+}
 
 static inline bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool backward)
 {
@@ -4698,7 +4722,7 @@ static inline bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool bac
         }
 
         if(warp.eventEnter != EVENT_NONE)
-            ProcEvent(warp.eventEnter);
+            ProcEvent(warp.eventEnter, A);
 
         if(warp.Effect == 0 || warp.Effect == 3) // Instant / Portal
         {
@@ -4758,26 +4782,13 @@ static inline bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool bac
             plr.Location.X = entrance.X + entrance.Width / 2.0 - plr.Location.Width / 2.0;
             plr.Location.Y = entrance.Y + entrance.Height - plr.Location.Height;
 
-            for(int C = 1; C <= numBackground; C++)
-            {
-                if(CheckCollision(entrance, Background[C].Location) || CheckCollision(exit, Background[C].Location))
-                {
-                    if(Background[C].Type == 88)
-                        NewEffect(EFFID_DOOR_S2_OPEN, Background[C].Location);
-                    else if(Background[C].Type == 87)
-                        NewEffect(EFFID_DOOR_DOUBLE_S3_OPEN, Background[C].Location);
-                    else if(Background[C].Type == 107)
-                        NewEffect(EFFID_DOOR_SIDE_S3_OPEN, Background[C].Location);
-                    else if(Background[C].Type == 141)
-                    {
-                        Location_t bLoc = Background[C].Location;
-                        bLoc.X += bLoc.Width / 2.0;
-                        bLoc.Width = 104;
-                        bLoc.X += -bLoc.Width / 2.0;
-                        NewEffect(EFFID_BIG_DOOR_OPEN, bLoc);
-                    }
-                }
-            }
+            bool same_section = SectionCollision(plr.Section, static_cast<Location_t>(exit));
+            bool do_scroll = (warp.transitEffect == LevelDoor::TRANSIT_SCROLL) && same_section;
+
+            s_TriggerDoorEffects(static_cast<Location_t>(entrance));
+
+            if(!do_scroll)
+                s_TriggerDoorEffects(static_cast<Location_t>(exit));
         }
     }
 
@@ -5759,6 +5770,9 @@ void PlayerEffects(const int A)
 
     p.Immune2 = false;
 
+    constexpr int plr_warp_scroll_speed = 8; // 8px / frame
+    constexpr int plr_warp_scroll_max_frames = 260; // 4 seconds
+
     if(p.Effect == 1) // Player growing effect
     {
 
@@ -5954,6 +5968,9 @@ void PlayerEffects(const int A)
         auto &warp_dir_enter = backward ? warp.Direction2 : warp.Direction;
         auto &warp_dir_exit = backward ? warp.Direction : warp.Direction2;
 
+        bool same_section = SectionCollision(p.Section, warp_exit);
+        bool do_scroll = (warp.transitEffect == LevelDoor::TRANSIT_SCROLL) && same_section;
+
         if(p.Effect2 == 0.0) // Entering pipe
         {
             double leftToGoal = 0.0;
@@ -5968,7 +5985,15 @@ void PlayerEffects(const int A)
                 leftToGoal = SDL_fabs((warp_enter.Y + warp_enter.Height) - p.Location.Y) * sign;
 
                 if(p.Location.Y > warp_enter.Y + warp_enter.Height + 8)
-                    p.Effect2 = 1;
+                {
+                    if(do_scroll)
+                    {
+                        int warp_dist = SDL_sqrt((warp_enter.X - warp_exit.X) * (warp_enter.X - warp_exit.X) + (warp_enter.Y - warp_exit.Y) * (warp_enter.Y - warp_exit.Y));
+                        p.Effect2 = 128 + SDL_min(warp_dist / plr_warp_scroll_speed, plr_warp_scroll_max_frames);
+                    }
+                    else
+                        p.Effect2 = 1;
+                }
 
                 if(p.Mount == 0)
                     p.Frame = 15;
@@ -5989,7 +6014,15 @@ void PlayerEffects(const int A)
                 leftToGoal = SDL_fabs(warp_enter.Y - (p.Location.Y + p.Location.Height)) * sign;
 
                 if(p.Location.Y + p.Location.Height + 8 < warp_enter.Y)
-                    p.Effect2 = 1;
+                {
+                    if(do_scroll)
+                    {
+                        int warp_dist = SDL_sqrt((warp_enter.X - warp_exit.X) * (warp_enter.X - warp_exit.X) + (warp_enter.Y - warp_exit.Y) * (warp_enter.Y - warp_exit.Y));
+                        p.Effect2 = 128 + SDL_min(warp_dist / plr_warp_scroll_speed, plr_warp_scroll_max_frames);
+                    }
+                    else
+                        p.Effect2 = 1;
+                }
 
                 if(p.HoldingNPC > 0)
                 {
@@ -6016,7 +6049,15 @@ void PlayerEffects(const int A)
                 leftToGoal = SDL_fabs((warp_enter.X - (p.Location.X + p.Location.Width)) * 2) * sign;
 
                 if(p.Location.X + p.Location.Width + 8 < warp_enter.X)
-                    p.Effect2 = 1;
+                {
+                    if(do_scroll)
+                    {
+                        int warp_dist = SDL_sqrt((warp_enter.X - warp_exit.X) * (warp_enter.X - warp_exit.X) + (warp_enter.Y - warp_exit.Y) * (warp_enter.Y - warp_exit.Y));
+                        p.Effect2 = 128 + SDL_min(warp_dist / plr_warp_scroll_speed, plr_warp_scroll_max_frames);
+                    }
+                    else
+                        p.Effect2 = 1;
+                }
 
                 if(p.HoldingNPC > 0)
                 {
@@ -6046,7 +6087,15 @@ void PlayerEffects(const int A)
                 leftToGoal = SDL_fabs(((warp_enter.X + warp_enter.Width) - p.Location.X) * 2) * sign;
 
                 if(p.Location.X > warp_enter.X + warp_enter.Width + 8)
-                    p.Effect2 = 1;
+                {
+                    if(do_scroll)
+                    {
+                        int warp_dist = SDL_sqrt((warp_enter.X - warp_exit.X) * (warp_enter.X - warp_exit.X) + (warp_enter.Y - warp_exit.Y) * (warp_enter.Y - warp_exit.Y));
+                        p.Effect2 = 128 + SDL_min(warp_dist / plr_warp_scroll_speed, plr_warp_scroll_max_frames);
+                    }
+                    else
+                        p.Effect2 = 1;
+                }
 
                 if(p.HoldingNPC > 0)
                 {
@@ -6070,14 +6119,24 @@ void PlayerEffects(const int A)
                 switch(warp.transitEffect)
                 {
                 default:
+                    if(warp.transitEffect >= ScreenFader::S_CUSTOM)
+                    {
+                        if(Maths::iRound(leftToGoal) == 8 && warp.level == STRINGINDEX_NONE && !warp.MapWarp)
+                            g_levelVScreenFader[A].setupFader(3, 0, 65, warp.transitEffect,
+                                                              true,
+                                                              Maths::iRound(warp_enter.X + warp_enter.Width / 2),
+                                                              Maths::iRound(warp_enter.Y + warp_enter.Height / 2), A);
+                        break;
+                    }
+                // fallthrough
                 case LevelDoor::TRANSIT_NONE:
-                    if(Maths::iRound(leftToGoal) == 0 && warp.level == STRINGINDEX_NONE && !warp.MapWarp && !SectionCollision(p.Section, warp_exit))
+                    if(Maths::iRound(leftToGoal) == 0 && warp.level == STRINGINDEX_NONE && !warp.MapWarp && !same_section)
                         g_levelVScreenFader[A].setupFader(g_config.EnableInterLevelFade ? 8 : 64, 0, 65, ScreenFader::S_FADE);
                     break;
 
                 case LevelDoor::TRANSIT_SCROLL:
                     // uses fade effect if not same section
-                    if(Maths::iRound(leftToGoal) == 24 && !SectionCollision(p.Section, warp_exit))
+                    if(Maths::iRound(leftToGoal) == 24 && !same_section)
                         g_levelVScreenFader[A].setupFader(3, 0, 65, ScreenFader::S_FADE);
                     break;
 
@@ -6224,7 +6283,7 @@ void PlayerEffects(const int A)
                 CheckSectionNPC(p.HoldingNPC);
             }
 
-            if(numPlayers > 2/* && nPlay.Online == false*/)
+            if(g_ClonedPlayerMode)
             {
                 for(B = 1; B <= numPlayers; B++)
                 {
@@ -6252,21 +6311,24 @@ void PlayerEffects(const int A)
                 switch(warp.transitEffect)
                 {
                 default:
+                    if(warp.transitEffect >= ScreenFader::S_CUSTOM)
+                    {
+                        g_levelVScreenFader[A].setupFader(3, 65, 0, warp.transitEffect,
+                                                          true,
+                                                          Maths::iRound(warp_exit.X + warp_exit.Width / 2),
+                                                          Maths::iRound(warp_exit.Y + warp_exit.Height /2),
+                                                          A);
+                        break;
+                    }
+                // fallthrough
                 case LevelDoor::TRANSIT_NONE:
                     g_levelVScreenFader[A].setupFader(g_config.EnableInterLevelFade ? 8 : 64, 65, 0, ScreenFader::S_FADE);
                     break;
 
                 case LevelDoor::TRANSIT_SCROLL:
-                    if(same_section)
-                    {
-                        qScreenLoc[A] = vScreen[A];
-                        qScreen = true;
-                    }
                     // follows fade logic if cross section
-                    else if(g_levelVScreenFader[A].isVisible())
-                    {
+                    if(!same_section && g_levelVScreenFader[A].isVisible())
                         g_levelVScreenFader[A].setupFader(3, 65, 0, ScreenFader::S_FADE);
-                    }
                     break;
 
                 case LevelDoor::TRANSIT_FADE:
@@ -6307,6 +6369,48 @@ void PlayerEffects(const int A)
                 p.Effect = 8;
                 p.Effect2 = 2970;
             }
+        }
+        else if(p.Effect2 > 128) // Scrolling between pipes
+        {
+            double targetX = p.Location.X;
+            double targetY = p.Location.Y;
+
+            if(warp_dir_exit == 1)
+            {
+                targetX = warp_exit.X + warp_exit.Width / 2.0 - p.Location.Width / 2.0;
+                targetY = warp_exit.Y - p.Location.Height - 8;
+            }
+            else if(warp_dir_exit == 3)
+            {
+                targetX = warp_exit.X + warp_exit.Width / 2.0 - p.Location.Width / 2.0;
+                targetY = warp_exit.Y + warp_exit.Height + 8;
+            }
+            else if(warp_dir_exit == 2)
+            {
+                if(p.Mount == 3)
+                    p.Location.Height = 30;
+
+                targetX = warp_exit.X - p.Location.Width - 8;
+                targetY = warp_exit.Y + warp_exit.Height - p.Location.Height - 2;
+            }
+            else if(warp_dir_exit == 4)
+            {
+                if(p.Mount == 3)
+                    p.Location.Height = 30;
+
+                targetX = warp_exit.X + warp_exit.Width + 8;
+                targetY = warp_exit.Y + warp_exit.Height - p.Location.Height - 2;
+            }
+
+            int frames_left = p.Effect2 - 128;
+
+            p.Location.X += (targetX - p.Location.X) / frames_left;
+            p.Location.Y += (targetY - p.Location.Y) / frames_left;
+
+            p.Effect2 -= 1;
+
+            if(p.Effect2 <= 128)
+                p.Effect2 = 1;
         }
         else if(p.Effect2 >= 100) // Waiting until exit pipe
         {
@@ -6545,7 +6649,7 @@ void PlayerEffects(const int A)
             if(p.HoldingNPC > 0)
                 NPC[p.HoldingNPC].Effect = 0;
 
-            if(numPlayers > 2 /*&& nPlay.Online == false*/)
+            if(g_ClonedPlayerMode)
             {
                 for(B = 1; B <= numPlayers; B++)
                 {
@@ -6573,6 +6677,9 @@ void PlayerEffects(const int A)
         Location_t warp_enter = static_cast<Location_t>(backward ? warp.Exit : warp.Entrance);
         Location_t warp_exit = static_cast<Location_t>(backward ? warp.Entrance : warp.Exit);
 
+        bool same_section = SectionCollision(p.Section, warp_exit);
+        bool do_scroll = (warp.transitEffect == LevelDoor::TRANSIT_SCROLL) && same_section;
+
         if(p.HoldingNPC > 0)
         {
             NPC[p.HoldingNPC].Location.Y = p.Location.Y + Physics.PlayerGrabSpotY[p.Character][p.State] + 32 - NPC[p.HoldingNPC].Location.Height;
@@ -6594,14 +6701,24 @@ void PlayerEffects(const int A)
             switch(warp.transitEffect)
             {
             default:
+                if(warp.transitEffect >= ScreenFader::S_CUSTOM)
+                {
+                    if(fEqual(p.Effect2, 5) && warp.level == STRINGINDEX_NONE && !warp.MapWarp)
+                        g_levelVScreenFader[A].setupFader(3, 0, 65, warp.transitEffect,
+                                                          true,
+                                                          Maths::iRound(warp_enter.X + warp_enter.Width / 2),
+                                                          Maths::iRound(warp_enter.Y + warp_enter.Height / 2), A);
+                    break;
+                }
+            // fallthrough
             case LevelDoor::TRANSIT_NONE:
-                if(fEqual(p.Effect2, 20) && warp.level == STRINGINDEX_NONE && !warp.MapWarp && !SectionCollision(p.Section, warp_exit))
+                if(fEqual(p.Effect2, 20) && warp.level == STRINGINDEX_NONE && !warp.MapWarp && !same_section)
                     g_levelVScreenFader[A].setupFader(g_config.EnableInterLevelFade ? 9 : 64, 0, 65, ScreenFader::S_FADE);
                 break;
 
             case LevelDoor::TRANSIT_SCROLL:
                 // uses fade effect if not same section
-                if(fEqual(p.Effect2, 5) && !SectionCollision(p.Section, warp_exit))
+                if(fEqual(p.Effect2, 5) && !same_section)
                     g_levelVScreenFader[A].setupFader(3, 0, 65, ScreenFader::S_FADE);
                 break;
 
@@ -6630,7 +6747,44 @@ void PlayerEffects(const int A)
             }
         }
 
-        if(p.Effect2 >= 30)
+        // start the scroll effect
+        if(do_scroll && fEqual(p.Effect2, 29))
+        {
+            int warp_dist = SDL_sqrt((warp_enter.X - warp_exit.X) * (warp_enter.X - warp_exit.X) + (warp_enter.Y - warp_exit.Y) * (warp_enter.Y - warp_exit.Y));
+
+            int scroll_frames = warp_dist / plr_warp_scroll_speed;
+            if(scroll_frames < 30)
+                scroll_frames = 30;
+            if(scroll_frames > plr_warp_scroll_max_frames)
+                scroll_frames = plr_warp_scroll_max_frames;
+
+            p.Effect2 = 128 + scroll_frames;
+        }
+        // process the scroll effect
+        else if(p.Effect2 >= 128)
+        {
+            double targetX = warp_exit.X + warp_exit.Width / 2.0 - p.Location.Width / 2.0;
+            double targetY = warp_exit.Y + warp_exit.Height - p.Location.Height;
+
+            // += 1 above
+            p.Effect2 -= 1;
+
+            int frames_left = p.Effect2 - 128;
+
+            p.Location.X += (targetX - p.Location.X) / frames_left;
+            p.Location.Y += (targetY - p.Location.Y) / frames_left;
+
+            if(frames_left == 30)
+                s_TriggerDoorEffects(warp_exit);
+
+            p.Effect2 -= 1;
+
+            if(p.Effect2 <= 128)
+                p.Effect2 = 30;
+        }
+
+        // finalize the warp
+        if(p.Effect2 >= 30 && p.Effect2 < 128)
         {
             if(warp.NoYoshi)
             {
@@ -6674,21 +6828,24 @@ void PlayerEffects(const int A)
                 switch(warp.transitEffect)
                 {
                 default:
+                    if(warp.transitEffect >= ScreenFader::S_CUSTOM)
+                    {
+                        g_levelVScreenFader[A].setupFader(3, 65, 0, warp.transitEffect,
+                                                          true,
+                                                          Maths::iRound(warp_exit.X + warp_exit.Width / 2),
+                                                          Maths::iRound(warp_exit.Y + warp_exit.Height /2),
+                                                          A);
+                        break;
+                    }
+                // fallthrough
                 case LevelDoor::TRANSIT_NONE:
                     g_levelVScreenFader[A].setupFader(g_config.EnableInterLevelFade ? 8 : 64, 65, 0, ScreenFader::S_FADE);
                     break;
 
                 case LevelDoor::TRANSIT_SCROLL:
-                    if(same_section)
-                    {
-                        qScreenLoc[A] = vScreen[A];
-                        qScreen = true;
-                    }
                     // follows fade logic if cross section
-                    else if(g_levelVScreenFader[A].isVisible())
-                    {
+                    if(!same_section && g_levelVScreenFader[A].isVisible())
                         g_levelVScreenFader[A].setupFader(3, 65, 0, ScreenFader::S_FADE);
-                    }
                     break;
 
                 case LevelDoor::TRANSIT_FADE:
@@ -6732,7 +6889,7 @@ void PlayerEffects(const int A)
                 p.Effect2 = 2970;
             }
 
-            if(numPlayers > 2 /*&& nPlay.Online == false*/)
+            if(g_ClonedPlayerMode)
             {
                 for(B = 1; B <= numPlayers; B++)
                 {
@@ -7380,7 +7537,7 @@ void AddPlayer(int Character)
     SizeCheck(Player[numPlayers]);
 
     // the rest only matters during level play
-    if(LevelSelect && (StartLevel.empty() || !NoMap))
+    if(LevelSelect)
         return;
 
     int alivePlayer = CheckLiving();
@@ -7457,7 +7614,7 @@ void DropPlayer(const int A)
     numPlayers --;
 
     // the rest only matters during level play
-    if(LevelSelect && (StartLevel.empty() || !NoMap))
+    if(LevelSelect)
         return;
 
     SetupScreens();

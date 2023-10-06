@@ -21,6 +21,8 @@
 #include <algorithm>
 #include <array>
 
+#include <Logger/logger.h>
+
 #include "../globals.h"
 #include "../npc.h"
 #include "../sound.h"
@@ -490,7 +492,7 @@ void UpdateNPCs()
                             NPC[numNPCs].TriggerTalk = NPC[A].TriggerTalk;
                             CheckSectionNPC(numNPCs);
                             if(NPC[numNPCs].TriggerActivate != EVENT_NONE)
-                                ProcEvent(NPC[numNPCs].TriggerActivate);
+                                ProcEvent(NPC[numNPCs].TriggerActivate, 0);
                             if(NPC[numNPCs].Type == NPCID_RANDOM_POWER)
                                 NPC[numNPCs].Type = RandomBonus();
                             syncLayers_NPC(numNPCs);
@@ -549,7 +551,7 @@ void UpdateNPCs()
                NPC[A].Type != NPCID_FALL_BLOCK_BROWN && !NPCIsACoin[NPC[A].Type]) // And .Type <> 47
             {
                 if(NPC[A].TriggerActivate != EVENT_NONE)
-                    ProcEvent(NPC[A].TriggerActivate);
+                    ProcEvent(NPC[A].TriggerActivate, NPC[A].JustActivated);
 
                 tempLocation = NPC[A].Location;
                 tempLocation.Y -= 32;
@@ -575,7 +577,7 @@ void UpdateNPCs()
                             if(B < A)
                             {
                                 if(NPC[B].TriggerActivate != EVENT_NONE)
-                                    ProcEvent(NPC[B].TriggerActivate);
+                                    ProcEvent(NPC[B].TriggerActivate, NPC[A].JustActivated);
                             }
 
                             NPCQueues::Active.insert(B);
@@ -625,7 +627,7 @@ void UpdateNPCs()
                                     if(B < A)
                                     {
                                         if(NPC[B].TriggerActivate != EVENT_NONE)
-                                            ProcEvent(NPC[B].TriggerActivate);
+                                            ProcEvent(NPC[B].TriggerActivate, NPC[A].JustActivated);
                                     }
 
                                     NPCQueues::Active.insert(B);
@@ -3507,10 +3509,10 @@ void UpdateNPCs()
                             {
                                 NPC[A].BeltSpeed = oldBeltSpeed - NPC[A].oldAddBelt;
                                 beltCount = 1;
-                                if(NPC[A].BeltSpeed >= 2.1)
-                                    NPC[A].BeltSpeed -= 0.1;
-                                else if(NPC[A].BeltSpeed <= -2.1)
-                                    NPC[A].BeltSpeed += 0.1;
+                                if(NPC[A].BeltSpeed >= 2.1f)
+                                    NPC[A].BeltSpeed -= 0.1f;
+                                else if(NPC[A].BeltSpeed <= -2.1f)
+                                    NPC[A].BeltSpeed += 0.1f;
                             }
                         }
 
@@ -5696,16 +5698,19 @@ void UpdateNPCs()
         return a > b;
     });
 
-    int last_NPC = numNPCs + 1;
-    for(int A : NPCQueues::Killed) // KILL THE NPCS <><><><><><><><><><><><><><><><><><><><><><><><><><><><><><
+    int last_NPC = maxNPCs + 1;
+    size_t KilledQueue_check = NPCQueues::Killed.size();
+    size_t KilledQueue_known = NPCQueues::Killed.size();
+
+    for(size_t i = 0; i < KilledQueue_check; i++) // KILL THE NPCS <><><><><><><><><><><><><><><><><><><><><><><><><><><><><><
     {
+        A = NPCQueues::Killed[i];
+
         // duplicated entry, no problem
         if(A == last_NPC)
             continue;
 
-        // something's wrong in the sort order
-        if(A > last_NPC)
-            break;
+        SDL_assert(A < last_NPC); // something's wrong in the sort order
 
         if(NPC[A].Killed > 0)
         {
@@ -5717,11 +5722,70 @@ void UpdateNPCs()
                 else
                     NPC[A].Location.SpeedX += 0.5;
             }
+
             KillNPC(A, NPC[A].Killed);
+
+            // KillNPC sometimes adds duplicate / unnecessary members to NPCQueues::Killed
+            bool real_new_killed = false;
+            if(NPCQueues::Killed.size() > KilledQueue_known)
+            {
+                for(size_t j = NPCQueues::Killed.size() - 1; j >= KilledQueue_known; j--)
+                {
+                    int K = NPCQueues::Killed[j];
+                    if(K != A && K >= 1 && K <= numNPCs)
+                    {
+                        real_new_killed = true;
+                        break;
+                    }
+                }
+
+                // ignore if no real new NPCs added
+                if(!real_new_killed)
+                    NPCQueues::Killed.resize(KilledQueue_known);
+                else
+                {
+                    pLogDebug("During KillNPC(%d), %d actual new killed NPC indexes added.", A, (int)(NPCQueues::Killed.size() - KilledQueue_known));
+                    KilledQueue_known = NPCQueues::Killed.size();
+                }
+            }
+
+            // rare cases exist where a real new NPC is killed (mostly events that hide layers)
+            // sort and check the ones smaller than A
+            if(real_new_killed)
+            {
+                size_t old_check = KilledQueue_check;
+
+                // partition to check all the ones < A this frame
+                auto first_bigger_it = std::partition(NPCQueues::Killed.begin() + KilledQueue_check, NPCQueues::Killed.end(),
+                [A](NPCRef_t a)
+                {
+                    return (int)a < A;
+                });
+
+                KilledQueue_check = first_bigger_it - NPCQueues::Killed.begin();
+
+                if(old_check != KilledQueue_check)
+                {
+                    pLogDebug("Found %d indexes lower than %d. Sorting to check this frame.", (int)(first_bigger_it - NPCQueues::Killed.begin()) - (int)old_check, A);
+
+                    // re-sort the range to check this frame
+                    std::sort(NPCQueues::Killed.begin() + i + 1, NPCQueues::Killed.begin() + KilledQueue_check,
+                    [](NPCRef_t a, NPCRef_t b)
+                    {
+                        return a > b;
+                    });
+                }
+            }
         }
     }
 
-    NPCQueues::Killed.clear();
+    if(NPCQueues::Killed.size() > KilledQueue_check)
+    {
+        NPCQueues::Killed.erase(NPCQueues::Killed.begin(), NPCQueues::Killed.begin() + KilledQueue_check);
+        pLogDebug("Checking %d newly killed NPC indexes next frame.", (int)NPCQueues::Killed.size());
+    }
+    else
+        NPCQueues::Killed.clear();
 
     //    if(nPlay.Online == true)
     //    {

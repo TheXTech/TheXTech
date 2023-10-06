@@ -22,15 +22,21 @@
 #define RASTER_FONT_H
 
 #include <string>
-#include <unordered_map>
+#ifdef LOW_MEM
+#   include <map>
+#else
+#   include <unordered_map>
+#endif
 #include <Utils/vptrlist.h>
 #include "std_picture.h"
-#include <Graphics/rect.h>
 #include <Graphics/size.h>
 
 #include "font_engine_base.h"
 
-class RasterFont : public BaseFontEngine
+/**
+ * @brief The raster fonts engine
+ */
+class RasterFont final : public BaseFontEngine
 {
 public:
     RasterFont();
@@ -122,17 +128,24 @@ private:
     //! Handalable name of the font
     std::string m_fontName;
 
+    /**
+     * @brief Raster font glyph
+     */
     struct RasChar
     {
-        bool valid = false;
-        StdPicture* tx     = nullptr;
-        uint32_t padding_left    = 0;  //!< Crop left
-        uint32_t padding_right   = 0; //!< Crop right
-        int32_t x = 0;//!< X pixel offset
-        int32_t y = 0;//!< Y pixel offset
+        bool        valid = false; //!< Is a valid glyph
+        StdPicture* tx     = nullptr; //!< Pointer to the texture that contains this glyph
+        uint8_t     padding_left    = 0; //!< Crop left
+        uint8_t     padding_right   = 0; //!< Crop right
+        int16_t     x = 0; //!< X pixel offset
+        int16_t     y = 0; //!< Y pixel offset
     };
 
+#ifdef LOW_MEM
+    typedef std::map<char32_t, RasChar > CharMap;
+#else
     typedef std::unordered_map<char32_t, RasChar > CharMap;
+#endif
 
     //! Table of available characters
     CharMap m_charMap;

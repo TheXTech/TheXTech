@@ -41,11 +41,28 @@ struct DeathCounter
     void UpdateDeaths(bool write_save);
     void AddDeath(const std::string &, int amount);
     void TrySave();
-    void Draw() const;
+    void Draw(int screenZ);
     void Recount();
     void ClearRecords();
 
     void PrintDebug() const;
+
+    struct CachedPrint
+    {
+        // Cache meta-data for counter
+        void syncCache(int curLevel, int total);
+        int counterLevel = -1;
+        int counterTotal = -1;
+        int counterPixLen = 0;
+        int font = -1;
+        std::string counterOut;
+
+        // Cache meta-data for title
+        void syncCache(const std::string &title);
+        int titlePixLen = 0;
+        intptr_t titlePointer = 0;
+        size_t titleSize = std::string::npos;
+    } m_print;
 
 private:
     friend struct DeathRecord;
@@ -57,11 +74,11 @@ private:
 
     // Members
 public:
-    bool mStatFileOK;
-    bool mEnabled;
+    bool mStatFileOK = false;
+    bool mEnabled = false;
 
-    int mCurTotalDeaths;
-    int mCurLevelDeaths;
+    int mCurTotalDeaths = 0;
+    int mCurLevelDeaths = 0;
 
     std::list<DeathRecord> mDeathRecords;
 

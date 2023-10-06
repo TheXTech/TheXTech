@@ -23,6 +23,7 @@
 #define SOUND_H
 
 #include <string>
+#include <cstdint>
 
 // Public musicPlaying As Boolean
 extern bool musicPlaying;

@@ -25,6 +25,9 @@
 
 namespace AppPathP
 {
+//! If this flag set to TRUE, the legacy debug assets root will be completely ignored
+extern bool ignoreLegacyDebugDir;
+
 /*!
  * \brief Initialize all default internals
  */
@@ -47,6 +50,18 @@ extern std::string userDirectory();
  * \return Path to the assets root directory
  */
 extern std::string assetsRoot();
+
+/*!
+ * \brief Get the default path to the writable settings directory (if empty, store at the usre directory)
+ * \return Path to the system-wide settings directory
+ */
+extern std::string settingsRoot();
+
+/*!
+ * \brief Get the default path to the writable gamesaves directory (if empty, store at the usre directory)
+ * \return Path to the system-wide gamesaves directory
+ */
+extern std::string gamesavesRoot();
 
 /*!
  * \brief Default directory for screenshots (if empty, store at the user directory)

@@ -71,6 +71,7 @@ static PauseType s_pause_type = PauseType::Modern;
 static int s_pause_plr = 0;
 static int s_longest_width = 0;
 static std::vector<MenuItem> s_items;
+static int s_cheat_menu_bits = 0;
 
 static bool s_Continue()
 {
@@ -111,6 +112,13 @@ static bool s_ResetCheckpoints()
 
 static bool s_DropAddScreen()
 {
+    // don't allow Drop / Add screen in clone mode
+    if(g_ClonedPlayerMode || SingleCoop)
+    {
+        PlaySoundMenu(SFX_BlockHit);
+        return false;
+    }
+
     if(PauseGame(PauseCode::DropAdd, 0) == 1)
         return true;
 
@@ -174,6 +182,7 @@ static bool s_Quit()
     else
         speedRun_saveStats();
 
+    s_cheat_menu_bits = 0;
     GameMenu = true;
 
     MenuMode = MENU_MAIN;
@@ -210,6 +219,8 @@ void Init(int plr, bool LegacyPause)
         s_pause_type = PauseType::Modern;
 
     s_pause_plr = plr;
+    if(s_cheat_menu_bits < 14)
+        s_cheat_menu_bits = 0;
 
     // do a context-aware initialization of s_items
     s_items.clear();
@@ -236,7 +247,7 @@ void Init(int plr, bool LegacyPause)
         if(g_compatibility.allow_drop_add)
             s_items.push_back(MenuItem{g_gameStrings.pauseItemDropAddPlayers, s_DropAddScreen});
 
-        if(!inter_screen && g_config.enter_cheats_menu_item)
+        if(!inter_screen && s_cheat_menu_bits == 14)
             s_items.push_back(MenuItem{g_gameStrings.pauseItemEnterCode, s_CheatScreen});
 
         s_items.push_back(MenuItem{editor_test ? g_gameStrings.pauseItemReturnToEditor : g_gameStrings.pauseItemQuitTesting, s_QuitTesting});
@@ -249,7 +260,7 @@ void Init(int plr, bool LegacyPause)
         if(g_compatibility.allow_drop_add && s_pause_type != PauseType::Legacy)
             s_items.push_back(MenuItem{g_gameStrings.pauseItemDropAddPlayers, s_DropAddScreen});
 
-        if(g_config.enter_cheats_menu_item && s_pause_type != PauseType::Legacy)
+        if(s_cheat_menu_bits == 14 && s_pause_type != PauseType::Legacy)
             s_items.push_back(MenuItem{g_gameStrings.pauseItemEnterCode, s_CheatScreen});
 
         if(CanSave)
@@ -275,7 +286,7 @@ void Init(int plr, bool LegacyPause)
             s_longest_width = item_width;
     }
 
-    int total_menu_height = s_items.size() * 36 - 18;
+    int total_menu_height = (int)s_items.size() * 36 - 18;
     int total_menu_width = s_longest_width + 40;
 
     // GBA bounds
@@ -287,7 +298,7 @@ void Render()
 {
     // height includes intermediate padding but no top/bottom padding
     // width includes cursor on left and 20px padding on right for symmetry
-    int total_menu_height = s_items.size() * 36 - 18;
+    int total_menu_height = (int)s_items.size() * 36 - 18;
     int total_menu_width = s_longest_width + 40;
 
     // enforce GBA bounds (480x320)
@@ -361,15 +372,13 @@ bool Logic(int plr)
 {
     bool upPressed = SharedControls.MenuUp;
     bool downPressed = SharedControls.MenuDown;
+    bool leftPressed = SharedControls.MenuLeft;
+    bool rightPressed = SharedControls.MenuRight;
 
     bool menuDoPress = SharedControls.MenuDo || SharedControls.Pause;
     bool menuBackPress = SharedControls.MenuBack;
 
-    if(SingleCoop > 0 || numPlayers > 2)
-    {
-        for(int A = 1; A <= numPlayers; A++)
-            Player[A].Controls = Player[1].Controls;
-    }
+    // there was previously code to copy all players' controls from the main player, but this is no longer necessary (and actively harmful in the SingleCoop case)
 
     if(!g_compatibility.multiplayer_pause_controls && plr == 0)
         plr = 1;
@@ -385,6 +394,8 @@ bool Logic(int plr)
 
             upPressed |= c.Up;
             downPressed |= c.Down;
+            leftPressed |= c.Left;
+            rightPressed |= c.Right;
         }
     }
     else
@@ -396,7 +407,8 @@ bool Logic(int plr)
 
         upPressed |= c.Up;
         downPressed |= c.Down;
-
+        leftPressed |= c.Left;
+        rightPressed |= c.Right;
     }
 
     if(menuBackPress && menuDoPress)
@@ -404,13 +416,16 @@ bool Logic(int plr)
 
     if(!MenuCursorCanMove)
     {
-        if(!menuDoPress && !menuBackPress && !upPressed && !downPressed)
+        if(!menuDoPress && !menuBackPress && !upPressed && !downPressed && (s_pause_type == PauseType::Legacy || (!leftPressed && !rightPressed)))
             MenuCursorCanMove = true;
 
         return false;
     }
 
-    int max_item = s_items.size() - 1;
+    if(s_pause_type == PauseType::Legacy && s_cheat_menu_bits < 14)
+        s_cheat_menu_bits = 0;
+
+    int max_item = (int)s_items.size() - 1;
 
     if(menuBackPress)
     {
@@ -419,20 +434,71 @@ bool Logic(int plr)
 
         MenuCursor = max_item;
         MenuCursorCanMove = false;
-    }
 
-    if(upPressed)
+        if(s_cheat_menu_bits < 14)
+            s_cheat_menu_bits = 0;
+    }
+    else if(upPressed)
     {
         PlaySound(SFX_Slide);
         MenuCursor = MenuCursor - 1;
         MenuCursorCanMove = false;
+
+        if(s_cheat_menu_bits < 14)
+            s_cheat_menu_bits = 0;
     }
     else if(downPressed)
     {
         PlaySound(SFX_Slide);
         MenuCursor = MenuCursor + 1;
         MenuCursorCanMove = false;
+
+        if(s_cheat_menu_bits < 14)
+            s_cheat_menu_bits = 0;
     }
+    else if(leftPressed && s_pause_type != PauseType::Legacy)
+    {
+        if(s_cheat_menu_bits == 0 || s_cheat_menu_bits == 2 || s_cheat_menu_bits == 5 || s_cheat_menu_bits == 9)
+        {
+            s_cheat_menu_bits++;
+            MenuCursorCanMove = false;
+
+            // don't swap char
+            if(s_cheat_menu_bits >= 5)
+            {
+                PlaySound(SFX_Do);
+                return false;
+            }
+        }
+        else if(s_cheat_menu_bits < 14)
+            s_cheat_menu_bits = 1;
+    }
+    else if(rightPressed && s_pause_type != PauseType::Legacy)
+    {
+        if(s_cheat_menu_bits != 0 && s_cheat_menu_bits != 2 && s_cheat_menu_bits != 5 && s_cheat_menu_bits != 9 && s_cheat_menu_bits < 14)
+        {
+            s_cheat_menu_bits++;
+            MenuCursorCanMove = false;
+
+            // do cheat screen
+            if(s_cheat_menu_bits == 14)
+            {
+                PlaySound(SFX_MedalGet);
+                return s_CheatScreen();
+            }
+
+            // don't swap char
+            if(s_cheat_menu_bits >= 5)
+            {
+                PlaySound(SFX_Do);
+                return false;
+            }
+        }
+        else if(s_cheat_menu_bits < 14)
+            s_cheat_menu_bits = 0;
+    }
+    else if(menuDoPress && s_cheat_menu_bits < 14)
+        s_cheat_menu_bits = 0;
 
     if(MenuCursor < 0)
         MenuCursor = max_item;

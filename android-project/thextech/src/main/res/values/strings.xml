@@ -29,6 +29,7 @@
     <string name="setup_feedback">Feedback</string>
     <string name="touchscreen_vibration_test_label">Test feedback</string>
     <string name="setup_show_battery_status_label">Device battery status</string>
+    <string name="setup_renderer_label">Render system</string>
     <string name="setup_show_controller_state_label">Show a game controller state</string>
     <string name="cheat_dialog_cancel">Cancel</string>
     <string name="cheat_dialog_ok">Run</string>
@@ -39,4 +40,5 @@
     <string name="launcher_gameselect_toast_listclean">The list of games has been clean.</string>
     <string name="launcher_gameselect_clearlist_title">Clear the games list</string>
     <string name="launcher_gameselect_clearlist_question">Do you really want to clear the list of games?</string>
+    <string name="launcher_openfile_indirectly">Can\'t retrieve a direct absolute path for the opened file, and therefore, it was coped into the internal storage of the game. Extra resources (such as custom graphics, music, configs, scripts, etc.) can\'t be loaded. Do you want to start the game in any way\?</string>
 </resources>

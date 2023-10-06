@@ -402,8 +402,7 @@ void UpdateEditor()
                         {
                             PlaySound(SFX_Grab);
                             EditorCursor.Location = PlayerStart[A];
-                            PlayerStart[A].X = 0;
-                            PlayerStart[A].Y = 0;
+                            PlayerStart[A] = PlayerStart_t();
                             optCursor.current = OptCursor_t::LVL_SETTINGS;
 //                            frmLevelSettings::optLevel(3 + A).Value = true;
                             EditorCursor.Mode = OptCursor_t::LVL_SETTINGS;
@@ -1813,7 +1812,7 @@ void UpdateEditor()
 
                 if(CanPlace)
                 {
-                    EditorCursor.WorldMusic.Location = static_cast<SpeedlessLocation_t>(EditorCursor.Location);
+                    EditorCursor.WorldMusic.Location = static_cast<TinyLocation_t>(EditorCursor.Location);
                     numWorldMusic++;
                     WorldMusic[numWorldMusic] = EditorCursor.WorldMusic;
                     // de-duplicate music file
@@ -2583,7 +2582,7 @@ void SetCursor()
             EditorCursor.Tile.Type = 1;
         EditorCursor.Location.Width = TileWidth[EditorCursor.Tile.Type];
         EditorCursor.Location.Height = TileHeight[EditorCursor.Tile.Type];
-        EditorCursor.Tile.Location = static_cast<SpeedlessLocation_t>(EditorCursor.Location);
+        EditorCursor.Tile.Location = static_cast<TinyLocation_t>(EditorCursor.Location);
     }
     else if(EditorCursor.Mode == 8) // Scene
     {
@@ -2602,7 +2601,7 @@ void SetCursor()
             EditorCursor.Scene.Type = 1;
         EditorCursor.Location.Width = SceneWidth[EditorCursor.Scene.Type];
         EditorCursor.Location.Height = SceneHeight[EditorCursor.Scene.Type];
-        EditorCursor.Scene.Location = static_cast<SpeedlessLocation_t>(EditorCursor.Location);
+        EditorCursor.Scene.Location = static_cast<TinyLocation_t>(EditorCursor.Location);
     }
     else if(EditorCursor.Mode == 9) // Levels
     {
@@ -2619,7 +2618,7 @@ void SetCursor()
             EditorCursor.WorldLevel.Type = 1;
         EditorCursor.Location.Width = 32;
         EditorCursor.Location.Height = 32;
-        EditorCursor.WorldLevel.Location = static_cast<SpeedlessLocation_t>(EditorCursor.Location);
+        EditorCursor.WorldLevel.Location = static_cast<TinyLocation_t>(EditorCursor.Location);
 //        EditorCursor.WorldLevel.FileName = frmLevels::txtFilename.Text;
 //        if(EditorCursor.WorldLevel::FileName != "" && EditorCursor.WorldLevel::FileName.substr(EditorCursor.WorldLevel::FileName.Length - 4) != StringHelper::toLower(".lvl"))
 //            EditorCursor.WorldLevel.FileName = EditorCursor.WorldLevel::FileName + ".lvl";
@@ -2669,13 +2668,13 @@ void SetCursor()
             EditorCursor.WorldPath.Type = 1;
         EditorCursor.Location.Width = 32;
         EditorCursor.Location.Height = 32;
-        EditorCursor.WorldPath.Location = static_cast<SpeedlessLocation_t>(EditorCursor.Location);
+        EditorCursor.WorldPath.Location = static_cast<TinyLocation_t>(EditorCursor.Location);
     }
     else if(EditorCursor.Mode == OptCursor_t::WLD_MUSIC) // World Music
     {
         EditorCursor.Location.Height = 32;
         EditorCursor.Location.Width = 32;
-        EditorCursor.WorldMusic.Location = static_cast<SpeedlessLocation_t>(EditorCursor.Location);
+        EditorCursor.WorldMusic.Location = static_cast<TinyLocation_t>(EditorCursor.Location);
         // make it play the music
         if(g_isWorldMusicNotSame(EditorCursor.WorldMusic))
             g_playWorldMusic(EditorCursor.WorldMusic);
@@ -2861,7 +2860,7 @@ void zTestLevel(bool magicHand, bool interProcess)
 
     if(Checkpoint.empty()) // Don't reset players when resume at the checkpoint
     {
-        if(numPlayers > 2 /* ||nPlay.Online == true*/)
+        if(g_ClonedPlayerMode)
         {
             for(A = 1; A <= numPlayers; A++)
             {
@@ -2893,6 +2892,8 @@ void zTestLevel(bool magicHand, bool interProcess)
                 Player[A].UnStart = false;
             }
         }
+
+        StartWarp = testStartWarp;
     }
 
     LevelEditor = false;
@@ -2922,7 +2923,6 @@ void zTestLevel(bool magicHand, bool interProcess)
         QuickReconnectScreen::g_active = true;
         PauseGame(PauseCode::PauseScreen);
         LevelBeatCode = 0;
-        QuickReconnectScreen::Deactivate();
     }
 
 #ifdef THEXTECH_INTERPROC_SUPPORTED
@@ -3004,7 +3004,6 @@ void zTestLevel(bool magicHand, bool interProcess)
     EndLevel = false;
     editorScreen.active = false;
     ReturnWarp = 0;
-    StartWarp = testStartWarp;
 
     optCursor.current = OptCursor_t::LVL_SELECT;
     EditorCursor.Mode = OptCursor_t::LVL_SELECT;

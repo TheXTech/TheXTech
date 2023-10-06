@@ -35,6 +35,7 @@
 #include "ini_processing.h"
 #include <cstdio>
 #include <cctype>
+#include <cstdint>
 #include <cstring>
 #include <cstdlib>
 #include <clocale>
@@ -88,22 +89,49 @@ static const unsigned char charTraits[256] =
 #define IS_SPECIAL(c) (charTraits[static_cast<unsigned char>(c)] & Special)
 #define IS_INIEQUAL(c) (charTraits[static_cast<unsigned char>(c)] & INIParamEq)
 #else
-inline unsigned char IS_SPACE(char &c)
+static inline unsigned char IS_SPACE(char &c)
 {
     return (charTraits[static_cast<unsigned char>(c)] & Space);
 }
-inline unsigned char IS_SPECIAL(char &c)
+static inline unsigned char IS_SPECIAL(char &c)
 {
     return (charTraits[static_cast<unsigned char>(c)] & Special);
 }
-inline unsigned char IS_INIEQUAL(char &c)
+static inline unsigned char IS_INIEQUAL(char &c)
 {
     return (charTraits[static_cast<unsigned char>(c)] & INIParamEq);
 }
 #endif
 
+static const unsigned char charDigit[256] =
+{
+//  0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // 0
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // 1
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // 2
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, // 3
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // 4
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // 5
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // 6
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // 7
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // 8
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // 9
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // A
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // B
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // C
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // D
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // E
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0  // F
+};
+
+static inline bool isDigit(char c)
+{
+    return static_cast<bool>(charDigit[static_cast<unsigned char>(c)]);
+}
+
+
 /* Strip whitespace chars off end of given string, in place. Return s. */
-inline char *rstrip(char *s)
+static inline char *rstrip(char *s)
 {
     char *p = s + strlen(s);
 
@@ -114,7 +142,7 @@ inline char *rstrip(char *s)
 }
 
 /* Return pointer to first non-whitespace char in given string. */
-inline char *lskip(char *s)
+static inline char *lskip(char *s)
 {
     while(*s && IS_SPACE(*s))
         s++;
@@ -122,7 +150,7 @@ inline char *lskip(char *s)
     return reinterpret_cast<char *>(s);
 }
 
-inline char *lrtrim(char *s)
+static inline char *lrtrim(char *s)
 {
     while(*s && IS_SPACE(*s))
         s++;
@@ -138,7 +166,7 @@ inline char *lrtrim(char *s)
 /* Return pointer to first char c or ';' comment in given string, or pointer to
    null at end of string if neither found. ';' must be prefixed by a whitespace
    character to register as a comment. */
-inline char *find_char_or_comment(char *s, char c)
+static inline char *find_char_or_comment(char *s, char c)
 {
     unsigned char was_whitespace = 0;
 
@@ -151,7 +179,7 @@ inline char *find_char_or_comment(char *s, char c)
     return s;
 }
 
-inline char *find_inieq_or_comment(char *s)
+static inline char *find_inieq_or_comment(char *s)
 {
     unsigned char was_whitespace = 0;
 
@@ -164,7 +192,7 @@ inline char *find_inieq_or_comment(char *s)
     return s;
 }
 
-inline char *removeQuotes(char *begin, char *end)
+static inline char *removeQuotes(char *begin, char *end)
 {
     if((*begin == '\0') || (begin == end))
         return begin;
@@ -180,7 +208,7 @@ inline char *removeQuotes(char *begin, char *end)
     return begin;
 }
 
-inline char *unescapeString(char* str)
+static inline char *unescapeString(char* str)
 {
     char *src, *dst;
     src = str;
@@ -210,7 +238,7 @@ inline char *unescapeString(char* str)
 }
 
 //Remove comment line from a tail of value
-inline void skipcomment(char *value)
+static inline void skipcomment(char *value)
 {
     unsigned char quoteDepth = 0;
 
@@ -240,7 +268,7 @@ inline void skipcomment(char *value)
     }
 }
 
-inline bool memfgets(char *&line, const char *data, char *&pos, const char *end)
+static inline bool memfgets(char *&line, const char *data, char *&pos, const char *end)
 {
     line = pos;
 
@@ -266,6 +294,14 @@ inline bool memfgets(char *&line, const char *data, char *&pos, const char *end)
 }
 
 /* See documentation in header file. */
+std::string IniProcessing::to_string_with_precision_private(const double a_value)
+{
+    char buf[35] = "";
+    std::memset(buf, 0, 35);
+    std::snprintf(buf, 34, "%.15g", a_value);
+    return buf;
+}
+
 bool IniProcessing::parseHelper(char *data, size_t size)
 {
     char *section = nullptr;
@@ -290,7 +326,7 @@ bool IniProcessing::parseHelper(char *data, size_t size)
         lineno++;
         start = line;
 
-        if((lineno == 1) && (size >= 3) && (memcmp(start, utfbom, 3) == 0))
+        if((lineno == 1) && (size >= 3) && (std::memcmp(start, utfbom, 3) == 0))
             start += 3;
 
         start = lrtrim(start);
@@ -386,11 +422,43 @@ bool IniProcessing::parseHelper(char *data, size_t size)
     return (error == 0);
 }
 
+#ifdef _WIN32
+static std::string s_wstr_to_str(const std::wstring &in)
+{
+    std::string out;
+    out.resize(in.size() * 4);
+    int newSize = WideCharToMultiByte(CP_UTF8,
+                                      0,
+                                      &in[0],
+                                      (int)in.size(),
+                                      &out[0],
+                                      (int)out.size(),
+                                      0, 0);
+    out.resize(newSize);
+    return out;
+}
+
+static std::wstring s_str_to_wstr(const std::string &in)
+{
+    std::wstring out;
+    out.resize(in.size());
+    int newlen = MultiByteToWideChar(CP_UTF8,
+                                     0,
+                                     in.c_str(),
+                                     (int)in.size(),
+                                     &out[0],
+                                     (int)in.size());
+    out.resize(newlen);
+    return out;
+}
+#endif
+
 /* See documentation in header file. */
 bool IniProcessing::parseFile(const char *filename)
 {
     bool valid = true;
     char *tmp = nullptr;
+
 #ifdef USE_FILE_MAPPER
     //By mystical reasons, reading whole file form fread() is faster than mapper :-P
     PGE_FileMapper file(filename);
@@ -415,15 +483,7 @@ bool IniProcessing::parseFile(const char *filename)
 #else
 #   ifdef _WIN32
     //Convert UTF8 file path into UTF16 to support non-ASCII paths on Windows
-    std::wstring dest;
-    dest.resize(std::strlen(filename));
-    int newSize = MultiByteToWideChar(CP_UTF8,
-                                      0,
-                                      filename,
-                                      (int)dest.size(),
-                                      (wchar_t *)dest.c_str(),
-                                      (int)dest.size());
-    dest.resize(newSize);
+    std::wstring dest = s_str_to_wstr(filename);
     FILE *cFile = _wfopen(dest.c_str(), L"rb");
 #   else
     FILE *cFile = fopen(filename, "rb");
@@ -443,8 +503,9 @@ bool IniProcessing::parseFile(const char *filename)
         fclose(cFile);
         return false;
     }
+
     fseek(cFile, 0, SEEK_SET);
-    tmp = reinterpret_cast<char *>(malloc(static_cast<size_t>(size + 1)));
+    tmp = reinterpret_cast<char *>(malloc(static_cast<size_t>(size + 2)));
     if(!tmp)
     {
         fclose(cFile);
@@ -456,9 +517,23 @@ bool IniProcessing::parseFile(const char *filename)
         valid = false;
 
     fclose(cFile);
+
     if(valid)
     {
-        *(tmp + size) = '\0';//null terminate last line
+        *(tmp + size) = '\0'; // null terminate last line
+#ifdef _WIN32
+        if(size > 2 && static_cast<uint8_t>(tmp[0]) == 0xFF && static_cast<uint8_t>(tmp[1]) == 0xFE) // is UTF16
+        {
+            *(tmp + size + 1) = '\0';
+            // Convert entire stuff into UTF-8
+            std::string tmp8 = s_wstr_to_str(std::wstring((wchar_t*)(tmp + 2), (size - 2) / 2));
+            std::memcpy(tmp, tmp8.c_str(), tmp8.size());
+            size = tmp8.size();
+            *(tmp + size) = '\0';//null terminate last line
+            m_params.is_utf16 = true;
+        }
+#endif
+
         try
         {
             valid = parseHelper(tmp, static_cast<size_t>(size));
@@ -479,7 +554,7 @@ bool IniProcessing::parseMemory(char *mem, size_t size)
 {
     bool valid = true;
     char *tmp = nullptr;
-    tmp = reinterpret_cast<char *>(malloc(size + 1));
+    tmp = reinterpret_cast<char *>(malloc(size + 2));
 
     if(!tmp)
     {
@@ -489,41 +564,121 @@ bool IniProcessing::parseMemory(char *mem, size_t size)
 
     memcpy(tmp, mem, static_cast<size_t>(size));
     *(tmp + size) = '\0';//null terminate last line
+#ifdef _WIN32
+    if(size > 2 && static_cast<uint8_t>(tmp[0]) == 0xFF && static_cast<uint8_t>(tmp[1]) == 0xFE) // is UTF16
+    {
+        *(tmp + size + 1) = '\0';
+        // Convert entire stuff into UTF-8
+        std::string tmp8 = s_wstr_to_str(std::wstring((wchar_t*)(tmp + 2), (size - 2) / 2));
+        std::memcpy(tmp, tmp8.c_str(), tmp8.size());
+        size = tmp8.size();
+        *(tmp + size) = '\0';//null terminate last line
+        m_params.is_utf16 = true;
+    }
+#endif
+
     valid = parseHelper(tmp, size);
     free(tmp);
     return valid;
 }
 
 
+IniProcessing::params::IniKeys::iterator IniProcessing_readHelper(IniProcessing *self, const char *key, bool &ok)
+{
+    IniProcessing::params &m_params = self->m_params;
+
+    if(!m_params.opened)
+        return IniProcessing::params::IniKeys::iterator();
+
+    if(!m_params.currentGroup)
+        return IniProcessing::params::IniKeys::iterator();
+
+#ifndef CASE_SENSITIVE_KEYS
+    std::string key1(key);
+    for(char *iter = &key1[0]; *iter != '\0'; ++iter)
+        *iter = (char)tolower(*iter);
+#else
+    auto &key1 = key;
+#endif
+
+    IniProcessing::params::IniKeys::iterator e = m_params.currentGroup->find(key1);
+
+    if(e != m_params.currentGroup->end())
+        ok = true;
+
+    return e;
+}
+
+
+
 IniProcessing::IniProcessing() :
-    m_params{"", false, -1, ERR_OK, false, params::IniSections(), nullptr, ""}
+    m_params
+    {
+        "", false, -1, ERR_OK, false, params::IniSections(), nullptr, ""
+#ifdef _WIN32
+        , false
+#endif
+    }
 {}
 
 IniProcessing::IniProcessing(const char *iniFileName, int) :
-    m_params{iniFileName, false, -1, ERR_OK, false, params::IniSections(), nullptr, ""}
+    m_params
+    {
+        iniFileName, false, -1, ERR_OK, false, params::IniSections(), nullptr, ""
+#ifdef _WIN32
+        , false
+#endif
+    }
 {
     open(iniFileName);
 }
 
 IniProcessing::IniProcessing(const std::string &iniFileName, int) :
-    m_params{iniFileName, false, -1, ERR_OK, false, params::IniSections(), nullptr, ""}
+    m_params
+    {
+        iniFileName, false, -1, ERR_OK, false, params::IniSections(), nullptr, ""
+#ifdef _WIN32
+        , false
+#endif
+    }
 {
     open(iniFileName);
 }
 
+#ifdef _WIN32
+IniProcessing::IniProcessing(const std::wstring &iniFileName, int) :
+    m_params{"", false, -1, ERR_OK, false, params::IniSections(), nullptr, "", true}
+{
+    std::string iniFileNameU8 = s_wstr_to_str(iniFileName);
+    open(iniFileNameU8);
+}
+#endif
+
+IniProcessing::IniProcessing(char *memory, size_t size) :
+    m_params
+    {
+        "", false, -1, ERR_OK, false, params::IniSections(), nullptr, ""
+#ifdef _WIN32
+        , false
+#endif
+    }
+{
+    openMem(memory, size);
+}
+
 #ifdef INI_PROCESSING_ALLOW_QT_TYPES
 IniProcessing::IniProcessing(const QString &iniFileName, int) :
-    m_params{iniFileName.toStdString(), false, -1, ERR_OK, false, params::IniSections(), nullptr, ""}
+    m_params
+    {
+        iniFileName.toStdString(), false, -1, ERR_OK, false, params::IniSections(), nullptr, ""
+#ifdef _WIN32
+        , false
+#endif
+    }
 {
     open(m_params.filePath);
 }
 #endif
-
-IniProcessing::IniProcessing(char *memory, size_t size):
-    m_params{"", false, -1, ERR_OK, false, params::IniSections(), nullptr, ""}
-{
-    openMem(memory, size);
-}
 
 IniProcessing::IniProcessing(const IniProcessing &ip) :
     m_params(ip.m_params)
@@ -531,7 +686,10 @@ IniProcessing::IniProcessing(const IniProcessing &ip) :
 
 bool IniProcessing::open(const std::string &iniFileName)
 {
-    std::setlocale(LC_NUMERIC, "C");
+    std::string prevLocale;
+    char *prevLocaleC = std::setlocale(LC_NUMERIC, "C");
+    if(prevLocaleC)
+        prevLocale.assign(prevLocaleC);
 
     if(!iniFileName.empty())
     {
@@ -539,25 +697,40 @@ bool IniProcessing::open(const std::string &iniFileName)
         m_params.errorCode = ERR_OK;
         m_params.filePath  = iniFileName;
         bool res = parseFile(m_params.filePath.c_str());
-        #ifdef INIDEBUG
 
+#ifdef INIDEBUG
         if(res)
             printf("\n==========WOOHOO!!!==============\n\n");
         else
             printf("\n==========OOOUCH!!!==============\n\n");
+#endif
 
-        #endif
         m_params.opened = res;
+        if(!prevLocale.empty())
+            std::setlocale(LC_NUMERIC, prevLocale.c_str());
         return res;
     }
 
+    if(!prevLocale.empty())
+        std::setlocale(LC_NUMERIC, prevLocale.c_str());
     m_params.errorCode = ERR_NOFILE;
     return false;
 }
 
+#ifdef _WIN32
+bool IniProcessing::open(const std::wstring &iniFileName)
+{
+    std::string iniFileName8 = s_wstr_to_str(iniFileName);
+    return open(iniFileName8);
+}
+#endif
+
 bool IniProcessing::openMem(char *memory, size_t size)
 {
-    std::setlocale(LC_NUMERIC, "C");
+    std::string prevLocale;
+    char *prevLocaleC = std::setlocale(LC_NUMERIC, "C");
+    if(prevLocaleC)
+        prevLocale.assign(prevLocaleC);
 
     if((memory != nullptr) && (size > 0))
     {
@@ -566,10 +739,16 @@ bool IniProcessing::openMem(char *memory, size_t size)
         m_params.filePath.clear();
         bool res = parseMemory(memory, size);
         m_params.opened = res;
+        if(!prevLocale.empty())
+            std::setlocale(LC_NUMERIC, prevLocale.c_str());
         return res;
     }
 
+    if(!prevLocale.empty())
+        std::setlocale(LC_NUMERIC, prevLocale.c_str());
+
     m_params.errorCode = ERR_NOFILE;
+
     return false;
 }
 
@@ -620,6 +799,20 @@ bool IniProcessing::contains(const std::string &groupName)
     return (e != m_params.iniData.end());
 }
 
+#ifdef _WIN32
+bool IniProcessing::beginGroup(const std::wstring &groupName)
+{
+    std::string groupName8 = s_wstr_to_str(groupName);
+    return beginGroup(groupName8);
+}
+
+bool IniProcessing::contains(const std::wstring &groupName)
+{
+    std::string groupName8 = s_wstr_to_str(groupName);
+    return contains(groupName8);
+}
+#endif
+
 std::string IniProcessing::fileName() const
 {
     return m_params.filePath;
@@ -630,16 +823,36 @@ std::string IniProcessing::group() const
     return m_params.currentGroupName;
 }
 
+#ifdef _WIN32
+std::wstring IniProcessing::wgroup() const
+{
+    return s_str_to_wstr(m_params.currentGroupName);
+}
+#endif
+
 std::vector<std::string> IniProcessing::childGroups()
 {
     std::vector<std::string> groups;
     groups.reserve(m_params.iniData.size());
+
     for(auto & e : m_params.iniData)
-    {
         groups.push_back(e.first);
-    }
+
     return groups;
 }
+
+#ifdef _WIN32
+std::vector<std::wstring> IniProcessing::wchildGroups()
+{
+    std::vector<std::wstring> groups;
+    groups.reserve(m_params.iniData.size());
+
+    for(auto & e : m_params.iniData)
+        groups.push_back(s_str_to_wstr(e.first));
+
+    return groups;
+}
+#endif
 
 bool IniProcessing::hasKey(const std::string &keyName) const
 {
@@ -660,6 +873,13 @@ bool IniProcessing::hasKey(const std::string &keyName) const
     auto e = m_params.currentGroup->find(keyName1);
     return (e != m_params.currentGroup->end());
 }
+
+#ifdef _WIN32
+bool IniProcessing::hasKey(const std::wstring &keyName) const
+{
+    return hasKey(s_wstr_to_str(keyName));
+}
+#endif
 
 bool IniProcessing::renameKey(const std::string &oldName, const std::string &newName)
 {
@@ -699,6 +919,13 @@ bool IniProcessing::renameKey(const std::string &oldName, const std::string &new
     return false;
 }
 
+#ifdef _WIN32
+bool IniProcessing::renameKey(const std::wstring &oldName, const std::wstring &newName)
+{
+    return renameKey(s_wstr_to_str(oldName), s_wstr_to_str(newName));
+}
+#endif
+
 bool IniProcessing::deleteKey(const std::string &keyName)
 {
     if(!m_params.opened)
@@ -728,6 +955,13 @@ bool IniProcessing::deleteKey(const std::string &keyName)
     return false;
 }
 
+#ifdef _WIN32
+bool IniProcessing::deleteKey(const std::wstring &keyName)
+{
+    return deleteKey(s_wstr_to_str(keyName));
+}
+#endif
+
 std::vector<std::string> IniProcessing::allKeys() const
 {
     std::vector<std::string> keys;
@@ -739,12 +973,28 @@ std::vector<std::string> IniProcessing::allKeys() const
     keys.reserve(m_params.currentGroup->size());
 
     for(auto &it : *m_params.currentGroup)
-    {
         keys.push_back( it.first );
-    }
 
     return keys;
 }
+
+#ifdef _WIN32
+std::vector<std::wstring> IniProcessing::wallKeys() const
+{
+    std::vector<std::wstring> keys;
+    if(!m_params.opened)
+        return keys;
+    if(!m_params.currentGroup)
+        return keys;
+
+    keys.reserve(m_params.currentGroup->size());
+
+    for(auto &it : *m_params.currentGroup)
+        keys.push_back(s_str_to_wstr(it.first));
+
+    return keys;
+}
+#endif
 
 void IniProcessing::endGroup()
 {
@@ -755,7 +1005,7 @@ void IniProcessing::endGroup()
 void IniProcessing::read(const char *key, bool &dest, bool defVal)
 {
     bool ok = false;
-    params::IniKeys::iterator e = readHelper(key, ok);
+    params::IniKeys::iterator e = IniProcessing_readHelper(this, key, ok);
 
     if(!ok)
     {
@@ -788,10 +1038,10 @@ void IniProcessing::read(const char *key, bool &dest, bool defVal)
         }
 
         bool isNum = true;
-        isNum = isNum && (std::isdigit(buff[i]) || (buff[i] == '-') || (buff[i] == '+'));
+        isNum = isNum && (isDigit(buff[i]) || (buff[i] == '-') || (buff[i] == '+'));
 
         for(size_t j = 1; j < ss; j++)
-            isNum = (isNum && std::isdigit(buff[j]));
+            isNum = (isNum && isDigit(buff[j]));
 
         if(isNum)
         {
@@ -829,7 +1079,7 @@ void IniProcessing::read(const char *key, bool &dest, bool defVal)
 void IniProcessing::read(const char *key, unsigned char &dest, unsigned char defVal)
 {
     bool ok = false;
-    params::IniKeys::iterator e = readHelper(key, ok);
+    params::IniKeys::iterator e = IniProcessing_readHelper(this, key, ok);
 
     if(!ok)
     {
@@ -848,7 +1098,7 @@ void IniProcessing::read(const char *key, unsigned char &dest, unsigned char def
 void IniProcessing::read(const char *key, char &dest, char defVal)
 {
     bool ok = false;
-    params::IniKeys::iterator e = readHelper(key, ok);
+    params::IniKeys::iterator e = IniProcessing_readHelper(this, key, ok);
 
     if(!ok)
     {
@@ -867,7 +1117,7 @@ void IniProcessing::read(const char *key, char &dest, char defVal)
 void IniProcessing::read(const char *key, unsigned short &dest, unsigned short defVal)
 {
     bool ok = false;
-    params::IniKeys::iterator e = readHelper(key, ok);
+    params::IniKeys::iterator e = IniProcessing_readHelper(this, key, ok);
 
     if(!ok)
     {
@@ -881,7 +1131,7 @@ void IniProcessing::read(const char *key, unsigned short &dest, unsigned short d
 void IniProcessing::read(const char *key, short &dest, short defVal)
 {
     bool ok = false;
-    params::IniKeys::iterator e = readHelper(key, ok);
+    params::IniKeys::iterator e = IniProcessing_readHelper(this, key, ok);
 
     if(!ok)
     {
@@ -895,7 +1145,7 @@ void IniProcessing::read(const char *key, short &dest, short defVal)
 void IniProcessing::read(const char *key, unsigned int &dest, unsigned int defVal)
 {
     bool ok = false;
-    params::IniKeys::iterator e = readHelper(key, ok);
+    params::IniKeys::iterator e = IniProcessing_readHelper(this, key, ok);
 
     if(!ok)
     {
@@ -909,7 +1159,7 @@ void IniProcessing::read(const char *key, unsigned int &dest, unsigned int defVa
 void IniProcessing::read(const char *key, int &dest, int defVal)
 {
     bool ok = false;
-    params::IniKeys::iterator e = readHelper(key, ok);
+    params::IniKeys::iterator e = IniProcessing_readHelper(this, key, ok);
 
     if(!ok)
     {
@@ -923,7 +1173,7 @@ void IniProcessing::read(const char *key, int &dest, int defVal)
 void IniProcessing::read(const char *key, unsigned long &dest, unsigned long defVal)
 {
     bool ok = false;
-    params::IniKeys::iterator e = readHelper(key, ok);
+    params::IniKeys::iterator e = IniProcessing_readHelper(this, key, ok);
 
     if(!ok)
     {
@@ -937,7 +1187,7 @@ void IniProcessing::read(const char *key, unsigned long &dest, unsigned long def
 void IniProcessing::read(const char *key, long &dest, long defVal)
 {
     bool ok = false;
-    params::IniKeys::iterator e = readHelper(key, ok);
+    params::IniKeys::iterator e = IniProcessing_readHelper(this, key, ok);
 
     if(!ok)
     {
@@ -951,7 +1201,7 @@ void IniProcessing::read(const char *key, long &dest, long defVal)
 void IniProcessing::read(const char *key, unsigned long long &dest, unsigned long long defVal)
 {
     bool ok = false;
-    params::IniKeys::iterator e = readHelper(key, ok);
+    params::IniKeys::iterator e = IniProcessing_readHelper(this, key, ok);
 
     if(!ok)
     {
@@ -965,7 +1215,7 @@ void IniProcessing::read(const char *key, unsigned long long &dest, unsigned lon
 void IniProcessing::read(const char *key, long long &dest, long long defVal)
 {
     bool ok = false;
-    params::IniKeys::iterator e = readHelper(key, ok);
+    params::IniKeys::iterator e = IniProcessing_readHelper(this, key, ok);
 
     if(!ok)
     {
@@ -979,44 +1229,47 @@ void IniProcessing::read(const char *key, long long &dest, long long defVal)
 void IniProcessing::read(const char *key, float &dest, float defVal)
 {
     bool ok = false;
-    params::IniKeys::iterator e = readHelper(key, ok);
+    params::IniKeys::iterator e = IniProcessing_readHelper(this, key, ok);
     if(!ok)
     {
         dest = defVal;
         return;
     }
+
     dest = std::strtof(e->second.c_str(), nullptr);
 }
 
 void IniProcessing::read(const char *key, double &dest, double defVal)
 {
     bool ok = false;
-    params::IniKeys::iterator e = readHelper(key, ok);
+    params::IniKeys::iterator e = IniProcessing_readHelper(this, key, ok);
 
     if(!ok)
     {
         dest = defVal;
         return;
     }
+
     dest = std::strtod(e->second.c_str(), nullptr);
 }
 
 void IniProcessing::read(const char *key, long double &dest, long double defVal)
 {
     bool ok = false;
-    params::IniKeys::iterator e = readHelper(key, ok);
+    params::IniKeys::iterator e = IniProcessing_readHelper(this, key, ok);
     if(!ok)
     {
         dest = defVal;
         return;
     }
+
     dest = std::strtold(e->second.c_str(), nullptr);
 }
 
 void IniProcessing::read(const char *key, std::string &dest, const std::string &defVal)
 {
     bool ok = false;
-    params::IniKeys::iterator e = readHelper(key, ok);
+    params::IniKeys::iterator e = IniProcessing_readHelper(this, key, ok);
 
     if(!ok)
     {
@@ -1027,11 +1280,27 @@ void IniProcessing::read(const char *key, std::string &dest, const std::string &
     dest = e->second;
 }
 
+#ifdef _WIN32
+void IniProcessing::read(const char *key, std::wstring &dest, const std::wstring &defVal)
+{
+    bool ok = false;
+    params::IniKeys::iterator e = IniProcessing_readHelper(this, key, ok);
+
+    if(!ok)
+    {
+        dest = defVal;
+        return;
+    }
+
+    dest = s_str_to_wstr(e->second);
+}
+#endif
+
 #ifdef INI_PROCESSING_ALLOW_QT_TYPES
 void IniProcessing::read(const char *key, QString &dest, const QString &defVal)
 {
     bool ok = false;
-    params::IniKeys::iterator e = readHelper(key, ok);
+    params::IniKeys::iterator e = IniProcessing_readHelper(this, key, ok);
 
     if(!ok)
     {
@@ -1055,7 +1324,8 @@ inline void StrToNumVectorHelper(const std::string &source, TList &dest, const t
         std::string item;
         while(std::getline(ss, item, ','))
         {
-            std::remove(item.begin(), item.end(), ' '); //-V530
+            auto remove_ret = std::remove(item.begin(), item.end(), ' '); //-V530
+            (void)remove_ret;
 
             try
             {
@@ -1089,7 +1359,7 @@ template<class TList, typename T>
 void readNumArrHelper(IniProcessing *self, const char *key, TList &dest, const TList &defVal)
 {
     bool ok = false;
-    IniProcessing::params::IniKeys::iterator e = self->readHelper(key, ok);
+    IniProcessing::params::IniKeys::iterator e = IniProcessing_readHelper(self, key, ok);
 
     if(!ok)
     {
@@ -1146,6 +1416,188 @@ void IniProcessing::read(const char *key, std::vector<long double> &dest, const 
     readNumArrHelper<std::vector<long double>, long double>(this, key, dest, defVal);
 }
 
+#ifdef _WIN32
+void IniProcessing::read(const wchar_t *key, bool &dest, bool defVal)
+{
+    std::string key8 = s_wstr_to_str(key);
+    read(key8.c_str(), dest, defVal);
+}
+
+void IniProcessing::read(const wchar_t *key, unsigned char &dest, unsigned char defVal)
+{
+    std::string key8 = s_wstr_to_str(key);
+    read(key8.c_str(), dest, defVal);
+}
+
+void IniProcessing::read(const wchar_t *key, char &dest, char defVal)
+{
+    std::string key8 = s_wstr_to_str(key);
+    read(key8.c_str(), dest, defVal);
+}
+
+void IniProcessing::read(const wchar_t *key, unsigned short &dest, unsigned short defVal)
+{
+    std::string key8 = s_wstr_to_str(key);
+    read(key8.c_str(), dest, defVal);
+}
+
+void IniProcessing::read(const wchar_t *key, short &dest, short defVal)
+{
+    std::string key8 = s_wstr_to_str(key);
+    read(key8.c_str(), dest, defVal);
+}
+
+void IniProcessing::read(const wchar_t *key, unsigned int &dest, unsigned int defVal)
+{
+    std::string key8 = s_wstr_to_str(key);
+    read(key8.c_str(), dest, defVal);
+}
+
+void IniProcessing::read(const wchar_t *key, int &dest, int defVal)
+{
+    std::string key8 = s_wstr_to_str(key);
+    read(key8.c_str(), dest, defVal);
+}
+
+void IniProcessing::read(const wchar_t *key, unsigned long &dest, unsigned long defVal)
+{
+    std::string key8 = s_wstr_to_str(key);
+    read(key8.c_str(), dest, defVal);
+}
+
+void IniProcessing::read(const wchar_t *key, long &dest, long defVal)
+{
+    std::string key8 = s_wstr_to_str(key);
+    read(key8.c_str(), dest, defVal);
+}
+
+void IniProcessing::read(const wchar_t *key, unsigned long long &dest, unsigned long long defVal)
+{
+    std::string key8 = s_wstr_to_str(key);
+    read(key8.c_str(), dest, defVal);
+}
+
+void IniProcessing::read(const wchar_t *key, long long &dest, long long defVal)
+{
+    std::string key8 = s_wstr_to_str(key);
+    read(key8.c_str(), dest, defVal);
+}
+
+void IniProcessing::read(const wchar_t *key, float &dest, float defVal)
+{
+    std::string key8 = s_wstr_to_str(key);
+    read(key8.c_str(), dest, defVal);
+}
+
+void IniProcessing::read(const wchar_t *key, double &dest, double defVal)
+{
+    std::string key8 = s_wstr_to_str(key);
+    read(key8.c_str(), dest, defVal);
+}
+
+void IniProcessing::read(const wchar_t *key, long double &dest, long double defVal)
+{
+    std::string key8 = s_wstr_to_str(key);
+    read(key8.c_str(), dest, defVal);
+}
+
+void IniProcessing::read(const wchar_t *key, std::string &dest, const std::string &defVal)
+{
+    std::string key8 = s_wstr_to_str(key);
+    bool ok = false;
+    params::IniKeys::iterator e = IniProcessing_readHelper(this, key8.c_str(), ok);
+
+    if(!ok)
+    {
+        dest = defVal;
+        return;
+    }
+
+    dest = e->second;
+}
+
+void IniProcessing::read(const wchar_t *key, std::wstring &dest, const std::wstring &defVal)
+{
+    std::string key8 = s_wstr_to_str(key);
+    bool ok = false;
+    params::IniKeys::iterator e = IniProcessing_readHelper(this, key8.c_str(), ok);
+
+    if(!ok)
+    {
+        dest = defVal;
+        return;
+    }
+
+    dest = s_str_to_wstr(e->second);
+}
+
+void IniProcessing::read(const wchar_t *key, std::vector<unsigned short> &dest, const std::vector<unsigned short> &defVal)
+{
+    std::string key8 = s_wstr_to_str(key);
+    read(key8.c_str(), dest, defVal);
+}
+
+void IniProcessing::read(const wchar_t *key, std::vector<short> &dest, const std::vector<short> &defVal)
+{
+    std::string key8 = s_wstr_to_str(key);
+    read(key8.c_str(), dest, defVal);
+}
+
+void IniProcessing::read(const wchar_t *key, std::vector<unsigned int> &dest, const std::vector<unsigned int> &defVal)
+{
+    std::string key8 = s_wstr_to_str(key);
+    read(key8.c_str(), dest, defVal);
+}
+
+void IniProcessing::read(const wchar_t *key, std::vector<int> &dest, const std::vector<int> &defVal)
+{
+    std::string key8 = s_wstr_to_str(key);
+    read(key8.c_str(), dest, defVal);
+}
+
+void IniProcessing::read(const wchar_t *key, std::vector<unsigned long> &dest, const std::vector<unsigned long> &defVal)
+{
+    std::string key8 = s_wstr_to_str(key);
+    read(key8.c_str(), dest, defVal);
+}
+
+void IniProcessing::read(const wchar_t *key, std::vector<long> &dest, const std::vector<long> &defVal)
+{
+    std::string key8 = s_wstr_to_str(key);
+    read(key8.c_str(), dest, defVal);
+}
+
+void IniProcessing::read(const wchar_t *key, std::vector<unsigned long long> &dest, const std::vector<unsigned long long> &defVal)
+{
+    std::string key8 = s_wstr_to_str(key);
+    read(key8.c_str(), dest, defVal);
+}
+
+void IniProcessing::read(const wchar_t *key, std::vector<long long> &dest, const std::vector<long long> &defVal)
+{
+    std::string key8 = s_wstr_to_str(key);
+    read(key8.c_str(), dest, defVal);
+}
+
+void IniProcessing::read(const wchar_t *key, std::vector<float> &dest, const std::vector<float> &defVal)
+{
+    std::string key8 = s_wstr_to_str(key);
+    read(key8.c_str(), dest, defVal);
+}
+
+void IniProcessing::read(const wchar_t *key, std::vector<double> &dest, const std::vector<double> &defVal)
+{
+    std::string key8 = s_wstr_to_str(key);
+    read(key8.c_str(), dest, defVal);
+}
+
+void IniProcessing::read(const wchar_t *key, std::vector<long double> &dest, const std::vector<long double> &defVal)
+{
+    std::string key8 = s_wstr_to_str(key);
+    read(key8.c_str(), dest, defVal);
+}
+#endif // WIN32
+
 #ifdef INI_PROCESSING_ALLOW_QT_TYPES
 void IniProcessing::read(const char *key, QList<short> &dest, const QList<short> &defVal)
 {
@@ -1195,6 +1647,7 @@ void IniProcessing::read(const char *key, QList<long double> &dest, const QList<
     readNumArrHelper<QList<long double>, long double>(this, key, dest, defVal);
 }
 
+#   if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 void IniProcessing::read(const char *key, QVector<short> &dest, const QVector<short> &defVal)
 {
     readNumArrHelper<QVector<short>, short>(this, key, dest, defVal);
@@ -1240,12 +1693,13 @@ void IniProcessing::read(const char *key, QVector<long double> &dest, const QVec
 {
     readNumArrHelper<QVector<long double>, long double>(this, key, dest, defVal);
 }
+#   endif
 #endif
 
 IniProcessingVariant IniProcessing::value(const char *key, const IniProcessingVariant &defVal)
 {
     bool ok = false;
-    params::IniKeys::iterator e = readHelper(key, ok);
+    params::IniKeys::iterator e = IniProcessing_readHelper(this, key, ok);
 
     if(!ok)
         return defVal;
@@ -1260,7 +1714,7 @@ void IniProcessing::writeIniParam(const char *key, const std::string &value)
         return;
 
     bool ok = false;
-    params::IniKeys::iterator e = readHelper(key, ok);
+    params::IniKeys::iterator e = IniProcessing_readHelper(this, key, ok);
     if(ok)
     {
         e->second = value;
@@ -1277,6 +1731,14 @@ void IniProcessing::writeIniParam(const char *key, const std::string &value)
         m_params.opened = true;
     }
 }
+
+#ifdef _WIN32
+void IniProcessing::writeIniParam(const wchar_t *key, const std::string &value)
+{
+    std::string key8 = s_wstr_to_str(key);
+    writeIniParam(key8.c_str(), value);
+}
+#endif
 
 void IniProcessing::setValue(const char *key, unsigned short value)
 {
@@ -1333,6 +1795,88 @@ void IniProcessing::setValue(const char *key, long double value)
     writeIniParam(key, IniProcessing::to_string_with_precision(value));
 }
 
+
+#ifdef _WIN32
+IniProcessingVariant IniProcessing::value(const wchar_t *key, const IniProcessingVariant &defVal)
+{
+    bool ok = false;
+    std::string key8 = s_wstr_to_str(key);
+    params::IniKeys::iterator e = IniProcessing_readHelper(this, key8.c_str(), ok);
+
+    if(!ok)
+        return defVal;
+
+    std::string &k = e->second;
+    return IniProcessingVariant(&k);
+}
+
+void IniProcessing::setValue(const wchar_t *key, unsigned short value)
+{
+    std::string key8 = s_wstr_to_str(key);
+    writeIniParam(key8.c_str(), std::to_string(value));
+}
+
+void IniProcessing::setValue(const wchar_t *key, short value)
+{
+    std::string key8 = s_wstr_to_str(key);
+    writeIniParam(key8.c_str(), std::to_string(value));
+}
+
+void IniProcessing::setValue(const wchar_t *key, unsigned int value)
+{
+    std::string key8 = s_wstr_to_str(key);
+    writeIniParam(key8.c_str(), std::to_string(value));
+}
+
+void IniProcessing::setValue(const wchar_t *key, int value)
+{
+    std::string key8 = s_wstr_to_str(key);
+    writeIniParam(key8.c_str(), std::to_string(value));
+}
+
+void IniProcessing::setValue(const wchar_t *key, unsigned long value)
+{
+    std::string key8 = s_wstr_to_str(key);
+    writeIniParam(key8.c_str(), std::to_string(value));
+}
+
+void IniProcessing::setValue(const wchar_t *key, long value)
+{
+    std::string key8 = s_wstr_to_str(key);
+    writeIniParam(key8.c_str(), std::to_string(value));
+}
+
+void IniProcessing::setValue(const wchar_t *key, unsigned long long value)
+{
+    std::string key8 = s_wstr_to_str(key);
+    writeIniParam(key8.c_str(), std::to_string(value));
+}
+
+void IniProcessing::setValue(const wchar_t *key, long long value)
+{
+    std::string key8 = s_wstr_to_str(key);
+    writeIniParam(key8.c_str(), std::to_string(value));
+}
+
+void IniProcessing::setValue(const wchar_t *key, float value)
+{
+    std::string key8 = s_wstr_to_str(key);
+    writeIniParam(key8.c_str(), IniProcessing::to_string_with_precision(value));
+}
+
+void IniProcessing::setValue(const wchar_t *key, double value)
+{
+    std::string key8 = s_wstr_to_str(key);
+    writeIniParam(key8.c_str(), IniProcessing::to_string_with_precision(value));
+}
+
+void IniProcessing::setValue(const wchar_t *key, long double value)
+{
+    std::string key8 = s_wstr_to_str(key);
+    writeIniParam(key8.c_str(), IniProcessing::to_string_with_precision(value));
+}
+#endif // _WIN32
+
 void IniProcessing::setValue(const char *key, const char *value)
 {
     writeIniParam(key, value);
@@ -1342,6 +1886,20 @@ void IniProcessing::setValue(const char *key, const std::string &value)
 {
     writeIniParam(key, value);
 }
+
+#ifdef _WIN32
+void IniProcessing::setValue(const wchar_t *key, const wchar_t *value)
+{
+    std::string key8 = s_wstr_to_str(key);
+    writeIniParam(key8.c_str(), s_wstr_to_str(value));
+}
+
+void IniProcessing::setValue(const wchar_t *key, const std::wstring &value)
+{
+    std::string key8 = s_wstr_to_str(key);
+    writeIniParam(key8.c_str(), s_wstr_to_str(value));
+}
+#endif // _WIN32
 
 #ifdef INI_PROCESSING_ALLOW_QT_TYPES
 void IniProcessing::setValue(const char *key, const QString &value)
@@ -1363,7 +1921,7 @@ static inline bool isFloatValue(const std::string &str)
 
     for(const char &c : str)
     {
-        if(!isdigit(c))
+        if(!isDigit(c))
         {
             switch(st)
             {
@@ -1411,16 +1969,11 @@ static inline bool isFloatValue(const std::string &str)
 bool IniProcessing::writeIniFile()
 {
 #ifdef _WIN32
+    if(m_params.is_utf16) // it's UTF-16 file, save as UTF-16 back
+        return writeIniFileU16();
+
     //Convert UTF8 file path into UTF16 to support non-ASCII paths on Windows
-    std::wstring dest;
-    dest.resize(m_params.filePath.size());
-    int newSize = MultiByteToWideChar(CP_UTF8,
-                                      0,
-                                      m_params.filePath.c_str(),
-                                      static_cast<int>(dest.size()),
-                                      &dest[0],
-                                      static_cast<int>(dest.size()));
-    dest.resize(newSize);
+    std::wstring dest = s_str_to_wstr(m_params.filePath);
     FILE *cFile = _wfopen(dest.c_str(), L"wb");
 #else
     FILE *cFile = fopen(m_params.filePath.c_str(), "wb");
@@ -1429,7 +1982,16 @@ bool IniProcessing::writeIniFile()
     if(!cFile)
         return false;
 
+    // Sort the data before to output
+    params::IniSectionsOrdered outData;
     for(auto &group : m_params.iniData)
+    {
+        auto &outKeys = outData[group.first];
+        for(auto &key : group.second)
+            outKeys.insert(key);
+    }
+
+    for(auto &group : outData)
     {
         fprintf(cFile, "[%s]\n", group.first.c_str());
 
@@ -1474,3 +2036,76 @@ bool IniProcessing::writeIniFile()
     return true;
 }
 
+#ifdef _WIN32
+bool IniProcessing::writeIniFileU16()
+{
+    //Convert UTF8 file path into UTF16 to support non-ASCII paths on Windows
+    std::wstring dest = s_str_to_wstr(m_params.filePath);
+    FILE *cFile = _wfopen(dest.c_str(), L"wb");
+
+    if(!cFile)
+        return false;
+
+    // Sort the data before to output
+    params::IniSectionsOrdered outData;
+    for(auto &group : m_params.iniData)
+    {
+        auto &outKeys = outData[group.first];
+        for(auto &key : group.second)
+            outKeys.insert(key);
+    }
+
+    // Write BOM
+    fwrite("\xFF\xFE", 1, 2, cFile);
+
+    for(auto &group : outData)
+    {
+        std::wstring grouName = s_str_to_wstr(group.first);
+        fwprintf(cFile, L"[%ls]\r\n", grouName.c_str());
+
+        for(auto &key : group.second)
+        {
+            if(isFloatValue(key.second))
+            {
+                std::wstring wkey = s_str_to_wstr(key.first);
+                std::wstring wvalue = s_str_to_wstr(key.second);
+                //Store as-is without quoting
+                fwprintf(cFile, L"%ls = %ls\r\n", wkey.c_str(), wvalue.c_str());
+            }
+            else
+            {
+                //Set escape quotes and put the string with a quotes
+                std::string &s = key.second;
+                std::string escaped;
+                escaped.reserve(s.length() * 2);
+
+                for(char &c : s)
+                {
+                    switch(c)
+                    {
+                    case '\n': escaped += "\\n"; break;
+                    case '\r': escaped += "\\r"; break;
+                    case '\t': escaped += "\\t"; break;
+                    default:
+                        if((c == '\\') || (c == '"'))
+                            escaped.push_back('\\');
+                        escaped.push_back(c);
+                    }
+                }
+
+                std::wstring wkey = s_str_to_wstr(key.first);
+                std::wstring wvalue = s_str_to_wstr(escaped);
+
+                fwprintf(cFile, L"%ls = \"%ls\"\r\n", wkey.c_str(), wvalue.c_str());
+            }
+        }
+
+        fwprintf(cFile, L"\r\n");
+        fflush(cFile);
+    }
+
+    fclose(cFile);
+
+    return true;
+}
+#endif

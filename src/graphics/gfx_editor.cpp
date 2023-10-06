@@ -18,6 +18,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <fmt_format_ne.h>
+
 #include "core/render.h"
 #include "globals.h"
 #include "graphics.h"
@@ -29,8 +31,11 @@
 #include "npc_id.h"
 #include "player.h"
 
+#include "main/trees.h"
+
 #include "editor.h"
 #include "editor/new_editor.h"
+#include "editor/editor_strings.h"
 #include "editor/magic_block.h"
 
 #ifdef THEXTECH_INTERPROC_SUPPORTED
@@ -50,15 +55,9 @@ void DrawEditorLevel(int Z)
 #ifdef __3DS__
     XRender::setTargetLayer(2);
 #endif
-    if(Z == 1)
-        BlockFlash += 1;
-
-    if(BlockFlash > 45)
-        BlockFlash = 0;
-
     if(LevelEditor)
     {
-        if(BlockFlash <= 30)
+        if((CommonFrame % 46) <= 30)
         {
             // render NPCs in blocks
             for(A = 1; A <= numBlock; A++)
@@ -102,7 +101,7 @@ void DrawEditorLevel(int Z)
                         tempLocation.X = Block[A].Location.X + Block[A].Location.Width / 2 - GFX.Chat.w / 2;
                         tempLocation.Y = Block[A].Location.Y - GFX.Chat.h - 8;
 
-                        XRender::renderTexture(vScreen[Z].X + tempLocation.X, vScreen[Z].Y + tempLocation.Y, GFX.Chat, 1., 0., 0., 0.7);
+                        XRender::renderTexture(vScreen[Z].X + tempLocation.X, vScreen[Z].Y + tempLocation.Y, GFX.Chat, 1., 0., 0., 0.7f);
                     }
                 }
             }
@@ -149,7 +148,7 @@ void DrawEditorLevel(int Z)
                             tempLocation.X = NPC[A].Location.X + NPC[A].Location.Width / 2 - 4 - GFX.Chat.w;
                         tempLocation.Y = NPC[A].Location.Y - GFX.Chat.h - 8;
 
-                        XRender::renderTexture(vScreen[Z].X + tempLocation.X, vScreen[Z].Y + tempLocation.Y, GFX.Chat, 1., 0., 0., 0.7);
+                        XRender::renderTexture(vScreen[Z].X + tempLocation.X, vScreen[Z].Y + tempLocation.Y, GFX.Chat, 1., 0., 0., 0.7f);
                     }
                 }
 
@@ -164,7 +163,7 @@ void DrawEditorLevel(int Z)
                             tempLocation.X = NPC[A].Location.X + NPC[A].Location.Width / 2 + 4;
                         tempLocation.Y = NPC[A].Location.Y - GFX.Chat.h - 8;
 
-                        XRender::renderTexture(vScreen[Z].X + tempLocation.X, vScreen[Z].Y + tempLocation.Y, GFX.Chat, 1., 1., 1., 0.7);
+                        XRender::renderTexture(vScreen[Z].X + tempLocation.X, vScreen[Z].Y + tempLocation.Y, GFX.Chat, 1., 1., 1., 0.7f);
                     }
                 }
             }
@@ -268,7 +267,7 @@ void DrawEditorLevel(int Z)
     // render section boundary
     if(LevelEditor)
     {
-        if(BlockFlash > 30 || BlockFlash == 0)
+        if((CommonFrame % 46) > 30 || (CommonFrame % 46) == 0)
         {
             if(vScreen[Z].X + level[S].X > 0)
             {
@@ -319,7 +318,7 @@ void DrawEditorLevel(int Z)
         int curX = int(double(e.X) - vScreen[Z].Left);
         int curY = int(double(e.Y) - vScreen[Z].Top);
 
-        if(BlockFlash < 10)
+        if((CommonFrame % 46) < 10)
         {
             // don't draw the currently held object
         }
@@ -375,7 +374,7 @@ void DrawEditorLevel(int Z)
             }
 
             // render NPC inside block
-            if(BlockFlash <= 30 && b.Special > 0)
+            if((CommonFrame % 46) <= 30 && b.Special > 0)
             {
                 if(vScreenCollision(Z, b.Location))
                 {
@@ -412,7 +411,7 @@ void DrawEditorLevel(int Z)
                 tempLocation.X = b.Location.X + b.Location.Width / 2 - GFX.Chat.w / 2;
                 tempLocation.Y = b.Location.Y - GFX.Chat.h - 8;
 
-                XRender::renderTexture(vScreen[Z].X + tempLocation.X, vScreen[Z].Y + tempLocation.Y, GFX.Chat, 1., 0., 0., 0.7);
+                XRender::renderTexture(vScreen[Z].X + tempLocation.X, vScreen[Z].Y + tempLocation.Y, GFX.Chat, 1., 0., 0., 0.7f);
             }
         }
 
@@ -538,7 +537,7 @@ void DrawEditorLevel(int Z)
             }
 
             // render NPC inside container
-            if(BlockFlash <= 30 && (n.Type == 91 || n.Type == 96)
+            if((CommonFrame % 46) <= 30 && (n.Type == 91 || n.Type == 96)
                 && (n.Special > 0))
             {
                 if(vScreenCollision(Z, n.Location))
@@ -577,7 +576,7 @@ void DrawEditorLevel(int Z)
                     tempLocation.X = n.Location.X + n.Location.Width / 2 - 4 - GFX.Chat.w;
                 tempLocation.Y = n.Location.Y - GFX.Chat.h - 8;
 
-                XRender::renderTexture(vScreen[Z].X + tempLocation.X, vScreen[Z].Y + tempLocation.Y, GFX.Chat, 1., 0., 0., 0.7);
+                XRender::renderTexture(vScreen[Z].X + tempLocation.X, vScreen[Z].Y + tempLocation.Y, GFX.Chat, 1., 0., 0., 0.7f);
             }
 
             // and that they can talk
@@ -589,7 +588,7 @@ void DrawEditorLevel(int Z)
                     tempLocation.X = n.Location.X + n.Location.Width / 2 + 4;
                 tempLocation.Y = n.Location.Y - GFX.Chat.h - 8;
 
-                XRender::renderTexture(vScreen[Z].X + tempLocation.X, vScreen[Z].Y + tempLocation.Y, GFX.Chat, 1., 1., 1., 0.7);
+                XRender::renderTexture(vScreen[Z].X + tempLocation.X, vScreen[Z].Y + tempLocation.Y, GFX.Chat, 1., 1., 1., 0.7f);
             }
         }
         else if(EditorCursor.Mode == OptCursor_t::LVL_WATER) // Water
@@ -623,7 +622,7 @@ void DrawEditorLevel(int Z)
         {
             if(EditorCursor.SubMode == -1)
             {
-                int frame = BlockFlash / 20;
+                int frame = (CommonFrame % 46) / 20;
                 if(frame > 2)
                     frame = 2;
                 XRender::renderTexture(curX - 8, curY, 32, 32, GFXNPC[NPCID_AXE], 0, 32 * frame);
@@ -660,7 +659,7 @@ void DrawEditorLevel(int Z)
             {
                 // there might be a tooltip in this case
                 if(editorScreen.active || EditorCursor.Y < 40)
-                    SuperPrint(GetL(e.Layer), 3, curX + 28 , curY + 34, 1., 1., 1., 0.3);
+                    SuperPrint(GetL(e.Layer), 3, curX + 28 , curY + 34, 1., 1., 1., 0.3f);
                 else
                     SuperPrint(GetL(e.Layer), 3, curX + 28 , curY + 34);
             }
@@ -700,18 +699,13 @@ void DrawEditorWorld()
 {
     int Z = 1;
 
-    BlockFlash += 1;
-
-    if(BlockFlash > 45)
-        BlockFlash = 0;
-
 #ifdef __3DS__
     // disable cursor rendering on inactive screen of 3DS
     if(editorScreen.active) {}
     else
 #endif
 
-    if(BlockFlash < 10)
+    if((CommonFrame % 46) < 10)
     {
         // don't draw the currently held object
     }
@@ -809,7 +803,7 @@ void DrawEditorWorld()
     {
         if(EditorCursor.SubMode == -1)
         {
-            int frame = BlockFlash / 20;
+            int frame = (CommonFrame % 46) / 20;
             if(frame > 2)
                 frame = 2;
             XRender::renderTexture(X - 8, Y, 32, 32, GFXNPC[NPCID_AXE], 0, 32 * frame);
@@ -822,6 +816,20 @@ void DrawEditorWorld()
         XRender::renderTexture(X, Y,
             32, 32,
             GFX.ECursor[2], 0, 0);
+
+        // show coordinates of nearby level for help making warps
+        for(WorldLevel_t* t : treeWorldLevelQuery(newLoc(EditorCursor.Location.X, EditorCursor.Location.Y, 1, 1), SORTMODE_NONE))
+        {
+            WorldLevel_t &lvl = *t;
+            if(CursorCollision(EditorCursor.Location, lvl.Location))
+            {
+                double at_X = lvl.Location.X + lvl.Location.Width / 2 + vScreen[Z].X;
+                double at_Y = lvl.Location.Y + vScreen[Z].Y - 40;
+                XRender::renderRect(at_X - 80, at_Y - 4, 160, 44, 0.0f, 0.0f, 0.0f, 0.5f, true);
+                SuperPrintCenter(fmt::format_ne("{0}: {1}", g_editorStrings.letterCoordX, static_cast<int>(lvl.Location.X)), 3, at_X, at_Y);
+                SuperPrintCenter(fmt::format_ne("{0}: {1}", g_editorStrings.letterCoordY, static_cast<int>(lvl.Location.Y)), 3, at_X, at_Y + 20);
+            }
+        }
     }
 
     editorScreen.UpdateEditorScreen(EditorScreen::CallMode::Render);

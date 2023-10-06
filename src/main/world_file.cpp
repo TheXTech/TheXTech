@@ -383,8 +383,8 @@ bool OpenWorld(std::string FilePath)
                 ll.Start = true;
         }
 
-        vScreen[1].X = (ScreenW / 2 - 800 / 2);
-        vScreen[1].Y = (ScreenH / 2 - 600 / 2);
+        vScreen[1].X = (ScreenW / 2) - (800 / 2);
+        vScreen[1].Y = (ScreenH / 2) - (600 / 2);
     }
 //    else
 //    {
@@ -466,8 +466,10 @@ void ClearWorld(bool quick)
     StartLevel.clear();
     BeatTheGame = false;
     numWorldCredits = 0;
-    for(int A = 1; A <= maxWorldCredits; A++)
-        WorldCredits[A].clear();
+
+    for(int i = 1; i <= maxWorldCredits; i++)
+        WorldCredits[i].clear();
+
     if(LevelEditor)
     {
         vScreen[1].X = 0;

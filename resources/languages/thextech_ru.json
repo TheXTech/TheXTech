@@ -87,7 +87,7 @@
                 "propBounds": "Границы",
                 "propMusic": "Музыка"
             },
-            "settingsForEvent": "Настройки события"
+            "settingsForEvent": "Настройки события \"{0}\""
         },
         "file": {
             "actionClearLevel": "Стереть уровень",
@@ -207,6 +207,7 @@
         "phraseAreYouSure": "Вы уверены?",
         "phraseCountMore": "Ещё {0}",
         "phraseDelayIsMs": "Период: {0} мс",
+        "phraseGenericIndex": "Номер {0}",
         "phraseRadiusIndex": "Радиус {0}",
         "phraseSectionIndex": "Секция {0}",
         "phraseTextOf": "Текст \"{0}\"",
@@ -322,8 +323,7 @@
             "phraseCreditIndex": "Титры, стрка {0}:",
             "retryOnFail": "Переигр. сразу",
             "totalStars": "Всего звёзд:"
-        },
-        "phraseGenericIndex": "Номер {0}"
+        }
     },
     "game": {
         "connect": {
@@ -349,6 +349,8 @@
             "phrasePlayerDisconnected": "И{0} отключился(лась)"
         },
         "error": {
+            "errorInvalidEnterWarp": "========= ОШИБКА! ========\n\nНевозможно запустить уровень, потому что указан некорректный входной проход {1}.\nВсего проходов: {2}\n\nФайл: {0}",
+            "errorNoStartPoint": "========= ОШИБКА! ========\n\nНевозможно запустить уровень из-за отсутствия начальных точек, либо не указан входной проход.\n\nФайл: {0}",
             "openFileFailed": "ОШИБКА: Не удаётся открыть \"{0}\": файл не существует или повреждён.",
             "warpNeedStarCount": "Требуется {0} {1}, чтобы войти."
         },
@@ -571,15 +573,19 @@
             "optionsModeFullScreen": "На весь экран",
             "optionsModeWindowed": "Оконный режим",
             "optionsViewCredits": "Титры",
+            "restartEngine": "Перезагрузите игру, чтобы применить изменения.",
             "scale": {
                 "integer": "Целочисленный",
-                "nearest": "Ближ. сосед",
                 "label": "Масштаб",
-                "linear": "Линейный"
-            }
+                "linear": "Линейный",
+                "nearest": "Ближ. сосед"
+            },
+            "renderX": "Графика: {0} (X)",
+            "render": "Графика: {0}"
         },
         "wordBack": "Назад",
         "wordHide": "Скрыть",
+        "wordLanguage": "Язык",
         "wordNo": "Нет",
         "wordOff": "Выкл.",
         "wordOn": "Вкл.",
@@ -588,8 +594,7 @@
         "wordResume": "Возобновить",
         "wordShow": "Показать",
         "wordWaiting": "Ждём",
-        "wordYes": "Да",
-        "wordLanguage": "Язык"
+        "wordYes": "Да"
     },
     "outro": {
         "cppPortDevelopers": "Разработчики C++-порта:",

@@ -18,6 +18,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <algorithm>
+
 #include "../config.h"
 #include "../controls.h"
 #include "../main/record.h"
@@ -107,10 +109,6 @@ void Hotkeys::Activate(size_t i, int player)
 #endif
 
 #ifdef DEBUG_BUILD
-    case Buttons::ToggleFontRender:
-        NewFontRender = !NewFontRender;
-        return;
-
     case Buttons::ReloadLanguage:
     {
         ReloadTranslations();
@@ -187,9 +185,9 @@ void InputMethodProfile::SaveConfig_All(IniProcessing* ctl)
 void InputMethodProfile::LoadConfig_All(IniProcessing* ctl)
 {
     if(this->Type->RumbleSupported())
-        ctl->read("enable-rumble", this->m_rumbleEnabled, g_config.JoystickEnableRumble);
+        ctl->read("enable-rumble", this->m_rumbleEnabled, this->m_rumbleEnabled);
 
-    ctl->read("ground-pound-by-alt-run", this->m_groundPoundByAltRun, g_config.GameplayPoundByAltRun);
+    ctl->read("ground-pound-by-alt-run", this->m_groundPoundByAltRun, this->m_groundPoundByAltRun);
     ctl->read("show-power-status", this->m_showPowerStatus, this->m_showPowerStatus);
     this->LoadConfig(ctl);
 }
@@ -302,7 +300,7 @@ bool InputMethodProfile::OptionChange(size_t i)
 // called when left is pressed
 bool InputMethodProfile::OptionRotateLeft(size_t i)
 {
-    int i_proc = i;
+    int i_proc = (int)i;
 
     if(!this->Type->RumbleSupported() && (int)i >= CommonOptions::rumble)
         i_proc += 1;
@@ -315,7 +313,7 @@ bool InputMethodProfile::OptionRotateLeft(size_t i)
 // called when right is pressed
 bool InputMethodProfile::OptionRotateRight(size_t i)
 {
-    int i_proc = i;
+    int i_proc = (int)i;
 
     if(!this->Type->RumbleSupported() && (int)i >= CommonOptions::rumble)
         i_proc += 1;
@@ -550,7 +548,7 @@ void InputMethodType::SaveConfig(IniProcessing* ctl)
 void InputMethodType::LoadConfig(IniProcessing* ctl)
 {
     int n_profiles;
-    int n_existing = this->m_profiles.size(); // should usually be zero
+    int n_existing = (int)this->m_profiles.size(); // should usually be zero
 
     ctl->beginGroup(this->Name);
     ctl->read("n-profiles", n_profiles, 0);
@@ -602,7 +600,13 @@ void InputMethodType::LoadConfig(IniProcessing* ctl)
         else
         {
             index += n_existing;
-            this->m_defaultProfiles[i] = this->m_profiles[index];
+            if(index < (int)this->m_profiles.size())
+                this->m_defaultProfiles[i] = this->m_profiles[index];
+            else
+            {
+                pLogWarning("Attempt to get the profile index %d out of range (m_profiles size: %d)", index, (int)this->m_profiles.size());
+                this->m_defaultProfiles[i] = nullptr;
+            }
         }
     }
 
@@ -808,7 +812,7 @@ bool Update(bool check_lost_devices)
 
     for(size_t i = 0; i < maxLocalPlayers; i++)
     {
-        Controls_t& controls = Player[i + 1].Controls;
+        Controls_t& controls = Player[(long)i + 1].Controls;
         CursorControls_t& cursor = SharedCursor;
         EditorControls_t& editor = ::EditorControls;
 
@@ -825,7 +829,7 @@ bool Update(bool check_lost_devices)
             continue;
         }
 
-        if(!method->Update(i + 1, controls, cursor, editor, g_hotkeysPressed) && check_lost_devices)
+        if(!method->Update((int)i + 1, controls, cursor, editor, g_hotkeysPressed) && check_lost_devices)
         {
             okay = false;
             DeleteInputMethod(method);
@@ -871,13 +875,11 @@ bool Update(bool check_lost_devices)
     {
         int A;
 
-        // if there is/was an input method bound to the player,
-        //   let them control themselves.
-        //   (same in spirit as old B == 2 && numPlayers == 2 case)
-        if(B - 1 < (int)g_InputMethods.size())
-            A = B;
-        else // otherwise, let Player 1 control them (blank controls later for SingleCoop)
+        // override in ClonedPlayerMode and SingleCoop mode (slightly different from original case which checked if numPlayers != 2)
+        if(g_ClonedPlayerMode || SingleCoop)
             A = 1;
+        else
+            A = B;
 
         // With Player(A).Controls
         {
@@ -905,16 +907,22 @@ bool Update(bool check_lost_devices)
             if(ForcedControls && GamePaused == PauseCode::None)
                 c = ForcedControl;
 
-            // new location for multi-mario (SingleCoop, "supermario128") code
+            // new location for cloned player code ("superbdemo128", was misplaced in ClownCar previously)
             if(A != B)
+            {
                 Player[B].Controls = c;
+
+                // allow pausing in SingleCoop
+                if(SingleCoop)
+                    Player[B].UnStart |= Player[A].UnStart;
+            }
         } // End With
     }
 
     // single coop code -- may want to revise
     if(SingleCoop > 0)
     {
-        if(numPlayers == 1 || numPlayers > 2)
+        if(numPlayers == 1 || g_ClonedPlayerMode)
             SingleCoop = 0;
 
         if(SingleCoop == 1)
@@ -933,7 +941,8 @@ bool Update(bool check_lost_devices)
         }
     }
 
-    if(((int)g_InputMethods.size() < numPlayers) && (numPlayers <= maxLocalPlayers)
+    // indicate if some control slots are missing
+    if(((int)g_InputMethods.size() < numPlayers) && !g_ClonedPlayerMode
        && !SingleCoop && !GameMenu && !Record::replay_file && check_lost_devices)
     {
         // fill with nullptrs
@@ -1034,7 +1043,7 @@ InputMethod* PollInputMethod() noexcept
 
     // if a profile has already been assigned, activate any hooks possible
     if(new_method->Profile)
-        SetInputMethodProfile(player_no, new_method->Profile);
+        SetInputMethodProfile((int)player_no, new_method->Profile);
 
     // try a number of ways of assigning a profile if one has not already been assigned
     std::vector<InputMethodProfile*> profiles = new_method->Type->GetProfiles();
@@ -1042,10 +1051,10 @@ InputMethod* PollInputMethod() noexcept
     // fallback 1: last profile used by this player index
     if(!new_method->Profile)
     {
-        InputMethodProfile* default_profile = new_method->Type->GetDefaultProfile(player_no);
+        InputMethodProfile* default_profile = new_method->Type->GetDefaultProfile((int)player_no);
 
         if(default_profile)
-            SetInputMethodProfile(player_no, default_profile);
+            SetInputMethodProfile((int)player_no, default_profile);
     }
 
     // fallback 2: find first unused profile
@@ -1071,16 +1080,16 @@ InputMethod* PollInputMethod() noexcept
         }
 
         if(i != profiles.size())
-            SetInputMethodProfile(player_no, profiles[i]);
+            SetInputMethodProfile((int)player_no, profiles[i]);
     }
 
     // fallback 3: use first profile
     if(!new_method->Profile && !profiles.empty())
-        SetInputMethodProfile(player_no, profiles[0]);
+        SetInputMethodProfile((int)player_no, profiles[0]);
 
     // fallback 4: new default profile
     if(!new_method->Profile)
-        SetInputMethodProfile(player_no, new_method->Type->AddProfile());
+        SetInputMethodProfile((int)player_no, new_method->Type->AddProfile());
 
     // should only STILL be null if something is very wrong (alloc failed, etc)
     if(!new_method->Profile)
@@ -1152,7 +1161,7 @@ bool SetInputMethodProfile(InputMethod* method, InputMethodProfile* profile)
     if(player_no == g_InputMethods.size())
         return false;
 
-    return method->Type->SetProfile(method, player_no, profile, g_InputMethods);
+    return method->Type->SetProfile(method, (int)player_no, profile, g_InputMethods);
 }
 
 void ClearInputMethods()

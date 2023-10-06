@@ -18,6 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <algorithm>
 #include <nds.h>
 
 #include "globals.h"
@@ -246,9 +247,7 @@ void InputMethod_16M::Rumble(int ms, float strength)
 
 StatusInfo InputMethod_16M::GetStatus()
 {
-    StatusInfo res;
-
-    return res;
+    return XPower::devicePowerStatus();
 }
 
 /*===============================================*\

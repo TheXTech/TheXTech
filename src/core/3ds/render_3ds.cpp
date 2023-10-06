@@ -43,6 +43,7 @@ extern void SetDefaultIO(FreeImageIO *io);
 #include "globals.h"
 #include "video.h"
 #include "frame_timer.h"
+#include "main/cheat_code.h"
 #include "core/render.h"
 #include "editor/new_editor.h"
 
@@ -235,6 +236,7 @@ FIBITMAP* robust_FILoad(const std::string& path, int target_w)
 
     if(w < target_w && FreeImage_GetBPP(rawImage) == 32)
     {
+        // don't rescale, just flip
         FreeImage_FlipVertical(rawImage);
         return rawImage;
     }
@@ -913,7 +915,7 @@ static C2D_SpriteSheet s_tryHardToLoadC2D_SpriteSheet(const char* path)
 
     if(!sourceImage)
     {
-        if(linearSpaceFree() < 8000000)
+        if(linearSpaceFree() < 15000000)
             minport_freeTextureMemory();
 
         sourceImage = C2D_SpriteSheetLoad(path);
@@ -932,6 +934,8 @@ void lazyLoad(StdPicture& target)
         FIBITMAP* FI_tex = nullptr;
         FIBITMAP* FI_mask = nullptr;
 
+        bool force_merge = false;
+
         if(Files::hasSuffix(target.l.mask_path, "m.gif"))
         {
             FI_tex = robust_FILoad(target.l.path, target.w);
@@ -942,22 +946,18 @@ void lazyLoad(StdPicture& target)
         else
         {
             FI_tex = robust_FILoad(target.l.path, target.w);
+
             FIBITMAP* FI_mask_rgba = nullptr;
-            if(!target.l.mask_path.empty())
+            if(FI_tex && !target.l.mask_path.empty())
                 FI_mask_rgba = robust_FILoad(target.l.mask_path, target.w);
 
             if(FI_mask_rgba)
             {
-                FIBITMAP* FI_mask_lum = nullptr;
-                GraphicsHelps::getMaskFromRGBA(FI_mask_rgba, FI_mask_lum);
+                GraphicsHelps::getMaskFromRGBA(FI_mask_rgba, FI_mask);
                 GraphicsHelps::closeImage(FI_mask_rgba);
-
-                if(FI_mask_lum)
-                {
-                    GraphicsHelps::mergeWithMask(FI_tex, FI_mask_lum);
-                    GraphicsHelps::closeImage(FI_mask_lum);
-                }
             }
+
+            force_merge = true;
         }
 
         if(!FI_tex)
@@ -966,6 +966,13 @@ void lazyLoad(StdPicture& target)
             pLogWarning("Error: %d (%s)", errno, strerror(errno));
             target.inited = false;
             return;
+        }
+
+        if(FI_mask && (force_merge || g_ForceBitmaskMerge || !GraphicsHelps::validateBitmaskRequired(FI_tex, FI_mask, target.l.path)))
+        {
+            GraphicsHelps::mergeWithMask(FI_tex, FI_mask);
+            GraphicsHelps::closeImage(FI_mask);
+            FI_mask = nullptr;
         }
 
         if(target.l.colorKey) // Apply transparent color for key pixels
@@ -1032,7 +1039,7 @@ void lazyLoad(StdPicture& target)
         if(target.h > 4096)
         {
             suppPath = target.l.path + '2';
-            sourceImage = C2D_SpriteSheetLoad(suppPath.c_str());
+            sourceImage = s_tryHardToLoadC2D_SpriteSheet(suppPath.c_str());
 
             if(!sourceImage)
             {

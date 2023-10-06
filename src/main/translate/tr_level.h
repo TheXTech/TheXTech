@@ -38,20 +38,20 @@ public:
         for(int i = 1; i <= numNPCs; ++i)
         {
             auto &it = m_trIdMap[GetS(NPC[i].Text)];
-            it.push_back(NPC[i].Text);
+            it.push_back(&NPC[i].Text);
         }
 
         for(int i = 0; i < numEvents; ++i)
         {
             auto &it = m_trIdMap[GetS(Events[i].Text)];
-            it.push_back(Events[i].Text);
+            it.push_back(&Events[i].Text);
         }
     }
 
     TrLevelParser(const TrLevelParser&) = default;
     ~TrLevelParser() = default;
 
-    std::unordered_map<std::string, std::vector<stringindex_t> > m_trIdMap;
+    std::unordered_map<std::string, std::vector<stringindex_t*> > m_trIdMap;
 
     std::string m_wantedKey;
     std::string m_curKey;
@@ -80,8 +80,8 @@ public:
             auto it = m_trIdMap.find(m_outTrId);
             if(it != m_trIdMap.end())
             {
-                for(auto &k : it->second)
-                    SetS(k, m_outValue);
+                for(auto *k : it->second)
+                    SetS(*k, m_outValue);
             }
         }
         else // By object Index

@@ -45,15 +45,19 @@
 #include "../game_main.h"
 #include "game_info.h"
 #include "screen_quickreconnect.h"
+#include "frm_main.h"
 
 #include "npc/npc_queues.h"
 #include "main/trees.h"
+
+#include "core/render.h"
 
 #include "cheat_code.h"
 
 #include "npc_id.h"
 #include "eff_id.h"
 
+bool g_ForceBitmaskMerge = false;
 
 static void redigitIsCool()
 {
@@ -136,11 +140,11 @@ static void dieCheater()
  */
 static void moonWalk()
 {
-    Location_t tempLocation;
+    TinyLocation_t tempLocation;
 
     for(int B = 1; B <= numWorldPaths; B++)
     {
-        tempLocation = static_cast<Location_t>(WorldPath[B].Location);
+        tempLocation = WorldPath[B].Location;
         tempLocation.X += 4;
         tempLocation.Y += 4;
         tempLocation.Width -= 8;
@@ -815,6 +819,7 @@ static void superbDemo200()
     if(B > 0)
     {
         numPlayers = 200;
+        g_ClonedPlayerMode = true;
 
         SetupScreens();
 
@@ -841,6 +846,7 @@ static void superbDemo128()
     if(B > 0)
     {
         numPlayers = 128;
+        g_ClonedPlayerMode = true;
 
         SetupScreens();
 
@@ -867,7 +873,10 @@ static void superbDemo64()
     if(B > 0)
     {
         numPlayers = 64;
+        g_ClonedPlayerMode = true;
+
         SetupScreens();
+
         if(Player[B].Effect == 9)
             Player[B].Effect = 0;
         Player[B].Immune = 1;
@@ -892,6 +901,7 @@ static void superbDemo32()
     {
         numPlayers = 32;
         SetupScreens();
+        g_ClonedPlayerMode = true;
 
         if(Player[B].Effect == 9)
             Player[B].Effect = 0;
@@ -918,6 +928,7 @@ static void superbDemo16()
     {
         numPlayers = 16;
         SetupScreens();
+        g_ClonedPlayerMode = true;
 
         if(Player[B].Effect == 9)
             Player[B].Effect = 0;
@@ -944,6 +955,7 @@ static void superbDemo8()
     {
         numPlayers = 8;
         SetupScreens();
+        g_ClonedPlayerMode = true;
 
         if(Player[B].Effect == 9)
             Player[B].Effect = 0;
@@ -970,6 +982,7 @@ static void superbDemo4()
     {
         numPlayers = 4;
         SetupScreens();
+        g_ClonedPlayerMode = true;
 
         if(Player[B].Effect == 9)
             Player[B].Effect = 0;
@@ -995,6 +1008,7 @@ static void superbDemo2()
 
     if(B > 0)
     {
+        g_ClonedPlayerMode = false;
         numPlayers = 2;
         SingleCoop = 1;
         SetupScreens();
@@ -1060,7 +1074,7 @@ static void onePlayer()
         }
 
         // set the living player to get the controls if not P1
-        if(B-1 < (int)Controls::g_InputMethods.size() && Controls::g_InputMethods[B-1])
+        if(!g_ClonedPlayerMode && !SingleCoop && B - 1 < (int)Controls::g_InputMethods.size() && Controls::g_InputMethods[B-1])
             std::swap(Controls::g_InputMethods[0], Controls::g_InputMethods[B-1]);
 
         // delete other control methods
@@ -1069,6 +1083,7 @@ static void onePlayer()
 
         numPlayers = 1;
         SingleCoop = 1;
+        g_ClonedPlayerMode = false;
         SetupScreens();
         if(Player[B].Effect == 9)
             Player[B].Effect = 0;
@@ -1112,6 +1127,7 @@ static void twoPlayer()
         }
 
         SingleCoop = 0;
+        g_ClonedPlayerMode = false;
         SetupScreens();
 
         if(Player[B].Effect == 9)
@@ -1735,14 +1751,19 @@ static void frameRate()
 {
     ShowFPS = !ShowFPS;
     PlaySound(ShowFPS ? SFX_PlayerGrow : SFX_PlayerShrink);
-    if(ShowFPS)
-        PrintFPS = 0;
 }
 
 static void speedDemon()
 {
     MaxFPS = !MaxFPS;
     PlaySound(MaxFPS ? SFX_PlayerGrow : SFX_PlayerShrink);
+}
+
+static void gifs2png()
+{
+    PlaySound(SFX_Transform);
+    g_ForceBitmaskMerge = !g_ForceBitmaskMerge;
+    XRender::unloadGifTextures();
 }
 
 static void newLeaf()
@@ -1927,6 +1948,9 @@ static const CheatCodeDefault_t s_cheatsListGlobalDefault[] =
     {"redigitiscool", redigitIsCool, false},
 #endif
     {"\x77\x6f\x68\x6c\x73\x74\x61\x6e\x64\x69\x73\x74\x73\x65\x68\x72\x67\x75\x74", redigitIsCool, false},
+
+    {"gifs2png", gifs2png, false},
+
     {nullptr, nullptr, false}
 };
 
@@ -1974,7 +1998,7 @@ static const CheatCodeDefault_t s_cheatsListLevelDefault[] =
     {"iamerror", becomeAsLink, true}, {"itsamelink", becomeAsLink, true},
     {"itsamemario", becomeAsMario, true}, {"plumberboy", becomeAsMario, true}, {"moustacheman", becomeAsMario, true},
     {"itsameluigi", becomeAsLuigi, true}, {"greenmario", becomeAsLuigi, true},
-    
+
     {"supermario200", superbDemo200, true},
     {"supermario128", superbDemo128, true},
     {"supermario64", superbDemo64, true},
@@ -2016,18 +2040,18 @@ static const CheatCodeDefault_t s_cheatsListLevelDefault[] =
     {"ahippinandahoppin", ahippinAndAHopping, true}, {"jumpman", ahippinAndAHopping, true},
     {"framerate", frameRate, false},
     {"speeddemon", speedDemon, true},
-    
+
     {"getmeouttahere", getMeOuttaHere, true},
     {"newleaf", newLeaf, true},
-    
+
     {"holytrinity", holyTrinity, true}, {"passerby", holyTrinity, true},
     {"essentials", essentials, true}, {"holyfour", essentials, true},
-    
+
     {"foundmycarkey", foundMyCarKey, true},
     {"lifegoals", lifeGoals, true},
     {"mysteryball", mysteryBall, true},
     {"itsvegas", itsVegas, true},
-    
+
     {nullptr, nullptr, false}
 };
 

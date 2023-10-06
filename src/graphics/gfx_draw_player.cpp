@@ -167,7 +167,9 @@ void DrawPlayer(Player_t &p, const int Z)
     float s = ShadowMode ? 0.f : 1.f;
     //auto &p = Player[A];
 
-    if(!p.Dead && !p.Immune2 && p.TimeToLive == 0 && !(p.Effect == 3 || p.Effect == 5 || p.Effect == 8 || p.Effect == 10))
+    bool player_door_scroll = (p.Effect == 7 && p.Effect2 >= 128);
+
+    if(!p.Dead && !p.Immune2 && p.TimeToLive == 0 && !(p.Effect == 3 || p.Effect == 5 || p.Effect == 8 || p.Effect == 10 || player_door_scroll))
     {
         if(vScreenCollision(Z, p.Location))
         {

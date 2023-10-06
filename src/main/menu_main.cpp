@@ -62,6 +62,10 @@
 #include "game_globals.h"
 #include "core/language.h"
 #include "main/translate.h"
+#include "fontman/font_manager.h"
+
+#include "video.h"
+#include "frm_main.h"
 
 #include "screen_textentry.h"
 #include "editor/new_editor.h"
@@ -140,6 +144,9 @@ void initMainMenu()
     g_mainMenu.optionsModeFullScreen = "Fullscreen mode";
     g_mainMenu.optionsModeWindowed = "Windowed mode";
     g_mainMenu.optionsViewCredits = "View credits";
+    g_mainMenu.optionsRestartEngine = "Restart engine for changes to take effect.";
+    g_mainMenu.optionsRender = "Render: {0}";
+    g_mainMenu.optionsRenderX = "Render: {0} (X)";
     g_mainMenu.optionsScaleMode = "Scale";
     g_mainMenu.optionsScaleInteger = "Integer";
     g_mainMenu.optionsScaleNearest = "Nearest";
@@ -230,7 +237,7 @@ static void s_findRecentEpisode()
            (MenuMode == MENU_2PLAYER_GAME && wPath == g_recentWorld2p) ||
            (MenuMode == MENU_EDITOR && wPath == g_recentWorldEditor))
         {
-            menuRecentEpisode = i - 1;
+            menuRecentEpisode = (int)i - 1;
             w.highlight = true;
         }
         else
@@ -406,7 +413,7 @@ static void s_FinishFindWorlds()
     SelectWorld_t createWorld = SelectWorld_t();
     createWorld.WorldName = g_mainMenu.editorNewWorld;
     SelectWorldEditable.push_back(createWorld);
-    NumSelectWorldEditable = (SelectWorldEditable.size() - 1);
+    NumSelectWorldEditable = ((int)SelectWorldEditable.size() - 1);
 
     s_findRecentEpisode();
 
@@ -429,6 +436,11 @@ void LoadSingleWorld(const std::string wPath)
 
     std::string fName = Files::basename(wPath);
     std::string epDir = wPath.substr(0, wPath.size() - fName.size());
+
+    if(epDir.empty())
+        epDir = "./";
+
+    epDir = DirMan(epDir).absolutePath() + "/";
 
     s_LoadSingleWorld(epDir, fName, head, tr, compatModern, true);
 
@@ -499,7 +511,7 @@ void FindLevels()
         }
     }
 
-    NumSelectBattle = (SelectBattle.size() - 1);
+    NumSelectBattle = ((int)SelectBattle.size() - 1);
 #ifndef PGE_NO_THREADING
     SDL_AtomicSet(&loading, 0);
 #endif
@@ -667,17 +679,17 @@ bool mainMenuUpdate()
                     {
                         int i = 0;
                         if(A == i++)
-                            menuLen = 18 * (g_gameInfo.disableTwoPlayer ? g_mainMenu.main1PlayerGame.size() : g_mainMenu.mainStartGame.size()) - 2;
+                            menuLen = 18 * (g_gameInfo.disableTwoPlayer ? (int)g_mainMenu.main1PlayerGame.size() : (int)g_mainMenu.mainStartGame.size()) - 2;
                         else if(!g_gameInfo.disableTwoPlayer && A == i++)
-                            menuLen = 18 * g_mainMenu.mainMultiplayerGame.size() - 2;
+                            menuLen = 18 * (int)g_mainMenu.mainMultiplayerGame.size() - 2;
                         else if(!g_gameInfo.disableBattleMode && A == i++)
-                            menuLen = 18 * g_mainMenu.mainBattleGame.size();
+                            menuLen = 18 * (int)g_mainMenu.mainBattleGame.size();
                         else if(g_config.enable_editor && A == i++)
-                            menuLen = 18 * g_mainMenu.mainEditor.size();
+                            menuLen = 18 * (int)g_mainMenu.mainEditor.size();
                         else if(A == i++)
-                            menuLen = 18 * g_mainMenu.mainOptions.size();
+                            menuLen = 18 * (int)g_mainMenu.mainOptions.size();
                         else if(A == i++)
-                            menuLen = 18 * g_mainMenu.mainExit.size();
+                            menuLen = 18 * (int)g_mainMenu.mainExit.size();
                         else
                             break;
 
@@ -1491,6 +1503,9 @@ bool mainMenuUpdate()
 #ifndef RENDER_FULLSCREEN_ALWAYS
             optionsMenuLength++; // FullScreen
 #endif
+#ifndef RENDER_CUSTOM
+            optionsMenuLength++; // Renderer
+#endif
             optionsMenuLength ++; // ScaleMode
 
             if(SharedCursor.Move)
@@ -1501,7 +1516,7 @@ bool mainMenuUpdate()
                     {
                         int i = 0;
                         if(A == i++)
-                            menuLen = 18 * g_mainMenu.controlsTitle.size();
+                            menuLen = 18 * (int)g_mainMenu.controlsTitle.size();
 #ifndef RENDER_FULLSCREEN_ALWAYS
                         else if(A == i++)
                         {
@@ -1511,8 +1526,12 @@ bool mainMenuUpdate()
                                 menuLen = 18 * 15; // std::strlen("fullscreen mode")
                         }
 #endif
+#ifndef RENDER_CUSTOM
                         else if(A == i++)
-                            menuLen = 18 * (7 + ScaleMode_strings.at(g_videoSettings.scaleMode).length());
+                            menuLen = 18 * 25; // Render Mode: XXXXXXXX
+#endif
+                        else if(A == i++)
+                            menuLen = 18 * (7 + (int)ScaleMode_strings.at(g_videoSettings.scaleMode).length());
                         else if(A == i++)
                             menuLen = 18 * 25; // Language: XXXXX (YY)
                         else
@@ -1568,6 +1587,49 @@ bool mainMenuUpdate()
                         ChangeScreen();
                     }
 #endif
+#ifndef RENDER_CUSTOM
+                    else if(MenuCursor == i++)
+                    {
+                        int delta = leftPressed ? -1 : 1;
+
+                        bool first = true;
+
+                        // check for and skip unsupported modes
+                        while(first
+#   ifndef THEXTECH_BUILD_GL_DESKTOP_MODERN
+                            || g_videoSettings.renderMode == RENDER_ACCELERATED_OPENGL
+#   endif
+#   ifndef THEXTECH_BUILD_GL_DESKTOP_LEGACY
+                            || g_videoSettings.renderMode == RENDER_ACCELERATED_OPENGL_LEGACY
+#   endif
+#   ifndef THEXTECH_BUILD_GL_ES_MODERN
+                            || g_videoSettings.renderMode == RENDER_ACCELERATED_OPENGL_ES
+#   endif
+#   ifndef THEXTECH_BUILD_GL_ES_LEGACY
+                            || g_videoSettings.renderMode == RENDER_ACCELERATED_OPENGL_ES_LEGACY
+#   endif
+                        )
+                        {
+                            g_videoSettings.renderMode += delta;
+                            if(g_videoSettings.renderMode < RENDER_SOFTWARE)
+                                g_videoSettings.renderMode = RENDER_END - 1;
+                            else if(g_videoSettings.renderMode >= RENDER_END)
+                                g_videoSettings.renderMode = RENDER_SOFTWARE;
+
+                            first = false;
+                        }
+
+                        bool res = g_frmMain.restartRenderer();
+                        PlaySoundMenu(SFX_PSwitch);
+                        SaveConfig();
+
+                        if(!res)
+                        {
+                            MessageText = g_mainMenu.optionsRestartEngine;
+                            PauseGame(PauseCode::Message);
+                        }
+                    }
+#endif // #ifndef RENDER_CUSTOM
                     else if(MenuCursor == i++)
                     {
                         PlaySoundMenu(SFX_Do);
@@ -1584,8 +1646,14 @@ bool mainMenuUpdate()
                     }
                     else if(MenuCursor == i++)
                     {
-                        XLanguage::rotateLanguage(g_config.language, leftPressed ? -1 : 1);
-                        ReloadTranslations();
+                        if(!FontManager::isInitied() || FontManager::isLegacy())
+                            PlaySoundMenu(SFX_BlockHit);
+                        else
+                        {
+                            XLanguage::rotateLanguage(g_config.language, leftPressed ? -1 : 1);
+                            ReloadTranslations();
+                            PlaySoundMenu(SFX_Climbing);
+                        }
                     }
                     else if(MenuCursor == i++ && (menuDoPress || MenuMouseClick))
                     {
@@ -1767,12 +1835,12 @@ static void s_drawGameSaves(int MenuX, int MenuY)
     // Gameplay Timer
     if(show_timer)
     {
-        std::string t = GameplayTimer::formatTime(info.Time);
+        std::string ts = GameplayTimer::formatTime(info.Time);
 
-        if(t.size() > 9)
-            t = t.substr(0, t.size() - 4);
+        if(ts.size() > 9)
+            ts = ts.substr(0, ts.size() - 4);
 
-        SuperPrint(fmt::format_ne(g_mainMenu.phraseTime, t), 3, infobox_x + 10, row_2);
+        SuperPrint(fmt::format_ne(g_mainMenu.phraseTime, ts), 3, infobox_x + 10, row_2);
     }
 
     // If demos off, put (l)ives and (c)oins on center
@@ -2056,6 +2124,23 @@ void mainMenuDraw()
         else
             SuperPrint(g_mainMenu.optionsModeFullScreen, 3, MenuX, MenuY + (30 * i++));
 #endif
+
+#ifndef RENDER_CUSTOM
+        const char* const renderers[] = {
+            "SW",
+            "HW",
+            "OpenGL 3+",
+            "OpenGL ES 2+",
+            "OpenGL 1.1",
+            "OpenGL ES 1.1",
+        };
+
+        const std::string &renderStr = (g_videoSettings.renderMode == g_videoSettings.renderModeObtained) ?
+                                           g_mainMenu.optionsRender :
+                                           g_mainMenu.optionsRenderX;
+        SuperPrint(fmt::format_ne(renderStr, renderers[g_videoSettings.renderMode]), 3, MenuX, MenuY + (30 * i++));
+#endif
+
         const std::string* scale_str = &ScaleMode_strings.at(g_videoSettings.scaleMode);
         if(g_videoSettings.scaleMode == SCALE_DYNAMIC_INTEGER)
             scale_str = &g_mainMenu.optionsScaleInteger;
@@ -2065,8 +2150,14 @@ void mainMenuDraw()
             scale_str = &g_mainMenu.optionsScaleLinear;
 
         SuperPrint(fmt::format_ne("{0}: {1}", g_mainMenu.optionsScaleMode, *scale_str), 3, MenuX, MenuY + (30 * i++));
-        SuperPrint(fmt::format_ne("{0}: {1} ({2})", g_mainMenu.wordLanguage, g_mainMenu.languageName, g_config.language), 3, MenuX, MenuY + (30 * i++));
+
+        if(!FontManager::isInitied() || FontManager::isLegacy())
+            SuperPrint("Language: <missing \"fonts\">", 3, MenuX, MenuY + (30 * i++), 0.5f, 0.5f, 0.5f, 1.0f);
+        else
+            SuperPrint(fmt::format_ne("{0}: {1} ({2})", g_mainMenu.wordLanguage, g_mainMenu.languageName, g_config.language), 3, MenuX, MenuY + (30 * i++));
+
         SuperPrint(g_mainMenu.optionsViewCredits, 3, MenuX, MenuY + (30 * i++));
+
         XRender::renderTexture(MenuX - 20, MenuY + (MenuCursor * 30),
                                GFX.MCursor[0].w, GFX.MCursor[0].h, GFX.MCursor[0], 0, 0);
     }

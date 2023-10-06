@@ -44,6 +44,9 @@ DeathCounter::DeathCounter() noexcept
     mEnabled = false;
     mCurTotalDeaths = 0;
     mCurLevelDeaths = 0;
+
+    // Print Demos counter with a font 3
+    m_print.font = 3;
 }
 
 void DeathCounter::init()
@@ -339,19 +342,47 @@ void DeathCounter::Recount()
 }
 
 // DRAW - Print the death counter in its current state
-void DeathCounter::Draw() const
+void DeathCounter::Draw(int screenZ)
 {
     if(!mEnabled)
         return;
 
     // Format string to print
-    std::string printstr = fmt::format_ne("{0} / {1}", mCurLevelDeaths, mCurTotalDeaths);
-    auto minusoffset = (float)(123 - (printstr.size() * 8));
+    m_print.syncCache(mCurLevelDeaths, mCurTotalDeaths);
+    m_print.syncCache(gDemoCounterTitle);
 
     XRender::offsetViewportIgnore(true);
-    // Print to screen in upper left
-    SuperPrint(gDemoCounterTitle, 3, 80, 27);
-    SuperPrint(printstr, 3, minusoffset, 48);
+
+    const vScreen_t& vscreen = vScreen[screenZ];
+
+    // With normal res, print to screen in upper left
+    if(vscreen.Width >= 800)
+    {
+        int title_X   = 123 - m_print.titlePixLen / 2;
+        int counter_X = 123 - m_print.counterPixLen / 2;
+
+        // make even
+        title_X &= ~1;
+        counter_X &= ~1;
+
+        SuperPrint(gDemoCounterTitle, m_print.font, title_X, 26);
+        SuperPrint(m_print.counterOut, m_print.font, counter_X, 48);
+    }
+    // At low res, print to top of screen
+    else
+    {
+        int total_W = m_print.titlePixLen + 16 + m_print.counterPixLen;
+        int title_X = vscreen.Width / 2 - total_W / 2;
+        int counter_X = title_X + m_print.titlePixLen + 16;
+
+        // make even
+        title_X &= ~1;
+        counter_X &= ~1;
+
+        SuperPrint(gDemoCounterTitle, m_print.font, title_X, 0);
+        SuperPrint(m_print.counterOut, m_print.font, counter_X, 0);
+    }
+
     XRender::offsetViewportIgnore(false);
 }
 
@@ -370,5 +401,28 @@ void DeathCounter::PrintDebug() const
             Renderer::Get().AddOp(new RenderStringOp(iter.m_levelName, 2, 80, y));
             y += 30;
         }
+    }
+}
+
+void DeathCounter::CachedPrint::syncCache(int curLevel, int total)
+{
+    if(curLevel != counterLevel || total != counterTotal)
+    {
+        counterLevel = curLevel;
+        counterTotal = total;
+        counterOut = fmt::format_ne("{0} / {1}", curLevel, total);
+        counterPixLen = SuperTextPixLen(counterOut.c_str(), font);
+    }
+}
+
+void DeathCounter::CachedPrint::syncCache(const std::string &title)
+{
+    intptr_t ptr = reinterpret_cast<intptr_t>(title.c_str());
+
+    if(titlePointer != ptr || titleSize != title.size())
+    {
+        titlePointer = ptr;
+        titleSize = title.size();
+        titlePixLen = SuperTextPixLen(title.c_str(), font);
     }
 }

@@ -22,13 +22,17 @@
 #ifndef SCREEN_QUICKRECONNECT_H
 #define SCREEN_QUICKRECONNECT_H
 
+#include "global_constants.h"
+
 namespace QuickReconnectScreen
 {
 
+constexpr int MAX_TOAST_DURATION = 66 * 3; // 3 seconds
+
 extern bool g_active;
+extern int g_toast_duration[maxLocalPlayers];
 
 void Deactivate();
-void Render();
 void Logic();
 
 } // namespace QuickReconnectScreen

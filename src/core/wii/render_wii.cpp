@@ -42,6 +42,8 @@
 #include "video.h"
 #include "frame_timer.h"
 
+#include "main/cheat_code.h"
+
 #include "core/window.h"
 
 #include "core/render.h"
@@ -255,7 +257,7 @@ void s_loadTexture(StdPicture& target, void* data, int width, int height, int pi
 
         if(w_i > 0 && h_i > 0)
         {
-            uint32_t wdst, hdst;
+            uint32_t wdst = 0, hdst = 0;
             target.d.backing_texture[i + 3 * mask] = s_RawTo4x4RGBA((uint8_t*)data + start_y * pitch + start_x * 4, w_i, h_i, pitch, &wdst, &hdst, downscale);
 
             if(target.d.backing_texture[i + 3 * mask])
@@ -753,6 +755,13 @@ void lazyLoad(StdPicture& target)
             pLogWarning("Error: %d (%s)", errno, strerror(errno));
             target.inited = false;
             return;
+        }
+
+        if(FI_mask && (g_ForceBitmaskMerge || !GraphicsHelps::validateBitmaskRequired(FI_tex, FI_mask, target.l.path)))
+        {
+            GraphicsHelps::mergeWithMask(FI_tex, FI_mask);
+            GraphicsHelps::closeImage(FI_mask);
+            FI_mask = nullptr;
         }
 
         if(target.l.colorKey) // Apply transparent color for key pixels

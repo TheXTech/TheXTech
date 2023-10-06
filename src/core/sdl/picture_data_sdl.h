@@ -22,7 +22,11 @@
 #ifndef PICTURE_DATA_SDL_H
 #define PICTURE_DATA_SDL_H
 
+#include <memory>
 #include <stdint.h>
+
+#include "core/opengl/gl_program_object.h"
+#include "core/opengl/gl_particle_system.h"
 
 typedef unsigned int    GLenum;
 typedef int             GLint;
@@ -38,11 +42,27 @@ struct StdPictureData
 // Compatible backend is only can use these internals
 private:
     friend class RenderSDL;
+    friend class RenderGL;
 
     //! Texture instance pointer for SDL Render
     SDL_Texture *texture = nullptr;
     //! Mask texture instance pointer for SDL Render
     SDL_Texture *mask_texture = nullptr;
+
+#ifdef THEXTECH_BUILD_GL_MODERN
+
+    //! GLProgramObject wrapper for texture's shader program
+    std::unique_ptr<GLProgramObject> shader_program = nullptr;
+
+    //! GLParticleSystem wrapper for texture's particle system state
+    std::unique_ptr<GLParticleSystem> particle_system = nullptr;
+
+#else
+
+    static constexpr GLProgramObject* shader_program = nullptr;
+    static constexpr GLParticleSystem* particle_system = nullptr;
+
+#endif
 
     //! texture ID for OpenGL and other render engines
     GLuint       texture_id = 0;
@@ -62,12 +82,20 @@ private:
     //! Cached color modifier
     uint8_t     modColor[4] = {255,255,255,255};
 
+    //! Can use depth test for out-of-order rendering
+    bool        use_depth_test = true;
+
 // Public API
 public:
 
     inline bool hasTexture() const
     {
-        return texture != nullptr;
+        return texture != nullptr || texture_id != 0;
+    }
+
+    inline void invalidateDepthTest()
+    {
+        use_depth_test = false;
     }
 };
 

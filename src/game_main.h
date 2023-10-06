@@ -30,7 +30,6 @@ enum class PauseCode
     None,
     PauseScreen,
     Message,
-    Reconnect,
     DropAdd,
     TextEntry,
     Prompt,

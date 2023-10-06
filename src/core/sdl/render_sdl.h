@@ -84,7 +84,7 @@ public:
 
     bool isWorking() override;
 
-    bool initRender(const CmdLineSetup_t &setup, SDL_Window *window);
+    bool initRender(const CmdLineSetup_t &setup, SDL_Window *window) override;
 
     /*!
      * \brief Close the renderer
@@ -160,7 +160,7 @@ public:
     void setTargetScreen() override;
 
 
-    void loadTexture(StdPicture &target,
+    void loadTextureInternal(StdPicture &target,
                      uint32_t width,
                      uint32_t height,
                      uint8_t *RGBApixels,

@@ -20,7 +20,10 @@
 
 // needed because there are a lot of writes / scans whose failure is detected at the end of the function
 // updated versions of glibc don't even seem to trigger this warning in this context
-#pragma GCC diagnostic ignored "-Wunused-result"
+#if defined(__GNUC__) || defined(__MINGW32__)
+#   pragma GCC diagnostic ignored "-Wunused-result"
+#   define XTECH_GCC_UNUSED_RESULT_IGNORED
+#endif
 
 
 // this module handles particular the control recording and playback functions
@@ -640,7 +643,7 @@ static void read_NPCs()
     fscanf(replay_file, "NPCs\r\n%n", &success);
 
     // will only possibly be used in the cases where it is initialized by fscanf
-    int o_numNPCs;
+    int o_numNPCs = 0;
 
     if(!success || fscanf(replay_file, "numNPCs %d\r\n", &o_numNPCs) != 1)
         success = 0;
@@ -926,6 +929,6 @@ void Sync()
 
 } // namespace Record
 
-#ifdef X_GCC_NO_WARNING_FORMAT
+#if defined(X_GCC_NO_WARNING_FORMAT) || defined(XTECH_GCC_UNUSED_RESULT_IGNORED)
 #   pragma GCC diagnostic pop
 #endif

@@ -176,7 +176,7 @@ static std::string findIntroLevel()
     if(!rootIntro.empty())
         intros.push_back(rootIntro);
 
-    const std::string &selected = intros[iRand2(intros.size())];;
+    const std::string &selected = intros[iRand2T(intros.size())];
 
     pLogDebug("Selected intro level to start: %s", selected.c_str());
 
@@ -373,8 +373,15 @@ int GameMain(const CmdLineSetup_t &setup)
             BattleMode = false;
             BattleIntro = 0;
         }
-        GodMode = setup.testGodMode;
-        GrabAll = setup.testGrabAll;
+
+        if(!is_world)
+        {
+            GodMode = setup.testGodMode;
+            GrabAll = setup.testGrabAll;
+
+            if(GodMode || GrabAll)
+                Cheater = true;
+        }
 
         editorScreen.ResetCursor();
 
@@ -414,11 +421,42 @@ int GameMain(const CmdLineSetup_t &setup)
                 if(numPlayers < 1)
                     numPlayers = 1;
 
+                for(int A = 1; A <= numCharacters; A++)
+                    blockCharacter[A] = SelectWorld[selWorld].blockChar[A];
+
                 // prepare for StartEpisode(): set player characters
                 for(int i = 0; i < numPlayers; i++)
                 {
                     if(testPlayer[i + 1].Character != 0)
                         g_charSelect[i] = testPlayer[i + 1].Character;
+                    else
+                        g_charSelect[i] = i + 1;
+
+                    // replace blocked characters
+                    if(blockCharacter[g_charSelect[i]])
+                    {
+                        for(int new_char = 1; new_char <= numCharacters; new_char++)
+                        {
+                            // check it's unblocked
+                            if(blockCharacter[new_char])
+                                continue;
+
+                            // check no other player has the character first
+                            int j = 0;
+                            for(; j < i; j++)
+                            {
+                                if(g_charSelect[j] == new_char)
+                                    break;
+                            }
+
+                            // if loop ended naturally, character is unused
+                            if(j == i)
+                            {
+                                g_charSelect[i] = new_char;
+                                break;
+                            }
+                        }
+                    }
 
                     if(i <= (int)Controls::g_InputMethods.size())
                         Controls::g_InputMethods.push_back(nullptr);
@@ -686,6 +724,9 @@ int GameMain(const CmdLineSetup_t &setup)
             SuperSpeed = false;
             FlyForever = false;
             BeatTheGame = false;
+            g_ForceBitmaskMerge = false;
+            g_ClonedPlayerMode = false;
+            XRender::unloadGifTextures();
 
             SetupScreens();
 
@@ -772,11 +813,11 @@ int GameMain(const CmdLineSetup_t &setup)
 
             delayedMusicStart(); // Allow music being started
 
-            ProcEvent(EVENT_LEVEL_START, true);
+            ProcEvent(EVENT_LEVEL_START, 0, true);
             For(A, 2, maxEvents)
             {
                 if(Events[A].AutoStart)
-                    ProcEvent(A, true);
+                    ProcEvent(A, 0, true);
             }
 
             // Main menu loop
@@ -1037,42 +1078,82 @@ int GameMain(const CmdLineSetup_t &setup)
                     ReturnWarp = 0;
             }
 
-            speedRun_resetCurrent();
-//'--------------------------------------------
+            // ---------------------------------------
+            //    Verify if level can run or not
+            // ---------------------------------------
+            bool hasPlayerPoint = false;
+            bool hasStartWarp = (Player[1].Warp > 0);
+            bool hasValidStartWarp = (Player[1].Warp > 0 && Player[1].Warp <= numWarps);
+            bool startError = false;
 
-            // Update graphics before loop begin (to process inital lazy-unpacking of used sprites)
-            GraphicsLazyPreLoad();
-            resetFrameTimer();
+            for(int i = 1; i <= numPlayers && i <= 2; ++i)
+                hasPlayerPoint |= !PlayerStart[i].isNull();
 
-            speedRun_triggerEnter();
-
-            clearScreenFaders(); // Reset all faders
-            if(g_config.EnableInterLevelFade)
-                g_levelScreenFader.setupFader(2, 65, 0, ScreenFader::S_FADE);
-
-            lunaLoad();
-
-            delayedMusicStart(); // Allow music being started
-
-            ProcEvent(EVENT_LEVEL_START, true);
-            for(int A = 2; A <= maxEvents; ++A)
+            if(hasStartWarp && !hasValidStartWarp)
             {
-                if(Events[A].AutoStart)
-                    ProcEvent(A, true);
+                MessageText = fmt::format_ne(g_gameStrings.errorInvalidEnterWarp,
+                                             FullFileName,
+                                             StartWarp,
+                                             numWarps);
+                startError = true;
+            }
+            else if(!hasPlayerPoint && !hasStartWarp)
+            {
+                MessageText = fmt::format_ne(g_gameStrings.errorNoStartPoint, FullFileName);
+                startError = true;
             }
 
-            // MAIN GAME LOOP
-            runFrameLoop(nullptr, &GameLoop,
-            []()->bool{return !LevelSelect && !GameMenu;},
-            []()->bool
+            if(startError) // Quit the level because of error
             {
-                if(!LivingPlayers())
+                // Mark all players as dead
+                for(int A = 1; A <= numPlayers; A++)
+                    Player[A].Dead = true;
+
+                PauseGame(PauseCode::Message);
+
+                ++Lives;
+                EveryonesDead();
+                clearScreenFaders();
+            }
+            else // Run the level normally
+            {
+                speedRun_resetCurrent();
+//'--------------------------------------------
+
+                // Update graphics before loop begin (to process inital lazy-unpacking of used sprites)
+                GraphicsLazyPreLoad();
+                resetFrameTimer();
+
+                speedRun_triggerEnter();
+
+                clearScreenFaders(); // Reset all faders
+                if(g_config.EnableInterLevelFade)
+                    g_levelScreenFader.setupFader(2, 65, 0, ScreenFader::S_FADE);
+
+                lunaLoad();
+
+                delayedMusicStart(); // Allow music being started
+
+                ProcEvent(EVENT_LEVEL_START, 0, true);
+                for(int A = 2; A <= maxEvents; ++A)
                 {
-                    EveryonesDead();
-                    return true;
+                    if(Events[A].AutoStart)
+                        ProcEvent(A, 0, true);
                 }
-                return false;
-            });
+
+                // MAIN GAME LOOP
+                runFrameLoop(nullptr, &GameLoop,
+                []()->bool{return !LevelSelect && !GameMenu;},
+                []()->bool
+                {
+                    if(!LivingPlayers())
+                    {
+                        EveryonesDead();
+                        return true;
+                    }
+                    return false;
+                });
+            }
 
             if(LevelBeatCode > 0)
             {
@@ -1838,19 +1919,18 @@ void StartEpisode()
         Player[i].Hearts = 0;
     }
 
-    numPlayers = Controls::g_InputMethods.size();
+    numPlayers = (int)Controls::g_InputMethods.size();
     if(numPlayers > maxLocalPlayers)
         numPlayers = maxLocalPlayers;
+
     for(int i = 0; i < numPlayers; i++)
     {
         if(g_charSelect[i] != 0)
             Player[i + 1].Character = g_charSelect[i];
     }
 
-    for(int i = Controls::g_InputMethods.size() - 1; i >= numPlayers; i--)
-    {
+    for(int i = (int)Controls::g_InputMethods.size() - 1; i >= numPlayers; i--)
         Controls::DeleteInputMethodSlot(i);
-    }
 
     ConnectScreen::SaveChars();
 
@@ -1902,9 +1982,9 @@ void StartEpisode()
     {
         For(A, 1, numWorldPaths)
         {
-            SpeedlessLocation_t tempLocation = WorldPath[A].Location;
+            TinyLocation_t tempLocation = WorldPath[A].Location;
             {
-                SpeedlessLocation_t &l = tempLocation;
+                TinyLocation_t &l = tempLocation;
                 l.X += 4;
                 l.Y += 4;
                 l.Width -= 8;
@@ -1975,19 +2055,18 @@ void StartBattleMode()
         Player[i].Hearts = 2;
     }
 
-    numPlayers = Controls::g_InputMethods.size();
+    numPlayers = (int)Controls::g_InputMethods.size();
     if(numPlayers > maxLocalPlayers)
         numPlayers = maxLocalPlayers;
+
     for(int i = 0; i < numPlayers; i++)
     {
         if(g_charSelect[i] != 0)
             Player[i + 1].Character = g_charSelect[i];
     }
 
-    for(int i = Controls::g_InputMethods.size() - 1; i >= numPlayers; i--)
-    {
+    for(int i = (int)Controls::g_InputMethods.size() - 1; i >= numPlayers; i--)
         Controls::DeleteInputMethodSlot(i);
-    }
 
     numStars = 0;
     Coins = 0;

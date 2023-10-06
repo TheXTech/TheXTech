@@ -86,7 +86,7 @@ struct node_t
             }
         }
 
-        inline iterator(node_t* parent, size_t i): parent(parent), i(i)
+        inline iterator(node_t* parent, size_t i): parent(parent), i((uint16_t)i)
         {
             this->check_linkage();
         }

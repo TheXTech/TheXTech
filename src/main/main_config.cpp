@@ -48,11 +48,16 @@ void OpenConfig_preSetup()
     const IniProcessing::StrEnumMap renderMode =
     {
         {"sw", RENDER_SOFTWARE},
-        {"hw", RENDER_ACCELERATED},
-        {"vsync", RENDER_ACCELERATED_VSYNC},
+        {"hw", RENDER_ACCELERATED_SDL},
+        {"vsync", RENDER_ACCELERATED_VSYNC_DEPRECATED},
+        {"sdl", RENDER_ACCELERATED_SDL},
+        {"opengl", RENDER_ACCELERATED_OPENGL},
+        {"opengles", RENDER_ACCELERATED_OPENGL_ES},
+        {"opengl11", RENDER_ACCELERATED_OPENGL_LEGACY},
+        {"opengles11", RENDER_ACCELERATED_OPENGL_ES_LEGACY},
         {"0", RENDER_SOFTWARE},
-        {"1", RENDER_ACCELERATED},
-        {"2", RENDER_ACCELERATED_VSYNC}
+        {"1", RENDER_ACCELERATED_SDL},
+        {"2", RENDER_ACCELERATED_VSYNC_DEPRECATED}
     };
 
 #ifndef THEXTECH_NO_SDL_BUILD
@@ -122,16 +127,20 @@ void OpenConfig_preSetup()
         IniProcessing config(configPath);
 
         config.beginGroup("main");
-        config.read("loading-debug", g_config.loading_show_debug, true);
         config.read("language", g_config.language, g_config.language);
         config.endGroup();
 
         config.beginGroup("video");
-        config.readEnum("render", g_videoSettings.renderMode, (int)RENDER_ACCELERATED, renderMode);
+        config.readEnum("render", g_videoSettings.renderMode, (int)RENDER_ACCELERATED_SDL, renderMode);
+        config.read("vsync", g_videoSettings.vSync, (g_videoSettings.renderMode == RENDER_ACCELERATED_VSYNC_DEPRECATED));
         config.read("background-work", g_videoSettings.allowBgWork, false);
         config.read("background-controller-input", g_videoSettings.allowBgControllerInput, false);
         config.read("frame-skip", g_videoSettings.enableFrameSkip, true);
         config.read("show-fps", g_videoSettings.showFrameRate, false);
+
+        if(g_videoSettings.renderMode == RENDER_ACCELERATED_VSYNC_DEPRECATED)
+            g_videoSettings.renderMode = RENDER_ACCELERATED_SDL;
+
         bool scale_down_all;
         config.read("scale-down-all-textures", scale_down_all, false);
         config.readEnum("scale-down-textures", g_videoSettings.scaleDownTextures, scale_down_all ? (int)VideoSettings_t::SCALE_ALL : (int)VideoSettings_t::SCALE_SAFE, scaleDownTextures);
@@ -252,12 +261,9 @@ void OpenConfig()
         config.endGroup();
 
         config.beginGroup("gameplay");
-        config.read("ground-pound-by-alt-run", g_config.GameplayPoundByAltRun, false);
         config.readEnum("world-map-stars-show-policy", g_config.WorldMapStarShowPolicyGlobal, 0, starsShowPolicy);
         config.readEnum("medals-show-policy", g_config.medals_show_policy, 0, medalsShowPolicy);
-        config.read("strict-drop-add", g_config.StrictDropAdd, false);
         config.read("no-pause-reconnect", g_config.NoPauseReconnect, false);
-        config.read("enter-cheats-menu-item", g_config.enter_cheats_menu_item, false);
         config.read("world-map-fast-move", g_config.worldMapFastMove, false);
 #ifdef ENABLE_XTECH_DISCORD_RPC
         config.read("discord-rpc", g_config.discord_rpc, false);
@@ -314,7 +320,6 @@ void SaveConfig()
     config.setValue("use-native-osk", g_config.use_native_osk);
     config.setValue("enable-editor", g_config.enable_editor);
     config.setValue("editor-edge-scroll", g_config.editor_edge_scroll);
-    config.setValue("loading-debug", g_config.loading_show_debug);
     config.setValue("language", g_config.language);
     config.endGroup();
 
@@ -329,8 +334,11 @@ void SaveConfig()
         std::unordered_map<int, std::string> renderMode =
         {
             {RENDER_SOFTWARE, "sw"},
-            {RENDER_ACCELERATED, "hw"},
-            {RENDER_ACCELERATED_VSYNC, "vsync"},
+            {RENDER_ACCELERATED_SDL, "hw"},
+            {RENDER_ACCELERATED_OPENGL, "opengl"},
+            {RENDER_ACCELERATED_OPENGL_ES, "opengles"},
+            {RENDER_ACCELERATED_OPENGL_LEGACY, "opengl11"},
+            {RENDER_ACCELERATED_OPENGL_ES_LEGACY, "opengles11"},
         };
 
         std::unordered_map<int, std::string> batteryStatus =
@@ -357,6 +365,7 @@ void SaveConfig()
         };
 
         config.setValue("render", renderMode[g_videoSettings.renderMode]);
+        config.setValue("vsync", g_videoSettings.vSync);
         config.setValue("background-work", g_videoSettings.allowBgWork);
         config.setValue("background-controller-input", g_videoSettings.allowBgControllerInput);
         config.setValue("frame-skip", g_videoSettings.enableFrameSkip);
@@ -416,14 +425,11 @@ void SaveConfig()
             {2, "smbx13"}
         };
 
-        config.setValue("ground-pound-by-alt-run", g_config.GameplayPoundByAltRun);
         config.setValue("world-map-stars-show-policy", starsShowPolicy[g_config.WorldMapStarShowPolicyGlobal]);
         config.setValue("medals-show-policy", medalsShowPolicy[g_config.medals_show_policy]);
         config.setValue("compatibility-mode", compatMode[g_preSetup.compatibilityMode]);
     }
-    config.setValue("strict-drop-add", g_config.StrictDropAdd);
     config.setValue("no-pause-reconnect", g_config.NoPauseReconnect);
-    config.setValue("enter-cheats-menu-item", g_config.enter_cheats_menu_item);
     config.setValue("world-map-fast-move", g_config.worldMapFastMove);
 #ifdef ENABLE_XTECH_DISCORD_RPC
     config.setValue("discord-rpc", g_config.discord_rpc);

@@ -612,19 +612,19 @@ void treeBackgroundJoinLayer(int layer)
     s_background_tables.join(layer);
 }
 
-void treeBackgroundAddLayer(int layer, BackgroundRef_t Background)
+void treeBackgroundAddLayer(int layer, BackgroundRef_t obj)
 {
-    s_background_tables.add(layer, Background);
+    s_background_tables.add(layer, obj);
 }
 
-void treeBackgroundUpdateLayer(int layer, BackgroundRef_t Background)
+void treeBackgroundUpdateLayer(int layer, BackgroundRef_t obj)
 {
-    s_background_tables.update(layer, Background);
+    s_background_tables.update(layer, obj);
 }
 
-void treeBackgroundRemoveLayer(int layer, BackgroundRef_t Background)
+void treeBackgroundRemoveLayer(int layer, BackgroundRef_t obj)
 {
-    s_background_tables.erase(layer, Background);
+    s_background_tables.erase(layer, obj);
 }
 
 TreeResult_Sentinel<BackgroundRef_t> treeBackgroundQuery(double Left, double Top, double Right, double Bottom,
@@ -806,19 +806,19 @@ void treeWaterJoinLayer(int layer)
     s_water_tables.join(layer);
 }
 
-void treeWaterAddLayer(int layer, WaterRef_t Water)
+void treeWaterAddLayer(int layer, WaterRef_t obj)
 {
-    s_water_tables.add(layer, Water);
+    s_water_tables.add(layer, obj);
 }
 
-void treeWaterUpdateLayer(int layer, WaterRef_t Water)
+void treeWaterUpdateLayer(int layer, WaterRef_t obj)
 {
-    s_water_tables.update(layer, Water);
+    s_water_tables.update(layer, obj);
 }
 
-void treeWaterRemoveLayer(int layer, WaterRef_t Water)
+void treeWaterRemoveLayer(int layer, WaterRef_t obj)
 {
-    s_water_tables.erase(layer, Water);
+    s_water_tables.erase(layer, obj);
 }
 
 TreeResult_Sentinel<WaterRef_t> treeWaterQuery(double Left, double Top, double Right, double Bottom,

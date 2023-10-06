@@ -57,15 +57,21 @@ struct vScreen_t : public qScreen_t
 //    Visible As Boolean
     bool Visible = false;
 
+    // NEW: which screen the vScreen belongs to.
     uint8_t screen_ref = 0;
+
+    // NEW: which player is associated with the vScreen. IMPORTANT: unused when shared screen mode is active
     uint8_t player = 0;
 };
 
-//Public vScreen(0 To 2) As vScreen 'Sets up the players screens
-extern RangeArr<vScreen_t, 0, 2> vScreen;
+constexpr int c_screenCount = 1;
+constexpr int c_vScreenCount = c_screenCount * maxLocalPlayers;
 
 //Public vScreen(0 To 2) As vScreen 'Sets up the players screens
-extern RangeArr<qScreen_t, 0, 2> qScreenLoc;
+extern RangeArr<vScreen_t, 0, c_vScreenCount> vScreen;
+
+//Public vScreen(0 To 2) As vScreen 'Sets up the players screens
+extern RangeArr<qScreen_t, 0, c_vScreenCount> qScreenLoc;
 
 namespace ScreenTypes
 {
@@ -98,19 +104,23 @@ namespace DScreenTypes
 
 struct Screen_t
 {
+private:
+    //! a reference to the canonical Screen for this screen (an 800x600 screen with the same players); 0 indicates that the screen itself is canonical
+    uint8_t m_CanonicalScreen = 0;
+    //! a reference to the visible Screen for a canonical screen
+    uint8_t m_VisibleScreen = 0;
+
+public:
     using localarr_t = std::array<uint8_t, maxLocalPlayers>;
 
     //! which vScreens belong to the screen
-    localarr_t vScreen_refs = localarr_t{1, 2};
+    localarr_t vScreen_refs;
 
-    // which players belong to the screen (at most one visible and one canonical screen may have a single player). zero-terminated.
-    localarr_t players = localarr_t{1, 2};
+    // which players belong to the screen (no player may belong to multiple visible screens). zero-terminated.
+    localarr_t players;
 
     //! whether this is being rendered by any client (not necessarily the local one)
     bool Visible = true;
-
-    //! a reference to the canonical Screen for this screen (an 800x600 screen with the same players), can be self
-    uint8_t CanonicalScreen = 0;
 
     //! the logical width of the screen in pixels
     int W = 800;
@@ -124,12 +134,33 @@ struct Screen_t
     //! the currently active dynamic split mode for the screen
     int DType = DScreenTypes::Inactive;
 
+    inline bool is_canonical() const
+    {
+        return m_CanonicalScreen == 0;
+    }
+
+    Screen_t& canonical_screen();
+    const Screen_t& canonical_screen() const;
+
+    Screen_t& visible_screen();
+    const Screen_t& visible_screen() const;
+
+    void set_canonical_screen(uint8_t index);
+
     // uses a 1-index to simplify conversion of legacy code
     inline vScreen_t& vScreen(size_t index) const
     {
         return ::vScreen[vScreen_refs[index - 1]];
     }
+
+    //! First active vScreen index (0-indexed). Use to replace numScreens logic.
+    int active_begin() const;
+
+    //! Bound on active vScreen indexes (0-indexed). Use to replace numScreens logic.
+    int active_end() const;
 };
+
+void InitScreens();
 
 // finds the visible Screen that contains a specific player
 Screen_t& ScreenByPlayer(int player);
@@ -138,13 +169,25 @@ Screen_t& ScreenByPlayer(int player);
 // Screen_t& ScreenByPlayer_canonical(int player);
 
 // finds the visible vScreen that contains a specific player
-vScreen_t& vScreenByPlayer(int player);
+int vScreenIdxByPlayer(int player);
+
+// finds the visible vScreen that contains a specific player
+inline vScreen_t& vScreenByPlayer(int player)
+{
+    return vScreen[vScreenIdxByPlayer(player)];
+}
 
 // finds the canonical vScreen that contains a specific player
-// vScreen_t& vScreenByPlayer_canonical(int player);
+int vScreenIdxByPlayer_canonical(int player);
+
+// finds the visible vScreen that contains a specific player
+inline vScreen_t& vScreenByPlayer_canonical(int player)
+{
+    return vScreen[vScreenIdxByPlayer_canonical(player)];
+}
 
 //! a list of all screens (local and remote, visible and virtual)
-extern RangeArr<Screen_t, 0, 0> Screens;
+extern RangeArr<Screen_t, 0, c_screenCount - 1> Screens;
 
 //! the screen being rendered by the local client (or, try to make all uses of ScreenW / ScreenH occur in functions that get passed a screen?)
 extern Screen_t* l_screen;

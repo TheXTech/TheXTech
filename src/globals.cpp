@@ -45,11 +45,10 @@ long myBackBuffer = 0;
 long myBufferBMP = 0;
 int AllCharBlock = 0;
 bool StartMenu = false;
-int BlockFlash = 0;
+uint32_t CommonFrame = 0;
 bool ScrollRelease = false;
 bool TakeScreen = false;
 bool ShowOnScreenHUD = true;
-bool NewFontRender = true;
 std::string LB;
 std::string EoT;
 
@@ -345,6 +344,7 @@ bool TestFullscreen = false;
 //bool keyDownEnter = false;
 bool BlocksSorted = false;
 int SingleCoop = 0;
+bool g_ClonedPlayerMode = false;
 //std::string CheatString;
 bool GameOutro = false;
 bool GameOutroDoQuit = false;
@@ -599,6 +599,8 @@ void initAll()
     Block.fill(Block_t());
     Background.fill(Background_t());
     NPC.fill(NPC_t());
+
+    InitScreens();
 }
 
 

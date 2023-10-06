@@ -168,6 +168,26 @@ std::string AppPathP::assetsRoot()
     return s_assetsRoot;
 }
 
+std::string AppPathP::settingsRoot()
+{
+    /*
+     * Fill this in only condition when you want to use the system-wide settings
+     * directory out of user directory. Keep it empty if you want to keep the
+     * default behaviour (i.e. settings saved at the user directory)
+     */
+    return std::string();
+}
+
+std::string AppPathP::gamesavesRoot()
+{
+    /*
+     * Fill this in only condition when you want to use the system-wide gamesaves
+     * directory out of user directory. Keep it empty if you want to keep the
+     * default behaviour (i.e. gamesaves saved at the settings directory)
+     */
+    return std::string();
+}
+
 std::string AppPathP::screenshotsRoot()
 {
     return s_screenshotsPath;

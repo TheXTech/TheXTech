@@ -35,11 +35,14 @@ typedef union SDL_Event SDL_Event;
 #include "sdl_proxy/sdl_assert.h"
 
 #include "globals.h"
+#include "core/power.h"
 
 extern Controls_t &operator|=(Controls_t &o1, const Controls_t &o2);
 
 namespace Controls
 {
+
+using XPower::StatusInfo;
 
 class InputMethod;
 class InputMethodProfile;
@@ -392,7 +395,6 @@ enum Buttons : size_t
     DebugInfo, EnterCheats,
     ToggleHUD, LegacyPause,
 #ifdef DEBUG_BUILD
-    ToggleFontRender,
     ReloadLanguage,
 #endif
     MAX
@@ -419,8 +421,6 @@ inline const char *GetButtonName_INI(size_t i)
     case Buttons::LegacyPause:
         return "legacy-pause";
 #ifdef DEBUG_BUILD
-    case Buttons::ToggleFontRender:
-        return "toggle-font-render";
     case Buttons::ReloadLanguage:
         return "reload-language";
 #endif
@@ -448,8 +448,6 @@ inline const char *GetButtonName_UI_Init(size_t i)
     case Buttons::LegacyPause:
         return "Old Pause";
 #ifdef DEBUG_BUILD
-    case Buttons::ToggleFontRender:
-        return "Old fonts";
     case Buttons::ReloadLanguage:
         return "Reload lang";
 #endif
@@ -473,23 +471,6 @@ void Activate(size_t i, int player = 0);
 } // namespace (Controls::)Hotkeys
 
 using HotkeysPressed_t = std::array<int, Hotkeys::n_buttons>;
-
-// information about a particular bound input method
-struct StatusInfo
-{
-    typedef enum _PowerStatus
-    {
-        POWER_DISABLED = -1,
-        POWER_UNKNOWN,
-        POWER_WIRED,
-        POWER_DISCHARGING,
-        POWER_CHARGING,
-        POWER_CHARGED
-    } PowerStatus;
-    PowerStatus power_status = POWER_DISABLED;
-    float power_level = 1.f;
-    const char *info_string = nullptr;
-};
 
 // represents a particular bound input method
 class InputMethod

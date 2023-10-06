@@ -18,6 +18,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <algorithm>
+
 #include "sdl_proxy/sdl_stdinc.h"
 #include "globals.h"
 #include "npc.h"
@@ -149,6 +151,46 @@ void Deactivate(int A)
 
             NPC[A].Pinched = PinchedInfo_t();
 
+            // new-added logic: if CURRENTLY offscreen for all vScreens, allow it to reset
+            if(g_compatibility.fix_frame_perfect_despawn && !FreezeNPCs)
+            {
+                bool hit = false;
+
+                for(int screen_i = 0; !hit && screen_i < c_screenCount; screen_i++)
+                {
+                    const Screen_t& screen = Screens[screen_i];
+
+                    bool single_screen = (screen.Type == ScreenTypes::SinglePlayer || screen.Type == ScreenTypes::Average
+                        || screen.Type == ScreenTypes::SharedScreen || screen.Type == ScreenTypes::Credits);
+
+                    for(int vscreen_i = 0; !hit && vscreen_i < maxLocalPlayers; vscreen_i++)
+                    {
+                        int vscreen_Z = screen.vScreen_refs[vscreen_i];
+
+                        // FIXME: SingleCoop should become a member of Screen_t
+                        if(screen.Type == ScreenTypes::SingleCoop && SingleCoop != vscreen_i + 1)
+                            continue;
+
+                        // check if non-first screen is visible in dynamic mode
+                        if(screen.Type == ScreenTypes::Dynamic && vscreen_i > 0 && !vScreen[vscreen_Z].Visible)
+                            continue;
+
+                        // in single screen mode, only allow first screen
+                        if(single_screen && vscreen_i > 0)
+                            continue;
+
+                        if(vScreenCollision(vscreen_Z, NPC[A].Location))
+                            hit = true;
+                    }
+                }
+
+                if(!hit)
+                {
+                    NPC[A].Reset[1] = true;
+                    NPC[A].Reset[2] = true;
+                }
+            }
+
             // NEW now that we have the new NPC Queues
             NPCQueues::update(A);
             treeNPCUpdate(A);
@@ -168,7 +210,7 @@ void Deactivate(int A)
 void Bomb(Location_t Location, int Game, int ImmunePlayer)
 {
     float Radius = 0;
-    int i = 0;
+    // int i = 0;
     double X = 0;
     double Y = 0;
     double A = 0;
@@ -244,7 +286,7 @@ void Bomb(Location_t Location, int Game, int ImmunePlayer)
 
     if(Game != 0)
     {
-        for(i = 1; i <= numPlayers; i++)
+        for(int i = 1; i <= numPlayers; i++)
         {
             A = std::abs(Player[i].Location.X + Player[i].Location.Width / 2.0 - X);
             B = std::abs(Player[i].Location.Y + Player[i].Location.Height / 2.0 - Y);
@@ -255,7 +297,7 @@ void Bomb(Location_t Location, int Game, int ImmunePlayer)
     }
     else if(BattleMode)
     {
-        for(i = 1; i <= numPlayers; i++)
+        for(int i = 1; i <= numPlayers; i++)
         {
             if(i != ImmunePlayer)
             {
@@ -2948,7 +2990,7 @@ void NPCSpecial(int A)
                             FreezeNPCs = false;
                             TurnNPCsIntoCoins();
 
-                            if(numPlayers > 2 /*&& nPlay.Online == false*/)
+                            if(g_ClonedPlayerMode)
                                 Player[1] = Player[A];
 
                             LevelMacro = LEVELMACRO_GOAL_TAPE_EXIT;
@@ -3392,6 +3434,7 @@ void SpecialNPC(int A)
             tempLocation.Y = NPC[A].Location.Y - tempLocation.Height / 2.0 + dRand() * NPC[A].Location.Height - 4;
             NewEffect(EFFID_SPARKLE, tempLocation);
         }
+
         if(NPC[A].Projectile)
         {
             if(iRand(5) == 0)
@@ -3427,6 +3470,7 @@ void SpecialNPC(int A)
                 }
                 NPC[A].Special = D;
             }
+
             if(NPC[A].Special2 == 0 || NPC[A].Special4 == 1)
             {
                 if(NPC[A].Location.Y + NPC[A].Location.Height >= Player[NPC[A].Special].Location.Y - 24 || NPC[A].Special4 == 1)
@@ -3443,6 +3487,7 @@ void SpecialNPC(int A)
                     }
                 }
             }
+
             if(NPC[A].Special2 > 0)
             {
                 NPC[A].Special2 -= 1;
@@ -3454,10 +3499,13 @@ void SpecialNPC(int A)
                 NPC[A].Location.SpeedY = 1;
                 NPC[A].Frame = 1;
             }
+
             if(NPC[A].Special2 == 0)
                 NPC[A].Special2 = -20;
+
             if(NPC[A].Special2 < 0)
                 NPC[A].Special2 += 1;
+
             if(NPC[A].Location.SpeedY >= 0)
                 NPC[A].Location.SpeedX = 0;
         }
@@ -3478,8 +3526,10 @@ void SpecialNPC(int A)
         {
             if(NPC[A].Wet == 2)
                 NPC[A].Special5 = 0;
+
             C = 0;
             D = 1;
+
             for(B = 1; B <= numPlayers; B++)
             {
                 if(!Player[B].Dead && Player[B].Section == NPC[A].Section)
@@ -3491,6 +3541,7 @@ void SpecialNPC(int A)
                     }
                 }
             }
+
             B = int(D);
             if(!Player[B].WetFrame && Player[B].Location.Y + Player[B].Location.Height < NPC[A].Location.Y)
             {
@@ -3511,6 +3562,7 @@ void SpecialNPC(int A)
                 }
                 else
                     NPC[A].Special3 = 0;
+
                 if(NPC[A].Special3 == 1 && NPC[A].Wet == 0)
                 {
                     NPC[A].Location.SpeedY = -(NPC[A].Location.Y - Player[B].Location.Y + Player[B].Location.Height / 2.0) * 0.05 + dRand() * 4 - 2;
@@ -3577,6 +3629,7 @@ void SpecialNPC(int A)
                 NPC[A].Special2 = 4;
                 NPC[A].Special = 70;
             }
+
             if(NPC[A].Special2 == 1)
             {
                 NPC[A].Special += 1;
@@ -3901,6 +3954,7 @@ void SpecialNPC(int A)
     {
         if(NPC[A].Special3 > 0)
             NPC[A].Special3 -= 1;
+
         if(NPC[A].Location.X != NPC[A].DefaultLocation.X)
         {
             NPC[A].Killed = 2;
@@ -3936,6 +3990,7 @@ void SpecialNPC(int A)
             {
                 if(NPC[A].Type != NPCID_LONG_PLANT_DOWN)
                     NPC[A].Special += 1;
+
                 if(NPC[A].Special >= 50)
                 {
                     NPC[A].Special2 = 3;
@@ -4115,6 +4170,7 @@ void SpecialNPC(int A)
             }
 
         }
+
         if(NPC[A].Direction == 1)
             NPC[A].Frame += 3;
     }
@@ -5688,8 +5744,6 @@ int RandomBonus()
     case 5:
         return NPCID_ICE_POWER_S3;
     }
-
-    return 0;
 }
 
 bool npcHasFloor(const struct NPC_t &npc)
