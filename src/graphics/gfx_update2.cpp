@@ -462,7 +462,7 @@ void UpdateGraphics2(bool skipRepaint)
 
             int Y = vScreen[Z].Y + WorldPlayer[1].Location.Y - 32;
 
-            if(l.save_info.max_stars > 0 && policy > Compatibility_t::STARS_DONT_SHOW)
+            if(l.save_info.inited() && l.save_info.max_stars > 0 && policy > Compatibility_t::STARS_DONT_SHOW)
             {
                 std::string label;
 
@@ -483,7 +483,7 @@ void UpdateGraphics2(bool skipRepaint)
                 Y -= 20;
             }
 
-            if(l.save_info.max_medals > 0 && true)
+            if(l.save_info.inited() && l.save_info.max_medals > 0 && true)
             {
                 int X = vScreen[Z].X + WorldPlayer[1].Location.X + (WorldPlayer[1].Location.Width / 2);
 
