@@ -4463,9 +4463,15 @@ void UpdatePlayer()
                 {
                     const auto& pi = Player[A].Pinched;
 
-                    bool old_condition = pi.Moving && ((pi.Bottom1 && pi.Top3) || (pi.Left2 && pi.Right4));
+                    bool vcrush = pi.Bottom1 && pi.Top3;
+                    bool hcrush = pi.Left2 && pi.Right4;
 
-                    bool new_condition = (pi.MovingUD && pi.Bottom1 && pi.Top3) || (pi.MovingLR && pi.Left2 && pi.Right4);
+                    // When the player is pushed through the floor or stops ducking while being crushed, they get left+right hits but no bottom hit
+                    bool vcrush_plus = vcrush || (hcrush && (pi.Bottom1 || pi.Top3));
+
+                    bool old_condition = pi.Moving && (vcrush || hcrush);
+
+                    bool new_condition = (pi.MovingUD && vcrush_plus) || (pi.MovingLR && hcrush);
 
                     bool pinch_death = (g_compatibility.fix_player_crush_death && !pi.Strict) ? new_condition : old_condition;
 
