@@ -33,7 +33,16 @@ struct PinchedInfo_t
     bool     MovingLR  : 1;
     bool     MovingUD  : 1;
 
+    // players only: frame counter to use classic (strict) pinched death condition
+    unsigned Strict    : 4;
+
     inline PinchedInfo_t()
+    {
+        reset_non_strict();
+        Strict = 0;
+    }
+
+    inline void reset_non_strict()
     {
         Bottom1 = 0;
         Left2 = 0;

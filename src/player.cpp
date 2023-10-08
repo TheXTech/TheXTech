@@ -5751,7 +5751,7 @@ void PlayerEffects(const int A)
     // p.Pinched3 = 0;
     // p.Pinched4 = 0;
     // p.NPCPinched = 0;
-    p.Pinched = PinchedInfo_t();
+    p.Pinched.reset_non_strict();
     p.SwordPoke = 0;
 
     if(!p.YoshiBlue && p.Effect != 500)
