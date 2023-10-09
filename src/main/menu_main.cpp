@@ -261,11 +261,8 @@ static int FindWorldsThread(void *)
 #endif
 
 #if (defined(__APPLE__) && defined(USE_BUNDLED_ASSETS)) || defined(FIXED_ASSETS_PATH)
-#   define USER_WORLDS_NEEDED
-#   define WORLD_ROOTS_SIZE 2
 #   define CAN_WRITE_APPPATH_WORLDS false
 #else
-#   define WORLD_ROOTS_SIZE 1
 #   define CAN_WRITE_APPPATH_WORLDS true
 #endif
 
