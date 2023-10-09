@@ -20,7 +20,7 @@ for dirpath, _, files in os.walk(datadir, topdown=True):
     outpath = os.path.join(outdir, dirpath[len(datadir):])
     os.makedirs(outpath, exist_ok=True)
 
-    if dirpath.endswith('fonts/'):
+    if dirpath.endswith('fonts'):
         print('found fonts dir', dirpath)
         is_fonts_dir = True
         texture_1x = set()
