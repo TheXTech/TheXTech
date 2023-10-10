@@ -74,6 +74,9 @@ for dirpath, _, files in os.walk(datadir, topdown=True):
                     os.system(f'convert "{rfn}" -set colorspace RGB -alpha extract -negate "{dest_maskfn}"')
         elif fn.endswith('m.gif') and os.path.isfile(rfn[:-5]+'.gif'):
             continue
+        elif fn.endswith('m.gif'):
+            shutil.copy(rfn, destfn)
+            continue
         elif fn.endswith('.gif'):
             maskfn = rfn[:-4]+'m.gif'
             ftype = fn[:fn.rfind('-')]
