@@ -931,34 +931,7 @@ void lazyLoad(StdPicture& target)
 
     if(!Files::hasSuffix(target.l.path, ".t3x"))
     {
-        FIBITMAP* FI_tex = nullptr;
-        FIBITMAP* FI_mask = nullptr;
-
-        bool force_merge = false;
-
-        if(Files::hasSuffix(target.l.mask_path, "m.gif"))
-        {
-            FI_tex = robust_FILoad(target.l.path, target.w);
-
-            if(FI_tex)
-                FI_mask = robust_FILoad(target.l.mask_path, target.w);
-        }
-        else
-        {
-            FI_tex = robust_FILoad(target.l.path, target.w);
-
-            FIBITMAP* FI_mask_rgba = nullptr;
-            if(FI_tex && !target.l.mask_path.empty())
-                FI_mask_rgba = robust_FILoad(target.l.mask_path, target.w);
-
-            if(FI_mask_rgba)
-            {
-                GraphicsHelps::getMaskFromRGBA(FI_mask_rgba, FI_mask);
-                GraphicsHelps::closeImage(FI_mask_rgba);
-            }
-
-            force_merge = true;
-        }
+        FIBITMAP* FI_tex = robust_FILoad(target.l.path, target.w);
 
         if(!FI_tex)
         {
@@ -966,6 +939,27 @@ void lazyLoad(StdPicture& target)
             pLogWarning("Error: %d (%s)", errno, strerror(errno));
             target.inited = false;
             return;
+        }
+
+        FIBITMAP* FI_mask = nullptr;
+        bool force_merge = false;
+
+        if(Files::hasSuffix(target.l.mask_path, "m.gif"))
+        {
+            FI_mask = robust_FILoad(target.l.mask_path, target.w);
+        }
+        else if(!target.l.mask_path.empty())
+        {
+            FIBITMAP* FI_mask_rgba = robust_FILoad(target.l.mask_path, target.w);
+
+            if(FI_mask_rgba)
+            {
+                GraphicsHelps::getMaskFromRGBA(FI_mask_rgba, FI_mask);
+                GraphicsHelps::closeImage(FI_mask_rgba);
+            }
+
+            // marginally faster, but inaccurate
+            force_merge = true;
         }
 
         if(FI_mask && (force_merge || g_ForceBitmaskMerge || !GraphicsHelps::validateBitmaskRequired(FI_tex, FI_mask, target.l.path)))
