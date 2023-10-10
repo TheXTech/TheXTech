@@ -50,6 +50,12 @@ DeathCounter::DeathCounter() noexcept
     m_print.font = 3;
 }
 
+DeathCounter::~DeathCounter() noexcept
+{
+    if(m_openFile)
+        std::fclose(m_openFile);
+}
+
 void DeathCounter::init()
 {
     if(counterFile.empty())
@@ -91,6 +97,12 @@ void DeathCounter::quit()
     mCurTotalDeaths = 0;
     mCurLevelDeaths = 0;
     mDeathRecords.clear();
+
+    if(m_openFile)
+    {
+        std::fclose(m_openFile);
+        m_openFile = nullptr;
+    }
 }
 
 // TRY LOAD STATS - Attempts to load stats from stats file. Creates and inits the file if it doesn't exist.
@@ -99,12 +111,11 @@ bool DeathCounter::TryLoadStats()
     // Try to open the file
     int32_t tempint = 0;
     size_t got;
-    FILE *statsfile;
 
     // If file is not exist yet, try to create empty file
     if(!Files::fileExists(counterFile))
     {
-        statsfile = Files::utf8_fopen(counterFile.c_str(), "wb");
+        FILE *statsfile = Files::utf8_fopen(counterFile.c_str(), "wb");
         if(!statsfile)
         {
             mStatFileOK = false;
@@ -118,10 +129,17 @@ bool DeathCounter::TryLoadStats()
         std::fclose(statsfile);
     }
 
-    statsfile = Files::utf8_fopen(counterFile.c_str(), "r+b");
+    // close old open file if present
+    if(m_openFile)
+    {
+        std::fclose(m_openFile);
+        m_openFile = nullptr;
+    }
+
+    m_openFile = Files::utf8_fopen(counterFile.c_str(), "r+b");
 
     // If create failed, disable death counter
-    if(!statsfile)
+    if(!m_openFile)
     {
         pLogWarning("Unable to open the Demos counter: %s", counterFile.c_str());
         mStatFileOK = false;
@@ -130,16 +148,16 @@ bool DeathCounter::TryLoadStats()
     }
 
     // If size less than 100, init new file
-    std::fseek(statsfile, 0, SEEK_END);
-    int cursize = (int)std::ftell(statsfile);
-    std::fseek(statsfile, 0, SEEK_SET);
+    std::fseek(m_openFile, 0, SEEK_END);
+    int cursize = (int)std::ftell(m_openFile);
+    std::fseek(m_openFile, 0, SEEK_SET);
 
     if(cursize < 50)
     {
-        InitStatsFile(statsfile);
-        std::fflush(statsfile);
+        InitStatsFile(m_openFile);
+        std::fflush(m_openFile);
         mStatFileOK = true;
-        std::fseek(statsfile, 0, SEEK_SET);
+        std::fseek(m_openFile, 0, SEEK_SET);
     }
 
 //    if(statsfile.good() == false)
@@ -150,31 +168,26 @@ bool DeathCounter::TryLoadStats()
 //    }
 
     // Check version
-    got = LunaCounterUtil::readIntLE(statsfile, tempint);
-    if(got != sizeof(int32_t))
+    got = LunaCounterUtil::readIntLE(m_openFile, tempint);
+    if(got != sizeof(int32_t) || tempint < 5)
     {
-        pLogWarning("Demos counter: Failed to read version numbe at the %s file", counterFile.c_str());
+        if(got != sizeof(int32_t))
+            pLogWarning("Demos counter: Failed to read version number at the %s file", counterFile.c_str());
+
         mStatFileOK = false;
         mEnabled = false;
+
+        std::fclose(m_openFile);
+        m_openFile = nullptr;
+
         return false;
     }
 
-    if(tempint < 5)
-    {
-        mStatFileOK = false;
-        mEnabled = false;
-        return false;
-    }
-    else
-    {
-        mStatFileOK = true;
-        mEnabled = true;
-    }
+    mStatFileOK = true;
+    mEnabled = true;
 
     ClearRecords();
-    ReadRecords(statsfile);
-
-    std::fclose(statsfile);
+    ReadRecords(m_openFile);
 
     return true;
 }
@@ -293,14 +306,19 @@ void DeathCounter::WriteRecords(FILE *statsfile)
 // TRY SAVE - Externally callable, safe auto-save function
 void DeathCounter::TrySave()
 {
-    if(mStatFileOK && mEnabled)
+    if(mStatFileOK && mEnabled && m_openFile)
     {
-        FILE *statsfile = Files::utf8_fopen(counterFile.c_str(), "wb");
-        if(statsfile)
+        if(std::fseek(m_openFile, 0, SEEK_SET))
         {
-            Save(statsfile);
-            std::fflush(statsfile);
-            std::fclose(statsfile);
+            // attempt to reopen the file
+            std::fclose(m_openFile);
+            m_openFile = Files::utf8_fopen(counterFile.c_str(), "wb");
+        }
+
+        if(m_openFile)
+        {
+            Save(m_openFile);
+            std::fflush(m_openFile);
         }
     }
 }
