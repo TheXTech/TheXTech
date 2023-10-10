@@ -367,7 +367,7 @@ static bool s_loadFontsFromDir(DirListCI &fonts_root,
             std::string name;
 
             if(key.find("-size") != std::string::npos)
-                continue; // Skil the size key
+                continue; // Skip the size key
 
             overrider.read(key.c_str(), name, "");
             if(name.empty())
@@ -491,7 +491,7 @@ void FontManager::loadCustomFonts()
     const std::string& dataSubDir = g_dirCustom.getCurDir();
 
     // Loading fonts from the episode directory
-    if(s_lastWorldFontsPath != episodeRoot)
+    if(s_lastWorldFontsPath != episodeRoot && episodeRoot != AppPathManager::assetsRoot())
     {
         if(!s_lastWorldFontsPath.empty())
             clearAllCustomFonts();
