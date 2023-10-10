@@ -196,22 +196,32 @@ void getRenderSize(int* w, int* h)
 
 inline int ROUNDDIV2(int x)
 {
-    return (x<0)?(x - 1) / 2:x / 2;
+    return (x < 0) ? (x - 1) / 2 : (x + 1) / 2;
 }
 
 inline float ROUNDDIV2(float x)
 {
-    return std::nearbyintf(std::roundf(x) / 2.0f);
+    return std::roundf(x / 2.0f);
 }
 
-inline float ROUNDDIV2(double x)
+inline double ROUNDDIV2(double x)
 {
-    return std::nearbyintf(std::roundf((float)x / 2.0f));
+    return std::round(x / 2.0);
+}
+
+inline int FLOORDIV2(int x)
+{
+    return (x < 0) ? (x - 1) / 2 : x / 2;
 }
 
 inline float FLOORDIV2(float x)
 {
-    return std::floor(x / 2.0f);
+    return std::floor(std::roundf(x) / 2.0f);
+}
+
+inline double FLOORDIV2(double x)
+{
+    return std::floor(std::round(x) / 2.0);
 }
 
 #ifndef __WII__
@@ -226,11 +236,11 @@ void minport_RenderBoxUnfilled(int x1, int y1, int x2, int y2, uint8_t r, uint8_
 
 void renderRect(int x, int y, int w, int h, float red, float green, float blue, float alpha, bool filled)
 {
-    int x_div = ROUNDDIV2(x);
-    int w_div = ROUNDDIV2(x + w) - x_div;
+    int x_div = FLOORDIV2(x);
+    int w_div = FLOORDIV2(x + w) - x_div;
 
-    int y_div = ROUNDDIV2(y);
-    int h_div = ROUNDDIV2(y + h) - y_div;
+    int y_div = FLOORDIV2(y);
+    int h_div = FLOORDIV2(y + h) - y_div;
 
     uint8_t r = red * 255.0f + 0.5f;
     uint8_t g = green * 255.0f + 0.5f;
@@ -440,10 +450,10 @@ void renderTextureScale(double xDst, double yDst, double wDst, double hDst,
                             StdPicture &tx,
                             float red, float green, float blue, float alpha)
 {
-    auto div_x = ROUNDDIV2(xDst), div_y = ROUNDDIV2(yDst);
+    auto div_x = FLOORDIV2(xDst), div_y = FLOORDIV2(yDst);
 
     minport_RenderTexturePrivate_2(
-        div_x, div_y, ROUNDDIV2(xDst + wDst) - div_x, ROUNDDIV2(yDst + hDst) - div_y,
+        div_x, div_y, FLOORDIV2(xDst + wDst) - div_x, FLOORDIV2(yDst + hDst) - div_y,
         tx,
         0.0f, 0.0f, tx.w / 2, tx.h / 2,
         0.0f, nullptr, X_FLIP_NONE,
@@ -455,10 +465,10 @@ void renderTextureScale(double xDst, double yDst, double wDst, double hDst,
                             int xSrc, int ySrc, int wSrc, int hSrc,
                             float red, float green, float blue, float alpha)
 {
-    auto div_x = ROUNDDIV2(xDst), div_y = ROUNDDIV2(yDst);
+    auto div_x = FLOORDIV2(xDst), div_y = FLOORDIV2(yDst);
 
     minport_RenderTexturePrivate_2(
-        div_x, div_y, ROUNDDIV2(xDst + wDst) - div_x, ROUNDDIV2(yDst + hDst) - div_y,
+        div_x, div_y, FLOORDIV2(xDst + wDst) - div_x, FLOORDIV2(yDst + hDst) - div_y,
         tx,
         xSrc / 2, ySrc / 2, wSrc / 2, hSrc / 2,
         0.0f, nullptr, X_FLIP_NONE,
@@ -470,14 +480,14 @@ void renderTexture(double xDst, double yDst, double wDst, double hDst,
                             int xSrc, int ySrc,
                             float red, float green, float blue, float alpha)
 {
-    auto div_x = ROUNDDIV2(xDst), div_y = ROUNDDIV2(yDst);
-    auto div_w = ROUNDDIV2(xDst + wDst) - div_x;
-    auto div_h = ROUNDDIV2(yDst + hDst) - div_y;
+    auto div_x = FLOORDIV2(xDst), div_y = FLOORDIV2(yDst);
+    auto div_w = FLOORDIV2(xDst + wDst) - div_x;
+    auto div_h = FLOORDIV2(yDst + hDst) - div_y;
 
     minport_RenderTexturePrivate_2(
         div_x, div_y, div_w, div_h,
         tx,
-        ROUNDDIV2(xSrc), ROUNDDIV2(ySrc), div_w, div_h,
+        FLOORDIV2(xSrc), FLOORDIV2(ySrc), div_w, div_h,
         0.0f, nullptr, X_FLIP_NONE,
         red, green, blue, alpha);
 }
@@ -489,7 +499,7 @@ void renderTexture(float xDst, float yDst, StdPicture &tx,
     int h = tx.h / 2;
 
     minport_RenderTexturePrivate_2(
-        ROUNDDIV2(xDst), ROUNDDIV2(yDst), w, h,
+        FLOORDIV2(xDst), FLOORDIV2(yDst), w, h,
         tx,
         0, 0, w, h,
         0.0f, nullptr, X_FLIP_NONE,
@@ -502,7 +512,7 @@ void renderTexture(int xDst, int yDst, StdPicture &tx, float red, float green, f
     int h = tx.h / 2;
 
     minport_RenderTexturePrivate_2(
-        ROUNDDIV2(xDst), ROUNDDIV2(yDst), w, h,
+        FLOORDIV2(xDst), FLOORDIV2(yDst), w, h,
         tx,
         0.0f, 0.0f, w, h,
         0.0f, nullptr, X_FLIP_NONE,
@@ -511,9 +521,9 @@ void renderTexture(int xDst, int yDst, StdPicture &tx, float red, float green, f
 
 void renderTextureScale(int xDst, int yDst, int wDst, int hDst, StdPicture &tx, float red, float green, float blue, float alpha)
 {
-    auto div_x = ROUNDDIV2(xDst), div_y = ROUNDDIV2(yDst);
-    auto div_w = ROUNDDIV2(xDst + wDst) - div_x;
-    auto div_h = ROUNDDIV2(yDst + hDst) - div_y;
+    auto div_x = FLOORDIV2(xDst), div_y = FLOORDIV2(yDst);
+    auto div_w = FLOORDIV2(xDst + wDst) - div_x;
+    auto div_h = FLOORDIV2(yDst + hDst) - div_y;
 
     minport_RenderTexturePrivate_2(
         div_x, div_y, div_w, div_h,
@@ -529,14 +539,14 @@ void renderTextureFL(double xDst, double yDst, double wDst, double hDst,
                           double rotateAngle, FPoint_t *center, unsigned int flip,
                           float red, float green, float blue, float alpha)
 {
-    auto div_x = ROUNDDIV2(xDst), div_y = ROUNDDIV2(yDst);
-    auto div_w = ROUNDDIV2(xDst + wDst) - div_x;
-    auto div_h = ROUNDDIV2(yDst + hDst) - div_y;
+    auto div_x = FLOORDIV2(xDst), div_y = FLOORDIV2(yDst);
+    auto div_w = FLOORDIV2(xDst + wDst) - div_x;
+    auto div_h = FLOORDIV2(yDst + hDst) - div_y;
 
     minport_RenderTexturePrivate_2(
         div_x, div_y, div_w, div_h,
         tx,
-        ROUNDDIV2(xSrc), ROUNDDIV2(ySrc), div_w, div_h,
+        FLOORDIV2(xSrc), FLOORDIV2(ySrc), div_w, div_h,
         rotateAngle, center, flip,
         red, green, blue, alpha);
 }
@@ -548,13 +558,13 @@ void renderTextureScaleEx(double xDst, double yDst, double wDst, double hDst,
                           double rotateAngle, FPoint_t *center, unsigned int flip,
                           float red, float green, float blue, float alpha)
 {
-    auto div_x = ROUNDDIV2(xDst), div_y = ROUNDDIV2(yDst);
-    auto div_w = ROUNDDIV2(xDst + wDst) - div_x;
-    auto div_h = ROUNDDIV2(yDst + hDst) - div_y;
+    auto div_x = FLOORDIV2(xDst), div_y = FLOORDIV2(yDst);
+    auto div_w = FLOORDIV2(xDst + wDst) - div_x;
+    auto div_h = FLOORDIV2(yDst + hDst) - div_y;
 
-    auto div_sx = ROUNDDIV2(xSrc), div_sy = ROUNDDIV2(ySrc);
-    auto div_sw = ROUNDDIV2(xSrc + wSrc) - div_sx;
-    auto div_sh = ROUNDDIV2(ySrc + hSrc) - div_sy;
+    auto div_sx = FLOORDIV2(xSrc), div_sy = FLOORDIV2(ySrc);
+    auto div_sw = FLOORDIV2(xSrc + wSrc) - div_sx;
+    auto div_sh = FLOORDIV2(ySrc + hSrc) - div_sy;
 
     minport_RenderTexturePrivate_2(
         div_x, div_y, div_w, div_h,
