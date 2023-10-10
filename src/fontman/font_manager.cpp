@@ -287,7 +287,7 @@ static bool s_loadFontsFromDir(DirListCI &fonts_root,
         g_defaultRasterFont = &outRasterFonts.front();
 
     /***************Load TTF font support****************/
-    IniProcessing overrider(fonts_root.getCurDir() + subdir + "/overrides.ini");
+    IniProcessing overrider(fonts_root.getCurDir() + sSubDir + "overrides.ini");
 
 #ifdef THEXTECH_ENABLE_TTF_SUPPORT
     if(overrider.beginGroup("ttf-fonts"))
