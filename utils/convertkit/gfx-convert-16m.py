@@ -81,14 +81,14 @@ for dirpath, _, files in os.walk(datadir, topdown=True):
         elif fn.endswith('.gif'):
             maskfn = rfn[:-4]+'m.gif'
             ftype = fn[:fn.rfind('-')]
-            altmaskfn_png_1 = os.path.join(fallbackdir, fn[:-4]+'m.png')
+            altmaskfn_gif_1 = os.path.join(fallbackdir, fn[:-4]+'m.gif')
             altmaskfn_gif = os.path.join(graphicsdir, ftype, fn[:-4]+'m.gif')
             altmaskfn_png = os.path.join(graphicsdir, ftype, fn[:-4]+'.png')
             if os.path.isfile(maskfn):
                 os.system(f'convert "{rfn}" "{maskfn}" -alpha Off -compose CopyOpacity -composite -channel a -negate +channel {downscale} "{bmpfn}"')
-            elif os.path.isfile(altmaskfn_png_1):
-                if os.popen(f'identify -format "%[fx:w*2],%[fx:h*2]" "{rfn}"').read() == os.popen(f'identify -format "%[fx:w*2],%[fx:h*2]" "{altmaskfn_png_1}"').read():
-                    os.system(f'convert "{rfn}" "{altmaskfn_png_1}" -alpha On -compose CopyOpacity -composite {downscale} "{bmpfn}"')
+            elif os.path.isfile(altmaskfn_gif_1):
+                if os.popen(f'identify -format "%[fx:w*2],%[fx:h*2]" "{rfn}"').read() == os.popen(f'identify -format "%[fx:w*2],%[fx:h*2]" "{altmaskfn_gif_1}"').read():
+                    os.system(f'convert "{rfn}" "{altmaskfn_gif_1}" -alpha Off -compose CopyOpacity -composite -channel a -negate +channel {downscale} "{bmpfn}"')
                 else:
                     os.system(f'convert {downscale} "{rfn}" "{bmpfn}"')
             elif os.path.isfile(altmaskfn_gif):
