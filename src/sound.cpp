@@ -63,21 +63,21 @@ int playerHammerSFX = SFX_Fireball;
 const AudioDefaults_t g_audioDefaults =
 #if defined(__WII__) /* Defaults for Nintendo Wii */
 {
-    32000,
+    44100,
     2,
     1536,
     (int)AUDIO_S16SYS
 };
 #elif defined(__3DS__)
 {
-    32728,
+    44100,
     2,
-    2048,
+    1024,
     (int)AUDIO_S16SYS
 };
 #elif defined(__SWITCH__) /* Defaults for Nintendo Switch */
 {
-    48000,
+    44100,
     2,
     1024,
     (int)AUDIO_S16SYS
