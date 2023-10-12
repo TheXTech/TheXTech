@@ -1785,7 +1785,7 @@ void EditorScreen::UpdateSectionsScreen(CallMode mode)
         }
 
         if(UpdateButton(mode, 330 + 4, 280 + 4, GFX.EIcons, false, 0, 32*Icon::open, 32, 32))
-            StartFileBrowser(&CustomMusic[curSection], FileNamePath, "", {".mp3", ".ogg", ".spc", ".vgm"}, BROWSER_MODE_OPEN, BROWSER_CALLBACK_CUSTOM_MUSIC);
+            StartFileBrowser(&CustomMusic[curSection], FileNamePath, "", {".mp3", ".ogg", ".spc", ".vgm", ".it", ".flac", ".wav", ".mid", ".nsf", ".mod", ".xm"}, BROWSER_MODE_OPEN, BROWSER_CALLBACK_CUSTOM_MUSIC);
     }
 
     // background
