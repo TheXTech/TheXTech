@@ -103,6 +103,36 @@ constexpr auto LESet_ResetDefault = EventSection_t::LESet_ResetDefault;
 constexpr int e_ScreenW = 640;
 constexpr int e_ScreenH = 480;
 
+static const std::vector<std::string> c_musicFormats =
+{
+    // MPEG 1 Layer III (LibMAD)
+    ".mp3",
+
+    // OGG Vorbis, FLAC, amd Opus (LibOGG, LibVorbis, LibFLAC, libOpus)
+    ".ogg", ".flac", ".opus",
+
+    // Uncompressed audio data
+    ".wav", ".aiff",
+
+    // MIDI
+    ".mid", ".midi", ".rmi", ".mus", ".kar", ".xmi", ".cmf",
+
+    // Id Music File (OPL2 raw) / Imago Orpheus (Tracker music)
+    ".imf", ".wlf",
+
+    // Modules (Tracker music)
+    ".mod", ".it", ".s3m", ".669", ".med", ".xm", ".amf",
+    ".apun", ".dsm", ".far", ".gdm", ".mtm",
+    ".okt", ".stm", ".stx", ".ult", ".uni", ".mptm",
+
+    // GAME EMU (Chiptunes)
+    ".ay", ".gbs", ".gym", ".hes", ".kss", ".nsf",
+    ".nsfe", ".sap", ".spc", ".vgm", ".vgz",
+
+    // PXTONE
+    ".pttune", ".ptcop"
+};
+
 int e_CursorX, e_CursorY;
 
 void DisableCursorNew()
@@ -1785,7 +1815,7 @@ void EditorScreen::UpdateSectionsScreen(CallMode mode)
         }
 
         if(UpdateButton(mode, 330 + 4, 280 + 4, GFX.EIcons, false, 0, 32*Icon::open, 32, 32))
-            StartFileBrowser(&CustomMusic[curSection], FileNamePath, "", {".mp3", ".ogg", ".spc", ".vgm", ".it", ".flac", ".wav", ".mid", ".nsf", ".mod", ".xm"}, BROWSER_MODE_OPEN, BROWSER_CALLBACK_CUSTOM_MUSIC);
+            StartFileBrowser(&CustomMusic[curSection], FileNamePath, "", c_musicFormats, BROWSER_MODE_OPEN, BROWSER_CALLBACK_CUSTOM_MUSIC);
     }
 
     // background
