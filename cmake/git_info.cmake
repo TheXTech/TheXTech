@@ -33,4 +33,16 @@ execute_process(
         OUTPUT_STRIP_TRAILING_WHITESPACE
 )
 
+# Check if the git index is dirty
+execute_process(
+        COMMAND git diff-index HEAD --
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+        OUTPUT_VARIABLE GIT_DIRTY_STRING
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+
+if(NOT "${GIT_DIRTY_STRING}" STREQUAL "")
+    set(GIT_COMMIT_HASH "${GIT_COMMIT_HASH}-dirty")
+endif()
+
 set(PACKAGE_SUFFIX ${GIT_BRANCH}${CI_PULL_REQUEST})
