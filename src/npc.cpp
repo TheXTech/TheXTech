@@ -60,6 +60,8 @@ void CheckSectionNPC(int A)
         NPC[A].Section = Player[NPC[A].HoldingPlayer].Section;
     }
 
+    // disabled in 1.3.6.1 because of bugs when overlapping sections change
+#if 0
     // Previously, it optimized for section 0. Now, it optimizes for NPC's current section.
     int B = NPC[A].Section;
     if(NPC[A].Location.X >= level[B].X)
@@ -75,8 +77,9 @@ void CheckSectionNPC(int A)
             }
         }
     }
+#endif
 
-    for(B = 0; B <= numSections; B++)
+    for(int B = 0; B <= numSections; B++)
     {
         if(NPC[A].Location.X >= level[B].X)
         {
