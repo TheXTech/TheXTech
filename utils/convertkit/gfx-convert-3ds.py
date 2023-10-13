@@ -58,7 +58,8 @@ for dirpath, _, files in os.walk(datadir, topdown=True):
         else:
             downscale = "-sample 50%"
 
-        if not REDO and not is_fonts_dir and not fn.endswith('m.gif') and (os.path.isfile(destfn) or os.path.isfile(destfn+'.wav') or ((fn.endswith('.gif') or fn.endswith('.png')) and os.path.isfile(t3xfn))): continue
+        if not REDO and not is_fonts_dir and not fn.endswith('m.gif') and (os.path.isfile(destfn) or os.path.isfile(destfn+'.wav') or ((fn.endswith('.gif') or fn.endswith('.png')) and os.path.isfile(t3xfn)) or os.path.isfile(destfn+'.it')):
+            continue
 
         print(rfn)
         if fn.endswith('.png'):
@@ -73,6 +74,9 @@ for dirpath, _, files in os.walk(datadir, topdown=True):
                 if not os.path.isfile(dest_maskfn):
                     os.system(f'convert "{rfn}" -set colorspace RGB -alpha extract -negate "{dest_maskfn}"')
         elif fn.endswith('m.gif') and os.path.isfile(rfn[:-5]+'.gif'):
+            continue
+        elif fn.endswith('m.gif'):
+            shutil.copy(rfn, destfn)
             continue
         elif fn.endswith('.gif'):
             maskfn = rfn[:-4]+'m.gif'
@@ -105,18 +109,36 @@ for dirpath, _, files in os.walk(datadir, topdown=True):
         elif fn.endswith('.ogg') and '/sound/' in rfn:
             os.system(f'ffmpeg -i "{rfn}" "{destfn}.wav"')
             continue
+        elif fn.endswith('.spc') and os.path.join(datadir, 'music/') in rfn:
+            shutil.copy(rfn, destfn)
+            os.system(f'spc2it "{destfn}"')
+            os.remove(destfn)
+            shutil.move(destfn[:-3] + 'it', destfn + '.it')
+            continue
+        elif fn.endswith('.spc'):
+            # hackish for now
+            shutil.copy(rfn, destfn)
+            os.system(f'spc2it "{destfn}"')
+            os.remove(destfn)
+            shutil.move(destfn[:-3] + 'it', destfn)
+            continue
         elif is_fonts_dir and fn.endswith('.ini'):
             shutil.copy(rfn, destfn)
             os.system(f'sed \'s/\\.png/\\.t3x/\' -i "{destfn}"')
             continue
-        elif fn == 'sounds.ini':
+        elif rfn == os.path.join(datadir, 'sounds.ini'):
             shutil.copy(rfn, destfn)
             os.system(f'sed \'s/\\.ogg"/\\.ogg.wav"/\' -i "{destfn}"')
             continue
-        elif fn.endswith('.mp3'):
-            os.system(f'ffmpeg -i "{rfn}" -aq 1 "{destfn}.ogg"')
-            shutil.move(destfn+'.ogg', destfn)
+        elif rfn == os.path.join(datadir, 'music.ini'):
+            shutil.copy(rfn, destfn)
+            os.system(f'sed \'s/\\.spc"/\\.spc.it"/\' -i "{destfn}"')
+            os.system(f'sed \'s/\\.spc|/\\.spc.it|/\' -i "{destfn}"')
             continue
+        # elif fn.endswith('.mp3'):
+        #     os.system(f'ffmpeg -i "{rfn}" -aq 1 "{destfn}.ogg"')
+        #     shutil.move(destfn+'.ogg', destfn)
+        #     continue
         else:
             shutil.copy(rfn, destfn)
             continue
