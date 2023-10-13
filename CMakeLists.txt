@@ -1382,11 +1382,35 @@ elseif(WIN32)
 elseif(VITA)
     include(cmake/package_vita.cmake)
 elseif(NINTENDO_3DS)
-    ctr_create_3dsx(thextech)
+    if(NOT "${THEXTECH_VERSION_REL}" STREQUAL "")
+        set(SMDH_VERSION "git branch ${GIT_BRANCH} #${GIT_COMMIT_HASH}")
+    else()
+        set(SMDH_VERSION "Based on SMBX 1.3 by Redigit")
+    endif()
+
+    ctr_generate_smdh(OUTPUT "thextech.smdh"
+        NAME "TheXTech ${THEXTECH_VERSION_STRING}"
+        DESCRIPTION "${SMDH_VERSION}"
+        AUTHOR "Wohlstand and ds-sloth"
+        ICON "${CMAKE_SOURCE_DIR}/resources/icon/thextech_48.png"
+    )
+
+    ctr_create_3dsx(thextech SMDH "thextech.smdh")
 elseif(NINTENDO_WII)
     ogc_create_dol(thextech)
 elseif(NINTENDO_DS)
-    nds_create_rom(thextech)
+    if(NOT "${THEXTECH_VERSION_REL}" STREQUAL "")
+        set(ROM_VERSION "${GIT_BRANCH} #${GIT_COMMIT_HASH}")
+    else()
+        set(ROM_VERSION "Based on SMBX 1.3")
+    endif()
+
+    nds_create_rom(thextech
+        NAME "TheXTech ${THEXTECH_VERSION_STRING}"
+        SUBTITLE1 "Wohlstand and ds-sloth"
+        SUBTITLE2 "${ROM_VERSION}"
+#        ICON "${CMAKE_SOURCE_DIR}/resources/icon/thextech_32.png" # seems to only accept bitmaps
+    )
 elseif(NINTENDO_SWITCH)
     include(cmake/package_switch.cmake)
 elseif(EMSCRIPTEN)
