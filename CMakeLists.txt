@@ -1409,7 +1409,7 @@ elseif(NINTENDO_DS)
         NAME "TheXTech ${THEXTECH_VERSION_STRING}"
         SUBTITLE1 "Wohlstand and ds-sloth"
         SUBTITLE2 "${ROM_VERSION}"
-#        ICON "${CMAKE_SOURCE_DIR}/resources/icon/thextech_32.png" # seems to only accept bitmaps
+        ICON "${CMAKE_SOURCE_DIR}/resources/nds/icon.bmp"
     )
 elseif(NINTENDO_SWITCH)
     include(cmake/package_switch.cmake)
