@@ -33,7 +33,12 @@ The original was written in VB6, targeting Windows only and eating up 2-3Gb of r
 
 ### KNOWN ISSUES
 
+- **The Wii port is currently experimental and not fully tested.**
 - LunaLua/LuaJIT episodes are not supported. (ATWE: A Tiny World Episode immediately comes to mind. The Episode shows in the world list, but upon trying to load the game will gracefully exit.)
-- Background pictures may sometimes get being unloaded because of agressive memory management model and bugs.
+- Background pictures (especially animated) may sometimes fail to load because of insufficient memory.
+- Minor graphical glitches (images sometimes do not line up correctly, leaving gaps)
+- Has several performance issues related to Wii's slow SD card access
+  - Has <1s delays when loading images (will cause in-level stuttering)
+  - Has ~1s delays when storing game saves or settings to the SD card
 
 # TheXTech Standard Readme

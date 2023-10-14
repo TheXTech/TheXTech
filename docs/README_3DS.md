@@ -35,6 +35,16 @@ The original was written in VB6, targeting Windows only and eating up 2-3Gb of r
 ### KNOWN ISSUES
 
 - LunaLua/LuaJIT episodes are not supported. (ATWE: A Tiny World Episode immediately comes to mind. The Episode shows in the world list, but upon trying to load the game will gracefully exit.)
+- Has <1s delays when loading music (can cause in-level stuttering)
+- Has <1s delays when loading PNG or GIF images (can cause in-level stuttering)
+- Minor graphical glitches (images sometimes do not line up correctly, leaving gaps)
+- Has several performance issues related to 3DS's slow SD card filesystem access
+  - Has >10s delays when loading unpacked episodes
+  - Has ~2s delays when loading images from unpacked episodes (will cause in-level stuttering)
+  - Has ~2s delays when storing game saves or settings to the SD card
 - Has several performance issues on the Old 3DS
+  - Low framerates when playing with SPC and non-44.1 KHz music
+  - Low framerates when section echo effects are active
+  - Occasional crashes have been reported due to the Old 3DS's limited memory
 
 # TheXTech Standard Readme
