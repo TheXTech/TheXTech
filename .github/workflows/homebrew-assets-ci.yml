@@ -154,13 +154,17 @@ jobs:
       shell: bash
       run: |
         mkromfs3ds assets/target package/${{ steps.res.outputs.filename }}.romfs
-        zip -9 "package/${{ steps.res.outputs.filename }}" "package/${{ steps.res.outputs.filename }}.romfs"
+        cd package
+        zip -9 "${{ steps.res.outputs.filename }}" "${{ steps.res.outputs.filename }}.romfs"
+        cd ..
 
     - name: Package for Wii
       if: matrix.target.id == 'wii'
       shell: bash
       run: |
-        zip -9 -r "package/${{ steps.res.outputs.filename }}" "assets/target"
+        cd assets/target
+        zip -9 -r "../../package/${{ steps.res.outputs.filename }}" .
+        cd ../..
 
     - name: Upload artifact
       if: success()
