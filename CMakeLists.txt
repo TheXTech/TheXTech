@@ -1417,32 +1417,32 @@ elseif(EMSCRIPTEN)
     add_custom_command(
         TARGET thextech POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy
-                ${CMAKE_SOURCE_DIR}/resources/emscripten/sw.js
-                ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/sw.js)
+                "${CMAKE_SOURCE_DIR}/resources/emscripten/sw.js"
+                "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/sw.js")
 
     add_custom_command(
         TARGET thextech POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E rename
-                ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${THEXTECH_EXECUTABLE_NAME}.html
-                ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/index.html)
+                "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${THEXTECH_EXECUTABLE_NAME}.html"
+                "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/index.html")
 
     add_custom_command(
         TARGET thextech POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy
-                ${PGE_PRELOAD_ENVIRONMENT}/graphics/ui/icon/thextech.ico
-                ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/favicon.ico)
+                "${PGE_PRELOAD_ENVIRONMENT}/graphics/ui/icon/thextech.ico"
+                "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/favicon.ico")
 
     add_custom_command(
         TARGET thextech POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy
-                ${PGE_PRELOAD_ENVIRONMENT}/graphics/ui/icon/thextech_32.png
-                ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/thextech_32.png)
+                "${PGE_PRELOAD_ENVIRONMENT}/graphics/ui/icon/thextech_32.png"
+                "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/thextech_32.png")
 
     add_custom_command(
         TARGET thextech POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy
-                ${PGE_PRELOAD_ENVIRONMENT}/graphics/ui/icon/thextech_256.png
-                ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/thextech_256.png)
+                "${PGE_PRELOAD_ENVIRONMENT}/graphics/ui/icon/thextech_256.png"
+                "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/thextech_256.png")
 
     configure_file(${CMAKE_SOURCE_DIR}/resources/emscripten/manifest.json ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/manifest.json)
 else()
