@@ -895,7 +895,7 @@ void UpdateGraphics(bool skipRepaint)
                 level[S].X = -vScreen[A].X;
 
                 // mark that section has shrunk
-                UpdateSectionOverlaps(A, true);
+                UpdateSectionOverlaps(S, true);
             }
         }
 
