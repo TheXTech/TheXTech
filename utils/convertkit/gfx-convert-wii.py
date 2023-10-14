@@ -16,11 +16,13 @@ outdir = sys.argv[2]
 if not datadir.endswith('/'): datadir += '/'
 if not outdir.endswith('/'): outdir += '/'
 
+os.makedirs(os.path.join(outdir, 'graphics', 'fallback'), exist_ok=True)
+
 for dirpath, _, files in os.walk(datadir, topdown=True):
     outpath = os.path.join(outdir, dirpath[len(datadir):])
     os.makedirs(outpath, exist_ok=True)
 
-    if dirpath.endswith('fonts/'):
+    if dirpath.endswith('fonts'):
         print('found fonts dir')
         is_fonts_dir = True
         texture_1x = set()
@@ -56,11 +58,20 @@ for dirpath, _, files in os.walk(datadir, topdown=True):
         else:
             downscale = "-sample 50%"
 
-        if not REDO and not is_fonts_dir and (os.path.isfile(destfn) or os.path.isfile(destfn+'.wav') or ((fn.endswith('.gif') or fn.endswith('.png')) and os.path.isfile(tplfn))): continue
+        if not REDO and not is_fonts_dir and not fn.endswith('m.gif') and (os.path.isfile(destfn) or os.path.isfile(destfn+'.wav') or ((fn.endswith('.gif') or fn.endswith('.png')) and os.path.isfile(tplfn))): continue
 
         print(rfn)
         if fn.endswith('.png'):
             os.system(f'convert {downscale} "{rfn}" "{bmpfn}"')
+
+            ftype = fn[:fn.rfind('-')]
+
+            if f'/graphics/{ftype}/' in rfn:
+                dest_maskfn = destfn[:-4] + 'm.gif'
+                dest_maskfn = dest_maskfn.replace(f'/graphics/{ftype}/', '/graphics/fallback/')
+
+                if not os.path.isfile(dest_maskfn):
+                    os.system(f'convert "{rfn}" -set colorspace RGB -alpha extract -negate "{dest_maskfn}"')
         elif fn.endswith('m.gif') and os.path.isfile(rfn[:-5]+'.gif'):
             continue
         elif fn.endswith('m.gif'):
@@ -70,19 +81,25 @@ for dirpath, _, files in os.walk(datadir, topdown=True):
             maskfn = rfn[:-4]+'m.gif'
             ftype = fn[:fn.rfind('-')]
             altmaskfn_gif = os.path.join(graphicsdir, 'fallback', fn[:-4]+'m.gif')
+            altmaskfn_gif2 = os.path.join(graphicsdir, ftype, fn[:-4]+'m.gif')
             altmaskfn_png = os.path.join(graphicsdir, ftype, fn[:-4]+'.png')
+
+            # would be nice to confirm merge safety
             if os.path.isfile(maskfn):
                 os.system(f'convert "{rfn}" "{maskfn}" -alpha Off -compose CopyOpacity -composite -channel a -negate +channel {downscale} "{bmpfn}"')
+
+                if f'/graphics/{ftype}/' in rfn:
+                    dest_maskfn = destfn[:-4] + 'm.gif'
+                    dest_maskfn = dest_maskfn.replace(f'/graphics/{ftype}/', '/graphics/fallback/')
+
+                    if not os.path.isfile(dest_maskfn):
+                        shutil.copy(maskfn, dest_maskfn)
             elif os.path.isfile(altmaskfn_gif):
-                if os.popen(f'identify -format "%[fx:w*2],%[fx:h*2]" "{rfn}"').read() == os.popen(f'identify -format "%[fx:w*2],%[fx:h*2]" "{altmaskfn_gif}"').read():
-                    os.system(f'convert "{rfn}" "{altmaskfn_gif}" -alpha Off -compose CopyOpacity -composite -channel a -negate +channel {downscale} "{bmpfn}"')
-                else:
-                    os.system(f'convert {downscale} "{rfn}" "{bmpfn}"')
+                os.system(f'convert "{rfn}" "{altmaskfn_gif}" -alpha Off -compose CopyOpacity -composite -channel a -negate +channel {downscale} "{bmpfn}"')
+            elif os.path.isfile(altmaskfn_gif2):
+                os.system(f'convert "{rfn}" "{altmaskfn_gif2}" -alpha Off -compose CopyOpacity -composite -channel a -negate +channel {downscale} "{bmpfn}"')
             elif os.path.isfile(altmaskfn_png):
-                if os.popen(f'identify -format "%[fx:w*2],%[fx:h*2]" "{rfn}"').read() == os.popen(f'identify -format "%[fx:w*2],%[fx:h*2]" "{altmaskfn_png}"').read():
-                    os.system(f'convert "{rfn}" "{altmaskfn_png}" -alpha On -compose CopyOpacity -composite {downscale} "{bmpfn}"')
-                else:
-                    os.system(f'convert {downscale} "{rfn}" "{bmpfn}"')
+                os.system(f'convert "{rfn}" "{altmaskfn_png}" -alpha On -compose CopyOpacity -composite {downscale} "{bmpfn}"')
             else:
                 os.system(f'convert {downscale} "{rfn}" "{bmpfn}"')
         elif fn.endswith('.db'):

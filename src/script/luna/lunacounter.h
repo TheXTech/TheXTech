@@ -33,6 +33,7 @@
 struct DeathCounter
 {
     DeathCounter() noexcept;
+    ~DeathCounter() noexcept;
 
     void init();
     void quit();
@@ -65,6 +66,8 @@ struct DeathCounter
     } m_print;
 
 private:
+    FILE* m_openFile = nullptr;
+
     friend struct DeathRecord;
     static void InitStatsFile(FILE *openfile);
     static void WriteHeader(FILE *openfile);

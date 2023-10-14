@@ -734,30 +734,38 @@ void lazyLoad(StdPicture& target)
     }
     else
     {
-        FIBITMAP* FI_tex = nullptr;
-        FIBITMAP* FI_mask = nullptr;
-
-        if(Files::hasSuffix(target.l.mask_path, "m.gif"))
-        {
-            FI_tex = robust_FILoad(target.l.path, "");
-
-            if(FI_tex)
-                FI_mask = robust_FILoad(target.l.mask_path, "");
-        }
-        else
-        {
-            FI_tex = robust_FILoad(target.l.path, target.l.mask_path);
-        }
+        FIBITMAP* FI_tex = robust_FILoad(target.l.path, "");
 
         if(!FI_tex)
         {
-            pLogWarning("Permanently failed to load %s", target.l.path.c_str());
+            pLogWarning("Permanently failed to load %s during image load", target.l.path.c_str());
             pLogWarning("Error: %d (%s)", errno, strerror(errno));
             target.inited = false;
             return;
         }
 
-        if(FI_mask && (g_ForceBitmaskMerge || !GraphicsHelps::validateBitmaskRequired(FI_tex, FI_mask, target.l.path)))
+        FIBITMAP* FI_mask = nullptr;
+        bool force_merge = false;
+
+        if(Files::hasSuffix(target.l.mask_path, "m.gif"))
+        {
+            FI_mask = robust_FILoad(target.l.mask_path, "");
+        }
+        else if(!target.l.mask_path.empty())
+        {
+            FIBITMAP* FI_mask_rgba = robust_FILoad(target.l.mask_path, "");
+
+            if(FI_mask_rgba)
+            {
+                GraphicsHelps::getMaskFromRGBA(FI_mask_rgba, FI_mask);
+                GraphicsHelps::closeImage(FI_mask_rgba);
+            }
+
+            // marginally faster, but inaccurate
+            force_merge = true;
+        }
+
+        if(FI_mask && (force_merge || g_ForceBitmaskMerge || !GraphicsHelps::validateBitmaskRequired(FI_tex, FI_mask, target.l.path)))
         {
             GraphicsHelps::mergeWithMask(FI_tex, FI_mask);
             GraphicsHelps::closeImage(FI_mask);

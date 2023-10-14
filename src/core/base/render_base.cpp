@@ -452,14 +452,18 @@ void AbstractRender_t::lazyLoad(StdPicture &target)
 
         if(!maskImage)
             pLogWarning("lazyLoad: failed to load mask image for texture at address %p [%s]", &target, StdPictureGetOrigPath(target).c_str());
+    }
 
-        // check if GIF bitmask cannot be properly represented with RGBA
-        bool bitmask_required = maskImage && !target.l.isMaskPng && GraphicsHelps::validateBitmaskRequired(sourceImage, maskImage, StdPictureGetOrigPath(target));
+    // check if bitmask required / possible and possibly merge
+    if(maskImage)
+    {
+        // check if bitmask cannot be properly represented with RGBA
+        bool bitmask_required = GraphicsHelps::validateBitmaskRequired(sourceImage, maskImage, StdPictureGetOrigPath(target));
 
         XRender::g_BitmaskTexturePresent |= bitmask_required;
 
-        // merge it with image if PNG, masks are unsupported, merge is forced, or the mask could be properly represented with RGBA
-        if(maskImage && (target.l.isMaskPng || g_ForceBitmaskMerge || !g_render->textureMaskSupported() || !bitmask_required))
+        // merge it with image masks are unsupported, merge is forced, or the mask could be properly represented with RGBA
+        if(maskImage && (g_ForceBitmaskMerge || !g_render->textureMaskSupported() || !bitmask_required))
         {
             GraphicsHelps::mergeWithMask(sourceImage, maskImage);
             GraphicsHelps::closeImage(maskImage);
