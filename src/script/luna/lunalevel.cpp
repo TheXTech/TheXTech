@@ -56,11 +56,12 @@ void LevelF::SetSectionBounds(int section, double left_bound, double top_bound, 
     boundarray.Y = top_bound;
     boundarray.Height = bot_bound;
     boundarray.Width = right_bound;
+    UpdateSectionOverlaps(section);
 }
 
 double LevelF::GetBoundary(int section, int which_boundary_UDLR)
 {
-    Location_t &boundarray = level[section];
+    const Location_t &boundarray = level[section];
 
     switch(which_boundary_UDLR)
     {
@@ -83,7 +84,7 @@ void LevelF::GetBoundary(LunaRect *rect, int section)
 {
     if(section >= 0 && section < numSections)
     {
-        Location_t &boundarray = level[section];
+        const Location_t &boundarray = level[section];
         rect->top = (int)boundarray.Y;
         rect->bottom = (int)boundarray.Height;
         rect->left = (int)boundarray.X;

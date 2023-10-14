@@ -4820,7 +4820,7 @@ void UpdateNPCs()
                                     // for(int B = (int)fBlock; B <= lBlock; B++)
                                     //     BlockShakeUp(B);
                                     {
-                                        auto &sec = level[NPC[A].Section];
+                                        const auto &sec = level[NPC[A].Section];
                                         Location_t toShake;
                                         toShake.X = sec.X;
                                         toShake.Width = (sec.Width - sec.X);
