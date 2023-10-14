@@ -112,6 +112,16 @@ public:
         SDL_assert_release(index >= begin);
         return *(array + index + offset);
     }
+
+    inline const T& operator[](long index) const
+    {
+#   ifdef RANGE_ARR_USE_HEAP
+        SDL_assert_release(array); // When array won't initialize
+#   endif
+        SDL_assert_release(index <= end);
+        SDL_assert_release(index >= begin);
+        return *(array + index + offset);
+    }
 #endif
 };
 
@@ -191,6 +201,16 @@ public:
     }
 #else
     inline T& operator[](long index)
+    {
+#   ifdef RANGE_ARR_USE_HEAP
+        SDL_assert_release(array); // When array won't initialize
+#   endif
+        SDL_assert_release(index <= end);
+        SDL_assert_release(index >= begin);
+        return *(array + index + offset);
+    }
+
+    inline const T& operator[](long index) const
     {
 #   ifdef RANGE_ARR_USE_HEAP
         SDL_assert_release(array); // When array won't initialize
