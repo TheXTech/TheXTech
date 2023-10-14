@@ -41,6 +41,7 @@
 #include "../layers.h"
 
 #include "npc/npc_queues.h"
+#include "npc/section_overlap.h"
 
 #include <Utils/maths.h>
 
@@ -4820,7 +4821,7 @@ void UpdateNPCs()
                                     // for(int B = (int)fBlock; B <= lBlock; B++)
                                     //     BlockShakeUp(B);
                                     {
-                                        auto &sec = level[NPC[A].Section];
+                                        const auto &sec = level[NPC[A].Section];
                                         Location_t toShake;
                                         toShake.X = sec.X;
                                         toShake.Width = (sec.Width - sec.X);
@@ -4863,6 +4864,9 @@ void UpdateNPCs()
                                             s.Y = 0;
                                             s.Width = 0;
                                             s.Height = 0;
+
+                                            UpdateSectionOverlaps(B);
+                                            UpdateSectionOverlaps(n.Section);
 
                                             for(int C = 1; C <= numNPCs; C++)
                                             {

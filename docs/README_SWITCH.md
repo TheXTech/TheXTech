@@ -9,20 +9,20 @@ The original was written in VB6, targeting Windows only and eating up 2-3Gb of r
 1. Download and place the `thextech.nro` at the "switch" directory at the root of SD card.
 2. Download one of the game assets packages for TheXTech from here: https://github.com/Wohlstand/TheXTech/wiki/Game-assets-packages
 3. Extract the downloaded archive with all it's content
-4. Created a folder on your Vita named “TheXTech” (case matters) in root of your SD card
-	sdmc:/TheXTech
+4. Created a folder on your Switch named “TheXTech” (case matters) in root of your SD card
+        sdmc:/TheXTech
 5. Move all extracted folders & files from the computer to sdmc:/TheXTech.
     Upon completion, your folder structure should look like this:
-	sdmc:/TheXTech/battle/
-	sdmc:/TheXTech/graphics/
-	sdmc:/TheXTech/music/
-	sdmc:/TheXTech/sound/
-	sdmc:/TheXTech/worlds/
-	sdmc:/TheXTech/gameinfo.ini
-	sdmc:/TheXTech/intro.lvl
-	sdmc:/TheXTech/music.ini
-	sdmc:/TheXTech/outro.lvl
-	sdmc:/TheXTech/sounds.ini
+        sdmc:/TheXTech/battle/
+        sdmc:/TheXTech/graphics/
+        sdmc:/TheXTech/music/
+        sdmc:/TheXTech/sound/
+        sdmc:/TheXTech/worlds/
+        sdmc:/TheXTech/gameinfo.ini
+        sdmc:/TheXTech/intro.lvl
+        sdmc:/TheXTech/music.ini
+        sdmc:/TheXTech/outro.lvl
+        sdmc:/TheXTech/sounds.ini
 
 6. Run `thextech.nro` via homebrew and enjoy.
 

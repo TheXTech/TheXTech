@@ -495,8 +495,8 @@ bool DoAction()
 bool KeyboardMouseRender(bool mouse, bool render)
 {
 #ifdef __3DS__
-    int cur_ScreenW = (editorScreen.active) ? 640 : ScreenW;
-    int cur_ScreenH = (editorScreen.active) ? 480 : ScreenH;
+    int cur_ScreenW = (LevelEditor && editorScreen.active) ? 640 : ScreenW;
+    int cur_ScreenH = (LevelEditor && editorScreen.active) ? 480 : ScreenH;
 #else
     const int cur_ScreenW = ScreenW;
     const int cur_ScreenH = ScreenH;

@@ -105,7 +105,7 @@ void SaveLevel(const std::string& FilePath, int format, int version)   // saves 
 
     for(int i = 0; i < numSections; ++i)
     {
-        auto &s = level[i];
+        const auto &s = level[i];
 
         section.id = i;
         section.size_left = s.X;
@@ -132,7 +132,7 @@ void SaveLevel(const std::string& FilePath, int format, int version)   // saves 
 
     for(int i = 1; i <= 2; ++i)
     {
-        auto &p = PlayerStart[i];
+        const auto &p = PlayerStart[i];
         player.id = i;
         player.x = p.X;
         player.y = p.Y;
@@ -144,7 +144,7 @@ void SaveLevel(const std::string& FilePath, int format, int version)   // saves 
 
     for(int i = 1; i <= numBlock; ++i)
     {
-        auto &b = Block[i];
+        const auto &b = Block[i];
 
         block.id = b.Type;
         block.x = b.Location.X;
@@ -182,7 +182,7 @@ void SaveLevel(const std::string& FilePath, int format, int version)   // saves 
 
     for(int i = 1; i <= numBackground; ++i)
     {
-        auto &b = Background[i];
+        const auto &b = Background[i];
 
         bgo.id = b.Type;
         bgo.x = b.Location.X;
@@ -203,7 +203,7 @@ void SaveLevel(const std::string& FilePath, int format, int version)   // saves 
 
     for(int i = 1; i <= numNPCs; ++i)
     {
-        auto &n = NPC[i];
+        const auto &n = NPC[i];
 
         npc.id = n.Type;
         npc.x = n.Location.X;
@@ -267,7 +267,7 @@ void SaveLevel(const std::string& FilePath, int format, int version)   // saves 
 
     for(int i = 1; i <= numWarps; ++i)
     {
-        auto &w = Warp[i];
+        const auto &w = Warp[i];
 
         // no case where user would want to save incomplete warp in classic editor
         if(!w.PlacedEnt || !w.PlacedExit)
@@ -323,7 +323,7 @@ void SaveLevel(const std::string& FilePath, int format, int version)   // saves 
 
     for(int i = 1; i <= numWater; ++i)
     {
-        auto &p = Water[i];
+        const auto &p = Water[i];
 
         pez.x = p.Location.X;
         pez.y = p.Location.Y;
@@ -347,7 +347,7 @@ void SaveLevel(const std::string& FilePath, int format, int version)   // saves 
 
     for(int i = 0; i < numLayers; ++i)
     {
-        auto &l = Layer[i];
+        const auto &l = Layer[i];
 
         layer.name = l.Name;
         layer.hidden = l.Hidden;
@@ -362,7 +362,7 @@ void SaveLevel(const std::string& FilePath, int format, int version)   // saves 
 
     for(int i = 0; i < numEvents; ++i)
     {
-        auto &e = Events[i];
+        const auto &e = Events[i];
 
         evt.name = e.Name;
         evt.msg = GetS(e.Text);
@@ -388,7 +388,7 @@ void SaveLevel(const std::string& FilePath, int format, int version)   // saves 
 
         for(int j = 0; j < numSections; ++j)
         {
-            auto &ss = e.section[j];
+            const auto &ss = e.section[j];
 
             s.id = j;
 

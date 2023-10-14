@@ -50,6 +50,7 @@
 
 #include "npc/npc_activation.h"
 #include "npc/npc_queues.h"
+#include "npc/section_overlap.h"
 
 #include "effect.h"
 #include "npc_id.h"
@@ -1591,6 +1592,9 @@ void UpdateGraphics(bool skipRepaint)
             {
                 LevelChop[S] += float(-screen.vScreen(A).X - level[S].X);
                 level[S].X = -screen.vScreen(A).X;
+
+                // mark that section has shrunk
+                UpdateSectionOverlaps(S, true);
             }
         }
 
