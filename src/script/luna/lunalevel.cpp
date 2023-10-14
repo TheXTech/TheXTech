@@ -21,6 +21,8 @@
 #include "lunalevel.h"
 #include "globals.h"
 
+#include "npc/section_overlap.h"
+
 
 void LevelF::PushSectionBoundary(int section, int which_boundary_UDLR, double push_val)
 {
@@ -47,6 +49,8 @@ void LevelF::PushSectionBoundary(int section, int which_boundary_UDLR, double pu
     default:
         break;
     }
+
+    UpdateSectionOverlaps(section);
 }
 
 void LevelF::SetSectionBounds(int section, double left_bound, double top_bound, double right_bound, double bot_bound)

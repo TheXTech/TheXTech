@@ -58,6 +58,8 @@
 #include "editor/editor_custom.h"
 #include "editor/editor_strings.h"
 
+#include "npc/section_overlap.h"
+
 
 #ifdef THEXTECH_BUILD_GL_MODERN
 #    include "core/opengl/gl_program_bank.h"
@@ -879,6 +881,8 @@ void OpenLevelDataPost()
     // FindSBlocks();
     syncLayersTrees_AllBlocks();
     syncLayers_AllBGOs();
+
+    CalculateSectionOverlaps();
 
     // moved the old event/layer loading code to the top
     // since it is needed before loading objects now

@@ -42,6 +42,7 @@
 #include "script/msg_preprocessor.h"
 
 #include "npc/npc_queues.h"
+#include "npc/section_overlap.h"
 #include "graphics/gfx_update.h"
 
 int numLayers = 0;
@@ -773,12 +774,16 @@ void ProcEvent(eventindex_t index, int whichPlayer, bool NoEffect)
 
                 /* Resize the section boundaries */
                 if(is_reset && !g_compatibility.modern_section_change)
+                {
                     level[B] = LevelREAL[B];
+                    UpdateSectionOverlaps(B);
+                }
                 else if(int(s.position.X) != EventSection_t::LESet_Nothing)
                 {
                     tempLevel = level[B];
                     newLevel = (is_reset) ? LevelREAL[B] : static_cast<Location_t>(s.position);
                     level[B] = newLevel;
+                    UpdateSectionOverlaps(B);
 
                     // warp other players to resized section, if not a reset
                     if(!evt.AutoStart && !equalCase(evt.Name, "Level - Start"))
@@ -1291,6 +1296,7 @@ void UpdateEvents()
                 level[A].Height = LevelREAL[A].Y + 800;
                 level[A].Y = LevelREAL[A].Y;
             }
+            UpdateSectionOverlaps(A);
         }
     }
 }

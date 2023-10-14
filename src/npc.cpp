@@ -41,6 +41,7 @@
 #include "layers.h"
 
 #include "npc/npc_queues.h"
+#include "npc/section_overlap.h"
 
 #include <Utils/maths.h>
 
@@ -61,10 +62,9 @@ void CheckSectionNPC(int A)
     }
 
     // disabled in 1.3.6.1 because of bugs when overlapping sections change
-#if 0
     // Previously, it optimized for section 0. Now, it optimizes for NPC's current section.
     int B = NPC[A].Section;
-    if(NPC[A].Location.X >= level[B].X)
+    if(g_SectionFirstOverlap[B] == B && NPC[A].Location.X >= level[B].X)
     {
         if(NPC[A].Location.X + NPC[A].Location.Width <= level[B].Width)
         {
@@ -77,7 +77,6 @@ void CheckSectionNPC(int A)
             }
         }
     }
-#endif
 
     for(int B = 0; B <= numSections; B++)
     {

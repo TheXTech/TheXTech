@@ -685,6 +685,7 @@ set(THEXTECH_SRC
     src/npc/npc_frames.cpp
     src/npc/npc_bonus.cpp
     src/npc/npc_queues.cpp
+    src/npc/section_overlap.cpp
     src/player/player_update.cpp
     src/fontman/font_manager.cpp
     src/fontman/font_manager_private.cpp

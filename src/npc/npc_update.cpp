@@ -41,6 +41,7 @@
 #include "../layers.h"
 
 #include "npc/npc_queues.h"
+#include "npc/section_overlap.h"
 
 #include <Utils/maths.h>
 
@@ -4863,6 +4864,9 @@ void UpdateNPCs()
                                             s.Y = 0;
                                             s.Width = 0;
                                             s.Height = 0;
+
+                                            UpdateSectionOverlaps(B);
+                                            UpdateSectionOverlaps(n.Section);
 
                                             for(int C = 1; C <= numNPCs; C++)
                                             {
