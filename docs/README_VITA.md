@@ -12,19 +12,19 @@ The original was written in VB6, targeting Windows only and eating up 2-3Gb of r
 2. Download one of the game assets packages for TheXTech from here: https://github.com/Wohlstand/TheXTech/wiki/Game-assets-packages
 3. Extract the downloaded archive with all it's content
 4. Created a folder on your Vita named “TheXTech” (case matters) in ux0:data
-	ux0:data/TheXTech
+        ux0:data/TheXTech
 5. Move all extracted folders & files from the computer to ux0:data/TheXTech.
     Upon completion, your folder structure should look like this:
-	ux0:data/TheXTech/battle/
-	ux0:data/TheXTech/graphics/
-	ux0:data/TheXTech/music/
-	ux0:data/TheXTech/sound/
-	ux0:data/TheXTech/worlds/
-	ux0:data/TheXTech/gameinfo.ini
-	ux0:data/TheXTech/intro.lvl
-	ux0:data/TheXTech/music.ini
-	ux0:data/TheXTech/outro.lvl
-	ux0:data/TheXTech/sounds.ini
+        ux0:data/TheXTech/battle/
+        ux0:data/TheXTech/graphics/
+        ux0:data/TheXTech/music/
+        ux0:data/TheXTech/sound/
+        ux0:data/TheXTech/worlds/
+        ux0:data/TheXTech/gameinfo.ini
+        ux0:data/TheXTech/intro.lvl
+        ux0:data/TheXTech/music.ini
+        ux0:data/TheXTech/outro.lvl
+        ux0:data/TheXTech/sounds.ini
 
 6. Install `thextech.vpk` and enjoy.
 
