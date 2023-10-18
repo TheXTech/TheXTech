@@ -111,7 +111,7 @@ jobs:
 
       - name: Build with Gradle
         if: ${{ steps.signing-check.outputs.available == 'true' }}
-        run: ./gradlew assembleReleaseci
+        run: ./gradlew assembleApkReleaseci
         env:
           RELEASE_STORE_PASSWORD: ${{ secrets.RELEASE_STORE_PASSWORD }}
           RELEASE_KEY_PASSWORD: ${{ secrets.RELEASE_KEY_PASSWORD }}
@@ -121,7 +121,7 @@ jobs:
 
       - name: Build with Gradle (unsigned)
         if: ${{ steps.signing-check.outputs.available != 'true' }}
-        run: ./gradlew assembleRelease
+        run: ./gradlew assembleApkRelease
         env:
           RELEASE_STORE_PASSWORD: ${{ secrets.RELEASE_STORE_PASSWORD }}
           RELEASE_KEY_PASSWORD: ${{ secrets.RELEASE_KEY_PASSWORD }}
