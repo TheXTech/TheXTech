@@ -154,7 +154,7 @@ void ExportLevelSaveInfo(GamesaveData& s)
     }
 }
 
-LevelSaveInfo_t InitLevelSaveInfo(LevelData& loadedLevel)
+LevelSaveInfo_t InitLevelSaveInfo(const LevelData& loadedLevel)
 {
     LevelSaveInfo_t ret;
 
@@ -167,7 +167,7 @@ LevelSaveInfo_t InitLevelSaveInfo(LevelData& loadedLevel)
     std::bitset<8> spec_hits;
 
     // look for medals
-    for(auto &npc : loadedLevel.npc)
+    for(const auto &npc : loadedLevel.npc)
     {
         bool is_container = (npc.id == NPCID_ITEM_BURIED || npc.id == NPCID_ITEM_POD ||
             npc.id == NPCID_ITEM_BUBBLE || npc.id == NPCID_ITEM_THROWER);

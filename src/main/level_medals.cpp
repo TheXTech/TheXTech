@@ -96,7 +96,7 @@ void CurLevelMedals_t::reset_lvl()
     prev = 0;
 }
 
-void CurLevelMedals_t::prepare_lvl(LevelData& loadedLevel)
+void CurLevelMedals_t::prepare_lvl(const LevelData& loadedLevel)
 {
     LevelSaveInfo_t* info = s_findSaveInfo();
 

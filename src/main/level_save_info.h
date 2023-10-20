@@ -28,7 +28,7 @@
 
 #include "globals.h"
 
-LevelSaveInfo_t InitLevelSaveInfo(LevelData& loadedLevel);
+LevelSaveInfo_t InitLevelSaveInfo(const LevelData& loadedLevel);
 LevelSaveInfo_t InitLevelSaveInfo(const std::string& fullPath, LevelData& tempData);
 void ImportLevelSaveInfo(const GamesaveData& s);
 void ExportLevelSaveInfo(GamesaveData& s);

@@ -30,6 +30,12 @@ struct CurLevelMedals_t
 private:
     uint8_t m_checkpoint = 0;
 
+protected:
+    friend bool OpenLevelData(LevelData &lvl, const std::string FilePath);
+
+    //! loads maximums from the current level (must be called during OpenLevelData)
+    void prepare_lvl(const LevelData& loadedLevel);
+
 public:
     uint8_t max = 0;
     uint8_t prev = 0;
@@ -54,10 +60,7 @@ public:
     // resets level attributes (keeps checkpoint)
     void reset_lvl();
 
-    // loads maximums for current level
-    void prepare_lvl(LevelData& loadedLevel);
-
-    // commits run to current level's save info
+    //! commits run to current level's save info
     void commit();
 };
 
