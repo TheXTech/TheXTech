@@ -146,6 +146,25 @@ android {
             versionNameSuffix '-DEVDEBUG'
         }
     }
+
+    flavorDimensions = ["default"]
+    productFlavors {
+        apk {}
+        fdroid {
+            if(project.hasProperty('applicationIdSuffix')) {
+                applicationIdSuffix += '.fdroid'
+            } else {
+                applicationIdSuffix = '.fdroid'
+            }
+
+            if(project.hasProperty('versionNameSuffix')) {
+                versionNameSuffix += '-FDROID'
+            } else {
+                versionNameSuffix = '-FDROID'
+            }
+        }
+    }
+
     lint {
         abortOnError false
     }

@@ -110,7 +110,7 @@ jobs:
 
       - name: Build with Gradle
         if: ${{ steps.signing-check.outputs.available == 'true' }}
-        run: ./gradlew assembleReleaseci
+        run: ./gradlew assembleApkReleaseci
         env:
           RELEASE_STORE_PASSWORD: ${{ secrets.RELEASE_STORE_PASSWORD }}
           RELEASE_KEY_PASSWORD: ${{ secrets.RELEASE_KEY_PASSWORD }}
@@ -120,7 +120,7 @@ jobs:
 
       - name: Build with Gradle (unsigned)
         if: ${{ steps.signing-check.outputs.available != 'true' }}
-        run: ./gradlew assembleRelease
+        run: ./gradlew assembleApkRelease
         env:
           RELEASE_STORE_PASSWORD: ${{ secrets.RELEASE_STORE_PASSWORD }}
           RELEASE_KEY_PASSWORD: ${{ secrets.RELEASE_KEY_PASSWORD }}
@@ -139,7 +139,7 @@ jobs:
               BRANCH_NAME_RES=${BRANCH_NAME}
           fi
 
-          mv thextech/build/outputs/apk/releaseci/thextech-releaseci.apk thextech-android-${BRANCH_NAME_RES}.apk
+          mv thextech/build/outputs/apk/apk/releaseci/thextech-apk-releaseci.apk thextech-android-${BRANCH_NAME_RES}.apk
 
       - name: Rename APK (unsigned)
         if: ${{ steps.signing-check.outputs.available != 'true' }}
@@ -152,7 +152,7 @@ jobs:
               BRANCH_NAME_RES=${BRANCH_NAME}
           fi
 
-          mv thextech/build/outputs/apk/release/thextech-release-unsigned.apk thextech-android-${BRANCH_NAME_RES}-unsigned.apk
+          mv thextech/build/outputs/apk/apk/release/thextech-apk-release-unsigned.apk thextech-android-${BRANCH_NAME_RES}-unsigned.apk
 
       - name: Upload APK
         if: success() && ${{ steps.signing-check.outputs.available == 'true' }}
