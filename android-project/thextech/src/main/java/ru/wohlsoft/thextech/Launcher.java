@@ -51,6 +51,7 @@ public class Launcher extends AppCompatActivity
     final String LOG_TAG = "TheXTech";
     public static final int READWRITE_PERMISSION_FOR_GAME = 1;
     public static final int READWRITE_PERMISSION_FOR_GAME_BY_INTENT = 2;
+    public static final int READWRITE_PERMISSION_FOR_ADD_DIRECTORY = 3;
     private Context m_context = null;
     private String filePathToOpen;
 
@@ -179,7 +180,7 @@ public class Launcher extends AppCompatActivity
 
                         if(id == MENU_ADD)
                         {
-                            if(checkFilePermissions(READWRITE_PERMISSION_FOR_GAME) || !hasManageAppFS())
+                            if(checkFilePermissions(READWRITE_PERMISSION_FOR_ADD_DIRECTORY) || !hasManageAppFS())
                                 return false;
                             GameSettings.selectAssetsPath(Launcher.this, Launcher.this);
                         }
@@ -514,8 +515,16 @@ public class Launcher extends AppCompatActivity
         if(!hasManageAppFS())
             return;
 
-        if(requestCode == READWRITE_PERMISSION_FOR_GAME)
+        switch(requestCode)
+        {
+        case READWRITE_PERMISSION_FOR_GAME:
             tryStartGame(m_context);
+            break;
+
+        case READWRITE_PERMISSION_FOR_ADD_DIRECTORY:
+            GameSettings.selectAssetsPath(Launcher.this, Launcher.this);
+            break;
+        }
     }
 
     public void startGame()
