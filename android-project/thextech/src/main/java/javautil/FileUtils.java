@@ -392,6 +392,7 @@ public class FileUtils
     {
         Cursor returnCursor = context.getContentResolver().query(uri, new String[] { OpenableColumns.DISPLAY_NAME, OpenableColumns.SIZE }, null, null, null);
         assert(returnCursor != null);
+        String name;
 
         /*
          * Get the column indexes of the data in the Cursor,
@@ -401,7 +402,19 @@ public class FileUtils
         int nameIndex = returnCursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
         // int sizeIndex = returnCursor.getColumnIndex(OpenableColumns.SIZE);
         returnCursor.moveToFirst();
-        String name = (returnCursor.getString(nameIndex));
+        try
+        {
+            name = (returnCursor.getString(nameIndex));
+        }
+        catch (Exception e)
+        {
+            if(e.getMessage() != null)
+                Log.e(TAG, e.getMessage());
+            else
+                Log.e(TAG, "<NULL error>");
+
+            name = "unknown.lvlx";
+        }
         // String size = (Long.toString(returnCursor.getLong(sizeIndex)));
 
         File output;
@@ -487,7 +500,7 @@ public class FileUtils
             else
                 Log.e(TAG, "<NULL error>");
 
-            return null;
+            return copyFileToInternalStorage(uri, FALLBACK_COPY_FOLDER);
         }
         finally
         {
@@ -495,7 +508,7 @@ public class FileUtils
                 cursor.close();
         }
 
-        return null;
+        return copyFileToInternalStorage(uri, FALLBACK_COPY_FOLDER);
     }
 
     private static boolean isExternalStorageDocument(Uri uri)
