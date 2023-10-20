@@ -19,6 +19,7 @@
  */
 
 #include <fmt_format_ne.h>
+#include "sdl_proxy/sdl_stdinc.h"
 
 #include "../globals.h"
 #include "../graphics.h"
@@ -434,7 +435,7 @@ static inline void s_DrawMedal(int x, int y, int coin_width, int coin_height, Me
     if(GFX.Medals.inited)
     {
         if(level == MedalDrawLevel::Best)
-            XRender::renderTexture(x, y, coin_width, coin_height, GFX.Medals, coin_width * 3, 0);
+            XRender::renderTexture(x, y, coin_width, coin_height, GFX.Medals, coin_width * 2, 0);
         else if(level == MedalDrawLevel::Got)
             XRender::renderTexture(x, y, coin_width, coin_height, GFX.Medals, coin_width * 2, 0);
         else if(level == MedalDrawLevel::Prev)
@@ -445,9 +446,9 @@ static inline void s_DrawMedal(int x, int y, int coin_width, int coin_height, Me
     else
     {
         if(level == MedalDrawLevel::Best)
-            XRender::renderTexture(x, y, GFX.Interface[2], 1.0f, 1.0f, 1.0f);
+            XRender::renderTexture(x, y, GFX.Interface[2]);
         else if(level == MedalDrawLevel::Got)
-            XRender::renderTexture(x, y, GFX.Interface[2], 0.9f, 0.9f, 0.9f);
+            XRender::renderTexture(x, y, GFX.Interface[2]);
         else if(level == MedalDrawLevel::Prev)
             XRender::renderTexture(x, y, GFX.Interface[2], 0.5f, 0.5f, 0.5f);
         else
@@ -457,21 +458,19 @@ static inline void s_DrawMedal(int x, int y, int coin_width, int coin_height, Me
     // render sparkles
     if(level == MedalDrawLevel::Best)
     {
-        int sparkle_1_idx = (CommonFrame % 256) / 16; // on frame 3
+        int sparkle_1_idx = ((CommonFrame + x * 37) % 1024) / 16; // on frame 3
 
         for(int i = 0; i < 3; ++i)
         {
-            int sparkle_idx = (sparkle_1_idx + i) % 16;
+            int sparkle_idx = (sparkle_1_idx + i) % 64;
+
+            if(sparkle_idx % 2)
+                continue;
+
             int sparkle_frame = 2 - i;
 
-            int sparkle_X = (9 * sparkle_idx) % coin_width;
-            int sparkle_Y = (13 * sparkle_idx) % coin_height;
-
-            if(sparkle_X <= 2)
-                sparkle_X = 2;
-
-            if(sparkle_Y <= 2)
-                sparkle_Y = 2;
+            int sparkle_X = (9 * sparkle_idx) % (coin_width - 8) + 4;
+            int sparkle_Y = (13 * (sparkle_idx % 16) + 29 * (sparkle_idx / 16)) % (coin_height - 8) + 4;
 
             sparkle_X -= EffectWidth[78] / 2;
             sparkle_Y -= EffectHeight[78] / 2;
@@ -479,7 +478,7 @@ static inline void s_DrawMedal(int x, int y, int coin_width, int coin_height, Me
             sparkle_X &= ~1;
             sparkle_Y &= ~1;
 
-            XRender::renderTexture(x + sparkle_X, y + sparkle_Y, EffectWidth[78], EffectHeight[78], GFXEffect[78], 0, EffectHeight[78] * sparkle_frame, 1.0f, 1.0f, 1.0f, 0.5f);
+            XRender::renderTexture(x + sparkle_X, y + sparkle_Y, EffectWidth[78], EffectHeight[78], GFXEffect[78], 0, EffectHeight[78] * sparkle_frame, 1.0f, 1.0f, 1.0f, 0.8f);
         }
     }
 }
@@ -504,8 +503,13 @@ void DrawMedals(int X, int Y, bool center, uint8_t max, uint8_t prev, uint8_t ck
     if(max > 8)
         max = 8;
 
+    bool show_shiny = false;
+
     if(g_config.medals_show_policy == Config_t::MEDALS_SHOW_FULL)
     {
+        if(best == ((1 << max) - 1))
+            show_shiny = true;
+
         if(center)
             X -= ((coin_width * max) / 2) & ~1;
         else
@@ -516,7 +520,7 @@ void DrawMedals(int X, int Y, bool center, uint8_t max, uint8_t prev, uint8_t ck
             int bit = (1 << i);
             int X_i = X + coin_width * i;
 
-            if(best & bit)
+            if((best & bit) && show_shiny)
                 s_DrawMedal(X_i, Y, coin_width, coin_height, MedalDrawLevel::Best);
             else if(got & bit)
                 s_DrawMedal(X_i, Y, coin_width, coin_height, MedalDrawLevel::Got);
@@ -533,6 +537,7 @@ void DrawMedals(int X, int Y, bool center, uint8_t max, uint8_t prev, uint8_t ck
 
     int best_count = 0;
     int got_count = 0;
+    int prev_count = 0;
 
     for(int i = 0; i < max; ++i)
     {
@@ -540,68 +545,39 @@ void DrawMedals(int X, int Y, bool center, uint8_t max, uint8_t prev, uint8_t ck
 
         if(best & bit)
             best_count++;
-        else if(got & bit)
+        if(got & bit)
             got_count++;
+        if(prev & bit)
+            prev_count++;
     }
 
-    std::string label_1;
-    std::string label_2;
-
+    std::string label;
     int total_len = 0;
-    int pix_len_1 = 0;
-    int pix_len_2 = 0;
 
-    if(best_count)
+    if(g_config.medals_show_policy == Config_t::MEDALS_SHOW_COUNTS)
     {
-        if(!got_count && g_config.medals_show_policy == Config_t::MEDALS_SHOW_COUNTS)
-            label_1 = fmt::format_ne("{0}/{1}", best_count, max);
-        else
-            label_1 = fmt::format_ne("{0}", best_count);
-
-        total_len += coin_width + 8 + GFX.Interface[1].w + 4;
-        pix_len_1 = SuperTextPixLen(label_1, 3);
-        total_len += pix_len_1;
-
-        // padding
-        if(got_count)
-            total_len += 8;
+        label = fmt::format_ne("{0}/{1}", got_count, max);
+        show_shiny = best_count == max;
+    }
+    else
+    {
+        label = fmt::format_ne("{0}", got_count);
+        show_shiny = best_count == SDL_max(got_count, prev_count);
     }
 
-    if(got_count || !best_count)
-    {
-        if(g_config.medals_show_policy == Config_t::MEDALS_SHOW_COUNTS)
-            label_2 = fmt::format_ne("{0}/{1}", got_count, max);
-        else
-            label_2 = fmt::format_ne("{0}", got_count);
-
-        total_len += coin_width + 8 + GFX.Interface[1].w + 4;
-        pix_len_2 = SuperTextPixLen(label_2, 3);
-        total_len += pix_len_2;
-    }
+    total_len += coin_width + 8 + GFX.Interface[1].w + 4;
+    total_len += SuperTextPixLen(label, 3);
 
     if(center)
         X -= (total_len / 2) & ~1;
     else
         X -= total_len;
 
-    if(best_count)
-    {
-        s_DrawMedal(X, Y, coin_width, coin_height, MedalDrawLevel::Best);
-        X += coin_width + 8;
-        XRender::renderTexture(X, Y, GFX.Interface[1]);
-        X += GFX.Interface[1].w + 4;
-        SuperPrint(label_1, 3, X, Y);
-        X += pix_len_1 + 8;
-    }
-
-    if(got_count || !best_count)
-    {
-        s_DrawMedal(X, Y, coin_width, coin_height, MedalDrawLevel::Got);
-        X += coin_width + 8;
-        XRender::renderTexture(X, Y, GFX.Interface[1]);
-        X += GFX.Interface[1].w + 4;
-        SuperPrint(label_2, 3, X, Y);
-    }
+    s_DrawMedal(X, Y, coin_width, coin_height, show_shiny ? MedalDrawLevel::Best : MedalDrawLevel::Got);
+    X += coin_width + 8;
+    XRender::renderTexture(X, Y, GFX.Interface[1]);
+    X += GFX.Interface[1].w + 4;
+    SuperPrint(label, 3, X, Y);
 }
 
 void DrawDeviceBattery()
