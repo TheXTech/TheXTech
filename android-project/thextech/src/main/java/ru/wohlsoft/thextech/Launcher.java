@@ -42,6 +42,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import javautil.FileUtils;
 
@@ -54,6 +55,7 @@ public class Launcher extends AppCompatActivity
     public static final int READWRITE_PERMISSION_FOR_ADD_DIRECTORY = 3;
     private Context m_context = null;
     private String filePathToOpen;
+    private String filePathToEdit;
     private boolean editRequested = false;
 
     /* ============ Animated background code ============ */
@@ -245,10 +247,7 @@ public class Launcher extends AppCompatActivity
             FileUtils utils = new FileUtils(this.m_context);
             filePathToOpen = utils.getPath(intent.getData());
 
-            if(intent.action == ACTION_EDIT)
-                editRequested = true;
-            else
-                editRequested = false;
+            editRequested = Objects.equals(intent.getAction(), Intent.ACTION_EDIT);
 
             Log.d(LOG_TAG, "Got a file: " + filePathToOpen + ";");
 
