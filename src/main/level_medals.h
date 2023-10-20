@@ -28,6 +28,7 @@ struct LevelData;
 struct CurLevelMedals_t
 {
 private:
+    //! bitfield of medals acquired at most recent checkpoint
     uint8_t m_checkpoint = 0;
 
 protected:
@@ -37,34 +38,39 @@ protected:
     void prepare_lvl(const LevelData& loadedLevel);
 
 public:
+    //! INTEGER for number of medals available (can't exceed 8)
     uint8_t max = 0;
+
+    //! bitfield of medals previously acquired in level (imported as "got" from save data)
     uint8_t prev = 0;
+    //! bitfield of medals acquired during current play session (on win, combined with "got" in save data)
     uint8_t got = 0;
+    //! bitfield of medals acquired since most recent lost life (on win, compared with and possibly replaces "best" in save data)
     uint8_t life = 0;
 
-    // sets specific coin as obtained
+    //! sets specific coin as obtained
     void get(uint8_t idx);
 
-    // resets this-life medals
+    //! resets this-life medals
     void on_any_death();
 
-    // loads currently got medals from checkpoint, resets this-life medals
+    //! loads currently got medals from checkpoint, resets this-life medals
     void on_all_dead();
 
-    // saves currently got medals to checkpoint
+    //! saves currently got medals to checkpoint
     void on_checkpoint();
 
-    // resets all player gotten medals for fresh level
+    //! resets all player gotten medals for fresh level
     void reset_checkpoint();
 
-    // resets level attributes (keeps checkpoint)
+    //! resets level attributes (keeps checkpoint)
     void reset_lvl();
 
     //! commits run to current level's save info
     void commit();
 };
 
-// sets the Variant attribute of medals in the level
+//! sets the Variant attribute of medals in the current level
 void OrderMedals();
 
 extern CurLevelMedals_t g_curLevelMedals;

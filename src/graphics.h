@@ -136,7 +136,17 @@ void DrawCredits();
 // draws the games interface
 void DrawInterface(int Z, int numScreens);
 
-// NEW: draws a set of medals
+/*!
+ * \brief NEW: draws a set of medals onscreen
+ * \param X      right/center X coordinate
+ * \param Y      top Y coordinate
+ * \param center should be centered on X if true, otherwise right-justified
+ * \param max    integer for the maximum number of medals (limited to 8)
+ * \param prev   bitmask for previously received medals (used in level)
+ * \param ckpt   bitmask for medals gotten before checkpoint (used in world / hub)
+ * \param got    bitmask for acquired medals (acquired in current session, when inside level)
+ * \param best   bitmask for best set of medals acquired during a single life (acquired during current life, when inside level)
+ */
 void DrawMedals(int X, int Y, bool center, uint8_t max, uint8_t prev, uint8_t ckpt, uint8_t got, uint8_t best);
 
 // NEW: draws the level editor interface on vScreen Z

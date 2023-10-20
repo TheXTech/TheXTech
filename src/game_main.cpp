@@ -1155,11 +1155,13 @@ int GameMain(const CmdLineSetup_t &setup)
                 });
             }
 
+            // store to level save info if level won
             if(LevelBeatCode > 0)
             {
                 g_curLevelMedals.commit();
                 g_curLevelMedals.reset_checkpoint();
             }
+            // otherwise, restore the medals from checkpoint
             else
                 g_curLevelMedals.on_all_dead();
 

@@ -880,9 +880,10 @@ struct Effect_t
 //Public Type vScreen 'Screen controls
 #include "screen.h"
 
-// NEW: information about available Stars and obtained / available Medals for a level
+//! NEW: information about available Stars and obtained / available Medals for a level
 struct LevelSaveInfo_t
 {
+    // INTEGERS
     uint8_t  max_stars = 0;
     uint8_t  max_medals = 255; // invalid, maximum is 8
 
@@ -896,6 +897,7 @@ struct LevelSaveInfo_t
     }
 };
 
+//! NEW: stores LevelSaveInfo for levels without WorldLevels
 struct LevelWarpSaveEntry_t
 {
     std::string levelPath;
@@ -946,7 +948,7 @@ struct WorldLevel_t
     int8_t starsShowPolicy = -1;
     uint8_t curStars = 0;
 
-    // new: info about collected / available medals / stars
+    //! NEW: info about collected / available medals / stars (replaces maxStars)
     LevelSaveInfo_t save_info;
 
     // NEW: returns graphical location extent (based on whether GFXLevelBig is set)
@@ -998,6 +1000,7 @@ struct Warp_t
 //    curStars As Integer
     uint8_t curStars = 0;
 //    maxStars As Integer
+    //! NEW: index into either LevelWarpSaveEntries (<0x7fff) or WorldLevel (>0x8000)
     uint16_t save_info_idx = 0x8000;
 //EXTRA:
     bool twoWay = false;
@@ -1011,6 +1014,7 @@ struct Warp_t
     vbint_t transitEffect = 0;
 //End Type
 
+    //! NEW: get the warp's LevelSaveInfo_t (based on save_info_idx)
     inline const LevelSaveInfo_t save_info() const;
 };
 
@@ -1139,6 +1143,7 @@ struct WorldPlayer_t
     int LastMove = 0;
 //    LevelName As String
     // std::string LevelName;
+    //! NEW: index to player's current WorldLevel, 0 if none. (Replaces LevelName and stars.)
     vbint_t LevelIndex;
 //End Type
 };
@@ -1170,7 +1175,7 @@ struct Checkpoint_t
 // List of taken checkpoints, spawn player at last of them
 extern std::vector<Checkpoint_t> CheckpointsList;
 
-// List of stars / medal info entries for the levels NOT on the world map
+//! List of stars / medal info entries for the levels NOT on the world map
 extern std::vector<LevelWarpSaveEntry_t> LevelWarpSaveEntries;
 
 //Public MagicHand As Boolean 'true if playing a level in the editor while not in fullscreen mode
@@ -1750,6 +1755,7 @@ extern bool ExitMenu;
 //Public LevelSelect As Boolean 'true if game should load the world map
 extern bool LevelSelect;
 
+//! NEW: utility function to check if in a hub level
 inline bool InHub()
 {
     return NoMap && IsEpisodeIntro;
