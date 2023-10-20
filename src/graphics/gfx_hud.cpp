@@ -523,7 +523,7 @@ void DrawMedals(int X, int Y, bool center, uint8_t max, uint8_t prev, uint8_t ck
             int X_i = X + coin_width * i;
 
             if((best & bit) && show_shiny)
-                s_DrawMedal(X_i, Y, coin_width, coin_height, MedalDrawLevel::Best);
+                s_DrawMedal(X_i, Y, coin_width, coin_height, MedalDrawLevel::Shiny);
             else if(got & bit)
                 s_DrawMedal(X_i, Y, coin_width, coin_height, MedalDrawLevel::Got);
             else if(ckpt & bit && (CommonFrame % 64) < 32)
@@ -578,7 +578,7 @@ void DrawMedals(int X, int Y, bool center, uint8_t max, uint8_t prev, uint8_t ck
         X -= total_len;
 
     // draw scene
-    s_DrawMedal(X, Y, coin_width, coin_height, show_shiny ? MedalDrawLevel::Best : MedalDrawLevel::Got);
+    s_DrawMedal(X, Y, coin_width, coin_height, show_shiny ? MedalDrawLevel::Shiny : MedalDrawLevel::Got);
     X += coin_width + 8;
     XRender::renderTexture(X, Y, GFX.Interface[1]);
     X += GFX.Interface[1].w + 4;
