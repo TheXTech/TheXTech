@@ -54,6 +54,7 @@ public class Launcher extends AppCompatActivity
     public static final int READWRITE_PERMISSION_FOR_ADD_DIRECTORY = 3;
     private Context m_context = null;
     private String filePathToOpen;
+    private boolean editRequested = false;
 
     /* ============ Animated background code ============ */
     private int m_bgAnimatorFrames = 1;
@@ -94,6 +95,7 @@ public class Launcher extends AppCompatActivity
         setContentView(R.layout.activity_launcher);
         initUiSetup();
         filePathToOpen = "";
+        filePathToEdit = "";
         handleFileIntent();
     }
 
@@ -242,6 +244,11 @@ public class Launcher extends AppCompatActivity
 
             FileUtils utils = new FileUtils(this.m_context);
             filePathToOpen = utils.getPath(intent.getData());
+
+            if(intent.action == ACTION_EDIT)
+                editRequested = true;
+            else
+                editRequested = false;
 
             Log.d(LOG_TAG, "Got a file: " + filePathToOpen + ";");
 
@@ -532,6 +539,9 @@ public class Launcher extends AppCompatActivity
         Intent myIntent = new Intent(Launcher.this, thextechActivity.class);
         if(!filePathToOpen.isEmpty())
             myIntent.putExtra("do-open-file", filePathToOpen);
+
+        if(editRequested)
+            myIntent.putExtra("edit-requested", true);
 
 //        myIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
 //        myIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);

@@ -52,6 +52,7 @@ public class thextechActivity extends SDLActivity
 {
     static boolean gameRunning = false;
     private String levelToRun;
+    private boolean editRequested = false;
 
     protected String[] getLibraries()
     {
@@ -115,6 +116,9 @@ public class thextechActivity extends SDLActivity
                 args.add("--speed-run-semitransparent");
         }
 
+        if(editRequested)
+            args.add("-e");
+
         if(!levelToRun.isEmpty())
             args.add(levelToRun);
 
@@ -147,6 +151,9 @@ public class thextechActivity extends SDLActivity
         {
             if(extras.containsKey("do-open-file"))
                 levelToRun = extras.getString("do-open-file");
+
+            if(extras.containsKey("edit-requested"))
+                editRequested = true;
         }
     }
 
