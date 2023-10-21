@@ -202,7 +202,10 @@ void OrderMedals()
         {
             const NPC_t& n = NPC[auto_hits[auto_i].second];
 
-            double coord = graph.place_loc({n.Location.X, n.Location.Y});
+            double coord = graph.distance_from_start({n.Location.X, n.Location.Y});
+
+            if(graph.furthest_dist)
+                coord /= graph.furthest_dist;
 
             D_pLogDebug("Medal with NPC ID %d at %f from level start to level end", auto_hits[auto_i].second, coord);
 

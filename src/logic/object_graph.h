@@ -28,6 +28,7 @@
 #include <set>
 #include <queue>
 
+//! a set of features designed to support warp-aware (but not block-aware) distance checks between objects
 namespace ObjectGraph
 {
 
@@ -37,6 +38,7 @@ struct Loc
     double y;
 };
 
+//! represents a single game object (does not attempt to track a single NPC if its ID changes)
 struct Object
 {
     enum Object_Type
@@ -110,39 +112,31 @@ public:
     // set of all objects in the graph
     std::set<const Object*> all_nodes;
 
-    // for each target, map of distances FROM each other object to the target
-    // std::unordered_map<const Object*, dist_map> target_dist_maps;
-
-    // using exit_row_map = std::unordered_map<const Object*, int>;
-    // using exit_row_map_patch = std::pair<double, exit_row_map>;
-    // std::vector<std::pair<double, exit_row_map>> exit_row_maps;
-
-    // map of distances from player start TO each object
+    // map of distances from P1 start TO each object
     DistMap start_dist_map;
 
-    // furthest distance of anything from player start
+    //! furthest distance of anything from player start
     double furthest_dist = 0.0;
 
-    // update graph logic based on level
+    //! update the object graph's nodes and start_dist_map based on its level substruct
     void update();
 
-    // get a coordinate (from start to finish) for a location
-    double place_loc(Loc loc);
+    //! get the distance (using warps if needed) from P1 start to loc
+    double distance_from_start(Loc loc);
 
 private:
+    // search algorithm support functions
     using QueueEntry = std::pair<double, const Object*>;
     using SearchPriorityQueue = std::priority_queue<QueueEntry, std::vector<QueueEntry>, std::greater<QueueEntry>>;
 
-    // expand a single object in the search_priority_queue, adding new entries to additional objects.
+    // Expand a single object in the queue, updating the dist_map and adding new queue entries to additional objects.
     void expand(SearchPriorityQueue& queue, DistMap& dist_map, const Object* node, double distance, bool warps_reverse) const;
 
-    // fill dist_map with distances to origin. if warps_reverse is true, then the warps go from dest to source.
+    // Fill dist_map with distances from origin. If warps_reverse is true, then find paths from objects to origin.
     void search(DistMap& dist_map, const Object* origin, bool warps_reverse) const;
-
-    // exit_row_map_patch find_row_split(const std::set<const Object*>& exit_row, int row_i);
-    // void calc_exit_row_maps();
 };
 
+//! create an object graph based on the currently loaded level
 void FillGraph(Graph& graph);
 
 }; //namespace ObjectGraph

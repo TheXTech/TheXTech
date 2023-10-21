@@ -29,7 +29,7 @@
 namespace ObjectGraph
 {
 
-double get_distance(const Loc& loc_1, const Loc& loc_2)
+static double s_get_distance(const Loc& loc_1, const Loc& loc_2)
 {
     double dx = loc_1.x - loc_2.x;
     double dy = loc_1.y - loc_2.y;
@@ -37,7 +37,7 @@ double get_distance(const Loc& loc_1, const Loc& loc_2)
     return SDL_sqrt(dx*dx + dy*dy);
 }
 
-void Graph::expand(Graph::SearchPriorityQueue& queue, Graph::DistMap& dist_map, const Object* node, double distance, bool warps_reverse) const
+void Graph::expand(SearchPriorityQueue& queue, DistMap& dist_map, const Object* node, double distance, bool warps_reverse) const
 {
     if(dist_map.find(node) != dist_map.end())
         return;
@@ -53,7 +53,7 @@ void Graph::expand(Graph::SearchPriorityQueue& queue, Graph::DistMap& dist_map, 
         for(const Object* next : this->all_nodes)
         {
             Loc dest_loc = (warps_reverse && next->type == Object::Warp) ? next->dest : next->loc;
-            queue.emplace(distance + get_distance(source_loc, dest_loc), next);
+            queue.emplace(distance + s_get_distance(source_loc, dest_loc), next);
         }
     }
 }
@@ -69,7 +69,7 @@ void Graph::search(DistMap& dist_map, const Object* origin, bool warps_reverse) 
     for(const Object* next : this->all_nodes)
     {
         Loc next_loc = (warps_reverse && next->type == Object::Warp) ? next->dest : next->loc;
-        queue.emplace(get_distance(origin_loc, next_loc), next);
+        queue.emplace(s_get_distance(origin_loc, next_loc), next);
     }
 
     while(!queue.empty())
@@ -86,6 +86,7 @@ void Graph::search(DistMap& dist_map, const Object* origin, bool warps_reverse) 
 
 void Graph::update()
 {
+    // refresh the set of nodes
     this->all_nodes.clear();
     for(const Object& node : this->level.warps)
         this->all_nodes.insert(&node);
@@ -94,8 +95,10 @@ void Graph::update()
     for(const Object& node : this->level.items)
         this->all_nodes.insert(&node);
 
+    // create the map of distances from start
     search(start_dist_map, &this->level.player_start, false);
 
+    // check the furthest distance
     this->furthest_dist = 0.0;
     for(const Object* node : this->all_nodes)
     {
@@ -105,33 +108,30 @@ void Graph::update()
     }
 }
 
-double Graph::place_loc(Loc loc)
+double Graph::distance_from_start(Loc loc)
 {
-    if(this->furthest_dist == 0)
-        return 0.0;
+    double best_distance = s_get_distance(loc, this->level.player_start.loc);
 
-    double best_distance = get_distance(loc, this->level.player_start.loc);
     for(const Object* node : this->all_nodes)
     {
         double start_to_node = start_dist_map[node];
         if(start_to_node == 0.0 || start_to_node >= best_distance)
             continue;
 
-        double node_to_loc;
-        if(node->type == Object::Warp)
-            node_to_loc = get_distance(loc, node->dest);
-        else
-            node_to_loc = get_distance(loc, node->loc);
+        const Loc& node_loc = (node->type == Object::Warp) ? node->dest : node->loc;
+
+        double node_to_loc = s_get_distance(loc, node_loc);
 
         if(start_to_node + node_to_loc < best_distance)
             best_distance = start_to_node + node_to_loc;
     }
 
-    return best_distance / this->furthest_dist;
+    return best_distance;
 }
 
 void FillGraph(Graph& graph)
 {
+    // start by filling the level struct
     graph.level = ObjectGraph::Level();
 
     graph.level.player_start = o(ObjectGraph::Object::PlayerStart,
@@ -168,6 +168,8 @@ void FillGraph(Graph& graph)
         }
     }
 
+    // FIXME: add potion doors and blocks containing them as warps
+
     for(int i = 1; i <= numNPCs; i++)
     {
         if(NPC[i].Type == NPCID_GOALTAPE || NPC[i].Type == NPCID_STAR_EXIT
@@ -188,6 +190,7 @@ void FillGraph(Graph& graph)
 
     for(int i = 1; i <= numBackground; i++)
     {
+        // keyhole
         if(Background[i].Type == 35)
         {
             graph.level.exits.push_back(o(ObjectGraph::Object::Exit,
@@ -196,6 +199,7 @@ void FillGraph(Graph& graph)
         }
     }
 
+    // now update the graph (gets all objects' distances from start)
     graph.update();
 }
 
