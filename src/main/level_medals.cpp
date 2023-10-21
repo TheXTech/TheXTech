@@ -35,6 +35,7 @@
 
 CurLevelMedals_t g_curLevelMedals;
 
+//! find the LevelSaveInfo for the current level
 static inline LevelSaveInfo_t* s_findSaveInfo()
 {
     for(int i = 1; i <= numWorldLevels; ++i)
@@ -151,11 +152,11 @@ void OrderMedals()
     using dist_and_hit_index = std::pair<uint16_t, int16_t>;
 
     // used to track medals without creator-specified indexes; first short is distance from start, second short is NPC array index
-    std::array<dist_and_hit_index, 8> auto_hits;
-    int auto_count = 0;
+    std::array<dist_and_hit_index, 8> auto_medals;
+    int auto_medal_count = 0;
 
     // used to track medals with creator indexes
-    std::bitset<8> spec_hits;
+    std::bitset<8> used_indexes;
 
     // look for medals
     for(int i = 1; i <= numNPCs; ++i)
@@ -179,67 +180,66 @@ void OrderMedals()
         if(n.Variant > 8)
             continue;
 
+        // record that the medal index has been used
         if(n.Variant > 0)
         {
-            // record that the medal index has been specified
-            spec_hits[n.Variant - 1] = true;
-
+            used_indexes[n.Variant - 1] = true;
             continue;
         }
 
         // if not specified, then try to fill into the array to auto-assign an index
-        if(auto_count < 8)
+        if(auto_medal_count < 8)
         {
-            auto_hits[auto_count] = {0, static_cast<int16_t>(i)};
-            auto_count++;
+            auto_medals[auto_medal_count] = {0, static_cast<int16_t>(i)};
+            auto_medal_count++;
         }
 
         // otherwise, Variant will be left as 0 and medal won't be counted
     }
 
     // find the distance of unspecified medals from level start, and sort
-    if(auto_count > 1)
+    if(auto_medal_count > 1)
     {
         // need to order the auto_hits; get an idea of the layout of the level
         ObjectGraph::Graph graph;
         ObjectGraph::FillGraph(graph);
 
-        for(int auto_i = 0; auto_i < auto_count; ++auto_i)
+        for(int auto_i = 0; auto_i < auto_medal_count; ++auto_i)
         {
-            const NPC_t& n = NPC[auto_hits[auto_i].second];
+            const NPC_t& n = NPC[auto_medals[auto_i].second];
 
             double coord = graph.distance_from_start({n.Location.X, n.Location.Y});
 
             if(graph.furthest_dist)
                 coord /= graph.furthest_dist;
 
-            D_pLogDebug("Medal with NPC ID %d at %f from level start to level end", auto_hits[auto_i].second, coord);
+            D_pLogDebug("Medal with NPC ID %d at %f from level start to level end", auto_medals[auto_i].second, coord);
 
             // 1.0 is the furthest exit, and it's never negative
             if(coord > 2.0)
                 coord = 2.0;
 
-            auto_hits[auto_i].first = static_cast<uint16_t>(coord / 2.0 * 0xFFFF);
+            auto_medals[auto_i].first = static_cast<uint16_t>(coord / 2.0 * 0xFFFF);
         }
 
         // sort by distance
-        std::sort(auto_hits.begin(), auto_hits.begin() + auto_count);
+        std::sort(auto_medals.begin(), auto_medals.begin() + auto_medal_count);
     }
 
     // auto-assign indexes to unspecified medals
-    for(int auto_i = 0; auto_i < auto_count; ++auto_i)
+    for(int auto_i = 0; auto_i < auto_medal_count; ++auto_i)
     {
-        NPC_t& n = NPC[auto_hits[auto_i].second];
+        NPC_t& n = NPC[auto_medals[auto_i].second];
 
         // try to find an index
         for(int i = 0; i < 8; ++i)
         {
-            if(!spec_hits[i])
+            if(!used_indexes[i])
             {
-                D_pLogDebug("Medal with NPC ID %d gets index %d", auto_hits[auto_i].second, i + 1);
+                D_pLogDebug("Medal with NPC ID %d gets index %d", auto_medals[auto_i].second, i + 1);
 
                 n.Variant = i + 1;
-                spec_hits[i] = true;
+                used_indexes[i] = true;
                 break;
             }
         }
