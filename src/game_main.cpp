@@ -871,10 +871,8 @@ int GameMain(const CmdLineSetup_t &setup)
             SetupPlayers();
             FontManager::loadCustomFonts();
 
-#ifndef PGE_MIN_PORT
             if(!NoMap)
                 FindWldStars();
-#endif
 
             if((!StartLevel.empty() && NoMap) || !GoToLevel.empty())
             {
