@@ -509,6 +509,7 @@ void FindWldStars()
                     l.curStars++;
             }
 
+            // skip check for max stars and medals if it's already been inited
             if(l.save_info.inited())
                 continue;
 
@@ -518,9 +519,7 @@ void FindWldStars()
             std::string fullPath = g_dirEpisode.resolveFileCaseExistsAbs(lFile);
 
             if(!fullPath.empty())
-            {
                 l.save_info = InitLevelSaveInfo(fullPath, tempData);
-            }
         }
     }
 }

@@ -1211,6 +1211,9 @@ void FindStars()
             if(warp.save_info().inited())
                 continue;
 
+            // set the warp's save info index
+
+            // check world levels
             for(uint16_t idx = 1; idx != 0x7FFF && idx <= numWorldLevels; ++idx)
             {
                 const auto& l = WorldLevel[idx];
@@ -1225,6 +1228,7 @@ void FindStars()
             if(warp.save_info().inited())
                 continue;
 
+            // check existing level warp save entries
             for(uint16_t idx = 0; idx != 0x7FFF && idx < LevelWarpSaveEntries.size(); ++idx)
             {
                 const auto& e = LevelWarpSaveEntries[idx];
@@ -1239,12 +1243,11 @@ void FindStars()
             if(warp.save_info().inited())
                 continue;
 
+            // don't overflow the LevelWarpSaveEntries array
             if(LevelWarpSaveEntries.size() >= 0x7FFF)
                 continue;
 
-            // done in level load function
-            // addMissingLvlSuffix(lFile);
-
+            // add a new save entry if the file exists
             std::string fullPath = g_dirEpisode.resolveFileCaseExistsAbs(lFile);
 
             if(!fullPath.empty())
