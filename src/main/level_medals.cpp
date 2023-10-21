@@ -149,9 +149,12 @@ void CurLevelMedals_t::commit()
 void OrderMedals()
 {
     using dist_and_hit_index = std::pair<uint16_t, int16_t>;
+
+    // used to track medals without creator-specified indexes; first short is distance from start, second short is NPC array index
     std::array<dist_and_hit_index, 8> auto_hits;
     int auto_count = 0;
 
+    // used to track medals with creator indexes
     std::bitset<8> spec_hits;
 
     // look for medals
@@ -172,29 +175,32 @@ void OrderMedals()
         if(n.Inert && n.Type != NPCID_ITEM_THROWER)
             continue;
 
-        // medal won't be counted if out-of-range
+        // medal won't be counted (at all) if out-of-range
         if(n.Variant > 8)
             continue;
 
-        if(n.Variant == 0)
+        if(n.Variant > 0)
         {
-            if(auto_count < 8)
-            {
-                auto_hits[auto_count] = {0, static_cast<int16_t>(i)};
-                auto_count++;
-            }
-
-            // otherwise, Variant will be left as 0 and medal won't be counted
+            // record that the medal index has been specified
+            spec_hits[n.Variant - 1] = true;
 
             continue;
         }
 
-        spec_hits[n.Variant - 1] = true;
+        // if not specified, then try to fill into the array to auto-assign an index
+        if(auto_count < 8)
+        {
+            auto_hits[auto_count] = {0, static_cast<int16_t>(i)};
+            auto_count++;
+        }
+
+        // otherwise, Variant will be left as 0 and medal won't be counted
     }
 
+    // find the distance of unspecified medals from level start, and sort
     if(auto_count > 1)
     {
-        // need to order the auto_hits
+        // need to order the auto_hits; get an idea of the layout of the level
         ObjectGraph::Graph graph;
         ObjectGraph::FillGraph(graph);
 
@@ -216,9 +222,11 @@ void OrderMedals()
             auto_hits[auto_i].first = static_cast<uint16_t>(coord / 2.0 * 0xFFFF);
         }
 
+        // sort by distance
         std::sort(auto_hits.begin(), auto_hits.begin() + auto_count);
     }
 
+    // auto-assign indexes to unspecified medals
     for(int auto_i = 0; auto_i < auto_count; ++auto_i)
     {
         NPC_t& n = NPC[auto_hits[auto_i].second];
