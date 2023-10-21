@@ -24,6 +24,7 @@
 #include "logic/object_graph.h"
 
 #include "npc_id.h"
+#include "npc.h"
 #include "globals.h"
 
 namespace ObjectGraph
@@ -174,7 +175,44 @@ void FillGraph(Graph& graph)
         }
     }
 
-    // FIXME: add potion doors and blocks containing them as warps
+    // add magic doors as warps
+    for(int i = 1; i <= numNPCs; ++i)
+    {
+        NPC_t& n = NPC[i];
+
+        bool is_container = (n.Type == NPCID_ITEM_BURIED || n.Type == NPCID_ITEM_POD ||
+                             n.Type == NPCID_ITEM_BUBBLE || n.Type == NPCID_ITEM_THROWER);
+
+        bool contains_door = is_container && (n.Special == NPCID_DOOR_MAKER || n.Special == NPCID_MAGIC_DOOR);
+        bool is_door = (n.Type == NPCID_DOOR_MAKER || n.Type == NPCID_MAGIC_DOOR);
+
+        bool has_target_section = n.Special2 > 0;
+
+        // allow doors only
+        if(!is_door && !contains_door)
+            continue;
+
+        // only count it if it has a target section
+        if(!has_target_section)
+            continue;
+
+        // add a warp from the NPC's position to the corresponding position in the target section
+
+        // check current section (backing up whatever value was already there)
+        int old_section = n.Section;
+        CheckSectionNPC(i);
+
+        int cur_section = n.Section;
+        n.Section = old_section;
+
+        double targetX = n.Location.X + n.Location.Width / 2 - level[cur_section].X + level[n.Special2].X;
+        double targetY = n.Location.Y + n.Location.Height / 2 - level[cur_section].Y + level[n.Special2].Y;
+
+        graph.level.warps.push_back(o(ObjectGraph::Object::Warp,
+            get_center(n.Location),
+            ObjectGraph::Object::G_NPC, i,
+            {targetX, targetY}));
+    }
 
     for(int i = 1; i <= numNPCs; i++)
     {
