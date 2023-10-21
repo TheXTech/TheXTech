@@ -2262,30 +2262,28 @@ void UpdateGraphics(bool skipRepaint)
                 {
                     if(Player[A].ShowWarp > 0)
                     {
-                        std::string tempString;
-                        auto &w = Warp[Player[A].ShowWarp];
+                        const auto &w = Warp[Player[A].ShowWarp];
 
-                        int Y = Player[A].Location.Y + Player[A].Location.Height - 96 + vScreen[Z].Y;
+                        int p_center_x = vScreen[Z].X + Player[A].Location.X + (Player[A].Location.Width / 2);
+                        int info_y = Player[A].Location.Y + Player[A].Location.Height - 96 + vScreen[Z].Y;
 
                         if(!w.noPrintStars && w.save_info().inited() && w.save_info().max_stars > 0 && Player[A].Mount != 2)
                         {
-                            tempString = fmt::format_ne("{0}/{1}", w.curStars, w.save_info().max_stars);
-                            XRender::renderTexture(Player[A].Location.X + Player[A].Location.Width / 2.0 + vScreen[Z].X - tempString.length() * 9, Y + 1, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
-                            XRender::renderTexture(Player[A].Location.X + Player[A].Location.Width / 2.0 + vScreen[Z].X - tempString.length() * 9 - 20, Y, GFX.Interface[5].w, GFX.Interface[5].h, GFX.Interface[5], 0, 0);
+                            std::string tempString = fmt::format_ne("{0}/{1}", w.curStars, w.save_info().max_stars);
+                            XRender::renderTexture(p_center_x - tempString.length() * 9 - 20, info_y,     GFX.Interface[5]);
+                            XRender::renderTexture(p_center_x - tempString.length() * 9,      info_y + 1, GFX.Interface[1]);
                             SuperPrint(tempString, 3,
-                                       float(Player[A].Location.X + Player[A].Location.Width / 2.0 + vScreen[Z].X - tempString.length() * 9 + 18),
-                                       float(Y));
+                                       p_center_x - tempString.length() * 9 + 18,
+                                       info_y);
 
-                            Y -= 20;
+                            info_y -= 20;
                         }
 
                         if(w.save_info().inited() && w.save_info().max_medals > 0)
                         {
-                            int X = vScreen[Z].X + Player[A].Location.X + (Player[A].Location.Width / 2);
-
                             uint8_t ckpt = (InHub() && Checkpoint == FileNamePath + GetS(w.level)) ? g_curLevelMedals.got : 0;
 
-                            DrawMedals(X, Y, true, w.save_info().max_medals, 0, ckpt, w.save_info().medals_got, w.save_info().medals_best);
+                            DrawMedals(p_center_x, info_y, true, w.save_info().max_medals, 0, ckpt, w.save_info().medals_got, w.save_info().medals_best);
                         }
                     }
                 }
