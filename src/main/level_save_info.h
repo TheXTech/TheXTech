@@ -28,9 +28,16 @@
 
 #include "globals.h"
 
+//! initialize level save info from a loaded LevelData object
 LevelSaveInfo_t InitLevelSaveInfo(const LevelData& loadedLevel);
+
+//! convenience function: initialize level save info from fullPath, loading the level into tempData
 LevelSaveInfo_t InitLevelSaveInfo(const std::string& fullPath, LevelData& tempData);
+
+//! import all level save info into WorldLevel and LevelWarpSaveEntries from a GamesaveData object
 void ImportLevelSaveInfo(const GamesaveData& s);
+
+//! export all level save info from WorldLevel and LevelWarpSaveEntries to a GamesaveData object
 void ExportLevelSaveInfo(GamesaveData& s);
 
 #endif // #ifndef LEVEL_SAVE_INFO_H

@@ -74,10 +74,10 @@ static bool s_importSingleSaveInfo(LevelSaveInfo_t& info, const saveLevelInfo& s
     // load medals
     for(unsigned i = 0; i < max_medals; ++i)
     {
-        if(s.medals_got[i])
+        if(i < s.medals_got.size() && s.medals_got[i])
             info.medals_got |= (1 << i);
 
-        if(s.medals_best[i])
+        if(i < s.medals_got.size() && s.medals_best[i])
             info.medals_best |= (1 << i);
     }
 
@@ -86,6 +86,7 @@ static bool s_importSingleSaveInfo(LevelSaveInfo_t& info, const saveLevelInfo& s
 
 void ImportLevelSaveInfo(const GamesaveData& s)
 {
+    // reset all world levels' save info
     for(int A = 1; A <= numWorldLevels; A++)
     {
         if(WorldLevel[A].FileName.empty())
@@ -103,7 +104,7 @@ void ImportLevelSaveInfo(const GamesaveData& s)
         if(!s_importSingleSaveInfo(info, e))
             continue;
 
-        D_pLogDebug("Loaded save info %d %d %d %d for level [%s]", (int)info.max_stars, (int)info.max_medals, (int)info.medals_got, (int)info.medals_best, e.level_filename.c_str());
+        D_pLogDebug("Loaded save info (stars %d, medals %d - got %x, best %x) for level [%s]", (int)info.max_stars, (int)info.max_medals, (int)info.medals_got, (int)info.medals_best, e.level_filename.c_str());
 
         // see if it applies to a world level
         bool worldLevelHit = false;
@@ -123,11 +124,9 @@ void ImportLevelSaveInfo(const GamesaveData& s)
             }
         }
 
+        // otherwise, add a new level warp save entry
         if(!worldLevelHit)
-        {
-            // add a new level warp save entry
             LevelWarpSaveEntries.push_back(LevelWarpSaveEntry_t{e.level_filename, info});
-        }
     }
 }
 
@@ -163,14 +162,16 @@ LevelSaveInfo_t InitLevelSaveInfo(const LevelData& loadedLevel)
     ret.medals_got = 0;
     ret.medals_best = 0;
 
-    uint8_t full_count = 0;
-    std::bitset<8> spec_hits;
-
     // look for medals
+    uint8_t medal_count = 0;
+
+    // keep track of the user-specified ones because two medals with the same user index are only counted once
+    std::bitset<8> used_indexes;
+
     for(const auto &npc : loadedLevel.npc)
     {
         bool is_container = (npc.id == NPCID_ITEM_BURIED || npc.id == NPCID_ITEM_POD ||
-            npc.id == NPCID_ITEM_BUBBLE || npc.id == NPCID_ITEM_THROWER);
+                             npc.id == NPCID_ITEM_BUBBLE || npc.id == NPCID_ITEM_THROWER);
 
         bool contains_medal = is_container && npc.contents == NPCID_MEDAL;
 
@@ -184,25 +185,30 @@ LevelSaveInfo_t InitLevelSaveInfo(const LevelData& loadedLevel)
 
         uint8_t Variant = static_cast<uint8_t>(npc.special_data);
 
+        // medal won't be counted (at all) if out-of-range
         if(Variant > 8)
             continue;
 
+        // if no index, freely add to medal count (cap at 8 later)
         if(Variant == 0)
         {
-            if(full_count < 8)
-                full_count++;
-
+            medal_count++;
             continue;
         }
 
-        if(!spec_hits[Variant - 1])
+        // if index specified, check that the index hasn't already been used
+        if(!used_indexes[Variant - 1])
         {
-            full_count++;
-            spec_hits[Variant - 1] = true;
+            medal_count++;
+            used_indexes[Variant - 1] = true;
         }
     }
 
-    ret.max_medals = full_count;
+    // cap medal count at 8
+    if(medal_count > 8)
+        medal_count = 8;
+
+    ret.max_medals = medal_count;
 
     return ret;
 }
@@ -214,7 +220,7 @@ LevelSaveInfo_t InitLevelSaveInfo(const std::string& fullPath, LevelData& tempDa
     if(FileFormats::OpenLevelFile(fullPath, tempData))
     {
         ret = InitLevelSaveInfo(tempData);
-        pLogDebug("Initing level save data at [%s] with %d stars", fullPath.c_str(), (int)ret.max_stars);
+        pLogDebug("Initing level save data at [%s] with %d stars and %d medals", fullPath.c_str(), (int)ret.max_stars, (int)ret.max_medals);
     }
     else
     {
