@@ -53,6 +53,23 @@ static inline LevelSaveInfo_t* s_findSaveInfo()
     return nullptr;
 }
 
+//! find the next matching LevelSaveInfo for the current level
+static inline LevelSaveInfo_t* s_nextSaveInfo(LevelSaveInfo_t* prev)
+{
+    for(int i = 1; i <= numWorldLevels; ++i)
+    {
+        if(WorldLevel[i].FileName == FileNameFull)
+        {
+            LevelSaveInfo_t* info = &WorldLevel[i].save_info;
+
+            if(info > prev)
+                return info;
+        }
+    }
+
+    return nullptr;
+}
+
 void CurLevelMedals_t::get(uint8_t idx)
 {
     if(InHub())
@@ -145,6 +162,13 @@ void CurLevelMedals_t::commit()
 
     if(new_best_count > old_best_count)
         info->medals_best = life;
+
+    // copy this to any other world levels with the same filename
+    while(LevelSaveInfo_t* next = s_nextSaveInfo(info))
+    {
+        *next = *info;
+        info = next;
+    }
 }
 
 void OrderMedals()
