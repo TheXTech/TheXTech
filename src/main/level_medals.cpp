@@ -72,6 +72,7 @@ static inline LevelSaveInfo_t* s_nextSaveInfo(LevelSaveInfo_t* prev)
 
 void CurLevelMedals_t::get(uint8_t idx)
 {
+    // don't save star coins in hub level
     if(InHub())
         return;
 
@@ -116,8 +117,10 @@ void CurLevelMedals_t::reset_lvl()
 
 void CurLevelMedals_t::prepare_lvl(const LevelData& loadedLevel)
 {
+    // find the level save info
     LevelSaveInfo_t* info = s_findSaveInfo();
 
+    // if it can't be found in the world map / previously warped locations, initialize it and add to LevelWarpSaveEntries
     if(!info && LevelWarpSaveEntries.size() != 0xFFFF)
     {
         LevelSaveInfo_t info_init = InitLevelSaveInfo(loadedLevel);
@@ -129,12 +132,18 @@ void CurLevelMedals_t::prepare_lvl(const LevelData& loadedLevel)
         }
     }
 
+    // if allocation failed, just reset level info
     if(!info)
     {
         reset_lvl();
         return;
     }
 
+    // if not inited yet (intro level?) do so now
+    if(!info->inited())
+        *info = InitLevelSaveInfo(loadedLevel);
+
+    // load max / prev from the level info
     max = info->max_medals;
     prev = info->medals_got;
 }
