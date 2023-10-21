@@ -29,6 +29,12 @@
 namespace ObjectGraph
 {
 
+template<class LocType>
+Loc get_center(const LocType& loc)
+{
+    return {loc.X + loc.Width / 2, loc.Y + loc.Height / 2};
+}
+
 static double s_get_distance(const Loc& loc_1, const Loc& loc_2)
 {
     double dx = loc_1.x - loc_2.x;
@@ -135,7 +141,7 @@ void FillGraph(Graph& graph)
     graph.level = ObjectGraph::Level();
 
     graph.level.player_start = o(ObjectGraph::Object::PlayerStart,
-        {PlayerStart[1].X, PlayerStart[1].Y});
+        get_center(PlayerStart[1]));
 
     for(int i = 1; i <= numWarps; i++)
     {
@@ -148,22 +154,22 @@ void FillGraph(Graph& graph)
         if(Warp[i].MapWarp || Warp[i].LevelWarp)
         {
             graph.level.exits.push_back(o(ObjectGraph::Object::Exit,
-                {Warp[i].Entrance.X, Warp[i].Entrance.Y},
+                get_center(Warp[i].Entrance),
                 ObjectGraph::Object::G_Warp, i));
         }
         else
         {
             graph.level.warps.push_back(o(ObjectGraph::Object::Warp,
-                {Warp[i].Entrance.X, Warp[i].Entrance.Y},
+                get_center(Warp[i].Entrance),
                 ObjectGraph::Object::G_Warp, i,
-                {Warp[i].Exit.X, Warp[i].Exit.Y}));
+                get_center(Warp[i].Exit)));
 
             if(Warp[i].twoWay)
             {
                 graph.level.warps.push_back(o(ObjectGraph::Object::Warp,
-                    {Warp[i].Exit.X, Warp[i].Exit.Y},
+                    get_center(Warp[i].Exit),
                     ObjectGraph::Object::G_Warp, i,
-                    {Warp[i].Entrance.X, Warp[i].Entrance.Y}));
+                    get_center(Warp[i].Entrance)));
             }
         }
     }
@@ -176,14 +182,14 @@ void FillGraph(Graph& graph)
             || NPC[i].Type == NPCID_ITEMGOAL || NPC[i].Type == NPCID_GOALORB_S3 || NPC[i].Type == NPCID_GOALORB_S2)
         {
             graph.level.exits.push_back(o(ObjectGraph::Object::Exit,
-                {NPC[i].Location.X, NPC[i].Location.Y},
+                get_center(NPC[i].Location),
                 ObjectGraph::Object::G_NPC, i));
         }
 
         if(NPC[i].Type == NPCID_MEDAL || NPC[i].Type == NPCID_STAR_COLLECT || NPC[i].Type == NPCID_KEY)
         {
             graph.level.items.push_back(o(ObjectGraph::Object::Item,
-                {NPC[i].Location.X, NPC[i].Location.Y},
+                get_center(NPC[i].Location),
                 ObjectGraph::Object::G_NPC, i));
         }
     }
@@ -194,7 +200,7 @@ void FillGraph(Graph& graph)
         if(Background[i].Type == 35)
         {
             graph.level.exits.push_back(o(ObjectGraph::Object::Exit,
-                {Background[i].Location.X, Background[i].Location.Y},
+                get_center(Background[i].Location),
                 ObjectGraph::Object::G_BGO, i));
         }
     }
