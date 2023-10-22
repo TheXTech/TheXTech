@@ -355,9 +355,8 @@ bool MessageScreen_Logic(int plr)
     if(!MenuCursorCanMove)
     {
         if(!menuDoPress && !menuBackPress)
-        {
             MenuCursorCanMove = true;
-        }
+
         return false;
     }
 
