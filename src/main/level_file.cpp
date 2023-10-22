@@ -148,10 +148,10 @@ bool OpenLevel(std::string FilePath)
         LevelData lvl;
         if(!FileFormats::OpenLevelFile(FilePath, lvl))
         {
-        pLogWarning("Error of level \"%s\" file loading: %s (line %d).",
-                    FilePath.c_str(),
-                    lvl.meta.ERROR_info.c_str(),
-                    lvl.meta.ERROR_linenum);
+            pLogWarning("Error of level \"%s\" file loading: %s (line %d).",
+                        FilePath.c_str(),
+                        lvl.meta.ERROR_info.c_str(),
+                        lvl.meta.ERROR_linenum);
             return false;
         }
 
