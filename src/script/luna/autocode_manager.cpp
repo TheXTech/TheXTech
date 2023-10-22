@@ -285,10 +285,10 @@ void AutocodeManager::Parse(FILE *code_file, bool add_to_globals, const std::str
             ac_type = Autocode::EnumerizeCommand(wbuf, lineNum);
 
             // Decimal pass
-            int hits = SDL_sscanf(wbuf, PARSE_FMT_STR, combuf, &target, &param1, &param2, &param3, &length, wstrbuf);
+            int hits = XTECH_sscanf(wbuf, PARSE_FMT_STR, combuf, &target, &param1, &param2, &param3, &length, wstrbuf);
 
             // Integer pass
-            int bhits = SDL_sscanf(wbuf, PARSE_FMT_STR_2, combuf, &btarget, &bparam1, &bparam2, &bparam3, &blength, wstrbuf);
+            int bhits = XTECH_sscanf(wbuf, PARSE_FMT_STR_2, combuf, &btarget, &bparam1, &bparam2, &bparam3, &blength, wstrbuf);
 
             // Check for formatting failure
             if(hits < 3 && bhits < 3)
