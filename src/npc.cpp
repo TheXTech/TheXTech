@@ -41,6 +41,7 @@
 #include "layers.h"
 
 #include "npc/npc_queues.h"
+#include "npc/section_overlap.h"
 
 #include <Utils/maths.h>
 
@@ -60,9 +61,10 @@ void CheckSectionNPC(int A)
         NPC[A].Section = Player[NPC[A].HoldingPlayer].Section;
     }
 
+    // disabled in 1.3.6.1 because of bugs when overlapping sections change
     // Previously, it optimized for section 0. Now, it optimizes for NPC's current section.
     int B = NPC[A].Section;
-    if(NPC[A].Location.X >= level[B].X)
+    if(g_SectionFirstOverlap[B] == B && NPC[A].Location.X >= level[B].X)
     {
         if(NPC[A].Location.X + NPC[A].Location.Width <= level[B].Width)
         {
@@ -76,7 +78,7 @@ void CheckSectionNPC(int A)
         }
     }
 
-    for(B = 0; B <= numSections; B++)
+    for(int B = 0; B <= numSections; B++)
     {
         if(NPC[A].Location.X >= level[B].X)
         {

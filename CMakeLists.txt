@@ -685,6 +685,7 @@ set(THEXTECH_SRC
     src/npc/npc_frames.cpp
     src/npc/npc_bonus.cpp
     src/npc/npc_queues.cpp
+    src/npc/section_overlap.cpp
     src/player/player_update.cpp
     src/fontman/font_manager.cpp
     src/fontman/font_manager_private.cpp
@@ -1382,43 +1383,70 @@ elseif(WIN32)
 elseif(VITA)
     include(cmake/package_vita.cmake)
 elseif(NINTENDO_3DS)
-    ctr_create_3dsx(thextech)
+    if(NOT "${THEXTECH_VERSION_REL}" STREQUAL "")
+        set(SMDH_VERSION "git branch ${GIT_BRANCH} #${GIT_COMMIT_HASH}")
+    else()
+        set(SMDH_VERSION "Based on SMBX 1.3 by Redigit")
+    endif()
+
+    ctr_generate_smdh(OUTPUT "thextech.smdh"
+        NAME "TheXTech ${THEXTECH_VERSION_STRING}"
+        DESCRIPTION "${SMDH_VERSION}"
+        AUTHOR "Wohlstand and ds-sloth"
+        ICON "${CMAKE_SOURCE_DIR}/resources/icon/thextech_48.png"
+    )
+
+    ctr_create_3dsx(thextech SMDH "thextech.smdh")
 elseif(NINTENDO_WII)
+    string(TIMESTAMP XTECH_WIIMETA_RELEASE_DATE "%Y%m%d")
+    configure_file(${CMAKE_SOURCE_DIR}/resources/wii/icon.png ${CMAKE_BINARY_DIR}/icon.png COPYONLY)
+    configure_file(${CMAKE_SOURCE_DIR}/resources/wii/meta.xml.in ${CMAKE_BINARY_DIR}/meta.xml)
     ogc_create_dol(thextech)
 elseif(NINTENDO_DS)
-    nds_create_rom(thextech)
+    if(NOT "${THEXTECH_VERSION_REL}" STREQUAL "")
+        set(ROM_VERSION "${GIT_BRANCH} #${GIT_COMMIT_HASH}")
+    else()
+        set(ROM_VERSION "Based on SMBX 1.3")
+    endif()
+
+    nds_create_rom(thextech
+        NAME "TheXTech ${THEXTECH_VERSION_STRING}"
+        SUBTITLE1 "Wohlstand and ds-sloth"
+        SUBTITLE2 "${ROM_VERSION}"
+        ICON "${CMAKE_SOURCE_DIR}/resources/nds/icon.bmp"
+    )
 elseif(NINTENDO_SWITCH)
     include(cmake/package_switch.cmake)
 elseif(EMSCRIPTEN)
     add_custom_command(
         TARGET thextech POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy
-                ${CMAKE_SOURCE_DIR}/resources/emscripten/sw.js
-                ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/sw.js)
+                "${CMAKE_SOURCE_DIR}/resources/emscripten/sw.js"
+                "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/sw.js")
 
     add_custom_command(
         TARGET thextech POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E rename
-                ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${THEXTECH_EXECUTABLE_NAME}.html
-                ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/index.html)
+                "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${THEXTECH_EXECUTABLE_NAME}.html"
+                "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/index.html")
 
     add_custom_command(
         TARGET thextech POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy
-                ${PGE_PRELOAD_ENVIRONMENT}/graphics/ui/icon/thextech.ico
-                ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/favicon.ico)
+                "${PGE_PRELOAD_ENVIRONMENT}/graphics/ui/icon/thextech.ico"
+                "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/favicon.ico")
 
     add_custom_command(
         TARGET thextech POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy
-                ${PGE_PRELOAD_ENVIRONMENT}/graphics/ui/icon/thextech_32.png
-                ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/thextech_32.png)
+                "${PGE_PRELOAD_ENVIRONMENT}/graphics/ui/icon/thextech_32.png"
+                "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/thextech_32.png")
 
     add_custom_command(
         TARGET thextech POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy
-                ${PGE_PRELOAD_ENVIRONMENT}/graphics/ui/icon/thextech_256.png
-                ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/thextech_256.png)
+                "${PGE_PRELOAD_ENVIRONMENT}/graphics/ui/icon/thextech_256.png"
+                "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/thextech_256.png")
 
     configure_file(${CMAKE_SOURCE_DIR}/resources/emscripten/manifest.json ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/manifest.json)
 else()

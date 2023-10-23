@@ -24,7 +24,7 @@
                 "changeSectionBoundsToCurrent": "改變場景{0}的範圍到當前設置嗎？",
                 "shouldEvent": "要使事件{0}"
             },
-            "controlsForEventN": "強制按下玩家按鍵{0}",
+            "controlsForEventN": "強制按下玩家按鍵：{0}",
             "deletion": {
                 "cancel": "否：不刪除事件",
                 "confirm": "是：刪除事件",
@@ -220,9 +220,9 @@
             "underwater": "水下"
         },
         "select": {
-            "allSectPropBlankForEventN": "更改所有場景{0}於事件{1}",
+            "allSectPropBlankForEventN": "更改所有場景{0}於{1}事件",
             "pathBlankUnlock": "路線向{0}開啓條件",
-            "sectBlankPropBlankForEventN": "更改場景{0}的{1}於事件{2}",
+            "sectBlankPropBlankForEventN": "更改場景{0}的{1}於{2}事件",
             "sectionBlankPropBlank": "場景{0}{1}",
             "soundForEventN": "播放聲音{0}",
             "warpTransitEffect": "過渡效果",

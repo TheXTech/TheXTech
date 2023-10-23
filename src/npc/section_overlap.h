@@ -19,39 +19,22 @@
  */
 
 #pragma once
-#ifndef PINCHED_INFO_H
-#define PINCHED_INFO_H
+#ifndef SECTION_OVERLAP_H
+#define SECTION_OVERLAP_H
 
-// structure used to store information about whether a player / NPC is being crushed by blocks
-struct PinchedInfo_t
-{
-    unsigned Bottom1   : 2;
-    unsigned Left2     : 2;
-    unsigned Top3      : 2;
-    unsigned Right4    : 2;
-    unsigned Moving    : 2;
-    bool     MovingLR  : 1;
-    bool     MovingUD  : 1;
+#include <array>
+#include <cstdint>
 
-    // players only: frame counter to use classic (strict) pinched death condition
-    unsigned Strict    : 4;
+#include "global_constants.h"
 
-    inline PinchedInfo_t()
-    {
-        reset_non_strict();
-        Strict = 0;
-    }
+extern std::array<uint8_t, maxSections + 1> g_SectionFirstOverlap;
 
-    inline void reset_non_strict()
-    {
-        Bottom1 = 0;
-        Left2 = 0;
-        Top3 = 0;
-        Right4 = 0;
-        Moving = 0;
-        MovingLR = false;
-        MovingUD = false;
-    }
-};
+//! calculate all section overlaps, called on level load
+void CalculateSectionOverlaps();
 
-#endif // #ifndef PINCHED_INFO_H
+//! Update section overlaps after section S's bounds are changed.
+//  Set shrink if section S's new bounds are contained in its old bounds.
+void UpdateSectionOverlaps(int S, bool shrink = false);
+
+
+#endif

@@ -261,11 +261,8 @@ static int FindWorldsThread(void *)
 #endif
 
 #if (defined(__APPLE__) && defined(USE_BUNDLED_ASSETS)) || defined(FIXED_ASSETS_PATH)
-#   define USER_WORLDS_NEEDED
-#   define WORLD_ROOTS_SIZE 2
 #   define CAN_WRITE_APPPATH_WORLDS false
 #else
-#   define WORLD_ROOTS_SIZE 1
 #   define CAN_WRITE_APPPATH_WORLDS true
 #endif
 
@@ -295,6 +292,11 @@ void FindWorlds()
         worldRoots.push_back({AppPathManager::userWorldsRootDir(), true});
 
 #ifdef __3DS__
+    // can't edit base assets if they're a romfs package (different from the user dir)
+    if(AppPathManager::userDirIsAvailable())
+        worldRoots[0].editable = false;
+
+    // add worlds from additional romfs packages
     for(const std::string& root : AppPathManager::worldRootDirs())
         worldRoots.push_back({root, false});
 #endif

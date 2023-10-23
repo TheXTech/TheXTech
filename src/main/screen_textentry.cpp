@@ -60,6 +60,9 @@ static void s_textEntry_callDialog()
 
 #include "sound.h"
 
+// to check if on second screen
+#include "editor/new_editor.h"
+
 namespace XRender
 {
     extern bool g_in_frame;
@@ -491,10 +494,18 @@ bool DoAction()
 
 bool KeyboardMouseRender(bool mouse, bool render)
 {
+#ifdef __3DS__
+    int cur_ScreenW = (LevelEditor && editorScreen.active) ? 640 : ScreenW;
+    int cur_ScreenH = (LevelEditor && editorScreen.active) ? 480 : ScreenH;
+#else
+    const int cur_ScreenW = ScreenW;
+    const int cur_ScreenH = ScreenH;
+#endif
+
     int key_size = 40;
     if(g_config.osk_fill_screen)
     {
-        key_size = (ScreenW - 40) / s_current_keymap_cols;
+        key_size = (cur_ScreenW - 40) / s_current_keymap_cols;
         // force even
         key_size &= ~1;
     }
@@ -516,11 +527,11 @@ bool KeyboardMouseRender(bool mouse, bool render)
     win_height += n_prompt_lines * 20;
     win_height += n_text_lines * 20;
 
-    int win_x = ScreenW / 2 - win_width / 2;
+    int win_x = cur_ScreenW / 2 - win_width / 2;
     int kb_x = win_x + 10;
 
     // bias towards bottom of screen
-    int win_y = ScreenH / 1.25 - win_height / 1.25;
+    int win_y = cur_ScreenH / 1.25 - win_height / 1.25;
     // force even
     win_y &= ~1;
     int kb_y = win_y + 10 + n_prompt_lines * 20 + n_text_lines * 20;
