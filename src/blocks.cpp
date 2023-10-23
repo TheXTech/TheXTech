@@ -43,6 +43,7 @@
 #include "npc/npc_queues.h"
 #include "main/trees.h"
 
+
 void BlockHit(int A, bool HitDown, int whatPlayer)
 {
     // int tempPlayer = 0;
@@ -78,25 +79,15 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
             {
                 // why is this inside the for loop, seems silly.
                 SavedChar[Player[whatPlayer].Character] = Player[whatPlayer];
-                if(Player[B].Character == 1)
+
+                switch(Player[B].Character)
                 {
-                    BlockFrame[622] = 4;
-                }
-                if(Player[B].Character == 2)
-                {
-                    BlockFrame[623] = 4;
-                }
-                if(Player[B].Character == 3)
-                {
-                    BlockFrame[624] = 4;
-                }
-                if(Player[B].Character == 4)
-                {
-                    BlockFrame[625] = 4;
-                }
-                if(Player[B].Character == 5)
-                {
-                    BlockFrame[631] = 4;
+                case 1: BlockFrame[622] = 4; break;
+                case 2: BlockFrame[623] = 4; break;
+                case 3: BlockFrame[624] = 4; break;
+                case 4: BlockFrame[625] = 4; break;
+                case 5: BlockFrame[631] = 4; break;
+                default: break;
                 }
             }
 
@@ -106,25 +97,14 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
 
                 // moved SwapCharacter logic into player.cpp
 
-                if(b.Type == 622)
+                switch(b.Type)
                 {
-                    SwapCharacter(whatPlayer, 1, false, true);
-                }
-                if(b.Type == 623)
-                {
-                    SwapCharacter(whatPlayer, 2, false, true);
-                }
-                if(b.Type == 624)
-                {
-                    SwapCharacter(whatPlayer, 3, false, true);
-                }
-                if(b.Type == 625)
-                {
-                    SwapCharacter(whatPlayer, 4, false, true);
-                }
-                if(b.Type == 631)
-                {
-                    SwapCharacter(whatPlayer, 5, false, true);
+                case 622: SwapCharacter(whatPlayer, 1, false, true); break;
+                case 623: SwapCharacter(whatPlayer, 2, false, true); break;
+                case 624: SwapCharacter(whatPlayer, 3, false, true); break;
+                case 625: SwapCharacter(whatPlayer, 4, false, true); break;
+                case 631: SwapCharacter(whatPlayer, 5, false, true); break;
+                default: break;
                 }
 
                 PlaySound(SFX_Transform);
@@ -141,9 +121,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
     if(b.ShakeY != 0 || b.ShakeY2 != 0 || b.ShakeY3 != 0) // if the block has just been hit, ignore
     {
         if(b.RapidHit > 0 && IF_INRANGE(whatPlayer, 1, maxPlayers) && Player[whatPlayer].Character == 4)
-        {
             b.RapidHit = iRand(3) + 1;
-        }
         return;
     }
 
@@ -151,7 +129,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
 
     if(HitDown && b.Special > 0)
     {
-        tempBool = false;
+        tempBool = false; // FIXME: Warning: value stored in `tempBool` is never read
         auto tmpNumBlocks = numBlock;
         for(auto B = 1; B <= tmpNumBlocks; B++)
         {
@@ -168,9 +146,8 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
     }
 
     if(b.Special == 1225 || b.Special == 1226 || b.Special == 1227)
-    {
         HitDown = false;
-    }
+
 
     // Shake the block
     if(b.Type == 4 || b.Type == 615 || b.Type == 55 ||
@@ -200,20 +177,15 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
         for(auto B = 1; B <= numBlock; B++)
         {
             if(Block[B].Type == 171)
-            {
                 Block[B].Type = 172;
-            }
             else if(Block[B].Type == 172)
-            {
                 Block[B].Type = 171;
-            }
         }
+
         for(auto B = 1; B <= numNPCs; B++)
         {
             if(NPC[B].Type == NPCID_YEL_PLATFORM)
-            {
                 NPC[B].Direction = -NPC[B].Direction;
-            }
         }
     }
 
@@ -223,20 +195,15 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
         for(auto B = 1; B <= numBlock; B++)
         {
             if(Block[B].Type == 174)
-            {
                 Block[B].Type = 175;
-            }
             else if(Block[B].Type == 175)
-            {
                 Block[B].Type = 174;
-            }
         }
+
         for(auto B = 1; B <= numNPCs; B++)
         {
             if(NPC[B].Type == NPCID_BLU_PLATFORM)
-            {
                 NPC[B].Direction = -NPC[B].Direction;
-            }
         }
     }
 
@@ -246,20 +213,15 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
         for(auto B = 1; B <= numBlock; B++)
         {
             if(Block[B].Type == 177)
-            {
                 Block[B].Type = 178;
-            }
             else if(Block[B].Type == 178)
-            {
                 Block[B].Type = 177;
-            }
         }
+
         for(auto B = 1; B <= numNPCs; B++)
         {
             if(NPC[B].Type == NPCID_GRN_PLATFORM)
-            {
                 NPC[B].Direction = -NPC[B].Direction;
-            }
         }
     }
 
@@ -269,44 +231,29 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
         for(auto B = 1; B <= numBlock; B++)
         {
             if(Block[B].Type == 180)
-            {
                 Block[B].Type = 181;
-            }
             else if(Block[B].Type == 181)
-            {
                 Block[B].Type = 180;
-            }
         }
+
         for(auto B = 1; B <= numNPCs; B++)
         {
             if(NPC[B].Type == NPCID_RED_PLATFORM)
-            {
                 NPC[B].Direction = -NPC[B].Direction;
-            }
         }
     }
 
     // Find out what the block should turn into
     if(b.Type == 88 || b.Type == 90 || b.Type == 89 || b.Type == 171 || b.Type == 174 || b.Type == 177 || b.Type == 180) // SMW
-    {
         newBlock = 89;
-    }
     else if(b.Type == 188 || b.Type == 192 || b.Type == 193 || b.Type == 60 || b.Type == 369) // SMB1
-    {
         newBlock = 192;
-    }
     else if(b.Type == 224 || b.Type == 225 || b.Type == 226) // Large SMB3 blocks
-    {
         newBlock = 225;
-    }
     else if(b.Type == 159) // SMB3 Battle Block
-    {
         newBlock = 159;
-    }
     else // Everything else defaults to SMB3
-    {
         newBlock = 2;
-    }
 
 
 
@@ -315,18 +262,12 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
     if(b.Special > 0 && b.Special < 100) // Block has coins
     {
         if(whatPlayer > 0 && Player[whatPlayer].Character == 4)
-        {
             b.RapidHit = iRand(3) + 1;
-        }
 
         if(!HitDown)
-        {
             BlockShakeUp(A);
-        }
         else
-        {
             BlockShakeDown(A);
-        }
 
 
         if(whatPlayer > 0 && (Player[whatPlayer].Character == 2 || Player[whatPlayer].Character == 5))
@@ -357,17 +298,11 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
                     nn.TimeLeft = 100;
 
                     if(newBlock == 89)
-                    {
                         nn.Type = 33;
-                    }
                     else if(newBlock == 192)
-                    {
                         nn.Type = 88;
-                    }
                     else
-                    {
                         nn.Type = 10;
-                    }
 
                     if(Player[whatPlayer].Character == 5)
                     {
@@ -497,6 +432,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
                         Coins = 99;
                     }
                 }
+
                 PlaySound(SFX_Coin);
                 NewEffect(EFFID_COIN_BLOCK_S3, b.Location);
                 b.Special -= 1;
@@ -519,6 +455,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
                     Coins = 99;
                 }
             }
+
             PlaySound(SFX_Coin);
             NewEffect(EFFID_COIN_BLOCK_S3, b.Location);
             b.Special -= 1;
@@ -561,13 +498,9 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
         }
 
         if(!HitDown)
-        {
             BlockShakeUp(A);
-        }
         else
-        {
             BlockShakeDown(A);
-        }
 
         b.Special = 0;
 
@@ -585,13 +518,9 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
         if(is_ancient)
         {
             if(!HitDown)
-            {
                 BlockShakeUp(A);
-            }
             else
-            {
                 BlockShakeDown(A);
-            }
         }
 
 #if 0 // Completely disable the DEAD the code that spawns the player
