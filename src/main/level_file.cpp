@@ -472,10 +472,10 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
 
         switch(block.Special) // Replace some legacy NPC codes with new
         {
-        case 100: block.Special = 1009; break;
-        case 102: block.Special = 1014; break;
-        case 103: block.Special = 1034; break;
-        case 105: block.Special = 1095; break;
+        case 100: block.Special = 1000 + NPCID_POWER_S3; break;
+        case 102: block.Special = 1000 + NPCID_FIRE_POWER_S3; break;
+        case 103: block.Special = 1000 + NPCID_LEAF_POWER; break;
+        case 105: block.Special = 1000 + NPCID_PET_GREEN; break;
         default: break;
         }
 
