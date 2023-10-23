@@ -306,19 +306,19 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
                     nn.TimeLeft = 100;
 
                     if(newBlock == 89)
-                        nn.Type = 33;
+                        nn.Type = NPCID_COIN_S4;
                     else if(newBlock == 192)
-                        nn.Type = 88;
+                        nn.Type = NPCID_COIN_S1;
                     else
-                        nn.Type = 10;
+                        nn.Type = NPCID_COIN_S3;
 
                     if(Player[whatPlayer].Character == 5)
                     {
-                        nn.Type = 251;
+                        nn.Type = NPCID_GEM_1;
                         if(iRand(20) < 3)
-                            nn.Type = 252;
+                            nn.Type = NPCID_GEM_5;
                         if(iRand(60) < 3)
-                            nn.Type = 253;
+                            nn.Type = NPCID_GEM_20;
                         PlaySound(SFX_HeroRupee);
                     }
                     else
@@ -712,14 +712,14 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
                 // the logic is the next clause didn't exist in ancient cases
             }
             else if(NPCIsYoshi[nn.Type] ||
-               NPCIsBoot[nn.Type] || nn.Type == 9 ||
-               nn.Type == 14 || nn.Type == 22 ||
-               nn.Type == 90 || nn.Type == 153 ||
-               nn.Type == 169 || nn.Type == 170 ||
-               nn.Type == 182 || nn.Type == 183 ||
-               nn.Type == 184 || nn.Type == 185 ||
-               nn.Type == 186 || nn.Type == 187 ||
-               nn.Type == 188 || nn.Type == 195)
+               NPCIsBoot[nn.Type] || nn.Type == NPCID_POWER_S3 ||
+               nn.Type == NPCID_FIRE_POWER_S3 || nn.Type == NPCID_CANNONITEM ||
+               nn.Type == NPCID_LIFE_S3 || nn.Type == NPCID_POISON ||
+               nn.Type == NPCID_STATUE_POWER || nn.Type == NPCID_HEAVY_POWER ||
+               nn.Type == NPCID_FIRE_POWER_S1 || nn.Type == NPCID_FIRE_POWER_S4 ||
+               nn.Type == NPCID_POWER_S1 || nn.Type == NPCID_POWER_S4 ||
+               nn.Type == NPCID_LIFE_S1 || nn.Type == NPCID_LIFE_S4 ||
+               nn.Type == NPCID_3_LIFE || nn.Type == NPCID_FLIPPED_RAINBOW_SHELL)
             {
                 nn.TimeLeft = Physics.NPCTimeOffScreen * 20;
             }
@@ -760,7 +760,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
         nn = NPC_t();
         nn.Active = true;
         nn.TimeLeft = 1;
-        nn.Type = 33;
+        nn.Type = NPCID_COIN_S4;
         nn.Block = 89;
         nn.Location = b.Location;
         nn.Location.Width = NPCWidth[nn.Type];
@@ -1552,15 +1552,15 @@ void PSwitch(bool enabled)
                     nn.TimeLeft = 1;
 
                     if(Block[A].Type == 89)
-                        nn.Type = 33;
+                        nn.Type = NPCID_COIN_S4;
                     else if(Block[A].Type == 188 || Block[A].Type == 60)
-                        nn.Type = 88;
+                        nn.Type = NPCID_COIN_S1;
                     else if(Block[A].Type == 280)
-                        nn.Type = 103;
+                        nn.Type = NPCID_RED_COIN;
                     else if(Block[A].Type == 293)
-                        nn.Type = 138;
+                        nn.Type = NPCID_COIN_S2;
                     else
-                        nn.Type = 10;
+                        nn.Type = NPCID_COIN_S3;
 
                     nn.Layer = Block[A].Layer;
                     nn.TriggerDeath = Block[A].TriggerDeath;
