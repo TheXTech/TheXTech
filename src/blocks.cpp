@@ -137,12 +137,17 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
     if(HitDown && b.Special > 0)
     {
         // tempBool = false; // unused since SMBX64, must have been replaced with the simple modification of HitDown
-        for(auto B = 1; B <= numBlock; B++)
+
+        // this is symmetric to the original transformation on the *other* block's location, but much cheaper
+        const auto query_loc = newLoc(b.Location.X + 4, b.Location.Y + 16, b.Location.Width - 8, b.Location.Height);
+
+        for(int B : treeBlockQuery(query_loc, SORTMODE_NONE))
         {
             if(B != A)
             {
                 const auto &bLoc = Block[B].Location;
-                if(CheckCollision(b.Location, newLoc(bLoc.X + 4, bLoc.Y - 16, bLoc.Width - 8, bLoc.Height)))
+                // if(CheckCollision(b.Location, newLoc(bLoc.X + 4, bLoc.Y - 16, bLoc.Width - 8, bLoc.Height)))
+                if(CheckCollision(query_loc, bLoc))
                 {
                     HitDown = false;
                     break;
@@ -281,12 +286,14 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
         {
             // check if blocked from above
             bool blocked_above = false;
+            const auto query_loc = newLoc(b.Location.X + 1, b.Location.Y - 31, 30, 30);
 
-            for(auto B = 1; B <= numBlock; B++)
+            for(int B : treeBlockQuery(query_loc, SORTMODE_NONE))
             {
                 if(B != A && !Block[B].Hidden && !(BlockOnlyHitspot1[Block[B].Type] && !BlockIsSizable[Block[B].Type]))
                 {
-                    if(CheckCollision(Block[B].Location, newLoc(b.Location.X + 1, b.Location.Y - 31, 30, 30)))
+                    // if(CheckCollision(Block[B].Location, newLoc(b.Location.X + 1, b.Location.Y - 31, 30, 30)))
+                    if(CheckCollision(Block[B].Location, query_loc))
                     {
                         blocked_above = true;
                         break;
@@ -374,12 +381,14 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
         {
             // check if anything is blocking from above
             bool blocked_above = false;
+            const auto query_loc = newLoc(b.Location.X + 1, b.Location.Y - 31, 30, 30);
 
-            for(auto B = 1; B <= numBlock; B++)
+            // use treeBlockQueryWithTemp because this code can be triggered during the period when NPC temp blocks are active
+            for(int B : treeBlockQueryWithTemp(query_loc, SORTMODE_NONE))
             {
                 if(B != A && !Block[B].Hidden && !(BlockOnlyHitspot1[Block[B].Type] && !BlockIsSizable[Block[B].Type]))
                 {
-                    if(CheckCollision(Block[B].Location, newLoc(b.Location.X + 1, b.Location.Y - 31, 30, 30)))
+                    if(CheckCollision(Block[B].Location, query_loc))
                     {
                         blocked_above = true;
                         break;
