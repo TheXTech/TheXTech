@@ -53,12 +53,12 @@ void CheckNPCWidth(NPC_t& n)
 {
     if(fEqual(n.Location.Width, 32.0))
     {
-        if(n.Type != 57 && n.Type != 84)
+        if(n.Type != NPCID_CONVEYOR && n.Type != NPCID_STATUE_S3)
         {
             // If .Type = 58 Or .Type = 21 Then
-            if(!(NPCIsAnExit[n.Type] || n.Type == 8 || n.Type == 51 ||
-                 n.Type == 52 || n.Type == 74 || n.Type == 256 ||
-                 n.Type == 257 || n.Type == 93 || n.Type == 245))
+            if(!(NPCIsAnExit[n.Type] || n.Type == NPCID_PLANT_S3 || n.Type == NPCID_BOTTOM_PLANT ||
+                 n.Type == NPCID_SIDE_PLANT || n.Type == NPCID_BIG_PLANT || n.Type == NPCID_LONG_PLANT_UP ||
+                 n.Type == NPCID_LONG_PLANT_DOWN || n.Type == NPCID_PLANT_S1 || n.Type == NPCID_FIRE_PLANT))
             {
                 n.Location.X += 0.015;
             }
@@ -91,7 +91,7 @@ void CheckNPCWidth(NPC_t& n)
             n.RealSpeedX = 0;
         }
 
-        if(!n.Projectile || n.Type == 50 || n.Type == 78)
+        if(!n.Projectile || n.Type == NPCID_TOOTHY || n.Type == NPCID_TANK_TREADS)
             n.Multiplier = 0;
     }
 }
