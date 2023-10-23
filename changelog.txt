@@ -7,6 +7,8 @@ Changelog for 1.3.7-dev
 Changelog for 1.3.6.2
 -Fixed a crash on attempt to add a game directory after storage permission grant on Android (@Wohlstand)
 -Added workaround for Little File Manager on Android (to open level file by content with no resources) (@Wohlstand)
+-Fixed TheXTech 1.3.6.1 bug where error messages at the main menu would lock the game (@ds-sloth)
+-Fixed an inability to parse LunaDLL Autocode files via MSVC builds of the game (@Wohlstand)
 
 Changelog for 1.3.6.1
 -Fixed some of the performance slowdown problems using improved object spatial lookup tables (@ds-sloth)

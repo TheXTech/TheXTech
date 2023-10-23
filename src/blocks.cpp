@@ -43,10 +43,11 @@
 #include "npc/npc_queues.h"
 #include "main/trees.h"
 
+
 void BlockHit(int A, bool HitDown, int whatPlayer)
 {
-    int tempPlayer = 0;
-    bool makeShroom = false; // if true make a mushroom
+    // int tempPlayer = 0;
+    // bool makeShroom = false; // if true make a mushroom
     int newBlock = 0; // what the block should turn into if anything
     int C = 0;
 //    int B = 0;
@@ -78,25 +79,15 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
             {
                 // why is this inside the for loop, seems silly.
                 SavedChar[Player[whatPlayer].Character] = Player[whatPlayer];
-                if(Player[B].Character == 1)
+
+                switch(Player[B].Character)
                 {
-                    BlockFrame[622] = 4;
-                }
-                if(Player[B].Character == 2)
-                {
-                    BlockFrame[623] = 4;
-                }
-                if(Player[B].Character == 3)
-                {
-                    BlockFrame[624] = 4;
-                }
-                if(Player[B].Character == 4)
-                {
-                    BlockFrame[625] = 4;
-                }
-                if(Player[B].Character == 5)
-                {
-                    BlockFrame[631] = 4;
+                case 1: BlockFrame[622] = 4; break;
+                case 2: BlockFrame[623] = 4; break;
+                case 3: BlockFrame[624] = 4; break;
+                case 4: BlockFrame[625] = 4; break;
+                case 5: BlockFrame[631] = 4; break;
+                default: break;
                 }
             }
 
@@ -106,25 +97,14 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
 
                 // moved SwapCharacter logic into player.cpp
 
-                if(b.Type == 622)
+                switch(b.Type)
                 {
-                    SwapCharacter(whatPlayer, 1, false, true);
-                }
-                if(b.Type == 623)
-                {
-                    SwapCharacter(whatPlayer, 2, false, true);
-                }
-                if(b.Type == 624)
-                {
-                    SwapCharacter(whatPlayer, 3, false, true);
-                }
-                if(b.Type == 625)
-                {
-                    SwapCharacter(whatPlayer, 4, false, true);
-                }
-                if(b.Type == 631)
-                {
-                    SwapCharacter(whatPlayer, 5, false, true);
+                case 622: SwapCharacter(whatPlayer, 1, false, true); break;
+                case 623: SwapCharacter(whatPlayer, 2, false, true); break;
+                case 624: SwapCharacter(whatPlayer, 3, false, true); break;
+                case 625: SwapCharacter(whatPlayer, 4, false, true); break;
+                case 631: SwapCharacter(whatPlayer, 5, false, true); break;
+                default: break;
                 }
 
                 PlaySound(SFX_Transform);
@@ -141,9 +121,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
     if(b.ShakeY != 0 || b.ShakeY2 != 0 || b.ShakeY3 != 0) // if the block has just been hit, ignore
     {
         if(b.RapidHit > 0 && IF_INRANGE(whatPlayer, 1, maxPlayers) && Player[whatPlayer].Character == 4)
-        {
             b.RapidHit = iRand(3) + 1;
-        }
         return;
     }
 
@@ -151,7 +129,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
 
     if(HitDown && b.Special > 0)
     {
-        tempBool = false;
+        tempBool = false; // FIXME: Warning: value stored in `tempBool` is never read
         auto tmpNumBlocks = numBlock;
         for(auto B = 1; B <= tmpNumBlocks; B++)
         {
@@ -168,9 +146,8 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
     }
 
     if(b.Special == 1225 || b.Special == 1226 || b.Special == 1227)
-    {
         HitDown = false;
-    }
+
 
     // Shake the block
     if(b.Type == 4 || b.Type == 615 || b.Type == 55 ||
@@ -200,20 +177,15 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
         for(auto B = 1; B <= numBlock; B++)
         {
             if(Block[B].Type == 171)
-            {
                 Block[B].Type = 172;
-            }
             else if(Block[B].Type == 172)
-            {
                 Block[B].Type = 171;
-            }
         }
+
         for(auto B = 1; B <= numNPCs; B++)
         {
             if(NPC[B].Type == NPCID_YEL_PLATFORM)
-            {
                 NPC[B].Direction = -NPC[B].Direction;
-            }
         }
     }
 
@@ -223,20 +195,15 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
         for(auto B = 1; B <= numBlock; B++)
         {
             if(Block[B].Type == 174)
-            {
                 Block[B].Type = 175;
-            }
             else if(Block[B].Type == 175)
-            {
                 Block[B].Type = 174;
-            }
         }
+
         for(auto B = 1; B <= numNPCs; B++)
         {
             if(NPC[B].Type == NPCID_BLU_PLATFORM)
-            {
                 NPC[B].Direction = -NPC[B].Direction;
-            }
         }
     }
 
@@ -246,20 +213,15 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
         for(auto B = 1; B <= numBlock; B++)
         {
             if(Block[B].Type == 177)
-            {
                 Block[B].Type = 178;
-            }
             else if(Block[B].Type == 178)
-            {
                 Block[B].Type = 177;
-            }
         }
+
         for(auto B = 1; B <= numNPCs; B++)
         {
             if(NPC[B].Type == NPCID_GRN_PLATFORM)
-            {
                 NPC[B].Direction = -NPC[B].Direction;
-            }
         }
     }
 
@@ -269,44 +231,29 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
         for(auto B = 1; B <= numBlock; B++)
         {
             if(Block[B].Type == 180)
-            {
                 Block[B].Type = 181;
-            }
             else if(Block[B].Type == 181)
-            {
                 Block[B].Type = 180;
-            }
         }
+
         for(auto B = 1; B <= numNPCs; B++)
         {
             if(NPC[B].Type == NPCID_RED_PLATFORM)
-            {
                 NPC[B].Direction = -NPC[B].Direction;
-            }
         }
     }
 
     // Find out what the block should turn into
     if(b.Type == 88 || b.Type == 90 || b.Type == 89 || b.Type == 171 || b.Type == 174 || b.Type == 177 || b.Type == 180) // SMW
-    {
         newBlock = 89;
-    }
     else if(b.Type == 188 || b.Type == 192 || b.Type == 193 || b.Type == 60 || b.Type == 369) // SMB1
-    {
         newBlock = 192;
-    }
     else if(b.Type == 224 || b.Type == 225 || b.Type == 226) // Large SMB3 blocks
-    {
         newBlock = 225;
-    }
     else if(b.Type == 159) // SMB3 Battle Block
-    {
         newBlock = 159;
-    }
     else // Everything else defaults to SMB3
-    {
         newBlock = 2;
-    }
 
 
 
@@ -315,18 +262,12 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
     if(b.Special > 0 && b.Special < 100) // Block has coins
     {
         if(whatPlayer > 0 && Player[whatPlayer].Character == 4)
-        {
             b.RapidHit = iRand(3) + 1;
-        }
 
         if(!HitDown)
-        {
             BlockShakeUp(A);
-        }
         else
-        {
             BlockShakeDown(A);
-        }
 
 
         if(whatPlayer > 0 && (Player[whatPlayer].Character == 2 || Player[whatPlayer].Character == 5))
@@ -357,17 +298,11 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
                     nn.TimeLeft = 100;
 
                     if(newBlock == 89)
-                    {
                         nn.Type = 33;
-                    }
                     else if(newBlock == 192)
-                    {
                         nn.Type = 88;
-                    }
                     else
-                    {
                         nn.Type = 10;
-                    }
 
                     if(Player[whatPlayer].Character == 5)
                     {
@@ -497,6 +432,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
                         Coins = 99;
                     }
                 }
+
                 PlaySound(SFX_Coin);
                 NewEffect(EFFID_COIN_BLOCK_S3, b.Location);
                 b.Special -= 1;
@@ -519,6 +455,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
                     Coins = 99;
                 }
             }
+
             PlaySound(SFX_Coin);
             NewEffect(EFFID_COIN_BLOCK_S3, b.Location);
             b.Special -= 1;
@@ -535,18 +472,35 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
 
 
     }
-    else if(b.Special >= 1000) // New spawn code
+    else if(b.Special >= 100) // New spawn code
     {
-        C = b.Special - 1000; // this finds the NPC type and puts in the variable C
+        // represents behavior for ancient 101 / 104 / 201 Special values (other ancient values replaced in OpenLevel)
+        bool is_ancient = false;
+
+        if(b.Special >= 1000)
+        {
+            C = b.Special - 1000; // this finds the NPC type and puts in the variable C
+        }
+        else if(b.Special == 201)
+        {
+            C = NPCID_LIFE_S3;
+            is_ancient = true;
+        }
+        else if(b.Special == 104)
+        {
+            C = NPCID_GRN_BOOT;
+            is_ancient = true;
+        }
+        else // b.Special == 101
+        {
+            C = NPCID_FODDER_S3;
+            is_ancient = true;
+        }
 
         if(!HitDown)
-        {
             BlockShakeUp(A);
-        }
         else
-        {
             BlockShakeDown(A);
-        }
 
         b.Special = 0;
 
@@ -558,6 +512,15 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
             // Doing this check here keeps the easy bonus pickup. -- ds-sloth
             if(!g_compatibility.fix_restored_block_move || !b.getShrinkResized())
                 b.Location.Width = BlockWidth[newBlock];
+        }
+
+        // was duplicated for some reason in ancient code
+        if(is_ancient)
+        {
+            if(!HitDown)
+                BlockShakeUp(A);
+            else
+                BlockShakeDown(A);
         }
 
 #if 0 // Completely disable the DEAD the code that spawns the player
@@ -582,98 +545,70 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
             nn.Active = true;
             nn.TimeLeft = 1000;
 
+            if(is_ancient)
+                nn.TimeLeft = 100;
+
+            // always give char 5 or big player full power
+            bool player_gets_full = (whatPlayer > 0 && (Player[whatPlayer].State > 1 || Player[whatPlayer].Character == 5));
+
+            // replacement index if full powerup should not be received
+            int replacement = C;
+
+            if(g_ClonedPlayerMode || BattleMode || player_gets_full)
+            {
+                // never replace if cloned player, in battle mode, or the player that hit the block should get the full powerup
+            }
+            else if(C == NPCID_FIRE_POWER_S3 || C == NPCID_LEAF_POWER || C == NPCID_ICE_POWER_S3 || C == NPCID_ICE_POWER_S4)
+                replacement = NPCID_POWER_S3;
+            else if(C == NPCID_FIRE_POWER_S4)
+                replacement = NPCID_POWER_S4;
+            else if(C == NPCID_FIRE_POWER_S1)
+                replacement = NPCID_POWER_S1;
+
             if(NPCIsYoshi[C])
             {
-                nn.Type = 96;
+                nn.Type = NPCID_ITEM_POD;
                 nn.Special = C;
             }
-            else if(g_ClonedPlayerMode)
+            else if(replacement != C)
             {
-                nn.Type = C;
-            }
-            else if(C == 14 || C == 34 || C == 264 || C == 277)
-            {
+                // if any player is small, then replace the NPC
+                bool do_replace = false;
+
                 for(auto B = 1; B <= numPlayers; B++)
                 {
                     if(Player[B].State == 1 && Player[B].Character != 5)
                     {
-                        makeShroom = true;
+                        do_replace = true;
+                        break;
                     }
                 }
 
-                if(!makeShroom)
-                {
+                if(!do_replace)
                     nn.Type = C;
-                }
                 else
-                {
-                    nn.Type = 9;
-                }
-            }
-            else if(C == 183)
-            {
-                for(auto B = 1; B <= numPlayers; B++)
-                {
-                    if(Player[B].State == 1 && Player[B].Character != 5)
-                    {
-                        makeShroom = true;
-                    }
-                }
-
-                if(!makeShroom)
-                {
-                    nn.Type = C;
-                }
-                else
-                {
-                    nn.Type = 185;
-                }
-            }
-            else if(C == 182)
-            {
-                for(auto B = 1; B <= numPlayers; B++)
-                {
-                    if(Player[B].State == 1 && Player[B].Character != 5)
-                    {
-                        makeShroom = true;
-                    }
-                }
-
-                if(!makeShroom)
-                {
-                    nn.Type = C;
-                }
-                else
-                {
-                    nn.Type = 184;
-                }
+                    nn.Type = replacement;
             }
             else
             {
                 nn.Type = C;
             }
 
-            if(makeShroom && whatPlayer > 0 &&
-               (Player[whatPlayer].State > 1 || Player[whatPlayer].Character == 5)) // set the NPC type if the conditions are met
-            {
-                nn.Type = C;
-            }
-
-            if(makeShroom && BattleMode) // always spawn the item in battlemode
-            {
-                nn.Type = C;
-            }
-
-            if(nn.Type == 287)
-            {
+            // replace random power immediately
+            if(nn.Type == NPCID_RANDOM_POWER)
                 nn.Type = RandomBonus();
-            }
 
             CharStuff(numNPCs);
+
+            // note: minor bug, should be NPCWidth[nn.Type]
             nn.Location.Width = NPCWidth[C];
 
+            // bug from ancient 101 case
+            if(is_ancient && C == NPCID_FODDER_S3)
+                nn.Location.Width = NPCWidth[NPCID_POWER_S3];
+
             // Make block a bit smaller to allow player take a bonus easier (Redigit's idea)
-            if(fEqual(b.Location.Width, 32)/* && !b.getShrinkResized()*/) // moved check above so that the width is not reset to 32 in the first place
+            if(!is_ancient && fEqual(b.Location.Width, 32))
             {
                 // make sure Location.Width == 31.9 heuristic works on low-mem builds
                 // b.Location.Width -= 0.1;
@@ -688,38 +623,35 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
             nn.Location.SpeedX = 0;
             nn.Location.SpeedY = 0;
 
-            if(NPCIsYoshi[C]) // if the npc is yoshi then set the color of the egg
+            // direction set to -1 if ancient boot block (104 case)
+            if(is_ancient && C == NPCID_GRN_BOOT)
+                nn.Direction = -1;
+
+            if(NPCIsYoshi[C]) // if the npc is pet then set the color of the pod
             {
-                if(C == 98)
-                {
+                if(C == NPCID_PET_BLUE)
                     nn.Frame = 1;
-                }
-                else if(C == 99)
-                {
+                else if(C == NPCID_PET_YELLOW)
                     nn.Frame = 2;
-                }
-                else if(C == 100)
-                {
+                else if(C == NPCID_PET_RED)
                     nn.Frame = 3;
-                }
-                else if(C == 148)
-                {
+                else if(C == NPCID_PET_BLACK)
                     nn.Frame = 4;
-                }
-                else if(C == 149)
-                {
+                else if(C == NPCID_PET_PURPLE)
                     nn.Frame = 5;
-                }
-                else if(C == 150)
-                {
+                else if(C == NPCID_PET_PINK)
                     nn.Frame = 6;
-                }
             }
 
             if(!HitDown)
             {
                 nn.Location.Y = b.Location.Y; // - 0.1
                 nn.Location.Height = 0;
+
+                // old behavior was never changed for ancient 101 / 104 / 201 cases
+                if(is_ancient)
+                    nn.Location.Y = b.Location.Y - 0.1;
+
                 if(NPCIsYoshi[C])
                 {
                     nn.Effect = 0;
@@ -754,6 +686,11 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
             {
                 nn.Location.Y = b.Location.Y + 4;
                 nn.Location.Height = NPCHeight[C];
+
+                // hardcoded to 32 in ancient 101 / 104 / 201 cases
+                if(is_ancient)
+                    nn.Location.Height = 32;
+
                 nn.Effect = 3;
                 PlaySound(SFX_ItemEmerge);
             }
@@ -761,7 +698,12 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
             nn.Effect2 = 0;
             syncLayers_NPC(numNPCs);
             CheckSectionNPC(numNPCs);
-            if(NPCIsYoshi[nn.Type] ||
+
+            if(is_ancient)
+            {
+                // the logic is the next clause didn't exist in ancient cases
+            }
+            else if(NPCIsYoshi[nn.Type] ||
                NPCIsBoot[nn.Type] || nn.Type == 9 ||
                nn.Type == 14 || nn.Type == 22 ||
                nn.Type == 90 || nn.Type == 153 ||
@@ -799,560 +741,9 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
 #endif
 
     }
-#if 1 // FIXME: Possibly dead code (because all such numbers were replaced with normal NPC ID at PGE-FL side)
-    else if(b.Special == 100) // Block contains a mushroom
-    {
-        if(!HitDown)
-        {
-            BlockShakeUp(A);
-        }
-        else
-        {
-            BlockShakeDown(A);
-        }
 
-        b.Special = 0;
-
-        if(b.Type != 55)
-        {
-            b.Type = newBlock;
-            b.Location.Height = BlockHeight[newBlock];
-            b.Location.Width = BlockWidth[newBlock];
-        }
-
-        tempPlayer = CheckDead();
-
-        if(g_ClonedPlayerMode)
-        {
-            tempPlayer = 0;
-        }
-
-        PlaySound(SFX_ItemEmerge);
-        if(tempPlayer == 0)
-        {
-            numNPCs++;
-            auto &nn = NPC[numNPCs];
-            nn = NPC_t();
-            nn.Active = true;
-            nn.TimeLeft = 1000;
-            nn.Type = 9;
-            nn.Location.Width = NPCWidth[9];
-            nn.Location.X = (b.Location.X + b.Location.Width / 2.0 - nn.Location.Width / 2.0);
-            nn.Location.SpeedX = 0;
-            nn.Location.SpeedY = 0;
-
-            if(!HitDown)
-            {
-                nn.Location.Y = b.Location.Y - 0.1;
-                nn.Location.Height = 0;
-                nn.Effect = 1;
-            }
-            else
-            {
-                nn.Location.Y = b.Location.Y + 4;
-                nn.Location.Height = 32;
-                nn.Effect = 3;
-            }
-
-            nn.Effect2 = 0;
-            syncLayers_NPC(numNPCs);
-            CheckSectionNPC(numNPCs);
-        }
-        else
-        {
-            auto &tp = Player[tempPlayer];
-            tp.Location.Width = Physics.PlayerWidth[tp.Character][tp.State];
-            tp.Location.Height = Physics.PlayerHeight[tp.Character][tp.State];
-            tp.Frame = 1;
-            tp.Dead = false;
-            tp.Location.X = b.Location.X + b.Location.Width * 0.5 - tp.Location.Width * 0.5;
-
-            if(!HitDown)
-            {
-                tp.Location.Y = b.Location.Y - 0.1 - tp.Location.Height;
-            }
-            else
-            {
-                tp.Location.Y = b.Location.Y + 0.1 + b.Location.Height;
-            }
-
-            tp.Location.SpeedX = 0;
-            tp.Location.SpeedY = 0;
-            tp.Immune = 150;
-        }
-    }
-    else if(b.Special == 102) // Block contains a fire flower
-    {
-        if(!HitDown)
-        {
-            BlockShakeUp(A);
-        }
-        else
-        {
-            BlockShakeDown(A);
-        }
-
-        b.Special = 0;
-
-        if(b.Type != 55)
-        {
-            b.Type = newBlock;
-            b.Location.Height = BlockHeight[newBlock];
-            b.Location.Width = BlockWidth[newBlock];
-        }
-
-        if(!HitDown)
-        {
-            BlockShakeUp(A);
-        }
-        else
-        {
-            BlockShakeDown(A);
-        }
-
-        tempPlayer = CheckDead();
-
-        if(g_ClonedPlayerMode)
-        {
-            tempPlayer = 0;
-        }
-
-        PlaySound(SFX_ItemEmerge);
-
-        if(tempPlayer == 0)
-        {
-            numNPCs++;
-            auto &nn = NPC[numNPCs];
-            nn = NPC_t();
-            nn.Active = true;
-            nn.TimeLeft = 1000;
-
-            for(auto B = 1; B <= numPlayers; B++)
-            {
-                if(Player[B].State == 1)
-                {
-                    makeShroom = true;
-                }
-            }
-
-            if(!makeShroom)
-            {
-                nn.Type = 14;
-            }
-            else
-            {
-                nn.Type = 9;
-            }
-
-            nn.Location.Width = NPCWidth[nn.Type];
-            nn.Location.X = (b.Location.X + b.Location.Width / 2.0 - nn.Location.Width / 2.0);
-            nn.Location.SpeedX = 0;
-            nn.Location.SpeedY = 0;
-
-            if(!HitDown)
-            {
-                nn.Location.Y = b.Location.Y - 0.1;
-                nn.Location.Height = 0;
-                nn.Effect = 1;
-            }
-            else
-            {
-                nn.Location.Y = b.Location.Y + 4;
-                nn.Location.Height = 32;
-                nn.Effect = 3;
-            }
-
-            nn.Effect2 = 0;
-            syncLayers_NPC(numNPCs);
-            CheckSectionNPC(numNPCs);
-        }
-        else // Rez player
-        {
-            auto &tp = Player[tempPlayer];
-            tp.Frame = 1;
-            tp.Dead = false;
-            tp.Location.Width = Physics.PlayerWidth[tp.Character][tp.State];
-            tp.Location.Height = Physics.PlayerHeight[tp.Character][tp.State];
-            tp.Location.X = b.Location.X + b.Location.Width * 0.5 - tp.Location.Width * 0.5;
-            if(!HitDown)
-            {
-                tp.Location.Y = b.Location.Y - 0.1 - tp.Location.Height;
-            }
-            else
-            {
-                tp.Location.Y = b.Location.Y + 0.1 + b.Location.Height;
-            }
-            tp.Location.SpeedX = 0;
-            tp.Location.SpeedY = 0;
-            tp.Immune = 150;
-        }
-    }
-    else if(b.Special == 103) // Block contains a Leaf
-    {
-        if(!HitDown)
-        {
-            BlockShakeUp(A);
-        }
-        else
-        {
-            BlockShakeDown(A);
-        }
-
-        b.Special = 0;
-
-        if(b.Type != 55)
-        {
-            b.Type = newBlock;
-            b.Location.Height = BlockHeight[b.Type];
-            b.Location.Width = BlockWidth[b.Type];
-        }
-
-        if(!HitDown)
-        {
-            BlockShakeUp(A);
-        }
-        else
-        {
-            BlockShakeDown(A);
-        }
-
-        tempPlayer = CheckDead();
-
-        if(g_ClonedPlayerMode)
-        {
-            tempPlayer = 0;
-        }
-
-        // TODO: @Wohlstand why was this commented out?
-        // PlaySound(SFX_ItemEmerge);
-
-        if(tempPlayer == 0)
-        {
-            numNPCs++;
-            auto &nn = NPC[numNPCs];
-            nn = NPC_t();
-            nn.Active = true;
-            nn.TimeLeft = 1000;
-
-            for(auto B = 1; B <= numPlayers; B++)
-            {
-                if(Player[B].State == 1)
-                {
-                    makeShroom = true;
-                }
-            }
-
-            if(!makeShroom)
-            {
-                nn.Type = 34;
-            }
-            else
-            {
-                nn.Type = 9;
-            }
-
-            nn.Location.Width = NPCWidth[nn.Type];
-            nn.Location.Height = NPCHeight[nn.Type];
-            nn.Location.X = (b.Location.X + b.Location.Width / 2.0 - nn.Location.Width / 2.0);
-            nn.Location.SpeedX = 0;
-
-            if(!HitDown)
-            {
-                if(nn.Type == 34)
-                {
-                    nn.Location.Y = b.Location.Y - 32;
-                    nn.Location.SpeedY = -6;
-                    nn.Location.Height = NPCHeight[34];
-                }
-                else
-                {
-                    nn.Location.Y = b.Location.Y - 0.1;
-                    nn.Location.Height = 0;
-                    nn.Effect = 1;
-                }
-            }
-            else
-            {
-                nn.Location.Y = b.Location.Y + 4;
-                nn.Location.Height = 32;
-                nn.Effect = 3;
-            }
-
-            nn.Effect2 = 0;
-            syncLayers_NPC(numNPCs);
-            CheckSectionNPC(numNPCs);
-        }
-        else // Rez player
-        {
-            auto &tp = Player[tempPlayer];
-            tp.Location.Width = Physics.PlayerWidth[tp.Character][tp.State];
-            tp.Location.Height = Physics.PlayerHeight[tp.Character][tp.State];
-            tp.Frame = 1;
-            tp.Dead = false;
-            tp.Location.X = b.Location.X + b.Location.Width * 0.5 - tp.Location.Width * 0.5;
-
-            if(!HitDown)
-            {
-                tp.Location.Y = b.Location.Y - 0.1 - tp.Location.Height;
-            }
-            else
-            {
-                tp.Location.Y = b.Location.Y + 0.1 + b.Location.Height;
-            }
-
-            tp.Location.SpeedX = 0;
-            tp.Location.SpeedY = 0;
-            tp.Immune = 150;
-        }
-    }
-    else if(b.Special == 104) // Block contains a Shoe
-    {
-        if(!HitDown)
-        {
-            BlockShakeUp(A);
-        }
-        else
-        {
-            BlockShakeDown(A);
-        }
-
-        b.Special = 0;
-
-        //if(!(b.Type == 55))
-        if(b.Type != 55)
-        {
-            b.Type = newBlock;
-            b.Location.Height = BlockHeight[newBlock];
-            b.Location.Width = BlockWidth[newBlock];
-        }
-
-        if(!HitDown)
-        {
-            BlockShakeUp(A);
-        }
-        else
-        {
-            BlockShakeDown(A);
-        }
-
-        PlaySound(SFX_ItemEmerge);
-        numNPCs++;
-        auto &nn = NPC[numNPCs];
-        nn = NPC_t();
-        nn.Active = true;
-        nn.TimeLeft = 100;
-        nn.Type = 35;
-        nn.Direction = -1;
-        nn.Location.Width = NPCWidth[35];
-        nn.Location.X = (b.Location.X + b.Location.Width / 2.0 - nn.Location.Width / 2.0);
-        nn.Location.Y = b.Location.Y - 0.1;
-        nn.Location.SpeedX = 0;
-        nn.Location.SpeedY = 0;
-
-        if(!HitDown)
-        {
-            nn.Location.Y = b.Location.Y - 0.1;
-            nn.Location.Height = 0;
-            nn.Effect = 1;
-        }
-        else
-        {
-            nn.Location.Y = b.Location.Y + 4;
-            nn.Location.Height = 32;
-            nn.Effect = 3;
-        }
-
-        nn.Effect2 = 0;
-        syncLayers_NPC(numNPCs);
-        CheckSectionNPC(numNPCs);
-    }
-    else if(b.Special == 105) // Block contains a Green Yoshi
-    {
-        SoundPause[2] = 2;
-        PlaySound(SFX_ItemEmerge);
-
-        if(!HitDown)
-        {
-            BlockShakeUp(A);
-        }
-        else
-        {
-            BlockShakeDown(A);
-        }
-
-        b.Special = 0;
-
-        //if(!(b.Type == 55))
-        if(b.Type != 55)
-        {
-            b.Type = newBlock;
-            b.Location.Height = BlockHeight[newBlock];
-            b.Location.Width = BlockWidth[newBlock];
-        }
-
-        if(!HitDown)
-        {
-            BlockShakeUp(A);
-        }
-        else
-        {
-            BlockShakeDown(A);
-        }
-
-        numNPCs++;
-        auto &nn = NPC[numNPCs];
-        nn = NPC_t();
-        nn.Active = true;
-        nn.TimeLeft = 100;
-        nn.Type = 96;
-        nn.Special = 95;
-        nn.Direction = 1;
-        nn.Location.Width = NPCWidth[96];
-        nn.Location.X = (b.Location.X + b.Location.Width / 2.0 - nn.Location.Width / 2.0);
-        nn.Location.Y = b.Location.Y - 0.1;
-        nn.Location.SpeedX = 0;
-        nn.Location.SpeedY = 0;
-
-        if(!HitDown)
-        {
-            nn.Location.Height = 32;
-            nn.Location.Y = b.Location.Y - 32;
-            nn.Effect = 0;
-        }
-        else
-        {
-            PlaySound(SFX_ItemEmerge);
-            nn.Location.Y = b.Location.Y + 4;
-            nn.Location.Height = 32;
-            nn.Effect = 3;
-        }
-
-        nn.Effect2 = 0;
-        syncLayers_NPC(numNPCs);
-        CheckSectionNPC(numNPCs);
-    }
-    else if(b.Special == 101) // Block contains a Goomba
-    {
-        if(!HitDown)
-        {
-            BlockShakeUp(A);
-        }
-        else
-        {
-            BlockShakeDown(A);
-        }
-
-        b.Special = 0;
-
-        //if(!(b.Type == 55))
-        if(b.Type != 55)
-        {
-            b.Type = newBlock;
-            b.Location.Height = BlockHeight[newBlock];
-            b.Location.Width = BlockWidth[newBlock];
-        }
-
-        if(!HitDown)
-        {
-            BlockShakeUp(A);
-        }
-        else
-        {
-            BlockShakeDown(A);
-        }
-
-        PlaySound(SFX_ItemEmerge);
-
-        numNPCs++;
-        auto &nn = NPC[numNPCs];
-        nn = NPC_t();
-        nn.Active = true;
-        nn.TimeLeft = 100;
-        nn.Type = 1;
-        nn.Location.Width = NPCWidth[9];
-        nn.Location.X = (b.Location.X + b.Location.Width / 2.0 - nn.Location.Width / 2.0);
-        nn.Location.Y = b.Location.Y - 0.1;
-        nn.Location.SpeedX = 0;
-        nn.Location.SpeedY = 0;
-
-        if(!HitDown)
-        {
-            nn.Location.Y = b.Location.Y - 0.1;
-            nn.Location.Height = 0;
-            nn.Effect = 1;
-        }
-        else
-        {
-            nn.Location.Y = b.Location.Y + 4;
-            nn.Location.Height = 32;
-            nn.Effect = 3;
-        }
-
-        nn.Effect2 = 0;
-        syncLayers_NPC(numNPCs);
-        CheckSectionNPC(numNPCs);
-    }
-    else if(b.Special == 201) // Block contains a 1-up
-    {
-        if(!HitDown)
-        {
-            BlockShakeUp(A);
-        }
-        else
-        {
-            BlockShakeDown(A);
-        }
-
-        b.Special = 0;
-
-        //if(!(b.Type == 55))
-        if(b.Type != 55)
-        {
-            b.Type = newBlock;
-            b.Location.Height = BlockHeight[newBlock];
-            b.Location.Width = BlockWidth[newBlock];
-        }
-
-        if(!HitDown)
-        {
-            BlockShakeUp(A);
-        }
-        else
-        {
-            BlockShakeDown(A);
-        }
-
-        PlaySound(SFX_ItemEmerge);
-        numNPCs++;
-        auto &nn = NPC[numNPCs];
-        nn = NPC_t();
-        nn.Active = true;
-        nn.TimeLeft = 100;
-        nn.Type = 90;
-        nn.Location.Width = NPCWidth[90];
-        nn.Location.X = (b.Location.X + b.Location.Width / 2.0 - nn.Location.Width / 2.0);
-        nn.Location.Y = b.Location.Y - 0.1;
-        nn.Location.SpeedX = 0;
-        nn.Location.SpeedY = 0;
-
-        if(!HitDown)
-        {
-            nn.Location.Y = b.Location.Y - 0.1;
-            nn.Location.Height = 0;
-            nn.Effect = 1;
-        }
-        else
-        {
-            nn.Location.Y = b.Location.Y + 4;
-            nn.Location.Height = 32;
-            nn.Effect = 3;
-        }
-
-        nn.Effect2 = 0;
-        syncLayers_NPC(numNPCs);
-        CheckSectionNPC(numNPCs);
-    }
-#endif
+    // There was a long passage of dead code that handled the (b.Special >= 100 && b.Special < 1000) cases here
+    // No longer needed -- most of these numbers are replaced with normal NPC ID at OpenLevel side in SMBX 1.3, and the others have been added to the above code.
 
     if(PSwitchTime > 0 && newBlock == 89 && b.Special == 0 && oldSpecial > 0)
     {

@@ -473,14 +473,16 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         block.DefaultType = block.Type;
 
         block.Special = int(b.npc_id > 0 ? b.npc_id + 1000 : -1 * b.npc_id);
-        if(block.Special == 100)
-            block.Special = 1009;
-        if(block.Special == 102)
-            block.Special = 1014;
-        if(block.Special == 103)
-            block.Special = 1034;
-        if(block.Special == 105)
-            block.Special = 1095;
+
+        switch(block.Special) // Replace some legacy NPC codes with new
+        {
+        case 100: block.Special = 1009; break;
+        case 102: block.Special = 1014; break;
+        case 103: block.Special = 1034; break;
+        case 105: block.Special = 1095; break;
+        default: break;
+        }
+
         block.DefaultSpecial = block.Special;
 
         block.forceSmashable = false;
