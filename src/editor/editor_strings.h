@@ -200,6 +200,7 @@ struct EditorContent
     std::string eventsPropSound;
     std::string eventsPropEndGame;
     std::string eventsPropControls;
+    std::string eventsPropLayerSmoke;
 
     std::string eventsHeaderTriggerEvent;
 

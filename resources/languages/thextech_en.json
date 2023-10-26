@@ -75,6 +75,7 @@
                 "autostart": "Autostart",
                 "controls": "Controls",
                 "endGame": "End Game",
+                "layerSmoke": "Smoke",
                 "sound": "Sound"
             },
             "sections": {
