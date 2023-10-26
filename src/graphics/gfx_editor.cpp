@@ -507,7 +507,7 @@ void DrawEditorLevel(int Z)
             }
             else
             {
-                if(n.Type == 283 && n.Special > 0)
+                if(n.Type == NPCID_ITEM_BUBBLE && n.Special > 0)
                 {
                     if(NPCWidthGFX[n.Special] == 0)
                     {
@@ -537,7 +537,7 @@ void DrawEditorLevel(int Z)
             }
 
             // render NPC inside container
-            if((CommonFrame % 46) <= 30 && (n.Type == 91 || n.Type == 96)
+            if((CommonFrame % 46) <= 30 && (n.Type == NPCID_ITEM_BURIED || n.Type == NPCID_ITEM_POD)
                 && (n.Special > 0))
             {
                 if(vScreenCollision(Z, n.Location))
@@ -554,10 +554,11 @@ void DrawEditorLevel(int Z)
                         tempLocation.Width = NPCWidthGFX[C];
                     }
 
-                    if(n.Type == 96)
+                    if(n.Type == NPCID_ITEM_POD)
                         tempLocation.Y = n.Location.Y + n.Location.Height - tempLocation.Height;
                     else
                         tempLocation.Y = n.Location.Y;
+
                     tempLocation.X = n.Location.X + n.Location.Width / 2 - tempLocation.Width / 2;
 
                     XRender::renderTexture(vScreen[Z].X + tempLocation.X + NPCFrameOffsetX[C],

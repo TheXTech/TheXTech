@@ -51,9 +51,9 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
     int newBlock = 0; // what the block should turn into if anything
     int C = 0;
 //    int B = 0;
-    Block_t blankBlock;
-    bool tempBool = false;
+    // Block_t blankBlock;
     int oldSpecial = 0; // previous .Special
+    // bool tempBool = false;
     // Location_t tempLocation;
 
     auto &b = Block[A];
@@ -64,6 +64,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
     // if(whatPlayer != 0)
     //     Controls::Rumble(whatPlayer, 10, .1);
 
+    // character switch blocks
     if((b.Type >= 622 && b.Type <= 625) || b.Type == 631)
     {
         if(whatPlayer == 0)
@@ -73,13 +74,13 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
         else
         {
             b.Special = 0;
-            auto tmpNumPlayers = numPlayers;
 
-            for(auto B = 1; B <= tmpNumPlayers; B++)
+            // note: this line was previously inside the below for loop
+            SavedChar[Player[whatPlayer].Character] = Player[whatPlayer];
+
+            // mark characters in current use as unavailable
+            for(auto B = 1; B <= numPlayers; B++)
             {
-                // why is this inside the for loop, seems silly.
-                SavedChar[Player[whatPlayer].Character] = Player[whatPlayer];
-
                 switch(Player[B].Character)
                 {
                 case 1: BlockFrame[622] = 4; break;
@@ -93,19 +94,24 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
 
             if(BlockFrame[b.Type] < 4)
             {
-                // UnDuck whatPlayer
+                // UnDuck whatPlayer // (commented since SMBX64)
 
-                // moved SwapCharacter logic into player.cpp
+                int transform_to = 0;
 
                 switch(b.Type)
                 {
-                case 622: SwapCharacter(whatPlayer, 1, false, true); break;
-                case 623: SwapCharacter(whatPlayer, 2, false, true); break;
-                case 624: SwapCharacter(whatPlayer, 3, false, true); break;
-                case 625: SwapCharacter(whatPlayer, 4, false, true); break;
-                case 631: SwapCharacter(whatPlayer, 5, false, true); break;
+                case 622: transform_to = 1; break;
+                case 623: transform_to = 2; break;
+                case 624: transform_to = 3; break;
+                case 625: transform_to = 4; break;
+                case 631: transform_to = 5; break;
                 default: break;
                 }
+
+                // moved SwapCharacter logic into player.cpp
+
+                if(transform_to)
+                    SwapCharacter(whatPlayer, transform_to, false, true);
 
                 PlaySound(SFX_Transform);
             }
@@ -127,16 +133,21 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
 
     b.Invis = false;
 
+    // check if block with contents is blocked from below, if so cancel hit from above
     if(HitDown && b.Special > 0)
     {
-        tempBool = false; // FIXME: Warning: value stored in `tempBool` is never read
-        auto tmpNumBlocks = numBlock;
-        for(auto B = 1; B <= tmpNumBlocks; B++)
+        // tempBool = false; // unused since SMBX64, must have been replaced with the simple modification of HitDown
+
+        // this is symmetric to the original transformation on the *other* block's location, but much cheaper
+        const auto query_loc = newLoc(b.Location.X + 4, b.Location.Y + 16, b.Location.Width - 8, b.Location.Height);
+
+        for(int B : treeBlockQuery(query_loc, SORTMODE_NONE))
         {
             if(B != A)
             {
                 const auto &bLoc = Block[B].Location;
-                if(CheckCollision(b.Location, newLoc(bLoc.X + 4, bLoc.Y - 16, bLoc.Width - 8, bLoc.Height)))
+                // if(CheckCollision(b.Location, newLoc(bLoc.X + 4, bLoc.Y - 16, bLoc.Width - 8, bLoc.Height)))
+                if(CheckCollision(query_loc, bLoc))
                 {
                     HitDown = false;
                     break;
@@ -145,7 +156,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
         }
     }
 
-    if(b.Special == 1225 || b.Special == 1226 || b.Special == 1227)
+    if(b.Special == 1000 + NPCID_RED_VINE_TOP_S3 || b.Special == 1000 + NPCID_GRN_VINE_TOP_S3 || b.Special == 1000 + NPCID_GRN_VINE_TOP_S4)
         HitDown = false;
 
 
@@ -270,23 +281,27 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
             BlockShakeDown(A);
 
 
+        // chars 2 and 5 make all coins come out at once
         if(whatPlayer > 0 && (Player[whatPlayer].Character == 2 || Player[whatPlayer].Character == 5))
         {
-            tempBool = false;
+            // check if blocked from above
+            bool blocked_above = false;
+            const auto query_loc = newLoc(b.Location.X + 1, b.Location.Y - 31, 30, 30);
 
-            for(auto B = 1; B <= numBlock; B++)
+            for(int B : treeBlockQuery(query_loc, SORTMODE_NONE))
             {
                 if(B != A && !Block[B].Hidden && !(BlockOnlyHitspot1[Block[B].Type] && !BlockIsSizable[Block[B].Type]))
                 {
-                    if(CheckCollision(Block[B].Location, newLoc(b.Location.X + 1, b.Location.Y - 31, 30, 30)))
+                    // if(CheckCollision(Block[B].Location, newLoc(b.Location.X + 1, b.Location.Y - 31, 30, 30)))
+                    if(CheckCollision(Block[B].Location, query_loc))
                     {
-                        tempBool = true;
+                        blocked_above = true;
                         break;
                     }
                 }
             }
 
-            if(!tempBool)
+            if(!blocked_above)
             {
                 for(auto B = 1; B <= b.Special; B++)
                 {
@@ -298,19 +313,19 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
                     nn.TimeLeft = 100;
 
                     if(newBlock == 89)
-                        nn.Type = 33;
+                        nn.Type = NPCID_COIN_S4;
                     else if(newBlock == 192)
-                        nn.Type = 88;
+                        nn.Type = NPCID_COIN_S1;
                     else
-                        nn.Type = 10;
+                        nn.Type = NPCID_COIN_S3;
 
                     if(Player[whatPlayer].Character == 5)
                     {
-                        nn.Type = 251;
+                        nn.Type = NPCID_GEM_1;
                         if(iRand(20) < 3)
-                            nn.Type = 252;
+                            nn.Type = NPCID_GEM_5;
                         if(iRand(60) < 3)
-                            nn.Type = 253;
+                            nn.Type = NPCID_GEM_20;
                         PlaySound(SFX_HeroRupee);
                     }
                     else
@@ -364,21 +379,24 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
         }
         else if(b.RapidHit > 0) // (whatPlayer > 0 And Player(whatPlayer).Character = 3)
         {
-            tempBool = false;
+            // check if anything is blocking from above
+            bool blocked_above = false;
+            const auto query_loc = newLoc(b.Location.X + 1, b.Location.Y - 31, 30, 30);
 
-            for(auto B = 1; B <= numBlock; B++)
+            // use treeBlockQueryWithTemp because this code can be triggered during the period when NPC temp blocks are active
+            for(int B : treeBlockQueryWithTemp(query_loc, SORTMODE_NONE))
             {
                 if(B != A && !Block[B].Hidden && !(BlockOnlyHitspot1[Block[B].Type] && !BlockIsSizable[Block[B].Type]))
                 {
-                    if(CheckCollision(Block[B].Location, newLoc(b.Location.X + 1, b.Location.Y - 31, 30, 30)))
+                    if(CheckCollision(Block[B].Location, query_loc))
                     {
-                        tempBool = true;
+                        blocked_above = true;
                         break;
                     }
                 }
             }
 
-            if(!tempBool)
+            if(!blocked_above)
             {
                 numNPCs++;
                 auto &nn = NPC[numNPCs];
@@ -386,7 +404,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
                 nn.Active = true;
                 nn.TimeLeft = 100;
 
-                // FIXME: This code was already broken by Redigit. It should spawn a coin depending on thematic block
+                // NOTE: This code was already broken by Redigit. It should spawn a coin depending on thematic block
 #if 0 // Useless code, needs a fix. Right now its broken by overriding by constant value
                 if(newBlock == 89)
                 {
@@ -437,7 +455,6 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
                 NewEffect(EFFID_COIN_BLOCK_S3, b.Location);
                 b.Special -= 1;
             }
-
         }
         else
         {
@@ -509,7 +526,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
             b.Type = newBlock;
             b.Location.Height = BlockHeight[newBlock];
 
-            // Doing this check here keeps the easy bonus pickup. -- ds-sloth
+            // Was always set in SMBX64. Doing this check here keeps the easy bonus pickup and prevents movement. -- ds-sloth
             if(!g_compatibility.fix_restored_block_move || !b.getShrinkResized())
                 b.Location.Width = BlockWidth[newBlock];
         }
@@ -600,7 +617,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
 
             CharStuff(numNPCs);
 
-            // note: minor bug, should be NPCWidth[nn.Type]
+            // note: minor SMBX64 bug, should be NPCWidth[nn.Type]
             nn.Location.Width = NPCWidth[C];
 
             // bug from ancient 101 case
@@ -610,7 +627,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
             // Make block a bit smaller to allow player take a bonus easier (Redigit's idea)
             if(!is_ancient && fEqual(b.Location.Width, 32))
             {
-                // make sure Location.Width == 31.9 heuristic works on low-mem builds
+                // set value directly to make sure Location.Width == 31.9 heuristic works on low-mem builds
                 // b.Location.Width -= 0.1;
                 b.Location.Width = 31.9;
 
@@ -664,7 +681,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
                     nn.Location.Y = b.Location.Y - 32;
                     nn.Location.SpeedY = -6;
                     nn.Location.Height = NPCHeight[C];
-                    // PlaySound(SFX_ItemEmerge); // Don't play mushroom sound on leaf, like in original SMB3
+                    // PlaySound(SFX_ItemEmerge); // Don't play mushroom sound on leaf, like in original SMB3 (Redigit's comment)
                 }
                 else
                 {
@@ -704,14 +721,14 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
                 // the logic is the next clause didn't exist in ancient cases
             }
             else if(NPCIsYoshi[nn.Type] ||
-               NPCIsBoot[nn.Type] || nn.Type == 9 ||
-               nn.Type == 14 || nn.Type == 22 ||
-               nn.Type == 90 || nn.Type == 153 ||
-               nn.Type == 169 || nn.Type == 170 ||
-               nn.Type == 182 || nn.Type == 183 ||
-               nn.Type == 184 || nn.Type == 185 ||
-               nn.Type == 186 || nn.Type == 187 ||
-               nn.Type == 188 || nn.Type == 195)
+               NPCIsBoot[nn.Type] || nn.Type == NPCID_POWER_S3 ||
+               nn.Type == NPCID_FIRE_POWER_S3 || nn.Type == NPCID_CANNONITEM ||
+               nn.Type == NPCID_LIFE_S3 || nn.Type == NPCID_POISON ||
+               nn.Type == NPCID_STATUE_POWER || nn.Type == NPCID_HEAVY_POWER ||
+               nn.Type == NPCID_FIRE_POWER_S1 || nn.Type == NPCID_FIRE_POWER_S4 ||
+               nn.Type == NPCID_POWER_S1 || nn.Type == NPCID_POWER_S4 ||
+               nn.Type == NPCID_LIFE_S1 || nn.Type == NPCID_LIFE_S4 ||
+               nn.Type == NPCID_3_LIFE || nn.Type == NPCID_FLIPPED_RAINBOW_SHELL)
             {
                 nn.TimeLeft = Physics.NPCTimeOffScreen * 20;
             }
@@ -752,7 +769,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
         nn = NPC_t();
         nn.Active = true;
         nn.TimeLeft = 1;
-        nn.Type = 33;
+        nn.Type = NPCID_COIN_S4;
         nn.Block = 89;
         nn.Location = b.Location;
         nn.Location.Width = NPCWidth[nn.Type];
@@ -763,13 +780,11 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
         nn.DefaultType = nn.Type;
         syncLayers_NPC(numNPCs);
         CheckSectionNPC(numNPCs);
-        b = blankBlock;
+        b = Block_t();
     }
 
     if(b.Type == 90)
-    {
         BlockHitHard(A);
-    }
 }
 
 void BlockShakeUp(int A)
@@ -1546,15 +1561,15 @@ void PSwitch(bool enabled)
                     nn.TimeLeft = 1;
 
                     if(Block[A].Type == 89)
-                        nn.Type = 33;
+                        nn.Type = NPCID_COIN_S4;
                     else if(Block[A].Type == 188 || Block[A].Type == 60)
-                        nn.Type = 88;
+                        nn.Type = NPCID_COIN_S1;
                     else if(Block[A].Type == 280)
-                        nn.Type = 103;
+                        nn.Type = NPCID_RED_COIN;
                     else if(Block[A].Type == 293)
-                        nn.Type = 138;
+                        nn.Type = NPCID_COIN_S2;
                     else
-                        nn.Type = 10;
+                        nn.Type = NPCID_COIN_S3;
 
                     nn.Layer = Block[A].Layer;
                     nn.TriggerDeath = Block[A].TriggerDeath;
