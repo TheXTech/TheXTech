@@ -33,8 +33,11 @@
 #include "gfx.h"
 #include "load_gfx.h"
 #include "graphics.h" // SuperPrint
+#include "graphics/gfx_frame.h" // FrameBorderInfo, loadFrameInfo
 #include "core/render.h"
 #include "core/events.h"
+
+#include <IniProcessor/ini_processing.h>
 #include <Utils/files.h>
 #include <Utils/dir_list_ci.h>
 #include <DirManager/dirman.h>
@@ -85,6 +88,14 @@ struct GFXBackup_t
 
 static std::vector<GFXBackup_t> g_defaultLevelGfxBackup;
 static std::vector<GFXBackup_t> g_defaultWorldGfxBackup;
+
+struct FrameBorderInfoBackup_t
+{
+    FrameBorderInfo *remote_info = nullptr;
+    FrameBorderInfo info_backup;
+};
+
+static std::vector<FrameBorderInfoBackup_t> g_defaultBorderInfoBackup;
 
 static DirListCI s_dirFallback;
 
@@ -315,6 +326,44 @@ static void loadCGFX(const std::string &origPath,
         else
             g_defaultLevelGfxBackup.push_back(backup);
     }
+}
+
+/* load a single custom border */
+static void loadCBorder(const std::string &origPath,
+    const std::string &fName,
+    bool& isCustom,
+    FrameBorder &border)
+{
+    loadCGFX(origPath, fName, nullptr, nullptr, isCustom, border.tex, false, true);
+
+    // find the frame border info
+    std::string res;
+
+    res = g_dirCustom.resolveFileCaseExistsAbs(fName + ".ini");
+
+    if(res.empty())
+        res = g_dirEpisode.resolveFileCaseExistsAbs(fName + ".ini");
+
+    // attempt to load frame border info
+    if(!res.empty())
+    {
+        // backup the frame border info
+        FrameBorderInfoBackup_t bak;
+        bak.remote_info = &border;
+        bak.info_backup =  border;
+        g_defaultBorderInfoBackup.push_back(bak);
+
+        // load the frame border info
+        IniProcessing ini(res);
+        loadFrameInfo(ini, border);
+    }
+
+    // warn if invalid
+    const FrameBorderInfo& i = border;
+    if(i.le + i.li + i.ri + i.re > border.tex.w)
+        pLogWarning("Invalid border: total internal/external width is %d but texture [%s] is only %dpx wide.", i.le + i.li + i.ri + i.re, fName.c_str(), border.tex.w);
+    if(i.te + i.ti + i.bi + i.be > border.tex.h)
+        pLogWarning("Invalid border: total internal/external height is %d but texture [%s] is only %dpx tall.", i.te + i.ti + i.bi + i.be, fName.c_str(), border.tex.h);
 }
 
 #if defined(PGE_MIN_PORT) || defined(THEXTECH_CLI_BUILD)
@@ -1263,6 +1312,16 @@ void UnloadCustomGFX()
         EffectWidth[A] = EffectDefaults.EffectWidth[A];
         EffectHeight[A] = EffectDefaults.EffectHeight[A];
     }
+
+    // unload custom frame border info
+    for(auto it = g_defaultBorderInfoBackup.rbegin(); it != g_defaultBorderInfoBackup.rend(); ++it)
+    {
+        auto &t = *it;
+
+        if(t.remote_info)
+            *t.remote_info = t.info_backup;
+    }
+    g_defaultBorderInfoBackup.clear();
 
     restoreLevelBackupTextures();
 }

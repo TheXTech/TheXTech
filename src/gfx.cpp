@@ -25,6 +25,7 @@
 #include "gfx.h"
 #include "core/msgbox.h"
 #include "core/render.h"
+#include <IniProcessor/ini_processing.h>
 #include <fmt_format_ne.h>
 #include <Logger/logger.h>
 #if defined(__3DS__) || defined(__SWITCH__) || defined(__WII__) || defined(__WIIU__)
@@ -73,6 +74,25 @@ void GFX_t::loadImage(StdPicture &img, const std::string &path)
     }
 
     m_loadedImages.push_back(&img);
+}
+
+void GFX_t::loadBorder(FrameBorder& border, const std::string& path)
+{
+    loadImage(border.tex, path);
+
+    if(!border.tex.inited)
+        return;
+
+    IniProcessing ini;
+    ini.open(path + ".ini");
+    loadFrameInfo(ini, border);
+
+    // warn if invalid
+    const FrameBorderInfo& i = border;
+    if(i.le + i.li + i.ri + i.re > border.tex.w)
+        pLogWarning("Invalid border: total internal/external width is %d but [%s] is only %dpx wide.", i.le + i.li + i.ri + i.re, path.c_str(), border.tex.w);
+    if(i.te + i.ti + i.bi + i.be > border.tex.h)
+        pLogWarning("Invalid border: total internal/external height is %d but [%s] is only %dpx tall.", i.te + i.ti + i.bi + i.be, path.c_str(), border.tex.h);
 }
 
 GFX_t::GFX_t() noexcept
