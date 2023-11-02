@@ -428,7 +428,7 @@ void DrawInterface(int Z, int numScreens)
 
 enum class MedalDrawLevel
 {
-    Off, Prev, Got, Shiny
+    Off = 0, Prev, Got, Shiny
 };
 
 //! helper function to draw a single medal at a specific top-left position and acquisition level
@@ -436,12 +436,7 @@ static inline void s_DrawMedal(int x, int y, int coin_width, int coin_height, Me
 {
     if(GFX.Medals.inited)
     {
-        if(level == MedalDrawLevel::Shiny || level == MedalDrawLevel::Got)
-            XRender::renderTexture(x, y, coin_width, coin_height, GFX.Medals, coin_width * 2, 0);
-        else if(level == MedalDrawLevel::Prev)
-            XRender::renderTexture(x, y, coin_width, coin_height, GFX.Medals, coin_width * 1, 0);
-        else
-            XRender::renderTexture(x, y, coin_width, coin_height, GFX.Medals, 0, 0);
+        XRender::renderTexture(x, y, coin_width, coin_height, GFX.Medals, coin_width * (int)level, 0);
     }
     else
     {
