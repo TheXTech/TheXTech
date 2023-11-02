@@ -476,7 +476,7 @@ static inline void s_DrawMedal(int x, int y, int coin_width, int coin_height, Me
     }
 }
 
-void DrawMedals(int X, int Y, bool center, uint8_t max, uint8_t prev, uint8_t ckpt, uint8_t got, uint8_t best)
+void DrawMedals(int X, int Y, bool warp, uint8_t max, uint8_t prev, uint8_t ckpt, uint8_t got, uint8_t best)
 {
     if(g_config.medals_show_policy == Config_t::MEDALS_SHOW_OFF)
         return;
@@ -499,14 +499,17 @@ void DrawMedals(int X, int Y, bool center, uint8_t max, uint8_t prev, uint8_t ck
     if(max > 8)
         max = 8;
 
-    // whether to use the shiny effect for medals, check if best is all 1s (up to bit max)
-    bool show_shiny = best == ((1 << max) - 1);
+    // don't spoil the maximum count, make it shiny if all of the discovered medals are shiny
+    bool show_max = g_config.medals_show_policy >= Config_t::MEDALS_SHOW_COUNTS;
+
+    // whether to use the shiny effect for medals; for warps, check if best is all 1s (up to bit max); in HUD, check if best == got
+    bool show_shiny = (warp && show_max) ? (best == ((1 << max) - 1)) : (best == got);
 
     // slot-based display
     if(g_config.medals_show_policy == Config_t::MEDALS_SHOW_FULL)
     {
         // position scene
-        if(center)
+        if(warp)
             X -= ((coin_width * max) / 2) & ~1;
         else
             X -= (coin_width * max);
@@ -558,16 +561,12 @@ void DrawMedals(int X, int Y, bool center, uint8_t max, uint8_t prev, uint8_t ck
     if(g_config.medals_show_policy == Config_t::MEDALS_SHOW_COUNTS)
         label = fmt::format_ne("{0}/{1}", got_count, max);
     else
-    {
         label = fmt::format_ne("{0}", got_count);
-        // don't spoil the maximum count, make it shiny if the user is holding the most they've ever gotten
-        show_shiny = best_count == SDL_max(got_count, prev_count);
-    }
 
     total_len += coin_width + 8 + GFX.Interface[1].w + 4;
     total_len += SuperTextPixLen(label, 3);
 
-    if(center)
+    if(warp)
         X -= (total_len / 2) & ~1;
     else
         X -= total_len;
