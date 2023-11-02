@@ -324,6 +324,13 @@ set(AUDIO_CODECS_BUILD_ARGS
     ${VITA_AUDIOCODECS_CMAKE_FLAGS}
 )
 
+if(WIN32 AND "${TARGET_PROCESSOR}" STREQUAL "i386")
+    # Disable SIMD on 32-bit Windows architecture to allow running on old computers
+    list(APPEND AUDIO_CODECS_BUILD_ARGS
+        -DDISABLE_SIMD=ON
+    )
+endif()
+
 if(USE_SYSTEM_SDL2)
     # Ensure the SAME SDL2 directory will be used
     list(APPEND AUDIO_CODECS_BUILD_ARGS

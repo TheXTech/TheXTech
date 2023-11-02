@@ -2,11 +2,13 @@
     "editor": {
         "block": {
             "canBreak": "Puede romper",
-            "canBreakTooltip": "Legado: Se rompe al ser golpeado",
+            "canBreakTooltip": "Legado: se rompe cuando se golpea",
             "inside": "Tiene:",
             "invis": "Invis",
             "slick": "Resbala",
-            "pickContents": "Elegir contenido del bloque"
+            "pickContents": "Elegir contenido del bloque",
+            "letterHeight": "alt. ",
+            "letterWidth": "anch. "
         },
         "browser": {
             "askOverwriteFile": "Sobreescribir {0}?",
@@ -28,7 +30,7 @@
                 "death": "NPC muere",
                 "destroy": "Bloque es destruido",
                 "hit": "Bloque es golpeado",
-                "phraseTriggersWhenTemplate": "{0} se activa cuando {1}",
+                "phraseTriggersWhenTemplate": "{0} desencadena cuando {1}",
                 "talk": "Jugador habla a NPC",
                 "phraseTriggersAfterTemplate": "{0} se activa {1} ms después del evento {2}",
                 "activate": "NPC entra en la pantalla",
