@@ -25,10 +25,11 @@
 #include "gfx.h"
 #include "core/msgbox.h"
 #include "core/render.h"
+#include "graphics/gfx_frame.h"
+
+#include <IniProcessor/ini_processing.h>
 #include <fmt_format_ne.h>
 #include <Logger/logger.h>
-#include <IniProcessor/ini_processing.h>
-#include "graphics/gfx_frame.h"
 
 #if defined(__SWITCH__) || defined(__WII__)
 #   include <Utils/files.h>
@@ -71,6 +72,25 @@ void GFX_t::loadImage(StdPicture &img, const std::string &path)
     }
 
     m_loadedImages.push_back(&img);
+}
+
+void GFX_t::loadBorder(FrameBorder& border, const std::string& path)
+{
+    loadImage(border.tex, path);
+
+    if(!border.tex.inited)
+        return;
+
+    IniProcessing ini;
+    ini.open(path + ".ini");
+    loadFrameInfo(ini, border);
+
+    // warn if invalid
+    const FrameBorderInfo& i = border;
+    if(i.le + i.li + i.ri + i.re > border.tex.w)
+        pLogWarning("Invalid border: total internal/external width is %d but [%s] is only %dpx wide.", i.le + i.li + i.ri + i.re, path.c_str(), border.tex.w);
+    if(i.te + i.ti + i.bi + i.be > border.tex.h)
+        pLogWarning("Invalid border: total internal/external height is %d but [%s] is only %dpx tall.", i.te + i.ti + i.bi + i.be, path.c_str(), border.tex.h);
 }
 
 GFX_t::GFX_t() noexcept
@@ -178,21 +198,7 @@ bool GFX_t::load()
     }
 
     loadImage(Backdrop, uiPath + "Backdrop");
-    loadImage(Backdrop_Border, uiPath + "Backdrop_Border");
-
-    IniProcessing ini;
-    ini.open(uiPath + "Backdrop_Border.ini");
-    loadFrameInfo(ini, g_backdropBorderInfo);
-
-    if(Backdrop_Border.inited)
-    {
-        // warn if invalid
-        const FrameBorderInfo& i = g_backdropBorderInfo;
-        if(i.le + i.li + i.ri + i.re > Backdrop_Border.w)
-            pLogWarning("Invalid border: total internal/external width is %d but Backdrop_Border.png is only %dpx wide.", i.le + i.li + i.ri + i.re, Backdrop_Border.w);
-        if(i.te + i.ti + i.bi + i.be > Backdrop_Border.h)
-            pLogWarning("Invalid border: total internal/external height is %d but Backdrop_Border.png is only %dpx wide.", i.te + i.ti + i.bi + i.be, Backdrop_Border.h);
-    }
+    loadBorder(Backdrop_Border, uiPath + "Backdrop_Border");
 
     if(m_loadErrors > 0)
     {
@@ -201,20 +207,7 @@ bool GFX_t::load()
     }
 
     loadImage(WorldMapFrame_Tile, uiPath + "WorldMapFrame_Tile");
-    loadImage(WorldMapFrame_Border, uiPath + "WorldMapFrame_Border");
-
-    ini.open(uiPath + "WorldMapFrame_Border.ini");
-    loadFrameInfo(ini, g_worldMapFrameBorderInfo);
-
-    if(WorldMapFrame_Border.inited)
-    {
-        // warn if invalid
-        const FrameBorderInfo& i = g_worldMapFrameBorderInfo;
-        if(i.le + i.li + i.ri + i.re > WorldMapFrame_Border.w)
-            pLogWarning("Invalid border: total internal/external width is %d but WorldMapFrame_Border.png is only %dpx wide.", i.le + i.li + i.ri + i.re, WorldMapFrame_Border.w);
-        if(i.te + i.ti + i.bi + i.be > WorldMapFrame_Border.h)
-            pLogWarning("Invalid border: total internal/external height is %d but WorldMapFrame_Border.png is only %dpx wide.", i.te + i.ti + i.bi + i.be, WorldMapFrame_Border.h);
-    }
+    loadBorder(WorldMapFrame_Border, uiPath + "WorldMapFrame_Border");
 
     if(m_loadErrors > 0)
     {

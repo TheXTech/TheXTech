@@ -28,28 +28,35 @@
 struct FrameBorderInfo
 {
 	// top, left, bottom, and right, external and internal
-	int te = 2;
-	int ti = 18;
-	int le = 2;
-	int li = 18;
-	int be = 18;
+	int te = 0;
+	int ti = 0;
+	int le = 0;
+	int li = 0;
+	int be = 0;
 	int bi = 0;
-	int re = 18;
+	int re = 0;
 	int ri = 0;
+};
+
+struct FrameBorder : public FrameBorderInfo
+{
+	StdPicture tex;
 };
 
 class IniProcessing;
 
-void loadFrameInfo(IniProcessing& ini, FrameBorderInfo& info);
+void loadFrameInfo(IniProcessing& ini, FrameBorderInfo& borderinfo);
 
 void DrawTextureTiled(int dst_x, int dst_y, int dst_w, int dst_h, StdPicture& tx, int src_x = 0, int src_y = 0, int src_w = -1, int src_h = -1, int off_x = -1, int off_y = -1, float alpha = 1.f);
 
-// renders a new-style frame with the included external and internal locations
-// border and borderinfo are nullable
-void RenderFrame(const Location_t& external, const Location_t& internal,
-	StdPicture& tile, StdPicture* border, const FrameBorderInfo* borderinfo);
+// renders a new-style frame as a border with the included external and internal locations
+// the frame fills the space between external and internal
+// border is nullable
+void RenderFrameBorder(const Location_t& external, const Location_t& internal,
+	StdPicture& tile, FrameBorder* border);
 
-extern FrameBorderInfo g_backdropBorderInfo;
-extern FrameBorderInfo g_worldMapFrameBorderInfo;
+// renders a new-style frame as a fill at the included internal location
+// the frame fills the internal rect
+void RenderFrameFill(const Location_t& internal, FrameBorder& frame);
 
 #endif // GFX_FRAME_H

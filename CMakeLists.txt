@@ -660,6 +660,7 @@ set(THEXTECH_SRC
     src/graphics/gfx_special_frames.cpp
     src/graphics/gfx_screen.cpp
     src/graphics/gfx_keyhole.cpp
+    src/graphics/gfx_frame.cpp
     src/control/duplicate.cpp
     src/control/controls.cpp
     src/script/msg_preprocessor.cpp

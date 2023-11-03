@@ -628,10 +628,10 @@ void UpdateGraphics2(bool skipRepaint)
 //        XRender::renderTexture(0, 0, 800, 130, GFX.Interface[4], 0, 0);
         if(worldHasFrameAssets())
         {
-            bool border_valid = GFX.WorldMapFrame_Border.inited && (!GFX.isCustom(69) || GFX.isCustom(70));
+            bool border_valid = GFX.WorldMapFrame_Border.tex.inited && (!GFX.isCustom(69) || GFX.isCustom(70));
 
-            RenderFrame(newLoc(0, 0, ScreenW, ScreenH), newLoc(vScreen[Z].ScreenLeft, vScreen[Z].ScreenTop, vScreen[Z].Width, vScreen[Z].Height),
-                GFX.WorldMapFrame_Tile, border_valid ? &GFX.WorldMapFrame_Border : nullptr, &g_worldMapFrameBorderInfo);
+            RenderFrameBorder(newLoc(0, 0, ScreenW, ScreenH), newLoc(vScreen[Z].ScreenLeft, vScreen[Z].ScreenTop, vScreen[Z].Width, vScreen[Z].Height),
+                GFX.WorldMapFrame_Tile, border_valid ? &GFX.WorldMapFrame_Border : nullptr);
         }
         else
         {

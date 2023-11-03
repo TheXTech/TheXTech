@@ -22,10 +22,12 @@
 #ifndef GFX_H
 #define GFX_H
 
-#include "range_arr.hpp"
-#include "std_picture.h"
 #include <vector>
 #include <string>
+
+#include "range_arr.hpp"
+#include "std_picture.h"
+#include "graphics/gfx_frame.h"
 
 /*!
  * \brief Holder of commonly-used textures such as interface, font, etc.
@@ -42,9 +44,16 @@ class GFX_t
     /*!
      * \brief Internal function of the texture loading
      * \param img Target texture
-     * \param path Path to the texture file
+     * \param path Path to the texture file (excluding extension)
      */
     void loadImage(StdPicture &img, const std::string &path);
+
+    /*!
+     * \brief Internal function to load a frame border including its texture
+     * \param border Target border to load
+     * \param path Path to texture file (excluding extension); border info will not include extension either
+     */
+    void loadBorder(FrameBorder& border, const std::string& path);
 
     //! Counter of loading errors
     int m_loadErrors = 0;
@@ -80,9 +89,9 @@ public:
     StdPicture EIcons;
     StdPicture PCursor;
     StdPicture Backdrop;
-    StdPicture Backdrop_Border;
+    FrameBorder Backdrop_Border;
     StdPicture WorldMapFrame_Tile; // WorldMapFrame_Tile is 70
-    StdPicture WorldMapFrame_Border;
+    FrameBorder WorldMapFrame_Border;
     StdPicture Camera;
 
     bool &isCustom(size_t i);
