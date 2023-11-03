@@ -75,7 +75,8 @@
                 "autostart": "进入关卡时启动",
                 "controls": "按键",
                 "endGame": "游戏通关",
-                "sound": "音效"
+                "sound": "音效",
+                "layerSmoke": "图层烟雾效果"
             },
             "sections": {
                 "actionKeep": "当前",

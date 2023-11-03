@@ -26,6 +26,14 @@
 
 #include <SDL2/SDL_stdinc.h>
 
+#ifdef _MSC_VER
+// Workaround for MSVC where SDL_sscanf fails to parse a string
+// See details: https://github.com/libsdl-org/SDL/issues/8423
+#   define XTECH_sscanf sscanf
+#else
+#   define XTECH_sscanf SDL_sscanf
+#endif
+
 #else
 
 #include "null/sdl_null.h"

@@ -42,6 +42,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import javautil.FileUtils;
 
@@ -51,8 +52,11 @@ public class Launcher extends AppCompatActivity
     final String LOG_TAG = "TheXTech";
     public static final int READWRITE_PERMISSION_FOR_GAME = 1;
     public static final int READWRITE_PERMISSION_FOR_GAME_BY_INTENT = 2;
+    public static final int READWRITE_PERMISSION_FOR_ADD_DIRECTORY = 3;
     private Context m_context = null;
     private String filePathToOpen;
+    private String filePathToEdit;
+    private boolean editRequested = false;
 
     /* ============ Animated background code ============ */
     private int m_bgAnimatorFrames = 1;
@@ -93,6 +97,7 @@ public class Launcher extends AppCompatActivity
         setContentView(R.layout.activity_launcher);
         initUiSetup();
         filePathToOpen = "";
+        filePathToEdit = "";
         handleFileIntent();
     }
 
@@ -179,7 +184,7 @@ public class Launcher extends AppCompatActivity
 
                         if(id == MENU_ADD)
                         {
-                            if(checkFilePermissions(READWRITE_PERMISSION_FOR_GAME) || !hasManageAppFS())
+                            if(checkFilePermissions(READWRITE_PERMISSION_FOR_ADD_DIRECTORY) || !hasManageAppFS())
                                 return false;
                             GameSettings.selectAssetsPath(Launcher.this, Launcher.this);
                         }
@@ -241,6 +246,8 @@ public class Launcher extends AppCompatActivity
 
             FileUtils utils = new FileUtils(this.m_context);
             filePathToOpen = utils.getPath(intent.getData());
+
+            editRequested = Objects.equals(intent.getAction(), Intent.ACTION_EDIT);
 
             Log.d(LOG_TAG, "Got a file: " + filePathToOpen + ";");
 
@@ -514,8 +521,16 @@ public class Launcher extends AppCompatActivity
         if(!hasManageAppFS())
             return;
 
-        if(requestCode == READWRITE_PERMISSION_FOR_GAME)
+        switch(requestCode)
+        {
+        case READWRITE_PERMISSION_FOR_GAME:
             tryStartGame(m_context);
+            break;
+
+        case READWRITE_PERMISSION_FOR_ADD_DIRECTORY:
+            GameSettings.selectAssetsPath(Launcher.this, Launcher.this);
+            break;
+        }
     }
 
     public void startGame()
@@ -523,6 +538,9 @@ public class Launcher extends AppCompatActivity
         Intent myIntent = new Intent(Launcher.this, thextechActivity.class);
         if(!filePathToOpen.isEmpty())
             myIntent.putExtra("do-open-file", filePathToOpen);
+
+        if(editRequested)
+            myIntent.putExtra("edit-requested", true);
 
 //        myIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
 //        myIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);

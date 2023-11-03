@@ -1684,7 +1684,8 @@ AutocodeType Autocode::EnumerizeCommand(char *wbuf, int lineNumber)
     {
         char command[100];
         SDL_memset(command, 0, 100 * sizeof(char));
-        int success = SDL_sscanf(wbuf, " %99[^,] ,", command);
+
+        int success = XTECH_sscanf(wbuf, " %99[^,] ,", command);
         if(!success)
         {
             // Bad or mistyped command?

@@ -628,6 +628,7 @@ XTechTranslate::XTechTranslate()
         {"editor.events.props.sound",         &g_editorStrings.eventsPropSound},
         {"editor.events.props.endGame",       &g_editorStrings.eventsPropEndGame},
         {"editor.events.props.controls",      &g_editorStrings.eventsPropControls},
+        {"editor.events.props.layerSmoke",    &g_editorStrings.eventsPropLayerSmoke},
 
         {"editor.events.headerTriggerEvent",  &g_editorStrings.eventsHeaderTriggerEvent},
 

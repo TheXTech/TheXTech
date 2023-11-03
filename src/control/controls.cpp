@@ -870,53 +870,49 @@ bool Update(bool check_lost_devices)
     for(int i = 0; i < numPlayers && i < maxLocalPlayers; i++)
         speedRun_syncControlKeys(i, Player[i + 1].Controls);
 
-    // resolve invalid states
+    // resolve invalid states and override players without controls
     For(B, 1, numPlayers)
     {
-        int A;
+        // erase for non-existant players during main menu and outro
+        if((GameMenu || GameOutro) && B > (int)g_InputMethods.size())
+            Player[B].Controls = blankControls;
 
         // override in ClonedPlayerMode and SingleCoop mode (slightly different from original case which checked if numPlayers != 2)
-        if(g_ClonedPlayerMode || SingleCoop)
-            A = 1;
-        else
-            A = B;
-
-        // With Player(A).Controls
+        if((g_ClonedPlayerMode || SingleCoop) && B > 1)
         {
-            auto& p = Player[A];
-            Controls_t& c = p.Controls;
-
-            if(!c.Start && !c.Jump)
-                p.UnStart = true;
-
-            if(c.Up && c.Down)
-            {
-                c.Up = false;
-                c.Down = false;
-            }
-
-            if(c.Left && c.Right)
-            {
-                c.Left = false;
-                c.Right = false;
-            }
-
-            if(!(p.State == 5 && p.Mount == 0) && c.AltRun)
-                c.Run = true;
-
-            if(ForcedControls && GamePaused == PauseCode::None)
-                c = ForcedControl;
-
             // new location for cloned player code ("superbdemo128", was misplaced in ClownCar previously)
-            if(A != B)
-            {
-                Player[B].Controls = c;
+            Player[B].Controls = Player[1].Controls;
 
-                // allow pausing in SingleCoop
-                if(SingleCoop)
-                    Player[B].UnStart |= Player[A].UnStart;
-            }
-        } // End With
+            // allow pausing in SingleCoop
+            if(SingleCoop)
+                Player[B].UnStart |= Player[1].UnStart;
+
+            continue;
+        }
+
+        auto& p = Player[B];
+        Controls_t& c = p.Controls;
+
+        if(!c.Start && !c.Jump)
+            p.UnStart = true;
+
+        if(c.Up && c.Down)
+        {
+            c.Up = false;
+            c.Down = false;
+        }
+
+        if(c.Left && c.Right)
+        {
+            c.Left = false;
+            c.Right = false;
+        }
+
+        if(!(p.State == 5 && p.Mount == 0) && c.AltRun)
+            c.Run = true;
+
+        if(ForcedControls && GamePaused == PauseCode::None)
+            c = ForcedControl;
     }
 
     // single coop code -- may want to revise

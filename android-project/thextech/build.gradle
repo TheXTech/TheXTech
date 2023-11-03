@@ -91,7 +91,7 @@ def xTechVersionNumber = (verNum[0] * 1000000) + (verNum[1] * 10000) + (verNum[2
 println "Project version: " + xTechVersionString + ", version code: " + xTechVersionNumber.toString()
 
 android {
-    compileSdkVersion 33
+    compileSdk 34
 
     // Note: The NDK 23 is SIGNIFICANTLY important, because of the support for non-NEON and older Android versions
     //       The NDK 24 removes the support for Android 4.1, 4.2, and 4.3.
@@ -104,7 +104,7 @@ android {
         }
 
         minSdkVersion 16
-        targetSdkVersion 33
+        targetSdkVersion 34
 
         versionName xTechVersionString
         versionCode xTechVersionNumber
@@ -146,6 +146,25 @@ android {
             versionNameSuffix '-DEVDEBUG'
         }
     }
+
+    flavorDimensions = ["default"]
+    productFlavors {
+        apk {}
+        fdroid {
+            if(project.hasProperty('applicationIdSuffix')) {
+                applicationIdSuffix += '.fdroid'
+            } else {
+                applicationIdSuffix = '.fdroid'
+            }
+
+            if(project.hasProperty('versionNameSuffix')) {
+                versionNameSuffix += '-FDROID'
+            } else {
+                versionNameSuffix = '-FDROID'
+            }
+        }
+    }
+
     lint {
         abortOnError false
     }
@@ -191,11 +210,11 @@ dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'jniLibs')
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
-    def lifecycle_version = "2.6.1"
+    def lifecycle_version = "2.6.2"
     implementation "androidx.lifecycle:lifecycle-viewmodel:$lifecycle_version"
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version"
-    implementation 'com.google.android.material:material:1.9.0'
-    implementation 'androidx.preference:preference:1.2.0'
+    implementation 'com.google.android.material:material:1.10.0'
+    implementation 'androidx.preference:preference:1.2.1'
     constraints {
         // Workaround to fix the build: https://dev.to/retyui/fix-react-native-android-builds-duplicate-class-kotlincollections-found-in-modules-jetified-kotlin-stdlib-180-2ca7
         implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.0") {

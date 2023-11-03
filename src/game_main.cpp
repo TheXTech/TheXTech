@@ -237,6 +237,9 @@ int GameMain(const CmdLineSetup_t &setup)
     //        DoEvents
     //    Loop While StartMenu = False 'wait until the player clicks a button
 
+    // Set global SMBX64 behaviour at PGE-FL
+    FileFormats::SetSMBX64LvlFlags(FileFormats::F_SMBX64_KEEP_LEGACY_NPC_IN_BLOCK_CODES);
+
     initOutroContent();
     initMainMenu();
     initEditorStrings();
