@@ -2490,7 +2490,7 @@ void UpdateNPCs()
                                                         if(BlockIsSizable[Block[B].Type] && HitSpot != 1)
                                                             HitSpot = 0;
 
-                                                        if(BlockIsSizable[Block[B].Type] || BlockOnlyHitspot1[Block[B].Type])
+                                                        if(BlockIsSizable[Block[B].Type] || (BlockOnlyHitspot1[Block[B].Type] && BlockSlope[Block[B].Type] == 0))
                                                         {
                                                             if(HitSpot != 1 || (NPCIsAParaTroopa[NPC[A].Type] && NPC[A].Special != 1))
                                                                 HitSpot = 0;
