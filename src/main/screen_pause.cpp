@@ -110,6 +110,13 @@ static bool s_ResetCheckpoints()
 
 static bool s_DropAddScreen()
 {
+    // don't allow Drop / Add screen in clone mode
+    if(g_ClonedPlayerMode || SingleCoop)
+    {
+        PlaySoundMenu(SFX_BlockHit);
+        return false;
+    }
+
     if(PauseGame(PauseCode::DropAdd, 0) == 1)
         return true;
 
@@ -369,11 +376,7 @@ bool Logic(int plr)
     bool menuDoPress = SharedControls.MenuDo || SharedControls.Pause;
     bool menuBackPress = SharedControls.MenuBack;
 
-    if(SingleCoop > 0 || numPlayers > 2)
-    {
-        for(int A = 1; A <= numPlayers; A++)
-            Player[A].Controls = Player[1].Controls;
-    }
+    // there was previously code to copy all players' controls from the main player, but this is no longer necessary (and actively harmful in the SingleCoop case)
 
     if(!g_compatibility.multiplayer_pause_controls && plr == 0)
         plr = 1;

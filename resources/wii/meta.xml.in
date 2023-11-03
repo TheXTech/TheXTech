@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<app version="1">
+	<name>TheXTech</name>
+	<coder>Wohlstand and ds-sloth</coder>
+	<version>@THEXTECH_VERSION_STRING@</version>
+	<release_date>@XTECH_WIIMETA_RELEASE_DATE@</release_date>
+	<short_description>The platforming game engine.</short_description>
+	<long_description>This is the free and open-source game engine for Mario-like platforming games. This is a complete and extended source code port of the Super Mario Bros. X 1.3 game engine (later just "SMBX") (originally developed by Andrew Spinks in 2009), and its direct unofficial continuation after development halted in the 2011th year.
+
+https://wohlsoft.ru/projects/TheXTech/
+https://github.com/Wohlstand/TheXTech
+</long_description>
+	<no_ios_reload/>
+</app>

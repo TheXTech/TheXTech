@@ -33,12 +33,6 @@ set(MIXER_USE_OGG_VORBIS_FILE OFF)
 set(MIXER_USE_OGG_VORBIS_STB ON)
 set(MIXER_USE_OGG_VORBIS_TREMOR OFF)
 
-if(NINTENDO_3DS)
-    set(MIXER_USE_OGG_VORBIS_FILE OFF)
-    set(MIXER_USE_OGG_VORBIS_STB OFF)
-    set(MIXER_USE_OGG_VORBIS_TREMOR ON)
-endif()
-
 #if(WIN32)
 #    if(MSVC)
 #        set(SDL_MixerX_SO_Lib "${DEPENDENCIES_INSTALL_DIR}/lib/${CMAKE_SHARED_LIBRARY_PREFIX}SDL2_mixer_ext${PGE_LIBS_DEBUG_SUFFIX}.lib")
@@ -329,6 +323,13 @@ set(AUDIO_CODECS_BUILD_ARGS
     ${VITA_CMAKE_FLAGS}
     ${VITA_AUDIOCODECS_CMAKE_FLAGS}
 )
+
+if(WIN32 AND "${TARGET_PROCESSOR}" STREQUAL "i386")
+    # Disable SIMD on 32-bit Windows architecture to allow running on old computers
+    list(APPEND AUDIO_CODECS_BUILD_ARGS
+        -DDISABLE_SIMD=ON
+    )
+endif()
 
 if(USE_SYSTEM_SDL2)
     # Ensure the SAME SDL2 directory will be used

@@ -870,55 +870,55 @@ bool Update(bool check_lost_devices)
     for(int i = 0; i < numPlayers && i < maxLocalPlayers; i++)
         speedRun_syncControlKeys(i, Player[i + 1].Controls);
 
-    // resolve invalid states
+    // resolve invalid states and override players without controls
     For(B, 1, numPlayers)
     {
-        int A;
+        // erase for non-existant players during main menu and outro
+        if((GameMenu || GameOutro) && B > (int)g_InputMethods.size())
+            Player[B].Controls = blankControls;
 
-        // if there is/was an input method bound to the player,
-        //   let them control themselves.
-        //   (same in spirit as old B == 2 && numPlayers == 2 case)
-        if(B - 1 < (int)g_InputMethods.size())
-            A = B;
-        else // otherwise, let Player 1 control them (blank controls later for SingleCoop)
-            A = 1;
-
-        // With Player(A).Controls
+        // override in ClonedPlayerMode and SingleCoop mode (slightly different from original case which checked if numPlayers != 2)
+        if((g_ClonedPlayerMode || SingleCoop) && B > 1)
         {
-            auto& p = Player[A];
-            Controls_t& c = p.Controls;
+            // new location for cloned player code ("superbdemo128", was misplaced in ClownCar previously)
+            Player[B].Controls = Player[1].Controls;
 
-            if(!c.Start && !c.Jump)
-                p.UnStart = true;
+            // allow pausing in SingleCoop
+            if(SingleCoop)
+                Player[B].UnStart |= Player[1].UnStart;
 
-            if(c.Up && c.Down)
-            {
-                c.Up = false;
-                c.Down = false;
-            }
+            continue;
+        }
 
-            if(c.Left && c.Right)
-            {
-                c.Left = false;
-                c.Right = false;
-            }
+        auto& p = Player[B];
+        Controls_t& c = p.Controls;
 
-            if(!(p.State == 5 && p.Mount == 0) && c.AltRun)
-                c.Run = true;
+        if(!c.Start && !c.Jump)
+            p.UnStart = true;
 
-            if(ForcedControls && GamePaused == PauseCode::None)
-                c = ForcedControl;
+        if(c.Up && c.Down)
+        {
+            c.Up = false;
+            c.Down = false;
+        }
 
-            // new location for multi-mario (SingleCoop, "supermario128") code
-            if(A != B)
-                Player[B].Controls = c;
-        } // End With
+        if(c.Left && c.Right)
+        {
+            c.Left = false;
+            c.Right = false;
+        }
+
+        if(!(p.State == 5 && p.Mount == 0) && c.AltRun)
+            c.Run = true;
+
+        if(ForcedControls && GamePaused == PauseCode::None)
+            c = ForcedControl;
     }
 
     // single coop code -- may want to revise
     if(SingleCoop > 0)
     {
-        if(numPlayers == 1 || numPlayers > 2)
+        if(numPlayers == 1 || g_ClonedPlayerMode)
             SingleCoop = 0;
 
         if(SingleCoop == 1)
@@ -937,7 +937,8 @@ bool Update(bool check_lost_devices)
         }
     }
 
-    if(((int)g_InputMethods.size() < numPlayers) && (numPlayers <= maxLocalPlayers)
+    // indicate if some control slots are missing
+    if(((int)g_InputMethods.size() < numPlayers) && !g_ClonedPlayerMode
        && !SingleCoop && !GameMenu && !Record::replay_file && check_lost_devices)
     {
         // fill with nullptrs

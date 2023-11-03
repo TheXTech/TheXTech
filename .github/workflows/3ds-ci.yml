@@ -115,6 +115,7 @@ jobs:
         mkdir "package/${{ matrix.config.subdir_name }}"
         cp ../changelog.txt "package/${{ matrix.config.subdir_name }}/"
         cp ../LICENSE "package/${{ matrix.config.subdir_name }}/License.TheXTech.txt"
+        cat ../docs/README_3DS.md ../README.md >> "package/${{ matrix.config.subdir_name }}/README.md"
         cp thextech.3dsx "package/${{ matrix.config.subdir_name }}/"
         cd package
         zip -9 -r "thextech-3ds-${BRANCH_NAME_RES}.zip" "${{ matrix.config.subdir_name }}"

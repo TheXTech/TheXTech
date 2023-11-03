@@ -103,6 +103,36 @@ constexpr auto LESet_ResetDefault = EventSection_t::LESet_ResetDefault;
 constexpr int e_ScreenW = 640;
 constexpr int e_ScreenH = 480;
 
+static const std::vector<std::string> c_musicFormats =
+{
+    // MPEG 1 Layer III (LibMAD)
+    ".mp3",
+
+    // OGG Vorbis, FLAC, amd Opus (LibOGG, LibVorbis, LibFLAC, libOpus)
+    ".ogg", ".flac", ".opus",
+
+    // Uncompressed audio data
+    ".wav", ".aiff",
+
+    // MIDI
+    ".mid", ".midi", ".rmi", ".mus", ".kar", ".xmi", ".cmf",
+
+    // Id Music File (OPL2 raw) / Imago Orpheus (Tracker music)
+    ".imf", ".wlf",
+
+    // Modules (Tracker music)
+    ".mod", ".it", ".s3m", ".669", ".med", ".xm", ".amf",
+    ".apun", ".dsm", ".far", ".gdm", ".mtm",
+    ".okt", ".stm", ".stx", ".ult", ".uni", ".mptm",
+
+    // GAME EMU (Chiptunes)
+    ".ay", ".gbs", ".gym", ".hes", ".kss", ".nsf",
+    ".nsfe", ".sap", ".spc", ".vgm", ".vgz",
+
+    // PXTONE
+    ".pttune", ".ptcop"
+};
+
 int e_CursorX, e_CursorY;
 
 void DisableCursorNew()
@@ -1475,12 +1505,19 @@ void EditorScreen::UpdateEventSettingsScreen(CallMode mode)
 
     if(layer_line == 1)
     {
-        SuperPrintR(mode, g_editorStrings.layersHeader, 3, e_ScreenW - 200, 40);
+        SuperPrintR(mode, g_editorStrings.layersHeader, 3, e_ScreenW - 192, 40);
         SuperPrintR(mode, g_mainMenu.caseNone, 3, e_ScreenW - 200, 40 + (20 * layer_line));
+
+        Events[m_current_event].LayerSmoke = false;
     }
     else
     {
-        SuperPrintR(mode, g_editorStrings.layersHeader, 3, e_ScreenW - 200, 50);
+        SuperPrintR(mode, g_editorStrings.layersHeader, 3, e_ScreenW - 192, 50);
+
+        // layer smoke (bottom of layers pane)
+        SuperPrintR(mode, g_editorStrings.eventsPropLayerSmoke, 3, e_ScreenW - 192, 40 + (20 * layer_line) + 30);
+        if(UpdateCheckBox(mode, e_ScreenW - 240 + 4, 40 + (20 * layer_line) + 24, !Events[m_current_event].LayerSmoke))
+            Events[m_current_event].LayerSmoke = !Events[m_current_event].LayerSmoke;
     }
 
     if(UpdateButton(mode, e_ScreenW - 240 + 4, 40 + 4, GFX.EIcons, false, 0, 32*Icon::subscreen, 32, 32))
@@ -1640,19 +1677,22 @@ void EditorScreen::UpdateEventSettingsScreen(CallMode mode)
             m_special_page = SPECIAL_PAGE_EVENT_BOUNDS;
     }
 
-    // autostart
+    // autostart (top left)
     SuperPrintR(mode, g_editorStrings.eventsPropAutostart, 3, 54, 90);
     if(UpdateCheckBox(mode, 10 + 4, 80 + 4, Events[m_current_event].AutoStart))
         Events[m_current_event].AutoStart = !Events[m_current_event].AutoStart;
-    // sound
+
+    // sound (top right)
     SuperPrintR(mode, g_editorStrings.eventsPropSound, 3, 254, 90);
     if(UpdateButton(mode, 210 + 4, 80 + 4, GFX.EIcons, Events[m_current_event].Sound != 0, 0, 32*Icon::subscreen, 32, 32))
         m_special_page = SPECIAL_PAGE_EVENT_SOUND;
-    // end game
+
+    // end game (mid left)
     SuperPrintR(mode, g_editorStrings.eventsPropEndGame, 3, 54, 130);
     if(UpdateCheckBox(mode, 10 + 4, 120 + 4, Events[m_current_event].EndGame == 1))
         Events[m_current_event].EndGame ^= 1;
-    // control lock
+
+    // control lock (mid right)
     bool controls_set = (Events[m_current_event].Controls.AltJump ||
         Events[m_current_event].Controls.AltRun ||
         Events[m_current_event].Controls.Down ||
@@ -1667,7 +1707,7 @@ void EditorScreen::UpdateEventSettingsScreen(CallMode mode)
     if(UpdateButton(mode, 210 + 4, 120 + 4, GFX.EIcons, controls_set, 0, 32*Icon::subscreen, 32, 32))
         m_special_page = SPECIAL_PAGE_EVENT_CONTROLS;
 
-    // message
+    // message (bottom left)
     if(!GetS(Events[m_current_event].Text).empty())
     {
         MessageText = GetS(Events[m_current_event].Text);
@@ -1682,7 +1722,7 @@ void EditorScreen::UpdateEventSettingsScreen(CallMode mode)
         MouseMove(SharedCursor.X, SharedCursor.Y);
     }
 
-    // trigger event
+    // trigger event (full width, below all)
     SuperPrintR(mode, g_editorStrings.eventsHeaderTriggerEvent, 3, 54, 220);
     if(UpdateButton(mode, 10 + 4, 220 + 4, GFX.EIcons, false, 0, 32*Icon::subscreen, 32, 32))
         m_special_page = SPECIAL_PAGE_EVENT_TRIGGER;
@@ -1785,7 +1825,7 @@ void EditorScreen::UpdateSectionsScreen(CallMode mode)
         }
 
         if(UpdateButton(mode, 330 + 4, 280 + 4, GFX.EIcons, false, 0, 32*Icon::open, 32, 32))
-            StartFileBrowser(&CustomMusic[curSection], FileNamePath, "", {".mp3", ".ogg", ".spc", ".vgm"}, BROWSER_MODE_OPEN, BROWSER_CALLBACK_CUSTOM_MUSIC);
+            StartFileBrowser(&CustomMusic[curSection], FileNamePath, "", c_musicFormats, BROWSER_MODE_OPEN, BROWSER_CALLBACK_CUSTOM_MUSIC);
     }
 
     // background

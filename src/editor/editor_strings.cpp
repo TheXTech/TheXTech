@@ -197,6 +197,7 @@ void initEditorStrings()
     g_editorStrings.eventsPropSound = "Sound";
     g_editorStrings.eventsPropEndGame = "End Game";
     g_editorStrings.eventsPropControls = "Controls";
+    g_editorStrings.eventsPropLayerSmoke = "Smoke";
 
     g_editorStrings.eventsHeaderTriggerEvent = "Trigger:";
 

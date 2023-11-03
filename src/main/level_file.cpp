@@ -58,6 +58,8 @@
 #include "editor/editor_custom.h"
 #include "editor/editor_strings.h"
 
+#include "npc/section_overlap.h"
+
 
 #ifdef THEXTECH_BUILD_GL_MODERN
 #    include "core/opengl/gl_program_bank.h"
@@ -148,10 +150,10 @@ bool OpenLevel(std::string FilePath)
         LevelData lvl;
         if(!FileFormats::OpenLevelFile(FilePath, lvl))
         {
-        pLogWarning("Error of level \"%s\" file loading: %s (line %d).",
-                    FilePath.c_str(),
-                    lvl.meta.ERROR_info.c_str(),
-                    lvl.meta.ERROR_linenum);
+            pLogWarning("Error of level \"%s\" file loading: %s (line %d).",
+                        FilePath.c_str(),
+                        lvl.meta.ERROR_info.c_str(),
+                        lvl.meta.ERROR_linenum);
             return false;
         }
 
@@ -467,14 +469,16 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         block.DefaultType = block.Type;
 
         block.Special = int(b.npc_id > 0 ? b.npc_id + 1000 : -1 * b.npc_id);
-        if(block.Special == 100)
-            block.Special = 1009;
-        if(block.Special == 102)
-            block.Special = 1014;
-        if(block.Special == 103)
-            block.Special = 1034;
-        if(block.Special == 105)
-            block.Special = 1095;
+
+        switch(block.Special) // Replace some legacy NPC codes with new
+        {
+        case 100: block.Special = 1000 + NPCID_POWER_S3; break;
+        case 102: block.Special = 1000 + NPCID_FIRE_POWER_S3; break;
+        case 103: block.Special = 1000 + NPCID_LEAF_POWER; break;
+        case 105: block.Special = 1000 + NPCID_PET_GREEN; break;
+        default: break;
+        }
+
         block.DefaultSpecial = block.Special;
 
         block.forceSmashable = false;
@@ -879,6 +883,8 @@ void OpenLevelDataPost()
     // FindSBlocks();
     syncLayersTrees_AllBlocks();
     syncLayers_AllBGOs();
+
+    CalculateSectionOverlaps();
 
     // moved the old event/layer loading code to the top
     // since it is needed before loading objects now

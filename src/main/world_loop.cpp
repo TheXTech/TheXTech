@@ -182,7 +182,7 @@ void WorldLoop()
     Location_t tempLocation;
     int A = 0;
     int B = 0;
-    bool allowFastMove = (g_config.worldMapFastMove || g_config.worldMapFastMove) && g_speedRunnerMode < SPEEDRUN_MODE_2;
+    bool allowFastMove = (g_config.worldMapFastMove || g_compatibility.world_map_fast_move) && CompatGetLevel() == COMPAT_MODERN;
 
     if(SingleCoop > 0)
         SingleCoop = 1;
@@ -190,8 +190,18 @@ void WorldLoop()
     vScreen[1].X = -(WorldPlayer[1].Location.X + WorldPlayer[1].Location.Width / 2.0) + vScreen[1].Width / 2.0;
     vScreen[1].Y = -(WorldPlayer[1].Location.Y + WorldPlayer[1].Location.Height / 2.0) + vScreen[1].Height / 2.0 + 32;
 
-    if(numPlayers > 2)
+    // disable cloned player mode
+    if(g_ClonedPlayerMode)
+    {
+        numPlayers = (int)Controls::g_InputMethods.size();
+        g_ClonedPlayerMode = false;
+    }
+
+    if(numPlayers < 1)
         numPlayers = 1;
+
+    if(numPlayers > maxLocalPlayers)
+        numPlayers = maxLocalPlayers;
 
     for(B = 1; B <= numPlayers; B++)
     {

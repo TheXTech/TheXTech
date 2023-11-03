@@ -61,6 +61,7 @@
 #include <Utils/maths.h>
 
 #include "npc/npc_queues.h"
+#include "npc/section_overlap.h"
 
 struct ScreenShake_t
 {
@@ -892,13 +893,16 @@ void UpdateGraphics(bool skipRepaint)
             {
                 LevelChop[S] += float(-vScreen[A].X - level[S].X);
                 level[S].X = -vScreen[A].X;
+
+                // mark that section has shrunk
+                UpdateSectionOverlaps(S, true);
             }
         }
 
-        // Position swap code?
+        // Keep all players onscreen in clone mode
         if(!GameMenu && !LevelEditor)
         {
-            if(numPlayers > 2)
+            if(g_ClonedPlayerMode)
             {
                 int C = 0;
                 int D = 0;
