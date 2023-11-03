@@ -88,7 +88,7 @@ public:
     // new graphics for TheXTech
     StdPicture EIcons;
     StdPicture PCursor;
-    StdPicture Backdrop;
+    StdPicture Backdrop; // Backdrop is 68
     FrameBorder Backdrop_Border;
     StdPicture WorldMapFrame_Tile; // WorldMapFrame_Tile is 70
     FrameBorder WorldMapFrame_Border;
