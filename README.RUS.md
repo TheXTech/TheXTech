@@ -116,7 +116,7 @@ force-portable = true
 
 
 ## Используемые инструменты
-* GCC, MinGW и Clang - основные компиляторы, используемые во время разработки игры. Редко MSVC, который используется исключительно для Windows-сборок под процессоры ARM64.
+* GCC, MinGW-w64 и Clang - основные компиляторы, используемые во время разработки игры. Редко MSVC, который используется исключительно для Windows-сборок под процессоры ARM64.
 * [Qt Creator](https://www.qt.io/product/development-tools) - среда разработки из комплекта Qt, в основном используемя при разработке.
 * [JetBrans CLion](https://www.jetbrains.com/ru-ru/clion/) - среда разработки для C/C++ на базе Intelliji Idea, бесплатна по [лицензии для СПО](https://www.jetbrains.com/ru-ru/community/opensource/).
-* [PVS-Studio](https://pvs-studio.com/ru/pvs-studio/?utm_source=github&utm_medium=organic&utm_campaign=open_source) - статический анализатор кода для C, C++, C# и Java. Используется для периодических проверок кода на возможные ошибки. Бесплатен по [лицензии для СПО](https://pvs-studio.com/ru/order/open-source-license/).
+* [PVS-Studio](https://pvs-studio.com/ru/pvs-studio/?utm_source=website&utm_medium=github&utm_campaign=open_source) - статический анализатор кода для C, C++, C# и Java. Используется для периодических проверок кода на возможные ошибки. Бесплатен по [лицензии для СПО](https://pvs-studio.com/ru/order/open-source-license/).
