@@ -67,7 +67,7 @@ const int MaxSavedEvents = 200;
 
 const int maxCreditsLines = 200;
 
-const int maxSaveSlots = 3;
+const int maxSaveSlots = 5;
 
 constexpr int c_menuSavesLength = maxSaveSlots + 2;
 constexpr int c_menuItemSavesEndList = maxSaveSlots - 1;
