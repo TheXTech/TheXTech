@@ -224,6 +224,22 @@ void GetMenuPos(int* MenuX, int* MenuY)
 {
     *MenuX = ScreenW / 2 - 100;
     *MenuY = ScreenH - 250;
+
+    switch(MenuMode)
+    {
+    case MENU_SELECT_SLOT_1P:
+    case MENU_SELECT_SLOT_2P:
+    case MENU_SELECT_SLOT_1P_COPY_S1:
+    case MENU_SELECT_SLOT_1P_COPY_S2:
+    case MENU_SELECT_SLOT_2P_COPY_S1:
+    case MENU_SELECT_SLOT_2P_COPY_S2:
+    case MENU_SELECT_SLOT_1P_DELETE:
+    case MENU_SELECT_SLOT_2P_DELETE:
+        *MenuY -= c_menuSavesOffsetY;
+        break;
+    default:
+        break;
+    }
 }
 
 static void s_findRecentEpisode()
@@ -1350,8 +1366,6 @@ bool mainMenuUpdate()
         // Save Select
         else if(MenuMode == MENU_SELECT_SLOT_1P || MenuMode == MENU_SELECT_SLOT_2P)
         {
-            MenuY -= c_menuSavesOffsetY;
-
             if(SharedCursor.Move)
                 s_handleMouseMove(c_menuItemSavesDelete, MenuX, MenuY, 300, 30);
 
@@ -1408,8 +1422,6 @@ bool mainMenuUpdate()
         else if(MenuMode == MENU_SELECT_SLOT_1P_COPY_S1 || MenuMode == MENU_SELECT_SLOT_2P_COPY_S1 ||
                 MenuMode == MENU_SELECT_SLOT_1P_COPY_S2 || MenuMode == MENU_SELECT_SLOT_2P_COPY_S2)
         {
-            MenuY -= c_menuSavesOffsetY;
-
             if(SharedCursor.Move)
                 s_handleMouseMove(c_menuItemSavesEndList, MenuX, MenuY, 300, 30);
 
@@ -1478,8 +1490,6 @@ bool mainMenuUpdate()
         // Delete gamesave
         else if(MenuMode == MENU_SELECT_SLOT_1P_DELETE || MenuMode == MENU_SELECT_SLOT_2P_DELETE)
         {
-            MenuY -= c_menuSavesOffsetY;
-
             if(SharedCursor.Move)
                 s_handleMouseMove(c_menuItemSavesEndList, MenuX, MenuY, 300, 30);
 
@@ -2090,8 +2100,6 @@ void mainMenuDraw()
 
     else if(MenuMode == MENU_SELECT_SLOT_1P || MenuMode == MENU_SELECT_SLOT_2P) // Save Select
     {
-        MenuY -= c_menuSavesOffsetY;
-
         s_drawGameTypeTitle(MenuX, MenuY - 70);
         SuperPrint(SelectWorld[selWorld].WorldName, 3, MenuX, MenuY - 40, 0.6f, 1.f, 1.f);
         s_drawGameSaves(MenuX, MenuY);
@@ -2101,8 +2109,6 @@ void mainMenuDraw()
     else if(MenuMode == MENU_SELECT_SLOT_1P_COPY_S1 || MenuMode == MENU_SELECT_SLOT_2P_COPY_S1 ||
             MenuMode == MENU_SELECT_SLOT_1P_COPY_S2 || MenuMode == MENU_SELECT_SLOT_2P_COPY_S2) // Copy save
     {
-        MenuY -= c_menuSavesOffsetY;
-
         s_drawGameTypeTitle(MenuX, MenuY - 70);
         SuperPrint(SelectWorld[selWorld].WorldName, 3, MenuX, MenuY - 40, 0.6f, 1.f, 1.f);
         s_drawGameSaves(MenuX, MenuY);
@@ -2123,8 +2129,6 @@ void mainMenuDraw()
 
     else if(MenuMode == MENU_SELECT_SLOT_1P_DELETE || MenuMode == MENU_SELECT_SLOT_2P_DELETE) // Copy save
     {
-        MenuY -= c_menuSavesOffsetY;
-
         s_drawGameTypeTitle(MenuX, MenuY - 70);
         SuperPrint(SelectWorld[selWorld].WorldName, 3, MenuX, MenuY - 40, 0.6f, 1.f, 1.f);
         s_drawGameSaves(MenuX, MenuY);
