@@ -123,7 +123,7 @@ void preProcessMessage(std::string& text, int playerWho)
         }
         else if(st.open && t == cond_else)
         {
-            st.open = true;
+            // st.open = true; // keep same value
             st.cond_true = !st.skip_to_endif;
             if(st.open && st.skip_to_endif)
                 continue;

@@ -278,7 +278,7 @@ void InitMixerX()
     {
         std::string msg = fmt::format_ne("Can't open audio stream, continuing without audio: ({0})", Mix_GetError());
         pLogCritical(msg.c_str());
-        XMsgBox::simpleMsgBox(XMsgBox::MESSAGEBOX_ERROR, "Sound opening error", msg.c_str());
+        XMsgBox::simpleMsgBox(XMsgBox::MESSAGEBOX_ERROR, "Sound opening error", msg);
         noSound = true;
     }
     else
