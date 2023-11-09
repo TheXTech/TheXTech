@@ -1349,8 +1349,10 @@ bool mainMenuUpdate()
         // Save Select
         else if(MenuMode == MENU_SELECT_SLOT_1P || MenuMode == MENU_SELECT_SLOT_2P)
         {
+            MenuY -= c_menuSavesOffsetY;
+
             if(SharedCursor.Move)
-                s_handleMouseMove(c_menuItemSavesDelete, MenuX, MenuY - c_menuSavesOffsetY, 300, 30);
+                s_handleMouseMove(c_menuItemSavesDelete, MenuX, MenuY, 300, 30);
 
             if(MenuCursorCanMove || MenuMouseClick)
             {
@@ -1405,8 +1407,10 @@ bool mainMenuUpdate()
         else if(MenuMode == MENU_SELECT_SLOT_1P_COPY_S1 || MenuMode == MENU_SELECT_SLOT_2P_COPY_S1 ||
                 MenuMode == MENU_SELECT_SLOT_1P_COPY_S2 || MenuMode == MENU_SELECT_SLOT_2P_COPY_S2)
         {
+            MenuY -= c_menuSavesOffsetY;
+
             if(SharedCursor.Move)
-                s_handleMouseMove(c_menuItemSavesEndList, MenuX, MenuY - c_menuSavesOffsetY, 300, 30);
+                s_handleMouseMove(c_menuItemSavesEndList, MenuX, MenuY, 300, 30);
 
             if(MenuCursorCanMove || MenuMouseClick)
             {
@@ -1473,8 +1477,10 @@ bool mainMenuUpdate()
         // Delete gamesave
         else if(MenuMode == MENU_SELECT_SLOT_1P_DELETE || MenuMode == MENU_SELECT_SLOT_2P_DELETE)
         {
+            MenuY -= c_menuSavesOffsetY;
+
             if(SharedCursor.Move)
-                s_handleMouseMove(c_menuItemSavesEndList, MenuX, MenuY - c_menuSavesOffsetY, 300, 30);
+                s_handleMouseMove(c_menuItemSavesEndList, MenuX, MenuY, 300, 30);
 
             if(MenuCursorCanMove || MenuMouseClick)
             {
@@ -2083,42 +2089,48 @@ void mainMenuDraw()
 
     else if(MenuMode == MENU_SELECT_SLOT_1P || MenuMode == MENU_SELECT_SLOT_2P) // Save Select
     {
-        s_drawGameTypeTitle(MenuX, MenuY - (70 + c_menuSavesOffsetY));
-        SuperPrint(SelectWorld[selWorld].WorldName, 3, MenuX, MenuY - (40 + c_menuSavesOffsetY), 0.6f, 1.f, 1.f);
-        s_drawGameSaves(MenuX, MenuY - c_menuSavesOffsetY);
-        XRender::renderTexture(MenuX - 20, MenuY + (MenuCursor * 30) - c_menuSavesOffsetY, GFX.MCursor[0]);
+        MenuY -= c_menuSavesOffsetY;
+
+        s_drawGameTypeTitle(MenuX, MenuY - 70);
+        SuperPrint(SelectWorld[selWorld].WorldName, 3, MenuX, MenuY - 40, 0.6f, 1.f, 1.f);
+        s_drawGameSaves(MenuX, MenuY);
+        XRender::renderTexture(MenuX - 20, MenuY + (MenuCursor * 30), GFX.MCursor[0]);
     }
 
     else if(MenuMode == MENU_SELECT_SLOT_1P_COPY_S1 || MenuMode == MENU_SELECT_SLOT_2P_COPY_S1 ||
             MenuMode == MENU_SELECT_SLOT_1P_COPY_S2 || MenuMode == MENU_SELECT_SLOT_2P_COPY_S2) // Copy save
     {
-        s_drawGameTypeTitle(MenuX, MenuY - (70 + c_menuSavesOffsetY));
-        SuperPrint(SelectWorld[selWorld].WorldName, 3, MenuX, MenuY - (40 + c_menuSavesOffsetY), 0.6f, 1.f, 1.f);
-        s_drawGameSaves(MenuX, MenuY - c_menuSavesOffsetY);
+        MenuY -= c_menuSavesOffsetY;
+
+        s_drawGameTypeTitle(MenuX, MenuY - 70);
+        SuperPrint(SelectWorld[selWorld].WorldName, 3, MenuX, MenuY - 40, 0.6f, 1.f, 1.f);
+        s_drawGameSaves(MenuX, MenuY);
 
         if(MenuMode == MENU_SELECT_SLOT_1P_COPY_S1 || MenuMode == MENU_SELECT_SLOT_2P_COPY_S1)
-            SuperPrint(g_mainMenu.gameSourceSlot, 3, MenuX, MenuY - 30 + (5 * 30), 0.7f, 0.7f, 1.0f);
+            SuperPrint(g_mainMenu.gameSourceSlot, 3, MenuX, MenuY - 30 + (c_menuSavesLength * 30), 0.7f, 0.7f, 1.0f);
         else if(MenuMode == MENU_SELECT_SLOT_1P_COPY_S2 || MenuMode == MENU_SELECT_SLOT_2P_COPY_S2)
-            SuperPrint(g_mainMenu.gameTargetSlot, 3, MenuX, MenuY - 30 + (5 * 30), 0.7f, 1.0f, 0.7f);
+            SuperPrint(g_mainMenu.gameTargetSlot, 3, MenuX, MenuY - 30 + (c_menuSavesLength * 30), 0.7f, 1.0f, 0.7f);
 
         if(MenuMode == MENU_SELECT_SLOT_1P_COPY_S2 || MenuMode == MENU_SELECT_SLOT_2P_COPY_S2)
         {
-            XRender::renderTexture(MenuX - 20, MenuY + ((menuCopySaveSrc - 1) * 30) - c_menuSavesOffsetY, GFX.MCursor[0]);
-            XRender::renderTexture(MenuX - 20, MenuY + (MenuCursor * 30) - c_menuSavesOffsetY, GFX.MCursor[3]);
+            XRender::renderTexture(MenuX - 20, MenuY + ((menuCopySaveSrc - 1) * 30), GFX.MCursor[0]);
+            XRender::renderTexture(MenuX - 20, MenuY + (MenuCursor * 30), GFX.MCursor[3]);
         }
         else
-            XRender::renderTexture(MenuX - 20, MenuY + (MenuCursor * 30) - c_menuSavesOffsetY, GFX.MCursor[0]);
+            XRender::renderTexture(MenuX - 20, MenuY + (MenuCursor * 30), GFX.MCursor[0]);
     }
 
     else if(MenuMode == MENU_SELECT_SLOT_1P_DELETE || MenuMode == MENU_SELECT_SLOT_2P_DELETE) // Copy save
     {
-        s_drawGameTypeTitle(MenuX, MenuY - (70 + c_menuSavesOffsetY));
-        SuperPrint(SelectWorld[selWorld].WorldName, 3, MenuX, MenuY - (40 + c_menuSavesOffsetY), 0.6f, 1.f, 1.f);
-        s_drawGameSaves(MenuX, MenuY - c_menuSavesOffsetY);
+        MenuY -= c_menuSavesOffsetY;
 
-        SuperPrint(g_mainMenu.gameEraseSlot, 3, MenuX, MenuY - 30 + (5 * 30), 1.0f, 0.7f, 0.7f);
+        s_drawGameTypeTitle(MenuX, MenuY - 70);
+        SuperPrint(SelectWorld[selWorld].WorldName, 3, MenuX, MenuY - 40, 0.6f, 1.f, 1.f);
+        s_drawGameSaves(MenuX, MenuY);
 
-        XRender::renderTexture(MenuX - 20, MenuY + (MenuCursor * 30) - c_menuSavesOffsetY, GFX.MCursor[0]);
+        SuperPrint(g_mainMenu.gameEraseSlot, 3, MenuX, MenuY - 30 + (c_menuSavesLength * 30), 1.0f, 0.7f, 0.7f);
+
+        XRender::renderTexture(MenuX - 20, MenuY + (MenuCursor * 30), GFX.MCursor[0]);
     }
 
     // Options Menu
