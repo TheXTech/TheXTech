@@ -84,6 +84,11 @@ static SDL_atomic_t         loadingProgrssMax = {};
 static SDL_Thread*          loadingThread = nullptr;
 #endif
 
+static constexpr int c_menuSavesLength = maxSaveSlots + 2;
+static constexpr int c_menuItemSavesEndList = maxSaveSlots - 1;
+static constexpr int c_menuItemSavesCopy = maxSaveSlots;
+static constexpr int c_menuItemSavesDelete = maxSaveSlots + 1;
+static constexpr int c_menuSavesOffsetY = (maxSaveSlots - 3) * 30;
 
 int NumSelectWorld = 0;
 int NumSelectWorldEditable = 0;
@@ -91,6 +96,7 @@ int NumSelectBattle = 0;
 std::vector<SelectWorld_t> SelectWorld;
 std::vector<SelectWorld_t> SelectWorldEditable;
 std::vector<SelectWorld_t> SelectBattle;
+
 
 void initMainMenu()
 {
@@ -1414,7 +1420,7 @@ bool mainMenuUpdate()
                     else
                     {
                         MenuMode -= MENU_SELECT_SLOT_COPY_S1_ADD;
-                        MenuCursor = maxSaveSlots;
+                        MenuCursor = c_menuItemSavesCopy;
                     }
 
                     MenuCursorCanMove = false;
