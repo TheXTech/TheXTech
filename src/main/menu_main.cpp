@@ -84,7 +84,7 @@ static SDL_atomic_t         loadingProgrssMax = {};
 static SDL_Thread*          loadingThread = nullptr;
 #endif
 
-static constexpr int c_menuSavesLength = maxSaveSlots + 2;
+// static constexpr int c_menuSavesLength = maxSaveSlots + 2;
 static constexpr int c_menuItemSavesEndList = maxSaveSlots - 1;
 static constexpr int c_menuItemSavesCopy = maxSaveSlots;
 static constexpr int c_menuItemSavesDelete = maxSaveSlots + 1;
@@ -2107,9 +2107,9 @@ void mainMenuDraw()
         s_drawGameSaves(MenuX, MenuY);
 
         if(MenuMode == MENU_SELECT_SLOT_1P_COPY_S1 || MenuMode == MENU_SELECT_SLOT_2P_COPY_S1)
-            SuperPrint(g_mainMenu.gameSourceSlot, 3, MenuX, MenuY - 30 + (c_menuSavesLength * 30), 0.7f, 0.7f, 1.0f);
+            SuperPrint(g_mainMenu.gameSourceSlot, 3, MenuX, MenuY + (c_menuItemSavesDelete * 30), 0.7f, 0.7f, 1.0f);
         else if(MenuMode == MENU_SELECT_SLOT_1P_COPY_S2 || MenuMode == MENU_SELECT_SLOT_2P_COPY_S2)
-            SuperPrint(g_mainMenu.gameTargetSlot, 3, MenuX, MenuY - 30 + (c_menuSavesLength * 30), 0.7f, 1.0f, 0.7f);
+            SuperPrint(g_mainMenu.gameTargetSlot, 3, MenuX, MenuY + (c_menuItemSavesDelete * 30), 0.7f, 1.0f, 0.7f);
 
         if(MenuMode == MENU_SELECT_SLOT_1P_COPY_S2 || MenuMode == MENU_SELECT_SLOT_2P_COPY_S2)
         {
@@ -2128,7 +2128,7 @@ void mainMenuDraw()
         SuperPrint(SelectWorld[selWorld].WorldName, 3, MenuX, MenuY - 40, 0.6f, 1.f, 1.f);
         s_drawGameSaves(MenuX, MenuY);
 
-        SuperPrint(g_mainMenu.gameEraseSlot, 3, MenuX, MenuY - 30 + (c_menuSavesLength * 30), 1.0f, 0.7f, 0.7f);
+        SuperPrint(g_mainMenu.gameEraseSlot, 3, MenuX, MenuY + (c_menuItemSavesDelete * 30), 1.0f, 0.7f, 0.7f);
 
         XRender::renderTexture(MenuX - 20, MenuY + (MenuCursor * 30), GFX.MCursor[0]);
     }
