@@ -69,6 +69,12 @@ const int maxCreditsLines = 200;
 
 const int maxSaveSlots = 3;
 
+constexpr int c_menuSavesLength = maxSaveSlots + 2;
+constexpr int c_menuItemSavesEndList = maxSaveSlots - 1;
+constexpr int c_menuItemSavesCopy = maxSaveSlots;
+constexpr int c_menuItemSavesDelete = maxSaveSlots + 1;
+constexpr int c_menuSavesOffsetY = (maxSaveSlots - 3) * 30;
+
 const int maxWorldCredits = 100;
 
 const int maxYoshiGfx = 10;
