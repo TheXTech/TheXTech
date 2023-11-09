@@ -394,7 +394,7 @@ int main(int argc, char**argv)
                                                     false, 0u,
                                                    "0, 1, 2, 3, or 4",
                                                    cmd);
-        TCLAP::ValueArg<int> saveSlot(std::string(), "save-slot", "Save slot to use for world play", false, 0, "number from 1 to 3", cmd);
+        TCLAP::ValueArg<int> saveSlot(std::string(), "save-slot", "Save slot to use for world play", false, 0, std::string("number from 1 to ") + std::to_string(maxSaveSlots), cmd);
 
 #ifndef THEXTECH_DISABLE_LANG_TOOLS
         TCLAP::SwitchArg switchMakeLangTemplate(std::string(), "export-lang", "Exports the default language template", false);
