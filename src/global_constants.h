@@ -67,7 +67,11 @@ const int MaxSavedEvents = 200;
 
 const int maxCreditsLines = 200;
 
+#ifdef LOW_MEM
+const int maxSaveSlots = 3;
+#else
 const int maxSaveSlots = 5;
+#endif
 
 const int maxWorldCredits = 100;
 
