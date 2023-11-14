@@ -63,6 +63,7 @@ void LogWriter::CloseLog()
 void LoggerPrivate_pLogConsole(int level, const char *label, const char *format, va_list arg)
 {
 #ifdef DEBUG_BUILD
+    va_list arg_in;
     (void)level;
     (void)label;
 
@@ -70,7 +71,9 @@ void LoggerPrivate_pLogConsole(int level, const char *label, const char *format,
         debugNetInit(NETDBG_IP_SERVER, NETDBG_PORT_SERVER, DEBUG);
 
     // Print arg list to first string buffer.
-    vsnprintf(__string_buffer, VITA_TEMP_BUFFER_SIZE - 4, format, arg);
+    va_copy(arg_in, arg);
+    vsnprintf(__string_buffer, VITA_TEMP_BUFFER_SIZE - 4, format, arg_in);
+    va_end(arg_in);
     // Print that string buffer into second string buffer with new line & null termination.
     snprintf(__string_buffer2, VITA_TEMP_BUFFER_SIZE, "%s\n", __string_buffer);
     
