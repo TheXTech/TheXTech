@@ -70,6 +70,7 @@
 #include <whb/proc.h>
 #include <whb/log.h>
 #include <whb/log_console.h>
+#include <coreinit/filesystem.h>
 #endif
 
 #ifdef __EMSCRIPTEN__
@@ -231,6 +232,7 @@ int main(int argc, char**argv)
 
 #ifdef __WIIU__
     WHBProcInit();
+    FSInit();
 #endif
 
     CmdLineSetup_t setup;

@@ -19,7 +19,6 @@
 
 #include <vector>
 #include <string>
-#include <coreinit/filesystem.h>
 
 #include "../app_path.h"
 #include "app_path_private.h"
@@ -28,8 +27,6 @@ constexpr const char* s_assetRoot = "/vol/external01/thextech/";
 
 void AppPathP::initDefaultPaths(const std::string &userDirName)
 {
-    FSInit();
-
     (void)userDirName;
 }
 
