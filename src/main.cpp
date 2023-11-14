@@ -232,7 +232,6 @@ int main(int argc, char**argv)
 
 #ifdef __WIIU__
     WHBProcInit();
-    FSInit();
 #endif
 
     CmdLineSetup_t setup;

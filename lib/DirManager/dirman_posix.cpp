@@ -237,6 +237,17 @@ bool DirMan::mkAbsPath(const std::string &dirPath)
         if(*p == '/')
         {
             *p = 0;
+
+#ifdef __WIIU__
+// On WiiU, mkdir to existing directory will always fail because of errno=EIO
+// (at virtual directories like /vol and /vol/external01)
+            if(exists(tmp))
+            {
+                *p = '/';
+                continue;
+            }
+#endif
+
             int err = ::mkdir(tmp, S_IRWXU | S_IRWXG);
             if((err != 0) && (errno != EEXIST))
             {
