@@ -900,9 +900,8 @@ elseif(NINTENDO_3DS)
     add_definitions(-DTHEXTECH_DISABLE_SDL_LOCALE) # SDL for 3DS doesn't support language detection
     list(APPEND THEXTECH_SRC src/core/language/language_3ds.cpp)
 elseif(NINTENDO_WII)
-    # FIXME: Implement the Nintendo WII language initializer
-    add_definitions(-DTHEXTECH_DISABLE_SDL_LOCALE)
-    list(APPEND THEXTECH_SRC src/core/language/language_dummy.cpp)
+    add_definitions(-DTHEXTECH_DISABLE_SDL_LOCALE) # SDL for Wii doesn't support language detection
+    list(APPEND THEXTECH_SRC src/core/language/language_wii.cpp)
 elseif(NINTENDO_WIIU)
     add_definitions(-DTHEXTECH_DISABLE_SDL_LOCALE) # SDL for WiiU doesn't support language detection
     list(APPEND THEXTECH_SRC src/core/language/language_wiiu.cpp)
