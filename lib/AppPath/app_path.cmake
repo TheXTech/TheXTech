@@ -43,6 +43,11 @@ elseif(NINTENDO_WII)
     list(APPEND APPPATH_SRCS
         ${CMAKE_CURRENT_LIST_DIR}/private/app_path_wii.cpp
     )
+elseif(NINTENDO_WIIU)
+    message("-- AppPath for Wii")
+    list(APPEND APPPATH_SRCS
+        ${CMAKE_CURRENT_LIST_DIR}/private/app_path_wiiu.cpp
+    )
 elseif(NINTENDO_SWITCH)
     message("-- AppPath for Switch")
     list(APPEND APPPATH_SRCS

@@ -66,6 +66,26 @@
 #include <nds.h>
 #endif
 
+#ifdef __WIIU__
+#include <coreinit/dynload.h>
+
+extern "C" int rpl_entry(OSDynLoad_Module module, OSDynLoad_EntryReason reason)
+{
+    UNUSED(module);
+
+    if(reason == OS_DYNLOAD_LOADED)
+    {
+        // Do stuff on load
+    }
+    else if(reason == OS_DYNLOAD_UNLOADED)
+    {
+        // Do stuff on unload
+    }
+
+    return 0;
+}
+#endif
+
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
 #endif

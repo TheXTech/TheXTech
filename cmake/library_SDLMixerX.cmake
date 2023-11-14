@@ -106,13 +106,22 @@ if(NINTENDO_WII)
     )
 endif()
 
+if(NINTENDO_WIIU)
+    set(CMAKE_STANDARD_LIBRARIES "")
+    set(CMAKE_C_STANDARD_LIBRARIES "")
+    set(CMAKE_CXX_STANDARD_LIBRARIES "")
+    list(APPEND MixerX_SysLibs
+        wut m
+    )
+endif()
+
 if(NINTENDO_3DS)
     list(APPEND MixerX_SysLibs
         citro2d citro3d ctru #vorbisidec ogg
     )
 endif()
 
-if(NOT WIN32 AND NOT EMSCRIPTEN AND NOT APPLE AND NOT ANDROID AND NOT NINTENDO_SWITCH)
+if(NOT WIN32 AND NOT EMSCRIPTEN AND NOT APPLE AND NOT ANDROID AND NOT NINTENDO_SWITCH AND NOT NINTENDO_WIIU)
     find_library(_LIB_GL GL)
     if(_LIB_GL)
         list(APPEND MixerX_SysLibs ${_LIB_GL})
