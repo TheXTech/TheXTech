@@ -67,23 +67,9 @@
 #endif
 
 #ifdef __WIIU__
-#include <coreinit/dynload.h>
-
-extern "C" int rpl_entry(OSDynLoad_Module module, OSDynLoad_EntryReason reason)
-{
-    UNUSED(module);
-
-    if(reason == OS_DYNLOAD_LOADED)
-    {
-        // Do stuff on load
-    }
-    else if(reason == OS_DYNLOAD_UNLOADED)
-    {
-        // Do stuff on unload
-    }
-
-    return 0;
-}
+#include <whb/proc.h>
+#include <whb/log.h>
+#include <whb/log_console.h>
 #endif
 
 #ifdef __EMSCRIPTEN__
@@ -241,6 +227,10 @@ int main(int argc, char**argv)
     consoleInit(nullptr, defaultConsole->bgLayer, BgType_Text4bpp, BgSize_T_256x256, defaultConsole->mapBase, defaultConsole->gfxBase, false, true);
 
     printf("Hello, 16MB world!\n");
+#endif
+
+#ifdef __WIIU__
+    WHBProcInit();
 #endif
 
     CmdLineSetup_t setup;
@@ -759,6 +749,10 @@ int main(int argc, char**argv)
     Controls::Quit();
 
     g_frmMain.freeSystem();
+
+#ifdef __WIIU__
+    WHBProcShutdown();
+#endif
 
 #ifdef __EMSCRIPTEN__
     AppPathManager::syncFs();
