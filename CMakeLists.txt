@@ -904,9 +904,8 @@ elseif(NINTENDO_WII)
     add_definitions(-DTHEXTECH_DISABLE_SDL_LOCALE)
     list(APPEND THEXTECH_SRC src/core/language/language_dummy.cpp)
 elseif(NINTENDO_WIIU)
-    # FIXME: Implement the Nintendo WII U language initializer
-    add_definitions(-DTHEXTECH_DISABLE_SDL_LOCALE)
-    list(APPEND THEXTECH_SRC src/core/language/language_dummy.cpp)
+    add_definitions(-DTHEXTECH_DISABLE_SDL_LOCALE) # SDL for WiiU doesn't support language detection
+    list(APPEND THEXTECH_SRC src/core/language/language_wiiu.cpp)
 elseif(NINTENDO_SWITCH)
     add_definitions(-DTHEXTECH_DISABLE_SDL_LOCALE) # SDL for Switch doesn't support language detection
     list(APPEND THEXTECH_SRC src/core/language/language_switch.cpp)
