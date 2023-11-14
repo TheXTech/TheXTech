@@ -101,11 +101,12 @@ void LogWriter::CloseLog()
 
 void LoggerPrivate_pLogConsole(int level, const char *label, const char *format, va_list arg)
 {
+#ifdef DEBUG_BUILD
     MUTEXLOCK(mutex);
     va_list arg_in;
     (void)level;
 
-#ifdef DEBUG_BUILD
+    // Try to connect the netcat server (run as `nc -nklv 18194`)
     if(!s_wut_debug_setup && s_socket_desc == 0)
     {
         s_socket_desc = socket(AF_INET , SOCK_STREAM , 0);
@@ -125,24 +126,24 @@ void LoggerPrivate_pLogConsole(int level, const char *label, const char *format,
         }
     }
 
-    va_copy(arg_in, arg);
-    // Print arg list to first string buffer.
-    std::vsnprintf(s_string_buffer, VITA_TEMP_BUFFER_SIZE - 4, format, arg_in);
-    va_end(arg_in);
-
-    // Print that string buffer into second string buffer with new line & null termination.
-    std::snprintf(s_string_buffer2, VITA_TEMP_BUFFER_SIZE, "%s: %s\n", label, s_string_buffer);
-
+    // If success, send log lines to it
     if(s_socket_desc > 0)
-        send(s_socket_desc, s_string_buffer2, strlen(s_string_buffer2) + 1, 0);
-#endif
+    {
+        va_copy(arg_in, arg);
+        // Print arg list to first string buffer.
+        std::vsnprintf(s_string_buffer, VITA_TEMP_BUFFER_SIZE - 4, format, arg_in);
+        va_end(arg_in);
 
-#if 0
-    va_copy(arg_in, arg);
-    std::printf("%s: ", label);
-    std::vprintf(format, arg_in);
-    std::printf(OS_NEWLINE);
-    va_end(arg_in);
+        // Print that string buffer into second string buffer with new line & null termination.
+        std::snprintf(s_string_buffer2, VITA_TEMP_BUFFER_SIZE, "%s: %s\n", label, s_string_buffer);
+
+        send(s_socket_desc, s_string_buffer2, strlen(s_string_buffer2) + 1, 0);
+    }
+#else
+    (void)level;
+    (void)label;
+    (void)format;
+    (void)arg;
 #endif
 }
 
