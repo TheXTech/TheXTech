@@ -21,12 +21,10 @@
 #include <string>
 #include <coreinit/filesystem.h>
 
-#include <DirManager/dirman.h>
-
 #include "../app_path.h"
 #include "app_path_private.h"
 
-constexpr const char* s_assetRoot = "/thextech/";
+constexpr const char* s_assetRoot = "/vol/external01/thextech/";
 
 void AppPathP::initDefaultPaths(const std::string &userDirName)
 {
