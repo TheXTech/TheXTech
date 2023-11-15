@@ -25,24 +25,29 @@
 #ifdef DEBUG_BUILD
 #include <stdio.h>
 #include <string>
-#include <unistd.h>
-#include <sys/socket.h>
-#include <arpa/inet.h>
 
-#   ifndef NETDBG_IP_SERVER
-#       define NETDBG_IP_SERVER "172.19.9.141"
-#   endif
-#   ifndef NETDBG_PORT_SERVER
-#       define NETDBG_PORT_SERVER 18194
-#   endif
+// #define ENABLE_NET_LOG
 
-#   define VITA_TEMP_BUFFER_SIZE (1024 * 1024)
+#ifdef ENABLE_NET_LOG
+#   include <unistd.h>
+#   include <sys/socket.h>
+#   include <arpa/inet.h>
+
+#       ifndef NETDBG_IP_SERVER
+#           define NETDBG_IP_SERVER "172.19.9.141"
+#       endif
+#       ifndef NETDBG_PORT_SERVER
+#           define NETDBG_PORT_SERVER 18194
+#       endif
+
+#       define VITA_TEMP_BUFFER_SIZE (1024 * 1024)
 
 static char s_string_buffer[VITA_TEMP_BUFFER_SIZE - 3];
 static char s_string_buffer2[VITA_TEMP_BUFFER_SIZE];
 static int s_wut_debug_setup = 0;
 static int s_socket_desc = 0;
 static struct sockaddr_in s_server;
+#   endif
 #endif
 
 #ifndef NO_FILE_LOGGING
@@ -86,7 +91,7 @@ void LogWriter::CloseLog()
 #endif // #ifndef NO_FILE_LOGGING
 
 
-#ifdef DEBUG_BUILD
+#ifdef ENABLE_NET_LOG
     if(s_wut_debug_setup)
     {
         const char *msg = "---- Game disconnected ----\n";
@@ -101,7 +106,7 @@ void LogWriter::CloseLog()
 
 void LoggerPrivate_pLogConsole(int level, const char *label, const char *format, va_list arg)
 {
-#ifdef DEBUG_BUILD
+#ifdef ENABLE_NET_LOG
     MUTEXLOCK(mutex);
     va_list arg_in;
     (void)level;
