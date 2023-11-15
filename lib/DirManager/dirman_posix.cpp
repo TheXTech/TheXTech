@@ -38,6 +38,44 @@ DEALINGS IN THE SOFTWARE.
 #   undef DIRMAN_HAS_FSSTATAT  /*This call isn't available at macOS older than 10.10 */
 #endif
 
+#ifdef __WIIU__
+// Workaround to avoid the EIO error on virtual directories
+
+static const char * s_sys_paths[] =
+{
+    "/vol/external01/",
+    "/vol/content/",
+    "usb:/",
+    nullptr
+};
+
+static int get_sys_path_offset(const std::string &dirPath)
+{
+    const char** p = s_sys_paths;
+    int offset = 1;
+
+    while(*p)
+    {
+        std::string t = std::string(*p);
+
+        if(dirPath.size() < t.size())
+        {
+            p++;
+            continue;
+        }
+
+        if(dirPath.substr(0, t.size()).compare(t) == 0)
+        {
+            offset = t.size();
+            break;
+        }
+        p++;
+    }
+
+    return offset;
+}
+#endif
+
 void DirMan::DirMan_private::setPath(const std::string &dirPath)
 {
 #ifdef DIRMAN_HAS_REALPATH
@@ -232,21 +270,17 @@ bool DirMan::mkAbsPath(const std::string &dirPath)
     if(len > 0 && tmp[len - 1] == '/')
         tmp[len - 1] = 0;
 
-    for(p = tmp + 1; *p; p++)
+#ifdef __WIIU__
+    p = tmp + get_sys_path_offset(dirPath);
+#else
+    p = tmp + 1;
+#endif
+
+    for(; *p; p++)
     {
         if(*p == '/')
         {
             *p = 0;
-
-#ifdef __WIIU__
-// On WiiU, mkdir to existing directory will always fail because of errno=EIO
-// (at virtual directories like /vol and /vol/external01)
-            if(exists(tmp))
-            {
-                *p = '/';
-                continue;
-            }
-#endif
 
             int err = ::mkdir(tmp, S_IRWXU | S_IRWXG);
             if((err != 0) && (errno != EEXIST))
