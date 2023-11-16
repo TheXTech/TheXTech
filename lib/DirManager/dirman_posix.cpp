@@ -43,8 +43,8 @@ DEALINGS IN THE SOFTWARE.
 
 static const char * s_sys_paths[] =
 {
-    "/vol/external01/",
-    "/vol/content/",
+    "fs:/vol/external01/",
+    "fs:/vol/content/",
     "usb:/",
     nullptr
 };

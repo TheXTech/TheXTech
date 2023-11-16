@@ -21,13 +21,38 @@
 #include <string>
 
 #include "../app_path.h"
+#include <DirManager/dirman.h>
 #include "app_path_private.h"
 
-constexpr const char* s_assetRoot = "/vol/external01/thextech/";
+constexpr const char* s_assetRootSD = "fs:/vol/external01/thextech/";
+constexpr const char* s_assetRootUSB = "usb:/thextech/";
+constexpr const char* s_assetRootContent = "fs:/vol/content/";
+
+constexpr const char* s_assetSaveRoot = "fs:/vol/save/";
+
+static std::string s_assetRoot;
+static std::string s_assetUserDir;
+
 
 void AppPathP::initDefaultPaths(const std::string &userDirName)
 {
     (void)userDirName;
+
+    if(DirMan::exists(s_assetRootContent))
+    {
+        s_assetRoot = s_assetRootContent;
+        s_assetUserDir = s_assetSaveRoot;
+    }
+    else if(DirMan::exists(s_assetRootUSB))
+    {
+        s_assetRoot = s_assetRootUSB;
+        s_assetUserDir = s_assetRootUSB;
+    }
+    else
+    {
+        s_assetRoot = s_assetRootSD;
+        s_assetUserDir = s_assetRootSD;
+    }
 }
 
 std::string AppPathP::appDirectory()
@@ -37,7 +62,7 @@ std::string AppPathP::appDirectory()
 
 std::string AppPathP::userDirectory()
 {
-    return s_assetRoot;
+    return s_assetUserDir;
 }
 
 std::string AppPathP::assetsRoot()
