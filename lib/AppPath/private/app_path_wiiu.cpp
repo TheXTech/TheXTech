@@ -20,6 +20,8 @@
 #include <vector>
 #include <string>
 
+#include <nn/save.h>
+
 #include "../app_path.h"
 #include <DirManager/dirman.h>
 #include "app_path_private.h"
@@ -28,10 +30,14 @@ constexpr const char* s_assetRootSD = "fs:/vol/external01/thextech/";
 constexpr const char* s_assetRootUSB = "usb:/thextech/";
 constexpr const char* s_assetRootContent = "fs:/vol/content/";
 
-constexpr const char* s_assetSaveRoot = "fs:/vol/save/";
+constexpr const char* s_assetSaveRoot = "fs:/vol/save/common/";
 
 static std::string s_assetRoot;
-static std::string s_assetUserDir;
+static std::string s_userDir;
+// Extra directories
+static std::string s_logsDir;
+static std::string s_screenshotsDir;
+static std::string s_gifsDir;
 
 
 void AppPathP::initDefaultPaths(const std::string &userDirName)
@@ -40,18 +46,36 @@ void AppPathP::initDefaultPaths(const std::string &userDirName)
 
     if(DirMan::exists(s_assetRootContent))
     {
+        SAVEInit();
+        SAVEInitCommonSaveDir();
+
         s_assetRoot = s_assetRootContent;
-        s_assetUserDir = s_assetSaveRoot;
+        s_userDir = s_assetSaveRoot;
+
+        if(DirMan::exists("usb:/"))
+        {
+            std::string extraDir = "usb:/thextech-user/";
+            s_logsDir = extraDir + "logs/";
+            s_screenshotsDir = extraDir + "screenshots/";
+            s_gifsDir = extraDir + "gif-recordings/";
+        }
+        else if(DirMan::exists("fs:/vol/external01/"))
+        {
+            std::string extraDir = "fs:/vol/external01/thextech-user/";
+            s_logsDir = extraDir + "logs/";
+            s_screenshotsDir = extraDir + "screenshots/";
+            s_gifsDir = extraDir + "gif-recordings/";
+        }
     }
     else if(DirMan::exists(s_assetRootUSB))
     {
         s_assetRoot = s_assetRootUSB;
-        s_assetUserDir = s_assetRootUSB;
+        s_userDir = s_assetRootUSB;
     }
     else
     {
         s_assetRoot = s_assetRootSD;
-        s_assetUserDir = s_assetRootSD;
+        s_userDir = s_assetRootSD;
     }
 }
 
@@ -62,7 +86,7 @@ std::string AppPathP::appDirectory()
 
 std::string AppPathP::userDirectory()
 {
-    return s_assetUserDir;
+    return s_userDir;
 }
 
 std::string AppPathP::assetsRoot()
@@ -97,7 +121,7 @@ std::string AppPathP::screenshotsRoot()
      * directory out of user directory. Keep it empty if you want to keep the
      * default behaviour (i.e. screenshots saved at the user directory)
      */
-    return std::string();
+    return s_screenshotsDir;
 }
 
 std::string AppPathP::gifRecsRoot()
@@ -107,7 +131,7 @@ std::string AppPathP::gifRecsRoot()
      * directory out of user directory. Keep it empty if you want to keep the
      * default behaviour (i.e. GIF recordings saved at the user directory)
      */
-    return std::string();
+    return s_gifsDir;
 }
 
 std::string AppPathP::logsRoot()
@@ -117,7 +141,7 @@ std::string AppPathP::logsRoot()
      * directory out of user directory. Keep it empty if you want to keep the
      * default behaviour (i.e. logs saved at the user directory)
      */
-    return std::string();
+    return s_logsDir;
 }
 
 bool AppPathP::portableAvailable()

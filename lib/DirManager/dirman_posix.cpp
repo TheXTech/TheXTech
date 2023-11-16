@@ -45,6 +45,7 @@ static const char * s_sys_paths[] =
 {
     "fs:/vol/external01/",
     "fs:/vol/content/",
+    "fs:/vol/save/common/",
     "usb:/",
     nullptr
 };
