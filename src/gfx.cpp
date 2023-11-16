@@ -27,12 +27,14 @@
 #include "core/render.h"
 #include <fmt_format_ne.h>
 #include <Logger/logger.h>
-#if defined(__SWITCH__) || defined(__WII__)
+#if defined(__SWITCH__) || defined(__WII__) || defined(__WIIU__)
 #   include <Utils/files.h>
 #   if defined(__SWITCH__)
 #       define UI_PLATFORM_EXT "-switch"
 #   elif defined(__WII__)
 #       define UI_PLATFORM_EXT "-wii"
+#   elif defined(__WIIU__)
+#       define UI_PLATFORM_EXT "-wiiu"
 #   endif
 #endif
 
