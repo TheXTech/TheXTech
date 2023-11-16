@@ -151,7 +151,7 @@ void XLanguagePriv::detectOSLanguage()
         }
         break;
 
-    case nn::swkbd::LanguageType::SimplifiedChinese:
+    case 6: // nn::swkbd::LanguageType::SimplifiedChinese: // FIXME: Workaround for WUT's bug (Chinese Traditional and Simplified are swapped)
         CurrentLanguage = "zh";
         CurrentLangDialect = "cn";
         break;
@@ -185,7 +185,7 @@ void XLanguagePriv::detectOSLanguage()
         CurrentLangDialect = "ru";
         break;
 
-    case nn::swkbd::LanguageType::TraditionalChinese:
+    case 11: //nn::swkbd::LanguageType::TraditionalChinese: // FIXME: Workaround for WUT's bug (Chinese Traditional and Simplified are swapped)
         CurrentLanguage = "zh";
         CurrentLangDialect = "tw";
         break;
