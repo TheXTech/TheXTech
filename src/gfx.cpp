@@ -175,6 +175,14 @@ bool GFX_t::load()
         m_loadErrors = 0;
     }
 
+    loadImage(Medals, uiPath + "Medals");
+
+    if(m_loadErrors > 0)
+    {
+        pLogWarning("Missing new medal icons.");
+        m_loadErrors = 0;
+    }
+
     // Add new optional assets here. Also update load_gfx.cpp:loadCustomUIAssets()
 
     SDL_assert_release(m_loadedImages.size() <= m_isCustomVolume);

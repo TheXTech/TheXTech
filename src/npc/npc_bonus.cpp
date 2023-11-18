@@ -33,6 +33,8 @@
 #include "../config.h"
 #include "../layers.h"
 
+#include "main/level_medals.h"
+
 #include "npc/npc_queues.h"
 
 #include "../controls.h"
@@ -301,6 +303,7 @@ void TouchBonus(int A, int B)
             Checkpoint_t cp;
             cp.id = Maths::iRound(NPC[B].Special);
             CheckpointsList.push_back(cp);
+            g_curLevelMedals.on_checkpoint();
             pLogDebug("Added checkpoint ID %d", cp.id);
             return;
         }
@@ -557,6 +560,8 @@ void TouchBonus(int A, int B)
                 NPCScore[274] += 1;
                 if(NPCScore[274] > 14)
                     NPCScore[274] = 14;
+
+                g_curLevelMedals.get(NPC[B].Variant - 1);
             }
             else
                 MoreScore(1, NPC[B].Location);

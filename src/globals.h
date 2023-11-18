@@ -880,6 +880,30 @@ struct Effect_t
 //Public Type vScreen 'Screen controls
 #include "screen.h"
 
+//! NEW: information about available Stars and obtained / available Medals for a level
+struct LevelSaveInfo_t
+{
+    // INTEGERS
+    uint8_t  max_stars = 0;
+    uint8_t  max_medals = 255; // invalid, maximum is 8
+
+    // BITMASKS, max medals is 8
+    uint8_t medals_got = 0;
+    uint8_t medals_best = 0;
+
+    inline bool inited() const
+    {
+        return max_medals != 255;
+    }
+};
+
+//! NEW: stores LevelSaveInfo for levels without WorldLevels
+struct LevelWarpSaveEntry_t
+{
+    std::string levelPath;
+    LevelSaveInfo_t save_info;
+};
+
 //Public Type WorldLevel 'the type for levels on the world map
 struct WorldLevel_t
 {
@@ -921,9 +945,11 @@ struct WorldLevel_t
     // int64_t Z = 0;
 
 // Display number of stars (if available)
-    vbint_t curStars = 0;
-    vbint_t maxStars = 0;
-    vbint_t starsShowPolicy = -1;
+    int8_t starsShowPolicy = -1;
+    uint8_t curStars = 0;
+
+    //! NEW: info about collected / available medals / stars (replaces maxStars)
+    LevelSaveInfo_t save_info;
 
     // NEW: returns graphical location extent (based on whether GFXLevelBig is set)
     //   defined in graphics.cpp
@@ -962,9 +988,9 @@ struct Warp_t
 //    LevelEnt As Boolean 'this warp can't be used if set to true (this is for level entrances)
     bool LevelEnt = false;
 //    Direction As Integer 'direction of the entrance for pipe style warps
-    vbint_t Direction = 0;
+    int8_t Direction = 0;
 //    Direction2 As Integer 'direction of the exit
-    vbint_t Direction2 = 0;
+    int8_t Direction2 = 0;
 //    MapWarp As Boolean
     bool MapWarp = false;
 //    MapX As Integer
@@ -972,9 +998,10 @@ struct Warp_t
 //    MapY As Integer
     vbint_t MapY = 0;
 //    curStars As Integer
-    vbint_t curStars = 0;
+    uint8_t curStars = 0;
 //    maxStars As Integer
-    vbint_t maxStars = 0;
+    //! NEW: index into either LevelWarpSaveEntries (<0x7fff) or WorldLevel (>0x8000)
+    uint16_t save_info_idx = 0x8000;
 //EXTRA:
     bool twoWay = false;
     bool noPrintStars = false;
@@ -986,6 +1013,9 @@ struct Warp_t
     stringindex_t StarsMsg = STRINGINDEX_NONE;
     vbint_t transitEffect = 0;
 //End Type
+
+    //! NEW: get the warp's LevelSaveInfo_t (based on save_info_idx)
+    inline const LevelSaveInfo_t save_info() const;
 };
 
 //Public Type Tile 'Tiles for the World
@@ -1112,15 +1142,10 @@ struct WorldPlayer_t
 // EXTRA: last move direction
     int LastMove = 0;
 //    LevelName As String
-    std::string LevelName;
+    // std::string LevelName;
+    //! NEW: index to player's current WorldLevel, 0 if none. (Replaces LevelName and stars.)
+    vbint_t LevelIndex;
 //End Type
-
-    struct StarsState_t
-    {
-        int cur = 0;
-        int max = 0;
-        int displayPolicy = 0;
-    } stars;
 };
 
 //Public Type Layer
@@ -1149,6 +1174,9 @@ struct Checkpoint_t
 };
 // List of taken checkpoints, spawn player at last of them
 extern std::vector<Checkpoint_t> CheckpointsList;
+
+//! List of stars / medal info entries for the levels NOT on the world map
+extern std::vector<LevelWarpSaveEntry_t> LevelWarpSaveEntries;
 
 //Public MagicHand As Boolean 'true if playing a level in the editor while not in fullscreen mode
 extern bool MagicHand;
@@ -1380,6 +1408,18 @@ extern int numWorldMusic;
 //Public WorldLevel(1 To maxWorldLevels) As WorldLevel
 extern RangeArr<WorldLevel_t, 1, maxWorldLevels> WorldLevel;
 DECLREF_T(WorldLevel);
+
+inline const LevelSaveInfo_t Warp_t::save_info() const
+{
+    if(save_info_idx < 0x7FFF && save_info_idx < LevelWarpSaveEntries.size())
+        return LevelWarpSaveEntries[save_info_idx].save_info;
+
+    if(save_info_idx > 0x8000 && save_info_idx - 0x8000 <= numWorldLevels)
+        return WorldLevel[save_info_idx - 0x8000].save_info;
+
+    return LevelSaveInfo_t();
+}
+
 //Public Background(1 To maxBackgrounds) As Background
 extern RangeArr<Background_t, 1, (maxBackgrounds + maxWarps)> Background;
 DECLREF_T(Background);
@@ -1714,6 +1754,14 @@ extern bool EndIntro;
 extern bool ExitMenu;
 //Public LevelSelect As Boolean 'true if game should load the world map
 extern bool LevelSelect;
+
+/**
+ * \brief NEW: utility function to check if in a hub level
+ */
+inline bool InHub()
+{
+    return NoMap && IsEpisodeIntro;
+}
 
 extern bool LevelRestartRequested;
 //Public WorldPlayer(1) As WorldPlayer
