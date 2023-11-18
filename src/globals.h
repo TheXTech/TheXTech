@@ -1755,8 +1755,10 @@ extern bool ExitMenu;
 //Public LevelSelect As Boolean 'true if game should load the world map
 extern bool LevelSelect;
 
-//! NEW: utility function to check if in a hub level
-inline bool InHub()
+/**
+ * \brief NEW: utility function to check if in a hub level
+ */
+SDL_FORCE_INLINE bool InHub()
 {
     return NoMap && IsEpisodeIntro;
 }
