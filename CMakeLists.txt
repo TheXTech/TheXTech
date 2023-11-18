@@ -637,6 +637,8 @@ set(THEXTECH_SRC
     src/main/speedrunner.cpp
     src/main/record.cpp
     src/main/game_save.cpp
+    src/main/level_save_info.cpp
+    src/main/level_medals.cpp
     src/main/main_config.cpp
     src/main/level_file.cpp
     src/main/menu_loop.cpp
@@ -670,6 +672,7 @@ set(THEXTECH_SRC
     src/control/duplicate.cpp
     src/control/controls.cpp
     src/script/msg_preprocessor.cpp
+    src/logic/object_graph.cpp
     src/change_res.cpp
     src/effect.cpp
     src/collision.cpp

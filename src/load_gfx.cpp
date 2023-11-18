@@ -1114,6 +1114,10 @@ static void loadCustomUIAssets()
     loadCGFX(uiRoot + "PCursor.png",
              "PCursor",
              nullptr, nullptr, GFX.isCustom(ci++), GFX.PCursor, false, true);
+
+    loadCGFX(uiRoot + "Medals.png",
+             "Medals",
+             nullptr, nullptr, GFX.isCustom(ci++), GFX.Medals, false, true);
 }
 
 void LoadCustomGFX(bool include_world)
