@@ -159,6 +159,7 @@ LevelSaveInfo_t InitLevelSaveInfo(const LevelData& loadedLevel)
 {
     LevelSaveInfo_t ret;
 
+    // NOTE: could use code similar to below for stars, if not trusting the level header
     ret.max_stars = loadedLevel.stars;
     ret.max_medals = 0;
     ret.medals_got = 0;

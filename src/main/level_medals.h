@@ -34,7 +34,12 @@ private:
 protected:
     friend bool OpenLevelData(LevelData &lvl, const std::string FilePath);
 
-    //! loads maximums from the current level (must be called during OpenLevelData)
+    /**
+     * \brief loads maximums from the current level
+     * Must be called during OpenLevelData after FileNameFull is set and before the LevelData is unloaded
+     *
+     * \param loadedLevel the loaded LevelData object, used to initialize level save info if needed
+     */
     void prepare_lvl(const LevelData& loadedLevel);
 
 public:
@@ -48,29 +53,46 @@ public:
     //! bitfield of medals acquired since most recent lost life (on win, compared with and possibly replaces "best" in save data)
     uint8_t life = 0;
 
-    //! sets specific coin as obtained
+    /**
+     * \brief sets specific coin as obtained
+     * \param idx coin index
+     */
     void get(uint8_t idx);
 
-    //! resets this-life medals
+    /**
+     * \brief resets this-life medals
+     */
     void on_any_death();
 
-    //! loads currently got medals from checkpoint, resets this-life medals
+    /**
+     * \brief loads currently got medals from checkpoint, resets this-life medals
+     */
     void on_all_dead();
 
-    //! saves currently got medals to checkpoint
+    /**
+     * \brief saves currently got medals to checkpoint
+     */
     void on_checkpoint();
 
-    //! resets all player gotten medals for fresh level
+    /**
+     * \brief resets all player gotten medals for fresh level
+     */
     void reset_checkpoint();
 
-    //! resets level attributes (keeps checkpoint)
+    /**
+     * \brief resets level attributes (keeps checkpoint)
+     */
     void reset_lvl();
 
-    //! commits run to current level's save info
+    /**
+     * \brief commits run to current level's save info
+     */
     void commit();
 };
 
-//! sets the Variant attribute of medals in the current level
+/**
+ * \brief sets the Variant attribute of medals in the current level
+ */
 void OrderMedals();
 
 extern CurLevelMedals_t g_curLevelMedals;

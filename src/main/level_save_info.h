@@ -28,16 +28,34 @@
 
 #include "globals.h"
 
-//! initialize level save info from a loaded LevelData object
+/**
+ * \brief initialize level save info from a loaded LevelData object
+ * \param loadedLevel a loaded LevelData object for the level whose save info will be initialized
+ * \return loaded save info
+ */
 LevelSaveInfo_t InitLevelSaveInfo(const LevelData& loadedLevel);
 
-//! convenience function: initialize level save info from fullPath, loading the level into tempData
+/**
+ * \brief convenience function: initialize level save info from fullPath, loading the level into tempData
+ *
+ * \param fullPath a full path to the level file whose save info will be initialized
+ * \param tempData an unloaded LevelData object used to prevent repeated heap allocations while loading multiple levels
+ *
+ * \return loaded save info
+ */
+//!
 LevelSaveInfo_t InitLevelSaveInfo(const std::string& fullPath, LevelData& tempData);
 
-//! import all level save info into WorldLevel and LevelWarpSaveEntries from a GamesaveData object
+/**
+ * \brief import all level save info into WorldLevel and LevelWarpSaveEntries from a GamesaveData object
+ * \param s a PGE-FL GamesaveData object from which level save info will be loaded to global arrays
+ */
 void ImportLevelSaveInfo(const GamesaveData& s);
 
-//! export all level save info from WorldLevel and LevelWarpSaveEntries to a GamesaveData object
+/**
+ * \brief export all level save info from WorldLevel and LevelWarpSaveEntries to a GamesaveData object
+ * \param s a mutable PGE-FL GamesaveData object to which level save info will be stored from global arrays
+ */
 void ExportLevelSaveInfo(GamesaveData& s);
 
 #endif // #ifndef LEVEL_SAVE_INFO_H

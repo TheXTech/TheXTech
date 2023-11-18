@@ -35,7 +35,7 @@
 
 CurLevelMedals_t g_curLevelMedals;
 
-//! find the LevelSaveInfo for the current level
+// find the LevelSaveInfo for the current level
 static inline LevelSaveInfo_t* s_findSaveInfo()
 {
     for(int i = 1; i <= numWorldLevels; ++i)
@@ -53,7 +53,7 @@ static inline LevelSaveInfo_t* s_findSaveInfo()
     return nullptr;
 }
 
-//! find the next matching LevelSaveInfo for the current level
+// find the next matching LevelSaveInfo for the current level, used to make sure all WorldLevels pointing to the same file are updated
 static inline LevelSaveInfo_t* s_nextSaveInfo(LevelSaveInfo_t* prev)
 {
     for(int i = 1; i <= numWorldLevels; ++i)
@@ -139,7 +139,7 @@ void CurLevelMedals_t::prepare_lvl(const LevelData& loadedLevel)
         return;
     }
 
-    // if not inited yet (intro level?) do so now
+    // if allocated but not inited yet (intro level?) do so now
     if(!info->inited())
         *info = InitLevelSaveInfo(loadedLevel);
 
