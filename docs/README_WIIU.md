@@ -65,7 +65,7 @@ In addition, there is a note that unlike the generic way, game saves and other s
 
 - **The Wii U port is currently experimental and not fully tested.**
 - Has a very long loading when placing all resources on SD card: the file system of SD card is slow. Suggested to make a WUHB package and run it as a monolythig game package.
-- Running the release build on CEMU, you may notice that control gets lost after returning back to the world map.
+- Running the release build on CEMU, you may notice that control gets lost after returning back to the world map. The source of error are bugs in the CEMU's recompiler. To escape this until these bugs gets fixed later, it's need to run the CEMU with the `--force-interpreter` command-line argument.
 - Attempt to change the scaling mode will lead a crash (at least on CEMU, not tested on hardware).
 
 # TheXTech Standard Readme
