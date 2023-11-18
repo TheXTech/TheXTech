@@ -23,6 +23,11 @@
 #include <string>
 #include <vector>
 
+#if defined(__3DS__)
+#   define APP_PATH_HAS_EXTRA_WORLDS
+#endif
+
+
 class AppPathManager
 {
 public:
@@ -124,7 +129,7 @@ public:
 
     static std::string userBattleRootDir(); // Read-Only, appears at writable directory
 
-#ifdef __3DS__
+#ifdef APP_PATH_HAS_EXTRA_WORLDS
     static const std::vector<std::string>& worldRootDirs(); // Read-Only, appears at writable directory
 #endif
 
