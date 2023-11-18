@@ -268,8 +268,8 @@ static void loadCGFX(const std::string &origPath,
         if(maskToUse.empty())
             maskToUse = g_dirCustom.resolveFileCaseExistsAbs(fName + "m.gif");
 
-        if(s_useLangDir && maskToUse.empty())
-            maskToUse = g_dirEpisode.resolveFileCaseExistsAbs(s_langSubDir + fName + "m.gif");
+        if(s_useLangDirEp && maskToUse.empty())
+            maskToUse = g_dirEpisode.resolveFileCaseExistsAbs(s_useLangDirEp + fName + "m.gif");
 
         if(maskToUse.empty())
             maskToUse = g_dirEpisode.resolveFileCaseExistsAbs(fName + "m.gif");
