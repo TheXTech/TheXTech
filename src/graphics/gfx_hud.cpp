@@ -496,8 +496,8 @@ void DrawMedals(int X, int Y, bool warp, uint8_t max, uint8_t prev, uint8_t ckpt
         coin_height = GFX.Medals.h;
     }
 
-    if(max > 8)
-        max = 8;
+    if(max > c_max_track_medals)
+        max = c_max_track_medals;
 
     // don't spoil the maximum count, make it shiny if all of the discovered medals are shiny
     bool show_max = g_config.medals_show_policy >= Config_t::MEDALS_SHOW_COUNTS;

@@ -39,7 +39,7 @@ static bool s_exportSingleSaveInfo(saveLevelInfo& s, const LevelSaveInfo_t& info
     s.max_stars = info.max_stars;
     s.max_medals = info.max_medals;
 
-    int size = SDL_min(info.max_medals, 8);
+    int size = SDL_min(info.max_medals, c_max_track_medals);
 
     s.medals_got.resize(size);
     s.medals_best.resize(size);
@@ -61,11 +61,13 @@ static bool s_importSingleSaveInfo(LevelSaveInfo_t& info, const saveLevelInfo& s
     unsigned max_medals = s.max_medals;
 
     // validate limits
-    if(max_stars > 255)
-        max_stars = 255;
+    static_assert(c_max_track_stars <= 255, "c_max_track_stars used to limit values of uint8_t");
+    if(max_stars > c_max_track_stars)
+        max_stars = c_max_track_stars;
 
-    if(max_medals > 8)
-        max_medals = 8;
+    static_assert(c_max_track_medals <= 8, "c_max_track_medals used to limit bit indexes into uint8_t");
+    if(max_medals > c_max_track_medals)
+        max_medals = c_max_track_medals;
 
     // load maximums
     info.max_stars = max_stars;
@@ -166,7 +168,7 @@ LevelSaveInfo_t InitLevelSaveInfo(const LevelData& loadedLevel)
     uint8_t medal_count = 0;
 
     // keep track of the user-specified ones because two medals with the same user index are only counted once
-    std::bitset<8> used_indexes;
+    std::bitset<c_max_track_medals> used_indexes;
 
     for(const auto &npc : loadedLevel.npc)
     {
@@ -186,7 +188,7 @@ LevelSaveInfo_t InitLevelSaveInfo(const LevelData& loadedLevel)
         uint8_t Variant = static_cast<uint8_t>(npc.special_data);
 
         // medal won't be counted (at all) if out-of-range
-        if(Variant > 8)
+        if(Variant > c_max_track_medals)
             continue;
 
         // if no index, freely add to medal count (cap at 8 later)
@@ -205,8 +207,8 @@ LevelSaveInfo_t InitLevelSaveInfo(const LevelData& loadedLevel)
     }
 
     // cap medal count at 8
-    if(medal_count > 8)
-        medal_count = 8;
+    if(medal_count > c_max_track_medals)
+        medal_count = c_max_track_medals;
 
     ret.max_medals = medal_count;
 

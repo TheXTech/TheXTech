@@ -76,7 +76,7 @@ void CurLevelMedals_t::get(uint8_t idx)
     if(InHub())
         return;
 
-    if(idx < 8 && idx < max)
+    if(idx < c_max_track_medals && idx < max)
     {
         got |= (1 << idx);
         life |= (1 << idx);
@@ -160,7 +160,7 @@ void CurLevelMedals_t::commit()
     int old_best_count = 0;
     int new_best_count = 0;
 
-    for(int i = 0; i < 8 && i < info->max_medals; ++i)
+    for(int i = 0; i < c_max_track_medals && i < info->max_medals; ++i)
     {
         if(info->medals_best & (1 << i))
             old_best_count++;
@@ -185,11 +185,11 @@ void OrderMedals()
     using dist_and_hit_index = std::pair<uint16_t, int16_t>;
 
     // used to track medals without creator-specified indexes; first short is distance from start, second short is NPC array index
-    std::array<dist_and_hit_index, 8> auto_medals;
+    std::array<dist_and_hit_index, c_max_track_medals> auto_medals;
     int auto_medal_count = 0;
 
     // used to track medals with creator indexes
-    std::bitset<8> used_indexes;
+    std::bitset<c_max_track_medals> used_indexes;
 
     // look for medals
     for(int i = 1; i <= numNPCs; ++i)
@@ -210,7 +210,7 @@ void OrderMedals()
             continue;
 
         // medal won't be counted (at all) if out-of-range
-        if(n.Variant > 8)
+        if(n.Variant > c_max_track_medals)
             continue;
 
         // record that the medal index has been used
@@ -221,7 +221,7 @@ void OrderMedals()
         }
 
         // if not specified, then try to fill into the array to auto-assign an index
-        if(auto_medal_count < 8)
+        if(auto_medal_count < c_max_track_medals)
         {
             auto_medals[auto_medal_count] = {0, static_cast<int16_t>(i)};
             auto_medal_count++;
@@ -265,7 +265,7 @@ void OrderMedals()
         NPC_t& n = NPC[auto_medals[auto_i].second];
 
         // try to find an index
-        for(int i = 0; i < 8; ++i)
+        for(int i = 0; i < c_max_track_medals; ++i)
         {
             if(!used_indexes[i])
             {

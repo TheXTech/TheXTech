@@ -77,7 +77,13 @@ const int maxWorldCredits = 100;
 
 const int maxYoshiGfx = 10;
 
-const int maxStarsNum = 1000;
+// unused since multistars update
+// const int maxStarsNum = 1000;
+
+// maximum number of tracked medals and stars per level
+// WARNING: c_max_track_medals must not exceed 8 (number of bits per byte) and c_max_track_stars must not exceed 255 (largest uint8_t)
+const int c_max_track_medals = 8;
+const int c_max_track_stars = 255;
 
 const int maxLocalPlayers = 2;
 
