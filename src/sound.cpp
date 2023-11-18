@@ -68,6 +68,13 @@ const AudioDefaults_t g_audioDefaults =
     1536,
     (int)AUDIO_S16SYS
 };
+#elif defined(__WIIU__)
+{
+    44100,
+    2,
+    1024,
+    (int)AUDIO_F32SYS
+};
 #elif defined(__3DS__)
 {
     44100,

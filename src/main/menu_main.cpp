@@ -291,7 +291,7 @@ void FindWorlds()
     if(AppPathManager::userDirIsAvailable())
         worldRoots.push_back({AppPathManager::userWorldsRootDir(), true});
 
-#ifdef __3DS__
+#ifdef APP_PATH_HAS_EXTRA_WORLDS
     // can't edit base assets if they're a romfs package (different from the user dir)
     if(AppPathManager::userDirIsAvailable())
         worldRoots[0].editable = false;
