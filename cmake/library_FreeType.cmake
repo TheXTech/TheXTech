@@ -1,6 +1,6 @@
 option(FREETYPE_PIC "Enable -fPIC flag for libFreeType" ON)
 
-if(VITA)
+if(VITA OR NINTENDO_SWITCH OR NINTENDO_3DS OR NINTENDO_WII OR NINTENDO_WIIU)
     set(FREETYPE_PIC OFF)
 endif()
 
