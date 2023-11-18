@@ -1758,7 +1758,7 @@ extern bool LevelSelect;
 /**
  * \brief NEW: utility function to check if in a hub level
  */
-SDL_FORCE_INLINE bool InHub()
+inline bool InHub()
 {
     return NoMap && IsEpisodeIntro;
 }
