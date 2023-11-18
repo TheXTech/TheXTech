@@ -46,6 +46,7 @@
 #include "main/menu_main.h"
 #include "main/game_strings.h"
 #include "main/game_info.h"
+#include "main/level_medals.h"
 #include "main/translate.h"
 #include "core/render.h"
 #include "core/events.h"
@@ -117,6 +118,7 @@ static void setupCheckpoints()
             pLogDebug("Clear check-points at SetupPlayers()");
             Checkpoint.clear();
             CheckpointsList.clear();
+            g_curLevelMedals.reset_checkpoint();
         }
         return;
     }
@@ -204,6 +206,8 @@ void SetupPlayers()
         pLogDebug("Clear check-points at Battle Mode begining");
         Checkpoint.clear();
         CheckpointsList.clear();
+        g_curLevelMedals.reset_lvl();
+        g_curLevelMedals.reset_checkpoint();
     }
     else
     {
@@ -751,6 +755,8 @@ void PlayerDead(int A)
 {
     Controls::Rumble(A, 400, 0.8f);
 
+    g_curLevelMedals.on_any_death();
+
     bool tempBool = false;
     int B = 0;
     auto &p = Player[A];
@@ -839,6 +845,7 @@ void PlayerDead(int A)
 
     if(CheckLiving() == 0 && !GameMenu && !BattleMode)
     {
+        g_curLevelMedals.on_all_dead();
         StopMusic();
         FreezeNPCs = false;
     }

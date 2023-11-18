@@ -221,7 +221,7 @@ typedef struct SpcEcho
             echo_ptr = echo_ram + echo_offset;
 
             if(!echo_offset)
-                echo_length = (int)round((((reg_edl & 0x0F) * 0x400 * channels) / 2) * rate_factor);
+                echo_length = (int)round((((reg_edl & 0x0F) * 0x400 * channels) / 2.0) * rate_factor);
             e_offset += channels;
             if(e_offset >= echo_length)
                 e_offset = 0;

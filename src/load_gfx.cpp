@@ -279,8 +279,8 @@ static void loadCGFX(const std::string &origPath,
         if(maskToUse.empty())
             maskToUse = g_dirCustom.resolveFileCaseExistsAbs(fName + "m.gif");
 
-        if(s_useLangDir && maskToUse.empty())
-            maskToUse = g_dirEpisode.resolveFileCaseExistsAbs(s_langSubDir + fName + "m.gif");
+        if(s_useLangDirEp && maskToUse.empty())
+            maskToUse = g_dirEpisode.resolveFileCaseExistsAbs(s_langSubDirEp + fName + "m.gif");
 
         if(maskToUse.empty())
             maskToUse = g_dirEpisode.resolveFileCaseExistsAbs(fName + "m.gif");
@@ -1163,6 +1163,10 @@ static void loadCustomUIAssets()
     loadCGFX(uiRoot + "PCursor.png",
              "PCursor",
              nullptr, nullptr, GFX.isCustom(ci++), GFX.PCursor, false, true);
+
+    loadCGFX(uiRoot + "Medals.png",
+             "Medals",
+             nullptr, nullptr, GFX.isCustom(ci++), GFX.Medals, false, true);
 
     loadCGFX(uiRoot + "Backdrop.png",
              "Backdrop",

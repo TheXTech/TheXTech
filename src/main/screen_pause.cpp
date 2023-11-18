@@ -46,6 +46,7 @@
 #include "cheat_code.h"
 
 #include "main/game_strings.h"
+#include "main/level_medals.h"
 
 #include "editor.h"
 
@@ -97,6 +98,7 @@ static bool s_ResetCheckpoints()
     pLogDebug("Clear check-points from a menu");
     Checkpoint.clear();
     CheckpointsList.clear();
+    g_curLevelMedals.reset_checkpoint();
     numStars = 0;
     Star.clear();
 #ifdef THEXTECH_INTERPROC_SUPPORTED

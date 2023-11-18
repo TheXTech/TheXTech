@@ -802,10 +802,13 @@ void SpriteFunc::RelativeDraw(CSprite *me)
             op->m_FramesLeft = 1;
             op->x = sx;
             op->y = sy;
-            op->sx = me->m_GfxRects[me->m_AnimationFrame].left;
-            op->sy = me->m_GfxRects[me->m_AnimationFrame].top;
-            op->sw = me->m_GfxRects[me->m_AnimationFrame].right;
-            op->sh = me->m_GfxRects[me->m_AnimationFrame].bottom;
+
+            auto &r = me->m_GfxRects[me->m_AnimationFrame];
+            op->sx = r.left;
+            op->sy = r.top;
+            op->sw = r.right;
+            op->sh = r.bottom;
+
             if(me->m_directImg)
                 op->direct_img = me->m_directImg;
             else

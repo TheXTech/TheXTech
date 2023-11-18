@@ -35,6 +35,7 @@
 #include "../main/trees.h"
 #include "level_file.h"
 #include "world_file.h"
+#include "main/level_save_info.h"
 #include "translate_episode.h"
 #include "fontman/font_manager.h"
 
@@ -516,7 +517,7 @@ void ClearWorld(bool quick)
 
 void FindWldStars()
 {
-    LevelData head;
+    LevelData tempData;
 
     for(int A = 1; A <= numWorldLevels; A++)
     {
@@ -524,26 +525,25 @@ void FindWldStars()
 
         if(!l.FileName.empty())
         {
+            l.curStars = 0;
+
+            for(const auto& star : Star)
+            {
+                if(SDL_strcasecmp(star.level.c_str(), Files::basename(l.FileName).c_str()) == 0)
+                    l.curStars++;
+            }
+
+            // skip check for max stars and medals if it's already been inited
+            if(l.save_info.inited())
+                continue;
+
             std::string lFile = l.FileName;
             addMissingLvlSuffix(lFile);
 
             std::string fullPath = g_dirEpisode.resolveFileCaseExistsAbs(lFile);
 
             if(!fullPath.empty())
-            {
-                if(FileFormats::OpenLevelFileHeader(fullPath, head))
-                {
-                    l.maxStars = head.stars;
-                    l.curStars = 0;
-
-                    for(const auto& star : Star)
-                    {
-                        if(SDL_strcasecmp(star.level.c_str(), Files::basename(l.FileName).c_str()) == 0)
-                            l.curStars++;
-                    }
-                }
-            }
-
+                l.save_info = InitLevelSaveInfo(fullPath, tempData);
         }
     }
 }

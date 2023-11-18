@@ -835,7 +835,7 @@ void DrawBackdrop()
 {
     if(GFX.Backdrop.inited)
     {
-        bool border_valid = GFX.Backdrop_Border.tex.inited && (!GFX.isCustom(68) || GFX.isCustom(69));
+        bool border_valid = GFX.Backdrop_Border.tex.inited && (!GFX.isCustom(69) || GFX.isCustom(70));
 
         for(int Z = 1; Z <= 2; Z++)
         {

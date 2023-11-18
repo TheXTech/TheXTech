@@ -87,6 +87,8 @@ enum
     MENU_SELECT_SLOT_1P_DELETE = 13,
     MENU_SELECT_SLOT_2P_DELETE = 23,
     MENU_SELECT_SLOT_DELETE_ADD = 3,
+
+    MENU_SELECT_SLOT_END = 30,
 };
 
 struct MainMenuContent

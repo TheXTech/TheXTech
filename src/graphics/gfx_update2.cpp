@@ -39,6 +39,7 @@
 #include "../main/screen_textentry.h"
 #include "../game_main.h"
 #include "../main/world_globals.h"
+#include "main/level_medals.h"
 #include "../core/render.h"
 #include "../screen_fader.h"
 
@@ -159,6 +160,41 @@ void GetvScreenWorld(vScreen_t& vscreen)
 
     vscreen.ScreenTop = vscreen.Top;
     vscreen.ScreenLeft = vscreen.Left;
+}
+
+
+static inline int computeStarsShowingPolicy(int ll, int cur)
+{
+    // Level individual
+    if(ll > Compatibility_t::STARS_UNSPECIFIED)
+    {
+        if(ll == Compatibility_t::STARS_SHOW_COLLECTED_ONLY && cur <= 0)
+            return Compatibility_t::STARS_DONT_SHOW;
+        return ll;
+    }
+
+    // World map-wide
+    if(WorldStarsShowPolicy > Compatibility_t::STARS_UNSPECIFIED)
+    {
+        if(WorldStarsShowPolicy == Compatibility_t::STARS_SHOW_COLLECTED_ONLY && cur <= 0)
+            return Compatibility_t::STARS_DONT_SHOW;
+        return WorldStarsShowPolicy;
+    }
+
+    // Compatibility settings
+    if(g_compatibility.world_map_stars_show_policy > Compatibility_t::STARS_UNSPECIFIED)
+    {
+        if(g_compatibility.world_map_stars_show_policy == Compatibility_t::STARS_SHOW_COLLECTED_ONLY && cur <= 0)
+            return Compatibility_t::STARS_DONT_SHOW;
+
+        return g_compatibility.world_map_stars_show_policy;
+    }
+
+    // Gameplay settings
+    if(g_config.WorldMapStarShowPolicyGlobal == Compatibility_t::STARS_SHOW_COLLECTED_ONLY && cur <= 0)
+        return Compatibility_t::STARS_DONT_SHOW;
+
+    return g_config.WorldMapStarShowPolicyGlobal;
 }
 
 
@@ -593,30 +629,40 @@ void UpdateGraphics2(bool skipRepaint)
                               WorldPlayer[1].Location.Width, WPHeight,
                               GFXPlayerBMP[WorldPlayer[1].Type], 0, WPHeight * WorldPlayer[1].Frame);
 
-        if(!WorldPlayer[1].LevelName.empty())
+        if(WorldPlayer[1].LevelIndex)
         {
-             auto &s = WorldPlayer[1].stars;
+            auto &l = WorldLevel[WorldPlayer[1].LevelIndex];
 
-             if(s.max > 0 && s.displayPolicy > Compatibility_t::STARS_DONT_SHOW)
-             {
-                 std::string label;
+            auto policy = computeStarsShowingPolicy(l.starsShowPolicy, l.curStars);
 
-                 if(s.displayPolicy >= Compatibility_t::STARS_SHOW_COLLECTED_AND_AVAILABLE)
-                     label = fmt::format_ne("{0}/{1}", s.cur, s.max);
-                 else
-                     label = fmt::format_ne("{0}", s.cur);
+            int p_center_x = vScreen[Z].X + WorldPlayer[1].Location.X + (WorldPlayer[1].Location.Width / 2);
+            int info_y = vScreen[Z].Y + WorldPlayer[1].Location.Y - 32;
 
-                 int len = SuperTextPixLen(label, 3);
-                 int totalLen = len + GFX.Interface[1].w + GFX.Interface[5].w + 8 + 4;
-                 int x = vScreen[Z].X + WorldPlayer[1].Location.X + (WorldPlayer[1].Location.Width / 2) - (totalLen / 2);
-                 int y = vScreen[Z].Y + WorldPlayer[1].Location.Y - 32;
+            if(l.save_info.inited() && l.save_info.max_stars > 0 && policy > Compatibility_t::STARS_DONT_SHOW)
+            {
+                std::string label;
 
-                 XRender::renderTexture(x, y,
-                                       GFX.Interface[5].w, GFX.Interface[5].h, GFX.Interface[5], 0, 0);
-                 XRender::renderTexture(x + GFX.Interface[5].w + 8, y,
-                                       GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
-                 SuperPrint(label, 3, x + GFX.Interface[1].w + GFX.Interface[5].w + 8 + 4, y);
-             }
+                if(policy >= Compatibility_t::STARS_SHOW_COLLECTED_AND_AVAILABLE)
+                    label = fmt::format_ne("{0}/{1}", l.curStars, l.save_info.max_stars);
+                else
+                    label = fmt::format_ne("{0}", l.curStars);
+
+                int len = SuperTextPixLen(label, 3);
+                int totalLen = len + GFX.Interface[1].w + GFX.Interface[5].w + 8 + 4;
+                int x = p_center_x - (totalLen / 2);
+
+                XRender::renderTexture(x, info_y, GFX.Interface[5]);
+                XRender::renderTexture(x + GFX.Interface[5].w + 8, info_y, GFX.Interface[1]);
+                SuperPrint(label, 3, x + GFX.Interface[1].w + GFX.Interface[5].w + 8 + 4, info_y);
+                info_y -= 20;
+            }
+
+            if(l.save_info.inited() && l.save_info.max_medals > 0 && true)
+            {
+                uint8_t ckpt = (Checkpoint == FileNamePathWorld + l.FileName) ? g_curLevelMedals.got : 0;
+
+                DrawMedals(p_center_x, info_y, true, l.save_info.max_medals, 0, ckpt, l.save_info.medals_got, l.save_info.medals_best);
+            }
         }
 
         XRender::resetViewport();
@@ -628,7 +674,7 @@ void UpdateGraphics2(bool skipRepaint)
 //        XRender::renderTexture(0, 0, 800, 130, GFX.Interface[4], 0, 0);
         if(worldHasFrameAssets())
         {
-            bool border_valid = GFX.WorldMapFrame_Border.tex.inited && (!GFX.isCustom(70) || GFX.isCustom(71));
+            bool border_valid = GFX.WorldMapFrame_Border.tex.inited && (!GFX.isCustom(71) || GFX.isCustom(72));
 
             RenderFrameBorder(newLoc(0, 0, ScreenW, ScreenH), newLoc(vScreen[Z].ScreenLeft, vScreen[Z].ScreenTop, vScreen[Z].Width, vScreen[Z].Height),
                 GFX.WorldMapFrame_Tile, border_valid ? &GFX.WorldMapFrame_Border : nullptr);
@@ -795,24 +841,27 @@ void UpdateGraphics2(bool skipRepaint)
         }
 
         // Print the level's name
-        if(!WorldPlayer[1].LevelName.empty())
+        if(WorldPlayer[1].LevelIndex)
         {
             int lnlx = pX + 116;
             int lnrx = vScreen[Z].ScreenLeft + vScreen[Z].Width;
 
             // could make these arrays if multiple world players ever supported
-            static std::string cache_LevelName;
+            static vbint_t cache_LevelIndex;
             static double cache_vScreen_W = 0.0;
             static std::string cache_LevelName_Split;
             static int cache_LevelName_H = 0;
 
             int font = FontManager::fontIdFromSmbxFont(2);
 
-            if(cache_LevelName != WorldPlayer[1].LevelName || cache_vScreen_W != vScreen[Z].Width)
+            if(cache_LevelIndex != WorldPlayer[1].LevelIndex || cache_vScreen_W != vScreen[Z].Width)
             {
+                cache_LevelIndex = WorldPlayer[1].LevelIndex;
+                cache_vScreen_W = vScreen[Z].Width;
+
                 int max_width = lnrx - lnlx;
 
-                cache_LevelName_Split = cache_LevelName = WorldPlayer[1].LevelName;
+                cache_LevelName_Split = WorldLevel[WorldPlayer[1].LevelIndex].LevelName;
                 // mutates cache_LevelName_Split
                 cache_LevelName_H = FontManager::optimizeTextPx(cache_LevelName_Split, max_width, font).h();
             }

@@ -197,6 +197,14 @@ bool GFX_t::load()
         m_loadErrors = 0;
     }
 
+    loadImage(Medals, uiPath + "Medals");
+
+    if(m_loadErrors > 0)
+    {
+        pLogWarning("Missing new medal icons.");
+        m_loadErrors = 0;
+    }
+
     loadImage(Backdrop, uiPath + "Backdrop");
     loadBorder(Backdrop_Border, uiPath + "Backdrop_Border");
 

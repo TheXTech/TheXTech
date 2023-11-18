@@ -241,6 +241,15 @@ void OpenConfig()
             {"show-all", 2}
         };
 
+        const IniProcessing::StrEnumMap medalsShowPolicy =
+        {
+            {"hide", Config_t::MEDALS_SHOW_OFF},
+            {"collected-only", Config_t::MEDALS_SHOW_GOT},
+            {"counts-only", Config_t::MEDALS_SHOW_COUNTS},
+            {"show", Config_t::MEDALS_SHOW_FULL},
+            {"show-full", Config_t::MEDALS_SHOW_FULL}
+        };
+
         const IniProcessing::StrEnumMap renderInactiveNPC =
         {
             {"hide", Config_t::INACTIVE_NPC_HIDE},
@@ -279,6 +288,7 @@ void OpenConfig()
 
         config.beginGroup("gameplay");
         config.readEnum("world-map-stars-show-policy", g_config.WorldMapStarShowPolicyGlobal, 0, starsShowPolicy);
+        config.readEnum("medals-show-policy", g_config.medals_show_policy, 0, medalsShowPolicy);
         config.read("no-pause-reconnect", g_config.NoPauseReconnect, false);
         config.read("world-map-fast-move", g_config.worldMapFastMove, false);
 #ifdef ENABLE_XTECH_DISCORD_RPC
@@ -431,6 +441,14 @@ void SaveConfig()
             {2, "show-all"}
         };
 
+        std::unordered_map<int, std::string> medalsShowPolicy =
+        {
+            {Config_t::MEDALS_SHOW_OFF, "hide"},
+            {Config_t::MEDALS_SHOW_GOT, "collected-only"},
+            {Config_t::MEDALS_SHOW_COUNTS, "counts-only"},
+            {Config_t::MEDALS_SHOW_FULL, "show-full"}
+        };
+
         std::unordered_map<int, std::string> compatMode =
         {
             {0, "native"},
@@ -439,6 +457,7 @@ void SaveConfig()
         };
 
         config.setValue("world-map-stars-show-policy", starsShowPolicy[g_config.WorldMapStarShowPolicyGlobal]);
+        config.setValue("medals-show-policy", medalsShowPolicy[g_config.medals_show_policy]);
         config.setValue("compatibility-mode", compatMode[g_preSetup.compatibilityMode]);
     }
     config.setValue("no-pause-reconnect", g_config.NoPauseReconnect);

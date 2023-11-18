@@ -629,6 +629,8 @@ set(THEXTECH_SRC
     src/main/speedrunner.cpp
     src/main/record.cpp
     src/main/game_save.cpp
+    src/main/level_save_info.cpp
+    src/main/level_medals.cpp
     src/main/main_config.cpp
     src/main/level_file.cpp
     src/main/menu_loop.cpp
@@ -664,6 +666,7 @@ set(THEXTECH_SRC
     src/control/duplicate.cpp
     src/control/controls.cpp
     src/script/msg_preprocessor.cpp
+    src/logic/object_graph.cpp
     src/change_res.cpp
     src/effect.cpp
     src/collision.cpp
@@ -895,9 +898,8 @@ elseif(NINTENDO_3DS)
     add_definitions(-DTHEXTECH_DISABLE_SDL_LOCALE) # SDL for 3DS doesn't support language detection
     list(APPEND THEXTECH_SRC src/core/language/language_3ds.cpp)
 elseif(NINTENDO_WII)
-    # FIXME: Implement the Nintendo WII language initializer
-    add_definitions(-DTHEXTECH_DISABLE_SDL_LOCALE)
-    list(APPEND THEXTECH_SRC src/core/language/language_dummy.cpp)
+    add_definitions(-DTHEXTECH_DISABLE_SDL_LOCALE) # SDL for Wii doesn't support language detection
+    list(APPEND THEXTECH_SRC src/core/language/language_wii.cpp)
 elseif(NINTENDO_WIIU)
     # FIXME: Implement the Nintendo WII U language initializer
     add_definitions(-DTHEXTECH_DISABLE_SDL_LOCALE)

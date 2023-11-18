@@ -89,6 +89,8 @@
 #include "main/screen_connect.h"
 #include "main/screen_quickreconnect.h"
 
+#include "main/level_medals.h"
+
 #include "main/trees.h"
 
 void CheckActive();
@@ -726,6 +728,8 @@ int GameMain(const CmdLineSetup_t &setup)
             pLogDebug("Clear check-points at Game Menu start");
             Checkpoint.clear();
             CheckpointsList.clear();
+            g_curLevelMedals.reset_lvl();
+            g_curLevelMedals.reset_checkpoint();
             WorldPlayer[1].Frame = 0;
             cheats_clearBuffer();
             LevelBeatCode = 0;
@@ -895,10 +899,8 @@ int GameMain(const CmdLineSetup_t &setup)
             SetupPlayers();
             FontManager::loadCustomFonts();
 
-#ifndef PGE_MIN_PORT
             if(!NoMap)
                 FindWldStars();
-#endif
 
             if((!StartLevel.empty() && NoMap) || !GoToLevel.empty())
             {
@@ -1182,6 +1184,16 @@ int GameMain(const CmdLineSetup_t &setup)
                     return false;
                 });
             }
+
+            // store to level save info if level won
+            if(LevelBeatCode > 0)
+            {
+                g_curLevelMedals.commit();
+                g_curLevelMedals.reset_checkpoint();
+            }
+            // otherwise, restore the medals from checkpoint
+            else
+                g_curLevelMedals.on_all_dead();
 
             Record::EndRecording();
 

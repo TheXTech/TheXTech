@@ -37,7 +37,7 @@ class GFX_t
     //! Holder of loaded textures for easier clean-up
     std::vector<StdPicture*> m_loadedImages;
     //! Capacity of the m_isCustom array (update when new assets are added)
-    static constexpr size_t m_isCustomVolume = 73;
+    static constexpr size_t m_isCustomVolume = 74;
     //! Holder of "is custom" flag
     bool m_isCustom[m_isCustomVolume];
 
@@ -88,9 +88,10 @@ public:
     // new graphics for TheXTech
     StdPicture EIcons;
     StdPicture PCursor;
-    StdPicture Backdrop; // Backdrop is 68
+    StdPicture Medals;
+    StdPicture Backdrop; // Backdrop is 69
     FrameBorder Backdrop_Border;
-    StdPicture WorldMapFrame_Tile; // WorldMapFrame_Tile is 70
+    StdPicture WorldMapFrame_Tile; // WorldMapFrame_Tile is 71
     FrameBorder WorldMapFrame_Border;
     StdPicture Camera;
 
