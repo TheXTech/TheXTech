@@ -249,9 +249,9 @@ void UpdateWindowRes()
 
     if(g_videoSettings.scaleMode == SCALE_FIXED_05X)
         XWindow::setWindowSize(w / 2, h / 2);
-    else if(g_videoSettings.scaleMode == SCALE_FIXED_1X)
-        XWindow::setWindowSize(w, h);
     else if(g_videoSettings.scaleMode == SCALE_FIXED_2X)
         XWindow::setWindowSize(w * 2, h * 2);
+    else
+        XWindow::setWindowSize(w, h);
 }
 
