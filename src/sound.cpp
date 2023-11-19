@@ -251,6 +251,15 @@ void InitMixerX()
     if(g_mixerLoaded)
         return;
 
+#ifdef __3DS__
+    // Create the blank "dspfirm.cdc" if not exists (it's required to exist for the 3DS audio work)
+    if(!Files::fileExists("/3ds/dspfirm.cdc"))
+    {
+        FILE *x = Files::utf8_fopen("/3ds/dspfirm.cdc", "wb");
+        fclose(x);
+    }
+#endif
+
     pLogDebug("Opening sound (wanted: rate=%d hz, format=%s, channels=%d, buffer=%d frames)...",
               g_audioSetup.sampleRate,
               audio_format_to_string(g_audioSetup.format),
