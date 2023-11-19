@@ -101,8 +101,8 @@ void GetvScreenWorld(vScreen_t& vscreen)
 
         if(vscreen.Height > 404)
         {
-            vscreen.Left += (vscreen.Width - 404) / 2;
-            vscreen.Width = 404;
+            vscreen.Top += (vscreen.Height - 404) / 2;
+            vscreen.Height = 404;
         }
     }
 
