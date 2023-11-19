@@ -14,20 +14,20 @@ HOWEVER, with this way, the game LOADS WERY SLOW on hardware because of the how 
 1. Download and place files `thextech.rpx`, `icon.png`, and `meta.xml` at the "wiiu/apps/thextech-wiiu" directory at the root of SD card.
 2. Download one of the game assets packages for TheXTech from here: https://github.com/Wohlstand/TheXTech/wiki/Game-assets-packages
 3. Extract the downloaded archive with all it's content
-4. Created a folder in root of your SD card named “thextech” (case matters)
-    `sd:/thextech`
-5. Move all extracted folders & files from the computer to sdmc:/thextech.
+4. Created a folder "wiiu" in root of your SD card if not exist, and then, inside, make another directory named "thextech" (case matters)
+    `sd:/wiiu/thextech`
+5. Move all extracted folders & files from the computer to `sd:/wiiu/thextech`.
     Upon completion, your folder structure should look like this:
-        sd:/thextech/battle/
-        sd:/thextech/graphics/
-        sd:/thextech/music/
-        sd:/thextech/sound/
-        sd:/thextech/worlds/
-        sd:/thextech/gameinfo.ini
-        sd:/thextech/intro.lvl
-        sd:/thextech/music.ini
-        sd:/thextech/outro.lvl
-        sd:/thextech/sounds.ini
+        sd:/wiiu/thextech/battle/
+        sd:/wiiu/thextech/graphics/
+        sd:/wiiu/thextech/music/
+        sd:/wiiu/thextech/sound/
+        sd:/wiiu/thextech/worlds/
+        sd:/wiiu/thextech/gameinfo.ini
+        sd:/wiiu/thextech/intro.lvl
+        sd:/wiiu/thextech/music.ini
+        sd:/wiiu/thextech/outro.lvl
+        sd:/wiiu/thextech/sounds.ini
 
 6. Run `TheXTech` application via Homebrew Launcher and enjoy.
 
@@ -58,7 +58,8 @@ And now, you can try to launch the package throgh the Aroma or something also.
 
 In addition, there is a note that unlike the generic way, game saves and other stuff appears in different places:
 - Settings and game saves will appear at the system-wide gamesave directory. The name of directory is directly depends on the name of the WOHB file, and if you rename it, the gamesave directory will be changed!
-- If you plugged an SD card or USB stick, the `thextech-user` sub-directory will appear on it: here are screenshots and logs will be saved.
+- If you plugged an SD card or USB stick, the `wiiu/thextech-user/<title-id>` sub-directory will appear on it: here are screenshots and logs will be saved.
+- Inside `wiiu/thextech-user` directory, there are sub-directories with the "Title-ID" value (a hexidecial number) that will contain the different stuff depending on currently running assets package.
 
 
 ### KNOWN ISSUES

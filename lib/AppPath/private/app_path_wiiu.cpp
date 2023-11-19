@@ -21,15 +21,17 @@
 #include <string>
 
 #include <nn/save.h>
+#include <coreinit/title.h>
 
 #include "../app_path.h"
 #include <DirManager/dirman.h>
+#include <fmt/fmt_printf.h>
 #include "app_path_private.h"
 
 //! The assets&user directory for standalone RPX when SD card is plugged
-constexpr const char* s_assetRootSD = "fs:/vol/external01/thextech/";
+constexpr const char* s_assetRootSD = "fs:/vol/external01/wiiu/thextech/";
 //! The assets&user directory for standalone RPX when USB stick is plugged
-constexpr const char* s_assetRootUSB = "usb:/thextech/";
+constexpr const char* s_assetRootUSB = "usb:/wiiu/thextech/";
 //! The assets directory for WUHB/installable package of the game
 constexpr const char* s_assetRootContent = "fs:/vol/content/";
 
@@ -56,6 +58,9 @@ void AppPathP::initDefaultPaths(const std::string &userDirName)
 {
     (void)userDirName;
 
+    uint16_t titleId = OSGetTitleID();
+    std::string titleIdString = fmt::sprintf("%016llX/", titleId);
+
     // When running game under WUHB package or as an installable game (/vol/content and /vol/save dirs do exist)
     if(DirMan::exists(s_assetRootContent))
     {
@@ -74,7 +79,7 @@ void AppPathP::initDefaultPaths(const std::string &userDirName)
         {
             // FIXME: Find a way to obtain executable/WUHB name, and put all the stuff into sub-directory
             // That should avoid collisions between different game packages using the same engine.
-            s_userDir = "usb:/thextech-user/";
+            s_userDir = "usb:/wiiu/thextech-user/" + titleIdString;
             s_logsDir = s_userDir + "logs/";
             s_screenshotsDir = s_userDir + "screenshots/";
             s_gifsDir = s_userDir + "gif-recordings/";
@@ -87,7 +92,7 @@ void AppPathP::initDefaultPaths(const std::string &userDirName)
         {
             // FIXME: Find a way to obtain executable/WUHB name, and put all the stuff into sub-directory
             // That should avoid collisions between different game packages using the same engine.
-            s_userDir = "fs:/vol/external01/thextech-user/";
+            s_userDir = "fs:/vol/external01/wiiu/thextech-user/" + titleIdString;
             s_logsDir = s_userDir + "logs/";
             s_screenshotsDir = s_userDir + "screenshots/";
             s_gifsDir = s_userDir + "gif-recordings/";
