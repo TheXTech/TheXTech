@@ -502,8 +502,8 @@ void DrawMedals(int X, int Y, bool warp, uint8_t max, uint8_t prev, uint8_t ckpt
     // don't spoil the maximum count, make it shiny if all of the discovered medals are shiny
     bool show_max = g_config.medals_show_policy >= Config_t::MEDALS_SHOW_COUNTS;
 
-    // whether to use the shiny effect for medals; for warps, check if best is all 1s (up to bit max); in HUD, check if best == got
-    bool show_shiny = (warp && show_max) ? (best == ((1 << max) - 1)) : (best == got);
+    // whether to use the shiny effect for medals; for warps, check if best is all 1s (up to bit max); in HUD, always draw shiny medals
+    bool show_shiny = (warp && show_max) ? (best == ((1 << max) - 1)) : true;
 
     // slot-based display
     if(g_config.medals_show_policy == Config_t::MEDALS_SHOW_FULL)
