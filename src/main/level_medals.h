@@ -60,6 +60,12 @@ public:
     void get(uint8_t idx);
 
     /**
+     * \brief checks whether specific coin has been obtained
+     * \param idx coin index
+     */
+    bool gotten(uint8_t idx) const;
+
+    /**
      * \brief resets this-life medals
      */
     void on_any_death();
