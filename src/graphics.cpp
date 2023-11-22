@@ -667,15 +667,13 @@ void GetvScreenCredits(vScreen_t& vscreen)
     if(B == 0)
         return;
 
-    // used ScreenW / ScreenH in VB6 code
-    const Screen_t& screen = Screens[vscreen.screen_ref];
-    const Screen_t& use_screen = g_compatibility.allow_multires ? screen : screen.canonical_screen();
+    // used ScreenW / ScreenH in VB6 code, using vScreen.Width / Height here
 
     const Location_t& section = level[Player[1].Section];
 
     // remember that the screen will be limited to the section's size in all cases
-    double use_width  = SDL_min(static_cast<double>(use_screen.W), section.Width  - section.X);
-    double use_height = SDL_min(static_cast<double>(use_screen.H), section.Height - section.Y);
+    double use_width  = SDL_min(vscreen.Width,  section.Width  - section.X);
+    double use_height = SDL_min(vscreen.Height, section.Height - section.Y);
 
     vscreen.X = (vscreen.X / B) + (use_width * 0.5);
     vscreen.Y = (vscreen.Y / B) + (use_height * 0.5) - vScreenYOffset;
@@ -684,10 +682,10 @@ void GetvScreenCredits(vScreen_t& vscreen)
         vscreen.X = -section.X;
     if(-vscreen.X + use_width > section.Width)
         vscreen.X = -(section.Width - use_width);
-    if(-vscreen.Y < section.Y + 100)
-        vscreen.Y = -section.Y + 100;
-    if(-vscreen.Y + use_height > section.Height - 100)
-        vscreen.Y = -(section.Height - use_height - 100);
+    if(-vscreen.Y < section.Y)
+        vscreen.Y = -section.Y;
+    if(-vscreen.Y + use_height > section.Height)
+        vscreen.Y = -(section.Height - use_height);
 }
 
 #if 0

@@ -171,7 +171,13 @@ void SetupScreens(Screen_t& screen, bool reset)
         vscreen2.Left = 0;
         vscreen2.Top = 0;
         break;
-    case 7: // Credits
+    case 7: // Credits (MODIFIED to include the chop feature)
+        vscreen1.Left = 0;
+        vscreen1.Height = screen.H - 200;
+        vscreen1.Top = 100;
+        vscreen1.Width = screen.W;
+        vscreen2.Visible = false;
+        break;
     case 8: // netplay
         vscreen1.Left = 0;
         vscreen1.Height = screen.H;
@@ -530,7 +536,7 @@ void CenterScreens(Screen_t& screen)
         bool in_map = (LevelSelect && !GameMenu);
 
         // skip centering in all these places (world map sections handled elsewhere)
-        if(GameOutro || LevelEditor || WorldEditor || in_map)
+        if(LevelEditor || WorldEditor || in_map)
             continue;
 
         // restrict the vScreen to the level if the level is smaller than the screen
