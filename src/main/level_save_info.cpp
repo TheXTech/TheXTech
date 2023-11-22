@@ -39,7 +39,7 @@ static bool s_exportSingleSaveInfo(saveLevelInfo& s, const LevelSaveInfo_t& info
     s.max_stars = info.max_stars;
     s.max_medals = info.max_medals;
 
-    int size = SDL_min(info.max_medals, c_max_track_medals);
+    int size = SDL_min(static_cast<int>(info.max_medals), c_max_track_medals);
 
     s.medals_got.resize(size);
     s.medals_best.resize(size);

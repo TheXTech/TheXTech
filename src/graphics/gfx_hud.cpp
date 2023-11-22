@@ -401,7 +401,7 @@ void DrawInterface(int Z, int numScreens)
     if(!InHub() && !BattleMode)
     {
         // draw medals at top-right side of HUD
-        int MedalsX = SDL_min(vScreen[Z].Width - 16, CenterX + 400 - 16);
+        int MedalsX = SDL_min(static_cast<int>(vScreen[Z].Width) - 16, CenterX + 400 - 16);
         int MedalsY = ScreenTop + 16;
 
         DrawMedals(MedalsX, MedalsY, false, g_curLevelMedals.max, g_curLevelMedals.prev, 0, g_curLevelMedals.got, g_curLevelMedals.life);
