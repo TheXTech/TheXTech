@@ -171,10 +171,10 @@ void SetupScreens(Screen_t& screen, bool reset)
         vscreen2.Left = 0;
         vscreen2.Top = 0;
         break;
-    case 7: // Credits (MODIFIED to include the chop feature)
+    case 7: // Credits (MODIFIED to include an adjusted chop feature)
         vscreen1.Left = 0;
-        vscreen1.Height = screen.H - 200;
-        vscreen1.Top = 100;
+        vscreen1.Top = (screen.H > 600) ? 100 : (screen.H / 6) & ~1;
+        vscreen1.Height = screen.H - 2 * vscreen1.Top;
         vscreen1.Width = screen.W;
         vscreen2.Visible = false;
         break;

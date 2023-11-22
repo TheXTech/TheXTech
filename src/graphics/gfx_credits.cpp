@@ -59,10 +59,13 @@ void DrawCredits()
     XRender::renderRect(0, 0, ScreenW, Maths::iRound(CreditChop), 0.f, 0.f, 0.f);
     XRender::renderRect(0, ScreenH - Maths::iRound(CreditChop), ScreenW, std::ceil(CreditChop), 0.f, 0.f, 0.f);
 
-    if(CreditChop > 100)
+    // previously hardcoded to 100
+    int shrink = vScreen[1].Top;
+
+    if(CreditChop > shrink)
     {
-        float chop = CreditChop- 100;
-        float chop_max = (static_cast<float>(ScreenH) / 2.f) - 100;
+        float chop = CreditChop - shrink;
+        float chop_max = (static_cast<float>(ScreenH) / 2.f) - shrink;
         float alpha = chop / chop_max;
         XRender::renderRect(0, 0, ScreenW, ScreenH, 0.f, 0.f, 0.f, alpha);
     }
