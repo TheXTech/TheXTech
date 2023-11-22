@@ -389,9 +389,9 @@ inline void get_NPC_tint(int A, float& cn, float& an)
             }
         }
     }
-    
+
     cn = n.Shadow ? 0.0f : 1.0f;
-    an = (NPC[A].Type == NPCID_MEDAL && g_curLevelMedals.gotten(NPC[A].Variant - 1)) ? 0.5f : 1.0f;
+    an = 1.0f;
 }
 
 // draws a warning icon for offscreen active NPC A on vScreen Z
@@ -2478,6 +2478,8 @@ void UpdateGraphics(bool skipRepaint)
 
             float cn, an;
             get_NPC_tint(A, cn, an);
+            if(NPC[A].Type == NPCID_MEDAL && g_curLevelMedals.gotten(NPC[A].Variant - 1))
+                an *= 0.5f;
 
             if(NPCWidthGFX[NPC[A].Type] == 0)
                 XRender::renderTexture(vScreen[Z].X + NPC[A].Location.X + NPCFrameOffsetX[NPC[A].Type], vScreen[Z].Y + NPC[A].Location.Y + NPCFrameOffsetY[NPC[A].Type], NPC[A].Location.Width, NPC[A].Location.Height, GFXNPC[NPC[A].Type], 0, NPC[A].Frame * NPC[A].Location.Height, cn, cn, cn, an);
