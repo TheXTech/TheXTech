@@ -83,6 +83,18 @@ void CurLevelMedals_t::get(uint8_t idx)
     }
 }
 
+bool CurLevelMedals_t::gotten(uint8_t idx) const
+{
+    // don't save star coins in hub level
+    if(InHub())
+        return false;
+
+    if(idx < c_max_track_medals && idx < max)
+        return got & (1 << idx);
+
+    return false;
+}
+
 void CurLevelMedals_t::on_any_death()
 {
     life = 0;

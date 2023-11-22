@@ -389,17 +389,9 @@ inline void get_NPC_tint(int A, float& cn, float& an)
             }
         }
     }
-
-    if(n.Shadow)
-    {
-        cn = 0.0f;
-        an = 1.0f;
-    }
-    else
-    {
-        cn = 1.0f;
-        an = 1.0f;
-    }
+    
+    cn = n.Shadow ? 0.0f : 1.0f;
+    an = (NPC[A].Type == NPCID_MEDAL && g_curLevelMedals.gotten(NPC[A].Variant - 1)) ? 0.5f : 1.0f;
 }
 
 // draws a warning icon for offscreen active NPC A on vScreen Z

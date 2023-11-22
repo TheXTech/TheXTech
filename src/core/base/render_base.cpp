@@ -37,7 +37,9 @@
 #include <Utils/files.h>
 #include <fmt_time_ne.h>
 #include <fmt_format_ne.h>
+#ifdef USE_SCREENSHOTS_AND_RECS
 #include <gif.h>
+#endif
 #include <pge_delay.h>
 
 #include <chrono>
