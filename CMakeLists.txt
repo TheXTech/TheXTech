@@ -334,7 +334,7 @@ if(USE_STATIC_LIBC)
 endif()
 
 include(lib/Allocator/pool-allocator.cmake)
-include(lib/DirManager/dirman.cmake)
+include(3rdparty/DirManager/dirman.cmake)
 
 if(NOT VITA AND NOT NINTENDO_SWITCH AND NOT NINTENDO_3DS AND NOT NINTENDO_WII AND NOT NINTENDO_WIIU AND NOT NINTENDO_DS)
     include(lib/FileMapper/FileMapper.cmake)
