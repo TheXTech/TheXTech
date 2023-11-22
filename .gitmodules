@@ -44,3 +44,7 @@
 	path = 3rdparty/IniProcessor
 	url = https://github.com/WohlSoft/IniProcessing.git
 	branch = master
+[submodule "3rdparty/FileMapper"]
+	path = 3rdparty/FileMapper
+	url = https://github.com/WohlSoft/FileMapper.git
+	branch = master
