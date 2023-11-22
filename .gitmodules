@@ -36,3 +36,7 @@
 [submodule "3rdparty/glew-cmake"]
 	path = 3rdparty/glew-cmake
 	url = https://github.com/Wohlstand/thextech-glew-cmake.git
+[submodule "3rdparty/DirManager"]
+	path = 3rdparty/DirManager
+	url = https://github.com/WohlSoft/DirManager.git
+	branch = master
