@@ -40,3 +40,7 @@
 	path = 3rdparty/DirManager
 	url = https://github.com/WohlSoft/DirManager.git
 	branch = master
+[submodule "3rdparty/IniProcessor"]
+	path = 3rdparty/IniProcessor
+	url = https://github.com/WohlSoft/IniProcessing.git
+	branch = master

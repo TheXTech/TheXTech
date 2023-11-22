@@ -341,7 +341,7 @@ if(NOT VITA AND NOT NINTENDO_SWITCH AND NOT NINTENDO_3DS AND NOT NINTENDO_WII AN
 endif()
 
 include(lib/fmt/fmt.cmake)
-include(lib/IniProcessor/IniProcessor.cmake)
+include(3rdparty/IniProcessor/IniProcessor.cmake)
 include(lib/Utils/Utils.cmake)
 include(lib/Logger/logger.cmake)
 include(lib/AppPath/app_path.cmake)
