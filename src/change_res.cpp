@@ -31,6 +31,10 @@
 void SetOrigRes()
 {
     XWindow::setFullScreen(false);
+
+    if(LevelEditor)
+        FullScreenEditor = false;
+
     resChanged = false;
 
 #ifndef __EMSCRIPTEN__
@@ -56,6 +60,9 @@ void SetOrigRes()
 void ChangeRes(int, int, int, int)
 {
     XWindow::setFullScreen(true);
+
+    if(LevelEditor)
+        FullScreenEditor = true;
 
     if(LoadingInProcess)
         UpdateLoad();

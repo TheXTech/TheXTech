@@ -572,6 +572,8 @@ int RupeeIDGrassSwipe3 = 253;
 
 std::string WindowTitle = "";
 
+bool FullScreenEditor = false;
+
 //void DoEvents()
 //{
 //    g_events->doEvents();

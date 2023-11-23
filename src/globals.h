@@ -2422,4 +2422,7 @@ extern int RupeeIDGrassSwipe3;
 //Public WindowTitle As String
 extern std::string WindowTitle;
 
+//Public FullScreenEditor As Boolean
+extern bool FullScreenEditor;
+
 #endif // GLOBALS_H

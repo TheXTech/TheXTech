@@ -625,8 +625,8 @@ public:
         insert(0x00B2C6F4, &Physics.PlayerTerminalVelocity); // Terminal velocity. GM_GRAVITY
         insert(0x00B2C6F8, &Physics.PlayerGravity); // Gravity. N/A
 
-        insert(0x00B2C8EA, &); // Universal time until NPCs despawn. N/A
-        insert(0x00B2C8EC, &); // Harm cooldown for NPCs. N/A
+        //insert(0x00B2C8EA, &); // Universal time until NPCs despawn. N/A
+        //insert(0x00B2C8EC, &); // Harm cooldown for NPCs. N/A
 
         insert(0x00B2C860, &Physics.NPCShellSpeed); //The shell speed for all Koopas. N/A
         insert(0x00B2C864, &Physics.NPCShellSpeedY); // Determines the Y speed of kicked shells. N/A
