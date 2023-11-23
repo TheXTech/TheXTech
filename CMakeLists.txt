@@ -129,7 +129,7 @@ endif()
 #endif()
 set(USE_SYSTEM_LIBS_DEFAULT OFF)
 
-if(HAIKU OR VITA OR NINTENDO_SWITCH OR NINTENDO_WII OR XTECH_MACOSX_TIGER)
+if(HAIKU OR VITA OR NINTENDO_SWITCH OR NINTENDO_WII OR NINTENDO_WIIU OR XTECH_MACOSX_TIGER)
     set(USE_SYSTEM_SDL2_DEFAULT ON)  # Should be used on Haiku, own SDL2 Haiku build on CMake is broken
 else()
     set(USE_SYSTEM_SDL2_DEFAULT ${USE_SYSTEM_LIBS_DEFAULT})
@@ -146,7 +146,7 @@ option(USE_SYSTEM_SDL2 "Use SDL2 from a system even prefering system libraries" 
 
 option(USE_STATIC_LIBC "Link libc and libstdc++ statically" OFF)
 
-if(NINTENDO_3DS OR NINTENDO_WII OR NINTENDO_DS)
+if(NINTENDO_3DS OR NINTENDO_WII OR NINTENDO_WIIU OR NINTENDO_DS)
     set(USE_STATIC_LIBC ON)
 endif()
 
@@ -270,6 +270,14 @@ if(NINTENDO_WII OR NINTENDO_3DS OR NINTENDO_DS)
     set(THEXTECH_BUILD_GL_ES_LEGACY OFF CACHE BOOL "" FORCE)
 endif()
 
+if(NINTENDO_WIIU)
+    set(THEXTECH_NO_ARGV_HANDLING ON)
+    set(THEXTECH_BUILD_GL_DESKTOP_MODERN OFF CACHE BOOL "" FORCE)
+    set(THEXTECH_BUILD_GL_DESKTOP_LEGACY OFF CACHE BOOL "" FORCE)
+    set(THEXTECH_BUILD_GL_ES_MODERN OFF CACHE BOOL "" FORCE)
+    set(THEXTECH_BUILD_GL_ES_LEGACY OFF CACHE BOOL "" FORCE)
+endif()
+
 if(THEXTECH_CLI_BUILD)
     set(THEXTECH_BUILD_GL_DESKTOP_MODERN OFF CACHE BOOL "" FORCE)
     set(THEXTECH_BUILD_GL_DESKTOP_LEGACY OFF CACHE BOOL "" FORCE)
@@ -326,14 +334,14 @@ if(USE_STATIC_LIBC)
 endif()
 
 include(lib/Allocator/pool-allocator.cmake)
-include(lib/DirManager/dirman.cmake)
+include(3rdparty/DirManager/dirman.cmake)
 
-if(NOT VITA AND NOT NINTENDO_SWITCH AND NOT NINTENDO_3DS AND NOT NINTENDO_WII AND NOT NINTENDO_DS)
-    include(lib/FileMapper/FileMapper.cmake)
+if(NOT VITA AND NOT NINTENDO_SWITCH AND NOT NINTENDO_3DS AND NOT NINTENDO_WII AND NOT NINTENDO_WIIU AND NOT NINTENDO_DS)
+    include(3rdparty/FileMapper/FileMapper.cmake)
 endif()
 
 include(lib/fmt/fmt.cmake)
-include(lib/IniProcessor/IniProcessor.cmake)
+include(3rdparty/IniProcessor/IniProcessor.cmake)
 include(lib/Utils/Utils.cmake)
 include(lib/Logger/logger.cmake)
 include(lib/AppPath/app_path.cmake)
@@ -629,6 +637,8 @@ set(THEXTECH_SRC
     src/main/speedrunner.cpp
     src/main/record.cpp
     src/main/game_save.cpp
+    src/main/level_save_info.cpp
+    src/main/level_medals.cpp
     src/main/main_config.cpp
     src/main/level_file.cpp
     src/main/menu_loop.cpp
@@ -662,6 +672,7 @@ set(THEXTECH_SRC
     src/control/duplicate.cpp
     src/control/controls.cpp
     src/script/msg_preprocessor.cpp
+    src/logic/object_graph.cpp
     src/change_res.cpp
     src/effect.cpp
     src/collision.cpp
@@ -892,13 +903,11 @@ elseif(NINTENDO_3DS)
     add_definitions(-DTHEXTECH_DISABLE_SDL_LOCALE) # SDL for 3DS doesn't support language detection
     list(APPEND THEXTECH_SRC src/core/language/language_3ds.cpp)
 elseif(NINTENDO_WII)
-    # FIXME: Implement the Nintendo WII language initializer
-    add_definitions(-DTHEXTECH_DISABLE_SDL_LOCALE)
-    list(APPEND THEXTECH_SRC src/core/language/language_dummy.cpp)
+    add_definitions(-DTHEXTECH_DISABLE_SDL_LOCALE) # SDL for Wii doesn't support language detection
+    list(APPEND THEXTECH_SRC src/core/language/language_wii.cpp)
 elseif(NINTENDO_WIIU)
-    # FIXME: Implement the Nintendo WII U language initializer
-    add_definitions(-DTHEXTECH_DISABLE_SDL_LOCALE)
-    list(APPEND THEXTECH_SRC src/core/language/language_dummy.cpp)
+    add_definitions(-DTHEXTECH_DISABLE_SDL_LOCALE) # SDL for WiiU doesn't support language detection
+    list(APPEND THEXTECH_SRC src/core/language/language_wiiu.cpp)
 elseif(NINTENDO_SWITCH)
     add_definitions(-DTHEXTECH_DISABLE_SDL_LOCALE) # SDL for Switch doesn't support language detection
     list(APPEND THEXTECH_SRC src/core/language/language_switch.cpp)
@@ -1005,7 +1014,7 @@ if(ANDROID)
 #    )
 #    add_dependencies(thextech SDL_ApkPackLibs_hidapi)
 
-elseif(NINTENDO_WII OR NINTENDO_3DS OR NINTENDO_DS)
+elseif(NINTENDO_WII OR NINTENDO_WIIU OR NINTENDO_3DS OR NINTENDO_DS)
     add_executable(thextech ${THEXTECH_SRC} ${LIB_SRC})
     set_target_properties(thextech PROPERTIES SUFFIX ".elf")
 
@@ -1124,6 +1133,8 @@ if(NINTENDO_3DS)
     target_compile_definitions(thextech PRIVATE -DPGE_SDL_MUTEX -DPGE_NO_THREADING -DLOW_MEM -DTHEXTECH_PRELOAD_LEVELS -D__3DS__)
 elseif(NINTENDO_WII)
     target_compile_definitions(thextech PRIVATE -DPGE_SDL_MUTEX -DLOW_MEM -DTHEXTECH_PRELOAD_LEVELS -D__WII__)
+elseif(NINTENDO_WIIU)
+    target_compile_definitions(thextech PRIVATE -DPGE_SDL_MUTEX)
 elseif(NINTENDO_DS)
     target_link_libraries(thextech PRIVATE filesystem)
     target_link_libraries(thextech PRIVATE slim)
@@ -1402,6 +1413,11 @@ elseif(NINTENDO_WII)
     configure_file(${CMAKE_SOURCE_DIR}/resources/wii/icon.png ${CMAKE_BINARY_DIR}/icon.png COPYONLY)
     configure_file(${CMAKE_SOURCE_DIR}/resources/wii/meta.xml.in ${CMAKE_BINARY_DIR}/meta.xml)
     ogc_create_dol(thextech)
+elseif(NINTENDO_WIIU)
+    string(TIMESTAMP XTECH_WIIMETA_RELEASE_DATE "%Y%m%d")
+    configure_file(${CMAKE_SOURCE_DIR}/resources/wiiu/icon.png ${CMAKE_BINARY_DIR}/icon.png COPYONLY)
+    configure_file(${CMAKE_SOURCE_DIR}/resources/wiiu/meta.xml.in ${CMAKE_BINARY_DIR}/meta.xml)
+    wut_create_rpx(thextech)
 elseif(NINTENDO_DS)
     if(NOT "${THEXTECH_VERSION_REL}" STREQUAL "")
         set(ROM_VERSION "${GIT_BRANCH} #${GIT_COMMIT_HASH}")

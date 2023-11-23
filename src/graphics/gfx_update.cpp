@@ -43,6 +43,7 @@
 #include "../config.h"
 #include "../game_main.h"
 #include "../main/game_globals.h"
+#include "main/level_medals.h"
 #include "../core/render.h"
 #include "../script/luna/luna.h"
 
@@ -1762,15 +1763,17 @@ void UpdateGraphics(bool skipRepaint)
         {
             A = NPC_Draw_Queue_p.Low[i];
             float cn = NPC[A].Shadow ? 0.f : 1.f;
+            float an = (NPC[A].Type == NPCID_MEDAL && g_curLevelMedals.gotten(NPC[A].Variant - 1)) ? 0.5f : 1.0f;
+
             {
 //                {
                     // If Not NPCIsACoin(.Type) Then
 //                    {
 //                        {
                 if(NPCWidthGFX[NPC[A].Type] == 0)
-                    XRender::renderTexture(vScreen[Z].X + NPC[A].Location.X + NPCFrameOffsetX[NPC[A].Type], vScreen[Z].Y + NPC[A].Location.Y + NPCFrameOffsetY[NPC[A].Type], NPC[A].Location.Width, NPC[A].Location.Height, GFXNPC[NPC[A].Type], 0, NPC[A].Frame * NPC[A].Location.Height, cn, cn, cn);
+                    XRender::renderTexture(vScreen[Z].X + NPC[A].Location.X + NPCFrameOffsetX[NPC[A].Type], vScreen[Z].Y + NPC[A].Location.Y + NPCFrameOffsetY[NPC[A].Type], NPC[A].Location.Width, NPC[A].Location.Height, GFXNPC[NPC[A].Type], 0, NPC[A].Frame * NPC[A].Location.Height, cn, cn, cn, an);
                 else
-                    XRender::renderTexture(vScreen[Z].X + NPC[A].Location.X + (NPCFrameOffsetX[NPC[A].Type] * -NPC[A].Direction) - NPCWidthGFX[NPC[A].Type] / 2.0 + NPC[A].Location.Width / 2.0, vScreen[Z].Y + NPC[A].Location.Y + NPCFrameOffsetY[NPC[A].Type] - NPCHeightGFX[NPC[A].Type] + NPC[A].Location.Height, NPCWidthGFX[NPC[A].Type], NPCHeightGFX[NPC[A].Type], GFXNPC[NPC[A].Type], 0, NPC[A].Frame * NPCHeightGFX[NPC[A].Type], cn, cn, cn);
+                    XRender::renderTexture(vScreen[Z].X + NPC[A].Location.X + (NPCFrameOffsetX[NPC[A].Type] * -NPC[A].Direction) - NPCWidthGFX[NPC[A].Type] / 2.0 + NPC[A].Location.Width / 2.0, vScreen[Z].Y + NPC[A].Location.Y + NPCFrameOffsetY[NPC[A].Type] - NPCHeightGFX[NPC[A].Type] + NPC[A].Location.Height, NPCWidthGFX[NPC[A].Type], NPCHeightGFX[NPC[A].Type], GFXNPC[NPC[A].Type], 0, NPC[A].Frame * NPCHeightGFX[NPC[A].Type], cn, cn, cn, an);
 //                        }
 //                    }
 //                }
@@ -2261,16 +2264,28 @@ void UpdateGraphics(bool skipRepaint)
                 {
                     if(Player[A].ShowWarp > 0)
                     {
-                        std::string tempString;
-                        auto &w = Warp[Player[A].ShowWarp];
-                        if(!w.noPrintStars && w.maxStars > 0 && Player[A].Mount != 2)
+                        const auto &w = Warp[Player[A].ShowWarp];
+
+                        int p_center_x = vScreen[Z].X + Player[A].Location.X + (Player[A].Location.Width / 2);
+                        int info_y = Player[A].Location.Y + Player[A].Location.Height - 96 + vScreen[Z].Y;
+
+                        if(!w.noPrintStars && w.save_info().inited() && w.save_info().max_stars > 0 && Player[A].Mount != 2)
                         {
-                            tempString = fmt::format_ne("{0}/{1}", w.curStars, w.maxStars);
-                            XRender::renderTexture(Player[A].Location.X + Player[A].Location.Width / 2.0 + vScreen[Z].X - tempString.length() * 9, Player[A].Location.Y + Player[A].Location.Height - 96 + vScreen[Z].Y + 1, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
-                            XRender::renderTexture(Player[A].Location.X + Player[A].Location.Width / 2.0 + vScreen[Z].X - tempString.length() * 9 - 20, Player[A].Location.Y + Player[A].Location.Height - 96 + vScreen[Z].Y, GFX.Interface[5].w, GFX.Interface[5].h, GFX.Interface[5], 0, 0);
+                            std::string tempString = fmt::format_ne("{0}/{1}", w.curStars, w.save_info().max_stars);
+                            XRender::renderTexture(p_center_x - tempString.length() * 9 - 20, info_y,     GFX.Interface[5]);
+                            XRender::renderTexture(p_center_x - tempString.length() * 9,      info_y + 1, GFX.Interface[1]);
                             SuperPrint(tempString, 3,
-                                       float(Player[A].Location.X + Player[A].Location.Width / 2.0 + vScreen[Z].X - tempString.length() * 9 + 18),
-                                       float(Player[A].Location.Y + Player[A].Location.Height - 96 + vScreen[Z].Y));
+                                       p_center_x - tempString.length() * 9 + 18,
+                                       info_y);
+
+                            info_y -= 20;
+                        }
+
+                        if(w.save_info().inited() && w.save_info().max_medals > 0)
+                        {
+                            uint8_t ckpt = (InHub() && Checkpoint == FileNamePath + GetS(w.level)) ? g_curLevelMedals.got : 0;
+
+                            DrawMedals(p_center_x, info_y, true, w.save_info().max_medals, 0, ckpt, w.save_info().medals_got, w.save_info().medals_best);
                         }
                     }
                 }

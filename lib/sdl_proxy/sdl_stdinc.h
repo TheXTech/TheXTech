@@ -34,11 +34,13 @@
 #   define XTECH_sscanf SDL_sscanf
 #endif
 
-#else
+#else // USING POSIX FUNCTIONS ONLY
 
 #include "null/sdl_null.h"
 
 #include <cstdint>
+
+#define XTECH_sscanf sscanf
 
 #ifdef SDL_min
 #   undef SDL_min
