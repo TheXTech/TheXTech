@@ -26,6 +26,7 @@
 #include "script/luna/luna.h"
 
 #include "../version.h"
+#include "../globals.h"
 
 
 GameInfo g_gameInfo;

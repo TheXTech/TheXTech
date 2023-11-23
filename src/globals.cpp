@@ -543,7 +543,7 @@ std::string LevelName;
 std::string CurrentLanguage;
 std::string CurrentLangDialect;
 
-std::string NullString;
+std::string NullString = "";
 
 int NPCToCoinSFX = 14;
 int NPCToCoinValue = 1;

@@ -2373,7 +2373,7 @@ extern std::string CurrentLanguage;
 extern std::string CurrentLangDialect;
 
 //Public NullString As String
-extern std::string NullString = "";
+extern std::string NullString;
 
 //Public NPCToCoinSFX As Int
 extern int NPCToCoinSFX;
