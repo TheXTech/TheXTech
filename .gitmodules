@@ -44,6 +44,3 @@
 	path = 3rdparty/FileMapper
 	url = https://github.com/WohlSoft/FileMapper.git
 	branch = master
-[submodule "3rdparty/PGE_File_Formats"]
-	path = 3rdparty/PGE_File_Formats
-	url = https://github.com/WohlSoft/PGE-File-Library-STL
