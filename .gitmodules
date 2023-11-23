@@ -1,7 +1,3 @@
-[submodule "3rdparty/PGE_File_Formats"]
-	path = 3rdparty/PGE_File_Formats
-	url = https://github.com/WohlSoft/PGE-File-Library-STL.git
-	branch = master
 [submodule "3rdparty/LuaJIT"]
 	path = 3rdparty/LuaJIT
 	url = https://github.com/WohlSoft/LuaJIT.git
