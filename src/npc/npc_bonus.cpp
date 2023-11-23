@@ -536,12 +536,13 @@ void TouchBonus(int A, int B)
                 PlaySound(SFX_HeroRupee);
             else if(NPC[B].Type != NPCID_MEDAL)
                 PlaySound(SFX_Coin);
+
             if(NPC[B].Type == NPCID_GEM_5 || NPC[B].Type == NPCID_COIN_5)
-                Coins += 5;
+                Coins += CoinValue5;
             else if(NPC[B].Type == NPCID_GEM_20)
-                Coins += 20;
+                Coins += CoinValue20;
             else
-                Coins += 1;
+                Coins += CoinValue1;
             if(Coins >= 100)
             {
                 if(Lives < 99)
@@ -579,11 +580,11 @@ void TouchBonus(int A, int B)
             if(NPC[B].Type == NPCID_ITEMGOAL)
             {
                 if(NPC[B].Frame == 0)
-                    MoreScore(10, Player[A].Location);
+                    MoreScore(RouletteScoreStar, Player[A].Location);
                 if(NPC[B].Frame == 1)
-                    MoreScore(6, Player[A].Location);
+                    MoreScore(RouletteScoreMushroom, Player[A].Location);
                 if(NPC[B].Frame == 2)
-                    MoreScore(8, Player[A].Location);
+                    MoreScore(RouletteScoreFireFlower, Player[A].Location);
                 LevelMacro = LEVELMACRO_CARD_ROULETTE_EXIT;
                 for(C = 1; C <= numPlayers; C++)
                 {

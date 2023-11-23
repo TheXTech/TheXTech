@@ -149,6 +149,8 @@ struct ScreenShake_t
     }
 };
 
+double ScreenShakeLegacyCount = 0;
+
 static ScreenShake_t s_shakeScreen;
 
 //static double s_shakeScreenX = 0;
@@ -795,6 +797,12 @@ void UpdateGraphics(bool skipRepaint)
     if(XRender::renderBlocked())
         return;
 #endif
+
+    if(ScreenShakeLegacyCount > 0)
+    {
+        ScreenShakeLegacyCount--;
+        doShakeScreen(ScreenShakeLegacyCount, SHAKE_RANDOM);
+    }
 
     // frame skip code
     cycleNextInc();

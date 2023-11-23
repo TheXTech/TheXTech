@@ -372,13 +372,13 @@ void NPCHit(int A, int B, int C)
         if(NPCIsVeggie[NPC[A].Type] || NPC[A].Type == NPCID_HEAVY_THROWER || NPC[A].Type == NPCID_GEM_1 || NPC[A].Type == NPCID_GEM_5)
         {
             if(NPC[A].Type != NPCID_GEM_5)
-                NPC[A].Type = NPCID_GEM_1;
+                NPC[A].Type = RupeeIDGrassSwipe1;
             NPC[A].Location.SpeedX = (1 + dRand() * 0.5) * Player[C].Direction;
             NPC[A].Location.SpeedY = -5;
             if(iRand(20) < 3)
-                NPC[A].Type = NPCID_GEM_5;
+                NPC[A].Type = RupeeIDGrassSwipe2;
             if(iRand(40) < 3)
-                NPC[A].Type = NPCID_GEM_20;
+                NPC[A].Type = RupeeIDGrassSwipe3;
             NPC[A].Location.X += NPC[A].Location.Width / 2.0;
             NPC[A].Location.Y += NPC[A].Location.Height;
             NPC[A].Location.Width = NPCWidth[NPC[A].Type];

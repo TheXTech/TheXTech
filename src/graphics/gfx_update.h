@@ -43,4 +43,6 @@ inline void invalidateDrawBGOs()
     g_drawBGOs_valid[1] = false;
 }
 
+extern double ScreenShakeLegacyCount; // This is needed for imitating screen shake on LunaDLL
+
 #endif // #ifdef GFX_UPDATE_H

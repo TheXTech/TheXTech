@@ -31,6 +31,8 @@
 #include "core/render.h"
 #include "core/events.h"
 
+#include "main/game_info.h" // Used for detecting window title changes in code
+
 MicroStats g_microStats;
 PerformanceStats_t g_stats;
 
@@ -548,6 +550,8 @@ void runFrameLoop(LoopCall_t doLoopCallbackPre,
 
         if(!MaxFPS)
             PGE_Delay(1);
+        
+        detectWindowTitleChanges();
 
         if(!GameIsActive)
             break;// Break on quit

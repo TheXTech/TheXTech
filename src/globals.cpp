@@ -543,6 +543,35 @@ std::string LevelName;
 std::string CurrentLanguage;
 std::string CurrentLangDialect;
 
+std::string NullString;
+
+int NPCToCoinSFX = 14;
+int NPCToCoinValue = 1;
+int NPCToCoin100CoinSub = 100;
+int NPCToCoinEffect = 11;
+
+int RouletteScoreMushroom = 6;
+int RouletteScoreFireFlower = 8;
+int RouletteScoreStar = 10;
+
+int CoinValue1 = 1;
+int CoinValue5 = 5;
+int CoinValue20 = 20;
+
+int RupeeIDHit1 = 251;
+int RupeeIDHit2 = 252;
+int RupeeIDHit3 = 253;
+
+int RupeeIDDrop1 = 251;
+int RupeeIDDrop2 = 252;
+int RupeeIDDrop3 = 253;
+
+int RupeeIDGrassSwipe1 = 251;
+int RupeeIDGrassSwipe2 = 252;
+int RupeeIDGrassSwipe3 = 253;
+
+std::string WindowTitle = "";
+
 //void DoEvents()
 //{
 //    g_events->doEvents();

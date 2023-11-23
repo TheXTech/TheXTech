@@ -87,4 +87,6 @@ extern GameInfo g_gameInfo;
 
 extern void initGameInfo();
 
+extern void detectWindowTitleChanges();
+
 #endif // GAME_INFO_H

@@ -2372,4 +2372,54 @@ const int curRelease = 64;
 extern std::string CurrentLanguage;
 extern std::string CurrentLangDialect;
 
+//Public NullString As String
+extern std::string NullString = "";
+
+//Public NPCToCoinSFX As Int
+extern int NPCToCoinSFX;
+//Public NPCToCoinValue As Int
+extern int NPCToCoinValue;
+//Public NPCToCoin100CoinSub As Int
+extern int NPCToCoin100CoinSub;
+//Public NPCToCoinEffect As Int
+extern int NPCToCoinEffect;
+
+//Public RouletteScoreMushroom As Int
+extern int RouletteScoreMushroom;
+//Public RouletteScoreFireFlower As Int
+extern int RouletteScoreFireFlower;
+//Public RouletteScoreStar As Int
+extern int RouletteScoreStar;
+
+//Public CoinValue1 As Int
+extern int CoinValue1;
+//Public CoinValue5 As Int
+extern int CoinValue5;
+//Public CoinValue20 As Int
+extern int CoinValue20;
+
+//Public RupeeIDHit1 As Int
+extern int RupeeIDHit1;
+//Public RupeeIDHit2 As Int
+extern int RupeeIDHit2;
+//Public RupeeIDHit3 As Int
+extern int RupeeIDHit3;
+
+//Public RupeeIDDrop1 As Int
+extern int RupeeIDDrop1;
+//Public RupeeIDDrop2 As Int
+extern int RupeeIDDrop2;
+//Public RupeeIDDrop3 As Int
+extern int RupeeIDDrop3;
+
+//Public RupeeIDGrassSwipe1 As Int
+extern int RupeeIDGrassSwipe1;
+//Public RupeeIDGrassSwipe2 As Int
+extern int RupeeIDGrassSwipe2;
+//Public RupeeIDGrassSwipe3 As Int
+extern int RupeeIDGrassSwipe3;
+
+//Public WindowTitle As String
+extern std::string WindowTitle;
+
 #endif // GLOBALS_H

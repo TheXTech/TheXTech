@@ -63,7 +63,9 @@ void initGameInfo()
     g_gameInfo.titleWindow = fmt::format_ne("TheXTech v{0}, #{1}", V_LATEST_STABLE, V_BUILD_VER);
 #   endif
 #endif /* CUSTOM_GAME_NAME_TITLE */
-
+    
+    WindowTitle = g_gameInfo.titleWindow; // This is needed so that LunaDLL can change the window title
+    
     g_gameInfo.statusIconName.clear();
 
     g_gameInfo.characterName[1] = "Mario";
@@ -213,6 +215,14 @@ void initGameInfo()
         readCheats(config, g_gameInfo.cheatsWorldRenames, "cheats-world-renames");
         readCheats(config, g_gameInfo.cheatsLevelAliases, "cheats-level-aliases");
         readCheats(config, g_gameInfo.cheatsLevelRenames, "cheats-level-renames");
+    }
+}
+
+void detectWindowTitleChanges()
+{
+    if(g_gameInfo.titleWindow != WindowTitle)
+    {
+        g_gameInfo.titleWindow = WindowTitle;
     }
 }
 

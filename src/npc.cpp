@@ -370,16 +370,16 @@ void TurnNPCsIntoCoins()
                    NPC[A].Type != NPCID_ITEM_BURIED && NPC[A].Type != NPCID_FIRE_CHAIN && NPC[A].Type != NPCID_FIRE_DISK)
                 {
                     NPC[A].Location.Y += 32;
-                    NewEffect(EFFID_COIN_BLOCK_S3, NPC[A].Location);
-                    PlaySound(SFX_Coin);
-                    Coins += 1;
+                    NewEffect(NPCToCoinEffect, NPC[A].Location);
+                    PlaySound(NPCToCoinSFX);
+                    Coins += NPCToCoinValue;
                     if(Coins >= 100)
                     {
                         if(Lives < 99)
                         {
                             Lives += 1;
                             PlaySound(SFX_1up);
-                            Coins -= 100;
+                            Coins -= NPCToCoin100CoinSub;
                         }
                         else
                             Coins = 99;

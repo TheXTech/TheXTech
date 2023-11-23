@@ -321,11 +321,11 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
 
                     if(Player[whatPlayer].Character == 5)
                     {
-                        nn.Type = NPCID_GEM_1;
+                        nn.Type = RupeeIDHit1;
                         if(iRand(20) < 3)
-                            nn.Type = NPCID_GEM_5;
+                            nn.Type = RupeeIDHit2;
                         if(iRand(60) < 3)
-                            nn.Type = NPCID_GEM_20;
+                            nn.Type = RupeeIDHit3;
                         PlaySound(SFX_HeroRupee);
                     }
                     else

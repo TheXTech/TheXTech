@@ -31,6 +31,7 @@
 #include "main/trees.h" // treeNPCUpdate
 #include "npc/npc_queues.h"
 #include "main/cheat_code.h"
+#include "graphics/gfx_update.h" // For screen shake
 
 #include <unordered_map>
 #include <functional>
@@ -522,9 +523,40 @@ public:
 
     void buildTable()
     {
-        insert(0x00B2504C, &TakeScreen);
-        insert(0x00B250D6, &numLocked);
-        insert(0x00B250E2, // Pause menu visible
+        /*
+
+        How things are sorted:
+
+        insert(MEM_ADDRESS, &VARIABLE); // The description of the thing that does what according to the 1.3 source code. After that we list where it can be found under Defines.h on the LunaLua source code. GM_EXAMPLE_VARIABLE
+
+        */
+        
+        insert(0x00423D00, &NullString); // A null string value. Should just be "". GM_STR_NULL
+        
+        insert(0x00A262B7, &CoinValue20); // How much a coin NPC is worth as coins. It will affect every coin NPC which has a 20-coin value. N/A
+        insert(0x00A262BD, &CoinValue1); // How much a coin NPC is worth as coins. It will affect every coin NPC which has a 1-coin value. N/A
+        insert(0x00A262C9, &CoinValue5); // How much a coin NPC is worth as coins. It will affect every coin NPC which has a 5-coin value. N/A
+        
+        insert(0x00A266AC, &RouletteScoreStar); // The score value of the SMB3 roulette, when the frame is a star and touched. N/A
+        insert(0x00A26719, &RouletteScoreMushroom); // The score value of the SMB3 roulette, when the frame is a mushroom and touched. N/A
+        insert(0x00A2677E, &RouletteScoreFireFlower); // The score value of the SMB3 roulette, when the frame is a fire flower and touched. N/A
+        
+        insert(0x00A32943, &RupeeIDDrop1); // The npc id for Link's main coin when killing an enemy. (Default would be the green rupee, 251). N/A
+        insert(0x00A329D5, &RupeeIDDrop2); // The npc id for Link's secondary coin when killing an enemy. (chance 15:3). (Default would be the blue rupee, 252). N/A
+        insert(0x00A32A6F, &RupeeIDDrop3); // The npc id for Link's tertiary coin when killing an enemy. (chance 40:3). (Default would be the red rupee, 253). N/A
+
+        insert(0x00A3C86E, &NPCToCoinEffect); // The effect ID of the npc-to-coins function (default is the coinflip effect, 11). VASM_END_ANIM
+        insert(0x00A3C87F, &NPCToCoinSFX); // The sound ID of the npc-to-coins function (default is the coin sound, 14). VASM_END_COINSOUND
+        insert(0x00A3C891, &NPCToCoinValue); // The coin-value for every destroyed npc in the npc-to-coins function. Default is 1. VASM_END_COINVAL
+        insert(0x00A3C8EE, &NPCToCoin100CoinSub); // How many coins get subtracted from the coin-value when the coin value hits 100 coins. N/A
+
+        insert(0x00B25046, &GameIsActive); // Are we in-game? GM_ISGAME
+        insert(0x00B2504C, &TakeScreen); // Taking a screenshot. False if not. GM_DO_SCREENSHOT
+        insert(0x00B250AC, &ScreenShakeLegacyCount); // The legacy screen shake intensity. While the screen shake system was redone entirely, this uses a different system to emulate the original screen shake system. GM_EARTHQUAKE
+        insert(0x00B250B0, &Checkpoint); // This contains the levelname (GM_FULLPATH) of the hitted checkpoint. GM_STR_CHECKPOINT
+        insert(0x00B250B4, &FullScreenEditor); // Whether or not the vanilla editor is in fullscreen mode. True if fullscreen, else it's false. GM_IS_EDITOR_TESTING_NON_FULLSCREEN
+        insert(0x00B250D6, &numLocked); // Used with BGOs. GM_BGO_LOCKS_COUNT
+        insert(0x00B250E2, // Pause menu visible. GM_PAUSE_OPEN
             [](FIELDTYPE ftype)->double
             {
                 bool tmp = (GamePaused != PauseCode::None);
@@ -537,63 +569,80 @@ public:
                             "(GamePaused) with value %g as %s", in, FieldtypeToStr(ftype));
             }
         );
-        insert(0x00B25134, &LevelEditor);
+        insert(0x00B250E4, &MessageText); // The messagebox string value. GM_STR_MSGBOX
 
-        insert(0x00B251E0, &numStars); // HUD star count
-        insert(0x00B25700, &numWater);
+        insert(0x00B25108, &ShowFPS); // If true, the FPS counter is visible. GM_SHOW_FPS
+        insert(0x00B2510C, &PrintFPS); // Must be set to 0 when disabling the FPS counter. GM_FPS_VALUE
 
-        insert(0x00B25724, &StartLevel);
-        insert(0x00B25728, &NoMap);
-        insert(0x00B2572A, &RestartLevel);
+        insert(0x00B25130, &ScreenType); // Screen Type. GM_CAMERA_CONTROL
+        insert(0x00B25132, &DScreenType); // Dynamic Screen Type. N/A
+
+        insert(0x00B25134, &LevelEditor); // Are we testing in the editor? This is true if so. GM_ISLEVELEDITORMODE
+
+        insert(0x00B251E0, &numStars); // HUD star count. GM_STAR_COUNT
+        insert(0x00B25700, &numWater); // Water count. GM_WATER_AREA_COUNT
+
+        insert(0x00B25724, &StartLevel); // The filename of the episode's intro level, or if it is a hub-styled episode, its hub level. N/A
+        insert(0x00B25728, &NoMap); // Whether this is a hub-styled episode (skips world map). N/A
+        insert(0x00B2572A, &RestartLevel); // Whether or not the "Restart Last Level on Death" flag is active. N/A
 
         // should all be read-only
-        insert(0x00B257A4, &numTiles);
-        insert(0x00B257A6, &numScenes);
-        insert(0x00B258E0, &numWorldPaths);
-        insert(0x00B258E2, &numWarps);
-        insert(0x00B25956, &numBlock);
-        insert(0x00B25958, &numBackground);
-        insert(0x00B2595A, &numNPCs); // NPC count
-        insert(0x00B2595E, &numPlayers); // Player Count
-        insert(0x00B25960, &numWorldLevels);
-        insert(0x00B25980, &numWorldMusic);
+        insert(0x00B257A4, &numTiles); // Tile count. GM_TILE_COUNT
+        insert(0x00B257A6, &numScenes); // Scenery count. GM_SCENERY_COUNT
+        insert(0x00B258E0, &numWorldPaths); // Path count. GM_PATH_COUNT
+        insert(0x00B258E2, &numWarps); // Warp count. GM_WARP_COUNT
+        insert(0x00B25956, &numBlock); // Block count. GM_BLOCK_COUNT
+        insert(0x00B25958, &numBackground); // BGO count. GM_BGO_COUNT
+        insert(0x00B2595A, &numNPCs); // NPC count. GM_NPCS_COUNT
+        insert(0x00B2595E, &numPlayers); // Player count. GM_PLAYERS_COUNT
+        insert(0x00B25960, &numWorldLevels); // Overworld level count. GM_LEVEL_COUNT
+        insert(0x00B25980, &numWorldMusic); // World music box count. GM_MUSICBOX_COUNT
 
-        insert(0x00B2C5A8, &Coins); // HUD coins count
-        insert(0x00B2C5AC, &Lives); // HUD lives count
+        insert(0x00B2B9E4, &qScreen); // If the camera is camera controlling due to an event scrolling the camera itself. GM_UNK_B2B9E4
 
-        insert(0x00B2C624, &WorldName);
+        insert(0x00B2C5A8, &Coins); // HUD coins count. GM_COINS
+        insert(0x00B2C5AC, &Lives); // HUD lives count. GM_PLAYER_LIVES
 
-        insert(0x00B2C62C, &PSwitchTime); // P-Switch Timer
-        insert(0x00B2C62E, &PSwitchStop); // Stopwatch Timer
+        insert(0x00B2C5B4, &LevelSelect); // Whether or not the game is on the overworld. If both 0x00B2C5B4 and 0x00B2C620 is set to -1/true, the game is on a level. GM_EPISODE_MODE
+        insert(0x00B2C620, &GameMenu); // Whether or not the game is on the title screen. GM_LEVEL_MODE
 
-        insert(0x00B2C630, &PSwitchPlayer); // P-Switch/Stopwatch Player
-        insert(0x00B2C684, &FrameSkip);
+        insert(0x00B2C624, &WorldName); // The name of the current episode. N/A
 
-        insert(0x00B2C6DC, &Physics.PlayerJumpHeight);
-        insert(0x00B2C6DE, &Physics.PlayerBlockJumpHeight);
-        insert(0x00B2C6E0, &Physics.PlayerHeadJumpHeight);
-        insert(0x00B2C6E2, &Physics.PlayerNPCJumpHeight);
-        insert(0x00B2C6E4, &Physics.PlayerSpringJumpHeight);
-        insert(0x00B2C6E8, &Physics.PlayerJumpVelocity);
-        insert(0x00B2C6EC, &Physics.PlayerRunSpeed);
-        insert(0x00B2C6F0, &Physics.PlayerWalkSpeed);
-        insert(0x00B2C6F4, &Physics.PlayerTerminalVelocity);
-        insert(0x00B2C6F8, &Physics.PlayerGravity);
-        insert(0x00B2C860, &Physics.NPCShellSpeed);
-        insert(0x00B2C864, &Physics.NPCShellSpeedY);
-        insert(0x00B2C868, &Physics.NPCWalkingSpeed);
-        insert(0x00B2C86C, &Physics.NPCWalkingOnSpeed);
-        insert(0x00B2C870, &Physics.NPCMushroomSpeed);
-        insert(0x00B2C874, &Physics.NPCGravity);
-        insert(0x00B2C878, &Physics.NPCGravityReal);
-        insert(0x00B2C87C, &Physics.NPCPSwitch); // P-Switch/Stopwatch Length
+        insert(0x00B2C62C, &PSwitchTime); // P-Switch Timer. GM_PSWITCH_COUNTER
+        insert(0x00B2C62E, &PSwitchStop); // Stopwatch Timer. N/A
 
-        insert(0x00B2C880, &MenuCursor); // Current menu choice
-        insert(0x00B2C882, &MenuMode); // Current menu mode
+        insert(0x00B2C630, &PSwitchPlayer); // P-Switch/Stopwatch Player. GM_MUSIC_RESTORE_PL (If pswitch is active, then the music of the section of the player index is restored.)
+        insert(0x00B2C684, &FrameSkip); // Is frame-ship enabled? GM_FRAMESKIP
 
-        // insert(0x00B2C884, ???}; // Key Released!!!
+        insert(0x00B2C6DC, &Physics.PlayerJumpHeight); // Jump height. GM_JUMPHIGHT
+        insert(0x00B2C6DE, &Physics.PlayerBlockJumpHeight); // Block jump height. N/A
+        insert(0x00B2C6E0, &Physics.PlayerHeadJumpHeight); // Player head jump height, Jump height off another players head. N/A
+        insert(0x00B2C6E2, &Physics.PlayerNPCJumpHeight); // NPC jump height. GM_JUMPHIGHT_BOUNCE
+        insert(0x00B2C6E4, &Physics.PlayerSpringJumpHeight); // Spring jump height. N/A
+        insert(0x00B2C6E8, &Physics.PlayerJumpVelocity); // Jump velocity. N/A
+        insert(0x00B2C6EC, &Physics.PlayerRunSpeed); // Run speed. N/A
+        insert(0x00B2C6F0, &Physics.PlayerWalkSpeed); // Walk speed. N/A
+        insert(0x00B2C6F4, &Physics.PlayerTerminalVelocity); // Terminal velocity. GM_GRAVITY
+        insert(0x00B2C6F8, &Physics.PlayerGravity); // Gravity. N/A
+
+        insert(0x00B2C8EA, &); // Universal time until NPCs despawn. N/A
+        insert(0x00B2C8EC, &); // Harm cooldown for NPCs. N/A
+
+        insert(0x00B2C860, &Physics.NPCShellSpeed); //The shell speed for all Koopas. N/A
+        insert(0x00B2C864, &Physics.NPCShellSpeedY); // Determines the Y speed of kicked shells. N/A
+        insert(0x00B2C868, &Physics.NPCWalkingSpeed); // Universal speed of most isWalker NPCs. N/A
+        insert(0x00B2C86C, &Physics.NPCWalkingOnSpeed); // NPC that can be walked on walking speed. N/A
+        insert(0x00B2C870, &Physics.NPCMushroomSpeed); // Universal speed of mushroom NPCs. N/A
+        insert(0x00B2C874, &Physics.NPCGravity); // Seperate field from the Defines use. Unsure how it's used. N/A
+        insert(0x00B2C878, &Physics.NPCGravityReal); // a.k.a. Defines.npc_grav. N/A
+        insert(0x00B2C87C, &Physics.NPCPSwitch); // P-Switch/Stopwatch Length. GM_PSWITCH_LENGTH
+
+        insert(0x00B2C880, &MenuCursor); // Current menu choice. GM_CUR_MENUCHOICE
+        insert(0x00B2C882, &MenuMode); // Current menu mode. GM_CUR_MENUTYPE
+
+        // insert(0x00B2C884, ???}; // Key released. GM_KEYRELEASED
         // insert(0x00B2C894, &BlocksSorted); // removed by block quadtree
-        insert(0x00B2C894,
+        insert(0x00B2C894, // The blocks that are sorted. GM_BLOCKS_SORTED
             [](FIELDTYPE ftype)->double
             {
                 bool ret = true;
@@ -606,8 +655,8 @@ public:
             }
         );
 
-        insert(0x00B2C896, &SingleCoop);
-        insert(0x00B2C898,
+        insert(0x00B2C896, &SingleCoop); // Whenever single-co-op is on or not. N/A
+        insert(0x00B2C898, // The cheats buffer. GM_INPUTSTR_BUF_PTR
             []()->std::string
             {
                 return cheats_get();
@@ -618,44 +667,64 @@ public:
             }
         );
 
-        insert(0x00B2C89C, &GameOutro);
-        insert(0x00B2C8A0, &CreditChop);
-        insert(0x00B2C8A4, &EndCredits);
+        insert(0x00B2C89C, &GameOutro); // Are we in the credits? GM_CREDITS_MODE
+        insert(0x00B2C8A0, &CreditChop); // Timer for the credits black bar effects. N/A
+        insert(0x00B2C8A4, &EndCredits); // How many lines there are in the credits. N/A
 
-        insert(0x00B2C8A6, &curStars);
-        insert(0x00B2C8A8, &maxStars);
+        insert(0x00B2C8A6, &curStars); // Current amount of stars in a level. N/A
+        insert(0x00B2C8A8, &maxStars); // The max amount of stars in a level. GM_STAR_COUNT_LEVEL
 
-        insert(0x00B2C8AA, &ShadowMode);
-        insert(0x00B2C8AC, &MultiHop);
-        insert(0x00B2C8AE, &SuperSpeed);
-        insert(0x00B2C8B0, &WalkAnywhere);
-        insert(0x00B2C8B2, &FlyForever);
-        insert(0x00B2C8B4, &FreezeNPCs);
-        insert(0x00B2C8B6, &CaptainN);
-        insert(0x00B2C8B8, &FlameThrower);
-        insert(0x00B2C8BA, &CoinMode);
-        insert(0x00B2C8BE, &MaxFPS);
-        insert(0x00B2C8C0, &GodMode);
-        insert(0x00B2C8C2, &GrabAll);
+        insert(0x00B2C8AA, &ShadowMode); // Whenever shadowstar is enabled or not. GM_PLAYER_SHADOWSTAR
+        insert(0x00B2C8AC, &MultiHop); // Whenever ahippinandahoppin is enabled or not. GM_PLAYER_INFJUMP
+        insert(0x00B2C8AE, &SuperSpeed); // Whenever sonicstooslow is enabled or not. N/A
+        insert(0x00B2C8B0, &WalkAnywhere); // Whenever illparkwhereiwant is enabled or not. N/A
+        insert(0x00B2C8B2, &FlyForever); // Whenever wingman is enabled or not. N/A
 
-        insert(0x00B2C8C4, &Cheater);
+        insert(0x00B2C8B4, &FreezeNPCs); // Is the level frozen? GM_FREEZWITCH_ACTIV
 
-        insert(0x00B2C8E4, &Score); // HUD points count
-        insert(0x00B2C906, &MaxWorldStars); // Max stars at episode
+        insert(0x00B2C8B6, &CaptainN); // Whenever captainn is enabled or not. N/A
+        insert(0x00B2C8B8, &FlameThrower); // Whenever flamethrower is enabled or not. N/A
+        insert(0x00B2C8BA, &CoinMode); // Whenever moneytree is enabled or not. N/A
+        insert(0x00B2C8BE, &MaxFPS); // Whenever speeddemon is enabled or not. GM_MAX_FPS_MODE
+        insert(0x00B2C8C0, &GodMode); // Whenever donthurtme is enabled or not. GM_PLAYER_INVULN
+        insert(0x00B2C8C2, &GrabAll); // Whenever stickyfingers is enabled or not. N/A
 
-        insert(0x00B2C908, &Debugger);
+        insert(0x00B2C8C4, &Cheater); // This is the indicator if the player has cheated (used on any cheat codes). If this is the case then saving is deactivated. However with the cheat redigitiscool you can activate cheating again (Which will make this false). GM_CHEATED
 
-        insert(0x00B2D6B8, &PlayerCharacter);
-        insert(0x00B2D6BA, &PlayerCharacter2);
+        insert(0x00B2C8E4, &Score); // HUD points count. GM_UNK_B2C8E4
+        insert(0x00B2C906, &MaxWorldStars); // The total number of stars in the episode. N/A
 
-        insert(0x00B2D6BC, &SharedCursor.X); // Mouse cursor X
-        insert(0x00B2D6C4, &SharedCursor.Y); // Mouse cursor Y
-        insert(0x00B2D6CC, &SharedCursor.Primary);
-        insert(0x00B2D6D0, &MenuMouseRelease);
-        insert(0x00B2D6D2, &SharedCursor.Move);
-        insert(0x00B2D710, &numEvents);
-        insert(0x00B2D734, &noSound);
-        insert(0x00B2D740, &BattleMode);
+        insert(0x00B2C908, &Debugger); //Whenever debug mode is enabled. N/A
+
+        insert(0x00B2D6B8, &PlayerCharacter); // Menu already chosen for Player 1. GM_CUR_MENUPLAYER1
+        insert(0x00B2D6BA, &PlayerCharacter2);// Menu already chosen for Player 2. GM_CUR_MENUPLAYER2
+
+        insert(0x00B2D6BC, &SharedCursor.X); // Mouse cursor X. GM_MOUSE_X
+        insert(0x00B2D6C4, &SharedCursor.Y); // Mouse cursor Y. GM_MOUSE_Y
+        insert(0x00B2D6CC, &SharedCursor.Primary); // Are we clicking something on the mouse? GM_MOUSEPRESSING
+        insert(0x00B2D6D0, &MenuMouseRelease); // If the mouse click was released. GM_MOUSERELEASED
+        insert(0x00B2D6D2, &SharedCursor.Move); // Is the mouse moving? GM_MOUSEMOVING
+
+        insert(0x00B2D710, &numEvents); // The total amount of events in a level. GM_EVENT_COUNT
+
+        //insert(0x00B2D72C, &); // Unknown frame timer. Could be a number from the last frame but I don't know. GM_LAST_FRAME_TIME
+
+        insert(0x00B2D734, &noSound); // Do we have any sound playing in the game? GM_NOSOUND
+        
+        //insert(0x00B2D738, &); // The amount of seconds since first loading the level. GM_CURRENT_TIME
+        
+        insert(0x00B2D740, &BattleMode); // Are we in battle mode? N/A
+
+        insert(0x00B2D760, &BattleIntro); // If greater than 0, the Battle Mode Text "Mario VS Luigi" is displayed. GM_MARIO_VS_LUIGI_T
+        insert(0x00B2D762, &BattleOutro); // If greater than 0, the Battle Mode Text "Wins!" is displayed. GM_WINS_T
+
+        insert(0x008BD869, &WindowTitle); // The window title of the game. This will only be set on platforms that support it (Like Windows, Linux, macOS). GM_GAMETITLE_1
+        insert(0x008BE25A, &WindowTitle); // Duplicate of window title setting, for compatibility reasons. GM_GAMETITLE_2
+        insert(0x0096AF26, &WindowTitle); // Duplicate of window title setting, for compatibility reasons. GM_GAMETITLE_3
+
+        insert(0x009DBD9A, &RupeeIDHit1); // The npc id for Link's main coin when hitting a block. (Default would be the green rupee, 251). N/A
+        insert(0x009DBDFF, &RupeeIDHit2); // The npc id for Link's secondary coin when hitting the block (chance 20:3). (Default would be the blue rupee, 252). N/A
+        insert(0x009DBE64, &RupeeIDHit3); // The npc id for Link's tertiary coin when hitting the block (chance 60:3). (Default would be the red rupee, 253). N/A
     }
 
     double getValue(size_t address, FIELDTYPE ftype)

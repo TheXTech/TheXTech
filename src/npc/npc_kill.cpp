@@ -221,11 +221,11 @@ void KillNPC(int A, int B)
             {
                 numNPCs++;
                 NPC[numNPCs] = NPC_t();
-                NPC[numNPCs].Type = NPCID_GEM_1;
+                NPC[numNPCs].Type = RupeeIDDrop1;
                 if(iRand(5) == 0)
-                    NPC[numNPCs].Type = NPCID_GEM_5;
+                    NPC[numNPCs].Type = RupeeIDDrop5;
                 if(iRand(40) < 3)
-                    NPC[numNPCs].Type = NPCID_GEM_20;
+                    NPC[numNPCs].Type = RupeeIDDrop20;
                 NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
                 NPC[numNPCs].Location.X = NPC[A].Location.X + NPC[A].Location.Width / 2.0 - NPC[numNPCs].Location.Width / 2.0;
                 NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
