@@ -597,16 +597,23 @@ public:
         insert(0x00B2595E, &numPlayers); // Player count. GM_PLAYERS_COUNT
         insert(0x00B25960, &numWorldLevels); // Overworld level count. GM_LEVEL_COUNT
         insert(0x00B25980, &numWorldMusic); // World music box count. GM_MUSICBOX_COUNT
-
+        
         insert(0x00B2B9E4, &qScreen); // If the camera is camera controlling due to an event scrolling the camera itself. GM_UNK_B2B9E4
+
+        insert(0x00B2C59E, &LevelMacro); // The level exit animation state (Level end state). If greater than 0, the victory animation depending on the value plays. Once the animation concludes, the level will exit. GM_WINNING
 
         insert(0x00B2C5A8, &Coins); // HUD coins count. GM_COINS
         insert(0x00B2C5AC, &Lives); // HUD lives count. GM_PLAYER_LIVES
 
         insert(0x00B2C5B4, &LevelSelect); // Whether or not the game is on the overworld. If both 0x00B2C5B4 and 0x00B2C620 is set to -1/true, the game is on a level. GM_EPISODE_MODE
+
+        insert(0x00B2C5D4, &LevelBeatCode); // The level exit type to use (Level win type). The level win type constants relate to the victory flags on the overworld (i.e. unlocking paths) and determine which type of victory has occured in a level. This value does not necessarily match the end state. GM_LEVEL_EXIT_TYPE
+
         insert(0x00B2C620, &GameMenu); // Whether or not the game is on the title screen. GM_LEVEL_MODE
 
         insert(0x00B2C624, &WorldName); // The name of the current episode. N/A
+        
+        insert(0x00B2C62A, &selSave); // The current save slot. GM_CUR_SAVE_SLOT
 
         insert(0x00B2C62C, &PSwitchTime); // P-Switch Timer. GM_PSWITCH_COUNTER
         insert(0x00B2C62E, &PSwitchStop); // Stopwatch Timer. N/A
@@ -631,7 +638,7 @@ public:
         insert(0x00B2C860, &Physics.NPCShellSpeed); //The shell speed for all Koopas. N/A
         insert(0x00B2C864, &Physics.NPCShellSpeedY); // Determines the Y speed of kicked shells. N/A
         insert(0x00B2C868, &Physics.NPCWalkingSpeed); // Universal speed of most isWalker NPCs. N/A
-        insert(0x00B2C86C, &Physics.NPCWalkingOnSpeed); // NPC that can be walked on walking speed. N/A
+        insert(0x00B2C86C, &Physics.NPCWalkingOnSpeed); // NPC that can be walked on walking speed. GM_NPC_WALKSPEED
         insert(0x00B2C870, &Physics.NPCMushroomSpeed); // Universal speed of mushroom NPCs. N/A
         insert(0x00B2C874, &Physics.NPCGravity); // Seperate field from the Defines use. Unsure how it's used. N/A
         insert(0x00B2C878, &Physics.NPCGravityReal); // a.k.a. Defines.npc_grav. N/A
