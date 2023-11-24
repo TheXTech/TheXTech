@@ -597,7 +597,7 @@ public:
         insert(0x00B2595E, &numPlayers); // Player count. GM_PLAYERS_COUNT
         insert(0x00B25960, &numWorldLevels); // Overworld level count. GM_LEVEL_COUNT
         insert(0x00B25980, &numWorldMusic); // World music box count. GM_MUSICBOX_COUNT
-        
+
         insert(0x00B2B9E4, &qScreen); // If the camera is camera controlling due to an event scrolling the camera itself. GM_UNK_B2B9E4
 
         insert(0x00B2C59E, &LevelMacro); // The level exit animation state (Level end state). If greater than 0, the victory animation depending on the value plays. Once the animation concludes, the level will exit. GM_WINNING
