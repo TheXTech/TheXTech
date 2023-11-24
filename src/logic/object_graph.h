@@ -139,6 +139,6 @@ private:
 //! create an object graph based on the currently loaded level
 void FillGraph(Graph& graph);
 
-}; //namespace ObjectGraph
+} //namespace ObjectGraph
 
 #endif // #ifndef OBJECT_GRAPH_H
