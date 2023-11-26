@@ -72,19 +72,6 @@ public:
     bool doublePixel() const;
 
     /*!
-     * \brief Measure the size of the multiline text block in pixels
-     * \param text Multi-line text string
-     * \param text_size The byte size of the text string to print
-     * \param max_line_length maximum length of the line in characters
-     * \param cut Cut the part of string after the line length and put the "..." to the end (Note: input string will remina unmodified)
-     * \param fontSize The size of the TTF font glyph
-     * \return Width and height of the text block in pixels
-     */
-    PGE_Size textSize(const char *text, size_t text_size,
-                      uint32_t max_line_length = 0,
-                      bool cut = false, uint32_t fontSize = 14) override;
-
-    /*!
      * \brief Get a size of one glyph
      * \param utf8char Pointer to one UTF-8 character
      * \param charNum Character number in the line (required to compute the size of the taboluation)
@@ -102,13 +89,16 @@ public:
      * \param Red Red channel colour
      * \param Green Green channel colour
      * \param Blue Blue channel colour
-     * \param Alpha Alpha channel level
+     * \param Alpha Alpha channel level (does not issue render calls if Alpha is 0)
      * \param fontSize The size of the TTF font glyph
+     * \param crop_info nullable pointer to info for crop (marquee) logic
+     * \return Width and height of the text block in pixels
      */
-    void printText(const char *text, size_t text_size,
-                   int32_t x, int32_t y,
-                   float Red = 1.f, float Green = 1.f, float Blue = 1.f, float Alpha = 1.f,
-                   uint32_t fontSize = 14) override;
+    PGE_Size printText(const char *text, size_t text_size,
+                       int32_t x, int32_t y,
+                       float Red = 1.f, float Green = 1.f, float Blue = 1.f, float Alpha = 1.f,
+                       uint32_t fontSize = 14,
+                       CropInfo* crop_info = nullptr) override;
 
     bool isLoaded() const override;
 

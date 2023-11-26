@@ -23,8 +23,8 @@
 
 #include "globals.h"
 #include "graphics.h"
-#include "../fontman/font_manager.h"
-#include "../fontman/font_manager_private.h"
+#include "fontman/font_manager.h"
+#include "fontman/font_manager_private.h"
 
 
 int SuperTextPixLen(int SuperN, const char* SuperChars, int Font)
@@ -48,7 +48,7 @@ int SuperTextPixLen(int SuperN, const char* SuperChars, int Font)
         return len;
     }
 
-    return FontManager::textSize(SuperChars, SuperN, dFont, 0, false, FontManager::fontSizeFromSmbxFont(Font)).w();
+    return FontManager::textSize(SuperChars, SuperN, dFont, FontManager::fontSizeFromSmbxFont(Font)).w();
 }
 
 void SuperPrintRightAlign(int SuperN, const char* SuperChars, int Font, float X, float Y, float r, float g, float b, float a)
@@ -66,7 +66,7 @@ void SuperPrintRightAlign(int SuperN, const char* SuperChars, int Font, float X,
 
     if(dFont >= 0)
     {
-        X -= FontManager::textSize(SuperChars, SuperN, dFont, 0, false, FontManager::fontSizeFromSmbxFont(Font)).w();
+        X -= FontManager::textSize(SuperChars, SuperN, dFont, FontManager::fontSizeFromSmbxFont(Font)).w();
         FontManager::printText(SuperChars, SuperN, X, Y, dFont, r, g, b, a, FontManager::fontSizeFromSmbxFont(Font), outline);
         return;
     }
@@ -90,7 +90,7 @@ void SuperPrintCenter(int SuperN, const char* SuperChars, int Font, float X, flo
 
     if(dFont >= 0)
     {
-        X -= FontManager::textSize(SuperChars, SuperN, dFont, 0, false, FontManager::fontSizeFromSmbxFont(Font)).w() / 2;
+        X -= FontManager::textSize(SuperChars, SuperN, dFont, FontManager::fontSizeFromSmbxFont(Font)).w() / 2;
         FontManager::printText(SuperChars, SuperN, X, Y, dFont, r, g, b, a, FontManager::fontSizeFromSmbxFont(Font), outline);
         return;
     }
@@ -114,7 +114,7 @@ void SuperPrintScreenCenter(int SuperN, const char* SuperChars, int Font, float 
 
     if(dFont >= 0)
     {
-        float X = (ScreenW / 2) - (FontManager::textSize(SuperChars, SuperN, dFont, 0, false, FontManager::fontSizeFromSmbxFont(Font)).w() / 2);
+        float X = (ScreenW / 2) - (FontManager::textSize(SuperChars, SuperN, dFont, FontManager::fontSizeFromSmbxFont(Font)).w() / 2);
         FontManager::printText(SuperChars, SuperN, X, Y, dFont, r, g, b, a, FontManager::fontSizeFromSmbxFont(Font), outline);
         return;
     }
