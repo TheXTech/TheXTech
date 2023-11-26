@@ -41,8 +41,11 @@ struct MarqueeSpec
     //! frames to hold text on left and right
     uint8_t hold_frames = 0;
 
-    inline constexpr MarqueeSpec(uint16_t marquee_width, uint8_t anim_speed, uint8_t fade_pixels, uint8_t hold_frames)
-        : marquee_width(marquee_width), anim_speed(anim_speed), fade_pixels(fade_pixels), hold_frames(hold_frames) {}
+    //! how text should be aligned with an unfilled marquee (-1 for left, 0 for center, and 1 for right)
+    int8_t align = 0;
+
+    inline constexpr MarqueeSpec(uint16_t marquee_width, uint8_t anim_speed, uint8_t fade_pixels, uint8_t hold_frames, int8_t align)
+        : marquee_width(marquee_width), anim_speed(anim_speed), fade_pixels(fade_pixels), hold_frames(hold_frames), align(align) {}
 };
 
 class MarqueeState
@@ -65,7 +68,7 @@ public:
     /**
      * \brief: resets the marquee state for a new text width
      */
-    void reset_width(uint16_t text_width);
+    void reset_width(uint16_t text_width = 0);
 
     /**
      * \brief: advance the marquee state by one frame

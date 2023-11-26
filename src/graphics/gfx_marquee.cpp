@@ -128,7 +128,11 @@ void SuperPrintMarquee(int SuperN, const char* SuperChars, int Font, float X, fl
 
     if(marquee_state.check_width() < marquee_spec.marquee_width)
     {
-        X += (marquee_spec.marquee_width - marquee_state.check_width()) / 2;
+        if(marquee_spec.align > 0)
+            X += (marquee_spec.marquee_width - marquee_state.check_width());
+        else if(marquee_spec.align == 0)
+            X += (marquee_spec.marquee_width - marquee_state.check_width()) / 2;
+
         marquee_spec.marquee_width = marquee_state.check_width();
     }
 
