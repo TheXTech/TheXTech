@@ -715,7 +715,7 @@ void minport_ApplyPhysCoords()
 
     glMatrixMode( GL_PROJECTION );
     glLoadIdentity();
-    glOrthof32( 0, ScreenW / 2, ScreenH / 2, 0, -1 << 12, 1 << 12 );
+    glOrthof32( 0, ScreenW / 2, ScreenH / 2, 0, -(1 << 12), 1 << 12 );
 }
 
 void minport_ApplyViewport()

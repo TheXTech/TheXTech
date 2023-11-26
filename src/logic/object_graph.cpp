@@ -247,4 +247,4 @@ void FillGraph(Graph& graph)
     graph.update();
 }
 
-}; //namespace ObjectGraph
+} //namespace ObjectGraph
