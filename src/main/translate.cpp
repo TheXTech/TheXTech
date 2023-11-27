@@ -762,6 +762,7 @@ XTechTranslate::XTechTranslate()
         {"editor.tooltip.levels",   &g_editorStrings.tooltipLevels},
         {"editor.tooltip.paths",    &g_editorStrings.tooltipPaths},
         {"editor.tooltip.music",    &g_editorStrings.tooltipMusic},
+        {"editor.tooltip.area",     &g_editorStrings.tooltipArea},
         {"editor.tooltip.file",     &g_editorStrings.tooltipFile},
         {"editor.tooltip.show",     &g_editorStrings.tooltipShow},
 

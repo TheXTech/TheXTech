@@ -122,6 +122,7 @@ bool OpenWorld(std::string FilePath)
     numWorldLevels = 0;
     numWorldPaths = 0;
     numWorldMusic = 0;
+    numWorldAreas = 0;
 
     WorldName = wld.EpisodeTitle;
     wld.charactersToS64();
@@ -346,6 +347,28 @@ bool OpenWorld(std::string FilePath)
         treeWorldMusicAdd(&box);
     }
 
+    for(auto &m : wld.arearects)
+    {
+        if(!(m.flags & WorldAreaRect::SETUP_SET_VIEWPORT))
+            continue;
+
+        numWorldAreas++;
+        if(numWorldAreas > maxWorldAreas)
+        {
+            numWorldAreas = maxWorldAreas;
+            break;
+        }
+
+        auto &area = WorldArea[numWorldAreas];
+
+        area = WorldArea_t();
+
+        area.Location.X = m.x;
+        area.Location.Y = m.y;
+        area.Location.Width = m.w;
+        area.Location.Height = m.h;
+    }
+
     if(!LevelEditor)
         tr.loadWorldTranslation(FileNameFull);
 
@@ -459,6 +482,7 @@ void ClearWorld(bool quick)
     numWorldLevels = 0;
     numWorldPaths = 0;
     numWorldMusic = 0;
+    numWorldAreas = 0;
     RestartLevel = false;
     WorldStarsShowPolicy = WorldData::STARS_UNSPECIFIED;
     NoMap = false;

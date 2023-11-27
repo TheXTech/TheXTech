@@ -240,6 +240,7 @@
         "tooltip": {
             "BGOs": "BGOs",
             "NPCs": "NPCs",
+            "area": "Area",
             "blocks": "Blocks",
             "erase": "Erase",
             "eraseAll": "Erase All",
