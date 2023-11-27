@@ -6,6 +6,12 @@
 
 Motor SMBX, reescrito en C ++ a partir de VisualBasic 6.
 
+| <!-- -->      | <!-- -->        | <!-- -->      |
+|:-------------:|:---------------:|:-------------:|
+| [English](README.md) | [Русский](README.RUS.md) | Español |
+
+-----------
+
 
 # Preguntas Frecuentes
 
