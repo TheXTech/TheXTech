@@ -255,7 +255,8 @@
             "show": "顯示",
             "tiles": "地形",
             "warps": "傳送點",
-            "water": "水流"
+            "water": "水流",
+            "area": "地圖區域"
         },
         "warp": {
             "allow": "允許：",
