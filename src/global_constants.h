@@ -155,7 +155,7 @@ const int maxWorldPaths = 2000;
 //Public Const maxWorldMusic As Integer = 1000   'Maximum number of musics
 const int maxWorldMusic = 1000;
 //! NEW: limit on world map area count
-const int maxWorldAreas = 100;
+const int maxWorldAreas = 20;
 //Public Const numSounds As Integer = 100
 const int numSounds = 200;
 //Public Const maxSections As Integer = 20
