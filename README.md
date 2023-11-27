@@ -6,6 +6,12 @@
 
 SMBX engine, rewritten into C++ from VisualBasic 6.
 
+| <!-- -->      | <!-- -->        | <!-- -->      |
+|:-------------:|:---------------:|:-------------:|
+| English | [Русский](README.RUS.md) | [Español](README.ESP.md) |
+
+-----------
+
 
 # Frequently Asked Questions
 
@@ -72,7 +78,7 @@ If you want to replace default assets with your own, you can modify the content 
 
 ## What is different with this thing in comparison to the original VB6 build?
 - First off, it's written in C++ while original (as we already know) is written in VB6.
-- Doesn't have an Editor. Instead, in has a deep integration with Moondust Editor that allows to use it with the same functionality as in original editor (the "magic hand" functionality was kept to allow real-time editing of the level while testing, it's needed to use IPC communication with Moondust Editor to get the ability to use it better).
+- Before the version 1.3.6, it had no Editor at all. Since the version 1.3.6, it has an embedded mobile editor that works in a full screen. It can be controlled by keyboard and mouse as well, as by gamepad or by touch screen. In addition, it has a deep integration with Moondust Editor that allows to use game with the same functionality as was possible in the original editor (the "magic hand" functionality was kept to allow real-time editing of a level while testing).
 - Full support of UTF-8 in filename paths and internal text data (original game had the only 8bit ANSI support).
 - For graphics and controlling, it uses an SDL2 library while original game have used WinAPI calls and GDI library.
 - It uses PGE-FL library that has better file formats support.
@@ -85,6 +91,7 @@ If you want to replace default assets with your own, you can modify the content 
 - Built-in PNG support for custom and default graphics. Masked GIFs are still supported for backward compatibility, however, without making an unexpected auto-conversion like SMBX-38A does.
 - Checkpoints now have multi-points! You can use them in your levels multiple times without limits!
 - It does use of lazy-decompress algorithm to speed-up the loading of a game and reduce the memory usage.
+- It has the completely reworked objects search algorithm which resolves the lag problem on slow systems after horizontal move of layers (See description of the [DrPepper Problem](https://wohlsoft.ru/pgewiki/DrPepper_Problem)).
 - For music and SFX, the MixerX library is used to give a support for a wide amount of sound and music formats!
 - It doesn't embeds any graphics: there are NO trurely hardcoded graphics, everything is now represented by external graphics!
 - Some internal limits have been expanded.
@@ -93,7 +100,7 @@ If you want to replace default assets with your own, you can modify the content 
 - It uses less RAM (80...150 MB instead of 600...800 MB like usually), and it's free from memory leaks given by the MCI interface used by VB6 SMBX originally.
 - it doesn't overload CPU (the reason was a bad way to process infinite loops, I did the fix of VB6 build too at my "smbx-experiments" branch)
 - it able to work on "toaster" (a weak computer) while VB6-SMBX won't work.
-- it's fully cross-platform and doesn't depend on Windows, and it no longer depends on x86 processor: it can work on ARM and MIPS processors too (VB6-SMBX won't work on ARM at all, with x86 emulator it will 20x times slower than usual).
+- it's fully cross-platform and doesn't depend on Windows, and it no longer depends on x86 processor: it can work on ARM and MIPS processors too (VB6-SMBX won't work on ARM at all, with x86 emulator it will 20x times slower than usualy).
 
 
 ## How to build it?
