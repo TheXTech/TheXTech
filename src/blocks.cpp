@@ -1855,13 +1855,28 @@ void PowBlock()
                         BlockShakeUpPow(A);
                 }
             }
+
+            // force-activate coins on the canonical screens
+            if(g_compatibility.allow_multires && screen.is_canonical())
+            {
+                for(int A : treeNPCQuery(query_loc, SORTMODE_NONE))
+                {
+                    if(!NPC[A].Active && NPCIsACoin[NPC[A].Type])
+                    {
+                        NPC[A].JustActivated = vscreen_Z;
+
+                        NPCQueues::Active.insert(A);
+                        NPC[A].Active = true;
+
+                        NPC[A].TimeLeft = Physics.NPCTimeOffScreen;
+                    }
+                }
+            }
         }
 
         if(!g_compatibility.allow_multires)
             break;
     }
-
-    // would be neat to force-activate coins on the canonical screens
 
     for(int A : NPCQueues::Active.no_change)
     {
