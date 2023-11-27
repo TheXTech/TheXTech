@@ -1167,6 +1167,18 @@ static void loadCustomUIAssets()
     loadCGFX(uiRoot + "Medals.png",
              "Medals",
              nullptr, nullptr, GFX.isCustom(ci++), GFX.Medals, false, true);
+
+    // suppresses compiler warning of uncalled function, replace when merging multires
+    if(false)
+    {
+        FrameBorder b;
+        bool c;
+
+        loadCBorder(uiRoot + "Backdrop_Border.png",
+                    "Backdrop_Border",
+                    c,
+                    b);
+    }
 }
 
 void LoadCustomGFX(bool include_world)
