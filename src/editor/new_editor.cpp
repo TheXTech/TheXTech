@@ -3367,6 +3367,45 @@ void EditorScreen::UpdateBGOScreen(CallMode mode)
     }
 }
 
+void EditorScreen::UpdateAreaScreen(CallMode mode)
+{
+    SuperPrintR(mode, g_editorStrings.tooltipArea, 3, 200, 50);
+
+    int H = EditorCursor.WorldArea.Location.Height / 32;
+    int W = EditorCursor.WorldArea.Location.Width / 32;
+
+    // validation
+    if(H == 0)
+    {
+        H = 1;
+        EditorCursor.WorldArea.Location.Height = 32;
+    }
+
+    if(W == 0)
+    {
+        W = 1;
+        EditorCursor.WorldArea.Location.Width = 32;
+    }
+
+    // Width
+    SuperPrintRightR(mode, g_editorStrings.wordWidth + " " + std::to_string(W), 3, 330, 90);
+
+    if(W > 1 && UpdateButton(mode, 340 + 4, 80 + 4, GFX.EIcons, false, 0, 32*Icon::left, 32, 32))
+        EditorCursor.WorldArea.Location.Width = 32 * (W - 1);
+
+    if(UpdateButton(mode, 380 + 4, 80 + 4, GFX.EIcons, false, 0, 32*Icon::right, 32, 32))
+        EditorCursor.WorldArea.Location.Width = 32 * (W + 1);
+
+    // Height
+    SuperPrintRightR(mode, g_editorStrings.wordHeight + " " + std::to_string(H), 3, 330, 130);
+
+    if(H > 1 && UpdateButton(mode, 340 + 4, 120 + 4, GFX.EIcons, false, 0, 32*Icon::left, 32, 32))
+        EditorCursor.WorldArea.Location.Height = 32 * (H - 1);
+
+    if(UpdateButton(mode, 380 + 4, 120 + 4, GFX.EIcons, false, 0, 32*Icon::right, 32, 32))
+        EditorCursor.WorldArea.Location.Height = 32 * (H + 1);
+}
+
 void EditorScreen::UpdateWaterScreen(CallMode mode)
 {
     SuperPrintR(mode, g_editorStrings.waterTitle, 3, 200, 50);
@@ -5061,6 +5100,17 @@ void EditorScreen::UpdateSelectorBar(CallMode mode, bool select_bar_only)
                 exit_special = true;
         }
 
+        // world area
+        currently_in = !in_excl_special && EditorCursor.Mode == OptCursor_t::WLD_AREA;
+        if(UpdateButton(mode, sx+8*40+4, 4, GFXBlock[60], currently_in, 0, 0, 32, 32, g_editorStrings.tooltipArea.c_str()))
+        {
+            if(currently_in)
+                swap_screens();
+            EditorCursor.Mode = OptCursor_t::WLD_AREA;
+            if(in_excl_special)
+                exit_special = true;
+        }
+
         // world settings
         if(UpdateButton(mode, sx+9*40+4, 4, GFXLevelBMP[15], in_world_settings, 0, 0, 32, 32, g_editorStrings.tooltipSettings.c_str()))
         {
@@ -5271,6 +5321,8 @@ void EditorScreen::UpdateEditorScreen(CallMode mode, bool second_screen)
         UpdateLevelScreen(mode);
     else if(EditorCursor.Mode == OptCursor_t::WLD_PATHS)
         UpdatePathScreen(mode);
+    else if(EditorCursor.Mode == OptCursor_t::WLD_AREA)
+        UpdateAreaScreen(mode);
 
     if(mode == CallMode::Render && e_CursorX >= 0 && GamePaused == PauseCode::None)
     {

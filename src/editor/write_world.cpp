@@ -33,6 +33,7 @@ void SaveWorld(const std::string& FilePath, int format, int version)   // Saves 
     WorldPathTile path;
     WorldLevelTile level;
     WorldMusicBox musicbox;
+    WorldAreaRect area;
 
     FileFormats::CreateWorldData(out);
 
@@ -132,6 +133,23 @@ void SaveWorld(const std::string& FilePath, int format, int version)   // Saves 
 
         musicbox.meta.array_id = out.musicbox_array_id++;
         out.music.push_back(musicbox);
+    }
+
+    for(int i = 1; i <= numWorldAreas; i++)
+    {
+        auto &s = WorldArea[i];
+
+        area = WorldAreaRect();
+
+        area.x = s.Location.X;
+        area.y = s.Location.Y;
+        area.w = s.Location.Width;
+        area.h = s.Location.Height;
+
+        area.flags |= WorldAreaRect::SETUP_SET_VIEWPORT;
+
+        area.meta.array_id = out.arearect_array_id++;
+        out.arearects.push_back(area);
     }
 
     if(!FileFormats::SaveWorldFile(out, FilePath, (FileFormats::WorldFileFormat)format, version))

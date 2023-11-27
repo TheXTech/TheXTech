@@ -334,6 +334,7 @@ struct EditorContent
     std::string tooltipLevels;
     std::string tooltipPaths;
     std::string tooltipMusic;
+    std::string tooltipArea;
     std::string tooltipFile;
     std::string tooltipShow;
 

@@ -92,6 +92,26 @@ struct SpeedlessLocation_t
     }
 };
 
+//NEW: 'Holds location information for an object without speed at integer coordinates (like most objects that have not moved since saving)
+struct IntegerLocation_t
+{
+    int32_t X = 0;
+    int32_t Y = 0;
+    int32_t Height = 0;
+    int32_t Width = 0;
+
+    inline explicit operator Location_t() const
+    {
+        Location_t ret;
+        ret.X = X;
+        ret.Y = Y;
+        ret.Height = Height;
+        ret.Width = Width;
+
+        return ret;
+    }
+};
+
 //NEW: 'Holds location information for player start location, including Direction
 struct PlayerStart_t
 {

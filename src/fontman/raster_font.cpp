@@ -256,172 +256,6 @@ void RasterFont::loadFontMap(const std::string& fontmap_ini)
 }
 
 
-PGE_Size RasterFont::textSize(const char* text, size_t text_size, uint32_t max_line_lenght, bool cut, uint32_t)
-{
-    const char* t = text;
-    size_t t_size = text_size;
-    // TODO: Get rid this string: use integer hints instead of making a modded string copy when performing a cut behaviour
-    std::string modText;
-
-    if(!text || text_size == 0)
-        return PGE_Size(0, 0);
-
-    size_t lastspace = 0; //!< index of last found space character
-    size_t count     = 1; //!< Count of lines
-    uint32_t maxWidth     = 0; //!< detected maximal width of message
-
-    uint32_t widthSumm    = 0;
-    uint32_t widthSummMax = 0;
-
-    if(cut)
-    {
-        modText = std::string(text, text_size);
-        std::string::size_type i = modText.find('\n');
-        if(i != std::string::npos)
-            modText.erase(i, modText.size() - i);
-        t = modText.c_str();
-        t_size = modText.size();
-    }
-
-    /****************Word wrap*********************/
-    uint32_t x = 0;
-    for(size_t i = 0; i < t_size; i++, x++)
-    {
-        const char &cx = t[i];
-        UTF8 uch = static_cast<UTF8>(cx);
-
-        switch(cx)
-        {
-        case '\r':
-            break;
-
-        case '\t':
-        {
-            lastspace = i;
-            size_t spaceSize = m_spaceWidth + m_interLetterSpace / 2;
-            if(spaceSize == 0)
-                spaceSize = 1; // Don't divide by zero
-            size_t tabMult = 4 - ((widthSumm / spaceSize) % 4);
-            widthSumm += static_cast<size_t>(m_spaceWidth + m_interLetterSpace / 2) * tabMult;
-            if(widthSumm > widthSummMax)
-                widthSummMax = widthSumm;
-            break;
-        }
-
-        case ' ':
-        {
-            lastspace = i;
-            widthSumm += m_spaceWidth + m_interLetterSpace / 2;
-            if(widthSumm > widthSummMax)
-                widthSummMax = widthSumm;
-            break;
-        }
-
-        case '\n':
-        {
-            lastspace = 0;
-            if((maxWidth < x) && (maxWidth < max_line_lenght))
-                maxWidth = x;
-            x = 0;
-            widthSumm = 0;
-            count++;
-            break;
-        }
-
-        default:
-        {
-            CharMap::iterator rc = m_charMap.find(get_utf8_char(&cx));
-            bool need_a_ttf = false;
-            if(rc != m_charMap.end())
-            {
-                RasChar &rch = rc->second;
-                need_a_ttf = !rch.valid;
-                if(rch.valid)
-                    widthSumm += (m_letterWidth - rch.padding_left - rch.padding_right + m_interLetterSpace);
-            }
-            else
-                need_a_ttf = true;
-
-            if(need_a_ttf)
-            {
-#ifdef THEXTECH_ENABLE_TTF_SUPPORT
-                TtfFont *font = FontManager::getTtfFontByName(m_ttfFallback);
-                if(font)
-                {
-                    uint32_t font_size_use = m_ttfSize > 0 ? m_ttfSize : m_letterWidth;
-                    // int y_offset = 0; // UNUSED
-                    bool doublePixel = font->doublePixel();
-
-                    if(font->bitmapSize())
-                    {
-                        if(font_size_use > font->bitmapSize() * 1.5)
-                            doublePixel = true;
-
-                        font_size_use = font->bitmapSize();
-                    }
-                    else if(doublePixel)
-                        font_size_use /= 2;
-
-                    TtfFont::TheGlyphInfo glyph = font->getGlyphInfo(&cx, font_size_use);
-                    uint32_t glyph_width = glyph.width > 0 ? uint32_t(glyph.advance >> 6) : (font_size_use >> 2);
-                    if(doublePixel)
-                        glyph_width *= 2;
-
-                    // Raster fonts are monospace fonts. TTF glyphs shoudn't break mono-width until they are wider than a cell
-                    auto lw = SDL_max(glyph_width, m_letterWidth);
-                    widthSumm += lw + m_interLetterSpace;
-                }
-                else
-#endif
-                {
-                    widthSumm += m_letterWidth + m_interLetterSpace;
-                }
-            }
-
-            if(widthSumm > widthSummMax)
-                widthSummMax = widthSumm;
-
-            break;
-        }
-
-        }//Switch
-
-        if((max_line_lenght > 0) && (x >= max_line_lenght)) //If lenght more than allowed
-        {
-            maxWidth = x;
-            if(t != modText.c_str())
-            {
-                modText = text;
-                t = modText.c_str();
-                t_size = modText.size();
-            }
-
-            if(lastspace > 0)
-            {
-                modText[lastspace] = '\n';
-                i = lastspace - 1;
-                lastspace = 0;
-            }
-            else
-            {
-                modText.insert(i, 1, '\n');
-                t = modText.c_str();
-                t_size = modText.size();
-                x = 0;
-                count++;
-            }
-        }
-        i += static_cast<size_t>(trailingBytesForUTF8[uch]);
-    }
-
-    // Unused later
-//    if(count == 1)
-//        maxWidth = static_cast<uint32_t>(t_size);
-
-    /****************Word wrap*end*****************/
-    return PGE_Size(static_cast<int32_t>(widthSummMax), static_cast<int32_t>(m_newlineOffset * count));
-}
-
 PGE_Size RasterFont::glyphSize(const char* utf8char, uint32_t charNum, uint32_t /*fontSize*/)
 {
     PGE_Size ret(0, m_newlineOffset);
@@ -507,18 +341,23 @@ PGE_Size RasterFont::glyphSize(const char* utf8char, uint32_t charNum, uint32_t 
     return ret;
 }
 
-void RasterFont::printText(const char* text, size_t text_size,
-                           int32_t x, int32_t y,
-                           float Red, float Green, float Blue, float Alpha,
-                           uint32_t)
+PGE_Size RasterFont::printText(const char* text, size_t text_size,
+                               int32_t x, int32_t y,
+                               float Red, float Green, float Blue, float Alpha,
+                               uint32_t,
+                               CropInfo* crop_info)
 {
     if(m_charMap.empty() || !text || text_size == 0)
-        return;
+        return PGE_Size(0, 0);
 
-    uint32_t offsetX = 0;
+    int32_t  offsetX = (crop_info) ? -crop_info->offset : 0;
     uint32_t offsetY = 0;
     uint32_t w = m_letterWidth;
     uint32_t h = m_letterHeight;
+
+    int32_t  offsetX_max = 0;
+
+    auto letter_alpha = Alpha;
 
     const char *strIt  = text;
     const char *strEnd = strIt + text_size;
@@ -530,7 +369,10 @@ void RasterFont::printText(const char* text, size_t text_size,
         switch(cx)
         {
         case '\n':
-            offsetX = 0;
+            if(offsetX > offsetX_max)
+                offsetX_max = offsetX;
+
+            offsetX = (crop_info) ? -crop_info->offset : 0;
             offsetY += m_newlineOffset;
             continue;
 
@@ -548,13 +390,26 @@ void RasterFont::printText(const char* text, size_t text_size,
         if(rch_f != m_charMap.end() && rch_f->second.valid)
         {
             const auto &rch = rch_f->second;
-            XRender::renderTexture(x + static_cast<int32_t>(offsetX - rch.padding_left + m_glyphOffsetX),
-                                   y + static_cast<int32_t>(offsetY + m_glyphOffsetY),
-                                   w, h,
-                                   *rch.tx,
-                                   rch.x, rch.y,
-                                   Red, Green, Blue, Alpha);
-            offsetX += w - rch.padding_left - rch.padding_right + m_interLetterSpace;
+
+            int drawn_width = w - rch.padding_left - rch.padding_right;
+
+            if(crop_info)
+            {
+                if(!crop_info->letter_alpha(letter_alpha, Alpha, offsetX, offsetX + drawn_width))
+                    break;
+            }
+
+            if(letter_alpha != 0)
+            {
+                XRender::renderTexture(x + static_cast<int32_t>(offsetX - rch.padding_left + m_glyphOffsetX),
+                                       y + static_cast<int32_t>(offsetY + m_glyphOffsetY),
+                                       w, h,
+                                       *rch.tx,
+                                       rch.x, rch.y,
+                                       Red, Green, Blue, letter_alpha);
+            }
+
+            offsetX += drawn_width + m_interLetterSpace;
         }
         else
 #ifdef THEXTECH_ENABLE_TTF_SUPPORT
@@ -590,20 +445,30 @@ void RasterFont::printText(const char* text, size_t text_size,
                 if(m_ttfOutlines)
                     offsetX += (doublePixel ? 2 : 1);
 
-                font->drawGlyph(&cx,
-                                x + static_cast<int32_t>(offsetX + m_glyphOffsetX),
-                                y + static_cast<int32_t>(offsetY + m_glyphOffsetY) - 2 + y_offset,
-                                font_size_use,
-                                (doublePixel ? 2.0 : 1.0),
-                                m_ttfOutlines,
-                                Red, Green, Blue, Alpha,
-                                m_ttfOutlinesColourF[0],
-                                m_ttfOutlinesColourF[1],
-                                m_ttfOutlinesColourF[2],
-                                m_ttfOutlinesColourF[3]);
+                int drawn_width = SDL_max(glyph_width, m_letterWidth);
 
-                auto lw = SDL_max(glyph_width, m_letterWidth);
-                offsetX += lw + m_interLetterSpace;
+                if(crop_info)
+                {
+                    if(!crop_info->letter_alpha(letter_alpha, Alpha, offsetX, offsetX + drawn_width))
+                        break;
+                }
+
+                if(letter_alpha != 0)
+                {
+                    font->drawGlyph(&cx,
+                                    x + static_cast<int32_t>(offsetX + m_glyphOffsetX),
+                                    y + static_cast<int32_t>(offsetY + m_glyphOffsetY) - 2 + y_offset,
+                                    font_size_use,
+                                    (doublePixel ? 2.0 : 1.0),
+                                    m_ttfOutlines,
+                                    Red, Green, Blue, letter_alpha,
+                                    m_ttfOutlinesColourF[0],
+                                    m_ttfOutlinesColourF[1],
+                                    m_ttfOutlinesColourF[2],
+                                    m_ttfOutlinesColourF[3]);
+                }
+
+                offsetX += drawn_width + m_interLetterSpace;
             }
             else
             {
@@ -617,6 +482,19 @@ void RasterFont::printText(const char* text, size_t text_size,
 #endif
         strIt += static_cast<size_t>(trailingBytesForUTF8[ucx]);
     }
+
+    if(offsetX > offsetX_max)
+        offsetX_max = offsetX;
+
+    // remove trailing space
+    if(offsetX_max > (int32_t)m_interLetterSpace)
+        offsetX_max -= m_interLetterSpace;
+
+    // add current line
+    if(offsetX > 0)
+        offsetY += m_newlineOffset;
+
+    return PGE_Size(offsetX_max, offsetY);
 }
 
 bool RasterFont::isLoaded() const
