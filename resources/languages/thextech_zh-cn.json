@@ -255,7 +255,8 @@
             "show": "显示",
             "tiles": "地形",
             "warps": "传送点",
-            "water": "水流"
+            "water": "水流",
+            "area": "地图区域"
         },
         "warp": {
             "allow": "允许：",
