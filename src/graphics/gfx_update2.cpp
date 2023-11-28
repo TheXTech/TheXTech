@@ -49,6 +49,10 @@
 
 #include <fmt_format_ne.h>
 
+static bool s_border_valid()
+{
+    return GFX.WorldMapFrame_Border.tex.inited && (!GFX.isCustom(71) || GFX.isCustom(72));
+}
 
 static void s_getMargins(const Screen_t& screen, double& margin, double& marginTop, double& marginBottom)
 {
@@ -73,6 +77,22 @@ static void s_getMargins(const Screen_t& screen, double& margin, double& marginT
         margin = 32;
     else if(screen.W < 800)
         margin = 48;
+
+    // make sure world map frame stays visible
+    if(s_border_valid())
+    {
+        if(margin < GFX.WorldMapFrame_Border.le)
+            margin = GFX.WorldMapFrame_Border.le;
+
+        if(margin < GFX.WorldMapFrame_Border.re)
+            margin = GFX.WorldMapFrame_Border.re;
+
+        if(marginTop < GFX.WorldMapFrame_Border.te)
+            marginTop = GFX.WorldMapFrame_Border.te;
+
+        if(marginBottom < GFX.WorldMapFrame_Border.be)
+            marginBottom = GFX.WorldMapFrame_Border.be;
+    }
 }
 
 void GetvScreenWorld(vScreen_t& vscreen)
@@ -674,10 +694,8 @@ void UpdateGraphics2(bool skipRepaint)
 //        XRender::renderTexture(0, 0, 800, 130, GFX.Interface[4], 0, 0);
         if(worldHasFrameAssets())
         {
-            bool border_valid = GFX.WorldMapFrame_Border.tex.inited && (!GFX.isCustom(71) || GFX.isCustom(72));
-
             RenderFrameBorder(newLoc(0, 0, ScreenW, ScreenH), newLoc(vScreen[Z].ScreenLeft, vScreen[Z].ScreenTop, vScreen[Z].Width, vScreen[Z].Height),
-                GFX.WorldMapFrame_Tile, border_valid ? &GFX.WorldMapFrame_Border : nullptr);
+                GFX.WorldMapFrame_Tile, s_border_valid() ? &GFX.WorldMapFrame_Border : nullptr);
         }
         else
         {
