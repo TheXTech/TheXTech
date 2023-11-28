@@ -44,6 +44,7 @@
 #include "../screen_fader.h"
 
 #include "graphics/gfx_frame.h"
+#include "graphics/gfx_marquee.h"
 
 #include "gfx_special_frames.h"
 
@@ -864,9 +865,13 @@ void UpdateGraphics2(bool skipRepaint)
             int lnlx = pX + 116;
             int lnrx = vScreen[Z].ScreenLeft + vScreen[Z].Width;
 
+            MarqueeSpec marquee_spec(lnrx - lnlx, 10, 64, 32, -1);
+            static MarqueeState marquee_state;
+
             // could make these arrays if multiple world players ever supported
             static vbint_t cache_LevelIndex;
             static double cache_vScreen_W = 0.0;
+
             static std::string cache_LevelName_Split;
             static int cache_LevelName_H = 0;
 
@@ -877,6 +882,8 @@ void UpdateGraphics2(bool skipRepaint)
                 cache_LevelIndex = WorldPlayer[1].LevelIndex;
                 cache_vScreen_W = vScreen[Z].Width;
 
+                marquee_state.reset_width();
+
                 int max_width = lnrx - lnlx;
 
                 cache_LevelName_Split = WorldLevel[WorldPlayer[1].LevelIndex].LevelName;
@@ -884,9 +891,17 @@ void UpdateGraphics2(bool skipRepaint)
                 cache_LevelName_H = FontManager::optimizeTextPx(cache_LevelName_Split, max_width, font).h();
             }
 
-            FontManager::printText(cache_LevelName_Split.c_str(), cache_LevelName_Split.size(),
-                                    lnlx, vScreen[Z].ScreenTop - 21 - cache_LevelName_H,
-                                    FontManager::fontIdFromSmbxFont(2));
+            if(g_compatibility.world_map_lvlname_marquee || cache_LevelName_H > vScreen[Z].ScreenTop - 21 - 8)
+            {
+                SuperPrintMarquee(WorldLevel[WorldPlayer[1].LevelIndex].LevelName, 2, lnlx, vScreen[Z].ScreenTop - 21, marquee_spec, marquee_state);
+                marquee_state.advance(marquee_spec);
+            }
+            else
+            {
+                FontManager::printText(cache_LevelName_Split.c_str(), cache_LevelName_Split.size(),
+                                        lnlx, vScreen[Z].ScreenTop - 21 - cache_LevelName_H,
+                                        font);
+            }
         }
 
         g_worldScreenFader.draw();

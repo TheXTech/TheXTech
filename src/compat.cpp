@@ -128,6 +128,7 @@ static void compatInit(Compatibility_t &c)
     c.allow_multires = true;
     c.modern_npc_activation = true;
     c.disable_background2_tiling = false;
+    c.world_map_lvlname_marquee = false;
 
 
     if(s_compatLevel >= COMPAT_SMBX2) // Make sure that bugs were same as on SMBX2 Beta 4 on this moment
@@ -432,6 +433,7 @@ static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
         compat.read("allow-multires", c.allow_multires, c.allow_multires);
         compat.read("modern-npc-activation", c.modern_npc_activation, c.modern_npc_activation);
         compat.read("disable-background2-tiling", c.disable_background2_tiling, c.disable_background2_tiling);
+        compat.read("world-map-lvlname-marquee", c.world_map_lvlname_marquee, c.world_map_lvlname_marquee);
     }
     // 1.3.4
     compat.read("fix-player-filter-bounce", c.fix_player_filter_bounce, c.fix_player_filter_bounce);
