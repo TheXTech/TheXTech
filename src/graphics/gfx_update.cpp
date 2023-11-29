@@ -3015,7 +3015,6 @@ void UpdateGraphics(bool skipRepaint)
                     }
                 }
 
-                
     //                DrawInterface Z, numScreens
                 if(ShowOnScreenHUD && !gSMBXHUDSettings.skip)
                 {
@@ -3123,9 +3122,7 @@ void UpdateGraphics(bool skipRepaint)
             doShakeScreen(1, 1, SHAKE_RANDOM, 0, 0.1);
         }
 
-        { // NOT AN EDITOR!!!
-            s_shakeScreen.update();
-        }
+        s_shakeScreen.update();
 
 //    Next Z
     } // For(Z, 2, numScreens)
