@@ -1525,6 +1525,9 @@ void UpdateGraphics(bool skipRepaint)
             {
                 LevelChop[S] += float(-vScreen[A].X - level[S].X);
                 level[S].X = -vScreen[A].X;
+
+                // mark that section has shrunk
+                UpdateSectionOverlaps(S, true);
             }
         }
         else if(!LevelEditor && NoTurnBack[Player[plr_Z].Section])
