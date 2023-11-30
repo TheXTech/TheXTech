@@ -24,7 +24,10 @@
 
 #include <cstdint>
 
-// graphics.cpp
+struct vScreen_t;
+
 void ResetCameraPanning();
+void ProcessSmallScreenCam(vScreen_t& vscreen);
+void DrawSmallScreenCam(vScreen_t& vscreen);
 
 #endif

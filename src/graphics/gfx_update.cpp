@@ -3059,49 +3059,7 @@ void UpdateGraphics(bool skipRepaint)
         if(g_config.small_screen_camera_features && screen.H < 600
             && screen.Type != 2 && screen.Type != 3 && screen.Type != 7 && (screen.Type != 5 || screen.vScreen(2).Visible))
         {
-            int CamX = vScreen[Z].Width - 54;
-            int CamY = vScreen[Z].Height - 42;
-            if(screen.Type == 5 && screen.vScreen(2).Visible && screen.vScreen(Z).Left > 0)
-                CamY -= 24;
-
-            if(vScreen[Z].small_screen_features.offset_y_hold != 0)
-            {
-                if(GFX.Camera.inited)
-                    XRender::renderTexture(CamX, CamY, GFX.Camera, 1.0f, 0.2f, 0.2f);
-                else
-                    XRender::renderRect(CamX, CamY, 24, 16, 1.0f, 0.2f, 0.2f);
-
-                if(vScreen[Z].small_screen_features.offset_y_hold > 0)
-                    XRender::renderTexture(CamX + 4, CamY - 18, GFX.MCursor[1]);
-                else
-                    XRender::renderTexture(CamX + 4, CamY + 18, GFX.MCursor[2]);
-            }
-            else if(vScreen[Z].small_screen_features.offset_y < -160 || vScreen[Z].small_screen_features.offset_y > 160)
-            {
-                if(GFX.Camera.inited)
-                    XRender::renderTexture(CamX, CamY, GFX.Camera, 0.5f, 1.0f, 0.5f, 0.7f);
-                else
-                    XRender::renderRect(CamX, CamY, 24, 16, 0.5f, 1.0f, 0.5f, 0.7f);
-
-                if(vScreen[Z].small_screen_features.offset_y > 0)
-                    XRender::renderTexture(CamX + 4, CamY - 18, GFX.MCursor[1], 1.0f, 1.0f, 1.0f, 0.7f);
-                else
-                    XRender::renderTexture(CamX + 4, CamY + 18, GFX.MCursor[2], 1.0f, 1.0f, 1.0f, 0.7f);
-            }
-            else if(vScreen[Z].small_screen_features.offset_y <= -48 || vScreen[Z].small_screen_features.offset_y >= 48)
-            {
-                if(GFX.Camera.inited)
-                    XRender::renderTexture(CamX, CamY, GFX.Camera, 1.0f, 1.0f, 1.0f, 0.5f);
-                else
-                    XRender::renderRect(CamX, CamY, 24, 16, 1.0f, 1.0f, 1.0f, 0.5f);
-            }
-            else
-            {
-                if(GFX.Camera.inited)
-                    XRender::renderTexture(CamX, CamY, GFX.Camera, 0.0f, 0.0f, 0.0f, 0.3f);
-                else
-                    XRender::renderRect(CamX, CamY, 24, 16, 0.0f, 0.0f, 0.0f, 0.3f);
-            }
+            DrawSmallScreenCam(vScreen[Z]);
         }
 
         XRender::offsetViewportIgnore(false);

@@ -663,6 +663,7 @@ set(THEXTECH_SRC
     src/graphics/gfx_message.cpp
     src/graphics/gfx_editor.cpp
     src/graphics/gfx_frame.cpp
+    src/graphics/gfx_camera.cpp
     src/graphics/gfx_credits.cpp
     src/graphics/gfx_hud.cpp
     src/graphics/gfx_enter_screen.cpp

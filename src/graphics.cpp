@@ -29,6 +29,7 @@
 #include "core/events.h"
 
 #include "graphics/gfx_frame.h"
+#include "graphics/gfx_camera.h"
 
 #include "pseudo_vb.h"
 #include "gfx.h"
@@ -37,130 +38,6 @@
 
 #include <Utils/maths.h>
 
-
-void ResetCameraPanning()
-{
-    for(int i = 0; i < 2; ++i)
-        vScreen[i].small_screen_features = vScreen_t::SmallScreenFeatures_t();
-}
-
-static void s_ProcessSmallScreenFeatures(vScreen_t& vscreen)
-{
-    Screen_t& screen = Screens[vscreen.screen_ref];
-    Player_t& p = Player[vscreen.player];
-
-    if(g_config.small_screen_camera_features && screen.W < 800 && !NoTurnBack[p.Section])
-    {
-        int16_t max_offsetX = 360;
-        if(max_offsetX > vscreen.Width - p.Location.Width * 4)
-            max_offsetX = vscreen.Width - p.Location.Width * 4;
-
-        int16_t lookX_target = max_offsetX * p.Location.SpeedX * 1.5 / Physics.PlayerRunSpeed;
-        if(lookX_target > max_offsetX)
-            lookX_target = max_offsetX;
-        if(lookX_target < -max_offsetX)
-            lookX_target = -max_offsetX;
-        lookX_target &= ~1;
-
-        int16_t rateX = 1;
-        // switching directions
-        if((vscreen.small_screen_features.offset_x < 0 && lookX_target > 0)
-            || (vscreen.small_screen_features.offset_x > 0 && lookX_target < 0))
-        {
-            rateX = 3;
-        }
-        // accelerating
-        else if((vscreen.small_screen_features.offset_x > 0) == (lookX_target > vscreen.small_screen_features.offset_x))
-        {
-            rateX = 2;
-        }
-
-        if(GamePaused == PauseCode::None && !qScreen && !ForcedControls)
-        {
-            if(vscreen.small_screen_features.offset_x < lookX_target)
-                vscreen.small_screen_features.offset_x += rateX;
-            else if(vscreen.small_screen_features.offset_x > lookX_target)
-                vscreen.small_screen_features.offset_x -= rateX;
-        }
-
-        vscreen.X -= vscreen.small_screen_features.offset_x / 2;
-    }
-
-    if(g_config.small_screen_camera_features && ScreenH < 600)
-    {
-        int16_t max_offsetY = 200;
-
-        int16_t lookY_target = max_offsetY;
-
-        bool on_ground = p.Pinched.Bottom1 || p.Slope || p.StandingOnNPC || p.Wet || p.Quicksand;
-        // bool duck_jump = !on_ground && p.Duck;
-        bool prevent_unlock = vscreen.small_screen_features.offset_y_hold != 0 && (p.Vine || !on_ground || p.GrabTime);
-
-        if(p.Controls.Up == p.Controls.Down || prevent_unlock)
-            lookY_target = vscreen.small_screen_features.offset_y_hold;
-        else if(p.Controls.Down)
-            lookY_target *= -1;
-
-        int16_t rateY = 4;
-        if((vscreen.small_screen_features.offset_y < 0 && lookY_target > 0)
-            || (vscreen.small_screen_features.offset_y > 0 && lookY_target < 0))
-        {
-            if(vscreen.small_screen_features.offset_y < 50 && vscreen.small_screen_features.offset_y > -50)
-                vscreen.small_screen_features.offset_y *= -1;
-        }
-
-        if(GamePaused == PauseCode::None && !qScreen && !ForcedControls)
-        {
-            if(vscreen.small_screen_features.offset_y < lookY_target)
-            {
-                vscreen.small_screen_features.offset_y += rateY;
-
-                if(vscreen.small_screen_features.offset_y > lookY_target)
-                    vscreen.small_screen_features.offset_y = lookY_target;
-            }
-            else if(vscreen.small_screen_features.offset_y > lookY_target)
-            {
-                vscreen.small_screen_features.offset_y -= rateY;
-
-                if(vscreen.small_screen_features.offset_y < lookY_target)
-                    vscreen.small_screen_features.offset_y = lookY_target;
-            }
-
-            if(vscreen.small_screen_features.offset_y_hold == 0 && vscreen.small_screen_features.offset_y < -max_offsetY + 40 && (vscreen.small_screen_features.last_buttons_held & 1) == 0 && p.Controls.Down)
-            {
-                vscreen.small_screen_features.offset_y_hold = -max_offsetY;
-                PlaySound(SFX_Camera);
-            }
-            else if(vscreen.small_screen_features.offset_y_hold == 0 && vscreen.small_screen_features.offset_y > max_offsetY - 40 && (vscreen.small_screen_features.last_buttons_held & 2) == 0 && p.Controls.Up)
-            {
-                vscreen.small_screen_features.offset_y_hold = max_offsetY;
-                PlaySound(SFX_Camera);
-            }
-            else if(vscreen.small_screen_features.offset_y_hold != 0 && vscreen.small_screen_features.offset_y > -60 && vscreen.small_screen_features.offset_y < 60)
-            {
-                vscreen.small_screen_features.offset_y_hold = 0;
-                PlaySound(SFX_Camera);
-            }
-
-            vscreen.small_screen_features.last_buttons_held = (int8_t)p.Controls.Down | (int8_t)p.Controls.Up << 1;
-        }
-
-        int16_t lookY = vscreen.small_screen_features.offset_y;
-
-        if(lookY > -50 && lookY < 50)
-            lookY = 0;
-        else
-        {
-            if(lookY > 0)
-                lookY -= 50;
-            if(lookY < 0)
-                lookY += 50;
-            lookY /= 2;
-        }
-
-        vscreen.Y += lookY + 32;
-    }
-}
 
 //  Get the screen position
 void GetvScreen(vScreen_t& vscreen)
@@ -177,7 +54,7 @@ void GetvScreen(vScreen_t& vscreen)
         vscreen.X = -pLoc.X + (vscreen.Width * 0.5) - pLoc.Width / 2.0;
         vscreen.Y = -pLoc.Y + (vscreen.Height * 0.5) - vScreenYOffset - pLoc.Height;
 
-        s_ProcessSmallScreenFeatures(vscreen);
+        ProcessSmallScreenCam(vscreen);
 
         vscreen.X += -vscreen.tempX;
         vscreen.Y += -vscreen.TempY;
