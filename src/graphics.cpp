@@ -256,13 +256,12 @@ void GetvScreenAverage(vScreen_t& vscreen)
 
     // used ScreenW / ScreenH in VB6 code
     const Screen_t& screen = Screens[vscreen.screen_ref];
-    const Screen_t& use_screen = g_compatibility.allow_multires ? screen : screen.canonical_screen();
 
     const Location_t& section = level[Player[1].Section];
 
     // remember that the screen will be limited to the section's size in all cases
-    double use_width  = SDL_min(static_cast<double>(use_screen.W), section.Width  - section.X);
-    double use_height = SDL_min(static_cast<double>(use_screen.H), section.Height - section.Y);
+    double use_width  = SDL_min(static_cast<double>(screen.W), section.Width  - section.X);
+    double use_height = SDL_min(static_cast<double>(screen.H), section.Height - section.Y);
 
     vscreen.X = (vscreen.X / B) + (use_width * 0.5);
     vscreen.Y = (vscreen.Y / B) + (use_height * 0.5) - vScreenYOffset;
@@ -330,12 +329,11 @@ void GetvScreenAverage2(vScreen_t& vscreen)
         return;
 
     const Screen_t& screen = Screens[vscreen.screen_ref];
-    const Screen_t& use_screen = g_compatibility.allow_multires ? screen : screen.canonical_screen();
 
     const Location_t& section = level[Player[1].Section];
 
-    double use_width  = SDL_min(static_cast<double>(use_screen.W), section.Width  - section.X);
-    double use_height = SDL_min(static_cast<double>(use_screen.H), section.Height - section.Y);
+    double use_width  = SDL_min(static_cast<double>(screen.W), section.Width  - section.X);
+    double use_height = SDL_min(static_cast<double>(screen.H), section.Height - section.Y);
 
     vscreen.X = (vscreen.X / B) + (use_width * 0.5);
     vscreen.Y = (vscreen.Y / B) + (use_height * 0.5) - vScreenYOffset;

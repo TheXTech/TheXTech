@@ -34,33 +34,6 @@
 #include "config.h"
 #include "core/render.h"
 
-// Copies all Screen and vScreen info, except size, from source to dest.
-void s_CopyScreen(Screen_t& dest, const Screen_t& source)
-{
-    for(int v = 1; v <= maxLocalPlayers; v++)
-    {
-        vScreen_t& d_vscreen = dest.vScreen(v);
-        const vScreen_t& s_vscreen = source.vScreen(v);
-
-        // copy all "ordinary" fields
-        d_vscreen.Left      = s_vscreen.Left;
-        d_vscreen.Top       = s_vscreen.Top;
-        d_vscreen.Width     = s_vscreen.Width;
-        d_vscreen.Height    = s_vscreen.Height;
-
-        d_vscreen.ScreenLeft = s_vscreen.ScreenLeft;
-        d_vscreen.ScreenTop = s_vscreen.ScreenTop;
-
-        d_vscreen.Visible   = s_vscreen.Visible;
-        d_vscreen.tempX     = s_vscreen.tempX;
-        d_vscreen.TempY     = s_vscreen.TempY;
-        d_vscreen.TempDelay = s_vscreen.TempDelay;
-    }
-
-    dest.Type  = source.Type;
-    dest.DType = source.DType;
-}
-
 void SetScreenType(Screen_t& screen)
 {
     // moved this code from game_main.cpp, but it occured elsewhere also
@@ -95,13 +68,6 @@ void SetupScreens(Screen_t& screen, bool reset)
     {
         Screen_t& c_screen = screen.canonical_screen();
         SetupScreens(c_screen, reset);
-
-        // if needed, defer to canonical screen logic
-        if(!g_compatibility.allow_multires)
-        {
-            s_CopyScreen(screen, c_screen);
-            return;
-        }
     }
 
     SetScreenType(screen);
@@ -210,29 +176,8 @@ void DynamicScreen(Screen_t& screen, bool mute)
     {
         Screen_t& c_screen = screen.canonical_screen();
 
-        // if g_compatibility.modern_section_change is off, vScreen 2's location gets read by DynamicScreen()
-        if(!g_compatibility.modern_section_change)
-        {
-            c_screen.vScreen(2).X = screen.vScreen(2).X;
-            c_screen.vScreen(2).Y = screen.vScreen(2).Y;
-        }
-
-        if(!g_compatibility.allow_multires)
-        {
-            DynamicScreen(c_screen, mute);
-
-            s_CopyScreen(screen, c_screen);
-
-            // copy messy vScreenAverage results in case they are used later
-            screen.vScreen(1).X = c_screen.vScreen(1).X;
-            screen.vScreen(1).Y = c_screen.vScreen(1).Y;
-
-            return;
-        }
-        else if(screen.canonical_screen().Type == 5)
-        {
-            DynamicScreen(screen.canonical_screen(), true);
-        }
+        if(c_screen.Type == 5)
+            DynamicScreen(c_screen, true);
     }
 
     int A = 0;
@@ -496,24 +441,6 @@ void CenterScreens(Screen_t& screen)
 
         // still needed in case of small sections
         CenterScreens(c_screen);
-
-        // if needed, defer to canonical screen logic
-        if(!g_compatibility.allow_multires)
-        {
-            s_CopyScreen(screen, c_screen);
-
-            // center c_screen on screen
-            int offX = (screen.W - c_screen.W) / 2;
-            int offY = (screen.H - c_screen.H) / 2;
-
-            for(int v = 1; v <= maxLocalPlayers; v++)
-            {
-                screen.vScreen(v).ScreenLeft += offX;
-                screen.vScreen(v).ScreenTop  += offY;
-            }
-
-            return;
-        }
     }
 
     // approximate positions of player screens

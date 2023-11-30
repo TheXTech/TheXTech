@@ -1076,12 +1076,9 @@ void ProcEvent(eventindex_t index, int whichPlayer, bool NoEffect)
                     // legacy qScreen animation
                     else if(!equalCase(evt.Name, "Level - Start"))
                     {
-                        // go from final to initial because vScreen(1) of the canonical screen is corrupted by DynamicScreen()
-                        for(int screen_i = c_screenCount - 1; screen_i >= 0; screen_i--)
+                        for(int screen_i = 0; screen_i < c_screenCount; screen_i++)
                         {
                             Screen_t& screen = Screens[screen_i];
-                            // for width / height logic
-                            const Screen_t& use_screen = g_compatibility.allow_multires ? screen : screen.canonical_screen();
 
                             int Z1 = screen.vScreen_refs[0];
                             int Z2 = screen.vScreen_refs[1];
@@ -1110,25 +1107,25 @@ void ProcEvent(eventindex_t index, int whichPlayer, bool NoEffect)
 
                                 // pan to indicate warped player, in the direction the screen was previously split
                                 //   (used hardcoded 400 / 200 / 300 / 150 in VB6 code)
-                                if(int(screenLoc.Width) == use_screen.W / 2)
+                                if(int(screenLoc.Width) == screen.W / 2)
                                 {
                                     if(qScreenLoc[Z1].X < screenLoc.X + screenLoc.Left)
-                                        qScreenLoc[Z1].X += use_screen.W / 4;
+                                        qScreenLoc[Z1].X += screen.W / 4;
                                     else
-                                        qScreenLoc[Z1].X -= use_screen.W / 4;
+                                        qScreenLoc[Z1].X -= screen.W / 4;
                                 }
 
-                                if(int(screenLoc.Height) == use_screen.H / 2)
+                                if(int(screenLoc.Height) == screen.H / 2)
                                 {
                                     if(qScreenLoc[Z1].Y < screenLoc.Y + screenLoc.Top)
-                                        qScreenLoc[Z1].Y += use_screen.H / 4;
+                                        qScreenLoc[Z1].Y += screen.H / 4;
                                     else
-                                        qScreenLoc[Z1].Y -= use_screen.H / 4;
+                                        qScreenLoc[Z1].Y -= screen.H / 4;
                                 }
 
                                 // used ScreenW / H and FrmMain.ScaleWidth / Height in VB6 code
-                                double use_width  = SDL_min(static_cast<double>(use_screen.W), level[B].Width  - level[B].X);
-                                double use_height = SDL_min(static_cast<double>(use_screen.H), level[B].Height - level[B].Y);
+                                double use_width  = SDL_min(static_cast<double>(screen.W), level[B].Width  - level[B].X);
+                                double use_height = SDL_min(static_cast<double>(screen.H), level[B].Height - level[B].Y);
 
                                 // restrict to old level bounds
                                 if(-qScreenLoc[Z1].X < level[B].X)

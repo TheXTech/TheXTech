@@ -77,13 +77,16 @@ void UpdateInternalRes()
     int req_w = g_config.InternalW;
     int req_h = g_config.InternalH;
 
+    // TODO: use the correct canonical screen's resolution here
+    int canon_w = 800;
+    int canon_h = 600;
+
     if(!g_compatibility.allow_multires)
     {
-        // TODO: use the correct canonical screen's resolution here
-        if((req_w != 0 && req_w < 800) || (req_h != 0 && req_h < 600))
+        if((req_w != 0 && req_w < canon_w) || (req_h != 0 && req_h < canon_h))
         {
-            req_w = 800;
-            req_h = 600;
+            req_w = canon_w;
+            req_h = canon_h;
         }
     }
 
@@ -177,17 +180,17 @@ void UpdateInternalRes()
         // force >800x600 resolution if required
         if(!g_compatibility.allow_multires)
         {
-            if(int_w < 800)
+            if(int_w < canon_w)
             {
-                int_h = (int_h * 800) / int_w;
-                int_w = 800;
+                int_h = (int_h * canon_w) / int_w;
+                int_w = canon_w;
                 if(int_h > 720)
                     int_h = 720;
             }
-            if(int_h < 600)
+            if(int_h < canon_h)
             {
-                int_w = (int_w * 600) / int_h;
-                int_h = 600;
+                int_w = (int_w * canon_h) / int_h;
+                int_h = canon_h;
             }
         }
 
@@ -210,6 +213,18 @@ void UpdateInternalRes()
     {
         ScreenW = req_w;
         ScreenH = req_h;
+    }
+
+    // TODO: above should tweak render target resolution. This should tweak game's screen resolution.
+    if(g_compatibility.allow_multires)
+    {
+        ScreenW = ScreenW;
+        ScreenH = ScreenH;
+    }
+    else
+    {
+        ScreenW = canon_w;
+        ScreenH = canon_h;
     }
 
     XRender::updateViewport();
