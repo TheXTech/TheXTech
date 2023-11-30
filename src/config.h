@@ -106,10 +106,11 @@ extern struct Config_t
         INACTIVE_NPC_SHOW,
     };
     static constexpr int render_inactive_NPC = INACTIVE_NPC_SHADE;
+
     //! Translate the coordinates of autocode screen-space objects based on the HUD location
-    bool autocode_translate_coords = true;
+    static constexpr bool autocode_translate_coords = true;
     //! Camera optimizations that improve the experience at low resolutions
-    bool small_screen_camera_features = false;
+    static constexpr bool small_screen_camera_features = true;
 
 
     /* ---- Joystick ----*/

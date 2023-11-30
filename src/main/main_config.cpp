@@ -303,8 +303,8 @@ void OpenConfig()
         config.read("sfx-player-grow-with-got-item", g_config.SoundPlayerGrowWithGetItem, false);
         config.read("enable-inter-level-fade-effect", g_config.EnableInterLevelFade, true);
         // config.readEnum("render-inactive-npc", g_config.render_inactive_NPC, (int)Config_t::INACTIVE_NPC_SHADE, renderInactiveNPC);
-        config.read("autocode-translate-coords", g_config.autocode_translate_coords, true);
-        config.read("small-screen-camera-features", g_config.small_screen_camera_features, false);
+        // config.read("autocode-translate-coords", g_config.autocode_translate_coords, true);
+        // config.read("small-screen-camera-features", g_config.small_screen_camera_features, false);
         config.endGroup();
 
         Controls::LoadConfig(ctl);
@@ -490,8 +490,8 @@ void SaveConfig()
         config.setValue("sfx-player-grow-with-got-item", g_config.SoundPlayerGrowWithGetItem);
         config.setValue("enable-inter-level-fade-effect", g_config.EnableInterLevelFade);
 
-        config.setValue("autocode-translate-coords", g_config.autocode_translate_coords);
-        config.setValue("small-screen-camera-features", g_config.small_screen_camera_features);
+        // config.setValue("autocode-translate-coords", g_config.autocode_translate_coords);
+        // config.setValue("small-screen-camera-features", g_config.small_screen_camera_features);
     }
     config.endGroup();
 
