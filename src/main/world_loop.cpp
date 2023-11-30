@@ -43,6 +43,7 @@
 #include "screen_quickreconnect.h"
 #include "screen_connect.h"
 #include "main/game_strings.h"
+#include "graphics/gfx_world.h"
 
 #include "global_dirs.h"
 
@@ -79,11 +80,6 @@ void worldWaitForFade(int waitTicks)
     }
 }
 
-
-bool worldHasFrameAssets()
-{
-    return GFX.WorldMapFrame_Tile.inited && (!GFX.Interface[4].inited || !GFX.isCustom(37) || GFX.isCustom(71));
-}
 
 bool g_isWorldMusicNotSame(WorldMusic_t &mus)
 {

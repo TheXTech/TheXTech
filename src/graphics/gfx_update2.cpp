@@ -45,143 +45,11 @@
 
 #include "graphics/gfx_frame.h"
 #include "graphics/gfx_marquee.h"
+#include "graphics/gfx_world.h"
 
 #include "gfx_special_frames.h"
 
 #include <fmt_format_ne.h>
-
-static bool s_border_valid()
-{
-    return GFX.WorldMapFrame_Border.tex.inited && (!GFX.isCustom(71) || GFX.isCustom(72));
-}
-
-static void s_getMargins(const Screen_t& screen, double& margin, double& marginTop, double& marginBottom)
-{
-    margin = 66;
-    marginTop = 130;
-    marginBottom = 66;
-
-    if(screen.H < 400)
-    {
-        marginBottom = 24;
-        marginTop = 72;
-    }
-    else if(screen.H < 500)
-    {
-        marginBottom = 32;
-        marginTop = 96;
-    }
-
-    if(screen.W < 400)
-        margin = 24;
-    else if(screen.W < 600)
-        margin = 32;
-    else if(screen.W < 800)
-        margin = 48;
-
-    // make sure world map frame stays visible
-    if(s_border_valid())
-    {
-        if(margin < GFX.WorldMapFrame_Border.le)
-            margin = GFX.WorldMapFrame_Border.le;
-
-        if(margin < GFX.WorldMapFrame_Border.re)
-            margin = GFX.WorldMapFrame_Border.re;
-
-        if(marginTop < GFX.WorldMapFrame_Border.te)
-            marginTop = GFX.WorldMapFrame_Border.te;
-
-        if(marginBottom < GFX.WorldMapFrame_Border.be)
-            marginBottom = GFX.WorldMapFrame_Border.be;
-    }
-}
-
-void GetvScreenWorld(vScreen_t& vscreen)
-{
-    const Screen_t& screen = Screens[vscreen.screen_ref];
-    const WorldPlayer_t& wp = WorldPlayer[vscreen.player];
-    const Location_t& wpLoc = wp.Location;
-
-    double margin, marginTop, marginBottom;
-    s_getMargins(screen, margin, marginTop, marginBottom);
-
-    vscreen.Top = marginTop;
-    vscreen.Height = screen.H - marginBottom - marginTop;
-    vscreen.Left = margin;
-    vscreen.Width = screen.W - (margin * 2);
-
-    // limit the vScreen to its 800x600 size (668x404) if the new world map frame assets are missing
-    const bool haveFrameAssets = worldHasFrameAssets();
-    if(!haveFrameAssets)
-    {
-        if(vscreen.Width > 668)
-        {
-            vscreen.Left += (vscreen.Width - 668) / 2;
-            vscreen.Width = 668;
-        }
-
-        if(vscreen.Height > 404)
-        {
-            vscreen.Top += (vscreen.Height - 404) / 2;
-            vscreen.Height = 404;
-        }
-    }
-
-    double fX = wpLoc.X + wpLoc.Width / 2;
-    double fY = wpLoc.Y + wpLoc.Height / 2;
-
-    // apply a temporary vScreen focus
-    if(vscreen.TempDelay)
-    {
-        fX = vscreen.tempX;
-        fY = vscreen.TempY;
-    }
-
-    vscreen.X = -fX + vscreen.Width / 2;
-    vscreen.Y = -fY + vscreen.Height / 2;
-
-    // begin bounds logic
-
-    // default bounds are the canonical vScreen
-    const Screen_t& c_screen = screen.canonical_screen();
-    double c_margin, c_marginTop, c_marginBottom;
-    s_getMargins(c_screen, c_margin, c_marginTop, c_marginBottom);
-
-    double c_width = c_screen.W - c_margin * 2;
-    double c_height = c_screen.H - c_marginTop - c_marginBottom;
-
-    const Location_t defaultBounds = newLoc(fX - c_width / 2, fY - c_height / 2, c_width, c_height);
-
-    // get the bounds from the player's section if possible, otherwise the defaults
-    const Location_t& bounds = (wp.Section != 0)
-        ? static_cast<Location_t>(WorldArea[wp.Section].Location)
-        : defaultBounds;
-
-    if(bounds.Width < vscreen.Width)
-    {
-        vscreen.Left += (vscreen.Width - bounds.Width) / 2;
-        vscreen.Width = bounds.Width;
-        vscreen.X = -bounds.X;
-    }
-    else if(-vscreen.X < bounds.X)
-        vscreen.X = -bounds.X;
-    else if(-vscreen.X > bounds.X + bounds.Width - vscreen.Width)
-        vscreen.X = -(bounds.X + bounds.Width - vscreen.Width);
-
-    if(bounds.Height < vscreen.Height)
-    {
-        vscreen.Top += (vscreen.Height - bounds.Height) / 2;
-        vscreen.Height = bounds.Height;
-        vscreen.Y = -bounds.Y;
-    }
-    else if(-vscreen.Y < bounds.Y)
-        vscreen.Y = -bounds.Y;
-    else if(-vscreen.Y > bounds.Y + bounds.Height - vscreen.Height)
-        vscreen.Y = -(bounds.Y + bounds.Height - vscreen.Height);
-
-    vscreen.ScreenTop = vscreen.Top;
-    vscreen.ScreenLeft = vscreen.Left;
-}
 
 
 static inline int computeStarsShowingPolicy(int ll, int cur)
@@ -242,7 +110,7 @@ void UpdateGraphics2(bool skipRepaint)
 
     g_stats.reset();
 
-    int A = 0;
+    // int A = 0;
     // int B = 0;
     const int Z = 1;
     int WPHeight = 0;
@@ -561,7 +429,7 @@ void UpdateGraphics2(bool skipRepaint)
 
     if(WorldEditor)
     {
-        for(A = 1; A <= numEffects; A++)
+        for(int A = 1; A <= numEffects; A++)
         {
             if(vScreenCollision(Z, Effect[A].Location))
             {
@@ -583,7 +451,7 @@ void UpdateGraphics2(bool skipRepaint)
             }
         }
 
-        for(A = 1; A <= numWorldAreas; A++)
+        for(int A = 1; A <= numWorldAreas; A++)
         {
             WorldArea_t &area = WorldArea[A];
             if(vScreenCollision(Z, static_cast<Location_t>(area.Location)))
@@ -693,92 +561,7 @@ void UpdateGraphics2(bool skipRepaint)
 #endif
 
 //        XRender::renderTexture(0, 0, 800, 130, GFX.Interface[4], 0, 0);
-        if(worldHasFrameAssets())
-        {
-            RenderFrameBorder(newLoc(0, 0, ScreenW, ScreenH), newLoc(vScreen[Z].ScreenLeft, vScreen[Z].ScreenTop, vScreen[Z].Width, vScreen[Z].Height),
-                GFX.WorldMapFrame_Tile, s_border_valid() ? &GFX.WorldMapFrame_Border : nullptr);
-        }
-        else
-        {
-            // render a legacy background, in MANY careful segments...
-            constexpr bool do_stretch = true;
-
-            // top-left
-            XRender::renderTexture(vScreen[Z].ScreenLeft - 66, vScreen[Z].ScreenTop - 130, 66, 130, GFX.Interface[4], 0, 0);
-
-            // top
-            int orig_width = GFX.Interface[4].w - 66 - 66;
-            if(do_stretch)
-            {
-                XRender::renderTextureScaleEx(vScreen[Z].ScreenLeft, vScreen[Z].ScreenTop - 130,
-                    vScreen[Z].Width, 130,
-                    GFX.Interface[4], 66, 0, orig_width, 130);
-            }
-            else
-                for(int offset = 0; offset < vScreen[Z].Width; offset += orig_width)
-            {
-                XRender::renderTexture(vScreen[Z].ScreenLeft + offset, vScreen[Z].ScreenTop - 130,
-                    SDL_min((int)vScreen[Z].Width - offset, orig_width), 130,
-                    GFX.Interface[4], 66, 0);
-            }
-
-            // top-right
-            XRender::renderTexture(vScreen[Z].ScreenLeft + vScreen[Z].Width, vScreen[Z].ScreenTop - 130, 66, 130 + 20, GFX.Interface[4], GFX.Interface[4].w - 66, 0);
-
-            // left
-            int orig_height = GFX.Interface[4].h - 130 - 66;
-            if(do_stretch)
-            {
-                XRender::renderTextureScaleEx(vScreen[Z].ScreenLeft - 66, vScreen[Z].ScreenTop,
-                    66, vScreen[Z].Height,
-                    GFX.Interface[4], 0, 130, 66, orig_height);
-            }
-            else
-                for(int offset = 0; offset < vScreen[Z].Height; offset += orig_height)
-            {
-                XRender::renderTexture(vScreen[Z].ScreenLeft - 66, vScreen[Z].ScreenTop + offset,
-                    66, SDL_min((int)vScreen[Z].Height - offset, orig_height),
-                    GFX.Interface[4], 0, 130);
-            }
-
-            // right
-            orig_height = GFX.Interface[4].h - (130 + 20) - 66;
-            if(do_stretch)
-            {
-                XRender::renderTextureScaleEx(vScreen[Z].ScreenLeft + vScreen[Z].Width, vScreen[Z].ScreenTop + 20,
-                    66, vScreen[Z].Height - 20,
-                    GFX.Interface[4], GFX.Interface[4].w - 66, 130 + 20, 66, orig_height);
-            }
-            else
-                for(int offset = 20; offset < vScreen[Z].Height; offset += orig_height)
-            {
-                XRender::renderTexture(vScreen[Z].ScreenLeft + vScreen[Z].Width, vScreen[Z].ScreenTop + offset,
-                    66, SDL_min((int)vScreen[Z].Height - offset, orig_height),
-                    GFX.Interface[4], GFX.Interface[4].w - 66, 130 + 20);
-            }
-
-            // bottom-left
-            XRender::renderTexture(vScreen[Z].ScreenLeft - 66, vScreen[Z].ScreenTop + vScreen[Z].Height, 66 + 34, 66, GFX.Interface[4], 0, GFX.Interface[4].h - 66);
-
-            // bottom
-            orig_width = GFX.Interface[4].w - (66 + 34) - 66;
-            if(do_stretch)
-            {
-                XRender::renderTextureScaleEx(vScreen[Z].ScreenLeft + 34, vScreen[Z].ScreenTop + vScreen[Z].Height,
-                    vScreen[Z].Width - 34, 66,
-                    GFX.Interface[4], 100, GFX.Interface[4].h - 66, orig_width, 66);
-            }
-            else
-                for(int offset = 34; offset < vScreen[Z].Width; offset += orig_width)
-            {
-                XRender::renderTexture(vScreen[Z].ScreenLeft + offset, vScreen[Z].ScreenTop + vScreen[Z].Height,
-                    SDL_min((int)vScreen[Z].Width - offset, orig_width), 66,
-                    GFX.Interface[4], 100, GFX.Interface[4].h - 66);
-            }
-
-            // bottom-right
-            XRender::renderTexture(vScreen[Z].ScreenLeft + vScreen[Z].Width, vScreen[Z].ScreenTop + vScreen[Z].Height, 66, 66, GFX.Interface[4], GFX.Interface[4].w - 66, GFX.Interface[4].h - 66);
-        }
+        DrawWorldMapFrame(vScreen[Z]);
 
 
         int pX = vScreen[Z].ScreenLeft + 32 - 64 + 48;
@@ -794,51 +577,12 @@ void UpdateGraphics2(bool skipRepaint)
         vScreen[0].Width = ScreenW;
         vScreen[0].Height = ScreenH;
 
-        for(A = 1; A <= numPlayers; A++)
+        for(int A = 1; A <= numPlayers; A++)
         {
-            Player_t& p = Player[A];
-
-            p.Direction = -1;
-            p.Location.SpeedY = 0;
-            p.Location.SpeedX = -1;
-            p.Controls.Left = false;
-            p.Controls.Right = false;
-            p.SpinJump = false;
-            p.Dead = false;
-            p.Immune2 = false;
-            p.Fairy = false;
-            p.TimeToLive = 0;
-            p.Effect = 0;
-            p.MountSpecial = 0;
-            p.HoldingNPC = 0;
-            if(p.Duck)
-                UnDuck(p);
-            PlayerFrame(p);
-
-            p.Location.Width = Physics.PlayerWidth[p.Character][p.State];
-            p.Location.Height = Physics.PlayerHeight[p.Character][p.State];
-            SizeCheck(p);
-            p.Location.X = pX;
-            p.Location.Y = pY - p.Location.Height;
-
-            if(p.MountType == 3)
-            {
-                p.YoshiWingsFrameCount += 1;
-                p.YoshiWingsFrame = 0;
-                if(p.YoshiWingsFrameCount <= 12)
-                    p.YoshiWingsFrame = 1;
-                else if(p.YoshiWingsFrameCount >= 24)
-                    p.YoshiWingsFrameCount = 0;
-                if(p.Direction == 1)
-                    p.YoshiWingsFrame += 2;
-            }
-
-            DrawPlayer(p, 0);
-
+            DrawPlayerWorld(Player[A], pX, pY);
             pX += 48;
         }
 
-        A = numPlayers + 1;
         // Print lives on the screen
         XRender::renderTexture(pX, vScreen[Z].ScreenTop - 4 - GFX.Interface[3].h, GFX.Interface[3].w, GFX.Interface[3].h, GFX.Interface[3], 0, 0);
         XRender::renderTexture(pX + 40, vScreen[Z].ScreenTop - 2 - GFX.Interface[3].h, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
@@ -911,6 +655,7 @@ void UpdateGraphics2(bool skipRepaint)
 
         g_stats.print();
 
+        // FIXME: split into own function
         if(!BattleMode && !GameMenu && g_config.show_episode_title)
         {
             // big screen, display at top
@@ -940,23 +685,21 @@ void UpdateGraphics2(bool skipRepaint)
     DrawDeviceBattery();
 
     // this code is for both non-editor and editor cases
+    // render special screens
+    if(GamePaused == PauseCode::PauseScreen)
+        PauseScreen::Render();
+
+    if(GamePaused == PauseCode::DropAdd)
     {
-        // render special screens
-        if(GamePaused == PauseCode::PauseScreen)
-            PauseScreen::Render();
-
-        if(GamePaused == PauseCode::DropAdd)
-        {
-            ConnectScreen::Render();
-            XRender::renderTexture(int(SharedCursor.X), int(SharedCursor.Y), GFX.ECursor[2]);
-        }
-
-        if(GamePaused == PauseCode::TextEntry)
-            TextEntryScreen::Render();
-
-        if(!skipRepaint)
-            XRender::repaint();
+        ConnectScreen::Render();
+        XRender::renderTexture(int(SharedCursor.X), int(SharedCursor.Y), GFX.ECursor[2]);
     }
+
+    if(GamePaused == PauseCode::TextEntry)
+        TextEntryScreen::Render();
+
+    if(!skipRepaint)
+        XRender::repaint();
 
     frameRenderEnd();
 

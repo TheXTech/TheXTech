@@ -62,8 +62,6 @@ void GetvScreenAuto(vScreen_t& vscreen);
 // NEW: get the fixed-res vScreen position for a player, and write the top-left coordinate to (left, top)
 void GetPlayerScreen(double W, double H, const Player_t& p, double& left, double& top);
 
-//! NEW: Get the vscreen for a world player, with world section bounds checking
-void GetvScreenWorld(vScreen_t& vscreen);
 
 // Public Sub SetupGraphics()
 //! DUMMY AND USELESS
