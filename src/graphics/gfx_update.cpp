@@ -1414,6 +1414,8 @@ void UpdateGraphics(bool skipRepaint)
     }
 
     SetupScreens(false);
+    DynamicScreens();
+    CenterScreens();
 
     // TODO: make a loop over screens here
     int screen_i = 0;
@@ -1427,32 +1429,7 @@ void UpdateGraphics(bool skipRepaint)
     int screen_p1 = screen.players[0];
     int screen_p2 = screen.players[1];
 
-    int numScreens = 1;
-
-    if(screen.Type == 1)
-        numScreens = 2;
-
-    if(screen.Type == 4)
-        numScreens = 2;
-
-    if(screen.Type == 5)
-    {
-        DynamicScreen(screen);
-
-        if(screen.vScreen(2).Visible)
-            numScreens = 2;
-        else
-            numScreens = 1;
-    }
-
-    if(screen.Type == 8)
-        numScreens = 1;
-
-    // FIXME: should become a screen attribute
-    if(SingleCoop == 2)
-        numScreens = 2;
-
-    CenterScreens(screen);
+    int numScreens = screen.active_end();
 
     // update screen's canonical vScreens
     if(!screen.is_canonical())
@@ -1464,33 +1441,20 @@ void UpdateGraphics(bool skipRepaint)
 
         if(qScreen_canonical)
         {
-            int Z1 = c_screen.vScreen_refs[0];
-            int Z2 = c_screen.vScreen_refs[1];
-            if(c_screen.Type == 1 || c_screen.Type == 4 || (c_screen.Type == 5 && c_screen.vScreen(2).Visible))
+            for(int i = c_screen.active_begin(); i < c_screen.active_end(); i++)
             {
-                continue_qScreen_canonical |= Update_qScreen(Z1);
-                continue_qScreen_canonical |= Update_qScreen(Z2);
-                if(!g_compatibility.modern_section_change)
+                int Z_i = c_screen.vScreen_refs[i];
+                continue_qScreen_canonical |= Update_qScreen(Z_i);
+
+                // the original code was badly written and made THIS happen (always exactly one frame of qScreen in 2P mode)
+                if(i >= 1 && !g_compatibility.modern_section_change)
                     continue_qScreen_canonical = false;
-            }
-            else if(c_screen.Type == 6 && SingleCoop == 2) // SingleCoop
-            {
-                continue_qScreen_canonical |= Update_qScreen(Z2);
-                if(!g_compatibility.modern_section_change)
-                    continue_qScreen_canonical = false;
-            }
-            else
-            {
-                continue_qScreen_canonical |= Update_qScreen(Z1);
             }
         }
     }
 
-    for(int vscreen_i = 0; vscreen_i < numScreens; vscreen_i++)
+    for(int vscreen_i = screen.active_begin(); vscreen_i < screen.active_end(); vscreen_i++)
     {
-        if(SingleCoop == 2)
-            vscreen_i = 1;
-
         Z = screen.vScreen_refs[vscreen_i];
         int plr_Z = screen.players[vscreen_i];
 
@@ -1522,7 +1486,7 @@ void UpdateGraphics(bool skipRepaint)
         // noturningback
         if(!LevelEditor && NoTurnBack[Player[plr_Z].Section] && g_compatibility.allow_multires)
         {
-            // goal: find vScreen currently on this section that is the furthest left
+            // goal: find canonical vScreen currently on this section that is the furthest left
             // only do anything with the last vScreen (of a Visible screen) in the section
             // (ensures all other logic has happened)
 
@@ -2952,11 +2916,8 @@ void UpdateGraphics(bool skipRepaint)
             if(g_CheatLogicScreen && !screen.is_canonical())
             {
                 Screen_t& c_screen = screen.canonical_screen();
-                int num_c_vScreens = 1;
-                if(c_screen.Type == 1 || c_screen.Type == 4 || (c_screen.Type == 5 && c_screen.vScreen(2).Visible))
-                    num_c_vScreens = 2;
 
-                for(int c_vscreen_Z = 1; c_vscreen_Z <= num_c_vScreens; c_vscreen_Z++)
+                for(int c_vscreen_Z = c_screen.active_begin() + 1; c_vscreen_Z <= c_screen.active_end(); c_vscreen_Z++)
                 {
                     vScreen_t& c_vscreen = c_screen.vScreen(c_vscreen_Z);
 

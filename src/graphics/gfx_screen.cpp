@@ -63,13 +63,6 @@ void SetScreenType(Screen_t& screen)
 // Sets up the split lines
 void SetupScreens(Screen_t& screen, bool reset)
 {
-    // keep canonical screen in sync
-    if(!screen.is_canonical())
-    {
-        Screen_t& c_screen = screen.canonical_screen();
-        SetupScreens(c_screen, reset);
-    }
-
     SetScreenType(screen);
 
     vScreen_t& vscreen1 = screen.vScreen(1);
@@ -166,20 +159,12 @@ void SetupScreens(Screen_t& screen, bool reset)
 
 void SetupScreens(bool reset)
 {
-    SetupScreens(Screens[0], reset);
+    for(int i = 0; i < c_screenCount; i++)
+        SetupScreens(Screens[i], reset);
 }
 
 void DynamicScreen(Screen_t& screen, bool mute)
 {
-    // keep canonical screen in sync
-    if(!screen.is_canonical())
-    {
-        Screen_t& c_screen = screen.canonical_screen();
-
-        if(c_screen.Type == 5)
-            DynamicScreen(c_screen, true);
-    }
-
     int A = 0;
 
     vScreen_t& vscreen1 = screen.vScreen(1);
@@ -431,18 +416,19 @@ void DynamicScreen(Screen_t& screen, bool mute)
     }
 }
 
+void DynamicScreens()
+{
+    for(int i = 0; i < c_screenCount; i++)
+    {
+        Screen_t& screen = Screens[i];
+        if(screen.Type == ScreenTypes::Dynamic)
+            DynamicScreen(screen, !screen.Visible);
+    }
+}
+
 // NEW: limit vScreens to playable section area and center them on the real screen
 void CenterScreens(Screen_t& screen)
 {
-    // keep canonical screen in sync
-    if(!screen.is_canonical())
-    {
-        Screen_t& c_screen = screen.canonical_screen();
-
-        // still needed in case of small sections
-        CenterScreens(c_screen);
-    }
-
     // approximate positions of player screens
     double cX1, cY1, cX2, cY2;
     GetPlayerScreen(screen.canonical_screen().W, screen.canonical_screen().H, Player[screen.players[0]], cX1, cY1);
@@ -541,6 +527,15 @@ void CenterScreens(Screen_t& screen)
 
             vscreen.Height = SetHeight;
         }
+    }
+}
+
+void CenterScreens()
+{
+    for(int i = 0; i < c_screenCount; i++)
+    {
+        Screen_t& screen = Screens[i];
+        CenterScreens(screen);
     }
 }
 

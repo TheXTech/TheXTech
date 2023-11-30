@@ -233,7 +233,7 @@ void UpdateInternalRes()
     if(GameMenu)
     {
         SetupScreens();
-        CenterScreens(Screens[0]);
+        CenterScreens();
         GameMenu = false;
         GetvScreenAverage(Screens[0].vScreen(1));
         if(!Screens[0].is_canonical())

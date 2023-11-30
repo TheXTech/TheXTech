@@ -69,14 +69,24 @@ void SetupGraphics();
 // Public Sub SetupEditorGraphics()
 //! DUMMY AND USELESS
 void SetupEditorGraphics();
+
 // Public Sub SetupScreens()
+// Sets the screen type and vScreen locations for all screens
 void SetupScreens(bool reset = true);
+
 // Public Sub DynamicScreen() 'for the split screen stuff
-// for the split screen stuff
+// Decides how to split the vScreens in Dynamic mode
 void DynamicScreen(Screen_t& screen, bool mute = false);
+
+// NEW: calls DynamicScreen for all screens with ScreenTypes::Dynamic. Mutes any that are not visible.
+void DynamicScreens();
 
 // NEW: limit vScreens to playable section area and center them on the real screen
 void CenterScreens(Screen_t& screen);
+
+// NEW: limits vScreens to playable section area and centers them on the real screen, for all screens.
+void CenterScreens();
+
 // NEW: moves qScreen towards vScreen, now including the screen size
 bool Update_qScreen(int Z, double camRate = 2, double resizeRate = 2);
 

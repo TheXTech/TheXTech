@@ -869,30 +869,12 @@ void ProcEvent(eventindex_t index, int whichPlayer, bool NoEffect)
                             if(onscreen_plr != p1 && onscreen_plr != p2)
                             {
                                 // no qScreen because there were no onscreen players, but do an update in case another Screen called qScreen
-                                if(screen.Type == 1 || screen.Type == 4 || (screen.Type == 5 && vScreen[Z2].Visible))
+                                for(int i = screen.active_begin(); i < screen.active_end(); i++)
                                 {
-                                    GetvScreen(vScreen[Z1]);
-                                    GetvScreen(vScreen[Z2]);
+                                    int Z_i = screen.vScreen_refs[i];
+                                    GetvScreenAuto(vScreen[Z_i]);
+                                    qScreenLoc[Z_i] = vScreen[Z_i];
                                 }
-                                else if(screen.Type == 2 || screen.Type == 3 || screen.Type == 5)
-                                {
-                                    GetvScreenAverage(vScreen[Z1]);
-                                }
-                                else if(screen.Type == 7)
-                                {
-                                    GetvScreenCredits(vScreen[Z1]);
-                                }
-                                else if(screen.Type == 6 && SingleCoop == 2) // SingleCoop
-                                {
-                                    GetvScreen(vScreen[Z2]);
-                                }
-                                else
-                                {
-                                    GetvScreen(vScreen[Z1]);
-                                }
-
-                                qScreenLoc[Z1] = vScreen[Z1];
-                                qScreenLoc[Z2] = vScreen[Z2];
                             }
                             // 2P dynamic screen handling
                             else if(screen.Type == 5)

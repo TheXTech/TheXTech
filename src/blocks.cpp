@@ -1821,7 +1821,7 @@ void PowBlock()
             Z = screen.active_begin() + 1;
             numScreens = screen.active_end();
         }
-        // buggy original code
+        // buggy original code, doesn't correctly handle SingleCoop
         else
         {
             Z = 1;
@@ -1829,13 +1829,13 @@ void PowBlock()
 
             if(!LevelEditor)
             {
-                if(ScreenType == 1 || ScreenType == 4)
+                if(screen.Type == 1 || screen.Type == 4)
                     numScreens = 2;
 
-                if(ScreenType == 5)
+                if(screen.Type == 5)
                 {
                     DynamicScreen(screen);
-                    if(vScreen[2].Visible)
+                    if(screen.vScreen(2).Visible)
                         numScreens = 2;
                 }
             }
