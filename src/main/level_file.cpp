@@ -302,6 +302,13 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         PlayerStart[A].Y = double(p.y);
         PlayerStart[A].Width = double(p.w);
         PlayerStart[A].Height = double(p.h);
+
+        // don't allow improper rects
+        if(PlayerStart[A].Width < 0)
+            PlayerStart[A].Width = 0;
+        if(PlayerStart[A].Height < 0)
+            PlayerStart[A].Height = 0;
+
         PlayerStart[A].Direction = p.direction;
         A++;
         if(A > 2)
@@ -469,6 +476,13 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         block.Location.Y = double(b.y);
         block.Location.Height = double(b.h);
         block.Location.Width = double(b.w);
+
+        // don't allow improper rects
+        if(block.Location.Width < 0)
+            block.Location.Width = 0;
+        if(block.Location.Height < 0)
+            block.Location.Height = 0;
+
         block.Type = int(b.id);
         block.DefaultType = block.Type;
 
@@ -865,6 +879,13 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         water.Location.Y = w.y;
         water.Location.Width = w.w;
         water.Location.Height = w.h;
+
+        // don't allow improper rects
+        if(water.Location.Width < 0)
+            water.Location.Width = 0;
+        if(water.Location.Height < 0)
+            water.Location.Height = 0;
+
         water.Buoy = w.buoy;
         water.Quicksand = w.env_type;
         water.Layer = FindLayer(w.layer);
