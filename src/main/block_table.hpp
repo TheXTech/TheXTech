@@ -356,110 +356,7 @@ struct table_t
         clear();
     }
 
-    void query(std::vector<BaseRef_t>& out, const rect_external& rect)
-    {
-        if(columns.size() == 0 || member_rects.size() == 0)
-            return;
-
-        int lcol = rect.l / 2048;
-        if(rect.l < 0 && (rect.l % 2048))
-            lcol -= 1;
-
-        int rcol = rect.r / 2048;
-        if(rect.r > 0 && (rect.r % 2048))
-            rcol += 1;
-
-        int trow = rect.t / 2048;
-        if(rect.t < 0 && (rect.t % 2048))
-            trow -= 1;
-
-        int brow = rect.b / 2048;
-        if(rect.b > 0 && (rect.b % 2048))
-            brow += 1;
-
-        int lcol_check = SDL_max(lcol, first_col_index);
-        int rcol_check = SDL_min(rcol, first_col_index + (int)columns.size());
-
-        rect_internal inner_rect;
-
-        inner_rect.cont_axes = CONT_NONE;
-        if(lcol_check != lcol)
-            inner_rect.cont_axes = CONT_X;
-
-        for(int col = lcol_check; col < rcol_check; col++)
-        {
-            int internal_col = col - first_col_index;
-
-            if(columns[internal_col].size() == 0)
-            {
-                inner_rect.cont_axes |= CONT_X;
-                continue;
-            }
-
-            int inner_l = 0;
-            if(col == lcol)
-                inner_l = rect.l - lcol * 2048;
-
-            int inner_r = 2048;
-            if(col == rcol - 1)
-                inner_r = rect.r - (rcol - 1) * 2048;
-
-            // apply offset if needed
-            inner_rect.l = inner_l / 64;
-            inner_rect.r = inner_r / 64;
-            if(inner_r & 63)
-                inner_rect.r += 1;
-
-            int trow_check = SDL_max(trow, col_first_row_index[internal_col]);
-            int brow_check = SDL_min(brow, col_first_row_index[internal_col] + (int)columns[internal_col].size());
-            if(trow_check != trow)
-                inner_rect.cont_axes |= CONT_Y;
-
-            for(int row = trow_check; row < brow_check; row++)
-            {
-                int internal_row = row - col_first_row_index[internal_col];
-
-                int inner_t = 0;
-                if(row == trow)
-                    inner_t = rect.t - trow * 2048;
-
-                int inner_b = 2048;
-                if(row == brow - 1)
-                    inner_b = rect.b - (brow - 1) * 2048;
-
-                // apply offset if needed
-                inner_rect.t = inner_t / 64;
-                inner_rect.b = inner_b / 64;
-                if(inner_b & 63)
-                    inner_rect.b += 1;
-
-                columns[internal_col][internal_row]->query(out, inner_rect);
-
-                inner_rect.cont_axes |= CONT_Y;
-            }
-
-            inner_rect.cont_axes = CONT_X;
-        }
-    }
-
-    void insert(MyRef_t b)
-    {
-        Location_t loc = extract_loc<MyRef_t>(b);
-
-        rect_external rect(loc);
-        member_rects[b] = rect;
-        insert(b, rect);
-    }
-
-    void insert_layer(MyRef_t b)
-    {
-        Location_t loc = extract_loc_layer<MyRef_t>(b);
-
-        rect_external rect(loc);
-        member_rects[b] = rect;
-        insert(b, rect);
-    }
-
+private:
     void insert(MyRef_t b, const rect_external& rect)
     {
         int lcol = rect.l / 2048;
@@ -577,16 +474,6 @@ struct table_t
         }
     }
 
-    void erase(MyRef_t b)
-    {
-        auto it = member_rects.find(b);
-        if(it == member_rects.end())
-            return;
-
-        erase(b, it->second);
-        member_rects.erase(it);
-    }
-
     void erase(MyRef_t b, const rect_external& rect)
     {
         int lcol = rect.l / 2048;
@@ -664,6 +551,129 @@ struct table_t
         }
     }
 
+public:
+    void query(std::vector<BaseRef_t>& out, const rect_external& rect)
+    {
+        if(columns.size() == 0 || member_rects.size() == 0)
+            return;
+
+        int lcol = rect.l / 2048;
+        if(rect.l < 0 && (rect.l % 2048))
+            lcol -= 1;
+
+        int rcol = rect.r / 2048;
+        if(rect.r > 0 && (rect.r % 2048))
+            rcol += 1;
+
+        int trow = rect.t / 2048;
+        if(rect.t < 0 && (rect.t % 2048))
+            trow -= 1;
+
+        int brow = rect.b / 2048;
+        if(rect.b > 0 && (rect.b % 2048))
+            brow += 1;
+
+        int lcol_check = SDL_max(lcol, first_col_index);
+        int rcol_check = SDL_min(rcol, first_col_index + (int)columns.size());
+
+        rect_internal inner_rect;
+
+        inner_rect.cont_axes = CONT_NONE;
+        if(lcol_check != lcol)
+            inner_rect.cont_axes = CONT_X;
+
+        for(int col = lcol_check; col < rcol_check; col++)
+        {
+            int internal_col = col - first_col_index;
+
+            if(columns[internal_col].size() == 0)
+            {
+                inner_rect.cont_axes |= CONT_X;
+                continue;
+            }
+
+            int inner_l = 0;
+            if(col == lcol)
+                inner_l = rect.l - lcol * 2048;
+
+            int inner_r = 2048;
+            if(col == rcol - 1)
+                inner_r = rect.r - (rcol - 1) * 2048;
+
+            // apply offset if needed
+            inner_rect.l = inner_l / 64;
+            inner_rect.r = inner_r / 64;
+            if(inner_r & 63)
+                inner_rect.r += 1;
+
+            int trow_check = SDL_max(trow, col_first_row_index[internal_col]);
+            int brow_check = SDL_min(brow, col_first_row_index[internal_col] + (int)columns[internal_col].size());
+            if(trow_check != trow)
+                inner_rect.cont_axes |= CONT_Y;
+
+            for(int row = trow_check; row < brow_check; row++)
+            {
+                int internal_row = row - col_first_row_index[internal_col];
+
+                int inner_t = 0;
+                if(row == trow)
+                    inner_t = rect.t - trow * 2048;
+
+                int inner_b = 2048;
+                if(row == brow - 1)
+                    inner_b = rect.b - (brow - 1) * 2048;
+
+                // apply offset if needed
+                inner_rect.t = inner_t / 64;
+                inner_rect.b = inner_b / 64;
+                if(inner_b & 63)
+                    inner_rect.b += 1;
+
+                columns[internal_col][internal_row]->query(out, inner_rect);
+
+                inner_rect.cont_axes |= CONT_Y;
+            }
+
+            inner_rect.cont_axes = CONT_X;
+        }
+    }
+
+    void insert(MyRef_t b)
+    {
+        Location_t loc = extract_loc<MyRef_t>(b);
+
+        // ignore improper rects
+        if(loc.Width < 0 || loc.Height < 0)
+            return;
+
+        rect_external rect(loc);
+        member_rects[b] = rect;
+        insert(b, rect);
+    }
+
+    void insert_layer(MyRef_t b)
+    {
+        Location_t loc = extract_loc_layer<MyRef_t>(b);
+
+        // ignore improper rects
+        if(loc.Width < 0 || loc.Height < 0)
+            return;
+
+        rect_external rect(loc);
+        member_rects[b] = rect;
+        insert(b, rect);
+    }
+
+    void erase(MyRef_t b)
+    {
+        auto it = member_rects.find(b);
+        if(it == member_rects.end())
+            return;
+
+        erase(b, it->second);
+        member_rects.erase(it);
+    }
+
     void update(MyRef_t b)
     {
         Location_t loc = extract_loc<MyRef_t>(b);
@@ -684,6 +694,10 @@ struct table_t
 
             erase(b, it->second);
         }
+
+        // ignore improper rects
+        if(loc.Width < 0 || loc.Height < 0)
+            return;
 
         member_rects[b] = rect;
         insert(b, rect);
