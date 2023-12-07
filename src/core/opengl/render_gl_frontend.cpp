@@ -534,17 +534,19 @@ void RenderGL::updateViewport()
 
 void RenderGL::resetViewport()
 {
+    // NOTE: resetViewport should not affect the viewport offset variable. Commented out logic.
+
     bool viewport_same = (m_viewport.x == 0 && m_viewport.y == 0 && m_viewport.w == ScreenW && m_viewport.h == ScreenH);
-    bool no_offset = m_viewport_offset_ignore || (m_viewport_offset.x == 0 && m_viewport_offset.y == 0);
-    bool viewport_changed = (!viewport_same || !no_offset);
+    // bool no_offset = m_viewport_offset_ignore || (m_viewport_offset.x == 0 && m_viewport_offset.y == 0);
+    bool viewport_changed = (!viewport_same /*|| !no_offset*/);
 
     if(viewport_changed)
         flushDrawQueues();
 
     m_viewport = RectSizeI(0, 0, ScreenW, ScreenH);
 
-    m_viewport_offset = PointI(0, 0);
-    m_viewport_offset_ignore = false;
+    // m_viewport_offset = PointI(0, 0);
+    // m_viewport_offset_ignore = false;
 
     if(viewport_changed)
         applyViewport();
