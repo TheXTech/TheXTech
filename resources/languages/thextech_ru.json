@@ -76,7 +76,8 @@
                 "autostart": "Автозап.",
                 "controls": "Авто-уп.",
                 "endGame": "Зав.игр.",
-                "sound": "Звук"
+                "sound": "Звук",
+                "layerSmoke": "Дым"
             },
             "sections": {
                 "actionKeep": "Ост.",
@@ -255,7 +256,8 @@
             "show": "Показать",
             "tiles": "Ландшафт",
             "warps": "Проходы",
-            "water": "Вода"
+            "water": "Вода",
+            "area": "Район"
         },
         "warp": {
             "allow": "Разр.",

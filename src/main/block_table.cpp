@@ -130,6 +130,10 @@ struct TableInterface
 
     inline void query(std::vector<BaseRef_t>& out, const Location_t& _loc, int sort_mode)
     {
+        // ignore improper rects
+        if(_loc.Width < 0 || _loc.Height < 0)
+            return;
+
         rect_external loc = _loc;
 
         // NOTE: there are extremely rare cases when these margins are not sufficient for full compatibility
@@ -392,10 +396,14 @@ TreeResult_Sentinel<BlockRef_t> treeTempBlockQuery(const Location_t &_loc,
     if(!s_temp_blocks_enabled)
         return result;
 
-    // NOTE: there are extremely rare cases when these margins are not sufficient for full compatibility
-    //   (such as, when an item is trapped inside a wall during !BlocksSorted)
+    // ignore improper rects
+    if(_loc.Width < 0 || _loc.Height < 0)
+        return result;
+
     rect_external loc = _loc;
 
+    // NOTE: there are extremely rare cases when these margins are not sufficient for full compatibility
+    //   (such as, when an item is trapped inside a wall during !BlocksSorted)
     if(g_compatibility.emulate_classic_block_order)
     {
         loc.l -= 32;
@@ -476,10 +484,14 @@ TreeResult_Sentinel<BlockRef_t> treeBlockQueryWithTemp(const Location_t &_loc,
 {
     TreeResult_Sentinel<BlockRef_t> result;
 
-    // NOTE: there are extremely rare cases when these margins are not sufficient for full compatibility
-    //   (such as, when an item is trapped inside a wall during !BlocksSorted)
+    // ignore improper rects
+    if(_loc.Width < 0 || _loc.Height < 0)
+        return result;
+
     Location_t loc = _loc;
 
+    // NOTE: there are extremely rare cases when these margins are not sufficient for full compatibility
+    //   (such as, when an item is trapped inside a wall during !BlocksSorted)
     if(g_compatibility.emulate_classic_block_order)
     {
         loc.X -= 32;
@@ -693,10 +705,14 @@ void treeNPCRemove(NPCRef_t obj)
 
 void treeNPCQuery(std::vector<BaseRef_t>& out, const Location_t &_loc, int sort_mode)
 {
-    // NOTE: there are extremely rare cases when these margins are not sufficient for full compatibility
-    //   (such as, when an item is trapped inside a wall during !BlocksSorted)
+    // ignore improper rects
+    if(_loc.Width < 0 || _loc.Height < 0)
+        return;
+
     rect_external loc = _loc;
 
+    // NOTE: there are extremely rare cases when these margins are not sufficient for full compatibility
+    //   (such as, when an item is trapped inside a wall during !BlocksSorted)
     if(g_compatibility.emulate_classic_block_order)
     {
         loc.l -= 32;

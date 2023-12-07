@@ -248,6 +248,9 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
     if(FilePath == ".lvl" || FilePath == ".lvlx")
         return false;
 
+    // warning for improper rects
+    const char* improper_rect_warning = "Attempted to set %s %d %s to %f, setting to 0";
+
     g_curLevelMedals.prepare_lvl(lvl);
 
     maxStars = lvl.stars;
@@ -305,6 +308,20 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         PlayerStart[A].Y = double(p.y);
         PlayerStart[A].Width = double(p.w);
         PlayerStart[A].Height = double(p.h);
+
+        // don't allow improper rects
+        if(PlayerStart[A].Width < 0)
+        {
+            pLogWarning(improper_rect_warning, "PlayerStart", A, "Width", PlayerStart[A].Width);
+            PlayerStart[A].Width = 0;
+        }
+
+        if(PlayerStart[A].Height < 0)
+        {
+            pLogWarning(improper_rect_warning, "PlayerStart", A, "Height", PlayerStart[A].Height);
+            PlayerStart[A].Height = 0;
+        }
+
         PlayerStart[A].Direction = p.direction;
         A++;
         if(A > 2)
@@ -472,6 +489,20 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         block.Location.Y = double(b.y);
         block.Location.Height = double(b.h);
         block.Location.Width = double(b.w);
+
+        // don't allow improper rects
+        if(block.Location.Width < 0)
+        {
+            pLogWarning(improper_rect_warning, "Block", numBlock, "Width", block.Location.Width);
+            block.Location.Width = 0;
+        }
+
+        if(block.Location.Height < 0)
+        {
+            pLogWarning(improper_rect_warning, "Block", numBlock, "Height", block.Location.Height);
+            block.Location.Height = 0;
+        }
+
         block.Type = int(b.id);
         block.DefaultType = block.Type;
 
@@ -868,6 +899,20 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         water.Location.Y = w.y;
         water.Location.Width = w.w;
         water.Location.Height = w.h;
+
+        // don't allow improper rects
+        if(water.Location.Width < 0)
+        {
+            pLogWarning(improper_rect_warning, "Water", numWater, "Width", water.Location.Width);
+            water.Location.Width = 0;
+        }
+
+        if(water.Location.Height < 0)
+        {
+            pLogWarning(improper_rect_warning, "Water", numWater, "Height", water.Location.Height);
+            water.Location.Height = 0;
+        }
+
         water.Buoy = w.buoy;
         water.Quicksand = w.env_type;
         water.Layer = FindLayer(w.layer);

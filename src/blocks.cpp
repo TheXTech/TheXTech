@@ -1585,6 +1585,7 @@ void PSwitch(bool enabled)
                     nn.DefaultLocation = nn.Location;
                     nn.DefaultType = nn.Type;
 
+                    // WARNING: this is new logic from #167. Check in case of any inconsistencies after Coin Switch is activated.
                     if(NPCFrame[nn.Type] > 0)
                     {
                         nn.Direction = 1;
@@ -1713,6 +1714,7 @@ void PSwitch(bool enabled)
                     nn.DefaultLocation = nn.Location;
                     nn.DefaultType = nn.Type;
 
+                    // WARNING: this is new logic from #167. Check in case of any inconsistencies after Coin Switch is activated.
                     if(NPCFrame[nn.Type] > 0)
                     {
                         nn.Direction = 1;
