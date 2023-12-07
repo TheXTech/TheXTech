@@ -245,6 +245,9 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
     if(FilePath == ".lvl" || FilePath == ".lvlx")
         return false;
 
+    // warning for improper rects
+    const char* improper_rect_warning = "Attempted to set %s %d %s to %f, setting to 0";
+
     g_curLevelMedals.prepare_lvl(lvl);
 
     maxStars = lvl.stars;
@@ -305,9 +308,16 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
 
         // don't allow improper rects
         if(PlayerStart[A].Width < 0)
+        {
+            pLogWarning(improper_rect_warning, "PlayerStart", A, "Width", PlayerStart[A].Width);
             PlayerStart[A].Width = 0;
+        }
+
         if(PlayerStart[A].Height < 0)
+        {
+            pLogWarning(improper_rect_warning, "PlayerStart", A, "Height", PlayerStart[A].Height);
             PlayerStart[A].Height = 0;
+        }
 
         PlayerStart[A].Direction = p.direction;
         A++;
@@ -479,9 +489,16 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
 
         // don't allow improper rects
         if(block.Location.Width < 0)
+        {
+            pLogWarning(improper_rect_warning, "Block", numBlock, "Width", block.Location.Width);
             block.Location.Width = 0;
+        }
+
         if(block.Location.Height < 0)
+        {
+            pLogWarning(improper_rect_warning, "Block", numBlock, "Height", block.Location.Height);
             block.Location.Height = 0;
+        }
 
         block.Type = int(b.id);
         block.DefaultType = block.Type;
@@ -882,9 +899,16 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
 
         // don't allow improper rects
         if(water.Location.Width < 0)
+        {
+            pLogWarning(improper_rect_warning, "Water", numWater, "Width", water.Location.Width);
             water.Location.Width = 0;
+        }
+
         if(water.Location.Height < 0)
+        {
+            pLogWarning(improper_rect_warning, "Water", numWater, "Height", water.Location.Height);
             water.Location.Height = 0;
+        }
 
         water.Buoy = w.buoy;
         water.Quicksand = w.env_type;
