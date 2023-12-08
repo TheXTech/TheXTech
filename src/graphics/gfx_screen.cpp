@@ -32,28 +32,37 @@
 
 void SetScreenType(Screen_t& screen)
 {
+    // TODO: move this logic elsewhere once multiple screens are supported
+    screen.player_count = SDL_min(numPlayers, maxLocalPlayers);
+
     // moved this code from game_main.cpp, but it occured elsewhere also
     //   it was always called before setup screens, now it is a part of setup screens.
     //   better to have it in one place so it can be updated
-    if(numPlayers == 1)
-        screen.Type = 0; // Follow 1 player
-    else if(numPlayers == 2)
-        screen.Type = 5; // Dynamic screen
-    else
+    if(screen.player_count == 1)
+        screen.Type = ScreenTypes::SinglePlayer; // Follow 1 player
+    else if(screen.player_count == 2)
     {
-        // screen.Type = 3 'Average, no one leaves the screen
-        screen.Type = 2; // Average
+        if(screen.multiplayer_pref == MultiplayerPrefs::Split)
+            screen.Type = ScreenTypes::LeftRight;
+        else if(screen.multiplayer_pref == MultiplayerPrefs::Shared)
+            screen.Type = ScreenTypes::SharedScreen;
+        else
+            screen.Type = ScreenTypes::Dynamic; // Dynamic screen
     }
+    else
+        screen.Type = ScreenTypes::SharedScreen; // Average, no one leaves the screen
 
     // special cases
+    if(g_ClonedPlayerMode)
+        screen.Type = ScreenTypes::Average;
     if(SingleCoop > 0)
-        screen.Type = 6;
+        screen.Type = ScreenTypes::SingleCoop;
     if(GameMenu)
-        screen.Type = 2;
+        screen.Type = ScreenTypes::Average;
     if(GameOutro)
-        screen.Type = 7;
+        screen.Type = ScreenTypes::Credits;
     if(LevelEditor)
-        screen.Type = 0;
+        screen.Type = ScreenTypes::SinglePlayer;
 }
 
 // Sets up the split lines

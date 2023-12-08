@@ -102,6 +102,19 @@ namespace DScreenTypes
     };
 }
 
+// player-specified per-screen preferences for multiplayer mode
+// (overridden by cheats SingleCoop and g_ClonedPlayerMode)
+namespace MultiplayerPrefs
+{
+    enum MultiplayerPrefs
+    {
+        Dynamic = 0,
+        Split = 1,
+        Shared = 2,
+        TopBottom = 3, // allow?
+    };
+}
+
 struct Screen_t
 {
 private:
@@ -116,8 +129,11 @@ public:
     //! which vScreens belong to the screen
     localarr_t vScreen_refs;
 
-    // which players belong to the screen (no player may belong to multiple visible screens). zero-terminated.
+    //! which players belong to the screen (no player may belong to multiple visible screens).
     localarr_t players;
+
+    //! how many active players in this screen (excluding cloned-player mode)
+    int player_count = 0;
 
     //! whether this is being rendered by any client (not necessarily the local one)
     bool Visible = true;
@@ -133,6 +149,9 @@ public:
 
     //! the currently active dynamic split mode for the screen
     int DType = DScreenTypes::Inactive;
+
+    //! the currently requested multiplayer mode for the screen
+    int multiplayer_pref = MultiplayerPrefs::Dynamic;
 
     inline bool is_canonical() const
     {
