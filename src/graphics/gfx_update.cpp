@@ -1404,7 +1404,7 @@ void UpdateGraphics(bool skipRepaint)
     NPCQueues::NoReset.clear();
 
     // mark the last-frame reset state of NPCs that may have Reset[0] set to false, and clear their this-frame reset state
-    if(g_compatibility.modern_npc_activation)
+    if(g_compatibility.modern_npc_camera_logic)
     {
         for(NPC_t& n : s_NoReset_NPCs_LastFrame)
         {
@@ -1459,7 +1459,7 @@ void UpdateGraphics(bool skipRepaint)
         int plr_Z = screen.players[vscreen_i];
 
         // modern NPC activation logic is required to support more than 2 vScreens (for the Reset array)
-        SDL_assert_release(Z <= 2 || g_compatibility.modern_npc_activation);
+        SDL_assert_release(Z <= 2 || g_compatibility.modern_npc_camera_logic);
 
         int S;
         if(LevelEditor)
@@ -1633,7 +1633,7 @@ void UpdateGraphics(bool skipRepaint)
         // we'll check the NPCs and do some logic for the game,
         if(!LevelEditor)
         {
-            if(g_compatibility.modern_npc_activation)
+            if(g_compatibility.modern_npc_camera_logic)
                 ModernNPCScreenLogic(screen, vscreen_i, fill_draw_queue, NPC_Draw_Queue_p);
             else
                 ClassicNPCScreenLogic(Z, numScreens, fill_draw_queue, NPC_Draw_Queue_p);
@@ -1661,7 +1661,7 @@ void UpdateGraphics(bool skipRepaint)
     // TODO: end loop over screens
 
     // clear the last-frame reset state of NPCs
-    if(g_compatibility.modern_npc_activation)
+    if(g_compatibility.modern_npc_camera_logic)
     {
         for(NPC_t& n : s_NoReset_NPCs_LastFrame)
             n.Reset[2] = true;
