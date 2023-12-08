@@ -123,6 +123,8 @@ static void compatInit(Compatibility_t &c)
     c.fix_held_item_cancel = true;
     c.modern_section_change = true;
     c.fix_frame_perfect_despawn = true;
+    // 1.3.7
+    c.modern_npc_camera_logic = true;
 
 
     if(s_compatLevel >= COMPAT_SMBX2) // Make sure that bugs were same as on SMBX2 Beta 4 on this moment
@@ -172,6 +174,8 @@ static void compatInit(Compatibility_t &c)
         c.fix_held_item_cancel = false;
         c.modern_section_change = false;
         c.fix_frame_perfect_despawn = false;
+        // 1.3.7
+        c.modern_npc_camera_logic = false;
     }
 
     if(s_compatLevel >= COMPAT_SMBX13) // Strict vanilla SMBX
@@ -420,6 +424,8 @@ static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
         compat.read("fix-held-item-cancel", c.fix_held_item_cancel, c.fix_held_item_cancel);
         compat.read("modern-section-change", c.modern_section_change, c.modern_section_change);
         compat.read("fix-frame-perfect-despawn", c.fix_frame_perfect_despawn, c.fix_frame_perfect_despawn);
+        // 1.3.7 (but these will be changed in the Compat update)
+        compat.read("modern-npc-camera-logic", c.modern_npc_camera_logic, c.modern_npc_camera_logic);
     }
     // 1.3.4
     compat.read("fix-player-filter-bounce", c.fix_player_filter_bounce, c.fix_player_filter_bounce);
