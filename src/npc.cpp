@@ -313,6 +313,9 @@ void Bomb(Location_t Location, int Game, int ImmunePlayer)
     }
 }
 
+#if 0
+// dead code, removed
+
 void DropNPC(int A, int NPCType)
 {
     int B = 0;
@@ -346,6 +349,7 @@ void DropNPC(int A, int NPCType)
         syncLayers_NPC(numNPCs);
     }
 }
+#endif
 
 void TurnNPCsIntoCoins()
 {
