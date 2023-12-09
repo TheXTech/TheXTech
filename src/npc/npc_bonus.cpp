@@ -76,10 +76,11 @@ inline void RumbleForPowerup(int A)
 
 void DropBonus(int A)
 {
+    // TODO: refactor, update to support new screen types
     int B = 0;
     //    if(nPlay.Online == true && nPlay.MySlot + 1 != A)
     //        return;
-    if(A == 1 || numPlayers == 2 /*|| nPlay.Online == true*/)
+    if(A == 1 || !g_ClonedPlayerMode)
     {
         if(Player[A].Character == 3 || Player[A].Character == 4)
         {
