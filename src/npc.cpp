@@ -169,7 +169,7 @@ void Deactivate(int A)
                     {
                         int vscreen_Z = screen.vScreen_refs[vscreen_i];
 
-                        // FIXME: SingleCoop should become a member of Screen_t
+                        // Possible future TODO: SingleCoop could become a member of Screen_t
                         if(screen.Type == ScreenTypes::SingleCoop && SingleCoop != vscreen_i + 1)
                             continue;
 
