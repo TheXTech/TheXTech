@@ -42,9 +42,9 @@ void DrawInterface(int Z, int numScreens)
 
     const Screen_t& screen = Screens[vScreen[Z].screen_ref];
 
-    int B = 0;
-    int C = 0;
-    int D = 0;
+    // int B = 0;
+    // int C = 0;
+    // int D = 0;
 
     std::string scoreStr = std::to_string(Score);
     std::string coinsStr = std::to_string(Coins);
@@ -53,353 +53,234 @@ void DrawInterface(int Z, int numScreens)
 
     XRender::offsetViewportIgnore(true);
 
-    if(screen.player_count > 1) // 2 Players (was previously ScreenType == 5 || ScreenType == 6)
+    // if(ScreenType == 5 || ScreenType == 6) // 2 Players (now removed; combined 2P split-screen code with 1P code)
+
+    if(screen.player_count > 1 && numScreens == 1 && screen.Type != 6) // screen with >1 player (shared screen)
     {
-        if(static_cast<int>(numScreens) == 1 && screen.Type != 6) // Only 1 screen (shared screen)
+        bool someone_has_key = false;
+
+        for(int i = 0; i < screen.player_count; i++)
         {
-            for(int i = 0; i < screen.player_count; i++)
+            int plr_idx = screen.players[i];
+            Player_t& plr = Player[plr_idx];
+
+            // show hearts
+            if(plr.Character == 3 || plr.Character == 4 || plr.Character == 5)
             {
-                // offset for hearts / held bonus
-                if(i == 0)
-                    C = -40;
-                else
-                    C = 40;
+                // heart offset
+                int off = (i == 0) ? -57 : 57;
 
-                B = screen.players[i];
+                auto& heart_1_gfx = plr.Hearts > 0 ? GFX.Heart[1] : GFX.Heart[2];
+                auto& heart_2_gfx = plr.Hearts > 1 ? GFX.Heart[1] : GFX.Heart[2];
+                auto& heart_3_gfx = plr.Hearts > 2 ? GFX.Heart[1] : GFX.Heart[2];
 
-                if(Player[B].Character == 3 || Player[B].Character == 4 || Player[B].Character == 5)
-                {
-                    D = (B == 1) ? -1 : 1;
-
-                    int hGfx;
-
-                    hGfx = Player[B].Hearts > 0 ? 1 : 2;
-                    XRender::renderTexture(CenterX - GFX.Heart[hGfx].w / 2 + C - 32 + 17 * D,
-                                            ScreenTop + 16,
-                                            GFX.Heart[hGfx].w, GFX.Heart[hGfx].h,
-                                            GFX.Heart[hGfx], 0, 0);
-
-                    hGfx = Player[B].Hearts > 1 ? 1 : 2;
-                    XRender::renderTexture(CenterX - GFX.Heart[hGfx].w / 2 + C + 17 * D,
-                                            ScreenTop + 16,
-                                            GFX.Heart[hGfx].w, GFX.Heart[hGfx].h,
-                                            GFX.Heart[hGfx], 0, 0);
-
-                    hGfx = Player[B].Hearts > 2 ? 1 : 2;
-                    XRender::renderTexture(CenterX - GFX.Heart[hGfx].w / 2 + C + 32 + 17 * D,
-                                            ScreenTop + 16,
-                                            GFX.Heart[hGfx].w, GFX.Heart[hGfx].h,
-                                            GFX.Heart[hGfx], 0, 0);
-                }
-                else
-                {
-                    // 2 players 1 screen heldbonus
-                    XRender::renderTexture(CenterX - GFX.Container[1].w / 2 + C, ScreenTop + 16, GFX.Container[1].w, GFX.Container[1].h, GFX.Container[Player[B].Character], 0, 0);
-
-                    if(Player[B].HeldBonus > 0)
-                    {
-                        XRender::renderTexture(CenterX - GFX.Container[1].w / 2 + C + 12,
-                                                ScreenTop + 16 + 12,
-                                                NPCWidth[Player[B].HeldBonus], NPCHeight[Player[B].HeldBonus],
-                                                GFXNPC[Player[B].HeldBonus], 0, 0);
-                    }
-                }
-
-                // offset for bombs
-                C = (i == 0) ? -58 : 56;
-
-                if(Player[B].Character == 5 && Player[B].Bombs > 0)
-                {
-                    XRender::renderTexture(20 + CenterX - GFX.Container[1].w / 2 - 34 + C, ScreenTop + 52,
-                        GFX.Interface[2].w, GFX.Interface[2].h, GFX.Interface[8], 0, 0);
-                    XRender::renderTexture(20 + CenterX - GFX.Container[1].w / 2 - 10 + C, ScreenTop + 53,
-                        GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
-                    SuperPrint(std::to_string(Player[B].Bombs), 1,
-                               float(20 + CenterX - GFX.Container[1].w / 2 + 12 + C),
-                               ScreenTop + 53);
-                }
+                XRender::renderTexture(CenterX - heart_1_gfx.w / 2 + off - 32, ScreenTop + 16, heart_1_gfx);
+                XRender::renderTexture(CenterX - heart_2_gfx.w / 2 + off     , ScreenTop + 16, heart_2_gfx);
+                XRender::renderTexture(CenterX - heart_3_gfx.w / 2 + off + 32, ScreenTop + 16, heart_3_gfx);
             }
-
-            C = 40;
-
-            if(!BattleMode)
-            {
-                // Print coins on the screen
-                if(Player[1].HasKey || Player[2].HasKey)
-                {
-                    XRender::renderTexture(-24 + 40 + 20 + CenterX - GFX.Container[1].w / 2 + 96, ScreenTop + 16 + 10, GFX.Interface[2].w, GFX.Interface[2].h, GFX.Interface[0], 0, 0);
-                }
-
-                if(Player[1].Character == 5)
-                {
-                    XRender::renderTexture(40 + 20 + CenterX - GFX.Container[1].w / 2 + 96, ScreenTop + 16 + 10, GFX.Interface[2].w, GFX.Interface[2].h, GFX.Interface[6], 0, 0);
-                }
-                else
-                {
-                    XRender::renderTexture(40 + 20 + CenterX - GFX.Container[1].w / 2 + 96, ScreenTop + 16 + 10, GFX.Interface[2].w, GFX.Interface[2].h, GFX.Interface[2], 0, 0);
-                }
-
-                XRender::renderTexture(40 + 20 + CenterX - GFX.Container[1].w / 2 + 96 + 8 + GFX.Interface[2].w, ScreenTop + 16 + 11, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
-
-                SuperPrint(coinsStr, 1,
-                           40 + 20 - (int(coinsStr.size()) * 18) +
-                           (CenterX) - (GFX.Container[1].w / 2) + 80 + 4 + 12 + 18 + 32 + GFX.Interface[3].w,
-                           ScreenTop + 16 + 11);
-                // Print Score
-                SuperPrint(scoreStr, 1,
-                           40 + 20 - (int(scoreStr.size()) * 18) +
-                           (CenterX) - (GFX.Container[1].w / 2) + 80 + 12 + 4 + 18 + 32 + GFX.Interface[3].w,
-                           ScreenTop + 16 + 31);
-
-                // Print lives on the screen
-                XRender::renderTexture(-80 + CenterX - GFX.Container[1].w / 2 + C - 122 - 16, ScreenTop + 16 + 10, GFX.Interface[3].w, GFX.Interface[3].h, GFX.Interface[3], 0, 0);
-                XRender::renderTexture(-80 + CenterX - GFX.Container[1].w / 2 + C - 122 + 10 + GFX.Interface[1].w, ScreenTop + 16 + 11, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
-
-                SuperPrint(livesStr, 1,
-                           float(-80 + (CenterX) - (GFX.Container[1].w / 2) + C - 122 + 12 + 18 + GFX.Interface[5].w),
-                           ScreenTop + 16 + 11);
-                // Print stars on the screen
-                if(numStars > 0)
-                {
-                    XRender::renderTexture(-80 + CenterX - GFX.Container[1].w / 2 + C - 122, ScreenTop + 16 + 30, GFX.Interface[5].w, GFX.Interface[5].h, GFX.Interface[5], 0, 0);
-                    XRender::renderTexture(-80 + CenterX - GFX.Container[1].w / 2 + C - 122 + 10 + GFX.Interface[1].w, ScreenTop + 16 + 31, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
-                    SuperPrint(numStarsStr, 1,
-                               float(-80 + (CenterX) - (GFX.Container[1].w / 2) + C - 122 + 12 + 18 + GFX.Interface[5].w),
-                               ScreenTop + 16 + 31);
-                }
-            }
+            // show held bonus (item box)
             else
             {
-                // plr 1 lives
-                XRender::renderTexture(-80 + CenterX - GFX.Container[1].w / 2 + C - 122 - 16, ScreenTop + 16 + 10, GFX.Interface[3].w, GFX.Interface[3].h, GFX.Interface[3], 0, 0);
-                XRender::renderTexture(-80 + CenterX - GFX.Container[1].w / 2 + C - 122 + 10 + GFX.Interface[1].w, ScreenTop + 16 + 11, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
-                SuperPrint(std::to_string(BattleLives[1]), 1,
-                           float(-80 + CenterX - GFX.Container[1].w / 2 + C - 122 + 12 + 18 + GFX.Interface[5].w),
-                           ScreenTop + 16 + 11);
+                // held bonus offset
+                int off = (i == 0) ? -40 : 40;
 
-                // plr 2 lives
-                XRender::renderTexture(40 + 20 + CenterX - GFX.Container[1].w / 2 + 96 - 16, ScreenTop + 16 + 10, GFX.Interface[3].w, GFX.Interface[3].h, GFX.Interface[7], 0, 0);
-                XRender::renderTexture(40 + 20 + CenterX - GFX.Container[1].w / 2 + 96 + 8 + GFX.Interface[2].w, ScreenTop + 16 + 11, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
-                SuperPrint(std::to_string(BattleLives[2]), 1,
-                           float(24 + CenterX - GFX.Container[1].w / 2 + 80 + 4 + 12 + 18 + 32 + GFX.Interface[3].w),
-                           ScreenTop + 16 + 11);
-            }
-        }
-        else // Split screen
-        {
+                // 2 players 1 screen heldbonus
+                int use_container = plr.Character;
 
+                if(use_container > 2)
+                    use_container = 0;
 
-// 2 players 2 screen heldbonus
+                XRender::renderTexture(CenterX - GFX.Container[1].w / 2 + off, ScreenTop + 16, GFX.Container[use_container]);
 
-            if(Player[Z].Character == 3 || Player[Z].Character == 4 || Player[Z].Character == 5)
-            {
-                auto& heart_1_gfx = Player[Z].Hearts > 0 ? GFX.Heart[1] : GFX.Heart[2];
-                auto& heart_2_gfx = Player[Z].Hearts > 1 ? GFX.Heart[1] : GFX.Heart[2];
-                auto& heart_3_gfx = Player[Z].Hearts > 2 ? GFX.Heart[1] : GFX.Heart[2];
-
-                XRender::renderTexture(CenterX - heart_1_gfx.w / 2 + C - 32, ScreenTop + 16, heart_1_gfx);
-                XRender::renderTexture(CenterX - heart_2_gfx.w / 2 + C     , ScreenTop + 16, heart_2_gfx);
-                XRender::renderTexture(CenterX - heart_3_gfx.w / 2 + C + 32, ScreenTop + 16, heart_3_gfx);
-            }
-            else
-            {
-
-                XRender::renderTexture(CenterX - GFX.Container[1].w / 2, ScreenTop + 16, GFX.Container[1].w + B, GFX.Container[1].h, GFX.Container[Player[Z].Character], 0, 0);
-                if(Player[Z].HeldBonus > 0)
+                if(plr.HeldBonus > 0)
                 {
-                    XRender::renderTexture(CenterX - GFX.Container[1].w / 2 + 12,
+                    XRender::renderTexture(CenterX - GFX.Container[1].w / 2 + off + 12,
                                             ScreenTop + 16 + 12,
-                                            NPCWidth[Player[Z].HeldBonus], NPCHeight[Player[Z].HeldBonus],
-                                            GFXNPC[Player[Z].HeldBonus], 0, 0);
+                                            NPCWidth[plr.HeldBonus], NPCHeight[plr.HeldBonus],
+                                            GFXNPC[plr.HeldBonus], 0, 0);
                 }
             }
 
-            if(Player[Z].Character == 5 && Player[Z].Bombs > 0)
+            // show bombs
+            if(plr.Character == 5 && plr.Bombs > 0)
             {
-                XRender::renderTexture(20 + CenterX - GFX.Container[1].w / 2 - 34, ScreenTop + 52, GFX.Interface[2].w, GFX.Interface[2].h, GFX.Interface[8], 0, 0);
-                XRender::renderTexture(20 + CenterX - GFX.Container[1].w / 2 - 10, ScreenTop + 53, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
-                SuperPrint(std::to_string(Player[Z].Bombs), 1, 20 + CenterX - GFX.Container[1].w / 2 + 12, ScreenTop + 53);
+                // offset for bombs
+                int off = (i == 0) ? -58 : 56;
+
+                XRender::renderTexture(20 + CenterX - GFX.Container[1].w / 2 - 34 + off, ScreenTop + 52,
+                    GFX.Interface[8]);
+                XRender::renderTexture(20 + CenterX - GFX.Container[1].w / 2 - 10 + off, ScreenTop + 53,
+                    GFX.Interface[1]);
+                SuperPrint(std::to_string(plr.Bombs), 1,
+                           float(20 + CenterX - GFX.Container[1].w / 2 + 12 + off),
+                           ScreenTop + 53);
             }
 
-            if(!BattleMode)
-            {
-                // Print coins on the screen
-                if(Player[Z].HasKey)
-                    XRender::renderTexture(-24 + 20 + CenterX - GFX.Container[1].w / 2 + 96, ScreenTop + 16 + 10, GFX.Interface[2].w, GFX.Interface[2].h, GFX.Interface[0], 0, 0);
-
-                if(Player[Z].Character == 5)
-                    XRender::renderTexture(20 + CenterX - GFX.Container[1].w / 2 + 96, ScreenTop + 16 + 10, GFX.Interface[2].w, GFX.Interface[2].h, GFX.Interface[6], 0, 0);
-                else
-                    XRender::renderTexture(20 + CenterX - GFX.Container[1].w / 2 + 96, ScreenTop + 16 + 10, GFX.Interface[2].w, GFX.Interface[2].h, GFX.Interface[2], 0, 0);
-
-
-                XRender::renderTexture(20 + CenterX - GFX.Container[1].w / 2 + 96 + 8 + GFX.Interface[2].w, ScreenTop + 16 + 11, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
-                SuperPrint(coinsStr, 1,
-                           float(20 - int(coinsStr.size()) * 18 + CenterX - GFX.Container[1].w / 2 + 80 + 4 + 12 + 18 + 32 + GFX.Interface[3].w),
-                           ScreenTop + 16 + 11);
-
-                // Print Score
-                SuperPrint(scoreStr,
-                           1,
-                           float(20 - int(scoreStr.size()) * 18 + CenterX - GFX.Container[1].w / 2 + 80 + 12 + 4 + 18 + 32 + GFX.Interface[3].w),
-                           ScreenTop + 16 + 31);
-
-                // Print lives on the screen
-
-                XRender::renderTexture(CenterX - GFX.Container[1].w / 2 + C - 122 - 16, ScreenTop + 16 + 10, GFX.Interface[3].w, GFX.Interface[3].h, GFX.Interface[3], 0, 0);
-                XRender::renderTexture(CenterX - GFX.Container[1].w / 2 + C - 122 + 10 + GFX.Interface[1].w, ScreenTop + 16 + 11, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
-                SuperPrint(livesStr, 1,
-                           float(CenterX - GFX.Container[1].w / 2 + C - 122 + 12 + 18 + GFX.Interface[5].w),
-                           ScreenTop + 16 + 11);
-                // Print stars on the screen
-                if(numStars > 0)
-                {
-                    XRender::renderTexture(CenterX - GFX.Container[1].w / 2 + C - 122, ScreenTop + 16 + 30, GFX.Interface[5].w, GFX.Interface[5].h, GFX.Interface[5], 0, 0);
-                    XRender::renderTexture(CenterX - GFX.Container[1].w / 2 + C - 122 + 10 + GFX.Interface[1].w, ScreenTop + 16 + 31, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
-                    SuperPrint(numStarsStr, 1,
-                               float(CenterX - GFX.Container[1].w / 2 + C - 122 + 12 + 18 + GFX.Interface[5].w),
-                               ScreenTop + 16 + 31);
-                }
-            }
-            else
-            {
-                // lives in battle mode
-
-                auto& oneup_twoup = (Z == 1) ? GFX.Interface[3] : GFX.Interface[7];
-
-                XRender::renderTexture(CenterX - GFX.Container[1].w / 2 + C - 122,
-                                      ScreenTop + 16 + 10,
-                                      oneup_twoup.w, oneup_twoup.h,
-                                      oneup_twoup, 0, 0);
-
-                XRender::renderTexture(CenterX - GFX.Container[1].w / 2 + C - 122 + 10 + GFX.Interface[1].w + 16,
-                    ScreenTop + 16 + 11,
-                    GFX.Interface[1].w, GFX.Interface[1].h,
-                    GFX.Interface[1], 0, 0);
-
-                SuperPrint(std::to_string(BattleLives[Z]), 1,
-                           float(CenterX - GFX.Container[1].w / 2 + C - 122 + 12 + 18 + GFX.Interface[5].w + 16),
-                           ScreenTop + 16 + 11);
-            }
-        }
-    }
-    else // 1 Player or Multi Mario
-    {
-
-
-//        if(nPlay.Online == false)
-        {
-            if(Player[1].Character == 3 || Player[1].Character == 4 || Player[1].Character == 5)
-            {
-//                BitBlt myBackBuffer, CenterX - GFX.Heart[1].w / 2 + C - 32, 16, GFX.Heart[1].w, GFX.Heart[1].h, GFX::HeartMask(1).hdc, 0, 0, vbSrcAnd;
-//                BitBlt myBackBuffer, CenterX - GFX.Heart[1].w / 2 + C, 16, GFX.Heart[1].w, GFX.Heart[1].h, GFX::HeartMask(1).hdc, 0, 0, vbSrcAnd;
-//                BitBlt myBackBuffer, CenterX - GFX.Heart[1].w / 2 + C + 32, 16, GFX.Heart[1].w, GFX.Heart[1].h, GFX::HeartMask(1).hdc, 0, 0, vbSrcAnd;
-                auto& heart_1_gfx = Player[1].Hearts > 0 ? GFX.Heart[1] : GFX.Heart[2];
-                auto& heart_2_gfx = Player[1].Hearts > 1 ? GFX.Heart[1] : GFX.Heart[2];
-                auto& heart_3_gfx = Player[1].Hearts > 2 ? GFX.Heart[1] : GFX.Heart[2];
-
-                XRender::renderTexture(CenterX - heart_1_gfx.w / 2 + C - 32, ScreenTop + 16, heart_1_gfx);
-                XRender::renderTexture(CenterX - heart_2_gfx.w / 2 + C     , ScreenTop + 16, heart_2_gfx);
-                XRender::renderTexture(CenterX - heart_3_gfx.w / 2 + C + 32, ScreenTop + 16, heart_3_gfx);
-            }
-            else
-            {
-                XRender::renderTexture(CenterX - GFX.Container[1].w / 2, ScreenTop + 16, GFX.Container[1].w + B, GFX.Container[1].h, GFX.Container[0], 0, 0);
-
-                if(Player[1].HeldBonus > 0)
-                    XRender::renderTexture(CenterX - GFX.Container[1].w / 2 + 12, ScreenTop + 16 + 12, NPCWidth[Player[1].HeldBonus], NPCHeight[Player[1].HeldBonus], GFXNPC[Player[1].HeldBonus], 0, 0);
-            }
-        }
-//        else
-//        {
-//            if(Player[nPlay.MySlot + 1].Character == 3 || Player[nPlay.MySlot + 1].Character == 4)
-//            {
-////                BitBlt myBackBuffer, CenterX - GFX.Heart[1].w / 2 + C - 32, 16, GFX.Heart[1].w, GFX.Heart[1].h, GFX::HeartMask(1).hdc, 0, 0, vbSrcAnd;
-////                BitBlt myBackBuffer, CenterX - GFX.Heart[1].w / 2 + C, 16, GFX.Heart[1].w, GFX.Heart[1].h, GFX::HeartMask(1).hdc, 0, 0, vbSrcAnd;
-////                BitBlt myBackBuffer, CenterX - GFX.Heart[1].w / 2 + C + 32, 16, GFX.Heart[1].w, GFX.Heart[1].h, GFX::HeartMask(1).hdc, 0, 0, vbSrcAnd;
-//                if(Player[nPlay.MySlot + 1].Hearts > 0)
-//                {
-//                    XRender::renderTexture(CenterX - GFX.Heart[1].w / 2 + C - 32, 16, GFX.Heart[1].w, GFX.Heart[1].h, GFX.Heart[1], 0, 0);
-//                }
-//                else
-//                {
-//                    XRender::renderTexture(CenterX - GFX.Heart[1].w / 2 + C - 32, 16, GFX.Heart[1].w, GFX.Heart[1].h, GFX.Heart[2], 0, 0);
-//                }
-//                if(Player[nPlay.MySlot + 1].Hearts > 1)
-//                {
-//                    XRender::renderTexture(CenterX - GFX.Heart[1].w / 2 + C, 16, GFX.Heart[1].w, GFX.Heart[1].h, GFX.Heart[1], 0, 0);
-//                }
-//                else
-//                {
-//                    XRender::renderTexture(CenterX - GFX.Heart[1].w / 2 + C, 16, GFX.Heart[1].w, GFX.Heart[1].h, GFX.Heart[2], 0, 0);
-//                }
-//                if(Player[nPlay.MySlot + 1].Hearts > 2)
-//                {
-//                    XRender::renderTexture(CenterX - GFX.Heart[1].w / 2 + C + 32, 16, GFX.Heart[1].w, GFX.Heart[1].h, GFX.Heart[1], 0, 0);
-//                }
-//                else
-//                {
-//                    XRender::renderTexture(CenterX - GFX.Heart[1].w / 2 + C + 32, 16, GFX.Heart[1].w, GFX.Heart[1].h, GFX.Heart[2], 0, 0);
-//                }
-//            }
-//            else
-//            {
-//                BitBlt myBackBuffer, CenterX - GFX.Container[1].w / 2, 16, GFX.Container[1].w + B, GFX.Container[1].h, GFX::ContainerMask(0).hdc, 0, 0, vbSrcAnd;
-//                BitBlt myBackBuffer, CenterX - GFX.Container[1].w / 2, 16, GFX.Container[1].w + B, GFX.Container[1].h, GFX::Container(0).hdc, 0, 0, vbSrcPaint;
-//                if(Player[nPlay.MySlot + 1].HeldBonus > 0)
-//                {
-//                    XRender::renderTexture(CenterX - GFX.Container[1].w / 2 + 12, 16 + 12, NPCWidth[Player[nPlay.MySlot + 1].HeldBonus], NPCHeight[Player[nPlay.MySlot + 1].HeldBonus], GFXNPCMask[Player[nPlay.MySlot + 1].HeldBonus], 0, 0);
-//                    XRender::renderTexture(CenterX - GFX.Container[1].w / 2 + 12, 16 + 12, NPCWidth[Player[nPlay.MySlot + 1].HeldBonus], NPCHeight[Player[nPlay.MySlot + 1].HeldBonus], GFXNPC[Player[nPlay.MySlot + 1].HeldBonus], 0, 0);
-//                }
-//            }
-//        }
-
-        if(Player[1].Character == 5 && Player[1].Bombs > 0)
-        {
-            XRender::renderTexture(20 + CenterX - GFX.Container[1].w / 2 - 34 + C, ScreenTop + 52, GFX.Interface[8]);
-            XRender::renderTexture(20 + CenterX - GFX.Container[1].w / 2 - 10 + C, ScreenTop + 53, GFX.Interface[1]);
-            SuperPrint(std::to_string(Player[1].Bombs), 1,
-                       float(20 + CenterX - GFX.Container[1].w / 2 + 12 + C), ScreenTop + 53);
+            if(plr.HasKey)
+                someone_has_key = true;
         }
 
-        // Print coins on the screen
-        if(Player[1].HasKey)
-            XRender::renderTexture(-24 + 20 + CenterX - GFX.Container[1].w / 2 + 96, ScreenTop + 16 + 10, GFX.Interface[0]);
+        int C = 40;
 
-        if(Player[1].Character == 5)
-            XRender::renderTexture(20 + CenterX - GFX.Container[1].w / 2 + 96, ScreenTop + 16 + 10, GFX.Interface[6]);
-        else
-            XRender::renderTexture(20 + CenterX - GFX.Container[1].w / 2 + 96, ScreenTop + 16 + 10, GFX.Interface[2]);
-
-        XRender::renderTexture(20 + CenterX - GFX.Container[1].w / 2 + 96 + 8 + GFX.Interface[2].w, ScreenTop + 16 + 11, GFX.Interface[1]);
-
-        SuperPrint(coinsStr, 1,
-                   float(20 - int(coinsStr.size()) * 18 + CenterX - GFX.Container[1].w / 2 + 80 + 4 + 12 + 18 + 32 + GFX.Interface[3].w),
-                   ScreenTop + 16 + 11);
-
-        // Print Score
-        SuperPrint(scoreStr, 1,
-                   20 - int(scoreStr.size()) * 18 +
-                   CenterX - GFX.Container[1].w / 2 + 80 + 12 + 4 + 18 + 32 + GFX.Interface[3].w,
-                   ScreenTop + 16 + 31);
-
-        // Print lives on the screen
-        XRender::renderTexture(CenterX - GFX.Container[1].w / 2 + C - 122 - 16, ScreenTop + 16 + 10, GFX.Interface[3].w, GFX.Interface[3].h, GFX.Interface[3], 0, 0);
-        XRender::renderTexture(CenterX - GFX.Container[1].w / 2 + C - 122 + 10 + GFX.Interface[1].w, ScreenTop + 16 + 11, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
-        SuperPrint(livesStr, 1,
-                   float(CenterX - GFX.Container[1].w / 2 + C - 122 + 12 + 18 + GFX.Interface[5].w),
-                   ScreenTop + 16 + 11);
-
-        // Print stars on the screen
-        if(numStars > 0)
+        if(!BattleMode)
         {
-            XRender::renderTexture(CenterX - GFX.Container[1].w / 2 + C - 122, ScreenTop + 16 + 30, GFX.Interface[5].w, GFX.Interface[5].h, GFX.Interface[5], 0, 0);
-            XRender::renderTexture(CenterX - GFX.Container[1].w / 2 + C - 122 + 10 + GFX.Interface[1].w, ScreenTop + 16 + 31, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
-            SuperPrint(numStarsStr, 1,
-                       float(CenterX - GFX.Container[1].w / 2 + C - 122 + 12 + 18 + GFX.Interface[5].w),
+            // Indicate key
+            if(someone_has_key)
+                XRender::renderTexture(-24 + C + 20 + CenterX - GFX.Container[1].w / 2 + 96, ScreenTop + 16 + 10, GFX.Interface[0]);
+
+            // Print coins on the screen
+            auto& coin_icon = (Player[screen.players[0]].Character == 5) ? GFX.Interface[6] : GFX.Interface[2];
+            XRender::renderTexture(C + 20 + CenterX - GFX.Container[1].w / 2 + 96, ScreenTop + 16 + 10, coin_icon);
+
+            XRender::renderTexture(C + 20 + CenterX - GFX.Container[1].w / 2 + 96 + 8 + GFX.Interface[2].w, ScreenTop + 16 + 11, GFX.Interface[1]);
+
+            SuperPrint(coinsStr, 1,
+                       C + 20 - (int(coinsStr.size()) * 18) +
+                       (CenterX) - (GFX.Container[1].w / 2) + 80 + 4 + 12 + 18 + 32 + GFX.Interface[3].w,
+                       ScreenTop + 16 + 11);
+
+            // Print Score
+            SuperPrint(scoreStr, 1,
+                       C + 20 - (int(scoreStr.size()) * 18) +
+                       (CenterX) - (GFX.Container[1].w / 2) + 80 + 12 + 4 + 18 + 32 + GFX.Interface[3].w,
                        ScreenTop + 16 + 31);
+
+            // Print lives on the screen
+            XRender::renderTexture(-80 + CenterX - GFX.Container[1].w / 2 + C - 122 - 16, ScreenTop + 16 + 10, GFX.Interface[3].w, GFX.Interface[3].h, GFX.Interface[3], 0, 0);
+            XRender::renderTexture(-80 + CenterX - GFX.Container[1].w / 2 + C - 122 + 10 + GFX.Interface[1].w, ScreenTop + 16 + 11, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
+
+            SuperPrint(livesStr, 1,
+                       float(-80 + (CenterX) - (GFX.Container[1].w / 2) + C - 122 + 12 + 18 + GFX.Interface[5].w),
+                       ScreenTop + 16 + 11);
+
+            // Print stars on the screen
+            if(numStars > 0)
+            {
+                XRender::renderTexture(-80 + CenterX - GFX.Container[1].w / 2 + C - 122, ScreenTop + 16 + 30, GFX.Interface[5].w, GFX.Interface[5].h, GFX.Interface[5], 0, 0);
+                XRender::renderTexture(-80 + CenterX - GFX.Container[1].w / 2 + C - 122 + 10 + GFX.Interface[1].w, ScreenTop + 16 + 31, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
+                SuperPrint(numStarsStr, 1,
+                           float(-80 + (CenterX) - (GFX.Container[1].w / 2) + C - 122 + 12 + 18 + GFX.Interface[5].w),
+                           ScreenTop + 16 + 31);
+            }
+        }
+        else
+        {
+            // plr 1 lives
+            XRender::renderTexture(-80 + CenterX - GFX.Container[1].w / 2 + C - 122 - 16, ScreenTop + 16 + 10, GFX.Interface[3]);
+            XRender::renderTexture(-80 + CenterX - GFX.Container[1].w / 2 + C - 122 + 10 + GFX.Interface[1].w, ScreenTop + 16 + 11, GFX.Interface[1]);
+            SuperPrint(std::to_string(BattleLives[screen.players[0]]), 1,
+                       float(-80 + CenterX - GFX.Container[1].w / 2 + C - 122 + 12 + 18 + GFX.Interface[5].w),
+                       ScreenTop + 16 + 11);
+
+            // plr 2 lives
+            XRender::renderTexture(40 + 20 + CenterX - GFX.Container[1].w / 2 + 96 - 16, ScreenTop + 16 + 10, GFX.Interface[7]);
+            XRender::renderTexture(40 + 20 + CenterX - GFX.Container[1].w / 2 + 96 + 8 + GFX.Interface[2].w, ScreenTop + 16 + 11, GFX.Interface[1]);
+            SuperPrint(std::to_string(BattleLives[screen.players[1]]), 1,
+                       float(24 + CenterX - GFX.Container[1].w / 2 + 80 + 4 + 12 + 18 + 32 + GFX.Interface[3].w),
+                       ScreenTop + 16 + 11);
         }
     }
+    else // non-shared screen
+    {
+        int C = 0;
+
+        int plr_idx = vScreen[Z].player;
+        Player_t& plr = Player[plr_idx];
+
+// 2 players 2 screen OR single-player single-screen heldbonus
+
+        if(plr.Character == 3 || plr.Character == 4 || plr.Character == 5)
+        {
+            auto& heart_1_gfx = plr.Hearts > 0 ? GFX.Heart[1] : GFX.Heart[2];
+            auto& heart_2_gfx = plr.Hearts > 1 ? GFX.Heart[1] : GFX.Heart[2];
+            auto& heart_3_gfx = plr.Hearts > 2 ? GFX.Heart[1] : GFX.Heart[2];
+
+            XRender::renderTexture(CenterX - heart_1_gfx.w / 2 + C - 32, ScreenTop + 16, heart_1_gfx);
+            XRender::renderTexture(CenterX - heart_2_gfx.w / 2 + C     , ScreenTop + 16, heart_2_gfx);
+            XRender::renderTexture(CenterX - heart_3_gfx.w / 2 + C + 32, ScreenTop + 16, heart_3_gfx);
+        }
+        else
+        {
+            int use_container = plr.Character;
+
+            if(screen.player_count == 1 || use_container > 2)
+                use_container = 0;
+
+            XRender::renderTexture(CenterX - GFX.Container[1].w / 2, ScreenTop + 16, GFX.Container[use_container]);
+            if(plr.HeldBonus > 0)
+            {
+                XRender::renderTexture(CenterX - GFX.Container[1].w / 2 + 12,
+                                        ScreenTop + 16 + 12,
+                                        NPCWidth[plr.HeldBonus], NPCHeight[plr.HeldBonus],
+                                        GFXNPC[plr.HeldBonus], 0, 0);
+            }
+        }
+
+        if(plr.Character == 5 && plr.Bombs > 0)
+        {
+            XRender::renderTexture(20 + CenterX - GFX.Container[1].w / 2 - 34, ScreenTop + 52, GFX.Interface[8]);
+            XRender::renderTexture(20 + CenterX - GFX.Container[1].w / 2 - 10, ScreenTop + 53, GFX.Interface[1]);
+            SuperPrint(std::to_string(plr.Bombs), 1, 20 + CenterX - GFX.Container[1].w / 2 + 12, ScreenTop + 53);
+        }
+
+        if(!BattleMode)
+        {
+            // Indicate key
+            if(plr.HasKey)
+                XRender::renderTexture(-24 + 20 + CenterX - GFX.Container[1].w / 2 + 96, ScreenTop + 16 + 10, GFX.Interface[2].w, GFX.Interface[2].h, GFX.Interface[0], 0, 0);
+
+            // Print coins on the screen
+            auto& coin_icon = (plr.Character == 5) ? GFX.Interface[6] : GFX.Interface[2];
+            XRender::renderTexture(20 + CenterX - GFX.Container[1].w / 2 + 96, ScreenTop + 16 + 10, coin_icon);
+
+            XRender::renderTexture(20 + CenterX - GFX.Container[1].w / 2 + 96 + 8 + GFX.Interface[2].w, ScreenTop + 16 + 11, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
+            SuperPrint(coinsStr, 1,
+                       float(20 - int(coinsStr.size()) * 18 + CenterX - GFX.Container[1].w / 2 + 80 + 4 + 12 + 18 + 32 + GFX.Interface[3].w),
+                       ScreenTop + 16 + 11);
+
+            // Print Score
+            SuperPrint(scoreStr,
+                       1,
+                       float(20 - int(scoreStr.size()) * 18 + CenterX - GFX.Container[1].w / 2 + 80 + 12 + 4 + 18 + 32 + GFX.Interface[3].w),
+                       ScreenTop + 16 + 31);
+
+            // Print lives on the screen
+            XRender::renderTexture(CenterX - GFX.Container[1].w / 2 + C - 122 - 16, ScreenTop + 16 + 10, GFX.Interface[3].w, GFX.Interface[3].h, GFX.Interface[3], 0, 0);
+            XRender::renderTexture(CenterX - GFX.Container[1].w / 2 + C - 122 + 10 + GFX.Interface[1].w, ScreenTop + 16 + 11, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
+            SuperPrint(livesStr, 1,
+                       float(CenterX - GFX.Container[1].w / 2 + C - 122 + 12 + 18 + GFX.Interface[5].w),
+                       ScreenTop + 16 + 11);
+
+            // Print stars on the screen
+            if(numStars > 0)
+            {
+                XRender::renderTexture(CenterX - GFX.Container[1].w / 2 + C - 122, ScreenTop + 16 + 30, GFX.Interface[5].w, GFX.Interface[5].h, GFX.Interface[5], 0, 0);
+                XRender::renderTexture(CenterX - GFX.Container[1].w / 2 + C - 122 + 10 + GFX.Interface[1].w, ScreenTop + 16 + 31, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
+                SuperPrint(numStarsStr, 1,
+                           float(CenterX - GFX.Container[1].w / 2 + C - 122 + 12 + 18 + GFX.Interface[5].w),
+                           ScreenTop + 16 + 31);
+            }
+        }
+        else
+        {
+            // lives in battle mode
+            auto& oneup_twoup = (plr_idx == 1) ? GFX.Interface[3] : GFX.Interface[7];
+
+            XRender::renderTexture(CenterX - GFX.Container[1].w / 2 + C - 122,
+                                  ScreenTop + 16 + 10,
+                                  oneup_twoup);
+
+            XRender::renderTexture(CenterX - GFX.Container[1].w / 2 + C - 122 + 10 + GFX.Interface[1].w + 16,
+                ScreenTop + 16 + 11,
+                GFX.Interface[1]);
+
+            SuperPrint(std::to_string(BattleLives[plr_idx]), 1,
+                       float(CenterX - GFX.Container[1].w / 2 + C - 122 + 12 + 18 + GFX.Interface[5].w + 16),
+                       ScreenTop + 16 + 11);
+        }
+    }
+    // }
+    // old 1P HUD code was here
 
     if(!InHub() && !BattleMode)
     {
