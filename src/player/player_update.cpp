@@ -4504,7 +4504,9 @@ void UpdatePlayer()
                 // Check edge of screen
                 if(!LevelWrap[Player[A].Section] && LevelMacro == LEVELMACRO_OFF)
                 {
-                    if(ScreenType == 3)
+                    const Screen_t& screen = ScreenByPlayer(A);
+
+                    if(screen.Type == 3)
                     {
                         if(Player[A].Location.X < -vScreen[1].X)
                         {

@@ -970,7 +970,7 @@ void ProcEvent(eventindex_t index, int whichPlayer, bool NoEffect)
                     // legacy qScreen animation
                     else if(!equalCase(evt.Name, "Level - Start"))
                     {
-                        if(numPlayers == 2 && DScreenType != 5)
+                        if(numPlayers == 2 && Screens[0].DType != 5)
                         {
                             level[B] = tempLevel;
                             screenLoc = vScreen[onscreen_plr];

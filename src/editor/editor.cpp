@@ -299,8 +299,9 @@ void UpdateEditor()
         LevelMacroCounter = 0;
     }
 
-    if(!MagicHand && ScreenType != 0)
+    if(!MagicHand)
     {
+        // TODO: can be safely removed after merging multires, since this is also called elsewhere
         SetupScreens();
     }
 
@@ -3110,7 +3111,7 @@ void MouseMove(float X, float Y, bool /*nCur*/)
     int A = 1;
     if(SingleCoop > 0)
         A = SingleCoop;
-    else if(ScreenType == 5 && vScreen[2].Visible)
+    else if(l_screen->Type == 5 && vScreen[2].Visible)
     {
         if(X < float(vScreen[2].Left + vScreen[2].Width))
         {
