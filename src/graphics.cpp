@@ -193,6 +193,19 @@ void GetvScreenAverage2(vScreen_t& vscreen)
     vscreen.Y = (vscreen.Y / B) + (screen.H * 0.5) - vScreenYOffset;
 }
 
+// NEW: update a vScreen with the correct procedure based on its screen's Type and DType
+void GetvScreenAuto(vScreen_t& vscreen)
+{
+    const Screen_t& screen = Screens[vscreen.screen_ref];
+
+    if(screen.Type == 2 || screen.Type == 3 || (screen.Type == 5 && !screen.vScreen(2).Visible))
+        GetvScreenAverage(vscreen);
+    else if(screen.Type == 7)
+        GetvScreenCredits(vscreen);
+    else
+        GetvScreen(vscreen);
+}
+
 void SetupGraphics()
 {
     //DUMMY AND USELESS

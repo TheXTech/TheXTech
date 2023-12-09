@@ -53,6 +53,10 @@ void GetvScreenAverage(vScreen_t& vscreen);
 // Public Sub GetvScreenAverage2() ' Get the average screen position for all players with no level edge detection
 //  Get the average screen position for all players with no level edge detection
 void GetvScreenAverage2(vScreen_t& vscreen);
+
+// NEW: update a vScreen with the correct procedure based on its screen's Type and DType
+void GetvScreenAuto(vScreen_t& vscreen);
+
 // Public Sub SetupGraphics()
 //! DUMMY AND USELESS
 void SetupGraphics();
