@@ -33,7 +33,10 @@
 void SetScreenType(Screen_t& screen)
 {
     // TODO: move this logic elsewhere once multiple screens are supported
-    screen.player_count = SDL_min(numPlayers, maxLocalPlayers);
+    if(g_ClonedPlayerMode)
+        screen.player_count = 1;
+    else
+        screen.player_count = SDL_min(numPlayers, maxLocalPlayers);
 
     // moved this code from game_main.cpp, but it occured elsewhere also
     //   it was always called before setup screens, now it is a part of setup screens.

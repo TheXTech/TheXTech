@@ -40,6 +40,8 @@ void DrawInterface(int Z, int numScreens)
         ScreenTop = vScreen[Z].Height / 2 - 300;
     int CenterX = vScreen[Z].Width / 2;
 
+    const Screen_t& screen = Screens[vScreen[Z].screen_ref];
+
     int B = 0;
     int C = 0;
     int D = 0;
@@ -51,16 +53,19 @@ void DrawInterface(int Z, int numScreens)
 
     XRender::offsetViewportIgnore(true);
 
-    if(ScreenType == 5 || ScreenType == 6) // 2 Players
+    if(screen.player_count > 1) // 2 Players (was previously ScreenType == 5 || ScreenType == 6)
     {
-        if(static_cast<int>(numScreens) == 1 && ScreenType != 6) // Only 1 screen
+        if(static_cast<int>(numScreens) == 1 && screen.Type != 6) // Only 1 screen (shared screen)
         {
-            for(B = 1; B <= numPlayers; B++)
+            for(int i = 0; i < screen.player_count; i++)
             {
-                if(B == 1)
+                // offset for hearts / held bonus
+                if(i == 0)
                     C = -40;
                 else
                     C = 40;
+
+                B = screen.players[i];
 
                 if(Player[B].Character == 3 || Player[B].Character == 4 || Player[B].Character == 5)
                 {
@@ -99,11 +104,9 @@ void DrawInterface(int Z, int numScreens)
                                                 GFXNPC[Player[B].HeldBonus], 0, 0);
                     }
                 }
-            }
 
-            for(B = 1; B <= 2; B++)
-            {
-                C = (B == 1) ? -58 : 56;
+                // offset for bombs
+                C = (i == 0) ? -58 : 56;
 
                 if(Player[B].Character == 5 && Player[B].Bombs > 0)
                 {
@@ -167,14 +170,14 @@ void DrawInterface(int Z, int numScreens)
             }
             else
             {
-                // plr 1 score
+                // plr 1 lives
                 XRender::renderTexture(-80 + CenterX - GFX.Container[1].w / 2 + C - 122 - 16, ScreenTop + 16 + 10, GFX.Interface[3].w, GFX.Interface[3].h, GFX.Interface[3], 0, 0);
                 XRender::renderTexture(-80 + CenterX - GFX.Container[1].w / 2 + C - 122 + 10 + GFX.Interface[1].w, ScreenTop + 16 + 11, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
                 SuperPrint(std::to_string(BattleLives[1]), 1,
                            float(-80 + CenterX - GFX.Container[1].w / 2 + C - 122 + 12 + 18 + GFX.Interface[5].w),
                            ScreenTop + 16 + 11);
 
-                // plr 2 score
+                // plr 2 lives
                 XRender::renderTexture(40 + 20 + CenterX - GFX.Container[1].w / 2 + 96 - 16, ScreenTop + 16 + 10, GFX.Interface[3].w, GFX.Interface[3].h, GFX.Interface[7], 0, 0);
                 XRender::renderTexture(40 + 20 + CenterX - GFX.Container[1].w / 2 + 96 + 8 + GFX.Interface[2].w, ScreenTop + 16 + 11, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
                 SuperPrint(std::to_string(BattleLives[2]), 1,
