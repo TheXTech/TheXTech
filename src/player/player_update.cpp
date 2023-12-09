@@ -206,9 +206,17 @@ void UpdatePlayer()
         if(Player[A].TimeToLive > 0)
         {
             Player[A].TimeToLive += 1;
-            if(Player[A].TimeToLive >= 200 || ScreenType != 5)
+
+            const Screen_t& screen = ScreenByPlayer(A);
+            bool dynamic_screen = (screen.Type == ScreenTypes::Dynamic);
+            bool always_split = (screen.active_end() - screen.active_begin() > 1);
+            bool split_screen = dynamic_screen || always_split; // was previously ScreenType == 5 (dynamic_screen)
+
+            if(Player[A].TimeToLive >= 200 || !split_screen)
             {
                 B = CheckLiving();
+
+                // move dead player towards start point in BattleMode
                 if(BattleMode && BattleLives[1] > 0 && BattleLives[2] > 0 && BattleWinner == 0)
                 {
                     B = 20 + A;
@@ -223,18 +231,21 @@ void UpdatePlayer()
                         Player[A].Section = Player[B].Section;
                     }
                 }
+
                 if(B > 0) // Move camera to the other living players
                 {
-                    if(ScreenType == 5)
+                    if(split_screen)
                     {
                         A1 = (Player[B].Location.X + Player[B].Location.Width * 0.5) - (Player[A].Location.X + Player[A].Location.Width * 0.5);
                         B1 = Player[B].Location.Y - Player[A].Location.Y;
                     }
                     else
                     {
-                        A1 = (float)((-vScreen[1].X + vScreen[1].Width * 0.5) - (Player[A].Location.X + Player[A].Location.Width * 0.5));
-                        B1 = (float)((-vScreen[1].Y + vScreen[1].Height * 0.5) - Player[A].Location.Y);
+                        const vScreen_t& vscreen = screen.vScreen(screen.active_begin() + 1);
+                        A1 = (float)((-vscreen.X + vscreen.Width * 0.5) - (Player[A].Location.X + Player[A].Location.Width * 0.5));
+                        B1 = (float)((-vscreen.Y + vscreen.Height * 0.5) - Player[A].Location.Y);
                     }
+
                     C1 = std::sqrt((A1 * A1) + (B1 * B1));
                     if(C1 != 0.0f)
                     {
@@ -248,22 +259,18 @@ void UpdatePlayer()
                     }
                     Player[A].Location.X += X * 10;
                     Player[A].Location.Y += Y * 10;
-                    if(ScreenType == 5 && Player[1].Section != Player[2].Section)
+
+                    // update Player A section (was previously guarded in ScreenType == 5)
+                    // code previously used Player 1 and Player 2 but this doesn't differ from that logic in cheat-free SMBX64
+                    if(split_screen && Player[A].Section != Player[B].Section)
                     {
                         C1 = 0;
-                        if(A == 1)
-                        {
-                            Player[A].Location.X = Player[2].Location.X;
-                            Player[A].Location.Y = Player[2].Location.Y;
-                            CheckSection(A);
-                        }
-                        else
-                        {
-                            Player[A].Location.X = Player[1].Location.X;
-                            Player[A].Location.Y = Player[1].Location.Y;
-                            CheckSection(A);
-                        }
+
+                        Player[A].Location.X = Player[B].Location.X;
+                        Player[A].Location.Y = Player[B].Location.Y;
+                        CheckSection(A);
                     }
+
                     if(C1 < 10 && C1 > -10)
                         KillPlayer(A);
                 }
