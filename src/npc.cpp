@@ -4799,15 +4799,26 @@ void SpecialNPC(int A)
                     NPC[A].Special = 0;
             }
 
-            D = 1;
+            // C is the targeted player
 
-            if(numPlayers == 2)
+            if(g_compatibility.modern_npc_camera_logic)
+                D = vScreenIdxByPlayer_canonical(C);
+            else
             {
-                if(ScreenType == 5)
+                const Screen_t& plr_screen = ScreenByPlayer(C);
+
+                int vscreen_idx = 0;
+
+                if(plr_screen.player_count == 2)
                 {
-                    if(DScreenType != 5)
-                        D = 2;
+                    if(plr_screen.Type == 5)
+                    {
+                        if(plr_screen.DType != 5)
+                            vscreen_idx = 1;
+                    }
                 }
+
+                D = plr_screen.vScreen_refs[vscreen_idx];
             }
 
             if(NPC[A].Location.Y + NPC[A].Location.Height > Player[C].Location.Y - 248)
@@ -5358,15 +5369,26 @@ void SpecialNPC(int A)
                     NPC[A].Special6 = 0;
             }
 
-            D = 1;
+            // C is the targeted player
 
-            if(numPlayers == 2)
+            if(g_compatibility.modern_npc_camera_logic)
+                D = vScreenIdxByPlayer_canonical(C);
+            else
             {
-                if(ScreenType == 5)
+                const Screen_t& plr_screen = ScreenByPlayer(C);
+
+                int vscreen_idx = 0;
+
+                if(plr_screen.player_count == 2)
                 {
-                    if(DScreenType != 5)
-                        D = 2;
+                    if(plr_screen.Type == 5)
+                    {
+                        if(plr_screen.DType != 5)
+                            vscreen_idx = 1;
+                    }
                 }
+
+                D = plr_screen.vScreen_refs[vscreen_idx];
             }
 
             if(NPC[A].Location.Y + NPC[A].Location.Height > Player[C].Location.Y - 248)
