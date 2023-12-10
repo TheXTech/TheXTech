@@ -126,7 +126,7 @@ static void initPlayers(Player_t tempPlayer[maxLocalPlayers])
         tempPlayer[0].Location.Y = ScreenH / 2.0 - tempPlayer[0].Location.Height + 24;
         tempPlayer[0].Direction = 1;
     }
-    else
+    else if(numPlayers == 2)
     {
         tempPlayer[0].Location.X = ScreenW / 2.0 - tempPlayer[0].Location.Width / 2.0 - 30;
         tempPlayer[0].Location.Y = ScreenH / 2.0 - tempPlayer[0].Location.Height + 24;
@@ -136,9 +136,19 @@ static void initPlayers(Player_t tempPlayer[maxLocalPlayers])
         tempPlayer[1].Location.Y = ScreenH / 2.0 - tempPlayer[1].Location.Height + 24;
         tempPlayer[1].Direction = 1;
     }
+    else
+    {
+        int start_x = ScreenW / 2.0 - (numPlayers - 1) * 32;
+        for(int i = 0; i < numPlayers && i < maxLocalPlayers; i++)
+        {
+            tempPlayer[i].Location.X = start_x + 64 * i - tempPlayer[i].Location.Width / 2.0;
+            tempPlayer[i].Location.Y = ScreenH / 2.0 - tempPlayer[i].Location.Height + 24;
+            tempPlayer[i].Direction = 1;
+        }
+    }
 
-    PlayerFrame(tempPlayer[0]);
-    PlayerFrame(tempPlayer[1]);
+    for(int i = 0; i < numPlayers && i < maxLocalPlayers; i++)
+        PlayerFrame(tempPlayer[i]);
 }
 
 
