@@ -2873,10 +2873,6 @@ void UpdateGraphics(bool skipRepaint)
         if(!LevelEditor) // Graphics for the main game.
         {
 
-            // vScreen divider was here, moved to after vScreen section
-
-            // player names
-            /* Dropped */
 
             lunaRender(Z);
 
@@ -3055,7 +3051,7 @@ void UpdateGraphics(bool skipRepaint)
     }
 
     // splitscreen divider
-    if(screen.vScreen(2).Visible)
+    if(numScreens > 1 && !SingleCoop)
     {
         if(screen.DType == 3 || screen.DType == 4 || screen.DType == 6)
             XRender::renderRect(0, (screen.H / 2) - 2, screen.W, 4, 0, 0, 0);
