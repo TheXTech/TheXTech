@@ -7461,7 +7461,7 @@ void PlayerEffects(const int A)
             for(B = 1; B <= numPlayers; B++)
             {
                 // !Player[B].Dead condition was added to prevent confusing Drop/Add cases where player gets locked in immune state
-                if(B != A && Player[B].Effect != 6 && (!g_compatibility.allow_drop_add || !Player[B].Dead) && CheckCollision(p.Location, Player[B].Location))
+                if(B != A && Player[B].Effect != 6 && (!g_compatibility.allow_drop_add || (!Player[B].Dead && Player[B].Effect != 10)) && CheckCollision(p.Location, Player[B].Location))
                     tempBool = false;
             }
             if(tempBool)
