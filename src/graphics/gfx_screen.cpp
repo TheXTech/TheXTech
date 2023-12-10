@@ -496,13 +496,21 @@ void CenterScreens(Screen_t& screen)
             MinWidth = screen.W;
             MinHeight = screen.H;
 
-            // allow to grow up to half the size of the visible screen
-            MinWidth = SDL_min(MinWidth, static_cast<double>(screen.visible_screen().W / 2));
-            MinHeight = SDL_min(MinHeight, static_cast<double>(screen.visible_screen().H / 2));
+            // allow to grow up to half the size of the visible screen (in dynamic screen), otherwise full screen
+            if(screen.Type == ScreenTypes::Dynamic)
+            {
+                MinWidth = SDL_min(MinWidth, static_cast<double>(screen.visible_screen().W / 2));
+                MinHeight = SDL_min(MinHeight, static_cast<double>(screen.visible_screen().H / 2));
+            }
+            else
+            {
+                MinWidth = SDL_min(MinWidth, static_cast<double>(screen.visible_screen().W));
+                MinHeight = SDL_min(MinHeight, static_cast<double>(screen.visible_screen().H));
+            }
 
             // this ensures a gradual transition between canonical screen size / 2 and visible screen size / 2
-            // (no need to use it if in different sections)
-            if(screen.DType != DScreenTypes::DiffSections)
+            // (no need to use it if in different sections or in permanent splitscreen)
+            if(screen.Type == ScreenTypes::Dynamic && screen.DType != DScreenTypes::DiffSections)
             {
                 MinWidth = SDL_min(MinWidth, screen_X_distance);
                 MinHeight = SDL_min(MinHeight, screen_Y_distance);
