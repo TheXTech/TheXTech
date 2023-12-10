@@ -2207,7 +2207,7 @@ void UpdateGraphics(bool skipRepaint)
 
         if(!LevelEditor) // Graphics for the main game.
         {
-            if(vScreen[2].Visible)
+            if(numScreens > 1 && !SingleCoop)
             {
                 if(int(vScreen[Z].Width) == ScreenW)
                 {
