@@ -301,12 +301,6 @@ void UpdateEditor()
 
     if(!MagicHand)
     {
-        // TODO: can be safely removed after merging multires, since this is also called elsewhere
-        SetupScreens();
-    }
-
-    if(!MagicHand)
-    {
         if(EditorControls.PrevSection && !WorldEditor)
         {
             if(ScrollRelease)
