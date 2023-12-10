@@ -49,11 +49,18 @@ void SetScreenType(Screen_t& screen)
             screen.Type = ScreenTypes::LeftRight;
         else if(screen.multiplayer_pref == MultiplayerPrefs::Shared)
             screen.Type = ScreenTypes::SharedScreen;
+        else if(screen.multiplayer_pref == MultiplayerPrefs::TopBottom)
+            screen.Type = ScreenTypes::TopBottom;
         else
             screen.Type = ScreenTypes::Dynamic; // Dynamic screen
     }
     else
-        screen.Type = ScreenTypes::SharedScreen; // Average, no one leaves the screen
+    {
+        if(screen.multiplayer_pref == MultiplayerPrefs::Split)
+            screen.Type = ScreenTypes::Quad;
+        else
+            screen.Type = ScreenTypes::SharedScreen; // Average, no one leaves the screen
+    }
 
     // special cases
     if(g_ClonedPlayerMode)

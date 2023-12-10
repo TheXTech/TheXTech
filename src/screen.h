@@ -85,6 +85,7 @@ namespace ScreenTypes
         Dynamic = 5,
         SingleCoop = 6,
         Credits = 7,
+        Quad = 9,
     };
 }
 
@@ -109,9 +110,9 @@ namespace MultiplayerPrefs
     enum MultiplayerPrefs
     {
         Dynamic = 0,
-        Split = 1,
+        Split = 1,     // means LeftRight in 2P mode
         Shared = 2,
-        TopBottom = 3, // allow?
+        TopBottom = 3, // 2P mode only
     };
 }
 

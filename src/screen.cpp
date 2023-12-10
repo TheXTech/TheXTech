@@ -121,6 +121,10 @@ void InitScreens()
             Screens[s].vScreen(v + 1).player = Screens[s].players[v];
         }
     }
+
+    // set multiplayer prefs
+    for(int s = 0; s < c_screenCount; s++)
+        Screens[s].multiplayer_pref = MultiplayerPrefs::Dynamic;
 }
 
 // finds the visible Screen that contains a specific player
