@@ -3053,13 +3053,13 @@ void UpdateGraphics(bool skipRepaint)
     // splitscreen dividers
     if(numScreens > 1 && !SingleCoop)
     {
-        bool horiz_split = (screen.Type == ScreenTypes::LeftRight) || (screen.Type == ScreenTypes::Quad);
+        bool horiz_split = (screen.Type == ScreenTypes::TopBottom) || (screen.Type == ScreenTypes::Quad);
         horiz_split |= screen.Type == ScreenTypes::Dynamic && (screen.DType == 3 || screen.DType == 4 || screen.DType == 6);
 
         if(horiz_split)
             XRender::renderRect(0, (screen.H / 2) - 2, screen.W, 4, 0, 0, 0);
 
-        bool vert_split = (screen.Type == ScreenTypes::TopBottom) || (screen.Type == ScreenTypes::Quad);
+        bool vert_split = (screen.Type == ScreenTypes::LeftRight) || (screen.Type == ScreenTypes::Quad);
         vert_split |= screen.Type == ScreenTypes::Dynamic && (screen.DType == 1 || screen.DType == 2);
 
         if(vert_split)
