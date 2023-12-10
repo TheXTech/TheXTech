@@ -642,26 +642,7 @@ void GraphicsLazyPreLoad()
     // TODO: check if this is needed at caller
     SetupScreens(false);
 
-    int numScreens = 1;
-
-    if(ScreenType == 1)
-        numScreens = 2;
-
-    if(ScreenType == 4)
-        numScreens = 2;
-
-    if(ScreenType == 5)
-    {
-        DynamicScreen(Screens[0]);
-        if(vScreen[2].Visible)
-            numScreens = 2;
-        else
-            numScreens = 1;
-    }
-
-    if(ScreenType == 8)
-        numScreens = 1;
-
+    int numScreens = Screens[0].active_end();
 
     if(SingleCoop == 2)
         numScreens = 1; // fine to be 1, since it would just be run for Z = 2 twice otherwise;
@@ -1738,7 +1719,7 @@ void UpdateGraphics(bool skipRepaint)
 
     // even if not, black background is good, to be safe
     XRender::renderRect(0, 0, screen.W, screen.H, 0, 0, 0);
-    DrawBackdrop();
+    DrawBackdrop(screen);
 
     // No logic
     // Draw the screens!

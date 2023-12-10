@@ -223,7 +223,7 @@ void ScreenShot();
 void DrawFrozenNPC(int Z, int A);
 
 // NEW: draw the backdrop texture behind the vScreens
-void DrawBackdrop();
+void DrawBackdrop(const Screen_t& screen);
 // NEW: draws device battery status in top-right corner of screen
 void DrawDeviceBattery();
 

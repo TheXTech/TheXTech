@@ -229,9 +229,9 @@ extern Screen_t* l_screen;
 
 #ifndef SCREEN_H_NO_HELPERS
 //Public ScreenType As Integer 'The screen/view type
-extern int& ScreenType;
+// extern int& ScreenType;
 //Public DScreenType As Integer 'The dynamic screen setup
-extern int& DScreenType;
+// extern int& DScreenType;
 
 //Public ScreenType As Integer 'The screen/view type
 extern int& ScreenW;

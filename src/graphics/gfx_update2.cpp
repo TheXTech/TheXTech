@@ -260,7 +260,7 @@ void UpdateGraphics2(bool skipRepaint)
 #endif
 
     XRender::clearBuffer();
-    DrawBackdrop();
+    DrawBackdrop(Screens[0]);
 
 //    if(TakeScreen == true)
 //    {

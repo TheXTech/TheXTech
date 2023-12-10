@@ -704,34 +704,32 @@ Location_t WorldLevel_t::LocationGFX()
     return ret;
 }
 
-void DrawBackdrop()
+void DrawBackdrop(const Screen_t& screen)
 {
     if(GFX.Backdrop.inited)
     {
         bool border_valid = GFX.Backdrop_Border.tex.inited && (!GFX.isCustom(69) || GFX.isCustom(70));
 
-        for(int Z = 1; Z <= 2; Z++)
+        for(int i = screen.active_begin(); i < screen.active_end(); i++)
         {
-            const auto& s = vScreen[Z];
-            if((Z == 1 && SingleCoop == 2) || (Z == 2 && !s.Visible))
-                continue;
+            const auto& s = screen.vScreen(i + 1);
 
-            Location_t full = newLoc(0, 0, ScreenW, ScreenH);
+            Location_t full = newLoc(0, 0, screen.W, screen.H);
             // horizontal
-            if(ScreenType == 4 || (ScreenType == 5 && (DScreenType == 1 || DScreenType == 2)))
+            if(screen.Type == 4 || (screen.Type == 5 && (screen.DType == 1 || screen.DType == 2)))
             {
-                full.Width = ScreenW / 2;
+                full.Width = screen.W / 2;
                 // our screen on right
-                if(((ScreenType == 4 || (ScreenType == 5 && DScreenType == 1)) && Z == 2) || (DScreenType == 2 && Z == 1))
+                if(((screen.Type == 4 || (screen.Type == 5 && screen.DType == 1)) && i == 1) || (screen.DType == 2 && i == 0))
                     full.X = ScreenW / 2;
             }
             // vertical
-            else if(ScreenType == 1 || (ScreenType == 5 && (DScreenType == 3 || DScreenType == 4 || DScreenType == 6)))
+            else if(screen.Type == 1 || (screen.Type == 5 && (screen.DType == 3 || screen.DType == 4 || screen.DType == 6)))
             {
-                full.Height = ScreenH / 2;
+                full.Height = screen.H / 2;
                 // our screen on bottom
-                if(((ScreenType == 1 || (ScreenType == 5 && (DScreenType == 3 || DScreenType == 6))) && Z == 2) || (DScreenType == 4 && Z == 1))
-                    full.Y = ScreenH / 2;
+                if(((screen.Type == 1 || (screen.Type == 5 && (screen.DType == 3 || screen.DType == 6))) && i == 1) || (screen.DType == 4 && i == 0))
+                    full.Y = screen.H / 2;
             }
 
             RenderFrameBorder(full, newLoc(s.ScreenLeft, s.ScreenTop, s.Width, s.Height),
