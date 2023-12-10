@@ -1,1 +1,121 @@
-{}
+{
+    "editor": {
+        "layers": {
+            "promptLayerName": "레이어 이름",
+            "label": "레이어:",
+            "deletion": {
+                "header": "레이어 {0} 삭제 중",
+                "confirmDelete": "아니요: *모든 콘텐츠 삭제*",
+                "preserveLayerContents": "레이어 내용을 보존하겠습니까?",
+                "confirmPreserve": "예: 기본 레이어로 이동",
+                "cancel": "취소: 레이어를 삭제하지 않음"
+            },
+            "header": "레이어:",
+            "labelAttachedLayer": "첨부 레이어:",
+            "labelMoveLayer": "이동 레이어:",
+            "desc": {
+                "att": "NPC가 움직일 때마다 부착된 레이어도 따라 움직임"
+            },
+            "default": "기본값",
+            "itemNewLayer": "<새로운 레이어>",
+            "abbrevAttLayer": "공격: ",
+            "labelAttached": "첨부:"
+        },
+        "block": {
+            "invis": "보이지 않음",
+            "canBreak": "깨질 수 있음",
+            "letterHeight": "높이",
+            "letterWidth": "폭",
+            "canBreakTooltip": "구버전: 부딪히면 부서진다",
+            "pickContents": "블록 내용 선택",
+            "inside": "내부:"
+        },
+        "file": {
+            "labelFormat": "형식:",
+            "optionCancelAction": "취소: {0}하지 마세요",
+            "optionYesSaveThenAction": "예: 저장한 다음 {0}",
+            "optionActionWithoutSave": "저장하지 않고 {0}",
+            "sectionWorld": "세계",
+            "optionProceedWithConversion": "변환 진행",
+            "optionCancelConversion": "변환 취소",
+            "sectionLevel": "레벨",
+            "labelCurrentFile": "현재 파일: "
+        },
+        "warp": {
+            "speed": "속도 "
+        }
+    },
+    "menu": {
+        "game": {
+            "gameNoBattleLevels": "<전투 레벨 없음>",
+            "gameSourceSlot": "소스 슬롯 선택",
+            "gameEraseSave": "저장 지우기",
+            "gameTargetSlot": "이제 대상을 선택",
+            "gameSlotContinue": "슬롯 {0} ... {1}%",
+            "gameSlotNew": "슬롯 {0} ... 새로운 게임",
+            "phraseScore": "점수: {0}",
+            "gameNoEpisodesToPlay": "<재생할 에피소드 없음>",
+            "phraseTime": "시간: {0}",
+            "gameEraseSlot": "삭제할 슬롯 선택"
+        },
+        "wordHide": "숨김",
+        "options": {
+            "scale": {
+                "label": "스케일",
+                "linear": "이중선형",
+                "integer": "정수",
+                "nearest": "가장 가까운"
+            },
+            "restartEngine": "변경 사항을 적용하려면 엔진을 다시 시작하세요.",
+            "renderX": "렌더: {0} (X)",
+            "render": "렌더: {0}",
+            "optionsModeWindowed": "창 모드",
+            "optionsModeFullScreen": "전체화면 모드",
+            "optionsViewCredits": "크레딧 보기"
+        },
+        "wordWaiting": "대기 중",
+        "main": {
+            "mainEditor": "편집기",
+            "mainStartGame": "게임 시작",
+            "main1PlayerGame": "1 인용 게임",
+            "mainMultiplayerGame": "2 인용 게임",
+            "mainBattleGame": "전투 게임",
+            "mainOptions": "옵션",
+            "mainExit": "종료"
+        },
+        "controls": {
+            "editor": {
+                "scrollUp": "위로 스크롤",
+                "prevSection": "이전 섹션",
+                "scrollRight": "오른쪽으로 스크롤",
+                "scrollLeft": "왼쪽으로 스크롤",
+                "scrollDown": "스크롤 다운"
+            }
+        },
+        "wordLanguage": "언어",
+        "wordPlayer": "플레이어",
+        "wordBack": "뒤로가기",
+        "wordOn": "켬",
+        "wordProfile": "프로파일",
+        "loading": "불러오기 중...",
+        "wordShow": "보기",
+        "wordNo": "아니오",
+        "wordYes": "예",
+        "wordResume": "다시 시작",
+        "wordOff": "끔"
+    },
+    "outro": {
+        "originalBy": "원본 VB6 코드 게시자:",
+        "cppPortDevelopers": "C++ 포트 개발자:",
+        "nameAndrewSpinks": "앤드류 스핑크스",
+        "customSprites": "커스텀 스프라이트:",
+        "specialThanks": "특별히 감사한 분:",
+        "psVitaPortBy": "PS 비타 포트 게시자:",
+        "engineCredits": "엔진 크레딧:",
+        "levelDesign": "레벨 디자인:",
+        "nameVitalyNovichkov": "비탈리 노비치코프",
+        "gameCredits": "게임 크레딧:"
+    },
+    "pluralRules": "singular-only",
+    "languageName": "한국어"
+}
