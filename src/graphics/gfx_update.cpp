@@ -1405,11 +1405,6 @@ void UpdateGraphics(bool skipRepaint)
     // if(!screen.Visible)
     //     continue;
 
-    vScreen_t& vscreen1 = screen.vScreen(1);
-    vScreen_t& vscreen2 = screen.vScreen(2);
-    int screen_p1 = screen.players[0];
-    int screen_p2 = screen.players[1];
-
     int numScreens = screen.active_end();
 
     // update screen's canonical vScreens
@@ -1511,8 +1506,14 @@ void UpdateGraphics(bool skipRepaint)
                 UpdateSectionOverlaps(S, true);
             }
         }
+        // Legacy noturningback
         else if(!LevelEditor && NoTurnBack[Player[plr_Z].Section])
         {
+            vScreen_t& vscreen1 = screen.vScreen(1);
+            vScreen_t& vscreen2 = screen.vScreen(2);
+            int screen_p1 = screen.players[0];
+            int screen_p2 = screen.players[1];
+
             // goal: find screen currently on this section that is the furthest left
             A = vscreen_i + 1;
             if(numScreens > 1)
