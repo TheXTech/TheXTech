@@ -2040,23 +2040,116 @@ void UpdatePlayer()
                 // level wrap
                 if(LevelWrap[Player[A].Section] || LevelVWrap[Player[A].Section])
                 {
+                    const Screen_t& screen = ScreenByPlayer(A);
+                    vScreen_t& vscreen = vScreenByPlayer(A);
+                    Location_t& pLoc = Player[A].Location;
+                    const Location_t& section = level[Player[A].Section];
+
+                    // track whether screen wrapped in each of the four ways
+                    bool did_wrap_lr = false;
+                    bool did_wrap_rl = false;
+                    bool did_wrap_tb = false;
+                    bool did_wrap_bt = false;
+
                     // horizontally
                     if(LevelWrap[Player[A].Section])
                     {
-                        if(Player[A].Location.X + Player[A].Location.Width < level[Player[A].Section].X)
-                            Player[A].Location.X = level[Player[A].Section].Width - 1;
-                        else if(Player[A].Location.X > level[Player[A].Section].Width)
-                            Player[A].Location.X = level[Player[A].Section].X - Player[A].Location.Width + 1;
+                        if(pLoc.X + pLoc.Width < section.X)
+                        {
+                            pLoc.X = section.Width - 1;
+
+                            if(vscreen.Width < section.Width - section.X)
+                                did_wrap_lr = true;
+                        }
+                        else if(pLoc.X > section.Width)
+                        {
+                            pLoc.X = section.X - pLoc.Width + 1;
+
+                            if(vscreen.Width < section.Width - section.X)
+                                did_wrap_rl = true;
+                        }
+
                         hBoundsHandled = true;
                     }
 
                     // vertically
                     if(LevelVWrap[Player[A].Section])
                     {
-                        if(Player[A].Location.Y + Player[A].Location.Height < level[Player[A].Section].Y)
-                            Player[A].Location.Y = level[Player[A].Section].Height - 1;
-                        else if(Player[A].Location.Y > level[Player[A].Section].Height)
-                            Player[A].Location.Y = level[Player[A].Section].Y - Player[A].Location.Height + 1;
+                        if(pLoc.Y + pLoc.Height < section.Y)
+                        {
+                            pLoc.Y = section.Height - 1;
+
+                            if(vscreen.Height < section.Height - section.Y)
+                                did_wrap_tb = true;
+                        }
+                        else if(pLoc.Y > section.Height)
+                        {
+                            pLoc.Y = section.Y - pLoc.Height + 1;
+
+                            if(vscreen.Height < section.Height - section.Y)
+                                did_wrap_bt = true;
+                        }
+                    }
+
+                    // shared screen: teleport other players to other side of section
+                    if(screen.Type == ScreenTypes::SharedScreen && (did_wrap_lr || did_wrap_rl || did_wrap_tb || did_wrap_bt))
+                    {
+                        double target_Y = pLoc.Y + ((Player[A].Mount != 2) ? pLoc.Height : 0);
+
+                        for(int i = 0; i < screen.player_count; i++)
+                        {
+                            int o_A = screen.players[i];
+
+                            if(o_A == A)
+                                continue;
+
+                            Player_t& o_p = Player[o_A];
+
+                            if(o_p.Dead)
+                                continue;
+
+                            // center on player that wrapped
+                            o_p.Location.X = pLoc.X + pLoc.Width / 2 - o_p.Location.Width / 2;
+                            o_p.Location.Y = target_Y - ((o_p.Mount != 2) ? o_p.Location.Height : 0);
+
+                            // make sure fully in section
+                            if(did_wrap_lr)
+                            {
+                                o_p.Location.X = section.Width - 1;
+                                if(o_p.Location.SpeedX > 0)
+                                    o_p.Location.SpeedX = 0;
+                            }
+
+                            if(did_wrap_rl)
+                            {
+                                o_p.Location.X = section.X - o_p.Location.Width + 1;
+                                if(o_p.Location.SpeedX < 0)
+                                    o_p.Location.SpeedX = 0;
+                            }
+
+                            if(did_wrap_tb)
+                                o_p.Location.Y = section.Height - 1;
+
+                            if(did_wrap_bt)
+                                o_p.Location.Y = section.Y - o_p.Location.Height + 1;
+
+                            // following effects only needed for living players
+                            if(o_p.TimeToLive != 0)
+                                continue;
+
+                            // remove from any pet's mouth that doesn't belong to this screen
+                            bool onscreen_pet = InOnscreenPet(o_A, screen);
+
+                            // disable collisions and remove from any offscreen pets
+                            if(!onscreen_pet)
+                            {
+                                RemoveFromPet(o_A);
+                                o_p.Effect = 6;
+                                o_p.Effect2 = o_p.Location.Y;
+                            }
+                        }
+
+                        GetvScreenAuto(vscreen);
                     }
                 }
 
