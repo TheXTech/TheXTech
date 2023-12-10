@@ -2996,7 +2996,7 @@ void UpdateGraphics(bool skipRepaint)
             speedRun_renderControls(1, Z, SPEEDRUN_ALIGN_LEFT);
             speedRun_renderControls(2, Z, SPEEDRUN_ALIGN_RIGHT);
         }
-        else if(numScreens == 2)
+        else if(numScreens >= 2)
         {
             speedRun_renderControls(Z, Z, SPEEDRUN_ALIGN_AUTO);
         }
