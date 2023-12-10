@@ -403,19 +403,21 @@ void SetupPlayers()
                 Player[A].Hearts = 2;
         }
 
-        if(numPlayers > 2 && !GameMenu) // find correct positions without start locations
+        bool shared_screen = (ScreenByPlayer(A).Type == ScreenTypes::SharedScreen);
+        if((shared_screen || numPlayers > 2) && !GameMenu) // find correct positions without start locations
         {
-            /*if(nPlay.Online)
-            {
-                Player[A].Location = Player[1].Location;
-                Player[A].Location.X += A * 32 - 32;
-            }
-            else*/
             if(GameOutro)
             {
                 Player[A].Location = Player[1].Location;
                 Player[A].Location.X += A * 52 - 52;
             }
+            // >2P shared screen
+            else if(!g_ClonedPlayerMode) //(nPlay.Online)
+            {
+                Player[A].Location = Player[1].Location;
+                Player[A].Location.X += A * 32 - 32;
+            }
+            // many-player code
             else
             {
                 Player[A].Location = Player[1].Location;
@@ -449,6 +451,17 @@ void SetupPlayers()
     UpdateYoshiMusic();
     SetupScreens(); // setup the screen depending on how many players there are
     setupCheckpoints(); // setup the checkpoint and restpore the player at it if needed
+
+    // prepare vScreens for SharedScreen since UpdatePlayer happens before UpdateGraphics
+    for(int screen_i = 0; screen_i < c_screenCount; screen_i++)
+    {
+        Screen_t& screen = Screens[screen_i];
+        if(screen.Type == ScreenTypes::SharedScreen)
+        {
+            // CenterScreens(screen);
+            GetvScreenAuto(screen.vScreen(1));
+        }
+    }
 }
 
 void PlayerHurt(const int A)
