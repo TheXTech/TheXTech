@@ -163,16 +163,17 @@ void SetupScreens(Screen_t& screen, bool reset)
         vscreen1.Width = screen.W;
         vscreen2.Visible = false;
         break;
-#if 0 // Merged with the branch above because they both are same
-    case 8: // netplay
-        vscreen1.Left = 0;
-        vscreen1.Width = 800;
-        vscreen1.Top = 0;
-        vscreen1.Height = 600;
-        vscreen2.Visible = false;
+    case ScreenTypes::Quad: // quad
+        for(int i = 0; i < 4 && i < maxLocalPlayers; i++)
+        {
+            vScreen_t& vscreen_i = screen.vScreen(i + 1);
+
+            vscreen_i.Width = screen.W / 2;
+            vscreen_i.Height = screen.H / 2;
+            vscreen_i.Left = (i & 1) ? screen.W / 2 : 0;
+            vscreen_i.Top = (i & 2) ? screen.H / 2 : 0;
+        }
         break;
-#endif
-//    End If
     }
 }
 

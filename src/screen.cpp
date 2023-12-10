@@ -94,6 +94,9 @@ int Screen_t::active_end() const
     if(Type == ScreenTypes::Dynamic && vScreen(2).Visible)
         return 2;
 
+    if(Type == ScreenTypes::Quad)
+        return player_count <= maxLocalPlayers ? player_count : maxLocalPlayers;
+
     return 1;
 }
 
