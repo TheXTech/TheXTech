@@ -5,6 +5,7 @@ Changelog for 1.3.7-dev
 -Extended the number of game save slots to five (@Wohlstand).
 -Add tracking for medals collected in levels (@ds-sloth)
 -Save the number of medals / stars that exist in levels to speed up subsequent loads (@ds-sloth)
+-Fix thrower vertical position logic in split-screen, guarded by compat flag modern-npc-camera-logic (@ds-sloth)
 -Added "opensesame" world map cheat to unlock paths from level (@ds-sloth)
 -Added smooth path unlock animations at the world map (@ds-sloth)
 -Added full game and in-game editor support for world map sections that limit screen view (@ds-sloth)
@@ -16,6 +17,7 @@ Changelog for 1.3.7-dev
 Changelog for 1.3.6.3-dev
 -Fixed a TheXTech 1.3.6.1 crash where object lookup table could not process items with negative size (@ds-sloth)
 -On level load, replace negative item sizes with size zero (such items cannot be created by any editor)
+-Fix TheXTech 1.3.6.1 bug where item would drop above incorrect player in SharedCoop mode (@ds-sloth)
 
 Changelog for 1.3.6.2
 -Fixed a crash on attempt to add a game directory after storage permission grant on Android (@Wohlstand)

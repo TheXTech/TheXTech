@@ -525,7 +525,7 @@ int GameMain(const CmdLineSetup_t &setup)
             BattleMode = false;
             SingleCoop = 0;
             numPlayers = 0;
-            ScreenType = 0;
+            // ScreenType = 0; // set in SetupScreens()
             XEvents::doEvents();
             SetupEditorGraphics(); //Set up the editor graphics
             SetupScreens();

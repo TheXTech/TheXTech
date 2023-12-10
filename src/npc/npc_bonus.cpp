@@ -76,98 +76,95 @@ inline void RumbleForPowerup(int A)
 
 void DropBonus(int A)
 {
-    int B = 0;
-    //    if(nPlay.Online == true && nPlay.MySlot + 1 != A)
-    //        return;
-    if(A == 1 || numPlayers == 2 /*|| nPlay.Online == true*/)
+    // TODO: refactor, update to support new screen types
+    const Player_t& plr = Player[A];
+
+    // does player not have a bonus?
+    if(plr.HeldBonus <= 0)
+        return;
+
+    // is player a clone?
+    if(g_ClonedPlayerMode && A != 1)
     {
-        if(Player[A].Character == 3 || Player[A].Character == 4)
+        Player[A].HeldBonus = 0;
+        return;
+    }
+
+    // is player not meant to have a bonus?
+    if(Player[A].Character == 3 || Player[A].Character == 4)
+    {
+        Player[A].HeldBonus = 0;
+        return;
+    }
+
+    // drop the bonus!
+    PlaySound(SFX_DropItem);
+    numNPCs++;
+    NPC[numNPCs] = NPC_t();
+    NPC[numNPCs].Type = Player[A].HeldBonus;
+    NPC[numNPCs].Location.Width = NPCWidth[Player[A].HeldBonus];
+    NPC[numNPCs].Location.Height = 32;
+
+    // need to find a position to place the bonus -- look for ths HUD
+    const Screen_t& screen = ScreenByPlayer(A);
+    bool is_shared = (screen.player_count > 1) && (screen.Type != 6) && (screen.active_end() == screen.active_begin() + 1);
+
+    // HUD offset for player
+    int hud_offset = 0;
+
+    if(is_shared && screen.player_count > 2)
+    {
+        int hud_width = 84 * screen.player_count;
+        for(int i = 0; i < screen.player_count; i++)
         {
-            Player[A].HeldBonus = 0;
-            return;
-        }
-
-        if(Player[A].HeldBonus > 0)
-        {
-            PlaySound(SFX_DropItem);
-            numNPCs++;
-            NPC[numNPCs] = NPC_t();
-            NPC[numNPCs].Type = Player[A].HeldBonus;
-            NPC[numNPCs].Location.Width = NPCWidth[Player[A].HeldBonus];
-            NPC[numNPCs].Location.Height = 32;
-
-            const Screen_t& screen = ScreenByPlayer(A);
-
-            // update canonical screen if relevant
-            if(!screen.is_canonical())
+            if(A == screen.players[i])
             {
-                const Screen_t& c_screen = screen.canonical_screen();
-
-                if(c_screen.Type == 5 && !c_screen.vScreen(2).Visible)
-                    GetvScreenAverage(c_screen.vScreen(1));
-                else
-                    GetvScreen(vScreenByPlayer_canonical(A));
+                // find center for player item box; this is the center of the i'th portion of the HUD (out of plr_count portions)
+                hud_offset = (hud_width * (i * 2 + 1)) / (screen.player_count * 2) - hud_width / 2;
+                break;
             }
-
-            if(screen.Type == 5 && !screen.vScreen(2).Visible /*&& nPlay.Online == false*/)
-            {
-                vScreen_t& vscreen = screen.vScreen(1);
-
-                if(A == 1)
-                    B = -40;
-                if(A == 2)
-                    B = 40;
-
-                GetvScreenAverage(vscreen);
-
-                double ScreenTop = -vscreen.Y;
-
-                if(vscreen.Height > 600)
-                    ScreenTop += vscreen.Height / 2 - 300;
-
-                double CenterX = -vscreen.X + vscreen.Width / 2;
-
-                NPC[numNPCs].Location.X = CenterX - NPC[numNPCs].Location.Width / 2.0 + B;
-                NPC[numNPCs].Location.Y = ScreenTop + 16 + 12;
-            }
-                //            else if(nPlay.Online == true)
-                //            {
-                //                GetvScreen 1;
-                //                NPC[numNPCs].Location.X = -vScreen[1].X + vScreen[1].Width / 2.0 - NPC[numNPCs].Location.Width / 2.0;
-                //                NPC[numNPCs].Location.Y = -vScreen[1].Y + 16 + 12;
-                //            }
-            else
-            {
-                vScreen_t& vscreen = vScreenByPlayer(A);
-
-                GetvScreen(vscreen);
-
-                double ScreenTop = -vscreen.Y;
-
-                if(vscreen.Height > 600)
-                    ScreenTop += vscreen.Height / 2 - 300;
-
-                double CenterX = -vscreen.X + vscreen.Width / 2;
-
-                NPC[numNPCs].Location.X = CenterX - NPC[numNPCs].Location.Width / 2.0;
-                NPC[numNPCs].Location.Y = ScreenTop + 16 + 12;
-            }
-
-            NPC[numNPCs].Location.SpeedX = 0;
-            NPC[numNPCs].Location.SpeedY = 0;
-            NPC[numNPCs].Effect = 2;
-            NPC[numNPCs].Effect2 = 1;
-            NPC[numNPCs].Active = true;
-            NPC[numNPCs].TimeLeft = 200;
-            syncLayers_NPC(numNPCs);
-            CheckSectionNPC(numNPCs);
-            Player[A].HeldBonus = 0;
-            //            if(nPlay.Online == true)
-            //                Netplay::sendData "M" + NPC[numNPCs].Type + "|" + NPC[numNPCs].Location.X + "|" + NPC[numNPCs].Location.Y + LB;
         }
     }
-    else
-        Player[A].HeldBonus = 0;
+    else if(is_shared)
+    {
+        if(A == screen.players[0])
+            hud_offset = -40;
+        if(A == screen.players[1])
+            hud_offset = 40;
+    }
+
+    // update the vScreen for the player
+    vScreen_t& vscreen = vScreenByPlayer(A);
+    GetvScreenAuto(vscreen);
+
+    // also update canonical vScreen if needed
+    if(!screen.is_canonical())
+        GetvScreenAuto(vScreenByPlayer_canonical(A));
+
+    // find the HUD
+    double ScreenTop = -vscreen.Y;
+
+    if(vscreen.Height > 600)
+        ScreenTop += vscreen.Height / 2 - 300;
+
+    double CenterX = -vscreen.X + vscreen.Width / 2;
+
+    // place NPC at HUD
+    NPC[numNPCs].Location.X = CenterX + hud_offset - NPC[numNPCs].Location.Width / 2.0;
+    NPC[numNPCs].Location.Y = ScreenTop + 16 + 12;
+
+    // finish initializing the NPC
+    NPC[numNPCs].Location.SpeedX = 0;
+    NPC[numNPCs].Location.SpeedY = 0;
+    NPC[numNPCs].Effect = 2;
+    NPC[numNPCs].Effect2 = 1;
+    NPC[numNPCs].Active = true;
+    NPC[numNPCs].TimeLeft = 200;
+    syncLayers_NPC(numNPCs);
+    CheckSectionNPC(numNPCs);
+
+    // erase bonus
+    Player[A].HeldBonus = 0;
 }
 
 void CheckAfterStarTake(bool many)

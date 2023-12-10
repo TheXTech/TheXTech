@@ -52,8 +52,8 @@ void Deactivate(int A);
 // for bomb explosions
 void Bomb(Location_t Location, int Game, int ImmunePlayer = 0);
 // Public Sub DropNPC(A As Integer, NPCType As Integer)  'Drops an NPC from the screen
-// Drops an NPC from the screen
-void DropNPC(int A, int NPCType);
+// Drops an NPC from the screen (dead code, removed)
+// void DropNPC(int A, int NPCType);
 // Public Sub TurnNPCsIntoCoins() 'turns some NPCs into coins when the player reaches the level exit
 // turns some NPCs into coins when the player reaches the level exit
 void TurnNPCsIntoCoins();

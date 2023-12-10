@@ -106,7 +106,7 @@ static void GetControllerColor(int player, float& r, float& g, float& b, bool* d
     if(player < 1 || player > maxLocalPlayers)
         return;
 
-    if(ScreenType == 5)  // TODO: VERIFY THIS
+    if(numPlayers > 1 && !g_ClonedPlayerMode)
     {
         auto &p = Player[player];
 

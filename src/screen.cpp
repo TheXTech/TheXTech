@@ -150,7 +150,7 @@ int vScreenIdxByPlayer(int player)
 
     Screen_t& screen = ScreenByPlayer(player);
 
-    bool is_splitscreen = (screen.Type == 1 || screen.Type == 4 || (screen.Type == 5 && screen.vScreen(2).Visible));
+    bool is_splitscreen = (screen.Type == 1 || screen.Type == 4 || (screen.Type == 5 && screen.vScreen(2).Visible) || screen.Type == 6);
 
     if(is_splitscreen && player == screen.players[1])
         return screen.vScreen_refs[1];
@@ -166,7 +166,7 @@ int vScreenIdxByPlayer_canonical(int player)
 
     Screen_t& screen = ScreenByPlayer_canonical(player);
 
-    bool is_splitscreen = (screen.Type == 1 || screen.Type == 4 || (screen.Type == 5 && screen.vScreen(2).Visible));
+    bool is_splitscreen = (screen.Type == 1 || screen.Type == 4 || (screen.Type == 5 && screen.vScreen(2).Visible) || screen.Type == 6);
 
     if(is_splitscreen && player == screen.players[1])
         return screen.vScreen_refs[1];

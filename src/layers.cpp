@@ -1068,7 +1068,7 @@ void ProcEvent(eventindex_t index, int whichPlayer, bool NoEffect)
                             int p1 = screen.players[0];
                             int p2 = screen.players[1];
 
-                            if(numPlayers == 2 && screen.DType != 5)
+                            if(screen.player_count == 2 && screen.DType != 5)
                             {
                                 level[B] = tempLevel;
 

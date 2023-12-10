@@ -928,8 +928,9 @@ static void superbDemo32()
     if(B > 0)
     {
         numPlayers = 32;
-        SetupScreens();
         g_ClonedPlayerMode = true;
+
+        SetupScreens();
 
         if(Player[B].Effect == 9)
             Player[B].Effect = 0;
@@ -955,8 +956,9 @@ static void superbDemo16()
     if(B > 0)
     {
         numPlayers = 16;
-        SetupScreens();
         g_ClonedPlayerMode = true;
+
+        SetupScreens();
 
         if(Player[B].Effect == 9)
             Player[B].Effect = 0;
@@ -982,8 +984,9 @@ static void superbDemo8()
     if(B > 0)
     {
         numPlayers = 8;
-        SetupScreens();
         g_ClonedPlayerMode = true;
+
+        SetupScreens();
 
         if(Player[B].Effect == 9)
             Player[B].Effect = 0;
@@ -1009,8 +1012,9 @@ static void superbDemo4()
     if(B > 0)
     {
         numPlayers = 4;
-        SetupScreens();
         g_ClonedPlayerMode = true;
+
+        SetupScreens();
 
         if(Player[B].Effect == 9)
             Player[B].Effect = 0;
