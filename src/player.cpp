@@ -3700,38 +3700,30 @@ void StealBonus()
 //    Location_t tempLocation;
 
     // dead players steal life
-    if(BattleMode)
+    if(BattleMode || GameMenu || GameOutro || g_ClonedPlayerMode)
         return;
 
-    if(numPlayers == 2 /*&& nPlay.Online == false*/)
-    {
-        if((Player[1].Dead || Player[1].TimeToLive > 0) && (Player[2].Dead || Player[2].TimeToLive > 0))
-            return;
-        for(A = 1; A <= numPlayers; A++)
-        {
-            if(Player[A].Dead)
-            {
-                // find other player
-                if(A == 1)
-                    B = 2;
-                else
-                    B = 1;
+    // NOTE: legacy code here accepted TimeToLive <= 0, CheckLiving() requires TimeToLive == 0. TimeToLive should never be negative.
+    int alive = CheckLiving();
+    if(!alive)
+        return;
 
-                if(Lives > 0 && LevelMacro == LEVELMACRO_OFF)
+    for(A = 1; A <= numPlayers; A++)
+    {
+        if(Player[A].Dead)
+        {
+            // find other player
+            B = alive;
+
+            if(Lives > 0 && LevelMacro == LEVELMACRO_OFF)
+            {
+                if(Player[A].Controls.Jump || Player[A].Controls.Run)
                 {
-                    if(Player[A].Controls.Jump || Player[A].Controls.Run)
-                    {
-                        Lives -= 1;
-                        Player[A].State = 1;
-                        Player[A].Hearts = 1;
-                        // old, dead HeldBonus code
-                        // if(B == 1)
-                        //     C = -40;
-                        // if(B == 2)
-                        //     C = 40;
-                        RespawnPlayerTo(A, B);
-                        PlaySound(SFX_DropItem);
-                    }
+                    Lives -= 1;
+                    Player[A].State = 1;
+                    Player[A].Hearts = 1;
+                    RespawnPlayerTo(A, B);
+                    PlaySound(SFX_DropItem);
                 }
             }
         }
