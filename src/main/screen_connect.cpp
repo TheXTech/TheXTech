@@ -522,7 +522,7 @@ bool Player_Select(int p)
                 s_playerState[p] = PlayerState::StartGame;
                 s_menuItem[p] = -4;
             }
-            if(CheckDone())
+            if(CheckDone() && (s_minPlayers == 1 || numPlayers == maxLocalPlayers))
                 return true;
         }
         else
@@ -1352,34 +1352,18 @@ int Mouse_Render(bool mouse, bool render)
     int p_width = (ScreenW-20)/n;
     const int min_width = 200;
     const int max_width = 320;
-    bool scroll_mode = false;
 
-    if(p_width < min_width)
-    {
-        p_width = min_width;
-        scroll_mode = true;
-    }
-    else if(p_width > max_width)
-    {
+    if(p_width > max_width)
         p_width = max_width;
-    }
 
     // horizontal start and width of the menu
     int sX;
     int sW;
-    // if scroll mode, must adjust screen start to first unfinished player
-    if(scroll_mode)
-    {
-        sX = -p_width*menuPlayer + 10;
-        sW = ScreenW - 20;
-    }
-    // otherwise, center players on screen
-    else
-    {
-        sX = ScreenW/2 - (p_width*n)/2;
-        sX -= sX & 1;
-        sW = p_width*n;
-    }
+
+    // center players on screen
+    sX = ScreenW/2 - (p_width*n)/2;
+    sX -= sX & 1;
+    sW = p_width*n;
 
     /*------------------------------------*\
     || Special modifications for P1 start ||
