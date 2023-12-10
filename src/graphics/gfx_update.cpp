@@ -3050,12 +3050,19 @@ void UpdateGraphics(bool skipRepaint)
         speedRun_renderControls(2, -1);
     }
 
-    // splitscreen divider
+    // splitscreen dividers
     if(numScreens > 1 && !SingleCoop)
     {
-        if(screen.DType == 3 || screen.DType == 4 || screen.DType == 6)
+        bool horiz_split = (screen.Type == ScreenTypes::LeftRight) || (screen.Type == ScreenTypes::Quad);
+        horiz_split |= screen.Type == ScreenTypes::Dynamic && (screen.DType == 3 || screen.DType == 4 || screen.DType == 6);
+
+        if(horiz_split)
             XRender::renderRect(0, (screen.H / 2) - 2, screen.W, 4, 0, 0, 0);
-        else
+
+        bool vert_split = (screen.Type == ScreenTypes::TopBottom) || (screen.Type == ScreenTypes::Quad);
+        vert_split |= screen.Type == ScreenTypes::Dynamic && (screen.DType == 1 || screen.DType == 2);
+
+        if(vert_split)
             XRender::renderRect((screen.W / 2) - 2, 0, 4, screen.H, 0, 0, 0);
     }
 
