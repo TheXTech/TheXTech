@@ -326,14 +326,16 @@ void Renderer::DrawOp(RenderOp &op)
 
 bool Render::IsOnScreen(double x, double y, double w, double h)
 {
-    double cam_x;
-    double cam_y;
-    CalcCameraPos(&cam_x, &cam_y);
+    int cam_x = vScreen[1].X;
+    int cam_y = vScreen[1].Y;
+    int cam_w = vScreen[1].Width;
+    int cam_h = vScreen[1].Height;
 
-    return FastTestCollision((int)cam_x, (int)cam_y, (int)cam_x + ScreenW, (int)cam_y + ScreenH,
+    return FastTestCollision((int)cam_x, (int)cam_y, (int)cam_x + (int)cam_w, (int)cam_y + (int)cam_h,
                              (int)x, (int)y, (int)x + (int)w, (int)y + (int)h);
 }
 
+#if 0
 void Render::CalcCameraPos(double *ret_x, double *ret_y)
 {
     // Old camera func, using "camera" memory
@@ -351,6 +353,7 @@ void Render::CalcCameraPos(double *ret_x, double *ret_y)
         *ret_y = val - val - val; // Fix backwards smbx camera
     }
 }
+#endif
 
 void Render::TranslateScreenCoords(double &x, double &y, double w, double h)
 {
