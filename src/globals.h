@@ -1194,7 +1194,7 @@ extern std::vector<LevelWarpSaveEntry_t> LevelWarpSaveEntries;
 //Public MagicHand As Boolean 'true if playing a level in the editor while not in fullscreen mode
 extern bool MagicHand;
 //Public testPlayer(1 To 2) As Player 'test level player settings
-extern RangeArr<Player_t, 1, 2> testPlayer;
+extern RangeArr<Player_t, 1, maxLocalPlayers> testPlayer;
 //Public ClearBuffer As Boolean 'true to black the backbuffer
 extern bool ClearBuffer;
 //Public numLocked As Integer

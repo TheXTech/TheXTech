@@ -1458,7 +1458,7 @@ bool InputMethodType_Keyboard::OptionChange(size_t i)
     {
         this->m_maxKeyboards ++;
 
-        if(this->m_maxKeyboards > 2)
+        if(this->m_maxKeyboards > maxLocalPlayers)
             this->m_maxKeyboards = 0;
 
         return true;
@@ -1499,7 +1499,7 @@ bool InputMethodType_Keyboard::OptionRotateRight(size_t i)
 {
     if(i == 0)
     {
-        if(this->m_maxKeyboards < 2)
+        if(this->m_maxKeyboards < maxLocalPlayers)
         {
             this->m_maxKeyboards ++;
             return true;
@@ -1523,7 +1523,7 @@ void InputMethodType_Keyboard::SaveConfig_Custom(IniProcessing* ctl)
 
 void InputMethodType_Keyboard::LoadConfig_Custom(IniProcessing* ctl)
 {
-    ctl->read("max-keyboards", this->m_maxKeyboards, 2);
+    ctl->read("max-keyboards", this->m_maxKeyboards, maxLocalPlayers);
     ctl->read("direct-text-entry", this->m_directText, true);
 }
 

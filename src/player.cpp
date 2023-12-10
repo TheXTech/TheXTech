@@ -404,19 +404,21 @@ void SetupPlayers()
                 Player[A].Hearts = 2;
         }
 
-        if(numPlayers > 2 && !GameMenu) // find correct positions without start locations
+        bool shared_screen = (ScreenByPlayer(A).Type == ScreenTypes::SharedScreen);
+        if((shared_screen || numPlayers > 2) && !GameMenu) // find correct positions without start locations
         {
-            /*if(nPlay.Online)
-            {
-                Player[A].Location = Player[1].Location;
-                Player[A].Location.X += A * 32 - 32;
-            }
-            else*/
             if(GameOutro)
             {
                 Player[A].Location = Player[1].Location;
                 Player[A].Location.X += A * 52 - 52;
             }
+            // >2P shared screen
+            else if(!g_ClonedPlayerMode) //(nPlay.Online)
+            {
+                Player[A].Location = Player[1].Location;
+                Player[A].Location.X += A * 32 - 32;
+            }
+            // many-player code
             else
             {
                 Player[A].Location = Player[1].Location;
@@ -451,6 +453,17 @@ void SetupPlayers()
     if(!LevelSelect)
         SetupScreens(); // setup the screen depending on how many players there are
     setupCheckpoints(); // setup the checkpoint and restpore the player at it if needed
+
+    // prepare vScreens for SharedScreen since UpdatePlayer happens before UpdateGraphics
+    for(int screen_i = 0; screen_i < c_screenCount; screen_i++)
+    {
+        Screen_t& screen = Screens[screen_i];
+        if(screen.Type == ScreenTypes::SharedScreen)
+        {
+            // CenterScreens(screen);
+            GetvScreenAuto(screen.vScreen(1));
+        }
+    }
 }
 
 void PlayerHurt(const int A)
@@ -3702,38 +3715,30 @@ void StealBonus()
 //    Location_t tempLocation;
 
     // dead players steal life
-    if(BattleMode)
+    if(BattleMode || GameMenu || GameOutro || g_ClonedPlayerMode)
         return;
 
-    if(numPlayers == 2 /*&& nPlay.Online == false*/)
-    {
-        if((Player[1].Dead || Player[1].TimeToLive > 0) && (Player[2].Dead || Player[2].TimeToLive > 0))
-            return;
-        for(A = 1; A <= numPlayers; A++)
-        {
-            if(Player[A].Dead)
-            {
-                // find other player
-                if(A == 1)
-                    B = 2;
-                else
-                    B = 1;
+    // NOTE: legacy code here accepted TimeToLive <= 0, CheckLiving() requires TimeToLive == 0. TimeToLive should never be negative.
+    int alive = CheckLiving();
+    if(!alive)
+        return;
 
-                if(Lives > 0 && LevelMacro == LEVELMACRO_OFF)
+    for(A = 1; A <= numPlayers; A++)
+    {
+        if(Player[A].Dead)
+        {
+            // find other player
+            B = alive;
+
+            if(Lives > 0 && LevelMacro == LEVELMACRO_OFF)
+            {
+                if(Player[A].Controls.Jump || Player[A].Controls.Run)
                 {
-                    if(Player[A].Controls.Jump || Player[A].Controls.Run)
-                    {
-                        Lives -= 1;
-                        Player[A].State = 1;
-                        Player[A].Hearts = 1;
-                        // old, dead HeldBonus code
-                        // if(B == 1)
-                        //     C = -40;
-                        // if(B == 2)
-                        //     C = 40;
-                        RespawnPlayerTo(A, B);
-                        PlaySound(SFX_DropItem);
-                    }
+                    Lives -= 1;
+                    Player[A].State = 1;
+                    Player[A].Hearts = 1;
+                    RespawnPlayerTo(A, B);
+                    PlaySound(SFX_DropItem);
                 }
             }
         }
@@ -4894,7 +4899,7 @@ void PlayerCollide(const int A)
                     HitSpot = 0;
                 if(HitSpot == 2 || HitSpot == 4)
                 {
-                    if(numPlayers < 3 /*|| nPlay.Online*/)
+                    if(!g_ClonedPlayerMode)
                         PlaySound(SFX_Skid);
                     tempLocation = p1.Location;
                     p1.Location.SpeedX = p2.Location.SpeedX;
@@ -4904,7 +4909,7 @@ void PlayerCollide(const int A)
                 }
                 else if(HitSpot == 1)
                 {
-                    if(numPlayers < 3 /*|| nPlay.Online*/)
+                    if(!g_ClonedPlayerMode)
                         PlaySound(SFX_Stomp);
                     p1.Location.Y = p2.Location.Y - p1.Location.Height - 0.1;
                     PlayerPush(A, 3);
@@ -4922,7 +4927,7 @@ void PlayerCollide(const int A)
                 }
                 else if(HitSpot == 3)
                 {
-                    if(numPlayers < 3/* || nPlay.Online*/)
+                    if(!g_ClonedPlayerMode)
                         PlaySound(SFX_Stomp);
                     p2.Location.Y = p1.Location.Y - p2.Location.Height - 0.1;
                     PlayerPush(B, 3);
@@ -7458,7 +7463,7 @@ void PlayerEffects(const int A)
             for(B = 1; B <= numPlayers; B++)
             {
                 // !Player[B].Dead condition was added to prevent confusing Drop/Add cases where player gets locked in immune state
-                if(B != A && Player[B].Effect != 6 && (!g_compatibility.allow_drop_add || !Player[B].Dead) && CheckCollision(p.Location, Player[B].Location))
+                if(B != A && Player[B].Effect != 6 && (!g_compatibility.allow_drop_add || (!Player[B].Dead && Player[B].Effect != 10)) && CheckCollision(p.Location, Player[B].Location))
                     tempBool = false;
             }
             if(tempBool)

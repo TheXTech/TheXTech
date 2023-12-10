@@ -56,7 +56,7 @@ std::string Checkpoint;
 std::vector<Checkpoint_t> CheckpointsList;
 std::vector<LevelWarpSaveEntry_t> LevelWarpSaveEntries;
 bool MagicHand = false;
-RangeArr<Player_t, 1, 2> testPlayer;
+RangeArr<Player_t, 1, maxLocalPlayers> testPlayer;
 bool ClearBuffer = false;
 int numLocked = 0;
 bool resChanged = false;
