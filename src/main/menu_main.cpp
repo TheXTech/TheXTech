@@ -1801,7 +1801,7 @@ static void s_drawGameVersion()
     constexpr bool show_commit = (!is_release || (!is_main && !is_stable));
 
     // show version
-    SuperPrintRightAlign(V_LATEST_STABLE, 5, ScreenW - 2, 2);
+    SuperPrintRightAlign("v" V_LATEST_STABLE, 5, ScreenW - 2, 2);
 
     // show branch
     if(show_branch)
