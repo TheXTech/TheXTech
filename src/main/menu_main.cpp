@@ -36,6 +36,7 @@
 
 #include "menu_main.h"
 #include "game_info.h"
+#include "../version.h"
 #include "../gfx.h"
 #include "screen_connect.h"
 #include "menu_controls.h"
@@ -1893,6 +1894,69 @@ bool mainMenuUpdate()
     return false;
 }
 
+static constexpr int find_in_string(const char* haystack, const char* haystack_start, char needle)
+{
+    return (*haystack == '\0') ? -1 :
+        ((*haystack == needle) ? haystack - haystack_start : find_in_string(haystack + 1, haystack_start, needle));
+}
+
+static constexpr bool in_string(const char* haystack, char needle)
+{
+    return find_in_string(haystack, haystack, needle) != -1;
+}
+
+static constexpr bool str_prefix(const char* string, const char* prefix)
+{
+    return (*prefix == '\0' || (*string == *prefix && str_prefix(string + 1, prefix + 1)));
+}
+
+static constexpr int find_in_string(const char* haystack, char needle)
+{
+    return find_in_string(haystack, haystack, needle);
+}
+
+static void s_drawGameVersion()
+{
+    constexpr bool is_release = !in_string(V_LATEST_STABLE, '-');
+    constexpr bool is_main = str_prefix(V_BUILD_BRANCH, "main");
+    constexpr bool is_stable = str_prefix(V_BUILD_BRANCH, "stable");
+    constexpr bool is_wip = str_prefix(V_BUILD_BRANCH, "wip-");
+
+    constexpr bool is_dirty = in_string(V_BUILD_VER, '-');
+
+    constexpr bool show_branch = (!is_main && (is_release || !is_stable));
+    constexpr bool show_commit = (!is_release || (!is_main && !is_stable));
+
+    // show version
+    SuperPrintRightAlign("v" V_LATEST_STABLE, 5, ScreenW - 2, 2);
+
+    // show branch
+    if(show_branch)
+    {
+        int y = show_commit ? ScreenH - 36 : ScreenH - 18;
+
+        if(is_wip)
+        {
+            // strip the WIP
+            SuperPrintRightAlign(V_BUILD_BRANCH + find_in_string(V_BUILD_BRANCH, '-') + 1, 5, ScreenW - 2, y);
+        }
+        else
+            SuperPrintRightAlign(V_BUILD_BRANCH, 5, ScreenW - 2, y);
+    }
+
+    // show git commit
+    if(show_commit)
+    {
+        if(is_dirty)
+        {
+            // only show -d, not -dirty
+            SuperPrintRightAlign(find_in_string(V_BUILD_VER, '-') + 2 + 1, "#" V_BUILD_VER, 5, ScreenW - 2, ScreenH - 18);
+        }
+        else
+            SuperPrintRightAlign("#" V_BUILD_VER, 5, ScreenW - 2, ScreenH - 18);
+    }
+}
+
 static void s_drawGameTypeTitle(int x, int y)
 {
     if(MenuMode == MENU_EDITOR)
@@ -2044,6 +2108,8 @@ void mainMenuDraw()
 
     XRender::renderTexture(ScreenW / 2 - GFX.MenuGFX[3].w / 2, 576,
             GFX.MenuGFX[3].w, GFX.MenuGFX[3].h, GFX.MenuGFX[3], 0, 0);
+
+    s_drawGameVersion();
 
 #ifndef PGE_NO_THREADING
     if(SDL_AtomicGet(&loading))

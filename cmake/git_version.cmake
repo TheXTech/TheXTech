@@ -1,24 +1,8 @@
+# adds a custom target for git version (always built)
+add_custom_target(git_version ALL)
 
-if(NOT GIT_COMMIT_HASH)
-    set(THEXTECH_GIT_VERSION "CMakeUnknown")
-else()
-    set(THEXTECH_GIT_VERSION "${GIT_COMMIT_HASH}")
-endif()
-
-if(NOT GIT_BRANCH)
-    set(THEXTECH_GIT_BRANCH "unknown")
-else()
-    set(THEXTECH_GIT_BRANCH "${GIT_BRANCH}")
-endif()
-
-macro(add_git_version_defs FILETARGET)
-    set_property(
-        SOURCE ${FILETARGET}
-        APPEND PROPERTY COMPILE_DEFINITIONS GIT_VERSION="${THEXTECH_GIT_VERSION}"
-    )
-    set_property(
-        SOURCE ${FILETARGET}
-        APPEND PROPERTY COMPILE_DEFINITIONS GIT_BRANCH="${THEXTECH_GIT_BRANCH}"
-    )
-    message("-- Set GIT definitions to file ${FILETARGET}")
-endmacro()
+# creates git_version.h using cmake script
+add_custom_command(TARGET git_version
+    COMMAND ${CMAKE_COMMAND}
+        -DSOURCE_DIR=${CMAKE_CURRENT_SOURCE_DIR} -DOVERRIDE_GIT_BRANCH=${OVERRIDE_GIT_BRANCH}
+        -P ${CMAKE_CURRENT_SOURCE_DIR}/cmake/git_version_update.cmake)

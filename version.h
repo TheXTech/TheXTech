@@ -20,6 +20,7 @@
 
 
 #include "pge_version.h" //Global Project version file
+#include "git_version.h" // generated git version info
 
 #ifndef THEXTECH_VERSION_H
 #define THEXTECH_VERSION_H

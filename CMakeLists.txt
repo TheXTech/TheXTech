@@ -592,7 +592,6 @@ if(NINTENDO_3DS OR NINTENDO_WII OR NOT PGE_MIN_PORT)
         ${STACK_WALKER_SRCS}
         lib/CrashHandler/crash_handler.cpp
     )
-    add_git_version_defs(lib/CrashHandler/crash_handler.cpp)
     set(THEXTECH_CRASHHANDLER_SUPPORTED ON)
 endif()
 
@@ -957,11 +956,6 @@ file(GLOB THEXTECH_HEADS_SRC
 )
 list(APPEND THEXTECH_SRC ${THEXTECH_HEADS_SRC})
 
-# For every file that includes "version.h", call this:
-add_git_version_defs(src/main.cpp)
-add_git_version_defs(src/frm_main.cpp)
-add_git_version_defs(src/main/game_info.cpp)
-add_git_version_defs(src/main/record.cpp)
 # ----------------------------------------------------
 
 if(WIN32 AND NOT EMSCRIPTEN)
@@ -1024,6 +1018,9 @@ else()
     add_executable(thextech ${THEXTECH_SRC} ${LIB_SRC})
     pge_set_nopie(thextech)
 endif()
+
+add_dependencies(thextech git_version)
+target_include_directories(thextech PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/generated-include")
 
 set_target_properties(thextech PROPERTIES
     OUTPUT_NAME "${THEXTECH_EXECUTABLE_NAME}"
@@ -1420,6 +1417,15 @@ elseif(NINTENDO_WIIU)
     configure_file(${CMAKE_SOURCE_DIR}/resources/wiiu/icon.png ${CMAKE_BINARY_DIR}/icon.png COPYONLY)
     configure_file(${CMAKE_SOURCE_DIR}/resources/wiiu/meta.xml.in ${CMAKE_BINARY_DIR}/meta.xml)
     wut_create_rpx(thextech)
+    wut_create_wuhb(thextech
+        CONTENT
+        NAME "TheXTech v$THEXTECH_VERSION_STRING"
+        SHORTNAME "TheXTech"
+        AUTHOR "Wohlstand and ds-sloth"
+        ICON "${CMAKE_SOURCE_DIR}/resources/switch/thextech-logo.png"
+        TVSPLASH "${CMAKE_SOURCE_DIR}/resources/wiiu/wuhb-splash.png"
+        DRCSPLASH "${CMAKE_SOURCE_DIR}/resources/wiiu/wuhb-splash.png"
+    )
 elseif(NINTENDO_DS)
     if(NOT "${THEXTECH_VERSION_REL}" STREQUAL "")
         set(ROM_VERSION "${GIT_BRANCH} #${GIT_COMMIT_HASH}")
