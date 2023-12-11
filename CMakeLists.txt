@@ -592,7 +592,6 @@ if(NINTENDO_3DS OR NINTENDO_WII OR NOT PGE_MIN_PORT)
         ${STACK_WALKER_SRCS}
         lib/CrashHandler/crash_handler.cpp
     )
-    add_git_version_defs(lib/CrashHandler/crash_handler.cpp)
     set(THEXTECH_CRASHHANDLER_SUPPORTED ON)
 endif()
 
@@ -957,12 +956,6 @@ file(GLOB THEXTECH_HEADS_SRC
 )
 list(APPEND THEXTECH_SRC ${THEXTECH_HEADS_SRC})
 
-# For every file that includes "version.h", call this:
-add_git_version_defs(src/main.cpp)
-add_git_version_defs(src/frm_main.cpp)
-add_git_version_defs(src/main/game_info.cpp)
-add_git_version_defs(src/main/record.cpp)
-add_git_version_defs(src/main/menu_main.cpp)
 # ----------------------------------------------------
 
 if(WIN32 AND NOT EMSCRIPTEN)
@@ -1025,6 +1018,9 @@ else()
     add_executable(thextech ${THEXTECH_SRC} ${LIB_SRC})
     pge_set_nopie(thextech)
 endif()
+
+add_dependencies(thextech git_version)
+target_include_directories(thextech PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/generated-include")
 
 set_target_properties(thextech PROPERTIES
     OUTPUT_NAME "${THEXTECH_EXECUTABLE_NAME}"
