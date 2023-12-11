@@ -674,7 +674,7 @@ bool mainMenuUpdate()
             }
             else if(MenuMode >= MENU_SELECT_SLOT_BASE && MenuMode < MENU_SELECT_SLOT_END)
             {
-                if(leftPressed)
+                if(leftPressed || SharedCursor.ScrollUp)
                 {
                     if(MenuCursorCanMove)
                     {
@@ -685,7 +685,7 @@ bool mainMenuUpdate()
 
                     MenuCursorCanMove = false;
                 }
-                else if(rightPressed)
+                else if(rightPressed || SharedCursor.ScrollDown)
                 {
                     if(MenuCursorCanMove)
                     {
@@ -1449,10 +1449,21 @@ bool mainMenuUpdate()
         {
             if(SharedCursor.Move)
             {
+                int old_cursor = MenuCursor;
+
                 int page_offset = s_GetSavesPageMenuOffset();
                 MenuCursor -= page_offset;
-                s_handleMouseMove(c_menuSavesPageLength, MenuX, MenuY, 300, 30);
+
+                SoundPause[SFX_Slide] += 1;
+                s_handleMouseMove(c_menuSavesPageLength - 1, MenuX, MenuY, 300, 30);
+                SoundPause[SFX_Slide] -= 1;
+
                 MenuCursor += page_offset;
+
+                if(s_GetSavesActionIdx(false) > maxSaveSlots)
+                    MenuCursor = old_cursor;
+                else if(MenuCursor != old_cursor)
+                    PlaySoundMenu(SFX_Slide);
             }
 
             if(MenuCursorCanMove || MenuMouseClick)
@@ -1514,7 +1525,12 @@ bool mainMenuUpdate()
             {
                 int page_offset = s_GetSavesPageMenuOffset();
                 MenuCursor -= page_offset;
-                s_handleMouseMove(c_menuSavesPageLength, MenuX, MenuY, 300, 30);
+
+                int item_bound = c_menuSavesPerPage;
+                if(page_offset == c_menuSavesPageLength * (c_menuSavesPageCount - 1))
+                    item_bound = SDL_min(item_bound, maxSaveSlots % c_menuSavesPerPage);
+
+                s_handleMouseMove(item_bound - 1, MenuX, MenuY, 300, 30);
                 MenuCursor += page_offset;
             }
 
@@ -1588,7 +1604,12 @@ bool mainMenuUpdate()
             {
                 int page_offset = s_GetSavesPageMenuOffset();
                 MenuCursor -= page_offset;
-                s_handleMouseMove(c_menuSavesPageLength, MenuX, MenuY, 300, 30);
+
+                int item_bound = c_menuSavesPerPage;
+                if(page_offset == c_menuSavesPageLength * (c_menuSavesPageCount - 1))
+                    item_bound = SDL_min(item_bound, maxSaveSlots % c_menuSavesPerPage);
+
+                s_handleMouseMove(item_bound - 1, MenuX, MenuY, 300, 30);
                 MenuCursor += page_offset;
             }
 
