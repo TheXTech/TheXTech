@@ -1417,6 +1417,15 @@ elseif(NINTENDO_WIIU)
     configure_file(${CMAKE_SOURCE_DIR}/resources/wiiu/icon.png ${CMAKE_BINARY_DIR}/icon.png COPYONLY)
     configure_file(${CMAKE_SOURCE_DIR}/resources/wiiu/meta.xml.in ${CMAKE_BINARY_DIR}/meta.xml)
     wut_create_rpx(thextech)
+    wut_create_wuhb(thextech
+        CONTENT
+        NAME "TheXTech v$THEXTECH_VERSION_STRING"
+        SHORTNAME "TheXTech"
+        AUTHOR "Wohlstand and ds-sloth"
+        ICON "${CMAKE_SOURCE_DIR}/resources/switch/thextech-logo.png"
+        TVSPLASH "${CMAKE_SOURCE_DIR}/resources/wiiu/wuhb-splash.png"
+        DRCSPLASH "${CMAKE_SOURCE_DIR}/resources/wiiu/wuhb-splash.png"
+    )
 elseif(NINTENDO_DS)
     if(NOT "${THEXTECH_VERSION_REL}" STREQUAL "")
         set(ROM_VERSION "${GIT_BRANCH} #${GIT_COMMIT_HASH}")
