@@ -184,6 +184,34 @@ bool RenderGL::initRender(const CmdLineSetup_t &setup, SDL_Window *window)
         return false;
     }
 
+    std::string init_string = fmt::format_ne("Initialized OpenGL {0}.{1}-{2}", m_gl_majver, m_gl_minver, get_profile_letter(m_gl_profile));
+
+    init_string += " with draw features: ";
+    if(m_use_logicop)
+        init_string += "logicOp, ";
+    if(m_use_depth_buffer)
+        init_string += "depth buffer, ";
+    if(m_client_side_arrays)
+        init_string += "client-side arrays, ";
+    if(m_use_shaders)
+        init_string += "ES2 shaders, ";
+    if(m_has_es3_shaders)
+        init_string += "ES3 shaders, ";
+
+    init_string += "and framebuffers: ";
+    if(m_buffer_texture[BUFFER_GAME])
+        init_string += "game, ";
+    if(m_buffer_texture[BUFFER_FB_READ])
+        init_string += "fb read, ";
+    if(m_buffer_texture[BUFFER_INT_PASS_2])
+        init_string += "multipass, ";
+    if(m_buffer_texture[BUFFER_LIGHTING])
+        init_string += "lighting, ";
+    if(m_depth_read_texture)
+        init_string += "depth read";
+
+    pLogDebug(init_string.c_str());
+
     GLenum err = glGetError();
     if(err)
     {
@@ -268,43 +296,7 @@ void RenderGL::repaint()
         renderParticleSystem(*s_sparkle, vScreen[1].X, vScreen[1].Y);
 #endif
 
-    if(GameMenu)
-    {
-        std::string feature_string = fmt::format_ne("BETA: GL{0}.{1}-{2}", m_gl_majver, m_gl_minver, get_profile_letter(m_gl_profile));
-
-        feature_string += " Draw: ";
-        if(m_use_logicop)
-            feature_string += "L";
-        if(m_use_depth_buffer)
-            feature_string += "Z";
-        if(m_client_side_arrays)
-            feature_string += "C";
-        if(m_use_shaders)
-            feature_string += "2";
-        if(m_has_es3_shaders)
-            feature_string += "3";
-
-        if(feature_string.size() == 4)
-            feature_string += ": none";
-
-        feature_string += " FBO: ";
-        if(m_buffer_texture[BUFFER_GAME])
-            feature_string += "G";
-        if(m_buffer_texture[BUFFER_FB_READ])
-            feature_string += "R";
-        if(m_buffer_texture[BUFFER_INT_PASS_2])
-            feature_string += "M";
-        if(m_buffer_texture[BUFFER_LIGHTING])
-            feature_string += "L";
-        if(m_depth_read_texture)
-            feature_string += "D";
-
-        if(feature_string.size() == 3)
-            feature_string += ": none";
-
-        SuperPrintScreenCenter(feature_string, 5, 2, 0.8f, 1.0f, 0.0f);
-    }
-    else if(XRender::g_BitmaskTexturePresent && g_ForceBitmaskMerge)
+    if(XRender::g_BitmaskTexturePresent && g_ForceBitmaskMerge)
         SuperPrintScreenCenter("Simulating GIFs2PNG (active)", 5, 2, 1.0f, 0.7f, 0.5f);
     else if(g_ForceBitmaskMerge)
         SuperPrintScreenCenter("Simulating GIFs2PNG (inactive)", 5, 2, 1.0f, 0.7f, 0.5f);
