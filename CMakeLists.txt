@@ -956,6 +956,7 @@ add_git_version_defs(src/main.cpp)
 add_git_version_defs(src/frm_main.cpp)
 add_git_version_defs(src/main/game_info.cpp)
 add_git_version_defs(src/main/record.cpp)
+add_git_version_defs(src/main/menu_main.cpp)
 # ----------------------------------------------------
 
 if(WIN32 AND NOT EMSCRIPTEN)
