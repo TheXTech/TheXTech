@@ -62,7 +62,8 @@ void AppPathP::initDefaultPaths(const std::string &userDirName)
     std::string titleIdString = fmt::sprintf("%016llX/", titleId);
 
     // When running game under WUHB package or as an installable game (/vol/content and /vol/save dirs do exist)
-    if(DirMan::exists(s_assetRootContent))
+    // Also check that /vol/content/graphics/ exists (assets non-empty)
+    if(DirMan::exists(s_assetRootContent) && DirMan::exists(std::string(s_assetRootContent) + "graphics/"))
     {
         SAVEInit();
         SAVEInitCommonSaveDir();
