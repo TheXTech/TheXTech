@@ -596,39 +596,47 @@ StatusInfo InputMethod_Joystick::GetStatus()
     if(!this->m_devices)
         return res;
 
-    SDL_JoystickPowerLevel level = SDL_JoystickCurrentPowerLevel(this->m_devices->joy);
+    uint32_t ticks = SDL_GetTicks();
 
-    if(level == SDL_JOYSTICK_POWER_UNKNOWN)
+    if(this->m_last_power_check > 10000)
     {
-        res.power_status = StatusInfo::POWER_UNKNOWN;
+        SDL_JoystickPowerLevel level = SDL_JoystickCurrentPowerLevel(this->m_devices->joy);
+
+        if(level == SDL_JOYSTICK_POWER_UNKNOWN)
+        {
+            res.power_status = StatusInfo::POWER_UNKNOWN;
+        }
+        else if(level == SDL_JOYSTICK_POWER_WIRED)
+        {
+            res.power_status = StatusInfo::POWER_WIRED;
+        }
+        else if(level == SDL_JOYSTICK_POWER_MAX)
+        {
+            res.power_status = StatusInfo::POWER_CHARGED;
+            res.power_level = 1.f;
+        }
+        else
+        {
+            res.power_status = StatusInfo::POWER_DISCHARGING;
+
+            if(level == SDL_JOYSTICK_POWER_EMPTY)
+                res.power_level = 0.15f;
+
+            if(level == SDL_JOYSTICK_POWER_LOW)
+                res.power_level = 0.3f;
+
+            if(level == SDL_JOYSTICK_POWER_MEDIUM)
+                res.power_level = 0.6f;
+
+            if(level == SDL_JOYSTICK_POWER_FULL)
+                res.power_level = 0.9f;
+        }
+
+        m_last_power_check = ticks;
+        m_recent_status = res;
     }
-    else if(level == SDL_JOYSTICK_POWER_WIRED)
-    {
-        res.power_status = StatusInfo::POWER_WIRED;
-    }
-    else if(level == SDL_JOYSTICK_POWER_MAX)
-    {
-        res.power_status = StatusInfo::POWER_CHARGED;
-        res.power_level = 1.f;
-    }
-    else
-    {
-        res.power_status = StatusInfo::POWER_DISCHARGING;
 
-        if(level == SDL_JOYSTICK_POWER_EMPTY)
-            res.power_level = 0.15f;
-
-        if(level == SDL_JOYSTICK_POWER_LOW)
-            res.power_level = 0.3f;
-
-        if(level == SDL_JOYSTICK_POWER_MEDIUM)
-            res.power_level = 0.6f;
-
-        if(level == SDL_JOYSTICK_POWER_FULL)
-            res.power_level = 0.9f;
-    }
-
-    return res;
+    return m_recent_status;
 }
 
 /*====================================================*\
