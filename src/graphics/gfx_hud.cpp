@@ -431,6 +431,12 @@ void DrawDeviceBattery()
     if(g_videoSettings.batteryStatus == BATTERY_STATUS_OFF)
         return;
 
+    if(!isFullScreen)
+    {
+        if(g_videoSettings.batteryStatus == BATTERY_STATUS_FULLSCREEN_WHEN_LOW || g_videoSettings.batteryStatus == BATTERY_STATUS_FULLSCREEN_ON)
+            return;
+    }
+
     XPower::StatusInfo status_info = XPower::devicePowerStatus();
 
     if(status_info.power_status == XPower::StatusInfo::POWER_DISABLED || status_info.power_status == XPower::StatusInfo::POWER_UNKNOWN || status_info.power_status == XPower::StatusInfo::POWER_WIRED)
