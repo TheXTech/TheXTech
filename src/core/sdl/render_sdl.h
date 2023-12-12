@@ -28,6 +28,8 @@
 #include "cmd_line_setup.h"
 #include "video.h"
 
+#include "core/sdl/render_op_sdl.h"
+
 struct SDL_Renderer;
 struct SDL_Texture;
 struct SDL_Window;
@@ -41,6 +43,9 @@ class RenderSDL final : public AbstractRender_t
     bool          m_tBufferDisabled = false;
     SDL_Texture  *m_recentTarget = nullptr;
     std::set<StdPicture *> m_loadedPictures;
+
+    // queue of render ops
+    RenderQueue m_render_queue;
 
     // Scale of virtual and window resolutuins
     float m_scale_x = 1.f;
@@ -172,6 +177,16 @@ public:
     void clearBuffer() override;
 
 
+
+    /*!
+     * \brief Immediately executes all render operations and clears render queue
+     */
+    void flushRenderQueue();
+
+    /*!
+     * \brief Immediately executes a single render operation
+     */
+    void execute(const RenderOp& op);
 
     // Draw primitives
 
