@@ -101,7 +101,7 @@ void DrawEditorLevel(int Z)
                         tempLocation.X = Block[A].Location.X + Block[A].Location.Width / 2 - GFX.Chat.w / 2;
                         tempLocation.Y = Block[A].Location.Y - GFX.Chat.h - 8;
 
-                        XRender::renderTexture(vScreen[Z].X + tempLocation.X, vScreen[Z].Y + tempLocation.Y, GFX.Chat, 1., 0., 0., 0.7f);
+                        XRender::renderTexture(vScreen[Z].X + tempLocation.X, vScreen[Z].Y + tempLocation.Y, GFX.Chat, XTColorF(1., 0., 0., 0.7f));
                     }
                 }
             }
@@ -148,7 +148,7 @@ void DrawEditorLevel(int Z)
                             tempLocation.X = NPC[A].Location.X + NPC[A].Location.Width / 2 - 4 - GFX.Chat.w;
                         tempLocation.Y = NPC[A].Location.Y - GFX.Chat.h - 8;
 
-                        XRender::renderTexture(vScreen[Z].X + tempLocation.X, vScreen[Z].Y + tempLocation.Y, GFX.Chat, 1., 0., 0., 0.7f);
+                        XRender::renderTexture(vScreen[Z].X + tempLocation.X, vScreen[Z].Y + tempLocation.Y, GFX.Chat, XTColorF(1., 0., 0., 0.7f));
                     }
                 }
 
@@ -163,7 +163,7 @@ void DrawEditorLevel(int Z)
                             tempLocation.X = NPC[A].Location.X + NPC[A].Location.Width / 2 + 4;
                         tempLocation.Y = NPC[A].Location.Y - GFX.Chat.h - 8;
 
-                        XRender::renderTexture(vScreen[Z].X + tempLocation.X, vScreen[Z].Y + tempLocation.Y, GFX.Chat, 1., 1., 1., 0.7f);
+                        XRender::renderTexture(vScreen[Z].X + tempLocation.X, vScreen[Z].Y + tempLocation.Y, GFX.Chat, XTColorF(1., 1., 1., 0.7f));
                     }
                 }
             }
@@ -234,26 +234,19 @@ void DrawEditorLevel(int Z)
             if(Warp[A].Direction > 0 && !Warp[A].Hidden)
             {
                 bool complete = Warp[A].PlacedEnt && Warp[A].PlacedExit;
+                XTColor color = complete ? XTColorF(1.f, 0.f, 1.f) : XTColorF(0.7f, 0.3f, 0.f);
 
                 if(Warp[A].PlacedEnt)
                 {
-                    if(complete)
-                        XRender::renderRect(vScreen[Z].X + Warp[A].Entrance.X, vScreen[Z].Y + Warp[A].Entrance.Y, 32, 32,
-                            1.f, 0.f, 1.f, 1.f, false);
-                    else
-                        XRender::renderRect(vScreen[Z].X + Warp[A].Entrance.X, vScreen[Z].Y + Warp[A].Entrance.Y, 32, 32,
-                            0.7f, 0.3f, 0.f, 1.f, false);
+                    XRender::renderRect(vScreen[Z].X + Warp[A].Entrance.X, vScreen[Z].Y + Warp[A].Entrance.Y, 32, 32,
+                        color, false);
                     SuperPrint(std::to_string(A), 1, vScreen[Z].X + Warp[A].Entrance.X + 2, vScreen[Z].Y + Warp[A].Entrance.Y + 2);
                 }
 
                 if(Warp[A].PlacedExit)
                 {
-                    if(complete)
-                        XRender::renderRect(vScreen[Z].X + Warp[A].Exit.X, vScreen[Z].Y + Warp[A].Exit.Y, 32, 32,
-                            1.f, 0.f, 1.f, 1.f, false);
-                    else
-                        XRender::renderRect(vScreen[Z].X + Warp[A].Exit.X, vScreen[Z].Y + Warp[A].Exit.Y, 32, 32,
-                            0.7f, 0.3f, 0.f, 1.f, false);
+                    XRender::renderRect(vScreen[Z].X + Warp[A].Exit.X, vScreen[Z].Y + Warp[A].Exit.Y, 32, 32,
+                        color, false);
                     SuperPrint(std::to_string(A), 1, vScreen[Z].X + Warp[A].Exit.X + Warp[A].Exit.Width - 16 - 2,
                         vScreen[Z].Y + Warp[A].Exit.Y + Warp[A].Exit.Height - 14 - 2);
                 }
@@ -272,25 +265,25 @@ void DrawEditorLevel(int Z)
             if(vScreen[Z].X + level[S].X > 0)
             {
                 XRender::renderRect(0, 0,
-                                   vScreen[Z].X + level[S].X, ScreenH, 0.f, 0.f, 0.f, 1.f, true);
+                                   vScreen[Z].X + level[S].X, ScreenH, {0, 0, 0}, true);
             }
 
             if(ScreenW > level[S].Width + vScreen[Z].X)
             {
                 XRender::renderRect(level[S].Width + vScreen[Z].X, 0,
-                                   ScreenW - (level[S].Width + vScreen[Z].X), ScreenH, 0.f, 0.f, 0.f, 1.f, true);
+                                   ScreenW - (level[S].Width + vScreen[Z].X), ScreenH, {0, 0, 0}, true);
             }
 
             if(vScreen[Z].Y + level[S].Y > 0)
             {
                 XRender::renderRect(0, 0,
-                                   ScreenW, vScreen[Z].Y + level[S].Y, 0.f, 0.f, 0.f, 1.f, true);
+                                   ScreenW, vScreen[Z].Y + level[S].Y, {0, 0, 0}, true);
             }
 
             if(ScreenH > level[S].Height + vScreen[Z].Y)
             {
                 XRender::renderRect(0, level[S].Height + vScreen[Z].Y,
-                                   ScreenW, ScreenH - (level[S].Height + vScreen[Z].Y), 0.f, 0.f, 0.f, 1.f, true);
+                                   ScreenW, ScreenH - (level[S].Height + vScreen[Z].Y), {0, 0, 0}, true);
             }
         }
     }
@@ -411,7 +404,7 @@ void DrawEditorLevel(int Z)
                 tempLocation.X = b.Location.X + b.Location.Width / 2 - GFX.Chat.w / 2;
                 tempLocation.Y = b.Location.Y - GFX.Chat.h - 8;
 
-                XRender::renderTexture(vScreen[Z].X + tempLocation.X, vScreen[Z].Y + tempLocation.Y, GFX.Chat, 1., 0., 0., 0.7f);
+                XRender::renderTexture(vScreen[Z].X + tempLocation.X, vScreen[Z].Y + tempLocation.Y, GFX.Chat, XTColorF(1., 0., 0., 0.7f));
             }
         }
 
@@ -577,7 +570,7 @@ void DrawEditorLevel(int Z)
                     tempLocation.X = n.Location.X + n.Location.Width / 2 - 4 - GFX.Chat.w;
                 tempLocation.Y = n.Location.Y - GFX.Chat.h - 8;
 
-                XRender::renderTexture(vScreen[Z].X + tempLocation.X, vScreen[Z].Y + tempLocation.Y, GFX.Chat, 1., 0., 0., 0.7f);
+                XRender::renderTexture(vScreen[Z].X + tempLocation.X, vScreen[Z].Y + tempLocation.Y, GFX.Chat, XTColorF(1., 0., 0., 0.7f));
             }
 
             // and that they can talk
@@ -589,22 +582,22 @@ void DrawEditorLevel(int Z)
                     tempLocation.X = n.Location.X + n.Location.Width / 2 + 4;
                 tempLocation.Y = n.Location.Y - GFX.Chat.h - 8;
 
-                XRender::renderTexture(vScreen[Z].X + tempLocation.X, vScreen[Z].Y + tempLocation.Y, GFX.Chat, 1., 1., 1., 0.7f);
+                XRender::renderTexture(vScreen[Z].X + tempLocation.X, vScreen[Z].Y + tempLocation.Y, GFX.Chat, XTColorF(1., 1., 1., 0.7f));
             }
         }
         else if(EditorCursor.Mode == OptCursor_t::LVL_WATER) // Water
         {
             if(EditorCursor.Water.Quicksand)
                 XRender::renderRect(vScreen[Z].X + EditorCursor.Location.X, vScreen[Z].Y + EditorCursor.Location.Y, EditorCursor.Location.Width, EditorCursor.Location.Height,
-                    1.f, 1.f, 0.f, 1.f, false);
+                    XTColorF(1.f, 1.f, 0.f, 1.f), false);
             else
                 XRender::renderRect(vScreen[Z].X + EditorCursor.Location.X, vScreen[Z].Y + EditorCursor.Location.Y, EditorCursor.Location.Width, EditorCursor.Location.Height,
-                    0.f, 1.f, 1.f, 1.f, false);
+                    XTColorF(0.f, 1.f, 1.f, 1.f), false);
         }
         else if(EditorCursor.Mode == OptCursor_t::LVL_WARPS)
         {
             XRender::renderRect(vScreen[Z].X + EditorCursor.Location.X, vScreen[Z].Y + EditorCursor.Location.Y, EditorCursor.Location.Width, EditorCursor.Location.Height,
-                1.f, 0.f, 0.f, 1.f, false);
+                XTColorF(1.f, 0.f, 0.f, 1.f), false);
         }
 
         if(g_config.editor_edge_scroll && !editorScreen.active && !MagicHand)
@@ -635,7 +628,7 @@ void DrawEditorLevel(int Z)
         else if(EditorCursor.Mode == 13 || EditorCursor.Mode == 14) // Selector
         {
             if(MagicBlock::enabled)
-                XRender::renderTexture(curX, curY, GFX.ECursor[2], 0.7f, 1.0f, 0.7f, 1.0f);
+                XRender::renderTexture(curX, curY, GFX.ECursor[2], XTColorF(0.7f, 1.0f, 0.7f, 1.0f));
             else
                 XRender::renderTexture(curX, curY, GFX.ECursor[2]);
 
@@ -652,7 +645,7 @@ void DrawEditorLevel(int Z)
         {
 //                    If .Mode = 5 Then
             if(MagicBlock::enabled)
-                XRender::renderTexture(curX, curY, GFX.ECursor[2], 0.7f, 1.0f, 0.7f, 1.0f);
+                XRender::renderTexture(curX, curY, GFX.ECursor[2], XTColorF(0.7f, 1.0f, 0.7f, 1.0f));
             else
                 XRender::renderTexture(curX, curY, GFX.ECursor[2]);
 
@@ -660,7 +653,7 @@ void DrawEditorLevel(int Z)
             {
                 // there might be a tooltip in this case
                 if(editorScreen.active || EditorCursor.Y < 40)
-                    SuperPrint(GetL(e.Layer), 3, curX + 28 , curY + 34, 1., 1., 1., 0.3f);
+                    SuperPrint(GetL(e.Layer), 3, curX + 28 , curY + 34, XTColorF(1., 1., 1., 0.3f));
                 else
                     SuperPrint(GetL(e.Layer), 3, curX + 28 , curY + 34);
             }
@@ -776,14 +769,14 @@ void DrawEditorWorld()
     else if(EditorCursor.Mode == OptCursor_t::WLD_MUSIC)
     {
         XRender::renderRect(vScreen[Z].X + EditorCursor.WorldMusic.Location.X, vScreen[Z].Y + EditorCursor.WorldMusic.Location.Y, 32, 32,
-            1.f, 0.f, 1.f, 1.f, false);
+            XTColorF(1.f, 0.f, 1.f), false);
         SuperPrint(std::to_string(EditorCursor.WorldMusic.Type), 1, vScreen[Z].X + EditorCursor.WorldMusic.Location.X + 2, vScreen[Z].Y + EditorCursor.WorldMusic.Location.Y + 2);
     }
     else if(EditorCursor.Mode == OptCursor_t::WLD_AREA)
     {
         XRender::renderRect(vScreen[Z].X + EditorCursor.WorldArea.Location.X, vScreen[Z].Y + EditorCursor.WorldArea.Location.Y,
             EditorCursor.WorldArea.Location.Width, EditorCursor.WorldArea.Location.Height,
-            1.0f, 0.8f, 0.2f, 1.f, false);
+            XTColorF(1.0f, 0.8f, 0.2f), false);
     }
 
     double X = EditorCursor.X;
@@ -832,7 +825,7 @@ void DrawEditorWorld()
             {
                 double at_X = lvl.Location.X + lvl.Location.Width / 2 + vScreen[Z].X;
                 double at_Y = lvl.Location.Y + vScreen[Z].Y - 40;
-                XRender::renderRect(at_X - 80, at_Y - 4, 160, 44, 0.0f, 0.0f, 0.0f, 0.5f, true);
+                XRender::renderRect(at_X - 80, at_Y - 4, 160, 44, {0, 0, 0, 127}, true);
                 SuperPrintCenter(fmt::format_ne("{0}: {1}", g_editorStrings.letterCoordX, static_cast<int>(lvl.Location.X)), 3, at_X, at_Y);
                 SuperPrintCenter(fmt::format_ne("{0}: {1}", g_editorStrings.letterCoordY, static_cast<int>(lvl.Location.Y)), 3, at_X, at_Y + 20);
             }

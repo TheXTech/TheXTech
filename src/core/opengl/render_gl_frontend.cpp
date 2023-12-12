@@ -57,7 +57,7 @@ StdPicture* s_sparkle = nullptr;
 #define UNUSED(x) (void)x
 #endif
 
-#define F_TO_B(r, g, b, a) {static_cast<GLubyte>((r) * 255.0f), static_cast<GLubyte>((g) * 255.0f), static_cast<GLubyte>((b) * 255.0f), static_cast<GLubyte>((a) * 255.0f)}
+#define F_TO_B(color) {color.r, color.g, color.b, color.a}
 
 
 RenderGL::RenderGL() :
@@ -297,9 +297,9 @@ void RenderGL::repaint()
 #endif
 
     if(XRender::g_BitmaskTexturePresent && g_ForceBitmaskMerge)
-        SuperPrintScreenCenter("Simulating GIFs2PNG (active)", 5, 2, 1.0f, 0.7f, 0.5f);
+        SuperPrintScreenCenter("Simulating GIFs2PNG (active)", 5, 2, XTColorF(1.0f, 0.7f, 0.5f));
     else if(g_ForceBitmaskMerge)
-        SuperPrintScreenCenter("Simulating GIFs2PNG (inactive)", 5, 2, 1.0f, 0.7f, 0.5f);
+        SuperPrintScreenCenter("Simulating GIFs2PNG (inactive)", 5, 2, XTColorF(1.0f, 0.7f, 0.5f));
 
     flushDrawQueues();
 
@@ -1058,7 +1058,7 @@ void RenderGL::spawnParticle(StdPicture &target, double worldX, double worldY, P
     target.d.particle_system->add_particle(particle);
 }
 
-void RenderGL::renderRect(int x, int y, int w, int h, float red, float green, float blue, float alpha, bool filled)
+void RenderGL::renderRect(int x, int y, int w, int h, XTColor color, bool filled)
 {
 #ifdef USE_RENDER_BLOCKING
     SDL_assert(!m_blockRender);
@@ -1066,16 +1066,16 @@ void RenderGL::renderRect(int x, int y, int w, int h, float red, float green, fl
 
     if(!m_use_shaders && !filled)
     {
-        renderRect(x, y, 2, h, red, green, blue, alpha, true);
-        renderRect(x + w - 2, y, 2, h, red, green, blue, alpha, true);
-        renderRect(x, y, w, 2, red, green, blue, alpha, true);
-        renderRect(x, y + h - 2, w, 2, red, green, blue, alpha, true);
+        renderRect(x, y, 2, h, color, true);
+        renderRect(x + w - 2, y, 2, h, color, true);
+        renderRect(x, y, w, 2, color, true);
+        renderRect(x, y + h - 2, w, 2, color, true);
         return;
     }
 
     DrawContext_t context = {(filled) ? m_program_rect_filled : m_program_rect_unfilled};
 
-    Vertex_t::Tint tint = F_TO_B(red, green, blue, alpha);
+    Vertex_t::Tint tint = F_TO_B(color);
 
     auto& vertex_list = ((m_use_depth_buffer && tint[3] == 255) ? m_unordered_draw_queue[context] : getOrderedDrawVertexList(context, m_cur_depth));
 
@@ -1096,16 +1096,16 @@ void RenderGL::renderRect(int x, int y, int w, int h, float red, float green, fl
     m_drawQueued = true;
 }
 
-void RenderGL::renderRectBR(int _left, int _top, int _right, int _bottom, float red, float green, float blue, float alpha)
+void RenderGL::renderRectBR(int _left, int _top, int _right, int _bottom, XTColor color)
 {
 #ifdef USE_RENDER_BLOCKING
     SDL_assert(!m_blockRender);
 #endif
 
-    renderRect(_left, _top, _right - _left, _bottom - _top, red, green, blue, alpha);
+    renderRect(_left, _top, _right - _left, _bottom - _top, color);
 }
 
-void RenderGL::renderCircle(int cx, int cy, int radius, float red, float green, float blue, float alpha, bool filled)
+void RenderGL::renderCircle(int cx, int cy, int radius, XTColor color, bool filled)
 {
 #ifdef USE_RENDER_BLOCKING
     SDL_assert(!m_blockRender);
@@ -1117,7 +1117,7 @@ void RenderGL::renderCircle(int cx, int cy, int radius, float red, float green, 
 
     DrawContext_t context = {m_program_circle};
 
-    Vertex_t::Tint tint = F_TO_B(red, green, blue, alpha);
+    Vertex_t::Tint tint = F_TO_B(color);
 
     auto& vertex_list = ((m_use_depth_buffer && tint[3] == 255) ? m_unordered_draw_queue[context] : getOrderedDrawVertexList(context, m_cur_depth));
 
@@ -1159,7 +1159,7 @@ void RenderGL::renderCircle(int cx, int cy, int radius, float red, float green, 
     m_drawQueued = true;
 }
 
-void RenderGL::renderCircleHole(int cx, int cy, int radius, float red, float green, float blue, float alpha)
+void RenderGL::renderCircleHole(int cx, int cy, int radius, XTColor color)
 {
 #ifdef USE_RENDER_BLOCKING
     SDL_assert(!m_blockRender);
@@ -1170,7 +1170,7 @@ void RenderGL::renderCircleHole(int cx, int cy, int radius, float red, float gre
 
     DrawContext_t context = {m_program_circle_hole};
 
-    Vertex_t::Tint tint = F_TO_B(red, green, blue, alpha);
+    Vertex_t::Tint tint = F_TO_B(color);
 
     auto& vertex_list = ((m_use_depth_buffer && tint[3] == 255) ? m_unordered_draw_queue[context] : getOrderedDrawVertexList(context, m_cur_depth));
 
@@ -1231,7 +1231,7 @@ void RenderGL::renderTextureScaleEx(double xDstD, double yDstD, double wDstD, do
                                        int xSrc, int ySrc,
                                        int wSrc, int hSrc,
                                        double rotateAngle, FPoint_t *center, unsigned int flip,
-                                       float red, float green, float blue, float alpha)
+                                       XTColor color)
 {
 #ifdef USE_RENDER_BLOCKING
     SDL_assert(!m_blockRender);
@@ -1297,7 +1297,7 @@ void RenderGL::renderTextureScaleEx(double xDstD, double yDstD, double wDstD, do
 
     DrawContext_t context = {tx.d.shader_program ? *tx.d.shader_program : m_standard_program, &tx};
 
-    Vertex_t::Tint tint = F_TO_B(red, green, blue, alpha);
+    Vertex_t::Tint tint = F_TO_B(color);
 
     bool draw_opaque = (tx.d.use_depth_test && tint[3] == 255 && !tx.d.shader_program);
     auto& vertex_list = (draw_opaque ? m_unordered_draw_queue[context] : getOrderedDrawVertexList(context, m_cur_depth));
@@ -1310,7 +1310,7 @@ void RenderGL::renderTextureScaleEx(double xDstD, double yDstD, double wDstD, do
 
 void RenderGL::renderTextureScale(double xDst, double yDst, double wDst, double hDst,
                                      StdPicture &tx,
-                                     float red, float green, float blue, float alpha)
+                                     XTColor color)
 {
 #ifdef USE_RENDER_BLOCKING
     SDL_assert(!m_blockRender);
@@ -1335,7 +1335,7 @@ void RenderGL::renderTextureScale(double xDst, double yDst, double wDst, double 
 
     DrawContext_t context = {tx.d.shader_program ? *tx.d.shader_program : m_standard_program, &tx};
 
-    Vertex_t::Tint tint = F_TO_B(red, green, blue, alpha);
+    Vertex_t::Tint tint = F_TO_B(color);
 
     bool draw_opaque = (tx.d.use_depth_test && tint[3] == 255 && !tx.d.shader_program);
     auto& vertex_list = (draw_opaque ? m_unordered_draw_queue[context] : getOrderedDrawVertexList(context, m_cur_depth));
@@ -1349,7 +1349,7 @@ void RenderGL::renderTextureScale(double xDst, double yDst, double wDst, double 
 void RenderGL::renderTexture(double xDstD, double yDstD, double wDstD, double hDstD,
                                 StdPicture &tx,
                                 int xSrc, int ySrc,
-                                float red, float green, float blue, float alpha)
+                                XTColor color)
 {
 #ifdef USE_RENDER_BLOCKING
     SDL_assert(!m_blockRender);
@@ -1424,7 +1424,7 @@ void RenderGL::renderTexture(double xDstD, double yDstD, double wDstD, double hD
 
     DrawContext_t context = {tx.d.shader_program ? *tx.d.shader_program : m_standard_program, &tx};
 
-    Vertex_t::Tint tint = F_TO_B(red, green, blue, alpha);
+    Vertex_t::Tint tint = F_TO_B(color);
 
     bool draw_opaque = (tx.d.use_depth_test && tint[3] == 255 && !tx.d.shader_program);
     auto& vertex_list = (draw_opaque ? m_unordered_draw_queue[context] : getOrderedDrawVertexList(context, m_cur_depth));
@@ -1439,7 +1439,7 @@ void RenderGL::renderTextureFL(double xDstD, double yDstD, double wDstD, double 
                                   StdPicture &tx,
                                   int xSrc, int ySrc,
                                   double rotateAngle, FPoint_t *center, unsigned int flip,
-                                  float red, float green, float blue, float alpha)
+                                  XTColor color)
 {
 #ifdef USE_RENDER_BLOCKING
     SDL_assert(!m_blockRender);
@@ -1506,7 +1506,7 @@ void RenderGL::renderTextureFL(double xDstD, double yDstD, double wDstD, double 
 
     DrawContext_t context = {tx.d.shader_program ? *tx.d.shader_program : m_standard_program, &tx};
 
-    Vertex_t::Tint tint = F_TO_B(red, green, blue, alpha);
+    Vertex_t::Tint tint = F_TO_B(color);
 
     bool draw_opaque = (tx.d.use_depth_test && tint[3] == 255 && !tx.d.shader_program);
     auto& vertex_list = (draw_opaque ? m_unordered_draw_queue[context] : getOrderedDrawVertexList(context, m_cur_depth));
@@ -1519,7 +1519,7 @@ void RenderGL::renderTextureFL(double xDstD, double yDstD, double wDstD, double 
 
 void RenderGL::renderTexture(float xDst, float yDst,
                                 StdPicture &tx,
-                                float red, float green, float blue, float alpha)
+                                XTColor color)
 {
 #ifdef USE_RENDER_BLOCKING
     SDL_assert(!m_blockRender);
@@ -1544,7 +1544,7 @@ void RenderGL::renderTexture(float xDst, float yDst,
 
     DrawContext_t context = {tx.d.shader_program ? *tx.d.shader_program : m_standard_program, &tx};
 
-    Vertex_t::Tint tint = F_TO_B(red, green, blue, alpha);
+    Vertex_t::Tint tint = F_TO_B(color);
 
     bool draw_opaque = (tx.d.use_depth_test && tint[3] == 255 && !tx.d.shader_program);
     auto& vertex_list = (draw_opaque ? m_unordered_draw_queue[context] : getOrderedDrawVertexList(context, m_cur_depth));

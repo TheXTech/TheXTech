@@ -284,9 +284,9 @@ static inline void s_DrawMedal(int x, int y, int coin_width, int coin_height, Me
         if(level == MedalDrawLevel::Shiny || level == MedalDrawLevel::Got)
             XRender::renderTexture(x, y, GFX.Interface[2]);
         else if(level == MedalDrawLevel::Prev)
-            XRender::renderTexture(x, y, GFX.Interface[2], 0.5f, 0.5f, 0.5f);
+            XRender::renderTexture(x, y, GFX.Interface[2], XTColorF(0.5f, 0.5f, 0.5f));
         else
-            XRender::renderTexture(x, y, GFX.Interface[2], 0.5f, 0.5f, 0.5f, 0.5f);
+            XRender::renderTexture(x, y, GFX.Interface[2], XTColorF(0.5f, 0.5f, 0.5f, 0.5f));
     }
 
     // render sparkles for shiny
@@ -312,7 +312,7 @@ static inline void s_DrawMedal(int x, int y, int coin_width, int coin_height, Me
             sparkle_X &= ~1;
             sparkle_Y &= ~1;
 
-            XRender::renderTexture(x + sparkle_X, y + sparkle_Y, EffectWidth[78], EffectHeight[78], GFXEffect[78], 0, EffectHeight[78] * sparkle_frame, 1.0f, 1.0f, 1.0f, 0.8f);
+            XRender::renderTexture(x + sparkle_X, y + sparkle_Y, EffectWidth[78], EffectHeight[78], GFXEffect[78], 0, EffectHeight[78] * sparkle_frame, XTAlphaF(0.8f));
         }
     }
 }
@@ -458,6 +458,6 @@ void DrawDeviceBattery()
         int bx = ScreenW - (bw + 8);
         int by = 24;
 
-        RenderPowerInfo(0, bx, by, bw, bh, 1.0f, &status_info);
+        RenderPowerInfo(0, bx, by, bw, bh, 255, &status_info);
     }
 }

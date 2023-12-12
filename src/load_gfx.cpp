@@ -1404,7 +1404,7 @@ void UpdateLoadREAL()
     }
 #endif // THEXTECH_INTERPROC_SUPPORTED
 
-    static float alphaFader = 1.0f;
+    static uint8_t alphaFader = 255;
 
     if(LoadCoinsT <= SDL_GetTicks())
     {
@@ -1415,9 +1415,14 @@ void UpdateLoadREAL()
         draw = true;
     }
 
-    if(gfxLoaderThreadingMode && alphaFader >= 0.f)
+    if(gfxLoaderThreadingMode && alphaFader >= 10)
     {
-        alphaFader -= 0.04f;
+        alphaFader -= 10;
+        draw = true;
+    }
+    else if(gfxLoaderThreadingMode && alphaFader != 0)
+    {
+        alphaFader = 0;
         draw = true;
     }
 
@@ -1468,8 +1473,8 @@ void UpdateLoadREAL()
         XRender::renderTexture(Right - 168, Bottom - 24, GFX.Loader);
         XRender::renderTexture(Right - 40, Bottom - 40, GFX.LoadCoin.w, GFX.LoadCoin.h / 4, GFX.LoadCoin, 0, 32 * LoadCoins);
 
-        if(gfxLoaderThreadingMode && alphaFader >= 0.f)
-            XRender::renderRect(0, 0, ScreenW, ScreenH, 0.f, 0.f, 0.f, alphaFader);
+        if(gfxLoaderThreadingMode && alphaFader > 0)
+            XRender::renderRect(0, 0, ScreenW, ScreenH, {0, 0, 0, alphaFader});
 
         if(!gfxLoaderDebugString.empty() && gfxLoaderDebugStart + c_gfxLoaderShowInterval < SDL_GetTicks())
         {
@@ -1478,7 +1483,7 @@ void UpdateLoadREAL()
 #endif
             SuperPrint(gfxLoaderDebugString.c_str(), 3,
                        Left + 10, Bottom - 24,
-                       1.f, 1.f, 0.f, 0.5f);
+                       {255, 255, 0, 127});
 
 #ifndef PGE_NO_THREADING
             SDL_UnlockMutex(gfxLoaderDebugMutex);

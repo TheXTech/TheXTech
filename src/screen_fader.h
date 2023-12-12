@@ -46,9 +46,7 @@ struct ScreenFader
     PGE_Fader m_fader;
     float m_scale = 0.0f;
 
-    float color_r = 0.f;
-    float color_g = 0.f;
-    float color_b = 0.f;
+    XTColor color = {0, 0, 0};
 
     // Focus on the point (using circle or rectangular effect)
     int m_focusUniform = -1;

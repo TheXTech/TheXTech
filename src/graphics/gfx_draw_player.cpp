@@ -164,7 +164,7 @@ void DrawPlayer(Player_t &p, const int Z)
 {
     int B = 0;
     double C = 0;
-    float s = ShadowMode ? 0.f : 1.f;
+    XTColor s = ShadowMode ? XTColor(0, 0, 0) : XTColor();
     //auto &p = Player[A];
 
     bool player_door_scroll = (p.Effect == 7 && p.Effect2 >= 128);
@@ -190,7 +190,7 @@ void DrawPlayer(Player_t &p, const int Z)
                                           16,
                                           GFX.Tongue[2],
                                           0, 0,
-                                          s, s, s);
+                                          s);
 
                     C = 1;
                     if(p.Direction == 1)
@@ -202,20 +202,20 @@ void DrawPlayer(Player_t &p, const int Z)
                                           GFX.Tongue[1],
                                           0,
                                           16 * C,
-                                          s, s, s);
+                                          s);
                 }
 
                 // Yoshi's Body
                 RenderTexturePlayer(Z, vScreen[Z].X + p.Location.X + p.YoshiBX,
                                       vScreen[Z].Y + p.Location.Y + p.YoshiBY,
                                       32, 32,
-                                      GFXYoshiB[B], 0, 32 * p.YoshiBFrame, s, s, s);
+                                      GFXYoshiB[B], 0, 32 * p.YoshiBFrame, s);
 
                 // Yoshi's Head
                 RenderTexturePlayer(Z, vScreen[Z].X + p.Location.X + p.YoshiTX,
                                       vScreen[Z].Y + p.Location.Y + p.YoshiTY,
                                       32, 32,
-                                      GFXYoshiT[B], 0, 32 * p.YoshiTFrame, s, s, s);
+                                      GFXYoshiT[B], 0, 32 * p.YoshiTFrame, s);
             }
 
             if(p.Fairy) // draw a fairy
@@ -230,14 +230,14 @@ void DrawPlayer(Player_t &p, const int Z)
                                           GFXNPC[254],
                                           0,
                                           (SpecialFrame[9] + (p.Direction > 0 ? 1 : 3)) * 32,
-                                          s, s, s);
+                                          s);
 //                    if(p.Direction == 1)
 //                    {
-//                        RenderTexturePlayer(Z, vScreen[Z].X + p.Location.X - 5, vScreen[Z].Y + p.Location.Y - 2, 32, 32, GFXNPC[254], 0, (SpecialFrame[9] + 1) * 32, s, s, s);
+//                        RenderTexturePlayer(Z, vScreen[Z].X + p.Location.X - 5, vScreen[Z].Y + p.Location.Y - 2, 32, 32, GFXNPC[254], 0, (SpecialFrame[9] + 1) * 32, s);
 //                    }
 //                    else
 //                    {
-//                        RenderTexturePlayer(Z, vScreen[Z].X + p.Location.X - 5, vScreen[Z].Y + p.Location.Y - 2, 32, 32, GFXNPC[254], 0, (SpecialFrame[9] + 3) * 32, s, s, s);
+//                        RenderTexturePlayer(Z, vScreen[Z].X + p.Location.X - 5, vScreen[Z].Y + p.Location.Y - 2, 32, 32, GFXNPC[254], 0, (SpecialFrame[9] + 3) * 32, s);
 //                    }
                 }
             }
@@ -260,7 +260,7 @@ void DrawPlayer(Player_t &p, const int Z)
                                 tx,
                                 pfrX(tx, p),
                                 pfrY(tx, p),
-                                s, s, s);
+                                s);
                 }
                 else if(p.Mount == 1)
                 {
@@ -284,7 +284,7 @@ void DrawPlayer(Player_t &p, const int Z)
                                     tx,
                                     pfrX(tx, p),
                                     pfrY(tx, p),
-                                    s, s, s);
+                                    s);
                     }
 
                     RenderTexturePlayer(Z, vScreen[Z].X + p.Location.X + p.Location.Width / 2.0 - 16,
@@ -293,7 +293,7 @@ void DrawPlayer(Player_t &p, const int Z)
                                           GFX.Boot[p.MountType],
                                           0,
                                           32 * p.MountFrame,
-                                          s, s, s);
+                                          s);
                 }
                 else if(p.Mount == 3)
                 {
@@ -304,7 +304,7 @@ void DrawPlayer(Player_t &p, const int Z)
                                           tx,
                                           pfrX(tx, p),
                                           pfrY(tx, p),
-                                          s, s, s);
+                                          s);
                 }
             }
 
@@ -368,13 +368,13 @@ void DrawPlayer(Player_t &p, const int Z)
                     {
                         RenderTexturePlayer(Z, vScreen[Z].X + p.Location.X + p.YoshiBX - 12,
                                               vScreen[Z].Y + p.Location.Y + p.YoshiBY - 16,
-                                              32, 32, GFX.YoshiWings, 0, 0 + 32 * p.YoshiWingsFrame, s, s, s);
+                                              32, 32, GFX.YoshiWings, 0, 0 + 32 * p.YoshiWingsFrame, s);
                     }
                     else
                     {
                         RenderTexturePlayer(Z, vScreen[Z].X + p.Location.X + p.YoshiBX + 12,
                                               vScreen[Z].Y + p.Location.Y + p.YoshiBY - 16,
-                                              32, 32, GFX.YoshiWings, 0, 0 + 32 * p.YoshiWingsFrame, s, s, s);
+                                              32, 32, GFX.YoshiWings, 0, 0 + 32 * p.YoshiWingsFrame, s);
                     }
                 }
                 if(p.Mount == 1 && p.MountType == 3)
@@ -383,13 +383,13 @@ void DrawPlayer(Player_t &p, const int Z)
                     {
                         RenderTexturePlayer(Z, vScreen[Z].X + p.Location.X - 24,
                                               vScreen[Z].Y + p.Location.Y + p.Location.Height - 40,
-                                              32, 32, GFX.YoshiWings, 0, 0 + 32 * p.YoshiWingsFrame, s, s, s);
+                                              32, 32, GFX.YoshiWings, 0, 0 + 32 * p.YoshiWingsFrame, s);
                     }
                     else
                     {
                         RenderTexturePlayer(Z, vScreen[Z].X + p.Location.X + 16,
                                               vScreen[Z].Y + p.Location.Y + p.Location.Height - 40,
-                                              32, 32, GFX.YoshiWings, 0, 0 + 32 * p.YoshiWingsFrame, s, s, s);
+                                              32, 32, GFX.YoshiWings, 0, 0 + 32 * p.YoshiWingsFrame, s);
                     }
                 }
             }

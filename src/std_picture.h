@@ -22,6 +22,8 @@
 #ifndef STD_PICTURE_H
 #define STD_PICTURE_H
 
+#include "xt_color.h"
+
 #include "core/picture_data.h"
 #include "core/picture_load.h"
 
@@ -30,16 +32,6 @@
 #   define STD_PICTURE_HAS_ORIG_PATH
 #endif
 
-/*!
- * \brief RGBA pixel color
- */
-struct XTColor
-{
-    uint8_t r = 255;
-    uint8_t g = 255;
-    uint8_t b = 255;
-    uint8_t a = 255;
-};
 
 struct SDL_Texture;
 

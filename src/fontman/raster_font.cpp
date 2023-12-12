@@ -72,12 +72,14 @@ void RasterFont::loadFont(const std::string &font_ini)
 #   define THEXTECH_USE_1X_FONT_MODE
 #endif
 
+    uint32_t ttfOutlinesColourPacked = 0x000000FF;
+
     size_t tables = 0;
     font.beginGroup("font");
     font.read("tables", tables, 0);
     font.read("name", m_fontName, m_fontName);
     font.read("ttf-outlines", m_ttfOutlines, false);
-    font.read("ttf-outlines-colour", m_ttfOutLinesColour, 0x000000FF);
+    font.read("ttf-outlines-colour", ttfOutlinesColourPacked, 0x000000FF);
     font.read("ttf-fallback", m_ttfFallback, "");
     font.read("ttf-size", m_ttfSize, -1);
 #if defined(THEXTECH_USE_1X_FONT_MODE) // Use special fonts targeted to smaller screen resolutions
@@ -94,10 +96,10 @@ void RasterFont::loadFont(const std::string &font_ini)
     std::vector<std::string> tables_list;
     tables_list.reserve(tables);
 
-    m_ttfOutlinesColourF[0] = float((m_ttfOutLinesColour >> 24) & 0xFF) / 255.f;
-    m_ttfOutlinesColourF[1] = float((m_ttfOutLinesColour >> 16) & 0xFF) / 255.f;
-    m_ttfOutlinesColourF[2] = float((m_ttfOutLinesColour >> 8) & 0xFF) / 255.f;
-    m_ttfOutlinesColourF[3] = float((m_ttfOutLinesColour >> 0) & 0xFF) / 255.f;
+    m_ttfOutlinesColour.r = (ttfOutlinesColourPacked >> 24) & 0xFF;
+    m_ttfOutlinesColour.g = (ttfOutlinesColourPacked >> 16) & 0xFF;
+    m_ttfOutlinesColour.b = (ttfOutlinesColourPacked >> 8) & 0xFF;
+    m_ttfOutlinesColour.a = (ttfOutlinesColourPacked >> 0) & 0xFF;
 
     font.beginGroup("tables");
 
@@ -343,7 +345,7 @@ PGE_Size RasterFont::glyphSize(const char* utf8char, uint32_t charNum, uint32_t 
 
 PGE_Size RasterFont::printText(const char* text, size_t text_size,
                                int32_t x, int32_t y,
-                               float Red, float Green, float Blue, float Alpha,
+                               XTColor color,
                                uint32_t,
                                CropInfo* crop_info)
 {
@@ -357,7 +359,7 @@ PGE_Size RasterFont::printText(const char* text, size_t text_size,
 
     int32_t  offsetX_max = 0;
 
-    auto letter_alpha = Alpha;
+    uint8_t letter_alpha = color.a;
 
     const char *strIt  = text;
     const char *strEnd = strIt + text_size;
@@ -395,7 +397,7 @@ PGE_Size RasterFont::printText(const char* text, size_t text_size,
 
             if(crop_info)
             {
-                if(!crop_info->letter_alpha(letter_alpha, Alpha, offsetX, offsetX + drawn_width))
+                if(!crop_info->letter_alpha(letter_alpha, color.a, offsetX, offsetX + drawn_width))
                     break;
             }
 
@@ -406,7 +408,7 @@ PGE_Size RasterFont::printText(const char* text, size_t text_size,
                                        w, h,
                                        *rch.tx,
                                        rch.x, rch.y,
-                                       Red, Green, Blue, letter_alpha);
+                                       color.with_alpha(letter_alpha));
             }
 
             offsetX += drawn_width + m_interLetterSpace;
@@ -449,7 +451,7 @@ PGE_Size RasterFont::printText(const char* text, size_t text_size,
 
                 if(crop_info)
                 {
-                    if(!crop_info->letter_alpha(letter_alpha, Alpha, offsetX, offsetX + drawn_width))
+                    if(!crop_info->letter_alpha(letter_alpha, color.a, offsetX, offsetX + drawn_width))
                         break;
                 }
 
@@ -461,11 +463,8 @@ PGE_Size RasterFont::printText(const char* text, size_t text_size,
                                     font_size_use,
                                     (doublePixel ? 2.0 : 1.0),
                                     m_ttfOutlines,
-                                    Red, Green, Blue, letter_alpha,
-                                    m_ttfOutlinesColourF[0],
-                                    m_ttfOutlinesColourF[1],
-                                    m_ttfOutlinesColourF[2],
-                                    m_ttfOutlinesColourF[3]);
+                                    color.with_alpha(letter_alpha),
+                                    m_ttfOutlinesColour);
                 }
 
                 offsetX += drawn_width + m_interLetterSpace;

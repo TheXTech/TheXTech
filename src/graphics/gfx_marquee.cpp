@@ -106,7 +106,7 @@ CropInfo MarqueeState::crop_info(MarqueeSpec spec) const
 
 void SuperPrintMarquee(int SuperN, const char* SuperChars, int Font, float X, float Y,
                     MarqueeSpec marquee_spec, MarqueeState& marquee_state,
-                    float r, float g, float b, float a)
+                    XTColor color)
 {
     bool outline = false;
 
@@ -138,7 +138,7 @@ void SuperPrintMarquee(int SuperN, const char* SuperChars, int Font, float X, fl
 
     CropInfo ci = marquee_state.crop_info(marquee_spec);
 
-    FontManager::printText(SuperChars, SuperN, X, Y, dFont, r, g, b, a, FontManager::fontSizeFromSmbxFont(Font), outline, 0.0f, 0.0f, 0.0f, &ci);
+    FontManager::printText(SuperChars, SuperN, X, Y, dFont, color, FontManager::fontSizeFromSmbxFont(Font), outline, {0, 0, 0}, &ci);
 
     // update text width if unexpected result occurred (didn't terminate while text left, terminated when no text left)
     bool text_left = (ci.offset < marquee_state.check_width() - marquee_spec.marquee_width);
@@ -152,22 +152,22 @@ void SuperPrintMarquee(int SuperN, const char* SuperChars, int Font, float X, fl
 
 void SuperPrintMarquee(const char* SuperChars, int Font, float X, float Y,
                     MarqueeSpec marquee_spec, MarqueeState& marquee_state,
-                    float r, float g, float b, float a)
+                    XTColor color)
 {
     int len = (int)SDL_strlen(SuperChars);
 
     return SuperPrintMarquee(len, SuperChars, Font, X, Y,
         marquee_spec, marquee_state,
-        r, g, b, a);
+        color);
 }
 
 void SuperPrintMarquee(const std::string& SuperWords, int Font, float X, float Y,
                     MarqueeSpec marquee_spec, MarqueeState& marquee_state,
-                    float r, float g, float b, float a)
+                    XTColor color)
 {
     int len = (int)SuperWords.size();
 
     return SuperPrintMarquee(len, SuperWords.c_str(), Font, X, Y,
         marquee_spec, marquee_state,
-        r, g, b, a);
+        color);
 }

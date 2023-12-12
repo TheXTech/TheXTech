@@ -446,7 +446,7 @@ void UpdateGraphics2(bool skipRepaint)
             if(vScreenCollision(Z, music.Location))
             {
                 XRender::renderRect(vScreen[Z].X + music.Location.X, vScreen[Z].Y + music.Location.Y, 32, 32,
-                    1.f, 0.f, 1.f, 1.f, false);
+                    {255, 0, 255}, false);
                 SuperPrint(std::to_string(music.Type), 1, vScreen[Z].X + music.Location.X + 2, vScreen[Z].Y + music.Location.Y + 2);
             }
         }
@@ -457,28 +457,26 @@ void UpdateGraphics2(bool skipRepaint)
             if(vScreenCollision(Z, static_cast<Location_t>(area.Location)))
             {
                 // single color for now
-                float r = 1.0f;
-                float g = 0.8f;
-                float b = 0.2f;
+                XTColor color = XTColorF(1.0f, 0.8f, 0.2f);
 
                 // draw rect with outline
                 XRender::renderRect(vScreen[Z].X + area.Location.X, vScreen[Z].Y + area.Location.Y,
                     area.Location.Width, area.Location.Height,
-                    0.0f, 0.0f, 0.0f, 1.0f, false);
+                    {0, 0, 0}, false);
                 XRender::renderRect(vScreen[Z].X + area.Location.X + 1, vScreen[Z].Y + area.Location.Y + 1,
                     area.Location.Width - 2, area.Location.Height - 2,
-                    0.0f, 0.0f, 0.0f, 1.0f, false);
+                    {0, 0, 0}, false);
                 XRender::renderRect(vScreen[Z].X + area.Location.X + 2, vScreen[Z].Y + area.Location.Y + 2,
                     area.Location.Width - 4, area.Location.Height - 4,
-                    r, g, b, 1.0f, false);
+                    color, false);
                 XRender::renderRect(vScreen[Z].X + area.Location.X + 3, vScreen[Z].Y + area.Location.Y + 3,
                     area.Location.Width - 6, area.Location.Height - 6,
-                    r, g, b, 1.0f, false);
+                    color, false);
 
                 // highlight selectable area
                 XRender::renderRect(vScreen[Z].X + area.Location.X + 4, vScreen[Z].Y + area.Location.Y + 4,
                     28, 28,
-                    1.0f, 1.0f, 0.0f, 0.5f, true);
+                    XTColorF(1.0f, 1.0f, 0.0f, 0.5f), true);
 
                 // label with index
                 SuperPrint(std::to_string(A), 1, vScreen[Z].X + area.Location.X + 4, vScreen[Z].Y + area.Location.Y + 4);
@@ -651,7 +649,7 @@ void UpdateGraphics2(bool skipRepaint)
         g_worldScreenFader.draw();
 
         if(PrintFPS > 0 && ShowFPS)
-            SuperPrint(std::to_string(int(PrintFPS)), 1, 8, 8, 0.f, 1.f, 0.f);
+            SuperPrint(std::to_string(int(PrintFPS)), 1, 8, 8, {0, 255, 0});
 
         g_stats.print();
 
@@ -663,14 +661,14 @@ void UpdateGraphics2(bool skipRepaint)
             {
                 int y = 20;
                 float alpha = 1.0f;
-                SuperPrintScreenCenter(WorldName, 3, y, 1.f, 1.f, 1.f, alpha);
+                SuperPrintScreenCenter(WorldName, 3, y, XTAlphaF(alpha));
             }
             // display at bottom
             else if(g_config.show_episode_title == Config_t::EPISODE_TITLE_BOTTOM)
             {
                 int y = ScreenH - 60;
                 float alpha = 0.75f;
-                SuperPrintScreenCenter(WorldName, 3, y, 1.f, 1.f, 1.f, alpha);
+                SuperPrintScreenCenter(WorldName, 3, y, XTAlphaF(alpha));
             }
         }
 

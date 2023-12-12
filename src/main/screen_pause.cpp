@@ -323,16 +323,16 @@ void Render()
     switch(s_pause_type)
     {
     case(PauseType::Legacy):
-        XRender::renderRect(ScreenW / 2 - menu_box_width / 2, ScreenH / 2 - menu_box_height / 2, menu_box_width, menu_box_height, 0, 0, 0);
+        XRender::renderRect(ScreenW / 2 - menu_box_width / 2, ScreenH / 2 - menu_box_height / 2, menu_box_width, menu_box_height, {0, 0, 0});
         break;
     case(PauseType::Modern):
     default:
-        XRender::renderRect(ScreenW / 2 - menu_box_width / 2 - 4, ScreenH / 2 - menu_box_height / 2 - 4, menu_box_width + 8, menu_box_height + 8, 0, 0, 0, 1);
-        XRender::renderRect(ScreenW / 2 - menu_box_width / 2 - 2, ScreenH / 2 - menu_box_height / 2 - 2, menu_box_width + 4, menu_box_height + 4, 1, 1, 1, 1);
-        XRender::renderRect(ScreenW / 2 - menu_box_width / 2, ScreenH / 2 - menu_box_height / 2, menu_box_width, menu_box_height, 0, 0, 0, 1);
+        XRender::renderRect(ScreenW / 2 - menu_box_width / 2 - 4, ScreenH / 2 - menu_box_height / 2 - 4, menu_box_width + 8, menu_box_height + 8, {0, 0, 0});
+        XRender::renderRect(ScreenW / 2 - menu_box_width / 2 - 2, ScreenH / 2 - menu_box_height / 2 - 2, menu_box_width + 4, menu_box_height + 4, {255, 255, 255});
+        XRender::renderRect(ScreenW / 2 - menu_box_width / 2, ScreenH / 2 - menu_box_height / 2, menu_box_width, menu_box_height, {0, 0, 0});
         break;
     case(PauseType::Testing):
-        XRender::renderRect(ScreenW / 2 - menu_box_width / 2, ScreenH / 2 - menu_box_height / 2, menu_box_width, menu_box_height, 0, 0, 0, 0.5);
+        XRender::renderRect(ScreenW / 2 - menu_box_width / 2, ScreenH / 2 - menu_box_height / 2, menu_box_width, menu_box_height, {0, 0, 0, 127});
         break;
     }
 
@@ -340,9 +340,9 @@ void Render()
     {
         for(size_t i = 0; i < s_items.size(); i++)
         {
-            float c = ((int)i == MenuCursor) ? 1.0f : 0.5f;
+            XTColor color = ((int)i == MenuCursor) ? XTColor() : XTColor(127, 127, 127);
 
-            SuperPrintScreenCenter(s_items[i].name, 5, menu_top_Y + (i * 36), c, c, c);
+            SuperPrintScreenCenter(s_items[i].name, 5, menu_top_Y + (i * 36), color);
         }
     }
     else
@@ -355,11 +355,11 @@ void Render()
         if(GFX.PCursor.inited)
         {
             if(s_pause_plr == 2 && s_pause_type != PauseType::Legacy)
-                XRender::renderTexture(menu_left_X - 20, menu_top_Y + (MenuCursor * 36), GFX.PCursor, 0.0, 1.0, 0.0);
+                XRender::renderTexture(menu_left_X - 20, menu_top_Y + (MenuCursor * 36), GFX.PCursor, {0, 255, 0});
             else if(s_pause_plr != 1 && s_pause_type != PauseType::Legacy)
                 XRender::renderTexture(menu_left_X - 20, menu_top_Y + (MenuCursor * 36), GFX.PCursor);
             else
-                XRender::renderTexture(menu_left_X - 20, menu_top_Y + (MenuCursor * 36), GFX.PCursor, 1.0, 0.0, 0.0);
+                XRender::renderTexture(menu_left_X - 20, menu_top_Y + (MenuCursor * 36), GFX.PCursor, {255, 0, 0});
         }
         else if(s_pause_plr == 2 && s_pause_type != PauseType::Legacy)
             XRender::renderTexture(menu_left_X - 20, menu_top_Y + (MenuCursor * 36), 16, 16, GFX.MCursor[3], 0, 0);

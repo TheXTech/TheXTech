@@ -93,22 +93,22 @@ bool Update_qScreen(int Z, double camRate = 2, double resizeRate = 2);
 // Public Sub SuperPrint(SuperWords As String, Font As Integer, X As Single, Y As Single) 'prints text to the screen
 // prints text to the screen
 int SuperTextPixLen(int SuperN, const char* SuperChars, int Font);
-void SuperPrint(int SuperN, const char* SuperChars, int Font, float X, float Y, float r = 1.f, float g = 1.f, float b = 1.f, float a = 1.f);
-void SuperPrintRightAlign(int SuperN, const char* SuperChars, int Font, float X, float Y, float r = 1.f, float g = 1.f, float b = 1.f, float a = 1.f);
-void SuperPrintCenter(int SuperN, const char* SuperChars, int Font, float X, float Y, float r = 1.f, float g = 1.f, float b = 1.f, float a = 1.f);
-void SuperPrintScreenCenter(int SuperN, const char* SuperChars, int Font, float Y, float r = 1.f, float g = 1.f, float b = 1.f, float a = 1.f);
+void SuperPrint(int SuperN, const char* SuperChars, int Font, float X, float Y, XTColor color = XTColor());
+void SuperPrintRightAlign(int SuperN, const char* SuperChars, int Font, float X, float Y, XTColor color = XTColor());
+void SuperPrintCenter(int SuperN, const char* SuperChars, int Font, float X, float Y, XTColor color = XTColor());
+void SuperPrintScreenCenter(int SuperN, const char* SuperChars, int Font, float Y, XTColor color = XTColor());
 
 int SuperTextPixLen(const char* SuperChars, int Font);
-void SuperPrint(const char* SuperChars, int Font, float X, float Y, float r = 1.f, float g = 1.f, float b = 1.f, float a = 1.f);
-void SuperPrintRightAlign(const char* SuperChars, int Font, float X, float Y, float r = 1.f, float g = 1.f, float b = 1.f, float a = 1.f);
-void SuperPrintCenter(const char* SuperChars, int Font, float X, float Y, float r = 1.f, float g = 1.f, float b = 1.f, float a = 1.f);
-void SuperPrintScreenCenter(const char* SuperChars, int Font, float Y, float r = 1.f, float g = 1.f, float b = 1.f, float a = 1.f);
+void SuperPrint(const char* SuperChars, int Font, float X, float Y, XTColor color = XTColor());
+void SuperPrintRightAlign(const char* SuperChars, int Font, float X, float Y, XTColor color = XTColor());
+void SuperPrintCenter(const char* SuperChars, int Font, float X, float Y, XTColor color = XTColor());
+void SuperPrintScreenCenter(const char* SuperChars, int Font, float Y, XTColor color = XTColor());
 
 int SuperTextPixLen(const std::string &SuperWords, int Font);
-void SuperPrint(const std::string &SuperWords, int Font, float X, float Y, float r = 1.f, float g = 1.f, float b = 1.f, float a = 1.f);
-void SuperPrintRightAlign(const std::string &SuperWords, int Font, float X, float Y, float r = 1.f, float g = 1.f, float b = 1.f, float a = 1.f);
-void SuperPrintCenter(const std::string &SuperWords, int Font, float X, float Y, float r = 1.f, float g = 1.f, float b = 1.f, float a = 1.f);
-void SuperPrintScreenCenter(const std::string &SuperWords, int Font, float Y, float r = 1.f, float g = 1.f, float b = 1.f, float a = 1.f);
+void SuperPrint(const std::string &SuperWords, int Font, float X, float Y, XTColor color = XTColor());
+void SuperPrintRightAlign(const std::string &SuperWords, int Font, float X, float Y, XTColor color = XTColor());
+void SuperPrintCenter(const std::string &SuperWords, int Font, float X, float Y, XTColor color = XTColor());
+void SuperPrintScreenCenter(const std::string &SuperWords, int Font, float Y, XTColor color = XTColor());
 
 /*!
  * \brief Builds a UTF8 character positions map to simplify the text processing.

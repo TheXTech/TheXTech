@@ -212,7 +212,7 @@ void ScreenFader::draw(bool fullscreen)
             if(m_focusUniform >= 0)
                 XRender::assignUniform(effect, m_focusUniform, UniformValue_t((GLfloat)focusX, (GLfloat)focusY));
 
-            XRender::renderTextureScale(0, 0, drawW, drawH, effect, 1.0, 1.0, 1.0, m_scale);
+            XRender::renderTextureScale(0, 0, drawW, drawH, effect, XTAlphaF(m_scale));
 
             // if catastrophic failure, fallback to normal fader
             if(effect.inited)
@@ -222,12 +222,12 @@ void ScreenFader::draw(bool fullscreen)
 
     // fallthrough
     case S_FADE:
-        XRender::renderRect(0, 0, drawW, drawH, color_r, color_b, color_g, m_scale, true);
+        XRender::renderRect(0, 0, drawW, drawH, color.with_alphaF(m_scale), true);
         break;
 
     case S_RECT:
         if(m_scale >= 1.0f)
-            XRender::renderRect(0, 0, drawW, drawH, color_r, color_b, color_g, m_scale, true);
+            XRender::renderRect(0, 0, drawW, drawH, color.with_alphaF(m_scale), true);
         else
         {
             float rightW = (drawW - focusX),
@@ -238,19 +238,19 @@ void ScreenFader::draw(bool fullscreen)
                     bottomY = drawH - SDL_ceil(bottomH * m_scale) + 1; // bottom side
 
             // Left side
-            XRender::renderRect(0, 0, leftW, drawH, color_r, color_b, color_g, 1.f, true);
+            XRender::renderRect(0, 0, leftW, drawH, color, true);
             // right side
-            XRender::renderRect(rightX, 0, rightW * m_scale, drawH, color_r, color_b, color_g, 1.f, true);
+            XRender::renderRect(rightX, 0, rightW * m_scale, drawH, color, true);
             // Top side
-            XRender::renderRect(0, 0, drawW, topY, color_r, color_b, color_g, 1.f, true);
+            XRender::renderRect(0, 0, drawW, topY, color, true);
             // Bottom side
-            XRender::renderRect(0, bottomY, drawW, bottomH * m_scale, color_r, color_b, color_g, 1.f, true);
+            XRender::renderRect(0, bottomY, drawW, bottomH * m_scale, color, true);
         }
         break;
 
     case S_CIRCLE:
         if(m_scale >= 1.0f)
-            XRender::renderRect(0, 0, drawW, drawH, color_r, color_b, color_g, m_scale, true);
+            XRender::renderRect(0, 0, drawW, drawH, color.with_alphaF(m_scale), true);
         else
         {
             // int radius = drawH - (drawH * m_scale);
@@ -278,39 +278,39 @@ void ScreenFader::draw(bool fullscreen)
 
             int radius = maxRadius - (maxRadius * m_scale);
 
-            XRender::renderCircleHole(focusX, focusY, radius, color_r, color_b, color_g, 1.f);
+            XRender::renderCircleHole(focusX, focusY, radius, color);
             // left side
-            XRender::renderRect(0, 0, focusX - radius, drawH, color_r, color_b, color_g, 1.f, true);
+            XRender::renderRect(0, 0, focusX - radius, drawH, color, true);
             // right side
-            XRender::renderRect(focusX + radius, 0, drawW - (focusX + radius), drawH, color_r, color_b, color_g, 1.f, true);
+            XRender::renderRect(focusX + radius, 0, drawW - (focusX + radius), drawH, color, true);
             // Top side
-            XRender::renderRect(0, 0, drawW, focusY - radius + 1, color_r, color_b, color_g, 1.f, true);
+            XRender::renderRect(0, 0, drawW, focusY - radius + 1, color, true);
             // Bottom side
-            XRender::renderRect(0, focusY + radius, drawW, drawH - (focusY + radius), color_r, color_b, color_g, 1.f, true);
+            XRender::renderRect(0, focusY + radius, drawW, drawH - (focusY + radius), color, true);
         }
         break;
 
     case S_FLIP_H:
         if(m_scale >= 1.0f)
-            XRender::renderRect(0, 0, drawW, drawH, color_r, color_b, color_g, m_scale, true);
+            XRender::renderRect(0, 0, drawW, drawH, color.with_alphaF(m_scale), true);
         else
         {
             float center = (drawH / 2);
             float sideHeight = SDL_ceil(center * m_scale);
-            XRender::renderRect(0, 0, drawW, sideHeight, color_r, color_b, color_g, 1.f, true);
-            XRender::renderRect(0, drawH - sideHeight, drawW, sideHeight, color_r, color_b, color_g, 1.f, true);
+            XRender::renderRect(0, 0, drawW, sideHeight, color, true);
+            XRender::renderRect(0, drawH - sideHeight, drawW, sideHeight, color, true);
         }
         break;
 
     case S_FLIP_V:
         if(m_scale >= 1.0f)
-            XRender::renderRect(0, 0, drawW, drawH, color_r, color_b, color_g, m_scale, true);
+            XRender::renderRect(0, 0, drawW, drawH, color.with_alphaF(m_scale), true);
         else
         {
             float center = (drawW / 2);
             float sideWidth = SDL_ceil(center * m_scale);
-            XRender::renderRect(0, 0, sideWidth, drawH, color_r, color_b, color_g, 1.f, true);
-            XRender::renderRect(drawW - sideWidth, 0, sideWidth, drawH, color_r, color_b, color_g, 1.f, true);
+            XRender::renderRect(0, 0, sideWidth, drawH, color, true);
+            XRender::renderRect(drawW - sideWidth, 0, sideWidth, drawH, color, true);
         }
         break;
     }

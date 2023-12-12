@@ -652,7 +652,7 @@ void DrawFrozenNPC(int Z, int A)
                             n.Location.Y, CDbl(NPCWidthGFX[n.Type]), CDbl(NPCHeight[n.Type])))) && !n.Hidden)
     {
 // draw npc
-        float c = n.Shadow ? 0.f : 1.f;
+        XTColor c = n.Shadow ? XTColor(0, 0, 0) : XTColor();
         int content = int(n.Special);
         int contentFrame = int(n.Special2);
 
@@ -666,26 +666,26 @@ void DrawFrozenNPC(int Z, int A)
                                     float(n.Location.Width - 4),
                                     float(n.Location.Height - 4),
                                     GFXNPCBMP[content],
-                                    2, 2 + contentFrame * NPCHeight[content], c, c, c);
+                                    2, 2 + contentFrame * NPCHeight[content], c);
         }
 
         // draw ice
          XRender::renderTexture(float(vScreen[Z].X + n.Location.X + NPCFrameOffsetX[n.Type]),
                                 float(vScreen[Z].Y + n.Location.Y + NPCFrameOffsetY[n.Type]),
                                 float(n.Location.Width - 6), float(n.Location.Height - 6),
-                                GFXNPCBMP[n.Type], 0, 0, c, c, c);
+                                GFXNPCBMP[n.Type], 0, 0, c);
          XRender::renderTexture(float(vScreen[Z].X + n.Location.X + NPCFrameOffsetX[n.Type] + n.Location.Width - 6),
                                 float(vScreen[Z].Y + n.Location.Y + NPCFrameOffsetY[n.Type]),
                                 6, float(n.Location.Height - 6),
-                                GFXNPCBMP[n.Type], 128 - 6, 0, c, c, c);
+                                GFXNPCBMP[n.Type], 128 - 6, 0, c);
          XRender::renderTexture(float(vScreen[Z].X + n.Location.X + NPCFrameOffsetX[n.Type]),
                                 float(vScreen[Z].Y + n.Location.Y + NPCFrameOffsetY[n.Type] + n.Location.Height - 6),
                                 float(n.Location.Width - 6), 6,
-                                GFXNPCBMP[n.Type], 0, 128 - 6, c, c, c);
+                                GFXNPCBMP[n.Type], 0, 128 - 6, c);
          XRender::renderTexture(float(vScreen[Z].X + n.Location.X + NPCFrameOffsetX[n.Type] + n.Location.Width - 6),
                                 float(vScreen[Z].Y + n.Location.Y + NPCFrameOffsetY[n.Type] + n.Location.Height - 6),
                                 6, 6, GFXNPCBMP[n.Type],
-                                128 - 6, 128 - 6, c, c, c);
+                                128 - 6, 128 - 6, c);
     }
 }
 

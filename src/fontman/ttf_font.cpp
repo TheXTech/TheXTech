@@ -232,7 +232,7 @@ PGE_Size TtfFont::glyphSize(const char* utf8char, uint32_t charNum, uint32_t fon
 
 PGE_Size TtfFont::printText(const char *text, size_t text_size,
                             int32_t x, int32_t y,
-                            float Red, float Green, float Blue, float Alpha,
+                            XTColor color,
                             uint32_t fontSize,
                             CropInfo* crop_info)
 {
@@ -245,7 +245,7 @@ PGE_Size TtfFont::printText(const char *text, size_t text_size,
 
     int32_t  offsetX_max = 0;
 
-    auto letter_alpha = Alpha;
+    uint8_t letter_alpha = color.a;
 
     const char *strIt  = text;
     const char *strEnd = strIt + text_size;
@@ -280,7 +280,7 @@ PGE_Size TtfFont::printText(const char *text, size_t text_size,
         {
             if(crop_info)
             {
-                if(!crop_info->letter_alpha(letter_alpha, Alpha, offsetX, offsetX + (glyph.advance >> 6)))
+                if(!crop_info->letter_alpha(letter_alpha, color.a, offsetX, offsetX + (glyph.advance >> 6)))
                     break;
             }
 
@@ -294,7 +294,7 @@ PGE_Size TtfFont::printText(const char *text, size_t text_size,
                     (m_doublePixel ? (glyph.width * 2) : glyph.width),
                     (m_doublePixel ? (glyph.height * 2) : glyph.height),
                     *glyph.tx,
-                    Red, Green, Blue, letter_alpha
+                    color.with_alpha(letter_alpha)
                 );
             }
         }
@@ -335,8 +335,8 @@ BaseFontEngine::FontType TtfFont::getFontType() const
 uint32_t TtfFont::drawGlyph(const char *u8char,
                             int32_t x, int32_t y, uint32_t fontSize, double scaleSize,
                             bool drawOutlines,
-                            float Red, float Green, float Blue, float Alpha,
-                            float OL_Red, float OL_Green, float OL_Blue, float OL_Alpha)
+                            XTColor color,
+                            XTColor OL_color)
 {
     const TheGlyph &glyph = getGlyph(fontSize, get_utf8_char(u8char));
     if(glyph.tx)
@@ -355,7 +355,7 @@ uint32_t TtfFont::drawGlyph(const char *u8char,
             };
 
             // take square of Alpha to match blend of normal text
-            float alpha_use = Alpha * Alpha * OL_Alpha;
+            uint8_t scaled_a = XTColor::mul(color.a, color.a);
 
             for(size_t i = 0; i < 4; ++i)
             {
@@ -365,7 +365,7 @@ uint32_t TtfFont::drawGlyph(const char *u8char,
                     glyph.width * static_cast<float>(scaleSize),
                     glyph.height * static_cast<float>(scaleSize),
                     *glyph.tx,
-                    OL_Red, OL_Green, OL_Blue, alpha_use
+                    color.with_alpha(scaled_a) * OL_color
                 );
             }
         }
@@ -376,7 +376,7 @@ uint32_t TtfFont::drawGlyph(const char *u8char,
             glyph.width * static_cast<float>(scaleSize),
             glyph.height * static_cast<float>(scaleSize),
             *glyph.tx,
-            Red, Green, Blue, Alpha
+            color
         );
 
         return glyph.width;

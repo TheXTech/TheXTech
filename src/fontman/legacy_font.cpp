@@ -251,7 +251,7 @@ PGE_Size LegacyFont::glyphSize(const char* utf8char, uint32_t charNum, uint32_t 
 }
 
 PGE_Size LegacyFont::printText(const char* text, size_t text_size, int32_t x, int32_t y,
-                               float Red, float Green, float Blue, float Alpha,
+                               XTColor color,
                                uint32_t /*fontSize*/,
                                CropInfo* crop_info)
 {
@@ -263,7 +263,7 @@ PGE_Size LegacyFont::printText(const char* text, size_t text_size, int32_t x, in
 
     int32_t  offsetX_max = 0;
 
-    auto letter_alpha = Alpha;
+    uint8_t letter_alpha = color.a;
 
     const char *strIt  = text;
     const char *strEnd = strIt + text_size;
@@ -303,7 +303,7 @@ PGE_Size LegacyFont::printText(const char* text, size_t text_size, int32_t x, in
 
             if(crop_info)
             {
-                if(!crop_info->letter_alpha(letter_alpha, Alpha, offsetX, offsetX + rch.width))
+                if(!crop_info->letter_alpha(letter_alpha, color.a, offsetX, offsetX + rch.width))
                     break;
             }
 
@@ -314,7 +314,7 @@ PGE_Size LegacyFont::printText(const char* text, size_t text_size, int32_t x, in
                                        rch.tW, rch.tH,
                                        *m_textures[rch.texId],
                                        rch.tX, rch.tY,
-                                       Red, Green, Blue, letter_alpha);
+                                       color.with_alpha(letter_alpha));
             }
 
             offsetX += rch.width;

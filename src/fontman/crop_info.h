@@ -58,11 +58,11 @@ struct CropInfo
      *
      * Side effect: marks the did_terminate flag if returning false
      */
-    inline bool letter_alpha(float& letter_alpha, float text_alpha, int left, int right)
+    inline bool letter_alpha(uint8_t& letter_alpha, uint16_t text_alpha, int left, int right)
     {
         if(left < 0)
         {
-            letter_alpha = 0.0f;
+            letter_alpha = 0;
             return true;
         }
 

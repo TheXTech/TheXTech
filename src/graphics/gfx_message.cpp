@@ -102,13 +102,13 @@ void DrawMessage(const UTF8CharMap_t &SuperTextMap)
     {
         XRender::renderRect(ScreenW / 2 - TextBoxW / 2,
                             BoxY_Start,
-                            TextBoxW, totalHeight, 0.f, 0.f, 0.f, 1.f);
+                            TextBoxW, totalHeight, {0, 0, 0});
         XRender::renderRect(ScreenW / 2 - TextBoxW / 2 + 2,
                             BoxY_Start + 2,
-                            TextBoxW - 4, totalHeight - 4, 1.f, 1.f, 1.f, 1.f);
+                            TextBoxW - 4, totalHeight - 4, {255, 255, 255});
         XRender::renderRect(ScreenW / 2 - TextBoxW / 2 + 4,
                             BoxY_Start + 4,
-                            TextBoxW - 8, totalHeight - 8, 8.f / 255.f, 96.f / 255.f, 168.f / 255.f, 1.f);
+                            TextBoxW - 8, totalHeight - 8, {8, 96, 168});
     }
 
 #ifndef BUILT_IN_TEXTBOX

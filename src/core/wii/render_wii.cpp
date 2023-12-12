@@ -451,7 +451,7 @@ void clearBuffer()
     {
         setTargetTexture();
         resetViewport();
-        renderRect(0, 0, ScreenW, ScreenH, 0, 0, 0);
+        renderRect(0, 0, ScreenW, ScreenH, {0, 0, 0});
         repaint();
     }
 }
@@ -886,8 +886,13 @@ inline float FLOORDIV2(float x)
     return std::floor(x / 2.0f);
 }
 
-void wii_RenderBox(int x1, int y1, int x2, int y2, uint8_t r, uint8_t g, uint8_t b, uint8_t a, bool filled)
+void wii_RenderBox(int x1, int y1, int x2, int y2, XTColor color, bool filled)
 {
+    uint8_t r = color.r;
+    uint8_t g = color.g;
+    uint8_t b = color.b;
+    uint8_t a = color.a;
+
     GX_SetTevOrder(GX_TEVSTAGE0, GX_TEXCOORDNULL, GX_TEXMAP_NULL, GX_COLOR0);
     GX_SetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
 
@@ -919,14 +924,14 @@ void wii_RenderBox(int x1, int y1, int x2, int y2, uint8_t r, uint8_t g, uint8_t
     GX_End();
 }
 
-void minport_RenderBoxFilled(int x1, int y1, int x2, int y2, uint8_t r, uint8_t g, uint8_t b, uint8_t a)
+void minport_RenderBoxFilled(int x1, int y1, int x2, int y2, XTColor color)
 {
-    wii_RenderBox(x1, y1, x2, y2, r, g, b, a, true);
+    wii_RenderBox(x1, y1, x2, y2, color, true);
 }
 
-void minport_RenderBoxUnfilled(int x1, int y1, int x2, int y2, uint8_t r, uint8_t g, uint8_t b, uint8_t a)
+void minport_RenderBoxUnfilled(int x1, int y1, int x2, int y2, XTColor color)
 {
-    wii_RenderBox(x1, y1, x2, y2, r, g, b, a, false);
+    wii_RenderBox(x1, y1, x2, y2, color, false);
 }
 
 inline bool GX_DrawImage_Custom(GXTexObj* img,
@@ -934,12 +939,12 @@ inline bool GX_DrawImage_Custom(GXTexObj* img,
                                 int16_t x, int16_t y, uint16_t w, uint16_t h,
                                 uint16_t src_x, uint16_t src_y, uint16_t src_w, uint16_t src_h,
                                 unsigned int flip,
-                                float _r, float _g, float _b, float _a)
+                                XTColor color)
 {
-    uint8_t r = _r * 255.0f + 0.5f;
-    uint8_t g = _g * 255.0f + 0.5f;
-    uint8_t b = _b * 255.0f + 0.5f;
-    uint8_t a = _a * 255.0f + 0.5f;
+    uint8_t r = color.r;
+    uint8_t g = color.g;
+    uint8_t b = color.b;
+    uint8_t a = color.a;
 
     GX_SetTevOp(GX_TEVSTAGE0, GX_MODULATE);
     GX_SetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
@@ -1027,7 +1032,7 @@ inline bool GX_DrawImage_Custom_Rotated(GXTexObj* img,
                                         float x, float y, float w, float h,
                                         float src_x, float src_y, float src_w, float src_h,
                                         unsigned int flip, FPoint_t* center, float angle,
-                                        float r, float g, float b, float a)
+                                        XTColor color)
 {
     Mtx rotated;
 
@@ -1060,7 +1065,7 @@ inline bool GX_DrawImage_Custom_Rotated(GXTexObj* img,
                         -cx, -cy, w, h,
                         src_x, src_y, src_w, src_h,
                         flip,
-                        r, g, b, a);
+                        color);
 
     GX_LoadPosMtxImm(view, GX_PNMTX0);
 
@@ -1071,7 +1076,7 @@ void minport_RenderTexturePrivate(int16_t xDst, int16_t yDst, int16_t wDst, int1
                                   StdPicture& tx,
                                   int16_t xSrc, int16_t ySrc, int16_t wSrc, int16_t hSrc,
                                   float rotateAngle, FPoint_t* center, unsigned int flip,
-                                  float red, float green, float blue, float alpha)
+                                  XTColor color)
 {
     if(!tx.inited)
         return;
@@ -1165,11 +1170,11 @@ void minport_RenderTexturePrivate(int16_t xDst, int16_t yDst, int16_t wDst, int1
             {
                 // TODO: use correct center to support big textures being rotated
                 GX_DrawImage_Custom_Rotated(to_draw_2, to_mask_2, xDst, yDst, (1024 - xSrc) * wDst / wSrc, hDst,
-                                            xSrc, ySrc, 1024 - xSrc, hSrc, flip, center, rotateAngle, red, green, blue, alpha);
+                                            xSrc, ySrc, 1024 - xSrc, hSrc, flip, center, rotateAngle, color);
             }
             else
                 GX_DrawImage_Custom(to_draw_2, to_mask_2, xDst, yDst, (1024 - xSrc) * wDst / wSrc, hDst,
-                                    xSrc, ySrc, 1024 - xSrc, hSrc, flip, red, green, blue, alpha);
+                                    xSrc, ySrc, 1024 - xSrc, hSrc, flip, color);
 
             xDst += (1024 - xSrc) * wDst / wSrc;
             wDst -= (1024 - xSrc) * wDst / wSrc;
@@ -1227,11 +1232,11 @@ void minport_RenderTexturePrivate(int16_t xDst, int16_t yDst, int16_t wDst, int1
             {
                 // TODO: use correct center to support big textures being rotated
                 GX_DrawImage_Custom_Rotated(to_draw_2, to_mask_2, xDst, yDst, wDst, (1024 - ySrc) * hDst / hSrc,
-                                            xSrc, ySrc, wSrc, 1024 - ySrc, flip, center, rotateAngle, red, green, blue, alpha);
+                                            xSrc, ySrc, wSrc, 1024 - ySrc, flip, center, rotateAngle, color);
             }
             else
                 GX_DrawImage_Custom(to_draw_2, to_mask_2, xDst, yDst, wDst, (1024 - ySrc) * hDst / hSrc,
-                                    xSrc, ySrc, wSrc, 1024 - ySrc, flip, red, green, blue, alpha);
+                                    xSrc, ySrc, wSrc, 1024 - ySrc, flip, color);
 
             yDst += (1024 - ySrc) * hDst / hSrc;
             hDst -= (1024 - ySrc) * hDst / hSrc;
@@ -1253,10 +1258,10 @@ void minport_RenderTexturePrivate(int16_t xDst, int16_t yDst, int16_t wDst, int1
 
     if(rotateAngle != 0.0)
         GX_DrawImage_Custom_Rotated(to_draw, to_mask, xDst, yDst, wDst, hDst,
-                                    xSrc, ySrc, wSrc, hSrc, flip, center, rotateAngle, red, green, blue, alpha);
+                                    xSrc, ySrc, wSrc, hSrc, flip, center, rotateAngle, color);
     else
         GX_DrawImage_Custom(to_draw, to_mask, xDst, yDst, wDst, hDst,
-                            xSrc, ySrc, wSrc, hSrc, flip, red, green, blue, alpha);
+                            xSrc, ySrc, wSrc, hSrc, flip, color);
 }
 
 } // namespace XRender

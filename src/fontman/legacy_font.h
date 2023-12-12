@@ -70,7 +70,7 @@ public:
      */
     PGE_Size printText(const char* text, size_t text_size,
                        int32_t x, int32_t y,
-                       float Red=1.f, float Green=1.f, float Blue=1.f, float Alpha=1.f,
+                       XTColor color = XTColor(),
                        uint32_t fontSize = 0,
                        CropInfo* crop_info = nullptr) override;
 

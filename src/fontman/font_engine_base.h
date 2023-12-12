@@ -24,6 +24,8 @@
 #include <Graphics/size.h>
 #include <string>
 
+#include "xt_color.h"
+
 #include "fontman/crop_info.h"
 
 class BaseFontEngine
@@ -63,7 +65,7 @@ public:
      */
     virtual PGE_Size printText(const char *text, size_t text_size,
                                int32_t x, int32_t y,
-                               float Red = 1.f, float Green = 1.f, float Blue = 1.f, float Alpha = 1.f,
+                               XTColor color = XTColor(),
                                uint32_t fontSize = 14,
                                CropInfo* crop_info = nullptr) = 0;
 
@@ -79,7 +81,7 @@ public:
     {
         return printText(text, text_size,
             0, 0,
-            1.0f, 1.0f, 1.0f, 0.0f,
+            XTAlpha(0),
             fontSize,
             nullptr);
     }

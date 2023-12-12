@@ -30,12 +30,12 @@ void DrawBackgroundColor(int A, int Z, bool lower = false)
     if(lower)
     {
         XRender::renderRect(0, 0, vScreen[Z].Width, vScreen[Z].Height,
-            GFXBackground2[A].ColorLower.r / 255.f, GFXBackground2[A].ColorLower.g / 255.f, GFXBackground2[A].ColorLower.b / 255.f);
+            GFXBackground2[A].ColorLower);
     }
     else
     {
         XRender::renderRect(0, 0, vScreen[Z].Width, vScreen[Z].Height,
-            GFXBackground2[A].ColorUpper.r / 255.f, GFXBackground2[A].ColorUpper.g / 255.f, GFXBackground2[A].ColorUpper.b / 255.f);
+            GFXBackground2[A].ColorUpper);
     }
 }
 
@@ -264,9 +264,9 @@ void DrawCenterAnchoredBackground(int S, int Z, int A, int expected_height = 0, 
         double undrawn_above = tempLocation.Y + vScreen[Z].Y;
         double undrawn_below = tempLocation.Y + vScreen[Z].Y + tempLocation.Height;
         XRender::renderRect(0, 0, vScreen[Z].Width, std::ceil(undrawn_above),
-            GFXBackground2[A].ColorUpper.r / 255.f, GFXBackground2[A].ColorUpper.g / 255.f, GFXBackground2[A].ColorUpper.b / 255.f);
+            GFXBackground2[A].ColorUpper);
         XRender::renderRect(0, undrawn_below, vScreen[Z].Width, vScreen[Z].Height - undrawn_below + 1,
-            GFXBackground2[A].ColorLower.r / 255.f, GFXBackground2[A].ColorLower.g / 255.f, GFXBackground2[A].ColorLower.b / 255.f);
+            GFXBackground2[A].ColorLower);
     }
 }
 
@@ -357,7 +357,7 @@ void DrawBackground(int S, int Z)
     level[S] = LevelREAL[S];
 
     if(Background2[S] == 0)
-        XRender::renderRect(0, 0, vScreen[Z].Width, vScreen[Z].Height, 0, 0, 0);
+        XRender::renderRect(0, 0, vScreen[Z].Width, vScreen[Z].Height, {0, 0, 0});
 
     A = 2; // Clouds
     if(Background2[S] == 1 || Background2[S] == 2 || Background2[S] == 22)
@@ -683,7 +683,7 @@ void DrawBackground(int S, int Z)
         {
             XRender::lazyPreLoad(GFXBackground2[A]);
             XRender::renderRect(0, 0, vScreen[Z].Width, vScreen[Z].Height,
-                GFXBackground2[A].ColorUpper.r / 255.f, GFXBackground2[A].ColorUpper.g / 255.f, GFXBackground2[A].ColorUpper.b / 255.f);
+                GFXBackground2[A].ColorUpper);
         }
 
         if(g_compatibility.allow_multires && (vScreen[Z].Height > GFXBackground2Height[A] || (vScreen[Z].Height == screen.H / 2 && screen.H > GFXBackground2Height[A])))
@@ -960,9 +960,9 @@ void DrawBackground(int S, int Z)
         double undrawn_above = tempLocation.Y + vScreen[Z].Y;
         double undrawn_below = tempLocation.Y + vScreen[Z].Y + tempLocation.Height;
         XRender::renderRect(0, 0, vScreen[Z].Width, std::ceil(undrawn_above),
-            GFXBackground2[A].ColorUpper.r / 255.f, GFXBackground2[A].ColorUpper.g / 255.f, GFXBackground2[A].ColorUpper.b / 255.f);
+            GFXBackground2[A].ColorUpper);
         XRender::renderRect(0, undrawn_below, vScreen[Z].Width, vScreen[Z].Height - undrawn_below + 1,
-            GFXBackground2[A].ColorLower.r / 255.f, GFXBackground2[A].ColorLower.g / 255.f, GFXBackground2[A].ColorLower.b / 255.f);
+            GFXBackground2[A].ColorLower);
 
         int tempVar66 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5 + (double)screen.W / GFXBackground2Width[A]))) + 1;
         for(B = 0; B <= tempVar66; B++)
@@ -1059,7 +1059,7 @@ void DrawBackground(int S, int Z)
     {
         XRender::lazyPreLoad(GFXBackground2[A]);
         XRender::renderRect(0, 0, vScreen[Z].Width, vScreen[Z].Height,
-            GFXBackground2[A].ColorLower.r / 255.f, GFXBackground2[A].ColorLower.g / 255.f, GFXBackground2[A].ColorLower.b / 255.f);
+            GFXBackground2[A].ColorLower);
 
         double Eff_ScreenH = 0;
         for(int i = 1; i <= 2; i++)
@@ -1172,9 +1172,9 @@ void DrawBackground(int S, int Z)
         double undrawn_above = tempLocation.Y + vScreen[Z].Y;
         double undrawn_below = tempLocation.Y + vScreen[Z].Y + tempLocation.Height;
         XRender::renderRect(0, 0, vScreen[Z].Width, std::ceil(undrawn_above),
-            GFXBackground2[A].ColorUpper.r / 255.f, GFXBackground2[A].ColorUpper.g / 255.f, GFXBackground2[A].ColorUpper.b / 255.f);
+            GFXBackground2[A].ColorUpper);
         XRender::renderRect(0, undrawn_below, vScreen[Z].Width, vScreen[Z].Height - undrawn_below + 1,
-            GFXBackground2[A].ColorLower.r / 255.f, GFXBackground2[A].ColorLower.g / 255.f, GFXBackground2[A].ColorLower.b / 255.f);
+            GFXBackground2[A].ColorLower);
 
         int tempVar78 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.75 + (double)screen.W / GFXBackground2Width[A]))) + 1;
         for(B = 0; B <= tempVar78; B++)
@@ -1236,9 +1236,9 @@ void DrawBackground(int S, int Z)
         double undrawn_above = tempLocation.Y + vScreen[Z].Y;
         double undrawn_below = tempLocation.Y + vScreen[Z].Y + tempLocation.Height;
         XRender::renderRect(0, 0, vScreen[Z].Width, std::ceil(undrawn_above),
-            GFXBackground2[A].ColorUpper.r / 255.f, GFXBackground2[A].ColorUpper.g / 255.f, GFXBackground2[A].ColorUpper.b / 255.f);
+            GFXBackground2[A].ColorUpper);
         XRender::renderRect(0, undrawn_below, vScreen[Z].Width, vScreen[Z].Height - undrawn_below + 1,
-            GFXBackground2[A].ColorLower.r / 255.f, GFXBackground2[A].ColorLower.g / 255.f, GFXBackground2[A].ColorLower.b / 255.f);
+            GFXBackground2[A].ColorLower);
 
         int tempVar80 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5 + (double)screen.W / GFXBackground2Width[A]))) + 1;
         for(B = 0; B <= tempVar80; B++)
@@ -1387,9 +1387,9 @@ void DrawBackground(int S, int Z)
         double undrawn_above = tempLocation.Y + vScreen[Z].Y;
         double undrawn_below = tempLocation.Y + vScreen[Z].Y + tempLocation.Height;
         XRender::renderRect(0, 0, vScreen[Z].Width, std::ceil(undrawn_above),
-            GFXBackground2[A].ColorUpper.r / 255.f, GFXBackground2[A].ColorUpper.g / 255.f, GFXBackground2[A].ColorUpper.b / 255.f);
+            GFXBackground2[A].ColorUpper);
         XRender::renderRect(0, undrawn_below, vScreen[Z].Width, vScreen[Z].Height - undrawn_below + 1,
-            GFXBackground2[A].ColorLower.r / 255.f, GFXBackground2[A].ColorLower.g / 255.f, GFXBackground2[A].ColorLower.b / 255.f);
+            GFXBackground2[A].ColorLower);
 
         int tempVar92 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.65 + (double)screen.W / GFXBackground2Width[A]))) + 1;
         for(B = 0; B <= tempVar92; B++)

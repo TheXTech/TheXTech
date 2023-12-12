@@ -1441,95 +1441,87 @@ void TouchScreenController::render(int player_no)
         int y2 = Maths::iRound((k.y2 / g_touchKeyMap.touchCanvasHeight) * float(m_renderHeight));
         int w = x2 - x1;
         int h = y2 - y1;
-        float r = 1.0f;
-        float g = 0.0f;
 
-        //        if(key == key_holdRun && m_runHeld)
-        //        {
-        //            r = 0.f;
-        //            g = 1.f;
-        //        }
-
-        float a = m_keysHeld[key] ? 0.9f : 0.3f;
+        const uint8_t a = XTColor::from_float(m_keysHeld[key] ? 0.9f : 0.3f);
 
         switch(key)
         {
         case TouchScreenController::key_toggleKeysView:
             XRender::renderTextureScale(x1, y1, w, h,
                                         m_GFX.touch[m_touchHidden ? TouchScreenGFX_t::BUTTON_VIEW_TOGGLE_OFF : TouchScreenGFX_t::BUTTON_VIEW_TOGGLE_ON],
-                                        1.f, 1.f, 1.f, a);
+                                        XTAlpha(a));
             break;
 
         case TouchScreenController::key_start:
-            XRender::renderTextureScale(x1, y1, w, h, m_GFX.touch[TouchScreenGFX_t::BUTTON_START], 1.f, 1.f, 1.f, a);
+            XRender::renderTextureScale(x1, y1, w, h, m_GFX.touch[TouchScreenGFX_t::BUTTON_START], XTAlpha(a));
             break;
 
         case TouchScreenController::key_drop:
-            XRender::renderTextureScale(x1, y1, w, h, m_GFX.touch[TouchScreenGFX_t::BUTTON_DROP], 1.f, 1.f, 1.f, a);
+            XRender::renderTextureScale(x1, y1, w, h, m_GFX.touch[TouchScreenGFX_t::BUTTON_DROP], XTAlpha(a));
             break;
 
         case TouchScreenController::key_up:
-            XRender::renderTextureScale(x1, y1, w, h, m_GFX.touch[TouchScreenGFX_t::BUTTON_UP], 1.f, 1.f, 1.f, a);
+            XRender::renderTextureScale(x1, y1, w, h, m_GFX.touch[TouchScreenGFX_t::BUTTON_UP], XTAlpha(a));
             break;
 
         case TouchScreenController::key_left:
-            XRender::renderTextureScale(x1, y1, w, h, m_GFX.touch[buttonLeft(player_no, style)], 1.f, 1.f, 1.f, a);
+            XRender::renderTextureScale(x1, y1, w, h, m_GFX.touch[buttonLeft(player_no, style)], XTAlpha(a));
             break;
 
         case TouchScreenController::key_right:
-            XRender::renderTextureScale(x1, y1, w, h, m_GFX.touch[buttonRight(player_no, style)], 1.f, 1.f, 1.f, a);
+            XRender::renderTextureScale(x1, y1, w, h, m_GFX.touch[buttonRight(player_no, style)], XTAlpha(a));
             break;
 
         case TouchScreenController::key_down:
-            XRender::renderTextureScale(x1, y1, w, h, m_GFX.touch[TouchScreenGFX_t::BUTTON_DOWN], 1.f, 1.f, 1.f, a);
+            XRender::renderTextureScale(x1, y1, w, h, m_GFX.touch[TouchScreenGFX_t::BUTTON_DOWN], XTAlpha(a));
             break;
 
         case TouchScreenController::key_upleft:
-            XRender::renderTextureScale(x1, y1, w, h, m_GFX.touch[TouchScreenGFX_t::BUTTON_UPLEFT], 1.f, 1.f, 1.f, a);
+            XRender::renderTextureScale(x1, y1, w, h, m_GFX.touch[TouchScreenGFX_t::BUTTON_UPLEFT], XTAlpha(a));
             break;
 
         case TouchScreenController::key_upright:
-            XRender::renderTextureScale(x1, y1, w, h, m_GFX.touch[TouchScreenGFX_t::BUTTON_UPRIGHT], 1.f, 1.f, 1.f, a);
+            XRender::renderTextureScale(x1, y1, w, h, m_GFX.touch[TouchScreenGFX_t::BUTTON_UPRIGHT], XTAlpha(a));
             break;
 
         case TouchScreenController::key_downleft:
-            XRender::renderTextureScale(x1, y1, w, h, m_GFX.touch[TouchScreenGFX_t::BUTTON_DOWNLEFT], 1.f, 1.f, 1.f, a);
+            XRender::renderTextureScale(x1, y1, w, h, m_GFX.touch[TouchScreenGFX_t::BUTTON_DOWNLEFT], XTAlpha(a));
             break;
 
         case TouchScreenController::key_downright:
-            XRender::renderTextureScale(x1, y1, w, h, m_GFX.touch[TouchScreenGFX_t::BUTTON_DOWNRIGHT], 1.f, 1.f, 1.f, a);
+            XRender::renderTextureScale(x1, y1, w, h, m_GFX.touch[TouchScreenGFX_t::BUTTON_DOWNRIGHT], XTAlpha(a));
             break;
 
         case TouchScreenController::key_holdRun:
             XRender::renderTextureScale(x1, y1, w, h,
                                         m_GFX.touch[m_runHeld ? TouchScreenGFX_t::BUTTON_HOLD_RUN_ON : TouchScreenGFX_t::BUTTON_HOLD_RUN_OFF],
-                                        1.f, 1.f, 1.f, a);
+                                        XTAlpha(a));
             break;
 
         case TouchScreenController::key_jump:
-            XRender::renderTextureScale(x1, y1, w, h, m_GFX.touch[buttonA(player_no, style)], 1.f, 1.f, 1.f, a);
+            XRender::renderTextureScale(x1, y1, w, h, m_GFX.touch[buttonA(player_no, style)], XTAlpha(a));
             break;
 
         case TouchScreenController::key_run:
-            XRender::renderTextureScale(x1, y1, w, h, m_GFX.touch[buttonX(player_no, style)], 1.f, 1.f, 1.f, a);
+            XRender::renderTextureScale(x1, y1, w, h, m_GFX.touch[buttonX(player_no, style)], XTAlpha(a));
             break;
 
         case TouchScreenController::key_altjump:
-            XRender::renderTextureScale(x1, y1, w, h, m_GFX.touch[buttonB(player_no, style)], 1.f, 1.f, 1.f, a);
+            XRender::renderTextureScale(x1, y1, w, h, m_GFX.touch[buttonB(player_no, style)], XTAlpha(a));
             break;
 
         case TouchScreenController::key_altrun:
-            XRender::renderTextureScale(x1, y1, w, h, m_GFX.touch[buttonY(player_no, style)], 1.f, 1.f, 1.f, a);
+            XRender::renderTextureScale(x1, y1, w, h, m_GFX.touch[buttonY(player_no, style)], XTAlpha(a));
             break;
 
         case TouchScreenController::key_enterCheats:
             if(m_enable_enter_cheats)
-                XRender::renderTextureScale(x1, y1, w, h, m_GFX.touch[TouchScreenGFX_t::BUTTON_ENTER_CHEATS], 1.f, 1.f, 1.f, a);
+                XRender::renderTextureScale(x1, y1, w, h, m_GFX.touch[TouchScreenGFX_t::BUTTON_ENTER_CHEATS], XTAlpha(a));
 
             break;
 
         default:
-            XRender::renderRect(x1, y1, w, h, r, g, 0.f, 0.3f);
+            XRender::renderRect(x1, y1, w, h, {255, 0, 0, 80});
             break;
         }
     }
