@@ -1422,7 +1422,7 @@ elseif(NINTENDO_WIIU)
     wut_create_rpx(thextech)
     wut_create_wuhb(thextech
         CONTENT
-        NAME "TheXTech v$THEXTECH_VERSION_STRING"
+        NAME "TheXTech v${THEXTECH_VERSION_STRING}"
         SHORTNAME "TheXTech"
         AUTHOR "Wohlstand and ds-sloth"
         ICON "${CMAKE_SOURCE_DIR}/resources/switch/thextech-logo.png"

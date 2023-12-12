@@ -19,6 +19,7 @@
  */
 
 #include <SDL2/SDL_power.h>
+#include <SDL2/SDL_timer.h>
 
 #include "core/power.h"
 
@@ -26,7 +27,10 @@
 namespace XPower
 {
 
-StatusInfo devicePowerStatus()
+static uint32_t s_last_power_check = -10000;
+static StatusInfo s_recent_status;
+
+static StatusInfo s_devicePowerStatus_REAL()
 {
     int pct;
     SDL_PowerState status = SDL_GetPowerInfo(nullptr, &pct);
@@ -60,6 +64,19 @@ StatusInfo devicePowerStatus()
         res.power_level = pct / 100.0f;
 
     return res;
+}
+
+StatusInfo devicePowerStatus()
+{
+    uint32_t ticks = SDL_GetTicks();
+
+    if(ticks - s_last_power_check > 10000)
+    {
+        s_last_power_check = ticks;
+        s_recent_status = s_devicePowerStatus_REAL();
+    }
+
+    return s_recent_status;
 }
 
 }

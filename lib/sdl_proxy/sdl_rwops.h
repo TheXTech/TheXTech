@@ -87,11 +87,15 @@ inline SDL_RWops* SDL_RWFromFile(const char* pathname, const char* mode)
 
 inline SDL_RWops* SDL_RWFromMem(char* mem, int size)
 {
+    (void)mem;
+    (void)size;
     return nullptr;
 }
 
 inline SDL_RWops* SDL_RWFromConstMem(const char* mem, int size)
 {
+    (void)mem;
+    (void)size;
     return nullptr;
 }
 
