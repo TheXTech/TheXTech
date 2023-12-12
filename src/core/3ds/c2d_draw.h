@@ -8,7 +8,7 @@ inline bool C2D_DrawImage_Custom(C2D_Image img,
     float x, float y, uint16_t w, uint16_t h,
     float src_x, float src_y, float src_w, float src_h,
     unsigned int flip,
-    float r, float g, float b, float a)
+    XTColor color)
 {
     const Tex3DS_SubTexture* old_subtex = img.subtex;
     // assuming not rotated (it isn't in the textures generated for TheXTech for 3DS)
@@ -34,14 +34,15 @@ inline bool C2D_DrawImage_Custom(C2D_Image img,
         scale_y = 1.f;
 
     bool result;
-    if(r != 1.f || g != 1.f || b != 1.f || a != 1.f)
+    if(color != XTColor())
     {
-        uint32_t color = C2D_Color32f(r, g, b, a);
-        const C2D_ImageTint tint = {color, 1., color, 1., color, 1., color, 1.};
+        uint32_t color32 = C2D_Color32(color.r, color.g, color.b, color.a);
+        const C2D_ImageTint tint = {color32, 1., color32, 1., color32, 1., color32, 1.};
         result = C2D_DrawImageAt(img, x, y, 0.f, &tint, scale_x, scale_y);
     }
     else
         result = C2D_DrawImageAt(img, x, y, 0.f, nullptr, scale_x, scale_y);
+
     img.subtex = old_subtex;
     return result;
 }
@@ -50,7 +51,7 @@ inline bool C2D_DrawImage_Custom_Rotated(C2D_Image img,
     float x, float y, float w, float h,
     float src_x, float src_y, float src_w, float src_h,
     unsigned int flip, FPoint_t *center, float angle,
-    float r, float g, float b, float a)
+    XTColor color)
 {
     const Tex3DS_SubTexture* old_subtex = img.subtex;
     // assuming not rotated (it isn't in the textures generated for TheXTech for 3DS)
@@ -88,15 +89,17 @@ inline bool C2D_DrawImage_Custom_Rotated(C2D_Image img,
     }
 
     const C2D_DrawParams params = {{x, y, w*scale_x, h*scale_y}, {cx, cy}, 0.f, angle * (float)M_PI / 180.0f};
+
     bool result;
-    if(r != 1.f || g != 1.f || b != 1.f || a != 1.f)
+    if(color != XTColor())
     {
-        uint32_t color = C2D_Color32f(r, g, b, a);
-        const C2D_ImageTint tint = {color, 1., color, 1., color, 1., color, 1.};
+        uint32_t color32 = C2D_Color32(color.r, color.g, color.b, color.a);
+        const C2D_ImageTint tint = {color32, 1., color32, 1., color32, 1., color32, 1.};
         result = C2D_DrawImage(img, &params, &tint);
     }
     else
         result = C2D_DrawImage(img, &params);
+
     img.subtex = old_subtex;
     return result;
 }

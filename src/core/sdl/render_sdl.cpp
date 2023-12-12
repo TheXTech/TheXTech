@@ -179,9 +179,9 @@ void RenderSDL::repaint()
 #endif
 
     if(XRender::g_BitmaskTexturePresent)
-        SuperPrintScreenCenter("Bitmasks using GIFs2PNG in SDL", 5, 2, 1.0f, 0.7f, 0.5f);
+        SuperPrintScreenCenter("Bitmasks using GIFs2PNG in SDL", 5, 2, XTColorF(1.0f, 0.7f, 0.5f));
     else if(g_ForceBitmaskMerge)
-        SuperPrintScreenCenter("GIFs2PNG always simulated in SDL", 5, 2, 1.0f, 0.7f, 0.5f);
+        SuperPrintScreenCenter("GIFs2PNG always simulated in SDL", 5, 2, XTColorF(1.0f, 0.7f, 0.5f));
 
     int w, h, off_x, off_y, wDst, hDst;
 
@@ -493,7 +493,7 @@ void RenderSDL::clearBuffer()
     SDL_RenderClear(m_gRenderer);
 }
 
-void RenderSDL::renderRect(int x, int y, int w, int h, float red, float green, float blue, float alpha, bool filled)
+void RenderSDL::renderRect(int x, int y, int w, int h, XTColor color, bool filled)
 {
 #ifdef USE_RENDER_BLOCKING
     SDL_assert(!m_blockRender);
@@ -501,12 +501,7 @@ void RenderSDL::renderRect(int x, int y, int w, int h, float red, float green, f
     SDL_Rect aRect = {x + m_viewport_offset_x,
                       y + m_viewport_offset_y,
                       w, h};
-    SDL_SetRenderDrawColor(m_gRenderer,
-                           static_cast<unsigned char>(255.f * red),
-                           static_cast<unsigned char>(255.f * green),
-                           static_cast<unsigned char>(255.f * blue),
-                           static_cast<unsigned char>(255.f * alpha)
-                          );
+    SDL_SetRenderDrawColor(m_gRenderer, color.r, color.g, color.b, color.a);
 
     if(filled)
         SDL_RenderFillRect(m_gRenderer, &aRect);
@@ -514,7 +509,7 @@ void RenderSDL::renderRect(int x, int y, int w, int h, float red, float green, f
         SDL_RenderDrawRect(m_gRenderer, &aRect);
 }
 
-void RenderSDL::renderRectBR(int _left, int _top, int _right, int _bottom, float red, float green, float blue, float alpha)
+void RenderSDL::renderRectBR(int _left, int _top, int _right, int _bottom, XTColor color)
 {
 #ifdef USE_RENDER_BLOCKING
     SDL_assert(!m_blockRender);
@@ -522,16 +517,11 @@ void RenderSDL::renderRectBR(int _left, int _top, int _right, int _bottom, float
     SDL_Rect aRect = {_left + m_viewport_offset_x,
                       _top + m_viewport_offset_y,
                       _right - _left, _bottom - _top};
-    SDL_SetRenderDrawColor(m_gRenderer,
-                           static_cast<unsigned char>(255.f * red),
-                           static_cast<unsigned char>(255.f * green),
-                           static_cast<unsigned char>(255.f * blue),
-                           static_cast<unsigned char>(255.f * alpha)
-                          );
+    SDL_SetRenderDrawColor(m_gRenderer, color.r, color.g, color.b, color.a);
     SDL_RenderFillRect(m_gRenderer, &aRect);
 }
 
-void RenderSDL::renderCircle(int cx, int cy, int radius, float red, float green, float blue, float alpha, bool filled)
+void RenderSDL::renderCircle(int cx, int cy, int radius, XTColor color, bool filled)
 {
 #ifdef USE_RENDER_BLOCKING
     SDL_assert(!m_blockRender);
@@ -541,12 +531,7 @@ void RenderSDL::renderCircle(int cx, int cy, int radius, float red, float green,
     if(radius <= 0)
         return; // Nothing to draw
 
-    SDL_SetRenderDrawColor(m_gRenderer,
-                               static_cast<unsigned char>(255.f * red),
-                               static_cast<unsigned char>(255.f * green),
-                               static_cast<unsigned char>(255.f * blue),
-                               static_cast<unsigned char>(255.f * alpha)
-                          );
+    SDL_SetRenderDrawColor(m_gRenderer, color.r, color.g, color.b, color.a);
 
     cx += m_viewport_offset_x;
     cy += m_viewport_offset_y;
@@ -574,7 +559,7 @@ void RenderSDL::renderCircle(int cx, int cy, int radius, float red, float green,
     } while(dy <= radius);
 }
 
-void RenderSDL::renderCircleHole(int cx, int cy, int radius, float red, float green, float blue, float alpha)
+void RenderSDL::renderCircleHole(int cx, int cy, int radius, XTColor color)
 {
 #ifdef USE_RENDER_BLOCKING
     SDL_assert(!m_blockRender);
@@ -583,12 +568,7 @@ void RenderSDL::renderCircleHole(int cx, int cy, int radius, float red, float gr
     if(radius <= 0)
         return; // Nothing to draw
 
-    SDL_SetRenderDrawColor(m_gRenderer,
-                               static_cast<unsigned char>(255.f * red),
-                               static_cast<unsigned char>(255.f * green),
-                               static_cast<unsigned char>(255.f * blue),
-                               static_cast<unsigned char>(255.f * alpha)
-                          );
+    SDL_SetRenderDrawColor(m_gRenderer, color.r, color.g, color.b, color.a);
 
     cx += m_viewport_offset_x;
     cy += m_viewport_offset_y;
@@ -632,12 +612,9 @@ void RenderSDL::renderCircleHole(int cx, int cy, int radius, float red, float gr
 
 
 
-void RenderSDL::txColorMod(StdPictureData &tx, float red, float green, float blue, float alpha)
+void RenderSDL::txColorMod(StdPictureData &tx, XTColor color)
 {
-    uint8_t modColor[4] = {static_cast<unsigned char>(255.f * red),
-                           static_cast<unsigned char>(255.f * green),
-                           static_cast<unsigned char>(255.f * blue),
-                           static_cast<unsigned char>(255.f * alpha)};
+    uint8_t modColor[4] = {color.r, color.g, color.b, color.a};
 
     if(SDL_memcmp(tx.modColor, modColor, 3) != 0)
     {
@@ -659,7 +636,7 @@ void RenderSDL::renderTextureScaleEx(double xDstD, double yDstD, double wDstD, d
                                        int xSrc, int ySrc,
                                        int wSrc, int hSrc,
                                        double rotateAngle, FPoint_t *center, unsigned int flip,
-                                       float red, float green, float blue, float alpha)
+                                       XTColor color)
 {
 #ifdef USE_RENDER_BLOCKING
     SDL_assert(!m_blockRender);
@@ -717,14 +694,14 @@ void RenderSDL::renderTextureScaleEx(double xDstD, double yDstD, double wDstD, d
     sourceRect = {int(tx.d.w_scale * xSrc), int(tx.d.h_scale * ySrc),
                   int(tx.d.w_scale * wSrc), int(tx.d.h_scale * hSrc)};
 
-    txColorMod(tx.d, red, green, blue, alpha);
+    txColorMod(tx.d, color);
     SDL_RenderCopyExF(m_gRenderer, tx.d.texture, &sourceRect, &destRect,
                       rotateAngle, centerD, static_cast<SDL_RendererFlip>(flip));
 }
 
 void RenderSDL::renderTextureScale(double xDst, double yDst, double wDst, double hDst,
                                      StdPicture &tx,
-                                     float red, float green, float blue, float alpha)
+                                     XTColor color)
 {
 #ifdef USE_RENDER_BLOCKING
     SDL_assert(!m_blockRender);
@@ -758,7 +735,7 @@ void RenderSDL::renderTextureScale(double xDst, double yDst, double wDst, double
     SDL_Rect sourceRect;
     sourceRect = {0, 0, tx.w, tx.h};
 
-    txColorMod(tx.d, red, green, blue, alpha);
+    txColorMod(tx.d, color);
     SDL_RenderCopyExF(m_gRenderer, tx.d.texture, &sourceRect, &destRect,
                       0.0, nullptr, static_cast<SDL_RendererFlip>(flip));
 }
@@ -766,7 +743,7 @@ void RenderSDL::renderTextureScale(double xDst, double yDst, double wDst, double
 void RenderSDL::renderTexture(double xDstD, double yDstD, double wDstD, double hDstD,
                                 StdPicture &tx,
                                 int xSrc, int ySrc,
-                                float red, float green, float blue, float alpha)
+                                XTColor color)
 {
 #ifdef USE_RENDER_BLOCKING
     SDL_assert(!m_blockRender);
@@ -822,7 +799,7 @@ void RenderSDL::renderTexture(double xDstD, double yDstD, double wDstD, double h
     sourceRect = {int(tx.d.w_scale * xSrc), int(tx.d.h_scale * ySrc),
                   int(tx.d.w_scale * wDst), int(tx.d.h_scale * hDst)};
 
-    txColorMod(tx.d, red, green, blue, alpha);
+    txColorMod(tx.d, color);
     SDL_RenderCopyF(m_gRenderer, tx.d.texture, &sourceRect, &destRect);
 }
 
@@ -830,7 +807,7 @@ void RenderSDL::renderTextureFL(double xDstD, double yDstD, double wDstD, double
                                   StdPicture &tx,
                                   int xSrc, int ySrc,
                                   double rotateAngle, FPoint_t *center, unsigned int flip,
-                                  float red, float green, float blue, float alpha)
+                                  XTColor color)
 {
 #ifdef USE_RENDER_BLOCKING
     SDL_assert(!m_blockRender);
@@ -890,14 +867,14 @@ void RenderSDL::renderTextureFL(double xDstD, double yDstD, double wDstD, double
     sourceRect = {int(tx.d.w_scale * xSrc), int(tx.d.h_scale * ySrc),
                   int(tx.d.w_scale * wDst), int(tx.d.h_scale * hDst)};
 
-    txColorMod(tx.d, red, green, blue, alpha);
+    txColorMod(tx.d, color);
     SDL_RenderCopyExF(m_gRenderer, tx.d.texture, &sourceRect, &destRect,
                       rotateAngle, centerD, static_cast<SDL_RendererFlip>(flip));
 }
 
 void RenderSDL::renderTexture(float xDst, float yDst,
                                 StdPicture &tx,
-                                float red, float green, float blue, float alpha)
+                                XTColor color)
 {
 #ifdef USE_RENDER_BLOCKING
     SDL_assert(!m_blockRender);
@@ -925,7 +902,7 @@ void RenderSDL::renderTexture(float xDst, float yDst,
     SDL_Rect sourceRect;
     sourceRect = {0, 0, tx.w, tx.h};
 
-    txColorMod(tx.d, red, green, blue, alpha);
+    txColorMod(tx.d, color);
     SDL_RenderCopyExF(m_gRenderer, tx.d.texture, &sourceRect, &destRect,
                       0.0, nullptr, static_cast<SDL_RendererFlip>(flip));
 }

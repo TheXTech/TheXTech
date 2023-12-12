@@ -67,14 +67,14 @@ void RenderKeyhole(int Z)
 void RenderTexturePlayerScale(int Z, double dst_x, double dst_y, double dst_w, double dst_h,
                          StdPicture& tex,
                          int src_x, int src_y, int src_w, int src_h,
-                         float r, float g, float b, float a)
+                         XTColor color)
 {
     if(LevelMacro != LEVELMACRO_KEYHOLE_EXIT || LevelMacroWhich == 0)
     {
         if(src_w == -1 || src_h == -1)
-            return XRender::renderTexture(dst_x, dst_y, dst_w, dst_h, tex, src_x, src_y, r, g, b, a);
+            return XRender::renderTexture(dst_x, dst_y, dst_w, dst_h, tex, src_x, src_y, color);
         else
-            return XRender::renderTextureScaleEx(dst_x, dst_y, dst_w, dst_h, tex, src_x, src_y, src_w, src_h, 0, nullptr, X_FLIP_NONE, r, g, b, a);
+            return XRender::renderTextureScaleEx(dst_x, dst_y, dst_w, dst_h, tex, src_x, src_y, src_w, src_h, 0, nullptr, X_FLIP_NONE, color);
     }
 
     if(src_w == -1 || src_h == -1)
@@ -104,15 +104,15 @@ void RenderTexturePlayerScale(int Z, double dst_x, double dst_y, double dst_w, d
                 src_x,
                 src_y,
                 src_w, src_h, 0, nullptr, X_FLIP_NONE,
-                r, g, b, a);
+                color);
 }
 
 void RenderTexturePlayer(int Z, double dst_x, double dst_y, double dst_w, double dst_h,
                          StdPicture& tex,
-                         int src_x, int src_y, float r, float g, float b, float a)
+                         int src_x, int src_y, XTColor color)
 {
     RenderTexturePlayerScale(Z, dst_x, dst_y, dst_w, dst_h,
         tex,
         src_x, src_y, -1, -1,
-        r, g, b, a);
+        color);
 }

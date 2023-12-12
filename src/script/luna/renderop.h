@@ -25,6 +25,7 @@
 #include "lunarender.h"
 #include "sdl_proxy/sdl_assert.h"
 
+#include "xt_color.h"
 
 static const double RENDEROP_PRIORITY_MIN = -100.0;
 static const double RENDEROP_PRIORITY_MAX = 10.0;
@@ -40,6 +41,11 @@ struct RenderOpColor
     float a;
 
     inline RenderOpColor(float r, float g, float b, float a) : r(r), g(g), b(b), a(a) {}
+
+    inline explicit operator XTColor()
+    {
+        return XTColorF(r, g, b, a);
+    }
 };
 
 // Base class respresenting a rendering operation

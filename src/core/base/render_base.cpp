@@ -999,13 +999,13 @@ void GifRecorder::drawRecCircle()
 
     if(doFinalize)
     {
-        m_self->renderCircle(50, 50, 20, 0.f, 0.6f, 0.f, fadeValue, true);
-        SuperPrint("SAVING", 3, 2, 80, 0.f, 0.6f, 0.f, fadeValue);
+        m_self->renderCircle(50, 50, 20, XTColorF(0.f, 0.6f, 0.f, fadeValue), true);
+        SuperPrint("SAVING", 3, 2, 80, XTColorF(0.f, 0.6f, 0.f, fadeValue));
     }
     else
     {
-        m_self->renderCircle(50, 50, 20, 1.f, 0.f, 0.f, fadeValue, true);
-        SuperPrint("REC", 3, 25, 80, 1.f, 0.f, 0.f, fadeValue);
+        m_self->renderCircle(50, 50, 20, XTColorF(1.f, 0.f, 0.f, fadeValue), true);
+        SuperPrint("REC", 3, 25, 80, XTColorF(1.f, 0.f, 0.f, fadeValue));
     }
 
     m_self->offsetViewportIgnore(false);

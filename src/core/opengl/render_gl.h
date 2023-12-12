@@ -737,20 +737,20 @@ public:
     // Draw primitives
 
     void renderRect(int x, int y, int w, int h,
-                    float red = 1.f, float green = 1.f, float blue = 1.f, float alpha = 1.f,
+                    XTColor color = XTColor(),
                     bool filled = true) override;
 
     void renderRectBR(int _left, int _top, int _right,
-                      int _bottom, float red, float green, float blue, float alpha) override;
+                      int _bottom, XTColor color) override;
 
     void renderCircle(int cx, int cy,
                       int radius,
-                      float red = 1.f, float green = 1.f, float blue = 1.f, float alpha = 1.f,
+                      XTColor color = XTColor(),
                       bool filled = true) override;
 
     void renderCircleHole(int cx, int cy,
                           int radius,
-                          float red = 1.f, float green = 1.f, float blue = 1.f, float alpha = 1.f) override;
+                          XTColor color = XTColor()) override;
 
 
 
@@ -762,25 +762,25 @@ public:
                               int xSrc, int ySrc,
                               int wSrc, int hSrc,
                               double rotateAngle =.0, FPoint_t *center = nullptr, unsigned int flip = X_FLIP_NONE,
-                              float red = 1.f, float green = 1.f, float blue = 1.f, float alpha = 1.f) override;
+                              XTColor color = XTColor()) override;
 
     void renderTextureScale(double xDst, double yDst, double wDst, double hDst,
                             StdPicture &tx,
-                            float red = 1.f, float green = 1.f, float blue = 1.f, float alpha = 1.f) override;
+                            XTColor color = XTColor()) override;
 
     void renderTexture(double xDst, double yDst, double wDst, double hDst,
                        StdPicture &tx,
                        int xSrc, int ySrc,
-                       float red = 1.f, float green = 1.f, float blue = 1.f, float alpha = 1.f) override;
+                       XTColor color = XTColor()) override;
 
     void renderTextureFL(double xDst, double yDst, double wDst, double hDst,
                          StdPicture &tx,
                          int xSrc, int ySrc,
                          double rotateAngle =.0, FPoint_t *center = nullptr, unsigned int flip = X_FLIP_NONE,
-                         float red = 1.f, float green = 1.f, float blue = 1.f, float alpha = 1.f) override;
+                         XTColor color = XTColor()) override;
 
     void renderTexture(float xDst, float yDst, StdPicture &tx,
-                       float red = 1.f, float green = 1.f, float blue = 1.f, float alpha = 1.f) override;
+                       XTColor color = XTColor()) override;
 
     void renderParticleSystem(StdPicture &tx,
                               double camX,

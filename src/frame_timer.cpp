@@ -145,14 +145,14 @@ void PerformanceStats_t::print()
     if(LevelSelect && !GameMenu)
     {
         items = 5;
-        XRender::renderRect(42, 6, 745, 6 + (18 * items), 0.0f,0.0f, 0.0f, 0.3f, true);
+        XRender::renderRect(42, 6, 745, 6 + (18 * items), XTColorF(0.0f, 0.0f, 0.0f, 0.3f), true);
 
         SuperPrint(fmt::sprintf_ne("FILE: %s", FileNameFull.empty() ? "<none>" : FileNameFull.c_str()),
-                   3, 45, YLINE, 0.5f, 1.f, 1.f);
+                   3, 45, YLINE, XTColorF(0.5f, 1.f, 1.f));
         SuperPrint(fmt::sprintf_ne("MUSK: %s", currentMusic.empty() ? "<none>" : currentMusic.c_str()),
-                   3, 45, YLINE, 0.5f, 1.f, 1.f);
+                   3, 45, YLINE, XTColorF(0.5f, 1.f, 1.f));
         SuperPrint(fmt::sprintf_ne("MUSF: %s", currentMusicFile.empty() ? "<none>" : currentMusicFile.c_str()),
-                   3, 45, YLINE, 0.5f, 1.f, 1.f);
+                   3, 45, YLINE, XTColorF(0.5f, 1.f, 1.f));
 
         SuperPrint(fmt::sprintf_ne("DRAW: T=%03d S=%03d P=%03d L=%03d, SUM=%03d",
                                    renderedTiles, renderedScenes, renderedPaths, renderedLevels,
@@ -171,47 +171,47 @@ void PerformanceStats_t::print()
         if(GameMenu)
             items++;
 
-        XRender::renderRect(42, 6, 745, 6 + (18 * items), 0.0f,0.0f, 0.0f, 0.3f, true);
+        XRender::renderRect(42, 6, 745, 6 + (18 * items), XTColorF(0.0f, 0.0f, 0.0f, 0.3f), true);
 
         SuperPrint(fmt::sprintf_ne("FILE: %s", FileNameFull.empty() ? "<none>" : FileNameFull.c_str()),
-                   3, 45, YLINE, 1.f, 0.5f, 1.f);
+                   3, 45, YLINE, XTColorF(1.f, 0.5f, 1.f));
         SuperPrint(fmt::sprintf_ne("MUSK: %s", currentMusic.empty() ? "<none>" : currentMusic.c_str()),
-                   3, 45, YLINE, 1.f, 0.5f, 1.f);
+                   3, 45, YLINE, XTColorF(1.f, 0.5f, 1.f));
         SuperPrint(fmt::sprintf_ne("MUSF: %s", currentMusicFile.empty() ? "<none>" : currentMusicFile.c_str()),
-                   3, 45, YLINE, 1.f, 0.5f, 1.f);
+                   3, 45, YLINE, XTColorF(1.f, 0.5f, 1.f));
 
         SuperPrint(fmt::sprintf_ne("DRAW: B=%05d Z=%04d G=%04d N=%04d, E=%03d",
                                    renderedBlocks, renderedSzBlocks, renderedBGOs, renderedNPCs, renderedEffects,
                                    (renderedBlocks + renderedSzBlocks + renderedBGOs + renderedNPCs + renderedEffects)),
-                   3, 45, YLINE, 0.5f, 1.f, 1.f);
+                   3, 45, YLINE, XTColorF(0.5f, 1.f, 1.f));
         SuperPrint(fmt::sprintf_ne("DRAW: SUMM=%d", (renderedBlocks + renderedSzBlocks + renderedBGOs + renderedNPCs + renderedEffects)),
-                   3, 45, YLINE, 0.5f, 1.f, 1.f);
+                   3, 45, YLINE, XTColorF(0.5f, 1.f, 1.f));
         SuperPrint(fmt::sprintf_ne("CHEK: B=%05d Z=%04d G=%04d N=%04d, E=%03d",
                                    checkedBlocks, checkedSzBlocks, checkedBGOs, checkedNPCs, checkedEffects),
-                   3, 45, YLINE, 0.5f, 1.f, 1.f);
+                   3, 45, YLINE, XTColorF(0.5f, 1.f, 1.f));
         SuperPrint(fmt::sprintf_ne("CHEK: SUMM=%d", (checkedBlocks + checkedSzBlocks+ checkedBGOs + checkedNPCs + checkedEffects)),
-                   3, 45, YLINE, 0.5f, 1.f, 1.f);
+                   3, 45, YLINE, XTColorF(0.5f, 1.f, 1.f));
 
         // MicroStats
         if(!GameMenu)
         {
             SuperPrint(fmt::sprintf_ne("PROC TIME: %05dms/s",
                                        g_microStats.view_total),
-                       3, 45, YLINE, 1.f, 1.f, 1.f);
+                       3, 45, YLINE);
             SuperPrint(fmt::sprintf_ne("%s %04d %s %04d %s %04d %s %04d %s %04d",
                                        g_microStats.task_names[0], g_microStats.view_timer[0],
                                        g_microStats.task_names[1], g_microStats.view_timer[1],
                                        g_microStats.task_names[2], g_microStats.view_timer[2],
                                        g_microStats.task_names[3], g_microStats.view_timer[3],
                                        g_microStats.task_names[4], g_microStats.view_timer[4]),
-                       3, 45, YLINE, 0.5f, 1.f, 1.f);
+                       3, 45, YLINE, XTColorF(0.5f, 1.f, 1.f));
             SuperPrint(fmt::sprintf_ne("%s %04d %s %04d %s %04d %s %04d %s %04d",
                                        g_microStats.task_names[5], g_microStats.view_timer[5],
                                        g_microStats.task_names[6], g_microStats.view_timer[6],
                                        g_microStats.task_names[7], g_microStats.view_timer[7],
                                        g_microStats.task_names[8], g_microStats.view_timer[8],
                                        g_microStats.task_names[9], g_microStats.view_timer[9]),
-                       3, 45, YLINE, 0.5f, 1.f, 1.f);
+                       3, 45, YLINE, XTColorF(0.5f, 1.f, 1.f));
         }
 
         // WIP
@@ -224,7 +224,7 @@ void PerformanceStats_t::print()
     if(GameMenu)
     {
         SuperPrint(fmt::sprintf_ne("MENU-MODE: %d", MenuMode),
-                   3, 45, YLINE, 0.5f, 1.f, 1.f);
+                   3, 45, YLINE, XTColorF(0.5f, 1.f, 1.f));
     }
 
 #undef YLINE

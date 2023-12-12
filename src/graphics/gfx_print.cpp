@@ -51,7 +51,7 @@ int SuperTextPixLen(int SuperN, const char* SuperChars, int Font)
     return FontManager::textSize(SuperChars, SuperN, dFont, FontManager::fontSizeFromSmbxFont(Font)).w();
 }
 
-void SuperPrintRightAlign(int SuperN, const char* SuperChars, int Font, float X, float Y, float r, float g, float b, float a)
+void SuperPrintRightAlign(int SuperN, const char* SuperChars, int Font, float X, float Y, XTColor color)
 {
     int RealFont = Font;
     bool outline = false;
@@ -67,15 +67,15 @@ void SuperPrintRightAlign(int SuperN, const char* SuperChars, int Font, float X,
     if(dFont >= 0)
     {
         X -= FontManager::textSize(SuperChars, SuperN, dFont, FontManager::fontSizeFromSmbxFont(Font)).w();
-        FontManager::printText(SuperChars, SuperN, X, Y, dFont, r, g, b, a, FontManager::fontSizeFromSmbxFont(Font), outline);
+        FontManager::printText(SuperChars, SuperN, X, Y, dFont, color, FontManager::fontSizeFromSmbxFont(Font), outline);
         return;
     }
 
     X -= SuperTextPixLen(SuperN, SuperChars, Font);
-    SuperPrint(SuperN, SuperChars, RealFont, X, Y, r, g, b, a);
+    SuperPrint(SuperN, SuperChars, RealFont, X, Y, color);
 }
 
-void SuperPrintCenter(int SuperN, const char* SuperChars, int Font, float X, float Y, float r, float g, float b, float a)
+void SuperPrintCenter(int SuperN, const char* SuperChars, int Font, float X, float Y, XTColor color)
 {
     int RealFont = Font;
     bool outline = false;
@@ -91,15 +91,15 @@ void SuperPrintCenter(int SuperN, const char* SuperChars, int Font, float X, flo
     if(dFont >= 0)
     {
         X -= FontManager::textSize(SuperChars, SuperN, dFont, FontManager::fontSizeFromSmbxFont(Font)).w() / 2;
-        FontManager::printText(SuperChars, SuperN, X, Y, dFont, r, g, b, a, FontManager::fontSizeFromSmbxFont(Font), outline);
+        FontManager::printText(SuperChars, SuperN, X, Y, dFont, color, FontManager::fontSizeFromSmbxFont(Font), outline);
         return;
     }
 
     X -= SuperTextPixLen(SuperN, SuperChars, Font) / 2;
-    SuperPrint(SuperN, SuperChars, RealFont, X, Y, r, g, b, a);
+    SuperPrint(SuperN, SuperChars, RealFont, X, Y, color);
 }
 
-void SuperPrintScreenCenter(int SuperN, const char* SuperChars, int Font, float Y, float r, float g, float b, float a)
+void SuperPrintScreenCenter(int SuperN, const char* SuperChars, int Font, float Y, XTColor color)
 {
     int RealFont = Font;
     bool outline = false;
@@ -115,16 +115,16 @@ void SuperPrintScreenCenter(int SuperN, const char* SuperChars, int Font, float 
     if(dFont >= 0)
     {
         float X = (ScreenW / 2) - (FontManager::textSize(SuperChars, SuperN, dFont, FontManager::fontSizeFromSmbxFont(Font)).w() / 2);
-        FontManager::printText(SuperChars, SuperN, X, Y, dFont, r, g, b, a, FontManager::fontSizeFromSmbxFont(Font), outline);
+        FontManager::printText(SuperChars, SuperN, X, Y, dFont, color, FontManager::fontSizeFromSmbxFont(Font), outline);
         return;
     }
 
     float X = (ScreenW / 2) - (SuperTextPixLen(SuperN, SuperChars, Font) / 2);
-    SuperPrint(SuperN, SuperChars, RealFont, X, Y, r, g, b, a);
+    SuperPrint(SuperN, SuperChars, RealFont, X, Y, color);
 }
 
 void SuperPrint(int SuperN, const char* SuperChars, int Font, float X, float Y,
-                float r, float g, float b, float a)
+                XTColor color)
 {
     bool outline = false;
 
@@ -141,7 +141,7 @@ void SuperPrint(int SuperN, const char* SuperChars, int Font, float X, float Y,
         return; // Invalid font specified
     }
 
-    FontManager::printText(SuperChars, SuperN, X, Y, dFont, r, g, b, a, FontManager::fontSizeFromSmbxFont(Font), outline);
+    FontManager::printText(SuperChars, SuperN, X, Y, dFont, color, FontManager::fontSizeFromSmbxFont(Font), outline);
 }
 
 // const char* versions
@@ -152,28 +152,28 @@ int SuperTextPixLen(const char* SuperChars, int Font)
     return SuperTextPixLen(len, SuperChars, Font);
 }
 
-void SuperPrintRightAlign(const char* SuperChars, int Font, float X, float Y, float r, float g, float b, float a)
+void SuperPrintRightAlign(const char* SuperChars, int Font, float X, float Y, XTColor color)
 {
     int len = (int)SDL_strlen(SuperChars);
-    SuperPrintRightAlign(len, SuperChars, Font, X, Y, r, g, b, a);
+    SuperPrintRightAlign(len, SuperChars, Font, X, Y, color);
 }
 
-void SuperPrintCenter(const char* SuperChars, int Font, float X, float Y, float r, float g, float b, float a)
+void SuperPrintCenter(const char* SuperChars, int Font, float X, float Y, XTColor color)
 {
     int len = (int)SDL_strlen(SuperChars);
-    SuperPrintCenter(len, SuperChars, Font, X, Y, r, g, b, a);
+    SuperPrintCenter(len, SuperChars, Font, X, Y, color);
 }
 
-void SuperPrintScreenCenter(const char* SuperChars, int Font, float Y, float r, float g, float b, float a)
+void SuperPrintScreenCenter(const char* SuperChars, int Font, float Y, XTColor color)
 {
     int len = (int)SDL_strlen(SuperChars);
-    SuperPrintScreenCenter(len, SuperChars, Font, Y, r, g, b, a);
+    SuperPrintScreenCenter(len, SuperChars, Font, Y, color);
 }
 
-void SuperPrint(const char* SuperChars, int Font, float X, float Y, float r, float g, float b, float a)
+void SuperPrint(const char* SuperChars, int Font, float X, float Y, XTColor color)
 {
     int len = (int)SDL_strlen(SuperChars);
-    SuperPrint(len, SuperChars, Font, X, Y, r, g, b, a);
+    SuperPrint(len, SuperChars, Font, X, Y, color);
 }
 
 
@@ -184,22 +184,22 @@ int SuperTextPixLen(const std::string& SuperWords, int Font)
     return SuperTextPixLen((int)SuperWords.size(), SuperWords.c_str(), Font);
 }
 
-void SuperPrintRightAlign(const std::string& SuperWords, int Font, float X, float Y, float r, float g, float b, float a)
+void SuperPrintRightAlign(const std::string& SuperWords, int Font, float X, float Y, XTColor color)
 {
-    SuperPrintRightAlign((int)SuperWords.size(), SuperWords.c_str(), Font, X, Y, r, g, b, a);
+    SuperPrintRightAlign((int)SuperWords.size(), SuperWords.c_str(), Font, X, Y, color);
 }
 
-void SuperPrintCenter(const std::string& SuperWords, int Font, float X, float Y, float r, float g, float b, float a)
+void SuperPrintCenter(const std::string& SuperWords, int Font, float X, float Y, XTColor color)
 {
-    SuperPrintCenter((int)SuperWords.size(), SuperWords.c_str(), Font, X, Y, r, g, b, a);
+    SuperPrintCenter((int)SuperWords.size(), SuperWords.c_str(), Font, X, Y, color);
 }
 
-void SuperPrintScreenCenter(const std::string& SuperWords, int Font, float Y, float r, float g, float b, float a)
+void SuperPrintScreenCenter(const std::string& SuperWords, int Font, float Y, XTColor color)
 {
-    SuperPrintScreenCenter((int)SuperWords.size(), SuperWords.c_str(), Font, Y, r, g, b, a);
+    SuperPrintScreenCenter((int)SuperWords.size(), SuperWords.c_str(), Font, Y, color);
 }
 
-void SuperPrint(const std::string& SuperWords, int Font, float X, float Y, float r, float g, float b, float a)
+void SuperPrint(const std::string& SuperWords, int Font, float X, float Y, XTColor color)
 {
-    SuperPrint((int)SuperWords.size(), SuperWords.c_str(), Font, X, Y, r, g, b, a);
+    SuperPrint((int)SuperWords.size(), SuperWords.c_str(), Font, X, Y, color);
 }

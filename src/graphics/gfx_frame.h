@@ -47,7 +47,7 @@ class IniProcessing;
 
 void loadFrameInfo(IniProcessing& ini, FrameBorderInfo& borderinfo);
 
-void DrawTextureTiled(int dst_x, int dst_y, int dst_w, int dst_h, StdPicture& tx, int src_x = 0, int src_y = 0, int src_w = -1, int src_h = -1, int off_x = -1, int off_y = -1, float alpha = 1.f);
+void DrawTextureTiled(int dst_x, int dst_y, int dst_w, int dst_h, StdPicture& tx, int src_x = 0, int src_y = 0, int src_w = -1, int src_h = -1, int off_x = -1, int off_y = -1, XTColor color = XTColor());
 
 // renders a new-style frame as a border with the included external and internal locations
 // the frame fills the space between external and internal

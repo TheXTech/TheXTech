@@ -146,9 +146,9 @@ int      getFontID(std::string fontName);
 PGE_Size printText(const char* text, size_t text_size,
                    int x, int y,
                    int font = DefaultRaster,
-                   float Red = 1.0, float Green = 1.0, float Blue = 1.0, float Alpha = 1.0,
+                   XTColor color = XTColor(),
                    uint32_t ttf_FontSize = 14, bool outline = false,
-                   float outline_r = 0.0, float outline_g = 0.0, float outline_b = 0.0,
+                   XTColor outline_color = {0, 0, 0},
                    CropInfo* crop_info = nullptr);
 
 /**
@@ -169,7 +169,7 @@ PGE_Size printTextOptiCol(std::string text,
                           int x, int y,
                           size_t max_columns,
                           int font = DefaultRaster,
-                          float Red = 1.0, float Green = 1.0, float Blue = 1.0, float Alpha = 1.0,
+                          XTColor color = XTColor(),
                           uint32_t ttf_FontSize = 14);
 
 /**
@@ -190,7 +190,7 @@ PGE_Size printTextOptiPx(std::string text,
                          int x, int y,
                          size_t max_pixels_lenght,
                          int font = DefaultRaster,
-                         float Red = 1.0, float Green = 1.0, float Blue = 1.0, float Alpha = 1.0,
+                         XTColor color = XTColor(),
                          uint32_t ttf_FontSize = 14);
 
 /**

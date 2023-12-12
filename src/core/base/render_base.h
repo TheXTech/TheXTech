@@ -253,20 +253,20 @@ public:
     // Draw primitives
 
     virtual void renderRect(int x, int y, int w, int h,
-                            float red = 1.f, float green = 1.f, float blue = 1.f, float alpha = 1.f,
+                            XTColor color = XTColor(),
                             bool filled = true) = 0;
 
     virtual void renderRectBR(int _left, int _top, int _right, int _bottom,
-                              float red, float green, float blue, float alpha) = 0;
+                              XTColor color) = 0;
 
     virtual void renderCircle(int cx, int cy,
                               int radius,
-                              float red = 1.f, float green = 1.f, float blue = 1.f, float alpha = 1.f,
+                              XTColor color = XTColor(),
                               bool filled = true) = 0;
 
     virtual void renderCircleHole(int cx, int cy,
                                   int radius,
-                                  float red = 1.f, float green = 1.f, float blue = 1.f, float alpha = 1.f) =0;
+                                  XTColor color = XTColor()) =0;
 
 
 
@@ -278,25 +278,25 @@ public:
                               int xSrc, int ySrc,
                               int wSrc, int hSrc,
                               double rotateAngle = 0.0, FPoint_t *center = nullptr, unsigned int flip = X_FLIP_NONE,
-                              float red = 1.f, float green = 1.f, float blue = 1.f, float alpha = 1.f) = 0;
+                              XTColor color = XTColor()) = 0;
 
     virtual void renderTextureScale(double xDst, double yDst, double wDst, double hDst,
                             StdPicture &tx,
-                            float red = 1.f, float green = 1.f, float blue = 1.f, float alpha = 1.f) = 0;
+                            XTColor color = XTColor()) = 0;
 
     virtual void renderTexture(double xDst, double yDst, double wDst, double hDst,
                                StdPicture &tx,
                                int xSrc, int ySrc,
-                               float red = 1.f, float green = 1.f, float blue = 1.f, float alpha = 1.f) = 0;
+                               XTColor color = XTColor()) = 0;
 
     virtual void renderTextureFL(double xDst, double yDst, double wDst, double hDst,
                                  StdPicture &tx,
                                  int xSrc, int ySrc,
                                  double rotateAngle = 0.0, FPoint_t *center = nullptr, unsigned int flip = X_FLIP_NONE,
-                                 float red = 1.f, float green = 1.f, float blue = 1.f, float alpha = 1.f) = 0;
+                                 XTColor color = XTColor()) = 0;
 
     virtual void renderTexture(float xDst, float yDst, StdPicture &tx,
-                               float red = 1.f, float green = 1.f, float blue = 1.f, float alpha = 1.f) = 0;
+                               XTColor color = XTColor()) = 0;
 
     virtual void renderParticleSystem(StdPicture &tx,
                                       double camX,

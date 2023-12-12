@@ -64,38 +64,38 @@ void setViewport(int x, int y, int w, int h);
 void offsetViewport(int x, int y);
 void offsetViewportIgnore(bool en);
 void setTransparentColor(StdPicture &target, uint32_t rgb);
-void renderRect(int x, int y, int w, int h, float red, float green, float blue, float alpha, bool filled);
-void renderRectBR(int _left, int _top, int _right, int _bottom, float red, float green, float blue, float alpha);
+void renderRect(int x, int y, int w, int h, XTColor color, bool filled);
+void renderRectBR(int _left, int _top, int _right, int _bottom, XTColor color);
 void renderCircle(int cx, int cy,
                   int radius,
                   float red , float green, float blue, float alpha,
                   bool filled);
 void renderCircleHole(int cx, int cy,
                       int radius,
-                      float red, float green, float blue, float alpha);
+                      XTColor color);
 void renderTextureScale(double xDst, double yDst, double wDst, double hDst,
                             StdPicture &tx,
                             int xSrc, int ySrc, int wSrc, int hSrc,
-                            float red, float green, float blue, float alpha);
+                            XTColor color);
 void renderTexture(double xDst, double yDst, double wDst, double hDst,
                             StdPicture &tx,
                             int xSrc, int ySrc,
-                            float red, float green, float blue, float alpha);
+                            XTColor color);
 void renderTexture(float xDst, float yDst, StdPicture &tx,
-                   float red, float green, float blue, float alpha);
-void renderTexture(int xDst, int yDst, StdPicture &tx, float red, float green, float blue, float alpha);
-void renderTextureScale(int xDst, int yDst, int wDst, int hDst, StdPicture &tx, float red, float green, float blue, float alpha);
+                   XTColor color);
+void renderTexture(int xDst, int yDst, StdPicture &tx, XTColor color);
+void renderTextureScale(int xDst, int yDst, int wDst, int hDst, StdPicture &tx, XTColor color);
 void renderTextureFL(double xDst, double yDst, double wDst, double hDst,
                           StdPicture &tx,
                           int xSrc, int ySrc,
                           double rotateAngle, FPoint_t *center, unsigned int flip,
-                          float red, float green, float blue, float alpha);
+                          XTColor color);
 void renderTextureScaleEx(double xDst, double yDst, double wDst, double hDst,
                           StdPicture &tx,
                           int xSrc, int ySrc,
                           int wSrc, int hSrc,
                           double rotateAngle, FPoint_t *center, unsigned int flip,
-                          float red, float green, float blue, float alpha);
+                          XTColor color);
 size_t lazyLoadedBytes();
 void lazyLoadedBytesReset();
 #endif
@@ -120,14 +120,14 @@ void minport_TransformPhysCoords();
 void minport_ApplyPhysCoords();
 void minport_ApplyViewport();
 
-void minport_RenderBoxFilled(int x1, int y1, int x2, int y2, uint8_t r, uint8_t g, uint8_t b, uint8_t alpha);
-void minport_RenderBoxUnfilled(int x1, int y1, int x2, int y2, uint8_t r, uint8_t g, uint8_t b, uint8_t alpha);
+void minport_RenderBoxFilled(int x1, int y1, int x2, int y2, XTColor color);
+void minport_RenderBoxUnfilled(int x1, int y1, int x2, int y2, XTColor color);
 
 void minport_RenderTexturePrivate(int16_t xDst, int16_t yDst, int16_t wDst, int16_t hDst,
                              StdPicture &tx,
                              int16_t xSrc, int16_t ySrc, int16_t wSrc, int16_t hSrc,
                              float rotateAngle, FPoint_t *center, unsigned int flip,
-                             float red, float green, float blue, float alpha);
+                             XTColor color);
 
 } // namespace XRender;
 

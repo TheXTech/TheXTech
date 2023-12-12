@@ -1833,17 +1833,18 @@ static void s_drawGameVersion()
 static void s_drawGameTypeTitle(int x, int y)
 {
     if(MenuMode == MENU_EDITOR)
-        SuperPrint(g_mainMenu.mainEditor, 3, x, y, 0.8f, 0.8f, 0.3f);
+        SuperPrint(g_mainMenu.mainEditor, 3, x, y, XTColorF(0.8f, 0.8f, 0.3f));
     else if(menuBattleMode)
-        SuperPrint(g_mainMenu.mainBattleGame, 3, x, y, 0.3f, 0.3f, 1.0f);
+        SuperPrint(g_mainMenu.mainBattleGame, 3, x, y, XTColorF(0.3f, 0.3f, 1.0f));
     else
     {
         float r = menuPlayersNum == 1 ? 1.f : 0.3f;
         float g = menuPlayersNum == 2 ? 1.f : 0.3f;
+
         if(menuPlayersNum == 1)
-            SuperPrint(g_mainMenu.main1PlayerGame, 3, x, y, r, g, 0.3f);
+            SuperPrint(g_mainMenu.main1PlayerGame, 3, x, y, XTColorF(r, g, 0.3f));
         else
-            SuperPrint(g_mainMenu.mainMultiplayerGame, 3, x, y, r, g, 0.3f);
+            SuperPrint(g_mainMenu.mainMultiplayerGame, 3, x, y, XTColorF(r, g, 0.3f));
     }
 }
 
@@ -1911,7 +1912,7 @@ static void s_drawGameSaves(int MenuX, int MenuY)
     if((info.Time <= 0 || g_speedRunnerMode == SPEEDRUN_MODE_OFF) && !hasFails)
         row_1 = infobox_y + 26;
 
-    XRender::renderRect(infobox_x, infobox_y, 480, 68, 0, 0, 0, 0.5f);
+    XRender::renderRect(infobox_x, infobox_y, 480, 68, {0, 0, 0, 127});
 
     // Temp string
     std::string t;
@@ -2025,7 +2026,7 @@ void mainMenuDraw()
         C = 0;
 
         s_drawGameTypeTitle(MenuX, 280);
-        SuperPrint(SelectWorld[selWorld].WorldName, 3, MenuX, 310, 0.6f, 1.f, 1.f);
+        SuperPrint(SelectWorld[selWorld].WorldName, 3, MenuX, 310, XTColorF(0.6f, 1.f, 1.f));
 
         // TODO: Make a custom playable character names print here
         if(!blockCharacter[1])
@@ -2135,20 +2136,16 @@ void mainMenuDraw()
         for(auto A = minShow; A <= maxShow; A++)
         {
             auto w = SelectorList[A];
-            float r = w.highlight ? 0.f : 1.f;
-            float g = 1.0f;
-            float b = 1.0f;
+
+            XTColor color;
+            color.r = w.highlight ? 0 : 255;
+
+            if(w.disabled)
+                color = {127, 127, 127};
 
             B = A - minShow + 1;
 
-            if(w.disabled)
-            {
-                r = 0.5f;
-                g = 0.5f;
-                b = 0.5f;
-            }
-
-            SuperPrint(w.WorldName, 3, MenuX, MenuY - 30 + (B * 30), r, g, b, 1.f);
+            SuperPrint(w.WorldName, 3, MenuX, MenuY - 30 + (B * 30), color);
         }
 
         // render the scroll indicators
@@ -2167,7 +2164,7 @@ void mainMenuDraw()
     else if(MenuMode == MENU_SELECT_SLOT_1P || MenuMode == MENU_SELECT_SLOT_2P) // Save Select
     {
         s_drawGameTypeTitle(MenuX, MenuY - 70);
-        SuperPrint(SelectWorld[selWorld].WorldName, 3, MenuX, MenuY - 40, 0.6f, 1.f, 1.f);
+        SuperPrint(SelectWorld[selWorld].WorldName, 3, MenuX, MenuY - 40, XTColorF(0.6f, 1.f, 1.f));
         s_drawGameSaves(MenuX, MenuY);
         XRender::renderTexture(MenuX - 20, MenuY + (MenuCursor * 30), GFX.MCursor[0]);
     }
@@ -2176,13 +2173,13 @@ void mainMenuDraw()
             MenuMode == MENU_SELECT_SLOT_1P_COPY_S2 || MenuMode == MENU_SELECT_SLOT_2P_COPY_S2) // Copy save
     {
         s_drawGameTypeTitle(MenuX, MenuY - 70);
-        SuperPrint(SelectWorld[selWorld].WorldName, 3, MenuX, MenuY - 40, 0.6f, 1.f, 1.f);
+        SuperPrint(SelectWorld[selWorld].WorldName, 3, MenuX, MenuY - 40, XTColorF(0.6f, 1.f, 1.f));
         s_drawGameSaves(MenuX, MenuY);
 
         if(MenuMode == MENU_SELECT_SLOT_1P_COPY_S1 || MenuMode == MENU_SELECT_SLOT_2P_COPY_S1)
-            SuperPrint(g_mainMenu.gameSourceSlot, 3, MenuX, MenuY + c_menuSavesFooterHint, 0.7f, 0.7f, 1.0f);
+            SuperPrint(g_mainMenu.gameSourceSlot, 3, MenuX, MenuY + c_menuSavesFooterHint, XTColorF(0.7f, 0.7f, 1.0f));
         else if(MenuMode == MENU_SELECT_SLOT_1P_COPY_S2 || MenuMode == MENU_SELECT_SLOT_2P_COPY_S2)
-            SuperPrint(g_mainMenu.gameTargetSlot, 3, MenuX, MenuY + c_menuSavesFooterHint, 0.7f, 1.0f, 0.7f);
+            SuperPrint(g_mainMenu.gameTargetSlot, 3, MenuX, MenuY + c_menuSavesFooterHint, XTColorF(0.7f, 1.0f, 0.7f));
 
         if(MenuMode == MENU_SELECT_SLOT_1P_COPY_S2 || MenuMode == MENU_SELECT_SLOT_2P_COPY_S2)
         {
@@ -2196,10 +2193,10 @@ void mainMenuDraw()
     else if(MenuMode == MENU_SELECT_SLOT_1P_DELETE || MenuMode == MENU_SELECT_SLOT_2P_DELETE) // Copy save
     {
         s_drawGameTypeTitle(MenuX, MenuY - 70);
-        SuperPrint(SelectWorld[selWorld].WorldName, 3, MenuX, MenuY - 40, 0.6f, 1.f, 1.f);
+        SuperPrint(SelectWorld[selWorld].WorldName, 3, MenuX, MenuY - 40, XTColorF(0.6f, 1.f, 1.f));
         s_drawGameSaves(MenuX, MenuY);
 
-        SuperPrint(g_mainMenu.gameEraseSlot, 3, MenuX, MenuY + c_menuSavesFooterHint, 1.0f, 0.7f, 0.7f);
+        SuperPrint(g_mainMenu.gameEraseSlot, 3, MenuX, MenuY + c_menuSavesFooterHint, XTColorF(1.0f, 0.7f, 0.7f));
 
         XRender::renderTexture(MenuX - 20, MenuY + (MenuCursor * 30), GFX.MCursor[0]);
     }
@@ -2243,7 +2240,7 @@ void mainMenuDraw()
         SuperPrint(fmt::format_ne("{0}: {1}", g_mainMenu.optionsScaleMode, *scale_str), 3, MenuX, MenuY + (30 * i++));
 
         if(!FontManager::isInitied() || FontManager::isLegacy())
-            SuperPrint("Language: <missing \"fonts\">", 3, MenuX, MenuY + (30 * i++), 0.5f, 0.5f, 0.5f, 1.0f);
+            SuperPrint("Language: <missing \"fonts\">", 3, MenuX, MenuY + (30 * i++), XTColorF(0.5f, 0.5f, 0.5f, 1.0f));
         else
             SuperPrint(fmt::format_ne("{0}: {1} ({2})", g_mainMenu.wordLanguage, g_mainMenu.languageName, g_config.language), 3, MenuX, MenuY + (30 * i++));
 

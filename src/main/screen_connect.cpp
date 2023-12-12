@@ -865,16 +865,16 @@ bool Player_MenuItem_Mouse_Render(int p, int i, const std::string& label, int X,
     return false;
 }
 
-inline void Render_PCursor(int x, int y, int p, float r, float g, float b)
+inline void Render_PCursor(int x, int y, int p, XTColor color)
 {
     if(GFX.PCursor.inited)
-        XRender::renderTexture(x, y, GFX.PCursor, r, g, b);
+        XRender::renderTexture(x, y, GFX.PCursor, color);
     else if(p == 0)
         XRender::renderTexture(x, y, GFX.MCursor[0]);
     else if(p == 1)
         XRender::renderTexture(x, y, GFX.MCursor[3]);
     else
-        XRender::renderTextureFL(x, y, GFX.MCursor[1].w, GFX.MCursor[1].h, GFX.MCursor[1], 0, 0, 90.0, nullptr, X_FLIP_NONE, r, g, b);
+        XRender::renderTextureFL(x, y, GFX.MCursor[1].w, GFX.MCursor[1].h, GFX.MCursor[1], 0, 0, 90.0, nullptr, X_FLIP_NONE, color);
 }
 
 // render the character select screen
@@ -913,20 +913,18 @@ void Chars_Mouse_Render(int x, int w, int y, int h, bool mouse, bool render)
         if(render)
         {
             // determine if it belongs to a character
-            float r = 1.f;
-            float g = 1.f;
-            float b = 1.f;
-            float a = 1.f;
+            XTColor color;
+
             if(blockCharacter[c+1] || !s_char_info.accept(c))
-                a = 0.2f;
+                color.a = XTColor::from_float(0.2f);
 
             for(int p = 0; p < maxLocalPlayers; p++)
             {
                 // player's color
-                float pr = (p == 0 ? 1.f : 0.f);
-                float pg = (p == 1 ? 1.f : 0.f);
-                float pb = (p > 1 ? 1.f : 0.f);
-                float pa = 1.f;
+                XTColor pcolor;
+                pcolor.r = (p == 0 ? 255 : 0);
+                pcolor.g = (p == 1 ? 255 : 0);
+                pcolor.b = (p >= 2 ? 255 : 0);
 
                 // render cursor if a player is currently (or pretend) selecting it
                 bool act_select_char;
@@ -936,9 +934,10 @@ void Chars_Mouse_Render(int x, int w, int y, int h, bool mouse, bool render)
                     act_select_char = true;
                 else
                     act_select_char = false;
+
                 if(act_select_char && s_menuItem[p] == c)
                 {
-                    Render_PCursor(menu_x - 20, y+c*line, p, pr, pg, pb);
+                    Render_PCursor(menu_x - 20, y+c*line, p, pcolor);
 
                     // do the fun player transformation thing!
                     // This WILL switch certain entities back and forth
@@ -976,17 +975,14 @@ void Chars_Mouse_Render(int x, int w, int y, int h, bool mouse, bool render)
                 {
                     player_okay = true;
                     if((CommonFrame % 45) < 25)
-                        pa = 0.5f;
+                        pcolor.a = 127;
                 }
+
                 if(player_okay && g_charSelect[p] == c+1)
-                {
-                    r = pr;
-                    g = pg;
-                    b = pb;
-                    a = pa;
-                }
+                    color = pcolor;
             }
-            SuperPrint(fmt::format_ne(g_mainMenu.selectCharacter, g_gameInfo.characterName[c + 1]), 3, menu_x, y + (c * line), r, g, b, a);
+
+            SuperPrint(fmt::format_ne(g_mainMenu.selectCharacter, g_gameInfo.characterName[c + 1]), 3, menu_x, y + (c * line), color);
         }
     }
 }
@@ -997,16 +993,17 @@ bool Player_Mouse_Render(int p, int pX, int cX, int pY, int line, bool mouse, bo
     bool ret = false;
 
     // player's color
-    float r = (p == 0 ? 1.f : 0.f);
-    float g = (p == 1 ? 1.f : 0.f);
-    float b = (p > 1 ? 1.f : 0.f);
+    XTColor color;
+    color.r = (p == 0 ? 255 : 0);
+    color.g = (p == 1 ? 255 : 0);
+    color.b = (p >= 2 ? 255 : 0);
 
     // note that all cursor rendering is done using MCursor[1] (the scroll-up indicator), rotated,
     //   because the standard cursor icons are already tinted.
 
     // render the player's header
     if(render && s_playerState[p] != PlayerState::SelectProfile && !(s_context == Context::MainMenu && s_minPlayers == 1))
-        SuperPrintCenter(fmt::format_ne("{0} {1}", g_mainMenu.wordPlayer, p+1), 3, cX, pY, r, g, b);
+        SuperPrintCenter(fmt::format_ne("{0} {1}", g_mainMenu.wordPlayer, p+1), 3, cX, pY, color);
 
     // now render / process the player's menu as appropriate to its case
 
@@ -1064,7 +1061,7 @@ bool Player_Mouse_Render(int p, int pX, int cX, int pY, int line, bool mouse, bo
 
         // show the menu cursor for the player
         if(render && s_menuItem[p] >= 0)
-            Render_PCursor(pX - 20, start_y + (s_menuItem[p]-scroll_start)*line, p, r, g, b);
+            Render_PCursor(pX - 20, start_y + (s_menuItem[p]-scroll_start)*line, p, color);
 
         for(int i = scroll_start; i < scroll_end; i++)
         {
@@ -1111,7 +1108,7 @@ bool Player_Mouse_Render(int p, int pX, int cX, int pY, int line, bool mouse, bo
         int i = 0;
         // show the cursor for the player
         if(render && s_menuItem[p] >= 0)
-            Render_PCursor(pX - 20, pY + (1+s_menuItem[p])*line, p, r, g, b);
+            Render_PCursor(pX - 20, pY + (1+s_menuItem[p])*line, p, color);
 
         ret |= Player_MenuItem_Mouse_Render(p, 0, g_gameStrings.connectSetControls,
             pX, pY+(1)*line, mouse, render);
@@ -1136,7 +1133,7 @@ bool Player_Mouse_Render(int p, int pX, int cX, int pY, int line, bool mouse, bo
         if(CheckDone() && render)
         {
             SuperPrint(g_mainMenu.connectStartGame, 3, pX, pY+2*line);
-            Render_PCursor(pX - 20, pY + 2*line, p, r, g, b);
+            Render_PCursor(pX - 20, pY + 2*line, p, color);
         }
         else
         {
@@ -1151,7 +1148,7 @@ bool Player_Mouse_Render(int p, int pX, int cX, int pY, int line, bool mouse, bo
             {
                 // show the cursor for the player
                 if(render && s_menuItem[p] >= 0)
-                    Render_PCursor(pX - 20, pY + (2+s_menuItem[p])*line, p, r, g, b);
+                    Render_PCursor(pX - 20, pY + (2+s_menuItem[p])*line, p, color);
                 if(g_compatibility.allow_drop_add && numPlayers > s_minPlayers)
                 {
                     // figure out which player would be dropped...
@@ -1179,7 +1176,7 @@ bool Player_Mouse_Render(int p, int pX, int cX, int pY, int line, bool mouse, bo
             SuperPrintCenter(Controls::g_InputMethods[p]->Name, 3, cX, pY + line);
 
             // show the menu cursor for the player
-            Render_PCursor(pX - 20, pY + (2+s_menuItem[p])*line, p, r, g, b);
+            Render_PCursor(pX - 20, pY + (2+s_menuItem[p])*line, p, color);
         }
 
         // should never be null
@@ -1206,11 +1203,11 @@ bool Player_Mouse_Render(int p, int pX, int cX, int pY, int line, bool mouse, bo
                 // MenuY + 145
                 int infobox_y = pY + 75;
 
-                XRender::renderRect(ScreenW / 2 - 240, infobox_y, 480, 68, 0, 0, 0, 0.5);
+                XRender::renderRect(ScreenW / 2 - 240, infobox_y, 480, 68, {0, 0, 0, 127});
 
-                SuperPrintScreenCenter(g_gameStrings.connectWaitingForInputDevice, 3, infobox_y + 4, 0.8f, 0.8f, 0.8f, 0.8f);
-                SuperPrintScreenCenter(g_gameStrings.connectPressSelectForControlsOptions_P1, 3, infobox_y + 24, 0.8f, 0.8f, 0.8f, 0.8f);
-                SuperPrintScreenCenter(g_gameStrings.connectPressSelectForControlsOptions_P2, 3, infobox_y + 44, 0.8f, 0.8f, 0.8f, 0.8f);
+                SuperPrintScreenCenter(g_gameStrings.connectWaitingForInputDevice, 3, infobox_y + 4, XTColorF(0.8f, 0.8f, 0.8f, 0.8f));
+                SuperPrintScreenCenter(g_gameStrings.connectPressSelectForControlsOptions_P1, 3, infobox_y + 24, XTColorF(0.8f, 0.8f, 0.8f, 0.8f));
+                SuperPrintScreenCenter(g_gameStrings.connectPressSelectForControlsOptions_P2, 3, infobox_y + 44, XTColorF(0.8f, 0.8f, 0.8f, 0.8f));
             }
             else if((CommonFrame % 90) < 45)
                 SuperPrintCenter(g_gameStrings.connectPressAButton, 3, cX, pY+2*line);
@@ -1220,7 +1217,7 @@ bool Player_Mouse_Render(int p, int pX, int cX, int pY, int line, bool mouse, bo
 
     if(s_playerState[p] == PlayerState::SelectChar && s_context != Context::MainMenu && p < numPlayers)
     {
-        SuperPrint(g_gameStrings.connectChangeChar, 3, pX, pY+2*line, 0.8f, 0.8f, 0.8f, 0.8f);
+        SuperPrint(g_gameStrings.connectChangeChar, 3, pX, pY+2*line, XTColorF(0.8f, 0.8f, 0.8f, 0.8f));
         return ret;
     }
 
@@ -1244,8 +1241,8 @@ bool Player_Mouse_Render(int p, int pX, int cX, int pY, int line, bool mouse, bo
                 SuperPrintCenter(g_mainMenu.wordProfile, 3, cX, pY + 2*line);
         }
 
-        SuperPrintCenter(g_gameStrings.connectPressSelectForControlsOptions_P1, 3, cX, pY + 3*line, 0.8f, 0.8f, 0.8f, 0.8f);
-        SuperPrintCenter(g_gameStrings.connectPressSelectForControlsOptions_P2, 3, cX, pY + 4*line, 0.8f, 0.8f, 0.8f, 0.8f);
+        SuperPrintCenter(g_gameStrings.connectPressSelectForControlsOptions_P1, 3, cX, pY + 3*line, XTColorF(0.8f, 0.8f, 0.8f, 0.8f));
+        SuperPrintCenter(g_gameStrings.connectPressSelectForControlsOptions_P2, 3, cX, pY + 4*line, XTColorF(0.8f, 0.8f, 0.8f, 0.8f));
     }
     // show the squashed info for 1P mode
     else if(render)
@@ -1253,7 +1250,7 @@ bool Player_Mouse_Render(int p, int pX, int cX, int pY, int line, bool mouse, bo
         // MenuY + 145
         int infobox_y = pY + 75;
 
-        XRender::renderRect(ScreenW / 2 - 240, infobox_y, 480, 68, 0, 0, 0, 0.5);
+        XRender::renderRect(ScreenW / 2 - 240, infobox_y, 480, 68, {0, 0, 0, 127});
 
         if(p < (int)Controls::g_InputMethods.size() && Controls::g_InputMethods[p])
         {
@@ -1265,8 +1262,8 @@ bool Player_Mouse_Render(int p, int pX, int cX, int pY, int line, bool mouse, bo
                 SuperPrintScreenCenter(Controls::g_InputMethods[p]->Name, 3, infobox_y + 4);
         }
 
-        SuperPrintScreenCenter(g_gameStrings.connectPressSelectForControlsOptions_P1, 3, infobox_y + 24, 0.8f, 0.8f, 0.8f, 0.8f);
-        SuperPrintScreenCenter(g_gameStrings.connectPressSelectForControlsOptions_P2, 3, infobox_y + 44, 0.8f, 0.8f, 0.8f, 0.8f);
+        SuperPrintScreenCenter(g_gameStrings.connectPressSelectForControlsOptions_P1, 3, infobox_y + 24, XTColorF(0.8f, 0.8f, 0.8f, 0.8f));
+        SuperPrintScreenCenter(g_gameStrings.connectPressSelectForControlsOptions_P2, 3, infobox_y + 44, XTColorF(0.8f, 0.8f, 0.8f, 0.8f));
     }
 
     return ret;
@@ -1378,7 +1375,7 @@ int Mouse_Render(bool mouse, bool render)
 
     if(render && !(s_context == Context::MainMenu && s_minPlayers == 1))
     {
-        XRender::renderRect(sX, sY - (line-16), p_width*n, line*max_line + line-16, 0, 0, 0, .5);
+        XRender::renderRect(sX, sY - (line-16), p_width*n, line*max_line + line-16, {0, 0, 0, 127});
     }
 
     /*--------------------*\
@@ -1389,8 +1386,8 @@ int Mouse_Render(bool mouse, bool render)
     {
         if(s_context == Context::MainMenu && s_minPlayers == 1)
         {
-            SuperPrint(g_mainMenu.main1PlayerGame, 3, MenuX, MenuY - 70, 1.0f, 0.3f, 0.3f);
-            SuperPrint(SelectWorld[selWorld].WorldName, 3, MenuX, MenuY - 40, 0.6f, 1.f, 1.f);
+            SuperPrint(g_mainMenu.main1PlayerGame, 3, MenuX, MenuY - 70, XTColorF(1.0f, 0.3f, 0.3f));
+            SuperPrint(SelectWorld[selWorld].WorldName, 3, MenuX, MenuY - 40, XTColorF(0.6f, 1.f, 1.f));
         }
         else if(s_context == Context::MainMenu)
             SuperPrintScreenCenter(g_mainMenu.connectCharSelTitle, 3, sY);
@@ -1415,7 +1412,7 @@ int Mouse_Render(bool mouse, bool render)
             if(s_context == Context::Reconnect)
                 SuperPrintScreenCenter(g_gameStrings.connectPressStartToResume, 3, sY+line*8);
             else
-                SuperPrintScreenCenter(g_gameStrings.connectPressStartToResume, 3, sY+line*8, 0.8f, 0.8f, 0.8f, 0.8f);
+                SuperPrintScreenCenter(g_gameStrings.connectPressStartToResume, 3, sY+line*8, XTColorF(0.8f, 0.8f, 0.8f, 0.8f));
         }
         else
         {
@@ -1427,7 +1424,7 @@ int Mouse_Render(bool mouse, bool render)
                     break;
             }
             if(p != n)
-                SuperPrintScreenCenter(g_gameStrings.connectPressStartToForceResume, 3, sY+line*8, 0.8f, 0.8f, 0.8f, 0.8f);
+                SuperPrintScreenCenter(g_gameStrings.connectPressStartToForceResume, 3, sY+line*8, XTColorF(0.8f, 0.8f, 0.8f, 0.8f));
         }
     }
 
@@ -1452,7 +1449,7 @@ int Mouse_Render(bool mouse, bool render)
             {
                 if(render)
                 {
-                    XRender::renderRect(ScreenW/2 - 150, MenuY, 300, 200, 0, 0, 0, 0.5);
+                    XRender::renderRect(ScreenW/2 - 150, MenuY, 300, 200, {0, 0, 0, 127});
                     if((CommonFrame % 90) < 45)
                         SuperPrintScreenCenter(g_gameStrings.connectPressAButton, 3, MenuY + 90);
                 }
@@ -1467,7 +1464,7 @@ int Mouse_Render(bool mouse, bool render)
                 if(l < 0)
                     l = 0;
                 if(render)
-                    XRender::renderRect(ScreenW/2 - 150, MenuY, 300, 200, 0, 0, 0, 0.5);
+                    XRender::renderRect(ScreenW/2 - 150, MenuY, 300, 200, {0, 0, 0, 127});
                 Player_Mouse_Render(p, l + 24, ScreenW / 2, MenuY, 30, mouse, render);
             }
             else
@@ -1476,7 +1473,7 @@ int Mouse_Render(bool mouse, bool render)
                 if(l < 0)
                     l = 0;
                 if(render)
-                    XRender::renderRect(ScreenW/2 - 150, MenuY, 300, 200, 0, 0, 0, 0.5);
+                    XRender::renderRect(ScreenW/2 - 150, MenuY, 300, 200, {0, 0, 0, 127});
                 Player_Mouse_Render(p, l + 24, ScreenW / 2, MenuY + 30, 30, mouse, render);
             }
         }

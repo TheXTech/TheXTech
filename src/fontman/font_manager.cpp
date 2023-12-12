@@ -634,9 +634,9 @@ int FontManager::getFontID(std::string fontName)
 PGE_Size FontManager::printText(const char* text, size_t text_size,
                                 int x, int y,
                                 int font,
-                                float Red, float Green, float Blue, float Alpha,
+                                XTColor color,
                                 uint32_t ttf_FontSize, bool outline,
-                                float outline_r, float outline_g, float outline_b,
+                                XTColor outline_color,
                                 CropInfo* crop_info)
 {
     if(!g_fontManagerIsInit)
@@ -682,20 +682,20 @@ PGE_Size FontManager::printText(const char* text, size_t text_size,
     if(outline)
     {
         // take square of Alpha to match blend of normal text
-        float outline_a = Alpha * Alpha;
+        uint8_t scaled_a = XTColor::mul(color.a, color.a);
         if(crop_info)
             crop_info->for_outline = true;
 
-        font_engine->printText(text, text_size, x - 2, y, outline_r, outline_g, outline_b, outline_a, ttf_FontSize, crop_info);
-        font_engine->printText(text, text_size, x + 2, y, outline_r, outline_g, outline_b, outline_a, ttf_FontSize, crop_info);
-        font_engine->printText(text, text_size, x, y - 2, outline_r, outline_g, outline_b, outline_a, ttf_FontSize, crop_info);
-        font_engine->printText(text, text_size, x, y + 2, outline_r, outline_g, outline_b, outline_a, ttf_FontSize, crop_info);
+        font_engine->printText(text, text_size, x - 2, y, color.with_alpha(scaled_a) * outline_color, ttf_FontSize, crop_info);
+        font_engine->printText(text, text_size, x + 2, y, color.with_alpha(scaled_a) * outline_color, ttf_FontSize, crop_info);
+        font_engine->printText(text, text_size, x, y - 2, color.with_alpha(scaled_a) * outline_color, ttf_FontSize, crop_info);
+        font_engine->printText(text, text_size, x, y + 2, color.with_alpha(scaled_a) * outline_color, ttf_FontSize, crop_info);
 
         if(crop_info)
             crop_info->for_outline = false;
     }
 
-    return font_engine->printText(text, text_size, x, y, Red, Green, Blue, Alpha, ttf_FontSize, crop_info);
+    return font_engine->printText(text, text_size, x, y, color, ttf_FontSize, crop_info);
 }
 
 PGE_Size FontManager::optimizeText(std::string &text, size_t max_columns)
@@ -758,14 +758,14 @@ PGE_Size FontManager::printTextOptiCol(std::string text,
                                    int x, int y,
                                    size_t max_columns,
                                    int font,
-                                   float Red, float Green, float Blue, float Alpha,
+                                   XTColor color,
                                    uint32_t ttf_FontSize)
 {
     PGE_Size ret = FontManager::optimizeText(text, max_columns);
     FontManager::printText(text.c_str(), text.size(),
                            x, y,
                            font,
-                           Red, Green, Blue, Alpha,
+                           color,
                            ttf_FontSize);
     return ret;
 }
@@ -774,14 +774,14 @@ PGE_Size FontManager::printTextOptiPx(std::string text,
                                   int x, int y,
                                   size_t max_pixels_lenght,
                                   int font,
-                                  float Red, float Green, float Blue, float Alpha,
+                                  XTColor color,
                                   uint32_t ttf_FontSize)
 {
     PGE_Size ret = FontManager::optimizeTextPx(text, max_pixels_lenght, font, ttf_FontSize);
     FontManager::printText(text.c_str(), text.size(),
                            x, y,
                            font,
-                           Red, Green, Blue, Alpha,
+                           color,
                            ttf_FontSize);
     return ret;
 }
