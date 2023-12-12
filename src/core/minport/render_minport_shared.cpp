@@ -225,16 +225,16 @@ inline double FLOORDIV2(double x)
 }
 
 #ifndef __WII__
-void minport_RenderBoxUnfilled(int x1, int y1, int x2, int y2, uint8_t r, uint8_t g, uint8_t b, uint8_t a)
+void minport_RenderBoxUnfilled(int x1, int y1, int x2, int y2, XTColor color)
 {
-    minport_RenderBoxFilled(x1, y1, x1 + 1, y2, r, g, b, a);
-    minport_RenderBoxFilled(x2 - 1, y1, x2, y2, r, g, b, a);
-    minport_RenderBoxFilled(x1, y1, x2, y1 + 1, r, g, b, a);
-    minport_RenderBoxFilled(x1, y2 - 1, x2, y2, r, g, b, a);
+    minport_RenderBoxFilled(x1, y1, x1 + 1, y2, color);
+    minport_RenderBoxFilled(x2 - 1, y1, x2, y2, color);
+    minport_RenderBoxFilled(x1, y1, x2, y1 + 1, color);
+    minport_RenderBoxFilled(x1, y2 - 1, x2, y2, color);
 }
 #endif
 
-void renderRect(int x, int y, int w, int h, float red, float green, float blue, float alpha, bool filled)
+void renderRect(int x, int y, int w, int h, XTColor color, bool filled)
 {
     int x_div = FLOORDIV2(x);
     int w_div = FLOORDIV2(x + w) - x_div;
@@ -242,20 +242,15 @@ void renderRect(int x, int y, int w, int h, float red, float green, float blue, 
     int y_div = FLOORDIV2(y);
     int h_div = FLOORDIV2(y + h) - y_div;
 
-    uint8_t r = red * 255.0f + 0.5f;
-    uint8_t g = green * 255.0f + 0.5f;
-    uint8_t b = blue * 255.0f + 0.5f;
-    uint8_t a = alpha * 255.0f + 0.5f;
-
     if(filled)
-        minport_RenderBoxFilled(x_div, y_div, x_div + w_div, y_div + h_div, r, g, b, a);
+        minport_RenderBoxFilled(x_div, y_div, x_div + w_div, y_div + h_div, color);
     else
-        minport_RenderBoxUnfilled(x_div, y_div, x_div + w_div, y_div + h_div, r, g, b, a);
+        minport_RenderBoxUnfilled(x_div, y_div, x_div + w_div, y_div + h_div, color);
 }
 
-void renderRectBR(int _left, int _top, int _right, int _bottom, float red, float green, float blue, float alpha)
+void renderRectBR(int _left, int _top, int _right, int _bottom, XTColor color)
 {
-    renderRect(_left, _top, _right-_left, _bottom-_top, red, green, blue, alpha, true);
+    renderRect(_left, _top, _right-_left, _bottom-_top, color, true);
 }
 
 void renderCircle(int cx, int cy,
@@ -276,7 +271,7 @@ void renderCircle(int cx, int cy,
 
 void renderCircleHole(int cx, int cy,
                       int radius,
-                      float red, float green, float blue, float alpha)
+                      XTColor color)
 {
     if(radius <= 0)
         return; // Nothing to draw
@@ -289,18 +284,18 @@ void renderCircleHole(int cx, int cy,
         double dx = std::floor(std::sqrt((2.0 * radius * dy) - (dy * dy)));
 
         renderRectBR(cx - radius, cy + dy - radius - line_size, cx - dx, cy + dy - radius + line_size,
-            red, green, blue, alpha);
+            color);
 
         renderRectBR(cx + dx, cy + dy - radius - line_size, cx + radius, cy + dy - radius + line_size,
-            red, green, blue, alpha);
+            color);
 
         if(dy < radius) // Don't cross lines
         {
             renderRectBR(cx - radius, cy - dy + radius - line_size, cx - dx, cy - dy + radius + line_size,
-                red, green, blue, alpha);
+                color);
 
             renderRectBR(cx + dx, cy - dy + radius - line_size, cx + radius, cy - dy + radius + line_size,
-                red, green, blue, alpha);
+                color);
         }
 
         dy += line_size * 2;
@@ -411,7 +406,7 @@ inline void minport_RenderTexturePrivate_2(int16_t xDst, int16_t yDst, int16_t w
                              StdPicture &tx,
                              int16_t xSrc, int16_t ySrc, int16_t wSrc, int16_t hSrc,
                              float rotateAngle, FPoint_t *center, unsigned int flip,
-                             float red, float green, float blue, float alpha)
+                             XTColor color)
 {
     if(wDst <= 0 || hDst <= 0)
         return;
@@ -420,7 +415,7 @@ inline void minport_RenderTexturePrivate_2(int16_t xDst, int16_t yDst, int16_t w
                              tx,
                              xSrc, ySrc, wSrc, hSrc,
                              rotateAngle, center, flip,
-                             red, green, blue, alpha);
+                             color);
 
     if(tx.inited && tx.l.lazyLoaded && &tx != g_render_chain_head)
     {
@@ -448,7 +443,7 @@ inline void minport_RenderTexturePrivate_2(int16_t xDst, int16_t yDst, int16_t w
 
 void renderTextureScale(double xDst, double yDst, double wDst, double hDst,
                             StdPicture &tx,
-                            float red, float green, float blue, float alpha)
+                            XTColor color)
 {
     auto div_x = FLOORDIV2(xDst), div_y = FLOORDIV2(yDst);
 
@@ -457,13 +452,13 @@ void renderTextureScale(double xDst, double yDst, double wDst, double hDst,
         tx,
         0.0f, 0.0f, tx.w / 2, tx.h / 2,
         0.0f, nullptr, X_FLIP_NONE,
-        red, green, blue, alpha);
+        color);
 }
 
 void renderTextureScale(double xDst, double yDst, double wDst, double hDst,
                             StdPicture &tx,
                             int xSrc, int ySrc, int wSrc, int hSrc,
-                            float red, float green, float blue, float alpha)
+                            XTColor color)
 {
     auto div_x = FLOORDIV2(xDst), div_y = FLOORDIV2(yDst);
 
@@ -472,13 +467,13 @@ void renderTextureScale(double xDst, double yDst, double wDst, double hDst,
         tx,
         xSrc / 2, ySrc / 2, wSrc / 2, hSrc / 2,
         0.0f, nullptr, X_FLIP_NONE,
-        red, green, blue, alpha);
+        color);
 }
 
 void renderTexture(double xDst, double yDst, double wDst, double hDst,
                             StdPicture &tx,
                             int xSrc, int ySrc,
-                            float red, float green, float blue, float alpha)
+                            XTColor color)
 {
     auto div_x = FLOORDIV2(xDst), div_y = FLOORDIV2(yDst);
     auto div_w = FLOORDIV2(xDst + wDst) - div_x;
@@ -489,11 +484,11 @@ void renderTexture(double xDst, double yDst, double wDst, double hDst,
         tx,
         FLOORDIV2(xSrc), FLOORDIV2(ySrc), div_w, div_h,
         0.0f, nullptr, X_FLIP_NONE,
-        red, green, blue, alpha);
+        color);
 }
 
 void renderTexture(float xDst, float yDst, StdPicture &tx,
-                   float red, float green, float blue, float alpha)
+                   XTColor color)
 {
     int w = tx.w / 2;
     int h = tx.h / 2;
@@ -503,10 +498,10 @@ void renderTexture(float xDst, float yDst, StdPicture &tx,
         tx,
         0, 0, w, h,
         0.0f, nullptr, X_FLIP_NONE,
-        red, green, blue, alpha);
+        color);
 }
 
-void renderTexture(int xDst, int yDst, StdPicture &tx, float red, float green, float blue, float alpha)
+void renderTexture(int xDst, int yDst, StdPicture &tx, XTColor color)
 {
     int w = tx.w / 2;
     int h = tx.h / 2;
@@ -516,10 +511,10 @@ void renderTexture(int xDst, int yDst, StdPicture &tx, float red, float green, f
         tx,
         0.0f, 0.0f, w, h,
         0.0f, nullptr, X_FLIP_NONE,
-        red, green, blue, alpha);
+        color);
 }
 
-void renderTextureScale(int xDst, int yDst, int wDst, int hDst, StdPicture &tx, float red, float green, float blue, float alpha)
+void renderTextureScale(int xDst, int yDst, int wDst, int hDst, StdPicture &tx, XTColor color)
 {
     auto div_x = FLOORDIV2(xDst), div_y = FLOORDIV2(yDst);
     auto div_w = FLOORDIV2(xDst + wDst) - div_x;
@@ -530,14 +525,14 @@ void renderTextureScale(int xDst, int yDst, int wDst, int hDst, StdPicture &tx, 
         tx,
         0.0f, 0.0f, tx.w / 2, tx.h / 2,
         0.0f, nullptr, X_FLIP_NONE,
-        red, green, blue, alpha);
+        color);
 }
 
 void renderTextureFL(double xDst, double yDst, double wDst, double hDst,
                           StdPicture &tx,
                           int xSrc, int ySrc,
                           double rotateAngle, FPoint_t *center, unsigned int flip,
-                          float red, float green, float blue, float alpha)
+                          XTColor color)
 {
     auto div_x = FLOORDIV2(xDst), div_y = FLOORDIV2(yDst);
     auto div_w = FLOORDIV2(xDst + wDst) - div_x;
@@ -548,7 +543,7 @@ void renderTextureFL(double xDst, double yDst, double wDst, double hDst,
         tx,
         FLOORDIV2(xSrc), FLOORDIV2(ySrc), div_w, div_h,
         rotateAngle, center, flip,
-        red, green, blue, alpha);
+        color);
 }
 
 void renderTextureScaleEx(double xDst, double yDst, double wDst, double hDst,
@@ -556,7 +551,7 @@ void renderTextureScaleEx(double xDst, double yDst, double wDst, double hDst,
                           int xSrc, int ySrc,
                           int wSrc, int hSrc,
                           double rotateAngle, FPoint_t *center, unsigned int flip,
-                          float red, float green, float blue, float alpha)
+                          XTColor color)
 {
     auto div_x = FLOORDIV2(xDst), div_y = FLOORDIV2(yDst);
     auto div_w = FLOORDIV2(xDst + wDst) - div_x;
@@ -571,7 +566,7 @@ void renderTextureScaleEx(double xDst, double yDst, double wDst, double hDst,
         tx,
         div_sx, div_sy, div_sw, div_sh,
         rotateAngle, center, flip,
-        red, green, blue, alpha);
+        color);
 }
 
 

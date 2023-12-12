@@ -81,8 +81,8 @@ public:
     CropInfo crop_info(MarqueeSpec spec) const;
 };
 
-void SuperPrintMarquee(int SuperN, const char* SuperChars, int Font, float X, float Y, MarqueeSpec spec, MarqueeState& marquee_state, float r = 1.f, float g = 1.f, float b = 1.f, float a = 1.f);
-void SuperPrintMarquee(const char* SuperChars, int Font, float X, float Y, MarqueeSpec spec, MarqueeState& marquee_state, float r = 1.f, float g = 1.f, float b = 1.f, float a = 1.f);
-void SuperPrintMarquee(const std::string &SuperWords, int Font, float X, float Y, MarqueeSpec spec, MarqueeState& marquee_state, float r = 1.f, float g = 1.f, float b = 1.f, float a = 1.f);
+void SuperPrintMarquee(int SuperN, const char* SuperChars, int Font, float X, float Y, MarqueeSpec spec, MarqueeState& marquee_state, XTColor color = XTColor());
+void SuperPrintMarquee(const char* SuperChars, int Font, float X, float Y, MarqueeSpec spec, MarqueeState& marquee_state, XTColor color = XTColor());
+void SuperPrintMarquee(const std::string &SuperWords, int Font, float X, float Y, MarqueeSpec spec, MarqueeState& marquee_state, XTColor color = XTColor());
 
 #endif // GFX_MARQUEE_H

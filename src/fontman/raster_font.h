@@ -74,7 +74,7 @@ public:
      */
     PGE_Size printText(const char* text, size_t text_size,
                        int32_t x, int32_t y,
-                       float Red=1.f, float Green=1.f, float Blue=1.f, float Alpha=1.f,
+                       XTColor color = XTColor(),
                        uint32_t fontSize = 0,
                        CropInfo* crop_info = nullptr) override;
 
@@ -90,8 +90,7 @@ private:
     std::string m_ttfFallback;
     //! Enable outline borders on backup ttf font render
     bool m_ttfOutlines = false;
-    uint32_t m_ttfOutLinesColour = 0x000000FF;
-    float    m_ttfOutlinesColourF[4] = {0.f, 0.f, 0.f, 1.f};
+    XTColor m_ttfOutlinesColour = {0, 0, 0, 255};
     //! The fallback TTF size of the glyph to request
     int  m_ttfSize = -1;
     //! Width of one letter

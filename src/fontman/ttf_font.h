@@ -96,7 +96,7 @@ public:
      */
     PGE_Size printText(const char *text, size_t text_size,
                        int32_t x, int32_t y,
-                       float Red = 1.f, float Green = 1.f, float Blue = 1.f, float Alpha = 1.f,
+                       XTColor color = XTColor(),
                        uint32_t fontSize = 14,
                        CropInfo* crop_info = nullptr) override;
 
@@ -124,8 +124,8 @@ public:
     uint32_t drawGlyph(const char* u8char,
                        int32_t x, int32_t y, uint32_t fontSize, double scaleSize = 1.0,
                        bool drawOutlines = false,
-                       float Red = 1.f, float Green = 1.f, float Blue = 1.f, float Alpha = 1.f,
-                       float OL_Red = 0.f, float OL_Green = 0.f, float OL_Blue = 0.f, float OL_Alpha = 1.f);
+                       XTColor color = XTColor(),
+                       XTColor OL_color = XTColor());
 
     struct TheGlyphInfo
     {

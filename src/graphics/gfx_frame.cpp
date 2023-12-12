@@ -41,7 +41,7 @@ void loadFrameInfo(IniProcessing& ini, FrameBorderInfo& info)
 	ini.endGroup();
 }
 
-void DrawTextureTiled(int dst_x, int dst_y, int dst_w, int dst_h, StdPicture& tx, int src_x, int src_y, int src_w, int src_h, int off_x, int off_y, float alpha)
+void DrawTextureTiled(int dst_x, int dst_y, int dst_w, int dst_h, StdPicture& tx, int src_x, int src_y, int src_w, int src_h, int off_x, int off_y, XTColor color)
 {
     if(off_x == -1)
         off_x = dst_x;
@@ -74,7 +74,7 @@ void DrawTextureTiled(int dst_x, int dst_y, int dst_w, int dst_h, StdPicture& tx
             if(y + render_h > dst_y + dst_h)
                 render_h = dst_y + dst_h - y;
 
-            XRender::renderTexture(x, y, render_w, render_h, tx, src_x + c_off_x, src_y + c_off_y, 1.f, 1.f, 1.f, alpha);
+            XRender::renderTexture(x, y, render_w, render_h, tx, src_x + c_off_x, src_y + c_off_y, color);
 
             y += src_h - c_off_y;
             c_off_y = 0;

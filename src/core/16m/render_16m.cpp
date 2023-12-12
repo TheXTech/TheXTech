@@ -504,16 +504,15 @@ static inline void s_gxVertex2i(v16 x, v16 y)
     GFX_VERTEX_XY = (y << 16) | (x & 0xFFFF);
 }
 
-void minport_RenderBoxFilled( int x1, int y1, int x2, int y2, uint8_t r, uint8_t g, uint8_t b, uint8_t a)
+void minport_RenderBoxFilled( int x1, int y1, int x2, int y2, XTColor color)
 {
-
     x2++;
     y2++;
 
     glBindTexture(0, 0);
-    if((a >> 3) < 31)
-        glPolyFmt(POLY_ID(s_poly_id++) | POLY_ALPHA((a >> 3) + 1) | POLY_CULL_NONE);
-    glColor3b(r, g, b);
+    if((color.a >> 3) < 31)
+        glPolyFmt(POLY_ID(s_poly_id++) | POLY_ALPHA((color.a >> 3) + 1) | POLY_CULL_NONE);
+    glColor3b(color.r, color.g, color.b);
 
     glBegin( GL_QUADS );
         s_gxVertex3i( x1, y1, s_depth++ );       // use 3i for first vertex so that we increment HW depth
@@ -522,7 +521,7 @@ void minport_RenderBoxFilled( int x1, int y1, int x2, int y2, uint8_t r, uint8_t
         s_gxVertex2i( x2, y1 );
     glEnd();
 
-    if((a >> 3) < 31)
+    if((color.a >> 3) < 31)
         glPolyFmt(POLY_ALPHA(31) | POLY_CULL_NONE);
 }
 
@@ -547,7 +546,7 @@ inline bool GL_DrawImage_Custom(int name, int flags,
     int16_t x, int16_t y, uint16_t w, uint16_t h,
     uint16_t src_x, uint16_t src_y, uint16_t src_w, uint16_t src_h,
     unsigned int flip,
-    float _r, float _g, float _b, float _a)
+    XTColor color)
 {
     uint16_t u1 = src_x >> (flags & 15);
     uint16_t u2 = (src_x + src_w) >> (flags & 15);
@@ -559,10 +558,10 @@ inline bool GL_DrawImage_Custom(int name, int flags,
     if(flip & X_FLIP_VERTICAL)
         std::swap(v1, v2);
 
-    uint8_t r = _r * 255.0f + 0.5f;
-    uint8_t g = _g * 255.0f + 0.5f;
-    uint8_t b = _b * 255.0f + 0.5f;
-    uint8_t a = _a * 255.0f + 0.5f;
+    uint8_t r = color.r;
+    uint8_t g = color.g;
+    uint8_t b = color.b;
+    uint8_t a = color.a;
 
     // GX_SetTevOp(GX_TEVSTAGE0, GX_MODULATE);
     // GX_SetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
@@ -756,11 +755,12 @@ void minport_ApplyViewport()
     //     off_x += 1;
     //     off_y += 1;
     // }
-    glOrthof32( off_x, g_viewport_w + off_x, g_viewport_h + off_y, off_y, -1 << 12, 1 << 12 );
+    glOrthof32( off_x, g_viewport_w + off_x, g_viewport_h + off_y, off_y, -(1 << 12), 1 << 12 );
 }
 
 void lazyLoadPicture(StdPicture_Sub& target, const std::string& path, int scaleFactor, const std::string& maskPath, const std::string& maskFallbackPath)
 {
+    (void)scaleFactor;
     (void)maskPath;
     (void)maskFallbackPath;
 
@@ -941,7 +941,7 @@ void minport_RenderTexturePrivate(int16_t xDst, int16_t yDst, int16_t wDst, int1
                              StdPicture &tx,
                              int16_t xSrc, int16_t ySrc, int16_t wSrc, int16_t hSrc,
                              float rotateAngle, FPoint_t *center, unsigned int flip,
-                             float red, float green, float blue, float alpha)
+                             XTColor color)
 {
     if(!tx.inited)
         return;
@@ -1009,7 +1009,7 @@ void minport_RenderTexturePrivate(int16_t xDst, int16_t yDst, int16_t wDst, int1
         if(to_draw_2)
         {
             GL_DrawImage_Custom(to_draw_2, tx.l.flags, xDst, yDst, wDst, (1024 - ySrc) * hDst / hSrc,
-                                xSrc, ySrc, wSrc, 1024 - ySrc, flip, red, green, blue, alpha);
+                                xSrc, ySrc, wSrc, 1024 - ySrc, flip, color);
             yDst += (1024 - ySrc) * hDst / hSrc;
             hDst -= (1024 - ySrc) * hDst / hSrc;
             hSrc -= (1024 - ySrc);
@@ -1026,7 +1026,7 @@ void minport_RenderTexturePrivate(int16_t xDst, int16_t yDst, int16_t wDst, int1
     if(!to_draw) return;
 
     GL_DrawImage_Custom(to_draw, tx.l.flags, xDst, yDst, wDst, hDst,
-                        xSrc, ySrc, wSrc, hSrc, flip, red, green, blue, alpha);
+                        xSrc, ySrc, wSrc, hSrc, flip, color);
 
     // finalize rotation HERE
     if(rotateAngle)

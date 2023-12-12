@@ -121,6 +121,7 @@ jobs:
         cp meta.xml "package/${{ matrix.config.subdir_name }}/"
         cp icon.png "package/${{ matrix.config.subdir_name }}/"
         cp thextech.rpx "package/${{ matrix.config.subdir_name }}/thextech.rpx"
+        cp thextech.wuhb "package/${{ matrix.config.subdir_name }}/thextech.wuhb"
         cat ../docs/README_WIIU.md ../README.md >> "package/${{ matrix.config.subdir_name }}/README.md"
         cd package
         zip -9 -r "thextech-wiiu-${BRANCH_NAME_RES}.zip" "${{ matrix.config.subdir_name }}"

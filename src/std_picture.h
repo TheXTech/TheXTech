@@ -22,6 +22,8 @@
 #ifndef STD_PICTURE_H
 #define STD_PICTURE_H
 
+#include "xt_color.h"
+
 #include "core/picture_data.h"
 #include "core/picture_load.h"
 
@@ -30,18 +32,6 @@
 #   define STD_PICTURE_HAS_ORIG_PATH
 #endif
 
-/*!
- * \brief RGB pixel color
- */
-// uses floats right now but should be converted into a packed
-// 32-bit integer for efficient parameter passing;
-// see the wip render queue branch
-struct PGEColor
-{
-    float r = 0;
-    float g = 0;
-    float b = 0;
-};
 
 struct SDL_Texture;
 
@@ -71,9 +61,9 @@ struct StdPicture_Sub
 
     // These colors were used to auto-choose the fill color for the background
     //! Left-top pixel color
-    PGEColor ColorUpper;
+    XTColor ColorUpper;
     //! Left-bottom pixel color
-    PGEColor ColorLower;
+    XTColor ColorLower;
 
     /*!
      * \brief Reset colors into black
@@ -83,9 +73,12 @@ struct StdPicture_Sub
         ColorUpper.r = 0;
         ColorUpper.g = 0;
         ColorUpper.b = 0;
+        ColorUpper.a = 255;
+
         ColorLower.r = 0;
         ColorLower.g = 0;
         ColorLower.b = 0;
+        ColorLower.a = 255;
     }
 
 

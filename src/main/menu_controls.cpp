@@ -173,9 +173,7 @@ int menuControls_Mouse_Render(bool mouse, bool render)
 
     // render the background
     if(render)
-    {
-        XRender::renderRect(sX, sY - (line-18), width, line*max_line + (line-18), 0, 0, 0, .5);
-    }
+        XRender::renderRect(sX, sY - (line-18), width, line*max_line + (line-18), {0, 0, 0, 127});
 
     // rendering of profile deletion screen
     if(s_deleteProfileSel)

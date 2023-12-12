@@ -144,7 +144,7 @@ void Render()
     int menu_left_X = ScreenW / 2 - total_menu_width / 2 + 20;
     int menu_top_Y = menu_box_Y + menu_box_height / 2 - total_menu_height / 2;
 
-    XRender::renderRect(ScreenW / 2 - menu_box_width / 2, menu_box_Y, menu_box_width, menu_box_height, 0.0f, 0.0f, 0.0f, 0.8f);
+    XRender::renderRect(ScreenW / 2 - menu_box_width / 2, menu_box_Y, menu_box_width, menu_box_height, XTColorF(0.0f, 0.0f, 0.0f, 0.8f));
 
     for(size_t i = 0; i < s_options.size(); i++)
         SuperPrint(s_options[i], 3, menu_left_X, menu_top_Y + (i * 36));

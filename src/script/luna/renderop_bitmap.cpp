@@ -71,7 +71,7 @@ void RenderBitmapOp::Draw(Renderer *renderer)
     if(!sceneCoords)
         XRender::offsetViewportIgnore(true);
 
-    XRender::renderTexture(x, y, width, height, direct_img->m_image, sx, sy, 1.f, 1.f, 1.f, opacity);
+    XRender::renderTexture(x, y, width, height, direct_img->m_image, sx, sy, XTAlphaF(opacity));
 
     if(!sceneCoords)
         XRender::offsetViewportIgnore(false);

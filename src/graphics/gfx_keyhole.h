@@ -29,11 +29,11 @@ void RenderKeyhole(int Z);
 void RenderTexturePlayer(int Z, double dst_x, double dst_y, double dst_w, double dst_h,
                          StdPicture& tex,
                          int src_x = 0, int src_y = 0,
-                         float r = 1.0f, float g = 1.0f, float b = 1.0f, float a = 1.0f);
+                         XTColor color = XTColor());
 
 void RenderTexturePlayerScale(int Z, double dst_x, double dst_y, double dst_w, double dst_h,
                          StdPicture& tex,
                          int src_x, int src_y, int src_w, int src_h,
-                         float r = 1.0f, float g = 1.0f, float b = 1.0f, float a = 1.0f);
+                         XTColor color = XTColor());
 
 #endif // GFX_KEYHOLE_H

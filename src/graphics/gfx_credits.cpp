@@ -56,15 +56,15 @@ static float s_alphaFromY(double y)
 
 void DrawCredits()
 {
-    XRender::renderRect(0, 0, ScreenW, Maths::iRound(CreditChop), 0.f, 0.f, 0.f);
-    XRender::renderRect(0, ScreenH - Maths::iRound(CreditChop), ScreenW, std::ceil(CreditChop), 0.f, 0.f, 0.f);
+    XRender::renderRect(0, 0, ScreenW, Maths::iRound(CreditChop), {0, 0, 0});
+    XRender::renderRect(0, ScreenH - Maths::iRound(CreditChop), ScreenW, std::ceil(CreditChop), {0, 0, 0});
 
     if(CreditChop > 100)
     {
-        float chop = CreditChop- 100;
-        float chop_max = (static_cast<float>(ScreenH) / 2.f) - 100;
-        float alpha = chop / chop_max;
-        XRender::renderRect(0, 0, ScreenW, ScreenH, 0.f, 0.f, 0.f, alpha);
+        int chop = CreditChop - 100;
+        int chop_max = (ScreenH / 2) - 100;
+        uint8_t alpha = 255 * chop / chop_max;
+        XRender::renderRect(0, 0, ScreenW, ScreenH, {0, 0, 0, alpha});
     }
 
     int A;
@@ -94,6 +94,6 @@ void DrawCredits()
                    g_gameInfo.creditsFont,
                    static_cast<float>(l.X),
                    y,
-                   1.0f, 1.0f, 1.0f, s_alphaFromY(y));
+                   XTAlphaF(s_alphaFromY(y)));
     }
 }

@@ -55,8 +55,8 @@ void speedRun_triggerLeave();
 
 void speedRun_bossDeadEvent();
 
-void RenderPowerInfo(int player, int bx, int by, int bw, int bh, float alpha, const XPower::StatusInfo* status);
-void RenderControls(int player, int x, int y, int w, int h, bool missing, float alpha);
+void RenderPowerInfo(int player, int bx, int by, int bw, int bh, uint8_t alpha, const XPower::StatusInfo* status);
+void RenderControls(int player, int x, int y, int w, int h, bool missing, uint8_t alpha);
 
 void speedRun_renderControls(int player, int screenZ = -1);
 void speedRun_renderTimer();

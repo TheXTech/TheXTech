@@ -472,46 +472,43 @@ E_INLINE void spawnParticle(StdPicture &target,
 // Draw primitives
 
 E_INLINE void renderRect(int x, int y, int w, int h,
-                        float red = 1.f, float green = 1.f, float blue = 1.f, float alpha = 1.f,
+                        XTColor color = XTColor(),
                         bool filled = true) TAIL
 #ifndef RENDER_CUSTOM
 {
     g_render->renderRect(x, y, w, h,
-                         red, green, blue, alpha,
+                         color,
                          filled);
 }
 #endif
 
 E_INLINE void renderRectBR(int _left, int _top, int _right, int _bottom,
-                           float red, float green, float blue, float alpha) TAIL
+                           XTColor color) TAIL
 #ifndef RENDER_CUSTOM
 {
     g_render->renderRectBR(_left, _top, _right, _bottom,
-                           red, green, blue, alpha);
+                           color);
 }
 #endif
 
 E_INLINE void renderCircle(int cx, int cy,
                           int radius,
-                          float red = 1.f, float green = 1.f, float blue = 1.f, float alpha = 1.f,
+                          XTColor color = XTColor(),
                           bool filled = true) TAIL
 #ifndef RENDER_CUSTOM
 {
     g_render->renderCircle(cx, cy,
                            radius,
-                           red, green, blue, alpha,
+                           color,
                            filled);
 }
 #endif
 
-E_INLINE void renderCircleHole(int cx, int cy,
-                              int radius,
-                              float red = 1.f, float green = 1.f, float blue = 1.f, float alpha = 1.f) TAIL
+E_INLINE void renderCircleHole(int cx, int cy, int radius,
+                               XTColor color = XTColor()) TAIL
 #ifndef RENDER_CUSTOM
 {
-    g_render->renderCircleHole(cx, cy,
-                               radius,
-                               red, green, blue, alpha);
+    g_render->renderCircleHole(cx, cy, radius, color);
 }
 #endif
 
@@ -523,7 +520,7 @@ E_INLINE void renderTextureScaleEx(double xDst, double yDst, double wDst, double
                           int xSrc, int ySrc,
                           int wSrc, int hSrc,
                           double rotateAngle = 0.0, FPoint_t *center = nullptr, unsigned int flip = X_FLIP_NONE,
-                          float red = 1.f, float green = 1.f, float blue = 1.f, float alpha = 1.f) TAIL
+                          XTColor color = XTColor()) TAIL
 #ifndef RENDER_CUSTOM
 {
     g_render->renderTextureScaleEx(xDst, yDst, wDst, hDst,
@@ -531,31 +528,31 @@ E_INLINE void renderTextureScaleEx(double xDst, double yDst, double wDst, double
                                    xSrc, ySrc,
                                    wSrc, hSrc,
                                    rotateAngle, center, flip,
-                                   red, green, blue, alpha);
+                                   color);
 }
 #endif
 
 E_INLINE void renderTextureScale(double xDst, double yDst, double wDst, double hDst,
                         StdPicture &tx,
-                        float red = 1.f, float green = 1.f, float blue = 1.f, float alpha = 1.f) TAIL
+                        XTColor color = XTColor()) TAIL
 #ifndef RENDER_CUSTOM
 {
     g_render->renderTextureScale(xDst, yDst, wDst, hDst,
                                  tx,
-                                 red, green, blue, alpha);
+                                 color);
 }
 #endif
 
 E_INLINE void renderTexture(double xDst, double yDst, double wDst, double hDst,
                            StdPicture &tx,
                            int xSrc, int ySrc,
-                           float red = 1.f, float green = 1.f, float blue = 1.f, float alpha = 1.f) TAIL
+                           XTColor color = XTColor()) TAIL
 #ifndef RENDER_CUSTOM
 {
     g_render->renderTexture(xDst, yDst, wDst, hDst,
                             tx,
                             xSrc, ySrc,
-                            red, green, blue, alpha);
+                            color);
 }
 #endif
 
@@ -563,23 +560,23 @@ E_INLINE void renderTextureFL(double xDst, double yDst, double wDst, double hDst
                              StdPicture &tx,
                              int xSrc, int ySrc,
                              double rotateAngle = 0.0, FPoint_t *center = nullptr, unsigned int flip = X_FLIP_NONE,
-                             float red = 1.f, float green = 1.f, float blue = 1.f, float alpha = 1.f) TAIL
+                             XTColor color = XTColor()) TAIL
 #ifndef RENDER_CUSTOM
 {
     g_render->renderTextureFL(xDst, yDst, wDst, hDst,
                               tx,
                               xSrc, ySrc,
                               rotateAngle, center, flip,
-                              red, green, blue, alpha);
+                              color);
 }
 #endif
 
 E_INLINE void renderTexture(float xDst, float yDst, StdPicture &tx,
-                           float red = 1.f, float green = 1.f, float blue = 1.f, float alpha = 1.f) TAIL
+                           XTColor color = XTColor()) TAIL
 #ifndef RENDER_CUSTOM
 {
     g_render->renderTexture(xDst, yDst, tx,
-                            red, green, blue, alpha);
+                            color);
 }
 #endif
 

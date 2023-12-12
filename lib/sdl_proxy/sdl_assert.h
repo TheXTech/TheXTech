@@ -29,7 +29,11 @@
 #   define SDL_assert(x)         assert(x)
 
 // Doesn't work as intended (trigger a fail on release builds), this is just a dummy
+#ifndef NDEBUG
 #   define SDL_assert_release(x) assert(x)
+#else
+#   define SDL_assert_release(x) (void)(x)
+#endif
 
 #else
 

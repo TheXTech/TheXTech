@@ -551,17 +551,17 @@ void clearBuffer()
         C3D_FrameBegin(0);
         C2D_ViewReset();
 
-        C2D_TargetClear(s_top_screen, C2D_Color32f(0.0f, 0.0f, 0.0f, 1.0f));
+        C2D_TargetClear(s_top_screen, C2D_Color32(0, 0, 0, 255));
         C2D_SceneBegin(s_top_screen);
-        renderRect(0, 0, 400, 240, 0.0f, 0.0f, 0.0f, 1.0f, true);
+        renderRect(0, 0, 400, 240, {0, 0, 0}, true);
 
-        C2D_TargetClear(s_right_screen, C2D_Color32f(0.0f, 0.0f, 0.0f, 1.0f));
+        C2D_TargetClear(s_right_screen, C2D_Color32(0, 0, 0, 255));
         C2D_SceneBegin(s_right_screen);
-        renderRect(0, 0, 400, 240, 0.0f, 0.0f, 0.0f, 1.0f, true);
+        renderRect(0, 0, 400, 240, {0, 0, 0}, true);
 
-        C2D_TargetClear(s_bottom_screen, C2D_Color32f(0.0f, 0.0f, 0.0f, 1.0f));
+        C2D_TargetClear(s_bottom_screen, C2D_Color32(0, 0, 0, 255));
         C2D_SceneBegin(s_bottom_screen);
-        renderRect(0, 0, 320, 240, 0.0f, 0.0f, 0.0f, 1.0f, true);
+        renderRect(0, 0, 320, 240, {0, 0, 0}, true);
 
         C3D_FrameEnd(0);
     }
@@ -587,7 +587,7 @@ void repaint()
     // in this case, the level graphics have already been rescaled to the bottom screen
     if(g_screen_swapped && (LevelEditor || MagicHand) && editorScreen.active)
     {
-        C2D_TargetClear(s_top_screen, C2D_Color32f(0.0f, 0.0f, 0.0f, 1.0f));
+        C2D_TargetClear(s_top_screen, C2D_Color32(0, 0, 0, 255));
         C2D_SceneBegin(s_top_screen);
 
         for(int layer = 0; layer < 4; layer++)
@@ -595,7 +595,7 @@ void repaint()
             C2D_DrawImage_Custom(s_layer_ims[layer],
                                  g_screen_phys_x + 40, g_screen_phys_y, g_screen_phys_w, g_screen_phys_h,
                                  shift, 0, s_tex_show_w, s_tex_h,
-                                 X_FLIP_NONE, 1.0f, 1.0f, 1.0f, 1.0f);
+                                 X_FLIP_NONE, XTColor());
 
             if(s_single_layer_mode)
                 break;
@@ -603,7 +603,7 @@ void repaint()
     }
     else if(g_screen_swapped)
     {
-        C2D_TargetClear(s_bottom_screen, C2D_Color32f(0.0f, 0.0f, 0.0f, 1.0f));
+        C2D_TargetClear(s_bottom_screen, C2D_Color32(0, 0, 0, 255));
         C2D_SceneBegin(s_bottom_screen);
 
         for(int layer = 0; layer < 4; layer++)
@@ -611,7 +611,7 @@ void repaint()
             C2D_DrawImage_Custom(s_layer_ims[layer],
                                  g_screen_phys_x, g_screen_phys_y, g_screen_phys_w, g_screen_phys_h,
                                  shift, 0, s_tex_show_w, s_tex_h,
-                                 X_FLIP_NONE, 1.0f, 1.0f, 1.0f, 1.0f);
+                                 X_FLIP_NONE, XTColor());
 
             if(s_single_layer_mode)
                 break;
@@ -620,7 +620,7 @@ void repaint()
     // normally in editor mode, just center the level graphics
     else if(LevelEditor && !editorScreen.active)
     {
-        C2D_TargetClear(s_bottom_screen, C2D_Color32f(0.0f, 0.0f, 0.0f, 1.0f));
+        C2D_TargetClear(s_bottom_screen, C2D_Color32(0, 0, 0, 255));
         C2D_SceneBegin(s_bottom_screen);
 
         for(int layer = 0; layer < 4; layer++)
@@ -628,7 +628,7 @@ void repaint()
             C2D_DrawImage_Custom(s_layer_ims[layer],
                                  g_screen_phys_x - 40, g_screen_phys_y, g_screen_phys_w, g_screen_phys_h,
                                  shift, 0, s_tex_show_w, s_tex_h,
-                                 X_FLIP_NONE, 1.0f, 1.0f, 1.0f, 1.0f);
+                                 X_FLIP_NONE, XTColor());
 
             if(s_single_layer_mode)
                 break;
@@ -636,7 +636,7 @@ void repaint()
     }
     else if(s_depth_slider <= 0.05 || s_single_layer_mode)
     {
-        C2D_TargetClear(s_top_screen, C2D_Color32f(0.0f, 0.0f, 0.0f, 1.0f));
+        C2D_TargetClear(s_top_screen, C2D_Color32(0, 0, 0, 255));
         C2D_SceneBegin(s_top_screen);
 
         for(int layer = 0; layer < 4; layer++)
@@ -644,7 +644,7 @@ void repaint()
             C2D_DrawImage_Custom(s_layer_ims[layer],
                                  g_screen_phys_x, g_screen_phys_y, g_screen_phys_w, g_screen_phys_h,
                                  shift, 0, s_tex_show_w, s_tex_h,
-                                 X_FLIP_NONE, 1.0f, 1.0f, 1.0f, 1.0f);
+                                 X_FLIP_NONE, XTColor());
 
             if(s_single_layer_mode)
                 break;
@@ -652,7 +652,7 @@ void repaint()
     }
     else
     {
-        C2D_TargetClear(s_top_screen, C2D_Color32f(0.0f, 0.0f, 0.0f, 1.0f));
+        C2D_TargetClear(s_top_screen, C2D_Color32(0, 0, 0, 255));
         C2D_SceneBegin(s_top_screen);
 
         for(int layer = 0; layer < 4; layer++)
@@ -660,10 +660,10 @@ void repaint()
             C2D_DrawImage_Custom(s_layer_ims[layer],
                                  g_screen_phys_x, g_screen_phys_y, g_screen_phys_w, g_screen_phys_h,
                                  shift + (int)(shift_i[layer] * s_depth_slider), 0, s_tex_show_w, s_tex_h,
-                                 X_FLIP_NONE, 1.0f, 1.0f, 1.0f, 1.0f);
+                                 X_FLIP_NONE, XTColor());
         }
 
-        C2D_TargetClear(s_right_screen, C2D_Color32f(0.0f, 0.0f, 0.0f, 1.0f));
+        C2D_TargetClear(s_right_screen, C2D_Color32(0, 0, 0, 255));
         C2D_SceneBegin(s_right_screen);
 
         for(int layer = 0; layer < 4; layer++)
@@ -671,7 +671,7 @@ void repaint()
             C2D_DrawImage_Custom(s_layer_ims[layer],
                                  g_screen_phys_x, g_screen_phys_y, g_screen_phys_w, g_screen_phys_h,
                                  shift - (int)(shift_i[layer] * s_depth_slider), 0, s_tex_show_w, s_tex_h,
-                                 X_FLIP_NONE, 1.0f, 1.0f, 1.0f, 1.0f);
+                                 X_FLIP_NONE, XTColor());
         }
     }
 
@@ -1094,9 +1094,9 @@ void unloadTexture(StdPicture& tx)
         static_cast<StdPicture_Sub&>(tx) = StdPicture_Sub();
 }
 
-void minport_RenderBoxFilled(int x1, int y1, int x2, int y2, uint8_t red, uint8_t green, uint8_t blue, uint8_t alpha)
+void minport_RenderBoxFilled(int x1, int y1, int x2, int y2, XTColor color)
 {
-    uint32_t clr = C2D_Color32(red, green, blue, alpha);
+    uint32_t clr = C2D_Color32(color.r, color.g, color.b, color.a);
 
     C2D_DrawRectSolid(x1, y1, 0, x2 - x1, y2 - y1, clr);
 }
@@ -1105,7 +1105,7 @@ void minport_RenderTexturePrivate(int16_t xDst, int16_t yDst, int16_t wDst, int1
                                   StdPicture& tx,
                                   int16_t xSrc, int16_t ySrc, int16_t wSrc, int16_t hSrc,
                                   float rotateAngle, FPoint_t* center, unsigned int flip,
-                                  float red, float green, float blue, float alpha)
+                                  XTColor color)
 {
     if(!tx.inited)
         return;
@@ -1219,13 +1219,13 @@ void minport_RenderTexturePrivate(int16_t xDst, int16_t yDst, int16_t wDst, int1
                 C2D_Flush();
                 C3D_ColorLogicOp(GPU_LOGICOP_AND);
                 C2D_DrawImage_Custom(*to_mask_2, xDst, yDst, wDst, (1024 - ySrc) * hDst / hSrc,
-                                     xSrc, ySrc, wSrc, 1024 - ySrc, flip, red, green, blue, alpha);
+                                     xSrc, ySrc, wSrc, 1024 - ySrc, flip, color);
                 C2D_Flush();
                 C3D_ColorLogicOp(GPU_LOGICOP_OR);
             }
 
             C2D_DrawImage_Custom(*to_draw_2, xDst, yDst, wDst, (1024 - ySrc) * hDst / hSrc,
-                                 xSrc, ySrc, wSrc, 1024 - ySrc, flip, red, green, blue, alpha);
+                                 xSrc, ySrc, wSrc, 1024 - ySrc, flip, color);
 
             if(to_mask_2)
             {
@@ -1255,13 +1255,13 @@ void minport_RenderTexturePrivate(int16_t xDst, int16_t yDst, int16_t wDst, int1
             C2D_Flush();
             C3D_ColorLogicOp(GPU_LOGICOP_AND);
             C2D_DrawImage_Custom(*to_mask, xDst, yDst, wDst, hDst,
-                                 xSrc, ySrc, wSrc, hSrc, flip, red, green, blue, alpha);
+                                 xSrc, ySrc, wSrc, hSrc, flip, color);
             C2D_Flush();
             C3D_ColorLogicOp(GPU_LOGICOP_OR);
         }
 
         C2D_DrawImage_Custom(*to_draw, xDst, yDst, wDst, hDst,
-                             xSrc, ySrc, wSrc, hSrc, flip, red, green, blue, alpha);
+                             xSrc, ySrc, wSrc, hSrc, flip, color);
 
         if(to_mask)
         {
