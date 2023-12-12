@@ -756,11 +756,12 @@ void minport_ApplyViewport()
     //     off_x += 1;
     //     off_y += 1;
     // }
-    glOrthof32( off_x, g_viewport_w + off_x, g_viewport_h + off_y, off_y, -1 << 12, 1 << 12 );
+    glOrthof32( off_x, g_viewport_w + off_x, g_viewport_h + off_y, off_y, -(1 << 12), 1 << 12 );
 }
 
 void lazyLoadPicture(StdPicture_Sub& target, const std::string& path, int scaleFactor, const std::string& maskPath, const std::string& maskFallbackPath)
 {
+    (void)scaleFactor;
     (void)maskPath;
     (void)maskFallbackPath;
 
