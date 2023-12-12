@@ -26,6 +26,7 @@
 #include <string>
 #include <set>
 #include <unordered_map>
+#include <SDL2/SDL_timer.h>
 
 typedef struct _SDL_Joystick SDL_Joystick;
 typedef struct _SDL_GameController SDL_GameController;
@@ -78,6 +79,10 @@ struct KM_Key
 
 class InputMethod_Joystick : public InputMethod
 {
+private:
+    uint32_t m_last_power_check = -10000;
+    StatusInfo m_recent_status;
+
 public:
     JoystickDevices *m_devices;
 
