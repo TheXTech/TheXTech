@@ -303,7 +303,7 @@ void RenderGL::repaint()
 
     flushDrawQueues();
 
-    m_cur_depth = 1;
+    m_render_planes.reset();
     if(m_use_depth_buffer)
         glClear(GL_DEPTH_BUFFER_BIT);
 
@@ -363,7 +363,7 @@ void RenderGL::repaint()
     if(m_use_depth_buffer)
         glEnable(GL_DEPTH_TEST);
 
-    m_cur_depth = 1;
+    m_render_planes.reset();
 
     SDL_GL_SwapWindow(m_window);
 
@@ -429,7 +429,7 @@ void RenderGL::applyViewport()
             2.0f / (float)viewport.w, 0.0f, 0.0f, 0.0f,
             0.0f, y_sign * 2.0f / (float)viewport.h, 0.0f, 0.0f,
             0.0f, 0.0f, 1.0f / (float)(1 << 15), 0.0f,
-            -(float)(viewport.w + off.x + off.x) / (viewport.w), -y_sign * (float)(viewport.h + off.y + off.y) / (viewport.h), -1.0f, 1.0f,
+            -(float)(viewport.w + off.x + off.x) / (viewport.w), -y_sign * (float)(viewport.h + off.y + off.y) / (viewport.h), 0.0f, 1.0f,
         };
 
         m_shader_read_viewport = {
@@ -677,6 +677,14 @@ void RenderGL::setTargetScreen()
         m_Ortho(0, hardware_w, hardware_h, 0, (1 << 15), -(1 << 15));
 #endif
     }
+}
+
+void RenderGL::setDrawPlane(uint8_t plane)
+{
+    m_render_planes.set_plane(plane);
+
+    m_recent_draw_context = DrawContext_t(nullptr);
+    m_mask_draw_context_depth.clear();
 }
 
 void RenderGL::prepareDrawMask()
@@ -1073,11 +1081,13 @@ void RenderGL::renderRect(int x, int y, int w, int h, XTColor color, bool filled
         return;
     }
 
+    int16_t cur_depth = m_render_planes.next();
+
     DrawContext_t context = {(filled) ? m_program_rect_filled : m_program_rect_unfilled};
 
     Vertex_t::Tint tint = F_TO_B(color);
 
-    auto& vertex_list = ((m_use_depth_buffer && tint[3] == 255) ? m_unordered_draw_queue[context] : getOrderedDrawVertexList(context, m_cur_depth));
+    auto& vertex_list = ((m_use_depth_buffer && tint[3] == 255) ? m_unordered_draw_queue[context] : getOrderedDrawVertexList(context, cur_depth));
 
     RectI draw_loc = RectI(x, y, x + w, y + h);
 
@@ -1090,9 +1100,9 @@ void RenderGL::renderRect(int x, int y, int w, int h, XTColor color, bool filled
 
     RectF draw_source = RectF(u1, v1, u2, v2);
 
-    addVertices(vertex_list, draw_loc, draw_source, m_cur_depth, tint);
+    addVertices(vertex_list, draw_loc, draw_source, cur_depth, tint);
 
-    m_cur_depth++;
+    cur_depth++;
     m_drawQueued = true;
 }
 
@@ -1119,14 +1129,16 @@ void RenderGL::renderCircle(int cx, int cy, int radius, XTColor color, bool fill
 
     Vertex_t::Tint tint = F_TO_B(color);
 
-    auto& vertex_list = ((m_use_depth_buffer && tint[3] == 255) ? m_unordered_draw_queue[context] : getOrderedDrawVertexList(context, m_cur_depth));
+    int16_t cur_depth = m_render_planes.next();
+
+    auto& vertex_list = ((m_use_depth_buffer && tint[3] == 255) ? m_unordered_draw_queue[context] : getOrderedDrawVertexList(context, cur_depth));
 
     if(m_use_shaders)
     {
         RectI draw_loc = RectI(cx - radius, cy - radius, cx + radius, cy + radius);
         RectF draw_source = RectF(0.0, 0.0, 1.0, 1.0);
 
-        addVertices(vertex_list, draw_loc, draw_source, m_cur_depth, tint);
+        addVertices(vertex_list, draw_loc, draw_source, cur_depth, tint);
     }
     else
     {
@@ -1147,15 +1159,14 @@ void RenderGL::renderCircle(int cx, int cy, int radius, XTColor color, bool fill
 
             if(i != 0)
             {
-                vertex_attribs.push_back({{x, y, m_cur_depth}, tint, {0.0, 0.0}});
-                vertex_attribs.push_back({{cx_s, cy_s, m_cur_depth}, tint, {0.0, 0.0}});
+                vertex_attribs.push_back({{x, y, cur_depth}, tint, {0.0, 0.0}});
+                vertex_attribs.push_back({{cx_s, cy_s, cur_depth}, tint, {0.0, 0.0}});
             }
             if(i != verts)
-                vertex_attribs.push_back({{x, y, m_cur_depth}, tint, {0.0, 0.0}});
+                vertex_attribs.push_back({{x, y, cur_depth}, tint, {0.0, 0.0}});
         }
     }
 
-    m_cur_depth++;
     m_drawQueued = true;
 }
 
@@ -1172,14 +1183,16 @@ void RenderGL::renderCircleHole(int cx, int cy, int radius, XTColor color)
 
     Vertex_t::Tint tint = F_TO_B(color);
 
-    auto& vertex_list = ((m_use_depth_buffer && tint[3] == 255) ? m_unordered_draw_queue[context] : getOrderedDrawVertexList(context, m_cur_depth));
+    int16_t cur_depth = m_render_planes.next();
+
+    auto& vertex_list = ((m_use_depth_buffer && tint[3] == 255) ? m_unordered_draw_queue[context] : getOrderedDrawVertexList(context, cur_depth));
 
     if(m_use_shaders)
     {
         RectI draw_loc = RectI(cx - radius, cy - radius, cx + radius, cy + radius);
         RectF draw_source = RectF(0.0, 0.0, 1.0, 1.0);
 
-        addVertices(vertex_list, draw_loc, draw_source, m_cur_depth, tint);
+        addVertices(vertex_list, draw_loc, draw_source, cur_depth, tint);
     }
     else
     {
@@ -1212,16 +1225,15 @@ void RenderGL::renderCircleHole(int cx, int cy, int radius, XTColor color)
             GLshort x2_box = cx_s + (GLshort)roundf(box_radius2 * cosf(theta2));
             GLshort y2_box = cy_s + (GLshort)roundf(box_radius2 * sinf(theta2));
 
-            vertex_attribs.push_back({{x1_perim, y1_perim, m_cur_depth}, tint, {0.0, 0.0}});
-            vertex_attribs.push_back({{x1_box, y1_box, m_cur_depth}, tint, {0.0, 0.0}});
-            vertex_attribs.push_back({{x2_perim, y2_perim, m_cur_depth}, tint, {0.0, 0.0}});
-            vertex_attribs.push_back({{x1_box, y1_box, m_cur_depth}, tint, {0.0, 0.0}});
-            vertex_attribs.push_back({{x2_perim, y2_perim, m_cur_depth}, tint, {0.0, 0.0}});
-            vertex_attribs.push_back({{x2_box, y2_box, m_cur_depth}, tint, {0.0, 0.0}});
+            vertex_attribs.push_back({{x1_perim, y1_perim, cur_depth}, tint, {0.0, 0.0}});
+            vertex_attribs.push_back({{x1_box, y1_box, cur_depth}, tint, {0.0, 0.0}});
+            vertex_attribs.push_back({{x2_perim, y2_perim, cur_depth}, tint, {0.0, 0.0}});
+            vertex_attribs.push_back({{x1_box, y1_box, cur_depth}, tint, {0.0, 0.0}});
+            vertex_attribs.push_back({{x2_perim, y2_perim, cur_depth}, tint, {0.0, 0.0}});
+            vertex_attribs.push_back({{x2_box, y2_box, cur_depth}, tint, {0.0, 0.0}});
         }
     }
 
-    m_cur_depth++;
     m_drawQueued = true;
 }
 
@@ -1299,12 +1311,13 @@ void RenderGL::renderTextureScaleEx(double xDstD, double yDstD, double wDstD, do
 
     Vertex_t::Tint tint = F_TO_B(color);
 
+    int16_t cur_depth = m_render_planes.next();
+
     bool draw_opaque = (tx.d.use_depth_test && tint[3] == 255 && !tx.d.shader_program);
-    auto& vertex_list = (draw_opaque ? m_unordered_draw_queue[context] : getOrderedDrawVertexList(context, m_cur_depth));
+    auto& vertex_list = (draw_opaque ? m_unordered_draw_queue[context] : getOrderedDrawVertexList(context, cur_depth));
 
-    addVertices(vertex_list, draw_loc, draw_source, m_cur_depth, tint);
+    addVertices(vertex_list, draw_loc, draw_source, cur_depth, tint);
 
-    m_cur_depth++;
     m_drawQueued = true;
 }
 
@@ -1337,12 +1350,13 @@ void RenderGL::renderTextureScale(double xDst, double yDst, double wDst, double 
 
     Vertex_t::Tint tint = F_TO_B(color);
 
+    int16_t cur_depth = m_render_planes.next();
+
     bool draw_opaque = (tx.d.use_depth_test && tint[3] == 255 && !tx.d.shader_program);
-    auto& vertex_list = (draw_opaque ? m_unordered_draw_queue[context] : getOrderedDrawVertexList(context, m_cur_depth));
+    auto& vertex_list = (draw_opaque ? m_unordered_draw_queue[context] : getOrderedDrawVertexList(context, cur_depth));
 
-    addVertices(vertex_list, draw_loc, draw_source, m_cur_depth, tint);
+    addVertices(vertex_list, draw_loc, draw_source, cur_depth, tint);
 
-    m_cur_depth++;
     m_drawQueued = true;
 }
 
@@ -1377,26 +1391,6 @@ void RenderGL::renderTexture(double xDstD, double yDstD, double wDstD, double hD
     }
 #endif
 
-#ifdef LIGHTING_DEMO
-    if(m_light_count < 63)
-    {
-        if(&tx == &GFXNPC[13])
-        {
-            m_light_queue.lights[m_light_count++] = Light::Point(xDstD + wDstD / 2.0, yDstD + hDstD / 2.0, m_cur_depth, LightColor(128, 0, 0), 100.0);
-        }
-
-        if(&tx == &GFXBackground[96])
-        {
-            m_light_queue.lights[m_light_count++] = Light::Point(xDstD + wDstD / 2.0, yDstD + hDstD / 2.0, m_cur_depth, LightColor(64, 0, 0), 250.0);
-        }
-
-        if(&tx == &GFXBackground[97])
-        {
-            m_light_queue.lights[m_light_count++] = Light::Point(xDstD + wDstD / 2.0, yDstD + hDstD / 2.0, m_cur_depth, LightColor(0, 64, 64), 250.0);
-        }
-    }
-#endif
-
     int xDst = Maths::iRound(xDstD);
     int yDst = Maths::iRound(yDstD);
     int wDst = Maths::iRound(wDstD);
@@ -1426,12 +1420,33 @@ void RenderGL::renderTexture(double xDstD, double yDstD, double wDstD, double hD
 
     Vertex_t::Tint tint = F_TO_B(color);
 
+    int16_t cur_depth = m_render_planes.next();
+
+#ifdef LIGHTING_DEMO
+    if(m_light_count < 63)
+    {
+        if(&tx == &GFXNPC[13])
+        {
+            m_light_queue.lights[m_light_count++] = Light::Point(xDstD + wDstD / 2.0, yDstD + hDstD / 2.0, cur_depth, LightColor(128, 0, 0), 100.0);
+        }
+
+        if(&tx == &GFXBackground[96])
+        {
+            m_light_queue.lights[m_light_count++] = Light::Point(xDstD + wDstD / 2.0, yDstD + hDstD / 2.0, cur_depth, LightColor(64, 0, 0), 250.0);
+        }
+
+        if(&tx == &GFXBackground[97])
+        {
+            m_light_queue.lights[m_light_count++] = Light::Point(xDstD + wDstD / 2.0, yDstD + hDstD / 2.0, cur_depth, LightColor(0, 64, 64), 250.0);
+        }
+    }
+#endif
+
     bool draw_opaque = (tx.d.use_depth_test && tint[3] == 255 && !tx.d.shader_program);
-    auto& vertex_list = (draw_opaque ? m_unordered_draw_queue[context] : getOrderedDrawVertexList(context, m_cur_depth));
+    auto& vertex_list = (draw_opaque ? m_unordered_draw_queue[context] : getOrderedDrawVertexList(context, cur_depth));
 
-    addVertices(vertex_list, draw_loc, draw_source, m_cur_depth, tint);
+    addVertices(vertex_list, draw_loc, draw_source, cur_depth, tint);
 
-    m_cur_depth++;
     m_drawQueued = true;
 }
 
@@ -1508,12 +1523,13 @@ void RenderGL::renderTextureFL(double xDstD, double yDstD, double wDstD, double 
 
     Vertex_t::Tint tint = F_TO_B(color);
 
+    int16_t cur_depth = m_render_planes.next();
+
     bool draw_opaque = (tx.d.use_depth_test && tint[3] == 255 && !tx.d.shader_program);
-    auto& vertex_list = (draw_opaque ? m_unordered_draw_queue[context] : getOrderedDrawVertexList(context, m_cur_depth));
+    auto& vertex_list = (draw_opaque ? m_unordered_draw_queue[context] : getOrderedDrawVertexList(context, cur_depth));
 
-    addVertices(vertex_list, draw_loc, draw_source, m_cur_depth, tint);
+    addVertices(vertex_list, draw_loc, draw_source, cur_depth, tint);
 
-    m_cur_depth++;
     m_drawQueued = true;
 }
 
@@ -1546,12 +1562,13 @@ void RenderGL::renderTexture(float xDst, float yDst,
 
     Vertex_t::Tint tint = F_TO_B(color);
 
+    int16_t cur_depth = m_render_planes.next();
+
     bool draw_opaque = (tx.d.use_depth_test && tint[3] == 255 && !tx.d.shader_program);
-    auto& vertex_list = (draw_opaque ? m_unordered_draw_queue[context] : getOrderedDrawVertexList(context, m_cur_depth));
+    auto& vertex_list = (draw_opaque ? m_unordered_draw_queue[context] : getOrderedDrawVertexList(context, cur_depth));
 
-    addVertices(vertex_list, draw_loc, draw_source, m_cur_depth, tint);
+    addVertices(vertex_list, draw_loc, draw_source, cur_depth, tint);
 
-    m_cur_depth++;
     m_drawQueued = true;
 }
 
@@ -1575,19 +1592,20 @@ void RenderGL::renderParticleSystem(StdPicture &tx,
         return;
     }
 
+    int16_t cur_depth = m_render_planes.next();
+
     // assign depth
-    assignUniform(tx, 0, UniformValue_t(m_cur_depth * m_transform_matrix[2 * 4 + 2] + m_transform_matrix[3 * 4 + 2]));
+    assignUniform(tx, 0, UniformValue_t(cur_depth * m_transform_matrix[2 * 4 + 2] + m_transform_matrix[3 * 4 + 2]));
 
     // assign camera pos
     assignUniform(tx, 1, UniformValue_t((GLfloat)camX, (GLfloat)camY));
 
     DrawContext_t context = {*tx.d.shader_program, &tx};
 
-    auto& vertex_attribs = getOrderedDrawVertexList(context, m_cur_depth).vertices;
+    auto& vertex_attribs = getOrderedDrawVertexList(context, cur_depth).vertices;
 
     vertex_attribs.emplace_back();
 
-    m_cur_depth++;
     m_drawQueued = true;
 }
 

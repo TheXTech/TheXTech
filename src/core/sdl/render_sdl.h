@@ -47,6 +47,9 @@ class RenderSDL final : public AbstractRender_t
     // queue of render ops
     RenderQueue m_render_queue;
 
+    // current draw plane
+    uint8_t m_recent_draw_plane = 0;
+
     // Scale of virtual and window resolutuins
     float m_scale_x = 1.f;
     float m_scale_y = 1.f;
@@ -163,6 +166,13 @@ public:
      * \brief Set render target into the real window or screen (use to render on-screen buttons and other meta-info)
      */
     void setTargetScreen() override;
+
+    /*!
+     * \brief Sets draw plane for subsequent draws.
+     *
+     * \param plane Which draw plane should be used.
+     */
+    void setDrawPlane(uint8_t plane) override;
 
 
     void loadTextureInternal(StdPicture &target,

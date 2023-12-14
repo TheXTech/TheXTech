@@ -238,6 +238,8 @@ void RenderSDL::repaint()
     flushRenderQueue();
 
     SDL_RenderPresent(m_gRenderer);
+
+    m_recent_draw_plane = 0;
 }
 
 void RenderSDL::updateViewport()
@@ -431,6 +433,11 @@ void RenderSDL::setTargetScreen()
 
     SDL_SetRenderTarget(m_gRenderer, nullptr);
     m_recentTarget = nullptr;
+}
+
+void RenderSDL::setDrawPlane(uint8_t plane)
+{
+    m_recent_draw_plane = plane;
 }
 
 void RenderSDL::loadTextureInternal(StdPicture &target, uint32_t width, uint32_t height, uint8_t *RGBApixels, uint32_t pitch)
@@ -691,7 +698,7 @@ void RenderSDL::execute(const RenderOp& op)
 
 void RenderSDL::renderRect(int x, int y, int w, int h, XTColor color, bool filled)
 {
-    RenderOp& op = m_render_queue.push(0);
+    RenderOp& op = m_render_queue.push(m_recent_draw_plane);
 
     op.type = RenderOp::Type::rect;
     op.xDst = x + m_viewport_offset_x;
@@ -709,7 +716,7 @@ void RenderSDL::renderRect(int x, int y, int w, int h, XTColor color, bool fille
 
 void RenderSDL::renderRectBR(int _left, int _top, int _right, int _bottom, XTColor color)
 {
-    RenderOp& op = m_render_queue.push(0);
+    RenderOp& op = m_render_queue.push(m_recent_draw_plane);
 
     op.type = RenderOp::Type::rect;
     op.xDst = _left + m_viewport_offset_x;
@@ -727,7 +734,7 @@ void RenderSDL::renderCircle(int cx, int cy, int radius, XTColor color, bool fil
     if(radius <= 0)
         return; // Nothing to draw
 
-    RenderOp& op = m_render_queue.push(0);
+    RenderOp& op = m_render_queue.push(m_recent_draw_plane);
 
     op.type = RenderOp::Type::circle;
     op.xDst = cx + m_viewport_offset_x;
@@ -747,7 +754,7 @@ void RenderSDL::renderCircleHole(int cx, int cy, int radius, XTColor color)
     if(radius <= 0)
         return; // Nothing to draw
 
-    RenderOp& op = m_render_queue.push(0);
+    RenderOp& op = m_render_queue.push(m_recent_draw_plane);
 
     op.type = RenderOp::Type::circle_hole;
     op.xDst = cx + m_viewport_offset_x;
@@ -812,7 +819,7 @@ void RenderSDL::renderTextureScaleEx(double xDstD, double yDstD, double wDstD, d
     }
 
 
-    RenderOp& op = m_render_queue.push(0);
+    RenderOp& op = m_render_queue.push(m_recent_draw_plane);
 
     op.type = RenderOp::Type::texture;
     op.texture = &tx;
@@ -873,7 +880,7 @@ void RenderSDL::renderTextureScale(double xDst, double yDst, double wDst, double
         return;
     }
 
-    RenderOp& op = m_render_queue.push(0);
+    RenderOp& op = m_render_queue.push(m_recent_draw_plane);
 
     op.type = RenderOp::Type::texture;
     op.traits = 0;
@@ -923,7 +930,7 @@ void RenderSDL::renderTexture(double xDstD, double yDstD, double wDstD, double h
     }
 
 
-    RenderOp& op = m_render_queue.push(0);
+    RenderOp& op = m_render_queue.push(m_recent_draw_plane);
 
     op.type = RenderOp::Type::texture;
     op.traits = RenderOp::Traits::src_rect;
@@ -977,7 +984,7 @@ void RenderSDL::renderTexture(float xDst, float yDst,
         return;
     }
 
-    RenderOp& op = m_render_queue.push(0);
+    RenderOp& op = m_render_queue.push(m_recent_draw_plane);
 
     op.type = RenderOp::Type::texture;
     op.traits = 0;
