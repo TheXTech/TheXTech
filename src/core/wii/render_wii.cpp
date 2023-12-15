@@ -49,11 +49,15 @@
 #include "core/render.h"
 #include "core/minport/render_minport_shared.h"
 
+#include "core/render_planes.h"
+
 
 namespace XRender
 {
 
 bool g_in_frame = false;
+
+static RenderPlanes_t s_render_planes;
 
 #define DEFAULT_FIFO_SIZE   (256*1024)
 
@@ -349,7 +353,7 @@ bool init()
     GX_Init(gp_fifo, DEFAULT_FIFO_SIZE);
 
     // clears the bg to color and clears the z buffer
-    GX_SetCopyClear(background, 0x00ffffff);
+    GX_SetCopyClear(background, GX_MAX_Z24);
     GX_SetDrawDoneCallback(gxDrawDoneCB);
 
     // other gx setup
@@ -445,6 +449,11 @@ void setTargetScreen()
 {
 }
 
+void setDrawPlane(uint8_t plane)
+{
+    s_render_planes.set_plane(plane);
+}
+
 void clearBuffer()
 {
     if(!g_in_frame)
@@ -464,11 +473,15 @@ void repaint()
     // do this stuff after drawing
     int next_buffer = cur_buffer ^ 1;
     GX_SetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
+    GX_SetZCompLoc(GX_FALSE);
+    GX_SetAlphaCompare(GX_GEQUAL, 0x08, GX_AOP_AND, GX_ALWAYS, 0);
     GX_SetColorUpdate(GX_TRUE);
     GX_CopyDisp(frameBuffer[next_buffer], GX_TRUE);
     GX_DrawDone();
 
     GX_Flush();
+
+    s_render_planes.reset();
 
     g_microStats.start_sleep();
 
@@ -541,14 +554,14 @@ void minport_TransformPhysCoords()
 void minport_ApplyPhysCoords()
 {
     GXColor background = {0, 0, 0, 0xff};
-    GX_SetCopyClear(background, 0x00ffffff);
+    GX_SetCopyClear(background, GX_MAX_Z24);
 
     // setup our projection matrix
     GX_SetViewport(g_screen_phys_x, g_screen_phys_y, g_screen_phys_w, g_screen_phys_h, 0, 1);
     GX_SetScissor(g_screen_phys_x, g_screen_phys_y, g_screen_phys_w, g_screen_phys_h);
 
     Mtx44 perspective;
-    guOrtho(perspective, 0.0f, ScreenH / 2, 0.0f, ScreenW / 2, -1.0f, 1.0f);
+    guOrtho(perspective, 0.0f, ScreenH / 2, 0.0f, ScreenW / 2, -(1 << 15), (1 << 15));
     GX_LoadProjectionMtx(perspective, GX_ORTHOGRAPHIC);
 }
 
@@ -572,12 +585,12 @@ void minport_ApplyViewport()
     Mtx44 perspective;
 
     if(g_viewport_offset_ignore)
-        guOrtho(perspective, 0, g_viewport_h, 0, g_viewport_w, -1.0f, 1.0f);
+        guOrtho(perspective, 0, g_viewport_h, 0, g_viewport_w, -(1 << 15), (1 << 15));
     else
         guOrtho(perspective,
                 g_viewport_offset_y, g_viewport_h + g_viewport_offset_y,
                 g_viewport_offset_x, g_viewport_w + g_viewport_offset_x,
-                -1.0f, 1.0f);
+                -(1 << 15), (1 << 15));
 
     GX_LoadProjectionMtx(perspective, GX_ORTHOGRAPHIC);
 
@@ -896,27 +909,29 @@ void wii_RenderBox(int x1, int y1, int x2, int y2, XTColor color, bool filled)
     GX_SetTevOrder(GX_TEVSTAGE0, GX_TEXCOORDNULL, GX_TEXMAP_NULL, GX_COLOR0);
     GX_SetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
 
+    int16_t z = s_render_planes.next();
+
     GX_Begin(filled ? GX_QUADS : GX_LINESTRIP, GX_VTXFMT0, filled ? 4 : 5);
-    GX_Position3s16(x1, y1, 0);
+    GX_Position3s16(x1, y1, z);
     GX_Color4u8(r, g, b, a);
     GX_TexCoord2u16(0, 0);
 
-    GX_Position3s16(x2, y1, 0);
+    GX_Position3s16(x2, y1, z);
     GX_Color4u8(r, g, b, a);
     GX_TexCoord2u16(0, 0);
 
-    GX_Position3s16(x2, y2, 0);
+    GX_Position3s16(x2, y2, z);
     GX_Color4u8(r, g, b, a);
     GX_TexCoord2u16(0, 0);
 
-    GX_Position3s16(x1, y2, 0);
+    GX_Position3s16(x1, y2, z);
     GX_Color4u8(r, g, b, a);
     GX_TexCoord2u16(0, 0);
 
     // complete the rect
     if(!filled)
     {
-        GX_Position3s16(x1, y1, 0);
+        GX_Position3s16(x1, y1, z);
         GX_Color4u8(r, g, b, a);
         GX_TexCoord2u16(0, 0);
     }
@@ -945,6 +960,8 @@ inline bool GX_DrawImage_Custom(GXTexObj* img,
     uint8_t g = color.g;
     uint8_t b = color.b;
     uint8_t a = color.a;
+
+    int16_t z = s_render_planes.next();
 
     GX_SetTevOp(GX_TEVSTAGE0, GX_MODULATE);
     GX_SetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
@@ -1000,19 +1017,19 @@ inline bool GX_DrawImage_Custom(GXTexObj* img,
             std::swap(v1, v2);
 
         GX_Begin(GX_QUADS, GX_VTXFMT0, 4);
-        GX_Position3s16(x1, y1, 0);
+        GX_Position3s16(x1, y1, z);
         GX_Color4u8(r, g, b, a);
         GX_TexCoord2u16(u1, v1);
 
-        GX_Position3s16(x2, y1, 0);
+        GX_Position3s16(x2, y1, z);
         GX_Color4u8(r, g, b, a);
         GX_TexCoord2u16(u2, v1);
 
-        GX_Position3s16(x2, y2, 0);
+        GX_Position3s16(x2, y2, z);
         GX_Color4u8(r, g, b, a);
         GX_TexCoord2u16(u2, v2);
 
-        GX_Position3s16(x1, y2, 0);
+        GX_Position3s16(x1, y2, z);
         GX_Color4u8(r, g, b, a);
         GX_TexCoord2u16(u1, v2);
         GX_End();

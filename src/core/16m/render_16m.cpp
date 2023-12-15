@@ -26,7 +26,6 @@
 #include <set>
 
 #include <nds.h>
-#include <gl2d.h>
 
 #include <Logger/logger.h>
 
@@ -39,6 +38,15 @@
 #include "core/render.h"
 #include "core/minport/render_minport_shared.h"
 
+#include "core/render_planes.h"
+
+#include "draw_planes.h"
+
+#ifdef DEBUG_PLANES
+#    define POLY_FOG_Q POLY_FOG
+#else
+#    define POLY_FOG_Q 0
+#endif
 
 namespace XRender
 {
@@ -484,10 +492,10 @@ void g_on_vblank()
 }
 
 
-// sourced from gl2d
-static v16 s_depth;
+static RenderPlanes_t s_render_planes;
 static uint8_t s_poly_id;
 
+// sourced from gl2d
 static inline void s_gxTexcoord2i(t16 u, t16 v)
 {
     GFX_TEX_COORD = (v << 20) | ( (u << 4) & 0xFFFF );
@@ -511,18 +519,18 @@ void minport_RenderBoxFilled( int x1, int y1, int x2, int y2, XTColor color)
 
     glBindTexture(0, 0);
     if((color.a >> 3) < 31)
-        glPolyFmt(POLY_ID(s_poly_id++) | POLY_ALPHA((color.a >> 3) + 1) | POLY_CULL_NONE);
+        glPolyFmt(POLY_ID(s_poly_id++) | POLY_ALPHA((color.a >> 3) + 1) | POLY_CULL_NONE | POLY_FOG_Q);
     glColor3b(color.r, color.g, color.b);
 
     glBegin( GL_QUADS );
-        s_gxVertex3i( x1, y1, s_depth++ );       // use 3i for first vertex so that we increment HW depth
+        s_gxVertex3i( x1, y1, s_render_planes.next() );       // use 3i for first vertex so that we increment HW depth
         s_gxVertex2i( x1, y2 );                // no need for 3 vertices as 2i would share last depth call
         s_gxVertex2i( x2, y2 );
         s_gxVertex2i( x2, y1 );
     glEnd();
 
     if((color.a >> 3) < 31)
-        glPolyFmt(POLY_ALPHA(31) | POLY_CULL_NONE);
+        glPolyFmt(POLY_ALPHA(31) | POLY_CULL_NONE | POLY_FOG_Q);
 }
 
 static void s_glBoxFilledGradient( int x1, int y1, int x2, int y2,
@@ -534,12 +542,11 @@ static void s_glBoxFilledGradient( int x1, int y1, int x2, int y2,
 
     glBindTexture( 0,0 );
     glBegin( GL_QUADS );
-        glColor( color1 ); s_gxVertex3i( x1, y1, s_depth++ );       // use 3i for first vertex so that we increment HW depth
+        glColor( color1 ); s_gxVertex3i( x1, y1, s_render_planes.next() );       // use 3i for first vertex so that we increment HW depth
         glColor( color2 ); s_gxVertex2i( x1, y2 );                // no need for 3 vertices as 2i would share last depth call
         glColor( color3 ); s_gxVertex2i( x2, y2 );
         glColor( color4 ); s_gxVertex2i( x2, y1 );
     glEnd();
-    glColor( 0x7FFF );
 }
 
 inline bool GL_DrawImage_Custom(int name, int flags,
@@ -570,14 +577,16 @@ inline bool GL_DrawImage_Custom(int name, int flags,
 
     glBindTexture(0, name);
     if((a >> 3) < 31)
-        glPolyFmt(POLY_ALPHA((a >> 3) + 1) | POLY_CULL_NONE);
+        glPolyFmt(/*POLY_ID(s_poly_id++) | */ POLY_ALPHA((a >> 3) + 1) | POLY_CULL_NONE | POLY_FOG_Q);
 
     glBegin(GL_QUADS);
 
     glColor3b(r, g, b);
 
     s_gxTexcoord2i(u1, v1);
-    s_gxVertex3i(x, y, s_depth++);
+    s_gxVertex3i(x, y, s_render_planes.next());
+    for(int i = 0; i < 7; ++i)
+        s_render_planes.next(); // actually advance 8 slots rather than 1, to handle some imprecision of the DSi depth buffer (unknown cause)
 
     s_gxTexcoord2i(u1, v2);
     s_gxVertex2i(x, y + h);
@@ -591,7 +600,7 @@ inline bool GL_DrawImage_Custom(int name, int flags,
     glEnd();
 
     if((a >> 3) < 31)
-        glPolyFmt(POLY_ALPHA(31) | POLY_CULL_NONE);
+        glPolyFmt(POLY_ALPHA(31) | POLY_CULL_NONE | POLY_FOG_Q);
 
     return true;
 }
@@ -611,8 +620,33 @@ bool init()
     videoSetMode(MODE_5_3D);
 
     glInit();
+
     glEnable(GL_BLEND);
-    glScreen2D();
+    glEnable(GL_TEXTURE_2D);
+
+    glMatrixMode(GL_TEXTURE);
+    glLoadIdentity();
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    glMatrixMode(GL_POSITION);
+    glLoadIdentity();
+
+    glColor(0x7FFF);
+    glPolyFmt(POLY_ALPHA(31) | POLY_CULL_NONE | POLY_FOG_Q);
+
+#ifdef DEBUG_PLANES
+    glEnable(GL_FOG);
+
+    glFogColor(255, 0, 0, 255);
+    for(int i = 0; i < 32; i++)
+        glFogDensity(i, 0);
+
+    // visibly mark a draw plane for debugging
+    glFogDensity(31 - PLANE_LVL_SBLOCK / 8, 127);
+
+    glFogOffset(0);
+    glFogShift(0);
+#endif
 
     updateViewport();
 
@@ -649,21 +683,20 @@ void setTargetTexture()
 
     minport_initFrame();
 
-    glBegin2D();
-    s_depth = 0;
+    s_render_planes.reset();
     s_poly_id = 0;
-    s_glBoxFilledGradient( 0, 0, 255, 191,
-                         RGB15( 0, 0, 0 ),
-                         RGB15( 0, 0, 0 ),
-                         RGB15( 0, 0, 0 ),
-                         RGB15( 0, 0, 0 )
-                       );
+    glClearColor(0, 0, 0, 31);
 
     minport_ApplyViewport();
 }
 
 void setTargetScreen()
 {
+}
+
+void setDrawPlane(uint8_t plane)
+{
+    s_render_planes.set_plane(plane);
 }
 
 void clearBuffer()
@@ -683,7 +716,6 @@ void repaint()
         return;
     }
 
-    glEnd2D();
     glFlush(0);
 
     // if(g_videoSettings.scaleMode == SCALE_DYNAMIC_LINEAR)
@@ -714,7 +746,7 @@ void minport_ApplyPhysCoords()
 
     glMatrixMode( GL_PROJECTION );
     glLoadIdentity();
-    glOrthof32( 0, ScreenW / 2, ScreenH / 2, 0, -(1 << 12), 1 << 12 );
+    glOrthof32( 0, ScreenW / 2, ScreenH / 2, 0, -0x7FFF, 0x7FFF );
 }
 
 void minport_ApplyViewport()
@@ -755,7 +787,7 @@ void minport_ApplyViewport()
     //     off_x += 1;
     //     off_y += 1;
     // }
-    glOrthof32( off_x, g_viewport_w + off_x, g_viewport_h + off_y, off_y, -(1 << 12), 1 << 12 );
+    glOrthof32( off_x, g_viewport_w + off_x, g_viewport_h + off_y, off_y, -0x7FFF, 0x7FFF );
 }
 
 void lazyLoadPicture(StdPicture_Sub& target, const std::string& path, int scaleFactor, const std::string& maskPath, const std::string& maskFallbackPath)
