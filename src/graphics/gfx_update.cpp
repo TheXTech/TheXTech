@@ -2401,14 +2401,14 @@ void UpdateGraphics(bool skipRepaint)
     XRender::offsetViewportIgnore(true);
     XRender::setViewport(0, 0, ScreenW, ScreenH);
 
-    g_levelScreenFader.draw();
-
     speedRun_renderTimer();
+
+    DrawDeviceBattery();
+
+    g_levelScreenFader.draw();
 
     if(LevelEditor || MagicHand)
         DrawEditorLevel_UI();
-
-    DrawDeviceBattery();
 
     // render special screens
     if(GamePaused == PauseCode::PauseScreen)
