@@ -2232,20 +2232,6 @@ void UpdateGraphics(bool skipRepaint)
 
             lunaRender(Z);
 
-#ifdef THEXTECH_BUILD_GL_MODERN
-            if(SectionParticlesFG[S])
-                XRender::renderParticleSystem(**SectionParticlesFG[S], vScreen[Z].X, vScreen[Z].Y);
-
-            if(SectionEffect[S])
-                XRender::renderTextureScale(0, 0, vScreen[Z].Width, vScreen[Z].Height, **SectionEffect[S]);
-#endif
-
-            XRender::splitFrame();
-
-#ifdef __3DS__
-        XRender::setTargetLayer(3);
-#endif
-
     //    'Interface
     //            B = 0
             B = 0;
@@ -2284,6 +2270,20 @@ void UpdateGraphics(bool skipRepaint)
                         }
                     }
                 }
+
+#ifdef THEXTECH_BUILD_GL_MODERN
+            if(SectionParticlesFG[S])
+                XRender::renderParticleSystem(**SectionParticlesFG[S], vScreen[Z].X, vScreen[Z].Y);
+
+            if(SectionEffect[S])
+                XRender::renderTextureScale(0, 0, vScreen[Z].Width, vScreen[Z].Height, **SectionEffect[S]);
+#endif
+
+            XRender::splitFrame();
+
+#ifdef __3DS__
+        XRender::setTargetLayer(3);
+#endif
 
 #ifdef THEXTECH_ENABLE_LUNA_AUTOCODE
                 lunaRenderHud(Z);
