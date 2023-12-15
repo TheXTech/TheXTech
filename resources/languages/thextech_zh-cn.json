@@ -103,7 +103,7 @@
             "confirmConvertFormatTo": "是否转换格式到{0}？",
             "confirmSaveBeforeAction": "{0}前是否保存文件？",
             "convert": {
-                "_38aUnsupported": "不支持转换 SMBX-38A 格式的关卡。",
+                "_38aUnsupported": "不支持转换SMBX-38A格式的关卡。",
                 "desc": "文件格式将会转换，但不会删除源文件。",
                 "featureBlockForceSmashable": "旋转方块设置了旧版本的破碎方式。",
                 "featureCustomWorldMusic": "在大地图中设置了自定义音乐。",
@@ -143,7 +143,7 @@
                 "cancel": "取消：返回上一级菜单",
                 "confirmDelete": "否：*删除全部对象*",
                 "confirmPreserve": "是：移动到默认图层",
-                "header": "删除图层{0}",
+                "header": "删除图层：{0}",
                 "preserveLayerContents": "是否保留图层对象？"
             },
             "desc": {
