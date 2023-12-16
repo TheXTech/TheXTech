@@ -2458,6 +2458,11 @@ void UpdateGraphics(bool skipRepaint)
 
     DrawDeviceBattery();
 
+    // TODO: don't rely on this behavior during level test, maybe just don't draw vScreen at all
+    // draw screen fader below level menu when game is paused
+    if(GamePaused != PauseCode::None)
+        XRender::setDrawPlane(PLANE_GAME_MENUS);
+
     g_levelScreenFader.draw();
 
     XRender::setDrawPlane(PLANE_GAME_MENUS);
