@@ -45,6 +45,9 @@
 
 #ifdef THEXTECH_WIP_FEATURES
 #define LIGHTING_DEMO
+
+#include "npc_id.h"
+#include "eff_id.h"
 #endif
 
 #ifdef MUTABLE_PARTICLES_DEMO
@@ -1428,6 +1431,27 @@ void RenderGL::renderTexture(double xDstD, double yDstD, double wDstD, double hD
         if(&tx == &GFXNPC[13])
         {
             m_light_queue.lights[m_light_count++] = Light::Point(xDstD + wDstD / 2.0, yDstD + hDstD / 2.0, cur_depth, LightColor(128, 0, 0), 100.0);
+        }
+
+        if(&tx == &GFXNPC[NPCID_HOMING_BALL])
+        {
+            m_light_queue.lights[m_light_count++] = Light::Point(xDstD + wDstD / 2.0, yDstD + hDstD / 2.0, cur_depth, LightColor(64, 32, 32), 250.0);
+        }
+
+        if(&tx == &GFXEffect[EFFID_SMOKE_S3])
+        {
+            m_light_queue.lights[m_light_count++] = Light::Point(xDstD + wDstD / 2.0, yDstD + hDstD / 2.0, cur_depth, LightColor(96, 96, 96), 350.0);
+        }
+
+        if(&tx == &GFXNPC[NPCID_CANNONITEM])
+        {
+            int frame = (int)ySrc / 32;
+            if(frame >= 0 || frame < 5)
+            {
+                LightColor colors[5] = {LightColor(0, 0, 48), LightColor(0, 32, 0), LightColor(24, 24, 0), LightColor(24, 0, 24), LightColor(24, 16, 32)};
+
+                m_light_queue.lights[m_light_count++] = Light::Point(xDstD + wDstD / 2.0, yDstD + hDstD / 2.0, cur_depth, colors[frame], 400.0);
+            }
         }
 
         if(&tx == &GFXBackground[96])
