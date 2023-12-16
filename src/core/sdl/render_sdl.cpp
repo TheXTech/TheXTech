@@ -207,9 +207,14 @@ void RenderSDL::repaint()
     if(m_tBufferDisabled) /* Render-to-texture is not supported, draw the scene on the screen */
     {
         Controls::RenderTouchControls();
+
+        flushRenderQueue();
+
         SDL_RenderPresent(m_gRenderer);
         return;
     }
+
+    flushRenderQueue();
 
     // Calculate the size difference factor
     wDst = int(m_scale_x * ScaleWidth);
@@ -231,11 +236,17 @@ void RenderSDL::repaint()
 
     Controls::RenderTouchControls();
 
+    flushRenderQueue();
+
     SDL_RenderPresent(m_gRenderer);
+
+    m_recent_draw_plane = 0;
 }
 
 void RenderSDL::updateViewport()
 {
+    flushRenderQueue();
+
     int   render_w, render_h;
 
     getRenderSize(&render_w, &render_h);
@@ -314,6 +325,11 @@ void RenderSDL::updateViewport()
 
 void RenderSDL::resetViewport()
 {
+    if(m_viewport_x == 0 && m_viewport_y == 0 && m_viewport_w == ScreenW && m_viewport_h == ScreenH)
+        return;
+
+    flushRenderQueue();
+
     // FIXME: Clarify the version of SDL2 with the buggy viewport
 //#if SDL_COMPILEDVERSION < SDL_VERSIONNUM(2, 0, 22)
     // set to an alt viewport as a workaround for SDL bug (doesn't allow resizing viewport without changing position)
@@ -322,10 +338,20 @@ void RenderSDL::resetViewport()
 //#endif
 
     SDL_RenderSetViewport(m_gRenderer, nullptr);
+
+    m_viewport_x = 0;
+    m_viewport_y = 0;
+    m_viewport_w = ScreenW;
+    m_viewport_h = ScreenH;
 }
 
 void RenderSDL::setViewport(int x, int y, int w, int h)
 {
+    if(m_viewport_x == x && m_viewport_y == y && m_viewport_w == w && m_viewport_h == h)
+        return;
+
+    flushRenderQueue();
+
     SDL_Rect topLeftViewport;
 
     // FIXME: Clarify the version of SDL2 with the buggy viewport
@@ -394,6 +420,9 @@ void RenderSDL::setTargetTexture()
 {
     if(m_tBufferDisabled || m_recentTarget == m_tBuffer)
         return;
+
+    flushRenderQueue();
+
     SDL_SetRenderTarget(m_gRenderer, m_tBuffer);
     m_recentTarget = m_tBuffer;
 }
@@ -402,8 +431,16 @@ void RenderSDL::setTargetScreen()
 {
     if(m_tBufferDisabled || m_recentTarget == nullptr)
         return;
+
+    flushRenderQueue();
+
     SDL_SetRenderTarget(m_gRenderer, nullptr);
     m_recentTarget = nullptr;
+}
+
+void RenderSDL::setDrawPlane(uint8_t plane)
+{
+    m_recent_draw_plane = plane;
 }
 
 void RenderSDL::loadTextureInternal(StdPicture &target, uint32_t width, uint32_t height, uint8_t *RGBApixels, uint32_t pitch)
@@ -494,123 +531,240 @@ void RenderSDL::clearBuffer()
 #endif
     SDL_SetRenderDrawColor(m_gRenderer, 0, 0, 0, 255);
     SDL_RenderClear(m_gRenderer);
+
+    m_render_queue.clear();
+}
+
+void RenderSDL::flushRenderQueue()
+{
+    if(!m_render_queue.size)
+        return;
+
+    m_render_queue.sort();
+
+    for(uint32_t i : m_render_queue.indices)
+        execute(m_render_queue.ops[i & 0xFFFF]);
+
+    m_render_queue.clear();
+}
+
+void RenderSDL::execute(const RenderOp& op)
+{
+#ifdef USE_RENDER_BLOCKING
+    SDL_assert(!m_blockRender);
+#endif
+
+    switch(op.type)
+    {
+    case RenderOp::Type::rect:
+    {
+        SDL_Rect aRect = {op.xDst, op.yDst, op.wDst, op.hDst};
+        SDL_SetRenderDrawColor(m_gRenderer, op.color.r, op.color.g, op.color.b, op.color.a);
+
+        if(op.traits && RenderOp::Traits::filled)
+            SDL_RenderFillRect(m_gRenderer, &aRect);
+        else
+            SDL_RenderDrawRect(m_gRenderer, &aRect);
+
+        break;
+    }
+
+    case RenderOp::Type::circle:
+    {
+        int radius = op.radius();
+
+        SDL_SetRenderDrawColor(m_gRenderer, op.color.r, op.color.g, op.color.b, op.color.a);
+
+        int dy = 1;
+        do //for(double dy = 1; dy <= radius; dy += 1.0)
+        {
+            int dx = std::floor(std::sqrt((2 * radius * dy) - (dy * dy)));
+            SDL_RenderDrawLine(m_gRenderer,
+                               int(op.xDst - dx),
+                               int(op.yDst + dy - radius),
+                               int(op.xDst + dx),
+                               int(op.yDst + dy - radius));
+
+            if(dy < radius) // Don't cross lines
+            {
+                SDL_RenderDrawLine(m_gRenderer,
+                                   int(op.xDst - dx),
+                                   int(op.yDst - dy + radius),
+                                   int(op.xDst + dx),
+                                   int(op.yDst - dy + radius));
+            }
+
+            dy += 1;
+        } while(dy <= radius);
+
+        break;
+    }
+
+    case RenderOp::Type::circle_hole:
+    {
+        int radius = op.radius();
+
+        SDL_SetRenderDrawColor(m_gRenderer, op.color.r, op.color.g, op.color.b, op.color.a);
+
+        int dy = 1;
+        do //for(double dy = 1; dy <= radius; dy += 1.0)
+        {
+            int dx = std::floor(std::sqrt((2 * radius * dy) - (dy * dy)));
+
+            SDL_RenderDrawLine(m_gRenderer,
+                               int(op.xDst - radius),
+                               int(op.yDst + dy - radius),
+                               int(op.xDst - dx),
+                               int(op.yDst + dy - radius));
+
+            SDL_RenderDrawLine(m_gRenderer,
+                               int(op.xDst + dx),
+                               int(op.yDst + dy - radius),
+                               int(op.xDst + radius),
+                               int(op.yDst + dy - radius));
+
+
+            if(dy < radius) // Don't cross lines
+            {
+                SDL_RenderDrawLine(m_gRenderer,
+                                   int(op.xDst - radius),
+                                   int(op.yDst - dy + radius),
+                                   int(op.xDst - dx),
+                                   int(op.yDst - dy + radius));
+
+                SDL_RenderDrawLine(m_gRenderer,
+                                   int(op.xDst + dx),
+                                   int(op.yDst - dy + radius),
+                                   int(op.xDst + radius),
+                                   int(op.yDst - dy + radius));
+            }
+
+            dy += 1;
+        } while(dy <= radius);
+
+        break;
+    }
+
+
+    case RenderOp::Type::texture:
+    {
+        if(!op.texture || !op.texture->inited)
+            break;
+
+        auto& tx = *op.texture;
+
+        if(!tx.d.texture)
+        {
+            D_pLogWarningNA("Attempt to render an empty texture!");
+            break;
+        }
+
+        SDL_assert_release(tx.d.texture);
+
+        SDL_Rect destRect = {op.xDst, op.yDst, op.wDst, op.hDst};
+
+        SDL_Rect sourceRect;
+        SDL_Rect* sourceRectPtr = nullptr;
+
+        if(op.traits & RenderOp::Traits::src_rect)
+        {
+            sourceRect = {op.xSrc, op.ySrc, op.wSrc, op.hSrc};
+            sourceRectPtr = &sourceRect;
+        }
+
+        txColorMod(tx.d, op.color);
+
+        if(op.traits & RenderOp::Traits::rotoflip)
+        {
+            const SDL_RendererFlip flip = (SDL_RendererFlip)(op.traits & 3);
+
+            double angle = (op.traits & RenderOp::Traits::rotation)
+                ? double(op.angle) * (360. / 65536.)
+                : 0.;
+
+            SDL_RenderCopyEx(m_gRenderer, tx.d.texture, sourceRectPtr, &destRect,
+                            angle, nullptr, flip);
+        }
+        else
+        {
+            SDL_RenderCopy(m_gRenderer, tx.d.texture, sourceRectPtr, &destRect);
+        }
+
+        break;
+    }
+
+    default:
+        SDL_assert_release(false); // illegal render op type!
+        break;
+    }
 }
 
 void RenderSDL::renderRect(int x, int y, int w, int h, XTColor color, bool filled)
 {
-#ifdef USE_RENDER_BLOCKING
-    SDL_assert(!m_blockRender);
-#endif
-    SDL_Rect aRect = {x + m_viewport_offset_x,
-                      y + m_viewport_offset_y,
-                      w, h};
-    SDL_SetRenderDrawColor(m_gRenderer, color.r, color.g, color.b, color.a);
+    RenderOp& op = m_render_queue.push(m_recent_draw_plane);
+
+    op.type = RenderOp::Type::rect;
+    op.xDst = x + m_viewport_offset_x;
+    op.yDst = y + m_viewport_offset_y;
+    op.wDst = w;
+    op.hDst = h;
+
+    op.color = color;
 
     if(filled)
-        SDL_RenderFillRect(m_gRenderer, &aRect);
+        op.traits = RenderOp::Traits::filled;
     else
-        SDL_RenderDrawRect(m_gRenderer, &aRect);
+        op.traits = 0;
 }
 
 void RenderSDL::renderRectBR(int _left, int _top, int _right, int _bottom, XTColor color)
 {
-#ifdef USE_RENDER_BLOCKING
-    SDL_assert(!m_blockRender);
-#endif
-    SDL_Rect aRect = {_left + m_viewport_offset_x,
-                      _top + m_viewport_offset_y,
-                      _right - _left, _bottom - _top};
-    SDL_SetRenderDrawColor(m_gRenderer, color.r, color.g, color.b, color.a);
-    SDL_RenderFillRect(m_gRenderer, &aRect);
+    RenderOp& op = m_render_queue.push(m_recent_draw_plane);
+
+    op.type = RenderOp::Type::rect;
+    op.xDst = _left + m_viewport_offset_x;
+    op.yDst = _top + m_viewport_offset_y;
+    op.wDst = _right - _left;
+    op.hDst = _bottom - _top;
+
+    op.color = color;
+
+    op.traits = RenderOp::Traits::filled;
 }
 
 void RenderSDL::renderCircle(int cx, int cy, int radius, XTColor color, bool filled)
 {
-#ifdef USE_RENDER_BLOCKING
-    SDL_assert(!m_blockRender);
-#endif
-    UNUSED(filled);
-
     if(radius <= 0)
         return; // Nothing to draw
 
-    SDL_SetRenderDrawColor(m_gRenderer, color.r, color.g, color.b, color.a);
+    RenderOp& op = m_render_queue.push(m_recent_draw_plane);
 
-    cx += m_viewport_offset_x;
-    cy += m_viewport_offset_y;
+    op.type = RenderOp::Type::circle;
+    op.xDst = cx + m_viewport_offset_x;
+    op.yDst = cy + m_viewport_offset_y;
+    op.radius() = radius;
 
-    double dy = 1;
-    do //for(double dy = 1; dy <= radius; dy += 1.0)
-    {
-        double dx = std::floor(std::sqrt((2.0 * radius * dy) - (dy * dy)));
-        SDL_RenderDrawLine(m_gRenderer,
-                           int(cx - dx),
-                           int(cy + dy - radius),
-                           int(cx + dx),
-                           int(cy + dy - radius));
+    op.color = color;
 
-        if(dy < radius) // Don't cross lines
-        {
-            SDL_RenderDrawLine(m_gRenderer,
-                               int(cx - dx),
-                               int(cy - dy + radius),
-                               int(cx + dx),
-                               int(cy - dy + radius));
-        }
-
-        dy += 1.0;
-    } while(dy <= radius);
+    if(filled)
+        op.traits = RenderOp::Traits::filled;
+    else
+        op.traits = 0;
 }
 
 void RenderSDL::renderCircleHole(int cx, int cy, int radius, XTColor color)
 {
-#ifdef USE_RENDER_BLOCKING
-    SDL_assert(!m_blockRender);
-#endif
-
     if(radius <= 0)
         return; // Nothing to draw
 
-    SDL_SetRenderDrawColor(m_gRenderer, color.r, color.g, color.b, color.a);
+    RenderOp& op = m_render_queue.push(m_recent_draw_plane);
 
-    cx += m_viewport_offset_x;
-    cy += m_viewport_offset_y;
+    op.type = RenderOp::Type::circle_hole;
+    op.xDst = cx + m_viewport_offset_x;
+    op.yDst = cy + m_viewport_offset_y;
+    op.radius() = radius;
 
-    double dy = 1;
-    do //for(double dy = 1; dy <= radius; dy += 1.0)
-    {
-        double dx = std::floor(std::sqrt((2.0 * radius * dy) - (dy * dy)));
-
-        SDL_RenderDrawLine(m_gRenderer,
-                           int(cx - radius),
-                           int(cy + dy - radius),
-                           int(cx - dx),
-                           int(cy + dy - radius));
-
-        SDL_RenderDrawLine(m_gRenderer,
-                           int(cx + dx),
-                           int(cy + dy - radius),
-                           int(cx + radius),
-                           int(cy + dy - radius));
-
-
-        if(dy < radius) // Don't cross lines
-        {
-            SDL_RenderDrawLine(m_gRenderer,
-                               int(cx - radius),
-                               int(cy - dy + radius),
-                               int(cx - dx),
-                               int(cy - dy + radius));
-
-            SDL_RenderDrawLine(m_gRenderer,
-                               int(cx + dx),
-                               int(cy - dy + radius),
-                               int(cx + radius),
-                               int(cy - dy + radius));
-        }
-
-        dy += 1.0;
-    } while(dy <= radius);
+    op.color = color;
 }
 
 
@@ -641,9 +795,6 @@ void RenderSDL::renderTextureScaleEx(double xDstD, double yDstD, double wDstD, d
                                        double rotateAngle, FPoint_t *center, unsigned int flip,
                                        XTColor color)
 {
-#ifdef USE_RENDER_BLOCKING
-    SDL_assert(!m_blockRender);
-#endif
     if(!tx.inited)
         return;
 
@@ -655,62 +806,71 @@ void RenderSDL::renderTextureScaleEx(double xDstD, double yDstD, double wDstD, d
         D_pLogWarningNA("Attempt to render an empty texture!");
         return;
     }
-
-    SDL_assert_release(tx.d.texture);
-
-    int xDst = Maths::iRound(xDstD);
-    int yDst = Maths::iRound(yDstD);
-    int wDst = Maths::iRound(wDstD);
-    int hDst = Maths::iRound(hDstD);
 
     // Don't go more than size of texture
     if(xSrc + wSrc > tx.w)
     {
         wSrc = tx.w - xSrc;
         if(wSrc < 0)
-            wSrc = 0;
+            return;
     }
     if(ySrc + hSrc > tx.h)
     {
         hSrc = tx.h - ySrc;
         if(hSrc < 0)
-            hSrc = 0;
+            return;
     }
 
-#ifndef XTECH_SDL_NO_RECTF_SUPPORT
-    SDL_FRect destRect = {(float)xDst + m_viewport_offset_x,
-                          (float)yDst + m_viewport_offset_y,
-                          (float)wDst,
-                          (float)hDst};
-    SDL_FPoint *centerD = (SDL_FPoint*)center;
-#else
-    SDL_Rect destRect = {(int)xDst + m_viewport_offset_x,
-                         (int)yDst + m_viewport_offset_y,
-                         (int)wDst,
-                         (int)hDst};
-    SDL_Point centerI = {center ? Maths::iRound(center->x) : 0,
-                         center ? Maths::iRound(center->y) : 0};
-    SDL_Point *centerD = center ? &centerI : nullptr;
-#endif
 
-    SDL_Rect sourceRect;
-    sourceRect = {int(tx.d.w_scale * xSrc), int(tx.d.h_scale * ySrc),
-                  int(tx.d.w_scale * wSrc), int(tx.d.h_scale * hSrc)};
+    RenderOp& op = m_render_queue.push(m_recent_draw_plane);
 
-    txColorMod(tx.d, color);
-    SDL_RenderCopyExF(m_gRenderer, tx.d.texture, &sourceRect, &destRect,
-                      rotateAngle, centerD, static_cast<SDL_RendererFlip>(flip));
+    op.type = RenderOp::Type::texture;
+    op.texture = &tx;
+
+    op.xDst = Maths::iRound(xDstD) + m_viewport_offset_x;
+    op.yDst = Maths::iRound(yDstD) + m_viewport_offset_y;
+    op.wDst = Maths::iRound(wDstD);
+    op.hDst = Maths::iRound(hDstD);
+
+    op.xSrc = tx.d.w_scale * xSrc;
+    op.ySrc = tx.d.h_scale * ySrc;
+    op.wSrc = tx.d.w_scale * wSrc;
+    op.hSrc = tx.d.h_scale * hSrc;
+
+    op.color = color;
+
+    op.traits = (flip & 3) | RenderOp::Traits::src_rect;
+    op.angle = 0;
+
+    if(rotateAngle != 0.)
+    {
+        op.traits |= RenderOp::Traits::rotation;
+        op.angle = (uint16_t)(std::fmod(rotateAngle, 360.) * (65536. / 360.));
+
+        // calculate new offset now
+        if(center)
+        {
+            double orig_offsetX = wDstD / 2 - center->x;
+            double orig_offsetY = hDstD / 2 - center->y;
+            double sin_theta = -sin(rotateAngle * (M_PI / 180.));
+            double cos_theta = cos(rotateAngle * (M_PI / 180.));
+
+            double rot_offsetX = orig_offsetX * cos_theta - orig_offsetY * sin_theta;
+            double rot_offsetY = orig_offsetX * sin_theta + orig_offsetY * cos_theta;
+
+            double shiftX = rot_offsetX - orig_offsetX;
+            double shiftY = rot_offsetY - orig_offsetY;
+
+            op.xDst = Maths::iRound(xDstD + shiftX) + m_viewport_offset_x;
+            op.yDst = Maths::iRound(yDstD + shiftY) + m_viewport_offset_y;
+        }
+    }
 }
 
 void RenderSDL::renderTextureScale(double xDst, double yDst, double wDst, double hDst,
                                      StdPicture &tx,
                                      XTColor color)
 {
-#ifdef USE_RENDER_BLOCKING
-    SDL_assert(!m_blockRender);
-#endif
-    const unsigned int flip = SDL_FLIP_NONE;
-
     if(!tx.inited)
         return;
 
@@ -723,24 +883,19 @@ void RenderSDL::renderTextureScale(double xDst, double yDst, double wDst, double
         return;
     }
 
-#ifndef XTECH_SDL_NO_RECTF_SUPPORT
-    SDL_FRect destRect = {Maths::fRound(xDst) + m_viewport_offset_x,
-                          Maths::fRound(yDst) + m_viewport_offset_y,
-                          (float)wDst,
-                          (float)hDst};
-#else
-    SDL_Rect destRect = {Maths::iRound(xDst) + m_viewport_offset_x,
-                         Maths::iRound(yDst) + m_viewport_offset_y,
-                         (int)wDst,
-                         (int)hDst};
-#endif
+    RenderOp& op = m_render_queue.push(m_recent_draw_plane);
 
-    SDL_Rect sourceRect;
-    sourceRect = {0, 0, tx.w, tx.h};
+    op.type = RenderOp::Type::texture;
+    op.traits = 0;
 
-    txColorMod(tx.d, color);
-    SDL_RenderCopyExF(m_gRenderer, tx.d.texture, &sourceRect, &destRect,
-                      0.0, nullptr, static_cast<SDL_RendererFlip>(flip));
+    op.texture = &tx;
+
+    op.xDst = Maths::iRound(xDst) + m_viewport_offset_x;
+    op.yDst = Maths::iRound(yDst) + m_viewport_offset_y;
+    op.wDst = Maths::iRound(wDst);
+    op.hDst = Maths::iRound(hDst);
+
+    op.color = color;
 }
 
 void RenderSDL::renderTexture(double xDstD, double yDstD, double wDstD, double hDstD,
@@ -748,9 +903,6 @@ void RenderSDL::renderTexture(double xDstD, double yDstD, double wDstD, double h
                                 int xSrc, int ySrc,
                                 XTColor color)
 {
-#ifdef USE_RENDER_BLOCKING
-    SDL_assert(!m_blockRender);
-#endif
     if(!tx.inited)
         return;
 
@@ -763,10 +915,6 @@ void RenderSDL::renderTexture(double xDstD, double yDstD, double wDstD, double h
         return;
     }
 
-    SDL_assert_release(tx.d.texture);
-
-    int xDst = Maths::iRound(xDstD);
-    int yDst = Maths::iRound(yDstD);
     int wDst = Maths::iRound(wDstD);
     int hDst = Maths::iRound(hDstD);
 
@@ -775,35 +923,34 @@ void RenderSDL::renderTexture(double xDstD, double yDstD, double wDstD, double h
     {
         wDst = tx.w - xSrc;
         if(wDst < 0)
-            wDst = 0;
+            return;
     }
-
     if(ySrc + hDst > tx.h)
     {
         hDst = tx.h - ySrc;
         if(hDst < 0)
-            hDst = 0;
+            return;
     }
 
-#ifndef XTECH_SDL_NO_RECTF_SUPPORT
-    SDL_FRect destRect = {(float)xDst + m_viewport_offset_x,
-                          (float)yDst + m_viewport_offset_y,
-                          (float)wDst,
-                          (float)hDst};
-#else
-    SDL_Rect destRect = {(int)xDst + m_viewport_offset_x,
-                         (int)yDst + m_viewport_offset_y,
-                         (int)wDst,
-                         (int)hDst};
-#endif
 
-    SDL_Rect sourceRect;
+    RenderOp& op = m_render_queue.push(m_recent_draw_plane);
 
-    sourceRect = {int(tx.d.w_scale * xSrc), int(tx.d.h_scale * ySrc),
-                  int(tx.d.w_scale * wDst), int(tx.d.h_scale * hDst)};
+    op.type = RenderOp::Type::texture;
+    op.traits = RenderOp::Traits::src_rect;
 
-    txColorMod(tx.d, color);
-    SDL_RenderCopyF(m_gRenderer, tx.d.texture, &sourceRect, &destRect);
+    op.texture = &tx;
+
+    op.xDst = Maths::iRound(xDstD) + m_viewport_offset_x;
+    op.yDst = Maths::iRound(yDstD) + m_viewport_offset_y;
+    op.wDst = wDst;
+    op.hDst = hDst;
+
+    op.xSrc = tx.d.w_scale * xSrc;
+    op.ySrc = tx.d.h_scale * ySrc;
+    op.wSrc = tx.d.w_scale * wDst;
+    op.hSrc = tx.d.h_scale * hDst;
+
+    op.color = color;
 }
 
 void RenderSDL::renderTextureFL(double xDstD, double yDstD, double wDstD, double hDstD,
@@ -812,67 +959,12 @@ void RenderSDL::renderTextureFL(double xDstD, double yDstD, double wDstD, double
                                   double rotateAngle, FPoint_t *center, unsigned int flip,
                                   XTColor color)
 {
-#ifdef USE_RENDER_BLOCKING
-    SDL_assert(!m_blockRender);
-#endif
-    if(!tx.inited)
-        return;
-
-    if(!tx.d.texture && tx.l.lazyLoaded)
-        lazyLoad(tx);
-
-    if(!tx.d.texture)
-    {
-        D_pLogWarningNA("Attempt to render an empty texture!");
-        return;
-    }
-
-    SDL_assert_release(tx.d.texture);
-
-    int xDst = Maths::iRound(xDstD);
-    int yDst = Maths::iRound(yDstD);
-    int wDst = Maths::iRound(wDstD);
-    int hDst = Maths::iRound(hDstD);
-
-    // Don't go more than size of texture
-    if(xSrc + wDst > tx.w)
-    {
-        wDst = tx.w - xSrc;
-        if(wDst < 0)
-            wDst = 0;
-    }
-
-    if(ySrc + hDst > tx.h)
-    {
-        hDst = tx.h - ySrc;
-        if(hDst < 0)
-            hDst = 0;
-    }
-
-#ifndef XTECH_SDL_NO_RECTF_SUPPORT
-    SDL_FRect destRect = {(float)xDst + m_viewport_offset_x,
-                          (float)yDst + m_viewport_offset_y,
-                          (float)wDst,
-                          (float)hDst};
-    SDL_FPoint *centerD = (SDL_FPoint*)center;
-#else
-    SDL_Rect destRect = {(int)xDst + m_viewport_offset_x,
-                         (int)yDst + m_viewport_offset_y,
-                         (int)wDst,
-                         (int)hDst};
-    SDL_Point centerI = {center ? Maths::iRound(center->x) : 0,
-                         center ? Maths::iRound(center->y) : 0};
-    SDL_Point *centerD = center ? &centerI : nullptr;
-#endif
-
-    SDL_Rect sourceRect;
-
-    sourceRect = {int(tx.d.w_scale * xSrc), int(tx.d.h_scale * ySrc),
-                  int(tx.d.w_scale * wDst), int(tx.d.h_scale * hDst)};
-
-    txColorMod(tx.d, color);
-    SDL_RenderCopyExF(m_gRenderer, tx.d.texture, &sourceRect, &destRect,
-                      rotateAngle, centerD, static_cast<SDL_RendererFlip>(flip));
+    renderTextureScaleEx(xDstD, yDstD, wDstD, hDstD,
+                         tx,
+                         xSrc, ySrc,
+                         Maths::iRound(wDstD), Maths::iRound(hDstD),
+                         rotateAngle, center, flip,
+                         color);
 }
 
 void RenderSDL::renderTexture(float xDst, float yDst,
@@ -882,7 +974,6 @@ void RenderSDL::renderTexture(float xDst, float yDst,
 #ifdef USE_RENDER_BLOCKING
     SDL_assert(!m_blockRender);
 #endif
-    const unsigned int flip = SDL_FLIP_NONE;
 
     if(!tx.inited)
         return;
@@ -896,22 +987,25 @@ void RenderSDL::renderTexture(float xDst, float yDst,
         return;
     }
 
-#ifndef XTECH_SDL_NO_RECTF_SUPPORT
-    SDL_FRect destRect = {Maths::fRound(xDst), Maths::fRound(yDst), (float)tx.w, (float)tx.h};
-#else
-    SDL_Rect destRect = {Maths::iRound(xDst), Maths::iRound(yDst), tx.w, tx.h};
-#endif
+    RenderOp& op = m_render_queue.push(m_recent_draw_plane);
 
-    SDL_Rect sourceRect;
-    sourceRect = {0, 0, tx.w, tx.h};
+    op.type = RenderOp::Type::texture;
+    op.traits = 0;
 
-    txColorMod(tx.d, color);
-    SDL_RenderCopyExF(m_gRenderer, tx.d.texture, &sourceRect, &destRect,
-                      0.0, nullptr, static_cast<SDL_RendererFlip>(flip));
+    op.texture = &tx;
+
+    op.xDst = Maths::iRound(xDst) + m_viewport_offset_x;
+    op.yDst = Maths::iRound(yDst) + m_viewport_offset_y;
+    op.wDst = tx.w;
+    op.hDst = tx.h;
+
+    op.color = color;
 }
 
 void RenderSDL::getScreenPixels(int x, int y, int w, int h, unsigned char *pixels)
 {
+    flushRenderQueue();
+
     SDL_Rect rect;
     rect.x = x;
     rect.y = y;
@@ -930,6 +1024,8 @@ void RenderSDL::getScreenPixels(int x, int y, int w, int h, unsigned char *pixel
 
 void RenderSDL::getScreenPixelsRGBA(int x, int y, int w, int h, unsigned char *pixels)
 {
+    flushRenderQueue();
+
     SDL_Rect rect;
     rect.x = x;
     rect.y = y;

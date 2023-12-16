@@ -22,6 +22,7 @@
 #ifndef ABTRACTRENDER_T_H
 #define ABTRACTRENDER_T_H
 
+#include <cstdint>
 #include <string>
 
 #include "std_picture.h"
@@ -174,6 +175,13 @@ public:
      * \brief Set render target into the real window or screen (use to render on-screen buttons and other meta-info)
      */
     virtual void setTargetScreen() = 0;
+
+    /*!
+     * \brief Sets draw plane for subsequent draws.
+     *
+     * \param plane Which draw plane should be used.
+     */
+    virtual void setDrawPlane(uint8_t plane) = 0;
 
 
 

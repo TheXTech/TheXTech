@@ -54,6 +54,11 @@ void setTargetTexture()
 void setTargetScreen()
 {}
 
+void setDrawPlane(uint8_t plane)
+{
+    (void)plane;
+}
+
 void clearBuffer()
 {}
 

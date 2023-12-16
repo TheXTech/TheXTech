@@ -49,6 +49,8 @@
 
 #include "gfx_special_frames.h"
 
+#include "draw_planes.h"
+
 #include <fmt_format_ne.h>
 
 
@@ -259,6 +261,8 @@ void UpdateGraphics2(bool skipRepaint)
         XRender::setTargetLayer(0);
 #endif
 
+    XRender::setDrawPlane(PLANE_GAME_BACKDROP);
+
     XRender::clearBuffer();
     DrawBackdrop(Screens[0]);
 
@@ -331,6 +335,8 @@ void UpdateGraphics2(bool skipRepaint)
         sView.Width = sRight - sLeft;
         sView.Height = sBottom - sTop;
 
+        XRender::setDrawPlane(PLANE_WLD_TIL);
+
         //for(A = 1; A <= numTiles; A++)
         for(Tile_t* t : treeWorldTileQuery(sLeft, sTop, sRight, sBottom, true))
         {
@@ -349,6 +355,8 @@ void UpdateGraphics2(bool skipRepaint)
                                       GFXTileBMP[tile.Type], 0, TileHeight[tile.Type] * TileFrame[tile.Type]);
             }
         }
+
+        XRender::setDrawPlane(PLANE_WLD_SCN);
 
         //for(A = 1; A <= numScenes; A++)
         for(Scene_t* t : treeWorldSceneQuery(sLeft, sTop, sRight, sBottom, true))
@@ -369,6 +377,8 @@ void UpdateGraphics2(bool skipRepaint)
             }
         }
 
+        XRender::setDrawPlane(PLANE_WLD_PTH);
+
         //for(A = 1; A <= numWorldPaths; A++)
         for(WorldPath_t* t : treeWorldPathQuery(sLeft, sTop, sRight, sBottom, true))
         {
@@ -387,6 +397,8 @@ void UpdateGraphics2(bool skipRepaint)
                                       GFXPathBMP[path.Type], 0, 0);
             }
         }
+
+        XRender::setDrawPlane(PLANE_WLD_LVL);
 
         //for(A = 1; A <= numWorldLevels; A++)
         for(WorldLevel_t* t : treeWorldLevelQuery(sLeft, sTop, sRight, sBottom, true))
@@ -429,6 +441,8 @@ void UpdateGraphics2(bool skipRepaint)
 
     if(WorldEditor)
     {
+        XRender::setDrawPlane(PLANE_WLD_EFF);
+
         for(int A = 1; A <= numEffects; A++)
         {
             if(vScreenCollision(Z, Effect[A].Location))
@@ -439,6 +453,8 @@ void UpdateGraphics2(bool skipRepaint)
                     GFXEffect[Effect[A].Type], 0, Effect[A].Frame * EffectHeight[Effect[A].Type]);
             }
         }
+
+        XRender::setDrawPlane(PLANE_WLD_INFO);
 
         for(WorldMusic_t* t : treeWorldMusicQuery(sLeft, sTop, sRight, sBottom, true))
         {
@@ -491,6 +507,8 @@ void UpdateGraphics2(bool skipRepaint)
     }
     else
     { // NOT AN EDITOR!!!
+        XRender::setDrawPlane(PLANE_WLD_PLR);
+
         if(WorldPlayer[1].Type == 0)
             WorldPlayer[1].Type = 1;
 
@@ -518,6 +536,8 @@ void UpdateGraphics2(bool skipRepaint)
 
         if(WorldPlayer[1].LevelIndex)
         {
+            XRender::setDrawPlane(PLANE_WLD_INFO);
+
             auto &l = WorldLevel[WorldPlayer[1].LevelIndex];
 
             auto policy = computeStarsShowingPolicy(l.starsShowPolicy, l.curStars);
@@ -558,6 +578,8 @@ void UpdateGraphics2(bool skipRepaint)
         XRender::setTargetLayer(2);
 #endif
 
+        XRender::setDrawPlane(PLANE_WLD_FRAME);
+
 //        XRender::renderTexture(0, 0, 800, 130, GFX.Interface[4], 0, 0);
         DrawWorldMapFrame(vScreen[Z]);
 
@@ -568,6 +590,8 @@ void UpdateGraphics2(bool skipRepaint)
 #ifdef __3DS__
         XRender::setTargetLayer(3);
 #endif
+
+        XRender::setDrawPlane(PLANE_WLD_HUD);
 
         // prepare for player draw
         vScreen[0].X = 0;
@@ -646,6 +670,8 @@ void UpdateGraphics2(bool skipRepaint)
             }
         }
 
+        XRender::setDrawPlane(PLANE_WLD_META);
+
         g_worldScreenFader.draw();
 
         if(PrintFPS > 0 && ShowFPS)
@@ -681,6 +707,8 @@ void UpdateGraphics2(bool skipRepaint)
     }
 
     DrawDeviceBattery();
+
+    XRender::setDrawPlane(PLANE_GAME_MENUS);
 
     // this code is for both non-editor and editor cases
     // render special screens

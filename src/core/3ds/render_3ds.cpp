@@ -52,9 +52,10 @@ extern void SetDefaultIO(FreeImageIO *io);
 
 #include "core/minport/render_minport_shared.h"
 
+#include "core/render_planes.h"
+
 // #include "core/3ds/n3ds-clock.h"
 // #include "second_screen.h"
-#include "c2d_draw.h"
 
 // used for crash prevention
 extern u32 gpuCmdBufOffset, gpuCmdBufSize;
@@ -66,6 +67,8 @@ static const C2D_SpriteSheet HEAP_MANAGED_TEXTURE = reinterpret_cast<C2D_SpriteS
 
 uint32_t s_current_frame = 0;
 float s_depth_slider = 0.;
+
+static RenderPlanes_t s_render_planes;
 
 bool g_in_frame = false;
 bool g_screen_swapped = false;
@@ -87,6 +90,8 @@ int s_tex_h = 0;
 int s_num_textures_loaded = 0;
 
 C3D_RenderTarget* s_cur_target = nullptr;
+
+#include "c2d_draw.h"
 
 static void s_destroySceneTargets()
 {
@@ -132,7 +137,7 @@ static void s_createSceneTargets()
     for(int i = 0; i < 4; i++)
     {
         C3D_TexInitVRAM(&s_layer_texs[i], mem_w, mem_h, GPU_RGBA8);
-        s_layer_targets[i] = C3D_RenderTargetCreateFromTex(&s_layer_texs[i], GPU_TEXFACE_2D, 0, GPU_RB_DEPTH24_STENCIL8);
+        s_layer_targets[i] = C3D_RenderTargetCreateFromTex(&s_layer_texs[i], GPU_TEXFACE_2D, 0, GPU_RB_DEPTH16);
         s_layer_subtexs[i] = {(uint16_t)s_tex_w, (uint16_t)s_tex_h, 0.0, 1.0, (float)((double)s_tex_w / (double)mem_w), 1.0f - (float)((double)s_tex_h / (double)mem_h)};
         s_layer_ims[i].tex = &s_layer_texs[i];
         s_layer_ims[i].subtex = &s_layer_subtexs[i];
@@ -454,6 +459,10 @@ bool init()
     C2D_SetTintMode(C2D_TintMult);
     s_resetBlend();
 
+    // seems to be set by other code
+    // C3D_DepthTest(true, GPU_GEQUAL, GPU_WRITE_DEPTH);
+    C3D_AlphaTest(true, GPU_GEQUAL, 0x08);
+
     // consoleInit(GFX_BOTTOM, NULL);
 
     s_top_screen = C2D_CreateScreenTarget(GFX_TOP, GFX_LEFT);
@@ -566,6 +575,11 @@ void clearBuffer()
     }
 }
 
+void setDrawPlane(uint8_t plane)
+{
+    s_render_planes.set_plane(plane);
+}
+
 void repaint()
 {
     if(!g_in_frame)
@@ -674,6 +688,8 @@ void repaint()
     }
 
     s_resetBlend();
+
+    s_render_planes.reset();
 
     s_current_frame ++;
     g_in_frame = false;
@@ -1096,7 +1112,7 @@ void minport_RenderBoxFilled(int x1, int y1, int x2, int y2, XTColor color)
 {
     uint32_t clr = C2D_Color32(color.r, color.g, color.b, color.a);
 
-    C2D_DrawRectSolid(x1, y1, 0, x2 - x1, y2 - y1, clr);
+    C2D_DrawRectSolid(x1, y1, s_render_planes.next() / (float)0x8000, x2 - x1, y2 - y1, clr);
 }
 
 void minport_RenderTexturePrivate(int16_t xDst, int16_t yDst, int16_t wDst, int16_t hDst,

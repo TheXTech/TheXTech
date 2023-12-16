@@ -56,6 +56,7 @@
 #include "effect.h"
 #include "npc_id.h"
 #include "eff_id.h"
+#include "draw_planes.h"
 
 #include "graphics/gfx_special_frames.h"
 #include "graphics/gfx_camera.h"
@@ -1717,6 +1718,8 @@ void UpdateGraphics(bool skipRepaint)
     XRender::setTargetLayer(0);
 #endif
 
+    XRender::setDrawPlane(PLANE_GAME_BACKDROP);
+
     // TODO: set screen to be the draw screen (can't do it here because we're still in the screen's scope from before)
     // Screen_t& screen = *l_screen;
     // TODO: update numScreens based on newly bound screen
@@ -1744,6 +1747,8 @@ void UpdateGraphics(bool skipRepaint)
         if(Z != 1)
             XRender::setTargetLayer(0);
 #endif
+
+        XRender::setDrawPlane(PLANE_LVL_BG);
 
         // Note: this was guarded by an if(!LevelEditor) condition in the past
         if(Background2[S] == 0)
@@ -1831,6 +1836,8 @@ void UpdateGraphics(bool skipRepaint)
 
         int nextBackground = 0;
 
+        XRender::setDrawPlane(PLANE_LVL_BGO_LOW);
+
         if(LevelEditor)
         {
             for(int A : screenBackgrounds)
@@ -1895,6 +1902,8 @@ void UpdateGraphics(bool skipRepaint)
 
         tempLocation.Width = 32;
         tempLocation.Height = 32;
+
+        XRender::setDrawPlane(PLANE_LVL_SBLOCK);
 
         for(Block_t& b : screenSBlocks) // Display sizable blocks
         {
@@ -1977,6 +1986,8 @@ void UpdateGraphics(bool skipRepaint)
             }
         }
 
+        XRender::setDrawPlane(PLANE_LVL_BGO_NORM);
+
         if(LevelEditor)
         {
             for(int A : screenBackgrounds)
@@ -2055,6 +2066,8 @@ void UpdateGraphics(bool skipRepaint)
         XRender::setTargetLayer(2);
 #endif
 
+        XRender::setDrawPlane(PLANE_LVL_NPC_BG);
+
 //        For A = 1 To numNPCs 'Display NPCs that should be behind blocks
         for(size_t i = 0; i < NPC_Draw_Queue_p.BG_n; i++)
         {
@@ -2104,6 +2117,8 @@ void UpdateGraphics(bool skipRepaint)
             }
         }
 
+
+        XRender::setDrawPlane(PLANE_LVL_PLR_WARP);
 
 //        For A = 1 To numPlayers 'Players behind blocks
         For(A, 1, numPlayers)
@@ -2367,6 +2382,8 @@ void UpdateGraphics(bool skipRepaint)
 //            blockTileGet(-vScreen[Z].X, vScreen[Z].Width, fBlock, lBlock);
 //        }
 
+        XRender::setDrawPlane(PLANE_LVL_BLK_NORM);
+
 //        For A = fBlock To lBlock 'Non-Sizable Blocks
         for(Block_t& block : screenMainBlocks)
         {
@@ -2400,6 +2417,8 @@ void UpdateGraphics(bool skipRepaint)
             }
         }
 
+        XRender::setDrawPlane(PLANE_LVL_EFF_LOW);
+
 //'effects in back
         for(A = 1; A <= numEffects; A++)
         {
@@ -2424,6 +2443,8 @@ void UpdateGraphics(bool skipRepaint)
         }
 
 
+        XRender::setDrawPlane(PLANE_LVL_NPC_LOW);
+
         // draw NPCs that should be behind other NPCs
         for(size_t i = 0; i < NPC_Draw_Queue_p.Low_n; i++)
         {
@@ -2441,6 +2462,8 @@ void UpdateGraphics(bool skipRepaint)
         }
 
 
+        XRender::setDrawPlane(PLANE_LVL_NPC_LOW + 1);
+
         // ice
         for(size_t i = 0; i < NPC_Draw_Queue_p.Iced_n; i++)
         {
@@ -2448,6 +2471,8 @@ void UpdateGraphics(bool skipRepaint)
             DrawFrozenNPC(Z, A);
         }
 
+
+        XRender::setDrawPlane(PLANE_LVL_NPC_NORM);
 
 //        For A = 1 To numNPCs 'Display NPCs that should be in front of blocks
         for(size_t i = 0; i < NPC_Draw_Queue_p.Normal_n; i++)
@@ -2621,6 +2646,8 @@ void UpdateGraphics(bool skipRepaint)
         }
 
 
+        XRender::setDrawPlane(PLANE_LVL_PLR_NORM);
+
         For(A, 1, numPlayers) // The clown car
         {
             if(!Player[A].Dead && !Player[A].Immune2 && Player[A].TimeToLive == 0 &&
@@ -2727,6 +2754,8 @@ void UpdateGraphics(bool skipRepaint)
 
 
 
+        XRender::setDrawPlane(PLANE_LVL_BGO_FG);
+
         if(LevelEditor)
         {
             for(int A : screenBackgrounds)
@@ -2778,6 +2807,8 @@ void UpdateGraphics(bool skipRepaint)
 //        End If
         }
 
+        XRender::setDrawPlane(PLANE_LVL_NPC_FG);
+
         // foreground NPCs
         for(size_t i = 0; i < NPC_Draw_Queue_p.FG_n; i++)
         {
@@ -2791,6 +2822,8 @@ void UpdateGraphics(bool skipRepaint)
             else
                 XRender::renderTexture(vScreen[Z].X + NPC[A].Location.X + (NPCFrameOffsetX[NPC[A].Type] * -NPC[A].Direction) - NPCWidthGFX[NPC[A].Type] / 2.0 + NPC[A].Location.Width / 2.0, vScreen[Z].Y + NPC[A].Location.Y + NPCFrameOffsetY[NPC[A].Type] - NPCHeightGFX[NPC[A].Type] + NPC[A].Location.Height, NPCWidthGFX[NPC[A].Type], NPCHeightGFX[NPC[A].Type], GFXNPC[NPC[A].Type], 0, NPC[A].Frame * NPCHeightGFX[NPC[A].Type], cn);
         }
+
+        XRender::setDrawPlane(PLANE_LVL_BLK_HURTS);
 
         // Blocks in Front
         for(Block_t& block : screenLavaBlocks)
@@ -2816,6 +2849,8 @@ void UpdateGraphics(bool skipRepaint)
             }
 //            }
         }
+
+        XRender::setDrawPlane(PLANE_LVL_EFF_NORM);
 
 // effects on top
         For(A, 1, numEffects)
@@ -2848,6 +2883,8 @@ void UpdateGraphics(bool skipRepaint)
 //        Next A
         }
 
+        XRender::setDrawPlane(PLANE_LVL_INFO);
+
         // NPCs warnings
         for(size_t i = 0; i < NPC_Draw_Queue_p.Warning_n; i++)
         {
@@ -2879,23 +2916,6 @@ void UpdateGraphics(bool skipRepaint)
 
             lunaRender(Z);
 
-#ifdef THEXTECH_BUILD_GL_MODERN
-            if(SectionParticlesFG[S])
-                XRender::renderParticleSystem(**SectionParticlesFG[S], vScreen[Z].X, vScreen[Z].Y);
-
-            if(SectionEffect[S])
-                XRender::renderTextureScale(0, 0, vScreen[Z].Width, vScreen[Z].Height, **SectionEffect[S]);
-#endif
-
-            XRender::splitFrame();
-
-            // Always draw for single-player
-            // And don't draw when many players at the same screen
-            if(numPlayers == 1 || numScreens != 1)
-                g_levelVScreenFader[Z].draw(false);
-
-            XRender::splitFrame();
-
             // debug code to show logical screens
             if(g_CheatLogicScreen && !screen.is_canonical())
             {
@@ -2916,10 +2936,6 @@ void UpdateGraphics(bool skipRepaint)
                     SuperPrint(std::to_string(c_vscreen_Z), 1, vScreen[Z].X - c_vscreen.X + 4, vScreen[Z].Y - c_vscreen.Y + 4);
                 }
             }
-
-#ifdef __3DS__
-        XRender::setTargetLayer(3);
-#endif
 
     //    'Interface
     //            B = 0
@@ -2960,6 +2976,24 @@ void UpdateGraphics(bool skipRepaint)
                     }
                 }
 
+            XRender::setDrawPlane(PLANE_LVL_SECTION_FG);
+
+#ifdef THEXTECH_BUILD_GL_MODERN
+            if(SectionParticlesFG[S])
+                XRender::renderParticleSystem(**SectionParticlesFG[S], vScreen[Z].X, vScreen[Z].Y);
+
+            if(SectionEffect[S])
+                XRender::renderTextureScale(0, 0, vScreen[Z].Width, vScreen[Z].Height, **SectionEffect[S]);
+#endif
+
+            XRender::splitFrame();
+
+#ifdef __3DS__
+        XRender::setTargetLayer(3);
+#endif
+
+                XRender::setDrawPlane(PLANE_LVL_HUD);
+
     //                DrawInterface Z, numScreens
                 if(ShowOnScreenHUD && !gSMBXHUDSettings.skip)
                 {
@@ -2968,6 +3002,8 @@ void UpdateGraphics(bool skipRepaint)
 #endif
                     DrawInterface(Z, numScreens);
                 }
+
+                XRender::setDrawPlane(PLANE_LVL_HUD + 1);
 
                 // Display NPCs that got dropped from the container
                 for(size_t i = 0; i < NPC_Draw_Queue_p.Dropped_n; i++)
@@ -2980,14 +3016,24 @@ void UpdateGraphics(bool skipRepaint)
                         XRender::renderTexture(vScreen[Z].X + NPC[A].Location.X + NPCFrameOffsetX[NPC[A].Type] - NPCWidthGFX[NPC[A].Type] / 2.0 + NPC[A].Location.Width / 2.0, vScreen[Z].Y + NPC[A].Location.Y + NPCFrameOffsetY[NPC[A].Type] - NPCHeightGFX[NPC[A].Type] + NPC[A].Location.Height, NPCWidthGFX[NPC[A].Type], NPCHeightGFX[NPC[A].Type], GFXNPC[NPC[A].Type], 0, NPC[A].Frame * NPCHeightGFX[NPC[A].Type]);
                 }
             }
+
+            XRender::setDrawPlane(PLANE_LVL_META);
+
+            // Always draw for single-player
+            // And don't draw when many players at the same screen
+            if(numPlayers == 1 || numScreens != 1)
+                g_levelVScreenFader[Z].draw(false);
         }
 
 //        If LevelEditor = True Or MagicHand = True Then
         if((LevelEditor || MagicHand))
         {
             // editor code now located in `gfx_editor.cpp`
+            XRender::setDrawPlane(PLANE_LVL_INFO);
             DrawEditorLevel(Z);
         }
+
+        XRender::setDrawPlane(PLANE_LVL_META);
 
         XRender::offsetViewportIgnore(true);
         if(screen.Type == 5 && numScreens == 1)
@@ -3034,13 +3080,15 @@ void UpdateGraphics(bool skipRepaint)
     XRender::resetViewport();
     XRender::offsetViewportIgnore(true);
 
+    XRender::setDrawPlane(PLANE_GAME_MENUS);
+
     if(GameMenu && !GameOutro)
         mainMenuDraw();
 
     if(GameOutro)
         DrawCredits();
 
-    g_levelScreenFader.draw();
+    XRender::setDrawPlane(PLANE_GAME_META);
 
     // 1P controls indicator
     if(screen.Type != 5 && numScreens == 1)
@@ -3072,38 +3120,7 @@ void UpdateGraphics(bool skipRepaint)
     speedRun_renderTimer();
 
     if(PrintFPS > 0 && ShowFPS)
-    {
         SuperPrint(fmt::format_ne("{0}", int(PrintFPS)), 1, 8, 8, {0, 255, 0});
-
-#if 0 // deprecated profiling info
-        for(int i = 0; i < 2; i++)
-        {
-            int val = (i == 0 ? g_microStats.view_total : g_microStats.view_slow_frame_time);
-
-            int x = val < 95 ? 36 : val < 995 ? 18 : 0;
-            int y = 24 + i * 16;
-
-            float r, g, a;
-            if(val < 500)
-            {
-                r = 0.0f; g = 1.0f; a = 0.25f;
-            }
-            else if(val < 1000)
-            {
-                r = 1.0f; g = 1.0f; a = 0.5f;
-            }
-            else
-            {
-                r = 1.0f; g = 0.0f; a = 1.0f;
-            }
-
-            std::string display = (i == 0
-                ? fmt::sprintf_ne("%d%%", (val + 5) / 10)
-                : fmt::sprintf_ne("%d%% (max)", (val + 5) / 10));
-            SuperPrint(display, 3, x, y, r, g, 0.f, a);
-        }
-#endif
-    }
 
     g_stats.print();
 
@@ -3125,10 +3142,19 @@ void UpdateGraphics(bool skipRepaint)
         }
     }
 
+    DrawDeviceBattery();
+
+    // TODO: don't rely on this behavior during level test, maybe just don't draw vScreen at all
+    // draw screen fader below level menu when game is paused
+    if(GamePaused != PauseCode::None)
+        XRender::setDrawPlane(PLANE_GAME_MENUS);
+
+    g_levelScreenFader.draw();
+
+    XRender::setDrawPlane(PLANE_GAME_MENUS);
+
     if(LevelEditor || MagicHand)
         DrawEditorLevel_UI();
-
-    DrawDeviceBattery();
 
     // render special screens
     if(GamePaused == PauseCode::PauseScreen)

@@ -35,6 +35,8 @@
 
 #include <SDL2/SDL_render.h>
 
+#include "core/render_planes.h"
+
 #include "core/opengl/gl_geom.h"
 
 #include "core/base/render_base.h"
@@ -345,8 +347,8 @@ private:
 
     // OpenGL state
 
-    // depth of most recent draw (reset per frame)
-    GLshort m_cur_depth = 0;
+    // depth of most recent draw in each plane (reset per frame)
+    RenderPlanes_t m_render_planes;
 
     // tick for current frame
     uint64_t m_current_frame = 0;
@@ -693,6 +695,13 @@ public:
      * \brief Set render target into the real window or screen (use to render on-screen buttons and other meta-info)
      */
     void setTargetScreen() override;
+
+    /*!
+     * \brief Sets draw plane for subsequent draws.
+     *
+     * \param plane Which draw plane should be used.
+     */
+    void setDrawPlane(uint8_t plane) override;
 
     void loadTextureInternal(StdPicture &target,
                      uint32_t width,

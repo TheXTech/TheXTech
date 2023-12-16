@@ -138,7 +138,7 @@ void RenderGL::framebufferCopy(BufferIndex_t dest, BufferIndex_t source, RectSiz
         draw_source -= m_viewport.xy;
 
         std::array<Vertex_t, 4> copy_triangle_strip =
-            genTriangleStrip(draw_loc, draw_source, m_cur_depth, {255, 255, 255, 255});
+            genTriangleStrip(draw_loc, draw_source, 0x7FFF, {255, 255, 255, 255});
 
         // fill vertex buffer to GL state and execute draw call
 
@@ -570,7 +570,7 @@ void RenderGL::calculateLighting()
     draw_loc -= m_viewport.xy;
 
     std::array<Vertex_t, 4> lighting_triangle_strip =
-        genTriangleStrip(draw_loc, draw_source, m_cur_depth, {255, 255, 255, 255});
+        genTriangleStrip(draw_loc, draw_source, 0x7FFF, {255, 255, 255, 255});
 
     // fill vertex buffer to GL state and execute draw call
 
