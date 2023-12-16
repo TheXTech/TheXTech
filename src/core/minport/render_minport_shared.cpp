@@ -411,6 +411,25 @@ inline void minport_RenderTexturePrivate_2(int16_t xDst, int16_t yDst, int16_t w
     if(wDst <= 0 || hDst <= 0)
         return;
 
+    // don't go past texture bounds!
+    if(xSrc + wSrc > tx.w)
+    {
+        if(xSrc >= tx.w)
+            return;
+
+        wDst += tx.w - (xSrc + wSrc);
+        wSrc = tx.w - xSrc;
+    }
+
+    if(ySrc + hSrc > tx.h)
+    {
+        if(ySrc >= tx.h)
+            return;
+
+        hDst += tx.h - (ySrc + hSrc);
+        hSrc = tx.h - ySrc;
+    }
+
     minport_RenderTexturePrivate(xDst, yDst, wDst, hDst,
                              tx,
                              xSrc, ySrc, wSrc, hSrc,
