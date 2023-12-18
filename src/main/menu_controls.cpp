@@ -272,7 +272,7 @@ int menuControls_Mouse_Render(bool mouse, bool render)
         if(top_line < 0)
             top_line = 0;
 
-        SuperPrintScreenCenter(g_gameStrings.connectTestControls, 3, sY+(top_line)*line);
+        SuperPrintScreenCenter(g_gameStrings.connectTestProfile, 3, sY+(top_line)*line);
 
         size_t p = s_changingProfilePlayer;
         if(!Controls::g_InputMethods[p])

@@ -55,7 +55,7 @@ struct GameContent
 
     std::string connectPressAButton;
 
-    std::string connectTestControls;
+    std::string connectTestProfile;
     std::string connectHoldStart;
     std::string connectDisconnect;
 

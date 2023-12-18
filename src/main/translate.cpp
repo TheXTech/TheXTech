@@ -437,7 +437,7 @@ XTechTranslate::XTechTranslate()
 
         {"game.connect.phrasePressAButton",        &g_gameStrings.connectPressAButton},
 
-        {"game.connect.phraseTestControls",        &g_gameStrings.connectTestControls},
+        {"game.connect.phraseTestProfile",        &g_gameStrings.connectTestProfile},
         {"game.connect.phraseHoldStart",           &g_gameStrings.connectHoldStart},
         {"game.connect.wordDisconnect",            &g_gameStrings.connectDisconnect},
 
