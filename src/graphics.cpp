@@ -285,17 +285,20 @@ void GetvScreenAverage3(vScreen_t& vscreen)
 
     const Location_t& section = level[section_idx];
 
-    vscreen.X = -(l + r) / 2 + (screen.W * 0.5);
-    vscreen.Y = vscreen.Y / (plr_count + 1) + (screen.H * 0.5) - vScreenYOffset;
+    double use_width  = SDL_min(static_cast<double>(screen.W), section.Width  - section.X);
+    double use_height = SDL_min(static_cast<double>(screen.H), section.Height - section.Y);
+
+    vscreen.X = -(l + r) / 2 + (use_width * 0.5);
+    vscreen.Y = vscreen.Y / (plr_count + 1) + (use_height * 0.5) - vScreenYOffset;
 
     if(-vscreen.X < section.X)
         vscreen.X = -section.X;
-    if(-vscreen.X + screen.W > section.Width)
-        vscreen.X = -(section.Width - screen.W);
+    if(-vscreen.X + use_width > section.Width)
+        vscreen.X = -(section.Width - use_width);
     if(-vscreen.Y < section.Y)
         vscreen.Y = -section.Y;
-    if(-vscreen.Y + screen.H > section.Height)
-        vscreen.Y = -(section.Height - screen.H);
+    if(-vscreen.Y + use_height > section.Height)
+        vscreen.Y = -(section.Height - use_height);
 }
 
 // NEW: update a vScreen with the correct procedure based on its screen's Type and DType
