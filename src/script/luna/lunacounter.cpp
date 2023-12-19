@@ -372,9 +372,13 @@ void DeathCounter::Draw(int screenZ)
     XRender::offsetViewportIgnore(true);
 
     const vScreen_t& vscreen = vScreen[screenZ];
+    const Screen_t& screen = Screens[vscreen.screen_ref];
+
+    // HUD is very wide in >2P shared screen
+    bool wide_hud = (screen.Type == ScreenTypes::SharedScreen && screen.player_count > 2);
 
     // With normal res, print to screen in upper left
-    if(vscreen.Width >= 800)
+    if(vscreen.Width >= 800 && !wide_hud)
     {
         int title_X   = 123 - m_print.titlePixLen / 2;
         int counter_X = 123 - m_print.counterPixLen / 2;
