@@ -72,7 +72,7 @@
             "promptEventName": "事件名称：",
             "promptEventText": "文字信息：",
             "props": {
-                "autostart": "进入关卡时启动",
+                "autostart": "进入关卡时执行事件",
                 "controls": "按键",
                 "endGame": "游戏通关",
                 "sound": "音效",
@@ -350,8 +350,8 @@
             "phrasePlayerDisconnected": "玩家{0}未连接任何设备"
         },
         "error": {
-            "errorInvalidEnterWarp": "========= 发生错误! =========\n\n作为关卡起点的传送点{1}号不存在，因此无法启动关卡。\n传送点总数：{2}\n\n文件：{0}",
-            "errorNoStartPoint": "========= 发生错误! =========\n\n未放置玩家起点或传送点入口，因此无法启动关卡。\n\n文件：{0}",
+            "errorInvalidEnterWarp": "========= 发生错误! =========\n\n作为关卡起点的传送点{1}号不存在，因此无法进入关卡。\n传送点总数：{2}\n\n文件：{0}",
+            "errorNoStartPoint": "========= 发生错误! =========\n\n未放置玩家起点或传送点入口，因此无法进入关卡。\n\n文件：{0}",
             "openFileFailed": "错误：无法打开文件\"{0}\"：文件不存在或已损坏。",
             "warpNeedStarCount": "你需要{0}{2}{1}才能进入此传送点。"
         },
@@ -372,7 +372,7 @@
     "menu": {
         "abbrevMilliseconds": "毫秒",
         "battle": {
-            "errorNoLevels": "对战关卡列表为空，无法启动对战模式。"
+            "errorNoLevels": "对战关卡列表为空，无法进入对战模式。"
         },
         "caseNone": "<无>",
         "character": {
@@ -541,8 +541,8 @@
             "wordProfiles": "配置"
         },
         "editor": {
-            "errorMissingResources": "抱歉，需要{0}，即编辑器图标文件，才能启动编辑器。",
-            "errorResolution": "抱歉，在当前设置的分辨率下，无法启动编辑器。",
+            "errorMissingResources": "抱歉，需要文件：{0}，才能进入编辑器。",
+            "errorResolution": "抱歉，在当前设置的分辨率下，无法进入编辑器。",
             "newWorld": "<新地图>",
             "promptNewWorldName": "新地图名称"
         },
