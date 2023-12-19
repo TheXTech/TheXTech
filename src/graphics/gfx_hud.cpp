@@ -252,7 +252,7 @@ void DrawInterface(int Z, int numScreens)
 
             XRender::renderTexture(vScreen[Z].Width / 2.0 - GFX.BMVs.w / 2, -96 + vScreen[Z].Height / 2.0 - GFX.BMVs.h / 2, GFX.BMVs);
             XRender::renderTexture(-50 + vScreen[Z].Width / 2.0 - P1_charname.w, -96 + vScreen[Z].Height / 2.0 - P1_charname.h / 2, P1_charname);
-            XRender::renderTexture(50 + vScreen[Z].Width / 2.0, -96 + vScreen[Z].Height / 2.0 - P2_charname.h / 2, P1_charname);
+            XRender::renderTexture(50 + vScreen[Z].Width / 2.0, -96 + vScreen[Z].Height / 2.0 - P2_charname.h / 2, P2_charname);
         }
     }
 

@@ -264,17 +264,17 @@ struct QuadI
         auto sina = sin(angle);
 
         QuadI ret;
-        ret.tl.x = tl.x *  cosa + tl.y * sina;
-        ret.tl.y = tl.x * -sina + tl.y * cosa;
+        ret.tl.x = round(tl.x *  cosa + tl.y * sina);
+        ret.tl.y = round(tl.x * -sina + tl.y * cosa);
 
-        ret.tr.x = tr.x *  cosa + tr.y * sina;
-        ret.tr.y = tr.x * -sina + tr.y * cosa;
+        ret.tr.x = round(tr.x *  cosa + tr.y * sina);
+        ret.tr.y = round(tr.x * -sina + tr.y * cosa);
 
-        ret.bl.x = bl.x *  cosa + bl.y * sina;
-        ret.bl.y = bl.x * -sina + bl.y * cosa;
+        ret.bl.x = round(bl.x *  cosa + bl.y * sina);
+        ret.bl.y = round(bl.x * -sina + bl.y * cosa);
 
-        ret.br.x = br.x *  cosa + br.y * sina;
-        ret.br.y = br.x * -sina + br.y * cosa;
+        ret.br.x = round(br.x *  cosa + br.y * sina);
+        ret.br.y = round(br.x * -sina + br.y * cosa);
 
         return ret;
     }
