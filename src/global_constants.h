@@ -85,7 +85,7 @@ const int maxYoshiGfx = 10;
 const int c_max_track_medals = 8;
 const int c_max_track_stars = 255;
 
-const int maxLocalPlayers = 2;
+const int maxLocalPlayers = 4;
 
 // was previously changed to 10000; now only used for certain NPC bounds checking.
 // returned to 8000.
