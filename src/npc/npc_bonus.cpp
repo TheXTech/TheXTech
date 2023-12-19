@@ -76,7 +76,6 @@ inline void RumbleForPowerup(int A)
 
 void DropBonus(int A)
 {
-    // TODO: refactor, update to support new screen types
     const Player_t& plr = Player[A];
 
     // does player not have a bonus?
