@@ -209,6 +209,7 @@ void UpdatePlayer()
 
             const Screen_t& screen = ScreenByPlayer(A);
             bool dynamic_screen = (screen.Type == ScreenTypes::Dynamic);
+            bool shared_screen = (screen.Type == ScreenTypes::SharedScreen);
             bool always_split = (screen.active_end() - screen.active_begin() > 1);
             bool split_screen = dynamic_screen || always_split; // was previously ScreenType == 5 (dynamic_screen)
 
@@ -234,7 +235,7 @@ void UpdatePlayer()
 
                 if(B > 0) // Move camera to the other living players
                 {
-                    if(split_screen)
+                    if(split_screen || shared_screen)
                     {
                         A1 = (Player[B].Location.X + Player[B].Location.Width * 0.5) - (Player[A].Location.X + Player[A].Location.Width * 0.5);
                         B1 = Player[B].Location.Y - Player[A].Location.Y;
