@@ -23,6 +23,7 @@
 #include "globals.h"
 #include "player.h"
 #include "gfx.h"
+#include "graphics.h"
 
 bool worldHasFrameAssets()
 {
@@ -198,6 +199,8 @@ void DrawPlayerWorld(Player_t& p, int X, int Y)
         if(p.Direction == 1)
             p.YoshiWingsFrame += 2;
     }
+
+    DrawPlayer(p, 0);
 }
 
 void DrawWorldMapFrame(const vScreen_t& vscreen)
