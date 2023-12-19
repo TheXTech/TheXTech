@@ -1243,6 +1243,13 @@ static void fourShared()
     }
 }
 
+static void fourSplit()
+{
+    fourShared();
+    Screens[0].multiplayer_pref = MultiplayerPrefs::Split;
+    SetupScreens();
+}
+
 static void warioTime()
 {
     Location_t tempLocation;
@@ -2146,6 +2153,7 @@ static const CheatCodeDefault_t s_cheatsListWorldDefault[] =
     {"imtiredofallthiswalking", moonWalk, true}, {"moonwalk", moonWalk, true}, {"skywalk", moonWalk, true},
     {"illparkwhereiwant", illParkWhereIWant, true}, {"parkinglot", illParkWhereIWant, true},
     {"4shared", fourShared, true},
+    {"4split", fourSplit, true},
     {"opensesame", openSesame, true},
     {nullptr, nullptr, false}
 };
@@ -2198,6 +2206,7 @@ static const CheatCodeDefault_t s_cheatsListLevelDefault[] =
     {"1player", onePlayer, true},
     {"2player", twoPlayer, true},
     {"4shared", fourShared, true},
+    {"4split", fourSplit, true},
 
     {"wariotime", warioTime, true},
     {"carkeys", carKeys, true},
