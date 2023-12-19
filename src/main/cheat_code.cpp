@@ -1160,6 +1160,7 @@ static void twoPlayer()
 
         SingleCoop = 0;
         g_ClonedPlayerMode = false;
+        Screens[0].multiplayer_pref = MultiplayerPrefs::Dynamic;
         SetupScreens();
 
         if(Player[B].Effect == 9)
@@ -1174,31 +1175,67 @@ static void twoPlayer()
                 Player[C].Location.SpeedY = dRand() * -12;
             }
 
-            if(C == 1)
+            Player[C].Character = C;
+            if(Player[C].Mount <= 1)
             {
-                Player[C].Character = 1;
-                if(Player[C].Mount <= 1)
-                {
-                    Player[C].Location.Y += Player[C].Location.Height;
-                    Player[C].Location.Height = Physics.PlayerHeight[Player[C].Character][Player[C].State];
-                    if(Player[C].Mount == 1 && Player[C].State == 1)
-                        Player[C].Location.Height = Physics.PlayerHeight[1][2];
-                    Player[C].Location.Y += -Player[C].Location.Height;
-                    Player[C].StandUp = true;
-                }
+                Player[C].Location.Y += Player[C].Location.Height;
+                Player[C].Location.Height = Physics.PlayerHeight[Player[C].Character][Player[C].State];
+                if(Player[C].Mount == 1 && Player[C].State == 1)
+                    Player[C].Location.Height = Physics.PlayerHeight[1][2];
+                Player[C].Location.Y += -Player[C].Location.Height;
+                Player[C].StandUp = true;
             }
-            else
+        }
+
+        Bomb(Player[B].Location, iRand(2) + 2);
+    }
+}
+
+static void fourShared()
+{
+    int B = CheckLiving();
+    if(B > 0)
+    {
+        numPlayers = 4;
+
+        // setup so there are exactly two controller slots,
+        // activate quick-reconnect if needed
+        while(Controls::g_InputMethods.size() > 4)
+        {
+            Controls::DeleteInputMethodSlot(4);
+        }
+        while(Controls::g_InputMethods.size() < 4)
+        {
+            Controls::g_InputMethods.push_back(nullptr);
+            QuickReconnectScreen::g_active = true;
+        }
+
+        SingleCoop = 0;
+        g_ClonedPlayerMode = false;
+        Screens[0].multiplayer_pref = MultiplayerPrefs::Shared;
+        SetupScreens();
+
+        if(Player[B].Effect == 9)
+            Player[B].Effect = 0;
+
+        Player[B].Immune = 1;
+        for(int C = 1; C <= numPlayers; C++)
+        {
+            if(C != B)
             {
-                Player[C].Character = 2;
-                if(Player[C].Mount <= 1)
-                {
-                    Player[C].Location.Y += Player[C].Location.Height;
-                    Player[C].Location.Height = Physics.PlayerHeight[Player[C].Character][Player[C].State];
-                    if(Player[C].Mount == 1 && Player[C].State == 1)
-                        Player[C].Location.Height = Physics.PlayerHeight[1][2];
-                    Player[C].Location.Y += -Player[C].Location.Height;
-                    Player[C].StandUp = true;
-                }
+                Player[C] = Player[B];
+                Player[C].Location.SpeedY = dRand() * -12;
+            }
+
+            Player[C].Character = C;
+            if(Player[C].Mount <= 1)
+            {
+                Player[C].Location.Y += Player[C].Location.Height;
+                Player[C].Location.Height = Physics.PlayerHeight[Player[C].Character][Player[C].State];
+                if(Player[C].Mount == 1 && Player[C].State == 1)
+                    Player[C].Location.Height = Physics.PlayerHeight[1][2];
+                Player[C].Location.Y += -Player[C].Location.Height;
+                Player[C].StandUp = true;
             }
         }
 
@@ -2108,6 +2145,7 @@ static const CheatCodeDefault_t s_cheatsListWorldDefault[] =
 {
     {"imtiredofallthiswalking", moonWalk, true}, {"moonwalk", moonWalk, true}, {"skywalk", moonWalk, true},
     {"illparkwhereiwant", illParkWhereIWant, true}, {"parkinglot", illParkWhereIWant, true},
+    {"4shared", fourShared, true},
     {"opensesame", openSesame, true},
     {nullptr, nullptr, false}
 };
@@ -2159,6 +2197,7 @@ static const CheatCodeDefault_t s_cheatsListLevelDefault[] =
     {"supermario2", superbDemo2, true},
     {"1player", onePlayer, true},
     {"2player", twoPlayer, true},
+    {"4shared", fourShared, true},
 
     {"wariotime", warioTime, true},
     {"carkeys", carKeys, true},

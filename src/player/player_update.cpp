@@ -209,6 +209,7 @@ void UpdatePlayer()
 
             const Screen_t& screen = ScreenByPlayer(A);
             bool dynamic_screen = (screen.Type == ScreenTypes::Dynamic);
+            bool shared_screen = (screen.Type == ScreenTypes::SharedScreen);
             bool always_split = (screen.active_end() - screen.active_begin() > 1);
             bool split_screen = dynamic_screen || always_split; // was previously ScreenType == 5 (dynamic_screen)
 
@@ -234,7 +235,7 @@ void UpdatePlayer()
 
                 if(B > 0) // Move camera to the other living players
                 {
-                    if(split_screen)
+                    if(split_screen || shared_screen)
                     {
                         A1 = (Player[B].Location.X + Player[B].Location.Width * 0.5) - (Player[A].Location.X + Player[A].Location.Width * 0.5);
                         B1 = Player[B].Location.Y - Player[A].Location.Y;
@@ -287,13 +288,17 @@ void UpdatePlayer()
         }
         else if(Player[A].Dead)
         {
-            // actually strictly better than the below code, should always be used except for compatibility concerns
+            // safer than the below code, should always be used except for compatibility concerns
             if(numPlayers > 2)
             {
                 B = CheckLiving();
-                Player[A].Location.X = Player[B].Location.X;
-                Player[A].Location.Y = Player[B].Location.Y;
-                Player[A].Section = Player[B].Section;
+
+                if(B)
+                {
+                    Player[A].Location.X = Player[B].Location.X;
+                    Player[A].Location.Y = Player[B].Location.Y;
+                    Player[A].Section = Player[B].Section;
+                }
             }
             else
             {
@@ -2036,23 +2041,116 @@ void UpdatePlayer()
                 // level wrap
                 if(LevelWrap[Player[A].Section] || LevelVWrap[Player[A].Section])
                 {
+                    const Screen_t& screen = ScreenByPlayer(A);
+                    vScreen_t& vscreen = vScreenByPlayer(A);
+                    Location_t& pLoc = Player[A].Location;
+                    const Location_t& section = level[Player[A].Section];
+
+                    // track whether screen wrapped in each of the four ways
+                    bool did_wrap_lr = false;
+                    bool did_wrap_rl = false;
+                    bool did_wrap_tb = false;
+                    bool did_wrap_bt = false;
+
                     // horizontally
                     if(LevelWrap[Player[A].Section])
                     {
-                        if(Player[A].Location.X + Player[A].Location.Width < level[Player[A].Section].X)
-                            Player[A].Location.X = level[Player[A].Section].Width - 1;
-                        else if(Player[A].Location.X > level[Player[A].Section].Width)
-                            Player[A].Location.X = level[Player[A].Section].X - Player[A].Location.Width + 1;
+                        if(pLoc.X + pLoc.Width < section.X)
+                        {
+                            pLoc.X = section.Width - 1;
+
+                            if(vscreen.Width < section.Width - section.X)
+                                did_wrap_lr = true;
+                        }
+                        else if(pLoc.X > section.Width)
+                        {
+                            pLoc.X = section.X - pLoc.Width + 1;
+
+                            if(vscreen.Width < section.Width - section.X)
+                                did_wrap_rl = true;
+                        }
+
                         hBoundsHandled = true;
                     }
 
                     // vertically
                     if(LevelVWrap[Player[A].Section])
                     {
-                        if(Player[A].Location.Y + Player[A].Location.Height < level[Player[A].Section].Y)
-                            Player[A].Location.Y = level[Player[A].Section].Height - 1;
-                        else if(Player[A].Location.Y > level[Player[A].Section].Height)
-                            Player[A].Location.Y = level[Player[A].Section].Y - Player[A].Location.Height + 1;
+                        if(pLoc.Y + pLoc.Height < section.Y)
+                        {
+                            pLoc.Y = section.Height - 1;
+
+                            if(vscreen.Height < section.Height - section.Y)
+                                did_wrap_tb = true;
+                        }
+                        else if(pLoc.Y > section.Height)
+                        {
+                            pLoc.Y = section.Y - pLoc.Height + 1;
+
+                            if(vscreen.Height < section.Height - section.Y)
+                                did_wrap_bt = true;
+                        }
+                    }
+
+                    // shared screen: teleport other players to other side of section
+                    if(screen.Type == ScreenTypes::SharedScreen && (did_wrap_lr || did_wrap_rl || did_wrap_tb || did_wrap_bt))
+                    {
+                        double target_Y = pLoc.Y + ((Player[A].Mount != 2) ? pLoc.Height : 0);
+
+                        for(int i = 0; i < screen.player_count; i++)
+                        {
+                            int o_A = screen.players[i];
+
+                            if(o_A == A)
+                                continue;
+
+                            Player_t& o_p = Player[o_A];
+
+                            if(o_p.Dead)
+                                continue;
+
+                            // center on player that wrapped
+                            o_p.Location.X = pLoc.X + pLoc.Width / 2 - o_p.Location.Width / 2;
+                            o_p.Location.Y = target_Y - ((o_p.Mount != 2) ? o_p.Location.Height : 0);
+
+                            // make sure fully in section
+                            if(did_wrap_lr)
+                            {
+                                o_p.Location.X = section.Width - 1;
+                                if(o_p.Location.SpeedX > 0)
+                                    o_p.Location.SpeedX = 0;
+                            }
+
+                            if(did_wrap_rl)
+                            {
+                                o_p.Location.X = section.X - o_p.Location.Width + 1;
+                                if(o_p.Location.SpeedX < 0)
+                                    o_p.Location.SpeedX = 0;
+                            }
+
+                            if(did_wrap_tb)
+                                o_p.Location.Y = section.Height - 1;
+
+                            if(did_wrap_bt)
+                                o_p.Location.Y = section.Y - o_p.Location.Height + 1;
+
+                            // following effects only needed for living players
+                            if(o_p.TimeToLive != 0)
+                                continue;
+
+                            // remove from any pet's mouth that doesn't belong to this screen
+                            bool onscreen_pet = InOnscreenPet(o_A, screen);
+
+                            // disable collisions and remove from any offscreen pets
+                            if(!onscreen_pet)
+                            {
+                                RemoveFromPet(o_A);
+                                o_p.Effect = 6;
+                                o_p.Effect2 = o_p.Location.Y;
+                            }
+                        }
+
+                        GetvScreenAuto(vscreen);
                     }
                 }
 
@@ -2087,7 +2185,10 @@ void UpdatePlayer()
                     hBoundsHandled = true;
                 }
 
-                if(!hBoundsHandled && LevelMacro != LEVELMACRO_CARD_ROULETTE_EXIT && LevelMacro != LEVELMACRO_GOAL_TAPE_EXIT && !GameMenu)
+                if(LevelMacro == LEVELMACRO_CARD_ROULETTE_EXIT || LevelMacro == LEVELMACRO_GOAL_TAPE_EXIT || GameMenu)
+                    hBoundsHandled = true;
+
+                if(!hBoundsHandled)
                 {
                     // Check edge of levels
                     if(Player[A].Location.X < level[Player[A].Section].X)
@@ -4509,23 +4610,76 @@ void UpdatePlayer()
                 }
 
                 // Check edge of screen
-                if(!LevelWrap[Player[A].Section] && LevelMacro == LEVELMACRO_OFF)
-                {
-                    const Screen_t& screen = ScreenByPlayer(A);
+                const Screen_t& screen = ScreenByPlayer(A);
 
-                    if(screen.Type == 3)
+                // if(!LevelWrap[Player[A].Section] && LevelMacro == LEVELMACRO_OFF)
+                // This section is fully new logic
+                if(screen.Type == ScreenTypes::SharedScreen)
+                {
+                    Player_t& p = Player[A];
+                    const Location_t& section = level[p.Section];
+
+                    const vScreen_t& vscreen = vScreenByPlayer(A);
+
+
+                    // section for shared screen push
+                    bool check_left = true;
+                    bool check_right = true;
+
+                    bool vscreen_at_section_bound_left = -vscreen.X <= section.X + 8;
+                    bool vscreen_at_section_bound_right = -vscreen.X + vscreen.Width >= section.Width - 8;
+
+                    // normally, don't use the shared screen push at section boundaries
+                    if(vscreen_at_section_bound_left)
+                        check_left = false;
+
+                    if(vscreen_at_section_bound_right)
+                        check_right = false;
+
+                    // do use shared screen push if there's a different player at the other side of the screen
+                    for(int o_p_i = 1; o_p_i <= numPlayers; o_p_i++)
                     {
-                        if(Player[A].Location.X < -vScreen[1].X)
-                        {
-                            Player[A].Location.X = -vScreen[1].X + 1;
-                            Player[A].Location.SpeedX = 4;
-                        }
-                        else if(Player[A].Location.X > -vScreen[1].X + ScreenW/*frmMain.ScaleWidth*/ - Player[A].Location.Width)
-                        {
-                            Player[A].Location.X = -vScreen[1].X + ScreenW/*frmMain.ScaleWidth*/ - Player[A].Location.Width - 1;
-                            Player[A].Location.SpeedX = -4;
-                        }
+                        const Player_t& o_p = Player[o_p_i];
+
+                        if(o_p.Location.X <= -vscreen.X + 8 && !vscreen_at_section_bound_left)
+                            check_right = true;
+                        else if(o_p.Location.X + o_p.Location.Width >= -vscreen.X + vscreen.Width - 8 && !vscreen_at_section_bound_right)
+                            check_left = true;
                     }
+
+                    if(p.Location.X <= -vscreen.X + 8 && check_left)
+                    {
+                        if(p.Location.X <= -vscreen.X)
+                        {
+                            p.Location.X = -vscreen.X;
+                            p.Pinched.Left2 = 2;
+
+                            if(p.Location.SpeedX < 0)
+                                p.Location.SpeedX = 0;
+                        }
+
+                        if(p.Location.SpeedX >= 0 && p.Location.SpeedX < 1)
+                            p.Location.SpeedX = 1;
+                    }
+                    else if(p.Location.X + p.Location.Width >= -vscreen.X + vscreen.Width - 8 && check_right)
+                    {
+                        if(p.Location.X + p.Location.Width >= -vscreen.X + vscreen.Width)
+                        {
+                            p.Location.X = -vscreen.X + vscreen.Width - p.Location.Width;
+                            p.Pinched.Right4 = 2;
+
+                            if(p.Location.SpeedX > 0)
+                                p.Location.SpeedX = 0;
+                        }
+
+                        if(p.Location.SpeedX > -1 && p.Location.SpeedX <= 0)
+                            p.Location.SpeedX = -1;
+                    }
+
+
+                    // kill a player that falls offscreen
+                    if(p.Location.Y > -vscreen.Y + vscreen.Height + 64)
+                        PlayerDead(A);
                 }
 
                 if(Player[A].Location.Y > level[Player[A].Section].Height + 64)

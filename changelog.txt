@@ -7,6 +7,7 @@ Changelog for 1.3.7-dev
 -Save the number of medals / stars that exist in levels to speed up subsequent loads (@ds-sloth)
 -Fix thrower vertical position logic in split-screen, guarded by compat flag modern-npc-camera-logic (@ds-sloth)
 -Internal change: added draw plane system to track different object groups' scene depth (@ds-sloth)
+-Add cheat "4shared" to test HIGHLY EXPERIMENTAL 4-player shared screen mode (@ds-sloth)
 -Added "opensesame" world map cheat to unlock paths from level (@ds-sloth)
 -Added smooth path unlock animations at the world map (@ds-sloth)
 -Added full game and in-game editor support for world map sections that limit screen view (@ds-sloth)

@@ -4509,7 +4509,7 @@ void PowerUps(const int A)
     }
 }
 
-static void s_TriggerDoorEffects(const Location_t& loc)
+static void s_TriggerDoorEffects(const Location_t& loc, bool do_big_door = true)
 {
     for(Background_t& bgo : treeBackgroundQuery(loc, SORTMODE_ID))
     {
@@ -4521,7 +4521,7 @@ static void s_TriggerDoorEffects(const Location_t& loc)
                 NewEffect(EFFID_DOOR_DOUBLE_S3_OPEN, bgo.Location);
             else if(bgo.Type == 107)
                 NewEffect(EFFID_DOOR_SIDE_S3_OPEN, bgo.Location);
-            else if(bgo.Type == 141)
+            else if(do_big_door && bgo.Type == 141)
             {
                 Location_t bLoc = bgo.Location;
                 bLoc.X += bLoc.Width / 2.0;
@@ -4531,6 +4531,103 @@ static void s_TriggerDoorEffects(const Location_t& loc)
             }
         }
     }
+}
+
+// copied logic from checkWarp function
+// parameter release_at_warp determines whether NPC should be dropped at the warp entrance
+//   (set to false in new behavior where players are being teleported to warp)
+static void s_WarpReleaseItems(const Warp_t& warp, int A, bool backward, bool release_at_warp = true)
+{
+    Player_t& plr = Player[A];
+
+    int direction  = backward ? warp.Direction2 : warp.Direction;
+    auto &entrance = backward ? warp.Exit       : warp.Entrance;
+
+    if(warp.NoYoshi && plr.YoshiPlayer > 0)
+        YoshiSpit(A);
+
+    if(!warp.WarpNPC || (plr.Mount == 3 && (plr.YoshiNPC != 0 || plr.YoshiPlayer != 0) && warp.NoYoshi))
+    {
+        if(plr.HoldingNPC > 0)
+        {
+            if(NPC[plr.HoldingNPC].Type == NPCID_HEAVY_THROWER)
+                NPCHit(plr.HoldingNPC, 3, plr.HoldingNPC);
+        }
+
+        if((plr.Character == 3 && release_at_warp) ||
+          (plr.Character == 4 && warp.Effect == 1 && direction == 1 && release_at_warp))
+        {
+            NPC[plr.HoldingNPC].Location.Y = entrance.Y;
+
+            if(plr.HoldingNPC > 0)
+                treeNPCUpdate(plr.HoldingNPC);
+        }
+
+        plr.HoldingNPC = 0;
+
+        if(plr.YoshiNPC > 0)
+            YoshiSpit(A);
+    }
+
+    if(plr.HoldingNPC > 0)
+    {
+        if(NPC[plr.HoldingNPC].Type == NPCID_ICE_CUBE) // can't bring ice through warps
+        {
+            NPC[plr.HoldingNPC].HoldingPlayer = 0;
+            plr.HoldingNPC = 0;
+        }
+    }
+
+    plr.StandingOnNPC = 0;
+}
+
+// steal the mount from a player (because they just entered a no-mount warp)
+static void s_WarpStealMount(int A)
+{
+    Player_t& p = Player[A];
+    if(OwedMount[A] == 0 && p.Mount > 0 && p.Mount != 2)
+    {
+        OwedMount[A] = p.Mount;
+        OwedMountType[A] = p.MountType;
+    }
+    p.Mount = 0;
+    p.MountType = 0;
+    p.MountOffsetY = 0;
+    SizeCheck(Player[A]);
+    UpdateYoshiMusic();
+}
+
+// checks if player A is in the mouth of the pet of any player on the screen
+bool InOnscreenPet(int plr_A, const Screen_t& screen)
+{
+    const Player_t& p = Player[plr_A];
+
+    // in the mouth of any player's Pet?
+    if(p.Effect == 10)
+    {
+        // check it really is a player on this screen
+        for(int plr_i = 0; plr_i < screen.player_count; plr_i++)
+        {
+            int B = screen.players[plr_i];
+
+            if(p.Effect2 == B && Player[B].YoshiPlayer == plr_A)
+                return true;
+        }
+    }
+
+    return false;
+}
+
+// removes a player from a pet's mouth (so that their effect can be changed successfully)
+void RemoveFromPet(int plr_A)
+{
+    Player_t& p = Player[plr_A];
+
+    if(p.Effect == 10 && p.Effect2 > 0 && p.Effect2 <= numPlayers && Player[p.Effect2].YoshiPlayer == plr_A)
+        Player[p.Effect2].YoshiPlayer = 0;
+
+    // set to no-collide mode with the other player (but this will be changed at the calling code)
+    p.Effect = 9;
 }
 
 static inline bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool backward)
@@ -4683,45 +4780,8 @@ static inline bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool bac
         plr.CanFly2 = false;
         plr.RunCount = 0;
 
-        if(warp.NoYoshi && plr.YoshiPlayer > 0)
-        {
-            YoshiSpit(A);
-        }
+        s_WarpReleaseItems(warp, A, backward);
 
-        if(!warp.WarpNPC || (plr.Mount == 3 && (plr.YoshiNPC != 0 || plr.YoshiPlayer != 0) && warp.NoYoshi))
-        {
-            if(plr.HoldingNPC > 0)
-            {
-                if(NPC[plr.HoldingNPC].Type == NPCID_HEAVY_THROWER)
-                {
-                    NPCHit(plr.HoldingNPC, 3, plr.HoldingNPC);
-                }
-            }
-            if(plr.Character == 3 ||
-              (plr.Character == 4 && warp.Effect == 1 && direction == 1))
-            {
-                NPC[plr.HoldingNPC].Location.Y = entrance.Y;
-
-                if(plr.HoldingNPC > 0)
-                    treeNPCUpdate(plr.HoldingNPC);
-            }
-            plr.HoldingNPC = 0;
-            if(plr.YoshiNPC > 0)
-            {
-                YoshiSpit(A);
-            }
-        }
-
-        if(plr.HoldingNPC > 0)
-        {
-            if(NPC[plr.HoldingNPC].Type == NPCID_ICE_CUBE) // can't bring ice through warps
-            {
-                NPC[plr.HoldingNPC].HoldingPlayer = 0;
-                plr.HoldingNPC = 0;
-            }
-        }
-
-        plr.StandingOnNPC = 0;
         if(warp.Effect != 3) // Don't zero speed when passing a portal warp
         {
             plr.Location.SpeedX = 0;
@@ -4763,6 +4823,48 @@ static inline bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool bac
             plr.Location.Y = exit.Y + exit.Height - plr.Location.Height - 0.1;
             CheckSection(A);
             plr.WarpCD = (warp.Effect == 3) ? 10 : 50;
+
+            const Screen_t& screen = ScreenByPlayer(A);
+            bool is_shared_screen = (screen.Type == 3);
+            bool do_tele = is_shared_screen && !vScreenCollision(vScreenIdxByPlayer(A), exit);
+
+            // teleport other players using the instant/portal warp in shared screen mode
+            if(do_tele)
+            {
+                for(int plr_i = 0; plr_i < screen.player_count; plr_i++)
+                {
+                    int o_A = screen.players[plr_i];
+                    if(o_A == A)
+                        continue;
+
+                    Player_t& o_p = Player[o_A];
+
+                    // in the mouth of an onscreen player's Pet?
+                    bool in_onscreen_pet = !warp.NoYoshi && InOnscreenPet(o_A, screen);
+
+                    if(!o_p.Dead && o_p.TimeToLive == 0 && !in_onscreen_pet)
+                    {
+                        RemoveFromPet(o_A);
+
+                        o_p.Location.X = exit.X + exit.Width / 2.0 - plr.Location.Width / 2.0;
+                        o_p.Location.Y = exit.Y + exit.Height - plr.Location.Height - 0.1;
+                        CheckSection(o_A);
+
+                        if(warp.Effect != 3) // Don't zero speed when passing a portal warp
+                        {
+                            o_p.Location.SpeedX = 0;
+                            o_p.Location.SpeedY = 0;
+                        }
+
+                        o_p.WarpCD = (warp.Effect == 3) ? 10 : 50;
+
+                        // put other player in no-collide mode
+                        o_p.Effect = 9;
+                        o_p.Effect2 = A;
+                    }
+                }
+            }
+
             return true; // break
         }
         else if(warp.Effect == 1) // Pipe
@@ -5978,6 +6080,10 @@ void PlayerEffects(const int A)
         bool same_section = SectionCollision(p.Section, warp_exit);
         bool do_scroll = (warp.transitEffect == LevelDoor::TRANSIT_SCROLL) && same_section;
 
+        // teleport other players into warp in shared screen mode
+        const Screen_t& screen = ScreenByPlayer(A);
+        bool is_shared_screen = (screen.Type == 3);
+
         if(p.Effect2 == 0.0) // Entering pipe
         {
             double leftToGoal = 0.0;
@@ -6118,6 +6224,46 @@ void PlayerEffects(const int A)
                 p.Location.SpeedX = 0;
             }
 
+            // teleport other players into the pipe warp
+            if(Maths::iRound(leftToGoal) == 8)
+            {
+                bool do_tele = is_shared_screen && !vScreenCollision(vScreenIdxByPlayer(A), warp_exit);
+
+                if(do_tele)
+                {
+                    for(int plr_i = 0; plr_i < screen.player_count; plr_i++)
+                    {
+                        int o_A = screen.players[plr_i];
+                        if(o_A == A)
+                            continue;
+
+                        Player_t& o_p = Player[o_A];
+
+                        // in the mouth of an onscreen player's Pet?
+                        bool in_onscreen_pet = !warp.NoYoshi && InOnscreenPet(o_A, screen);
+
+                        bool status_match = (o_p.Effect == 3 && o_p.Warp == p.Warp && o_p.WarpBackward == p.WarpBackward);
+
+                        if(!o_p.Dead && o_p.TimeToLive == 0 && !in_onscreen_pet && !status_match)
+                        {
+                            RemoveFromPet(o_A);
+
+                            s_WarpReleaseItems(warp, o_A, p.WarpBackward, false);
+
+                            o_p.Warp = p.Warp;
+                            o_p.WarpBackward = p.WarpBackward;
+                            o_p.Effect = 3;
+                            // make other player behind so that this player will exit first
+                            o_p.Effect2 = 0;
+                            o_p.Location.X = warp_enter.X + warp_enter.Width / 2.0 - o_p.Location.Width / 2.0;
+                            o_p.Location.Y = warp_enter.Y + warp_enter.Height / 2.0 - o_p.Location.Height / 2.0;
+                            o_p.Location.SpeedX = 0.0;
+                            o_p.Location.SpeedY = 0.0;
+                        }
+                    }
+                }
+            }
+
             // D_pLogDebug("Warping: %g (same section? %s!)", leftToGoal, SectionCollision(p.Section, warp_exit) ? "yes" : "no");
 
             // must limit to the number of actual vScreens to avoid RangeArr out-of-bounds access
@@ -6176,17 +6322,8 @@ void PlayerEffects(const int A)
         {
             if(warp.NoYoshi)
             {
-                if(OwedMount[A] == 0 && p.Mount > 0 && p.Mount != 2)
-                {
-                    OwedMount[A] = p.Mount;
-                    OwedMountType[A] = p.MountType;
-                }
-                UnDuck(Player[A]);
-                p.Mount = 0;
-                p.MountType = 0;
-                p.MountOffsetY = 0;
-                SizeCheck(Player[A]);
-                UpdateYoshiMusic();
+                UnDuck(p);
+                s_WarpStealMount(A);
             }
 
             if(warp_dir_exit == 1)
@@ -6290,6 +6427,55 @@ void PlayerEffects(const int A)
                 CheckSectionNPC(p.HoldingNPC);
             }
 
+            // set any other players warping to the same pipe to this state (needed to avoid splitting a shared screen)
+            if(is_shared_screen)
+            {
+                for(int plr_i = 0; plr_i < screen.player_count; plr_i++)
+                {
+                    int o_A = screen.players[plr_i];
+                    if(A == o_A)
+                        continue;
+
+                    Player_t& o_p = Player[o_A];
+                    if(!o_p.Dead && o_p.TimeToLive == 0 && o_p.Effect == 3 && o_p.Effect2 == 0 && o_p.Warp == Player[A].Warp && o_p.WarpBackward == Player[A].WarpBackward)
+                    {
+                        o_p.Location.X = p.Location.X + p.Location.Width / 2.0 - o_p.Location.Width / 2.0;
+                        o_p.Location.Y = p.Location.Y + p.Location.Height - o_p.Location.Height;
+
+                        CheckSection(o_A);
+
+                        o_p.Effect = 3;
+                        o_p.Effect2 = 1;
+                    }
+                }
+            }
+
+            // delay based on number of players ahead of this one
+            if(is_shared_screen)
+            {
+                // number of players ahead of this one
+                int hit = 0;
+
+                for(int plr_i = 0; plr_i < screen.player_count; plr_i++)
+                {
+                    int o_A = screen.players[plr_i];
+                    if(o_A == A)
+                        continue;
+
+                    Player_t& o_p = Player[o_A];
+                    if(!o_p.Dead && o_p.TimeToLive == 0 && o_p.Effect == 3 && o_p.Warp == p.Warp && o_p.WarpBackward == p.WarpBackward && o_p.Effect2 > 1 && (o_p.Effect2 < 128 || o_p.Effect2 >= 2000))
+                        hit += 1;
+                }
+
+                // put in new pipe holding state
+                if(hit)
+                {
+                    p.Effect = 3;
+                    p.Effect2 = 2010 + 100 * hit;
+                }
+            }
+
+            // many-player code
             if(g_ClonedPlayerMode)
             {
                 for(B = 1; B <= numPlayers; B++)
@@ -6375,6 +6561,17 @@ void PlayerEffects(const int A)
             {
                 p.Effect = 8;
                 p.Effect2 = 2970;
+            }
+        }
+        else if(p.Effect2 >= 2000) // NEW >2P holding state for pipe exit
+        {
+            p.Effect2 -= 1;
+
+            if(p.Effect2 <= 2000)
+            {
+                p.Effect2 = 2;
+                if(backward || !warp.cannonExit)
+                    PlaySound(SFX_Warp);
             }
         }
         else if(p.Effect2 > 128) // Scrolling between pipes
@@ -6492,6 +6689,10 @@ void PlayerEffects(const int A)
 
                 if(p.Mount == 0)
                     p.Frame = 15;
+
+                // make players less likely to collide chaotically out of UP exits
+                if(is_shared_screen || (numPlayers > 2 && !g_ClonedPlayerMode))
+                    p.StandUp2 = true;
             }
             else if(warp_dir_exit == LevelDoor::EXIT_LEFT)
             {
@@ -6754,6 +6955,44 @@ void PlayerEffects(const int A)
             }
         }
 
+        // teleport other players into door in shared screen mode
+        const Screen_t& screen = ScreenByPlayer(A);
+        bool is_shared_screen = (screen.Type == 3);
+        bool do_tele = is_shared_screen && !vScreenCollision(vScreenIdxByPlayer(A), warp_exit);
+        if(do_tele && fEqual(p.Effect2, 15))
+        {
+            for(int plr_i = 0; plr_i < screen.player_count; plr_i++)
+            {
+                int o_A = screen.players[plr_i];
+                if(o_A == A)
+                    continue;
+
+                Player_t& o_p = Player[o_A];
+
+                // in the mouth of an onscreen player's Pet?
+                bool in_onscreen_pet = !warp.NoYoshi && InOnscreenPet(o_A, screen);
+
+                bool status_match = (o_p.Effect == 7 && o_p.Warp == p.Warp && o_p.WarpBackward == p.WarpBackward);
+
+                if(!o_p.Dead && o_p.TimeToLive == 0 && !in_onscreen_pet && !status_match)
+                {
+                    RemoveFromPet(o_A);
+
+                    s_WarpReleaseItems(warp, o_A, p.WarpBackward, false);
+
+                    o_p.Warp = p.Warp;
+                    o_p.WarpBackward = p.WarpBackward;
+                    o_p.Effect = 7;
+                    // 1 frame behind so that this player will exit first
+                    o_p.Effect2 = 14;
+                    o_p.Location.X = warp_enter.X + warp_enter.Width / 2.0 - o_p.Location.Width / 2.0;
+                    o_p.Location.Y = warp_enter.Y + warp_enter.Height - o_p.Location.Height;
+                    o_p.Location.SpeedX = 0.0;
+                    o_p.Location.SpeedY = 0.0;
+                }
+            }
+        }
+
         // start the scroll effect
         if(do_scroll && fEqual(p.Effect2, 29))
         {
@@ -6795,22 +7034,42 @@ void PlayerEffects(const int A)
         {
             if(warp.NoYoshi)
             {
-                if(OwedMount[A] == 0 && p.Mount > 0 && p.Mount != 2)
-                {
-                    OwedMount[A] = p.Mount;
-                    OwedMountType[A] = p.MountType;
-                }
-
-                p.Mount = 0;
-                p.MountType = 0;
-                SizeCheck(Player[A]);
-                p.MountOffsetY = 0;
+                s_WarpStealMount(A);
                 p.Frame = 1;
-                UpdateYoshiMusic();
             }
 
             p.Location.X = warp_exit.X + warp_exit.Width / 2.0 - p.Location.Width / 2.0;
             p.Location.Y = warp_exit.Y + warp_exit.Height - p.Location.Height;
+
+            // set any other players warping to the same door into the door holding pattern (needed to avoid splitting a shared screen)
+            if(is_shared_screen)
+            {
+                for(int plr_i = 0; plr_i < screen.player_count; plr_i++)
+                {
+                    int o_A = screen.players[plr_i];
+                    if(A == o_A)
+                        continue;
+
+                    Player_t& o_p = Player[o_A];
+                    if(!o_p.Dead && o_p.TimeToLive == 0 && o_p.Effect == 7 && o_p.Warp == Player[A].Warp && o_p.WarpBackward == Player[A].WarpBackward)
+                    {
+                        o_p.Location.X = warp_exit.X + warp_exit.Width / 2.0 - o_p.Location.Width / 2.0;
+                        o_p.Location.Y = warp_exit.Y + warp_exit.Height - o_p.Location.Height;
+
+                        CheckSection(o_A);
+
+                        o_p.Effect = 8;
+                        o_p.Effect2 = 131;
+                        o_p.WarpCD = 40;
+
+                        if(warp.NoYoshi)
+                        {
+                            s_WarpStealMount(A);
+                            p.Frame = 1;
+                        }
+                    }
+                }
+            }
 
             int last_section = p.Section;
 
@@ -6947,12 +7206,15 @@ void PlayerEffects(const int A)
                 p.Effect2 = 0;
             }
         }
+        // door exit holding pattern (exit blocked)
         else if(fEqual(p.Effect2, 131))
         {
             tempBool = false;
             for(B = 1; B <= numPlayers; B++)
             {
-                if(B != A && CheckCollision(p.Location, Player[B].Location))
+                // Was previously only B != A. New conditions only apply in >2P
+                bool check_coll = B != A && !Player[B].Dead && (Player[B].Effect != 8 || B < A);
+                if(check_coll && CheckCollision(p.Location, Player[B].Location))
                     tempBool = true;
             }
 
@@ -6960,26 +7222,15 @@ void PlayerEffects(const int A)
             {
                 p.Effect2 = 130;
 
-                for(int c : treeBackgroundQuery(static_cast<Location_t>(Warp[p.Warp].Exit), SORTMODE_NONE))
-                {
-                    if(c > numBackground)
-                        continue;
+                const auto& warp_exit = p.WarpBackward ? Warp[p.Warp].Entrance : Warp[p.Warp].Exit;
 
-                    if(CheckCollision(Warp[p.Warp].Exit, Background[c].Location))
-                    {
-                        if(Background[c].Type == 88)
-                            NewEffect(EFFID_DOOR_S2_OPEN, Background[c].Location);
-                        else if(Background[c].Type == 87)
-                            NewEffect(EFFID_DOOR_DOUBLE_S3_OPEN, Background[c].Location);
-                        else if(Background[c].Type == 107)
-                            NewEffect(EFFID_DOOR_SIDE_S3_OPEN, Background[c].Location);
-                    }
-                }
+                s_TriggerDoorEffects(static_cast<Location_t>(warp_exit), false);
 
                 SoundPause[46] = 0;
                 PlaySound(SFX_Door);
             }
         }
+        // door exit wait
         else if(p.Effect2 <= 130)
         {
             p.Effect2 -= 1;
@@ -6989,6 +7240,7 @@ void PlayerEffects(const int A)
                 p.Effect2 = 0;
             }
         }
+        // 2P holding condition for start warp (pipe exit)
         else if(p.Effect2 <= 300)
         {
             p.Effect2 -= 1;
@@ -6998,52 +7250,47 @@ void PlayerEffects(const int A)
                 p.Effect = 3;
             }
         }
-        else if(p.Effect2 <= 1000) // Start Wait
+        else if(p.Effect2 <= 1000) // Start Wait for pipe
         {
             p.Effect2 -= 1;
             if(fEqual(p.Effect2, 900))
             {
                 p.Effect = 3;
                 p.Effect2 = 100;
-                if(A == 2)
+
+                // 2P holding condition for start warp
+                if(A == 2 && (g_ClonedPlayerMode || numPlayers <= 2))
                 {
                     p.Effect = 8;
                     p.Effect2 = 300;
                 }
+                // modern >2P holding condition for warp
+                else if(A >= 2 && !g_ClonedPlayerMode)
+                {
+                    p.Effect = 3;
+                    p.Effect2 = 2010 + 100 * (A - 1);
+                }
             }
         }
-        else if(p.Effect2 <= 2000) // Start Wait
+        else if(p.Effect2 <= 2000) // Start Wait for door
         {
             p.Effect2 -= 1;
 
             if(fEqual(p.Effect2, 1900))
             {
-                for(int c : treeBackgroundQuery(static_cast<Location_t>(Warp[p.Warp].Exit), SORTMODE_NONE))
-                {
-                    if(c > numBackground)
-                        continue;
-
-                    if(CheckCollision(Warp[p.Warp].Exit, Background[c].Location))
-                    {
-                        if(Background[c].Type == 88)
-                            NewEffect(EFFID_DOOR_S2_OPEN, Background[c].Location);
-                        else if(Background[c].Type == 87)
-                            NewEffect(EFFID_DOOR_DOUBLE_S3_OPEN, Background[c].Location);
-                        else if(Background[c].Type == 107)
-                            NewEffect(EFFID_DOOR_SIDE_S3_OPEN, Background[c].Location);
-                    }
-                }
+                s_TriggerDoorEffects(static_cast<Location_t>(Warp[p.Warp].Exit), false);
 
                 SoundPause[46] = 0;
-                PlaySound(SFX_Door);
                 p.Effect = 8;
                 p.Effect2 = 30;
 
-                if(A == 2)
+                if(A >= 2 && !g_ClonedPlayerMode)
                 {
                     p.Effect = 8;
                     p.Effect2 = 131;
                 }
+                else
+                    PlaySound(SFX_Door);
             }
         }
         else if(p.Effect2 <= 3000) // warp wait

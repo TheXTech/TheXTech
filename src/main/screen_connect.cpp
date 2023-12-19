@@ -1291,6 +1291,9 @@ int Mouse_Render(bool mouse, bool render)
     if(s_context == Context::DropAdd && g_gameInfo.disableTwoPlayer)
         n = 1;
 
+    if(n > 2 && (int)Controls::g_InputMethods.size() <= 2)
+        n = 2;
+
 
     // What is the first player that is not done?
     int menuPlayer = GetMenuPlayer();
@@ -1772,23 +1775,31 @@ int Logic()
             }
         }
     }
+
     // in 1-player mode, only allow a single player to connect
     if(s_context == Context::MainMenu && s_minPlayers == 1)
     {
         if((int)Controls::g_InputMethods.size() >= s_minPlayers)
             block_poll = true;
     }
+
+    int first_not_connected = std::find(Controls::g_InputMethods.begin(), Controls::g_InputMethods.end(), nullptr) - Controls::g_InputMethods.begin();
+
     // if the game has disabled 2-player mode, only allow a single player to connect
-    if(g_gameInfo.disableTwoPlayer && (int)Controls::g_InputMethods.size() == 1)
-    {
+    if(g_gameInfo.disableTwoPlayer && first_not_connected == 1)
         block_poll = true;
-    }
+
+    // only allow 2 players to connect for now
+    if(first_not_connected == 2 && Controls::g_InputMethods.size() <= 2)
+        block_poll = true;
+
     // block polling if a player is hitting random buttons
     for(int p = 0; p < maxLocalPlayers; p++)
     {
         if(s_playerState[p] == PlayerState::TestControls || s_playerState[p] == PlayerState::ConfirmProfile)
             block_poll = true;
     }
+
     if(!block_poll)
         Controls::PollInputMethod();
 

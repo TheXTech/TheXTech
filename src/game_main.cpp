@@ -755,6 +755,8 @@ int GameMain(const CmdLineSetup_t &setup)
             g_CheatLogicScreen = false;
             XRender::unloadGifTextures();
 
+            // reinitialize the screens (resets multiplayer preferences)
+            InitScreens();
             SetupScreens();
 
             BattleOutro = 0;
