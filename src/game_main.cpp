@@ -731,6 +731,8 @@ int GameMain(const CmdLineSetup_t &setup)
             g_ClonedPlayerMode = false;
             XRender::unloadGifTextures();
 
+            // reinitialize the screens (resets multiplayer preferences)
+            InitScreens();
             SetupScreens();
 
             BattleOutro = 0;
