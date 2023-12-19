@@ -287,13 +287,17 @@ void UpdatePlayer()
         }
         else if(Player[A].Dead)
         {
-            // actually strictly better than the below code, should always be used except for compatibility concerns
+            // safer than the below code, should always be used except for compatibility concerns
             if(numPlayers > 2)
             {
                 B = CheckLiving();
-                Player[A].Location.X = Player[B].Location.X;
-                Player[A].Location.Y = Player[B].Location.Y;
-                Player[A].Section = Player[B].Section;
+
+                if(B)
+                {
+                    Player[A].Location.X = Player[B].Location.X;
+                    Player[A].Location.Y = Player[B].Location.Y;
+                    Player[A].Section = Player[B].Section;
+                }
             }
             else
             {
