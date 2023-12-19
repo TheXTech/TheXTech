@@ -72,7 +72,7 @@
             "promptEventName": "事件名稱：",
             "promptEventText": "文字信息：",
             "props": {
-                "autostart": "進入關卡時啓動",
+                "autostart": "進入關卡時執行事件",
                 "controls": "按鍵",
                 "endGame": "遊戲通關",
                 "sound": "音效",
@@ -350,8 +350,8 @@
             "phrasePlayerDisconnected": "玩家{0}未連接任何設備"
         },
         "error": {
-            "errorInvalidEnterWarp": "========= 發生錯誤! =========\n\n作爲關卡起點的傳送點{1}號不存在，因此無法啓動關卡。\n傳送點總數：{2}\n\n檔案：{0}",
-            "errorNoStartPoint": "========= 發生錯誤! =========\n\n未放置玩家起點或傳送點入口，因此無法啓動關卡。\n\n檔案：{0}",
+            "errorInvalidEnterWarp": "========= 發生錯誤! =========\n\n作爲關卡起點的傳送點{1}號不存在，因此無法進入關卡。\n傳送點總數：{2}\n\n檔案：{0}",
+            "errorNoStartPoint": "========= 發生錯誤! =========\n\n未放置玩家起點或傳送點入口，因此無法進入關卡。\n\n檔案：{0}",
             "openFileFailed": "錯誤：無法打開檔案\"{0}\"：檔案不存在或已損壞。",
             "warpNeedStarCount": "你需要{0}{2}{1}才能進入此傳送點。"
         },
@@ -372,7 +372,7 @@
     "menu": {
         "abbrevMilliseconds": "毫秒",
         "battle": {
-            "errorNoLevels": "對戰關卡列表爲空，無法啓動對戰模式。"
+            "errorNoLevels": "對戰關卡列表爲空，無法進入對戰模式。"
         },
         "caseNone": "<無>",
         "character": {
@@ -541,8 +541,8 @@
             "wordProfiles": "配置"
         },
         "editor": {
-            "errorMissingResources": "抱歉，需要{0}，即編輯器圖示檔案，才能啓動編輯器。",
-            "errorResolution": "抱歉，在當前設置的分辨率下，無法啓動編輯器。",
+            "errorMissingResources": "抱歉，需要檔案：{0}，才能進入編輯器。",
+            "errorResolution": "抱歉，在當前設置的分辨率下，無法進入編輯器。",
             "newWorld": "<新地圖>",
             "promptNewWorldName": "新地圖名稱"
         },
