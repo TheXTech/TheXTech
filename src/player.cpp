@@ -4507,7 +4507,7 @@ void PowerUps(const int A)
     }
 }
 
-static void s_TriggerDoorEffects(const Location_t& loc)
+static void s_TriggerDoorEffects(const Location_t& loc, bool do_big_door = true)
 {
     for(Background_t& bgo : treeBackgroundQuery(loc, SORTMODE_ID))
     {
@@ -4519,7 +4519,7 @@ static void s_TriggerDoorEffects(const Location_t& loc)
                 NewEffect(EFFID_DOOR_DOUBLE_S3_OPEN, bgo.Location);
             else if(bgo.Type == 107)
                 NewEffect(EFFID_DOOR_SIDE_S3_OPEN, bgo.Location);
-            else if(bgo.Type == 141)
+            else if(do_big_door && bgo.Type == 141)
             {
                 Location_t bLoc = bgo.Location;
                 bLoc.X += bLoc.Width / 2.0;
@@ -6958,21 +6958,9 @@ void PlayerEffects(const int A)
             {
                 p.Effect2 = 130;
 
-                for(int c : treeBackgroundQuery(static_cast<Location_t>(Warp[p.Warp].Exit), SORTMODE_NONE))
-                {
-                    if(c > numBackground)
-                        continue;
+                const auto& warp_exit = p.WarpBackward ? Warp[p.Warp].Entrance : Warp[p.Warp].Exit;
 
-                    if(CheckCollision(Warp[p.Warp].Exit, Background[c].Location))
-                    {
-                        if(Background[c].Type == 88)
-                            NewEffect(EFFID_DOOR_S2_OPEN, Background[c].Location);
-                        else if(Background[c].Type == 87)
-                            NewEffect(EFFID_DOOR_DOUBLE_S3_OPEN, Background[c].Location);
-                        else if(Background[c].Type == 107)
-                            NewEffect(EFFID_DOOR_SIDE_S3_OPEN, Background[c].Location);
-                    }
-                }
+                s_TriggerDoorEffects(static_cast<Location_t>(warp_exit), false);
 
                 SoundPause[46] = 0;
                 PlaySound(SFX_Door);
@@ -7016,21 +7004,7 @@ void PlayerEffects(const int A)
 
             if(fEqual(p.Effect2, 1900))
             {
-                for(int c : treeBackgroundQuery(static_cast<Location_t>(Warp[p.Warp].Exit), SORTMODE_NONE))
-                {
-                    if(c > numBackground)
-                        continue;
-
-                    if(CheckCollision(Warp[p.Warp].Exit, Background[c].Location))
-                    {
-                        if(Background[c].Type == 88)
-                            NewEffect(EFFID_DOOR_S2_OPEN, Background[c].Location);
-                        else if(Background[c].Type == 87)
-                            NewEffect(EFFID_DOOR_DOUBLE_S3_OPEN, Background[c].Location);
-                        else if(Background[c].Type == 107)
-                            NewEffect(EFFID_DOOR_SIDE_S3_OPEN, Background[c].Location);
-                    }
-                }
+                s_TriggerDoorEffects(static_cast<Location_t>(Warp[p.Warp].Exit), false);
 
                 SoundPause[46] = 0;
                 PlaySound(SFX_Door);
