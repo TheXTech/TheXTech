@@ -187,7 +187,7 @@ void GameLoop()
 
         if(SwapCharAllowed())
         {
-            pLogDebug("Save drop/add characters configuration at GameLoop()");
+            pLogDebug("Save drop/add characters configuration at EndLevel");
             ConnectScreen::SaveChars();
         }
 

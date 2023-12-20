@@ -7954,7 +7954,7 @@ void SwapCharacter(int A, int Character, bool Die, bool FromBlock)
 // returns whether a player is allowed to swap characters
 bool SwapCharAllowed()
 {
-    if(LevelSelect || GameMenu || (IsEpisodeIntro && NoMap && GamePaused == PauseCode::DropAdd))
+    if(LevelSelect || GameMenu || (g_compatibility.allow_drop_add && InHub()))
         return true;
     else
         return false;
