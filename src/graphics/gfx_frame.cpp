@@ -275,7 +275,7 @@ void RenderFrameBorder(const Location_t& external, const Location_t& internal,
 
 // renders a new-style frame as a fill at the included internal location
 // the frame fills the internal rect
-void RenderFrameFill(const Location_t& internal, FrameBorder& frame)
+void RenderFrameFill(const Location_t& internal, FrameBorder& frame, XTColor color)
 {
 	FrameBorder& i = frame;
 
@@ -290,7 +290,8 @@ void RenderFrameFill(const Location_t& internal, FrameBorder& frame)
 	{
 		XRender::renderTexture(internal.X, internal.Y, i.li, i.ti,
 		    i.tex,
-		    i.le, i.te);
+		    i.le, i.te,
+		    color);
 	}
 	// top internal-center
 	if(i.ti && internal.Width - i.li - i.ri > 0)
@@ -300,14 +301,16 @@ void RenderFrameFill(const Location_t& internal, FrameBorder& frame)
 		    i.le + i.li, i.te,
 		    i.tex.w - i.le - i.li - i.ri - i.re,
 		    i.ti,
-		    0, 0);
+		    0, 0,
+		    color);
 	}
 	// top internal-right internal
 	if(i.ri && i.ti)
 	{
 		XRender::renderTexture(internal.X + internal.Width - i.ri, internal.Y, i.ri, i.ti,
 		    i.tex,
-		    i.tex.w - i.ri - i.re, i.te);
+		    i.tex.w - i.ri - i.re, i.te,
+		    color);
 	}
 	// center-left internal
 	if(i.li && internal.Height - i.ti - i.bi > 0)
@@ -317,7 +320,8 @@ void RenderFrameFill(const Location_t& internal, FrameBorder& frame)
 		    i.le, i.te + i.ti,
 		    i.li,
 		    i.tex.h - i.te - i.ti - i.bi - i.be,
-		    0, 0);
+		    0, 0,
+		    color);
 	}
 	// bottom internal-left internal
 	if(i.li && i.bi)
@@ -325,7 +329,8 @@ void RenderFrameFill(const Location_t& internal, FrameBorder& frame)
 		XRender::renderTexture(internal.X, internal.Y + internal.Height - i.bi, i.li, i.bi,
 		    i.tex,
 		    i.le,
-		    i.tex.h - i.bi - i.be);
+		    i.tex.h - i.bi - i.be,
+		    color);
 	}
 	// bottom internal-center
 	if(i.bi && internal.Width - i.li - i.ri > 0)
@@ -333,14 +338,16 @@ void RenderFrameFill(const Location_t& internal, FrameBorder& frame)
 		DrawTextureTiled(internal.X + i.li, internal.Y + internal.Height - i.bi, internal.Width - i.li - i.ri, i.bi,
 		    i.tex,
 		    i.le + i.li, i.tex.h - i.be - i.bi, i.tex.w - i.le - i.li - i.ri - i.re, i.bi,
-		    0, 0);
+		    0, 0,
+		    color);
 	}
 	// bottom internal-right internal
 	if(i.ri && i.bi)
 	{
 		XRender::renderTexture(internal.X + internal.Width - i.ri, internal.Y + internal.Height - i.bi, i.ri, i.bi,
 		    i.tex,
-		    i.tex.w - i.ri - i.re, i.tex.h - i.bi - i.be);
+		    i.tex.w - i.ri - i.re, i.tex.h - i.bi - i.be,
+		    color);
 	}
 	// center-right internal
 	if(i.ri && internal.Height - i.ti - i.bi)
@@ -349,7 +356,8 @@ void RenderFrameFill(const Location_t& internal, FrameBorder& frame)
 		    i.tex,
 		    i.tex.w - i.re - i.ri, i.te + i.ti,
 		    i.ri, i.tex.h - i.te - i.ti - i.bi - i.be,
-		    0, 0);
+		    0, 0,
+		    color);
 	}
 	// center
 	if(internal.Width - i.li - i.ri > 0 && internal.Height - i.ti - i.bi > 0)
@@ -358,6 +366,7 @@ void RenderFrameFill(const Location_t& internal, FrameBorder& frame)
 		    i.tex,
 		    i.le + i.li, i.te + i.ti,
 		    i.tex.w - i.le - i.li - i.ri - i.re, i.tex.h - i.te - i.ti - i.bi - i.be,
-		    0, 0);
+		    0, 0,
+		    color);
 	}
 }
