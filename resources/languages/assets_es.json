@@ -74,12 +74,14 @@
                 "music26": "Castillo",
                 "music36": "Jefe",
                 "music49": "Agua",
-                "music27": "Tema Principal"
+                "music27": "Tema central"
             },
             "fam-misc": {
-                "music55": "Tema del Título",
-                "music38": "Aldea de la Jungla",
-                "music18": "Playa"
+                "music55": "Tema del título",
+                "music38": "Aldea de la jungla",
+                "music18": "Playa",
+                "music56": "Carrera de obstáculos",
+                "music8": "¡Acorralado!"
             },
             "fam-fight": {
                 "music39": "Templo",
