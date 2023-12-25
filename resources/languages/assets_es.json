@@ -81,12 +81,14 @@
                 "music38": "Aldea de la jungla",
                 "music18": "Playa",
                 "music56": "Carrera de obstáculos",
-                "music8": "¡Acorralado!"
+                "music8": "¡Acorralado!",
+                "music37": "Montaña de Hielo"
             },
             "fam-fight": {
                 "music39": "Templo",
                 "header": "Batalla",
-                "music40": "Caballero"
+                "music40": "Caballero",
+                "music52": "Subterráneo"
             },
             "auto": {
                 "music0": "Ninguna",
@@ -146,7 +148,9 @@
             "fam-wood3": "Madera",
             "fam-castle4": "Castillo",
             "fam-special1": "Especial",
-            "fam-castle2": "Castillo"
+            "fam-castle2": "Castillo",
+            "fam-underground2": "Subterráneo",
+            "fam-underground1": "Subterráneo"
         },
         "bgo": {
             "fam-key4": "Llave",
@@ -176,7 +180,8 @@
             "4": "Llave",
             "1": "Ruleta",
             "2": "Orbe #16",
-            "none": "Ninguno"
+            "none": "Ninguno",
+            "8": "Final de Barra"
         },
         "worldMusic": {
             "fam-world": {
