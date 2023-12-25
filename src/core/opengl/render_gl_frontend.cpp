@@ -1426,7 +1426,7 @@ void RenderGL::renderTexture(double xDstD, double yDstD, double wDstD, double hD
     int16_t cur_depth = m_render_planes.next();
 
 #ifdef LIGHTING_DEMO
-    if(m_light_count < 63)
+    if(m_light_count < (int)m_light_queue.lights.size() - 1)
     {
         if(&tx == &GFXNPC[13])
         {

@@ -274,12 +274,34 @@ private:
         GLfloat radius = 0.0;
         GLfloat depth = 0.0;
         LightPos pos = LightPos{0.0, 0.0, 0.0, 0.0};
+
+        // frustrating, but at least it's here. observe that pos is not sorted; that's intentional because calling code may sort it in different ways.
+        inline bool operator<(const Light& o) const
+        {
+            return type  < o.type    || (type == o.type &&
+                (color.b < o.color.b || (color.b == o.color.b &&
+                (color.r < o.color.r || (color.r == o.color.r &&
+                (color.g < o.color.g || (color.g == o.color.g &&
+                (color.a < o.color.a || (color.a == o.color.a &&
+                (radius  < o.radius))))))))));
+        }
+
+        // frustrating, but at least it's here. observe that pos is not sorted; that's intentional because calling code may sort it in different ways.
+        inline bool operator==(const Light& o) const
+        {
+            return (type == o.type &&
+                color.b == o.color.b &&
+                color.r == o.color.r &&
+                color.g == o.color.g &&
+                color.a == o.color.a &&
+                radius == o.radius);
+        }
     };
 
     struct LightBuffer
     {
         // LightHeader header;
-        std::array<Light, 64> lights;
+        std::array<Light, 256> lights;
     };
 
 #endif // #ifdef RENDERGL_HAS_SHADERS
@@ -587,6 +609,8 @@ private:
 
     // executes and clears all vertex lists in the unordered draw queue
     void flushUnorderedDrawQueue();
+    // sorts and coalesces lights in the light queue
+    void coalesceLights();
     // calculates the lighting state using depth buffer information
     void calculateLighting();
     // prepares for the next pass during multipass drawing

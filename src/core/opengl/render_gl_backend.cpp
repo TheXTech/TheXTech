@@ -18,6 +18,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <algorithm>
+
 #include "core/opengl/gl_inc.h"
 
 #include <Logger/logger.h>
@@ -521,6 +523,172 @@ void RenderGL::executeOrderedDrawQueue(bool clear)
     }
 }
 
+void RenderGL::coalesceLights()
+{
+    constexpr bool debug_coalesce = false;
+    const GLfloat tolerance = 0.1;
+
+    auto& lights = m_light_queue.lights;
+
+    auto lights_begin_it = lights.begin();
+    auto lights_end_it   = lights_begin_it + m_light_count;
+
+    // sort by light type
+    std::sort(lights_begin_it, lights_end_it);
+
+    if(debug_coalesce)
+        pLogDebug("Lights %d:%d", int(lights_begin_it - lights_begin_it), (lights_end_it - lights_begin_it));
+
+    // for each light type, mark non-initial lights and try to coalesce (if box lights)
+    auto type_begin_it = lights_begin_it;
+    while(type_begin_it != lights_end_it)
+    {
+        auto type_end_it = std::upper_bound(type_begin_it, lights_end_it, *type_begin_it);
+
+        if(debug_coalesce)
+            pLogDebug("Type %d:%d", int(type_begin_it - lights_begin_it), (type_end_it - lights_begin_it));
+
+        // can perform box coalescing algorithm
+        if(type_begin_it->type == LightType::box)
+        {
+            // comparison to sort by row, higher first, then sort by height, taller first
+            auto y_compare = [](const Light& a, const Light& b) {
+                return a.pos[1] < b.pos[1] || (a.pos[1] == b.pos[1] && a.pos[3] > b.pos[3]);
+            };
+
+            // comparison to sort by column, left first, then sort by width, wider first
+            auto x_compare = [](const Light& a, const Light& b) {
+                return a.pos[0] < b.pos[0] || (a.pos[0] == b.pos[0] && a.pos[2] > b.pos[2]);
+            };
+
+            // coalesce horizontally, then vertically
+            std::sort(type_begin_it, type_end_it, y_compare);
+
+            // treat each row separately
+            auto row_begin_it = type_begin_it;
+            while(row_begin_it != type_end_it)
+            {
+                auto row_end_it = std::upper_bound(row_begin_it, type_end_it, *row_begin_it, y_compare);
+
+                if(debug_coalesce)
+                    pLogDebug("Row %d:%d", int(row_begin_it - lights_begin_it), (row_end_it - lights_begin_it));
+
+                // sort row horizontally
+                std::sort(row_begin_it, row_end_it, x_compare);
+
+                // for each item in row, try to coalesce
+                auto item_it = row_begin_it;
+                while(item_it != row_end_it)
+                {
+                    auto orig_left = item_it->pos[0];
+
+                    // bounds on left x of possible continuation
+                    auto lower_bound = item_it->pos[2] - tolerance;
+                    auto upper_bound = item_it->pos[2] + tolerance;
+
+                    // use current item to temporarily store lower bound on left x
+                    item_it->pos[0] = lower_bound;
+                    auto continuation_it = std::lower_bound(item_it + 1, row_end_it, *item_it, x_compare);
+                    item_it->pos[0] = orig_left;
+
+                    // can coalesce!
+                    if(continuation_it != row_end_it && continuation_it->pos[0] < upper_bound)
+                    {
+                        if(debug_coalesce)
+                            pLogDebug("Combine item %d with continuation %d", int(item_it - lights_begin_it), int(continuation_it - lights_begin_it));
+
+                        // set current item's right bound to continuation's right bound
+                        item_it->pos[2] = continuation_it->pos[2];
+
+                        // get rid of the continuation
+                        std::rotate(continuation_it, continuation_it + 1, lights_end_it);
+
+                        // update end iterators
+                        --row_end_it;
+                        --type_end_it;
+                        --lights_end_it;
+                    }
+                    // try next item
+                    else
+                    {
+                        ++item_it;
+                    }
+                }
+
+                row_begin_it = row_end_it;
+            }
+
+            // now coalesce vertically
+            std::sort(type_begin_it, type_end_it, x_compare);
+
+            // treat each column separately
+            auto col_begin_it = type_begin_it;
+            while(col_begin_it != type_end_it)
+            {
+                auto col_end_it = std::upper_bound(col_begin_it, type_end_it, *col_begin_it, x_compare);
+
+                if(debug_coalesce)
+                    pLogDebug("Col %d:%d", int(col_begin_it - lights_begin_it), (col_end_it - lights_begin_it));
+
+                // sort col vertically
+                std::sort(col_begin_it, col_end_it, y_compare);
+
+                // for each item in col, try to coalesce
+                auto item_it = col_begin_it;
+                while(item_it != col_end_it)
+                {
+                    auto orig_top = item_it->pos[1];
+
+                    // bounds on top y of possible continuation
+                    auto lower_bound = item_it->pos[3] - tolerance;
+                    auto upper_bound = item_it->pos[3] + tolerance;
+
+                    // use current item to temporarily store lower bound on top y
+                    item_it->pos[1] = lower_bound;
+                    auto continuation_it = std::lower_bound(item_it + 1, col_end_it, *item_it, y_compare);
+                    item_it->pos[1] = orig_top;
+
+                    // can coalesce!
+                    if(continuation_it != col_end_it && continuation_it->pos[1] < upper_bound)
+                    {
+                        if(debug_coalesce)
+                            pLogDebug("Combine item %d with continuation %d", int(item_it - lights_begin_it), int(continuation_it - lights_begin_it));
+
+                        // set current item's bottom bound to continuation's bottom bound
+                        item_it->pos[3] = continuation_it->pos[3];
+
+                        // get rid of the continuation
+                        std::rotate(continuation_it, continuation_it + 1, lights_end_it);
+
+                        // update end iterators
+                        --col_end_it;
+                        --type_end_it;
+                        --lights_end_it;
+                    }
+                    // try next item
+                    else
+                    {
+                        ++item_it;
+                    }
+                }
+
+                col_begin_it = col_end_it;
+            }
+        }
+
+        // now mark all duplicates
+        for(auto mark_it = type_begin_it + 1; mark_it < type_end_it; ++mark_it)
+            mark_it->type = LightType::duplicate;
+
+        type_begin_it = type_end_it;
+    }
+
+    if(debug_coalesce)
+        pLogDebug("Coalesced %d lights to %d", m_light_count, int(lights_end_it - lights_begin_it));
+
+    m_light_count = lights_end_it - lights_begin_it;
+}
+
 void RenderGL::calculateLighting()
 {
 #if defined(RENDERGL_HAS_FBO) && defined(RENDERGL_HAS_SHADERS)
@@ -530,6 +698,7 @@ void RenderGL::calculateLighting()
 
 
     // (1) flush the lights
+    coalesceLights();
     m_light_queue.lights[m_light_count].type = LightType::none;
 
     glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(Light) * m_light_count + 4, &m_light_queue);
