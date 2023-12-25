@@ -91,6 +91,33 @@
             "auto": {
                 "music0": "Ninguna",
                 "music24": "Personalizada"
+            },
+            "fam-space": {
+                "music11": "Pantano Rojo",
+                "music22": "Carga Espacial",
+                "header": "Espacio",
+                "music44": "Cuarto de Objeto",
+                "music12": "Cráter"
+            },
+            "fam-rpg": {
+                "music33": "Nubes",
+                "music34": "Ciudad"
+            },
+            "fam-set2": {
+                "music43": "Jefe Final",
+                "music25": "Subterráneo"
+            },
+            "fam-set3": {
+                "music2": "Cielo",
+                "music3": "Calabozo",
+                "music6": "Jefe",
+                "music4": "Subterráneo",
+                "music47": "Agua"
+            },
+            "fam-set1": {
+                "music46": "Agua",
+                "music42": "Calabozo",
+                "music7": "Subterráneo"
             }
         },
         "block": {
@@ -150,7 +177,20 @@
             "1": "Ruleta",
             "2": "Orbe #16",
             "none": "Ninguno"
+        },
+        "worldMusic": {
+            "fam-world": {
+                "wmusic16": "Cueva",
+                "wmusic14": "Cielo",
+                "wmusic15": "Isla",
+                "wmusic7": "Bosque"
+            }
         }
     },
-    "languageName": "Español"
+    "languageName": "Español",
+    "objects": {
+        "wordStarAccusativeSingular": "estrella",
+        "wordFails": "Fallas",
+        "wordStarAccusativePlural": "estrellas"
+    }
 }
