@@ -203,6 +203,7 @@ private:
         arc,
         bar,
         box,
+        duplicate,
     };
 
 #    ifdef THEXTECH_BIG_ENDIAN
@@ -251,6 +252,21 @@ private:
         static constexpr Light Point(GLfloat x, GLfloat y, GLfloat depth, LightColor color, GLfloat radius)
         {
             return Light(LightType::point, color, radius, depth, {x, y, 0.0f, 0.0f});
+        }
+
+        static constexpr Light Box(GLfloat x1, GLfloat y1, GLfloat x2, GLfloat y2, GLfloat depth, LightColor color, GLfloat radius)
+        {
+            return Light(LightType::box, color, radius, depth, {x1, y1, x2, y2});
+        }
+
+        static constexpr Light Bar(GLfloat x1, GLfloat y1, GLfloat x2, GLfloat y2, GLfloat depth, LightColor color, GLfloat radius)
+        {
+            return Light(LightType::bar, color, radius, depth, {x1, y1, x2, y2});
+        }
+
+        static constexpr Light Arc(GLfloat x1, GLfloat y1, GLfloat angle, GLfloat width, GLfloat depth, LightColor color, GLfloat radius)
+        {
+            return Light(LightType::arc, color, radius, depth, {x1, y1, angle, width});
         }
 
         LightType type = LightType::none;

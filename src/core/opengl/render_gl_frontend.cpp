@@ -1456,12 +1456,27 @@ void RenderGL::renderTexture(double xDstD, double yDstD, double wDstD, double hD
 
         if(&tx == &GFXBackground[96])
         {
-            m_light_queue.lights[m_light_count++] = Light::Point(xDstD + wDstD / 2.0, yDstD + hDstD / 2.0, cur_depth, LightColor(64, 0, 0), 250.0);
+            m_light_queue.lights[m_light_count++] = Light::Arc(xDstD + wDstD / 2.0, yDstD, M_PI * 1.5, M_PI * 0.75, cur_depth, LightColor(64, 0, 0), 250.0);
         }
 
         if(&tx == &GFXBackground[97])
         {
             m_light_queue.lights[m_light_count++] = Light::Point(xDstD + wDstD / 2.0, yDstD + hDstD / 2.0, cur_depth, LightColor(0, 64, 64), 250.0);
+        }
+
+        if(&tx == &GFXBackground[99])
+        {
+            m_light_queue.lights[m_light_count++] = Light::Box(xDstD, yDstD, xDstD + wDstD, yDstD + hDstD, cur_depth, LightColor(0, 64, 64), 250.0);
+        }
+
+        if(&tx == &GFXBackground[147])
+        {
+            m_light_queue.lights[m_light_count++] = Light::Bar(xDstD, yDstD + hDstD, xDstD + wDstD, yDstD, cur_depth, LightColor(64, 64, 64), 250.0);
+        }
+
+        if((&tx >= &GFXBlock[459] && &tx <= &GFXBlock[487]) || &tx == &GFXBlock[404] || &tx == &GFXBlock[420])
+        {
+            m_light_queue.lights[m_light_count++] = Light::Box(xDstD, yDstD, xDstD + wDstD, yDstD + hDstD, cur_depth, LightColor(128, 64, 64), 250.0);
         }
     }
 #endif
