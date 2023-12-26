@@ -399,6 +399,21 @@ bool RenderGL::initShaders()
     // initialize the lighting program
     if(m_has_es3_shaders)
     {
+        // code to support a jump flooding algorithm to calculate a distance field
+        m_distance_field_1_program = GLProgramObject(
+            s_es3_advanced_vert_src,
+            s_es3_distance_field_1_frag_src
+        );
+
+        m_distance_field_2_program = GLProgramObject(
+            s_es3_advanced_vert_src,
+            s_es3_distance_field_2_frag_src
+        );
+
+        // will assume that this is stored in the GLProgramObject's uniform slot 0 later
+        StdPictureLoad null_load;
+        m_distance_field_2_program.register_uniform("u_step_size", null_load);
+
         dumpFullFile(output_contents, (AppPath + "/graphics/shaders/lighting.frag").c_str());
         if(!output_contents.empty())
             output_contents.push_back('\0');

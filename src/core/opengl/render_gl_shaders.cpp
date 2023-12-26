@@ -326,6 +326,125 @@ void main()
 }
 )RAW";
 
+const char* const RenderGL::s_es3_distance_field_1_frag_src =
+R"RAW(#version 300 es
+
+precision mediump float;
+
+out vec4 o_FragColor;
+
+in   vec2  v_fbcoord;
+
+uniform highp mat4 u_transform;
+uniform highp vec4 u_read_viewport;
+
+uniform   sampler2D u_depth_buffer;
+
+const float c_max_dist = 64.0;
+const float c_pixel_delta = 1.0 / c_max_dist;
+
+void main()
+{
+    vec2 pixel_size = (u_transform * vec4(1.0, 1.0, 0.0, 0.0)).xy * u_read_viewport.xy;
+
+    float pixel_depth = texture(u_depth_buffer, v_fbcoord).r;
+    float pixel_plane = floor(pixel_depth * 32.0);
+
+    o_FragColor.r = 1.0;
+    o_FragColor.g = 0.0;
+    o_FragColor.b = 0.0;
+    o_FragColor.a = 1.0;
+
+    for(float oX = -1.0; oX <= 1.0; oX++)
+    {
+        for(float oY = -1.0; oY <= 1.0; oY++)
+        {
+            if(oX == 0.0 && oY == 0.0)
+                continue;
+
+            float other_pixel_depth = texture(u_depth_buffer, v_fbcoord + pixel_size * vec2(oX, oY)).r;
+            float other_pixel_plane = floor(other_pixel_depth * 32.0);
+
+            if(other_pixel_plane == pixel_plane)
+                continue;
+
+            vec2 other_offset = vec2(oX, oY);
+
+            float possible_dist = length(other_offset) * c_pixel_delta;
+
+            if(possible_dist < o_FragColor.r)
+            {
+                o_FragColor.r = possible_dist;
+                o_FragColor.gb = (other_offset + 128.0) / 255.0;
+            }
+        }
+    }
+}
+)RAW";
+
+const char* const RenderGL::s_es3_distance_field_2_frag_src =
+R"RAW(#version 300 es
+
+precision mediump float;
+
+out vec4 o_FragColor;
+
+in   vec2  v_fbcoord;
+
+uniform highp mat4 u_transform;
+uniform highp vec4 u_read_viewport;
+
+uniform   sampler2D u_previous_pass;
+
+uniform   float u_step_size;
+
+const float c_max_dist = 64.0;
+const float c_pixel_delta = 1.0 / c_max_dist;
+
+void main()
+{
+    float step_size = u_step_size;
+    // whole pixel (of half resolution texture)
+    vec2 pixel_size = (u_transform * vec4(1.0, 1.0, 0.0, 0.0)).xy * u_read_viewport.xy * step_size;
+
+    // half resolution read
+    vec2 read_coord = v_fbcoord / 2.0;
+
+
+    // calculate all dists now!
+    vec3 prev_pass = texture(u_previous_pass, read_coord).rgb;
+    o_FragColor.r = prev_pass.r;
+    o_FragColor.gb = prev_pass.gb;
+    o_FragColor.a = 1.0;
+
+    for(float oX = -1.0; oX <= 1.0; oX++)
+    {
+        for(float oY = -1.0; oY <= 1.0; oY++)
+        {
+            if(oX == 0.0 && oY == 0.0)
+                continue;
+
+            if(read_coord.x + pixel_size.x * oX >= 0.5)
+                continue;
+            if(read_coord.y + pixel_size.y * oY >= 0.5)
+                continue;
+
+            vec2 other_seed_offset = texture(u_previous_pass, read_coord + pixel_size * vec2(oX, oY)).gb * 255.0 - 128.0;
+            vec2 other_offset = step_size * vec2(oX, oY);
+
+            vec2 possible_seed_offset = other_offset + other_seed_offset;
+            float possible_dist = length(possible_seed_offset) * c_pixel_delta;
+
+            if(possible_dist < o_FragColor.r)
+            {
+                o_FragColor.r = possible_dist;
+                o_FragColor.gb = (possible_seed_offset + 128.0) / 255.0;
+            }
+        }
+    }
+}
+)RAW";
+
 const char* const RenderGL::s_es3_lighting_frag_src =
 R"RAW(#version 300 es
 

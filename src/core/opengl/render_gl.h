@@ -469,6 +469,12 @@ private:
 
 #ifdef RENDERGL_HAS_SHADERS
 
+    // performs the first distance field calculation pass
+    GLProgramObject m_distance_field_1_program;
+
+    // performs the remaining distance field calculation passes
+    GLProgramObject m_distance_field_2_program;
+
     // performs the light calculation pass
     GLProgramObject m_lighting_program;
 
@@ -499,6 +505,8 @@ private:
     static const char* const s_es2_circle_frag_src;
     static const char* const s_es2_circle_hole_frag_src;
 
+    static const char* const s_es3_distance_field_1_frag_src;
+    static const char* const s_es3_distance_field_2_frag_src;
     static const char* const s_es3_lighting_frag_src;
 
 #endif // #ifdef RENDERGL_HAS_SHADERS
@@ -609,6 +617,8 @@ private:
 
     // executes and clears all vertex lists in the unordered draw queue
     void flushUnorderedDrawQueue();
+    // sets BUFFER_INT_PASS_1 to contain a distance field to the nearest edge in the game depth buffer
+    void calculateDistanceField();
     // sorts and coalesces lights in the light queue
     void coalesceLights();
     // calculates the lighting state using depth buffer information

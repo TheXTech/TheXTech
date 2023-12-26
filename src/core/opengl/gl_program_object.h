@@ -215,7 +215,7 @@ public:
     }
 
     /*!
-     * \brief Registers a custom uniform variable in the next available index
+     * \brief Restores all registered uniforms from a StdPictureLoad object (after a shader has been reloaded)
      * \param l StdPictureLoad to restore uniform registrations / assignments from
      *
      * Note: will fix the type of any assignments in l
@@ -225,7 +225,7 @@ public:
     /*!
      * \brief Registers a custom uniform variable in the next available index
      * \param name name of uniform
-     * \param l StdPictureLoad to cache the registration in, in case of unload
+     * \param l StdPictureLoad to cache the registration in, in case of shader unload
      * \returns The internal index for the uniform, -1 on failure
      */
     int register_uniform(const char* name, StdPictureLoad& l);

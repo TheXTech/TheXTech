@@ -523,6 +523,83 @@ void RenderGL::executeOrderedDrawQueue(bool clear)
     }
 }
 
+void RenderGL::calculateDistanceField()
+{
+    if(!m_distance_field_1_program.inited() || !m_distance_field_2_program.inited())
+        return;
+
+    glDepthMask(GL_FALSE);
+
+    // (0) activate a half-resolution viewport
+    RectSizeI viewport = m_viewport;
+
+    s_normalize_coords(viewport);
+
+    RectSizeI viewport_scaled = viewport * 0.5f;
+
+    glViewport(viewport_scaled.x, viewport_scaled.y,
+        viewport_scaled.w, viewport_scaled.h);
+
+    // (1) create a draw call
+    RectI draw_loc = RectI(m_viewport);
+
+    RectF draw_source = RectF(draw_loc);
+    draw_source /= PointF(ScreenW, ScreenH);
+
+    // draw dest is in viewport coordinates, draw source isn't
+    draw_loc -= m_viewport.xy;
+
+    std::array<Vertex_t, 4> dist_triangle_strip =
+        genTriangleStrip(draw_loc, draw_source, 0x7FFF, {255, 255, 255, 255});
+
+
+    // (2) bind the FB read framebuffer (since it is depthless) and the actual game depth texture
+    glBindFramebuffer(GL_FRAMEBUFFER, m_buffer_fb[BUFFER_FB_READ]);
+    glActiveTexture(TEXTURE_UNIT_DEPTH_READ);
+    glBindTexture(GL_TEXTURE_2D, m_game_depth_texture);
+
+    // (2) run the first pass (edge or not?)
+    m_distance_field_1_program.use_program();
+    m_distance_field_1_program.update_transform(m_transform_tick, m_transform_matrix.data(), m_shader_read_viewport.data(), m_shader_clock);
+
+    fillVertexBuffer(dist_triangle_strip.data(), 4);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+    constexpr GLfloat pass_step_size[] = {16.0, 8.0, 4.0, 2.0, 1.0};
+    constexpr int num_pass = sizeof(pass_step_size) / sizeof(GLfloat);
+    for(int pass = 0; pass < num_pass; pass++)
+    {
+        BufferIndex_t prev_buffer = ((pass % 2) == (num_pass % 2) ? BUFFER_INT_PASS_1 : BUFFER_INT_PASS_2);
+        BufferIndex_t draw_buffer = ((pass % 2) == (num_pass % 2) ? BUFFER_INT_PASS_2 : BUFFER_INT_PASS_1);
+
+        if(pass == 0)
+            prev_buffer = BUFFER_FB_READ;
+
+        // (3) bind the correct int pass and prev pass framebuffers
+        glActiveTexture(TEXTURE_UNIT_PREV_PASS);
+        glBindTexture(GL_TEXTURE_2D, m_buffer_texture[prev_buffer]);
+        glBindFramebuffer(GL_FRAMEBUFFER, m_buffer_fb[draw_buffer]);
+
+        // (4) run the nth pass (edge distance propagation)
+        m_distance_field_2_program.use_program();
+        m_distance_field_2_program.update_transform(m_transform_tick, m_transform_matrix.data(), m_shader_read_viewport.data(), m_shader_clock);
+        glUniform1f(m_distance_field_2_program.get_uniform_loc(0), pass_step_size[pass]);
+        // glUniform1f(m_distance_field_2_program.get_uniform_loc(0), 1.0);
+
+        fillVertexBuffer(dist_triangle_strip.data(), 4);
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    }
+
+    // (5) restore the original framebuffer and viewport
+    glBindFramebuffer(GL_FRAMEBUFFER, m_game_texture_fb);
+    glActiveTexture(TEXTURE_UNIT_IMAGE);
+
+    viewport_scaled = viewport * m_render_scale_factor;
+
+    glViewport(viewport_scaled.x, viewport_scaled.y,
+        viewport_scaled.w, viewport_scaled.h);
+}
+
 void RenderGL::coalesceLights()
 {
     constexpr bool debug_coalesce = false;
@@ -696,6 +773,8 @@ void RenderGL::calculateLighting()
     if(!m_lighting_program.inited() || !m_light_ubo)
         return;
 
+    // (0) calculate the distance field (currently unused after benchmarking showed minimal improvements in intensive shadowing situations and large slowdowns normally)
+    // calculateDistanceField();
 
     // (1) flush the lights
     coalesceLights();
@@ -723,6 +802,8 @@ void RenderGL::calculateLighting()
     // (3) bind the texture and program
     glActiveTexture(TEXTURE_UNIT_DEPTH_READ);
     glBindTexture(GL_TEXTURE_2D, m_game_depth_texture);
+    glActiveTexture(TEXTURE_UNIT_PREV_PASS);
+    glBindTexture(GL_TEXTURE_2D, m_buffer_texture[BUFFER_INT_PASS_1]);
     glActiveTexture(TEXTURE_UNIT_IMAGE);
 
     m_lighting_program.use_program();
