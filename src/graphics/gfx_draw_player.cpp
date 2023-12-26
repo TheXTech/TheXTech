@@ -164,7 +164,7 @@ void DrawPlayer(Player_t &p, const int Z, XTColor color)
 {
     int B = 0;
     double C = 0;
-    XTColor s = color * (ShadowMode ? XTColor(0, 0, 0) : XTColor());
+    XTColor s = (ShadowMode ? XTColor(0, 0, 0) : color);
     //auto &p = Player[A];
 
     bool player_door_scroll = (p.Effect == 7 && p.Effect2 >= 128);
