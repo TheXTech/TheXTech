@@ -29,6 +29,7 @@
 
 #include <FreeImageLite.h>
 
+#include <IniProcessor/ini_processing.h>
 #include <AppPath/app_path.h>
 #include <Logger/logger.h>
 #include <Graphics/graphics_funcs.h>
@@ -285,6 +286,82 @@ void AbstractRender_t::lazyLoadPicture(StdPicture_Sub& target,
 
         // must be null-terminated
         target.l.fragmentShaderSource.push_back('\0');
+    }
+
+    // load lighting info if it exists
+    if(Files::fileExists(path + ".ini"))
+    {
+        IniProcessing ini;
+        ini.open(path + ".ini");
+        std::string temp;
+
+        for(const std::string& group : ini.childGroups())
+        {
+            GLLight temp_light;
+
+            if(SDL_strncasecmp(group.c_str(), "light", 5) != 0)
+                continue;
+
+            ini.beginGroup(group);
+            ini.read("type", temp, "");
+
+            // load coordinates
+            if(SDL_strcasecmp(temp.c_str(), "point") == 0)
+            {
+                temp_light.type = GLLightType::point;
+                ini.read("x", temp_light.pos[0], target.w / 2);
+                ini.read("y", temp_light.pos[1], target.h / 2);
+            }
+            else if(SDL_strcasecmp(temp.c_str(), "box") == 0)
+            {
+                temp_light.type = GLLightType::box;
+                ini.read("left", temp_light.pos[0], 0);
+                ini.read("top", temp_light.pos[1], 0);
+                ini.read("right", temp_light.pos[2], target.w);
+                ini.read("bottom", temp_light.pos[3], target.h);
+            }
+            else if(SDL_strcasecmp(temp.c_str(), "bar") == 0)
+            {
+                temp_light.type = GLLightType::bar;
+                ini.read("x1", temp_light.pos[0], 0);
+                ini.read("y1", temp_light.pos[1], 0);
+                ini.read("x2", temp_light.pos[2], target.w);
+                ini.read("y2", temp_light.pos[3], target.h);
+            }
+            else if(SDL_strcasecmp(temp.c_str(), "arc") == 0)
+            {
+                temp_light.type = GLLightType::arc;
+                ini.read("x", temp_light.pos[0], target.w / 2);
+                ini.read("y", temp_light.pos[1], target.h / 2);
+                ini.read("angle", temp_light.pos[2], 270.0f);
+                ini.read("spread", temp_light.pos[3], 120.0f);
+                // convert from degrees to radians
+                temp_light.pos[2] *= float(M_PI / 180.0);
+                temp_light.pos[3] *= float(M_PI / 180.0);
+            }
+            else
+            {
+                ini.endGroup();
+                continue;
+            }
+
+            ini.read("radius", temp_light.radius, 32);
+
+            unsigned int temp_byte;
+            ini.read("r", temp_byte, 64);
+            temp_light.color.r = uint8_t(temp_byte);
+            ini.read("g", temp_byte, 64);
+            temp_light.color.g = uint8_t(temp_byte);
+            ini.read("b", temp_byte, 64);
+            temp_light.color.b = uint8_t(temp_byte);
+
+            ini.endGroup();
+
+            GLPictureLightInfoPtr temp = std::move(target.l.light_info);
+            target.l.light_info.init();
+            target.l.light_info->light = temp_light;
+            target.l.light_info->next = std::move(temp);
+        }
     }
 #endif
 }

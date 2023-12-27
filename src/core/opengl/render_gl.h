@@ -44,6 +44,7 @@
 #include "video.h"
 
 #include "core/opengl/gl_program_object.h"
+#include "core/opengl/gl_light_info.h"
 
 struct StdPicture;
 struct SDL_Window;
@@ -196,112 +197,10 @@ private:
 
 #ifdef RENDERGL_HAS_SHADERS
 
-    enum class LightType : uint32_t
-    {
-        none = 0,
-        point,
-        arc,
-        bar,
-        box,
-        duplicate,
-    };
-
-#    ifdef THEXTECH_BIG_ENDIAN
-    struct LightColor
-    {
-        constexpr LightColor() = default;
-        constexpr LightColor(uint8_t r, uint8_t g, uint8_t b, uint8_t a = 0xff)
-            : a(a), r(r), g(g), b(b) {}
-
-        uint8_t a = 0x00;
-        uint8_t r = 0x00;
-        uint8_t g = 0x00;
-        uint8_t b = 0x00;
-    };
-#    else // #ifdef THEXTECH_BIG_ENDIAN
-    struct LightColor
-    {
-        constexpr LightColor() = default;
-        constexpr LightColor(uint8_t r, uint8_t g, uint8_t b, uint8_t a = 0xff)
-            : b(b), g(g), r(r), a(a) {}
-
-        uint8_t b = 0x00;
-        uint8_t g = 0x00;
-        uint8_t r = 0x00;
-        uint8_t a = 0x00;
-    };
-#    endif // #else (from #ifdef THEXTECH_BIG_ENDIAN)
-
-    using LightPos = std::array<GLfloat, 4>;
-
-    /*!
-     * \brief Information parameterizing the overall lighting system
-     */
-    struct LightHeader
-    {};
-
-    /*!
-     * \brief Information parameterizing a single light source
-     */
-    struct Light
-    {
-        constexpr Light() = default;
-        constexpr Light(LightType type, LightColor color, GLfloat radius, GLfloat depth, LightPos pos)
-            : type(type), color(color), radius(radius), depth(depth), pos(pos) {}
-
-        static constexpr Light Point(GLfloat x, GLfloat y, GLfloat depth, LightColor color, GLfloat radius)
-        {
-            return Light(LightType::point, color, radius, depth, {x, y, 0.0f, 0.0f});
-        }
-
-        static constexpr Light Box(GLfloat x1, GLfloat y1, GLfloat x2, GLfloat y2, GLfloat depth, LightColor color, GLfloat radius)
-        {
-            return Light(LightType::box, color, radius, depth, {x1, y1, x2, y2});
-        }
-
-        static constexpr Light Bar(GLfloat x1, GLfloat y1, GLfloat x2, GLfloat y2, GLfloat depth, LightColor color, GLfloat radius)
-        {
-            return Light(LightType::bar, color, radius, depth, {x1, y1, x2, y2});
-        }
-
-        static constexpr Light Arc(GLfloat x1, GLfloat y1, GLfloat angle, GLfloat width, GLfloat depth, LightColor color, GLfloat radius)
-        {
-            return Light(LightType::arc, color, radius, depth, {x1, y1, angle, width});
-        }
-
-        LightType type = LightType::none;
-        LightColor color = LightColor{0, 0, 0, 0};
-        GLfloat radius = 0.0;
-        GLfloat depth = 0.0;
-        LightPos pos = LightPos{0.0, 0.0, 0.0, 0.0};
-
-        // frustrating, but at least it's here. observe that pos is not sorted; that's intentional because calling code may sort it in different ways.
-        inline bool operator<(const Light& o) const
-        {
-            return type  < o.type    || (type == o.type &&
-                (color.b < o.color.b || (color.b == o.color.b &&
-                (color.r < o.color.r || (color.r == o.color.r &&
-                (color.g < o.color.g || (color.g == o.color.g &&
-                (color.a < o.color.a || (color.a == o.color.a &&
-                (radius  < o.radius))))))))));
-        }
-
-        // frustrating, but at least it's here. observe that pos is not sorted; that's intentional because calling code may sort it in different ways.
-        inline bool operator==(const Light& o) const
-        {
-            return (type == o.type &&
-                color.b == o.color.b &&
-                color.r == o.color.r &&
-                color.g == o.color.g &&
-                color.a == o.color.a &&
-                radius == o.radius);
-        }
-    };
-
     struct LightBuffer
     {
-        // LightHeader header;
-        std::array<Light, 256> lights;
+        GLLightSystem header;
+        std::array<GLLight, 256> lights;
     };
 
 #endif // #ifdef RENDERGL_HAS_SHADERS
@@ -641,6 +540,9 @@ private:
     // Adds vertices to a VertexList
     void addVertices(VertexList& list, const RectI& loc, const RectF& texcoord, GLshort depth, const Vertex_t::Tint& tint);
     void addVertices(VertexList& list, const QuadI& loc, const RectF& texcoord, GLshort depth, const Vertex_t::Tint& tint);
+
+    // Checks for and adds lights for a draw call to the light buffer
+    void addLights(const GLPictureLightInfo& light_info, const QuadI& loc, const RectF& texcoord, GLshort depth);
 
     // simple helper function to make a triangle strip for a single-quad draw
     std::array<Vertex_t, 4> genTriangleStrip(const RectI& loc, const RectF& texcoord, GLshort depth, const Vertex_t::Tint& tint);

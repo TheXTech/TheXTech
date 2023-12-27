@@ -626,15 +626,15 @@ void RenderGL::coalesceLights()
             pLogDebug("Type %d:%d", int(type_begin_it - lights_begin_it), (type_end_it - lights_begin_it));
 
         // can perform box coalescing algorithm
-        if(type_begin_it->type == LightType::box)
+        if(type_begin_it->type == GLLightType::box)
         {
             // comparison to sort by row, higher first, then sort by height, taller first
-            auto y_compare = [](const Light& a, const Light& b) {
+            auto y_compare = [](const GLLight& a, const GLLight& b) {
                 return a.pos[1] < b.pos[1] || (a.pos[1] == b.pos[1] && a.pos[3] > b.pos[3]);
             };
 
             // comparison to sort by column, left first, then sort by width, wider first
-            auto x_compare = [](const Light& a, const Light& b) {
+            auto x_compare = [](const GLLight& a, const GLLight& b) {
                 return a.pos[0] < b.pos[0] || (a.pos[0] == b.pos[0] && a.pos[2] > b.pos[2]);
             };
 
@@ -755,7 +755,7 @@ void RenderGL::coalesceLights()
 
         // now mark all duplicates
         for(auto mark_it = type_begin_it + 1; mark_it < type_end_it; ++mark_it)
-            mark_it->type = LightType::duplicate;
+            mark_it->type = GLLightType::duplicate;
 
         type_begin_it = type_end_it;
     }
@@ -778,9 +778,9 @@ void RenderGL::calculateLighting()
 
     // (1) flush the lights
     coalesceLights();
-    m_light_queue.lights[m_light_count].type = LightType::none;
+    m_light_queue.lights[m_light_count].type = GLLightType::none;
 
-    glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(Light) * m_light_count + 4, &m_light_queue);
+    glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(GLLightSystem) + sizeof(GLLight) * m_light_count + 4, &m_light_queue);
 
     m_light_count = 0;
 
@@ -934,6 +934,8 @@ void RenderGL::flushDrawQueues()
     // if shaders use lighting and lighting framebuffer successfully allocated, calculate lighting
     if((active_draw_flags & GLProgramObject::read_light) && m_buffer_fb[BUFFER_LIGHTING])
         calculateLighting();
+    else
+        m_light_count = 0;
 
     // if any shaders read the depth buffer and it is supported, copy it from the main framebuffer
     if((active_draw_flags & GLProgramObject::read_depth) && m_depth_read_texture)
