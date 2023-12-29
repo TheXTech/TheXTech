@@ -70,6 +70,7 @@
 
 #        define GL_UNIFORM_BUFFER       0x8A11
 #        define GL_DRAW_FRAMEBUFFER     0x8CA9
+#        define GL_RGB16F               0x881B
 
 // defined and loaded in render_gl_init.cpp
 
