@@ -752,6 +752,7 @@ void AbstractRender_t::spawnParticle(StdPicture &target, double worldX, double w
     UNUSED(attrs);
 }
 
+#ifdef THEXTECH_BUILD_GL_MODERN
 void AbstractRender_t::addLight(const GLLight &light)
 {
     // no-op
@@ -770,6 +771,7 @@ void AbstractRender_t::renderLighting()
 {
     // no-op
 }
+#endif
 
 void AbstractRender_t::renderParticleSystem(StdPicture &tx, double camX, double camY)
 {
