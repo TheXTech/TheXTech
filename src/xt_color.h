@@ -23,6 +23,7 @@
 #define XT_COLOR_H
 
 #include <cstdint>
+#include <string>
 
 /*!
  * \brief RGBA pixel color
@@ -96,5 +97,14 @@ static inline constexpr XTColor XTAlphaF(float a)
 {
     return XTColor().with_alpha(XTColor::from_float(a));
 }
+
+/**
+ * \brief converts a color string into an XTColor instance
+ *
+ * \param s string reference
+ *
+ * Currently supports hex strings only. Defined in globals.cpp.
+ **/
+XTColor XTColorString(const std::string& s);
 
 #endif
