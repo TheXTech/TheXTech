@@ -35,6 +35,7 @@ std::vector<std::unique_ptr<StdPicture>> LoadedGLProgram;
 RangeArr<LoadedGLProgramRef_t, 0, maxSections> SectionEffect;
 RangeArr<LoadedGLProgramRef_t, 0, maxSections> SectionParticlesBG;
 RangeArr<LoadedGLProgramRef_t, 0, maxSections> SectionParticlesFG;
+RangeArr<       GLLightSystem, 0, maxSections> SectionLighting;
 
 
 static std::map<std::string, LoadedGLProgramRef_t> s_ProgramCache;

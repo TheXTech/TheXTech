@@ -169,6 +169,9 @@ std::array<RenderGL::Vertex_t, 4> RenderGL::genTriangleStrip(const RectI& loc, c
 
 void RenderGL::addLights(const GLPictureLightInfo& light_info, const QuadI& loc, const RectF& texcoord, GLshort depth)
 {
+    if(!m_lighting_calc_program.inited() || m_light_count >= (int)m_light_queue.lights.size())
+        return;
+
     const GLPictureLightInfo* target = &light_info;
 
     while(target)
@@ -328,11 +331,20 @@ void RenderGL::close()
     m_program_circle_hole.reset();
     m_program_rect_filled.reset();
     m_program_rect_unfilled.reset();
-    m_lighting_program.reset();
+    m_lighting_calc_program.reset();
+    m_lighting_apply_program.reset();
+    m_distance_field_1_program.reset();
+    m_distance_field_2_program.reset();
 #endif
 
     for(int i = BUFFER_GAME; i < BUFFER_MAX; i++)
         destroyFramebuffer((BufferIndex_t)i);
+
+    if(m_null_light_texture)
+    {
+        glDeleteTextures(1, &m_null_light_texture);
+        m_null_light_texture = 0;
+    }
 
 #ifdef RENDERGL_HAS_VBO
     if(m_vertex_buffer[0])
@@ -1096,32 +1108,23 @@ void RenderGL::clearBuffer()
 }
 
 
+#ifdef THEXTECH_BUILD_GL_MODERN
+
 int RenderGL::registerUniform(StdPicture &target, const char* name)
 {
-#ifdef THEXTECH_BUILD_GL_MODERN
 
     if(userShadersSupported() && target.d.shader_program && target.d.shader_program->inited())
         return target.d.shader_program->register_uniform(name, target.l);
     else
         return AbstractRender_t::registerUniform(target, name);
-
-#else
-    return AbstractRender_t::registerUniform(target, name);
-#endif
 }
 
 void RenderGL::assignUniform(StdPicture &target, int index, const UniformValue_t& value)
 {
-#ifdef THEXTECH_BUILD_GL_MODERN
-
     if(userShadersSupported() && target.d.shader_program && target.d.shader_program->inited())
         return target.d.shader_program->assign_uniform(index, value, target.l);
     else
         return AbstractRender_t::assignUniform(target, index, value);
-
-#else
-    return AbstractRender_t::assignUniform(target, index, value);
-#endif
 }
 
 void RenderGL::spawnParticle(StdPicture &target, double worldX, double worldY, ParticleVertexAttrs_t attrs)
@@ -1145,6 +1148,45 @@ void RenderGL::spawnParticle(StdPicture &target, double worldX, double worldY, P
 
     target.d.particle_system->add_particle(particle);
 }
+
+void RenderGL::addLight(const GLLight &light)
+{
+    if(!m_lighting_calc_program.inited() || m_light_count >= (int)m_light_queue.lights.size())
+        return;
+
+    m_light_queue.lights[m_light_count++] = light;
+}
+
+void RenderGL::setupLighting(const GLLightSystem &system)
+{
+    m_light_queue.header = system;
+}
+
+void RenderGL::renderLighting()
+{
+    if(!m_light_queue.header || !m_has_es3_shaders || !m_light_ubo || !m_lighting_calc_program.inited() || !m_lighting_apply_program.inited())
+        return;
+
+    int16_t cur_depth = m_render_planes.next();
+
+    DrawContext_t context = {m_lighting_apply_program};
+
+    Vertex_t::Tint tint = F_TO_B(XTColor());
+
+    auto& vertex_list = getOrderedDrawVertexList(context, cur_depth);
+
+    RectI draw_loc = RectI(0, 0, m_viewport.w, m_viewport.h);
+    RectF draw_source = RectF(0.0f, 0.0f, 1.0f, 1.0f);
+
+    addVertices(vertex_list, draw_loc, draw_source, cur_depth, tint);
+
+    cur_depth++;
+    m_drawQueued = true;
+
+}
+
+#endif // THEXTECH_BUILD_GL_MODERN
+
 
 void RenderGL::renderRect(int x, int y, int w, int h, XTColor color, bool filled)
 {
@@ -1398,7 +1440,7 @@ void RenderGL::renderTextureScaleEx(double xDstD, double yDstD, double wDstD, do
 
     addVertices(vertex_list, draw_loc, draw_source, cur_depth, tint);
 
-    if(m_lighting_program.inited() && m_light_count < (int)m_light_queue.lights.size() && tx.l.light_info)
+    if(tx.l.light_info)
         addLights(*tx.l.light_info, QuadI(draw_loc), draw_source_raw, cur_depth);
 
     m_drawQueued = true;
@@ -1440,7 +1482,7 @@ void RenderGL::renderTextureScale(double xDst, double yDst, double wDst, double 
 
     addVertices(vertex_list, draw_loc, draw_source, cur_depth, tint);
 
-    if(m_lighting_program.inited() && m_light_count < (int)m_light_queue.lights.size() && tx.l.light_info)
+    if(tx.l.light_info)
         addLights(*tx.l.light_info, QuadI(draw_loc), draw_source_raw, cur_depth);
 
     m_drawQueued = true;
@@ -1509,7 +1551,7 @@ void RenderGL::renderTexture(double xDstD, double yDstD, double wDstD, double hD
     int16_t cur_depth = m_render_planes.next();
 
 #ifdef LIGHTING_DEMO
-    if(m_lighting_program.inited() && m_light_count < (int)m_light_queue.lights.size())
+    if(m_lighting_calc_program.inited() && m_light_count < (int)m_light_queue.lights.size())
     {
         if(&tx == &GFXNPC[NPCID_HOMING_BALL])
             m_light_queue.lights[m_light_count++] = GLLight::Point(xDstD + wDstD / 2.0, yDstD + hDstD / 2.0, cur_depth, GLLightColor(64, 32, 32), 250.0);
@@ -1535,7 +1577,7 @@ void RenderGL::renderTexture(double xDstD, double yDstD, double wDstD, double hD
 
     addVertices(vertex_list, draw_loc, draw_source, cur_depth, tint);
 
-    if(m_lighting_program.inited() && m_light_count < (int)m_light_queue.lights.size() && tx.l.light_info)
+    if(tx.l.light_info)
         addLights(*tx.l.light_info, QuadI(draw_loc), draw_source_raw, cur_depth);
 
     m_drawQueued = true;
@@ -1621,7 +1663,7 @@ void RenderGL::renderTextureFL(double xDstD, double yDstD, double wDstD, double 
 
     addVertices(vertex_list, draw_loc, draw_source, cur_depth, tint);
 
-    if(m_lighting_program.inited() && m_light_count < (int)m_light_queue.lights.size() && tx.l.light_info)
+    if(tx.l.light_info)
         addLights(*tx.l.light_info, QuadI(draw_loc), draw_source_raw, cur_depth);
 
     m_drawQueued = true;
@@ -1663,7 +1705,7 @@ void RenderGL::renderTexture(float xDst, float yDst,
 
     addVertices(vertex_list, draw_loc, draw_source, cur_depth, tint);
 
-    if(m_lighting_program.inited() && m_light_count < (int)m_light_queue.lights.size() && tx.l.light_info)
+    if(tx.l.light_info)
         addLights(*tx.l.light_info, QuadI(draw_loc), draw_source_raw, cur_depth);
 
     m_drawQueued = true;

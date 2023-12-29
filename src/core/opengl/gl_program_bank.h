@@ -49,5 +49,6 @@ LoadedGLProgramRef_t ResolveGLParticleSystem(const std::string& name);
 extern RangeArr<LoadedGLProgramRef_t, 0, maxSections> SectionEffect;
 extern RangeArr<LoadedGLProgramRef_t, 0, maxSections> SectionParticlesBG;
 extern RangeArr<LoadedGLProgramRef_t, 0, maxSections> SectionParticlesFG;
+extern RangeArr<       GLLightSystem, 0, maxSections> SectionLighting;
 
 #endif // #ifndef GL_PROGRAM_BANK_H

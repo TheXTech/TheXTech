@@ -255,8 +255,11 @@ public:
                                double worldX,
                                double worldY,
                                ParticleVertexAttrs_t attrs);
-
-
+#ifdef THEXTECH_BUILD_GL_MODERN
+    virtual void addLight(const GLLight &light);
+    virtual void setupLighting(const GLLightSystem &system);
+    virtual void renderLighting();
+#endif
 
     // Draw primitives
 

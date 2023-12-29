@@ -2266,49 +2266,45 @@ void UpdateGraphics(bool skipRepaint)
                 }
             }
 
-        // player names
-        /* Dropped */
+            // player names
+            /* Dropped */
 
             lunaRender(Z);
 
-    //    'Interface
-    //            B = 0
+            // 'Interface
             B = 0;
-    //            C = 0
-            // C = 0;
-    //            If GameMenu = False And GameOutro = False Then
-            if(!GameMenu && !GameOutro)
+
+            // moved condition past the splitFrame() call (always draw section effects)
+            // if(!GameMenu && !GameOutro)
+            For(A, 1, numPlayers)
             {
-    //                For A = 1 To numPlayers
-                For(A, 1, numPlayers)
+                if(Player[A].ShowWarp > 0)
                 {
-                    if(Player[A].ShowWarp > 0)
+                    const auto &w = Warp[Player[A].ShowWarp];
+
+                    int p_center_x = vScreen[Z].X + Player[A].Location.X + (Player[A].Location.Width / 2);
+                    int info_y = Player[A].Location.Y + Player[A].Location.Height - 96 + vScreen[Z].Y;
+
+                    if(!w.noPrintStars && w.save_info().inited() && w.save_info().max_stars > 0 && Player[A].Mount != 2)
                     {
-                        const auto &w = Warp[Player[A].ShowWarp];
+                        std::string tempString = fmt::format_ne("{0}/{1}", w.curStars, w.save_info().max_stars);
+                        XRender::renderTexture(p_center_x - tempString.length() * 9 - 20, info_y,     GFX.Interface[5]);
+                        XRender::renderTexture(p_center_x - tempString.length() * 9,      info_y + 1, GFX.Interface[1]);
+                        SuperPrint(tempString, 3,
+                                   p_center_x - tempString.length() * 9 + 18,
+                                   info_y);
 
-                        int p_center_x = vScreen[Z].X + Player[A].Location.X + (Player[A].Location.Width / 2);
-                        int info_y = Player[A].Location.Y + Player[A].Location.Height - 96 + vScreen[Z].Y;
+                        info_y -= 20;
+                    }
 
-                        if(!w.noPrintStars && w.save_info().inited() && w.save_info().max_stars > 0 && Player[A].Mount != 2)
-                        {
-                            std::string tempString = fmt::format_ne("{0}/{1}", w.curStars, w.save_info().max_stars);
-                            XRender::renderTexture(p_center_x - tempString.length() * 9 - 20, info_y,     GFX.Interface[5]);
-                            XRender::renderTexture(p_center_x - tempString.length() * 9,      info_y + 1, GFX.Interface[1]);
-                            SuperPrint(tempString, 3,
-                                       p_center_x - tempString.length() * 9 + 18,
-                                       info_y);
+                    if(w.save_info().inited() && w.save_info().max_medals > 0)
+                    {
+                        uint8_t ckpt = (InHub() && Checkpoint == FileNamePath + GetS(w.level)) ? g_curLevelMedals.got : 0;
 
-                            info_y -= 20;
-                        }
-
-                        if(w.save_info().inited() && w.save_info().max_medals > 0)
-                        {
-                            uint8_t ckpt = (InHub() && Checkpoint == FileNamePath + GetS(w.level)) ? g_curLevelMedals.got : 0;
-
-                            DrawMedals(p_center_x, info_y, true, w.save_info().max_medals, 0, ckpt, w.save_info().medals_got, w.save_info().medals_best);
-                        }
+                        DrawMedals(p_center_x, info_y, true, w.save_info().max_medals, 0, ckpt, w.save_info().medals_got, w.save_info().medals_best);
                     }
                 }
+            }
 
             XRender::setDrawPlane(PLANE_LVL_SECTION_FG);
 
@@ -2316,16 +2312,22 @@ void UpdateGraphics(bool skipRepaint)
             if(SectionParticlesFG[S])
                 XRender::renderParticleSystem(**SectionParticlesFG[S], vScreen[Z].X, vScreen[Z].Y);
 
+            XRender::setupLighting(SectionLighting[S]);
+
             if(SectionEffect[S])
                 XRender::renderTextureScale(0, 0, vScreen[Z].Width, vScreen[Z].Height, **SectionEffect[S]);
+            else if(SectionLighting[S])
+                XRender::renderLighting();
 #endif
 
             XRender::splitFrame();
 
 #ifdef __3DS__
-        XRender::setTargetLayer(3);
+            XRender::setTargetLayer(3);
 #endif
 
+            if(!GameMenu && !GameOutro)
+            {
                 XRender::setDrawPlane(PLANE_LVL_HUD);
 
 #ifdef THEXTECH_ENABLE_LUNA_AUTOCODE

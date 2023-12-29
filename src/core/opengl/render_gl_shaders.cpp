@@ -445,139 +445,21 @@ void main()
 }
 )RAW";
 
-const char* const RenderGL::s_es3_lighting_frag_src =
-R"RAW(#version 300 es
+const char* const RenderGL::s_es2_lighting_apply_frag_src =
+R"RAW(#version 100
 
-//precision mediump float;
-precision highp float;
+precision mediump float;
 
-out vec4 o_FragColor;
+varying   vec2  v_fbcoord;
 
-in   vec2  v_texcoord;
-in   vec2  v_fbcoord;
-
-uniform highp mat4 u_transform;
-uniform highp vec4 u_read_viewport;
-
-uniform   sampler2D u_depth_buffer;
-
-uniform   float u_clock;
-
-
-const float shadowSoftness = 0.95;
-//const float shadowSoftness = 0.5;
-//const float shadowSoftness = 0.0;
-const float shadowResolution = 0.5;
-
-
-// should be 32 bytes wide
-struct Light
-{
-    uint type;
-    highp uint color;
-    float radius;
-    float depth;
-    vec4 pos;
-};
-
-layout(std140) uniform Lighting
-{
-     Light u_lights[64];
-};
-
-vec3 shadow(const in Light light, const in vec2 pixel_pos, const in float pixel_depth)
-{
-    vec4 source_pos_raw = vec4(light.pos.xy, light.depth, 1.0);
-    vec4 source_pos_transform = u_transform * source_pos_raw;
-    vec2 source_pos = source_pos_transform.xy * u_read_viewport.xy + u_read_viewport.zw;
-
-    float source_depth = source_pos_transform.z / 2.0 + 0.5;
-
-    source_depth = floor(source_depth * 65535.0 + 0.5) / 65535.0;
-
-    vec2 dist = pixel_pos - source_pos;
-
-    float pixel_dist = length(dist * vec2(800.0, 600.0));
-
-    if(pixel_dist > light.radius)
-        return vec3(0.0);
-
-    vec3 color = vec3((light.color >> 16) & 255U, (light.color >> 8) & 255U, (light.color >> 0) & 255U) / 255.0;
-
-    // squared decay
-    color *= (light.radius * light.radius - (pixel_dist + 1.0) * (pixel_dist + 1.0)) / (light.radius * light.radius);
-
-    int step_count = int(floor(pixel_dist * shadowResolution));
-    const int max_steps = 400;
-    step_count = max(1, step_count);
-    step_count = min(step_count, max_steps);
-
-    vec2 step_offset = dist / float(step_count);
-
-    vec2 step_pos = source_pos;
-
-    if(shadowSoftness == 0.0)
-    {
-        for(int i = 0; i < step_count; i++)
-        {
-            step_pos += step_offset;
-
-            float depth_at = texture(u_depth_buffer, step_pos).r;
-
-            // gets blocked if something is between source and dest
-            // special case: source does not block self
-
-            // first, test: lights everything not in front of it
-
-            if(pixel_depth < depth_at && depth_at != source_depth)
-                return vec3(0.0);
-        }
-
-        return color;
-    }
-
-    float accum_rate = 1.0 / float(step_count);
-
-    float accum = 0.0;
-    float mult = 1.0;
-
-    for(int i = 0; i < step_count; i++)
-    {
-        step_pos += step_offset;
-
-        float depth_at = texture(u_depth_buffer, step_pos).r;
-
-        if(pixel_depth < depth_at && depth_at != source_depth)
-            mult *= shadowSoftness;
-        else
-            accum += accum_rate;
-    }
-
-    return color * accum * mult;
-}
+uniform   sampler2D u_framebuffer;
+uniform   sampler2D u_light_buffer;
 
 void main()
 {
-//    o_FragColor = texture(u_framebuffer, v_fbcoord);
-    o_FragColor.rgb = vec3(0.5, 0.5, 0.5);
-
-    vec2 pixel_floor = v_fbcoord - vec2(0.4999 / 800.0, 0.4999 / 600.0);
-    float pixel_depth_TL = texture(u_depth_buffer, pixel_floor).r;
-    float pixel_depth_TR = texture(u_depth_buffer, pixel_floor + vec2(1.0 / 800.0, 0.0)).r;
-    float pixel_depth_BL = texture(u_depth_buffer, pixel_floor + vec2(0.0, 1.0 / 600.0)).r;
-    float pixel_depth_BR = texture(u_depth_buffer, pixel_floor + vec2(1.0 / 800.0, 1.0 / 600.0)).r;
-    float pixel_depth = min(min(min(pixel_depth_TL, pixel_depth_TR), pixel_depth_BL), pixel_depth_BR);
-
-    for(int i = 0; i < 64; i++)
-    {
-        if(u_lights[i].type == 0U)
-            break;
-
-        o_FragColor.rgb += shadow(u_lights[i], v_fbcoord, pixel_depth);
-    }
-
-    o_FragColor.a = 1.0;
+    gl_FragColor = texture2D(u_framebuffer, v_fbcoord);
+    gl_FragColor.rgb *= texture2D(u_light_buffer, v_fbcoord).rgb;
 }
 )RAW";
 
-#endif
+#endif // #ifdef RENDERGL_HAS_SHADERS

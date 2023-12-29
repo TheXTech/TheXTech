@@ -418,18 +418,24 @@ bool RenderGL::initShaders()
         if(!output_contents.empty())
             output_contents.push_back('\0');
 
-        m_lighting_program = GLProgramObject(
+        m_lighting_calc_program = GLProgramObject(
             s_es3_advanced_vert_src,
-            output_contents.empty() ? s_es3_lighting_frag_src : output_contents.data()
+            output_contents.empty() ? s_es3_lighting_calc_frag_src : output_contents.data()
         );
 
-        if(m_lighting_program.inited())
+        if(m_lighting_calc_program.inited())
         {
             // initialize uniform buffer (if supported)
             glGenBuffers(1, &m_light_ubo);
             glBindBuffer(GL_UNIFORM_BUFFER, m_light_ubo);
             glBufferData(GL_UNIFORM_BUFFER, sizeof(LightBuffer), &m_light_queue, GL_STREAM_DRAW);
             glBindBufferBase(GL_UNIFORM_BUFFER, 0, m_light_ubo);
+
+            // initialize lighting apply program
+            m_lighting_apply_program = GLProgramObject(
+                s_es2_advanced_vert_src,
+                s_es2_lighting_apply_frag_src
+            );
         }
     }
 
@@ -478,6 +484,12 @@ void RenderGL::createFramebuffer(BufferIndex_t buffer)
         glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT16,
             ScreenW * scale_factor, ScreenH * scale_factor,
             0, GL_DEPTH_COMPONENT, GL_UNSIGNED_SHORT, nullptr);
+    }
+    else if(buffer == BUFFER_LIGHTING)
+    {
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F,
+            ScreenW * scale_factor, ScreenH * scale_factor,
+            0, GL_RGB,  GL_FLOAT, nullptr);
     }
     else
     {
@@ -660,16 +672,17 @@ bool RenderGL::initFramebuffers()
     {
         glActiveTexture(TEXTURE_UNIT_FB_READ);
         glBindTexture(GL_TEXTURE_2D, m_buffer_texture[BUFFER_FB_READ]);
-        glActiveTexture(TEXTURE_UNIT_IMAGE);
     }
 
-    // bind texture unit 5 to the lighting texture
-    if(m_buffer_texture[BUFFER_LIGHTING])
-    {
-        glActiveTexture(TEXTURE_UNIT_LIGHT_READ);
-        glBindTexture(GL_TEXTURE_2D, m_buffer_texture[BUFFER_LIGHTING]);
-        glActiveTexture(TEXTURE_UNIT_IMAGE);
-    }
+    // initialize null lighting texture and bind to texture unit 5
+    glGenTextures(1, &m_null_light_texture);
+    glActiveTexture(TEXTURE_UNIT_LIGHT_READ);
+    glBindTexture(GL_TEXTURE_2D, m_null_light_texture);
+    const GLubyte white_texel[4] = {255, 255, 255, 255};
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB,
+        1, 1,
+        0, GL_RGB, GL_UNSIGNED_BYTE, white_texel);
+    glActiveTexture(TEXTURE_UNIT_IMAGE);
 
 #endif // #ifdef RENDERGL_HAS_FBO
 

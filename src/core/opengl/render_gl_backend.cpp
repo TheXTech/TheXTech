@@ -770,8 +770,14 @@ void RenderGL::calculateLighting()
 {
 #if defined(RENDERGL_HAS_FBO) && defined(RENDERGL_HAS_SHADERS)
 
-    if(!m_lighting_program.inited() || !m_light_ubo)
+    if(!m_lighting_calc_program.inited() || !m_light_ubo || !m_light_queue.header)
+    {
+        glActiveTexture(TEXTURE_UNIT_LIGHT_READ);
+        glBindTexture(GL_TEXTURE_2D, m_null_light_texture);
+        glActiveTexture(TEXTURE_UNIT_IMAGE);
+
         return;
+    }
 
     // (0) calculate the distance field (currently unused after benchmarking showed minimal improvements in intensive shadowing situations and large slowdowns normally)
     // calculateDistanceField();
@@ -804,10 +810,9 @@ void RenderGL::calculateLighting()
     glBindTexture(GL_TEXTURE_2D, m_game_depth_texture);
     glActiveTexture(TEXTURE_UNIT_PREV_PASS);
     glBindTexture(GL_TEXTURE_2D, m_buffer_texture[BUFFER_INT_PASS_1]);
-    glActiveTexture(TEXTURE_UNIT_IMAGE);
 
-    m_lighting_program.use_program();
-    m_lighting_program.update_transform(m_transform_tick, m_transform_matrix.data(), m_shader_read_viewport.data(), m_shader_clock);
+    m_lighting_calc_program.use_program();
+    m_lighting_calc_program.update_transform(m_transform_tick, m_transform_matrix.data(), m_shader_read_viewport.data(), m_shader_clock);
 
 
     // (4) create and execute the draw call
@@ -836,6 +841,11 @@ void RenderGL::calculateLighting()
 
     glViewport(viewport_scaled.x, viewport_scaled.y,
         viewport_scaled.w, viewport_scaled.h);
+
+    // (6) bind lighting texture
+    glActiveTexture(TEXTURE_UNIT_LIGHT_READ);
+    glBindTexture(GL_TEXTURE_2D, m_buffer_texture[BUFFER_LIGHTING]);
+    glActiveTexture(TEXTURE_UNIT_IMAGE);
 #endif
 }
 
@@ -934,8 +944,8 @@ void RenderGL::flushDrawQueues()
     // if shaders use lighting and lighting framebuffer successfully allocated, calculate lighting
     if((active_draw_flags & GLProgramObject::read_light) && m_buffer_fb[BUFFER_LIGHTING])
         calculateLighting();
-    else
-        m_light_count = 0;
+
+    m_light_count = 0;
 
     // if any shaders read the depth buffer and it is supported, copy it from the main framebuffer
     if((active_draw_flags & GLProgramObject::read_depth) && m_depth_read_texture)

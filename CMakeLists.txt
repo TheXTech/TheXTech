@@ -866,6 +866,7 @@ else()
             src/core/opengl/render_gl_backend.cpp
             src/core/opengl/render_gl_init.cpp
             src/core/opengl/render_gl_shaders.cpp
+            src/core/opengl/render_gl_shader_lighting.cpp
         )
     endif()
 

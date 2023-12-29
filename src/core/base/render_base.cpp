@@ -752,6 +752,25 @@ void AbstractRender_t::spawnParticle(StdPicture &target, double worldX, double w
     UNUSED(attrs);
 }
 
+void AbstractRender_t::addLight(const GLLight &light)
+{
+    // no-op
+
+    UNUSED(light);
+}
+
+void AbstractRender_t::setupLighting(const GLLightSystem &system)
+{
+    // no-op
+
+    UNUSED(system);
+}
+
+void AbstractRender_t::renderLighting()
+{
+    // no-op
+}
+
 void AbstractRender_t::renderParticleSystem(StdPicture &tx, double camX, double camY)
 {
     // no-op

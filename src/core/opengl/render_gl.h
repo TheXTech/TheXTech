@@ -375,7 +375,13 @@ private:
     GLProgramObject m_distance_field_2_program;
 
     // performs the light calculation pass
-    GLProgramObject m_lighting_program;
+    GLProgramObject m_lighting_calc_program;
+
+    // applies the calculated light to the framebuffer
+    GLProgramObject m_lighting_apply_program;
+
+    // blank 1x1 texture for programs using light to reference when light is disabled
+    GLuint m_null_light_texture = 0;
 
     // UBO to support the lighting queue
     GLuint m_light_ubo = 0;
@@ -404,9 +410,11 @@ private:
     static const char* const s_es2_circle_frag_src;
     static const char* const s_es2_circle_hole_frag_src;
 
+    static const char* const s_es2_lighting_apply_frag_src;
+
     static const char* const s_es3_distance_field_1_frag_src;
     static const char* const s_es3_distance_field_2_frag_src;
-    static const char* const s_es3_lighting_frag_src;
+    static const char* const s_es3_lighting_calc_frag_src;
 
 #endif // #ifdef RENDERGL_HAS_SHADERS
 
@@ -690,10 +698,15 @@ public:
 
     void clearBuffer() override;
 
+#ifdef THEXTECH_BUILD_GL_MODERN
     int registerUniform(StdPicture &target, const char* name) override;
     void assignUniform(StdPicture &target, int index, const UniformValue_t& value) override;
     void spawnParticle(StdPicture &target, double worldX, double worldY, ParticleVertexAttrs_t attrs) override;
 
+    void addLight(const GLLight &light) override;
+    void setupLighting(const GLLightSystem &system) override;
+    void renderLighting() override;
+#endif
 
     // Draw primitives
 

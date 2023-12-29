@@ -23,6 +23,9 @@
 
 #include <cstdint>
 
+#include "xt_color.h"
+
+
 typedef unsigned int    GLenum;
 typedef int             GLint;
 typedef unsigned int    GLuint;
@@ -44,6 +47,8 @@ struct GLLightColor
     constexpr GLLightColor() = default;
     constexpr GLLightColor(uint8_t r, uint8_t g, uint8_t b, uint8_t a = 0xff)
         : a(a), r(r), g(g), b(b) {}
+    constexpr GLLightColor(XTColor color)
+        : a(color.a), r(color.r), g(color.g), b(color.b) {}
 
     uint8_t a = 0x00;
     uint8_t r = 0x00;
@@ -56,6 +61,8 @@ struct GLLightColor
     constexpr GLLightColor() = default;
     constexpr GLLightColor(uint8_t r, uint8_t g, uint8_t b, uint8_t a = 0xff)
         : b(b), g(g), r(r), a(a) {}
+    constexpr GLLightColor(XTColor color)
+        : b(color.b), g(color.g), r(color.r), a(color.a) {}
 
     uint8_t b = 0x00;
     uint8_t g = 0x00;
@@ -139,6 +146,11 @@ struct GLLightSystem
     GLfloat shadow_strength = 0.05;
     GLLightColor ambient = GLLightColor(0, 0, 0);
     uint32_t padding_2 = 0;
+
+    inline operator bool() const
+    {
+        return system_type != GLLightSystemType::disabled;
+    }
 };
 
 struct GLPictureLightInfo;
