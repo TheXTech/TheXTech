@@ -24,6 +24,11 @@
 
 #include <Logger/logger.h>
 
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#include <emscripten/html5.h>
+#endif
+
 #include "globals.h"
 #include "video.h"
 
@@ -487,9 +492,29 @@ void RenderGL::createFramebuffer(BufferIndex_t buffer)
     }
     else if(buffer == BUFFER_LIGHTING)
     {
+#ifdef __EMSCRIPTEN__
+        // emscripten requires an extension to render to floats
+        const EMSCRIPTEN_WEBGL_CONTEXT_HANDLE context = emscripten_webgl_get_current_context();
+        const EM_BOOL got_float_buffer = emscripten_webgl_enable_extension(context, "EXT_color_buffer_float");
+        if(got_float_buffer)
+        {
+            pLogDebug("Attempting to initialize lighting buffer with RGBA16F using EXT_color_buffer_float...");
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F,
+                ScreenW * scale_factor, ScreenH * scale_factor,
+                0, GL_RGBA, GL_FLOAT, nullptr);
+        }
+        else
+        {
+            pLogDebug("Initializing lighting buffer with RGB8...");
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB,
+                ScreenW * scale_factor, ScreenH * scale_factor,
+                0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
+        }
+#else // #ifdef __EMSCRIPTEN__
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F,
             ScreenW * scale_factor, ScreenH * scale_factor,
-            0, GL_RGB,  GL_FLOAT, nullptr);
+            0, GL_RGB, GL_FLOAT, nullptr);
+#endif
     }
     else
     {

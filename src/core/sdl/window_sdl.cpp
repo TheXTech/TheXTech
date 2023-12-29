@@ -367,6 +367,7 @@ void WindowSDL::restoreWindow()
 
 void WindowSDL::setWindowSize(int w, int h)
 {
+#ifndef __EMSCRIPTEN__
     // try to figure out whether requested size is bigger than the screen
     int display = SDL_GetWindowDisplayIndex(m_window);
     if(display >= 0)
@@ -380,6 +381,7 @@ void WindowSDL::setWindowSize(int w, int h)
     }
 
     SDL_SetWindowSize(m_window, w, h);
+#endif
 }
 
 void WindowSDL::getWindowSize(int *w, int *h)
