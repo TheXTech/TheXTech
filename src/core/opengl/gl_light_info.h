@@ -102,8 +102,8 @@ struct GLLight
 
     GLLightType type = GLLightType::none;
     GLLightColor color = GLLightColor{0, 0, 0, 0};
-    GLfloat radius = 0.0;
-    GLfloat depth = 0.0;
+    GLfloat radius = 0.0f;
+    GLfloat depth = 0.0f;
     GLLightPos pos = GLLightPos{0.0, 0.0, 0.0, 0.0};
 
     // frustrating, but at least it's here. observe that pos is not sorted; that's intentional because calling code may sort it in different ways.
@@ -143,7 +143,7 @@ enum class GLLightSystemType : uint32_t
 struct GLLightSystem
 {
     GLLightSystemType system_type = GLLightSystemType::disabled;
-    GLfloat shadow_strength = 0.05;
+    GLfloat shadow_strength = 0.05f;
     GLLightColor ambient = GLLightColor(0, 0, 0);
     uint32_t padding_2 = 0;
 
