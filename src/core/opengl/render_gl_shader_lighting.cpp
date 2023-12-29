@@ -216,7 +216,8 @@ float calculate_light_falloff(const in Light light, const in uint light_type, co
     // squared decay
     return (light.radius * light.radius - (pixel_dist + 1.0) * (pixel_dist + 1.0)) / (light.radius * light.radius);
 }
-
+)RAW" // MSVC limits pre-concatenation length of strings to 16384 bytes, but C++ standard mandates support for up to 65536 bytes (after concatenation)
+R"RAW(
 float shadow(const in vec2 target_pos, const in float target_plane, const in vec2 source_pos, const in float source_plane)
 {
     float shadow_base = u_shadow_strength < 1.0 ? 0.25 * log(1.0 - u_shadow_strength) : 0.0;
