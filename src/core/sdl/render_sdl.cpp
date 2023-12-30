@@ -558,7 +558,7 @@ void RenderSDL::execute(const RenderOp& op)
         SDL_Rect aRect = {op.xDst, op.yDst, op.wDst, op.hDst};
         SDL_SetRenderDrawColor(m_gRenderer, op.color.r, op.color.g, op.color.b, op.color.a);
 
-        if(op.traits && RenderOp::Traits::filled)
+        if(op.traits & RenderOp::Traits::filled)
             SDL_RenderFillRect(m_gRenderer, &aRect);
         else
             SDL_RenderDrawRect(m_gRenderer, &aRect);
