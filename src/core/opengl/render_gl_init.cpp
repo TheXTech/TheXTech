@@ -37,7 +37,7 @@
 constexpr bool s_enable_debug_output = true;
 
 
-#if defined(__ANDROID__) && defined(THEXTECH_BUILD_GL_ES_MODERN)
+#ifdef RENDERGL_LOAD_ES3_SYMBOLS
 
 #include <EGL/egl.h>
 
@@ -54,7 +54,7 @@ void load_gles3_symbols()
     #undef FIND_PROC
 }
 
-#endif // #if defined(__ANDROID__) && defined(THEXTECH_BUILD_GL_ES_MODERN)
+#endif // #ifdef RENDERGL_LOAD_ES3_SYMBOLS
 
 
 #ifdef RENDERGL_HAS_DEBUG
@@ -289,7 +289,7 @@ bool RenderGL::initOpenGL(const CmdLineSetup_t &setup)
         return false;
     }
 
-#if defined(__ANDROID__) && defined(THEXTECH_BUILD_GL_ES_MODERN)
+#ifdef RENDERGL_LOAD_ES3_SYMBOLS
     if(m_gl_profile == SDL_GL_CONTEXT_PROFILE_ES && m_gl_majver >= 3)
         load_gles3_symbols();
 #endif
