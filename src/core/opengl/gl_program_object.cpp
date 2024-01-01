@@ -26,11 +26,13 @@
 
 #include "core/opengl/gl_inc.h"
 #include "core/opengl/gl_program_object.h"
+#include "core/opengl/gl_shader_translator.h"
 #include "core/opengl/render_gl.h"
 #include "std_picture.h"
 
 
 GLuint GLProgramObject::s_last_program = 0;
+std::string GLProgramObject::s_temp_string;
 
 bool UniformValue_t::operator==(const UniformValue_t& o) const
 {
@@ -99,8 +101,25 @@ void s_execute_assignment(GLint uniform_loc, const UniformValue_t& value)
  *** Static helper functions ***
  *******************************/
 
+// -1 indicates that the translator is required, and 1 indicates that the essl version has been natively compiled before
+enum translation_preference
+{
+    TL_PREF_UNKNOWN = 0,
+    TL_PREF_NATIVE,
+    TL_PREF_TRANSLATE
+};
+static translation_preference s_essl_tl_pref[2] = {TL_PREF_UNKNOWN, TL_PREF_UNKNOWN};
+
+void GLProgramObject::s_reset_supported_versions()
+{
+    s_essl_tl_pref[0] = TL_PREF_UNKNOWN;
+    s_essl_tl_pref[1] = TL_PREF_UNKNOWN;
+}
+
 GLuint GLProgramObject::s_compile_shader(GLenum type, const char* src)
 {
+    int essl_version = (SDL_strncmp(src, "#version 100", 12) != 0) ? 1 : 0;
+
     // Create the shader object
     GLuint shader = glCreateShader(type);
 
@@ -111,7 +130,27 @@ GLuint GLProgramObject::s_compile_shader(GLenum type, const char* src)
     }
 
     // Load the shader source
-    glShaderSource(shader, 1, &src, nullptr);
+    if(XTechShaderTranslator::Inited() && s_essl_tl_pref[essl_version] == TL_PREF_TRANSLATE)
+    {
+        // translate source before compilation
+        std::string translated_src;
+        XTechShaderTranslator::TranslateShader(translated_src, src, type);
+
+        if(translated_src.empty())
+        {
+            glDeleteShader(shader);
+            return 0;
+        }
+
+        // compile translated source
+        const char* translated_src_ptr = translated_src.c_str();
+        glShaderSource(shader, 1, &translated_src_ptr, nullptr);
+    }
+    else
+    {
+        // compile natively
+        glShaderSource(shader, 1, &src, nullptr);
+    }
 
     // Compile the shader
     glCompileShader(shader);
@@ -120,7 +159,10 @@ GLuint GLProgramObject::s_compile_shader(GLenum type, const char* src)
     GLint status;
     glGetShaderiv(shader, GL_COMPILE_STATUS, &status);
 
-    if(!status)
+    // don't issue a log if we will try compiling it again using the translator
+    bool suppress_log = (XTechShaderTranslator::Inited() && !status && s_essl_tl_pref[essl_version] == TL_PREF_UNKNOWN);
+
+    if(!status && !suppress_log)
     {
         pLogWarning("GLProgramObject: error compiling %s shader", type == GL_VERTEX_SHADER ? "vertex" : "fragment");
         pLogDebug("shader source:\n%s", src);
@@ -130,7 +172,7 @@ GLuint GLProgramObject::s_compile_shader(GLenum type, const char* src)
 
     glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &len);
 
-    if(len > 1)
+    if(len > 1 && !suppress_log)
     {
         char* log = (char*)malloc(len);
 
@@ -146,11 +188,37 @@ GLuint GLProgramObject::s_compile_shader(GLenum type, const char* src)
     if(!status)
     {
         glDeleteShader(shader);
+        shader = 0;
 
-        return 0;
+#ifdef THEXTECH_USE_ANGLE_TRANSLATOR
+        // if we've never natively compiled a shader at this version, try translating it
+        if(XTechShaderTranslator::Inited() && s_essl_tl_pref[essl_version] == TL_PREF_UNKNOWN)
+        {
+            pLogDebug("GLProgramObject: attempting to translate OpenGL ES %c shader to desktop GLSL...", char('2' + essl_version));
+
+            s_essl_tl_pref[essl_version] = TL_PREF_TRANSLATE;
+            shader = s_compile_shader(type, src);
+
+            // mark as indeterminate if the translated version also fails, otherwise keep the preference for translated
+            if(!shader)
+                s_essl_tl_pref[essl_version] = TL_PREF_UNKNOWN;
+            else
+                pLogDebug("GLProgramObject: will use the ANGLE translator for OpenGL ES %c shaders.", char('2' + essl_version));
+        }
+#endif
+
+        return shader;
     }
 
     D_pLogDebug("GLProgramObject: %s shader successfully compiled", type == GL_VERTEX_SHADER ? "vertex" : "fragment");
+
+    // mark that compilation succeeded if using native compiler
+    if(s_essl_tl_pref[essl_version] == TL_PREF_UNKNOWN)
+    {
+        s_essl_tl_pref[essl_version] = TL_PREF_NATIVE;
+        if(XTechShaderTranslator::Inited())
+            pLogDebug("GLProgramObject: will use the native OpenGL compiler for OpenGL ES %c shaders.", char('2' + essl_version));
+    }
 
     return shader;
 }
@@ -159,6 +227,16 @@ GLuint GLProgramObject::s_compile_shader(GLenum type, const char* src)
 /***********************
  *** Private methods ***
  ***********************/
+
+const char* GLProgramObject::m_map_var(const char* variable)
+{
+    if(!m_binding_point_prefix)
+        return variable;
+
+    s_temp_string = m_binding_point_prefix;
+    s_temp_string += variable;
+    return s_temp_string.c_str();
+}
 
 void GLProgramObject::m_update_transform(const GLfloat* transform, const GLfloat* read_viewport, GLfloat clock)
 {
@@ -190,17 +268,17 @@ void GLProgramObject::m_link_program(GLuint vertex_shader, GLuint fragment_shade
     // set the builtin vertex attribute locations
     if(!particle_system)
     {
-        glBindAttribLocation(program, 0, "a_position");
-        glBindAttribLocation(program, 1, "a_texcoord");
-        glBindAttribLocation(program, 2, "a_tint");
+        glBindAttribLocation(program, 0, m_map_var("a_position"));
+        glBindAttribLocation(program, 1, m_map_var("a_texcoord"));
+        glBindAttribLocation(program, 2, m_map_var("a_tint"));
     }
     else
     {
-        glBindAttribLocation(program, 0, "a_index");
-        glBindAttribLocation(program, 1, "a_texcoord");
-        glBindAttribLocation(program, 2, "a_position");
-        glBindAttribLocation(program, 3, "a_spawn_time");
-        glBindAttribLocation(program, 4, "a_attribs");
+        glBindAttribLocation(program, 0, m_map_var("a_index"));
+        glBindAttribLocation(program, 1, m_map_var("a_texcoord"));
+        glBindAttribLocation(program, 2, m_map_var("a_position"));
+        glBindAttribLocation(program, 3, m_map_var("a_spawn_time"));
+        glBindAttribLocation(program, 4, m_map_var("a_attribs"));
     }
 
     // Link the program
@@ -242,19 +320,19 @@ void GLProgramObject::m_link_program(GLuint vertex_shader, GLuint fragment_shade
 
     // load all builtin uniform variable locations
 
-    m_u_transform_loc = glGetUniformLocation(m_program, "u_transform");
-    m_u_read_viewport_loc = glGetUniformLocation(m_program, "u_read_viewport");
-    m_u_clock_loc = glGetUniformLocation(m_program, "u_clock");
-    // m_u_fb_pixsize_loc = glGetUniformLocation(m_program, "u_fb_pixsize");
-    // m_u_texture_pixsize_loc = glGetUniformLocation(m_program, "u_texture_pixsize");
+    m_u_transform_loc = glGetUniformLocation(m_program, m_map_var("u_transform"));
+    m_u_read_viewport_loc = glGetUniformLocation(m_program, m_map_var("u_read_viewport"));
+    m_u_clock_loc = glGetUniformLocation(m_program, m_map_var("u_clock"));
+    // m_u_fb_pixsize_loc = glGetUniformLocation(m_program, m_map_var("u_fb_pixsize"));
+    // m_u_texture_pixsize_loc = glGetUniformLocation(m_program, m_map_var("u_texture_pixsize"));
 
     // set sampler texture index to 0 (fixed for all programs)
-    GLint u_texture_loc = glGetUniformLocation(m_program, "u_texture");
-    GLint u_framebuffer_loc = glGetUniformLocation(m_program, "u_framebuffer");
-    GLint u_mask_loc = glGetUniformLocation(m_program, "u_mask");
-    GLint u_previous_pass_loc = glGetUniformLocation(m_program, "u_previous_pass");
-    GLint u_depth_buffer_loc = glGetUniformLocation(m_program, "u_depth_buffer");
-    GLint u_light_buffer_loc = glGetUniformLocation(m_program, "u_light_buffer");
+    GLint u_texture_loc = glGetUniformLocation(m_program, m_map_var("u_texture"));
+    GLint u_framebuffer_loc = glGetUniformLocation(m_program, m_map_var("u_framebuffer"));
+    GLint u_mask_loc = glGetUniformLocation(m_program, m_map_var("u_mask"));
+    GLint u_previous_pass_loc = glGetUniformLocation(m_program, m_map_var("u_previous_pass"));
+    GLint u_depth_buffer_loc = glGetUniformLocation(m_program, m_map_var("u_depth_buffer"));
+    GLint u_light_buffer_loc = glGetUniformLocation(m_program, m_map_var("u_light_buffer"));
 
     glUseProgram(m_program);
     glUniform1i(u_texture_loc,       TEXTURE_UNIT_IMAGE      - GL_TEXTURE0);
@@ -377,6 +455,7 @@ GLProgramObject::GLProgramObject(GLuint vertex_shader, GLuint fragment_shader, b
 
 GLProgramObject::GLProgramObject(const char* vertex_src, const char* fragment_src, bool particle_system)
 {
+    // compile shaders
     GLuint vertex_shader = s_compile_shader(GL_VERTEX_SHADER, vertex_src);
 
     if(!vertex_shader)
@@ -390,8 +469,17 @@ GLProgramObject::GLProgramObject(const char* vertex_src, const char* fragment_sr
         return;
     }
 
+    // set binding point prefix based on whether translation occurred
+    int essl_version = (SDL_strncmp(fragment_src, "#version 100", 12) != 0) ? 1 : 0;
+    if(s_essl_tl_pref[essl_version] == TL_PREF_TRANSLATE)
+        m_binding_point_prefix = "_u";
+    else
+        m_binding_point_prefix = nullptr;
+
+    // link program
     m_link_program(vertex_shader, fragment_shader, particle_system);
 
+    // delete shaders
     glDeleteShader(vertex_shader);
     glDeleteShader(fragment_shader);
 }
@@ -481,7 +569,7 @@ int GLProgramObject::register_uniform(const char* name, StdPictureLoad& l)
 
     GLint loc = -1;
     if(m_program)
-        loc = glGetUniformLocation(m_program, name);
+        loc = glGetUniformLocation(m_program, m_map_var(name));
 
     if(loc < 0)
         pLogWarning("GLProgramObject: attempted to register non-existent uniform %s", name);
