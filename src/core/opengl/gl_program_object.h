@@ -22,6 +22,7 @@
 #ifndef GL_PROGRAM_OBJECT_H
 
 #include <vector>
+#include <string>
 #include <cstdint>
 
 typedef unsigned int    GLenum;
@@ -104,8 +105,10 @@ public:
 
 private:
     static GLuint s_last_program;
+    static std::string s_temp_string;
 
     GLuint m_program = 0;
+    const char* m_binding_point_prefix = nullptr;
     int m_flags = translucent;
 
     // OpenGL locations for common uniforms
@@ -140,6 +143,9 @@ private:
     std::vector<UniformAssignment_t> m_uniform_steps;
 
     // internal functions
+    //! map a binding point in case the shader was translated
+    const char* m_map_var(const char* variable);
+
     void m_update_transform(const GLfloat* transform, const GLfloat* read_viewport, GLfloat clock);
 
     static GLuint s_compile_shader(GLenum type, const char* src);
@@ -273,6 +279,11 @@ public:
 
         m_activate_uniform_step(step);
     }
+
+    /*!
+     * \brief Resets information about which versions of ESSL are supported by the native OpenGL driver
+     */
+    static void s_reset_supported_versions();
 };
 
 #endif // #ifndef GL_PROGRAM_OBJECT_H

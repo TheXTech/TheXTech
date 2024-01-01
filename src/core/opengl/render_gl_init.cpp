@@ -33,6 +33,7 @@
 #include "video.h"
 
 #include "core/opengl/render_gl.h"
+#include "core/opengl/gl_shader_translator.h"
 
 constexpr bool s_enable_debug_output = true;
 
@@ -323,7 +324,13 @@ bool RenderGL::initShaders()
     if(!m_use_shaders)
         return true;
 
-    // do something to assess es3 compatibility here
+    GLProgramObject::s_reset_supported_versions();
+
+    if(m_gl_profile != SDL_GL_CONTEXT_PROFILE_ES)
+    {
+        XTechShaderTranslator::EnsureInit();
+        XTechShaderTranslator::SetOpenGLVersion(m_gl_majver, m_gl_minver);
+    }
 
     m_standard_program = GLProgramObject(
         s_es2_standard_vert_src,
@@ -353,6 +360,7 @@ bool RenderGL::initShaders()
     if(!logic_contents.empty())
         logic_contents.push_back('\0');
 
+    // assess es3 compatibility using the bitmask shader
     m_bitmask_program = GLProgramObject(
         s_es3_advanced_vert_src,
         s_es3_bitmask_frag_src

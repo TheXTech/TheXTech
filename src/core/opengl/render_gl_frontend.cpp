@@ -26,6 +26,7 @@
 
 #include "core/opengl/render_gl.h"
 #include "core/opengl/gl_program_object.h"
+#include "core/opengl/gl_shader_translator.h"
 
 #include <FreeImageLite.h>
 #include <Graphics/graphics_funcs.h>
@@ -325,6 +326,8 @@ void RenderGL::close()
 {
     RenderGL::clearAllTextures();
     AbstractRender_t::close();
+
+    XTechShaderTranslator::EnsureQuit();
 
 #ifdef RENDERGL_HAS_SHADERS
     m_standard_program.reset();
