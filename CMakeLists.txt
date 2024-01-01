@@ -159,6 +159,8 @@ option(THEXTECH_BUILD_GL_ES_MODERN "On SDL builds, include the OpenGL ES 2.0+ re
 option(THEXTECH_BUILD_GL_DESKTOP_LEGACY "On SDL builds, include the OpenGL 1.1+ renderer" ON)
 option(THEXTECH_BUILD_GL_ES_LEGACY "On SDL builds, include the OpenGL ES 1.1 renderer" OFF)
 
+option(THEXTECH_USE_ANGLE_TRANSLATOR "Use the ANGLE shader translator to improve shader support in OpenGL 3.0+ Core/Compatibility profiles" OFF)
+
 option(RANGE_ARR_USE_HEAP "Store data of RangeArr<> template in a heap" OFF)
 option(RANGE_ARR_UNSAFE_MODE "Disable all range checks at RangeArr<> template" OFF)
 
@@ -518,6 +520,24 @@ if(THEXTECH_ENABLE_DISCORD_RPC)
     set(THEXTECH_ENABLE_INTEGRATOR ON)  # This feature needs for an Integrator
 endif()
 
+if(THEXTECH_BUILD_GL_DESKTOP_MODERN AND THEXTECH_USE_ANGLE_TRANSLATOR)
+    add_subdirectory(3rdparty/angle-shader-translator)
+
+    message("== Building ANGLE shader translator ==")
+    # suppress some known warnings on GCC / Clang
+    if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+        target_compile_options(angle_shader_translator PRIVATE -Wno-unused-parameter)
+        target_compile_options(angle_shader_translator PRIVATE -Wno-c++17-attribute-extensions)
+    elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang")
+        target_compile_options(angle_shader_translator PRIVATE -Wno-unused-parameter)
+        target_compile_options(angle_shader_translator PRIVATE -Wno-c++17-extensions)
+    elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+        target_compile_options(angle_shader_translator PRIVATE /wd4100) # unreferenced formal parameter
+    endif()
+
+    target_link_libraries(A2XT_Int INTERFACE angle_shader_translator)
+endif()
+
 target_link_libraries(A2XT_Int INTERFACE ${A2XT_LIBS})
 target_include_directories(A2XT_Int INTERFACE ${A2XT_INCS})
 
@@ -874,6 +894,13 @@ else()
         list(APPEND THEXTECH_SRC
             src/core/opengl/gl_program_bank.cpp
             src/core/opengl/gl_particle_system.cpp
+        )
+    endif()
+
+    if(THEXTECH_BUILD_GL_DESKTOP_MODERN AND THEXTECH_USE_ANGLE_TRANSLATOR)
+        add_definitions(-DTHEXTECH_USE_ANGLE_TRANSLATOR)
+        list(APPEND THEXTECH_SRC
+            src/core/opengl/gl_shader_translator.cpp
         )
     endif()
 
