@@ -85,7 +85,7 @@ void AppPathP::initDefaultPaths(const std::string &userDirName)
     }
     else
         s_toUtf8(localPath, pathBuffer, (DWORD)SDL_wcslen(pathBuffer));
-#endif THEXTECH_NEW_USER_PATHS
+#endif // THEXTECH_NEW_USER_PATHS
 
     // Application path
     char *path = SDL_GetBasePath();
