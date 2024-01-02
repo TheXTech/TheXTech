@@ -20,6 +20,10 @@
 
 #include "sdl_proxy/sdl_stdinc.h"
 
+#ifdef THEXTECH_BUILD_GL_MODERN
+#include <json/json.hpp>
+#endif
+
 #ifdef __16M__
 // used to clear loaded textures on level/world load
 #include "core/render.h"
@@ -280,11 +284,96 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         else
             CustomMusic[B] = g_dirEpisode.resolveFileCase(s.music_file);
 
-#if defined(THEXTECH_BUILD_GL_MODERN) && defined(THEXTECH_WIP_FEATURES)
-        // FIXME: allow sections to specify shaders by name
-        SectionEffect[B] = ResolveGLProgram("section-effect");
-        SectionParticlesBG[B] = ResolveGLParticleSystem("particles-bg");
-        SectionParticlesFG[B] = ResolveGLParticleSystem("particles-fg");
+#if defined(THEXTECH_BUILD_GL_MODERN)
+        if(!s.custom_params.empty())
+        {
+            try
+            {
+                const nlohmann::json section_data = nlohmann::json::parse(s.custom_params);
+
+                if(section_data.contains("effects"))
+                {
+                    std::string screen_effect = section_data["effects"].value("screenEffect", "");
+                    if(screen_effect.empty())
+                    {
+                        const char* x2_screen_effects[] = {"", "wavy", "lava", "caustics", "underwater", "mist", "sepia", "grayscale", "inverted", "gameboy", "gameboy-dither"};
+
+                        int x2_effect_idx = section_data["effects"].value("screenEffects", 0);
+                        if(x2_effect_idx > 0 && x2_effect_idx < int(sizeof(x2_screen_effects) / sizeof(const char*)))
+                        {
+                            screen_effect += "x2-";
+                            screen_effect += x2_screen_effects[x2_effect_idx];
+                        }
+                    }
+
+                    if(!screen_effect.empty())
+                        SectionEffect[B] = ResolveGLProgram("screen-" + screen_effect);
+
+                    std::string particles_fg = section_data["effects"].value("fgParticles", "");
+                    if(particles_fg.empty())
+                    {
+                        const char* x2_weather_effects[] = {"", "rain", "snow", "fog", "sandstorm", "cinders", "wisps"};
+
+                        int x2_weather_idx = section_data["effects"].value("weather", 0);
+                        if(x2_weather_idx > 0 && x2_weather_idx < int(sizeof(x2_weather_effects) / sizeof(const char*)))
+                        {
+                            particles_fg += "x2-";
+                            particles_fg += x2_weather_effects[x2_weather_idx];
+                        }
+                    }
+
+                    if(!particles_fg.empty())
+                        SectionParticlesFG[B] = ResolveGLParticleSystem("particles-" + particles_fg);
+
+                    std::string particles_bg = section_data["effects"].value("bgParticles", "");
+                    if(!particles_bg.empty())
+                        SectionParticlesBG[B] = ResolveGLParticleSystem("particles-" + particles_bg);
+                }
+
+                SectionLighting[B] = GLLightSystem();
+                if(section_data.contains("darkness") && section_data["darkness"].value("enableDarkness", false))
+                {
+                    double shadow_strength = section_data["darkness"].value("shadowStrength", 0.5);
+                    SectionLighting[B].shadow_strength = (float)shadow_strength;
+
+                    int shadow_type = section_data["darkness"].value("shadowType", -1);
+                    if(shadow_type == -1)
+                    {
+                        int x2_shadows = section_data["darkness"].value("shadows", 0);
+
+                        if(x2_shadows == 1)
+                            SectionLighting[B].system_type = GLLightSystemType::shadow_rays;
+                        else if(x2_shadows == 2)
+                        {
+                            SectionLighting[B].system_type = GLLightSystemType::shadow_rays;
+                            SectionLighting[B].shadow_strength = 1.0f;
+                        }
+                        else
+                            SectionLighting[B].system_type = GLLightSystemType::shadow_none;
+                    }
+
+                    if(shadow_type == 1)
+                        SectionLighting[B].system_type = GLLightSystemType::shadow_rays;
+                    else if(shadow_type == 2)
+                        SectionLighting[B].system_type = GLLightSystemType::shadow_drop;
+                    else
+                        SectionLighting[B].system_type = GLLightSystemType::shadow_none;
+
+                    std::string ambient = section_data["darkness"].value("ambient", "#181828ff");
+
+                    SectionLighting[B].ambient = XTColorString(ambient);
+                }
+            }
+            catch(const std::exception &e)
+            {
+                pLogWarning("Failed to load Section %d JSON data: %s", B, e.what());
+
+                SectionEffect[B] = LoadedGLProgramRef_t();
+                SectionParticlesBG[B] = LoadedGLProgramRef_t();
+                SectionParticlesFG[B] = LoadedGLProgramRef_t();
+                SectionLighting[B] = GLLightSystem();
+            }
+        }
 #endif
 
         B++;
@@ -1064,6 +1153,7 @@ void ClearLevel()
     SectionEffect.fill(LoadedGLProgramRef_t());
     SectionParticlesBG.fill(LoadedGLProgramRef_t());
     SectionParticlesFG.fill(LoadedGLProgramRef_t());
+    SectionLighting.fill(GLLightSystem());
 #endif
 
     UnloadCustomGFX();

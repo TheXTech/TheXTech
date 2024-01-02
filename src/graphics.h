@@ -218,8 +218,8 @@ int pfrOffY(const StdPicture& tx, const Player_t& p);
  */
 void GameThing(int waitms = 0, int fadeSpeed = 0);
 // Public Sub DrawPlayer(A As Integer, Z As Integer)
-void DrawPlayer(const int A, const int Z);
-void DrawPlayer(Player_t &p, const int Z);
+void DrawPlayer(const int A, const int Z, XTColor color = XTColor());
+void DrawPlayer(Player_t &p, const int Z, XTColor color = XTColor());
 // Public Sub ScreenShot()
 void ScreenShot();
 // Public Sub DrawFrozenNPC(Z As Integer, A As Integer)

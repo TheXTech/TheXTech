@@ -57,6 +57,6 @@ void RenderFrameBorder(const Location_t& external, const Location_t& internal,
 
 // renders a new-style frame as a fill at the included internal location
 // the frame fills the internal rect
-void RenderFrameFill(const Location_t& internal, FrameBorder& frame);
+void RenderFrameFill(const Location_t& internal, FrameBorder& frame, XTColor color = XTColor());
 
 #endif // GFX_FRAME_H

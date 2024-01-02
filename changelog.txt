@@ -23,6 +23,8 @@ Changelog for 1.3.6.3-dev
 -Fix rare TheXTech 1.3.6 bug where newly-added player could get stuck in immune state if other player died (@ds-sloth)
 -Display current version (and git revision if a dev build) on title screen (@ds-sloth)
 -Wii U port: add WUHB build (@ds-sloth)
+-Fix TheXTech 1.3.6.1 bug where the score display would not show '9's when using legacy assets (@ds-sloth)
+-Use the ANGLE shader translator library to improve support for OpenGL ES 3.0 shaders on desktop platforms (@ds-sloth)
 
 Changelog for 1.3.6.2
 -Fixed a crash on attempt to add a game directory after storage permission grant on Android (@Wohlstand)

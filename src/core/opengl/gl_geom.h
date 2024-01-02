@@ -221,6 +221,13 @@ struct RectF
         br /= o;
         return *this;
     }
+
+    inline RectF operator*(const PointF& o)
+    {
+        RectF ret = *this;
+        ret *= o;
+        return ret;
+    }
 };
 
 struct QuadI

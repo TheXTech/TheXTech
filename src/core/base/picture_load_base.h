@@ -31,6 +31,7 @@
 #ifdef THEXTECH_BUILD_GL_MODERN
 #include <string>
 #include "core/opengl/gl_program_object.h"
+#include "core/opengl/gl_light_info.h"
 #endif
 
 /*!
@@ -61,6 +62,9 @@ struct StdPictureLoad
     std::vector<std::string> registeredUniforms;
     //! Most recent values for shader uniform variables, in order of registration
     std::vector<UniformValue_t> finalUniformState;
+
+    //! GLPictureLightInfo for texture's light table entries
+    GLPictureLightInfoPtr light_info;
 #endif
 
 

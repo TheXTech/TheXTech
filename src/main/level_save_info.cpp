@@ -115,13 +115,19 @@ void ImportLevelSaveInfo(const GamesaveData& s)
         {
             WorldLevel_t& l = WorldLevel[A];
 
-            if(l.save_info.inited())
+            // can skip the string comparison if the level has already been initialized and we are no longer checking whether this save info has any level
+            if(l.save_info.inited() && worldLevelHit)
                 continue;
 
             if(l.FileName == e.level_filename)
             {
-                l.save_info = info;
+                // update level save info if not yet initialized
+                if(!l.save_info.inited())
+                    l.save_info = info;
+
+                // mark save info as paired with a level
                 worldLevelHit = true;
+
                 // don't break, in case another level has the same filename
             }
         }

@@ -24,15 +24,21 @@
 
 #include <Logger/logger.h>
 
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#include <emscripten/html5.h>
+#endif
+
 #include "globals.h"
 #include "video.h"
 
 #include "core/opengl/render_gl.h"
+#include "core/opengl/gl_shader_translator.h"
 
 constexpr bool s_enable_debug_output = true;
 
 
-#if defined(__ANDROID__) && defined(THEXTECH_BUILD_GL_ES_MODERN)
+#ifdef RENDERGL_LOAD_ES3_SYMBOLS
 
 #include <EGL/egl.h>
 
@@ -49,7 +55,7 @@ void load_gles3_symbols()
     #undef FIND_PROC
 }
 
-#endif // #if defined(__ANDROID__) && defined(THEXTECH_BUILD_GL_ES_MODERN)
+#endif // #ifdef RENDERGL_LOAD_ES3_SYMBOLS
 
 
 #ifdef RENDERGL_HAS_DEBUG
@@ -284,7 +290,7 @@ bool RenderGL::initOpenGL(const CmdLineSetup_t &setup)
         return false;
     }
 
-#if defined(__ANDROID__) && defined(THEXTECH_BUILD_GL_ES_MODERN)
+#ifdef RENDERGL_LOAD_ES3_SYMBOLS
     if(m_gl_profile == SDL_GL_CONTEXT_PROFILE_ES && m_gl_majver >= 3)
         load_gles3_symbols();
 #endif
@@ -318,7 +324,13 @@ bool RenderGL::initShaders()
     if(!m_use_shaders)
         return true;
 
-    // do something to assess es3 compatibility here
+    GLProgramObject::s_reset_supported_versions();
+
+    if(m_gl_profile != SDL_GL_CONTEXT_PROFILE_ES)
+    {
+        XTechShaderTranslator::EnsureInit();
+        XTechShaderTranslator::SetOpenGLVersion(m_gl_majver, m_gl_minver);
+    }
 
     m_standard_program = GLProgramObject(
         s_es2_standard_vert_src,
@@ -348,6 +360,7 @@ bool RenderGL::initShaders()
     if(!logic_contents.empty())
         logic_contents.push_back('\0');
 
+    // assess es3 compatibility using the bitmask shader
     m_bitmask_program = GLProgramObject(
         s_es3_advanced_vert_src,
         s_es3_bitmask_frag_src
@@ -399,22 +412,43 @@ bool RenderGL::initShaders()
     // initialize the lighting program
     if(m_has_es3_shaders)
     {
+        // code to support a jump flooding algorithm to calculate a distance field
+        m_distance_field_1_program = GLProgramObject(
+            s_es3_advanced_vert_src,
+            s_es3_distance_field_1_frag_src
+        );
+
+        m_distance_field_2_program = GLProgramObject(
+            s_es3_advanced_vert_src,
+            s_es3_distance_field_2_frag_src
+        );
+
+        // will assume that this is stored in the GLProgramObject's uniform slot 0 later
+        StdPictureLoad null_load;
+        m_distance_field_2_program.register_uniform("u_step_size", null_load);
+
         dumpFullFile(output_contents, (AppPath + "/graphics/shaders/lighting.frag").c_str());
         if(!output_contents.empty())
             output_contents.push_back('\0');
 
-        m_lighting_program = GLProgramObject(
+        m_lighting_calc_program = GLProgramObject(
             s_es3_advanced_vert_src,
-            output_contents.empty() ? s_es3_lighting_frag_src : output_contents.data()
+            output_contents.empty() ? s_es3_lighting_calc_frag_src : output_contents.data()
         );
 
-        if(m_lighting_program.inited())
+        if(m_lighting_calc_program.inited())
         {
             // initialize uniform buffer (if supported)
             glGenBuffers(1, &m_light_ubo);
             glBindBuffer(GL_UNIFORM_BUFFER, m_light_ubo);
             glBufferData(GL_UNIFORM_BUFFER, sizeof(LightBuffer), &m_light_queue, GL_STREAM_DRAW);
             glBindBufferBase(GL_UNIFORM_BUFFER, 0, m_light_ubo);
+
+            // initialize lighting apply program
+            m_lighting_apply_program = GLProgramObject(
+                s_es2_advanced_vert_src,
+                s_es2_lighting_apply_frag_src
+            );
         }
     }
 
@@ -463,6 +497,32 @@ void RenderGL::createFramebuffer(BufferIndex_t buffer)
         glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT16,
             ScreenW * scale_factor, ScreenH * scale_factor,
             0, GL_DEPTH_COMPONENT, GL_UNSIGNED_SHORT, nullptr);
+    }
+    else if(buffer == BUFFER_LIGHTING)
+    {
+#ifdef __EMSCRIPTEN__
+        // emscripten requires an extension to render to floats
+        const EMSCRIPTEN_WEBGL_CONTEXT_HANDLE context = emscripten_webgl_get_current_context();
+        const EM_BOOL got_float_buffer = emscripten_webgl_enable_extension(context, "EXT_color_buffer_float");
+        if(got_float_buffer)
+        {
+            pLogDebug("Attempting to initialize lighting buffer with RGBA16F using EXT_color_buffer_float...");
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F,
+                ScreenW * scale_factor, ScreenH * scale_factor,
+                0, GL_RGBA, GL_FLOAT, nullptr);
+        }
+        else
+        {
+            pLogDebug("Initializing lighting buffer with RGB8...");
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB,
+                ScreenW * scale_factor, ScreenH * scale_factor,
+                0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
+        }
+#else // #ifdef __EMSCRIPTEN__
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F,
+            ScreenW * scale_factor, ScreenH * scale_factor,
+            0, GL_RGB, GL_FLOAT, nullptr);
+#endif
     }
     else
     {
@@ -645,16 +705,17 @@ bool RenderGL::initFramebuffers()
     {
         glActiveTexture(TEXTURE_UNIT_FB_READ);
         glBindTexture(GL_TEXTURE_2D, m_buffer_texture[BUFFER_FB_READ]);
-        glActiveTexture(TEXTURE_UNIT_IMAGE);
     }
 
-    // bind texture unit 5 to the lighting texture
-    if(m_buffer_texture[BUFFER_LIGHTING])
-    {
-        glActiveTexture(TEXTURE_UNIT_LIGHT_READ);
-        glBindTexture(GL_TEXTURE_2D, m_buffer_texture[BUFFER_LIGHTING]);
-        glActiveTexture(TEXTURE_UNIT_IMAGE);
-    }
+    // initialize null lighting texture and bind to texture unit 5
+    glGenTextures(1, &m_null_light_texture);
+    glActiveTexture(TEXTURE_UNIT_LIGHT_READ);
+    glBindTexture(GL_TEXTURE_2D, m_null_light_texture);
+    const GLubyte white_texel[4] = {255, 255, 255, 255};
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB,
+        1, 1,
+        0, GL_RGB, GL_UNSIGNED_BYTE, white_texel);
+    glActiveTexture(TEXTURE_UNIT_IMAGE);
 
 #endif // #ifdef RENDERGL_HAS_FBO
 

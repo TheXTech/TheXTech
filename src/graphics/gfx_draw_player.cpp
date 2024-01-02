@@ -155,16 +155,16 @@ int pfrOffY(const StdPicture& tx, const Player_t& p)
     return offY;
 }
 
-void DrawPlayer(const int A, const int Z)
+void DrawPlayer(const int A, const int Z, XTColor color)
 {
-    DrawPlayer(Player[A], Z);
+    DrawPlayer(Player[A], Z, color);
 }
 
-void DrawPlayer(Player_t &p, const int Z)
+void DrawPlayer(Player_t &p, const int Z, XTColor color)
 {
     int B = 0;
     double C = 0;
-    XTColor s = ShadowMode ? XTColor(0, 0, 0) : XTColor();
+    XTColor s = (ShadowMode ? XTColor(0, 0, 0) : color);
     //auto &p = Player[A];
 
     bool player_door_scroll = (p.Effect == 7 && p.Effect2 >= 128);

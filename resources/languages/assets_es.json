@@ -12,7 +12,10 @@
             "fam-set2": {
                 "bg2-25": "Subterráneo",
                 "bg2-44": "Castillo",
-                "bg2-48": "Nubes"
+                "bg2-48": "Nubes",
+                "bg2-57": "Calabozo",
+                "bg2-52": "Noche - Desierto",
+                "bg2-5": "Árboles"
             },
             "fam-misc": {
                 "bg2-16": "Cráter espacial",
@@ -23,7 +26,176 @@
             },
             "auto": {
                 "bg2-0": "Ninguno"
+            },
+            "fam-set3": {
+                "bg2-13": "Nubes",
+                "bg2-21": "Batalla",
+                "bg2-4": "Tuberías",
+                "bg2-15": "Calabozo 2",
+                "bg2-36": "Nubes 2",
+                "bg2-3": "Calabozo",
+                "bg2-39": "Cueva 2",
+                "bg2-20": "Bosque",
+                "bg2-38": "Cueva",
+                "bg2-1": "Bloques",
+                "bg2-24": "Jefe Final",
+                "bg2-23": "Tanques",
+                "bg2-27": "Castillo",
+                "bg2-22": "Cascada",
+                "bg2-37": "Colinas de Nieve",
+                "bg2-35": "Árboles de Nieve",
+                "bg2-2": "Colinas",
+                "bg2-14": "Desierto",
+                "bg2-17": "Nave",
+                "bg2-56": "Bajo el agua"
+            },
+            "fam-set4": {
+                "bg2-32": "Colinas 2",
+                "bg2-33": "Colinas 4",
+                "bg2-30": "Cueva",
+                "bg2-55": "Bajo el agua",
+                "bg2-58": "Noche del Desierto",
+                "bg2-11": "Colinas",
+                "bg2-12": "Árboles",
+                "bg2-19": "Árboles",
+                "bg2-18": "Mansión",
+                "bg2-42": "Castillo",
+                "bg2-29": "Noche",
+                "bg2-43": "Castillo 2",
+                "bg2-31": "Nubes",
+                "bg2-34": "Colinas 3"
+            }
+        },
+        "music": {
+            "fam-64": {
+                "music50": "Cueva",
+                "music14": "Desierto",
+                "music35": "Nieve",
+                "music26": "Castillo",
+                "music36": "Jefe",
+                "music49": "Agua",
+                "music27": "Tema central"
+            },
+            "fam-misc": {
+                "music55": "Tema del título",
+                "music38": "Aldea de la jungla",
+                "music18": "Playa",
+                "music56": "Carrera de obstáculos",
+                "music8": "¡Acorralado!",
+                "music37": "Montaña de Hielo"
+            },
+            "fam-fight": {
+                "music39": "Templo",
+                "header": "Batalla",
+                "music40": "Caballero",
+                "music52": "Subterráneo"
+            },
+            "auto": {
+                "music0": "Ninguna",
+                "music24": "Personalizada"
+            },
+            "fam-space": {
+                "music11": "Pantano Rojo",
+                "music22": "Carga Espacial",
+                "header": "Espacio",
+                "music44": "Cuarto de Objeto",
+                "music12": "Cráter"
+            },
+            "fam-rpg": {
+                "music33": "Nubes",
+                "music34": "Ciudad"
+            },
+            "fam-set2": {
+                "music43": "Jefe Final",
+                "music25": "Subterráneo"
+            },
+            "fam-set3": {
+                "music2": "Cielo",
+                "music3": "Calabozo",
+                "music6": "Jefe",
+                "music4": "Subterráneo",
+                "music47": "Agua"
+            },
+            "fam-set1": {
+                "music46": "Agua",
+                "music42": "Calabozo",
+                "music7": "Subterráneo"
+            }
+        },
+        "block": {
+            "fam-cave4": "Cueva",
+            "fam-water3": "Agua",
+            "fam-pipes3": "Tuberías",
+            "fam-pipes1": "Tuberías",
+            "fam-pipes4": "Tuberías",
+            "fam-desert3": "Desierto",
+            "fam-wood2": "Madera",
+            "fam-dungeon3": "Calabozo",
+            "fam-clouds1": "Nubes",
+            "fam-dungeon1": "Calabozo",
+            "fam-grass4": "Césped",
+            "fam-mansion4": "Mansión",
+            "fam-special2": "Especial",
+            "fam-pipes5-2": "Tuberías",
+            "fam-bricks5": "Ladrillo",
+            "fam-special4": "Especial",
+            "fam-woods4": "Maderas",
+            "fam-ruins5": "Ruinas",
+            "fam-grass3": "Césped",
+            "fam-house3": "Casa",
+            "fam-special3": "Especial",
+            "fam-cave3": "Cueva",
+            "fam-wood3": "Madera",
+            "fam-castle4": "Castillo",
+            "fam-special1": "Especial",
+            "fam-castle2": "Castillo",
+            "fam-underground2": "Subterráneo",
+            "fam-underground1": "Subterráneo"
+        },
+        "bgo": {
+            "fam-key4": "Llave",
+            "fam-water3": "Agua",
+            "fam-water4": "Agua",
+            "fam-water1": "Agua",
+            "fam-tiles3": "Baldosas",
+            "fam-temple5": "Templo",
+            "fam-structures3": "Estructuras",
+            "fam-plants2": "Plantas 2",
+            "fam-exit3": "Salida",
+            "fam-water2": "Agua",
+            "fam-plants4": "Plantas",
+            "fam-bars4": "Barras",
+            "fam-clouds1": "Nubes",
+            "fam-plants1": "Plantas",
+            "fam-doors4": "Puertas",
+            "fam-plants3": "Plantas",
+            "fam-fences1": "Cercas",
+            "fam-fences4": "Cercas",
+            "fam-doors2": "Puertas"
+        },
+        "exit-codes": {
+            "5": "Orbe #41",
+            "any": "Cualquiera",
+            "6": "Pasaje",
+            "4": "Llave",
+            "1": "Ruleta",
+            "2": "Orbe #16",
+            "none": "Ninguno",
+            "8": "Final de Barra"
+        },
+        "worldMusic": {
+            "fam-world": {
+                "wmusic16": "Cueva",
+                "wmusic14": "Cielo",
+                "wmusic15": "Isla",
+                "wmusic7": "Bosque"
             }
         }
+    },
+    "languageName": "Español",
+    "objects": {
+        "wordStarAccusativeSingular": "estrella",
+        "wordFails": "Fallas",
+        "wordStarAccusativePlural": "estrellas"
     }
 }

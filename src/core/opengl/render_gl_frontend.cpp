@@ -18,11 +18,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#endif
 
 #include "core/opengl/gl_inc.h"
 
 #include "core/opengl/render_gl.h"
 #include "core/opengl/gl_program_object.h"
+#include "core/opengl/gl_shader_translator.h"
 
 #include <FreeImageLite.h>
 #include <Graphics/graphics_funcs.h>
@@ -167,6 +171,86 @@ std::array<RenderGL::Vertex_t, 4> RenderGL::genTriangleStrip(const RectI& loc, c
     };
 }
 
+void RenderGL::addLights(const GLPictureLightInfo& light_info, const QuadI& loc, const RectF& texcoord, GLshort depth)
+{
+    if(!m_lighting_calc_program.inited() || m_light_count >= (int)m_light_queue.lights.size())
+        return;
+
+    const GLPictureLightInfo* target = &light_info;
+
+    while(target)
+    {
+        const auto& light = target->light;
+
+        float light_l = light.pos[0];
+        float light_t = light.pos[1];
+        float light_r = light.pos[0];
+        float light_b = light.pos[1];
+
+        // get full coordinates for boxes and bars
+        if(light.type == GLLightType::box || light.type == GLLightType::bar)
+        {
+            light_l = SDL_min(light_l, light.pos[2]);
+            light_t = SDL_min(light_t, light.pos[3]);
+            light_r = SDL_max(light_r, light.pos[2]);
+            light_b = SDL_max(light_b, light.pos[3]);
+        }
+
+        // test light collision with draw rect
+        if(light_r >= texcoord.tl.x && light_l <= texcoord.br.x && light_b >= texcoord.tl.y && light_t <= texcoord.br.y)
+        {
+            auto& new_light = m_light_queue.lights[m_light_count++];
+
+            new_light = light;
+
+            // crop box lights to drawn rect
+            if(new_light.type == GLLightType::box)
+            {
+                if(new_light.pos[0] < texcoord.tl.x)
+                    new_light.pos[0] = texcoord.tl.x;
+                if(new_light.pos[1] < texcoord.tl.y)
+                    new_light.pos[1] = texcoord.tl.y;
+                if(new_light.pos[2] > texcoord.br.x)
+                    new_light.pos[2] = texcoord.br.x;
+                if(new_light.pos[3] > texcoord.br.y)
+                    new_light.pos[3] = texcoord.br.y;
+            }
+
+            // project bar lights to drawn rect
+            if(new_light.type == GLLightType::bar)
+            {
+                // ...
+            }
+
+            // place the light in the scene, including any rotoscale transformations
+            int num_pts = (new_light.type == GLLightType::box || new_light.type == GLLightType::bar) ? 2 : 1;
+            for(int pt = 0; pt < num_pts; pt++)
+            {
+                auto& x_dest = new_light.pos[pt * 2 + 0];
+                auto& y_dest = new_light.pos[pt * 2 + 1];
+
+                float x_coord = (x_dest - texcoord.tl.x) / (texcoord.br.x - texcoord.tl.x);
+                float y_coord = (y_dest - texcoord.tl.y) / (texcoord.br.y - texcoord.tl.y);
+
+                x_dest = (loc.br.x * x_coord * y_coord) + (loc.bl.x * (1 - x_coord) * y_coord) + (loc.tr.x * x_coord * (1 - y_coord)) + (loc.tl.x * (1 - x_coord) * (1 - y_coord));
+                y_dest = (loc.br.y * x_coord * y_coord) + (loc.bl.y * (1 - x_coord) * y_coord) + (loc.tr.y * x_coord * (1 - y_coord)) + (loc.tl.y * (1 - x_coord) * (1 - y_coord));
+            }
+
+            // set depth
+            new_light.depth = depth;
+
+            if(m_light_count >= (int)m_light_queue.lights.size())
+                break;
+        }
+
+        // access next light (if it exists)
+        if(target->next)
+            target = &*target->next;
+        else
+            target = nullptr;
+    }
+}
+
 bool RenderGL::initRender(const CmdLineSetup_t &setup, SDL_Window *window)
 {
     pLogDebug("Init renderer settings...");
@@ -243,6 +327,8 @@ void RenderGL::close()
     RenderGL::clearAllTextures();
     AbstractRender_t::close();
 
+    XTechShaderTranslator::EnsureQuit();
+
 #ifdef RENDERGL_HAS_SHADERS
     m_standard_program.reset();
     m_bitmask_program.reset();
@@ -251,11 +337,20 @@ void RenderGL::close()
     m_program_circle_hole.reset();
     m_program_rect_filled.reset();
     m_program_rect_unfilled.reset();
-    m_lighting_program.reset();
+    m_lighting_calc_program.reset();
+    m_lighting_apply_program.reset();
+    m_distance_field_1_program.reset();
+    m_distance_field_2_program.reset();
 #endif
 
     for(int i = BUFFER_GAME; i < BUFFER_MAX; i++)
         destroyFramebuffer((BufferIndex_t)i);
+
+    if(m_null_light_texture)
+    {
+        glDeleteTextures(1, &m_null_light_texture);
+        m_null_light_texture = 0;
+    }
 
 #ifdef RENDERGL_HAS_VBO
     if(m_vertex_buffer[0])
@@ -601,6 +696,19 @@ void RenderGL::mapFromScreen(int scr_x, int scr_y, int *window_x, int *window_y)
     *window_y = ((float)scr_y * m_phys_h / ScreenH + m_phys_y) / m_hidpi_y;
 }
 
+#ifdef __EMSCRIPTEN__
+
+EM_JS(int, get_canvas_width, (), { return canvas.width; });
+EM_JS(int, get_canvas_height, (), { return canvas.height; });
+
+void RenderGL::getRenderSize(int *w, int *h)
+{
+    *w = get_canvas_width();
+    *h = get_canvas_height();
+}
+
+#else
+
 void RenderGL::getRenderSize(int *w, int *h)
 {
     if(!m_window)
@@ -618,6 +726,8 @@ void RenderGL::getRenderSize(int *w, int *h)
         SDL_GetWindowSize(m_window, w, h);
     }
 }
+
+#endif
 
 void RenderGL::setTargetTexture()
 {
@@ -1019,32 +1129,23 @@ void RenderGL::clearBuffer()
 }
 
 
+#ifdef THEXTECH_BUILD_GL_MODERN
+
 int RenderGL::registerUniform(StdPicture &target, const char* name)
 {
-#ifdef THEXTECH_BUILD_GL_MODERN
 
     if(userShadersSupported() && target.d.shader_program && target.d.shader_program->inited())
         return target.d.shader_program->register_uniform(name, target.l);
     else
         return AbstractRender_t::registerUniform(target, name);
-
-#else
-    return AbstractRender_t::registerUniform(target, name);
-#endif
 }
 
 void RenderGL::assignUniform(StdPicture &target, int index, const UniformValue_t& value)
 {
-#ifdef THEXTECH_BUILD_GL_MODERN
-
     if(userShadersSupported() && target.d.shader_program && target.d.shader_program->inited())
         return target.d.shader_program->assign_uniform(index, value, target.l);
     else
         return AbstractRender_t::assignUniform(target, index, value);
-
-#else
-    return AbstractRender_t::assignUniform(target, index, value);
-#endif
 }
 
 void RenderGL::spawnParticle(StdPicture &target, double worldX, double worldY, ParticleVertexAttrs_t attrs)
@@ -1068,6 +1169,45 @@ void RenderGL::spawnParticle(StdPicture &target, double worldX, double worldY, P
 
     target.d.particle_system->add_particle(particle);
 }
+
+void RenderGL::addLight(const GLLight &light)
+{
+    if(!m_lighting_calc_program.inited() || m_light_count >= (int)m_light_queue.lights.size())
+        return;
+
+    m_light_queue.lights[m_light_count++] = light;
+}
+
+void RenderGL::setupLighting(const GLLightSystem &system)
+{
+    m_light_queue.header = system;
+}
+
+void RenderGL::renderLighting()
+{
+    if(!m_light_queue.header || !m_has_es3_shaders || !m_light_ubo || !m_lighting_calc_program.inited() || !m_lighting_apply_program.inited())
+        return;
+
+    int16_t cur_depth = m_render_planes.next();
+
+    DrawContext_t context = {m_lighting_apply_program};
+
+    Vertex_t::Tint tint = F_TO_B(XTColor());
+
+    auto& vertex_list = getOrderedDrawVertexList(context, cur_depth);
+
+    RectI draw_loc = RectI(0, 0, m_viewport.w, m_viewport.h);
+    RectF draw_source = RectF(0.0f, 0.0f, 1.0f, 1.0f);
+
+    addVertices(vertex_list, draw_loc, draw_source, cur_depth, tint);
+
+    cur_depth++;
+    m_drawQueued = true;
+
+}
+
+#endif // THEXTECH_BUILD_GL_MODERN
+
 
 void RenderGL::renderRect(int x, int y, int w, int h, XTColor color, bool filled)
 {
@@ -1301,8 +1441,8 @@ void RenderGL::renderTextureScaleEx(double xDstD, double yDstD, double wDstD, do
         draw_loc = QuadI(RectI(xDst, yDst, xDst + wDst, yDst + hDst));
     }
 
-    RectF draw_source = RectF(xSrc, ySrc, xSrc + wSrc, ySrc + hSrc);
-    draw_source *= PointF(tx.d.w_scale, tx.d.h_scale);
+    RectF draw_source_raw = RectF(xSrc, ySrc, xSrc + wSrc, ySrc + hSrc);
+    RectF draw_source = draw_source_raw * PointF(tx.d.w_scale, tx.d.h_scale);
 
     if(flip & X_FLIP_HORIZONTAL)
         std::swap(draw_source.tl.x, draw_source.br.x);
@@ -1320,6 +1460,9 @@ void RenderGL::renderTextureScaleEx(double xDstD, double yDstD, double wDstD, do
     auto& vertex_list = (draw_opaque ? m_unordered_draw_queue[context] : getOrderedDrawVertexList(context, cur_depth));
 
     addVertices(vertex_list, draw_loc, draw_source, cur_depth, tint);
+
+    if(tx.l.light_info)
+        addLights(*tx.l.light_info, QuadI(draw_loc), draw_source_raw, cur_depth);
 
     m_drawQueued = true;
 }
@@ -1346,8 +1489,8 @@ void RenderGL::renderTextureScale(double xDst, double yDst, double wDst, double 
 
     RectI draw_loc = RectI(xDst, yDst, xDst + wDst, yDst + hDst);
 
-    RectF draw_source = RectF(0.0, 0.0, tx.w, tx.h);
-    draw_source *= PointF(tx.d.w_scale, tx.d.h_scale);
+    RectF draw_source_raw = RectF(0.0, 0.0, tx.w, tx.h);
+    RectF draw_source = draw_source_raw * PointF(tx.d.w_scale, tx.d.h_scale);
 
     DrawContext_t context = {tx.d.shader_program ? *tx.d.shader_program : m_standard_program, &tx};
 
@@ -1359,6 +1502,9 @@ void RenderGL::renderTextureScale(double xDst, double yDst, double wDst, double 
     auto& vertex_list = (draw_opaque ? m_unordered_draw_queue[context] : getOrderedDrawVertexList(context, cur_depth));
 
     addVertices(vertex_list, draw_loc, draw_source, cur_depth, tint);
+
+    if(tx.l.light_info)
+        addLights(*tx.l.light_info, QuadI(draw_loc), draw_source_raw, cur_depth);
 
     m_drawQueued = true;
 }
@@ -1416,8 +1562,8 @@ void RenderGL::renderTexture(double xDstD, double yDstD, double wDstD, double hD
 
     RectI draw_loc = RectI(xDst, yDst, xDst + wDst, yDst + hDst);
 
-    RectF draw_source = RectF(xSrc, ySrc, xSrc + wDst, ySrc + hDst);
-    draw_source *= PointF(tx.d.w_scale, tx.d.h_scale);
+    RectF draw_source_raw = RectF(xSrc, ySrc, xSrc + wDst, ySrc + hDst);
+    RectF draw_source = draw_source_raw * PointF(tx.d.w_scale, tx.d.h_scale);
 
     DrawContext_t context = {tx.d.shader_program ? *tx.d.shader_program : m_standard_program, &tx};
 
@@ -1426,42 +1572,23 @@ void RenderGL::renderTexture(double xDstD, double yDstD, double wDstD, double hD
     int16_t cur_depth = m_render_planes.next();
 
 #ifdef LIGHTING_DEMO
-    if(m_light_count < 63)
+    if(m_lighting_calc_program.inited() && m_light_count < (int)m_light_queue.lights.size())
     {
-        if(&tx == &GFXNPC[13])
-        {
-            m_light_queue.lights[m_light_count++] = Light::Point(xDstD + wDstD / 2.0, yDstD + hDstD / 2.0, cur_depth, LightColor(128, 0, 0), 100.0);
-        }
-
         if(&tx == &GFXNPC[NPCID_HOMING_BALL])
-        {
-            m_light_queue.lights[m_light_count++] = Light::Point(xDstD + wDstD / 2.0, yDstD + hDstD / 2.0, cur_depth, LightColor(64, 32, 32), 250.0);
-        }
+            m_light_queue.lights[m_light_count++] = GLLight::Point(xDstD + wDstD / 2.0, yDstD + hDstD / 2.0, cur_depth, GLLightColor(64, 32, 32), 250.0);
 
         if(&tx == &GFXEffect[EFFID_SMOKE_S3])
-        {
-            m_light_queue.lights[m_light_count++] = Light::Point(xDstD + wDstD / 2.0, yDstD + hDstD / 2.0, cur_depth, LightColor(96, 96, 96), 350.0);
-        }
+            m_light_queue.lights[m_light_count++] = GLLight::Point(xDstD + wDstD / 2.0, yDstD + hDstD / 2.0, cur_depth, GLLightColor(96, 96, 96), 350.0);
 
         if(&tx == &GFXNPC[NPCID_CANNONITEM])
         {
             int frame = (int)ySrc / 32;
             if(frame >= 0 || frame < 5)
             {
-                LightColor colors[5] = {LightColor(0, 0, 48), LightColor(0, 32, 0), LightColor(24, 24, 0), LightColor(24, 0, 24), LightColor(24, 16, 32)};
+                GLLightColor colors[5] = {GLLightColor(0, 0, 48), GLLightColor(0, 32, 0), GLLightColor(24, 24, 0), GLLightColor(24, 0, 24), GLLightColor(24, 16, 32)};
 
-                m_light_queue.lights[m_light_count++] = Light::Point(xDstD + wDstD / 2.0, yDstD + hDstD / 2.0, cur_depth, colors[frame], 400.0);
+                m_light_queue.lights[m_light_count++] = GLLight::Point(xDstD + wDstD / 2.0, yDstD + hDstD / 2.0, cur_depth, colors[frame], 400.0);
             }
-        }
-
-        if(&tx == &GFXBackground[96])
-        {
-            m_light_queue.lights[m_light_count++] = Light::Point(xDstD + wDstD / 2.0, yDstD + hDstD / 2.0, cur_depth, LightColor(64, 0, 0), 250.0);
-        }
-
-        if(&tx == &GFXBackground[97])
-        {
-            m_light_queue.lights[m_light_count++] = Light::Point(xDstD + wDstD / 2.0, yDstD + hDstD / 2.0, cur_depth, LightColor(0, 64, 64), 250.0);
         }
     }
 #endif
@@ -1470,6 +1597,9 @@ void RenderGL::renderTexture(double xDstD, double yDstD, double wDstD, double hD
     auto& vertex_list = (draw_opaque ? m_unordered_draw_queue[context] : getOrderedDrawVertexList(context, cur_depth));
 
     addVertices(vertex_list, draw_loc, draw_source, cur_depth, tint);
+
+    if(tx.l.light_info)
+        addLights(*tx.l.light_info, QuadI(draw_loc), draw_source_raw, cur_depth);
 
     m_drawQueued = true;
 }
@@ -1534,8 +1664,8 @@ void RenderGL::renderTextureFL(double xDstD, double yDstD, double wDstD, double 
         draw_loc = QuadI(RectI(xDst, yDst, xDst + wDst, yDst + hDst));
     }
 
-    RectF draw_source = RectF(xSrc, ySrc, xSrc + wDst, ySrc + hDst);
-    draw_source *= PointF(tx.d.w_scale, tx.d.h_scale);
+    RectF draw_source_raw = RectF(xSrc, ySrc, xSrc + wDst, ySrc + hDst);
+    RectF draw_source = draw_source_raw * PointF(tx.d.w_scale, tx.d.h_scale);
 
     if(flip & X_FLIP_HORIZONTAL)
         std::swap(draw_source.tl.x, draw_source.br.x);
@@ -1553,6 +1683,9 @@ void RenderGL::renderTextureFL(double xDstD, double yDstD, double wDstD, double 
     auto& vertex_list = (draw_opaque ? m_unordered_draw_queue[context] : getOrderedDrawVertexList(context, cur_depth));
 
     addVertices(vertex_list, draw_loc, draw_source, cur_depth, tint);
+
+    if(tx.l.light_info)
+        addLights(*tx.l.light_info, QuadI(draw_loc), draw_source_raw, cur_depth);
 
     m_drawQueued = true;
 }
@@ -1579,8 +1712,8 @@ void RenderGL::renderTexture(float xDst, float yDst,
 
     RectI draw_loc = RectI(xDst, yDst, xDst + tx.w, yDst + tx.h);
 
-    RectF draw_source = RectF(0.0, 0.0, tx.w, tx.h);
-    draw_source *= PointF(tx.d.w_scale, tx.d.h_scale);
+    RectF draw_source_raw = RectF(0.0, 0.0, tx.w, tx.h);
+    RectF draw_source = draw_source_raw * PointF(tx.d.w_scale, tx.d.h_scale);
 
     DrawContext_t context = {tx.d.shader_program ? *tx.d.shader_program : m_standard_program, &tx};
 
@@ -1592,6 +1725,9 @@ void RenderGL::renderTexture(float xDst, float yDst,
     auto& vertex_list = (draw_opaque ? m_unordered_draw_queue[context] : getOrderedDrawVertexList(context, cur_depth));
 
     addVertices(vertex_list, draw_loc, draw_source, cur_depth, tint);
+
+    if(tx.l.light_info)
+        addLights(*tx.l.light_info, QuadI(draw_loc), draw_source_raw, cur_depth);
 
     m_drawQueued = true;
 }

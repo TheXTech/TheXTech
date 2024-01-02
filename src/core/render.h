@@ -489,7 +489,39 @@ E_INLINE void spawnParticle(StdPicture &target,
 }
 #endif
 
+#ifdef THEXTECH_BUILD_GL_MODERN
 
+/*!
+ * \brief Adds a light to the current scene (used by section effect shaders, expires at the next viewport change, splitFrame, or finish draw)
+ * \param light Light specified in screen coordinates
+ *
+ * Lights are only stored or remembered if the CURRENT renderer supports them.
+ */
+E_INLINE void addLight(const GLLight &light) TAIL
+{
+    return g_render->addLight(light);
+}
+
+/*!
+ * \brief Sets the lighting system parameters for the current scene (used by section effect shaders, expires at the next viewport change, splitFrame, or finish draw)
+ * \param system Light system parameters
+ *
+ * Lights are only stored or remembered if the CURRENT renderer supports them.
+ */
+E_INLINE void setupLighting(const GLLightSystem &system) TAIL
+{
+    return g_render->setupLighting(system);
+}
+
+/*!
+ * \brief A render call over the full viewport whose fragment shader tints the screen with information from the lighting system
+ */
+E_INLINE void renderLighting() TAIL
+{
+    return g_render->renderLighting();
+}
+
+#endif
 
 // Draw primitives
 

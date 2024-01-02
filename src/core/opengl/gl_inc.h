@@ -70,12 +70,14 @@
 
 #        define GL_UNIFORM_BUFFER       0x8A11
 #        define GL_DRAW_FRAMEBUFFER     0x8CA9
+#        define GL_RGB16F               0x881B
 
 // defined and loaded in render_gl_init.cpp
 
 extern GL_APICALL void (* GL_APIENTRY glBindBufferBase) (GLenum target, GLuint index, GLuint buffer);
 extern GL_APICALL void (* GL_APIENTRY glBlitFramebuffer) (GLint srcX0, GLint srcY0, GLint srcX1, GLint srcY1, GLint dstX0, GLint dstY0, GLint dstX1, GLint dstY1, GLbitfield mask, GLenum filter);
 
+#        define RENDERGL_LOAD_ES3_SYMBOLS
 #    else
 #        include <GLES3/gl3.h>
 #    endif

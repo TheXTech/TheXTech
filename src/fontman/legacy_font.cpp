@@ -57,7 +57,7 @@ void LegacyFont::loadFont(int fontId)
         m_glyphWidth = 18;
         m_glyphHeight = 16;
 
-        for(int i = 0; i < 9; ++i)
+        for(int i = 0; i <= 9; ++i)
         {
             char uchar[5] = {static_cast<char>('0' + i), 0, 0, 0, 0};
             m_textures[i] = &GFX.Font1[i];

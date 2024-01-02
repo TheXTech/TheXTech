@@ -44,6 +44,7 @@
 #include "video.h"
 
 #include "core/opengl/gl_program_object.h"
+#include "core/opengl/gl_light_info.h"
 
 struct StdPicture;
 struct SDL_Window;
@@ -196,74 +197,10 @@ private:
 
 #ifdef RENDERGL_HAS_SHADERS
 
-    enum class LightType : uint32_t
-    {
-        none = 0,
-        point,
-        arc,
-        bar,
-        box,
-    };
-
-#    ifdef THEXTECH_BIG_ENDIAN
-    struct LightColor
-    {
-        constexpr LightColor() = default;
-        constexpr LightColor(uint8_t r, uint8_t g, uint8_t b, uint8_t a = 0xff)
-            : a(a), r(r), g(g), b(b) {}
-
-        uint8_t a = 0x00;
-        uint8_t r = 0x00;
-        uint8_t g = 0x00;
-        uint8_t b = 0x00;
-    };
-#    else // #ifdef THEXTECH_BIG_ENDIAN
-    struct LightColor
-    {
-        constexpr LightColor() = default;
-        constexpr LightColor(uint8_t r, uint8_t g, uint8_t b, uint8_t a = 0xff)
-            : b(b), g(g), r(r), a(a) {}
-
-        uint8_t b = 0x00;
-        uint8_t g = 0x00;
-        uint8_t r = 0x00;
-        uint8_t a = 0x00;
-    };
-#    endif // #else (from #ifdef THEXTECH_BIG_ENDIAN)
-
-    using LightPos = std::array<GLfloat, 4>;
-
-    /*!
-     * \brief Information parameterizing the overall lighting system
-     */
-    struct LightHeader
-    {};
-
-    /*!
-     * \brief Information parameterizing a single light source
-     */
-    struct Light
-    {
-        constexpr Light() = default;
-        constexpr Light(LightType type, LightColor color, GLfloat radius, GLfloat depth, LightPos pos)
-            : type(type), color(color), radius(radius), depth(depth), pos(pos) {}
-
-        static constexpr Light Point(GLfloat x, GLfloat y, GLfloat depth, LightColor color, GLfloat radius)
-        {
-            return Light(LightType::point, color, radius, depth, {x, y, 0.0f, 0.0f});
-        }
-
-        LightType type = LightType::none;
-        LightColor color = LightColor{0, 0, 0, 0};
-        GLfloat radius = 0.0;
-        GLfloat depth = 0.0;
-        LightPos pos = LightPos{0.0, 0.0, 0.0, 0.0};
-    };
-
     struct LightBuffer
     {
-        // LightHeader header;
-        std::array<Light, 64> lights;
+        GLLightSystem header;
+        std::array<GLLight, 256> lights;
     };
 
 #endif // #ifdef RENDERGL_HAS_SHADERS
@@ -431,8 +368,20 @@ private:
 
 #ifdef RENDERGL_HAS_SHADERS
 
+    // performs the first distance field calculation pass
+    GLProgramObject m_distance_field_1_program;
+
+    // performs the remaining distance field calculation passes
+    GLProgramObject m_distance_field_2_program;
+
     // performs the light calculation pass
-    GLProgramObject m_lighting_program;
+    GLProgramObject m_lighting_calc_program;
+
+    // applies the calculated light to the framebuffer
+    GLProgramObject m_lighting_apply_program;
+
+    // blank 1x1 texture for programs using light to reference when light is disabled
+    GLuint m_null_light_texture = 0;
 
     // UBO to support the lighting queue
     GLuint m_light_ubo = 0;
@@ -461,7 +410,11 @@ private:
     static const char* const s_es2_circle_frag_src;
     static const char* const s_es2_circle_hole_frag_src;
 
-    static const char* const s_es3_lighting_frag_src;
+    static const char* const s_es2_lighting_apply_frag_src;
+
+    static const char* const s_es3_distance_field_1_frag_src;
+    static const char* const s_es3_distance_field_2_frag_src;
+    static const char* const s_es3_lighting_calc_frag_src;
 
 #endif // #ifdef RENDERGL_HAS_SHADERS
 
@@ -571,6 +524,10 @@ private:
 
     // executes and clears all vertex lists in the unordered draw queue
     void flushUnorderedDrawQueue();
+    // sets BUFFER_INT_PASS_1 to contain a distance field to the nearest edge in the game depth buffer
+    void calculateDistanceField();
+    // sorts and coalesces lights in the light queue
+    void coalesceLights();
     // calculates the lighting state using depth buffer information
     void calculateLighting();
     // prepares for the next pass during multipass drawing
@@ -591,6 +548,9 @@ private:
     // Adds vertices to a VertexList
     void addVertices(VertexList& list, const RectI& loc, const RectF& texcoord, GLshort depth, const Vertex_t::Tint& tint);
     void addVertices(VertexList& list, const QuadI& loc, const RectF& texcoord, GLshort depth, const Vertex_t::Tint& tint);
+
+    // Checks for and adds lights for a draw call to the light buffer
+    void addLights(const GLPictureLightInfo& light_info, const QuadI& loc, const RectF& texcoord, GLshort depth);
 
     // simple helper function to make a triangle strip for a single-quad draw
     std::array<Vertex_t, 4> genTriangleStrip(const RectI& loc, const RectF& texcoord, GLshort depth, const Vertex_t::Tint& tint);
@@ -738,10 +698,15 @@ public:
 
     void clearBuffer() override;
 
+#ifdef THEXTECH_BUILD_GL_MODERN
     int registerUniform(StdPicture &target, const char* name) override;
     void assignUniform(StdPicture &target, int index, const UniformValue_t& value) override;
     void spawnParticle(StdPicture &target, double worldX, double worldY, ParticleVertexAttrs_t attrs) override;
 
+    void addLight(const GLLight &light) override;
+    void setupLighting(const GLLightSystem &system) override;
+    void renderLighting() override;
+#endif
 
     // Draw primitives
 

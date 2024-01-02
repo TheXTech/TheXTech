@@ -159,6 +159,12 @@ option(THEXTECH_BUILD_GL_ES_MODERN "On SDL builds, include the OpenGL ES 2.0+ re
 option(THEXTECH_BUILD_GL_DESKTOP_LEGACY "On SDL builds, include the OpenGL 1.1+ renderer" ON)
 option(THEXTECH_BUILD_GL_ES_LEGACY "On SDL builds, include the OpenGL ES 1.1 renderer" OFF)
 
+if(APPLE OR WIN32 OR (CMAKE_SYSTEM_NAME STREQUAL "Linux"))
+    option(THEXTECH_USE_ANGLE_TRANSLATOR "On modern OpenGL builds, include the ANGLE shader translator to improve shader support in OpenGL 3.0+ Core/Compatibility profiles" ON)
+else()
+    option(THEXTECH_USE_ANGLE_TRANSLATOR "On modern OpenGL builds, include the ANGLE shader translator to improve shader support in OpenGL 3.0+ Core/Compatibility profiles" OFF)
+endif()
+
 option(RANGE_ARR_USE_HEAP "Store data of RangeArr<> template in a heap" OFF)
 option(RANGE_ARR_UNSAFE_MODE "Disable all range checks at RangeArr<> template" OFF)
 
@@ -518,6 +524,24 @@ if(THEXTECH_ENABLE_DISCORD_RPC)
     set(THEXTECH_ENABLE_INTEGRATOR ON)  # This feature needs for an Integrator
 endif()
 
+if(THEXTECH_BUILD_GL_DESKTOP_MODERN AND THEXTECH_USE_ANGLE_TRANSLATOR)
+    add_subdirectory(3rdparty/angle-shader-translator)
+
+    message("== Building ANGLE shader translator ==")
+    # suppress some known warnings on GCC / Clang
+    if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+        target_compile_options(angle_shader_translator PRIVATE -Wno-unused-parameter)
+        target_compile_options(angle_shader_translator PRIVATE -Wno-c++17-attribute-extensions)
+    elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang")
+        target_compile_options(angle_shader_translator PRIVATE -Wno-unused-parameter)
+        target_compile_options(angle_shader_translator PRIVATE -Wno-c++17-extensions)
+    elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+        target_compile_options(angle_shader_translator PRIVATE /wd4100) # unreferenced formal parameter
+    endif()
+
+    target_link_libraries(A2XT_Int INTERFACE angle_shader_translator)
+endif()
+
 target_link_libraries(A2XT_Int INTERFACE ${A2XT_LIBS})
 target_include_directories(A2XT_Int INTERFACE ${A2XT_INCS})
 
@@ -869,6 +893,7 @@ else()
             src/core/opengl/render_gl_backend.cpp
             src/core/opengl/render_gl_init.cpp
             src/core/opengl/render_gl_shaders.cpp
+            src/core/opengl/render_gl_shader_lighting.cpp
         )
     endif()
 
@@ -876,6 +901,13 @@ else()
         list(APPEND THEXTECH_SRC
             src/core/opengl/gl_program_bank.cpp
             src/core/opengl/gl_particle_system.cpp
+        )
+    endif()
+
+    if(THEXTECH_BUILD_GL_DESKTOP_MODERN AND THEXTECH_USE_ANGLE_TRANSLATOR)
+        add_definitions(-DTHEXTECH_USE_ANGLE_TRANSLATOR)
+        list(APPEND THEXTECH_SRC
+            src/core/opengl/gl_shader_translator.cpp
         )
     endif()
 
@@ -1154,7 +1186,7 @@ if(NINTENDO_DS OR NINTENDO_3DS OR NINTENDO_WII OR NINTENDO_SWITCH OR ANDROID OR 
     target_compile_definitions(thextech PRIVATE -DTHEXTECH_DISABLE_LANG_TOOLS)
 endif()
 
-if(UNIX OR NINTENDO_SWITCH OR ANDROID OR APPLE)
+if((UNIX OR NINTENDO_SWITCH OR ANDROID OR APPLE) AND NOT EMSCRIPTEN)
     # Allow hotswapping renderer on fully tested platforms
     target_compile_definitions(thextech PRIVATE -DTHEXTECH_RESTART_RENDERER_SUPPORTED)
 endif()

@@ -7926,9 +7926,17 @@ void SwapCharacter(int A, int Character, bool Die, bool FromBlock)
         }
         else
         {
+            double saved_respawn_StopY = 0;
+            if(p.Effect == 6)
+                saved_respawn_StopY = p.Effect2 + p.Location.Height;
+
             // make player bottom match old player bottom, to avoid floor glitches
             UnDuck(Player[A]);
             SizeCheck(Player[A]);
+
+            // if player effect is 6 (respawn downwards), update target similarly
+            if(p.Effect == 6)
+                p.Effect2 = saved_respawn_StopY - p.Location.Height;
         }
 
         if(!LevelSelect)
@@ -7956,7 +7964,7 @@ void SwapCharacter(int A, int Character, bool Die, bool FromBlock)
 // returns whether a player is allowed to swap characters
 bool SwapCharAllowed()
 {
-    if(LevelSelect || GameMenu || (IsEpisodeIntro && NoMap && GamePaused == PauseCode::DropAdd))
+    if(LevelSelect || GameMenu || (g_compatibility.allow_drop_add && InHub()))
         return true;
     else
         return false;
