@@ -784,9 +784,18 @@ void RenderGL::calculateLighting()
 
     // (1) flush the lights
     coalesceLights();
-    m_light_queue.lights[m_light_count].type = GLLightType::none;
 
-    glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(GLLightSystem) + sizeof(GLLight) * m_light_count + 4, &m_light_queue);
+    int lights_to_flush = m_light_count;
+
+    if(m_light_count < (int)m_light_queue.lights.size())
+    {
+        m_light_queue.lights[m_light_count].type = GLLightType::none;
+        lights_to_flush += 1;
+    }
+    else
+        lights_to_flush = (int)m_light_queue.lights.size();
+
+    glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(GLLightSystem) + sizeof(GLLight) * lights_to_flush, &m_light_queue);
 
     m_light_count = 0;
 
