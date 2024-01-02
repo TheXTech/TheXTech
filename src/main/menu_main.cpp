@@ -1810,8 +1810,8 @@ static void s_drawGameVersion()
 
         if(is_wip)
         {
-            // strip the WIP
-            SuperPrintRightAlign(V_BUILD_BRANCH + find_in_string(V_BUILD_BRANCH, '-') + 1, 5, ScreenW - 2, y);
+            // strip the "wip-"
+            SuperPrintRightAlign(&V_BUILD_BRANCH[find_in_string(V_BUILD_BRANCH, '-') + 1], 5, ScreenW - 2, y);
         }
         else
             SuperPrintRightAlign(V_BUILD_BRANCH, 5, ScreenW - 2, y);
