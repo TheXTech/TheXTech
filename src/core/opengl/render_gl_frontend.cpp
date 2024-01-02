@@ -18,6 +18,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#endif
 
 #include "core/opengl/gl_inc.h"
 
@@ -598,6 +601,19 @@ void RenderGL::mapFromScreen(int scr_x, int scr_y, int *window_x, int *window_y)
     *window_y = ((float)scr_y * m_phys_h / ScreenH + m_phys_y) / m_hidpi_y;
 }
 
+#ifdef __EMSCRIPTEN__
+
+EM_JS(int, get_canvas_width, (), { return canvas.width; });
+EM_JS(int, get_canvas_height, (), { return canvas.height; });
+
+void RenderGL::getRenderSize(int *w, int *h)
+{
+    *w = get_canvas_width();
+    *h = get_canvas_height();
+}
+
+#else
+
 void RenderGL::getRenderSize(int *w, int *h)
 {
     if(!m_window)
@@ -615,6 +631,8 @@ void RenderGL::getRenderSize(int *w, int *h)
         SDL_GetWindowSize(m_window, w, h);
     }
 }
+
+#endif
 
 void RenderGL::setTargetTexture()
 {
