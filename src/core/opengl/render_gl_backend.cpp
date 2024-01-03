@@ -693,11 +693,6 @@ void RenderGL::flushDrawQueues()
     if(m_use_depth_buffer)
         glDepthMask(GL_FALSE);
 
-    // reset lighting buffer
-#ifdef RENDERGL_HAS_SHADERS
-    m_light_count = 0;
-#endif
-
     for(int pass = 1; pass <= num_pass; pass++)
     {
         // setup state for multipass rendering
