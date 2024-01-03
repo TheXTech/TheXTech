@@ -115,7 +115,8 @@ struct RectSizeI
     constexpr RectSizeI(int x, int y, int w, int h) :
         xy(x, y), wh(w, h) {}
 
-    constexpr RectSizeI(const RectSizeI&) = default;
+    constexpr RectSizeI(const RectSizeI& o) :
+        xy(o.xy), wh(o.wh) {}
 
     inline RectSizeI& operator=(const RectSizeI& o)
     {
