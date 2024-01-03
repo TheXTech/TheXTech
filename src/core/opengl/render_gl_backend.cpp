@@ -137,7 +137,7 @@ void RenderGL::framebufferCopy(BufferIndex_t dest, BufferIndex_t source, RectSiz
         draw_source /= PointF(ScreenW, ScreenH);
 
         // dest rect is viewport-relative
-        draw_source -= m_viewport.xy;
+        draw_loc -= m_viewport.xy;
 
         std::array<Vertex_t, 4> copy_triangle_strip =
             genTriangleStrip(draw_loc, draw_source, 0x7FFF, {255, 255, 255, 255});
