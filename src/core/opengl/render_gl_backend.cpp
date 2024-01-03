@@ -137,7 +137,7 @@ void RenderGL::framebufferCopy(BufferIndex_t dest, BufferIndex_t source, RectSiz
         draw_source /= PointF(ScreenW, ScreenH);
 
         // dest rect is viewport-relative
-        draw_source -= m_viewport.xy;
+        draw_loc -= m_viewport.xy;
 
         std::array<Vertex_t, 4> copy_triangle_strip =
             genTriangleStrip(draw_loc, draw_source, 0x7FFF, {255, 255, 255, 255});
@@ -776,6 +776,8 @@ void RenderGL::calculateLighting()
         glBindTexture(GL_TEXTURE_2D, m_null_light_texture);
         glActiveTexture(TEXTURE_UNIT_IMAGE);
 
+        m_light_count = 0;
+
         return;
     }
 
@@ -935,6 +937,14 @@ void RenderGL::flushDrawQueues()
         }
     }
 
+    bool do_lighting = ((active_draw_flags & GLProgramObject::read_light) && m_buffer_fb[BUFFER_LIGHTING]);
+
+    // always reset lighting buffer if lighting calculation will not run
+#ifdef RENDERGL_HAS_SHADERS
+    if(!do_lighting)
+        m_light_count = 0;
+#endif
+
     // if no translucent objects, return without needing to call glDepthMask (speedup on Emscripten)
     if(!any_translucent_draws)
         return;
@@ -951,10 +961,8 @@ void RenderGL::flushDrawQueues()
         num_pass = 2;
 
     // if shaders use lighting and lighting framebuffer successfully allocated, calculate lighting
-    if((active_draw_flags & GLProgramObject::read_light) && m_buffer_fb[BUFFER_LIGHTING])
+    if(do_lighting)
         calculateLighting();
-
-    m_light_count = 0;
 
     // if any shaders read the depth buffer and it is supported, copy it from the main framebuffer
     if((active_draw_flags & GLProgramObject::read_depth) && m_depth_read_texture)
@@ -963,11 +971,6 @@ void RenderGL::flushDrawQueues()
     // disable depth writing while rendering translucent textures (small speedup, needed for multipass rendering)
     if(m_use_depth_buffer)
         glDepthMask(GL_FALSE);
-
-    // reset lighting buffer
-#ifdef RENDERGL_HAS_SHADERS
-    m_light_count = 0;
-#endif
 
     for(int pass = 1; pass <= num_pass; pass++)
     {
