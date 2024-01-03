@@ -141,6 +141,12 @@ else()
     set(THEXTECH_ENABLE_TTF_SUPPORT_DEFAULT ON)
 endif()
 
+if(APPLE OR WIN32 OR (CMAKE_SYSTEM_NAME STREQUAL "Linux"))
+    set(THEXTECH_USE_ANGLE_TRANSLATOR_DEFAULT ON)
+else()
+    set(THEXTECH_USE_ANGLE_TRANSLATOR_DEFAULT OFF)
+endif()
+
 option(USE_SYSTEM_LIBS "Use dependent libraries like SDL2, FreeImageLite and MixerX, installed in the system" ${USE_SYSTEM_LIBS_DEFAULT})
 option(USE_SYSTEM_SDL2 "Use SDL2 from a system even prefering system libraries" ${USE_SYSTEM_SDL2_DEFAULT})
 
@@ -159,11 +165,7 @@ option(THEXTECH_BUILD_GL_ES_MODERN "On SDL builds, include the OpenGL ES 2.0+ re
 option(THEXTECH_BUILD_GL_DESKTOP_LEGACY "On SDL builds, include the OpenGL 1.1+ renderer" ON)
 option(THEXTECH_BUILD_GL_ES_LEGACY "On SDL builds, include the OpenGL ES 1.1 renderer" OFF)
 
-if(APPLE OR WIN32 OR (CMAKE_SYSTEM_NAME STREQUAL "Linux"))
-    option(THEXTECH_USE_ANGLE_TRANSLATOR "On modern OpenGL builds, include the ANGLE shader translator to improve shader support in OpenGL 3.0+ Core/Compatibility profiles" ON)
-else()
-    option(THEXTECH_USE_ANGLE_TRANSLATOR "On modern OpenGL builds, include the ANGLE shader translator to improve shader support in OpenGL 3.0+ Core/Compatibility profiles" OFF)
-endif()
+option(THEXTECH_USE_ANGLE_TRANSLATOR "On modern OpenGL builds, include the ANGLE shader translator to improve shader support in OpenGL 3.0+ Core/Compatibility profiles" ${THEXTECH_USE_ANGLE_TRANSLATOR_DEFAULT})
 
 option(RANGE_ARR_USE_HEAP "Store data of RangeArr<> template in a heap" OFF)
 option(RANGE_ARR_UNSAFE_MODE "Disable all range checks at RangeArr<> template" OFF)
