@@ -776,6 +776,8 @@ void RenderGL::calculateLighting()
         glBindTexture(GL_TEXTURE_2D, m_null_light_texture);
         glActiveTexture(TEXTURE_UNIT_IMAGE);
 
+        m_light_count = 0;
+
         return;
     }
 
@@ -935,6 +937,14 @@ void RenderGL::flushDrawQueues()
         }
     }
 
+    bool do_lighting = ((active_draw_flags & GLProgramObject::read_light) && m_buffer_fb[BUFFER_LIGHTING]);
+
+    // always reset lighting buffer if lighting calculation will not run
+#ifdef RENDERGL_HAS_SHADERS
+    if(!do_lighting)
+        m_light_count = 0;
+#endif
+
     // if no translucent objects, return without needing to call glDepthMask (speedup on Emscripten)
     if(!any_translucent_draws)
         return;
@@ -951,7 +961,7 @@ void RenderGL::flushDrawQueues()
         num_pass = 2;
 
     // if shaders use lighting and lighting framebuffer successfully allocated, calculate lighting
-    if((active_draw_flags & GLProgramObject::read_light) && m_buffer_fb[BUFFER_LIGHTING])
+    if(do_lighting)
         calculateLighting();
 
     // if any shaders read the depth buffer and it is supported, copy it from the main framebuffer
