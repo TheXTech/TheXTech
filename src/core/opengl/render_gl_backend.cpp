@@ -954,8 +954,6 @@ void RenderGL::flushDrawQueues()
     if((active_draw_flags & GLProgramObject::read_light) && m_buffer_fb[BUFFER_LIGHTING])
         calculateLighting();
 
-    m_light_count = 0;
-
     // if any shaders read the depth buffer and it is supported, copy it from the main framebuffer
     if((active_draw_flags & GLProgramObject::read_depth) && m_depth_read_texture)
         depthbufferCopy();
@@ -963,11 +961,6 @@ void RenderGL::flushDrawQueues()
     // disable depth writing while rendering translucent textures (small speedup, needed for multipass rendering)
     if(m_use_depth_buffer)
         glDepthMask(GL_FALSE);
-
-    // reset lighting buffer
-#ifdef RENDERGL_HAS_SHADERS
-    m_light_count = 0;
-#endif
 
     for(int pass = 1; pass <= num_pass; pass++)
     {
