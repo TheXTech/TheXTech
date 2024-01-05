@@ -90,6 +90,7 @@ void s_emscriptenLeaveRealFullscreen()
             setTimeout(() => {
                 console.log("Restoring canvas on return from fullscreen");
                 softFullscreenResizeWebGLRenderTarget();
+                window.dispatchEvent(new Event('resize'));
             }, 500);
         }
     );
