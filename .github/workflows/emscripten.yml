@@ -29,7 +29,7 @@ jobs:
             -DTHEXTECH_CREDITS_URL=\"wohlsoft.ru\" \
             -DTHEXTECH_CREDITS_TITLE=\"Adventures of Demo\" \
             -DTHEXTECH_MANIFEST_NAME=\"AoD on TheXTech ${THEXTECH_VERSION_STRING}\" \
-            -DTHEXTECH_MANIFEST_ID=\"wohlsoft-aod-thextech-${GIT_BRANCH}-${GIT_COMMIT_HASH}\" \
+            -DTHEXTECH_MANIFEST_ID=\"wohlsoft-aod-thextech\" \
             -DTHEXTECH_MANIFEST_DESC=\"Play AoD on TheXTech ${THEXTECH_VERSION_STRING}\" \
             -DTHEXTECH_DEPLOY_URL=\"https://wohlsoft.ru/projects/TheXTech/aod-on-web-debug/\"",
 
@@ -56,7 +56,7 @@ jobs:
             -DTHEXTECH_CREDITS_URL=\"www.SuperMarioBrosX.org\" \
             -DTHEXTECH_CREDITS_TITLE=\"Super Mario Bros. X\" \
             -DTHEXTECH_MANIFEST_NAME=\"SMBX on TheXTech ${THEXTECH_VERSION_STRING}\" \
-            -DTHEXTECH_MANIFEST_ID=\"wohlsoft-smbx-thextech-${GIT_BRANCH}-${GIT_COMMIT_HASH}\" \
+            -DTHEXTECH_MANIFEST_ID=\"wohlsoft-smbx-thextech\" \
             -DTHEXTECH_MANIFEST_DESC=\"Play SMBX on TheXTech ${THEXTECH_VERSION_STRING}\" \
             -DTHEXTECH_DEPLOY_URL=\"https://wohlsoft.ru/projects/TheXTech/smbx-on-web-debug/\"",
 
