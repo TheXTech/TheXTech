@@ -1849,6 +1849,8 @@ void RenderGL::getScreenPixelsRGBA(int x, int y, int w, int h, unsigned char *pi
     {
         mapFromScreen(x, y, &phys_x, &phys_y);
 
+        phys_x *= m_hidpi_x;
+        phys_y *= m_hidpi_y;
         phys_w = w * m_phys_w / ScreenW;
         phys_h = h * m_phys_h / ScreenH;
     }
@@ -1871,6 +1873,10 @@ void RenderGL::getScreenPixelsRGBA(int x, int y, int w, int h, unsigned char *pi
     for(int r = 0; r < h; r++)
     {
         int phys_r = r * phys_h / h;
+
+        // vertical flip from legacy OpenGL to image
+        if(!m_has_fbo || !m_game_texture_fb || !m_game_texture)
+            phys_r = (phys_h - 1) - phys_r;
 
         for(int c = 0; c < w; c++)
         {
