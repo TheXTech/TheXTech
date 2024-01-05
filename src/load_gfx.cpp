@@ -1378,6 +1378,9 @@ void LoaderUpdateDebugString(const std::string &strig)
 #ifndef PGE_NO_THREADING
     SDL_UnlockMutex(gfxLoaderDebugMutex);
 #endif
+
+    if(!gfxLoaderThreadingMode)
+        UpdateLoadREAL();
 }
 
 

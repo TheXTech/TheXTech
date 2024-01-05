@@ -706,8 +706,6 @@ int main(int argc, char**argv)
     setCpuClock(true);
 #endif
 
-    initGameInfo();
-
     // set this flag before SDL initialization to allow game be quit when closing a window before a loading process will be completed
     GameIsActive = true;
 
@@ -716,8 +714,6 @@ int main(int argc, char**argv)
         g_frmMain.freeSystem();
         return 1;
     }
-
-    XLanguage::resolveLanguage(g_config.language);
 
 #ifdef __APPLE__
     macosReceiveOpenFile();

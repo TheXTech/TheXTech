@@ -107,8 +107,13 @@ static int loadingThread(void *waiter_ptr)
     UNUSED(waiter_ptr);
 #endif
 
+    LoaderUpdateDebugString("Game info");
+    initGameInfo();
+    cheats_reset();
+
     LoaderUpdateDebugString("Translations");
     XLanguage::findLanguages(); // find present translations
+    ReloadTranslations(); // load translations
 
     SetupPhysics(); // Setup Physics
     SetupGraphics(); // setup graphics
@@ -183,6 +188,67 @@ static std::string findIntroLevel()
     return selected;
 }
 
+void MainLoadAll(bool reload)
+{
+    if(reload)
+    {
+        StopAllSounds();
+        StopMusic();
+
+        // UnloadSound();
+        // UnloadGFX(true);
+        FontManager::quit();
+
+        if(!noSound)
+            PlayInitSound();
+    }
+
+    LoaderInit();
+
+    LoaderUpdateDebugString("Fonts");
+
+    FontManager::initFull();
+
+#ifndef PGE_NO_THREADING
+    {
+        gfxLoaderThreadingMode = true;
+
+        SDL_Thread*     loadThread;
+        SDL_atomic_t    loadWaiter;
+        int             loadWaiterState = 1;
+        int             threadReturnValue;
+
+        SDL_AtomicSet(&loadWaiter, loadWaiterState);
+        loadThread = SDL_CreateThread(loadingThread, "Loader", &loadWaiter);
+
+        if(!loadThread)
+        {
+            gfxLoaderThreadingMode = false;
+            pLogCritical("Failed to create the loading thread! Do running the load directly");
+            loadingThread(nullptr);
+        }
+        else
+        {
+            do
+            {
+                UpdateLoadREAL();
+                PGE_Delay(15);
+                loadWaiterState = SDL_AtomicGet(&loadWaiter);
+            } while(loadWaiterState);
+
+            SDL_WaitThread(loadThread, &threadReturnValue);
+            pLogDebug("Loading thread was exited with %d code.", threadReturnValue);
+        }
+    }
+#else
+    loadingThread(nullptr);
+#endif
+
+    Integrator::setGameName(g_gameInfo.title, g_gameInfo.statusIconName);
+
+    LoaderFinish();
+}
+
 
 int GameMain(const CmdLineSetup_t &setup)
 {
@@ -208,7 +274,8 @@ int GameMain(const CmdLineSetup_t &setup)
     speedRun_setBlinkEffect(setup.speedRunnerBlinkEffect);
 
     ResetCompat();
-    cheats_reset();
+    // moved into MainLoadAll
+    // cheats_reset();
 
     // [ !Here was a starting dialog! ]
 
@@ -220,11 +287,14 @@ int GameMain(const CmdLineSetup_t &setup)
     // Set global SMBX64 behaviour at PGE-FL
     FileFormats::SetSMBX64LvlFlags(FileFormats::F_SMBX64_KEEP_LEGACY_NPC_IN_BLOCK_CODES);
 
+    StartMenu = true;
+
+    // strings and translation initialization moved into MainLoadAll
+#if 0
     initOutroContent();
     initMainMenu();
     initEditorStrings();
     initGameStrings();
-    StartMenu = true;
 
     if(!CurrentLanguage.empty())
     {
@@ -236,12 +306,14 @@ int GameMain(const CmdLineSetup_t &setup)
                       CurrentLangDialect.empty() ? "??" : CurrentLangDialect.c_str());
         }
     }
+#endif
 
     initAll();
 
 //    Unload frmLoader
     gfxLoaderTestMode = setup.testLevelMode;
 
+    // TODO: check locations in search path
     if(!GFX.load()) // Load UI graphics
         return 1;
 
@@ -288,50 +360,8 @@ int GameMain(const CmdLineSetup_t &setup)
 #endif
     XWindow::show(); // Don't show window until playing an initial sound
 
-    if(!noSound)
-    {
-        if(!setup.testLevelMode)
-            PlayInitSound();
-    }
-
-    LoaderInit();
-
-#ifndef PGE_NO_THREADING
-    {
-        SDL_Thread*     loadThread;
-        int             threadReturnValue;
-        SDL_atomic_t    loadWaiter;
-        int             loadWaiterState = 1;
-
-        SDL_AtomicSet(&loadWaiter, loadWaiterState);
-        loadThread = SDL_CreateThread(loadingThread, "Loader", &loadWaiter);
-
-        if(!loadThread)
-        {
-            gfxLoaderThreadingMode = false;
-            pLogCritical("Failed to create the loading thread! Do running the load directly");
-            loadingThread(nullptr);
-        }
-        else
-        {
-            do
-            {
-                UpdateLoadREAL();
-                PGE_Delay(15);
-                loadWaiterState = SDL_AtomicGet(&loadWaiter);
-            } while(loadWaiterState);
-
-            SDL_WaitThread(loadThread, &threadReturnValue);
-            pLogDebug("Loading thread was exited with %d code.", threadReturnValue);
-        }
-    }
-#else
-    loadingThread(nullptr);
-#endif
-
-    LoaderFinish();
-
-    LevelSelect = true; // world map is to be shown
+    if(!noSound && !setup.testLevelMode)
+        PlayInitSound();
 
 #ifdef THEXTECH_INTERPROC_SUPPORTED
     if(setup.interprocess)
@@ -339,7 +369,10 @@ int GameMain(const CmdLineSetup_t &setup)
 #endif
 
     Integrator::initIntegrations();
-    Integrator::setGameName(g_gameInfo.title, g_gameInfo.statusIconName);
+
+    MainLoadAll(false);
+
+    LevelSelect = true; // world map is to be shown
 
     LoadingInProcess = false;
 
