@@ -121,6 +121,9 @@ static int loadingThread(void *waiter_ptr)
 //    GFX.load(); // load the graphics form // Moved to before sound load
     SizableBlocks();
     LoadGFX(); // load the graphics from file
+
+    Controls::LoadTouchScreenGFX();
+
     SetupVars(); //Setup Variables
 
 #ifdef THEXTECH_PRELOAD_LEVELS

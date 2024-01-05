@@ -782,6 +782,7 @@ StatusInfo GetStatus(int player);
 
 void RenderTouchControls();
 void UpdateTouchScreenSize();
+void LoadTouchScreenGFX();
 
 // global variables at bottom
 

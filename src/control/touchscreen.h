@@ -50,10 +50,15 @@ class TouchScreenGFX_t
     std::string m_gfxPath;
     int m_loadErrors = 0;
 
+    void loadAll();
+
 public:
     bool m_success = false;
 
     TouchScreenGFX_t();
+
+    //! (re)load the touchscreen graphics from the current asset pack
+    void load();
 
     enum
     {
@@ -314,6 +319,11 @@ public:
     void render(int player_no);
 
     void resetState();
+
+    inline void loadGFX()
+    {
+        m_GFX.load();
+    }
 };
 
 class InputMethod_TouchScreen : public InputMethod
