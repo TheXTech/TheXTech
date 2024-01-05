@@ -136,6 +136,12 @@ public:
      * \return true if window is maximized
      */
     bool isMaximized() override;
+
+    /*!
+     * \brief Set the title of the window
+     * \param title Title to set, as C string
+     */
+    void setTitle(const char* title) override;
 };
 
 #endif // WINDOWSDL_H

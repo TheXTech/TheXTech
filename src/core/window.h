@@ -206,6 +206,17 @@ E_INLINE bool isMaximized() TAIL
 }
 #endif
 
+/*!
+ * \brief Set the title of the window
+ * \param title Title to set, as C string
+ */
+E_INLINE void setTitle(const char* title) TAIL
+#ifndef WINDOW_CUSTOM
+{
+    return g_window->setTitle(title);
+}
+#endif
+
 }
 
 #ifndef WINDOW_CUSTOM

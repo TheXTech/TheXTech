@@ -413,3 +413,11 @@ bool WindowSDL::isMaximized()
     Uint32 flags = SDL_GetWindowFlags(m_window);
     return (flags & SDL_WINDOW_MAXIMIZED) != 0;
 }
+
+void WindowSDL::setTitle(const char* title)
+{
+    if(!m_window)
+        return;
+
+    SDL_SetWindowTitle(m_window, title);
+}
