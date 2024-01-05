@@ -235,12 +235,21 @@ endif()
 if(EMSCRIPTEN)
     # config for web app deployment manifest
     set(THEXTECH_MANIFEST_NAME "TheXTech Engine ${THEXTECH_VERSION_STRING}" CACHE STRING "Web app manifest name, used as title after installation")
-    set(THEXTECH_MANIFEST_ID "wohlsoft-thextech-${GIT_BRANCH}-${GIT_COMMIT_HASH}" CACHE STRING "Web app ID, uniquely identifies installed app")
+    set(THEXTECH_MANIFEST_ID "wohlsoft-thextech" CACHE STRING "Web app ID, uniquely identifies installed app")
     set(THEXTECH_MANIFEST_DESC "" CACHE STRING "Web app description")
-    set(THEXTECH_DEPLOY_URL "" CACHE STRING "Fully qualified HTTPS URL where application will be deployed")
+    set(THEXTECH_DEPLOY_URL "http://localhost:8080/" CACHE STRING "Fully qualified HTTPS URL where application will be deployed (HTTP may only be used for local testing)")
+
+    # versioned ID
+    if(GIT_BRANCH STREQUAL "main")
+        set(GIT_BRANCH_IF_NOT_MAIN "")
+    else()
+        set(GIT_BRANCH_IF_NOT_MAIN "-${GIT_BRANCH}")
+    endif()
+
+    set(THEXTECH_MANIFEST_ID_V "${THEXTECH_MANIFEST_ID}${GIT_BRANCH_IF_NOT_MAIN}${THEXTECH_VERSION_REL}")
 
     string(CONFIGURE "${THEXTECH_MANIFEST_NAME}" THEXTECH_MANIFEST_NAME_OUT)
-    string(CONFIGURE "${THEXTECH_MANIFEST_ID}"   THEXTECH_MANIFEST_ID_OUT)
+    string(CONFIGURE "${THEXTECH_MANIFEST_ID_V}"   THEXTECH_MANIFEST_ID_OUT)
     string(CONFIGURE "${THEXTECH_MANIFEST_DESC}" THEXTECH_MANIFEST_DESC_OUT)
 endif()
 
@@ -1479,12 +1488,6 @@ elseif(NINTENDO_SWITCH)
 elseif(EMSCRIPTEN)
     add_custom_command(
         TARGET thextech POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy
-                "${CMAKE_SOURCE_DIR}/resources/emscripten/sw.js"
-                "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/sw.js")
-
-    add_custom_command(
-        TARGET thextech POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E rename
                 "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${THEXTECH_EXECUTABLE_NAME}.html"
                 "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/index.html")
@@ -1507,7 +1510,10 @@ elseif(EMSCRIPTEN)
                 "${PGE_PRELOAD_ENVIRONMENT}/graphics/ui/icon/thextech_256.png"
                 "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/thextech_256.png")
 
-    configure_file(${CMAKE_SOURCE_DIR}/resources/emscripten/manifest.json ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/manifest.json)
+    configure_file(${CMAKE_SOURCE_DIR}/resources/emscripten/manifest.json.in ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/manifest.json)
+
+    configure_file(${CMAKE_SOURCE_DIR}/resources/emscripten/sw.js.in ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/sw.js)
+
 else()
     install(TARGETS thextech
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
