@@ -31,7 +31,6 @@ typedef struct SDL_Window SDL_Window;
 
 class WindowSDL final : public AbstractWindow_t
 {
-    std::string m_windowTitle;
     SDL_Window *m_window = nullptr;
     WindowCursor_t m_cursor = CURSOR_DEFAULT;
 
