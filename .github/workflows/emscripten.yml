@@ -218,13 +218,14 @@ jobs:
         done
 
         UPLOAD_LIST="${UPLOAD_LIST} rm -rf ${{ matrix.config.deploy_directory }}-next;"
+        UPLOAD_LIST="${UPLOAD_LIST} mkdir ${{ matrix.config.deploy_directory }}-next;"
         for q in ./build/output/bin/*; do
             UPLOAD_LIST="${UPLOAD_LIST} put -O ${{ matrix.config.deploy_directory }}-next/ $q;"
         done
 
         UPLOAD_LIST="${UPLOAD_LIST} rm -rf ${{ matrix.config.deploy_directory }}-prev;"
-        UPLOAD_LIST="${UPLOAD_LIST} rename ${{ matrix.config.deploy_directory }} ${{ matrix.config.deploy_directory }}-prev;"
-        UPLOAD_LIST="${UPLOAD_LIST} rename ${{ matrix.config.deploy_directory }}-next ${{ matrix.config.deploy_directory }};"
+        UPLOAD_LIST="${UPLOAD_LIST} mv ${{ matrix.config.deploy_directory }} ${{ matrix.config.deploy_directory }}-prev;"
+        UPLOAD_LIST="${UPLOAD_LIST} mv ${{ matrix.config.deploy_directory }}-next ${{ matrix.config.deploy_directory }};"
         UPLOAD_LIST="${UPLOAD_LIST} rm -rf ${{ matrix.config.deploy_directory }}-prev;"
 
         lftp -e "${UPLOAD_LIST} exit" -u ${{ secrets.builds_login }},${{ secrets.builds_password }} ${{ secrets.builds_host }}
