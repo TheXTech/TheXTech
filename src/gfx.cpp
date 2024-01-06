@@ -218,7 +218,8 @@ bool GFX_t::load()
 void GFX_t::unLoad()
 {
     for(StdPicture *p : m_loadedImages)
-        XRender::unloadTexture(*p);
+        p->reset();
+
     m_loadedImages.clear();
     SDL_memset(m_isCustom, 0, sizeof(m_loadedImages.size() * sizeof(bool)));
 }

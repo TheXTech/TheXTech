@@ -252,7 +252,7 @@ void InitMixerX()
         return;
 
 #ifdef __3DS__
-    // Create the blank "dspfirm.cdc" if not exists (it's required to exist for the 3DS audio work)
+    // Create the blank "dspfirm.cdc" if not exists (it's required to exist for the 3DS audio work on Citra HLE)
     if(!Files::fileExists("/3ds/dspfirm.cdc"))
     {
         FILE *x = Files::utf8_fopen("/3ds/dspfirm.cdc", "wb");
@@ -861,6 +861,9 @@ void FadeOutMusic(int ms)
 
 void PlayInitSound()
 {
+    MusicRoot = AppPath + "music/";
+    SfxRoot = AppPath + "sound/";
+
     // std::string doSound = AppPath + "sound/";
     IniProcessing sounds(AppPath + "sounds.ini");
     unsigned int totalSounds;
@@ -1059,6 +1062,9 @@ void InitSound()
     if(noSound)
         return;
 
+    MusicRoot = AppPath + "music/";
+    SfxRoot = AppPath + "sound/";
+
     musicIni = AppPath + "music.ini";
     sfxIni = AppPath + "sounds.ini";
 
@@ -1131,6 +1137,27 @@ void InitSound()
                               "Sounds loading error",
                               fmt::format_ne("Failed to load some SFX assets. Loo a log file to get more details:\n{0}", getLogFilePath()));
     }
+}
+
+void UnloadSound()
+{
+    restoreDefaultSfx();
+
+    UnloadExtSounds();
+
+    if(g_curMusic)
+        Mix_FreeMusic(g_curMusic);
+    g_curMusic = nullptr;
+
+    for(auto & it : sound)
+    {
+        auto &s = it.second;
+        if(s.chunk)
+            Mix_FreeChunk(s.chunk);
+    }
+
+    sound.clear();
+    music.clear();
 }
 
 static const std::unordered_map<int, int> s_soundDelays =

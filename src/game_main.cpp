@@ -198,8 +198,8 @@ void MainLoadAll(bool reload)
         StopAllSounds();
         StopMusic();
 
-        // UnloadSound();
-        // UnloadGFX(true);
+        UnloadSound();
+        UnloadGFX(true);
         FontManager::quit();
 
         if(!noSound)

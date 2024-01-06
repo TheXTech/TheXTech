@@ -122,6 +122,12 @@ void QuitMixerX()
     g_mixerLoaded = false;
 }
 
+void UnloadSound()
+{
+    QuitMixerX();
+    InitMixerX();
+}
+
 void InitSoundDefaults()
 {
 }

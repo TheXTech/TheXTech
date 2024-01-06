@@ -1041,9 +1041,61 @@ void LoadGFX()
     UpdateLoad();
 }
 
-void UnloadGFX()
+void UnloadGFX(bool reload)
 {
-    // Do nothing
+    if(!reload)
+    {
+        // Do nothing at game exit
+        return;
+    }
+
+    UnloadCustomGFX();
+    UnloadWorldCustomGFX();
+
+    for(int c = 0; c < numCharacters; ++c)
+    {
+        For(A, 1, 10)
+        {
+            (*GFXCharacterBMP[c])[A].reset();
+        }
+    }
+
+    for(int A = 1; A <= maxBlockType; ++A)
+        GFXBlockBMP[A].reset();
+
+    for(int A = 1; A <= numBackground2; ++A)
+        GFXBackground2BMP[A].reset();
+
+    for(int A = 1; A <= maxNPCType; ++A)
+        GFXNPCBMP[A].reset();
+
+    for(int A = 1; A <= maxEffectType; ++A)
+        GFXEffectBMP[A].reset();
+
+    for(int A = 1; A <= maxYoshiGfx; ++A)
+    {
+        GFXYoshiBBMP[A].reset();
+        GFXYoshiTBMP[A].reset();
+    }
+
+    for(int A = 1; A <= maxBackgroundType; ++A)
+        GFXBackgroundBMP[A].reset();
+
+// 'world map
+    for(int A = 1; A <= maxTileType; ++A)
+        GFXTileBMP[A].reset();
+
+    for(int A = 1; A <= maxLevelType; ++A)
+        GFXLevelBMP[A].reset();
+
+    for(int A = 1; A <= maxSceneType; ++A)
+        GFXSceneBMP[A].reset();
+
+    for(int A = 1; A <= numCharacters; ++A)
+        GFXPlayerBMP[A].reset();
+
+    for(int A = 1; A <= maxPathType; ++A)
+        GFXPathBMP[A].reset();
 }
 
 static void loadCustomUIAssets()

@@ -30,7 +30,7 @@ extern bool gfxLoaderThreadingMode;
 // Public Sub LoadGFX()
 void LoadGFX();
 // Public Sub UnloadGFX()
-void UnloadGFX();
+void UnloadGFX(bool reload = false);
 // Public Sub LoadCustomGFX()
 void LoadCustomGFX(bool include_world = false);
 // Public Sub UnloadCustomGFX()
