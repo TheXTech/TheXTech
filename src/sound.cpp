@@ -1148,6 +1148,7 @@ void UnloadSound()
     if(g_curMusic)
         Mix_FreeMusic(g_curMusic);
     g_curMusic = nullptr;
+    g_reservedChannels = 0;
 
     for(auto & it : sound)
     {
