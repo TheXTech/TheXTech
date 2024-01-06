@@ -139,11 +139,11 @@ bool WindowSDL::initSDL(uint32_t windowInitFlags)
     windowInitFlags &= ~SDL_WINDOW_FULLSCREEN;
 #endif
 
-    const char* window_name = "TheXTech Engine - (TheXTech v" V_LATEST_STABLE ", #" V_BUILD_VER ")";
+    std::string window_name = "TheXTech Engine - (TheXTech v" V_LATEST_STABLE ", #" V_BUILD_VER ")";
     if(!g_gameInfo.title.empty())
-        window_name = g_gameInfo.titleWindow().c_str();
+        window_name = g_gameInfo.titleWindow();
 
-    m_window = SDL_CreateWindow(window_name,
+    m_window = SDL_CreateWindow(window_name.c_str(),
                                 SDL_WINDOWPOS_CENTERED,
                                 SDL_WINDOWPOS_CENTERED,
                                 initWindowW, initWindowH,
