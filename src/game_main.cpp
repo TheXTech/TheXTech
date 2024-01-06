@@ -341,6 +341,8 @@ int GameMain(const CmdLineSetup_t &setup)
     XEvents::doEvents();
 
 #ifdef __EMSCRIPTEN__ // Workaround for a recent Chrome's policy to avoid sudden sound without user's interaction
+    FontManager::initFull();
+
     XWindow::show(); // Don't show window until playing an initial sound
 
     while(!SharedCursor.Primary)
