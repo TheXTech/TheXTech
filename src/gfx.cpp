@@ -180,6 +180,7 @@ bool GFX_t::load()
                                          "It's possible that you didn't installed the game assets package, or you had installed it at the incorrect directory.",
                                          getLogFilePath());
         XMsgBox::simpleMsgBox(XMsgBox::MESSAGEBOX_ERROR, "UI image assets loading error", msg);
+        m_loadErrors = 0;
         return false;
     }
 
