@@ -756,6 +756,8 @@ int main(int argc, char**argv)
     EM_ASM(
         setTimeout(() => {
             console.log("Attempting to close window following game exit...");
+            document.getElementById("canvas").style.display = 'none';
+            document.getElementById("exit-msg").style.display = null;
             window.close();
         }, 250);
     );
