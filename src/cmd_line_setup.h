@@ -51,6 +51,9 @@ struct CmdLineSetup_t
     //! Run a test in battle mode
     bool testBattleMode = false;
 
+    //! Custom-specified asset pack name or path
+    std::string assetPack;
+
     //! Enable interprocessing communication with the Moondust Editor
     bool interprocess = false;
 

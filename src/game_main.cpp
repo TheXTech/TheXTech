@@ -73,6 +73,7 @@
 #include "main/game_strings.h"
 #include "main/translate.h"
 #include "main/record.h"
+#include "main/asset_pack.h"
 #include "core/render.h"
 #include "core/window.h"
 #include "core/events.h"
@@ -114,6 +115,9 @@ static int loadingThread(void *waiter_ptr)
     LoaderUpdateDebugString("Translations");
     XLanguage::findLanguages(); // find present translations
     ReloadTranslations(); // load translations
+
+    LoaderUpdateDebugString("Asset packs");
+    GetAssetPacks();
 
     SetupPhysics(); // Setup Physics
     SetupGraphics(); // setup graphics
@@ -343,8 +347,8 @@ int GameMain(const CmdLineSetup_t &setup)
 //    Unload frmLoader
     gfxLoaderTestMode = setup.testLevelMode;
 
-    // TODO: check locations in search path
-    if(!GFX.load()) // Load UI graphics
+    // find asset pack and load required UI graphics
+    if(!InitUIAssetsFrom(setup.assetPack))
         return 1;
 
 //    If LevelEditor = False Then
