@@ -2,6 +2,7 @@
 // based closely on the designs from https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API/Using_Service_Workers
 
 // configuration
+const app_id = "${THEXTECH_MANIFEST_ID_OUT}"
 const current_version = "${THEXTECH_MANIFEST_ID_OUT}-${GIT_COMMIT_HASH}";
 const scope = "${THEXTECH_DEPLOY_URL}";
 const executable_name = "${THEXTECH_EXECUTABLE_NAME}";
@@ -39,7 +40,7 @@ const clear_cache = async (key) => {
 
 const clear_other_caches = async () => {
   const keyList = await caches.keys();
-  const cachesToDelete = keyList.filter((key) => (key != current_version));
+  const cachesToDelete = keyList.filter((key) => (key.startsWith(app_id) && key != current_version));
   await Promise.all(cachesToDelete.map(clear_cache));
   console.info("TheXTech service worker update to " + current_version + ": update activated. (" + new Date() + ")");
   console.info("Deleted old caches: " + cachesToDelete);
