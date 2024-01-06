@@ -70,6 +70,8 @@
 #include "frm_main.h"
 
 #include "screen_textentry.h"
+#include "main/asset_pack.h"
+#include "main/screen_asset_pack.h"
 #include "editor/new_editor.h"
 #include "editor/write_level.h"
 #include "editor/write_world.h"
@@ -226,6 +228,8 @@ static int menuRecentEpisode = -1;
 
 static int listMenuLastScroll = 0;
 static int listMenuLastCursor = 0;
+
+static int s_startAssetPackTimer = 0;
 
 static const int TinyScreenH = 400;
 static const int SmallScreenH = 500;
@@ -617,6 +621,12 @@ static void s_handleMouseMove(int items, int x, int y, int maxWidth, int itemHei
 }
 
 
+static bool s_can_enter_ap_screen()
+{
+    return MenuMode == MENU_INTRO || (XRender::TargetH >= TinyScreenH && MenuMode == MENU_MAIN);
+}
+
+
 
 bool mainMenuUpdate()
 {
@@ -656,6 +666,23 @@ bool mainMenuUpdate()
 
     if(menuBackPress && menuDoPress)
         menuDoPress = false;
+
+    if(homePressed && s_can_enter_ap_screen() && MenuCursorCanMove && GetAssetPacks().size() > 1)
+    {
+        s_startAssetPackTimer++;
+        if(s_startAssetPackTimer == 60)
+        {
+            PlaySoundMenu(SFX_Do);
+            FadeOutMusic(500);
+            ScreenAssetPack::g_LoopActive = true;
+            GameMenu = false;
+            return true;
+        }
+    }
+    else if(s_can_enter_ap_screen() && s_startAssetPackTimer > 0)
+        s_startAssetPackTimer -= 2;
+    else
+        s_startAssetPackTimer = 0;
 
     {
         if(XWindow::getCursor() != CURSOR_NONE)
@@ -825,6 +852,7 @@ bool mainMenuUpdate()
                 else if(MenuCursor != quitKeyPos)
                 {
                     MenuCursor = quitKeyPos;
+                    MenuCursorCanMove = false;
                     PlaySoundMenu(SFX_Slide);
                 }
             }
@@ -1965,7 +1993,7 @@ static constexpr int find_in_string(const char* haystack, char needle)
     return find_in_string(haystack, haystack, needle);
 }
 
-static void s_drawGameVersion()
+void drawGameVersion(bool disable_git)
 {
     constexpr bool is_release = !in_string(V_LATEST_STABLE, '-');
     constexpr bool is_main = str_prefix(V_BUILD_BRANCH, "main");
@@ -1981,7 +2009,7 @@ static void s_drawGameVersion()
     SuperPrintRightAlign("v" V_LATEST_STABLE, 5, XRender::TargetW - 2, 2);
 
     // show branch
-    if(show_branch)
+    if(show_branch && !disable_git)
     {
         int y = show_commit ? XRender::TargetH - 36 : XRender::TargetH - 18;
 
@@ -1995,7 +2023,7 @@ static void s_drawGameVersion()
     }
 
     // show git commit
-    if(show_commit)
+    if(show_commit && !disable_git)
     {
         if(is_dirty)
         {
@@ -2151,45 +2179,50 @@ void mainMenuDraw()
     if(XRender::TargetH >= SmallScreenH)
         XRender::renderTexture(XRender::TargetW / 2 - GFX.MenuGFX[3].w / 2, XRender::TargetH - 24, GFX.MenuGFX[3]);
 
-    // Curtain
-    // correction to loop the original asset properly
-    int curtain_draw_w = GFX.MenuGFX[1].w;
-    if(curtain_draw_w == 800)
-        curtain_draw_w = 768;
-    int curtain_horiz_reps = XRender::TargetW / curtain_draw_w + 2;
+    bool draw_in_asset_pack = (MenuMode == MENU_MAIN || MenuMode == MENU_INTRO) && s_startAssetPackTimer >= 2;
 
-    for(int i = 0; i < curtain_horiz_reps; i++)
-        XRender::renderTexture(curtain_draw_w * i, 0, curtain_draw_w, GFX.MenuGFX[1].h, GFX.MenuGFX[1], 0, 0);
-
-    // game logo
-    int LogoMode = 0;
-    if(XRender::TargetH >= TinyScreenH || MenuMode == MENU_INTRO)
-        LogoMode = 1;
-    else if(MenuMode == MENU_MAIN || MenuMode == MENU_OPTIONS)
-        LogoMode = 2;
-
-    if(LogoMode == 1)
+    if(!draw_in_asset_pack)
     {
-        // show at half opacity if not at main menu on a small screen
-        XTColor logo_tint = (XRender::TargetH < SmallScreenH && MenuMode != MENU_INTRO && MenuMode != MENU_MAIN) ? XTAlpha(127) : XTColor();
+        // Curtain
+        // correction to loop the original asset properly
+        int curtain_draw_w = GFX.MenuGFX[1].w;
+        if(curtain_draw_w == 800)
+            curtain_draw_w = 768;
+        int curtain_horiz_reps = XRender::TargetW / curtain_draw_w + 2;
 
-        int logo_y = XRender::TargetH / 2 - 230;
+        for(int i = 0; i < curtain_horiz_reps; i++)
+            XRender::renderTexture(curtain_draw_w * i, 0, curtain_draw_w, GFX.MenuGFX[1].h, GFX.MenuGFX[1], 0, 0);
 
-        // place manually on small screens
-        if(XRender::TargetH < SmallScreenH)
-            logo_y = 16;
-        else if(XRender::TargetH <= 600)
-            logo_y = 40;
+        // game logo
+        int LogoMode = 0;
+        if(XRender::TargetH >= TinyScreenH || MenuMode == MENU_INTRO)
+            LogoMode = 1;
+        else if(MenuMode == MENU_MAIN || MenuMode == MENU_OPTIONS)
+            LogoMode = 2;
 
-        XRender::renderTexture(XRender::TargetW / 2 - GFX.MenuGFX[2].w / 2, logo_y, GFX.MenuGFX[2], logo_tint);
+        if(LogoMode == 1)
+        {
+            // show at half opacity if not at main menu on a small screen
+            XTColor logo_tint = (XRender::TargetH < SmallScreenH && MenuMode != MENU_INTRO && MenuMode != MENU_MAIN) ? XTAlpha(127) : XTColor();
+
+            int logo_y = XRender::TargetH / 2 - 230;
+
+            // place manually on small screens
+            if(XRender::TargetH < SmallScreenH)
+                logo_y = 16;
+            else if(XRender::TargetH <= 600)
+                logo_y = 40;
+
+            XRender::renderTexture(XRender::TargetW / 2 - GFX.MenuGFX[2].w / 2, logo_y, GFX.MenuGFX[2], logo_tint);
+        }
+        else if(LogoMode == 2)
+        {
+            SuperPrint(g_gameInfo.title, 3, XRender::TargetW / 2 - g_gameInfo.title.length()*9, 30);
+        }
     }
-    else if(LogoMode == 2)
-    {
-        SuperPrint(g_gameInfo.title, 3, XRender::TargetW/2 - g_gameInfo.title.length()*9, 30);
-    }
 
 
-    s_drawGameVersion();
+    drawGameVersion(false);
 
 #ifndef PGE_NO_THREADING
     if(SDL_AtomicGet(&loading))
@@ -2507,6 +2540,13 @@ void mainMenuDraw()
     else if(MenuMode == MENU_INPUT_SETTINGS)
     {
         menuControls_Render();
+    }
+
+    // fade to / from asset pack screen
+    if(s_can_enter_ap_screen() && s_startAssetPackTimer > 0)
+    {
+        ScreenAssetPack::DrawBackground(s_startAssetPackTimer / 60.0);
+        g_levelScreenFader.clearFader();
     }
 
     // Mouse cursor

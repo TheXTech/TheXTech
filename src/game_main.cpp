@@ -89,6 +89,7 @@
 #include "config.h"
 #include "main/screen_connect.h"
 #include "main/screen_quickreconnect.h"
+#include "main/screen_asset_pack.h"
 
 #include "main/level_medals.h"
 
@@ -552,7 +553,7 @@ int GameMain(const CmdLineSetup_t &setup)
 
     do
     {
-        if(GameMenu || MagicHand || LevelEditor)
+        if(GameMenu || MagicHand || LevelEditor || ScreenAssetPack::g_LoopActive)
         {
             XWindow::setCursor(CURSOR_NONE);
             XWindow::showCursor(0);
@@ -564,7 +565,16 @@ int GameMain(const CmdLineSetup_t &setup)
         }
 
 
-        if(LevelEditor) // Load the level editor
+        if(ScreenAssetPack::g_LoopActive)
+        {
+            // Run the frame-loop
+            runFrameLoop(&ScreenAssetPack::Loop,
+                         nullptr,
+                        []()->bool{ return ScreenAssetPack::g_LoopActive;}, nullptr,
+                        nullptr,
+                        nullptr);
+        }
+        else if(LevelEditor) // Load the level editor
         {
             // if(resChanged)
             //     ChangeScreen();

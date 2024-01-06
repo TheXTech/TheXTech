@@ -36,6 +36,7 @@
 #include "graphics/gfx_frame.h" // FrameBorderInfo, loadFrameInfo
 #include "core/render.h"
 #include "core/events.h"
+#include "main/screen_asset_pack.h"
 
 #include <IniProcessor/ini_processing.h>
 #include <Utils/files.h>
@@ -1469,6 +1470,9 @@ void UpdateLoadREAL()
 
     static uint8_t alphaFader = 255;
 
+    if(ScreenAssetPack::g_LoopActive)
+        alphaFader = 0;
+
     if(LoadCoinsT <= SDL_GetTicks())
     {
         LoadCoinsT = SDL_GetTicks() + 100;
@@ -1521,7 +1525,12 @@ void UpdateLoadREAL()
         if(Bottom > XRender::TargetH)
             Bottom = XRender::TargetH;
 
-        if(!gfxLoaderTestMode)
+        if(ScreenAssetPack::g_LoopActive)
+        {
+            ScreenAssetPack::DrawBackground(1.0);
+            DrawDeviceBattery();
+        }
+        else if(!gfxLoaderTestMode)
         {
             XRender::renderTexture(sh_w - gh_w, sh_h - gh_h, GFX.MenuGFX[4]);
         }
