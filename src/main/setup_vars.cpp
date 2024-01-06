@@ -305,7 +305,7 @@ void SetupVars()
     NPCHeight.fill(0);
     NPCWidthGFX.fill(0);
     NPCHeightGFX.fill(0);
-    NPCSpeedvar.fill(0.f);
+    NPCSpeedvar.fill(1.f);
 
     NPCIsAShell.fill(false);
     NPCIsABlock.fill(false);
