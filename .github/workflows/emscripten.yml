@@ -43,7 +43,7 @@ jobs:
             subdir_name: "thextech-adventures-of-demo",
             package_filename_game: "adventures-of-demo",
             upload_directory: "www/webassembly/",
-            deploy_directory: "www/webassembly/debug-deploy/aod-on-web-debug/"
+            deploy_directory: "www/webassembly/debug-deploy/aod-on-web-debug"
           }
 
         # ======================================= Super Mario Bros. X - a fan-game =======================================
@@ -71,7 +71,7 @@ jobs:
             subdir_name: "thextech-super-mario-bros-x",
             package_filename_game: "super-mario-bros-x",
             upload_directory: "www/webassembly/",
-            deploy_directory: "www/webassembly/debug-deploy/smbx-on-web-debug/"
+            deploy_directory: "www/webassembly/debug-deploy/smbx-on-web-debug"
           }
 
     steps:
@@ -216,9 +216,17 @@ jobs:
         for q in ./build/package/*.tar.gz; do
             UPLOAD_LIST="${UPLOAD_LIST} put -O ${{ matrix.config.upload_directory }} $q;"
         done
+
+        UPLOAD_LIST="${UPLOAD_LIST} rm -rf ${{ matrix.config.deploy_directory }}-next;"
         for q in ./build/output/bin/*; do
-            UPLOAD_LIST="${UPLOAD_LIST} put -O ${{ matrix.config.deploy_directory }} $q;"
+            UPLOAD_LIST="${UPLOAD_LIST} put -O ${{ matrix.config.deploy_directory }}-next/ $q;"
         done
+
+        UPLOAD_LIST="${UPLOAD_LIST} rm -rf ${{ matrix.config.deploy_directory }}-prev;"
+        UPLOAD_LIST="${UPLOAD_LIST} rename ${{ matrix.config.deploy_directory }} ${{ matrix.config.deploy_directory }}-prev;"
+        UPLOAD_LIST="${UPLOAD_LIST} rename ${{ matrix.config.deploy_directory }}-next ${{ matrix.config.deploy_directory }};"
+        UPLOAD_LIST="${UPLOAD_LIST} rm -rf ${{ matrix.config.deploy_directory }}-prev;"
+
         lftp -e "${UPLOAD_LIST} exit" -u ${{ secrets.builds_login }},${{ secrets.builds_password }} ${{ secrets.builds_host }}
 
     - name: List Build Directory
