@@ -30,8 +30,7 @@
 struct GameInfo
 {
     std::string title;
-    std::string titleWindow;
-    std::string titleCredits;
+    // std::string titleCredits;
     RangeArr<std::string, 1, numCharacters> characterName;
 
     std::string statusIconName;
@@ -81,6 +80,8 @@ struct GameInfo
 
     int outroCharacterNext();
     size_t outroCharacterCurrent = 0;
+
+    const std::string titleWindow() const;
 };
 
 extern GameInfo g_gameInfo;

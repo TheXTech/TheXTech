@@ -31,7 +31,6 @@ typedef struct SDL_Window SDL_Window;
 
 class WindowSDL final : public AbstractWindow_t
 {
-    std::string m_windowTitle;
     SDL_Window *m_window = nullptr;
     WindowCursor_t m_cursor = CURSOR_DEFAULT;
 
@@ -136,6 +135,12 @@ public:
      * \return true if window is maximized
      */
     bool isMaximized() override;
+
+    /*!
+     * \brief Set the title of the window
+     * \param title Title to set, as C string
+     */
+    void setTitle(const char* title) override;
 };
 
 #endif // WINDOWSDL_H

@@ -200,6 +200,8 @@ void PlayInitSound();
 // Public Sub InitSound() 'readys sound and music to be played
 // readys sound and music to be played
 void InitSound();
+// unloads all sounds for asset pack switch
+void UnloadSound();
 // Public Sub PlaySound(A As Integer) 'play a sound
 // play a sound
 void PlaySound(int A, int loops = 0, int volume = 128);

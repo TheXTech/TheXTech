@@ -68,6 +68,7 @@ void getWindowSize(int *w, int *h)
 bool hasWindowInputFocus() { return true; }
 bool hasWindowMouseFocus() { return true; }
 bool isMaximized() { return false; }
+void setTitle(const char*) {}
 
 
 } // namespace XWindow

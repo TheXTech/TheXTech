@@ -30,6 +30,7 @@
 #include "config.h"
 #include "video.h"
 #include "screen.h"
+#include "../version.h"
 
 #ifdef __EMSCRIPTEN__
 #include <emscripten/html5.h>
@@ -90,6 +91,7 @@ void s_emscriptenLeaveRealFullscreen()
             setTimeout(() => {
                 console.log("Restoring canvas on return from fullscreen");
                 softFullscreenResizeWebGLRenderTarget();
+                window.dispatchEvent(new Event('resize'));
             }, 500);
         }
     );
@@ -114,8 +116,6 @@ bool WindowSDL::initSDL(uint32_t windowInitFlags)
 
     bool res = true;
 
-    m_windowTitle = g_gameInfo.titleWindow;
-
     // SDL_GL_ResetAttributes();
 
 #if defined(__SWITCH__) /* On Switch, expect the initial size 1920x1080 */
@@ -139,7 +139,11 @@ bool WindowSDL::initSDL(uint32_t windowInitFlags)
     windowInitFlags &= ~SDL_WINDOW_FULLSCREEN;
 #endif
 
-    m_window = SDL_CreateWindow(m_windowTitle.c_str(),
+    std::string window_name = "TheXTech Engine - (TheXTech v" V_LATEST_STABLE ", #" V_BUILD_VER ")";
+    if(!g_gameInfo.title.empty())
+        window_name = g_gameInfo.titleWindow();
+
+    m_window = SDL_CreateWindow(window_name.c_str(),
                                 SDL_WINDOWPOS_CENTERED,
                                 SDL_WINDOWPOS_CENTERED,
                                 initWindowW, initWindowH,
@@ -411,4 +415,12 @@ bool WindowSDL::isMaximized()
         return false;
     Uint32 flags = SDL_GetWindowFlags(m_window);
     return (flags & SDL_WINDOW_MAXIMIZED) != 0;
+}
+
+void WindowSDL::setTitle(const char* title)
+{
+    if(!m_window)
+        return;
+
+    SDL_SetWindowTitle(m_window, title);
 }

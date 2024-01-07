@@ -107,8 +107,13 @@ static int loadingThread(void *waiter_ptr)
     UNUSED(waiter_ptr);
 #endif
 
+    LoaderUpdateDebugString("Game info");
+    initGameInfo();
+    cheats_reset();
+
     LoaderUpdateDebugString("Translations");
     XLanguage::findLanguages(); // find present translations
+    ReloadTranslations(); // load translations
 
     SetupPhysics(); // Setup Physics
     SetupGraphics(); // setup graphics
@@ -116,6 +121,9 @@ static int loadingThread(void *waiter_ptr)
 //    GFX.load(); // load the graphics form // Moved to before sound load
     SizableBlocks();
     LoadGFX(); // load the graphics from file
+
+    Controls::LoadTouchScreenGFX();
+
     SetupVars(); //Setup Variables
 
 #ifdef THEXTECH_PRELOAD_LEVELS
@@ -206,125 +214,35 @@ static void s_ExpandSectionForMenu()
         level[Player[1].Section].Y = level[Player[1].Section].Height - 2160;
 }
 
-int GameMain(const CmdLineSetup_t &setup)
+void MainLoadAll(bool reload)
 {
-    Player_t blankPlayer;
-//    int A = 0;
-//    int B = 0;
-//    int C = 0;
-    bool tempBool = false;
-    int lastWarpEntered = 0;
-
-//    LB = "\n";
-//    EoT = "";
-
-    FrameSkip = setup.frameSkip;
-    noSound = setup.noSound;
-    neverPause = setup.neverPause;
-
-    CompatSetEnforcedLevel(setup.compatibilityLevel);
-
-    g_speedRunnerMode = setup.speedRunnerMode;
-    g_drawController |= setup.showControllerState;
-    speedRun_setSemitransparentRender(setup.speedRunnerSemiTransparent);
-    speedRun_setBlinkEffect(setup.speedRunnerBlinkEffect);
-
-    ResetCompat();
-    cheats_reset();
-
-    // [ !Here was a starting dialog! ]
-
-    //    frmLoader.Show 'show the Splash screen
-    //    Do
-    //        DoEvents
-    //    Loop While StartMenu = False 'wait until the player clicks a button
-
-    // Set global SMBX64 behaviour at PGE-FL
-    FileFormats::SetSMBX64LvlFlags(FileFormats::F_SMBX64_KEEP_LEGACY_NPC_IN_BLOCK_CODES);
-
-    initOutroContent();
-    initMainMenu();
-    initEditorStrings();
-    initGameStrings();
-    StartMenu = true;
-    MenuMode = MENU_INTRO;
-
-    if(!CurrentLanguage.empty())
+    if(reload)
     {
-        XTechTranslate translator;
-        if(translator.translate())
-        {
-            pLogDebug("Loaded translation for language %s-%s",
-                      CurrentLanguage.c_str(),
-                      CurrentLangDialect.empty() ? "??" : CurrentLangDialect.c_str());
-        }
-    }
+        StopAllSounds();
+        StopMusic();
 
-    initAll();
+        UnloadSound();
+        UnloadGFX(true);
+        FontManager::quit();
 
-//    Unload frmLoader
-    gfxLoaderTestMode = setup.testLevelMode;
-
-    if(!GFX.load()) // Load UI graphics
-        return 1;
-
-//    If LevelEditor = False Then
-//        frmMain.Show // Show window a bit later
-//    XWindow::show();
-//        GameMenu = True
-    GameMenu = true;
-//    Else
-//        frmSplash.Show
-//        BlocksSorted = True
-//    End If
-
-    LoadingInProcess = true;
-
-    ShowFPS = setup.testShowFPS;
-    MaxFPS = setup.testMaxFPS; // || (g_videoSettings.renderModeObtained == RENDER_ACCELERATED_VSYNC);
-
-    OpenConfig();
-
-    XEvents::doEvents();
-
-#ifdef __EMSCRIPTEN__ // Workaround for a recent Chrome's policy to avoid sudden sound without user's interaction
-    XWindow::show(); // Don't show window until playing an initial sound
-
-    while(!SharedCursor.Primary)
-    {
-        XRender::setTargetTexture();
-        XRender::clearBuffer();
-        SuperPrint("Click to start a game", 3, 230, 280);
-        XRender::repaint();
-        XRender::setTargetScreen();
-        XEvents::doEvents();
-        Controls::Update(false);
-        PGE_Delay(10);
-    }
-#endif
-
-    if(!noSound)
-        InitMixerX();
-
-#ifndef PGE_NO_THREADING
-    gfxLoaderThreadingMode = true;
-#endif
-    XWindow::show(); // Don't show window until playing an initial sound
-
-    if(!noSound)
-    {
-        if(!setup.testLevelMode)
+        if(!noSound)
             PlayInitSound();
     }
 
     LoaderInit();
 
+    LoaderUpdateDebugString("Fonts");
+
+    FontManager::initFull();
+
 #ifndef PGE_NO_THREADING
     {
+        gfxLoaderThreadingMode = true;
+
         SDL_Thread*     loadThread;
-        int             threadReturnValue;
         SDL_atomic_t    loadWaiter;
         int             loadWaiterState = 1;
+        int             threadReturnValue;
 
         SDL_AtomicSet(&loadWaiter, loadWaiterState);
         loadThread = SDL_CreateThread(loadingThread, "Loader", &loadWaiter);
@@ -352,9 +270,128 @@ int GameMain(const CmdLineSetup_t &setup)
     loadingThread(nullptr);
 #endif
 
-    LoaderFinish();
+    Integrator::setGameName(g_gameInfo.title, g_gameInfo.statusIconName);
+    XWindow::setTitle(g_gameInfo.titleWindow().c_str());
 
-    LevelSelect = true; // world map is to be shown
+    LoaderFinish();
+}
+
+
+int GameMain(const CmdLineSetup_t &setup)
+{
+    Player_t blankPlayer;
+//    int A = 0;
+//    int B = 0;
+//    int C = 0;
+    bool tempBool = false;
+    int lastWarpEntered = 0;
+
+//    LB = "\n";
+//    EoT = "";
+
+    FrameSkip = setup.frameSkip;
+    noSound = setup.noSound;
+    neverPause = setup.neverPause;
+
+    CompatSetEnforcedLevel(setup.compatibilityLevel);
+
+    g_speedRunnerMode = setup.speedRunnerMode;
+    g_drawController |= setup.showControllerState;
+    speedRun_setSemitransparentRender(setup.speedRunnerSemiTransparent);
+    speedRun_setBlinkEffect(setup.speedRunnerBlinkEffect);
+
+    ResetCompat();
+    // moved into MainLoadAll
+    // cheats_reset();
+
+    // [ !Here was a starting dialog! ]
+
+    //    frmLoader.Show 'show the Splash screen
+    //    Do
+    //        DoEvents
+    //    Loop While StartMenu = False 'wait until the player clicks a button
+
+    // Set global SMBX64 behaviour at PGE-FL
+    FileFormats::SetSMBX64LvlFlags(FileFormats::F_SMBX64_KEEP_LEGACY_NPC_IN_BLOCK_CODES);
+
+    StartMenu = true;
+    MenuMode = MENU_INTRO;
+
+    // strings and translation initialization moved into MainLoadAll
+#if 0
+    initOutroContent();
+    initMainMenu();
+    initEditorStrings();
+    initGameStrings();
+
+    if(!CurrentLanguage.empty())
+    {
+        XTechTranslate translator;
+        if(translator.translate())
+        {
+            pLogDebug("Loaded translation for language %s-%s",
+                      CurrentLanguage.c_str(),
+                      CurrentLangDialect.empty() ? "??" : CurrentLangDialect.c_str());
+        }
+    }
+#endif
+
+    initAll();
+
+//    Unload frmLoader
+    gfxLoaderTestMode = setup.testLevelMode;
+
+    // TODO: check locations in search path
+    if(!GFX.load()) // Load UI graphics
+        return 1;
+
+//    If LevelEditor = False Then
+//        frmMain.Show // Show window a bit later
+//    XWindow::show();
+//        GameMenu = True
+    GameMenu = true;
+//    Else
+//        frmSplash.Show
+//        BlocksSorted = True
+//    End If
+
+    LoadingInProcess = true;
+
+    ShowFPS = setup.testShowFPS;
+    MaxFPS = setup.testMaxFPS; // || (g_videoSettings.renderModeObtained == RENDER_ACCELERATED_VSYNC);
+
+    OpenConfig();
+
+    XEvents::doEvents();
+
+#ifdef __EMSCRIPTEN__ // Workaround for a recent Chrome's policy to avoid sudden sound without user's interaction
+    FontManager::initFull();
+
+    XWindow::show(); // Don't show window until playing an initial sound
+
+    while(!SharedCursor.Primary)
+    {
+        XRender::setTargetTexture();
+        XRender::clearBuffer();
+        SuperPrint("Click to start a game", 3, 230, 280);
+        XRender::repaint();
+        XRender::setTargetScreen();
+        XEvents::doEvents();
+        Controls::Update(false);
+        PGE_Delay(10);
+    }
+#endif
+
+    if(!noSound)
+        InitMixerX();
+
+#ifndef PGE_NO_THREADING
+    gfxLoaderThreadingMode = true;
+#endif
+    XWindow::show(); // Don't show window until playing an initial sound
+
+    if(!noSound && !setup.testLevelMode)
+        PlayInitSound();
 
 #ifdef THEXTECH_INTERPROC_SUPPORTED
     if(setup.interprocess)
@@ -362,7 +399,10 @@ int GameMain(const CmdLineSetup_t &setup)
 #endif
 
     Integrator::initIntegrations();
-    Integrator::setGameName(g_gameInfo.title, g_gameInfo.statusIconName);
+
+    MainLoadAll(false);
+
+    LevelSelect = true; // world map is to be shown
 
     LoadingInProcess = false;
 

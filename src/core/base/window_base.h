@@ -122,6 +122,12 @@ public:
      * \return true if window is maximized
      */
     virtual bool isMaximized() = 0;
+
+    /*!
+     * \brief Set the title of the window
+     * \param title Title to set, as C string
+     */
+    virtual void setTitle(const char* title) = 0;
 };
 
 extern AbstractWindow_t *g_window;

@@ -1304,5 +1304,31 @@ void UpdateTouchScreenSize()
 #endif // #ifdef TOUCHSCREEN_H
 }
 
+void LoadTouchScreenGFX()
+{
+#ifdef TOUCHSCREEN_H
+    InputMethodType_TouchScreen* touchscreen = nullptr;
+
+    for(InputMethodType* type : g_InputMethodTypes)
+    {
+        if(!type)
+            continue;
+
+        auto* t = dynamic_cast<InputMethodType_TouchScreen*>(type);
+
+        if(t)
+        {
+            touchscreen = t;
+            break;
+        }
+    }
+
+    if(!touchscreen)
+        return;
+
+    touchscreen->m_controller.loadGFX();
+#endif // #ifdef TOUCHSCREEN_H
+}
+
 } // namespace Controls
 

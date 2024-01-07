@@ -706,8 +706,6 @@ int main(int argc, char**argv)
     setCpuClock(true);
 #endif
 
-    initGameInfo();
-
     // set this flag before SDL initialization to allow game be quit when closing a window before a loading process will be completed
     GameIsActive = true;
 
@@ -716,8 +714,6 @@ int main(int argc, char**argv)
         g_frmMain.freeSystem();
         return 1;
     }
-
-    XLanguage::resolveLanguage(g_config.language);
 
 #ifdef __APPLE__
     macosReceiveOpenFile();
@@ -760,6 +756,8 @@ int main(int argc, char**argv)
     EM_ASM(
         setTimeout(() => {
             console.log("Attempting to close window following game exit...");
+            document.getElementById("canvas").style.display = 'none';
+            document.getElementById("exit-msg").style.display = null;
             window.close();
         }, 250);
     );
