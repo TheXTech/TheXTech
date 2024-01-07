@@ -134,7 +134,7 @@ static void GetControllerColor(int player, XTColor& color, bool* drawLabel = nul
     }
 }
 
-void RenderControls(int player, int x, int y, int w, int h, bool missing, uint8_t alpha)
+void RenderControls(int player, int x, int y, int w, int h, bool missing, uint8_t alpha, bool connect_screen)
 {
     if(player < 1 || player > maxLocalPlayers)
         return;
@@ -145,7 +145,8 @@ void RenderControls(int player, int x, int y, int w, int h, bool missing, uint8_
     XTColor color;
     bool drawLabel;
 
-    GetControllerColor(player, color, &drawLabel);
+    if(!connect_screen)
+        GetControllerColor(player, color, &drawLabel);
 
     XRender::renderRect(x, y, w, h, {0, 0, 0, alpha}, true);//Edge
     XRender::renderRect(x + 2, y + 2, w - 4, h - 4, {color, alpha}, true);//Box
@@ -178,10 +179,14 @@ void RenderControls(int player, int x, int y, int w, int h, bool missing, uint8_
     else
         XRender::renderRect(x + 40, y + 22, 10, 4, bool2(s_gray, c.Start, alphaBtn), true);
 
-    if(drawLabel || missing)
+    if(!connect_screen && (drawLabel || missing))
     {
         const char* label_fmt = (missing ? "P{0}?" : "P{0}");
         SuperPrintCenter(fmt::format_ne(label_fmt, player), 3, x + w / 2, y + 2, XTAlpha(alphaText));
+    }
+    else if(missing)
+    {
+        SuperPrintCenter("?", 3, x + w / 2, y + 4, XTAlpha(alphaText));
     }
 }
 
