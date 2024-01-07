@@ -71,6 +71,7 @@
 #include <whb/log.h>
 #include <whb/log_console.h>
 #include <coreinit/filesystem.h>
+#include <sysapp/launch.h>
 #endif
 
 #ifdef __EMSCRIPTEN__
@@ -753,6 +754,7 @@ int main(int argc, char**argv)
 
 #ifdef __WIIU__
     WHBProcShutdown();
+    SYSLaunchMenu();
 #endif
 
 #ifdef __EMSCRIPTEN__
