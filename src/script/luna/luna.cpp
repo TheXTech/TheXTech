@@ -65,6 +65,7 @@ void lunaReset()
     gRunTapped = 0;
 
     gEnableDemoCounterByLC = false;
+    gSMBXHUDSettings = SMBXHUDSettings();
 
     gAutoMan.Clear();
     Renderer::Get().ClearAllDebugMessages();
