@@ -271,6 +271,10 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         else
             CustomMusic[B] = g_dirEpisode.resolveFileCase(s.music_file);
 
+        // NOTE: maybe this will get stored and used as a Lua table (instead of as a string) on platforms supporting Lua
+        if(LevelEditor && !s.custom_params.empty())
+            SetS(SectionJSONInfo[B], s.custom_params);
+
 #if defined(THEXTECH_BUILD_GL_MODERN) && defined(THEXTECH_WIP_FEATURES)
         // FIXME: allow sections to specify shaders by name
         SectionEffect[B] = ResolveGLProgram("section-effect");
@@ -1042,6 +1046,8 @@ void ClearLevel()
 #ifdef __16M__
     XRender::clearAllTextures();
 #endif
+
+    SectionJSONInfo.fill(STRINGINDEX_NONE);
 
 #ifdef THEXTECH_BUILD_GL_MODERN
     SectionEffect.fill(LoadedGLProgramRef_t());

@@ -122,6 +122,9 @@ void SaveLevel(const std::string& FilePath, int format, int version)   // saves 
         section.underwater = UnderWater[i];
         section.music_file = CustomMusic[i];
 
+        if(SectionJSONInfo[i] != STRINGINDEX_NONE)
+            section.custom_params = GetS(SectionJSONInfo[i]);
+
         // swapped order of operands because
         // previous code did not make sense
         if(size_t(i) >= out.sections.size())

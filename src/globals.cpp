@@ -304,6 +304,7 @@ int curWorldMusic = 0;
 std::string curWorldMusicFile;
 RangeArrI<bool, 0, maxSections, false> NoTurnBack;
 RangeArrI<bool, 0, maxSections, false> UnderWater;
+RangeArrI<stringindex_t, 0, maxSections, STRINGINDEX_NONE> SectionJSONInfo;
 bool TestLevel = false;
 bool GameMenu = false;
 std::string WorldName;
