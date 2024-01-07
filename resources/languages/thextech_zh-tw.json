@@ -343,7 +343,8 @@
             "reconnectTitle": "重新連接",
             "splitPressSelect_1": "按選擇鍵",
             "splitPressSelect_2": "進入按鍵配置",
-            "wordDisconnect": "斷開"
+            "wordDisconnect": "斷開",
+            "phraseTestProfile": "測試配置"
         },
         "controls": {
             "phrasePlayerConnected": "玩家{0}已連接{1}， 配置： {2}",
@@ -581,8 +582,9 @@
                 "linear": "雙綫性",
                 "nearest": "最近鄰居"
             },
-            "render": "圖形渲染方式: {0}",
-            "renderX": "圖形渲染方式: {0} (X)"
+            "render": "圖形渲染類型: {0}",
+            "renderX": "圖形渲染類型: {0} (X)",
+            "renderAuto": "圖形渲染類型：自動選擇 ({0})"
         },
         "wordBack": "返回",
         "wordHide": "隱藏",
