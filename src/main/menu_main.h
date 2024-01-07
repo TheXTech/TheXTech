@@ -133,6 +133,7 @@ struct MainMenuContent
     std::string optionsViewCredits;
     std::string optionsRestartEngine;
     std::string optionsRender;
+    std::string optionsRenderAuto;
     std::string optionsRenderX;
     std::string optionsScaleMode;
     std::string optionsScaleInteger;
