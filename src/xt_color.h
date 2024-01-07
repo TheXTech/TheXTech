@@ -57,6 +57,17 @@ struct alignas(uint32_t) XTColor
         return XTColor(mul(r, o.r), mul(g, o.g), mul(b, o.b), mul(a, o.a));
     }
 
+    // intensity scale
+    inline constexpr XTColor operator*(float o) const
+    {
+        return XTColor(uint8_t(r * o), uint8_t(g * o), uint8_t(b * o), a);
+    }
+
+    inline constexpr XTColor operator*(uint8_t o) const
+    {
+        return XTColor(mul(r, o), mul(g, o), mul(b, o), a);
+    }
+
     // (in)equality operators
     inline constexpr bool operator==(XTColor o) const
     {
