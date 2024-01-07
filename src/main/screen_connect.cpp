@@ -1262,7 +1262,7 @@ bool PlayerBox::DrawChar(int x, int w, int y, int h)
         DoTransform(p, ch);
 
     // draw frame
-    if(GFX.CharSelFrame.tex.inited && false)
+    if(GFX.CharSelFrame.tex.inited)
         RenderFrameFill(newLoc(x, y, w, h), GFX.CharSelFrame, XTAlpha(alpha));
     else
     {
