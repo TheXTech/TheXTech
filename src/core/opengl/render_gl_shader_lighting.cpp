@@ -238,14 +238,12 @@ float shadow(const in vec2 target_pos, const in float target_plane, const in vec
     step_count = min(step_count, max_steps);
 
     vec2 step_offset = (target_pos - source_pos) / float(step_count);
+    float accum_rate = 1.0 / float(step_count);
 
-    // set up iteration
+
+    // primary loop variables
     vec2  cur_pos = source_pos;
     float last_plane = floor(texture(u_depth_buffer, cur_pos).r * 32.0);
-    float source_occluder = (last_plane > source_plane) ? 1.0 : 0.0;
-    bool is_source = (last_plane == source_plane);
-
-    float accum_rate = 1.0 / float(step_count);
 
     float accum = 0.0;
     float mult = 0.0;
@@ -253,21 +251,24 @@ float shadow(const in vec2 target_pos, const in float target_plane, const in vec
     float accum_conditional = 0.0; // accumulation for something currently at target's depth
     float mult_conditional  = 0.0; // shadow of something currently at target's depth
 
-    int last_target_step = 0;           // time that last_accum_conditional and last_mult_conditional were most recently saved
-    float last_accum_conditional = 0.0; // accumulation for something previously at target's depth
-    float last_mult_conditional  = 0.0; // shadow of something previously at target's depth
 
-    int last_source_step = 0;           // last time that the plane was the source plane
-    int not_source_steps = 0;           // number of steps that the plane was not the source plane
+    // special cases:
 
-    // maximum number of not source steps that allow the source to be privileged (8px)
-    const int   is_source_permit = int(8.0 * shadowResolution);
+    // if something is in front of the source, don't light it at all
+    float source_occluder = (last_plane > source_plane) ? 1.0 : 0.0;
+    const float source_occluder_dist = 14.0 * shadowResolution; // (will partially apply even if occluder starts up to 14px away)
 
-    // fade in the source occlusion condition over 14px
-    const float source_occluder_dist = 14.0 * shadowResolution;
+    // don't cast shadows when going backwards from the source to the background
+    float       long_term_plane  = source_plane;                // plane determining how shadows are cast, decreases from the source to the background
+    const int   long_term_steps  = int(8.0 * shadowResolution); // number of steps required to decrease the long term plane (8px)
+    int         last_switch_step = 0;                           // number of steps since last switch (used to decide when to update long_term_plane)
 
-    // fade in target self-shadows from 2px to 12px
-    const int   self_shadow_fade = int(12.0 * shadowResolution);
+    // target shouldn't cast shadows on itself (fade these in)
+    int         last_target_step       = 0;                            // time that last_accum_conditional and last_mult_conditional were most recently saved
+    float       last_accum_conditional = 0.0;                          // accumulation for something previously at target's depth
+    float       last_mult_conditional  = 0.0;                          // shadow of something previously at target's depth
+    const int   self_shadow_fade       = int(12.0 * shadowResolution); // fade in target self-shadows from 2px to 12px
+
 
     for(int i = 0; i < step_count; i++)
     {
@@ -282,18 +283,9 @@ float shadow(const in vec2 target_pos, const in float target_plane, const in vec
             else
                 source_occluder = 0.0;
 
-            is_source = false;
-
-            if(plane_at == source_plane)
-            {
-                not_source_steps += i - last_source_step;
-                if(not_source_steps < is_source_permit)
-                    is_source = true;
-            }
-            else if(last_plane == source_plane)
-            {
-                last_source_step = i;
-            }
+            if(last_plane < long_term_plane && i - last_switch_step >= long_term_steps)
+                long_term_plane = last_plane;
+            last_switch_step = i;
 
             if(plane_at == target_plane && i - last_target_step < self_shadow_fade)
             {
@@ -324,8 +316,8 @@ float shadow(const in vec2 target_pos, const in float target_plane, const in vec
             last_plane = plane_at;
         }
 
-        // no shadows from background, effects, or source
-        if(plane_at < 3.0 || plane_at > 16.0 || is_source)
+        // no shadows from objects at lower planes (or effects)
+        if(plane_at <= long_term_plane || plane_at > 16.0)
             accum += accum_rate;
         // BGOs only partially cast shadows on foreground
         else if(plane_at < 6.0 && target_plane >= 6.0)
