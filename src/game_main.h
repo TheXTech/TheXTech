@@ -98,6 +98,9 @@ int PauseGame(PauseCode code, int plr = 0);
 
 void OpenConfig_preSetup();
 
+// reload recent episodes from config (used when asset pack changes)
+void ConfigReloadRecentEpisodes();
+
 void OpenConfig();
 
 void SaveConfig();

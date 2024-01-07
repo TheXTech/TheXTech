@@ -312,6 +312,8 @@ bool ReloadAssetsFrom(const std::string& id)
         return false;
     }
 
+    ConfigReloadRecentEpisodes();
+
     pLogDebug("Successfully loaded UI assets; now loading all other assets from [%s]", AppPath.c_str());
 
     MainLoadAll(true);

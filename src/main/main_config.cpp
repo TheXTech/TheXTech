@@ -242,6 +242,30 @@ void OpenConfig_preSetup()
 }
 
 
+void ConfigReloadRecentEpisodes()
+{
+    // reload recently used episodes for the new asset pack
+    std::string configPath = AppPathManager::settingsFileSTD();
+
+    if(Files::fileExists(configPath))
+    {
+        IniProcessing config(configPath);
+
+        std::string asset_pack_prefix = g_AssetPackID;
+        if(!asset_pack_prefix.empty())
+            asset_pack_prefix += '-';
+
+        config.beginGroup("recent");
+        config.read((asset_pack_prefix + "episode-1p").c_str(), g_recentWorld1p, std::string());
+        config.read((asset_pack_prefix + "episode-2p").c_str(), g_recentWorld2p, std::string());
+        config.read((asset_pack_prefix + "episode-editor").c_str(), g_recentWorldEditor, std::string());
+        config.endGroup();
+
+        pLogDebug("Loaded recent episodes for asset pack [id: %s] from [%s]", g_AssetPackID.c_str(), configPath.c_str());
+    }
+}
+
+
 void OpenConfig()
 {
     int FileRelease = 0;
@@ -317,10 +341,14 @@ void OpenConfig()
         config.readEnum("show-episode-title", g_config.show_episode_title, (int)Config_t::EPISODE_TITLE_OFF, showEpisodeTitle);
         config.endGroup();
 
+        std::string asset_pack_prefix = g_AssetPackID;
+        if(!asset_pack_prefix.empty())
+            asset_pack_prefix += '-';
+
         config.beginGroup("recent");
-        config.read("episode-1p", g_recentWorld1p, std::string());
-        config.read("episode-2p", g_recentWorld2p, std::string());
-        config.read("episode-editor", g_recentWorldEditor, std::string());
+        config.read((asset_pack_prefix + "episode-1p").c_str(), g_recentWorld1p, std::string());
+        config.read((asset_pack_prefix + "episode-2p").c_str(), g_recentWorld2p, std::string());
+        config.read((asset_pack_prefix + "episode-editor").c_str(), g_recentWorldEditor, std::string());
         config.endGroup();
 
         config.beginGroup("gameplay");
@@ -407,10 +435,15 @@ void SaveConfig()
     }
     config.endGroup();
 
+    std::string asset_pack_prefix = g_AssetPackID;
+    if(!asset_pack_prefix.empty())
+        asset_pack_prefix += '-';
+
     config.beginGroup("recent");
     config.setValue("asset-pack", g_AssetPackID);
-    config.setValue("episode-2p", g_recentWorld2p);
-    config.setValue("episode-editor", g_recentWorldEditor);
+    config.setValue((asset_pack_prefix + "episode-1p").c_str(), g_recentWorld1p);
+    config.setValue((asset_pack_prefix + "episode-2p").c_str(), g_recentWorld2p);
+    config.setValue((asset_pack_prefix + "episode-editor").c_str(), g_recentWorldEditor);
     config.endGroup();
 
     config.beginGroup("video");
