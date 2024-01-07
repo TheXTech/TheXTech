@@ -2,7 +2,7 @@
  * TheXTech - A platform game engine ported from old source code for VB6
  *
  * Copyright (c) 2009-2011 Andrew Spinks, original VB6 code
- * Copyright (c) 2020-2023 Vitaly Novichkov <admin@wohlnet.ru>
+ * Copyright (c) 2020-2024 Vitaly Novichkov <admin@wohlnet.ru>
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the "Software"),
@@ -90,7 +90,7 @@
 #define V_VERSION V_PROJECT_VERSION_NUM
 #define V_RELEASE "" //Developing state (for release this field must be empty)
 
-#define V_COPYRIGHT "2020-2023 by Wohlstand"
+#define V_COPYRIGHT "2020-2024 by Wohlstand"
 
 #define V_COMPANY "Moondust Team"
 
