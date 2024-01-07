@@ -2,7 +2,7 @@
  * TheXTech - A platform game engine ported from old source code for VB6
  *
  * Copyright (c) 2009-2011 Andrew Spinks, original VB6 code
- * Copyright (c) 2020-2023 Vitaly Novichkov <admin@wohlnet.ru>
+ * Copyright (c) 2020-2024 Vitaly Novichkov <admin@wohlnet.ru>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -308,6 +308,7 @@ int curWorldMusic = 0;
 std::string curWorldMusicFile;
 RangeArrI<bool, 0, maxSections, false> NoTurnBack;
 RangeArrI<bool, 0, maxSections, false> UnderWater;
+RangeArrI<stringindex_t, 0, maxSections, STRINGINDEX_NONE> SectionJSONInfo;
 bool TestLevel = false;
 bool GameMenu = false;
 std::string WorldName;

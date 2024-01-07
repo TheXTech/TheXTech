@@ -2,7 +2,7 @@
 VPtrList - implementation of PtrList based on std::vector<std::shared_ptr<T>> inherence
 implements same API as PtrList, but works faster and has things as std::vector has
 
-Copyright (c) 2017 Vitaliy Novichkov <admin@wohlnet.ru>
+Copyright (c) 2024 Vitaliy Novichkov <admin@wohlnet.ru>
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the "Software"),

@@ -2,7 +2,7 @@
  * TheXTech - A platform game engine ported from old source code for VB6
  *
  * Copyright (c) 2009-2011 Andrew Spinks, original VB6 code
- * Copyright (c) 2020-2023 Vitaly Novichkov <admin@wohlnet.ru>
+ * Copyright (c) 2020-2024 Vitaly Novichkov <admin@wohlnet.ru>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -283,6 +283,10 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
             CustomMusic[B].clear();
         else
             CustomMusic[B] = g_dirEpisode.resolveFileCase(s.music_file);
+
+        // NOTE: maybe this will get stored and used as a Lua table (instead of as a string) on platforms supporting Lua
+        if(LevelEditor && !s.custom_params.empty())
+            SetS(SectionJSONInfo[B], s.custom_params);
 
 #if defined(THEXTECH_BUILD_GL_MODERN)
         if(!s.custom_params.empty())
@@ -1148,6 +1152,8 @@ void ClearLevel()
 #ifdef __16M__
     XRender::clearAllTextures();
 #endif
+
+    SectionJSONInfo.fill(STRINGINDEX_NONE);
 
 #ifdef THEXTECH_BUILD_GL_MODERN
     SectionEffect.fill(LoadedGLProgramRef_t());

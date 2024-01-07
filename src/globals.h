@@ -2,7 +2,7 @@
  * TheXTech - A platform game engine ported from old source code for VB6
  *
  * Copyright (c) 2009-2011 Andrew Spinks, original VB6 code
- * Copyright (c) 2020-2023 Vitaly Novichkov <admin@wohlnet.ru>
+ * Copyright (c) 2020-2024 Vitaly Novichkov <admin@wohlnet.ru>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -1803,6 +1803,10 @@ void g_playWorldMusic(WorldMusic_t &mus);
 extern RangeArrI<bool, 0, maxSections, false> NoTurnBack;
 //Public UnderWater(0 To maxSections) As Boolean
 extern RangeArrI<bool, 0, maxSections, false> UnderWater;
+
+// EXTRA: track extra JSON info from a loaded level
+extern RangeArrI<stringindex_t, 0, maxSections, STRINGINDEX_NONE> SectionJSONInfo;
+
 //Public TestLevel As Boolean
 extern bool TestLevel;
 //Public GameMenu As Boolean
