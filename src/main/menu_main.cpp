@@ -223,8 +223,11 @@ static int listMenuLastCursor = 0;
 
 void GetMenuPos(int* MenuX, int* MenuY)
 {
-    *MenuX = ScreenW / 2 - 100;
-    *MenuY = ScreenH - 250;
+    if(MenuX)
+        *MenuX = ScreenW / 2 - 100;
+
+    if(MenuY)
+        *MenuY = ScreenH - 250;
 
     switch(MenuMode)
     {
@@ -236,7 +239,8 @@ void GetMenuPos(int* MenuX, int* MenuY)
     case MENU_SELECT_SLOT_2P_COPY_S2:
     case MENU_SELECT_SLOT_1P_DELETE:
     case MENU_SELECT_SLOT_2P_DELETE:
-        *MenuY -= c_menuSavesOffsetY;
+        if(MenuY)
+            *MenuY -= c_menuSavesOffsetY;
         break;
     default:
         break;
