@@ -208,6 +208,16 @@ bool GFX_t::load()
         m_loadErrors = 0;
     }
 
+    loadImage(CharSelIcons, uiPath + "CharSelIcons");
+
+    loadBorder(CharSelFrame, uiPath + "CharSelFrame");
+
+    if(m_loadErrors > 0)
+    {
+        pLogWarning("Missing new char select icons.");
+        m_loadErrors = 0;
+    }
+
     // Add new optional assets here. Also update load_gfx.cpp:loadCustomUIAssets()
 
     SDL_assert_release(m_loadedImages.size() <= m_isCustomVolume);

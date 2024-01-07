@@ -37,7 +37,7 @@ class GFX_t
     //! Holder of loaded textures for easier clean-up
     std::vector<StdPicture*> m_loadedImages;
     //! Capacity of the m_isCustom array (update when new assets are added)
-    static constexpr size_t m_isCustomVolume = 69;
+    static constexpr size_t m_isCustomVolume = 71;
     //! Holder of "is custom" flag
     bool m_isCustom[m_isCustomVolume];
 
@@ -89,6 +89,8 @@ public:
     StdPicture EIcons;
     StdPicture PCursor;
     StdPicture Medals;
+    StdPicture CharSelIcons;
+    FrameBorder CharSelFrame;
 
     bool &isCustom(size_t i);
 };
