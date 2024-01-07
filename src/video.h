@@ -29,6 +29,7 @@ enum RenderMode_t
 {
     RENDER_ACCELERATED_VSYNC_DEPRECATED = -1,
     RENDER_SOFTWARE = 0,
+    RENDER_ACCELERATED_AUTO,
     RENDER_ACCELERATED_SDL,
     RENDER_ACCELERATED_OPENGL,
     RENDER_ACCELERATED_OPENGL_ES,
@@ -76,9 +77,9 @@ extern struct VideoSettings_t
     };
 
     //! Render mode
-    int    renderMode = RENDER_ACCELERATED_SDL;
+    int    renderMode = RENDER_ACCELERATED_AUTO;
     //! The currently running render mode
-    int    renderModeObtained = RENDER_ACCELERATED_SDL;
+    int    renderModeObtained = RENDER_ACCELERATED_AUTO;
     //! Attempt to enable vSync
     bool   vSync = false;
     //! Render scaling mode

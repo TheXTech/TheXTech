@@ -156,6 +156,7 @@ void initMainMenu()
     g_mainMenu.optionsViewCredits = "View credits";
     g_mainMenu.optionsRestartEngine = "Restart engine for changes to take effect.";
     g_mainMenu.optionsRender = "Render: {0}";
+    g_mainMenu.optionsRenderAuto = "Render: Auto ({0})";
     g_mainMenu.optionsRenderX = "Render: {0} (X)";
     g_mainMenu.optionsScaleMode = "Scale";
     g_mainMenu.optionsScaleInteger = "Integer";
@@ -229,15 +230,23 @@ static const int TinyScreenW = 600;
 
 void GetMenuPos(int* MenuX, int* MenuY)
 {
-    *MenuX = ScreenW / 2 - 100;
-    *MenuY = ScreenH - 250;
+    if(MenuX)
+        *MenuX = ScreenW / 2 - 100;
 
-    if(ScreenW < TinyScreenW)
+    if(MenuY)
+        *MenuY = ScreenH - 250;
+
+    // tweaks for MenuX
+    if(MenuX && ScreenW < TinyScreenW)
     {
         *MenuX = ScreenW / 2 - 240;
         if(*MenuX < 24)
             *MenuX = 24;
     }
+
+    // the rest is tweaks for MenuY
+    if(!MenuY)
+        return;
 
     if(ScreenH < TinyScreenH)
         *MenuY = 100;
@@ -2380,17 +2389,20 @@ void mainMenuDraw()
 #ifndef RENDER_CUSTOM
         const char* const renderers[] = {
             "SW",
-            "HW",
+            "Auto",
+            "SDL2",
             "OpenGL 3+",
             "OpenGL ES 2+",
             "OpenGL 1.1",
             "OpenGL ES 1.1",
         };
 
-        const std::string &renderStr = (g_videoSettings.renderMode == g_videoSettings.renderModeObtained) ?
-                                           g_mainMenu.optionsRender :
-                                           g_mainMenu.optionsRenderX;
-        SuperPrint(fmt::format_ne(renderStr, renderers[g_videoSettings.renderMode]), 3, MenuX, MenuY + (30 * i++));
+        if(g_videoSettings.renderMode == RENDER_ACCELERATED_AUTO)
+            SuperPrint(fmt::format_ne(g_mainMenu.optionsRenderAuto, renderers[g_videoSettings.renderModeObtained]), 3, MenuX, MenuY + (30 * i++));
+        else if(g_videoSettings.renderMode != g_videoSettings.renderModeObtained)
+            SuperPrint(fmt::format_ne(g_mainMenu.optionsRenderX, renderers[g_videoSettings.renderMode]), 3, MenuX, MenuY + (30 * i++));
+        else
+            SuperPrint(fmt::format_ne(g_mainMenu.optionsRender, renderers[g_videoSettings.renderMode]), 3, MenuX, MenuY + (30 * i++));
 #endif
 
         const std::string* scale_str = &ScaleMode_strings.at(g_videoSettings.scaleMode);
