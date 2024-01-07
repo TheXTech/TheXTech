@@ -32,6 +32,7 @@
 
 #include "speedrunner.h"
 #include "presetup.h"
+#include "main/asset_pack.h"
 
 #include <Utils/files.h>
 #include <Utils/strings.h>
@@ -228,6 +229,10 @@ void OpenConfig_preSetup()
         config.readEnum("compatibility-mode", g_preSetup.compatibilityMode, 0, compatMode);
         config.endGroup();
 
+        config.beginGroup("recent");
+        config.read("asset-pack", g_preSetup.assetPack, std::string());
+        config.endGroup();
+
         config.beginGroup("speedrun");
         config.read("mode", g_preSetup.speedRunMode, 0);
         config.read("semi-transparent-timer", g_preSetup.speedRunSemiTransparentTimer, false);
@@ -403,7 +408,7 @@ void SaveConfig()
     config.endGroup();
 
     config.beginGroup("recent");
-    config.setValue("episode-1p", g_recentWorld1p);
+    config.setValue("asset-pack", g_AssetPackID);
     config.setValue("episode-2p", g_recentWorld2p);
     config.setValue("episode-editor", g_recentWorldEditor);
     config.endGroup();

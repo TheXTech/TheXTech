@@ -28,6 +28,7 @@
 #include "main/asset_pack.h"
 #include "core/render.h"
 
+#include "presetup.h"
 #include "gfx.h"
 #include "load_gfx.h"
 #include "game_main.h"
@@ -244,7 +245,7 @@ static AssetPack_t s_find_pack_init(const std::string& id)
     if(id.empty())
         pLogCritical("Could not find any asset packs.");
 
-    return s_scan_asset_pack(id, "", true);
+    return AssetPack_t();
 }
 
 static std::vector<AssetPack_t>::iterator s_find_pack(const std::string& id)
@@ -327,7 +328,26 @@ bool InitUIAssetsFrom(const std::string& id)
         pLogDebug("- %sassets/*", root.c_str());
     }
 
-    AssetPack_t pack = s_find_pack_init(id);
+    AssetPack_t pack;
+    if(!id.empty())
+    {
+        pLogDebug("Trying to load CLI-specified asset pack [%s]", id.c_str());
+        pack = s_find_pack_init(id);
+
+        if(pack.path.empty())
+            pack.path = id;
+    }
+    else
+    {
+        pLogDebug("Trying to load most recent asset pack [ID: %s]", g_preSetup.assetPack.c_str());
+        pack = s_find_pack_init(g_preSetup.assetPack);
+        if(pack.path.empty())
+        {
+            pLogDebug("Couldn't find recent asset pack, loading any other assets");
+            pack = s_find_pack_init("");
+        }
+    }
+
     if(pack.path.empty())
         pack.path = ".";
 

@@ -282,6 +282,11 @@ bool Logic()
                 s_cur_idx = -1;
                 s_AnimatingBack = true;
             }
+            else
+            {
+                // update recent asset pack
+                SaveConfig();
+            }
         }
         else
             PlaySoundMenu(SFX_Do);
