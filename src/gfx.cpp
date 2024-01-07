@@ -210,6 +210,16 @@ bool GFX_t::load()
         m_loadErrors = 0;
     }
 
+    loadImage(CharSelIcons, uiPath + "CharSelIcons");
+
+    loadBorder(CharSelFrame, uiPath + "CharSelFrame");
+
+    if(m_loadErrors > 0)
+    {
+        pLogWarning("Missing new char select icons.");
+        m_loadErrors = 0;
+    }
+
     loadImage(Backdrop, uiPath + "Backdrop");
     loadBorder(Backdrop_Border, uiPath + "Backdrop_Border");
 

@@ -27,12 +27,12 @@
 
 bool worldHasFrameAssets()
 {
-    return GFX.WorldMapFrame_Tile.inited && (!GFX.Interface[4].inited || !GFX.isCustom(37) || GFX.isCustom(71));
+    return GFX.WorldMapFrame_Tile.inited && (!GFX.Interface[4].inited || !GFX.isCustom(37) || GFX.isCustom(73));
 }
 
 static bool s_border_valid()
 {
-    return GFX.WorldMapFrame_Border.tex.inited && (!GFX.isCustom(71) || GFX.isCustom(72));
+    return GFX.WorldMapFrame_Border.tex.inited && (!GFX.isCustom(73) || GFX.isCustom(74));
 }
 
 static void s_getMargins(const Screen_t& screen, double& margin, double& marginTop, double& marginBottom)

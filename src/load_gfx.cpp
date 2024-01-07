@@ -1220,6 +1220,14 @@ static void loadCustomUIAssets()
              "Medals",
              nullptr, nullptr, GFX.isCustom(ci++), GFX.Medals, false, true);
 
+    loadCGFX(uiRoot + "CharSelIcons.png",
+             "CharSelIcons",
+             nullptr, nullptr, GFX.isCustom(ci++), GFX.CharSelIcons, false, true);
+
+    loadCBorder(uiRoot + "CharSelFrame.png",
+             "CharSelFrame",
+             GFX.isCustom(ci++), GFX.CharSelFrame);
+
     loadCGFX(uiRoot + "Backdrop.png",
              "Backdrop",
              nullptr, nullptr, GFX.isCustom(ci++), GFX.Backdrop, false, true);
