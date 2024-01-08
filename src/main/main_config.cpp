@@ -48,7 +48,7 @@ void OpenConfig_preSetup()
     const IniProcessing::StrEnumMap renderMode =
     {
         {"sw", RENDER_SOFTWARE},
-        {"hw", RENDER_ACCELERATED_SDL},
+        {"hw", RENDER_ACCELERATED_AUTO},
         {"vsync", RENDER_ACCELERATED_VSYNC_DEPRECATED},
         {"sdl", RENDER_ACCELERATED_SDL},
         {"opengl", RENDER_ACCELERATED_OPENGL},
@@ -131,7 +131,7 @@ void OpenConfig_preSetup()
         config.endGroup();
 
         config.beginGroup("video");
-        config.readEnum("render", g_videoSettings.renderMode, (int)RENDER_ACCELERATED_SDL, renderMode);
+        config.readEnum("render", g_videoSettings.renderMode, (int)RENDER_ACCELERATED_AUTO, renderMode);
         config.read("vsync", g_videoSettings.vSync, (g_videoSettings.renderMode == RENDER_ACCELERATED_VSYNC_DEPRECATED));
         config.read("background-work", g_videoSettings.allowBgWork, false);
         config.read("background-controller-input", g_videoSettings.allowBgControllerInput, false);
@@ -139,7 +139,7 @@ void OpenConfig_preSetup()
         config.read("show-fps", g_videoSettings.showFrameRate, false);
 
         if(g_videoSettings.renderMode == RENDER_ACCELERATED_VSYNC_DEPRECATED)
-            g_videoSettings.renderMode = RENDER_ACCELERATED_SDL;
+            g_videoSettings.renderMode = RENDER_ACCELERATED_AUTO;
 
         bool scale_down_all;
         config.read("scale-down-all-textures", scale_down_all, false);
@@ -334,7 +334,8 @@ void SaveConfig()
         std::unordered_map<int, std::string> renderMode =
         {
             {RENDER_SOFTWARE, "sw"},
-            {RENDER_ACCELERATED_SDL, "hw"},
+            {RENDER_ACCELERATED_AUTO, "hw"},
+            {RENDER_ACCELERATED_SDL, "sdl"},
             {RENDER_ACCELERATED_OPENGL, "opengl"},
             {RENDER_ACCELERATED_OPENGL_ES, "opengles"},
             {RENDER_ACCELERATED_OPENGL_LEGACY, "opengl11"},

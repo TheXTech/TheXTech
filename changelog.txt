@@ -9,6 +9,9 @@ Changelog for 1.3.7-dev
 -Internal change: added draw plane system to track different object groups' scene depth (@ds-sloth)
 -Add cheat "4shared" to test HIGHLY EXPERIMENTAL 4-player shared screen mode (@ds-sloth)
 
+Changelog for 1.3.6.4-dev
+-Use OpenGL as the default renderer on supported platforms ("sdl" may be used in config.ini or at at the command line to request the SDL2 renderer)
+
 Changelog for 1.3.6.3-dev
 -Fixed a TheXTech 1.3.6.1 crash where object lookup table could not process items with negative size (@ds-sloth)
 -On level load, replace negative item sizes with size zero (such items cannot be created by any editor)
