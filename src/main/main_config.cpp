@@ -139,7 +139,7 @@ void OpenConfig_preSetup()
 #if defined(DEBUG_BUILD)
     const PGE_LogLevel::Level c_defaultLogLevel = PGE_LogLevel::Debug;
 #else
-    const PGE_LogLevel::Level c_defaultLogLevel = PGE_LogLevel::Warning;
+    const PGE_LogLevel::Level c_defaultLogLevel = PGE_LogLevel::Info;
 #endif
 
     const std::string configPath = AppPathManager::settingsFileSTD();
