@@ -29,9 +29,9 @@ struct PGE_LogLevel
     enum Level : int
     {
         Debug    = 5,
-        Warning  = 4,
-        Critical = 3,
-        Info     = 2,
+        Info     = 4,
+        Warning  = 3,
+        Critical = 2,
         Fatal    = 1,
         NoLog    = 0,
     };

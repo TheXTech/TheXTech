@@ -122,15 +122,17 @@ void OpenConfig_preSetup()
     {
         {"0", PGE_LogLevel::NoLog},
         {"1", PGE_LogLevel::Fatal},
-        {"2", PGE_LogLevel::Info},
-        {"3", PGE_LogLevel::Critical},
-        {"4", PGE_LogLevel::Warning},
+        {"2", PGE_LogLevel::Critical},
+        {"3", PGE_LogLevel::Warning},
+        {"4", PGE_LogLevel::Info},
         {"5", PGE_LogLevel::Debug},
         {"disabled", PGE_LogLevel::NoLog},
+        {"nolog",    PGE_LogLevel::NoLog},
+        {"off",      PGE_LogLevel::NoLog},
         {"fatal",    PGE_LogLevel::Fatal},
-        {"info",     PGE_LogLevel::Info},
         {"critical", PGE_LogLevel::Critical},
         {"warning",  PGE_LogLevel::Warning},
+        {"info",     PGE_LogLevel::Info},
         {"debug",    PGE_LogLevel::Debug}
     };
 
@@ -359,9 +361,9 @@ void SaveConfig()
         {
             {PGE_LogLevel::NoLog, "disabled"},
             {PGE_LogLevel::Fatal, "fatal"},
-            {PGE_LogLevel::Info, "info"},
             {PGE_LogLevel::Critical, "info"},
             {PGE_LogLevel::Warning, "warning"},
+            {PGE_LogLevel::Info, "info"},
             {PGE_LogLevel::Debug, "debug"},
         };
 
