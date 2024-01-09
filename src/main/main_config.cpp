@@ -134,7 +134,13 @@ void OpenConfig_preSetup()
         {"debug",    PGE_LogLevel::Debug}
     };
 
-    std::string configPath = AppPathManager::settingsFileSTD();
+#if defined(DEBUG_BUILD)
+    const PGE_LogLevel::Level c_defaultLogLevel = PGE_LogLevel::Debug;
+#else
+    const PGE_LogLevel::Level c_defaultLogLevel = PGE_LogLevel::Warning;
+#endif
+
+    const std::string configPath = AppPathManager::settingsFileSTD();
 
     InitSoundDefaults();
 
@@ -149,7 +155,7 @@ void OpenConfig_preSetup()
         config.beginGroup("logging");
         config.read("log-path", g_pLogGlobalSetup.logPathCustom, std::string());
         config.read("max-log-count", g_pLogGlobalSetup.maxFilesCount, 10);
-        config.readEnum("log-level", g_pLogGlobalSetup.level, PGE_LogLevel::Debug, logLevelEnum);
+        config.readEnum("log-level", g_pLogGlobalSetup.level, c_defaultLogLevel, logLevelEnum);
         g_pLogGlobalSetup.logPathDefault = AppPathManager::logsDir();
         g_pLogGlobalSetup.logPathFallBack = AppPathManager::userAppDirSTD();
         config.endGroup();
