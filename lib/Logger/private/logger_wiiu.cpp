@@ -68,12 +68,14 @@ static FILE* s_logout;
 void LogWriter::OpenLogFile()
 {
 #if !defined(PGE_NO_THREADING) && defined(PGE_SDL_MUTEX)
+    OSReport("Debug: Creating the SDL Mutex");
     g_lockLocker = SDL_CreateMutex();
 #endif
 
     if(m_enabled)
     {
 #ifndef NO_FILE_LOGGING
+        OSReport("Debug: Opening a log file for APPEND: %s\n", m_logFilePath.c_str());
         s_logout = std::fopen(m_logFilePath.c_str(), "a");
 #endif // #ifndef NO_FILE_LOGGING
     }
@@ -82,6 +84,7 @@ void LogWriter::OpenLogFile()
 void LogWriter::CloseLog()
 {
 #if !defined(PGE_NO_THREADING) && defined(PGE_SDL_MUTEX)
+    OSReport("Debug: Destroying the SDL Mutex");
     SDL_DestroyMutex(g_lockLocker);
     g_lockLocker = nullptr;
 #endif
