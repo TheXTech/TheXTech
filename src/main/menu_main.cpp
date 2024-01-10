@@ -253,19 +253,13 @@ void GetMenuPos(int* MenuX, int* MenuY)
     else if(ScreenH < SmallScreenH)
     {
         if(MenuMode == MENU_OPTIONS)
-            *MenuY = ScreenH - 220;
+            *MenuY = ScreenH - 250;
         else
-            *MenuY = ScreenH - 180;
+            *MenuY = ScreenH - 220;
     }
 
     if(MenuMode >= MENU_SELECT_SLOT_BASE && MenuMode < MENU_SELECT_SLOT_END)
         *MenuY -= c_menuSavesOffsetY;
-
-    if(MenuMode == MENU_CHARACTER_SELECT_NEW)
-    {
-        if(ScreenH >= TinyScreenH && ScreenH < SmallScreenH)
-            *MenuY -= 40;
-    }
 }
 
 static void s_findRecentEpisode()
@@ -2127,9 +2121,9 @@ void mainMenuDraw()
 
         // place manually on small screens
         if(ScreenH < SmallScreenH)
-            logo_y = 30;
+            logo_y = 16;
         else if(ScreenH <= 600)
-            logo_y = 70;
+            logo_y = 40;
 
         XRender::renderTexture(ScreenW / 2 - GFX.MenuGFX[2].w / 2, logo_y, GFX.MenuGFX[2], logo_tint);
     }
