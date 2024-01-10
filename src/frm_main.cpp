@@ -71,8 +71,8 @@ bool FrmMain::initSystem(const CmdLineSetup_t &setup)
 
     LoadLogSettings(setup.interprocess, setup.verboseLogging);
     //Write into log the application start event
-    pLogDebug("<Application started>");
-    pLogDebug("TheXTech %s (branch %s, commit %s)", V_LATEST_STABLE, V_BUILD_BRANCH, V_BUILD_VER);
+    pLogInfo("<Application started>");
+    pLogInfo("TheXTech %s (branch %s, commit %s)", V_LATEST_STABLE, V_BUILD_BRANCH, V_BUILD_VER);
 
 #ifndef THEXTECH_NO_SDL_CORE
     res = CoreSDL::init(setup);
@@ -275,7 +275,7 @@ void FrmMain::freeSystem()
     GraphicsHelps::closeFreeImage();
 #endif
 
-    pLogDebug("<Application closed>");
+    pLogInfo("<Application closed>");
     CloseLog();
 
 #ifndef THEXTECH_NO_SDL_CORE

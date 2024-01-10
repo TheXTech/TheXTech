@@ -118,7 +118,31 @@ void OpenConfig_preSetup()
         {"all", VideoSettings_t::SCALE_ALL}
     };
 
-    std::string configPath = AppPathManager::settingsFileSTD();
+    const IniProcessing::StrEnumMap logLevelEnum =
+    {
+        {"0", PGE_LogLevel::NoLog},
+        {"1", PGE_LogLevel::Fatal},
+        {"2", PGE_LogLevel::Critical},
+        {"3", PGE_LogLevel::Warning},
+        {"4", PGE_LogLevel::Info},
+        {"5", PGE_LogLevel::Debug},
+        {"disabled", PGE_LogLevel::NoLog},
+        {"nolog",    PGE_LogLevel::NoLog},
+        {"off",      PGE_LogLevel::NoLog},
+        {"fatal",    PGE_LogLevel::Fatal},
+        {"critical", PGE_LogLevel::Critical},
+        {"warning",  PGE_LogLevel::Warning},
+        {"info",     PGE_LogLevel::Info},
+        {"debug",    PGE_LogLevel::Debug}
+    };
+
+#if defined(DEBUG_BUILD)
+    const PGE_LogLevel::Level c_defaultLogLevel = PGE_LogLevel::Debug;
+#else
+    const PGE_LogLevel::Level c_defaultLogLevel = PGE_LogLevel::Info;
+#endif
+
+    const std::string configPath = AppPathManager::settingsFileSTD();
 
     InitSoundDefaults();
 
@@ -128,6 +152,14 @@ void OpenConfig_preSetup()
 
         config.beginGroup("main");
         config.read("language", g_config.language, g_config.language);
+        config.endGroup();
+
+        config.beginGroup("logging");
+        config.read("log-path", g_pLogGlobalSetup.logPathCustom, std::string());
+        config.read("max-log-count", g_pLogGlobalSetup.maxFilesCount, 10);
+        config.readEnum("log-level", g_pLogGlobalSetup.level, c_defaultLogLevel, logLevelEnum);
+        g_pLogGlobalSetup.logPathDefault = AppPathManager::logsDir();
+        g_pLogGlobalSetup.logPathFallBack = AppPathManager::userAppDirSTD();
         config.endGroup();
 
         config.beginGroup("video");
@@ -350,6 +382,25 @@ void SaveConfig()
     config.setValue("enable-editor", g_config.enable_editor);
     config.setValue("editor-edge-scroll", g_config.editor_edge_scroll);
     config.setValue("language", g_config.language);
+    config.endGroup();
+
+    config.beginGroup("logging");
+    {
+        std::unordered_map<int, std::string> logLevels =
+        {
+            {PGE_LogLevel::NoLog, "disabled"},
+            {PGE_LogLevel::Fatal, "fatal"},
+            {PGE_LogLevel::Critical, "info"},
+            {PGE_LogLevel::Warning, "warning"},
+            {PGE_LogLevel::Info, "info"},
+            {PGE_LogLevel::Debug, "debug"},
+        };
+
+        if(!g_pLogGlobalSetup.logPathCustom.empty())
+            config.setValue("log-path", g_pLogGlobalSetup.logPathCustom);
+        config.setValue("max-log-count", g_pLogGlobalSetup.maxFilesCount);
+        config.setValue("log-level", logLevels[g_pLogGlobalSetup.level]);
+    }
     config.endGroup();
 
     config.beginGroup("recent");

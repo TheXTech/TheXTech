@@ -339,6 +339,7 @@
             "phraseStartToForceRes": "Press Start to Force Resume",
             "phraseStartToResume": "Press Start to Resume",
             "phraseTestControls": "Test Controls",
+            "phraseTestProfile": "Test Profile",
             "phraseWaitingForInput": "Waiting for input device...",
             "reconnectTitle": "Reconnect",
             "splitPressSelect_1": "Press Select for",
@@ -575,6 +576,7 @@
             "optionsModeWindowed": "Windowed mode",
             "optionsViewCredits": "View credits",
             "render": "Render: {0}",
+            "renderAuto": "Render: Auto ({0})",
             "renderX": "Render: {0} (X)",
             "restartEngine": "Restart engine for changes to take effect.",
             "scale": {
