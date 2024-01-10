@@ -370,6 +370,9 @@
             "returnToEditor": "返回编辑器",
             "saveAndContinue": "保存并继续",
             "saveAndQuit": "保存并退出"
+        },
+        "message": {
+            "scanningLevels": "扫描关卡中……"
         }
     },
     "languageName": "简体中文",
