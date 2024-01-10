@@ -2113,29 +2113,25 @@ void mainMenuDraw()
 
     // game logo
     int LogoMode = 0;
-    if(ScreenH < SmallScreenH &&
-        (MenuMode == MENU_INPUT_SETTINGS))
-    {
-        LogoMode = 2;
-    }
-    else if(ScreenH >= TinyScreenH || MenuMode == MENU_INTRO)
-    {
+    if(ScreenH >= TinyScreenH || MenuMode == MENU_INTRO)
         LogoMode = 1;
-    }
     else if(MenuMode == MENU_MAIN || MenuMode == MENU_OPTIONS)
         LogoMode = 2;
 
     if(LogoMode == 1)
     {
+        // show at half opacity if not at main menu on a small screen
+        XTColor logo_tint = (ScreenH < SmallScreenH && MenuMode != MENU_INTRO && MenuMode != MENU_MAIN) ? XTAlpha(127) : XTColor();
+
+        int logo_y = ScreenH / 2 - 230;
+
+        // place manually on small screens
         if(ScreenH < SmallScreenH)
-            XRender::renderTexture(ScreenW / 2 - GFX.MenuGFX[2].w / 2, 30,
-                    GFX.MenuGFX[2].w, GFX.MenuGFX[2].h, GFX.MenuGFX[2], 0, 0);
+            logo_y = 30;
         else if(ScreenH <= 600)
-            XRender::renderTexture(ScreenW / 2 - GFX.MenuGFX[2].w / 2, 70,
-                    GFX.MenuGFX[2].w, GFX.MenuGFX[2].h, GFX.MenuGFX[2], 0, 0);
-        else
-            XRender::renderTexture(ScreenW / 2 - GFX.MenuGFX[2].w / 2, ScreenH / 2 - 230,
-                    GFX.MenuGFX[2].w, GFX.MenuGFX[2].h, GFX.MenuGFX[2], 0, 0);
+            logo_y = 70;
+
+        XRender::renderTexture(ScreenW / 2 - GFX.MenuGFX[2].w / 2, logo_y, GFX.MenuGFX[2], logo_tint);
     }
     else if(LogoMode == 2)
     {
