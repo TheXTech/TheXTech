@@ -2,7 +2,7 @@
  * TheXTech - A platform game engine ported from old source code for VB6
  *
  * Copyright (c) 2009-2011 Andrew Spinks, original VB6 code
- * Copyright (c) 2020-2023 Vitaly Novichkov <admin@wohlnet.ru>
+ * Copyright (c) 2020-2024 Vitaly Novichkov <admin@wohlnet.ru>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -1301,6 +1301,32 @@ void UpdateTouchScreenSize()
         return;
 
     touchscreen->m_controller.updateScreenSize();
+#endif // #ifdef TOUCHSCREEN_H
+}
+
+void LoadTouchScreenGFX()
+{
+#ifdef TOUCHSCREEN_H
+    InputMethodType_TouchScreen* touchscreen = nullptr;
+
+    for(InputMethodType* type : g_InputMethodTypes)
+    {
+        if(!type)
+            continue;
+
+        auto* t = dynamic_cast<InputMethodType_TouchScreen*>(type);
+
+        if(t)
+        {
+            touchscreen = t;
+            break;
+        }
+    }
+
+    if(!touchscreen)
+        return;
+
+    touchscreen->m_controller.loadGFX();
 #endif // #ifdef TOUCHSCREEN_H
 }
 

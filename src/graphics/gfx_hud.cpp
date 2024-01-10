@@ -2,7 +2,7 @@
  * TheXTech - A platform game engine ported from old source code for VB6
  *
  * Copyright (c) 2009-2011 Andrew Spinks, original VB6 code
- * Copyright (c) 2020-2023 Vitaly Novichkov <admin@wohlnet.ru>
+ * Copyright (c) 2020-2024 Vitaly Novichkov <admin@wohlnet.ru>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -252,7 +252,7 @@ void DrawInterface(int Z, int numScreens)
 
             XRender::renderTexture(vScreen[Z].Width / 2.0 - GFX.BMVs.w / 2, -96 + vScreen[Z].Height / 2.0 - GFX.BMVs.h / 2, GFX.BMVs);
             XRender::renderTexture(-50 + vScreen[Z].Width / 2.0 - P1_charname.w, -96 + vScreen[Z].Height / 2.0 - P1_charname.h / 2, P1_charname);
-            XRender::renderTexture(50 + vScreen[Z].Width / 2.0, -96 + vScreen[Z].Height / 2.0 - P2_charname.h / 2, P1_charname);
+            XRender::renderTexture(50 + vScreen[Z].Width / 2.0, -96 + vScreen[Z].Height / 2.0 - P2_charname.h / 2, P2_charname);
         }
     }
 

@@ -2,7 +2,7 @@
  * TheXTech - A platform game engine ported from old source code for VB6
  *
  * Copyright (c) 2009-2011 Andrew Spinks, original VB6 code
- * Copyright (c) 2020-2023 Vitaly Novichkov <admin@wohlnet.ru>
+ * Copyright (c) 2020-2024 Vitaly Novichkov <admin@wohlnet.ru>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -115,7 +115,8 @@ struct RectSizeI
     constexpr RectSizeI(int x, int y, int w, int h) :
         xy(x, y), wh(w, h) {}
 
-    constexpr RectSizeI(const RectSizeI&) = default;
+    constexpr RectSizeI(const RectSizeI& o) :
+        xy(o.xy), wh(o.wh) {}
 
     inline RectSizeI& operator=(const RectSizeI& o)
     {
@@ -221,6 +222,13 @@ struct RectF
         br /= o;
         return *this;
     }
+
+    inline RectF operator*(const PointF& o)
+    {
+        RectF ret = *this;
+        ret *= o;
+        return ret;
+    }
 };
 
 struct QuadI
@@ -264,17 +272,17 @@ struct QuadI
         auto sina = sin(angle);
 
         QuadI ret;
-        ret.tl.x = tl.x *  cosa + tl.y * sina;
-        ret.tl.y = tl.x * -sina + tl.y * cosa;
+        ret.tl.x = round(tl.x *  cosa + tl.y * sina);
+        ret.tl.y = round(tl.x * -sina + tl.y * cosa);
 
-        ret.tr.x = tr.x *  cosa + tr.y * sina;
-        ret.tr.y = tr.x * -sina + tr.y * cosa;
+        ret.tr.x = round(tr.x *  cosa + tr.y * sina);
+        ret.tr.y = round(tr.x * -sina + tr.y * cosa);
 
-        ret.bl.x = bl.x *  cosa + bl.y * sina;
-        ret.bl.y = bl.x * -sina + bl.y * cosa;
+        ret.bl.x = round(bl.x *  cosa + bl.y * sina);
+        ret.bl.y = round(bl.x * -sina + bl.y * cosa);
 
-        ret.br.x = br.x *  cosa + br.y * sina;
-        ret.br.y = br.x * -sina + br.y * cosa;
+        ret.br.x = round(br.x *  cosa + br.y * sina);
+        ret.br.y = round(br.x * -sina + br.y * cosa);
 
         return ret;
     }

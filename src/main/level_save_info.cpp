@@ -2,7 +2,7 @@
  * TheXTech - A platform game engine ported from old source code for VB6
  *
  * Copyright (c) 2009-2011 Andrew Spinks, original VB6 code
- * Copyright (c) 2020-2023 Vitaly Novichkov <admin@wohlnet.ru>
+ * Copyright (c) 2020-2024 Vitaly Novichkov <admin@wohlnet.ru>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -115,13 +115,19 @@ void ImportLevelSaveInfo(const GamesaveData& s)
         {
             WorldLevel_t& l = WorldLevel[A];
 
-            if(l.save_info.inited())
+            // can skip the string comparison if the level has already been initialized and we are no longer checking whether this save info has any level
+            if(l.save_info.inited() && worldLevelHit)
                 continue;
 
             if(l.FileName == e.level_filename)
             {
-                l.save_info = info;
+                // update level save info if not yet initialized
+                if(!l.save_info.inited())
+                    l.save_info = info;
+
+                // mark save info as paired with a level
                 worldLevelHit = true;
+
                 // don't break, in case another level has the same filename
             }
         }

@@ -2,7 +2,7 @@
  * TheXTech - A platform game engine ported from old source code for VB6
  *
  * Copyright (c) 2009-2011 Andrew Spinks, original VB6 code
- * Copyright (c) 2020-2023 Vitaly Novichkov <admin@wohlnet.ru>
+ * Copyright (c) 2020-2024 Vitaly Novichkov <admin@wohlnet.ru>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -71,6 +71,7 @@
 #include <whb/log.h>
 #include <whb/log_console.h>
 #include <coreinit/filesystem.h>
+#include <sysapp/launch.h>
 #endif
 
 #ifdef __EMSCRIPTEN__
@@ -264,7 +265,7 @@ int main(int argc, char**argv)
     {
         // Define the command line object.
         TCLAP::CmdLine  cmd("TheXTech Engine\n"
-                            "Copyright (c) 2020-2023 Vitaly Novichkov <admin@wohlnet.ru>\n\n"
+                            "Copyright (c) 2020-2024 Vitaly Novichkov <admin@wohlnet.ru>\n\n"
                             "This program is distributed under the GPLv3 license\n\n", ' ', V_LATEST_STABLE " [" V_BUILD_BRANCH ", #" V_BUILD_VER "]");
 
         TCLAP::ValueArg<std::string> customAssetsPath("c", "assets-root", "Specify the different assets root directory to play",
@@ -529,11 +530,11 @@ int main(int argc, char**argv)
                 setup.renderType = RENDER_SOFTWARE;
             else if(rt == "vsync")
             {
-                setup.renderType = RENDER_ACCELERATED_SDL;
+                setup.renderType = RENDER_ACCELERATED_AUTO;
                 setup.vSync = true;
             }
             else if(rt == "hw")
-                setup.renderType = RENDER_ACCELERATED_SDL;
+                setup.renderType = RENDER_ACCELERATED_AUTO;
             else if(rt == "sdl")
                 setup.renderType = RENDER_ACCELERATED_SDL;
             else if(rt == "opengl")
@@ -706,8 +707,6 @@ int main(int argc, char**argv)
     setCpuClock(true);
 #endif
 
-    initGameInfo();
-
     // set this flag before SDL initialization to allow game be quit when closing a window before a loading process will be completed
     GameIsActive = true;
 
@@ -716,8 +715,6 @@ int main(int argc, char**argv)
         g_frmMain.freeSystem();
         return 1;
     }
-
-    XLanguage::resolveLanguage(g_config.language);
 
 #ifdef __APPLE__
     macosReceiveOpenFile();
@@ -753,6 +750,7 @@ int main(int argc, char**argv)
 
 #ifdef __WIIU__
     WHBProcShutdown();
+    SYSLaunchMenu();
 #endif
 
 #ifdef __EMSCRIPTEN__
@@ -760,6 +758,8 @@ int main(int argc, char**argv)
     EM_ASM(
         setTimeout(() => {
             console.log("Attempting to close window following game exit...");
+            document.getElementById("canvas").style.display = 'none';
+            document.getElementById("exit-msg").style.display = null;
             window.close();
         }, 250);
     );

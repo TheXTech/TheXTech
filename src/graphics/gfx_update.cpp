@@ -2,7 +2,7 @@
  * TheXTech - A platform game engine ported from old source code for VB6
  *
  * Copyright (c) 2009-2011 Andrew Spinks, original VB6 code
- * Copyright (c) 2020-2023 Vitaly Novichkov <admin@wohlnet.ru>
+ * Copyright (c) 2020-2024 Vitaly Novichkov <admin@wohlnet.ru>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -50,6 +50,7 @@
 #include "effect.h"
 #include "npc_id.h"
 #include "eff_id.h"
+#include "draw_planes.h"
 
 #include "graphics/gfx_special_frames.h"
 #include "graphics/gfx_keyhole.h"
@@ -855,8 +856,10 @@ void UpdateGraphics(bool skipRepaint)
         // update vScreen location
         if(!LevelEditor)
         {
-            if(ScreenType == 2 || ScreenType == 3)
+            if(ScreenType == 2)
                 GetvScreenAverage(vScreen[1]);
+            else if(ScreenType == 3)
+                GetvScreenAverage3(vScreen[1]);
             else if(ScreenType == 5 && !vScreen[2].Visible)
                 GetvScreenAverage(vScreen[1]);
             else if(ScreenType == 7)
@@ -1060,6 +1063,8 @@ void UpdateGraphics(bool skipRepaint)
         XRender::setTargetLayer(0);
 #endif
 
+    XRender::setDrawPlane(PLANE_GAME_BACKDROP);
+
     // No logic
     // Draw the screens!
     For(Z, 1, numScreens)
@@ -1079,6 +1084,8 @@ void UpdateGraphics(bool skipRepaint)
         if(Z != 1)
             XRender::setTargetLayer(0);
 #endif
+
+        XRender::setDrawPlane(PLANE_LVL_BG);
 
         // Note: this was guarded by an if(!LevelEditor) condition in the past
         if(Background2[S] == 0)
@@ -1169,6 +1176,8 @@ void UpdateGraphics(bool skipRepaint)
 
         int nextBackground = 0;
 
+        XRender::setDrawPlane(PLANE_LVL_BGO_LOW);
+
         if(LevelEditor)
         {
             for(int A : screenBackgrounds)
@@ -1233,6 +1242,8 @@ void UpdateGraphics(bool skipRepaint)
 
         tempLocation.Width = 32;
         tempLocation.Height = 32;
+
+        XRender::setDrawPlane(PLANE_LVL_SBLOCK);
 
         for(Block_t& b : screenSBlocks) // Display sizable blocks
         {
@@ -1315,6 +1326,8 @@ void UpdateGraphics(bool skipRepaint)
             }
         }
 
+        XRender::setDrawPlane(PLANE_LVL_BGO_NORM);
+
         if(LevelEditor)
         {
             for(int A : screenBackgrounds)
@@ -1393,6 +1406,8 @@ void UpdateGraphics(bool skipRepaint)
         XRender::setTargetLayer(2);
 #endif
 
+        XRender::setDrawPlane(PLANE_LVL_NPC_BG);
+
 //        For A = 1 To numNPCs 'Display NPCs that should be behind blocks
         for(size_t i = 0; i < NPC_Draw_Queue_p.BG_n; i++)
         {
@@ -1440,6 +1455,8 @@ void UpdateGraphics(bool skipRepaint)
             }
         }
 
+
+        XRender::setDrawPlane(PLANE_LVL_PLR_WARP);
 
 //        For A = 1 To numPlayers 'Players behind blocks
         For(A, 1, numPlayers)
@@ -1703,6 +1720,8 @@ void UpdateGraphics(bool skipRepaint)
 //            blockTileGet(-vScreen[Z].X, vScreen[Z].Width, fBlock, lBlock);
 //        }
 
+        XRender::setDrawPlane(PLANE_LVL_BLK_NORM);
+
 //        For A = fBlock To lBlock 'Non-Sizable Blocks
         for(Block_t& block : screenMainBlocks)
         {
@@ -1736,6 +1755,8 @@ void UpdateGraphics(bool skipRepaint)
             }
         }
 
+        XRender::setDrawPlane(PLANE_LVL_EFF_LOW);
+
 //'effects in back
         for(A = 1; A <= numEffects; A++)
         {
@@ -1760,6 +1781,8 @@ void UpdateGraphics(bool skipRepaint)
         }
 
 
+        XRender::setDrawPlane(PLANE_LVL_NPC_LOW);
+
         // draw NPCs that should be behind other NPCs
         for(size_t i = 0; i < NPC_Draw_Queue_p.Low_n; i++)
         {
@@ -1783,6 +1806,8 @@ void UpdateGraphics(bool skipRepaint)
         }
 
 
+        XRender::setDrawPlane(PLANE_LVL_NPC_LOW + 1);
+
         // ice
         for(size_t i = 0; i < NPC_Draw_Queue_p.Iced_n; i++)
         {
@@ -1794,6 +1819,8 @@ void UpdateGraphics(bool skipRepaint)
 //            }
         }
 
+
+        XRender::setDrawPlane(PLANE_LVL_NPC_NORM);
 
 //        For A = 1 To numNPCs 'Display NPCs that should be in front of blocks
         for(size_t i = 0; i < NPC_Draw_Queue_p.Normal_n; i++)
@@ -1963,6 +1990,8 @@ void UpdateGraphics(bool skipRepaint)
         }
 
 
+        XRender::setDrawPlane(PLANE_LVL_PLR_NORM);
+
         For(A, 1, numPlayers) // The clown car
         {
             if(!Player[A].Dead && !Player[A].Immune2 && Player[A].TimeToLive == 0 &&
@@ -2070,6 +2099,8 @@ void UpdateGraphics(bool skipRepaint)
 
 
 
+        XRender::setDrawPlane(PLANE_LVL_BGO_FG);
+
         if(LevelEditor)
         {
             for(int A : screenBackgrounds)
@@ -2121,6 +2152,8 @@ void UpdateGraphics(bool skipRepaint)
 //        End If
         }
 
+        XRender::setDrawPlane(PLANE_LVL_NPC_FG);
+
         // foreground NPCs
         for(size_t i = 0; i < NPC_Draw_Queue_p.FG_n; i++)
         {
@@ -2131,6 +2164,8 @@ void UpdateGraphics(bool skipRepaint)
             else
                 XRender::renderTexture(vScreen[Z].X + NPC[A].Location.X + (NPCFrameOffsetX[NPC[A].Type] * -NPC[A].Direction) - NPCWidthGFX[NPC[A].Type] / 2.0 + NPC[A].Location.Width / 2.0, vScreen[Z].Y + NPC[A].Location.Y + NPCFrameOffsetY[NPC[A].Type] - NPCHeightGFX[NPC[A].Type] + NPC[A].Location.Height, NPCWidthGFX[NPC[A].Type], NPCHeightGFX[NPC[A].Type], GFXNPC[NPC[A].Type], 0, NPC[A].Frame * NPCHeightGFX[NPC[A].Type], cn);
         }
+
+        XRender::setDrawPlane(PLANE_LVL_BLK_HURTS);
 
         // Blocks in Front
         for(Block_t& block : screenLavaBlocks)
@@ -2156,6 +2191,8 @@ void UpdateGraphics(bool skipRepaint)
             }
 //            }
         }
+
+        XRender::setDrawPlane(PLANE_LVL_EFF_NORM);
 
 // effects on top
         For(A, 1, numEffects)
@@ -2187,6 +2224,8 @@ void UpdateGraphics(bool skipRepaint)
 //            End With
 //        Next A
         }
+
+        XRender::setDrawPlane(PLANE_LVL_INFO);
 
         // water
         if(LevelEditor)
@@ -2227,70 +2266,69 @@ void UpdateGraphics(bool skipRepaint)
                 }
             }
 
-        // player names
-        /* Dropped */
+            // player names
+            /* Dropped */
 
             lunaRender(Z);
+
+            // 'Interface
+            B = 0;
+
+            // moved condition past the splitFrame() call (always draw section effects)
+            // if(!GameMenu && !GameOutro)
+            For(A, 1, numPlayers)
+            {
+                if(Player[A].ShowWarp > 0)
+                {
+                    const auto &w = Warp[Player[A].ShowWarp];
+
+                    int p_center_x = vScreen[Z].X + Player[A].Location.X + (Player[A].Location.Width / 2);
+                    int info_y = Player[A].Location.Y + Player[A].Location.Height - 96 + vScreen[Z].Y;
+
+                    if(!w.noPrintStars && w.save_info().inited() && w.save_info().max_stars > 0 && Player[A].Mount != 2)
+                    {
+                        std::string tempString = fmt::format_ne("{0}/{1}", w.curStars, w.save_info().max_stars);
+                        XRender::renderTexture(p_center_x - tempString.length() * 9 - 20, info_y,     GFX.Interface[5]);
+                        XRender::renderTexture(p_center_x - tempString.length() * 9,      info_y + 1, GFX.Interface[1]);
+                        SuperPrint(tempString, 3,
+                                   p_center_x - tempString.length() * 9 + 18,
+                                   info_y);
+
+                        info_y -= 20;
+                    }
+
+                    if(w.save_info().inited() && w.save_info().max_medals > 0)
+                    {
+                        uint8_t ckpt = (InHub() && Checkpoint == FileNamePath + GetS(w.level)) ? g_curLevelMedals.got : 0;
+
+                        DrawMedals(p_center_x, info_y, true, w.save_info().max_medals, 0, ckpt, w.save_info().medals_got, w.save_info().medals_best);
+                    }
+                }
+            }
+
+            XRender::setDrawPlane(PLANE_LVL_SECTION_FG);
 
 #ifdef THEXTECH_BUILD_GL_MODERN
             if(SectionParticlesFG[S])
                 XRender::renderParticleSystem(**SectionParticlesFG[S], vScreen[Z].X, vScreen[Z].Y);
 
+            XRender::setupLighting(SectionLighting[S]);
+
             if(SectionEffect[S])
                 XRender::renderTextureScale(0, 0, vScreen[Z].Width, vScreen[Z].Height, **SectionEffect[S]);
+            else if(SectionLighting[S])
+                XRender::renderLighting();
 #endif
-
-            XRender::splitFrame();
-
-            // Always draw for single-player
-            // And don't draw when many players at the same screen
-            if(numPlayers == 1 || numScreens != 1)
-                g_levelVScreenFader[Z].draw(false);
 
             XRender::splitFrame();
 
 #ifdef __3DS__
-        XRender::setTargetLayer(3);
+            XRender::setTargetLayer(3);
 #endif
 
-    //    'Interface
-    //            B = 0
-            B = 0;
-    //            C = 0
-            // C = 0;
-    //            If GameMenu = False And GameOutro = False Then
             if(!GameMenu && !GameOutro)
             {
-    //                For A = 1 To numPlayers
-                For(A, 1, numPlayers)
-                {
-                    if(Player[A].ShowWarp > 0)
-                    {
-                        const auto &w = Warp[Player[A].ShowWarp];
-
-                        int p_center_x = vScreen[Z].X + Player[A].Location.X + (Player[A].Location.Width / 2);
-                        int info_y = Player[A].Location.Y + Player[A].Location.Height - 96 + vScreen[Z].Y;
-
-                        if(!w.noPrintStars && w.save_info().inited() && w.save_info().max_stars > 0 && Player[A].Mount != 2)
-                        {
-                            std::string tempString = fmt::format_ne("{0}/{1}", w.curStars, w.save_info().max_stars);
-                            XRender::renderTexture(p_center_x - tempString.length() * 9 - 20, info_y,     GFX.Interface[5]);
-                            XRender::renderTexture(p_center_x - tempString.length() * 9,      info_y + 1, GFX.Interface[1]);
-                            SuperPrint(tempString, 3,
-                                       p_center_x - tempString.length() * 9 + 18,
-                                       info_y);
-
-                            info_y -= 20;
-                        }
-
-                        if(w.save_info().inited() && w.save_info().max_medals > 0)
-                        {
-                            uint8_t ckpt = (InHub() && Checkpoint == FileNamePath + GetS(w.level)) ? g_curLevelMedals.got : 0;
-
-                            DrawMedals(p_center_x, info_y, true, w.save_info().max_medals, 0, ckpt, w.save_info().medals_got, w.save_info().medals_best);
-                        }
-                    }
-                }
+                XRender::setDrawPlane(PLANE_LVL_HUD);
 
 #ifdef THEXTECH_ENABLE_LUNA_AUTOCODE
                 lunaRenderHud(Z);
@@ -2298,6 +2336,8 @@ void UpdateGraphics(bool skipRepaint)
     //                DrawInterface Z, numScreens
                 if(ShowOnScreenHUD && !gSMBXHUDSettings.skip)
                     DrawInterface(Z, numScreens);
+
+                XRender::setDrawPlane(PLANE_LVL_HUD + 1);
 
                 // Display NPCs that got dropped from the container
                 for(size_t i = 0; i < NPC_Draw_Queue_p.Dropped_n; i++)
@@ -2312,7 +2352,12 @@ void UpdateGraphics(bool skipRepaint)
             }
 
             else if(!GameOutro)
+            {
+                XRender::setDrawPlane(PLANE_GAME_MENUS);
                 mainMenuDraw();
+            }
+
+            XRender::setDrawPlane(PLANE_LVL_META);
 
             if(PrintFPS > 0 && ShowFPS)
             {
@@ -2361,6 +2406,10 @@ void UpdateGraphics(bool skipRepaint)
                     SuperPrintScreenCenter(WorldName, 3, y);
             }
 
+            // Always draw for single-player
+            // And don't draw when many players at the same screen
+            if(numPlayers == 1 || numScreens != 1)
+                g_levelVScreenFader[Z].draw(false);
         }
 
 //        If LevelEditor = True Or MagicHand = True Then
@@ -2378,7 +2427,10 @@ void UpdateGraphics(bool skipRepaint)
             XRender::setViewport(0, 0, ScreenW, ScreenH);
 
         if(GameOutro)
+        {
+            XRender::setDrawPlane(PLANE_GAME_MENUS);
             DrawCredits();
+        }
 
 //        If LevelEditor = True Then
 //            StretchBlt frmLevelWindow.vScreen(Z).hdc, 0, 0, frmLevelWindow.vScreen(Z).ScaleWidth, frmLevelWindow.vScreen(Z).ScaleHeight, myBackBuffer, 0, 0, 800, 600, vbSrcCopy
@@ -2404,14 +2456,23 @@ void UpdateGraphics(bool skipRepaint)
     XRender::offsetViewportIgnore(true);
     XRender::setViewport(0, 0, ScreenW, ScreenH);
 
-    g_levelScreenFader.draw();
+    XRender::setDrawPlane(PLANE_GAME_META);
 
     speedRun_renderTimer();
 
+    DrawDeviceBattery();
+
+    // TODO: don't rely on this behavior during level test, maybe just don't draw vScreen at all
+    // draw screen fader below level menu when game is paused
+    if(GamePaused != PauseCode::None)
+        XRender::setDrawPlane(PLANE_GAME_MENUS);
+
+    g_levelScreenFader.draw();
+
+    XRender::setDrawPlane(PLANE_GAME_MENUS);
+
     if(LevelEditor || MagicHand)
         DrawEditorLevel_UI();
-
-    DrawDeviceBattery();
 
     // render special screens
     if(GamePaused == PauseCode::PauseScreen)

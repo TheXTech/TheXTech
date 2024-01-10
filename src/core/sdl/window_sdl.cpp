@@ -2,7 +2,7 @@
  * TheXTech - A platform game engine ported from old source code for VB6
  *
  * Copyright (c) 2009-2011 Andrew Spinks, original VB6 code
- * Copyright (c) 2020-2023 Vitaly Novichkov <admin@wohlnet.ru>
+ * Copyright (c) 2020-2024 Vitaly Novichkov <admin@wohlnet.ru>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,6 +30,7 @@
 #include "config.h"
 #include "video.h"
 #include "screen.h"
+#include "../version.h"
 
 #ifdef __EMSCRIPTEN__
 #include <emscripten/html5.h>
@@ -90,6 +91,7 @@ void s_emscriptenLeaveRealFullscreen()
             setTimeout(() => {
                 console.log("Restoring canvas on return from fullscreen");
                 softFullscreenResizeWebGLRenderTarget();
+                window.dispatchEvent(new Event('resize'));
             }, 500);
         }
     );
@@ -114,8 +116,6 @@ bool WindowSDL::initSDL(uint32_t windowInitFlags)
 
     bool res = true;
 
-    m_windowTitle = g_gameInfo.titleWindow;
-
     // SDL_GL_ResetAttributes();
 
 #if defined(__SWITCH__) /* On Switch, expect the initial size 1920x1080 */
@@ -139,7 +139,11 @@ bool WindowSDL::initSDL(uint32_t windowInitFlags)
     windowInitFlags &= ~SDL_WINDOW_FULLSCREEN;
 #endif
 
-    m_window = SDL_CreateWindow(m_windowTitle.c_str(),
+    std::string window_name = "TheXTech Engine - (TheXTech v" V_LATEST_STABLE ", #" V_BUILD_VER ")";
+    if(!g_gameInfo.title.empty())
+        window_name = g_gameInfo.titleWindow();
+
+    m_window = SDL_CreateWindow(window_name.c_str(),
                                 SDL_WINDOWPOS_CENTERED,
                                 SDL_WINDOWPOS_CENTERED,
                                 initWindowW, initWindowH,
@@ -367,6 +371,7 @@ void WindowSDL::restoreWindow()
 
 void WindowSDL::setWindowSize(int w, int h)
 {
+#ifndef __EMSCRIPTEN__
     // try to figure out whether requested size is bigger than the screen
     int display = SDL_GetWindowDisplayIndex(m_window);
     if(display >= 0)
@@ -380,6 +385,7 @@ void WindowSDL::setWindowSize(int w, int h)
     }
 
     SDL_SetWindowSize(m_window, w, h);
+#endif
 }
 
 void WindowSDL::getWindowSize(int *w, int *h)
@@ -409,4 +415,12 @@ bool WindowSDL::isMaximized()
         return false;
     Uint32 flags = SDL_GetWindowFlags(m_window);
     return (flags & SDL_WINDOW_MAXIMIZED) != 0;
+}
+
+void WindowSDL::setTitle(const char* title)
+{
+    if(!m_window)
+        return;
+
+    SDL_SetWindowTitle(m_window, title);
 }

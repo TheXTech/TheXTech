@@ -2,7 +2,7 @@
  * TheXTech - A platform game engine ported from old source code for VB6
  *
  * Copyright (c) 2009-2011 Andrew Spinks, original VB6 code
- * Copyright (c) 2020-2023 Vitaly Novichkov <admin@wohlnet.ru>
+ * Copyright (c) 2020-2024 Vitaly Novichkov <admin@wohlnet.ru>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -1041,9 +1041,61 @@ void LoadGFX()
     UpdateLoad();
 }
 
-void UnloadGFX()
+void UnloadGFX(bool reload)
 {
-    // Do nothing
+    if(!reload)
+    {
+        // Do nothing at game exit
+        return;
+    }
+
+    UnloadCustomGFX();
+    UnloadWorldCustomGFX();
+
+    for(int c = 0; c < numCharacters; ++c)
+    {
+        For(A, 1, 10)
+        {
+            (*GFXCharacterBMP[c])[A].reset();
+        }
+    }
+
+    for(int A = 1; A <= maxBlockType; ++A)
+        GFXBlockBMP[A].reset();
+
+    for(int A = 1; A <= numBackground2; ++A)
+        GFXBackground2BMP[A].reset();
+
+    for(int A = 1; A <= maxNPCType; ++A)
+        GFXNPCBMP[A].reset();
+
+    for(int A = 1; A <= maxEffectType; ++A)
+        GFXEffectBMP[A].reset();
+
+    for(int A = 1; A <= maxYoshiGfx; ++A)
+    {
+        GFXYoshiBBMP[A].reset();
+        GFXYoshiTBMP[A].reset();
+    }
+
+    for(int A = 1; A <= maxBackgroundType; ++A)
+        GFXBackgroundBMP[A].reset();
+
+// 'world map
+    for(int A = 1; A <= maxTileType; ++A)
+        GFXTileBMP[A].reset();
+
+    for(int A = 1; A <= maxLevelType; ++A)
+        GFXLevelBMP[A].reset();
+
+    for(int A = 1; A <= maxSceneType; ++A)
+        GFXSceneBMP[A].reset();
+
+    for(int A = 1; A <= numCharacters; ++A)
+        GFXPlayerBMP[A].reset();
+
+    for(int A = 1; A <= maxPathType; ++A)
+        GFXPathBMP[A].reset();
 }
 
 static void loadCustomUIAssets()
@@ -1168,17 +1220,13 @@ static void loadCustomUIAssets()
              "Medals",
              nullptr, nullptr, GFX.isCustom(ci++), GFX.Medals, false, true);
 
-    // suppresses compiler warning of uncalled function, replace when merging multires
-    if(false)
-    {
-        FrameBorder b;
-        bool c;
+    loadCGFX(uiRoot + "CharSelIcons.png",
+             "CharSelIcons",
+             nullptr, nullptr, GFX.isCustom(ci++), GFX.CharSelIcons, false, true);
 
-        loadCBorder(uiRoot + "Backdrop_Border.png",
-                    "Backdrop_Border",
-                    c,
-                    b);
-    }
+    loadCBorder(uiRoot + "CharSelFrame.png",
+             "CharSelFrame",
+             GFX.isCustom(ci++), GFX.CharSelFrame);
 }
 
 void LoadCustomGFX(bool include_world)
@@ -1378,6 +1426,9 @@ void LoaderUpdateDebugString(const std::string &strig)
 #ifndef PGE_NO_THREADING
     SDL_UnlockMutex(gfxLoaderDebugMutex);
 #endif
+
+    if(!gfxLoaderThreadingMode)
+        UpdateLoadREAL();
 }
 
 

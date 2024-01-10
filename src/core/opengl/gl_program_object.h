@@ -2,7 +2,7 @@
  * TheXTech - A platform game engine ported from old source code for VB6
  *
  * Copyright (c) 2009-2011 Andrew Spinks, original VB6 code
- * Copyright (c) 2020-2023 Vitaly Novichkov <admin@wohlnet.ru>
+ * Copyright (c) 2020-2024 Vitaly Novichkov <admin@wohlnet.ru>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,6 +22,7 @@
 #ifndef GL_PROGRAM_OBJECT_H
 
 #include <vector>
+#include <string>
 #include <cstdint>
 
 typedef unsigned int    GLenum;
@@ -104,8 +105,10 @@ public:
 
 private:
     static GLuint s_last_program;
+    static std::string s_temp_string;
 
     GLuint m_program = 0;
+    const char* m_binding_point_prefix = nullptr;
     int m_flags = translucent;
 
     // OpenGL locations for common uniforms
@@ -140,6 +143,9 @@ private:
     std::vector<UniformAssignment_t> m_uniform_steps;
 
     // internal functions
+    //! map a binding point in case the shader was translated
+    const char* m_map_var(const char* variable);
+
     void m_update_transform(const GLfloat* transform, const GLfloat* read_viewport, GLfloat clock);
 
     static GLuint s_compile_shader(GLenum type, const char* src);
@@ -215,7 +221,7 @@ public:
     }
 
     /*!
-     * \brief Registers a custom uniform variable in the next available index
+     * \brief Restores all registered uniforms from a StdPictureLoad object (after a shader has been reloaded)
      * \param l StdPictureLoad to restore uniform registrations / assignments from
      *
      * Note: will fix the type of any assignments in l
@@ -225,7 +231,7 @@ public:
     /*!
      * \brief Registers a custom uniform variable in the next available index
      * \param name name of uniform
-     * \param l StdPictureLoad to cache the registration in, in case of unload
+     * \param l StdPictureLoad to cache the registration in, in case of shader unload
      * \returns The internal index for the uniform, -1 on failure
      */
     int register_uniform(const char* name, StdPictureLoad& l);
@@ -273,6 +279,11 @@ public:
 
         m_activate_uniform_step(step);
     }
+
+    /*!
+     * \brief Resets information about which versions of ESSL are supported by the native OpenGL driver
+     */
+    static void s_reset_supported_versions();
 };
 
 #endif // #ifndef GL_PROGRAM_OBJECT_H

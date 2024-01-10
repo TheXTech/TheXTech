@@ -2,7 +2,7 @@
  * TheXTech - A platform game engine ported from old source code for VB6
  *
  * Copyright (c) 2009-2011 Andrew Spinks, original VB6 code
- * Copyright (c) 2020-2023 Vitaly Novichkov <admin@wohlnet.ru>
+ * Copyright (c) 2020-2024 Vitaly Novichkov <admin@wohlnet.ru>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -307,6 +307,7 @@ int curWorldMusic = 0;
 std::string curWorldMusicFile;
 RangeArrI<bool, 0, maxSections, false> NoTurnBack;
 RangeArrI<bool, 0, maxSections, false> UnderWater;
+RangeArrI<stringindex_t, 0, maxSections, STRINGINDEX_NONE> SectionJSONInfo;
 bool TestLevel = false;
 bool GameMenu = false;
 std::string WorldName;
@@ -673,4 +674,42 @@ double vb6Round(double x, int decimals)
     }
 
     return res;
+}
+
+XTColor XTColorString(const std::string& s)
+{
+    const char* s_ = s.c_str();
+
+    if(s_[0] == '0' && s_[1] == 'x')
+        s_ += 2;
+
+    if(*s_ == '#')
+        s_++;
+
+    uint8_t color[4] = {255, 255, 255, 255};
+
+    // read each byte separately
+    for(int i = 0; i < 4; i++)
+    {
+        if(s_[0] == '\0' || s_[1] == '\0')
+            break;
+
+        uint8_t nybble[2] = {0, 0};
+
+        for(int j = 0; j < 2; j++)
+        {
+            if(*s_ >= '0' && *s_ <= '9')
+                nybble[j] = *s_ - '0';
+            else if(*s_ >= 'a' && *s_ <= 'f')
+                nybble[j] = *s_ - 'a' + 10;
+            else if(*s_ >= 'A' && *s_ <= 'F')
+                nybble[j] = *s_ - 'A' + 10;
+
+            s_++;
+        }
+
+        color[i] = nybble[0] * 16 + nybble[1];
+    }
+
+    return XTColor(color[0], color[1], color[2], color[3]);
 }

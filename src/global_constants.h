@@ -2,7 +2,7 @@
  * TheXTech - A platform game engine ported from old source code for VB6
  *
  * Copyright (c) 2009-2011 Andrew Spinks, original VB6 code
- * Copyright (c) 2020-2023 Vitaly Novichkov <admin@wohlnet.ru>
+ * Copyright (c) 2020-2024 Vitaly Novichkov <admin@wohlnet.ru>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -85,7 +85,7 @@ const int maxYoshiGfx = 10;
 const int c_max_track_medals = 8;
 const int c_max_track_stars = 255;
 
-const int maxLocalPlayers = 2;
+const int maxLocalPlayers = 4;
 
 // was previously changed to 10000; now only used for certain NPC bounds checking.
 // returned to 8000.

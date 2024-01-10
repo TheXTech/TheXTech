@@ -1,6 +1,6 @@
 /*
  * Moondust, a free game engine for platform game making
- * Copyright (c) 2014-2023 Vitaly Novichkov <admin@wohlnet.ru>
+ * Copyright (c) 2014-2024 Vitaly Novichkov <admin@wohlnet.ru>
  *
  * This software is licensed under a dual license system (MIT or GPL version 3 or later).
  * This means you are free to choose with which of both licenses (MIT or GPL version 3 or later)
@@ -21,6 +21,11 @@
 #include "logger_sets.h"
 #include "logger_private.h"
 #include <fmt/fmt_printf.h>
+#include <coreinit/debug.h>
+
+#define VITA_TEMP_BUFFER_SIZE (1024 * 1024)
+
+static char s_string_buffer[VITA_TEMP_BUFFER_SIZE - 3];
 
 #ifdef DEBUG_BUILD
 #include <stdio.h>
@@ -28,10 +33,10 @@
 
 // #define ENABLE_NET_LOG
 
-#ifdef ENABLE_NET_LOG
-#   include <unistd.h>
-#   include <sys/socket.h>
-#   include <arpa/inet.h>
+#   ifdef ENABLE_NET_LOG
+#       include <unistd.h>
+#       include <sys/socket.h>
+#       include <arpa/inet.h>
 
 #       ifndef NETDBG_IP_SERVER
 #           define NETDBG_IP_SERVER "172.19.9.141"
@@ -40,15 +45,12 @@
 #           define NETDBG_PORT_SERVER 18194
 #       endif
 
-#       define VITA_TEMP_BUFFER_SIZE (1024 * 1024)
-
-static char s_string_buffer[VITA_TEMP_BUFFER_SIZE - 3];
 static char s_string_buffer2[VITA_TEMP_BUFFER_SIZE];
 static int s_wut_debug_setup = 0;
 static int s_socket_desc = 0;
 static struct sockaddr_in s_server;
-#   endif
-#endif
+#   endif // ENABLE_NET_LOG
+#endif // DEBUG_BUILD
 
 #ifndef NO_FILE_LOGGING
 //! Output file
@@ -66,12 +68,14 @@ static FILE* s_logout;
 void LogWriter::OpenLogFile()
 {
 #if !defined(PGE_NO_THREADING) && defined(PGE_SDL_MUTEX)
+    OSReport("Debug: Creating the SDL Mutex");
     g_lockLocker = SDL_CreateMutex();
 #endif
 
     if(m_enabled)
     {
 #ifndef NO_FILE_LOGGING
+        OSReport("Debug: Opening a log file for APPEND: %s\n", m_logFilePath.c_str());
         s_logout = std::fopen(m_logFilePath.c_str(), "a");
 #endif // #ifndef NO_FILE_LOGGING
     }
@@ -80,6 +84,7 @@ void LogWriter::OpenLogFile()
 void LogWriter::CloseLog()
 {
 #if !defined(PGE_NO_THREADING) && defined(PGE_SDL_MUTEX)
+    OSReport("Debug: Destroying the SDL Mutex");
     SDL_DestroyMutex(g_lockLocker);
     g_lockLocker = nullptr;
 #endif
@@ -106,10 +111,11 @@ void LogWriter::CloseLog()
 
 void LoggerPrivate_pLogConsole(int level, const char *label, const char *format, va_list arg)
 {
-#ifdef ENABLE_NET_LOG
-    MUTEXLOCK(mutex);
     va_list arg_in;
     (void)level;
+    MUTEXLOCK(mutex);
+
+#ifdef ENABLE_NET_LOG
 
     // Try to connect the netcat server (run as `nc -nklv 18194`)
     if(!s_wut_debug_setup && s_socket_desc == 0)
@@ -145,10 +151,13 @@ void LoggerPrivate_pLogConsole(int level, const char *label, const char *format,
         send(s_socket_desc, s_string_buffer2, strlen(s_string_buffer2) + 1, 0);
     }
 #else
-    (void)level;
-    (void)label;
-    (void)format;
-    (void)arg;
+    va_copy(arg_in, arg);
+    // Print arg list to first string buffer.
+    std::vsnprintf(s_string_buffer, VITA_TEMP_BUFFER_SIZE - 4, format, arg_in);
+    va_end(arg_in);
+
+    // Print that string buffer into the output with new line & null termination.
+    OSReport("%s: %s\n", label, s_string_buffer);
 #endif
 }
 

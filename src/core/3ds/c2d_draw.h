@@ -38,10 +38,10 @@ inline bool C2D_DrawImage_Custom(C2D_Image img,
     {
         uint32_t color32 = C2D_Color32(color.r, color.g, color.b, color.a);
         const C2D_ImageTint tint = {color32, 1., color32, 1., color32, 1., color32, 1.};
-        result = C2D_DrawImageAt(img, x, y, 0.f, &tint, scale_x, scale_y);
+        result = C2D_DrawImageAt(img, x, y, s_render_planes.next() / (float)0x8000, &tint, scale_x, scale_y);
     }
     else
-        result = C2D_DrawImageAt(img, x, y, 0.f, nullptr, scale_x, scale_y);
+        result = C2D_DrawImageAt(img, x, y, s_render_planes.next() / (float)0x8000, nullptr, scale_x, scale_y);
 
     img.subtex = old_subtex;
     return result;
@@ -88,7 +88,7 @@ inline bool C2D_DrawImage_Custom_Rotated(C2D_Image img,
         cy = center->y;
     }
 
-    const C2D_DrawParams params = {{x, y, w*scale_x, h*scale_y}, {cx, cy}, 0.f, angle * (float)M_PI / 180.0f};
+    const C2D_DrawParams params = {{x, y, w*scale_x, h*scale_y}, {cx, cy}, (float)s_render_planes.next() / (float)0x8000, angle * (float)M_PI / 180.0f};
 
     bool result;
     if(color != XTColor())

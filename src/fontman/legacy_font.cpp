@@ -1,6 +1,6 @@
 /*
  * Moondust, a free game engine for platform game making
- * Copyright (c) 2014-2023 Vitaly Novichkov <admin@wohlnet.ru>
+ * Copyright (c) 2014-2024 Vitaly Novichkov <admin@wohlnet.ru>
  *
  * This software is licensed under a dual license system (MIT or GPL version 3 or later).
  * This means you are free to choose with which of both licenses (MIT or GPL version 3 or later)
@@ -57,7 +57,7 @@ void LegacyFont::loadFont(int fontId)
         m_glyphWidth = 18;
         m_glyphHeight = 16;
 
-        for(int i = 0; i < 9; ++i)
+        for(int i = 0; i <= 9; ++i)
         {
             char uchar[5] = {static_cast<char>('0' + i), 0, 0, 0, 0};
             m_textures[i] = &GFX.Font1[i];

@@ -141,6 +141,12 @@ else()
     set(THEXTECH_ENABLE_TTF_SUPPORT_DEFAULT ON)
 endif()
 
+if(APPLE OR WIN32 OR (CMAKE_SYSTEM_NAME STREQUAL "Linux"))
+    set(THEXTECH_USE_ANGLE_TRANSLATOR_DEFAULT ON)
+else()
+    set(THEXTECH_USE_ANGLE_TRANSLATOR_DEFAULT OFF)
+endif()
+
 option(USE_SYSTEM_LIBS "Use dependent libraries like SDL2, FreeImageLite and MixerX, installed in the system" ${USE_SYSTEM_LIBS_DEFAULT})
 option(USE_SYSTEM_SDL2 "Use SDL2 from a system even prefering system libraries" ${USE_SYSTEM_SDL2_DEFAULT})
 
@@ -158,6 +164,8 @@ option(THEXTECH_BUILD_GL_DESKTOP_MODERN "On SDL builds, include the OpenGL 2.0+ 
 option(THEXTECH_BUILD_GL_ES_MODERN "On SDL builds, include the OpenGL ES 2.0+ renderer" ON)
 option(THEXTECH_BUILD_GL_DESKTOP_LEGACY "On SDL builds, include the OpenGL 1.1+ renderer" ON)
 option(THEXTECH_BUILD_GL_ES_LEGACY "On SDL builds, include the OpenGL ES 1.1 renderer" OFF)
+
+option(THEXTECH_USE_ANGLE_TRANSLATOR "On modern OpenGL builds, include the ANGLE shader translator to improve shader support in OpenGL 3.0+ Core/Compatibility profiles" ${THEXTECH_USE_ANGLE_TRANSLATOR_DEFAULT})
 
 option(RANGE_ARR_USE_HEAP "Store data of RangeArr<> template in a heap" OFF)
 option(RANGE_ARR_UNSAFE_MODE "Disable all range checks at RangeArr<> template" OFF)
@@ -227,12 +235,21 @@ endif()
 if(EMSCRIPTEN)
     # config for web app deployment manifest
     set(THEXTECH_MANIFEST_NAME "TheXTech Engine ${THEXTECH_VERSION_STRING}" CACHE STRING "Web app manifest name, used as title after installation")
-    set(THEXTECH_MANIFEST_ID "wohlsoft-thextech-${GIT_BRANCH}-${GIT_COMMIT_HASH}" CACHE STRING "Web app ID, uniquely identifies installed app")
+    set(THEXTECH_MANIFEST_ID "wohlsoft-thextech" CACHE STRING "Web app ID, uniquely identifies installed app")
     set(THEXTECH_MANIFEST_DESC "" CACHE STRING "Web app description")
-    set(THEXTECH_DEPLOY_URL "" CACHE STRING "Fully qualified HTTPS URL where application will be deployed")
+    set(THEXTECH_DEPLOY_URL "http://localhost:8080/" CACHE STRING "Fully qualified HTTPS URL where application will be deployed (HTTP may only be used for local testing)")
+
+    # versioned ID
+    if(GIT_BRANCH STREQUAL "main")
+        set(GIT_BRANCH_IF_NOT_MAIN "")
+    else()
+        set(GIT_BRANCH_IF_NOT_MAIN "-${GIT_BRANCH}")
+    endif()
+
+    set(THEXTECH_MANIFEST_ID_V "${THEXTECH_MANIFEST_ID}${GIT_BRANCH_IF_NOT_MAIN}${THEXTECH_VERSION_REL}")
 
     string(CONFIGURE "${THEXTECH_MANIFEST_NAME}" THEXTECH_MANIFEST_NAME_OUT)
-    string(CONFIGURE "${THEXTECH_MANIFEST_ID}"   THEXTECH_MANIFEST_ID_OUT)
+    string(CONFIGURE "${THEXTECH_MANIFEST_ID_V}"   THEXTECH_MANIFEST_ID_OUT)
     string(CONFIGURE "${THEXTECH_MANIFEST_DESC}" THEXTECH_MANIFEST_DESC_OUT)
 endif()
 
@@ -401,6 +418,7 @@ if(EMSCRIPTEN)
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -s EXPORTED_RUNTIME_METHODS=ccall")
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -s BINARYEN_EXTRA_PASSES=coalesce-locals")
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -s MAX_WEBGL_VERSION=2")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -s GL_ENABLE_GET_PROC_ADDRESS")
 #    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -s \"EXTRA_EXPORTED_RUNTIME_METHODS=['Pointer_stringify']\"")
 #    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --embed-file \"${_LANGAUGES_TEMP_FOLDER}\"@\"languages/\"")
 #    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --preload-file \"${PGE_PRELOAD_CONFIG_PACK}\"@\"configs/${PGE_PRELOAD_CONFIG_PACK_NAME}/\"")
@@ -515,6 +533,24 @@ if(THEXTECH_ENABLE_DISCORD_RPC)
     list(APPEND A2XT_DEPS DiscordPRC_Local)
     list(APPEND A2XT_LIBS PGE_DiscordRPC)
     set(THEXTECH_ENABLE_INTEGRATOR ON)  # This feature needs for an Integrator
+endif()
+
+if(THEXTECH_BUILD_GL_DESKTOP_MODERN AND THEXTECH_USE_ANGLE_TRANSLATOR)
+    add_subdirectory(3rdparty/angle-shader-translator)
+
+    message("== Building ANGLE shader translator ==")
+    # suppress some known warnings on GCC / Clang
+    if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+        target_compile_options(angle_shader_translator PRIVATE -Wno-unused-parameter)
+        target_compile_options(angle_shader_translator PRIVATE -Wno-c++17-attribute-extensions)
+    elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang")
+        target_compile_options(angle_shader_translator PRIVATE -Wno-unused-parameter)
+        target_compile_options(angle_shader_translator PRIVATE -Wno-c++17-extensions)
+    elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+        target_compile_options(angle_shader_translator PRIVATE /wd4100) # unreferenced formal parameter
+    endif()
+
+    target_link_libraries(A2XT_Int INTERFACE angle_shader_translator)
 endif()
 
 target_link_libraries(A2XT_Int INTERFACE ${A2XT_LIBS})
@@ -865,6 +901,7 @@ else()
             src/core/opengl/render_gl_backend.cpp
             src/core/opengl/render_gl_init.cpp
             src/core/opengl/render_gl_shaders.cpp
+            src/core/opengl/render_gl_shader_lighting.cpp
         )
     endif()
 
@@ -872,6 +909,13 @@ else()
         list(APPEND THEXTECH_SRC
             src/core/opengl/gl_program_bank.cpp
             src/core/opengl/gl_particle_system.cpp
+        )
+    endif()
+
+    if(THEXTECH_BUILD_GL_DESKTOP_MODERN AND THEXTECH_USE_ANGLE_TRANSLATOR)
+        add_definitions(-DTHEXTECH_USE_ANGLE_TRANSLATOR)
+        list(APPEND THEXTECH_SRC
+            src/core/opengl/gl_shader_translator.cpp
         )
     endif()
 
@@ -1150,7 +1194,7 @@ if(NINTENDO_DS OR NINTENDO_3DS OR NINTENDO_WII OR NINTENDO_SWITCH OR ANDROID OR 
     target_compile_definitions(thextech PRIVATE -DTHEXTECH_DISABLE_LANG_TOOLS)
 endif()
 
-if(UNIX OR NINTENDO_SWITCH OR ANDROID OR APPLE)
+if((UNIX OR NINTENDO_SWITCH OR ANDROID OR APPLE) AND NOT EMSCRIPTEN)
     # Allow hotswapping renderer on fully tested platforms
     target_compile_definitions(thextech PRIVATE -DTHEXTECH_RESTART_RENDERER_SUPPORTED)
 endif()
@@ -1444,12 +1488,6 @@ elseif(NINTENDO_SWITCH)
 elseif(EMSCRIPTEN)
     add_custom_command(
         TARGET thextech POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy
-                "${CMAKE_SOURCE_DIR}/resources/emscripten/sw.js"
-                "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/sw.js")
-
-    add_custom_command(
-        TARGET thextech POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E rename
                 "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${THEXTECH_EXECUTABLE_NAME}.html"
                 "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/index.html")
@@ -1472,7 +1510,10 @@ elseif(EMSCRIPTEN)
                 "${PGE_PRELOAD_ENVIRONMENT}/graphics/ui/icon/thextech_256.png"
                 "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/thextech_256.png")
 
-    configure_file(${CMAKE_SOURCE_DIR}/resources/emscripten/manifest.json ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/manifest.json)
+    configure_file(${CMAKE_SOURCE_DIR}/resources/emscripten/manifest.json.in ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/manifest.json)
+
+    configure_file(${CMAKE_SOURCE_DIR}/resources/emscripten/sw.js.in ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/sw.js)
+
 else()
     install(TARGETS thextech
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}

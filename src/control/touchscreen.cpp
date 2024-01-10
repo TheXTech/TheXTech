@@ -2,7 +2,7 @@
  * TheXTech - A platform game engine ported from old source code for VB6
  *
  * Copyright (c) 2009-2011 Andrew Spinks, original VB6 code
- * Copyright (c) 2020-2023 Vitaly Novichkov <admin@wohlnet.ru>
+ * Copyright (c) 2020-2024 Vitaly Novichkov <admin@wohlnet.ru>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,6 +25,8 @@
 #ifdef __ANDROID__
 #   include <Utils/files.h>
 #endif
+
+#include "AppPath/app_path.h"
 
 #include "touchscreen.h"
 #include "../globals.h"
@@ -104,19 +106,28 @@ void TouchScreenGFX_t::loadImage(StdPicture& img, const std::string& fileName)
         imgPath = "buttons/" + fileName;
 #endif
 
-    pLogDebug("Loading texture %s...", imgPath.c_str());
-    XRender::LoadPicture(img, imgPath);
+    // pLogDebug("Loading texture %s...", imgPath.c_str());
+    img.reset();
+    XRender::lazyLoadPicture(img, imgPath);
 
     if(!img.inited)
     {
-        pLogWarning("Failed to load texture: %s...", imgPath.c_str());
+        if(m_loadErrors == 0)
+            pLogWarning("Failed to load texture: %s...", imgPath.c_str());
+
         m_loadErrors++;
     }
 }
 
 TouchScreenGFX_t::TouchScreenGFX_t()
 {
-    m_gfxPath = AppPath + "graphics/touchscreen/";
+    m_success = false;
+}
+
+void TouchScreenGFX_t::loadAll()
+{
+    m_loadErrors = 0;
+    m_success = true;
 
     // Loading a touch-screen buttons from assets
     loadImage(touch[BUTTON_START], "Start.png");
@@ -171,12 +182,21 @@ TouchScreenGFX_t::TouchScreenGFX_t()
     loadImage(touch[BUTTON_ENTER_CHEATS], "EnterCheats.png");
 
     if(m_loadErrors > 0)
-    {
         m_success = false;
-        return;
-    }
 
-    m_success = true;
+    if(m_loadErrors > 1)
+        pLogWarning("and %d other file(s)", m_loadErrors - 1);
+}
+
+void TouchScreenGFX_t::load()
+{
+    m_gfxPath = AppPath + "graphics/touchscreen/";
+    loadAll();
+
+    if(m_success)
+        pLogDebug("Loaded touchscreen GFX from %s", m_gfxPath.c_str());
+    else
+        pLogWarning("Touch-screen controller cannot be used due to missing assets.");
 }
 
 /*------------------------------------------*\
@@ -908,9 +928,6 @@ TouchScreenController::TouchScreenController() noexcept
 
     pLogDebug("Initialization of touch-screen controller...");
 
-    if(!m_GFX.m_success)
-        pLogDebug("Touch-screen controller cannot be used due to missing assets.");
-
     scanTouchDevices();
 
     for(auto &d : m_devices)
@@ -946,7 +963,7 @@ void TouchScreenController::scanTouchDevices()
 {
     m_touchDevicesCount = SDL_GetNumTouchDevices();
 
-    if(touchSupported())
+    if(m_touchDevicesCount > 0)
     {
         pLogDebug("Found %d touch devices, screen size: %d x %d",
                   m_touchDevicesCount,

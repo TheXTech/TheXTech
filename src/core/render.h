@@ -2,7 +2,7 @@
  * TheXTech - A platform game engine ported from old source code for VB6
  *
  * Copyright (c) 2009-2011 Andrew Spinks, original VB6 code
- * Copyright (c) 2020-2023 Vitaly Novichkov <admin@wohlnet.ru>
+ * Copyright (c) 2020-2024 Vitaly Novichkov <admin@wohlnet.ru>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,10 +22,13 @@
 #ifndef RENDER_HHHHHH
 #define RENDER_HHHHHH
 
+#include <cstdint>
 #include <string>
+
+#include "sdl_proxy/sdl_stdinc.h"
+
 #include "std_picture.h"
 #include "base/render_types.h"
-#include "sdl_proxy/sdl_stdinc.h"
 
 #ifndef RENDER_CUSTOM
 #   include "base/render_base.h"
@@ -223,6 +226,25 @@ E_INLINE void setTargetScreen() TAIL
 #ifndef RENDER_CUSTOM
 {
     g_render->setTargetScreen();
+}
+#endif
+
+/*!
+ * \brief Sets draw plane for subsequent draws.
+ *
+ * \param plane Which draw plane should be used.
+ *
+ * The multiples of 8 are "primary planes" and will correctly order 1824 draws. There are 32 of these.
+ * Other planes are "offset" planes, with each primary_plane + offset (-4 - +3) having the same 5 most significant bits as the primary plane.
+ * Offset planes -4 (252), -3, -2, and -1 (255) are offset planes of primary plane 0.
+ * Each offset plane will correctly order 32 draws per frame.
+ *
+ * NOTE: Switching between 3D planes will disrupt the 3DS render pipeline. Avoid doing so more than strictly necessary.
+ */
+E_INLINE void setDrawPlane(uint8_t plane) TAIL
+#ifndef RENDER_CUSTOM
+{
+    return g_render->setDrawPlane(plane);
 }
 #endif
 
@@ -467,7 +489,39 @@ E_INLINE void spawnParticle(StdPicture &target,
 }
 #endif
 
+#ifdef THEXTECH_BUILD_GL_MODERN
 
+/*!
+ * \brief Adds a light to the current scene (used by section effect shaders, expires at the next viewport change, splitFrame, or finish draw)
+ * \param light Light specified in screen coordinates
+ *
+ * Lights are only stored or remembered if the CURRENT renderer supports them.
+ */
+E_INLINE void addLight(const GLLight &light) TAIL
+{
+    return g_render->addLight(light);
+}
+
+/*!
+ * \brief Sets the lighting system parameters for the current scene (used by section effect shaders, expires at the next viewport change, splitFrame, or finish draw)
+ * \param system Light system parameters
+ *
+ * Lights are only stored or remembered if the CURRENT renderer supports them.
+ */
+E_INLINE void setupLighting(const GLLightSystem &system) TAIL
+{
+    return g_render->setupLighting(system);
+}
+
+/*!
+ * \brief A render call over the full viewport whose fragment shader tints the screen with information from the lighting system
+ */
+E_INLINE void renderLighting() TAIL
+{
+    return g_render->renderLighting();
+}
+
+#endif
 
 // Draw primitives
 

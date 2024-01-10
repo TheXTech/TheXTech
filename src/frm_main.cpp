@@ -2,7 +2,7 @@
  * TheXTech - A platform game engine ported from old source code for VB6
  *
  * Copyright (c) 2009-2011 Andrew Spinks, original VB6 code
- * Copyright (c) 2020-2023 Vitaly Novichkov <admin@wohlnet.ru>
+ * Copyright (c) 2020-2024 Vitaly Novichkov <admin@wohlnet.ru>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -71,8 +71,8 @@ bool FrmMain::initSystem(const CmdLineSetup_t &setup)
 
     LoadLogSettings(setup.interprocess, setup.verboseLogging);
     //Write into log the application start event
-    pLogDebug("<Application started>");
-    pLogDebug("TheXTech %s (branch %s, commit %s)", V_LATEST_STABLE, V_BUILD_BRANCH, V_BUILD_VER);
+    pLogInfo("<Application started>");
+    pLogInfo("TheXTech %s (branch %s, commit %s)", V_LATEST_STABLE, V_BUILD_BRANCH, V_BUILD_VER);
 
 #ifndef THEXTECH_NO_SDL_CORE
     res = CoreSDL::init(setup);
@@ -99,7 +99,7 @@ bool FrmMain::initSystem(const CmdLineSetup_t &setup)
 #   ifdef RENDERGL_SUPPORTED
     bool try_gl = false;
 
-    if(setup.renderType == RENDER_ACCELERATED_OPENGL || setup.renderType == RENDER_ACCELERATED_OPENGL_ES || setup.renderType == RENDER_ACCELERATED_OPENGL_LEGACY || setup.renderType == RENDER_ACCELERATED_OPENGL_ES_LEGACY)
+    if(setup.renderType == RENDER_ACCELERATED_AUTO || setup.renderType == RENDER_ACCELERATED_OPENGL || setup.renderType == RENDER_ACCELERATED_OPENGL_ES || setup.renderType == RENDER_ACCELERATED_OPENGL_LEGACY || setup.renderType == RENDER_ACCELERATED_OPENGL_ES_LEGACY)
     {
         RenderGL *render = new RenderGL();
         m_render.reset(render);
@@ -222,8 +222,6 @@ bool FrmMain::initSystem(const CmdLineSetup_t &setup)
         return true;
     }
 
-    FontManager::initFull();
-
     return !res;
 }
 
@@ -277,7 +275,7 @@ void FrmMain::freeSystem()
     GraphicsHelps::closeFreeImage();
 #endif
 
-    pLogDebug("<Application closed>");
+    pLogInfo("<Application closed>");
     CloseLog();
 
 #ifndef THEXTECH_NO_SDL_CORE
@@ -320,7 +318,7 @@ bool FrmMain::restartRenderer()
     setup.renderType = g_videoSettings.renderMode;
     setup.vSync = g_videoSettings.vSync;
 
-    if(setup.renderType == RENDER_ACCELERATED_OPENGL || setup.renderType == RENDER_ACCELERATED_OPENGL_ES || setup.renderType == RENDER_ACCELERATED_OPENGL_LEGACY || setup.renderType == RENDER_ACCELERATED_OPENGL_ES_LEGACY)
+    if(setup.renderType == RENDER_ACCELERATED_AUTO || setup.renderType == RENDER_ACCELERATED_OPENGL || setup.renderType == RENDER_ACCELERATED_OPENGL_ES || setup.renderType == RENDER_ACCELERATED_OPENGL_LEGACY || setup.renderType == RENDER_ACCELERATED_OPENGL_ES_LEGACY)
     {
         m_render.reset(new RenderGL());
         try_gl = true;

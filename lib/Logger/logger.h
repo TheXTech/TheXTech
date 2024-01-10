@@ -1,6 +1,6 @@
 /*
  * Moondust, a free game engine for platform game making
- * Copyright (c) 2014-2023 Vitaly Novichkov <admin@wohlnet.ru>
+ * Copyright (c) 2014-2024 Vitaly Novichkov <admin@wohlnet.ru>
  *
  * This software is licensed under a dual license system (MIT or GPL version 3 or later).
  * This means you are free to choose with which of both licenses (MIT or GPL version 3 or later)
@@ -29,13 +29,27 @@ struct PGE_LogLevel
     enum Level : int
     {
         Debug    = 5,
-        Warning  = 4,
-        Critical = 3,
-        Info     = 2,
+        Info     = 4,
+        Warning  = 3,
+        Critical = 2,
         Fatal    = 1,
         NoLog    = 0,
     };
 };
+
+extern struct PGE_LogSetup
+{
+    //! The logging level
+    PGE_LogLevel::Level level = PGE_LogLevel::Debug;
+    //! Maximum number of log files in the directory
+    int maxFilesCount = 0;
+    //! Default logs directory
+    std::string logPathDefault;
+    //! Fallback log directory when default log directory is inaccessible
+    std::string logPathFallBack;
+    //! Custom log directory, specified by user
+    std::string logPathCustom;
+} g_pLogGlobalSetup;
 
 extern void LoadLogSettings(bool disableStdOut = false, bool verboseLogs = false);
 extern void CloseLog();

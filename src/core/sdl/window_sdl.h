@@ -2,7 +2,7 @@
  * TheXTech - A platform game engine ported from old source code for VB6
  *
  * Copyright (c) 2009-2011 Andrew Spinks, original VB6 code
- * Copyright (c) 2020-2023 Vitaly Novichkov <admin@wohlnet.ru>
+ * Copyright (c) 2020-2024 Vitaly Novichkov <admin@wohlnet.ru>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,7 +31,6 @@ typedef struct SDL_Window SDL_Window;
 
 class WindowSDL final : public AbstractWindow_t
 {
-    std::string m_windowTitle;
     SDL_Window *m_window = nullptr;
     WindowCursor_t m_cursor = CURSOR_DEFAULT;
 
@@ -136,6 +135,12 @@ public:
      * \return true if window is maximized
      */
     bool isMaximized() override;
+
+    /*!
+     * \brief Set the title of the window
+     * \param title Title to set, as C string
+     */
+    void setTitle(const char* title) override;
 };
 
 #endif // WINDOWSDL_H

@@ -28,7 +28,7 @@
             "deletion": {
                 "cancel": "否：不删除事件",
                 "confirm": "是：删除事件",
-                "deletingEvent": "删除事件{0}"
+                "deletingEvent": "删除{0}事件"
             },
             "desc": {
                 "activate": "NPC在当前画面出现时",
@@ -72,7 +72,7 @@
             "promptEventName": "事件名称：",
             "promptEventText": "文字信息：",
             "props": {
-                "autostart": "进入关卡时启动",
+                "autostart": "进入关卡时执行事件",
                 "controls": "按键",
                 "endGame": "游戏通关",
                 "sound": "音效",
@@ -103,7 +103,7 @@
             "confirmConvertFormatTo": "是否转换格式到{0}？",
             "confirmSaveBeforeAction": "{0}前是否保存文件？",
             "convert": {
-                "_38aUnsupported": "不支持转换 SMBX-38A 格式的关卡。",
+                "_38aUnsupported": "不支持转换SMBX-38A格式的关卡。",
                 "desc": "文件格式将会转换，但不会删除源文件。",
                 "featureBlockForceSmashable": "旋转方块设置了旧版本的破碎方式。",
                 "featureCustomWorldMusic": "在大地图中设置了自定义音乐。",
@@ -143,7 +143,7 @@
                 "cancel": "取消：返回上一级菜单",
                 "confirmDelete": "否：*删除全部对象*",
                 "confirmPreserve": "是：移动到默认图层",
-                "header": "删除图层{0}",
+                "header": "删除{0}图层",
                 "preserveLayerContents": "是否保留图层对象？"
             },
             "desc": {
@@ -153,7 +153,7 @@
             "itemNewLayer": "<新图层>",
             "label": "图层：",
             "labelAttached": "跟随：",
-            "labelAttachedLayer": "跟随图层",
+            "labelAttachedLayer": "跟随图层：",
             "labelMoveLayer": "移动图层：",
             "promptLayerName": "图层名称"
         },
@@ -197,7 +197,7 @@
             "inertNice": "友好",
             "props": {
                 "active": "启动",
-                "attachSurface": "跟随",
+                "attachSurface": "位置",
                 "facing": "方向"
             },
             "stuckStop": "静止",
@@ -208,7 +208,7 @@
         "phraseCountMore": "更多{0}",
         "phraseDelayIsMs": "延迟：{0}毫秒",
         "phraseGenericIndex": "编号：{0}",
-        "phraseRadiusIndex": "半径{0}",
+        "phraseRadiusIndex": "半径：{0}",
         "phraseSectionIndex": "场景{0}",
         "phraseTextOf": "{0}的文字信息",
         "phraseWarpIndex": "传送点{0}号",
@@ -343,15 +343,16 @@
             "reconnectTitle": "重新连接",
             "splitPressSelect_1": "按选择键",
             "splitPressSelect_2": "进入按键配置",
-            "wordDisconnect": "断开"
+            "wordDisconnect": "断开",
+            "phraseTestProfile": "测试配置"
         },
         "controls": {
             "phrasePlayerConnected": "玩家{0}已连接{1}， 配置： {2}",
             "phrasePlayerDisconnected": "玩家{0}未连接任何设备"
         },
         "error": {
-            "errorInvalidEnterWarp": "========= 发生错误! =========\n\n作为关卡起点的传送点{1}号不存在，因此无法启动关卡。\n传送点总数：{2}\n\n文件：{0}",
-            "errorNoStartPoint": "========= 发生错误! =========\n\n未放置玩家起点或传送点入口，因此无法启动关卡。\n\n文件：{0}",
+            "errorInvalidEnterWarp": "========= 发生错误! =========\n\n作为关卡起点的传送点{1}号不存在，因此无法进入关卡。\n传送点总数：{2}\n\n文件：{0}",
+            "errorNoStartPoint": "========= 发生错误! =========\n\n未放置玩家起点或传送点入口，因此无法进入关卡。\n\n文件：{0}",
             "openFileFailed": "错误：无法打开文件\"{0}\"：文件不存在或已损坏。",
             "warpNeedStarCount": "你需要{0}{2}{1}才能进入此传送点。"
         },
@@ -372,7 +373,7 @@
     "menu": {
         "abbrevMilliseconds": "毫秒",
         "battle": {
-            "errorNoLevels": "对战关卡列表为空，无法启动对战模式。"
+            "errorNoLevels": "对战关卡列表为空，无法进入对战模式。"
         },
         "caseNone": "<无>",
         "character": {
@@ -534,15 +535,15 @@
                     "buttonPlus": "+",
                     "caseIR": "（IR）",
                     "dPad": "十字键",
-                    "shake": "震动"
+                    "shake": "摇晃"
                 }
             },
             "wordButtons": "按键",
             "wordProfiles": "配置"
         },
         "editor": {
-            "errorMissingResources": "抱歉，需要{0}，即编辑器图标文件，才能启动编辑器。",
-            "errorResolution": "抱歉，在当前设置的分辨率下，无法启动编辑器。",
+            "errorMissingResources": "抱歉，需要文件：{0}，才能进入编辑器。",
+            "errorResolution": "抱歉，在当前设置的分辨率下，无法进入编辑器。",
             "newWorld": "<新地图>",
             "promptNewWorldName": "新地图名称"
         },
@@ -581,8 +582,9 @@
                 "linear": "双线性",
                 "nearest": "最近邻居"
             },
-            "render": "图形渲染方式: {0}",
-            "renderX": "图形渲染方式: {0} (X)"
+            "render": "图形渲染类型: {0}",
+            "renderX": "图形渲染类型: {0} (X)",
+            "renderAuto": "图形渲染类型: 自动选择 ({0})"
         },
         "wordBack": "返回",
         "wordHide": "隐藏",

@@ -2,7 +2,7 @@
  * TheXTech - A platform game engine ported from old source code for VB6
  *
  * Copyright (c) 2009-2011 Andrew Spinks, original VB6 code
- * Copyright (c) 2020-2023 Vitaly Novichkov <admin@wohlnet.ru>
+ * Copyright (c) 2020-2024 Vitaly Novichkov <admin@wohlnet.ru>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,6 +28,8 @@
 #include "cmd_line_setup.h"
 #include "video.h"
 
+#include "core/sdl/render_op_sdl.h"
+
 struct SDL_Renderer;
 struct SDL_Texture;
 struct SDL_Window;
@@ -41,6 +43,12 @@ class RenderSDL final : public AbstractRender_t
     bool          m_tBufferDisabled = false;
     SDL_Texture  *m_recentTarget = nullptr;
     std::set<StdPicture *> m_loadedPictures;
+
+    // queue of render ops
+    RenderQueue m_render_queue;
+
+    // current draw plane
+    uint8_t m_recent_draw_plane = 0;
 
     // Scale of virtual and window resolutuins
     float m_scale_x = 1.f;
@@ -159,6 +167,13 @@ public:
      */
     void setTargetScreen() override;
 
+    /*!
+     * \brief Sets draw plane for subsequent draws.
+     *
+     * \param plane Which draw plane should be used.
+     */
+    void setDrawPlane(uint8_t plane) override;
+
 
     void loadTextureInternal(StdPicture &target,
                      uint32_t width,
@@ -172,6 +187,16 @@ public:
     void clearBuffer() override;
 
 
+
+    /*!
+     * \brief Immediately executes all render operations and clears render queue
+     */
+    void flushRenderQueue();
+
+    /*!
+     * \brief Immediately executes a single render operation
+     */
+    void execute(const RenderOp& op);
 
     // Draw primitives
 

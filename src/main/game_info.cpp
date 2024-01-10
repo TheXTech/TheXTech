@@ -2,7 +2,7 @@
  * TheXTech - A platform game engine ported from old source code for VB6
  *
  * Copyright (c) 2009-2011 Andrew Spinks, original VB6 code
- * Copyright (c) 2020-2023 Vitaly Novichkov <admin@wohlnet.ru>
+ * Copyright (c) 2020-2024 Vitaly Novichkov <admin@wohlnet.ru>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -49,18 +49,25 @@ static void readCheats(IniProcessing &conf, std::vector<GameInfo::CheatAlias> &d
     conf.endGroup();
 }
 
+const std::string GameInfo::titleWindow() const
+{
+#if defined(ENABLE_OLD_CREDITS) && !defined(CUSTOM_GAME_NAME_TITLE)
+    return "Super Mario Bros. X - Version 1.3 - www.SuperMarioBrothers.org";
+#else
+    const char* ver_string = "TheXTech v" V_LATEST_STABLE ", #" V_BUILD_VER;
+    return fmt::format_ne("{0} - ({1})", this->title, ver_string);
+#endif
+}
+
 void initGameInfo()
 {
 #ifdef CUSTOM_GAME_NAME_TITLE
     g_gameInfo.title = CUSTOM_GAME_NAME_TITLE;
-    g_gameInfo.titleWindow = CUSTOM_GAME_NAME_TITLE;
 #else
 #   ifdef ENABLE_OLD_CREDITS
     g_gameInfo.title = "Super Mario Bros. X";
-    g_gameInfo.titleWindow = "Super Mario Bros. X - Version 1.3 - www.SuperMarioBrothers.org";
 #   else
     g_gameInfo.title = "TheXTech Engine";
-    g_gameInfo.titleWindow = fmt::format_ne("TheXTech v{0}, #{1}", V_LATEST_STABLE, V_BUILD_VER);
 #   endif
 #endif /* CUSTOM_GAME_NAME_TITLE */
 
@@ -116,7 +123,6 @@ void initGameInfo()
         {
             if(config.hasKey("title"))
                 config.read("title", g_gameInfo.title, g_gameInfo.title);
-            g_gameInfo.titleWindow = fmt::format_ne("{0} - (TheXTech v{1}, #{2})", g_gameInfo.title, V_LATEST_STABLE, V_BUILD_VER);
             config.read("disable-two-player", g_gameInfo.disableTwoPlayer, false);
             config.read("disable-battle-mode", g_gameInfo.disableBattleMode, false);
             config.read("status-icon-name", g_gameInfo.statusIconName, std::string());

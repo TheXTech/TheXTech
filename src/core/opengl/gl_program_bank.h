@@ -2,7 +2,7 @@
  * TheXTech - A platform game engine ported from old source code for VB6
  *
  * Copyright (c) 2009-2011 Andrew Spinks, original VB6 code
- * Copyright (c) 2020-2023 Vitaly Novichkov <admin@wohlnet.ru>
+ * Copyright (c) 2020-2024 Vitaly Novichkov <admin@wohlnet.ru>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -49,5 +49,6 @@ LoadedGLProgramRef_t ResolveGLParticleSystem(const std::string& name);
 extern RangeArr<LoadedGLProgramRef_t, 0, maxSections> SectionEffect;
 extern RangeArr<LoadedGLProgramRef_t, 0, maxSections> SectionParticlesBG;
 extern RangeArr<LoadedGLProgramRef_t, 0, maxSections> SectionParticlesFG;
+extern RangeArr<       GLLightSystem, 0, maxSections> SectionLighting;
 
 #endif // #ifndef GL_PROGRAM_BANK_H

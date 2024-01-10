@@ -2,7 +2,7 @@
  * TheXTech - A platform game engine ported from old source code for VB6
  *
  * Copyright (c) 2009-2011 Andrew Spinks, original VB6 code
- * Copyright (c) 2020-2023 Vitaly Novichkov <admin@wohlnet.ru>
+ * Copyright (c) 2020-2024 Vitaly Novichkov <admin@wohlnet.ru>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -57,6 +57,6 @@ void RenderFrameBorder(const Location_t& external, const Location_t& internal,
 
 // renders a new-style frame as a fill at the included internal location
 // the frame fills the internal rect
-void RenderFrameFill(const Location_t& internal, FrameBorder& frame);
+void RenderFrameFill(const Location_t& internal, FrameBorder& frame, XTColor color = XTColor());
 
 #endif // GFX_FRAME_H

@@ -2,7 +2,7 @@
  * TheXTech - A platform game engine ported from old source code for VB6
  *
  * Copyright (c) 2009-2011 Andrew Spinks, original VB6 code
- * Copyright (c) 2020-2023 Vitaly Novichkov <admin@wohlnet.ru>
+ * Copyright (c) 2020-2024 Vitaly Novichkov <admin@wohlnet.ru>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,6 +17,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+#include <algorithm>
 
 #include "core/opengl/gl_inc.h"
 
@@ -135,10 +137,10 @@ void RenderGL::framebufferCopy(BufferIndex_t dest, BufferIndex_t source, RectSiz
         draw_source /= PointF(ScreenW, ScreenH);
 
         // dest rect is viewport-relative
-        draw_source -= m_viewport.xy;
+        draw_loc -= m_viewport.xy;
 
         std::array<Vertex_t, 4> copy_triangle_strip =
-            genTriangleStrip(draw_loc, draw_source, m_cur_depth, {255, 255, 255, 255});
+            genTriangleStrip(draw_loc, draw_source, 0x7FFF, {255, 255, 255, 255});
 
         // fill vertex buffer to GL state and execute draw call
 
@@ -521,18 +523,281 @@ void RenderGL::executeOrderedDrawQueue(bool clear)
     }
 }
 
+void RenderGL::calculateDistanceField()
+{
+    if(!m_distance_field_1_program.inited() || !m_distance_field_2_program.inited())
+        return;
+
+    glDepthMask(GL_FALSE);
+
+    // (0) activate a half-resolution viewport
+    RectSizeI viewport = m_viewport;
+
+    s_normalize_coords(viewport);
+
+    RectSizeI viewport_scaled = viewport * 0.5f;
+
+    glViewport(viewport_scaled.x, viewport_scaled.y,
+        viewport_scaled.w, viewport_scaled.h);
+
+    // (1) create a draw call
+    RectI draw_loc = RectI(m_viewport);
+
+    RectF draw_source = RectF(draw_loc);
+    draw_source /= PointF(ScreenW, ScreenH);
+
+    // draw dest is in viewport coordinates, draw source isn't
+    draw_loc -= m_viewport.xy;
+
+    std::array<Vertex_t, 4> dist_triangle_strip =
+        genTriangleStrip(draw_loc, draw_source, 0x7FFF, {255, 255, 255, 255});
+
+
+    // (2) bind the FB read framebuffer (since it is depthless) and the actual game depth texture
+    glBindFramebuffer(GL_FRAMEBUFFER, m_buffer_fb[BUFFER_FB_READ]);
+    glActiveTexture(TEXTURE_UNIT_DEPTH_READ);
+    glBindTexture(GL_TEXTURE_2D, m_game_depth_texture);
+
+    // (2) run the first pass (edge or not?)
+    m_distance_field_1_program.use_program();
+    m_distance_field_1_program.update_transform(m_transform_tick, m_transform_matrix.data(), m_shader_read_viewport.data(), m_shader_clock);
+
+    fillVertexBuffer(dist_triangle_strip.data(), 4);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+    constexpr GLfloat pass_step_size[] = {16.0, 8.0, 4.0, 2.0, 1.0};
+    constexpr int num_pass = sizeof(pass_step_size) / sizeof(GLfloat);
+    for(int pass = 0; pass < num_pass; pass++)
+    {
+        BufferIndex_t prev_buffer = ((pass % 2) == (num_pass % 2) ? BUFFER_INT_PASS_1 : BUFFER_INT_PASS_2);
+        BufferIndex_t draw_buffer = ((pass % 2) == (num_pass % 2) ? BUFFER_INT_PASS_2 : BUFFER_INT_PASS_1);
+
+        if(pass == 0)
+            prev_buffer = BUFFER_FB_READ;
+
+        // (3) bind the correct int pass and prev pass framebuffers
+        glActiveTexture(TEXTURE_UNIT_PREV_PASS);
+        glBindTexture(GL_TEXTURE_2D, m_buffer_texture[prev_buffer]);
+        glBindFramebuffer(GL_FRAMEBUFFER, m_buffer_fb[draw_buffer]);
+
+        // (4) run the nth pass (edge distance propagation)
+        m_distance_field_2_program.use_program();
+        m_distance_field_2_program.update_transform(m_transform_tick, m_transform_matrix.data(), m_shader_read_viewport.data(), m_shader_clock);
+        glUniform1f(m_distance_field_2_program.get_uniform_loc(0), pass_step_size[pass]);
+        // glUniform1f(m_distance_field_2_program.get_uniform_loc(0), 1.0);
+
+        fillVertexBuffer(dist_triangle_strip.data(), 4);
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    }
+
+    // (5) restore the original framebuffer and viewport
+    glBindFramebuffer(GL_FRAMEBUFFER, m_game_texture_fb);
+    glActiveTexture(TEXTURE_UNIT_IMAGE);
+
+    viewport_scaled = viewport * m_render_scale_factor;
+
+    glViewport(viewport_scaled.x, viewport_scaled.y,
+        viewport_scaled.w, viewport_scaled.h);
+}
+
+void RenderGL::coalesceLights()
+{
+    constexpr bool debug_coalesce = false;
+    const GLfloat tolerance = 0.1;
+
+    auto& lights = m_light_queue.lights;
+
+    auto lights_begin_it = lights.begin();
+    auto lights_end_it   = lights_begin_it + m_light_count;
+
+    // sort by light type
+    std::sort(lights_begin_it, lights_end_it);
+
+    if(debug_coalesce)
+        pLogDebug("Lights %d:%d", int(lights_begin_it - lights_begin_it), (lights_end_it - lights_begin_it));
+
+    // for each light type, mark non-initial lights and try to coalesce (if box lights)
+    auto type_begin_it = lights_begin_it;
+    while(type_begin_it != lights_end_it)
+    {
+        auto type_end_it = std::upper_bound(type_begin_it, lights_end_it, *type_begin_it);
+
+        if(debug_coalesce)
+            pLogDebug("Type %d:%d", int(type_begin_it - lights_begin_it), (type_end_it - lights_begin_it));
+
+        // can perform box coalescing algorithm
+        if(type_begin_it->type == GLLightType::box)
+        {
+            // comparison to sort by row, higher first, then sort by height, taller first
+            auto y_compare = [](const GLLight& a, const GLLight& b) {
+                return a.pos[1] < b.pos[1] || (a.pos[1] == b.pos[1] && a.pos[3] > b.pos[3]);
+            };
+
+            // comparison to sort by column, left first, then sort by width, wider first
+            auto x_compare = [](const GLLight& a, const GLLight& b) {
+                return a.pos[0] < b.pos[0] || (a.pos[0] == b.pos[0] && a.pos[2] > b.pos[2]);
+            };
+
+            // coalesce horizontally, then vertically
+            std::sort(type_begin_it, type_end_it, y_compare);
+
+            // treat each row separately
+            auto row_begin_it = type_begin_it;
+            while(row_begin_it != type_end_it)
+            {
+                auto row_end_it = std::upper_bound(row_begin_it, type_end_it, *row_begin_it, y_compare);
+
+                if(debug_coalesce)
+                    pLogDebug("Row %d:%d", int(row_begin_it - lights_begin_it), (row_end_it - lights_begin_it));
+
+                // sort row horizontally
+                std::sort(row_begin_it, row_end_it, x_compare);
+
+                // for each item in row, try to coalesce
+                auto item_it = row_begin_it;
+                while(item_it != row_end_it)
+                {
+                    auto orig_left = item_it->pos[0];
+
+                    // bounds on left x of possible continuation
+                    auto lower_bound = item_it->pos[2] - tolerance;
+                    auto upper_bound = item_it->pos[2] + tolerance;
+
+                    // use current item to temporarily store lower bound on left x
+                    item_it->pos[0] = lower_bound;
+                    auto continuation_it = std::lower_bound(item_it + 1, row_end_it, *item_it, x_compare);
+                    item_it->pos[0] = orig_left;
+
+                    // can coalesce!
+                    if(continuation_it != row_end_it && continuation_it->pos[0] < upper_bound)
+                    {
+                        if(debug_coalesce)
+                            pLogDebug("Combine item %d with continuation %d", int(item_it - lights_begin_it), int(continuation_it - lights_begin_it));
+
+                        // set current item's right bound to continuation's right bound
+                        item_it->pos[2] = continuation_it->pos[2];
+
+                        // get rid of the continuation
+                        std::rotate(continuation_it, continuation_it + 1, lights_end_it);
+
+                        // update end iterators
+                        --row_end_it;
+                        --type_end_it;
+                        --lights_end_it;
+                    }
+                    // try next item
+                    else
+                    {
+                        ++item_it;
+                    }
+                }
+
+                row_begin_it = row_end_it;
+            }
+
+            // now coalesce vertically
+            std::sort(type_begin_it, type_end_it, x_compare);
+
+            // treat each column separately
+            auto col_begin_it = type_begin_it;
+            while(col_begin_it != type_end_it)
+            {
+                auto col_end_it = std::upper_bound(col_begin_it, type_end_it, *col_begin_it, x_compare);
+
+                if(debug_coalesce)
+                    pLogDebug("Col %d:%d", int(col_begin_it - lights_begin_it), (col_end_it - lights_begin_it));
+
+                // sort col vertically
+                std::sort(col_begin_it, col_end_it, y_compare);
+
+                // for each item in col, try to coalesce
+                auto item_it = col_begin_it;
+                while(item_it != col_end_it)
+                {
+                    auto orig_top = item_it->pos[1];
+
+                    // bounds on top y of possible continuation
+                    auto lower_bound = item_it->pos[3] - tolerance;
+                    auto upper_bound = item_it->pos[3] + tolerance;
+
+                    // use current item to temporarily store lower bound on top y
+                    item_it->pos[1] = lower_bound;
+                    auto continuation_it = std::lower_bound(item_it + 1, col_end_it, *item_it, y_compare);
+                    item_it->pos[1] = orig_top;
+
+                    // can coalesce!
+                    if(continuation_it != col_end_it && continuation_it->pos[1] < upper_bound)
+                    {
+                        if(debug_coalesce)
+                            pLogDebug("Combine item %d with continuation %d", int(item_it - lights_begin_it), int(continuation_it - lights_begin_it));
+
+                        // set current item's bottom bound to continuation's bottom bound
+                        item_it->pos[3] = continuation_it->pos[3];
+
+                        // get rid of the continuation
+                        std::rotate(continuation_it, continuation_it + 1, lights_end_it);
+
+                        // update end iterators
+                        --col_end_it;
+                        --type_end_it;
+                        --lights_end_it;
+                    }
+                    // try next item
+                    else
+                    {
+                        ++item_it;
+                    }
+                }
+
+                col_begin_it = col_end_it;
+            }
+        }
+
+        // now mark all duplicates
+        for(auto mark_it = type_begin_it + 1; mark_it < type_end_it; ++mark_it)
+            mark_it->type = GLLightType::duplicate;
+
+        type_begin_it = type_end_it;
+    }
+
+    if(debug_coalesce)
+        pLogDebug("Coalesced %d lights to %d", m_light_count, int(lights_end_it - lights_begin_it));
+
+    m_light_count = lights_end_it - lights_begin_it;
+}
+
 void RenderGL::calculateLighting()
 {
 #if defined(RENDERGL_HAS_FBO) && defined(RENDERGL_HAS_SHADERS)
 
-    if(!m_lighting_program.inited() || !m_light_ubo)
-        return;
+    if(!m_lighting_calc_program.inited() || !m_light_ubo || !m_light_queue.header)
+    {
+        glActiveTexture(TEXTURE_UNIT_LIGHT_READ);
+        glBindTexture(GL_TEXTURE_2D, m_null_light_texture);
+        glActiveTexture(TEXTURE_UNIT_IMAGE);
 
+        m_light_count = 0;
+
+        return;
+    }
+
+    // (0) calculate the distance field (currently unused after benchmarking showed minimal improvements in intensive shadowing situations and large slowdowns normally)
+    // calculateDistanceField();
 
     // (1) flush the lights
-    m_light_queue.lights[m_light_count].type = LightType::none;
+    coalesceLights();
 
-    glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(Light) * m_light_count + 4, &m_light_queue);
+    int lights_to_flush = m_light_count;
+
+    if(m_light_count < (int)m_light_queue.lights.size())
+    {
+        m_light_queue.lights[m_light_count].type = GLLightType::none;
+        lights_to_flush += 1;
+    }
+    else
+        lights_to_flush = (int)m_light_queue.lights.size();
+
+    glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(GLLightSystem) + sizeof(GLLight) * lights_to_flush, &m_light_queue);
 
     m_light_count = 0;
 
@@ -554,10 +819,11 @@ void RenderGL::calculateLighting()
     // (3) bind the texture and program
     glActiveTexture(TEXTURE_UNIT_DEPTH_READ);
     glBindTexture(GL_TEXTURE_2D, m_game_depth_texture);
-    glActiveTexture(TEXTURE_UNIT_IMAGE);
+    glActiveTexture(TEXTURE_UNIT_PREV_PASS);
+    glBindTexture(GL_TEXTURE_2D, m_buffer_texture[BUFFER_INT_PASS_1]);
 
-    m_lighting_program.use_program();
-    m_lighting_program.update_transform(m_transform_tick, m_transform_matrix.data(), m_shader_read_viewport.data(), m_shader_clock);
+    m_lighting_calc_program.use_program();
+    m_lighting_calc_program.update_transform(m_transform_tick, m_transform_matrix.data(), m_shader_read_viewport.data(), m_shader_clock);
 
 
     // (4) create and execute the draw call
@@ -570,7 +836,7 @@ void RenderGL::calculateLighting()
     draw_loc -= m_viewport.xy;
 
     std::array<Vertex_t, 4> lighting_triangle_strip =
-        genTriangleStrip(draw_loc, draw_source, m_cur_depth, {255, 255, 255, 255});
+        genTriangleStrip(draw_loc, draw_source, 0x7FFF, {255, 255, 255, 255});
 
     // fill vertex buffer to GL state and execute draw call
 
@@ -586,6 +852,11 @@ void RenderGL::calculateLighting()
 
     glViewport(viewport_scaled.x, viewport_scaled.y,
         viewport_scaled.w, viewport_scaled.h);
+
+    // (6) bind lighting texture
+    glActiveTexture(TEXTURE_UNIT_LIGHT_READ);
+    glBindTexture(GL_TEXTURE_2D, m_buffer_texture[BUFFER_LIGHTING]);
+    glActiveTexture(TEXTURE_UNIT_IMAGE);
 #endif
 }
 
@@ -666,6 +937,14 @@ void RenderGL::flushDrawQueues()
         }
     }
 
+    bool do_lighting = ((active_draw_flags & GLProgramObject::read_light) && m_buffer_fb[BUFFER_LIGHTING]);
+
+    // always reset lighting buffer if lighting calculation will not run
+#ifdef RENDERGL_HAS_SHADERS
+    if(!do_lighting)
+        m_light_count = 0;
+#endif
+
     // if no translucent objects, return without needing to call glDepthMask (speedup on Emscripten)
     if(!any_translucent_draws)
         return;
@@ -682,7 +961,7 @@ void RenderGL::flushDrawQueues()
         num_pass = 2;
 
     // if shaders use lighting and lighting framebuffer successfully allocated, calculate lighting
-    if((active_draw_flags & GLProgramObject::read_light) && m_buffer_fb[BUFFER_LIGHTING])
+    if(do_lighting)
         calculateLighting();
 
     // if any shaders read the depth buffer and it is supported, copy it from the main framebuffer
@@ -692,11 +971,6 @@ void RenderGL::flushDrawQueues()
     // disable depth writing while rendering translucent textures (small speedup, needed for multipass rendering)
     if(m_use_depth_buffer)
         glDepthMask(GL_FALSE);
-
-    // reset lighting buffer
-#ifdef RENDERGL_HAS_SHADERS
-    m_light_count = 0;
-#endif
 
     for(int pass = 1; pass <= num_pass; pass++)
     {

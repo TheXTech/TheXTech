@@ -2,7 +2,7 @@
  * TheXTech - A platform game engine ported from old source code for VB6
  *
  * Copyright (c) 2009-2011 Andrew Spinks, original VB6 code
- * Copyright (c) 2020-2023 Vitaly Novichkov <admin@wohlnet.ru>
+ * Copyright (c) 2020-2024 Vitaly Novichkov <admin@wohlnet.ru>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -203,6 +203,17 @@ E_INLINE bool isMaximized() TAIL
 #ifndef WINDOW_CUSTOM
 {
     return g_window->isMaximized();
+}
+#endif
+
+/*!
+ * \brief Set the title of the window
+ * \param title Title to set, as C string
+ */
+E_INLINE void setTitle(const char* title) TAIL
+#ifndef WINDOW_CUSTOM
+{
+    return g_window->setTitle(title);
 }
 #endif
 

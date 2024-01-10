@@ -2,7 +2,7 @@
  * TheXTech - A platform game engine ported from old source code for VB6
  *
  * Copyright (c) 2009-2011 Andrew Spinks, original VB6 code
- * Copyright (c) 2020-2023 Vitaly Novichkov <admin@wohlnet.ru>
+ * Copyright (c) 2020-2024 Vitaly Novichkov <admin@wohlnet.ru>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -151,10 +151,16 @@ int vScreenIdxByPlayer(int player)
 
     Screen_t& screen = ScreenByPlayer(player);
 
-    bool is_splitscreen = (screen.Type == 1 || screen.Type == 4 || (screen.Type == 5 && screen.vScreen(2).Visible) || screen.Type == 6);
+    bool is_splitscreen = (screen.Type == 1 || screen.Type == 4 || (screen.Type == 5 && screen.vScreen(2).Visible) || screen.Type == 6 || screen.Type == ScreenTypes::Quad);
 
-    if(is_splitscreen && player == screen.players[1])
-        return screen.vScreen_refs[1];
+    if(is_splitscreen)
+    {
+        for(int i = 0; i < screen.player_count; i++)
+        {
+            if(player == screen.players[i])
+                return screen.vScreen_refs[i];
+        }
+    }
 
     return screen.vScreen_refs[0];
 }

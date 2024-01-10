@@ -28,7 +28,7 @@
             "deletion": {
                 "cancel": "否：不刪除事件",
                 "confirm": "是：刪除事件",
-                "deletingEvent": "刪除事件{0}"
+                "deletingEvent": "刪除{0}事件"
             },
             "desc": {
                 "activate": "NPC在當前畫面出現時",
@@ -72,7 +72,7 @@
             "promptEventName": "事件名稱：",
             "promptEventText": "文字信息：",
             "props": {
-                "autostart": "進入關卡時啓動",
+                "autostart": "進入關卡時執行事件",
                 "controls": "按鍵",
                 "endGame": "遊戲通關",
                 "sound": "音效",
@@ -143,7 +143,7 @@
                 "cancel": "取消：返回上一級菜單",
                 "confirmDelete": "否：*刪除全部對象*",
                 "confirmPreserve": "是：移動到默認圖層",
-                "header": "刪除圖層{0}",
+                "header": "刪除{0}圖層",
                 "preserveLayerContents": "是否保留圖層對象？"
             },
             "desc": {
@@ -153,7 +153,7 @@
             "itemNewLayer": "<新圖層>",
             "label": "圖層：",
             "labelAttached": "跟隨：",
-            "labelAttachedLayer": "跟隨圖層",
+            "labelAttachedLayer": "跟隨圖層：",
             "labelMoveLayer": "移動圖層：",
             "promptLayerName": "圖層名稱"
         },
@@ -197,7 +197,7 @@
             "inertNice": "友好",
             "props": {
                 "active": "啓動",
-                "attachSurface": "跟隨",
+                "attachSurface": "位置",
                 "facing": "方向"
             },
             "stuckStop": "靜止",
@@ -208,7 +208,7 @@
         "phraseCountMore": "更多{0}",
         "phraseDelayIsMs": "延遲：{0}毫秒",
         "phraseGenericIndex": "編號：{0}",
-        "phraseRadiusIndex": "半徑{0}",
+        "phraseRadiusIndex": "半徑：{0}",
         "phraseSectionIndex": "場景{0}",
         "phraseTextOf": "{0}的文字信息",
         "phraseWarpIndex": "傳送點{0}號",
@@ -343,15 +343,16 @@
             "reconnectTitle": "重新連接",
             "splitPressSelect_1": "按選擇鍵",
             "splitPressSelect_2": "進入按鍵配置",
-            "wordDisconnect": "斷開"
+            "wordDisconnect": "斷開",
+            "phraseTestProfile": "測試配置"
         },
         "controls": {
             "phrasePlayerConnected": "玩家{0}已連接{1}， 配置： {2}",
             "phrasePlayerDisconnected": "玩家{0}未連接任何設備"
         },
         "error": {
-            "errorInvalidEnterWarp": "========= 發生錯誤! =========\n\n作爲關卡起點的傳送點{1}號不存在，因此無法啓動關卡。\n傳送點總數：{2}\n\n檔案：{0}",
-            "errorNoStartPoint": "========= 發生錯誤! =========\n\n未放置玩家起點或傳送點入口，因此無法啓動關卡。\n\n檔案：{0}",
+            "errorInvalidEnterWarp": "========= 發生錯誤! =========\n\n作爲關卡起點的傳送點{1}號不存在，因此無法進入關卡。\n傳送點總數：{2}\n\n檔案：{0}",
+            "errorNoStartPoint": "========= 發生錯誤! =========\n\n未放置玩家起點或傳送點入口，因此無法進入關卡。\n\n檔案：{0}",
             "openFileFailed": "錯誤：無法打開檔案\"{0}\"：檔案不存在或已損壞。",
             "warpNeedStarCount": "你需要{0}{2}{1}才能進入此傳送點。"
         },
@@ -372,7 +373,7 @@
     "menu": {
         "abbrevMilliseconds": "毫秒",
         "battle": {
-            "errorNoLevels": "對戰關卡列表爲空，無法啓動對戰模式。"
+            "errorNoLevels": "對戰關卡列表爲空，無法進入對戰模式。"
         },
         "caseNone": "<無>",
         "character": {
@@ -534,15 +535,15 @@
                     "buttonPlus": "+",
                     "caseIR": "（IR）",
                     "dPad": "十字鍵",
-                    "shake": "震動"
+                    "shake": "搖晃"
                 }
             },
             "wordButtons": "按鍵",
             "wordProfiles": "配置"
         },
         "editor": {
-            "errorMissingResources": "抱歉，需要{0}，即編輯器圖示檔案，才能啓動編輯器。",
-            "errorResolution": "抱歉，在當前設置的分辨率下，無法啓動編輯器。",
+            "errorMissingResources": "抱歉，需要檔案：{0}，才能進入編輯器。",
+            "errorResolution": "抱歉，在當前設置的分辨率下，無法進入編輯器。",
             "newWorld": "<新地圖>",
             "promptNewWorldName": "新地圖名稱"
         },
@@ -581,8 +582,9 @@
                 "linear": "雙綫性",
                 "nearest": "最近鄰居"
             },
-            "render": "圖形渲染方式: {0}",
-            "renderX": "圖形渲染方式: {0} (X)"
+            "render": "圖形渲染類型: {0}",
+            "renderX": "圖形渲染類型: {0} (X)",
+            "renderAuto": "圖形渲染類型：自動選擇 ({0})"
         },
         "wordBack": "返回",
         "wordHide": "隱藏",

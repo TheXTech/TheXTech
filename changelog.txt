@@ -6,6 +6,11 @@ Changelog for 1.3.7-dev
 -Add tracking for medals collected in levels (@ds-sloth)
 -Save the number of medals / stars that exist in levels to speed up subsequent loads (@ds-sloth)
 -Fix thrower vertical position logic in split-screen, guarded by compat flag modern-npc-camera-logic (@ds-sloth)
+-Internal change: added draw plane system to track different object groups' scene depth (@ds-sloth)
+-Add cheat "4shared" to test HIGHLY EXPERIMENTAL 4-player shared screen mode (@ds-sloth)
+
+Changelog for 1.3.6.4-dev
+-Use OpenGL as the default renderer on supported platforms ("sdl" may be used in config.ini or at at the command line to request the SDL2 renderer)
 
 Changelog for 1.3.6.3-dev
 -Fixed a TheXTech 1.3.6.1 crash where object lookup table could not process items with negative size (@ds-sloth)
@@ -14,6 +19,8 @@ Changelog for 1.3.6.3-dev
 -Fix rare TheXTech 1.3.6 bug where newly-added player could get stuck in immune state if other player died (@ds-sloth)
 -Display current version (and git revision if a dev build) on title screen (@ds-sloth)
 -Wii U port: add WUHB build (@ds-sloth)
+-Fix TheXTech 1.3.6.1 bug where the score display would not show '9's when using legacy assets (@ds-sloth)
+-Use the ANGLE shader translator library to improve support for OpenGL ES 3.0 shaders on desktop platforms (@ds-sloth)
 
 Changelog for 1.3.6.2
 -Fixed a crash on attempt to add a game directory after storage permission grant on Android (@Wohlstand)

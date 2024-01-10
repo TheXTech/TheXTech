@@ -2,7 +2,7 @@
  * TheXTech - A platform game engine ported from old source code for VB6
  *
  * Copyright (c) 2009-2011 Andrew Spinks, original VB6 code
- * Copyright (c) 2020-2023 Vitaly Novichkov <admin@wohlnet.ru>
+ * Copyright (c) 2020-2024 Vitaly Novichkov <admin@wohlnet.ru>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,6 +22,7 @@
 #ifndef ABTRACTRENDER_T_H
 #define ABTRACTRENDER_T_H
 
+#include <cstdint>
 #include <string>
 
 #include "std_picture.h"
@@ -175,6 +176,13 @@ public:
      */
     virtual void setTargetScreen() = 0;
 
+    /*!
+     * \brief Sets draw plane for subsequent draws.
+     *
+     * \param plane Which draw plane should be used.
+     */
+    virtual void setDrawPlane(uint8_t plane) = 0;
+
 
 
 
@@ -247,8 +255,11 @@ public:
                                double worldX,
                                double worldY,
                                ParticleVertexAttrs_t attrs);
-
-
+#ifdef THEXTECH_BUILD_GL_MODERN
+    virtual void addLight(const GLLight &light);
+    virtual void setupLighting(const GLLightSystem &system);
+    virtual void renderLighting();
+#endif
 
     // Draw primitives
 

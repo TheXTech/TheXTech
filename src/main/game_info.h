@@ -2,7 +2,7 @@
  * TheXTech - A platform game engine ported from old source code for VB6
  *
  * Copyright (c) 2009-2011 Andrew Spinks, original VB6 code
- * Copyright (c) 2020-2023 Vitaly Novichkov <admin@wohlnet.ru>
+ * Copyright (c) 2020-2024 Vitaly Novichkov <admin@wohlnet.ru>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,8 +30,7 @@
 struct GameInfo
 {
     std::string title;
-    std::string titleWindow;
-    std::string titleCredits;
+    // std::string titleCredits;
     RangeArr<std::string, 1, numCharacters> characterName;
 
     std::string statusIconName;
@@ -81,6 +80,8 @@ struct GameInfo
 
     int outroCharacterNext();
     size_t outroCharacterCurrent = 0;
+
+    const std::string titleWindow() const;
 };
 
 extern GameInfo g_gameInfo;

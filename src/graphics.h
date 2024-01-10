@@ -2,7 +2,7 @@
  * TheXTech - A platform game engine ported from old source code for VB6
  *
  * Copyright (c) 2009-2011 Andrew Spinks, original VB6 code
- * Copyright (c) 2020-2023 Vitaly Novichkov <admin@wohlnet.ru>
+ * Copyright (c) 2020-2024 Vitaly Novichkov <admin@wohlnet.ru>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -53,6 +53,9 @@ void GetvScreenAverage(vScreen_t& vscreen);
 // Public Sub GetvScreenAverage2() ' Get the average screen position for all players with no level edge detection
 //  Get the average screen position for all players with no level edge detection
 void GetvScreenAverage2(vScreen_t& vscreen);
+//  EXTRA: Get the average screen position for all players in shared screen mode.
+//   The main difference is that it uses the average of the further players to each side, instead of the true average
+void GetvScreenAverage3(vScreen_t& vscreen);
 
 // NEW: update a vScreen with the correct procedure based on its screen's Type and DType
 void GetvScreenAuto(vScreen_t& vscreen);
@@ -197,8 +200,8 @@ int pfrOffY(const StdPicture& tx, const Player_t& p);
  */
 void GameThing(int waitms = 0, int fadeSpeed = 0);
 // Public Sub DrawPlayer(A As Integer, Z As Integer)
-void DrawPlayer(const int A, const int Z);
-void DrawPlayer(Player_t &p, const int Z);
+void DrawPlayer(const int A, const int Z, XTColor color = XTColor());
+void DrawPlayer(Player_t &p, const int Z, XTColor color = XTColor());
 // Public Sub ScreenShot()
 void ScreenShot();
 // Public Sub DrawFrozenNPC(Z As Integer, A As Integer)

@@ -2,7 +2,7 @@
  * TheXTech - A platform game engine ported from old source code for VB6
  *
  * Copyright (c) 2009-2011 Andrew Spinks, original VB6 code
- * Copyright (c) 2020-2023 Vitaly Novichkov <admin@wohlnet.ru>
+ * Copyright (c) 2020-2024 Vitaly Novichkov <admin@wohlnet.ru>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,6 +23,7 @@
 #define XT_COLOR_H
 
 #include <cstdint>
+#include <string>
 
 /*!
  * \brief RGBA pixel color
@@ -54,6 +55,17 @@ struct alignas(uint32_t) XTColor
     inline constexpr XTColor operator*(XTColor o) const
     {
         return XTColor(mul(r, o.r), mul(g, o.g), mul(b, o.b), mul(a, o.a));
+    }
+
+    // intensity scale
+    inline constexpr XTColor operator*(float o) const
+    {
+        return XTColor(uint8_t(r * o), uint8_t(g * o), uint8_t(b * o), a);
+    }
+
+    inline constexpr XTColor operator*(uint8_t o) const
+    {
+        return XTColor(mul(r, o), mul(g, o), mul(b, o), a);
     }
 
     // (in)equality operators
@@ -96,5 +108,14 @@ static inline constexpr XTColor XTAlphaF(float a)
 {
     return XTColor().with_alpha(XTColor::from_float(a));
 }
+
+/**
+ * \brief converts a color string into an XTColor instance
+ *
+ * \param s string reference
+ *
+ * Currently supports hex strings only. Defined in globals.cpp.
+ **/
+XTColor XTColorString(const std::string& s);
 
 #endif

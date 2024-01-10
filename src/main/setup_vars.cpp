@@ -2,7 +2,7 @@
  * TheXTech - A platform game engine ported from old source code for VB6
  *
  * Copyright (c) 2009-2011 Andrew Spinks, original VB6 code
- * Copyright (c) 2020-2023 Vitaly Novichkov <admin@wohlnet.ru>
+ * Copyright (c) 2020-2024 Vitaly Novichkov <admin@wohlnet.ru>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -298,6 +298,51 @@ void SetupVars()
     EffectHeight[47] = 44;
     EffectWidth[47] = 44;
 
+    // NEW: reset all variables to their original values (it will be nice to convert all NPC traits to a single struct)
+    NPCFrameOffsetX.fill(0);
+    NPCFrameOffsetY.fill(0);
+    NPCWidth.fill(0);
+    NPCHeight.fill(0);
+    NPCWidthGFX.fill(0);
+    NPCHeightGFX.fill(0);
+    NPCSpeedvar.fill(1.f);
+
+    NPCIsAShell.fill(false);
+    NPCIsABlock.fill(false);
+    NPCIsAHit1Block.fill(false);
+    NPCIsABonus.fill(false);
+    NPCIsACoin.fill(false);
+    NPCIsAVine.fill(false);
+    NPCIsAnExit.fill(false);
+    NPCIsAParaTroopa.fill(false);
+    NPCIsCheep.fill(false);
+    NPCJumpHurt.fill(false);
+    NPCNoClipping.fill(false);
+    NPCScore.fill(0);
+    NPCCanWalkOn.fill(false);
+    NPCGrabFromTop.fill(false);
+    NPCTurnsAtCliffs.fill(false);
+    NPCWontHurt.fill(false);
+    NPCMovesPlayer.fill(false);
+    NPCStandsOnPlayer.fill(false);
+    NPCIsGrabbable.fill(false);
+    NPCIsBoot.fill(false);
+    NPCIsYoshi.fill(false);
+    NPCIsToad.fill(false);
+    NPCNoYoshi.fill(false);
+    NPCForeground.fill(false);
+    NPCIsABot.fill(false);
+    NPCDefaultMovement.fill(false);
+    NPCIsVeggie.fill(false);
+    NPCNoFireBall.fill(false);
+    NPCNoIceBall.fill(false);
+    NPCNoGravity.fill(false);
+
+    NPCFrame.fill(0);
+    NPCFrameSpeed.fill(0);
+    NPCFrameStyle.fill(0);
+
+    // SMBX64 logic:
     for(int A = 1; A <= maxNPCType; ++A)
     {
         NPCScore[A] = 2;

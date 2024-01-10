@@ -2,7 +2,7 @@
  * TheXTech - A platform game engine ported from old source code for VB6
  *
  * Copyright (c) 2009-2011 Andrew Spinks, original VB6 code
- * Copyright (c) 2020-2023 Vitaly Novichkov <admin@wohlnet.ru>
+ * Copyright (c) 2020-2024 Vitaly Novichkov <admin@wohlnet.ru>
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the "Software"),
@@ -56,6 +56,7 @@ void getWindowSize(int *w, int *h)
 bool hasWindowInputFocus() { return true; }
 bool hasWindowMouseFocus() { return true; }
 bool isMaximized() { return false; }
+void setTitle(const char*) {}
 
 
 } // namespace XWindow

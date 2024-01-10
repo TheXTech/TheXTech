@@ -1,0 +1,96 @@
+// service worker with a cache-first model, with atomic updates based on service worker version
+// based closely on the designs from https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API/Using_Service_Workers
+
+// configuration
+const app_id = "${THEXTECH_MANIFEST_ID_OUT}"
+const current_version = "${THEXTECH_MANIFEST_ID_OUT}-${GIT_COMMIT_HASH}";
+const scope = "${THEXTECH_DEPLOY_URL}";
+const executable_name = "${THEXTECH_EXECUTABLE_NAME}";
+
+
+// code for installation
+const cache_resources = async (resources) => {
+  const cache = await caches.open(current_version);
+  console.info("TheXTech service worker update to " + current_version + " initialized: starting download. (" + new Date() + ")");
+  await cache.addAll(resources);
+  console.info("TheXTech service worker update to " + current_version + ": download complete. (" + new Date() + ")");
+};
+
+// make sure that all resources have been downloaded / cached upon installation of new SW version
+self.addEventListener("install", (event) => {
+  event.waitUntil(
+    cache_resources([
+      scope,
+      scope + "favicon.ico",
+      scope + "index.html",
+      scope + executable_name + ".js",
+      scope + executable_name + ".wasm",
+      scope + executable_name + ".data",
+    ]),
+  );
+});
+
+
+// code for activation
+
+// clear previously cached versions of the game on update
+const clear_cache = async (key) => {
+  await caches.delete(key);
+};
+
+const clear_other_caches = async () => {
+  const keyList = await caches.keys();
+  const cachesToDelete = keyList.filter((key) => (key.startsWith(app_id) && key != current_version));
+  await Promise.all(cachesToDelete.map(clear_cache));
+  console.info("TheXTech service worker update to " + current_version + ": update activated. (" + new Date() + ")");
+  console.info("Deleted old caches: " + cachesToDelete);
+};
+
+// delete all other caches upon activation (do NOT claim clients; wait for the old service worker to die naturally)
+self.addEventListener("activate", (event) => {
+  event.waitUntil(clear_other_caches());
+});
+
+
+// code for fetches
+const cache_response = async (request, response) => {
+  const cache = await caches.open(current_version);
+  await cache.put(request, response);
+};
+
+// cache-first strategy based on MDN's tutorial
+const cache_first = async (request) => {
+  // First try to get the resource from the cache
+  const cache = await caches.open(current_version);
+  const responseFromCache = await cache.match(request);
+  if (responseFromCache) {
+    console.info("Cache hit!");
+    return responseFromCache;
+  }
+
+  // Next try to get the resource from the network
+  try {
+    const responseFromNetwork = await fetch(request);
+    // response may be used only once
+    // we need to save clone to put one copy in cache
+    // and serve second one
+    cache_response(request, responseFromNetwork.clone());
+    console.info("Cache miss, got!");
+    return responseFromNetwork;
+  } catch (error) {
+    console.info("Cache miss, failed!");
+
+    // there is nothing we can do, but we must always
+    // return a Response object
+    return new Response("Resource not available: " + error, {
+      status: 408,
+      headers: { "Content-Type": "text/plain" },
+    });
+  }
+};
+
+// fetch handler, use cache first
+self.addEventListener("fetch", function (event) {
+  console.info("TheXTech service worker. Fetch: " + event.request.url + " with mode:" + event.request.mode);
+  event.respondWith(cache_first(event.request));
+});

@@ -1,6 +1,6 @@
 /*
  * Moondust, a free game engine for platform game making
- * Copyright (c) 2014-2023 Vitaly Novichkov <admin@wohlnet.ru>
+ * Copyright (c) 2014-2024 Vitaly Novichkov <admin@wohlnet.ru>
  *
  * This software is licensed under a dual license system (MIT or GPL version 3 or later).
  * This means you are free to choose with which of both licenses (MIT or GPL version 3 or later)
@@ -28,9 +28,6 @@
 #   include <Utils/files.h>
 #endif
 
-#include <IniProcessor/ini_processing.h>
-#include <AppPath/app_path.h>
-
 #include <fmt_format_ne.h>
 #include <fmt/fmt_printf.h>
 
@@ -40,6 +37,8 @@
 #ifndef MOONDUST_LOGGER_FILENAME_PREFIX
 #   error Please define the "-DMOONDUST_LOGGER_FILENAME_PREFIX=<name-of-application>" to specify the log filename prefix
 #endif
+
+PGE_LogSetup    g_pLogGlobalSetup;
 
 std::string     LogWriter::m_logDirPath;
 std::string     LogWriter::m_logFilePath;
@@ -117,20 +116,20 @@ static void cleanUpLogs(const std::string &logsPath, int maxLogs)
     for(auto &s : files)
         Files::deleteFile(logsPath + "/" + s);
 }
-#endif
+#endif // !NO_FILE_LOGGING
 
 
 void LoadLogSettings(bool disableStdOut, bool verboseLogs)
 {
-#   if defined(DEBUG_BUILD)
+#if defined(DEBUG_BUILD) || defined(__WIIU__)
     (void)verboseLogs; // unused
-    LogWriter::m_enabledVerboseLogs = true; // Enforce verbose log for debug builds
-#   else
+    LogWriter::m_enabledVerboseLogs = true; // Enforce verbose log for debug builds or on some platforms like WiiU
+#else
     LogWriter::m_enabledVerboseLogs = verboseLogs;
 #endif
 
     LogWriter::m_enabledStdOut = !disableStdOut;
-    LogWriter::m_logLevel = PGE_LogLevel::Debug;
+    LogWriter::m_logLevel = g_pLogGlobalSetup.level;
 
 #if !defined(NO_FILE_LOGGING)
     std::string logFileName = fmt::format_ne(MOONDUST_LOGGER_FILENAME_PREFIX "_log_{0}.txt", return_current_time_and_date());
@@ -138,57 +137,34 @@ void LoadLogSettings(bool disableStdOut, bool verboseLogs)
 
     LogWriter::m_appStartTicks = SDL_GetTicks64();
 
-    std::string mainIniFile = AppPathManager::settingsFileSTD();
-    IniProcessing logSettings(mainIniFile);
-
 #if !defined(NO_FILE_LOGGING)
-    std::string logPath = AppPathManager::logsDir();
+    const std::string logPath = g_pLogGlobalSetup.logPathDefault;
     DirMan defLogDir(logPath);
 
     if(!defLogDir.exists())
     {
         if(!defLogDir.mkpath())
-            defLogDir.setPath(AppPathManager::userAppDirSTD());
+            defLogDir.setPath(g_pLogGlobalSetup.logPathFallBack);
     }
-#endif
+#endif // !NO_FILE_LOGGING
 
-    logSettings.beginGroup("logging");
-    {
 #if !defined(NO_FILE_LOGGING)
-        logSettings.read("log-path", LogWriter::m_logDirPath, defLogDir.absolutePath());
-        logSettings.read("max-log-count", LogWriter::m_maxFilesCount, 10);
+    LogWriter::m_logDirPath = g_pLogGlobalSetup.logPathCustom.empty() ? defLogDir.absolutePath() : g_pLogGlobalSetup.logPathCustom;
+    LogWriter::m_maxFilesCount = g_pLogGlobalSetup.maxFilesCount;
 
-        if(!DirMan::exists(LogWriter::m_logDirPath))
-            LogWriter::m_logDirPath = defLogDir.absolutePath();
-#endif
+    if(!DirMan::exists(LogWriter::m_logDirPath))
+        LogWriter::m_logDirPath = defLogDir.absolutePath();
+#endif // !NO_FILE_LOGGING
 
-        IniProcessing::StrEnumMap logLevelEnum =
-        {
-            {"0", PGE_LogLevel::NoLog},
-            {"1", PGE_LogLevel::Fatal},
-            {"2", PGE_LogLevel::Info},
-            {"3", PGE_LogLevel::Critical},
-            {"4", PGE_LogLevel::Warning},
-            {"5", PGE_LogLevel::Debug},
-            {"disabled", PGE_LogLevel::NoLog},
-            {"fatal",    PGE_LogLevel::Fatal},
-            {"info",     PGE_LogLevel::Info},
-            {"critical", PGE_LogLevel::Critical},
-            {"warning",  PGE_LogLevel::Warning},
-            {"debug",    PGE_LogLevel::Debug}
-        };
-
-        logSettings.readEnum("log-level", LogWriter::m_logLevel, PGE_LogLevel::Debug, logLevelEnum);
-        LogWriter::m_enabled   = (LogWriter::m_logLevel != PGE_LogLevel::NoLog);
-    }
-    logSettings.endGroup();
+    LogWriter::m_logLevel = g_pLogGlobalSetup.level;
+    LogWriter::m_enabled   = (LogWriter::m_logLevel != PGE_LogLevel::NoLog);
 
 #if !defined(NO_FILE_LOGGING)
     LogWriter::m_logFilePath = LogWriter::m_logDirPath + "/" + logFileName;
     cleanUpLogs(LogWriter::m_logDirPath, LogWriter::m_maxFilesCount);
 #else
     LogWriter::m_logFilePath.clear();
-#endif
+#endif // !NO_FILE_LOGGING
 
     LogWriter::OpenLogFile();
 }
