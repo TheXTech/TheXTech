@@ -356,6 +356,9 @@
             "openFileFailed": "错误：无法打开文件\"{0}\"：文件不存在或已损坏。",
             "warpNeedStarCount": "你需要{0}{2}{1}才能进入此传送点。"
         },
+        "format": {
+            "minutesSeconds": "{0}分{1}秒"
+        },
         "pause": {
             "continue": "继续游戏",
             "dropAddPlayers": "加入/离开游戏",

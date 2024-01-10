@@ -46,6 +46,9 @@ void initGameStrings()
                                       "\n"
                                       "File: {0}";
 
+    g_gameStrings.messageScanningLevels = "Scanning levels...";
+    g_gameStrings.formatMinutesSeconds = "{0}m{1}s";
+
     g_gameStrings.warpNeedStarCount = "You need {0} {1} to enter.";
 
     g_gameStrings.pauseItemContinue = "Continue";
