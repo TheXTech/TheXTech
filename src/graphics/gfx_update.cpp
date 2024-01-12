@@ -441,27 +441,10 @@ void GraphicsLazyPreLoad()
 {
     // TODO: check if this is needed at caller
     SetupScreens();
-
-    int numScreens = 1;
-
-    if(ScreenType == 1)
-        numScreens = 2;
-
-    if(ScreenType == 4)
-        numScreens = 2;
-
     if(ScreenType == 5)
-    {
         DynamicScreen(Screens[0]);
-        if(vScreen[2].Visible)
-            numScreens = 2;
-        else
-            numScreens = 1;
-    }
 
-    if(ScreenType == 8)
-        numScreens = 1;
-
+    int numScreens = Screens[0].active_end();
 
     if(SingleCoop == 2)
         numScreens = 1; // fine to be 1, since it would just be run for Z = 2 twice otherwise;
@@ -843,7 +826,7 @@ void UpdateGraphics(bool skipRepaint)
 
     g_stats.reset();
 
-    bool continue_qScreen = false;
+    bool continue_qScreen = false; // will qScreen continue for any visible screen?
 
     // prepare to fill this frame's NoReset queue
     std::swap(NPCQueues::NoReset, s_NoReset_NPCs_LastFrame);
@@ -866,18 +849,7 @@ void UpdateGraphics(bool skipRepaint)
 
         // update vScreen location
         if(!LevelEditor)
-        {
-            if(ScreenType == 2)
-                GetvScreenAverage(vScreen[1]);
-            else if(ScreenType == 3)
-                GetvScreenAverage3(vScreen[1]);
-            else if(ScreenType == 5 && !vScreen[2].Visible)
-                GetvScreenAverage(vScreen[1]);
-            else if(ScreenType == 7)
-                GetvScreenCredits(vScreen[1]);
-            else
-                GetvScreen(vScreen[Z]);
-        }
+            GetvScreenAuto(vScreen[Z]);
 
         // moved to `graphics/gfx_screen.cpp`
         // NOTE: this logic was previously only performed on non-frameskips
@@ -1011,10 +983,13 @@ void UpdateGraphics(bool skipRepaint)
         }
 
         // moved from render code because it affects the game's random state
+        // TODO: have a separate shakeScreen state per screen
         s_shakeScreen.update();
     }
 
-    // NOTE: frames were only updated on non-frameskip in vanilla
+    // TODO: end loop over screens
+
+    // Background frames (NOTE: frames were only updated on non-frameskip in vanilla)
     if(!FreezeNPCs)
     {
         LevelFramesNotFrozen();
@@ -1177,7 +1152,7 @@ void UpdateGraphics(bool skipRepaint)
         {
 //            If numPlayers > 2 And nPlay.Online = False Then
 
-            // moved strange many-player handling code to logic section above
+            // moved many-player (superbdemo128) handling code to logic section above
 
 //        End If
         }
@@ -2003,9 +1978,11 @@ void UpdateGraphics(bool skipRepaint)
         for(size_t i = 0; i < NPC_Draw_Queue_p.Chat_n; i++)
         {
             A = NPC_Draw_Queue_p.Chat[i];
+
             B = NPCHeightGFX[NPC[A].Type] - NPC[A].Location.Height;
             if(B < 0)
                 B = 0;
+
             XRender::renderTexture(vScreen[Z].X + NPC[A].Location.X + NPC[A].Location.Width / 2.0 - GFX.Chat.w / 2, vScreen[Z].Y + NPC[A].Location.Y - 30 - B, GFX.Chat.w, GFX.Chat.h, GFX.Chat, 0, 0);
         }
 
