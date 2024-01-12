@@ -800,21 +800,19 @@ void UpdateGraphics(bool skipRepaint)
     if(!GameIsActive)
         return;
 
+    // check that we can render, and that we should not frameskip
+    bool Do_FrameSkip = false;
+
 #ifdef USE_RENDER_BLOCKING
-    // might want to put this after the logic part of UpdateGraphics,
-    // once we have merged the multires code that separates logic from
-    // rendering
     if(XRender::renderBlocked())
-        return;
+        Do_FrameSkip = true;
 #endif
 
     // frame skip code
     cycleNextInc();
 
-    bool Do_FrameSkip = FrameSkip && !TakeScreen;
-
-    if(Do_FrameSkip)
-        Do_FrameSkip = frameSkipNeeded();
+    if(FrameSkip && !TakeScreen && frameSkipNeeded())
+        Do_FrameSkip = true;
 
     // ALL graphics-based logic code has been moved here, separate from rendering.
     // (This code is a combination of the FrameSkip logic from before with the
