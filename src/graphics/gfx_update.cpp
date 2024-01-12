@@ -876,7 +876,8 @@ void UpdateGraphics(bool skipRepaint)
         }
 
         // moved to `graphics/gfx_screen.cpp`
-        if(!Do_FrameSkip && qScreen)
+        // NOTE: this logic was previously only performed on non-frameskips
+        if(qScreen)
             continue_qScreen |= Update_qScreen(Z);
 
         // the original code was badly written and made THIS happen (always exactly one frame of qScreen in 2P mode)
@@ -1009,14 +1010,25 @@ void UpdateGraphics(bool skipRepaint)
         s_shakeScreen.update();
     }
 
+    // NOTE: frames were only updated on non-frameskip in vanilla
+    if(!FreezeNPCs)
+    {
+        LevelFramesNotFrozen();
+        SpecialFrames();
+    }
+
+    LevelFramesAlways();
+
+    // NOTE: qScreen was only updated on non-frameskip in vanilla
+    qScreen = continue_qScreen;
+
+
     // we've now done all the logic that UpdateGraphics can do.
     if(Do_FrameSkip)
         return;
 
-    // only updated on non-frameskip in vanilla
-    qScreen = continue_qScreen;
 
-
+    // begin render code
     XRender::setTargetTexture();
 
     frameNextInc();
@@ -1053,15 +1065,6 @@ void UpdateGraphics(bool skipRepaint)
 //            frmMain.AutoRedraw = True
 //        End If
 //    End If
-
-    // Background frames
-    if(!FreezeNPCs)
-    {
-        LevelFramesNotFrozen();
-        SpecialFrames();
-    }
-
-    LevelFramesAlways();
 
     if(ClearBuffer)
     {
