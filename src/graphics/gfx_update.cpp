@@ -73,6 +73,8 @@ struct ScreenShake_t
 {
     double forceX = 0;
     double forceY = 0;
+    int    offsetX = 0;
+    int    offsetY = 0;
     double forceDecay = 1.0;
     int    type = SHAKE_RANDOM;
     double duration = 0;
@@ -84,8 +86,6 @@ struct ScreenShake_t
     {
         if(!active || GameMenu)
             return;
-
-        int offsetX, offsetY;
 
         if(duration <= 0)
         {
@@ -118,9 +118,18 @@ struct ScreenShake_t
                 sign *= -1;
                 break;
             }
-
-            XRender::offsetViewport(offsetX, offsetY);
         }
+    }
+
+    void apply()
+    {
+        if(!active || GameMenu)
+        {
+            XRender::offsetViewport(0, 0);
+            return;
+        }
+
+        XRender::offsetViewport(offsetX, offsetY);
     }
 
     void setup(int i_forceX, int i_forceY, int i_type, int i_duration, double i_decay)
@@ -1356,22 +1365,19 @@ void UpdateGraphics(bool skipRepaint)
     if(!GameIsActive)
         return;
 
+    // check that we can render, and that we should not frameskip
+    bool Do_FrameSkip = false;
+
 #ifdef USE_RENDER_BLOCKING
-    // might want to put this after the logic part of UpdateGraphics,
-    // once we have merged the multires code that separates logic from
-    // rendering
     if(XRender::renderBlocked())
-        return;
+        Do_FrameSkip = true;
 #endif
 
     // frame skip code
     cycleNextInc();
 
-    // Skip frame condition
-    bool Do_FrameSkip = FrameSkip && !TakeScreen;
-
-    if(Do_FrameSkip)
-        Do_FrameSkip = frameSkipNeeded();
+    if(FrameSkip && !TakeScreen && frameSkipNeeded())
+        Do_FrameSkip = true;
 
     // ALL graphics-based logic code has been moved here, separate from rendering.
     // (This code is a combination of the FrameSkip logic from before with the
@@ -1452,6 +1458,7 @@ void UpdateGraphics(bool skipRepaint)
             GetvScreenAuto(vScreen[Z]);
 
         // moved to `graphics/gfx_screen.cpp`
+        // NOTE: this logic was previously only performed on non-frameskips
         if(qScreen)
         {
             bool continue_this_qScreen = Update_qScreen(Z);
@@ -1642,9 +1649,23 @@ void UpdateGraphics(bool skipRepaint)
                     NPC_Draw_Queue_p.add(A);
             }
         }
+
+        // moved from render code because it affects the game's random state
+        // TODO: do this only for visible screens
+        s_shakeScreen.update();
     }
 
     // TODO: end loop over screens
+
+    // Background frames (NOTE: frames were only updated on non-frameskip in vanilla)
+    if(!FreezeNPCs)
+    {
+        LevelFramesNotFrozen();
+        SpecialFrames();
+    }
+
+    LevelFramesAlways();
+    ProcessIntroNPCFrames();
 
     // clear the last-frame reset state of NPCs
     if(g_compatibility.modern_npc_camera_logic)
@@ -1653,6 +1674,26 @@ void UpdateGraphics(bool skipRepaint)
             n.Reset[2] = true;
     }
 
+    // use screen-shake to indicate if invisible screen is currently causing qScreen
+    if(g_compatibility.allow_multires)
+    {
+        // TODO: do loop over visible screens here once s_shakeScreen, s_forcedShakeScreen, and continue_qScreen_local are separated by screen
+
+        // shake screen to tell player game is currently paused (will take effect next frame)
+        if(!continue_qScreen_local && (continue_qScreen || continue_qScreen_canonical) && !s_shakeScreen.active)
+        {
+            s_forcedShakeScreen = true;
+            doShakeScreen(1, 1, SHAKE_RANDOM, 0, 0.0);
+        }
+        // finish forced screenshake
+        else if(!(continue_qScreen || continue_qScreen_canonical) && s_forcedShakeScreen)
+        {
+            s_forcedShakeScreen = false;
+            doShakeScreen(1, 1, SHAKE_RANDOM, 0, 0.1);
+        }
+    }
+
+    // NOTE: qScreen was only updated on non-frameskip in vanilla
     qScreen = continue_qScreen;
     qScreen_canonical = continue_qScreen_canonical;
 
@@ -1661,6 +1702,7 @@ void UpdateGraphics(bool skipRepaint)
         return;
 
 
+    // begin render code
     XRender::setTargetTexture();
 
     frameNextInc();
@@ -1697,16 +1739,6 @@ void UpdateGraphics(bool skipRepaint)
 //            frmMain.AutoRedraw = True
 //        End If
 //    End If
-
-    // Background frames
-    if(!FreezeNPCs)
-    {
-        LevelFramesNotFrozen();
-        SpecialFrames();
-    }
-
-    LevelFramesAlways();
-    ProcessIntroNPCFrames();
 
     if(ClearBuffer)
     {
@@ -1766,6 +1798,9 @@ void UpdateGraphics(bool skipRepaint)
 
         // always needed now due to cases where vScreen is smaller than physical screen
         XRender::setViewport(vScreen[Z].ScreenLeft, vScreen[Z].ScreenTop, vScreen[Z].Width, vScreen[Z].Height);
+
+        // update viewport from screen shake
+        s_shakeScreen.apply();
 
         DrawBackground(S, Z);
 
@@ -3060,20 +3095,7 @@ void UpdateGraphics(bool skipRepaint)
 //        If LevelEditor = True Then
 //            StretchBlt frmLevelWindow.vScreen(Z).hdc, 0, 0, frmLevelWindow.vScreen(Z).ScaleWidth, frmLevelWindow.vScreen(Z).ScaleHeight, myBackBuffer, 0, 0, 800, 600, vbSrcCopy
 //        Else
-
-        // shake screen to tell player game is currently paused
-        if(g_compatibility.allow_multires && !continue_qScreen_local && (qScreen || qScreen_canonical) && !s_shakeScreen.active)
-        {
-            s_forcedShakeScreen = true;
-            doShakeScreen(1, 1, SHAKE_RANDOM, 0, 0.0);
-        }
-        else if(g_compatibility.allow_multires && !(qScreen || qScreen_canonical) && s_forcedShakeScreen)
-        {
-            s_forcedShakeScreen = false;
-            doShakeScreen(1, 1, SHAKE_RANDOM, 0, 0.1);
-        }
-
-        s_shakeScreen.update();
+        // Screen shake logic was here; moved into the logic section of the file because it affects the random state of the game
 
 //    Next Z
     } // For(Z, 2, numScreens)
