@@ -2268,26 +2268,9 @@ void UpdateGraphics(bool skipRepaint)
 
         if(!LevelEditor) // Graphics for the main game.
         {
-            if(numScreens > 1 && !SingleCoop)
-            {
-                if(int(vScreen[Z].Width) == ScreenW)
-                {
-                    if(vScreen[Z].Top != 0.0)
-                        XRender::renderRect(0, 0, vScreen[Z].Width, 1, {0, 0, 0});
-                    else
-                        XRender::renderRect(0, vScreen[Z].Height - 1, vScreen[Z].Width, 1, {0, 0, 0});
-                }
-                else
-                {
-                    if(vScreen[Z].Left != 0.0)
-                        XRender::renderRect(0, 0, 1, vScreen[Z].Height, {0, 0, 0});
-                    else
-                        XRender::renderRect(vScreen[Z].Width - 1, 0, 1, vScreen[Z].Height, {0, 0, 0});
-                }
-            }
+            // moved vScreen divider below
 
-            // player names
-            /* Dropped */
+            // Redigit NetPlay player names were also dropped
 
             lunaRender(Z);
 
@@ -2371,60 +2354,7 @@ void UpdateGraphics(bool skipRepaint)
                 }
             }
 
-            else if(!GameOutro)
-            {
-                XRender::setDrawPlane(PLANE_GAME_MENUS);
-                mainMenuDraw();
-            }
-
             XRender::setDrawPlane(PLANE_LVL_META);
-
-            if(PrintFPS > 0 && ShowFPS)
-            {
-                XRender::offsetViewportIgnore(true);
-                SuperPrint(fmt::format_ne("{0}", int(PrintFPS)), 1, 8, 8, {0, 255, 0});
-
-#if 0 // deprecated profiling info
-                for(int i = 0; i < 2; i++)
-                {
-                    int val = (i == 0 ? g_microStats.view_total : g_microStats.view_slow_frame_time);
-
-                    int x = val < 95 ? 36 : val < 995 ? 18 : 0;
-                    int y = 24 + i * 16;
-
-                    float r, g, a;
-                    if(val < 500)
-                    {
-                        r = 0.0f; g = 1.0f; a = 0.25f;
-                    }
-                    else if(val < 1000)
-                    {
-                        r = 1.0f; g = 1.0f; a = 0.5f;
-                    }
-                    else
-                    {
-                        r = 1.0f; g = 0.0f; a = 1.0f;
-                    }
-
-                    std::string display = (i == 0
-                        ? fmt::sprintf_ne("%d%%", (val + 5) / 10)
-                        : fmt::sprintf_ne("%d%% (max)", (val + 5) / 10));
-                    SuperPrint(display, 3, x, y, r, g, 0.f, a);
-                }
-#endif
-                XRender::offsetViewportIgnore(false);
-            }
-
-            g_stats.print();
-
-            if(!BattleMode && !GameMenu && !GameOutro && g_config.show_episode_title)
-            {
-                int y = (ScreenH >= 640) ? 20 : ScreenH - 60;
-                if(g_config.show_episode_title == Config_t::EPISODE_TITLE_TRANSPARENT)
-                    SuperPrintScreenCenter(WorldName, 3, y, XTAlpha(127));
-                else
-                    SuperPrintScreenCenter(WorldName, 3, y);
-            }
 
             // Always draw for single-player
             // And don't draw when many players at the same screen
@@ -2438,18 +2368,13 @@ void UpdateGraphics(bool skipRepaint)
             XRender::offsetViewportIgnore(true);
 
             // editor code now located in `gfx_editor.cpp`
+            XRender::setDrawPlane(PLANE_LVL_INFO);
             DrawEditorLevel(Z);
 
             XRender::offsetViewportIgnore(false);
         }
 
         XRender::setDrawPlane(PLANE_LVL_META);
-
-        if(GameOutro)
-        {
-            XRender::setDrawPlane(PLANE_GAME_MENUS);
-            DrawCredits();
-        }
 
 //        If LevelEditor = True Then
 //            StretchBlt frmLevelWindow.vScreen(Z).hdc, 0, 0, frmLevelWindow.vScreen(Z).ScaleWidth, frmLevelWindow.vScreen(Z).ScaleHeight, myBackBuffer, 0, 0, 800, 600, vbSrcCopy
@@ -2475,7 +2400,32 @@ void UpdateGraphics(bool skipRepaint)
     // graphics shared by all vScreens
     XRender::resetViewport();
     XRender::offsetViewportIgnore(true);
-    XRender::setViewport(0, 0, ScreenW, ScreenH);
+
+    // splitscreen dividers
+    if(numScreens > 1 && !SingleCoop)
+    {
+        XRender::setDrawPlane(PLANE_LVL_META);
+
+        bool horiz_split = (screen.Type == ScreenTypes::TopBottom) || (screen.Type == ScreenTypes::Quad);
+        horiz_split |= screen.Type == ScreenTypes::Dynamic && (screen.DType == 3 || screen.DType == 4 || screen.DType == 6);
+
+        if(horiz_split)
+            XRender::renderRect(0, (screen.H / 2) - 2, screen.W, 4, {0, 0, 0});
+
+        bool vert_split = (screen.Type == ScreenTypes::LeftRight) || (screen.Type == ScreenTypes::Quad);
+        vert_split |= screen.Type == ScreenTypes::Dynamic && (screen.DType == 1 || screen.DType == 2);
+
+        if(vert_split)
+            XRender::renderRect((screen.W / 2) - 2, 0, 4, screen.H, {0, 0, 0});
+    }
+
+    XRender::setDrawPlane(PLANE_GAME_MENUS);
+
+    if(GameMenu && !GameOutro)
+        mainMenuDraw();
+
+    if(GameOutro)
+        DrawCredits();
 
     XRender::setDrawPlane(PLANE_GAME_META);
 
@@ -2491,6 +2441,20 @@ void UpdateGraphics(bool skipRepaint)
     }
 
     speedRun_renderTimer();
+
+    if(PrintFPS > 0 && ShowFPS)
+        SuperPrint(fmt::format_ne("{0}", int(PrintFPS)), 1, 8, 8, {0, 255, 0});
+
+    g_stats.print();
+
+    if(!BattleMode && !GameMenu && !GameOutro && g_config.show_episode_title)
+    {
+        int y = (ScreenH >= 640) ? 20 : ScreenH - 60;
+        if(g_config.show_episode_title == Config_t::EPISODE_TITLE_TRANSPARENT)
+            SuperPrintScreenCenter(WorldName, 3, y, XTAlpha(127));
+        else
+            SuperPrintScreenCenter(WorldName, 3, y);
+    }
 
     DrawDeviceBattery();
 
