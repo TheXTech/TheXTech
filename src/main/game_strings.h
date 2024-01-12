@@ -33,6 +33,8 @@ struct GameContent
     std::string errorOpenFileFailed;
     std::string errorInvalidEnterWarp;
     std::string errorNoStartPoint;
+    std::string messageScanningLevels;
+    std::string formatMinutesSeconds;
 
     std::string warpNeedStarCount;
 

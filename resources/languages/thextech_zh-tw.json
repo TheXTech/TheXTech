@@ -367,6 +367,12 @@
             "returnToEditor": "返回編輯器",
             "saveAndContinue": "保存並繼續",
             "saveAndQuit": "保存並退出"
+        },
+        "format": {
+            "minutesSeconds": "{0}分{1}秒"
+        },
+        "message": {
+            "scanningLevels": "掃描關卡中……"
         }
     },
     "languageName": "繁體中文",

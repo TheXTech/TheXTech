@@ -88,6 +88,9 @@ int s_tex_show_w = 0;
 int s_tex_h = 0;
 
 int s_num_textures_loaded = 0;
+int s_num_bitmasks_loaded = 0;
+bool s_just_unloaded_bitmask = false;
+
 
 C3D_RenderTarget* s_cur_target = nullptr;
 
@@ -127,7 +130,11 @@ static void s_createSceneTargets()
     if(s_tex_h > mem_h)
         s_tex_h = mem_h;
 
-    if(mem_w >= 512 && mem_h == 512)
+    if(s_num_bitmasks_loaded > 0)
+        s_single_layer_mode = true;
+    else if(mem_w >= 512 && mem_h == 512)
+        s_single_layer_mode = true;
+    else if(mem_w >= 512 && mem_h == 512)
         s_single_layer_mode = true;
     else if(should_swap_screen())
         s_single_layer_mode = true;
@@ -158,6 +165,21 @@ void s_ensureInFrame()
         // if(g_screen_swapped != should_swap_screen())
         //     UpdateInternalRes();
 
+        // force 2D mode if bitmasks are currently loaded
+        if(s_just_unloaded_bitmask && s_single_layer_mode)
+        {
+            pLogInfo("No longer forbidding 3D mode, since all bitmasks unloaded");
+            s_createSceneTargets();
+        }
+        else if(s_num_bitmasks_loaded > 0 && !s_single_layer_mode)
+        {
+            pLogInfo("Forbidding 3D mode, since a bitmask was loaded");
+            s_createSceneTargets();
+        }
+
+        s_just_unloaded_bitmask = false;
+
+        // initialize the frame and clear render targets
         C3D_FrameBegin(0);
 
         for(int layer = 0; layer < 4; layer++)
@@ -1061,6 +1083,10 @@ void lazyLoad(StdPicture& target)
 
     s_num_textures_loaded++;
 
+    // 3 is the first mask texture
+    if(target.d.texture[3])
+        s_num_bitmasks_loaded++;
+
     if(linearSpaceFree() < 4194304)
     {
         pLogDebug("Triggering free texture memory due to low memory (%u bytes)", (unsigned)linearSpaceFree());
@@ -1085,7 +1111,15 @@ void unloadTexture(StdPicture& tx)
     minport_unlinkTexture(&tx);
 
     if(tx.d.hasTexture())
-        s_num_textures_loaded --;
+        s_num_textures_loaded--;
+
+    // 3 is the first mask texture
+    if(tx.d.texture[3])
+    {
+        s_num_bitmasks_loaded--;
+        if(s_num_bitmasks_loaded == 0)
+            s_just_unloaded_bitmask = true;
+    }
 
     for(int i = 0; i < 6; i++)
     {
