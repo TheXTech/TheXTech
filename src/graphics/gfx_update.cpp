@@ -69,6 +69,8 @@ struct ScreenShake_t
 {
     double forceX = 0;
     double forceY = 0;
+    int    offsetX = 0;
+    int    offsetY = 0;
     double forceDecay = 1.0;
     int    type = SHAKE_RANDOM;
     double duration = 0;
@@ -80,8 +82,6 @@ struct ScreenShake_t
     {
         if(!active || GameMenu)
             return;
-
-        int offsetX, offsetY;
 
         if(duration <= 0)
         {
@@ -114,9 +114,18 @@ struct ScreenShake_t
                 sign *= -1;
                 break;
             }
-
-            XRender::offsetViewport(offsetX, offsetY);
         }
+    }
+
+    void apply()
+    {
+        if(!active || GameMenu)
+        {
+            XRender::offsetViewport(0, 0);
+            return;
+        }
+
+        XRender::offsetViewport(offsetX, offsetY);
     }
 
     void setup(int i_forceX, int i_forceY, int i_type, int i_duration, double i_decay)
@@ -997,6 +1006,9 @@ void UpdateGraphics(bool skipRepaint)
                     NPC_Draw_Queue_p.add(A);
             }
         }
+
+        // moved from render code because it affects the game's random state
+        s_shakeScreen.update();
     }
 
     // we've now done all the logic that UpdateGraphics can do.
@@ -1106,6 +1118,9 @@ void UpdateGraphics(bool skipRepaint)
 
         if(numScreens > 1) // To separate drawing of screens
             XRender::setViewport(vScreen[Z].Left, vScreen[Z].Top, vScreen[Z].Width, vScreen[Z].Height);
+
+        // update viewport from screen shake
+        s_shakeScreen.apply();
 
         DrawBackground(S, Z);
 
@@ -2435,9 +2450,7 @@ void UpdateGraphics(bool skipRepaint)
 //        If LevelEditor = True Then
 //            StretchBlt frmLevelWindow.vScreen(Z).hdc, 0, 0, frmLevelWindow.vScreen(Z).ScaleWidth, frmLevelWindow.vScreen(Z).ScaleHeight, myBackBuffer, 0, 0, 800, 600, vbSrcCopy
 //        Else
-        { // NOT AN EDITOR!!!
-            s_shakeScreen.update();
-        }
+        // Screen shake logic was here; moved into the logic section of the file because it affects the random state of the game
 
         // TODO: VERIFY THIS
         XRender::offsetViewportIgnore(true);
