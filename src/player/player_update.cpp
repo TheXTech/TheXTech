@@ -215,7 +215,7 @@ void UpdatePlayer()
 
             if(Player[A].TimeToLive >= 200 || !split_screen)
             {
-                B = CheckLiving();
+                B = CheckNearestLiving(A);
 
                 // move dead player towards start point in BattleMode
                 if(BattleMode && BattleLives[1] > 0 && BattleLives[2] > 0 && BattleWinner == 0)
@@ -320,7 +320,7 @@ void UpdatePlayer()
                     }
                 }
                 else
-                    B = CheckLiving();
+                    B = CheckNearestLiving(A);
 
                 if(B)
                 {

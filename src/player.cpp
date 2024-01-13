@@ -981,6 +981,55 @@ int CheckLiving()
     return 0;
 }
 
+int CheckNearestLiving(const int A)
+{
+    const Player_t& p = Player[A];
+    const Screen_t& screen = ScreenByPlayer(A);
+
+    int    closest      = 0;
+    double closest_dist = 0;
+
+    // first, look on same screen
+    for(int plr_i = 0; plr_i < screen.player_count; plr_i++)
+    {
+        int o_A = screen.players[plr_i];
+        const Player_t& o_p = Player[o_A];
+
+        if(o_A != A && !o_p.Dead && o_p.TimeToLive == 0)
+        {
+            double dist = (o_p.Location.X - p.Location.X) * (o_p.Location.X - p.Location.X) + (o_p.Location.Y - p.Location.Y) * (o_p.Location.Y - p.Location.Y);
+
+            if(closest == 0 || closest_dist > dist)
+            {
+                closest = o_A;
+                closest_dist = dist;
+            }
+        }
+    }
+
+    if(closest)
+        return closest;
+
+    // next, look at all players
+    for(int o_A = 1; o_A <= numPlayers; o_A++)
+    {
+        const Player_t& o_p = Player[o_A];
+
+        if(o_A != A && !o_p.Dead && o_p.TimeToLive == 0)
+        {
+            double dist = (o_p.Location.X - p.Location.X) * (o_p.Location.X - p.Location.X) + (o_p.Location.Y - p.Location.Y) * (o_p.Location.Y - p.Location.Y);
+
+            if(closest == 0 || closest_dist > dist)
+            {
+                closest = o_A;
+                closest_dist = dist;
+            }
+        }
+    }
+
+    return closest;
+}
+
 int LivingPlayersLeft()
 {
     int ret = 0;
@@ -3726,12 +3775,12 @@ void StealBonus()
         if(Player[A].Dead)
         {
             // find other player
-            B = alive;
-
             if(Lives > 0 && LevelMacro == LEVELMACRO_OFF)
             {
                 if(Player[A].Controls.Jump || Player[A].Controls.Run)
                 {
+                    B = CheckNearestLiving(A);
+
                     Lives -= 1;
                     Player[A].State = 1;
                     Player[A].Hearts = 1;
