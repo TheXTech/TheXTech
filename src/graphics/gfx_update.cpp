@@ -849,6 +849,10 @@ void UpdateGraphics(bool skipRepaint)
     std::swap(NPCQueues::NoReset, s_NoReset_NPCs_LastFrame);
     NPCQueues::NoReset.clear();
 
+    // TODO: make a loop over screens here
+    int screen_i = 0;
+    Screen_t& screen = Screens[screen_i];
+
     for(Z = 1; Z <= numScreens; Z++)
     {
         if(SingleCoop == 2)
@@ -2439,8 +2443,7 @@ void UpdateGraphics(bool skipRepaint)
             XRender::offsetViewportIgnore(false);
         }
 
-        if(numScreens > 1) // for multiple screens
-            XRender::setViewport(0, 0, ScreenW, ScreenH);
+        XRender::setDrawPlane(PLANE_LVL_META);
 
         if(GameOutro)
         {
@@ -2453,24 +2456,39 @@ void UpdateGraphics(bool skipRepaint)
 //        Else
         // Screen shake logic was here; moved into the logic section of the file because it affects the random state of the game
 
-        // TODO: VERIFY THIS
+        // draw onscreen controls display
         XRender::offsetViewportIgnore(true);
-        if(ScreenType == 5 && numScreens == 1)
+
+        if(screen.Type == 5 && numScreens == 1)
         {
             speedRun_renderControls(1, -1);
             speedRun_renderControls(2, -1);
         }
-        else
+        else if(numScreens >= 2)
             speedRun_renderControls(Z, Z);
+
         XRender::offsetViewportIgnore(false);
 
 //    Next Z
     } // For(Z, 2, numScreens)
 
+    // graphics shared by all vScreens
+    XRender::resetViewport();
     XRender::offsetViewportIgnore(true);
     XRender::setViewport(0, 0, ScreenW, ScreenH);
 
     XRender::setDrawPlane(PLANE_GAME_META);
+
+    // 1P controls indicator
+    if(screen.Type != 5 && numScreens == 1)
+        speedRun_renderControls(1, -1);
+
+    // fix missing controls info when the vScreen didn't get rendered at all
+    if(screen.Type == 5 && numScreens == 1 && screen.vScreen(1).Width == 0)
+    {
+        speedRun_renderControls(1, -1);
+        speedRun_renderControls(2, -1);
+    }
 
     speedRun_renderTimer();
 
