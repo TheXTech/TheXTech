@@ -919,12 +919,11 @@ void UpdateGraphicsLogic(bool Do_FrameSkip)
                 {
                     int C = 0;
                     int D = 0;
-    //                For A = 1 To numPlayers
+
                     For(A, 1, numPlayers)
                     {
-    //                    With Player(A)
                         Player_t &p = Player[A];
-    //                        If vScreenCollision(Z, .Location) = False And LevelMacro = 0 And .Location.Y < level(.Section).Height And .Location.Y + .Location.Height > level(.Section).Y And .TimeToLive = 0 And .Dead = False Then
+
                         if(!vScreenCollision(Z, p.Location) && LevelMacro == LEVELMACRO_OFF &&
                             p.Location.Y < level[p.Section].Height &&
                             p.Location.Y + p.Location.Height > level[p.Section].Y &&
@@ -965,10 +964,7 @@ void UpdateGraphicsLogic(bool Do_FrameSkip)
                             Player[A].Location.SpeedY = dRand() * 12 - 6;
                             Player[A].CanJump = true;
                         }
-    //                    End With
-    //                Next A
                     }
-    //            End If
                 }
             }
 
@@ -1010,8 +1006,11 @@ void UpdateGraphicsLogic(bool Do_FrameSkip)
             // moved from render code because it affects the game's random state
             // TODO: have a separate shakeScreen state per screen
             s_shakeScreen.update();
+
         } // loop over vScreens
+
     } // loop over Screens
+
 
     // Background frames (NOTE: frames were only updated on non-frameskip in vanilla)
     if(!FreezeNPCs)
