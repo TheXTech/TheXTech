@@ -22,8 +22,10 @@
 #ifndef GFX_UPDATE_H
 #define GFX_UPDATE_H
 
-extern bool g_drawBlocks_valid[2];
-extern bool g_drawBGOs_valid[2];
+#include "global_constants.h"
+
+extern std::array<bool, maxLocalPlayers> g_drawBlocks_valid;
+extern std::array<bool, maxLocalPlayers> g_drawBGOs_valid;
 
 // should equal the largest X or Y move rate of any layer containing blocks / BGOs
 extern double g_drawBlocks_invalidate_rate;

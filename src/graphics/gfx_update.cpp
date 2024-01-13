@@ -323,26 +323,28 @@ public:
     }
 };
 
-NPC_Draw_Queue_t NPC_Draw_Queue[2] = {NPC_Draw_Queue_t(), NPC_Draw_Queue_t()};
+NPC_Draw_Queue_t NPC_Draw_Queue[maxLocalPlayers] = {NPC_Draw_Queue_t(), NPC_Draw_Queue_t()};
 
 // code to facilitate cached values for the onscreen blocks and BGOs
-// query results of last update
-static std::vector<BlockRef_t> s_drawMainBlocks[2] = {std::vector<BlockRef_t>(400), std::vector<BlockRef_t>(400)};
-static std::vector<BlockRef_t> s_drawLavaBlocks[2] = {std::vector<BlockRef_t>(100), std::vector<BlockRef_t>(100)};
-static std::vector<BlockRef_t> s_drawSBlocks[2] = {std::vector<BlockRef_t>(40), std::vector<BlockRef_t>(40)};
-static std::vector<BaseRef_t> s_drawBGOs[2] = {std::vector<BaseRef_t>(400), std::vector<BaseRef_t>(400)};
+// intentionally only initialize the vectors for the first 2 screens since >2P mode is rare
 
-// query location of last update
-static Location_t s_drawBlocks_bounds[2];
-static Location_t s_drawBGOs_bounds[2];
+// query results of last tree query
+static std::vector<BlockRef_t> s_drawMainBlocks[maxLocalPlayers] = {std::vector<BlockRef_t>(400), std::vector<BlockRef_t>(400)};
+static std::vector<BlockRef_t> s_drawLavaBlocks[maxLocalPlayers] = {std::vector<BlockRef_t>(100), std::vector<BlockRef_t>(100)};
+static std::vector<BlockRef_t> s_drawSBlocks[maxLocalPlayers] = {std::vector<BlockRef_t>(40), std::vector<BlockRef_t>(40)};
+static std::vector<BaseRef_t> s_drawBGOs[maxLocalPlayers] = {std::vector<BaseRef_t>(400), std::vector<BaseRef_t>(400)};
 
-// maximum amount of layer movement since last update
-static double s_drawBlocks_invalidate_timer[2] = {0, 0};
-static double s_drawBGOs_invalidate_timer[2] = {0, 0};
+// query location of last tree query
+static Location_t s_drawBlocks_bounds[maxLocalPlayers];
+static Location_t s_drawBGOs_bounds[maxLocalPlayers];
+
+// maximum amount of layer movement since last tree query
+static double s_drawBlocks_invalidate_timer[maxLocalPlayers] = {0, 0};
+static double s_drawBGOs_invalidate_timer[maxLocalPlayers] = {0, 0};
 
 // global: force-invalidate the cache when the blocks themselves change
-bool g_drawBlocks_valid[2] = {false, false};
-bool g_drawBGOs_valid[2] = {false, false};
+std::array<bool, maxLocalPlayers> g_drawBlocks_valid{};
+std::array<bool, maxLocalPlayers> g_drawBGOs_valid{};
 
 // global: based on layer movement speed, set in layers.cpp
 double g_drawBlocks_invalidate_rate = 0;
@@ -355,11 +357,12 @@ double g_drawBGOs_invalidate_rate = 0;
 constexpr double i_drawBlocks_margin = 64;
 constexpr double i_drawBGOs_margin = 128;
 
-// updates the lists of blocks and BGOs to draw on vScreen Z
-void s_UpdateDrawItems(int Z)
+// updates the lists of blocks and BGOs to draw on i'th vScreen of screen
+void s_UpdateDrawItems(Screen_t& screen, int i)
 {
-    int i = Z - 1;
-    if(i < 0 || i >= 2)
+    vScreen_t& vscreen = screen.vScreen(i + 1);
+
+    if(i < 0 || i >= maxLocalPlayers)
         return;
 
     // based on layer movement speed
@@ -369,19 +372,19 @@ void s_UpdateDrawItems(int Z)
 
     // update draw blocks if needed
     if(!g_drawBlocks_valid[i]
-        || -vScreen[Z].X                     < s_drawBlocks_bounds[i].X                                 + s_drawBlocks_invalidate_timer[i]
-        || -vScreen[Z].X + vScreen[Z].Width  > s_drawBlocks_bounds[i].X + s_drawBlocks_bounds[i].Width  - s_drawBlocks_invalidate_timer[i]
-        || -vScreen[Z].Y                     < s_drawBlocks_bounds[i].Y                                 + s_drawBlocks_invalidate_timer[i]
-        || -vScreen[Z].Y + vScreen[Z].Height > s_drawBlocks_bounds[i].Y + s_drawBlocks_bounds[i].Height - s_drawBlocks_invalidate_timer[i])
+        || -vscreen.X                  < s_drawBlocks_bounds[i].X                                 + s_drawBlocks_invalidate_timer[i]
+        || -vscreen.X + vscreen.Width  > s_drawBlocks_bounds[i].X + s_drawBlocks_bounds[i].Width  - s_drawBlocks_invalidate_timer[i]
+        || -vscreen.Y                  < s_drawBlocks_bounds[i].Y                                 + s_drawBlocks_invalidate_timer[i]
+        || -vscreen.Y + vscreen.Height > s_drawBlocks_bounds[i].Y + s_drawBlocks_bounds[i].Height - s_drawBlocks_invalidate_timer[i])
     {
         g_drawBlocks_valid[i] = true;
         s_drawBlocks_invalidate_timer[i] = 0;
 
         // form query location
-        s_drawBlocks_bounds[i] = newLoc(-vScreen[Z].X - i_drawBlocks_margin,
-            -vScreen[Z].Y - i_drawBlocks_margin,
-            vScreen[Z].Width + i_drawBlocks_margin * 2,
-            vScreen[Z].Height + i_drawBlocks_margin * 2);
+        s_drawBlocks_bounds[i] = newLoc(-vscreen.X - i_drawBlocks_margin,
+            -vscreen.Y - i_drawBlocks_margin,
+            vscreen.Width + i_drawBlocks_margin * 2,
+            vscreen.Height + i_drawBlocks_margin * 2);
 
         // make query (sort by ID as done in vanilla)
         TreeResult_Sentinel<BlockRef_t> areaBlocks = treeBlockQuery(s_drawBlocks_bounds[i], SORTMODE_ID);
@@ -417,19 +420,19 @@ void s_UpdateDrawItems(int Z)
 
     // update draw BGOs if needed
     if(!g_drawBGOs_valid[i]
-        || -vScreen[Z].X                     < s_drawBGOs_bounds[i].X                               + s_drawBGOs_invalidate_timer[i]
-        || -vScreen[Z].X + vScreen[Z].Width  > s_drawBGOs_bounds[i].X + s_drawBGOs_bounds[i].Width  - s_drawBGOs_invalidate_timer[i]
-        || -vScreen[Z].Y                     < s_drawBGOs_bounds[i].Y                               + s_drawBGOs_invalidate_timer[i]
-        || -vScreen[Z].Y + vScreen[Z].Height > s_drawBGOs_bounds[i].Y + s_drawBGOs_bounds[i].Height - s_drawBGOs_invalidate_timer[i])
+        || -vscreen.X                  < s_drawBGOs_bounds[i].X                               + s_drawBGOs_invalidate_timer[i]
+        || -vscreen.X + vscreen.Width  > s_drawBGOs_bounds[i].X + s_drawBGOs_bounds[i].Width  - s_drawBGOs_invalidate_timer[i]
+        || -vscreen.Y                  < s_drawBGOs_bounds[i].Y                               + s_drawBGOs_invalidate_timer[i]
+        || -vscreen.Y + vscreen.Height > s_drawBGOs_bounds[i].Y + s_drawBGOs_bounds[i].Height - s_drawBGOs_invalidate_timer[i])
     {
         g_drawBGOs_valid[i] = true;
         s_drawBGOs_invalidate_timer[i] = 0;
 
         // form query location
-        s_drawBGOs_bounds[i] = newLoc(-vScreen[Z].X - i_drawBGOs_margin,
-            -vScreen[Z].Y - i_drawBGOs_margin,
-            vScreen[Z].Width + i_drawBGOs_margin * 2,
-            vScreen[Z].Height + i_drawBGOs_margin * 2);
+        s_drawBGOs_bounds[i] = newLoc(-vscreen.X - i_drawBGOs_margin,
+            -vscreen.Y - i_drawBGOs_margin,
+            vscreen.Width + i_drawBGOs_margin * 2,
+            vscreen.Height + i_drawBGOs_margin * 2);
 
         // make query (sort by ID as done in vanilla)
         s_drawBGOs[i].clear();
@@ -522,7 +525,7 @@ void GraphicsLazyPreLoad()
         // int64_t fBlock = 0;
         // int64_t lBlock = 0;
         // blockTileGet(-vScreen[Z].X, vScreen[Z].Width, fBlock, lBlock);
-        s_UpdateDrawItems(Z);
+        s_UpdateDrawItems(Screens[0], Z - 1);
 
         for(Block_t& b : s_drawSBlocks[Z - 1])
         {
@@ -1164,11 +1167,11 @@ void UpdateGraphics(bool skipRepaint)
 #endif
 
         // update the vectors of all the onscreen blocks and backgrounds for use at multiple places
-        s_UpdateDrawItems(Z);
-        const std::vector<BlockRef_t>& screenMainBlocks = s_drawMainBlocks[Z - 1];
-        const std::vector<BlockRef_t>& screenLavaBlocks = s_drawLavaBlocks[Z - 1];
-        const std::vector<BlockRef_t>& screenSBlocks = s_drawSBlocks[Z - 1];
-        const std::vector<BaseRef_t>& screenBackgrounds = s_drawBGOs[Z - 1];
+        s_UpdateDrawItems(screen, vscreen_i);
+        const std::vector<BlockRef_t>& screenMainBlocks = s_drawMainBlocks[vscreen_i];
+        const std::vector<BlockRef_t>& screenLavaBlocks = s_drawLavaBlocks[vscreen_i];
+        const std::vector<BlockRef_t>& screenSBlocks = s_drawSBlocks[vscreen_i];
+        const std::vector<BaseRef_t>& screenBackgrounds = s_drawBGOs[vscreen_i];
 
         int nextBackground = 0;
 
