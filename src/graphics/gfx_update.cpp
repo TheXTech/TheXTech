@@ -838,111 +838,102 @@ void UpdateGraphicsLogic(bool Do_FrameSkip)
     NPCQueues::NoReset.clear();
 
 
-    // TODO: make a loop over screens here
-    int screen_i = 0;
-    Screen_t& screen = Screens[screen_i];
-
-    // if(!screen.Visible)
-    //     continue;
-
-    int numScreens = screen.active_end();
-
-    for(int vscreen_i = screen.active_begin(); vscreen_i < screen.active_end(); vscreen_i++)
+    // the graphics screen logic is handled via a big loop over Screens (clients)
+    for(int screen_i = 0; screen_i < c_screenCount; screen_i++)
     {
-        int Z = screen.vScreen_refs[vscreen_i];
-        int plr_Z = screen.players[vscreen_i];
+        int screen_i = 0;
+        Screen_t& screen = Screens[screen_i];
 
-        // modern NPC activation logic is required to support more than 2 vScreens (for the Reset array), but we don't have that yet in the main branch
-        SDL_assert_release(Z <= 2);
+        if(!screen.Visible)
+            continue;
 
-        int S;
-        if(LevelEditor)
-            S = curSection;
-        else
-            S = Player[plr_Z].Section;
+        if(!screen.player_count)
+            continue;
 
-        // update vScreen location
-        if(!LevelEditor)
-            GetvScreenAuto(vScreen[Z]);
+        int numScreens = screen.active_end();
 
-        // moved to `graphics/gfx_screen.cpp`
-        // NOTE: this logic was previously only performed on non-frameskips
-        if(qScreen)
-            continue_qScreen |= Update_qScreen(Z);
-
-        // the original code was badly written and made THIS happen (always exactly one frame of qScreen in 2P mode)
-        if(Z == 2 && !g_compatibility.modern_section_change)
-            continue_qScreen = false;
-
-        // noturningback
-        if(!LevelEditor && NoTurnBack[Player[Z].Section])
+        for(int vscreen_i = screen.active_begin(); vscreen_i < screen.active_end(); vscreen_i++)
         {
-            vScreen_t& vscreen1 = screen.vScreen(1);
-            vScreen_t& vscreen2 = screen.vScreen(2);
-            int screen_p1 = screen.players[0];
-            int screen_p2 = screen.players[1];
+            int Z = screen.vScreen_refs[vscreen_i];
+            int plr_Z = screen.players[vscreen_i];
 
-            // goal: find screen currently on this section that is the furthest left
-            int A = vscreen_i + 1;
-            if(numScreens > 1)
+            // modern NPC activation logic is required to support more than 2 vScreens (for the Reset array), but we don't have that yet in the main branch
+            SDL_assert_release(Z <= 2);
+
+            int S;
+            if(LevelEditor)
+                S = curSection;
+            else
+                S = Player[plr_Z].Section;
+
+            // update vScreen location
+            if(!LevelEditor)
+                GetvScreenAuto(vScreen[Z]);
+
+            // moved to `graphics/gfx_screen.cpp`
+            // NOTE: this logic was previously only performed on non-frameskips
+            if(qScreen)
+                continue_qScreen |= Update_qScreen(Z);
+
+            // the original code was badly written and made THIS happen (always exactly one frame of qScreen in 2P mode)
+            if(Z == 2 && !g_compatibility.modern_section_change)
+                continue_qScreen = false;
+
+            // noturningback
+            if(!LevelEditor && NoTurnBack[Player[Z].Section])
             {
-                if(Player[screen_p1].Section == Player[screen_p2].Section)
-                {
-                    if(A == 1)
-                        GetvScreen(vscreen2);
+                vScreen_t& vscreen1 = screen.vScreen(1);
+                vScreen_t& vscreen2 = screen.vScreen(2);
+                int screen_p1 = screen.players[0];
+                int screen_p2 = screen.players[1];
 
-                    if(-vscreen1.X < -vscreen2.X)
-                        A = 1;
-                    else
-                        A = 2;
+                // goal: find screen currently on this section that is the furthest left
+                int A = vscreen_i + 1;
+                if(numScreens > 1)
+                {
+                    if(Player[screen_p1].Section == Player[screen_p2].Section)
+                    {
+                        if(A == 1)
+                            GetvScreen(vscreen2);
+
+                        if(-vscreen1.X < -vscreen2.X)
+                            A = 1;
+                        else
+                            A = 2;
+                    }
+                }
+
+                if(-screen.vScreen(A).X > level[S].X)
+                {
+                    LevelChop[S] += float(-screen.vScreen(A).X - level[S].X);
+                    level[S].X = -screen.vScreen(A).X;
+
+                    // mark that section has shrunk
+                    UpdateSectionOverlaps(S, true);
                 }
             }
 
-            if(-screen.vScreen(A).X > level[S].X)
+            // Keep all players onscreen in clone mode
+            if(!GameMenu && !LevelEditor)
             {
-                LevelChop[S] += float(-screen.vScreen(A).X - level[S].X);
-                level[S].X = -screen.vScreen(A).X;
-
-                // mark that section has shrunk
-                UpdateSectionOverlaps(S, true);
-            }
-        }
-
-        // Keep all players onscreen in clone mode
-        if(!GameMenu && !LevelEditor)
-        {
-            if(g_ClonedPlayerMode)
-            {
-                int C = 0;
-                int D = 0;
-//                For A = 1 To numPlayers
-                For(A, 1, numPlayers)
+                if(g_ClonedPlayerMode)
                 {
-//                    With Player(A)
-                    Player_t &p = Player[A];
-//                        If vScreenCollision(Z, .Location) = False And LevelMacro = 0 And .Location.Y < level(.Section).Height And .Location.Y + .Location.Height > level(.Section).Y And .TimeToLive = 0 And .Dead = False Then
-                    if(!vScreenCollision(Z, p.Location) && LevelMacro == LEVELMACRO_OFF &&
-                        p.Location.Y < level[p.Section].Height &&
-                        p.Location.Y + p.Location.Height > level[p.Section].Y &&
-                        p.TimeToLive == 0 && !p.Dead)
+                    int C = 0;
+                    int D = 0;
+    //                For A = 1 To numPlayers
+                    For(A, 1, numPlayers)
                     {
-                        for(int B = 1; B <= numPlayers; B++)
-                        {
-                            if(!Player[B].Dead && Player[B].TimeToLive == 0 && Player[B].Section == Player[A].Section && vScreenCollision(Z, Player[B].Location))
-                            {
-                                if(C == 0 || std::abs(Player[A].Location.X + Player[A].Location.Width / 2.0 - (Player[B].Location.X + Player[B].Location.Width / 2.0)) < C)
-                                {
-                                    C = std::abs(Player[A].Location.X + Player[A].Location.Width / 2.0 - (Player[B].Location.X + Player[B].Location.Width / 2.0));
-                                    D = B;
-                                }
-                            }
-                        }
-
-                        if(C == 0)
+    //                    With Player(A)
+                        Player_t &p = Player[A];
+    //                        If vScreenCollision(Z, .Location) = False And LevelMacro = 0 And .Location.Y < level(.Section).Height And .Location.Y + .Location.Height > level(.Section).Y And .TimeToLive = 0 And .Dead = False Then
+                        if(!vScreenCollision(Z, p.Location) && LevelMacro == LEVELMACRO_OFF &&
+                            p.Location.Y < level[p.Section].Height &&
+                            p.Location.Y + p.Location.Height > level[p.Section].Y &&
+                            p.TimeToLive == 0 && !p.Dead)
                         {
                             for(int B = 1; B <= numPlayers; B++)
                             {
-                                if(!Player[B].Dead && Player[B].TimeToLive == 0 && Player[B].Section == Player[A].Section)
+                                if(!Player[B].Dead && Player[B].TimeToLive == 0 && Player[B].Section == Player[A].Section && vScreenCollision(Z, Player[B].Location))
                                 {
                                     if(C == 0 || std::abs(Player[A].Location.X + Player[A].Location.Width / 2.0 - (Player[B].Location.X + Player[B].Location.Width / 2.0)) < C)
                                     {
@@ -951,64 +942,77 @@ void UpdateGraphicsLogic(bool Do_FrameSkip)
                                     }
                                 }
                             }
+
+                            if(C == 0)
+                            {
+                                for(int B = 1; B <= numPlayers; B++)
+                                {
+                                    if(!Player[B].Dead && Player[B].TimeToLive == 0 && Player[B].Section == Player[A].Section)
+                                    {
+                                        if(C == 0 || std::abs(Player[A].Location.X + Player[A].Location.Width / 2.0 - (Player[B].Location.X + Player[B].Location.Width / 2.0)) < C)
+                                        {
+                                            C = std::abs(Player[A].Location.X + Player[A].Location.Width / 2.0 - (Player[B].Location.X + Player[B].Location.Width / 2.0));
+                                            D = B;
+                                        }
+                                    }
+                                }
+                            }
+
+                            Player[A].Location.X = Player[D].Location.X + Player[D].Location.Width / 2.0 - Player[A].Location.Width / 2.0;
+                            Player[A].Location.Y = Player[D].Location.Y + Player[D].Location.Height - Player[A].Location.Height;
+                            Player[A].Section = Player[D].Section;
+                            Player[A].Location.SpeedX = Player[D].Location.SpeedX;
+                            Player[A].Location.SpeedY = Player[D].Location.SpeedY;
+                            Player[A].Location.SpeedY = dRand() * 12 - 6;
+                            Player[A].CanJump = true;
                         }
-
-                        Player[A].Location.X = Player[D].Location.X + Player[D].Location.Width / 2.0 - Player[A].Location.Width / 2.0;
-                        Player[A].Location.Y = Player[D].Location.Y + Player[D].Location.Height - Player[A].Location.Height;
-                        Player[A].Section = Player[D].Section;
-                        Player[A].Location.SpeedX = Player[D].Location.SpeedX;
-                        Player[A].Location.SpeedY = Player[D].Location.SpeedY;
-                        Player[A].Location.SpeedY = dRand() * 12 - 6;
-                        Player[A].CanJump = true;
+    //                    End With
+    //                Next A
                     }
-//                    End With
-//                Next A
+    //            End If
                 }
-//            End If
             }
-        }
 
-        // It's time to process NPCs. We will update their active state and fill a draw queue.
+            // It's time to process NPCs. We will update their active state and fill a draw queue.
 
-        // only fill draw queue if drawing will happen and this is the local screen
-        bool fill_draw_queue = !Do_FrameSkip && (&screen == l_screen);
+            // only fill draw queue if drawing will happen and this is the local screen
+            bool fill_draw_queue = !Do_FrameSkip && (&screen == l_screen);
 
-        // Make sure we are in range.
-        SDL_assert_release(vscreen_i >= 0 && vscreen_i < (int)(sizeof(NPC_Draw_Queue) / sizeof(NPC_Draw_Queue_t)));
-        NPC_Draw_Queue_t& NPC_Draw_Queue_p = NPC_Draw_Queue[vscreen_i];
+            // Make sure we are in range.
+            SDL_assert_release(vscreen_i >= 0 && vscreen_i < (int)(sizeof(NPC_Draw_Queue) / sizeof(NPC_Draw_Queue_t)));
+            NPC_Draw_Queue_t& NPC_Draw_Queue_p = NPC_Draw_Queue[vscreen_i];
 
-        if(fill_draw_queue)
-            NPC_Draw_Queue_p.reset();
+            if(fill_draw_queue)
+                NPC_Draw_Queue_p.reset();
 
-        // we'll check the NPCs and do some logic for the game,
-        if(!LevelEditor)
-            ClassicNPCScreenLogic(Z, numScreens, fill_draw_queue, NPC_Draw_Queue_p);
+            // we'll check the NPCs and do some logic for the game,
+            if(!LevelEditor)
+                ClassicNPCScreenLogic(Z, numScreens, fill_draw_queue, NPC_Draw_Queue_p);
 
-        // fill the NPC render queue for the level editor
-        else if(fill_draw_queue)
-        {
-            for(int A = 1; A <= numNPCs; A++)
+            // fill the NPC render queue for the level editor
+            else if(fill_draw_queue)
             {
-                g_stats.checkedNPCs++;
+                for(int A = 1; A <= numNPCs; A++)
+                {
+                    g_stats.checkedNPCs++;
 
-                if(NPC[A].Hidden)
-                    continue;
+                    if(NPC[A].Hidden)
+                        continue;
 
-                const Location_t loc2 = newLoc(NPC[A].Location.X - (NPCWidthGFX[NPC[A].Type] - NPC[A].Location.Width) / 2.0,
-                    NPC[A].Location.Y,
-                    NPCWidthGFX[NPC[A].Type], NPCHeight[NPC[A].Type]);
+                    const Location_t loc2 = newLoc(NPC[A].Location.X - (NPCWidthGFX[NPC[A].Type] - NPC[A].Location.Width) / 2.0,
+                        NPC[A].Location.Y,
+                        NPCWidthGFX[NPC[A].Type], NPCHeight[NPC[A].Type]);
 
-                if(vScreenCollision(Z, NPC[A].Location) || vScreenCollision(Z, loc2))
-                    NPC_Draw_Queue_p.add(A);
+                    if(vScreenCollision(Z, NPC[A].Location) || vScreenCollision(Z, loc2))
+                        NPC_Draw_Queue_p.add(A);
+                }
             }
-        }
 
-        // moved from render code because it affects the game's random state
-        // TODO: have a separate shakeScreen state per screen
-        s_shakeScreen.update();
-    }
-
-    // TODO: end loop over screens
+            // moved from render code because it affects the game's random state
+            // TODO: have a separate shakeScreen state per screen
+            s_shakeScreen.update();
+        } // loop over vScreens
+    } // loop over Screens
 
     // Background frames (NOTE: frames were only updated on non-frameskip in vanilla)
     if(!FreezeNPCs)
