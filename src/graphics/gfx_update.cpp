@@ -564,7 +564,7 @@ double g_drawBGOs_invalidate_rate = 0;
 constexpr double i_drawBlocks_margin = 64;
 constexpr double i_drawBGOs_margin = 128;
 
-// updates the lists of blocks and BGOs to draw on vScreen Z
+// updates the lists of blocks and BGOs to draw on i'th vScreen of screen
 void s_UpdateDrawItems(Screen_t& screen, int i)
 {
     vScreen_t& vscreen = screen.vScreen(i + 1);
@@ -652,6 +652,9 @@ void GraphicsLazyPreLoad()
     // FIXME: update to work for multiple screens
     // TODO: check if this is needed at caller
     SetupScreens(false);
+
+    // TODO: check whether this is even safe
+    DynamicScreens();
 
     int numScreens = Screens[0].active_end();
 
@@ -1386,6 +1389,10 @@ void UpdateGraphics(bool skipRepaint)
 
     g_stats.reset();
 
+    SetupScreens(false);
+    DynamicScreens();
+    CenterScreens();
+
     bool continue_qScreen = false; // will qScreen continue for any visible screen?
     bool continue_qScreen_local = false; // will qScreen continue for a visible screen on the local machine? (NetPlay)
     bool continue_qScreen_canonical = false; // will qScreen continue for any canonical screen?
@@ -1404,18 +1411,12 @@ void UpdateGraphics(bool skipRepaint)
         }
     }
 
-    SetupScreens(false);
-    DynamicScreens();
-    CenterScreens();
-
     // TODO: make a loop over screens here
     int screen_i = 0;
     Screen_t& screen = Screens[screen_i];
 
     // if(!screen.Visible)
     //     continue;
-
-    int numScreens = screen.active_end();
 
     // update screen's canonical vScreens
     if(!screen.is_canonical())
@@ -1438,6 +1439,8 @@ void UpdateGraphics(bool skipRepaint)
             }
         }
     }
+
+    int numScreens = screen.active_end();
 
     for(int vscreen_i = screen.active_begin(); vscreen_i < screen.active_end(); vscreen_i++)
     {
@@ -1531,7 +1534,7 @@ void UpdateGraphics(bool skipRepaint)
             {
                 if(Player[screen_p1].Section == Player[screen_p2].Section)
                 {
-                    if(vscreen_i == 0)
+                    if(A == 1)
                         GetvScreen(vscreen2);
 
                     if(-vscreen1.X < -vscreen2.X)
@@ -1651,7 +1654,7 @@ void UpdateGraphics(bool skipRepaint)
         }
 
         // moved from render code because it affects the game's random state
-        // TODO: do this only for visible screens
+        // TODO: have a separate shakeScreen state per screen
         s_shakeScreen.update();
     }
 
@@ -1756,7 +1759,7 @@ void UpdateGraphics(bool skipRepaint)
     // Screen_t& screen = *l_screen;
     // TODO: update numScreens based on newly bound screen
 
-    // even if not, black background is good, to be safe
+    // even if not clearing buffer, black background is good, to be safe
     XRender::renderRect(0, 0, screen.W, screen.H, {0, 0, 0});
     DrawBackdrop(screen);
 
@@ -2948,6 +2951,9 @@ void UpdateGraphics(bool skipRepaint)
 
         if(!LevelEditor) // Graphics for the main game.
         {
+            // moved vScreen divider below
+
+            // Redigit NetPlay player names were also dropped
 
             lunaRender(Z);
 
@@ -3072,7 +3078,14 @@ void UpdateGraphics(bool skipRepaint)
 
         XRender::setDrawPlane(PLANE_LVL_META);
 
+//        If LevelEditor = True Then
+//            StretchBlt frmLevelWindow.vScreen(Z).hdc, 0, 0, frmLevelWindow.vScreen(Z).ScaleWidth, frmLevelWindow.vScreen(Z).ScaleHeight, myBackBuffer, 0, 0, 800, 600, vbSrcCopy
+//        Else
+        // Screen shake logic was here; moved into the logic section of the file because it affects the random state of the game
+
+        // draw onscreen controls display
         XRender::offsetViewportIgnore(true);
+
         if(screen.Type == 5 && numScreens == 1)
         {
             speedRun_renderControls(1, Z, SPEEDRUN_ALIGN_LEFT);
@@ -3091,11 +3104,6 @@ void UpdateGraphics(bool skipRepaint)
         }
 
         XRender::offsetViewportIgnore(false);
-
-//        If LevelEditor = True Then
-//            StretchBlt frmLevelWindow.vScreen(Z).hdc, 0, 0, frmLevelWindow.vScreen(Z).ScaleWidth, frmLevelWindow.vScreen(Z).ScaleHeight, myBackBuffer, 0, 0, 800, 600, vbSrcCopy
-//        Else
-        // Screen shake logic was here; moved into the logic section of the file because it affects the random state of the game
 
 //    Next Z
     } // For(Z, 2, numScreens)
