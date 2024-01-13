@@ -1428,184 +1428,174 @@ void UpdateGraphicsLogic(bool Do_FrameSkip)
         }
     }
 
-    // TODO: make a loop over screens here
-    int screen_i = 0;
-    Screen_t& screen = Screens[screen_i];
-
-    // if(!screen.Visible)
-    //     continue;
-
-    // update screen's canonical vScreens
-    if(!screen.is_canonical())
+    // the graphics screen logic is handled via a big loop over Screens (clients)
+    for(int screen_i = 0; screen_i < c_screenCount; screen_i++)
     {
-        Screen_t& c_screen = screen.canonical_screen();
+        Screen_t& screen = Screens[screen_i];
 
-        for(int i = c_screen.active_begin() + 1; i <= c_screen.active_end(); i++)
-            GetvScreenAuto(c_screen.vScreen(i));
+        if(!screen.Visible)
+            continue;
 
-        if(qScreen_canonical)
+        if(!screen.player_count)
+            continue;
+
+        // update screen's canonical vScreens
+        if(!screen.is_canonical())
         {
-            for(int i = c_screen.active_begin(); i < c_screen.active_end(); i++)
-            {
-                int Z_i = c_screen.vScreen_refs[i];
-                continue_qScreen_canonical |= Update_qScreen(Z_i);
+            Screen_t& c_screen = screen.canonical_screen();
 
-                // the original code was badly written and made THIS happen (always exactly one frame of qScreen in 2P mode)
-                if(i >= 1 && !g_compatibility.modern_section_change)
-                    continue_qScreen_canonical = false;
+            for(int i = c_screen.active_begin() + 1; i <= c_screen.active_end(); i++)
+                GetvScreenAuto(c_screen.vScreen(i));
+
+            if(qScreen_canonical)
+            {
+                for(int i = c_screen.active_begin(); i < c_screen.active_end(); i++)
+                {
+                    int Z_i = c_screen.vScreen_refs[i];
+                    continue_qScreen_canonical |= Update_qScreen(Z_i);
+
+                    // the original code was badly written and made THIS happen (always exactly one frame of qScreen in 2P mode)
+                    if(i >= 1 && !g_compatibility.modern_section_change)
+                        continue_qScreen_canonical = false;
+                }
             }
         }
-    }
 
-    int numScreens = screen.active_end();
+        int numScreens = screen.active_end();
 
-    for(int vscreen_i = screen.active_begin(); vscreen_i < screen.active_end(); vscreen_i++)
-    {
-        int Z = screen.vScreen_refs[vscreen_i];
-        int plr_Z = screen.players[vscreen_i];
-
-        // modern NPC activation logic is required to support more than 2 vScreens (for the Reset array)
-        SDL_assert_release(Z <= 2 || g_compatibility.modern_npc_camera_logic);
-
-        int S;
-        if(LevelEditor)
-            S = curSection;
-        else
-            S = Player[plr_Z].Section;
-
-        // update vScreen location
-        if(!LevelEditor)
-            GetvScreenAuto(vScreen[Z]);
-
-        // moved to `graphics/gfx_screen.cpp`
-        // NOTE: this logic was previously only performed on non-frameskips
-        if(qScreen)
+        for(int vscreen_i = screen.active_begin(); vscreen_i < screen.active_end(); vscreen_i++)
         {
-            bool continue_this_qScreen = Update_qScreen(Z);
-            continue_qScreen |= continue_this_qScreen;
-            continue_qScreen_local |= (&screen == l_screen) && continue_this_qScreen;
-        }
+            int Z = screen.vScreen_refs[vscreen_i];
+            int plr_Z = screen.players[vscreen_i];
 
-        // the original code was badly written and made THIS happen (always exactly one frame of qScreen in 2P mode)
-        if(Z == 2 && !g_compatibility.modern_section_change)
-            continue_qScreen = false;
+            // modern NPC activation logic is required to support more than 2 vScreens (for the Reset array)
+            SDL_assert_release(Z <= 2 || g_compatibility.modern_npc_camera_logic);
 
-        // noturningback
-        if(!LevelEditor && NoTurnBack[Player[plr_Z].Section] && g_compatibility.allow_multires)
-        {
-            // goal: find canonical vScreen currently on this section that is the furthest left
-            // only do anything with the last vScreen (of a Visible screen) in the section
-            // (ensures all other logic has happened)
+            int S;
+            if(LevelEditor)
+                S = curSection;
+            else
+                S = Player[plr_Z].Section;
 
-            int A = 0;
-            int section = Player[plr_Z].Section;
-            bool is_last = true;
+            // update vScreen location
+            if(!LevelEditor)
+                GetvScreenAuto(vScreen[Z]);
 
-            for(int screen_j = 0; screen_j < c_screenCount; screen_j++)
+            // moved to `graphics/gfx_screen.cpp`
+            // NOTE: this logic was previously only performed on non-frameskips
+            if(qScreen)
             {
-                Screen_t& o_screen = Screens[screen_j];
+                bool continue_this_qScreen = Update_qScreen(Z);
+                continue_qScreen |= continue_this_qScreen;
+                continue_qScreen_local |= (&screen == l_screen) && continue_this_qScreen;
+            }
 
-                // active_begin() / active_end() are 0-indexed
-                for(int vscreen_j = o_screen.active_begin(); vscreen_j < o_screen.active_end(); vscreen_j++)
+            // the original code was badly written and made THIS happen (always exactly one frame of qScreen in 2P mode)
+            if(Z == 2 && !g_compatibility.modern_section_change)
+                continue_qScreen = false;
+
+            // noturningback
+            if(!LevelEditor && NoTurnBack[Player[plr_Z].Section] && g_compatibility.allow_multires)
+            {
+                // goal: find canonical vScreen currently on this section that is the furthest left
+                // only do anything with the last vScreen (of a Visible screen) in the section
+                // (ensures all other logic has happened)
+
+                int A = 0;
+                int section = Player[plr_Z].Section;
+                bool is_last = true;
+
+                for(int screen_j = 0; screen_j < c_screenCount; screen_j++)
                 {
-                    int o_p = o_screen.players[vscreen_j];
-                    int o_Z = o_screen.vScreen_refs[vscreen_j];
+                    Screen_t& o_screen = Screens[screen_j];
 
-                    if(Player[o_p].Section == section)
+                    // active_begin() / active_end() are 0-indexed
+                    for(int vscreen_j = o_screen.active_begin(); vscreen_j < o_screen.active_end(); vscreen_j++)
                     {
-                        // check if this is the last vScreen (of a Visible screen) in the section
-                        if(o_screen.Visible && (screen_j > screen_i || (screen_j == screen_i && vscreen_j > vscreen_i)))
-                            is_last = false;
+                        int o_p = o_screen.players[vscreen_j];
+                        int o_Z = o_screen.vScreen_refs[vscreen_j];
 
-                        // only consider canonical screens
-                        if(!o_screen.is_canonical())
-                            break;
+                        if(Player[o_p].Section == section)
+                        {
+                            // check if this is the last vScreen (of a Visible screen) in the section
+                            if(o_screen.Visible && (screen_j > screen_i || (screen_j == screen_i && vscreen_j > vscreen_i)))
+                                is_last = false;
 
-                        // pick screen further to left
-                        if(A == 0 || -vScreen[o_Z].X < -vScreen[A].X)
-                            A = o_Z;
+                            // only consider canonical screens
+                            if(!o_screen.is_canonical())
+                                break;
+
+                            // pick screen further to left
+                            if(A == 0 || -vScreen[o_Z].X < -vScreen[A].X)
+                                A = o_Z;
+                        }
                     }
                 }
-            }
 
-            if(is_last && A != 0 && -vScreen[A].X > level[S].X)
-            {
-                LevelChop[S] += float(-vScreen[A].X - level[S].X);
-                level[S].X = -vScreen[A].X;
-
-                // mark that section has shrunk
-                UpdateSectionOverlaps(S, true);
-            }
-        }
-        // Legacy noturningback
-        else if(!LevelEditor && NoTurnBack[Player[plr_Z].Section])
-        {
-            vScreen_t& vscreen1 = screen.vScreen(1);
-            vScreen_t& vscreen2 = screen.vScreen(2);
-            int screen_p1 = screen.players[0];
-            int screen_p2 = screen.players[1];
-
-            // goal: find screen currently on this section that is the furthest left
-            int A = vscreen_i + 1;
-            if(numScreens > 1)
-            {
-                if(Player[screen_p1].Section == Player[screen_p2].Section)
+                if(is_last && A != 0 && -vScreen[A].X > level[S].X)
                 {
-                    if(A == 1)
-                        GetvScreen(vscreen2);
+                    LevelChop[S] += float(-vScreen[A].X - level[S].X);
+                    level[S].X = -vScreen[A].X;
 
-                    if(-vscreen1.X < -vscreen2.X)
-                        A = 1;
-                    else
-                        A = 2;
+                    // mark that section has shrunk
+                    UpdateSectionOverlaps(S, true);
+                }
+            }
+            // Legacy noturningback
+            else if(!LevelEditor && NoTurnBack[Player[plr_Z].Section])
+            {
+                vScreen_t& vscreen1 = screen.vScreen(1);
+                vScreen_t& vscreen2 = screen.vScreen(2);
+                int screen_p1 = screen.players[0];
+                int screen_p2 = screen.players[1];
+
+                // goal: find screen currently on this section that is the furthest left
+                int A = vscreen_i + 1;
+                if(numScreens > 1)
+                {
+                    if(Player[screen_p1].Section == Player[screen_p2].Section)
+                    {
+                        if(A == 1)
+                            GetvScreen(vscreen2);
+
+                        if(-vscreen1.X < -vscreen2.X)
+                            A = 1;
+                        else
+                            A = 2;
+                    }
+                }
+
+                if(-screen.vScreen(A).X > level[S].X)
+                {
+                    LevelChop[S] += float(-screen.vScreen(A).X - level[S].X);
+                    level[S].X = -screen.vScreen(A).X;
+
+                    // mark that section has shrunk
+                    UpdateSectionOverlaps(S, true);
                 }
             }
 
-            if(-screen.vScreen(A).X > level[S].X)
+            // Keep all players onscreen in clone mode
+            if(!GameMenu && !LevelEditor)
             {
-                LevelChop[S] += float(-screen.vScreen(A).X - level[S].X);
-                level[S].X = -screen.vScreen(A).X;
-
-                // mark that section has shrunk
-                UpdateSectionOverlaps(S, true);
-            }
-        }
-
-        // Keep all players onscreen in clone mode
-        if(!GameMenu && !LevelEditor)
-        {
-            if(g_ClonedPlayerMode)
-            {
-                int C = 0;
-                int D = 0;
-//                For A = 1 To numPlayers
-                For(A, 1, numPlayers)
+                if(g_ClonedPlayerMode)
                 {
-//                    With Player(A)
-                    Player_t &p = Player[A];
-//                        If vScreenCollision(Z, .Location) = False And LevelMacro = 0 And .Location.Y < level(.Section).Height And .Location.Y + .Location.Height > level(.Section).Y And .TimeToLive = 0 And .Dead = False Then
-                    if(!vScreenCollision(Z, p.Location) && LevelMacro == LEVELMACRO_OFF &&
-                        p.Location.Y < level[p.Section].Height &&
-                        p.Location.Y + p.Location.Height > level[p.Section].Y &&
-                        p.TimeToLive == 0 && !p.Dead)
+                    int C = 0;
+                    int D = 0;
+    //                For A = 1 To numPlayers
+                    For(A, 1, numPlayers)
                     {
-                        for(int B = 1; B <= numPlayers; B++)
-                        {
-                            if(!Player[B].Dead && Player[B].TimeToLive == 0 && Player[B].Section == Player[A].Section && vScreenCollision(Z, Player[B].Location))
-                            {
-                                if(C == 0 || std::abs(Player[A].Location.X + Player[A].Location.Width / 2.0 - (Player[B].Location.X + Player[B].Location.Width / 2.0)) < C)
-                                {
-                                    C = std::abs(Player[A].Location.X + Player[A].Location.Width / 2.0 - (Player[B].Location.X + Player[B].Location.Width / 2.0));
-                                    D = B;
-                                }
-                            }
-                        }
-
-                        if(C == 0)
+    //                    With Player(A)
+                        Player_t &p = Player[A];
+    //                        If vScreenCollision(Z, .Location) = False And LevelMacro = 0 And .Location.Y < level(.Section).Height And .Location.Y + .Location.Height > level(.Section).Y And .TimeToLive = 0 And .Dead = False Then
+                        if(!vScreenCollision(Z, p.Location) && LevelMacro == LEVELMACRO_OFF &&
+                            p.Location.Y < level[p.Section].Height &&
+                            p.Location.Y + p.Location.Height > level[p.Section].Y &&
+                            p.TimeToLive == 0 && !p.Dead)
                         {
                             for(int B = 1; B <= numPlayers; B++)
                             {
-                                if(!Player[B].Dead && Player[B].TimeToLive == 0 && Player[B].Section == Player[A].Section)
+                                if(!Player[B].Dead && Player[B].TimeToLive == 0 && Player[B].Section == Player[A].Section && vScreenCollision(Z, Player[B].Location))
                                 {
                                     if(C == 0 || std::abs(Player[A].Location.X + Player[A].Location.Width / 2.0 - (Player[B].Location.X + Player[B].Location.Width / 2.0)) < C)
                                     {
@@ -1614,68 +1604,81 @@ void UpdateGraphicsLogic(bool Do_FrameSkip)
                                     }
                                 }
                             }
+
+                            if(C == 0)
+                            {
+                                for(int B = 1; B <= numPlayers; B++)
+                                {
+                                    if(!Player[B].Dead && Player[B].TimeToLive == 0 && Player[B].Section == Player[A].Section)
+                                    {
+                                        if(C == 0 || std::abs(Player[A].Location.X + Player[A].Location.Width / 2.0 - (Player[B].Location.X + Player[B].Location.Width / 2.0)) < C)
+                                        {
+                                            C = std::abs(Player[A].Location.X + Player[A].Location.Width / 2.0 - (Player[B].Location.X + Player[B].Location.Width / 2.0));
+                                            D = B;
+                                        }
+                                    }
+                                }
+                            }
+
+                            Player[A].Location.X = Player[D].Location.X + Player[D].Location.Width / 2.0 - Player[A].Location.Width / 2.0;
+                            Player[A].Location.Y = Player[D].Location.Y + Player[D].Location.Height - Player[A].Location.Height;
+                            Player[A].Section = Player[D].Section;
+                            Player[A].Location.SpeedX = Player[D].Location.SpeedX;
+                            Player[A].Location.SpeedY = Player[D].Location.SpeedY;
+                            Player[A].Location.SpeedY = dRand() * 12 - 6;
+                            Player[A].CanJump = true;
                         }
-
-                        Player[A].Location.X = Player[D].Location.X + Player[D].Location.Width / 2.0 - Player[A].Location.Width / 2.0;
-                        Player[A].Location.Y = Player[D].Location.Y + Player[D].Location.Height - Player[A].Location.Height;
-                        Player[A].Section = Player[D].Section;
-                        Player[A].Location.SpeedX = Player[D].Location.SpeedX;
-                        Player[A].Location.SpeedY = Player[D].Location.SpeedY;
-                        Player[A].Location.SpeedY = dRand() * 12 - 6;
-                        Player[A].CanJump = true;
+    //                    End With
+    //                Next A
                     }
-//                    End With
-//                Next A
+    //            End If
                 }
-//            End If
             }
-        }
 
-        // It's time to process NPCs. We will update their active state and fill a draw queue.
+            // It's time to process NPCs. We will update their active state and fill a draw queue.
 
-        // only fill draw queue if drawing will happen and this is the local screen
-        bool fill_draw_queue = !Do_FrameSkip && (&screen == l_screen);
+            // only fill draw queue if drawing will happen and this is the local screen
+            bool fill_draw_queue = !Do_FrameSkip && (&screen == l_screen);
 
-        // Make sure we are in range.
-        SDL_assert_release(vscreen_i >= 0 && vscreen_i < (int)(sizeof(NPC_Draw_Queue) / sizeof(NPC_Draw_Queue_t)));
-        NPC_Draw_Queue_t& NPC_Draw_Queue_p = NPC_Draw_Queue[vscreen_i];
+            // Make sure we are in range.
+            SDL_assert_release(vscreen_i >= 0 && vscreen_i < (int)(sizeof(NPC_Draw_Queue) / sizeof(NPC_Draw_Queue_t)));
+            NPC_Draw_Queue_t& NPC_Draw_Queue_p = NPC_Draw_Queue[vscreen_i];
 
-        if(fill_draw_queue)
-            NPC_Draw_Queue_p.reset();
+            if(fill_draw_queue)
+                NPC_Draw_Queue_p.reset();
 
-        // we'll check the NPCs and do some logic for the game,
-        if(!LevelEditor)
-        {
-            if(g_compatibility.modern_npc_camera_logic)
-                ModernNPCScreenLogic(screen, vscreen_i, fill_draw_queue, NPC_Draw_Queue_p);
-            else
-                ClassicNPCScreenLogic(Z, numScreens, fill_draw_queue, NPC_Draw_Queue_p);
-        }
-        // fill the NPC render queue for the level editor
-        else if(fill_draw_queue)
-        {
-            for(int A = 1; A <= numNPCs; A++)
+            // we'll check the NPCs and do some logic for the game,
+            if(!LevelEditor)
             {
-                g_stats.checkedNPCs++;
-
-                if(NPC[A].Hidden)
-                    continue;
-
-                const Location_t loc2 = newLoc(NPC[A].Location.X - (NPCWidthGFX[NPC[A].Type] - NPC[A].Location.Width) / 2.0,
-                    NPC[A].Location.Y,
-                    NPCWidthGFX[NPC[A].Type], NPCHeight[NPC[A].Type]);
-
-                if(vScreenCollision(Z, NPC[A].Location) || vScreenCollision(Z, loc2))
-                    NPC_Draw_Queue_p.add(A);
+                if(g_compatibility.modern_npc_camera_logic)
+                    ModernNPCScreenLogic(screen, vscreen_i, fill_draw_queue, NPC_Draw_Queue_p);
+                else
+                    ClassicNPCScreenLogic(Z, numScreens, fill_draw_queue, NPC_Draw_Queue_p);
             }
-        }
+            // fill the NPC render queue for the level editor
+            else if(fill_draw_queue)
+            {
+                for(int A = 1; A <= numNPCs; A++)
+                {
+                    g_stats.checkedNPCs++;
 
-        // moved from render code because it affects the game's random state
-        // TODO: have a separate shakeScreen state per screen
-        s_shakeScreen.update();
-    }
+                    if(NPC[A].Hidden)
+                        continue;
 
-    // TODO: end loop over screens
+                    const Location_t loc2 = newLoc(NPC[A].Location.X - (NPCWidthGFX[NPC[A].Type] - NPC[A].Location.Width) / 2.0,
+                        NPC[A].Location.Y,
+                        NPCWidthGFX[NPC[A].Type], NPCHeight[NPC[A].Type]);
+
+                    if(vScreenCollision(Z, NPC[A].Location) || vScreenCollision(Z, loc2))
+                        NPC_Draw_Queue_p.add(A);
+                }
+            }
+
+            // moved from render code because it affects the game's random state
+            // TODO: have a separate shakeScreen state per screen
+            s_shakeScreen.update();
+        } // loop over vScreens
+    } // loop over Screens
 
     // Background frames (NOTE: frames were only updated on non-frameskip in vanilla)
     if(!FreezeNPCs)
