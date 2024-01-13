@@ -841,7 +841,6 @@ void UpdateGraphicsLogic(bool Do_FrameSkip)
     // the graphics screen logic is handled via a big loop over Screens (clients)
     for(int screen_i = 0; screen_i < c_screenCount; screen_i++)
     {
-        int screen_i = 0;
         Screen_t& screen = Screens[screen_i];
 
         if(!screen.Visible)
