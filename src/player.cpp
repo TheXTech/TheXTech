@@ -7188,10 +7188,12 @@ void PlayerEffects(const int A)
     }
     else if(p.Effect == 8) // Holding Pattern
     {
+        // tracking a player that got an exit
         if(p.Effect2 < 0)
         {
             p.Location.X = Player[-p.Effect2].Location.X;
             p.Location.Y = Player[-p.Effect2].Location.Y;
+
             if(Player[-p.Effect2].Dead)
                 p.Dead = true;
         }
