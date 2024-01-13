@@ -3718,7 +3718,7 @@ void YoshiEatCode(const int A)
     }
 }
 
-void RespawnPlayer(int A, double Direction, double CenterX, double StopY)
+void RespawnPlayer(int A, double Direction, double CenterX, double StopY, const vScreen_t& target_screen)
 {
     Player[A].Location.Width = Physics.PlayerWidth[Player[A].Character][Player[A].State];
     Player[A].Location.Height = Physics.PlayerHeight[Player[A].Character][Player[A].State];
@@ -3730,7 +3730,7 @@ void RespawnPlayer(int A, double Direction, double CenterX, double StopY)
     Player[A].Effect = 6;
     // location where player stops flashing
     Player[A].Effect2 = StopY - Player[A].Location.Height;
-    Player[A].Location.Y = -vScreen[1].Y - Player[A].Location.Height;
+    Player[A].Location.Y = -target_screen.Y - Player[A].Location.Height;
     Player[A].Location.X = CenterX - Player[A].Location.Width / 2.0;
 }
 
@@ -3750,7 +3750,11 @@ void RespawnPlayerTo(int A, int TargetPlayer)
     // technically this would fix a vanilla bug (possible weird effects after Player 2 dies, Player 1 goes through Warp, Player 2 respawns)
     //   so I will do it where it only affects the new code.
     // Player[A].Section = Player[TargetPlayer].Section;
-    RespawnPlayer(A, Player[TargetPlayer].Direction, CenterX, StopY);
+
+    // respawn at top of target player's vScreen in >2P mode, otherwise use vScreen 1 as SMBX64 does
+    const vScreen_t& target_screen = (numPlayers > 2) ? vScreenByPlayer(TargetPlayer) : vScreen[1];
+
+    RespawnPlayer(A, Player[TargetPlayer].Direction, CenterX, StopY, target_screen);
 }
 
 void StealBonus()
