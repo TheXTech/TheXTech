@@ -18,31 +18,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#pragma once
-#ifndef GFX_UPDATE_H
-#define GFX_UPDATE_H
+#ifndef SCREEN_PROGRESS_H
+#define SCREEN_PROGRESS_H
 
-#include "global_constants.h"
+#include <cstdint>
+#include <string>
 
-extern std::array<bool, maxLocalPlayers> g_drawBlocks_valid;
-extern std::array<bool, maxLocalPlayers> g_drawBGOs_valid;
+/**
+ * \brief Updates a progress screen for a long main thread operation
+ *
+ * \param start_time: start time of the operation based on SDL_GetTicks() (required)
+ * \param progress: estimated progress ratio between 0 and 1 (set to negative value if no estimate possible)
+ * \param message:
+ *
+ * Will perform an events update and other actions required during main loop
+ **/
+void IndicateProgress(uint32_t start_time, double progress, const std::string& message);
 
-// should equal the largest X or Y move rate of any layer containing blocks / BGOs
-extern double g_drawBlocks_invalidate_rate;
-extern double g_drawBGOs_invalidate_rate;
-
-// call when a block is added, moved, or its Hidden attribute is changed
-inline void invalidateDrawBlocks()
-{
-    g_drawBlocks_valid[0] = false;
-    g_drawBlocks_valid[1] = false;
-}
-
-// call when a BGO is added, moved, or its Hidden attribute is changed
-inline void invalidateDrawBGOs()
-{
-    g_drawBGOs_valid[0] = false;
-    g_drawBGOs_valid[1] = false;
-}
-
-#endif // #ifdef GFX_UPDATE_H
+#endif // SCREEN_PROGRESS_H

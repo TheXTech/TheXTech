@@ -343,7 +343,8 @@
             "reconnectTitle": "重新连接",
             "splitPressSelect_1": "按选择键",
             "splitPressSelect_2": "进入按键配置",
-            "wordDisconnect": "断开"
+            "wordDisconnect": "断开",
+            "phraseTestProfile": "测试配置"
         },
         "controls": {
             "phrasePlayerConnected": "玩家{0}已连接{1}， 配置： {2}",
@@ -354,6 +355,9 @@
             "errorNoStartPoint": "========= 发生错误! =========\n\n未放置玩家起点或传送点入口，因此无法进入关卡。\n\n文件：{0}",
             "openFileFailed": "错误：无法打开文件\"{0}\"：文件不存在或已损坏。",
             "warpNeedStarCount": "你需要{0}{2}{1}才能进入此传送点。"
+        },
+        "format": {
+            "minutesSeconds": "{0}分{1}秒"
         },
         "pause": {
             "continue": "继续游戏",
@@ -366,6 +370,9 @@
             "returnToEditor": "返回编辑器",
             "saveAndContinue": "保存并继续",
             "saveAndQuit": "保存并退出"
+        },
+        "message": {
+            "scanningLevels": "扫描关卡中……"
         }
     },
     "languageName": "简体中文",
@@ -581,8 +588,9 @@
                 "linear": "双线性",
                 "nearest": "最近邻居"
             },
-            "render": "图形渲染方式: {0}",
-            "renderX": "图形渲染方式: {0} (X)"
+            "render": "图形渲染类型: {0}",
+            "renderX": "图形渲染类型: {0} (X)",
+            "renderAuto": "图形渲染类型: 自动选择 ({0})"
         },
         "wordBack": "返回",
         "wordHide": "隐藏",

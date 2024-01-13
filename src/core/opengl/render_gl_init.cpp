@@ -715,6 +715,19 @@ bool RenderGL::initFramebuffers()
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB,
         1, 1,
         0, GL_RGB, GL_UNSIGNED_BYTE, white_texel);
+
+#ifdef THEXTECH_BUILD_GL_DESKTOP_LEGACY
+    auto texborder = (m_gl_majver == 1 && m_gl_profile == SDL_GL_CONTEXT_PROFILE_COMPATIBILITY)
+        ? GL_CLAMP : GL_CLAMP_TO_EDGE;
+#else
+    auto texborder = GL_CLAMP_TO_EDGE;
+#endif
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, texborder);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, texborder);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
     glActiveTexture(TEXTURE_UNIT_IMAGE);
 
 #endif // #ifdef RENDERGL_HAS_FBO
