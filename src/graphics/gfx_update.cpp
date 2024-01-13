@@ -564,11 +564,14 @@ void GraphicsLazyPreLoad()
 // swappable buffer for previous frame's NoReset NPCs
 static std::vector<NPCRef_t> s_NoReset_NPCs_LastFrame;
 
+// shared between the NPC screen logic functions, always reset to 0 between frames
+static std::bitset<maxNPCs> s_NPC_present;
+
 // does the classic ("onscreen") NPC activation / reset logic for vScreen Z, directly based on the many NPC loops of the original game
-void ClassicNPCScreenLogic(int Z, int numScreens, bool Do_FrameSkip, NPC_Draw_Queue_t& NPC_Draw_Queue_p)
+void ClassicNPCScreenLogic(int Z, int numScreens, bool fill_draw_queue, NPC_Draw_Queue_t& NPC_Draw_Queue_p)
 {
-    // using bitset here instead of simpler set for checkNPCs because I benchmarked it to be faster -- ds-sloth
-    static std::bitset<maxNPCs> NPC_present;
+    // using bitset here instead of simpler set because I benchmarked it to be faster -- ds-sloth
+    std::bitset<maxNPCs>& NPC_present = s_NPC_present;
 
     // find the onscreen NPCs
     TreeResult_Sentinel<NPCRef_t> _screenNPCs = treeNPCQuery(-vScreen[Z].X, -vScreen[Z].Y,
@@ -729,7 +732,7 @@ void ClassicNPCScreenLogic(int Z, int numScreens, bool Do_FrameSkip, NPC_Draw_Qu
                 NPC[A].Killed = 9;
                 KillNPC(A, 9);
             }
-            else if(NPC[A].Active && !Do_FrameSkip)
+            else if(NPC[A].Active && fill_draw_queue)
             {
                 NPC_Draw_Queue_p.add(A);
             }
@@ -769,7 +772,8 @@ void ClassicNPCScreenLogic(int Z, int numScreens, bool Do_FrameSkip, NPC_Draw_Qu
         }
     }
 
-    NPC_Draw_Queue_p.sort();
+    if(fill_draw_queue)
+        NPC_Draw_Queue_p.sort();
 }
 
 // This draws the graphic to the screen when in a level/game menu/outro/level editor
@@ -961,10 +965,10 @@ void UpdateGraphics(bool skipRepaint)
 
         // we'll check the NPCs and do some logic for the game,
         if(!LevelEditor)
-            ClassicNPCScreenLogic(Z, numScreens, Do_FrameSkip, NPC_Draw_Queue_p);
+            ClassicNPCScreenLogic(Z, numScreens, fill_draw_queue, NPC_Draw_Queue_p);
 
         // fill the NPC render queue for the level editor
-        else if(!Do_FrameSkip)
+        else if(fill_draw_queue)
         {
             for(A = 1; A <= numNPCs; A++)
             {
