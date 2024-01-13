@@ -1183,25 +1183,7 @@ void UpdateGraphicsScreen(Screen_t& screen)
         }
 
 
-//        If GameMenu = True Then
-        // if(GameMenu)
-        // {
-            // (Commented out in original code :thinking:)
-            // Curtain
-//            XRender::renderTexture(0, 0, GFX.MenuGFX[1]);
-            // Game logo
-//            XRender::renderTexture(ScreenW / 2 - GFX.MenuGFX[2].w / 2, 70, GFX.MenuGFX[2]);
-//        ElseIf LevelEditor = False Then
-#if 0 /* DEAD CODE */
-        if(!GameMenu && !LevelEditor)
-        {
-//            If numPlayers > 2 And nPlay.Online = False Then
-
-            // moved many-player (superbdemo128) handling code to logic section above
-
-//        End If
-        }
-#endif
+        // moved many-player (superbdemo128) handling code to logic section above
 
 #ifdef __3DS__
         XRender::setTargetLayer(1);
@@ -1246,7 +1228,7 @@ void UpdateGraphicsScreen(Screen_t& screen)
         }
         else
         {
-//            For A = 1 To MidBackground - 1 'First backgrounds
+            // For A = 1 To MidBackground - 1 'First backgrounds
             for(; nextBackground < (int)screenBackgrounds.size() && (int)screenBackgrounds[nextBackground] < MidBackground; nextBackground++)  // First backgrounds
             {
                 int A = screenBackgrounds[nextBackground];
@@ -1434,7 +1416,7 @@ void UpdateGraphicsScreen(Screen_t& screen)
 
         XRender::setDrawPlane(PLANE_LVL_NPC_BG);
 
-//        For A = 1 To numNPCs 'Display NPCs that should be behind blocks
+        // 'Display NPCs that should be behind blocks
         for(size_t i = 0; i < NPC_Draw_Queue_p.BG_n; i++)
         {
             int A = NPC_Draw_Queue_p.BG[i];
@@ -1477,8 +1459,8 @@ void UpdateGraphicsScreen(Screen_t& screen)
 
         XRender::setDrawPlane(PLANE_LVL_PLR_WARP);
 
-//        For A = 1 To numPlayers 'Players behind blocks
-        For(A, 1, numPlayers)
+        // Player warp effects 'Players behind blocks
+        for(int A = 1; A <= numPlayers; A++)
         {
             if(!Player[A].Dead && !Player[A].Immune2 && Player[A].TimeToLive == 0 && Player[A].Effect == 3)
             {
@@ -1727,21 +1709,9 @@ void UpdateGraphicsScreen(Screen_t& screen)
         }
 
 
-//        if(LevelEditor)
-//        {
-//            fBlock = 1;
-//            lBlock = numBlock;
-//        }
-//        else
-//        {
-//            //fBlock = FirstBlock[int(-vScreen[Z].X / 32) - 1];
-//            //lBlock = LastBlock[int((-vScreen[Z].X + vScreen[Z].Width) / 32) + 1];
-//            blockTileGet(-vScreen[Z].X, vScreen[Z].Width, fBlock, lBlock);
-//        }
-
         XRender::setDrawPlane(PLANE_LVL_BLK_NORM);
 
-//        For A = fBlock To lBlock 'Non-Sizable Blocks
+        // 'Non-Sizable Blocks
         for(Block_t& block : screenMainBlocks)
         {
             g_stats.checkedBlocks++;
@@ -1776,7 +1746,7 @@ void UpdateGraphicsScreen(Screen_t& screen)
 
         XRender::setDrawPlane(PLANE_LVL_EFF_LOW);
 
-//'effects in back
+        //'effects in back
         for(int A = 1; A <= numEffects; A++)
         {
             g_stats.checkedEffects++;
@@ -1828,7 +1798,7 @@ void UpdateGraphicsScreen(Screen_t& screen)
 
         XRender::setDrawPlane(PLANE_LVL_NPC_NORM);
 
-//        For A = 1 To numNPCs 'Display NPCs that should be in front of blocks
+        // 'Display NPCs that should be in front of blocks
         for(size_t i = 0; i < NPC_Draw_Queue_p.Normal_n; i++)
         {
             int A = NPC_Draw_Queue_p.Normal[i];
@@ -1984,7 +1954,6 @@ void UpdateGraphicsScreen(Screen_t& screen)
                 // Yoshi's Head
                 XRender::renderTexture(vScreen[Z].X + SDL_floor(NPC[A].Location.X) + YoshiTX, vScreen[Z].Y + NPC[A].Location.Y + YoshiTY, 32, 32, GFXYoshiT[B], 0, 32 * YoshiTFrame, cn);
             }
-//        Next A
         }
 
         // npc chat bubble
@@ -2098,19 +2067,16 @@ void UpdateGraphicsScreen(Screen_t& screen)
 
 
 
-//'normal player draw code
-//        For A = numPlayers To 1 Step -1 'Players in front of blocks
-        for(int A = numPlayers; A >= 1; A--)// Players in front of blocks
+        //'normal player draw code
+        //'Players in front of blocks
+        for(int A = numPlayers; A >= 1; A--)
         {
-//            DrawPlayer A, Z
             DrawPlayer(Player[A], Z);
-//        Next A
         }
-//'normal player end
+        //'normal player end
 
 
-
-
+        // foreground backgrounds
         XRender::setDrawPlane(PLANE_LVL_BGO_FG);
 
         if(LevelEditor)
@@ -2161,7 +2127,6 @@ void UpdateGraphicsScreen(Screen_t& screen)
                     XRender::renderTexture(sX, sY, GFXBackgroundWidth[Background[A].Type], BackgroundHeight[Background[A].Type], GFXBackground[Background[A].Type], 0, BackgroundHeight[Background[A].Type] * BackgroundFrame[Background[A].Type]);
                 }
             }
-//        End If
         }
 
         XRender::setDrawPlane(PLANE_LVL_NPC_FG);
@@ -2184,8 +2149,9 @@ void UpdateGraphicsScreen(Screen_t& screen)
         {
             g_stats.checkedBlocks++;
 
-            // if(BlockKills[block.Type])
-//            {
+            // screenLavaBlocks only contains deadly blocks
+            // if(!BlockKills[block.Type]) continue;
+
             if(vScreenCollision(Z, block.Location) /*&& !block.Hidden*/)
             {
                 g_stats.renderedBlocks++;
@@ -2201,40 +2167,32 @@ void UpdateGraphicsScreen(Screen_t& screen)
                                       0,
                                       BlockFrame[block.Type] * 32);
             }
-//            }
         }
 
         XRender::setDrawPlane(PLANE_LVL_EFF_NORM);
 
-// effects on top
+        // effects on top
         For(A, 1, numEffects)
         {
             g_stats.checkedEffects++;
-//            With Effect(A)
             auto &e = Effect[A];
-//                If .Type <> 112 And .Type <> 54 And .Type <> 55 And .Type <> 59 And .Type <> 77 And .Type <> 81 And .Type <> 82 And .Type <> 103 And .Type <> 104 And .Type <> 114 And .Type <> 123 And .Type <> 124 Then
+
             if(e.Type != EFFID_BOSS_FRAGILE_DIE && e.Type != EFFID_DOOR_S2_OPEN && e.Type != EFFID_DOOR_DOUBLE_S3_OPEN && e.Type != EFFID_DOOR_SIDE_S3_OPEN &&
                e.Type != EFFID_PLR_FIREBALL_TRAIL && e.Type != EFFID_COIN_SWITCH_PRESS && e.Type != EFFID_SPINBLOCK && e.Type != EFFID_BIG_DOOR_OPEN &&
                e.Type != EFFID_LAVA_MONSTER_LOOK && e.Type != EFFID_WATER_SPLASH && e.Type != EFFID_TIME_SWITCH_PRESS && e.Type != EFFID_TNT_PRESS)
             {
-//                    If vScreenCollision(Z, .Location) Then
                 if(vScreenCollision(Z, e.Location))
                 {
                     g_stats.renderedEffects++;
-//                        BitBlt myBackBuffer, vScreenX(Z) + .Location.X, vScreenY(Z) + .Location.Y, .Location.Width, .Location.Height, GFXEffectMask(.Type), 0, .Frame * EffectHeight(.Type), vbSrcAnd
-//                        If .Shadow = False Then BitBlt myBackBuffer, vScreenX(Z) + .Location.X, vScreenY(Z) + .Location.Y, .Location.Width, .Location.Height, GFXEffect(.Type), 0, .Frame * EffectHeight(.Type), vbSrcPaint
+
                     XTColor cn = e.Shadow ? XTColor(0, 0, 0) : XTColor();
                     XRender::renderTexture(vb6Round(vScreen[Z].X + e.Location.X),
                                            vb6Round(vScreen[Z].Y + e.Location.Y),
                                            vb6Round(e.Location.Width),
                                            vb6Round(e.Location.Height),
                                            GFXEffectBMP[e.Type], 0, e.Frame * EffectHeight[e.Type], cn);
-//                    End If
                 }
-//                End If
             }
-//            End With
-//        Next A
         }
 
         XRender::setDrawPlane(PLANE_LVL_INFO);
@@ -2327,7 +2285,7 @@ void UpdateGraphicsScreen(Screen_t& screen)
 #ifdef THEXTECH_ENABLE_LUNA_AUTOCODE
                 lunaRenderHud(Z);
 #endif
-    //                DrawInterface Z, numScreens
+
                 if(ShowOnScreenHUD && !gSMBXHUDSettings.skip)
                     DrawInterface(Z, numScreens);
 
@@ -2353,7 +2311,6 @@ void UpdateGraphicsScreen(Screen_t& screen)
                 g_levelVScreenFader[Z].draw(false);
         }
 
-//        If LevelEditor = True Or MagicHand = True Then
         if((LevelEditor || MagicHand))
         {
             XRender::offsetViewportIgnore(true);
@@ -2367,9 +2324,6 @@ void UpdateGraphicsScreen(Screen_t& screen)
 
         XRender::setDrawPlane(PLANE_LVL_META);
 
-//        If LevelEditor = True Then
-//            StretchBlt frmLevelWindow.vScreen(Z).hdc, 0, 0, frmLevelWindow.vScreen(Z).ScaleWidth, frmLevelWindow.vScreen(Z).ScaleHeight, myBackBuffer, 0, 0, 800, 600, vbSrcCopy
-//        Else
         // Screen shake logic was here; moved into the logic section of the file because it affects the random state of the game
 
         // draw onscreen controls display
@@ -2384,11 +2338,10 @@ void UpdateGraphicsScreen(Screen_t& screen)
             speedRun_renderControls(Z, Z);
 
         XRender::offsetViewportIgnore(false);
-
-//    Next Z
     } // For(Z, 2, numScreens)
 
-    // graphics shared by all vScreens
+
+    // graphics shared by all vScreens, but still on the Screen
     XRender::resetViewport();
     XRender::offsetViewportIgnore(true);
 
@@ -2448,8 +2401,8 @@ void UpdateGraphicsMeta()
 
     DrawDeviceBattery();
 
-    // TODO: don't rely on this behavior during level test, maybe just don't draw vScreen at all
-    // draw screen fader below level menu when game is paused
+    // Draw screen fader below level menu when game is paused
+    // This makes sure that the level test menu is drawn above the screen fader during level tests
     if(GamePaused != PauseCode::None)
         XRender::setDrawPlane(PLANE_GAME_MENUS);
 
