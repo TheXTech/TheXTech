@@ -776,16 +776,22 @@ void ClassicNPCScreenLogic(int Z, int numScreens, bool fill_draw_queue, NPC_Draw
         NPC_Draw_Queue_p.sort();
 }
 
+//! all of the logic done by UpdateGraphics
+void UpdateGraphicsLogic(bool Do_FrameSkip);
+
+//! parent function for the actual drawing to screen
+void UpdateGraphicsDraw(bool skipRepaint);
+
+//! draw graphics for the current Screen_t
+void UpdateGraphicsScreen(Screen_t& screen);
+
+//! extra non-gameplay related draws (menus and information display)
+void UpdateGraphicsMeta();
+
 // This draws the graphic to the screen when in a level/game menu/outro/level editor
 void UpdateGraphics(bool skipRepaint)
 {
 //    On Error Resume Next
-
-    XTColor plr_shade = ShadowMode ? XTColor(0, 0, 0) : XTColor();
-
-    int A = 0;
-//    std::string timeStr;
-    int Z = 0;
 
     if(!GameIsActive)
         return;
@@ -804,6 +810,17 @@ void UpdateGraphics(bool skipRepaint)
     if(FrameSkip && !TakeScreen && frameSkipNeeded())
         Do_FrameSkip = true;
 
+    UpdateGraphicsLogic(Do_FrameSkip);
+
+    // we've now done all the logic that UpdateGraphics can do.
+    if(Do_FrameSkip)
+        return;
+
+    UpdateGraphicsDraw(skipRepaint);
+}
+
+void UpdateGraphicsLogic(bool Do_FrameSkip)
+{
     // ALL graphics-based logic code has been moved here, separate from rendering.
     // (This code is a combination of the FrameSkip logic from before with the
     //   logic components of the full rendering code.)
@@ -832,7 +849,7 @@ void UpdateGraphics(bool skipRepaint)
 
     for(int vscreen_i = screen.active_begin(); vscreen_i < screen.active_end(); vscreen_i++)
     {
-        Z = screen.vScreen_refs[vscreen_i];
+        int Z = screen.vScreen_refs[vscreen_i];
         int plr_Z = screen.players[vscreen_i];
 
         // modern NPC activation logic is required to support more than 2 vScreens (for the Reset array), but we don't have that yet in the main branch
@@ -866,7 +883,7 @@ void UpdateGraphics(bool skipRepaint)
             int screen_p2 = screen.players[1];
 
             // goal: find screen currently on this section that is the furthest left
-            A = vscreen_i + 1;
+            int A = vscreen_i + 1;
             if(numScreens > 1)
             {
                 if(Player[screen_p1].Section == Player[screen_p2].Section)
@@ -970,7 +987,7 @@ void UpdateGraphics(bool skipRepaint)
         // fill the NPC render queue for the level editor
         else if(fill_draw_queue)
         {
-            for(A = 1; A <= numNPCs; A++)
+            for(int A = 1; A <= numNPCs; A++)
             {
                 g_stats.checkedNPCs++;
 
@@ -1039,23 +1056,17 @@ void UpdateGraphics(bool skipRepaint)
 
     // NOTE: qScreen was only updated on non-frameskip in vanilla
     qScreen = continue_qScreen;
+}
 
 
-    // we've now done all the logic that UpdateGraphics can do.
-    if(Do_FrameSkip)
-        return;
-
-
+void UpdateGraphicsDraw(bool skipRepaint)
+{
     // begin render code
     XRender::setTargetTexture();
 
     frameNextInc();
     frameRenderStart();
     lunaRenderStart();
-
-    int B = 0;
-    int Y = 0;
-    Location_t tempLocation;
 
     if(ClearBuffer)
     {
@@ -1069,15 +1080,33 @@ void UpdateGraphics(bool skipRepaint)
 
     XRender::setDrawPlane(PLANE_GAME_BACKDROP);
 
-    // TODO: set screen to be the draw screen (can't do it here because we're still in the screen's scope from before)
-    // Screen_t& screen = *l_screen;
-    // TODO: update numScreens based on newly bound screen
+    UpdateGraphicsScreen(*l_screen);
+
+    UpdateGraphicsMeta();
+
+    if(!skipRepaint)
+        XRender::repaint();
+
+    lunaRenderEnd();
+    frameRenderEnd();
+
+//    if(XRender::lazyLoadedBytes() > 200000) // Reset timer while loading many pictures at the same time
+//        resetFrameTimer();
+    XRender::lazyLoadedBytesReset();
+}
+
+void UpdateGraphicsScreen(Screen_t& screen)
+{
+    XTColor plr_shade = ShadowMode ? XTColor(0, 0, 0) : XTColor();
+    Location_t tempLocation;
+
+    int numScreens = screen.active_end();
 
     // No logic
     // Draw the screens!
     for(int vscreen_i = screen.active_begin(); vscreen_i < screen.active_end(); vscreen_i++)
     {
-        Z = screen.vScreen_refs[vscreen_i];
+        int Z = screen.vScreen_refs[vscreen_i];
         int plr_Z = screen.players[vscreen_i];
 
         int S;
@@ -1220,7 +1249,7 @@ void UpdateGraphics(bool skipRepaint)
 //            For A = 1 To MidBackground - 1 'First backgrounds
             for(; nextBackground < (int)screenBackgrounds.size() && (int)screenBackgrounds[nextBackground] < MidBackground; nextBackground++)  // First backgrounds
             {
-                A = screenBackgrounds[nextBackground];
+                int A = screenBackgrounds[nextBackground];
                 g_stats.checkedBGOs++;
 
                 if(vScreenCollision(Z, Background[A].Location) && !Background[A].Hidden)
@@ -1354,7 +1383,7 @@ void UpdateGraphics(bool skipRepaint)
         {
             for(; nextBackground < (int)screenBackgrounds.size() && (int)screenBackgrounds[nextBackground] <= LastBackground; nextBackground++)  // Second backgrounds
             {
-                A = screenBackgrounds[nextBackground];
+                int A = screenBackgrounds[nextBackground];
 
                 g_stats.checkedBGOs++;
 
@@ -1384,7 +1413,7 @@ void UpdateGraphics(bool skipRepaint)
 
         for(int oBackground = (int)screenBackgrounds.size() - 1; oBackground > 0 && (int)screenBackgrounds[oBackground] > numBackground; oBackground--)  // Locked doors
         {
-            A = screenBackgrounds[oBackground];
+            int A = screenBackgrounds[oBackground];
 
             g_stats.checkedBGOs++;
             if(vScreenCollision(Z, Background[A].Location) &&
@@ -1408,7 +1437,7 @@ void UpdateGraphics(bool skipRepaint)
 //        For A = 1 To numNPCs 'Display NPCs that should be behind blocks
         for(size_t i = 0; i < NPC_Draw_Queue_p.BG_n; i++)
         {
-            A = NPC_Draw_Queue_p.BG[i];
+            int A = NPC_Draw_Queue_p.BG[i];
             XTColor cn = NPC[A].Shadow ? XTColor(0, 0, 0) : XTColor();
 
             if(NPC[A].Type == NPCID_PLANT_S3 || NPC[A].Type == NPCID_BIG_PLANT || NPC[A].Type == NPCID_PLANT_S1 || NPC[A].Type == NPCID_FIRE_PLANT || NPC[A].Type == NPCID_LONG_PLANT_UP || NPC[A].Type == NPCID_JUMP_PLANT)
@@ -1524,7 +1553,7 @@ void UpdateGraphics(bool skipRepaint)
 
                     if(p.Mount == 3)
                     {
-                        B = p.MountType;
+                        int B = p.MountType;
                         // Yoshi's Body
                         tempLocation = roundLoc(p.Location, 2.0);
                         tempLocation.Height = 32;
@@ -1748,7 +1777,7 @@ void UpdateGraphics(bool skipRepaint)
         XRender::setDrawPlane(PLANE_LVL_EFF_LOW);
 
 //'effects in back
-        for(A = 1; A <= numEffects; A++)
+        for(int A = 1; A <= numEffects; A++)
         {
             g_stats.checkedEffects++;
             if(Effect[A].Type == EFFID_BOSS_FRAGILE_DIE || Effect[A].Type == EFFID_DOOR_S2_OPEN || Effect[A].Type == EFFID_DOOR_DOUBLE_S3_OPEN ||
@@ -1776,7 +1805,7 @@ void UpdateGraphics(bool skipRepaint)
         // draw NPCs that should be behind other NPCs
         for(size_t i = 0; i < NPC_Draw_Queue_p.Low_n; i++)
         {
-            A = NPC_Draw_Queue_p.Low[i];
+            int A = NPC_Draw_Queue_p.Low[i];
             XTColor cn = NPC[A].Shadow ? XTColor(0, 0, 0) : XTColor();
             cn.a = (NPC[A].Type == NPCID_MEDAL && g_curLevelMedals.gotten(NPC[A].Variant - 1)) ? 127 : 255;
 
@@ -1792,7 +1821,7 @@ void UpdateGraphics(bool skipRepaint)
         // ice
         for(size_t i = 0; i < NPC_Draw_Queue_p.Iced_n; i++)
         {
-            A = NPC_Draw_Queue_p.Iced[i];
+            int A = NPC_Draw_Queue_p.Iced[i];
             DrawFrozenNPC(Z, A);
         }
 
@@ -1802,7 +1831,7 @@ void UpdateGraphics(bool skipRepaint)
 //        For A = 1 To numNPCs 'Display NPCs that should be in front of blocks
         for(size_t i = 0; i < NPC_Draw_Queue_p.Normal_n; i++)
         {
-            A = NPC_Draw_Queue_p.Normal[i];
+            int A = NPC_Draw_Queue_p.Normal[i];
             XTColor cn = NPC[A].Shadow ? XTColor(0, 0, 0) : XTColor();
 
             if(!NPCIsYoshi[NPC[A].Type])
@@ -1828,7 +1857,7 @@ void UpdateGraphics(bool skipRepaint)
                         tempLocation.X = NPC[A].Location.X + NPC[A].Location.Width / 2.0 - tempLocation.Width / 2.0;
                         tempLocation.Y = NPC[A].Location.Y + NPC[A].Location.Height / 2.0 - tempLocation.Height / 2.0;
 
-                        B = EditorNPCFrame((int)SDL_floor(NPC[A].Special), NPC[A].Direction);
+                        int B = EditorNPCFrame((int)SDL_floor(NPC[A].Special), NPC[A].Direction);
                         XRender::renderTexture(vScreen[Z].X + tempLocation.X + NPCFrameOffsetX[NPC[A].Type], vScreen[Z].Y + tempLocation.Y, tempLocation.Width, tempLocation.Height, GFXNPC[NPC[A].Special], 0, B * tempLocation.Height);
                     }
 
@@ -1837,6 +1866,8 @@ void UpdateGraphics(bool skipRepaint)
             }
             else
             {
+                int B = 1;
+
                 if(NPC[A].Type == NPCID_PET_GREEN)
                     B = 1;
                 else if(NPC[A].Type == NPCID_PET_BLUE)
@@ -1959,13 +1990,13 @@ void UpdateGraphics(bool skipRepaint)
         // npc chat bubble
         for(size_t i = 0; i < NPC_Draw_Queue_p.Chat_n; i++)
         {
-            A = NPC_Draw_Queue_p.Chat[i];
+            int A = NPC_Draw_Queue_p.Chat[i];
 
-            B = NPCHeightGFX[NPC[A].Type] - NPC[A].Location.Height;
+            int B = NPCHeightGFX[NPC[A].Type] - NPC[A].Location.Height;
             if(B < 0)
                 B = 0;
 
-            XRender::renderTexture(vScreen[Z].X + NPC[A].Location.X + NPC[A].Location.Width / 2.0 - GFX.Chat.w / 2, vScreen[Z].Y + NPC[A].Location.Y - 30 - B, GFX.Chat.w, GFX.Chat.h, GFX.Chat, 0, 0);
+            XRender::renderTexture(vScreen[Z].X + NPC[A].Location.X + NPC[A].Location.Width / 2.0 - GFX.Chat.w / 2, vScreen[Z].Y + NPC[A].Location.Y - 30 - B, GFX.Chat);
         }
 
 
@@ -1982,6 +2013,8 @@ void UpdateGraphics(bool skipRepaint)
                 constexpr std::array<plr_pic_arr*, 5> char_tex = {&GFXMario, &GFXLuigi, &GFXPeach, &GFXToad, &GFXLink};
 
                 StdPicture& tx = (*char_tex[p.Character - 1])[p.State];
+
+                int Y = 0;
 
                 switch(Player[A].Character)
                 {
@@ -2046,7 +2079,7 @@ void UpdateGraphics(bool skipRepaint)
         // Put held NPCs on top
         for(size_t i = 0; i < NPC_Draw_Queue_p.Held_n; i++)
         {
-            A = NPC_Draw_Queue_p.Held[i];
+            int A = NPC_Draw_Queue_p.Held[i];
             XTColor cn = NPC[A].Shadow ? XTColor(0, 0, 0) : XTColor();
             {
                 if(NPC[A].Type == NPCID_ICE_CUBE)
@@ -2107,7 +2140,7 @@ void UpdateGraphics(bool skipRepaint)
         {
             for(; nextBackground < (int)screenBackgrounds.size() && (int)screenBackgrounds[nextBackground] <= numBackground; nextBackground++)  // Foreground objects
             {
-                A = screenBackgrounds[nextBackground];
+                int A = screenBackgrounds[nextBackground];
 
                 g_stats.checkedBGOs++;
 
@@ -2136,7 +2169,7 @@ void UpdateGraphics(bool skipRepaint)
         // foreground NPCs
         for(size_t i = 0; i < NPC_Draw_Queue_p.FG_n; i++)
         {
-            A = NPC_Draw_Queue_p.FG[i];
+            int A = NPC_Draw_Queue_p.FG[i];
             XTColor cn = NPC[A].Shadow ? XTColor(0, 0, 0) : XTColor();
             if(NPCWidthGFX[NPC[A].Type] == 0)
                 XRender::renderTexture(vScreen[Z].X + NPC[A].Location.X + NPCFrameOffsetX[NPC[A].Type], vScreen[Z].Y + NPC[A].Location.Y + NPCFrameOffsetY[NPC[A].Type], NPC[A].Location.Width, NPC[A].Location.Height, GFXNPC[NPC[A].Type], 0, NPC[A].Frame * NPC[A].Location.Height, cn);
@@ -2303,7 +2336,7 @@ void UpdateGraphics(bool skipRepaint)
                 // Display NPCs that got dropped from the container
                 for(size_t i = 0; i < NPC_Draw_Queue_p.Dropped_n; i++)
                 {
-                    A = NPC_Draw_Queue_p.Dropped[i];
+                    int A = NPC_Draw_Queue_p.Dropped[i];
 
                     if(NPCWidthGFX[NPC[A].Type] == 0)
                         XRender::renderTexture(vScreen[Z].X + NPC[A].Location.X + NPCFrameOffsetX[NPC[A].Type], vScreen[Z].Y + NPC[A].Location.Y + NPCFrameOffsetY[NPC[A].Type], NPC[A].Location.Width, NPC[A].Location.Height, GFXNPC[NPC[A].Type], 0, NPC[A].Frame * NPC[A].Location.Height);
@@ -2377,14 +2410,6 @@ void UpdateGraphics(bool skipRepaint)
             XRender::renderRect((screen.W / 2) - 2, 0, 4, screen.H, {0, 0, 0});
     }
 
-    XRender::setDrawPlane(PLANE_GAME_MENUS);
-
-    if(GameMenu && !GameOutro)
-        mainMenuDraw();
-
-    if(GameOutro)
-        DrawCredits();
-
     XRender::setDrawPlane(PLANE_GAME_META);
 
     // 1P controls indicator
@@ -2397,6 +2422,13 @@ void UpdateGraphics(bool skipRepaint)
         speedRun_renderControls(1, -1);
         speedRun_renderControls(2, -1);
     }
+}
+
+void UpdateGraphicsMeta()
+{
+    XRender::resetViewport();
+
+    XRender::setDrawPlane(PLANE_GAME_META);
 
     speedRun_renderTimer();
 
@@ -2423,7 +2455,14 @@ void UpdateGraphics(bool skipRepaint)
 
     g_levelScreenFader.draw();
 
+    // Important note: PLANE_GAME_MENUS is below PLANE_GAME_META.
     XRender::setDrawPlane(PLANE_GAME_MENUS);
+
+    if(GameMenu && !GameOutro)
+        mainMenuDraw();
+
+    if(GameOutro)
+        DrawCredits();
 
     if(LevelEditor || MagicHand)
         DrawEditorLevel_UI();
@@ -2450,14 +2489,4 @@ void UpdateGraphics(bool skipRepaint)
         TextEntryScreen::Render();
 
     XRender::offsetViewportIgnore(false);
-
-    if(!skipRepaint)
-        XRender::repaint();
-
-    lunaRenderEnd();
-    frameRenderEnd();
-
-//    if(XRender::lazyLoadedBytes() > 200000) // Reset timer while loading many pictures at the same time
-//        resetFrameTimer();
-    XRender::lazyLoadedBytesReset();
 }
