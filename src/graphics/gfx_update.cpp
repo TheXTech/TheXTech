@@ -3014,12 +3014,16 @@ void UpdateGraphicsScreen(Screen_t& screen)
             {
                 XRender::setDrawPlane(PLANE_LVL_HUD);
 
-                if(ShowOnScreenHUD && !gSMBXHUDSettings.skip)
+                // draw HUD only if player has not disabled it
+                if(ShowOnScreenHUD)
                 {
 #ifdef THEXTECH_ENABLE_LUNA_AUTOCODE
                     lunaRenderHud(Z);
 #endif
-                    DrawInterface(Z, numScreens);
+
+                    // this is LunaScript's way of disabling the original SMBX HUD, so it shouldn't affect the Luna HUD
+                    if(!gSMBXHUDSettings.skip)
+                       DrawInterface(Z, numScreens);
                 }
 
                 XRender::setDrawPlane(PLANE_LVL_HUD + 1);
