@@ -1002,6 +1002,41 @@ void UpdateGraphics(bool skipRepaint)
 
     LevelFramesAlways();
 
+    // Update Coin Frames
+    CoinFrame2[1] += 1;
+    if(CoinFrame2[1] >= 6)
+    {
+        CoinFrame2[1] = 0;
+        CoinFrame[1] += 1;
+        if(CoinFrame[1] >= 4)
+            CoinFrame[1] = 0;
+    }
+
+    CoinFrame2[2] += 1;
+    if(CoinFrame2[2] >= 6)
+    {
+        CoinFrame2[2] = 0;
+        CoinFrame[2] += 1;
+        if(CoinFrame[2] >= 7)
+            CoinFrame[2] = 0;
+    }
+
+    CoinFrame2[3] += 1;
+    if(CoinFrame2[3] >= 7)
+    {
+        CoinFrame2[3] = 0;
+        CoinFrame[3] += 1;
+        if(CoinFrame[3] >= 4)
+            CoinFrame[3] = 0;
+    }
+
+    // update score and lives to their displayable limits
+    if(Score > 9999990)
+        Score = 9999990;
+
+    if(Lives > 99)
+        Lives = 99;
+
     // NOTE: qScreen was only updated on non-frameskip in vanilla
     qScreen = continue_qScreen;
 
@@ -1034,12 +1069,6 @@ void UpdateGraphics(bool skipRepaint)
     // int64_t fBlock = 0;
     // int64_t lBlock = 0;
     Location_t tempLocation;
-
-    if(Score > 9999990)
-        Score = 9999990;
-
-    if(Lives > 99)
-        Lives = 99;
 
 //    If TakeScreen = True Then // Useless
 //        If LevelEditor = True Or MagicHand = True Then
@@ -2481,33 +2510,6 @@ void UpdateGraphics(bool skipRepaint)
     if(!skipRepaint)
         XRender::repaint();
 
-    // Update Coin Frames
-    CoinFrame2[1] += 1;
-    if(CoinFrame2[1] >= 6)
-    {
-        CoinFrame2[1] = 0;
-        CoinFrame[1] += 1;
-        if(CoinFrame[1] >= 4)
-            CoinFrame[1] = 0;
-    }
-
-    CoinFrame2[2] += 1;
-    if(CoinFrame2[2] >= 6)
-    {
-        CoinFrame2[2] = 0;
-        CoinFrame[2] += 1;
-        if(CoinFrame[2] >= 7)
-            CoinFrame[2] = 0;
-    }
-
-    CoinFrame2[3] += 1;
-    if(CoinFrame2[3] >= 7)
-    {
-        CoinFrame2[3] = 0;
-        CoinFrame[3] += 1;
-        if(CoinFrame[3] >= 4)
-            CoinFrame[3] = 0;
-    }
 //    if(nPlay.Mode == 0)
 //    {
 //        if(nPlay.NPCWaitCount >= 11)
