@@ -801,28 +801,9 @@ void UpdateGraphics(bool skipRepaint)
     // (This code is a combination of the FrameSkip logic from before with the
     //   logic components of the full rendering code.)
     // NPC render queue formation is also here.
-    int numScreens = 1;
-    if(ScreenType == 1)
-        numScreens = 2;
-
-    if(ScreenType == 4)
-        numScreens = 2;
 
     if(ScreenType == 5)
-    {
         DynamicScreen(Screens[0]);
-
-        if(vScreen[2].Visible)
-            numScreens = 2;
-        else
-            numScreens = 1;
-    }
-
-    if(ScreenType == 8)
-        numScreens = 1;
-
-    if(SingleCoop == 2)
-        numScreens = 2;
 
     g_stats.reset();
 
@@ -832,20 +813,29 @@ void UpdateGraphics(bool skipRepaint)
     std::swap(NPCQueues::NoReset, s_NoReset_NPCs_LastFrame);
     NPCQueues::NoReset.clear();
 
+
     // TODO: make a loop over screens here
     int screen_i = 0;
     Screen_t& screen = Screens[screen_i];
 
-    for(Z = 1; Z <= numScreens; Z++)
+    // if(!screen.Visible)
+    //     continue;
+
+    int numScreens = screen.active_end();
+
+    for(int vscreen_i = screen.active_begin(); vscreen_i < screen.active_end(); vscreen_i++)
     {
-        if(SingleCoop == 2)
-            Z = 2;
+        Z = screen.vScreen_refs[vscreen_i];
+        int plr_Z = screen.players[vscreen_i];
+
+        // modern NPC activation logic is required to support more than 2 vScreens (for the Reset array), but we don't have that yet in the main branch
+        SDL_assert_release(Z <= 2);
 
         int S;
         if(LevelEditor)
             S = curSection;
         else
-            S = Player[Z].Section;
+            S = Player[plr_Z].Section;
 
         // update vScreen location
         if(!LevelEditor)
@@ -863,26 +853,31 @@ void UpdateGraphics(bool skipRepaint)
         // noturningback
         if(!LevelEditor && NoTurnBack[Player[Z].Section])
         {
+            vScreen_t& vscreen1 = screen.vScreen(1);
+            vScreen_t& vscreen2 = screen.vScreen(2);
+            int screen_p1 = screen.players[0];
+            int screen_p2 = screen.players[1];
+
             // goal: find screen currently on this section that is the furthest left
-            A = Z;
+            A = vscreen_i + 1;
             if(numScreens > 1)
             {
-                if(Player[1].Section == Player[2].Section)
+                if(Player[screen_p1].Section == Player[screen_p2].Section)
                 {
-                    if(Z == 1)
-                        GetvScreen(vScreen[2]);
+                    if(A == 1)
+                        GetvScreen(vscreen2);
 
-                    if(-vScreen[1].X < -vScreen[2].X)
+                    if(-vscreen1.X < -vscreen2.X)
                         A = 1;
                     else
                         A = 2;
                 }
             }
 
-            if(-vScreen[A].X > level[S].X)
+            if(-screen.vScreen(A).X > level[S].X)
             {
-                LevelChop[S] += float(-vScreen[A].X - level[S].X);
-                level[S].X = -vScreen[A].X;
+                LevelChop[S] += float(-screen.vScreen(A).X - level[S].X);
+                level[S].X = -screen.vScreen(A).X;
 
                 // mark that section has shrunk
                 UpdateSectionOverlaps(S, true);
@@ -951,12 +946,14 @@ void UpdateGraphics(bool skipRepaint)
 
         // It's time to process NPCs. We will update their active state and fill a draw queue.
 
+        // only fill draw queue if drawing will happen and this is the local screen
+        bool fill_draw_queue = !Do_FrameSkip && (&screen == l_screen);
+
         // Make sure we are in range.
-        // If we later add more than two screens,
-        // need to change how many NPC draw queues we have.
-        SDL_assert_release(Z-1 >= 0 && Z-1 < (int)(sizeof(NPC_Draw_Queue) / sizeof(NPC_Draw_Queue_t)));
-        NPC_Draw_Queue_t& NPC_Draw_Queue_p = NPC_Draw_Queue[Z-1];
-        if(!Do_FrameSkip)
+        SDL_assert_release(vscreen_i >= 0 && vscreen_i < (int)(sizeof(NPC_Draw_Queue) / sizeof(NPC_Draw_Queue_t)));
+        NPC_Draw_Queue_t& NPC_Draw_Queue_p = NPC_Draw_Queue[vscreen_i];
+
+        if(fill_draw_queue)
             NPC_Draw_Queue_p.reset();
 
         // we'll check the NPCs and do some logic for the game,
@@ -1057,18 +1054,22 @@ void UpdateGraphics(bool skipRepaint)
 
     XRender::setDrawPlane(PLANE_GAME_BACKDROP);
 
+    // TODO: set screen to be the draw screen (can't do it here because we're still in the screen's scope from before)
+    // Screen_t& screen = *l_screen;
+    // TODO: update numScreens based on newly bound screen
+
     // No logic
     // Draw the screens!
-    For(Z, 1, numScreens)
+    for(int vscreen_i = screen.active_begin(); vscreen_i < screen.active_end(); vscreen_i++)
     {
-        if(SingleCoop == 2)
-            Z = 2;
+        Z = screen.vScreen_refs[vscreen_i];
+        int plr_Z = screen.players[vscreen_i];
 
         int S;
         if(LevelEditor)
             S = curSection;
         else
-            S = Player[Z].Section;
+            S = Player[plr_Z].Section;
 
         // (Code to get vScreen moved into logic section above.)
 
@@ -1115,25 +1116,25 @@ void UpdateGraphics(bool skipRepaint)
             if(vScreen[Z].X + level[S].X > 0)
             {
                 XRender::renderRect(0, 0,
-                                    vScreen[Z].X + level[S].X, ScreenH, XTColorF(0.2f, 0.2f, 0.2f), true);
+                                    vScreen[Z].X + level[S].X, screen.H, XTColorF(0.2f, 0.2f, 0.2f), true);
             }
 
-            if(ScreenW > level[S].Width + vScreen[Z].X)
+            if(screen.W > level[S].Width + vScreen[Z].X)
             {
                 XRender::renderRect(level[S].Width + vScreen[Z].X, 0,
-                                    ScreenW - (level[S].Width + vScreen[Z].X), ScreenH, XTColorF(0.2f, 0.2f, 0.2f), true);
+                                    screen.W - (level[S].Width + vScreen[Z].X), screen.H, XTColorF(0.2f, 0.2f, 0.2f), true);
             }
 
             if(vScreen[Z].Y + level[S].Y > 0)
             {
                 XRender::renderRect(0, 0,
-                                    ScreenW, vScreen[Z].Y + level[S].Y, XTColorF(0.2f, 0.2f, 0.2f), true);
+                                    screen.W, vScreen[Z].Y + level[S].Y, XTColorF(0.2f, 0.2f, 0.2f), true);
             }
 
-            if(ScreenH > level[S].Height + vScreen[Z].Y)
+            if(screen.H > level[S].Height + vScreen[Z].Y)
             {
                 XRender::renderRect(0, level[S].Height + vScreen[Z].Y,
-                                    ScreenW, ScreenH - (level[S].Height + vScreen[Z].Y), XTColorF(0.2f, 0.2f, 0.2f), true);
+                                    screen.W, screen.H - (level[S].Height + vScreen[Z].Y), XTColorF(0.2f, 0.2f, 0.2f), true);
             }
         }
 
