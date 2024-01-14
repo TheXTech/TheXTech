@@ -215,7 +215,7 @@ void UpdatePlayer()
 
             if(Player[A].TimeToLive >= 200 || !split_screen)
             {
-                B = CheckLiving();
+                B = CheckNearestLiving(A);
 
                 // move dead player towards start point in BattleMode
                 if(BattleMode && BattleLives[1] > 0 && BattleLives[2] > 0 && BattleWinner == 0)
@@ -273,7 +273,20 @@ void UpdatePlayer()
                     }
 
                     if(C1 < 10 && C1 > -10)
+                    {
                         KillPlayer(A);
+
+                        // new logic: mark which player A's ghost is following
+                        if(!BattleMode && Player[A].Dead)
+                            Player[A].Effect2 = -B;
+
+                        // new logic: fix player's location in split-screen mode
+                        if(!dynamic_screen)
+                        {
+                            Player[A].Location.X = Player[B].Location.X;
+                            Player[A].Location.Y = Player[B].Location.Y;
+                        }
+                    }
                 }
                 // start fadeout (65 / 3) frames before level end
                 else if(Player[A].TimeToLive == 200 - (65 / 3))
@@ -291,7 +304,23 @@ void UpdatePlayer()
             // safer than the below code, should always be used except for compatibility concerns
             if(numPlayers > 2)
             {
-                B = CheckLiving();
+                // continue following currently-tracked player if possible
+                if(Player[A].Effect2 < 0)
+                {
+                    B = -Player[A].Effect2;
+
+                    // put player back in TimeToLive state if their tracked dead player is gone
+                    if(B > numPlayers || Player[B].Dead || Player[B].TimeToLive > 0)
+                    {
+                        Player[A].Effect2 = 0;
+                        Player[A].Dead = false;
+                        Player[A].TimeToLive = 200;
+
+                        B = 0;
+                    }
+                }
+                else
+                    B = CheckNearestLiving(A);
 
                 if(B)
                 {

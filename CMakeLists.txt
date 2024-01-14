@@ -857,7 +857,6 @@ elseif(NINTENDO_DS)
         src/core/16m/window_16m.cpp
         src/core/null/events_null.cpp
         src/core/16m/sound_16m.cpp
-        src/core/16m/packloader.cpp
         src/core/power/power_null.cpp
     )
 elseif(THEXTECH_NO_SDL_BUILD)

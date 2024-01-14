@@ -40,18 +40,8 @@ struct StdPictureLoad
     //! Generic information about texture type
     int flags = 0;
 
-    //! Pack index (PACK_NONE if not a pack)
-    PackLoader::packref_t pack;
-    uint32_t pack_offset = 0;
-
-    //! Path to find image (could be a pack)
+    //! Path to find image
     std::string path = "";
-
-    inline void clear()
-    {
-        pack = PackLoader::PACK_NONE;
-        pack_offset = 0;
-    }
 };
 
 #endif // #ifndef STD_PICTURE_LOAD_H
