@@ -142,7 +142,7 @@ for dirpath, _, files in os.walk(datadir, topdown=True):
         if i_w != int(w) / 2:
             os.system(f'convert -resize {200 * i_w / int(w)}% "{bmpfn}" "{bmpfn}"')
 
-        if op == 'true':
+        if op.lower().strip() == 'true':
             flags |= 1 << 4
 
         open(dsgfn+'.size','w').write(f'{w:>4}\n{h:>4}\n{flags}\n')
