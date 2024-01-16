@@ -33,6 +33,12 @@ execute_process(
 )
 
 if(NOT "${GIT_DIRTY_STRING}" STREQUAL "")
+    # on CI, display the git diff in the log
+    if(OVERRIDE_GIT_BRANCH OR DEFINED ENV{CI})
+        message("=== git index dirty, see diff:")
+        message("${GIT_DIRTY_STRING}")
+    endif()
+
     set(GIT_COMMIT_HASH "${GIT_COMMIT_HASH}-dirty")
 endif()
 
