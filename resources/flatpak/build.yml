@@ -15,10 +15,11 @@ modules:
       - -DTHEXTECH_EXECUTABLE_NAME=ru.wohlsoft.TheXTech
       - -DPGE_SHARED_SDLMIXER=Off
       - -DFLATPAK_BUILD=On
+      - -DOVERRIDE_GIT_BRANCH=
 finish-args:
   - --filesystem=host
   - --device=dri
-  - --device=input
+  - --device=all
   - --socket=x11
   - --socket=wayland
   - --socket=pulseaudio

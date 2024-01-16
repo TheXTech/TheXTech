@@ -41,7 +41,8 @@ execute_process(
         OUTPUT_STRIP_TRAILING_WHITESPACE
 )
 
-if(NOT "${GIT_DIRTY_STRING}" STREQUAL "")
+# flatpak-builder breaks any commands that check the git tree
+if(NOT "${GIT_DIRTY_STRING}" STREQUAL "" AND NOT FLATPAK_BUILD)
     set(GIT_COMMIT_HASH "${GIT_COMMIT_HASH}-dirty")
 endif()
 
