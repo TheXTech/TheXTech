@@ -8,6 +8,7 @@ Type=Application
 Terminal=false
 Icon=@DESKTOP_ICON@
 Exec=@DESKTOP_EXEC@ @F
+X-Purism-FormFactor=Workstation;Mobile;
 Categories=Game;
 StartupWMClass=@DESKTOP_WMCLASS@
 Actions=SpeedRunMode1;SpeedRunMode2;SpeedRunMode3;CompatModeX2;CompatMode13;
