@@ -1534,6 +1534,18 @@ else()
             install(FILES "${DEPENDENCIES_INSTALL_DIR}/share/applications/${THEXTECH_EXECUTABLE_NAME}.desktop"
                     DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/applications)
 
+            # flatpak manifest
+            set(FLATPAK_BUILD OFF CACHE BOOL "Is this build a part of a flatpak workflow?")
+            mark_as_advanced(FLATPAK_BUILD)
+            if(FLATPAK_BUILD)
+                set(FLATPAK_DESCRIPTION "TheXTech is an open-source continuation of the SMBX 1.3 platformer game engine. Its highest priority is full compatibility with the SMBX 1.3 content standard, but it also adds a number of enhancements and bugfixes." CACHE STRING "Description for the installable flatpak package.")
+
+                configure_file("${CMAKE_CURRENT_SOURCE_DIR}/resources/flatpak/appdata.xml.in"
+                               "${DEPENDENCIES_INSTALL_DIR}/share/metainfo/${THEXTECH_EXECUTABLE_NAME}.metainfo.xml")
+                install(FILES "${DEPENDENCIES_INSTALL_DIR}/share/metainfo/${THEXTECH_EXECUTABLE_NAME}.metainfo.xml"
+                        DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/metainfo)
+            endif()
+
             # application icons
             if(THEXTECH_SOURCE_ASSETS_PATH AND NOT THEXTECH_SOURCE_ASSETS_PATH STREQUAL "")
                 set(THEXTECH_ICON_PATH "${THEXTECH_SOURCE_ASSETS_PATH}/graphics/ui/icon/")
