@@ -9,6 +9,7 @@ Changelog for 1.3.6.3
 -Wii U port: add WUHB build (@ds-sloth)
 -Fix TheXTech 1.3.6.1 bug where the score display would not show '9's when using legacy assets (@ds-sloth)
 -Use the ANGLE shader translator library to improve support for OpenGL ES 3.0 shaders on desktop platforms (@ds-sloth)
+-Fix vanilla / TheXTech bug where a player could clip into ground while standing on a downwards-moving slope, guarded by fix-player-downward-clip compat flag (@ds-sloth)
 
 Changelog for 1.3.6.2
 -Fixed a crash on attempt to add a game directory after storage permission grant on Android (@Wohlstand)
