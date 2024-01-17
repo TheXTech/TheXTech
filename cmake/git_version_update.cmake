@@ -7,6 +7,8 @@ elseif(DEFINED ENV{APPVEYOR_REPO_BRANCH})
     set(GIT_BRANCH $ENV{APPVEYOR_REPO_BRANCH})
 elseif(DEFINED ENV{TRAVIS_BRANCH})
     set(GIT_BRANCH $ENV{TRAVIS_BRANCH})
+elseif(DEFINED ENV{BRANCH_NAME})
+    set(GIT_BRANCH $ENV{BRANCH_NAME})
 else()
     execute_process(
             COMMAND git rev-parse --abbrev-ref HEAD
