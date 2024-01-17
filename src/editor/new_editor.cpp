@@ -1501,6 +1501,8 @@ void EditorScreen::UpdateEventSettingsScreen(CallMode mode)
             Events[m_current_event].SpeedX = 0.1f*(sx-1);
         if(UpdateButton(mode, e_ScreenW - 40 + 4, 40 + (20 * layer_line) + 4, GFX.EIcons, false, 0, 32*Icon::right, 32, 32))
             Events[m_current_event].SpeedX = 0.1f*(sx+1);
+
+        layer_line ++;
     }
 
     if(layer_line == 1)

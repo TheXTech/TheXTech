@@ -965,8 +965,8 @@ void Load(XTechTranslate* translate)
     pLogDebug("Loading editor.ini...");
 
     IniProcessing editor(AppPath + "editor.ini");
-    IniProcessing sound(AppPath + "sound.ini");
-    IniProcessing music(AppPath + "music.ini");
+    // IniProcessing sound(AppPath + "sounds.ini");
+    // IniProcessing music(AppPath + "music.ini");
 
     std::vector<int> temp_ints;
     std::vector<int> temp_layout_pod_indices;

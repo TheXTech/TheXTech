@@ -142,7 +142,7 @@ for dirpath, _, files in os.walk(datadir, topdown=True):
         if i_w != int(w) / 2:
             os.system(f'convert -resize {200 * i_w / int(w)}% "{bmpfn}" "{bmpfn}"')
 
-        if op == 'true':
+        if op.lower().strip() == 'true':
             flags |= 1 << 4
 
         open(dsgfn+'.size','w').write(f'{w:>4}\n{h:>4}\n{flags}\n')
@@ -192,7 +192,6 @@ for dirpath, dirs, files in os.walk(outdir, topdown=True):
 
     if dirpath.endswith('graphics'):
         l = open(os.path.join(dirpath, 'graphics.list'), 'w')
-        pak = open(os.path.join(dirpath, 'graphics.pak'), 'wb')
 
         for d in dirs:
             if d == 'touchscreen' or d == 'ui':
@@ -216,27 +215,9 @@ for dirpath, dirs, files in os.walk(outdir, topdown=True):
                         'yoshib', 'yoshit'):
                     continue
 
-                gfx_f = abs_f[:-5]
-
-                if os.path.isfile(gfx_f):
-                    offset = pak.tell()
-                    pak.write(open(gfx_f, 'rb').read())
-
-                    # continuation textures
-                    i = 1
-                    while os.path.isfile(gfx_f + str(i)):
-                        pak.write(open(gfx_f + str(i), 'rb').read())
-                        i += 1
-
-                    fullname = 'graphics.pak'
-                else:
-                    offset = -1
-                    fullname = os.path.join(d, f[:-5])
-
+                fullname = os.path.join(d, f[:-5])
                 l.write(basename+'\n')
                 l.write(fullname+'\n')
-                if offset != -1:
-                    l.write(f'pack_offset {offset}\n')
                 l.write(open(abs_f, 'r').read())
                 l.write('\n')
 

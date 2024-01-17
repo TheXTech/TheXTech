@@ -18,7 +18,7 @@
  */
 
 #include <filesystem.h>
-#include <slim.h>
+#include <fat.h>
 
 #include <vector>
 #include <string>

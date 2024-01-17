@@ -45,6 +45,9 @@ int CheckDead();
 // Public Function CheckLiving() As Integer 'Check if players are alive, returns the first player or 0 if everyones dead
 // Check if players are alive, returns the first player or 0 if everyones dead
 int CheckLiving();
+// NEW: returns the closest player to A (prioritizing players on same screen as A) or 0 if everyone's dead
+int CheckNearestLiving(const int A);
+// Unknown
 int LivingPlayersLeft();
 // Public Function LivingPlayers() As Boolean 'true if there are still living players
 // true if there are still living players
@@ -52,6 +55,7 @@ bool LivingPlayers();
 // Public Sub EveryonesDead() 'Handles the game when all players have died
 // Handles the game when all players have died
 void EveryonesDead();
+// Initiate level fadeout procedure if all players have died
 void ProcessLastDead();
 // Public Sub UnDuck(A As Integer) 'Un Duck the player
 // Un Duck the player

@@ -1,0 +1,27 @@
+id: ru.wohlsoft.TheXTech
+default-branch: dev
+runtime: org.freedesktop.Platform
+runtime-version: "22.08"
+sdk: org.freedesktop.Sdk
+command: ru.wohlsoft.TheXTech
+modules:
+  - buildsystem: cmake-ninja
+    name: thextech
+    sources:
+      - type: git
+        url: https://github.com/Wohlstand/TheXTech
+    config-opts:
+      - -DCMAKE_BUILD_TYPE=MinSizeRel
+      - -DTHEXTECH_EXECUTABLE_NAME=ru.wohlsoft.TheXTech
+      - -DPGE_SHARED_SDLMIXER=Off
+      - -DFLATPAK_BUILD=On
+      - -DOVERRIDE_GIT_BRANCH=
+finish-args:
+  - --filesystem=host
+  - --device=dri
+  - --device=all
+  - --socket=x11
+  - --socket=wayland
+  - --socket=pulseaudio
+  - --share=ipc
+  - --share=network

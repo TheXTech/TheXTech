@@ -631,6 +631,19 @@ void PlayerBox::UpdatePlayer()
         {
             s_char_info.dead_count--;
             Player[numPlayers].Dead = true;
+
+            // initialize ghost logic for player
+            int living = CheckLiving();
+            if(living)
+            {
+                Player[numPlayers].Effect2 = -living;
+                Player[numPlayers].Location.X = Player[living].Location.X;
+                Player[numPlayers].Location.Y = Player[living].Location.Y;
+                Player[numPlayers].Section    = Player[living].Section;
+            }
+            else
+                Player[numPlayers].Effect2 = 0;
+
             PlaySound(SFX_ShellHit);
         }
         else

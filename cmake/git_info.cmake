@@ -16,6 +16,8 @@ elseif(DEFINED ENV{APPVEYOR_REPO_BRANCH})
     set(GIT_BRANCH $ENV{APPVEYOR_REPO_BRANCH})
 elseif(DEFINED ENV{TRAVIS_BRANCH})
     set(GIT_BRANCH $ENV{TRAVIS_BRANCH})
+elseif(DEFINED ENV{BRANCH_NAME})
+    set(GIT_BRANCH $ENV{BRANCH_NAME})
 else()
     execute_process(
             COMMAND git rev-parse --abbrev-ref HEAD
@@ -41,7 +43,8 @@ execute_process(
         OUTPUT_STRIP_TRAILING_WHITESPACE
 )
 
-if(NOT "${GIT_DIRTY_STRING}" STREQUAL "")
+# flatpak-builder breaks any commands that check the git tree
+if(NOT "${GIT_DIRTY_STRING}" STREQUAL "" AND NOT FLATPAK_BUILD)
     set(GIT_COMMIT_HASH "${GIT_COMMIT_HASH}-dirty")
 endif()
 
