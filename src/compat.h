@@ -93,6 +93,8 @@ struct Compatibility_t
     bool modern_section_change; // fix glitches and improve animations for section resize
     bool fix_frame_perfect_despawn; // if NPC comes onscreen later in the same frame it timed out, should still be able to spawn
     unsigned int bitblit_background_colour[3];
+    // 1.3.6.3
+    bool pound_by_alt_run; // use alt run for pound action when player is in a purple pet mount
     // 1.3.7
     bool modern_npc_camera_logic; // NPCs should support more than two cameras, and consider the event logic camera when activating
 

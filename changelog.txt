@@ -22,6 +22,7 @@ Changelog for 1.3.6.3-dev
 -Wii U port: add WUHB build (@ds-sloth)
 -Fix TheXTech 1.3.6.1 bug where the score display would not show '9's when using legacy assets (@ds-sloth)
 -Use the ANGLE shader translator library to improve support for OpenGL ES 3.0 shaders on desktop platforms (@ds-sloth)
+-CONTROLS / LOGIC CHANGE: when riding a purple pet mount, alt run is now used to enter a pound (down is still used in compat mode) (@0lhi, @ds-sloth, @Wohlstand)
 
 Changelog for 1.3.6.2
 -Fixed a crash on attempt to add a game directory after storage permission grant on Android (@Wohlstand)

@@ -354,22 +354,16 @@ void UpdatePlayer()
             // for the purple yoshi ground pound
             if(Player[A].Effect == 0)
             {
+                // for the pound pet mount logic
                 if(Player[A].Location.SpeedY != 0 && Player[A].StandingOnNPC == 0 && Player[A].Slope == 0)
                 {
                     if(Player[A].Mount == 3 && Player[A].MountType == 6) // Purple Yoshi Pound
                     {
-                        bool groundPoundByAltRun = false;
-                        if(!ForcedControls &&
-                           A - 1 < (int)Controls::g_InputMethods.size() &&
-                           Controls::g_InputMethods[A - 1] &&
-                           Controls::g_InputMethods[A-1]->Profile &&
-                           Controls::g_InputMethods[A - 1]->Profile->m_groundPoundByAltRun)
-                        {
-                            groundPoundByAltRun = true;
-                        }
-
+                        bool groundPoundByAltRun = !ForcedControls && g_compatibility.pound_by_alt_run;
                         bool poundKeyPressed = groundPoundByAltRun ? Player[A].Controls.AltRun : Player[A].Controls.Down;
-                        if(poundKeyPressed && Player[A].DuckRelease && Player[A].CanPound)
+                        bool poundKeyRelease = groundPoundByAltRun ? Player[A].AltRunRelease   : Player[A].DuckRelease;
+
+                        if(poundKeyPressed && poundKeyRelease && Player[A].CanPound)
                         {
                             Player[A].GroundPound = true;
                             Player[A].GroundPound2 = true;
@@ -383,19 +377,10 @@ void UpdatePlayer()
 
                 if(Player[A].GroundPound)
                 {
-                    bool groundPoundByAltRun = false;
-                    if(!ForcedControls &&
-                       A - 1 < (int)Controls::g_InputMethods.size() &&
-                       Controls::g_InputMethods[A - 1] &&
-                       Controls::g_InputMethods[A-1]->Profile &&
-                       Controls::g_InputMethods[A - 1]->Profile->m_groundPoundByAltRun)
-                    {
-                        groundPoundByAltRun = true;
-                    }
-
                     if(!Player[A].CanPound && Player[A].Location.SpeedY < 0)
                         Player[A].GroundPound = false;
 
+                    bool groundPoundByAltRun = !ForcedControls && g_compatibility.pound_by_alt_run;
                     if(groundPoundByAltRun)
                         Player[A].Controls.AltRun = true;
                     else
@@ -4785,6 +4770,7 @@ void UpdatePlayer()
 //        else
 //            Player[A].DuckRelease = true;
         Player[A].DuckRelease = !Player[A].Controls.Down;
+        Player[A].AltRunRelease = !Player[A].Controls.AltRun;
     }
 
     // int C = 0;
