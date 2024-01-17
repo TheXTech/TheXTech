@@ -69,6 +69,8 @@ struct ScreenShake_t
 {
     double forceX = 0;
     double forceY = 0;
+    int    offsetX = 0;
+    int    offsetY = 0;
     double forceDecay = 1.0;
     int    type = SHAKE_RANDOM;
     double duration = 0;
@@ -80,8 +82,6 @@ struct ScreenShake_t
     {
         if(!active || GameMenu)
             return;
-
-        int offsetX, offsetY;
 
         if(duration <= 0)
         {
@@ -114,9 +114,18 @@ struct ScreenShake_t
                 sign *= -1;
                 break;
             }
-
-            XRender::offsetViewport(offsetX, offsetY);
         }
+    }
+
+    void apply()
+    {
+        if(!active || GameMenu)
+        {
+            XRender::offsetViewport(0, 0);
+            return;
+        }
+
+        XRender::offsetViewport(offsetX, offsetY);
     }
 
     void setup(int i_forceX, int i_forceY, int i_type, int i_duration, double i_decay)
@@ -314,26 +323,28 @@ public:
     }
 };
 
-NPC_Draw_Queue_t NPC_Draw_Queue[2] = {NPC_Draw_Queue_t(), NPC_Draw_Queue_t()};
+NPC_Draw_Queue_t NPC_Draw_Queue[maxLocalPlayers] = {NPC_Draw_Queue_t(), NPC_Draw_Queue_t()};
 
 // code to facilitate cached values for the onscreen blocks and BGOs
-// query results of last update
-static std::vector<BlockRef_t> s_drawMainBlocks[2] = {std::vector<BlockRef_t>(400), std::vector<BlockRef_t>(400)};
-static std::vector<BlockRef_t> s_drawLavaBlocks[2] = {std::vector<BlockRef_t>(100), std::vector<BlockRef_t>(100)};
-static std::vector<BlockRef_t> s_drawSBlocks[2] = {std::vector<BlockRef_t>(40), std::vector<BlockRef_t>(40)};
-static std::vector<BaseRef_t> s_drawBGOs[2] = {std::vector<BaseRef_t>(400), std::vector<BaseRef_t>(400)};
+// intentionally only initialize the vectors for the first 2 screens since >2P mode is rare
 
-// query location of last update
-static Location_t s_drawBlocks_bounds[2];
-static Location_t s_drawBGOs_bounds[2];
+// query results of last tree query
+static std::vector<BlockRef_t> s_drawMainBlocks[maxLocalPlayers] = {std::vector<BlockRef_t>(400), std::vector<BlockRef_t>(400)};
+static std::vector<BlockRef_t> s_drawLavaBlocks[maxLocalPlayers] = {std::vector<BlockRef_t>(100), std::vector<BlockRef_t>(100)};
+static std::vector<BlockRef_t> s_drawSBlocks[maxLocalPlayers] = {std::vector<BlockRef_t>(40), std::vector<BlockRef_t>(40)};
+static std::vector<BaseRef_t> s_drawBGOs[maxLocalPlayers] = {std::vector<BaseRef_t>(400), std::vector<BaseRef_t>(400)};
 
-// maximum amount of layer movement since last update
-static double s_drawBlocks_invalidate_timer[2] = {0, 0};
-static double s_drawBGOs_invalidate_timer[2] = {0, 0};
+// query location of last tree query
+static Location_t s_drawBlocks_bounds[maxLocalPlayers];
+static Location_t s_drawBGOs_bounds[maxLocalPlayers];
+
+// maximum amount of layer movement since last tree query
+static double s_drawBlocks_invalidate_timer[maxLocalPlayers] = {0, 0};
+static double s_drawBGOs_invalidate_timer[maxLocalPlayers] = {0, 0};
 
 // global: force-invalidate the cache when the blocks themselves change
-bool g_drawBlocks_valid[2] = {false, false};
-bool g_drawBGOs_valid[2] = {false, false};
+std::array<bool, maxLocalPlayers> g_drawBlocks_valid{};
+std::array<bool, maxLocalPlayers> g_drawBGOs_valid{};
 
 // global: based on layer movement speed, set in layers.cpp
 double g_drawBlocks_invalidate_rate = 0;
@@ -346,11 +357,12 @@ double g_drawBGOs_invalidate_rate = 0;
 constexpr double i_drawBlocks_margin = 64;
 constexpr double i_drawBGOs_margin = 128;
 
-// updates the lists of blocks and BGOs to draw on vScreen Z
-void s_UpdateDrawItems(int Z)
+// updates the lists of blocks and BGOs to draw on i'th vScreen of screen
+void s_UpdateDrawItems(Screen_t& screen, int i)
 {
-    int i = Z - 1;
-    if(i < 0 || i >= 2)
+    vScreen_t& vscreen = screen.vScreen(i + 1);
+
+    if(i < 0 || i >= maxLocalPlayers)
         return;
 
     // based on layer movement speed
@@ -360,19 +372,19 @@ void s_UpdateDrawItems(int Z)
 
     // update draw blocks if needed
     if(!g_drawBlocks_valid[i]
-        || -vScreen[Z].X                     < s_drawBlocks_bounds[i].X                                 + s_drawBlocks_invalidate_timer[i]
-        || -vScreen[Z].X + vScreen[Z].Width  > s_drawBlocks_bounds[i].X + s_drawBlocks_bounds[i].Width  - s_drawBlocks_invalidate_timer[i]
-        || -vScreen[Z].Y                     < s_drawBlocks_bounds[i].Y                                 + s_drawBlocks_invalidate_timer[i]
-        || -vScreen[Z].Y + vScreen[Z].Height > s_drawBlocks_bounds[i].Y + s_drawBlocks_bounds[i].Height - s_drawBlocks_invalidate_timer[i])
+        || -vscreen.X                  < s_drawBlocks_bounds[i].X                                 + s_drawBlocks_invalidate_timer[i]
+        || -vscreen.X + vscreen.Width  > s_drawBlocks_bounds[i].X + s_drawBlocks_bounds[i].Width  - s_drawBlocks_invalidate_timer[i]
+        || -vscreen.Y                  < s_drawBlocks_bounds[i].Y                                 + s_drawBlocks_invalidate_timer[i]
+        || -vscreen.Y + vscreen.Height > s_drawBlocks_bounds[i].Y + s_drawBlocks_bounds[i].Height - s_drawBlocks_invalidate_timer[i])
     {
         g_drawBlocks_valid[i] = true;
         s_drawBlocks_invalidate_timer[i] = 0;
 
         // form query location
-        s_drawBlocks_bounds[i] = newLoc(-vScreen[Z].X - i_drawBlocks_margin,
-            -vScreen[Z].Y - i_drawBlocks_margin,
-            vScreen[Z].Width + i_drawBlocks_margin * 2,
-            vScreen[Z].Height + i_drawBlocks_margin * 2);
+        s_drawBlocks_bounds[i] = newLoc(-vscreen.X - i_drawBlocks_margin,
+            -vscreen.Y - i_drawBlocks_margin,
+            vscreen.Width + i_drawBlocks_margin * 2,
+            vscreen.Height + i_drawBlocks_margin * 2);
 
         // make query (sort by ID as done in vanilla)
         TreeResult_Sentinel<BlockRef_t> areaBlocks = treeBlockQuery(s_drawBlocks_bounds[i], SORTMODE_ID);
@@ -408,19 +420,19 @@ void s_UpdateDrawItems(int Z)
 
     // update draw BGOs if needed
     if(!g_drawBGOs_valid[i]
-        || -vScreen[Z].X                     < s_drawBGOs_bounds[i].X                               + s_drawBGOs_invalidate_timer[i]
-        || -vScreen[Z].X + vScreen[Z].Width  > s_drawBGOs_bounds[i].X + s_drawBGOs_bounds[i].Width  - s_drawBGOs_invalidate_timer[i]
-        || -vScreen[Z].Y                     < s_drawBGOs_bounds[i].Y                               + s_drawBGOs_invalidate_timer[i]
-        || -vScreen[Z].Y + vScreen[Z].Height > s_drawBGOs_bounds[i].Y + s_drawBGOs_bounds[i].Height - s_drawBGOs_invalidate_timer[i])
+        || -vscreen.X                  < s_drawBGOs_bounds[i].X                               + s_drawBGOs_invalidate_timer[i]
+        || -vscreen.X + vscreen.Width  > s_drawBGOs_bounds[i].X + s_drawBGOs_bounds[i].Width  - s_drawBGOs_invalidate_timer[i]
+        || -vscreen.Y                  < s_drawBGOs_bounds[i].Y                               + s_drawBGOs_invalidate_timer[i]
+        || -vscreen.Y + vscreen.Height > s_drawBGOs_bounds[i].Y + s_drawBGOs_bounds[i].Height - s_drawBGOs_invalidate_timer[i])
     {
         g_drawBGOs_valid[i] = true;
         s_drawBGOs_invalidate_timer[i] = 0;
 
         // form query location
-        s_drawBGOs_bounds[i] = newLoc(-vScreen[Z].X - i_drawBGOs_margin,
-            -vScreen[Z].Y - i_drawBGOs_margin,
-            vScreen[Z].Width + i_drawBGOs_margin * 2,
-            vScreen[Z].Height + i_drawBGOs_margin * 2);
+        s_drawBGOs_bounds[i] = newLoc(-vscreen.X - i_drawBGOs_margin,
+            -vscreen.Y - i_drawBGOs_margin,
+            vscreen.Width + i_drawBGOs_margin * 2,
+            vscreen.Height + i_drawBGOs_margin * 2);
 
         // make query (sort by ID as done in vanilla)
         s_drawBGOs[i].clear();
@@ -432,27 +444,10 @@ void GraphicsLazyPreLoad()
 {
     // TODO: check if this is needed at caller
     SetupScreens();
-
-    int numScreens = 1;
-
-    if(ScreenType == 1)
-        numScreens = 2;
-
-    if(ScreenType == 4)
-        numScreens = 2;
-
     if(ScreenType == 5)
-    {
         DynamicScreen(Screens[0]);
-        if(vScreen[2].Visible)
-            numScreens = 2;
-        else
-            numScreens = 1;
-    }
 
-    if(ScreenType == 8)
-        numScreens = 1;
-
+    int numScreens = Screens[0].active_end();
 
     if(SingleCoop == 2)
         numScreens = 1; // fine to be 1, since it would just be run for Z = 2 twice otherwise;
@@ -530,7 +525,7 @@ void GraphicsLazyPreLoad()
         // int64_t fBlock = 0;
         // int64_t lBlock = 0;
         // blockTileGet(-vScreen[Z].X, vScreen[Z].Width, fBlock, lBlock);
-        s_UpdateDrawItems(Z);
+        s_UpdateDrawItems(Screens[0], Z - 1);
 
         for(Block_t& b : s_drawSBlocks[Z - 1])
         {
@@ -569,11 +564,14 @@ void GraphicsLazyPreLoad()
 // swappable buffer for previous frame's NoReset NPCs
 static std::vector<NPCRef_t> s_NoReset_NPCs_LastFrame;
 
+// shared between the NPC screen logic functions, always reset to 0 between frames
+static std::bitset<maxNPCs> s_NPC_present;
+
 // does the classic ("onscreen") NPC activation / reset logic for vScreen Z, directly based on the many NPC loops of the original game
-void ClassicNPCScreenLogic(int Z, int numScreens, bool Do_FrameSkip, NPC_Draw_Queue_t& NPC_Draw_Queue_p)
+void ClassicNPCScreenLogic(int Z, int numScreens, bool fill_draw_queue, NPC_Draw_Queue_t& NPC_Draw_Queue_p)
 {
-    // using bitset here instead of simpler set for checkNPCs because I benchmarked it to be faster -- ds-sloth
-    static std::bitset<maxNPCs> NPC_present;
+    // using bitset here instead of simpler set because I benchmarked it to be faster -- ds-sloth
+    std::bitset<maxNPCs>& NPC_present = s_NPC_present;
 
     // find the onscreen NPCs
     TreeResult_Sentinel<NPCRef_t> _screenNPCs = treeNPCQuery(-vScreen[Z].X, -vScreen[Z].Y,
@@ -734,7 +732,7 @@ void ClassicNPCScreenLogic(int Z, int numScreens, bool Do_FrameSkip, NPC_Draw_Qu
                 NPC[A].Killed = 9;
                 KillNPC(A, 9);
             }
-            else if(NPC[A].Active && !Do_FrameSkip)
+            else if(NPC[A].Active && fill_draw_queue)
             {
                 NPC_Draw_Queue_p.add(A);
             }
@@ -774,172 +772,166 @@ void ClassicNPCScreenLogic(int Z, int numScreens, bool Do_FrameSkip, NPC_Draw_Qu
         }
     }
 
-    NPC_Draw_Queue_p.sort();
+    if(fill_draw_queue)
+        NPC_Draw_Queue_p.sort();
 }
+
+//! all of the logic done by UpdateGraphics
+void UpdateGraphicsLogic(bool Do_FrameSkip);
+
+//! parent function for the actual drawing to screen
+void UpdateGraphicsDraw(bool skipRepaint);
+
+//! draw graphics for the current Screen_t
+void UpdateGraphicsScreen(Screen_t& screen);
+
+//! extra non-gameplay related draws (menus and information display)
+void UpdateGraphicsMeta();
 
 // This draws the graphic to the screen when in a level/game menu/outro/level editor
 void UpdateGraphics(bool skipRepaint)
 {
 //    On Error Resume Next
 
-    XTColor plr_shade = ShadowMode ? XTColor(0, 0, 0) : XTColor();
-
-    int A = 0;
-//    std::string timeStr;
-    int Z = 0;
-
     if(!GameIsActive)
         return;
 
+    // check that we can render, and that we should not frameskip
+    bool Do_FrameSkip = false;
+
 #ifdef USE_RENDER_BLOCKING
-    // might want to put this after the logic part of UpdateGraphics,
-    // once we have merged the multires code that separates logic from
-    // rendering
     if(XRender::renderBlocked())
-        return;
+        Do_FrameSkip = true;
 #endif
 
     // frame skip code
     cycleNextInc();
 
-    bool Do_FrameSkip = FrameSkip && !TakeScreen;
+    if(FrameSkip && !TakeScreen && frameSkipNeeded())
+        Do_FrameSkip = true;
 
+    UpdateGraphicsLogic(Do_FrameSkip);
+
+    // we've now done all the logic that UpdateGraphics can do.
     if(Do_FrameSkip)
-        Do_FrameSkip = frameSkipNeeded();
+        return;
 
+    UpdateGraphicsDraw(skipRepaint);
+}
+
+void UpdateGraphicsLogic(bool Do_FrameSkip)
+{
     // ALL graphics-based logic code has been moved here, separate from rendering.
     // (This code is a combination of the FrameSkip logic from before with the
     //   logic components of the full rendering code.)
     // NPC render queue formation is also here.
-    int numScreens = 1;
-    if(ScreenType == 1)
-        numScreens = 2;
-
-    if(ScreenType == 4)
-        numScreens = 2;
 
     if(ScreenType == 5)
-    {
         DynamicScreen(Screens[0]);
-
-        if(vScreen[2].Visible)
-            numScreens = 2;
-        else
-            numScreens = 1;
-    }
-
-    if(ScreenType == 8)
-        numScreens = 1;
-
-    if(SingleCoop == 2)
-        numScreens = 2;
 
     g_stats.reset();
 
-    bool continue_qScreen = false;
+    bool continue_qScreen = false; // will qScreen continue for any visible screen?
 
     // prepare to fill this frame's NoReset queue
     std::swap(NPCQueues::NoReset, s_NoReset_NPCs_LastFrame);
     NPCQueues::NoReset.clear();
 
-    for(Z = 1; Z <= numScreens; Z++)
+
+    // the graphics screen logic is handled via a big loop over Screens (clients)
+    for(int screen_i = 0; screen_i < c_screenCount; screen_i++)
     {
-        if(SingleCoop == 2)
-            Z = 2;
+        Screen_t& screen = Screens[screen_i];
 
-        int S;
-        if(LevelEditor)
-            S = curSection;
-        else
-            S = Player[Z].Section;
+        if(!screen.Visible)
+            continue;
 
-        // update vScreen location
-        if(!LevelEditor)
+        if(!screen.player_count)
+            continue;
+
+        int numScreens = screen.active_end();
+
+        for(int vscreen_i = screen.active_begin(); vscreen_i < screen.active_end(); vscreen_i++)
         {
-            if(ScreenType == 2)
-                GetvScreenAverage(vScreen[1]);
-            else if(ScreenType == 3)
-                GetvScreenAverage3(vScreen[1]);
-            else if(ScreenType == 5 && !vScreen[2].Visible)
-                GetvScreenAverage(vScreen[1]);
-            else if(ScreenType == 7)
-                GetvScreenCredits(vScreen[1]);
+            int Z = screen.vScreen_refs[vscreen_i];
+            int plr_Z = screen.players[vscreen_i];
+
+            // modern NPC activation logic is required to support more than 2 vScreens (for the Reset array), but we don't have that yet in the main branch
+            SDL_assert_release(Z <= 2);
+
+            int S;
+            if(LevelEditor)
+                S = curSection;
             else
-                GetvScreen(vScreen[Z]);
-        }
+                S = Player[plr_Z].Section;
 
-        // moved to `graphics/gfx_screen.cpp`
-        if(!Do_FrameSkip && qScreen)
-            continue_qScreen |= Update_qScreen(Z);
+            // update vScreen location
+            if(!LevelEditor)
+                GetvScreenAuto(vScreen[Z]);
 
-        // the original code was badly written and made THIS happen (always exactly one frame of qScreen in 2P mode)
-        if(Z == 2 && !g_compatibility.modern_section_change)
-            continue_qScreen = false;
+            // moved to `graphics/gfx_screen.cpp`
+            // NOTE: this logic was previously only performed on non-frameskips
+            if(qScreen)
+                continue_qScreen |= Update_qScreen(Z);
 
-        // noturningback
-        if(!LevelEditor && NoTurnBack[Player[Z].Section])
-        {
-            // goal: find screen currently on this section that is the furthest left
-            A = Z;
-            if(numScreens > 1)
+            // the original code was badly written and made THIS happen (always exactly one frame of qScreen in 2P mode)
+            if(Z == 2 && !g_compatibility.modern_section_change)
+                continue_qScreen = false;
+
+            // noturningback
+            if(!LevelEditor && NoTurnBack[Player[Z].Section])
             {
-                if(Player[1].Section == Player[2].Section)
-                {
-                    if(Z == 1)
-                        GetvScreen(vScreen[2]);
+                vScreen_t& vscreen1 = screen.vScreen(1);
+                vScreen_t& vscreen2 = screen.vScreen(2);
+                int screen_p1 = screen.players[0];
+                int screen_p2 = screen.players[1];
 
-                    if(-vScreen[1].X < -vScreen[2].X)
-                        A = 1;
-                    else
-                        A = 2;
+                // goal: find screen currently on this section that is the furthest left
+                int A = vscreen_i + 1;
+                if(numScreens > 1)
+                {
+                    if(Player[screen_p1].Section == Player[screen_p2].Section)
+                    {
+                        if(A == 1)
+                            GetvScreen(vscreen2);
+
+                        if(-vscreen1.X < -vscreen2.X)
+                            A = 1;
+                        else
+                            A = 2;
+                    }
+                }
+
+                if(-screen.vScreen(A).X > level[S].X)
+                {
+                    LevelChop[S] += float(-screen.vScreen(A).X - level[S].X);
+                    level[S].X = -screen.vScreen(A).X;
+
+                    // mark that section has shrunk
+                    UpdateSectionOverlaps(S, true);
                 }
             }
 
-            if(-vScreen[A].X > level[S].X)
+            // Keep all players onscreen in clone mode
+            if(!GameMenu && !LevelEditor)
             {
-                LevelChop[S] += float(-vScreen[A].X - level[S].X);
-                level[S].X = -vScreen[A].X;
-
-                // mark that section has shrunk
-                UpdateSectionOverlaps(S, true);
-            }
-        }
-
-        // Keep all players onscreen in clone mode
-        if(!GameMenu && !LevelEditor)
-        {
-            if(g_ClonedPlayerMode)
-            {
-                int C = 0;
-                int D = 0;
-//                For A = 1 To numPlayers
-                For(A, 1, numPlayers)
+                if(g_ClonedPlayerMode)
                 {
-//                    With Player(A)
-                    Player_t &p = Player[A];
-//                        If vScreenCollision(Z, .Location) = False And LevelMacro = 0 And .Location.Y < level(.Section).Height And .Location.Y + .Location.Height > level(.Section).Y And .TimeToLive = 0 And .Dead = False Then
-                    if(!vScreenCollision(Z, p.Location) && LevelMacro == LEVELMACRO_OFF &&
-                        p.Location.Y < level[p.Section].Height &&
-                        p.Location.Y + p.Location.Height > level[p.Section].Y &&
-                        p.TimeToLive == 0 && !p.Dead)
-                    {
-                        for(int B = 1; B <= numPlayers; B++)
-                        {
-                            if(!Player[B].Dead && Player[B].TimeToLive == 0 && Player[B].Section == Player[A].Section && vScreenCollision(Z, Player[B].Location))
-                            {
-                                if(C == 0 || std::abs(Player[A].Location.X + Player[A].Location.Width / 2.0 - (Player[B].Location.X + Player[B].Location.Width / 2.0)) < C)
-                                {
-                                    C = std::abs(Player[A].Location.X + Player[A].Location.Width / 2.0 - (Player[B].Location.X + Player[B].Location.Width / 2.0));
-                                    D = B;
-                                }
-                            }
-                        }
+                    int C = 0;
+                    int D = 0;
 
-                        if(C == 0)
+                    For(A, 1, numPlayers)
+                    {
+                        Player_t &p = Player[A];
+
+                        if(!vScreenCollision(Z, p.Location) && LevelMacro == LEVELMACRO_OFF &&
+                            p.Location.Y < level[p.Section].Height &&
+                            p.Location.Y + p.Location.Height > level[p.Section].Y &&
+                            p.TimeToLive == 0 && !p.Dead)
                         {
                             for(int B = 1; B <= numPlayers; B++)
                             {
-                                if(!Player[B].Dead && Player[B].TimeToLive == 0 && Player[B].Section == Player[A].Section)
+                                if(!Player[B].Dead && Player[B].TimeToLive == 0 && Player[B].Section == Player[A].Section && vScreenCollision(Z, Player[B].Location))
                                 {
                                     if(C == 0 || std::abs(Player[A].Location.X + Player[A].Location.Width / 2.0 - (Player[B].Location.X + Player[B].Location.Width / 2.0)) < C)
                                     {
@@ -948,103 +940,79 @@ void UpdateGraphics(bool skipRepaint)
                                     }
                                 }
                             }
+
+                            if(C == 0)
+                            {
+                                for(int B = 1; B <= numPlayers; B++)
+                                {
+                                    if(!Player[B].Dead && Player[B].TimeToLive == 0 && Player[B].Section == Player[A].Section)
+                                    {
+                                        if(C == 0 || std::abs(Player[A].Location.X + Player[A].Location.Width / 2.0 - (Player[B].Location.X + Player[B].Location.Width / 2.0)) < C)
+                                        {
+                                            C = std::abs(Player[A].Location.X + Player[A].Location.Width / 2.0 - (Player[B].Location.X + Player[B].Location.Width / 2.0));
+                                            D = B;
+                                        }
+                                    }
+                                }
+                            }
+
+                            Player[A].Location.X = Player[D].Location.X + Player[D].Location.Width / 2.0 - Player[A].Location.Width / 2.0;
+                            Player[A].Location.Y = Player[D].Location.Y + Player[D].Location.Height - Player[A].Location.Height;
+                            Player[A].Section = Player[D].Section;
+                            Player[A].Location.SpeedX = Player[D].Location.SpeedX;
+                            Player[A].Location.SpeedY = Player[D].Location.SpeedY;
+                            Player[A].Location.SpeedY = dRand() * 12 - 6;
+                            Player[A].CanJump = true;
                         }
-
-                        Player[A].Location.X = Player[D].Location.X + Player[D].Location.Width / 2.0 - Player[A].Location.Width / 2.0;
-                        Player[A].Location.Y = Player[D].Location.Y + Player[D].Location.Height - Player[A].Location.Height;
-                        Player[A].Section = Player[D].Section;
-                        Player[A].Location.SpeedX = Player[D].Location.SpeedX;
-                        Player[A].Location.SpeedY = Player[D].Location.SpeedY;
-                        Player[A].Location.SpeedY = dRand() * 12 - 6;
-                        Player[A].CanJump = true;
                     }
-//                    End With
-//                Next A
                 }
-//            End If
             }
-        }
 
-        // It's time to process NPCs. We will update their active state and fill a draw queue.
+            // It's time to process NPCs. We will update their active state and fill a draw queue.
 
-        // Make sure we are in range.
-        // If we later add more than two screens,
-        // need to change how many NPC draw queues we have.
-        SDL_assert_release(Z-1 >= 0 && Z-1 < (int)(sizeof(NPC_Draw_Queue) / sizeof(NPC_Draw_Queue_t)));
-        NPC_Draw_Queue_t& NPC_Draw_Queue_p = NPC_Draw_Queue[Z-1];
-        if(!Do_FrameSkip)
-            NPC_Draw_Queue_p.reset();
+            // only fill draw queue if drawing will happen and this is the local screen
+            bool fill_draw_queue = !Do_FrameSkip && (&screen == l_screen);
 
-        // we'll check the NPCs and do some logic for the game,
-        if(!LevelEditor)
-            ClassicNPCScreenLogic(Z, numScreens, Do_FrameSkip, NPC_Draw_Queue_p);
+            // Make sure we are in range.
+            SDL_assert_release(vscreen_i >= 0 && vscreen_i < (int)(sizeof(NPC_Draw_Queue) / sizeof(NPC_Draw_Queue_t)));
+            NPC_Draw_Queue_t& NPC_Draw_Queue_p = NPC_Draw_Queue[vscreen_i];
 
-        // fill the NPC render queue for the level editor
-        else if(!Do_FrameSkip)
-        {
-            for(A = 1; A <= numNPCs; A++)
+            if(fill_draw_queue)
+                NPC_Draw_Queue_p.reset();
+
+            // we'll check the NPCs and do some logic for the game,
+            if(!LevelEditor)
+                ClassicNPCScreenLogic(Z, numScreens, fill_draw_queue, NPC_Draw_Queue_p);
+
+            // fill the NPC render queue for the level editor
+            else if(fill_draw_queue)
             {
-                g_stats.checkedNPCs++;
+                for(int A = 1; A <= numNPCs; A++)
+                {
+                    g_stats.checkedNPCs++;
 
-                if(NPC[A].Hidden)
-                    continue;
+                    if(NPC[A].Hidden)
+                        continue;
 
-                const Location_t loc2 = newLoc(NPC[A].Location.X - (NPCWidthGFX[NPC[A].Type] - NPC[A].Location.Width) / 2.0,
-                    NPC[A].Location.Y,
-                    NPCWidthGFX[NPC[A].Type], NPCHeight[NPC[A].Type]);
+                    const Location_t loc2 = newLoc(NPC[A].Location.X - (NPCWidthGFX[NPC[A].Type] - NPC[A].Location.Width) / 2.0,
+                        NPC[A].Location.Y,
+                        NPCWidthGFX[NPC[A].Type], NPCHeight[NPC[A].Type]);
 
-                if(vScreenCollision(Z, NPC[A].Location) || vScreenCollision(Z, loc2))
-                    NPC_Draw_Queue_p.add(A);
+                    if(vScreenCollision(Z, NPC[A].Location) || vScreenCollision(Z, loc2))
+                        NPC_Draw_Queue_p.add(A);
+                }
             }
-        }
-    }
 
-    // we've now done all the logic that UpdateGraphics can do.
-    if(Do_FrameSkip)
-        return;
+            // moved from render code because it affects the game's random state
+            // TODO: have a separate shakeScreen state per screen
+            s_shakeScreen.update();
 
-    // only updated on non-frameskip in vanilla
-    qScreen = continue_qScreen;
+        } // loop over vScreens
+
+    } // loop over Screens
 
 
-    XRender::setTargetTexture();
-
-    frameNextInc();
-    frameRenderStart();
-    lunaRenderStart();
-
-    // std::string SuperText;
-    // std::string tempText;
-    // int BoxY = 0;
-    // bool tempBool = false;
-    int B = 0;
-//    int B2 = 0;
-    // int C = 0;
-    // int D = 0;
-    // int E = 0;
-    // double d2 = 0;
-//    int e2 = 0;
-//    int X = 0;
-    int Y = 0;
-    // int64_t fBlock = 0;
-    // int64_t lBlock = 0;
-    Location_t tempLocation;
-
-    if(Score > 9999990)
-        Score = 9999990;
-
-    if(Lives > 99)
-        Lives = 99;
-
-//    If TakeScreen = True Then // Useless
-//        If LevelEditor = True Or MagicHand = True Then
-//            frmLevelWindow.vScreen(1).AutoRedraw = True
-//        Else
-//            frmMain.AutoRedraw = True
-//        End If
-//    End If
-
-    // Background frames
+    // Background frames (NOTE: frames were only updated on non-frameskip in vanilla)
     if(!FreezeNPCs)
     {
         LevelFramesNotFrozen();
@@ -1052,6 +1020,55 @@ void UpdateGraphics(bool skipRepaint)
     }
 
     LevelFramesAlways();
+
+    // Update Coin Frames
+    CoinFrame2[1] += 1;
+    if(CoinFrame2[1] >= 6)
+    {
+        CoinFrame2[1] = 0;
+        CoinFrame[1] += 1;
+        if(CoinFrame[1] >= 4)
+            CoinFrame[1] = 0;
+    }
+
+    CoinFrame2[2] += 1;
+    if(CoinFrame2[2] >= 6)
+    {
+        CoinFrame2[2] = 0;
+        CoinFrame[2] += 1;
+        if(CoinFrame[2] >= 7)
+            CoinFrame[2] = 0;
+    }
+
+    CoinFrame2[3] += 1;
+    if(CoinFrame2[3] >= 7)
+    {
+        CoinFrame2[3] = 0;
+        CoinFrame[3] += 1;
+        if(CoinFrame[3] >= 4)
+            CoinFrame[3] = 0;
+    }
+
+    // update score and lives to their displayable limits
+    if(Score > 9999990)
+        Score = 9999990;
+
+    if(Lives > 99)
+        Lives = 99;
+
+    // NOTE: qScreen was only updated on non-frameskip in vanilla
+    qScreen = continue_qScreen;
+}
+
+
+void UpdateGraphicsDraw(bool skipRepaint)
+{
+    // begin render code
+    XRender::setTargetTexture();
+
+    frameNextInc();
+    frameRenderStart();
+    lunaRenderStart();
 
     if(ClearBuffer)
     {
@@ -1065,18 +1082,40 @@ void UpdateGraphics(bool skipRepaint)
 
     XRender::setDrawPlane(PLANE_GAME_BACKDROP);
 
+    UpdateGraphicsScreen(*l_screen);
+
+    UpdateGraphicsMeta();
+
+    if(!skipRepaint)
+        XRender::repaint();
+
+    lunaRenderEnd();
+    frameRenderEnd();
+
+//    if(XRender::lazyLoadedBytes() > 200000) // Reset timer while loading many pictures at the same time
+//        resetFrameTimer();
+    XRender::lazyLoadedBytesReset();
+}
+
+void UpdateGraphicsScreen(Screen_t& screen)
+{
+    XTColor plr_shade = ShadowMode ? XTColor(0, 0, 0) : XTColor();
+    Location_t tempLocation;
+
+    int numScreens = screen.active_end();
+
     // No logic
     // Draw the screens!
-    For(Z, 1, numScreens)
+    for(int vscreen_i = screen.active_begin(); vscreen_i < screen.active_end(); vscreen_i++)
     {
-        if(SingleCoop == 2)
-            Z = 2;
+        int Z = screen.vScreen_refs[vscreen_i];
+        int plr_Z = screen.players[vscreen_i];
 
         int S;
         if(LevelEditor)
             S = curSection;
         else
-            S = Player[Z].Section;
+            S = Player[plr_Z].Section;
 
         // (Code to get vScreen moved into logic section above.)
 
@@ -1101,11 +1140,14 @@ void UpdateGraphics(bool skipRepaint)
         // Make sure we are in range.
         // If we later add more than two screens,
         // need to change how many NPC draw queues we have.
-        SDL_assert_release(Z-1 >= 0 && Z-1 < (int)(sizeof(NPC_Draw_Queue) / sizeof(NPC_Draw_Queue_t)));
+        SDL_assert_release((Z - 1 >= 0) && ((Z - 1) < (int)(sizeof(NPC_Draw_Queue) / sizeof(NPC_Draw_Queue_t))));
         NPC_Draw_Queue_t& NPC_Draw_Queue_p = NPC_Draw_Queue[Z-1];
 
         if(numScreens > 1) // To separate drawing of screens
             XRender::setViewport(vScreen[Z].Left, vScreen[Z].Top, vScreen[Z].Width, vScreen[Z].Height);
+
+        // update viewport from screen shake
+        s_shakeScreen.apply();
 
         DrawBackground(S, Z);
 
@@ -1120,59 +1162,41 @@ void UpdateGraphics(bool skipRepaint)
             if(vScreen[Z].X + level[S].X > 0)
             {
                 XRender::renderRect(0, 0,
-                                    vScreen[Z].X + level[S].X, ScreenH, XTColorF(0.2f, 0.2f, 0.2f), true);
+                                    vScreen[Z].X + level[S].X, screen.H, XTColorF(0.2f, 0.2f, 0.2f), true);
             }
 
-            if(ScreenW > level[S].Width + vScreen[Z].X)
+            if(screen.W > level[S].Width + vScreen[Z].X)
             {
                 XRender::renderRect(level[S].Width + vScreen[Z].X, 0,
-                                    ScreenW - (level[S].Width + vScreen[Z].X), ScreenH, XTColorF(0.2f, 0.2f, 0.2f), true);
+                                    screen.W - (level[S].Width + vScreen[Z].X), screen.H, XTColorF(0.2f, 0.2f, 0.2f), true);
             }
 
             if(vScreen[Z].Y + level[S].Y > 0)
             {
                 XRender::renderRect(0, 0,
-                                    ScreenW, vScreen[Z].Y + level[S].Y, XTColorF(0.2f, 0.2f, 0.2f), true);
+                                    screen.W, vScreen[Z].Y + level[S].Y, XTColorF(0.2f, 0.2f, 0.2f), true);
             }
 
-            if(ScreenH > level[S].Height + vScreen[Z].Y)
+            if(screen.H > level[S].Height + vScreen[Z].Y)
             {
                 XRender::renderRect(0, level[S].Height + vScreen[Z].Y,
-                                    ScreenW, ScreenH - (level[S].Height + vScreen[Z].Y), XTColorF(0.2f, 0.2f, 0.2f), true);
+                                    screen.W, screen.H - (level[S].Height + vScreen[Z].Y), XTColorF(0.2f, 0.2f, 0.2f), true);
             }
         }
 
 
-//        If GameMenu = True Then
-        // if(GameMenu)
-        // {
-            // (Commented out in original code :thinking:)
-            // Curtain
-//            XRender::renderTexture(0, 0, GFX.MenuGFX[1]);
-            // Game logo
-//            XRender::renderTexture(ScreenW / 2 - GFX.MenuGFX[2].w / 2, 70, GFX.MenuGFX[2]);
-//        ElseIf LevelEditor = False Then
-#if 0 /* DEAD CODE */
-        if(!GameMenu && !LevelEditor)
-        {
-//            If numPlayers > 2 And nPlay.Online = False Then
-
-            // moved strange many-player handling code to logic section above
-
-//        End If
-        }
-#endif
+        // moved many-player (superbdemo128) handling code to logic section above
 
 #ifdef __3DS__
         XRender::setTargetLayer(1);
 #endif
 
         // update the vectors of all the onscreen blocks and backgrounds for use at multiple places
-        s_UpdateDrawItems(Z);
-        const std::vector<BlockRef_t>& screenMainBlocks = s_drawMainBlocks[Z - 1];
-        const std::vector<BlockRef_t>& screenLavaBlocks = s_drawLavaBlocks[Z - 1];
-        const std::vector<BlockRef_t>& screenSBlocks = s_drawSBlocks[Z - 1];
-        const std::vector<BaseRef_t>& screenBackgrounds = s_drawBGOs[Z - 1];
+        s_UpdateDrawItems(screen, vscreen_i);
+        const std::vector<BlockRef_t>& screenMainBlocks = s_drawMainBlocks[vscreen_i];
+        const std::vector<BlockRef_t>& screenLavaBlocks = s_drawLavaBlocks[vscreen_i];
+        const std::vector<BlockRef_t>& screenSBlocks = s_drawSBlocks[vscreen_i];
+        const std::vector<BaseRef_t>& screenBackgrounds = s_drawBGOs[vscreen_i];
 
         int nextBackground = 0;
 
@@ -1206,26 +1230,12 @@ void UpdateGraphics(bool skipRepaint)
         }
         else
         {
-//            For A = 1 To MidBackground - 1 'First backgrounds
+            // For A = 1 To MidBackground - 1 'First backgrounds
             for(; nextBackground < (int)screenBackgrounds.size() && (int)screenBackgrounds[nextBackground] < MidBackground; nextBackground++)  // First backgrounds
             {
-                A = screenBackgrounds[nextBackground];
+                int A = screenBackgrounds[nextBackground];
                 g_stats.checkedBGOs++;
-//                if(BackgroundHasNoMask[Background[A].Type] == false) // Useless code
-//                {
-//                    if(vScreenCollision(Z, Background[A].Location) && !Background[A].Hidden)
-//                    {
-//                        XRender::renderTexture(vScreen[Z].X + Background[A].Location.X,
-//                                              vScreen[Z].Y + Background[A].Location.Y,
-//                                              BackgroundWidth[Background[A].Type],
-//                                              BackgroundHeight[Background[A].Type],
-//                                              GFXBackgroundBMP[Background[A].Type], 0,
-//                                              BackgroundHeight[Background[A].Type] *
-//                                              BackgroundFrame[Background[A].Type]);
-//                    }
-//                }
-//                else
-//                {
+
                 if(vScreenCollision(Z, Background[A].Location) && !Background[A].Hidden)
                 {
                     g_stats.renderedBGOs++;
@@ -1357,7 +1367,7 @@ void UpdateGraphics(bool skipRepaint)
         {
             for(; nextBackground < (int)screenBackgrounds.size() && (int)screenBackgrounds[nextBackground] <= LastBackground; nextBackground++)  // Second backgrounds
             {
-                A = screenBackgrounds[nextBackground];
+                int A = screenBackgrounds[nextBackground];
 
                 g_stats.checkedBGOs++;
 
@@ -1387,7 +1397,7 @@ void UpdateGraphics(bool skipRepaint)
 
         for(int oBackground = (int)screenBackgrounds.size() - 1; oBackground > 0 && (int)screenBackgrounds[oBackground] > numBackground; oBackground--)  // Locked doors
         {
-            A = screenBackgrounds[oBackground];
+            int A = screenBackgrounds[oBackground];
 
             g_stats.checkedBGOs++;
             if(vScreenCollision(Z, Background[A].Location) &&
@@ -1408,58 +1418,51 @@ void UpdateGraphics(bool skipRepaint)
 
         XRender::setDrawPlane(PLANE_LVL_NPC_BG);
 
-//        For A = 1 To numNPCs 'Display NPCs that should be behind blocks
+        // 'Display NPCs that should be behind blocks
         for(size_t i = 0; i < NPC_Draw_Queue_p.BG_n; i++)
         {
-            A = NPC_Draw_Queue_p.BG[i];
+            int A = NPC_Draw_Queue_p.BG[i];
             XTColor cn = NPC[A].Shadow ? XTColor(0, 0, 0) : XTColor();
+
+            if(NPC[A].Type == NPCID_PLANT_S3 || NPC[A].Type == NPCID_BIG_PLANT || NPC[A].Type == NPCID_PLANT_S1 || NPC[A].Type == NPCID_FIRE_PLANT || NPC[A].Type == NPCID_LONG_PLANT_UP || NPC[A].Type == NPCID_JUMP_PLANT)
             {
+                XRender::renderTexture(vScreen[Z].X + NPC[A].Location.X + NPCFrameOffsetX[NPC[A].Type], vScreen[Z].Y + NPC[A].Location.Y + NPCFrameOffsetY[NPC[A].Type], NPC[A].Location.Width, NPC[A].Location.Height, GFXNPC[NPC[A].Type], 0, NPC[A].Frame * NPCHeight[NPC[A].Type], cn);
+            }
+            else if(NPC[A].Type == NPCID_BOTTOM_PLANT || NPC[A].Type == NPCID_LONG_PLANT_DOWN)
+            {
+                XRender::renderTexture(vScreen[Z].X + NPC[A].Location.X + NPCFrameOffsetX[NPC[A].Type],
+                        vScreen[Z].Y + NPC[A].Location.Y + NPCFrameOffsetY[NPC[A].Type],
+                        NPC[A].Location.Width, NPC[A].Location.Height,
+                        GFXNPC[NPC[A].Type], 0,
+                        NPC[A].Frame * NPCHeight[NPC[A].Type] + NPCHeight[NPC[A].Type] - NPC[A].Location.Height,
+                        cn);
+            }
+            else if(NPC[A].Type == NPCID_SIDE_PLANT)
+            {
+                if(NPC[A].Direction == -1)
                 {
-                    {
-                        {
-                            if(NPC[A].Type == NPCID_PLANT_S3 || NPC[A].Type == NPCID_BIG_PLANT || NPC[A].Type == NPCID_PLANT_S1 || NPC[A].Type == NPCID_FIRE_PLANT || NPC[A].Type == NPCID_LONG_PLANT_UP || NPC[A].Type == NPCID_JUMP_PLANT)
-                            {
-                                XRender::renderTexture(vScreen[Z].X + NPC[A].Location.X + NPCFrameOffsetX[NPC[A].Type], vScreen[Z].Y + NPC[A].Location.Y + NPCFrameOffsetY[NPC[A].Type], NPC[A].Location.Width, NPC[A].Location.Height, GFXNPC[NPC[A].Type], 0, NPC[A].Frame * NPCHeight[NPC[A].Type], cn);
-                            }
-                            else if(NPC[A].Type == NPCID_BOTTOM_PLANT || NPC[A].Type == NPCID_LONG_PLANT_DOWN)
-                            {
-                                XRender::renderTexture(vScreen[Z].X + NPC[A].Location.X + NPCFrameOffsetX[NPC[A].Type],
-                                        vScreen[Z].Y + NPC[A].Location.Y + NPCFrameOffsetY[NPC[A].Type],
-                                        NPC[A].Location.Width, NPC[A].Location.Height,
-                                        GFXNPC[NPC[A].Type], 0,
-                                        NPC[A].Frame * NPCHeight[NPC[A].Type] + NPCHeight[NPC[A].Type] - NPC[A].Location.Height,
-                                        cn);
-                            }
-                            else if(NPC[A].Type == NPCID_SIDE_PLANT)
-                            {
-                                if(NPC[A].Direction == -1)
-                                {
-                                    XRender::renderTexture(vScreen[Z].X + NPC[A].Location.X + NPCFrameOffsetX[NPC[A].Type], vScreen[Z].Y + NPC[A].Location.Y + NPCFrameOffsetY[NPC[A].Type], NPC[A].Location.Width, NPC[A].Location.Height, GFXNPC[NPC[A].Type], 0, NPC[A].Frame * NPCHeight[NPC[A].Type]);
-                                }
-                                else
-                                {
-                                    XRender::renderTexture(vScreen[Z].X + NPC[A].Location.X + NPCFrameOffsetX[NPC[A].Type], vScreen[Z].Y + NPC[A].Location.Y + NPCFrameOffsetY[NPC[A].Type], NPC[A].Location.Width, NPC[A].Location.Height, GFXNPC[NPC[A].Type], NPCWidth[NPC[A].Type] - NPC[A].Location.Width, NPC[A].Frame * NPCHeight[NPC[A].Type], cn);
-                                }
-                            }
-                            else if(NPCWidthGFX[NPC[A].Type] == 0 || NPC[A].Effect == 1)
-                            {
-                                XRender::renderTexture(vScreen[Z].X + NPC[A].Location.X + NPCFrameOffsetX[NPC[A].Type], vScreen[Z].Y + NPC[A].Location.Y + NPCFrameOffsetY[NPC[A].Type], NPC[A].Location.Width, NPC[A].Location.Height, GFXNPC[NPC[A].Type], 0, NPC[A].Frame * NPCHeight[NPC[A].Type], cn);
-                            }
-                            else
-                            {
-                                XRender::renderTexture(vScreen[Z].X + NPC[A].Location.X + NPCFrameOffsetX[NPC[A].Type] - NPCWidthGFX[NPC[A].Type] / 2.0 + NPC[A].Location.Width / 2.0, vScreen[Z].Y + NPC[A].Location.Y + NPCFrameOffsetY[NPC[A].Type] - NPCHeightGFX[NPC[A].Type] + NPC[A].Location.Height, NPCWidthGFX[NPC[A].Type], NPCHeightGFX[NPC[A].Type], GFXNPC[NPC[A].Type], 0, NPC[A].Frame * NPCHeightGFX[NPC[A].Type], cn);
-                            }
-                        }
-                    }
+                    XRender::renderTexture(vScreen[Z].X + NPC[A].Location.X + NPCFrameOffsetX[NPC[A].Type], vScreen[Z].Y + NPC[A].Location.Y + NPCFrameOffsetY[NPC[A].Type], NPC[A].Location.Width, NPC[A].Location.Height, GFXNPC[NPC[A].Type], 0, NPC[A].Frame * NPCHeight[NPC[A].Type]);
                 }
+                else
+                {
+                    XRender::renderTexture(vScreen[Z].X + NPC[A].Location.X + NPCFrameOffsetX[NPC[A].Type], vScreen[Z].Y + NPC[A].Location.Y + NPCFrameOffsetY[NPC[A].Type], NPC[A].Location.Width, NPC[A].Location.Height, GFXNPC[NPC[A].Type], NPCWidth[NPC[A].Type] - NPC[A].Location.Width, NPC[A].Frame * NPCHeight[NPC[A].Type], cn);
+                }
+            }
+            else if(NPCWidthGFX[NPC[A].Type] == 0 || NPC[A].Effect == 1)
+            {
+                XRender::renderTexture(vScreen[Z].X + NPC[A].Location.X + NPCFrameOffsetX[NPC[A].Type], vScreen[Z].Y + NPC[A].Location.Y + NPCFrameOffsetY[NPC[A].Type], NPC[A].Location.Width, NPC[A].Location.Height, GFXNPC[NPC[A].Type], 0, NPC[A].Frame * NPCHeight[NPC[A].Type], cn);
+            }
+            else
+            {
+                XRender::renderTexture(vScreen[Z].X + NPC[A].Location.X + NPCFrameOffsetX[NPC[A].Type] - NPCWidthGFX[NPC[A].Type] / 2.0 + NPC[A].Location.Width / 2.0, vScreen[Z].Y + NPC[A].Location.Y + NPCFrameOffsetY[NPC[A].Type] - NPCHeightGFX[NPC[A].Type] + NPC[A].Location.Height, NPCWidthGFX[NPC[A].Type], NPCHeightGFX[NPC[A].Type], GFXNPC[NPC[A].Type], 0, NPC[A].Frame * NPCHeightGFX[NPC[A].Type], cn);
             }
         }
 
 
         XRender::setDrawPlane(PLANE_LVL_PLR_WARP);
 
-//        For A = 1 To numPlayers 'Players behind blocks
-        For(A, 1, numPlayers)
+        // Player warp effects 'Players behind blocks
+        for(int A = 1; A <= numPlayers; A++)
         {
             if(!Player[A].Dead && !Player[A].Immune2 && Player[A].TimeToLive == 0 && Player[A].Effect == 3)
             {
@@ -1534,7 +1537,7 @@ void UpdateGraphics(bool skipRepaint)
 
                     if(p.Mount == 3)
                     {
-                        B = p.MountType;
+                        int B = p.MountType;
                         // Yoshi's Body
                         tempLocation = roundLoc(p.Location, 2.0);
                         tempLocation.Height = 32;
@@ -1708,21 +1711,9 @@ void UpdateGraphics(bool skipRepaint)
         }
 
 
-//        if(LevelEditor)
-//        {
-//            fBlock = 1;
-//            lBlock = numBlock;
-//        }
-//        else
-//        {
-//            //fBlock = FirstBlock[int(-vScreen[Z].X / 32) - 1];
-//            //lBlock = LastBlock[int((-vScreen[Z].X + vScreen[Z].Width) / 32) + 1];
-//            blockTileGet(-vScreen[Z].X, vScreen[Z].Width, fBlock, lBlock);
-//        }
-
         XRender::setDrawPlane(PLANE_LVL_BLK_NORM);
 
-//        For A = fBlock To lBlock 'Non-Sizable Blocks
+        // 'Non-Sizable Blocks
         for(Block_t& block : screenMainBlocks)
         {
             g_stats.checkedBlocks++;
@@ -1757,8 +1748,8 @@ void UpdateGraphics(bool skipRepaint)
 
         XRender::setDrawPlane(PLANE_LVL_EFF_LOW);
 
-//'effects in back
-        for(A = 1; A <= numEffects; A++)
+        //'effects in back
+        for(int A = 1; A <= numEffects; A++)
         {
             g_stats.checkedEffects++;
             if(Effect[A].Type == EFFID_BOSS_FRAGILE_DIE || Effect[A].Type == EFFID_DOOR_S2_OPEN || Effect[A].Type == EFFID_DOOR_DOUBLE_S3_OPEN ||
@@ -1786,23 +1777,14 @@ void UpdateGraphics(bool skipRepaint)
         // draw NPCs that should be behind other NPCs
         for(size_t i = 0; i < NPC_Draw_Queue_p.Low_n; i++)
         {
-            A = NPC_Draw_Queue_p.Low[i];
+            int A = NPC_Draw_Queue_p.Low[i];
             XTColor cn = NPC[A].Shadow ? XTColor(0, 0, 0) : XTColor();
             cn.a = (NPC[A].Type == NPCID_MEDAL && g_curLevelMedals.gotten(NPC[A].Variant - 1)) ? 127 : 255;
 
-            {
-//                {
-                    // If Not NPCIsACoin(.Type) Then
-//                    {
-//                        {
-                if(NPCWidthGFX[NPC[A].Type] == 0)
-                    XRender::renderTexture(vScreen[Z].X + NPC[A].Location.X + NPCFrameOffsetX[NPC[A].Type], vScreen[Z].Y + NPC[A].Location.Y + NPCFrameOffsetY[NPC[A].Type], NPC[A].Location.Width, NPC[A].Location.Height, GFXNPC[NPC[A].Type], 0, NPC[A].Frame * NPC[A].Location.Height, cn);
-                else
-                    XRender::renderTexture(vScreen[Z].X + NPC[A].Location.X + (NPCFrameOffsetX[NPC[A].Type] * -NPC[A].Direction) - NPCWidthGFX[NPC[A].Type] / 2.0 + NPC[A].Location.Width / 2.0, vScreen[Z].Y + NPC[A].Location.Y + NPCFrameOffsetY[NPC[A].Type] - NPCHeightGFX[NPC[A].Type] + NPC[A].Location.Height, NPCWidthGFX[NPC[A].Type], NPCHeightGFX[NPC[A].Type], GFXNPC[NPC[A].Type], 0, NPC[A].Frame * NPCHeightGFX[NPC[A].Type], cn);
-//                        }
-//                    }
-//                }
-            }
+            if(NPCWidthGFX[NPC[A].Type] == 0)
+                XRender::renderTexture(vScreen[Z].X + NPC[A].Location.X + NPCFrameOffsetX[NPC[A].Type], vScreen[Z].Y + NPC[A].Location.Y + NPCFrameOffsetY[NPC[A].Type], NPC[A].Location.Width, NPC[A].Location.Height, GFXNPC[NPC[A].Type], 0, NPC[A].Frame * NPC[A].Location.Height, cn);
+            else
+                XRender::renderTexture(vScreen[Z].X + NPC[A].Location.X + (NPCFrameOffsetX[NPC[A].Type] * -NPC[A].Direction) - NPCWidthGFX[NPC[A].Type] / 2.0 + NPC[A].Location.Width / 2.0, vScreen[Z].Y + NPC[A].Location.Y + NPCFrameOffsetY[NPC[A].Type] - NPCHeightGFX[NPC[A].Type] + NPC[A].Location.Height, NPCWidthGFX[NPC[A].Type], NPCHeightGFX[NPC[A].Type], GFXNPC[NPC[A].Type], 0, NPC[A].Frame * NPCHeightGFX[NPC[A].Type], cn);
         }
 
 
@@ -1811,21 +1793,17 @@ void UpdateGraphics(bool skipRepaint)
         // ice
         for(size_t i = 0; i < NPC_Draw_Queue_p.Iced_n; i++)
         {
-            A = NPC_Draw_Queue_p.Iced[i];
-//            {
-//                {
+            int A = NPC_Draw_Queue_p.Iced[i];
             DrawFrozenNPC(Z, A);
-//                }
-//            }
         }
 
 
         XRender::setDrawPlane(PLANE_LVL_NPC_NORM);
 
-//        For A = 1 To numNPCs 'Display NPCs that should be in front of blocks
+        // 'Display NPCs that should be in front of blocks
         for(size_t i = 0; i < NPC_Draw_Queue_p.Normal_n; i++)
         {
-            A = NPC_Draw_Queue_p.Normal[i];
+            int A = NPC_Draw_Queue_p.Normal[i];
             XTColor cn = NPC[A].Shadow ? XTColor(0, 0, 0) : XTColor();
 
             if(!NPCIsYoshi[NPC[A].Type])
@@ -1851,7 +1829,7 @@ void UpdateGraphics(bool skipRepaint)
                         tempLocation.X = NPC[A].Location.X + NPC[A].Location.Width / 2.0 - tempLocation.Width / 2.0;
                         tempLocation.Y = NPC[A].Location.Y + NPC[A].Location.Height / 2.0 - tempLocation.Height / 2.0;
 
-                        B = EditorNPCFrame((int)SDL_floor(NPC[A].Special), NPC[A].Direction);
+                        int B = EditorNPCFrame((int)SDL_floor(NPC[A].Special), NPC[A].Direction);
                         XRender::renderTexture(vScreen[Z].X + tempLocation.X + NPCFrameOffsetX[NPC[A].Type], vScreen[Z].Y + tempLocation.Y, tempLocation.Width, tempLocation.Height, GFXNPC[NPC[A].Special], 0, B * tempLocation.Height);
                     }
 
@@ -1860,6 +1838,8 @@ void UpdateGraphics(bool skipRepaint)
             }
             else
             {
+                int B = 1;
+
                 if(NPC[A].Type == NPCID_PET_GREEN)
                     B = 1;
                 else if(NPC[A].Type == NPCID_PET_BLUE)
@@ -1976,17 +1956,18 @@ void UpdateGraphics(bool skipRepaint)
                 // Yoshi's Head
                 XRender::renderTexture(vScreen[Z].X + SDL_floor(NPC[A].Location.X) + YoshiTX, vScreen[Z].Y + NPC[A].Location.Y + YoshiTY, 32, 32, GFXYoshiT[B], 0, 32 * YoshiTFrame, cn);
             }
-//        Next A
         }
 
         // npc chat bubble
         for(size_t i = 0; i < NPC_Draw_Queue_p.Chat_n; i++)
         {
-            A = NPC_Draw_Queue_p.Chat[i];
-            B = NPCHeightGFX[NPC[A].Type] - NPC[A].Location.Height;
+            int A = NPC_Draw_Queue_p.Chat[i];
+
+            int B = NPCHeightGFX[NPC[A].Type] - NPC[A].Location.Height;
             if(B < 0)
                 B = 0;
-            XRender::renderTexture(vScreen[Z].X + NPC[A].Location.X + NPC[A].Location.Width / 2.0 - GFX.Chat.w / 2, vScreen[Z].Y + NPC[A].Location.Y - 30 - B, GFX.Chat.w, GFX.Chat.h, GFX.Chat, 0, 0);
+
+            XRender::renderTexture(vScreen[Z].X + NPC[A].Location.X + NPC[A].Location.Width / 2.0 - GFX.Chat.w / 2, vScreen[Z].Y + NPC[A].Location.Y - 30 - B, GFX.Chat);
         }
 
 
@@ -2003,6 +1984,8 @@ void UpdateGraphics(bool skipRepaint)
                 constexpr std::array<plr_pic_arr*, 5> char_tex = {&GFXMario, &GFXLuigi, &GFXPeach, &GFXToad, &GFXLink};
 
                 StdPicture& tx = (*char_tex[p.Character - 1])[p.State];
+
+                int Y = 0;
 
                 switch(Player[A].Character)
                 {
@@ -2067,7 +2050,7 @@ void UpdateGraphics(bool skipRepaint)
         // Put held NPCs on top
         for(size_t i = 0; i < NPC_Draw_Queue_p.Held_n; i++)
         {
-            A = NPC_Draw_Queue_p.Held[i];
+            int A = NPC_Draw_Queue_p.Held[i];
             XTColor cn = NPC[A].Shadow ? XTColor(0, 0, 0) : XTColor();
             {
                 if(NPC[A].Type == NPCID_ICE_CUBE)
@@ -2086,19 +2069,16 @@ void UpdateGraphics(bool skipRepaint)
 
 
 
-//'normal player draw code
-//        For A = numPlayers To 1 Step -1 'Players in front of blocks
-        for(int A = numPlayers; A >= 1; A--)// Players in front of blocks
+        //'normal player draw code
+        //'Players in front of blocks
+        for(int A = numPlayers; A >= 1; A--)
         {
-//            DrawPlayer A, Z
             DrawPlayer(Player[A], Z);
-//        Next A
         }
-//'normal player end
+        //'normal player end
 
 
-
-
+        // foreground backgrounds
         XRender::setDrawPlane(PLANE_LVL_BGO_FG);
 
         if(LevelEditor)
@@ -2128,7 +2108,7 @@ void UpdateGraphics(bool skipRepaint)
         {
             for(; nextBackground < (int)screenBackgrounds.size() && (int)screenBackgrounds[nextBackground] <= numBackground; nextBackground++)  // Foreground objects
             {
-                A = screenBackgrounds[nextBackground];
+                int A = screenBackgrounds[nextBackground];
 
                 g_stats.checkedBGOs++;
 
@@ -2149,7 +2129,6 @@ void UpdateGraphics(bool skipRepaint)
                     XRender::renderTexture(sX, sY, GFXBackgroundWidth[Background[A].Type], BackgroundHeight[Background[A].Type], GFXBackground[Background[A].Type], 0, BackgroundHeight[Background[A].Type] * BackgroundFrame[Background[A].Type]);
                 }
             }
-//        End If
         }
 
         XRender::setDrawPlane(PLANE_LVL_NPC_FG);
@@ -2157,7 +2136,7 @@ void UpdateGraphics(bool skipRepaint)
         // foreground NPCs
         for(size_t i = 0; i < NPC_Draw_Queue_p.FG_n; i++)
         {
-            A = NPC_Draw_Queue_p.FG[i];
+            int A = NPC_Draw_Queue_p.FG[i];
             XTColor cn = NPC[A].Shadow ? XTColor(0, 0, 0) : XTColor();
             if(NPCWidthGFX[NPC[A].Type] == 0)
                 XRender::renderTexture(vScreen[Z].X + NPC[A].Location.X + NPCFrameOffsetX[NPC[A].Type], vScreen[Z].Y + NPC[A].Location.Y + NPCFrameOffsetY[NPC[A].Type], NPC[A].Location.Width, NPC[A].Location.Height, GFXNPC[NPC[A].Type], 0, NPC[A].Frame * NPC[A].Location.Height, cn);
@@ -2172,8 +2151,9 @@ void UpdateGraphics(bool skipRepaint)
         {
             g_stats.checkedBlocks++;
 
-            // if(BlockKills[block.Type])
-//            {
+            // screenLavaBlocks only contains deadly blocks
+            // if(!BlockKills[block.Type]) continue;
+
             if(vScreenCollision(Z, block.Location) /*&& !block.Hidden*/)
             {
                 g_stats.renderedBlocks++;
@@ -2189,40 +2169,32 @@ void UpdateGraphics(bool skipRepaint)
                                       0,
                                       BlockFrame[block.Type] * 32);
             }
-//            }
         }
 
         XRender::setDrawPlane(PLANE_LVL_EFF_NORM);
 
-// effects on top
+        // effects on top
         For(A, 1, numEffects)
         {
             g_stats.checkedEffects++;
-//            With Effect(A)
             auto &e = Effect[A];
-//                If .Type <> 112 And .Type <> 54 And .Type <> 55 And .Type <> 59 And .Type <> 77 And .Type <> 81 And .Type <> 82 And .Type <> 103 And .Type <> 104 And .Type <> 114 And .Type <> 123 And .Type <> 124 Then
+
             if(e.Type != EFFID_BOSS_FRAGILE_DIE && e.Type != EFFID_DOOR_S2_OPEN && e.Type != EFFID_DOOR_DOUBLE_S3_OPEN && e.Type != EFFID_DOOR_SIDE_S3_OPEN &&
                e.Type != EFFID_PLR_FIREBALL_TRAIL && e.Type != EFFID_COIN_SWITCH_PRESS && e.Type != EFFID_SPINBLOCK && e.Type != EFFID_BIG_DOOR_OPEN &&
                e.Type != EFFID_LAVA_MONSTER_LOOK && e.Type != EFFID_WATER_SPLASH && e.Type != EFFID_TIME_SWITCH_PRESS && e.Type != EFFID_TNT_PRESS)
             {
-//                    If vScreenCollision(Z, .Location) Then
                 if(vScreenCollision(Z, e.Location))
                 {
                     g_stats.renderedEffects++;
-//                        BitBlt myBackBuffer, vScreenX(Z) + .Location.X, vScreenY(Z) + .Location.Y, .Location.Width, .Location.Height, GFXEffectMask(.Type), 0, .Frame * EffectHeight(.Type), vbSrcAnd
-//                        If .Shadow = False Then BitBlt myBackBuffer, vScreenX(Z) + .Location.X, vScreenY(Z) + .Location.Y, .Location.Width, .Location.Height, GFXEffect(.Type), 0, .Frame * EffectHeight(.Type), vbSrcPaint
+
                     XTColor cn = e.Shadow ? XTColor(0, 0, 0) : XTColor();
                     XRender::renderTexture(vb6Round(vScreen[Z].X + e.Location.X),
                                            vb6Round(vScreen[Z].Y + e.Location.Y),
                                            vb6Round(e.Location.Width),
                                            vb6Round(e.Location.Height),
                                            GFXEffectBMP[e.Type], 0, e.Frame * EffectHeight[e.Type], cn);
-//                    End If
                 }
-//                End If
             }
-//            End With
-//        Next A
         }
 
         XRender::setDrawPlane(PLANE_LVL_INFO);
@@ -2248,31 +2220,13 @@ void UpdateGraphics(bool skipRepaint)
 
         if(!LevelEditor) // Graphics for the main game.
         {
-            if(numScreens > 1 && !SingleCoop)
-            {
-                if(int(vScreen[Z].Width) == ScreenW)
-                {
-                    if(vScreen[Z].Top != 0.0)
-                        XRender::renderRect(0, 0, vScreen[Z].Width, 1, {0, 0, 0});
-                    else
-                        XRender::renderRect(0, vScreen[Z].Height - 1, vScreen[Z].Width, 1, {0, 0, 0});
-                }
-                else
-                {
-                    if(vScreen[Z].Left != 0.0)
-                        XRender::renderRect(0, 0, 1, vScreen[Z].Height, {0, 0, 0});
-                    else
-                        XRender::renderRect(vScreen[Z].Width - 1, 0, 1, vScreen[Z].Height, {0, 0, 0});
-                }
-            }
+            // moved vScreen divider below
 
-            // player names
-            /* Dropped */
+            // Redigit NetPlay player names were also dropped
 
             lunaRender(Z);
 
             // 'Interface
-            B = 0;
 
             // moved condition past the splitFrame() call (always draw section effects)
             // if(!GameMenu && !GameOutro)
@@ -2330,19 +2284,24 @@ void UpdateGraphics(bool skipRepaint)
             {
                 XRender::setDrawPlane(PLANE_LVL_HUD);
 
+                // draw HUD only if player has not disabled it
+                if(ShowOnScreenHUD)
+                {
 #ifdef THEXTECH_ENABLE_LUNA_AUTOCODE
-                lunaRenderHud(Z);
+                    lunaRenderHud(Z);
 #endif
-    //                DrawInterface Z, numScreens
-                if(ShowOnScreenHUD && !gSMBXHUDSettings.skip)
-                    DrawInterface(Z, numScreens);
+
+                    // this is LunaScript's way of disabling the original SMBX HUD, so it shouldn't affect the Luna HUD
+                    if(!gSMBXHUDSettings.skip)
+                       DrawInterface(Z, numScreens);
+                }
 
                 XRender::setDrawPlane(PLANE_LVL_HUD + 1);
 
                 // Display NPCs that got dropped from the container
                 for(size_t i = 0; i < NPC_Draw_Queue_p.Dropped_n; i++)
                 {
-                    A = NPC_Draw_Queue_p.Dropped[i];
+                    int A = NPC_Draw_Queue_p.Dropped[i];
 
                     if(NPCWidthGFX[NPC[A].Type] == 0)
                         XRender::renderTexture(vScreen[Z].X + NPC[A].Location.X + NPCFrameOffsetX[NPC[A].Type], vScreen[Z].Y + NPC[A].Location.Y + NPCFrameOffsetY[NPC[A].Type], NPC[A].Location.Width, NPC[A].Location.Height, GFXNPC[NPC[A].Type], 0, NPC[A].Frame * NPC[A].Location.Height);
@@ -2351,60 +2310,7 @@ void UpdateGraphics(bool skipRepaint)
                 }
             }
 
-            else if(!GameOutro)
-            {
-                XRender::setDrawPlane(PLANE_GAME_MENUS);
-                mainMenuDraw();
-            }
-
             XRender::setDrawPlane(PLANE_LVL_META);
-
-            if(PrintFPS > 0 && ShowFPS)
-            {
-                XRender::offsetViewportIgnore(true);
-                SuperPrint(fmt::format_ne("{0}", int(PrintFPS)), 1, 8, 8, {0, 255, 0});
-
-#if 0 // deprecated profiling info
-                for(int i = 0; i < 2; i++)
-                {
-                    int val = (i == 0 ? g_microStats.view_total : g_microStats.view_slow_frame_time);
-
-                    int x = val < 95 ? 36 : val < 995 ? 18 : 0;
-                    int y = 24 + i * 16;
-
-                    float r, g, a;
-                    if(val < 500)
-                    {
-                        r = 0.0f; g = 1.0f; a = 0.25f;
-                    }
-                    else if(val < 1000)
-                    {
-                        r = 1.0f; g = 1.0f; a = 0.5f;
-                    }
-                    else
-                    {
-                        r = 1.0f; g = 0.0f; a = 1.0f;
-                    }
-
-                    std::string display = (i == 0
-                        ? fmt::sprintf_ne("%d%%", (val + 5) / 10)
-                        : fmt::sprintf_ne("%d%% (max)", (val + 5) / 10));
-                    SuperPrint(display, 3, x, y, r, g, 0.f, a);
-                }
-#endif
-                XRender::offsetViewportIgnore(false);
-            }
-
-            g_stats.print();
-
-            if(!BattleMode && !GameMenu && !GameOutro && g_config.show_episode_title)
-            {
-                int y = (ScreenH >= 640) ? 20 : ScreenH - 60;
-                if(g_config.show_episode_title == Config_t::EPISODE_TITLE_TRANSPARENT)
-                    SuperPrintScreenCenter(WorldName, 3, y, XTAlpha(127));
-                else
-                    SuperPrintScreenCenter(WorldName, 3, y);
-            }
 
             // Always draw for single-player
             // And don't draw when many players at the same screen
@@ -2412,64 +2318,111 @@ void UpdateGraphics(bool skipRepaint)
                 g_levelVScreenFader[Z].draw(false);
         }
 
-//        If LevelEditor = True Or MagicHand = True Then
         if((LevelEditor || MagicHand))
         {
             XRender::offsetViewportIgnore(true);
 
             // editor code now located in `gfx_editor.cpp`
+            XRender::setDrawPlane(PLANE_LVL_INFO);
             DrawEditorLevel(Z);
 
             XRender::offsetViewportIgnore(false);
         }
 
-        if(numScreens > 1) // for multiple screens
-            XRender::setViewport(0, 0, ScreenW, ScreenH);
+        XRender::setDrawPlane(PLANE_LVL_META);
 
-        if(GameOutro)
-        {
-            XRender::setDrawPlane(PLANE_GAME_MENUS);
-            DrawCredits();
-        }
+        // Screen shake logic was here; moved into the logic section of the file because it affects the random state of the game
 
-//        If LevelEditor = True Then
-//            StretchBlt frmLevelWindow.vScreen(Z).hdc, 0, 0, frmLevelWindow.vScreen(Z).ScaleWidth, frmLevelWindow.vScreen(Z).ScaleHeight, myBackBuffer, 0, 0, 800, 600, vbSrcCopy
-//        Else
-        { // NOT AN EDITOR!!!
-            s_shakeScreen.update();
-        }
-
-        // TODO: VERIFY THIS
+        // draw onscreen controls display
         XRender::offsetViewportIgnore(true);
-        if(ScreenType == 5 && numScreens == 1)
+
+        if(screen.Type == 5 && numScreens == 1)
         {
             speedRun_renderControls(1, -1);
             speedRun_renderControls(2, -1);
         }
-        else
+        else if(numScreens >= 2)
             speedRun_renderControls(Z, Z);
-        XRender::offsetViewportIgnore(false);
 
-//    Next Z
+        XRender::offsetViewportIgnore(false);
     } // For(Z, 2, numScreens)
 
+
+    // graphics shared by all vScreens, but still on the Screen
+    XRender::resetViewport();
     XRender::offsetViewportIgnore(true);
-    XRender::setViewport(0, 0, ScreenW, ScreenH);
+
+    // splitscreen dividers
+    if(numScreens > 1 && !SingleCoop)
+    {
+        XRender::setDrawPlane(PLANE_LVL_META);
+
+        bool horiz_split = (screen.Type == ScreenTypes::TopBottom) || (screen.Type == ScreenTypes::Quad);
+        horiz_split |= screen.Type == ScreenTypes::Dynamic && (screen.DType == 3 || screen.DType == 4 || screen.DType == 6);
+
+        if(horiz_split)
+            XRender::renderRect(0, (screen.H / 2) - 2, screen.W, 4, {0, 0, 0});
+
+        bool vert_split = (screen.Type == ScreenTypes::LeftRight) || (screen.Type == ScreenTypes::Quad);
+        vert_split |= screen.Type == ScreenTypes::Dynamic && (screen.DType == 1 || screen.DType == 2);
+
+        if(vert_split)
+            XRender::renderRect((screen.W / 2) - 2, 0, 4, screen.H, {0, 0, 0});
+    }
+
+    XRender::setDrawPlane(PLANE_GAME_META);
+
+    // 1P controls indicator
+    if(screen.Type != 5 && numScreens == 1)
+        speedRun_renderControls(1, -1);
+
+    // fix missing controls info when the vScreen didn't get rendered at all
+    if(screen.Type == 5 && numScreens == 1 && screen.vScreen(1).Width == 0)
+    {
+        speedRun_renderControls(1, -1);
+        speedRun_renderControls(2, -1);
+    }
+}
+
+void UpdateGraphicsMeta()
+{
+    XRender::resetViewport();
 
     XRender::setDrawPlane(PLANE_GAME_META);
 
     speedRun_renderTimer();
 
+    if(PrintFPS > 0 && ShowFPS)
+        SuperPrint(fmt::format_ne("{0}", int(PrintFPS)), 1, 8, 8, {0, 255, 0});
+
+    g_stats.print();
+
+    if(!BattleMode && !GameMenu && !GameOutro && g_config.show_episode_title)
+    {
+        int y = (ScreenH >= 640) ? 20 : ScreenH - 60;
+        if(g_config.show_episode_title == Config_t::EPISODE_TITLE_TRANSPARENT)
+            SuperPrintScreenCenter(WorldName, 3, y, XTAlpha(127));
+        else
+            SuperPrintScreenCenter(WorldName, 3, y);
+    }
+
     DrawDeviceBattery();
 
-    // TODO: don't rely on this behavior during level test, maybe just don't draw vScreen at all
-    // draw screen fader below level menu when game is paused
+    // Draw screen fader below level menu when game is paused
+    // This makes sure that the level test menu is drawn above the screen fader during level tests
     if(GamePaused != PauseCode::None)
         XRender::setDrawPlane(PLANE_GAME_MENUS);
 
     g_levelScreenFader.draw();
 
+    // Important note: PLANE_GAME_MENUS is below PLANE_GAME_META.
     XRender::setDrawPlane(PLANE_GAME_MENUS);
+
+    if(GameMenu && !GameOutro)
+        mainMenuDraw();
+
+    if(GameOutro)
+        DrawCredits();
 
     if(LevelEditor || MagicHand)
         DrawEditorLevel_UI();
@@ -2496,50 +2449,4 @@ void UpdateGraphics(bool skipRepaint)
         TextEntryScreen::Render();
 
     XRender::offsetViewportIgnore(false);
-
-    if(!skipRepaint)
-        XRender::repaint();
-
-    // Update Coin Frames
-    CoinFrame2[1] += 1;
-    if(CoinFrame2[1] >= 6)
-    {
-        CoinFrame2[1] = 0;
-        CoinFrame[1] += 1;
-        if(CoinFrame[1] >= 4)
-            CoinFrame[1] = 0;
-    }
-
-    CoinFrame2[2] += 1;
-    if(CoinFrame2[2] >= 6)
-    {
-        CoinFrame2[2] = 0;
-        CoinFrame[2] += 1;
-        if(CoinFrame[2] >= 7)
-            CoinFrame[2] = 0;
-    }
-
-    CoinFrame2[3] += 1;
-    if(CoinFrame2[3] >= 7)
-    {
-        CoinFrame2[3] = 0;
-        CoinFrame[3] += 1;
-        if(CoinFrame[3] >= 4)
-            CoinFrame[3] = 0;
-    }
-//    if(nPlay.Mode == 0)
-//    {
-//        if(nPlay.NPCWaitCount >= 11)
-//            nPlay.NPCWaitCount = 0;
-//        nPlay.NPCWaitCount += 2;
-//        if(timeStr != "")
-//            Netplay::sendData timeStr + LB;
-//    }
-
-    lunaRenderEnd();
-    frameRenderEnd();
-
-//    if(XRender::lazyLoadedBytes() > 200000) // Reset timer while loading many pictures at the same time
-//        resetFrameTimer();
-    XRender::lazyLoadedBytesReset();
 }

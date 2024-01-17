@@ -162,24 +162,9 @@ void Deactivate(int A)
                 {
                     const Screen_t& screen = Screens[screen_i];
 
-                    bool single_screen = (screen.Type == ScreenTypes::SinglePlayer || screen.Type == ScreenTypes::Average
-                        || screen.Type == ScreenTypes::SharedScreen || screen.Type == ScreenTypes::Credits);
-
-                    for(int vscreen_i = 0; !hit && vscreen_i < maxLocalPlayers; vscreen_i++)
+                    for(int vscreen_i = screen.active_begin(); !hit && vscreen_i < screen.active_end(); vscreen_i++)
                     {
                         int vscreen_Z = screen.vScreen_refs[vscreen_i];
-
-                        // Possible future TODO: SingleCoop could become a member of Screen_t
-                        if(screen.Type == ScreenTypes::SingleCoop && SingleCoop != vscreen_i + 1)
-                            continue;
-
-                        // check if non-first screen is visible in dynamic mode
-                        if(screen.Type == ScreenTypes::Dynamic && vscreen_i > 0 && !vScreen[vscreen_Z].Visible)
-                            continue;
-
-                        // in single screen mode, only allow first screen
-                        if(single_screen && vscreen_i > 0)
-                            continue;
 
                         if(vScreenCollision(vscreen_Z, NPC[A].Location))
                             hit = true;

@@ -421,6 +421,9 @@ XTechTranslate::XTechTranslate()
 
         {"game.error.warpNeedStarCount",            &g_gameStrings.warpNeedStarCount},
 
+        {"game.message.scanningLevels",             &g_gameStrings.messageScanningLevels},
+        {"game.format.minutesSeconds",              &g_gameStrings.formatMinutesSeconds},
+
         {"game.pause.continue",             &g_gameStrings.pauseItemContinue},
         {"game.pause.restartLevel",         &g_gameStrings.pauseItemRestartLevel},
         {"game.pause.resetCheckpoints",     &g_gameStrings.pauseItemResetCheckpoints},

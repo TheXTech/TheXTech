@@ -215,7 +215,7 @@ void UpdatePlayer()
 
             if(Player[A].TimeToLive >= 200 || !split_screen)
             {
-                B = CheckLiving();
+                B = CheckNearestLiving(A);
 
                 // move dead player towards start point in BattleMode
                 if(BattleMode && BattleLives[1] > 0 && BattleLives[2] > 0 && BattleWinner == 0)
@@ -273,7 +273,20 @@ void UpdatePlayer()
                     }
 
                     if(C1 < 10 && C1 > -10)
+                    {
                         KillPlayer(A);
+
+                        // new logic: mark which player A's ghost is following
+                        if(!BattleMode && Player[A].Dead)
+                            Player[A].Effect2 = -B;
+
+                        // new logic: fix player's location in split-screen mode
+                        if(!dynamic_screen)
+                        {
+                            Player[A].Location.X = Player[B].Location.X;
+                            Player[A].Location.Y = Player[B].Location.Y;
+                        }
+                    }
                 }
                 // start fadeout (65 / 3) frames before level end
                 else if(Player[A].TimeToLive == 200 - (65 / 3))
@@ -291,7 +304,23 @@ void UpdatePlayer()
             // safer than the below code, should always be used except for compatibility concerns
             if(numPlayers > 2)
             {
-                B = CheckLiving();
+                // continue following currently-tracked player if possible
+                if(Player[A].Effect2 < 0)
+                {
+                    B = -Player[A].Effect2;
+
+                    // put player back in TimeToLive state if their tracked dead player is gone
+                    if(B > numPlayers || Player[B].Dead || Player[B].TimeToLive > 0)
+                    {
+                        Player[A].Effect2 = 0;
+                        Player[A].Dead = false;
+                        Player[A].TimeToLive = 200;
+
+                        B = 0;
+                    }
+                }
+                else
+                    B = CheckNearestLiving(A);
 
                 if(B)
                 {
@@ -2486,6 +2515,7 @@ void UpdatePlayer()
                                                     PlrMid = Player[A].Location.X;
                                                 else
                                                     PlrMid = Player[A].Location.X + Player[A].Location.Width;
+
                                                 Slope = (PlrMid - Block[B].Location.X) / Block[B].Location.Width;
                                                 if(BlockSlope[Block[B].Type] < 0)
                                                     Slope = 1 - Slope;
@@ -2494,15 +2524,22 @@ void UpdatePlayer()
                                                 if(Slope > 1)
                                                     Slope = 1;
 
+                                                // if we're already on top of another (higher or more leftwards, at level load time) block this frame, consider canceling it
                                                 if(tempHit3 > 0)
                                                 {
-                                                    if(!BlockIsSizable[Block[tempHit3].Type])
+                                                    // the bug here is vanilla, but this case happens for a single frame every time a slope falls through ground since TheXTech 1.3.6, and only in the rare case where a slope falls through ground *it was originally below* in vanilla
+                                                    if(g_compatibility.fix_player_downward_clip && !CompareWalkBlock(tempHit3, B, Player[A].Location))
+                                                    {
+                                                        // keep the old block, other conditions are VERY likely to cancel it
+                                                    }
+                                                    else if(!BlockIsSizable[Block[tempHit3].Type])
                                                     {
                                                         if(Block[tempHit3].Location.Y != Block[B].Location.Y)
                                                             tempHit3 = 0;
                                                     }
                                                     else
                                                     {
+                                                        // NOTE: looks like a good place for a vb6-style fEqual
                                                         if(Block[tempHit3].Location.Y == Block[B].Location.Y + Block[B].Location.Height)
                                                             tempHit3 = 0;
                                                     }
@@ -2510,6 +2547,7 @@ void UpdatePlayer()
 
                                                 if(tempHit2)
                                                 {
+                                                    // NOTE: looks like a good place for a vb6-style fEqual
                                                     if(Block[tempSlope2].Location.Y + Block[tempSlope2].Location.Height == Block[B].Location.Y && BlockSlope[Block[tempSlope2].Type] == BlockSlope[Block[B].Type])
                                                     {
                                                         tempHit2 = false;

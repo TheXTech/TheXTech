@@ -683,6 +683,7 @@ set(THEXTECH_SRC
     src/main/screen_quickreconnect.cpp
     src/main/screen_textentry.cpp
     src/main/screen_prompt.cpp
+    src/main/screen_progress.cpp
     src/main/game_strings.cpp
     src/main/translate.cpp
     src/main/translate_episode.cpp
@@ -853,7 +854,6 @@ elseif(NINTENDO_DS)
         src/core/16m/window_16m.cpp
         src/core/null/events_null.cpp
         src/core/16m/sound_16m.cpp
-        src/core/16m/packloader.cpp
         src/core/power/power_null.cpp
     )
 elseif(THEXTECH_NO_SDL_BUILD)
@@ -1180,7 +1180,7 @@ elseif(NINTENDO_WIIU)
     target_compile_definitions(thextech PRIVATE -DPGE_SDL_MUTEX)
 elseif(NINTENDO_DS)
     target_link_libraries(thextech PRIVATE filesystem)
-    target_link_libraries(thextech PRIVATE slim)
+    target_link_libraries(thextech PRIVATE fat)
     target_link_libraries(thextech PRIVATE mm9)
     target_link_libraries(thextech PRIVATE nds9)
     target_compile_definitions(thextech PRIVATE -DPGE_NO_THREADING -DLOW_MEM -DTHEXTECH_PRELOAD_LEVELS -D__16M__)
@@ -1522,33 +1522,61 @@ else()
     )
 
     if(THEXTECH_UNIX_INSTALL)
+        # set up application metadata
+        if(NOT HAIKU)
+            # application launcher
+            if(NOT EXISTS "${DEPENDENCIES_INSTALL_DIR}/share/applications")
+                file(MAKE_DIRECTORY "${DEPENDENCIES_INSTALL_DIR}/share/applications")
+            endif()
+
+            set(DESKTOP_EXEC ${THEXTECH_EXECUTABLE_NAME})
+            set(DESKTOP_ICON ${THEXTECH_EXECUTABLE_NAME})
+            set(DESKTOP_WMCLASS ${THEXTECH_EXECUTABLE_NAME})
+            set(DESKTOP_NAME "TheXTech" CACHE STRING "Name for the application icon")
+            set(DESKTOP_GENERIC_NAME "TheXTech Engine" CACHE STRING "")
+            set(DESKTOP_COMMENT "TheXTech - the modern C++ port and successor of the SMBX engine" CACHE STRING "Short description of the application")
+
+            configure_file("${CMAKE_CURRENT_SOURCE_DIR}/cmake/icon.desktop.in"
+                           "${DEPENDENCIES_INSTALL_DIR}/share/applications/${THEXTECH_EXECUTABLE_NAME}.desktop")
+            install(FILES "${DEPENDENCIES_INSTALL_DIR}/share/applications/${THEXTECH_EXECUTABLE_NAME}.desktop"
+                    DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/applications)
+
+            # flatpak manifest
+            set(FLATPAK_BUILD OFF CACHE BOOL "Is this build a part of a flatpak workflow?")
+            mark_as_advanced(FLATPAK_BUILD)
+            if(FLATPAK_BUILD)
+                set(FLATPAK_DESCRIPTION "TheXTech is an open-source continuation of the SMBX 1.3 platformer game engine. Its highest priority is full compatibility with the SMBX 1.3 content standard, but it also adds a number of enhancements and bugfixes." CACHE STRING "Description for the installable flatpak package.")
+
+                configure_file("${CMAKE_CURRENT_SOURCE_DIR}/resources/flatpak/appdata.xml.in"
+                               "${DEPENDENCIES_INSTALL_DIR}/share/metainfo/${THEXTECH_EXECUTABLE_NAME}.metainfo.xml")
+                install(FILES "${DEPENDENCIES_INSTALL_DIR}/share/metainfo/${THEXTECH_EXECUTABLE_NAME}.metainfo.xml"
+                        DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/metainfo)
+            endif()
+
+            # application icons
+            if(THEXTECH_SOURCE_ASSETS_PATH AND NOT THEXTECH_SOURCE_ASSETS_PATH STREQUAL "")
+                set(THEXTECH_ICON_PATH "${THEXTECH_SOURCE_ASSETS_PATH}/graphics/ui/icon/")
+            else()
+                set(THEXTECH_ICON_PATH "${CMAKE_CURRENT_SOURCE_DIR}/resources/icon/")
+            endif()
+
+            install(FILES "${THEXTECH_ICON_PATH}/thextech_16.png"
+                    DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/icons/hicolor/16x16/apps/" RENAME "${THEXTECH_EXECUTABLE_NAME}.png")
+            install(FILES "${THEXTECH_ICON_PATH}/thextech_32.png"
+                    DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/icons/hicolor/32x32/apps/" RENAME "${THEXTECH_EXECUTABLE_NAME}.png")
+            install(FILES "${THEXTECH_ICON_PATH}/thextech_48.png"
+                    DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/icons/hicolor/48x48/apps/" RENAME "${THEXTECH_EXECUTABLE_NAME}.png")
+            install(FILES "${THEXTECH_ICON_PATH}/thextech_128.png"
+                    DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/icons/hicolor/128x128/apps/" RENAME "${THEXTECH_EXECUTABLE_NAME}.png")
+            install(FILES "${THEXTECH_ICON_PATH}/thextech_256.png"
+                    DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/icons/hicolor/256x256/apps/" RENAME "${THEXTECH_EXECUTABLE_NAME}.png")
+            install(FILES "${THEXTECH_ICON_PATH}/thextech_512.png" OPTIONAL
+                    DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/icons/hicolor/512x512/apps/" RENAME "${THEXTECH_EXECUTABLE_NAME}.png")
+        endif()
+
+        # package all assets
         if(THEXTECH_FIXED_ASSETS_PATH AND NOT THEXTECH_FIXED_ASSETS_PATH STREQUAL "" AND
            THEXTECH_SOURCE_ASSETS_PATH AND NOT THEXTECH_SOURCE_ASSETS_PATH STREQUAL "")
-
-            if(NOT HAIKU)
-                if(NOT EXISTS "${DEPENDENCIES_INSTALL_DIR}/share/applications")
-                    file(MAKE_DIRECTORY "${DEPENDENCIES_INSTALL_DIR}/share/applications")
-                endif()
-
-                set(DESKTOP_EXEC ${THEXTECH_EXECUTABLE_NAME})
-                set(DESKTOP_ICON ${THEXTECH_EXECUTABLE_NAME})
-                set(DESKTOP_WMCLASS ${THEXTECH_EXECUTABLE_NAME})
-                configure_file("${CMAKE_CURRENT_SOURCE_DIR}/cmake/icon.desktop.in"
-                               "${DEPENDENCIES_INSTALL_DIR}/share/applications/${THEXTECH_EXECUTABLE_NAME}.desktop")
-                install(FILES "${DEPENDENCIES_INSTALL_DIR}/share/applications/${THEXTECH_EXECUTABLE_NAME}.desktop"
-                        DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/applications)
-
-                install(FILES "${THEXTECH_SOURCE_ASSETS_PATH}/graphics/ui/icon/thextech_16.png"
-                        DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/icons/hicolor/16x16/apps/" RENAME "${THEXTECH_EXECUTABLE_NAME}.png")
-                install(FILES "${THEXTECH_SOURCE_ASSETS_PATH}/graphics/ui/icon/thextech_32.png"
-                        DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/icons/hicolor/32x32/apps/" RENAME "${THEXTECH_EXECUTABLE_NAME}.png")
-                install(FILES "${THEXTECH_SOURCE_ASSETS_PATH}/graphics/ui/icon/thextech_48.png"
-                        DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/icons/hicolor/48x48/apps/" RENAME "${THEXTECH_EXECUTABLE_NAME}.png")
-                install(FILES "${THEXTECH_SOURCE_ASSETS_PATH}/graphics/ui/icon/thextech_128.png"
-                        DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/icons/hicolor/128x128/apps/" RENAME "${THEXTECH_EXECUTABLE_NAME}.png")
-                install(FILES "${THEXTECH_SOURCE_ASSETS_PATH}/graphics/ui/icon/thextech_256.png"
-                        DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/icons/hicolor/256x256/apps/" RENAME "${THEXTECH_EXECUTABLE_NAME}.png")
-            endif()
 
             file(GLOB THEXTECH_ASSETS_FILES_ROOT_LIST LIST_DIRECTORIES false  "${THEXTECH_SOURCE_ASSETS_PATH}/*")
             install(FILES ${THEXTECH_ASSETS_FILES_ROOT_LIST} DESTINATION "${THEXTECH_FIXED_ASSETS_PATH}")
@@ -1558,11 +1586,12 @@ else()
             install(DIRECTORY "${THEXTECH_SOURCE_ASSETS_PATH}/music" DESTINATION "${THEXTECH_FIXED_ASSETS_PATH}")
             install(DIRECTORY "${THEXTECH_SOURCE_ASSETS_PATH}/sound" DESTINATION "${THEXTECH_FIXED_ASSETS_PATH}")
             install(DIRECTORY "${THEXTECH_SOURCE_ASSETS_PATH}/worlds" DESTINATION "${THEXTECH_FIXED_ASSETS_PATH}")
-
-            install(FILES changelog.txt DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/doc/${THEXTECH_EXECUTABLE_NAME})
-            install(FILES README.md DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/doc/${THEXTECH_EXECUTABLE_NAME} RENAME ReadMe.txt)
-            install(FILES LICENSE DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/doc/${THEXTECH_EXECUTABLE_NAME} RENAME License.TheXTech.txt)
         endif()
+
+        # install readmes
+        install(FILES changelog.txt DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/doc/${THEXTECH_EXECUTABLE_NAME})
+        install(FILES README.md DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/doc/${THEXTECH_EXECUTABLE_NAME} RENAME ReadMe.txt)
+        install(FILES LICENSE DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/doc/${THEXTECH_EXECUTABLE_NAME} RENAME License.TheXTech.txt)
     else()
         install(FILES changelog.txt DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/thextech)
         install(FILES README.md DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/thextech RENAME ReadMe.txt)

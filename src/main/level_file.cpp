@@ -19,6 +19,7 @@
  */
 
 #include "sdl_proxy/sdl_stdinc.h"
+#include "sdl_proxy/sdl_timer.h"
 
 #ifdef THEXTECH_BUILD_GL_MODERN
 #include <json/json.hpp>
@@ -45,6 +46,8 @@
 #include "level_file.h"
 #include "main/level_save_info.h"
 #include "main/level_medals.h"
+#include "main/screen_progress.h"
+#include "main/game_strings.h"
 #include "trees.h"
 #include "npc_special_data.h"
 #include "graphics/gfx_update.h"
@@ -1335,8 +1338,12 @@ void FindStars()
 //    std::string newInput;
     LevelData tempData;
 
+    uint32_t start_time = SDL_GetTicks();
+
     for(int A = 1; A <= numWarps; A++)
     {
+        IndicateProgress(start_time, (double)A / numWarps, g_gameStrings.messageScanningLevels);
+
         auto &warp = Warp[A];
 
         if(warp.level != STRINGINDEX_NONE)

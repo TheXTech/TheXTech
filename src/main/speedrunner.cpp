@@ -321,10 +321,10 @@ void speedRun_renderControls(int player, int screenZ)
     if(screenZ >= 0)
     {
         auto &scr = vScreen[screenZ];
-        x = scr.Left > 0 ? (int)(scr.Left + scr.Width) - (w + 4) : (int)scr.Left + 4;
         rightAlign = scr.Left > 0;
-        y = (int)(scr.Top + scr.Height) - 34;
-        bx = scr.Left > 0 ? x - (bw + 4) : (x + w + 4);
+        x = rightAlign ? (int)(scr.Width) - (w + 4) : 4;
+        y = (int)(scr.Height) - 34;
+        bx = rightAlign ? x - (bw + 4) : (x + w + 4);
         by = y + 4;
     }
     else
