@@ -1,0 +1,153 @@
+name: Flatpak CI
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Flatpak for ${{ matrix.arch.name }}
+    runs-on: ubuntu-latest
+    container:
+      image: ubuntu:22.04
+      options: --privileged
+    strategy:
+      fail-fast: true
+      matrix:
+        arch:
+        - {
+            name: "x86-64",
+            id: "x86_64",
+            sdk_ver: "22.08"
+          }
+        - {
+            name: "arm64",
+            id: "aarch64",
+            sdk_ver: "22.08"
+          }
+        exclude:
+          - arch: {
+              name: "${{ (github.event_name == 'workflow_dispatch' && ' ') || 'arm64' }}",
+              id: "${{ (github.event_name == 'workflow_dispatch' && ' ') || 'aarch64' }}",
+              sdk_ver: "22.08"
+            }
+    steps:
+    - name: Check for the upload support
+      id: upload-check
+      shell: bash
+      run: |
+        if [[ "${{ secrets.builds_login }}" != '' && \
+              "${{ secrets.builds_password }}" != '' && \
+              "${{ secrets.builds_host }}" != '' ]]; then
+          echo "available=true" >> $GITHUB_OUTPUT;
+        else
+          echo "available=false" >> $GITHUB_OUTPUT;
+        fi
+
+    - uses: styfle/cancel-workflow-action@0.11.0
+      with:
+        workflow_id: flatpak.yml
+        all_but_latest: true
+        access_token: ${{ github.token }}
+
+    - name: Install Ubuntu Dependencies
+      shell: bash
+      run: |
+        apt update --fix-missing -y
+        apt upgrade -y
+
+        apt install -y flatpak flatpak-builder qemu-user-static p7zip-full git lftp
+
+        update-binfmts --enable qemu-aarch64
+        update-binfmts --enable qemu-arm
+
+    - name: Install flatpak Dependencies
+      shell: bash
+      run: |
+        flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+        flatpak install -y flathub org.freedesktop.Platform/${{ matrix.arch.id }}/${{ matrix.arch.sdk_ver }} org.freedesktop.Sdk/${{ matrix.arch.id }}/${{ matrix.arch.sdk_ver }}
+
+#    - uses: nelonoel/branch-name@v1.0.1
+    - uses: Wohlstand/branch-name@v1.0.2-pr-test
+
+    - name: Check if a pull request
+      id: event-check
+      shell: bash
+      run: |
+        if [[ "${BRANCH_NAME}" == *"merge"* ]]; then
+          echo "--- This build is a pull-request ---"
+          echo "is_pull_request=true" >> $GITHUB_OUTPUT;
+        else
+          echo "--- This build is a normal branch build ---"
+          echo "is_pull_request=false" >> $GITHUB_OUTPUT;
+        fi
+
+    - uses: actions/checkout@v3
+
+    - name: Pull submodules
+      shell: bash
+      run: |
+        git config --global --add safe.directory '*'
+        git submodule init
+        git submodule update
+
+    - name: Create flatpak manifest YML
+      id: make-yml
+      shell: bash
+      run: |
+        if [[ "${BRANCH_NAME}" == *"merge"* ]]; then
+            BRANCH_NAME_RES="pull-request"
+            echo "-- Pull-request detected!"
+        else
+            BRANCH_NAME_RES=${BRANCH_NAME}
+        fi
+
+        export REPO_PATH="$(pwd)"
+        export REPO_PATH_SED="$(pwd | sed 's_/_\\/_g')"
+        export BRANCH_NAME_SED="$(echo $BRANCH_NAME_RES | sed 's_/_\\/_g')"
+        cd ..
+        cat $REPO_PATH/resources/flatpak/build.yml \
+          | sed "s/- type: git/- type: dir/" \
+          | sed "s/url: https:.*/path: $REPO_PATH_SED/" \
+          | sed "s/OVERRIDE_GIT_BRANCH=/OVERRIDE_GIT_BRANCH=$BRANCH_NAME_SED/" \
+          | tee ci-build.yml
+
+    - name: Build flatpak
+      shell: bash
+      run: |
+        cd ..
+        flatpak-builder --arch=${{ matrix.arch.id }} --force-clean --repo=temp_repo temp_build ci-build.yml
+
+    - name: Create bundle
+      shell: bash
+      run: |
+        mkdir -p package
+        # ru.wohlsoft.TheXTech is the package id, and dev is the branch
+        flatpak build-bundle --arch=${{ matrix.arch.id }} ../temp_repo package/thextech-${{ matrix.arch.name }}.flatpak ru.wohlsoft.TheXTech dev
+
+    - name: Upload artifact
+      if: success()
+      uses: actions/upload-artifact@v3
+      continue-on-error: true
+      with:
+        path: package/thextech-${{ matrix.arch.name }}.flatpak
+        name: TheXTech (${{ matrix.arch.name }})
+
+    - name: Deploy to builds.wohlsoft.ru
+      if: success() && github.event_name != 'pull_request' && steps.event-check.outputs.is_pull_request == 'false' && steps.upload-check.outputs.available == 'true'
+      continue-on-error: true
+      shell: bash
+      run: |
+        if [[ "${BRANCH_NAME}" == *"merge"* ]]; then
+            BRANCH_NAME_RES="pull-request"
+            echo "-- Pull-request detected!"
+        else
+            BRANCH_NAME_RES=${BRANCH_NAME}
+        fi
+
+        cd package
+        mv "thextech-${{ matrix.arch.name }}.flatpak" "thextech-${BRANCH_NAME_RES}-${{ matrix.arch.name }}.flatpak"
+
+        UPLOAD_LIST="set ssl:verify-certificate no;"
+        UPLOAD_LIST="${UPLOAD_LIST} put -O www/flatpak thextech-${BRANCH_NAME_RES}-${{ matrix.arch.name }}.flatpak;"
+
+        lftp -e "${UPLOAD_LIST} exit" -u ${{ secrets.builds_login }},${{ secrets.builds_password }} ${{ secrets.builds_host }}

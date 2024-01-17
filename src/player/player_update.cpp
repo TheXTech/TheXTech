@@ -2515,6 +2515,7 @@ void UpdatePlayer()
                                                     PlrMid = Player[A].Location.X;
                                                 else
                                                     PlrMid = Player[A].Location.X + Player[A].Location.Width;
+
                                                 Slope = (PlrMid - Block[B].Location.X) / Block[B].Location.Width;
                                                 if(BlockSlope[Block[B].Type] < 0)
                                                     Slope = 1 - Slope;
@@ -2523,15 +2524,22 @@ void UpdatePlayer()
                                                 if(Slope > 1)
                                                     Slope = 1;
 
+                                                // if we're already on top of another (higher or more leftwards, at level load time) block this frame, consider canceling it
                                                 if(tempHit3 > 0)
                                                 {
-                                                    if(!BlockIsSizable[Block[tempHit3].Type])
+                                                    // the bug here is vanilla, but this case happens for a single frame every time a slope falls through ground since TheXTech 1.3.6, and only in the rare case where a slope falls through ground *it was originally below* in vanilla
+                                                    if(g_compatibility.fix_player_downward_clip && !CompareWalkBlock(tempHit3, B, Player[A].Location))
+                                                    {
+                                                        // keep the old block, other conditions are VERY likely to cancel it
+                                                    }
+                                                    else if(!BlockIsSizable[Block[tempHit3].Type])
                                                     {
                                                         if(Block[tempHit3].Location.Y != Block[B].Location.Y)
                                                             tempHit3 = 0;
                                                     }
                                                     else
                                                     {
+                                                        // NOTE: looks like a good place for a vb6-style fEqual
                                                         if(Block[tempHit3].Location.Y == Block[B].Location.Y + Block[B].Location.Height)
                                                             tempHit3 = 0;
                                                     }
@@ -2539,6 +2547,7 @@ void UpdatePlayer()
 
                                                 if(tempHit2)
                                                 {
+                                                    // NOTE: looks like a good place for a vb6-style fEqual
                                                     if(Block[tempSlope2].Location.Y + Block[tempSlope2].Location.Height == Block[B].Location.Y && BlockSlope[Block[tempSlope2].Type] == BlockSlope[Block[B].Type])
                                                     {
                                                         tempHit2 = false;
