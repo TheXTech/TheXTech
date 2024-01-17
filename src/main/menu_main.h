@@ -161,7 +161,7 @@ struct MainMenuContent
     std::string controlsHotkeys;
 
     std::string controlsOptionRumble;
-    std::string controlsOptionGroundPoundButton;
+    // std::string controlsOptionGroundPoundButton;
     std::string controlsOptionBatteryStatus;
 
     std::string wordProfiles;

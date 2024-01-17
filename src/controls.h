@@ -541,14 +541,12 @@ public:
         enum co
         {
             rumble = 0,
-            ground_pound_by_alt_run,
             show_power_status,
             COUNT
         };
     };
 
     bool m_rumbleEnabled = false;
-    bool m_groundPoundByAltRun = false;
     bool m_showPowerStatus = false;
 
     // assume that the IniProcessing* is already in the correct group

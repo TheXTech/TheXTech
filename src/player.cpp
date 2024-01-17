@@ -346,6 +346,7 @@ void SetupPlayers()
         Player[A].WarpBackward = false;
         Player[A].WarpShooted = false;
         Player[A].CanPound = false;
+        Player[A].AltRunRelease = false;
         Player[A].GroundPound = false;
         Player[A].GroundPound2 = false;
         Player[A].Duck = false;

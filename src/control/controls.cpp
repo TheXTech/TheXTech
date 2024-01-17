@@ -177,7 +177,6 @@ void InputMethodProfile::SaveConfig_All(IniProcessing* ctl)
     if(this->Type->RumbleSupported())
         ctl->setValue("enable-rumble", this->m_rumbleEnabled);
 
-    ctl->setValue("ground-pound-by-alt-run", this->m_groundPoundByAltRun);
     ctl->setValue("show-power-status", this->m_showPowerStatus);
     this->SaveConfig(ctl);
 }
@@ -187,7 +186,6 @@ void InputMethodProfile::LoadConfig_All(IniProcessing* ctl)
     if(this->Type->RumbleSupported())
         ctl->read("enable-rumble", this->m_rumbleEnabled, this->m_rumbleEnabled);
 
-    ctl->read("ground-pound-by-alt-run", this->m_groundPoundByAltRun, this->m_groundPoundByAltRun);
     ctl->read("show-power-status", this->m_showPowerStatus, this->m_showPowerStatus);
     this->LoadConfig(ctl);
 }
@@ -216,8 +214,6 @@ const char* InputMethodProfile::GetOptionName(size_t i)
 
     if(i == CommonOptions::rumble)
         return g_mainMenu.controlsOptionRumble.c_str();
-    else if(i == CommonOptions::ground_pound_by_alt_run)
-        return g_mainMenu.controlsOptionGroundPoundButton.c_str();
     else if(i == CommonOptions::show_power_status) // -V547 Should be here to fail when adding new enum fields
         return g_mainMenu.controlsOptionBatteryStatus.c_str();
     else
@@ -240,13 +236,6 @@ const char* InputMethodProfile::GetOptionValue(size_t i)
             return g_mainMenu.wordOn.c_str();
         else
             return g_mainMenu.wordOff.c_str();
-    }
-    else if(i == CommonOptions::ground_pound_by_alt_run)
-    {
-        if(this->m_groundPoundByAltRun)
-            return PlayerControls::GetButtonName_UI(PlayerControls::Buttons::AltRun);
-        else
-            return PlayerControls::GetButtonName_UI(PlayerControls::Buttons::Down);
     }
     else if(i == CommonOptions::show_power_status) // -V547 Should be here to fail when adding new enum fields
     {
@@ -280,11 +269,6 @@ bool InputMethodProfile::OptionChange(size_t i)
                 m->Rumble(200, .5);
         }
 
-        return true;
-    }
-    else if(i == CommonOptions::ground_pound_by_alt_run)
-    {
-        this->m_groundPoundByAltRun = !this->m_groundPoundByAltRun;
         return true;
     }
     else if(i == CommonOptions::show_power_status) // -V547 Should be here to fail when adding new enum fields

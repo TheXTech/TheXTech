@@ -178,7 +178,7 @@ void initMainMenu()
     g_mainMenu.controlsHotkeys = "Hotkeys";
 
     g_mainMenu.controlsOptionRumble = "Rumble";
-    g_mainMenu.controlsOptionGroundPoundButton = "Ground Pound Button";
+    // g_mainMenu.controlsOptionGroundPoundButton = "Ground Pound Button";
     g_mainMenu.controlsOptionBatteryStatus = "Battery Status";
 
     g_mainMenu.wordProfiles = "Profiles";

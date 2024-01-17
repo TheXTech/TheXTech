@@ -552,14 +552,21 @@ struct Player_t
     int SlideCounter = 0;
 //    ShowWarp As Integer
     int ShowWarp = 0;
-//    GroundPound As Boolean 'for purple yoshi pound
-    bool GroundPound = false;
-//    GroundPound2 As Boolean 'for purple yoshi pound
-    bool GroundPound2 = false;
-//    CanPound As Boolean 'for purple yoshi pound
-    bool CanPound = false;
 //    ForceHold As Integer  'force the player to hold an item for a specific amount of time
     int ForceHold = 0;
+
+    // pound state converted to bitfield
+//    GroundPound As Boolean 'for purple yoshi pound
+    bool GroundPound : 1;
+//    GroundPound2 As Boolean 'for purple yoshi pound
+    bool GroundPound2 : 1;
+//    CanPound As Boolean 'for purple yoshi pound
+    bool CanPound : 1;
+//    NEW: AltRunRelease As Boolean 'has the player not been holding Alt Run?
+    bool AltRunRelease : 1;
+//    DuckRelease As Boolean
+    bool DuckRelease : 1;
+
 //'yoshi powers
 //    YoshiYellow As Boolean
     bool YoshiYellow = false;
@@ -638,8 +645,6 @@ struct Player_t
     int Effect = 0;
 //    Effect2 As Double 'counter for the effects
     double Effect2 = 0.0;
-//    DuckRelease As Boolean
-    bool DuckRelease = false;
 //    Duck As Boolean 'true if ducking
     bool Duck = false;
 //    DropRelease As Boolean
@@ -724,6 +729,8 @@ struct Player_t
 //    SpeedFixY As Single
     float SpeedFixY = 0.0f;
 //End Type
+
+    Player_t() : GroundPound(false), GroundPound2(false), CanPound(false), AltRunRelease(false), DuckRelease(false) {}
 };
 
 //Public Type Background  'Background objects
