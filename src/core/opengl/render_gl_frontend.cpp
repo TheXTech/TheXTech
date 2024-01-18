@@ -227,12 +227,12 @@ bool RenderGL::initRender(const CmdLineSetup_t &setup, SDL_Window *window)
     if(m_depth_read_texture)
         init_string += "depth read";
 
-    pLogDebug(init_string.c_str());
+    pLogInfo(init_string.c_str());
 
     GLenum err = glGetError();
     if(err)
     {
-        pLogDebug("Render GL: GL error %d occurred during init process, falling back to SDL.", err);
+        pLogWarning("Render GL: GL error %d occurred during init process, falling back to SDL.", err);
         close();
         return false;
     }

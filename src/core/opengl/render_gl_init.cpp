@@ -73,7 +73,7 @@ void RenderGL::try_init_gl(SDL_GLContext& context, SDL_Window* window, GLint pro
     if(context)
         return;
 
-    pLogDebug("Render GL: attempting to create OpenGL %s %d.%d+ context...", get_profile_name(profile), majver, minver);
+    pLogInfo("Render GL: attempting to create OpenGL %s %d.%d+ context...", get_profile_name(profile), majver, minver);
 
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, profile);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, majver);
@@ -83,8 +83,7 @@ void RenderGL::try_init_gl(SDL_GLContext& context, SDL_Window* window, GLint pro
     if(context)
         g_videoSettings.renderModeObtained = mode;
     else
-        pLogDebug("Render GL: context creation failed.");
-
+        pLogInfo("Render GL: context creation failed.");
 }
 
 bool RenderGL::initOpenGL(const CmdLineSetup_t &setup)
@@ -92,7 +91,7 @@ bool RenderGL::initOpenGL(const CmdLineSetup_t &setup)
     SDL_version compiled, linked;
     SDL_VERSION(&compiled);
     SDL_GetVersion(&linked);
-    pLogDebug("Render GL: compiled for SDL %d.%d.%d, running with SDL %d.%d.%d",
+    pLogInfo("Render GL: compiled for SDL %d.%d.%d, running with SDL %d.%d.%d",
         compiled.major, compiled.minor, compiled.patch,
         linked.major, linked.minor, linked.patch);
 
@@ -194,14 +193,14 @@ bool RenderGL::initOpenGL(const CmdLineSetup_t &setup)
         }
     }
 
-    pLogDebug("Render GL: successfully initialized OpenGL %d.%d (Profile %s)", m_gl_majver, m_gl_minver, get_profile_name(m_gl_profile));
-    pLogDebug("OpenGL version: %s", gl_ver_string);
-    pLogDebug("OpenGL renderer: %s", glGetString(GL_RENDERER));
+    pLogInfo("Render GL: successfully initialized OpenGL %d.%d (Profile %s)", m_gl_majver, m_gl_minver, get_profile_name(m_gl_profile));
+    pLogInfo("OpenGL version: %s", gl_ver_string);
+    pLogInfo("OpenGL renderer: %s", glGetString(GL_RENDERER));
 #ifdef RENDERGL_HAS_SHADERS
     if(m_gl_majver >= 2)
-        pLogDebug("GLSL version: %s", glGetString(GL_SHADING_LANGUAGE_VERSION));
+        pLogInfo("GLSL version: %s", glGetString(GL_SHADING_LANGUAGE_VERSION));
 #endif
-    D_pLogDebug("OpenGL extensions: %s", glGetString(GL_EXTENSIONS));
+    // pLogDebug("OpenGL extensions: %s", glGetString(GL_EXTENSIONS));
 
     GLint depth = 16;
 
@@ -214,7 +213,7 @@ bool RenderGL::initOpenGL(const CmdLineSetup_t &setup)
         glGetIntegerv(GL_BLUE_BITS, &b);
         glGetIntegerv(GL_DEPTH_BITS, &depth);
 
-        pLogDebug("OpenGL video mode: R%d G%d B%d with %d-bit depth buffer", r, g, b, depth);
+        pLogInfo("OpenGL video mode: R%d G%d B%d with %d-bit depth buffer", r, g, b, depth);
     }
 #endif
 
@@ -227,7 +226,7 @@ bool RenderGL::initOpenGL(const CmdLineSetup_t &setup)
     // Check capabilities
     GLint maxTextureSize = 256;
     glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxTextureSize);
-    pLogDebug("RenderGL: max texture size %d", (int)maxTextureSize);
+    pLogInfo("RenderGL: max texture size %d", (int)maxTextureSize);
 
     m_maxTextureWidth = maxTextureSize;
     m_maxTextureHeight = maxTextureSize;
@@ -281,7 +280,7 @@ bool RenderGL::initOpenGL(const CmdLineSetup_t &setup)
 
     if(err)
     {
-        pLogDebug("Render GL: GL error %d occurred in early init process, falling back to SDL.", err);
+        pLogInfo("Render GL: GL error %d occurred in early init process, falling back to SDL.", err);
         return false;
     }
 
@@ -300,7 +299,7 @@ bool RenderGL::initDebug()
 #ifdef RENDERGL_HAS_DEBUG
         if(m_gl_profile != SDL_GL_CONTEXT_PROFILE_ES)
         {
-            pLogDebug("Enabling GL debug output...");
+            pLogInfo("Enabling GL debug output...");
 
             glEnable(GL_DEBUG_OUTPUT);
             glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
@@ -338,15 +337,15 @@ bool RenderGL::initShaders()
 
         m_use_shaders = false;
 
-        pLogWarning("Render GL: Failed to compile standard GLSL ES 1.00 shader.");
+        pLogInfo("Render GL: Failed to compile standard GLSL ES 1.00 shader.");
 
         if(m_gl_profile == SDL_GL_CONTEXT_PROFILE_COMPATIBILITY || m_gl_majver < 2)
         {
-            pLogDebug("Render GL: Falling back to fixed-function rendering.");
+            pLogInfo("Render GL: Falling back to fixed-function rendering.");
             return true;
         }
 
-        pLogDebug("Render GL: Falling back to SDL.");
+        pLogInfo("Render GL: Falling back to SDL.");
         return false;
     }
 
@@ -431,7 +430,7 @@ bool RenderGL::initShaders()
     if(m_gl_profile == SDL_GL_CONTEXT_PROFILE_COMPATIBILITY || m_gl_majver < 2)
         return true;
 
-    pLogDebug("Render GL: Built without shader support but OpenGL version requires shaders.");
+    pLogWarning("Render GL: Built without shader support but OpenGL version requires shaders.");
     return false;
 #endif
 }
@@ -441,14 +440,14 @@ void RenderGL::createFramebuffer(BufferIndex_t buffer)
 #ifdef RENDERGL_HAS_FBO
     GLenum err;
     while((err = glGetError()))
-        pLogDebug("Render GL: GL error %d occurred prior to framebuffer creation", err);
+        pLogInfo("Render GL: GL error %d occurred prior to framebuffer creation", err);
 
     // (0) cleanup existing framebuffer
     destroyFramebuffer(buffer);
 
     if((m_gl_majver < 3 || !m_game_depth_texture) && buffer == BUFFER_DEPTH_READ)
     {
-        pLogDebug("Cannot create depth read buffer on OpenGL < 3.0 / OpenGL ES < 3.0");
+        pLogInfo("Render GL: cannot create depth read buffer on OpenGL < 3.0 / OpenGL ES < 3.0");
         return;
     }
 
