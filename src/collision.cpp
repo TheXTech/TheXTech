@@ -644,7 +644,7 @@ static inline double blockGetTopYTouching(const Block_t &block, const Location_t
     if(slope > 1.0) slope = 1.0;
 
     // Determine the y coordinate
-    return block.Location.Y + block.Location.Height - (block.Location.Height * slope);
+    return block.Location.Y + block.Location.Height * slope;
 }
 
 bool CompareWalkBlock(int oldBlockIdx, int newBlockIdx, const Location_t &referenceLoc)
