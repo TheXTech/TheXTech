@@ -23,6 +23,7 @@ Changelog for 1.3.6.3-dev
 -Use the ANGLE shader translator library to improve support for OpenGL ES 3.0 shaders on desktop platforms (@ds-sloth)
 -Fix vanilla / TheXTech bug where a player could clip into ground while standing on a downwards-moving slope, guarded by fix-player-downward-clip compat flag (@ds-sloth)
 -CONTROLS / LOGIC CHANGE: when riding a purple pet mount, alt run is now used to enter a pound (down is still used in compat mode) (@0lhi, @ds-sloth, @Wohlstand)
+-Fix TheXTech modern mode bug where simultaneous slope-ground collisions were not handled properly (@ds-sloth)
 
 Changelog for 1.3.6.2
 -Fixed a crash on attempt to add a game directory after storage permission grant on Android (@Wohlstand)
