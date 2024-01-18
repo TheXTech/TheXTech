@@ -2375,7 +2375,8 @@ void UpdatePlayer()
                                                 // if we're already on top of another (higher or more leftwards, at level load time) block this frame, consider canceling it
                                                 if(tempHit3 > 0)
                                                 {
-                                                    // the bug here is vanilla, but this case happens for a single frame every time a slope falls through ground since TheXTech 1.3.6, and only in the rare case where a slope falls through ground *it was originally below* in vanilla
+                                                    // the bug this is fixing is vanilla, but this case happens for a single frame every time a slope falls through ground since TheXTech 1.3.6,
+                                                    // and only in the rare case where a slope falls through ground *it was originally below* in vanilla
                                                     if(g_compatibility.fix_player_downward_clip && !CompareWalkBlock(tempHit3, B, Player[A].Location))
                                                     {
                                                         // keep the old block, other conditions are VERY likely to cancel it
