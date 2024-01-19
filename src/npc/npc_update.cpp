@@ -641,13 +641,14 @@ void UpdateNPCs()
 
             if(NPC[A].Type == NPCID_BOSS_CASE)
             {
-                for(int B : treeNPCQuery(NPC[A].Location, SORTMODE_NONE))
+                for(int B : NPCQueues::Active.no_change)
                 {
                     if(NPC[B].Type != NPCID_BOSS_CASE && NPC[B].Effect == 0 && NPC[B].Active)
                     {
                         if(!NPCNoClipping[NPC[B].Type])
                         {
-                            // checks if A contains B
+                            // TRIES to check if A contains B, but actually checks the Y axis only
+                            // cross-reference the NPC Effect 208 code, which fixes this but wastes a frame
                             if(NPC[A].Location.Y < NPC[B].Location.Y)
                             {
                                 if(NPC[A].Location.Y + NPC[A].Location.Height > NPC[B].Location.Y + NPC[B].Location.Height)
@@ -665,7 +666,7 @@ void UpdateNPCs()
                         }
                     }
                 }
-            } // 208
+            } // NPCID_BOSS_CASE
         } // .JustActivated != 0
 
 #if 0
