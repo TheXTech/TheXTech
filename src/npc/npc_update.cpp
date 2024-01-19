@@ -121,8 +121,8 @@ void UpdateNPCs()
     // float tempSpeedA = 0;
 //    float tempSpeedB = 0;
     // bool tempTurn = false; // used for turning the npc around
-    Location_t tempLocation;
-    Location_t tempLocation2;
+    // Location_t tempLocation;
+    // Location_t tempLocation2;
     // Location_t preBeltLoc;
     // float beltCount = 0;
     // int tempBlockHit[3] = {0}; // Hit block from below code
@@ -135,7 +135,7 @@ void UpdateNPCs()
 //    bool tempBool3 = false;
     // float newY = 0; // fully unused
 //    bool straightLine = false;
-    Block_t blankBlock;
+    const Block_t blankBlock;
 //    bool noBelt = false;
     // float oldBeltSpeed = 0;
 //    float beltFixX = 0;
@@ -554,7 +554,7 @@ void UpdateNPCs()
                 if(NPC[A].TriggerActivate != EVENT_NONE)
                     ProcEvent(NPC[A].TriggerActivate, NPC[A].JustActivated);
 
-                tempLocation = NPC[A].Location;
+                Location_t tempLocation = NPC[A].Location;
                 tempLocation.Y -= 32;
                 tempLocation.X -= 32;
                 tempLocation.Width += 64;
@@ -602,19 +602,19 @@ void UpdateNPCs()
                        NPC[newAct[C]].Type != 212 && NPC[newAct[C]].Type != 47 &&
                        !NPCIsACoin[NPC[newAct[C]].Type])
                     {
-                        tempLocation = NPC[newAct[C]].Location;
-                        tempLocation.Y -= 32;
-                        tempLocation.X -= 32;
-                        tempLocation.Width += 64;
-                        tempLocation.Height += 64;
+                        Location_t tempLocation2 = NPC[newAct[C]].Location;
+                        tempLocation2.Y -= 32;
+                        tempLocation2.X -= 32;
+                        tempLocation2.Width += 64;
+                        tempLocation2.Height += 64;
 
-                        for(int B : treeNPCQuery(tempLocation, SORTMODE_ID))
+                        for(int B : treeNPCQuery(tempLocation2, SORTMODE_ID))
                         {
                             if(!NPC[B].Active &&
                               (!NPC[B].Hidden || !g_compatibility.fix_npc_activation_event_loop_bug) &&
                                B != A && NPC[B].Reset[1] && NPC[B].Reset[2])
                             {
-                                if(CheckCollision(tempLocation, NPC[B].Location))
+                                if(CheckCollision(tempLocation2, NPC[B].Location))
                                 {
                                     SDL_assert_release(numAct < maxNPCs);
                                     newAct[numAct] = B;
@@ -847,7 +847,7 @@ void UpdateNPCs()
             {
                 if(NPC[A].Type == NPCID_GOALTAPE)
                 {
-                    tempLocation = NPC[A].Location;
+                    Location_t tempLocation = NPC[A].Location;
                     tempLocation.Height = 8000;
                     int C = 0;
                     for(int B : treeBlockQueryWithTemp(tempLocation, SORTMODE_COMPAT))
@@ -1025,6 +1025,7 @@ void UpdateNPCs()
                             {
                                 if(NPC[A].Location.SpeedY >= 1 && (!g_compatibility.fix_submerged_splash_effect || !CheckCollisionIntersect(NPC[A].Location, static_cast<Location_t>(Water[B].Location))))
                                 {
+                                    Location_t tempLocation;
                                     tempLocation.Width = 32;
                                     tempLocation.Height = 32;
                                     tempLocation.X = NPC[A].Location.X + NPC[A].Location.Width / 2.0 - tempLocation.Width / 2.0;
@@ -1062,6 +1063,7 @@ void UpdateNPCs()
 
             if(NPC[A].Wet == 1 && NPC[A].Location.SpeedY < -1)
             {
+                Location_t tempLocation;
                 tempLocation.Width = 32;
                 tempLocation.Height = 32;
                 tempLocation.X = NPC[A].Location.X + NPC[A].Location.Width / 2.0 - tempLocation.Width / 2.0;
@@ -1134,7 +1136,7 @@ void UpdateNPCs()
             if(NPC[A].Text != STRINGINDEX_NONE)
             {
                 NPC[A].Chat = false;
-                tempLocation = NPC[A].Location;
+                Location_t tempLocation = NPC[A].Location;
                 tempLocation.Y -= 25;
                 tempLocation.Height += 50;
                 tempLocation.X -= 25;
@@ -1350,10 +1352,9 @@ void UpdateNPCs()
                         {
                             if(iRand(100) >= 93)
                             {
-                                tempLocation.Height = EffectHeight[80];
-                                tempLocation.Width = EffectWidth[80];
-                                tempLocation.SpeedX = 0;
-                                tempLocation.SpeedY = 0;
+                                Location_t tempLocation;
+                                tempLocation.Height = EffectHeight[EFFID_SPARKLE];
+                                tempLocation.Width = EffectWidth[EFFID_SPARKLE];
                                 tempLocation.X = NPC[A].Location.X - tempLocation.Width / 2.0 + dRand() * NPC[A].Location.Width - 4;
                                 tempLocation.Y = NPC[A].Location.Y - tempLocation.Height / 2.0 + dRand() * NPC[A].Location.Height - 4;
                                 NewEffect(EFFID_SPARKLE, tempLocation);
@@ -1464,6 +1465,7 @@ void UpdateNPCs()
                         if(NPCIsAShell[NPC[A].Type] && NPC[A].Location.SpeedX != 0 && NPC[A].Special4 == 0)
                         {
                             NPC[A].Special4 = 5;
+                            Location_t tempLocation;
                             tempLocation.Height = 0;
                             tempLocation.Width = 0;
                             tempLocation.Y = NPC[A].Location.Y + NPC[A].Location.Height / 2.0 - 16;
@@ -3564,7 +3566,7 @@ void UpdateNPCs()
                             NPC[A].BeltSpeed = NPC[A].BeltSpeed * speedVar;
                             NPC[A].Location.X += double(NPC[A].BeltSpeed);
 //                            D = NPC[A].BeltSpeed; // Idk why this is needed as this value gets been overriden and never re-used
-                            tempLocation = NPC[A].Location;
+                            Location_t tempLocation = NPC[A].Location;
                             tempLocation.Y += 1;
                             tempLocation.Height -= 2;
                             tempLocation.Width = tempLocation.Width / 2;
@@ -3581,7 +3583,7 @@ void UpdateNPCs()
                                         if(NPC[C].Killed == 0 && NPC[C].standingOnPlayer == 0 && NPC[C].HoldingPlayer == 0 &&
                                            !NPCNoClipping[NPC[C].Type] && NPC[C].Effect == 0 && !NPC[C].Inert) // And Not NPCIsABlock(NPC(C).Type) Then
                                         {
-                                            tempLocation2 = preBeltLoc;
+                                            Location_t tempLocation2 = preBeltLoc;
                                             tempLocation2.Width -= 4;
                                             tempLocation2.X += 2;
                                             if(CheckCollision(tempLocation, NPC[C].Location))
@@ -3745,8 +3747,8 @@ void UpdateNPCs()
                                                                     if((NPC[A].Type == NPCID_GRN_HIT_TURTLE_S4 || NPC[A].Type == NPCID_RED_HIT_TURTLE_S4 || NPC[A].Type == NPCID_YEL_HIT_TURTLE_S4) && !NPC[A].Projectile &&
                                                                        (!NPC[B].Projectile && NPC[B].Type >= NPCID_GRN_SHELL_S4 && NPC[B].Type <= NPCID_YEL_SHELL_S4))
                                                                     {
-                                                                        tempLocation = NPC[A].Location;
-                                                                        tempLocation2 = NPC[B].Location;
+                                                                        Location_t tempLocation = NPC[A].Location;
+                                                                        Location_t tempLocation2 = NPC[B].Location;
                                                                         tempLocation.Width = 8;
                                                                         tempLocation.X += 12;
                                                                         tempLocation2.Width = 8;
@@ -3805,7 +3807,7 @@ void UpdateNPCs()
                                                                                     if(NPC[A].CantHurt < 25)
                                                                                         NPC[A].Special = 2;
                                                                                     NPC[B].Special = 0;
-                                                                                    tempLocation = NPC[B].Location;
+                                                                                    Location_t tempLocation = NPC[B].Location;
                                                                                     tempLocation.Y += 1;
                                                                                     tempLocation.Height -= 2;
 
@@ -4113,7 +4115,7 @@ void UpdateNPCs()
                             else if(NPCTurnsAtCliffs[NPC[A].Type] && !NPC[A].Projectile) // Walking code NPCs that turn
                             {
                                 bool tempTurn = true; // used for turning the npc around
-                                tempLocation = NPC[A].Location;
+                                Location_t tempLocation = NPC[A].Location;
                                 tempLocation.SpeedX = 0;
                                 tempLocation.SpeedY = 0;
                                 tempLocation.Y = NPC[A].Location.Y + NPC[A].Location.Height - 8;
@@ -4205,7 +4207,7 @@ void UpdateNPCs()
                             else if(NPC[A].Type == NPCID_JUMPER_S4) // ninja code
                             {
                                 bool tempTurn = true; // used for turning the npc around
-                                tempLocation = NPC[A].Location;
+                                Location_t tempLocation = NPC[A].Location;
                                 tempLocation.SpeedX = 0;
                                 tempLocation.SpeedY = 0;
                                 tempLocation.Y = NPC[A].Location.Y + NPC[A].Location.Height - 8;
@@ -4843,7 +4845,7 @@ void UpdateNPCs()
                                 NPC[A].Special3 = 30;
                                 NPC[A].Frame = 11;
                                 NPC[A].Projectile = false;
-                                tempLocation = NPC[A].Location;
+                                Location_t tempLocation = NPC[A].Location;
 
                                 // Useless self-assignment code [PVS Studio]
                                 //tempLocation.X = tempLocation.X; // + 16
@@ -5193,7 +5195,7 @@ void UpdateNPCs()
                                     NPC[numNPCs].Location.Y = NPC[A].Location.Y + NPC[A].Location.Height / 2.0 - NPC[numNPCs].Location.Height / 2.0;
                                     syncLayers_NPC(numNPCs);
 
-                                    tempLocation = NPC[numNPCs].Location;
+                                    Location_t tempLocation = NPC[numNPCs].Location;
                                     tempLocation.X = NPC[numNPCs].Location.X + (NPC[numNPCs].Location.Width / 2.0) * NPC[numNPCs].Direction;
                                     tempLocation.Y = NPC[numNPCs].Location.Y + NPC[numNPCs].Location.Height / 2.0 - EffectHeight[10] / 2.0;
                                     NewEffect(EFFID_SMOKE_S3, tempLocation);
@@ -5315,7 +5317,7 @@ void UpdateNPCs()
 
                             if(Background[B].Type == 35)
                             {
-                                tempLocation = Background[B].Location;
+                                Location_t tempLocation = Background[B].Location;
                                 tempLocation.Width = 16;
                                 tempLocation.X += 8;
                                 tempLocation.Height = 26;
