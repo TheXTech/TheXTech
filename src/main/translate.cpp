@@ -176,6 +176,7 @@ XTechTranslate::XTechTranslate()
         {"languageName",                   &g_mainMenu.languageName},
         {"pluralRules",                    &g_mainMenu.pluralRules},
 
+        {"menu.editor.battles",            &g_mainMenu.editorBattles},
         {"menu.editor.newWorld",           &g_mainMenu.editorNewWorld},
         {"menu.editor.errorResolution",    &g_mainMenu.editorErrorResolution},
         {"menu.editor.errorMissingResources", &g_mainMenu.editorErrorMissingResources},
@@ -241,7 +242,7 @@ XTechTranslate::XTechTranslate()
 
         {"menu.controls.options.rumble",            &g_mainMenu.controlsOptionRumble},
         {"menu.controls.options.batteryStatus",     &g_mainMenu.controlsOptionBatteryStatus},
-        {"menu.controls.options.groundPoundButton", &g_mainMenu.controlsOptionGroundPoundButton},
+        // {"menu.controls.options.groundPoundButton", &g_mainMenu.controlsOptionGroundPoundButton},
         {"menu.controls.options.maxPlayers",        &g_controlsStrings.sharedOptionMaxPlayers},
 
         {"menu.controls.buttons.up",      &Controls::PlayerControls::g_button_name_UI[Controls::PlayerControls::Up]},

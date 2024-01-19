@@ -1439,9 +1439,10 @@ public:
         insert(0x00000056, &Player_t::Multiplier);
         insert(0x00000058, &Player_t::SlideCounter);
         insert(0x0000005a, &Player_t::ShowWarp);
-        insert(0x0000005c, &Player_t::GroundPound);
-        insert(0x0000005e, &Player_t::GroundPound2);
-        insert(0x00000060, &Player_t::CanPound);
+        // pound state handled below
+        // insert(0x0000005c, &Player_t::GroundPound);
+        // insert(0x0000005e, &Player_t::GroundPound2);
+        // insert(0x00000060, &Player_t::CanPound);
         insert(0x00000062, &Player_t::ForceHold);
         insert(0x00000064, &Player_t::YoshiYellow);
         insert(0x00000066, &Player_t::YoshiBlue);
@@ -1481,7 +1482,8 @@ public:
         insert(0x00000120, &Player_t::CanAltJump);
         insert(0x00000122, &Player_t::Effect);
         insert(0x00000124, &Player_t::Effect2);
-        insert(0x0000012c, &Player_t::DuckRelease);
+        // pound state handled below
+        // insert(0x0000012c, &Player_t::DuckRelease);
         insert(0x0000012e, &Player_t::Duck);
         insert(0x00000130, &Player_t::DropRelease);
         insert(0x00000132, &Player_t::StandUp);
@@ -1532,6 +1534,23 @@ public:
             return s_locMem.getValue(&obj->Location, address - 0xC0, ftype);
         else if(address >= 0xF2 && address < 0x106) // Controls
             return s_conMem.getValue(&obj->Controls, address - 0xF2, ftype);
+        else if((address >= 0x5C && address < 0x62) || address == 0x12C) // pound state
+        {
+            switch(address)
+            {
+            case 0x5c: // GroundPound
+                return valueToMem((bool)obj->GroundPound, ftype);
+            case 0x5e: // GroundPound2
+                return valueToMem((bool)obj->GroundPound2, ftype);
+            case 0x60: // CanPound
+                return valueToMem((bool)obj->CanPound, ftype);
+            case 0x12C: // DuckRelease
+                return valueToMem((bool)obj->DuckRelease, ftype);
+            default:
+                pLogWarning("MemEmu: Attempt to read player address 0x%x (invalid byte hacking)", address);
+                break;
+            }
+        }
         else if(address >= 0x146 && address < 0x150) // Pinched
         {
             switch(address)
@@ -1570,6 +1589,31 @@ public:
         {
             s_conMem.setValue(&obj->Controls, address - 0xF2, value, ftype);
             return;
+        }
+        else if((address >= 0x5C && address < 0x62) || address == 0x12C) // pound state
+        {
+            bool in = false;
+
+            memToValue(in, value, ftype);
+
+            switch(address)
+            {
+            case 0x5c: // GroundPound
+                obj->GroundPound = in;
+                return;
+            case 0x5e: // GroundPound2
+                obj->GroundPound2 = in;
+                return;
+            case 0x60: // CanPound
+                obj->CanPound = in;
+                return;
+            case 0x12C: // DuckRelease
+                obj->DuckRelease = in;
+                return;
+            default:
+                pLogWarning("MemEmu: Attempt to set player address 0x%x to %d (invalid byte hacking)", address, (int)in);
+                break;
+            }
         }
         else if(address >= 0x146 && address < 0x150) // Pinched
         {

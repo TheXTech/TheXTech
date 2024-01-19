@@ -125,7 +125,7 @@ GLuint GLProgramObject::s_compile_shader(GLenum type, const char* src)
 
     if(!shader)
     {
-        pLogDebug("GLProgramObject: could not allocate %s shader", type == GL_VERTEX_SHADER ? "vertex" : "fragment");
+        pLogWarning("GLProgramObject: could not allocate %s shader", type == GL_VERTEX_SHADER ? "vertex" : "fragment");
         return 0;
     }
 
@@ -194,7 +194,7 @@ GLuint GLProgramObject::s_compile_shader(GLenum type, const char* src)
         // if we've never natively compiled a shader at this version, try translating it
         if(XTechShaderTranslator::Inited() && s_essl_tl_pref[essl_version] == TL_PREF_UNKNOWN)
         {
-            pLogDebug("GLProgramObject: attempting to translate OpenGL ES %c shader to desktop GLSL...", char('2' + essl_version));
+            pLogInfo("GLProgramObject: attempting to translate OpenGL ES %c shader to desktop GLSL...", char('2' + essl_version));
 
             s_essl_tl_pref[essl_version] = TL_PREF_TRANSLATE;
             shader = s_compile_shader(type, src);
@@ -203,7 +203,7 @@ GLuint GLProgramObject::s_compile_shader(GLenum type, const char* src)
             if(!shader)
                 s_essl_tl_pref[essl_version] = TL_PREF_UNKNOWN;
             else
-                pLogDebug("GLProgramObject: will use the ANGLE translator for OpenGL ES %c shaders.", char('2' + essl_version));
+                pLogInfo("GLProgramObject: will use the ANGLE translator for OpenGL ES %c shaders.", char('2' + essl_version));
         }
 #endif
 
@@ -217,7 +217,7 @@ GLuint GLProgramObject::s_compile_shader(GLenum type, const char* src)
     {
         s_essl_tl_pref[essl_version] = TL_PREF_NATIVE;
         if(XTechShaderTranslator::Inited())
-            pLogDebug("GLProgramObject: will use the native OpenGL compiler for OpenGL ES %c shaders.", char('2' + essl_version));
+            pLogInfo("GLProgramObject: will use the native OpenGL compiler for OpenGL ES %c shaders.", char('2' + essl_version));
     }
 
     return shader;

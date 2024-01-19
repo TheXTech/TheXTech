@@ -108,6 +108,7 @@ struct MainMenuContent
     std::string languageName;
     std::string pluralRules;
 
+    std::string editorBattles;
     std::string editorNewWorld;
     std::string editorErrorResolution;
     std::string editorErrorMissingResources;
@@ -168,7 +169,7 @@ struct MainMenuContent
     std::string controlsHotkeys;
 
     std::string controlsOptionRumble;
-    std::string controlsOptionGroundPoundButton;
+    // std::string controlsOptionGroundPoundButton;
     std::string controlsOptionBatteryStatus;
 
     std::string wordProfiles;

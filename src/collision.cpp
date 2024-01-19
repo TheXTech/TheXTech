@@ -634,17 +634,17 @@ static inline double blockGetTopYTouching(const Block_t &block, const Location_t
 
     // Get right or left x coordinate as relevant for the slope direction
     double refX = loc.X;
-    if(slopeDirection > 0)
+    if(slopeDirection < 0)
         refX += loc.Width;
 
     // Get how far along the slope we are in the x direction
     double slope = (refX - block.Location.X) / block.Location.Width;
-    if(slopeDirection > 0) slope = 1.0 - slope;
+    if(slopeDirection < 0) slope = 1.0 - slope;
     if(slope < 0.0) slope = 0.0;
     if(slope > 1.0) slope = 1.0;
 
     // Determine the y coordinate
-    return block.Location.Y + block.Location.Height - (block.Location.Height * slope);
+    return block.Location.Y + block.Location.Height * slope;
 }
 
 bool CompareWalkBlock(int oldBlockIdx, int newBlockIdx, const Location_t &referenceLoc)
