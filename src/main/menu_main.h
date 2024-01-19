@@ -102,6 +102,7 @@ struct MainMenuContent
     std::string languageName;
     std::string pluralRules;
 
+    std::string editorBattles;
     std::string editorNewWorld;
     std::string editorErrorResolution;
     std::string editorErrorMissingResources;

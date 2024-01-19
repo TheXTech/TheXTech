@@ -2000,6 +2000,8 @@ void EditorScreen::UpdateEditorSettingsScreen(CallMode mode)
         m_special_subpage = maxLocalPlayers;
     if(this->num_test_players < 1)
         this->num_test_players = 1;
+    if(BattleMode /*&& this->num_test_players < 2*/) // currently >2P battle is not supported
+        this->num_test_players = 2;
     if(m_special_subpage > this->num_test_players + 1)
         m_special_subpage = this->num_test_players;
 
@@ -2048,7 +2050,7 @@ void EditorScreen::UpdateEditorSettingsScreen(CallMode mode)
     if(m_special_subpage < maxLocalPlayers && m_special_subpage <= this->num_test_players && UpdateButton(mode, 580 + 4, 140 + 4, GFX.EIcons, false, 0, 32*Icon::right, 32, 32))
         m_special_subpage ++;
 
-    if(m_special_subpage >= this->num_test_players && m_special_subpage != 1)
+    if(m_special_subpage >= this->num_test_players && m_special_subpage != 1 && !(BattleMode && m_special_subpage == 2))
     {
         SuperPrintR(mode, g_editorStrings.wordEnabled, 3, e_ScreenW / 2 + 54, 194);
 

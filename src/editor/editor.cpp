@@ -2935,6 +2935,7 @@ void zTestLevel(bool magicHand, bool interProcess)
 //  frmNPCs::chkMessage.Value = 0;
     BattleLives[1] = 3;
     BattleLives[2] = 3;
+    BattleIntro = 150;
     BattleWinner = 0;
     BattleOutro = 0;
 //  frmLevelEditor::mnuOnline.Enabled = false;
@@ -2947,6 +2948,9 @@ void zTestLevel(bool magicHand, bool interProcess)
 
     if(numPlayers == 0)
         numPlayers = editorScreen.num_test_players;
+
+    if(BattleMode && numPlayers < 2)
+        numPlayers = 2;
 
     if(Checkpoint.empty()) // Don't reset players when resume at the checkpoint
     {

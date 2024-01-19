@@ -66,10 +66,12 @@
 #include "fontman/font_manager.h"
 
 #include "video.h"
+#include "editor.h"
 #include "frm_main.h"
 
 #include "screen_textentry.h"
 #include "editor/new_editor.h"
+#include "editor/write_level.h"
 #include "editor/write_world.h"
 #include "editor/editor_custom.h"
 #include "script/luna/luna.h"
@@ -127,6 +129,7 @@ void initMainMenu()
 
     g_mainMenu.selectCharacter = "{0} game";
 
+    g_mainMenu.editorBattles = "<Battle Levels>";
     g_mainMenu.editorNewWorld = "<New World>";
     g_mainMenu.editorErrorResolution = "Sorry! The in-game editor is not supported at your current resolution.";
     g_mainMenu.editorErrorMissingResources = "Sorry! You are missing {0}, required for the in-game editor.";
@@ -259,8 +262,11 @@ static void s_findRecentEpisode()
 
     for(size_t i = 1; i < SelectorList.size(); ++i)
     {
+        // special editor entry for battle levels
+        bool is_battle = (MenuMode == MENU_EDITOR && i == SelectorList.size() - 2);
+
         auto &w = SelectorList[i];
-        const std::string wPath = w.WorldPath + w.WorldFile;
+        const std::string wPath = (!is_battle) ? w.WorldPath + w.WorldFile : "battle";
 
         if((MenuMode == MENU_1PLAYER_GAME && wPath == g_recentWorld1p) ||
            (MenuMode == MENU_2PLAYER_GAME && wPath == g_recentWorld2p) ||
@@ -421,7 +427,7 @@ static void s_FinishFindWorlds()
     {
         SelectWorld.clear();
         SelectWorld.emplace_back(SelectWorld_t()); // Dummy entry
-        SelectWorld.emplace_back(SelectWorld_t()); // "no battle levels" entry
+        SelectWorld.emplace_back(SelectWorld_t()); // "no episodes to play" entry
         SelectWorld[1].WorldName = g_mainMenu.gameNoEpisodesToPlay;
         SelectWorld[1].disabled = true;
     }
@@ -441,9 +447,14 @@ static void s_FinishFindWorlds()
 
     NumSelectWorld = (int)(SelectWorld.size() - 1);
 
+    SelectWorld_t battles = SelectWorld_t();
+    battles.WorldName = g_mainMenu.editorBattles;
+    SelectWorldEditable.push_back(battles);
+
     SelectWorld_t createWorld = SelectWorld_t();
     createWorld.WorldName = g_mainMenu.editorNewWorld;
     SelectWorldEditable.push_back(createWorld);
+
     NumSelectWorldEditable = ((int)SelectWorldEditable.size() - 1);
 
     s_findRecentEpisode();
@@ -1241,6 +1252,52 @@ bool mainMenuUpdate()
                                 loadingThread = SDL_CreateThread(FindWorldsThread, "FindWorlds", NULL);
 #endif
                             }
+                        }
+                        else if(selWorld == NumSelectWorldEditable - 1)
+                        {
+                            ClearWorld(true);
+                            GameMenu = false;
+                            LevelSelect = false;
+                            BattleMode = true;
+                            LevelEditor = true;
+                            WorldEditor = false;
+                            ClearLevel();
+                            ClearGame();
+                            SetupPlayers();
+
+                            std::string lPath = AppPathManager::userBattleRootDir();
+                            {
+                                // find a single battle level to open first
+                                std::vector<std::string> files;
+                                DirMan battleLvls(lPath);
+                                battleLvls.getListOfFiles(files, {".lvl", ".lvlx"});
+                                if(files.empty())
+                                    lPath += "newbattle.lvl";
+                                else
+                                    lPath += files[0];
+                            }
+
+                            if(!Files::fileExists(lPath))
+                            {
+                                if(g_config.editor_preferred_file_format != FileFormats::WLD_SMBX64 && g_config.editor_preferred_file_format != FileFormats::WLD_SMBX38A)
+                                    lPath += "x";
+                                SaveLevel(lPath, g_config.editor_preferred_file_format);
+                            }
+
+                            OpenLevel(lPath);
+                            EditorBackup(); // EditorRestore() gets called when not in world editor
+
+                            if(g_recentWorldEditor != "battle")
+                            {
+                                g_recentWorldEditor = "battle";
+                                SaveConfig();
+                            }
+
+                            Integrator::setEditorFile(FileName);
+                            editorScreen.ResetCursor();
+                            editorScreen.active = false;
+                            MouseRelease = false;
+                            return true;
                         }
                         else
                         {
