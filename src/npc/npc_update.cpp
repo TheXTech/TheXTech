@@ -1492,9 +1492,15 @@ void UpdateNPCs()
 
                     if(NPC[A].Type == NPCID_SAW) // play saw sound
                         PlaySound(SFX_Saw);
+
+
+
                     // NPC Movement Code
+                    // Probably make a single function pointer for this whole block (until RESUME UNIFIED CODE),
+                    //   but create subroutines for the most commonly repeated code
 
 
+                    // POSSIBLE SUBROUTINE: setSpeed
 
                     // Default Movement Code
                     if((NPCDefaultMovement[NPC[A].Type] || (NPCIsCheep[NPC[A].Type] && NPC[A].Special != 2)) && !((NPC[A].Type == NPCID_EXT_TURTLE || NPC[A].Type == NPCID_BLU_HIT_TURTLE_S4) && NPC[A].Special > 0) && NPC[A].Type != NPCID_ITEM_BURIED)
@@ -1871,6 +1877,7 @@ void UpdateNPCs()
                     // NPC Gravity
                     if(!NPCNoGravity[NPC[A].Type])
                     {
+                        // POSSIBLE SUBROUTINE: calcGravity
 
                         if(NPC[A].Type == NPCID_PLR_FIREBALL || NPC[A].Type == NPCID_PLR_ICEBALL)
                         {
@@ -2035,6 +2042,9 @@ void UpdateNPCs()
                         }
                     }
 
+
+                    // POSSIBLE SUBROUTINE: preMovement
+
                     if(NPC[A].Location.SpeedY >= 8 && NPC[A].Type != NPCID_FIRE_DISK && NPC[A].Type != NPCID_FIRE_CHAIN)
                         NPC[A].Location.SpeedY = 8;
                     if(NPC[A].Type == NPCID_SPIT_BOSS_BALL)
@@ -2053,32 +2063,10 @@ void UpdateNPCs()
                         NPC[A].Location.SpeedX = 0;
                         NPC[A].Location.SpeedY = 0;
                     }
-                    NPCSpecial(A);
-                    // Dont move
-                    if(NPC[A].Stuck && !NPC[A].Projectile && NPC[A].Type != NPCID_LEAF_POWER) // face closest player
-                    {
-                        NPC[A].Location.SpeedX = 0;
-                        if(!(NPC[A].Type == NPCID_SKELETON && NPC[A].Special > 0))
-                        {
-                            double C = 0;
-                            for(B = 1; B <= numPlayers; B++)
-                            {
-                                if(!Player[B].Dead && Player[B].Section == NPC[A].Section)
-                                {
-                                    if(C == 0.0 || std::abs(NPC[A].Location.X + NPC[A].Location.Width / 2.0 - (Player[B].Location.X + Player[B].Location.Width / 2.0)) < C)
-                                    {
-                                        C = std::abs(NPC[A].Location.X + NPC[A].Location.Width / 2.0 - (Player[B].Location.X + Player[B].Location.Width / 2.0));
-                                        if(NPC[A].Location.X + NPC[A].Location.Width / 2.0 > Player[B].Location.X + Player[B].Location.Width / 2.0)
-                                            NPC[A].Direction = -1;
-                                        else
-                                            NPC[A].Direction = 1;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    // Actual Movement
 
+                    NPCSpecial(A);
+
+                    // lots of speed cancel code (and some TheXTech logic for the Raft NPC); fine to move into NPCSpecial
                     if(NPC[A].Type == NPCID_TANK_TREADS)
                     {
                         for(B = 1; B <= numPlayers; B++)
@@ -2167,7 +2155,6 @@ void UpdateNPCs()
                         }
                     }
 
-
                     if(NPC[A].Type == NPCID_STACKER && !NPC[A].Projectile)
                     {
                         speedVar = (float)(speedVar * 0.7);
@@ -2178,9 +2165,38 @@ void UpdateNPCs()
                         }
                     }
 
+
+                    // POSSIBLE SUBROUTINE: applyMovement
+
+                    // Dont move
+                    if(NPC[A].Stuck && !NPC[A].Projectile && NPC[A].Type != NPCID_LEAF_POWER) // face closest player
+                    {
+                        NPC[A].Location.SpeedX = 0;
+                        if(!(NPC[A].Type == NPCID_SKELETON && NPC[A].Special > 0))
+                        {
+                            double C = 0;
+                            for(B = 1; B <= numPlayers; B++)
+                            {
+                                if(!Player[B].Dead && Player[B].Section == NPC[A].Section)
+                                {
+                                    if(C == 0.0 || std::abs(NPC[A].Location.X + NPC[A].Location.Width / 2.0 - (Player[B].Location.X + Player[B].Location.Width / 2.0)) < C)
+                                    {
+                                        C = std::abs(NPC[A].Location.X + NPC[A].Location.Width / 2.0 - (Player[B].Location.X + Player[B].Location.Width / 2.0));
+                                        if(NPC[A].Location.X + NPC[A].Location.Width / 2.0 > Player[B].Location.X + Player[B].Location.Width / 2.0)
+                                            NPC[A].Direction = -1;
+                                        else
+                                            NPC[A].Direction = 1;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    // Actual Movement (SpeedX / SpeedY application code)
                     if((!NPCIsAnExit[NPC[A].Type] || NPC[A].Type == NPCID_STAR_EXIT || NPC[A].Type == NPCID_STAR_COLLECT) &&
                         NPC[A].Type != NPCID_FIRE_POWER_S3 && NPC[A].Type != NPCID_CONVEYOR)
                     {
+                        // ParaTroopa speed application happens in SpecialNPC, buried item can't move at all
                         if(!NPCIsAParaTroopa[NPC[A].Type] && NPC[A].Type != NPCID_ITEM_BURIED)
                         {
                             NPC[A].Location.X += NPC[A].Location.SpeedX * speedVar;
@@ -2200,9 +2216,11 @@ void UpdateNPCs()
                     }
                     // End If 'end of freezenpcs
 
+
+                    // POSSIBLE SUBROUTINE: postMovement
+
                     if(NPC[A].Type == NPCID_ICE_CUBE && NPC[A].Special == 3)
                         NPC[A].BeltSpeed = 0;
-
 
                     // projectile check
                     if(NPC[A].Type == NPCID_PLR_FIREBALL || NPC[A].Type == NPCID_PET_FIRE || NPC[A].Type == NPCID_PLR_ICEBALL || NPC[A].Type == NPCID_SWORDBEAM || NPC[A].Type == NPCID_PLR_HEAVY || NPC[A].Type == NPCID_CHAR4_HEAVY)
@@ -2220,12 +2238,18 @@ void UpdateNPCs()
                         NPC[A].Projectile = true;
                     if(NPC[A].Type == NPCID_EARTHQUAKE_BLOCK && (NPC[A].Location.SpeedY > 2 || NPC[A].Location.SpeedY < -2))
                         NPC[A].Projectile = true;
+
                     // Special NPCs code
                     SpecialNPC(A);
-                    // Block Collision
 
+                    // only the top half of the saw collides with blocks (gets restored after block collisions)
                     if(NPC[A].Type == NPCID_SAW)
                         NPC[A].Location.Height = 24;
+
+
+                    // RESUME UNIFIED CODE
+
+                    // Block Collision
 
                     if(NPC[A].Pinched.Bottom1 > 0)
                         NPC[A].Pinched.Bottom1 -= 1;
@@ -3357,6 +3381,8 @@ void UpdateNPCs()
                                 else
                                     winningBlock = tempBlockHit[2];
                             }
+
+                            // possible usually-nulled function pointer here: ceiling collision logic. Takes winningBlock. Returns true if we should set the NPC's speed / location by the ceiling, otherwise false.
                             if(NPC[A].Type == NPCID_PLR_FIREBALL || NPC[A].Type == NPCID_PLR_ICEBALL) // Kill the fireball
                                 NPCHit(A, 4);
                             else if(NPC[A].Projectile || Block[winningBlock].Invis) // Hit the block hard if the NPC is a projectile
@@ -3374,6 +3400,7 @@ void UpdateNPCs()
                                         NPC[A].Projectile = false;
                                 }
                             }
+
                             if(!NPCIsAParaTroopa[NPC[A].Type])
                             {
                                 NPC[A].Location.Y = Block[winningBlock].Location.Y + Block[winningBlock].Location.Height + 0.01;
@@ -3579,6 +3606,9 @@ void UpdateNPCs()
                         if(beltClear)
                             NPC[A].BeltSpeed = 0;
 
+
+                        // possible usually-nulled function pointer for logic between block and NPC collisions
+
                         if(NPC[A].Type == NPCID_STONE_S3 || NPC[A].Type == NPCID_STONE_S4)
                             NPC[A].BeltSpeed = 0;
                         // End Block Collision
@@ -3586,11 +3616,13 @@ void UpdateNPCs()
                         if(NPC[A].Type == NPCID_RAINBOW_SHELL)
                             NPC[A].Projectile = true;
 
+                        // restore saw height after block collision and belt logic
                         if(NPC[A].Type == NPCID_SAW)
                         {
                             NPC[A].Location.Height = NPCHeight[NPC[A].Type];
                             NPC[A].Projectile = true;
                         }
+
 
                         // NPC Collision
 
@@ -3659,7 +3691,8 @@ void UpdateNPCs()
                                                                    NPC[B].Type != NPCID_PET_FIRE && NPC[B].Type != NPCID_PLANT_FIRE && NPC[B].Type != NPCID_QUAD_BALL &&
                                                                    NPC[B].Type != NPCID_FIRE_BOSS_FIRE && NPC[B].Type != NPCID_RED_VINE_TOP_S3 && NPC[B].Type != NPCID_GRN_VINE_TOP_S3 && NPC[B].Type != NPCID_GRN_VINE_TOP_S4)
                                                                 {
-
+                                                                    // NPC-NPC collisions must be handled a function pointer defined by NPC A, but also shouldn't be hardcoded based on NPC B's type
+                                                                    //   this logic will be quite difficult (but necessary) to convert
                                                                     if(NPC[A].Type == NPCID_MAGIC_BOSS_BALL || NPC[B].Type == NPCID_MAGIC_BOSS_BALL || NPC[A].Type == NPCID_FIRE_BOSS_FIRE || NPC[B].Type == NPCID_FIRE_BOSS_FIRE)
                                                                         HitSpot = 0;
 
