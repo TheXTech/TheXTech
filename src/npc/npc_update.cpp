@@ -112,11 +112,11 @@ void UpdateNPCs()
     int oldSlope = 0; // previous sloped block the npc was on
 //    NPC_t tempNPC;
     // int HitSpot = 0; // used for collision detection
-    double tempHit = 0;
-    double tempHitOld = 0;
+    // double tempHit = 0;
+    // double tempHitOld = 0;
     // Block_t tmpBlock;
-    int tempHitBlock = 0;
-    int tempHitOldBlock = 0;
+    // int tempHitBlock = 0;
+    // int tempHitOldBlock = 0;
     int tempHitIsSlope = 0;
     float tempSpeedA = 0;
 //    float tempSpeedB = 0;
@@ -1388,8 +1388,8 @@ void UpdateNPCs()
                 {
                     if(NPC[A].CantHurt <= 0)
                         NPC[A].CantHurtPlayer = 0;
-                    tempHit = 0;
-                    tempHitBlock = 0;
+                    // tempHit = 0;
+                    // tempHitBlock = 0;
                     // tempBlockHit[1] = 0;
                     // tempBlockHit[2] = 0;
                     // winningBlock = 0;
@@ -2288,6 +2288,8 @@ void UpdateNPCs()
                        NPC[A].Type != NPCID_LIFT_SAND && NPC[A].Type != NPCID_CHECKPOINT && NPC[A].Type != NPCID_SICK_BOSS_BALL &&
                        !(NPC[A].Type == NPCID_PLANT_FIRE || NPC[A].Type == NPCID_LOCK_DOOR || NPC[A].Type == NPCID_FIRE_DISK || NPC[A].Type == NPCID_FIRE_CHAIN))
                     {
+                        double tempHit = 0; // height of block NPC is walking on
+                        int tempHitBlock = 0; // index of block NPC is walking on
                         int tempBlockHit[3] = {0}; // keeps track of up to two blocks hit from below
 
                         if((!NPCNoClipping[NPC[A].Type] || NPC[A].Projectile) &&
@@ -2969,6 +2971,10 @@ void UpdateNPCs()
                                                         }
                                                         if(NPC[A].Type == NPCID_CHAR3_HEAVY && HitSpot > 0)
                                                             NPCHit(A, 3, A);
+
+                                                        // safe to leave uninitialized, they're only read if g_compatibility.fix_npc_downward_clip is set
+                                                        double tempHitOld;
+                                                        int tempHitOldBlock;
 
                                                         if(g_compatibility.fix_npc_downward_clip)
                                                         {
