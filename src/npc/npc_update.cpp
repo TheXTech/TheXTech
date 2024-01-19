@@ -123,8 +123,8 @@ void UpdateNPCs()
     bool tempTurn = false; // used for turning the npc around
     Location_t tempLocation;
     Location_t tempLocation2;
-    Location_t preBeltLoc;
-    float beltCount = 0;
+    // Location_t preBeltLoc;
+    // float beltCount = 0;
     // int tempBlockHit[3] = {0}; // Hit block from below code
     // int winningBlock = 0; // More code for hitting the block from below
     int numTempBlock = 0;
@@ -133,11 +133,11 @@ void UpdateNPCs()
     bool tempBool = false;
 //    bool tempBool2 = false;
 //    bool tempBool3 = false;
-    float newY = 0;
+    // float newY = 0; // fully unused
 //    bool straightLine = false;
     Block_t blankBlock;
 //    bool noBelt = false;
-    float oldBeltSpeed = 0;
+    // float oldBeltSpeed = 0;
 //    float beltFixX = 0;
     // int oldDirection = 0;
 
@@ -148,10 +148,10 @@ void UpdateNPCs()
     // int64_t lBlock2 = 0;
     int bCheck2 = 0;
     int bCheck = 0;
-    float addBelt = 0;
+    // float addBelt = 0;
     // int numAct = 0;
-    bool beltClear = false; // stops belt movement when on a wall
-    bool resetBeltSpeed = false;
+    // bool beltClear = false; // stops belt movement when on a wall
+    // bool resetBeltSpeed = false;
     double PlrMid = 0;
     double Slope = 0;
     bool SlopeTurn = false;
@@ -2262,14 +2262,12 @@ void UpdateNPCs()
                     if(NPC[A].Pinched.Moving > 0)
                         NPC[A].Pinched.Moving -= 1;
 
-                    newY = 0;
-                    UNUSED(newY);
-                    oldBeltSpeed = NPC[A].BeltSpeed;
-                    resetBeltSpeed = false;
-                    beltClear = false;
+                    float oldBeltSpeed = NPC[A].BeltSpeed;
+                    bool resetBeltSpeed = false;
+                    bool beltClear = false; // "stops belt movement when on a wall" (Redigit)
                     NPC[A].BeltSpeed = 0;
-                    beltCount = 0;
-                    addBelt = 0;
+                    float beltCount = 0;
+                    float addBelt = 0;
                     NPC[A].onWall = false;
                     tempSpeedA = 0;
                     oldSlope = NPC[A].Slope;
@@ -3558,7 +3556,7 @@ void UpdateNPCs()
 
                         if(NPC[A].BeltSpeed != 0.0f)
                         {
-                            preBeltLoc = NPC[A].Location;
+                            Location_t preBeltLoc = NPC[A].Location;
                             NPC[A].BeltSpeed = NPC[A].BeltSpeed / beltCount;
                             NPC[A].BeltSpeed = NPC[A].BeltSpeed * speedVar;
                             NPC[A].Location.X += double(NPC[A].BeltSpeed);
