@@ -846,7 +846,7 @@ void UpdateGraphicsLogic(bool Do_FrameSkip)
         if(!screen.Visible)
             continue;
 
-        if(!screen.player_count)
+        if(!screen.player_count && !LevelEditor)
             continue;
 
         int numScreens = screen.active_end();
