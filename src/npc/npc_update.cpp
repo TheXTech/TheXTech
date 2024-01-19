@@ -111,7 +111,7 @@ void UpdateNPCs()
 //    std::string tempStr;
     int oldSlope = 0; // previous sloped block the npc was on
 //    NPC_t tempNPC;
-    int HitSpot = 0; // used for collision detection
+    // int HitSpot = 0; // used for collision detection
     double tempHit = 0;
     double tempHitOld = 0;
     // Block_t tmpBlock;
@@ -2337,10 +2337,11 @@ void UpdateNPCs()
                                                        !(NPC[A].Projectile && Block[B].noProjClipping) &&
                                                        !BlockNoClipping[Block[B].Type] && !Block[B].Hidden)
                                                     {
-                                                        if(Block[B].IsNPC == 78 && !NPCNoClipping[NPC[A].Type] && NPC[A].Type != NPCID_BULLET)
+                                                        if(Block[B].IsNPC == NPCID_TANK_TREADS && !NPCNoClipping[NPC[A].Type] && NPC[A].Type != NPCID_BULLET)
                                                             NPCHit(A, 8);
 
-                                                        if(Block[B].IsNPC != 57 && (NPCIsABlock[Block[B].IsNPC] || NPCIsAHit1Block[Block[B].IsNPC] || NPCCanWalkOn[Block[B].IsNPC]))
+                                                        int HitSpot;
+                                                        if(Block[B].IsNPC != NPCID_CONVEYOR && (NPCIsABlock[Block[B].IsNPC] || NPCIsAHit1Block[Block[B].IsNPC] || NPCCanWalkOn[Block[B].IsNPC]))
                                                             HitSpot = NPCFindCollision(NPC[A].Location, Block[B].Location);
                                                         else
                                                             HitSpot = FindCollisionBelt(NPC[A].Location, Block[B].Location, oldBeltSpeed);
@@ -3693,13 +3694,18 @@ void UpdateNPCs()
                                                                 {
                                                                     // NPC-NPC collisions must be handled a function pointer defined by NPC A, but also shouldn't be hardcoded based on NPC B's type
                                                                     //   this logic will be quite difficult (but necessary) to convert
-                                                                    if(NPC[A].Type == NPCID_MAGIC_BOSS_BALL || NPC[B].Type == NPCID_MAGIC_BOSS_BALL || NPC[A].Type == NPCID_FIRE_BOSS_FIRE || NPC[B].Type == NPCID_FIRE_BOSS_FIRE)
-                                                                        HitSpot = 0;
+
+                                                                    // NOTE: There are a number of assignments to HitSpot here, but they are never read from (in the entire UpdateNPCs routine).
+                                                                    // All reads are preceded by other writes.
+                                                                    // I am commenting out these assignments.
+
+                                                                    // if(NPC[A].Type == NPCID_MAGIC_BOSS_BALL || NPC[B].Type == NPCID_MAGIC_BOSS_BALL || NPC[A].Type == NPCID_FIRE_BOSS_FIRE || NPC[B].Type == NPCID_FIRE_BOSS_FIRE)
+                                                                    //     HitSpot = 0;
 
                                                                     if(NPC[A].Type == NPCID_ITEM_BUBBLE)
                                                                     {
                                                                         NPCHit(A, 3, B);
-                                                                        HitSpot = 0;
+                                                                        // HitSpot = 0;
                                                                     }
                                                                     else if(NPC[B].Type == NPCID_ITEM_BUBBLE)
                                                                         NPCHit(B, 3, A);
@@ -3709,7 +3715,7 @@ void UpdateNPCs()
                                                                     {
                                                                         if(!NPCIsABonus[NPC[B].Type])
                                                                             NPCHit(B, 10, NPC[A].CantHurtPlayer);
-                                                                        HitSpot = 0;
+                                                                        // HitSpot = 0;
                                                                     }
 
                                                                     // toad code
@@ -3720,10 +3726,11 @@ void UpdateNPCs()
                                                                            NPC[B].Type != NPCID_TOOTHY && NPC[B].Type != NPCID_PLR_HEAVY && NPC[B].Type != NPCID_CHAR4_HEAVY && NPC[B].Type != NPCID_FLIPPED_RAINBOW_SHELL)
                                                                         {
                                                                             NPCHit(A, 3, B);
-                                                                            HitSpot = 0;
+                                                                            // HitSpot = 0;
                                                                         }
                                                                     }
-                                                                    // Koopa Code
+
+                                                                    // turtle enters a shell
                                                                     if((NPC[A].Type == NPCID_GRN_HIT_TURTLE_S4 || NPC[A].Type == NPCID_RED_HIT_TURTLE_S4 || NPC[A].Type == NPCID_YEL_HIT_TURTLE_S4) && !NPC[A].Projectile &&
                                                                        (!NPC[B].Projectile && NPC[B].Type >= NPCID_GRN_SHELL_S4 && NPC[B].Type <= NPCID_YEL_SHELL_S4))
                                                                     {
@@ -3919,7 +3926,7 @@ void UpdateNPCs()
                                                                     }
                                                                     else if(!(NPC[B].Type == NPCID_SPIT_BOSS_BALL && !NPC[B].Projectile))
                                                                     {
-                                                                        HitSpot = FindCollision(NPC[A].Location, NPC[B].Location);
+                                                                        int HitSpot = FindCollision(NPC[A].Location, NPC[B].Location);
                                                                         if(NPCIsToad[NPC[A].Type] && NPC[A].Killed > 0)
                                                                             HitSpot = 0;
                                                                         if(NPCIsAParaTroopa[NPC[A].Type] && NPCIsAParaTroopa[NPC[B].Type])
