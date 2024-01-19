@@ -109,7 +109,7 @@ void UpdateNPCs()
 //    float F = 0;
 
 //    std::string tempStr;
-    int oldSlope = 0; // previous sloped block the npc was on
+    // int oldSlope = 0; // previous sloped block the npc was on
 //    NPC_t tempNPC;
     // int HitSpot = 0; // used for collision detection
     // double tempHit = 0;
@@ -120,7 +120,7 @@ void UpdateNPCs()
     // int tempHitIsSlope = 0;
     // float tempSpeedA = 0;
 //    float tempSpeedB = 0;
-    bool tempTurn = false; // used for turning the npc around
+    // bool tempTurn = false; // used for turning the npc around
     Location_t tempLocation;
     Location_t tempLocation2;
     // Location_t preBeltLoc;
@@ -152,9 +152,9 @@ void UpdateNPCs()
     // int numAct = 0;
     // bool beltClear = false; // stops belt movement when on a wall
     // bool resetBeltSpeed = false;
-    double PlrMid = 0;
-    double Slope = 0;
-    bool SlopeTurn = false;
+    // double PlrMid = 0;
+    // double Slope = 0;
+    // bool SlopeTurn = false;
 //    std::string timeStr;
 
     double lyrX = 0; // for attaching to layers
@@ -2269,8 +2269,8 @@ void UpdateNPCs()
                     float beltCount = 0;
                     float addBelt = 0;
                     NPC[A].onWall = false;
-                    oldSlope = NPC[A].Slope;
-                    SlopeTurn = false;
+                    int oldSlope = NPC[A].Slope; // previous sloped block the npc was on
+                    bool SlopeTurn = false;
                     NPC[A].Slope = 0;
                     if(NPC[A].Location.X < -(FLBlocks - 1) * 32)
                         NPC[A].Location.X = -(FLBlocks - 1) * 32;
@@ -2616,11 +2616,12 @@ void UpdateNPCs()
                                                             }
 
                                                             HitSpot = 0;
+                                                            double PlrMid;
                                                             if(BlockSlope2[Block[B].Type] == 1)
                                                                 PlrMid = NPC[A].Location.X + NPC[A].Location.Width;
                                                             else
                                                                 PlrMid = NPC[A].Location.X;
-                                                            Slope = (PlrMid - Block[B].Location.X) / Block[B].Location.Width;
+                                                            double Slope = (PlrMid - Block[B].Location.X) / Block[B].Location.Width;
                                                             if(BlockSlope2[Block[B].Type] > 0)
                                                                 Slope = 1 - Slope;
                                                             if(Slope < 0)
@@ -2701,12 +2702,13 @@ void UpdateNPCs()
                                                                 if(NPC[A].Location.X < Block[B].Location.X + Block[B].Location.Width && NPC[A].Location.X + NPC[A].Location.Width > Block[B].Location.X)
                                                                 {
 
+                                                                    double PlrMid;
                                                                     if(BlockSlope[Block[B].Type] == 1)
                                                                         PlrMid = NPC[A].Location.X;
                                                                     else
                                                                         PlrMid = NPC[A].Location.X + NPC[A].Location.Width;
 
-                                                                    Slope = (PlrMid - Block[B].Location.X) / Block[B].Location.Width;
+                                                                    double Slope = (PlrMid - Block[B].Location.X) / Block[B].Location.Width;
 
                                                                     if(BlockSlope[Block[B].Type] < 0)
                                                                         Slope = 1 - Slope;
@@ -4110,7 +4112,7 @@ void UpdateNPCs()
                             }
                             else if(NPCTurnsAtCliffs[NPC[A].Type] && !NPC[A].Projectile) // Walking code NPCs that turn
                             {
-                                tempTurn = true;
+                                bool tempTurn = true; // used for turning the npc around
                                 tempLocation = NPC[A].Location;
                                 tempLocation.SpeedX = 0;
                                 tempLocation.SpeedY = 0;
@@ -4202,7 +4204,7 @@ void UpdateNPCs()
                             }
                             else if(NPC[A].Type == NPCID_JUMPER_S4) // ninja code
                             {
-                                tempTurn = true;
+                                bool tempTurn = true; // used for turning the npc around
                                 tempLocation = NPC[A].Location;
                                 tempLocation.SpeedX = 0;
                                 tempLocation.SpeedY = 0;
