@@ -102,7 +102,7 @@ void UpdateNPCs()
 
     // misc variables used mainly for arrays
     int A = 0;
-    int B = 0;
+    // int B = 0;
 //    float C = 0;
 //    float D = 0;
 //    double E = 0;
@@ -130,7 +130,7 @@ void UpdateNPCs()
     int numTempBlock = 0;
     float speedVar = 0; // percent of the NPC it should actually moved. this helps when underwater
 
-    bool tempBool = false;
+    // bool tempBool = false;
 //    bool tempBool2 = false;
 //    bool tempBool3 = false;
     // float newY = 0; // fully unused
@@ -336,14 +336,14 @@ void UpdateNPCs()
                     NPC[A].GeneratorActive = false;
                     if(NPC[A].GeneratorTime >= NPC[A].GeneratorTimeMax * 6.5f)
                     {
-                        tempBool = false;
+                        bool tempBool = false;
 
                         if(numNPCs == maxNPCs - 100)
                             tempBool = true;
 
                         if(NPC[A].Type != NPCID_ITEM_BURIED && !tempBool)
                         {
-                            for(B = 1; B <= numPlayers; B++)
+                            for(int B = 1; B <= numPlayers; B++)
                             {
                                 if(!Player[B].Dead && Player[B].TimeToLive == 0)
                                 {
@@ -511,7 +511,7 @@ void UpdateNPCs()
         {
             CheckSectionNPC(A);
             bool sameSection = false;
-            for(B = 1; B <= numPlayers; B++)
+            for(int B = 1; B <= numPlayers; B++)
             {
                 if(Player[B].Section == NPC[A].Section)
                     sameSection = true;
@@ -1120,7 +1120,7 @@ void UpdateNPCs()
 
             if(NPC[A].Type == NPCID_VEGGIE_RANDOM)
             {
-                B = iRand(9);
+                int B = iRand(9);
                 NPC[A].Type = NPCID_VEGGIE_2 + B;
                 if(NPC[A].Type == NPCID_VEGGIE_RANDOM)
                     NPC[A].Type = NPCID_VEGGIE_1;
@@ -1141,7 +1141,7 @@ void UpdateNPCs()
                 tempLocation.Height += 50;
                 tempLocation.X -= 25;
                 tempLocation.Width += 50;
-                for(B = 1; B <= numPlayers; B++)
+                for(int B = 1; B <= numPlayers; B++)
                 {
                     if(CheckCollision(tempLocation, Player[B].Location))
                         NPC[A].Chat = true;
@@ -1179,7 +1179,7 @@ void UpdateNPCs()
                  NPC[A].HoldingPlayer == 0)
             {
                 int C = 0;
-                for(B = 1; B <= numPlayers; B++)
+                for(int B = 1; B <= numPlayers; B++)
                 {
                     if(Player[B].Section == NPC[A].Section)
                         C = 1;
@@ -1262,7 +1262,7 @@ void UpdateNPCs()
 
                             if(NPC[A].Type == NPCID_VEGGIE_RANDOM)
                             {
-                                B = iRand(9);
+                                int B = iRand(9);
                                 NPC[A].Type = NPCID_VEGGIE_2 + B;
                                 if(NPC[A].Type == NPCID_VEGGIE_RANDOM)
                                     NPC[A].Type = NPCID_VEGGIE_1;
@@ -1611,7 +1611,7 @@ void UpdateNPCs()
                         NPC[A].Projectile = true;
                         NPC[A].Direction = NPC[A].DefaultDirection;
                         NPC[A].Location.SpeedX = 1 * NPC[A].DefaultDirection;
-                        for(B = 1; B <= numPlayers; B++)
+                        for(int B = 1; B <= numPlayers; B++)
                         {
                             if(!(Player[B].Effect == 0 || Player[B].Effect == 3))
                             {
@@ -1629,7 +1629,7 @@ void UpdateNPCs()
                         if(NPC[A].Direction == 0.0f) // Move toward the closest player
                         {
                             double C = 0;
-                            for(B = 1; B <= numPlayers; B++)
+                            for(int B = 1; B <= numPlayers; B++)
                             {
                                 if(!Player[B].Dead && Player[B].Section == NPC[A].Section)
                                 {
@@ -1657,7 +1657,7 @@ void UpdateNPCs()
                         NPC[A].Projectile = true;
 
                         double C = 0;
-                        for(B = 1; B <= numPlayers; B++)
+                        for(int B = 1; B <= numPlayers; B++)
                         {
                             if(!Player[B].Dead && Player[B].Section == NPC[A].Section)
                             {
@@ -1690,7 +1690,7 @@ void UpdateNPCs()
                         if(!NPC[A].Projectile && NPC[A].Special2 == 0.0)
                         {
                             double C = 0;
-                            for(B = 1; B <= numPlayers; B++)
+                            for(int B = 1; B <= numPlayers; B++)
                             {
                                 if(!Player[B].Dead && Player[B].Section == NPC[A].Section)
                                 {
@@ -1770,7 +1770,7 @@ void UpdateNPCs()
                         else
                         {
                             double C = 0;
-                            for(B = 1; B <= numPlayers; B++)
+                            for(int B = 1; B <= numPlayers; B++)
                             {
                                 if(!Player[B].Dead && Player[B].Section == NPC[A].Section)
                                 {
@@ -2071,7 +2071,7 @@ void UpdateNPCs()
                     // lots of speed cancel code (and some TheXTech logic for the Raft NPC); fine to move into NPCSpecial
                     if(NPC[A].Type == NPCID_TANK_TREADS)
                     {
-                        for(B = 1; B <= numPlayers; B++)
+                        for(int B = 1; B <= numPlayers; B++)
                         {
                             if(!(Player[B].Effect == 0 || Player[B].Effect == 3 || Player[B].Effect == 9 || Player[B].Effect == 10))
                             {
@@ -2106,7 +2106,7 @@ void UpdateNPCs()
 
                     if(NPC[A].Type == NPCID_RAFT) // Skull raft
                     {
-                        for(B = 1; B <= numPlayers; B++)
+                        for(int B = 1; B <= numPlayers; B++)
                         {
                             if(!(Player[B].Effect == 0 || Player[B].Effect == 3 || Player[B].Effect == 9 || Player[B].Effect == 10))
                             {
@@ -2134,7 +2134,7 @@ void UpdateNPCs()
 
                             for(BlockRef_t block : treeBlockQuery(loc, SORTMODE_NONE))
                             {
-                                B = block;
+                                int B = block;
                                 if(!CheckCollision(loc, Block[B].Location))
                                     continue;
                                 if(NPC[A].Block == B || Block[B].noProjClipping ||
@@ -2177,7 +2177,7 @@ void UpdateNPCs()
                         if(!(NPC[A].Type == NPCID_SKELETON && NPC[A].Special > 0))
                         {
                             double C = 0;
-                            for(B = 1; B <= numPlayers; B++)
+                            for(int B = 1; B <= numPlayers; B++)
                             {
                                 if(!Player[B].Dead && Player[B].Section == NPC[A].Section)
                                 {
@@ -2318,7 +2318,7 @@ void UpdateNPCs()
 
                                 for(BlockRef_t block : collBlockSentinel)
                                 {
-                                    B = block;
+                                    int B = block;
                                     // If Not .Block = B And Not .tempBlock = B And Not (.Projectile = True And Block(B).noProjClipping = True) And BlockNoClipping(Block(B).Type) = False And Block(B).Hidden = False And Block(B).Hidden = False Then
 
 
@@ -3152,7 +3152,7 @@ void UpdateNPCs()
                                                                         {
                                                                             if(NPC[A].Location.SpeedX == 0)
                                                                             {
-                                                                                tempBool = false;
+                                                                                bool tempBool = false;
                                                                                 for(int C = 1; C <= numPlayers; C++)
                                                                                 {
                                                                                     if(CheckCollision(NPC[A].Location, Player[C].Location))
@@ -3443,6 +3443,8 @@ void UpdateNPCs()
                                         lBlock = numBlock - numTempBlock;
                                     }
 
+                                    int B = -1;
+
                                     // The first line contains the original condition that guarded the "break" in our loop above B.
                                     // Note that this means the bug would be different during PSwitch or after a horiz layer has moved.
                                     // The second line lets us find the Block that is accessed upon overflow of the original FLBlock column.
@@ -3505,9 +3507,8 @@ void UpdateNPCs()
                                     }
                                     else
                                     {
-                                        // The game went through the full loop and B = numBlock + 1.
+                                        // The game went through the full loop and B = numBlock + 1 in vanilla.
                                         // We'll assume it was properly deallocated and has SpeedY = 0.
-                                        B = -1;
                                     }
 
                                     if(B != -1)
@@ -3874,7 +3875,7 @@ void UpdateNPCs()
                                                                                             NPC[B].Projectile = true;
                                                                                         else
                                                                                         {
-                                                                                            tempBool = false; // This whole cluster stops friendly projectiles form killing riddin shells
+                                                                                            bool tempBool = false; // This whole cluster stops friendly projectiles form killing riddin shells
 
                                                                                             if(NPCIsAShell[NPC[A].Type])
                                                                                             {
@@ -4161,7 +4162,7 @@ void UpdateNPCs()
 
                                     for(BlockRef_t block : collBlockSentinel2)
                                     {
-                                        B = block;
+                                        int B = block;
                                         //If BlockNoClipping(Block(B).Type) = False And Block(B).Invis = False And Block(B).Hidden = False And Not (BlockIsSizable(Block(B).Type) And Block(B).Location.Y < .Location.Y + .Location.Height - 3) Then
 
                                         // Don't collapse Pokey during walking on slopes and other touching surfaces
@@ -4239,7 +4240,7 @@ void UpdateNPCs()
 
                                     for(BlockRef_t block : collBlockSentinel2)
                                     {
-                                        B = block;
+                                        int B = block;
                                         if(!BlockNoClipping[Block[B].Type] && !Block[B].Invis && !Block[B].Hidden && !(BlockIsSizable[Block[B].Type] && Block[B].Location.Y < NPC[A].Location.Y + NPC[A].Location.Height - 3))
                                         {
                                             if(CheckCollision(tempLocation, Block[B].Location))
@@ -4287,7 +4288,7 @@ void UpdateNPCs()
 
                                     for(BlockRef_t block : collBlockSentinel2)
                                     {
-                                        B = block;
+                                        int B = block;
                                         if(!BlockNoClipping[Block[B].Type] && !Block[B].Invis && !Block[B].Hidden && !(BlockIsSizable[Block[B].Type] && Block[B].Location.Y < NPC[A].Location.Y + NPC[A].Location.Height - 1))
                                         {
                                             if(CheckCollision(tempLocation, Block[B].Location))
@@ -4575,8 +4576,8 @@ void UpdateNPCs()
 
                     if(NPC[A].Special5 == 0.0) // find player
                     {
-                        tempBool = false;
-                        for(B = 1; B <= numPlayers; B++)
+                        bool tempBool = false;
+                        for(int B = 1; B <= numPlayers; B++)
                         {
                             if(!Player[B].Dead && Player[B].TimeToLive == 0)
                                 tempBool = true;
@@ -4589,6 +4590,7 @@ void UpdateNPCs()
                         }
                         else
                         {
+                            int B;
                             do
                                 B = iRand(numPlayers) + 1;
                             while(Player[B].Dead || Player[B].TimeToLive > 0);
@@ -4597,7 +4599,7 @@ void UpdateNPCs()
                     }
 
                     // see if facing the player
-                    tempBool = false;
+                    bool tempBool = false;
                     if(NPC[A].Special5 > 0)
                     {
                         if(Player[long(NPC[A].Special5)].Location.X + Player[long(NPC[A].Special5)].Location.Width / 2.0 < NPC[A].Location.X + NPC[A].Location.Width / 2.0)
@@ -4859,7 +4861,7 @@ void UpdateNPCs()
 
                                 for(BlockRef_t block : treeBlockQuery(tempLocation, false))
                                 {
-                                    B = block;
+                                    int B = block;
                                     if(Block[B].Type == 186 && CheckCollision(tempLocation, Block[B].Location) && !Block[B].Hidden)
                                         KillBlock(B);
                                 }
@@ -4891,7 +4893,7 @@ void UpdateNPCs()
                                         toShake.Height = (sec.Height - sec.Y);
                                         for(BlockRef_t block : treeBlockQuery(toShake, false))
                                         {
-                                            B = block;
+                                            int B = block;
                                             BlockShakeUp(B);
                                         }
                                     }
@@ -5123,7 +5125,7 @@ void UpdateNPCs()
                         if(NPC[A].HoldingPlayer == 0 && NPC[A].standingOnPlayer == 0 && NPC[A].Type == NPCID_CANNONENEMY)
                         {
                             C = 0;
-                            for(B = 1; B <= numPlayers; B++)
+                            for(int B = 1; B <= numPlayers; B++)
                             {
                                 if(!Player[B].Dead && Player[B].Section == NPC[A].Section)
                                 {
@@ -5151,7 +5153,7 @@ void UpdateNPCs()
                                 numNPCs++;
                                 NPC[numNPCs] = NPC_t();
                                 NPC[numNPCs].Inert = NPC[A].Inert;
-                                tempBool = false;
+                                bool tempBool = false;
                                 NPC[numNPCs].Direction = NPC[A].Direction;
                                 NPC[numNPCs].DefaultDirection = NPC[A].Direction;
                                 if(NPC[A].HoldingPlayer > 0 || NPC[A].standingOnPlayer > 0 || (NPC[A].Type == NPCID_CANNONITEM && NPC[A].Projectile))
@@ -5208,7 +5210,7 @@ void UpdateNPCs()
                 }
                 else if(NPC[A].Type == NPCID_TOOTHY)
                 {
-                    B = 0;
+                    int B = 0;
                     if(NPC[A].Special > 0)
                     {
                         if(Player[NPC[A].Special].HoldingNPC > 0)
@@ -5349,7 +5351,7 @@ void UpdateNPCs()
                         {
                             double C = 0;
                             int D = 1;
-                            for(B = 1; B <= numPlayers; B++)
+                            for(int B = 1; B <= numPlayers; B++)
                             {
                                 if(!Player[B].Dead && Player[B].Section == NPC[A].Section)
                                 {
@@ -5443,7 +5445,7 @@ void UpdateNPCs()
                 if(NPC[A].Direction == 0.0f) // Move toward the closest player
                 {
                     double C = 0;
-                    for(B = 1; B <= numPlayers; B++)
+                    for(int B = 1; B <= numPlayers; B++)
                     {
                         if(!Player[B].Dead && Player[B].Section == NPC[A].Section)
                         {
@@ -5482,9 +5484,9 @@ void UpdateNPCs()
             }
             else if(NPC[A].Effect == 208)
             {
-                tempBool = false;
+                bool tempBool = false;
 
-                for(B = 1; B <= numNPCs; B++)
+                for(int B = 1; B <= numNPCs; B++)
                 {
                     if(NPC[B].Type == NPCID_BOSS_CASE)
                     {
@@ -5513,7 +5515,7 @@ void UpdateNPCs()
                 else if(NPC[A].Direction == 0.f) // Move toward the closest player
                 {
                     double C = 0;
-                    for(B = 1; B <= numPlayers; B++)
+                    for(int B = 1; B <= numPlayers; B++)
                     {
                         if(!Player[B].Dead && Player[B].Section == NPC[A].Section)
                         {
@@ -5558,7 +5560,7 @@ void UpdateNPCs()
 
                         for(BlockRef_t block : collBlockSentinel)
                         {
-                            B = block;
+                            int B = block;
 
                             if(!Block[B].Invis && !(BlockIsSizable[Block[B].Type] && NPC[A].Location.Y > Block[B].Location.Y) && !Block[B].Hidden)
                             {
@@ -5698,7 +5700,7 @@ void UpdateNPCs()
         if(NPC[A].AttLayer != LAYER_NONE && NPC[A].AttLayer != LAYER_DEFAULT && NPC[A].HoldingPlayer == 0)
         {
             int B = NPC[A].AttLayer;
-            // for(B = 1; B <= maxLayers; B++)
+            // for(int B = 1; B <= maxLayers; B++)
             {
                 // if(Layer[B].Name != "")
                 {
