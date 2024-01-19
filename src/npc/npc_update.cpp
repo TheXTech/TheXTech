@@ -125,8 +125,8 @@ void UpdateNPCs()
     Location_t tempLocation2;
     Location_t preBeltLoc;
     float beltCount = 0;
-    int tempBlockHit[3] = {0}; // Hit block from below code
-    int winningBlock = 0; // More code for hitting the block from below
+    // int tempBlockHit[3] = {0}; // Hit block from below code
+    // int winningBlock = 0; // More code for hitting the block from below
     int numTempBlock = 0;
     float speedVar = 0; // percent of the NPC it should actually moved. this helps when underwater
 
@@ -1390,9 +1390,9 @@ void UpdateNPCs()
                         NPC[A].CantHurtPlayer = 0;
                     tempHit = 0;
                     tempHitBlock = 0;
-                    tempBlockHit[1] = 0;
-                    tempBlockHit[2] = 0;
-                    winningBlock = 0;
+                    // tempBlockHit[1] = 0;
+                    // tempBlockHit[2] = 0;
+                    // winningBlock = 0;
 
                     if((LevelWrap[NPC[A].Section] || LevelVWrap[NPC[A].Section]) && NPC[A].Type != NPCID_HEAVY_THROWN && NPC[A].Type != NPCID_PET_FIRE) // Level wraparound
                     {
@@ -2288,6 +2288,7 @@ void UpdateNPCs()
                        NPC[A].Type != NPCID_LIFT_SAND && NPC[A].Type != NPCID_CHECKPOINT && NPC[A].Type != NPCID_SICK_BOSS_BALL &&
                        !(NPC[A].Type == NPCID_PLANT_FIRE || NPC[A].Type == NPCID_LOCK_DOOR || NPC[A].Type == NPCID_FIRE_DISK || NPC[A].Type == NPCID_FIRE_CHAIN))
                     {
+                        int tempBlockHit[3] = {0}; // keeps track of up to two blocks hit from below
 
                         if((!NPCNoClipping[NPC[A].Type] || NPC[A].Projectile) &&
                            !(NPC[A].Type == NPCID_SPIT_BOSS_BALL && NPC[A].Projectile) && NPC[A].Type != NPCID_TOOTHY &&
@@ -3359,10 +3360,13 @@ void UpdateNPCs()
                                 if(numTempBlock == 0)
                                     break;
                             }
-                        }
+                        } // do block collisions
 
+                        // ceiling logic (safe to move into above braces if desired; it's impossible for tempBlockHit to be set unless that clause executed)
                         if(tempBlockHit[1] > 0) // find out which block was hit from below
                         {
+                            int winningBlock = 0;
+
                             if(tempBlockHit[2] == 0)
                                 winningBlock = tempBlockHit[1];
                             else
