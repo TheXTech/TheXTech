@@ -101,7 +101,7 @@ void UpdateNPCs()
     // this is 1 of the 2 clusterfuck subs in the code, be weary
 
     // misc variables used mainly for arrays
-    int A = 0;
+    // int A = 0;
     // int B = 0;
 //    float C = 0;
 //    float D = 0;
@@ -128,7 +128,7 @@ void UpdateNPCs()
     // int tempBlockHit[3] = {0}; // Hit block from below code
     // int winningBlock = 0; // More code for hitting the block from below
     int numTempBlock = 0;
-    float speedVar = 0; // percent of the NPC it should actually moved. this helps when underwater
+    // float speedVar = 0; // percent of the NPC it should actually moved. this helps when underwater
 
     // bool tempBool = false;
 //    bool tempBool2 = false;
@@ -146,8 +146,8 @@ void UpdateNPCs()
     // int64_t lBlock = 0;
     // int64_t fBlock2 = 0;
     // int64_t lBlock2 = 0;
-    int bCheck2 = 0;
-    int bCheck = 0;
+    // int bCheck2 = 0;
+    // int bCheck = 0;
     // float addBelt = 0;
     // int numAct = 0;
     // bool beltClear = false; // stops belt movement when on a wall
@@ -196,7 +196,7 @@ void UpdateNPCs()
     if(FreezeNPCs) // When time is paused
     {
         StopHit = 0;
-        for(A = numNPCs; A >= 1; A--) // check to see if NPCs should be killed
+        for(int A = numNPCs; A >= 1; A--) // check to see if NPCs should be killed
         {
             if(NPCIsBoot[NPC[A].Type] || NPCIsYoshi[NPC[A].Type])
             {
@@ -277,7 +277,7 @@ void UpdateNPCs()
     // need this complex loop syntax because RespawnDelay can be modified within it
     for(auto it = NPCQueues::RespawnDelay.begin(); it != NPCQueues::RespawnDelay.end();)
     {
-        A = *(it++);
+        int A = *(it++);
 
         if(NPC[A].RespawnDelay > 0)
         {
@@ -761,7 +761,7 @@ void UpdateNPCs()
     // only need to add NPC temp blocks to the quadtree when they are at a diff loc than the NPC
     treeTempBlockEnable();
 
-    for(A = 1; A <= numPlayers; A++)
+    for(int A = 1; A <= numPlayers; A++)
     {
         if(Player[A].Mount == 2)
         {
@@ -781,7 +781,7 @@ void UpdateNPCs()
 
     // if(numTempBlock > 1)
     //     qSortBlocksX(numBlock + 1 - numTempBlock, numBlock);
-    // for(A = numBlock + 1 - numTempBlock; A <= numBlock; A++)
+    // for(int A = numBlock + 1 - numTempBlock; A <= numBlock; A++)
     //     NPC[Block[A].IsReally].tempBlock = A;
 
     for(int A : NPCQueues::Unchecked)
@@ -981,7 +981,7 @@ void UpdateNPCs()
             if(NPC[A].Type == NPCID_VEHICLE && NPC[A].TimeLeft > 1)
                 NPC[A].TimeLeft = 100;
 
-            speedVar = 1;
+            float speedVar = 1; // percent of the NPC it should actually moved. this helps when underwater
             if(NPC[A].Slope > 0 && !(NPCIsAShell[NPC[A].Type] || (NPC[A].Type == NPCID_SLIDE_BLOCK && NPC[A].Special == 1)))
             {
                 if((NPC[A].Location.SpeedX > 0 && BlockSlope[Block[NPC[A].Slope].Type] == -1) ||
@@ -2299,7 +2299,7 @@ void UpdateNPCs()
                            NPC[A].Type != NPCID_HEAVY_THROWN && NPC[A].Type != NPCID_BIG_BULLET && NPC[A].Type != NPCID_PET_FIRE &&
                            !(NPCIsCheep[NPC[A].Type] && NPC[A].Special == 2) && NPC[A].Type != NPCID_VINE_BUG)
                         {
-                            for(bCheck = 1; bCheck <= 2; bCheck++)
+                            for(int bCheck = 1; bCheck <= 2; bCheck++)
                             {
                                 // if(bCheck == 1)
                                 // {
@@ -3812,7 +3812,7 @@ void UpdateNPCs()
                                                                                     tempLocation.Y += 1;
                                                                                     tempLocation.Height -= 2;
 
-                                                                                    for(bCheck2 = 1; bCheck2 <= 2; bCheck2++)
+                                                                                    for(int bCheck2 = 1; bCheck2 <= 2; bCheck2++)
                                                                                     {
                                                                                         // if(bCheck2 == 1)
                                                                                         // {
@@ -4143,7 +4143,7 @@ void UpdateNPCs()
                                     // If .Type = 189 Then tempLocation.X += 10
                                 }
 
-                                for(bCheck2 = 1; bCheck2 <= 2; bCheck2++)
+                                for(int bCheck2 = 1; bCheck2 <= 2; bCheck2++)
                                 {
                                     // if(bCheck2 == 1)
                                     // {
@@ -4221,7 +4221,7 @@ void UpdateNPCs()
                                 else
                                     tempLocation.X = NPC[A].Location.X - tempLocation.Width + 16;
 
-                                for(bCheck2 = 1; bCheck2 <= 2; bCheck2++)
+                                for(int bCheck2 = 1; bCheck2 <= 2; bCheck2++)
                                 {
                                     // if(bCheck2 == 1)
                                     // {
@@ -4269,7 +4269,7 @@ void UpdateNPCs()
                                 // we are able to wrap this whole thing in the inner-loop check that (NPC[A].Slope <= 0)
                                 // commenting for now to avoid inadvertently introducing any bugs
                                 // if(NPC[A].Slope <= 0)
-                                for(bCheck2 = 1; bCheck2 <= 2; bCheck2++)
+                                for(int bCheck2 = 1; bCheck2 <= 2; bCheck2++)
                                 {
                                     // if(bCheck2 == 1)
                                     // {
@@ -5537,7 +5537,7 @@ void UpdateNPCs()
                     NPC[A].Effect2 = 0;
                     NPC[A].Location.Height = 32;
 
-                    for(bCheck = 1; bCheck <= 2; bCheck++)
+                    for(int bCheck = 1; bCheck <= 2; bCheck++)
                     {
                         // if(bCheck == 1)
                         // {
@@ -5772,7 +5772,7 @@ void UpdateNPCs()
 
     for(size_t i = 0; i < KilledQueue_check; i++) // KILL THE NPCS <><><><><><><><><><><><><><><><><><><><><><><><><><><><><><
     {
-        A = NPCQueues::Killed[i];
+        int A = NPCQueues::Killed[i];
 
         // duplicated entry, no problem
         if(A == last_NPC)
@@ -5863,7 +5863,7 @@ void UpdateNPCs()
     //            if(nPlay.NPCWaitCount >= 5)
     //            {
     //                tempStr = "L" + LB;
-    //                for(A = 1; A <= numNPCs; A++)
+    //                for(int A = 1; A <= numNPCs; A++)
     //                {
     //                    if(NPC[A].Active == true && NPC[A].TimeLeft > 1)
     //                    {
