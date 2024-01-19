@@ -117,8 +117,8 @@ void UpdateNPCs()
     // Block_t tmpBlock;
     // int tempHitBlock = 0;
     // int tempHitOldBlock = 0;
-    int tempHitIsSlope = 0;
-    float tempSpeedA = 0;
+    // int tempHitIsSlope = 0;
+    // float tempSpeedA = 0;
 //    float tempSpeedB = 0;
     bool tempTurn = false; // used for turning the npc around
     Location_t tempLocation;
@@ -2269,7 +2269,6 @@ void UpdateNPCs()
                     float beltCount = 0;
                     float addBelt = 0;
                     NPC[A].onWall = false;
-                    tempSpeedA = 0;
                     oldSlope = NPC[A].Slope;
                     SlopeTurn = false;
                     NPC[A].Slope = 0;
@@ -2289,6 +2288,8 @@ void UpdateNPCs()
                         double tempHit = 0; // height of block NPC is walking on
                         int tempHitBlock = 0; // index of block NPC is walking on
                         int tempBlockHit[3] = {0}; // keeps track of up to two blocks hit from below
+                        int tempHitIsSlope = 0;
+                        float tempSpeedA = 0; // speed of ground the NPC is possibly standing on
 
                         if((!NPCNoClipping[NPC[A].Type] || NPC[A].Projectile) &&
                            !(NPC[A].Type == NPCID_SPIT_BOSS_BALL && NPC[A].Projectile) && NPC[A].Type != NPCID_TOOTHY &&
@@ -4022,6 +4023,14 @@ void UpdateNPCs()
 
                         if(tempHit != 0) // Walking   // VERIFY ME
                         {
+                            // tempSpeedA does not check for walking collisions in vanilla
+                            if(g_compatibility.fix_npc_downward_clip)
+                            {
+                                tempSpeedA = Block[tempHitBlock].Location.SpeedY;
+                                if(tempSpeedA < 0)
+                                    tempSpeedA = 0;
+                            }
+
                             if(NPC[A].Type == NPCID_RED_FLY_FODDER) // Walking code for Flying Goomba
                             {
                                 if(NPC[A].Special <= 30)
