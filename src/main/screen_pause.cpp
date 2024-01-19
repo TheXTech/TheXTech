@@ -241,13 +241,13 @@ void Init(int plr, bool LegacyPause)
 
         s_items.push_back(MenuItem{start_screen ? g_gameStrings.pauseItemContinue : g_gameStrings.pauseItemRestartLevel, s_RestartLevel});
 
-        if(!start_screen)
+        if(!start_screen && !BattleMode)
             s_items.push_back(MenuItem{g_gameStrings.pauseItemResetCheckpoints, s_ResetCheckpoints});
 
         if(g_compatibility.allow_drop_add)
             s_items.push_back(MenuItem{g_gameStrings.pauseItemDropAddPlayers, s_DropAddScreen});
 
-        if(!inter_screen && s_cheat_menu_bits == 14)
+        if(!inter_screen && s_cheat_menu_bits == 14 && !BattleMode)
             s_items.push_back(MenuItem{g_gameStrings.pauseItemEnterCode, s_CheatScreen});
 
         s_items.push_back(MenuItem{editor_test ? g_gameStrings.pauseItemReturnToEditor : g_gameStrings.pauseItemQuitTesting, s_QuitTesting});
@@ -260,7 +260,7 @@ void Init(int plr, bool LegacyPause)
         if(g_compatibility.allow_drop_add && s_pause_type != PauseType::Legacy)
             s_items.push_back(MenuItem{g_gameStrings.pauseItemDropAddPlayers, s_DropAddScreen});
 
-        if(s_cheat_menu_bits == 14 && s_pause_type != PauseType::Legacy)
+        if(s_cheat_menu_bits == 14 && s_pause_type != PauseType::Legacy && !BattleMode)
             s_items.push_back(MenuItem{g_gameStrings.pauseItemEnterCode, s_CheatScreen});
 
         if(CanSave)
@@ -422,7 +422,7 @@ bool Logic(int plr)
         return false;
     }
 
-    if(s_pause_type == PauseType::Legacy && s_cheat_menu_bits < 14)
+    if((s_pause_type == PauseType::Legacy || BattleMode) && s_cheat_menu_bits < 14)
         s_cheat_menu_bits = 0;
 
     int max_item = (int)s_items.size() - 1;
