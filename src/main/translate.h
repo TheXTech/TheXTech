@@ -26,6 +26,7 @@
 #include <string>
 
 #include "editor/editor_custom.h"
+#include "main/hints.h"
 
 const std::string& LanguageFormatNumber(int number, const std::string& singular, const std::string& dual, const std::string& plural);
 
@@ -66,6 +67,8 @@ public:
     friend void EditorCustom::Load(XTechTranslate* translate);
     friend struct EditorCustom::ItemList_t;
 #endif
+
+    friend void XHints::InitTranslations(XTechTranslate& translate);
 
 private:
     bool translateFile(const std::string &file, TrList &list, const char* trTypeName);
