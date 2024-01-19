@@ -176,6 +176,7 @@ XTechTranslate::XTechTranslate()
         {"languageName",                   &g_mainMenu.languageName},
         {"pluralRules",                    &g_mainMenu.pluralRules},
 
+        {"menu.editor.battles",            &g_mainMenu.editorBattles},
         {"menu.editor.newWorld",           &g_mainMenu.editorNewWorld},
         {"menu.editor.errorResolution",    &g_mainMenu.editorErrorResolution},
         {"menu.editor.errorMissingResources", &g_mainMenu.editorErrorMissingResources},

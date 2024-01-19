@@ -494,7 +494,7 @@ int GameMain(const CmdLineSetup_t &setup)
         {
             // if(resChanged)
             //     ChangeScreen();
-            BattleMode = false;
+            // BattleMode = false;
             SingleCoop = 0;
             numPlayers = 0;
             ScreenType = 0;
@@ -507,9 +507,7 @@ int GameMain(const CmdLineSetup_t &setup)
 
             // coming back from a level test
             if(!WorldEditor)
-            {
                 EditorRestore();
-            }
 
             // Run the frame-loop
             runFrameLoop(&EditorLoop,
@@ -1190,6 +1188,7 @@ int GameMain(const CmdLineSetup_t &setup)
 
                     TestLevel = false;
                     LevelEditor = true;
+                    GameMenu = false;
                     SetupPlayers();
 
                     // reopen the temporary level (FullFileName)
@@ -1344,7 +1343,9 @@ void NextLevel()
         if(TestLevel && BattleMode)
         {
             BattleIntro = 150;
-            GameIsActive = false; // Quit game
+
+            if(!LevelEditor && Backup_FullFileName.empty())
+                GameIsActive = false; // Quit game
         }
     }
 }
