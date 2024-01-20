@@ -1,12 +1,14 @@
 {
     "editor": {
         "block": {
-            "canBreak": "Puede romper",
-            "canBreakTooltip": "Legado: Se rompe al ser golpeado",
+            "canBreak": "Se rompe",
+            "canBreakTooltip": "Legado: se rompe cuando se golpea",
             "inside": "Tiene:",
             "invis": "Invis",
             "slick": "Resbala",
-            "pickContents": "Elegir contenido del bloque"
+            "pickContents": "Elegir contenido del bloque",
+            "letterHeight": "alt. ",
+            "letterWidth": "anch. "
         },
         "browser": {
             "askOverwriteFile": "Sobreescribir {0}?",
@@ -28,7 +30,7 @@
                 "death": "NPC muere",
                 "destroy": "Bloque es destruido",
                 "hit": "Bloque es golpeado",
-                "phraseTriggersWhenTemplate": "{0} se activa cuando {1}",
+                "phraseTriggersWhenTemplate": "{0} desencadena cuando {1}",
                 "talk": "Jugador habla a NPC",
                 "phraseTriggersAfterTemplate": "{0} se activa {1} ms después del evento {2}",
                 "activate": "NPC entra en la pantalla",
@@ -44,7 +46,7 @@
                 "hit": "Golpe",
                 "next": "Siguiente",
                 "talk": "Conversación",
-                "layerClear": "Capa transparente"
+                "layerClear": "Capa limpia"
             },
             "sections": {
                 "phraseAllSections": "Todas las secciones",
@@ -63,10 +65,11 @@
             },
             "promptEventText": "Texto del evento",
             "props": {
-                "autostart": "Autoencendido",
+                "autostart": "Comenzar Automáticamente",
                 "controls": "Controles",
                 "endGame": "Final del Juego",
-                "sound": "Sonido"
+                "sound": "Sonido",
+                "layerSmoke": "Humo"
             },
             "settingsForEvent": "Ajustes para el Evento",
             "bounds": {
@@ -101,7 +104,7 @@
                 "noIssues": "No hay problemas de compatibilidad.",
                 "formatUnknown": "El formato solicitado es desconocido.",
                 "featureWarpNeedsStand": "Un warp requiere que el jugador se ponga de pie.",
-                "featureWarpNoStartScene": "Un warp de nivel se salta la escena inicial.",
+                "featureWarpNoStartScene": "Un pasaje del nivel omite la escena inicial.",
                 "featureWorldStarDisplay": "Utiliza la configuración del mundo para la visualización de las estrellas.",
                 "featureEventAutoscroll": "Un evento utiliza el autoscroll moderno.",
                 "featureEventCustomMusic": "Un evento pone música a un archivo.",
@@ -152,7 +155,7 @@
         },
         "level": {
             "levelName": "Nombre del nivel",
-            "startPos": "Inicio Pos",
+            "startPos": "Pos Inicio",
             "pathBG": "Ruta BG",
             "pathUnlocks": "Desbloqueo de rutas",
             "gameStart": "Inicio del juego",
@@ -165,9 +168,9 @@
             "genitive": "Evento"
         },
         "warp": {
-            "needStarCount": "Necesito {0} {1}",
+            "needStarCount": "Requiere {0} {1}",
             "placing": "Colocación:",
-            "to": "Para: {0}",
+            "to": "Hacia: {0}",
             "showStartScene": "Mostrar escena de inicio",
             "twoWay": "Dos-vías",
             "needFloor": "Necesita suelo",
@@ -175,12 +178,17 @@
                 "door": "Puerta",
                 "pipe": "Tubería",
                 "portal": "Puerto",
-                "style": "Estilo: "
+                "style": "Estilo: ",
+                "blipInstant": "Instantáneo"
             },
             "cannonExit": "Salida del cañón",
             "transit": {
                 "name1": "DESPLAZAMIENTO",
-                "name3": "CÍRCULO"
+                "name3": "CÍRCULO",
+                "name2": "DESVANECER",
+                "name0": "NADA",
+                "name4": "VOLTEAR (H)",
+                "name5": "VOLTEAR (V)"
             },
             "allow": "Permitir:",
             "starLockMessage": "Mensaje de bloqueo de estrella",
@@ -188,7 +196,12 @@
             "effect": "Efecto:",
             "target": "Objetivo: ",
             "speed": "Velocidad ",
-            "toMap": "Mapa"
+            "toMap": "Hacia el Mapa",
+            "item": "Objeto",
+            "needKey": "Requiere Llave",
+            "in": "Entrada",
+            "out": "Salida",
+            "title": "Configuración de Pasaje"
         },
         "letterRight": "R",
         "select": {
@@ -212,7 +225,10 @@
             "layers": "Capas",
             "file": "Archivo",
             "select": "Seleccione",
-            "scenes": "Escenas"
+            "scenes": "Escenas",
+            "tiles": "Baldosas",
+            "warps": "Pasajes",
+            "blocks": "Bloques"
         },
         "npc": {
             "ai": {
@@ -247,7 +263,10 @@
         "letterLeft": "L",
         "testPlay": {
             "magicHand": "Mano mágica",
-            "power": "Potencia"
+            "power": "Potencia",
+            "char": "Pers",
+            "pet": "Mascota",
+            "boot": "Bota"
         },
         "letterDown": "D",
         "mapPos": "Mapa Pos:",
@@ -264,18 +283,31 @@
             "noTurnBack": "Sin vuelta atrás",
             "underwater": "Bajo el agua",
             "offscreenExit": "Salida fuera de pantalla",
-            "scroll": "Desplácese por"
+            "scroll": "Desplácese por",
+            "horizWrap": "Env. Horizontal"
         },
         "phraseGenericIndex": "Número {0}",
         "letterUp": "U",
         "phraseCountMore": "{0} Más",
         "phraseRadiusIndex": "Radio {0}",
         "pageBlankOfBlank": "Página {0} de {1}",
-        "phraseWarpIndex": "Warp {0}",
+        "phraseWarpIndex": "Pasaje {0}",
         "phraseAreYouSure": "¿Seguro?",
         "toggleMagicBlock": "Bloque mágico",
         "phraseDelayIsMs": "Retraso: {0} ms",
-        "letterCoordY": "Y"
+        "letterCoordY": "Y",
+        "wordHeight": "Alto",
+        "wordWidth": "Ancho",
+        "wordInstant": "Instante",
+        "world": {
+            "introLevel": "Nivel de Introducción",
+            "name": "Nombre del Mundo",
+            "phraseCreditIndex": "Línea {0} de Créditos del Mundo:",
+            "retryOnFail": "Reintentar En Fallo",
+            "allowChars": "Permitir Personajes"
+        },
+        "wordMode": "Modo",
+        "wordText": "Texto"
     },
     "menu": {
         "game": {
@@ -335,7 +367,35 @@
                 }
             },
             "wordProfiles": "Perfiles",
-            "wordButtons": "Botones"
+            "wordButtons": "Botones",
+            "buttons": {
+                "altJump": "Salto Alternativo",
+                "start": "Comenzar",
+                "down": "Abajo",
+                "jump": "Saltar",
+                "drop": "Soltar Objeto",
+                "run": "Correr",
+                "altRun": "Correr Alternativo",
+                "up": "Arriba",
+                "left": "Izquierda",
+                "right": "Derecha"
+            },
+            "controlsInUse": "(En uso)",
+            "controlsNewProfile": "<Nuevo Perfil>",
+            "controlsDeleteKey": "(Salto Alternativo para Borrar)",
+            "controlsNotInUse": "(No en uso)",
+            "tDS": {
+                "buttonStart": "Comenzar"
+            },
+            "controlsDeviceTypes": "Tipos de Dispositivo",
+            "caseInvalid": "(Inválido)",
+            "controlsReallyDeleteProfile": "Realmente eliminar perfil?",
+            "controlsTitle": "Controles",
+            "touchscreen": {
+                "option": {
+                    "holdRun": "Mantener \"Correr\" al Comenzar"
+                }
+            }
         },
         "wordLanguage": "Idioma",
         "wordPlayer": "Jugador",
@@ -346,7 +406,16 @@
         "wordShow": "Mostrar",
         "wordNo": "No",
         "wordYes": "Si",
-        "wordOff": "Apagado"
+        "wordOff": "Apagado",
+        "character": {
+            "selectCharacter": "Juego de {0}",
+            "charSelTitle": "Selección de Personaje",
+            "startGame": "Comenzar Juego"
+        },
+        "battle": {
+            "errorNoLevels": "Imposible comenzar batalla debido a que no hay niveles disponibles"
+        },
+        "caseNone": "<Ninguno>"
     },
     "outro": {
         "originalBy": "Código original VB6 Por:",
@@ -360,5 +429,42 @@
         "nameVitalyNovichkov": "Vitaly Novichkov",
         "gameCredits": "Créditos del juego:"
     },
-    "pluralRules": "one-is-singular"
+    "pluralRules": "one-is-singular",
+    "game": {
+        "connect": {
+            "phraseTestControls": "Probar Controles",
+            "phraseChangeChar": "Cambiar Personaje",
+            "phrasePressAButton": "Presiona el Botón A",
+            "splitPressSelect_2": "Opciones de Controles",
+            "dropAddTitle": "Quitar/Añadir Jugadores",
+            "phraseStartToForceRes": "Presiona Comenzar para Forzar Resumir",
+            "splitPressSelect_1": "Presiona Select para",
+            "wordDisconnect": "Desconectar",
+            "phraseStartToResume": "Presiona Comenzar para Resumir",
+            "phraseHoldStart": "Mantén Comenzar",
+            "phraseWaitingForInput": "Esperando un dispositivo de entrada...",
+            "reconnectTitle": "Reconectar"
+        },
+        "error": {
+            "errorInvalidEnterWarp": "========= ERROR! =========\n\nImposible comenzar el nivel debido a que un pasaje de entrada inválido {1} fue especificado.\nTotal Pasajes de Entrada: {2}\n\nArchivo: {0}",
+            "openFileFailed": "ERROR: Imposible abrir \"{0}\": El archivo está corrupto o no existe.",
+            "warpNeedStarCount": "Necesitas {0} {1} para entrar.",
+            "errorNoStartPoint": "========= ERROR! =========\n\nImposible empezar nivel debido a que no hay puntos de comienzo colocados ni pasajes de entrada especificados.\n\nArchivo: {0}"
+        },
+        "pause": {
+            "dropAddPlayers": "Quitar/Añadir Jugadores",
+            "restartLevel": "Reiniciar Nivel",
+            "quit": "Salir",
+            "saveAndContinue": "Guardar y Continuar",
+            "resetCheckpoints": "Reiniciar Puntos de Control",
+            "saveAndQuit": "Guardar y Salir",
+            "returnToEditor": "Regresar al Editor",
+            "continue": "Continuar",
+            "quitTesting": "Dejar de Probar"
+        },
+        "controls": {
+            "phrasePlayerDisconnected": "P{0} desconectado"
+        }
+    },
+    "languageName": "Español"
 }

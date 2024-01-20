@@ -75,6 +75,7 @@
                 "autostart": "Autostart",
                 "controls": "Controls",
                 "endGame": "End Game",
+                "layerSmoke": "Smoke",
                 "sound": "Sound"
             },
             "sections": {
@@ -239,6 +240,7 @@
         "tooltip": {
             "BGOs": "BGOs",
             "NPCs": "NPCs",
+            "area": "Area",
             "blocks": "Blocks",
             "erase": "Erase",
             "eraseAll": "Erase All",
@@ -337,6 +339,7 @@
             "phraseStartToForceRes": "Press Start to Force Resume",
             "phraseStartToResume": "Press Start to Resume",
             "phraseTestControls": "Test Controls",
+            "phraseTestProfile": "Test Profile",
             "phraseWaitingForInput": "Waiting for input device...",
             "reconnectTitle": "Reconnect",
             "splitPressSelect_1": "Press Select for",
@@ -352,6 +355,12 @@
             "errorNoStartPoint": "========= ERROR! =========\n\nCan't start the level because of no available start points placed or entrance warp specified.\n\nFile: {0}",
             "openFileFailed": "ERROR: Can't open \"{0}\": file doesn't exist or corrupted.",
             "warpNeedStarCount": "You need {0} {1} to enter."
+        },
+        "message": {
+            "scanningLevels": "Scanning levels..."
+        },
+        "format": {
+            "minutesSeconds": "{0}m{1}s"
         },
         "pause": {
             "continue": "Continue",
@@ -541,6 +550,7 @@
         "editor": {
             "errorMissingResources": "Sorry! You are missing {0}, required for the in-game editor.",
             "errorResolution": "Sorry! The in-game editor is not supported at your current resolution.",
+            "battles": "<Battle Levels>",
             "newWorld": "<New World>",
             "promptNewWorldName": "New world name"
         },
@@ -573,6 +583,7 @@
             "optionsModeWindowed": "Windowed mode",
             "optionsViewCredits": "View credits",
             "render": "Render: {0}",
+            "renderAuto": "Render: Auto ({0})",
             "renderX": "Render: {0} (X)",
             "restartEngine": "Restart engine for changes to take effect.",
             "scale": {
