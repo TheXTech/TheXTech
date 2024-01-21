@@ -2200,10 +2200,28 @@ static void s_drawGameTypeTitle(int x, int y)
 
 static void s_drawGameSaves(int MenuX, int MenuY)
 {
-    int A = 1;
+    int page_count = s_GetCurrentSavesPageCount();
+    int current_page = MenuCursor / c_menuSavesPageLength;
 
+    // draw page indicator
+    if(page_count > 1)
+    {
+        int cX_base = MenuX + 100 - (16 * page_count) / 2 + 8;
+        int cY = MenuY - 10;
+
+        for(int i = 0; i < page_count; i++)
+        {
+            int cX = cX_base + i * 16;
+            int size = (current_page == i) ? 12 : 8;
+            uint8_t alpha = (current_page == i) ? 255 : 127;
+            XRender::renderRect(cX - size / 2, cY - size / 2, size, size, {0, 0, 0, alpha});
+            XRender::renderRect(cX - size / 2 + 2, cY - size / 2 + 2, size - 4, size - 4, {255, 255, 255, alpha});
+        }
+    }
+
+    // draw saves
     int page_offset = s_GetSavesPageSaveOffset();
-    for(; A <= c_menuSavesPerPage && page_offset + A <= maxSaveSlots; A++)
+    for(int A = 1; A <= c_menuSavesPerPage && page_offset + A <= maxSaveSlots; A++)
     {
         int posY = MenuY - 30 + (A * 30);
 
@@ -2240,7 +2258,7 @@ static void s_drawGameSaves(int MenuX, int MenuY)
         }
     }
 
-    A = c_menuSavesPerPage + 1;
+    int A = c_menuSavesPerPage + 1;
 
     if(MenuMode == MENU_SELECT_SLOT_1P || MenuMode == MENU_SELECT_SLOT_2P)
     {
@@ -2254,6 +2272,7 @@ static void s_drawGameSaves(int MenuX, int MenuY)
     if(save_slot < 1 || save_slot > maxSaveSlots || (MenuMode != MENU_SELECT_SLOT_1P && MenuMode != MENU_SELECT_SLOT_2P) || SaveSlotInfo[save_slot].Progress < 0)
         return;
 
+    // draw save slot info
     const auto& info = SaveSlotInfo[save_slot];
 
     int infobox_x = ScreenW / 2 - 240;
