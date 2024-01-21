@@ -69,12 +69,14 @@ void DoCredits(bool quit)
 
     int screenH_half = ScreenH / 2;
 
+    int shrink = vScreen[1].Top;
+
     CreditOffsetY -= 0.8;
 //    if(CreditOffsetY > ScreenH || CreditOffsetY + CreditTotalHeight < 0)
 //    {}
 
     // Closing screen
-    if((CreditOffsetY + CreditTotalHeight) < -100)
+    if((CreditOffsetY + CreditTotalHeight) < -shrink)
     {
         if(musicPlaying)
         {
@@ -99,13 +101,13 @@ void DoCredits(bool quit)
     }
 
         // Opening screen
-    else if(CreditChop > 100 && CreditOffsetY + CreditTotalHeight > 0)
+    else if(CreditChop > shrink && CreditOffsetY + CreditTotalHeight > 0)
     {
         CreditChop -= 2.0f;
-        if(CreditChop < 100)
-            CreditChop = 100;
+        if(CreditChop < shrink)
+            CreditChop = shrink;
 
-        if(CreditChop < 250 && !musicPlaying)
+        if(CreditChop < screenH_half - 50 && !musicPlaying)
         {
             if(bgMusic[0] <= 0) // Play default music if no music set in outro level
             {
@@ -118,7 +120,7 @@ void DoCredits(bool quit)
         }
     }
 
-    if(CreditChop <= 100 || EndCredits > 0)
+    if(CreditChop <= shrink || EndCredits > 0)
     {
 //        for(A = 1; A <= 2; A++) // Useless loop
 //        {

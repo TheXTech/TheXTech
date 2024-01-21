@@ -19,28 +19,17 @@
  */
 
 #pragma once
-#ifndef WORLD_GLOBALS_H
-#define WORLD_GLOBALS_H
+#ifndef NPC_ACTIVATION_H
+#define NPC_ACTIVATION_H
 
-#include "../screen_fader.h"
+#include "globals.h"
 
-//! Holds the screen overlay for the world map
-extern ScreenFader g_worldScreenFader;
+bool NPC_MustBeCanonical(NPCRef_t n);
 
-//! Multiplier for world map qScreen
-extern double g_worldCamSpeed;
+bool NPC_MustNotRenderInactive(const NPC_t& n);
 
-//! Play sound if world map qScreen stays active next frame
-extern bool g_worldPlayCamSound;
+bool NPC_MustRenderInactive(const NPC_t& n);
 
-//! NEW: set the world player's section variable based on its position
-extern void worldCheckSection(WorldPlayer_t& wp);
+void NPC_ConstructCanonicalSet();
 
-//! NEW: reset the world players' section variables without invoking qScreen
-extern void worldResetSection();
-
-extern void worldWaitForFade(int waitTicks = -1);
-
-extern bool worldHasFrameAssets();
-
-#endif // WORLD_GLOBALS_H
+#endif // #ifndef NPC_ACTIVATION_H

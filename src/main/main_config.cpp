@@ -176,6 +176,23 @@ void OpenConfig_preSetup()
         bool scale_down_all;
         config.read("scale-down-all-textures", scale_down_all, false);
         config.readEnum("scale-down-textures", g_videoSettings.scaleDownTextures, scale_down_all ? (int)VideoSettings_t::SCALE_ALL : (int)VideoSettings_t::SCALE_SAFE, scaleDownTextures);
+        config.read("internal-width", g_config.InternalW, 800);
+        config.read("internal-height", g_config.InternalH, 600);
+
+        ScreenW = g_config.InternalW;
+        ScreenH = g_config.InternalH;
+        // default res for full dynamic res
+        if(ScreenH == 0)
+        {
+            ScreenW = 1280;
+            ScreenH = 720;
+        }
+        // default res for dynamic width
+        else if(ScreenW == 0)
+        {
+            ScreenW = 800;
+        }
+
         IniProcessing::StrEnumMap scaleModes =
         {
             {"linear", SCALE_DYNAMIC_LINEAR},
@@ -238,11 +255,13 @@ void OpenConfig()
         const IniProcessing::StrEnumMap showEpisodeTitle
         {
             {"off", Config_t::EPISODE_TITLE_OFF},
-            {"on", Config_t::EPISODE_TITLE_ON},
-            {"transparent", Config_t::EPISODE_TITLE_TRANSPARENT},
+            {"on", Config_t::EPISODE_TITLE_BOTTOM},
+            {"transparent", Config_t::EPISODE_TITLE_BOTTOM},
+            {"bottom", Config_t::EPISODE_TITLE_BOTTOM},
+            {"top", Config_t::EPISODE_TITLE_TOP},
             {"0", Config_t::EPISODE_TITLE_OFF},
-            {"1", Config_t::EPISODE_TITLE_ON},
-            {"2", Config_t::EPISODE_TITLE_TRANSPARENT}
+            {"1", Config_t::EPISODE_TITLE_BOTTOM},
+            {"2", Config_t::EPISODE_TITLE_BOTTOM}
         };
 
         const IniProcessing::StrEnumMap starsShowPolicy =
@@ -261,6 +280,13 @@ void OpenConfig()
             {"counts-only", Config_t::MEDALS_SHOW_COUNTS},
             {"show", Config_t::MEDALS_SHOW_FULL},
             {"show-full", Config_t::MEDALS_SHOW_FULL}
+        };
+
+        const IniProcessing::StrEnumMap renderInactiveNPC =
+        {
+            {"hide", Config_t::INACTIVE_NPC_HIDE},
+            {"shade", Config_t::INACTIVE_NPC_SHADE},
+            {"show", Config_t::INACTIVE_NPC_SHOW},
         };
 
         config.beginGroup("main");
@@ -308,6 +334,9 @@ void OpenConfig()
         config.read("enable-bowser-iiird-screen-shake", g_config.GameplayShakeScreenBowserIIIrd, true);
         config.read("sfx-player-grow-with-got-item", g_config.SoundPlayerGrowWithGetItem, false);
         config.read("enable-inter-level-fade-effect", g_config.EnableInterLevelFade, true);
+        // config.readEnum("render-inactive-npc", g_config.render_inactive_NPC, (int)Config_t::INACTIVE_NPC_SHADE, renderInactiveNPC);
+        // config.read("autocode-translate-coords", g_config.autocode_translate_coords, true);
+        // config.read("small-screen-camera-features", g_config.small_screen_camera_features, false);
         config.endGroup();
 
         Controls::LoadConfig(ctl);
@@ -405,8 +434,8 @@ void SaveConfig()
         std::unordered_map<int, std::string> showEpisodeTitle =
         {
             {Config_t::EPISODE_TITLE_OFF, "off"},
-            {Config_t::EPISODE_TITLE_ON, "on"},
-            {Config_t::EPISODE_TITLE_TRANSPARENT, "transparent"}
+            {Config_t::EPISODE_TITLE_TOP, "top"},
+            {Config_t::EPISODE_TITLE_BOTTOM, "bottom"}
         };
 
         std::unordered_map<int, std::string> scaleDownTextures =
@@ -427,6 +456,8 @@ void SaveConfig()
         config.setValue("battery-status", batteryStatus[g_videoSettings.batteryStatus]);
         config.setValue("osk-fill-screen", g_config.osk_fill_screen);
         config.setValue("show-episode-title", showEpisodeTitle[g_config.show_episode_title]);
+        config.setValue("internal-width", g_config.InternalW);
+        config.setValue("internal-height", g_config.InternalH);
         config.setValue("scale-mode", ScaleMode_strings.at(g_videoSettings.scaleMode));
     }
     config.endGroup();
@@ -510,6 +541,9 @@ void SaveConfig()
         config.setValue("enable-bowser-iiird-screen-shake", g_config.GameplayShakeScreenBowserIIIrd);
         config.setValue("sfx-player-grow-with-got-item", g_config.SoundPlayerGrowWithGetItem);
         config.setValue("enable-inter-level-fade-effect", g_config.EnableInterLevelFade);
+
+        // config.setValue("autocode-translate-coords", g_config.autocode_translate_coords);
+        // config.setValue("small-screen-camera-features", g_config.small_screen_camera_features);
     }
     config.endGroup();
 

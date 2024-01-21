@@ -81,7 +81,7 @@ static bool s_Continue()
 
 static bool s_RestartLevel()
 {
-    MenuMode = MENU_MAIN;
+    MenuMode = MENU_INTRO;
     MenuCursor = 0;
     XRender::setTargetTexture();
     XRender::clearBuffer();
@@ -137,7 +137,7 @@ static bool s_CheatScreen()
 
 static bool s_QuitTesting()
 {
-    MenuMode = MENU_MAIN;
+    MenuMode = MENU_INTRO;
     MenuCursor = 0;
     XRender::setTargetTexture();
     XRender::clearBuffer();
@@ -185,7 +185,7 @@ static bool s_Quit()
     s_cheat_menu_bits = 0;
     GameMenu = true;
 
-    MenuMode = MENU_MAIN;
+    MenuMode = MENU_INTRO;
     MenuCursor = 0;
 
     if(!LevelSelect)

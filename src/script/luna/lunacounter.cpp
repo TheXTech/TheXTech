@@ -30,6 +30,7 @@
 #include "renderop_string.h"
 #include "globals.h"
 #include "graphics.h"
+#include "config.h"
 #include "game_main.h"
 #include "core/render.h"
 #include "main/menu_main.h"
@@ -377,6 +378,11 @@ void DeathCounter::Draw(int screenZ)
     // HUD is very wide in >2P shared screen
     bool wide_hud = (screen.Type == ScreenTypes::SharedScreen && screen.player_count > 2);
 
+    int ScreenTop = 0;
+    if(vscreen.Height > 600)
+        ScreenTop = vscreen.Height / 2 - 300;
+    int HUDLeft = vscreen.Width / 2 - 400;
+
     // With normal res, print to screen in upper left
     if(vscreen.Width >= 800 && !wide_hud)
     {
@@ -387,8 +393,8 @@ void DeathCounter::Draw(int screenZ)
         title_X &= ~1;
         counter_X &= ~1;
 
-        SuperPrint(gDemoCounterTitle, m_print.font, title_X, 26);
-        SuperPrint(m_print.counterOut, m_print.font, counter_X, 48);
+        SuperPrint(gDemoCounterTitle, m_print.font, HUDLeft + title_X, ScreenTop + 26);
+        SuperPrint(m_print.counterOut, m_print.font, HUDLeft + counter_X, ScreenTop + 48);
     }
     // At low res, print to top of screen
     else
@@ -401,8 +407,8 @@ void DeathCounter::Draw(int screenZ)
         title_X &= ~1;
         counter_X &= ~1;
 
-        SuperPrint(gDemoCounterTitle, m_print.font, title_X, 0);
-        SuperPrint(m_print.counterOut, m_print.font, counter_X, 0);
+        SuperPrint(gDemoCounterTitle, m_print.font, title_X, ScreenTop);
+        SuperPrint(m_print.counterOut, m_print.font, counter_X, ScreenTop);
     }
 
     XRender::offsetViewportIgnore(false);

@@ -19,28 +19,22 @@
  */
 
 #pragma once
-#ifndef WORLD_GLOBALS_H
-#define WORLD_GLOBALS_H
+#ifndef GFX_WORLD_H
+#define GFX_WORLD_H
 
-#include "../screen_fader.h"
+struct vScreen_t;
+struct Player_t;
 
-//! Holds the screen overlay for the world map
-extern ScreenFader g_worldScreenFader;
+//! Checks whether the world map frame assets exist and are valid
+bool worldHasFrameAssets();
 
-//! Multiplier for world map qScreen
-extern double g_worldCamSpeed;
+//! Get the vscreen for a world player, with world section bounds checking
+void GetvScreenWorld(vScreen_t& vscreen);
 
-//! Play sound if world map qScreen stays active next frame
-extern bool g_worldPlayCamSound;
+//! Draws world map frame around vscreen in its screen
+void DrawWorldMapFrame(const vScreen_t& vscreen);
 
-//! NEW: set the world player's section variable based on its position
-extern void worldCheckSection(WorldPlayer_t& wp);
+//! Draws a player for the world map HUD, at coordinates X (left) and Y (bottom)
+void DrawPlayerWorld(Player_t& p, int X, int Y);
 
-//! NEW: reset the world players' section variables without invoking qScreen
-extern void worldResetSection();
-
-extern void worldWaitForFade(int waitTicks = -1);
-
-extern bool worldHasFrameAssets();
-
-#endif // WORLD_GLOBALS_H
+#endif // GFX_WORLD_H

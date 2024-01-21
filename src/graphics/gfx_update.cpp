@@ -30,6 +30,7 @@
 #include "../collision.h"
 #include "../editor.h"
 #include "../npc.h"
+#include "../player.h"
 #include "../gfx.h"
 #include "../layers.h"
 #include "../main/menu_main.h"
@@ -39,6 +40,7 @@
 #include "../main/screen_connect.h"
 #include "../main/screen_quickreconnect.h"
 #include "../main/screen_textentry.h"
+#include "../main/cheat_code.h"
 #include "../compat.h"
 #include "../config.h"
 #include "../game_main.h"
@@ -47,12 +49,17 @@
 #include "../core/render.h"
 #include "../script/luna/luna.h"
 
+#include "npc/npc_activation.h"
+#include "npc/npc_queues.h"
+#include "npc/section_overlap.h"
+
 #include "effect.h"
 #include "npc_id.h"
 #include "eff_id.h"
 #include "draw_planes.h"
 
 #include "graphics/gfx_special_frames.h"
+#include "graphics/gfx_camera.h"
 #include "graphics/gfx_keyhole.h"
 
 #ifdef THEXTECH_BUILD_GL_MODERN
@@ -61,9 +68,6 @@
 
 #include <fmt_format_ne.h>
 #include <Utils/maths.h>
-
-#include "npc/npc_queues.h"
-#include "npc/section_overlap.h"
 
 struct ScreenShake_t
 {
@@ -160,6 +164,7 @@ struct ScreenShake_t
 };
 
 static ScreenShake_t s_shakeScreen;
+static bool s_forcedShakeScreen = false;
 
 //static double s_shakeScreenX = 0;
 //static double s_shakeScreenY = 0;
@@ -308,6 +313,16 @@ public:
         }
     }
 
+    void add_warning(uint16_t A)
+    {
+        if(Warning_n != sizeof(Warning) / sizeof(uint16_t))
+        {
+            Warning[Warning_n] = A;
+            Warning_n += 1;
+            g_stats.renderedNPCs += 1;
+        }
+    }
+
     // sort each queue properly
     void sort()
     {
@@ -324,6 +339,198 @@ public:
 };
 
 NPC_Draw_Queue_t NPC_Draw_Queue[maxLocalPlayers] = {NPC_Draw_Queue_t(), NPC_Draw_Queue_t()};
+
+constexpr int NPC_intro_length = 8;
+constexpr float NPC_shade_opacity = 0.4f;
+constexpr size_t NPC_intro_count_MAX = 32;
+
+uint8_t NPC_intro_count = 0;
+int16_t NPC_intro[NPC_intro_count_MAX];
+// positive values represent just-activated onscreen NPCs; negative values represent conditionally active NPCs
+int8_t NPC_intro_frame[NPC_intro_count_MAX];
+
+inline void ProcessIntroNPCFrames()
+{
+    for(uint8_t i = 0; i < NPC_intro_count; i++)
+    {
+        NPC_intro_frame[i]++;
+
+        // two termination conditions, remove the NPC from the intro list either way
+        if(NPC_intro_frame[i] == NPC_intro_length || NPC_intro_frame[i] == 0)
+        {
+            NPC_intro_count--;
+            NPC_intro[i] = NPC_intro[NPC_intro_count];
+            NPC_intro_frame[i] = NPC_intro_frame[NPC_intro_count];
+
+            // don't advance the iteration counter, since a new NPC is here now
+            i--;
+        }
+    }
+}
+
+// tints NPCS
+static inline void s_get_NPC_tint(int A, XTColor& cn)
+{
+    const NPC_t& n = NPC[A];
+
+    if(!LevelEditor && g_config.render_inactive_NPC == Config_t::INACTIVE_NPC_SHADE)
+    {
+        if(!n.Active)
+        {
+            if(!NPC_MustRenderInactive(n))
+            {
+                cn = XTColorF(0.0f, 0.0f, 0.0f, 0.4f);
+                return;
+            }
+        }
+        else for(uint8_t i = 0; i < NPC_intro_count; i++)
+        {
+            if(NPC_intro[i] == A)
+            {
+                if(NPC_intro_frame[i] >= 0)
+                {
+                    float coord = NPC_intro_frame[i] / (float)NPC_intro_length;
+                    cn = XTColorF(coord, coord, coord);
+                    cn.a = XTColor::from_float(NPC_shade_opacity + coord * (1.0f - NPC_shade_opacity));
+                    return;
+                }
+                break;
+            }
+        }
+    }
+
+    cn = n.Shadow ? XTColor(0, 0, 0) : XTColor();
+}
+
+// draws a warning icon for offscreen active NPC A on vScreen Z
+void DrawWarningNPC(int Z, int A)
+{
+    XTColor cn;
+    s_get_NPC_tint(A, cn);
+
+    double scr_x, scr_y, w, h, frame_h;
+    double frame_x = 0, frame_y = 0;
+
+    // some special cases: plants that come from below
+    if(NPC[A].Type == 8 || NPC[A].Type == 74 || NPC[A].Type == 93 || NPC[A].Type == 245 || NPC[A].Type == 256 || NPC[A].Type == 270)
+    {
+        scr_x = vScreen[Z].X + NPC[A].Location.X + NPCFrameOffsetX[NPC[A].Type];
+        scr_y = vScreen[Z].Y + NPC[A].Location.Y + NPCFrameOffsetY[NPC[A].Type];
+        w = NPC[A].Location.Width;
+        h = NPC[A].Location.Height;
+        frame_h = NPCHeight[NPC[A].Type];
+    }
+    // plants from above
+    else if(NPC[A].Type == 51 || NPC[A].Type == 257)
+    {
+        scr_x = vScreen[Z].X + NPC[A].Location.X + NPCFrameOffsetX[NPC[A].Type];
+        scr_y = vScreen[Z].Y + NPC[A].Location.Y + NPCFrameOffsetY[NPC[A].Type],
+        w = NPC[A].Location.Width;
+        h = NPC[A].Location.Height;
+        frame_h = NPCHeight[NPC[A].Type];
+        frame_y = NPCHeight[NPC[A].Type] - NPC[A].Location.Height;
+    }
+    // plants from side
+    else if(NPC[A].Type == 52)
+    {
+        if(NPC[A].Direction == -1)
+        {
+            scr_x = vScreen[Z].X + NPC[A].Location.X + NPCFrameOffsetX[NPC[A].Type];
+            scr_y = vScreen[Z].Y + NPC[A].Location.Y + NPCFrameOffsetY[NPC[A].Type];
+            w = NPC[A].Location.Width;
+            frame_h = h = NPC[A].Location.Height;
+        }
+        else
+        {
+            scr_x = vScreen[Z].X + NPC[A].Location.X + NPCFrameOffsetX[NPC[A].Type];
+            scr_y = vScreen[Z].Y + NPC[A].Location.Y + NPCFrameOffsetY[NPC[A].Type];
+            w = NPC[A].Location.Width;
+            frame_x = NPCWidth[NPC[A].Type] - NPC[A].Location.Width;
+            frame_h = h = NPC[A].Location.Height;
+        }
+    }
+    else if(NPCWidthGFX[NPC[A].Type] == 0)
+    {
+        scr_x = vScreen[Z].X + NPC[A].Location.X + NPCFrameOffsetX[NPC[A].Type];
+        scr_y = vScreen[Z].Y + NPC[A].Location.Y + NPCFrameOffsetY[NPC[A].Type];
+        w = NPC[A].Location.Width;
+        frame_h = h = NPC[A].Location.Height;
+    }
+    else
+    {
+        scr_x = vScreen[Z].X + NPC[A].Location.X + (NPCFrameOffsetX[NPC[A].Type] * -NPC[A].Direction) - NPCWidthGFX[NPC[A].Type] / 2.0 + NPC[A].Location.Width / 2.0;
+        scr_y = vScreen[Z].Y + NPC[A].Location.Y + NPCFrameOffsetY[NPC[A].Type] - NPCHeightGFX[NPC[A].Type] + NPC[A].Location.Height;
+        w = NPCWidthGFX[NPC[A].Type];
+        frame_h = h = NPCHeightGFX[NPC[A].Type];
+    }
+
+    double left_x = -scr_x;
+    double right_x = scr_x + w - vScreen[Z].Width;
+
+    double add_x = (left_x > 0 ? left_x : (right_x > 0 ? -right_x : 0));
+
+    double top_y = -scr_y;
+    double bottom_y = scr_y + h - vScreen[Z].Height;
+
+    double add_y = (top_y > 0 ? top_y : (bottom_y > 0 ? -bottom_y : 0));
+
+    int total_off = (add_x > 0 ? add_x : -add_x)
+        + (add_y > 0 ? add_y : -add_y);
+
+    if(total_off >= 250)
+        return;
+
+    int a_scale = (int(cn.a) * (250 - total_off)) / 500;
+    if(a_scale > 255)
+        a_scale = 255;
+
+    cn.a = uint8_t(a_scale);
+
+    double scale = 0.25 + (250.0 - total_off) / 500.0;
+
+    scr_x += w * (1 - scale) / 2;
+    scr_y += h * (1 - scale);
+
+    double exclam_x = 0.5;
+    double exclam_y = 0.5;
+
+    // push it onto the screen
+    if(scr_x < 0)
+    {
+        scr_x = 0;
+        exclam_x = 0.25;
+    }
+    else if(scr_x + w * scale > vScreen[Z].Width)
+    {
+        scr_x = vScreen[Z].Width - w * scale;
+        exclam_x = 0.75;
+    }
+
+    if(scr_y < 0)
+    {
+        scr_y = 0;
+        exclam_y = 0.25;
+    }
+    else if(scr_y + h * scale > vScreen[Z].Height)
+    {
+        scr_y = vScreen[Z].Height - h * scale;
+        exclam_y = 0.75;
+    }
+
+    XRender::renderTextureScaleEx(scr_x,
+        scr_y,
+        w * scale, h * scale,
+        GFXNPC[NPC[A].Type],
+        frame_x, NPC[A].Frame * frame_h + frame_y,
+        w, h,
+        0, nullptr, X_FLIP_NONE,
+        cn);
+
+    XRender::renderTexture(scr_x + (w * scale - GFX.Chat.w) * exclam_x,
+        scr_y + (h * scale - GFX.Chat.h) * exclam_y,
+        GFX.Chat,
+        {255, 0, 0, cn.a});
+}
 
 // code to facilitate cached values for the onscreen blocks and BGOs
 // intentionally only initialize the vectors for the first 2 screens since >2P mode is rare
@@ -442,15 +649,19 @@ void s_UpdateDrawItems(Screen_t& screen, int i)
 
 void GraphicsLazyPreLoad()
 {
+    // FIXME: update to work for multiple screens
     // TODO: check if this is needed at caller
-    SetupScreens();
-    if(ScreenType == 5)
-        DynamicScreen(Screens[0]);
+    SetupScreens(false);
+
+    // TODO: check whether this is even safe
+    DynamicScreens();
 
     int numScreens = Screens[0].active_end();
 
     if(SingleCoop == 2)
         numScreens = 1; // fine to be 1, since it would just be run for Z = 2 twice otherwise;
+
+    CenterScreens(Screens[0]);
 
     For(Z, 1, numScreens)
     {
@@ -776,6 +987,373 @@ void ClassicNPCScreenLogic(int Z, int numScreens, bool fill_draw_queue, NPC_Draw
         NPC_Draw_Queue_p.sort();
 }
 
+// does the modern NPC activation / reset logic for vScreen Z
+void ModernNPCScreenLogic(Screen_t& screen, int vscreen_i, bool fill_draw_queue, NPC_Draw_Queue_t& NPC_Draw_Queue_p)
+{
+    int Z = screen.vScreen_refs[vscreen_i];
+
+    // canonical vScreens
+    int c_Z1 = 0;
+    int c_Z2 = 0;
+
+    if(!screen.is_canonical())
+    {
+        Screen_t& c_screen = screen.canonical_screen();
+
+        // canonical screen might have different split than visible screen
+        if(c_screen.Type == 5)
+        {
+            // visible shared, canonical split
+            if(screen.DType == 5 && c_screen.DType != 5)
+            {
+                c_Z1 = c_screen.vScreen_refs[0];
+                c_Z2 = c_screen.vScreen_refs[1];
+            }
+            // visible split, canonical shared
+            else if(screen.DType != 5 && c_screen.DType == 5)
+            {
+                c_Z1 = c_screen.vScreen_refs[0];
+            }
+            // same mode, use same vScreen index
+            else
+            {
+                c_Z1 = c_screen.vScreen_refs[vscreen_i];
+            }
+        }
+        // same mode, use same vScreen index
+        else
+        {
+            c_Z1 = c_screen.vScreen_refs[vscreen_i];
+        }
+    }
+
+    // using bitset here instead of simpler set because I benchmarked it to be faster -- ds-sloth
+    // the purpose of this logic is to avoid duplicates in the checkNPCs vector
+    std::bitset<maxNPCs>& NPC_present = s_NPC_present;
+
+    // find the onscreen NPCs; first, get query bounds that cover all 3 possible screens
+    double bounds_left = -vScreen[Z].X;
+    double bounds_top = -vScreen[Z].Y;
+    double bounds_right = -vScreen[Z].X + vScreen[Z].Width;
+    double bounds_bottom = -vScreen[Z].Y + vScreen[Z].Height;
+
+    if(c_Z1)
+    {
+        bounds_left = SDL_min(bounds_left, -vScreen[c_Z1].X);
+        bounds_top = SDL_min(bounds_top, -vScreen[c_Z1].Y);
+        bounds_right = SDL_max(bounds_right, -vScreen[c_Z1].X + vScreen[c_Z1].Width);
+        bounds_bottom = SDL_max(bounds_bottom, -vScreen[c_Z1].Y + vScreen[c_Z1].Height);
+    }
+
+    if(c_Z2)
+    {
+        bounds_left = SDL_min(bounds_left, -vScreen[c_Z2].X);
+        bounds_top = SDL_min(bounds_top, -vScreen[c_Z2].Y);
+        bounds_right = SDL_max(bounds_right, -vScreen[c_Z2].X + vScreen[c_Z2].Width);
+        bounds_bottom = SDL_max(bounds_bottom, -vScreen[c_Z2].Y + vScreen[c_Z2].Height);
+    }
+
+    TreeResult_Sentinel<NPCRef_t> _screenNPCs = treeNPCQuery(bounds_left, bounds_top,
+        bounds_right, bounds_bottom, SORTMODE_NONE);
+
+
+    // combine the onscreen NPCs with the no-reset NPCs
+    std::vector<BaseRef_t>& checkNPCs = *_screenNPCs.i_vec;
+
+    // mark previous ones as checked
+    for(int16_t n : checkNPCs)
+        NPC_present[n] = true;
+
+    // add the previous frame's no-reset NPCs (without duplicates)
+    for(int16_t n : s_NoReset_NPCs_LastFrame)
+    {
+        if(n <= numNPCs && !NPC_present[n])
+        {
+            checkNPCs.push_back(n);
+            NPC_present[n] = true;
+        }
+    }
+
+    // cleanup the checked NPCs
+    for(int16_t n : checkNPCs)
+        NPC_present[n] = false;
+
+    Location_t loc2;
+
+    for(int A : checkNPCs)
+    {
+        g_stats.checkedNPCs++;
+
+        // there are three related things we will determine:
+        // - is the NPC onscreen for rendering?
+        // - can we reset the NPC (respawn it to its original location)?
+        // - can we activate the NPC?
+
+        // they are normally the same thing -- onscreen -- but we need to separate them to support multiple resolutions.
+
+        bool loc2_exists;
+        if(NPC[A].Effect == 0 && NPC[A].HoldingPlayer == 0 && !NPC[A].Generator &&
+                (NPC[A].standingOnPlayer > 0 || NPC[A].Type == 56 || NPC[A].Type == 22
+                    || NPC[A].Type == 49 || NPC[A].Type == 91 || NPC[A].Type == 160
+                    || NPC[A].Type == 282 || NPCIsACoin[NPC[A].Type] || NPC[A].Type == 263))
+        {
+            loc2_exists = true;
+            loc2 = newLoc(NPC[A].Location.X - (NPCWidthGFX[NPC[A].Type] - NPC[A].Location.Width) / 2.0,
+                NPC[A].Location.Y,
+                NPCWidthGFX[NPC[A].Type],
+                NPCHeight[NPC[A].Type]);
+            // not sure why loc2 does not consider NPCHeightGFX...
+        }
+        else
+            loc2_exists = false;
+
+        bool render, cannot_reset, can_activate;
+
+        if(NPC[A].Hidden)
+        {
+            render = cannot_reset = can_activate = false;
+        }
+        else
+        {
+            render = vScreenCollision(Z, NPC[A].Location) || (loc2_exists && vScreenCollision(Z, loc2));
+
+            bool onscreen_canonical = false;
+
+            // check canonical screen
+            if(c_Z1)
+            {
+                onscreen_canonical = (vScreenCollision(c_Z1, NPC[A].Location)
+                    || (loc2_exists && vScreenCollision(c_Z1, loc2)));
+            }
+            // fallback to Z itself if no canonical screen exists
+            else
+            {
+                onscreen_canonical = render;
+            }
+
+            // add second canonical screen if needed
+            if(c_Z2 && !onscreen_canonical)
+            {
+                onscreen_canonical = (vScreenCollision(c_Z2, NPC[A].Location)
+                    || (loc2_exists && vScreenCollision(c_Z2, loc2)));
+            }
+
+            cannot_reset = (render || onscreen_canonical);
+
+            // Possible situations where we need to activate as original:
+            if(
+                   ForcedControls
+                || LevelMacro != LEVELMACRO_OFF
+                || qScreen_canonical
+                || NPC_MustBeCanonical(A)
+            )
+                can_activate = onscreen_canonical;
+            else
+                can_activate = render;
+
+            // can_activate = cannot_reset = onscreen_canonical;
+        }
+
+        if(NPC[A].Generator)
+        {
+            NPC[A].GeneratorActive |= can_activate;
+            continue;
+        }
+
+        if(NPC[A].Type == 0)
+        {
+            render = false;
+        }
+
+        // find the intro frame index for this NPC; will be NPC_intro_count if not found
+        uint8_t NPC_intro_index;
+        for(NPC_intro_index = 0; NPC_intro_index < NPC_intro_count; NPC_intro_index++)
+        {
+            if(NPC_intro[NPC_intro_index] == A)
+                break;
+        }
+
+        // Handle the game's "conditional activation" state where NPC is activated *without* its events being triggered,
+        //   with TimeLeft = 0 by the time we get to rendering. In this case, "resetting" means "not activating",
+        //   so it's essential that we set cannot_reset to follow can_activate for this frame and the next one
+        //   (when Reset[1] and Reset[2] need to become true).
+
+        // Note that this condition, NPC[A].TimeLeft == 0 or 1, is practically never encountered when the NPC is onscreen,
+        //   except in the conditional activation code.
+        if(NPC[A].TimeLeft == 0 || NPC[A].TimeLeft == 1)
+        {
+            if(render && !can_activate)
+            {
+                // add it to the set of NPCs in intro/conditional states if not already present
+                if(NPC_intro_index == NPC_intro_count && NPC_intro_count < NPC_intro_count_MAX)
+                {
+                    NPC_intro[NPC_intro_index] = A;
+                    NPC_intro_count++;
+                }
+
+                // if it was already in the set, or if it was successfully added,
+                // set its intro frame to -2 to give it 2 frames of allowing it to reset while onscreen
+                if(NPC_intro_index < NPC_intro_count)
+                    NPC_intro_frame[NPC_intro_index] = -2;
+            }
+        }
+
+        // if the NPC is in the "conditional activation" state but didn't activate, then allow it to reset even when onscreen
+        if(NPC_intro_index < NPC_intro_count && NPC_intro_frame[NPC_intro_index] < 0)
+        {
+            cannot_reset = can_activate;
+        }
+
+        // this section of the logic handles NPCs that are onscreen but not active yet
+        if(!NPC[A].Active && render)
+        {
+            // Don't show a Cheep that hasn't jumped yet, a podoboo that hasn't started coming out yet,
+            //   a piranha plant that hasn't emerged yet, etc. Also, don't do poofs for them, etc.
+            if(NPC_MustNotRenderInactive(NPC[A]))
+            {
+                render = false;
+            }
+
+            else if(g_config.render_inactive_NPC != Config_t::INACTIVE_NPC_SHOW && !NPC_MustRenderInactive(NPC[A]))
+            {
+                // add to queue of hidden NPCs
+                if(!can_activate)
+                {
+                    if(NPC_intro_index == NPC_intro_count && NPC_intro_count < NPC_intro_count_MAX)
+                    {
+                        NPC_intro[NPC_intro_index] = A;
+                        NPC_intro_frame[NPC_intro_index] = 0;
+                        NPC_intro_count++;
+                    }
+
+                    // keep it hidden
+                    if(NPC_intro_index < NPC_intro_count && NPC_intro_frame[NPC_intro_index] >= 0)
+                    {
+                        NPC_intro_frame[NPC_intro_index] = 0;
+                    }
+                }
+
+                // if in "poof" mode, render this effect here
+                if(g_config.render_inactive_NPC == Config_t::INACTIVE_NPC_HIDE)
+                {
+                    if(can_activate && (NPC[A].Reset[1] && NPC[A].Reset[2]))
+                    {
+                        // if it was hidden, then add the poof effect!
+                        if(NPC_intro_index < NPC_intro_count && NPC_intro_frame[NPC_intro_index] > 0)
+                        {
+                            Location_t tempLocation = NPC[A].Location;
+                            tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[10] / 2.0;
+                            tempLocation.Y += tempLocation.Height / 2.0 - EffectHeight[10] / 2.0;
+                            NewEffect(10, tempLocation);
+                        }
+                    }
+                    else
+                    {
+                        render = false;
+                    }
+                }
+            }
+        }
+
+
+        // activate the NPC if allowed
+        if(can_activate)
+        {
+            if(NPC[A].Type == 0) // what is this?
+            {
+                NPC[A].Killed = 9;
+                KillNPC(A, 9);
+
+                NPCQueues::Killed.push_back(A);
+            }
+            else if(!NPC[A].Active && NPC[A].Effect != 2
+                && ((NPC[A].Reset[1] && NPC[A].Reset[2]) || NPC[A].Type == NPCID_CONVEYOR))
+            {
+                NPC[A].JustActivated = Z;
+
+                if(!NPC[A].Active)
+                {
+                    NPCQueues::Active.insert(A);
+                    NPC[A].Active = true;
+                }
+            }
+        }
+
+        // track the NPC's reset timer
+        if(cannot_reset)
+        {
+            if(NPC[A].Type != 0
+                && ((NPC[A].Reset[1] && NPC[A].Reset[2]) || NPC[A].Active || NPC[A].Type == NPCID_CONVEYOR))
+            {
+                if(
+                       NPCIsYoshi[NPC[A].Type] || NPCIsBoot[NPC[A].Type] || NPC[A].Type == NPCID_POWER_S3
+                    || NPC[A].Type == NPCID_FIRE_POWER_S3 || NPC[A].Type == NPCID_CANNONITEM || NPC[A].Type == NPCID_LIFE_S3
+                    || NPC[A].Type == NPCID_POISON || NPC[A].Type == NPCID_STATUE_POWER || NPC[A].Type == NPCID_HEAVY_POWER || NPC[A].Type == NPCID_FIRE_POWER_S1
+                    || NPC[A].Type == NPCID_FIRE_POWER_S4 || NPC[A].Type == NPCID_POWER_S1 || NPC[A].Type == NPCID_POWER_S4
+                    || NPC[A].Type == NPCID_LIFE_S1 || NPC[A].Type == NPCID_LIFE_S4 || NPC[A].Type == NPCID_3_LIFE || NPC[A].Type == NPCID_FLIPPED_RAINBOW_SHELL
+                    || NPC[A].Type == NPCID_PLATFORM_S3
+                )
+                    NPC[A].TimeLeft = Physics.NPCTimeOffScreen * 20;
+                else
+                    NPC[A].TimeLeft = Physics.NPCTimeOffScreen;
+            }
+
+            // mark reset if it is currently active, or it has never been offscreen since deactivating
+            if((NPC[A].Active || !NPC[A].Reset[2]) && NPC[A].Reset[1])
+            {
+                NPC[A].Reset[1] = false;
+                // only need to mark current-frame state
+                // NPC[A].Reset[2] = false;
+
+                NPCQueues::NoReset.push_back(A);
+            }
+        }
+        else
+        {
+            // Reset was previously cleared here, but now it is cleared in the main UpdateGraphics function
+            // NPC[A].Reset[Z] = true;
+            // if(numScreens == 1)
+            //     NPC[A].Reset[2] = true;
+            // if(SingleCoop == 1)
+            //     NPC[A].Reset[2] = true;
+            // else if(SingleCoop == 2)
+            //     NPC[A].Reset[1] = true;
+        }
+
+        const Player_t& hp = Player[NPC[A].HoldingPlayer];
+        bool hp_door_scroll = (NPC[A].HoldingPlayer > 0 && hp.Effect == 7 && hp.Effect2 >= 128);
+
+        if(hp_door_scroll)
+            render = false;
+
+        if(fill_draw_queue && render && ((NPC[A].Reset[1] && NPC[A].Reset[2]) || NPC[A].Active || NPC[A].Type == NPCID_CONVEYOR))
+        {
+            NPC_Draw_Queue_p.add(A);
+
+            // just for appearance, do the NPC's frames if it hasn't been activated yet and isn't in a shade / hidden mode
+            if(!NPC[A].Active && !FreezeNPCs)
+            {
+                bool in_hidden_mode = NPC_intro_index < NPC_intro_count && NPC_intro_frame[NPC_intro_index] >= 0;
+                if(!in_hidden_mode)
+                {
+                    NPCFrames(A);
+                }
+            }
+        }
+        else if(fill_draw_queue && g_config.small_screen_camera_features && NPC[A].Active && cannot_reset && NPC[A].JustActivated == 0 && !NPC[A].Inert && NPC[A].Type != NPCID_CONVEYOR)
+        {
+            if(NPC[A].Location.SpeedX != 0 || NPC[A].Location.SpeedY != 0
+                || (!NPCWontHurt[NPC[A].Type] && !NPCIsACoin[NPC[A].Type] && !NPCIsABonus[NPC[A].Type]))
+            {
+                NPC_Draw_Queue_p.add_warning(A);
+            }
+        }
+    }
+
+    if(fill_draw_queue)
+        NPC_Draw_Queue_p.sort();
+}
+
 //! all of the logic done by UpdateGraphics
 void UpdateGraphicsLogic(bool Do_FrameSkip);
 
@@ -826,17 +1404,29 @@ void UpdateGraphicsLogic(bool Do_FrameSkip)
     //   logic components of the full rendering code.)
     // NPC render queue formation is also here.
 
-    if(ScreenType == 5)
-        DynamicScreen(Screens[0]);
-
     g_stats.reset();
 
+    SetupScreens(false);
+    DynamicScreens();
+    CenterScreens();
+
     bool continue_qScreen = false; // will qScreen continue for any visible screen?
+    bool continue_qScreen_local = false; // will qScreen continue for a visible screen on the local machine? (NetPlay)
+    bool continue_qScreen_canonical = false; // will qScreen continue for any canonical screen?
 
     // prepare to fill this frame's NoReset queue
     std::swap(NPCQueues::NoReset, s_NoReset_NPCs_LastFrame);
     NPCQueues::NoReset.clear();
 
+    // mark the last-frame reset state of NPCs that may have Reset[0] set to false, and clear their this-frame reset state
+    if(g_compatibility.modern_npc_camera_logic)
+    {
+        for(NPC_t& n : s_NoReset_NPCs_LastFrame)
+        {
+            n.Reset[2] = n.Reset[1] && n.Reset[2];
+            n.Reset[1] = true;
+        }
+    }
 
     // the graphics screen logic is handled via a big loop over Screens (clients)
     for(int screen_i = 0; screen_i < c_screenCount; screen_i++)
@@ -849,6 +1439,28 @@ void UpdateGraphicsLogic(bool Do_FrameSkip)
         if(!screen.player_count && !LevelEditor)
             continue;
 
+        // update screen's canonical vScreens
+        if(!screen.is_canonical())
+        {
+            Screen_t& c_screen = screen.canonical_screen();
+
+            for(int i = c_screen.active_begin() + 1; i <= c_screen.active_end(); i++)
+                GetvScreenAuto(c_screen.vScreen(i));
+
+            if(qScreen_canonical)
+            {
+                for(int i = c_screen.active_begin(); i < c_screen.active_end(); i++)
+                {
+                    int Z_i = c_screen.vScreen_refs[i];
+                    continue_qScreen_canonical |= Update_qScreen(Z_i);
+
+                    // the original code was badly written and made THIS happen (always exactly one frame of qScreen in 2P mode)
+                    if(i >= 1 && !g_compatibility.modern_section_change)
+                        continue_qScreen_canonical = false;
+                }
+            }
+        }
+
         int numScreens = screen.active_end();
 
         for(int vscreen_i = screen.active_begin(); vscreen_i < screen.active_end(); vscreen_i++)
@@ -856,8 +1468,8 @@ void UpdateGraphicsLogic(bool Do_FrameSkip)
             int Z = screen.vScreen_refs[vscreen_i];
             int plr_Z = screen.players[vscreen_i];
 
-            // modern NPC activation logic is required to support more than 2 vScreens (for the Reset array), but we don't have that yet in the main branch
-            SDL_assert_release(Z <= 2);
+            // modern NPC activation logic is required to support more than 2 vScreens (for the Reset array)
+            SDL_assert_release(Z <= 2 || g_compatibility.modern_npc_camera_logic);
 
             int S;
             if(LevelEditor)
@@ -872,14 +1484,65 @@ void UpdateGraphicsLogic(bool Do_FrameSkip)
             // moved to `graphics/gfx_screen.cpp`
             // NOTE: this logic was previously only performed on non-frameskips
             if(qScreen)
-                continue_qScreen |= Update_qScreen(Z);
+            {
+                bool continue_this_qScreen = Update_qScreen(Z);
+                continue_qScreen |= continue_this_qScreen;
+                continue_qScreen_local |= (&screen == l_screen) && continue_this_qScreen;
+            }
 
             // the original code was badly written and made THIS happen (always exactly one frame of qScreen in 2P mode)
             if(Z == 2 && !g_compatibility.modern_section_change)
                 continue_qScreen = false;
 
             // noturningback
-            if(!LevelEditor && NoTurnBack[Player[Z].Section])
+            if(!LevelEditor && NoTurnBack[Player[plr_Z].Section] && g_compatibility.allow_multires)
+            {
+                // goal: find canonical vScreen currently on this section that is the furthest left
+                // only do anything with the last vScreen (of a Visible screen) in the section
+                // (ensures all other logic has happened)
+
+                int A = 0;
+                int section = Player[plr_Z].Section;
+                bool is_last = true;
+
+                for(int screen_j = 0; screen_j < c_screenCount; screen_j++)
+                {
+                    Screen_t& o_screen = Screens[screen_j];
+
+                    // active_begin() / active_end() are 0-indexed
+                    for(int vscreen_j = o_screen.active_begin(); vscreen_j < o_screen.active_end(); vscreen_j++)
+                    {
+                        int o_p = o_screen.players[vscreen_j];
+                        int o_Z = o_screen.vScreen_refs[vscreen_j];
+
+                        if(Player[o_p].Section == section)
+                        {
+                            // check if this is the last vScreen (of a Visible screen) in the section
+                            if(o_screen.Visible && (screen_j > screen_i || (screen_j == screen_i && vscreen_j > vscreen_i)))
+                                is_last = false;
+
+                            // only consider canonical screens
+                            if(!o_screen.is_canonical())
+                                break;
+
+                            // pick screen further to left
+                            if(A == 0 || -vScreen[o_Z].X < -vScreen[A].X)
+                                A = o_Z;
+                        }
+                    }
+                }
+
+                if(is_last && A != 0 && -vScreen[A].X > level[S].X)
+                {
+                    LevelChop[S] += float(-vScreen[A].X - level[S].X);
+                    level[S].X = -vScreen[A].X;
+
+                    // mark that section has shrunk
+                    UpdateSectionOverlaps(S, true);
+                }
+            }
+            // Legacy noturningback
+            else if(!LevelEditor && NoTurnBack[Player[plr_Z].Section])
             {
                 vScreen_t& vscreen1 = screen.vScreen(1);
                 vScreen_t& vscreen2 = screen.vScreen(2);
@@ -982,8 +1645,12 @@ void UpdateGraphicsLogic(bool Do_FrameSkip)
 
             // we'll check the NPCs and do some logic for the game,
             if(!LevelEditor)
-                ClassicNPCScreenLogic(Z, numScreens, fill_draw_queue, NPC_Draw_Queue_p);
-
+            {
+                if(g_compatibility.modern_npc_camera_logic)
+                    ModernNPCScreenLogic(screen, vscreen_i, fill_draw_queue, NPC_Draw_Queue_p);
+                else
+                    ClassicNPCScreenLogic(Z, numScreens, fill_draw_queue, NPC_Draw_Queue_p);
+            }
             // fill the NPC render queue for the level editor
             else if(fill_draw_queue)
             {
@@ -1020,6 +1687,7 @@ void UpdateGraphicsLogic(bool Do_FrameSkip)
     }
 
     LevelFramesAlways();
+    ProcessIntroNPCFrames();
 
     // Update Coin Frames
     CoinFrame2[1] += 1;
@@ -1049,6 +1717,32 @@ void UpdateGraphicsLogic(bool Do_FrameSkip)
             CoinFrame[3] = 0;
     }
 
+    // clear the last-frame reset state of NPCs
+    if(g_compatibility.modern_npc_camera_logic)
+    {
+        for(NPC_t& n : s_NoReset_NPCs_LastFrame)
+            n.Reset[2] = true;
+    }
+
+    // use screen-shake to indicate if invisible screen is currently causing qScreen
+    if(g_compatibility.allow_multires)
+    {
+        // TODO: do loop over visible screens here once s_shakeScreen, s_forcedShakeScreen, and continue_qScreen_local are separated by screen
+
+        // shake screen to tell player game is currently paused (will take effect next frame)
+        if(!continue_qScreen_local && (continue_qScreen || continue_qScreen_canonical) && !s_shakeScreen.active)
+        {
+            s_forcedShakeScreen = true;
+            doShakeScreen(1, 1, SHAKE_RANDOM, 0, 0.0);
+        }
+        // finish forced screenshake
+        else if(!(continue_qScreen || continue_qScreen_canonical) && s_forcedShakeScreen)
+        {
+            s_forcedShakeScreen = false;
+            doShakeScreen(1, 1, SHAKE_RANDOM, 0, 0.1);
+        }
+    }
+
     // update score and lives to their displayable limits
     if(Score > 9999990)
         Score = 9999990;
@@ -1058,6 +1752,7 @@ void UpdateGraphicsLogic(bool Do_FrameSkip)
 
     // NOTE: qScreen was only updated on non-frameskip in vanilla
     qScreen = continue_qScreen;
+    qScreen_canonical = continue_qScreen_canonical;
 }
 
 
@@ -1077,7 +1772,7 @@ void UpdateGraphicsDraw(bool skipRepaint)
     }
 
 #ifdef __3DS__
-        XRender::setTargetLayer(0);
+    XRender::setTargetLayer(0);
 #endif
 
     XRender::setDrawPlane(PLANE_GAME_BACKDROP);
@@ -1104,6 +1799,10 @@ void UpdateGraphicsScreen(Screen_t& screen)
 
     int numScreens = screen.active_end();
 
+    // even if not clearing buffer, black background is good, to be safe
+    XRender::renderRect(0, 0, screen.W, screen.H, {0, 0, 0});
+    DrawBackdrop(screen);
+
     // No logic
     // Draw the screens!
     for(int vscreen_i = screen.active_begin(); vscreen_i < screen.active_end(); vscreen_i++)
@@ -1129,11 +1828,8 @@ void UpdateGraphicsScreen(Screen_t& screen)
         // Note: this was guarded by an if(!LevelEditor) condition in the past
         if(Background2[S] == 0)
         {
-            if(numScreens > 1)
-                XRender::renderRect(vScreen[Z].Left, vScreen[Z].Top,
-                                    vScreen[Z].Width, vScreen[Z].Height, {0, 0, 0}, true);
-            else
-                XRender::clearBuffer();
+            XRender::renderRect(vScreen[Z].ScreenLeft, vScreen[Z].ScreenTop,
+                                vScreen[Z].Width, vScreen[Z].Height, {0, 0, 0}, true);
         }
 
         // Get a reference to our NPC draw queue.
@@ -1143,8 +1839,8 @@ void UpdateGraphicsScreen(Screen_t& screen)
         SDL_assert_release((Z - 1 >= 0) && ((Z - 1) < (int)(sizeof(NPC_Draw_Queue) / sizeof(NPC_Draw_Queue_t))));
         NPC_Draw_Queue_t& NPC_Draw_Queue_p = NPC_Draw_Queue[Z-1];
 
-        if(numScreens > 1) // To separate drawing of screens
-            XRender::setViewport(vScreen[Z].Left, vScreen[Z].Top, vScreen[Z].Width, vScreen[Z].Height);
+        // always needed now due to cases where vScreen is smaller than physical screen
+        XRender::setViewport(vScreen[Z].ScreenLeft, vScreen[Z].ScreenTop, vScreen[Z].Width, vScreen[Z].Height);
 
         // update viewport from screen shake
         s_shakeScreen.apply();
@@ -1422,7 +2118,8 @@ void UpdateGraphicsScreen(Screen_t& screen)
         for(size_t i = 0; i < NPC_Draw_Queue_p.BG_n; i++)
         {
             int A = NPC_Draw_Queue_p.BG[i];
-            XTColor cn = NPC[A].Shadow ? XTColor(0, 0, 0) : XTColor();
+            XTColor cn;
+            s_get_NPC_tint(A, cn);
 
             if(NPC[A].Type == NPCID_PLANT_S3 || NPC[A].Type == NPCID_BIG_PLANT || NPC[A].Type == NPCID_PLANT_S1 || NPC[A].Type == NPCID_FIRE_PLANT || NPC[A].Type == NPCID_LONG_PLANT_UP || NPC[A].Type == NPCID_JUMP_PLANT)
             {
@@ -1778,8 +2475,11 @@ void UpdateGraphicsScreen(Screen_t& screen)
         for(size_t i = 0; i < NPC_Draw_Queue_p.Low_n; i++)
         {
             int A = NPC_Draw_Queue_p.Low[i];
-            XTColor cn = NPC[A].Shadow ? XTColor(0, 0, 0) : XTColor();
-            cn.a = (NPC[A].Type == NPCID_MEDAL && g_curLevelMedals.gotten(NPC[A].Variant - 1)) ? 127 : 255;
+
+            XTColor cn;
+            s_get_NPC_tint(A, cn);
+            if(NPC[A].Type == NPCID_MEDAL && g_curLevelMedals.gotten(NPC[A].Variant - 1))
+                cn.a *= 0.5f;
 
             if(NPCWidthGFX[NPC[A].Type] == 0)
                 XRender::renderTexture(vScreen[Z].X + NPC[A].Location.X + NPCFrameOffsetX[NPC[A].Type], vScreen[Z].Y + NPC[A].Location.Y + NPCFrameOffsetY[NPC[A].Type], NPC[A].Location.Width, NPC[A].Location.Height, GFXNPC[NPC[A].Type], 0, NPC[A].Frame * NPC[A].Location.Height, cn);
@@ -1804,7 +2504,9 @@ void UpdateGraphicsScreen(Screen_t& screen)
         for(size_t i = 0; i < NPC_Draw_Queue_p.Normal_n; i++)
         {
             int A = NPC_Draw_Queue_p.Normal[i];
-            XTColor cn = NPC[A].Shadow ? XTColor(0, 0, 0) : XTColor();
+
+            XTColor cn;
+            s_get_NPC_tint(A, cn);
 
             if(!NPCIsYoshi[NPC[A].Type])
             {
@@ -1830,7 +2532,7 @@ void UpdateGraphicsScreen(Screen_t& screen)
                         tempLocation.Y = NPC[A].Location.Y + NPC[A].Location.Height / 2.0 - tempLocation.Height / 2.0;
 
                         int B = EditorNPCFrame((int)SDL_floor(NPC[A].Special), NPC[A].Direction);
-                        XRender::renderTexture(vScreen[Z].X + tempLocation.X + NPCFrameOffsetX[NPC[A].Type], vScreen[Z].Y + tempLocation.Y, tempLocation.Width, tempLocation.Height, GFXNPC[NPC[A].Special], 0, B * tempLocation.Height);
+                        XRender::renderTexture(vScreen[Z].X + tempLocation.X + NPCFrameOffsetX[NPC[A].Type], vScreen[Z].Y + tempLocation.Y, tempLocation.Width, tempLocation.Height, GFXNPC[NPC[A].Special], 0, B * tempLocation.Height, cn);
                     }
 
                     XRender::renderTexture(vScreen[Z].X + NPC[A].Location.X + (NPCFrameOffsetX[NPC[A].Type] * -NPC[A].Direction) - NPCWidthGFX[NPC[A].Type] / 2.0 + NPC[A].Location.Width / 2.0, vScreen[Z].Y + NPC[A].Location.Y + NPCFrameOffsetY[NPC[A].Type] - NPCHeightGFX[NPC[A].Type] + NPC[A].Location.Height, NPCWidthGFX[NPC[A].Type], NPCHeightGFX[NPC[A].Type], GFXNPC[NPC[A].Type], 0, NPC[A].Frame * NPCHeightGFX[NPC[A].Type], cn);
@@ -2052,18 +2754,17 @@ void UpdateGraphicsScreen(Screen_t& screen)
         {
             int A = NPC_Draw_Queue_p.Held[i];
             XTColor cn = NPC[A].Shadow ? XTColor(0, 0, 0) : XTColor();
+
+            if(NPC[A].Type == NPCID_ICE_CUBE)
             {
-                if(NPC[A].Type == NPCID_ICE_CUBE)
-                {
-                    DrawFrozenNPC(Z, A);
-                }
-                else if(!NPCIsYoshi[NPC[A].Type] && NPC[A].Type > 0)
-                {
-                    if(NPCWidthGFX[NPC[A].Type] == 0)
-                        RenderTexturePlayer(Z, vScreen[Z].X + NPC[A].Location.X + NPCFrameOffsetX[NPC[A].Type], vScreen[Z].Y + NPC[A].Location.Y + NPCFrameOffsetY[NPC[A].Type], NPC[A].Location.Width, NPC[A].Location.Height, GFXNPC[NPC[A].Type], 0, NPC[A].Frame * NPC[A].Location.Height, cn);
-                    else
-                        RenderTexturePlayer(Z, vScreen[Z].X + NPC[A].Location.X + (NPCFrameOffsetX[NPC[A].Type] * -NPC[A].Direction) - NPCWidthGFX[NPC[A].Type] / 2.0 + NPC[A].Location.Width / 2.0, vScreen[Z].Y + NPC[A].Location.Y + NPCFrameOffsetY[NPC[A].Type] - NPCHeightGFX[NPC[A].Type] + NPC[A].Location.Height, NPCWidthGFX[NPC[A].Type], NPCHeightGFX[NPC[A].Type], GFXNPC[NPC[A].Type], 0, NPC[A].Frame * NPCHeightGFX[NPC[A].Type], cn);
-                }
+                DrawFrozenNPC(Z, A);
+            }
+            else if(!NPCIsYoshi[NPC[A].Type] && NPC[A].Type > 0)
+            {
+                if(NPCWidthGFX[NPC[A].Type] == 0)
+                    RenderTexturePlayer(Z, vScreen[Z].X + NPC[A].Location.X + NPCFrameOffsetX[NPC[A].Type], vScreen[Z].Y + NPC[A].Location.Y + NPCFrameOffsetY[NPC[A].Type], NPC[A].Location.Width, NPC[A].Location.Height, GFXNPC[NPC[A].Type], 0, NPC[A].Frame * NPC[A].Location.Height, cn);
+                else
+                    RenderTexturePlayer(Z, vScreen[Z].X + NPC[A].Location.X + (NPCFrameOffsetX[NPC[A].Type] * -NPC[A].Direction) - NPCWidthGFX[NPC[A].Type] / 2.0 + NPC[A].Location.Width / 2.0, vScreen[Z].Y + NPC[A].Location.Y + NPCFrameOffsetY[NPC[A].Type] - NPCHeightGFX[NPC[A].Type] + NPC[A].Location.Height, NPCWidthGFX[NPC[A].Type], NPCHeightGFX[NPC[A].Type], GFXNPC[NPC[A].Type], 0, NPC[A].Frame * NPCHeightGFX[NPC[A].Type], cn);
             }
         }
 
@@ -2137,7 +2838,10 @@ void UpdateGraphicsScreen(Screen_t& screen)
         for(size_t i = 0; i < NPC_Draw_Queue_p.FG_n; i++)
         {
             int A = NPC_Draw_Queue_p.FG[i];
-            XTColor cn = NPC[A].Shadow ? XTColor(0, 0, 0) : XTColor();
+
+            XTColor cn;
+            s_get_NPC_tint(A, cn);
+
             if(NPCWidthGFX[NPC[A].Type] == 0)
                 XRender::renderTexture(vScreen[Z].X + NPC[A].Location.X + NPCFrameOffsetX[NPC[A].Type], vScreen[Z].Y + NPC[A].Location.Y + NPCFrameOffsetY[NPC[A].Type], NPC[A].Location.Width, NPC[A].Location.Height, GFXNPC[NPC[A].Type], 0, NPC[A].Frame * NPC[A].Location.Height, cn);
             else
@@ -2199,6 +2903,13 @@ void UpdateGraphicsScreen(Screen_t& screen)
 
         XRender::setDrawPlane(PLANE_LVL_INFO);
 
+        // NPCs warnings
+        for(size_t i = 0; i < NPC_Draw_Queue_p.Warning_n; i++)
+        {
+            int A = NPC_Draw_Queue_p.Warning[i];
+            DrawWarningNPC(Z, A);
+        }
+
         // water
         if(LevelEditor)
         {
@@ -2225,6 +2936,27 @@ void UpdateGraphicsScreen(Screen_t& screen)
             // Redigit NetPlay player names were also dropped
 
             lunaRender(Z);
+
+            // debug code to show logical screens
+            if(g_CheatLogicScreen && !screen.is_canonical())
+            {
+                Screen_t& c_screen = screen.canonical_screen();
+
+                for(int c_vscreen_Z = c_screen.active_begin() + 1; c_vscreen_Z <= c_screen.active_end(); c_vscreen_Z++)
+                {
+                    vScreen_t& c_vscreen = c_screen.vScreen(c_vscreen_Z);
+
+                    XRender::renderRect(vScreen[Z].X - c_vscreen.X, vScreen[Z].Y - c_vscreen.Y, c_vscreen.Width, c_vscreen.Height,
+                        {  0,   0,   0}, false);
+                    XRender::renderRect(vScreen[Z].X - c_vscreen.X + 1, vScreen[Z].Y - c_vscreen.Y + 1, c_vscreen.Width - 2, c_vscreen.Height - 2,
+                        {  0,   0,   0}, false);
+                    XRender::renderRect(vScreen[Z].X - c_vscreen.X + 2, vScreen[Z].Y - c_vscreen.Y + 2, c_vscreen.Width - 4, c_vscreen.Height - 4,
+                        {255, 255, 255}, false);
+                    XRender::renderRect(vScreen[Z].X - c_vscreen.X + 3, vScreen[Z].Y - c_vscreen.Y + 3, c_vscreen.Width - 6, c_vscreen.Height - 6,
+                        {255, 255, 255}, false);
+                    SuperPrint(std::to_string(c_vscreen_Z), 1, vScreen[Z].X - c_vscreen.X + 4, vScreen[Z].Y - c_vscreen.Y + 4);
+                }
+            }
 
             // 'Interface
 
@@ -2320,13 +3052,9 @@ void UpdateGraphicsScreen(Screen_t& screen)
 
         if((LevelEditor || MagicHand))
         {
-            XRender::offsetViewportIgnore(true);
-
             // editor code now located in `gfx_editor.cpp`
             XRender::setDrawPlane(PLANE_LVL_INFO);
             DrawEditorLevel(Z);
-
-            XRender::offsetViewportIgnore(false);
         }
 
         XRender::setDrawPlane(PLANE_LVL_META);
@@ -2338,11 +3066,20 @@ void UpdateGraphicsScreen(Screen_t& screen)
 
         if(screen.Type == 5 && numScreens == 1)
         {
-            speedRun_renderControls(1, -1);
-            speedRun_renderControls(2, -1);
+            speedRun_renderControls(1, Z, SPEEDRUN_ALIGN_LEFT);
+            speedRun_renderControls(2, Z, SPEEDRUN_ALIGN_RIGHT);
         }
         else if(numScreens >= 2)
-            speedRun_renderControls(Z, Z);
+        {
+            speedRun_renderControls(Z, Z, SPEEDRUN_ALIGN_AUTO);
+        }
+
+        // indicate any small-screen camera features
+        if(g_config.small_screen_camera_features && screen.H < 600
+            && screen.Type != 2 && screen.Type != 3 && screen.Type != 7 && (screen.Type != 5 || screen.vScreen(2).Visible))
+        {
+            DrawSmallScreenCam(vScreen[Z]);
+        }
 
         XRender::offsetViewportIgnore(false);
     } // For(Z, 2, numScreens)
@@ -2374,7 +3111,7 @@ void UpdateGraphicsScreen(Screen_t& screen)
 
     // 1P controls indicator
     if(screen.Type != 5 && numScreens == 1)
-        speedRun_renderControls(1, -1);
+        speedRun_renderControls(1, -1, SPEEDRUN_ALIGN_LEFT);
 
     // fix missing controls info when the vScreen didn't get rendered at all
     if(screen.Type == 5 && numScreens == 1 && screen.vScreen(1).Width == 0)
@@ -2399,11 +3136,20 @@ void UpdateGraphicsMeta()
 
     if(!BattleMode && !GameMenu && !GameOutro && g_config.show_episode_title)
     {
-        int y = (ScreenH >= 640) ? 20 : ScreenH - 60;
-        if(g_config.show_episode_title == Config_t::EPISODE_TITLE_TRANSPARENT)
-            SuperPrintScreenCenter(WorldName, 3, y, XTAlpha(127));
-        else
-            SuperPrintScreenCenter(WorldName, 3, y);
+        // big screen, display at top
+        if(ScreenH >= 640 && g_config.show_episode_title == Config_t::EPISODE_TITLE_TOP)
+        {
+            int y = 20;
+            float alpha = 1.0f;
+            SuperPrintScreenCenter(WorldName, 3, y, XTAlphaF(alpha));
+        }
+        // display at bottom
+        else if(g_config.show_episode_title == Config_t::EPISODE_TITLE_BOTTOM)
+        {
+            int y = ScreenH - 60;
+            float alpha = 0.75f;
+            SuperPrintScreenCenter(WorldName, 3, y, XTAlphaF(alpha));
+        }
     }
 
     DrawDeviceBattery();

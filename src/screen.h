@@ -44,10 +44,24 @@ struct qScreen_t
 //    Height As Double
     double Height = 0.0;
 //End Type
+
+//    NEW: location on screen when vScreens are smaller due to level size
+    double ScreenTop = 0.0;
+    double ScreenLeft = 0.0;
 };
 
 struct vScreen_t : public qScreen_t
 {
+    struct SmallScreenFeatures_t
+    {
+        int16_t offset_x = 0;
+        int16_t offset_y = 0;
+        int16_t offset_y_hold = 0;
+        int8_t last_buttons_held = 0;
+    };
+
+    SmallScreenFeatures_t small_screen_features;
+
 //    tempX As Double
     double tempX = 0.0;
 //    TempY As Double
@@ -64,7 +78,7 @@ struct vScreen_t : public qScreen_t
     uint8_t player = 0;
 };
 
-constexpr int c_screenCount = 1;
+constexpr int c_screenCount = 2;
 constexpr int c_vScreenCount = c_screenCount * maxLocalPlayers;
 
 //Public vScreen(0 To 2) As vScreen 'Sets up the players screens
@@ -186,7 +200,7 @@ void InitScreens();
 Screen_t& ScreenByPlayer(int player);
 
 // finds the canonical Screen that contains a specific player
-// Screen_t& ScreenByPlayer_canonical(int player);
+Screen_t& ScreenByPlayer_canonical(int player);
 
 // finds the visible vScreen that contains a specific player
 int vScreenIdxByPlayer(int player);
@@ -216,9 +230,9 @@ extern Screen_t* l_screen;
 
 #ifndef SCREEN_H_NO_HELPERS
 //Public ScreenType As Integer 'The screen/view type
-extern int& ScreenType;
+// extern int& ScreenType;
 //Public DScreenType As Integer 'The dynamic screen setup
-extern int& DScreenType;
+// extern int& DScreenType;
 
 //Public ScreenType As Integer 'The screen/view type
 extern int& ScreenW;

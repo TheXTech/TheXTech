@@ -22,6 +22,8 @@
 #include "autocode_manager.h"
 #include "renderop.h"
 #include "globals.h"
+#include "graphics.h"
+#include "config.h"
 #include "lunamisc.h"
 #include "renderop_string.h"
 #include "game_main.h"
@@ -324,14 +326,16 @@ void Renderer::DrawOp(RenderOp &op)
 
 bool Render::IsOnScreen(double x, double y, double w, double h)
 {
-    double cam_x;
-    double cam_y;
-    CalcCameraPos(&cam_x, &cam_y);
+    int cam_x = vScreen[1].X;
+    int cam_y = vScreen[1].Y;
+    int cam_w = vScreen[1].Width;
+    int cam_h = vScreen[1].Height;
 
-    return FastTestCollision((int)cam_x, (int)cam_y, (int)cam_x + ScreenW, (int)cam_y + ScreenH,
+    return FastTestCollision((int)cam_x, (int)cam_y, (int)cam_x + (int)cam_w, (int)cam_y + (int)cam_h,
                              (int)x, (int)y, (int)x + (int)w, (int)y + (int)h);
 }
 
+#if 0
 void Render::CalcCameraPos(double *ret_x, double *ret_y)
 {
     // Old camera func, using "camera" memory
@@ -347,5 +351,27 @@ void Render::CalcCameraPos(double *ret_x, double *ret_y)
     {
         val = vScreen[1].Y;
         *ret_y = val - val - val; // Fix backwards smbx camera
+    }
+}
+#endif
+
+void Render::TranslateScreenCoords(double &x, double &y, double w, double h)
+{
+    // FIXME: What we shall to do with w and h?
+    UNUSED(w);
+    UNUSED(h);
+
+    if(g_config.autocode_translate_coords)
+    {
+        int top = 0;
+        if(vScreen[1].Height > 600)
+            top = vScreen[1].Height / 2 - 300;
+        int left = vScreen[1].Width / 2 - 400;
+
+        x += left;
+        y += top;
+
+        if(vScreen[1].Height < 600.0)
+            y *= vScreen[1].Height / 600.0;
     }
 }

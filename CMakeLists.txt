@@ -699,6 +699,8 @@ set(THEXTECH_SRC
     src/graphics/gfx_message.cpp
     src/graphics/gfx_editor.cpp
     src/graphics/gfx_frame.cpp
+    src/graphics/gfx_camera.cpp
+    src/graphics/gfx_world.cpp
     src/graphics/gfx_credits.cpp
     src/graphics/gfx_hud.cpp
     src/graphics/gfx_enter_screen.cpp
@@ -735,6 +737,7 @@ set(THEXTECH_SRC
     src/npc/npc_bonus.cpp
     src/npc/npc_queues.cpp
     src/npc/section_overlap.cpp
+    src/npc/npc_activation.cpp
     src/player/player_update.cpp
     src/fontman/font_manager.cpp
     src/fontman/font_manager_private.cpp
@@ -1165,7 +1168,7 @@ if(VITA)
 
     # Set explicit flags for this project
     target_compile_definitions(thextech PRIVATE
-        -DVITA -DNO_SCREENSHOT -DTHEXTECH_FIXED_RES -DFIXED_RES -DLOW_MEM -DTHEXTECH_PRELOAD_LEVELS -DNO_INTPTROC)
+        -DVITA -DNO_SCREENSHOT -DLOW_MEM -DTHEXTECH_PRELOAD_LEVELS -DNO_INTPTROC)
 endif()
 
 if(WIN32 AND WINDOWS_STORE)

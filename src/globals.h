@@ -434,6 +434,8 @@ struct NPC_t
     bool Bouce : 1;
 //    DefaultStuck As Boolean
     bool DefaultStuck : 1;
+    // EXTRA (private to npc_activation.cpp): stores whether the NPC needs to use an event logic screen for activation
+    bool _priv_force_canonical : 1;
 
 //'the default values are used when De-Activating an NPC when it goes on screen
 //    DefaultType As Integer
@@ -463,7 +465,7 @@ struct NPC_t
 
     NPC_t() : TurnAround(false), onWall(false), TurnBackWipe(false), GeneratorActive(false),
         playerTemp(false), Legacy(false), Chat(false), NoLavaSplash(false),
-        Bouce(false), DefaultStuck(false) {}
+        Bouce(false), DefaultStuck(false), _priv_force_canonical(false) {}
 
 };
 
@@ -1157,6 +1159,8 @@ struct WorldPlayer_t
     int Move3 = 0;
 // EXTRA: last move direction
     int LastMove = 0;
+// EXTRA: current world map section
+    int Section = 0;
 //    LevelName As String
     // std::string LevelName;
     //! NEW: index to player's current WorldLevel, 0 if none. (Replaces LevelName and stars.)
@@ -1596,6 +1600,8 @@ extern RangeArrI<int, 0, maxBlockType, 0> BlockSlope2;
 
 //Public qScreen As Boolean 'Weather or not the screen needs adjusting
 extern bool qScreen;
+//! New: whether any canonical screens are currently in qScreen mode
+extern bool qScreen_canonical;
 
 // moved to "screen.h"
 // NEW: allows screen position to change during qScreen

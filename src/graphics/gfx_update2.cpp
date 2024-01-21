@@ -18,6 +18,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <sdl_proxy/sdl_stdinc.h>
+
+#include <fontman/font_manager.h>
+
 #include "../globals.h"
 #include "../gfx.h"
 #include "../frame_timer.h"
@@ -26,6 +30,7 @@
 #include "../player.h"
 #include "../compat.h"
 #include "../config.h"
+#include "../sound.h"
 #include "../main/speedrunner.h"
 #include "../main/trees.h"
 #include "../main/screen_pause.h"
@@ -37,6 +42,10 @@
 #include "main/level_medals.h"
 #include "../core/render.h"
 #include "../screen_fader.h"
+
+#include "graphics/gfx_frame.h"
+#include "graphics/gfx_marquee.h"
+#include "graphics/gfx_world.h"
 
 #include "gfx_special_frames.h"
 
@@ -79,6 +88,7 @@ static inline int computeStarsShowingPolicy(int ll, int cur)
     return g_config.WorldMapStarShowPolicyGlobal;
 }
 
+
 // draws GFX to screen when on the world map/world map editor
 void UpdateGraphics2(bool skipRepaint)
 {
@@ -102,17 +112,43 @@ void UpdateGraphics2(bool skipRepaint)
 
     g_stats.reset();
 
-    int A = 0;
+    // int A = 0;
     // int B = 0;
     const int Z = 1;
     int WPHeight = 0;
 //    Location_t tempLocation;
     //Z = 1;
 
-    vScreen[Z].Left = 0;
-    vScreen[Z].Top = 0;
-    vScreen[Z].Width = ScreenW;
-    vScreen[Z].Height = ScreenH;
+    if(WorldEditor)
+    {
+        vScreen[Z].Left = 0;
+        vScreen[Z].ScreenLeft = 0;
+        vScreen[Z].Top = 0;
+        vScreen[Z].ScreenTop = 0;
+        vScreen[Z].Width = ScreenW;
+        vScreen[Z].Height = ScreenH;
+    }
+    else
+    {
+        GetvScreenWorld(vScreen[Z]);
+
+        if(qScreen)
+        {
+            qScreen = Update_qScreen(1, g_worldCamSpeed, g_worldCamSpeed);
+
+            if(qScreen && g_worldPlayCamSound)
+                PlaySound(SFX_Camera);
+
+            // reset cam sound
+            g_worldPlayCamSound = false;
+        }
+        // reset cam speed
+        else
+        {
+            g_worldCamSpeed = 1.5;
+        }
+    }
+
     SpecialFrames();
     SceneFrame2[1] += 1;
     if(SceneFrame2[1] >= 12)
@@ -228,6 +264,7 @@ void UpdateGraphics2(bool skipRepaint)
     XRender::setDrawPlane(PLANE_GAME_BACKDROP);
 
     XRender::clearBuffer();
+    DrawBackdrop(Screens[0]);
 
 //    if(TakeScreen == true)
 //    {
@@ -283,23 +320,15 @@ void UpdateGraphics2(bool skipRepaint)
 //            End With
 //        Next A
 //    Else
-    double sLeft, sTop, sRight, sBottom;
-    {
-        if(WorldEditor)
-        {
-            sLeft = -vScreen[1].X;
-            sTop = -vScreen[1].Y;
-            sRight = -vScreen[1].X + vScreen[1].Width;
-            sBottom = -vScreen[1].Y + vScreen[1].Height;
-        }
-        else
-        {
-            sLeft = -vScreen[1].X + 64;
-            sTop = -vScreen[1].Y + 96;
-            sRight = -vScreen[1].X + vScreen[1].Width - 64;
-            sBottom = -vScreen[1].Y + vScreen[1].Height - 64;
-        }
 
+    XRender::setViewport(vScreen[Z].ScreenLeft, vScreen[Z].ScreenTop, vScreen[Z].Width, vScreen[Z].Height);
+
+    double sLeft = -vScreen[1].X;
+    double sTop = -vScreen[1].Y;
+    double sRight = -vScreen[1].X + vScreen[1].Width;
+    double sBottom = -vScreen[1].Y + vScreen[1].Height;
+
+    {
         Location_t sView;
         sView.X = sLeft;
         sView.Y = sTop;
@@ -414,7 +443,7 @@ void UpdateGraphics2(bool skipRepaint)
     {
         XRender::setDrawPlane(PLANE_WLD_EFF);
 
-        for(A = 1; A <= numEffects; A++)
+        for(int A = 1; A <= numEffects; A++)
         {
             if(vScreenCollision(Z, Effect[A].Location))
             {
@@ -438,7 +467,7 @@ void UpdateGraphics2(bool skipRepaint)
             }
         }
 
-        for(A = 1; A <= numWorldAreas; A++)
+        for(int A = 1; A <= numWorldAreas; A++)
         {
             WorldArea_t &area = WorldArea[A];
             if(vScreenCollision(Z, static_cast<Location_t>(area.Location)))
@@ -543,6 +572,8 @@ void UpdateGraphics2(bool skipRepaint)
             }
         }
 
+        XRender::resetViewport();
+
 #ifdef __3DS__
         XRender::setTargetLayer(2);
 #endif
@@ -550,11 +581,11 @@ void UpdateGraphics2(bool skipRepaint)
         XRender::setDrawPlane(PLANE_WLD_FRAME);
 
 //        XRender::renderTexture(0, 0, 800, 130, GFX.Interface[4], 0, 0);
+        DrawWorldMapFrame(vScreen[Z]);
 
-        XRender::renderTexture(0, 0, 800, 130, GFX.Interface[4], 0, 0);
-        XRender::renderTexture(0, 534, 800, 66, GFX.Interface[4], 0, 534);
-        XRender::renderTexture(0, 130, 66, 404, GFX.Interface[4], 0, 130);
-        XRender::renderTexture(734, 130, 66, 404, GFX.Interface[4], 734, 130);
+
+        int pX = vScreen[Z].ScreenLeft + 32 - 64 + 48;
+        int pY = vScreen[Z].ScreenTop - 6;
 
 #ifdef __3DS__
         XRender::setTargetLayer(3);
@@ -562,80 +593,81 @@ void UpdateGraphics2(bool skipRepaint)
 
         XRender::setDrawPlane(PLANE_WLD_HUD);
 
-        for(A = 1; A <= numPlayers; A++)
+        // prepare for player draw
+        vScreen[0].X = 0;
+        vScreen[0].Y = 0;
+        vScreen[0].Width = ScreenW;
+        vScreen[0].Height = ScreenH;
+
+        for(int A = 1; A <= numPlayers; A++)
         {
-            int pX = 32 + 48 * A;
-            int pY = 124;
-
-            Player_t& p = Player[A];
-
-            p.Direction = -1;
-            p.Location.SpeedY = 0;
-            p.Location.SpeedX = -1;
-            p.Controls.Left = false;
-            p.Controls.Right = false;
-            p.SpinJump = false;
-            p.Dead = false;
-            p.Immune2 = false;
-            p.Fairy = false;
-            p.TimeToLive = 0;
-            p.Effect = 0;
-            p.MountSpecial = 0;
-            p.HoldingNPC = 0;
-            if(p.Duck)
-                UnDuck(p);
-            PlayerFrame(p);
-
-            p.Location.Width = Physics.PlayerWidth[p.Character][p.State];
-            p.Location.Height = Physics.PlayerHeight[p.Character][p.State];
-            SizeCheck(p);
-            p.Location.X = pX - vScreen[1].X;
-            p.Location.Y = pY - vScreen[1].Y - p.Location.Height;
-
-            if(p.MountType == 3)
-            {
-                p.YoshiWingsFrameCount += 1;
-                p.YoshiWingsFrame = 0;
-                if(p.YoshiWingsFrameCount <= 12)
-                    p.YoshiWingsFrame = 1;
-                else if(p.YoshiWingsFrameCount >= 24)
-                    p.YoshiWingsFrameCount = 0;
-                if(p.Direction == 1)
-                    p.YoshiWingsFrame += 2;
-            }
-
-            DrawPlayer(p, 1);
+            DrawPlayerWorld(Player[A], pX, pY);
+            pX += 48;
         }
 
-        A = numPlayers + 1;
-
         // Print lives on the screen
-        XRender::renderTexture(32 + (48 * A), 126 - GFX.Interface[3].h, GFX.Interface[3].w, GFX.Interface[3].h, GFX.Interface[3], 0, 0);
-        XRender::renderTexture(32 + (48 * A) + 40, 128 - GFX.Interface[3].h, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
-        SuperPrint(std::to_string(int(Lives)), 1, 32 + (48 * A) + 62, 112);
+        XRender::renderTexture(pX, vScreen[Z].ScreenTop - 4 - GFX.Interface[3].h, GFX.Interface[3].w, GFX.Interface[3].h, GFX.Interface[3], 0, 0);
+        XRender::renderTexture(pX + 40, vScreen[Z].ScreenTop - 2 - GFX.Interface[3].h, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
 
+        SuperPrint(std::to_string(int(Lives)), 1, pX + 62, vScreen[Z].ScreenTop - 18);
         // Print coins on the screen
-        if(Player[1].Character == 5)
-            XRender::renderTexture(32 + (48 * A) + 16, 88, GFX.Interface[2].w, GFX.Interface[2].h, GFX.Interface[6], 0, 0);
-        else
-            XRender::renderTexture(32 + (48 * A) + 16, 88, GFX.Interface[2].w, GFX.Interface[2].h, GFX.Interface[2], 0, 0);
-        XRender::renderTexture(32 + (48 * A) + 40, 90, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
+        auto& coin_icon = (Player[1].Character == 5) ? GFX.Interface[6] : GFX.Interface[2];
+        XRender::renderTexture(pX + 16, vScreen[Z].ScreenTop - 42, coin_icon.w, coin_icon.h, coin_icon, 0, 0);
 
-        SuperPrint(std::to_string(Coins), 1, 32 + (48 * A) + 62, 90);
+        XRender::renderTexture(pX + 40, vScreen[Z].ScreenTop - 40, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
 
+        SuperPrint(std::to_string(Coins), 1, pX + 62, vScreen[Z].ScreenTop - 40);
         // Print stars on the screen
         if(numStars > 0)
         {
-            XRender::renderTexture(32 + (48 * A) + 16, 66, GFX.Interface[5].w, GFX.Interface[5].h, GFX.Interface[5], 0, 0);
-            XRender::renderTexture(32 + (48 * A) + 40, 68, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
-            SuperPrint(std::to_string(numStars), 1, 32 + (48 * A) + 62, 68);
+            XRender::renderTexture(pX + 16, vScreen[Z].ScreenTop - 64, GFX.Interface[5].w, GFX.Interface[5].h, GFX.Interface[5], 0, 0);
+            XRender::renderTexture(pX + 40, vScreen[Z].ScreenTop - 62, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
+            SuperPrint(std::to_string(numStars), 1, pX + 62, vScreen[Z].ScreenTop - 62);
         }
 
         // Print the level's name
         if(WorldPlayer[1].LevelIndex)
         {
-            int lnlx = 32 + (48 * A) + 116;
-            SuperPrint(WorldLevel[WorldPlayer[1].LevelIndex].LevelName, 2, lnlx, 109);
+            int lnlx = pX + 116;
+            int lnrx = vScreen[Z].ScreenLeft + vScreen[Z].Width;
+
+            MarqueeSpec marquee_spec(lnrx - lnlx, 10, 64, 32, -1);
+            static MarqueeState marquee_state;
+
+            // could make these arrays if multiple world players ever supported
+            static vbint_t cache_LevelIndex;
+            static double cache_vScreen_W = 0.0;
+
+            static std::string cache_LevelName_Split;
+            static int cache_LevelName_H = 0;
+
+            int font = FontManager::fontIdFromSmbxFont(2);
+
+            if(cache_LevelIndex != WorldPlayer[1].LevelIndex || cache_vScreen_W != vScreen[Z].Width)
+            {
+                cache_LevelIndex = WorldPlayer[1].LevelIndex;
+                cache_vScreen_W = vScreen[Z].Width;
+
+                marquee_state.reset_width();
+
+                int max_width = lnrx - lnlx;
+
+                cache_LevelName_Split = WorldLevel[WorldPlayer[1].LevelIndex].LevelName;
+                // mutates cache_LevelName_Split
+                cache_LevelName_H = FontManager::optimizeTextPx(cache_LevelName_Split, max_width, font).h();
+            }
+
+            if(g_compatibility.world_map_lvlname_marquee || cache_LevelName_H > vScreen[Z].ScreenTop - 21 - 8)
+            {
+                SuperPrintMarquee(WorldLevel[WorldPlayer[1].LevelIndex].LevelName, 2, lnlx, vScreen[Z].ScreenTop - 21, marquee_spec, marquee_state);
+                marquee_state.advance(marquee_spec);
+            }
+            else
+            {
+                FontManager::printText(cache_LevelName_Split.c_str(), cache_LevelName_Split.size(),
+                                        lnlx, vScreen[Z].ScreenTop - 21 - cache_LevelName_H,
+                                        font);
+            }
         }
 
         XRender::setDrawPlane(PLANE_WLD_META);
@@ -647,13 +679,23 @@ void UpdateGraphics2(bool skipRepaint)
 
         g_stats.print();
 
+        // FIXME: split into own function
         if(!BattleMode && !GameMenu && g_config.show_episode_title)
         {
-            int y = (ScreenH >= 640) ? 20 : ScreenH - 60;
-            if(g_config.show_episode_title == Config_t::EPISODE_TITLE_TRANSPARENT)
-                SuperPrintScreenCenter(WorldName, 3, y, XTAlpha(127));
-            else
-                SuperPrintScreenCenter(WorldName, 3, y);
+            // big screen, display at top
+            if(ScreenH >= 640 && g_config.show_episode_title == Config_t::EPISODE_TITLE_TOP)
+            {
+                int y = 20;
+                float alpha = 1.0f;
+                SuperPrintScreenCenter(WorldName, 3, y, XTAlphaF(alpha));
+            }
+            // display at bottom
+            else if(g_config.show_episode_title == Config_t::EPISODE_TITLE_BOTTOM)
+            {
+                int y = ScreenH - 60;
+                float alpha = 0.75f;
+                SuperPrintScreenCenter(WorldName, 3, y, XTAlphaF(alpha));
+            }
         }
 
         speedRun_renderControls(1, -1);
@@ -664,30 +706,26 @@ void UpdateGraphics2(bool skipRepaint)
         speedRun_renderTimer();
     }
 
-    XRender::setViewport(0, 0, ScreenW, ScreenH);
-
     DrawDeviceBattery();
 
     XRender::setDrawPlane(PLANE_GAME_MENUS);
 
     // this code is for both non-editor and editor cases
+    // render special screens
+    if(GamePaused == PauseCode::PauseScreen)
+        PauseScreen::Render();
+
+    if(GamePaused == PauseCode::DropAdd)
     {
-        // render special screens
-        if(GamePaused == PauseCode::PauseScreen)
-            PauseScreen::Render();
-
-        if(GamePaused == PauseCode::DropAdd)
-        {
-            ConnectScreen::Render();
-            XRender::renderTexture(int(SharedCursor.X), int(SharedCursor.Y), GFX.ECursor[2]);
-        }
-
-        if(GamePaused == PauseCode::TextEntry)
-            TextEntryScreen::Render();
-
-        if(!skipRepaint)
-            XRender::repaint();
+        ConnectScreen::Render();
+        XRender::renderTexture(int(SharedCursor.X), int(SharedCursor.Y), GFX.ECursor[2]);
     }
+
+    if(GamePaused == PauseCode::TextEntry)
+        TextEntryScreen::Render();
+
+    if(!skipRepaint)
+        XRender::repaint();
 
     frameRenderEnd();
 

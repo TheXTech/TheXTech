@@ -97,6 +97,9 @@ struct Compatibility_t
     bool pound_by_alt_run; // use alt run for pound action when player is in a purple pet mount
     // 1.3.7
     bool modern_npc_camera_logic; // NPCs should support more than two cameras, and consider the event logic camera when activating
+    bool allow_multires;
+    bool disable_background2_tiling;
+    bool world_map_lvlname_marquee;
 
     // SpeedRun section
     enum

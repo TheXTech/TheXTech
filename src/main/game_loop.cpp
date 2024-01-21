@@ -196,7 +196,7 @@ void GameLoop()
 
         Controls::Update(false);
     }
-    else if(qScreen)
+    else if(qScreen || (g_compatibility.allow_multires && qScreen_canonical))
     {
         g_microStats.start_task(MicroStats::Effects);
         UpdateEffects();
@@ -473,6 +473,10 @@ int PauseGame(PauseCode code, int plr)
             if(qScreen)
             {
                 // prevent any logic or unpause from taking place
+
+                // qScreen takes place in WorldLoop, not world graphics
+                if(LevelSelect)
+                    qScreen = Update_qScreen(1);
             }
             else if(GamePaused == PauseCode::PauseScreen)
             {

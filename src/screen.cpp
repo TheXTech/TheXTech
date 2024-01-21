@@ -94,6 +94,9 @@ int Screen_t::active_end() const
     if(Type == ScreenTypes::Dynamic && vScreen(2).Visible)
         return 2;
 
+    if(Type == ScreenTypes::Quad)
+        return player_count <= maxLocalPlayers ? player_count : maxLocalPlayers;
+
     return 1;
 }
 
@@ -112,6 +115,9 @@ void InitScreens()
             Screens[s].vScreen(v + 1).screen_ref = s;
         }
     }
+
+    Screens[0].set_canonical_screen(1);
+    Screens[1].Visible = false;
 
     // assign players to vScreens
     for(int s = 0; s < c_screenCount; s++)
