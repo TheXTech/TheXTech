@@ -1599,7 +1599,8 @@ int PlayerBox::Mouse_Render(bool render, int x, int y, int w, int h)
                 menu_max = 66 * 12;
             }
 
-            XRender::renderRect(x + 4, info_y + 4, (w - 8) * menu_progress / menu_max, info_height - 8, color * 0.95f);
+            XTColor shade = (m_state == PlayerState::StartGame && !CheckDone()) ? XTColor(color.r / 2 + 64, color.g / 2 + 64, color.b / 2 + 64) : color * 0.95f;
+            XRender::renderRect(x + 4, info_y + 4, (w - 8) * menu_progress / menu_max, info_height - 8, shade);
 
             // move infotext y up a bit, since controls will be drawn in main box (if at all)
             infotext_y = info_y + info_height / 2 - 8;
@@ -2225,13 +2226,24 @@ int PlayerBox::Logic()
     }
     else if(m_state == PlayerState::StartGame)
     {
-        if(CheckDone() && (c.Start || c.Jump))
+        bool can_advance = CheckDone();
+
+        if(c.Start || c.Jump)
             m_menu_item += 2;
-        else if(m_menu_item > 0)
+        else if(m_menu_item >= 0)
             m_menu_item -= 2;
 
-        if(m_menu_item > 66 * 2)
+        if(can_advance && m_menu_item > 66 * 2)
             return Do();
+        else if(!can_advance && m_menu_item > 66 * 1)
+            m_menu_item = 66 * 1;
+        else if(m_menu_item < 0)
+        {
+            m_state = PlayerState::SelectChar;
+            m_menu_item = 0;
+            m_marquee_state.reset_width();
+            m_input_ready = false;
+        }
 
         return 0;
     }
