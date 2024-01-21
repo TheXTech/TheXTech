@@ -751,7 +751,7 @@ bool mainMenuUpdate()
             {
                 if(leftPressed || SharedCursor.ScrollUp)
                 {
-                    if(MenuCursorCanMove && (pre_flip_page_count = s_GetCurrentSavesPageCount()) > 1)
+                    if(MenuCursorCanMove && (MenuCursor % c_menuSavesPageLength < c_menuSavesPerPage) && (pre_flip_page_count = s_GetCurrentSavesPageCount()) > 1)
                     {
                         MenuCursor -= c_menuSavesPageLength;
                         cursorDelta = -1;
@@ -762,7 +762,7 @@ bool mainMenuUpdate()
                 }
                 else if(rightPressed || SharedCursor.ScrollDown)
                 {
-                    if(MenuCursorCanMove && (pre_flip_page_count = s_GetCurrentSavesPageCount()) > 1)
+                    if(MenuCursorCanMove && (MenuCursor % c_menuSavesPageLength < c_menuSavesPerPage) && (pre_flip_page_count = s_GetCurrentSavesPageCount()) > 1)
                     {
                         MenuCursor += c_menuSavesPageLength;
                         cursorDelta = -1;
