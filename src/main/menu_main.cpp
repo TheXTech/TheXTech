@@ -2206,16 +2206,18 @@ static void s_drawGameSaves(int MenuX, int MenuY)
     // draw page indicator
     if(page_count > 1)
     {
-        int cX_base = MenuX + 100 - (16 * page_count) / 2 + 8;
-        int cY = MenuY - 10;
+        int lX_base = MenuX + 8;
+        int cY = MenuY + (c_menuSavesPerPage * 30) - 6;
 
         for(int i = 0; i < page_count; i++)
         {
-            int cX = cX_base + i * 16;
-            int size = (current_page == i) ? 12 : 8;
-            uint8_t alpha = (current_page == i) ? 255 : 127;
-            XRender::renderRect(cX - size / 2, cY - size / 2, size, size, {0, 0, 0, alpha});
-            XRender::renderRect(cX - size / 2 + 2, cY - size / 2 + 2, size - 4, size - 4, {255, 255, 255, alpha});
+            int lX = lX_base + i * 64;
+            int h = (current_page == i) ? 8 : 6;
+            int w = 56;
+            uint8_t alpha = (current_page == i) ? 255 : 191;
+            XTColor fill = (current_page == i) ? XTColorF(0.6f, 1.f, 1.f).with_alpha(alpha) : XTColor(255, 255, 255, alpha);
+            XRender::renderRect(lX,     cY - h / 2,     w,     h,     {0, 0, 0, alpha});
+            XRender::renderRect(lX + 2, cY - h / 2 + 2, w - 4, h - 4, fill);
         }
     }
 
