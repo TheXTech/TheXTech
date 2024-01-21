@@ -241,7 +241,7 @@ void Autocode::Do(bool init)
                     case 0: // UP
                     {
                         //double* pCamera = vScreenY;
-                        double top = -vScreen[1].Y;
+                        double top = -vscreen.Y;
                         if(npc->Location.Y < top + Param2)
                         {
                             npc->Location.Y = (top + Param2) + 1;
@@ -253,7 +253,7 @@ void Autocode::Do(bool init)
                     case 1:  // DOWN
                     {
                         //double* pCamera = GM_CAMERA_Y;
-                        double bot = -vScreen[1].Y + vScreen[1].Height;
+                        double bot = -vscreen.Y + vscreen.Height;
                         if(npc->Location.Y > bot - Param2)
                         {
                             npc->Location.Y = (bot - Param2) - 1;
@@ -265,7 +265,7 @@ void Autocode::Do(bool init)
                     case 2: // LEFT
                     {
                         //double* pCamera = GM_CAMERA_X;
-                        double left = -vScreen[1].X;
+                        double left = -vscreen.X;
                         if(npc->Location.X < left + Param2)
                         {
                             npc->Location.X = (left + Param2) + 1;
@@ -277,7 +277,7 @@ void Autocode::Do(bool init)
                     case 3: // RIGHT
                     {
                         //double* pCamera = GM_CAMERA_X;
-                        double rt = -vScreen[1].X + vScreen[1].Width;
+                        double rt = -vscreen.X + vscreen.Width;
                         if(npc->Location.Y > rt - Param2)
                         {
                             npc->Location.Y = (rt - Param2) - 1;
