@@ -2,25 +2,29 @@ TheXTech Changelog.
 
 Changelog for 1.3.7-dev
 -Add ability to trigger event layer smoke in the in-game editor (@ds-sloth)
--Extended the number of game save slots to five (@Wohlstand, @ds-sloth).
+-Extended the number of game save slots to six (@Wohlstand, @ds-sloth).
 -Add tracking for medals collected in levels (@ds-sloth)
 -Save the number of medals / stars that exist in levels to speed up subsequent loads (@ds-sloth)
 -Fix thrower vertical position logic in split-screen, guarded by compat flag modern-npc-camera-logic (@ds-sloth)
 -Internal change: added draw plane system to track different object groups' scene depth (@ds-sloth)
--Add cheat "4shared" to test HIGHLY EXPERIMENTAL 4-player shared screen mode (@ds-sloth)
+-Add cheats "4shared" and "4split" to test HIGHLY EXPERIMENTAL 4-player shared / split screen modes (@ds-sloth)
 -Added "opensesame" world map cheat to unlock paths from level (@ds-sloth)
 -Added smooth path unlock animations at the world map (@ds-sloth)
 -Added full game and in-game editor support for world map sections that limit screen view (@ds-sloth)
+-Added support for more than 2 cameras (@ds-sloth)
 -Added support for different display resolutions (@ds-sloth)
--Added compat setting to choose when NPCs activate, based on both the screen size and the episode's original screen size (@ds-sloth)
+-Allow event logic NPCs to consider SMBX 1.3 camera when activating, guarded by compat flag modern-npc-camera-logic (@ds-sloth)
+-Added code "logicscreen" to view camera used by event logic NPCs (@ds-sloth)
 -Added backdrop for levels smaller than the screen at graphics/ui/Backdrop.png (@ds-sloth)
 -Added alternative format for world map frame with better support for various display resolutions (@ds-sloth)
 
 Changelog for 1.3.6.4-dev
 -Use OpenGL as the default renderer on supported platforms ("sdl" may be used in config.ini or at at the command line to request the SDL2 renderer)
 -Add ability to edit battle levels using in-game editor (@ds-sloth)
+-Fix bug where it was not possible to return to the main menu from an invalid battle mode level (@ds-sloth)
+-Fix vanilla bug where P2 could not close message box during shared screen coop (@ds-sloth)
 
-Changelog for 1.3.6.3-dev
+Changelog for 1.3.6.3
 -Fixed a TheXTech 1.3.6.1 crash where object lookup table could not process items with negative size (@ds-sloth)
 -On level load, replace negative item sizes with size zero (such items cannot be created by any editor)
 -Fix TheXTech 1.3.6.1 bug where item would drop above incorrect player in SharedCoop mode (@ds-sloth)
