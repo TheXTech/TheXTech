@@ -549,10 +549,17 @@ void UpdateNPCs()
 
             if(NPC[A].Active && NPC[A].TimeLeft > 1 &&
                NPC[A].Type != NPCID_CONVEYOR && NPC[A].Type != NPCID_FALL_BLOCK_RED &&
-               NPC[A].Type != NPCID_FALL_BLOCK_BROWN && !NPCIsACoin[NPC[A].Type]) // And .Type <> 47
+               NPC[A].Type != NPCID_FALL_BLOCK_BROWN && !NPCIsACoin[NPC[A].Type]) // And .Type <> NPCID_SPIKY_THROWER
             {
+                // if activated by a shared screen, don't make the event player-specific
+                const vScreen_t& activ_vscreen = vScreen[NPC[A].JustActivated];
+                const Screen_t& activ_screen = Screens[activ_vscreen.screen_ref];
+                bool shared_screen = (g_compatibility.multiplayer_pause_controls) && (activ_screen.player_count > 1) && (activ_screen.active_end() - activ_screen.active_begin() == 1);
+
+                int activ_player = (shared_screen) ? 0 : activ_vscreen.player;
+
                 if(NPC[A].TriggerActivate != EVENT_NONE)
-                    ProcEvent(NPC[A].TriggerActivate, NPC[A].JustActivated);
+                    ProcEvent(NPC[A].TriggerActivate, activ_player);
 
                 Location_t tempLocation = NPC[A].Location;
                 tempLocation.Y -= 32;
@@ -572,13 +579,16 @@ void UpdateNPCs()
 
                             NPC[B].Active = true;
                             NPC[B].TimeLeft = NPC[A].TimeLeft;
-                            NPC[B].JustActivated = 1;
                             NPC[B].Section = NPC[A].Section;
+                            if(g_compatibility.modern_npc_camera_logic)
+                                NPC[B].JustActivated = NPC[A].JustActivated;
+                            else
+                                NPC[B].JustActivated = 1;
 
                             if(B < A)
                             {
                                 if(NPC[B].TriggerActivate != EVENT_NONE)
-                                    ProcEvent(NPC[B].TriggerActivate, NPC[A].JustActivated);
+                                    ProcEvent(NPC[B].TriggerActivate, activ_player);
                             }
 
                             NPCQueues::Active.insert(B);
@@ -598,8 +608,8 @@ void UpdateNPCs()
                 //     C++;
                 for(int C = 0; C < numAct; C++)
                 {
-                    if(NPC[newAct[C]].Type != 57 && NPC[newAct[C]].Type != 46 &&
-                       NPC[newAct[C]].Type != 212 && NPC[newAct[C]].Type != 47 &&
+                    if(NPC[newAct[C]].Type != NPCID_CONVEYOR && NPC[newAct[C]].Type != NPCID_FALL_BLOCK_RED &&
+                       NPC[newAct[C]].Type != NPCID_FALL_BLOCK_BROWN && NPC[newAct[C]].Type != NPCID_SPIKY_THROWER &&
                        !NPCIsACoin[NPC[newAct[C]].Type])
                     {
                         Location_t tempLocation2 = NPC[newAct[C]].Location;
@@ -622,13 +632,16 @@ void UpdateNPCs()
 
                                     NPC[B].Active = true;
                                     NPC[B].TimeLeft = NPC[newAct[C]].TimeLeft;
-                                    NPC[B].JustActivated = 1;
                                     NPC[B].Section = NPC[newAct[C]].Section;
+                                    if(g_compatibility.modern_npc_camera_logic)
+                                        NPC[B].JustActivated = NPC[A].JustActivated;
+                                    else
+                                        NPC[B].JustActivated = 1;
 
                                     if(B < A)
                                     {
                                         if(NPC[B].TriggerActivate != EVENT_NONE)
-                                            ProcEvent(NPC[B].TriggerActivate, NPC[A].JustActivated);
+                                            ProcEvent(NPC[B].TriggerActivate, activ_player);
                                     }
 
                                     NPCQueues::Active.insert(B);

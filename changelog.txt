@@ -22,6 +22,7 @@ Changelog for 1.3.6.4-dev
 -Use OpenGL as the default renderer on supported platforms ("sdl" may be used in config.ini or at at the command line to request the SDL2 renderer)
 -Add ability to edit battle levels using in-game editor (@ds-sloth)
 -Fix bug where it was not possible to return to the main menu from an invalid battle mode level (@ds-sloth)
+-Fix vanilla bug where P2 could not close message box during shared screen coop (@ds-sloth)
 
 Changelog for 1.3.6.3
 -Fixed a TheXTech 1.3.6.1 crash where object lookup table could not process items with negative size (@ds-sloth)
