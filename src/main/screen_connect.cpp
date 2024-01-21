@@ -1353,8 +1353,21 @@ bool PlayerBox::DrawChar(int x, int w, int y, int h)
         }
         else if(s_context == Context::MainMenu)
             scratch_player = SaveSlotInfo[selSave].SavedChar[ch];
+        else if(BattleMode)
+        {
+            scratch_player = Player_t();
+            scratch_player.Character = ch;
+            scratch_player.State = 2;
+            scratch_player.Hearts = 2;
+        }
         else
             scratch_player = SavedChar[ch];
+
+        if(scratch_player.Character < 1 || scratch_player.Character > numCharacters)
+            scratch_player.Character = ch;
+
+        if(scratch_player.State < 1 || scratch_player.State > numStates)
+            scratch_player.State = 1;
 
         // restore data
         scratch_player.Frame = Frame;
