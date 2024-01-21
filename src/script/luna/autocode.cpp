@@ -140,6 +140,7 @@ void Autocode::Do(bool init)
 
     // Make sure game is in OK state to run
     Player_t *demo = PlayerF::Get(1);
+    const vScreen_t& vscreen = vScreenByPlayer(1);
 
     if(!demo)
         return;
@@ -554,8 +555,8 @@ void Autocode::Do(bool init)
 
             double L_edge = 0 + depth;
             double U_edge = 0 + depth;
-            double D_edge = ScreenH - depth;
-            double R_edge = ScreenW - depth;
+            double D_edge = vscreen.Height - depth;
+            double R_edge = vscreen.Width - depth;
 
             if(demo->WarpCD < 1)
             {

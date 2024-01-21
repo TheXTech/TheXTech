@@ -24,6 +24,7 @@
 
 #include <Logger/logger.h>
 
+#include "core/render.h"
 #include "core/opengl/render_gl.h"
 #include "core/opengl/gl_program_object.h"
 
@@ -55,11 +56,11 @@ void RenderGL::s_normalize_coords(RectSizeI& r)
         r.y = 0;
     }
 
-    if(r.x + r.w >= ScreenW)
-        r.w = ScreenW - r.x;
+    if(r.x + r.w >= XRender::TargetW)
+        r.w = XRender::TargetW - r.x;
 
-    if(r.y + r.h >= ScreenH)
-        r.h = ScreenH - r.y;
+    if(r.y + r.h >= XRender::TargetH)
+        r.h = XRender::TargetH - r.y;
 }
 
 void RenderGL::m_Ortho(GLfloat left, GLfloat right, GLfloat bottom, GLfloat top, GLfloat near, GLfloat far)
@@ -134,7 +135,7 @@ void RenderGL::framebufferCopy(BufferIndex_t dest, BufferIndex_t source, RectSiz
         RectI draw_loc = RectI(r);
 
         RectF draw_source = RectF(draw_loc);
-        draw_source /= PointF(ScreenW, ScreenH);
+        draw_source /= PointF(XRender::TargetW, XRender::TargetH);
 
         // dest rect is viewport-relative
         draw_loc -= m_viewport.xy;
@@ -544,7 +545,7 @@ void RenderGL::calculateDistanceField()
     RectI draw_loc = RectI(m_viewport);
 
     RectF draw_source = RectF(draw_loc);
-    draw_source /= PointF(ScreenW, ScreenH);
+    draw_source /= PointF(XRender::TargetW, XRender::TargetH);
 
     // draw dest is in viewport coordinates, draw source isn't
     draw_loc -= m_viewport.xy;
@@ -830,7 +831,7 @@ void RenderGL::calculateLighting()
     RectI draw_loc = RectI(m_viewport);
 
     RectF draw_source = RectF(draw_loc);
-    draw_source /= PointF(ScreenW, ScreenH);
+    draw_source /= PointF(XRender::TargetW, XRender::TargetH);
 
     // draw dest is in viewport coordinates, draw source isn't
     draw_loc -= m_viewport.xy;

@@ -266,25 +266,25 @@ void DrawEditorLevel(int Z)
             if(vScreen[Z].X + level[S].X > 0)
             {
                 XRender::renderRect(0, 0,
-                                   vScreen[Z].X + level[S].X, ScreenH, {0, 0, 0}, true);
+                                   vScreen[Z].X + level[S].X, XRender::TargetH, {0, 0, 0}, true);
             }
 
-            if(ScreenW > level[S].Width + vScreen[Z].X)
+            if(XRender::TargetW > level[S].Width + vScreen[Z].X)
             {
                 XRender::renderRect(level[S].Width + vScreen[Z].X, 0,
-                                   ScreenW - (level[S].Width + vScreen[Z].X), ScreenH, {0, 0, 0}, true);
+                                   XRender::TargetW - (level[S].Width + vScreen[Z].X), XRender::TargetH, {0, 0, 0}, true);
             }
 
             if(vScreen[Z].Y + level[S].Y > 0)
             {
                 XRender::renderRect(0, 0,
-                                   ScreenW, vScreen[Z].Y + level[S].Y, {0, 0, 0}, true);
+                                   XRender::TargetW, vScreen[Z].Y + level[S].Y, {0, 0, 0}, true);
             }
 
-            if(ScreenH > level[S].Height + vScreen[Z].Y)
+            if(XRender::TargetH > level[S].Height + vScreen[Z].Y)
             {
                 XRender::renderRect(0, level[S].Height + vScreen[Z].Y,
-                                   ScreenW, ScreenH - (level[S].Height + vScreen[Z].Y), {0, 0, 0}, true);
+                                   XRender::TargetW, XRender::TargetH - (level[S].Height + vScreen[Z].Y), {0, 0, 0}, true);
             }
         }
     }
@@ -607,10 +607,10 @@ void DrawEditorLevel(int Z)
                 curX = 36;
             if(curY >= 0 && curY < 36)
                 curY = 36;
-            if(curX >= ScreenW - 36)
-                curX = ScreenW - 36;
-            if(curY >= ScreenH - 36)
-                curY = ScreenH - 36;
+            if(curX >= XRender::TargetW - 36)
+                curX = XRender::TargetW - 36;
+            if(curY >= XRender::TargetH - 36)
+                curY = XRender::TargetH - 36;
         }
 
         if(EditorCursor.Mode == 0 || EditorCursor.Mode == 6) // Eraser
@@ -788,10 +788,10 @@ void DrawEditorWorld()
             X = 36;
         if(Y >= 0 && Y < 36)
             Y = 36;
-        if(X >= ScreenW - 36)
-            X = ScreenW - 36;
-        if(Y >= ScreenH - 36)
-            Y = ScreenH - 36;
+        if(X >= XRender::TargetW - 36)
+            X = XRender::TargetW - 36;
+        if(Y >= XRender::TargetH - 36)
+            Y = XRender::TargetH - 36;
     }
 
 #ifdef __3DS__

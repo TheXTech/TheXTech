@@ -217,10 +217,10 @@ bool InputMethod_3DS::Update(int player, Controls_t& c, CursorControls_t& m, Edi
     if(cursor[0] || cursor[1] || cursor[2] || cursor[3])
     {
         if(m.X < 0)
-            m.X = ScreenW / 2;
+            m.X = XRender::TargetW / 2;
 
         if(m.Y < 0)
-            m.Y = ScreenH / 2;
+            m.Y = XRender::TargetH / 2;
 
         if(cursor[3])
             m.X += 16.0;
@@ -236,13 +236,13 @@ bool InputMethod_3DS::Update(int player, Controls_t& c, CursorControls_t& m, Edi
 
         if(m.X < 0)
             m.X = 0;
-        else if(m.X >= ScreenW)
-            m.X = ScreenW - 1;
+        else if(m.X >= XRender::TargetW)
+            m.X = XRender::TargetW - 1;
 
         if(m.Y < 0)
             m.Y = 0;
-        else if(m.Y >= ScreenH)
-            m.Y = ScreenH - 1;
+        else if(m.Y >= XRender::TargetH)
+            m.Y = XRender::TargetH - 1;
 
         m.Move = true;
     }

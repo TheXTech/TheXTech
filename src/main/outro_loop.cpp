@@ -67,7 +67,7 @@ void DoCredits(bool quit)
     if(GameMenu)
         return;
 
-    int screenH_half = ScreenH / 2;
+    int TargetH_half = XRender::TargetH / 2;
 
     int shrink = vScreen[1].Top;
 
@@ -85,11 +85,11 @@ void DoCredits(bool quit)
         }
 
         CreditChop += 0.4f;
-        if(CreditChop >= static_cast<float>(screenH_half))
+        if(CreditChop >= static_cast<float>(TargetH_half))
         {
-            CreditChop = static_cast<float>(screenH_half);
+            CreditChop = static_cast<float>(TargetH_half);
             EndCredits++;
-            if(EndCredits == screenH_half)
+            if(EndCredits == TargetH_half)
             {
                 SetupCredits();
                 GameOutroDoQuit = true;
@@ -107,7 +107,7 @@ void DoCredits(bool quit)
         if(CreditChop < shrink)
             CreditChop = shrink;
 
-        if(CreditChop < screenH_half - 50 && !musicPlaying)
+        if(CreditChop < TargetH_half - 50 && !musicPlaying)
         {
             if(bgMusic[0] <= 0) // Play default music if no music set in outro level
             {
@@ -126,7 +126,7 @@ void DoCredits(bool quit)
 //        {
         if(quit)
         {
-            CreditChop = static_cast<float>(screenH_half);
+            CreditChop = static_cast<float>(TargetH_half);
             EndCredits = 0;
             XRender::clearBuffer();
             SetupCredits();
@@ -435,7 +435,7 @@ void SetupCredits()
     AddCredit("");
     AddCredit(g_gameInfo.creditsHomePage);
 
-    CreditOffsetY = (ScreenH + 40);
+    CreditOffsetY = (XRender::TargetH + 40);
     CreditTotalHeight = 32.0;
 
     for(A = 1; A <= numCredits; A++)
@@ -443,7 +443,7 @@ void SetupCredits()
         auto &cr = Credit[A];
         cr.Location.Width = SuperTextPixLen(GetS(cr.Text), g_gameInfo.creditsFont);
         cr.Location.Height = 16;
-        cr.Location.X = (double(ScreenW) / 2) - (cr.Location.Width / 2.0);
+        cr.Location.X = (double(XRender::TargetW) / 2) - (cr.Location.Width / 2.0);
         cr.Location.Y = 32 * A;
         CreditTotalHeight += 32.0;
     }

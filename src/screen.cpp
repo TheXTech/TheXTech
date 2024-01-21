@@ -188,8 +188,8 @@ int vScreenIdxByPlayer_canonical(int player)
 }
 
 // temporary helpers while game is being converted to use Screen_t
-int& ScreenType = Screens[0].Type;
-int& DScreenType = Screens[0].DType;
+// int& ScreenType = Screens[0].Type;
+// int& DScreenType = Screens[0].DType;
 
-int& ScreenW = Screens[0].W;
-int& ScreenH = Screens[0].H;
+// int& XRender::TargetW = Screens[0].W;
+// int& XRender::TargetH = Screens[0].H;

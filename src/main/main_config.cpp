@@ -26,6 +26,8 @@
 #include "../video.h"
 #include "../controls.h"
 
+#include "core/render.h"
+
 #include "sdl_proxy/sdl_audio.h"
 
 #include "speedrunner.h"
@@ -179,24 +181,24 @@ void OpenConfig_preSetup()
         config.read("internal-width", g_config.InternalW, 800);
         config.read("internal-height", g_config.InternalH, 600);
 
-        // resolution smaller than a gameboy? forbid it!
+        // resolution smaller than CGA? forbid it!
         if(g_config.InternalW > 0 && g_config.InternalW < 320)
             g_config.InternalW = 320;
         if(g_config.InternalH > 0 && g_config.InternalH < 200)
             g_config.InternalH = 200;
 
-        ScreenW = g_config.InternalW;
-        ScreenH = g_config.InternalH;
+        XRender::TargetW = g_config.InternalW;
+        XRender::TargetH = g_config.InternalH;
         // default res for full dynamic res
-        if(ScreenH == 0)
+        if(XRender::TargetH == 0)
         {
-            ScreenW = 1280;
-            ScreenH = 720;
+            XRender::TargetW = 1280;
+            XRender::TargetH = 720;
         }
         // default res for dynamic width
-        else if(ScreenW == 0)
+        else if(XRender::TargetW == 0)
         {
-            ScreenW = 800;
+            XRender::TargetW = 800;
         }
 
         IniProcessing::StrEnumMap scaleModes =

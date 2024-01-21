@@ -1216,7 +1216,7 @@ bool Player_Mouse_Render(int p, int pX, int cX, int pY, int line, bool mouse, bo
                 // MenuY + 145
                 int infobox_y = pY + 75;
 
-                XRender::renderRect(ScreenW / 2 - 240, infobox_y, 480, 68, {0, 0, 0, 127});
+                XRender::renderRect(XRender::TargetW / 2 - 240, infobox_y, 480, 68, {0, 0, 0, 127});
 
                 SuperPrintScreenCenter(g_gameStrings.connectWaitingForInputDevice, 3, infobox_y + 4, XTColorF(0.8f, 0.8f, 0.8f, 0.8f));
                 SuperPrintScreenCenter(g_gameStrings.connectPressSelectForControlsOptions_P1, 3, infobox_y + 24, XTColorF(0.8f, 0.8f, 0.8f, 0.8f));
@@ -1263,7 +1263,7 @@ bool Player_Mouse_Render(int p, int pX, int cX, int pY, int line, bool mouse, bo
         // MenuY + 145
         int infobox_y = pY + 75;
 
-        XRender::renderRect(ScreenW / 2 - 240, infobox_y, 480, 68, {0, 0, 0, 127});
+        XRender::renderRect(XRender::TargetW / 2 - 240, infobox_y, 480, 68, {0, 0, 0, 127});
 
         if(p < (int)Controls::g_InputMethods.size() && Controls::g_InputMethods[p])
         {
@@ -1337,7 +1337,7 @@ int Mouse_Render(bool mouse, bool render)
     // line height is scaled so that these fit onscreen
     // with at least 30px of padding on either side
     int max_line = 15;
-    int line = (ScreenH - 60) / max_line;
+    int line = (XRender::TargetH - 60) / max_line;
 
     if(line > 30)
         line = 30;
@@ -1345,14 +1345,14 @@ int Mouse_Render(bool mouse, bool render)
     if(line < 18)
     {
         line = 18;
-        max_line = (ScreenH - 60) / line;
+        max_line = (XRender::TargetH - 60) / line;
     }
 
     line -= line & 1;
 
 
     // vertical start of the menu
-    int sY = ScreenH/2 - (line*max_line)/2;
+    int sY = XRender::TargetH/2 - (line*max_line)/2;
     sY -= sY & 1;
 
     // Assume that the controller profile name is up to 15 characters.
@@ -1362,7 +1362,7 @@ int Mouse_Render(bool mouse, bool render)
 
     // Automatically set up the screen to enable this, with minimum width 144px
     // and maximum width 270px per player.
-    int p_width = (ScreenW-20)/n;
+    int p_width = (XRender::TargetW-20)/n;
     const int min_width = 200;
     const int max_width = 320;
 
@@ -1374,7 +1374,7 @@ int Mouse_Render(bool mouse, bool render)
     int sW;
 
     // center players on screen
-    sX = ScreenW/2 - (p_width*n)/2;
+    sX = XRender::TargetW/2 - (p_width*n)/2;
     sX -= sX & 1;
     sW = p_width*n;
 
@@ -1465,32 +1465,32 @@ int Mouse_Render(bool mouse, bool render)
             {
                 if(render)
                 {
-                    XRender::renderRect(ScreenW/2 - 150, MenuY, 300, 200, {0, 0, 0, 127});
+                    XRender::renderRect(XRender::TargetW/2 - 150, MenuY, 300, 200, {0, 0, 0, 127});
                     if((CommonFrame % 90) < 45)
                         SuperPrintScreenCenter(g_gameStrings.connectPressAButton, 3, MenuY + 90);
                 }
             }
             else if(s_playerState[p] == PlayerState::Disconnected || s_playerState[p] == PlayerState::SelectChar)
             {
-                Player_Mouse_Render(p, MenuX, ScreenW / 2, MenuY + 70, 30, mouse, render);
+                Player_Mouse_Render(p, MenuX, XRender::TargetW / 2, MenuY + 70, 30, mouse, render);
             }
             else if(s_playerState[p] == PlayerState::ControlsMenu || s_playerState[p] == PlayerState::TestControls)
             {
-                int l = ScreenW/2 - 150;
+                int l = XRender::TargetW/2 - 150;
                 if(l < 0)
                     l = 0;
                 if(render)
-                    XRender::renderRect(ScreenW/2 - 150, MenuY, 300, 200, {0, 0, 0, 127});
-                Player_Mouse_Render(p, l + 24, ScreenW / 2, MenuY, 30, mouse, render);
+                    XRender::renderRect(XRender::TargetW/2 - 150, MenuY, 300, 200, {0, 0, 0, 127});
+                Player_Mouse_Render(p, l + 24, XRender::TargetW / 2, MenuY, 30, mouse, render);
             }
             else
             {
-                int l = ScreenW/2 - 150;
+                int l = XRender::TargetW/2 - 150;
                 if(l < 0)
                     l = 0;
                 if(render)
-                    XRender::renderRect(ScreenW/2 - 150, MenuY, 300, 200, {0, 0, 0, 127});
-                Player_Mouse_Render(p, l + 24, ScreenW / 2, MenuY + 30, 30, mouse, render);
+                    XRender::renderRect(XRender::TargetW/2 - 150, MenuY, 300, 200, {0, 0, 0, 127});
+                Player_Mouse_Render(p, l + 24, XRender::TargetW / 2, MenuY + 30, 30, mouse, render);
             }
         }
         else

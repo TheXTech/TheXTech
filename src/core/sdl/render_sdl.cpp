@@ -259,8 +259,8 @@ void RenderSDL::updateViewport()
     m_hidpi_x = (float)render_w / (float)window_w;
     m_hidpi_y = (float)render_h / (float)window_h;
 
-    float scale_x = (float)render_w / ScreenW;
-    float scale_y = (float)render_h / ScreenH;
+    float scale_x = (float)render_w / XRender::TargetW;
+    float scale_y = (float)render_h / XRender::TargetH;
 
     float scale = SDL_min(scale_x, scale_y);
 
@@ -273,8 +273,8 @@ void RenderSDL::updateViewport()
     if(g_videoSettings.scaleMode == SCALE_FIXED_2X && scale > 2.f)
         scale = 2.f;
 
-    int game_w = scale * ScreenW;
-    int game_h = scale * ScreenH;
+    int game_w = scale * XRender::TargetW;
+    int game_h = scale * XRender::TargetH;
 
     m_scale_x = scale;
     m_scale_y = scale;
@@ -292,11 +292,11 @@ void RenderSDL::updateViewport()
 
     m_viewport_x = 0;
     m_viewport_y = 0;
-    m_viewport_w = ScreenW;
-    m_viewport_h = ScreenH;
+    m_viewport_w = XRender::TargetW;
+    m_viewport_h = XRender::TargetH;
 
     // update render targets
-    if(ScaleWidth != ScreenW || ScaleHeight != ScreenH || m_current_scale_mode != g_videoSettings.scaleMode)
+    if(ScaleWidth != XRender::TargetW || ScaleHeight != XRender::TargetH || m_current_scale_mode != g_videoSettings.scaleMode)
     {
 #ifdef USE_SCREENSHOTS_AND_RECS
         // invalidates GIF recorder handle
@@ -311,21 +311,21 @@ void RenderSDL::updateViewport()
             SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");
 
         SDL_DestroyTexture(m_tBuffer);
-        m_tBuffer = SDL_CreateTexture(m_gRenderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, ScreenW, ScreenH);
+        m_tBuffer = SDL_CreateTexture(m_gRenderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, XRender::TargetW, XRender::TargetH);
         SDL_SetRenderTarget(m_gRenderer, m_tBuffer);
 
         // reset scaling setting for images loaded later
         SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");
 
-        ScaleWidth = ScreenW;
-        ScaleHeight = ScreenH;
+        ScaleWidth = XRender::TargetW;
+        ScaleHeight = XRender::TargetH;
         m_current_scale_mode = g_videoSettings.scaleMode;
     }
 }
 
 void RenderSDL::resetViewport()
 {
-    if(m_viewport_x == 0 && m_viewport_y == 0 && m_viewport_w == ScreenW && m_viewport_h == ScreenH)
+    if(m_viewport_x == 0 && m_viewport_y == 0 && m_viewport_w == XRender::TargetW && m_viewport_h == XRender::TargetH)
         return;
 
     flushRenderQueue();
@@ -341,8 +341,8 @@ void RenderSDL::resetViewport()
 
     m_viewport_x = 0;
     m_viewport_y = 0;
-    m_viewport_w = ScreenW;
-    m_viewport_h = ScreenH;
+    m_viewport_w = XRender::TargetW;
+    m_viewport_h = XRender::TargetH;
 }
 
 void RenderSDL::setViewport(int x, int y, int w, int h)

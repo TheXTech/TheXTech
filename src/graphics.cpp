@@ -809,7 +809,7 @@ void DrawBackdrop(const Screen_t& screen)
                 full.Width = screen.W / 2;
                 // our screen on right
                 if(((screen.Type == 4 || (screen.Type == 5 && screen.DType == 1)) && i == 1) || (screen.DType == 2 && i == 0))
-                    full.X = ScreenW / 2;
+                    full.X = screen.W / 2;
             }
             // vertical
             else if(screen.Type == 1 || (screen.Type == 5 && (screen.DType == 3 || screen.DType == 4 || screen.DType == 6)))

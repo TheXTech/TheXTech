@@ -495,11 +495,11 @@ bool DoAction()
 bool KeyboardMouseRender(bool mouse, bool render)
 {
 #ifdef __3DS__
-    int cur_ScreenW = (LevelEditor && editorScreen.active) ? 640 : ScreenW;
-    int cur_ScreenH = (LevelEditor && editorScreen.active) ? 480 : ScreenH;
+    int cur_ScreenW = (LevelEditor && editorScreen.active) ? 640 : XRender::TargetW;
+    int cur_ScreenH = (LevelEditor && editorScreen.active) ? 480 : XRender::TargetH;
 #else
-    const int cur_ScreenW = ScreenW;
-    const int cur_ScreenH = ScreenH;
+    const int cur_ScreenW = XRender::TargetW;
+    const int cur_ScreenH = XRender::TargetH;
 #endif
 
     int key_size = 40;

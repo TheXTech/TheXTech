@@ -21,6 +21,8 @@
 #include <Logger/logger.h>
 #include "sdl_proxy/sdl_stdinc.h"
 
+#include "core/render.h"
+
 #include "globals.h"
 #include "graphics.h"
 #include "fontman/font_manager.h"
@@ -114,12 +116,12 @@ void SuperPrintScreenCenter(int SuperN, const char* SuperChars, int Font, float 
 
     if(dFont >= 0)
     {
-        float X = (ScreenW / 2) - (FontManager::textSize(SuperChars, SuperN, dFont, FontManager::fontSizeFromSmbxFont(Font)).w() / 2);
+        float X = (XRender::TargetW / 2) - (FontManager::textSize(SuperChars, SuperN, dFont, FontManager::fontSizeFromSmbxFont(Font)).w() / 2);
         FontManager::printText(SuperChars, SuperN, X, Y, dFont, color, FontManager::fontSizeFromSmbxFont(Font), outline);
         return;
     }
 
-    float X = (ScreenW / 2) - (SuperTextPixLen(SuperN, SuperChars, Font) / 2);
+    float X = (XRender::TargetW / 2) - (SuperTextPixLen(SuperN, SuperChars, Font) / 2);
     SuperPrint(SuperN, SuperChars, RealFont, X, Y, color);
 }
 

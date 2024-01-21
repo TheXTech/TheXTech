@@ -51,6 +51,10 @@ constexpr int MAX_3D_OFFSET = 20;
 
 #endif
 
+// the current width / height of the primary render target
+extern int TargetW;
+extern int TargetH;
+
 #ifdef RENDER_CUSTOM
 
 extern bool init();

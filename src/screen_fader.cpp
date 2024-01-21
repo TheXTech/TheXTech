@@ -177,8 +177,8 @@ void ScreenFader::draw(bool fullscreen)
 
     XRender::offsetViewportIgnore(true);
 
-    int drawW = ScreenW;
-    int drawH = ScreenH;
+    int drawW = XRender::TargetW;
+    int drawH = XRender::TargetH;
 
     if(m_focusScreen > 0 && m_focusScreen <= c_vScreenCount && !fullscreen)
     {

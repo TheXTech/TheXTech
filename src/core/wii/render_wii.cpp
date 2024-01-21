@@ -460,7 +460,7 @@ void clearBuffer()
     {
         setTargetTexture();
         resetViewport();
-        renderRect(0, 0, ScreenW, ScreenH, {0, 0, 0});
+        renderRect(0, 0, XRender::TargetW, XRender::TargetH, {0, 0, 0});
         repaint();
     }
 }
@@ -504,14 +504,14 @@ void repaint()
 
 void mapToScreen(int x, int y, int* dx, int* dy)
 {
-    *dx = (x - g_screen_phys_x) * ScreenW / g_screen_phys_w;
-    *dy = (y - g_screen_phys_y) * ScreenH / g_screen_phys_h;
+    *dx = (x - g_screen_phys_x) * XRender::TargetW / g_screen_phys_w;
+    *dy = (y - g_screen_phys_y) * XRender::TargetH / g_screen_phys_h;
 }
 
 void mapFromScreen(int scr_x, int scr_y, int* window_x, int* window_y)
 {
-    *window_x = (scr_x * g_screen_phys_w / ScreenW) + g_screen_phys_x;
-    *window_y = (scr_y * g_screen_phys_h / ScreenH) + g_screen_phys_y;
+    *window_x = (scr_x * g_screen_phys_w / XRender::TargetW) + g_screen_phys_x;
+    *window_y = (scr_y * g_screen_phys_h / XRender::TargetH) + g_screen_phys_y;
 }
 
 void minport_TransformPhysCoords()
@@ -561,17 +561,17 @@ void minport_ApplyPhysCoords()
     GX_SetScissor(g_screen_phys_x, g_screen_phys_y, g_screen_phys_w, g_screen_phys_h);
 
     Mtx44 perspective;
-    guOrtho(perspective, 0.0f, ScreenH / 2, 0.0f, ScreenW / 2, -(1 << 15), (1 << 15));
+    guOrtho(perspective, 0.0f, XRender::TargetH / 2, 0.0f, XRender::TargetW / 2, -(1 << 15), (1 << 15));
     GX_LoadProjectionMtx(perspective, GX_ORTHOGRAPHIC);
 }
 
 void minport_ApplyViewport()
 {
-    int phys_offset_x = g_viewport_x * g_screen_phys_w * 2 / ScreenW;
-    int phys_width = g_viewport_w * g_screen_phys_w * 2 / ScreenW;
+    int phys_offset_x = g_viewport_x * g_screen_phys_w * 2 / XRender::TargetW;
+    int phys_width = g_viewport_w * g_screen_phys_w * 2 / XRender::TargetW;
 
-    int phys_offset_y = g_viewport_y * g_screen_phys_h * 2 / ScreenH;
-    int phys_height = g_viewport_h * g_screen_phys_h * 2 / ScreenH;
+    int phys_offset_y = g_viewport_y * g_screen_phys_h * 2 / XRender::TargetH;
+    int phys_height = g_viewport_h * g_screen_phys_h * 2 / XRender::TargetH;
 
     if(g_screen_phys_x + phys_offset_x < 0)
         phys_offset_x = -g_screen_phys_x;

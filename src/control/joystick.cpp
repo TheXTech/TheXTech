@@ -29,6 +29,8 @@
 #include <Utils/strings.h>
 #include <Logger/logger.h>
 
+#include "core/render.h"
+
 #include "config.h"
 #include "../controls.h"
 #include "joystick.h"
@@ -535,23 +537,23 @@ bool InputMethod_Joystick::Update(int player, Controls_t& c, CursorControls_t& m
     if(cursor[0] || cursor[1] || cursor[2] || cursor[3])
     {
         if(m.X < 0)
-            m.X = ScreenW / 2;
+            m.X = XRender::TargetW / 2;
 
         if(m.Y < 0)
-            m.Y = ScreenH / 2;
+            m.Y = XRender::TargetH / 2;
 
         m.X += (cursor[3] - cursor[2]) * 16.;
         m.Y += (cursor[1] - cursor[0]) * 16.;
 
         if(m.X < 0)
             m.X = 0;
-        else if(m.X >= ScreenW)
-            m.X = ScreenW - 1;
+        else if(m.X >= XRender::TargetW)
+            m.X = XRender::TargetW - 1;
 
         if(m.Y < 0)
             m.Y = 0;
-        else if(m.Y >= ScreenH)
-            m.Y = ScreenH - 1;
+        else if(m.Y >= XRender::TargetH)
+            m.Y = XRender::TargetH - 1;
 
         m.Move = true;
     }

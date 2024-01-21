@@ -115,8 +115,8 @@ static void s_createSceneTargets()
 {
     s_destroySceneTargets();
 
-    s_tex_w = ScreenW / 2;
-    s_tex_h = ScreenH / 2;
+    s_tex_w = XRender::TargetW / 2;
+    s_tex_h = XRender::TargetH / 2;
 
     uint16_t mem_w = (s_tex_w <= 256) ? 256 : 512;
     uint16_t mem_h = (s_tex_h <= 256) ? 256 : 512;
@@ -738,8 +738,8 @@ void mapToScreen(int x, int y, int* dx, int* dy)
     if(!g_screen_swapped)
         x += 40;
 
-    *dx = (x - g_screen_phys_x) * ScreenW / g_screen_phys_w;
-    *dy = (y - g_screen_phys_y) * ScreenH / g_screen_phys_h;
+    *dx = (x - g_screen_phys_x) * XRender::TargetW / g_screen_phys_w;
+    *dy = (y - g_screen_phys_y) * XRender::TargetH / g_screen_phys_h;
 }
 
 void mapFromScreen(int scr_x, int scr_y, int* window_x, int* window_y)
@@ -752,8 +752,8 @@ void mapFromScreen(int scr_x, int scr_y, int* window_x, int* window_y)
         return;
     }
 
-    *window_x = (scr_x * g_screen_phys_w / ScreenW) + g_screen_phys_x;
-    *window_y = (scr_y * g_screen_phys_h / ScreenH) + g_screen_phys_y;
+    *window_x = (scr_x * g_screen_phys_w / XRender::TargetW) + g_screen_phys_x;
+    *window_y = (scr_y * g_screen_phys_h / XRender::TargetH) + g_screen_phys_y;
 
     if(!g_screen_swapped)
         *window_x -= 40;
@@ -763,8 +763,8 @@ void minport_TransformPhysCoords() {}
 
 void minport_ApplyPhysCoords()
 {
-    int tex_w = ScreenW / 2;
-    int tex_h = ScreenH / 2;
+    int tex_w = XRender::TargetW / 2;
+    int tex_h = XRender::TargetH / 2;
 
     if(tex_w != s_tex_w || tex_h != s_tex_h || g_screen_swapped != should_swap_screen())
         s_createSceneTargets();

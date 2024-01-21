@@ -21,10 +21,7 @@
 #include "sdl_proxy/sdl_stdinc.h"
 #include "sdl_proxy/sdl_timer.h"
 
-#ifdef __16M__
-// used to clear loaded textures on level/world load
 #include "core/render.h"
-#endif
 
 #include "../globals.h"
 #include "../frame_timer.h"
@@ -409,8 +406,8 @@ bool OpenWorld(std::string FilePath)
                 ll.Start = true;
         }
 
-        vScreen[1].X = (ScreenW / 2) - (800 / 2);
-        vScreen[1].Y = (ScreenH / 2) - (600 / 2);
+        vScreen[1].X = (XRender::TargetW / 2) - (800 / 2);
+        vScreen[1].Y = (XRender::TargetH / 2) - (600 / 2);
     }
 //    else
 //    {

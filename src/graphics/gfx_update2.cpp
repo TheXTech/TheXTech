@@ -125,8 +125,8 @@ void UpdateGraphics2(bool skipRepaint)
         vScreen[Z].ScreenLeft = 0;
         vScreen[Z].Top = 0;
         vScreen[Z].ScreenTop = 0;
-        vScreen[Z].Width = ScreenW;
-        vScreen[Z].Height = ScreenH;
+        vScreen[Z].Width = Screens[0].W;
+        vScreen[Z].Height = Screens[0].H;
     }
     else
     {
@@ -596,8 +596,8 @@ void UpdateGraphics2(bool skipRepaint)
         // prepare for player draw
         vScreen[0].X = 0;
         vScreen[0].Y = 0;
-        vScreen[0].Width = ScreenW;
-        vScreen[0].Height = ScreenH;
+        vScreen[0].Width = XRender::TargetW;
+        vScreen[0].Height = XRender::TargetH;
 
         for(int A = 1; A <= numPlayers; A++)
         {
@@ -683,7 +683,7 @@ void UpdateGraphics2(bool skipRepaint)
         if(!BattleMode && !GameMenu && g_config.show_episode_title)
         {
             // big screen, display at top
-            if(ScreenH >= 640 && g_config.show_episode_title == Config_t::EPISODE_TITLE_TOP)
+            if(XRender::TargetH >= 640 && g_config.show_episode_title == Config_t::EPISODE_TITLE_TOP)
             {
                 int y = 20;
                 float alpha = 1.0f;
@@ -692,7 +692,7 @@ void UpdateGraphics2(bool skipRepaint)
             // display at bottom
             else if(g_config.show_episode_title == Config_t::EPISODE_TITLE_BOTTOM)
             {
-                int y = ScreenH - 60;
+                int y = XRender::TargetH - 60;
                 float alpha = 0.75f;
                 SuperPrintScreenCenter(WorldName, 3, y, XTAlphaF(alpha));
             }

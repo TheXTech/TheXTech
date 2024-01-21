@@ -235,9 +235,9 @@ extern Screen_t* l_screen;
 // extern int& DScreenType;
 
 //Public ScreenType As Integer 'The screen/view type
-extern int& ScreenW;
+// extern int& ScreenW;
 //Public DScreenType As Integer 'The dynamic screen setup
-extern int& ScreenH;
+// extern int& ScreenH;
 #endif
 
 #endif // #ifndef SCREEN_HHH

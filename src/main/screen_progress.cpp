@@ -63,19 +63,19 @@ void IndicateProgress(uint32_t start_time, double progress, const std::string& m
     XRender::clearBuffer();
 
     SuperPrintScreenCenter(message.c_str(), 4,
-               ScreenH / 2 - 40,
+               XRender::TargetH / 2 - 40,
                {255, 255, 0, 127});
 
-    int time_y = ScreenH / 2 - 20;
+    int time_y = XRender::TargetH / 2 - 20;
 
     if(progress_valid)
     {
         // outline
-        XRender::renderRect(ScreenW * 0.25, time_y + 4, ScreenW * 0.50, 32, {255, 255, 255});
+        XRender::renderRect(XRender::TargetW * 0.25, time_y + 4, XRender::TargetW * 0.50, 32, {255, 255, 255});
         // empty progress
-        XRender::renderRect(ScreenW * 0.25 + 2, time_y + 6, ScreenW * 0.50 - 4, 28, {0, 0, 0});
+        XRender::renderRect(XRender::TargetW * 0.25 + 2, time_y + 6, XRender::TargetW * 0.50 - 4, 28, {0, 0, 0});
         // progress fill
-        XRender::renderRect(ScreenW * 0.25 + 2, time_y + 6, (ScreenW * 0.50 - 4) * progress, 28, {127, 255, 127});
+        XRender::renderRect(XRender::TargetW * 0.25 + 2, time_y + 6, (XRender::TargetW * 0.50 - 4) * progress, 28, {127, 255, 127});
         // push text down
         time_y += 60;
     }
@@ -93,7 +93,7 @@ void IndicateProgress(uint32_t start_time, double progress, const std::string& m
                time_y,
                {255, 255, 255, 127});
 
-    XRender::renderTexture(ScreenW / 2 - GFX.LoadCoin.w / 2, time_y + 40, GFX.LoadCoin.w, GFX.LoadCoin.h / 4, GFX.LoadCoin, 0, 32 * LoadCoins);
+    XRender::renderTexture(XRender::TargetW / 2 - GFX.LoadCoin.w / 2, time_y + 40, GFX.LoadCoin.w, GFX.LoadCoin.h / 4, GFX.LoadCoin, 0, 32 * LoadCoins);
 
     XRender::repaint();
     XRender::setTargetScreen();

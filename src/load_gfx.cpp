@@ -1499,9 +1499,9 @@ void UpdateLoadREAL()
         XRender::setTargetTexture();
         XRender::clearBuffer();
 
-        int sh_w = ScreenW / 2;
+        int sh_w = XRender::TargetW / 2;
         int gh_w = GFX.MenuGFX[4].w / 2;
-        int sh_h = ScreenH / 2;
+        int sh_h = XRender::TargetH / 2;
         int gh_h = GFX.MenuGFX[4].h / 2;
 
         int Left    = sh_w - gh_w;
@@ -1515,11 +1515,11 @@ void UpdateLoadREAL()
         if(Top < 0)
             Top = 0;
 
-        if(Right > ScreenW)
-            Right = ScreenW;
+        if(Right > XRender::TargetW)
+            Right = XRender::TargetW;
 
-        if(Bottom > ScreenH)
-            Bottom = ScreenH;
+        if(Bottom > XRender::TargetH)
+            Bottom = XRender::TargetH;
 
         if(!gfxLoaderTestMode)
         {
@@ -1537,7 +1537,7 @@ void UpdateLoadREAL()
         XRender::renderTexture(Right - 40, Bottom - 40, GFX.LoadCoin.w, GFX.LoadCoin.h / 4, GFX.LoadCoin, 0, 32 * LoadCoins);
 
         if(gfxLoaderThreadingMode && alphaFader > 0)
-            XRender::renderRect(0, 0, ScreenW, ScreenH, {0, 0, 0, alphaFader});
+            XRender::renderRect(0, 0, XRender::TargetW, XRender::TargetH, {0, 0, 0, alphaFader});
 
         if(!gfxLoaderDebugString.empty() && gfxLoaderDebugStart + c_gfxLoaderShowInterval < SDL_GetTicks())
         {

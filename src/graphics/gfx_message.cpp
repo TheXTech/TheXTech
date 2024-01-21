@@ -42,9 +42,9 @@ void DrawMessage(const UTF8CharMap_t &SuperTextMap)
     int TextBoxW = GFX.TextBox.w;
     bool UseGFX = true;
 
-    if(ScreenW < GFX.TextBox.w)
+    if(XRender::TargetW < GFX.TextBox.w)
     {
-        TextBoxW = ScreenW - 50;
+        TextBoxW = XRender::TargetW - 50;
         UseGFX = false;
     }
 
@@ -55,7 +55,7 @@ void DrawMessage(const UTF8CharMap_t &SuperTextMap)
     const int lineHeight = 16;
 
     int BoxY = 0;
-    int BoxY_Start = ScreenH / 2 - 150;
+    int BoxY_Start = XRender::TargetH / 2 - 150;
 
     if(BoxY_Start < 60)
         BoxY_Start = 60;
@@ -100,13 +100,13 @@ void DrawMessage(const UTF8CharMap_t &SuperTextMap)
 
     if(!UseGFX)
     {
-        XRender::renderRect(ScreenW / 2 - TextBoxW / 2,
+        XRender::renderRect(XRender::TargetW / 2 - TextBoxW / 2,
                             BoxY_Start,
                             TextBoxW, totalHeight, {0, 0, 0});
-        XRender::renderRect(ScreenW / 2 - TextBoxW / 2 + 2,
+        XRender::renderRect(XRender::TargetW / 2 - TextBoxW / 2 + 2,
                             BoxY_Start + 2,
                             TextBoxW - 4, totalHeight - 4, {255, 255, 255});
-        XRender::renderRect(ScreenW / 2 - TextBoxW / 2 + 4,
+        XRender::renderRect(XRender::TargetW / 2 - TextBoxW / 2 + 4,
                             BoxY_Start + 4,
                             TextBoxW - 8, totalHeight - 8, {8, 96, 168});
     }
@@ -135,7 +135,7 @@ void DrawMessage(const UTF8CharMap_t &SuperTextMap)
         }
 
         // render top 20px of graphics
-        XRender::renderTexture(ScreenW / 2 - TextBoxW / 2,
+        XRender::renderTexture(XRender::TargetW / 2 - TextBoxW / 2,
                                BoxY_Start,
                                TextBoxW, 20, GFX.TextBox, 0, 0);
 
@@ -143,17 +143,17 @@ void DrawMessage(const UTF8CharMap_t &SuperTextMap)
         for(int i = 0; i < vertReps; i++)
         {
             if((i + 1) * gfxMidH <= spaceToFill)
-                XRender::renderTexture(ScreenW / 2 - TextBoxW / 2,
+                XRender::renderTexture(XRender::TargetW / 2 - TextBoxW / 2,
                                        BoxY_Start + 20 + i * gfxMidH,
                                        TextBoxW, gfxMidH, GFX.TextBox, 0, 20);
             else
-                XRender::renderTexture(ScreenW / 2 - TextBoxW / 2,
+                XRender::renderTexture(XRender::TargetW / 2 - TextBoxW / 2,
                                        BoxY_Start + 20 + i * gfxMidH,
                                        TextBoxW, spaceToFill - i * gfxMidH, GFX.TextBox, 0, 20);
         }
 
         // render bottom of graphics
-        XRender::renderTexture(ScreenW / 2 - TextBoxW / 2,
+        XRender::renderTexture(XRender::TargetW / 2 - TextBoxW / 2,
                                BoxY_Start + 20 + spaceToFill,
                                TextBoxW, bottomPaddingHeight, GFX.TextBox, 0, GFX.TextBox.h - bottomPaddingHeight);
     }
@@ -195,14 +195,14 @@ void DrawMessage(const UTF8CharMap_t &SuperTextMap)
         {
             SuperPrint(lineLenU, SuperTextMap[lineStart],
                        4,
-                       ScreenW / 2 - ((lastWord - lineStart) * charWidth) / 2,
+                       XRender::TargetW / 2 - ((lastWord - lineStart) * charWidth) / 2,
                        BoxY);
         }
         else
         {
             SuperPrint(lineLenU, SuperTextMap[lineStart],
                        4,
-                       ScreenW / 2 - TextBoxW / 2 + 12,
+                       XRender::TargetW / 2 - TextBoxW / 2 + 12,
                        BoxY);
         }
 

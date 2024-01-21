@@ -41,6 +41,9 @@
 namespace XRender
 {
 
+int TargetW = 800;
+int TargetH = 600;
+
 int g_viewport_x = 0;
 int g_viewport_y = 0;
 int g_viewport_w = 0;
@@ -66,7 +69,7 @@ void updateViewport()
 
     // calculate physical render coordinates
 
-    pLogDebug("Updating viewport. Game screen is %d x %d", ScreenW, ScreenH);
+    pLogDebug("Updating viewport. Game screen is %d x %d", TargetW, TargetH);
 
     int hardware_w, hardware_h;
     XWindow::getWindowSize(&hardware_w, &hardware_h);
@@ -75,20 +78,20 @@ void updateViewport()
     hardware_h /= 2;
 
 #ifdef __3DS__
-    int ScreenW_Show = ScreenW - MAX_3D_OFFSET * 2;
+    int TargetW_Show = TargetW - MAX_3D_OFFSET * 2;
 #else
-    int ScreenW_Show = ScreenW;
+    int TargetW_Show = TargetW;
 #endif
 
     if(g_videoSettings.scaleMode == SCALE_DYNAMIC_LINEAR || g_videoSettings.scaleMode == SCALE_DYNAMIC_NEAREST)
     {
         int res_h = hardware_h;
-        int res_w = ScreenW_Show * hardware_h / ScreenH;
+        int res_w = TargetW_Show * hardware_h / TargetH;
 
         if(res_w > hardware_w)
         {
             res_w = hardware_w;
-            res_h = ScreenH * res_w / ScreenW;
+            res_h = TargetH * res_w / TargetW;
         }
 
         g_screen_phys_w = res_w;
@@ -96,32 +99,32 @@ void updateViewport()
     }
     else if(g_videoSettings.scaleMode == SCALE_FIXED_1X)
     {
-        g_screen_phys_w = ScreenW_Show / 2;
-        g_screen_phys_h = ScreenH / 2;
+        g_screen_phys_w = TargetW_Show / 2;
+        g_screen_phys_h = TargetH / 2;
     }
     else if(g_videoSettings.scaleMode == SCALE_FIXED_2X)
     {
-        g_screen_phys_w = ScreenW_Show;
-        g_screen_phys_h = ScreenH;
+        g_screen_phys_w = TargetW_Show;
+        g_screen_phys_h = TargetH;
     }
     else if(g_videoSettings.scaleMode == SCALE_FIXED_05X)
     {
-        g_screen_phys_w = ScreenW_Show / 4;
-        g_screen_phys_h = ScreenH / 4;
+        g_screen_phys_w = TargetW_Show / 4;
+        g_screen_phys_h = TargetH / 4;
     }
     else if(g_videoSettings.scaleMode == SCALE_DYNAMIC_INTEGER)
     {
-        g_screen_phys_w = ScreenW_Show / 2;
-        g_screen_phys_h = ScreenH / 2;
+        g_screen_phys_w = TargetW_Show / 2;
+        g_screen_phys_h = TargetH / 2;
         while(g_screen_phys_w <= hardware_w && g_screen_phys_h <= hardware_h)
         {
-            g_screen_phys_w += ScreenW_Show / 2;
-            g_screen_phys_h += ScreenH / 2;
+            g_screen_phys_w += TargetW_Show / 2;
+            g_screen_phys_h += TargetH / 2;
         }
-        if(g_screen_phys_w > ScreenW_Show / 2)
+        if(g_screen_phys_w > TargetW_Show / 2)
         {
-            g_screen_phys_w -= ScreenW_Show / 2;
-            g_screen_phys_h -= ScreenH / 2;
+            g_screen_phys_w -= TargetW_Show / 2;
+            g_screen_phys_h -= TargetH / 2;
         }
     }
 
@@ -138,7 +141,7 @@ void updateViewport()
 
 void resetViewport()
 {
-    setViewport(0, 0, ScreenW, ScreenH);
+    setViewport(0, 0, TargetW, TargetH);
 }
 
 void setViewport(int x, int y, int w, int h)

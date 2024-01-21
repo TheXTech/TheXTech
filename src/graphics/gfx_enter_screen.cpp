@@ -122,27 +122,27 @@ static void initPlayers(Player_t tempPlayer[maxLocalPlayers])
 
     if(numPlayers == 1)
     {
-        tempPlayer[0].Location.X = ScreenW / 2.0 - tempPlayer[0].Location.Width / 2.0;
-        tempPlayer[0].Location.Y = ScreenH / 2.0 - tempPlayer[0].Location.Height + 24;
+        tempPlayer[0].Location.X = XRender::TargetW / 2.0 - tempPlayer[0].Location.Width / 2.0;
+        tempPlayer[0].Location.Y = XRender::TargetH / 2.0 - tempPlayer[0].Location.Height + 24;
         tempPlayer[0].Direction = 1;
     }
     else if(numPlayers == 2)
     {
-        tempPlayer[0].Location.X = ScreenW / 2.0 - tempPlayer[0].Location.Width / 2.0 - 30;
-        tempPlayer[0].Location.Y = ScreenH / 2.0 - tempPlayer[0].Location.Height + 24;
+        tempPlayer[0].Location.X = XRender::TargetW / 2.0 - tempPlayer[0].Location.Width / 2.0 - 30;
+        tempPlayer[0].Location.Y = XRender::TargetH / 2.0 - tempPlayer[0].Location.Height + 24;
         tempPlayer[0].Direction = -1;
 
-        tempPlayer[1].Location.X = ScreenW / 2.0 - tempPlayer[1].Location.Width / 2.0 + 32;
-        tempPlayer[1].Location.Y = ScreenH / 2.0 - tempPlayer[1].Location.Height + 24;
+        tempPlayer[1].Location.X = XRender::TargetW / 2.0 - tempPlayer[1].Location.Width / 2.0 + 32;
+        tempPlayer[1].Location.Y = XRender::TargetH / 2.0 - tempPlayer[1].Location.Height + 24;
         tempPlayer[1].Direction = 1;
     }
     else
     {
-        int start_x = ScreenW / 2.0 - (numPlayers - 1) * 32;
+        int start_x = XRender::TargetW / 2.0 - (numPlayers - 1) * 32;
         for(int i = 0; i < numPlayers && i < maxLocalPlayers; i++)
         {
             tempPlayer[i].Location.X = start_x + 64 * i - tempPlayer[i].Location.Width / 2.0;
-            tempPlayer[i].Location.Y = ScreenH / 2.0 - tempPlayer[i].Location.Height + 24;
+            tempPlayer[i].Location.Y = XRender::TargetH / 2.0 - tempPlayer[i].Location.Height + 24;
             tempPlayer[i].Direction = 1;
         }
     }
@@ -159,13 +159,13 @@ static void drawEnterScreen(Player_t tempPlayer[maxLocalPlayers])
 
     if(TestLevel)
     {
-        SuperPrintScreenCenter("LOADING...", 3, /*(ScreenW / 2.0f) - float(loading.size() / 2) * 18,*/ ScreenH / 2.0f + 32);
+        SuperPrintScreenCenter("LOADING...", 3, /*(XRender::TargetW / 2.0f) - float(loading.size() / 2) * 18,*/ XRender::TargetH / 2.0f + 32);
     }
     else
     {
-        XRender::renderTexture(ScreenW / 2.0 - 46, ScreenH / 2.0 + 31, GFX.Interface[3].w, GFX.Interface[3].h, GFX.Interface[3], 0, 0);
-        XRender::renderTexture(ScreenW / 2.0 - GFX.Interface[1].w / 2, ScreenH / 2.0 + 32, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
-        SuperPrint(std::to_string(int(Lives)), 1, ScreenW / 2.0 + 12, ScreenH / 2.0 + 32);
+        XRender::renderTexture(XRender::TargetW / 2.0 - 46, XRender::TargetH / 2.0 + 31, GFX.Interface[3].w, GFX.Interface[3].h, GFX.Interface[3], 0, 0);
+        XRender::renderTexture(XRender::TargetW / 2.0 - GFX.Interface[1].w / 2, XRender::TargetH / 2.0 + 32, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
+        SuperPrint(std::to_string(int(Lives)), 1, XRender::TargetW / 2.0 + 12, XRender::TargetH / 2.0 + 32);
     }
 
 }

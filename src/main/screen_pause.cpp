@@ -317,22 +317,22 @@ void Render()
     if(menu_box_width - total_menu_width < 32)
         menu_box_width = total_menu_width + 32;
 
-    int menu_left_X = ScreenW / 2 - total_menu_width / 2 + 20;
-    int menu_top_Y = ScreenH / 2 - total_menu_height / 2;
+    int menu_left_X = XRender::TargetW / 2 - total_menu_width / 2 + 20;
+    int menu_top_Y = XRender::TargetH / 2 - total_menu_height / 2;
 
     switch(s_pause_type)
     {
     case(PauseType::Legacy):
-        XRender::renderRect(ScreenW / 2 - menu_box_width / 2, ScreenH / 2 - menu_box_height / 2, menu_box_width, menu_box_height, {0, 0, 0});
+        XRender::renderRect(XRender::TargetW / 2 - menu_box_width / 2, XRender::TargetH / 2 - menu_box_height / 2, menu_box_width, menu_box_height, {0, 0, 0});
         break;
     case(PauseType::Modern):
     default:
-        XRender::renderRect(ScreenW / 2 - menu_box_width / 2 - 4, ScreenH / 2 - menu_box_height / 2 - 4, menu_box_width + 8, menu_box_height + 8, {0, 0, 0});
-        XRender::renderRect(ScreenW / 2 - menu_box_width / 2 - 2, ScreenH / 2 - menu_box_height / 2 - 2, menu_box_width + 4, menu_box_height + 4, {255, 255, 255});
-        XRender::renderRect(ScreenW / 2 - menu_box_width / 2, ScreenH / 2 - menu_box_height / 2, menu_box_width, menu_box_height, {0, 0, 0});
+        XRender::renderRect(XRender::TargetW / 2 - menu_box_width / 2 - 4, XRender::TargetH / 2 - menu_box_height / 2 - 4, menu_box_width + 8, menu_box_height + 8, {0, 0, 0});
+        XRender::renderRect(XRender::TargetW / 2 - menu_box_width / 2 - 2, XRender::TargetH / 2 - menu_box_height / 2 - 2, menu_box_width + 4, menu_box_height + 4, {255, 255, 255});
+        XRender::renderRect(XRender::TargetW / 2 - menu_box_width / 2, XRender::TargetH / 2 - menu_box_height / 2, menu_box_width, menu_box_height, {0, 0, 0});
         break;
     case(PauseType::Testing):
-        XRender::renderRect(ScreenW / 2 - menu_box_width / 2, ScreenH / 2 - menu_box_height / 2, menu_box_width, menu_box_height, {0, 0, 0, 127});
+        XRender::renderRect(XRender::TargetW / 2 - menu_box_width / 2, XRender::TargetH / 2 - menu_box_height / 2, menu_box_width, menu_box_height, {0, 0, 0, 127});
         break;
     }
 

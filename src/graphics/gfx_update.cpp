@@ -3170,7 +3170,7 @@ void UpdateGraphicsMeta()
     if(!BattleMode && !GameMenu && !GameOutro && g_config.show_episode_title)
     {
         // big screen, display at top
-        if(ScreenH >= 640 && g_config.show_episode_title == Config_t::EPISODE_TITLE_TOP)
+        if(XRender::TargetH >= 640 && g_config.show_episode_title == Config_t::EPISODE_TITLE_TOP)
         {
             int y = 20;
             float alpha = 1.0f;
@@ -3179,7 +3179,7 @@ void UpdateGraphicsMeta()
         // display at bottom
         else if(g_config.show_episode_title == Config_t::EPISODE_TITLE_BOTTOM)
         {
-            int y = ScreenH - 60;
+            int y = XRender::TargetH - 60;
             float alpha = 0.75f;
             SuperPrintScreenCenter(WorldName, 3, y, XTAlphaF(alpha));
         }
