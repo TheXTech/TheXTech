@@ -5284,6 +5284,7 @@ void EditorScreen::UpdateEditorScreen(CallMode mode, bool second_screen)
 
     if(select_bar_only)
     {
+        XRender::resetViewport();
         UpdateSelectorBar(mode, true);
 
         if(mode == CallMode::Logic)

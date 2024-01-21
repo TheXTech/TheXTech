@@ -76,6 +76,12 @@ struct vScreen_t : public qScreen_t
 
     // NEW: which player is associated with the vScreen. IMPORTANT: unused when shared screen mode is active
     uint8_t player = 0;
+
+    //! left x-coordinate for drawing on the currently active render target
+    int TargetX() const;
+
+    //! top y-coordinate for start drawing on the currently active render target
+    int TargetY() const;
 };
 
 constexpr int c_screenCount = 2;
@@ -192,6 +198,12 @@ public:
 
     //! Bound on active vScreen indexes (0-indexed). Use to replace numScreens logic.
     int active_end() const;
+
+    //! left x-coordinate for drawing on the currently active render target
+    int TargetX() const;
+
+    //! top y-coordinate for start drawing on the currently active render target
+    int TargetY() const;
 };
 
 void InitScreens();

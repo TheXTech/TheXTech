@@ -309,8 +309,8 @@ void DrawEditorLevel(int Z)
     // Display the cursor
     {
         auto &e = EditorCursor;
-        int curX = int(double(e.X) - vScreen[Z].ScreenLeft);
-        int curY = int(double(e.Y) - vScreen[Z].ScreenTop);
+        int curX = int(double(e.X) - vScreen[Z].TargetX());
+        int curY = int(double(e.Y) - vScreen[Z].TargetY());
 
         if((CommonFrame % 46) < 10)
         {
@@ -780,8 +780,8 @@ void DrawEditorWorld()
             XTColorF(1.0f, 0.8f, 0.2f), false);
     }
 
-    double X = EditorCursor.X;
-    double Y = EditorCursor.Y;
+    double X = EditorCursor.X - vScreen[Z].TargetX();
+    double Y = EditorCursor.Y - vScreen[Z].TargetY();
     if(g_config.editor_edge_scroll && !editorScreen.active && !MagicHand)
     {
         if(X >= 0 && X < 36)

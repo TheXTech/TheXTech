@@ -30,6 +30,7 @@
 
 #include "graphics/gfx_frame.h"
 #include "graphics/gfx_camera.h"
+#include "graphics/gfx_world.h"
 
 #include "pseudo_vb.h"
 #include "gfx.h"
@@ -798,29 +799,50 @@ void DrawBackdrop(const Screen_t& screen)
     {
         bool border_valid = GFX.Backdrop_Border.tex.inited && (!GFX.isCustom(71) || GFX.isCustom(72));
 
+        // special case for world map
+        if(LevelSelect && !GameMenu && !GameOutro && !LevelEditor)
+        {
+            Location_t full = newLoc(0, 0, XRender::TargetW, XRender::TargetH);
+            Location_t inner = newLoc(screen.TargetX(), screen.TargetY(), screen.W, screen.H);
+
+            // if world map frame assets missing, use the 800x600 area isntead
+            if(!worldHasFrameAssets())
+            {
+                inner.X = screen.vScreen(1).TargetX() - 66;
+                inner.Y = screen.vScreen(1).TargetY() - 130;
+                inner.Width = 800;
+                inner.Height = 600;
+            }
+
+            RenderFrameBorder(full, inner,
+                GFX.Backdrop, border_valid ? &GFX.Backdrop_Border : nullptr);
+
+            return;
+        }
+
         for(int i = screen.active_begin(); i < screen.active_end(); i++)
         {
             const auto& s = screen.vScreen(i + 1);
 
-            Location_t full = newLoc(0, 0, screen.W, screen.H);
+            Location_t full = newLoc(0, 0, XRender::TargetW, XRender::TargetH);
             // horizontal
             if(screen.Type == 4 || (screen.Type == 5 && (screen.DType == 1 || screen.DType == 2)))
             {
-                full.Width = screen.W / 2;
+                full.Width = XRender::TargetW / 2;
                 // our screen on right
                 if(((screen.Type == 4 || (screen.Type == 5 && screen.DType == 1)) && i == 1) || (screen.DType == 2 && i == 0))
-                    full.X = screen.W / 2;
+                    full.X = XRender::TargetW / 2;
             }
             // vertical
             else if(screen.Type == 1 || (screen.Type == 5 && (screen.DType == 3 || screen.DType == 4 || screen.DType == 6)))
             {
-                full.Height = screen.H / 2;
+                full.Height = XRender::TargetH / 2;
                 // our screen on bottom
                 if(((screen.Type == 1 || (screen.Type == 5 && (screen.DType == 3 || screen.DType == 6))) && i == 1) || (screen.DType == 4 && i == 0))
-                    full.Y = screen.H / 2;
+                    full.Y = XRender::TargetH / 2;
             }
 
-            RenderFrameBorder(full, newLoc(s.ScreenLeft, s.ScreenTop, s.Width, s.Height),
+            RenderFrameBorder(full, newLoc(s.TargetX(), s.TargetY(), s.Width, s.Height),
                 GFX.Backdrop, border_valid ? &GFX.Backdrop_Border : nullptr);
         }
     }

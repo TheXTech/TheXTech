@@ -547,7 +547,7 @@ void MenuLoop()
 
     if(SharedCursor.Primary)
     {
-        const Location_t cursorLoc = newLoc(SharedCursor.X - vScreen[1].X - vScreen[1].ScreenLeft, SharedCursor.Y - vScreen[1].Y - vScreen[1].ScreenTop);
+        const Location_t cursorLoc = newLoc(SharedCursor.X - vScreen[1].X - vScreen[1].TargetX(), SharedCursor.Y - vScreen[1].Y - vScreen[1].TargetY());
         if(iRand(5) >= 2)
         {
             NewEffect(EFFID_SPARKLE, cursorLoc);

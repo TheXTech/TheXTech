@@ -1776,6 +1776,8 @@ void UpdateGraphicsDraw(bool skipRepaint)
     XRender::setTargetLayer(0);
 #endif
 
+    XRender::resetViewport();
+
     XRender::setDrawPlane(PLANE_GAME_BACKDROP);
 
     UpdateGraphicsScreen(*l_screen);
@@ -1801,7 +1803,7 @@ void UpdateGraphicsScreen(Screen_t& screen)
     int numScreens = screen.active_end();
 
     // even if not clearing buffer, black background is good, to be safe
-    XRender::renderRect(0, 0, screen.W, screen.H, {0, 0, 0});
+    XRender::renderRect(0, 0, XRender::TargetW, XRender::TargetH, {0, 0, 0});
     DrawBackdrop(screen);
 
     // No logic
@@ -1841,7 +1843,7 @@ void UpdateGraphicsScreen(Screen_t& screen)
         NPC_Draw_Queue_t& NPC_Draw_Queue_p = NPC_Draw_Queue[Z-1];
 
         // always needed now due to cases where vScreen is smaller than physical screen
-        XRender::setViewport(vScreen[Z].ScreenLeft, vScreen[Z].ScreenTop, vScreen[Z].Width, vScreen[Z].Height);
+        XRender::setViewport(vScreen[Z].TargetX(), vScreen[Z].TargetY(), vScreen[Z].Width, vScreen[Z].Height);
 
         // update viewport from screen shake
         s_shakeScreen.apply();
@@ -3087,7 +3089,7 @@ void UpdateGraphicsScreen(Screen_t& screen)
 
 
     // graphics shared by all vScreens, but still on the Screen
-    XRender::resetViewport();
+    XRender::setViewport(screen.TargetX(), screen.TargetY(), screen.W, screen.H);
     XRender::offsetViewportIgnore(true);
 
     // splitscreen dividers
@@ -3107,6 +3109,8 @@ void UpdateGraphicsScreen(Screen_t& screen)
         if(vert_split)
             XRender::renderRect((screen.W / 2) - 2, 0, 4, screen.H, {0, 0, 0});
     }
+
+    XRender::resetViewport();
 
     XRender::setDrawPlane(PLANE_GAME_META);
 

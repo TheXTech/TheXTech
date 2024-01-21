@@ -196,8 +196,8 @@ void ScreenFader::draw(bool fullscreen)
 
         if(fullscreen)
         {
-            focusX += vScreen[m_focusScreen].ScreenLeft;
-            focusY += vScreen[m_focusScreen].ScreenTop;
+            focusX += vScreen[m_focusScreen].TargetX();
+            focusY += vScreen[m_focusScreen].TargetY();
         }
     }
 

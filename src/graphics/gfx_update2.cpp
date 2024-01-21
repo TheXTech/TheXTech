@@ -264,6 +264,7 @@ void UpdateGraphics2(bool skipRepaint)
     XRender::setDrawPlane(PLANE_GAME_BACKDROP);
 
     XRender::clearBuffer();
+    XRender::resetViewport();
     DrawBackdrop(Screens[0]);
 
 //    if(TakeScreen == true)
@@ -321,7 +322,7 @@ void UpdateGraphics2(bool skipRepaint)
 //        Next A
 //    Else
 
-    XRender::setViewport(vScreen[Z].ScreenLeft, vScreen[Z].ScreenTop, vScreen[Z].Width, vScreen[Z].Height);
+    XRender::setViewport(vScreen[Z].TargetX(), vScreen[Z].TargetY(), vScreen[Z].Width, vScreen[Z].Height);
 
     double sLeft = -vScreen[1].X;
     double sTop = -vScreen[1].Y;
@@ -572,7 +573,7 @@ void UpdateGraphics2(bool skipRepaint)
             }
         }
 
-        XRender::resetViewport();
+        XRender::setViewport(Screens[0].TargetX(), Screens[0].TargetY(), Screens[0].W, Screens[0].H);
 
 #ifdef __3DS__
         XRender::setTargetLayer(2);
@@ -671,6 +672,7 @@ void UpdateGraphics2(bool skipRepaint)
         }
 
         XRender::setDrawPlane(PLANE_WLD_META);
+        XRender::resetViewport();
 
         g_worldScreenFader.draw();
 

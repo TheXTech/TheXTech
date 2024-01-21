@@ -3121,13 +3121,13 @@ void MouseMove(float X, float Y, bool /*nCur*/)
         A = SingleCoop;
     else if(l_screen->Type == 5 && vScreen[2].Visible)
     {
-        if(X < float(vScreen[2].ScreenLeft + vScreen[2].Width))
+        if(X < float(vScreen[2].TargetX() + vScreen[2].Width))
         {
-            if(X > float(vScreen[2].ScreenLeft))
+            if(X > float(vScreen[2].TargetX()))
             {
-                if(Y < float(vScreen[2].ScreenTop + vScreen[2].Height))
+                if(Y < float(vScreen[2].TargetY() + vScreen[2].Height))
                 {
-                    if(Y > float(vScreen[2].ScreenTop))
+                    if(Y > float(vScreen[2].TargetY()))
                         A = 2;
                 }
             }
@@ -3136,8 +3136,8 @@ void MouseMove(float X, float Y, bool /*nCur*/)
     else
         A = 1;
 
-    X -= vScreen[A].ScreenLeft;
-    Y -= vScreen[A].ScreenTop;
+    X -= vScreen[A].TargetX();
+    Y -= vScreen[A].TargetY();
 
     // translate into layer coordinates to snap to layer's grid
     if(MagicHand && EditorCursor.Layer != LAYER_NONE)
