@@ -1440,8 +1440,8 @@ void NextLevel()
         {
             BattleIntro = 150;
 
-            if(!LevelEditor && Backup_FullFileName.empty())
-                GameIsActive = false; // Quit game
+            // if(!LevelEditor && Backup_FullFileName.empty())
+            //     GameIsActive = false; // Quit game
         }
     }
 }
