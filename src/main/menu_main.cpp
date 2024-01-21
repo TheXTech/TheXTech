@@ -107,6 +107,36 @@ static inline int s_GetSavesPageSaveOffset()
     return (MenuCursor / c_menuSavesPageLength) * c_menuSavesPerPage;
 }
 
+// returns the number of save pages that actually exist currently
+static inline int s_GetCurrentSavesPageCount()
+{
+    int max_all = -1;
+    int max_any = -1;
+
+    for(int page_i = 0; page_i < c_menuSavesPageCount; page_i++)
+    {
+        bool any = false;
+        bool all = true;
+
+        int page_base = c_menuSavesPerPage * page_i;
+        for(int slot_i = 1; slot_i <= c_menuSavesPerPage && page_base + slot_i <= maxSaveSlots; slot_i++)
+        {
+            if(SaveSlotInfo[page_base + slot_i].Progress >= 0)
+                any = true;
+            else
+                all = false;
+        }
+
+        if(any)
+            max_any = page_i;
+
+        if(all)
+            max_all = page_i;
+    }
+
+    return SDL_min(SDL_max(SDL_max(max_all + 1, max_any), MenuCursor / c_menuSavesPageLength) + 1, c_menuSavesPageCount);
+}
+
 // returns c_menuItemSavesCopy, c_menuItemSavesDelete, or an actual save slot
 static inline int s_GetSavesActionIdx(bool check_bounds = true)
 {
@@ -695,6 +725,7 @@ bool mainMenuUpdate()
         {
             int cursorDelta = 0;
             bool page_flip = false;
+            int pre_flip_page_count = 0;
 
             if(upPressed)
             {
@@ -720,7 +751,7 @@ bool mainMenuUpdate()
             {
                 if(leftPressed || SharedCursor.ScrollUp)
                 {
-                    if(MenuCursorCanMove)
+                    if(MenuCursorCanMove && (pre_flip_page_count = s_GetCurrentSavesPageCount()) > 1)
                     {
                         MenuCursor -= c_menuSavesPageLength;
                         cursorDelta = -1;
@@ -731,7 +762,7 @@ bool mainMenuUpdate()
                 }
                 else if(rightPressed || SharedCursor.ScrollDown)
                 {
-                    if(MenuCursorCanMove)
+                    if(MenuCursorCanMove && (pre_flip_page_count = s_GetCurrentSavesPageCount()) > 1)
                     {
                         MenuCursor += c_menuSavesPageLength;
                         cursorDelta = -1;
@@ -763,6 +794,12 @@ bool mainMenuUpdate()
                     if(page_flip)
                     {
                         // total wrap
+                        if(MenuCursor < 0)
+                            MenuCursor += pre_flip_page_count * c_menuSavesPageLength;
+                        else if(MenuCursor >= pre_flip_page_count * c_menuSavesPageLength)
+                            MenuCursor -= pre_flip_page_count * c_menuSavesPageLength;
+
+                        // backup total wrap
                         if(MenuCursor < 0)
                             MenuCursor += c_menuItemSavesEndList + 1;
                         else if(MenuCursor > c_menuItemSavesEndList)
