@@ -194,24 +194,26 @@ static std::string findIntroLevel()
 // expand the section vertically if the top 8px of the level are empty
 static void s_ExpandSectionForMenu()
 {
-    // check current section top for expandability
-    Location_t tempLocation = newLoc(level[Player[1].Section].X, level[0].Y, level[Player[1].Section].Width - level[Player[1].Section].X, 8);
+    Location_t& menu_section = level[0];
 
-    for(int A = 1; A <= numBlock; A++)
+    // check current section top for expandability
+    Location_t tempLocation = newLoc(menu_section.X, menu_section.Y, menu_section.Width - menu_section.X, 8);
+
+    for(int A : treeBlockQuery(tempLocation, SORTMODE_NONE))
     {
         if(CheckCollision(Block[A].Location, tempLocation))
             return;
     }
 
-    for(int A = 1; A <= numBackground; A++)
+    for(int A : treeBackgroundQuery(tempLocation, SORTMODE_NONE))
     {
         if(CheckCollision(Background[A].Location, tempLocation))
             return;
     }
 
     // expand level height to a maximum of 2160px
-    if(level[Player[1].Section].Y > level[Player[1].Section].Height - 2160)
-        level[Player[1].Section].Y = level[Player[1].Section].Height - 2160;
+    if(menu_section.Y > menu_section.Height - 2160)
+        menu_section.Y = menu_section.Height - 2160;
 }
 
 void MainLoadAll(bool reload)
