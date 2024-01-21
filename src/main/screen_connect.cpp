@@ -462,12 +462,12 @@ bool PlayerBox::CharAvailable(int c, bool ghost_mode)
 
     int max_check = ghost_mode ? BoxCount() : (int)Controls::g_InputMethods.size();
 
-    // check if a different player has selected or is currently selecting the character
-    for(int i = 0; i < maxLocalPlayers; i++)
-    {
-        if(i == max_check)
-            break;
+    if(max_check < s_minPlayers)
+        max_check = s_minPlayers;
 
+    // check if a different player has selected or is currently selecting the character
+    for(int i = 0; i < maxLocalPlayers && i < max_check; i++)
+    {
         // fine if self
         if(i == p)
             continue;
@@ -722,8 +722,8 @@ bool PlayerBox::Back()
             // remove the player's slot
             Player_Remove(p);
 
-            // quit if there aren't any other players
-            if(Controls::g_InputMethods.empty())
+            // quit if there aren't enough players
+            if((int)Controls::g_InputMethods.size() < s_minPlayers)
             {
                 PlaySoundMenu(SFX_Slide);
                 return true;
@@ -1260,10 +1260,10 @@ bool PlayerBox::DrawChar(int x, int w, int y, int h)
 
     // player hasn't been added yet
     bool inactive = m_state == PlayerState::Disconnected && (IsMenu() || p >= numPlayers);
-    bool inactive_vis = inactive && p != 0;
+    bool show_inactive = inactive && p >= s_minPlayers;
 
     // alpha for most uses
-    uint8_t alpha = (inactive_vis) ? 127 : 255;
+    uint8_t alpha = (show_inactive) ? 127 : 255;
 
     // verify that character is valid
     int ch = g_charSelect[p];
@@ -1279,7 +1279,7 @@ bool PlayerBox::DrawChar(int x, int w, int y, int h)
         RenderFrameFill(newLoc(x, y, w, h), GFX.CharSelFrame, XTAlpha(alpha));
     else
     {
-        uint8_t alpha_border = (inactive_vis) ?  64 : 255;
+        uint8_t alpha_border = (show_inactive) ?  64 : 255;
 
         XRender::renderRect(x, y, w, h, {0, 0, 0, alpha_border});
         XRender::renderRect(x + 2, y + 2, w - 4, h - 4, {255, 255, 255, alpha});
@@ -1297,7 +1297,7 @@ bool PlayerBox::DrawChar(int x, int w, int y, int h)
         else if(CommonFrame % 90 >= 45)
             arrow_color.a = 0;
         // never show full opacity when inactive
-        else if(inactive_vis)
+        else if(show_inactive)
             arrow_color.a = 127;
 
         if(arrow_color.a == 0)
@@ -1524,9 +1524,14 @@ int PlayerBox::Mouse_Render(bool render, int x, int y, int w, int h)
 
     // not-yet-added player
     bool inactive = m_state == PlayerState::Disconnected && (s_context == Context::MainMenu || p >= numPlayers);
+    bool show_inactive = inactive && p >= s_minPlayers;
 
     if(inactive)
+    {
+        if(show_inactive)
+            g_charSelect[p] = 1;
         ValidateChar(true);
+    }
 
     // check currently selected character
     int ch = g_charSelect[p];
@@ -1557,7 +1562,7 @@ int PlayerBox::Mouse_Render(bool render, int x, int y, int w, int h)
         break;
     }
 
-    if(inactive && p != 0)
+    if(show_inactive)
     {
         color.r = color.r / 4 + 127;
         color.g = color.g / 4 + 127;
@@ -1641,7 +1646,7 @@ int PlayerBox::Mouse_Render(bool render, int x, int y, int w, int h)
     // draw cursor above char box
     if(render)
     {
-        if(m_state == PlayerState::SelectChar || (inactive && p == 0))
+        if(m_state == PlayerState::SelectChar || (inactive && p < s_minPlayers))
             Render_PCursorDownwards(pbox_x + pbox_w / 2, pbox_y - 2);
         else if(inactive && s_context == Context::MainMenu)
             Render_PCursorDownwards(pbox_x + pbox_w / 2, pbox_y - 2, XTAlpha(127));
@@ -1961,13 +1966,6 @@ int Mouse_Render(bool mouse, bool render)
         draw_x += box_width + padding;
     }
 
-    // reset selected characters for non-added players
-    for(int p = 0; p < n; p++)
-    {
-        if(s_players[p].m_state == PlayerState::Disconnected && (s_context == Context::MainMenu || p >= numPlayers))
-            g_charSelect[p] = 0;
-    }
-
     return ret;
 }
 
@@ -2031,7 +2029,8 @@ int PlayerBox::Logic()
                 m_just_added = true;
 
                 m_menu_item = 0;
-                g_charSelect[p] = 1;
+                if(p >= s_minPlayers)
+                    g_charSelect[p] = 1;
                 m_state = PlayerState::SelectChar;
                 ValidateChar();
             }
@@ -2081,8 +2080,8 @@ int PlayerBox::Logic()
         // play drop item noise?
         bool play_noise = (s_context != Context::LegacyMenu);
 
-        // block start and back if not 1P
-        if(Controls::g_InputMethods.size() > 1 && (c.Jump || c.Start || c.Run || SharedControls.MenuBack))
+        // block back if a new-added player
+        if((int)Controls::g_InputMethods.size() > s_minPlayers && (c.Run || SharedControls.MenuBack))
             m_input_ready = false;
         // if pressing back, don't play drop item noise
         else if(c.Run || SharedControls.MenuBack)
