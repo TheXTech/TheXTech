@@ -1108,6 +1108,14 @@ int GameMain(const CmdLineSetup_t &setup)
                 ++Lives;
                 EveryonesDead();
                 clearScreenFaders();
+
+                if(BattleMode && !LevelEditor)
+                {
+                    BattleMode = false;
+                    GameMenu = true;
+                    MenuMode = MENU_BATTLE_MODE;
+                    MenuCursor = selWorld - 1;
+                }
             }
             else // Run the level normally
             {
