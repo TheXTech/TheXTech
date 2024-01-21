@@ -66,10 +66,12 @@
 #include "fontman/font_manager.h"
 
 #include "video.h"
+#include "editor.h"
 #include "frm_main.h"
 
 #include "screen_textentry.h"
 #include "editor/new_editor.h"
+#include "editor/write_level.h"
 #include "editor/write_world.h"
 #include "editor/editor_custom.h"
 #include "script/luna/luna.h"
@@ -138,6 +140,8 @@ void initMainMenu()
     }
 #endif
 
+    g_mainMenu.introPressStart = "Press Start";
+
     g_mainMenu.mainStartGame = "Start Game";
     g_mainMenu.main1PlayerGame = "1 Player Game";
     g_mainMenu.mainMultiplayerGame = "2 Player Game";
@@ -153,6 +157,7 @@ void initMainMenu()
 
     g_mainMenu.selectCharacter = "{0} game";
 
+    g_mainMenu.editorBattles = "<Battle Levels>";
     g_mainMenu.editorNewWorld = "<New World>";
     g_mainMenu.editorErrorResolution = "Sorry! The in-game editor is not supported at your current resolution.";
     g_mainMenu.editorErrorMissingResources = "Sorry! You are missing {0}, required for the in-game editor.";
@@ -212,7 +217,7 @@ void initMainMenu()
     g_mainMenu.controlsHotkeys = "Hotkeys";
 
     g_mainMenu.controlsOptionRumble = "Rumble";
-    g_mainMenu.controlsOptionGroundPoundButton = "Ground Pound Button";
+    // g_mainMenu.controlsOptionGroundPoundButton = "Ground Pound Button";
     g_mainMenu.controlsOptionBatteryStatus = "Battery Status";
 
     g_mainMenu.wordProfiles = "Profiles";
@@ -248,6 +253,10 @@ static int menuRecentEpisode = -1;
 static int listMenuLastScroll = 0;
 static int listMenuLastCursor = 0;
 
+static const int TinyScreenH = 400;
+static const int SmallScreenH = 500;
+static const int TinyScreenW = 600;
+
 void GetMenuPos(int* MenuX, int* MenuY)
 {
     if(MenuX)
@@ -255,6 +264,28 @@ void GetMenuPos(int* MenuX, int* MenuY)
 
     if(MenuY)
         *MenuY = ScreenH - 250;
+
+    // tweaks for MenuX
+    if(MenuX && ScreenW < TinyScreenW)
+    {
+        *MenuX = ScreenW / 2 - 240;
+        if(*MenuX < 24)
+            *MenuX = 24;
+    }
+
+    // the rest is tweaks for MenuY
+    if(!MenuY)
+        return;
+
+    if(ScreenH < TinyScreenH)
+        *MenuY = 100;
+    else if(ScreenH < SmallScreenH)
+    {
+        if(MenuMode == MENU_OPTIONS)
+            *MenuY = ScreenH - 250;
+        else
+            *MenuY = ScreenH - 220;
+    }
 }
 
 static void s_findRecentEpisode()
@@ -268,8 +299,11 @@ static void s_findRecentEpisode()
 
     for(size_t i = 1; i < SelectorList.size(); ++i)
     {
+        // special editor entry for battle levels
+        bool is_battle = (MenuMode == MENU_EDITOR && i == SelectorList.size() - 2);
+
         auto &w = SelectorList[i];
-        const std::string wPath = w.WorldPath + w.WorldFile;
+        const std::string wPath = (!is_battle) ? w.WorldPath + w.WorldFile : "battle";
 
         if((MenuMode == MENU_1PLAYER_GAME && wPath == g_recentWorld1p) ||
            (MenuMode == MENU_2PLAYER_GAME && wPath == g_recentWorld2p) ||
@@ -430,7 +464,7 @@ static void s_FinishFindWorlds()
     {
         SelectWorld.clear();
         SelectWorld.emplace_back(SelectWorld_t()); // Dummy entry
-        SelectWorld.emplace_back(SelectWorld_t()); // "no battle levels" entry
+        SelectWorld.emplace_back(SelectWorld_t()); // "no episodes to play" entry
         SelectWorld[1].WorldName = g_mainMenu.gameNoEpisodesToPlay;
         SelectWorld[1].disabled = true;
     }
@@ -450,9 +484,14 @@ static void s_FinishFindWorlds()
 
     NumSelectWorld = (int)(SelectWorld.size() - 1);
 
+    SelectWorld_t battles = SelectWorld_t();
+    battles.WorldName = g_mainMenu.editorBattles;
+    SelectWorldEditable.push_back(battles);
+
     SelectWorld_t createWorld = SelectWorld_t();
     createWorld.WorldName = g_mainMenu.editorNewWorld;
     SelectWorldEditable.push_back(createWorld);
+
     NumSelectWorldEditable = ((int)SelectWorldEditable.size() - 1);
 
     s_findRecentEpisode();
@@ -652,7 +691,7 @@ bool mainMenuUpdate()
                 MenuCursorCanMove = true;
         }
 
-        if(!g_pollingInput && (MenuMode != MENU_CHARACTER_SELECT_NEW && MenuMode != MENU_CHARACTER_SELECT_NEW_BM))
+        if(!g_pollingInput && (MenuMode != MENU_CHARACTER_SELECT_NEW && MenuMode != MENU_CHARACTER_SELECT_NEW_BM && MenuMode != MENU_INTRO))
         {
             int cursorDelta = 0;
             bool page_flip = false;
@@ -765,6 +804,9 @@ bool mainMenuUpdate()
 
         } // No keyboard/Joystick grabbing active
 
+        if(MenuMode == MENU_INTRO && ScreenH >= TinyScreenH)
+            MenuMode = MENU_MAIN;
+
 #ifndef PGE_NO_THREADING
         if(SDL_AtomicGet(&loading))
         {
@@ -776,6 +818,35 @@ bool mainMenuUpdate()
         }
         else
 #endif
+
+        // Menu Intro
+        if(MenuMode == MENU_INTRO)
+        {
+            if(MenuMouseRelease && SharedCursor.Primary)
+                MenuMouseClick = true;
+            if(menuBackPress && MenuCursorCanMove)
+            {
+                int quitKeyPos = 2;
+                if(!g_gameInfo.disableTwoPlayer)
+                    quitKeyPos ++;
+                if(!g_gameInfo.disableBattleMode)
+                    quitKeyPos ++;
+                if(g_config.enable_editor)
+                    quitKeyPos ++;
+
+                MenuMode = MENU_MAIN;
+                MenuCursor = quitKeyPos;
+                MenuCursorCanMove = false;
+                PlaySoundMenu(SFX_Slide);
+            }
+            if((menuDoPress && MenuCursorCanMove) || MenuMouseClick)
+            {
+                MenuCursorCanMove = false;
+                MenuMode = MENU_MAIN;
+                MenuCursor = 0;
+                PlaySoundMenu(SFX_Do);
+            }
+        }
         // Main Menu
         if(MenuMode == MENU_MAIN)
         {
@@ -826,7 +897,13 @@ bool mainMenuUpdate()
                 if(g_config.enable_editor)
                     quitKeyPos ++;
 
-                if(MenuCursor != quitKeyPos)
+                if(ScreenH < TinyScreenH)
+                {
+                    MenuCursorCanMove = false;
+                    MenuMode = MENU_INTRO;
+                    PlaySoundMenu(SFX_Slide);
+                }
+                else if(MenuCursor != quitKeyPos)
                 {
                     MenuCursor = quitKeyPos;
                     PlaySoundMenu(SFX_Slide);
@@ -1322,6 +1399,52 @@ bool mainMenuUpdate()
 #endif
                             }
                         }
+                        else if(selWorld == NumSelectWorldEditable - 1)
+                        {
+                            ClearWorld(true);
+                            GameMenu = false;
+                            LevelSelect = false;
+                            BattleMode = true;
+                            LevelEditor = true;
+                            WorldEditor = false;
+                            ClearLevel();
+                            ClearGame();
+                            SetupPlayers();
+
+                            std::string lPath = AppPathManager::userBattleRootDir();
+                            {
+                                // find a single battle level to open first
+                                std::vector<std::string> files;
+                                DirMan battleLvls(lPath);
+                                battleLvls.getListOfFiles(files, {".lvl", ".lvlx"});
+                                if(files.empty())
+                                    lPath += "newbattle.lvl";
+                                else
+                                    lPath += files[0];
+                            }
+
+                            if(!Files::fileExists(lPath))
+                            {
+                                if(g_config.editor_preferred_file_format != FileFormats::WLD_SMBX64 && g_config.editor_preferred_file_format != FileFormats::WLD_SMBX38A)
+                                    lPath += "x";
+                                SaveLevel(lPath, g_config.editor_preferred_file_format);
+                            }
+
+                            OpenLevel(lPath);
+                            EditorBackup(); // EditorRestore() gets called when not in world editor
+
+                            if(g_recentWorldEditor != "battle")
+                            {
+                                g_recentWorldEditor = "battle";
+                                SaveConfig();
+                            }
+
+                            Integrator::setEditorFile(FileName);
+                            editorScreen.ResetCursor();
+                            editorScreen.active = false;
+                            MouseRelease = false;
+                            return true;
+                        }
                         else
                         {
                             GameMenu = false;
@@ -1663,6 +1786,7 @@ bool mainMenuUpdate()
 #ifndef RENDER_CUSTOM
             optionsMenuLength++; // Renderer
 #endif
+            optionsMenuLength ++; // resolution
             optionsMenuLength ++; // ScaleMode
 
             if(SharedCursor.Move)
@@ -1689,6 +1813,8 @@ bool mainMenuUpdate()
 #endif
                         else if(A == i++)
                             menuLen = 18 * (7 + (int)ScaleMode_strings.at(g_videoSettings.scaleMode).length());
+                        else if(A == i++)
+                            menuLen = 18 * std::strlen("res: WWWxHHH (word)");
                         else if(A == i++)
                             menuLen = 18 * 25; // Language: XXXXX (YY)
                         else
@@ -1798,6 +1924,62 @@ bool mainMenuUpdate()
                             g_videoSettings.scaleMode = SCALE_DYNAMIC_INTEGER;
                         if(g_videoSettings.scaleMode < SCALE_DYNAMIC_INTEGER)
                             g_videoSettings.scaleMode = SCALE_FIXED_2X;
+                        UpdateWindowRes();
+                        UpdateInternalRes();
+                    }
+                    else if(MenuCursor == i++)
+                    {
+                        PlaySoundMenu(SFX_Do);
+                        if(!leftPressed)
+                        {
+                            if (g_config.InternalW == 0 && g_config.InternalH == 0)
+                                { g_config.InternalW = 480; g_config.InternalH = 320; }
+                            else if (g_config.InternalW == 480 && g_config.InternalH == 320)
+                                { g_config.InternalW = 512; g_config.InternalH = 384; }
+                            else if (g_config.InternalW == 512 && g_config.InternalH == 384)
+                                { g_config.InternalW = 512; g_config.InternalH = 448; }
+                            else if (g_config.InternalW == 512 && g_config.InternalH == 448)
+                                { g_config.InternalW = 768; g_config.InternalH = 432; }
+                            else if (g_config.InternalW == 768 && g_config.InternalH == 432)
+                                { g_config.InternalW = 640; g_config.InternalH = 480; }
+                            else if (g_config.InternalW == 640 && g_config.InternalH == 480)
+                                { g_config.InternalW = 800; g_config.InternalH = 480; }
+                            else if (g_config.InternalW == 800 && g_config.InternalH == 480)
+                                { g_config.InternalW = 800; g_config.InternalH = 600; }
+                            else if (g_config.InternalW == 800 && g_config.InternalH == 600)
+                                { g_config.InternalW = 1280; g_config.InternalH = 720; }
+                            else if (g_config.InternalW == 1280 && g_config.InternalH == 720)
+                                { g_config.InternalW = 0; g_config.InternalH = 600; }
+                            else if (g_config.InternalW == 0 && g_config.InternalH == 600)
+                                { g_config.InternalW = 0; g_config.InternalH = 0; }
+                            else
+                                { g_config.InternalW = 0; g_config.InternalH = 0; }
+                        }
+                        else
+                        {
+                            if (g_config.InternalW == 0 && g_config.InternalH == 0)
+                                { g_config.InternalW = 0; g_config.InternalH = 600; }
+                            else if (g_config.InternalW == 480 && g_config.InternalH == 320)
+                                { g_config.InternalW = 0; g_config.InternalH = 0; }
+                            else if (g_config.InternalW == 512 && g_config.InternalH == 384)
+                                { g_config.InternalW = 480; g_config.InternalH = 320; }
+                            else if (g_config.InternalW == 512 && g_config.InternalH == 448)
+                                { g_config.InternalW = 512; g_config.InternalH = 384; }
+                            else if (g_config.InternalW == 640 && g_config.InternalH == 480)
+                                { g_config.InternalW = 768; g_config.InternalH = 432; }
+                            else if (g_config.InternalW == 768 && g_config.InternalH == 432)
+                                { g_config.InternalW = 512; g_config.InternalH = 448; }
+                            else if (g_config.InternalW == 800 && g_config.InternalH == 480)
+                                { g_config.InternalW = 640; g_config.InternalH = 480; }
+                            else if (g_config.InternalW == 800 && g_config.InternalH == 600)
+                                { g_config.InternalW = 800; g_config.InternalH = 480; }
+                            else if (g_config.InternalW == 1280 && g_config.InternalH == 720)
+                                { g_config.InternalW = 800; g_config.InternalH = 600; }
+                            else if (g_config.InternalW == 0 && g_config.InternalH == 600)
+                                { g_config.InternalW = 1280; g_config.InternalH = 720; }
+                            else
+                                { g_config.InternalW = 0; g_config.InternalH = 0; }
+                        }
                         UpdateWindowRes();
                         UpdateInternalRes();
                     }
@@ -2107,12 +2289,53 @@ void mainMenuDraw()
     XRender::setTargetLayer(2);
 #endif
 
-    XRender::renderTexture(0, 0, GFX.MenuGFX[1].w, GFX.MenuGFX[1].h, GFX.MenuGFX[1], 0, 0);
-    XRender::renderTexture(ScreenW / 2 - GFX.MenuGFX[2].w / 2, 70,
-            GFX.MenuGFX[2].w, GFX.MenuGFX[2].h, GFX.MenuGFX[2], 0, 0);
+    // Render the permanent menu graphics (curtain, URL, logo)
 
-    XRender::renderTexture(ScreenW / 2 - GFX.MenuGFX[3].w / 2, 576,
-            GFX.MenuGFX[3].w, GFX.MenuGFX[3].h, GFX.MenuGFX[3], 0, 0);
+    // Curtain
+    // correction to loop the original asset properly
+    int A = GFX.MenuGFX[1].w;
+    if(A == 800)
+        A = 768;
+    // horizReps
+    B = ScreenW / A + 2;
+
+    double x = 0;
+
+    for(int C = 0; C < B; C++)
+        XRender::renderTexture(x + A * C, 0, A, GFX.MenuGFX[1].h, GFX.MenuGFX[1], 0, 0);
+
+    // URL
+    if(ScreenH >= SmallScreenH)
+        XRender::renderTexture(ScreenW / 2 - GFX.MenuGFX[3].w / 2, ScreenH - 24,
+                GFX.MenuGFX[3].w, GFX.MenuGFX[3].h, GFX.MenuGFX[3], 0, 0);
+
+    // game logo
+    int LogoMode = 0;
+    if(ScreenH >= TinyScreenH || MenuMode == MENU_INTRO)
+        LogoMode = 1;
+    else if(MenuMode == MENU_MAIN || MenuMode == MENU_OPTIONS)
+        LogoMode = 2;
+
+    if(LogoMode == 1)
+    {
+        // show at half opacity if not at main menu on a small screen
+        XTColor logo_tint = (ScreenH < SmallScreenH && MenuMode != MENU_INTRO && MenuMode != MENU_MAIN) ? XTAlpha(127) : XTColor();
+
+        int logo_y = ScreenH / 2 - 230;
+
+        // place manually on small screens
+        if(ScreenH < SmallScreenH)
+            logo_y = 16;
+        else if(ScreenH <= 600)
+            logo_y = 40;
+
+        XRender::renderTexture(ScreenW / 2 - GFX.MenuGFX[2].w / 2, logo_y, GFX.MenuGFX[2], logo_tint);
+    }
+    else if(LogoMode == 2)
+    {
+        SuperPrint(g_gameInfo.title, 3, ScreenW/2 - g_gameInfo.title.length()*9, 30);
+    }
+
 
     s_drawGameVersion();
 
@@ -2130,6 +2353,12 @@ void mainMenuDraw()
     else
 #endif
 
+    // Menu Intro
+    if(MenuMode == MENU_INTRO)
+    {
+        if((CommonFrame % 90) < 45)
+            SuperPrint(g_mainMenu.introPressStart, 3, ScreenW/2 - g_mainMenu.introPressStart.length()*9, ScreenH - 40);
+    }
     // Main menu
     if(MenuMode == MENU_MAIN)
     {
@@ -2381,6 +2610,33 @@ void mainMenuDraw()
             scale_str = &g_mainMenu.optionsScaleLinear;
 
         SuperPrint(fmt::format_ne("{0}: {1}", g_mainMenu.optionsScaleMode, *scale_str), 3, MenuX, MenuY + (30 * i++));
+
+        std::string resString = fmt::format_ne("RES: {0}x{1}", g_config.InternalW, g_config.InternalH);
+
+        if (g_config.InternalW == 480 && g_config.InternalH == 320)
+            resString += " (GBA)";
+        else if (g_config.InternalW == 512 && g_config.InternalH == 384)
+            resString += " (NDS)";
+        else if (g_config.InternalW == 512 && g_config.InternalH == 448)
+            resString += " (SNES)";
+        else if (g_config.InternalW == 640 && g_config.InternalH == 480)
+            resString += " (VGA)";
+        else if (g_config.InternalW == 768 && g_config.InternalH == 432)
+            resString += " (HELLO)";
+        else if (g_config.InternalW == 800 && g_config.InternalH == 480)
+            resString += " (3DS)";
+        else if (g_config.InternalW == 800 && g_config.InternalH == 600)
+            resString += " (SMBX)";
+        else if (g_config.InternalW == 1280 && g_config.InternalH == 720)
+            resString += " (HD)";
+        else if (g_config.InternalW == 0 && g_config.InternalH == 600)
+            resString = "RES: 600P DYNAMIC";
+        else if (g_config.InternalW == 0 && g_config.InternalH == 0)
+            resString = "RES: DYNAMIC";
+        else
+            resString += " (CUSTOM)";
+
+        SuperPrint(resString, 3, MenuX, MenuY + (30 * i++));
 
         if(!FontManager::isInitied() || FontManager::isLegacy())
             SuperPrint("Language: <missing \"fonts\">", 3, MenuX, MenuY + (30 * i++), XTColorF(0.5f, 0.5f, 0.5f, 1.0f));

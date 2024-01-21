@@ -22,6 +22,7 @@
 #ifndef GFX_UPDATE_H
 #define GFX_UPDATE_H
 
+#include <array>
 #include "global_constants.h"
 
 extern std::array<bool, maxLocalPlayers> g_drawBlocks_valid;
@@ -34,15 +35,15 @@ extern double g_drawBGOs_invalidate_rate;
 // call when a block is added, moved, or its Hidden attribute is changed
 inline void invalidateDrawBlocks()
 {
-    g_drawBlocks_valid[0] = false;
-    g_drawBlocks_valid[1] = false;
+    for(bool& v : g_drawBlocks_valid)
+        v = false;
 }
 
 // call when a BGO is added, moved, or its Hidden attribute is changed
 inline void invalidateDrawBGOs()
 {
-    g_drawBGOs_valid[0] = false;
-    g_drawBGOs_valid[1] = false;
+    for(bool& v : g_drawBGOs_valid)
+        v = false;
 }
 
 #endif // #ifdef GFX_UPDATE_H

@@ -28,6 +28,7 @@
 #include "globals.h"
 #include "global_dirs.h"
 #include "compat.h"
+#include "change_res.h"
 #include "main/speedrunner.h"
 #include "main/presetup.h"
 #include "main/screen_prompt.h"
@@ -123,8 +124,13 @@ static void compatInit(Compatibility_t &c)
     c.fix_held_item_cancel = true;
     c.modern_section_change = true;
     c.fix_frame_perfect_despawn = true;
+    // 1.3.6.3
+    c.pound_by_alt_run = true;
     // 1.3.7
     c.modern_npc_camera_logic = true;
+    c.allow_multires = true;
+    c.disable_background2_tiling = false;
+    c.world_map_lvlname_marquee = false;
 
 
     if(s_compatLevel >= COMPAT_SMBX2) // Make sure that bugs were same as on SMBX2 Beta 4 on this moment
@@ -176,6 +182,7 @@ static void compatInit(Compatibility_t &c)
         c.fix_frame_perfect_despawn = false;
         // 1.3.7
         c.modern_npc_camera_logic = false;
+        c.allow_multires = false;
     }
 
     if(s_compatLevel >= COMPAT_SMBX13) // Strict vanilla SMBX
@@ -184,7 +191,8 @@ static void compatInit(Compatibility_t &c)
         c.fix_player_filter_bounce = false;
         c.fix_player_downward_clip = false;
         c.fix_player_clip_wall_at_npc = false;
-        // 1.3.6
+        // 1.3.6.3
+        c.pound_by_alt_run = false;
     }
 
     c.speedrun_stop_timer_by = Compatibility_t::SPEEDRUN_STOP_NONE;
@@ -424,8 +432,13 @@ static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
         compat.read("fix-held-item-cancel", c.fix_held_item_cancel, c.fix_held_item_cancel);
         compat.read("modern-section-change", c.modern_section_change, c.modern_section_change);
         compat.read("fix-frame-perfect-despawn", c.fix_frame_perfect_despawn, c.fix_frame_perfect_despawn);
+        // 1.3.6.3
+        // compat.read("pound-by-alt-run", c.pound_by_alt_run, c.pound_by_alt_run); // compat mode only flag
         // 1.3.7 (but these will be changed in the Compat update)
         compat.read("modern-npc-camera-logic", c.modern_npc_camera_logic, c.modern_npc_camera_logic);
+        compat.read("allow-multires", c.allow_multires, c.allow_multires);
+        compat.read("disable-background2-tiling", c.disable_background2_tiling, c.disable_background2_tiling);
+        compat.read("world-map-lvlname-marquee", c.world_map_lvlname_marquee, c.world_map_lvlname_marquee);
     }
     // 1.3.4
     compat.read("fix-player-filter-bounce", c.fix_player_filter_bounce, c.fix_player_filter_bounce);
@@ -465,6 +478,8 @@ void LoadCustomCompat()
                                 (uint8_t)g_compatibility.bitblit_background_colour[2]);
 #endif
 
+    UpdateInternalRes();
+
     s_cur_load_iter++;
 }
 
@@ -475,6 +490,8 @@ void ResetCompat()
 #ifndef SDLRPOXY_NULL
     GraphicsHelps::resetBitBlitBG();
 #endif
+
+    UpdateInternalRes();
 }
 
 void CompatSetEnforcedLevel(int cLevel)

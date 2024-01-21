@@ -167,6 +167,7 @@ void SetupPlayers()
 //    int C = 0;
     FreezeNPCs = false;
     qScreen = false;
+    qScreen_canonical = false;
     ForcedControls = false;
     // online stuff
     //    if(nPlay.Online)
@@ -350,6 +351,7 @@ void SetupPlayers()
         Player[A].WarpBackward = false;
         Player[A].WarpShooted = false;
         Player[A].CanPound = false;
+        Player[A].AltRunRelease = false;
         Player[A].GroundPound = false;
         Player[A].GroundPound2 = false;
         Player[A].Duck = false;
@@ -449,7 +451,8 @@ void SetupPlayers()
     //        StartMusic Player[nPlay.MySlot + 1].Section;
     //    }
     UpdateYoshiMusic();
-    SetupScreens(); // setup the screen depending on how many players there are
+    if(!LevelSelect)
+        SetupScreens(); // setup the screen depending on how many players there are
     setupCheckpoints(); // setup the checkpoint and restpore the player at it if needed
 
     // prepare vScreens for SharedScreen since UpdatePlayer happens before UpdateGraphics
@@ -1124,7 +1127,7 @@ void EveryonesDead()
         ClearLevel();
         LevelSelect = true;
         GameMenu = true;
-        MenuMode = MENU_MAIN;
+        MenuMode = MENU_INTRO;
         MenuCursor = 0;
     }
     XEvents::doEvents();

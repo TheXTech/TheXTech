@@ -344,7 +344,8 @@
             "reconnectTitle": "Переподключить",
             "splitPressSelect_1": "Нажмите Select, чтобы",
             "splitPressSelect_2": "Настройки управления",
-            "wordDisconnect": "Отключить"
+            "wordDisconnect": "Отключить",
+            "phraseTestProfile": "Тест профиля"
         },
         "controls": {
             "phrasePlayerConnected": "И{0} подключил(а) {1}, Профиль: {2}",
@@ -367,6 +368,12 @@
             "returnToEditor": "Назад в редактор",
             "saveAndContinue": "Сохранить и продолжить",
             "saveAndQuit": "Сохранить и выйти"
+        },
+        "message": {
+            "scanningLevels": "Чтение уровней..."
+        },
+        "format": {
+            "minutesSeconds": "{0}м{1}с"
         }
     },
     "languageName": "Русский",
@@ -545,7 +552,8 @@
             "errorMissingResources": "Извините, но для встроенного редактора не хватает файла {0}.",
             "errorResolution": "Извините, но встроенный редактор не поддерживает ваше текущее разрешение.",
             "newWorld": "<Новый мир>",
-            "promptNewWorldName": "Имя нового мира"
+            "promptNewWorldName": "Имя нового мира",
+            "battles": "<Уровни для битв>"
         },
         "game": {
             "gameBattleRandom": "Случайный уровень",
@@ -583,7 +591,8 @@
                 "nearest": "Ближ. сосед"
             },
             "renderX": "Графика: {0} (X)",
-            "render": "Графика: {0}"
+            "render": "Графика: {0}",
+            "renderAuto": "Графика: Авто ({0})"
         },
         "wordBack": "Назад",
         "wordHide": "Скрыть",
@@ -608,6 +617,7 @@
         "nameVitalyNovichkov": "Новичков Виталий",
         "originalBy": "Автор оригинала на VB6:",
         "psVitaPortBy": "Автор порта на PS Vita:",
+        "qualityControl": "Контроль качества:",
         "specialThanks": "Особые благодарности:"
     },
     "pluralRules": "slavic"

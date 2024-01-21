@@ -301,12 +301,6 @@ void UpdateEditor()
 
     if(!MagicHand)
     {
-        // TODO: can be safely removed after merging multires, since this is also called elsewhere
-        SetupScreens();
-    }
-
-    if(!MagicHand)
-    {
         if(EditorControls.PrevSection && !WorldEditor)
         {
             if(ScrollRelease)
@@ -2908,6 +2902,7 @@ void zTestLevel(bool magicHand, bool interProcess)
     int A = 0;
     Player_t blankPlayer;
     qScreen = false;
+    qScreen_canonical = false;
 
 #ifndef THEXTECH_INTERPROC_SUPPORTED
     UNUSED(interProcess);
@@ -2935,6 +2930,7 @@ void zTestLevel(bool magicHand, bool interProcess)
 //  frmNPCs::chkMessage.Value = 0;
     BattleLives[1] = 3;
     BattleLives[2] = 3;
+    BattleIntro = 150;
     BattleWinner = 0;
     BattleOutro = 0;
 //  frmLevelEditor::mnuOnline.Enabled = false;
@@ -2947,6 +2943,9 @@ void zTestLevel(bool magicHand, bool interProcess)
 
     if(numPlayers == 0)
         numPlayers = editorScreen.num_test_players;
+
+    if(BattleMode && numPlayers < 2)
+        numPlayers = 2;
 
     if(Checkpoint.empty()) // Don't reset players when resume at the checkpoint
     {
@@ -3113,13 +3112,13 @@ void MouseMove(float X, float Y, bool /*nCur*/)
         A = SingleCoop;
     else if(l_screen->Type == 5 && vScreen[2].Visible)
     {
-        if(X < float(vScreen[2].Left + vScreen[2].Width))
+        if(X < float(vScreen[2].ScreenLeft + vScreen[2].Width))
         {
-            if(X > float(vScreen[2].Left))
+            if(X > float(vScreen[2].ScreenLeft))
             {
-                if(Y < float(vScreen[2].Top + vScreen[2].Height))
+                if(Y < float(vScreen[2].ScreenTop + vScreen[2].Height))
                 {
-                    if(Y > float(vScreen[2].Top))
+                    if(Y > float(vScreen[2].ScreenTop))
                         A = 2;
                 }
             }
@@ -3128,8 +3127,8 @@ void MouseMove(float X, float Y, bool /*nCur*/)
     else
         A = 1;
 
-    X -= vScreen[A].Left;
-    Y -= vScreen[A].Top;
+    X -= vScreen[A].ScreenLeft;
+    Y -= vScreen[A].ScreenTop;
 
     // translate into layer coordinates to snap to layer's grid
     if(MagicHand && EditorCursor.Layer != LAYER_NONE)

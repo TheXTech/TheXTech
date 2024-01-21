@@ -218,6 +218,7 @@ RangeArrI<int, 0, maxBlockType, 0> BlockSlope2;
 // RangeArr<double, 0, maxPlayers> qScreenY;
 
 bool qScreen = false;
+bool qScreen_canonical = false;
 // RangeArr<vScreen_t, 0, 2> qScreenLoc;
 
 RangeArrI<int, 0, maxBlockType, 0> BlockWidth;

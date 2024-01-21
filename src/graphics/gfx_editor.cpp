@@ -308,8 +308,8 @@ void DrawEditorLevel(int Z)
     // Display the cursor
     {
         auto &e = EditorCursor;
-        int curX = int(double(e.X) - vScreen[Z].Left);
-        int curY = int(double(e.Y) - vScreen[Z].Top);
+        int curX = int(double(e.X) - vScreen[Z].ScreenLeft);
+        int curY = int(double(e.Y) - vScreen[Z].ScreenTop);
 
         if((CommonFrame % 46) < 10)
         {

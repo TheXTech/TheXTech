@@ -18,6 +18,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <sdl_proxy/sdl_stdinc.h>
+
 #include "../globals.h"
 #include "../graphics.h"
 #include "../player.h"
@@ -25,6 +27,8 @@
 #include "../change_res.h"
 #include "../load_gfx.h"
 #include "../core/window.h"
+#include "../compat.h"
+#include "config.h"
 
 #include "../compat.h"
 #include "config.h"
@@ -82,9 +86,6 @@ void SetupScreens(Screen_t& screen, bool reset)
 
     vScreen_t& vscreen1 = screen.vScreen(1);
     vScreen_t& vscreen2 = screen.vScreen(2);
-
-    vscreen1.player = screen.players[0];
-    vscreen2.player = screen.players[1];
 
     switch(screen.Type)
     {
@@ -148,7 +149,13 @@ void SetupScreens(Screen_t& screen, bool reset)
         vscreen2.Left = 0;
         vscreen2.Top = 0;
         break;
-    case 7: // Credits
+    case 7: // Credits (MODIFIED to include an adjusted chop feature)
+        vscreen1.Left = 0;
+        vscreen1.Top = (screen.H > 600) ? 100 : (screen.H / 6) & ~1;
+        vscreen1.Height = screen.H - 2 * vscreen1.Top;
+        vscreen1.Width = screen.W;
+        vscreen2.Visible = false;
+        break;
     case 8: // netplay
         vscreen1.Left = 0;
         vscreen1.Height = screen.H;
@@ -156,22 +163,24 @@ void SetupScreens(Screen_t& screen, bool reset)
         vscreen1.Width = screen.W;
         vscreen2.Visible = false;
         break;
-#if 0 // Merged with the branch above because they both are same
-    case 8: // netplay
-        vscreen1.Left = 0;
-        vscreen1.Width = 800;
-        vscreen1.Top = 0;
-        vscreen1.Height = 600;
-        vscreen2.Visible = false;
+    case ScreenTypes::Quad: // quad
+        for(int i = 0; i < 4 && i < maxLocalPlayers; i++)
+        {
+            vScreen_t& vscreen_i = screen.vScreen(i + 1);
+
+            vscreen_i.Width = screen.W / 2;
+            vscreen_i.Height = screen.H / 2;
+            vscreen_i.Left = (i & 1) ? screen.W / 2 : 0;
+            vscreen_i.Top = (i & 2) ? screen.H / 2 : 0;
+        }
         break;
-#endif
-//    End If
     }
 }
 
 void SetupScreens(bool reset)
 {
-    SetupScreens(Screens[0], reset);
+    for(int i = 0; i < c_screenCount; i++)
+        SetupScreens(Screens[i], reset);
 }
 
 void DynamicScreen(Screen_t& screen, bool mute)
@@ -204,8 +213,12 @@ void DynamicScreen(Screen_t& screen, bool mute)
         {
             const Location_t& section = level[p1.Section];
 
+            // use canonical width for checks in NoTurnBack case
+            bool shrink_screen = (NoTurnBack[p1.Section] && g_compatibility.allow_multires);
+            const double check_W = shrink_screen ? screen.canonical_screen().W : screen.W;
+
             // a number of clauses check whether the section is larger than the screen
-            bool section_wide = section.Width  - section.X > screen.W;
+            bool section_wide = section.Width  - section.X > check_W;
             bool section_tall = section.Height - section.Y > screen.H;
 
             // observe that in the original code, there is a condition on whether vScreen 2 is visible, and this decides what P1 is compared with
@@ -228,7 +241,7 @@ void DynamicScreen(Screen_t& screen, bool mute)
             //       (vScreen(2).Visible = True  And Player(2).Location.X + vScreenX(1) >= ScreenW * 0.75 - Player(2).Location.Width / 2))
             //   And (Player(1).Location.X < level(Player(1).Section).Width - ScreenW * 0.75 - Player(1).Location.Width / 2)) Then
 
-            if(section_wide && (p2.Location.X + p2_compare_vscreen.X >= screen.W * 0.75 - p2.Location.Width / 2.0) && (p1.Location.X < section.Width - screen.W * 0.75 - p1.Location.Width / 2.0))
+            if(section_wide && (p2.Location.X + p2_compare_vscreen.X >= check_W * 0.75 - p2.Location.Width / 2.0) && (p1.Location.X < section.Width - check_W * 0.75 - p1.Location.Width / 2.0))
             {
                 vscreen2.Height = screen.H;
                 vscreen2.Width = screen.W / 2;
@@ -259,7 +272,7 @@ void DynamicScreen(Screen_t& screen, bool mute)
             //   (vScreen(2).Visible = True  And Player(1).Location.X + vScreenX(2) >= ScreenW * 0.75 - Player(1).Location.Width / 2))
             // And (Player(2).Location.X < level(Player(1).Section).Width - ScreenW * 0.75 - Player(2).Location.Width / 2)) Then
 
-            else if(section_wide && (p1.Location.X + p1_compare_vscreen.X >= screen.W * 0.75 - p1.Location.Width / 2.0) && (p2.Location.X < section.Width - screen.W * 0.75 - p2.Location.Width / 2.0))
+            else if(section_wide && (p1.Location.X + p1_compare_vscreen.X >= check_W * 0.75 - p1.Location.Width / 2.0) && (p2.Location.X < section.Width - check_W * 0.75 - p2.Location.Width / 2.0))
             {
                 vscreen1.Height = screen.H;
                 vscreen1.Width = screen.W / 2;
@@ -310,7 +323,7 @@ void DynamicScreen(Screen_t& screen, bool mute)
 
                     vscreena.TempDelay = 200;
                     vscreena.TempY = 0;
-                    vscreena.tempX = -vscreen1.X + screen.W * 0.5 - p.Location.X - p.Location.Width * 0.5;
+                    vscreena.tempX = -vscreen1.X + check_W * 0.5 - p.Location.X - p.Location.Width * 0.5;
                 }
                 vscreen2.Visible = true;
                 screen.DType = 3;
@@ -341,7 +354,7 @@ void DynamicScreen(Screen_t& screen, bool mute)
 
                     vscreena.TempDelay = 200;
                     vscreena.TempY = 0;
-                    vscreena.tempX = -vscreen1.X + screen.W * 0.5 - p.Location.X - p.Location.Width * 0.5;
+                    vscreena.tempX = -vscreen1.X + check_W * 0.5 - p.Location.X - p.Location.Width * 0.5;
                 }
                 vscreen2.Visible = true;
                 screen.DType = 4;
@@ -423,8 +436,139 @@ void DynamicScreen(Screen_t& screen, bool mute)
     }
 }
 
+void DynamicScreens()
+{
+    for(int i = 0; i < c_screenCount; i++)
+    {
+        Screen_t& screen = Screens[i];
+        if(screen.Type == ScreenTypes::Dynamic)
+            DynamicScreen(screen, !screen.Visible);
+    }
+}
+
+// NEW: limit vScreens to playable section area and center them on the real screen
+void CenterScreens(Screen_t& screen)
+{
+    // approximate positions of player screens
+    double cX1, cY1, cX2, cY2;
+    GetPlayerScreen(screen.canonical_screen().W, screen.canonical_screen().H, Player[screen.players[0]], cX1, cY1);
+    GetPlayerScreen(screen.canonical_screen().W, screen.canonical_screen().H, Player[screen.players[1]], cX2, cY2);
+
+    double screen_X_distance = SDL_abs(cX1 - cX2);
+    double screen_Y_distance = SDL_abs(cY1 - cY2);
+
+    for(int v = 1; v <= maxLocalPlayers; v++)
+    {
+        vScreen_t& vscreen = screen.vScreen(v);
+        const Player_t& p = Player[screen.players[v - 1]];
+        const Location_t& section = level[p.Section];
+
+        vscreen.ScreenLeft = vscreen.Left;
+        vscreen.ScreenTop  = vscreen.Top;
+
+        bool in_map = (LevelSelect && !GameMenu);
+
+        // skip centering in all these places (world map sections handled elsewhere)
+        if(LevelEditor || WorldEditor || in_map)
+            continue;
+
+        // restrict the vScreen to the level if the level is smaller than the screen
+        double MaxWidth = section.Width - section.X;
+        double MaxHeight = section.Height - section.Y;
+
+        double MinWidth = 0;
+        double MinHeight = 0;
+
+        bool no_turn_back = NoTurnBack[p.Section];
+
+        // restrict single vScreens on NoTurnBack sections
+        if(g_compatibility.allow_multires && no_turn_back)
+        {
+            MaxWidth = SDL_min(MaxWidth, static_cast<double>(screen.canonical_screen().W));
+
+            // limit Visible screens further during DynamicScreen
+            if(screen.Visible && screen.Type == 5 && screen.vScreen(2).Visible)
+                MaxWidth = SDL_min(MaxWidth, static_cast<double>(screen.canonical_screen().W / 2));
+        }
+
+        // allow the canonical vScreens to approach normal screen size during dynamic screen
+        if(g_compatibility.allow_multires && !screen.Visible && !no_turn_back)
+        {
+            MinWidth = screen.W;
+            MinHeight = screen.H;
+
+            // allow to grow up to half the size of the visible screen (in dynamic screen), otherwise full screen
+            if(screen.Type == ScreenTypes::Dynamic)
+            {
+                MinWidth = SDL_min(MinWidth, static_cast<double>(screen.visible_screen().W / 2));
+                MinHeight = SDL_min(MinHeight, static_cast<double>(screen.visible_screen().H / 2));
+            }
+            else
+            {
+                MinWidth = SDL_min(MinWidth, static_cast<double>(screen.visible_screen().W));
+                MinHeight = SDL_min(MinHeight, static_cast<double>(screen.visible_screen().H));
+            }
+
+            // this ensures a gradual transition between canonical screen size / 2 and visible screen size / 2
+            // (no need to use it if in different sections or in permanent splitscreen)
+            if(screen.Type == ScreenTypes::Dynamic && screen.DType != DScreenTypes::DiffSections)
+            {
+                MinWidth = SDL_min(MinWidth, screen_X_distance);
+                MinHeight = SDL_min(MinHeight, screen_Y_distance);
+            }
+
+            // never get larger than section
+            MinWidth = SDL_min(MinWidth, MaxWidth);
+            MinHeight = SDL_min(MinHeight, MaxHeight);
+        }
+
+        if(MinWidth > vscreen.Width || MaxWidth < vscreen.Width)
+        {
+            double SetWidth = (MaxWidth < vscreen.Width) ? MaxWidth : MinWidth;
+
+            int left_from_center = vscreen.ScreenLeft - (screen.W / 2);
+            int right_from_center = (screen.W / 2) - (vscreen.ScreenLeft + vscreen.Width);
+            int total_from_center = (left_from_center + right_from_center);
+            int size_diff = vscreen.Width - SetWidth;
+
+            // Move towards center of screen. If left is on center, don't need to move left side of screen.
+            // If right is on center, need to fully move left so right can stay. Yields following formula:
+            if(total_from_center)
+                vscreen.ScreenLeft += size_diff * left_from_center / total_from_center;
+
+            vscreen.Width = SetWidth;
+        }
+
+        if(MinHeight > vscreen.Height || MaxHeight < vscreen.Height)
+        {
+            double SetHeight = (MaxHeight < vscreen.Height) ? MaxHeight : MinHeight;
+
+            int top_from_center = vscreen.ScreenTop - (screen.H / 2);
+            int bottom_from_center = (screen.H / 2) - (vscreen.ScreenTop + vscreen.Height);
+            int total_from_center = (top_from_center + bottom_from_center);
+            int size_diff = vscreen.Height - SetHeight;
+
+            // Move towards center of screen. If top is on center, don't need to move top side of screen.
+            // If bottom is on center, need to fully move top so bottom can stay. Yields following formula:
+            if(total_from_center)
+                vscreen.ScreenTop += size_diff * top_from_center / total_from_center;
+
+            vscreen.Height = SetHeight;
+        }
+    }
+}
+
+void CenterScreens()
+{
+    for(int i = 0; i < c_screenCount; i++)
+    {
+        Screen_t& screen = Screens[i];
+        CenterScreens(screen);
+    }
+}
+
 // NEW: moves qScreen towards vScreen, now including the screen size
-bool Update_qScreen(int Z, int camRate, int resizeRate)
+bool Update_qScreen(int Z, double camRate, double resizeRate)
 {
     if(Z == 2 && !g_compatibility.modern_section_change)
         return false;
@@ -452,8 +596,14 @@ bool Update_qScreen(int Z, int camRate, int resizeRate)
         camFramesY = SDL_min(camFramesY, camFramesY_b);
     }
 
-    double resizeFramesX = 0;
-    double resizeFramesY = 0;
+    double resizeFramesX = std::abs(vScreen[Z].Width - qScreenLoc[Z].Width) / resizeRateX;
+    double resizeFramesY = std::abs(vScreen[Z].Height - qScreenLoc[Z].Height) / resizeRateY;
+
+    if(!g_compatibility.modern_section_change)
+    {
+        resizeFramesX = 0;
+        resizeFramesY = 0;
+    }
 
     double qFramesX = SDL_max(camFramesX, resizeFramesX);
     double qFramesY = SDL_max(camFramesY, resizeFramesY);
@@ -476,6 +626,12 @@ bool Update_qScreen(int Z, int camRate, int resizeRate)
     camRateX = std::abs(vScreen[Z].X - qScreenLoc[Z].X) / qFramesX;
     camRateY = std::abs(vScreen[Z].Y - qScreenLoc[Z].Y) / qFramesY;
 
+    resizeRateX = std::abs(vScreen[Z].Width - qScreenLoc[Z].Width) / qFramesX;
+    resizeRateY = std::abs(vScreen[Z].Height - qScreenLoc[Z].Height) / qFramesY;
+
+    double screenRateX = std::abs(vScreen[Z].ScreenLeft - qScreenLoc[Z].ScreenLeft) / qFramesX;
+    double screenRateY = std::abs(vScreen[Z].ScreenTop - qScreenLoc[Z].ScreenTop) / qFramesY;
+
     if(vScreen[Z].X < qScreenLoc[Z].X - camRateX)
         qScreenLoc[Z].X -= camRateX;
     else if(vScreen[Z].X > qScreenLoc[Z].X + camRateX)
@@ -490,22 +646,45 @@ bool Update_qScreen(int Z, int camRate, int resizeRate)
     else
         qScreenLoc[Z].Y = vScreen[Z].Y;
 
-    if(vScreen[Z].Width < qScreenLoc[Z].Width - resizeRateX * 2)
-        qScreenLoc[Z].Width -= resizeRateX * 2;
-    else if(vScreen[Z].Width > qScreenLoc[Z].Width + resizeRateX * 2)
-        qScreenLoc[Z].Width += resizeRateX * 2;
+    if(vScreen[Z].ScreenLeft < qScreenLoc[Z].ScreenLeft - screenRateX)
+        qScreenLoc[Z].ScreenLeft -= screenRateX;
+    else if(vScreen[Z].ScreenLeft > qScreenLoc[Z].ScreenLeft + screenRateX)
+        qScreenLoc[Z].ScreenLeft += screenRateX;
+    else
+        qScreenLoc[Z].ScreenLeft = vScreen[Z].ScreenLeft;
+
+    if(vScreen[Z].ScreenTop < qScreenLoc[Z].ScreenTop - screenRateY)
+        qScreenLoc[Z].ScreenTop -= screenRateY;
+    else if(vScreen[Z].ScreenTop > qScreenLoc[Z].ScreenTop + screenRateY)
+        qScreenLoc[Z].ScreenTop += screenRateY;
+    else
+        qScreenLoc[Z].ScreenTop = vScreen[Z].ScreenTop;
+
+    if(vScreen[Z].Width < qScreenLoc[Z].Width - resizeRateX)
+        qScreenLoc[Z].Width -= resizeRateX;
+    else if(vScreen[Z].Width > qScreenLoc[Z].Width + resizeRateX)
+        qScreenLoc[Z].Width += resizeRateX;
     else
         qScreenLoc[Z].Width = vScreen[Z].Width;
 
-    if(vScreen[Z].Height < qScreenLoc[Z].Height - resizeRateY * 2)
-        qScreenLoc[Z].Height -= resizeRateY * 2;
-    else if(vScreen[Z].Height > qScreenLoc[Z].Height + resizeRateY * 2)
-        qScreenLoc[Z].Height += resizeRateY * 2;
+    if(vScreen[Z].Height < qScreenLoc[Z].Height - resizeRateY)
+        qScreenLoc[Z].Height -= resizeRateY;
+    else if(vScreen[Z].Height > qScreenLoc[Z].Height + resizeRateY)
+        qScreenLoc[Z].Height += resizeRateY;
     else
         qScreenLoc[Z].Height = vScreen[Z].Height;
 
     vScreen[Z].X = qScreenLoc[Z].X;
     vScreen[Z].Y = qScreenLoc[Z].Y;
+
+    // update vScreen width / height
+    if(g_compatibility.modern_section_change)
+    {
+        vScreen[Z].Width = std::floor(qScreenLoc[Z].Width / 2) * 2;
+        vScreen[Z].Height = std::floor(qScreenLoc[Z].Height / 2) * 2;
+        vScreen[Z].ScreenLeft = std::floor(qScreenLoc[Z].ScreenLeft);
+        vScreen[Z].ScreenTop = std::floor(qScreenLoc[Z].ScreenTop);
+    }
 
     return continue_qScreen;
 }

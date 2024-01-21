@@ -19,28 +19,15 @@
  */
 
 #pragma once
-#ifndef WORLD_GLOBALS_H
-#define WORLD_GLOBALS_H
+#ifndef GFX_CAMERA_H
+#define GFX_CAMERA_H
 
-#include "../screen_fader.h"
+#include <cstdint>
 
-//! Holds the screen overlay for the world map
-extern ScreenFader g_worldScreenFader;
+struct vScreen_t;
 
-//! Multiplier for world map qScreen
-extern double g_worldCamSpeed;
+void ResetCameraPanning();
+void ProcessSmallScreenCam(vScreen_t& vscreen);
+void DrawSmallScreenCam(vScreen_t& vscreen);
 
-//! Play sound if world map qScreen stays active next frame
-extern bool g_worldPlayCamSound;
-
-//! NEW: set the world player's section variable based on its position
-extern void worldCheckSection(WorldPlayer_t& wp);
-
-//! NEW: reset the world players' section variables without invoking qScreen
-extern void worldResetSection();
-
-extern void worldWaitForFade(int waitTicks = -1);
-
-extern bool worldHasFrameAssets();
-
-#endif // WORLD_GLOBALS_H
+#endif

@@ -28,7 +28,13 @@
 #include "core/render.h"
 #include "core/events.h"
 
+#include "graphics/gfx_frame.h"
+#include "graphics/gfx_camera.h"
+
 #include "pseudo_vb.h"
+#include "gfx.h"
+#include "config.h"
+#include "compat.h"
 
 #include <Utils/maths.h>
 
@@ -47,8 +53,13 @@ void GetvScreen(vScreen_t& vscreen)
     {
         vscreen.X = -pLoc.X + (vscreen.Width * 0.5) - pLoc.Width / 2.0;
         vscreen.Y = -pLoc.Y + (vscreen.Height * 0.5) - vScreenYOffset - pLoc.Height;
+
+        ProcessSmallScreenCam(vscreen);
+
         vscreen.X += -vscreen.tempX;
         vscreen.Y += -vscreen.TempY;
+
+        // shift the level so that it is onscreen
         if(-vscreen.X < level[p.Section].X)
             vscreen.X = -level[p.Section].X;
         if(-vscreen.X + vscreen.Width > level[p.Section].Width)
@@ -87,7 +98,6 @@ void GetvScreenAverage(vScreen_t& vscreen)
 
     OldX = vscreen.X;
     OldY = vscreen.Y;
-    UNUSED(OldY);
 
     vscreen.X = 0;
     vscreen.Y = 0;
@@ -123,19 +133,24 @@ void GetvScreenAverage(vScreen_t& vscreen)
 
     // used ScreenW / ScreenH in VB6 code
     const Screen_t& screen = Screens[vscreen.screen_ref];
+
     const Location_t& section = level[Player[1].Section];
 
-    vscreen.X = (vscreen.X / B) + (screen.W * 0.5);
-    vscreen.Y = (vscreen.Y / B) + (screen.H * 0.5) - vScreenYOffset;
+    // remember that the screen will be limited to the section's size in all cases
+    double use_width  = SDL_min(static_cast<double>(screen.W), section.Width  - section.X);
+    double use_height = SDL_min(static_cast<double>(screen.H), section.Height - section.Y);
+
+    vscreen.X = (vscreen.X / B) + (use_width * 0.5);
+    vscreen.Y = (vscreen.Y / B) + (use_height * 0.5) - vScreenYOffset;
 
     if(-vscreen.X < section.X)
         vscreen.X = -section.X;
-    if(-vscreen.X + screen.W > section.Width)
-        vscreen.X = -(section.Width - screen.W);
+    if(-vscreen.X + use_width > section.Width)
+        vscreen.X = -(section.Width - use_width);
     if(-vscreen.Y < section.Y)
         vscreen.Y = -section.Y;
-    if(-vscreen.Y + screen.H > section.Height)
-        vscreen.Y = -(section.Height - screen.H);
+    if(-vscreen.Y + use_height > section.Height)
+        vscreen.Y = -(section.Height - use_height);
 
     // keep vScreen boundary even (on 1x platforms)
 #ifdef PGE_MIN_PORT
@@ -157,6 +172,9 @@ void GetvScreenAverage(vScreen_t& vscreen)
         }
         else if(vscreen.X < OldX - 10)
             vscreen.X = OldX - 10;
+
+        // on menu, bottom of screen always tracks bottom of level
+        vscreen.Y = -(level[Player[1].Section].Height - vscreen.Height);
     }
 }
 
@@ -189,8 +207,13 @@ void GetvScreenAverage2(vScreen_t& vscreen)
 
     const Screen_t& screen = Screens[vscreen.screen_ref];
 
-    vscreen.X = (vscreen.X / B) + (screen.W * 0.5);
-    vscreen.Y = (vscreen.Y / B) + (screen.H * 0.5) - vScreenYOffset;
+    const Location_t& section = level[Player[1].Section];
+
+    double use_width  = SDL_min(static_cast<double>(screen.W), section.Width  - section.X);
+    double use_height = SDL_min(static_cast<double>(screen.H), section.Height - section.Y);
+
+    vscreen.X = (vscreen.X / B) + (use_width * 0.5);
+    vscreen.Y = (vscreen.Y / B) + (use_height * 0.5) - vScreenYOffset;
 }
 
 // Get the average screen position for all players for ScreenType 3
@@ -262,17 +285,20 @@ void GetvScreenAverage3(vScreen_t& vscreen)
 
     const Location_t& section = level[section_idx];
 
-    vscreen.X = -(l + r) / 2 + (screen.W * 0.5);
-    vscreen.Y = vscreen.Y / (plr_count + 1) + (screen.H * 0.5) - vScreenYOffset;
+    double use_width  = SDL_min(static_cast<double>(screen.W), section.Width  - section.X);
+    double use_height = SDL_min(static_cast<double>(screen.H), section.Height - section.Y);
+
+    vscreen.X = -(l + r) / 2 + (use_width * 0.5);
+    vscreen.Y = vscreen.Y / (plr_count + 1) + (use_height * 0.5) - vScreenYOffset;
 
     if(-vscreen.X < section.X)
         vscreen.X = -section.X;
-    if(-vscreen.X + screen.W > section.Width)
-        vscreen.X = -(section.Width - screen.W);
+    if(-vscreen.X + use_width > section.Width)
+        vscreen.X = -(section.Width - use_width);
     if(-vscreen.Y < section.Y)
         vscreen.Y = -section.Y;
-    if(-vscreen.Y + screen.H > section.Height)
-        vscreen.Y = -(section.Height - screen.H);
+    if(-vscreen.Y + use_height > section.Height)
+        vscreen.Y = -(section.Height - use_height);
 }
 
 // NEW: update a vScreen with the correct procedure based on its screen's Type and DType
@@ -288,6 +314,28 @@ void GetvScreenAuto(vScreen_t& vscreen)
         GetvScreenCredits(vscreen);
     else
         GetvScreen(vscreen);
+}
+
+// NEW: get the fixed-resolution vScreen position for a player, and write the top-left coordinate to (left, top)
+void GetPlayerScreen(double W, double H, const Player_t& p, double& left, double& top)
+{
+    auto &pLoc = p.Location;
+
+    double pHeight = (p.Mount != 2) ? pLoc.Height : 0;
+
+    left = -pLoc.X + (W * 0.5) - pLoc.Width / 2.0;
+    top = -pLoc.Y + (H * 0.5) - vScreenYOffset - pHeight;
+
+    // limit to level bounds
+    if(-left < level[p.Section].X)
+        left = -level[p.Section].X;
+    else if(-left + W > level[p.Section].Width)
+        left = -(level[p.Section].Width - W);
+
+    if(-top < level[p.Section].Y)
+        top = -level[p.Section].Y;
+    else if(-top + H > level[p.Section].Height)
+        top = -(level[p.Section].Height - H);
 }
 
 void SetupGraphics()
@@ -581,20 +629,25 @@ void GetvScreenCredits(vScreen_t& vscreen)
     if(B == 0)
         return;
 
-    const Screen_t& screen = Screens[vscreen.screen_ref];
+    // used ScreenW / ScreenH in VB6 code, using vScreen.Width / Height here
+
     const Location_t& section = level[Player[1].Section];
 
-    vscreen.X = (vscreen.X / B) + (screen.W * 0.5);
-    vscreen.Y = (vscreen.Y / B) + (screen.H * 0.5) - vScreenYOffset;
+    // remember that the screen will be limited to the section's size in all cases
+    double use_width  = SDL_min(vscreen.Width,  section.Width  - section.X);
+    double use_height = SDL_min(vscreen.Height, section.Height - section.Y);
+
+    vscreen.X = (vscreen.X / B) + (use_width * 0.5);
+    vscreen.Y = (vscreen.Y / B) + (use_height * 0.5) - vScreenYOffset;
 
     if(-vscreen.X < section.X)
         vscreen.X = -section.X;
-    if(-vscreen.X + screen.W > section.Width)
-        vscreen.X = -(section.Width - screen.W);
-    if(-vscreen.Y < section.Y + 100)
-        vscreen.Y = -section.Y + 100;
-    if(-vscreen.Y + screen.H > section.Height - 100)
-        vscreen.Y = -(section.Height - screen.H) - 100;
+    if(-vscreen.X + use_width > section.Width)
+        vscreen.X = -(section.Width - use_width);
+    if(-vscreen.Y < section.Y)
+        vscreen.Y = -section.Y;
+    if(-vscreen.Y + use_height > section.Height)
+        vscreen.Y = -(section.Height - use_height);
 }
 
 #if 0
@@ -736,4 +789,38 @@ Location_t WorldLevel_t::LocationGFX()
     }
 
     return ret;
+}
+
+void DrawBackdrop(const Screen_t& screen)
+{
+    if(GFX.Backdrop.inited)
+    {
+        bool border_valid = GFX.Backdrop_Border.tex.inited && (!GFX.isCustom(71) || GFX.isCustom(72));
+
+        for(int i = screen.active_begin(); i < screen.active_end(); i++)
+        {
+            const auto& s = screen.vScreen(i + 1);
+
+            Location_t full = newLoc(0, 0, screen.W, screen.H);
+            // horizontal
+            if(screen.Type == 4 || (screen.Type == 5 && (screen.DType == 1 || screen.DType == 2)))
+            {
+                full.Width = screen.W / 2;
+                // our screen on right
+                if(((screen.Type == 4 || (screen.Type == 5 && screen.DType == 1)) && i == 1) || (screen.DType == 2 && i == 0))
+                    full.X = ScreenW / 2;
+            }
+            // vertical
+            else if(screen.Type == 1 || (screen.Type == 5 && (screen.DType == 3 || screen.DType == 4 || screen.DType == 6)))
+            {
+                full.Height = screen.H / 2;
+                // our screen on bottom
+                if(((screen.Type == 1 || (screen.Type == 5 && (screen.DType == 3 || screen.DType == 6))) && i == 1) || (screen.DType == 4 && i == 0))
+                    full.Y = screen.H / 2;
+            }
+
+            RenderFrameBorder(full, newLoc(s.ScreenLeft, s.ScreenTop, s.Width, s.Height),
+                GFX.Backdrop, border_valid ? &GFX.Backdrop_Border : nullptr);
+        }
+    }
 }
