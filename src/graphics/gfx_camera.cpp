@@ -39,6 +39,22 @@ void ProcessSmallScreenCam(vScreen_t& vscreen)
     Screen_t& screen = Screens[vscreen.screen_ref];
     Player_t& p = Player[vscreen.player];
 
+    // slowly disable small screen camera features as player cameras approach each other
+    double rate = 1.0;
+    if(screen.Type == ScreenTypes::Dynamic && (screen.W < 800 || screen.H < 600))
+    {
+        double dx = std::abs(screen.vScreen(1).X - screen.vScreen(2).X);
+        double dy = std::abs(screen.vScreen(1).Y - screen.vScreen(2).Y);
+        double d = dx + dy;
+        const double screen_join = (screen.W + screen.H) / 2;
+
+        rate = (d - screen_join) / screen_join;
+        if(rate < 0.0)
+            rate = 0.0;
+        if(rate > 1.0)
+            rate = 1.0;
+    }
+
     if(g_config.small_screen_camera_features && screen.W < 800 && !NoTurnBack[p.Section])
     {
         int16_t max_offsetX = 360;
@@ -73,10 +89,10 @@ void ProcessSmallScreenCam(vScreen_t& vscreen)
                 vscreen.small_screen_features.offset_x -= rateX;
         }
 
-        vscreen.X -= vscreen.small_screen_features.offset_x / 2;
+        vscreen.X -= rate * vscreen.small_screen_features.offset_x / 2;
     }
 
-    if(g_config.small_screen_camera_features && ScreenH < 600)
+    if(g_config.small_screen_camera_features && screen.H < 600)
     {
         int16_t max_offsetY = 200;
 
@@ -148,7 +164,7 @@ void ProcessSmallScreenCam(vScreen_t& vscreen)
             lookY /= 2;
         }
 
-        vscreen.Y += lookY + 32;
+        vscreen.Y += rate * (lookY + 32);
     }
 }
 
@@ -159,8 +175,25 @@ void DrawSmallScreenCam(vScreen_t& vscreen)
     int CamX = vscreen.Width - 54;
     int CamY = vscreen.Height - 42;
 
-    if(screen.Type == 5 && screen.vScreen(2).Visible && vscreen.Left > 0)
+    // don't overlap the controls display
+    if(screen.Type == ScreenTypes::Dynamic && screen.vScreen(2).Visible && vscreen.Left > 0)
         CamY -= 24;
+
+    // scale the opacity by the current effectiveness of the camera features
+    double rate = 1.0;
+    if(screen.Type == ScreenTypes::Dynamic)
+    {
+        double dx = std::abs(screen.vScreen(1).X - screen.vScreen(2).X);
+        double dy = std::abs(screen.vScreen(1).Y - screen.vScreen(2).Y);
+        double d = dx + dy;
+        const double screen_join = (screen.W + screen.H) / 2;
+
+        rate = (d - screen_join) / screen_join;
+        if(rate < 0.0)
+            rate = 0.0;
+        if(rate > 1.0)
+            rate = 1.0;
+    }
 
     // color for camera
     XTColor color;
@@ -170,18 +203,18 @@ void DrawSmallScreenCam(vScreen_t& vscreen)
         color = XTColorF(1.0f, 0.2f, 0.2f, 1.0f);
 
         if(vscreen.small_screen_features.offset_y_hold > 0)
-            XRender::renderTexture(CamX + 4, CamY - 18, GFX.MCursor[1]);
+            XRender::renderTexture(CamX + 4, CamY - 18, GFX.MCursor[1], XTAlphaF(rate));
         else
-            XRender::renderTexture(CamX + 4, CamY + 18, GFX.MCursor[2]);
+            XRender::renderTexture(CamX + 4, CamY + 18, GFX.MCursor[2], XTAlphaF(rate));
     }
     else if(vscreen.small_screen_features.offset_y < -160 || vscreen.small_screen_features.offset_y > 160)
     {
         color = XTColorF(0.5f, 1.0f, 0.5f, 0.7f);
 
         if(vscreen.small_screen_features.offset_y > 0)
-            XRender::renderTexture(CamX + 4, CamY - 18, GFX.MCursor[1], XTAlphaF(0.7f));
+            XRender::renderTexture(CamX + 4, CamY - 18, GFX.MCursor[1], XTAlphaF(0.7f * rate));
         else
-            XRender::renderTexture(CamX + 4, CamY + 18, GFX.MCursor[2], XTAlphaF(0.7f));
+            XRender::renderTexture(CamX + 4, CamY + 18, GFX.MCursor[2], XTAlphaF(0.7f * rate));
     }
     else if(vscreen.small_screen_features.offset_y <= -48 || vscreen.small_screen_features.offset_y >= 48)
     {
@@ -191,6 +224,8 @@ void DrawSmallScreenCam(vScreen_t& vscreen)
     {
         color = XTColorF(0.0f, 0.0f, 0.0f, 0.3f);
     }
+
+    color.a *= rate;
 
     if(GFX.Camera.inited)
         XRender::renderTexture(CamX, CamY, GFX.Camera, color);

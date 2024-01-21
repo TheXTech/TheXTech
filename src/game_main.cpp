@@ -1186,6 +1186,14 @@ int GameMain(const CmdLineSetup_t &setup)
                 ++Lives;
                 EveryonesDead();
                 clearScreenFaders();
+
+                if(BattleMode && !LevelEditor && !setup.testLevelMode)
+                {
+                    BattleMode = false;
+                    GameMenu = true;
+                    MenuMode = MENU_BATTLE_MODE;
+                    MenuCursor = selWorld - 1;
+                }
             }
             else // Run the level normally
             {
@@ -1432,8 +1440,8 @@ void NextLevel()
         {
             BattleIntro = 150;
 
-            if(!LevelEditor && Backup_FullFileName.empty())
-                GameIsActive = false; // Quit game
+            // if(!LevelEditor && Backup_FullFileName.empty())
+            //     GameIsActive = false; // Quit game
         }
     }
 }
