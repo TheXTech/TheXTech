@@ -183,7 +183,7 @@ private:
     bool MenuItem_Mouse_Render(int i, const std::string& label, int X, int Y, bool mouse, bool render, int end_X = 0);
 
     // draws the selected character at a location
-    bool DrawChar(int x, int w, int y, int h);
+    bool DrawChar(int x, int w, int y, int h, bool show_name);
 
     // do rendering and mouse logic for SinglePlayer char select
     // returns -1 if player is ready to return, +1 if player is ready to proceed
@@ -299,8 +299,8 @@ static inline int BoxCount()
         n = 2;
 
     // disable entering >2P by mistake (for now)
-    if(n > 2 && Controls::g_InputMethods.size() == 2)
-        n = 2;
+    // if(n > 2 && Controls::g_InputMethods.size() == 2)
+    //     n = 2;
 
     // disable entering >1P from legacy menu
     if(s_context == Context::LegacyMenu)
@@ -1250,7 +1250,7 @@ bool PlayerBox::MenuItem_Mouse_Render(int i, const std::string& label, int X, in
 }
 
 // render the selected character for player P
-bool PlayerBox::DrawChar(int x, int w, int y, int h)
+bool PlayerBox::DrawChar(int x, int w, int y, int h, bool show_name)
 {
     // don't render character box in certain states
     if(m_state == PlayerState::SelectProfile || m_state == PlayerState::ConfirmProfile)
@@ -1413,7 +1413,8 @@ bool PlayerBox::DrawChar(int x, int w, int y, int h)
     }
 
     // finish with character name
-    SuperPrintCenter(g_gameInfo.characterName[g_charSelect[p]], 3, x + w / 2, y + h + 12, XTAlpha(alpha));
+    if(show_name)
+        SuperPrintCenter(g_gameInfo.characterName[g_charSelect[p]], 3, x + w / 2, y + h + 12, XTAlpha(alpha));
 
     return true;
 }
@@ -1608,15 +1609,17 @@ int PlayerBox::Mouse_Render(bool render, int x, int y, int w, int h)
     }
 
     // render the player box (if appropriate)
-    const int pbox_w = 88;
-    const int pbox_h = 88;
-    const int pbox_h_full = pbox_h + 16 + 32;
+    bool show_name = (main_height > 88 + 16 + 32);
+    const int label_h = show_name ? 32 : 16;
+    const int pbox_h = SDL_max(64, SDL_min(88, main_height - 16 - label_h));
+    const int pbox_w = pbox_h;
+    const int pbox_h_full = pbox_h + 16 + label_h;
     int pbox_x = main_x + main_width / 2 - pbox_w / 2;
     int pbox_y = main_y + main_height / 2 - pbox_h_full / 2 + 16;
 
     // draw character box
     if(render)
-        DrawChar(pbox_x, pbox_w, pbox_y, pbox_h);
+        DrawChar(pbox_x, pbox_w, pbox_y, pbox_h, show_name);
 
     // allow mouse to select char
     if(mouse && (m_state == PlayerState::ControlsMenu || m_state == PlayerState::SelectChar))
@@ -1893,7 +1896,9 @@ int Mouse_Render(bool mouse, bool render)
 
     const int header_height = (s_context == Context::DropAdd) ? 32 : 0;
     int box_width = 220;
-    const int box_height = 240;
+    int box_height = 240;
+    if(IsMenu() && box_height > ScreenH - MenuY - 8)
+        box_height = ScreenH - MenuY - 8;
     int padding = 16;
 
     // number of columns per row
@@ -1906,11 +1911,16 @@ int Mouse_Render(bool mouse, bool render)
         n_cols[0] = n - n_cols[1];
     }
 
-    // shrink boxes when there are more than 3 columns
-    if(n_cols[0] > 3)
+    // shrink boxes when they would not fit on screen
+    if(n_cols[0] * box_width + (n_cols[0] - 1) * padding > ScreenW)
     {
         box_width = 168;
         padding = 8;
+
+        int max_width = (ScreenW - (n_cols[0] - 1) * padding) / n_cols[0];
+        max_width &= ~1;
+        if(box_width > max_width)
+            box_width = max_width;
     }
 
     int full_height = header_height + box_height + padding;
