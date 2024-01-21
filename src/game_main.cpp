@@ -1187,7 +1187,7 @@ int GameMain(const CmdLineSetup_t &setup)
                 EveryonesDead();
                 clearScreenFaders();
 
-                if(BattleMode && !LevelEditor)
+                if(BattleMode && !LevelEditor && !setup.testLevelMode)
                 {
                     BattleMode = false;
                     GameMenu = true;
