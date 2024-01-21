@@ -50,6 +50,8 @@ void initOutroContent()
     g_outroScreen.cppPortDevelopers = "C++ port developers:";
     g_outroScreen.nameVitalyNovichkov = "Vitaly Novichkov";
 
+    g_outroScreen.qualityControl = "Quality Control:";
+
     g_outroScreen.psVitaPortBy = "PS Vita Port By:";
 
     g_outroScreen.levelDesign = "Level Design:";
@@ -301,6 +303,10 @@ void SetupCredits()
     AddCredit("");
     AddCredit("'ds-sloth'");
     AddCredit("");
+    AddCredit("");
+    AddCredit(g_outroScreen.qualityControl);
+    AddCredit("");
+    AddCredit("0lhi");
 #endif
 #ifdef VITA
     AddCredit(g_outroScreen.psVitaPortBy);

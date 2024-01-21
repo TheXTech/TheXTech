@@ -407,6 +407,7 @@ XTechTranslate::XTechTranslate()
         {"outro.nameAndrewSpinks",      &g_outroScreen.nameAndrewSpinks},
         {"outro.cppPortDevelopers",     &g_outroScreen.cppPortDevelopers},
         {"outro.nameVitalyNovichkov",   &g_outroScreen.nameVitalyNovichkov},
+        {"outro.qualityControl",        &g_outroScreen.qualityControl},
         {"outro.psVitaPortBy",          &g_outroScreen.psVitaPortBy},
         {"outro.levelDesign",           &g_outroScreen.levelDesign},
         {"outro.customSprites",         &g_outroScreen.customSprites},

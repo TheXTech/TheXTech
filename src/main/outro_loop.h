@@ -35,6 +35,8 @@ struct OutroContent
     std::string cppPortDevelopers;
     std::string nameVitalyNovichkov;
 
+    std::string qualityControl;
+
     std::string psVitaPortBy;
 
     std::string levelDesign;
