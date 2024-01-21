@@ -299,8 +299,8 @@ static inline int BoxCount()
         n = 2;
 
     // disable entering >2P by mistake (for now)
-    // if(n > 2 && Controls::g_InputMethods.size() == 2)
-    //     n = 2;
+    if(n > 2 && Controls::g_InputMethods.size() == 2)
+        n = 2;
 
     // disable entering >1P from legacy menu
     if(s_context == Context::LegacyMenu)
