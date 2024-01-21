@@ -136,6 +136,10 @@ void DropBonus(int A)
     vScreen_t& vscreen = vScreenByPlayer(A);
     GetvScreenAuto(vscreen);
 
+    // also update canonical vScreen if needed
+    if(!screen.is_canonical())
+        GetvScreenAuto(vScreenByPlayer_canonical(A));
+
     // find the HUD
     double ScreenTop = -vscreen.Y;
 

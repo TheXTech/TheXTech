@@ -50,7 +50,9 @@
 #include "main/game_strings.h"
 #include "trees.h"
 #include "npc_special_data.h"
+#include "graphics/gfx_camera.h"
 #include "graphics/gfx_update.h"
+#include "npc/npc_activation.h"
 #include "translate_episode.h"
 #include "fontman/font_manager.h"
 
@@ -188,6 +190,7 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
 //    Location_t tempLocation;
 
     qScreen = false;
+    qScreen_canonical = false;
     ClearLevel();
     BlockSound();
     FreezeNPCs = false;
@@ -1030,6 +1033,7 @@ void OpenLevelDataPost()
     syncLayers_AllBGOs();
 
     CalculateSectionOverlaps();
+    NPC_ConstructCanonicalSet();
 
     // moved the old event/layer loading code to the top
     // since it is needed before loading objects now
@@ -1146,6 +1150,7 @@ void ClearLevel()
     noUpdate = true;
     BlocksSorted = true;
     qScreen = false;
+    qScreen_canonical = false;
 
 #ifdef __16M__
     XRender::clearAllTextures();
@@ -1162,6 +1167,7 @@ void ClearLevel()
 
     UnloadCustomGFX();
     doShakeScreenClear();
+    ResetCameraPanning();
     treeLevelCleanAll();
     FontManager::clearLevelFonts();
 

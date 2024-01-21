@@ -542,7 +542,7 @@ void MenuLoop()
 
     if(SharedCursor.Primary)
     {
-        const Location_t cursorLoc = newLoc(SharedCursor.X - vScreen[1].X, SharedCursor.Y - vScreen[1].Y);
+        const Location_t cursorLoc = newLoc(SharedCursor.X - vScreen[1].X - vScreen[1].ScreenLeft, SharedCursor.Y - vScreen[1].Y - vScreen[1].ScreenTop);
         if(iRand(5) >= 2)
         {
             NewEffect(EFFID_SPARKLE, cursorLoc);
@@ -559,8 +559,8 @@ void MenuLoop()
                     if(!NPCIsACoin[NPC[A].Type])
                     {
                         NPC[0] = NPC[A];
-                        NPC[0].Location.X = SharedCursor.X - vScreen[1].X;
-                        NPC[0].Location.Y = SharedCursor.Y - vScreen[1].Y;
+                        NPC[0].Location.X = SharedCursor.X - vScreen[1].X - vScreen[1].ScreenLeft;
+                        NPC[0].Location.Y = SharedCursor.Y - vScreen[1].Y - vScreen[1].ScreenTop;
                         NPCHit(A, 3, 0);
                     }
                     else

@@ -20,8 +20,14 @@
 
 #include "globals.h"
 #include "video.h"
+#include "compat.h"
+#include "config.h"
 #include "change_res.h"
 #include "load_gfx.h"
+#include "graphics.h"
+#include "sound.h"
+#include "game_main.h"
+#include "core/render.h"
 #include "core/window.h"
 #include "core/render.h"
 #ifdef __EMSCRIPTEN__
@@ -68,7 +74,176 @@ void ChangeRes(int, int, int, int)
 
 void UpdateInternalRes()
 {
+    int req_w = g_config.InternalW;
+    int req_h = g_config.InternalH;
+
+    // TODO: use the correct canonical screen's resolution here
+    int canon_w = 800;
+    int canon_h = 600;
+
+    if(!g_compatibility.allow_multires)
+    {
+        if((req_w != 0 && req_w < canon_w) || (req_h != 0 && req_h < canon_h))
+        {
+            req_w = canon_w;
+            req_h = canon_h;
+        }
+    }
+
+    if(req_w == 0 || req_h == 0)
+    {
+        int int_w, int_h, orig_int_h;
+
+        XRender::getRenderSize(&int_w, &int_h);
+        orig_int_h = int_h;
+
+        // set internal height first
+        if(req_h != 0)
+        {
+            int_h = req_h;
+        }
+        else if(g_videoSettings.scaleMode == SCALE_FIXED_05X)
+        {
+            int_h *= 2;
+        }
+        else if(g_videoSettings.scaleMode == SCALE_FIXED_2X)
+        {
+            int_h /= 2;
+        }
+        else if(g_videoSettings.scaleMode == SCALE_DYNAMIC_INTEGER)
+        {
+            if(int_h >= 600)
+            {
+                // constrains height to be in the 600-720p range
+                int scale_factor = int_h / 600;
+                int_h /= scale_factor;
+            }
+        }
+
+        // minimum height constraint
+        if(int_h < 320)
+            int_h = 320;
+
+        // maximum height constraint
+        if(int_h > 720 && req_h <= 720)
+            int_h = 720;
+
+        // now, set width based on height and scaling mode
+        if(g_videoSettings.scaleMode == SCALE_FIXED_05X)
+        {
+            int_w *= 2;
+        }
+        else if(g_videoSettings.scaleMode == SCALE_FIXED_1X)
+        {
+            // keep as-is
+            // int_w = int_w;
+        }
+        else if(g_videoSettings.scaleMode == SCALE_FIXED_2X)
+        {
+            int_w /= 2;
+        }
+        else if(g_videoSettings.scaleMode == SCALE_DYNAMIC_INTEGER)
+        {
+            int scale_factor = orig_int_h / int_h;
+            if(scale_factor == 0)
+            {
+                // keep as-is
+                // int_w = int_w;
+            }
+            else if(int_w / scale_factor >= 800)
+            {
+                int_w /= scale_factor;
+            }
+            else
+            {
+                // scale based on width
+                int scale_factor = int_w / 800;
+                if(scale_factor != 0)
+                    int_w /= scale_factor;
+
+                // rescale the height if possible
+                if(scale_factor != 0 && req_h == 0)
+                {
+                    int_h = orig_int_h / scale_factor;
+                    if(int_h < 600)
+                        int_h = 600;
+                    if(int_h > 720)
+                        int_h = 720;
+                }
+            }
+        }
+        else
+        {
+            int_w = (int_w * int_h) / orig_int_h;
+        }
+
+        // force >800x600 resolution if required
+        if(!g_compatibility.allow_multires)
+        {
+            if(int_w < canon_w)
+            {
+                int_h = (int_h * canon_w) / int_w;
+                int_w = canon_w;
+                if(int_h > 720)
+                    int_h = 720;
+            }
+            if(int_h < canon_h)
+            {
+                int_w = (int_w * canon_h) / int_h;
+                int_h = canon_h;
+            }
+        }
+
+        // minimum width constraint
+        if(int_w < 480)
+            int_w = 480;
+
+        // maximum 2.4 (cinematic) aspect ratio
+        if(int_w > int_h*2.4)
+            int_w = (int)(int_h*2.4);
+
+        // force even dimensions
+        int_w -= int_w & 1;
+        int_h -= int_h & 1;
+
+        ScreenW = int_w;
+        ScreenH = int_h;
+    }
+    else
+    {
+        ScreenW = req_w;
+        ScreenH = req_h;
+    }
+
+    // TODO: above should tweak render target resolution. This should tweak game's screen resolution.
+    if(g_compatibility.allow_multires)
+    {
+        ScreenW = ScreenW;
+        ScreenH = ScreenH;
+    }
+    else
+    {
+        ScreenW = canon_w;
+        ScreenH = canon_h;
+    }
+
     XRender::updateViewport();
+
+    // recenter the game menu graphics
+    if(GameMenu)
+    {
+        SetupScreens();
+        CenterScreens();
+        GameMenu = false;
+        GetvScreenAverage(Screens[0].vScreen(1));
+        if(!Screens[0].is_canonical())
+            GetvScreenAverage(Screens[0].canonical_screen().vScreen(1));
+        GameMenu = true;
+    }
+
+    // disable world map qScreen if active
+    if(LevelSelect && qScreen)
+        qScreen = false;
 }
 
 void UpdateWindowRes()
@@ -76,14 +251,22 @@ void UpdateWindowRes()
     if(XWindow::isFullScreen() || XWindow::isMaximized())
         return;
 
-    int w = ScreenW;
-    int h = ScreenH;
+    int h = g_config.InternalH;
+    if(h == 0)
+        return;
+
+    int w = g_config.InternalW;
+
+    if(w == 0 && h == ScreenH)
+        w = ScreenW;
+    else if(w == 0)
+        return;
 
     if(g_videoSettings.scaleMode == SCALE_FIXED_05X)
         XWindow::setWindowSize(w / 2, h / 2);
-    else if(g_videoSettings.scaleMode == SCALE_FIXED_1X)
-        XWindow::setWindowSize(w, h);
     else if(g_videoSettings.scaleMode == SCALE_FIXED_2X)
         XWindow::setWindowSize(w * 2, h * 2);
+    else
+        XWindow::setWindowSize(w, h);
 }
 

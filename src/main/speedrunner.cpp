@@ -295,9 +295,9 @@ void RenderPowerInfo(int player, int bx, int by, int bw, int bh, uint8_t alpha, 
         SuperPrintCenter(status_info.info_string, 3, bx + bw / 2, by - 30, XTAlpha(alpha));
 }
 
-void speedRun_renderControls(int player, int screenZ)
+void speedRun_renderControls(int player, int screenZ, int align)
 {
-    if(GameMenu || GameOutro)
+    if(GameMenu || GameOutro || LevelEditor)
         return; // Don't draw things at Menu and Outro
 
     if(player < 1 || player > maxLocalPlayers)
@@ -309,58 +309,55 @@ void speedRun_renderControls(int player, int screenZ)
     const bool player_missing = (player - 1 >= (int)Controls::g_InputMethods.size() || !Controls::g_InputMethods[player - 1]);
     const bool player_newly_connected = !player_missing && QuickReconnectScreen::g_active && QuickReconnectScreen::g_toast_duration[player - 1];
 
-    bool rightAlign = false;
-
     // Controller
-    int x = 4;
-    int y = ScreenH - 34;
+    int x, y;
     int w = 76;
     int h = 30;
 
     // Battery status
-    int bx = x + w + 4;
-    int by = y + 4;
+    int bx, by;
     int bw = 40;
     int bh = 22;
 
     if(screenZ >= 0)
     {
         auto &scr = vScreen[screenZ];
-        rightAlign = scr.Left > 0;
-        x = rightAlign ? (int)(scr.Width) - (w + 4) : 4;
-        y = (int)(scr.Height) - 34;
-        bx = rightAlign ? x - (bw + 4) : (x + w + 4);
+        y = (int)scr.Height - 34;
         by = y + 4;
+
+        if(align == SPEEDRUN_ALIGN_AUTO)
+            align = scr.Left > 0 ? SPEEDRUN_ALIGN_RIGHT : SPEEDRUN_ALIGN_LEFT;
+
+        // this keeps the locations fixed even when the vScreens expand/contract
+        if(align == SPEEDRUN_ALIGN_LEFT)
+        {
+            x = 4;
+            bx = x + w + 4;
+        }
+        else
+        {
+            x = (int)scr.Width - (w + 4);
+            bx = x - (bw + 4);
+        }
     }
     else
     {
-#if 0
-        bool firstLefter =   Player[1].Location.X + (Player[1].Location.Width / 2)
-                           < Player[2].Location.X + (Player[2].Location.Width / 2);
+        if(align == SPEEDRUN_ALIGN_AUTO)
+            align = player > 1 ? SPEEDRUN_ALIGN_RIGHT : SPEEDRUN_ALIGN_LEFT;
 
-        switch(player)
+        if(align == SPEEDRUN_ALIGN_LEFT)
         {
-        case 1:
-            x = firstLefter ? 4 : (ScreenW - (w + 4));
-            break;
-        case 2:
-            x = firstLefter ? (ScreenW - (w + 4)) : 4;
-            break;
-        }
-#else
-        switch(player)
-        {
-        case 1:
             x = 4;
             bx = x + w + 4;
-            break;
-        case 2:
+        }
+        else
+        {
             x = (ScreenW - (w + 4));
             bx = x - (bw + 4);
-            rightAlign = true;
-            break;
         }
-#endif
+
+        y = ScreenH - 34;
+        by = y + 4;
     }
 
     bool show_always = (g_speedRunnerMode != SPEEDRUN_MODE_OFF || g_drawController);
@@ -411,7 +408,7 @@ void speedRun_renderControls(int player, int screenZ)
         // code for lower-resolution case
         if(ScreenW < 600 || (ScreenW < 800 && status_info.power_status != XPower::StatusInfo::POWER_DISABLED))
         {
-            if(rightAlign)
+            if(align == SPEEDRUN_ALIGN_RIGHT)
                 SuperPrintRightAlign(profile_name, 3, x + w, y - 20, XTAlpha(alpha));
             else
                 SuperPrint(profile_name, 3, x, y - 20, XTAlpha(alpha));
@@ -419,7 +416,7 @@ void speedRun_renderControls(int player, int screenZ)
         // code for higher resolution case, including battery
         else if(status_info.power_status != XPower::StatusInfo::POWER_DISABLED)
         {
-            if(rightAlign)
+            if(align == SPEEDRUN_ALIGN_RIGHT)
                 SuperPrintRightAlign(profile_name, 3, bx - 4, by + 2, XTAlpha(alpha));
             else
                 SuperPrint(profile_name, 3, bx + bw + 4, by + 2, XTAlpha(alpha));
@@ -427,7 +424,7 @@ void speedRun_renderControls(int player, int screenZ)
         // code for normal case
         else
         {
-            if(rightAlign)
+            if(align == SPEEDRUN_ALIGN_RIGHT)
                 SuperPrintRightAlign(profile_name, 3, x - 4, by + 2, XTAlpha(alpha));
             else
                 SuperPrint(profile_name, 3, x + w + 4, by + 2, XTAlpha(alpha));

@@ -49,8 +49,8 @@ extern struct Config_t
     enum
     {
         EPISODE_TITLE_OFF = 0,
-        EPISODE_TITLE_ON,
-        EPISODE_TITLE_TRANSPARENT,
+        EPISODE_TITLE_BOTTOM,
+        EPISODE_TITLE_TOP
     };
     int show_episode_title = EPISODE_TITLE_OFF;
 
@@ -78,6 +78,9 @@ extern struct Config_t
     bool    NoPauseReconnect = false;
     //! Allow player quickly move through paths on the world map (works for compatibility Mode 1 only)
     bool    worldMapFastMove = false;
+    //! Internal gameplay resolution (0 means that Renderer may set on window resize)
+    int     InternalW = 800;
+    int     InternalH = 600;
 #ifdef ENABLE_XTECH_DISCORD_RPC
     //! Enable Discord Rich Presense support on supported platforms
     bool    discord_rpc = false;
@@ -95,6 +98,19 @@ extern struct Config_t
     bool    SoundPlayerGrowWithGetItem = false;
     //! Enables the inter-level fade effect
     bool    EnableInterLevelFade = true;
+    //! Hide an event trigger NPC that is inactive but onscreen
+    enum
+    {
+        INACTIVE_NPC_HIDE = 0,
+        INACTIVE_NPC_SHADE,
+        INACTIVE_NPC_SHOW,
+    };
+    static constexpr int render_inactive_NPC = INACTIVE_NPC_SHADE;
+
+    //! Translate the coordinates of autocode screen-space objects based on the HUD location
+    static constexpr bool autocode_translate_coords = true;
+    //! Camera optimizations that improve the experience at low resolutions
+    static constexpr bool small_screen_camera_features = true;
 
 
     /* ---- Joystick ----*/

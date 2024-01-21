@@ -58,7 +58,14 @@ void speedRun_bossDeadEvent();
 void RenderPowerInfo(int player, int bx, int by, int bw, int bh, uint8_t alpha, const XPower::StatusInfo* status);
 void RenderControls(int player, int x, int y, int w, int h, bool missing, uint8_t alpha, bool connect_screen = false);
 
-void speedRun_renderControls(int player, int screenZ = -1);
+enum
+{
+    SPEEDRUN_ALIGN_LEFT = -1,
+    SPEEDRUN_ALIGN_AUTO,
+    SPEEDRUN_ALIGN_RIGHT,
+};
+
+void speedRun_renderControls(int player, int screenZ = -1, int align = SPEEDRUN_ALIGN_AUTO);
 void speedRun_renderTimer();
 
 #endif // SPEEDRUNNER_H

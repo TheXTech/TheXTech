@@ -29,6 +29,7 @@
 
 #include "render_sdl.h"
 #include "video.h"
+
 #include "core/window.h"
 #include "core/render.h"
 
@@ -295,7 +296,7 @@ void RenderSDL::updateViewport()
     m_viewport_h = ScreenH;
 
     // update render targets
-    if(m_current_scale_mode != g_videoSettings.scaleMode)
+    if(ScaleWidth != ScreenW || ScaleHeight != ScreenH || m_current_scale_mode != g_videoSettings.scaleMode)
     {
 #ifdef USE_SCREENSHOTS_AND_RECS
         // invalidates GIF recorder handle
@@ -316,6 +317,8 @@ void RenderSDL::updateViewport()
         // reset scaling setting for images loaded later
         SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");
 
+        ScaleWidth = ScreenW;
+        ScaleHeight = ScreenH;
         m_current_scale_mode = g_videoSettings.scaleMode;
     }
 }

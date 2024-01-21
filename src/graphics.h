@@ -47,9 +47,11 @@ void UpdateGraphics(bool skipRepaint = false);
 // Public Sub GetvScreen(A As Integer) ' Get the screen position
 //  Get the screen position
 void GetvScreen(vScreen_t& vscreen);
+
 // Public Sub GetvScreenAverage() ' Get the average screen position for all players
 //  Get the average screen position for all players
 void GetvScreenAverage(vScreen_t& vscreen);
+
 // Public Sub GetvScreenAverage2() ' Get the average screen position for all players with no level edge detection
 //  Get the average screen position for all players with no level edge detection
 void GetvScreenAverage2(vScreen_t& vscreen);
@@ -60,20 +62,36 @@ void GetvScreenAverage3(vScreen_t& vscreen);
 // NEW: update a vScreen with the correct procedure based on its screen's Type and DType
 void GetvScreenAuto(vScreen_t& vscreen);
 
+// NEW: get the fixed-res vScreen position for a player, and write the top-left coordinate to (left, top)
+void GetPlayerScreen(double W, double H, const Player_t& p, double& left, double& top);
+
+
 // Public Sub SetupGraphics()
 //! DUMMY AND USELESS
 void SetupGraphics();
 // Public Sub SetupEditorGraphics()
 //! DUMMY AND USELESS
 void SetupEditorGraphics();
+
 // Public Sub SetupScreens()
+// Sets the screen type and vScreen locations for all screens
 void SetupScreens(bool reset = true);
+
 // Public Sub DynamicScreen() 'for the split screen stuff
-// for the split screen stuff
+// Decides how to split the vScreens in Dynamic mode
 void DynamicScreen(Screen_t& screen, bool mute = false);
 
+// NEW: calls DynamicScreen for all screens with ScreenTypes::Dynamic. Mutes any that are not visible.
+void DynamicScreens();
+
+// NEW: limit vScreens to playable section area and center them on the real screen
+void CenterScreens(Screen_t& screen);
+
+// NEW: limits vScreens to playable section area and centers them on the real screen, for all screens.
+void CenterScreens();
+
 // NEW: moves qScreen towards vScreen, now including the screen size
-bool Update_qScreen(int Z, int camRate = 2, int resizeRate = 2);
+bool Update_qScreen(int Z, double camRate = 2, double resizeRate = 2);
 
 // Public Sub SuperPrint(SuperWords As String, Font As Integer, X As Single, Y As Single) 'prints text to the screen
 // prints text to the screen
@@ -207,6 +225,8 @@ void ScreenShot();
 // Public Sub DrawFrozenNPC(Z As Integer, A As Integer)
 void DrawFrozenNPC(int Z, int A);
 
+// NEW: draw the backdrop texture behind the vScreens
+void DrawBackdrop(const Screen_t& screen);
 // NEW: draws device battery status in top-right corner of screen
 void DrawDeviceBattery();
 

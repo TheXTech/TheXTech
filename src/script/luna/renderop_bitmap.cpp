@@ -48,6 +48,10 @@ void RenderBitmapOp::Draw(Renderer *renderer)
         screenX -= vScreen[renderer->GetCameraIdx()].X;
         screenY -= vScreen[renderer->GetCameraIdx()].Y;
     }
+    else
+    {
+        Render::TranslateScreenCoords(screenX, screenY, this->sw, this->sh);
+    }
 
     // Get integer values as current rendering backends prefer that
     int x = Maths::iRound(screenX);

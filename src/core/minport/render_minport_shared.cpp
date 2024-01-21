@@ -74,7 +74,11 @@ void updateViewport()
     hardware_w /= 2;
     hardware_h /= 2;
 
+#ifdef __3DS__
+    int ScreenW_Show = ScreenW - MAX_3D_OFFSET * 2;
+#else
     int ScreenW_Show = ScreenW;
+#endif
 
     if(g_videoSettings.scaleMode == SCALE_DYNAMIC_LINEAR || g_videoSettings.scaleMode == SCALE_DYNAMIC_NEAREST)
     {

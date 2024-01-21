@@ -191,6 +191,31 @@ static std::string findIntroLevel()
     return selected;
 }
 
+// expand the section vertically if the top 8px of the level are empty
+static void s_ExpandSectionForMenu()
+{
+    Location_t& menu_section = level[0];
+
+    // check current section top for expandability
+    Location_t tempLocation = newLoc(menu_section.X, menu_section.Y, menu_section.Width - menu_section.X, 8);
+
+    for(int A : treeBlockQuery(tempLocation, SORTMODE_NONE))
+    {
+        if(CheckCollision(Block[A].Location, tempLocation))
+            return;
+    }
+
+    for(int A : treeBackgroundQuery(tempLocation, SORTMODE_NONE))
+    {
+        if(CheckCollision(Background[A].Location, tempLocation))
+            return;
+    }
+
+    // expand level height to a maximum of 2160px
+    if(menu_section.Y > menu_section.Height - 2160)
+        menu_section.Y = menu_section.Height - 2160;
+}
+
 void MainLoadAll(bool reload)
 {
     if(reload)
@@ -292,6 +317,7 @@ int GameMain(const CmdLineSetup_t &setup)
     FileFormats::SetSMBX64LvlFlags(FileFormats::F_SMBX64_KEEP_LEGACY_NPC_IN_BLOCK_CODES);
 
     StartMenu = true;
+    MenuMode = MENU_INTRO;
 
     // strings and translation initialization moved into MainLoadAll
 #if 0
@@ -538,7 +564,7 @@ int GameMain(const CmdLineSetup_t &setup)
         {
             // if(resChanged)
             //     ChangeScreen();
-            BattleMode = false;
+            // BattleMode = false;
             SingleCoop = 0;
             numPlayers = 0;
             // ScreenType = 0; // set in SetupScreens()
@@ -551,9 +577,7 @@ int GameMain(const CmdLineSetup_t &setup)
 
             // coming back from a level test
             if(!WorldEditor)
-            {
                 EditorRestore();
-            }
 
             // Run the frame-loop
             runFrameLoop(&EditorLoop,
@@ -562,7 +586,7 @@ int GameMain(const CmdLineSetup_t &setup)
                         nullptr,
                         nullptr);
 
-            MenuMode = MENU_MAIN; // MENU_INTRO when this is implemented
+            MenuMode = MENU_INTRO;
             LevelEditor = false;
             WorldEditor = false;
             XRender::clearBuffer();
@@ -660,7 +684,7 @@ int GameMain(const CmdLineSetup_t &setup)
             }
 
             SetupPlayers();
-            CreditChop = 300; // 100
+            CreditChop = ScreenH / 2; // 100
             EndCredits = 0;
             GameOutroDoQuit = false;
             SetupCredits();
@@ -768,6 +792,7 @@ int GameMain(const CmdLineSetup_t &setup)
             BeatTheGame = false;
             g_ForceBitmaskMerge = false;
             g_ClonedPlayerMode = false;
+            g_CheatLogicScreen = false;
             XRender::unloadGifTextures();
 
             // reinitialize the screens (resets multiplayer preferences)
@@ -805,6 +830,7 @@ int GameMain(const CmdLineSetup_t &setup)
 
             OpenLevel(introPath);
             vScreen[1].X = -level[0].X;
+            s_ExpandSectionForMenu();
 
             if(g_config.EnableInterLevelFade)
                 g_levelScreenFader.setupFader(3, 65, 0, ScreenFader::S_FADE);
@@ -972,6 +998,8 @@ int GameMain(const CmdLineSetup_t &setup)
                 ResetSoundFX();
                 setMusicStartDelay(); // Don't start music until all gfx will be loaded
 
+                worldResetSection();
+
                 if(curWorldMusic > 0)
                     StartMusic(curWorldMusic);
 
@@ -992,6 +1020,7 @@ int GameMain(const CmdLineSetup_t &setup)
 
                 // WorldLoop will automatically resume the music as needed
                 // delayedMusicStart(); // Allow music being started
+                worldResetSection();
 
                 // 'level select loop
                 runFrameLoop(nullptr, &WorldLoop,
@@ -1029,6 +1058,7 @@ int GameMain(const CmdLineSetup_t &setup)
                 StartWarp = lastWarpEntered; // When restarting a level (after death), don't restore an entered warp on checkpoints
 
             qScreen = false;
+            qScreen_canonical = false;
             LevelRestartRequested = false;
 
             if(lastWarpEntered != StartWarp)
@@ -1246,6 +1276,7 @@ int GameMain(const CmdLineSetup_t &setup)
 
                     TestLevel = false;
                     LevelEditor = true;
+                    GameMenu = false;
                     SetupPlayers();
 
                     // reopen the temporary level (FullFileName)
@@ -1400,7 +1431,9 @@ void NextLevel()
         if(TestLevel && BattleMode)
         {
             BattleIntro = 150;
-            GameIsActive = false; // Quit game
+
+            if(!LevelEditor && Backup_FullFileName.empty())
+                GameIsActive = false; // Quit game
         }
     }
 }
@@ -1634,7 +1667,7 @@ void UpdateMacro()
                 BeatTheGame = true;
                 SaveGame();
                 GameOutro = true;
-                MenuMode = MENU_MAIN;
+                MenuMode = MENU_INTRO;
                 MenuCursor = 0;
             }
             XRender::clearBuffer();

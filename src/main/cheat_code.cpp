@@ -33,31 +33,37 @@
 #include <pge_delay.h>
 #endif
 
-#include "../globals.h"
-#include "../sound.h"
-#include "../graphics.h"
-#include "../collision.h"
-#include "../effect.h"
-#include "../player.h"
-#include "../npc.h"
-#include "../layers.h"
-#include "../controls.h"
-#include "../game_main.h"
-#include "game_info.h"
-#include "screen_quickreconnect.h"
+#include "globals.h"
+#include "sound.h"
+#include "graphics.h"
+#include "collision.h"
+#include "effect.h"
+#include "player.h"
+#include "npc.h"
+#include "layers.h"
+#include "controls.h"
+#include "game_main.h"
+#include "change_res.h"
+#include "config.h"
 #include "frm_main.h"
-
-#include "npc/npc_queues.h"
-#include "main/trees.h"
 
 #include "core/render.h"
 
-#include "cheat_code.h"
+#include "npc/npc_queues.h"
+
+#include "main/game_info.h"
+#include "main/screen_quickreconnect.h"
+#include "main/screen_textentry.h"
+
+#include "main/trees.h"
+
+#include "main/cheat_code.h"
 
 #include "npc_id.h"
 #include "eff_id.h"
 
 bool g_ForceBitmaskMerge = false;
+bool g_CheatLogicScreen = false;
 
 static void redigitIsCool()
 {
@@ -162,6 +168,28 @@ static void moonWalk()
         WorldLevel[B].Active = true;
 
     PlaySound(SFX_NewPath);
+}
+
+/*!
+ * \brief Opens all exits for current world level
+ */
+static void openSesame()
+{
+    bool found = false;
+
+    for(WorldLevel_t &lev : treeWorldLevelQuery(WorldPlayer[1].Location, SORTMODE_ID))
+    {
+        if(CheckCollision(WorldPlayer[1].Location, lev.Location))
+        {
+            found = true;
+
+            for(int A = 1; A <= 4; A++)
+                LevelPath(lev, A);
+        }
+    }
+
+    if(!found)
+        PlaySound(SFX_BlockHit);
 }
 
 /*!
@@ -1215,6 +1243,13 @@ static void fourShared()
     }
 }
 
+static void fourSplit()
+{
+    fourShared();
+    Screens[0].multiplayer_pref = MultiplayerPrefs::Split;
+    SetupScreens();
+}
+
 static void warioTime()
 {
     Location_t tempLocation;
@@ -1807,6 +1842,12 @@ static void gifs2png()
     XRender::unloadGifTextures();
 }
 
+static void logicScreen()
+{
+    PlaySound(SFX_PSwitch);
+    g_CheatLogicScreen = !g_CheatLogicScreen;
+}
+
 static void newLeaf()
 {
     GodMode = false;
@@ -1961,7 +2002,97 @@ static void itsVegas()
     PlaySound(SFX_CardRouletteClear);
 }
 
+static void setRes(int w, int h)
+{
+    g_config.InternalW = w;
+    g_config.InternalH = h;
+    UpdateWindowRes();
+    UpdateInternalRes();
+}
 
+static void setResGb()
+{
+    setRes(320, 288);
+}
+
+static void setResGba()
+{
+    setRes(480, 320);
+}
+
+static void setResNds()
+{
+    setRes(512, 384);
+}
+
+static void setResSnes()
+{
+    setRes(512, 448);
+}
+
+static void setResVga()
+{
+    setRes(640, 480);
+}
+
+static void setResHello()
+{
+    setRes(768, 432);
+}
+
+static void setRes3ds()
+{
+    setRes(800, 480);
+}
+
+static void setResClassic()
+{
+    setRes(800, 600);
+}
+
+static void setResHD()
+{
+    setRes(1280, 720);
+}
+
+static void setResDyn()
+{
+    setRes(0, 0);
+}
+
+static void setResCustom()
+{
+    int w, h;
+
+    std::string s = TextEntryScreen::Run("Game width:");
+    if(s.empty())
+        return;
+
+    w = 0; // just to suppress an unneeded warning
+
+    while(s != "dyn" && (w = atol(s.c_str())) <= 0)
+    {
+        s = TextEntryScreen::Run("Invalid input. Game width:");
+        if(s.empty())
+            return;
+    }
+
+    if(s == "dyn")
+        w = 0;
+
+    s = TextEntryScreen::Run("Game height:");
+    if(s.empty())
+        return;
+
+    while((h = atol(s.c_str())) <= 0)
+    {
+        s = TextEntryScreen::Run("Invalid input. Game height:");
+        if(s.empty())
+            return;
+    }
+
+    setRes(w, h);
+}
 
 
 
@@ -1992,6 +2123,27 @@ static const CheatCodeDefault_t s_cheatsListGlobalDefault[] =
 
     {"gifs2png", gifs2png, false},
 
+    // cheat to show the logical screens
+    {"logicscreen", logicScreen, false},
+
+    // resolution cheats
+    {"gameboyview", setResGb, false},
+    {"tinyview", setResGba, false},
+    {"gbaview", setResGba, false},
+    {"superbdemoadvance", setResGba, false},
+    {"ndsview", setResNds, false},
+    {"snesview", setResSnes, false},
+    {"vgaview", setResVga, false},
+    {"helloview", setResHello, false},
+    {"3dsview", setRes3ds, false},
+    {"smbxview", setResClassic, false},
+    {"aodview", setResClassic, false},
+    {"classicview", setResClassic, false},
+    {"hdview", setResHD, false},
+    {"dynview", setResDyn, false},
+    {"debugview", setResCustom, false},
+    {"customview", setResCustom, false},
+
     {nullptr, nullptr, false}
 };
 
@@ -2001,6 +2153,8 @@ static const CheatCodeDefault_t s_cheatsListWorldDefault[] =
     {"imtiredofallthiswalking", moonWalk, true}, {"moonwalk", moonWalk, true}, {"skywalk", moonWalk, true},
     {"illparkwhereiwant", illParkWhereIWant, true}, {"parkinglot", illParkWhereIWant, true},
     {"4shared", fourShared, true},
+    {"4split", fourSplit, true},
+    {"opensesame", openSesame, true},
     {nullptr, nullptr, false}
 };
 
@@ -2052,6 +2206,7 @@ static const CheatCodeDefault_t s_cheatsListLevelDefault[] =
     {"1player", onePlayer, true},
     {"2player", twoPlayer, true},
     {"4shared", fourShared, true},
+    {"4split", fourSplit, true},
 
     {"wariotime", warioTime, true},
     {"carkeys", carKeys, true},
