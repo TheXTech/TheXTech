@@ -1582,6 +1582,20 @@ bool CanConvertLevel(int format, std::string* reasons)
         }
     }
 
+    for(int i = 1; i <= numBackground; i++)
+    {
+        if(Background[i].GetCustomLayer() || Background[i].GetCustomOffset())
+        {
+            can_convert = false;
+            if(reasons)
+            {
+                *reasons += g_editorStrings.fileConvertFeatureBgoOrder;
+                *reasons += '\n';
+            }
+            break;
+        }
+    }
+
     return can_convert;
 }
 
@@ -1637,6 +1651,9 @@ void ConvertLevel(int format)
             ss.autoscroll = false;
         }
     }
+
+    for(int i = 1; i <= numBackground; i++)
+        Background[i].SetSortPriority(0, 0);
 
     for(int i = 1; i <= numNPCs; i++)
         NPC[i].Variant = 0;
