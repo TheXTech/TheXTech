@@ -77,32 +77,6 @@
 #endif
 
 
-void bgoApplyZMode(Background_t *bgo, int smbx64sp)
-{
-    if(bgo->zMode == LevelBGO::ZDefault)
-        bgo->SortPriority = smbx64sp;
-    else
-    {
-        switch(bgo->zMode)
-        {
-        case LevelBGO::Background2:
-            bgo->SortPriority = 10;
-            break;
-        case LevelBGO::Background1:
-            bgo->SortPriority = 30;
-            break;
-        case LevelBGO::Foreground1:
-            bgo->SortPriority = 125;
-            break;
-        case LevelBGO::Foreground2:
-            bgo->SortPriority = 200;
-            break;
-        default:
-            break;
-        }
-    }
-}
-
 void addMissingLvlSuffix(std::string &fileName)
 {
     if(!fileName.empty() && !Files::hasSuffix(fileName, ".lvl") && !Files::hasSuffix(fileName, ".lvlx") && !Files::hasSuffix(fileName, "tst"))
@@ -665,12 +639,7 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         bgo.Location.Width = GFXBackgroundWidth[bgo.Type];
         bgo.Location.Height = BackgroundHeight[bgo.Type];
 
-        bgo.uid = int(b.meta.array_id);
-
-        bgo.zMode = b.z_mode;
-        bgo.zOffset = b.z_offset;
-
-        bgoApplyZMode(&bgo, int(b.smbx64_sp));
+        bgo.SetSortPriority(b.z_mode, std::round(b.z_offset));
     }
 
 

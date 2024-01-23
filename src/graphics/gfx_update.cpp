@@ -1905,9 +1905,7 @@ void UpdateGraphicsScreen(Screen_t& screen)
                 if(A > numBackground)
                     break;
 
-                if(Background[A].Type == 11 || Background[A].Type == 12 || Background[A].Type == 60
-                    || Background[A].Type == 61 || Background[A].Type == 75 || Background[A].Type == 76
-                    || Background[A].Type == 77 || Background[A].Type == 78 || Background[A].Type == 79)
+                if(Background[A].SortPriority < Background_t::PRI_NORM_START)
                 {
                     g_stats.checkedBGOs++;
                     if(vScreenCollision(Z, Background[A].Location) && !Background[A].Hidden)
@@ -2041,9 +2039,7 @@ void UpdateGraphicsScreen(Screen_t& screen)
                 if(A > numBackground)
                     break;
 
-                if(!(Background[A].Type == 11 || Background[A].Type == 12 || Background[A].Type == 60
-                    || Background[A].Type == 61 || Background[A].Type == 75 || Background[A].Type == 76
-                    || Background[A].Type == 77 || Background[A].Type == 78 || Background[A].Type == 79) && !Foreground[Background[A].Type])
+                if(Background[A].SortPriority >= Background_t::PRI_NORM_START && Background[A].SortPriority < Background_t::PRI_FG_START)
                 {
                     g_stats.checkedBGOs++;
                     if(vScreenCollision(Z, Background[A].Location) && !Background[A].Hidden)
@@ -2789,7 +2785,7 @@ void UpdateGraphicsScreen(Screen_t& screen)
                 if(A > numBackground)
                     continue;
 
-                if(Foreground[Background[A].Type])
+                if(Background[A].SortPriority >= Background_t::PRI_FG_START)
                 {
                     g_stats.checkedBGOs++;
                     if(vScreenCollision(Z, Background[A].Location) && !Background[A].Hidden)

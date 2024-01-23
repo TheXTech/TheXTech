@@ -182,6 +182,7 @@ void EditorScreen::ResetCursor()
     EditorCursor.Block.Type = 1;
     EditorCursor.Background = Background_t();
     EditorCursor.Background.Type = 1;
+    EditorCursor.Background.SetSortPriority(0, 0);
     EditorCursor.NPC = NPC_t();
     EditorCursor.NPC.Type = 1;
     EditorCursor.NPC.Direction = -1;
@@ -3281,6 +3282,7 @@ void EditorScreen::UpdateBGO(CallMode mode, int x, int y, int type)
     if(UpdateBGOButton(mode, x, y, type, sel) && !sel)
     {
         EditorCursor.Background.Type = type;
+        EditorCursor.Background.UpdateSortPriority();
     }
 }
 

@@ -738,22 +738,33 @@ struct Player_t
 //Public Type Background  'Background objects
 struct Background_t
 {
-//    Layer As String
-    layerindex_t Layer = LAYER_NONE;
-//    Hidden As Boolean
-    bool Hidden = false;
 //    Type As Integer
     vbint_t Type = 0;
+//    Hidden As Boolean
+    bool Hidden = false;
+//    Layer As String
+    layerindex_t Layer = LAYER_NONE;
+//    EXTRA: sort priority for BGO (NOT a draw plane itself, a BGO-only format used for sorting and determining draw plane)
+    uint8_t SortPriority = 0;
 //    Location As Location
     Location_t Location;
-//EXTRA: make a custom sorting priority
-    int SortPriority = -1;
-//EXTRA: Preserved Z-Mode value
-    int zMode = 0;
-//EXTRA: sub-priority
-    double zOffset = 0.0;
-//EXTRA: UID
-    int uid = 0;
+
+    //! SortPriority at which PLANE_LVL_BGO_NORM, PLANE_LVL_BGO_FG, and PLANE_LVL_BGO_TOP start
+    static constexpr uint8_t PRI_NORM_START = 0x30;
+    static constexpr uint8_t PRI_FG_START = 0xA0;
+    static constexpr uint8_t PRI_TOP_START = 0xC0;
+
+    // all defined in sorting.cpp:
+
+    //! checks if a custom sorting layer is set; returns -2, -1, +1, or +2 if so, 0 if not
+    int GetCustomLayer() const;
+    //! returns custom sorting offset (a number between -3 and +3)
+    int GetCustomOffset() const;
+    //! sets custom sorting layer and offset bits and updates sort priority
+    void SetSortPriority(int layer, int offset);
+    //! updates SortPriority based on current type, custom layer, and custom offset
+    void UpdateSortPriority();
+
 //End Type
 };
 
