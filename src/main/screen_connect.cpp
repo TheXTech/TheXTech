@@ -1390,6 +1390,9 @@ bool PlayerBox::DrawChar(int x, int w, int y, int h, bool show_name)
         scratch_player.Location.X = x + w / 2 - scratch_player.Location.Width / 2 - vScreen[0].X;
         scratch_player.Location.Y = y + h / 2 + Physics.PlayerHeight[5][2] / 4 - scratch_player.Location.Height * 3 / 4 + 4 - vScreen[0].Y;
 
+        if(scratch_player.Mount == 3)
+            scratch_player.Location.Y += 6;
+
         // animate winged boot
         if(scratch_player.Mount == 1 && scratch_player.MountType == 3)
         {
