@@ -3339,6 +3339,28 @@ void EditorScreen::UpdateBGOScreen(CallMode mode)
     if(UpdateButton(mode, e_ScreenW - 160 + 4, 40 + 4, GFXNPC[NPCID_COIN_SWITCH], MagicBlock::enabled, 0, 0, 32, 32))
         MagicBlock::enabled = !MagicBlock::enabled;
 
+    // Z-Layer and Z-Offset
+    if(FileFormat == FileFormats::LVL_PGEX)
+    {
+        int layer = EditorCursor.Background.GetCustomLayer();
+        int offset = EditorCursor.Background.GetCustomOffset();
+
+        if(mode == CallMode::Render)
+        {
+            // std::string tempString = g_editorStrings.labelSortLayer + ": ";
+
+            // if(layer > 0)
+            //     tempString += '+';
+
+            // if(layer == 0)
+            //     tempString += g_editorStrings.layersLayerDefault;
+            // else
+            //     tempString += std::to_string(layer);
+
+            // SuperPrintCenter(tempString, 3, e_ScreenW - 80);
+        }
+    }
+
     // Layers
     SuperPrintRightR(mode, g_editorStrings.labelLayer, 3, e_ScreenW - 40, 434);
     if(EditorCursor.Background.Layer == LAYER_NONE)
