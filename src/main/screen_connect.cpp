@@ -1319,6 +1319,7 @@ bool PlayerBox::DrawChar(int x, int w, int y, int h, bool show_name)
         Player_t& scratch_player = Player[scratch_index];
 
         // back up some info to the stack
+        int PrevCh = scratch_player.Character;
         int Frame = scratch_player.Frame;
         int FrameCount = scratch_player.FrameCount;
         int YoshiTFrameCount = scratch_player.YoshiTFrameCount;
@@ -1360,11 +1361,16 @@ bool PlayerBox::DrawChar(int x, int w, int y, int h, bool show_name)
             scratch_player.State = 1;
 
         // restore data
-        scratch_player.Frame = Frame;
-        scratch_player.FrameCount = FrameCount;
-        scratch_player.YoshiTFrameCount = YoshiTFrameCount;
-        scratch_player.YoshiBFrameCount = YoshiBFrameCount;
-        scratch_player.YoshiWingsFrameCount = YoshiWingsFrameCount;
+        if(scratch_player.Character == PrevCh)
+        {
+            scratch_player.Frame = Frame;
+            scratch_player.FrameCount = FrameCount;
+            scratch_player.YoshiTFrameCount = YoshiTFrameCount;
+            scratch_player.YoshiBFrameCount = YoshiBFrameCount;
+            scratch_player.YoshiWingsFrameCount = YoshiWingsFrameCount;
+        }
+        else
+            scratch_player.Frame = 1;
 
         // process height and frames
         scratch_player.Location.Height = Physics.PlayerHeight[scratch_player.Character][scratch_player.State];
