@@ -703,7 +703,7 @@ struct PlayDoSentinel
 // returns true to signal exit from menu
 bool PlayerBox::Back()
 {
-    int p = CalcIndex();
+    // int p = CalcIndex();
 
     m_input_ready = false;
 
@@ -719,19 +719,9 @@ bool PlayerBox::Back()
         // adding player at main menu
         if(IsMenu())
         {
-            // remove the player's slot
-            Player_Remove(p);
-
-            // quit if there aren't enough players
-            if((int)Controls::g_InputMethods.size() < s_minPlayers)
-            {
-                PlaySoundMenu(SFX_Slide);
-                return true;
-            }
-
-            PlaySoundMenu(SFX_PlayerDied2);
-
-            return false;
+            // jsut go back!
+            PlaySoundMenu(SFX_Slide);
+            return true;
         }
         // escape the drop/add menu
         else
