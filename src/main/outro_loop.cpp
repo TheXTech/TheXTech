@@ -299,12 +299,12 @@ void SetupCredits()
     AddCredit(g_outroScreen.nameVitalyNovichkov);
     AddCredit("'Wohlstand'");
     AddCredit("");
-    AddCredit("'ds-sloth'");
+    AddCredit("'ds-sloth'"); // For the major contribution to the code and becoming a co-developer
     AddCredit("");
     AddCredit("");
     AddCredit(g_outroScreen.qualityControl);
     AddCredit("");
-    AddCredit("0lhi");
+    AddCredit("0lhi"); // Significant contribution to TheXTech development, testing, improvement process
 #endif
 #ifdef VITA
     AddCredit(g_outroScreen.psVitaPortBy);
@@ -353,10 +353,9 @@ void SetupCredits()
     AddCredit("Yingchun Soul"); // Idea for individual iceball shooting SFX and contribution with the "frozen NPC breaking" SFX
     AddCredit("MrDoubleA"); // Contribution with the "NPC got frozen" SFX
     AddCredit("Slash-18"); // Contribution with the better iceball shooting SFX
-    AddCredit("ds-sloth"); // For the major contribution to the code and becoming a co-developer
-    AddCredit("0lhi"); // Significant contribution to TheXTech development, testing, improvement process
     AddCredit("Eclipsed"); // For the help to verify and polish the speed-run mode
     AddCredit("ThatRoadRunnerfan727 (Matthew)"); // For Nintendo Switch alpha testing on hardware
+    AddCredit("RMN Community"); // For Quality Episodes that allowed us to refine the Engine
 #endif
     AddCredit("");
     AddCredit("4matsy");

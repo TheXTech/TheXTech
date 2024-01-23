@@ -76,7 +76,7 @@ void initGameInfo()
     g_gameInfo.wordStarAccusativeDual_Cnt = "";
     g_gameInfo.wordStarAccusativePlural = "stars";
 
-    g_gameInfo.creditsFont = 4;
+    g_gameInfo.creditsFont = 5;
 
 #ifdef CUSTOM_CREDITS_URL
     g_gameInfo.creditsHomePage = CUSTOM_CREDITS_URL;
@@ -189,7 +189,7 @@ void initGameInfo()
 
         config.beginGroup("credits");
         {
-            config.read("font", g_gameInfo.creditsFont, 4);
+            config.read("font", g_gameInfo.creditsFont, 5);
             config.read("homepage", g_gameInfo.creditsHomePage, g_gameInfo.creditsHomePage);
 
             int cr;
