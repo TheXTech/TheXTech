@@ -46,7 +46,8 @@
                 "music26": "성",
                 "music36": "보스",
                 "music49": "물",
-                "music27": "주요 테마"
+                "music27": "주요 테마",
+                "header": "64"
             },
             "fam-misc": {
                 "music55": "타이틀 테마",
@@ -465,7 +466,11 @@
         "wordStarAccusativePlural": "별"
     },
     "character": {
-        "name1": ""
+        "name1": "캐릭터1",
+        "name2": "캐릭터2",
+        "name3": "캐릭터3",
+        "name4": "캐릭터4",
+        "name5": "캐릭터5"
     },
     "languageName": "한국어"
 }
