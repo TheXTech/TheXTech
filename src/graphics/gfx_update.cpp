@@ -643,7 +643,7 @@ void s_UpdateDrawItems(Screen_t& screen, int i)
 
         // make query (sort by ID as done in vanilla)
         s_drawBGOs[i].clear();
-        treeBackgroundQuery(s_drawBGOs[i], s_drawBGOs_bounds[i], SORTMODE_ID);
+        treeBackgroundQuery(s_drawBGOs[i], s_drawBGOs_bounds[i], (LevelEditor) ? SORTMODE_Z : SORTMODE_ID);
     }
 }
 
@@ -1900,27 +1900,27 @@ void UpdateGraphicsScreen(Screen_t& screen)
 
         if(LevelEditor)
         {
-            for(int A : screenBackgrounds)
+            for(; nextBackground < (int)screenBackgrounds.size(); nextBackground++) // First backgrounds
             {
+                int A = screenBackgrounds[nextBackground];
+
                 if(A > numBackground)
                     break;
 
-                if(Background[A].Type == 11 || Background[A].Type == 12 || Background[A].Type == 60
-                    || Background[A].Type == 61 || Background[A].Type == 75 || Background[A].Type == 76
-                    || Background[A].Type == 77 || Background[A].Type == 78 || Background[A].Type == 79)
+                if(Background[A].SortPriority >= Background_t::PRI_NORM_START)
+                    break;
+
+                g_stats.checkedBGOs++;
+                if(vScreenCollision(Z, Background[A].Location) && !Background[A].Hidden)
                 {
-                    g_stats.checkedBGOs++;
-                    if(vScreenCollision(Z, Background[A].Location) && !Background[A].Hidden)
-                    {
-                        g_stats.renderedBGOs++;
-                        XRender::renderTexture(vScreen[Z].X + Background[A].Location.X,
-                                              vScreen[Z].Y + Background[A].Location.Y,
-                                              GFXBackgroundWidth[Background[A].Type],
-                                              BackgroundHeight[Background[A].Type],
-                                              GFXBackgroundBMP[Background[A].Type], 0,
-                                              BackgroundHeight[Background[A].Type] *
-                                              BackgroundFrame[Background[A].Type]);
-                    }
+                    g_stats.renderedBGOs++;
+                    XRender::renderTexture(vScreen[Z].X + Background[A].Location.X,
+                                          vScreen[Z].Y + Background[A].Location.Y,
+                                          GFXBackgroundWidth[Background[A].Type],
+                                          BackgroundHeight[Background[A].Type],
+                                          GFXBackgroundBMP[Background[A].Type], 0,
+                                          BackgroundHeight[Background[A].Type] *
+                                          BackgroundFrame[Background[A].Type]);
                 }
             }
         }
@@ -2036,26 +2036,26 @@ void UpdateGraphicsScreen(Screen_t& screen)
 
         if(LevelEditor)
         {
-            for(int A : screenBackgrounds)
+            for(; nextBackground < (int)screenBackgrounds.size(); nextBackground++)  // Second backgrounds
             {
+                int A = screenBackgrounds[nextBackground];
+
                 if(A > numBackground)
                     break;
 
-                if(!(Background[A].Type == 11 || Background[A].Type == 12 || Background[A].Type == 60
-                    || Background[A].Type == 61 || Background[A].Type == 75 || Background[A].Type == 76
-                    || Background[A].Type == 77 || Background[A].Type == 78 || Background[A].Type == 79) && !Foreground[Background[A].Type])
+                if(Background[A].SortPriority >= Background_t::PRI_FG_START)
+                    break;
+
+                g_stats.checkedBGOs++;
+                if(vScreenCollision(Z, Background[A].Location) && !Background[A].Hidden)
                 {
-                    g_stats.checkedBGOs++;
-                    if(vScreenCollision(Z, Background[A].Location) && !Background[A].Hidden)
-                    {
-                        g_stats.renderedBGOs++;
-                        XRender::renderTexture(vScreen[Z].X + Background[A].Location.X,
-                                              vScreen[Z].Y + Background[A].Location.Y,
-                                              GFXBackgroundWidth[Background[A].Type],
-                                              BackgroundHeight[Background[A].Type],
-                                              GFXBackgroundBMP[Background[A].Type], 0,
-                                              BackgroundHeight[Background[A].Type] * BackgroundFrame[Background[A].Type]);
-                    }
+                    g_stats.renderedBGOs++;
+                    XRender::renderTexture(vScreen[Z].X + Background[A].Location.X,
+                                          vScreen[Z].Y + Background[A].Location.Y,
+                                          GFXBackgroundWidth[Background[A].Type],
+                                          BackgroundHeight[Background[A].Type],
+                                          GFXBackgroundBMP[Background[A].Type], 0,
+                                          BackgroundHeight[Background[A].Type] * BackgroundFrame[Background[A].Type]);
                 }
             }
         }
@@ -2784,24 +2784,23 @@ void UpdateGraphicsScreen(Screen_t& screen)
 
         if(LevelEditor)
         {
-            for(int A : screenBackgrounds)
+            for(; nextBackground < (int)screenBackgrounds.size(); nextBackground++)  // Foreground objects
             {
+                int A = screenBackgrounds[nextBackground];
+
                 if(A > numBackground)
                     continue;
 
-                if(Foreground[Background[A].Type])
+                g_stats.checkedBGOs++;
+                if(vScreenCollision(Z, Background[A].Location) && !Background[A].Hidden)
                 {
-                    g_stats.checkedBGOs++;
-                    if(vScreenCollision(Z, Background[A].Location) && !Background[A].Hidden)
-                    {
-                        g_stats.renderedBGOs++;
-                        XRender::renderTexture(vScreen[Z].X + Background[A].Location.X,
-                                              vScreen[Z].Y + Background[A].Location.Y,
-                                              GFXBackgroundWidth[Background[A].Type],
-                                              BackgroundHeight[Background[A].Type],
-                                              GFXBackgroundBMP[Background[A].Type], 0,
-                                              BackgroundHeight[Background[A].Type] * BackgroundFrame[Background[A].Type]);
-                    }
+                    g_stats.renderedBGOs++;
+                    XRender::renderTexture(vScreen[Z].X + Background[A].Location.X,
+                                          vScreen[Z].Y + Background[A].Location.Y,
+                                          GFXBackgroundWidth[Background[A].Type],
+                                          BackgroundHeight[Background[A].Type],
+                                          GFXBackgroundBMP[Background[A].Type], 0,
+                                          BackgroundHeight[Background[A].Type] * BackgroundFrame[Background[A].Type]);
                 }
             }
         }

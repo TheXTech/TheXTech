@@ -21,6 +21,8 @@
 #include "globals.h"
 #include "sorting.h"
 
+#include <algorithm>
+
 // these are now used only when saving levels
 void qSortBlocksY(int min, int max)
 {
@@ -117,6 +119,14 @@ void qSortBlocksX(int min, int max)
 
 void qSortBackgrounds(int min, int max)
 {
+    std::stable_sort(&Background[min], (&Background[max]) + 1,
+    [](const Background_t& a, const Background_t& b)
+    {
+        return a.SortPriority < b.SortPriority || (a.SortPriority == b.SortPriority && a.Location.X < b.Location.X);
+    });
+
+    // old code was acceptable but didn't make it easy to sort by SortPriority first, Location second
+#if 0
     Background_t medBackground;
     double medBackgroundPri = 0.0;
     int hi = 0;
@@ -162,6 +172,7 @@ void qSortBackgrounds(int min, int max)
     } while(true);
     qSortBackgrounds(min, lo - 1);
     qSortBackgrounds(lo + 1, max);
+#endif
 }
 
 // deprecated by block quadtree
@@ -285,7 +296,6 @@ void BlockSort2()
         }
     } while(sortAgain);
 }
-#endif
 
 void BackgroundSort()
 {
@@ -316,7 +326,145 @@ void BackgroundSort()
         }
     } while(sortAgain);
 }
+#endif
 
+//! checks if a custom layer is set, returns -2, -1, +1, or +2 if so, 0 if not
+int Background_t::GetCustomLayer() const
+{
+    switch(SortPriority & 0xf8)
+    {
+    case(0x08):
+    case(0x18):
+    case(0x28):
+        return -2;
+    case(0x30):
+    case(0x48):
+    case(0x98):
+        return -1;
+    case(0xA0):
+    case(0xB8):
+        return +1;
+    case(0xC0):
+        return +2;
+    default:
+        return 0;
+    }
+}
+
+//! returns the custom offset of a BGO
+int Background_t::GetCustomOffset() const
+{
+    return int((SortPriority) & 0x07) - 4;
+}
+
+//! update a background's priority based on its current type, custom layer, and custom offset
+void Background_t::UpdateSortPriority()
+{
+    // check user-specified Z-layer
+    int user_order = GetCustomLayer();
+
+    // clear upper 5 bits
+    SortPriority &= ~0xf8;
+
+    // set upper 5 bits by user order
+    if(user_order)
+    {
+        int user_offset = GetCustomOffset();
+
+        if(user_order == -2 && user_offset < 0)
+            SortPriority |= 0x08;
+        else if(user_order == -2 && user_offset == 0)
+            SortPriority |= 0x18;
+        else if(user_order == -2)
+            SortPriority |= 0x28;
+        else if(user_order == -1 && user_offset < 0)
+            SortPriority |= 0x30;
+        else if(user_order == -1 && user_offset == 0)
+            SortPriority |= 0x48;
+        else if(user_order == -1)
+            SortPriority |= 0x98;
+        else if(user_order == +1 && user_offset <= 0)
+            SortPriority |= 0xA0;
+        else if(user_order == +1)
+            SortPriority |= 0xB8;
+        else
+            SortPriority |= 0xC0;
+
+        return;
+    }
+
+    // set upper 5 bits by Type-based order
+
+    // PLANE_LVL_BGO_LOW
+    // custom -2 with - offset is 0x08
+    if(Type == 75 || Type == 76 || Type == 77 || Type == 78 || Type == 14)
+        SortPriority |= 0x10;
+    // custom -2 with 0 offset is 0x18
+    else if(Type == 11 || Type == 12 || Type == 60 || Type == 61)
+        SortPriority |= 0x20;
+    // custom -2 with + offset is 0x28
+    // PLANE_LVL_BGO_NORM
+    // custom -1 with - offset is 0x30
+    else if(Type == 168 || Type == 159 || Type == 172 || Type == 66 || Type == 158) // WATER FALLS
+        SortPriority |= 0x38;
+    else if(Type == 65 || Type == 26 || Type == 82 || Type == 83 || Type == 164 || Type == 165 || Type == 166 || Type == 167 || Type == 168 || Type == 169) // WATER
+        SortPriority |= 0x40;
+    // custom -1 with 0 offset is 0x48
+    else if(Type == 79 || Type == 52)
+        SortPriority |= 0x50;
+    else if(Type == 66)
+        SortPriority |= 0x58;
+    // default is 0x60
+    else if(Type == 1)
+        SortPriority |= 0x68;
+    else if(Type >= 129 && Type <= 131)
+        SortPriority |= 0x70;
+    else if(Type == 139 || Type == 140 || Type == 48)
+        SortPriority |= 0x78;
+    else if(Type == 70 || Type == 71 || Type == 72 || Type == 73 || Type == 74 || Type == 141)
+        SortPriority |= 0x80;
+    else if(Type == 87 || Type == 88 || Type == 92 || Type == 107 || Type == 105 || Type == 104) // Doors
+        SortPriority |= 0x88;
+    else if(Type == 99)
+        SortPriority |= 0x90; // Always doors + 1
+    // custom -1 with + offset is 0x98
+    // PLANE_LVL_BGO_FG
+    // custom +1 with - or 0 offset is 0xA0
+    else if(Foreground[Type])
+        SortPriority |= 0xA8;
+    else if(Type == 65 || Type == 165)
+        SortPriority |= 0xB0;
+    // custom +1 with + offset is 0xB8
+    // PLANE_LVL_BGO_TOP
+    // custom +2 is 0xC0
+    else
+        SortPriority |= 0x60;
+}
+
+//! sets custom layer and offset bits for a bgo and updates its sort priority
+void Background_t::SetSortPriority(int layer, int offset)
+{
+    SortPriority = 0;
+
+    // set upper 5 bits by layer
+    if(layer == -2)
+        SortPriority = 0x18;
+    else if(layer == -1)
+        SortPriority = 0x48;
+    else if(layer == +1)
+        SortPriority = 0xA0;
+    else if(layer == +2)
+        SortPriority = 0xC0;
+
+    // set lower 3 bits by offset
+    uint8_t offset_bits = uint8_t(offset + 4) & 7;
+    SortPriority |= offset_bits;
+
+    UpdateSortPriority();
+}
+
+
+#if 0
 double BackGroundPri(int A)
 {
     double tempBackGroundPri = 0;
@@ -364,6 +512,7 @@ double BackGroundPri(int A)
 
     return tempBackGroundPri;
 }
+#endif
 
 void NPCSort()
 {
@@ -508,11 +657,11 @@ void UpdateBackgrounds()
     MidBackground = 1;
     for(A = 1; A <= numBackground; A++)
     {
-        if(BackGroundPri(A) >= 25)
+        if(Background[A].SortPriority >= Background_t::PRI_NORM_START)
         {
             for(B = A; B <= numBackground; B++)
             {
-                if(BackGroundPri(B) >= 100)
+                if(Background[B].SortPriority >= Background_t::PRI_FG_START)
                 {
                     LastBackground = B - 1;
                     break;

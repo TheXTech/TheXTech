@@ -192,9 +192,9 @@ void SaveLevel(const std::string& FilePath, int format, int version)   // saves 
         bgo.y = b.Location.Y;
         bgo.layer = GetL(b.Layer);
 
-        bgo.z_mode = b.zMode;
-        bgo.z_offset = b.zOffset;
-        bgo.smbx64_sp = bgo.z_mode == LevelBGO::ZDefault ? b.SortPriority : -1;
+        bgo.z_mode = b.GetCustomLayer();
+        bgo.z_offset = b.GetCustomOffset();
+        // bgo.smbx64_sp = bgo.z_mode == LevelBGO::ZDefault ? b.SortPriority : -1;
 
         // fix this to update as needed
         if(bgo.layer.empty())

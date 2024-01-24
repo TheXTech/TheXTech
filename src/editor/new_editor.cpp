@@ -182,6 +182,7 @@ void EditorScreen::ResetCursor()
     EditorCursor.Block.Type = 1;
     EditorCursor.Background = Background_t();
     EditorCursor.Background.Type = 1;
+    EditorCursor.Background.SetSortPriority(0, 0);
     EditorCursor.NPC = NPC_t();
     EditorCursor.NPC.Type = 1;
     EditorCursor.NPC.Direction = -1;
@@ -3281,6 +3282,7 @@ void EditorScreen::UpdateBGO(CallMode mode, int x, int y, int type)
     if(UpdateBGOButton(mode, x, y, type, sel) && !sel)
     {
         EditorCursor.Background.Type = type;
+        EditorCursor.Background.UpdateSortPriority();
     }
 }
 
@@ -3336,6 +3338,52 @@ void EditorScreen::UpdateBGOScreen(CallMode mode)
     }
     if(UpdateButton(mode, e_ScreenW - 160 + 4, 40 + 4, GFXNPC[NPCID_COIN_SWITCH], MagicBlock::enabled, 0, 0, 32, 32))
         MagicBlock::enabled = !MagicBlock::enabled;
+
+    // Z-Layer and Z-Offset
+    if(FileFormat == FileFormats::LVL_PGEX)
+    {
+        int layer = EditorCursor.Background.GetCustomLayer();
+        int offset = EditorCursor.Background.GetCustomOffset();
+
+        if(mode == CallMode::Render)
+        {
+            FontManager::printTextOptiPx(g_editorStrings.labelSortLayer,
+                                         e_ScreenW - 120, 102,
+                                         120,
+                                         FontManager::fontIdFromSmbxFont(3));
+
+            SuperPrint((layer == 0) ? g_editorStrings.layersLayerDefault : std::to_string(layer),
+                       3,
+                       e_ScreenW - 160, 142);
+        }
+
+        if(layer < 2 && UpdateButton(mode, e_ScreenW - 160 + 4, 100 + 4, GFX.EIcons, false, 0, 32*Icon::up, 32, 32))
+            EditorCursor.Background.SetSortPriority(layer + 1, offset);
+        if(layer > -2 && UpdateButton(mode, e_ScreenW - 160 + 4, 160 + 4, GFX.EIcons, false, 0, 32*Icon::down, 32, 32))
+            EditorCursor.Background.SetSortPriority(layer - 1, offset);
+
+        if(mode == CallMode::Render)
+        {
+            FontManager::printTextOptiPx(g_editorStrings.labelSortOffset,
+                                         e_ScreenW - 120, 222,
+                                         120,
+                                         FontManager::fontIdFromSmbxFont(3));
+
+            SuperPrint(std::to_string(offset),
+                       3,
+                       e_ScreenW - 160, 262);
+
+            // debug: total sort priority
+            SuperPrint("=" + std::to_string(EditorCursor.Background.SortPriority),
+                       3,
+                       e_ScreenW - 140, 322);
+        }
+
+        if(offset < 3 && UpdateButton(mode, e_ScreenW - 160 + 4, 220 + 4, GFX.EIcons, false, 0, 32*Icon::up, 32, 32))
+            EditorCursor.Background.SetSortPriority(layer, offset + 1);
+        if(offset > -3 && UpdateButton(mode, e_ScreenW - 160 + 4, 280 + 4, GFX.EIcons, false, 0, 32*Icon::down, 32, 32))
+            EditorCursor.Background.SetSortPriority(layer, offset - 1);
+    }
 
     // Layers
     SuperPrintRightR(mode, g_editorStrings.labelLayer, 3, e_ScreenW - 40, 434);

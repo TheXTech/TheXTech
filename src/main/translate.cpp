@@ -544,6 +544,9 @@ XTechTranslate::XTechTranslate()
         {"editor.wordHeight",               &g_editorStrings.wordHeight},
         {"editor.wordWidth",                &g_editorStrings.wordWidth},
 
+        {"editor.labelSortLayer",           &g_editorStrings.labelSortLayer},
+        {"editor.labelSortOffset",          &g_editorStrings.labelSortOffset},
+
         {"editor.phraseTextOf",             &g_editorStrings.phraseTextOf},
         {"editor.phraseSectionIndex",       &g_editorStrings.phraseSectionIndex},
         {"editor.phraseRadiusIndex",        &g_editorStrings.phraseRadiusIndex},
@@ -738,6 +741,7 @@ XTechTranslate::XTechTranslate()
 
         {"editor.file.convert.featureNPCVariant",       &g_editorStrings.fileConvertFeatureNPCVariant},
         {"editor.file.convert.featureBlockForceSmashable", &g_editorStrings.fileConvertFeatureBlockForceSmashable},
+        {"editor.file.convert.featureBgoOrder",         &g_editorStrings.fileConvertFeatureBgoOrder},
 
         {"editor.file.convert.featureCustomWorldMusic", &g_editorStrings.fileConvertFeatureCustomWorldMusic},
         {"editor.file.convert.featureWorldStarDisplay", &g_editorStrings.fileConvertFeatureWorldStarDisplay},

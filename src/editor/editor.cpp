@@ -601,8 +601,14 @@ void UpdateEditor()
 
                 if(MouseRelease) // BGOs
                 {
-                    for(A = numBackground; A >= 1; A--)
+                    // more difficult to iterate backwards, but that's what we need to do here
+                    auto sentinel = treeBackgroundQuery(EditorCursor.Location, SORTMODE_Z);
+                    auto i = sentinel.end();
+                    --i;
+                    for(; i >= sentinel.begin(); i--)
                     {
+                        A = *i;
+
                         if(CursorCollision(EditorCursor.Location, Background[A].Location) && !Background[A].Hidden)
                         {
                             PlaySound(SFX_Grab);
@@ -646,10 +652,8 @@ void UpdateEditor()
                                 LevelBGO b;
                                 b.id = EditorCursor.Background.Type;
                                 b.layer = GetL(EditorCursor.Background.Layer);
-                                b.z_mode = EditorCursor.Background.zMode;
-                                b.z_offset = EditorCursor.Background.zOffset;
-                                if(EditorCursor.Background.zMode == LevelBGO::ZDefault)
-                                    b.smbx64_sp = EditorCursor.Background.SortPriority;
+                                b.z_mode = EditorCursor.Background.GetCustomLayer();
+                                b.z_offset = EditorCursor.Background.GetCustomOffset();
                                 IntProc::sendTakenBGO(b);
                             }
 #endif // THEXTECH_INTERPROC_SUPPORTED
@@ -1046,8 +1050,14 @@ void UpdateEditor()
                     && (EditorCursor.SubMode == -1 || EditorCursor.SubMode == 0
                         || EditorCursor.SubMode == OptCursor_t::LVL_BGOS))
                 {
-                    for(A = numBackground; A >= 1; A--)
+                    // more difficult to iterate backwards, but that's what we need to do here
+                    auto sentinel = treeBackgroundQuery(EditorCursor.Location, SORTMODE_Z);
+                    auto i = sentinel.end();
+                    --i;
+                    for(; i >= sentinel.begin(); i--)
                     {
+                        A = *i;
+
                         if(CursorCollision(EditorCursor.Location, Background[A].Location) && !Background[A].Hidden)
                         {
 //                            Netplay::sendData Netplay::EraseBackground(A, 0);
@@ -1233,7 +1243,8 @@ void UpdateEditor()
                     --i;
                     for(; i >= sentinel.begin(); i--)
                     {
-                        A = (*i - &Scene[1]) + 1;
+                        A = *i;
+
                         if(CursorCollision(EditorCursor.Location, Scene[A].Location))
                         {
                             tempLocation = static_cast<Location_t>(Scene[A].Location);
@@ -1528,7 +1539,6 @@ void UpdateEditor()
                     if(numBackground < maxBackgrounds) // Not out of backgrounds
                     {
                         numBackground++;
-                        EditorCursor.Background.uid = numBackground;
                         Background[numBackground] = EditorCursor.Background;
                         syncLayers_BGO(numBackground);
 
@@ -2040,12 +2050,7 @@ void UpdateInterprocess()
             EditorCursor.Location.X = b.x;
             EditorCursor.Location.Y = b.y;
             EditorCursor.Background.Layer = FindLayer(b.layer);
-            EditorCursor.Background.SortPriority = -1;
-            EditorCursor.Background.uid = (numBackground + 1);
-            EditorCursor.Background.zMode = b.z_mode;
-            EditorCursor.Background.zOffset = b.z_offset;
-
-            bgoApplyZMode(&EditorCursor.Background, int(b.smbx64_sp));
+            EditorCursor.Background.SetSortPriority(b.z_mode, std::round(b.z_offset));
 
             if(EditorCursor.Background.Type > maxBackgroundType) // Avoid out of range crash
                 EditorCursor.Background.Type = 1;

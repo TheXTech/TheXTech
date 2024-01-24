@@ -28,7 +28,7 @@
 
 struct Background_t;
 
-extern void bgoApplyZMode(Background_t *bgo, int smbx64sp);
+// extern void bgoApplyZMode(Background_t *bgo, int smbx64sp);
 
 extern void addMissingLvlSuffix(std::string &fileName);
 extern void validateLevelName(std::string &out, const std::string &raw);
