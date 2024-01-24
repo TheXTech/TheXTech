@@ -3347,18 +3347,42 @@ void EditorScreen::UpdateBGOScreen(CallMode mode)
 
         if(mode == CallMode::Render)
         {
-            // std::string tempString = g_editorStrings.labelSortLayer + ": ";
+            FontManager::printTextOptiPx(g_editorStrings.labelSortLayer,
+                                         e_ScreenW - 120, 102,
+                                         120,
+                                         FontManager::fontIdFromSmbxFont(3));
 
-            // if(layer > 0)
-            //     tempString += '+';
-
-            // if(layer == 0)
-            //     tempString += g_editorStrings.layersLayerDefault;
-            // else
-            //     tempString += std::to_string(layer);
-
-            // SuperPrintCenter(tempString, 3, e_ScreenW - 80);
+            SuperPrint((layer == 0) ? g_editorStrings.layersLayerDefault : std::to_string(layer),
+                       3,
+                       e_ScreenW - 160, 142);
         }
+
+        if(layer < 2 && UpdateButton(mode, e_ScreenW - 160 + 4, 100 + 4, GFX.EIcons, false, 0, 32*Icon::up, 32, 32))
+            EditorCursor.Background.SetSortPriority(layer + 1, offset);
+        if(layer > -2 && UpdateButton(mode, e_ScreenW - 160 + 4, 160 + 4, GFX.EIcons, false, 0, 32*Icon::down, 32, 32))
+            EditorCursor.Background.SetSortPriority(layer - 1, offset);
+
+        if(mode == CallMode::Render)
+        {
+            FontManager::printTextOptiPx(g_editorStrings.labelSortOffset,
+                                         e_ScreenW - 120, 222,
+                                         120,
+                                         FontManager::fontIdFromSmbxFont(3));
+
+            SuperPrint(std::to_string(offset),
+                       3,
+                       e_ScreenW - 160, 262);
+
+            // debug: total sort priority
+            SuperPrint("=" + std::to_string(EditorCursor.Background.SortPriority),
+                       3,
+                       e_ScreenW - 140, 322);
+        }
+
+        if(offset < 3 && UpdateButton(mode, e_ScreenW - 160 + 4, 220 + 4, GFX.EIcons, false, 0, 32*Icon::up, 32, 32))
+            EditorCursor.Background.SetSortPriority(layer, offset + 1);
+        if(offset > -3 && UpdateButton(mode, e_ScreenW - 160 + 4, 280 + 4, GFX.EIcons, false, 0, 32*Icon::down, 32, 32))
+            EditorCursor.Background.SetSortPriority(layer, offset - 1);
     }
 
     // Layers
