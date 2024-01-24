@@ -119,6 +119,9 @@ void qSortBlocksX(int min, int max)
 
 void qSortBackgrounds(int min, int max)
 {
+    if(min >= max)
+        return;
+
     std::stable_sort(&Background[min], (&Background[max]) + 1,
     [](const Background_t& a, const Background_t& b)
     {
