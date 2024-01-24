@@ -305,6 +305,8 @@ void SetupCredits()
     AddCredit(g_outroScreen.qualityControl);
     AddCredit("");
     AddCredit("0lhi"); // Significant contribution to TheXTech development, testing, improvement process
+    AddCredit("");
+    AddCredit("");
 #endif
 #ifdef VITA
     AddCredit(g_outroScreen.psVitaPortBy);
