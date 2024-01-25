@@ -2623,16 +2623,21 @@ void YoshiEat(const int A)
         if(((NPCIsACoin(n) && n.Special == 1) || !n->NoYoshi) &&
            n.Active && ((!NPCIsACoin(n) || n.Special == 1) || n.Type == 103) &&
            !NPCIsAnExit(n) && !n.Generator && !n.Inert && !NPCIsYoshi(n) &&
-            n.Effect != 5 && n.Immune == 0 && n.Type != 91 && !(n.Projectile && n.Type == 17) && n.HoldingPlayer == 0)
+            n.Effect != 5 && n.Immune == 0 && n.Type != NPCID_ITEM_BURIED &&
+            !(n.Projectile && n.Type == NPCID_BULLET) && n.HoldingPlayer == 0)
         {
             tempLocation = n.Location;
-            if(n.Type == 91)
+            // dead code
+#if 0
+            if(n.Type == NPCID_ITEM_BURIED)
                 tempLocation.Y = n.Location.Y - 16;
+#endif
 
             if(CheckCollision(p.YoshiTongue, tempLocation))
             {
                 // dead code, check n.Type != 91 condition above
-                if(n.Type == 91)
+#if 0
+                if(n.Type == NPCID_ITEM_BURIED)
                 {
                     if(!NPCTraits[(int)n.Special].NoYoshi)
                     {
@@ -2662,7 +2667,9 @@ void YoshiEat(const int A)
                         treeNPCUpdate(B);
                     }
                 }
-                else if(n.Type == 283)
+                else
+#endif
+                if(n.Type == NPCID_ITEM_BUBBLE)
                 {
                     NPCHit(B, 3, B);
                 }
@@ -2675,11 +2682,12 @@ void YoshiEat(const int A)
                     treeNPCUpdate(B);
                 }
 
-                if(n.Type == 147)
+                if(n.Type == NPCID_VEGGIE_RANDOM)
                 {
-                    n.Type = 139 + iRand(9);
-                    if(n.Type == 147)
-                        n.Type = 92;
+                    n.Type = NPCID_VEGGIE_2 + iRand(9);
+                    if(n.Type == NPCID_VEGGIE_RANDOM)
+                        n.Type = NPCID_VEGGIE_1;
+
                     n.Location.X += n.Location.Width / 2.0;
                     n.Location.Y += n.Location.Height / 2.0;
                     n.Location.Width = n->Width;
