@@ -1281,6 +1281,9 @@ extern bool WorldEditor;
 //Public PlayerStart(1 To 2) As Location
 extern RangeArr<PlayerStart_t, 1, 2> PlayerStart;
 
+// NEW: force selected characters to be used (ignore the blockCharacter array)
+extern bool g_forceCharacter;
+
 //Public blockCharacter(0 To 20) As Boolean
 extern RangeArrI<bool, 0, 20, false> blockCharacter;
 

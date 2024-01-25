@@ -153,11 +153,14 @@ struct PlayerBox
     uint8_t m_current_add = 0;
 
 private:
-    //! multiuse tracker for current menu item / action confirm progress
-    int m_menu_item = 0;
-
     // just added a player in multiplayer menu char select: play DropItem if appropriate, and block the start and back keys for non-P1 players
     bool m_just_added = false;
+
+    // progress towards entering the Konami cheat to set g_forceCharacter
+    uint8_t m_konami_bits = false;
+
+    //! multiuse tracker for current menu item / action confirm progress
+    int m_menu_item = 0;
 
     // state of hint text marquee
     MarqueeState m_marquee_state;
@@ -334,6 +337,8 @@ void MainMenu_Start(int minPlayers)
     MenuMouseRelease = false;
     MenuCursorCanMove = false;
 
+    g_forceCharacter = false;
+
     s_char_info.reset();
 
     // prepare for first frame
@@ -362,6 +367,8 @@ void LegacyMenu_Start()
 
     MenuMouseRelease = false;
     MenuCursorCanMove = false;
+
+    g_forceCharacter = false;
 
     s_char_info.reset();
 
@@ -2122,6 +2129,43 @@ int PlayerBox::Logic()
         }
 
         return 0;
+    }
+
+    if(s_context == Context::MainMenu && !g_forceCharacter)
+    {
+        if((m_konami_bits == 0 && c.Up)
+            || (m_konami_bits == 1 && c.Up)
+            || (m_konami_bits == 2 && c.Down)
+            || (m_konami_bits == 3 && c.Down)
+            || (m_konami_bits == 4 && c.Left)
+            || (m_konami_bits == 5 && c.Right)
+            || (m_konami_bits == 6 && c.Left)
+            || (m_konami_bits == 7 && c.Right)
+            || (m_konami_bits == 8 && c.Run)
+            || (m_konami_bits == 9 && c.Jump))
+        {
+            m_konami_bits++;
+
+            if(m_konami_bits == 10)
+            {
+                for(int A = 1; A <= numCharacters; A++)
+                    blockCharacter[A] = false;
+
+                g_forceCharacter = true;
+
+                PlaySoundMenu(SFX_MedalGet);
+                m_input_ready = false;
+                return 0;
+            }
+            else if(m_konami_bits >= 5)
+            {
+                PlaySoundMenu(SFX_Do);
+                m_input_ready = false;
+                return 0;
+            }
+        }
+        else if(c.Jump || c.Start || c.Run || c.Down || c.Up || c.Left || c.Right || c.Drop)
+            m_konami_bits = 0;
     }
 
     if(m_state == PlayerState::ConfirmProfile)
