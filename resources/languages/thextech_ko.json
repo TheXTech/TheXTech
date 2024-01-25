@@ -137,7 +137,9 @@
                 "fastScroll": "빠른 스크롤",
                 "modeErase": "지우기 모드",
                 "modeSelect": "선택 모드",
-                "nextSection": "다음 선택"
+                "nextSection": "다음 선택",
+                "switchScreens": "창 표시",
+                "testPlay": "재생 테스트"
             },
             "buttons": {
                 "jump": "점프",
@@ -170,7 +172,12 @@
             "caseTouch": "(터치)",
             "controlsNotInUse": "(사용하지 않음)",
             "controlsReallyDeleteProfile": "프로파일을 삭제하겠습니까?",
-            "controlsTitle": "컨트롤"
+            "controlsTitle": "컨트롤",
+            "hotkeys": {
+                "fullscreen": "전체화면",
+                "debugInfo": "디버그 정보",
+                "enterCheats": "치트 입력"
+            }
         },
         "wordLanguage": "언어",
         "wordPlayer": "플레이어",
