@@ -2135,7 +2135,7 @@ int PlayerBox::Logic()
     {
         if(!SharedControls.MenuDo && !SharedControls.MenuBack && !SharedControls.MenuDown
             && !SharedControls.MenuUp && !SharedControls.MenuLeft && !SharedControls.MenuRight
-            && !c.Jump && !c.Start && !c.Run && !c.Down && !c.Up && !c.Left && !c.Right && !c.Drop)
+            && !c.Jump && !c.Start && !c.Run && !c.Down && !c.Up && !c.Left && !c.Right && !c.Drop && !c.AltRun && !c.AltJump)
         {
             m_input_ready = true;
         }
@@ -2143,7 +2143,7 @@ int PlayerBox::Logic()
         return 0;
     }
 
-    if(s_context == Context::MainMenu && !g_forceCharacter)
+    if(IsMenu() && !g_forceCharacter)
     {
         if((m_konami_bits == 0 && c.Up)
             || (m_konami_bits == 1 && c.Up)
@@ -2153,8 +2153,8 @@ int PlayerBox::Logic()
             || (m_konami_bits == 5 && c.Right)
             || (m_konami_bits == 6 && c.Left)
             || (m_konami_bits == 7 && c.Right)
-            || (m_konami_bits == 8 && c.Run)
-            || (m_konami_bits == 9 && c.Jump))
+            || (m_konami_bits == 8 && c.AltRun)
+            || (m_konami_bits == 9 && c.AltJump))
         {
             m_konami_bits++;
 
@@ -2169,14 +2169,13 @@ int PlayerBox::Logic()
                 m_input_ready = false;
                 return 0;
             }
-            else if(m_konami_bits >= 5)
+            else if(m_konami_bits >= 9)
             {
-                PlaySoundMenu(SFX_Do);
                 m_input_ready = false;
                 return 0;
             }
         }
-        else if(c.Jump || c.Start || c.Run || c.Down || c.Up || c.Left || c.Right || c.Drop)
+        else if(c.Jump || c.Start || c.Run || c.Down || c.Up || c.Left || c.Right || c.Drop || c.AltRun || c.AltJump)
             m_konami_bits = 0;
     }
 
