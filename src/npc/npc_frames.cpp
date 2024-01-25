@@ -25,6 +25,7 @@
 #include "effect.h"
 #include "npc_id.h"
 #include "eff_id.h"
+#include "npc_traits.h"
 
 #include "main/trees.h"
 

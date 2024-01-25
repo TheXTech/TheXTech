@@ -40,6 +40,8 @@
 #include "../eff_id.h"
 #include "../layers.h"
 
+#include "npc_traits.h"
+
 #include "npc/npc_queues.h"
 #include "npc/section_overlap.h"
 

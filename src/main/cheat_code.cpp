@@ -60,6 +60,7 @@
 #include "main/cheat_code.h"
 
 #include "npc_id.h"
+#include "npc_traits.h"
 #include "eff_id.h"
 
 bool g_ForceBitmaskMerge = false;

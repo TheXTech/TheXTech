@@ -58,6 +58,7 @@
 #include "controls.h"
 
 #include "pseudo_vb.h"
+#include "npc_traits.h"
 #include "npc_id.h"
 #include "eff_id.h"
 

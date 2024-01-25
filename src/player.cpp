@@ -33,6 +33,7 @@
 #include "npc.h"
 #include "npc_id.h"
 #include "eff_id.h"
+#include "npc_traits.h"
 #include "sound.h"
 #include "game_main.h"
 #include "effect.h"

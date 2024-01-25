@@ -27,6 +27,7 @@
 #include "gfx.h"
 
 #include "npc_id.h"
+#include "npc_traits.h"
 
 #include "graphics/gfx_keyhole.h"
 

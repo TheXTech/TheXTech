@@ -38,6 +38,7 @@
 #include "core/events.h"
 #include "npc_id.h"
 #include "eff_id.h"
+#include "npc_traits.h"
 #include "layers.h"
 
 #include "npc/npc_queues.h"

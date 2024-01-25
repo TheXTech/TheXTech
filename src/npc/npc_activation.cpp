@@ -27,6 +27,7 @@
 #include "collision.h"
 
 #include "npc_id.h"
+#include "npc_traits.h"
 
 inline static bool s_Event_SoundOnly(const Events_t& evt, int test_section)
 {

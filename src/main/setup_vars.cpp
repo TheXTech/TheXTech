@@ -21,6 +21,7 @@
 #include "../globals.h"
 #include "../game_main.h"
 #include "../custom.h"
+#include "npc_traits.h"
 
 void SetupVars()
 {

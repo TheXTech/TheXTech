@@ -33,6 +33,8 @@
 #include "../config.h"
 #include "../layers.h"
 
+#include "npc_traits.h"
+
 #include "main/level_medals.h"
 
 #include "npc/npc_queues.h"

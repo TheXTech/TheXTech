@@ -43,6 +43,7 @@
 
 #include "config.h"
 #include "npc_id.h"
+#include "npc_traits.h"
 #include "npc_special_data.h"
 #include "controls.h"
 

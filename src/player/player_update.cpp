@@ -43,6 +43,7 @@
 #include "../script/msg_preprocessor.h"
 
 #include "npc_id.h"
+#include "npc_traits.h"
 #include "eff_id.h"
 
 #include "npc/npc_queues.h"

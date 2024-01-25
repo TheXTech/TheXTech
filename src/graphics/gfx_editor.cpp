@@ -29,6 +29,7 @@
 #include "gfx.h"
 #include "config.h"
 #include "npc_id.h"
+#include "npc_traits.h"
 #include "player.h"
 
 #include "main/trees.h"

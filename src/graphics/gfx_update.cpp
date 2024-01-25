@@ -56,6 +56,7 @@
 #include "effect.h"
 #include "npc_id.h"
 #include "eff_id.h"
+#include "npc_traits.h"
 #include "draw_planes.h"
 
 #include "graphics/gfx_special_frames.h"

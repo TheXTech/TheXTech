@@ -33,6 +33,7 @@
 #include "npc.h"
 #include "npc_id.h"
 #include "eff_id.h"
+#include "npc_traits.h"
 #include "player.h"
 #include "sorting.h"
 #include "layers.h"
