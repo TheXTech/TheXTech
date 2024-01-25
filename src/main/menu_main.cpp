@@ -757,7 +757,7 @@ bool mainMenuUpdate()
             }
         }
         // Main Menu
-        if(MenuMode == MENU_MAIN)
+        else if(MenuMode == MENU_MAIN)
         {
             if(SharedCursor.Move)
             {
