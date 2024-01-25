@@ -175,7 +175,7 @@ void SaveNPCDefaults()
 
     for(int A = 1; A <= maxNPCType; A++)
     {
-        NPCTraits[A].Frame = 0;
+        NPCTraits[A].TFrames = 0;
         NPCTraits[A].FrameSpeed = 8;
         NPCTraits[A].FrameStyle = 0;
 
@@ -354,9 +354,9 @@ void LoadCustomNPC(int A, std::string cFileName)
     if(npc.en_gfxoffsety)
         traits.FrameOffsetY = npc.gfxoffsety;
     if(npc.en_width)
-        traits.Width = int(npc.width);
+        traits.TWidth = int(npc.width);
     if(npc.en_height)
-        traits.Height = int(npc.height);
+        traits.THeight = int(npc.height);
     if(npc.en_gfxwidth)
         traits.WidthGFX = int(npc.gfxwidth);
     if(npc.en_gfxheight)
@@ -396,7 +396,7 @@ void LoadCustomNPC(int A, std::string cFileName)
     if(npc.en_nogravity)
         traits.NoGravity = npc.nogravity;
     if(npc.en_frames)
-        traits.Frame = int(npc.frames);
+        traits.TFrames = int(npc.frames);
     if(npc.en_framespeed)
         traits.FrameSpeed = int(npc.framespeed);
     if(npc.en_framestyle)

@@ -419,7 +419,7 @@ void DrawWarningNPC(int Z, int A)
         scr_y = vScreen[Z].Y + NPC[A].Location.Y + NPC[A]->FrameOffsetY;
         w = NPC[A].Location.Width;
         h = NPC[A].Location.Height;
-        frame_h = NPC[A]->Height;
+        frame_h = NPC[A]->THeight;
     }
     // plants from above
     else if(NPC[A].Type == 51 || NPC[A].Type == 257)
@@ -428,8 +428,8 @@ void DrawWarningNPC(int Z, int A)
         scr_y = vScreen[Z].Y + NPC[A].Location.Y + NPC[A]->FrameOffsetY,
         w = NPC[A].Location.Width;
         h = NPC[A].Location.Height;
-        frame_h = NPC[A]->Height;
-        frame_y = NPC[A]->Height - NPC[A].Location.Height;
+        frame_h = NPC[A]->THeight;
+        frame_y = NPC[A]->THeight - NPC[A].Location.Height;
     }
     // plants from side
     else if(NPC[A].Type == 52)
@@ -446,7 +446,7 @@ void DrawWarningNPC(int Z, int A)
             scr_x = vScreen[Z].X + NPC[A].Location.X + NPC[A]->FrameOffsetX;
             scr_y = vScreen[Z].Y + NPC[A].Location.Y + NPC[A]->FrameOffsetY;
             w = NPC[A].Location.Width;
-            frame_x = NPC[A]->Width - NPC[A].Location.Width;
+            frame_x = NPC[A]->TWidth - NPC[A].Location.Width;
             frame_h = h = NPC[A].Location.Height;
         }
     }
@@ -851,7 +851,7 @@ void ClassicNPCScreenLogic(int Z, int numScreens, bool fill_draw_queue, NPC_Draw
             npcALoc = newLoc(NPC[A].Location.X - (NPC[A]->WidthGFX - NPC[A].Location.Width) / 2.0,
                                   NPC[A].Location.Y,
                                   static_cast<double>(NPC[A]->WidthGFX),
-                                  static_cast<double>(NPC[A]->Height));
+                                  static_cast<double>(NPC[A]->THeight));
             has_ALoc = true;
             can_check = true;
         }
@@ -861,7 +861,7 @@ void ClassicNPCScreenLogic(int Z, int numScreens, bool fill_draw_queue, NPC_Draw
             npcALoc = newLoc(NPC[A].Location.X - (NPC[A]->WidthGFX - NPC[A].Location.Width) / 2.0,
                                   NPC[A].Location.Y,
                                   static_cast<double>(NPC[A]->WidthGFX),
-                                  static_cast<double>(NPC[A]->Height));
+                                  static_cast<double>(NPC[A]->THeight));
 
             has_ALoc = true;
             can_check = true;
@@ -1102,7 +1102,7 @@ void ModernNPCScreenLogic(Screen_t& screen, int vscreen_i, bool fill_draw_queue,
             loc2 = newLoc(NPC[A].Location.X - (NPC[A]->WidthGFX - NPC[A].Location.Width) / 2.0,
                 NPC[A].Location.Y,
                 NPC[A]->WidthGFX,
-                NPC[A]->Height);
+                NPC[A]->THeight);
             // not sure why loc2 does not consider NPCHeightGFX...
         }
         else
@@ -1664,7 +1664,7 @@ void UpdateGraphicsLogic(bool Do_FrameSkip)
 
                     const Location_t loc2 = newLoc(NPC[A].Location.X - (NPC[A]->WidthGFX - NPC[A].Location.Width) / 2.0,
                         NPC[A].Location.Y,
-                        NPC[A]->WidthGFX, NPC[A]->Height);
+                        NPC[A]->WidthGFX, NPC[A]->THeight);
 
                     if(vScreenCollision(Z, NPC[A].Location) || vScreenCollision(Z, loc2))
                         NPC_Draw_Queue_p.add(A);
@@ -2124,7 +2124,7 @@ void UpdateGraphicsScreen(Screen_t& screen)
 
             if(NPC[A].Type == NPCID_PLANT_S3 || NPC[A].Type == NPCID_BIG_PLANT || NPC[A].Type == NPCID_PLANT_S1 || NPC[A].Type == NPCID_FIRE_PLANT || NPC[A].Type == NPCID_LONG_PLANT_UP || NPC[A].Type == NPCID_JUMP_PLANT)
             {
-                XRender::renderTexture(vScreen[Z].X + NPC[A].Location.X + NPC[A]->FrameOffsetX, vScreen[Z].Y + NPC[A].Location.Y + NPC[A]->FrameOffsetY, NPC[A].Location.Width, NPC[A].Location.Height, GFXNPC[NPC[A].Type], 0, NPC[A].Frame * NPC[A]->Height, cn);
+                XRender::renderTexture(vScreen[Z].X + NPC[A].Location.X + NPC[A]->FrameOffsetX, vScreen[Z].Y + NPC[A].Location.Y + NPC[A]->FrameOffsetY, NPC[A].Location.Width, NPC[A].Location.Height, GFXNPC[NPC[A].Type], 0, NPC[A].Frame * NPC[A]->THeight, cn);
             }
             else if(NPC[A].Type == NPCID_BOTTOM_PLANT || NPC[A].Type == NPCID_LONG_PLANT_DOWN)
             {
@@ -2132,23 +2132,23 @@ void UpdateGraphicsScreen(Screen_t& screen)
                         vScreen[Z].Y + NPC[A].Location.Y + NPC[A]->FrameOffsetY,
                         NPC[A].Location.Width, NPC[A].Location.Height,
                         GFXNPC[NPC[A].Type], 0,
-                        NPC[A].Frame * NPC[A]->Height + NPC[A]->Height - NPC[A].Location.Height,
+                        NPC[A].Frame * NPC[A]->THeight + NPC[A]->THeight - NPC[A].Location.Height,
                         cn);
             }
             else if(NPC[A].Type == NPCID_SIDE_PLANT)
             {
                 if(NPC[A].Direction == -1)
                 {
-                    XRender::renderTexture(vScreen[Z].X + NPC[A].Location.X + NPC[A]->FrameOffsetX, vScreen[Z].Y + NPC[A].Location.Y + NPC[A]->FrameOffsetY, NPC[A].Location.Width, NPC[A].Location.Height, GFXNPC[NPC[A].Type], 0, NPC[A].Frame * NPC[A]->Height);
+                    XRender::renderTexture(vScreen[Z].X + NPC[A].Location.X + NPC[A]->FrameOffsetX, vScreen[Z].Y + NPC[A].Location.Y + NPC[A]->FrameOffsetY, NPC[A].Location.Width, NPC[A].Location.Height, GFXNPC[NPC[A].Type], 0, NPC[A].Frame * NPC[A]->THeight);
                 }
                 else
                 {
-                    XRender::renderTexture(vScreen[Z].X + NPC[A].Location.X + NPC[A]->FrameOffsetX, vScreen[Z].Y + NPC[A].Location.Y + NPC[A]->FrameOffsetY, NPC[A].Location.Width, NPC[A].Location.Height, GFXNPC[NPC[A].Type], NPC[A]->Width - NPC[A].Location.Width, NPC[A].Frame * NPC[A]->Height, cn);
+                    XRender::renderTexture(vScreen[Z].X + NPC[A].Location.X + NPC[A]->FrameOffsetX, vScreen[Z].Y + NPC[A].Location.Y + NPC[A]->FrameOffsetY, NPC[A].Location.Width, NPC[A].Location.Height, GFXNPC[NPC[A].Type], NPC[A]->TWidth - NPC[A].Location.Width, NPC[A].Frame * NPC[A]->THeight, cn);
                 }
             }
             else if(NPC[A]->WidthGFX == 0 || NPC[A].Effect == 1)
             {
-                XRender::renderTexture(vScreen[Z].X + NPC[A].Location.X + NPC[A]->FrameOffsetX, vScreen[Z].Y + NPC[A].Location.Y + NPC[A]->FrameOffsetY, NPC[A].Location.Width, NPC[A].Location.Height, GFXNPC[NPC[A].Type], 0, NPC[A].Frame * NPC[A]->Height, cn);
+                XRender::renderTexture(vScreen[Z].X + NPC[A].Location.X + NPC[A]->FrameOffsetX, vScreen[Z].Y + NPC[A].Location.Y + NPC[A]->FrameOffsetY, NPC[A].Location.Width, NPC[A].Location.Height, GFXNPC[NPC[A].Type], 0, NPC[A].Frame * NPC[A]->THeight, cn);
             }
             else
             {
@@ -2185,7 +2185,7 @@ void UpdateGraphicsScreen(Screen_t& screen)
                         auto warpNpcLoc = newLoc(hNpc.Location.X - (hNpc->WidthGFX - hNpc.Location.Width) / 2.0,
                                                  hNpc.Location.Y,
                                                  static_cast<double>(hNpc->WidthGFX),
-                                                 static_cast<double>(hNpc->Height));
+                                                 static_cast<double>(hNpc->THeight));
 
                         if((vScreenCollision(Z, hNpc.Location) || vScreenCollision(Z, warpNpcLoc)) && !hNpc.Hidden)
                         {
@@ -2199,8 +2199,8 @@ void UpdateGraphicsScreen(Screen_t& screen)
                             }
                             else
                             {
-                                tempLocation.Height = hNpc->Height;
-                                tempLocation.Width = hNpc->Width;
+                                tempLocation.Height = hNpc->THeight;
+                                tempLocation.Width = hNpc->TWidth;
                             }
 
                             tempLocation.X += hNpc->FrameOffsetX;
@@ -2228,7 +2228,7 @@ void UpdateGraphicsScreen(Screen_t& screen)
                                                       tempLocation.Height,
                                                       GFXNPC[hNpc.Type],
                                                       X2,
-                                                      Y2 + hNpc.Frame * hNpc->Height);
+                                                      Y2 + hNpc.Frame * hNpc->THeight);
                             }
                         }
                     }
@@ -2359,7 +2359,7 @@ void UpdateGraphicsScreen(Screen_t& screen)
                     auto hNpcLoc = newLoc(hNpc.Location.X - (hNpc->WidthGFX - hNpc.Location.Width) / 2.0,
                                           hNpc.Location.Y,
                                           static_cast<double>(hNpc->WidthGFX),
-                                          static_cast<double>(hNpc->Height));
+                                          static_cast<double>(hNpc->THeight));
 
                     if((vScreenCollision(Z, hNpc.Location) || vScreenCollision(Z, hNpcLoc)) && !hNpc.Hidden && hNpc.Type != 263)
                     {
@@ -2373,8 +2373,8 @@ void UpdateGraphicsScreen(Screen_t& screen)
                         }
                         else
                         {
-                            tempLocation.Height = hNpc->Height;
-                            tempLocation.Width = hNpc->Width;
+                            tempLocation.Height = hNpc->THeight;
+                            tempLocation.Width = hNpc->TWidth;
                         }
 
                         tempLocation.X += hNpc->FrameOffsetX;
@@ -2401,7 +2401,7 @@ void UpdateGraphicsScreen(Screen_t& screen)
                                                   tempLocation.Height,
                                                   GFXNPC[hNpc.Type],
                                                   X2,
-                                                  Y2 + hNpc.Frame * hNpc->Height);
+                                                  Y2 + hNpc.Frame * hNpc->THeight);
                         }
                     }
                 }

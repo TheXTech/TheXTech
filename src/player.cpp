@@ -2653,8 +2653,8 @@ void YoshiEat(const int A)
                             n.Type = 96;
                         }
 
-                        n.Location.Height = n->Height;
-                        n.Location.Width = n->Width;
+                        n.Location.Height = n->THeight;
+                        n.Location.Width = n->TWidth;
 
                         if(!(n.Type == 21 || n.Type == 22 || n.Type == 26 || n.Type == 31 || n.Type == 32 || n.Type == 35 || n.Type == 49 || NPCIsAnExit(n)))
                             n.DefaultType = 0;
@@ -2677,7 +2677,7 @@ void YoshiEat(const int A)
                 {
                     n.Effect = 5;
                     n.Effect2 = A;
-                    n.Location.Height = n->Height;
+                    n.Location.Height = n->THeight;
                     p.YoshiNPC = B;
                     treeNPCUpdate(B);
                 }
@@ -2690,8 +2690,8 @@ void YoshiEat(const int A)
 
                     n.Location.X += n.Location.Width / 2.0;
                     n.Location.Y += n.Location.Height / 2.0;
-                    n.Location.Width = n->Width;
-                    n.Location.Height = n->Height;
+                    n.Location.Width = n->TWidth;
+                    n.Location.Height = n->THeight;
                     n.Location.X += -n.Location.Width / 2.0;
                     n.Location.Y += -n.Location.Height / 2.0;
 
@@ -3608,7 +3608,7 @@ void YoshiEatCode(const int A)
                 NPC[p.YoshiNPC].Location.Height = 28;
             }
 
-            NPC[p.YoshiNPC].Location.Height = NPC[p.YoshiNPC]->Height;
+            NPC[p.YoshiNPC].Location.Height = NPC[p.YoshiNPC]->THeight;
             if((NPC[p.YoshiNPC]->IsGrabbable || NPCIsAShell(NPC[p.YoshiNPC]) || NPC[p.YoshiNPC].Type == NPCID_SPIT_BOSS_BALL || NPCIsABot(NPC[p.YoshiNPC]) || NPC[p.YoshiNPC].Type == NPCID_RAINBOW_SHELL || NPC[p.YoshiNPC].Type == NPCID_WALK_BOMB_S2 || NPC[p.YoshiNPC].Type == NPCID_WALK_BOMB_S3 || NPC[p.YoshiNPC].Type == NPCID_LIT_BOMB_S3) && (NPC[p.YoshiNPC].Type != NPCID_HIT_CARRY_FODDER))
             {
                 if(NPC[p.YoshiNPC].Type == NPCID_WALK_BOMB_S2)
@@ -3619,7 +3619,7 @@ void YoshiEatCode(const int A)
                 {
                     NPC[p.YoshiNPC].Special = 250;
                     NPC[p.YoshiNPC].Type = NPCID_LIT_BOMB_S3;
-                    NPC[p.YoshiNPC].Location.Height = NPC[p.YoshiNPC]->Height;
+                    NPC[p.YoshiNPC].Location.Height = NPC[p.YoshiNPC]->THeight;
                 }
 
                 NPC[p.YoshiNPC].Effect = 6;
@@ -3645,8 +3645,8 @@ void YoshiEatCode(const int A)
                     NPC[p.YoshiNPC].Type = NPCID_VEGGIE_1;
                 NPC[p.YoshiNPC].Location.X += NPC[p.YoshiNPC].Location.Width / 2.0;
                 NPC[p.YoshiNPC].Location.Y += NPC[p.YoshiNPC].Location.Height / 2.0;
-                NPC[p.YoshiNPC].Location.Width = NPC[p.YoshiNPC]->Width;
-                NPC[p.YoshiNPC].Location.Height = NPC[p.YoshiNPC]->Height;
+                NPC[p.YoshiNPC].Location.Width = NPC[p.YoshiNPC]->TWidth;
+                NPC[p.YoshiNPC].Location.Height = NPC[p.YoshiNPC]->THeight;
                 NPC[p.YoshiNPC].Location.X += -NPC[p.YoshiNPC].Location.Width / 2.0;
                 NPC[p.YoshiNPC].Location.Y += -NPC[p.YoshiNPC].Location.Height / 2.0;
                 NPC[p.YoshiNPC].Effect = 6;
@@ -3665,8 +3665,8 @@ void YoshiEatCode(const int A)
                 NPC[p.YoshiNPC].Type = NPCID_ICE_BLOCK;
                 NPC[p.YoshiNPC].Location.X += NPC[p.YoshiNPC].Location.Width / 2.0;
                 NPC[p.YoshiNPC].Location.Y += NPC[p.YoshiNPC].Location.Height / 2.0;
-                NPC[p.YoshiNPC].Location.Width = NPC[p.YoshiNPC]->Width;
-                NPC[p.YoshiNPC].Location.Height = NPC[p.YoshiNPC]->Height;
+                NPC[p.YoshiNPC].Location.Width = NPC[p.YoshiNPC]->TWidth;
+                NPC[p.YoshiNPC].Location.Height = NPC[p.YoshiNPC]->THeight;
                 NPC[p.YoshiNPC].Location.X += -NPC[p.YoshiNPC].Location.Width / 2.0;
                 NPC[p.YoshiNPC].Location.Y += -NPC[p.YoshiNPC].Location.Height / 2.0;
                 NPC[p.YoshiNPC].Effect = 6;
@@ -4270,8 +4270,8 @@ void PowerUps(const int A)
                             PlaySound(playerHammerSFX);
 
                         NPC[numNPCs].Projectile = true;
-                        NPC[numNPCs].Location.Height = NPC[numNPCs]->Height;
-                        NPC[numNPCs].Location.Width = NPC[numNPCs]->Width;
+                        NPC[numNPCs].Location.Height = NPC[numNPCs]->THeight;
+                        NPC[numNPCs].Location.Width = NPC[numNPCs]->TWidth;
                         NPC[numNPCs].Location.X = p.Location.X + Physics.PlayerGrabSpotX[p.Character][p.State] * p.Direction;
                         NPC[numNPCs].Location.Y = p.Location.Y + Physics.PlayerGrabSpotY[p.Character][p.State];
                         NPC[numNPCs].Active = true;
@@ -4353,8 +4353,8 @@ void PowerUps(const int A)
                         if(p.State == 7)
                             NPC[numNPCs].Type = NPCID_PLR_ICEBALL;
                         NPC[numNPCs].Projectile = true;
-                        NPC[numNPCs].Location.Height = NPC[numNPCs]->Height;
-                        NPC[numNPCs].Location.Width = NPC[numNPCs]->Width;
+                        NPC[numNPCs].Location.Height = NPC[numNPCs]->THeight;
+                        NPC[numNPCs].Location.Width = NPC[numNPCs]->TWidth;
                         NPC[numNPCs].Location.X = p.Location.X + Physics.PlayerGrabSpotX[p.Character][p.State] * p.Direction + 4;
                         NPC[numNPCs].Location.Y = p.Location.Y + Physics.PlayerGrabSpotY[p.Character][p.State];
                         NPC[numNPCs].Active = true;
@@ -4488,8 +4488,8 @@ void PowerUps(const int A)
             NPC[numNPCs].TimeLeft = Physics.NPCTimeOffScreen;
             NPC[numNPCs].Section = p.Section;
             NPC[numNPCs].Type = NPCID_BOMB;
-            NPC[numNPCs].Location.Width = NPC[numNPCs]->Width;
-            NPC[numNPCs].Location.Height = NPC[numNPCs]->Height;
+            NPC[numNPCs].Location.Width = NPC[numNPCs]->TWidth;
+            NPC[numNPCs].Location.Height = NPC[numNPCs]->THeight;
             NPC[numNPCs].CantHurtPlayer = A;
             NPC[numNPCs].CantHurt = 1000;
 
@@ -5224,8 +5224,8 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
                                 NPC[p.StandingOnNPC].DefaultType = 0;
                         }
 
-                        NPC[p.StandingOnNPC].Location.Height = NPC[p.StandingOnNPC]->Height;
-                        NPC[p.StandingOnNPC].Location.Width = NPC[p.StandingOnNPC]->Width;
+                        NPC[p.StandingOnNPC].Location.Height = NPC[p.StandingOnNPC]->THeight;
+                        NPC[p.StandingOnNPC].Location.Width = NPC[p.StandingOnNPC]->TWidth;
 
                         if(NPC[p.StandingOnNPC].Type == NPCID_VEGGIE_RANDOM)
                         {
@@ -5235,8 +5235,8 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
                                 NPC[p.StandingOnNPC].Type = NPCID_VEGGIE_1;
                             NPC[p.StandingOnNPC].Location.X += NPC[p.StandingOnNPC].Location.Width / 2.0;
                             NPC[p.StandingOnNPC].Location.Y += NPC[p.StandingOnNPC].Location.Height / 2.0;
-                            NPC[p.StandingOnNPC].Location.Width = NPC[p.StandingOnNPC]->Width;
-                            NPC[p.StandingOnNPC].Location.Height = NPC[p.StandingOnNPC]->Height;
+                            NPC[p.StandingOnNPC].Location.Width = NPC[p.StandingOnNPC]->TWidth;
+                            NPC[p.StandingOnNPC].Location.Height = NPC[p.StandingOnNPC]->THeight;
                             NPC[p.StandingOnNPC].Location.X += -NPC[p.StandingOnNPC].Location.Width / 2.0;
                             NPC[p.StandingOnNPC].Location.Y += -NPC[p.StandingOnNPC].Location.Height / 2.0;
                         }
@@ -5333,8 +5333,8 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
                         NPC[numNPCs].CantHurtPlayer = A;
                         NPC[numNPCs].BattleOwner = A;
                         NPC[numNPCs].Type = NPCID_PET_FIRE;
-                        NPC[numNPCs].Location.Width = NPC[numNPCs]->Width;
-                        NPC[numNPCs].Location.Height = NPC[numNPCs]->Height;
+                        NPC[numNPCs].Location.Width = NPC[numNPCs]->TWidth;
+                        NPC[numNPCs].Location.Height = NPC[numNPCs]->THeight;
                         NPC[numNPCs].Active = true;
                         NPC[numNPCs].TimeLeft = NPC[p.HoldingNPC].TimeLeft;
                         NPC[numNPCs].Layer = LAYER_SPAWNED_NPCS;

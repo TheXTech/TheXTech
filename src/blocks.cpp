@@ -335,8 +335,8 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
                     }
 
                     auto &nLoc = nn.Location;
-                    nLoc.Width = nn->Width;
-                    nLoc.Height = nn->Height;
+                    nLoc.Width = nn->TWidth;
+                    nLoc.Height = nn->THeight;
                     nLoc.X = b.Location.X + b.Location.Width / 2.0 - nLoc.Width / 2.0;
                     nLoc.Y = b.Location.Y - nLoc.Height - 0.01;
                     nLoc.SpeedX = dRand() * 3 - 1.5;
@@ -422,8 +422,8 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
 #endif
                 nn.Type = NPCID_COIN_S2;
 
-                nn.Location.Width = nn->Width;
-                nn.Location.Height = nn->Height;
+                nn.Location.Width = nn->TWidth;
+                nn.Location.Height = nn->THeight;
                 nn.Location.X = b.Location.X + b.Location.Width / 2.0 - nn.Location.Width / 2.0;
                 nn.Location.Y = b.Location.Y - nn.Location.Height - 0.01;
                 nn.Location.SpeedX = dRand() * 3.0 - 1.5;
@@ -618,7 +618,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
 
             CharStuff(numNPCs);
 
-            // note: minor SMBX64 bug, should be nn->Width
+            // note: minor SMBX64 bug, should be nn->TWidth
             nn.Location.Width = NPCWidth(C);
 
             // bug from ancient 101 case
@@ -773,8 +773,8 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
         nn.Type = NPCID_COIN_S4;
         nn.Block = 89;
         nn.Location = b.Location;
-        nn.Location.Width = nn->Width;
-        nn.Location.Height = nn->Height;
+        nn.Location.Width = nn->TWidth;
+        nn.Location.Height = nn->THeight;
         nn.Location.X += (b.Location.Width - nn.Location.Width) / 2.0;
         nn.Location.Y -= 0.01;
         nn.DefaultLocation = nn.Location;
@@ -1580,14 +1580,14 @@ void PSwitch(bool enabled)
                     nn.Location = Block[A].Location;
                     nn.Location.SpeedX = 0;
                     nn.Location.SpeedY = 0;
-                    nn.Location.Width = nn->Width;
-                    nn.Location.Height = nn->Height;
+                    nn.Location.Width = nn->TWidth;
+                    nn.Location.Height = nn->THeight;
                     nn.Location.X += (Block[A].Location.Width - nn.Location.Width) / 2.0;
                     nn.DefaultLocation = nn.Location;
                     nn.DefaultType = nn.Type;
 
                     // WARNING: this is new logic from #167. Check in case of any inconsistencies after Coin Switch is activated.
-                    if(nn->Frame > 0)
+                    if(nn->TFrames > 0)
                     {
                         nn.Direction = 1;
                         nn.Frame = EditorNPCFrame(nn.Type, nn.Direction);
@@ -1709,14 +1709,14 @@ void PSwitch(bool enabled)
                     nn.Location = Block[A].Location;
                     nn.Location.SpeedX = 0;
                     nn.Location.SpeedY = 0;
-                    nn.Location.Width = nn->Width;
-                    nn.Location.Height = nn->Height;
+                    nn.Location.Width = nn->TWidth;
+                    nn.Location.Height = nn->THeight;
                     nn.Location.X += (Block[A].Location.Width - nn.Location.Width) / 2.0;
                     nn.DefaultLocation = nn.Location;
                     nn.DefaultType = nn.Type;
 
                     // WARNING: this is new logic from #167. Check in case of any inconsistencies after Coin Switch is activated.
-                    if(nn->Frame > 0)
+                    if(nn->TFrames > 0)
                     {
                         nn.Direction = 1;
                         nn.Frame = EditorNPCFrame(nn.Type, nn.Direction);

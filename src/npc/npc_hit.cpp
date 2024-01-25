@@ -362,8 +362,8 @@ void NPCHit(int A, int B, int C)
             if(!BattleMode)
                 NPC[A].DefaultType = 0;
         }
-        NPC[A].Location.Height = NPC[A]->Height;
-        NPC[A].Location.Width = NPC[A]->Width;
+        NPC[A].Location.Height = NPC[A]->THeight;
+        NPC[A].Location.Width = NPC[A]->TWidth;
         NPC[A].Location.Y += -NPC[A].Location.Height;
         NPC[A].Location.SpeedX = (3 + dRand() * 1) * Player[C].Direction;
         if(NPC[A].Type == NPCID_BULLET)
@@ -383,8 +383,8 @@ void NPCHit(int A, int B, int C)
                 NPC[A].Type = NPCID_GEM_20;
             NPC[A].Location.X += NPC[A].Location.Width / 2.0;
             NPC[A].Location.Y += NPC[A].Location.Height;
-            NPC[A].Location.Width = NPC[A]->Width;
-            NPC[A].Location.Height = NPC[A]->Height;
+            NPC[A].Location.Width = NPC[A]->TWidth;
+            NPC[A].Location.Height = NPC[A]->THeight;
             NPC[A].Location.X += -NPC[A].Location.Width / 2.0;
             NPC[A].Location.Y += -NPC[A].Location.Height;
         }
@@ -467,8 +467,8 @@ void NPCHit(int A, int B, int C)
                 NPC[A].Type = NPCID_MAGIC_BOSS_SHELL;
             else
                 NPC[A].Type = NPCID_FIRE_BOSS_SHELL;
-            NPC[A].Location.Width = NPC[A]->Width;
-            NPC[A].Location.Height = NPC[A]->Height;
+            NPC[A].Location.Width = NPC[A]->TWidth;
+            NPC[A].Location.Height = NPC[A]->THeight;
             NPC[A].Location.X += -NPC[A].Location.Width / 2.0;
             NPC[A].Location.Y += -NPC[A].Location.Height;
             NPC[A].Location.SpeedX = 0;
@@ -1347,8 +1347,8 @@ void NPCHit(int A, int B, int C)
                 syncLayers_NPC(numNPCs);
                 NPC[A].Type +=  4;
             }
-            NPC[A].Location.Height = NPC[A]->Height;
-            NPC[A].Location.Width = NPC[A]->Width;
+            NPC[A].Location.Height = NPC[A]->THeight;
+            NPC[A].Location.Width = NPC[A]->TWidth;
 
             NPCQueues::Unchecked.push_back(A);
 
@@ -1425,8 +1425,8 @@ void NPCHit(int A, int B, int C)
                 NPC[numNPCs].TimeLeft = 100;
                 syncLayers_NPC(numNPCs);
             }
-            NPC[A].Location.Height = NPC[A]->Height;
-            NPC[A].Location.Width = NPC[A]->Width;
+            NPC[A].Location.Height = NPC[A]->THeight;
+            NPC[A].Location.Width = NPC[A]->TWidth;
             NPC[A].Location.Y -= NPC[A].Location.Height;
             NPC[A].Location.X += -(NPC[A].Location.Width / 2.0) - double(NPC[A].Direction * 2.f);
             NPC[A].Location.SpeedX = 0;
@@ -2315,10 +2315,10 @@ void NPCHit(int A, int B, int C)
     if(NPC[A].Type != oldNPC.Type)
     {
         NPC[A].Location.Y += NPC[A].Location.Height;
-        NPC[A].Location.Height = NPC[A]->Height;
+        NPC[A].Location.Height = NPC[A]->THeight;
         NPC[A].Location.Y -= NPC[A].Location.Height;
         NPC[A].Location.X += (NPC[A].Location.Width / 2.0);
-        NPC[A].Location.Width = NPC[A]->Width;
+        NPC[A].Location.Width = NPC[A]->TWidth;
         NPC[A].Location.X -= (NPC[A].Location.Width / 2.0);
     }
 

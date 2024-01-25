@@ -37,7 +37,7 @@ void NPCFrames(int A)
     double D = 0;
     Location_t tempLocation;
 
-    if(NPC[A]->Frame > 0) // custom frames
+    if(NPC[A]->TFrames > 0) // custom frames
     {
         NPC[A].FrameCount += 1;
         if(NPC[A]->FrameStyle == 2 && (NPC[A].Projectile || NPC[A].HoldingPlayer > 0))
@@ -52,26 +52,26 @@ void NPCFrames(int A)
         }
         if(NPC[A]->FrameStyle == 0)
         {
-            if(NPC[A].Frame >= NPC[A]->Frame)
+            if(NPC[A].Frame >= NPC[A]->TFrames)
                 NPC[A].Frame = 0;
             if(NPC[A].Frame < 0)
-                NPC[A].Frame = NPC[A]->Frame - 1;
+                NPC[A].Frame = NPC[A]->TFrames - 1;
         }
         else if(NPC[A]->FrameStyle == 1)
         {
             if(NPC[A].Direction == -1)
             {
-                if(NPC[A].Frame >= NPC[A]->Frame)
+                if(NPC[A].Frame >= NPC[A]->TFrames)
                     NPC[A].Frame = 0;
                 if(NPC[A].Frame < 0)
-                    NPC[A].Frame = NPC[A]->Frame;
+                    NPC[A].Frame = NPC[A]->TFrames;
             }
             else
             {
-                if(NPC[A].Frame >= NPC[A]->Frame * 2)
-                    NPC[A].Frame = NPC[A]->Frame;
-                if(NPC[A].Frame < NPC[A]->Frame)
-                    NPC[A].Frame = NPC[A]->Frame;
+                if(NPC[A].Frame >= NPC[A]->TFrames * 2)
+                    NPC[A].Frame = NPC[A]->TFrames;
+                if(NPC[A].Frame < NPC[A]->TFrames)
+                    NPC[A].Frame = NPC[A]->TFrames;
             }
         }
         else if(NPC[A]->FrameStyle == 2)
@@ -80,34 +80,34 @@ void NPCFrames(int A)
             {
                 if(NPC[A].Direction == -1)
                 {
-                    if(NPC[A].Frame >= NPC[A]->Frame)
+                    if(NPC[A].Frame >= NPC[A]->TFrames)
                         NPC[A].Frame = 0;
                     if(NPC[A].Frame < 0)
-                        NPC[A].Frame = NPC[A]->Frame - 1;
+                        NPC[A].Frame = NPC[A]->TFrames - 1;
                 }
                 else
                 {
-                    if(NPC[A].Frame >= NPC[A]->Frame * 2)
-                        NPC[A].Frame = NPC[A]->Frame;
-                    if(NPC[A].Frame < NPC[A]->Frame)
-                        NPC[A].Frame = NPC[A]->Frame * 2 - 1;
+                    if(NPC[A].Frame >= NPC[A]->TFrames * 2)
+                        NPC[A].Frame = NPC[A]->TFrames;
+                    if(NPC[A].Frame < NPC[A]->TFrames)
+                        NPC[A].Frame = NPC[A]->TFrames * 2 - 1;
                 }
             }
             else
             {
                 if(NPC[A].Direction == -1)
                 {
-                    if(NPC[A].Frame >= NPC[A]->Frame * 3)
-                        NPC[A].Frame = NPC[A]->Frame * 2;
-                    if(NPC[A].Frame < NPC[A]->Frame * 2)
-                        NPC[A].Frame = NPC[A]->Frame * 3 - 1;
+                    if(NPC[A].Frame >= NPC[A]->TFrames * 3)
+                        NPC[A].Frame = NPC[A]->TFrames * 2;
+                    if(NPC[A].Frame < NPC[A]->TFrames * 2)
+                        NPC[A].Frame = NPC[A]->TFrames * 3 - 1;
                 }
                 else
                 {
-                    if(NPC[A].Frame >= NPC[A]->Frame * 4)
-                        NPC[A].Frame = NPC[A]->Frame * 3;
-                    if(NPC[A].Frame < NPC[A]->Frame * 3)
-                        NPC[A].Frame = NPC[A]->Frame * 4 - 1;
+                    if(NPC[A].Frame >= NPC[A]->TFrames * 4)
+                        NPC[A].Frame = NPC[A]->TFrames * 3;
+                    if(NPC[A].Frame < NPC[A]->TFrames * 3)
+                        NPC[A].Frame = NPC[A]->TFrames * 4 - 1;
                 }
             }
         }

@@ -103,7 +103,7 @@ void DropBonus(int A)
     numNPCs++;
     NPC[numNPCs] = NPC_t();
     NPC[numNPCs].Type = Player[A].HeldBonus;
-    NPC[numNPCs].Location.Width = NPC[numNPCs]->Width;
+    NPC[numNPCs].Location.Width = NPC[numNPCs]->TWidth;
     NPC[numNPCs].Location.Height = 32;
 
     // need to find a position to place the bonus -- look for ths HUD

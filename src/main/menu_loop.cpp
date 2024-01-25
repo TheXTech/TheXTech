@@ -372,8 +372,8 @@ static void updateIntroLevelActivity()
 
                     n.Active = true;
                     n.HoldingPlayer = A;
-                    n.Location.Height = n->Height;
-                    n.Location.Width = n->Width;
+                    n.Location.Height = n->THeight;
+                    n.Location.Width = n->TWidth;
                     n.Location.Y = Player[A].Location.Y;  // level[n.Section].Height + 1000
                     n.Location.X = Player[A].Location.X; // level[n.Section].X + 1000
                     n.TimeLeft = 100;

@@ -812,8 +812,8 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         npc.AttLayer = FindLayer(n.attach_layer);
 
         npc.DefaultType = npc.Type;
-        npc.Location.Width = npc->Width;
-        npc.Location.Height = npc->Height;
+        npc.Location.Width = npc->TWidth;
+        npc.Location.Height = npc->THeight;
         npc.DefaultLocation = npc.Location;
         npc.DefaultDirection = npc.Direction;
 

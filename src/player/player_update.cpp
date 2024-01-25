@@ -1956,8 +1956,8 @@ void UpdatePlayer()
                                 if(Player[A].State == 6)
                                     NPC[numNPCs].Type = NPCID_SWORDBEAM;
                                 NPC[numNPCs].Projectile = true;
-                                NPC[numNPCs].Location.Height = NPC[numNPCs]->Height;
-                                NPC[numNPCs].Location.Width = NPC[numNPCs]->Width;
+                                NPC[numNPCs].Location.Height = NPC[numNPCs]->THeight;
+                                NPC[numNPCs].Location.Width = NPC[numNPCs]->TWidth;
                                 NPC[numNPCs].Location.X = Player[A].Location.X + Player[A].Location.Width / 2.0 + (40 * Player[A].Direction) - 8;
                                 if(!Player[A].Duck)
                                 {
@@ -3606,8 +3606,8 @@ void UpdatePlayer()
                                                     NPC[numNPCs].Section = Player[A].Section;
                                                     NPC[numNPCs].Type = NPCID_PLR_FIREBALL;
                                                     NPC[numNPCs].Special = Player[A].Character;
-                                                    NPC[numNPCs].Location.Height = NPC[numNPCs]->Height;
-                                                    NPC[numNPCs].Location.Width = NPC[numNPCs]->Width;
+                                                    NPC[numNPCs].Location.Height = NPC[numNPCs]->THeight;
+                                                    NPC[numNPCs].Location.Width = NPC[numNPCs]->TWidth;
                                                     NPC[numNPCs].Location.Y = Player[A].Location.Height + Player[A].Location.Y - NPC[numNPCs].Location.Height;
                                                     NPC[numNPCs].Location.X = Player[A].Location.X + Player[A].Location.Width / 2.0 - NPC[numNPCs].Location.Width / 2.0;
                                                     NPC[numNPCs].Location.SpeedX = 4;
@@ -3620,8 +3620,8 @@ void UpdatePlayer()
                                                     NPC[numNPCs].Section = Player[A].Section;
                                                     NPC[numNPCs].Type = NPCID_PLR_FIREBALL;
                                                     NPC[numNPCs].Special = Player[A].Character;
-                                                    NPC[numNPCs].Location.Height = NPC[numNPCs]->Height;
-                                                    NPC[numNPCs].Location.Width = NPC[numNPCs]->Width;
+                                                    NPC[numNPCs].Location.Height = NPC[numNPCs]->THeight;
+                                                    NPC[numNPCs].Location.Width = NPC[numNPCs]->TWidth;
                                                     NPC[numNPCs].Location.Y = Player[A].Location.Height + Player[A].Location.Y - NPC[numNPCs].Location.Height;
                                                     NPC[numNPCs].Location.X = Player[A].Location.X + Player[A].Location.Width / 2.0 - NPC[numNPCs].Location.Width / 2.0;
                                                     NPC[numNPCs].Location.SpeedX = -4;

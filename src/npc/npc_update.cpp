@@ -1141,8 +1141,8 @@ void UpdateNPCs()
                     NPC[A].Type = NPCID_VEGGIE_1;
                 NPC[A].Location.X += NPC[A].Location.Width / 2.0;
                 NPC[A].Location.Y += NPC[A].Location.Height / 2.0;
-                NPC[A].Location.Width = NPC[A]->Width;
-                NPC[A].Location.Height = NPC[A]->Height;
+                NPC[A].Location.Width = NPC[A]->TWidth;
+                NPC[A].Location.Height = NPC[A]->THeight;
                 NPC[A].Location.X += -NPC[A].Location.Width / 2.0;
                 NPC[A].Location.Y += -NPC[A].Location.Height / 2.0;
                 NPCQueues::Unchecked.push_back(A);
@@ -1272,8 +1272,8 @@ void UpdateNPCs()
                                  NPC[A].Type == NPCID_TOOTHYPIPE || NPCIsAnExit(NPC[A])))
                                 NPC[A].DefaultType = 0;
 
-                            NPC[A].Location.Height = NPC[A]->Height;
-                            NPC[A].Location.Width = NPC[A]->Width;
+                            NPC[A].Location.Height = NPC[A]->THeight;
+                            NPC[A].Location.Width = NPC[A]->TWidth;
 
                             if(NPC[A].Type == NPCID_VEGGIE_RANDOM)
                             {
@@ -1283,8 +1283,8 @@ void UpdateNPCs()
                                     NPC[A].Type = NPCID_VEGGIE_1;
                                 NPC[A].Location.X += NPC[A].Location.Width / 2.0;
                                 NPC[A].Location.Y += NPC[A].Location.Height / 2.0;
-                                NPC[A].Location.Width = NPC[A]->Width;
-                                NPC[A].Location.Height = NPC[A]->Height;
+                                NPC[A].Location.Width = NPC[A]->TWidth;
+                                NPC[A].Location.Height = NPC[A]->THeight;
                                 NPC[A].Location.X += -NPC[A].Location.Width / 2.0;
                                 NPC[A].Location.Y += -NPC[A].Location.Height / 2.0;
                             }
@@ -1300,8 +1300,8 @@ void UpdateNPCs()
                             NPC[A].Location.X += NPC[A].Location.Width / 2.0;
                             NPC[A].Location.Y += NPC[A].Location.Height / 2.0;
                             NPC[A].Type = NPCID_COIN_S2;
-                            NPC[A].Location.Height = NPC[A]->Height;
-                            NPC[A].Location.Width = NPC[A]->Width;
+                            NPC[A].Location.Height = NPC[A]->THeight;
+                            NPC[A].Location.Width = NPC[A]->TWidth;
                             NPC[A].Location.X += -NPC[A].Location.Width / 2.0;
                             NPC[A].Location.Y += -NPC[A].Location.Height / 2.0;
 
@@ -3652,7 +3652,7 @@ void UpdateNPCs()
                         // restore saw height after block collision and belt logic
                         if(NPC[A].Type == NPCID_SAW)
                         {
-                            NPC[A].Location.Height = NPC[A]->Height;
+                            NPC[A].Location.Height = NPC[A]->THeight;
                             NPC[A].Projectile = true;
                         }
 
@@ -5012,8 +5012,8 @@ void UpdateNPCs()
                                 NPC[numNPCs].Type = NPCID_VILLAIN_FIRE;
                                 if(NPC[numNPCs].Direction > 0)
                                     NPC[numNPCs].Frame = 4;
-                                NPC[numNPCs].Location.Height = NPC[numNPCs]->Height;
-                                NPC[numNPCs].Location.Width = NPC[numNPCs]->Width;
+                                NPC[numNPCs].Location.Height = NPC[numNPCs]->THeight;
+                                NPC[numNPCs].Location.Width = NPC[numNPCs]->TWidth;
                                 if(NPC[numNPCs].Direction < 0)
                                     NPC[numNPCs].Location.X = NPC[A].Location.X - 40;
                                 else
@@ -5200,8 +5200,8 @@ void UpdateNPCs()
                                     NPC[numNPCs].JustActivated = 0;
                                     NPC[numNPCs].Section = NPC[A].Section;
                                     NPC[numNPCs].Type = NPCID_BULLET;
-                                    NPC[numNPCs].Location.Width = NPC[numNPCs]->Width;
-                                    NPC[numNPCs].Location.Height = NPC[numNPCs]->Height;
+                                    NPC[numNPCs].Location.Width = NPC[numNPCs]->TWidth;
+                                    NPC[numNPCs].Location.Height = NPC[numNPCs]->THeight;
 
                                     if(NPC[numNPCs].Direction > 0)
                                         NPC[numNPCs].Location.X = NPC[A].Location.X + NPC[A].Location.Width / 2.0;
@@ -5486,17 +5486,17 @@ void UpdateNPCs()
                         NPC[A].Effect = 0;
                         NPC[A].Effect2 = 0;
                         NPC[A].Location.Y += NPC[A].Location.Height;
-                        NPC[A].Location.Height = NPC[A]->Height;
+                        NPC[A].Location.Height = NPC[A]->THeight;
                         NPC[A].Location.Y += -NPC[A].Location.Height;
                     }
                 }
                 else
                 {
-                    if(NPC[A].Effect2 >= NPC[A]->Height)
+                    if(NPC[A].Effect2 >= NPC[A]->THeight)
                     {
                         NPC[A].Effect = 0;
                         NPC[A].Effect2 = 0;
-                        NPC[A].Location.Height = NPC[A]->Height;
+                        NPC[A].Location.Height = NPC[A]->THeight;
                     }
                 }
             }

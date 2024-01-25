@@ -2149,8 +2149,8 @@ void UpdateInterprocess()
             EditorCursor.NPC.AttLayer = FindLayer(n.attach_layer);
 
             EditorCursor.NPC.DefaultType = EditorCursor.NPC.Type;
-            EditorCursor.NPC.Location.Width = EditorCursor.NPC->Width;
-            EditorCursor.NPC.Location.Height = EditorCursor.NPC->Height;
+            EditorCursor.NPC.Location.Width = EditorCursor.NPC->TWidth;
+            EditorCursor.NPC.Location.Height = EditorCursor.NPC->THeight;
             EditorCursor.NPC.DefaultLocation = EditorCursor.NPC.Location;
             EditorCursor.NPC.DefaultDirection = EditorCursor.NPC.Direction;
             EditorCursor.NPC.TimeLeft = 1;
@@ -2610,12 +2610,12 @@ void SetCursor()
         EditorCursor.NPC.Layer = EditorCursor.Layer;
         EditorCursor.NPC.Location = EditorCursor.Location;
 
-        if(EditorCursor.NPC->Width > 0)
-            EditorCursor.NPC.Location.Width = EditorCursor.NPC->Width;
+        if(EditorCursor.NPC->TWidth > 0)
+            EditorCursor.NPC.Location.Width = EditorCursor.NPC->TWidth;
         else
             EditorCursor.NPC.Location.Width = 32;
-        if(EditorCursor.NPC->Height > 0)
-            EditorCursor.NPC.Location.Height = EditorCursor.NPC->Height;
+        if(EditorCursor.NPC->THeight > 0)
+            EditorCursor.NPC.Location.Height = EditorCursor.NPC->THeight;
         else
             EditorCursor.NPC.Location.Height = 32;
         EditorCursor.Location.Width = EditorCursor.NPC.Location.Width;
@@ -2871,7 +2871,7 @@ void PositionCursor()
 
     if(EditorCursor.Mode == 4)
     {
-        if(EditorCursor.NPC->Height < 32)
+        if(EditorCursor.NPC->THeight < 32)
             EditorCursor.Location.Y += 32;
     }
 }

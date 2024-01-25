@@ -37,9 +37,9 @@ struct NPCTraits_t
     //Public NPCFrameOffsetY(0 To maxNPCType) As Integer 'NPC frame offset Y
     int16_t FrameOffsetY = 0;
     //Public NPCWidth(0 To maxNPCType) As Integer 'NPC width
-    int16_t Width = 32;
+    int16_t TWidth = 32;
     //Public NPCHeight(0 To maxNPCType) As Integer 'NPC height
-    int16_t Height = 32;
+    int16_t THeight = 32;
     //Public NPCWidthGFX(0 To maxNPCType) As Integer 'NPC gfx width
     int16_t WidthGFX = 0;
     //Public NPCHeightGFX(0 To maxNPCType) As Integer 'NPC gfx height
@@ -83,7 +83,7 @@ struct NPCTraits_t
     bool NoGravity = false;
 
     //Public NPCFrame(0 To maxNPCType) As Integer
-    int16_t Frame = 0;
+    int16_t TFrames = 0;
     //Public NPCFrameSpeed(0 To maxNPCType) As Integer
     int16_t FrameSpeed = 8;
     //Public NPCFrameStyle(0 To maxNPCType) As Integer
@@ -101,12 +101,12 @@ inline const NPCTraits_t* NPC_t::operator->() const
 // some read-only accessors
 inline int16_t NPCHeight(int Type)
 {
-    return NPCTraits[Type].Height;
+    return NPCTraits[Type].THeight;
 }
 
 inline int16_t NPCWidth(int Type)
 {
-    return NPCTraits[Type].Width;
+    return NPCTraits[Type].TWidth;
 }
 
 inline int16_t NPCHeightGFX(int Type)

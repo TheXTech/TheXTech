@@ -737,7 +737,7 @@ void DrawFrozenNPC(int Z, int A)
     auto &n = NPC[A];
     if((vScreenCollision(Z, n.Location) ||
         vScreenCollision(Z, newLoc(n.Location.X - (n->WidthGFX - n.Location.Width) / 2,
-                            n.Location.Y, CDbl(n->WidthGFX), CDbl(n->Height)))) && !n.Hidden)
+                            n.Location.Y, CDbl(n->WidthGFX), CDbl(n->THeight)))) && !n.Hidden)
     {
 // draw npc
         XTColor c = n.Shadow ? XTColor(0, 0, 0) : XTColor();
