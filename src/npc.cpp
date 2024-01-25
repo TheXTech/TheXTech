@@ -5671,7 +5671,7 @@ void CharStuff(int WhatNPC, bool CheckEggs)
                 if(NPCIsYoshi[(int)NPC[A].Special]) // Yoshi into mushroom (Egg)
                 {
                     // NPC(A).Special = 249
-                    NPC[A].Special = 35; // Yoshi into boot
+                    NPC[A].Special = NPCID_GRN_BOOT; // Yoshi into boot
                 }
             }
         }
@@ -5728,11 +5728,11 @@ void CharStuff(int WhatNPC, bool CheckEggs)
             if(NPC[A].Type == NPCID_ITEM_POD && NPC[A].Special > 0 /* && CheckEggs*/) // Check Eggs
             {
                 if(NPCIsYoshi[(int)NPC[A].Special] || NPCIsBoot[(int)NPC[A].Special]) // Yoshi / boot into mushroom (Egg)
-                    NPC[A].Special = 250;
-                if(NPC[A].Special == 9 || NPC[A].Special == 184 || NPC[A].Special == 185) // mushrooms into hearts (eggs)
-                    NPC[A].Special = 250;
-                if(NPC[A].Special == 10 || NPC[A].Special == 33 || NPC[A].Special == 88 || (!SMB2 && NPC[A].Special == 138)) // coins into rupees (eggs)
-                    NPC[A].Special = 251;
+                    NPC[A].Special = NPCID_POWER_S5;
+                if(NPC[A].Special == NPCID_POWER_S3 || NPC[A].Special == NPCID_POWER_S1 || NPC[A].Special == NPCID_POWER_S4) // mushrooms into hearts (eggs)
+                    NPC[A].Special = NPCID_POWER_S5;
+                if(NPC[A].Special == NPCID_COIN_S3 || NPC[A].Special == NPCID_COIN_S4 || NPC[A].Special == NPCID_COIN_S1 || (!SMB2 && NPC[A].Special == NPCID_COIN_S2)) // coins into rupees (eggs)
+                    NPC[A].Special = NPCID_GEM_1;
             }
         }
     }
