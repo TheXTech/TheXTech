@@ -49,6 +49,7 @@
 #include "main/screen_progress.h"
 #include "main/game_strings.h"
 #include "trees.h"
+#include "npc_traits.h"
 #include "npc_special_data.h"
 #include "graphics/gfx_camera.h"
 #include "graphics/gfx_update.h"
@@ -687,13 +688,13 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
             npc.DefaultSpecial2 = int(npc.Special2);
         }
 
-        if(NPCIsAParaTroopa[npc.Type])
+        if(NPCIsAParaTroopa(npc))
         {
             npc.Special = n.special_data;
             npc.DefaultSpecial = int(npc.Special);
         }
 
-        if(NPCIsCheep[npc.Type])
+        if(NPCIsCheep(npc))
         {
             npc.Special = n.special_data;
             npc.DefaultSpecial = int(npc.Special);
@@ -811,8 +812,8 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         npc.AttLayer = FindLayer(n.attach_layer);
 
         npc.DefaultType = npc.Type;
-        npc.Location.Width = NPCWidth[npc.Type];
-        npc.Location.Height = NPCHeight[npc.Type];
+        npc.Location.Width = npc->TWidth;
+        npc.Location.Height = npc->THeight;
         npc.DefaultLocation = npc.Location;
         npc.DefaultDirection = npc.Direction;
 
@@ -995,7 +996,7 @@ void OpenLevelDataPost()
         tr.loadLevelTranslation(FileNameFull);
 
     // FindBlocks();
-    qSortBackgrounds(1, numBackground);
+    qSortBackgrounds(1, numBackground, false);
     UpdateBackgrounds();
     // FindSBlocks();
     syncLayersTrees_AllBlocks();
@@ -1109,7 +1110,7 @@ void ClearLevel()
     const Background_t BlankBackground = Background_t();
     const Location_t BlankLocation = Location_t();
     const Effect_t blankEffect = Effect_t();
-    NPCScore[NPCID_MEDAL] = 6;
+    NPCTraits[NPCID_MEDAL].Score = 6;
     RestoreWorldStrings();
     LevelName.clear();
     ResetCompat();

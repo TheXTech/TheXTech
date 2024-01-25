@@ -24,6 +24,7 @@
 #include "write_common.h"
 #include "sound.h"
 #include "npc_id.h"
+#include "npc_traits.h"
 #include "npc_special_data.h"
 #include <PGE_File_Formats/file_formats.h>
 #include <AppPath/app_path.h>
@@ -227,7 +228,7 @@ void SaveLevel(const std::string& FilePath, int format, int version)   // saves 
             npc.special_data = n.Special2;
         }
         // AI / firebar length
-        else if(n.Type == NPCID_FIRE_CHAIN || NPCIsAParaTroopa[n.Type] || NPCIsCheep[n.Type])
+        else if(n.Type == NPCID_FIRE_CHAIN || NPCIsAParaTroopa(n) || NPCIsCheep(n))
         {
             npc.special_data = n.Special;
         }

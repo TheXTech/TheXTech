@@ -25,6 +25,7 @@
 #include "effect.h"
 #include "npc_id.h"
 #include "eff_id.h"
+#include "npc_traits.h"
 
 #include "main/trees.h"
 
@@ -36,77 +37,77 @@ void NPCFrames(int A)
     double D = 0;
     Location_t tempLocation;
 
-    if(NPCFrame[NPC[A].Type] > 0) // custom frames
+    if(NPC[A]->TFrames > 0) // custom frames
     {
         NPC[A].FrameCount += 1;
-        if(NPCFrameStyle[NPC[A].Type] == 2 && (NPC[A].Projectile || NPC[A].HoldingPlayer > 0))
+        if(NPC[A]->FrameStyle == 2 && (NPC[A].Projectile || NPC[A].HoldingPlayer > 0))
             NPC[A].FrameCount += 1;
-        if(NPC[A].FrameCount >= NPCFrameSpeed[NPC[A].Type])
+        if(NPC[A].FrameCount >= NPC[A]->FrameSpeed)
         {
-            if(NPCFrameStyle[NPC[A].Type] == 0)
+            if(NPC[A]->FrameStyle == 0)
                 NPC[A].Frame += 1 * NPC[A].Direction;
             else
                 NPC[A].Frame += 1;
             NPC[A].FrameCount = 0;
         }
-        if(NPCFrameStyle[NPC[A].Type] == 0)
+        if(NPC[A]->FrameStyle == 0)
         {
-            if(NPC[A].Frame >= NPCFrame[NPC[A].Type])
+            if(NPC[A].Frame >= NPC[A]->TFrames)
                 NPC[A].Frame = 0;
             if(NPC[A].Frame < 0)
-                NPC[A].Frame = NPCFrame[NPC[A].Type] - 1;
+                NPC[A].Frame = NPC[A]->TFrames - 1;
         }
-        else if(NPCFrameStyle[NPC[A].Type] == 1)
+        else if(NPC[A]->FrameStyle == 1)
         {
             if(NPC[A].Direction == -1)
             {
-                if(NPC[A].Frame >= NPCFrame[NPC[A].Type])
+                if(NPC[A].Frame >= NPC[A]->TFrames)
                     NPC[A].Frame = 0;
                 if(NPC[A].Frame < 0)
-                    NPC[A].Frame = NPCFrame[NPC[A].Type];
+                    NPC[A].Frame = NPC[A]->TFrames;
             }
             else
             {
-                if(NPC[A].Frame >= NPCFrame[NPC[A].Type] * 2)
-                    NPC[A].Frame = NPCFrame[NPC[A].Type];
-                if(NPC[A].Frame < NPCFrame[NPC[A].Type])
-                    NPC[A].Frame = NPCFrame[NPC[A].Type];
+                if(NPC[A].Frame >= NPC[A]->TFrames * 2)
+                    NPC[A].Frame = NPC[A]->TFrames;
+                if(NPC[A].Frame < NPC[A]->TFrames)
+                    NPC[A].Frame = NPC[A]->TFrames;
             }
         }
-        else if(NPCFrameStyle[NPC[A].Type] == 2)
+        else if(NPC[A]->FrameStyle == 2)
         {
             if(NPC[A].HoldingPlayer == 0 && !NPC[A].Projectile)
             {
                 if(NPC[A].Direction == -1)
                 {
-                    if(NPC[A].Frame >= NPCFrame[NPC[A].Type])
+                    if(NPC[A].Frame >= NPC[A]->TFrames)
                         NPC[A].Frame = 0;
                     if(NPC[A].Frame < 0)
-                        NPC[A].Frame = NPCFrame[NPC[A].Type] - 1;
+                        NPC[A].Frame = NPC[A]->TFrames - 1;
                 }
                 else
                 {
-                    if(NPC[A].Frame >= NPCFrame[NPC[A].Type] * 2)
-                        NPC[A].Frame = NPCFrame[NPC[A].Type];
-                    if(NPC[A].Frame < NPCFrame[NPC[A].Type])
-                        NPC[A].Frame = NPCFrame[NPC[A].Type] * 2 - 1;
+                    if(NPC[A].Frame >= NPC[A]->TFrames * 2)
+                        NPC[A].Frame = NPC[A]->TFrames;
+                    if(NPC[A].Frame < NPC[A]->TFrames)
+                        NPC[A].Frame = NPC[A]->TFrames * 2 - 1;
                 }
             }
             else
             {
                 if(NPC[A].Direction == -1)
                 {
-                    if(NPC[A].Frame >= NPCFrame[NPC[A].Type] * 3)
-                        NPC[A].Frame = NPCFrame[NPC[A].Type] * 2;
-                    if(NPC[A].Frame < NPCFrame[NPC[A].Type] * 2)
-                        NPC[A].Frame = NPCFrame[NPC[A].Type] * 3 - 1;
+                    if(NPC[A].Frame >= NPC[A]->TFrames * 3)
+                        NPC[A].Frame = NPC[A]->TFrames * 2;
+                    if(NPC[A].Frame < NPC[A]->TFrames * 2)
+                        NPC[A].Frame = NPC[A]->TFrames * 3 - 1;
                 }
                 else
                 {
-                    if(NPC[A].Frame >= NPCFrame[NPC[A].Type] * 4)
-                        NPC[A].Frame = NPCFrame[NPC[A].Type] * 3;
-                    if(NPC[A].Frame < NPCFrame[NPC[A].Type] * 3)
-                        NPC[A].Frame = NPCFrame[NPC[A].Type] * 4 - 1;
+                    if(NPC[A].Frame >= NPC[A]->TFrames * 4)
+                        NPC[A].Frame = NPC[A]->TFrames * 3;
+                    if(NPC[A].Frame < NPC[A]->TFrames * 3)
+                        NPC[A].Frame = NPC[A]->TFrames * 4 - 1;
                 }
             }
         }
@@ -114,11 +115,11 @@ void NPCFrames(int A)
     else if(NPC[A].Type == NPCID_SQUID_S3 || NPC[A].Type == NPCID_SQUID_S1 || NPC[A].Type == NPCID_VILLAIN_S3 || NPC[A].Type == NPCID_SPIT_BOSS_BALL ||
             NPC[A].Type == NPCID_FALL_BLOCK_RED || NPC[A].Type == NPCID_FALL_BLOCK_BROWN || NPC[A].Type == NPCID_SPIKY_THROWER || NPC[A].Type == NPCID_ITEM_THROWER ||
             NPC[A].Type == NPCID_METALBARREL || NPC[A].Type == NPCID_HPIPE_SHORT || NPC[A].Type == NPCID_HPIPE_LONG || NPC[A].Type == NPCID_VPIPE_SHORT ||
-            NPC[A].Type == NPCID_VPIPE_LONG || NPC[A].Type == NPCID_BIG_SHELL || NPCIsVeggie[NPC[A].Type] || NPC[A].Type == NPCID_SHORT_WOOD ||
+            NPC[A].Type == NPCID_VPIPE_LONG || NPC[A].Type == NPCID_BIG_SHELL || NPCIsVeggie(NPC[A]) || NPC[A].Type == NPCID_SHORT_WOOD ||
             NPC[A].Type == NPCID_LONG_WOOD || NPC[A].Type == NPCID_SLANT_WOOD_R || NPC[A].Type == NPCID_SLANT_WOOD_M || NPC[A].Type == NPCID_PLATFORM_S3 ||
             NPC[A].Type == NPCID_CHECKER_PLATFORM || NPC[A].Type == NPCID_PLATFORM_S1 || NPC[A].Type == NPCID_SPIT_GUY_BALL || NPC[A].Type == NPCID_SIGN ||
             (NPC[A].Type >= NPCID_CARRY_BLOCK_A && NPC[A].Type <= NPCID_CARRY_BLOCK_D) || NPC[A].Type == NPCID_LIFT_SAND || NPC[A].Type == NPCID_CHECKPOINT ||
-            NPC[A].Type == NPCID_GOALTAPE || NPCIsAVine[NPC[A].Type] || NPC[A].Type == NPCID_ICE_BLOCK || NPC[A].Type == NPCID_TNT ||
+            NPC[A].Type == NPCID_GOALTAPE || NPCIsAVine(NPC[A]) || NPC[A].Type == NPCID_ICE_BLOCK || NPC[A].Type == NPCID_TNT ||
             NPC[A].Type == NPCID_TIMER_S2 || NPC[A].Type == NPCID_POWER_S5 || NPC[A].Type == NPCID_MAGIC_DOOR || NPC[A].Type == NPCID_COCKPIT) // no frames
     {
         if(!(NPC[A].Type == NPCID_VILLAIN_S3 || NPC[A].Type == NPCID_ITEM_THROWER || NPC[A].Type == NPCID_SPIKY_THROWER) && A == 0) // Reset Frame to 0 unless a specific NPC type
@@ -1145,7 +1146,7 @@ void NPCFrames(int A)
         else if(NPC[A].Special5 < 16)
             NPC[A].Frame += 12;
     }
-    else if(NPCIsAShell[NPC[A].Type]) // Turtle shell
+    else if(NPCIsAShell(NPC[A])) // Turtle shell
     {
         if(NPC[A].Location.SpeedX == 0)
             NPC[A].Frame = 0;
@@ -1546,7 +1547,7 @@ void NPCFrames(int A)
             NPC[A].Frame = 0;
         }
     }
-    else if(NPCIsACoin[NPC[A].Type]) // Coin
+    else if(NPCIsACoin(NPC[A])) // Coin
     {
         NPC[A].Frame = CoinFrame[3];
         if(NPC[A].Type == NPCID_COIN_S2)
@@ -1830,7 +1831,7 @@ void NPCFrames(int A)
     {
         // Bullet Bills / Key / ONLY DIRECTION FRAMES
     }
-    else if(NPC[A].Type == NPCID_BULLET || NPC[A].Type == NPCID_BIG_BULLET || NPC[A].Type == NPCID_KEY || NPC[A].Type == NPCID_STATUE_S3 || NPC[A].Type == NPCID_CIVILIAN || NPC[A].Type == NPCID_CHAR3 || NPCIsYoshi[NPC[A].Type] || NPC[A].Type == NPCID_CHAR2 || NPC[A].Type == NPCID_CHAR5 || NPC[A].Type == NPCID_STATUE_S4)
+    else if(NPC[A].Type == NPCID_BULLET || NPC[A].Type == NPCID_BIG_BULLET || NPC[A].Type == NPCID_KEY || NPC[A].Type == NPCID_STATUE_S3 || NPC[A].Type == NPCID_CIVILIAN || NPC[A].Type == NPCID_CHAR3 || NPCIsYoshi(NPC[A]) || NPC[A].Type == NPCID_CHAR2 || NPC[A].Type == NPCID_CHAR5 || NPC[A].Type == NPCID_STATUE_S4)
     {
         if(NPC[A].Direction == -1)
             NPC[A].Frame = 0;
@@ -2195,7 +2196,7 @@ void NPCFrames(int A)
                 NPC[A].FrameCount = 0;
         }
     }
-    else if(!(NPCIsABonus[NPC[A].Type] || NPC[A].Type == NPCID_CANNONENEMY || NPC[A].Type == NPCID_COIN_SWITCH)) // Frame finder for everything else
+    else if(!(NPCIsABonus(NPC[A]) || NPC[A].Type == NPCID_CANNONENEMY || NPC[A].Type == NPCID_COIN_SWITCH)) // Frame finder for everything else
     {
         NPC[A].FrameCount += 1;
         if(NPC[A].Type == NPCID_SPIKY_BALL_S3 || NPC[A].Type == NPCID_WALL_SPARK)

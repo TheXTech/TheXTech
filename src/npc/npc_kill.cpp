@@ -31,6 +31,8 @@
 #include "../controls.h"
 #include "../layers.h"
 
+#include "npc_traits.h"
+
 #include "sdl_proxy/sdl_stdinc.h"
 
 #include "npc/npc_queues.h"
@@ -79,7 +81,7 @@ void KillNPC(int A, int B)
 
         if(B != 10)
         {
-            MoreScore(NPCScore[NPC[A].Type], NPC[A].Location, NPC[A].Multiplier);
+            MoreScore(NPC[A]->Score, NPC[A].Location, NPC[A].Multiplier);
         }
 
         NPC[A].Location.SpeedX = NPC[A].Location.SpeedX * 0.4;
@@ -87,7 +89,7 @@ void KillNPC(int A, int B)
             NPC[A].Location.SpeedX = double(2 * NPC[A].Direction);
     }
 
-    if(NPC[A].Killed == 8 && NPC[A].Type != NPCID_PLR_FIREBALL && NPC[A].Type != NPCID_KNIGHT && !NPCIsABot[NPC[A].Type] && NPC[A].Type != NPCID_FLIER && NPC[A].Type != NPCID_ROCKET_FLIER && NPC[A].Type != NPCID_WALL_BUG && NPC[A].Type != NPCID_HOMING_BALL)
+    if(NPC[A].Killed == 8 && NPC[A].Type != NPCID_PLR_FIREBALL && NPC[A].Type != NPCID_KNIGHT && !NPCIsABot(NPC[A]) && NPC[A].Type != NPCID_FLIER && NPC[A].Type != NPCID_ROCKET_FLIER && NPC[A].Type != NPCID_WALL_BUG && NPC[A].Type != NPCID_HOMING_BALL)
         NewEffect(EFFID_BOOT_STOMP, NPC[A].Location);
 
     if(NPC[A].Type == NPCID_YELSWITCH_FODDER || NPC[A].Type == NPCID_BLUSWITCH_FODDER || NPC[A].Type == NPCID_GRNSWITCH_FODDER || NPC[A].Type == NPCID_REDSWITCH_FODDER || NPC[A].DefaultType == 59 || NPC[A].DefaultType == 61 || NPC[A].DefaultType == 63 || NPC[A].DefaultType == 65)
@@ -206,7 +208,7 @@ void KillNPC(int A, int B)
 
     if(NPC[A].HoldingPlayer > 0)
     {
-        if(!NPCIsAnExit[NPC[A].Type]) // Tell the player the NPC he was holding is dead
+        if(!NPCIsAnExit(NPC[A])) // Tell the player the NPC he was holding is dead
             Player[NPC[A].HoldingPlayer].HoldingNPC = 0;
     }
 
@@ -226,9 +228,9 @@ void KillNPC(int A, int B)
                     NPC[numNPCs].Type = NPCID_GEM_5;
                 if(iRand(40) < 3)
                     NPC[numNPCs].Type = NPCID_GEM_20;
-                NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
+                NPC[numNPCs].Location.Width = NPC[numNPCs]->TWidth;
                 NPC[numNPCs].Location.X = NPC[A].Location.X + NPC[A].Location.Width / 2.0 - NPC[numNPCs].Location.Width / 2.0;
-                NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
+                NPC[numNPCs].Location.Height = NPC[numNPCs]->THeight;
                 if(NPC[A].Location.Height >= 32)
                     NPC[numNPCs].Location.Y = NPC[A].Location.Y + NPC[A].Location.Height / 2.0 - NPC[numNPCs].Location.Height / 2.0;
                 else if(NPC[A].Type == NPCID_BOTTOM_PLANT || NPC[A].Type == NPCID_LONG_PLANT_DOWN) // Stops the rupees from spawning in blocks
@@ -443,7 +445,7 @@ void KillNPC(int A, int B)
 
         }
         // turnips
-        else if(NPCIsVeggie[NPC[A].Type])
+        else if(NPCIsVeggie(NPC[A]))
         {
             NPC[A].Location.Y += -(32 - NPC[A].Location.Height);
             NPC[A].Location.X += NPC[A].Location.Width / 2.0 - EffectWidth[10] / 2.0;
@@ -597,7 +599,7 @@ void KillNPC(int A, int B)
             }
         // Zelda NPCs
         }
-        else if(NPC[A].Type == NPCID_KNIGHT || NPCIsABot[NPC[A].Type] || NPC[A].Type == NPCID_LOCK_DOOR)
+        else if(NPC[A].Type == NPCID_KNIGHT || NPCIsABot(NPC[A]) || NPC[A].Type == NPCID_LOCK_DOOR)
         {
             PlaySound(SFX_HeroKill);
             NewEffect(EFFID_SMOKE_S5, NPC[A].Location);
@@ -767,7 +769,7 @@ void KillNPC(int A, int B)
                 NewEffect(EFFID_RED_FODDER_DIE, NPC[A].Location);
             }
         }
-        else if(NPCIsToad[NPC[A].Type]) // toad
+        else if(NPCIsToad(NPC[A])) // toad
         {
             if(B != 2)
             {
@@ -1098,8 +1100,8 @@ void KillNPC(int A, int B)
                     numNPCs++;
                     NPC[numNPCs] = NPC_t();
                     NPC[numNPCs].Type = NPCID_GOALORB_S2;
-                    NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
-                    NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
+                    NPC[numNPCs].Location.Height = NPC[numNPCs]->THeight;
+                    NPC[numNPCs].Location.Width = NPC[numNPCs]->TWidth;
                     NPC[numNPCs].Location.X = NPC[A].Location.X;
                     NPC[numNPCs].Location.Y = NPC[A].Location.Y;
                     NPC[numNPCs].Location.SpeedY = -6;
@@ -1306,8 +1308,8 @@ void KillNPC(int A, int B)
         }
         else if(NPC[A].Type == NPCID_MINIBOSS) // Big Koopa
         {
-            NPC[A].Location.Y += -(NPCHeight[NPC[A].Type] - NPC[A].Location.Height);
-            NPC[A].Location.Height = NPCHeight[NPC[A].Type];
+            NPC[A].Location.Y += -(NPC[A]->THeight - NPC[A].Location.Height);
+            NPC[A].Location.Height = NPC[A]->THeight;
             if(NPC[A].Legacy)
             {
                 for(B = 1; B <= numNPCs; B++)
@@ -1516,11 +1518,11 @@ void KillNPC(int A, int B)
                 PlaySound(SFX_BlockSmashed);
             }
         }
-        else if(NPCIsABonus[NPC[A].Type]) // NPC is a bonus
+        else if(NPCIsABonus(NPC[A])) // NPC is a bonus
         {
             if(B == 3 || B == 4 || B == 5)
             {
-                if(!NPCIsACoin[NPC[A].Type] || LevelEditor || TestLevel) // Shell hit sound
+                if(!NPCIsACoin(NPC[A]) || LevelEditor || TestLevel) // Shell hit sound
                     PlaySound(SFX_ShellHit);
                 NPC[A].Location.X += NPC[A].Location.Width / 2.0 - EffectWidth[10] / 2.0;
                 NPC[A].Location.Y += NPC[A].Location.Height / 2.0 - EffectHeight[10] / 2.0;

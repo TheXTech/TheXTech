@@ -33,6 +33,8 @@
 #include "../eff_id.h"
 #include "../layers.h"
 
+#include "npc_traits.h"
+
 #include "npc/npc_queues.h"
 #include "main/trees.h"
 
@@ -68,7 +70,7 @@ void NPCHit(int A, int B, int C)
             if(NPC[A].Type == NPCID_ITEM_BUBBLE)
                 NPCHit(A, 3, B);
 
-            if(NPCNoIceBall[NPC[A].Type] || NPC[A].Location.Width > 128 || NPC[A].Location.Height > 128)
+            if(NPC[A]->NoIceBall || NPC[A].Location.Width > 128 || NPC[A].Location.Height > 128)
                 return;
 
             if(NPC[A].Type == NPCID_RED_FLY_FODDER)
@@ -215,7 +217,7 @@ void NPCHit(int A, int B, int C)
         if(NPC[C].Generator)
             return;
     }
-    if((NPC[A].Type == NPCID_SQUID_S1 || NPC[A].Type == NPCID_SQUID_S3 || NPCIsCheep[NPC[A].Type]) && B == 1)
+    if((NPC[A].Type == NPCID_SQUID_S1 || NPC[A].Type == NPCID_SQUID_S3 || NPCIsCheep(NPC[A])) && B == 1)
     {
         if(Player[C].Wet > 0)
             return;
@@ -228,13 +230,13 @@ void NPCHit(int A, int B, int C)
     {
         if(NPC[C].Type == NPCID_PLR_FIREBALL)
         {
-            if(NPCNoFireBall[NPC[A].Type])
+            if(NPC[A]->NoFireBall)
                 return;
         }
     }
 
 
-    if(B == 1 && NPCJumpHurt[NPC[A].Type] && NPC[A].Type != NPCID_ITEM_BUBBLE) // Things that don't die from jumping
+    if(B == 1 && NPC[A]->JumpHurt && NPC[A].Type != NPCID_ITEM_BUBBLE) // Things that don't die from jumping
         return;
 
     // Add it to the queue, no matter whether it will happen. Reduces code size and increases maintainability.
@@ -323,7 +325,7 @@ void NPCHit(int A, int B, int C)
             NPC[A].Direction = Player[C].Direction;
     }
     // SMB2 Grass
-    else if(B == 10 && (NPC[A].Type == NPCID_ITEM_BURIED || NPCIsVeggie[NPC[A].Type]))
+    else if(B == 10 && (NPC[A].Type == NPCID_ITEM_BURIED || NPCIsVeggie(NPC[A])))
     {
         if(NPC[A].Type == NPCID_ITEM_BURIED)
         {
@@ -350,18 +352,18 @@ void NPCHit(int A, int B, int C)
         NPC[A].Frame = EditorNPCFrame(NPC[A].Type, NPC[A].Direction);
         CharStuff(A);
         NPC[A].Special = 0;
-        if(NPCIsYoshi[NPC[A].Type])
+        if(NPCIsYoshi(NPC[A]))
         {
             NPC[A].Special = NPC[A].Type;
             NPC[A].Type = NPCID_ITEM_POD;
         }
-        if(!(NPC[A].Type == NPCID_CANNONENEMY || NPC[A].Type == NPCID_CANNONITEM || NPC[A].Type == NPCID_SPRING || NPC[A].Type == NPCID_KEY || NPC[A].Type == NPCID_COIN_SWITCH || NPC[A].Type == NPCID_GRN_BOOT || NPC[A].Type == NPCID_RED_BOOT || NPC[A].Type == NPCID_BLU_BOOT || NPC[A].Type == NPCID_TOOTHYPIPE || NPCIsAnExit[NPC[A].Type]))
+        if(!(NPC[A].Type == NPCID_CANNONENEMY || NPC[A].Type == NPCID_CANNONITEM || NPC[A].Type == NPCID_SPRING || NPC[A].Type == NPCID_KEY || NPC[A].Type == NPCID_COIN_SWITCH || NPC[A].Type == NPCID_GRN_BOOT || NPC[A].Type == NPCID_RED_BOOT || NPC[A].Type == NPCID_BLU_BOOT || NPC[A].Type == NPCID_TOOTHYPIPE || NPCIsAnExit(NPC[A])))
         {
             if(!BattleMode)
                 NPC[A].DefaultType = 0;
         }
-        NPC[A].Location.Height = NPCHeight[NPC[A].Type];
-        NPC[A].Location.Width = NPCWidth[NPC[A].Type];
+        NPC[A].Location.Height = NPC[A]->THeight;
+        NPC[A].Location.Width = NPC[A]->TWidth;
         NPC[A].Location.Y += -NPC[A].Location.Height;
         NPC[A].Location.SpeedX = (3 + dRand() * 1) * Player[C].Direction;
         if(NPC[A].Type == NPCID_BULLET)
@@ -369,7 +371,7 @@ void NPCHit(int A, int B, int C)
         NPC[A].Location.SpeedY = -4;
         NPC[A].CantHurtPlayer = C;
         NPC[A].CantHurt = 30;
-        if(NPCIsVeggie[NPC[A].Type] || NPC[A].Type == NPCID_HEAVY_THROWER || NPC[A].Type == NPCID_GEM_1 || NPC[A].Type == NPCID_GEM_5)
+        if(NPCIsVeggie(NPC[A]) || NPC[A].Type == NPCID_HEAVY_THROWER || NPC[A].Type == NPCID_GEM_1 || NPC[A].Type == NPCID_GEM_5)
         {
             if(NPC[A].Type != NPCID_GEM_5)
                 NPC[A].Type = NPCID_GEM_1;
@@ -381,19 +383,19 @@ void NPCHit(int A, int B, int C)
                 NPC[A].Type = NPCID_GEM_20;
             NPC[A].Location.X += NPC[A].Location.Width / 2.0;
             NPC[A].Location.Y += NPC[A].Location.Height;
-            NPC[A].Location.Width = NPCWidth[NPC[A].Type];
-            NPC[A].Location.Height = NPCHeight[NPC[A].Type];
+            NPC[A].Location.Width = NPC[A]->TWidth;
+            NPC[A].Location.Height = NPC[A]->THeight;
             NPC[A].Location.X += -NPC[A].Location.Width / 2.0;
             NPC[A].Location.Y += -NPC[A].Location.Height;
         }
-        if(NPCIsAShell[NPC[A].Type])
+        if(NPCIsAShell(NPC[A]))
             NPC[A].Location.SpeedX = Physics.NPCShellSpeed * Player[C].Direction;
 
         NPCQueues::Unchecked.push_back(A);
 
         NPCFrames(A);
 
-        if(!NPCIsACoin[NPC[A].Type])
+        if(!NPCIsACoin(NPC[A]))
             NPC[A].Projectile = true;
         else
             NPC[A].Special = 1;
@@ -465,8 +467,8 @@ void NPCHit(int A, int B, int C)
                 NPC[A].Type = NPCID_MAGIC_BOSS_SHELL;
             else
                 NPC[A].Type = NPCID_FIRE_BOSS_SHELL;
-            NPC[A].Location.Width = NPCWidth[NPC[A].Type];
-            NPC[A].Location.Height = NPCHeight[NPC[A].Type];
+            NPC[A].Location.Width = NPC[A]->TWidth;
+            NPC[A].Location.Height = NPC[A]->THeight;
             NPC[A].Location.X += -NPC[A].Location.Width / 2.0;
             NPC[A].Location.Y += -NPC[A].Location.Height;
             NPC[A].Location.SpeedX = 0;
@@ -755,7 +757,7 @@ void NPCHit(int A, int B, int C)
         }
         else if(B == 3)
         {
-            if(NPCIsVeggie[NPC[C].Type])
+            if(NPCIsVeggie(NPC[C]))
             {
                 if(NPC[A].Special == 1)
                 {
@@ -1048,7 +1050,7 @@ void NPCHit(int A, int B, int C)
     else if(NPC[A].Type == NPCID_KNIGHT)
         NPC[A].Killed = B;
     // Zelda Bots
-    else if(NPCIsABot[NPC[A].Type])
+    else if(NPCIsABot(NPC[A]))
         NPC[A].Killed = B;
     // Switch Platforms
     else if(NPC[A].Type == NPCID_YEL_PLATFORM || NPC[A].Type == NPCID_BLU_PLATFORM || NPC[A].Type == NPCID_GRN_PLATFORM || NPC[A].Type == NPCID_RED_PLATFORM)
@@ -1057,7 +1059,7 @@ void NPCHit(int A, int B, int C)
             NPC[A].Killed = B;
     }
     // Veggies
-    else if(NPCIsVeggie[NPC[A].Type])
+    else if(NPCIsVeggie(NPC[A]))
     {
         if(B == 5)
         {
@@ -1184,7 +1186,7 @@ void NPCHit(int A, int B, int C)
             NPC[A].Location.Height = 28;
     }
     // Friendly NPCs (Toad, Peach, Link, Luigi, Etc.)
-    else if(NPCIsToad[NPC[A].Type])
+    else if(NPCIsToad(NPC[A]))
     {
         if(B == 2 && NPC[A].Location.SpeedY > -4)
         {
@@ -1287,7 +1289,7 @@ void NPCHit(int A, int B, int C)
         }
     }
     // Things With Shells (Koopa Troopa, Buzzy Beetle, Etc.)
-    else if(NPC[A].Type == NPCID_GRN_TURTLE_S3 || NPC[A].Type == NPCID_RED_TURTLE_S3 || NPC[A].Type == NPCID_GLASS_TURTLE || NPC[A].Type == NPCID_BIG_TURTLE || NPCIsAParaTroopa[NPC[A].Type] || (NPC[A].Type >= NPCID_GRN_TURTLE_S4 && NPC[A].Type <= NPCID_YEL_TURTLE_S4) || NPC[A].Type == NPCID_GRN_TURTLE_S1 || NPC[A].Type == NPCID_RED_TURTLE_S1 || NPC[A].Type == NPCID_GRN_FLY_TURTLE_S1 || NPC[A].Type == NPCID_RED_FLY_TURTLE_S1)
+    else if(NPC[A].Type == NPCID_GRN_TURTLE_S3 || NPC[A].Type == NPCID_RED_TURTLE_S3 || NPC[A].Type == NPCID_GLASS_TURTLE || NPC[A].Type == NPCID_BIG_TURTLE || NPCIsAParaTroopa(NPC[A]) || (NPC[A].Type >= NPCID_GRN_TURTLE_S4 && NPC[A].Type <= NPCID_YEL_TURTLE_S4) || NPC[A].Type == NPCID_GRN_TURTLE_S1 || NPC[A].Type == NPCID_RED_TURTLE_S1 || NPC[A].Type == NPCID_GRN_FLY_TURTLE_S1 || NPC[A].Type == NPCID_RED_FLY_TURTLE_S1)
     {
         if(B == 1)
         {
@@ -1345,8 +1347,8 @@ void NPCHit(int A, int B, int C)
                 syncLayers_NPC(numNPCs);
                 NPC[A].Type +=  4;
             }
-            NPC[A].Location.Height = NPCHeight[NPC[A].Type];
-            NPC[A].Location.Width = NPCWidth[NPC[A].Type];
+            NPC[A].Location.Height = NPC[A]->THeight;
+            NPC[A].Location.Width = NPC[A]->TWidth;
 
             NPCQueues::Unchecked.push_back(A);
 
@@ -1423,8 +1425,8 @@ void NPCHit(int A, int B, int C)
                 NPC[numNPCs].TimeLeft = 100;
                 syncLayers_NPC(numNPCs);
             }
-            NPC[A].Location.Height = NPCHeight[NPC[A].Type];
-            NPC[A].Location.Width = NPCWidth[NPC[A].Type];
+            NPC[A].Location.Height = NPC[A]->THeight;
+            NPC[A].Location.Width = NPC[A]->TWidth;
             NPC[A].Location.Y -= NPC[A].Location.Height;
             NPC[A].Location.X += -(NPC[A].Location.Width / 2.0) - double(NPC[A].Direction * 2.f);
             NPC[A].Location.SpeedX = 0;
@@ -1447,7 +1449,7 @@ void NPCHit(int A, int B, int C)
             else
                 NPC[A].Killed = B;
         }
-        if(NPCIsAShell[NPC[A].Type])
+        if(NPCIsAShell(NPC[A]))
             NPC[A].Stuck = false;
     }
     // SMB3 Bowser
@@ -1876,7 +1878,7 @@ void NPCHit(int A, int B, int C)
         }
     }
     // Indestructable Objects
-    else if(NPC[A].Type == NPCID_CANNONENEMY || NPC[A].Type == NPCID_CANNONITEM || NPC[A].Type == NPCID_SPRING || NPC[A].Type == NPCID_KEY || NPC[A].Type == NPCID_COIN_SWITCH || NPC[A].Type == NPCID_TIME_SWITCH || NPC[A].Type == NPCID_TNT || NPC[A].Type == NPCID_GRN_BOOT || NPC[A].Type == NPCID_RED_BOOT || NPC[A].Type == NPCID_BLU_BOOT || NPC[A].Type == NPCID_TOOTHYPIPE || NPCIsYoshi[NPC[A].Type] || NPC[A].Type == NPCID_ITEM_POD || (NPC[A].Type >= NPCID_CARRY_BLOCK_A && NPC[A].Type <= NPCID_CARRY_BLOCK_D) || NPC[A].Type == NPCID_TIMER_S2 || NPC[A].Type == NPCID_EARTHQUAKE_BLOCK || NPC[A].Type == NPCID_FLY_BLOCK || NPC[A].Type == NPCID_FLY_CANNON)
+    else if(NPC[A].Type == NPCID_CANNONENEMY || NPC[A].Type == NPCID_CANNONITEM || NPC[A].Type == NPCID_SPRING || NPC[A].Type == NPCID_KEY || NPC[A].Type == NPCID_COIN_SWITCH || NPC[A].Type == NPCID_TIME_SWITCH || NPC[A].Type == NPCID_TNT || NPC[A].Type == NPCID_GRN_BOOT || NPC[A].Type == NPCID_RED_BOOT || NPC[A].Type == NPCID_BLU_BOOT || NPC[A].Type == NPCID_TOOTHYPIPE || NPCIsYoshi(NPC[A]) || NPC[A].Type == NPCID_ITEM_POD || (NPC[A].Type >= NPCID_CARRY_BLOCK_A && NPC[A].Type <= NPCID_CARRY_BLOCK_D) || NPC[A].Type == NPCID_TIMER_S2 || NPC[A].Type == NPCID_EARTHQUAKE_BLOCK || NPC[A].Type == NPCID_FLY_BLOCK || NPC[A].Type == NPCID_FLY_CANNON)
     {
         if(NPC[A].Type == NPCID_EARTHQUAKE_BLOCK && (B == 4 || B == 5 || B == 10))
         {
@@ -2043,7 +2045,7 @@ void NPCHit(int A, int B, int C)
             NPC[A].Location.SpeedY = 0;
             NPC[A].Location.SpeedX = 0;
         }
-        else if(B == 1 && !NPCCanWalkOn[NPC[A].Type] && !NPCJumpHurt[NPC[A].Type])
+        else if(B == 1 && !NPC[A]->CanWalkOn && !NPC[A]->JumpHurt)
         {
             NPC[A].Killed = B;
             NPC[A].Location.SpeedY = 0.123;
@@ -2056,7 +2058,7 @@ void NPCHit(int A, int B, int C)
             NPC[A].Killed = B;
     }
     // Exits
-    else if(NPCIsAnExit[NPC[A].Type])
+    else if(NPCIsAnExit(NPC[A]))
     {
         if(B == 6)
         {
@@ -2068,7 +2070,7 @@ void NPCHit(int A, int B, int C)
         }
     }
     // Coins
-    else if(NPCIsACoin[NPC[A].Type])
+    else if(NPCIsACoin(NPC[A]))
     {
         if(LevelEditor)
             PlaySound(SFX_ShellHit);
@@ -2124,7 +2126,7 @@ void NPCHit(int A, int B, int C)
         }
     }
     // Bonus Items
-    else if(NPCIsABonus[NPC[A].Type])
+    else if(NPCIsABonus(NPC[A]))
     {
         if(B == 2 && NPC[A].Location.SpeedY > -4)
         {
@@ -2145,7 +2147,7 @@ void NPCHit(int A, int B, int C)
         // B == 6 - old behavior, access index C as an NPC
         else if(B == 6 || B == 5 || B == 4)
         {
-            if(!(NPC[C].Type == NPCID_PLR_FIREBALL || NPC[C].Type == NPCID_PET_FIRE || NPC[C].Type == NPCID_PLR_HEAVY || NPCIsVeggie[NPC[C].Type]))
+            if(!(NPC[C].Type == NPCID_PLR_FIREBALL || NPC[C].Type == NPCID_PET_FIRE || NPC[C].Type == NPCID_PLR_HEAVY || NPCIsVeggie(NPC[C])))
                 NPC[A].Killed = B;
         }
         else if(B == 7)
@@ -2185,18 +2187,18 @@ void NPCHit(int A, int B, int C)
     if(NPC[A].Killed == 10)
     {
         if(tempBool)
-            MoreScore(NPCScore[NPC[A].Type], NPC[A].Location, NPC[C].Multiplier);
+            MoreScore(NPC[A]->Score, NPC[A].Location, NPC[C].Multiplier);
         else
-            MoreScore(NPCScore[NPC[A].Type], NPC[A].Location, Player[C].Multiplier);
+            MoreScore(NPC[A]->Score, NPC[A].Location, Player[C].Multiplier);
     }
     // Calculate Score
     Player[0].Multiplier = 0;
-    if((B == 1 || B == 8) && C <= numPlayers && !NPCIsABonus[NPC[A].Type])
+    if((B == 1 || B == 8) && C <= numPlayers && !NPCIsABonus(NPC[A]))
     {
         if(NPC[A].Type == NPCID_PLR_FIREBALL || NPC[A].Type == NPCID_COIN_SWITCH || NPC[A].Type == NPCID_TIME_SWITCH || NPC[A].Type == NPCID_TNT)
         {
         }
-        else if(oldNPC.Type == 137 || NPC[A].Type == NPCID_SLIDE_BLOCK || oldNPC.Type == 166 || NPC[A].Type == NPCID_BULLY || (NPCIsAShell[oldNPC.Type] && B != 8))
+        else if(oldNPC.Type == 137 || NPC[A].Type == NPCID_SLIDE_BLOCK || oldNPC.Type == 166 || NPC[A].Type == NPCID_BULLY || (NPCIsAShell(oldNPC) && B != 8))
         {
             if(B != 8) // (.Type = 45 And B = 8) Then
             {
@@ -2221,18 +2223,18 @@ void NPCHit(int A, int B, int C)
             }
             else
             {
-                MoreScore(NPCScore[NPC[A].Type], NPC[A].Location, Player[C].Multiplier);
+                MoreScore(NPC[A]->Score, NPC[A].Location, Player[C].Multiplier);
                 if(Player[C].Multiplier > NPC[A].Multiplier)
                     NPC[A].Multiplier = Player[C].Multiplier;
             }
         }
     }
 
-    if((B == 2 || B == 7) && !NPCIsABonus[NPC[A].Type] && oldNPC.Type != 194 && NPC[A].Type != NPCID_EARTHQUAKE_BLOCK)
+    if((B == 2 || B == 7) && !NPCIsABonus(NPC[A]) && oldNPC.Type != 194 && NPC[A].Type != NPCID_EARTHQUAKE_BLOCK)
     {
         if(NPC[A].Killed != 0 || NPC[A].Type != oldNPC.Type)
         {
-            MoreScore(NPCScore[NPC[A].Type], NPC[A].Location);
+            MoreScore(NPC[A]->Score, NPC[A].Location);
             if(B == 2)
                 NewEffect(EFFID_WHACK, newLoc(NPC[A].Location.X, NPC[A].Location.Y + NPC[A].Location.Height - 16));
         }
@@ -2246,7 +2248,7 @@ void NPCHit(int A, int B, int C)
         }
     }
 
-    if(B == 4 && NPC[A].Killed == 4 && !NPCIsACoin[NPC[A].Type] && C != A && NPC[A].Type != NPCID_PLR_FIREBALL && NPC[A].Type != NPCID_PLR_ICEBALL && NPC[A].Type != NPCID_PET_FIRE && NPC[A].Type != NPCID_EARTHQUAKE_BLOCK)
+    if(B == 4 && NPC[A].Killed == 4 && !NPCIsACoin(NPC[A]) && C != A && NPC[A].Type != NPCID_PLR_FIREBALL && NPC[A].Type != NPCID_PLR_ICEBALL && NPC[A].Type != NPCID_PET_FIRE && NPC[A].Type != NPCID_EARTHQUAKE_BLOCK)
     {
         if(NPC[C].Type != NPCID_BOSS_CASE)
         {
@@ -2254,7 +2256,7 @@ void NPCHit(int A, int B, int C)
             {
                 if(NPC[C].Multiplier < NPC[A].Multiplier)
                     NPC[C].Multiplier = NPC[A].Multiplier;
-                MoreScore(NPCScore[NPC[A].Type], NPC[A].Location, NPC[C].Multiplier);
+                MoreScore(NPC[A]->Score, NPC[A].Location, NPC[C].Multiplier);
             }
         }
     }
@@ -2263,16 +2265,16 @@ void NPCHit(int A, int B, int C)
     {
         if(NPC[A].Multiplier < NPC[C].Multiplier)
             NPC[A].Multiplier = NPC[C].Multiplier;
-        MoreScore(NPCScore[NPC[A].Type], NPC[A].Location, NPC[A].Multiplier);
+        MoreScore(NPC[A]->Score, NPC[A].Location, NPC[A].Multiplier);
     }
 
     if(B == 6 && NPC[A].Killed == 6 && (NPC[A].Type == NPCID_BOSS_FRAGILE || NPC[A].Type == NPCID_VILLAIN_S1 || NPC[A].Type == NPCID_SICK_BOSS || NPC[A].Type == NPCID_MINIBOSS || NPC[A].Type == NPCID_SPIT_BOSS || NPC[A].Type == NPCID_VILLAIN_S3))
     {
-        if(!NPCWontHurt[NPC[A].Type] && !NPCIsABonus[NPC[A].Type] && NPC[A].Type != NPCID_PLR_FIREBALL)
-            MoreScore(NPCScore[NPC[A].Type], NPC[A].Location);
+        if(!NPC[A]->WontHurt && !NPCIsABonus(NPC[A]) && NPC[A].Type != NPCID_PLR_FIREBALL)
+            MoreScore(NPC[A]->Score, NPC[A].Location);
     }
 
-    if(!NPCIsACoin[NPC[A].Type] && B == 3 && C != A &&
+    if(!NPCIsACoin(NPC[A]) && B == 3 && C != A &&
        (NPC[A].Killed == B || !fEqual(NPC[A].Damage, oldNPC.Damage)) &&
         NPC[A].Type != NPCID_PLR_FIREBALL && NPC[A].Type != NPCID_PET_FIRE && NPC[A].Type != NPCID_SLIDE_BLOCK &&
         NPC[A].Type != NPCID_HOMING_BALL && NPC[A].Type != NPCID_EARTHQUAKE_BLOCK)
@@ -2281,7 +2283,7 @@ void NPCHit(int A, int B, int C)
         {
             if(NPC[C].Multiplier < NPC[A].Multiplier)
                 NPC[C].Multiplier = NPC[A].Multiplier;
-            MoreScore(NPCScore[NPC[A].Type], NPC[A].Location, NPC[C].Multiplier);
+            MoreScore(NPC[A]->Score, NPC[A].Location, NPC[C].Multiplier);
         }
         if(NPC[A].Type != NPCID_BOSS_CASE && NPC[A].Type != NPCID_BOSS_FRAGILE)
         {
@@ -2313,10 +2315,10 @@ void NPCHit(int A, int B, int C)
     if(NPC[A].Type != oldNPC.Type)
     {
         NPC[A].Location.Y += NPC[A].Location.Height;
-        NPC[A].Location.Height = NPCHeight[NPC[A].Type];
+        NPC[A].Location.Height = NPC[A]->THeight;
         NPC[A].Location.Y -= NPC[A].Location.Height;
         NPC[A].Location.X += (NPC[A].Location.Width / 2.0);
-        NPC[A].Location.Width = NPCWidth[NPC[A].Type];
+        NPC[A].Location.Width = NPC[A]->TWidth;
         NPC[A].Location.X -= (NPC[A].Location.Width / 2.0);
     }
 

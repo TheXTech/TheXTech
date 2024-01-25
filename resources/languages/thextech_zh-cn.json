@@ -122,7 +122,8 @@
                 "featureWorldStarDisplay": "使用了大地图的设置以显示星星数量。",
                 "featuresWillBeLost": "下列特性将会丢失：",
                 "formatUnknown": "请求的格式不支持。",
-                "noIssues": "该操作不会造成任何兼容性问题。"
+                "noIssues": "该操作不会造成任何兼容性问题。",
+                "featureBgoOrder": "背景对象设置了自定义叠放次序。"
             },
             "formatLegacy": "旧版本",
             "formatModern": "新版本",
@@ -324,7 +325,9 @@
             "phraseCreditIndex": "地图制作团队 第{0}行：",
             "retryOnFail": "失败之后重新开始",
             "totalStars": "总星星数："
-        }
+        },
+        "labelSortLayer": "叠放图层：",
+        "labelSortOffset": "叠放次序："
     },
     "game": {
         "connect": {
@@ -616,7 +619,8 @@
         "nameVitalyNovichkov": "维塔利·诺维奇科夫",
         "originalBy": "原始VB6代码：",
         "psVitaPortBy": "PS Vita移植：",
-        "specialThanks": "特别鸣谢："
+        "specialThanks": "特别鸣谢：",
+        "qualityControl": "品质管理："
     },
     "pluralRules": "singular-only"
 }

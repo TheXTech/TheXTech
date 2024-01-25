@@ -33,6 +33,7 @@
 #include "npc.h"
 #include "npc_id.h"
 #include "eff_id.h"
+#include "npc_traits.h"
 #include "player.h"
 #include "sorting.h"
 #include "layers.h"
@@ -334,8 +335,8 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
                     }
 
                     auto &nLoc = nn.Location;
-                    nLoc.Width = NPCWidth[nn.Type];
-                    nLoc.Height = NPCHeight[nn.Type];
+                    nLoc.Width = nn->TWidth;
+                    nLoc.Height = nn->THeight;
                     nLoc.X = b.Location.X + b.Location.Width / 2.0 - nLoc.Width / 2.0;
                     nLoc.Y = b.Location.Y - nLoc.Height - 0.01;
                     nLoc.SpeedX = dRand() * 3 - 1.5;
@@ -421,8 +422,8 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
 #endif
                 nn.Type = NPCID_COIN_S2;
 
-                nn.Location.Width = NPCWidth[nn.Type];
-                nn.Location.Height = NPCHeight[nn.Type];
+                nn.Location.Width = nn->TWidth;
+                nn.Location.Height = nn->THeight;
                 nn.Location.X = b.Location.X + b.Location.Width / 2.0 - nn.Location.Width / 2.0;
                 nn.Location.Y = b.Location.Y - nn.Location.Height - 0.01;
                 nn.Location.SpeedX = dRand() * 3.0 - 1.5;
@@ -541,7 +542,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
         }
 
 #if 0 // Completely disable the DEAD the code that spawns the player
-        if(NPCIsABonus[C] && C != 169 && C != 170) // check to see if it should spawn a dead player
+        if(NPCIsABonus(C) && C != 169 && C != 170) // check to see if it should spawn a dead player
         {
             tempPlayer = CheckDead();
             if(g_ClonedPlayerMode)
@@ -582,7 +583,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
             else if(C == NPCID_FIRE_POWER_S1)
                 replacement = NPCID_POWER_S1;
 
-            if(NPCIsYoshi[C])
+            if(NPCIsYoshi(C))
             {
                 nn.Type = NPCID_ITEM_POD;
                 nn.Special = C;
@@ -617,12 +618,12 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
 
             CharStuff(numNPCs);
 
-            // note: minor SMBX64 bug, should be NPCWidth[nn.Type]
-            nn.Location.Width = NPCWidth[C];
+            // note: minor SMBX64 bug, should be nn->TWidth
+            nn.Location.Width = NPCWidth(C);
 
             // bug from ancient 101 case
             if(is_ancient && C == NPCID_FODDER_S3)
-                nn.Location.Width = NPCWidth[NPCID_POWER_S3];
+                nn.Location.Width = NPCWidth(NPCID_POWER_S3);
 
             // Make block a bit smaller to allow player take a bonus easier (Redigit's idea)
             if(!is_ancient && fEqual(b.Location.Width, 32))
@@ -644,7 +645,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
             if(is_ancient && C == NPCID_GRN_BOOT)
                 nn.Direction = -1;
 
-            if(NPCIsYoshi[C]) // if the npc is pet then set the color of the pod
+            if(NPCIsYoshi(C)) // if the npc is pet then set the color of the pod
             {
                 if(C == NPCID_PET_BLUE)
                     nn.Frame = 1;
@@ -669,7 +670,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
                 if(is_ancient)
                     nn.Location.Y = b.Location.Y - 0.1;
 
-                if(NPCIsYoshi[C])
+                if(NPCIsYoshi(C))
                 {
                     nn.Effect = 0;
                     nn.Location.Height = 32;
@@ -680,7 +681,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
                     nn.Effect = 0;
                     nn.Location.Y = b.Location.Y - 32;
                     nn.Location.SpeedY = -6;
-                    nn.Location.Height = NPCHeight[C];
+                    nn.Location.Height = NPCHeight(C);
                     // PlaySound(SFX_ItemEmerge); // Don't play mushroom sound on leaf, like in original SMB3 (Redigit's comment)
                 }
                 else
@@ -702,7 +703,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
             else
             {
                 nn.Location.Y = b.Location.Y + 4;
-                nn.Location.Height = NPCHeight[C];
+                nn.Location.Height = NPCHeight(C);
 
                 // hardcoded to 32 in ancient 101 / 104 / 201 cases
                 if(is_ancient)
@@ -720,8 +721,8 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
             {
                 // the logic is the next clause didn't exist in ancient cases
             }
-            else if(NPCIsYoshi[nn.Type] ||
-               NPCIsBoot[nn.Type] || nn.Type == NPCID_POWER_S3 ||
+            else if(NPCIsYoshi(nn) ||
+               NPCIsBoot(nn) || nn.Type == NPCID_POWER_S3 ||
                nn.Type == NPCID_FIRE_POWER_S3 || nn.Type == NPCID_CANNONITEM ||
                nn.Type == NPCID_LIFE_S3 || nn.Type == NPCID_POISON ||
                nn.Type == NPCID_STATUE_POWER || nn.Type == NPCID_HEAVY_POWER ||
@@ -772,8 +773,8 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
         nn.Type = NPCID_COIN_S4;
         nn.Block = 89;
         nn.Location = b.Location;
-        nn.Location.Width = NPCWidth[nn.Type];
-        nn.Location.Height = NPCHeight[nn.Type];
+        nn.Location.Width = nn->TWidth;
+        nn.Location.Height = nn->THeight;
         nn.Location.X += (b.Location.Width - nn.Location.Width) / 2.0;
         nn.Location.Y -= 0.01;
         nn.DefaultLocation = nn.Location;
@@ -1350,9 +1351,9 @@ void UpdateBlocks()
             {
                 if(NPC[B].Active)
                 {
-                    if(NPC[B].Killed == 0 && NPC[B].Effect == 0 && NPC[B].HoldingPlayer == 0 && (!NPCNoClipping[NPC[B].Type] || NPCIsACoin[NPC[B].Type]))
+                    if(NPC[B].Killed == 0 && NPC[B].Effect == 0 && NPC[B].HoldingPlayer == 0 && (!NPC[B]->NoClipping || NPCIsACoin(NPC[B])))
                     {
-                        if(ib.ShakeY3 <= 0 || NPCIsACoin[NPC[B].Type])
+                        if(ib.ShakeY3 <= 0 || NPCIsACoin(NPC[B]))
                         {
                             if(ShakeCollision(NPC[B].Location, ib.Location, ib.ShakeY3))
                             {
@@ -1472,7 +1473,7 @@ void PSwitch(bool enabled)
     {
         for(A = 1; A <= numNPCs; A++)
         {
-            bool transform = NPCIsACoin[NPC[A].Type] && NPC[A].Block == 0 && !NPC[A].Hidden && NPC[A].Special == 0.0;
+            bool transform = NPCIsACoin(NPC[A]) && NPC[A].Block == 0 && !NPC[A].Hidden && NPC[A].Special == 0.0;
 
             if(NPC[A].Type == NPCID_MEDAL && g_compatibility.fix_special_coin_switch)
                 transform = false;
@@ -1579,14 +1580,14 @@ void PSwitch(bool enabled)
                     nn.Location = Block[A].Location;
                     nn.Location.SpeedX = 0;
                     nn.Location.SpeedY = 0;
-                    nn.Location.Width = NPCWidth[nn.Type];
-                    nn.Location.Height = NPCHeight[nn.Type];
+                    nn.Location.Width = nn->TWidth;
+                    nn.Location.Height = nn->THeight;
                     nn.Location.X += (Block[A].Location.Width - nn.Location.Width) / 2.0;
                     nn.DefaultLocation = nn.Location;
                     nn.DefaultType = nn.Type;
 
                     // WARNING: this is new logic from #167. Check in case of any inconsistencies after Coin Switch is activated.
-                    if(NPCFrame[nn.Type] > 0)
+                    if(nn->TFrames > 0)
                     {
                         nn.Direction = 1;
                         nn.Frame = EditorNPCFrame(nn.Type, nn.Direction);
@@ -1708,14 +1709,14 @@ void PSwitch(bool enabled)
                     nn.Location = Block[A].Location;
                     nn.Location.SpeedX = 0;
                     nn.Location.SpeedY = 0;
-                    nn.Location.Width = NPCWidth[nn.Type];
-                    nn.Location.Height = NPCHeight[nn.Type];
+                    nn.Location.Width = nn->TWidth;
+                    nn.Location.Height = nn->THeight;
                     nn.Location.X += (Block[A].Location.Width - nn.Location.Width) / 2.0;
                     nn.DefaultLocation = nn.Location;
                     nn.DefaultType = nn.Type;
 
                     // WARNING: this is new logic from #167. Check in case of any inconsistencies after Coin Switch is activated.
-                    if(NPCFrame[nn.Type] > 0)
+                    if(nn->TFrames > 0)
                     {
                         nn.Direction = 1;
                         nn.Frame = EditorNPCFrame(nn.Type, nn.Direction);
@@ -1863,7 +1864,7 @@ void PowBlock()
             {
                 for(int A : treeNPCQuery(query_loc, SORTMODE_NONE))
                 {
-                    if(!NPC[A].Active && NPCIsACoin[NPC[A].Type])
+                    if(!NPC[A].Active && NPCIsACoin(NPC[A]))
                     {
                         NPC[A].JustActivated = vscreen_Z;
 
@@ -1884,7 +1885,7 @@ void PowBlock()
     {
         if(NPC[A].Active)
         {
-            if(NPCIsACoin[NPC[A].Type])
+            if(NPCIsACoin(NPC[A]))
             {
                 NPC[A].Special = 1;
                 NPC[A].Location.SpeedX = (dRand() * 1.0) - 0.5;

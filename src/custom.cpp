@@ -25,6 +25,7 @@
 
 #include "custom.h"
 #include "compat.h"
+#include "npc_traits.h"
 
 #include <utility>
 
@@ -68,47 +69,7 @@ const char *s_playerFileName[] = {nullptr, "mario", "luigi", "peach", "toad", "l
 
 static struct NPCDefaults_t
 {
-    RangeArrI<int, 0, maxNPCType, 0> NPCFrameOffsetX;
-    RangeArrI<int, 0, maxNPCType, 0> NPCFrameOffsetY;
-    RangeArrI<int, 0, maxNPCType, 0> NPCWidth;
-    RangeArrI<int, 0, maxNPCType, 0> NPCHeight;
-    RangeArrI<int, 0, maxNPCType, 0> NPCWidthGFX;
-    RangeArrI<int, 0, maxNPCType, 0> NPCHeightGFX;
-    RangeArrI<bool, 0, maxNPCType, false> NPCIsAShell;
-    RangeArrI<bool, 0, maxNPCType, false> NPCIsABlock;
-    RangeArrI<bool, 0, maxNPCType, false> NPCIsAHit1Block;
-    RangeArrI<bool, 0, maxNPCType, false> NPCIsABonus;
-    RangeArrI<bool, 0, maxNPCType, false> NPCIsACoin;
-    RangeArrI<bool, 0, maxNPCType, false> NPCIsAVine;
-    RangeArrI<bool, 0, maxNPCType, false> NPCIsAnExit;
-    RangeArrI<bool, 0, maxNPCType, false> NPCIsAParaTroopa;
-    RangeArrI<bool, 0, maxNPCType, false> NPCIsCheep;
-    RangeArrI<bool, 0, maxNPCType, false> NPCJumpHurt;
-    RangeArrI<bool, 0, maxNPCType, false> NPCNoClipping;
-    RangeArrI<int, 0, maxNPCType, 0> NPCScore;
-    RangeArrI<bool, 0, maxNPCType, false> NPCCanWalkOn;
-    RangeArrI<bool, 0, maxNPCType, false> NPCGrabFromTop;
-    RangeArrI<bool, 0, maxNPCType, false> NPCTurnsAtCliffs;
-    RangeArrI<bool, 0, maxNPCType, false> NPCWontHurt;
-    RangeArrI<bool, 0, maxNPCType, false> NPCMovesPlayer;
-    RangeArrI<bool, 0, maxNPCType, false> NPCStandsOnPlayer;
-    RangeArrI<bool, 0, maxNPCType, false> NPCIsGrabbable;
-    RangeArrI<bool, 0, maxNPCType, false> NPCIsBoot;
-    RangeArrI<bool, 0, maxNPCType, false> NPCIsYoshi;
-    RangeArrI<bool, 0, maxNPCType, false> NPCIsToad;
-    RangeArrI<bool, 0, maxNPCType, false> NPCNoYoshi;
-    RangeArrI<bool, 0, maxNPCType, false> NPCForeground;
-    RangeArrI<bool, 0, maxNPCType, false> NPCIsABot;
-    RangeArrI<bool, 0, maxNPCType, false> NPCDefaultMovement;
-    RangeArrI<bool, 0, maxNPCType, false> NPCIsVeggie;
-    RangeArr<float, 0, maxNPCType> NPCSpeedvar;
-    RangeArrI<bool, 0, maxNPCType, false> NPCNoFireBall;
-    RangeArrI<bool, 0, maxNPCType, false> NPCNoIceBall;
-    RangeArrI<bool, 0, maxNPCType, false> NPCNoGravity;
-
-    RangeArrI<int, 0, maxNPCType, 0> NPCFrame;
-    RangeArrI<int, 0, maxNPCType, 0> NPCFrameSpeed;
-    RangeArrI<int, 0, maxNPCType, 0> NPCFrameStyle;
+    RangeArr<NPCTraits_t, 0, maxNPCType> NPCTraits;
 //End Type
 } s_NPCDefaults;
 
@@ -191,19 +152,19 @@ SDL_FORCE_INLINE void loadNpcSetupFixes()
     // TODO: Implement settings fixing logic here!
     if(g_compatibility.custom_powerup_collect_score)
     {
-        NPCScore[9] = 6; // Set Default Scores for PowerUps (6=1000)
-        NPCScore[184] = 6; // Mushrooms
-        NPCScore[185] = 6;
-        NPCScore[249] = 6;
-        NPCScore[250] = 6;
-        NPCScore[14] = 6; // Fire Flowers
-        NPCScore[182] = 6;
-        NPCScore[183] = 6;
-        NPCScore[34] = 6; // Leaf
-        NPCScore[169] = 6; // Tanooki
-        NPCScore[170] = 6; // Hammer Suit
-        NPCScore[264] = 6; // Ice Flowers
-        NPCScore[277] = 6;
+        NPCTraits[9].Score = 6; // Set Default Scores for PowerUps (6=1000)
+        NPCTraits[184].Score = 6; // Mushrooms
+        NPCTraits[185].Score = 6;
+        NPCTraits[249].Score = 6;
+        NPCTraits[250].Score = 6;
+        NPCTraits[14].Score = 6; // Fire Flowers
+        NPCTraits[182].Score = 6;
+        NPCTraits[183].Score = 6;
+        NPCTraits[34].Score = 6; // Leaf
+        NPCTraits[169].Score = 6; // Tanooki
+        NPCTraits[170].Score = 6; // Hammer Suit
+        NPCTraits[264].Score = 6; // Ice Flowers
+        NPCTraits[277].Score = 6;
     }
 }
 
@@ -212,59 +173,19 @@ void SaveNPCDefaults()
     DirListCI NPCDir = DirListCI(AppPath + "graphics/npc/");
     std::string npcPathRes;
 
-    NPCFrame.fill(0);
-    NPCFrameSpeed.fill(8);
-    NPCFrameStyle.fill(0);
-
     for(int A = 1; A <= maxNPCType; A++)
     {
+        NPCTraits[A].TFrames = 0;
+        NPCTraits[A].FrameSpeed = 8;
+        NPCTraits[A].FrameStyle = 0;
+
         // Global override of NPC setup
         npcPathRes = NPCDir.resolveFileCaseExistsAbs(fmt::format_ne("npc-{0}.txt", A));
 
         if(!npcPathRes.empty())
             LoadCustomNPC(A, npcPathRes);
 
-        s_NPCDefaults.NPCFrameOffsetX[A] = NPCFrameOffsetX[A];
-        s_NPCDefaults.NPCFrameOffsetY[A] = NPCFrameOffsetY[A];
-        s_NPCDefaults.NPCWidth[A] = NPCWidth[A];
-        s_NPCDefaults.NPCHeight[A] = NPCHeight[A];
-        s_NPCDefaults.NPCWidthGFX[A] = NPCWidthGFX[A];
-        s_NPCDefaults.NPCHeightGFX[A] = NPCHeightGFX[A];
-        s_NPCDefaults.NPCIsAShell[A] = NPCIsAShell[A];
-        s_NPCDefaults.NPCIsABlock[A] = NPCIsABlock[A];
-        s_NPCDefaults.NPCIsAHit1Block[A] = NPCIsAHit1Block[A];
-        s_NPCDefaults.NPCIsABonus[A] = NPCIsABonus[A];
-        s_NPCDefaults.NPCIsACoin[A] = NPCIsACoin[A];
-        s_NPCDefaults.NPCIsAVine[A] = NPCIsAVine[A];
-        s_NPCDefaults.NPCIsAnExit[A] = NPCIsAnExit[A];
-        s_NPCDefaults.NPCIsAParaTroopa[A] = NPCIsAParaTroopa[A];
-        s_NPCDefaults.NPCIsCheep[A] = NPCIsCheep[A];
-        s_NPCDefaults.NPCJumpHurt[A] = NPCJumpHurt[A];
-        s_NPCDefaults.NPCNoClipping[A] = NPCNoClipping[A];
-        s_NPCDefaults.NPCScore[A] = NPCScore[A];
-        s_NPCDefaults.NPCCanWalkOn[A] = NPCCanWalkOn[A];
-        s_NPCDefaults.NPCGrabFromTop[A] = NPCGrabFromTop[A];
-        s_NPCDefaults.NPCTurnsAtCliffs[A] = NPCTurnsAtCliffs[A];
-        s_NPCDefaults.NPCWontHurt[A] = NPCWontHurt[A];
-        s_NPCDefaults.NPCMovesPlayer[A] = NPCMovesPlayer[A];
-        s_NPCDefaults.NPCStandsOnPlayer[A] = NPCStandsOnPlayer[A];
-        s_NPCDefaults.NPCIsGrabbable[A] = NPCIsGrabbable[A];
-        s_NPCDefaults.NPCIsBoot[A] = NPCIsBoot[A];
-        s_NPCDefaults.NPCIsYoshi[A] = NPCIsYoshi[A];
-        s_NPCDefaults.NPCIsToad[A] = NPCIsToad[A];
-        s_NPCDefaults.NPCNoYoshi[A] = NPCNoYoshi[A];
-        s_NPCDefaults.NPCForeground[A] = NPCForeground[A];
-        s_NPCDefaults.NPCIsABot[A] = NPCIsABot[A];
-        s_NPCDefaults.NPCDefaultMovement[A] = NPCDefaultMovement[A];
-        s_NPCDefaults.NPCIsVeggie[A] = NPCIsVeggie[A];
-        s_NPCDefaults.NPCSpeedvar[A] = NPCSpeedvar[A];
-        s_NPCDefaults.NPCNoFireBall[A] = NPCNoFireBall[A];
-        s_NPCDefaults.NPCNoIceBall[A] = NPCNoIceBall[A];
-        s_NPCDefaults.NPCNoGravity[A] = NPCNoGravity[A];
-
-        s_NPCDefaults.NPCFrame[A] = NPCFrame[A];
-        s_NPCDefaults.NPCFrameSpeed[A] = NPCFrameSpeed[A];
-        s_NPCDefaults.NPCFrameStyle[A] = NPCFrameStyle[A];
+        s_NPCDefaults.NPCTraits[A] = NPCTraits[A];
     }
 }
 
@@ -272,49 +193,7 @@ void LoadNPCDefaults()
 {
     int A = 0;
     for(A = 1; A <= maxNPCType; A++)
-    {
-        NPCFrameOffsetX[A] = s_NPCDefaults.NPCFrameOffsetX[A];
-        NPCFrameOffsetY[A] = s_NPCDefaults.NPCFrameOffsetY[A];
-        NPCWidth[A] = s_NPCDefaults.NPCWidth[A];
-        NPCHeight[A] = s_NPCDefaults.NPCHeight[A];
-        NPCWidthGFX[A] = s_NPCDefaults.NPCWidthGFX[A];
-        NPCHeightGFX[A] = s_NPCDefaults.NPCHeightGFX[A];
-        NPCIsAShell[A] = s_NPCDefaults.NPCIsAShell[A];
-        NPCIsABlock[A] = s_NPCDefaults.NPCIsABlock[A];
-        NPCIsAHit1Block[A] = s_NPCDefaults.NPCIsAHit1Block[A];
-        NPCIsABonus[A] = s_NPCDefaults.NPCIsABonus[A];
-        NPCIsACoin[A] = s_NPCDefaults.NPCIsACoin[A];
-        NPCIsAVine[A] = s_NPCDefaults.NPCIsAVine[A];
-        NPCIsAnExit[A] = s_NPCDefaults.NPCIsAnExit[A];
-        NPCIsAParaTroopa[A] = s_NPCDefaults.NPCIsAParaTroopa[A];
-        NPCIsCheep[A] = s_NPCDefaults.NPCIsCheep[A];
-        NPCJumpHurt[A] = s_NPCDefaults.NPCJumpHurt[A];
-        NPCNoClipping[A] = s_NPCDefaults.NPCNoClipping[A];
-        NPCScore[A] = s_NPCDefaults.NPCScore[A];
-        NPCCanWalkOn[A] = s_NPCDefaults.NPCCanWalkOn[A];
-        NPCGrabFromTop[A] = s_NPCDefaults.NPCGrabFromTop[A];
-        NPCTurnsAtCliffs[A] = s_NPCDefaults.NPCTurnsAtCliffs[A];
-        NPCWontHurt[A] = s_NPCDefaults.NPCWontHurt[A];
-        NPCMovesPlayer[A] = s_NPCDefaults.NPCMovesPlayer[A];
-        NPCStandsOnPlayer[A] = s_NPCDefaults.NPCStandsOnPlayer[A];
-        NPCIsGrabbable[A] = s_NPCDefaults.NPCIsGrabbable[A];
-        NPCIsBoot[A] = s_NPCDefaults.NPCIsBoot[A];
-        NPCIsYoshi[A] = s_NPCDefaults.NPCIsYoshi[A];
-        NPCIsToad[A] = s_NPCDefaults.NPCIsToad[A];
-        NPCNoYoshi[A] = s_NPCDefaults.NPCNoYoshi[A];
-        NPCForeground[A] = s_NPCDefaults.NPCForeground[A];
-        NPCIsABot[A] = s_NPCDefaults.NPCIsABot[A];
-        NPCDefaultMovement[A] = s_NPCDefaults.NPCDefaultMovement[A];
-        NPCIsVeggie[A] = s_NPCDefaults.NPCIsVeggie[A];
-        NPCSpeedvar[A] = s_NPCDefaults.NPCSpeedvar[A];
-        NPCNoFireBall[A] = s_NPCDefaults.NPCNoFireBall[A];
-        NPCNoIceBall[A] = s_NPCDefaults.NPCNoIceBall[A];
-        NPCNoGravity[A] = s_NPCDefaults.NPCNoGravity[A];
-
-        NPCFrame[A] = s_NPCDefaults.NPCFrame[A];
-        NPCFrameSpeed[A] = s_NPCDefaults.NPCFrameSpeed[A];
-        NPCFrameStyle[A] = s_NPCDefaults.NPCFrameStyle[A];
-    }
+        NPCTraits[A] = s_NPCDefaults.NPCTraits[A];
 
     loadNpcSetupFixes();
 }
@@ -468,56 +347,58 @@ void LoadCustomNPC(int A, std::string cFileName)
     NPCConfigFile npc;
     FileFormats::ReadNpcTXTFileF(std::move(cFileName), npc, true);
 
+    auto& traits = NPCTraits[A];
+
     if(npc.en_gfxoffsetx)
-        NPCFrameOffsetX[A] = npc.gfxoffsetx;
+        traits.FrameOffsetX = npc.gfxoffsetx;
     if(npc.en_gfxoffsety)
-        NPCFrameOffsetY[A] = npc.gfxoffsety;
+        traits.FrameOffsetY = npc.gfxoffsety;
     if(npc.en_width)
-        NPCWidth[A] = int(npc.width);
+        traits.TWidth = int(npc.width);
     if(npc.en_height)
-        NPCHeight[A] = int(npc.height);
+        traits.THeight = int(npc.height);
     if(npc.en_gfxwidth)
-        NPCWidthGFX[A] = int(npc.gfxwidth);
+        traits.WidthGFX = int(npc.gfxwidth);
     if(npc.en_gfxheight)
-        NPCHeightGFX[A] = int(npc.gfxheight);
+        traits.HeightGFX = int(npc.gfxheight);
     if(npc.en_score)
-        NPCScore[A] = int(npc.score);
+        traits.Score = int(npc.score);
     if(npc.en_playerblock)
-        NPCMovesPlayer[A] = npc.playerblock;
+        traits.MovesPlayer = npc.playerblock;
     if(npc.en_playerblocktop)
-        NPCCanWalkOn[A] = npc.playerblocktop;
+        traits.CanWalkOn = npc.playerblocktop;
     if(npc.en_npcblock)
-        NPCIsABlock[A] = npc.npcblock;
+        traits.IsABlock = npc.npcblock;
     if(npc.en_npcblocktop)
-        NPCIsAHit1Block[A] = npc.npcblocktop;
+        traits.IsAHit1Block = npc.npcblocktop;
     if(npc.en_grabside)
-        NPCIsGrabbable[A] = npc.grabside;
+        traits.IsGrabbable = npc.grabside;
     if(npc.en_grabtop)
-        NPCGrabFromTop[A] = npc.grabtop;
+        traits.GrabFromTop = npc.grabtop;
     if(npc.en_jumphurt)
-        NPCJumpHurt[A] = npc.jumphurt;
+        traits.JumpHurt = npc.jumphurt;
     if(npc.en_nohurt)
-        NPCWontHurt[A] = npc.nohurt;
+        traits.WontHurt = npc.nohurt;
     if(npc.en_noblockcollision)
-        NPCNoClipping[A] = npc.noblockcollision;
+        traits.NoClipping = npc.noblockcollision;
     if(npc.en_cliffturn)
-        NPCTurnsAtCliffs[A] = npc.cliffturn;
+        traits.TurnsAtCliffs = npc.cliffturn;
     if(npc.en_noyoshi)
-        NPCNoYoshi[A] = npc.noyoshi;
+        traits.NoYoshi = npc.noyoshi;
     if(npc.en_foreground)
-        NPCForeground[A] = npc.foreground;
+        traits.Foreground = npc.foreground;
     if(npc.en_speed)
-        NPCSpeedvar[A] = float(npc.speed);
+        traits.Speedvar = float(npc.speed);
     if(npc.en_nofireball)
-        NPCNoFireBall[A] = npc.nofireball;
+        traits.NoFireBall = npc.nofireball;
     if(npc.en_noiceball)
-        NPCNoIceBall[A] = npc.noiceball;
+        traits.NoIceBall = npc.noiceball;
     if(npc.en_nogravity)
-        NPCNoGravity[A] = npc.nogravity;
+        traits.NoGravity = npc.nogravity;
     if(npc.en_frames)
-        NPCFrame[A] = int(npc.frames);
+        traits.TFrames = int(npc.frames);
     if(npc.en_framespeed)
-        NPCFrameSpeed[A] = int(npc.framespeed);
+        traits.FrameSpeed = int(npc.framespeed);
     if(npc.en_framestyle)
-        NPCFrameStyle[A] = int(npc.framestyle);
+        traits.FrameStyle = int(npc.framestyle);
 }

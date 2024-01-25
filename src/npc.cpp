@@ -38,6 +38,7 @@
 #include "core/events.h"
 #include "npc_id.h"
 #include "eff_id.h"
+#include "npc_traits.h"
 #include "layers.h"
 
 #include "npc/npc_queues.h"
@@ -185,7 +186,7 @@ void Deactivate(int A)
                 treeNPCSplitTempBlock(A);
         }
     }
-    else if(NPCIsAnExit[NPC[A].Type])
+    else if(NPCIsAnExit(NPC[A]))
         NPC[A].TimeLeft = 100;
     else
     {
@@ -231,7 +232,7 @@ void Bomb(Location_t Location, int Game, int ImmunePlayer)
 
     for(int i : treeNPCQuery(newLoc(X - Radius, Y - Radius, Radius * 2, Radius * 2), SORTMODE_ID))
     {
-        if(!NPC[i].Hidden && NPC[i].Active && !NPC[i].Inert && !NPC[i].Generator && !NPCIsABonus[NPC[i].Type])
+        if(!NPC[i].Hidden && NPC[i].Active && !NPC[i].Inert && !NPC[i].Generator && !NPCIsABonus(NPC[i]))
         {
             if(NPC[i].Type != NPCID_PLR_FIREBALL && NPC[i].Type != NPCID_CHAR3_HEAVY)
             {
@@ -243,7 +244,7 @@ void Bomb(Location_t Location, int Game, int ImmunePlayer)
                 {
                     NPC[0].Location = NPC[i].Location;
                     NPCHit(i, 3, 0);
-                    if(NPCIsVeggie[NPC[i].Type])
+                    if(NPCIsVeggie(NPC[i]))
                     {
                         NPC[i].Projectile = true;
                         NPC[i].Location.SpeedY = -5;
@@ -310,8 +311,8 @@ void DropNPC(int A, int NPCType)
         numNPCs++;
         NPC[numNPCs] = NPC_t();
         NPC[numNPCs].Type = NPCType;
-        NPC[numNPCs].Location.Width = NPCWidth[NPCType];
-        NPC[numNPCs].Location.Height = NPCHeight[NPCType];
+        NPC[numNPCs].Location.Width = NPCWidth(NPCType);
+        NPC[numNPCs].Location.Height = NPCHeight(NPCType);
         if(ScreenType == 5 && !vScreen[2].Visible)
         {
             if(A == 1)
@@ -343,12 +344,12 @@ void TurnNPCsIntoCoins()
     {
         if(NPC[A].Active && !NPC[A].Generator)
         {
-            if(!NPC[A].Hidden && NPC[A].Killed == 0 && !NPCIsAnExit[NPC[A].Type] && !NPC[A].Inert)
+            if(!NPC[A].Hidden && NPC[A].Killed == 0 && !NPCIsAnExit(NPC[A]) && !NPC[A].Inert)
             {
-                if(!NPCIsYoshi[NPC[A].Type] && !NPCIsBoot[NPC[A].Type] &&
-                   !NPCIsABonus[NPC[A].Type] && NPC[A].Type != NPCID_PLR_ICEBALL && NPC[A].Type != NPCID_PLR_FIREBALL &&
-                   NPC[A].Type != NPCID_PET_FIRE && NPC[A].Type != NPCID_SPRING && !NPCIsVeggie[NPC[A].Type] &&
-                   NPC[A].Type != NPCID_ITEM_BURIED && NPC[A].Type != NPCID_PLR_HEAVY && !NPCIsAVine[NPC[A].Type] &&
+                if(!NPCIsYoshi(NPC[A]) && !NPCIsBoot(NPC[A]) &&
+                   !NPCIsABonus(NPC[A]) && NPC[A].Type != NPCID_PLR_ICEBALL && NPC[A].Type != NPCID_PLR_FIREBALL &&
+                   NPC[A].Type != NPCID_PET_FIRE && NPC[A].Type != NPCID_SPRING && !NPCIsVeggie(NPC[A]) &&
+                   NPC[A].Type != NPCID_ITEM_BURIED && NPC[A].Type != NPCID_PLR_HEAVY && !NPCIsAVine(NPC[A]) &&
                    NPC[A].Type != NPCID_VEHICLE && NPC[A].Type != NPCID_YEL_PLATFORM && NPC[A].Type != NPCID_BLU_PLATFORM &&
                    NPC[A].Type != NPCID_GRN_PLATFORM && NPC[A].Type != NPCID_RED_PLATFORM && NPC[A].Type != NPCID_PLATFORM_S3 &&
                    !(NPC[A].Projectile && NPC[A].Type == NPCID_HEAVY_THROWN) &&
@@ -678,7 +679,7 @@ void NPCSpecial(int A)
         for(int i = 1; i <= numNPCs; i++)
         {
             auto &n = NPC[i];
-            if(NPCIsAVine[n.Type] && !n.Hidden && CheckCollision(tempLocation, n.Location))
+            if(NPCIsAVine(n) && !n.Hidden && CheckCollision(tempLocation, n.Location))
             {
                 tempBool = true;
                 break;
@@ -719,7 +720,7 @@ void NPCSpecial(int A)
                 NPC[numNPCs].Type = NPCID_GRN_VINE_S4;
             NPC[numNPCs].Location.Y = vb6Round(npc.Location.Y / 32) * 32;
             NPC[numNPCs].Location.Height = 32;
-            NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
+            NPC[numNPCs].Location.Width = NPC[numNPCs]->TWidth;
             NPC[numNPCs].Location.X = npc.Location.X + npc.Location.Width / 2.0 - NPC[numNPCs].Location.Width / 2.0;
             NPC[numNPCs].Active = true;
             NPC[numNPCs].TimeLeft = 100;
@@ -846,7 +847,7 @@ void NPCSpecial(int A)
             for(int i : treeNPCQuery(tempLocation, SORTMODE_NONE))
             {
                 auto &n = NPC[i];
-                if(n.Active && !n.Hidden && NPCIsAVine[n.Type] && CheckCollision(tempLocation, n.Location))
+                if(n.Active && !n.Hidden && NPCIsAVine(n) && CheckCollision(tempLocation, n.Location))
                 {
                     tempBool = true;
                     break;
@@ -965,8 +966,8 @@ void NPCSpecial(int A)
             npc.FrameCount = 0;
             npc.Location.X += npc.Location.Width / 2.0;
             npc.Location.Y += npc.Location.Height / 2.0;
-            npc.Location.Width = NPCWidth[npc.Type];
-            npc.Location.Height = NPCHeight[npc.Type];
+            npc.Location.Width = npc->TWidth;
+            npc.Location.Height = npc->THeight;
             npc.Location.X += -npc.Location.Width / 2.0;
             npc.Location.Y += -npc.Location.Height / 2.0;
             npc.Location.SpeedX = 0;
@@ -977,7 +978,7 @@ void NPCSpecial(int A)
 
             // deferring tree update to end of the NPC physics update
 
-            if(NPCIsACoin[npc.Type])
+            if(NPCIsACoin(npc))
             {
                 npc.Special = 1;
                 npc.Location.SpeedX = dRand() * 1 - 0.5;
@@ -1026,8 +1027,8 @@ void NPCSpecial(int A)
                     numNPCs++;
                     NPC[numNPCs] = NPC_t();
                     NPC[numNPCs].Type = NPCID_QUAD_BALL;
-                    NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
-                    NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
+                    NPC[numNPCs].Location.Height = NPC[numNPCs]->THeight;
+                    NPC[numNPCs].Location.Width = NPC[numNPCs]->TWidth;
                     NPC[numNPCs].Section = npc.Section;
                     NPC[numNPCs].TimeLeft = npc.TimeLeft;
                     NPC[numNPCs].Location.X = npc.Location.X + npc.Location.Width / 2.0 - NPC[numNPCs].Location.Width / 2.0;
@@ -1301,8 +1302,8 @@ void NPCSpecial(int A)
                 npc.Location.X += npc.Location.Width / 2.0;
                 npc.Location.Y += npc.Location.Height;
                 npc.Type -= 1;
-                npc.Location.Width = NPCWidth[npc.Type];
-                npc.Location.Height = NPCHeight[npc.Type];
+                npc.Location.Width = npc->TWidth;
+                npc.Location.Height = npc->THeight;
                 npc.Location.X -= npc.Location.Width / 2.0;
                 npc.Location.Y -= npc.Location.Height;
 
@@ -1564,8 +1565,8 @@ void NPCSpecial(int A)
                 npc.Location.X += npc.Location.Width / 2.0;
                 npc.Location.Y += npc.Location.Height;
                 npc.Type = NPCID_FIRE_BOSS_SHELL;
-                npc.Location.Width = NPCWidth[npc.Type];
-                npc.Location.Height = NPCHeight[npc.Type];
+                npc.Location.Width = npc->TWidth;
+                npc.Location.Height = npc->THeight;
                 npc.Location.X -= npc.Location.Width / 2.0;
                 npc.Location.Y -= npc.Location.Height;
 
@@ -1601,8 +1602,8 @@ void NPCSpecial(int A)
                 NPC[numNPCs].Direction = npc.Direction;
                 NPC[numNPCs].Section = npc.Section;
                 NPC[numNPCs].Type = NPCID_FIRE_BOSS_FIRE;
-                NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
-                NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
+                NPC[numNPCs].Location.Width = NPC[numNPCs]->TWidth;
+                NPC[numNPCs].Location.Height = NPC[numNPCs]->THeight;
                 NPC[numNPCs].Frame = 0;
 
                 if(Maths::iRound(NPC[numNPCs].Direction) == -1)
@@ -1756,8 +1757,8 @@ void NPCSpecial(int A)
                 NPC[numNPCs].Active = true;
                 NPC[numNPCs].Direction = npc.Direction;
                 NPC[numNPCs].Type = NPCID_BOMB;
-                NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
-                NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
+                NPC[numNPCs].Location.Height = NPC[numNPCs]->THeight;
+                NPC[numNPCs].Location.Width = NPC[numNPCs]->TWidth;
                 NPC[numNPCs].Location.Y = npc.Location.Y + npc.Location.Height - 48;
                 NPC[numNPCs].Location.X = npc.Location.X + npc.Location.Width / 2.0 - NPC[numNPCs].Location.Width / 2.0 - 12 * NPC[numNPCs].Direction;
                 NPC[numNPCs].TimeLeft = 100;
@@ -3317,7 +3318,7 @@ void SpecialNPC(int A)
         {
             if(NPC[B].Active)
             {
-                if(NPCIsACoin[NPC[B].Type])
+                if(NPCIsACoin(NPC[B]))
                 {
                     if(CheckCollision(NPC[A].Location, NPC[B].Location))
                     {
@@ -3350,7 +3351,7 @@ void SpecialNPC(int A)
                 {
                     if(NPC[B].Active)
                     {
-                        if(NPCIsACoin[NPC[B].Type])
+                        if(NPCIsACoin(NPC[B]))
                         {
                             if(CheckCollision(NPC[A].Location, NPC[B].Location))
                             {
@@ -3511,7 +3512,7 @@ void SpecialNPC(int A)
         if(Player[NPC[A].Special].Dead || Player[NPC[A].Special].Section != NPC[A].Section)
             NPC[A].Special = 0;
     }
-    else if(NPCIsCheep[NPC[A].Type] && NPC[A].Special == 1) // Red SMB3 Cheep
+    else if(NPCIsCheep(NPC[A]) && NPC[A].Special == 1) // Red SMB3 Cheep
     {
         if(!NPC[A].Projectile)
         {
@@ -3616,7 +3617,7 @@ void SpecialNPC(int A)
         {
             if(NPC[A].Special2 == 0 && !NPC[A].Inert)
             {
-                NPC[A].Location.Y += NPCHeight[NPC[A].Type] + 1.5;
+                NPC[A].Location.Y += NPC[A]->THeight + 1.5;
                 NPC[A].Special2 = 4;
                 NPC[A].Special = 70;
             }
@@ -3625,7 +3626,7 @@ void SpecialNPC(int A)
             {
                 NPC[A].Special += 1;
                 NPC[A].Location.Y -= 1.5;
-                if(NPC[A].Special >= NPCHeight[NPC[A].Type] * 0.65 + 1)
+                if(NPC[A].Special >= NPC[A]->THeight * 0.65 + 1)
                 {
                     NPC[A].Special2 = 2;
                     NPC[A].Special = 0;
@@ -3649,8 +3650,8 @@ void SpecialNPC(int A)
                     NPC[numNPCs].Section = NPC[A].Section;
                     NPC[numNPCs].Type = NPCID_PLANT_FIRE;
                     NPC[numNPCs].Frame = 1;
-                    NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
-                    NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
+                    NPC[numNPCs].Location.Height = NPC[numNPCs]->THeight;
+                    NPC[numNPCs].Location.Width = NPC[numNPCs]->TWidth;
 
                     if(fEqual(NPC[numNPCs].Location.Width, 16))
                     {
@@ -3688,7 +3689,7 @@ void SpecialNPC(int A)
             {
                 NPC[A].Special += 1;
                 NPC[A].Location.Y += 1.5;
-                if(NPC[A].Special >= NPCHeight[NPC[A].Type] * 0.65 + 1)
+                if(NPC[A].Special >= NPC[A]->THeight * 0.65 + 1)
                     NPC[A].Special2 = 4;
             }
             else if(fiEqual(NPC[A].Special2, 4))
@@ -3722,7 +3723,7 @@ void SpecialNPC(int A)
                 }
             }
 
-            NPC[A].Location.Height = NPCHeight[NPC[A].Type] - (NPC[A].Location.Y - NPC[A].DefaultLocation.Y);
+            NPC[A].Location.Height = NPC[A]->THeight - (NPC[A].Location.Y - NPC[A].DefaultLocation.Y);
 
             if(NPC[A].Location.Height < 0)
                 NPC[A].Location.Height = 0;
@@ -3747,7 +3748,7 @@ void SpecialNPC(int A)
         {
             if(NPC[A].Special == 0) // hiding
             {
-                NPC[A].Location.Y = NPC[A].DefaultLocation.Y + NPCHeight[NPC[A].Type] + 1.5;
+                NPC[A].Location.Y = NPC[A].DefaultLocation.Y + NPC[A]->THeight + 1.5;
                 NPC[A].Location.Height = 0;
                 NPC[A].Special2 -= 1;
 
@@ -3781,7 +3782,7 @@ void SpecialNPC(int A)
             }
             else if(NPC[A].Special == 1) // jumping
             {
-                NPC[A].Location.Height = NPCHeight[NPC[A].Type];
+                NPC[A].Location.Height = NPC[A]->THeight;
 
                 if(NPC[A].Special2 == 0)
                     NPC[A].Location.SpeedY = -6;
@@ -3807,19 +3808,19 @@ void SpecialNPC(int A)
             }
             else if(NPC[A].Special == 2) // falling
             {
-                NPC[A].Location.Height = NPCHeight[NPC[A].Type];
+                NPC[A].Location.Height = NPC[A]->THeight;
 
                 NPC[A].Location.SpeedY += 0.01;
                 if(NPC[A].Location.SpeedY >= 0.75)
                     NPC[A].Location.SpeedY = 0.75;
 
-                if(NPC[A].Location.Y + NPCHeight[NPC[A].Type] >= NPC[A].DefaultLocation.Y + NPCHeight[NPC[A].Type])
+                if(NPC[A].Location.Y + NPC[A]->THeight >= NPC[A].DefaultLocation.Y + NPC[A]->THeight)
                 {
-                    NPC[A].Location.Height = (NPC[A].DefaultLocation.Y + NPCHeight[NPC[A].Type]) - (NPC[A].Location.Y);
-                    if(NPC[A].Location.Y >= NPC[A].DefaultLocation.Y + NPCHeight[NPC[A].Type])
+                    NPC[A].Location.Height = (NPC[A].DefaultLocation.Y + NPC[A]->THeight) - (NPC[A].Location.Y);
+                    if(NPC[A].Location.Y >= NPC[A].DefaultLocation.Y + NPC[A]->THeight)
                     {
                         NPC[A].Location.Height = 0;
-                        NPC[A].Location.Y = NPC[A].DefaultLocation.Y + NPCHeight[NPC[A].Type];
+                        NPC[A].Location.Y = NPC[A].DefaultLocation.Y + NPC[A]->THeight;
                         NPC[A].Special = 0;
                         NPC[A].Special2 = 60;
                     }
@@ -3855,7 +3856,7 @@ void SpecialNPC(int A)
         {
             if(NPC[A].Special2 == 0 && !NPC[A].Inert)
             {
-                NPC[A].Location.Y += NPCHeight[NPC[A].Type] + 1.5;
+                NPC[A].Location.Y += NPC[A]->THeight + 1.5;
                 NPC[A].Special2 = 4;
                 NPC[A].Special = 70;
             }
@@ -3864,12 +3865,12 @@ void SpecialNPC(int A)
             {
                 NPC[A].Special += 1;
                 NPC[A].Location.Y -= 1.5;
-                if(NPC[A].Special >= NPCHeight[NPC[A].Type] * 0.65 + 1)
+                if(NPC[A].Special >= NPC[A]->THeight * 0.65 + 1)
                 {
                     if(g_compatibility.fix_plant_wobble)
                     {
                         NPC[A].Location.Y = vb6Round(NPC[A].Location.Y);
-                        NPC[A].Location.Height = NPCHeight[NPC[A].Type];
+                        NPC[A].Location.Height = NPC[A]->THeight;
                     }
 
                     NPC[A].Special2 = 2;
@@ -3890,7 +3891,7 @@ void SpecialNPC(int A)
             {
                 NPC[A].Special += 1;
                 NPC[A].Location.Y += 1.5;
-                if(NPC[A].Special >= NPCHeight[NPC[A].Type] * 0.65 + 1)
+                if(NPC[A].Special >= NPC[A]->THeight * 0.65 + 1)
                 {
                     NPC[A].Special2 = 4;
                     if(NPC[A].Type == NPCID_LONG_PLANT_UP)
@@ -3929,7 +3930,7 @@ void SpecialNPC(int A)
                 }
             }
 
-            NPC[A].Location.Height = NPCHeight[NPC[A].Type] - (NPC[A].Location.Y - NPC[A].DefaultLocation.Y);
+            NPC[A].Location.Height = NPC[A]->THeight - (NPC[A].Location.Y - NPC[A].DefaultLocation.Y);
             if(NPC[A].Location.Height < 0)
                 NPC[A].Location.Height = 0;
             // deferring tree update to end of the NPC physics update
@@ -3968,10 +3969,10 @@ void SpecialNPC(int A)
                 NPC[A].Special += 1;
                 // .Location.Y += 1.5
                 NPC[A].Location.Height += 1.5;
-                if(NPC[A].Special >= NPCHeight[NPC[A].Type] * 0.65 + 1)
+                if(NPC[A].Special >= NPC[A]->THeight * 0.65 + 1)
                 {
                     if(g_compatibility.fix_plant_wobble)
-                        NPC[A].Location.Height = NPCHeight[NPC[A].Type];
+                        NPC[A].Location.Height = NPC[A]->THeight;
 
                     NPC[A].Special2 = 2;
                     NPC[A].Special = 0;
@@ -3993,7 +3994,7 @@ void SpecialNPC(int A)
                 NPC[A].Special += 1;
                 // .Location.Y += -1.5
                 NPC[A].Location.Height -= 1.5;
-                if(NPC[A].Special >= NPCHeight[NPC[A].Type] * 0.65 + 1)
+                if(NPC[A].Special >= NPC[A]->THeight * 0.65 + 1)
                 {
                     if(g_compatibility.fix_plant_wobble)
                         NPC[A].Location.Height = 0;
@@ -4035,10 +4036,10 @@ void SpecialNPC(int A)
                 if(NPC[A].Direction == 1)
                 {
                     // .Location.x += -NPCWidth(.Type) - 1.5
-                    NPC[A].Location.Width += -NPCWidth[NPC[A].Type] - 1.5;
+                    NPC[A].Location.Width += -NPC[A]->TWidth - 1.5;
                 }
                 else
-                    NPC[A].Location.X += NPCWidth[NPC[A].Type] + 1.5;
+                    NPC[A].Location.X += NPC[A]->TWidth + 1.5;
                 NPC[A].Special2 = 1;
                 NPC[A].Special = 0;
             }
@@ -4051,11 +4052,11 @@ void SpecialNPC(int A)
                 else
                     NPC[A].Location.Width += 1.5 * NPC[A].Direction;
 
-                if(NPC[A].Special >= NPCWidth[NPC[A].Type] * 0.65 + 1)
+                if(NPC[A].Special >= NPC[A]->TWidth * 0.65 + 1)
                 {
                     if(g_compatibility.fix_plant_wobble)
                     {
-                        NPC[A].Location.Width = NPCWidth[NPC[A].Type];
+                        NPC[A].Location.Width = NPC[A]->TWidth;
                         NPCQueues::Unchecked.push_back(A);
                     }
 
@@ -4082,7 +4083,7 @@ void SpecialNPC(int A)
                 else
                     NPC[A].Location.Width -= 1.5 * NPC[A].Direction;
 
-                if(NPC[A].Special >= NPCWidth[NPC[A].Type] * 0.65 + 1)
+                if(NPC[A].Special >= NPC[A]->TWidth * 0.65 + 1)
                 {
                     NPC[A].Special2 = 4;
 
@@ -4105,7 +4106,7 @@ void SpecialNPC(int A)
 
             if(NPC[A].Direction == -1)
             {
-                NPC[A].Location.Width = NPCWidth[NPC[A].Type] - (NPC[A].Location.X - NPC[A].DefaultLocation.X);
+                NPC[A].Location.Width = NPC[A]->TWidth - (NPC[A].Location.X - NPC[A].DefaultLocation.X);
                 if(NPC[A].Location.Width < 0)
                     NPC[A].Location.Width = 0;
 
@@ -4332,7 +4333,7 @@ void SpecialNPC(int A)
         }
         // deferring tree update to end of the NPC physics update
     }
-    else if(NPCIsAParaTroopa[NPC[A].Type]) // para-troopas
+    else if(NPCIsAParaTroopa(NPC[A])) // para-troopas
     {
         if(NPC[A].Special == 0) // chase
         {
@@ -4563,8 +4564,8 @@ void SpecialNPC(int A)
             NPC[numNPCs].Inert = NPC[A].Inert;
             NPC[numNPCs].Type = NPCID_STATUE_FIRE;
             NPC[numNPCs].Direction = NPC[A].Direction;
-            NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
-            NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
+            NPC[numNPCs].Location.Height = NPC[numNPCs]->THeight;
+            NPC[numNPCs].Location.Width = NPC[numNPCs]->TWidth;
             NPC[numNPCs].TimeLeft = 100;
             NPC[numNPCs].Active = true;
             NPC[numNPCs].Section = NPC[A].Section;
@@ -5261,8 +5262,8 @@ void SpecialNPC(int A)
                     NPC[numNPCs].Direction = NPC[A].Direction;
                     NPC[numNPCs].Type = NPCID_SPIT_BOSS_BALL;
 
-                    NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
-                    NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
+                    NPC[numNPCs].Location.Height = NPC[numNPCs]->THeight;
+                    NPC[numNPCs].Location.Width = NPC[numNPCs]->TWidth;
                     NPC[numNPCs].Location.Y = NPC[A].Location.Y + 14 - NPC[numNPCs].Location.Height / 2.0;
 
                     if(NPC[numNPCs].Direction == 1)
@@ -5504,8 +5505,8 @@ void SpecialNPC(int A)
                 if(NPC[numNPCs].Type == NPCID_RANDOM_POWER)
                     NPC[numNPCs].Type = RandomBonus();
 
-                NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
-                NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
+                NPC[numNPCs].Location.Height = NPC[numNPCs]->THeight;
+                NPC[numNPCs].Location.Width = NPC[numNPCs]->TWidth;
                 NPC[numNPCs].Location.X = NPC[A].Location.X + NPC[A].Location.Width / 2.0 - NPC[numNPCs].Location.Width / 2.0;
                 NPC[numNPCs].Location.Y = NPC[A].Location.Y;
 
@@ -5524,7 +5525,7 @@ void SpecialNPC(int A)
 
                 NPC[numNPCs].Variant = NPC[A].Variant;
 
-                if(NPCIsACoin[NPC[numNPCs].Type])
+                if(NPCIsACoin(NPC[numNPCs]))
                 {
                     NPC[numNPCs].Special = 1;
                     NPC[numNPCs].Location.SpeedX = NPC[numNPCs].Location.SpeedX * 0.5;
@@ -5604,7 +5605,7 @@ void SpecialNPC(int A)
         }
     }
     // Projectile code
-    if(NPCIsAShell[NPC[A].Type] || (NPC[A].Type == NPCID_SLIDE_BLOCK && NPC[A].Special == 1))
+    if(NPCIsAShell(NPC[A]) || (NPC[A].Type == NPCID_SLIDE_BLOCK && NPC[A].Special == 1))
     {
         if(NPC[A].Location.SpeedX != 0)
             NPC[A].Projectile = true;
@@ -5667,10 +5668,10 @@ void CharStuff(int WhatNPC, bool CheckEggs)
         {
             if(NPC[A].Type == NPCID_ITEM_POD && NPC[A].Special > 0 /* && CheckEggs*/) // Check Eggs
             {
-                if(NPCIsYoshi[(int)NPC[A].Special]) // Yoshi into mushroom (Egg)
+                if(NPCIsYoshi((int)NPC[A].Special)) // Yoshi into mushroom (Egg)
                 {
                     // NPC(A).Special = 249
-                    NPC[A].Special = 35; // Yoshi into boot
+                    NPC[A].Special = NPCID_GRN_BOOT; // Yoshi into boot
                 }
             }
         }
@@ -5685,13 +5686,13 @@ void CharStuff(int WhatNPC, bool CheckEggs)
 
             if(NPC[A].Active && !NPC[A].Generator && !NPC[A].Inert)
             {
-                if(NPC[A].Type == NPCID_POWER_S3 || NPC[A].Type == NPCID_POWER_S1 || NPC[A].Type == NPCID_POWER_S4 || NPCIsBoot[NPC[A].Type]) // turn mushrooms into hearts
+                if(NPC[A].Type == NPCID_POWER_S3 || NPC[A].Type == NPCID_POWER_S1 || NPC[A].Type == NPCID_POWER_S4 || NPCIsBoot(NPC[A])) // turn mushrooms into hearts
                 {
                     NPC[A].Frame = 0;
                     NPC[A].Type = NPCID_POWER_S5;
                     NPC[A].Location.SpeedX = 0;
-                    NPC[A].Location.Y += NPC[A].Location.Height - NPCHeight[NPC[A].Type] - 1;
-                    NPC[A].Location.X += NPC[A].Location.Width / 2.0 - NPCWidth[NPC[A].Type] / 2.0;
+                    NPC[A].Location.Y += NPC[A].Location.Height - NPC[A]->THeight - 1;
+                    NPC[A].Location.X += NPC[A].Location.Width / 2.0 - NPC[A]->TWidth / 2.0;
                     NPC[A].Location.Width = 32;
                     NPC[A].Location.Height = 32;
 
@@ -5704,10 +5705,10 @@ void CharStuff(int WhatNPC, bool CheckEggs)
                         NPC[A].Type = NPCID_GEM_5;
                     else
                         NPC[A].Type = NPCID_GEM_1;
-                    NPC[A].Location.Y += NPC[A].Location.Height - NPCHeight[NPC[A].Type];
-                    NPC[A].Location.X += NPC[A].Location.Width / 2.0 - NPCWidth[NPC[A].Type] / 2.0;
-                    NPC[A].Location.Width = NPCWidth[NPC[A].Type];
-                    NPC[A].Location.Height = NPCHeight[NPC[A].Type];
+                    NPC[A].Location.Y += NPC[A].Location.Height - NPC[A]->THeight;
+                    NPC[A].Location.X += NPC[A].Location.Width / 2.0 - NPC[A]->TWidth / 2.0;
+                    NPC[A].Location.Width = NPC[A]->TWidth;
+                    NPC[A].Location.Height = NPC[A]->THeight;
                     NPC[A].Frame = 0;
 
                     NPCQueues::Unchecked.push_back(A);
@@ -5726,12 +5727,12 @@ void CharStuff(int WhatNPC, bool CheckEggs)
         {
             if(NPC[A].Type == NPCID_ITEM_POD && NPC[A].Special > 0 /* && CheckEggs*/) // Check Eggs
             {
-                if(NPCIsYoshi[(int)NPC[A].Special] || NPCIsBoot[(int)NPC[A].Special]) // Yoshi / boot into mushroom (Egg)
-                    NPC[A].Special = 250;
-                if(NPC[A].Special == 9 || NPC[A].Special == 184 || NPC[A].Special == 185) // mushrooms into hearts (eggs)
-                    NPC[A].Special = 250;
-                if(NPC[A].Special == 10 || NPC[A].Special == 33 || NPC[A].Special == 88 || (!SMB2 && NPC[A].Special == 138)) // coins into rupees (eggs)
-                    NPC[A].Special = 251;
+                if(NPCIsYoshi((int)NPC[A].Special) || NPCIsBoot((int)NPC[A].Special)) // Yoshi / boot into mushroom (Egg)
+                    NPC[A].Special = NPCID_POWER_S5;
+                if(NPC[A].Special == NPCID_POWER_S3 || NPC[A].Special == NPCID_POWER_S1 || NPC[A].Special == NPCID_POWER_S4) // mushrooms into hearts (eggs)
+                    NPC[A].Special = NPCID_POWER_S5;
+                if(NPC[A].Special == NPCID_COIN_S3 || NPC[A].Special == NPCID_COIN_S4 || NPC[A].Special == NPCID_COIN_S1 || (!SMB2 && NPC[A].Special == NPCID_COIN_S2)) // coins into rupees (eggs)
+                    NPC[A].Special = NPCID_GEM_1;
             }
         }
     }
@@ -5766,7 +5767,7 @@ bool npcHasFloor(const struct NPC_t &npc)
     if(npc.Type < 1 || npc.Type > maxNPCType)
         return false; // invalid NPC type
 
-    if(NPCNoClipping[npc.Type])
+    if(npc->NoClipping)
         return false; // No collision with blocks
 
     const auto &l = npc.Location;

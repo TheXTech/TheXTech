@@ -33,6 +33,7 @@
 #include "npc.h"
 #include "npc_id.h"
 #include "eff_id.h"
+#include "npc_traits.h"
 #include "sound.h"
 #include "game_main.h"
 #include "effect.h"
@@ -2458,19 +2459,19 @@ void TailSwipe(const int plr, bool boo, bool Stab, int StabDir)
         if(A > numNPCsMax5)
             continue;
 
-        if(NPC[A].Active && NPC[A].Effect == 0 && !(NPCIsAnExit[NPC[A].Type] || (NPCIsACoin[NPC[A].Type] && !Stab)) &&
+        if(NPC[A].Active && NPC[A].Effect == 0 && !(NPCIsAnExit(NPC[A]) || (NPCIsACoin(NPC[A]) && !Stab)) &&
             NPC[A].CantHurtPlayer != plr && !(p.StandingOnNPC == A && p.ShellSurf))
         {
             if(NPC[A].Type != NPCID_PLR_FIREBALL && NPC[A].Type != NPCID_PLR_ICEBALL && !(NPC[A].Type == NPCID_BULLET && NPC[A].Projectile) &&
                 NPC[A].Type != NPCID_PET_FIRE && NPC[A].Type != NPCID_GOALTAPE && NPC[A].Type != NPCID_CHECKPOINT)
             {
                 stabLoc = NPC[A].Location;
-                if(NPCHeightGFX[NPC[A].Type] > NPC[A].Location.Height && NPC[A].Type != NPCID_PLANT_S3 && NPC[A].Type != NPCID_MINIBOSS &&
+                if(NPC[A]->HeightGFX > NPC[A].Location.Height && NPC[A].Type != NPCID_PLANT_S3 && NPC[A].Type != NPCID_MINIBOSS &&
                     NPC[A].Type != NPCID_WALL_BUG && NPC[A].Type != NPCID_POWER_S3 && NPC[A].Type != NPCID_BOTTOM_PLANT && NPC[A].Type != NPCID_SIDE_PLANT &&
                     NPC[A].Type != NPCID_BIG_PLANT && NPC[A].Type != NPCID_PLANT_S1 && NPC[A].Type != NPCID_FIRE_PLANT)
                 {
                     stabLoc.Y += stabLoc.Height;
-                    stabLoc.Height = NPCHeightGFX[NPC[A].Type];
+                    stabLoc.Height = NPC[A]->HeightGFX;
                     stabLoc.Y += -stabLoc.Height;
                 }
 
@@ -2619,21 +2620,26 @@ void YoshiEat(const int A)
     for(int B : treeNPCQuery(p.YoshiTongue, SORTMODE_ID))
     {
         auto &n = NPC[B];
-        if(((NPCIsACoin[n.Type] && n.Special == 1) || !NPCNoYoshi[n.Type]) &&
-           n.Active && ((!NPCIsACoin[n.Type] || n.Special == 1) || n.Type == 103) &&
-           !NPCIsAnExit[n.Type] && !n.Generator && !n.Inert && !NPCIsYoshi[n.Type] &&
-            n.Effect != 5 && n.Immune == 0 && n.Type != 91 && !(n.Projectile && n.Type == 17) && n.HoldingPlayer == 0)
+        if(((NPCIsACoin(n) && n.Special == 1) || !n->NoYoshi) &&
+           n.Active && ((!NPCIsACoin(n) || n.Special == 1) || n.Type == 103) &&
+           !NPCIsAnExit(n) && !n.Generator && !n.Inert && !NPCIsYoshi(n) &&
+            n.Effect != 5 && n.Immune == 0 && n.Type != NPCID_ITEM_BURIED &&
+            !(n.Projectile && n.Type == NPCID_BULLET) && n.HoldingPlayer == 0)
         {
             tempLocation = n.Location;
-            if(n.Type == 91)
+            // dead code
+#if 0
+            if(n.Type == NPCID_ITEM_BURIED)
                 tempLocation.Y = n.Location.Y - 16;
+#endif
 
             if(CheckCollision(p.YoshiTongue, tempLocation))
             {
                 // dead code, check n.Type != 91 condition above
-                if(n.Type == 91)
+#if 0
+                if(n.Type == NPCID_ITEM_BURIED)
                 {
-                    if(!NPCNoYoshi[(int)n.Special])
+                    if(!NPCTraits[(int)n.Special].NoYoshi)
                     {
                         PlaySound(SFX_Grab);
                         n.Generator = false;
@@ -2641,16 +2647,16 @@ void YoshiEat(const int A)
                         n.Type = n.Special;
                         n.Special = 0;
 
-                        if(NPCIsYoshi[n.Type])
+                        if(NPCIsYoshi(n))
                         {
                             n.Special = n.Type;
                             n.Type = 96;
                         }
 
-                        n.Location.Height = NPCHeight[n.Type];
-                        n.Location.Width = NPCWidth[n.Type];
+                        n.Location.Height = n->THeight;
+                        n.Location.Width = n->TWidth;
 
-                        if(!(n.Type == 21 || n.Type == 22 || n.Type == 26 || n.Type == 31 || n.Type == 32 || n.Type == 35 || n.Type == 49 || NPCIsAnExit[n.Type]))
+                        if(!(n.Type == 21 || n.Type == 22 || n.Type == 26 || n.Type == 31 || n.Type == 32 || n.Type == 35 || n.Type == 49 || NPCIsAnExit(n)))
                             n.DefaultType = 0;
 
                         n.Effect = 5;
@@ -2661,7 +2667,9 @@ void YoshiEat(const int A)
                         treeNPCUpdate(B);
                     }
                 }
-                else if(n.Type == 283)
+                else
+#endif
+                if(n.Type == NPCID_ITEM_BUBBLE)
                 {
                     NPCHit(B, 3, B);
                 }
@@ -2669,20 +2677,21 @@ void YoshiEat(const int A)
                 {
                     n.Effect = 5;
                     n.Effect2 = A;
-                    n.Location.Height = NPCHeight[n.Type];
+                    n.Location.Height = n->THeight;
                     p.YoshiNPC = B;
                     treeNPCUpdate(B);
                 }
 
-                if(n.Type == 147)
+                if(n.Type == NPCID_VEGGIE_RANDOM)
                 {
-                    n.Type = 139 + iRand(9);
-                    if(n.Type == 147)
-                        n.Type = 92;
+                    n.Type = NPCID_VEGGIE_2 + iRand(9);
+                    if(n.Type == NPCID_VEGGIE_RANDOM)
+                        n.Type = NPCID_VEGGIE_1;
+
                     n.Location.X += n.Location.Width / 2.0;
                     n.Location.Y += n.Location.Height / 2.0;
-                    n.Location.Width = NPCWidth[n.Type];
-                    n.Location.Height = NPCHeight[n.Type];
+                    n.Location.Width = n->TWidth;
+                    n.Location.Height = n->THeight;
                     n.Location.X += -n.Location.Width / 2.0;
                     n.Location.Y += -n.Location.Height / 2.0;
 
@@ -2749,10 +2758,10 @@ void YoshiSpit(const int A)
     else
     {
         NPC[p.YoshiNPC].RealSpeedX = 0;
-        if(NPCIsAShell[NPC[p.YoshiNPC].Type])
+        if(NPCIsAShell(NPC[p.YoshiNPC]))
             NPC[p.YoshiNPC].Special = 0;
 
-        if((NPCIsAShell[NPC[p.YoshiNPC].Type] || NPCIsABot[NPC[p.YoshiNPC].Type] || NPC[p.YoshiNPC].Type == NPCID_RAINBOW_SHELL) &&
+        if((NPCIsAShell(NPC[p.YoshiNPC]) || NPCIsABot(NPC[p.YoshiNPC]) || NPC[p.YoshiNPC].Type == NPCID_RAINBOW_SHELL) &&
            NPC[p.YoshiNPC].Type != NPCID_GLASS_SHELL && p.YoshiRed)
         {
             NPC[p.YoshiNPC].Killed = 9;
@@ -2826,7 +2835,7 @@ void YoshiSpit(const int A)
 
             if(!p.Controls.Down || (p.Location.SpeedY != 0 && p.StandingOnNPC == 0 && p.Slope == 0))
             {
-                if(NPCIsAShell[NPC[p.YoshiNPC].Type])
+                if(NPCIsAShell(NPC[p.YoshiNPC]))
                 {
                     SoundPause[9] = 2;
                     // NPCHit .YoshiNPC, 1, A
@@ -3599,8 +3608,8 @@ void YoshiEatCode(const int A)
                 NPC[p.YoshiNPC].Location.Height = 28;
             }
 
-            NPC[p.YoshiNPC].Location.Height = NPCHeight[NPC[p.YoshiNPC].Type];
-            if((NPCIsGrabbable[NPC[p.YoshiNPC].Type] || NPCIsAShell[NPC[p.YoshiNPC].Type] || NPC[p.YoshiNPC].Type == NPCID_SPIT_BOSS_BALL || NPCIsABot[NPC[p.YoshiNPC].Type] || NPC[p.YoshiNPC].Type == NPCID_RAINBOW_SHELL || NPC[p.YoshiNPC].Type == NPCID_WALK_BOMB_S2 || NPC[p.YoshiNPC].Type == NPCID_WALK_BOMB_S3 || NPC[p.YoshiNPC].Type == NPCID_LIT_BOMB_S3) && (NPC[p.YoshiNPC].Type != NPCID_HIT_CARRY_FODDER))
+            NPC[p.YoshiNPC].Location.Height = NPC[p.YoshiNPC]->THeight;
+            if((NPC[p.YoshiNPC]->IsGrabbable || NPCIsAShell(NPC[p.YoshiNPC]) || NPC[p.YoshiNPC].Type == NPCID_SPIT_BOSS_BALL || NPCIsABot(NPC[p.YoshiNPC]) || NPC[p.YoshiNPC].Type == NPCID_RAINBOW_SHELL || NPC[p.YoshiNPC].Type == NPCID_WALK_BOMB_S2 || NPC[p.YoshiNPC].Type == NPCID_WALK_BOMB_S3 || NPC[p.YoshiNPC].Type == NPCID_LIT_BOMB_S3) && (NPC[p.YoshiNPC].Type != NPCID_HIT_CARRY_FODDER))
             {
                 if(NPC[p.YoshiNPC].Type == NPCID_WALK_BOMB_S2)
                     NPC[p.YoshiNPC].Special = 450;
@@ -3610,7 +3619,7 @@ void YoshiEatCode(const int A)
                 {
                     NPC[p.YoshiNPC].Special = 250;
                     NPC[p.YoshiNPC].Type = NPCID_LIT_BOMB_S3;
-                    NPC[p.YoshiNPC].Location.Height = NPCHeight[NPC[p.YoshiNPC].Type];
+                    NPC[p.YoshiNPC].Location.Height = NPC[p.YoshiNPC]->THeight;
                 }
 
                 NPC[p.YoshiNPC].Effect = 6;
@@ -3628,7 +3637,7 @@ void YoshiEatCode(const int A)
                     NPC[p.YoshiNPC].Special2 = 0;
                 }
             }
-            else if(p.MountType == 7 && !NPCIsABonus[NPC[p.YoshiNPC].Type])
+            else if(p.MountType == 7 && !NPCIsABonus(NPC[p.YoshiNPC]))
             {
                 B = iRand(9);
                 NPC[p.YoshiNPC].Type = NPCID_VEGGIE_2 + B;
@@ -3636,8 +3645,8 @@ void YoshiEatCode(const int A)
                     NPC[p.YoshiNPC].Type = NPCID_VEGGIE_1;
                 NPC[p.YoshiNPC].Location.X += NPC[p.YoshiNPC].Location.Width / 2.0;
                 NPC[p.YoshiNPC].Location.Y += NPC[p.YoshiNPC].Location.Height / 2.0;
-                NPC[p.YoshiNPC].Location.Width = NPCWidth[NPC[p.YoshiNPC].Type];
-                NPC[p.YoshiNPC].Location.Height = NPCHeight[NPC[p.YoshiNPC].Type];
+                NPC[p.YoshiNPC].Location.Width = NPC[p.YoshiNPC]->TWidth;
+                NPC[p.YoshiNPC].Location.Height = NPC[p.YoshiNPC]->THeight;
                 NPC[p.YoshiNPC].Location.X += -NPC[p.YoshiNPC].Location.Width / 2.0;
                 NPC[p.YoshiNPC].Location.Y += -NPC[p.YoshiNPC].Location.Height / 2.0;
                 NPC[p.YoshiNPC].Effect = 6;
@@ -3651,13 +3660,13 @@ void YoshiEatCode(const int A)
                     NPCQueues::update(p.YoshiNPC);
                 }
             }
-            else if(p.MountType == 8 && !NPCIsABonus[NPC[p.YoshiNPC].Type])
+            else if(p.MountType == 8 && !NPCIsABonus(NPC[p.YoshiNPC]))
             {
                 NPC[p.YoshiNPC].Type = NPCID_ICE_BLOCK;
                 NPC[p.YoshiNPC].Location.X += NPC[p.YoshiNPC].Location.Width / 2.0;
                 NPC[p.YoshiNPC].Location.Y += NPC[p.YoshiNPC].Location.Height / 2.0;
-                NPC[p.YoshiNPC].Location.Width = NPCWidth[NPC[p.YoshiNPC].Type];
-                NPC[p.YoshiNPC].Location.Height = NPCHeight[NPC[p.YoshiNPC].Type];
+                NPC[p.YoshiNPC].Location.Width = NPC[p.YoshiNPC]->TWidth;
+                NPC[p.YoshiNPC].Location.Height = NPC[p.YoshiNPC]->THeight;
                 NPC[p.YoshiNPC].Location.X += -NPC[p.YoshiNPC].Location.Width / 2.0;
                 NPC[p.YoshiNPC].Location.Y += -NPC[p.YoshiNPC].Location.Height / 2.0;
                 NPC[p.YoshiNPC].Effect = 6;
@@ -3673,14 +3682,14 @@ void YoshiEatCode(const int A)
             }
             else
             {
-                if(NPCIsABonus[NPC[p.YoshiNPC].Type])
+                if(NPCIsABonus(NPC[p.YoshiNPC]))
                 {
                     TouchBonus(A, p.YoshiNPC);
                     p.YoshiNPC = 0;
                 }
                 else
                 {
-                    MoreScore(NPCScore[NPC[p.YoshiNPC].Type], NPC[p.YoshiNPC].Location, p.Multiplier);
+                    MoreScore(NPC[p.YoshiNPC]->Score, NPC[p.YoshiNPC].Location, p.Multiplier);
                     NPC[p.YoshiNPC].Killed = 9;
                     NPCQueues::Killed.push_back(p.YoshiNPC);
 
@@ -4261,8 +4270,8 @@ void PowerUps(const int A)
                             PlaySound(playerHammerSFX);
 
                         NPC[numNPCs].Projectile = true;
-                        NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
-                        NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
+                        NPC[numNPCs].Location.Height = NPC[numNPCs]->THeight;
+                        NPC[numNPCs].Location.Width = NPC[numNPCs]->TWidth;
                         NPC[numNPCs].Location.X = p.Location.X + Physics.PlayerGrabSpotX[p.Character][p.State] * p.Direction;
                         NPC[numNPCs].Location.Y = p.Location.Y + Physics.PlayerGrabSpotY[p.Character][p.State];
                         NPC[numNPCs].Active = true;
@@ -4344,8 +4353,8 @@ void PowerUps(const int A)
                         if(p.State == 7)
                             NPC[numNPCs].Type = NPCID_PLR_ICEBALL;
                         NPC[numNPCs].Projectile = true;
-                        NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
-                        NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
+                        NPC[numNPCs].Location.Height = NPC[numNPCs]->THeight;
+                        NPC[numNPCs].Location.Width = NPC[numNPCs]->TWidth;
                         NPC[numNPCs].Location.X = p.Location.X + Physics.PlayerGrabSpotX[p.Character][p.State] * p.Direction + 4;
                         NPC[numNPCs].Location.Y = p.Location.Y + Physics.PlayerGrabSpotY[p.Character][p.State];
                         NPC[numNPCs].Active = true;
@@ -4479,8 +4488,8 @@ void PowerUps(const int A)
             NPC[numNPCs].TimeLeft = Physics.NPCTimeOffScreen;
             NPC[numNPCs].Section = p.Section;
             NPC[numNPCs].Type = NPCID_BOMB;
-            NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
-            NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
+            NPC[numNPCs].Location.Width = NPC[numNPCs]->TWidth;
+            NPC[numNPCs].Location.Height = NPC[numNPCs]->THeight;
             NPC[numNPCs].CantHurtPlayer = A;
             NPC[numNPCs].CantHurt = 1000;
 
@@ -5156,7 +5165,7 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
 
     if(p.StandingOnNPC != 0 && p.HoldingNPC == 0)
     {
-        if(NPCGrabFromTop[NPC[p.StandingOnNPC].Type])
+        if(NPC[p.StandingOnNPC]->GrabFromTop)
         {
             if(((p.Controls.Run && p.Controls.Down) || ((p.Controls.Down || p.Controls.Run) && p.GrabTime > 0)) && (p.RunRelease || p.GrabTime > 0) && p.TailCount == 0)
             {
@@ -5177,7 +5186,7 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
                     if(p.Location.SpeedY == 0)
                         p.Location.SpeedY = 0.01;
                     p.CanJump = false;
-                    if(NPCIsAShell[NPC[p.StandingOnNPC].Type])
+                    if(NPCIsAShell(NPC[p.StandingOnNPC]))
                         p.Location.SpeedX = NPC[p.StandingOnNPC].Location.SpeedX;
                     NPC[p.StandingOnNPC].HoldingPlayer = A;
                     NPC[p.StandingOnNPC].CantHurt = Physics.NPCCanHurtWait;
@@ -5203,20 +5212,20 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
                         CharStuff(p.StandingOnNPC);
                         NPC[p.StandingOnNPC].Special = 0;
 
-                        if(NPCIsYoshi[NPC[p.StandingOnNPC].Type])
+                        if(NPCIsYoshi(NPC[p.StandingOnNPC]))
                         {
                             NPC[p.StandingOnNPC].Special = NPC[p.StandingOnNPC].Type;
                             NPC[p.StandingOnNPC].Type = NPCID_ITEM_POD;
                         }
 
-                        if(!(NPC[p.StandingOnNPC].Type == NPCID_CANNONENEMY || NPC[p.StandingOnNPC].Type == NPCID_CANNONITEM || NPC[p.StandingOnNPC].Type == NPCID_SPRING || NPC[p.StandingOnNPC].Type == NPCID_KEY || NPC[p.StandingOnNPC].Type == NPCID_COIN_SWITCH || NPC[p.StandingOnNPC].Type == NPCID_GRN_BOOT || NPC[p.StandingOnNPC].Type == NPCID_RED_BOOT || NPC[p.StandingOnNPC].Type == NPCID_BLU_BOOT || NPC[p.StandingOnNPC].Type == NPCID_TOOTHYPIPE || NPCIsAnExit[NPC[p.StandingOnNPC].Type]))
+                        if(!(NPC[p.StandingOnNPC].Type == NPCID_CANNONENEMY || NPC[p.StandingOnNPC].Type == NPCID_CANNONITEM || NPC[p.StandingOnNPC].Type == NPCID_SPRING || NPC[p.StandingOnNPC].Type == NPCID_KEY || NPC[p.StandingOnNPC].Type == NPCID_COIN_SWITCH || NPC[p.StandingOnNPC].Type == NPCID_GRN_BOOT || NPC[p.StandingOnNPC].Type == NPCID_RED_BOOT || NPC[p.StandingOnNPC].Type == NPCID_BLU_BOOT || NPC[p.StandingOnNPC].Type == NPCID_TOOTHYPIPE || NPCIsAnExit(NPC[p.StandingOnNPC])))
                         {
                             if(!BattleMode)
                                 NPC[p.StandingOnNPC].DefaultType = 0;
                         }
 
-                        NPC[p.StandingOnNPC].Location.Height = NPCHeight[NPC[p.StandingOnNPC].Type];
-                        NPC[p.StandingOnNPC].Location.Width = NPCWidth[NPC[p.StandingOnNPC].Type];
+                        NPC[p.StandingOnNPC].Location.Height = NPC[p.StandingOnNPC]->THeight;
+                        NPC[p.StandingOnNPC].Location.Width = NPC[p.StandingOnNPC]->TWidth;
 
                         if(NPC[p.StandingOnNPC].Type == NPCID_VEGGIE_RANDOM)
                         {
@@ -5226,8 +5235,8 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
                                 NPC[p.StandingOnNPC].Type = NPCID_VEGGIE_1;
                             NPC[p.StandingOnNPC].Location.X += NPC[p.StandingOnNPC].Location.Width / 2.0;
                             NPC[p.StandingOnNPC].Location.Y += NPC[p.StandingOnNPC].Location.Height / 2.0;
-                            NPC[p.StandingOnNPC].Location.Width = NPCWidth[NPC[p.StandingOnNPC].Type];
-                            NPC[p.StandingOnNPC].Location.Height = NPCHeight[NPC[p.StandingOnNPC].Type];
+                            NPC[p.StandingOnNPC].Location.Width = NPC[p.StandingOnNPC]->TWidth;
+                            NPC[p.StandingOnNPC].Location.Height = NPC[p.StandingOnNPC]->THeight;
                             NPC[p.StandingOnNPC].Location.X += -NPC[p.StandingOnNPC].Location.Width / 2.0;
                             NPC[p.StandingOnNPC].Location.Y += -NPC[p.StandingOnNPC].Location.Height / 2.0;
                         }
@@ -5247,7 +5256,7 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
                 {
                     if(p.GrabTime == 0)
                     {
-                        if(NPC[p.StandingOnNPC].Type == NPCID_ITEM_BURIED || NPCIsVeggie[NPC[p.StandingOnNPC].Type])
+                        if(NPC[p.StandingOnNPC].Type == NPCID_ITEM_BURIED || NPCIsVeggie(NPC[p.StandingOnNPC]))
                             PlaySound(SFX_Grab2);
                         else
                             PlaySound(SFX_Grab);
@@ -5324,8 +5333,8 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
                         NPC[numNPCs].CantHurtPlayer = A;
                         NPC[numNPCs].BattleOwner = A;
                         NPC[numNPCs].Type = NPCID_PET_FIRE;
-                        NPC[numNPCs].Location.Width = NPCWidth[108];
-                        NPC[numNPCs].Location.Height = NPCHeight[108];
+                        NPC[numNPCs].Location.Width = NPC[numNPCs]->TWidth;
+                        NPC[numNPCs].Location.Height = NPC[numNPCs]->THeight;
                         NPC[numNPCs].Active = true;
                         NPC[numNPCs].TimeLeft = NPC[p.HoldingNPC].TimeLeft;
                         NPC[numNPCs].Layer = LAYER_SPAWNED_NPCS;
@@ -5364,7 +5373,7 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
         NPC[p.HoldingNPC].Effect = 0;
         NPC[p.HoldingNPC].CantHurt = Physics.NPCCanHurtWait;
         NPC[p.HoldingNPC].CantHurtPlayer = A;
-        if(NPCIsVeggie[NPC[p.HoldingNPC].Type])
+        if(NPCIsVeggie(NPC[p.HoldingNPC]))
             NPC[p.HoldingNPC].CantHurt = 1000;
         if(p.Controls.Run || p.ForceHold > 0)
         {
@@ -5451,11 +5460,11 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
             {
                 NPCHit(p.HoldingNPC, 3, p.HoldingNPC);
             }
-            if(NPCIsACoin[NPC[p.HoldingNPC].Type] && !p.Controls.Down) // Smoke effect for coins
+            if(NPCIsACoin(NPC[p.HoldingNPC]) && !p.Controls.Down) // Smoke effect for coins
                 NewEffect(EFFID_SMOKE_S3, NPC[p.HoldingNPC].Location);
-            if(p.Controls.Up && !NPCIsACoin[NPC[p.HoldingNPC].Type] && NPC[p.HoldingNPC].Type != NPCID_BULLET) // Throw the npc up
+            if(p.Controls.Up && !NPCIsACoin(NPC[p.HoldingNPC]) && NPC[p.HoldingNPC].Type != NPCID_BULLET) // Throw the npc up
             {
-                if(NPCIsAShell[NPC[p.HoldingNPC].Type] || NPC[p.HoldingNPC].Type == NPCID_SLIDE_BLOCK || NPC[p.HoldingNPC].Type == NPCID_ICE_CUBE)
+                if(NPCIsAShell(NPC[p.HoldingNPC]) || NPC[p.HoldingNPC].Type == NPCID_SLIDE_BLOCK || NPC[p.HoldingNPC].Type == NPCID_ICE_CUBE)
                 {
                     if(p.Controls.Left || p.Controls.Right) // Up and forward
                     {
@@ -5501,7 +5510,7 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
                             NPC[p.HoldingNPC].Location.SpeedY = -9;
                     }
                 }
-                if(NPCIsVeggie[NPC[p.HoldingNPC].Type] || NPC[p.HoldingNPC].Type == NPCID_BLU_GUY || NPC[p.HoldingNPC].Type == NPCID_RED_GUY || NPC[p.HoldingNPC].Type == NPCID_JUMPER_S3 || NPC[p.HoldingNPC].Type == NPCID_BIRD || NPC[p.HoldingNPC].Type == NPCID_RED_SPIT_GUY || NPC[p.HoldingNPC].Type == NPCID_BLU_SPIT_GUY || NPC[p.HoldingNPC].Type == NPCID_GRY_SPIT_GUY || NPC[p.HoldingNPC].Type == NPCID_BOMB || NPC[p.HoldingNPC].Type == NPCID_WALK_BOMB_S2 || NPC[p.HoldingNPC].Type == NPCID_CARRY_BLOCK_A || NPC[p.HoldingNPC].Type == NPCID_CARRY_BLOCK_B || NPC[p.HoldingNPC].Type == NPCID_CARRY_BLOCK_C || NPC[p.HoldingNPC].Type == NPCID_CARRY_BLOCK_D || NPC[p.HoldingNPC].Type == NPCID_SPIT_BOSS_BALL || NPC[p.HoldingNPC].Type == NPCID_TIMER_S2 || NPC[p.HoldingNPC].Type == NPCID_PLR_FIREBALL || NPC[p.HoldingNPC].Type == NPCID_PLR_ICEBALL || NPC[p.HoldingNPC].Type == NPCID_DOOR_MAKER || NPC[p.HoldingNPC].Type == NPCID_CHAR3_HEAVY)
+                if(NPCIsVeggie(NPC[p.HoldingNPC]) || NPC[p.HoldingNPC].Type == NPCID_BLU_GUY || NPC[p.HoldingNPC].Type == NPCID_RED_GUY || NPC[p.HoldingNPC].Type == NPCID_JUMPER_S3 || NPC[p.HoldingNPC].Type == NPCID_BIRD || NPC[p.HoldingNPC].Type == NPCID_RED_SPIT_GUY || NPC[p.HoldingNPC].Type == NPCID_BLU_SPIT_GUY || NPC[p.HoldingNPC].Type == NPCID_GRY_SPIT_GUY || NPC[p.HoldingNPC].Type == NPCID_BOMB || NPC[p.HoldingNPC].Type == NPCID_WALK_BOMB_S2 || NPC[p.HoldingNPC].Type == NPCID_CARRY_BLOCK_A || NPC[p.HoldingNPC].Type == NPCID_CARRY_BLOCK_B || NPC[p.HoldingNPC].Type == NPCID_CARRY_BLOCK_C || NPC[p.HoldingNPC].Type == NPCID_CARRY_BLOCK_D || NPC[p.HoldingNPC].Type == NPCID_SPIT_BOSS_BALL || NPC[p.HoldingNPC].Type == NPCID_TIMER_S2 || NPC[p.HoldingNPC].Type == NPCID_PLR_FIREBALL || NPC[p.HoldingNPC].Type == NPCID_PLR_ICEBALL || NPC[p.HoldingNPC].Type == NPCID_DOOR_MAKER || NPC[p.HoldingNPC].Type == NPCID_CHAR3_HEAVY)
                     PlaySound(SFX_Throw);
                 else
                     PlaySound(SFX_ShellHit);
@@ -5556,10 +5565,10 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
                     NPC[p.HoldingNPC].Location.SpeedY = 20;
                 }
             }
-            else if(!NPCIsAShell[NPC[p.HoldingNPC].Type] &&
+            else if(!NPCIsAShell(NPC[p.HoldingNPC]) &&
                     NPC[p.HoldingNPC].Type != NPCID_SLIDE_BLOCK &&
                     NPC[p.HoldingNPC].Type != NPCID_ICE_CUBE &&
-                    !NPCIsACoin[NPC[p.HoldingNPC].Type]) // if not a shell or a coin the kick it up and forward
+                    !NPCIsACoin(NPC[p.HoldingNPC])) // if not a shell or a coin the kick it up and forward
             {
             // peach
                 if(p.Character == 3)
@@ -5596,14 +5605,14 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
                     NPC[p.HoldingNPC].Location.SpeedY = -6;
                 }
                 NPC[p.HoldingNPC].Projectile = true;
-                if(NPCIsVeggie[NPC[p.HoldingNPC].Type] || NPC[p.HoldingNPC].Type == NPCID_BLU_GUY || NPC[p.HoldingNPC].Type == NPCID_RED_GUY || NPC[p.HoldingNPC].Type == NPCID_JUMPER_S3 || NPC[p.HoldingNPC].Type == NPCID_BIRD || NPC[p.HoldingNPC].Type == NPCID_RED_SPIT_GUY || NPC[p.HoldingNPC].Type == NPCID_BLU_SPIT_GUY || NPC[p.HoldingNPC].Type == NPCID_GRY_SPIT_GUY || NPC[p.HoldingNPC].Type == NPCID_BOMB || NPC[p.HoldingNPC].Type == NPCID_WALK_BOMB_S2 || NPC[p.HoldingNPC].Type == NPCID_CARRY_BLOCK_A || NPC[p.HoldingNPC].Type == NPCID_CARRY_BLOCK_B || NPC[p.HoldingNPC].Type == NPCID_CARRY_BLOCK_C || NPC[p.HoldingNPC].Type == NPCID_CARRY_BLOCK_D || NPC[p.HoldingNPC].Type == NPCID_SPIT_BOSS_BALL || NPC[p.HoldingNPC].Type == NPCID_TIMER_S2 || NPC[p.HoldingNPC].Type == NPCID_PLR_FIREBALL || NPC[p.HoldingNPC].Type == NPCID_PLR_ICEBALL || NPC[p.HoldingNPC].Type == NPCID_DOOR_MAKER || NPC[p.HoldingNPC].Type == NPCID_CHAR3_HEAVY)
+                if(NPCIsVeggie(NPC[p.HoldingNPC]) || NPC[p.HoldingNPC].Type == NPCID_BLU_GUY || NPC[p.HoldingNPC].Type == NPCID_RED_GUY || NPC[p.HoldingNPC].Type == NPCID_JUMPER_S3 || NPC[p.HoldingNPC].Type == NPCID_BIRD || NPC[p.HoldingNPC].Type == NPCID_RED_SPIT_GUY || NPC[p.HoldingNPC].Type == NPCID_BLU_SPIT_GUY || NPC[p.HoldingNPC].Type == NPCID_GRY_SPIT_GUY || NPC[p.HoldingNPC].Type == NPCID_BOMB || NPC[p.HoldingNPC].Type == NPCID_WALK_BOMB_S2 || NPC[p.HoldingNPC].Type == NPCID_CARRY_BLOCK_A || NPC[p.HoldingNPC].Type == NPCID_CARRY_BLOCK_B || NPC[p.HoldingNPC].Type == NPCID_CARRY_BLOCK_C || NPC[p.HoldingNPC].Type == NPCID_CARRY_BLOCK_D || NPC[p.HoldingNPC].Type == NPCID_SPIT_BOSS_BALL || NPC[p.HoldingNPC].Type == NPCID_TIMER_S2 || NPC[p.HoldingNPC].Type == NPCID_PLR_FIREBALL || NPC[p.HoldingNPC].Type == NPCID_PLR_ICEBALL || NPC[p.HoldingNPC].Type == NPCID_DOOR_MAKER || NPC[p.HoldingNPC].Type == NPCID_CHAR3_HEAVY)
                     PlaySound(SFX_Throw);
                 else if(NPC[p.HoldingNPC].Type == NPCID_BULLET)
                     PlaySound(SFX_Bullet);
                 else
                     PlaySound(SFX_ShellHit);
             }
-            else if(NPCIsAShell[NPC[p.HoldingNPC].Type])
+            else if(NPCIsAShell(NPC[p.HoldingNPC]))
             {
                 NPC[p.HoldingNPC].Location.SpeedY = 0;
                 NPC[p.HoldingNPC].Location.SpeedX = 0;
@@ -5701,7 +5710,7 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
                             {
                                 // if(NPC[C].Layer == Layer[B].Name)
                                 {
-                                    if(NPCIsAVine[NPC[C].Type] || NPC[C].Type == NPCID_ITEM_BURIED)
+                                    if(NPCIsAVine(NPC[C]) || NPC[C].Type == NPCID_ITEM_BURIED)
                                     {
                                         NPC[C].Location.SpeedX = 0;
                                         NPC[C].Location.SpeedY = 0;

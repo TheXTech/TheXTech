@@ -20,6 +20,7 @@
 
 #include "globals.h"
 #include "sorting.h"
+#include "npc_traits.h"
 
 #include <algorithm>
 
@@ -117,15 +118,15 @@ void qSortBlocksX(int min, int max)
     qSortBlocksX(lo + 1, max);
 }
 
-void qSortBackgrounds(int min, int max)
+void qSortBackgrounds(int min, int max, bool use_x)
 {
     if(min >= max)
         return;
 
     std::stable_sort(&Background[min], (&Background[max]) + 1,
-    [](const Background_t& a, const Background_t& b)
+    [use_x](const Background_t& a, const Background_t& b)
     {
-        return a.SortPriority < b.SortPriority || (a.SortPriority == b.SortPriority && a.Location.X < b.Location.X);
+        return a.SortPriority < b.SortPriority || (use_x && a.SortPriority == b.SortPriority && a.Location.X < b.Location.X);
     });
 
     // old code was acceptable but didn't make it easy to sort by SortPriority first, Location second
@@ -525,11 +526,11 @@ void NPCSort()
 
     for(A = 1; A <= numNPCs; A++)
     {
-        if(NPCIsACoin[NPC[A].Type])
+        if(NPCIsACoin(NPC[A]))
         {
             for(B = 1; B < A; B++)
             {
-                if(!NPCIsACoin[NPC[B].Type])
+                if(!NPCIsACoin(NPC[B]))
                 {
                     tempNPC = NPC[A];
                     NPC[A] = NPC[B];

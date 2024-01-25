@@ -27,6 +27,7 @@
 #include "collision.h"
 
 #include "npc_id.h"
+#include "npc_traits.h"
 
 inline static bool s_Event_SoundOnly(const Events_t& evt, int test_section)
 {
@@ -74,7 +75,7 @@ static bool s_NPC_MustBeCanonical_internal(const NPC_t& n)
         || n.Type == NPCID_LAVA_MONSTER
         || n.Type == NPCID_SPIKY_THROWER
         || n.Type == NPCID_ITEM_THROWER
-        || (NPCIsCheep[n.Type] && Maths::iRound(n.Special) == 2)
+        || (NPCIsCheep(n) && Maths::iRound(n.Special) == 2)
         || n.AttLayer != LAYER_NONE
         || (n.TriggerActivate != EVENT_NONE && !s_Event_SoundOnly(Events[n.TriggerActivate], n.Section));
 }
@@ -86,7 +87,7 @@ bool NPC_MustBeCanonical(NPCRef_t n)
 
 bool NPC_MustNotRenderInactive(const NPC_t& n)
 {
-    return (NPCIsCheep[n.Type] && Maths::iRound(n.Special) == 2)
+    return (NPCIsCheep(n) && Maths::iRound(n.Special) == 2)
         || n.Type == NPCID_LAVABUBBLE
         || n.Type == NPCID_PLANT_S3 || n.Type == NPCID_BOTTOM_PLANT || n.Type == NPCID_SIDE_PLANT
         || n.Type == NPCID_BIG_PLANT || n.Type == NPCID_PLANT_S1 || n.Type == NPCID_FIRE_PLANT
@@ -98,11 +99,11 @@ bool NPC_MustRenderInactive(const NPC_t& n)
 {
     return n.Inert
         || n.Stuck
-        || NPCIsACoin[n.Type]
-        || NPCIsABlock[n.Type]
-        || NPCIsAHit1Block[n.Type]
-        || NPCIsAVine[n.Type]
-        || NPCIsABonus[n.Type]
+        || NPCIsACoin(n)
+        || n->IsABlock
+        || n->IsAHit1Block
+        || NPCIsAVine(n)
+        || NPCIsABonus(n)
         || n.Type == NPCID_CHECKPOINT
         || n.Type == NPCID_ITEM_BURIED
         || n.Type == NPCID_CONVEYOR

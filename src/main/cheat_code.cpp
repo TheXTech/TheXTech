@@ -60,6 +60,7 @@
 #include "main/cheat_code.h"
 
 #include "npc_id.h"
+#include "npc_traits.h"
 #include "eff_id.h"
 
 bool g_ForceBitmaskMerge = false;
@@ -260,7 +261,7 @@ static void iceAge()
     {
         if(NPC[C].Active)
         {
-            if(!NPCNoIceBall[NPC[C].Type] && NPC[C].Type != NPCID_ICE_CUBE && !NPCIsABonus[NPC[C].Type])
+            if(!NPC[C]->NoIceBall && NPC[C].Type != NPCID_ICE_CUBE && !NPCIsABonus(NPC[C]))
             {
                 NPC[0].Type = NPCID_PLR_ICEBALL;
                 NPCHit(C, 3, 0);
@@ -1258,11 +1259,11 @@ static void warioTime()
     {
         if(NPC[B].Active)
         {
-            if(!NPCWontHurt[NPC[B].Type] &&
-               !NPCIsABlock[NPC[B].Type] &&
-               !NPCIsABonus[NPC[B].Type] &&
-               !NPCIsACoin[NPC[B].Type] &&
-               !NPCIsAnExit[NPC[B].Type] &&
+            if(!NPC[B]->WontHurt &&
+               !NPC[B]->IsABlock &&
+               !NPCIsABonus(NPC[B]) &&
+               !NPCIsACoin(NPC[B]) &&
+               !NPCIsAnExit(NPC[B]) &&
                 NPC[B].Type != NPCID_ITEM_BURIED && !NPC[B].Generator &&
                !NPC[B].Inert
             )
@@ -1275,8 +1276,8 @@ static void warioTime()
                 tempLocation.X -= 16;
                 NewEffect(EFFID_SMOKE_S3, tempLocation);
                 NPC[B].Type = NPCID_COIN_S3;
-                NPC[B].Location.Width = NPCWidth[NPC[B].Type];
-                NPC[B].Location.Height = NPCHeight[NPC[B].Type];
+                NPC[B].Location.Width = NPC[B]->TWidth;
+                NPC[B].Location.Height = NPC[B]->THeight;
                 NPC[B].Location.Y += -NPC[B].Location.Height / 2.0;
                 NPC[B].Location.X += -NPC[B].Location.Width / 2.0;
                 NPC[B].Location.SpeedX = 0;
@@ -1298,8 +1299,8 @@ static void carKeys()
             numNPCs++;
             NPC[numNPCs] = NPC_t();
             NPC[numNPCs].Type = NPCID_KEY;
-            NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
-            NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
+            NPC[numNPCs].Location.Width = NPC[numNPCs]->TWidth;
+            NPC[numNPCs].Location.Height = NPC[numNPCs]->THeight;
             NPC[numNPCs].Location.SpeedX = 0;
             NPC[numNPCs].Location.SpeedY = 0;
             NPC[numNPCs].Active = true;
@@ -1325,8 +1326,8 @@ static void boingyBoing()
             numNPCs++;
             NPC[numNPCs] = NPC_t();
             NPC[numNPCs].Type = NPCID_SPRING;
-            NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
-            NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
+            NPC[numNPCs].Location.Width = NPC[numNPCs]->TWidth;
+            NPC[numNPCs].Location.Height = NPC[numNPCs]->THeight;
             NPC[numNPCs].Location.SpeedX = 0;
             NPC[numNPCs].Location.SpeedY = 0;
             NPC[numNPCs].Active = true;
@@ -1351,8 +1352,8 @@ static void bombsAway()
             numNPCs++;
             NPC[numNPCs] = NPC_t();
             NPC[numNPCs].Type = NPCID_BOMB;
-            NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
-            NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
+            NPC[numNPCs].Location.Width = NPC[numNPCs]->TWidth;
+            NPC[numNPCs].Location.Height = NPC[numNPCs]->THeight;
             NPC[numNPCs].Location.X = Player[B].Location.X;
             NPC[numNPCs].Location.Y = Player[B].Location.Y;
             NPC[numNPCs].Location.SpeedX = 0;
@@ -1380,8 +1381,8 @@ static void fireMissiles()
             numNPCs++;
             NPC[numNPCs] = NPC_t();
             NPC[numNPCs].Type = NPCID_BULLET;
-            NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
-            NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
+            NPC[numNPCs].Location.Width = NPC[numNPCs]->TWidth;
+            NPC[numNPCs].Location.Height = NPC[numNPCs]->THeight;
             NPC[numNPCs].Location.SpeedX = 0;
             NPC[numNPCs].Location.SpeedY = 0;
             NPC[numNPCs].Active = true;
@@ -1406,8 +1407,8 @@ static void hellFire()
             numNPCs++;
             NPC[numNPCs] = NPC_t();
             NPC[numNPCs].Type = NPCID_FLY_CANNON;
-            NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
-            NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
+            NPC[numNPCs].Location.Width = NPC[numNPCs]->TWidth;
+            NPC[numNPCs].Location.Height = NPC[numNPCs]->THeight;
             NPC[numNPCs].Location.SpeedX = 0;
             NPC[numNPCs].Location.SpeedY = 0;
             NPC[numNPCs].Active = true;
@@ -1434,8 +1435,8 @@ static void upAndOut()
             numNPCs++;
             NPC[numNPCs] = NPC_t();
             NPC[numNPCs].Type = NPCID_FLY_BLOCK;
-            NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
-            NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
+            NPC[numNPCs].Location.Width = NPC[numNPCs]->TWidth;
+            NPC[numNPCs].Location.Height = NPC[numNPCs]->THeight;
             NPC[numNPCs].Location.SpeedX = 0;
             NPC[numNPCs].Location.SpeedY = 0;
             NPC[numNPCs].Active = true;
@@ -1462,8 +1463,8 @@ static void powHammer()
             numNPCs++;
             NPC[numNPCs] = NPC_t();
             NPC[numNPCs].Type = NPCID_EARTHQUAKE_BLOCK;
-            NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
-            NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
+            NPC[numNPCs].Location.Width = NPC[numNPCs]->TWidth;
+            NPC[numNPCs].Location.Height = NPC[numNPCs]->THeight;
             NPC[numNPCs].Location.SpeedX = 0;
             NPC[numNPCs].Location.SpeedY = 0;
             NPC[numNPCs].Active = true;
@@ -1491,8 +1492,8 @@ static void hammerInMyPants()
             numNPCs++;
             NPC[numNPCs] = NPC_t();
             NPC[numNPCs].Type = NPCID_HEAVY_THROWER;
-            NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
-            NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
+            NPC[numNPCs].Location.Width = NPC[numNPCs]->TWidth;
+            NPC[numNPCs].Location.Height = NPC[numNPCs]->THeight;
             NPC[numNPCs].Location.SpeedX = 0;
             NPC[numNPCs].Location.SpeedY = 0;
             NPC[numNPCs].Active = true;
@@ -1520,8 +1521,8 @@ static void rainbowRider()
             numNPCs++;
             NPC[numNPCs] = NPC_t();
             NPC[numNPCs].Type = NPCID_FLIPPED_RAINBOW_SHELL;
-            NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
-            NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
+            NPC[numNPCs].Location.Width = NPC[numNPCs]->TWidth;
+            NPC[numNPCs].Location.Height = NPC[numNPCs]->THeight;
             NPC[numNPCs].Location.SpeedX = 0;
             NPC[numNPCs].Location.SpeedY = 0;
             NPC[numNPCs].Effect = 2;
@@ -1547,8 +1548,8 @@ static void greenEgg()
             NPC[numNPCs] = NPC_t();
             NPC[numNPCs].Type = NPCID_ITEM_POD;
             NPC[numNPCs].Special = 95;
-            NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
-            NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
+            NPC[numNPCs].Location.Width = NPC[numNPCs]->TWidth;
+            NPC[numNPCs].Location.Height = NPC[numNPCs]->THeight;
             NPC[numNPCs].Location.SpeedX = 0;
             NPC[numNPCs].Location.SpeedY = 0;
             NPC[numNPCs].Effect = 2;
@@ -1575,8 +1576,8 @@ static void blueEgg()
             NPC[numNPCs].Type = NPCID_ITEM_POD;
             NPC[numNPCs].Frame = 1;
             NPC[numNPCs].Special = 98;
-            NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
-            NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
+            NPC[numNPCs].Location.Width = NPC[numNPCs]->TWidth;
+            NPC[numNPCs].Location.Height = NPC[numNPCs]->THeight;
             NPC[numNPCs].Location.SpeedX = 0;
             NPC[numNPCs].Location.SpeedY = 0;
             NPC[numNPCs].Effect = 2;
@@ -1603,8 +1604,8 @@ static void yellowEgg()
             NPC[numNPCs].Type = NPCID_ITEM_POD;
             NPC[numNPCs].Special = 99;
             NPC[numNPCs].Frame = 2;
-            NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
-            NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
+            NPC[numNPCs].Location.Width = NPC[numNPCs]->TWidth;
+            NPC[numNPCs].Location.Height = NPC[numNPCs]->THeight;
             NPC[numNPCs].Location.SpeedX = 0;
             NPC[numNPCs].Location.SpeedY = 0;
             NPC[numNPCs].Effect = 2;
@@ -1631,8 +1632,8 @@ static void redEgg()
             NPC[numNPCs].Type = NPCID_ITEM_POD;
             NPC[numNPCs].Special = 100;
             NPC[numNPCs].Frame = 3;
-            NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
-            NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
+            NPC[numNPCs].Location.Width = NPC[numNPCs]->TWidth;
+            NPC[numNPCs].Location.Height = NPC[numNPCs]->THeight;
             NPC[numNPCs].Location.SpeedX = 0;
             NPC[numNPCs].Location.SpeedY = 0;
             NPC[numNPCs].Effect = 2;
@@ -1660,8 +1661,8 @@ static void blackEgg()
             NPC[numNPCs].Type = NPCID_ITEM_POD;
             NPC[numNPCs].Special = 148;
             NPC[numNPCs].Frame = 4;
-            NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
-            NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
+            NPC[numNPCs].Location.Width = NPC[numNPCs]->TWidth;
+            NPC[numNPCs].Location.Height = NPC[numNPCs]->THeight;
             NPC[numNPCs].Location.SpeedX = 0;
             NPC[numNPCs].Location.SpeedY = 0;
             NPC[numNPCs].Effect = 2;
@@ -1688,8 +1689,8 @@ static void purpleEgg()
             NPC[numNPCs].Type = NPCID_ITEM_POD;
             NPC[numNPCs].Special = 149;
             NPC[numNPCs].Frame = 5;
-            NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
-            NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
+            NPC[numNPCs].Location.Width = NPC[numNPCs]->TWidth;
+            NPC[numNPCs].Location.Height = NPC[numNPCs]->THeight;
             NPC[numNPCs].Location.SpeedX = 0;
             NPC[numNPCs].Location.SpeedY = 0;
             NPC[numNPCs].Effect = 2;
@@ -1716,8 +1717,8 @@ static void pinkEgg()
             NPC[numNPCs].Type = NPCID_ITEM_POD;
             NPC[numNPCs].Special = 150;
             NPC[numNPCs].Frame = 6;
-            NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
-            NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
+            NPC[numNPCs].Location.Width = NPC[numNPCs]->TWidth;
+            NPC[numNPCs].Location.Height = NPC[numNPCs]->THeight;
             NPC[numNPCs].Location.SpeedX = 0;
             NPC[numNPCs].Location.SpeedY = 0;
             NPC[numNPCs].Effect = 2;
@@ -1744,8 +1745,8 @@ static void coldEgg()
             NPC[numNPCs].Type = NPCID_ITEM_POD;
             NPC[numNPCs].Special = 228;
             NPC[numNPCs].Frame = 6;
-            NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
-            NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
+            NPC[numNPCs].Location.Width = NPC[numNPCs]->TWidth;
+            NPC[numNPCs].Location.Height = NPC[numNPCs]->THeight;
             NPC[numNPCs].Location.SpeedX = 0;
             NPC[numNPCs].Location.SpeedY = 0;
             NPC[numNPCs].Effect = 2;
