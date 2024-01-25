@@ -202,7 +202,7 @@ void TouchBonus(int A, int B)
     bool tempBool = false;
     Location_t tempLocation;
 
-    if(NPC[B].CantHurtPlayer != A || (NPCIsACoin[NPC[B].Type] && Player[A].HoldingNPC != B && NPC[B].Killed == 0))
+    if(NPC[B].CantHurtPlayer != A || (NPCIsACoin(NPC[B]) && Player[A].HoldingNPC != B && NPC[B].Killed == 0))
     {
         //        if(nPlay.Online == true && nPlay.MySlot + 1 == A)
         //            Netplay::sendData "1k" + std::to_string(A) + "|" + std::to_string(B) + "|" + NPC[B].Type + LB;
@@ -329,7 +329,7 @@ void TouchBonus(int A, int B)
             NPCQueues::Killed.push_back(B);
             return;
         }
-        if(NPCIsToad[NPC[B].Type])
+        if(NPCIsToad(NPC[B]))
         {
             toadBool = NPC[B].Type;
             NPC[B].Type = NPCID_POWER_S3;
@@ -537,7 +537,7 @@ void TouchBonus(int A, int B)
             if(NPC[B].Effect != 2)
                 s_PowerupScore(B);
         }
-        else if(NPCIsACoin[NPC[B].Type]) // Bonus is a coin
+        else if(NPCIsACoin(NPC[B])) // Bonus is a coin
         {
             if(NPC[B].Type == NPCID_RING)
                 PlaySound(SFX_RingGet);
@@ -576,7 +576,7 @@ void TouchBonus(int A, int B)
                 MoreScore(1, NPC[B].Location);
             NewEffect(EFFID_COIN_COLLECT, NPC[B].Location);
         }
-        else if(NPCIsAnExit[NPC[B].Type] && LevelMacro == LEVELMACRO_OFF) // Level exit
+        else if(NPCIsAnExit(NPC[B]) && LevelMacro == LEVELMACRO_OFF) // Level exit
         {
             if(NPC[B].Type != NPCID_STAR_COLLECT)
             {

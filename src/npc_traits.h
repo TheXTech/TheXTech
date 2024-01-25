@@ -28,7 +28,7 @@
 #include "range_arr.hpp"
 
 #include "globals.h"
-
+#include "npc_constant_traits.h"
 
 struct NPCTraits_t
 {

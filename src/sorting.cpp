@@ -20,6 +20,7 @@
 
 #include "globals.h"
 #include "sorting.h"
+#include "npc_traits.h"
 
 #include <algorithm>
 
@@ -525,11 +526,11 @@ void NPCSort()
 
     for(A = 1; A <= numNPCs; A++)
     {
-        if(NPCIsACoin[NPC[A].Type])
+        if(NPCIsACoin(NPC[A]))
         {
             for(B = 1; B < A; B++)
             {
-                if(!NPCIsACoin[NPC[B].Type])
+                if(!NPCIsACoin(NPC[B]))
                 {
                     tempNPC = NPC[A];
                     NPC[A] = NPC[B];

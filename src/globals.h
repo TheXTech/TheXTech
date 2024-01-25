@@ -1508,23 +1508,23 @@ extern RangeArrI<int, 0, maxNPCType, 0> NPCHeightGFX;
 extern RangeArr<float, 0, maxNPCType> NPCSpeedvar;
 
 //Public NPCIsAShell(0 To maxNPCType) As Boolean 'Flags the NPC type if it is a shell
-extern RangeArrI<bool, 0, maxNPCType, false> NPCIsAShell;
+// extern RangeArrI<bool, 0, maxNPCType, false> NPCIsAShell;
 //Public NPCIsABlock(0 To maxNPCType) As Boolean 'Flag NPC as a block
 extern RangeArrI<bool, 0, maxNPCType, false> NPCIsABlock;
 //Public NPCIsAHit1Block(0 To maxNPCType) As Boolean 'Flag NPC as a hit1 block
 extern RangeArrI<bool, 0, maxNPCType, false> NPCIsAHit1Block;
 //Public NPCIsABonus(0 To maxNPCType) As Boolean 'Flags the NPC type if it is a bonus
-extern RangeArrI<bool, 0, maxNPCType, false> NPCIsABonus;
+// extern RangeArrI<bool, 0, maxNPCType, false> NPCIsABonus;
 //Public NPCIsACoin(0 To maxNPCType) As Boolean 'Flags the NPC type if it is a coin
-extern RangeArrI<bool, 0, maxNPCType, false> NPCIsACoin;
+// extern RangeArrI<bool, 0, maxNPCType, false> NPCIsACoin;
 //Public NPCIsAVine(0 To maxNPCType) As Boolean 'Flags the NPC type if it is a vine
-extern RangeArrI<bool, 0, maxNPCType, false> NPCIsAVine;
+// extern RangeArrI<bool, 0, maxNPCType, false> NPCIsAVine;
 //Public NPCIsAnExit(0 To maxNPCType) As Boolean 'Flags the NPC type if it is a level exit
-extern RangeArrI<bool, 0, maxNPCType, false> NPCIsAnExit;
+// extern RangeArrI<bool, 0, maxNPCType, false> NPCIsAnExit;
 //Public NPCIsAParaTroopa(0 To maxNPCType) As Boolean 'Flags the NPC type as a para-troopa
-extern RangeArrI<bool, 0, maxNPCType, false> NPCIsAParaTroopa;
+// extern RangeArrI<bool, 0, maxNPCType, false> NPCIsAParaTroopa;
 //Public NPCIsCheep(0 To maxNPCType) As Boolean 'Flags the NPC type as a cheep cheep
-extern RangeArrI<bool, 0, maxNPCType, false> NPCIsCheep;
+// extern RangeArrI<bool, 0, maxNPCType, false> NPCIsCheep;
 //Public NPCJumpHurt(0 To maxNPCType) As Boolean 'Hurts the player even if it jumps on the NPC
 extern RangeArrI<bool, 0, maxNPCType, false> NPCJumpHurt;
 //Public NPCNoClipping(0 To maxNPCType) As Boolean 'NPC can go through blocks
@@ -1546,21 +1546,21 @@ extern RangeArrI<bool, 0, maxNPCType, false> NPCStandsOnPlayer;
 //Public NPCIsGrabbable(0 To maxNPCType) As Boolean 'Player can grab the NPC
 extern RangeArrI<bool, 0, maxNPCType, false> NPCIsGrabbable;
 //Public NPCIsBoot(0 To maxNPCType) As Boolean 'npc is a kurbo's shoe
-extern RangeArrI<bool, 0, maxNPCType, false> NPCIsBoot;
+// extern RangeArrI<bool, 0, maxNPCType, false> NPCIsBoot;
 //Public NPCIsYoshi(0 To maxNPCType) As Boolean 'npc is a yoshi
-extern RangeArrI<bool, 0, maxNPCType, false> NPCIsYoshi;
+// extern RangeArrI<bool, 0, maxNPCType, false> NPCIsYoshi;
 //Public NPCIsToad(0 To maxNPCType) As Boolean 'npc is a toad
-extern RangeArrI<bool, 0, maxNPCType, false> NPCIsToad;
+// extern RangeArrI<bool, 0, maxNPCType, false> NPCIsToad;
 //Public NPCNoYoshi(0 To maxNPCType) As Boolean 'Player can't eat the NPC
 extern RangeArrI<bool, 0, maxNPCType, false> NPCNoYoshi;
 //Public NPCForeground(0 To maxNPCType) As Boolean 'draw the npc in front
 extern RangeArrI<bool, 0, maxNPCType, false> NPCForeground;
 //Public NPCIsABot(0 To maxNPCType) As Boolean 'Zelda 2 Bot monster
-extern RangeArrI<bool, 0, maxNPCType, false> NPCIsABot;
+// extern RangeArrI<bool, 0, maxNPCType, false> NPCIsABot;
 //Public NPCDefaultMovement(0 To maxNPCType) As Boolean 'default NPC movement
-extern RangeArrI<bool, 0, maxNPCType, false> NPCDefaultMovement;
+// extern RangeArrI<bool, 0, maxNPCType, false> NPCDefaultMovement;
 //Public NPCIsVeggie(0 To maxNPCType) As Boolean 'turnips
-extern RangeArrI<bool, 0, maxNPCType, false> NPCIsVeggie;
+// extern RangeArrI<bool, 0, maxNPCType, false> NPCIsVeggie;
 //Public NPCNoFireBall(0 To maxNPCType) As Boolean 'not hurt by fireball
 extern RangeArrI<bool, 0, maxNPCType, false> NPCNoFireBall;
 //Public NPCNoIceBall(0 To maxNPCType) As Boolean 'not hurt by fireball

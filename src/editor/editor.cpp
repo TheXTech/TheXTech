@@ -468,7 +468,7 @@ void UpdateEditor()
                                 if(n.id == 288 || n.id == 289 || (n.id == 91 && int(EditorCursor.NPC.Special) == 288))
                                     n.special_data = (long)EditorCursor.NPC.Special2;
 
-                                if(NPCIsAParaTroopa[n.id] || NPCIsCheep[n.id] || n.id == 260)
+                                if(NPCIsAParaTroopa(n.id) || NPCIsCheep(n.id) || n.id == 260)
                                     n.special_data = (long)EditorCursor.NPC.Special;
 
                                 if(n.id == 86)
@@ -973,7 +973,7 @@ void UpdateEditor()
                             else
                                 NPC[A].Location.SpeedX = -double(Physics.NPCShellSpeed / 2);
 //                            Netplay::sendData Netplay::EraseNPC(A, 0);
-                            if(NPCIsABonus[NPC[A].Type] || NPCIsACoin[NPC[A].Type])
+                            if(NPCIsABonus(NPC[A]) || NPCIsACoin(NPC[A]))
                                 KillNPC(A, 4); // Kill the bonus/coin
                             else
                                 KillNPC(A, 2); // Kill the NPC
@@ -1582,7 +1582,7 @@ void UpdateEditor()
                         {
                             if((EditorCursor.NPC.Type != 208 && NPC[A].Type != NPCID_BOSS_CASE) || (EditorCursor.NPC.Type == 208 && NPC[A].Type == NPCID_BOSS_CASE))
                             {
-                                if(!NPCIsAVine[NPC[A].Type])
+                                if(!NPCIsAVine(NPC[A]))
                                 {
                                     CanPlace = false;
                                     break;
@@ -2096,13 +2096,13 @@ void UpdateInterprocess()
                 EditorCursor.NPC.DefaultSpecial2 = int(EditorCursor.NPC.Special2);
             }
 
-            if(NPCIsAParaTroopa[EditorCursor.NPC.Type])
+            if(NPCIsAParaTroopa(EditorCursor.NPC))
             {
                 EditorCursor.NPC.Special = n.special_data;
                 EditorCursor.NPC.DefaultSpecial = int(EditorCursor.NPC.Special);
             }
 
-            if(NPCIsCheep[EditorCursor.NPC.Type])
+            if(NPCIsCheep(EditorCursor.NPC))
             {
                 EditorCursor.NPC.Special = n.special_data;
                 EditorCursor.NPC.DefaultSpecial = int(EditorCursor.NPC.Special);
@@ -2240,7 +2240,7 @@ int EditorNPCFrame(const int A, float& C, int N)
 
     // Bullet Bills
     if(A == 17 || A == 18 || A == 29 || A == 31 || A == 84 || A == 94 || A == 198 ||
-       NPCIsYoshi[A] || A == 101 || A == 102 || A == 181 || A == 81)
+       NPCIsYoshi(A) || A == 101 || A == 102 || A == 181 || A == 81)
     {
         if(int(B) == -1)
             ret = 0;
@@ -2598,7 +2598,7 @@ void SetCursor()
         // Container NPCs are handled elsewhere in new editor
         if(MagicHand)
         {
-            if(t != 91 && t != 96 && t != 283 && t != 284 && !NPCIsCheep[t] && !NPCIsAParaTroopa[t] && t != NPCID_FIRE_CHAIN)
+            if(t != 91 && t != 96 && t != 283 && t != 284 && !NPCIsCheep(t) && !NPCIsAParaTroopa(t) && t != NPCID_FIRE_CHAIN)
                 EditorCursor.NPC.Special = 0;
             if(t != 288 && t != 289 && t != 91 && t != 260)
                 EditorCursor.NPC.Special2 = 0.0;

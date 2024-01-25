@@ -330,7 +330,7 @@ void DrawPlayer(Player_t &p, const int Z, XTColor color)
                      !Player[NPC[p.HoldingNPC].HoldingPlayer].Dead
                     )
                     {
-                        if(!NPCIsYoshi[NPC[p.HoldingNPC].Type] && NPC[p.HoldingNPC].Type > 0)
+                        if(!NPCIsYoshi(NPC[p.HoldingNPC]) && NPC[p.HoldingNPC].Type > 0)
                         {
                             if(NPCWidthGFX[NPC[p.HoldingNPC].Type] == 0)
                             {

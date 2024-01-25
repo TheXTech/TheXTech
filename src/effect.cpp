@@ -713,7 +713,7 @@ void UpdateEffects()
                 e.Life = 0;
                 if(!LevelEditor && e.NewNpc != 96)
                 {
-                    if(NPCIsYoshi[e.NewNpc])
+                    if(NPCIsYoshi(e.NewNpc))
                         NewEffect(EFFID_PET_BIRTH, e.Location, 1, static_cast<float>(e.NewNpc));
                     else if(e.NewNpc > 0)
                     {
@@ -733,7 +733,7 @@ void UpdateEffects()
                         if(nn.Type == NPCID_LEAF_POWER)
                             nn.Location.SpeedY = -6;
 
-                        if(NPCIsCheep[e.NewNpc] || NPCIsAParaTroopa[e.NewNpc] || e.NewNpc == NPCID_FIRE_CHAIN)
+                        if(NPCIsCheep(e.NewNpc) || NPCIsAParaTroopa(e.NewNpc) || e.NewNpc == NPCID_FIRE_CHAIN)
                         {
                             nn.Special = static_cast<double>(e.NewNpcSpecial);
                             nn.DefaultSpecial = static_cast<int>(e.NewNpcSpecial);

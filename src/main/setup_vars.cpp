@@ -308,15 +308,15 @@ void SetupVars()
     NPCHeightGFX.fill(0);
     NPCSpeedvar.fill(1.f);
 
-    NPCIsAShell.fill(false);
+    // NPCIsAShell.fill(false);
     NPCIsABlock.fill(false);
     NPCIsAHit1Block.fill(false);
-    NPCIsABonus.fill(false);
-    NPCIsACoin.fill(false);
-    NPCIsAVine.fill(false);
-    NPCIsAnExit.fill(false);
-    NPCIsAParaTroopa.fill(false);
-    NPCIsCheep.fill(false);
+    // NPCIsABonus.fill(false);
+    // NPCIsACoin.fill(false);
+    // NPCIsAVine.fill(false);
+    // NPCIsAnExit.fill(false);
+    // NPCIsAParaTroopa.fill(false);
+    // NPCIsCheep.fill(false);
     NPCJumpHurt.fill(false);
     NPCNoClipping.fill(false);
     NPCScore.fill(0);
@@ -327,14 +327,14 @@ void SetupVars()
     NPCMovesPlayer.fill(false);
     NPCStandsOnPlayer.fill(false);
     NPCIsGrabbable.fill(false);
-    NPCIsBoot.fill(false);
-    NPCIsYoshi.fill(false);
-    NPCIsToad.fill(false);
+    // NPCIsBoot.fill(false);
+    // NPCIsYoshi.fill(false);
+    // NPCIsToad.fill(false);
     NPCNoYoshi.fill(false);
     NPCForeground.fill(false);
-    NPCIsABot.fill(false);
-    NPCDefaultMovement.fill(false);
-    NPCIsVeggie.fill(false);
+    // NPCIsABot.fill(false);
+    // NPCDefaultMovement.fill(false);
+    // NPCIsVeggie.fill(false);
     NPCNoFireBall.fill(false);
     NPCNoIceBall.fill(false);
     NPCNoGravity.fill(false);
@@ -397,13 +397,13 @@ void SetupVars()
     NPCForeground[210] = true;
     NPCForeground[230] = true;
 
-    NPCIsCheep[28] = true;
-    NPCIsCheep[229] = true;
-    NPCIsCheep[230] = true;
-    NPCIsCheep[232] = true;
-    NPCIsCheep[233] = true;
-    NPCIsCheep[234] = true;
-    NPCIsCheep[236] = true;
+    // NPCIsCheep(28) = true;
+    // NPCIsCheep(229) = true;
+    // NPCIsCheep(230) = true;
+    // NPCIsCheep(232) = true;
+    // NPCIsCheep(233) = true;
+    // NPCIsCheep(234) = true;
+    // NPCIsCheep(236) = true;
 
 
     NPCNoClipping[289] = true;
@@ -447,8 +447,8 @@ void SetupVars()
 
 
 
-    NPCIsABonus[254] = true;
-    NPCIsAShell[237] = true;
+    // NPCIsABonus(254) = true;
+    // NPCIsAShell(237) = true;
     NPCWontHurt[237] = true;
     NPCCanWalkOn[237] = true;
     NPCJumpHurt[13] = true;
@@ -472,27 +472,27 @@ void SetupVars()
 
     NPCWidth[251] = 18; // TLOZ Rupee
     NPCHeight[251] = 32;
-    NPCIsABonus[251] = true;
-    NPCIsACoin[251] = true;
+    // NPCIsABonus(251) = true;
+    // NPCIsACoin(251) = true;
 
     NPCWidth[252] = 18; // TLOZ Rupee
     NPCHeight[252] = 32;
-    NPCIsABonus[252] = true;
-    NPCIsACoin[252] = true;
+    // NPCIsABonus(252) = true;
+    // NPCIsACoin(252) = true;
 
     NPCWidth[253] = 18; // TLOZ Rupee
     NPCHeight[253] = 32;
-    NPCIsABonus[253] = true;
-    NPCIsACoin[253] = true;
+    // NPCIsABonus(253) = true;
+    // NPCIsACoin(253) = true;
 
     NPCWidth[250] = 32; // TLOZ Heart
     NPCHeight[250] = 32;
-    NPCIsABonus[250] = true;
+    // NPCIsABonus(250) = true;
 
     // vines
     for(int A = 213; A <= 224; ++A)
     {
-        NPCIsAVine[A] = true;
+        // NPCIsAVine(A) = true;
         NPCWontHurt[A] = true;
         NPCNoClipping[A] = true;
         NPCJumpHurt[A] = true;
@@ -521,11 +521,11 @@ void SetupVars()
 
     NPCWidth[240] = 32;
     NPCHeight[240] = 32;
-    NPCIsABonus[240] = true;//32;
+    // NPCIsABonus(240) = true;//32;
 
     NPCWidth[248] = 32;
     NPCHeight[248] = 32;
-    NPCIsABonus[248] = true;//32;
+    // NPCIsABonus(248) = true;//32;
 
     NPCWidth[200] = 64;
     NPCHeight[200] = 72;
@@ -546,7 +546,7 @@ void SetupVars()
     NPCWidth[242] = 32; // SML2 Goomba
     NPCHeight[242] = 32;
     NPCFrameOffsetY[242] = 2;
-    NPCDefaultMovement[242] = true;
+    // NPCDefaultMovement(242) = true;
 
     NPCWidth[243] = 32; // SML2 Flying Goomba
     NPCHeight[243] = 32;
@@ -567,8 +567,8 @@ void SetupVars()
     NPCCanWalkOn[255] = true;
     NPCMovesPlayer[255] = true;
 
-    NPCIsAParaTroopa[244] = true;
-    NPCIsAParaTroopa[243] = true;
+    // NPCIsAParaTroopa(244) = true;
+    // NPCIsAParaTroopa(243) = true;
 
     NPCWidth[1] = 32; // Goomba
     NPCHeight[1] = 32;
@@ -623,12 +623,12 @@ void SetupVars()
 
     NPCWidth[249] = 32; // SMB2 Mushroom
     NPCHeight[249] = 32;
-    NPCIsABonus[249] = true;
+    // NPCIsABonus(249) = true;
 
     NPCWidth[274] = 32; // dragon coin
     NPCHeight[274] = 50;
-    NPCIsABonus[274] = true;
-    NPCIsACoin[274] = true;
+    // NPCIsABonus(274) = true;
+    // NPCIsACoin(274) = true;
     NPCScore[274] = 6;
 
     NPCWidth[10] = 28; // SMB3 Coin
@@ -872,19 +872,19 @@ void SetupVars()
     NPCFrameOffsetY[75] = 2;
     NPCWidthGFX[75] = 38;
     NPCHeightGFX[75] = 58;
-    NPCIsToad[75] = true;
+    // NPCIsToad(75) = true;
     NPCWidth[76] = 32; // flying green koopa
     NPCHeight[76] = 32;
     NPCFrameOffsetY[76] = 2;
     NPCWidthGFX[76] = 32;
     NPCHeightGFX[76] = 56;
-    NPCIsAParaTroopa[76] = true;
+    // NPCIsAParaTroopa(76) = true;
     NPCWidth[161] = 32; // flying red koopa
     NPCHeight[161] = 32;
     NPCFrameOffsetY[161] = 2;
     NPCWidthGFX[161] = 32;
     NPCHeightGFX[161] = 56;
-    NPCIsAParaTroopa[161] = true;
+    // NPCIsAParaTroopa(161) = true;
     NPCWidth[77] = 32; // black ninja
     NPCHeight[77] = 32;
     NPCFrameOffsetY[73] = 2;
@@ -935,7 +935,7 @@ void SetupVars()
     NPCFrameOffsetY[91] = -16;
     NPCWidth[92] = 32; // turnip
     NPCHeight[92] = 32;
-    NPCIsVeggie[92] = true;
+    // NPCIsVeggie(92) = true;
     NPCWidth[93] = 32; // SMB1 Plant
     NPCHeight[93] = 48;
     NPCWidth[94] = 32; // Inert Toad
@@ -945,8 +945,8 @@ void SetupVars()
     NPCHeight[198] = 64;
     NPCFrameOffsetY[198] = 2;
     NPCFrameOffsetY[94] = 2;
-    NPCIsToad[94] = true;
-    NPCIsToad[198] = true;
+    // NPCIsToad(94) = true;
+    // NPCIsToad(198) = true;
     NPCWidth[95] = 32; // Green Yoshi
     NPCHeight[95] = 32;
     NPCWidthGFX[95] = 74;
@@ -975,11 +975,11 @@ void SetupVars()
     NPCWidth[101] = 28; // Luigi
     NPCHeight[101] = 62;
     NPCFrameOffsetY[101] = 2;
-    NPCIsToad[101] = true;
+    // NPCIsToad(101) = true;
     NPCWidth[102] = 32; // Link
     NPCHeight[102] = 64;
     NPCFrameOffsetY[102] = 2;
-    NPCIsToad[102] = true;
+    // NPCIsToad(102) = true;
     NPCWidth[103] = 28; // SMB3 Red Coin
     NPCHeight[103] = 32;
     NPCWidth[104] = 96; // SMB3 Platform
@@ -996,7 +996,7 @@ void SetupVars()
     NPCWidthGFX[107] = 48;
     NPCHeightGFX[107] = 38;
     NPCFrameOffsetY[107] = 2;
-    NPCIsToad[107] = true;
+    // NPCIsToad(107) = true;
     NPCWidth[108] = 32; // Yoshi Fireball
     NPCHeight[108] = 32;
     NPCNoYoshi[108] = true;
@@ -1005,87 +1005,87 @@ void SetupVars()
     NPCWidthGFX[109] = 32;
     NPCHeightGFX[109] = 54;
     NPCFrameOffsetY[109] = 2;
-    NPCDefaultMovement[109] = true;
+    // NPCDefaultMovement(109) = true;
     NPCWidth[110] = 32; // SMW Red Koopa
     NPCHeight[110] = 32;
     NPCWidthGFX[110] = 32;
     NPCHeightGFX[110] = 54;
     NPCFrameOffsetY[110] = 2;
     NPCTurnsAtCliffs[110] = true;
-    NPCDefaultMovement[110] = true;
+    // NPCDefaultMovement(110) = true;
     NPCWidth[111] = 32; // SMW Blue Koopa
     NPCHeight[111] = 32;
     NPCWidthGFX[111] = 32;
     NPCHeightGFX[111] = 54;
     NPCFrameOffsetY[111] = 2;
     NPCTurnsAtCliffs[111] = true;
-    NPCDefaultMovement[111] = true;
+    // NPCDefaultMovement(111) = true;
     NPCWidth[112] = 32; // SMW Yellow Koopa
     NPCHeight[112] = 32;
     NPCWidthGFX[112] = 32;
     NPCHeightGFX[112] = 54;
     NPCFrameOffsetY[112] = 2;
     NPCTurnsAtCliffs[112] = true;
-    NPCDefaultMovement[112] = true;
+    // NPCDefaultMovement(112) = true;
     NPCWidth[113] = 32; // SMW Green Shell
     NPCHeight[113] = 32;
     NPCFrameOffsetY[113] = 2;
-    NPCIsAShell[113] = true;
+    // NPCIsAShell(113) = true;
     NPCWidth[114] = 32; // SMW Red Shell
     NPCHeight[114] = 32;
     NPCFrameOffsetY[114] = 2;
-    NPCIsAShell[114] = true;
+    // NPCIsAShell(114) = true;
     NPCWidth[115] = 32; // SMW Blue Shell
     NPCHeight[115] = 32;
     NPCFrameOffsetY[115] = 2;
-    NPCIsAShell[115] = true;
+    // NPCIsAShell(115) = true;
     NPCWidth[116] = 32; // SMW Yellow Shell
     NPCHeight[116] = 32;
     NPCFrameOffsetY[116] = 2;
-    NPCIsAShell[116] = true;
+    // NPCIsAShell(116) = true;
     NPCWidth[117] = 32; // SMW Green Beach Koopa
     NPCHeight[117] = 32;
     NPCFrameOffsetY[117] = 2;
-    NPCDefaultMovement[117] = true;
+    // NPCDefaultMovement(117) = true;
     NPCWidth[118] = 32; // SMW Red Beach Koopa
     NPCHeight[118] = 32;
     NPCFrameOffsetY[118] = 2;
     NPCTurnsAtCliffs[118] = true;
-    NPCDefaultMovement[118] = true;
+    // NPCDefaultMovement(118) = true;
     NPCWidth[119] = 32; // SMW Blue Beach Koopa
     NPCHeight[119] = 32;
     NPCFrameOffsetY[119] = 2;
     NPCTurnsAtCliffs[119] = true;
-    NPCDefaultMovement[119] = true;
+    // NPCDefaultMovement(119) = true;
     NPCWidth[120] = 32; // SMW Yellow Beach Koopa
     NPCHeight[120] = 32;
     NPCFrameOffsetY[120] = 2;
     NPCTurnsAtCliffs[120] = true;
-    NPCDefaultMovement[120] = true;
+    // NPCDefaultMovement(120) = true;
     NPCWidth[121] = 32; // SMW Green Para-Koopa
     NPCHeight[121] = 32;
     NPCWidthGFX[121] = 56;
     NPCHeightGFX[121] = 56;
     NPCFrameOffsetY[121] = 2;
-    NPCIsAParaTroopa[121] = true;
+    // NPCIsAParaTroopa(121) = true;
     NPCWidth[122] = 32; // SMW Red Para-Koopa
     NPCHeight[122] = 32;
     NPCWidthGFX[122] = 56;
     NPCHeightGFX[122] = 56;
     NPCFrameOffsetY[122] = 2;
-    NPCIsAParaTroopa[122] = true;
+    // NPCIsAParaTroopa(122) = true;
     NPCWidth[123] = 32; // SMW Blue Para-Koopa
     NPCHeight[123] = 32;
     NPCWidthGFX[123] = 56;
     NPCHeightGFX[123] = 56;
     NPCFrameOffsetY[123] = 2;
-    NPCIsAParaTroopa[123] = true;
+    // NPCIsAParaTroopa(123) = true;
     NPCWidth[124] = 32; // SMW Yellow Para-Koopa
     NPCHeight[124] = 32;
     NPCWidthGFX[124] = 56;
     NPCHeightGFX[124] = 56;
     NPCFrameOffsetY[124] = 2;
-    NPCIsAParaTroopa[124] = true;
+    // NPCIsAParaTroopa(124) = true;
     NPCWidth[125] = 36; // Rat Head
     NPCHeight[125] = 56;
     NPCWidthGFX[125] = 36;
@@ -1094,18 +1094,18 @@ void SetupVars()
     NPCJumpHurt[261] = true;
     NPCNoFireBall[261] = true;
     NPCNoFireBall[17] = true;
-    NPCDefaultMovement[125] = true;
+    // NPCDefaultMovement(125) = true;
     NPCNoYoshi[125] = true;
     NPCWidth[126] = 32; // Blue Bot
     NPCHeight[126] = 34;
     NPCWidthGFX[126] = 32;
     NPCHeightGFX[126] = 26;
-    NPCIsABot[126] = true;
+    // NPCIsABot(126) = true;
     NPCWidth[127] = 32; // Cyan Bot
     NPCHeight[127] = 34;
     NPCWidthGFX[127] = 32;
     NPCHeightGFX[127] = 26;
-    NPCIsABot[127] = true;
+    // NPCIsABot(127) = true;
     NPCWidth[128] = 32; // Red Bot
     NPCHeight[128] = 34;
     NPCWidthGFX[128] = 32;
@@ -1114,23 +1114,23 @@ void SetupVars()
     NPCHeight[129] = 32;
     NPCCanWalkOn[129] = true;
     NPCGrabFromTop[129] = true;
-    NPCDefaultMovement[129] = true;
+    // NPCDefaultMovement(129) = true;
     NPCWidth[130] = 32; // Red Sniffit
     NPCHeight[130] = 32;
     NPCCanWalkOn[130] = true;
     NPCGrabFromTop[130] = true;
-    NPCDefaultMovement[130] = true;
+    // NPCDefaultMovement(130) = true;
     NPCWidth[131] = 32; // Blue Sniffit
     NPCHeight[131] = 32;
     NPCCanWalkOn[131] = true;
     NPCGrabFromTop[131] = true;
-    NPCDefaultMovement[131] = true;
+    // NPCDefaultMovement(131) = true;
     NPCTurnsAtCliffs[131] = true;
     NPCWidth[132] = 32; // Grey Sniffit
     NPCHeight[132] = 32;
     NPCCanWalkOn[132] = true;
     NPCGrabFromTop[132] = true;
-    NPCDefaultMovement[132] = true;
+    // NPCDefaultMovement(132) = true;
     NPCWidth[133] = 16; // Bullet
     NPCHeight[133] = 16;
     NPCNoYoshi[133] = true;
@@ -1147,11 +1147,11 @@ void SetupVars()
     NPCHeight[135] = 32;
     NPCGrabFromTop[135] = true;
     NPCCanWalkOn[135] = true;
-    NPCDefaultMovement[135] = true;
+    // NPCDefaultMovement(135) = true;
     NPCWidth[136] = 32; // SMB3 Bob-om
     NPCHeight[136] = 32;
     NPCFrameOffsetY[136] = 2;
-    NPCDefaultMovement[136] = true;
+    // NPCDefaultMovement(136) = true;
     NPCTurnsAtCliffs[136] = true;
     NPCWidth[137] = 32; // SMB3 Bomb
     NPCHeight[137] = 28;
@@ -1159,12 +1159,12 @@ void SetupVars()
     NPCIsGrabbable[137] = true;
     NPCWidth[138] = 28; // SMB 2 Coin
     NPCHeight[138] = 32;
-    NPCIsABonus[138] = true;
-    NPCIsACoin[138] = true;
+    // NPCIsABonus(138) = true;
+    // NPCIsACoin(138) = true;
     NPCWidth[152] = 32; // Sonic Ring
     NPCHeight[152] = 32;
-    NPCIsABonus[152] = true;
-    NPCIsACoin[152] = true;
+    // NPCIsABonus(152) = true;
+    // NPCIsACoin(152) = true;
     For(A, 139, 147) // Veggies
     {
         NPCWidth[A] = GFXNPCWidth[A];
@@ -1173,7 +1173,7 @@ void SetupVars()
         NPCGrabFromTop[A] = true;
         NPCWontHurt[A] = true;
         NPCIsGrabbable[A] = true;
-        NPCIsVeggie[A] = true;
+        // NPCIsVeggie(A) = true;
     }
     NPCWidth[148] = 32; // Black Yoshi
     NPCHeight[148] = 32;
@@ -1257,11 +1257,11 @@ void SetupVars()
     NPCWidth[169] = 32; // Tanooki Suit
     NPCHeight[169] = 32;
     NPCFrameOffsetY[169] = 2;
-    NPCIsABonus[169] = true;
+    // NPCIsABonus(169) = true;
     NPCWidth[170] = 32; // Hammer Suit
     NPCHeight[170] = 32;
     NPCFrameOffsetY[170] = 2;
-    NPCIsABonus[170] = true;
+    // NPCIsABonus(170) = true;
 
     NPCWontHurt[292] = true; // Boomerang
     NPCJumpHurt[292] = true;
@@ -1279,10 +1279,10 @@ void SetupVars()
     NPCNoYoshi[171] = true;
 
     NPCHeight[172] = 28; //  Green SMB1 Shell
-    NPCIsAShell[172] = true;
+    // NPCIsAShell(172) = true;
     NPCHeight[174] = 28; //  Red SMB1 Shell
-    NPCIsAShell[174] = true;
-    NPCIsAShell[195] = true;
+    // NPCIsAShell(174) = true;
+    // NPCIsAShell(195) = true;
 
     NPCJumpHurt[179] = true; // Razor Blade
     NPCWidthGFX[179] = 64;
@@ -1311,14 +1311,14 @@ void SetupVars()
     NPCFrameOffsetY[181] = 2;
     NPCWidth[197] = 48;
     NPCHeight[197] = 16;
-    NPCIsABonus[197] = true;
-    NPCIsABonus[182] = true; // SMB1 Flower
-    NPCIsABonus[183] = true; // SMW Flower
-    NPCIsABonus[184] = true; // SMB1 Mushroom
-    NPCIsABonus[185] = true; // SMW Mushroom
-    NPCIsABonus[186] = true; // SMB1 1-up
-    NPCIsABonus[187] = true; // SMW 1-up
-    NPCIsABonus[188] = true; // SMW 3 up
+    // NPCIsABonus(197) = true;
+    // NPCIsABonus(182) = true; // SMB1 Flower
+    // NPCIsABonus(183) = true; // SMW Flower
+    // NPCIsABonus(184) = true; // SMB1 Mushroom
+    // NPCIsABonus(185) = true; // SMW Mushroom
+    // NPCIsABonus(186) = true; // SMB1 1-up
+    // NPCIsABonus(187) = true; // SMW 1-up
+    // NPCIsABonus(188) = true; // SMW 3 up
     NPCWidth[188] = 30;
     NPCWidth[189] = 32;
 
@@ -1365,7 +1365,7 @@ void SetupVars()
     NPCHeight[189] = 64;
     NPCTurnsAtCliffs[189] = true;
     NPCFrameOffsetY[189] = 2;
-    NPCDefaultMovement[189] = true;
+    // NPCDefaultMovement(189) = true;
     NPCWidthGFX[175] = 32;
     NPCWidthGFX[176] = 32;
     NPCWidthGFX[177] = 32;
@@ -1403,20 +1403,20 @@ void SetupVars()
 
     NPCNoYoshi[190] = true;
     NPCNoYoshi[192] = true;
-    NPCIsABonus[192] = true;
+    // NPCIsABonus(192) = true;
 
 
 
-    NPCIsAParaTroopa[176] = true;
-    NPCIsAParaTroopa[177] = true;
-    NPCIsABonus[178] = true;
-    NPCDefaultMovement[173] = true;
-    NPCDefaultMovement[175] = true;
-    NPCDefaultMovement[162] = true;
-    // NPCDefaultMovement[163] = true;
-    // NPCDefaultMovement[164] = true;
-    NPCDefaultMovement[165] = true;
-    NPCDefaultMovement[167] = true;
+    // NPCIsAParaTroopa(176) = true;
+    // NPCIsAParaTroopa(177) = true;
+    // NPCIsABonus(178) = true;
+    // NPCDefaultMovement(173) = true;
+    // NPCDefaultMovement(175) = true;
+    // NPCDefaultMovement(162) = true;
+    // 'NPCDefaultMovement(163) = true;
+    // 'NPCDefaultMovement(164) = true;
+    // NPCDefaultMovement(165) = true;
+    // NPCDefaultMovement(167) = true;
     NPCCanWalkOn[164] = true;
     NPCIsAHit1Block[164] = true;
     NPCWontHurt[160] = true;
@@ -1424,7 +1424,7 @@ void SetupVars()
     NPCCanWalkOn[160] = true;
     NPCMovesPlayer[160] = true;
     NPCIsABlock[160] = true;
-    NPCDefaultMovement[160] = true;
+    // NPCDefaultMovement(160) = true;
     NPCWontHurt[159] = true;
     NPCCanWalkOn[159] = true;
     NPCIsAHit1Block[159] = true;
@@ -1461,56 +1461,56 @@ void SetupVars()
     NPCGrabFromTop[156] = true;
     NPCIsGrabbable[157] = true;
     NPCGrabFromTop[157] = true;
-    NPCIsABot[128] = true;
-    NPCIsYoshi[95] = true;
-    NPCIsYoshi[98] = true;
-    NPCIsYoshi[99] = true;
-    NPCIsYoshi[100] = true;
-    NPCIsYoshi[148] = true;
-    NPCIsYoshi[149] = true;
-    NPCIsYoshi[150] = true;
-    NPCIsYoshi[228] = true;
-    NPCIsBoot[35] = true;
-    NPCIsBoot[191] = true;
-    NPCIsBoot[193] = true;
-    NPCIsAShell[5] = true;
-    NPCIsAShell[7] = true;
-    NPCIsAShell[24] = true;
-    NPCIsAShell[73] = true;
-    NPCIsABonus[9] = true;
-    NPCIsABonus[273] = true;
-    NPCIsABonus[10] = true;
-    NPCIsABonus[11] = true;
-    NPCIsABonus[14] = true;
-    NPCIsABonus[264] = true;
-    NPCIsABonus[277] = true;
-    NPCIsABonus[16] = true;
-    NPCIsABonus[33] = true;
-    NPCIsABonus[258] = true;
-    NPCIsABonus[34] = true;
-    NPCIsABonus[41] = true;
-    NPCIsABonus[75] = true;
-    NPCIsABonus[88] = true;
-    NPCIsABonus[90] = true;
-    NPCIsABonus[94] = true;
-    NPCIsABonus[198] = true;
-    NPCIsABonus[97] = true;
-    NPCIsABonus[101] = true;
-    NPCIsABonus[102] = true;
-    NPCIsABonus[103] = true;
-    NPCIsABonus[107] = true;
-    NPCIsABonus[153] = true;
-    NPCIsABonus[196] = true;
-    NPCIsACoin[10] = true;
-    NPCIsACoin[33] = true;
-    NPCIsACoin[258] = true;
-    NPCIsACoin[88] = true;
-    NPCIsACoin[103] = true;
-    NPCIsAnExit[11] = true;
-    NPCIsAnExit[16] = true;
-    NPCIsAnExit[41] = true;
-    NPCIsAnExit[97] = true;
-    NPCIsAnExit[196] = true;
+    // NPCIsABot(128) = true;
+    // NPCIsYoshi(95) = true;
+    // NPCIsYoshi(98) = true;
+    // NPCIsYoshi(99) = true;
+    // NPCIsYoshi(100) = true;
+    // NPCIsYoshi(148) = true;
+    // NPCIsYoshi(149) = true;
+    // NPCIsYoshi(150) = true;
+    // NPCIsYoshi(228) = true;
+    // NPCIsBoot(35) = true;
+    // NPCIsBoot(191) = true;
+    // NPCIsBoot(193) = true;
+    // NPCIsAShell(5) = true;
+    // NPCIsAShell(7) = true;
+    // NPCIsAShell(24) = true;
+    // NPCIsAShell(73) = true;
+    // NPCIsABonus(9) = true;
+    // NPCIsABonus(273) = true;
+    // NPCIsABonus(10) = true;
+    // NPCIsABonus(11) = true;
+    // NPCIsABonus(14) = true;
+    // NPCIsABonus(264) = true;
+    // NPCIsABonus(277) = true;
+    // NPCIsABonus(16) = true;
+    // NPCIsABonus(33) = true;
+    // NPCIsABonus(258) = true;
+    // NPCIsABonus(34) = true;
+    // NPCIsABonus(41) = true;
+    // NPCIsABonus(75) = true;
+    // NPCIsABonus(88) = true;
+    // NPCIsABonus(90) = true;
+    // NPCIsABonus(94) = true;
+    // NPCIsABonus(198) = true;
+    // NPCIsABonus(97) = true;
+    // NPCIsABonus(101) = true;
+    // NPCIsABonus(102) = true;
+    // NPCIsABonus(103) = true;
+    // NPCIsABonus(107) = true;
+    // NPCIsABonus(153) = true;
+    // NPCIsABonus(196) = true;
+    // NPCIsACoin(10) = true;
+    // NPCIsACoin(33) = true;
+    // NPCIsACoin(258) = true;
+    // NPCIsACoin(88) = true;
+    // NPCIsACoin(103) = true;
+    // NPCIsAnExit(11) = true;
+    // NPCIsAnExit(16) = true;
+    // NPCIsAnExit(41) = true;
+    // NPCIsAnExit(97) = true;
+    // NPCIsAnExit(196) = true;
     NPCJumpHurt[8] = true;
     NPCJumpHurt[245] = true;
     NPCJumpHurt[12] = true;
@@ -1835,32 +1835,32 @@ void SetupVars()
     NPCForeground[87] = true;
     NPCForeground[108] = true;
     NPCForeground[171] = true;
-    NPCDefaultMovement[1] = true;
-    NPCDefaultMovement[2] = true;
-    NPCDefaultMovement[3] = true;
-    NPCDefaultMovement[4] = true;
-    NPCDefaultMovement[6] = true;
-    NPCDefaultMovement[19] = true;
-    NPCDefaultMovement[20] = true;
-    NPCDefaultMovement[247] = true;
-    NPCDefaultMovement[23] = true;
-    NPCDefaultMovement[27] = true;
-    NPCDefaultMovement[36] = true;
-    NPCDefaultMovement[285] = true;
-    NPCDefaultMovement[50] = true;
-    NPCDefaultMovement[53] = true;
-    NPCDefaultMovement[55] = true;
-    NPCDefaultMovement[59] = true;
-    NPCDefaultMovement[61] = true;
-    NPCDefaultMovement[63] = true;
-    NPCDefaultMovement[65] = true;
-    NPCDefaultMovement[71] = true;
-    NPCDefaultMovement[72] = true;
-    NPCDefaultMovement[77] = true;
-    NPCDefaultMovement[78] = true;
-    NPCDefaultMovement[89] = true;
-    NPCDefaultMovement[91] = true;
-    NPCDefaultMovement[107] = true;
+    // NPCDefaultMovement(1) = true;
+    // NPCDefaultMovement(2) = true;
+    // NPCDefaultMovement(3) = true;
+    // NPCDefaultMovement(4) = true;
+    // NPCDefaultMovement(6) = true;
+    // NPCDefaultMovement(19) = true;
+    // NPCDefaultMovement(20) = true;
+    // NPCDefaultMovement(247) = true;
+    // NPCDefaultMovement(23) = true;
+    // NPCDefaultMovement(27) = true;
+    // NPCDefaultMovement(36) = true;
+    // NPCDefaultMovement(285) = true;
+    // NPCDefaultMovement(50) = true;
+    // NPCDefaultMovement(53) = true;
+    // NPCDefaultMovement(55) = true;
+    // NPCDefaultMovement(59) = true;
+    // NPCDefaultMovement(61) = true;
+    // NPCDefaultMovement(63) = true;
+    // NPCDefaultMovement(65) = true;
+    // NPCDefaultMovement(71) = true;
+    // NPCDefaultMovement(72) = true;
+    // NPCDefaultMovement(77) = true;
+    // NPCDefaultMovement(78) = true;
+    // NPCDefaultMovement(89) = true;
+    // NPCDefaultMovement(91) = true;
+    // NPCDefaultMovement(107) = true;
 
     NPCNoFireBall[19] = true;
     NPCNoFireBall[20] = true;
@@ -2022,7 +2022,7 @@ void SetupVars()
     NPCWidthGFX[247] = 32;
 
 
-    NPCDefaultMovement[158] = true;
+    // NPCDefaultMovement(158) = true;
 
 
     NPCWidthGFX[267] = 84;
@@ -2779,7 +2779,7 @@ void SetupVars()
     Points[13] = 5;
     For(A, 1, maxNPCType)
     {
-        if(NPCIsCheep[A])
+        if(NPCIsCheep(A))
             NPCForeground[A] = true;
     }
     For(A, 1, maxEffectType)

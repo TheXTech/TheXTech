@@ -274,11 +274,11 @@ void SetEditorNPCType(int type)
         EditorCursor.NPC.Type = type;
 
         // can't have a murderous default, reset to 1 for ParaTroopas
-        if(NPCIsAParaTroopa[type] && !NPCIsAParaTroopa[prev_type])
+        if(NPCIsAParaTroopa(type) && !NPCIsAParaTroopa(prev_type))
             EditorCursor.NPC.Special = 1;
 
         // reset special for NPCs that don't allow it
-        if(!(NPCIsCheep[type] || NPCIsAParaTroopa[type] || type == NPCID_FIRE_CHAIN))
+        if(!(NPCIsCheep(type) || NPCIsAParaTroopa(type) || type == NPCID_FIRE_CHAIN))
             EditorCursor.NPC.Special = 0;
 
         // reset special if it's out of range
@@ -719,7 +719,7 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
             else
             {
                 SuperPrintCenter(g_editorStrings.npcPropertyFacing, 3, e_ScreenW - 120, 40);
-                if(type == NPCID_PLATFORM_S1 || (NPCIsAParaTroopa[type] && EditorCursor.NPC.Special == 3))
+                if(type == NPCID_PLATFORM_S1 || (NPCIsAParaTroopa(type) && EditorCursor.NPC.Special == 3))
                 {
                     dir_neg_icon = Icon::up;
                     dir_pos_icon = Icon::down;
@@ -773,7 +773,7 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
             m_NPC_page = -2;
 
         // Behavior
-        if(NPCIsAParaTroopa[EditorCursor.NPC.Type])
+        if(NPCIsAParaTroopa(EditorCursor.NPC))
         {
             // Describe current AI if valid
             if(mode == CallMode::Render)
@@ -809,7 +809,7 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
                 EditorCursor.NPC.Special = 3;
         }
 
-        if(NPCIsCheep[EditorCursor.NPC.Type])
+        if(NPCIsCheep(EditorCursor.NPC))
         {
             // Describe current AI if valid
             if(mode == CallMode::Render)

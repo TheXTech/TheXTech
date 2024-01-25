@@ -542,7 +542,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
         }
 
 #if 0 // Completely disable the DEAD the code that spawns the player
-        if(NPCIsABonus[C] && C != 169 && C != 170) // check to see if it should spawn a dead player
+        if(NPCIsABonus(C) && C != 169 && C != 170) // check to see if it should spawn a dead player
         {
             tempPlayer = CheckDead();
             if(g_ClonedPlayerMode)
@@ -583,7 +583,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
             else if(C == NPCID_FIRE_POWER_S1)
                 replacement = NPCID_POWER_S1;
 
-            if(NPCIsYoshi[C])
+            if(NPCIsYoshi(C))
             {
                 nn.Type = NPCID_ITEM_POD;
                 nn.Special = C;
@@ -645,7 +645,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
             if(is_ancient && C == NPCID_GRN_BOOT)
                 nn.Direction = -1;
 
-            if(NPCIsYoshi[C]) // if the npc is pet then set the color of the pod
+            if(NPCIsYoshi(C)) // if the npc is pet then set the color of the pod
             {
                 if(C == NPCID_PET_BLUE)
                     nn.Frame = 1;
@@ -670,7 +670,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
                 if(is_ancient)
                     nn.Location.Y = b.Location.Y - 0.1;
 
-                if(NPCIsYoshi[C])
+                if(NPCIsYoshi(C))
                 {
                     nn.Effect = 0;
                     nn.Location.Height = 32;
@@ -721,8 +721,8 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
             {
                 // the logic is the next clause didn't exist in ancient cases
             }
-            else if(NPCIsYoshi[nn.Type] ||
-               NPCIsBoot[nn.Type] || nn.Type == NPCID_POWER_S3 ||
+            else if(NPCIsYoshi(nn) ||
+               NPCIsBoot(nn) || nn.Type == NPCID_POWER_S3 ||
                nn.Type == NPCID_FIRE_POWER_S3 || nn.Type == NPCID_CANNONITEM ||
                nn.Type == NPCID_LIFE_S3 || nn.Type == NPCID_POISON ||
                nn.Type == NPCID_STATUE_POWER || nn.Type == NPCID_HEAVY_POWER ||
@@ -1351,9 +1351,9 @@ void UpdateBlocks()
             {
                 if(NPC[B].Active)
                 {
-                    if(NPC[B].Killed == 0 && NPC[B].Effect == 0 && NPC[B].HoldingPlayer == 0 && (!NPCNoClipping[NPC[B].Type] || NPCIsACoin[NPC[B].Type]))
+                    if(NPC[B].Killed == 0 && NPC[B].Effect == 0 && NPC[B].HoldingPlayer == 0 && (!NPCNoClipping[NPC[B].Type] || NPCIsACoin(NPC[B])))
                     {
-                        if(ib.ShakeY3 <= 0 || NPCIsACoin[NPC[B].Type])
+                        if(ib.ShakeY3 <= 0 || NPCIsACoin(NPC[B]))
                         {
                             if(ShakeCollision(NPC[B].Location, ib.Location, ib.ShakeY3))
                             {
@@ -1473,7 +1473,7 @@ void PSwitch(bool enabled)
     {
         for(A = 1; A <= numNPCs; A++)
         {
-            bool transform = NPCIsACoin[NPC[A].Type] && NPC[A].Block == 0 && !NPC[A].Hidden && NPC[A].Special == 0.0;
+            bool transform = NPCIsACoin(NPC[A]) && NPC[A].Block == 0 && !NPC[A].Hidden && NPC[A].Special == 0.0;
 
             if(NPC[A].Type == NPCID_MEDAL && g_compatibility.fix_special_coin_switch)
                 transform = false;
@@ -1864,7 +1864,7 @@ void PowBlock()
             {
                 for(int A : treeNPCQuery(query_loc, SORTMODE_NONE))
                 {
-                    if(!NPC[A].Active && NPCIsACoin[NPC[A].Type])
+                    if(!NPC[A].Active && NPCIsACoin(NPC[A]))
                     {
                         NPC[A].JustActivated = vscreen_Z;
 
@@ -1885,7 +1885,7 @@ void PowBlock()
     {
         if(NPC[A].Active)
         {
-            if(NPCIsACoin[NPC[A].Type])
+            if(NPCIsACoin(NPC[A]))
             {
                 NPC[A].Special = 1;
                 NPC[A].Location.SpeedX = (dRand() * 1.0) - 0.5;

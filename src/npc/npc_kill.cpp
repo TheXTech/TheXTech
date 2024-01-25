@@ -89,7 +89,7 @@ void KillNPC(int A, int B)
             NPC[A].Location.SpeedX = double(2 * NPC[A].Direction);
     }
 
-    if(NPC[A].Killed == 8 && NPC[A].Type != NPCID_PLR_FIREBALL && NPC[A].Type != NPCID_KNIGHT && !NPCIsABot[NPC[A].Type] && NPC[A].Type != NPCID_FLIER && NPC[A].Type != NPCID_ROCKET_FLIER && NPC[A].Type != NPCID_WALL_BUG && NPC[A].Type != NPCID_HOMING_BALL)
+    if(NPC[A].Killed == 8 && NPC[A].Type != NPCID_PLR_FIREBALL && NPC[A].Type != NPCID_KNIGHT && !NPCIsABot(NPC[A]) && NPC[A].Type != NPCID_FLIER && NPC[A].Type != NPCID_ROCKET_FLIER && NPC[A].Type != NPCID_WALL_BUG && NPC[A].Type != NPCID_HOMING_BALL)
         NewEffect(EFFID_BOOT_STOMP, NPC[A].Location);
 
     if(NPC[A].Type == NPCID_YELSWITCH_FODDER || NPC[A].Type == NPCID_BLUSWITCH_FODDER || NPC[A].Type == NPCID_GRNSWITCH_FODDER || NPC[A].Type == NPCID_REDSWITCH_FODDER || NPC[A].DefaultType == 59 || NPC[A].DefaultType == 61 || NPC[A].DefaultType == 63 || NPC[A].DefaultType == 65)
@@ -208,7 +208,7 @@ void KillNPC(int A, int B)
 
     if(NPC[A].HoldingPlayer > 0)
     {
-        if(!NPCIsAnExit[NPC[A].Type]) // Tell the player the NPC he was holding is dead
+        if(!NPCIsAnExit(NPC[A])) // Tell the player the NPC he was holding is dead
             Player[NPC[A].HoldingPlayer].HoldingNPC = 0;
     }
 
@@ -445,7 +445,7 @@ void KillNPC(int A, int B)
 
         }
         // turnips
-        else if(NPCIsVeggie[NPC[A].Type])
+        else if(NPCIsVeggie(NPC[A]))
         {
             NPC[A].Location.Y += -(32 - NPC[A].Location.Height);
             NPC[A].Location.X += NPC[A].Location.Width / 2.0 - EffectWidth[10] / 2.0;
@@ -599,7 +599,7 @@ void KillNPC(int A, int B)
             }
         // Zelda NPCs
         }
-        else if(NPC[A].Type == NPCID_KNIGHT || NPCIsABot[NPC[A].Type] || NPC[A].Type == NPCID_LOCK_DOOR)
+        else if(NPC[A].Type == NPCID_KNIGHT || NPCIsABot(NPC[A]) || NPC[A].Type == NPCID_LOCK_DOOR)
         {
             PlaySound(SFX_HeroKill);
             NewEffect(EFFID_SMOKE_S5, NPC[A].Location);
@@ -769,7 +769,7 @@ void KillNPC(int A, int B)
                 NewEffect(EFFID_RED_FODDER_DIE, NPC[A].Location);
             }
         }
-        else if(NPCIsToad[NPC[A].Type]) // toad
+        else if(NPCIsToad(NPC[A])) // toad
         {
             if(B != 2)
             {
@@ -1518,11 +1518,11 @@ void KillNPC(int A, int B)
                 PlaySound(SFX_BlockSmashed);
             }
         }
-        else if(NPCIsABonus[NPC[A].Type]) // NPC is a bonus
+        else if(NPCIsABonus(NPC[A])) // NPC is a bonus
         {
             if(B == 3 || B == 4 || B == 5)
             {
-                if(!NPCIsACoin[NPC[A].Type] || LevelEditor || TestLevel) // Shell hit sound
+                if(!NPCIsACoin(NPC[A]) || LevelEditor || TestLevel) // Shell hit sound
                     PlaySound(SFX_ShellHit);
                 NPC[A].Location.X += NPC[A].Location.Width / 2.0 - EffectWidth[10] / 2.0;
                 NPC[A].Location.Y += NPC[A].Location.Height / 2.0 - EffectHeight[10] / 2.0;

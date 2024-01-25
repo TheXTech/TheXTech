@@ -186,7 +186,7 @@ void Deactivate(int A)
                 treeNPCSplitTempBlock(A);
         }
     }
-    else if(NPCIsAnExit[NPC[A].Type])
+    else if(NPCIsAnExit(NPC[A]))
         NPC[A].TimeLeft = 100;
     else
     {
@@ -232,7 +232,7 @@ void Bomb(Location_t Location, int Game, int ImmunePlayer)
 
     for(int i : treeNPCQuery(newLoc(X - Radius, Y - Radius, Radius * 2, Radius * 2), SORTMODE_ID))
     {
-        if(!NPC[i].Hidden && NPC[i].Active && !NPC[i].Inert && !NPC[i].Generator && !NPCIsABonus[NPC[i].Type])
+        if(!NPC[i].Hidden && NPC[i].Active && !NPC[i].Inert && !NPC[i].Generator && !NPCIsABonus(NPC[i]))
         {
             if(NPC[i].Type != NPCID_PLR_FIREBALL && NPC[i].Type != NPCID_CHAR3_HEAVY)
             {
@@ -244,7 +244,7 @@ void Bomb(Location_t Location, int Game, int ImmunePlayer)
                 {
                     NPC[0].Location = NPC[i].Location;
                     NPCHit(i, 3, 0);
-                    if(NPCIsVeggie[NPC[i].Type])
+                    if(NPCIsVeggie(NPC[i]))
                     {
                         NPC[i].Projectile = true;
                         NPC[i].Location.SpeedY = -5;
@@ -344,12 +344,12 @@ void TurnNPCsIntoCoins()
     {
         if(NPC[A].Active && !NPC[A].Generator)
         {
-            if(!NPC[A].Hidden && NPC[A].Killed == 0 && !NPCIsAnExit[NPC[A].Type] && !NPC[A].Inert)
+            if(!NPC[A].Hidden && NPC[A].Killed == 0 && !NPCIsAnExit(NPC[A]) && !NPC[A].Inert)
             {
-                if(!NPCIsYoshi[NPC[A].Type] && !NPCIsBoot[NPC[A].Type] &&
-                   !NPCIsABonus[NPC[A].Type] && NPC[A].Type != NPCID_PLR_ICEBALL && NPC[A].Type != NPCID_PLR_FIREBALL &&
-                   NPC[A].Type != NPCID_PET_FIRE && NPC[A].Type != NPCID_SPRING && !NPCIsVeggie[NPC[A].Type] &&
-                   NPC[A].Type != NPCID_ITEM_BURIED && NPC[A].Type != NPCID_PLR_HEAVY && !NPCIsAVine[NPC[A].Type] &&
+                if(!NPCIsYoshi(NPC[A]) && !NPCIsBoot(NPC[A]) &&
+                   !NPCIsABonus(NPC[A]) && NPC[A].Type != NPCID_PLR_ICEBALL && NPC[A].Type != NPCID_PLR_FIREBALL &&
+                   NPC[A].Type != NPCID_PET_FIRE && NPC[A].Type != NPCID_SPRING && !NPCIsVeggie(NPC[A]) &&
+                   NPC[A].Type != NPCID_ITEM_BURIED && NPC[A].Type != NPCID_PLR_HEAVY && !NPCIsAVine(NPC[A]) &&
                    NPC[A].Type != NPCID_VEHICLE && NPC[A].Type != NPCID_YEL_PLATFORM && NPC[A].Type != NPCID_BLU_PLATFORM &&
                    NPC[A].Type != NPCID_GRN_PLATFORM && NPC[A].Type != NPCID_RED_PLATFORM && NPC[A].Type != NPCID_PLATFORM_S3 &&
                    !(NPC[A].Projectile && NPC[A].Type == NPCID_HEAVY_THROWN) &&
@@ -679,7 +679,7 @@ void NPCSpecial(int A)
         for(int i = 1; i <= numNPCs; i++)
         {
             auto &n = NPC[i];
-            if(NPCIsAVine[n.Type] && !n.Hidden && CheckCollision(tempLocation, n.Location))
+            if(NPCIsAVine(n) && !n.Hidden && CheckCollision(tempLocation, n.Location))
             {
                 tempBool = true;
                 break;
@@ -847,7 +847,7 @@ void NPCSpecial(int A)
             for(int i : treeNPCQuery(tempLocation, SORTMODE_NONE))
             {
                 auto &n = NPC[i];
-                if(n.Active && !n.Hidden && NPCIsAVine[n.Type] && CheckCollision(tempLocation, n.Location))
+                if(n.Active && !n.Hidden && NPCIsAVine(n) && CheckCollision(tempLocation, n.Location))
                 {
                     tempBool = true;
                     break;
@@ -978,7 +978,7 @@ void NPCSpecial(int A)
 
             // deferring tree update to end of the NPC physics update
 
-            if(NPCIsACoin[npc.Type])
+            if(NPCIsACoin(npc))
             {
                 npc.Special = 1;
                 npc.Location.SpeedX = dRand() * 1 - 0.5;
@@ -3318,7 +3318,7 @@ void SpecialNPC(int A)
         {
             if(NPC[B].Active)
             {
-                if(NPCIsACoin[NPC[B].Type])
+                if(NPCIsACoin(NPC[B]))
                 {
                     if(CheckCollision(NPC[A].Location, NPC[B].Location))
                     {
@@ -3351,7 +3351,7 @@ void SpecialNPC(int A)
                 {
                     if(NPC[B].Active)
                     {
-                        if(NPCIsACoin[NPC[B].Type])
+                        if(NPCIsACoin(NPC[B]))
                         {
                             if(CheckCollision(NPC[A].Location, NPC[B].Location))
                             {
@@ -3512,7 +3512,7 @@ void SpecialNPC(int A)
         if(Player[NPC[A].Special].Dead || Player[NPC[A].Special].Section != NPC[A].Section)
             NPC[A].Special = 0;
     }
-    else if(NPCIsCheep[NPC[A].Type] && NPC[A].Special == 1) // Red SMB3 Cheep
+    else if(NPCIsCheep(NPC[A]) && NPC[A].Special == 1) // Red SMB3 Cheep
     {
         if(!NPC[A].Projectile)
         {
@@ -4333,7 +4333,7 @@ void SpecialNPC(int A)
         }
         // deferring tree update to end of the NPC physics update
     }
-    else if(NPCIsAParaTroopa[NPC[A].Type]) // para-troopas
+    else if(NPCIsAParaTroopa(NPC[A])) // para-troopas
     {
         if(NPC[A].Special == 0) // chase
         {
@@ -5525,7 +5525,7 @@ void SpecialNPC(int A)
 
                 NPC[numNPCs].Variant = NPC[A].Variant;
 
-                if(NPCIsACoin[NPC[numNPCs].Type])
+                if(NPCIsACoin(NPC[numNPCs]))
                 {
                     NPC[numNPCs].Special = 1;
                     NPC[numNPCs].Location.SpeedX = NPC[numNPCs].Location.SpeedX * 0.5;
@@ -5605,7 +5605,7 @@ void SpecialNPC(int A)
         }
     }
     // Projectile code
-    if(NPCIsAShell[NPC[A].Type] || (NPC[A].Type == NPCID_SLIDE_BLOCK && NPC[A].Special == 1))
+    if(NPCIsAShell(NPC[A]) || (NPC[A].Type == NPCID_SLIDE_BLOCK && NPC[A].Special == 1))
     {
         if(NPC[A].Location.SpeedX != 0)
             NPC[A].Projectile = true;
@@ -5668,7 +5668,7 @@ void CharStuff(int WhatNPC, bool CheckEggs)
         {
             if(NPC[A].Type == NPCID_ITEM_POD && NPC[A].Special > 0 /* && CheckEggs*/) // Check Eggs
             {
-                if(NPCIsYoshi[(int)NPC[A].Special]) // Yoshi into mushroom (Egg)
+                if(NPCIsYoshi((int)NPC[A].Special)) // Yoshi into mushroom (Egg)
                 {
                     // NPC(A).Special = 249
                     NPC[A].Special = NPCID_GRN_BOOT; // Yoshi into boot
@@ -5686,7 +5686,7 @@ void CharStuff(int WhatNPC, bool CheckEggs)
 
             if(NPC[A].Active && !NPC[A].Generator && !NPC[A].Inert)
             {
-                if(NPC[A].Type == NPCID_POWER_S3 || NPC[A].Type == NPCID_POWER_S1 || NPC[A].Type == NPCID_POWER_S4 || NPCIsBoot[NPC[A].Type]) // turn mushrooms into hearts
+                if(NPC[A].Type == NPCID_POWER_S3 || NPC[A].Type == NPCID_POWER_S1 || NPC[A].Type == NPCID_POWER_S4 || NPCIsBoot(NPC[A])) // turn mushrooms into hearts
                 {
                     NPC[A].Frame = 0;
                     NPC[A].Type = NPCID_POWER_S5;
@@ -5727,7 +5727,7 @@ void CharStuff(int WhatNPC, bool CheckEggs)
         {
             if(NPC[A].Type == NPCID_ITEM_POD && NPC[A].Special > 0 /* && CheckEggs*/) // Check Eggs
             {
-                if(NPCIsYoshi[(int)NPC[A].Special] || NPCIsBoot[(int)NPC[A].Special]) // Yoshi / boot into mushroom (Egg)
+                if(NPCIsYoshi((int)NPC[A].Special) || NPCIsBoot((int)NPC[A].Special)) // Yoshi / boot into mushroom (Egg)
                     NPC[A].Special = NPCID_POWER_S5;
                 if(NPC[A].Special == NPCID_POWER_S3 || NPC[A].Special == NPCID_POWER_S1 || NPC[A].Special == NPCID_POWER_S4) // mushrooms into hearts (eggs)
                     NPC[A].Special = NPCID_POWER_S5;

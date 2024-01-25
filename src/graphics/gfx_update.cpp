@@ -262,7 +262,7 @@ public:
             Held_n += 1;
             g_stats.renderedNPCs += 1;
         }
-        else if(NPC[A].Effect == 0 && NPCForeground[NPC[A].Type] && NPC[A].HoldingPlayer == 0 && !NPCIsACoin[NPC[A].Type])
+        else if(NPC[A].Effect == 0 && NPCForeground[NPC[A].Type] && NPC[A].HoldingPlayer == 0 && !NPCIsACoin(NPC[A]))
         {
             if(FG_n == sizeof(FG) / sizeof(uint16_t))
                 return;
@@ -281,7 +281,7 @@ public:
         else if(NPC[A].Effect == 0 && NPC[A].HoldingPlayer == 0 &&
             (NPC[A].standingOnPlayer > 0 || NPC[A].Type == NPCID_VEHICLE || NPC[A].Type == NPCID_CANNONITEM ||
                 NPC[A].Type == NPCID_TOOTHYPIPE || NPC[A].Type == NPCID_ITEM_BURIED || NPC[A].Type == NPCID_ROCKET_WOOD ||
-                NPC[A].Type == NPCID_FIRE_BOSS_FIRE || NPCIsACoin[NPC[A].Type]))
+                NPC[A].Type == NPCID_FIRE_BOSS_FIRE || NPCIsACoin(NPC[A])))
         {
             if(Low_n == sizeof(Low) / sizeof(uint16_t))
                 return;
@@ -290,7 +290,7 @@ public:
             g_stats.renderedNPCs += 1;
         }
         else if(NPC[A].Type == NPCID_SAW || NPC[A].Type == NPCID_JUMP_PLANT ||
-            ((NPC[A].Effect == 208 || NPCIsAVine[NPC[A].Type] ||
+            ((NPC[A].Effect == 208 || NPCIsAVine(NPC[A]) ||
                     NPC[A].Type == NPCID_BOSS_FRAGILE || NPC[A].Type == NPCID_LIFT_SAND || NPC[A].Type == NPCID_FIRE_PLANT ||
                     NPC[A].Type == NPCID_PLANT_S3 || NPC[A].Type == NPCID_PLANT_S1 || NPC[A].Type == NPCID_BIG_PLANT ||
                     NPC[A].Type == NPCID_LONG_PLANT_UP || NPC[A].Type == NPCID_LONG_PLANT_DOWN || NPC[A].Type == NPCID_BOTTOM_PLANT ||
@@ -829,7 +829,7 @@ void ClassicNPCScreenLogic(int Z, int numScreens, bool fill_draw_queue, NPC_Draw
         bool can_check = false;
         bool reset_all = true;
 
-        if(((NPC[A].Effect == 208 || NPCIsAVine[NPC[A].Type] ||
+        if(((NPC[A].Effect == 208 || NPCIsAVine(NPC[A]) ||
              NPC[A].Type == NPCID_BOSS_FRAGILE || NPC[A].Type == NPCID_LIFT_SAND || NPC[A].Type == NPCID_FIRE_PLANT ||
              NPC[A].Type == NPCID_PLANT_S3 || NPC[A].Type == NPCID_PLANT_S1 || NPC[A].Type == NPCID_BIG_PLANT ||
              NPC[A].Type == NPCID_LONG_PLANT_UP || NPC[A].Type == NPCID_LONG_PLANT_DOWN || NPC[A].Type == NPCID_BOTTOM_PLANT ||
@@ -846,7 +846,7 @@ void ClassicNPCScreenLogic(int Z, int numScreens, bool fill_draw_queue, NPC_Draw
 
         if(NPC[A].Effect == 0 && ((NPC[A].HoldingPlayer == 0 && (NPC[A].standingOnPlayer > 0 || NPC[A].Type == NPCID_VEHICLE ||
                                    NPC[A].Type == NPCID_CANNONITEM || NPC[A].Type == NPCID_TOOTHYPIPE || NPC[A].Type == NPCID_ITEM_BURIED || NPC[A].Type == NPCID_ROCKET_WOOD ||
-                                   NPC[A].Type == NPCID_FIRE_BOSS_FIRE || NPCIsACoin[NPC[A].Type]) && (!NPC[A].Generator || LevelEditor))))
+                                   NPC[A].Type == NPCID_FIRE_BOSS_FIRE || NPCIsACoin(NPC[A])) && (!NPC[A].Generator || LevelEditor))))
         {
             npcALoc = newLoc(NPC[A].Location.X - (NPCWidthGFX[NPC[A].Type] - NPC[A].Location.Width) / 2.0,
                                   NPC[A].Location.Y,
@@ -870,7 +870,7 @@ void ClassicNPCScreenLogic(int Z, int numScreens, bool fill_draw_queue, NPC_Draw
 
         if(NPC[A].Effect == 0)
         {
-            if(!(NPC[A].HoldingPlayer > 0 || NPCIsAVine[NPC[A].Type] || NPC[A].Type == NPCID_BOSS_FRAGILE || NPC[A].Type == NPCID_FIRE_BOSS_FIRE ||
+            if(!(NPC[A].HoldingPlayer > 0 || NPCIsAVine(NPC[A]) || NPC[A].Type == NPCID_BOSS_FRAGILE || NPC[A].Type == NPCID_FIRE_BOSS_FIRE ||
                  NPC[A].Type == NPCID_JUMP_PLANT || NPC[A].Type == NPCID_ROCKET_WOOD || NPC[A].Type == NPCID_LIFT_SAND || NPC[A].Type == NPCID_PLANT_S3 || NPC[A].Type == NPCID_FIRE_PLANT ||
                  NPC[A].Type == NPCID_PLANT_S1 || NPC[A].Type == NPCID_BOTTOM_PLANT || NPC[A].Type == NPCID_SIDE_PLANT || NPC[A].Type == NPCID_BIG_PLANT || NPC[A].Type == NPCID_LONG_PLANT_UP ||
                  NPC[A].Type == NPCID_LONG_PLANT_DOWN || NPC[A].Type == NPCID_VEHICLE || NPC[A].Type == NPCID_CANNONITEM || NPC[A].Type == NPCID_TOOTHYPIPE || NPC[A].Type == NPCID_ITEM_BURIED) &&
@@ -878,7 +878,7 @@ void ClassicNPCScreenLogic(int Z, int numScreens, bool fill_draw_queue, NPC_Draw
                !NPCForeground[NPC[A].Type] && (!NPC[A].Generator || LevelEditor) &&
                NPC[A].Type != NPCID_SAW && NPC[A].Type != NPCID_ICE_CUBE)
             {
-                if(!NPCIsACoin[NPC[A].Type])
+                if(!NPCIsACoin(NPC[A]))
                 {
                     can_check = true;
                     kill_zero = true;
@@ -910,7 +910,7 @@ void ClassicNPCScreenLogic(int Z, int numScreens, bool fill_draw_queue, NPC_Draw
         {
             if(NPCForeground[NPC[A].Type] && NPC[A].HoldingPlayer == 0 && (!NPC[A].Generator || LevelEditor))
             {
-                if(!NPCIsACoin[NPC[A].Type])
+                if(!NPCIsACoin(NPC[A]))
                 {
                     can_check = true;
                     check_both_reset = true;
@@ -955,7 +955,7 @@ void ClassicNPCScreenLogic(int Z, int numScreens, bool fill_draw_queue, NPC_Draw
                     NPC[A].JustActivated = Z;
 
                 NPC[A].TimeLeft = Physics.NPCTimeOffScreen;
-                if(check_long_life && (NPCIsYoshi[NPC[A].Type] || NPCIsBoot[NPC[A].Type] || NPC[A].Type == NPCID_POWER_S3 || NPC[A].Type == NPCID_FIRE_POWER_S3 || NPC[A].Type == NPCID_CANNONITEM || NPC[A].Type == NPCID_LIFE_S3 || NPC[A].Type == NPCID_POISON || NPC[A].Type == NPCID_STATUE_POWER || NPC[A].Type == NPCID_HEAVY_POWER || NPC[A].Type == NPCID_FIRE_POWER_S1 || NPC[A].Type == NPCID_FIRE_POWER_S4 || NPC[A].Type == NPCID_POWER_S1 || NPC[A].Type == NPCID_POWER_S4 || NPC[A].Type == NPCID_LIFE_S1 || NPC[A].Type == NPCID_LIFE_S4 || NPC[A].Type == NPCID_3_LIFE || NPC[A].Type == NPCID_FLIPPED_RAINBOW_SHELL || NPC[A].Type == NPCID_PLATFORM_S3))
+                if(check_long_life && (NPCIsYoshi(NPC[A]) || NPCIsBoot(NPC[A]) || NPC[A].Type == NPCID_POWER_S3 || NPC[A].Type == NPCID_FIRE_POWER_S3 || NPC[A].Type == NPCID_CANNONITEM || NPC[A].Type == NPCID_LIFE_S3 || NPC[A].Type == NPCID_POISON || NPC[A].Type == NPCID_STATUE_POWER || NPC[A].Type == NPCID_HEAVY_POWER || NPC[A].Type == NPCID_FIRE_POWER_S1 || NPC[A].Type == NPCID_FIRE_POWER_S4 || NPC[A].Type == NPCID_POWER_S1 || NPC[A].Type == NPCID_POWER_S4 || NPC[A].Type == NPCID_LIFE_S1 || NPC[A].Type == NPCID_LIFE_S4 || NPC[A].Type == NPCID_3_LIFE || NPC[A].Type == NPCID_FLIPPED_RAINBOW_SHELL || NPC[A].Type == NPCID_PLATFORM_S3))
                     NPC[A].TimeLeft = Physics.NPCTimeOffScreen * 20;
 
                 if(!NPC[A].Active)
@@ -1096,7 +1096,7 @@ void ModernNPCScreenLogic(Screen_t& screen, int vscreen_i, bool fill_draw_queue,
         if(NPC[A].Effect == 0 && NPC[A].HoldingPlayer == 0 && !NPC[A].Generator &&
                 (NPC[A].standingOnPlayer > 0 || NPC[A].Type == 56 || NPC[A].Type == 22
                     || NPC[A].Type == 49 || NPC[A].Type == 91 || NPC[A].Type == 160
-                    || NPC[A].Type == 282 || NPCIsACoin[NPC[A].Type] || NPC[A].Type == 263))
+                    || NPC[A].Type == 282 || NPCIsACoin(NPC[A]) || NPC[A].Type == 263))
         {
             loc2_exists = true;
             loc2 = newLoc(NPC[A].Location.X - (NPCWidthGFX[NPC[A].Type] - NPC[A].Location.Width) / 2.0,
@@ -1287,7 +1287,7 @@ void ModernNPCScreenLogic(Screen_t& screen, int vscreen_i, bool fill_draw_queue,
                 && ((NPC[A].Reset[1] && NPC[A].Reset[2]) || NPC[A].Active || NPC[A].Type == NPCID_CONVEYOR))
             {
                 if(
-                       NPCIsYoshi[NPC[A].Type] || NPCIsBoot[NPC[A].Type] || NPC[A].Type == NPCID_POWER_S3
+                       NPCIsYoshi(NPC[A]) || NPCIsBoot(NPC[A]) || NPC[A].Type == NPCID_POWER_S3
                     || NPC[A].Type == NPCID_FIRE_POWER_S3 || NPC[A].Type == NPCID_CANNONITEM || NPC[A].Type == NPCID_LIFE_S3
                     || NPC[A].Type == NPCID_POISON || NPC[A].Type == NPCID_STATUE_POWER || NPC[A].Type == NPCID_HEAVY_POWER || NPC[A].Type == NPCID_FIRE_POWER_S1
                     || NPC[A].Type == NPCID_FIRE_POWER_S4 || NPC[A].Type == NPCID_POWER_S1 || NPC[A].Type == NPCID_POWER_S4
@@ -1344,7 +1344,7 @@ void ModernNPCScreenLogic(Screen_t& screen, int vscreen_i, bool fill_draw_queue,
         else if(fill_draw_queue && g_config.small_screen_camera_features && NPC[A].Active && cannot_reset && NPC[A].JustActivated == 0 && !NPC[A].Inert && NPC[A].Type != NPCID_CONVEYOR)
         {
             if(NPC[A].Location.SpeedX != 0 || NPC[A].Location.SpeedY != 0
-                || (!NPCWontHurt[NPC[A].Type] && !NPCIsACoin[NPC[A].Type] && !NPCIsABonus[NPC[A].Type]))
+                || (!NPCWontHurt[NPC[A].Type] && !NPCIsACoin(NPC[A]) && !NPCIsABonus(NPC[A])))
             {
                 NPC_Draw_Queue_p.add_warning(A);
             }
@@ -2509,7 +2509,7 @@ void UpdateGraphicsScreen(Screen_t& screen)
             XTColor cn;
             s_get_NPC_tint(A, cn);
 
-            if(!NPCIsYoshi[NPC[A].Type])
+            if(!NPCIsYoshi(NPC[A]))
             {
                 if(NPCWidthGFX[NPC[A].Type] == 0)
                 {
@@ -2760,7 +2760,7 @@ void UpdateGraphicsScreen(Screen_t& screen)
             {
                 DrawFrozenNPC(Z, A);
             }
-            else if(!NPCIsYoshi[NPC[A].Type] && NPC[A].Type > 0)
+            else if(!NPCIsYoshi(NPC[A]) && NPC[A].Type > 0)
             {
                 if(NPCWidthGFX[NPC[A].Type] == 0)
                     RenderTexturePlayer(Z, vScreen[Z].X + NPC[A].Location.X + NPCFrameOffsetX[NPC[A].Type], vScreen[Z].Y + NPC[A].Location.Y + NPCFrameOffsetY[NPC[A].Type], NPC[A].Location.Width, NPC[A].Location.Height, GFXNPC[NPC[A].Type], 0, NPC[A].Frame * NPC[A].Location.Height, cn);

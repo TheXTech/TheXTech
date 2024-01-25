@@ -49,6 +49,7 @@
 #include "main/screen_progress.h"
 #include "main/game_strings.h"
 #include "trees.h"
+#include "npc_traits.h"
 #include "npc_special_data.h"
 #include "graphics/gfx_camera.h"
 #include "graphics/gfx_update.h"
@@ -687,13 +688,13 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
             npc.DefaultSpecial2 = int(npc.Special2);
         }
 
-        if(NPCIsAParaTroopa[npc.Type])
+        if(NPCIsAParaTroopa(npc))
         {
             npc.Special = n.special_data;
             npc.DefaultSpecial = int(npc.Special);
         }
 
-        if(NPCIsCheep[npc.Type])
+        if(NPCIsCheep(npc))
         {
             npc.Special = n.special_data;
             npc.DefaultSpecial = int(npc.Special);
