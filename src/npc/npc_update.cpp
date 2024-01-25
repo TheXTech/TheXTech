@@ -407,10 +407,10 @@ void UpdateNPCs()
                                 NPC[numNPCs].TimeLeft = 100;
                                 if(NPC[A].GeneratorDirection == 1)
                                 {
-                                    if(NPCHeightGFX[NPC[A].Type] > NPC[A].Location.Height)
+                                    if(NPC[A]->HeightGFX > NPC[A].Location.Height)
                                     {
-                                        NPC[numNPCs].Location.Y = NPC[A].Location.Y + NPCHeightGFX[NPC[A].Type];
-                                        NPC[numNPCs].Effect2 = NPC[numNPCs].Location.Y - (NPCHeightGFX[NPC[A].Type] - NPC[A].Location.Height);
+                                        NPC[numNPCs].Location.Y = NPC[A].Location.Y + NPC[A]->HeightGFX;
+                                        NPC[numNPCs].Effect2 = NPC[numNPCs].Location.Y - (NPC[A]->HeightGFX - NPC[A].Location.Height);
                                     }
                                     else
                                     {
@@ -420,10 +420,10 @@ void UpdateNPCs()
                                 }
                                 else if(NPC[A].GeneratorDirection == 3)
                                 {
-                                    if(NPCHeightGFX[NPC[A].Type] > NPC[A].Location.Height)
+                                    if(NPC[A]->HeightGFX > NPC[A].Location.Height)
                                     {
                                         NPC[numNPCs].Location.Y = NPC[A].Location.Y - NPC[A].Location.Height;
-                                        NPC[numNPCs].Effect2 = NPC[numNPCs].Location.Y + NPC[A].Location.Height + (NPCHeightGFX[NPC[A].Type] - NPC[A].Location.Height);
+                                        NPC[numNPCs].Effect2 = NPC[numNPCs].Location.Y + NPC[A].Location.Height + (NPC[A]->HeightGFX - NPC[A].Location.Height);
                                     }
                                     else
                                     {
@@ -660,7 +660,7 @@ void UpdateNPCs()
                 {
                     if(NPC[B].Type != NPCID_BOSS_CASE && NPC[B].Effect == 0 && NPC[B].Active)
                     {
-                        if(!NPCNoClipping[NPC[B].Type])
+                        if(!NPC[B]->NoClipping)
                         {
                             // TRIES to check if A contains B, but actually checks the Y axis only
                             // cross-reference the NPC Effect 208 code, which fixes this but wastes a frame
@@ -733,7 +733,7 @@ void UpdateNPCs()
                 }
             }
 
-            if(NPCIsABlock[NPC[A].Type] || NPCIsAHit1Block[NPC[A].Type] || (NPCCanWalkOn[NPC[A].Type] && !(NPCIsCheep(NPC[A]) && NPC[A].Special == 2)))
+            if(NPC[A]->IsABlock || NPC[A]->IsAHit1Block || (NPC[A]->CanWalkOn && !(NPCIsCheep(NPC[A]) && NPC[A].Special == 2)))
             {
                 if(
                     (
@@ -754,9 +754,9 @@ void UpdateNPCs()
                     Block[numBlock].IsReally = A;
                     if(NPC[A].Type == NPCID_VEHICLE)
                         Block[numBlock].Type = 25;
-                    if(NPCIsAHit1Block[NPC[A].Type] || (NPCCanWalkOn[NPC[A].Type] && !NPCIsABlock[NPC[A].Type]))
+                    if(NPC[A]->IsAHit1Block || (NPC[A]->CanWalkOn && !NPC[A]->IsABlock))
                         Block[numBlock].Type = 26;
-                    if(NPCCanWalkOn[NPC[A].Type] && !NPCIsAHit1Block[NPC[A].Type] && !NPCIsABlock[NPC[A].Type])
+                    if(NPC[A]->CanWalkOn && !NPC[A]->IsAHit1Block && !NPC[A]->IsABlock)
                         Block[numBlock].noProjClipping = true;
                     if(NPC[A].Type == NPCID_SPRING && Block[numBlock].Location.Height != 32)
                     {
@@ -1002,14 +1002,14 @@ void UpdateNPCs()
                 if((NPC[A].Location.SpeedX > 0 && BlockSlope[Block[NPC[A].Slope].Type] == -1) ||
                    (NPC[A].Location.SpeedX < 0 && BlockSlope[Block[NPC[A].Slope].Type] == 1))
                 {
-                    if(!NPCCanWalkOn[NPC[A].Type] || NPCIsABlock[NPC[A].Type] || NPC[A].Type == NPCID_TANK_TREADS)
+                    if(!NPC[A]->CanWalkOn || NPC[A]->IsABlock || NPC[A].Type == NPCID_TANK_TREADS)
                         speedVar = (float)(1 - Block[NPC[A].Slope].Location.Height / Block[NPC[A].Slope].Location.Width * 0.4);
                 }
             }
             speedVar = 1;
 
             if(!NPC[A].Projectile)
-                speedVar = speedVar * NPCSpeedvar[NPC[A].Type];
+                speedVar = speedVar * NPC[A]->Speedvar;
 
             // water check
 
@@ -1118,7 +1118,7 @@ void UpdateNPCs()
                     NPC[A].WallDeath = 10;
             }
 
-            if(NPC[A].Quicksand > 0 && !NPCNoClipping[NPC[A].Type])
+            if(NPC[A].Quicksand > 0 && !NPC[A]->NoClipping)
             {
                 NPC[A].Location.SpeedY += 1;
 
@@ -1141,8 +1141,8 @@ void UpdateNPCs()
                     NPC[A].Type = NPCID_VEGGIE_1;
                 NPC[A].Location.X += NPC[A].Location.Width / 2.0;
                 NPC[A].Location.Y += NPC[A].Location.Height / 2.0;
-                NPC[A].Location.Width = NPCWidth[NPC[A].Type];
-                NPC[A].Location.Height = NPCHeight[NPC[A].Type];
+                NPC[A].Location.Width = NPC[A]->Width;
+                NPC[A].Location.Height = NPC[A]->Height;
                 NPC[A].Location.X += -NPC[A].Location.Width / 2.0;
                 NPC[A].Location.Y += -NPC[A].Location.Height / 2.0;
                 NPCQueues::Unchecked.push_back(A);
@@ -1272,8 +1272,8 @@ void UpdateNPCs()
                                  NPC[A].Type == NPCID_TOOTHYPIPE || NPCIsAnExit(NPC[A])))
                                 NPC[A].DefaultType = 0;
 
-                            NPC[A].Location.Height = NPCHeight[NPC[A].Type];
-                            NPC[A].Location.Width = NPCWidth[NPC[A].Type];
+                            NPC[A].Location.Height = NPC[A]->Height;
+                            NPC[A].Location.Width = NPC[A]->Width;
 
                             if(NPC[A].Type == NPCID_VEGGIE_RANDOM)
                             {
@@ -1283,8 +1283,8 @@ void UpdateNPCs()
                                     NPC[A].Type = NPCID_VEGGIE_1;
                                 NPC[A].Location.X += NPC[A].Location.Width / 2.0;
                                 NPC[A].Location.Y += NPC[A].Location.Height / 2.0;
-                                NPC[A].Location.Width = NPCWidth[NPC[A].Type];
-                                NPC[A].Location.Height = NPCHeight[NPC[A].Type];
+                                NPC[A].Location.Width = NPC[A]->Width;
+                                NPC[A].Location.Height = NPC[A]->Height;
                                 NPC[A].Location.X += -NPC[A].Location.Width / 2.0;
                                 NPC[A].Location.Y += -NPC[A].Location.Height / 2.0;
                             }
@@ -1300,8 +1300,8 @@ void UpdateNPCs()
                             NPC[A].Location.X += NPC[A].Location.Width / 2.0;
                             NPC[A].Location.Y += NPC[A].Location.Height / 2.0;
                             NPC[A].Type = NPCID_COIN_S2;
-                            NPC[A].Location.Height = NPCHeight[NPC[A].Type];
-                            NPC[A].Location.Width = NPCWidth[NPC[A].Type];
+                            NPC[A].Location.Height = NPC[A]->Height;
+                            NPC[A].Location.Width = NPC[A]->Width;
                             NPC[A].Location.X += -NPC[A].Location.Width / 2.0;
                             NPC[A].Location.Y += -NPC[A].Location.Height / 2.0;
 
@@ -1530,7 +1530,7 @@ void UpdateNPCs()
                                 NPC[A].Direction = 1;
                         }
 
-                        if(NPCCanWalkOn[NPC[A].Type])
+                        if(NPC[A]->CanWalkOn)
                         {
                             if(NPC[A].Location.SpeedX < Physics.NPCWalkingOnSpeed && NPC[A].Location.SpeedX > -Physics.NPCWalkingOnSpeed)
                             {
@@ -1849,9 +1849,9 @@ void UpdateNPCs()
                     // If Not (NPCIsAShell(.Type) Or .Type = 8 Or .Type = 93 Or .Type = 74 Or .Type = 51 Or .Type = 52 Or .Type = 12 Or .Type = 14 Or .Type = 13 Or .Type = 15 Or NPCIsABonus(.Type) Or .Type = 17 Or .Type = 18 Or .Type = 21 Or .Type = 22 Or .Type = 25 Or .Type = 26 Or .Type = 29 Or .Type = 30 Or .Type = 31 Or .Type = 32 Or .Type = 35 Or .Type = 37 Or .Type = 38 Or .Type = 39 Or .Type = 40 Or .Type = 42 Or .Type = 43 Or .Type = 44 Or .Type = 45 Or .Type = 46 Or .Type = 47 Or .Type = 48 Or .Type = 76 Or .Type = 49 Or .Type = 54 Or .Type = 56 Or .Type = 57 Or .Type = 58 Or .Type = 60 Or .Type = 62 Or .Type = 64 Or .Type = 66 Or .Type = 67 Or .Type = 68 Or .Type = 69 Or .Type = 70 Or .Type = 78 Or .Type = 84 Or .Type = 85 Or .Type = 87 Or (.Type = 55 And .Special > 0) Or (.Type >= 79 And .Type <= 83) Or .Type = 86 Or .Type = 92 Or .Type = 94 Or NPCIsYoshi(.Type) Or .Type = 96 Or .Type = 101 Or .Type = 102) And .Projectile = False Then
                     if((NPCDefaultMovement(NPC[A]) || (NPCIsCheep(NPC[A]) && NPC[A].Special != 2)) && !((NPC[A].Type == NPCID_EXT_TURTLE || NPC[A].Type == NPCID_BLU_HIT_TURTLE_S4) && NPC[A].Special > 0) && !NPC[A].Projectile)
                     {
-                        if(!NPCCanWalkOn[NPC[A].Type])
+                        if(!NPC[A]->CanWalkOn)
                         {
-                            if(NPCCanWalkOn[NPC[A].Type])
+                            if(NPC[A]->CanWalkOn)
                                 NPC[A].Location.SpeedX = Physics.NPCWalkingOnSpeed * NPC[A].Direction;
                             else if(NPC[A].Type == NPCID_KNIGHT)
                                 NPC[A].Location.SpeedX = 2 * NPC[A].Direction;
@@ -1892,7 +1892,7 @@ void UpdateNPCs()
 
 
                     // NPC Gravity
-                    if(!NPCNoGravity[NPC[A].Type])
+                    if(!NPC[A]->NoGravity)
                     {
                         // POSSIBLE SUBROUTINE: calcGravity
 
@@ -2308,7 +2308,7 @@ void UpdateNPCs()
                         int tempHitIsSlope = 0;
                         float tempSpeedA = 0; // speed of ground the NPC is possibly standing on
 
-                        if((!NPCNoClipping[NPC[A].Type] || NPC[A].Projectile) &&
+                        if((!NPC[A]->NoClipping || NPC[A].Projectile) &&
                            !(NPC[A].Type == NPCID_SPIT_BOSS_BALL && NPC[A].Projectile) && NPC[A].Type != NPCID_TOOTHY &&
                             NPC[A].standingOnPlayer == 0 && !(NPCIsVeggie(NPC[A]) && NPC[A].Projectile) &&
                            NPC[A].Type != NPCID_HEAVY_THROWN && NPC[A].Type != NPCID_BIG_BULLET && NPC[A].Type != NPCID_PET_FIRE &&
@@ -2356,11 +2356,14 @@ void UpdateNPCs()
                                                        !(NPC[A].Projectile && Block[B].noProjClipping) &&
                                                        !BlockNoClipping[Block[B].Type] && !Block[B].Hidden)
                                                     {
-                                                        if(Block[B].IsNPC == NPCID_TANK_TREADS && !NPCNoClipping[NPC[A].Type] && NPC[A].Type != NPCID_BULLET)
+                                                        if(Block[B].IsNPC == NPCID_TANK_TREADS && !NPC[A]->NoClipping && NPC[A].Type != NPCID_BULLET)
                                                             NPCHit(A, 8);
 
+                                                        // traits of the block's NPC (if it is actually an NPC)
+                                                        const NPCTraits_t& blk_npc_tr = NPCTraits[Block[B].IsNPC];
+
                                                         int HitSpot;
-                                                        if(Block[B].IsNPC != NPCID_CONVEYOR && (NPCIsABlock[Block[B].IsNPC] || NPCIsAHit1Block[Block[B].IsNPC] || NPCCanWalkOn[Block[B].IsNPC]))
+                                                        if(Block[B].IsNPC != NPCID_CONVEYOR && (blk_npc_tr.IsABlock || blk_npc_tr.IsAHit1Block || blk_npc_tr.CanWalkOn))
                                                             HitSpot = NPCFindCollision(NPC[A].Location, Block[B].Location);
                                                         else
                                                             HitSpot = FindCollisionBelt(NPC[A].Location, Block[B].Location, oldBeltSpeed);
@@ -2384,7 +2387,7 @@ void UpdateNPCs()
                                                         if(NPC[A].Type == NPCID_SWORDBEAM)
                                                             HitSpot = 0;
 
-                                                        if(Block[B].IsPlayer > 0 && ((!NPCStandsOnPlayer[NPC[A].Type] && NPC[A].Type != NPCID_PLR_FIREBALL) || NPC[A].Inert))
+                                                        if(Block[B].IsPlayer > 0 && ((!NPC[A]->StandsOnPlayer && NPC[A].Type != NPCID_PLR_FIREBALL) || NPC[A].Inert))
                                                             HitSpot = 0;
 
                                                         if((NPCIsCheep(NPC[A]) && NPC[A].Special == 2) && HitSpot != 3)
@@ -3069,7 +3072,7 @@ void UpdateNPCs()
                                                                 if(Block[B].IsPlayer == 0)
                                                                 {
                                                                     if(Block[B].IsNPC > 0)
-                                                                        NPC[A].BeltSpeed += float(Block[B].Location.SpeedX * C) * NPCSpeedvar[Block[B].IsNPC];
+                                                                        NPC[A].BeltSpeed += float(Block[B].Location.SpeedX * C) * blk_npc_tr.Speedvar;
                                                                     else
                                                                         NPC[A].BeltSpeed += float(Block[B].Location.SpeedX * C);
                                                                     beltCount += static_cast<float>(C);
@@ -3090,7 +3093,7 @@ void UpdateNPCs()
                                                                     }
                                                                 }
 
-                                                                if(((NPCStandsOnPlayer[NPC[A].Type] && !NPC[A].Projectile) || (NPCIsAShell(NPC[A]) && NPC[A].Location.SpeedX == 0.0)) && Block[B].IsPlayer > 0)
+                                                                if(((NPC[A]->StandsOnPlayer && !NPC[A].Projectile) || (NPCIsAShell(NPC[A]) && NPC[A].Location.SpeedX == 0.0)) && Block[B].IsPlayer > 0)
                                                                 {
                                                                     NPC[A].standingOnPlayerY = Block[B].standingOnPlayerY + NPC[A].Location.Height;
                                                                     NPC[A].standingOnPlayer = Block[B].IsPlayer;
@@ -3163,7 +3166,7 @@ void UpdateNPCs()
                                                                     }
                                                                     else if(NPC[A].Type != NPCID_TANK_TREADS && NPC[A].Type != NPCID_BULLET && NPC[A].Type != NPCID_PLR_FIREBALL)
                                                                     {
-                                                                        if(NPCMovesPlayer[NPC[A].Type])
+                                                                        if(NPC[A]->MovesPlayer)
                                                                         {
                                                                             if(NPC[A].Location.SpeedX == 0)
                                                                             {
@@ -3312,7 +3315,7 @@ void UpdateNPCs()
                                                                     NPCQueues::Killed.push_back(A);
                                                                 }
                                                             }
-                                                            else if(NPC[A].Type != NPCID_SPIKY_BALL_S3 && !(NPCIsABlock[NPC[A].Type] && Block[B].IsNPC > 0) && Block[B].IsNPC != 57)
+                                                            else if(NPC[A].Type != NPCID_SPIKY_BALL_S3 && !(NPC[A]->IsABlock && Block[B].IsNPC > 0) && Block[B].IsNPC != 57)
                                                             {
                                                                 addBelt = NPC[A].Location.X;
                                                                 if(NPC[A].Location.X + NPC[A].Location.Width / 2.0 < Block[B].Location.X + Block[B].Location.Width * 0.5)
@@ -3597,7 +3600,7 @@ void UpdateNPCs()
                                     if(A != C && NPC[C].Active && !NPC[C].Projectile)
                                     {
                                         if(NPC[C].Killed == 0 && NPC[C].standingOnPlayer == 0 && NPC[C].HoldingPlayer == 0 &&
-                                           !NPCNoClipping[NPC[C].Type] && NPC[C].Effect == 0 && !NPC[C].Inert) // And Not NPCIsABlock(NPC(C).Type) Then
+                                           !NPC[C]->NoClipping && NPC[C].Effect == 0 && !NPC[C].Inert) // And Not NPCIsABlock(NPC(C).Type) Then
                                         {
                                             Location_t tempLocation2 = preBeltLoc;
                                             tempLocation2.Width -= 4;
@@ -3649,7 +3652,7 @@ void UpdateNPCs()
                         // restore saw height after block collision and belt logic
                         if(NPC[A].Type == NPCID_SAW)
                         {
-                            NPC[A].Location.Height = NPCHeight[NPC[A].Type];
+                            NPC[A].Location.Height = NPC[A]->Height;
                             NPC[A].Projectile = true;
                         }
 
@@ -3750,7 +3753,7 @@ void UpdateNPCs()
                                                                     // toad code
                                                                     if(NPCIsToad(NPC[A]))
                                                                     {
-                                                                        if(!(NPCWontHurt[NPC[B].Type] && !NPC[B].Projectile) && !NPCIsABonus(NPC[B]) &&
+                                                                        if(!(NPC[B]->WontHurt && !NPC[B].Projectile) && !NPCIsABonus(NPC[B]) &&
                                                                            NPC[B].Type != NPCID_PLR_FIREBALL && NPC[B].Type != NPCID_PLR_ICEBALL && !(NPC[B].Type == NPCID_BULLET && NPC[B].CantHurt > 0) &&
                                                                            NPC[B].Type != NPCID_TOOTHY && NPC[B].Type != NPCID_PLR_HEAVY && NPC[B].Type != NPCID_CHAR4_HEAVY && NPC[B].Type != NPCID_FLIPPED_RAINBOW_SHELL)
                                                                         {
@@ -3971,7 +3974,7 @@ void UpdateNPCs()
                                                                             HitSpot = 0;
                                                                         }
 
-                                                                        if(!NPC[B].Projectile && !NPCNoClipping[NPC[A].Type] && !NPCNoClipping[NPC[B].Type])
+                                                                        if(!NPC[B].Projectile && !NPC[A]->NoClipping && !NPC[B]->NoClipping)
                                                                         {
                                                                             if(((NPC[A].Type == NPCID_EXT_TURTLE || NPC[A].Type == NPCID_BLU_HIT_TURTLE_S4) && NPCIsAShell(NPC[B])) || ((NPC[B].Type == NPCID_EXT_TURTLE || NPC[B].Type == NPCID_BLU_HIT_TURTLE_S4) && NPCIsAShell(NPC[A]))) // Nekkid koopa kicking a shell
                                                                             {
@@ -4128,7 +4131,7 @@ void UpdateNPCs()
                                     NPC[A].Location.SpeedY = -7;
                                 }
                             }
-                            else if(NPCTurnsAtCliffs[NPC[A].Type] && !NPC[A].Projectile) // Walking code NPCs that turn
+                            else if(NPC[A]->TurnsAtCliffs && !NPC[A].Projectile) // Walking code NPCs that turn
                             {
                                 bool tempTurn = true; // used for turning the npc around
                                 Location_t tempLocation = NPC[A].Location;
@@ -5009,8 +5012,8 @@ void UpdateNPCs()
                                 NPC[numNPCs].Type = NPCID_VILLAIN_FIRE;
                                 if(NPC[numNPCs].Direction > 0)
                                     NPC[numNPCs].Frame = 4;
-                                NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
-                                NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
+                                NPC[numNPCs].Location.Height = NPC[numNPCs]->Height;
+                                NPC[numNPCs].Location.Width = NPC[numNPCs]->Width;
                                 if(NPC[numNPCs].Direction < 0)
                                     NPC[numNPCs].Location.X = NPC[A].Location.X - 40;
                                 else
@@ -5197,8 +5200,8 @@ void UpdateNPCs()
                                     NPC[numNPCs].JustActivated = 0;
                                     NPC[numNPCs].Section = NPC[A].Section;
                                     NPC[numNPCs].Type = NPCID_BULLET;
-                                    NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
-                                    NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
+                                    NPC[numNPCs].Location.Width = NPC[numNPCs]->Width;
+                                    NPC[numNPCs].Location.Height = NPC[numNPCs]->Height;
 
                                     if(NPC[numNPCs].Direction > 0)
                                         NPC[numNPCs].Location.X = NPC[A].Location.X + NPC[A].Location.Width / 2.0;
@@ -5476,24 +5479,24 @@ void UpdateNPCs()
                 NPC[A].Effect2 += 1;
                 NPC[A].Location.Y -= 1; // .01
                 NPC[A].Location.Height += 1;
-                if(NPCHeightGFX[NPC[A].Type] > 0)
+                if(NPC[A]->HeightGFX > 0)
                 {
-                    if(NPC[A].Effect2 >= NPCHeightGFX[NPC[A].Type])
+                    if(NPC[A].Effect2 >= NPC[A]->HeightGFX)
                     {
                         NPC[A].Effect = 0;
                         NPC[A].Effect2 = 0;
                         NPC[A].Location.Y += NPC[A].Location.Height;
-                        NPC[A].Location.Height = NPCHeight[NPC[A].Type];
+                        NPC[A].Location.Height = NPC[A]->Height;
                         NPC[A].Location.Y += -NPC[A].Location.Height;
                     }
                 }
                 else
                 {
-                    if(NPC[A].Effect2 >= NPCHeight[NPC[A].Type])
+                    if(NPC[A].Effect2 >= NPC[A]->Height)
                     {
                         NPC[A].Effect = 0;
                         NPC[A].Effect2 = 0;
-                        NPC[A].Location.Height = NPCHeight[NPC[A].Type];
+                        NPC[A].Location.Height = NPC[A]->Height;
                     }
                 }
             }
@@ -5622,7 +5625,7 @@ void UpdateNPCs()
                 {
                     if(NPC[A].Type == NPCID_POWER_S3 || NPC[A].Type == NPCID_LIFE_S3 || NPC[A].Type == NPCID_POISON || NPC[A].Type == NPCID_POWER_S1 || NPC[A].Type == NPCID_POWER_S4 || NPC[A].Type == NPCID_LIFE_S1 || NPC[A].Type == NPCID_LIFE_S4 || NPC[A].Type == NPCID_BRUTE_SQUISHED || NPC[A].Type == NPCID_BIG_MOLE)
                         NPC[A].Location.X -= double(Physics.NPCMushroomSpeed);
-                    else if(NPCCanWalkOn[NPC[A].Type])
+                    else if(NPC[A]->CanWalkOn)
                         NPC[A].Location.X -= 1;
                     else
                         NPC[A].Location.X -= double(Physics.NPCWalkingSpeed);
@@ -5638,7 +5641,7 @@ void UpdateNPCs()
                 {
                     if(NPC[A].Type == NPCID_POWER_S3 || NPC[A].Type == NPCID_LIFE_S3 || NPC[A].Type == NPCID_POISON || NPC[A].Type == NPCID_POWER_S1 || NPC[A].Type == NPCID_POWER_S4 || NPC[A].Type == NPCID_LIFE_S1 || NPC[A].Type == NPCID_LIFE_S4 || NPC[A].Type == NPCID_BRUTE_SQUISHED || NPC[A].Type == NPCID_BIG_MOLE)
                         NPC[A].Location.X += double(Physics.NPCMushroomSpeed);
-                    else if(NPCCanWalkOn[NPC[A].Type])
+                    else if(NPC[A]->CanWalkOn)
                         NPC[A].Location.X += 1;
                     else
                         NPC[A].Location.X += double(Physics.NPCWalkingSpeed);

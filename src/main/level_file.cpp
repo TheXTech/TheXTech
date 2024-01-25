@@ -812,8 +812,8 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         npc.AttLayer = FindLayer(n.attach_layer);
 
         npc.DefaultType = npc.Type;
-        npc.Location.Width = NPCWidth[npc.Type];
-        npc.Location.Height = NPCHeight[npc.Type];
+        npc.Location.Width = npc->Width;
+        npc.Location.Height = npc->Height;
         npc.DefaultLocation = npc.Location;
         npc.DefaultDirection = npc.Direction;
 
@@ -1110,7 +1110,7 @@ void ClearLevel()
     const Background_t BlankBackground = Background_t();
     const Location_t BlankLocation = Location_t();
     const Effect_t blankEffect = Effect_t();
-    NPCScore[NPCID_MEDAL] = 6;
+    NPCTraits[NPCID_MEDAL].Score = 6;
     RestoreWorldStrings();
     LevelName.clear();
     ResetCompat();

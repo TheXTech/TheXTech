@@ -124,7 +124,7 @@ static void updateIntroLevelActivity()
                 for(int B : treeNPCQuery(tempLocation, SORTMODE_NONE))
                 {
                     if(NPC[B].Active && !NPCIsABonus(NPC[B]) &&
-                       !NPCWontHurt[NPC[B].Type] && NPC[B].HoldingPlayer == 0)
+                       !NPC[B]->WontHurt && NPC[B].HoldingPlayer == 0)
                     {
                         if(CheckCollision(tempLocation, NPC[B].Location))
                         {
@@ -137,7 +137,7 @@ static void updateIntroLevelActivity()
 
             if(p.StandingOnNPC > 0)
             {
-                if(NPCGrabFromTop[NPC[p.StandingOnNPC].Type])
+                if(NPC[p.StandingOnNPC]->GrabFromTop)
                 {
                     p.Controls.Down = true;
                     p.Controls.Run = true;
@@ -158,7 +158,7 @@ static void updateIntroLevelActivity()
                 for(int B : treeNPCQuery(tempLocation, SORTMODE_NONE))
                 {
                     if(NPC[B].Active && !NPCIsABonus(NPC[B]) &&
-                      !NPCWontHurt[NPC[B].Type] && NPC[B].HoldingPlayer == 0)
+                      !NPC[B]->WontHurt && NPC[B].HoldingPlayer == 0)
                     {
                         if(CheckCollision(tempLocation, NPC[B].Location))
                         {
@@ -183,7 +183,7 @@ static void updateIntroLevelActivity()
                     for(int B : treeNPCQuery(tempLocation, SORTMODE_NONE))
                     {
                         if(NPC[B].Active && !NPCIsABonus(NPC[B]) &&
-                           !NPCWontHurt[NPC[B].Type] && NPC[B].HoldingPlayer == 0)
+                           !NPC[B]->WontHurt && NPC[B].HoldingPlayer == 0)
                         {
                             if(CheckCollision(tempLocation, NPC[B].Location))
                             {
@@ -204,7 +204,7 @@ static void updateIntroLevelActivity()
                     for(int B : treeNPCQuery(tempLocation, SORTMODE_NONE))
                     {
                         if(NPC[B].Active && !NPCIsABonus(NPC[B]) &&
-                           !NPCWontHurt[NPC[B].Type] && NPC[B].HoldingPlayer == 0)
+                           !NPC[B]->WontHurt && NPC[B].HoldingPlayer == 0)
                         {
                             if(CheckCollision(tempLocation, NPC[B].Location))
                             {
@@ -372,8 +372,8 @@ static void updateIntroLevelActivity()
 
                     n.Active = true;
                     n.HoldingPlayer = A;
-                    n.Location.Height = NPCHeight[n.Type];
-                    n.Location.Width = NPCWidth[n.Type];
+                    n.Location.Height = n->Height;
+                    n.Location.Width = n->Width;
                     n.Location.Y = Player[A].Location.Y;  // level[n.Section].Height + 1000
                     n.Location.X = Player[A].Location.X; // level[n.Section].X + 1000
                     n.TimeLeft = 100;

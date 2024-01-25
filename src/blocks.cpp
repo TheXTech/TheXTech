@@ -335,8 +335,8 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
                     }
 
                     auto &nLoc = nn.Location;
-                    nLoc.Width = NPCWidth[nn.Type];
-                    nLoc.Height = NPCHeight[nn.Type];
+                    nLoc.Width = nn->Width;
+                    nLoc.Height = nn->Height;
                     nLoc.X = b.Location.X + b.Location.Width / 2.0 - nLoc.Width / 2.0;
                     nLoc.Y = b.Location.Y - nLoc.Height - 0.01;
                     nLoc.SpeedX = dRand() * 3 - 1.5;
@@ -422,8 +422,8 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
 #endif
                 nn.Type = NPCID_COIN_S2;
 
-                nn.Location.Width = NPCWidth[nn.Type];
-                nn.Location.Height = NPCHeight[nn.Type];
+                nn.Location.Width = nn->Width;
+                nn.Location.Height = nn->Height;
                 nn.Location.X = b.Location.X + b.Location.Width / 2.0 - nn.Location.Width / 2.0;
                 nn.Location.Y = b.Location.Y - nn.Location.Height - 0.01;
                 nn.Location.SpeedX = dRand() * 3.0 - 1.5;
@@ -618,12 +618,12 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
 
             CharStuff(numNPCs);
 
-            // note: minor SMBX64 bug, should be NPCWidth[nn.Type]
-            nn.Location.Width = NPCWidth[C];
+            // note: minor SMBX64 bug, should be nn->Width
+            nn.Location.Width = NPCWidth(C);
 
             // bug from ancient 101 case
             if(is_ancient && C == NPCID_FODDER_S3)
-                nn.Location.Width = NPCWidth[NPCID_POWER_S3];
+                nn.Location.Width = NPCWidth(NPCID_POWER_S3);
 
             // Make block a bit smaller to allow player take a bonus easier (Redigit's idea)
             if(!is_ancient && fEqual(b.Location.Width, 32))
@@ -681,7 +681,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
                     nn.Effect = 0;
                     nn.Location.Y = b.Location.Y - 32;
                     nn.Location.SpeedY = -6;
-                    nn.Location.Height = NPCHeight[C];
+                    nn.Location.Height = NPCHeight(C);
                     // PlaySound(SFX_ItemEmerge); // Don't play mushroom sound on leaf, like in original SMB3 (Redigit's comment)
                 }
                 else
@@ -703,7 +703,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
             else
             {
                 nn.Location.Y = b.Location.Y + 4;
-                nn.Location.Height = NPCHeight[C];
+                nn.Location.Height = NPCHeight(C);
 
                 // hardcoded to 32 in ancient 101 / 104 / 201 cases
                 if(is_ancient)
@@ -773,8 +773,8 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
         nn.Type = NPCID_COIN_S4;
         nn.Block = 89;
         nn.Location = b.Location;
-        nn.Location.Width = NPCWidth[nn.Type];
-        nn.Location.Height = NPCHeight[nn.Type];
+        nn.Location.Width = nn->Width;
+        nn.Location.Height = nn->Height;
         nn.Location.X += (b.Location.Width - nn.Location.Width) / 2.0;
         nn.Location.Y -= 0.01;
         nn.DefaultLocation = nn.Location;
@@ -1351,7 +1351,7 @@ void UpdateBlocks()
             {
                 if(NPC[B].Active)
                 {
-                    if(NPC[B].Killed == 0 && NPC[B].Effect == 0 && NPC[B].HoldingPlayer == 0 && (!NPCNoClipping[NPC[B].Type] || NPCIsACoin(NPC[B])))
+                    if(NPC[B].Killed == 0 && NPC[B].Effect == 0 && NPC[B].HoldingPlayer == 0 && (!NPC[B]->NoClipping || NPCIsACoin(NPC[B])))
                     {
                         if(ib.ShakeY3 <= 0 || NPCIsACoin(NPC[B]))
                         {
@@ -1580,14 +1580,14 @@ void PSwitch(bool enabled)
                     nn.Location = Block[A].Location;
                     nn.Location.SpeedX = 0;
                     nn.Location.SpeedY = 0;
-                    nn.Location.Width = NPCWidth[nn.Type];
-                    nn.Location.Height = NPCHeight[nn.Type];
+                    nn.Location.Width = nn->Width;
+                    nn.Location.Height = nn->Height;
                     nn.Location.X += (Block[A].Location.Width - nn.Location.Width) / 2.0;
                     nn.DefaultLocation = nn.Location;
                     nn.DefaultType = nn.Type;
 
                     // WARNING: this is new logic from #167. Check in case of any inconsistencies after Coin Switch is activated.
-                    if(NPCFrame[nn.Type] > 0)
+                    if(nn->Frame > 0)
                     {
                         nn.Direction = 1;
                         nn.Frame = EditorNPCFrame(nn.Type, nn.Direction);
@@ -1709,14 +1709,14 @@ void PSwitch(bool enabled)
                     nn.Location = Block[A].Location;
                     nn.Location.SpeedX = 0;
                     nn.Location.SpeedY = 0;
-                    nn.Location.Width = NPCWidth[nn.Type];
-                    nn.Location.Height = NPCHeight[nn.Type];
+                    nn.Location.Width = nn->Width;
+                    nn.Location.Height = nn->Height;
                     nn.Location.X += (Block[A].Location.Width - nn.Location.Width) / 2.0;
                     nn.DefaultLocation = nn.Location;
                     nn.DefaultType = nn.Type;
 
                     // WARNING: this is new logic from #167. Check in case of any inconsistencies after Coin Switch is activated.
-                    if(NPCFrame[nn.Type] > 0)
+                    if(nn->Frame > 0)
                     {
                         nn.Direction = 1;
                         nn.Frame = EditorNPCFrame(nn.Type, nn.Direction);

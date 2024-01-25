@@ -35,6 +35,7 @@
 #include "gfx.h"
 #include "config.h"
 #include "compat.h"
+#include "npc_traits.h"
 
 #include <Utils/maths.h>
 
@@ -735,8 +736,8 @@ void DrawFrozenNPC(int Z, int A)
 {
     auto &n = NPC[A];
     if((vScreenCollision(Z, n.Location) ||
-        vScreenCollision(Z, newLoc(n.Location.X - (NPCWidthGFX[n.Type] - n.Location.Width) / 2,
-                            n.Location.Y, CDbl(NPCWidthGFX[n.Type]), CDbl(NPCHeight[n.Type])))) && !n.Hidden)
+        vScreenCollision(Z, newLoc(n.Location.X - (n->WidthGFX - n.Location.Width) / 2,
+                            n.Location.Y, CDbl(n->WidthGFX), CDbl(n->Height)))) && !n.Hidden)
     {
 // draw npc
         XTColor c = n.Shadow ? XTColor(0, 0, 0) : XTColor();
@@ -753,24 +754,24 @@ void DrawFrozenNPC(int Z, int A)
                                     float(n.Location.Width - 4),
                                     float(n.Location.Height - 4),
                                     GFXNPCBMP[content],
-                                    2, 2 + contentFrame * NPCHeight[content], c);
+                                    2, 2 + contentFrame * NPCHeight(content), c);
         }
 
         // draw ice
-         XRender::renderTexture(float(vScreen[Z].X + n.Location.X + NPCFrameOffsetX[n.Type]),
-                                float(vScreen[Z].Y + n.Location.Y + NPCFrameOffsetY[n.Type]),
+         XRender::renderTexture(float(vScreen[Z].X + n.Location.X + n->FrameOffsetX),
+                                float(vScreen[Z].Y + n.Location.Y + n->FrameOffsetY),
                                 float(n.Location.Width - 6), float(n.Location.Height - 6),
                                 GFXNPCBMP[n.Type], 0, 0, c);
-         XRender::renderTexture(float(vScreen[Z].X + n.Location.X + NPCFrameOffsetX[n.Type] + n.Location.Width - 6),
-                                float(vScreen[Z].Y + n.Location.Y + NPCFrameOffsetY[n.Type]),
+         XRender::renderTexture(float(vScreen[Z].X + n.Location.X + n->FrameOffsetX + n.Location.Width - 6),
+                                float(vScreen[Z].Y + n.Location.Y + n->FrameOffsetY),
                                 6, float(n.Location.Height - 6),
                                 GFXNPCBMP[n.Type], 128 - 6, 0, c);
-         XRender::renderTexture(float(vScreen[Z].X + n.Location.X + NPCFrameOffsetX[n.Type]),
-                                float(vScreen[Z].Y + n.Location.Y + NPCFrameOffsetY[n.Type] + n.Location.Height - 6),
+         XRender::renderTexture(float(vScreen[Z].X + n.Location.X + n->FrameOffsetX),
+                                float(vScreen[Z].Y + n.Location.Y + n->FrameOffsetY + n.Location.Height - 6),
                                 float(n.Location.Width - 6), 6,
                                 GFXNPCBMP[n.Type], 0, 128 - 6, c);
-         XRender::renderTexture(float(vScreen[Z].X + n.Location.X + NPCFrameOffsetX[n.Type] + n.Location.Width - 6),
-                                float(vScreen[Z].Y + n.Location.Y + NPCFrameOffsetY[n.Type] + n.Location.Height - 6),
+         XRender::renderTexture(float(vScreen[Z].X + n.Location.X + n->FrameOffsetX + n.Location.Width - 6),
+                                float(vScreen[Z].Y + n.Location.Y + n->FrameOffsetY + n.Location.Height - 6),
                                 6, 6, GFXNPCBMP[n.Type],
                                 128 - 6, 128 - 6, c);
     }

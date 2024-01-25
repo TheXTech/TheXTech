@@ -22,6 +22,7 @@
 
 #include "core/events.h"
 #include "globals.h"
+#include "npc_traits.h"
 #include <fmt_format_ne.h>
 #include <cmath>
 #include <cfenv>
@@ -162,6 +163,10 @@ RangeArrI<int, 0, maxPlayerFrames, 0> ToadFrameY;
 RangeArrI<int, 0, maxPlayerFrames, 0> LinkFrameX;
 RangeArrI<int, 0, maxPlayerFrames, 0> LinkFrameY;
 RangeArrI<bool, 0, maxBackgroundType, false> BackgroundFence;
+
+RangeArr<NPCTraits_t, 0, maxNPCType> NPCTraits;
+
+#if 0
 RangeArrI<int, 0, maxNPCType, 0> NPCFrameOffsetX;
 RangeArrI<int, 0, maxNPCType, 0> NPCFrameOffsetY;
 RangeArrI<int, 0, maxNPCType, 0> NPCWidth;
@@ -204,6 +209,7 @@ RangeArrI<bool, 0, maxNPCType, false> NPCNoGravity;
 RangeArrI<int, 0, maxNPCType, 0> NPCFrame;
 RangeArrI<int, 0, maxNPCType, 0> NPCFrameSpeed;
 RangeArrI<int, 0, maxNPCType, 0> NPCFrameStyle;
+#endif
 
 RangeArrI<bool, 0, maxBlockType, false> BlockIsSizable;
 RangeArrI<int, 0, maxBlockType, 0> BlockSlope;
@@ -598,7 +604,7 @@ void initAll()
     Background2REAL.fill(0);
     Background2.fill(0);
     SpecialFrameCount.fill(0.f);
-    NPCSpeedvar.fill(0.f);
+    // NPCSpeedvar.fill(0.f);
 
     Block.fill(Block_t());
     Background.fill(Background_t());

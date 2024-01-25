@@ -81,7 +81,7 @@ void KillNPC(int A, int B)
 
         if(B != 10)
         {
-            MoreScore(NPCScore[NPC[A].Type], NPC[A].Location, NPC[A].Multiplier);
+            MoreScore(NPC[A]->Score, NPC[A].Location, NPC[A].Multiplier);
         }
 
         NPC[A].Location.SpeedX = NPC[A].Location.SpeedX * 0.4;
@@ -228,9 +228,9 @@ void KillNPC(int A, int B)
                     NPC[numNPCs].Type = NPCID_GEM_5;
                 if(iRand(40) < 3)
                     NPC[numNPCs].Type = NPCID_GEM_20;
-                NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
+                NPC[numNPCs].Location.Width = NPC[numNPCs]->Width;
                 NPC[numNPCs].Location.X = NPC[A].Location.X + NPC[A].Location.Width / 2.0 - NPC[numNPCs].Location.Width / 2.0;
-                NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
+                NPC[numNPCs].Location.Height = NPC[numNPCs]->Height;
                 if(NPC[A].Location.Height >= 32)
                     NPC[numNPCs].Location.Y = NPC[A].Location.Y + NPC[A].Location.Height / 2.0 - NPC[numNPCs].Location.Height / 2.0;
                 else if(NPC[A].Type == NPCID_BOTTOM_PLANT || NPC[A].Type == NPCID_LONG_PLANT_DOWN) // Stops the rupees from spawning in blocks
@@ -1100,8 +1100,8 @@ void KillNPC(int A, int B)
                     numNPCs++;
                     NPC[numNPCs] = NPC_t();
                     NPC[numNPCs].Type = NPCID_GOALORB_S2;
-                    NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
-                    NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
+                    NPC[numNPCs].Location.Height = NPC[numNPCs]->Height;
+                    NPC[numNPCs].Location.Width = NPC[numNPCs]->Width;
                     NPC[numNPCs].Location.X = NPC[A].Location.X;
                     NPC[numNPCs].Location.Y = NPC[A].Location.Y;
                     NPC[numNPCs].Location.SpeedY = -6;
@@ -1308,8 +1308,8 @@ void KillNPC(int A, int B)
         }
         else if(NPC[A].Type == NPCID_MINIBOSS) // Big Koopa
         {
-            NPC[A].Location.Y += -(NPCHeight[NPC[A].Type] - NPC[A].Location.Height);
-            NPC[A].Location.Height = NPCHeight[NPC[A].Type];
+            NPC[A].Location.Y += -(NPC[A]->Height - NPC[A].Location.Height);
+            NPC[A].Location.Height = NPC[A]->Height;
             if(NPC[A].Legacy)
             {
                 for(B = 1; B <= numNPCs; B++)

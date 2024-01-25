@@ -26,6 +26,7 @@
 #include "../core/render.h"
 #include "../core/power.h"
 #include "../gfx.h"
+#include "npc_traits.h"
 
 #include "video.h"
 #include "main/speedrunner.h"
@@ -114,7 +115,7 @@ void DrawInterface(int Z, int numScreens)
             {
                 XRender::renderTexture(plr_center - GFX.Container[1].w / 2 + 12,
                                         ScreenTop + 16 + 12,
-                                        NPCWidth[plr.HeldBonus], NPCHeight[plr.HeldBonus],
+                                        NPCWidth(plr.HeldBonus), NPCHeight(plr.HeldBonus),
                                         GFXNPC[plr.HeldBonus], 0, 0);
             }
         }

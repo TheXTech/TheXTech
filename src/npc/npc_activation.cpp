@@ -100,8 +100,8 @@ bool NPC_MustRenderInactive(const NPC_t& n)
     return n.Inert
         || n.Stuck
         || NPCIsACoin(n)
-        || NPCIsABlock[n.Type]
-        || NPCIsAHit1Block[n.Type]
+        || n->IsABlock
+        || n->IsAHit1Block
         || NPCIsAVine(n)
         || NPCIsABonus(n)
         || n.Type == NPCID_CHECKPOINT

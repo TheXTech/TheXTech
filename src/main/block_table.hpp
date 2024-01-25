@@ -30,6 +30,7 @@
 
 #include "globals.h"
 #include "layers.h"
+#include "npc_traits.h"
 
 #include "sdl_proxy/sdl_stdinc.h"
 
@@ -307,13 +308,13 @@ inline Location_t extract_loc(NPCRef_t obj)
 {
     Location_t ret = obj->Location;
 
-    if(ret.Height < NPCHeight[obj->Type])
-        ret.Height = NPCHeight[obj->Type];
+    if(ret.Height < NPCHeight(obj->Type))
+        ret.Height = NPCHeight(obj->Type);
 
-    if(ret.Width < NPCWidthGFX[obj->Type])
+    if(ret.Width < NPCWidthGFX(obj->Type))
     {
-        ret.X -= (NPCWidthGFX[obj->Type] - ret.Width) / 2.0;
-        ret.Width = NPCWidthGFX[obj->Type];
+        ret.X -= (NPCWidthGFX(obj->Type) - ret.Width) / 2.0;
+        ret.Width = NPCWidthGFX(obj->Type);
     }
 
     // for tempBlock queries

@@ -70,7 +70,7 @@ void NPCHit(int A, int B, int C)
             if(NPC[A].Type == NPCID_ITEM_BUBBLE)
                 NPCHit(A, 3, B);
 
-            if(NPCNoIceBall[NPC[A].Type] || NPC[A].Location.Width > 128 || NPC[A].Location.Height > 128)
+            if(NPC[A]->NoIceBall || NPC[A].Location.Width > 128 || NPC[A].Location.Height > 128)
                 return;
 
             if(NPC[A].Type == NPCID_RED_FLY_FODDER)
@@ -230,13 +230,13 @@ void NPCHit(int A, int B, int C)
     {
         if(NPC[C].Type == NPCID_PLR_FIREBALL)
         {
-            if(NPCNoFireBall[NPC[A].Type])
+            if(NPC[A]->NoFireBall)
                 return;
         }
     }
 
 
-    if(B == 1 && NPCJumpHurt[NPC[A].Type] && NPC[A].Type != NPCID_ITEM_BUBBLE) // Things that don't die from jumping
+    if(B == 1 && NPC[A]->JumpHurt && NPC[A].Type != NPCID_ITEM_BUBBLE) // Things that don't die from jumping
         return;
 
     // Add it to the queue, no matter whether it will happen. Reduces code size and increases maintainability.
@@ -362,8 +362,8 @@ void NPCHit(int A, int B, int C)
             if(!BattleMode)
                 NPC[A].DefaultType = 0;
         }
-        NPC[A].Location.Height = NPCHeight[NPC[A].Type];
-        NPC[A].Location.Width = NPCWidth[NPC[A].Type];
+        NPC[A].Location.Height = NPC[A]->Height;
+        NPC[A].Location.Width = NPC[A]->Width;
         NPC[A].Location.Y += -NPC[A].Location.Height;
         NPC[A].Location.SpeedX = (3 + dRand() * 1) * Player[C].Direction;
         if(NPC[A].Type == NPCID_BULLET)
@@ -383,8 +383,8 @@ void NPCHit(int A, int B, int C)
                 NPC[A].Type = NPCID_GEM_20;
             NPC[A].Location.X += NPC[A].Location.Width / 2.0;
             NPC[A].Location.Y += NPC[A].Location.Height;
-            NPC[A].Location.Width = NPCWidth[NPC[A].Type];
-            NPC[A].Location.Height = NPCHeight[NPC[A].Type];
+            NPC[A].Location.Width = NPC[A]->Width;
+            NPC[A].Location.Height = NPC[A]->Height;
             NPC[A].Location.X += -NPC[A].Location.Width / 2.0;
             NPC[A].Location.Y += -NPC[A].Location.Height;
         }
@@ -467,8 +467,8 @@ void NPCHit(int A, int B, int C)
                 NPC[A].Type = NPCID_MAGIC_BOSS_SHELL;
             else
                 NPC[A].Type = NPCID_FIRE_BOSS_SHELL;
-            NPC[A].Location.Width = NPCWidth[NPC[A].Type];
-            NPC[A].Location.Height = NPCHeight[NPC[A].Type];
+            NPC[A].Location.Width = NPC[A]->Width;
+            NPC[A].Location.Height = NPC[A]->Height;
             NPC[A].Location.X += -NPC[A].Location.Width / 2.0;
             NPC[A].Location.Y += -NPC[A].Location.Height;
             NPC[A].Location.SpeedX = 0;
@@ -1347,8 +1347,8 @@ void NPCHit(int A, int B, int C)
                 syncLayers_NPC(numNPCs);
                 NPC[A].Type +=  4;
             }
-            NPC[A].Location.Height = NPCHeight[NPC[A].Type];
-            NPC[A].Location.Width = NPCWidth[NPC[A].Type];
+            NPC[A].Location.Height = NPC[A]->Height;
+            NPC[A].Location.Width = NPC[A]->Width;
 
             NPCQueues::Unchecked.push_back(A);
 
@@ -1425,8 +1425,8 @@ void NPCHit(int A, int B, int C)
                 NPC[numNPCs].TimeLeft = 100;
                 syncLayers_NPC(numNPCs);
             }
-            NPC[A].Location.Height = NPCHeight[NPC[A].Type];
-            NPC[A].Location.Width = NPCWidth[NPC[A].Type];
+            NPC[A].Location.Height = NPC[A]->Height;
+            NPC[A].Location.Width = NPC[A]->Width;
             NPC[A].Location.Y -= NPC[A].Location.Height;
             NPC[A].Location.X += -(NPC[A].Location.Width / 2.0) - double(NPC[A].Direction * 2.f);
             NPC[A].Location.SpeedX = 0;
@@ -2045,7 +2045,7 @@ void NPCHit(int A, int B, int C)
             NPC[A].Location.SpeedY = 0;
             NPC[A].Location.SpeedX = 0;
         }
-        else if(B == 1 && !NPCCanWalkOn[NPC[A].Type] && !NPCJumpHurt[NPC[A].Type])
+        else if(B == 1 && !NPC[A]->CanWalkOn && !NPC[A]->JumpHurt)
         {
             NPC[A].Killed = B;
             NPC[A].Location.SpeedY = 0.123;
@@ -2187,9 +2187,9 @@ void NPCHit(int A, int B, int C)
     if(NPC[A].Killed == 10)
     {
         if(tempBool)
-            MoreScore(NPCScore[NPC[A].Type], NPC[A].Location, NPC[C].Multiplier);
+            MoreScore(NPC[A]->Score, NPC[A].Location, NPC[C].Multiplier);
         else
-            MoreScore(NPCScore[NPC[A].Type], NPC[A].Location, Player[C].Multiplier);
+            MoreScore(NPC[A]->Score, NPC[A].Location, Player[C].Multiplier);
     }
     // Calculate Score
     Player[0].Multiplier = 0;
@@ -2223,7 +2223,7 @@ void NPCHit(int A, int B, int C)
             }
             else
             {
-                MoreScore(NPCScore[NPC[A].Type], NPC[A].Location, Player[C].Multiplier);
+                MoreScore(NPC[A]->Score, NPC[A].Location, Player[C].Multiplier);
                 if(Player[C].Multiplier > NPC[A].Multiplier)
                     NPC[A].Multiplier = Player[C].Multiplier;
             }
@@ -2234,7 +2234,7 @@ void NPCHit(int A, int B, int C)
     {
         if(NPC[A].Killed != 0 || NPC[A].Type != oldNPC.Type)
         {
-            MoreScore(NPCScore[NPC[A].Type], NPC[A].Location);
+            MoreScore(NPC[A]->Score, NPC[A].Location);
             if(B == 2)
                 NewEffect(EFFID_WHACK, newLoc(NPC[A].Location.X, NPC[A].Location.Y + NPC[A].Location.Height - 16));
         }
@@ -2256,7 +2256,7 @@ void NPCHit(int A, int B, int C)
             {
                 if(NPC[C].Multiplier < NPC[A].Multiplier)
                     NPC[C].Multiplier = NPC[A].Multiplier;
-                MoreScore(NPCScore[NPC[A].Type], NPC[A].Location, NPC[C].Multiplier);
+                MoreScore(NPC[A]->Score, NPC[A].Location, NPC[C].Multiplier);
             }
         }
     }
@@ -2265,13 +2265,13 @@ void NPCHit(int A, int B, int C)
     {
         if(NPC[A].Multiplier < NPC[C].Multiplier)
             NPC[A].Multiplier = NPC[C].Multiplier;
-        MoreScore(NPCScore[NPC[A].Type], NPC[A].Location, NPC[A].Multiplier);
+        MoreScore(NPC[A]->Score, NPC[A].Location, NPC[A].Multiplier);
     }
 
     if(B == 6 && NPC[A].Killed == 6 && (NPC[A].Type == NPCID_BOSS_FRAGILE || NPC[A].Type == NPCID_VILLAIN_S1 || NPC[A].Type == NPCID_SICK_BOSS || NPC[A].Type == NPCID_MINIBOSS || NPC[A].Type == NPCID_SPIT_BOSS || NPC[A].Type == NPCID_VILLAIN_S3))
     {
-        if(!NPCWontHurt[NPC[A].Type] && !NPCIsABonus(NPC[A]) && NPC[A].Type != NPCID_PLR_FIREBALL)
-            MoreScore(NPCScore[NPC[A].Type], NPC[A].Location);
+        if(!NPC[A]->WontHurt && !NPCIsABonus(NPC[A]) && NPC[A].Type != NPCID_PLR_FIREBALL)
+            MoreScore(NPC[A]->Score, NPC[A].Location);
     }
 
     if(!NPCIsACoin(NPC[A]) && B == 3 && C != A &&
@@ -2283,7 +2283,7 @@ void NPCHit(int A, int B, int C)
         {
             if(NPC[C].Multiplier < NPC[A].Multiplier)
                 NPC[C].Multiplier = NPC[A].Multiplier;
-            MoreScore(NPCScore[NPC[A].Type], NPC[A].Location, NPC[C].Multiplier);
+            MoreScore(NPC[A]->Score, NPC[A].Location, NPC[C].Multiplier);
         }
         if(NPC[A].Type != NPCID_BOSS_CASE && NPC[A].Type != NPCID_BOSS_FRAGILE)
         {
@@ -2315,10 +2315,10 @@ void NPCHit(int A, int B, int C)
     if(NPC[A].Type != oldNPC.Type)
     {
         NPC[A].Location.Y += NPC[A].Location.Height;
-        NPC[A].Location.Height = NPCHeight[NPC[A].Type];
+        NPC[A].Location.Height = NPC[A]->Height;
         NPC[A].Location.Y -= NPC[A].Location.Height;
         NPC[A].Location.X += (NPC[A].Location.Width / 2.0);
-        NPC[A].Location.Width = NPCWidth[NPC[A].Type];
+        NPC[A].Location.Width = NPC[A]->Width;
         NPC[A].Location.X -= (NPC[A].Location.Width / 2.0);
     }
 

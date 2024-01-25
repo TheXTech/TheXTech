@@ -387,7 +387,7 @@ void ShowLayer(layerindex_t L, bool NoEffect)
 
             if(!LevelEditor)
             {
-                if(!NPCWontHurt[NPC[A].Type] && !NPCIsABonus(NPC[A]) && NPC[A].Active)
+                if(!NPC[A]->WontHurt && !NPCIsABonus(NPC[A]) && NPC[A].Active)
                 {
                     for(B = 1; B <= numPlayers; B++)
                     {

@@ -242,13 +242,13 @@ bool AllowBubble()
     else
         type = EditorCursor.NPC.Type;
     if(type == 134) return true;
-    if(NPCHeight[type] > 36 || NPCWidth[type] > 36
-        || NPCWidthGFX[type] > 36 || NPCHeightGFX[type] > 36)
+    if(NPCHeight(type) > 36 || NPCWidth(type) > 36
+        || NPCWidthGFX(type) > 36 || NPCHeightGFX(type) > 36)
     {
-        int W = NPCWidth[type];
-        int H = NPCHeight[type];
-        if(NPCWidthGFX[type] > W) W = NPCWidthGFX[type];
-        if(NPCHeightGFX[type] > H) H = NPCHeightGFX[type];
+        int W = NPCWidth(type);
+        int H = NPCHeight(type);
+        if(NPCWidthGFX(type) > W) W = NPCWidthGFX(type);
+        if(NPCHeightGFX(type) > H) H = NPCHeightGFX(type);
         if((W <= 32 && H <= 54) || (H <= 32 && W <= 54))
             return true;
         else
@@ -497,15 +497,15 @@ bool EditorScreen::UpdateCheckBox(CallMode mode, int x, int y, bool sel, const c
 bool EditorScreen::UpdateNPCButton(CallMode mode, int x, int y, int type, bool sel)
 {
     int draw_width, draw_height;
-    if(NPCWidthGFX[type] == 0)
+    if(NPCWidthGFX(type) == 0)
     {
-        draw_width = NPCWidth[type];
-        draw_height = NPCHeight[type];
+        draw_width = NPCWidth(type);
+        draw_height = NPCHeight(type);
     }
     else
     {
-        draw_width = NPCWidthGFX[type];
-        draw_height = NPCHeightGFX[type];
+        draw_width = NPCWidthGFX(type);
+        draw_height = NPCHeightGFX(type);
     }
 
     return UpdateButton(mode, x, y, GFXNPC[type], sel, 0, 0, draw_width, draw_height);
@@ -605,7 +605,7 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
     {
         // Containers
         SuperPrintCenterR(mode, g_editorStrings.npcInContainer, 3, e_ScreenW - 20, 40);
-        if(UpdateButton(mode, e_ScreenW - 40 + 4, 60 + 4, GFXNPC[NPCID_ITEM_BURIED], EditorCursor.NPC.Type == NPCID_ITEM_BURIED, 0, 0, NPCWidth[NPCID_ITEM_BURIED], NPCHeight[NPCID_ITEM_BURIED]))
+        if(UpdateButton(mode, e_ScreenW - 40 + 4, 60 + 4, GFXNPC[NPCID_ITEM_BURIED], EditorCursor.NPC.Type == NPCID_ITEM_BURIED, 0, 0, NPCWidth(NPCID_ITEM_BURIED), NPCHeight(NPCID_ITEM_BURIED)))
         {
             if(EditorCursor.NPC.Type == NPCID_ITEM_BURIED)
             {
@@ -641,7 +641,7 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
                 EditorCursor.NPC.Type = NPCID_ITEM_POD;
             }
         }
-        if(UpdateButton(mode, e_ScreenW - 40 + 4, 140 + 4, GFXNPC[NPCID_ITEM_THROWER], EditorCursor.NPC.Type == NPCID_ITEM_THROWER, 0, 0, NPCWidthGFX[NPCID_ITEM_THROWER], NPCHeightGFX[NPCID_ITEM_THROWER]))
+        if(UpdateButton(mode, e_ScreenW - 40 + 4, 140 + 4, GFXNPC[NPCID_ITEM_THROWER], EditorCursor.NPC.Type == NPCID_ITEM_THROWER, 0, 0, NPCWidthGFX(NPCID_ITEM_THROWER), NPCHeightGFX(NPCID_ITEM_THROWER)))
         {
             if(EditorCursor.NPC.Type == NPCID_ITEM_THROWER)
             {
@@ -661,7 +661,7 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
         }
         if(AllowBubble())
         {
-            if(UpdateButton(mode, e_ScreenW - 40 + 4, 180 + 4, GFXNPC[NPCID_ITEM_BUBBLE], EditorCursor.NPC.Type == NPCID_ITEM_BUBBLE, 0, 0, NPCWidthGFX[NPCID_ITEM_BUBBLE], NPCHeightGFX[NPCID_ITEM_BUBBLE]))
+            if(UpdateButton(mode, e_ScreenW - 40 + 4, 180 + 4, GFXNPC[NPCID_ITEM_BUBBLE], EditorCursor.NPC.Type == NPCID_ITEM_BUBBLE, 0, 0, NPCWidthGFX(NPCID_ITEM_BUBBLE), NPCHeightGFX(NPCID_ITEM_BUBBLE)))
             {
                 if(EditorCursor.NPC.Type == NPCID_ITEM_BUBBLE)
                 {

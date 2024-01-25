@@ -37,77 +37,77 @@ void NPCFrames(int A)
     double D = 0;
     Location_t tempLocation;
 
-    if(NPCFrame[NPC[A].Type] > 0) // custom frames
+    if(NPC[A]->Frame > 0) // custom frames
     {
         NPC[A].FrameCount += 1;
-        if(NPCFrameStyle[NPC[A].Type] == 2 && (NPC[A].Projectile || NPC[A].HoldingPlayer > 0))
+        if(NPC[A]->FrameStyle == 2 && (NPC[A].Projectile || NPC[A].HoldingPlayer > 0))
             NPC[A].FrameCount += 1;
-        if(NPC[A].FrameCount >= NPCFrameSpeed[NPC[A].Type])
+        if(NPC[A].FrameCount >= NPC[A]->FrameSpeed)
         {
-            if(NPCFrameStyle[NPC[A].Type] == 0)
+            if(NPC[A]->FrameStyle == 0)
                 NPC[A].Frame += 1 * NPC[A].Direction;
             else
                 NPC[A].Frame += 1;
             NPC[A].FrameCount = 0;
         }
-        if(NPCFrameStyle[NPC[A].Type] == 0)
+        if(NPC[A]->FrameStyle == 0)
         {
-            if(NPC[A].Frame >= NPCFrame[NPC[A].Type])
+            if(NPC[A].Frame >= NPC[A]->Frame)
                 NPC[A].Frame = 0;
             if(NPC[A].Frame < 0)
-                NPC[A].Frame = NPCFrame[NPC[A].Type] - 1;
+                NPC[A].Frame = NPC[A]->Frame - 1;
         }
-        else if(NPCFrameStyle[NPC[A].Type] == 1)
+        else if(NPC[A]->FrameStyle == 1)
         {
             if(NPC[A].Direction == -1)
             {
-                if(NPC[A].Frame >= NPCFrame[NPC[A].Type])
+                if(NPC[A].Frame >= NPC[A]->Frame)
                     NPC[A].Frame = 0;
                 if(NPC[A].Frame < 0)
-                    NPC[A].Frame = NPCFrame[NPC[A].Type];
+                    NPC[A].Frame = NPC[A]->Frame;
             }
             else
             {
-                if(NPC[A].Frame >= NPCFrame[NPC[A].Type] * 2)
-                    NPC[A].Frame = NPCFrame[NPC[A].Type];
-                if(NPC[A].Frame < NPCFrame[NPC[A].Type])
-                    NPC[A].Frame = NPCFrame[NPC[A].Type];
+                if(NPC[A].Frame >= NPC[A]->Frame * 2)
+                    NPC[A].Frame = NPC[A]->Frame;
+                if(NPC[A].Frame < NPC[A]->Frame)
+                    NPC[A].Frame = NPC[A]->Frame;
             }
         }
-        else if(NPCFrameStyle[NPC[A].Type] == 2)
+        else if(NPC[A]->FrameStyle == 2)
         {
             if(NPC[A].HoldingPlayer == 0 && !NPC[A].Projectile)
             {
                 if(NPC[A].Direction == -1)
                 {
-                    if(NPC[A].Frame >= NPCFrame[NPC[A].Type])
+                    if(NPC[A].Frame >= NPC[A]->Frame)
                         NPC[A].Frame = 0;
                     if(NPC[A].Frame < 0)
-                        NPC[A].Frame = NPCFrame[NPC[A].Type] - 1;
+                        NPC[A].Frame = NPC[A]->Frame - 1;
                 }
                 else
                 {
-                    if(NPC[A].Frame >= NPCFrame[NPC[A].Type] * 2)
-                        NPC[A].Frame = NPCFrame[NPC[A].Type];
-                    if(NPC[A].Frame < NPCFrame[NPC[A].Type])
-                        NPC[A].Frame = NPCFrame[NPC[A].Type] * 2 - 1;
+                    if(NPC[A].Frame >= NPC[A]->Frame * 2)
+                        NPC[A].Frame = NPC[A]->Frame;
+                    if(NPC[A].Frame < NPC[A]->Frame)
+                        NPC[A].Frame = NPC[A]->Frame * 2 - 1;
                 }
             }
             else
             {
                 if(NPC[A].Direction == -1)
                 {
-                    if(NPC[A].Frame >= NPCFrame[NPC[A].Type] * 3)
-                        NPC[A].Frame = NPCFrame[NPC[A].Type] * 2;
-                    if(NPC[A].Frame < NPCFrame[NPC[A].Type] * 2)
-                        NPC[A].Frame = NPCFrame[NPC[A].Type] * 3 - 1;
+                    if(NPC[A].Frame >= NPC[A]->Frame * 3)
+                        NPC[A].Frame = NPC[A]->Frame * 2;
+                    if(NPC[A].Frame < NPC[A]->Frame * 2)
+                        NPC[A].Frame = NPC[A]->Frame * 3 - 1;
                 }
                 else
                 {
-                    if(NPC[A].Frame >= NPCFrame[NPC[A].Type] * 4)
-                        NPC[A].Frame = NPCFrame[NPC[A].Type] * 3;
-                    if(NPC[A].Frame < NPCFrame[NPC[A].Type] * 3)
-                        NPC[A].Frame = NPCFrame[NPC[A].Type] * 4 - 1;
+                    if(NPC[A].Frame >= NPC[A]->Frame * 4)
+                        NPC[A].Frame = NPC[A]->Frame * 3;
+                    if(NPC[A].Frame < NPC[A]->Frame * 3)
+                        NPC[A].Frame = NPC[A]->Frame * 4 - 1;
                 }
             }
         }

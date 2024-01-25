@@ -332,10 +332,10 @@ void DrawPlayer(Player_t &p, const int Z, XTColor color)
                     {
                         if(!NPCIsYoshi(NPC[p.HoldingNPC]) && NPC[p.HoldingNPC].Type > 0)
                         {
-                            if(NPCWidthGFX[NPC[p.HoldingNPC].Type] == 0)
+                            if(NPC[p.HoldingNPC]->WidthGFX == 0)
                             {
-                                RenderTexturePlayer(Z, vScreen[Z].X + NPC[p.HoldingNPC].Location.X + NPCFrameOffsetX[NPC[p.HoldingNPC].Type],
-                                                      vScreen[Z].Y + NPC[p.HoldingNPC].Location.Y + NPCFrameOffsetY[NPC[p.HoldingNPC].Type],
+                                RenderTexturePlayer(Z, vScreen[Z].X + NPC[p.HoldingNPC].Location.X + NPC[p.HoldingNPC]->FrameOffsetX,
+                                                      vScreen[Z].Y + NPC[p.HoldingNPC].Location.Y + NPC[p.HoldingNPC]->FrameOffsetY,
                                                       NPC[p.HoldingNPC].Location.Width,
                                                       NPC[p.HoldingNPC].Location.Height,
                                                       GFXNPC[NPC[p.HoldingNPC].Type],
@@ -344,13 +344,13 @@ void DrawPlayer(Player_t &p, const int Z, XTColor color)
                             }
                             else
                             {
-                                RenderTexturePlayer(Z, vScreen[Z].X + NPC[p.HoldingNPC].Location.X + (NPCFrameOffsetX[NPC[p.HoldingNPC].Type] * -NPC[p.HoldingNPC].Direction) - NPCWidthGFX[NPC[p.HoldingNPC].Type] / 2.0 + NPC[p.HoldingNPC].Location.Width / 2.0,
-                                                      vScreen[Z].Y + NPC[p.HoldingNPC].Location.Y + NPCFrameOffsetY[NPC[p.HoldingNPC].Type] - NPCHeightGFX[NPC[p.HoldingNPC].Type] + NPC[p.HoldingNPC].Location.Height,
-                                                      NPCWidthGFX[NPC[p.HoldingNPC].Type],
-                                                      NPCHeightGFX[NPC[p.HoldingNPC].Type],
+                                RenderTexturePlayer(Z, vScreen[Z].X + NPC[p.HoldingNPC].Location.X + (NPC[p.HoldingNPC]->FrameOffsetX * -NPC[p.HoldingNPC].Direction) - NPC[p.HoldingNPC]->WidthGFX / 2.0 + NPC[p.HoldingNPC].Location.Width / 2.0,
+                                                      vScreen[Z].Y + NPC[p.HoldingNPC].Location.Y + NPC[p.HoldingNPC]->FrameOffsetY - NPC[p.HoldingNPC]->HeightGFX + NPC[p.HoldingNPC].Location.Height,
+                                                      NPC[p.HoldingNPC]->WidthGFX,
+                                                      NPC[p.HoldingNPC]->HeightGFX,
                                                       GFXNPC[NPC[p.HoldingNPC].Type],
                                                       0,
-                                                      NPC[p.HoldingNPC].Frame * NPCHeightGFX[NPC[p.HoldingNPC].Type]);
+                                                      NPC[p.HoldingNPC].Frame * NPC[p.HoldingNPC]->HeightGFX);
                             }
                         }
                     }

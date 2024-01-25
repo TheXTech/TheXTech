@@ -245,6 +245,8 @@ struct OldEditorControls_t
 // extern RangeArrI<int, 1, maxLocalPlayers, 0> useJoystick; // no longer
 // extern RangeArrI<bool, 1, maxLocalPlayers, false> wantedKeyboard;
 
+struct NPCTraits_t;
+
 //Public Type NPC 'The NPC Type
 struct NPC_t
 {
@@ -462,6 +464,8 @@ struct NPC_t
     // int Settings = 0;    // unused since SMBX64, removed
 
 //End Type
+
+    const NPCTraits_t* operator->() const;
 
     NPC_t() : TurnAround(false), onWall(false), TurnBackWipe(false), GeneratorActive(false),
         playerTemp(false), Legacy(false), Chat(false), NoLavaSplash(false),
@@ -1492,6 +1496,10 @@ extern RangeArrI<int, 0, maxPlayerFrames, 0> LinkFrameX;
 extern RangeArrI<int, 0, maxPlayerFrames, 0> LinkFrameY;
 //Public BackgroundFence(0 To maxBackgroundType) As Boolean
 extern RangeArrI<bool, 0, maxBackgroundType, false> BackgroundFence;
+
+#if 0
+// moved to npc_traits.h
+
 //Public NPCFrameOffsetX(0 To maxNPCType) As Integer 'NPC frame offset X
 extern RangeArrI<int, 0, maxNPCType, 0> NPCFrameOffsetX;
 //Public NPCFrameOffsetY(0 To maxNPCType) As Integer 'NPC frame offset Y
@@ -1574,6 +1582,7 @@ extern RangeArrI<int, 0, maxNPCType, 0> NPCFrame;
 extern RangeArrI<int, 0, maxNPCType, 0> NPCFrameSpeed;
 //Public NPCFrameStyle(0 To maxNPCType) As Integer
 extern RangeArrI<int, 0, maxNPCType, 0> NPCFrameStyle;
+#endif
 
 //Public Type NPCDefaults 'Default NPC Settings
 // Moved into custom.cpp as local-private

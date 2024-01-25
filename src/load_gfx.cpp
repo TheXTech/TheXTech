@@ -824,15 +824,15 @@ void LoadGFX()
         if(!p.empty())
         {
             XRender::lazyLoadPicture(GFXNPCBMP[A], p);
-            // GFXNPCWidth[A] = GFXNPCBMP[A].w;
-            // GFXNPCHeight[A] = GFXNPCBMP[A].h;
+            // GFXNPCWidth(A) = GFXNPCBMP[A].w;
+            // GFXNPCHeight(A) = GFXNPCBMP[A].h;
             if(A % 20 == 0)
                 UpdateLoad();
         }
         else
         {
-            // GFXNPCWidth[A] = 0;
-            // GFXNPCHeight[A] = 0;
+            // GFXNPCWidth(A) = 0;
+            // GFXNPCHeight(A) = 0;
             break;
         }
     }

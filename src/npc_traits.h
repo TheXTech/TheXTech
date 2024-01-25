@@ -37,92 +37,101 @@ struct NPCTraits_t
     //Public NPCFrameOffsetY(0 To maxNPCType) As Integer 'NPC frame offset Y
     int16_t FrameOffsetY = 0;
     //Public NPCWidth(0 To maxNPCType) As Integer 'NPC width
-    int16_t Width = 0;
+    int16_t Width = 32;
     //Public NPCHeight(0 To maxNPCType) As Integer 'NPC height
-    int16_t Height = 0;
+    int16_t Height = 32;
     //Public NPCWidthGFX(0 To maxNPCType) As Integer 'NPC gfx width
     int16_t WidthGFX = 0;
     //Public NPCHeightGFX(0 To maxNPCType) As Integer 'NPC gfx height
     int16_t HeightGFX = 0;
     //Public NPCSpeedvar(0 To maxNPCType) As Single 'NPC Speed Change
-    float Speedvar = 0.0;
+    float Speedvar = 1.0;
 
-    //Public NPCIsAShell(0 To maxNPCType) As Boolean 'Flags the NPC type if it is a shell
-    bool IsAShell = false;
     //Public NPCIsABlock(0 To maxNPCType) As Boolean 'Flag NPC as a block
     bool IsABlock = false;
     //Public NPCIsAHit1Block(0 To maxNPCType) As Boolean 'Flag NPC as a hit1 block
     bool IsAHit1Block = false;
-    //Public NPCIsABonus(0 To maxNPCType) As Boolean 'Flags the NPC type if it is a bonus
-    bool IsABonus = false;
-    //Public NPCIsACoin(0 To maxNPCType) As Boolean 'Flags the NPC type if it is a coin
-    bool IsACoin;
-    //Public NPCIsAVine(0 To maxNPCType) As Boolean 'Flags the NPC type if it is a vine
-    bool IsAVine;
-    //Public NPCIsAnExit(0 To maxNPCType) As Boolean 'Flags the NPC type if it is a level exit
-    bool IsAnExit;
-    //Public NPCIsAParaTroopa(0 To maxNPCType) As Boolean 'Flags the NPC type as a para-troopa
-    bool IsAParaTroopa;
-    //Public NPCIsCheep(0 To maxNPCType) As Boolean 'Flags the NPC type as a cheep cheep
-    bool IsCheep;
     //Public NPCJumpHurt(0 To maxNPCType) As Boolean 'Hurts the player even if it jumps on the NPC
-    bool JumpHurt;
+    bool JumpHurt = false;
     //Public NPCNoClipping(0 To maxNPCType) As Boolean 'NPC can go through blocks
-    bool NoClipping;
+    bool NoClipping = false;
     //Public NPCScore(0 To maxNPCType) As Integer 'NPC score value
-    int8_t Score;
+    int8_t Score = 2;
     //Public NPCCanWalkOn(0 To maxNPCType) As Boolean  'NPC can be walked on
-    bool CanWalkOn;
+    bool CanWalkOn = false;
     //Public NPCGrabFromTop(0 To maxNPCType) As Boolean  'NPC can be grabbed from the top
-    bool GrabFromTop;
+    bool GrabFromTop = false;
     //Public NPCTurnsAtCliffs(0 To maxNPCType) As Boolean  'NPC turns around at cliffs
-    bool TurnsAtCliffs;
+    bool TurnsAtCliffs = false;
     //Public NPCWontHurt(0 To maxNPCType) As Boolean  'NPC wont hurt the player
-    bool WontHurt;
+    bool WontHurt = false;
     //Public NPCMovesPlayer(0 To maxNPCType) As Boolean 'Player can not walk through the NPC
-    bool MovesPlayer;
+    bool MovesPlayer = false;
     //Public NPCStandsOnPlayer(0 To maxNPCType) As Boolean 'for the clown car
-    bool StandsOnPlayer;
+    bool StandsOnPlayer = false;
     //Public NPCIsGrabbable(0 To maxNPCType) As Boolean 'Player can grab the NPC
-    bool IsGrabbable;
-    //Public NPCIsBoot(0 To maxNPCType) As Boolean 'npc is a kurbo's shoe
-    bool IsBoot;
-    //Public NPCIsYoshi(0 To maxNPCType) As Boolean 'npc is a yoshi
-    bool IsYoshi;
-    //Public NPCIsToad(0 To maxNPCType) As Boolean 'npc is a toad
-    bool IsToad;
+    bool IsGrabbable = false;
     //Public NPCNoYoshi(0 To maxNPCType) As Boolean 'Player can't eat the NPC
-    bool NoYoshi;
+    bool NoYoshi = false;
     //Public NPCForeground(0 To maxNPCType) As Boolean 'draw the npc in front
-    bool Foreground;
-    //Public NPCIsABot(0 To maxNPCType) As Boolean 'Zelda 2 Bot monster
-    bool IsABot;
-    //Public NPCDefaultMovement(0 To maxNPCType) As Boolean 'default NPC movement
-    bool DefaultMovement;
-    //Public NPCIsVeggie(0 To maxNPCType) As Boolean 'turnips
-    bool IsVeggie;
+    bool Foreground = false;
     //Public NPCNoFireBall(0 To maxNPCType) As Boolean 'not hurt by fireball
-    bool NoFireBall;
+    bool NoFireBall = false;
     //Public NPCNoIceBall(0 To maxNPCType) As Boolean 'not hurt by fireball
-    bool NoIceBall;
+    bool NoIceBall = false;
     //Public NPCNoGravity(0 To maxNPCType) As Boolean 'not affected by gravity
-    bool NoGravity;
+    bool NoGravity = false;
 
     //Public NPCFrame(0 To maxNPCType) As Integer
-    int16_t Frame;
+    int16_t Frame = 0;
     //Public NPCFrameSpeed(0 To maxNPCType) As Integer
-    int16_t FrameSpeed;
+    int16_t FrameSpeed = 8;
     //Public NPCFrameStyle(0 To maxNPCType) As Integer
-    int16_t FrameStyle;
+    int16_t FrameStyle = 0;
 };
 
 extern RangeArr<NPCTraits_t, 0, maxNPCType> NPCTraits;
 
-#if 0
 inline const NPCTraits_t* NPC_t::operator->() const
 {
     return &NPCTraits[Type];
 }
-#endif
+
+
+// some read-only accessors
+inline int16_t NPCHeight(int Type)
+{
+    return NPCTraits[Type].Height;
+}
+
+inline int16_t NPCWidth(int Type)
+{
+    return NPCTraits[Type].Width;
+}
+
+inline int16_t NPCHeightGFX(int Type)
+{
+    return NPCTraits[Type].HeightGFX;
+}
+
+inline int16_t NPCWidthGFX(int Type)
+{
+    return NPCTraits[Type].WidthGFX;
+}
+
+inline int16_t NPCFrameOffsetX(int Type)
+{
+    return NPCTraits[Type].FrameOffsetX;
+}
+
+inline int16_t NPCFrameOffsetY(int Type)
+{
+    return NPCTraits[Type].FrameOffsetY;
+}
+
+inline bool NPCNoYoshi(int Type)
+{
+    return NPCTraits[Type].NoYoshi;
+}
 
 #endif // #ifndef NPC_TRAITS_H

@@ -65,7 +65,7 @@ static bool doPlayGrowWithGotItem()
 static void s_PowerupScore(NPCRef_t n)
 {
     if(g_compatibility.custom_powerup_collect_score)
-        MoreScore(NPCScore[n->Type], n->Location);
+        MoreScore((*n)->Score, n->Location);
     else
         MoreScore(6, n->Location);
 }
@@ -103,7 +103,7 @@ void DropBonus(int A)
     numNPCs++;
     NPC[numNPCs] = NPC_t();
     NPC[numNPCs].Type = Player[A].HeldBonus;
-    NPC[numNPCs].Location.Width = NPCWidth[Player[A].HeldBonus];
+    NPC[numNPCs].Location.Width = NPC[numNPCs]->Width;
     NPC[numNPCs].Location.Height = 32;
 
     // need to find a position to place the bonus -- look for ths HUD
@@ -565,10 +565,11 @@ void TouchBonus(int A, int B)
             if(NPC[B].Type == NPCID_MEDAL)
             {
                 PlaySound(SFX_MedalGet);
-                MoreScore(NPCScore[NPC[B].Type], NPC[B].Location);
-                NPCScore[274] += 1;
-                if(NPCScore[274] > 14)
-                    NPCScore[274] = 14;
+                auto& medal_score = NPCTraits[NPC[B].Type].Score;
+                MoreScore(medal_score, NPC[B].Location);
+                medal_score += 1;
+                if(medal_score > 14)
+                    medal_score = 14;
 
                 g_curLevelMedals.get(NPC[B].Variant - 1);
             }

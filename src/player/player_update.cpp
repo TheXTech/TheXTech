@@ -561,7 +561,7 @@ void UpdatePlayer()
 
                         if(!tempBool) for(int B : treeNPCQuery(tempLocation, SORTMODE_NONE))
                         {
-                            if(NPCIsABlock[NPC[B].Type] && !NPCStandsOnPlayer[NPC[B].Type] && NPC[B].Active && NPC[B].Type != NPCID_VEHICLE)
+                            if(NPC[B]->IsABlock && !NPC[B]->StandsOnPlayer && NPC[B].Active && NPC[B].Type != NPCID_VEHICLE)
                             {
                                 if(CheckCollision(tempLocation, NPC[B].Location))
                                 {
@@ -1956,8 +1956,8 @@ void UpdatePlayer()
                                 if(Player[A].State == 6)
                                     NPC[numNPCs].Type = NPCID_SWORDBEAM;
                                 NPC[numNPCs].Projectile = true;
-                                NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
-                                NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
+                                NPC[numNPCs].Location.Height = NPC[numNPCs]->Height;
+                                NPC[numNPCs].Location.Width = NPC[numNPCs]->Width;
                                 NPC[numNPCs].Location.X = Player[A].Location.X + Player[A].Location.Width / 2.0 + (40 * Player[A].Direction) - 8;
                                 if(!Player[A].Duck)
                                 {
@@ -3436,10 +3436,10 @@ void UpdatePlayer()
                                 {
                                     if((NPC[B].Type == NPCID_METALBARREL || NPC[B].Type == NPCID_CANNONENEMY || NPC[B].Type == NPCID_HPIPE_SHORT || NPC[B].Type == NPCID_HPIPE_LONG || NPC[B].Type == NPCID_VPIPE_SHORT || NPC[B].Type == NPCID_VPIPE_LONG) && NPC[B].Projectile)
                                         PlayerHurt(A);
-                                    if((Player[A].Mount == 1 || Player[A].Mount == 3 || Player[A].SpinJump || (Player[A].ShellSurf && NPCIsAShell(NPC[B])) || (Player[A].Stoned && !NPCCanWalkOn[NPC[B].Type])) && !NPCMovesPlayer[NPC[B].Type])
-                                        HitSpot = BootCollision(Player[A].Location, NPC[B].Location, NPCCanWalkOn[NPC[B].Type]); // find the hitspot for normal mario
+                                    if((Player[A].Mount == 1 || Player[A].Mount == 3 || Player[A].SpinJump || (Player[A].ShellSurf && NPCIsAShell(NPC[B])) || (Player[A].Stoned && !NPC[B]->CanWalkOn)) && !NPC[B]->MovesPlayer)
+                                        HitSpot = BootCollision(Player[A].Location, NPC[B].Location, NPC[B]->CanWalkOn); // find the hitspot for normal mario
                                     else
-                                        HitSpot = EasyModeCollision(Player[A].Location, NPC[B].Location, NPCCanWalkOn[NPC[B].Type]); // find the hitspot when in a shoe or on a yoshi
+                                        HitSpot = EasyModeCollision(Player[A].Location, NPC[B].Location, NPC[B]->CanWalkOn); // find the hitspot when in a shoe or on a yoshi
 
                                     if(!NPC[B].Inert)
                                     {
@@ -3516,7 +3516,7 @@ void UpdatePlayer()
 
                                         if(BattleMode && NPC[B].HoldingPlayer > 0 && NPC[B].HoldingPlayer != A)
                                         {
-                                            if(NPCWontHurt[NPC[B].Type])
+                                            if(NPC[B]->WontHurt)
                                                 HitSpot = 0;
                                             else
                                                 HitSpot = 5;
@@ -3567,7 +3567,7 @@ void UpdatePlayer()
 
                                     // the following code is for spin jumping and landing on things as yoshi/shoe
                                     if(Player[A].Mount == 1 || Player[A].Mount == 3 || Player[A].SpinJump ||
-                                       (Player[A].Stoned && !NPCCanWalkOn[NPC[B].Type]))
+                                       (Player[A].Stoned && !NPC[B]->CanWalkOn))
                                     {
                                         if(HitSpot == 1)
                                         {
@@ -3577,7 +3577,7 @@ void UpdatePlayer()
                                                       NPC[B].Type == NPCID_SPIKY_S3 || NPC[B].Type == NPCID_SPIKY_S4 || NPC[B].Type == NPCID_SPIKY_BALL_S4 || NPC[B].Type == NPCID_BOTTOM_PLANT ||
                                                       NPC[B].Type == NPCID_SIDE_PLANT || NPC[B].Type == NPCID_CRAB || NPC[B].Type == NPCID_FLY || NPC[B].Type == NPCID_BIG_PLANT ||
                                                       NPC[B].Type == NPCID_PLANT_S1 || NPC[B].Type == NPCID_VILLAIN_S1 || NPC[B].Type == NPCID_WALL_BUG || NPC[B].Type == NPCID_WALL_TURTLE ||
-                                                      NPC[B].Type == NPCID_SICK_BOSS || NPC[B].Type == NPCID_WALK_PLANT || NPC[B].Type == NPCID_JUMP_PLANT) && !NPCCanWalkOn[NPC[B].Type])
+                                                      NPC[B].Type == NPCID_SICK_BOSS || NPC[B].Type == NPCID_WALK_PLANT || NPC[B].Type == NPCID_JUMP_PLANT) && !NPC[B]->CanWalkOn)
                                             {
                                                 if(Player[A].Wet > 0 && (NPCIsCheep(NPC[B]) || NPC[B].Type == NPCID_SQUID_S3 || NPC[B].Type == NPCID_SQUID_S1))
                                                 {
@@ -3606,8 +3606,8 @@ void UpdatePlayer()
                                                     NPC[numNPCs].Section = Player[A].Section;
                                                     NPC[numNPCs].Type = NPCID_PLR_FIREBALL;
                                                     NPC[numNPCs].Special = Player[A].Character;
-                                                    NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
-                                                    NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
+                                                    NPC[numNPCs].Location.Height = NPC[numNPCs]->Height;
+                                                    NPC[numNPCs].Location.Width = NPC[numNPCs]->Width;
                                                     NPC[numNPCs].Location.Y = Player[A].Location.Height + Player[A].Location.Y - NPC[numNPCs].Location.Height;
                                                     NPC[numNPCs].Location.X = Player[A].Location.X + Player[A].Location.Width / 2.0 - NPC[numNPCs].Location.Width / 2.0;
                                                     NPC[numNPCs].Location.SpeedX = 4;
@@ -3620,8 +3620,8 @@ void UpdatePlayer()
                                                     NPC[numNPCs].Section = Player[A].Section;
                                                     NPC[numNPCs].Type = NPCID_PLR_FIREBALL;
                                                     NPC[numNPCs].Special = Player[A].Character;
-                                                    NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
-                                                    NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
+                                                    NPC[numNPCs].Location.Height = NPC[numNPCs]->Height;
+                                                    NPC[numNPCs].Location.Width = NPC[numNPCs]->Width;
                                                     NPC[numNPCs].Location.Y = Player[A].Location.Height + Player[A].Location.Y - NPC[numNPCs].Location.Height;
                                                     NPC[numNPCs].Location.X = Player[A].Location.X + Player[A].Location.Width / 2.0 - NPC[numNPCs].Location.Width / 2.0;
                                                     NPC[numNPCs].Location.SpeedX = -4;
@@ -3817,7 +3817,7 @@ void UpdatePlayer()
 
                                     if(HitSpot == 1) // Player landed on a NPC
                                     {
-                                        if(NPCCanWalkOn[NPC[B].Type] || (Player[A].ShellSurf && NPCIsAShell(NPC[B]))) // NPCs that can be walked on
+                                        if(NPC[B]->CanWalkOn || (Player[A].ShellSurf && NPCIsAShell(NPC[B]))) // NPCs that can be walked on
                                         {
                                             // the player landed on an NPC he can stand on
                                             if(tempBlockHit[1] == 0)
@@ -3903,7 +3903,7 @@ void UpdatePlayer()
                                         }
                                         else if(NPC[B].Type != NPCID_CANNONITEM && NPC[B].Type != NPCID_KEY &&
                                                 NPC[B].Type != NPCID_TOOTHYPIPE && NPC[B].Type != NPCID_TOOTHY &&
-                                                (!Player[A].SlideKill || NPCWontHurt[NPC[B].Type])) // NPCs that cannot be walked on
+                                                (!Player[A].SlideKill || NPC[B]->WontHurt)) // NPCs that cannot be walked on
                                         {
                                             if(NPC[B].CantHurtPlayer == A && Player[A].NoShellKick > 0)
                                             {
@@ -3929,9 +3929,9 @@ void UpdatePlayer()
                                                     }
 
                                                 }
-                                                else if(NPCJumpHurt[NPC[B].Type] || (NPCIsCheep(NPC[B]) && Player[A].WetFrame)) // NPCs that cause damage even when jumped on
+                                                else if(NPC[B]->JumpHurt || (NPCIsCheep(NPC[B]) && Player[A].WetFrame)) // NPCs that cause damage even when jumped on
                                                 {
-                                                    if(!(NPC[B].Type == NPCID_PLANT_S3 && NPC[B].Special2 == 4) && !NPCWontHurt[NPC[B].Type] && NPC[B].CantHurtPlayer != A)
+                                                    if(!(NPC[B].Type == NPCID_PLANT_S3 && NPC[B].Special2 == 4) && !NPC[B]->WontHurt && NPC[B].CantHurtPlayer != A)
                                                     {
 
                                                         // the n00bcollision function reduces the size of the npc's hit box before it damages the player
@@ -4005,7 +4005,7 @@ void UpdatePlayer()
 */
                                         // grab code
                                         if(
-                                            ((Player[A].CanGrabNPCs || NPCIsGrabbable[NPC[B].Type] || (NPC[B].Effect == 2 && !NPCIsABonus(NPC[B]))) && (NPC[B].Effect == 0 || NPC[B].Effect == 2)) ||
+                                            ((Player[A].CanGrabNPCs || NPC[B]->IsGrabbable || (NPC[B].Effect == 2 && !NPCIsABonus(NPC[B]))) && (NPC[B].Effect == 0 || NPC[B].Effect == 2)) ||
                                              (NPCIsAShell(NPC[B]) && FreezeNPCs)
                                         ) // GRAB EVERYTHING
                                         {
@@ -4098,7 +4098,7 @@ void UpdatePlayer()
                                                     NPCHit(B, 1, A);
                                                 }
                                             }
-                                            else if(NPC[B].CantHurtPlayer != A && !NPCWontHurt[NPC[B].Type])
+                                            else if(NPC[B].CantHurtPlayer != A && !NPC[B]->WontHurt)
                                             {
                                                 if(!(NPC[B].Type == NPCID_BULLET && NPC[B].Projectile != 0))
                                                 {
@@ -4108,7 +4108,7 @@ void UpdatePlayer()
                                                     {
                                                         if(NPC[B].Effect != 2)
                                                         {
-                                                            if(Player[A].SlideKill && !NPCJumpHurt[NPC[B].Type])
+                                                            if(Player[A].SlideKill && !NPC[B]->JumpHurt)
                                                                 NPCHit(B, 3, B);
                                                             if(NPC[B].Killed == 0)
                                                             {
@@ -4120,14 +4120,14 @@ void UpdatePlayer()
                                                                 }
                                                             }
                                                             else
-                                                                MoreScore(NPCScore[NPC[B].Type], NPC[B].Location, Player[A].Multiplier);
+                                                                MoreScore(NPC[B]->Score, NPC[B].Location, Player[A].Multiplier);
                                                         }
                                                     }
                                                 }
                                             }
 
                                             // this is for NPC that physically push the player
-                                            if(NPCMovesPlayer[NPC[B].Type] && NPC[B].Projectile == 0 && Player[A].HoldingNPC != B &&
+                                            if(NPC[B]->MovesPlayer && NPC[B].Projectile == 0 && Player[A].HoldingNPC != B &&
                                                !(Player[A].Mount == 2 && (NPC[B].Type == NPCID_KEY || NPC[B].Type == NPCID_COIN_SWITCH)) &&
                                                !ShadowMode && NPC[B].Effect != 2)
                                             {
