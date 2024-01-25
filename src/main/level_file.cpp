@@ -996,7 +996,7 @@ void OpenLevelDataPost()
         tr.loadLevelTranslation(FileNameFull);
 
     // FindBlocks();
-    qSortBackgrounds(1, numBackground);
+    qSortBackgrounds(1, numBackground, false);
     UpdateBackgrounds();
     // FindSBlocks();
     syncLayersTrees_AllBlocks();

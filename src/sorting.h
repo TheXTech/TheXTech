@@ -32,7 +32,7 @@ void qSortBlocksY(int min, int max);
 void qSortBlocksX(int min, int max);
 // Public Sub qSortBackgrounds(min As Integer, max As Integer) 'quicksort the backgrounds
 // quicksort the backgrounds
-void qSortBackgrounds(int min, int max);
+void qSortBackgrounds(int min, int max, bool use_x = true);
 
 // Public Sub FindBlocks() 'create a table of contents for blocks for an optimization
 // create a table of contents for blocks for an optimization
