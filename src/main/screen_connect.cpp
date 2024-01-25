@@ -318,6 +318,18 @@ static inline int BoxCount()
     return n;
 }
 
+static void s_InitBlockCharacter()
+{
+    g_forceCharacter = false;
+    For(A, 1, numCharacters)
+    {
+        if(MenuMode == MENU_CHARACTER_SELECT_NEW_BM)
+            blockCharacter[A] = false;
+        else
+            blockCharacter[A] = SelectWorld[selWorld].blockChar[A];
+    }
+}
+
 void MainMenu_Start(int minPlayers)
 {
     Controls::ClearInputMethods();
@@ -337,7 +349,7 @@ void MainMenu_Start(int minPlayers)
     MenuMouseRelease = false;
     MenuCursorCanMove = false;
 
-    g_forceCharacter = false;
+    s_InitBlockCharacter();
 
     s_char_info.reset();
 
@@ -368,7 +380,7 @@ void LegacyMenu_Start()
     MenuMouseRelease = false;
     MenuCursorCanMove = false;
 
-    g_forceCharacter = false;
+    s_InitBlockCharacter();
 
     s_char_info.reset();
 

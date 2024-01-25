@@ -1382,14 +1382,6 @@ bool mainMenuUpdate()
                         if(MenuMode != MENU_BATTLE_MODE)
                             FindSaves();
 
-                        For(A, 1, numCharacters)
-                        {
-                            if(MenuMode == MENU_BATTLE_MODE)
-                                blockCharacter[A] = false;
-                            else
-                                blockCharacter[A] = SelectWorld[selWorld].blockChar[A];
-                        }
-
                         if(MenuMode == MENU_BATTLE_MODE)
                         {
                             MenuMode = MENU_CHARACTER_SELECT_NEW_BM;
