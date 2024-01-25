@@ -525,7 +525,7 @@ bool LoadGFXFromList(std::string source_dir, bool custom, bool skip_world)
             }
 
             loadImageFromList(f, source_dir,
-                GFXNPCBMP[A], &GFXNPCWidth[A], &GFXNPCHeight[A], GFXNPCCustom[A],
+                GFXNPCBMP[A], nullptr, nullptr, GFXNPCCustom[A],
                 false, custom);
         }
         else if(type_buf[0] == 'e')
@@ -824,15 +824,15 @@ void LoadGFX()
         if(!p.empty())
         {
             XRender::lazyLoadPicture(GFXNPCBMP[A], p);
-            GFXNPCWidth[A] = GFXNPCBMP[A].w;
-            GFXNPCHeight[A] = GFXNPCBMP[A].h;
+            // GFXNPCWidth[A] = GFXNPCBMP[A].w;
+            // GFXNPCHeight[A] = GFXNPCBMP[A].h;
             if(A % 20 == 0)
                 UpdateLoad();
         }
         else
         {
-            GFXNPCWidth[A] = 0;
-            GFXNPCHeight[A] = 0;
+            // GFXNPCWidth[A] = 0;
+            // GFXNPCHeight[A] = 0;
             break;
         }
     }
@@ -1291,7 +1291,7 @@ void LoadCustomGFX(bool include_world)
     {
         loadCGFX(GfxRoot + fmt::format_ne("npc/npc-{0}.png", A),
                  fmt::format_ne("npc-{0}", A),
-                 &GFXNPCWidth[A], &GFXNPCHeight[A], GFXNPCCustom[A], GFXNPCBMP[A]);
+                 nullptr, nullptr, GFXNPCCustom[A], GFXNPCBMP[A]);
     }
 
     for(int A = 1; A < maxEffectType; ++A)

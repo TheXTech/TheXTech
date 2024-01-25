@@ -1167,8 +1167,8 @@ void SetupVars()
     // NPCIsACoin(152) = true;
     For(A, 139, 147) // Veggies
     {
-        NPCWidth[A] = GFXNPCWidth[A];
-        NPCHeight[A] = GFXNPCHeight[A];
+        NPCWidth[A] = GFXNPC[A].w;
+        NPCHeight[A] = GFXNPC[A].h;
         NPCCanWalkOn[A] = true;
         NPCGrabFromTop[A] = true;
         NPCWontHurt[A] = true;

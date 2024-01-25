@@ -2129,10 +2129,13 @@ extern RangeArrI<bool, 1, maxNPCType, false> GFXNPCCustom;
 extern RangeArr<StdPicture, 0, maxNPCType> GFXNPCBMP;
 //Public GFXNPCMaskBMP(1 To maxNPCType) As StdPicture
 //extern RangeArr<StdPicture, 0, maxNPCType> GFXNPCMaskBMP;
+
+// removed (GFXNPC[Type].w/w used instead, only used by veggies originally)
 //Public GFXNPCHeight(1 To maxNPCType) As Integer
-extern RangeArrI<int, 1, maxNPCType, 0> GFXNPCHeight;
+// extern RangeArrI<int, 1, maxNPCType, 0> GFXNPCHeight;
 //Public GFXNPCWidth(1 To maxNPCType) As Integer
-extern RangeArrI<int, 1, maxNPCType, 0> GFXNPCWidth;
+// extern RangeArrI<int, 1, maxNPCType, 0> GFXNPCWidth;
+
 //Public GFXEffectCustom(1 To maxEffectType) As Boolean
 extern RangeArrI<bool, 1, maxEffectType, false> GFXEffectCustom;
 //Public GFXEffect(1 To maxEffectType) As Long
