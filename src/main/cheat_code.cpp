@@ -45,6 +45,7 @@
 #include "game_main.h"
 #include "change_res.h"
 #include "config.h"
+#include "compat.h"
 #include "frm_main.h"
 
 #include "core/render.h"
@@ -1247,8 +1248,13 @@ static void fourShared()
 static void fourSplit()
 {
     fourShared();
-    Screens[0].multiplayer_pref = MultiplayerPrefs::Split;
-    SetupScreens();
+
+    // more than 2 vScreens requires modern camera logic
+    if(g_compatibility.modern_npc_camera_logic)
+    {
+        Screens[0].multiplayer_pref = MultiplayerPrefs::Split;
+        SetupScreens();
+    }
 }
 
 static void warioTime()
