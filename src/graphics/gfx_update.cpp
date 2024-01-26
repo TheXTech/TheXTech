@@ -3125,6 +3125,38 @@ void UpdateGraphicsMeta()
 {
     XRender::resetViewport();
 
+    XRender::setDrawPlane(PLANE_GAME_MENUS);
+
+    if(GameMenu && !GameOutro)
+        mainMenuDraw();
+
+    if(GameOutro)
+        DrawCredits();
+
+    if(LevelEditor || MagicHand)
+        DrawEditorLevel_UI();
+
+    // render special screens
+    if(GamePaused == PauseCode::PauseScreen)
+        PauseScreen::Render();
+
+    if(GamePaused == PauseCode::Message)
+    {
+        if(MessageTextMap.empty())
+            DrawMessage(MessageText);
+        else
+            DrawMessage(MessageTextMap);
+    }
+
+    if(GamePaused == PauseCode::DropAdd)
+    {
+        ConnectScreen::Render();
+        XRender::renderTexture(int(SharedCursor.X), int(SharedCursor.Y), GFX.ECursor[2]);
+    }
+
+    if(GamePaused == PauseCode::TextEntry)
+        TextEntryScreen::Render();
+
     XRender::setDrawPlane(PLANE_GAME_META);
 
     speedRun_renderTimer();
@@ -3157,42 +3189,9 @@ void UpdateGraphicsMeta()
     // Draw screen fader below level menu when game is paused
     // This makes sure that the level test menu is drawn above the screen fader during level tests
     if(GamePaused != PauseCode::None)
-        XRender::setDrawPlane(PLANE_GAME_MENUS);
+        XRender::setDrawPlane(PLANE_GAME_MENUS - 1);
 
     g_levelScreenFader.draw();
-
-    // Important note: PLANE_GAME_MENUS is below PLANE_GAME_META.
-    XRender::setDrawPlane(PLANE_GAME_MENUS);
-
-    if(GameMenu && !GameOutro)
-        mainMenuDraw();
-
-    if(GameOutro)
-        DrawCredits();
-
-    if(LevelEditor || MagicHand)
-        DrawEditorLevel_UI();
-
-    // render special screens
-    if(GamePaused == PauseCode::PauseScreen)
-        PauseScreen::Render();
-
-    if(GamePaused == PauseCode::Message)
-    {
-        if(MessageTextMap.empty())
-            DrawMessage(MessageText);
-        else
-            DrawMessage(MessageTextMap);
-    }
-
-    if(GamePaused == PauseCode::DropAdd)
-    {
-        ConnectScreen::Render();
-        XRender::renderTexture(int(SharedCursor.X), int(SharedCursor.Y), GFX.ECursor[2]);
-    }
-
-    if(GamePaused == PauseCode::TextEntry)
-        TextEntryScreen::Render();
 
     XRender::offsetViewportIgnore(false);
 }
