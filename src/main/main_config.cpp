@@ -182,8 +182,8 @@ void OpenConfig_preSetup()
         // resolution smaller than a gameboy? forbid it!
         if(g_config.InternalW > 0 && g_config.InternalW < 320)
             g_config.InternalW = 320;
-        if(g_config.InternalH > 0 && g_config.InternalH < 288)
-            g_config.InternalH = 288;
+        if(g_config.InternalH > 0 && g_config.InternalH < 200)
+            g_config.InternalH = 200;
 
         ScreenW = g_config.InternalW;
         ScreenH = g_config.InternalH;
