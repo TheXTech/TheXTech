@@ -340,6 +340,8 @@ void MainMenu_Start(int minPlayers)
     for(int i = 0; i < maxLocalPlayers; i++)
         g_charSelect[i] = 0;
 
+    s_InitBlockCharacter();
+
     for(int i = 0; i < maxLocalPlayers; i++)
     {
         s_players[i] = PlayerBox();
@@ -348,8 +350,6 @@ void MainMenu_Start(int minPlayers)
 
     MenuMouseRelease = false;
     MenuCursorCanMove = false;
-
-    s_InitBlockCharacter();
 
     s_char_info.reset();
 
@@ -366,6 +366,11 @@ void LegacyMenu_Start()
     s_context = Context::LegacyMenu;
 
     for(int i = 0; i < maxLocalPlayers; i++)
+        g_charSelect[i] = 0;
+
+    s_InitBlockCharacter();
+
+    for(int i = 0; i < maxLocalPlayers; i++)
     {
         s_players[i] = PlayerBox();
         s_players[i].Init();
@@ -379,8 +384,6 @@ void LegacyMenu_Start()
 
     MenuMouseRelease = false;
     MenuCursorCanMove = false;
-
-    s_InitBlockCharacter();
 
     s_char_info.reset();
 
