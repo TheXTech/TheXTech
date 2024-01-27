@@ -225,6 +225,8 @@ void RenderGL::addLights(const GLPictureLightInfo& light_info, const QuadI& loc,
             }
 
             // place the light in the scene, including any rotoscale transformations
+            bool onscreen = false;
+
             int num_pts = (new_light.type == GLLightType::box || new_light.type == GLLightType::bar) ? 2 : 1;
             for(int pt = 0; pt < num_pts; pt++)
             {
@@ -236,10 +238,18 @@ void RenderGL::addLights(const GLPictureLightInfo& light_info, const QuadI& loc,
 
                 x_dest = (loc.br.x * x_coord * y_coord) + (loc.bl.x * (1 - x_coord) * y_coord) + (loc.tr.x * x_coord * (1 - y_coord)) + (loc.tl.x * (1 - x_coord) * (1 - y_coord));
                 y_dest = (loc.br.y * x_coord * y_coord) + (loc.bl.y * (1 - x_coord) * y_coord) + (loc.tr.y * x_coord * (1 - y_coord)) + (loc.tl.y * (1 - x_coord) * (1 - y_coord));
+
+                // use a 16 pixel margin for detecting onscreen draws (cross-ref the lighting shader)
+                if(x_dest >= -16 && x_dest < m_viewport.w + 16 && y_dest >= -16 && y_dest < m_viewport.h + 16)
+                    onscreen = true;
             }
 
             // set depth
             new_light.depth = depth;
+
+            // cancel light if offscreen
+            if(!onscreen)
+                m_light_count--;
 
             if(m_light_count >= (int)m_light_queue.lights.size())
                 break;
