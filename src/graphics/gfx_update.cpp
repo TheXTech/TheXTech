@@ -2991,64 +2991,65 @@ void UpdateGraphicsScreen(Screen_t& screen)
                     }
                 }
             }
+        }
 
-            XRender::setDrawPlane(PLANE_LVL_SECTION_FG);
+        XRender::setDrawPlane(PLANE_LVL_SECTION_FG);
 
 #ifdef THEXTECH_BUILD_GL_MODERN
-            if(SectionParticlesFG[S])
-                XRender::renderParticleSystem(**SectionParticlesFG[S], vScreen[Z].X, vScreen[Z].Y);
+        if(SectionParticlesFG[S])
+            XRender::renderParticleSystem(**SectionParticlesFG[S], vScreen[Z].X, vScreen[Z].Y);
 
-            XRender::setupLighting(SectionLighting[S]);
+        XRender::setupLighting(SectionLighting[S]);
 
-            if(SectionEffect[S])
-                XRender::renderTextureScale(0, 0, vScreen[Z].Width, vScreen[Z].Height, **SectionEffect[S]);
-            else if(SectionLighting[S])
-                XRender::renderLighting();
+        if(SectionEffect[S])
+            XRender::renderTextureScale(0, 0, vScreen[Z].Width, vScreen[Z].Height, **SectionEffect[S]);
+        else if(SectionLighting[S])
+            XRender::renderLighting();
 #endif
 
-            XRender::splitFrame();
+        XRender::splitFrame();
 
 #ifdef __3DS__
-            XRender::setTargetLayer(3);
+        XRender::setTargetLayer(3);
 #endif
 
-            if(!GameMenu && !GameOutro)
+        // HUD and dropped NPCs
+        if(!GameMenu && !GameOutro && !LevelEditor)
+        {
+            XRender::setDrawPlane(PLANE_LVL_HUD);
+
+            // draw HUD only if player has not disabled it
+            if(ShowOnScreenHUD)
             {
-                XRender::setDrawPlane(PLANE_LVL_HUD);
-
-                // draw HUD only if player has not disabled it
-                if(ShowOnScreenHUD)
-                {
 #ifdef THEXTECH_ENABLE_LUNA_AUTOCODE
-                    lunaRenderHud(Z);
+                lunaRenderHud(Z);
 #endif
 
-                    // this is LunaScript's way of disabling the original SMBX HUD, so it shouldn't affect the Luna HUD
-                    if(!gSMBXHUDSettings.skip)
-                       DrawInterface(Z, numScreens);
-                }
-
-                XRender::setDrawPlane(PLANE_LVL_HUD + 1);
-
-                // Display NPCs that got dropped from the container
-                for(size_t i = 0; i < NPC_Draw_Queue_p.Dropped_n; i++)
-                {
-                    int A = NPC_Draw_Queue_p.Dropped[i];
-
-                    if(NPC[A]->WidthGFX == 0)
-                        XRender::renderTexture(vScreen[Z].X + NPC[A].Location.X + NPC[A]->FrameOffsetX, vScreen[Z].Y + NPC[A].Location.Y + NPC[A]->FrameOffsetY, NPC[A].Location.Width, NPC[A].Location.Height, GFXNPC[NPC[A].Type], 0, NPC[A].Frame * NPC[A].Location.Height);
-                    else
-                        XRender::renderTexture(vScreen[Z].X + NPC[A].Location.X + NPC[A]->FrameOffsetX - NPC[A]->WidthGFX / 2.0 + NPC[A].Location.Width / 2.0, vScreen[Z].Y + NPC[A].Location.Y + NPC[A]->FrameOffsetY - NPC[A]->HeightGFX + NPC[A].Location.Height, NPC[A]->WidthGFX, NPC[A]->HeightGFX, GFXNPC[NPC[A].Type], 0, NPC[A].Frame * NPC[A]->HeightGFX);
-                }
+                // this is LunaScript's way of disabling the original SMBX HUD, so it shouldn't affect the Luna HUD
+                if(!gSMBXHUDSettings.skip)
+                   DrawInterface(Z, numScreens);
             }
 
-            XRender::setDrawPlane(PLANE_LVL_META);
+            XRender::setDrawPlane(PLANE_LVL_HUD + 1);
 
-            // Always draw for single-player
-            // And don't draw when many players at the same screen
-            if(numPlayers == 1 || numScreens != 1)
-                g_levelVScreenFader[Z].draw(false);
+            // Display NPCs that got dropped from the container
+            for(size_t i = 0; i < NPC_Draw_Queue_p.Dropped_n; i++)
+            {
+                int A = NPC_Draw_Queue_p.Dropped[i];
+
+                if(NPC[A]->WidthGFX == 0)
+                    XRender::renderTexture(vScreen[Z].X + NPC[A].Location.X + NPC[A]->FrameOffsetX, vScreen[Z].Y + NPC[A].Location.Y + NPC[A]->FrameOffsetY, NPC[A].Location.Width, NPC[A].Location.Height, GFXNPC[NPC[A].Type], 0, NPC[A].Frame * NPC[A].Location.Height);
+                else
+                    XRender::renderTexture(vScreen[Z].X + NPC[A].Location.X + NPC[A]->FrameOffsetX - NPC[A]->WidthGFX / 2.0 + NPC[A].Location.Width / 2.0, vScreen[Z].Y + NPC[A].Location.Y + NPC[A]->FrameOffsetY - NPC[A]->HeightGFX + NPC[A].Location.Height, NPC[A]->WidthGFX, NPC[A]->HeightGFX, GFXNPC[NPC[A].Type], 0, NPC[A].Frame * NPC[A]->HeightGFX);
+            }
         }
+
+        XRender::setDrawPlane(PLANE_LVL_META);
+
+        // Always draw for single-player
+        // And don't draw when many players at the same screen
+        if(screen.player_count == 1 || numScreens != 1)
+            g_levelVScreenFader[Z].draw(false);
 
         if((LevelEditor || MagicHand))
         {
