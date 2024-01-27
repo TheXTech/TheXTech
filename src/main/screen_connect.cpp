@@ -1482,7 +1482,7 @@ int PlayerBox::Mouse_Render_1P(bool render)
     {
         int infobox_y = MenuY + 145;
 
-        XRender::renderRect(ScreenW / 2 - 240, infobox_y, 480, 68, XTColorF(0, 0, 0, 0.5));
+        XRender::renderRect(XRender::TargetW / 2 - 240, infobox_y, 480, 68, XTColorF(0, 0, 0, 0.5));
 
         // disconnection hint
         if(p >= (int)Controls::g_InputMethods.size() || !Controls::g_InputMethods[p])
@@ -1915,8 +1915,8 @@ int Mouse_Render(bool mouse, bool render)
     const int header_height = (s_context == Context::DropAdd) ? 32 : 0;
     int box_width = 220;
     int box_height = 240;
-    if(IsMenu() && box_height > ScreenH - MenuY - 8)
-        box_height = ScreenH - MenuY - 8;
+    if(IsMenu() && box_height > XRender::TargetH - MenuY - 8)
+        box_height = XRender::TargetH - MenuY - 8;
     int padding = 16;
 
     // number of columns per row
@@ -1930,12 +1930,12 @@ int Mouse_Render(bool mouse, bool render)
     }
 
     // shrink boxes when they would not fit on screen
-    if(n_cols[0] * box_width + (n_cols[0] - 1) * padding > ScreenW)
+    if(n_cols[0] * box_width + (n_cols[0] - 1) * padding > XRender::TargetW)
     {
         box_width = 168;
         padding = 8;
 
-        int max_width = (ScreenW - (n_cols[0] - 1) * padding) / n_cols[0];
+        int max_width = (XRender::TargetW - (n_cols[0] - 1) * padding) / n_cols[0];
         max_width &= ~1;
         if(box_width > max_width)
             box_width = max_width;
@@ -1948,8 +1948,8 @@ int Mouse_Render(bool mouse, bool render)
         full_height += padding + box_height;
 
     // vertical / horizontal start of the menu
-    int start_x = ScreenW / 2 - full_width / 2;
-    int draw_y = ScreenH / 2 - full_height / 2;
+    int start_x = XRender::TargetW / 2 - full_width / 2;
+    int draw_y = XRender::TargetH / 2 - full_height / 2;
 
     if(IsMenu())
         GetMenuPos(nullptr, &draw_y);

@@ -122,8 +122,8 @@ bool WindowSDL::initSDL(uint32_t windowInitFlags)
     const int initWindowW = 1920;
     const int initWindowH = 1080;
 #else
-    const auto initWindowW = ScreenW;
-    const auto initWindowH = ScreenH;
+    const auto initWindowW = XRender::TargetW;
+    const auto initWindowH = XRender::TargetH;
 #endif
 
 #if defined(RENDER_FULLSCREEN_ALWAYS)
@@ -174,18 +174,18 @@ bool WindowSDL::initSDL(uint32_t windowInitFlags)
     SDL_SetWindowMinimumSize(m_window, 240, 160);
 
 #ifdef __EMSCRIPTEN__ // Set canvas be 1/2 size for a faster rendering
-    SDL_SetWindowSize(m_window, ScreenW / 2, ScreenH / 2);
+    SDL_SetWindowSize(m_window, XRender::TargetW / 2, XRender::TargetH / 2);
 #elif defined(__ANDROID__) || defined(__SWITCH__) // Set as small as possible
     SDL_SetWindowMinimumSize(m_window, 200, 150);
 #elif defined(VITA)
     SDL_SetWindowSize(m_window, 960, 544);
 #else
     if(g_videoSettings.scaleMode == SCALE_FIXED_05X)
-        SDL_SetWindowSize(m_window, ScreenW / 2, ScreenH / 2);
+        SDL_SetWindowSize(m_window, XRender::TargetW / 2, XRender::TargetH / 2);
     else if(g_videoSettings.scaleMode == SCALE_FIXED_2X)
-        SDL_SetWindowSize(m_window, ScreenW * 2, ScreenH * 2);
+        SDL_SetWindowSize(m_window, XRender::TargetW * 2, XRender::TargetH * 2);
     else
-        SDL_SetWindowSize(m_window, ScreenW, ScreenH);
+        SDL_SetWindowSize(m_window, XRender::TargetW, XRender::TargetH);
 #endif //__EMSCRIPTEN__
 
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");

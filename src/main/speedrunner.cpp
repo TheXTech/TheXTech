@@ -94,7 +94,7 @@ void speedRun_renderTimer()
         return; // Don't draw things at Menu and Outro
 
     s_gamePlayTimer.render();
-    SuperPrintRightAlign(fmt::format_ne(Cheater ? "CMode {0}" : "Mode {0}", g_speedRunnerMode), 3, ScreenW - 2, 2, XTColorF(1.f, 0.3f, 0.3f, 0.5f));
+    SuperPrintRightAlign(fmt::format_ne(Cheater ? "CMode {0}" : "Mode {0}", g_speedRunnerMode), 3, XRender::TargetW - 2, 2, XTColorF(1.f, 0.3f, 0.3f, 0.5f));
 }
 
 static void GetControllerColor(int player, XTColor& color, bool* drawLabel = nullptr)
@@ -352,11 +352,11 @@ void speedRun_renderControls(int player, int screenZ, int align)
         }
         else
         {
-            x = (ScreenW - (w + 4));
+            x = (XRender::TargetW - (w + 4));
             bx = x - (bw + 4);
         }
 
-        y = ScreenH - 34;
+        y = XRender::TargetH - 34;
         by = y + 4;
     }
 
@@ -406,7 +406,7 @@ void speedRun_renderControls(int player, int screenZ, int align)
         }
 
         // code for lower-resolution case
-        if(ScreenW < 600 || (ScreenW < 800 && status_info.power_status != XPower::StatusInfo::POWER_DISABLED))
+        if(XRender::TargetW < 600 || (XRender::TargetW < 800 && status_info.power_status != XPower::StatusInfo::POWER_DISABLED))
         {
             if(align == SPEEDRUN_ALIGN_RIGHT)
                 SuperPrintRightAlign(profile_name, 3, x + w, y - 20, XTAlpha(alpha));

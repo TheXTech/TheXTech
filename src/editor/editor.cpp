@@ -115,6 +115,9 @@ void ResetSectionScrolls()
 {
     int p1_section = 0;
 
+    // use screen 0 for section scrolls
+    const Screen_t& screen = Screens[0];
+
     for(int i = 0; i <= maxSections; i++)
     {
         // initialize the section
@@ -139,7 +142,7 @@ void ResetSectionScrolls()
         }
 
         // normally start at bottom-left
-        last_vScreenY[i] = -(level[i].Height - ScreenH);
+        last_vScreenY[i] = -(level[i].Height - screen.H);
         last_vScreenX[i] = -(level[i].X);
 
         // if player start is in section, start there instead
@@ -149,19 +152,19 @@ void ResetSectionScrolls()
                 && PlayerStart[p].Y >= level[i].Y && PlayerStart[p].Y + PlayerStart[p].Height <= level[i].Height)
             {
                 // center on player
-                last_vScreenX[i] = -(PlayerStart[p].X + PlayerStart[p].Width / 2 - ScreenW / 2);
-                last_vScreenY[i] = -(PlayerStart[p].Y + PlayerStart[p].Height / 2 - ScreenH / 2);
+                last_vScreenX[i] = -(PlayerStart[p].X + PlayerStart[p].Width / 2 - screen.W / 2);
+                last_vScreenY[i] = -(PlayerStart[p].Y + PlayerStart[p].Height / 2 - screen.H / 2);
 
                 // check section bounds
                 if(-last_vScreenX[i] < level[i].X)
                     last_vScreenX[i] = -level[i].X;
-                else if(-last_vScreenX[i] + ScreenW > level[i].Width)
-                    last_vScreenX[i] = -(level[i].Width - ScreenW);
+                else if(-last_vScreenX[i] + screen.W > level[i].Width)
+                    last_vScreenX[i] = -(level[i].Width - screen.W);
 
                 if(-last_vScreenY[i] < level[i].Y)
                     last_vScreenY[i] = -level[i].Y;
-                else if(-last_vScreenY[i] + ScreenH > level[i].Height)
-                    last_vScreenY[i] = -(level[i].Height - ScreenH);
+                else if(-last_vScreenY[i] + screen.H > level[i].Height)
+                    last_vScreenY[i] = -(level[i].Height - screen.H);
 
                 // save P1 section
                 if(p == 1)
@@ -173,10 +176,10 @@ void ResetSectionScrolls()
         }
 
         // center on section if screen bigger
-        if(level[i].Width - level[i].X < ScreenW)
-            last_vScreenX[i] += ScreenW / 2 - (level[i].Width - level[i].X) / 2;
-        if(level[i].Height - level[i].Y < ScreenH)
-            last_vScreenY[i] = -level[i].Y + ScreenH / 2 - (level[i].Height - level[i].Y) / 2;
+        if(level[i].Width - level[i].X < screen.W)
+            last_vScreenX[i] += screen.W / 2 - (level[i].Width - level[i].X) / 2;
+        if(level[i].Height - level[i].Y < screen.H)
+            last_vScreenY[i] = -level[i].Y + screen.H / 2 - (level[i].Height - level[i].Y) / 2;
 
         // align to grid
         if(std::fmod((last_vScreenY[i] + 8), 32) != 0.0)
@@ -340,7 +343,7 @@ void UpdateEditor()
     }
 
 
-    // if(!XWindow::hasWindowMouseFocus() || SharedCursor.X < 0 || SharedCursor.Y > ScreenW || SharedCursor.Y < 0 || SharedCursor.Y > ScreenH)
+    // if(!XWindow::hasWindowMouseFocus() || SharedCursor.X < 0 || SharedCursor.Y > XRender::TargetW || SharedCursor.Y < 0 || SharedCursor.Y > XRender::TargetH)
     //     HideCursor();
 
     if(LevelEditor || MagicHand)
@@ -2407,27 +2410,27 @@ void GetEditorControls()
     {
         bool scrolled = false;
         int scroll_margin = EditorControls.FastScroll ? 16 : 32;
-        if(SharedCursor.X < 4 && SharedCursor.Y >= 0 && SharedCursor.Y < ScreenH)
+        if(SharedCursor.X < 4 && SharedCursor.Y >= 0 && SharedCursor.Y < XRender::TargetH)
         {
             SharedCursor.X += scroll_margin;
             EditorControls.ScrollLeft += scroll_margin;
             scrolled = true;
         }
-        if(SharedCursor.X >= ScreenW - 4 && SharedCursor.Y >= 0 && SharedCursor.Y < ScreenH)
+        if(SharedCursor.X >= XRender::TargetW - 4 && SharedCursor.Y >= 0 && SharedCursor.Y < XRender::TargetH)
         {
             SharedCursor.X -= scroll_margin;
             EditorControls.ScrollRight += scroll_margin;
             scrolled = true;
         }
 
-        if(SharedCursor.Y < 4 && SharedCursor.X >= 0 && SharedCursor.X < ScreenW)
+        if(SharedCursor.Y < 4 && SharedCursor.X >= 0 && SharedCursor.X < XRender::TargetW)
         {
             SharedCursor.Y += scroll_margin;
             EditorControls.ScrollUp += scroll_margin;
             scrolled = true;
         }
 
-        if(SharedCursor.Y >= ScreenH - 4 && SharedCursor.X >= 0 && SharedCursor.X < ScreenW)
+        if(SharedCursor.Y >= XRender::TargetH - 4 && SharedCursor.X >= 0 && SharedCursor.X < XRender::TargetW)
         {
             SharedCursor.Y -= scroll_margin;
             EditorControls.ScrollDown += scroll_margin;
@@ -3118,13 +3121,13 @@ void MouseMove(float X, float Y, bool /*nCur*/)
         A = SingleCoop;
     else if(l_screen->Type == 5 && vScreen[2].Visible)
     {
-        if(X < float(vScreen[2].ScreenLeft + vScreen[2].Width))
+        if(X < float(vScreen[2].TargetX() + vScreen[2].Width))
         {
-            if(X > float(vScreen[2].ScreenLeft))
+            if(X > float(vScreen[2].TargetX()))
             {
-                if(Y < float(vScreen[2].ScreenTop + vScreen[2].Height))
+                if(Y < float(vScreen[2].TargetY() + vScreen[2].Height))
                 {
-                    if(Y > float(vScreen[2].ScreenTop))
+                    if(Y > float(vScreen[2].TargetY()))
                         A = 2;
                 }
             }
@@ -3133,8 +3136,8 @@ void MouseMove(float X, float Y, bool /*nCur*/)
     else
         A = 1;
 
-    X -= vScreen[A].ScreenLeft;
-    Y -= vScreen[A].ScreenTop;
+    X -= vScreen[A].TargetX();
+    Y -= vScreen[A].TargetY();
 
     // translate into layer coordinates to snap to layer's grid
     if(MagicHand && EditorCursor.Layer != LAYER_NONE)

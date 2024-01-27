@@ -684,7 +684,7 @@ int GameMain(const CmdLineSetup_t &setup)
             }
 
             SetupPlayers();
-            CreditChop = ScreenH / 2; // 100
+            CreditChop = XRender::TargetH / 2; // 100
             EndCredits = 0;
             GameOutroDoQuit = false;
             SetupCredits();

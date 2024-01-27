@@ -146,13 +146,13 @@ int menuControls_Mouse_Render(bool mouse, bool render)
 
     // want 680px width. if not possible, use double-line mode on settable option screens
     int width = 680;
-    if(ScreenW < 720)
+    if(XRender::TargetW < 720)
     {
-        width = ScreenW - 40;
+        width = XRender::TargetW - 40;
     }
 
     // want up to 15 lines of text
-    int line = (ScreenH - 60) / 15;
+    int line = (XRender::TargetH - 60) / 15;
     line -= line & 1;
     if(line > 30)
         line = 30;
@@ -161,14 +161,14 @@ int menuControls_Mouse_Render(bool mouse, bool render)
     if(line < 18)
     {
         line = 18;
-        max_line = (int)ScreenH / line;
+        max_line = (int)XRender::TargetH / line;
     }
 
     // horizontal start of the menu
-    int sX = ScreenW/2 - width/2;
+    int sX = XRender::TargetW/2 - width/2;
     sX -= sX & 1;
     // vertical start of the menu
-    int sY = ScreenH/2 - (line*max_line)/2;
+    int sY = XRender::TargetH/2 - (line*max_line)/2;
     sY -= sY & 1;
 
     // render the background
@@ -286,7 +286,7 @@ int menuControls_Mouse_Render(bool mouse, bool render)
             SuperPrintScreenCenter(Controls::g_InputMethods[p]->Profile->Name, 3, sY+(top_line+3)*line);
 
         // display the test controls and profile reversion countdown (add more details)
-        RenderControls((int)p + 1, (ScreenW / 2) - 38, sY + (top_line + 4) * line, 76, 30, false, 1.0f);
+        RenderControls((int)p + 1, (XRender::TargetW / 2) - 38, sY + (top_line + 4) * line, 76, 30, false, 1.0f);
         SuperPrintScreenCenter(g_gameStrings.connectHoldStart, 3, sY + (top_line + 6) * line);
         int n_stars;
         int n_empty;

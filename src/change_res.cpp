@@ -41,11 +41,11 @@ void SetOrigRes()
 
 #ifndef __EMSCRIPTEN__
     if(g_videoSettings.scaleMode == SCALE_FIXED_05X)
-        XWindow::setWindowSize(ScreenW / 2, ScreenH / 2);
+        XWindow::setWindowSize(XRender::TargetW / 2, XRender::TargetH / 2);
     else if(g_videoSettings.scaleMode == SCALE_FIXED_2X)
-        XWindow::setWindowSize(ScreenW * 2, ScreenH * 2);
+        XWindow::setWindowSize(XRender::TargetW * 2, XRender::TargetH * 2);
     else
-        XWindow::setWindowSize(ScreenW, ScreenH);
+        XWindow::setWindowSize(XRender::TargetW, XRender::TargetH);
 #endif
 
 #ifdef __EMSCRIPTEN__
@@ -206,25 +206,25 @@ void UpdateInternalRes()
         int_w -= int_w & 1;
         int_h -= int_h & 1;
 
-        ScreenW = int_w;
-        ScreenH = int_h;
+        XRender::TargetW = int_w;
+        XRender::TargetH = int_h;
     }
     else
     {
-        ScreenW = req_w;
-        ScreenH = req_h;
+        XRender::TargetW = req_w;
+        XRender::TargetH = req_h;
     }
 
     // TODO: above should tweak render target resolution. This should tweak game's screen resolution.
     if(g_compatibility.allow_multires)
     {
-        ScreenW = ScreenW;
-        ScreenH = ScreenH;
+        l_screen->W = XRender::TargetW;
+        l_screen->H = XRender::TargetH;
     }
     else
     {
-        ScreenW = canon_w;
-        ScreenH = canon_h;
+        l_screen->W = canon_w;
+        l_screen->H = canon_h;
     }
 
     XRender::updateViewport();
@@ -257,8 +257,8 @@ void UpdateWindowRes()
 
     int w = g_config.InternalW;
 
-    if(w == 0 && h == ScreenH)
-        w = ScreenW;
+    if(w == 0 && h == XRender::TargetH)
+        w = XRender::TargetW;
     else if(w == 0)
         return;
 

@@ -24,6 +24,8 @@
 
 #include "sdl_proxy/sdl_stdinc.h"
 
+#include "core/render.h"
+
 #include "gameplay_timer.h"
 #include "graphics.h"
 #include "game_main.h"
@@ -277,8 +279,8 @@ void GameplayTimer::onBossDead()
 void GameplayTimer::render()
 {
     float a = m_semiTransparent ? 0.5f : 1.f;
-    // int x = (ScreenW / 2) - (144 / 2);
-    int y = ScreenH;
+    // int x = (XRender::TargetW / 2) - (144 / 2);
+    int y = XRender::TargetH;
 
     float lc[3] =
     {

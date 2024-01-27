@@ -31,14 +31,14 @@ static float s_alphaFromY(double y)
     int b = static_cast<int>(y + h);
     int t = static_cast<int>(y);
 
-    if(t >= ScreenH) // The line at bottom
+    if(t >= XRender::TargetH) // The line at bottom
     {
         return 0.0f;
     }
 
-    if(b > ScreenH) // The line enters the screen
+    if(b > XRender::TargetH) // The line enters the screen
     {
-        return 1.0f - static_cast<float>(b - ScreenH) / static_cast<float>(h);
+        return 1.0f - static_cast<float>(b - XRender::TargetH) / static_cast<float>(h);
     }
 
     if(b <= tb) // The line at the top
@@ -56,8 +56,8 @@ static float s_alphaFromY(double y)
 
 void DrawCredits()
 {
-    XRender::renderRect(0, 0, ScreenW, Maths::iRound(CreditChop), {0, 0, 0});
-    XRender::renderRect(0, ScreenH - Maths::iRound(CreditChop), ScreenW, std::ceil(CreditChop), {0, 0, 0});
+    XRender::renderRect(0, 0, XRender::TargetW, Maths::iRound(CreditChop), {0, 0, 0});
+    XRender::renderRect(0, XRender::TargetH - Maths::iRound(CreditChop), XRender::TargetW, std::ceil(CreditChop), {0, 0, 0});
 
     // previously hardcoded to 100
     int shrink = vScreen[1].Top;
@@ -65,9 +65,9 @@ void DrawCredits()
     if(CreditChop > shrink)
     {
         int chop = CreditChop - shrink;
-        int chop_max = (ScreenH / 2) - shrink;
+        int chop_max = (XRender::TargetH / 2) - shrink;
         uint8_t alpha = 255 * chop / chop_max;
-        XRender::renderRect(0, 0, ScreenW, ScreenH, {0, 0, 0, alpha});
+        XRender::renderRect(0, 0, XRender::TargetW, XRender::TargetH, {0, 0, 0, alpha});
     }
 
     int A;
@@ -89,7 +89,7 @@ void DrawCredits()
         auto &l = c.Location;
         auto y = static_cast<float>(l.Y) + CreditOffsetY;
 
-        if(y > ScreenH)
+        if(y > XRender::TargetH)
             break; // Nothing also to draw
 
         // Printing lines of credits

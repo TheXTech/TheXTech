@@ -496,7 +496,7 @@ private:
     || Private draw management functions, defined at render_gl_backend.cpp ||
     \***********************************************************************/
 
-    // normalizes a rect to fully fit within the (0, 0, ScreenW, ScreenH) box
+    // normalizes a rect to fully fit within the (0, 0, TargetW, TargetH) box
     static void s_normalize_coords(RectSizeI& r);
 
     // shortcut to the correct glOrtho / glOrthof function

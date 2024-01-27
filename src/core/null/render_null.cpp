@@ -40,6 +40,9 @@
 namespace XRender
 {
 
+int TargetW = 800;
+int TargetH = 600;
+
 bool init()
 {
     return true;

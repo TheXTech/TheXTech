@@ -4932,7 +4932,7 @@ void EditorScreen::UpdateSelectorBar(CallMode mode, bool select_bar_only)
         e_CursorY = EditorCursor.Y;
         // if(WorldEditor)
         //     e_CursorY += 8;
-        sx = (ScreenW - e_ScreenW)/2;
+        sx = (XRender::TargetW - e_ScreenW)/2;
     }
     else
         sx = 0;
@@ -5238,10 +5238,10 @@ void EditorScreen::UpdateSelectorBar(CallMode mode, bool select_bar_only)
                 X = 36;
             if(Y < 36)
                 Y = 36;
-            if(X >= ScreenW - 36)
-                X = ScreenW - 36;
-            if(Y >= ScreenH - 36)
-                Y = ScreenH - 36;
+            if(X >= XRender::TargetW - 36)
+                X = XRender::TargetW - 36;
+            if(Y >= XRender::TargetH - 36)
+                Y = XRender::TargetH - 36;
         }
 
 #ifdef __3DS__
@@ -5284,6 +5284,7 @@ void EditorScreen::UpdateEditorScreen(CallMode mode, bool second_screen)
 
     if(select_bar_only)
     {
+        XRender::resetViewport();
         UpdateSelectorBar(mode, true);
 
         if(mode == CallMode::Logic)
@@ -5305,7 +5306,7 @@ void EditorScreen::UpdateEditorScreen(CallMode mode, bool second_screen)
     }
 #else
     if(mode == CallMode::Render)
-        XRender::setViewport(ScreenW/2-e_ScreenW/2, 0, e_ScreenW, e_ScreenH);
+        XRender::setViewport(XRender::TargetW/2-e_ScreenW/2, 0, e_ScreenW, e_ScreenH);
 #endif
 
     e_CursorX = EditorCursor.X;
@@ -5313,9 +5314,9 @@ void EditorScreen::UpdateEditorScreen(CallMode mode, bool second_screen)
 
 #ifdef __3DS__
     if(!editorScreen.active)
-        e_CursorX -= ScreenW/2-e_ScreenW/2;
+        e_CursorX -= XRender::TargetW/2-e_ScreenW/2;
 #else
-    e_CursorX -= ScreenW/2-e_ScreenW/2;
+    e_CursorX -= XRender::TargetW/2-e_ScreenW/2;
 #endif
 
     // if(WorldEditor)

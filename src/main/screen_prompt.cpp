@@ -96,7 +96,7 @@ void Init()
 
     // setup fader
     if(g_config.EnableInterLevelFade)
-        g_levelScreenFader.setupFader(3, 65, 0, ScreenFader::S_CIRCLE, false, ScreenW / 2, ScreenH / 2, 0);
+        g_levelScreenFader.setupFader(3, 65, 0, ScreenFader::S_CIRCLE, false, XRender::TargetW / 2, XRender::TargetH / 2, 0);
 }
 
 void Render()
@@ -109,9 +109,9 @@ void Render()
     // display background
     vScreen[1].X = 0;
     vScreen[1].Y = 0;
-    vScreen[1].Left = 0; vScreen[1].Top = 0; vScreen[1].Width = ScreenW; vScreen[1].Height = ScreenH;
-    level[1] = newLoc(0, 0, ScreenW, ScreenH);
-    LevelREAL[1] = newLoc(0, 0, ScreenW, ScreenH);
+    vScreen[1].Left = 0; vScreen[1].Top = 0; vScreen[1].Width = XRender::TargetW; vScreen[1].Height = XRender::TargetH;
+    level[1] = newLoc(0, 0, XRender::TargetW, XRender::TargetH);
+    LevelREAL[1] = newLoc(0, 0, XRender::TargetW, XRender::TargetH);
     Background2[1] = 1;
     DrawBackground(1, 1);
 
@@ -139,12 +139,12 @@ void Render()
     if(menu_box_width - total_menu_width < 32)
         menu_box_width = total_menu_width + 32;
 
-    int menu_box_Y = ScreenH - 24 - menu_box_height;
+    int menu_box_Y = XRender::TargetH - 24 - menu_box_height;
 
-    int menu_left_X = ScreenW / 2 - total_menu_width / 2 + 20;
+    int menu_left_X = XRender::TargetW / 2 - total_menu_width / 2 + 20;
     int menu_top_Y = menu_box_Y + menu_box_height / 2 - total_menu_height / 2;
 
-    XRender::renderRect(ScreenW / 2 - menu_box_width / 2, menu_box_Y, menu_box_width, menu_box_height, XTColorF(0.0f, 0.0f, 0.0f, 0.8f));
+    XRender::renderRect(XRender::TargetW / 2 - menu_box_width / 2, menu_box_Y, menu_box_width, menu_box_height, XTColorF(0.0f, 0.0f, 0.0f, 0.8f));
 
     for(size_t i = 0; i < s_options.size(); i++)
         SuperPrint(s_options[i], 3, menu_left_X, menu_top_Y + (i * 36));
@@ -219,9 +219,9 @@ bool Logic()
         PlaySoundMenu(SFX_Do);
 
         if(g_config.EnableInterLevelFade)
-            g_levelScreenFader.setupFader(3, 0, 65, ScreenFader::S_CIRCLE, false, ScreenW / 2, ScreenH / 2, 0);
+            g_levelScreenFader.setupFader(3, 0, 65, ScreenFader::S_CIRCLE, false, XRender::TargetW / 2, XRender::TargetH / 2, 0);
         else
-            g_levelScreenFader.setupFader(65, 0, 65, ScreenFader::S_CIRCLE, false, ScreenW / 2, ScreenH / 2, 0);
+            g_levelScreenFader.setupFader(65, 0, 65, ScreenFader::S_CIRCLE, false, XRender::TargetW / 2, XRender::TargetH / 2, 0);
 
         editorWaitForFade();
         return true;

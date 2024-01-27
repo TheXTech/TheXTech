@@ -60,6 +60,8 @@
 #endif
 
 
+int XRender::TargetW = 800;
+int XRender::TargetH = 600;
 bool XRender::g_BitmaskTexturePresent = false;
 
 static const char blank_gif[] = "GIF89a\x01\x00\x01\x00\x80\x00\x00\xff\xff\xff\x00\x00\x00!\xf9\x04\x01\x00\x00\x00\x00,\x00\x00\x00\x00\x01\x00\x01\x00\x00\x02\2D\x01\x00;";
@@ -142,8 +144,8 @@ AbstractRender_t::~AbstractRender_t()
 
 bool AbstractRender_t::init()
 {
-    ScaleWidth = ScreenW;
-    ScaleHeight = ScreenH;
+    ScaleWidth = XRender::TargetW;
+    ScaleHeight = XRender::TargetH;
 
 #ifdef USE_SCREENSHOTS_AND_RECS
     m_gif->init(this);
@@ -950,7 +952,7 @@ void AbstractRender_t::toggleGifRecorder()
         m_gif->worker = nullptr;
 
         FILE *gifFile = Files::utf8_fopen(saveTo.data(), "wb");
-        if(GIF_H::GifBegin(&m_gif->writer, gifFile, ScreenW, ScreenH, m_gif->delay, false))
+        if(GIF_H::GifBegin(&m_gif->writer, gifFile, XRender::TargetW, XRender::TargetH, m_gif->delay, false))
         {
             m_gif->enabled = true;
             m_gif->doFinalize = false;
@@ -994,7 +996,7 @@ void AbstractRender_t::processRecorder()
         return;
     }
 
-    const int w = ScreenW, h = ScreenH;
+    const int w = XRender::TargetW, h = XRender::TargetH;
 
     uint8_t *pixels = reinterpret_cast<uint8_t*>(SDL_malloc(size_t(4 * w * h) + 42));
     if(!pixels)
