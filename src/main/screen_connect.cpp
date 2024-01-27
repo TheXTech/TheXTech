@@ -1430,9 +1430,13 @@ bool PlayerBox::DrawChar(int x, int w, int y, int h, bool show_name)
         DrawPlayer(scratch_player, 0, XTAlpha(alpha));
     }
 
+#if 0
     // finish with character name
     if(show_name)
         SuperPrintCenter(g_gameInfo.characterName[g_charSelect[p]], 3, x + w / 2, y + h + 12, XTAlpha(alpha));
+#else
+    UNUSED(show_name);
+#endif
 
     return true;
 }
@@ -1627,7 +1631,8 @@ int PlayerBox::Mouse_Render(bool render, int x, int y, int w, int h)
     }
 
     // render the player box (if appropriate)
-    bool show_name = (main_height > 88 + 16 + 32);
+    // bool show_name = (main_height > 88 + 16 + 32);
+    constexpr bool show_name = false;
     const int label_h = show_name ? 32 : 16;
     const int pbox_h = SDL_max(64, SDL_min(88, main_height - 16 - label_h));
     const int pbox_w = pbox_h;
