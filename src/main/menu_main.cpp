@@ -757,7 +757,7 @@ bool mainMenuUpdate()
             }
         }
         // Main Menu
-        if(MenuMode == MENU_MAIN)
+        else if(MenuMode == MENU_MAIN)
         {
             if(SharedCursor.Move)
             {
@@ -2136,23 +2136,19 @@ void mainMenuDraw()
 
     // Render the permanent menu graphics (curtain, URL, logo)
 
-    // Curtain
-    // correction to loop the original asset properly
-    int A = GFX.MenuGFX[1].w;
-    if(A == 800)
-        A = 768;
-    // horizReps
-    B = ScreenW / A + 2;
-
-    double x = 0;
-
-    for(int C = 0; C < B; C++)
-        XRender::renderTexture(x + A * C, 0, A, GFX.MenuGFX[1].h, GFX.MenuGFX[1], 0, 0);
-
     // URL
     if(ScreenH >= SmallScreenH)
-        XRender::renderTexture(ScreenW / 2 - GFX.MenuGFX[3].w / 2, ScreenH - 24,
-                GFX.MenuGFX[3].w, GFX.MenuGFX[3].h, GFX.MenuGFX[3], 0, 0);
+        XRender::renderTexture(ScreenW / 2 - GFX.MenuGFX[3].w / 2, ScreenH - 24, GFX.MenuGFX[3]);
+
+    // Curtain
+    // correction to loop the original asset properly
+    int curtain_draw_w = GFX.MenuGFX[1].w;
+    if(curtain_draw_w == 800)
+        curtain_draw_w = 768;
+    int curtain_horiz_reps = ScreenW / curtain_draw_w + 2;
+
+    for(int i = 0; i < curtain_horiz_reps; i++)
+        XRender::renderTexture(curtain_draw_w * i, 0, curtain_draw_w, GFX.MenuGFX[1].h, GFX.MenuGFX[1], 0, 0);
 
     // game logo
     int LogoMode = 0;

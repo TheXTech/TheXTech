@@ -44,6 +44,7 @@
 #include "npc_traits.h"
 
 #include "main/trees.h"
+#include "script/luna/luna.h"
 
 #include "npc/npc_queues.h"
 
@@ -511,6 +512,8 @@ static void updateIntroLevelActivity()
 
 void MenuLoop()
 {
+    lunaLoop();
+
     // ConnectScreen and ControlsSettings screens handles its own input method polling
     if(MenuMode != MENU_CHARACTER_SELECT_NEW && MenuMode != MENU_INPUT_SETTINGS && !g_pollingInput)
         Controls::PollInputMethod();

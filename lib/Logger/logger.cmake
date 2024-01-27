@@ -1,7 +1,10 @@
 set(LOGGER_SRCS)
 
 list(APPEND LOGGER_SRCS
+    ${CMAKE_CURRENT_LIST_DIR}/logger.h
     ${CMAKE_CURRENT_LIST_DIR}/private/logger.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/private/logger_sets.h
+    ${CMAKE_CURRENT_LIST_DIR}/private/logger_private.h
 )
 
 if(ANDROID)
