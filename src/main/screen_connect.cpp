@@ -309,7 +309,7 @@ static inline int BoxCount()
     if(s_context == Context::LegacyMenu)
         n = 1;
 
-    if(g_gameInfo.disableTwoPlayer)
+    if(g_gameInfo.disableTwoPlayer && !g_forceCharacter)
         n = 1;
 
     if(BattleMode && n > 2)
