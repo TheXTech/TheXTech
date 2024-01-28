@@ -2209,7 +2209,7 @@ void mainMenuDraw()
     if(MenuMode == MENU_INTRO)
     {
         if((CommonFrame % 90) < 45)
-            SuperPrint(g_mainMenu.introPressStart, 3, XRender::TargetW/2 - g_mainMenu.introPressStart.length()*9, XRender::TargetH - 40);
+            SuperPrintScreenCenter(g_mainMenu.introPressStart, 3, (16 + 240 + XRender::TargetH - 48) / 2);
     }
     // Main menu
     if(MenuMode == MENU_MAIN)
