@@ -579,7 +579,7 @@
             "mainExit": "Exit",
             "mainMultiplayerGame": "2 Player Game",
             "mainOptions": "Options",
-            "mainStartGame": "Start Game"
+            "mainPlayEpisode": "Play Episode"
         },
         "options": {
             "optionsModeFullScreen": "Fullscreen mode",

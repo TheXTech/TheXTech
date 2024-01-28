@@ -95,7 +95,7 @@ struct MainMenuContent
 {
     std::string introPressStart;
 
-    std::string mainStartGame;
+    std::string mainPlayEpisode;
     std::string main1PlayerGame;
     std::string mainMultiplayerGame;
     std::string mainBattleGame;

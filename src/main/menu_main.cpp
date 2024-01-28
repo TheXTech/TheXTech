@@ -116,7 +116,7 @@ void initMainMenu()
 
     g_mainMenu.introPressStart = "Press Start";
 
-    g_mainMenu.mainStartGame = "Start Game";
+    g_mainMenu.mainPlayEpisode = "Play Episode";
     g_mainMenu.main1PlayerGame = "1 Player Game";
     g_mainMenu.mainMultiplayerGame = "2 Player Game";
     g_mainMenu.mainBattleGame = "Battle Game";
@@ -777,7 +777,7 @@ bool mainMenuUpdate()
                     {
                         int i = 0;
                         if(A == i++)
-                            menuLen = 18 * (s_show_separate_2P() ? (int)g_mainMenu.main1PlayerGame.size() : (int)g_mainMenu.mainStartGame.size()) - 2;
+                            menuLen = 18 * (s_show_separate_2P() ? (int)g_mainMenu.main1PlayerGame.size() : (int)g_mainMenu.mainPlayEpisode.size()) - 2;
                         else if(s_show_separate_2P() && A == i++)
                             menuLen = 18 * (int)g_mainMenu.mainMultiplayerGame.size() - 2;
                         else if(!g_gameInfo.disableBattleMode && A == i++)
@@ -2016,7 +2016,7 @@ static void s_drawGameTypeTitle(int x, int y)
     else
     {
         if(!s_show_separate_2P())
-            SuperPrint(g_mainMenu.mainStartGame, 3, x, y, XTColorF(1.0f, 0.3f, 0.3f));
+            SuperPrint(g_mainMenu.mainPlayEpisode, 3, x, y, XTColorF(1.0f, 0.3f, 0.3f));
         else if(menuPlayersNum == 1)
             SuperPrint(g_mainMenu.main1PlayerGame, 3, x, y, XTColorF(1.0f, 0.3f, 0.3f));
         else
@@ -2215,7 +2215,7 @@ void mainMenuDraw()
     if(MenuMode == MENU_MAIN)
     {
         int i = 0;
-        SuperPrint(s_show_separate_2P() ? g_mainMenu.main1PlayerGame : g_mainMenu.mainStartGame, 3, MenuX, MenuY+30*(i++));
+        SuperPrint(s_show_separate_2P() ? g_mainMenu.main1PlayerGame : g_mainMenu.mainPlayEpisode, 3, MenuX, MenuY+30*(i++));
         if(s_show_separate_2P())
             SuperPrint(g_mainMenu.mainMultiplayerGame, 3, MenuX, MenuY+30*(i++));
         if(!g_gameInfo.disableBattleMode)

@@ -163,7 +163,7 @@ XTechTranslate::XTechTranslate()
     // List of all translatable strings of the engine
     m_engineMap =
     {
-        {"menu.main.mainStartGame",        &g_mainMenu.mainStartGame},
+        {"menu.main.mainPlayEpisode",        &g_mainMenu.mainPlayEpisode},
         {"menu.main.main1PlayerGame",      &g_mainMenu.main1PlayerGame},
         {"menu.main.mainMultiplayerGame",  &g_mainMenu.mainMultiplayerGame},
         {"menu.main.mainBattleGame",       &g_mainMenu.mainBattleGame},
