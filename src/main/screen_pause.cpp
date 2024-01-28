@@ -245,7 +245,7 @@ void Init(int plr, bool LegacyPause)
             s_items.push_back(MenuItem{g_gameStrings.pauseItemResetCheckpoints, s_ResetCheckpoints});
 
         if(g_compatibility.allow_drop_add)
-            s_items.push_back(MenuItem{g_gameStrings.pauseItemDropAddPlayers, s_DropAddScreen});
+            s_items.push_back(MenuItem{g_gameStrings.pauseItemPlayerSetup, s_DropAddScreen});
 
         if(!inter_screen && s_cheat_menu_bits == 14 && !BattleMode)
             s_items.push_back(MenuItem{g_gameStrings.pauseItemEnterCode, s_CheatScreen});
@@ -258,7 +258,7 @@ void Init(int plr, bool LegacyPause)
         s_items.push_back(MenuItem{g_gameStrings.pauseItemContinue, s_Continue});
 
         if(g_compatibility.allow_drop_add && s_pause_type != PauseType::Legacy)
-            s_items.push_back(MenuItem{g_gameStrings.pauseItemDropAddPlayers, s_DropAddScreen});
+            s_items.push_back(MenuItem{g_gameStrings.pauseItemPlayerSetup, s_DropAddScreen});
 
         if(s_cheat_menu_bits == 14 && s_pause_type != PauseType::Legacy && !BattleMode)
             s_items.push_back(MenuItem{g_gameStrings.pauseItemEnterCode, s_CheatScreen});

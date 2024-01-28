@@ -56,7 +56,7 @@ void initGameStrings()
     g_gameStrings.pauseItemResetCheckpoints = "Reset Checkpoints";
     g_gameStrings.pauseItemQuitTesting = "Quit Testing";
     g_gameStrings.pauseItemReturnToEditor = "Return to Editor";
-    g_gameStrings.pauseItemDropAddPlayers = "Drop/Add Players";
+    g_gameStrings.pauseItemPlayerSetup = "Player Setup";
     g_gameStrings.pauseItemEnterCode = "Enter Code";
     g_gameStrings.pauseItemSaveAndContinue = "Save and Continue";
     g_gameStrings.pauseItemSaveAndQuit = "Save and Quit";
