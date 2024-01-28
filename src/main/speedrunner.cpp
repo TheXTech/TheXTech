@@ -308,6 +308,7 @@ void speedRun_renderControls(int player, int screenZ, int align)
 
     const bool player_missing = (player - 1 >= (int)Controls::g_InputMethods.size() || !Controls::g_InputMethods[player - 1]);
     const bool player_newly_connected = !player_missing && QuickReconnectScreen::g_active && QuickReconnectScreen::g_toast_duration[player - 1];
+    XPower::StatusInfo status_info = Controls::GetStatus(player);
 
     // Controller
     int x, y;
@@ -318,6 +319,8 @@ void speedRun_renderControls(int player, int screenZ, int align)
     int bx, by;
     int bw = 40;
     int bh = 22;
+
+    int num_players = 1;
 
     if(screenZ >= 0)
     {
@@ -342,18 +345,40 @@ void speedRun_renderControls(int player, int screenZ, int align)
     }
     else
     {
+        const Screen_t& plr_screen = ScreenByPlayer(player);
+        num_players = plr_screen.player_count;
+        int plr_i = 0;
+        for(; plr_i < plr_screen.player_count; plr_i++)
+        {
+            if(plr_screen.players[plr_i] == player)
+                break;
+        }
+
+
         if(align == SPEEDRUN_ALIGN_AUTO)
-            align = player > 1 ? SPEEDRUN_ALIGN_RIGHT : SPEEDRUN_ALIGN_LEFT;
+        {
+            if(plr_i == 0 || num_players <= 1)
+                align = SPEEDRUN_ALIGN_LEFT;
+            else if(plr_i >= num_players - 1)
+                align = SPEEDRUN_ALIGN_RIGHT;
+        }
 
         if(align == SPEEDRUN_ALIGN_LEFT)
         {
             x = 4;
             bx = x + w + 4;
         }
-        else
+        else if(align == SPEEDRUN_ALIGN_RIGHT)
         {
             x = (XRender::TargetW - (w + 4));
             bx = x - (bw + 4);
+        }
+        else
+        {
+            int display_w = (status_info.power_status != XPower::StatusInfo::POWER_DISABLED) ? (w + 4 + bw + 4) : (w + 4);
+
+            x = (XRender::TargetW - display_w) * plr_i / (num_players - 1);
+            bx = x + (w + 4);
         }
 
         y = XRender::TargetH - 34;
@@ -376,8 +401,6 @@ void speedRun_renderControls(int player, int screenZ, int align)
         else
             bx = x + w - bw;
     }
-
-    XPower::StatusInfo status_info = Controls::GetStatus(player);
 
     uint8_t controls_alpha = 255;
     uint8_t battery_alpha = 255;
@@ -406,28 +429,34 @@ void speedRun_renderControls(int player, int screenZ, int align)
         }
 
         // code for lower-resolution case
-        if(XRender::TargetW < 600 || (XRender::TargetW < 800 && status_info.power_status != XPower::StatusInfo::POWER_DISABLED))
+        if(XRender::TargetW < 600 || (XRender::TargetW < 800 && status_info.power_status != XPower::StatusInfo::POWER_DISABLED) || num_players > 2)
         {
             if(align == SPEEDRUN_ALIGN_RIGHT)
                 SuperPrintRightAlign(profile_name, 3, x + w, y - 20, XTAlpha(alpha));
-            else
+            else if(align == SPEEDRUN_ALIGN_LEFT)
                 SuperPrint(profile_name, 3, x, y - 20, XTAlpha(alpha));
+            else
+                SuperPrintCenter(profile_name, 3, x + w / 2, y - 20, XTAlpha(alpha));
         }
         // code for higher resolution case, including battery
         else if(status_info.power_status != XPower::StatusInfo::POWER_DISABLED)
         {
             if(align == SPEEDRUN_ALIGN_RIGHT)
                 SuperPrintRightAlign(profile_name, 3, bx - 4, by + 2, XTAlpha(alpha));
-            else
+            else if(align == SPEEDRUN_ALIGN_LEFT)
                 SuperPrint(profile_name, 3, bx + bw + 4, by + 2, XTAlpha(alpha));
+            else
+                SuperPrintCenter(profile_name, 3, x + w, y - 20, XTAlpha(alpha));
         }
         // code for normal case
         else
         {
             if(align == SPEEDRUN_ALIGN_RIGHT)
                 SuperPrintRightAlign(profile_name, 3, x - 4, by + 2, XTAlpha(alpha));
-            else
+            else if(align == SPEEDRUN_ALIGN_LEFT)
                 SuperPrint(profile_name, 3, x + w + 4, by + 2, XTAlpha(alpha));
+            else
+                SuperPrintCenter(profile_name, 3, x + w / 2, y - 20, XTAlpha(alpha));
         }
     }
 

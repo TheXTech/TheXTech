@@ -3069,12 +3069,12 @@ void UpdateGraphicsScreen(Screen_t& screen)
 
         if(screen.Type == 5 && numScreens == 1)
         {
-            speedRun_renderControls(1, Z, SPEEDRUN_ALIGN_LEFT);
-            speedRun_renderControls(2, Z, SPEEDRUN_ALIGN_RIGHT);
+            speedRun_renderControls(screen.players[0], Z, SPEEDRUN_ALIGN_LEFT);
+            speedRun_renderControls(screen.players[1], Z, SPEEDRUN_ALIGN_RIGHT);
         }
         else if(numScreens >= 2)
         {
-            speedRun_renderControls(Z, Z, SPEEDRUN_ALIGN_AUTO);
+            speedRun_renderControls(plr_Z, Z, SPEEDRUN_ALIGN_AUTO);
         }
 
         // indicate any small-screen camera features
@@ -3116,13 +3116,16 @@ void UpdateGraphicsScreen(Screen_t& screen)
 
     // 1P controls indicator
     if(screen.Type != 5 && numScreens == 1)
-        speedRun_renderControls(1, -1, SPEEDRUN_ALIGN_LEFT);
+    {
+        for(int plr_i = 0; plr_i < screen.player_count; plr_i++)
+            speedRun_renderControls(screen.players[plr_i], -1, SPEEDRUN_ALIGN_AUTO);
+    }
 
     // fix missing controls info when the vScreen didn't get rendered at all
     if(screen.Type == 5 && numScreens == 1 && screen.vScreen(1).Width == 0)
     {
-        speedRun_renderControls(1, -1);
-        speedRun_renderControls(2, -1);
+        speedRun_renderControls(screen.players[0], -1);
+        speedRun_renderControls(screen.players[1], -1);
     }
 }
 
