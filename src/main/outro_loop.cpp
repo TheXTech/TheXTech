@@ -360,6 +360,7 @@ void SetupCredits()
     AddCredit("Eclipsed"); // For the help to verify and polish the speed-run mode
     AddCredit("ThatRoadRunnerfan727 (Matthew)"); // For Nintendo Switch alpha testing on hardware
     AddCredit("RMN Community"); // For Quality Episodes that allowed us to refine the Engine
+    AddCredit("Savby"); // For important design work on the character select screen (ConnectScreen)
 #endif
     AddCredit("");
     AddCredit("4matsy");
