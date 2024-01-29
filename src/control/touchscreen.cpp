@@ -1016,7 +1016,7 @@ void TouchScreenController::updateScreenSize()
     XRender::getRenderSize(&m_renderWidth, &m_renderHeight);
 
     updateTouchMap(m_layout,
-                   m_screenWidth, m_screenHeight,
+                   m_renderWidth, m_renderHeight,
                    m_scale_factor,
                    m_scale_factor_dpad,
                    m_scale_factor_buttons,
