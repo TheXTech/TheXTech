@@ -20,7 +20,7 @@ Changelog for 1.3.7-dev
 -Add ability to edit BGO sort layers and offset in the in-game editor (@ds-sloth)
 -Redesigned character select screen for multiplayer game start and player setup (@Savbyn, @ds-sloth)
 -Drop/add screen renamed to "Player Setup"
--In modern gameplay, the main menu now has a single "Start Episode" item instead of separate 1P/2P items
+-In modern gameplay, the main menu now has a single "Play Episode" item instead of separate 1P/2P items
 
 Changelog for 1.3.6.4-dev
 -Use OpenGL as the default renderer on supported platforms ("sdl" may be used in config.ini or at at the command line to request the SDL2 renderer)
