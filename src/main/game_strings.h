@@ -53,7 +53,6 @@ struct GameContent
     // ConnectScreen
 
     std::string connectReconnectTitle;
-    std::string connectDropAddTitle;
 
     std::string connectPressAButton;
 

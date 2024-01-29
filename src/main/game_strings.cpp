@@ -64,7 +64,6 @@ void initGameStrings()
 
 
     g_gameStrings.connectReconnectTitle = "Reconnect";
-    g_gameStrings.connectDropAddTitle = "Drop/Add Players";
     g_gameStrings.connectPressAButton = "Press A Button";
     g_gameStrings.connectTestProfile = "Test Profile";
     g_gameStrings.connectDisconnect = "Disconnect";

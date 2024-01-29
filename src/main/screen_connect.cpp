@@ -1975,7 +1975,7 @@ int Mouse_Render(bool mouse, bool render)
         if(render)
         {
             XRender::renderRect(start_x, draw_y, full_width, full_height, XTColorF(0.0f, 0.0f, 0.0f, 0.5f));
-            SuperPrintScreenCenter(g_gameStrings.connectDropAddTitle, 3, draw_y + 8);
+            SuperPrintScreenCenter(g_gameStrings.pauseItemPlayerSetup, 3, draw_y + 8);
         }
 
         draw_y += header_height;

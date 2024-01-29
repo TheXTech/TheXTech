@@ -438,7 +438,6 @@ XTechTranslate::XTechTranslate()
         {"game.pause.quit",                 &g_gameStrings.pauseItemQuit},
 
         {"game.connect.reconnectTitle",            &g_gameStrings.connectReconnectTitle},
-        {"game.connect.dropAddTitle",              &g_gameStrings.connectDropAddTitle},
 
         {"game.connect.phrasePressAButton",        &g_gameStrings.connectPressAButton},
 
