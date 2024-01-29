@@ -490,7 +490,7 @@ int GameMain(const CmdLineSetup_t &setup)
                     numPlayers = 1;
 
                 for(int A = 1; A <= numCharacters; A++)
-                    blockCharacter[A] = SelectWorld[selWorld].blockChar[A];
+                    blockCharacter[A] = (g_forceCharacter) ? false : SelectWorld[selWorld].blockChar[A];
 
                 // prepare for StartEpisode(): set player characters
                 for(int i = 0; i < numPlayers; i++)

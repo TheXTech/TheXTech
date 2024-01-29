@@ -43,7 +43,7 @@ struct GameContent
     std::string pauseItemResetCheckpoints;
     std::string pauseItemQuitTesting;
     std::string pauseItemReturnToEditor;
-    std::string pauseItemDropAddPlayers;
+    std::string pauseItemPlayerSetup;
     std::string pauseItemEnterCode;
     std::string pauseItemSaveAndContinue;
     std::string pauseItemSaveAndQuit;
@@ -57,7 +57,7 @@ struct GameContent
 
     std::string connectPressAButton;
 
-    std::string connectTestControls;
+    std::string connectTestProfile;
     std::string connectHoldStart;
     std::string connectDisconnect;
 

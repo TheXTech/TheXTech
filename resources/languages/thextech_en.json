@@ -367,7 +367,7 @@
         },
         "pause": {
             "continue": "Continue",
-            "dropAddPlayers": "Drop/Add Players",
+            "playerSetup": "Player Setup",
             "enterCode": "Enter Code",
             "quit": "Quit",
             "quitTesting": "Quit Testing",
@@ -579,7 +579,7 @@
             "mainExit": "Exit",
             "mainMultiplayerGame": "2 Player Game",
             "mainOptions": "Options",
-            "mainStartGame": "Start Game"
+            "mainPlayEpisode": "Play Episode"
         },
         "options": {
             "optionsModeFullScreen": "Fullscreen mode",

@@ -18,6 +18,7 @@ Changelog for 1.3.7-dev
 -Added backdrop for levels smaller than the screen at graphics/ui/Backdrop.png (@ds-sloth)
 -Added alternative format for world map frame with better support for various display resolutions (@ds-sloth)
 -Add ability to edit BGO sort layers and offset in the in-game editor (@ds-sloth)
+-Redesigned character select screen for multiplayer game start and Drop/Add (@Savbyn, @ds-sloth)
 
 Changelog for 1.3.6.4-dev
 -Use OpenGL as the default renderer on supported platforms ("sdl" may be used in config.ini or at at the command line to request the SDL2 renderer)

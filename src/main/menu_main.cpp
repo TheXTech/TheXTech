@@ -116,7 +116,7 @@ void initMainMenu()
 
     g_mainMenu.introPressStart = "Press Start";
 
-    g_mainMenu.mainStartGame = "Start Game";
+    g_mainMenu.mainPlayEpisode = "Play Episode";
     g_mainMenu.main1PlayerGame = "1 Player Game";
     g_mainMenu.mainMultiplayerGame = "2 Player Game";
     g_mainMenu.mainBattleGame = "Battle Game";
@@ -230,6 +230,16 @@ static int listMenuLastCursor = 0;
 static const int TinyScreenH = 400;
 static const int SmallScreenH = 500;
 static const int TinyScreenW = 600;
+
+static bool s_prefer_modern_char_sel()
+{
+    return (CompatGetLevel() < COMPAT_SMBX2);
+}
+
+static bool s_show_separate_2P()
+{
+    return !s_prefer_modern_char_sel() && !g_gameInfo.disableTwoPlayer;
+}
 
 void GetMenuPos(int* MenuX, int* MenuY)
 {
@@ -736,7 +746,7 @@ bool mainMenuUpdate()
             if(menuBackPress && MenuCursorCanMove)
             {
                 int quitKeyPos = 2;
-                if(!g_gameInfo.disableTwoPlayer)
+                if(s_show_separate_2P())
                     quitKeyPos ++;
                 if(!g_gameInfo.disableBattleMode)
                     quitKeyPos ++;
@@ -767,8 +777,8 @@ bool mainMenuUpdate()
                     {
                         int i = 0;
                         if(A == i++)
-                            menuLen = 18 * (g_gameInfo.disableTwoPlayer ? (int)g_mainMenu.main1PlayerGame.size() : (int)g_mainMenu.mainStartGame.size()) - 2;
-                        else if(!g_gameInfo.disableTwoPlayer && A == i++)
+                            menuLen = 18 * (s_show_separate_2P() ? (int)g_mainMenu.main1PlayerGame.size() : (int)g_mainMenu.mainPlayEpisode.size()) - 2;
+                        else if(s_show_separate_2P() && A == i++)
                             menuLen = 18 * (int)g_mainMenu.mainMultiplayerGame.size() - 2;
                         else if(!g_gameInfo.disableBattleMode && A == i++)
                             menuLen = 18 * (int)g_mainMenu.mainBattleGame.size();
@@ -799,7 +809,7 @@ bool mainMenuUpdate()
             if(menuBackPress && MenuCursorCanMove)
             {
                 int quitKeyPos = 2;
-                if(!g_gameInfo.disableTwoPlayer)
+                if(s_show_separate_2P())
                     quitKeyPos ++;
                 if(!g_gameInfo.disableBattleMode)
                     quitKeyPos ++;
@@ -842,7 +852,7 @@ bool mainMenuUpdate()
                     SDL_DetachThread(loadingThread);
 #endif
                 }
-                else if(!g_gameInfo.disableTwoPlayer && MenuCursor == i++)
+                else if(s_show_separate_2P() && MenuCursor == i++)
                 {
                     PlaySoundMenu(SFX_Do);
                     MenuMode = MENU_2PLAYER_GAME;
@@ -937,7 +947,7 @@ bool mainMenuUpdate()
 
 
             int quitKeyPos = 2;
-            if(!g_gameInfo.disableTwoPlayer)
+            if(s_show_separate_2P())
                 quitKeyPos ++;
             if(!g_gameInfo.disableBattleMode)
                 quitKeyPos ++;
@@ -1226,12 +1236,12 @@ bool mainMenuUpdate()
 
                     if(MenuMode == MENU_BATTLE_MODE)
                     {
-                        MenuCursor = g_gameInfo.disableTwoPlayer ? 1 : 2;
+                        MenuCursor = !s_show_separate_2P() ? 1 : 2;
                     }
                     else if(MenuMode == MENU_EDITOR)
                     {
                         MenuCursor = 3;
-                        if(g_gameInfo.disableTwoPlayer)
+                        if(!s_show_separate_2P())
                             MenuCursor--;
                         if(g_gameInfo.disableBattleMode)
                             MenuCursor--;
@@ -1382,14 +1392,6 @@ bool mainMenuUpdate()
                         if(MenuMode != MENU_BATTLE_MODE)
                             FindSaves();
 
-                        For(A, 1, numCharacters)
-                        {
-                            if(MenuMode == MENU_BATTLE_MODE)
-                                blockCharacter[A] = false;
-                            else
-                                blockCharacter[A] = SelectWorld[selWorld].blockChar[A];
-                        }
-
                         if(MenuMode == MENU_BATTLE_MODE)
                         {
                             MenuMode = MENU_CHARACTER_SELECT_NEW_BM;
@@ -1506,8 +1508,10 @@ bool mainMenuUpdate()
                         selSave = MenuCursor + 1;
                         if(MenuMode == MENU_SELECT_SLOT_2P)
                             ConnectScreen::MainMenu_Start(2);
-                        else
+                        else if(s_prefer_modern_char_sel())
                             ConnectScreen::MainMenu_Start(1);
+                        else
+                            ConnectScreen::LegacyMenu_Start();
                         MenuMode = MENU_CHARACTER_SELECT_NEW;
                         MenuCursorCanMove = false;
                     }
@@ -1702,7 +1706,7 @@ bool mainMenuUpdate()
                     SaveConfig();
 
                     int optionsIndex = 1;
-                    if(!g_gameInfo.disableTwoPlayer)
+                    if(s_show_separate_2P())
                         optionsIndex++;
                     if(!g_gameInfo.disableBattleMode)
                         optionsIndex++;
@@ -2011,13 +2015,12 @@ static void s_drawGameTypeTitle(int x, int y)
         SuperPrint(g_mainMenu.mainBattleGame, 3, x, y, XTColorF(0.3f, 0.3f, 1.0f));
     else
     {
-        float r = menuPlayersNum == 1 ? 1.f : 0.3f;
-        float g = menuPlayersNum == 2 ? 1.f : 0.3f;
-
-        if(menuPlayersNum == 1)
-            SuperPrint(g_mainMenu.main1PlayerGame, 3, x, y, XTColorF(r, g, 0.3f));
+        if(!s_show_separate_2P())
+            SuperPrint(g_mainMenu.mainPlayEpisode, 3, x, y, XTColorF(1.0f, 0.3f, 0.3f));
+        else if(menuPlayersNum == 1)
+            SuperPrint(g_mainMenu.main1PlayerGame, 3, x, y, XTColorF(1.0f, 0.3f, 0.3f));
         else
-            SuperPrint(g_mainMenu.mainMultiplayerGame, 3, x, y, XTColorF(r, g, 0.3f));
+            SuperPrint(g_mainMenu.mainMultiplayerGame, 3, x, y, XTColorF(0.3f, 1.0f, 0.3f));
     }
 }
 
@@ -2212,8 +2215,8 @@ void mainMenuDraw()
     if(MenuMode == MENU_MAIN)
     {
         int i = 0;
-        SuperPrint(g_gameInfo.disableTwoPlayer ? g_mainMenu.mainStartGame : g_mainMenu.main1PlayerGame, 3, MenuX, MenuY+30*(i++));
-        if(!g_gameInfo.disableTwoPlayer)
+        SuperPrint(s_show_separate_2P() ? g_mainMenu.main1PlayerGame : g_mainMenu.mainPlayEpisode, 3, MenuX, MenuY+30*(i++));
+        if(s_show_separate_2P())
             SuperPrint(g_mainMenu.mainMultiplayerGame, 3, MenuX, MenuY+30*(i++));
         if(!g_gameInfo.disableBattleMode)
             SuperPrint(g_mainMenu.mainBattleGame, 3, MenuX, MenuY+30*(i++));
@@ -2228,6 +2231,10 @@ void mainMenuDraw()
     else if(MenuMode == MENU_CHARACTER_SELECT_NEW ||
             MenuMode == MENU_CHARACTER_SELECT_NEW_BM)
     {
+        s_drawGameTypeTitle(MenuX, MenuY - 70);
+        const auto& world_list = (MenuMode == MENU_CHARACTER_SELECT_NEW) ? SelectWorld : SelectBattle;
+        SuperPrint(world_list[selWorld].WorldName, 3, MenuX, MenuY - 40, XTColorF(0.6f, 1.f, 1.f));
+
         ConnectScreen::Render();
     }
 #if 0 // dead now

@@ -163,7 +163,7 @@ XTechTranslate::XTechTranslate()
     // List of all translatable strings of the engine
     m_engineMap =
     {
-        {"menu.main.mainStartGame",        &g_mainMenu.mainStartGame},
+        {"menu.main.mainPlayEpisode",        &g_mainMenu.mainPlayEpisode},
         {"menu.main.main1PlayerGame",      &g_mainMenu.main1PlayerGame},
         {"menu.main.mainMultiplayerGame",  &g_mainMenu.mainMultiplayerGame},
         {"menu.main.mainBattleGame",       &g_mainMenu.mainBattleGame},
@@ -431,7 +431,7 @@ XTechTranslate::XTechTranslate()
         {"game.pause.resetCheckpoints",     &g_gameStrings.pauseItemResetCheckpoints},
         {"game.pause.quitTesting",          &g_gameStrings.pauseItemQuitTesting},
         {"game.pause.returnToEditor",       &g_gameStrings.pauseItemReturnToEditor},
-        {"game.pause.dropAddPlayers",       &g_gameStrings.pauseItemDropAddPlayers},
+        {"game.pause.playerSetup",          &g_gameStrings.pauseItemPlayerSetup},
         {"game.pause.enterCode",            &g_gameStrings.pauseItemEnterCode},
         {"game.pause.saveAndContinue",      &g_gameStrings.pauseItemSaveAndContinue},
         {"game.pause.saveAndQuit",          &g_gameStrings.pauseItemSaveAndQuit},
@@ -442,7 +442,7 @@ XTechTranslate::XTechTranslate()
 
         {"game.connect.phrasePressAButton",        &g_gameStrings.connectPressAButton},
 
-        {"game.connect.phraseTestControls",        &g_gameStrings.connectTestControls},
+        {"game.connect.phraseTestProfile",        &g_gameStrings.connectTestProfile},
         {"game.connect.phraseHoldStart",           &g_gameStrings.connectHoldStart},
         {"game.connect.wordDisconnect",            &g_gameStrings.connectDisconnect},
 

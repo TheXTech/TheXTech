@@ -143,6 +143,13 @@ bool OpenWorld(std::string FilePath)
         blockCharacter[5] = true;
     }
 
+    // cancel block if cheat is active
+    if(g_forceCharacter && !LevelEditor && !WorldEditor)
+    {
+        for(int A = 1; A <= numCharacters; A++)
+            blockCharacter[A] = false;
+    }
+
     StartLevel = wld.IntroLevel_file;
     addMissingLvlSuffix(StartLevel);
     StartLevel = g_dirEpisode.resolveFileCase(StartLevel);
