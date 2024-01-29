@@ -47,6 +47,9 @@ static void loadCustomState()
         FS.mkdir('/settings');
         FS.mount(IDBFS, {}, '/settings');
 
+        FS.mkdir('/user');
+        FS.mount(IDBFS, {}, '/user');
+
         // sync from persisted state into memory and then
         // run the 'test' function
         FS.syncfs(true, function (err) {
@@ -97,7 +100,7 @@ void AppPathP::initDefaultPaths(const std::string & /*userDirName*/)
         s_applicationPath.push_back('/');
 
     s_assetsRoot = s_applicationPath;
-    s_userDirectory = s_applicationPath;
+    s_userDirectory = "/user/";
 
     loadCustomState();
 
@@ -131,7 +134,7 @@ std::string AppPathP::settingsRoot()
      * directory out of user directory. Keep it empty if you want to keep the
      * default behaviour (i.e. settings saved at the user directory)
      */
-    return std::string();
+    return "/settings/";
 }
 
 std::string AppPathP::gamesavesRoot()
