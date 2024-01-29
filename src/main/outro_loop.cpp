@@ -301,7 +301,7 @@ void SetupCredits()
     AddCredit(g_outroScreen.nameVitalyNovichkov);
     AddCredit("'Wohlstand'");
     AddCredit("");
-    AddCredit("'ds-sloth'"); // For the major contribution to the code and becoming a co-developer
+    AddCredit("ds-sloth"); // For the major contribution to the code and becoming a co-developer
     AddCredit("");
     AddCredit("");
     AddCredit(g_outroScreen.qualityControl);
