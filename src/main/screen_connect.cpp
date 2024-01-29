@@ -18,6 +18,7 @@
 #include "main/game_info.h"
 
 #include "main/screen_connect.h"
+#include "main/screen_quickreconnect.h"
 #include "main/menu_main.h"
 #include "main/game_strings.h"
 #include "main/speedrunner.h"
@@ -534,7 +535,7 @@ static bool CheckDone()
 
 
 // helper function when trying to force exit the drop/add screen
-// returns zero-indexed player that can be dropped (is currently disconnected), or -1 if dropping a player will not allow exiting the drop/add menu
+// returns zero-indexed player that can be dropped (is currently disconnected), -3 if the player set is already complete, -2 if exiting the menu is blocked, and -1 if dropping a player will not make the player set complete
 static int CheckCanDrop()
 {
     // What is the first player that is not done?
@@ -545,7 +546,7 @@ static int CheckCanDrop()
         n = maxLocalPlayers;
 
     int are_present = 0;
-    int can_drop = -1;
+    int can_drop = -3;
 
     // What is the first player that is not done?
     for(int notDone = 0; notDone < n; notDone++)
@@ -554,6 +555,8 @@ static int CheckCanDrop()
             are_present++;
         else if(s_players[notDone].m_state == PlayerState::Disconnected || s_players[notDone].m_state == PlayerState::Reconnecting)
             can_drop = notDone;
+        else if(s_players[notDone].m_state == PlayerState::ConfirmProfile)
+            return -2;
     }
 
     // not enough players / controllers -> can't drop to exit
@@ -753,7 +756,7 @@ bool PlayerBox::Back()
                 PlaySoundMenu(SFX_Slide);
                 return true;
             }
-            else if(CheckCanDrop() != -1)
+            else if(CheckCanDrop() >= -1)
             {
                 m_state = PlayerState::ForceDrop;
                 m_menu_item = 0;
@@ -1877,8 +1880,10 @@ int PlayerBox::Mouse_Render(bool render, int x, int y, int w, int h)
         {
             int index = CheckCanDrop() + 1;
 
-            if(index != 0)
+            if(index > 0)
                 message = &(temporary = fmt::format_ne(g_gameStrings.connectDropPX, index));
+            else
+                message = &g_gameStrings.connectForceResume;
         }
         else if(m_state == PlayerState::Reconnecting)
             message = &g_gameStrings.connectReconnectTitle;
@@ -2256,10 +2261,10 @@ int PlayerBox::Logic()
     {
         int to_drop = CheckCanDrop();
 
-        if(to_drop == -1)
+        if(to_drop <= -2)
         {
             PlaySoundMenu(SFX_BlockHit);
-            m_state = PlayerState::ControlsMenu;
+            m_state = PlayerState::SelectChar;
             m_menu_item = 0;
             m_marquee_state.reset_width();
             m_input_ready = false;
@@ -2271,9 +2276,12 @@ int PlayerBox::Logic()
 
         if(m_menu_item > 66 * 2)
         {
-            Player_Remove(to_drop);
+            if(to_drop >= 0)
+                Player_Remove(to_drop);
+            else
+                QuickReconnectScreen::g_active = true;
 
-            if(CheckDone())
+            if(to_drop == -1 || CheckDone())
             {
                 PlaySoundMenu(SFX_Slide);
                 return -1;
