@@ -43,8 +43,6 @@ extern struct Config_t
 
     /* ---- Video ----*/
 
-    //! The onscreen keyboard should fill the screen
-    bool    osk_fill_screen = false;
     //! Show the episode title onscreen
     enum
     {
