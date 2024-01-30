@@ -368,7 +368,8 @@
             "mainMultiplayerGame": "2 인용 게임",
             "mainBattleGame": "전투 게임",
             "mainOptions": "옵션",
-            "mainExit": "종료"
+            "mainExit": "종료",
+            "mainPlayEpisode": "에피소드 재생"
         },
         "controls": {
             "editor": {
@@ -610,7 +611,8 @@
             "resetCheckpoints": "체크포인트 재설정",
             "restartLevel": "레벨 재시작",
             "returnToEditor": "편집기로 돌아가기",
-            "saveAndContinue": "저장하고 계속하기"
+            "saveAndContinue": "저장하고 계속하기",
+            "playerSetup": "플레이어 설정"
         },
         "message": {
             "scanningLevels": "레벨 스캔 중..."
