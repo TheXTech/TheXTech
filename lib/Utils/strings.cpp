@@ -118,6 +118,9 @@ void Strings::doRTrim(std::string &str)
 
 void Strings::split(Strings::List& out, const std::string& str, char delimiter)
 {
+    if(str.empty())
+        return;
+
     std::string::size_type beg = 0;
     std::string::size_type end = 0;
     do
@@ -133,6 +136,9 @@ void Strings::split(Strings::List& out, const std::string& str, char delimiter)
 
 void Strings::split(Strings::List& out, const std::string& str, const std::string& delimiter)
 {
+    if(str.empty())
+        return;
+
     std::string::size_type beg = 0;
     std::string::size_type end = 0;
     do
