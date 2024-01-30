@@ -307,16 +307,9 @@ void OpenConfig()
         config.read("editor-edge-scroll", g_config.editor_edge_scroll, g_config.editor_edge_scroll);
         config.endGroup();
 
-#if defined(__ANDROID__) || defined(__EMSCRIPTEN__)
-        constexpr bool osk_fill_screen_default = true;
-#else
-        constexpr bool osk_fill_screen_default = false;
-#endif
-
         config.beginGroup("video");
         config.read("display-controllers", g_drawController, false);
         config.readEnum("battery-status", g_videoSettings.batteryStatus, (int)BATTERY_STATUS_OFF, batteryStatus);
-        config.read("osk-fill-screen", g_config.osk_fill_screen, osk_fill_screen_default);
         config.readEnum("show-episode-title", g_config.show_episode_title, (int)Config_t::EPISODE_TITLE_OFF, showEpisodeTitle);
         config.endGroup();
 
@@ -462,7 +455,6 @@ void SaveConfig()
         config.setValue("scale-down-textures", scaleDownTextures[g_videoSettings.scaleDownTextures]);
         config.setValue("display-controllers", g_drawController);
         config.setValue("battery-status", batteryStatus[g_videoSettings.batteryStatus]);
-        config.setValue("osk-fill-screen", g_config.osk_fill_screen);
         config.setValue("show-episode-title", showEpisodeTitle[g_config.show_episode_title]);
         config.setValue("internal-width", g_config.InternalW);
         config.setValue("internal-height", g_config.InternalH);

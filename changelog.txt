@@ -29,6 +29,7 @@ Changelog for 1.3.6.4-dev
 -Fix vanilla bug where P2 could not close message box during shared screen coop (@ds-sloth)
 -Changed credits font id to 5 for outlines. (@0lhi)
 -Fix Emscripten bug where worlds created in the editor would get lost on page refresh (@ds-sloth)
+-Remove option "osk-fill-screen"; this behavior is now used whenever a touchscreen is active (@ds-sloth)
 
 Changelog for 1.3.6.3
 -Fixed a TheXTech 1.3.6.1 crash where object lookup table could not process items with negative size (@ds-sloth)
