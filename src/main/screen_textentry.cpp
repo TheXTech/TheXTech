@@ -100,11 +100,20 @@ std::string Text;
 static std::vector<int16_t> s_Prompt_UTF_offsets;
 static std::vector<int16_t> s_Text_UTF_offsets;
 
+enum class MouseState : uint8_t
+{
+    down = 0,
+    just_released = 1,
+    up = 2,
+    canceled = 3,
+    canceled_2 = 4, // sometimes takes 2 frames for residual touchscreen press to become active
+};
+
 static std::string s_Prompt;
 static int s_cursor = 0;
-static int s_mouse_up = 2;
 static int s_timer = 0;
 static bool s_committed = false;
+static MouseState s_mouse_state = MouseState::canceled;
 
 // KEYMAP!
 // we are assumed to be operating on a Nx5x12 (levels, rows, columns) grid.
@@ -286,15 +295,16 @@ bool UpdateButton(int x, int y, int size, const char* c, bool sel, bool render)
     {
         if(sel)
         {
-            if(coll && SharedCursor.Primary)
+            if(coll && s_mouse_state == MouseState::down)
                 XRender::renderRect(x, y, width, size, 0.f, 0.5f, 0.5f, 1.0f, true);
             else
                 XRender::renderRect(x, y, width, size, 0.f, 1.0f, 1.0f, 1.0f, true);
         }
-        else if(coll && SharedCursor.Primary)
+        else if(coll && s_mouse_state == MouseState::down)
             XRender::renderRect(x, y, width, size, 0.f, 0.f, 0.f, 1.0f, true);
+
         // background:
-        if(SharedCursor.Primary && coll)
+        if(s_mouse_state == MouseState::down && coll)
             XRender::renderRect(x+2, y+2, width-4, size-4, 0.2f, 0.2f, 0.2f, 1.0f, true);
         else
             XRender::renderRect(x+2, y+2, width-4, size-4, 0.5f, 0.5f, 0.5f, 0.8f, true);
@@ -302,7 +312,7 @@ bool UpdateButton(int x, int y, int size, const char* c, bool sel, bool render)
         SuperPrintCenter(print_char, 4, x+width/2, y+size/2-10);
     }
 
-    return (s_mouse_up == 1 && coll);
+    return (s_mouse_state == MouseState::just_released && coll);
 }
 
 void GoLeft()
@@ -502,8 +512,15 @@ bool KeyboardMouseRender(bool mouse, bool render)
     const int cur_ScreenH = ScreenH;
 #endif
 
+#if defined(__WII__) || defined(__3DS__) || defined(__16M__)
+    constexpr bool c_always_fill_screen = true;
+#else
+    constexpr bool c_always_fill_screen = false;
+#endif
+
     int key_size = 40;
-    if(g_config.osk_fill_screen)
+    // make OSK fill screen on certain platforms / when touchscreen is in use
+    if(c_always_fill_screen || Controls::g_renderTouchscreen)
     {
         key_size = (cur_ScreenW - 40) / s_current_keymap_cols;
         // force even
@@ -564,6 +581,9 @@ bool KeyboardMouseRender(bool mouse, bool render)
         }
 
         XRender::renderRect(kb_x, kb_y, kb_width, kb_height, 0.f, 0.f, 0.f, 0.2f);
+
+        if(!Controls::g_renderTouchscreen)
+            XRender::renderTexture(SharedCursor.X, SharedCursor.Y, GFX.ECursor[2]);
     }
 
     for(int row = 0; row < s_current_keymap_rows; row ++)
@@ -584,9 +604,6 @@ bool KeyboardMouseRender(bool mouse, bool render)
             }
         }
     }
-
-    if(!Controls::g_renderTouchscreen)
-        XRender::renderTexture(SharedCursor.X, SharedCursor.Y, GFX.ECursor[2]);
 
     return false;
 }
@@ -616,7 +633,7 @@ const std::string& Run(const std::string& Prompt, const std::string Value)
     find_utf_offsets(Text.c_str(), s_Text_UTF_offsets);
     find_utf_offsets(s_Prompt.c_str(), s_Prompt_UTF_offsets);
     s_cursor = (int)s_Text_UTF_offsets.size() - 1;
-    s_mouse_up = 2;
+    s_mouse_state = MouseState::canceled;
     s_cur_level = 0;
     s_cur_row = 0;
     s_cur_col = 0;
@@ -647,12 +664,22 @@ void Render()
 
 bool Logic()
 {
-    if(SharedCursor.Primary)
-        s_mouse_up = 0;
-    else if(s_mouse_up == 0)
-        s_mouse_up = 1;
+    if(s_mouse_state == MouseState::canceled)
+    {
+        if(!SharedCursor.Primary)
+            s_mouse_state = MouseState::canceled_2;
+    }
+    else if(s_mouse_state == MouseState::canceled_2)
+    {
+        if(!SharedCursor.Primary)
+            s_mouse_state = MouseState::up;
+    }
+    else if(SharedCursor.Primary)
+        s_mouse_state = MouseState::down;
+    else if(s_mouse_state == MouseState::down)
+        s_mouse_state = MouseState::just_released;
     else
-        s_mouse_up = 2;
+        s_mouse_state = MouseState::up;
 
     if(KeyboardMouseRender(true, false))
     {
@@ -718,7 +745,8 @@ bool Logic()
     }
     else
     {
-        s_render_sel = true;
+        if(MenuCursorCanMove)
+            s_render_sel = true;
         MenuCursorCanMove = false;
         s_timer --;
         if(s_timer == 0)
