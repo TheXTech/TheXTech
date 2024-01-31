@@ -372,7 +372,8 @@
             "restartLevel": "重新开始",
             "returnToEditor": "返回编辑器",
             "saveAndContinue": "保存并继续",
-            "saveAndQuit": "保存并退出"
+            "saveAndQuit": "保存并退出",
+            "playerSetup": "玩家设置"
         },
         "message": {
             "scanningLevels": "扫描关卡中……"
@@ -579,7 +580,8 @@
             "mainExit": "退出",
             "mainMultiplayerGame": "双人游戏",
             "mainOptions": "设置",
-            "mainStartGame": "开始游戏"
+            "mainStartGame": "开始游戏",
+            "mainPlayEpisode": "开始游戏"
         },
         "options": {
             "optionsModeFullScreen": "全屏模式",
