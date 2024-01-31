@@ -637,14 +637,18 @@ void PlayMusic(const std::string &Alias, int fadeInMs)
         pLogWarning("Unknown music alias '%s'", Alias.c_str());
 }
 
-void PlaySfx(const std::string &Alias, int loops, int volume)
+void PlaySfx(const std::string &Alias, int loops, int volume, uint8_t left, uint8_t right)
 {
     auto sfx = sound.find(Alias);
     if(sfx != sound.end())
     {
         auto &s = sfx->second;
         if(!s.isSilent)
-            Mix_PlayChannelVol(s.channel, s.chunk, loops, volume);
+        {
+            int channel = Mix_PlayChannelVol(s.channel, s.chunk, loops, volume);
+            if(channel >= 0)
+                Mix_SetPanning(channel, left, right);
+        }
     }
 }
 
@@ -1249,6 +1253,37 @@ void PlaySound(int A, int loops, int volume)
     {
         std::string alias = fmt::format_ne("sound{0}", A);
         PlaySfx(alias, loops, volume);
+        s_resetSoundDelay(A);
+    }
+}
+
+void PlaySoundSpatial(int A, int l, int t, int r, int b, int loops, int volume)
+{
+    if(noSound)
+        return;
+
+    if(GameMenu || GameOutro) // || A == 26 || A == 27 || A == 29)
+        return;
+
+    if(A > (int)g_totalSounds) // Play fallback sound for the missing SFX
+        A = getFallbackSfx(A);
+    else if(!s_useIceBallSfx && A == SFX_Iceball)
+        A = SFX_Fireball; // Fell back into fireball when iceball sound isn't preferred
+    else if(!s_useIceBallSfx && A == SFX_HeroIce)
+        A = SFX_HeroFire;
+    else if(!s_useNewIceSfx && (A == SFX_Freeze || A == SFX_Icebreak))
+        A = SFX_ShellHit; // Restore the old behavior
+
+    if(g_ClonedPlayerMode)
+        SoundPause[10] = 1;
+
+    if(SoundPause[A] == 0) // if the sound wasn't just played
+    {
+        uint8_t left, right;
+        Sound_ResolveSpatialMod(left, right, l, t, r, b);
+
+        std::string alias = fmt::format_ne("sound{0}", A);
+        PlaySfx(alias, loops, volume, left, right);
         s_resetSoundDelay(A);
     }
 }

@@ -25,6 +25,8 @@
 #include <string>
 #include <cstdint>
 
+#include "location.h"
+
 // Public musicPlaying As Boolean
 extern bool musicPlaying;
 // Public musicLoop As Integer
@@ -180,7 +182,7 @@ void SoundPauseEngine(int paused);
 // Public Sub PlayMusic(Alias As String)
 void PlayMusic(const std::string &Alias, int fadeInMs = 0);
 // Public Sub PlaySfx(Alias As String)
-void PlaySfx(const std::string &Alias, int loops = 0, int volume = 128);
+void PlaySfx(const std::string &Alias, int loops = 0, int volume = 128, uint8_t left = 255, uint8_t right = 255);
 // Public Sub StopSfx(Alias As String)
 void StopSfx(const std::string &Alias);
 // Public Sub StartMusic(A As Integer) 'play music
@@ -205,6 +207,29 @@ void UnloadSound();
 // Public Sub PlaySound(A As Integer) 'play a sound
 // play a sound
 void PlaySound(int A, int loops = 0, int volume = 128);
+
+// NEW: play a sound with spatial awareness
+void PlaySoundSpatial(int A, int l, int t, int r, int b, int loops = 0, int volume = 128);
+
+// public signatures for spatial sound feature
+inline void PlaySoundSpatial(int A, const Location_t& loc, int loops = 0, int volume = 128)
+{
+    PlaySoundSpatial(A, loc.X, loc.Y, loc.X + loc.Width, loc.Y + loc.Height, loops, volume);
+}
+
+inline void PlaySoundSpatial(int A, const SpeedlessLocation_t& loc, int loops = 0, int volume = 128)
+{
+    PlaySoundSpatial(A, loc.X, loc.Y, loc.X + loc.Width, loc.Y + loc.Height, loops, volume);
+}
+
+inline void PlaySoundSpatial(int A, int x, int y, int loops = 0, int volume = 128)
+{
+    PlaySoundSpatial(A, x, y, x, y, loops, volume);
+}
+
+// NEW: internal function to determine the panning for a sound (defined in sound_spatial.cpp)
+void Sound_ResolveSpatialMod(uint8_t& left, uint8_t& right, int l, int t, int r, int b);
+
 // Check does sound is defined at sounds.ini
 bool HasSound(int A);
 void PlaySoundMenu(int A, int loops = 0);
