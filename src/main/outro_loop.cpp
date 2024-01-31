@@ -361,6 +361,10 @@ void SetupCredits()
     AddCredit("ThatRoadRunnerfan727 (Matthew)"); // For Nintendo Switch alpha testing on hardware
     AddCredit("RMN Community"); // For Quality Episodes that allowed us to refine the Engine
     AddCredit("Savby"); // For important design work on the character select screen (ConnectScreen)
+    AddCredit("Otabo"); /* For the "Sarasaland Adventure" projects (both 1 and 2) that was being widely used in
+                           tests and debugs: and also, they introduced the SMBX to me (Vitaliy), in 2013
+                           and inspired me to all my future projects (Moondust Project and TheXTech).
+                        */  // --- P.S. Put all next lines under THIS comment line. ---
 #endif
     AddCredit("");
     AddCredit("4matsy");
