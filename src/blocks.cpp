@@ -114,7 +114,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
                 if(transform_to)
                     SwapCharacter(whatPlayer, transform_to, false, true);
 
-                PlaySound(SFX_Transform);
+                PlaySoundSpatial(SFX_Transform, b.Location);
             }
             else
             {
@@ -176,16 +176,16 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
     }
 
 
-    if(Block[A].Type == 169)
+    if(b.Type == 169)
     {
-        PlaySound(SFX_PSwitch);
+        PlaySoundSpatial(SFX_PSwitch, b.Location);
         BeltDirection = -BeltDirection; // for the blet direction changing block
     }
 
 
     if(b.Type == 170) // smw switch blocks
     {
-        PlaySound(SFX_PSwitch);
+        PlaySoundSpatial(SFX_PSwitch, b.Location);
         for(auto B = 1; B <= numBlock; B++)
         {
             if(Block[B].Type == 171)
@@ -203,7 +203,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
 
     if(b.Type == 173) // smw switch blocks
     {
-        PlaySound(SFX_PSwitch);
+        PlaySoundSpatial(SFX_PSwitch, b.Location);
         for(auto B = 1; B <= numBlock; B++)
         {
             if(Block[B].Type == 174)
@@ -221,7 +221,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
 
     if(b.Type == 176) // smw switch blocks
     {
-        PlaySound(SFX_PSwitch);
+        PlaySoundSpatial(SFX_PSwitch, b.Location);
         for(auto B = 1; B <= numBlock; B++)
         {
             if(Block[B].Type == 177)
@@ -239,7 +239,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
 
     if(b.Type == 179) // smw switch blocks
     {
-        PlaySound(SFX_PSwitch);
+        PlaySoundSpatial(SFX_PSwitch, b.Location);
         for(auto B = 1; B <= numBlock; B++)
         {
             if(Block[B].Type == 180)
@@ -327,11 +327,11 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
                             nn.Type = NPCID_GEM_5;
                         if(iRand(60) < 3)
                             nn.Type = NPCID_GEM_20;
-                        PlaySound(SFX_HeroRupee);
+                        PlaySoundSpatial(SFX_HeroRupee, b.Location);
                     }
                     else
                     {
-                        PlaySound(SFX_Coin);
+                        PlaySoundSpatial(SFX_Coin, b.Location);
                     }
 
                     auto &nLoc = nn.Location;
@@ -373,7 +373,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
                         Coins = 99;
                     }
                 }
-                PlaySound(SFX_Coin);
+                PlaySoundSpatial(SFX_Coin, b.Location);
                 NewEffect(EFFID_COIN_BLOCK_S3, b.Location);
                 b.Special -= 1;
             }
@@ -430,7 +430,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
                 nn.Location.SpeedY = -(dRand() * 4) - 3;
                 nn.Special = 1;
                 nn.Immune = 20;
-                PlaySound(SFX_Coin);
+                PlaySoundSpatial(SFX_Coin, b.Location);
                 syncLayers_NPC(numNPCs);
                 CheckSectionNPC(numNPCs);
                 b.Special -= 1;
@@ -452,7 +452,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
                     }
                 }
 
-                PlaySound(SFX_Coin);
+                PlaySoundSpatial(SFX_Coin, b.Location);
                 NewEffect(EFFID_COIN_BLOCK_S3, b.Location);
                 b.Special -= 1;
             }
@@ -474,7 +474,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
                 }
             }
 
-            PlaySound(SFX_Coin);
+            PlaySoundSpatial(SFX_Coin, b.Location);
             NewEffect(EFFID_COIN_BLOCK_S3, b.Location);
             b.Special -= 1;
         }
@@ -692,10 +692,10 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
                     case NPCID_GRN_VINE_TOP_S3:
                     case NPCID_RED_VINE_TOP_S3:
                     case NPCID_GRN_VINE_TOP_S4:
-                        PlaySound(SFX_SproutVine);
+                        PlaySoundSpatial(SFX_SproutVine, b.Location);
                         break;
                     default:
-                        PlaySound(SFX_ItemEmerge);
+                        PlaySoundSpatial(SFX_ItemEmerge, b.Location);
                         break;
                     }
                 }
@@ -710,7 +710,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
                     nn.Location.Height = 32;
 
                 nn.Effect = 3;
-                PlaySound(SFX_ItemEmerge);
+                PlaySoundSpatial(SFX_ItemEmerge, b.Location);
             }
 
             nn.Effect2 = 0;
@@ -859,6 +859,8 @@ void KillBlock(int A, bool Splode)
     Block_t blankBlock;
     bool tempBool = false;
 
+    Block_t& b = Block[A];
+
     if(Block[A].Hidden)
         return;
 
@@ -868,11 +870,12 @@ void KillBlock(int A, bool Splode)
     if(Splode)
     {
         if(Block[A].Type == 526)
-            PlaySound(SFX_SMBlockHit);
+            PlaySoundSpatial(SFX_SMBlockHit, b.Location);
         else if(Block[A].Type == 186)
-            PlaySound(SFX_Fireworks);
+            PlaySoundSpatial(SFX_Fireworks, b.Location);
         else
-            PlaySound(SFX_BlockSmashed); // Block smashed
+            PlaySoundSpatial(SFX_BlockSmashed, b.Location); // Block smashed
+
         // Create the break effect
         if(Block[A].Type == 60)
             NewEffect(EFFID_BLU_BLOCK_SMASH, Block[A].Location);
@@ -1391,7 +1394,7 @@ void UpdateBlocks()
                             {
                                 Player[B].Location.SpeedY = double(Physics.PlayerJumpVelocity);
                                 Player[B].StandUp = true;
-                                PlaySound(SFX_Stomp);
+                                PlaySoundSpatial(SFX_Stomp, Player[B].Location);
                             }
                             else
                             {
@@ -1399,7 +1402,7 @@ void UpdateBlocks()
                                 {
                                     Player[B].Location.SpeedY = double(Physics.PlayerJumpVelocity);
                                     Player[B].StandUp = true;
-                                    PlaySound(SFX_Stomp);
+                                    PlaySoundSpatial(SFX_Stomp, Player[B].Location);
                                 }
                             }
                         }
@@ -1445,7 +1448,12 @@ void UpdateBlocks()
         {
             StopMusic();
             StartMusic(-1);
-            PlaySound(SFX_PSwitch);
+
+            if(PSwitchPlayer >= 1 && PSwitchPlayer <= numPlayers)
+                PlaySoundSpatial(SFX_PSwitch, Player[PSwitchPlayer].Location);
+            else
+                PlaySound(SFX_PSwitch);
+
             PSwitch(true);
         }
 
