@@ -69,6 +69,9 @@ static bool s_NPC_MustBeCanonical_internal(const NPC_t& n)
         || n.Type == NPCID_STONE_S4
         || n.Type == NPCID_METALBARREL
         || n.Type == NPCID_CANNONENEMY
+        || n.Type == NPCID_BULLET
+        || n.Type == NPCID_BIG_BULLET
+        || n.Type == NPCID_GHOST_FAST
         || n.Type == NPCID_STATUE_S3
         || n.Type == NPCID_STATUE_S4
         || n.Type == NPCID_HOMING_BALL_GEN
