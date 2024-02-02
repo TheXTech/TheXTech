@@ -471,10 +471,16 @@ class numeric_limits<fmt::internal::DummyInt> :
     }
     if (x < 0) return true;
     if (!isnotanumber(x)) return false;
+#ifndef _WIN32
     int dec = 0, sign = 0;
     char buffer[2];  // The buffer size must be >= 2 or _ecvt_s will fail.
     _ecvt_s(buffer, sizeof(buffer), x, 0, &dec, &sign);
     return sign != 0;
+#else
+    char buffer[2];
+    snprintf(buffer, 2, "%g", x);
+    return buffer[0] == '-';
+#endif
   }
 };
 }  // namespace std
