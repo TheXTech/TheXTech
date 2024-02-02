@@ -1410,9 +1410,9 @@ void StackWalker::OnSymInit(LPCSTR szSearchPath, DWORD symOptions, LPCSTR szUser
     if(GetVersionExA(&ver) != FALSE)
     {
         sprintf_s(buffer, STACKWALK_MAX_NAMELEN, "OS-Version: %ld.%ld.%ld (%s)\n",
-                  (int32_t)ver.dwMajorVersion,
-                  (int32_t)ver.dwMinorVersion,
-                  (int32_t)ver.dwBuildNumber,
+                  (long)ver.dwMajorVersion,
+                  (long)ver.dwMinorVersion,
+                  (long)ver.dwBuildNumber,
                   ver.szCSDVersion);
         ansi2utf8(buffer, STACKWALK_MAX_NAMELEN);
         OnOutput(buffer);
