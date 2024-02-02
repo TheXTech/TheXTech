@@ -1182,7 +1182,7 @@ void ModernNPCScreenLogic(Screen_t& screen, int vscreen_i, bool fill_draw_queue,
 
         // Note that this condition, NPC[A].TimeLeft == 0 or 1, is practically never encountered when the NPC is onscreen,
         //   except in the conditional activation code.
-        if(NPC[A].TimeLeft == 0 || NPC[A].TimeLeft == 1)
+        if((NPC[A].TimeLeft == 0 || NPC[A].TimeLeft == 1) && (!NPC[A].Reset[1] || !NPC[A].Reset[2]))
         {
             if(render && !can_activate)
             {
@@ -1209,10 +1209,10 @@ void ModernNPCScreenLogic(Screen_t& screen, int vscreen_i, bool fill_draw_queue,
         {
             Location_t tempLocation = NPC[A].Location;
             tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[10] / 2.0;
-            tempLocation.Y += tempLocation.Height / 2.0 - EffectHeight[10] / 2.0;
-            NewEffect(EFFID_SMOKE_S3, tempLocation);
+                tempLocation.Y += tempLocation.Height / 2.0 - EffectHeight[10] / 2.0;
+                NewEffect(EFFID_SMOKE_S3, tempLocation);
 
-            // disable the NPC intro
+                // disable the NPC intro
             s_RemoveIntroNPC(NPC_intro_index);
             NPC_intro_index = NPC_intro_count;
         }
@@ -1293,7 +1293,7 @@ void ModernNPCScreenLogic(Screen_t& screen, int vscreen_i, bool fill_draw_queue,
                     NPC[A].TimeLeft = Physics.NPCTimeOffScreen;
             }
 
-            // mark reset if it is currently active, or it has never been offscreen since deactivating
+            // mark no-reset if it is currently active, or it has never been offscreen since deactivating
             if((NPC[A].Active || !NPC[A].Reset[2]) && NPC[A].Reset[1])
             {
                 NPC[A].Reset[1] = false;
