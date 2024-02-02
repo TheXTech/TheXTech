@@ -26,9 +26,12 @@
 
 bool NPC_MustBeCanonical(NPCRef_t n);
 
-bool NPC_MustNotRenderInactive(const NPC_t& n);
+// four possible render outcomes for an NPC: ignore (hide with no effect), render normally, hide with smoke effect, or shade (the default)
+bool NPC_InactiveIgnore(const NPC_t& n);
 
-bool NPC_MustRenderInactive(const NPC_t& n);
+bool NPC_InactiveRender(const NPC_t& n);
+
+bool NPC_InactiveSmoke(const NPC_t& n);
 
 void NPC_ConstructCanonicalSet();
 

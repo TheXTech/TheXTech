@@ -350,7 +350,14 @@ int16_t NPC_intro[NPC_intro_count_MAX];
 // positive values represent just-activated onscreen NPCs; negative values represent conditionally active NPCs
 int8_t NPC_intro_frame[NPC_intro_count_MAX];
 
-inline void ProcessIntroNPCFrames()
+static inline void s_RemoveIntroNPC(int i)
+{
+    NPC_intro_count--;
+    NPC_intro[i] = NPC_intro[NPC_intro_count];
+    NPC_intro_frame[i] = NPC_intro_frame[NPC_intro_count];
+}
+
+static inline void ProcessIntroNPCFrames()
 {
     for(uint8_t i = 0; i < NPC_intro_count; i++)
     {
@@ -359,9 +366,7 @@ inline void ProcessIntroNPCFrames()
         // two termination conditions, remove the NPC from the intro list either way
         if(NPC_intro_frame[i] == NPC_intro_length || NPC_intro_frame[i] == 0)
         {
-            NPC_intro_count--;
-            NPC_intro[i] = NPC_intro[NPC_intro_count];
-            NPC_intro_frame[i] = NPC_intro_frame[NPC_intro_count];
+            s_RemoveIntroNPC(i);
 
             // don't advance the iteration counter, since a new NPC is here now
             i--;
@@ -374,11 +379,11 @@ static inline void s_get_NPC_tint(int A, XTColor& cn)
 {
     const NPC_t& n = NPC[A];
 
-    if(!LevelEditor && g_config.render_inactive_NPC == Config_t::INACTIVE_NPC_SHADE)
+    if(!LevelEditor)
     {
         if(!n.Active)
         {
-            if(!NPC_MustRenderInactive(n))
+            if(!NPC_InactiveRender(n))
             {
                 cn = XTColorF(0.0f, 0.0f, 0.0f, 0.4f);
                 return;
@@ -1151,8 +1156,6 @@ void ModernNPCScreenLogic(Screen_t& screen, int vscreen_i, bool fill_draw_queue,
                 can_activate = onscreen_canonical;
             else
                 can_activate = render;
-
-            // can_activate = cannot_reset = onscreen_canonical;
         }
 
         if(NPC[A].Generator)
@@ -1162,9 +1165,7 @@ void ModernNPCScreenLogic(Screen_t& screen, int vscreen_i, bool fill_draw_queue,
         }
 
         if(NPC[A].Type == 0)
-        {
             render = false;
-        }
 
         // find the intro frame index for this NPC; will be NPC_intro_count if not found
         uint8_t NPC_intro_index;
@@ -1201,21 +1202,29 @@ void ModernNPCScreenLogic(Screen_t& screen, int vscreen_i, bool fill_draw_queue,
 
         // if the NPC is in the "conditional activation" state but didn't activate, then allow it to reset even when onscreen
         if(NPC_intro_index < NPC_intro_count && NPC_intro_frame[NPC_intro_index] < 0)
-        {
             cannot_reset = can_activate;
+
+        // if in "poof" mode, render the smoke effect on the first frame of the intro for an active NPC, then cancel the intro
+        if(NPC_intro_index < NPC_intro_count && NPC_intro_frame[NPC_intro_index] > 0 && NPC[A].Active && NPC_InactiveSmoke(NPC[A]))
+        {
+            Location_t tempLocation = NPC[A].Location;
+            tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[10] / 2.0;
+            tempLocation.Y += tempLocation.Height / 2.0 - EffectHeight[10] / 2.0;
+            NewEffect(EFFID_SMOKE_S3, tempLocation);
+
+            // disable the NPC intro
+            s_RemoveIntroNPC(NPC_intro_index);
+            NPC_intro_index = NPC_intro_count;
         }
 
         // this section of the logic handles NPCs that are onscreen but not active yet
         if(!NPC[A].Active && render)
         {
-            // Don't show a Cheep that hasn't jumped yet, a podoboo that hasn't started coming out yet,
-            //   a piranha plant that hasn't emerged yet, etc. Also, don't do poofs for them, etc.
-            if(NPC_MustNotRenderInactive(NPC[A]))
-            {
+            // Don't show a fish that hasn't jumped yet, a lava bubble that hasn't started coming out yet,
+            //   a plant that hasn't emerged yet, etc. Also, don't do poofs for them, since they handle their own intros.
+            if(NPC_InactiveIgnore(NPC[A]))
                 render = false;
-            }
-
-            else if(g_config.render_inactive_NPC != Config_t::INACTIVE_NPC_SHOW && !NPC_MustRenderInactive(NPC[A]))
+            else if(!NPC_InactiveRender(NPC[A]))
             {
                 // add to queue of hidden NPCs
                 if(!can_activate)
@@ -1229,33 +1238,18 @@ void ModernNPCScreenLogic(Screen_t& screen, int vscreen_i, bool fill_draw_queue,
 
                     // keep it hidden
                     if(NPC_intro_index < NPC_intro_count && NPC_intro_frame[NPC_intro_index] >= 0)
-                    {
                         NPC_intro_frame[NPC_intro_index] = 0;
-                    }
                 }
 
-                // if in "poof" mode, render this effect here
-                if(g_config.render_inactive_NPC == Config_t::INACTIVE_NPC_HIDE)
-                {
-                    if(can_activate && (NPC[A].Reset[1] && NPC[A].Reset[2]))
-                    {
-                        // if it was hidden, then add the poof effect!
-                        if(NPC_intro_index < NPC_intro_count && NPC_intro_frame[NPC_intro_index] > 0)
-                        {
-                            Location_t tempLocation = NPC[A].Location;
-                            tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[10] / 2.0;
-                            tempLocation.Y += tempLocation.Height / 2.0 - EffectHeight[10] / 2.0;
-                            NewEffect(10, tempLocation);
-                        }
-                    }
-                    else
-                    {
-                        render = false;
-                    }
-                }
+                // if in "poof" mode, cancel render, but still set the intro frames as above so we can spawn the Smoke effect
+                if(NPC_InactiveSmoke(NPC[A]))
+                    render = false;
             }
         }
 
+        // TODO: experiment with allowing resetting NPCs that are onscreen, cannot activate, and are not rendered
+        // if(!can_activate && !render && onscreen)
+        //     cannot_reset = false;
 
         // activate the NPC if allowed
         if(can_activate)

@@ -88,7 +88,7 @@ bool NPC_MustBeCanonical(NPCRef_t n)
     return n->_priv_force_canonical;
 }
 
-bool NPC_MustNotRenderInactive(const NPC_t& n)
+bool NPC_InactiveIgnore(const NPC_t& n)
 {
     return (NPCIsCheep(n) && Maths::iRound(n.Special) == 2)
         || n.Type == NPCID_LAVABUBBLE
@@ -98,7 +98,7 @@ bool NPC_MustNotRenderInactive(const NPC_t& n)
         || n.Type == NPCID_LAVA_MONSTER;
 }
 
-bool NPC_MustRenderInactive(const NPC_t& n)
+bool NPC_InactiveRender(const NPC_t& n)
 {
     return n.Inert
         || n.Stuck
@@ -131,6 +131,11 @@ bool NPC_MustRenderInactive(const NPC_t& n)
         || n.Type == NPCID_FLY_CANNON
         || n.Type == NPCID_MAGIC_DOOR
         || n.Type == NPCID_DOOR_MAKER;
+}
+
+bool NPC_InactiveSmoke(const NPC_t& n)
+{
+    return n.Type == NPCID_BULLET || n.Type == NPCID_BIG_BULLET || n.Type == NPCID_GHOST_FAST;
 }
 
 void NPC_ConstructCanonicalSet()
