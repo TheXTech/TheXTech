@@ -420,7 +420,7 @@ void DropAdd_Start()
 
 int PlayerBox::CalcIndex() const
 {
-    if(this >= &s_players[0] && this < &s_players[maxLocalPlayers])
+    if(this >= &s_players[0] && this <= &s_players[maxLocalPlayers - 1])
     {
         return this - &s_players[0];
     }
