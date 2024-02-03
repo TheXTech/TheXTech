@@ -25,8 +25,7 @@
 #include <stdint.h>
 
 // VB6 Integer type had 16-bit precision, but this is not ideal on modern platforms. Decide based on memory constraint.
-// TEMPORARY: use 32-bit integers on all platforms instead of 16-bit while tracing some bugs
-#if 0 // #ifdef LOW_MEM
+#ifdef LOW_MEM
     using vbint_t = int16_t;
 #else
     using vbint_t = int;
