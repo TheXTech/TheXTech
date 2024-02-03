@@ -130,6 +130,7 @@ void UpdateGraphics2(bool skipRepaint)
     }
     else
     {
+        SetupScreens();
         GetvScreenWorld(vScreen[Z]);
 
         if(qScreen)
