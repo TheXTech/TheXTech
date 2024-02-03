@@ -31,6 +31,7 @@ Changelog for 1.3.6.4-dev
 -Fix Emscripten bug where worlds created in the editor would get lost on page refresh (@ds-sloth)
 -Remove option "osk-fill-screen"; this behavior is now used whenever a touchscreen is active (@ds-sloth)
 -Fix TheXTech 1.3.6.1 crash on activating a joystick with an empty SDL name (@ds-sloth)
+-Fixed the TheXTech 1.3.6.3's startup crash on some 32-bit Windows systems. (@Wohlstand)
 
 Changelog for 1.3.6.3
 -Fixed a TheXTech 1.3.6.1 crash where object lookup table could not process items with negative size (@ds-sloth)
