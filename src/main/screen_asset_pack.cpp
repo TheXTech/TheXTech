@@ -57,7 +57,7 @@ static bool s_ensure_idx_valid()
 
     for(const auto& pack : asset_packs)
     {
-        if(pack.path == AppPath && pack.id == g_AssetPackID)
+        if(pack.path == AppPath && pack.full_id() == g_AssetPackID)
             return true;
 
         s_cur_idx++;
@@ -152,7 +152,7 @@ void DrawBackground(double fade)
     // draw current logo in all cases (needed for cases where title card is not in GFX.MenuGFX[2])
     if(!gfx.logo.inited)
     {
-        SuperPrintScreenCenter(pack.id, 3, XRender::TargetH / 2 - 20, color);
+        SuperPrintScreenCenter(pack.full_id(), 3, XRender::TargetH / 2 - 20, color);
         SuperPrintScreenCenter(pack.path, 3, XRender::TargetH / 2 + 2, color);
     }
     else if(g_LoopActive || s_AnimatingBack)
@@ -277,7 +277,7 @@ bool Logic()
         {
             s_cur_idx = cur_idx;
             CommonFrame = 0; // don't show indicators
-            if(!ReloadAssetsFrom(GetAssetPacks()[cur_idx].path))
+            if(!ReloadAssetsFrom(GetAssetPacks()[cur_idx]))
             {
                 s_cur_idx = -1;
                 s_AnimatingBack = true;

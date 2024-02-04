@@ -18,6 +18,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <algorithm>
+
 #include <AppPath/app_path.h>
 
 #include <Utils/files.h>
@@ -27,6 +29,7 @@
 
 #include "main/asset_pack.h"
 #include "core/render.h"
+#include "core/msgbox.h"
 
 #include "presetup.h"
 #include "gfx.h"
@@ -73,12 +76,12 @@ static inline void s_load_image(StdPicture& dest, std::string nameWithPng)
 #endif
 
 #if !defined(X_NO_PNG_GIF)
-    if(!dest.inited)
+    if(!dest.inited && Files::fileExists(nameWithPng))
         XRender::lazyLoadPicture(dest, nameWithPng);
 #endif
 }
 
-static AssetPack_t s_scan_asset_pack(const std::string& path, const char* default_name, bool skip_graphics = false)
+static AssetPack_t s_scan_asset_pack(const std::string& path, bool skip_graphics = false)
 {
     AssetPack_t ret;
     ret.path = path;
@@ -105,8 +108,7 @@ static AssetPack_t s_scan_asset_pack(const std::string& path, const char* defaul
 
         gameinfo.beginGroup("game");
         gameinfo.read("id", ret.id, ret.id);
-        bool provides_smbx64_default = ret.id.empty();
-        gameinfo.read("provides-smbx64", ret.provides_smbx64, provides_smbx64_default);
+        gameinfo.read("version", ret.version, ret.version);
         gameinfo.endGroup();
 
         gameinfo.beginGroup("android");
@@ -116,9 +118,6 @@ static AssetPack_t s_scan_asset_pack(const std::string& path, const char* defaul
         gameinfo.read("background-delay", ret.gfx->bg_frame_ticks, ret.gfx->bg_frame_ticks);
         gameinfo.endGroup();
     }
-
-    if(ret.id.empty())
-        ret.id = default_name;
 
     // don't allow any dirsep characters in asset pack ID
     for(char& c : ret.id)
@@ -154,23 +153,49 @@ static void s_find_asset_packs()
 {
     pLogDebug("Looking for asset packs...");
 
+    std::string custom_root = AppPathManager::userAddedAssetsRoot();
+
     DirMan assets;
     std::vector<std::string> subdirList;
     std::string subdir;
 
+    bool found_debug = false;
+
     for(const std::string& root : AppPathManager::assetsSearchPath())
     {
+        // check for a root passed via `-c`
+        bool is_custom_root = !custom_root.empty() && root == custom_root;
+
         D_pLogDebug(" Checking %s", root.c_str());
         if(DirMan::exists(root + "graphics/ui/"))
         {
-            AssetPack_t pack = s_scan_asset_pack(root, "");
+            AssetPack_t pack = s_scan_asset_pack(root);
+
+            // strip the ID from a legacy asset pack
+            if(!is_custom_root)
+            {
+                if(!pack.id.empty() && !pack.version.empty())
+                    pack.version = pack.id + '-' + pack.version;
+                else if(!pack.id.empty())
+                    pack.version = pack.id;
+
+                pack.id = "";
+            }
+
             if(!pack.gfx || !pack.gfx->logo.inited)
-                pLogWarning("Could not load UI assets from possible asset pack [%s], ignoring", pack.path.c_str());
+                pLogWarning("Could not load UI assets from %s asset pack [%s], ignoring", (is_custom_root) ? "user-specified" : "possible legacy", pack.path.c_str());
+            else if(is_custom_root && pack.id.empty())
+                pLogWarning("Could not read ID of user-specified asset pack [%s], ignoring", pack.path.c_str());
+            else if(found_debug && (g_AssetPackID.empty() || pack.full_id() != g_AssetPackID))
+                pLogDebug("Legacy/debug assets already found, ignoring assets at [%s]", pack.path.c_str());
             else
+            {
+                found_debug = true;
                 s_asset_packs.push_back(std::move(pack));
+            }
         }
 
-        if(DirMan::exists(root + "assets/"))
+        if(!is_custom_root && DirMan::exists(root + "assets/"))
         {
             assets.setPath(root + "assets/");
             assets.getListOfFolders(subdirList);
@@ -178,12 +203,17 @@ static void s_find_asset_packs()
             for(const std::string& sub : subdirList)
             {
                 subdir = root + "assets/" + sub;
+
                 D_pLogDebug("  Checking %s", subDir.c_str());
+
                 if(DirMan::exists(subdir + "/graphics/ui/"))
                 {
-                    AssetPack_t pack = s_scan_asset_pack(subdir, sub.c_str());
+                    AssetPack_t pack = s_scan_asset_pack(subdir);
+
                     if(!pack.gfx || !pack.gfx->logo.inited)
                         pLogWarning("Could not load UI assets from possible asset pack [%s], ignoring", pack.path.c_str());
+                    else if(pack.id.empty())
+                        pLogWarning("Could not read ID of possible asset pack [%s], ignoring", pack.path.c_str());
                     else
                         s_asset_packs.push_back(std::move(pack));
                 }
@@ -196,7 +226,7 @@ static void s_find_asset_packs()
         pLogDebug("Found asset packs:");
 
         for(const AssetPack_t& pack : s_asset_packs)
-            pLogDebug("- %s (%s)", pack.id.c_str(), pack.path.c_str());
+            pLogDebug("- %s (%s)", pack.full_id().c_str(), pack.path.c_str());
     }
     else
         pLogCritical("Could not find any asset packs.");
@@ -204,85 +234,115 @@ static void s_find_asset_packs()
     s_found_asset_packs = true;
 }
 
-static AssetPack_t s_find_pack_init(const std::string& id)
+static AssetPack_t s_find_pack_init(const std::string& full_id)
 {
-    if(id.find('/') != std::string::npos)
-        return s_scan_asset_pack(id, "", true);
+    std::string id = full_id;
+    std::string version;
 
-    bool id_is_smbx64 = (id == "smbx64");
+    auto slash_pos = id.find('/');
+
+    if(slash_pos != std::string::npos)
+    {
+        version = id.substr(slash_pos + 1);
+        id.resize(slash_pos);
+    }
+
+    std::string custom_root = AppPathManager::userAddedAssetsRoot();
 
     DirMan assets;
     std::vector<std::string> subdirList;
     std::string subdir;
 
+    AssetPack_t any_pack;
+    AssetPack_t id_match;
+
     for(const std::string& root : AppPathManager::assetsSearchPath())
     {
+        // skip a root passed via `-c` (if there are no matches, load that by path later)
+        bool is_custom_root = !custom_root.empty() && root == custom_root;
+
+        // check for legacy debug assets
         if(DirMan::exists(root + "graphics/ui/"))
         {
-            AssetPack_t maybe = s_scan_asset_pack(root, "", true);
-            if(id.empty() || maybe.id == id || (id_is_smbx64 && maybe.provides_smbx64))
-                return maybe;
+            AssetPack_t pack = s_scan_asset_pack(root, true);
+
+            // strip the ID from a legacy asset pack
+            if(!is_custom_root)
+            {
+                if(!pack.id.empty() && !pack.version.empty())
+                    pack.version = pack.id + '-' + pack.version;
+                else if(!pack.id.empty())
+                    pack.version = pack.id;
+
+                pack.id = "";
+            }
+
+            if(is_custom_root && pack.id.empty())
+            {
+                pLogWarning("Could not read ID of command-line specified asset pack [%s], ignoring", pack.path.c_str());
+                pLogCritical("gameinfo.ini of command-line specified asset pack [%s] has not been updated to specify its asset pack ID. After updating, you will need to move your gamesaves to settings/gamesaves/<ID>.", pack.path.c_str());
+
+                XMsgBox::errorMsgBox("Critical error",
+                                     "gameinfo.ini of command-line specified asset pack has not been updated to specify its asset pack ID.\n"
+                                     "After updating, you will need to manually move your gamesaves to settings/gamesaves/<ID>.\n");
+            }
+            else if(is_custom_root && pack.path == full_id)
+                return pack;
+            else if(pack.id == id && pack.version == version)
+                return pack;
+            else if(!pack.id.empty() && pack.id == id && id_match.path.empty())
+                id_match = std::move(pack);
+            else if(any_pack.path.empty())
+                any_pack = std::move(pack);
         }
 
-        if(DirMan::exists(root + "assets/"))
+        if(!is_custom_root && DirMan::exists(root + "assets/"))
         {
             assets.setPath(root + "assets/");
             assets.getListOfFolders(subdirList);
 
-            for(const std::string& pack : subdirList)
+            for(const std::string& sub : subdirList)
             {
-                subdir = root + "assets/" + pack;
+                subdir = root + "assets/" + sub;
+
                 if(DirMan::exists(subdir + "/graphics/ui/"))
                 {
-                    AssetPack_t maybe = s_scan_asset_pack(subdir, pack.c_str(), true);
-                    if(id.empty() || maybe.id == id || (id_is_smbx64 && maybe.provides_smbx64))
-                        return maybe;
+                    AssetPack_t pack = s_scan_asset_pack(subdir, true);
+                    if(pack.id.empty())
+                        pLogWarning("Could not read ID of possible asset pack [%s], ignoring", pack.path.c_str());
+                    else if(pack.id == id && pack.version == version)
+                        return pack;
+                    else if(pack.id == id && id_match.path.empty())
+                        id_match = std::move(pack);
+                    else if(any_pack.path.empty())
+                        any_pack = std::move(pack);
                 }
             }
         }
     }
 
-    if(id.empty())
+    if(!id_match.path.empty())
+        return id_match;
+    else if(full_id.empty() && !any_pack.path.empty())
+        return any_pack;
+
+    if(full_id.empty())
         pLogCritical("Could not find any asset packs.");
 
     return AssetPack_t();
 }
 
-static std::vector<AssetPack_t>::iterator s_find_pack(const std::string& id)
+
+bool ReloadAssetsFrom(const AssetPack_t& pack)
 {
-    if(!s_found_asset_packs)
-        s_find_asset_packs();
-
-    for(auto it = s_asset_packs.begin(); it != s_asset_packs.end(); ++it)
-    {
-        if(it->path == id || it->id == id)
-            return it;
-    }
-
-    return s_asset_packs.end();
-}
-
-
-
-bool ReloadAssetsFrom(const std::string& id)
-{
-    pLogDebug("= Trying to load asset pack %s", id.c_str());
-
-    auto it = s_find_pack(id);
-    if(it == s_asset_packs.end())
-    {
-        pLogWarning("Couldn't find asset pack");
-        return false;
-    }
-
-    const AssetPack_t& pack = *it;
+    pLogDebug("= Trying to load asset pack \"%s/\" from [%s]", pack.id.c_str(), pack.version.c_str(), pack.path.c_str());
 
     std::string OldAppPath = AppPath;
     std::string OldAssetPackID = g_AssetPackID;
 
     AppPathManager::setCurrentAssetPack(pack.id, pack.path);
     AppPath = AppPathManager::assetsRoot();
-    g_AssetPackID = pack.id;
+    g_AssetPackID = pack.full_id();
 
     UnloadCustomGFX();
     UnloadWorldCustomGFX();
@@ -303,6 +363,7 @@ bool ReloadAssetsFrom(const std::string& id)
         GFX.load();
 
         // also, remove from list of valid asset packs
+        auto it = std::find(s_asset_packs.begin(), s_asset_packs.end(), pack);
         if(it != s_asset_packs.end())
         {
             pLogDebug("Removed %s from asset pack list because it is missing UI assets", pack.path.c_str());
@@ -323,11 +384,21 @@ bool ReloadAssetsFrom(const std::string& id)
 
 bool InitUIAssetsFrom(const std::string& id)
 {
+    std::string custom_root = AppPathManager::userAddedAssetsRoot();
+
     pLogDebug("Searching for asset packs in:");
     for(const std::string& root : AppPathManager::assetsSearchPath())
     {
-        pLogDebug("- %s", root.c_str());
-        pLogDebug("- %sassets/*", root.c_str());
+        // treat command-line specified locations as direct storage
+        if(!custom_root.empty() && root == custom_root)
+        {
+            pLogDebug("- %s", root.c_str());
+        }
+        else
+        {
+            pLogDebug("- %s (legacy)", root.c_str());
+            pLogDebug("- %sassets/*", root.c_str());
+        }
     }
 
     AssetPack_t pack;
@@ -336,13 +407,20 @@ bool InitUIAssetsFrom(const std::string& id)
         pLogDebug("Trying to load CLI-specified asset pack [%s]", id.c_str());
         pack = s_find_pack_init(id);
 
+        // not found, perhaps it was not updated
         if(pack.path.empty())
-            pack.path = id;
+        {
+            XMsgBox::errorMsgBox("Fatal error",
+                                 "Could not load command-line specified asset pack: " + id);
+            pLogFatal("Command-line specified asset pack [%s] could not be loaded.", id.c_str());
+            return false;
+        }
     }
     else
     {
         pLogDebug("Trying to load most recent asset pack [ID: %s]", g_preSetup.assetPack.c_str());
         pack = s_find_pack_init(g_preSetup.assetPack);
+
         if(pack.path.empty())
         {
             pLogDebug("Couldn't find recent asset pack, loading any other assets");
@@ -355,7 +433,7 @@ bool InitUIAssetsFrom(const std::string& id)
 
     AppPathManager::setCurrentAssetPack(pack.id, pack.path);
     AppPath = AppPathManager::assetsRoot();
-    g_AssetPackID = pack.id;
+    g_AssetPackID = pack.full_id();
 
     pLogDebug("Loading assets from %s", AppPath.c_str());
 

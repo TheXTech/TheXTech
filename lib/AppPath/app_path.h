@@ -64,6 +64,12 @@ public:
     static void initAppPath();
 
     /*!
+     * \brief Check the user added assets root (so that it can be treated differently than other members of the search path)
+     * \return root passed to addAssetsRoot()
+     */
+    static std::string userAddedAssetsRoot(); // Read-Only
+
+    /*!
      * \brief Get a list of folders that should be searched for asset packs (each folder directly, and also each subdirectory in folder + "/assets"). Does not change after initAppPath() is called.
      * \return Vector of paths to the read-only assets directory, always ends with a slash
      */

@@ -44,18 +44,33 @@ struct AssetPack_t
     };
 
     std::string id;
+    std::string version;
+
     std::string path;
 
     std::unique_ptr<Gfx> gfx;
 
-    bool provides_smbx64 = false;
+    bool operator==(const AssetPack_t& o) const
+    {
+        return this == &o;
+    }
+
+    std::string full_id() const
+    {
+        if(id.empty() && version.empty())
+            return "";
+        else if(version.empty())
+            return id;
+
+        return id + "/" + version;
+    }
 };
 
 //! reports currently discovered asset pack IDs
 const std::vector<AssetPack_t>& GetAssetPacks();
 
 //! changes the AppPath and reloads assets from a desired asset pack
-bool ReloadAssetsFrom(const std::string& id);
+bool ReloadAssetsFrom(const AssetPack_t& pack);
 
 //! initalizes the AppPath and loads GFX from a desired asset pack
 bool InitUIAssetsFrom(const std::string& id);

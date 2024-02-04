@@ -144,6 +144,11 @@ defaultSettingsPath:
 #endif
 }
 
+std::string AppPathManager::userAddedAssetsRoot()
+{
+    return m_customAssetsRoot;
+}
+
 std::vector<std::string> AppPathManager::assetsSearchPath()
 {
     std::vector<std::string> out;
@@ -191,7 +196,7 @@ void AppPathManager::setCurrentAssetPack(const std::string &id, const std::strin
     m_currentAssetPackPath = path;
     appendSlash(m_currentAssetPackPath);
 
-    if(!id.empty() && id != "smbx64")
+    if(!id.empty())
         m_assetPackPostfix = id + "/";
     else
         m_assetPackPostfix = "";
@@ -234,7 +239,7 @@ void AppPathManager::initSettingsPath()
     initString(m_settingsPath, AppPathP::settingsRoot(), m_userPath + "settings/");
 
     // Default settings path
-    initString(m_gamesavesPath, AppPathP::gamesavesRoot(), m_settingsPath + "gamesaves/");
+    initString(m_gamesavesPath, AppPathP::gamesavesRoot(), m_settingsPath + "gamesaves/" + m_assetPackPostfix);
 
     // Check if need to use system-wide screenshots directory
     initString(m_screenshotsPath, AppPathP::screenshotsRoot(), m_userPath + "screenshots/" + m_assetPackPostfix);
@@ -333,17 +338,17 @@ std::string AppPathManager::gameSaveRootDir() // Writable
 
 std::string AppPathManager::gameplayRecordsRootDir() // Writable
 {
-    return m_userPath + "gameplay-records/";
+    return m_userPath + "gameplay-records/" + m_assetPackPostfix;
 }
 
 std::string AppPathManager::userWorldsRootDir() // Readable
 {
-    return m_userPath + "worlds/";
+    return m_userPath + "worlds/" + m_assetPackPostfix;
 }
 
 std::string AppPathManager::userBattleRootDir() // Readable
 {
-    return m_userPath + "battle/";
+    return m_userPath + "battle/" + m_assetPackPostfix;
 }
 
 void AppPathManager::install()
