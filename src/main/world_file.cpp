@@ -55,7 +55,6 @@ bool OpenWorld(std::string FilePath)
     // USE PGE-FL here
     // std::string newInput = "";
     int FileRelease = 64;
-    bool compatModern = (CompatGetLevel() == COMPAT_MODERN);
     int A = 0;
     int B = 0;
     // long long zCounter = 0;
@@ -130,18 +129,11 @@ bool OpenWorld(std::string FilePath)
     blockCharacter[1] = wld.nocharacter1;
     blockCharacter[2] = wld.nocharacter2;
 
-    if(FileRelease >= 30 || !compatModern)
-    {
-        blockCharacter[3] = wld.nocharacter3;
-        blockCharacter[4] = wld.nocharacter4;
-        blockCharacter[5] = wld.nocharacter5;
-    }
-    else
-    {
-        blockCharacter[3] = true;
-        blockCharacter[4] = true;
-        blockCharacter[5] = true;
-    }
+    // previously checked FileRelease here
+    // if(FileRelease >= 30 || !compatModern)
+    blockCharacter[3] = wld.nocharacter3;
+    blockCharacter[4] = wld.nocharacter4;
+    blockCharacter[5] = wld.nocharacter5;
 
     // cancel block if cheat is active
     if(g_forceCharacter && !LevelEditor && !WorldEditor)
@@ -380,6 +372,8 @@ bool OpenWorld(std::string FilePath)
         tr.loadWorldTranslation(FileNameFull);
 
     LoadCustomSound();
+
+    // the version targeting below is from SMBX 1.3
 
     if(!LevelEditor)
     {

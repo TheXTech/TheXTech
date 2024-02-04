@@ -179,7 +179,7 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
 
     bool compatModern = (CompatGetLevel() == COMPAT_MODERN);
     bool isSmbx64 = (lvl.meta.RecentFormat == LevelData::SMBX64);
-    int  fVersion = lvl.meta.RecentFormatVersion;
+    // int  fVersion = lvl.meta.RecentFormatVersion;
 
     if(!FilePath.empty())
     {
@@ -593,10 +593,10 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         block.forceSmashable = false;
         if(b.id == 90)
         {
-            if(lvl.meta.RecentFormat == LevelData::SMBX64 && lvl.meta.RecentFormatVersion < 20)
-                block.forceSmashable = true; // Restore bricks algorithm for turn blocks for SMBX19 and lower
-            else
-                block.forceSmashable = (bool)b.special_data; // load it if set in the modern format
+            // if(lvl.meta.RecentFormat == LevelData::SMBX64 && lvl.meta.RecentFormatVersion < 20)
+            //     block.forceSmashable = true; // Restore bricks algorithm for turn blocks for SMBX19 and lower
+            // else
+            block.forceSmashable = (bool)b.special_data; // load it if set in the modern format
         }
 
         block.Invis = b.invisible;
@@ -712,19 +712,21 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
             variantHandled = true;
         }
 
-        if(compatModern && isSmbx64)
+        // if(compatModern && isSmbx64)
+        // {
+        //     // legacy Smbx64 NPC behavior tracking moved to npc_special_data.h
+        //     npc.Variant = find_legacy_Variant(npc.Type, fVersion);
+        // }
+        // else
+
+        // don't load anything for SMBX64 files
+        if(isSmbx64)
         {
-            // legacy Smbx64 NPC behavior tracking moved to npc_special_data.h
-            npc.Variant = find_legacy_Variant(npc.Type, fVersion);
-        }
-        else if(isSmbx64)
-        {
-            // don't load anything for SMBX64 files
             npc.Variant = 0;
         }
+        // only load Variant for NPCs that support it
         else if(find_Variant_Data(npc.Type) /* && compatModern */)
         {
-            // only load Special7 for NPCs that support it
             if((n.special_data < 0) || (n.special_data >= 256))
                 pLogWarning("Attempted to load npc Type %d with out-of-range variant index %f", npc.Type, n.special_data);
             else
@@ -735,55 +737,6 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
             if(!variantHandled)
                 npc.Variant = 0;
         }
-
-        // All of the following duplicate the new Special7 code.
-        // That code should be updated instead, because doing so is required to update the in-game editor.
-
-#if 0
-        if(npc.Type == NPCID_CANNONITEM) // billy gun
-        {
-            if(compatModern && isSmbx64 && fVersion < 28)
-                npc.Special7 = 2.0; // SMBX 1.1.x and 1.0.x behavior
-            else if(compatModern && isSmbx64 && fVersion < 51)
-                npc.Special7 = 1.0; // SMBX 1.2 behavior
-            else if(compatModern)
-                npc.Special7 = n.special_data; // SMBX 1.2.1 and newer behavior, customizable behavior
-        }
-
-        if(npc.Type == NPCID_STONE_S3)
-        {
-            if(compatModern && isSmbx64 && fVersion < 9)
-                npc.Special7 = 1.0; // Make twomps to fall always
-            else if(compatModern)
-                npc.Special7 = n.special_data;
-        }
-
-        if(npc.Type == NPCID_VILLAIN_S3)
-        {
-            if(compatModern && isSmbx64 && fVersion < 30)
-                npc.Special7 = 1.0; // Keep original behavior of Bowser as in SMBX 1.0
-            else if(compatModern)
-                npc.Special7 = n.special_data;
-        }
-
-        switch(npc.Type)
-        {
-        case NPCID_YEL_PLATFORM:
-        case NPCID_BLU_PLATFORM:
-        case NPCID_GRN_PLATFORM:
-        case NPCID_RED_PLATFORM:
-        case NPCID_PLATFORM_S3:
-        case NPCID_SAW:
-            if(compatModern && isSmbx64 && fVersion < 30)
-                npc.Special7 = 1.0; // Workaround for yellow platform at The Invasion 1 on the "Clown Car Parking" level
-            else if(compatModern)
-                npc.Special7 = n.special_data;
-            break;
-
-        default:
-            break;
-        }
-#endif
 
         npc.Generator = n.generator;
         if(npc.Generator)

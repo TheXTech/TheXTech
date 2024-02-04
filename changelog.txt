@@ -21,6 +21,7 @@ Changelog for 1.3.7-dev
 -Redesigned character select screen for multiplayer game start and player setup (@Savbyn, @ds-sloth)
 -Drop/add screen renamed to "Player Setup"
 -In modern gameplay, the main menu now has a single "Play Episode" item instead of separate 1P/2P items
+-COMPATIBILITY CHANGE: remove automatic version targeting for pre-SMBX 1.3 content (@ds-sloth)
 
 Changelog for 1.3.6.4-dev
 -Use OpenGL as the default renderer on supported platforms ("sdl" may be used in config.ini or at at the command line to request the SDL2 renderer)
