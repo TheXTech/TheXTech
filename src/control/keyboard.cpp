@@ -189,6 +189,8 @@ bool InputMethod_Keyboard::Update(int player, Controls_t& c, CursorControls_t& m
     // Cursor control (UDLR)
     if(cursor[0] || cursor[1] || cursor[2] || cursor[3])
     {
+        bool edge_scroll = LevelEditor && !MagicHand;
+
         if(m.X < 0)
             m.X = ScreenW / 2;
 
@@ -208,14 +210,34 @@ bool InputMethod_Keyboard::Update(int player, Controls_t& c, CursorControls_t& m
             m.Y -= 16.0;
 
         if(m.X < 0)
+        {
+            if(edge_scroll)
+                e.ScrollLeft += -m.X;
+
             m.X = 0;
+        }
         else if(m.X >= ScreenW)
+        {
+            if(edge_scroll)
+                e.ScrollRight += m.X - (ScreenW - 1);
+
             m.X = ScreenW - 1;
+        }
 
         if(m.Y < 0)
+        {
+            if(edge_scroll)
+                e.ScrollUp += -m.Y;
+
             m.Y = 0;
+        }
         else if(m.Y >= ScreenH)
+        {
+            if(edge_scroll)
+                e.ScrollDown += m.Y - (ScreenH - 1);
+
             m.Y = ScreenH - 1;
+        }
 
         m.Move = true;
     }
