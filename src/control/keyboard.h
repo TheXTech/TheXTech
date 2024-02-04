@@ -112,6 +112,12 @@ public:
     const uint8_t *m_keyboardState;
     int m_keyboardStateSize = 0;
 
+
+    // used by input methods for scrolling in editor
+    float m_scroll_x_precise = 0.0;
+    float m_scroll_y_precise = 0.0;
+
+
     InputMethodType_Keyboard();
 
     const std::string& LocalName() const override;

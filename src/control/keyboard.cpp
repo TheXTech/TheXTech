@@ -75,6 +75,21 @@ bool InputMethod_Keyboard::Update(int player, Controls_t& c, CursorControls_t& m
     if(k->m_directText && GamePaused == PauseCode::TextEntry)
         return true;
 
+    // consume parent's precise scrolling
+    if(k->m_scroll_x_precise < 0)
+        e.ScrollLeft += -k->m_scroll_x_precise * 32.0;
+    else if(k->m_scroll_x_precise > 0)
+        e.ScrollRight += k->m_scroll_x_precise * 32.0;
+
+    if(k->m_scroll_y_precise < 0)
+        e.ScrollUp += -k->m_scroll_y_precise * 32.0;
+    else if(k->m_scroll_y_precise > 0)
+        e.ScrollDown += k->m_scroll_y_precise * 32.0;
+
+    k->m_scroll_x_precise = 0;
+    k->m_scroll_y_precise = 0;
+
+    // check for alt press (disables some keys)
     bool altPressed = (k->m_keyboardState[SDL_SCANCODE_LALT] ||
                        k->m_keyboardState[SDL_SCANCODE_RALT] ||
                        k->m_keyboardState[SDL_SCANCODE_LCTRL] ||
@@ -1336,6 +1351,23 @@ bool InputMethodType_Keyboard::ConsumeEvent(const SDL_Event* ev)
         {
             // scrolling up results in traversing items backwards
             this->m_scroll -= ev->wheel.y;
+
+#if SDL_VERSION_ATLEAST(2,0,18)
+            SDL_version ver;
+            SDL_GetVersion(&ver);
+
+            if(int(ver.major) * 0x10000 + int(ver.minor) * 0x100 + int(ver.patch) >= 2 * 0x10000 + 0 * 0x100 + 18)
+            {
+                this->m_scroll_x_precise += ev->wheel.preciseX;
+                this->m_scroll_y_precise -= ev->wheel.preciseY;
+            }
+            else
+#endif
+            {
+                this->m_scroll_x_precise += ev->wheel.x;
+                this->m_scroll_y_precise -= ev->wheel.y;
+            }
+
             return true;
         }
         else
