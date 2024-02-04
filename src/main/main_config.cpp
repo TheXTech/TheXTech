@@ -304,7 +304,6 @@ void OpenConfig()
         config.read("use-native-osk", g_config.use_native_osk, false);
         config.read("new-editor", g_config.enable_editor, false);
         config.read("enable-editor", g_config.enable_editor, g_config.enable_editor);
-        config.read("editor-edge-scroll", g_config.editor_edge_scroll, g_config.editor_edge_scroll);
         config.endGroup();
 
         config.beginGroup("video");
@@ -381,7 +380,6 @@ void SaveConfig()
     config.setValue("record-gameplay", g_config.RecordGameplayData);
     config.setValue("use-native-osk", g_config.use_native_osk);
     config.setValue("enable-editor", g_config.enable_editor);
-    config.setValue("editor-edge-scroll", g_config.editor_edge_scroll);
     config.setValue("language", g_config.language);
     config.endGroup();
 

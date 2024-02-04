@@ -601,6 +601,7 @@ void DrawEditorLevel(int Z)
                 XTColorF(1.f, 0.f, 0.f, 1.f), false);
         }
 
+#if 0
         if(g_config.editor_edge_scroll && !editorScreen.active && !MagicHand)
         {
             if(curX >= 0 && curX < 36)
@@ -612,6 +613,7 @@ void DrawEditorLevel(int Z)
             if(curY >= XRender::TargetH - 36)
                 curY = XRender::TargetH - 36;
         }
+#endif
 
         if(EditorCursor.Mode == 0 || EditorCursor.Mode == 6) // Eraser
         {
@@ -782,6 +784,8 @@ void DrawEditorWorld()
 
     double X = EditorCursor.X - vScreen[Z].TargetX();
     double Y = EditorCursor.Y - vScreen[Z].TargetY();
+
+#if 0
     if(g_config.editor_edge_scroll && !editorScreen.active && !MagicHand)
     {
         if(X >= 0 && X < 36)
@@ -793,6 +797,7 @@ void DrawEditorWorld()
         if(Y >= XRender::TargetH - 36)
             Y = XRender::TargetH - 36;
     }
+#endif
 
 #ifdef __3DS__
     // disable cursor rendering on inactive screen of 3DS

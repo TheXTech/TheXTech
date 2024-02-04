@@ -34,8 +34,6 @@ extern struct Config_t
     bool    use_native_osk = false;
     //! Enable the in-game editor
     bool    enable_editor = true;
-    //! Scroll when cursor is at edge of screen in editor
-    bool    editor_edge_scroll = false;
     //! Preferred file format for editor (0 is Moondust engine lvlx format)
     int     editor_preferred_file_format = 0;
     //! User's preferred language / dialect

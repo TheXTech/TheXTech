@@ -2406,6 +2406,7 @@ void GetEditorControls()
         PlaySound(SFX_Pause);
     }
 
+#if 0
     if(g_config.editor_edge_scroll && !editorScreen.active && !MagicHand) // scroll-by-edge
     {
         bool scrolled = false;
@@ -2444,6 +2445,7 @@ void GetEditorControls()
             XWindow::placeCursor(window_x, window_y);
         }
     }
+#endif
 
     if(EditorControls.ScrollDown || EditorControls.ScrollUp || EditorControls.ScrollLeft || EditorControls.ScrollRight)
     {

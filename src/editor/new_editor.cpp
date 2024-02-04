@@ -5232,6 +5232,7 @@ void EditorScreen::UpdateSelectorBar(CallMode mode, bool select_bar_only)
     {
         int X = e_CursorX;
         int Y = e_CursorY;
+#if 0
         if(g_config.editor_edge_scroll && !MagicHand)
         {
             if(X < 36)
@@ -5243,6 +5244,7 @@ void EditorScreen::UpdateSelectorBar(CallMode mode, bool select_bar_only)
             if(Y >= XRender::TargetH - 36)
                 Y = XRender::TargetH - 36;
         }
+#endif
 
 #ifdef __3DS__
         if(select_bar_only)

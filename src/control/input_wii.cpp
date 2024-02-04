@@ -1239,6 +1239,8 @@ void InputMethodType_Wii::UpdateControlsPost()
         SharedCursor.Move = true;
         SharedCursor.X = scr_x;
         SharedCursor.Y = scr_y;
+
+        // TODO: put editor edge scrolling logic here
     }
 }
 

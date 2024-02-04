@@ -507,7 +507,7 @@ bool InputMethod_Joystick::Update(int player, Controls_t& c, CursorControls_t& m
     {
         for(int i = 0; i < 4; i++)
         {
-            cursor[i] = 0.;
+            cursor[i] = 0.0;
             s_updateCtrlAnalogue(this->m_devices->ctrl, cursor[i], p->m_cursor_keys[i]);
             s_updateCtrlAnalogue(this->m_devices->ctrl, cursor[i], p->m_cursor_keys2[i]);
             s_updateCtrlAnalogue(this->m_devices->ctrl, scroll[i], p->m_editor_keys[i]);
@@ -518,7 +518,7 @@ bool InputMethod_Joystick::Update(int player, Controls_t& c, CursorControls_t& m
     {
         for(int i = 0; i < 4; i++)
         {
-            cursor[i] = 0.;
+            cursor[i] = 0.0;
             s_updateJoystickAnalogue(this->m_devices->joy, cursor[i], p->m_cursor_keys[i]);
             s_updateJoystickAnalogue(this->m_devices->joy, cursor[i], p->m_cursor_keys2[i]);
             s_updateJoystickAnalogue(this->m_devices->joy, scroll[i], p->m_editor_keys[i]);
@@ -529,13 +529,13 @@ bool InputMethod_Joystick::Update(int player, Controls_t& c, CursorControls_t& m
     // Scroll control (UDLR)
     double* const scroll_dest[4] = {&e.ScrollUp, &e.ScrollDown, &e.ScrollLeft, &e.ScrollRight};
     for(int i = 0; i < 4; i++)
-    {
         *scroll_dest[i] += scroll[i] * 10.;
-    }
 
     // Cursor control (UDLR)
     if(cursor[0] || cursor[1] || cursor[2] || cursor[3])
     {
+        bool edge_scroll = LevelEditor && !MagicHand;
+
         if(m.X < 0)
             m.X = XRender::TargetW / 2;
 
@@ -546,14 +546,34 @@ bool InputMethod_Joystick::Update(int player, Controls_t& c, CursorControls_t& m
         m.Y += (cursor[1] - cursor[0]) * 16.;
 
         if(m.X < 0)
+        {
+            if(edge_scroll)
+                e.ScrollLeft += -m.X;
+
             m.X = 0;
+        }
         else if(m.X >= XRender::TargetW)
+        {
+            if(edge_scroll)
+                e.ScrollRight += m.X - (XRender::TargetW - 1);
+
             m.X = XRender::TargetW - 1;
+        }
 
         if(m.Y < 0)
+        {
+            if(edge_scroll)
+                e.ScrollUp += -m.Y;
+
             m.Y = 0;
+        }
         else if(m.Y >= XRender::TargetH)
+        {
+            if(edge_scroll)
+                e.ScrollDown += m.Y - (XRender::TargetH - 1);
+
             m.Y = XRender::TargetH - 1;
+        }
 
         m.Move = true;
     }
