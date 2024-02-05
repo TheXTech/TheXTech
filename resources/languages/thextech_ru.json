@@ -123,7 +123,8 @@
                 "featureWorldStarDisplay": "Кол-во звёзд в мире.",
                 "featuresWillBeLost": "Функционал, который будет ПОТЕРЯН:",
                 "formatUnknown": "Запрошенный формат неизвестен.",
-                "noIssues": "Проблемы совместимости не найдены."
+                "noIssues": "Проблемы совместимости не найдены.",
+                "featureBgoOrder": "Фон.Об. исп. другой порядок отрисовки."
             },
             "formatLegacy": "Устаревший",
             "formatModern": "Современный",
@@ -325,7 +326,9 @@
             "phraseCreditIndex": "Титры, стрка {0}:",
             "retryOnFail": "Переигр. сразу",
             "totalStars": "Всего звёзд:"
-        }
+        },
+        "labelSortLayer": "Слой сорт.:",
+        "labelSortOffset": "Смещ.Сорт:"
     },
     "game": {
         "connect": {
@@ -367,7 +370,8 @@
             "restartLevel": "Начать сначала",
             "returnToEditor": "Назад в редактор",
             "saveAndContinue": "Сохранить и продолжить",
-            "saveAndQuit": "Сохранить и выйти"
+            "saveAndQuit": "Сохранить и выйти",
+            "playerSetup": "Настройки игрока"
         },
         "message": {
             "scanningLevels": "Чтение уровней..."
@@ -577,7 +581,8 @@
             "mainExit": "Выйти",
             "mainMultiplayerGame": "Игра вдвоём",
             "mainOptions": "Настройки",
-            "mainStartGame": "Начать игру"
+            "mainStartGame": "Начать игру",
+            "mainPlayEpisode": "Сыграть в эпизод"
         },
         "options": {
             "optionsModeFullScreen": "На весь экран",
