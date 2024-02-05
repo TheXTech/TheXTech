@@ -237,6 +237,14 @@ static void read_header()
     pLogDebug("Attempt to load level file %s for the replay", FullFileName.c_str());
 
     thisHash = md5::file_to_hashGC(FullFileName);
+
+    if(thisHash.empty())
+    {
+        FullFileName = AppPath + FullFileName;
+        pLogDebug("Not found; attempt to load level file %s for the replay", FullFileName.c_str());
+        thisHash = md5::file_to_hashGC(FullFileName);
+    }
+
     if(thisHash.empty())
         pLogCritical("Failed to retrieve the MD5 hash for %s file (probably, it doesn't exist)", FullFileName.c_str());
 
