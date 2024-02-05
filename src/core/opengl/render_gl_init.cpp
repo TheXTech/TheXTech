@@ -98,7 +98,7 @@ bool RenderGL::initOpenGL(const CmdLineSetup_t &setup)
     m_gContext = nullptr;
 
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 16);
+    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
 
     // user request sequence
 
