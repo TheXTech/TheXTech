@@ -1974,7 +1974,7 @@ static void s_drawGameVersion()
 
     constexpr bool is_dirty = in_string(V_BUILD_VER, '-');
 
-    constexpr bool show_branch = (!is_main && (is_release || !is_stable));
+    constexpr bool show_branch = (!is_main && !(is_release && is_stable));
     constexpr bool show_commit = (!is_release || (!is_main && !is_stable));
 
     // show version
