@@ -91,7 +91,8 @@ bool RenderGL::isWorking()
 
 RenderGL::VertexList& RenderGL::getOrderedDrawVertexList(RenderGL::DrawContext_t context, int depth)
 {
-    if(context == m_recent_draw_context)
+    // combine draw calls issued in sequence (except bitmask calls)
+    if(context == m_recent_draw_context && (!context.texture || !context.texture->d.mask_texture_id))
         return m_ordered_draw_queue[{m_recent_draw_context_depth, context}];
 
     // optimization for buffer-read shaders: only use a single depth per frame
