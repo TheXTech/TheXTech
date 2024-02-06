@@ -222,12 +222,28 @@ void FreeS(stringindex_t& index)
 
 std::string* PtrS(stringindex_t& index)
 {
+#ifdef STRS_UNIQUENESS_TRACKING
+    // deduplicate the string
+    std::string target;
+    if(index != STRINGINDEX_NONE && g_LevelStringUsages[index] > 1)
+    {
+        target = GetS(index);
+        FreeS(index);
+    }
+#endif
+
     if(index == STRINGINDEX_NONE)
     {
         if(g_LevelString.size() >= MaxLevelStrings)
             return nullptr;
+
         index = (stringindex_t)g_LevelString.size();
         g_LevelString.push_back(std::string());
+
+#ifdef STRS_UNIQUENESS_TRACKING
+        g_LevelStringUsages.push_back(1);
+        g_LevelString[index] = target;
+#endif
     }
 
     SDL_assert_release(index < g_LevelString.size());
