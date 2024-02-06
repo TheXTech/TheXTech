@@ -21,9 +21,7 @@
 #include "sdl_proxy/sdl_stdinc.h"
 #include "sdl_proxy/sdl_timer.h"
 
-#ifdef THEXTECH_BUILD_GL_MODERN
 #include <json/json.hpp>
-#endif
 
 #ifdef __16M__
 // used to clear loaded textures on level/world load
