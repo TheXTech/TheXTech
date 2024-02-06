@@ -51,7 +51,7 @@ extern const std::string& GetS(stringindex_t index);
  * \param index destinition string field
  * \param target Target string data to assign
  */
-extern void SetS(stringindex_t& index, const std::string& target);
+extern void SetS(stringindex_t& index, const std::string target);
 
 /*!
  * \brief Create new string index entry or return exist matching

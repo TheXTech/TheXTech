@@ -118,7 +118,7 @@ const std::string& GetS(stringindex_t index)
     return g_LevelString[index];
 }
 
-void SetS(stringindex_t& index, const std::string& target)
+void SetS(stringindex_t& index, const std::string target)
 {
     if(index == STRINGINDEX_NONE && target.empty())
         return;
