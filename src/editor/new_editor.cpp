@@ -3680,7 +3680,7 @@ void EditorScreen::UpdateWarpScreen(CallMode mode)
             EditorCursor.Warp.MapWarp = !EditorCursor.Warp.MapWarp;
             if(EditorCursor.Warp.MapWarp)
             {
-                EditorCursor.Warp.level = STRINGINDEX_NONE;
+                FreeS(EditorCursor.Warp.level);
                 EditorCursor.Warp.LevelEnt = false;
             }
         }
@@ -3697,7 +3697,7 @@ void EditorScreen::UpdateWarpScreen(CallMode mode)
                 EditorCursor.Warp.LevelEnt = false;
             }
             else
-                EditorCursor.Warp.level = STRINGINDEX_NONE;
+                FreeS(EditorCursor.Warp.level);
         }
 
         SuperPrintRightR(mode, g_editorStrings.warpOut, 3, 360, 234);
@@ -3706,7 +3706,7 @@ void EditorScreen::UpdateWarpScreen(CallMode mode)
             EditorCursor.Warp.LevelEnt = !EditorCursor.Warp.LevelEnt;
             if(EditorCursor.Warp.LevelEnt)
             {
-                EditorCursor.Warp.level = STRINGINDEX_NONE;
+                FreeS(EditorCursor.Warp.level);
                 EditorCursor.Warp.MapWarp = false;
             }
         }
