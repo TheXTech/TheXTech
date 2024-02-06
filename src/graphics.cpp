@@ -640,3 +640,22 @@ Location_t WorldLevel_t::LocationGFX()
 
     return ret;
 }
+
+Location_t WorldLevel_t::LocationOnscreen()
+{
+    Location_t ret = LocationGFX();
+
+    if(Path2)
+    {
+        if(ret.Height < 40)
+            ret.Height = 40;
+
+        if(ret.Width < 64)
+        {
+            ret.X += (ret.Width - 64) / 2;
+            ret.Width = 64;
+        }
+    }
+
+    return ret;
+}

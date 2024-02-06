@@ -332,10 +332,14 @@ void UpdateGraphics2(bool skipRepaint)
 
             g_stats.checkedLevels++;
 
-            Location_t locGFX = lvlP.LocationGFX();
+            // using this for the onscreen collision fixes bugs where levels with large graphics or Big Path backgrounds would not be drawn when partially offscreen
+            //   could use a compat check here to choose between LocationOnscreen and Location if desired
+            Location_t locOnscreen = lvlP.LocationOnscreen();
 
-            if(CheckCollision(sView, locGFX) && (WorldEditor || lvlP.Active))
+            if(CheckCollision(sView, locOnscreen) && (WorldEditor || lvlP.Active))
             {
+                Location_t locGFX = lvlP.LocationGFX();
+
                 g_stats.renderedLevels++;
 
                 if(lvlP.Path)
