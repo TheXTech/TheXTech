@@ -293,6 +293,7 @@ std::string FileName;
 std::string FileNameFull;
 std::string FullFileName;
 std::string FileNamePath;
+std::string FileRecentSubHubLevel;
 int FileFormat = 0;
 
 // backup information to restore when returning to world map
@@ -302,6 +303,7 @@ std::string FileNamePathWorld;
 int FileFormatWorld = 0;
 
 bool IsEpisodeIntro = false;
+bool IsHubLevel = false;
 int Coins = 0;
 float Lives = 0.0f;
 bool EndIntro = false;

@@ -968,7 +968,12 @@ int GameMain(const CmdLineSetup_t &setup)
 
                 std::string levelPath;
                 if(GoToLevel.empty())
-                    levelPath = SelectWorld[selWorld].WorldPath + StartLevel;
+                {
+                    if(FileRecentSubHubLevel.empty())
+                        levelPath = SelectWorld[selWorld].WorldPath + StartLevel;
+                    else
+                        levelPath = SelectWorld[selWorld].WorldPath + FileRecentSubHubLevel;
+                }
                 else
                 {
                     levelPath = SelectWorld[selWorld].WorldPath + GoToLevel;
@@ -1057,6 +1062,9 @@ int GameMain(const CmdLineSetup_t &setup)
             if(LevelRestartRequested && Checkpoint.empty())
                 StartWarp = lastWarpEntered; // When restarting a level (after death), don't restore an entered warp on checkpoints
 
+            if(IsHubLevel && StartWarp > 0) // Save the warp where player entered the hub
+                ReturnWarpSaved = StartWarp;
+
             qScreen = false;
             qScreen_canonical = false;
             LevelRestartRequested = false;
@@ -1065,7 +1073,7 @@ int GameMain(const CmdLineSetup_t &setup)
                 lastWarpEntered = StartWarp; // Re-use it when player re-enters a level after death (when option is toggled on)
 
 // for warp entrances
-            if((ReturnWarp > 0 && IsEpisodeIntro/*FileName == StartLevel*/) || (StartWarp > 0))
+            if((ReturnWarp > 0 && (IsEpisodeIntro || IsHubLevel)/*FileName == StartLevel*/) || (StartWarp > 0))
             {
                 for(int numPlayersMax = numPlayers, A = 1; A <= numPlayersMax; ++A)
                 {
@@ -2091,7 +2099,7 @@ void StartEpisode()
 
     SetupPlayers();
 
-    if(!StartLevel.empty())
+    if(!StartLevel.empty() || !FileRecentSubHubLevel.empty())
     {
         // TODO: why did Wohlstand disable this?
         PlaySoundMenu(SFX_LevelSelect);
@@ -2101,10 +2109,11 @@ void StartEpisode()
         ResetSoundFX();
         // todo: update this!
         ClearLevel();
-        std::string levelPath = SelectWorld[selWorld].WorldPath + StartLevel;
+        std::string levelName = (FileRecentSubHubLevel.empty() ? StartLevel : FileRecentSubHubLevel);
+        std::string levelPath = SelectWorld[selWorld].WorldPath + levelName;
         if(!OpenLevel(levelPath))
         {
-            MessageText = fmt::format_ne(g_gameStrings.errorOpenFileFailed, StartLevel);
+            MessageText = fmt::format_ne(g_gameStrings.errorOpenFileFailed, levelName);
             PauseGame(PauseCode::Message);
             ErrorQuit = true;
         }

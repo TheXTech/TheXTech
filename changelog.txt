@@ -22,6 +22,7 @@ Changelog for 1.3.7-dev
 -Drop/add screen renamed to "Player Setup"
 -In modern gameplay, the main menu now has a single "Play Episode" item instead of separate 1P/2P items
 -COMPATIBILITY CHANGE: remove automatic version targeting for pre-SMBX 1.3 content (@ds-sloth)
+-Added Sub-Hubs: it's will be possible to mark any level as a "sub-hub" where player can save the game and resume it from that level instead of the main hub (@Wohlstand)
 
 Changelog for 1.3.6.4-dev
 -Use OpenGL as the default renderer on supported platforms ("sdl" may be used in config.ini or at at the command line to request the SDL2 renderer)

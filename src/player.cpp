@@ -4867,7 +4867,7 @@ static inline bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool bac
                     plr.Warp = B;
                     plr.WarpBackward = backward;
                     ReturnWarp = B;
-                    if(IsEpisodeIntro && NoMap)
+                    if((IsEpisodeIntro && NoMap) || IsHubLevel)
                         ReturnWarpSaved = ReturnWarp;
                     StartWarp = warp.LevelWarp;
                     return true;
@@ -6616,7 +6616,7 @@ void PlayerEffects(const int A)
                 p.Effect = 8;
                 p.Effect2 = 2970;
                 ReturnWarp = p.Warp;
-                if(IsEpisodeIntro && NoMap)
+                if((IsEpisodeIntro && NoMap) || IsHubLevel)
                     ReturnWarpSaved = ReturnWarp;
                 StartWarp = warp.LevelWarp;
             }
@@ -7207,7 +7207,7 @@ void PlayerEffects(const int A)
                 p.Effect2 = 3000;
                 ReturnWarp = p.Warp;
 
-                if(IsEpisodeIntro && NoMap)
+                if((IsEpisodeIntro && NoMap) || IsHubLevel)
                     ReturnWarpSaved = ReturnWarp;
 
                 StartWarp = warp.LevelWarp;

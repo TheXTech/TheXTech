@@ -157,7 +157,7 @@ static bool s_QuitTesting()
 
 static bool s_SaveAndContinue()
 {
-    bool CanSave = (LevelSelect || (IsEpisodeIntro && NoMap)) && !Cheater;
+    bool CanSave = (LevelSelect || (IsEpisodeIntro && NoMap) || IsHubLevel) && !Cheater;
 
     if(CanSave)
     {
@@ -175,7 +175,7 @@ static bool s_SaveAndContinue()
 
 static bool s_Quit()
 {
-    bool CanSave = (LevelSelect || (IsEpisodeIntro && NoMap)) && !Cheater;
+    bool CanSave = (LevelSelect || (IsEpisodeIntro && NoMap) || IsHubLevel) && !Cheater;
 
     if(CanSave)
         SaveGame(); // "Save & Quit"
@@ -225,7 +225,7 @@ void Init(int plr, bool LegacyPause)
     // do a context-aware initialization of s_items
     s_items.clear();
 
-    bool CanSave = (LevelSelect || (IsEpisodeIntro && NoMap)) && !Cheater && !TestLevel;
+    bool CanSave = (LevelSelect || (IsEpisodeIntro && NoMap) || IsHubLevel) && !Cheater && !TestLevel;
 
     // add pause menu items
 

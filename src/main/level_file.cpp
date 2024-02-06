@@ -199,6 +199,25 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
 
     IsEpisodeIntro = (StartLevel == FileNameFull);
 
+    if(IsEpisodeIntro)
+    {
+        IsHubLevel = NoMap;
+        FileRecentSubHubLevel.clear();
+    }
+
+    // Level-wide extra settings
+    if(!lvl.custom_params.empty())
+    {
+        const nlohmann::json level_data = nlohmann::json::parse(lvl.custom_params);
+
+        if(!IsEpisodeIntro && level_data.contains("is_subhub"))
+        {
+            IsHubLevel = level_data.value("is_subhub", false);
+            if(IsHubLevel)
+                FileRecentSubHubLevel = FileNameFull;
+        }
+    }
+
     FileFormats::smbx64LevelPrepare(lvl);
     FileFormats::smbx64LevelSortBlocks(lvl);
     FileFormats::smbx64LevelSortBGOs(lvl);
@@ -1066,6 +1085,7 @@ void ClearLevel()
     NPCTraits[NPCID_MEDAL].Score = 6;
     RestoreWorldStrings();
     LevelName.clear();
+    IsHubLevel = false;
     ResetCompat();
     SetupPhysics();
     LoadNPCDefaults();
