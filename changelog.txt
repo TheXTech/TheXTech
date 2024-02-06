@@ -37,6 +37,7 @@ Changelog for 1.3.6.4-dev
 -Removed config option "editor-edge-scroll" (enable by default on gamepads) (@ds-sloth)
 -Add ability to scroll in editor using mouse wheel or touchpad (@ds-sloth)
 -Fix TheXTech 1.3.6.1 bug where bitmask GIFs would sometimes be rendered incorrectly (@ds-sloth)
+-Fix TheXTech 1.3.6 bug where the editor could occasionally crash when placing warps (@ds-sloth)
 
 Changelog for 1.3.6.3
 -Fixed a TheXTech 1.3.6.1 crash where object lookup table could not process items with negative size (@ds-sloth)
