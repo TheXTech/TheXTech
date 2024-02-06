@@ -260,6 +260,7 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
 
     g_curLevelMedals.prepare_lvl(lvl);
 
+    // Level-wide settings
     maxStars = lvl.stars;
     LevelName = lvl.LevelName;
 

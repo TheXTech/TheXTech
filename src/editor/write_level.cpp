@@ -28,6 +28,7 @@
 #include "npc_special_data.h"
 #include <PGE_File_Formats/file_formats.h>
 #include <AppPath/app_path.h>
+#include <fmt_format_ne.h>
 #include "Logger/logger.h"
 
 void SaveLevel(const std::string& FilePath, int format, int version)   // saves the level
@@ -104,6 +105,10 @@ void SaveLevel(const std::string& FilePath, int format, int version)   // saves 
     //     FileNamePath = Left(FileNamePath, Len(FileNamePath) - 1)
     // End If
 
+    // Level-wide extra settings (may use full JSON encoder in the future)
+    out.custom_params = fmt::sprintf_ne("{\"is_subhub\": %s}", (!IsEpisodeIntro && IsHubLevel) ? "true" : "false");
+
+    // sections
     for(int i = 0; i < numSections; ++i)
     {
         const auto &s = level[i];

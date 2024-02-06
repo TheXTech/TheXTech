@@ -1782,10 +1782,17 @@ void EditorScreen::UpdateSectionsScreen(CallMode mode)
         SuperPrintR(mode, g_mainMenu.caseNone, 3, 54, 60);
 
     SuperPrintR(mode, g_editorStrings.levelStartPos, 3, 10, 110);
-    if(UpdateButton(mode, 240, 100, GFXBlock[622], EditorCursor.SubMode == 4, 0, 0, 32, 32))
+    if(UpdateButton(mode, 240, 100 + 4, GFXBlock[622], EditorCursor.SubMode == 4, 0, 0, 32, 32))
         EditorCursor.SubMode = 4;
-    if(UpdateButton(mode, 280, 100, GFXBlock[623], EditorCursor.SubMode == 5, 0, 0, 32, 32))
+    if(UpdateButton(mode, 280, 100 + 4, GFXBlock[623], EditorCursor.SubMode == 5, 0, 0, 32, 32))
         EditorCursor.SubMode = 5;
+
+    if(FileFormat == FileFormats::LVL_PGEX && !IsEpisodeIntro)
+    {
+        if(UpdateCheckBox(mode, e_ScreenW/2 + 10 + 4, 100 + 4, IsHubLevel))
+            IsHubLevel = !IsHubLevel;
+        SuperPrintR(mode, g_editorStrings.levelIsHub, 3, e_ScreenW/2 + 54, 110);
+    }
 
     // section settings
     SuperPrintCenterR(mode, fmt::format_ne(g_editorStrings.phraseSectionIndex, curSection + 1), 3, 320, 166);
