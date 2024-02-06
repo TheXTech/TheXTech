@@ -300,7 +300,7 @@ inline Location_t extract_loc(MyRef_t obj)
 template<>
 inline Location_t extract_loc(WorldLevelRef_t obj)
 {
-    return obj->LocationGFX();
+    return obj->LocationOnscreen();
 }
 
 template<>

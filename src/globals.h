@@ -978,6 +978,10 @@ struct WorldLevel_t
     // NEW: returns graphical location extent (based on whether GFXLevelBig is set)
     //   defined in graphics.cpp
     Location_t LocationGFX();
+
+    // NEW: returns location extent, including big background paths, for onscreen checks
+    //   defined in graphics.cpp
+    Location_t LocationOnscreen();
 };
 
 //Public Type Warp 'warps such as pipes and doors
