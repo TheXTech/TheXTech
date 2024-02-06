@@ -333,7 +333,8 @@ static void s_InitBlockCharacter()
 
 void MainMenu_Start(int minPlayers)
 {
-    Controls::ClearInputMethods();
+    if((int)Controls::g_InputMethods.size() != minPlayers)
+        Controls::ClearInputMethods();
 
     s_minPlayers = minPlayers;
     s_context = Context::MainMenu;
@@ -455,13 +456,13 @@ void PlayerBox::Init()
 {
     int p = CalcIndex();
 
+    if(p < (int)Controls::g_InputMethods.size() && Controls::g_InputMethods[p])
+        m_state = PlayerState::SelectChar;
+    else
+        m_state = PlayerState::Disconnected;
+
     if(s_context == Context::DropAdd)
     {
-        if(p < (int)Controls::g_InputMethods.size() && Controls::g_InputMethods[p])
-            m_state = PlayerState::SelectChar;
-        else
-            m_state = PlayerState::Disconnected;
-
         g_charSelect[p] = Player[p + 1].Character;
     }
     else
