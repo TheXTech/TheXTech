@@ -1014,6 +1014,9 @@ int GameMain(const CmdLineSetup_t &setup)
                 // On a world map, reset this into default state
                 GoToLevelNoGameThing = false;
 
+                // Clear the recent hub level when entering a world map
+                FileRecentSubHubLevel.clear();
+
                 // Update graphics before loop begin (to process inital lazy-unpacking of used sprites)
                 UpdateGraphics2(true);
                 resetFrameTimer();
@@ -2111,14 +2114,17 @@ void StartEpisode()
         ResetSoundFX();
         // todo: update this!
         ClearLevel();
+
         std::string levelName = (FileRecentSubHubLevel.empty() ? StartLevel : FileRecentSubHubLevel);
         std::string levelPath = SelectWorld[selWorld].WorldPath + levelName;
+
         if(!OpenLevel(levelPath))
         {
             MessageText = fmt::format_ne(g_gameStrings.errorOpenFileFailed, levelName);
             PauseGame(PauseCode::Message);
             ErrorQuit = true;
         }
+
         GameThing(1000, 3);
     }
 }
