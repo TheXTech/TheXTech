@@ -167,6 +167,16 @@ void DrawBackground(double fade)
         XRender::renderTexture(XRender::TargetW / 2 - gfx.logo.w / 2, place_Y, gfx.logo);
     }
 
+    // show version if appropriate
+    bool show_version = pack.show_version && !pack.version.empty();
+    if(show_version || pack.id.empty())
+    {
+        int text_Y = XRender::TargetH / 2 + gfx.logo.h / 2 + 8;
+
+        const std::string& display = (show_version) ? pack.version : "<legacy>";
+        SuperPrintScreenCenter(display, 3, text_Y, color);
+    }
+
     // show scroll indicators
     if(g_LoopActive && CommonFrame % 90 >= 45)
     {

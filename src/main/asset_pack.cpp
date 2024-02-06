@@ -231,6 +231,29 @@ static void s_find_asset_packs()
     else
         pLogCritical("Could not find any asset packs.");
 
+    // check for duplicates
+    for(size_t i = 0; i < s_asset_packs.size(); i++)
+    {
+        for(size_t j = i + 1; j < s_asset_packs.size();)
+        {
+            if(s_asset_packs[i].id == s_asset_packs[j].id)
+            {
+                if(s_asset_packs[i].version == s_asset_packs[j].version)
+                {
+                    // erase a case with same ID and version
+                    s_asset_packs.erase(s_asset_packs.begin() + j);
+                    continue;
+                }
+
+                // if version is the distinguishing factor, display it
+                s_asset_packs[i].show_version = true;
+                s_asset_packs[j].show_version = true;
+            }
+
+            j++;
+        }
+    }
+
     s_found_asset_packs = true;
 }
 
