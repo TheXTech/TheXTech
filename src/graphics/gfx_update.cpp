@@ -2981,7 +2981,7 @@ void UpdateGraphicsScreen(Screen_t& screen)
 
                     if(w.save_info().inited() && w.save_info().max_medals > 0)
                     {
-                        uint8_t ckpt = (InHub() && Checkpoint == FileNamePath + GetS(w.level)) ? g_curLevelMedals.got : 0;
+                        uint8_t ckpt = (IsHubLevel && Checkpoint == FileNamePath + GetS(w.level)) ? g_curLevelMedals.got : 0;
 
                         DrawMedals(p_center_x, info_y, true, w.save_info().max_medals, 0, ckpt, w.save_info().medals_got, w.save_info().medals_best);
                     }

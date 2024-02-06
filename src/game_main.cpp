@@ -1064,6 +1064,8 @@ int GameMain(const CmdLineSetup_t &setup)
 
             if(IsHubLevel && StartWarp > 0) // Save the warp where player entered the hub
                 ReturnWarpSaved = StartWarp;
+            else if(IsHubLevel && ReturnWarp == 0)
+                ReturnWarpSaved = 0;
 
             qScreen = false;
             qScreen_canonical = false;

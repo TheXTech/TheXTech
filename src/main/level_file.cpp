@@ -206,13 +206,21 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
     // Level-wide extra settings
     if(!lvl.custom_params.empty())
     {
-        const nlohmann::json level_data = nlohmann::json::parse(lvl.custom_params);
-
-        if(!IsEpisodeIntro && level_data.contains("is_subhub"))
+        try
         {
-            IsHubLevel = level_data.value("is_subhub", false);
-            if(IsHubLevel)
-                FileRecentSubHubLevel = FileNameFull;
+            const nlohmann::json level_data = nlohmann::json::parse(lvl.custom_params);
+
+            if(!IsEpisodeIntro && level_data.contains("is_subhub"))
+            {
+                IsHubLevel = level_data.value("is_subhub", false);
+                if(IsHubLevel)
+                    FileRecentSubHubLevel = FileNameFull;
+            }
+        }
+        catch(const std::exception &e)
+        {
+            pLogWarning("Failed to load Level %s JSON data: %s", FileNameFull.c_str(), e.what());
+            IsHubLevel = false;
         }
     }
 
