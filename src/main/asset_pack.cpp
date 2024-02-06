@@ -204,7 +204,7 @@ static void s_find_asset_packs()
             {
                 subdir = root + "assets/" + sub;
 
-                D_pLogDebug("  Checking %s", subDir.c_str());
+                D_pLogDebug("  Checking %s", subdir.c_str());
 
                 if(DirMan::exists(subdir + "/graphics/ui/"))
                 {
