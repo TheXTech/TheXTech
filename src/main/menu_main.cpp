@@ -671,7 +671,15 @@ bool mainMenuUpdate()
     if(menuBackPress && menuDoPress)
         menuDoPress = false;
 
-    if(homePressed && s_can_enter_ap_screen() && MenuCursorCanMove && GetAssetPacks().size() > 1)
+    bool should_enter_ap_screen = homePressed && s_can_enter_ap_screen() && MenuCursorCanMove;
+
+    if(should_enter_ap_screen && GetAssetPacks().size() <= 1)
+    {
+        PlaySoundMenu(SFX_BlockHit);
+        MenuCursorCanMove = false;
+    }
+
+    if(should_enter_ap_screen && GetAssetPacks().size() > 1)
     {
         s_startAssetPackTimer++;
         if(s_startAssetPackTimer == 60)
