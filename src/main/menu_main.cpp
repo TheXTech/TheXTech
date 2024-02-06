@@ -352,13 +352,13 @@ void FindWorlds()
     };
 
     if(AppPathManager::userDirIsAvailable())
+    {
+        // assume that assets are not writable
         worldRoots.push_back({AppPathManager::userWorldsRootDir(), true});
+        worldRoots[0].editable = false;
+    }
 
 #ifdef APP_PATH_HAS_EXTRA_WORLDS
-    // can't edit base assets if they're a romfs package (different from the user dir)
-    if(AppPathManager::userDirIsAvailable())
-        worldRoots[0].editable = false;
-
     // add worlds from additional romfs packages
     for(const std::string& root : AppPathManager::worldRootDirs())
         worldRoots.push_back({root, false});
@@ -533,7 +533,11 @@ void FindLevels()
     };
 
     if(AppPathManager::userDirIsAvailable())
+    {
+        // assume that assets are not writable
         battleRoots.push_back({AppPathManager::userBattleRootDir(), true});
+        battleRoots[0].editable = false;
+    }
 
     SelectBattle.clear();
     SelectBattle.emplace_back(SelectWorld_t()); // Dummy entry
