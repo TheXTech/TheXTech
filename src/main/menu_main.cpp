@@ -1391,27 +1391,22 @@ bool mainMenuUpdate()
                             return true;
                         }
                     }
-                    // game mode
+                    // battle mode
+                    else if(MenuMode == MENU_BATTLE_MODE)
+                    {
+                        MenuMode = MENU_CHARACTER_SELECT_NEW_BM;
+                        ConnectScreen::MainMenu_Start(2);
+                    }
+                    // enter save select
                     else
                     {
-                        if(MenuMode != MENU_BATTLE_MODE)
-                            FindSaves();
-
-                        if(MenuMode == MENU_BATTLE_MODE)
-                        {
-                            MenuMode = MENU_CHARACTER_SELECT_NEW_BM;
-                            ConnectScreen::MainMenu_Start(2);
-                        }
-                        else
-                        {
-                            MenuMode *= MENU_SELECT_SLOT_BASE;
-                            MenuCursor = 0;
-                        }
+                        FindSaves();
+                        MenuMode *= MENU_SELECT_SLOT_BASE;
+                        MenuCursor = 0;
                     }
 
                     MenuCursorCanMove = false;
                 }
-
             }
 
             // New world select scroll options!
