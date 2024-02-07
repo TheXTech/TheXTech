@@ -36,7 +36,6 @@ enum class PlayerState
     Reconnecting,   // player requested to reconnect controller
     SelectProfile,  // selecting controls profile
     ConfirmProfile, // checking that player understands controls profile
-    StartGame,      // player is waiting for others to start game
     ForceDrop,      // player wants to force disconnected other players to drop (to leave drop/add screen)
 };
 
@@ -333,7 +332,8 @@ static void s_InitBlockCharacter()
 
 void MainMenu_Start(int minPlayers)
 {
-    Controls::ClearInputMethods();
+    if((int)Controls::g_InputMethods.size() != minPlayers)
+        Controls::ClearInputMethods();
 
     s_minPlayers = minPlayers;
     s_context = Context::MainMenu;
@@ -430,16 +430,8 @@ int PlayerBox::CalcIndex() const
 
 bool PlayerBox::Ready() const
 {
-    int p = CalcIndex();
-
     switch(m_state)
     {
-    case PlayerState::StartGame:
-        if(p >= (int)Controls::g_InputMethods.size() || !Controls::g_InputMethods[p])
-            return false;
-
-        return true;
-
     case PlayerState::Disconnected:
     case PlayerState::Reconnecting:
     case PlayerState::SelectProfile:
@@ -455,13 +447,13 @@ void PlayerBox::Init()
 {
     int p = CalcIndex();
 
+    if(p < (int)Controls::g_InputMethods.size() && Controls::g_InputMethods[p])
+        m_state = PlayerState::SelectChar;
+    else
+        m_state = PlayerState::Disconnected;
+
     if(s_context == Context::DropAdd)
     {
-        if(p < (int)Controls::g_InputMethods.size() && Controls::g_InputMethods[p])
-            m_state = PlayerState::SelectChar;
-        else
-            m_state = PlayerState::Disconnected;
-
         g_charSelect[p] = Player[p + 1].Character;
     }
     else
@@ -515,7 +507,7 @@ static bool CheckDone()
     int notDone;
     for(notDone = 0; notDone < n; notDone++)
     {
-        if(notDone == (int)Controls::g_InputMethods.size())
+        if(notDone == (int)Controls::g_InputMethods.size() || !Controls::g_InputMethods[notDone])
             break;
 
         if(!s_players[notDone].Ready())
@@ -775,11 +767,7 @@ bool PlayerBox::Back()
 
     PlaySoundMenu(SFX_Slide);
 
-    if(m_state == PlayerState::StartGame)
-    {
-        m_state = PlayerState::SelectChar;
-    }
-    else if(Is1P() && m_state == PlayerState::SelectProfile)
+    if(Is1P() && m_state == PlayerState::SelectProfile)
     {
         m_state = PlayerState::SelectChar;
         m_menu_item = 0;
@@ -864,30 +852,18 @@ bool PlayerBox::Do()
     // select char
     if(m_state == PlayerState::SelectChar)
     {
+        do_sentinel.active = false;
+
         if(IsMenu())
         {
-            m_state = PlayerState::StartGame;
-            m_menu_item = 0;
-            m_marquee_state.reset_width();
-            m_input_ready = true;
-
-            if(Is1P() && CheckDone())
+            if(CheckDone())
+            {
+                do_sentinel.active = true;
                 return true;
+            }
+            else
+                PlaySoundMenu(SFX_BlockHit);
         }
-        // nothing to do in drop/add
-        else
-        {
-            do_sentinel.active = false;
-        }
-    }
-    // waiting for start
-    else if(m_state == PlayerState::StartGame)
-    {
-        if(CheckDone())
-            return true;
-
-        PlaySoundMenu(SFX_BlockHit);
-        do_sentinel.active = false;
     }
     // select profile
     else if(m_state == PlayerState::SelectProfile)
@@ -1337,7 +1313,7 @@ bool PlayerBox::DrawChar(int x, int w, int y, int h, bool show_name)
     if(!player_flash || (CommonFrame % 60) < 30)
     {
         // always walk in Drop / Add, walk only after finalizing selection at main menu
-        bool player_walk = (s_context == Context::DropAdd || m_state == PlayerState::StartGame);
+        bool player_walk = (s_context == Context::DropAdd || !inactive);
 
         // find a spare player to edit
         int scratch_index = maxPlayers - maxLocalPlayers + 1 + p;
@@ -1464,10 +1440,6 @@ int PlayerBox::Mouse_Render_1P(bool render)
             return -1;
     }
 
-    // don't do any mouse logic in StartGame state (except for the global "Do" trigger)
-    if(m_state == PlayerState::StartGame && !render)
-        return 0;
-
     int MenuX, MenuY;
     GetMenuPos(&MenuX, &MenuY);
 
@@ -1523,7 +1495,7 @@ int PlayerBox::Mouse_Render_1P(bool render)
 // do the mouse logic and rendering for each player
 int PlayerBox::Mouse_Render(bool render, int x, int y, int w, int h)
 {
-    if(Is1P() && (m_state == PlayerState::SelectChar || m_state == PlayerState::StartGame))
+    if(Is1P() && (m_state == PlayerState::SelectChar))
         return Mouse_Render_1P(render);
 
     int p = CalcIndex();
@@ -1616,7 +1588,7 @@ int PlayerBox::Mouse_Render(bool render, int x, int y, int w, int h)
         }
 
         // confirmation progress
-        if(m_state == PlayerState::ConfirmProfile || m_state == PlayerState::StartGame || m_state == PlayerState::ForceDrop)
+        if(m_state == PlayerState::ConfirmProfile || m_state == PlayerState::ForceDrop)
         {
             int menu_progress = m_menu_item;
             int menu_max = 66 * 2;
@@ -1628,7 +1600,7 @@ int PlayerBox::Mouse_Render(bool render, int x, int y, int w, int h)
                 menu_max = 66 * 12;
             }
 
-            XTColor shade = (m_state == PlayerState::StartGame && !CheckDone()) ? XTColor(color.r / 2 + 64, color.g / 2 + 64, color.b / 2 + 64) : color * 0.95f;
+            XTColor shade = color * 0.95f;
             XRender::renderRect(x + 4, info_y + 4, (w - 8) * menu_progress / menu_max, info_height - 8, shade);
 
             // move infotext y up a bit, since controls will be drawn in main box (if at all)
@@ -1781,7 +1753,7 @@ int PlayerBox::Mouse_Render(bool render, int x, int y, int w, int h)
         int controls_x = 0;
         int controls_y = 0;
 
-        if(m_state == PlayerState::SelectProfile || m_state == PlayerState::StartGame || m_state == PlayerState::ForceDrop)
+        if(m_state == PlayerState::SelectProfile || m_state == PlayerState::ForceDrop)
         {
             // don't draw at all
         }
@@ -1868,13 +1840,6 @@ int PlayerBox::Mouse_Render(bool render, int x, int y, int w, int h)
         {
             // using marquee for profile name
             SuperPrintCenter(g_gameStrings.connectHoldStart, 5, cx, infotext_y, message_color);
-        }
-        else if(m_state == PlayerState::StartGame)
-        {
-            if(CheckDone())
-                message = &g_mainMenu.connectStartGame;
-            else if((CommonFrame % 60) < 30)
-                SuperPrintCenter(g_mainMenu.wordWaiting, 5, cx, infotext_y, XTAlphaF(0.75));
         }
         else if(m_state == PlayerState::ForceDrop)
         {
@@ -2303,29 +2268,6 @@ int PlayerBox::Logic()
     {
         if(Back())
             return -1;
-    }
-    else if(m_state == PlayerState::StartGame)
-    {
-        bool can_advance = CheckDone();
-
-        if(c.Start || c.Jump)
-            m_menu_item += 2;
-        else if(m_menu_item >= 0)
-            m_menu_item -= 2;
-
-        if(can_advance && m_menu_item > 66 * 2)
-            return Do();
-        else if(!can_advance && m_menu_item > 66 * 1)
-            m_menu_item = 66 * 1;
-        else if(m_menu_item < 0)
-        {
-            m_state = PlayerState::SelectChar;
-            m_menu_item = 0;
-            m_marquee_state.reset_width();
-            m_input_ready = false;
-        }
-
-        return 0;
     }
     else if(c.Jump || c.Start || (Is1P() && SharedControls.MenuDo))
     {
