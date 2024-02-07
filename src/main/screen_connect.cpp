@@ -507,7 +507,7 @@ static bool CheckDone()
     int notDone;
     for(notDone = 0; notDone < n; notDone++)
     {
-        if(notDone == (int)Controls::g_InputMethods.size())
+        if(notDone == (int)Controls::g_InputMethods.size() || !Controls::g_InputMethods[notDone])
             break;
 
         if(!s_players[notDone].Ready())
