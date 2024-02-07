@@ -19,16 +19,16 @@ jobs:
     runs-on: ubuntu-latest
     name: Build release-apk
     steps:
-      - uses: styfle/cancel-workflow-action@0.11.0
+      - uses: styfle/cancel-workflow-action@0.12.1
         with:
           workflow_id: android-ci.yml
           all_but_latest: true
           access_token: ${{ github.token }}
 
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
 #      - uses: nelonoel/branch-name@v1.0.1
-      - uses: Wohlstand/branch-name@v1.0.2-pr-test
+      - uses: Wohlstand/branch-name@v1.0.2-wohl
 
       - name: Check if a pull request
         id: event-check
@@ -156,14 +156,14 @@ jobs:
 
       - name: Upload APK
         if: success() && ${{ steps.signing-check.outputs.available == 'true' }}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: thextech-android-${BRANCH_NAME_RES}
           path: android-project/thextech-android-*.apk
 
       - name: Upload APK (unsigned)
         if: success() && ${{ steps.signing-check.outputs.available != 'true' }}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         continue-on-error: true
         with:
           name: thextech-android-${BRANCH_NAME_RES}-unsigned

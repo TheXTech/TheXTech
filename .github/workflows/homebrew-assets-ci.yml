@@ -73,7 +73,7 @@ jobs:
         echo "filename=assets-${{ matrix.source.id }}-${{ matrix.target.id }}.zip" >> $GITHUB_OUTPUT;
         echo "The target will be named: [assets-${{ matrix.source.id }}-${{ matrix.target.id }}.${{ matrix.target.package_ext }}]"
 
-    - uses: styfle/cancel-workflow-action@0.11.0
+    - uses: styfle/cancel-workflow-action@0.12.1
       with:
         workflow_id: homebrew-assets-ci.yml
         all_but_latest: true
@@ -91,7 +91,7 @@ jobs:
                        lftp
 
 #    - uses: nelonoel/branch-name@v1.0.1
-    - uses: Wohlstand/branch-name@v1.0.2-pr-test
+    - uses: Wohlstand/branch-name@v1.0.2-wohl
 
     - name: Check if a pull request
       id: event-check
@@ -116,7 +116,7 @@ jobs:
         ninja
         cp spc2it /usr/bin/spc2it
 
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Download assets
       uses: carlosperate/download-file-action@v2
@@ -168,7 +168,7 @@ jobs:
 
     - name: Upload artifact
       if: success()
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       continue-on-error: true
       with:
         path: package/${{ steps.res.outputs.filename }}
