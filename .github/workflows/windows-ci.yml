@@ -82,7 +82,7 @@ jobs:
           echo "available=false" >> $GITHUB_OUTPUT;
         fi
 
-    - uses: styfle/cancel-workflow-action@0.12.1
+    - uses: styfle/cancel-workflow-action@0.11.0
       with:
         workflow_id: windows-ci.yml
         all_but_latest: true
@@ -96,10 +96,10 @@ jobs:
         fi
         cmake --version
 
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v3
 
 #    - uses: nelonoel/branch-name@v1.0.1
-    - uses: Wohlstand/branch-name@v1.0.2-wohl
+    - uses: Wohlstand/branch-name@v1.0.2-pr-test
 
     - name: Check if a pull request
       id: event-check
@@ -261,7 +261,7 @@ jobs:
 
     - name: Upload artifact
       if: success() && runner.os == 'Linux'
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v3
       continue-on-error: true
       with:
         path: build/package/*.tar.gz
@@ -269,7 +269,7 @@ jobs:
 
     - name: Upload artifact
       if: success() && runner.os == 'Windows'
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v3
       continue-on-error: true
       with:
         path: build/package/*.7z

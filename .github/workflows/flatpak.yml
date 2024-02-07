@@ -43,7 +43,7 @@ jobs:
           echo "available=false" >> $GITHUB_OUTPUT;
         fi
 
-    - uses: styfle/cancel-workflow-action@0.12.1
+    - uses: styfle/cancel-workflow-action@0.11.0
       with:
         workflow_id: flatpak.yml
         all_but_latest: true
@@ -67,7 +67,7 @@ jobs:
         flatpak install -y flathub org.freedesktop.Platform/${{ matrix.arch.id }}/${{ matrix.arch.sdk_ver }} org.freedesktop.Sdk/${{ matrix.arch.id }}/${{ matrix.arch.sdk_ver }}
 
 #    - uses: nelonoel/branch-name@v1.0.1
-    - uses: Wohlstand/branch-name@v1.0.2-wohl
+    - uses: Wohlstand/branch-name@v1.0.2-pr-test
 
     - name: Check if a pull request
       id: event-check
@@ -81,7 +81,7 @@ jobs:
           echo "is_pull_request=false" >> $GITHUB_OUTPUT;
         fi
 
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v3
 
     - name: Pull submodules
       shell: bash
@@ -126,7 +126,7 @@ jobs:
 
     - name: Upload artifact
       if: success()
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v3
       continue-on-error: true
       with:
         path: package/thextech-${{ matrix.arch.name }}.flatpak
