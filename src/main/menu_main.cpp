@@ -578,9 +578,6 @@ void FindLevels()
     }
 
     NumSelectBattle = ((int)SelectBattle.size() - 1);
-#ifndef PGE_NO_THREADING
-    SDL_AtomicSet(&loading, 0);
-#endif
 
     if(SelectBattle.size() <= 2) // No available levels in the list
     {
@@ -592,6 +589,10 @@ void FindLevels()
         SelectBattle[1].WorldName = g_mainMenu.gameNoBattleLevels;
         SelectBattle[1].disabled = true;
     }
+
+#ifndef PGE_NO_THREADING
+    SDL_AtomicSet(&loading, 0);
+#endif
 }
 
 
@@ -1312,6 +1313,7 @@ bool mainMenuUpdate()
 #else
                                 SDL_AtomicSet(&loading, 1);
                                 loadingThread = SDL_CreateThread(FindWorldsThread, "FindWorlds", NULL);
+                                SDL_DetachThread(loadingThread);
 #endif
                             }
                         }
@@ -2191,7 +2193,15 @@ void mainMenuDraw()
 
     s_drawGameVersion();
 
+    // Menu Intro
+    if(MenuMode == MENU_INTRO)
+    {
+        if((CommonFrame % 90) < 45)
+            SuperPrintScreenCenter(g_mainMenu.introPressStart, 3, (16 + 240 + XRender::TargetH - 48) / 2);
+    }
+
 #ifndef PGE_NO_THREADING
+    // loading (can't safely render)
     if(SDL_AtomicGet(&loading))
     {
         if(SDL_AtomicGet(&loadingProgrssMax) <= 0)
@@ -2204,13 +2214,8 @@ void mainMenuDraw()
     }
     else
 #endif
+    // DO NOT DETACH THE ABOVE ELSE STATEMENT FROM THE FOLLOWING SERIES OF IF CLAUSES
 
-    // Menu Intro
-    if(MenuMode == MENU_INTRO)
-    {
-        if((CommonFrame % 90) < 45)
-            SuperPrintScreenCenter(g_mainMenu.introPressStart, 3, (16 + 240 + XRender::TargetH - 48) / 2);
-    }
     // Main menu
     if(MenuMode == MENU_MAIN)
     {
