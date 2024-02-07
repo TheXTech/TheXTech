@@ -64,6 +64,7 @@
 #include "core/language.h"
 #include "main/translate.h"
 #include "fontman/font_manager.h"
+#include "custom.h"
 
 #include "video.h"
 #include "editor.h"
@@ -975,6 +976,8 @@ bool mainMenuUpdate()
                 }
                 else
                 {
+                    UnloadCustomPlayerPreviews();
+
                     MenuCursor = selSave - 1;
                     if(menuPlayersNum == 1)
                         MenuMode = MENU_SELECT_SLOT_1P;
@@ -1507,6 +1510,8 @@ bool mainMenuUpdate()
 
                     if(MenuCursor >= 0 && MenuCursor <= c_menuItemSavesEndList) // Select the save slot, but still need to select players
                     {
+                        LoadCustomPlayerPreviews(SelectWorld[selWorld].WorldPath.c_str());
+
                         selSave = MenuCursor + 1;
                         if(MenuMode == MENU_SELECT_SLOT_2P)
                             ConnectScreen::MainMenu_Start(2);
