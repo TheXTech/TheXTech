@@ -44,7 +44,14 @@ namespace ScreenAssetPack
 bool g_LoopActive = false;
 bool s_AnimatingBack = false;
 
+// the player's target asset pack index
+static int s_target_idx = -1;
+
+// the current asset pack index
 static int s_cur_idx = -1;
+
+// how far to scroll the logos. ranges from -1 (halfway through a right rotation) to +1 (halfway through a left rotation)
+static float s_switch_coord = 0.0f;
 
 static bool s_ensure_idx_valid()
 {
@@ -58,12 +65,40 @@ static bool s_ensure_idx_valid()
     for(const auto& pack : asset_packs)
     {
         if(pack.path == AppPath && pack.full_id() == g_AssetPackID)
+        {
+            if(s_target_idx == -1)
+                s_target_idx = s_cur_idx;
+
             return true;
+        }
 
         s_cur_idx++;
     }
 
     return false;
+}
+
+static void s_renderBackground(AssetPack_t::Gfx& gfx, XTColor bg_color)
+{
+    if(gfx.background.inited)
+    {
+        int background_height = gfx.background.h / gfx.bg_frames;
+        int background_frame = (CommonFrame / gfx.bg_frame_ticks) % gfx.bg_frames;
+
+        int show_width = SDL_min(background_height * XRender::TargetW / XRender::TargetH, gfx.background.w);
+        int show_height = SDL_min(gfx.background.w * XRender::TargetH / XRender::TargetW, background_height);
+
+        XRender::renderTextureScaleEx(0, 0, XRender::TargetW, XRender::TargetH,
+                                      gfx.background,
+                                      (gfx.background.w - show_width) / 2, background_height * background_frame + (background_height - show_height) / 2,
+                                      show_width, show_height,
+                                      0.0, nullptr, X_FLIP_NONE,
+                                      bg_color);
+    }
+    else
+    {
+        XRender::renderRect(0, 0, XRender::TargetW, XRender::TargetH, XTColor(0, 0, 0) * bg_color);
+    }
 }
 
 // this method is public so that it is possible to fade in the asset pack screen from the main menu
@@ -72,7 +107,11 @@ void DrawBackground(double fade)
     if(!s_ensure_idx_valid())
         return;
 
-    XTColor color = XTAlphaF(static_cast<float>(fade));
+    // used for things that are scaled in special ways during switch
+    XTColor color_no_switch = XTAlphaF(static_cast<float>(fade));
+
+    // used for things linked to the central pack
+    XTColor color = XTAlphaF(static_cast<float>(fade) * (1.0f - SDL_fabs(s_switch_coord)));
 
     const AssetPack_t& pack = GetAssetPacks()[s_cur_idx];
 
@@ -101,28 +140,10 @@ void DrawBackground(double fade)
         XRender::renderTexture(XRender::TargetW / 2 - GFX.MenuGFX[2].w / 2, menu_logo_y, GFX.MenuGFX[2]);
     }
 
-    AssetPack_t::Gfx& gfx = *pack.gfx.get();
+    AssetPack_t::Gfx& gfx = *pack.gfx;
 
-    // zoom background to screen size
-    if(gfx.background.inited)
-    {
-        int background_height = gfx.background.h / gfx.bg_frames;
-        int background_frame = (CommonFrame / gfx.bg_frame_ticks) % gfx.bg_frames;
-
-        int show_width = SDL_min(background_height * XRender::TargetW / XRender::TargetH, gfx.background.w);
-        int show_height = SDL_min(gfx.background.w * XRender::TargetH / XRender::TargetW, background_height);
-
-        XRender::renderTextureScaleEx(0, 0, XRender::TargetW, XRender::TargetH,
-                                      gfx.background,
-                                      (gfx.background.w - show_width) / 2, background_height * background_frame + (background_height - show_height) / 2,
-                                      show_width, show_height,
-                                      0.0, nullptr, X_FLIP_NONE,
-                                      color);
-    }
-    else
-    {
-        XRender::renderRect(0, 0, XRender::TargetW, XRender::TargetH, XTColor(0, 0, 0) * color);
-    }
+    // draw background
+    s_renderBackground(gfx, color_no_switch);
 
     // draw curtain during transition
     if(!g_LoopActive && !s_AnimatingBack)
@@ -143,11 +164,34 @@ void DrawBackground(double fade)
     const AssetPack_t& prev_pack = GetAssetPacks()[prev_index];
     const AssetPack_t& next_pack = GetAssetPacks()[next_index];
 
+    // cross-fade background
+    if(s_switch_coord > 0.0f && prev_pack.gfx)
+    {
+        XTColor bg_color = color_no_switch * XTAlphaF(0.5f * s_switch_coord);
+        s_renderBackground(*prev_pack.gfx, bg_color);
+    }
+    else if(s_switch_coord < 0.0f && next_pack.gfx)
+    {
+        XTColor bg_color = color_no_switch * XTAlphaF(-0.5f * s_switch_coord);
+        s_renderBackground(*next_pack.gfx, bg_color);
+    }
+
+    // calculate how much the pack logos should be shifted
+    int logo_shift = (XRender::TargetW / 2) - 100;
+
     if(prev_pack.gfx && prev_pack.gfx->logo.inited)
-        XRender::renderTexture(100 - prev_pack.gfx->logo.w, XRender::TargetH / 2 - prev_pack.gfx->logo.h / 2, prev_pack.gfx->logo, color * XTAlpha(127));
+    {
+        float cX = 100 + logo_shift * s_switch_coord / 2.0f;
+        XTColor pack_color = (s_switch_coord == 0.0f) ? color * XTAlpha(127) : color_no_switch * XTAlphaF(0.25f + 0.25f * (s_switch_coord + 1.0f));
+        XRender::renderTexture(cX + prev_pack.gfx->logo.w * (s_switch_coord / 4.0f - 1.0f), XRender::TargetH / 2 - prev_pack.gfx->logo.h / 2, prev_pack.gfx->logo, pack_color);
+    }
 
     if(next_pack.gfx && next_pack.gfx->logo.inited)
-        XRender::renderTexture(XRender::TargetW - 100, XRender::TargetH / 2 - next_pack.gfx->logo.h / 2, next_pack.gfx->logo, color * XTAlpha(127));
+    {
+        float cX = (XRender::TargetW - 100) + logo_shift * s_switch_coord / 2.0f;
+        XTColor pack_color = (s_switch_coord == 0.0f) ? color * XTAlpha(127) : color_no_switch * XTAlphaF(0.25f + 0.25f * (1.0f - s_switch_coord));
+        XRender::renderTexture(cX + prev_pack.gfx->logo.w * (s_switch_coord / 4.0f), XRender::TargetH / 2 - next_pack.gfx->logo.h / 2, next_pack.gfx->logo, pack_color);
+    }
 
     // draw current logo in all cases (needed for cases where title card is not in GFX.MenuGFX[2])
     if(!gfx.logo.inited)
@@ -157,28 +201,33 @@ void DrawBackground(double fade)
     }
     else if(g_LoopActive || s_AnimatingBack)
     {
-        XRender::renderTexture(XRender::TargetW / 2 - gfx.logo.w / 2, XRender::TargetH / 2 - gfx.logo.h / 2, gfx.logo, color);
+        float cX = (XRender::TargetW / 2) + logo_shift * s_switch_coord / 2.0f;
+        XTColor main_color = color_no_switch * XTAlphaF(0.75f + 0.25f * (1.0f - SDL_fabs(s_switch_coord)));
+        XRender::renderTexture(cX + gfx.logo.w * (s_switch_coord / 4.0f - 0.5f), XRender::TargetH / 2 - gfx.logo.h / 2, gfx.logo, main_color);
     }
     else
     {
+        float cX = (XRender::TargetW / 2) + logo_shift * s_switch_coord * fade / 2.0f;
+
         int center_Y = XRender::TargetH / 2 - gfx.logo.h / 2;
         int place_Y = (center_Y * fade) + (menu_logo_y * (1.0 - fade));
 
-        XRender::renderTexture(XRender::TargetW / 2 - gfx.logo.w / 2, place_Y, gfx.logo);
+        XRender::renderTexture(cX + gfx.logo.w * (s_switch_coord * fade / 4.0f - 0.5f), place_Y, gfx.logo);
     }
 
     // show version if appropriate
     bool show_version = pack.show_version && !pack.version.empty();
     if(show_version || pack.id.empty())
     {
+        float cX = (XRender::TargetW / 2) + logo_shift * s_switch_coord / 2.0f;
         int text_Y = XRender::TargetH / 2 + gfx.logo.h / 2 + 8;
 
         const std::string& display = (show_version) ? pack.version : "<legacy>";
-        SuperPrintScreenCenter(display, 3, text_Y, color);
+        SuperPrintCenter(display, 3, cX, text_Y, color);
     }
 
     // show scroll indicators
-    if(g_LoopActive && CommonFrame % 90 >= 45)
+    if(g_LoopActive && CommonFrame % 90 >= 45 && s_cur_idx == s_target_idx && s_switch_coord == 0.0f)
     {
         int offset = SDL_min(XRender::TargetW / 2 - 8, 250);
         if(GFX.CharSelIcons.inited)
@@ -195,18 +244,24 @@ void DrawBackground(double fade)
 
     drawGameVersion(true);
 
-    // cancel back animation when alpha is low enough
-    if(s_AnimatingBack && fade < 2.0 / 60.0)
+    // reset all variables when alpha is low enough during exit
+    if(fade < 3.0 / 60.0)
     {
         s_AnimatingBack = false;
         s_cur_idx = -1;
+        s_target_idx = -1;
+        s_switch_coord = 0.0f;
     }
+
+    if(g_LoopActive)
+        s_AnimatingBack = false;
 }
 
 void Render()
 {
     XRender::setTargetTexture();
     XRender::resetViewport();
+    XRender::clearBuffer();
 
     XRender::setDrawPlane(PLANE_GAME_MENUS);
 
@@ -336,24 +391,61 @@ bool Logic()
         MenuCursorCanMove = false;
 
         PlaySoundMenu(SFX_Climbing);
-        s_cur_idx--;
-        if(s_cur_idx < 0)
-            s_cur_idx = GetAssetPacks().size() - 1;
+        s_target_idx--;
     }
     else if(rightPressed)
     {
         MenuCursorCanMove = false;
 
         PlaySoundMenu(SFX_Climbing);
-        s_cur_idx++;
-        if(s_cur_idx >= (int)GetAssetPacks().size())
-            s_cur_idx = 0;
+        s_target_idx++;
     }
 
     if(SharedCursor.Primary || SharedCursor.Secondary)
         MenuMouseRelease = false;
 
     MenuMouseClick = false;
+
+    // 16 frames to switch
+    constexpr float move_rate = 0.125f;
+
+    // make s_switch_coord approach the target
+    if(s_target_idx != s_cur_idx)
+        s_switch_coord -= move_rate * (s_target_idx - s_cur_idx);
+    else if(s_switch_coord < -move_rate)
+        s_switch_coord += move_rate;
+    else if(s_switch_coord > move_rate)
+        s_switch_coord -= move_rate;
+    else
+        s_switch_coord = 0.0f;
+
+    // actually switch the index when switch coord grows enough
+    if(s_switch_coord >= 1.0f)
+    {
+        s_cur_idx--;
+        if(s_cur_idx < 0)
+        {
+            if(s_target_idx < 0)
+                s_target_idx += (int)GetAssetPacks().size();
+
+            s_cur_idx = (int)GetAssetPacks().size() - 1;
+        }
+
+        s_switch_coord -= 2.0f;
+    }
+    else if(s_switch_coord <= -1.0f)
+    {
+        s_cur_idx++;
+        if(s_cur_idx >= (int)GetAssetPacks().size())
+        {
+            if(s_target_idx >= (int)GetAssetPacks().size())
+                s_target_idx -= (int)GetAssetPacks().size();
+
+            s_cur_idx = 0;
+        }
+
+        s_switch_coord += 2.0f;
+    }
 
     return false;
 }
