@@ -853,6 +853,17 @@ void InputMethodType_Keyboard::UpdateControlsPost()
         int window_x, window_y;
         Uint32 buttons = SDL_GetMouseState(&window_x, &window_y);
 
+        static int last_window_x = -1, last_window_y = -1;
+        bool allow_move = false;
+
+        // only allow move if both the window coordinates and the gamespace coordinates changed (prevents fake move when resolution changes)
+        if(last_window_x != window_x || last_window_y != window_y)
+        {
+            last_window_x = window_x;
+            last_window_y = window_y;
+            allow_move = true;
+        }
+
         SDL_Point p;
         XRender::mapToScreen(window_x, window_y, &p.x, &p.y);
         static SDL_Point last_p;
@@ -861,7 +872,10 @@ void InputMethodType_Keyboard::UpdateControlsPost()
            p.y - last_p.y <= -1 || p.y - last_p.y >= 1)
         {
             last_p = p;
-            SharedCursor.Move = true;
+
+            if(allow_move)
+                SharedCursor.Move = true;
+
             SharedCursor.X = p.x;
             SharedCursor.Y = p.y;
         }
