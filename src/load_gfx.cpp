@@ -90,6 +90,10 @@ struct GFXBackup_t
 static std::vector<GFXBackup_t> g_defaultLevelGfxBackup;
 static std::vector<GFXBackup_t> g_defaultWorldGfxBackup;
 
+// track which backups are previews of player graphics
+static size_t s_previewPlayersBegin = 0;
+static size_t s_previewPlayersEnd = 0;
+
 struct FrameBorderInfoBackup_t
 {
     FrameBorderInfo *remote_info = nullptr;
@@ -681,6 +685,39 @@ bool LoadGFXFromList(std::string source_dir, bool custom, bool skip_world)
 
 #endif // #if defined(PGE_MIN_PORT) || defined(THEXTECH_CLI_BUILD)
 
+static void s_UnloadPreviewPlayers()
+{
+    if(s_previewPlayersEnd == 0 || s_previewPlayersEnd == s_previewPlayersBegin)
+    {
+        s_previewPlayersBegin = 0;
+        s_previewPlayersEnd = 0;
+        return;
+    }
+
+    // check that no textures have been loaded since player preview
+    SDL_assert_release(s_previewPlayersEnd == g_defaultLevelGfxBackup.size());
+
+    for(auto it = g_defaultLevelGfxBackup.begin() + (s_previewPlayersEnd - 1); it >= g_defaultLevelGfxBackup.begin() + s_previewPlayersBegin; --it)
+    {
+        auto &t = *it;
+
+        if(t.remote_width)
+            *t.remote_width = t.width;
+        if(t.remote_height)
+            *t.remote_height = t.height;
+        if(t.remote_isCustom)
+            *t.remote_isCustom = false;
+        SDL_assert_release(t.remote_texture);
+        XRender::unloadTexture(*t.remote_texture);
+        *static_cast<StdPicture_Sub*>(t.remote_texture) = t.texture_backup;
+    }
+
+    g_defaultLevelGfxBackup.resize(s_previewPlayersBegin);
+
+    s_previewPlayersBegin = 0;
+    s_previewPlayersEnd = 0;
+}
+
 static void restoreLevelBackupTextures()
 {
     for(auto it = g_defaultLevelGfxBackup.rbegin(); it != g_defaultLevelGfxBackup.rend(); ++it)
@@ -698,6 +735,8 @@ static void restoreLevelBackupTextures()
         *static_cast<StdPicture_Sub*>(t.remote_texture) = t.texture_backup;
     }
     g_defaultLevelGfxBackup.clear();
+    s_previewPlayersBegin = 0;
+    s_previewPlayersEnd = 0;
 }
 
 static void restoreWorldBackupTextures()
@@ -1252,25 +1291,74 @@ static void loadCustomUIAssets()
     // Add new optional assets above this line. Also update gfx.cpp: GFX_t::load(), and gfx.h: GFX_t::m_isCustomVolume.
 }
 
-void LoadCustomGFX(bool include_world)
+void LoadCustomGFX(bool include_world, const char* preview_players_from)
 {
     std::string GfxRoot = AppPath + "graphics/";
 
-     // these should all have been set previously, but will do no harm
-    g_dirEpisode.setCurDir(FileNamePath);
-    g_dirCustom.setCurDir(FileNamePath + FileName);
+    // this should have been set previously, but will do no harm
     s_dirFallback.setCurDir(getGfxDir() + "fallback");
 
-    cgfx_initLangDir();
+    // unload any previously loaded player previews
+    s_UnloadPreviewPlayers();
 
-    loadCustomUIAssets();
+    if(!preview_players_from)
+    {
+        // these should all have been set previously, but will do no harm
+        g_dirEpisode.setCurDir(FileNamePath);
+        g_dirCustom.setCurDir(FileNamePath + FileName);
+
+        cgfx_initLangDir();
+
+        loadCustomUIAssets();
 
 #if defined(PGE_MIN_PORT) || defined(THEXTECH_CLI_BUILD)
-    bool success = LoadGFXFromList(g_dirEpisode.getCurDir(), true, !include_world);
-    success |= LoadGFXFromList(g_dirCustom.getCurDir(), true, !include_world);
-    if(success)
-        return;
+        bool success = LoadGFXFromList(g_dirEpisode.getCurDir(), true, !include_world);
+        success |= LoadGFXFromList(g_dirCustom.getCurDir(), true, !include_world);
+        if(success)
+            return;
 #endif
+    }
+    else
+    {
+        s_previewPlayersBegin = g_defaultLevelGfxBackup.size();
+
+        g_dirEpisode.setCurDir(preview_players_from);
+        g_dirCustom.setCurDir("");
+    }
+
+
+    for(int A = 1; A < maxYoshiGfx; ++A)
+    {
+        loadCGFX(GfxRoot + fmt::format_ne("yoshi/yoshib-{0}.png", A),
+                 fmt::format_ne("yoshib-{0}", A),
+                 nullptr, nullptr, GFXYoshiBCustom[A], GFXYoshiBBMP[A]);
+    }
+
+    for(int A = 1; A < maxYoshiGfx; ++A)
+    {
+        loadCGFX(GfxRoot + fmt::format_ne("yoshi/yoshit-{0}.png", A),
+                 fmt::format_ne("yoshit-{0}", A),
+                 nullptr, nullptr, GFXYoshiTCustom[A], GFXYoshiTBMP[A]);
+    }
+
+    for(int c = 0; c < numCharacters; ++c)
+    {
+        for(int A = 1; A <= numStates; ++A)
+        {
+            loadCGFX(GfxRoot + fmt::format_ne("{1}/{1}-{0}.png", A, GFXPlayerNames[c]),
+                     fmt::format_ne("{1}-{0}", A, GFXPlayerNames[c]),
+                     &(*GFXCharacterWidth[c])[A], &(*GFXCharacterHeight[c])[A],
+                     (*GFXCharacterCustom[c])[A], (*GFXCharacterBMP[c])[A]);
+        }
+    }
+
+
+    if(preview_players_from)
+    {
+        s_previewPlayersEnd = g_defaultLevelGfxBackup.size();
+        return;
+    }
+
 
     for(int A = 1; A < maxBlockType; ++A)
     {
@@ -1316,30 +1404,6 @@ void LoadCustomGFX(bool include_world)
                  false, BackgroundHasNoMask[A]);
     }
 
-    for(int A = 1; A < maxYoshiGfx; ++A)
-    {
-        loadCGFX(GfxRoot + fmt::format_ne("yoshi/yoshib-{0}.png", A),
-                 fmt::format_ne("yoshib-{0}", A),
-                 nullptr, nullptr, GFXYoshiBCustom[A], GFXYoshiBBMP[A]);
-    }
-
-    for(int A = 1; A < maxYoshiGfx; ++A)
-    {
-        loadCGFX(GfxRoot + fmt::format_ne("yoshi/yoshit-{0}.png", A),
-                 fmt::format_ne("yoshit-{0}", A),
-                 nullptr, nullptr, GFXYoshiTCustom[A], GFXYoshiTBMP[A]);
-    }
-
-    for(int c = 0; c < numCharacters; ++c)
-    {
-        for(int A = 1; A <= numStates; ++A)
-        {
-            loadCGFX(GfxRoot + fmt::format_ne("{1}/{1}-{0}.png", A, GFXPlayerNames[c]),
-                     fmt::format_ne("{1}-{0}", A, GFXPlayerNames[c]),
-                     &(*GFXCharacterWidth[c])[A], &(*GFXCharacterHeight[c])[A],
-                     (*GFXCharacterCustom[c])[A], (*GFXCharacterBMP[c])[A]);
-        }
-    }
 
     if(!include_world)
         return;
@@ -1409,6 +1473,10 @@ void UnloadCustomGFX()
     restoreLevelBackupTextures();
 }
 
+void UnloadPlayerPreviewGFX()
+{
+    s_UnloadPreviewPlayers();
+}
 
 
 void UnloadWorldCustomGFX()

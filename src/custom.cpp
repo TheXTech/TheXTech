@@ -20,6 +20,7 @@
 
 #include "globals.h"
 #include "global_dirs.h"
+#include "load_gfx.h"
 
 #include "sdl_proxy/sdl_stdinc.h"
 
@@ -198,13 +199,19 @@ void LoadNPCDefaults()
     loadNpcSetupFixes();
 }
 
-void FindCustomPlayers()
+void FindCustomPlayers(const char* preview_players_from)
 {
     pLogDebug("Trying to load custom Player configs...");
 
     std::string playerPath, playerPathC;
-    g_dirEpisode.setCurDir(FileNamePath);
-    g_dirCustom.setCurDir(FileNamePath + FileName);
+
+    if(preview_players_from)
+        g_dirEpisode.setCurDir(preview_players_from);
+    else
+    {
+        g_dirEpisode.setCurDir(FileNamePath);
+        g_dirCustom.setCurDir(FileNamePath + FileName);
+    }
 
     for(int C = 1; C <= numCharacters; ++C)
     {
@@ -212,8 +219,10 @@ void FindCustomPlayers()
         {
             // Episode-wide custom player setup
             playerPath = g_dirEpisode.resolveFileCaseExistsAbs(fmt::format_ne("{1}-{0}.ini", S, s_playerFileName[C]));
+
             // Level-wide custom player setup
-            playerPathC = g_dirCustom.resolveFileCaseExistsAbs(fmt::format_ne("{1}-{0}.ini", S, s_playerFileName[C]));
+            if(!preview_players_from)
+                playerPathC = g_dirCustom.resolveFileCaseExistsAbs(fmt::format_ne("{1}-{0}.ini", S, s_playerFileName[C]));
 
             if(!playerPath.empty())
                 LoadCustomPlayer(C, S, playerPath);
@@ -401,4 +410,16 @@ void LoadCustomNPC(int A, std::string cFileName)
         traits.FrameSpeed = int(npc.framespeed);
     if(npc.en_framestyle)
         traits.FrameStyle = int(npc.framestyle);
+}
+
+void LoadCustomPlayerPreviews(const char* preview_players_from)
+{
+    FindCustomPlayers(preview_players_from);
+    LoadCustomGFX(false, preview_players_from);
+}
+
+void UnloadCustomPlayerPreviews()
+{
+    LoadPlayerDefaults();
+    UnloadPlayerPreviewGFX();
 }

@@ -35,12 +35,15 @@ void SaveNPCDefaults();
 void LoadNPCDefaults();
 
 
-void FindCustomPlayers();
+void FindCustomPlayers(const char* preview_players_from = nullptr);
 // Public Sub FindCustomNPCs(Optional cFilePath As String = "")
 //void FindCustomNPCs(std::string cFilePath = "");
 void FindCustomNPCs();
 
 // Private Sub LoadCustomNPC(A As Integer, cFileName As String)
 
+// public-facing functions used by the main menu to load and unload previews of the custom players
+void LoadCustomPlayerPreviews(const char* preview_players_from);
+void UnloadCustomPlayerPreviews();
 
 #endif // CUSTOM_H

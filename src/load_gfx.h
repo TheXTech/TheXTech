@@ -32,11 +32,13 @@ void LoadGFX();
 // Public Sub UnloadGFX()
 void UnloadGFX(bool reload = false);
 // Public Sub LoadCustomGFX()
-void LoadCustomGFX(bool include_world = false);
+void LoadCustomGFX(bool include_world = false, const char* preview_players_from = nullptr);
 // Public Sub UnloadCustomGFX()
 void UnloadCustomGFX();
 // Public Sub LoadCustomGFX2(GFXFilePath As String)
 //void LoadCustomGFX2(std::string GFXFilePath);
+
+void UnloadPlayerPreviewGFX();
 
 // now a subfunction of LoadCustomGFX
 // Public Sub LoadWorldCustomGFX()

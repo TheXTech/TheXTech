@@ -64,6 +64,7 @@
 #include "core/language.h"
 #include "main/translate.h"
 #include "fontman/font_manager.h"
+#include "custom.h"
 
 #include "video.h"
 #include "editor.h"
@@ -1015,6 +1016,8 @@ bool mainMenuUpdate()
                 }
                 else
                 {
+                    UnloadCustomPlayerPreviews();
+
                     MenuCursor = selSave - 1;
                     if(menuPlayersNum == 1)
                         MenuMode = MENU_SELECT_SLOT_1P;
@@ -1428,27 +1431,22 @@ bool mainMenuUpdate()
                             return true;
                         }
                     }
-                    // game mode
+                    // battle mode
+                    else if(MenuMode == MENU_BATTLE_MODE)
+                    {
+                        MenuMode = MENU_CHARACTER_SELECT_NEW_BM;
+                        ConnectScreen::MainMenu_Start(2);
+                    }
+                    // enter save select
                     else
                     {
-                        if(MenuMode != MENU_BATTLE_MODE)
-                            FindSaves();
-
-                        if(MenuMode == MENU_BATTLE_MODE)
-                        {
-                            MenuMode = MENU_CHARACTER_SELECT_NEW_BM;
-                            ConnectScreen::MainMenu_Start(2);
-                        }
-                        else
-                        {
-                            MenuMode *= MENU_SELECT_SLOT_BASE;
-                            MenuCursor = 0;
-                        }
+                        FindSaves();
+                        MenuMode *= MENU_SELECT_SLOT_BASE;
+                        MenuCursor = 0;
                     }
 
                     MenuCursorCanMove = false;
                 }
-
             }
 
             // New world select scroll options!
@@ -1547,6 +1545,8 @@ bool mainMenuUpdate()
 
                     if(MenuCursor >= 0 && MenuCursor <= c_menuItemSavesEndList) // Select the save slot, but still need to select players
                     {
+                        LoadCustomPlayerPreviews(SelectWorld[selWorld].WorldPath.c_str());
+
                         selSave = MenuCursor + 1;
                         if(MenuMode == MENU_SELECT_SLOT_2P)
                             ConnectScreen::MainMenu_Start(2);
