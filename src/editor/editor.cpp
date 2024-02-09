@@ -606,8 +606,12 @@ void UpdateEditor()
 
                 if(MouseRelease) // BGOs
                 {
-                    for(A = numBackground; A >= 1; A--)
+                    // more difficult to iterate backwards, but that's what we need to do here
+                    auto sentinel = treeBackgroundQuery(EditorCursor.Location, SORTMODE_Z);
+                    for(auto i = sentinel.end(); i > sentinel.begin();)
                     {
+                        A = *(--i);
+
                         if(CursorCollision(EditorCursor.Location, Background[A].Location) && !Background[A].Hidden)
                         {
                             PlaySound(SFX_Grab);
@@ -807,11 +811,10 @@ void UpdateEditor()
                     // otherwise it would take a long time for the result vector
                     // to rejoin the pool. -- ds-sloth
                     auto sentinel = treeWorldSceneQuery(EditorCursor.Location, SORTMODE_ID);
-                    auto i = sentinel.end();
-                    --i;
-                    for(; i >= sentinel.begin(); i--)
+                    for(auto i = sentinel.end(); i > sentinel.begin();)
                     {
-                        A = (*i - &Scene[1]) + 1;
+                        A = *(--i);
+
                         if(CursorCollision(EditorCursor.Location, Scene[A].Location))
                         {
                             PlaySound(SFX_Grab);
@@ -1028,8 +1031,12 @@ void UpdateEditor()
                     && (EditorCursor.SubMode == -1 || EditorCursor.SubMode == 0
                         || EditorCursor.SubMode == OptCursor_t::LVL_BGOS))
                 {
-                    for(A = numBackground; A >= 1; A--)
+                    // more difficult to iterate backwards, but that's what we need to do here
+                    auto sentinel = treeBackgroundQuery(EditorCursor.Location, SORTMODE_Z);
+                    for(auto i = sentinel.end(); i > sentinel.begin();)
                     {
+                        A = *(--i);
+
                         if(CursorCollision(EditorCursor.Location, Background[A].Location) && !Background[A].Hidden)
                         {
 //                            Netplay::sendData Netplay::EraseBackground(A, 0);
@@ -1178,11 +1185,10 @@ void UpdateEditor()
                 {
                     // more difficult to iterate backwards, but that's what we need to do here
                     auto sentinel = treeWorldSceneQuery(EditorCursor.Location, SORTMODE_ID);
-                    auto i = sentinel.end();
-                    --i;
-                    for(; i >= sentinel.begin(); i--)
+                    for(auto i = sentinel.end(); i > sentinel.begin();)
                     {
-                        A = (*i - &Scene[1]) + 1;
+                        A = *(--i);
+
                         if(CursorCollision(EditorCursor.Location, Scene[A].Location))
                         {
                             tempLocation = static_cast<Location_t>(Scene[A].Location);
