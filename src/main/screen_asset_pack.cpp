@@ -132,13 +132,16 @@ void DrawBackground(double fade)
         curtain_draw_w = 768;
     int curtain_horiz_reps = XRender::TargetW / curtain_draw_w + 2;
 
+    // draw background curtain fade
     if(s_AnimatingBack)
     {
         for(int i = 0; i < curtain_horiz_reps; i++)
             XRender::renderTexture(curtain_draw_w * i, -GFX.MenuGFX[1].h * fade, curtain_draw_w, GFX.MenuGFX[1].h, GFX.MenuGFX[1], 0, 0);
-
-        XRender::renderTexture(XRender::TargetW / 2 - GFX.MenuGFX[2].w / 2, menu_logo_y, GFX.MenuGFX[2]);
     }
+
+    // draw background logo
+    if(s_AnimatingBack || pack.logo_override)
+        XRender::renderTexture(XRender::TargetW / 2 - GFX.MenuGFX[2].w / 2, menu_logo_y, GFX.MenuGFX[2]);
 
     AssetPack_t::Gfx& gfx = *pack.gfx;
 
