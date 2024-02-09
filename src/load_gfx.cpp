@@ -1589,6 +1589,9 @@ void UpdateLoadREAL()
         if(Bottom > XRender::TargetH)
             Bottom = XRender::TargetH;
 
+        Left += XRender::TargetOverscanX;
+        Right -= XRender::TargetOverscanX;
+
         if(!gfxLoaderTestMode)
         {
             XRender::renderTexture(sh_w - gh_w, sh_h - gh_h, GFX.MenuGFX[4]);

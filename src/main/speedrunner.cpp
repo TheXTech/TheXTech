@@ -94,7 +94,7 @@ void speedRun_renderTimer()
         return; // Don't draw things at Menu and Outro
 
     s_gamePlayTimer.render();
-    SuperPrintRightAlign(fmt::format_ne(Cheater ? "CMode {0}" : "Mode {0}", g_speedRunnerMode), 3, XRender::TargetW - 2, 2, XTColorF(1.f, 0.3f, 0.3f, 0.5f));
+    SuperPrintRightAlign(fmt::format_ne(Cheater ? "CMode {0}" : "Mode {0}", g_speedRunnerMode), 3, XRender::TargetW - XRender::TargetOverscanX - 2, 2, XTColorF(1.f, 0.3f, 0.3f, 0.5f));
 }
 
 static void GetControllerColor(int player, XTColor& color, bool* drawLabel = nullptr)
@@ -365,12 +365,12 @@ void speedRun_renderControls(int player, int screenZ, int align)
 
         if(align == SPEEDRUN_ALIGN_LEFT)
         {
-            x = 4;
+            x = XRender::TargetOverscanX + 4;
             bx = x + w + 4;
         }
         else if(align == SPEEDRUN_ALIGN_RIGHT)
         {
-            x = (XRender::TargetW - (w + 4));
+            x = (XRender::TargetW - XRender::TargetOverscanX - (w + 4));
             bx = x - (bw + 4);
         }
         else

@@ -682,7 +682,7 @@ void UpdateGraphics2(bool skipRepaint)
         g_worldScreenFader.draw();
 
         if(PrintFPS > 0 && ShowFPS)
-            SuperPrint(std::to_string(int(PrintFPS)), 1, 8, 8, {0, 255, 0});
+            SuperPrint(std::to_string(int(PrintFPS)), 1, XRender::TargetOverscanX + 8, 8, {0, 255, 0});
 
         g_stats.print();
 

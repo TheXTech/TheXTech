@@ -3164,7 +3164,7 @@ void UpdateGraphicsMeta()
     speedRun_renderTimer();
 
     if(PrintFPS > 0 && ShowFPS)
-        SuperPrint(fmt::format_ne("{0}", int(PrintFPS)), 1, 8, 8, {0, 255, 0});
+        SuperPrint(fmt::format_ne("{0}", int(PrintFPS)), 1, XRender::TargetOverscanX + 8, 8, {0, 255, 0});
 
     g_stats.print();
 

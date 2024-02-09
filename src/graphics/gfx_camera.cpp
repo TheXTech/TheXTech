@@ -179,6 +179,10 @@ void DrawSmallScreenCam(vScreen_t& vscreen)
     if(screen.Type == ScreenTypes::Dynamic && screen.vScreen(2).Visible && vscreen.Left > 0)
         CamY -= 24;
 
+    // stay in the safe zone
+    if(vscreen.ScreenLeft + vscreen.Width >= XRender::TargetW)
+        CamX -= XRender::TargetOverscanX;
+
     // scale the opacity by the current effectiveness of the camera features
     double rate = 1.0;
     if(screen.Type == ScreenTypes::Dynamic)
