@@ -120,6 +120,9 @@ static AssetPack_t s_scan_asset_pack(const std::string& path, bool skip_graphics
         gameinfo.endGroup();
     }
 
+    if(logo_image_path != logo_image_path_default)
+        ret.logo_override = true;
+
     // don't allow any dirsep characters in asset pack ID
     for(char& c : ret.id)
     {

@@ -52,6 +52,7 @@ struct AssetPack_t
 
     bool show_id = false;
     bool show_version = false;
+    bool logo_override = false;
 
     bool operator==(const AssetPack_t& o) const
     {

@@ -199,7 +199,7 @@ void DrawBackground(double fade)
         SuperPrintScreenCenter(pack.full_id(), 3, XRender::TargetH / 2 - 20, color);
         SuperPrintScreenCenter(pack.path, 3, XRender::TargetH / 2 + 2, color);
     }
-    else if(g_LoopActive || s_AnimatingBack)
+    else if(g_LoopActive || s_AnimatingBack || pack.logo_override)
     {
         float cX = (XRender::TargetW / 2) + logo_shift * s_switch_coord / 2.0f;
         XTColor main_color = color_no_switch * XTAlphaF(0.75f + 0.25f * (1.0f - SDL_fabs(s_switch_coord)));
