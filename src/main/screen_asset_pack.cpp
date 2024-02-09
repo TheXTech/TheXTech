@@ -217,12 +217,12 @@ void DrawBackground(double fade)
 
     // show version if appropriate
     bool show_version = pack.show_version && !pack.version.empty();
-    if(show_version || pack.id.empty())
+    if(pack.show_id || show_version || pack.id.empty())
     {
         float cX = (XRender::TargetW / 2) + logo_shift * s_switch_coord / 2.0f;
         int text_Y = XRender::TargetH / 2 + gfx.logo.h / 2 + 8;
 
-        const std::string& display = (show_version) ? pack.version : "<legacy>";
+        const std::string& display = (pack.show_id) ? pack.full_id() : ((show_version) ? pack.version : "<legacy>");
         SuperPrintCenter(display, 3, cX, text_Y, color);
     }
 

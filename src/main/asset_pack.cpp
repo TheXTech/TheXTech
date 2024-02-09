@@ -109,6 +109,7 @@ static AssetPack_t s_scan_asset_pack(const std::string& path, bool skip_graphics
         gameinfo.beginGroup("game");
         gameinfo.read("id", ret.id, ret.id);
         gameinfo.read("version", ret.version, ret.version);
+        gameinfo.read("show-id", ret.show_id, ret.show_id);
         gameinfo.endGroup();
 
         gameinfo.beginGroup("android");

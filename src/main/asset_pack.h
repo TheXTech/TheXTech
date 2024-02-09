@@ -50,6 +50,7 @@ struct AssetPack_t
 
     std::unique_ptr<Gfx> gfx;
 
+    bool show_id = false;
     bool show_version = false;
 
     bool operator==(const AssetPack_t& o) const
