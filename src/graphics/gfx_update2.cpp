@@ -323,11 +323,11 @@ void UpdateGraphics2(bool skipRepaint)
 //        Next A
 //    Else
 
-    XRender::setViewport(vScreen[Z].TargetX(), vScreen[Z].TargetY(), vScreen[Z].Width, vScreen[Z].Height);
+    XRender::setViewport(vScreen[Z].TargetX() - XRender::TargetOverscanX, vScreen[Z].TargetY(), vScreen[Z].Width + 2 * XRender::TargetOverscanX, vScreen[Z].Height);
 
-    double sLeft = -vScreen[1].X;
+    double sLeft = -vScreen[1].X - 2 * XRender::TargetOverscanX;
     double sTop = -vScreen[1].Y;
-    double sRight = -vScreen[1].X + vScreen[1].Width;
+    double sRight = -vScreen[1].X + vScreen[1].Width + 2 * XRender::TargetOverscanX;
     double sBottom = -vScreen[1].Y + vScreen[1].Height;
 
     {
