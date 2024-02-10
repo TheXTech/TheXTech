@@ -168,15 +168,6 @@ void GetvScreenAverage(vScreen_t& vscreen)
     if(-vscreen.Y + use_height > section.Height)
         vscreen.Y = -(section.Height - use_height);
 
-    // keep vScreen boundary even (on 1x platforms)
-#ifdef PGE_MIN_PORT
-    vscreen.X += 1;
-    if(vscreen.X > 0)
-        vscreen.X -= std::fmod(vscreen.X, 2.);
-    else
-        vscreen.X += std::fmod(vscreen.X, 2.);
-#endif
-
     if(GameMenu)
     {
         if(vscreen.X > OldX)
@@ -756,6 +747,9 @@ void ScreenShot()
 
 void DrawFrozenNPC(int Z, int A)
 {
+    double camX = vScreen[Z].CameraAddX();
+    double camY = vScreen[Z].CameraAddY();
+
     auto &n = NPC[A];
     if((vScreenCollision(Z, n.Location) ||
         vScreenCollision(Z, newLoc(n.Location.X - (n->WidthGFX - n.Location.Width) / 2,
@@ -771,8 +765,8 @@ void DrawFrozenNPC(int Z, int A)
         // Draw frozen NPC body in only condition the content value is valid
         if(content > 0 && content <= maxNPCType)
         {
-             XRender::renderTexture(float(vScreen[Z].X + n.Location.X + 2),
-                                    float(vScreen[Z].Y + n.Location.Y + 2),
+             XRender::renderTexture(float(camX + n.Location.X + 2),
+                                    float(camY + n.Location.Y + 2),
                                     float(n.Location.Width - 4),
                                     float(n.Location.Height - 4),
                                     GFXNPCBMP[content],
@@ -780,20 +774,20 @@ void DrawFrozenNPC(int Z, int A)
         }
 
         // draw ice
-         XRender::renderTexture(float(vScreen[Z].X + n.Location.X + n->FrameOffsetX),
-                                float(vScreen[Z].Y + n.Location.Y + n->FrameOffsetY),
+         XRender::renderTexture(float(camX + n.Location.X + n->FrameOffsetX),
+                                float(camY + n.Location.Y + n->FrameOffsetY),
                                 float(n.Location.Width - 6), float(n.Location.Height - 6),
                                 GFXNPCBMP[n.Type], 0, 0, c);
-         XRender::renderTexture(float(vScreen[Z].X + n.Location.X + n->FrameOffsetX + n.Location.Width - 6),
-                                float(vScreen[Z].Y + n.Location.Y + n->FrameOffsetY),
+         XRender::renderTexture(float(camX + n.Location.X + n->FrameOffsetX + n.Location.Width - 6),
+                                float(camY + n.Location.Y + n->FrameOffsetY),
                                 6, float(n.Location.Height - 6),
                                 GFXNPCBMP[n.Type], 128 - 6, 0, c);
-         XRender::renderTexture(float(vScreen[Z].X + n.Location.X + n->FrameOffsetX),
-                                float(vScreen[Z].Y + n.Location.Y + n->FrameOffsetY + n.Location.Height - 6),
+         XRender::renderTexture(float(camX + n.Location.X + n->FrameOffsetX),
+                                float(camY + n.Location.Y + n->FrameOffsetY + n.Location.Height - 6),
                                 float(n.Location.Width - 6), 6,
                                 GFXNPCBMP[n.Type], 0, 128 - 6, c);
-         XRender::renderTexture(float(vScreen[Z].X + n.Location.X + n->FrameOffsetX + n.Location.Width - 6),
-                                float(vScreen[Z].Y + n.Location.Y + n->FrameOffsetY + n.Location.Height - 6),
+         XRender::renderTexture(float(camX + n.Location.X + n->FrameOffsetX + n.Location.Width - 6),
+                                float(camY + n.Location.Y + n->FrameOffsetY + n.Location.Height - 6),
                                 6, 6, GFXNPCBMP[n.Type],
                                 128 - 6, 128 - 6, c);
     }
