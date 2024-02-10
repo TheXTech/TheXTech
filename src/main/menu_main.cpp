@@ -258,8 +258,8 @@ void GetMenuPos(int* MenuX, int* MenuY)
     if(MenuX && XRender::TargetW < TinyScreenW)
     {
         *MenuX = XRender::TargetW / 2 - 240;
-        if(*MenuX < 24)
-            *MenuX = 24;
+        if(*MenuX < 24 + XRender::TargetOverscanX)
+            *MenuX = 24 + XRender::TargetOverscanX;
     }
 
     // the rest is tweaks for MenuY
@@ -2020,7 +2020,7 @@ void drawGameVersion(bool disable_git)
     constexpr bool show_commit = (!is_release || (!is_main && !is_stable));
 
     // show version
-    SuperPrintRightAlign("v" V_LATEST_STABLE, 5, XRender::TargetW - 2, 2);
+    SuperPrintRightAlign("v" V_LATEST_STABLE, 5, XRender::TargetW - XRender::TargetOverscanX - 2, 2);
 
     // show branch
     if(show_branch && !disable_git)
@@ -2030,10 +2030,10 @@ void drawGameVersion(bool disable_git)
         if(is_wip)
         {
             // strip the "wip-"
-            SuperPrintRightAlign(&V_BUILD_BRANCH[find_in_string(V_BUILD_BRANCH, '-') + 1], 5, XRender::TargetW - 2, y);
+            SuperPrintRightAlign(&V_BUILD_BRANCH[find_in_string(V_BUILD_BRANCH, '-') + 1], 5, XRender::TargetW - XRender::TargetOverscanX - 2, y);
         }
         else
-            SuperPrintRightAlign(V_BUILD_BRANCH, 5, XRender::TargetW - 2, y);
+            SuperPrintRightAlign(V_BUILD_BRANCH, 5, XRender::TargetW - XRender::TargetOverscanX - 2, y);
     }
 
     // show git commit
@@ -2042,10 +2042,10 @@ void drawGameVersion(bool disable_git)
         if(is_dirty)
         {
             // only show -d, not -dirty
-            SuperPrintRightAlign(find_in_string(V_BUILD_VER, '-') + 2 + 1, "#" V_BUILD_VER, 5, XRender::TargetW - 2, XRender::TargetH - 18);
+            SuperPrintRightAlign(find_in_string(V_BUILD_VER, '-') + 2 + 1, "#" V_BUILD_VER, 5, XRender::TargetW - XRender::TargetOverscanX - 2, XRender::TargetH - 18);
         }
         else
-            SuperPrintRightAlign("#" V_BUILD_VER, 5, XRender::TargetW - 2, XRender::TargetH - 18);
+            SuperPrintRightAlign("#" V_BUILD_VER, 5, XRender::TargetW - XRender::TargetOverscanX - 2, XRender::TargetH - 18);
     }
 }
 

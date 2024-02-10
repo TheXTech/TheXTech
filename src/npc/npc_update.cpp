@@ -447,7 +447,7 @@ void UpdateNPCs()
                             else if(NPC[A].GeneratorEffect == 2) // projectile
                             {
                                 NPC[numNPCs].Layer = LAYER_SPAWNED_NPCS;
-                                PlaySound(SFX_Bullet);
+                                PlaySoundSpatial(SFX_Bullet, NPC[A].Location);
                                 NPC[numNPCs].Projectile = true;
                                 if(NPC[numNPCs].Type == NPCID_BULLET) // Normal Bullet Bills
                                     NPC[numNPCs].Projectile = false;
@@ -929,7 +929,7 @@ void UpdateNPCs()
                             treeNPCSplitTempBlock(A);
                     }
                     else if(NPC[A].Type != NPCID_GHOST_FAST)
-                        PlaySound(SFX_Bullet);
+                        PlaySoundSpatial(SFX_Bullet, NPC[A].Location);
                 }
                 else if(NPC[A].Type == NPCID_CANNONENEMY)
                     NPC[A].Special = 100;
@@ -1391,7 +1391,7 @@ void UpdateNPCs()
                         }
                         if(NPC[A].Type == NPCID_BULLET)
                         {
-                            PlaySound(SFX_Bullet);
+                            PlaySoundSpatial(SFX_Bullet, NPC[A].Location);
                             NPC[A].Location.SpeedX = 5 * NPC[A].Direction;
                             NPC[A].Projectile = true;
                             NPC[A].CantHurt = 1000;
@@ -1508,7 +1508,7 @@ void UpdateNPCs()
                     }
 
                     if(NPC[A].Type == NPCID_SAW) // play saw sound
-                        PlaySound(SFX_Saw);
+                        PlaySoundSpatial(SFX_Saw, NPC[A].Location);
 
 
 
@@ -3030,9 +3030,9 @@ void UpdateNPCs()
                                                                 NPC[A].Special = 2;
 
                                                             if((NPC[A].Type == NPCID_METALBARREL || NPC[A].Type == NPCID_CANNONENEMY || NPC[A].Type == NPCID_HPIPE_SHORT || NPC[A].Type == NPCID_HPIPE_LONG || NPC[A].Type == NPCID_VPIPE_SHORT || NPC[A].Type == NPCID_VPIPE_LONG) && NPC[A].Location.SpeedY > Physics.NPCGravity * 20)
-                                                                PlaySound(SFX_Stone);
+                                                                PlaySoundSpatial(SFX_Stone, NPC[A].Location);
                                                             if(NPC[A].Type == NPCID_TANK_TREADS && NPC[A].Location.SpeedY > Physics.NPCGravity * 10)
-                                                                PlaySound(SFX_Stone);
+                                                                PlaySoundSpatial(SFX_Stone, NPC[A].Location);
 
                                                             if(WalkingCollision3(NPC[A].Location, Block[B].Location, oldBeltSpeed) || NPC[A].Location.Width > 32)
                                                             {
@@ -3353,7 +3353,7 @@ void UpdateNPCs()
                                                             if(HitSpot == 2 || HitSpot == 4 || HitSpot == 5)
                                                             {
                                                                 BlockHit(B);
-                                                                PlaySound(SFX_BlockHit);
+                                                                PlaySoundSpatial(SFX_BlockHit, NPC[A].Location);
                                                                 if(NPC[A].Type == NPCID_BULLET) // Bullet Bills
                                                                 {
                                                                     NPC[A].Location.SpeedX = -NPC[A].Location.SpeedX;
@@ -3424,7 +3424,7 @@ void UpdateNPCs()
                                     if(NPC[A].Location.SpeedY < -0.05)
                                     {
                                         BlockHit(winningBlock);
-                                        PlaySound(SFX_BlockHit);
+                                        PlaySoundSpatial(SFX_BlockHit, NPC[A].Location);
                                         if(NPCIsAShell(NPC[A]) || NPC[A].Type == NPCID_ICE_CUBE)
                                             BlockHitHard(winningBlock);
                                     }
@@ -3946,7 +3946,7 @@ void UpdateNPCs()
                                                                                                 else if(NPC[B].Type == NPCID_CANNONENEMY)
                                                                                                 {
                                                                                                     NPC[A].Location.SpeedX = -NPC[A].Location.SpeedX;
-                                                                                                    PlaySound(SFX_BlockHit);
+                                                                                                    PlaySoundSpatial(SFX_BlockHit, NPC[A].Location);
                                                                                                     NPCHit(A, 4, A);
                                                                                                 }
                                                                                             }
@@ -4861,7 +4861,7 @@ void UpdateNPCs()
                             else
                             {
                                 bool legacy = /*NPC[A].Legacy &&*/ (NPC[A].Variant == 1);
-                                PlaySound(SFX_Stone);
+                                PlaySoundSpatial(SFX_Stone, NPC[A].Location);
                                 NPC[A].Special3 = 30;
                                 NPC[A].Frame = 11;
                                 NPC[A].Projectile = false;
@@ -5028,7 +5028,7 @@ void UpdateNPCs()
                                 else if(NPC[numNPCs].Location.SpeedY < -1)
                                     NPC[numNPCs].Location.SpeedY = -1;
                                 syncLayers_NPC(numNPCs);
-                                PlaySound(SFX_BigFireball);
+                                PlaySoundSpatial(SFX_BigFireball, NPC[A].Location);
                             }
                         }
                         else if(NPC[A].Special3 < 45)
@@ -5049,7 +5049,7 @@ void UpdateNPCs()
                         NPC[A].Special3 += 1;
                     if(NPC[A].Special3 >= 20)
                     {
-                        PlaySound(SFX_HeavyToss);
+                        PlaySoundSpatial(SFX_HeavyToss, NPC[A].Location);
                         NPC[A].Special3 = 0; // -15
                         numNPCs++;
                         NPC[numNPCs] = NPC_t();
@@ -5220,7 +5220,7 @@ void UpdateNPCs()
                                     tempLocation.Y = NPC[numNPCs].Location.Y + NPC[numNPCs].Location.Height / 2.0 - EffectHeight[10] / 2.0;
                                     NewEffect(EFFID_SMOKE_S3, tempLocation);
 
-                                    PlaySound(SFX_Bullet);
+                                    PlaySoundSpatial(SFX_Bullet, NPC[A].Location);
                                 }
                             }
                         }

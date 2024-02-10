@@ -22,6 +22,7 @@ Changelog for 1.3.7-dev
 -Drop/add screen renamed to "Player Setup"
 -In modern gameplay, the main menu now has a single "Play Episode" item instead of separate 1P/2P items
 -COMPATIBILITY CHANGE: remove automatic version targeting for pre-SMBX 1.3 content (@ds-sloth)
+-Sounds now get quieter when they are further from the screen (@ds-sloth)
 -Game looks for asset packs in the assets/ subdirectory of the user and system directories (@ds-sloth)
 -Add ability to specify asset pack by ID in the command line (as well as by path) (@ds-sloth)
 -Add ability to switch asset pack at main menu screen by holding select button (@ds-sloth)
@@ -41,6 +42,7 @@ Changelog for 1.3.6.4-dev
 -Fix TheXTech 1.3.6.1 bug where bitmask GIFs would sometimes be rendered incorrectly (@ds-sloth)
 -Fix TheXTech 1.3.6 bug where the editor could occasionally crash when placing warps (@ds-sloth)
 -Fix TheXTech 1.3.6 bug where the editor could not set the level name (used in battle mode) (@ds-sloth)
+-Fix TheXTech 1.3.6.1 bug affecting debug builds where the editor could crash when erasing objects (@ds-sloth)
 
 Changelog for 1.3.6.3
 -Fixed a TheXTech 1.3.6.1 crash where object lookup table could not process items with negative size (@ds-sloth)

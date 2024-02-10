@@ -209,21 +209,21 @@ void Bomb(Location_t Location, int Game, int ImmunePlayer)
     if(Game == 0)
     {
         NewEffect(EFFID_CHAR3_HEAVY_EXPLODE, Location);
-        PlaySound(SFX_Bullet);
+        PlaySoundSpatial(SFX_Bullet, Location);
         Radius = 32;
     }
     if(Game == 2)
     {
         Controls::RumbleAllPlayers(150, 1.0);
         NewEffect(EFFID_BOMB_S2_EXPLODE, Location);
-        PlaySound(SFX_Fireworks);
+        PlaySoundSpatial(SFX_Fireworks, Location);
         Radius = 52;
     }
     if(Game == 3)
     {
         Controls::RumbleAllPlayers(200, 1.0);
         NewEffect(EFFID_BOMB_S3_EXPLODE_SEED, Location);
-        PlaySound(SFX_Fireworks);
+        PlaySoundSpatial(SFX_Fireworks, Location);
         Radius = 64;
     }
 
@@ -361,7 +361,7 @@ void TurnNPCsIntoCoins()
                 {
                     NPC[A].Location.Y += 32;
                     NewEffect(EFFID_COIN_BLOCK_S3, NPC[A].Location);
-                    PlaySound(SFX_Coin);
+                    PlaySoundSpatial(SFX_Coin, NPC[A].Location);
                     Coins += 1;
                     if(Coins >= 100)
                     {
@@ -957,7 +957,7 @@ void NPCSpecial(int A)
         if(npc.Special3 > 0)
         {
             NewEffect(EFFID_BUBBLE_POP, npc.Location);
-            PlaySound(SFX_Bubble);
+            PlaySoundSpatial(SFX_Bubble, npc.Location);
             npc.Type = npc.Special;
             npc.Special3 = 0;
             npc.Special2 = 0;
@@ -1139,7 +1139,7 @@ void NPCSpecial(int A)
                             }
 
                             if(npc.Active)
-                                PlaySound(SFX_BatFlap);
+                                PlaySoundSpatial(SFX_BatFlap, npc.Location);
                         }
                     }
                 }
@@ -1288,7 +1288,7 @@ void NPCSpecial(int A)
             if(npc.Type == 281)
             {
                 npc.Special2 = 20;
-                PlaySound(SFX_Spring);
+                PlaySoundSpatial(SFX_Spring, npc.Location);
             }
 
             if(npc.Special2 == 20)
@@ -1421,7 +1421,7 @@ void NPCSpecial(int A)
                 }
 
                 if(npc.Special3 == 0)
-                    PlaySound(SFX_Transform);
+                    PlaySoundSpatial(SFX_Transform, npc.Location);
 
                 numNPCs++;
                 NPC[numNPCs] = NPC_t();
@@ -1548,7 +1548,7 @@ void NPCSpecial(int A)
             {
                 npc.Special6 = 0;
                 npc.Special = 3;
-                PlaySound(SFX_Spring);
+                PlaySoundSpatial(SFX_Spring, npc.Location);
                 npc.Location.SpeedY = -7 - dRand() * 2;
             }
         }
@@ -1594,7 +1594,7 @@ void NPCSpecial(int A)
 
             if(npc.Special3 == 20) // shoot
             {
-                PlaySound(SFX_BigFireball);
+                PlaySoundSpatial(SFX_BigFireball, npc.Location);
                 numNPCs++;
                 NPC[numNPCs] = NPC_t();
                 NPC[numNPCs].Active = true;
@@ -2469,7 +2469,7 @@ void NPCSpecial(int A)
         if(npc.Damage >= 30)
         {
             if(npc.Special != 3)
-                PlaySound(SFX_SickBossKilled);
+                PlaySoundSpatial(SFX_SickBossKilled, npc.Location);
             npc.Special = 3;
         }
 
@@ -2502,7 +2502,7 @@ void NPCSpecial(int A)
         {
             npc.Location.SpeedX = 0;
             if(npc.Special3 == 0)
-                PlaySound(SFX_SickBossSpit);
+                PlaySoundSpatial(SFX_SickBossSpit, npc.Location);
 
             npc.Special3 += 1;
             if((int(npc.Special3) % 10) == 0)
@@ -2834,7 +2834,7 @@ void NPCSpecial(int A)
         {
             if((iRand(100) >= 40) && int(npc.Special4) % 16 == 0)
             {
-                PlaySound(SFX_HeavyToss);
+                PlaySoundSpatial(SFX_HeavyToss, npc.Location);
                 numNPCs++;
                 NPC[numNPCs] = NPC_t();
                 NPC[numNPCs].Inert = npc.Inert;
@@ -2893,7 +2893,7 @@ void NPCSpecial(int A)
                         NPC[numNPCs].Location.SpeedY = 1;
                     else if(NPC[numNPCs].Location.SpeedY < -1)
                         NPC[numNPCs].Location.SpeedY = -1;
-                    PlaySound(SFX_BigFireball);
+                    PlaySoundSpatial(SFX_BigFireball, npc.Location);
 
                     syncLayers_NPC(numNPCs);
                 }
@@ -2976,7 +2976,7 @@ void NPCSpecial(int A)
                                 MoreScore(vb6Round((1 - (npc.Location.Y - npc.DefaultLocation.Y) / (npc.Special2 - npc.DefaultLocation.Y)) * 10) + 1, npc.Location);
                                 npc.Killed = 9;
                                 NPCQueues::Killed.push_back(A);
-                                PlaySound(SFX_Stone);
+                                PlaySoundSpatial(SFX_Stone, npc.Location);
                             }
 
                             FreezeNPCs = false;
@@ -3057,7 +3057,7 @@ void NPCSpecial(int A)
                 npc.Location.SpeedX = 1 * npc.Direction;
                 npc.Location.SpeedY = -4.2;
                 npc.Special = 2;
-                PlaySound(SFX_LavaMonster);
+                PlaySoundSpatial(SFX_LavaMonster, npc.Location);
             }
         }
         else if(npc.Special == 2)
@@ -3209,7 +3209,7 @@ void SpecialNPC(int A)
 #if XTECH_ENABLE_WEIRD_GFX_UPDATES
                     UpdateGraphics(true);
 #endif
-                    PlaySound(SFX_HeroShield);
+                    PlaySoundSpatial(SFX_HeroShield, NPC[A].Location);
                     if(NPC[A].Type == NPCID_SPIT_GUY_BALL)
                     {
                         NPC[A].Killed = 3;
@@ -3346,7 +3346,7 @@ void SpecialNPC(int A)
                 NPC[A].Killed = 9;
                 NPCQueues::Killed.push_back(A);
                 Player[NPC[A].Special5].FrameCount = 115;
-                PlaySound(SFX_Grab2);
+                PlaySoundSpatial(SFX_Grab2, NPC[A].Location);
                 for(int B : treeNPCQuery(NPC[A].Location, SORTMODE_ID))
                 {
                     if(NPC[B].Active)
@@ -3583,7 +3583,7 @@ void SpecialNPC(int A)
             NPC[A].Projectile = false;
             NPC[A].Type = NPCID_MAGIC_DOOR;
             NPC[A].Effect2 = 16;
-            PlaySound(SFX_SpitBossBeat);
+            PlaySoundSpatial(SFX_SpitBossBeat, NPC[A].Location);
         }
     }
     // firespitting plant
@@ -4180,7 +4180,7 @@ void SpecialNPC(int A)
             NPC[A].Location.Y = NPC[A].DefaultLocation.Y + NPC[A].Location.Height + 1.5;
             NPC[A].Special2 = 1;
             NPC[A].Special = 0;
-            PlaySound(SFX_Lava);
+            PlaySoundSpatial(SFX_Lava, NPC[A].Location);
             tempLocation = NPC[A].Location;
             tempLocation.Y -= 32;
             NewEffect(EFFID_LAVA_SPLASH, tempLocation);
@@ -4212,7 +4212,7 @@ void SpecialNPC(int A)
                 tempLocation = NPC[A].Location;
                 tempLocation.Y += 2;
                 NewEffect(EFFID_LAVA_SPLASH, tempLocation);
-                PlaySound(SFX_Lava);
+                PlaySoundSpatial(SFX_Lava, NPC[A].Location);
             }
 
             if(NPC[A].Special >= 150)
@@ -4580,7 +4580,7 @@ void SpecialNPC(int A)
             if(NPC[numNPCs].Direction == 1)
                 NPC[numNPCs].Frame = 4;
             NPC[numNPCs].FrameCount = iRand(8);
-            PlaySound(SFX_BigFireball);
+            PlaySoundSpatial(SFX_BigFireball, NPC[A].Location);
 
             syncLayers_NPC(numNPCs);
         }
@@ -4641,7 +4641,7 @@ void SpecialNPC(int A)
                 // deferring tree update to end of the NPC physics update
             }
 
-            PlaySound(SFX_HeavyToss);
+            PlaySoundSpatial(SFX_HeavyToss, NPC[A].Location);
             NPC[A].Special3 = -15;
             numNPCs++;
             NPC[numNPCs] = NPC_t();
@@ -4961,7 +4961,7 @@ void SpecialNPC(int A)
                 NPC_t tempNPC = NPC[A];
                 NPC[A] = NPC[numNPCs];
                 NPC[numNPCs] = tempNPC;
-                PlaySound(SFX_HeavyToss);
+                PlaySoundSpatial(SFX_HeavyToss, NPC[A].Location);
 
                 syncLayers_NPC(A);
                 syncLayers_NPC(numNPCs);
@@ -5007,7 +5007,7 @@ void SpecialNPC(int A)
             {
                 if(NPC[A].Special2 == 0)
                 {
-                    PlaySound(SFX_Stone);
+                    PlaySoundSpatial(SFX_Stone, NPC[A].Location);
                     if(g_config.GameplayShakeScreenThwomp)
                         doShakeScreen(0, 4, SHAKE_SEQUENTIAL, 5, 0.2);
                     tempLocation.Width = 32;
@@ -5273,7 +5273,7 @@ void SpecialNPC(int A)
                     NPC[numNPCs].TimeLeft = 100;
                     NPC[numNPCs].Section = NPC[A].Section;
                     NPC[numNPCs].Location.SpeedX = 4 * NPC[numNPCs].Direction;
-                    PlaySound(SFX_SpitBossSpit);
+                    PlaySoundSpatial(SFX_SpitBossSpit, NPC[A].Location);
                     syncLayers_NPC(numNPCs);
                 }
                 NPC[A].Special = 1;

@@ -607,11 +607,9 @@ void UpdateEditor()
                 {
                     // more difficult to iterate backwards, but that's what we need to do here
                     auto sentinel = treeBackgroundQuery(EditorCursor.Location, SORTMODE_Z);
-                    auto i = sentinel.end();
-                    --i;
-                    for(; i >= sentinel.begin(); i--)
+                    for(auto i = sentinel.end(); i > sentinel.begin();)
                     {
-                        A = *i;
+                        A = *(--i);
 
                         if(CursorCollision(EditorCursor.Location, Background[A].Location) && !Background[A].Hidden)
                         {
@@ -833,11 +831,10 @@ void UpdateEditor()
                     // otherwise it would take a long time for the result vector
                     // to rejoin the pool. -- ds-sloth
                     auto sentinel = treeWorldSceneQuery(EditorCursor.Location, SORTMODE_ID);
-                    auto i = sentinel.end();
-                    --i;
-                    for(; i >= sentinel.begin(); i--)
+                    for(auto i = sentinel.end(); i > sentinel.begin();)
                     {
-                        A = (*i - &Scene[1]) + 1;
+                        A = *(--i);
+
                         if(CursorCollision(EditorCursor.Location, Scene[A].Location))
                         {
                             PlaySound(SFX_Grab);
@@ -1056,11 +1053,9 @@ void UpdateEditor()
                 {
                     // more difficult to iterate backwards, but that's what we need to do here
                     auto sentinel = treeBackgroundQuery(EditorCursor.Location, SORTMODE_Z);
-                    auto i = sentinel.end();
-                    --i;
-                    for(; i >= sentinel.begin(); i--)
+                    for(auto i = sentinel.end(); i > sentinel.begin();)
                     {
-                        A = *i;
+                        A = *(--i);
 
                         if(CursorCollision(EditorCursor.Location, Background[A].Location) && !Background[A].Hidden)
                         {
@@ -1243,11 +1238,9 @@ void UpdateEditor()
                 {
                     // more difficult to iterate backwards, but that's what we need to do here
                     auto sentinel = treeWorldSceneQuery(EditorCursor.Location, SORTMODE_ID);
-                    auto i = sentinel.end();
-                    --i;
-                    for(; i >= sentinel.begin(); i--)
+                    for(auto i = sentinel.end(); i > sentinel.begin();)
                     {
-                        A = *i;
+                        A = *(--i);
 
                         if(CursorCollision(EditorCursor.Location, Scene[A].Location))
                         {

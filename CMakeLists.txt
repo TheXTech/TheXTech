@@ -661,6 +661,7 @@ set(THEXTECH_SRC
     src/globals.cpp
     src/npc.cpp
     src/sound.cpp
+    src/sound_spatial.cpp
     src/frame_timer.cpp
     src/global_dirs.cpp
     src/global_strings.cpp

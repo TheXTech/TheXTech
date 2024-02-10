@@ -1593,6 +1593,9 @@ void UpdateLoadREAL()
         if(Bottom > XRender::TargetH)
             Bottom = XRender::TargetH;
 
+        Left += XRender::TargetOverscanX;
+        Right -= XRender::TargetOverscanX;
+
         if(ScreenAssetPack::g_LoopActive)
         {
             ScreenAssetPack::DrawBackground(1.0);
