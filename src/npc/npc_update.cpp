@@ -40,6 +40,7 @@
 #include "../eff_id.h"
 #include "../layers.h"
 
+#include "game_main.h"
 #include "npc_traits.h"
 
 #include "npc/npc_queues.h"
@@ -261,16 +262,7 @@ void UpdateNPCs()
             PlaySound(SFX_Coin);
             Coins += 1;
             if(Coins >= 100)
-            {
-                if(Lives < 99)
-                {
-                    Lives += 1;
-                    PlaySound(SFX_1up);
-                    Coins -= 100;
-                }
-                else
-                    Coins = 99;
-            }
+                Got100Coins();
         }
     }
 

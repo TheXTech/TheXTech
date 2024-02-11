@@ -1920,18 +1920,23 @@ void MoreScore(int addScore, const Location_t &Loc, vbint_t &Multiplier)
 
     if(GameMenu || GameOutro || BattleMode)
         return;
+
     A = addScore + Multiplier;
+
     if(A == 0)
         return;
+
     Multiplier++;
-    if(A > 13)
-        A = 13;
-    if(A < addScore)
-        A = addScore;
+
     if(Multiplier > 9)
         Multiplier = 8;
+
+    if(A < addScore)
+        A = addScore;
+
     if(A > 13)
         A = 13;
+
     if(Points[A] <= 5)
     {
         Lives += Points[A];
@@ -1939,8 +1944,21 @@ void MoreScore(int addScore, const Location_t &Loc, vbint_t &Multiplier)
     }
     else
         Score += Points[A];
+
     NewEffect(EFFID_SCORE, Loc);
     Effect[numEffects].Frame = A - 1;
+}
+
+void Got100Coins()
+{
+    if(Lives < 99)
+    {
+        Lives += 1;
+        PlaySound(SFX_1up);
+        Coins -= 100;
+    }
+    else
+        Coins = 99;
 }
 
 void SizableBlocks()

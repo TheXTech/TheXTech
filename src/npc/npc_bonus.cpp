@@ -546,23 +546,17 @@ void TouchBonus(int A, int B)
                 PlaySoundSpatial(SFX_HeroRupee, NPC[B].Location);
             else if(NPC[B].Type != NPCID_MEDAL)
                 PlaySoundSpatial(SFX_Coin, NPC[B].Location);
+
             if(NPC[B].Type == NPCID_GEM_5 || NPC[B].Type == NPCID_COIN_5)
                 Coins += 5;
             else if(NPC[B].Type == NPCID_GEM_20)
                 Coins += 20;
             else
                 Coins += 1;
+
             if(Coins >= 100)
-            {
-                if(Lives < 99)
-                {
-                    Lives += 1;
-                    PlaySound(SFX_1up);
-                    Coins -= 100;
-                }
-                else
-                    Coins = 99;
-            }
+                Got100Coins();
+
             if(NPC[B].Type == NPCID_MEDAL)
             {
                 PlaySoundSpatial(SFX_MedalGet, NPC[B].Location);
@@ -576,6 +570,7 @@ void TouchBonus(int A, int B)
             }
             else
                 MoreScore(1, NPC[B].Location);
+
             NewEffect(EFFID_COIN_COLLECT, NPC[B].Location);
         }
         else if(NPCIsAnExit(NPC[B]) && LevelMacro == LEVELMACRO_OFF) // Level exit
