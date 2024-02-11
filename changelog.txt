@@ -1,7 +1,7 @@
 TheXTech Changelog.
 
 Changelog for 1.3.6.5-dev
-- <nothing yet>
+-Fix TheXTech 1.3.6 bug where auto movement on the world map was not reset when switching episodes (@ds-sloth)
 
 Changelog for 1.3.6.4
 -Use OpenGL as the default renderer on supported platforms ("sdl" may be used in config.ini or at at the command line to request the SDL2 renderer)

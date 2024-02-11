@@ -438,6 +438,8 @@ void ClearWorld(bool quick)
     for(A = 1; A <= numWorldMusic; A++)
         WorldMusic[A] = WorldMusic_t();
 
+    WorldPlayer[1] = WorldPlayer_t();
+
     if(!quick)
     {
 #ifdef __16M__

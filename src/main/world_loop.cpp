@@ -914,6 +914,7 @@ void PlayerPath(WorldPlayer_t &p)
             tempLocation.X += 32; // Right
         }
 
+        // don't consider the backwards path
         if(B != p.LastMove && B % 2 == p.LastMove % 2)
             continue;
 
