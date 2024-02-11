@@ -127,7 +127,7 @@ void DropPlayer(const int A);
 void AddPlayer(int Character);
 
 // NEW but, when Die is false and FromBlock is true, identical to hitting character block.
-void SwapCharacter(int A, int Character, bool Die = false, bool FromBlock = false);
+void SwapCharacter(int A, int Character, bool FromBlock = false);
 
 // returns whether a player is allowed to swap characters
 bool SwapCharAllowed();

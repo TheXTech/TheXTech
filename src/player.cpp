@@ -7944,19 +7944,8 @@ void DropPlayer(const int A)
     SetupScreens();
 }
 
-void SwapCharacter(int A, int Character, bool Die, bool FromBlock)
+void SwapCharacter(int A, int Character, bool FromBlock)
 {
-    // if already dead or respawning, don't die again
-    if(Player[A].Dead || Player[A].Effect == 6)
-        Die = false;
-    if(Die && Lives <= 0)
-    {
-        return;
-    }
-
-    if(Die)
-        PlayerGone(A);
-
     SavedChar[Player[A].Character] = Player[A];
 
     // the following is identical to the code moved from blocks.cpp
@@ -7979,11 +7968,9 @@ void SwapCharacter(int A, int Character, bool Die, bool FromBlock)
         p.Effect2 = 14;
     }
 
-    if(!Die)
+    if(FromBlock)
     {
-        if(FromBlock)
-        {
-            // make player top match old player top, for bricks (from blocks.cpp)
+        // make player top match old player top, for bricks (from blocks.cpp)
             if(p.Mount <= 1)
             {
                 p.Location.Height = Physics.PlayerHeight[p.Character][p.State];
@@ -8013,19 +8000,8 @@ void SwapCharacter(int A, int Character, bool Die, bool FromBlock)
         {
             Location_t tempLocation = p.Location;
             tempLocation.Y = p.Location.Y + p.Location.Height / 2.0 - 16;
-            tempLocation.X = p.Location.X + p.Location.Width / 2.0 - 16;
-            NewEffect(EFFID_SMOKE_S3, tempLocation);
-        }
-    }
-
-    if(Die)
-    {
-        // make player bottom match old player bottom, for respawn
-        Lives --;
-        UnDuck(Player[A]);
-        SizeCheck(Player[A]);
-        RespawnPlayerTo(A, A);
-        PlaySoundSpatial(SFX_DropItem, Player[A].Location);
+        tempLocation.X = p.Location.X + p.Location.Width / 2.0 - 16;
+        NewEffect(EFFID_SMOKE_S3, tempLocation);
     }
 
     UpdateYoshiMusic();

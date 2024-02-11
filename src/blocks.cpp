@@ -112,7 +112,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
                 // moved SwapCharacter logic into player.cpp
 
                 if(transform_to)
-                    SwapCharacter(whatPlayer, transform_to, false, true);
+                    SwapCharacter(whatPlayer, transform_to, true);
 
                 PlaySoundSpatial(SFX_Transform, b.Location);
             }
