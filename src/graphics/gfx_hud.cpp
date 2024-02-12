@@ -31,6 +31,7 @@
 #include "video.h"
 #include "main/speedrunner.h"
 
+#include "compat.h"
 #include "config.h"
 #include "main/level_medals.h"
 
@@ -45,7 +46,6 @@ void DrawInterface(int Z, int numScreens)
 
     std::string scoreStr = std::to_string(Score);
     std::string coinsStr = std::to_string(Coins);
-    std::string livesStr = std::to_string(int(Lives));
     std::string numStarsStr = std::to_string(numStars);
 
     XRender::offsetViewportIgnore(true);
@@ -177,13 +177,9 @@ void DrawInterface(int Z, int numScreens)
 
         // Print lives on the screen
         int lives_stars_x = left_margin - 60; // excludes life / star icon width
-        XRender::renderTexture(lives_stars_x - GFX.Interface[3].w, ScreenTop + 16 + 10, GFX.Interface[3]);
-        XRender::renderTexture(lives_stars_x + 8, ScreenTop + 16 + 11, GFX.Interface[1]);
-
         int lives_stars_text_left = lives_stars_x + 8 + GFX.Interface[1].w + 8;
-        SuperPrint(livesStr, 1,
-                   lives_stars_text_left,
-                   ScreenTop + 16 + 11);
+
+        DrawLives(lives_stars_x, ScreenTop + 16 + 10, Lives, g_100s);
 
         // Print stars on the screen
         if(numStars > 0)
@@ -266,6 +262,45 @@ void DrawInterface(int Z, int numScreens)
     }
 
     XRender::offsetViewportIgnore(false);
+}
+
+void DrawLives(int X, int Y, int lives, int hunds)
+{
+    bool show_times = true;
+    int count = 0;
+    int text_X = X + 8 + GFX.Interface[1].w + 8;
+
+    if(g_compatibility.modern_lives_system)
+    {
+        bool debt = (hunds < 0);
+        count = (debt) ? -hunds : hunds;
+
+        if(debt)
+            XRender::renderTextureFL(X - GFX.Interface[3].w, Y, GFX.Interface[3].w, GFX.Interface[3].h, GFX.Interface[3], 0, 0, 0.0, nullptr, X_FLIP_VERTICAL, {128, 128, 128});
+        else
+            XRender::renderTexture(X - GFX.Interface[3].w, Y, GFX.Interface[3]);
+
+        if(count >= 100)
+        {
+            show_times = false;
+            text_X -= 18;
+        }
+
+        if(count >= 1000)
+            text_X -= 10;
+    }
+    else
+    {
+        count = lives;
+        XRender::renderTexture(X - GFX.Interface[3].w, Y, GFX.Interface[3]);
+    }
+
+    if(show_times)
+        XRender::renderTexture(X + 8, Y + 1, GFX.Interface[1]);
+
+    SuperPrint(std::to_string(count), 1,
+               text_X,
+               Y + 1);
 }
 
 enum class MedalDrawLevel

@@ -2115,9 +2115,7 @@ static void s_drawGameSaves(int MenuX, int MenuY)
     int row_lc = (hasFails) ? row_1 : row_c;
 
     // Print lives on the screen (from gfx_update2.cpp)
-    XRender::renderTexture(infobox_x + 272, row_lc + 2 + 14 - GFX.Interface[3].h, GFX.Interface[3]);
-    XRender::renderTexture(infobox_x + 272 + 40, row_lc + 2 + 16 - GFX.Interface[3].h, GFX.Interface[1]);
-    SuperPrint(t = std::to_string(info.Lives), 1, infobox_x + 272 + 62, row_lc + 2);
+    DrawLives(infobox_x + 272 + 32, row_lc, info.Lives, info.Hundreds);
 
     // Print coins on the screen (from gfx_update2.cpp)
     int coins_x = infobox_x + 480 - 10 - 36 - 62;

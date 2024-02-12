@@ -81,6 +81,7 @@ static void dieCheater()
     PlaySound(SFX_SMExplosion);
     Score = 0; // Being very evil here, mu-ha-ha-ha-ha! >:D
     Lives = 0;
+    g_100s = 0;
     Coins = 0;
     GodMode = false;
     ClearGame(true); // As a penalty, remove the saved game

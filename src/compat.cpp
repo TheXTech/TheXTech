@@ -131,6 +131,7 @@ static void compatInit(Compatibility_t &c)
     c.allow_multires = true;
     c.disable_background2_tiling = false;
     c.world_map_lvlname_marquee = false;
+    c.modern_lives_system = true;
 
 
     if(s_compatLevel >= COMPAT_SMBX2) // Make sure that bugs were same as on SMBX2 Beta 4 on this moment
@@ -193,6 +194,8 @@ static void compatInit(Compatibility_t &c)
         c.fix_player_clip_wall_at_npc = false;
         // 1.3.6.3
         c.pound_by_alt_run = false;
+        // 1.3.7
+        c.modern_lives_system = false;
     }
 
     c.speedrun_stop_timer_by = Compatibility_t::SPEEDRUN_STOP_NONE;
@@ -439,6 +442,7 @@ static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
         compat.read("allow-multires", c.allow_multires, c.allow_multires);
         compat.read("disable-background2-tiling", c.disable_background2_tiling, c.disable_background2_tiling);
         compat.read("world-map-lvlname-marquee", c.world_map_lvlname_marquee, c.world_map_lvlname_marquee);
+        // compat.read("modern-lives-system", c.modern_lives_system, c.modern_lives_system); // compat mode only flag
     }
     // 1.3.4
     compat.read("fix-player-filter-bounce", c.fix_player_filter_bounce, c.fix_player_filter_bounce);

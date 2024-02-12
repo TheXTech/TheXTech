@@ -162,6 +162,15 @@ void DrawCredits();
 void DrawInterface(int Z, int numScreens);
 
 /*!
+ * \brief NEW: draws the lives / 100s count
+ * \param X      the *right* side of the 1UP / 100 icon
+ * \param Y      top Y coordinate
+ * \param lives  lives count to draw
+ * \param hunds  100s count to draw
+ */
+void DrawLives(int X, int Y, int lives, int hunds);
+
+/*!
  * \brief NEW: draws a set of medals onscreen
  * \param X      right/center X coordinate
  * \param Y      top Y coordinate

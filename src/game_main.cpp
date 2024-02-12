@@ -1183,7 +1183,11 @@ int GameMain(const CmdLineSetup_t &setup)
 
                 PauseGame(PauseCode::Message);
 
-                ++Lives;
+                if(g_compatibility.modern_lives_system)
+                    ++g_100s;
+                else
+                    ++Lives;
+
                 EveryonesDead();
                 clearScreenFaders();
 
@@ -1939,7 +1943,11 @@ void MoreScore(int addScore, const Location_t &Loc, vbint_t &Multiplier)
 
     if(Points[A] <= 5)
     {
-        Lives += Points[A];
+        if(g_compatibility.modern_lives_system)
+            g_100s += Points[A];
+        else
+            Lives += Points[A];
+
         PlaySound(SFX_1up, Points[A] - 1);
     }
     else
@@ -1951,14 +1959,28 @@ void MoreScore(int addScore, const Location_t &Loc, vbint_t &Multiplier)
 
 void Got100Coins()
 {
-    if(Lives < 99)
+    if(g_compatibility.modern_lives_system)
     {
-        Lives += 1;
-        PlaySound(SFX_1up);
-        Coins -= 100;
+        if(g_100s < 9999)
+        {
+            g_100s++;
+            PlaySound(SFX_1up);
+            Coins -= 100;
+        }
+        else
+            Coins = 99;
     }
     else
-        Coins = 99;
+    {
+        if(Lives < 99)
+        {
+            Lives += 1;
+            PlaySound(SFX_1up);
+            Coins -= 100;
+        }
+        else
+            Coins = 99;
+    }
 }
 
 void SizableBlocks()
@@ -2040,6 +2062,7 @@ void StartEpisode()
     numStars = 0;
     Coins = 0;
     Score = 0;
+    g_100s = 3;
     Lives = 3;
     LevelSelect = true;
     GameMenu = false;
@@ -2174,6 +2197,7 @@ void StartBattleMode()
     numStars = 0;
     Coins = 0;
     Score = 0;
+    g_100s = 0;
     Lives = 99;
     BattleLives[1] = 3;
     BattleLives[2] = 3;

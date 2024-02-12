@@ -1097,8 +1097,17 @@ void EveryonesDead()
             PGE_Delay(500);
     }
 
-    Lives--;
-    if(Lives >= 0.f)
+    if(g_compatibility.modern_lives_system)
+    {
+        g_100s--;
+
+        if(g_100s < 0)
+            Score = 0;
+    }
+    else
+        Lives--;
+
+    if(g_compatibility.modern_lives_system || Lives >= 0.f)
     {
         LevelMacro = LEVELMACRO_OFF;
         LevelMacroCounter = 0;
@@ -3784,13 +3793,22 @@ void StealBonus()
         if(Player[A].Dead)
         {
             // find other player
-            if(Lives > 0 && LevelMacro == LEVELMACRO_OFF)
+            if((g_compatibility.modern_lives_system || Lives > 0) && LevelMacro == LEVELMACRO_OFF)
             {
                 if(Player[A].Controls.Jump || Player[A].Controls.Run)
                 {
                     B = CheckNearestLiving(A);
 
-                    Lives -= 1;
+                    if(g_compatibility.modern_lives_system)
+                    {
+                        g_100s--;
+
+                        if(g_100s < 0)
+                            Score = 0;
+                    }
+                    else
+                        Lives -= 1;
+
                     Player[A].State = 1;
                     Player[A].Hearts = 1;
                     RespawnPlayerTo(A, B);
@@ -7962,35 +7980,35 @@ void SwapCharacter(int A, int Character, bool FromBlock)
     if(FromBlock)
     {
         // make player top match old player top, for bricks (from blocks.cpp)
-            if(p.Mount <= 1)
+        if(p.Mount <= 1)
+        {
+            p.Location.Height = Physics.PlayerHeight[p.Character][p.State];
+            if(p.Mount == 1 && p.State == 1)
             {
-                p.Location.Height = Physics.PlayerHeight[p.Character][p.State];
-                if(p.Mount == 1 && p.State == 1)
-                {
-                    p.Location.Height = Physics.PlayerHeight[1][2];
-                }
-                p.StandUp = true;
+                p.Location.Height = Physics.PlayerHeight[1][2];
             }
+            p.StandUp = true;
         }
-        else
-        {
-            double saved_respawn_StopY = 0;
-            if(p.Effect == 6)
-                saved_respawn_StopY = p.Effect2 + p.Location.Height;
+    }
+    else
+    {
+        double saved_respawn_StopY = 0;
+        if(p.Effect == 6)
+            saved_respawn_StopY = p.Effect2 + p.Location.Height;
 
-            // make player bottom match old player bottom, to avoid floor glitches
-            UnDuck(Player[A]);
-            SizeCheck(Player[A]);
+        // make player bottom match old player bottom, to avoid floor glitches
+        UnDuck(Player[A]);
+        SizeCheck(Player[A]);
 
-            // if player effect is 6 (respawn downwards), update target similarly
-            if(p.Effect == 6)
-                p.Effect2 = saved_respawn_StopY - p.Location.Height;
-        }
+        // if player effect is 6 (respawn downwards), update target similarly
+        if(p.Effect == 6)
+            p.Effect2 = saved_respawn_StopY - p.Location.Height;
+    }
 
-        if(!LevelSelect)
-        {
-            Location_t tempLocation = p.Location;
-            tempLocation.Y = p.Location.Y + p.Location.Height / 2.0 - 16;
+    if(!LevelSelect)
+    {
+        Location_t tempLocation = p.Location;
+        tempLocation.Y = p.Location.Y + p.Location.Height / 2.0 - 16;
         tempLocation.X = p.Location.X + p.Location.Width / 2.0 - 16;
         NewEffect(EFFID_SMOKE_S3, tempLocation);
     }

@@ -304,6 +304,7 @@ int FileFormatWorld = 0;
 bool IsEpisodeIntro = false;
 int Coins = 0;
 float Lives = 0.0f;
+int g_100s = 0;
 bool EndIntro = false;
 bool ExitMenu = false;
 bool LevelSelect = false;

@@ -2944,6 +2944,7 @@ void zTestLevel(bool magicHand, bool interProcess)
     Score = 0;
     Coins = 0;
     Lives = 3;
+    g_100s = 3;
 
     if(numPlayers == 0)
         numPlayers = editorScreen.num_test_players;
