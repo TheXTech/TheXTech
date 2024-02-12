@@ -7510,7 +7510,9 @@ void PlayerGone(const int A)
 void AddPlayer(int Character)
 {
     numPlayers++;
+
     Player_t& p = Player[numPlayers];
+
     p = Player_t();
     p.Character = Character;
     p.State = SavedChar[p.Character].State;
@@ -7518,10 +7520,9 @@ void AddPlayer(int Character)
     p.Mount = SavedChar[p.Character].Mount;
     p.MountType = SavedChar[p.Character].MountType;
     p.Hearts = SavedChar[p.Character].Hearts;
+
     if(p.State == 0)
-    {
         p.State = 1;
-    }
 
     p.Frame = 1;
     if(p.Character == 3)
@@ -7537,6 +7538,7 @@ void AddPlayer(int Character)
     int alivePlayer = CheckLiving();
     if(alivePlayer == 0 || alivePlayer == numPlayers)
         alivePlayer = 1;
+
     p.Section = Player[alivePlayer].Section;
     RespawnPlayerTo(numPlayers, alivePlayer);
 
@@ -7545,9 +7547,12 @@ void AddPlayer(int Character)
 
 void DropPlayer(const int A)
 {
-    PlayerGone(A);
     if(A < 1 || A > numPlayers)
         return;
+
+    // in levels, make a death effect (and leave behind mount)
+    if(!LevelSelect)
+        PlayerGone(A);
 
     // IMPORTANT - removes all references to player A,
     //   decrements all references to higher players
@@ -7599,10 +7604,10 @@ void DropPlayer(const int A)
     SavedChar[Player[A].Character] = Player[A];
     for(int B = A; B < numPlayers; B++)
     {
-        Player[B] = std::move(Player[B+1]);
-        OwedMount[B] = OwedMount[B+1];
-        OwedMountType[B] = OwedMountType[B+1];
-        BattleLives[B] = BattleLives[B+1];
+        Player[B] = std::move(Player[B + 1]);
+        OwedMount[B] = OwedMount[B + 1];
+        OwedMountType[B] = OwedMountType[B + 1];
+        BattleLives[B] = BattleLives[B + 1];
     }
 
     numPlayers --;
