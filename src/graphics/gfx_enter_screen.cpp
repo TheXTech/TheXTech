@@ -30,6 +30,7 @@
 #include "../core/render.h"
 #include "../core/events.h"
 #include "../controls.h"
+#include "compat.h"
 #include "pge_delay.h"
 
 
@@ -158,16 +159,9 @@ static void drawEnterScreen(Player_t tempPlayer[maxLocalPlayers])
         DrawPlayer(tempPlayer[A], 0);
 
     if(TestLevel)
-    {
-        SuperPrintScreenCenter("LOADING...", 3, /*(XRender::TargetW / 2.0f) - float(loading.size() / 2) * 18,*/ XRender::TargetH / 2.0f + 32);
-    }
+        SuperPrintScreenCenter("LOADING...", 3, XRender::TargetH / 2.0f + 32);
     else
-    {
-        XRender::renderTexture(XRender::TargetW / 2.0 - 46, XRender::TargetH / 2.0 + 31, GFX.Interface[3].w, GFX.Interface[3].h, GFX.Interface[3], 0, 0);
-        XRender::renderTexture(XRender::TargetW / 2.0 - GFX.Interface[1].w / 2, XRender::TargetH / 2.0 + 32, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
-        SuperPrint(std::to_string(int(Lives)), 1, XRender::TargetW / 2.0 + 12, XRender::TargetH / 2.0 + 32);
-    }
-
+        DrawLives(XRender::TargetW / 2 - 14, XRender::TargetH / 2 + 31, Lives, g_100s);
 }
 
 

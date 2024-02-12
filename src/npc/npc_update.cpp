@@ -40,6 +40,7 @@
 #include "../eff_id.h"
 #include "../layers.h"
 
+#include "game_main.h"
 #include "npc_traits.h"
 
 #include "npc/npc_queues.h"
@@ -254,7 +255,7 @@ void UpdateNPCs()
 
     if(CoinMode) // this is a cheat code
     {
-        if(Lives >= 99 && Coins >= 99)
+        if(!g_compatibility.modern_lives_system && Lives >= 99 && Coins >= 99)
             CoinMode = false;
         else
         {
@@ -262,14 +263,10 @@ void UpdateNPCs()
             Coins += 1;
             if(Coins >= 100)
             {
-                if(Lives < 99)
-                {
-                    Lives += 1;
-                    PlaySound(SFX_1up);
-                    Coins -= 100;
-                }
-                else
-                    Coins = 99;
+                if(g_compatibility.modern_lives_system && g_100s >= -1)
+                    CoinMode = false;
+
+                Got100Coins();
             }
         }
     }

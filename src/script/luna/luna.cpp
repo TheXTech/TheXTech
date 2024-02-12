@@ -32,6 +32,7 @@
 #include "lunalevels.h"
 #include "lunavarbank.h"
 #include "compat.h"
+#include "config.h"
 
 #include "globals.h"
 
@@ -153,7 +154,7 @@ void lunaLoop()
 void lunaRenderHud(int screenZ)
 {
     bool dcAllow = (gEnableDemoCounter || gEnableDemoCounterByLC || g_compatibility.demos_counter_enable);
-    if(dcAllow && gShowDemoCounter && ShowOnScreenHUD)
+    if(dcAllow && g_config.show_fails_counter && gShowDemoCounter && ShowOnScreenHUD)
         gDeathCounter.Draw(screenZ);
 }
 

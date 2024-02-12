@@ -116,6 +116,7 @@ SDL_IMPORT_MATH(fabs)
 SDL_IMPORT(fmod)
 SDL_IMPORT_MATH(floor)
 SDL_IMPORT_MATH(ceil)
+SDL_IMPORT_MATH(round)
 SDL_IMPORT_MATH(sqrt)
 
 #endif

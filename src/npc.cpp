@@ -364,16 +364,8 @@ void TurnNPCsIntoCoins()
                     PlaySoundSpatial(SFX_Coin, NPC[A].Location);
                     Coins += 1;
                     if(Coins >= 100)
-                    {
-                        if(Lives < 99)
-                        {
-                            Lives += 1;
-                            PlaySound(SFX_1up);
-                            Coins -= 100;
-                        }
-                        else
-                            Coins = 99;
-                    }
+                        Got100Coins();
+
                     NPC[A].Killed = 9;
                     NPC[A].Location.Height = 0;
 

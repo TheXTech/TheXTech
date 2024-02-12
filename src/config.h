@@ -70,6 +70,8 @@ extern struct Config_t
     int     WorldMapStarShowPolicyGlobal = 0;
     //! Policy of medals showing
     int     medals_show_policy = MEDALS_SHOW_OFF;
+    //! Show fails counter
+    bool    show_fails_counter = true;
     //! Use the quick (non-pausing) reconnect screen
     bool    NoPauseReconnect = false;
     //! Allow player quickly move through paths on the world map (works for compatibility Mode 1 only)

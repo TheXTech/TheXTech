@@ -1097,8 +1097,17 @@ void EveryonesDead()
             PGE_Delay(500);
     }
 
-    Lives--;
-    if(Lives >= 0.f)
+    if(g_compatibility.modern_lives_system)
+    {
+        g_100s--;
+
+        if(g_100s < 0)
+            Score = 0;
+    }
+    else
+        Lives--;
+
+    if(g_compatibility.modern_lives_system || Lives >= 0.f)
     {
         LevelMacro = LEVELMACRO_OFF;
         LevelMacroCounter = 0;
@@ -3700,16 +3709,7 @@ void YoshiEatCode(const int A)
                     Coins += 1;
 
                     if(Coins >= 100)
-                    {
-                        if(Lives < 99)
-                        {
-                            Lives += 1;
-                            PlaySound(SFX_1up);
-                            Coins -= 100;
-                        }
-                        else
-                            Coins = 99;
-                    }
+                        Got100Coins();
 
                     PlaySoundSpatial(SFX_PetSwallow, p.Location);
                 }
@@ -3793,13 +3793,22 @@ void StealBonus()
         if(Player[A].Dead)
         {
             // find other player
-            if(Lives > 0 && LevelMacro == LEVELMACRO_OFF)
+            if((g_compatibility.modern_lives_system || Lives > 0) && LevelMacro == LEVELMACRO_OFF)
             {
                 if(Player[A].Controls.Jump || Player[A].Controls.Run)
                 {
                     B = CheckNearestLiving(A);
 
-                    Lives -= 1;
+                    if(g_compatibility.modern_lives_system)
+                    {
+                        g_100s--;
+
+                        if(g_100s < 0)
+                            Score = 0;
+                    }
+                    else
+                        Lives -= 1;
+
                     Player[A].State = 1;
                     Player[A].Hearts = 1;
                     RespawnPlayerTo(A, B);
@@ -7840,7 +7849,9 @@ void PlayerGone(const int A)
 void AddPlayer(int Character)
 {
     numPlayers++;
+
     Player_t& p = Player[numPlayers];
+
     p = Player_t();
     p.Character = Character;
     p.State = SavedChar[p.Character].State;
@@ -7848,10 +7859,9 @@ void AddPlayer(int Character)
     p.Mount = SavedChar[p.Character].Mount;
     p.MountType = SavedChar[p.Character].MountType;
     p.Hearts = SavedChar[p.Character].Hearts;
+
     if(p.State == 0)
-    {
         p.State = 1;
-    }
 
     p.Frame = 1;
     if(p.Character == 3)
@@ -7867,6 +7877,7 @@ void AddPlayer(int Character)
     int alivePlayer = CheckLiving();
     if(alivePlayer == 0 || alivePlayer == numPlayers)
         alivePlayer = 1;
+
     p.Section = Player[alivePlayer].Section;
     RespawnPlayerTo(numPlayers, alivePlayer);
 
@@ -7875,9 +7886,12 @@ void AddPlayer(int Character)
 
 void DropPlayer(const int A)
 {
-    PlayerGone(A);
     if(A < 1 || A > numPlayers)
         return;
+
+    // in levels, make a death effect (and leave behind mount)
+    if(!LevelSelect)
+        PlayerGone(A);
 
     // IMPORTANT - removes all references to player A,
     //   decrements all references to higher players
@@ -7929,10 +7943,10 @@ void DropPlayer(const int A)
     SavedChar[Player[A].Character] = Player[A];
     for(int B = A; B < numPlayers; B++)
     {
-        Player[B] = std::move(Player[B+1]);
-        OwedMount[B] = OwedMount[B+1];
-        OwedMountType[B] = OwedMountType[B+1];
-        BattleLives[B] = BattleLives[B+1];
+        Player[B] = std::move(Player[B + 1]);
+        OwedMount[B] = OwedMount[B + 1];
+        OwedMountType[B] = OwedMountType[B + 1];
+        BattleLives[B] = BattleLives[B + 1];
     }
 
     numPlayers --;
@@ -7944,19 +7958,8 @@ void DropPlayer(const int A)
     SetupScreens();
 }
 
-void SwapCharacter(int A, int Character, bool Die, bool FromBlock)
+void SwapCharacter(int A, int Character, bool FromBlock)
 {
-    // if already dead or respawning, don't die again
-    if(Player[A].Dead || Player[A].Effect == 6)
-        Die = false;
-    if(Die && Lives <= 0)
-    {
-        return;
-    }
-
-    if(Die)
-        PlayerGone(A);
-
     SavedChar[Player[A].Character] = Player[A];
 
     // the following is identical to the code moved from blocks.cpp
@@ -7978,54 +7981,50 @@ void SwapCharacter(int A, int Character, bool Die, bool FromBlock)
         p.Effect = 8;
         p.Effect2 = 14;
     }
-
-    if(!Die)
+    // NEW CODE that plays same role as old call to SetupPlayers() in the original world map char swap code
+    else
     {
-        if(FromBlock)
-        {
-            // make player top match old player top, for bricks (from blocks.cpp)
-            if(p.Mount <= 1)
-            {
-                p.Location.Height = Physics.PlayerHeight[p.Character][p.State];
-                if(p.Mount == 1 && p.State == 1)
-                {
-                    p.Location.Height = Physics.PlayerHeight[1][2];
-                }
-                p.StandUp = true;
-            }
-        }
-        else
-        {
-            double saved_respawn_StopY = 0;
-            if(p.Effect == 6)
-                saved_respawn_StopY = p.Effect2 + p.Location.Height;
+        p.Frame = 1;
+        p.FrameCount = 0;
 
-            // make player bottom match old player bottom, to avoid floor glitches
-            UnDuck(Player[A]);
-            SizeCheck(Player[A]);
-
-            // if player effect is 6 (respawn downwards), update target similarly
-            if(p.Effect == 6)
-                p.Effect2 = saved_respawn_StopY - p.Location.Height;
-        }
-
-        if(!LevelSelect)
-        {
-            Location_t tempLocation = p.Location;
-            tempLocation.Y = p.Location.Y + p.Location.Height / 2.0 - 16;
-            tempLocation.X = p.Location.X + p.Location.Width / 2.0 - 16;
-            NewEffect(EFFID_SMOKE_S3, tempLocation);
-        }
+        if(LevelSelect)
+            p.Immune = 0;
     }
 
-    if(Die)
+    if(FromBlock)
     {
-        // make player bottom match old player bottom, for respawn
-        Lives --;
+        // make player top match old player top, for bricks (from blocks.cpp)
+        if(p.Mount <= 1)
+        {
+            p.Location.Height = Physics.PlayerHeight[p.Character][p.State];
+            if(p.Mount == 1 && p.State == 1)
+            {
+                p.Location.Height = Physics.PlayerHeight[1][2];
+            }
+            p.StandUp = true;
+        }
+    }
+    else
+    {
+        double saved_respawn_StopY = 0;
+        if(p.Effect == 6)
+            saved_respawn_StopY = p.Effect2 + p.Location.Height;
+
+        // make player bottom match old player bottom, to avoid floor glitches
         UnDuck(Player[A]);
         SizeCheck(Player[A]);
-        RespawnPlayerTo(A, A);
-        PlaySoundSpatial(SFX_DropItem, Player[A].Location);
+
+        // if player effect is 6 (respawn downwards), update target similarly
+        if(p.Effect == 6)
+            p.Effect2 = saved_respawn_StopY - p.Location.Height;
+    }
+
+    if(!LevelSelect)
+    {
+        Location_t tempLocation = p.Location;
+        tempLocation.Y = p.Location.Y + p.Location.Height / 2.0 - 16;
+        tempLocation.X = p.Location.X + p.Location.Width / 2.0 - 16;
+        NewEffect(EFFID_SMOKE_S3, tempLocation);
     }
 
     UpdateYoshiMusic();

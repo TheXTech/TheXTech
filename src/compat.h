@@ -100,6 +100,7 @@ struct Compatibility_t
     bool allow_multires;
     bool disable_background2_tiling;
     bool world_map_lvlname_marquee;
+    bool modern_lives_system;
 
     // SpeedRun section
     enum

@@ -1745,6 +1745,12 @@ void UpdateGraphicsLogic(bool Do_FrameSkip)
     if(Lives > 99)
         Lives = 99;
 
+    if(g_100s > 9999)
+        g_100s = 9999;
+
+    if(g_100s < -9999)
+        g_100s = -9999;
+
     // NOTE: qScreen was only updated on non-frameskip in vanilla
     qScreen = continue_qScreen;
     qScreen_canonical = continue_qScreen_canonical;

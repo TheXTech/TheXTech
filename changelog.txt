@@ -23,11 +23,16 @@ Changelog for 1.3.7-dev
 -In modern gameplay, the main menu now has a single "Play Episode" item instead of separate 1P/2P items
 -COMPATIBILITY CHANGE: remove automatic version targeting for pre-SMBX 1.3 content (@ds-sloth)
 -Sounds now get quieter when they are further from the screen (@ds-sloth)
+-In non-compat modes, now allow negative lives instead of game over (@ds-sloth, @0lhi)
 -Game looks for asset packs in the assets/ subdirectory of the user and system directories (@ds-sloth)
 -Add ability to specify asset pack by ID in the command line (as well as by path) (@ds-sloth)
 -Add ability to switch asset pack at main menu screen by holding select button (@ds-sloth)
 
-Changelog for 1.3.6.4-dev
+Changelog for 1.3.6.5-dev
+-Fix TheXTech 1.3.6 bug where auto movement on the world map was not reset when switching episodes (@ds-sloth)
+-Fix TheXTech 1.3.6 bug where dropping a player at the world map removed their mount (@ds-sloth)
+
+Changelog for 1.3.6.4
 -Use OpenGL as the default renderer on supported platforms ("sdl" may be used in config.ini or at at the command line to request the SDL2 renderer)
 -Add ability to edit battle levels using in-game editor (@ds-sloth)
 -Fix bug where it was not possible to return to the main menu from an invalid battle mode level (@ds-sloth)
