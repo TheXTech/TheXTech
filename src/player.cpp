@@ -7653,6 +7653,15 @@ void SwapCharacter(int A, int Character, bool Die, bool FromBlock)
         p.Effect = 8;
         p.Effect2 = 14;
     }
+    // NEW CODE that plays same role as old call to SetupPlayers() in the original world map char swap code
+    else
+    {
+        p.Frame = 1;
+        p.FrameCount = 0;
+
+        if(LevelSelect)
+            p.Immune = 0;
+    }
 
     if(!Die)
     {
