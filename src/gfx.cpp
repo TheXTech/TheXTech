@@ -189,36 +189,24 @@ bool GFX_t::load()
     loadImage(EIcons, uiPath + "EditorIcons");
 
     if(m_loadErrors > 0)
-    {
-        pLogWarning("Missing new editor icons.");
         m_loadErrors = 0;
-    }
 
     loadImage(PCursor, uiPath + "PCursor");
 
     if(m_loadErrors > 0)
-    {
-        pLogWarning("Missing new player cursor.");
         m_loadErrors = 0;
-    }
 
     loadImage(Medals, uiPath + "Medals");
 
     if(m_loadErrors > 0)
-    {
-        pLogWarning("Missing new medal icons.");
         m_loadErrors = 0;
-    }
 
     loadImage(CharSelIcons, uiPath + "CharSelIcons");
 
     loadBorder(CharSelFrame, uiPath + "CharSelFrame");
 
     if(m_loadErrors > 0)
-    {
-        pLogWarning("Missing new char select icons.");
         m_loadErrors = 0;
-    }
 
     loadImage(Backdrop, uiPath + "Backdrop");
     loadBorder(Backdrop_Border, uiPath + "Backdrop_Border");
@@ -241,10 +229,12 @@ bool GFX_t::load()
     loadImage(Camera, uiPath + "Camera");
 
     if(m_loadErrors > 0)
-    {
-        pLogDebug("Missing new small-screen look up/down camera texture.");
         m_loadErrors = 0;
-    }
+
+    loadImage(Balance, uiPath + "Balance");
+
+    if(m_loadErrors > 0)
+        m_loadErrors = 0;
 
     // Add new optional assets above this line. Also update load_gfx.cpp: loadCustomUIAssets(), and gfx.h: GFX_t::m_isCustomVolume.
 

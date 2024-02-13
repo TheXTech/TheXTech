@@ -275,10 +275,14 @@ void DrawLives(int X, int Y, int lives, int hunds)
         bool debt = (hunds < 0);
         count = (debt) ? -hunds : hunds;
 
-        if(debt)
-            XRender::renderTextureFL(X - GFX.Interface[3].w, Y, GFX.Interface[3].w, GFX.Interface[3].h, GFX.Interface[3], 0, 0, 0.0, nullptr, X_FLIP_VERTICAL, {128, 128, 128});
+        if(GFX.Balance.inited)
+            XRender::renderTexture(X - GFX.Balance.w / 2, Y, GFX.Balance.w / 2, GFX.Balance.h, GFX.Balance, debt * GFX.Balance.w / 2, 0);
         else
-            XRender::renderTexture(X - GFX.Interface[3].w, Y, GFX.Interface[3]);
+        {
+            XRender::renderTexture(X - GFX.Interface[2].w,      Y, GFX.Interface[2], XTColor(0x7F, 0x7F * !debt, 0x7F * !debt));
+            XRender::renderTexture(X - GFX.Interface[2].w - 8,  Y, GFX.Interface[2], XTColor(0xBF, 0xBF * !debt, 0xBF * !debt));
+            XRender::renderTexture(X - GFX.Interface[2].w - 16, Y, GFX.Interface[2], XTColor(0xFF, 0xFF * !debt, 0xFF * !debt));
+        }
 
         if(count >= 100)
         {
