@@ -29,6 +29,7 @@
 // constant traits that determine NPC behavior based on Type
 // will be replaced with other mechanisms during the NPC function pointer update
 
+// Should turn into trait.
 //'Flags the NPC type if it is a shell
 constexpr bool NPCIsAShell(int Type)
 {
@@ -53,6 +54,7 @@ constexpr bool NPCIsAShell(const NPC_t& n)
     return NPCIsAShell(n.Type);
 }
 
+// Should turn into trait.
 //'Flags the NPC type if it is a bonus
 constexpr bool NPCIsABonus(int Type)
 {
@@ -112,6 +114,7 @@ constexpr bool NPCIsABonus(const NPC_t& n)
     return NPCIsABonus(n.Type);
 }
 
+// Should turn into trait.
 //'Flags the NPC type if it is a coin
 constexpr bool NPCIsACoin(int Type)
 {
@@ -135,6 +138,7 @@ constexpr bool NPCIsACoin(const NPC_t& n)
     return NPCIsACoin(n.Type);
 }
 
+// Should turn into trait.
 //'Flags the NPC type if it is a vine
 constexpr bool NPCIsAVine(int Type)
 {
@@ -146,6 +150,7 @@ constexpr bool NPCIsAVine(const NPC_t& n)
     return NPCIsAVine(n.Type);
 }
 
+// OKAY TO KEEP AS FUNCTION. Usages outside of NPC methods should be replaced with new usage-specific NPC traits.
 //'Flags the NPC type if it is a level exit
 constexpr bool NPCIsAnExit(int Type)
 {
@@ -163,6 +168,7 @@ constexpr bool NPCIsAnExit(const NPC_t& n)
     return NPCIsAnExit(n.Type);
 }
 
+// OKAY TO KEEP AS FUNCTION. Usages in UpdatePlayer may become an OnPlayerCollide NPC method.
 //'Flags the NPC type as a para-troopa
 constexpr bool NPCIsAParaTroopa(int Type)
 {
@@ -185,6 +191,7 @@ constexpr bool NPCIsAParaTroopa(const NPC_t& n)
     return NPCIsAParaTroopa(n.Type);
 }
 
+// Must become a trait, because it's used in a unique way for activation logic, which I do not want to turn into a function pointer.
 //'Flags the NPC type as a cheep cheep
 constexpr bool NPCIsCheep(int Type)
 {
@@ -204,6 +211,7 @@ constexpr bool NPCIsCheep(const NPC_t& n)
     return NPCIsCheep(n.Type);
 }
 
+// OKAY TO KEEP AS FUNCTION. Usages in UpdatePlayer may become an OnPlayerCollide NPC method, usages in Blocks should become a new flag.
 //'npc is a kurbo's shoe
 constexpr bool NPCIsBoot(int Type)
 {
@@ -215,6 +223,7 @@ constexpr bool NPCIsBoot(const NPC_t& n)
     return NPCIsBoot(n.Type);
 }
 
+// OKAY TO KEEP AS FUNCTION. Usages in UpdatePlayer may become an OnPlayerCollide NPC method, usages in Blocks should become a new flag.
 //'npc is a yoshi
 constexpr bool NPCIsYoshi(int Type)
 {
@@ -235,6 +244,7 @@ constexpr bool NPCIsYoshi(const NPC_t& n)
     return NPCIsYoshi(n.Type);
 }
 
+// OKAY TO KEEP AS FUNCTION. Usages outside of NPC methods should be replaced with new usage-specific NPC traits.
 //'npc is a toad
 constexpr bool NPCIsToad(int Type)
 {
@@ -253,6 +263,7 @@ constexpr bool NPCIsToad(const NPC_t& n)
     return NPCIsToad(n.Type);
 }
 
+// OKAY TO KEEP AS FUNCTION. Usages outside of NPC methods should be replaced with new usage-specific NPC traits.
 //'Zelda 2 Bot monster
 constexpr bool NPCIsABot(int Type)
 {
@@ -264,6 +275,7 @@ constexpr bool NPCIsABot(const NPC_t& n)
     return NPCIsABot(n.Type);
 }
 
+// OKAY TO KEEP AS FUNCTION. Unused outside of NPC methods.
 //'default NPC movement
 constexpr bool NPCDefaultMovement(int Type)
 {
@@ -326,6 +338,7 @@ constexpr bool NPCDefaultMovement(const NPC_t& n)
     return NPCDefaultMovement(n.Type);
 }
 
+// OKAY TO KEEP AS FUNCTION. Usages outside of NPC methods should be replaced with new usage-specific NPC traits.
 //'turnips
 constexpr bool NPCIsVeggie(int Type)
 {
