@@ -3913,7 +3913,9 @@ void UpdatePlayer()
                                             {
                                                 if(NPCIsABonus(NPC[B])) // Bonus
                                                     TouchBonus(A, B);
-                                                else if(NPCIsAShell(NPC[B]) && NPC[B].Location.SpeedX == 0 && Player[A].HoldingNPC == 0 && Player[A].Controls.Run)
+                                                else if(NPCIsAShell(NPC[B]) && NPC[B].Location.SpeedX == 0 &&
+                                                        Player[A].HoldingNPC == 0 && Player[A].Controls.Run &&
+                                                        g_compatibility.allow_grab_from_top_fall)
                                                 {
                                                     // grab turtle shells
                                                     //if(nPlay.Online == false || nPlay.MySlot + 1 == A)
