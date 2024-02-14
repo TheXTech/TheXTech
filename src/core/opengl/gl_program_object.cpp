@@ -24,10 +24,13 @@
 
 #include "sdl_proxy/sdl_assert.h"
 
+#include "core/render.h"
+
 #include "core/opengl/gl_inc.h"
 #include "core/opengl/gl_program_object.h"
 #include "core/opengl/gl_shader_translator.h"
 #include "core/opengl/render_gl.h"
+
 #include "std_picture.h"
 
 
@@ -246,6 +249,8 @@ void GLProgramObject::m_update_transform(const GLfloat* transform, const GLfloat
         glUniform4fv(m_u_read_viewport_loc, 1, read_viewport);
     if(m_u_clock_loc != -1)
         glUniform1f(m_u_clock_loc, clock);
+    if(m_u_framebuffer_pixsize_loc != -1)
+        glUniform2f(m_u_framebuffer_pixsize_loc, 1.0f / XRender::TargetW, 1.0f / XRender::TargetH);
 }
 
 void GLProgramObject::m_link_program(GLuint vertex_shader, GLuint fragment_shader, bool particle_system)
@@ -323,8 +328,8 @@ void GLProgramObject::m_link_program(GLuint vertex_shader, GLuint fragment_shade
     m_u_transform_loc = glGetUniformLocation(m_program, m_map_var("u_transform"));
     m_u_read_viewport_loc = glGetUniformLocation(m_program, m_map_var("u_read_viewport"));
     m_u_clock_loc = glGetUniformLocation(m_program, m_map_var("u_clock"));
-    // m_u_fb_pixsize_loc = glGetUniformLocation(m_program, m_map_var("u_fb_pixsize"));
-    // m_u_texture_pixsize_loc = glGetUniformLocation(m_program, m_map_var("u_texture_pixsize"));
+    m_u_framebuffer_pixsize_loc = glGetUniformLocation(m_program, m_map_var("u_framebuffer_pixsize"));
+    m_u_texture_pixsize_loc = glGetUniformLocation(m_program, m_map_var("u_texture_pixsize"));
 
     // set sampler texture index to 0 (fixed for all programs)
     GLint u_texture_loc = glGetUniformLocation(m_program, m_map_var("u_texture"));
@@ -499,6 +504,8 @@ const GLProgramObject& GLProgramObject::operator=(GLProgramObject&& other)
     m_u_transform_loc = other.m_u_transform_loc;
     m_u_read_viewport_loc = other.m_u_read_viewport_loc;
     m_u_clock_loc = other.m_u_clock_loc;
+    m_u_framebuffer_pixsize_loc = other.m_u_framebuffer_pixsize_loc;
+    m_u_texture_pixsize_loc = other.m_u_texture_pixsize_loc;
 
     m_transform_tick = other.m_transform_tick;
     m_flags = other.m_flags;
@@ -532,13 +539,15 @@ void GLProgramObject::use_program()
 }
 
 /*!
- * \brief Registers a custom uniform variable in the next available index
- * \param l StdPictureLoad to restore uniform registrations / assignments from
+ * \brief Restores all registered uniforms from a StdPicture_Sub object (after a shader has been reloaded)
+ * \param target StdPicture_Sub to restore uniform registrations / assignments from
  *
- * Note: will fix any incorrect assignment types in l
+ * Note: will fix the type of any assignments in target, and will also update the GL program's texture dimensions if needed.
  */
-void GLProgramObject::restore_uniforms(StdPictureLoad& l)
+void GLProgramObject::restore_uniforms(StdPicture_Sub& target)
 {
+    StdPictureLoad& l = target.l;
+
     // clear own custom uniform state
     m_u_custom_loc.clear();
 
@@ -550,18 +559,30 @@ void GLProgramObject::restore_uniforms(StdPictureLoad& l)
 
     // register all uniforms (saving their types)
     for(const std::string& name : uniform_names)
-        register_uniform(name.c_str(), l);
+        register_uniform(name.c_str(), target);
 
     // assign all uniforms
     for(size_t i = 0; i < final_values.size(); i++)
-        assign_uniform((int)i, final_values[i], l);
+        assign_uniform((int)i, final_values[i], target);
+
+    // assign texture pixel size
+    if(m_u_texture_pixsize_loc != -1)
+    {
+        use_program();
+        glUniform2f(m_u_texture_pixsize_loc, 1.0f / target.w, 1.0f / target.h);
+    }
 }
 
 /*!
  * \brief Registers a custom uniform variable in the next available index
+ * \param name name of uniform
+ * \param target StdPicture_Sub to cache the registration in, in case of shader unload
+ * \returns The internal index for the uniform, -1 on failure
  */
-int GLProgramObject::register_uniform(const char* name, StdPictureLoad& l)
+int GLProgramObject::register_uniform(const char* name, StdPicture_Sub& target)
 {
+    StdPictureLoad& l = target.l;
+
     auto it = std::find(l.registeredUniforms.begin(), l.registeredUniforms.end(), name);
 
     if(it != l.registeredUniforms.end())
@@ -654,8 +675,18 @@ GLint GLProgramObject::get_uniform_loc(int index)
         return -1;
 }
 
-void GLProgramObject::assign_uniform(int index, const UniformValue_t& value, StdPictureLoad& l)
+/*!
+ * \brief Assigns a custom uniform variable to a value and stores it in the managed uniform state
+ * \param index registered internal index returned by previous call to register_uniform
+ * \param value to assign the uniform to
+ * \param target StdPicture_Sub to check current state from and cache the assignment in, in case of unload
+ *
+ * Note: clears the previous rewind buffer if activate_uniform_step has been called.
+ */
+void GLProgramObject::assign_uniform(int index, const UniformValue_t& value, StdPicture_Sub& target)
 {
+    StdPictureLoad& l = target.l;
+
     if(index < 0 || index >= (int)m_u_custom_loc.size() || index >= (int)l.finalUniformState.size())
     {
         pLogWarning("GLProgramObject: invalid assignment called for uniform registered at index %d, only %d registered.", index, (int)m_u_custom_loc.size());

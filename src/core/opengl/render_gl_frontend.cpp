@@ -1062,7 +1062,7 @@ void RenderGL::compileShaders(StdPicture &target)
     }
 
     if(target.d.shader_program)
-        target.d.shader_program->restore_uniforms(target.l);
+        target.d.shader_program->restore_uniforms(target);
 #else
     UNUSED(target);
 #endif
@@ -1160,7 +1160,7 @@ int RenderGL::registerUniform(StdPicture &target, const char* name)
 {
 
     if(userShadersSupported() && target.d.shader_program && target.d.shader_program->inited())
-        return target.d.shader_program->register_uniform(name, target.l);
+        return target.d.shader_program->register_uniform(name, target);
     else
         return AbstractRender_t::registerUniform(target, name);
 }
@@ -1168,7 +1168,7 @@ int RenderGL::registerUniform(StdPicture &target, const char* name)
 void RenderGL::assignUniform(StdPicture &target, int index, const UniformValue_t& value)
 {
     if(userShadersSupported() && target.d.shader_program && target.d.shader_program->inited())
-        return target.d.shader_program->assign_uniform(index, value, target.l);
+        return target.d.shader_program->assign_uniform(index, value, target);
     else
         return AbstractRender_t::assignUniform(target, index, value);
 }
