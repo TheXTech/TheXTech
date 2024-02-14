@@ -88,6 +88,11 @@ struct NPCTraits_t
     int16_t FrameSpeed = 8;
     //Public NPCFrameStyle(0 To maxNPCType) As Integer
     int16_t FrameStyle = 0;
+
+    // Uses fish AI. Redigit's comment: 'Flags the NPC type as a cheep cheep
+    bool IsFish : 1;
+
+    constexpr NPCTraits_t() : IsFish(false) {}
 };
 
 extern RangeArr<NPCTraits_t, 0, maxNPCType> NPCTraits;

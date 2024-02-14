@@ -358,13 +358,13 @@ void SetupVars()
     NPCTraits[210].Foreground = true;
     NPCTraits[230].Foreground = true;
 
-    // NPCIsCheep(28) = true;
-    // NPCIsCheep(229) = true;
-    // NPCIsCheep(230) = true;
-    // NPCIsCheep(232) = true;
-    // NPCIsCheep(233) = true;
-    // NPCIsCheep(234) = true;
-    // NPCIsCheep(236) = true;
+    NPCTraits[28].IsFish = true;
+    NPCTraits[229].IsFish = true;
+    NPCTraits[230].IsFish = true;
+    NPCTraits[232].IsFish = true;
+    NPCTraits[233].IsFish = true;
+    NPCTraits[234].IsFish = true;
+    NPCTraits[236].IsFish = true;
 
 
     NPCTraits[289].NoClipping = true;
@@ -2740,7 +2740,7 @@ void SetupVars()
     Points[13] = 5;
     For(A, 1, maxNPCType)
     {
-        if(NPCIsCheep(A))
+        if(NPCTraits[A].IsFish)
             NPCTraits[A].Foreground = true;
     }
     For(A, 1, maxEffectType)

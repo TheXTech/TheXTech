@@ -3579,14 +3579,14 @@ void UpdatePlayer()
                                                       NPC[B].Type == NPCID_PLANT_S1 || NPC[B].Type == NPCID_VILLAIN_S1 || NPC[B].Type == NPCID_WALL_BUG || NPC[B].Type == NPCID_WALL_TURTLE ||
                                                       NPC[B].Type == NPCID_SICK_BOSS || NPC[B].Type == NPCID_WALK_PLANT || NPC[B].Type == NPCID_JUMP_PLANT) && !NPC[B]->CanWalkOn)
                                             {
-                                                if(Player[A].Wet > 0 && (NPCIsCheep(NPC[B]) || NPC[B].Type == NPCID_SQUID_S3 || NPC[B].Type == NPCID_SQUID_S1))
+                                                if(Player[A].Wet > 0 && (NPC[B]->IsFish || NPC[B].Type == NPCID_SQUID_S3 || NPC[B].Type == NPCID_SQUID_S1))
                                                 {
                                                 }
                                                 else
                                                     NPCHit(B, 8, A);
                                             }
 
-                                            if(NPC[B].Killed == 8 || NPCIsCheep(NPC[B]) || NPC[B].Type == NPCID_SAW ||
+                                            if(NPC[B].Killed == 8 || NPC[B]->IsFish || NPC[B].Type == NPCID_SAW ||
                                                NPC[B].Type == NPCID_STONE_S3 || NPC[B].Type == NPCID_STONE_S4 || NPC[B].Type == NPCID_GHOST_S3 ||
                                                NPC[B].Type == NPCID_GHOST_FAST || NPC[B].Type == NPCID_GHOST_S4 || NPC[B].Type == NPCID_BIG_GHOST ||
                                                NPC[B].Type == NPCID_PLANT_S3 || NPC[B].Type == NPCID_LAVABUBBLE || NPC[B].Type == NPCID_SPIKY_S3 ||
@@ -3929,7 +3929,7 @@ void UpdatePlayer()
                                                     }
 
                                                 }
-                                                else if(NPC[B]->JumpHurt || (NPCIsCheep(NPC[B]) && Player[A].WetFrame)) // NPCs that cause damage even when jumped on
+                                                else if(NPC[B]->JumpHurt || (NPC[B]->IsFish && Player[A].WetFrame)) // NPCs that cause damage even when jumped on
                                                 {
                                                     if(!(NPC[B].Type == NPCID_PLANT_S3 && NPC[B].Special2 == 4) && !NPC[B]->WontHurt && NPC[B].CantHurtPlayer != A)
                                                     {

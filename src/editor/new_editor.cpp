@@ -278,7 +278,7 @@ void SetEditorNPCType(int type)
             EditorCursor.NPC.Special = 1;
 
         // reset special for NPCs that don't allow it
-        if(!(NPCIsCheep(type) || NPCIsAParaTroopa(type) || type == NPCID_FIRE_CHAIN))
+        if(!(NPCTraits[type].IsFish || NPCIsAParaTroopa(type) || type == NPCID_FIRE_CHAIN))
             EditorCursor.NPC.Special = 0;
 
         // reset special if it's out of range
@@ -809,7 +809,7 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
                 EditorCursor.NPC.Special = 3;
         }
 
-        if(NPCIsCheep(EditorCursor.NPC))
+        if(EditorCursor.NPC->IsFish)
         {
             // Describe current AI if valid
             if(mode == CallMode::Render)

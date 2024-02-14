@@ -471,7 +471,7 @@ void UpdateEditor()
                                 if(n.id == 288 || n.id == 289 || (n.id == 91 && int(EditorCursor.NPC.Special) == 288))
                                     n.special_data = (long)EditorCursor.NPC.Special2;
 
-                                if(NPCIsAParaTroopa(n.id) || NPCIsCheep(n.id) || n.id == 260)
+                                if(NPCIsAParaTroopa(n.id) || NPCTraits[n.id].IsFish || n.id == 260)
                                     n.special_data = (long)EditorCursor.NPC.Special;
 
                                 if(n.id == 86)
@@ -2098,7 +2098,7 @@ void UpdateInterprocess()
                 EditorCursor.NPC.DefaultSpecial = int(EditorCursor.NPC.Special);
             }
 
-            if(NPCIsCheep(EditorCursor.NPC))
+            if(EditorCursor.NPC->IsFish)
             {
                 EditorCursor.NPC.Special = n.special_data;
                 EditorCursor.NPC.DefaultSpecial = int(EditorCursor.NPC.Special);
@@ -2596,7 +2596,7 @@ void SetCursor()
         // Container NPCs are handled elsewhere in new editor
         if(MagicHand)
         {
-            if(t != 91 && t != 96 && t != 283 && t != 284 && !NPCIsCheep(t) && !NPCIsAParaTroopa(t) && t != NPCID_FIRE_CHAIN)
+            if(t != 91 && t != 96 && t != 283 && t != 284 && !NPCTraits[t].IsFish && !NPCIsAParaTroopa(t) && t != NPCID_FIRE_CHAIN)
                 EditorCursor.NPC.Special = 0;
             if(t != 288 && t != 289 && t != 91 && t != 260)
                 EditorCursor.NPC.Special2 = 0.0;
