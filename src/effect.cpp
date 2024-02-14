@@ -739,7 +739,7 @@ void UpdateEffects()
                             nn.DefaultSpecial = static_cast<int>(e.NewNpcSpecial);
                         }
 
-                        if(e.NewNpc == NPCID_STAR_EXIT || e.NewNpc == NPCID_STAR_COLLECT)
+                        if(e.NewNpc == NPCID_STAR_EXIT || e.NewNpc == NPCID_STAR_COLLECT || e.NewNpc == NPCID_MEDAL)
                             nn.Variant = e.NewNpcSpecial;
 
                         syncLayers_NPC(numNPCs);

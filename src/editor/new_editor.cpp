@@ -309,7 +309,7 @@ void SetEditorNPCType(int type)
     }
 
     // reset Variant data for NPCs that don't support it
-    if(find_Variant_Data(type) == nullptr && !(type == NPCID_STAR_COLLECT || type == NPCID_STAR_EXIT))
+    if(find_Variant_Data(type) == nullptr && !(type == NPCID_STAR_COLLECT || type == NPCID_STAR_EXIT || type == NPCID_MEDAL))
         EditorCursor.NPC.Variant = 0;
 
     // turn into new type if can't be in bubble anymore
@@ -881,14 +881,16 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
         }
 
         // multistars
-        if((type == NPCID_STAR_COLLECT || type == NPCID_STAR_EXIT) && FileFormat == FileFormats::LVL_PGEX)
+        if((type == NPCID_STAR_COLLECT || type == NPCID_STAR_EXIT || type == NPCID_MEDAL) && FileFormat == FileFormats::LVL_PGEX)
         {
             std::string&& star_index = EditorCursor.NPC.Variant ? fmt::format_ne(g_editorStrings.phraseGenericIndex, (int)(EditorCursor.NPC.Variant)) : g_editorStrings.fileFormatLegacy;
             SuperPrintCenterR(mode, star_index, 3, e_ScreenW - 120, 220);
 
+            uint8_t max_index = (type == NPCID_MEDAL) ? 8 : 20;
+
             if(EditorCursor.NPC.Variant > 0 && UpdateButton(mode, e_ScreenW - 160 + 4, 240 + 4, GFX.EIcons, false, 0, 32*Icon::left, 32, 32))
                 EditorCursor.NPC.Variant --;
-            if(EditorCursor.NPC.Variant < 20 && UpdateButton(mode, e_ScreenW - 120 + 4, 240 + 4, GFX.EIcons, false, 0, 32*Icon::right, 32, 32))
+            if(EditorCursor.NPC.Variant < max_index && UpdateButton(mode, e_ScreenW - 120 + 4, 240 + 4, GFX.EIcons, false, 0, 32*Icon::right, 32, 32))
                 EditorCursor.NPC.Variant ++;
         }
 

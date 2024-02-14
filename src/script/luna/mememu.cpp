@@ -27,6 +27,7 @@
 #include "globals.h"
 #include "global_constants.h"
 #include "layers.h"
+#include "compat.h"
 #include "game_main.h" // GamePaused
 #include "main/trees.h" // treeNPCUpdate
 #include "npc/npc_queues.h"
@@ -559,7 +560,33 @@ public:
         insert(0x00B25980, &numWorldMusic);
 
         insert(0x00B2C5A8, &Coins); // HUD coins count
-        insert(0x00B2C5AC, &Lives); // HUD lives count
+        insert(0x00B2C5AC, // HUD lives count
+            [](FIELDTYPE ftype)->double
+            {
+                int tmp = g_compatibility.modern_lives_system ? g_100s : Lives;
+                if(tmp < 0)
+                    tmp = 0;
+                if(tmp > 99)
+                    tmp = 99;
+                return valueToMem(tmp, ftype);
+            },
+            [](double in, FIELDTYPE ftype)->void
+            {
+                if(!g_compatibility.modern_lives_system)
+                    memToValue(Lives, in, ftype);
+
+                int old = g_100s;
+                if(old < 0)
+                    old = 0;
+                if(old > 99)
+                    old = 99;
+
+                int out = old;
+                memToValue(out, in, ftype);
+
+                g_100s += out - old;
+            }
+        );  // lives now replaced by g_100s
 
         insert(0x00B2C624, &WorldName);
 
