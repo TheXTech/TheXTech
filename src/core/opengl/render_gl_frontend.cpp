@@ -1080,11 +1080,7 @@ bool RenderGL::depthTestSupported()
 
 bool RenderGL::userShadersSupported()
 {
-#ifdef THEXTECH_WIP_FEATURES
     return m_use_shaders && m_buffer_texture[BUFFER_FB_READ] && m_buffer_texture[BUFFER_INT_PASS_1];
-#else
-    return false;
-#endif
 }
 
 void RenderGL::unloadTexture(StdPicture &tx)
