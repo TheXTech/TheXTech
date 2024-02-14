@@ -745,6 +745,7 @@ XTechTranslate::XTechTranslate()
         {"editor.file.convert.featureCustomWorldMusic", &g_editorStrings.fileConvertFeatureCustomWorldMusic},
         {"editor.file.convert.featureWorldStarDisplay", &g_editorStrings.fileConvertFeatureWorldStarDisplay},
         {"editor.file.convert.featureLevelStarDisplay", &g_editorStrings.fileConvertFeatureLevelStarDisplay},
+        {"editor.file.convert.featureWorldMapSections", &g_editorStrings.fileConvertFeatureWorldMapSections},
 
         {"editor.browser.newFile",          &g_editorStrings.browserNewFile},
         {"editor.browser.saveFile",         &g_editorStrings.browserSaveFile},
