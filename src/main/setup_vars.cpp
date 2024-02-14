@@ -22,6 +22,7 @@
 #include "../game_main.h"
 #include "../custom.h"
 #include "npc_traits.h"
+#include "npc_id.h"
 
 void SetupVars()
 {
@@ -2020,6 +2021,70 @@ void SetupVars()
     NPCTraits[282].FrameOffsetY = 4;
     NPCTraits[282].NoClipping = true;
     NPCTraits[282].JumpHurt = true;
+
+    // Default NPCs that must use the canonical camera
+    NPCTraits[NPCID_STONE_S3].UseDefaultCam = true;
+    NPCTraits[NPCID_STONE_S4].UseDefaultCam = true;
+    NPCTraits[NPCID_METALBARREL].UseDefaultCam = true;
+    NPCTraits[NPCID_CANNONENEMY].UseDefaultCam = true;
+    NPCTraits[NPCID_BULLET].UseDefaultCam = true;
+    NPCTraits[NPCID_BIG_BULLET].UseDefaultCam = true;
+    NPCTraits[NPCID_GHOST_FAST].UseDefaultCam = true;
+    NPCTraits[NPCID_STATUE_S3].UseDefaultCam = true;
+    NPCTraits[NPCID_STATUE_S4].UseDefaultCam = true;
+    NPCTraits[NPCID_HOMING_BALL_GEN].UseDefaultCam = true;
+    NPCTraits[NPCID_LAVA_MONSTER].UseDefaultCam = true;
+    NPCTraits[NPCID_SPIKY_THROWER].UseDefaultCam = true;
+    NPCTraits[NPCID_ITEM_THROWER].UseDefaultCam = true;
+
+    // Default NPCs that render differently when inactive
+    for(int A = 1; A <= maxNPCType; A++)
+    {
+        if(NPCTraits[A].IsABlock || NPCTraits[A].IsAHit1Block || NPCIsACoin(A) || NPCIsAVine(A) || NPCIsABonus(A))
+            NPCTraits[A].InactiveRender = NPCTraits_t::SHOW_ALWAYS;
+    }
+
+    NPCTraits[NPCID_CHECKPOINT].InactiveRender = NPCTraits_t::SHOW_ALWAYS;
+    NPCTraits[NPCID_ITEM_BURIED].InactiveRender = NPCTraits_t::SHOW_ALWAYS;
+    NPCTraits[NPCID_CONVEYOR].InactiveRender = NPCTraits_t::SHOW_ALWAYS;
+    NPCTraits[NPCID_STONE_S3].InactiveRender = NPCTraits_t::SHOW_ALWAYS;
+    NPCTraits[NPCID_STONE_S4].InactiveRender = NPCTraits_t::SHOW_ALWAYS;
+    NPCTraits[NPCID_HOMING_BALL_GEN].InactiveRender = NPCTraits_t::SHOW_ALWAYS;
+    NPCTraits[NPCID_ITEMGOAL].InactiveRender = NPCTraits_t::SHOW_ALWAYS;
+    NPCTraits[NPCID_CANNONENEMY].InactiveRender = NPCTraits_t::SHOW_ALWAYS;
+    NPCTraits[NPCID_STATUE_S3].InactiveRender = NPCTraits_t::SHOW_ALWAYS;
+    NPCTraits[NPCID_STATUE_S4].InactiveRender = NPCTraits_t::SHOW_ALWAYS;
+    NPCTraits[NPCID_ITEM_POD].InactiveRender = NPCTraits_t::SHOW_ALWAYS;
+    NPCTraits[NPCID_SPRING].InactiveRender = NPCTraits_t::SHOW_ALWAYS;
+    NPCTraits[NPCID_CANNONITEM].InactiveRender = NPCTraits_t::SHOW_ALWAYS;
+    NPCTraits[NPCID_KEY].InactiveRender = NPCTraits_t::SHOW_ALWAYS;
+    NPCTraits[NPCID_TIME_SWITCH].InactiveRender = NPCTraits_t::SHOW_ALWAYS;
+    NPCTraits[NPCID_COIN_SWITCH].InactiveRender = NPCTraits_t::SHOW_ALWAYS;
+    NPCTraits[NPCID_ICE_BLOCK].InactiveRender = NPCTraits_t::SHOW_ALWAYS;
+    NPCTraits[NPCID_VEHICLE].InactiveRender = NPCTraits_t::SHOW_ALWAYS;
+    NPCTraits[NPCID_AXE].InactiveRender = NPCTraits_t::SHOW_ALWAYS;
+    NPCTraits[NPCID_WALK_PLANT].InactiveRender = NPCTraits_t::SHOW_ALWAYS;
+    NPCTraits[NPCID_FLY_BLOCK].InactiveRender = NPCTraits_t::SHOW_ALWAYS;
+    NPCTraits[NPCID_FLY_CANNON].InactiveRender = NPCTraits_t::SHOW_ALWAYS;
+    NPCTraits[NPCID_MAGIC_DOOR].InactiveRender = NPCTraits_t::SHOW_ALWAYS;
+    NPCTraits[NPCID_DOOR_MAKER].InactiveRender = NPCTraits_t::SHOW_ALWAYS;
+
+    NPCTraits[NPCID_LAVABUBBLE].InactiveRender = NPCTraits_t::SKIP;
+    NPCTraits[NPCID_PLANT_S3].InactiveRender = NPCTraits_t::SKIP;
+    NPCTraits[NPCID_BOTTOM_PLANT].InactiveRender = NPCTraits_t::SKIP;
+    NPCTraits[NPCID_SIDE_PLANT].InactiveRender = NPCTraits_t::SKIP;
+    NPCTraits[NPCID_BIG_PLANT].InactiveRender = NPCTraits_t::SKIP;
+    NPCTraits[NPCID_PLANT_S1].InactiveRender = NPCTraits_t::SKIP;
+    NPCTraits[NPCID_FIRE_PLANT].InactiveRender = NPCTraits_t::SKIP;
+    NPCTraits[NPCID_LONG_PLANT_UP].InactiveRender = NPCTraits_t::SKIP;
+    NPCTraits[NPCID_LONG_PLANT_DOWN].InactiveRender = NPCTraits_t::SKIP;
+    NPCTraits[NPCID_JUMP_PLANT].InactiveRender = NPCTraits_t::SKIP;
+    NPCTraits[NPCID_LAVA_MONSTER].InactiveRender = NPCTraits_t::SKIP;
+
+    NPCTraits[NPCID_BULLET].InactiveRender = NPCTraits_t::SMOKE;
+    NPCTraits[NPCID_BIG_BULLET].InactiveRender = NPCTraits_t::SMOKE;
+    NPCTraits[NPCID_GHOST_FAST].InactiveRender = NPCTraits_t::SMOKE;
+
 
     For(A, 1, maxBlockType)
     {
