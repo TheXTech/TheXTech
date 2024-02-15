@@ -40,6 +40,7 @@
 #include "../core/render.h"
 #include "../core/events.h"
 #include "../core/window.h"
+#include "graphics/gfx_update.h"
 #include "game_globals.h"
 #include "world_globals.h"
 #include "speedrunner.h"
@@ -84,7 +85,7 @@ void levelWaitForFade()
         if(canProceedFrame())
         {
             computeFrameTime1();
-            UpdateGraphics();
+            UpdateGraphicsDraw();
             UpdateSound();
             XEvents::doEvents();
             computeFrameTime2();
