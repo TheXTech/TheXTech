@@ -209,7 +209,6 @@ struct EditorContent
 
     std::string levelName;
     std::string levelStartPos;
-    std::string levelIsHub;
     std::string levelPathBG;
     std::string levelBigBG;
     std::string levelGameStart;

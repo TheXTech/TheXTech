@@ -28,7 +28,6 @@
 #include "npc_special_data.h"
 #include <PGE_File_Formats/file_formats.h>
 #include <AppPath/app_path.h>
-#include <fmt_format_ne.h>
 #include "Logger/logger.h"
 
 void SaveLevel(const std::string& FilePath, int format, int version)   // saves the level
@@ -107,9 +106,6 @@ void SaveLevel(const std::string& FilePath, int format, int version)   // saves 
 
     // Level-wide settings
     out.LevelName = LevelName;
-
-    // Level-wide extra settings (may use full JSON encoder in the future)
-    // none supported yet
 
     // sections
     for(int i = 0; i < numSections; ++i)

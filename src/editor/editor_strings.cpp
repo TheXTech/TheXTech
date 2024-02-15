@@ -206,7 +206,6 @@ void initEditorStrings()
 
     g_editorStrings.levelName = "Level Name";
     g_editorStrings.levelStartPos = "Start Pos";
-    g_editorStrings.levelIsHub = "Is Hub";
     g_editorStrings.levelPathBG = "Path BG";
     g_editorStrings.levelBigBG = "Big BG";
     g_editorStrings.levelGameStart = "Game Start";

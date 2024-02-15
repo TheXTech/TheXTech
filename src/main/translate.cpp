@@ -642,7 +642,6 @@ XTechTranslate::XTechTranslate()
 
         {"editor.level.levelName",            &g_editorStrings.levelName},
         {"editor.level.startPos",             &g_editorStrings.levelStartPos},
-        {"editor.level.isHub",                &g_editorStrings.levelIsHub},
         {"editor.level.pathBG",               &g_editorStrings.levelPathBG},
         {"editor.level.bigBG",                &g_editorStrings.levelBigBG},
         {"editor.level.gameStart",            &g_editorStrings.levelGameStart},
