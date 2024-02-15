@@ -61,10 +61,13 @@ void SetOrigRes()
 
 void ChangeRes(int, int, int, int)
 {
+    resChanged = false;
     XWindow::setFullScreen(true);
 
     if(LoadingInProcess)
         UpdateLoad();
+
+    XWindow::showCursor(0);
 }
 
 //void SaveIt(int ScX, int ScY, int ScC, int ScF, std::string ScreenChanged)

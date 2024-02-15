@@ -564,54 +564,11 @@ void ChangeScreen()
 //    If resChanged = True Then
     if(resChanged)
     {
-//        SetOrigRes
         SetOrigRes();
-//        DoEvents
         XEvents::doEvents();
-//        DeleteDC myBackBuffer
-//        DeleteObject myBufferBMP
-//        DoEvents
-//        myBackBuffer = CreateCompatibleDC(frmMain.hdc)
-//        myBufferBMP = CreateCompatibleBitmap(frmMain.hdc, 800, 600)
-//        SelectObject myBackBuffer, myBufferBMP
-//        frmMain.BorderStyle = 2
-//        frmMain.Caption = "Super Mario Bros. X - Version 1.3 - www.SuperMarioBrothers.org"
-//        frmMain.Left = 0
-//        frmMain.Top = 0
-//    Else
     } else {
-//        If frmMain.WindowState = 2 Then
-//            frmMain.WindowState = 0
-//        End If
-//        frmMain.Width = 12240
-//        frmMain.Height = 9570
-//        Do While frmMain.ScaleWidth > 800
-//            frmMain.Width += -5
-//        Loop
-//        Do While frmMain.ScaleHeight > 600
-//            frmMain.Height += -5
-//        Loop
-//        Do While frmMain.ScaleWidth < 800
-//            frmMain.Width += 5
-//        Loop
-//        Do While frmMain.ScaleHeight < 600
-//            frmMain.Height += 5
-//        Loop
-//        SetRes
-        SetRes();
-//        DoEvents
+        ChangeRes(0, 0, 0, 0);
         XEvents::doEvents();
-//        DeleteDC myBackBuffer
-//        DeleteObject myBufferBMP
-//        DoEvents
-//        myBackBuffer = CreateCompatibleDC(frmMain.hdc)
-//        myBufferBMP = CreateCompatibleBitmap(frmMain.hdc, 800, 600)
-//        SelectObject myBackBuffer, myBufferBMP
-//        frmMain.BorderStyle = 0
-//        frmMain.Caption = ""
-//        frmMain.Left = 0
-//        frmMain.Top = 0
-//    End If
     }
 //    SaveConfig
     SaveConfig();
