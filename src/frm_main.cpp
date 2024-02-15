@@ -39,7 +39,6 @@
 #endif
 
 #ifdef CORE_EVERYTHING_SDL
-#   include "core/sdl/init_sdl.h"
 
 #   include "core/sdl/render_sdl.h"
 #   include "core/opengl/render_gl.h"

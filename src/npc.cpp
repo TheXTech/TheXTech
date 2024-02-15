@@ -3504,7 +3504,7 @@ void SpecialNPC(int A)
         if(Player[NPC[A].Special].Dead || Player[NPC[A].Special].Section != NPC[A].Section)
             NPC[A].Special = 0;
     }
-    else if(NPCIsCheep(NPC[A]) && NPC[A].Special == 1) // Red SMB3 Cheep
+    else if(NPC[A]->IsFish && NPC[A].Special == 1) // Red SMB3 Cheep
     {
         if(!NPC[A].Projectile)
         {

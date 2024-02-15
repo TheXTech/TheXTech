@@ -232,7 +232,7 @@ void SaveLevel(const std::string& FilePath, int format, int version)   // saves 
             npc.special_data = n.Special2;
         }
         // AI / firebar length
-        else if(n.Type == NPCID_FIRE_CHAIN || NPCIsAParaTroopa(n) || NPCIsCheep(n))
+        else if(n.Type == NPCID_FIRE_CHAIN || NPCIsAParaTroopa(n) || n->IsFish)
         {
             npc.special_data = n.Special;
         }

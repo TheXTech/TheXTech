@@ -278,7 +278,7 @@ void SetEditorNPCType(int type)
             EditorCursor.NPC.Special = 1;
 
         // reset special for NPCs that don't allow it
-        if(!(NPCIsCheep(type) || NPCIsAParaTroopa(type) || type == NPCID_FIRE_CHAIN))
+        if(!(NPCTraits[type].IsFish || NPCIsAParaTroopa(type) || type == NPCID_FIRE_CHAIN))
             EditorCursor.NPC.Special = 0;
 
         // reset special if it's out of range
@@ -809,7 +809,7 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
                 EditorCursor.NPC.Special = 3;
         }
 
-        if(NPCIsCheep(EditorCursor.NPC))
+        if(EditorCursor.NPC->IsFish)
         {
             // Describe current AI if valid
             if(mode == CallMode::Render)
@@ -5156,7 +5156,7 @@ void EditorScreen::UpdateSelectorBar(CallMode mode, bool select_bar_only)
 
         // world area
         currently_in = !in_excl_special && EditorCursor.Mode == OptCursor_t::WLD_AREA;
-        if(UpdateButton(mode, sx+8*40+4, 4, GFXBlock[60], currently_in, 0, 0, 32, 32, g_editorStrings.tooltipArea.c_str()))
+        if(FileFormat == FileFormats::LVL_PGEX && UpdateButton(mode, sx+8*40+4, 4, GFXBlock[60], currently_in, 0, 0, 32, 32, g_editorStrings.tooltipArea.c_str()))
         {
             if(currently_in)
                 swap_screens();

@@ -46,4 +46,7 @@ inline void invalidateDrawBGOs()
         v = false;
 }
 
+//! UpdateGraphics function that ONLY draws to the screen (no logic!)
+void UpdateGraphicsDraw(bool skipRepaint = false);
+
 #endif // #ifdef GFX_UPDATE_H

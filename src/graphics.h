@@ -131,7 +131,7 @@ void DrawMessage(const std::string& SuperText);
 void DrawMessage(const UTF8CharMap_t& SuperTextMap);
 
 // Public Sub SetRes()
-void SetRes();
+// void SetRes(); //deprecated
 // Public Function CheckKey(newStrizzle As String) As String
 //std::string CheckKey(std::string newStrizzle); // USELESS
 

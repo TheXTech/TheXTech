@@ -694,7 +694,7 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
             npc.DefaultSpecial = int(npc.Special);
         }
 
-        if(NPCIsCheep(npc))
+        if(npc->IsFish)
         {
             npc.Special = n.special_data;
             npc.DefaultSpecial = int(npc.Special);

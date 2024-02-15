@@ -191,26 +191,6 @@ constexpr bool NPCIsAParaTroopa(const NPC_t& n)
     return NPCIsAParaTroopa(n.Type);
 }
 
-// Must become a trait, because it's used in a unique way for activation logic, which I do not want to turn into a function pointer.
-//'Flags the NPC type as a cheep cheep
-constexpr bool NPCIsCheep(int Type)
-{
-    return (
-        Type == 28 ||
-        Type == 229 ||
-        Type == 230 ||
-        Type == 232 ||
-        Type == 233 ||
-        Type == 234 ||
-        Type == 236
-    );
-}
-
-constexpr bool NPCIsCheep(const NPC_t& n)
-{
-    return NPCIsCheep(n.Type);
-}
-
 // OKAY TO KEEP AS FUNCTION. Usages in UpdatePlayer may become an OnPlayerCollide NPC method, usages in Blocks should become a new flag.
 //'npc is a kurbo's shoe
 constexpr bool NPCIsBoot(int Type)

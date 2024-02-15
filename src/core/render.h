@@ -60,6 +60,14 @@ constexpr int TargetOverscanX = 0;
 extern int TargetW;
 extern int TargetH;
 
+#ifndef RENDER_CUSTOM
+
+// reset bitmask warning flag for SDL platforms
+extern bool g_BitmaskTexturePresent;
+
+#endif
+
+
 #ifdef RENDER_CUSTOM
 
 extern bool init();
@@ -67,12 +75,22 @@ extern void quit();
 
 #endif
 
-#ifndef RENDER_CUSTOM
+#ifdef RENDER_CUSTOM
 
-// reset bitmask warning flag for SDL platforms
-extern bool g_BitmaskTexturePresent;
+constexpr bool is_nullptr()
+{
+    return false;
+}
+
+#else
+
+SDL_FORCE_INLINE bool is_nullptr()
+{
+    return !g_render;
+}
 
 #endif
+
 
 /*!
  * \brief Identify does render engine works or not

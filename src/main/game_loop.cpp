@@ -40,6 +40,7 @@
 #include "../core/render.h"
 #include "../core/events.h"
 #include "../core/window.h"
+#include "graphics/gfx_update.h"
 #include "game_globals.h"
 #include "world_globals.h"
 #include "speedrunner.h"
@@ -84,7 +85,7 @@ void levelWaitForFade()
         if(canProceedFrame())
         {
             computeFrameTime1();
-            UpdateGraphics();
+            UpdateGraphicsDraw();
             UpdateSound();
             XEvents::doEvents();
             computeFrameTime2();
@@ -200,7 +201,7 @@ void GameLoop()
     {
         g_microStats.start_task(MicroStats::Effects);
         UpdateEffects();
-        if(CompatGetLevel() >= COMPAT_SMBX2)
+        if(!g_compatibility.modern_section_change)
             speedRun_tick();
         g_microStats.start_task(MicroStats::Graphics);
         UpdateGraphics();
@@ -289,13 +290,13 @@ void GameLoop()
                         if(FreezeNPCs)
                         {
                             FreezeNPCs = false;
-                            if(PSwitchTime > 0 && !noSound)
+                            if(PSwitchTime > 0)
                                 ResumeMusic();
                         }
                         else
                         {
                             FreezeNPCs = true;
-                            if(PSwitchTime > 0 && !noSound)
+                            if(PSwitchTime > 0)
                                 PauseMusic();
                         }
                         PlaySound(SFX_Pause);
@@ -405,11 +406,7 @@ int PauseGame(PauseCode code, int plr)
     GamePaused = code;
 
     if(PSwitchTime > 0)
-    {
-        // If noSound = False Then mciSendString "pause smusic", 0, 0, 0
-        if(!noSound)
-            PauseMusic();
-    }
+        PauseMusic();
 
     // resetFrameTimer();
 
@@ -529,11 +526,7 @@ int PauseGame(PauseCode code, int plr)
     XWindow::showCursor(prev_cursor);
 
     if(PSwitchTime > 0)
-    {
-        // If noSound = False Then mciSendString "resume smusic", 0, 0, 0
-        if(!noSound)
-            ResumeMusic();
-    }
+        ResumeMusic();
 
     // resetFrameTimer();
 

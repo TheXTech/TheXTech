@@ -217,7 +217,7 @@ void NPCHit(int A, int B, int C)
         if(NPC[C].Generator)
             return;
     }
-    if((NPC[A].Type == NPCID_SQUID_S1 || NPC[A].Type == NPCID_SQUID_S3 || NPCIsCheep(NPC[A])) && B == 1)
+    if((NPC[A].Type == NPCID_SQUID_S1 || NPC[A].Type == NPCID_SQUID_S3 || NPC[A]->IsFish) && B == 1)
     {
         if(Player[C].Wet > 0)
             return;

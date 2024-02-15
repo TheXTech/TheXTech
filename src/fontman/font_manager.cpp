@@ -890,3 +890,7 @@ std::string FontManager::cropText(std::string text, size_t max_symbols)
     return text;
 }
 
+bool FontManager::hasTtfSupport()
+{
+    return (bool)getDefaultTtfFont();
+}

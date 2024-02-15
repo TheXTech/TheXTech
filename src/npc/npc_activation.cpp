@@ -65,20 +65,8 @@ inline static bool s_Event_SoundOnly(const Events_t& evt, int test_section)
 static bool s_NPC_MustBeCanonical_internal(const NPC_t& n)
 {
     return n.Generator
-        || n.Type == NPCID_STONE_S3
-        || n.Type == NPCID_STONE_S4
-        || n.Type == NPCID_METALBARREL
-        || n.Type == NPCID_CANNONENEMY
-        || n.Type == NPCID_BULLET
-        || n.Type == NPCID_BIG_BULLET
-        || n.Type == NPCID_GHOST_FAST
-        || n.Type == NPCID_STATUE_S3
-        || n.Type == NPCID_STATUE_S4
-        || n.Type == NPCID_HOMING_BALL_GEN
-        || n.Type == NPCID_LAVA_MONSTER
-        || n.Type == NPCID_SPIKY_THROWER
-        || n.Type == NPCID_ITEM_THROWER
-        || (NPCIsCheep(n) && Maths::iRound(n.Special) == 2)
+        || n->UseDefaultCam
+        || (n->IsFish && Maths::iRound(n.Special) == 2)
         || n.AttLayer != LAYER_NONE
         || (n.TriggerActivate != EVENT_NONE && !s_Event_SoundOnly(Events[n.TriggerActivate], n.Section));
 }
@@ -90,52 +78,20 @@ bool NPC_MustBeCanonical(NPCRef_t n)
 
 bool NPC_InactiveIgnore(const NPC_t& n)
 {
-    return (NPCIsCheep(n) && Maths::iRound(n.Special) == 2)
-        || n.Type == NPCID_LAVABUBBLE
-        || n.Type == NPCID_PLANT_S3 || n.Type == NPCID_BOTTOM_PLANT || n.Type == NPCID_SIDE_PLANT
-        || n.Type == NPCID_BIG_PLANT || n.Type == NPCID_PLANT_S1 || n.Type == NPCID_FIRE_PLANT
-        || n.Type == NPCID_LONG_PLANT_UP || n.Type == NPCID_LONG_PLANT_DOWN || n.Type == NPCID_JUMP_PLANT
-        || n.Type == NPCID_LAVA_MONSTER;
+    return (n->IsFish && Maths::iRound(n.Special) == 2)
+        || n->InactiveRender == NPCTraits_t::SKIP;
 }
 
 bool NPC_InactiveRender(const NPC_t& n)
 {
     return n.Inert
         || n.Stuck
-        || NPCIsACoin(n)
-        || n->IsABlock
-        || n->IsAHit1Block
-        || NPCIsAVine(n)
-        || NPCIsABonus(n)
-        || n.Type == NPCID_CHECKPOINT
-        || n.Type == NPCID_ITEM_BURIED
-        || n.Type == NPCID_CONVEYOR
-        || n.Type == NPCID_STONE_S3
-        || n.Type == NPCID_STONE_S4
-        || n.Type == NPCID_HOMING_BALL_GEN
-        || n.Type == NPCID_ITEMGOAL
-        || n.Type == NPCID_CANNONENEMY
-        || n.Type == NPCID_STATUE_S3
-        || n.Type == NPCID_STATUE_S4
-        || n.Type == NPCID_ITEM_POD
-        || n.Type == NPCID_SPRING
-        || n.Type == NPCID_CANNONITEM
-        || n.Type == NPCID_KEY
-        || n.Type == NPCID_TIME_SWITCH
-        || n.Type == NPCID_COIN_SWITCH
-        || n.Type == NPCID_ICE_BLOCK
-        || n.Type == NPCID_VEHICLE
-        || n.Type == NPCID_AXE
-        || n.Type == NPCID_WALK_PLANT
-        || n.Type == NPCID_FLY_BLOCK
-        || n.Type == NPCID_FLY_CANNON
-        || n.Type == NPCID_MAGIC_DOOR
-        || n.Type == NPCID_DOOR_MAKER;
+        || n->InactiveRender == NPCTraits_t::SHOW_ALWAYS;
 }
 
 bool NPC_InactiveSmoke(const NPC_t& n)
 {
-    return n.Type == NPCID_BULLET || n.Type == NPCID_BIG_BULLET || n.Type == NPCID_GHOST_FAST;
+    return n->InactiveRender == NPCTraits_t::SMOKE;
 }
 
 void NPC_ConstructCanonicalSet()

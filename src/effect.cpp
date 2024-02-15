@@ -176,7 +176,7 @@ void UpdateEffects()
                 else if(e.Life == 52)
                     e.Location.SpeedY = -14;
             }
-            else if(!HasSound(SFX_MagicBossShell) && e.Life == 100) // Old sound
+            else if(e.Life == 100) // Old sound
             {
                 e.Location.SpeedY = -8;
                 PlaySoundSpatial(SFX_SickBossKilled, e.Location);
@@ -733,7 +733,7 @@ void UpdateEffects()
                         if(nn.Type == NPCID_LEAF_POWER)
                             nn.Location.SpeedY = -6;
 
-                        if(NPCIsCheep(e.NewNpc) || NPCIsAParaTroopa(e.NewNpc) || e.NewNpc == NPCID_FIRE_CHAIN)
+                        if(NPCTraits[e.NewNpc].IsFish || NPCIsAParaTroopa(e.NewNpc) || e.NewNpc == NPCID_FIRE_CHAIN)
                         {
                             nn.Special = static_cast<double>(e.NewNpcSpecial);
                             nn.DefaultSpecial = static_cast<int>(e.NewNpcSpecial);

@@ -24,18 +24,7 @@
 #ifdef __cplusplus
 #include <string>
 
-struct PGE_LogLevel
-{
-    enum Level : int
-    {
-        Debug    = 5,
-        Info     = 4,
-        Warning  = 3,
-        Critical = 2,
-        Fatal    = 1,
-        NoLog    = 0,
-    };
-};
+#include "logger_level.h"
 
 extern struct PGE_LogSetup
 {

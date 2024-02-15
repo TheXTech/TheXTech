@@ -36,6 +36,7 @@
 #include "main/cheat_code.h"
 #include "main/menu_main.h"
 #include "main/translate.h"
+#include "main/game_strings.h"
 #include "../graphics.h"
 #include "../frame_timer.h"
 
@@ -948,7 +949,7 @@ bool Update(bool check_lost_devices)
         s_requestedPause = PauseCode::None;
 
         if(p == PauseCode::TextEntry)
-            cheats_setBuffer(TextEntryScreen::Run("Enter cheat:"));
+            cheats_setBuffer(TextEntryScreen::Run(g_gameStrings.pauseItemEnterCode));
         else
             PauseGame(p);
 

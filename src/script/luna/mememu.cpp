@@ -681,7 +681,7 @@ public:
         insert(0x00B2D6D0, &MenuMouseRelease);
         insert(0x00B2D6D2, &SharedCursor.Move);
         insert(0x00B2D710, &numEvents);
-        insert(0x00B2D734, &noSound);
+        // insert(0x00B2D734, &noSound); // deprecated, can read g_mixerLoaded
         insert(0x00B2D740, &BattleMode);
     }
 

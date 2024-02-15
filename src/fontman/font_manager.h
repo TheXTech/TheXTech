@@ -225,6 +225,12 @@ PGE_Size    optimizeTextPx(std::string &text,
  */
 std::string     cropText(std::string text, size_t max_symbols);
 
+/**
+ * @brief Checks for TTF font support
+ * @return True if any TTF font is loaded
+ */
+bool            hasTtfSupport();
+
 } //namespace FontManager
 
 #endif // FONT_MANAGER_H
