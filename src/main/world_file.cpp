@@ -463,6 +463,8 @@ void ClearWorld(bool quick)
     for(A = 1; A <= numWorldMusic; A++)
         WorldMusic[A] = WorldMusic_t();
 
+    WorldPlayer[1] = WorldPlayer_t();
+
     if(!quick)
     {
 #ifdef __16M__
@@ -619,6 +621,16 @@ bool CanConvertWorld(int format, std::string* reasons)
         }
     }
 
+    if(numWorldAreas > 0)
+    {
+        can_convert = false;
+        if(reasons)
+        {
+            *reasons = g_editorStrings.fileConvertFeatureLevelStarDisplay;
+            *reasons += '\n';
+        }
+    }
+
     return can_convert;
 }
 
@@ -645,14 +657,12 @@ void ConvertWorld(int format)
         return;
 
     for(int i = 1; i <= numWorldMusic; i++)
-    {
         SetS(WorldMusic[i].MusicFile, "");
-    }
 
     WorldStarsShowPolicy = WorldData::STARS_UNSPECIFIED;
 
     for(int i = 1; i <= numWorldLevels; i++)
-    {
         WorldLevel[i].starsShowPolicy = WorldData::STARS_UNSPECIFIED;
-    }
+
+    numWorldAreas = 0;
 }

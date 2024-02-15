@@ -115,6 +115,10 @@ void AddCredit(const std::string& newCredit);
 // calcualtes scores based on the multiplyer and how much the NPC is worth
 void MoreScore(int addScore, const Location_t &Loc);
 void MoreScore(int addScore, const Location_t &Loc, vbint_t &Multiplier);
+
+// NEW: convenience hook for when a player has collected 100 coins
+void Got100Coins();
+
 // sets up player frame offsets so they are displayed correctly on the screen
 void SetupPlayerFrames();
 

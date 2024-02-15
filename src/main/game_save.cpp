@@ -162,6 +162,7 @@ void FindSaves()
 
             // load normal stats
             info.Lives = f.lives;
+            info.Hundreds = (f.hundreds == 0) ? f.lives : ((f.hundreds > 0) ? f.hundreds - 1 : f.hundreds);
             info.Coins = f.coins;
             info.Score = f.points;
 
@@ -245,6 +246,7 @@ void SaveGame()
 
 //    Open SelectWorld[selWorld].WorldPath + "save" + selSave + ".sav" For Output As #1;
     sav.lives = int(Lives);
+    sav.hundreds = (g_100s >= 0) ? g_100s + 1 : g_100s;
     sav.coins = uint32_t(Coins);
     sav.points = uint32_t(Score);
     sav.worldPosX = WorldPlayer[1].Location.X;
@@ -335,6 +337,7 @@ void LoadGame()
     }
 
     Lives = float(sav.lives);
+    g_100s = (sav.hundreds == 0) ? sav.lives : ((sav.hundreds > 0) ? sav.hundreds - 1 : sav.hundreds);
     Coins = int(sav.coins);
     Score = int(sav.points);
     BeatTheGame = sav.gameCompleted;
@@ -347,6 +350,11 @@ void LoadGame()
         Coins = 0;
     if(Score > 9999990)
         Score = 9999990;
+
+    if(g_100s > 9999)
+        g_100s = 9999;
+    else if(g_100s < -9999)
+        g_100s = -9999;
 
     curWorldMusic = int(sav.musicID);
     curWorldMusicFile = sav.musicFile;

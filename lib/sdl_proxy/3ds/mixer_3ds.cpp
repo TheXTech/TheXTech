@@ -206,6 +206,14 @@ int Mix_PlayChannelVol(int channel, Mix_Chunk* chunk, int loops, int volume)
     return Mix_PlayChannel(channel, chunk, loops);
 }
 
+int Mix_SetPanning(int channel, uint8_t left, uint8_t right)
+{
+    UNUSED(channel);
+    UNUSED(left);
+    UNUSED(right);
+    return -1;
+}
+
 int Mix_ReserveChannels(int channels)
 {
     cur_sound = (SoundId*)malloc(sizeof(SoundId) * channels);

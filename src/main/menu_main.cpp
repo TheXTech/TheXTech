@@ -64,6 +64,7 @@
 #include "core/language.h"
 #include "main/translate.h"
 #include "fontman/font_manager.h"
+#include "custom.h"
 
 #include "video.h"
 #include "editor.h"
@@ -253,8 +254,8 @@ void GetMenuPos(int* MenuX, int* MenuY)
     if(MenuX && XRender::TargetW < TinyScreenW)
     {
         *MenuX = XRender::TargetW / 2 - 240;
-        if(*MenuX < 24)
-            *MenuX = 24;
+        if(*MenuX < 24 + XRender::TargetOverscanX)
+            *MenuX = 24 + XRender::TargetOverscanX;
     }
 
     // the rest is tweaks for MenuY
@@ -578,9 +579,6 @@ void FindLevels()
     }
 
     NumSelectBattle = ((int)SelectBattle.size() - 1);
-#ifndef PGE_NO_THREADING
-    SDL_AtomicSet(&loading, 0);
-#endif
 
     if(SelectBattle.size() <= 2) // No available levels in the list
     {
@@ -592,6 +590,10 @@ void FindLevels()
         SelectBattle[1].WorldName = g_mainMenu.gameNoBattleLevels;
         SelectBattle[1].disabled = true;
     }
+
+#ifndef PGE_NO_THREADING
+    SDL_AtomicSet(&loading, 0);
+#endif
 }
 
 
@@ -974,6 +976,8 @@ bool mainMenuUpdate()
                 }
                 else
                 {
+                    UnloadCustomPlayerPreviews();
+
                     MenuCursor = selSave - 1;
                     if(menuPlayersNum == 1)
                         MenuMode = MENU_SELECT_SLOT_1P;
@@ -1312,6 +1316,7 @@ bool mainMenuUpdate()
 #else
                                 SDL_AtomicSet(&loading, 1);
                                 loadingThread = SDL_CreateThread(FindWorldsThread, "FindWorlds", NULL);
+                                SDL_DetachThread(loadingThread);
 #endif
                             }
                         }
@@ -1386,27 +1391,22 @@ bool mainMenuUpdate()
                             return true;
                         }
                     }
-                    // game mode
+                    // battle mode
+                    else if(MenuMode == MENU_BATTLE_MODE)
+                    {
+                        MenuMode = MENU_CHARACTER_SELECT_NEW_BM;
+                        ConnectScreen::MainMenu_Start(2);
+                    }
+                    // enter save select
                     else
                     {
-                        if(MenuMode != MENU_BATTLE_MODE)
-                            FindSaves();
-
-                        if(MenuMode == MENU_BATTLE_MODE)
-                        {
-                            MenuMode = MENU_CHARACTER_SELECT_NEW_BM;
-                            ConnectScreen::MainMenu_Start(2);
-                        }
-                        else
-                        {
-                            MenuMode *= MENU_SELECT_SLOT_BASE;
-                            MenuCursor = 0;
-                        }
+                        FindSaves();
+                        MenuMode *= MENU_SELECT_SLOT_BASE;
+                        MenuCursor = 0;
                     }
 
                     MenuCursorCanMove = false;
                 }
-
             }
 
             // New world select scroll options!
@@ -1505,6 +1505,8 @@ bool mainMenuUpdate()
 
                     if(MenuCursor >= 0 && MenuCursor <= c_menuItemSavesEndList) // Select the save slot, but still need to select players
                     {
+                        LoadCustomPlayerPreviews(SelectWorld[selWorld].WorldPath.c_str());
+
                         selSave = MenuCursor + 1;
                         if(MenuMode == MENU_SELECT_SLOT_2P)
                             ConnectScreen::MainMenu_Start(2);
@@ -1978,7 +1980,7 @@ static void s_drawGameVersion()
     constexpr bool show_commit = (!is_release || (!is_main && !is_stable));
 
     // show version
-    SuperPrintRightAlign("v" V_LATEST_STABLE, 5, XRender::TargetW - 2, 2);
+    SuperPrintRightAlign("v" V_LATEST_STABLE, 5, XRender::TargetW - XRender::TargetOverscanX - 2, 2);
 
     // show branch
     if(show_branch)
@@ -1988,10 +1990,10 @@ static void s_drawGameVersion()
         if(is_wip)
         {
             // strip the "wip-"
-            SuperPrintRightAlign(&V_BUILD_BRANCH[find_in_string(V_BUILD_BRANCH, '-') + 1], 5, XRender::TargetW - 2, y);
+            SuperPrintRightAlign(&V_BUILD_BRANCH[find_in_string(V_BUILD_BRANCH, '-') + 1], 5, XRender::TargetW - XRender::TargetOverscanX - 2, y);
         }
         else
-            SuperPrintRightAlign(V_BUILD_BRANCH, 5, XRender::TargetW - 2, y);
+            SuperPrintRightAlign(V_BUILD_BRANCH, 5, XRender::TargetW - XRender::TargetOverscanX - 2, y);
     }
 
     // show git commit
@@ -2000,10 +2002,10 @@ static void s_drawGameVersion()
         if(is_dirty)
         {
             // only show -d, not -dirty
-            SuperPrintRightAlign(find_in_string(V_BUILD_VER, '-') + 2 + 1, "#" V_BUILD_VER, 5, XRender::TargetW - 2, XRender::TargetH - 18);
+            SuperPrintRightAlign(find_in_string(V_BUILD_VER, '-') + 2 + 1, "#" V_BUILD_VER, 5, XRender::TargetW - XRender::TargetOverscanX - 2, XRender::TargetH - 18);
         }
         else
-            SuperPrintRightAlign("#" V_BUILD_VER, 5, XRender::TargetW - 2, XRender::TargetH - 18);
+            SuperPrintRightAlign("#" V_BUILD_VER, 5, XRender::TargetW - XRender::TargetOverscanX - 2, XRender::TargetH - 18);
     }
 }
 
@@ -2113,9 +2115,7 @@ static void s_drawGameSaves(int MenuX, int MenuY)
     int row_lc = (hasFails) ? row_1 : row_c;
 
     // Print lives on the screen (from gfx_update2.cpp)
-    XRender::renderTexture(infobox_x + 272, row_lc + 2 + 14 - GFX.Interface[3].h, GFX.Interface[3]);
-    XRender::renderTexture(infobox_x + 272 + 40, row_lc + 2 + 16 - GFX.Interface[3].h, GFX.Interface[1]);
-    SuperPrint(t = std::to_string(info.Lives), 1, infobox_x + 272 + 62, row_lc + 2);
+    DrawLives(infobox_x + 272 + 32, row_lc, info.Lives, info.Hundreds);
 
     // Print coins on the screen (from gfx_update2.cpp)
     int coins_x = infobox_x + 480 - 10 - 36 - 62;
@@ -2191,7 +2191,15 @@ void mainMenuDraw()
 
     s_drawGameVersion();
 
+    // Menu Intro
+    if(MenuMode == MENU_INTRO)
+    {
+        if((CommonFrame % 90) < 45)
+            SuperPrintScreenCenter(g_mainMenu.introPressStart, 3, (16 + 240 + XRender::TargetH - 48) / 2);
+    }
+
 #ifndef PGE_NO_THREADING
+    // loading (can't safely render)
     if(SDL_AtomicGet(&loading))
     {
         if(SDL_AtomicGet(&loadingProgrssMax) <= 0)
@@ -2204,13 +2212,8 @@ void mainMenuDraw()
     }
     else
 #endif
+    // DO NOT DETACH THE ABOVE ELSE STATEMENT FROM THE FOLLOWING SERIES OF IF CLAUSES
 
-    // Menu Intro
-    if(MenuMode == MENU_INTRO)
-    {
-        if((CommonFrame % 90) < 45)
-            SuperPrintScreenCenter(g_mainMenu.introPressStart, 3, (16 + 240 + XRender::TargetH - 48) / 2);
-    }
     // Main menu
     if(MenuMode == MENU_MAIN)
     {

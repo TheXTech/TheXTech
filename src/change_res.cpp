@@ -77,6 +77,10 @@ void UpdateInternalRes()
     int req_w = g_config.InternalW;
     int req_h = g_config.InternalH;
 
+#ifdef __3DS__
+    req_w += XRender::TargetOverscanX * 2;
+#endif
+
     // TODO: use the correct canonical screen's resolution here
     int canon_w = 800;
     int canon_h = 600;

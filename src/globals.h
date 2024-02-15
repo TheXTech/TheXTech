@@ -1805,6 +1805,8 @@ extern bool IsHubLevel;
 extern int Coins;
 //Public Lives As Single 'number of lives
 extern float Lives;
+//NEW: tracker of number of hundreds of coins that have been obtained
+extern int g_100s;
 //Public EndIntro As Boolean
 extern bool EndIntro;
 //Public ExitMenu As Boolean
@@ -1906,6 +1908,7 @@ struct SaveSlotInfo_t
     int Progress = -1;
     int Stars = 0;
     int Lives = 3;
+    int Hundreds = 0;
     int Coins = 0;
 };
 

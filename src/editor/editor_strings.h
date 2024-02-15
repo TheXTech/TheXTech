@@ -313,6 +313,7 @@ struct EditorContent
     std::string fileConvertFeatureCustomWorldMusic;
     std::string fileConvertFeatureWorldStarDisplay;
     std::string fileConvertFeatureLevelStarDisplay;
+    std::string fileConvertFeatureWorldMapSections;
 
     std::string browserNewFile;
     std::string browserSaveFile;

@@ -61,11 +61,18 @@ void GetvScreen(vScreen_t& vscreen)
         vscreen.X += -vscreen.tempX;
         vscreen.Y += -vscreen.TempY;
 
+        // allow some overscan (needed for 3DS)
+        int allow_X = (g_compatibility.allow_multires && Screens[vscreen.screen_ref].player_count == 1 && !Screens[vscreen.screen_ref].is_canonical()) ? XRender::TargetOverscanX : 0;
+
+        // don't do overscan if at the level bounds
+        if(allow_X > 0 && level[p.Section].Width - level[p.Section].X <= vscreen.Width)
+            allow_X = 0;
+
         // shift the level so that it is onscreen
-        if(-vscreen.X < level[p.Section].X)
-            vscreen.X = -level[p.Section].X;
-        if(-vscreen.X + vscreen.Width > level[p.Section].Width)
-            vscreen.X = -(level[p.Section].Width - vscreen.Width);
+        if(-vscreen.X < level[p.Section].X - allow_X)
+            vscreen.X = -(level[p.Section].X - allow_X);
+        if(-vscreen.X + vscreen.Width > level[p.Section].Width + allow_X)
+            vscreen.X = -(level[p.Section].Width - vscreen.Width + allow_X);
         if(-vscreen.Y < level[p.Section].Y)
             vscreen.Y = -level[p.Section].Y;
         if(-vscreen.Y + vscreen.Height > level[p.Section].Height)
@@ -145,23 +152,21 @@ void GetvScreenAverage(vScreen_t& vscreen)
     vscreen.X = (vscreen.X / B) + (use_width * 0.5);
     vscreen.Y = (vscreen.Y / B) + (use_height * 0.5) - vScreenYOffset;
 
-    if(-vscreen.X < section.X)
-        vscreen.X = -section.X;
-    if(-vscreen.X + use_width > section.Width)
-        vscreen.X = -(section.Width - use_width);
+    // allow some overscan (needed for 3DS)
+    int allow_X = (g_compatibility.allow_multires && Screens[vscreen.screen_ref].player_count == 1 && !Screens[vscreen.screen_ref].is_canonical()) ? XRender::TargetOverscanX : 0;
+
+    // don't do overscan if at the level bounds
+    if(allow_X > 0 && section.Width - section.X <= vscreen.Width)
+        allow_X = 0;
+
+    if(-vscreen.X < section.X - allow_X)
+        vscreen.X = -(section.X - allow_X);
+    if(-vscreen.X + use_width > section.Width + allow_X)
+        vscreen.X = -(section.Width - use_width + allow_X);
     if(-vscreen.Y < section.Y)
         vscreen.Y = -section.Y;
     if(-vscreen.Y + use_height > section.Height)
         vscreen.Y = -(section.Height - use_height);
-
-    // keep vScreen boundary even (on 1x platforms)
-#ifdef PGE_MIN_PORT
-    vscreen.X += 1;
-    if(vscreen.X > 0)
-        vscreen.X -= std::fmod(vscreen.X, 2.);
-    else
-        vscreen.X += std::fmod(vscreen.X, 2.);
-#endif
 
     if(GameMenu)
     {
@@ -293,10 +298,17 @@ void GetvScreenAverage3(vScreen_t& vscreen)
     vscreen.X = -(l + r) / 2 + (use_width * 0.5);
     vscreen.Y = vscreen.Y / (plr_count + 1) + (use_height * 0.5) - vScreenYOffset;
 
-    if(-vscreen.X < section.X)
-        vscreen.X = -section.X;
-    if(-vscreen.X + use_width > section.Width)
-        vscreen.X = -(section.Width - use_width);
+    // allow some overscan (needed for 3DS)
+    int allow_X = (g_compatibility.allow_multires && Screens[vscreen.screen_ref].player_count == 1 && !Screens[vscreen.screen_ref].is_canonical()) ? XRender::TargetOverscanX : 0;
+
+    // don't do overscan if at the level bounds
+    if(allow_X > 0 && section.Width - section.X <= vscreen.Width)
+        allow_X = 0;
+
+    if(-vscreen.X < section.X - allow_X)
+        vscreen.X = -(section.X - allow_X);
+    if(-vscreen.X + use_width > section.Width + allow_X)
+        vscreen.X = -(section.Width - use_width + allow_X);
     if(-vscreen.Y < section.Y)
         vscreen.Y = -section.Y;
     if(-vscreen.Y + use_height > section.Height)
@@ -735,6 +747,9 @@ void ScreenShot()
 
 void DrawFrozenNPC(int Z, int A)
 {
+    double camX = vScreen[Z].CameraAddX();
+    double camY = vScreen[Z].CameraAddY();
+
     auto &n = NPC[A];
     if((vScreenCollision(Z, n.Location) ||
         vScreenCollision(Z, newLoc(n.Location.X - (n->WidthGFX - n.Location.Width) / 2,
@@ -750,8 +765,8 @@ void DrawFrozenNPC(int Z, int A)
         // Draw frozen NPC body in only condition the content value is valid
         if(content > 0 && content <= maxNPCType)
         {
-             XRender::renderTexture(float(vScreen[Z].X + n.Location.X + 2),
-                                    float(vScreen[Z].Y + n.Location.Y + 2),
+             XRender::renderTexture(float(camX + n.Location.X + 2),
+                                    float(camY + n.Location.Y + 2),
                                     float(n.Location.Width - 4),
                                     float(n.Location.Height - 4),
                                     GFXNPCBMP[content],
@@ -759,20 +774,20 @@ void DrawFrozenNPC(int Z, int A)
         }
 
         // draw ice
-         XRender::renderTexture(float(vScreen[Z].X + n.Location.X + n->FrameOffsetX),
-                                float(vScreen[Z].Y + n.Location.Y + n->FrameOffsetY),
+         XRender::renderTexture(float(camX + n.Location.X + n->FrameOffsetX),
+                                float(camY + n.Location.Y + n->FrameOffsetY),
                                 float(n.Location.Width - 6), float(n.Location.Height - 6),
                                 GFXNPCBMP[n.Type], 0, 0, c);
-         XRender::renderTexture(float(vScreen[Z].X + n.Location.X + n->FrameOffsetX + n.Location.Width - 6),
-                                float(vScreen[Z].Y + n.Location.Y + n->FrameOffsetY),
+         XRender::renderTexture(float(camX + n.Location.X + n->FrameOffsetX + n.Location.Width - 6),
+                                float(camY + n.Location.Y + n->FrameOffsetY),
                                 6, float(n.Location.Height - 6),
                                 GFXNPCBMP[n.Type], 128 - 6, 0, c);
-         XRender::renderTexture(float(vScreen[Z].X + n.Location.X + n->FrameOffsetX),
-                                float(vScreen[Z].Y + n.Location.Y + n->FrameOffsetY + n.Location.Height - 6),
+         XRender::renderTexture(float(camX + n.Location.X + n->FrameOffsetX),
+                                float(camY + n.Location.Y + n->FrameOffsetY + n.Location.Height - 6),
                                 float(n.Location.Width - 6), 6,
                                 GFXNPCBMP[n.Type], 0, 128 - 6, c);
-         XRender::renderTexture(float(vScreen[Z].X + n.Location.X + n->FrameOffsetX + n.Location.Width - 6),
-                                float(vScreen[Z].Y + n.Location.Y + n->FrameOffsetY + n.Location.Height - 6),
+         XRender::renderTexture(float(camX + n.Location.X + n->FrameOffsetX + n.Location.Width - 6),
+                                float(camY + n.Location.Y + n->FrameOffsetY + n.Location.Height - 6),
                                 6, 6, GFXNPCBMP[n.Type],
                                 128 - 6, 128 - 6, c);
     }

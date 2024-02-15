@@ -310,6 +310,7 @@ void initEditorStrings()
     g_editorStrings.fileConvertFeatureCustomWorldMusic = "Uses custom world music file.";
     g_editorStrings.fileConvertFeatureWorldStarDisplay = "Uses world setting for star display.";
     g_editorStrings.fileConvertFeatureLevelStarDisplay = "A level uses setting for star display.";
+    g_editorStrings.fileConvertFeatureWorldMapSections = "The world includes world map sections.";
 
     g_editorStrings.browserNewFile = "New file";
     g_editorStrings.browserSaveFile = "Save file";

@@ -116,6 +116,14 @@ int Mix_PlayChannelTimedVolume(int channel, Mix_Chunk* chunk, int loops, int tic
 }
 #endif
 
+int Mix_SetPanning(int channel, uint8_t left, uint8_t right)
+{
+    UNUSED(channel);
+    UNUSED(left);
+    UNUSED(right);
+    return -1;
+}
+
 int Mix_ReserveChannels(int channels)
 {
     UNUSED(channels);

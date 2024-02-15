@@ -21,6 +21,10 @@
 #pragma once
 #ifndef GL_PROGRAM_OBJECT_H
 
+#if defined(THEXTECH_BUILD_GL_DESKTOP_MODERN) || defined(THEXTECH_BUILD_GL_ES_MODERN)
+#    define RENDERGL_HAS_SHADERS
+#endif
+
 #include <vector>
 #include <string>
 #include <cstdint>
@@ -33,7 +37,7 @@ typedef float           GLfloat;
 constexpr int XT_GL_FLOAT = 0x1406;
 constexpr int XT_GL_INT   = 0x1404;
 
-struct StdPictureLoad;
+struct StdPicture_Sub;
 
 
 struct UniformValue_t
@@ -115,6 +119,8 @@ private:
     GLint m_u_transform_loc = -1;
     GLint m_u_read_viewport_loc = -1;
     GLint m_u_clock_loc = -1;
+    GLint m_u_framebuffer_pixsize_loc = -1;
+    GLint m_u_texture_pixsize_loc = -1;
 
     // OpenGL locations for custom uniforms (indices match those returned by register_uniform)
     std::vector<GLint> m_u_custom_loc;
@@ -221,20 +227,20 @@ public:
     }
 
     /*!
-     * \brief Restores all registered uniforms from a StdPictureLoad object (after a shader has been reloaded)
-     * \param l StdPictureLoad to restore uniform registrations / assignments from
+     * \brief Restores all registered uniforms from a StdPicture_Sub object (after a shader has been reloaded)
+     * \param target StdPicture_Sub to restore uniform registrations / assignments from
      *
-     * Note: will fix the type of any assignments in l
+     * Note: will fix the type of any assignments in target, and will also update the GL program's texture dimensions if needed.
      */
-    void restore_uniforms(StdPictureLoad& l);
+    void restore_uniforms(StdPicture_Sub& target);
 
     /*!
      * \brief Registers a custom uniform variable in the next available index
      * \param name name of uniform
-     * \param l StdPictureLoad to cache the registration in, in case of shader unload
+     * \param target StdPicture_Sub to cache the registration in, in case of shader unload
      * \returns The internal index for the uniform, -1 on failure
      */
-    int register_uniform(const char* name, StdPictureLoad& l);
+    int register_uniform(const char* name, StdPicture_Sub& target);
 
     /*!
      * \brief Gets location of custom uniform variable by registered index (advanced, ignores uniform state management)
@@ -245,11 +251,11 @@ public:
      * \brief Assigns a custom uniform variable to a value and stores it in the managed uniform state
      * \param index registered internal index returned by previous call to register_uniform
      * \param value to assign the uniform to
-     * \param l StdPictureLoad to check current state from and cache the assignment in, in case of unload
+     * \param target StdPicture_Sub to check current state from and cache the assignment in, in case of unload
      *
      * Note: clears the previous rewind buffer if activate_uniform_step has been called.
      */
-    void assign_uniform(int index, const UniformValue_t& value, StdPictureLoad& l);
+    void assign_uniform(int index, const UniformValue_t& value, StdPicture_Sub& target);
 
     /*!
      * \brief Returns the current uniform step (following all pending assignments) for rewinding during the current frame

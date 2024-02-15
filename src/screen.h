@@ -82,6 +82,12 @@ struct vScreen_t : public qScreen_t
 
     //! top y-coordinate for start drawing on the currently active render target
     int TargetY() const;
+
+    //! x-offset to add for render calls (based on X, but may be rounded)
+    double CameraAddX() const;
+
+    //! Y-offset to add for render calls (based on Y, but may be rounded)
+    double CameraAddY() const;
 };
 
 constexpr int c_screenCount = 2;

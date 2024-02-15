@@ -43,6 +43,8 @@ void DrawBackgroundColor(int A, int Z, bool lower = false)
 void DrawTopAnchoredBackground(int S, int Z, int A, int offset = 32, int expected_height = 0, int tile_bottom = 0, double h_parallax = 0.5)
 {
     DrawBackgroundColor(A, Z, true);
+    double camX = vScreen[Z].CameraAddX();
+    double camY = vScreen[Z].CameraAddY();
 
     const Screen_t& screen = Screens[vScreen[Z].screen_ref];
 
@@ -55,17 +57,17 @@ void DrawTopAnchoredBackground(int S, int Z, int A, int offset = 32, int expecte
         tempLocation.Width = GFXBackground2Width[A];
         tempLocation.Height = GFXBackground2Height[A];
 
-        tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreen[Z].X + vScreen[Z].Left + level[S].X) * h_parallax);
+        tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (camX + vScreen[Z].Left + level[S].X) * h_parallax);
 
         tempLocation.Y = level[S].Y - offset;
-        if(GameMenu && tempLocation.Y > -vScreen[Z].Y)
-            tempLocation.Y = -vScreen[Z].Y;
+        if(GameMenu && tempLocation.Y > -camY)
+            tempLocation.Y = -camY;
 
-        while(tempLocation.X + tempLocation.Width > -vScreen[Z].X
-                && tempLocation.X < -vScreen[Z].X + vScreen[Z].Width
-                && tempLocation.Y < -vScreen[Z].Y + vScreen[Z].Height)
+        while(tempLocation.X + tempLocation.Width > -camX
+                && tempLocation.X < -camX + vScreen[Z].Width
+                && tempLocation.Y < -camY + vScreen[Z].Height)
         {
-            XRender::renderTexture(vScreen[Z].X + tempLocation.X, vScreen[Z].Y + tempLocation.Y,
+            XRender::renderTexture(camX + tempLocation.X, camY + tempLocation.Y,
                 GFXBackground2Width[A], tempLocation.Height, GFXBackground2[A], 0, GFXBackground2Height[A] - tempLocation.Height);
 
             if(g_compatibility.disable_background2_tiling)
@@ -89,6 +91,8 @@ void DrawTopAnchoredBackground(int S, int Z, int A, int offset = 32, int expecte
 void DrawCenterAnchoredBackground(int S, int Z, int A, int expected_height = 0, int tile_bottom = 0, int tile_top = 0, bool flip_tile = false, double h_parallax = 0.5, bool anim = false)
 {
     const Screen_t& screen = Screens[vScreen[Z].screen_ref];
+    double camX = vScreen[Z].CameraAddX();
+    double camY = vScreen[Z].CameraAddY();
 
     double Eff_ScreenH = 0;
     for(int i = 1; i <= 2; i++)
@@ -137,13 +141,13 @@ void DrawCenterAnchoredBackground(int S, int Z, int A, int expected_height = 0, 
         tempLocation.Width = GFXBackground2Width[A];
         tempLocation.Height = frameH;
 
-        tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreen[Z].X + vScreen[Z].Left + level[S].X) * h_parallax);
+        tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (camX + vScreen[Z].Left + level[S].X) * h_parallax);
         if(level[S].Height - level[S].Y > CanvasH)
         {
             // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - (600 - vScreen(Z).Top)) * (GFXBackground2Height(A) / 4 - (600 - vScreen(Z).Top))
             // .Y = -vScreenY(Z) - .Y
-            tempLocation.Y = (-vScreen[Z].Y - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - Eff_ScreenH) * (CanvasH - Eff_ScreenH) + vScreen[Z].Top;
-            tempLocation.Y = -vScreen[Z].Y - tempLocation.Y;
+            tempLocation.Y = (-camY - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - Eff_ScreenH) * (CanvasH - Eff_ScreenH) + vScreen[Z].Top;
+            tempLocation.Y = -camY - tempLocation.Y;
             tempLocation.Y += CanvasOffset;
         }
         else if(CanvasH > frameH)
@@ -155,22 +159,22 @@ void DrawCenterAnchoredBackground(int S, int Z, int A, int expected_height = 0, 
 
         double bottom_Y = tempLocation.Y + frameH;
         unsigned int flip = X_FLIP_NONE;
-        while(tempLocation.X + tempLocation.Width > -vScreen[Z].X
-            && tempLocation.X < -vScreen[Z].X + vScreen[Z].Width
-            && tempLocation.Y + tempLocation.Height > -vScreen[Z].Y)
+        while(tempLocation.X + tempLocation.Width > -camX
+            && tempLocation.X < -camX + vScreen[Z].Width
+            && tempLocation.Y + tempLocation.Height > -camY)
         {
             // HACK: place the fourth frame in the correct location if we are missing a single line
             if(A == 42 && GFXBackground2Height[A] == expected_height - 1 && anim && SpecialFrame[3] == 3)
             {
                 // duplicate the line
-                XRender::renderTextureScaleEx(vScreen[Z].X + tempLocation.X, vScreen[Z].Y + tempLocation.Y,
+                XRender::renderTextureScaleEx(camX + tempLocation.X, camY + tempLocation.Y,
                     GFXBackground2Width[A], 1,
                     GFXBackground2[A],
                     0, frameH * SpecialFrame[3],
                     GFXBackground2Width[A], 1,
                     0., nullptr, flip);
                 // draw the frame
-                XRender::renderTextureScaleEx(vScreen[Z].X + tempLocation.X, vScreen[Z].Y + tempLocation.Y + 1,
+                XRender::renderTextureScaleEx(camX + tempLocation.X, camY + tempLocation.Y + 1,
                     GFXBackground2Width[A], tempLocation.Height - 1,
                     GFXBackground2[A],
                     0, frameH * SpecialFrame[3],
@@ -179,7 +183,7 @@ void DrawCenterAnchoredBackground(int S, int Z, int A, int expected_height = 0, 
             }
             else if(anim)
             {
-                XRender::renderTextureScaleEx(vScreen[Z].X + tempLocation.X, vScreen[Z].Y + tempLocation.Y,
+                XRender::renderTextureScaleEx(camX + tempLocation.X, camY + tempLocation.Y,
                     GFXBackground2Width[A], tempLocation.Height,
                     GFXBackground2[A],
                     0, frameH * SpecialFrame[3],
@@ -188,7 +192,7 @@ void DrawCenterAnchoredBackground(int S, int Z, int A, int expected_height = 0, 
             }
             else
             {
-                XRender::renderTextureScaleEx(vScreen[Z].X + tempLocation.X, vScreen[Z].Y + tempLocation.Y,
+                XRender::renderTextureScaleEx(camX + tempLocation.X, camY + tempLocation.Y,
                     GFXBackground2Width[A], tempLocation.Height,
                     GFXBackground2[A],
                     0, 0,
@@ -219,14 +223,14 @@ void DrawCenterAnchoredBackground(int S, int Z, int A, int expected_height = 0, 
         if(flip_tile)
             flip = X_FLIP_VERTICAL;
 
-        while(tempLocation.X + tempLocation.Width > -vScreen[Z].X
-            && tempLocation.X < -vScreen[Z].X + vScreen[Z].Width
-            && tempLocation.Y < -vScreen[Z].Y + vScreen[Z].Height)
+        while(tempLocation.X + tempLocation.Width > -camX
+            && tempLocation.X < -camX + vScreen[Z].Width
+            && tempLocation.Y < -camY + vScreen[Z].Height)
         {
             // HACK: use the smaller frame size if we are missing a single line
             if(A == 42 && GFXBackground2Height[A] == expected_height - 1 && anim && SpecialFrame[3] == 3)
             {
-                XRender::renderTextureScaleEx(vScreen[Z].X + tempLocation.X, vScreen[Z].Y + tempLocation.Y,
+                XRender::renderTextureScaleEx(camX + tempLocation.X, camY + tempLocation.Y,
                     GFXBackground2Width[A], tempLocation.Height,
                     GFXBackground2[A],
                     0, frameH * SpecialFrame[3] + (frameH - 1) - tempLocation.Height,
@@ -235,7 +239,7 @@ void DrawCenterAnchoredBackground(int S, int Z, int A, int expected_height = 0, 
             }
             else if(anim)
             {
-                XRender::renderTextureScaleEx(vScreen[Z].X + tempLocation.X, vScreen[Z].Y + tempLocation.Y,
+                XRender::renderTextureScaleEx(camX + tempLocation.X, camY + tempLocation.Y,
                     GFXBackground2Width[A], tempLocation.Height,
                     GFXBackground2[A],
                     0, frameH * SpecialFrame[3] + frameH - tempLocation.Height,
@@ -244,7 +248,7 @@ void DrawCenterAnchoredBackground(int S, int Z, int A, int expected_height = 0, 
             }
             else
             {
-                XRender::renderTextureScaleEx(vScreen[Z].X + tempLocation.X, vScreen[Z].Y + tempLocation.Y,
+                XRender::renderTextureScaleEx(camX + tempLocation.X, camY + tempLocation.Y,
                     GFXBackground2Width[A], tempLocation.Height,
                     GFXBackground2[A],
                     0, frameH - tempLocation.Height,
@@ -261,8 +265,8 @@ void DrawCenterAnchoredBackground(int S, int Z, int A, int expected_height = 0, 
     // use the remaining information from the tempLocation (Y and Height, never tiled)
     if(no_tiling)
     {
-        double undrawn_above = tempLocation.Y + vScreen[Z].Y;
-        double undrawn_below = tempLocation.Y + vScreen[Z].Y + tempLocation.Height;
+        double undrawn_above = tempLocation.Y + camY;
+        double undrawn_below = tempLocation.Y + camY + tempLocation.Height;
         XRender::renderRect(0, 0, vScreen[Z].Width, std::ceil(undrawn_above),
             GFXBackground2[A].ColorUpper);
         XRender::renderRect(0, undrawn_below, vScreen[Z].Width, vScreen[Z].Height - undrawn_below + 1,
@@ -273,6 +277,8 @@ void DrawCenterAnchoredBackground(int S, int Z, int A, int expected_height = 0, 
 void DrawBottomAnchoredBackground(int S, int Z, int A, int offset = 0, int expected_height = 0, int tile_top = 0, double h_parallax = 0.5, bool no_bg = false, bool anim = false)
 {
     const Screen_t& screen = Screens[vScreen[Z].screen_ref];
+    double camX = vScreen[Z].CameraAddX();
+    double camY = vScreen[Z].CameraAddY();
 
     if(!no_bg)
         DrawBackgroundColor(A, Z, false);
@@ -286,7 +292,7 @@ void DrawBottomAnchoredBackground(int S, int Z, int A, int offset = 0, int expec
     int horiz_reps = (level[S].Width - level[S].X + screen.W / h_parallax) / GFXBackground2Width[A] * h_parallax + 1;
     for(int B = 0; B <= horiz_reps; B++)
     {
-        tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreen[Z].X + vScreen[Z].Left + level[S].X) * h_parallax);
+        tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (camX + vScreen[Z].Left + level[S].X) * h_parallax);
         tempLocation.Y = level[S].Height - frameH - offset;
 
         tempLocation.Height = frameH;
@@ -296,13 +302,13 @@ void DrawBottomAnchoredBackground(int S, int Z, int A, int offset = 0, int expec
         {
             if(anim)
             {
-                XRender::renderTexture(vScreen[Z].X + tempLocation.X, vScreen[Z].Y + tempLocation.Y,
+                XRender::renderTexture(camX + tempLocation.X, camY + tempLocation.Y,
                     GFXBackground2Width[A], tempLocation.Height,
                     GFXBackground2[A], 0, frameH * SpecialFrame[3]);
             }
             else
             {
-                XRender::renderTexture(vScreen[Z].X + tempLocation.X, vScreen[Z].Y + tempLocation.Y,
+                XRender::renderTexture(camX + tempLocation.X, camY + tempLocation.Y,
                     GFXBackground2Width[A], tempLocation.Height,
                     GFXBackground2[A], 0, 0);
             }
@@ -320,20 +326,20 @@ void DrawBottomAnchoredBackground(int S, int Z, int A, int offset = 0, int expec
         if(tile_top != 0)
             tempLocation.Height = tile_top;
 
-        while(tempLocation.Y > level[S].Y || tempLocation.Y > -vScreen[Z].Y)
+        while(tempLocation.Y > level[S].Y || tempLocation.Y > -camY)
         {
             tempLocation.Y -= tempLocation.Height;
             if(vScreenCollision(Z, tempLocation))
             {
                 if(anim)
                 {
-                    XRender::renderTexture(vScreen[Z].X + tempLocation.X, vScreen[Z].Y + tempLocation.Y,
+                    XRender::renderTexture(camX + tempLocation.X, camY + tempLocation.Y,
                         GFXBackground2Width[A], tempLocation.Height,
                         GFXBackground2[A], 0, frameH * SpecialFrame[3]);
                 }
                 else
                 {
-                    XRender::renderTexture(vScreen[Z].X + tempLocation.X, vScreen[Z].Y + tempLocation.Y,
+                    XRender::renderTexture(camX + tempLocation.X, camY + tempLocation.Y,
                         GFXBackground2Width[A], tempLocation.Height,
                         GFXBackground2[A], 0, 0);
                 }
@@ -346,6 +352,8 @@ void DrawBottomAnchoredBackground(int S, int Z, int A, int offset = 0, int expec
 void DrawBackground(int S, int Z)
 {
     const Screen_t& screen = Screens[vScreen[Z].screen_ref];
+    double camX = vScreen[Z].CameraAddX();
+    double camY = vScreen[Z].CameraAddY();
 
     int A = 0;
     int B = 0;
@@ -396,16 +404,16 @@ void DrawBackground(int S, int Z)
         for(B = 0; B <= tempVar6; B++)
         {
             // why is the background 381px...
-            tempLocation.Y = level[S].Y + ((B * GFXBackground2Height[A] - B) - (vScreen[Z].Y + vScreen[Z].Top + level[S].Y) * 0.5) - 32;
-            if(GameMenu && level[S].Y > -vScreen[Z].Y)
+            tempLocation.Y = level[S].Y + ((B * GFXBackground2Height[A] - B) - (camY + vScreen[Z].Top + level[S].Y) * 0.5) - 32;
+            if(GameMenu && level[S].Y > -camY)
             {
-                tempLocation.Y = -vScreen[Z].Y + B * (GFXBackground2Height[A] - 1);
+                tempLocation.Y = -camY + B * (GFXBackground2Height[A] - 1);
             }
 
             if(level[S].Width - level[S].X > GFXBackground2Width[A])
             {
-                tempLocation.X = (-vScreen[Z].X - level[S].X - vScreen[Z].Left) / (level[S].Width - level[S].X - 800) * (GFXBackground2Width[A] - 800) + vScreen[Z].Left;
-                tempLocation.X = -vScreen[Z].X - tempLocation.X;
+                tempLocation.X = (-camX - level[S].X - vScreen[Z].Left) / (level[S].Width - level[S].X - 800) * (GFXBackground2Width[A] - 800) + vScreen[Z].Left;
+                tempLocation.X = -camX - tempLocation.X;
             }
             else
                 tempLocation.X = level[S].Width - GFXBackground2Width[A];
@@ -414,19 +422,19 @@ void DrawBackground(int S, int Z)
             tempLocation.Width = GFXBackground2Width[A];
 
             double X_right = tempLocation.X + GFXBackground2Width[A];
-            while(tempLocation.X + tempLocation.Width > -vScreen[Z].X
-                && tempLocation.Y < -vScreen[Z].Y + vScreen[Z].Height
-                && tempLocation.Y + tempLocation.Height > -vScreen[Z].Y)
+            while(tempLocation.X + tempLocation.Width > -camX
+                && tempLocation.Y < -camY + vScreen[Z].Height
+                && tempLocation.Y + tempLocation.Height > -camY)
             {
-                XRender::renderTexture(vScreen[Z].X + tempLocation.X, vScreen[Z].Y + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
+                XRender::renderTexture(camX + tempLocation.X, camY + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
                 tempLocation.X -= GFXBackground2Width[A];
             }
             tempLocation.X = X_right;
-            while(tempLocation.X < -vScreen[Z].X + vScreen[Z].Width
-                && tempLocation.Y < -vScreen[Z].Y + vScreen[Z].Height
-                && tempLocation.Y + tempLocation.Height > -vScreen[Z].Y)
+            while(tempLocation.X < -camX + vScreen[Z].Width
+                && tempLocation.Y < -camY + vScreen[Z].Height
+                && tempLocation.Y + tempLocation.Height > -camY)
             {
-                XRender::renderTexture(vScreen[Z].X + tempLocation.X, vScreen[Z].Y + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
+                XRender::renderTexture(camX + tempLocation.X, camY + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
                 tempLocation.X += GFXBackground2Width[A];
             }
         }
@@ -556,29 +564,29 @@ void DrawBackground(int S, int Z)
         int tempVar26 = static_cast<int>(floor(static_cast<double>((level[S].Height - level[S].Y) / GFXBackground2Height[A] * 0.5 + (double)screen.H * 2 / GFXBackground2Height[A]))) + 1;
         for(B = 0; B <= tempVar26; B++)
         {
-            tempLocation.Y = level[S].Y + ((B * GFXBackground2Height[A] - B) - (vScreen[Z].Y + vScreen[Z].Top + level[S].Y) * 0.5) - 32;
-            if(GameMenu && level[S].Y > -vScreen[Z].Y)
+            tempLocation.Y = level[S].Y + ((B * GFXBackground2Height[A] - B) - (camY + vScreen[Z].Top + level[S].Y) * 0.5) - 32;
+            if(GameMenu && level[S].Y > -camY)
             {
-                tempLocation.Y -= level[S].Y + vScreen[Z].Y;
+                tempLocation.Y -= level[S].Y + camY;
             }
             // .X = Level(S).X
             if(level[S].Width - level[S].X > GFXBackground2Width[A])
             {
                 // .X = (-vScreenX(Z) - level(S).X) / (level(S).Width - level(S).X - 800) * (GFXBackground2Width(A) - 800)
                 // note: fixed the left alignment to match the vanilla game
-                tempLocation.X = (-vScreen[Z].X - level[S].X - vScreen[Z].Left) / (level[S].Width - level[S].X - 800) * (GFXBackground2Width[A] - 800) + vScreen[Z].Left;
-                tempLocation.X = -vScreen[Z].X - tempLocation.X;
+                tempLocation.X = (-camX - level[S].X - vScreen[Z].Left) / (level[S].Width - level[S].X - 800) * (GFXBackground2Width[A] - 800) + vScreen[Z].Left;
+                tempLocation.X = -camX - tempLocation.X;
             }
             else
                 tempLocation.X = level[S].Width - GFXBackground2Width[A];
             tempLocation.Height = GFXBackground2Height[A];
             tempLocation.Width = GFXBackground2Width[A];
 
-            while(tempLocation.Y + tempLocation.Height > -vScreen[Z].Y
-                && tempLocation.Y < -vScreen[Z].Y + vScreen[Z].Height
-                && tempLocation.X < -vScreen[Z].X + vScreen[Z].Width)
+            while(tempLocation.Y + tempLocation.Height > -camY
+                && tempLocation.Y < -camY + vScreen[Z].Height
+                && tempLocation.X < -camX + vScreen[Z].Width)
             {
-                XRender::renderTexture(vScreen[Z].X + tempLocation.X, vScreen[Z].Y + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
+                XRender::renderTexture(camX + tempLocation.X, camY + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
                 tempLocation.X += GFXBackground2Width[A];
             }
         }
@@ -700,8 +708,8 @@ void DrawBackground(int S, int Z)
 
 
 
-            tempLocation.Y = (-vScreen[Z].Y - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - screen.H) * (GFXBackground2Height[A] - screen.H) + vScreen[Z].Top;
-            tempLocation.Y = -vScreen[Z].Y - tempLocation.Y;
+            tempLocation.Y = (-camY - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - screen.H) * (GFXBackground2Height[A] - screen.H) + vScreen[Z].Top;
+            tempLocation.Y = -camY - tempLocation.Y;
         }
         else
             tempLocation.Y = level[S].Height - GFXBackground2Height[A];
@@ -714,160 +722,160 @@ void DrawBackground(int S, int Z)
         int tempVar42 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5 + (double)screen.W / GFXBackground2Width[A]))) + 1;
         for(B = 0; B <= tempVar42; B++)
         {
-            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreen[Z].X + vScreen[Z].Left + level[S].X) * 0.5);
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (camX + vScreen[Z].Left + level[S].X) * 0.5);
             if(vScreenCollision(Z, tempLocation))
             {
-                XRender::renderTexture(vScreen[Z].X + tempLocation.X, vScreen[Z].Y + tempLocation.Y + 953, GFXBackground2Width[A], 47, GFXBackground2[A], 0, 953);
+                XRender::renderTexture(camX + tempLocation.X, camY + tempLocation.Y + 953, GFXBackground2Width[A], 47, GFXBackground2[A], 0, 953);
             }
         }
 
         int tempVar43 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.6 + (double)screen.W / GFXBackground2Width[A]))) + 1;
         for(B = 0; B <= tempVar43; B++)
         {
-            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreen[Z].X + vScreen[Z].Left + level[S].X) * 0.6);
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (camX + vScreen[Z].Left + level[S].X) * 0.6);
             if(vScreenCollision(Z, tempLocation))
             {
-                XRender::renderTexture(vScreen[Z].X + tempLocation.X, vScreen[Z].Y + tempLocation.Y + 916, GFXBackground2Width[A], 37, GFXBackground2[A], 0, 916);
+                XRender::renderTexture(camX + tempLocation.X, camY + tempLocation.Y + 916, GFXBackground2Width[A], 37, GFXBackground2[A], 0, 916);
             }
         }
 
         int tempVar44 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.7 + (double)screen.W / GFXBackground2Width[A]))) + 1;
         for(B = 0; B <= tempVar44; B++)
         {
-            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreen[Z].X + vScreen[Z].Left + level[S].X) * 0.7);
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (camX + vScreen[Z].Left + level[S].X) * 0.7);
             if(vScreenCollision(Z, tempLocation))
             {
-                XRender::renderTexture(vScreen[Z].X + tempLocation.X, vScreen[Z].Y + tempLocation.Y + 849, GFXBackground2Width[A], 67, GFXBackground2[A], 0, 849);
+                XRender::renderTexture(camX + tempLocation.X, camY + tempLocation.Y + 849, GFXBackground2Width[A], 67, GFXBackground2[A], 0, 849);
             }
         }
 
         int tempVar45 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.8 + (double)screen.W / GFXBackground2Width[A]))) + 1;
         for(B = 0; B <= tempVar45; B++)
         {
-            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreen[Z].X + vScreen[Z].Left + level[S].X) * 0.8);
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (camX + vScreen[Z].Left + level[S].X) * 0.8);
             if(vScreenCollision(Z, tempLocation))
             {
-                XRender::renderTexture(vScreen[Z].X + tempLocation.X, vScreen[Z].Y + tempLocation.Y + 815, GFXBackground2Width[A], 34, GFXBackground2[A], 0, 815);
+                XRender::renderTexture(camX + tempLocation.X, camY + tempLocation.Y + 815, GFXBackground2Width[A], 34, GFXBackground2[A], 0, 815);
             }
         }
 
         int tempVar46 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.9 + (double)screen.W / GFXBackground2Width[A]))) + 1;
         for(B = 0; B <= tempVar46; B++)
         {
-            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreen[Z].X + vScreen[Z].Left + level[S].X) * 0.9);
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (camX + vScreen[Z].Left + level[S].X) * 0.9);
             if(vScreenCollision(Z, tempLocation))
             {
-                XRender::renderTexture(vScreen[Z].X + tempLocation.X, vScreen[Z].Y + tempLocation.Y + 709, GFXBackground2Width[A], 106, GFXBackground2[A], 0, 709);
+                XRender::renderTexture(camX + tempLocation.X, camY + tempLocation.Y + 709, GFXBackground2Width[A], 106, GFXBackground2[A], 0, 709);
             }
         }
 
         int tempVar47 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.85 + (double)screen.W / GFXBackground2Width[A]))) + 1;
         for(B = 0; B <= tempVar47; B++)
         {
-            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreen[Z].X + vScreen[Z].Left + level[S].X) * 0.85);
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (camX + vScreen[Z].Left + level[S].X) * 0.85);
             if(vScreenCollision(Z, tempLocation))
             {
-                XRender::renderTexture(vScreen[Z].X + tempLocation.X, vScreen[Z].Y + tempLocation.Y + 664, GFXBackground2Width[A], 45, GFXBackground2[A], 0, 664);
+                XRender::renderTexture(camX + tempLocation.X, camY + tempLocation.Y + 664, GFXBackground2Width[A], 45, GFXBackground2[A], 0, 664);
             }
         }
 
         int tempVar48 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.8 + (double)screen.W / GFXBackground2Width[A]))) + 1;
         for(B = 0; B <= tempVar48; B++)
         {
-            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreen[Z].X + vScreen[Z].Left + level[S].X) * 0.8);
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (camX + vScreen[Z].Left + level[S].X) * 0.8);
             if(vScreenCollision(Z, tempLocation))
             {
-                XRender::renderTexture(vScreen[Z].X + tempLocation.X, vScreen[Z].Y + tempLocation.Y + 614, GFXBackground2Width[A], 50, GFXBackground2[A], 0, 614);
+                XRender::renderTexture(camX + tempLocation.X, camY + tempLocation.Y + 614, GFXBackground2Width[A], 50, GFXBackground2[A], 0, 614);
             }
         }
 
         int tempVar49 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.75 + (double)screen.W / GFXBackground2Width[A]))) + 1;
         for(B = 0; B <= tempVar49; B++)
         {
-            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreen[Z].X + vScreen[Z].Left + level[S].X) * 0.75);
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (camX + vScreen[Z].Left + level[S].X) * 0.75);
             if(vScreenCollision(Z, tempLocation))
             {
-                XRender::renderTexture(vScreen[Z].X + tempLocation.X, vScreen[Z].Y + tempLocation.Y + 540, GFXBackground2Width[A], 74, GFXBackground2[A], 0, 540);
+                XRender::renderTexture(camX + tempLocation.X, camY + tempLocation.Y + 540, GFXBackground2Width[A], 74, GFXBackground2[A], 0, 540);
             }
         }
 
         int tempVar50 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.7 + (double)screen.W / GFXBackground2Width[A]))) + 1;
         for(B = 0; B <= tempVar50; B++)
         {
-            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreen[Z].X + vScreen[Z].Left + level[S].X) * 0.7);
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (camX + vScreen[Z].Left + level[S].X) * 0.7);
             if(vScreenCollision(Z, tempLocation))
             {
-                XRender::renderTexture(vScreen[Z].X + tempLocation.X, vScreen[Z].Y + tempLocation.Y + 408, GFXBackground2Width[A], 132, GFXBackground2[A], 0, 408);
+                XRender::renderTexture(camX + tempLocation.X, camY + tempLocation.Y + 408, GFXBackground2Width[A], 132, GFXBackground2[A], 0, 408);
             }
         }
 
         int tempVar51 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.75 + (double)screen.W / GFXBackground2Width[A]))) + 1;
         for(B = 0; B <= tempVar51; B++)
         {
-            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreen[Z].X + vScreen[Z].Left + level[S].X) * 0.75);
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (camX + vScreen[Z].Left + level[S].X) * 0.75);
             if(vScreenCollision(Z, tempLocation))
             {
-                XRender::renderTexture(vScreen[Z].X + tempLocation.X, vScreen[Z].Y + tempLocation.Y + 333, GFXBackground2Width[A], 75, GFXBackground2[A], 0, 333);
+                XRender::renderTexture(camX + tempLocation.X, camY + tempLocation.Y + 333, GFXBackground2Width[A], 75, GFXBackground2[A], 0, 333);
             }
         }
 
         int tempVar52 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.8 + (double)screen.W / GFXBackground2Width[A]))) + 1;
         for(B = 0; B <= tempVar52; B++)
         {
-            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreen[Z].X + vScreen[Z].Left + level[S].X) * 0.8);
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (camX + vScreen[Z].Left + level[S].X) * 0.8);
             if(vScreenCollision(Z, tempLocation))
             {
-                XRender::renderTexture(vScreen[Z].X + tempLocation.X, vScreen[Z].Y + tempLocation.Y + 278, GFXBackground2Width[A], 55, GFXBackground2[A], 0, 278);
+                XRender::renderTexture(camX + tempLocation.X, camY + tempLocation.Y + 278, GFXBackground2Width[A], 55, GFXBackground2[A], 0, 278);
             }
         }
 
         int tempVar53 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.85 + (double)screen.W / GFXBackground2Width[A]))) + 1;
         for(B = 0; B <= tempVar53; B++)
         {
-            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreen[Z].X + vScreen[Z].Left + level[S].X) * 0.85);
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (camX + vScreen[Z].Left + level[S].X) * 0.85);
             if(vScreenCollision(Z, tempLocation))
             {
-                XRender::renderTexture(vScreen[Z].X + tempLocation.X, vScreen[Z].Y + tempLocation.Y + 235, GFXBackground2Width[A], 43, GFXBackground2[A], 0, 235);
+                XRender::renderTexture(camX + tempLocation.X, camY + tempLocation.Y + 235, GFXBackground2Width[A], 43, GFXBackground2[A], 0, 235);
             }
         }
 
         int tempVar54 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.9 + (double)screen.W / GFXBackground2Width[A]))) + 1;
         for(B = 0; B <= tempVar54; B++)
         {
-            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreen[Z].X + vScreen[Z].Left + level[S].X) * 0.9);
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (camX + vScreen[Z].Left + level[S].X) * 0.9);
             if(vScreenCollision(Z, tempLocation))
             {
-                XRender::renderTexture(vScreen[Z].X + tempLocation.X, vScreen[Z].Y + tempLocation.Y + 123, GFXBackground2Width[A], 112, GFXBackground2[A], 0, 123);
+                XRender::renderTexture(camX + tempLocation.X, camY + tempLocation.Y + 123, GFXBackground2Width[A], 112, GFXBackground2[A], 0, 123);
             }
         }
 
         int tempVar55 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.8 + (double)screen.W / GFXBackground2Width[A]))) + 1;
         for(B = 0; B <= tempVar55; B++)
         {
-            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreen[Z].X + vScreen[Z].Left + level[S].X) * 0.8);
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (camX + vScreen[Z].Left + level[S].X) * 0.8);
             if(vScreenCollision(Z, tempLocation))
             {
-                XRender::renderTexture(vScreen[Z].X + tempLocation.X, vScreen[Z].Y + tempLocation.Y + 85, GFXBackground2Width[A], 38, GFXBackground2[A], 0, 85);
+                XRender::renderTexture(camX + tempLocation.X, camY + tempLocation.Y + 85, GFXBackground2Width[A], 38, GFXBackground2[A], 0, 85);
             }
         }
 
         int tempVar56 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.7 + (double)screen.W / GFXBackground2Width[A]))) + 1;
         for(B = 0; B <= tempVar56; B++)
         {
-            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreen[Z].X + vScreen[Z].Left + level[S].X) * 0.7);
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (camX + vScreen[Z].Left + level[S].X) * 0.7);
             if(vScreenCollision(Z, tempLocation))
             {
-                XRender::renderTexture(vScreen[Z].X + tempLocation.X, vScreen[Z].Y + tempLocation.Y + 48, GFXBackground2Width[A], 37, GFXBackground2[A], 0, 48);
+                XRender::renderTexture(camX + tempLocation.X, camY + tempLocation.Y + 48, GFXBackground2Width[A], 37, GFXBackground2[A], 0, 48);
             }
         }
 
         int tempVar57 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.6 + (double)screen.W / GFXBackground2Width[A]))) + 1;
         for(B = 0; B <= tempVar57; B++)
         {
-            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreen[Z].X + vScreen[Z].Left + level[S].X) * 0.6);
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (camX + vScreen[Z].Left + level[S].X) * 0.6);
             if(vScreenCollision(Z, tempLocation))
             {
-                XRender::renderTexture(vScreen[Z].X + tempLocation.X, vScreen[Z].Y + tempLocation.Y, GFXBackground2Width[A], 48, GFXBackground2[A], 0, 0);
+                XRender::renderTexture(camX + tempLocation.X, camY + tempLocation.Y, GFXBackground2Width[A], 48, GFXBackground2[A], 0, 0);
             }
         }
 
@@ -876,7 +884,7 @@ void DrawBackground(int S, int Z)
         if(g_compatibility.disable_background2_tiling)
             break;
 
-        } while(tempLocation.Y + GFXBackground2Height[A] > -vScreen[Z].Y);
+        } while(tempLocation.Y + GFXBackground2Height[A] > -camY);
     }
 
     A = 41; // SMB 1 Castle
@@ -942,8 +950,8 @@ void DrawBackground(int S, int Z)
         if(level[S].Height - level[S].Y > CanvasH)
         {
             // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - 600) * (GFXBackground2Height(A) - 600)
-            tempLocation.Y = (-vScreen[Z].Y - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - Eff_ScreenH) * (CanvasH - Eff_ScreenH) + vScreen[Z].Top;
-            tempLocation.Y = -vScreen[Z].Y - tempLocation.Y;
+            tempLocation.Y = (-camY - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - Eff_ScreenH) * (CanvasH - Eff_ScreenH) + vScreen[Z].Top;
+            tempLocation.Y = -camY - tempLocation.Y;
             tempLocation.Y += CanvasOffset;
         }
         else if(CanvasH > GFXBackground2Height[A])
@@ -957,8 +965,8 @@ void DrawBackground(int S, int Z)
 
         // use a simple color fill for the sky above and sand below the texture
         XRender::lazyPreLoad(GFXBackground2[A]);
-        double undrawn_above = tempLocation.Y + vScreen[Z].Y;
-        double undrawn_below = tempLocation.Y + vScreen[Z].Y + tempLocation.Height;
+        double undrawn_above = tempLocation.Y + camY;
+        double undrawn_below = tempLocation.Y + camY + tempLocation.Height;
         XRender::renderRect(0, 0, vScreen[Z].Width, std::ceil(undrawn_above),
             GFXBackground2[A].ColorUpper);
         XRender::renderRect(0, undrawn_below, vScreen[Z].Width, vScreen[Z].Height - undrawn_below + 1,
@@ -967,90 +975,90 @@ void DrawBackground(int S, int Z)
         int tempVar66 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5 + (double)screen.W / GFXBackground2Width[A]))) + 1;
         for(B = 0; B <= tempVar66; B++)
         {
-            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreen[Z].X + vScreen[Z].Left + level[S].X) * 0.5);
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (camX + vScreen[Z].Left + level[S].X) * 0.5);
             if(vScreenCollision(Z, tempLocation))
             {
-                XRender::renderTexture(vScreen[Z].X + tempLocation.X, vScreen[Z].Y + tempLocation.Y + 280, GFXBackground2Width[A], 450, GFXBackground2[A], 0, 280);
+                XRender::renderTexture(camX + tempLocation.X, camY + tempLocation.Y + 280, GFXBackground2Width[A], 450, GFXBackground2[A], 0, 280);
             }
         }
 
         int tempVar67 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.9 + (double)screen.W / GFXBackground2Width[A]))) + 1;
         for(B = 0; B <= tempVar67; B++)
         {
-            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreen[Z].X + vScreen[Z].Left + level[S].X) * 0.9);
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (camX + vScreen[Z].Left + level[S].X) * 0.9);
             if(vScreenCollision(Z, tempLocation))
             {
-                XRender::renderTexture(vScreen[Z].X + tempLocation.X, vScreen[Z].Y + tempLocation.Y + 268, GFXBackground2Width[A], 12, GFXBackground2[A], 0, 268);
+                XRender::renderTexture(camX + tempLocation.X, camY + tempLocation.Y + 268, GFXBackground2Width[A], 12, GFXBackground2[A], 0, 268);
             }
         }
 
         int tempVar68 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.89 + (double)screen.W / GFXBackground2Width[A]))) + 1;
         for(B = 0; B <= tempVar68; B++)
         {
-            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreen[Z].X + vScreen[Z].Left + level[S].X) * 0.89);
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (camX + vScreen[Z].Left + level[S].X) * 0.89);
             if(vScreenCollision(Z, tempLocation))
             {
-                XRender::renderTexture(vScreen[Z].X + tempLocation.X, vScreen[Z].Y + tempLocation.Y + 244, GFXBackground2Width[A], 24, GFXBackground2[A], 0, 244);
+                XRender::renderTexture(camX + tempLocation.X, camY + tempLocation.Y + 244, GFXBackground2Width[A], 24, GFXBackground2[A], 0, 244);
             }
         }
 
         int tempVar69 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.88 + (double)screen.W / GFXBackground2Width[A]))) + 1;
         for(B = 0; B <= tempVar69; B++)
         {
-            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreen[Z].X + vScreen[Z].Left + level[S].X) * 0.88);
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (camX + vScreen[Z].Left + level[S].X) * 0.88);
             if(vScreenCollision(Z, tempLocation))
             {
-                XRender::renderTexture(vScreen[Z].X + tempLocation.X, vScreen[Z].Y + tempLocation.Y + 228, GFXBackground2Width[A], 16, GFXBackground2[A], 0, 228);
+                XRender::renderTexture(camX + tempLocation.X, camY + tempLocation.Y + 228, GFXBackground2Width[A], 16, GFXBackground2[A], 0, 228);
             }
         }
 
         int tempVar70 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.87 + (double)screen.W / GFXBackground2Width[A]))) + 1;
         for(B = 0; B <= tempVar70; B++)
         {
-            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreen[Z].X + vScreen[Z].Left + level[S].X) * 0.87);
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (camX + vScreen[Z].Left + level[S].X) * 0.87);
             if(vScreenCollision(Z, tempLocation))
             {
-                XRender::renderTexture(vScreen[Z].X + tempLocation.X, vScreen[Z].Y + tempLocation.Y + 196, GFXBackground2Width[A], 32, GFXBackground2[A], 0, 196);
+                XRender::renderTexture(camX + tempLocation.X, camY + tempLocation.Y + 196, GFXBackground2Width[A], 32, GFXBackground2[A], 0, 196);
             }
         }
 
         int tempVar71 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.86 + (double)screen.W / GFXBackground2Width[A]))) + 1;
         for(B = 0; B <= tempVar71; B++)
         {
-            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreen[Z].X + vScreen[Z].Left + level[S].X) * 0.86);
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (camX + vScreen[Z].Left + level[S].X) * 0.86);
             if(vScreenCollision(Z, tempLocation))
             {
-                XRender::renderTexture(vScreen[Z].X + tempLocation.X, vScreen[Z].Y + tempLocation.Y + 164, GFXBackground2Width[A], 32, GFXBackground2[A], 0, 164);
+                XRender::renderTexture(camX + tempLocation.X, camY + tempLocation.Y + 164, GFXBackground2Width[A], 32, GFXBackground2[A], 0, 164);
             }
         }
 
         int tempVar72 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.85 + (double)screen.W / GFXBackground2Width[A]))) + 1;
         for(B = 0; B <= tempVar72; B++)
         {
-            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreen[Z].X + vScreen[Z].Left + level[S].X) * 0.85);
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (camX + vScreen[Z].Left + level[S].X) * 0.85);
             if(vScreenCollision(Z, tempLocation))
             {
-                XRender::renderTexture(vScreen[Z].X + tempLocation.X, vScreen[Z].Y + tempLocation.Y + 116, GFXBackground2Width[A], 48, GFXBackground2[A], 0, 116);
+                XRender::renderTexture(camX + tempLocation.X, camY + tempLocation.Y + 116, GFXBackground2Width[A], 48, GFXBackground2[A], 0, 116);
             }
         }
 
         int tempVar73 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.84 + (double)screen.W / GFXBackground2Width[A]))) + 1;
         for(B = 0; B <= tempVar73; B++)
         {
-            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreen[Z].X + vScreen[Z].Left + level[S].X) * 0.84);
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (camX + vScreen[Z].Left + level[S].X) * 0.84);
             if(vScreenCollision(Z, tempLocation))
             {
-                XRender::renderTexture(vScreen[Z].X + tempLocation.X, vScreen[Z].Y + tempLocation.Y + 58, GFXBackground2Width[A], 58, GFXBackground2[A], 0, 58);
+                XRender::renderTexture(camX + tempLocation.X, camY + tempLocation.Y + 58, GFXBackground2Width[A], 58, GFXBackground2[A], 0, 58);
             }
         }
 
         int tempVar74 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.83 + (double)screen.W / GFXBackground2Width[A]))) + 1;
         for(B = 0; B <= tempVar74; B++)
         {
-            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreen[Z].X + vScreen[Z].Left + level[S].X) * 0.83);
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (camX + vScreen[Z].Left + level[S].X) * 0.83);
             if(vScreenCollision(Z, tempLocation))
             {
-                XRender::renderTexture(vScreen[Z].X + tempLocation.X, vScreen[Z].Y + tempLocation.Y, GFXBackground2Width[A], 58, GFXBackground2[A], 0, 0);
+                XRender::renderTexture(camX + tempLocation.X, camY + tempLocation.Y, GFXBackground2Width[A], 58, GFXBackground2[A], 0, 0);
             }
         }
     }
@@ -1080,8 +1088,8 @@ void DrawBackground(int S, int Z)
         if(level[S].Height - level[S].Y > CanvasH)
         {
             // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - 600) * (GFXBackground2Height(A) - 600)
-            tempLocation.Y = (-vScreen[Z].Y - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - Eff_ScreenH) * (CanvasH - Eff_ScreenH) + vScreen[Z].Top;
-            tempLocation.Y = -vScreen[Z].Y - tempLocation.Y;
+            tempLocation.Y = (-camY - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - Eff_ScreenH) * (CanvasH - Eff_ScreenH) + vScreen[Z].Top;
+            tempLocation.Y = -camY - tempLocation.Y;
             tempLocation.Y += CanvasOffset;
         }
         else if(CanvasH > GFXBackground2Height[A])
@@ -1096,32 +1104,32 @@ void DrawBackground(int S, int Z)
         int tempVar75 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5 + (double)screen.W / GFXBackground2Width[A]))) + 1;
         for(B = 0; B <= tempVar75; B++)
         {
-            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreen[Z].X + vScreen[Z].Left + level[S].X) * 0.5);
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (camX + vScreen[Z].Left + level[S].X) * 0.5);
             if(vScreenCollision(Z, tempLocation))
             {
-                XRender::renderTexture(vScreen[Z].X + tempLocation.X, vScreen[Z].Y + tempLocation.Y + 378, GFXBackground2Width[A], 378, GFXBackground2[A], 0, 378);
+                XRender::renderTexture(camX + tempLocation.X, camY + tempLocation.Y + 378, GFXBackground2Width[A], 378, GFXBackground2[A], 0, 378);
             }
         }
 
-        while(tempLocation.Y + 378 > -vScreen[Z].Y)
+        while(tempLocation.Y + 378 > -camY)
         {
             int tempVar76 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.65 + (double)screen.W / GFXBackground2Width[A]))) + 1;
             for(B = 0; B <= tempVar76; B++)
             {
-                tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreen[Z].X + vScreen[Z].Left + level[S].X) * 0.65);
+                tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (camX + vScreen[Z].Left + level[S].X) * 0.65);
                 if(vScreenCollision(Z, tempLocation))
                 {
-                    XRender::renderTexture(vScreen[Z].X + tempLocation.X, vScreen[Z].Y + tempLocation.Y, GFXBackground2Width[A], 220, GFXBackground2[A], 0, 0);
+                    XRender::renderTexture(camX + tempLocation.X, camY + tempLocation.Y, GFXBackground2Width[A], 220, GFXBackground2[A], 0, 0);
                 }
             }
 
             int tempVar77 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.6 + (double)screen.W / GFXBackground2Width[A]))) + 1;
             for(B = 0; B <= tempVar77; B++)
             {
-                tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreen[Z].X + vScreen[Z].Left + level[S].X) * 0.6);
+                tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (camX + vScreen[Z].Left + level[S].X) * 0.6);
                 if(vScreenCollision(Z, tempLocation))
                 {
-                    XRender::renderTexture(vScreen[Z].X + tempLocation.X, vScreen[Z].Y + tempLocation.Y + 220, GFXBackground2Width[A], 158, GFXBackground2[A], 0, 220);
+                    XRender::renderTexture(camX + tempLocation.X, camY + tempLocation.Y + 220, GFXBackground2Width[A], 158, GFXBackground2[A], 0, 220);
                 }
             }
 
@@ -1154,8 +1162,8 @@ void DrawBackground(int S, int Z)
         if(level[S].Height - level[S].Y > CanvasH)
         {
             // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - 600) * (GFXBackground2Height(A) - 600)
-            tempLocation.Y = (-vScreen[Z].Y - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - Eff_ScreenH) * (CanvasH - Eff_ScreenH) + vScreen[Z].Top;
-            tempLocation.Y = -vScreen[Z].Y - tempLocation.Y;
+            tempLocation.Y = (-camY - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - Eff_ScreenH) * (CanvasH - Eff_ScreenH) + vScreen[Z].Top;
+            tempLocation.Y = -camY - tempLocation.Y;
             tempLocation.Y += CanvasOffset;
         }
         else if(CanvasH > GFXBackground2Height[A])
@@ -1169,8 +1177,8 @@ void DrawBackground(int S, int Z)
 
         // use a simple color fill for the sky above and sand below the texture
         XRender::lazyPreLoad(GFXBackground2[A]);
-        double undrawn_above = tempLocation.Y + vScreen[Z].Y;
-        double undrawn_below = tempLocation.Y + vScreen[Z].Y + tempLocation.Height;
+        double undrawn_above = tempLocation.Y + camY;
+        double undrawn_below = tempLocation.Y + camY + tempLocation.Height;
         XRender::renderRect(0, 0, vScreen[Z].Width, std::ceil(undrawn_above),
             GFXBackground2[A].ColorUpper);
         XRender::renderRect(0, undrawn_below, vScreen[Z].Width, vScreen[Z].Height - undrawn_below + 1,
@@ -1179,20 +1187,20 @@ void DrawBackground(int S, int Z)
         int tempVar78 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.75 + (double)screen.W / GFXBackground2Width[A]))) + 1;
         for(B = 0; B <= tempVar78; B++)
         {
-            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreen[Z].X + vScreen[Z].Left + level[S].X) * 0.75);
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (camX + vScreen[Z].Left + level[S].X) * 0.75);
             if(vScreenCollision(Z, tempLocation))
             {
-                XRender::renderTexture(vScreen[Z].X + tempLocation.X, vScreen[Z].Y + tempLocation.Y, GFXBackground2Width[A], 350, GFXBackground2[A], 0, 0);
+                XRender::renderTexture(camX + tempLocation.X, camY + tempLocation.Y, GFXBackground2Width[A], 350, GFXBackground2[A], 0, 0);
             }
         }
 
         int tempVar79 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5 + (double)screen.W / GFXBackground2Width[A]))) + 1;
         for(B = 0; B <= tempVar79; B++)
         {
-            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreen[Z].X + vScreen[Z].Left + level[S].X) * 0.5);
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (camX + vScreen[Z].Left + level[S].X) * 0.5);
             if(vScreenCollision(Z, tempLocation))
             {
-                XRender::renderTexture(vScreen[Z].X + tempLocation.X, vScreen[Z].Y + tempLocation.Y + 350, GFXBackground2Width[A], GFXBackground2Height[A] - 350, GFXBackground2[A], 0, 350);
+                XRender::renderTexture(camX + tempLocation.X, camY + tempLocation.Y + 350, GFXBackground2Width[A], GFXBackground2Height[A] - 350, GFXBackground2[A], 0, 350);
             }
         }
     }
@@ -1218,8 +1226,8 @@ void DrawBackground(int S, int Z)
         if(level[S].Height - level[S].Y > CanvasH)
         {
             // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - 600) * (GFXBackground2Height(A) - 600)
-            tempLocation.Y = (-vScreen[Z].Y - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - Eff_ScreenH) * (CanvasH - Eff_ScreenH) + vScreen[Z].Top;
-            tempLocation.Y = -vScreen[Z].Y - tempLocation.Y;
+            tempLocation.Y = (-camY - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - Eff_ScreenH) * (CanvasH - Eff_ScreenH) + vScreen[Z].Top;
+            tempLocation.Y = -camY - tempLocation.Y;
             tempLocation.Y += CanvasOffset;
         }
         else if(CanvasH > GFXBackground2Height[A])
@@ -1233,8 +1241,8 @@ void DrawBackground(int S, int Z)
 
         // use a simple color fill for the sky above and sand below the texture
         XRender::lazyPreLoad(GFXBackground2[A]);
-        double undrawn_above = tempLocation.Y + vScreen[Z].Y;
-        double undrawn_below = tempLocation.Y + vScreen[Z].Y + tempLocation.Height;
+        double undrawn_above = tempLocation.Y + camY;
+        double undrawn_below = tempLocation.Y + camY + tempLocation.Height;
         XRender::renderRect(0, 0, vScreen[Z].Width, std::ceil(undrawn_above),
             GFXBackground2[A].ColorUpper);
         XRender::renderRect(0, undrawn_below, vScreen[Z].Width, vScreen[Z].Height - undrawn_below + 1,
@@ -1243,90 +1251,90 @@ void DrawBackground(int S, int Z)
         int tempVar80 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5 + (double)screen.W / GFXBackground2Width[A]))) + 1;
         for(B = 0; B <= tempVar80; B++)
         {
-            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreen[Z].X + vScreen[Z].Left + level[S].X) * 0.5);
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (camX + vScreen[Z].Left + level[S].X) * 0.5);
             if(vScreenCollision(Z, tempLocation))
             {
-                XRender::renderTexture(vScreen[Z].X + tempLocation.X, vScreen[Z].Y + tempLocation.Y + 280, GFXBackground2Width[A], GFXBackground2Height[A] - 280, GFXBackground2[A], 0, 280);
+                XRender::renderTexture(camX + tempLocation.X, camY + tempLocation.Y + 280, GFXBackground2Width[A], GFXBackground2Height[A] - 280, GFXBackground2[A], 0, 280);
             }
         }
 
         int tempVar81 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.9 + (double)screen.W / GFXBackground2Width[A]))) + 1;
         for(B = 0; B <= tempVar81; B++)
         {
-            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreen[Z].X + vScreen[Z].Left + level[S].X) * 0.9);
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (camX + vScreen[Z].Left + level[S].X) * 0.9);
             if(vScreenCollision(Z, tempLocation))
             {
-                XRender::renderTexture(vScreen[Z].X + tempLocation.X, vScreen[Z].Y + tempLocation.Y + 268, GFXBackground2Width[A], 12, GFXBackground2[A], 0, 268);
+                XRender::renderTexture(camX + tempLocation.X, camY + tempLocation.Y + 268, GFXBackground2Width[A], 12, GFXBackground2[A], 0, 268);
             }
         }
 
         int tempVar82 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.89 + (double)screen.W / GFXBackground2Width[A]))) + 1;
         for(B = 0; B <= tempVar82; B++)
         {
-            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreen[Z].X + vScreen[Z].Left + level[S].X) * 0.89);
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (camX + vScreen[Z].Left + level[S].X) * 0.89);
             if(vScreenCollision(Z, tempLocation))
             {
-                XRender::renderTexture(vScreen[Z].X + tempLocation.X, vScreen[Z].Y + tempLocation.Y + 244, GFXBackground2Width[A], 24, GFXBackground2[A], 0, 244);
+                XRender::renderTexture(camX + tempLocation.X, camY + tempLocation.Y + 244, GFXBackground2Width[A], 24, GFXBackground2[A], 0, 244);
             }
         }
 
         int tempVar83 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.88 + (double)screen.W / GFXBackground2Width[A]))) + 1;
         for(B = 0; B <= tempVar83; B++)
         {
-            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreen[Z].X + vScreen[Z].Left + level[S].X) * 0.88);
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (camX + vScreen[Z].Left + level[S].X) * 0.88);
             if(vScreenCollision(Z, tempLocation))
             {
-                XRender::renderTexture(vScreen[Z].X + tempLocation.X, vScreen[Z].Y + tempLocation.Y + 228, GFXBackground2Width[A], 16, GFXBackground2[A], 0, 228);
+                XRender::renderTexture(camX + tempLocation.X, camY + tempLocation.Y + 228, GFXBackground2Width[A], 16, GFXBackground2[A], 0, 228);
             }
         }
 
         int tempVar84 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.87 + (double)screen.W / GFXBackground2Width[A]))) + 1;
         for(B = 0; B <= tempVar84; B++)
         {
-            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreen[Z].X + vScreen[Z].Left + level[S].X) * 0.87);
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (camX + vScreen[Z].Left + level[S].X) * 0.87);
             if(vScreenCollision(Z, tempLocation))
             {
-                XRender::renderTexture(vScreen[Z].X + tempLocation.X, vScreen[Z].Y + tempLocation.Y + 196, GFXBackground2Width[A], 32, GFXBackground2[A], 0, 196);
+                XRender::renderTexture(camX + tempLocation.X, camY + tempLocation.Y + 196, GFXBackground2Width[A], 32, GFXBackground2[A], 0, 196);
             }
         }
 
         int tempVar85 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.86 + (double)screen.W / GFXBackground2Width[A]))) + 1;
         for(B = 0; B <= tempVar85; B++)
         {
-            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreen[Z].X + vScreen[Z].Left + level[S].X) * 0.86);
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (camX + vScreen[Z].Left + level[S].X) * 0.86);
             if(vScreenCollision(Z, tempLocation))
             {
-                XRender::renderTexture(vScreen[Z].X + tempLocation.X, vScreen[Z].Y + tempLocation.Y + 164, GFXBackground2Width[A], 32, GFXBackground2[A], 0, 164);
+                XRender::renderTexture(camX + tempLocation.X, camY + tempLocation.Y + 164, GFXBackground2Width[A], 32, GFXBackground2[A], 0, 164);
             }
         }
 
         int tempVar86 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.85 + (double)screen.W / GFXBackground2Width[A]))) + 1;
         for(B = 0; B <= tempVar86; B++)
         {
-            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreen[Z].X + vScreen[Z].Left + level[S].X) * 0.85);
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (camX + vScreen[Z].Left + level[S].X) * 0.85);
             if(vScreenCollision(Z, tempLocation))
             {
-                XRender::renderTexture(vScreen[Z].X + tempLocation.X, vScreen[Z].Y + tempLocation.Y + 116, GFXBackground2Width[A], 48, GFXBackground2[A], 0, 116);
+                XRender::renderTexture(camX + tempLocation.X, camY + tempLocation.Y + 116, GFXBackground2Width[A], 48, GFXBackground2[A], 0, 116);
             }
         }
 
         int tempVar87 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.84 + (double)screen.W / GFXBackground2Width[A]))) + 1;
         for(B = 0; B <= tempVar87; B++)
         {
-            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreen[Z].X + vScreen[Z].Left + level[S].X) * 0.84);
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (camX + vScreen[Z].Left + level[S].X) * 0.84);
             if(vScreenCollision(Z, tempLocation))
             {
-                XRender::renderTexture(vScreen[Z].X + tempLocation.X, vScreen[Z].Y + tempLocation.Y + 58, GFXBackground2Width[A], 58, GFXBackground2[A], 0, 58);
+                XRender::renderTexture(camX + tempLocation.X, camY + tempLocation.Y + 58, GFXBackground2Width[A], 58, GFXBackground2[A], 0, 58);
             }
         }
 
         int tempVar88 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.83 + (double)screen.W / GFXBackground2Width[A]))) + 1;
         for(B = 0; B <= tempVar88; B++)
         {
-            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreen[Z].X + vScreen[Z].Left + level[S].X) * 0.83);
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (camX + vScreen[Z].Left + level[S].X) * 0.83);
             if(vScreenCollision(Z, tempLocation))
             {
-                XRender::renderTexture(vScreen[Z].X + tempLocation.X, vScreen[Z].Y + tempLocation.Y, GFXBackground2Width[A], 58, GFXBackground2[A], 0, 0);
+                XRender::renderTexture(camX + tempLocation.X, camY + tempLocation.Y, GFXBackground2Width[A], 58, GFXBackground2[A], 0, 0);
             }
         }
     }
@@ -1369,8 +1377,8 @@ void DrawBackground(int S, int Z)
         if(level[S].Height - level[S].Y > CanvasH)
         {
             // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - 600) * (GFXBackground2Height(A) - 600)
-            tempLocation.Y = (-vScreen[Z].Y - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - Eff_ScreenH) * (CanvasH - Eff_ScreenH) + vScreen[Z].Top;
-            tempLocation.Y = -vScreen[Z].Y - tempLocation.Y;
+            tempLocation.Y = (-camY - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - Eff_ScreenH) * (CanvasH - Eff_ScreenH) + vScreen[Z].Top;
+            tempLocation.Y = -camY - tempLocation.Y;
             tempLocation.Y += CanvasOffset;
         }
         else if(CanvasH > GFXBackground2Height[A])
@@ -1384,8 +1392,8 @@ void DrawBackground(int S, int Z)
 
         // use a simple color fill for the water above and below the texture
         XRender::lazyPreLoad(GFXBackground2[A]);
-        double undrawn_above = tempLocation.Y + vScreen[Z].Y;
-        double undrawn_below = tempLocation.Y + vScreen[Z].Y + tempLocation.Height;
+        double undrawn_above = tempLocation.Y + camY;
+        double undrawn_below = tempLocation.Y + camY + tempLocation.Height;
         XRender::renderRect(0, 0, vScreen[Z].Width, std::ceil(undrawn_above),
             GFXBackground2[A].ColorUpper);
         XRender::renderRect(0, undrawn_below, vScreen[Z].Width, vScreen[Z].Height - undrawn_below + 1,
@@ -1394,10 +1402,10 @@ void DrawBackground(int S, int Z)
         int tempVar92 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.65 + (double)screen.W / GFXBackground2Width[A]))) + 1;
         for(B = 0; B <= tempVar92; B++)
         {
-            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreen[Z].X + vScreen[Z].Left + level[S].X) * 0.65);
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (camX + vScreen[Z].Left + level[S].X) * 0.65);
             if(vScreenCollision(Z, tempLocation))
             {
-                XRender::renderTexture(vScreen[Z].X + tempLocation.X, vScreen[Z].Y + tempLocation.Y, GFXBackground2Width[A], 100, GFXBackground2[A], 0, 0);
+                XRender::renderTexture(camX + tempLocation.X, camY + tempLocation.Y, GFXBackground2Width[A], 100, GFXBackground2[A], 0, 0);
             }
         }
 
@@ -1405,10 +1413,10 @@ void DrawBackground(int S, int Z)
         int tempVar93 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.6 + (double)screen.W / GFXBackground2Width[A]))) + 1;
         for(B = 0; B <= tempVar93; B++)
         {
-            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreen[Z].X + vScreen[Z].Left + level[S].X) * 0.6);
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (camX + vScreen[Z].Left + level[S].X) * 0.6);
             if(vScreenCollision(Z, tempLocation))
             {
-                XRender::renderTexture(vScreen[Z].X + tempLocation.X, vScreen[Z].Y + tempLocation.Y + 100, GFXBackground2Width[A], 245, GFXBackground2[A], 0, 100);
+                XRender::renderTexture(camX + tempLocation.X, camY + tempLocation.Y + 100, GFXBackground2Width[A], 245, GFXBackground2[A], 0, 100);
             }
         }
 
@@ -1416,10 +1424,10 @@ void DrawBackground(int S, int Z)
         int tempVar94 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.55 + (double)screen.W / GFXBackground2Width[A]))) + 1;
         for(B = 0; B <= tempVar94; B++)
         {
-            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreen[Z].X + vScreen[Z].Left + level[S].X) * 0.55);
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (camX + vScreen[Z].Left + level[S].X) * 0.55);
             if(vScreenCollision(Z, tempLocation))
             {
-                XRender::renderTexture(vScreen[Z].X + tempLocation.X, vScreen[Z].Y + tempLocation.Y + 345, GFXBackground2Width[A], 110, GFXBackground2[A], 0, 345);
+                XRender::renderTexture(camX + tempLocation.X, camY + tempLocation.Y + 345, GFXBackground2Width[A], 110, GFXBackground2[A], 0, 345);
             }
         }
 
@@ -1427,10 +1435,10 @@ void DrawBackground(int S, int Z)
         int tempVar95 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5 + (double)screen.W / GFXBackground2Width[A]))) + 1;
         for(B = 0; B <= tempVar95; B++)
         {
-            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreen[Z].X + vScreen[Z].Left + level[S].X) * 0.5);
+            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (camX + vScreen[Z].Left + level[S].X) * 0.5);
             if(vScreenCollision(Z, tempLocation))
             {
-                XRender::renderTexture(vScreen[Z].X + tempLocation.X, vScreen[Z].Y + tempLocation.Y + 455, GFXBackground2Width[A], GFXBackground2Height[A] - 455, GFXBackground2[A], 0, 455);
+                XRender::renderTexture(camX + tempLocation.X, camY + tempLocation.Y + 455, GFXBackground2Width[A], GFXBackground2Height[A] - 455, GFXBackground2[A], 0, 455);
             }
         }
     }

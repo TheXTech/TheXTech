@@ -40,6 +40,7 @@
 #include "../eff_id.h"
 #include "../layers.h"
 
+#include "game_main.h"
 #include "npc_traits.h"
 
 #include "npc/npc_queues.h"
@@ -254,7 +255,7 @@ void UpdateNPCs()
 
     if(CoinMode) // this is a cheat code
     {
-        if(Lives >= 99 && Coins >= 99)
+        if(!g_compatibility.modern_lives_system && Lives >= 99 && Coins >= 99)
             CoinMode = false;
         else
         {
@@ -262,14 +263,10 @@ void UpdateNPCs()
             Coins += 1;
             if(Coins >= 100)
             {
-                if(Lives < 99)
-                {
-                    Lives += 1;
-                    PlaySound(SFX_1up);
-                    Coins -= 100;
-                }
-                else
-                    Coins = 99;
+                if(g_compatibility.modern_lives_system && g_100s >= -1)
+                    CoinMode = false;
+
+                Got100Coins();
             }
         }
     }
@@ -447,7 +444,7 @@ void UpdateNPCs()
                             else if(NPC[A].GeneratorEffect == 2) // projectile
                             {
                                 NPC[numNPCs].Layer = LAYER_SPAWNED_NPCS;
-                                PlaySound(SFX_Bullet);
+                                PlaySoundSpatial(SFX_Bullet, NPC[A].Location);
                                 NPC[numNPCs].Projectile = true;
                                 if(NPC[numNPCs].Type == NPCID_BULLET) // Normal Bullet Bills
                                     NPC[numNPCs].Projectile = false;
@@ -733,7 +730,7 @@ void UpdateNPCs()
                 }
             }
 
-            if(NPC[A]->IsABlock || NPC[A]->IsAHit1Block || (NPC[A]->CanWalkOn && !(NPCIsCheep(NPC[A]) && NPC[A].Special == 2)))
+            if(NPC[A]->IsABlock || NPC[A]->IsAHit1Block || (NPC[A]->CanWalkOn && !(NPC[A]->IsFish && NPC[A].Special == 2)))
             {
                 if(
                     (
@@ -810,7 +807,7 @@ void UpdateNPCs()
             continue;
 
         // check for inactive NPCs that are falling off
-        if(NPC[A].JustActivated == 0 && !(NPCIsCheep(NPC[A]) && Maths::iRound(NPC[A].Special) == 2) && NPC[A].Type != NPCID_LAVABUBBLE)
+        if(NPC[A].JustActivated == 0 && !(NPC[A]->IsFish && Maths::iRound(NPC[A].Special) == 2) && NPC[A].Type != NPCID_LAVABUBBLE)
         {
             if(!GameMenu && NPC[A].Location.Y > level[NPC[A].Section].Height + 16)
             {
@@ -899,7 +896,7 @@ void UpdateNPCs()
 
 
 
-                else if(NPC[A].Type == NPCID_BULLET || NPC[A].Type == NPCID_BIG_BULLET || (NPCIsCheep(NPC[A]) && NPC[A].Special == 2) || NPC[A].Type == NPCID_GHOST_FAST) // Special Start for Jumping Fish and Bullet Bills
+                else if(NPC[A].Type == NPCID_BULLET || NPC[A].Type == NPCID_BIG_BULLET || (NPC[A]->IsFish && NPC[A].Special == 2) || NPC[A].Type == NPCID_GHOST_FAST) // Special Start for Jumping Fish and Bullet Bills
                 {
                     if(NPC[A].TimeLeft <= 1)
                     {
@@ -919,7 +916,7 @@ void UpdateNPCs()
                         NPC[A].Active = false;
                         NPC[A].TimeLeft = 0;
                     }
-                    else if(NPCIsCheep(NPC[A]) && Maths::iRound(NPC[A].Special) == 2)
+                    else if(NPC[A]->IsFish && Maths::iRound(NPC[A].Special) == 2)
                     {
                         NPC[A].Location.Y = level[Player[NPC[A].JustActivated].Section].Height - 0.1;
                         NPC[A].Location.SpeedX = (1 + (NPC[A].Location.Y - NPC[A].DefaultLocation.Y) * 0.005) * NPC[A].Direction;
@@ -929,7 +926,7 @@ void UpdateNPCs()
                             treeNPCSplitTempBlock(A);
                     }
                     else if(NPC[A].Type != NPCID_GHOST_FAST)
-                        PlaySound(SFX_Bullet);
+                        PlaySoundSpatial(SFX_Bullet, NPC[A].Location);
                 }
                 else if(NPC[A].Type == NPCID_CANNONENEMY)
                     NPC[A].Special = 100;
@@ -950,7 +947,7 @@ void UpdateNPCs()
         // check for active NPCs that are falling off
         else if(NPC[A].Location.Y > level[NPC[A].Section].Height && NPC[A].Location.Y > level[NPC[A].Section].Height + 16)
         {
-            if(!GameMenu && !(NPCIsCheep(NPC[A]) && Maths::iRound(NPC[A].Special) == 2) && NPC[A].Type != NPCID_LAVABUBBLE)
+            if(!GameMenu && !(NPC[A]->IsFish && Maths::iRound(NPC[A].Special) == 2) && NPC[A].Type != NPCID_LAVABUBBLE)
                 NPCHit(A, 9);
         }
 
@@ -1048,7 +1045,7 @@ void UpdateNPCs()
                                     NewEffect(EFFID_WATER_SPLASH, tempLocation);
                                 }
 
-                                if(!(NPCIsCheep(NPC[A]) && NPC[A].Special == 1) && NPC[A].Type != NPCID_LEAF_POWER && NPC[A].Type != NPCID_PLR_FIREBALL)
+                                if(!(NPC[A]->IsFish && NPC[A].Special == 1) && NPC[A].Type != NPCID_LEAF_POWER && NPC[A].Type != NPCID_PLR_FIREBALL)
                                 {
                                     if(NPC[A].Location.SpeedY > 0.5)
                                         NPC[A].Location.SpeedY = 0.5;
@@ -1099,9 +1096,9 @@ void UpdateNPCs()
 
                 if(NPC[A].Type == NPCID_FLIPPED_RAINBOW_SHELL && NPC[A].Special4 == 1)
                     NPC[A].Special5 = 0;
-                else if(!NPCIsCheep(NPC[A]) && NPC[A].Type != NPCID_RAFT && NPC[A].Type != NPCID_WALL_BUG && NPC[A].Type != NPCID_WALL_SPARK && NPC[A].Type != NPCID_WALL_TURTLE)
+                else if(!NPC[A]->IsFish && NPC[A].Type != NPCID_RAFT && NPC[A].Type != NPCID_WALL_BUG && NPC[A].Type != NPCID_WALL_SPARK && NPC[A].Type != NPCID_WALL_TURTLE)
                     speedVar = (float)(speedVar * 0.5);
-                else if(NPCIsCheep(NPC[A]) && NPC[A].Special == 2 && NPC[A].Location.SpeedY > 0)
+                else if(NPC[A]->IsFish && NPC[A].Special == 2 && NPC[A].Location.SpeedY > 0)
                     speedVar = (float)(speedVar * 0.5);
 
                 if(NPC[A].Location.SpeedY >= 3) // Terminal Velocity in water
@@ -1110,7 +1107,7 @@ void UpdateNPCs()
                 if(NPC[A].Location.SpeedY < -3)
                     NPC[A].Location.SpeedY = -3;
             }
-            else if(!(NPC[A].Type != NPCID_RAFT && !NPCIsCheep(NPC[A])))
+            else if(!(NPC[A].Type != NPCID_RAFT && !NPC[A]->IsFish))
             {
                 NPC[A].WallDeath += 2;
 
@@ -1188,7 +1185,7 @@ void UpdateNPCs()
             if((NPC[A].Type == NPCID_VILLAIN_S3 || NPC[A].Type == NPCID_FIRE_DISK || NPC[A].Type == NPCID_FIRE_CHAIN) && NPC[A].TimeLeft > 1)
                 NPC[A].TimeLeft = 100;
 
-            if(!(NPC[A].Type == NPCID_PLR_FIREBALL || (NPCIsCheep(NPC[A]) && fiEqual(NPC[A].Special, 2)) ||
+            if(!(NPC[A].Type == NPCID_PLR_FIREBALL || (NPC[A]->IsFish && fiEqual(NPC[A].Special, 2)) ||
                  NPC[A].Type == NPCID_TOOTHY || NPC[A].Type == NPCID_VEHICLE || NPC[A].Type == NPCID_YEL_PLATFORM || NPC[A].Type == NPCID_BLU_PLATFORM ||
                  NPC[A].Type == NPCID_GRN_PLATFORM || NPC[A].Type == NPCID_RED_PLATFORM || NPC[A].Type == NPCID_VILLAIN_S3 || NPCIsYoshi(NPC[A])) &&
                  NPC[A].HoldingPlayer == 0)
@@ -1311,7 +1308,7 @@ void UpdateNPCs()
                         NPC[A].TimeLeft = 100;
                         NPC[A].BeltSpeed = 0;
 
-                        if(NPC[A].Type == (NPCIsCheep(NPC[A]) && NPC[A].Special == 2))
+                        if(NPC[A].Type == (NPC[A]->IsFish && NPC[A].Special == 2))
                             NPC[A].Special5 = 0;
 
                         NPC[A].Direction = Player[NPC[A].HoldingPlayer].Direction; // Face the player
@@ -1391,7 +1388,7 @@ void UpdateNPCs()
                         }
                         if(NPC[A].Type == NPCID_BULLET)
                         {
-                            PlaySound(SFX_Bullet);
+                            PlaySoundSpatial(SFX_Bullet, NPC[A].Location);
                             NPC[A].Location.SpeedX = 5 * NPC[A].Direction;
                             NPC[A].Projectile = true;
                             NPC[A].CantHurt = 1000;
@@ -1508,7 +1505,7 @@ void UpdateNPCs()
                     }
 
                     if(NPC[A].Type == NPCID_SAW) // play saw sound
-                        PlaySound(SFX_Saw);
+                        PlaySoundSpatial(SFX_Saw, NPC[A].Location);
 
 
 
@@ -1520,7 +1517,7 @@ void UpdateNPCs()
                     // POSSIBLE SUBROUTINE: setSpeed
 
                     // Default Movement Code
-                    if((NPCDefaultMovement(NPC[A]) || (NPCIsCheep(NPC[A]) && NPC[A].Special != 2)) && !((NPC[A].Type == NPCID_EXT_TURTLE || NPC[A].Type == NPCID_BLU_HIT_TURTLE_S4) && NPC[A].Special > 0) && NPC[A].Type != NPCID_ITEM_BURIED)
+                    if((NPCDefaultMovement(NPC[A]) || (NPC[A]->IsFish && NPC[A].Special != 2)) && !((NPC[A].Type == NPCID_EXT_TURTLE || NPC[A].Type == NPCID_BLU_HIT_TURTLE_S4) && NPC[A].Special > 0) && NPC[A].Type != NPCID_ITEM_BURIED)
                     {
                         if(NPC[A].Direction == 0)
                         {
@@ -1847,7 +1844,7 @@ void UpdateNPCs()
                     }
                     // Reset Speed when no longer a projectile
                     // If Not (NPCIsAShell(.Type) Or .Type = 8 Or .Type = 93 Or .Type = 74 Or .Type = 51 Or .Type = 52 Or .Type = 12 Or .Type = 14 Or .Type = 13 Or .Type = 15 Or NPCIsABonus(.Type) Or .Type = 17 Or .Type = 18 Or .Type = 21 Or .Type = 22 Or .Type = 25 Or .Type = 26 Or .Type = 29 Or .Type = 30 Or .Type = 31 Or .Type = 32 Or .Type = 35 Or .Type = 37 Or .Type = 38 Or .Type = 39 Or .Type = 40 Or .Type = 42 Or .Type = 43 Or .Type = 44 Or .Type = 45 Or .Type = 46 Or .Type = 47 Or .Type = 48 Or .Type = 76 Or .Type = 49 Or .Type = 54 Or .Type = 56 Or .Type = 57 Or .Type = 58 Or .Type = 60 Or .Type = 62 Or .Type = 64 Or .Type = 66 Or .Type = 67 Or .Type = 68 Or .Type = 69 Or .Type = 70 Or .Type = 78 Or .Type = 84 Or .Type = 85 Or .Type = 87 Or (.Type = 55 And .Special > 0) Or (.Type >= 79 And .Type <= 83) Or .Type = 86 Or .Type = 92 Or .Type = 94 Or NPCIsYoshi(.Type) Or .Type = 96 Or .Type = 101 Or .Type = 102) And .Projectile = False Then
-                    if((NPCDefaultMovement(NPC[A]) || (NPCIsCheep(NPC[A]) && NPC[A].Special != 2)) && !((NPC[A].Type == NPCID_EXT_TURTLE || NPC[A].Type == NPCID_BLU_HIT_TURTLE_S4) && NPC[A].Special > 0) && !NPC[A].Projectile)
+                    if((NPCDefaultMovement(NPC[A]) || (NPC[A]->IsFish && NPC[A].Special != 2)) && !((NPC[A].Type == NPCID_EXT_TURTLE || NPC[A].Type == NPCID_BLU_HIT_TURTLE_S4) && NPC[A].Special > 0) && !NPC[A].Projectile)
                     {
                         if(!NPC[A]->CanWalkOn)
                         {
@@ -1859,7 +1856,7 @@ void UpdateNPCs()
                                 NPC[A].Location.SpeedX = Physics.NPCWalkingSpeed * NPC[A].Direction;
 
 
-                            if((NPCIsCheep(NPC[A]) && NPC[A].Special != 1) && !NPC[A].Projectile)
+                            if((NPC[A]->IsFish && NPC[A].Special != 1) && !NPC[A].Projectile)
                             {
                                 if(NPC[A].Wet == 0)
                                 {
@@ -1880,7 +1877,7 @@ void UpdateNPCs()
                                 }
                             }
 
-                            if(NPCIsCheep(NPC[A]) && NPC[A].Special == 1 && !NPC[A].Projectile)
+                            if(NPC[A]->IsFish && NPC[A].Special == 1 && !NPC[A].Projectile)
                                 NPC[A].Location.SpeedX = Physics.NPCWalkingOnSpeed * 2 * NPC[A].Direction;
 
 
@@ -1930,7 +1927,7 @@ void UpdateNPCs()
                         else if(NPC[A].Type == NPCID_BULLET || NPC[A].Type == NPCID_BIG_BULLET)
                             NPC[A].Location.SpeedY = 0;
 
-                        else if((NPCIsCheep(NPC[A]) && NPC[A].Special == 2) && !NPC[A].Projectile)
+                        else if((NPC[A]->IsFish && NPC[A].Special == 2) && !NPC[A].Projectile)
                         {
                             if(Maths::iRound(NPC[A].Special5) == 1)
                             {
@@ -1947,7 +1944,7 @@ void UpdateNPCs()
                             }
                         }
                         else if(NPC[A].Type != NPCID_RED_VINE_TOP_S3 && NPC[A].Type != NPCID_GRN_VINE_TOP_S3 && NPC[A].Type != NPCID_GRN_VINE_TOP_S4 &&
-                                !(NPCIsCheep(NPC[A]) && NPC[A].Special == 2) && NPC[A].Type != NPCID_HOMING_BALL &&
+                                !(NPC[A]->IsFish && NPC[A].Special == 2) && NPC[A].Type != NPCID_HOMING_BALL &&
                                 NPC[A].Type != NPCID_HOMING_BALL_GEN && NPC[A].Type != NPCID_SPIT_GUY_BALL && NPC[A].Type != NPCID_STAR_EXIT && NPC[A].Type != NPCID_STAR_COLLECT &&
                                 NPC[A].Type != NPCID_VILLAIN_FIRE && NPC[A].Type != NPCID_PLANT_S3 && NPC[A].Type != NPCID_FIRE_PLANT && NPC[A].Type != NPCID_PLANT_FIRE &&
                                 NPC[A].Type != NPCID_PLANT_S1 && NPC[A].Type != NPCID_BIG_PLANT && NPC[A].Type != NPCID_LONG_PLANT_UP && NPC[A].Type != NPCID_LONG_PLANT_DOWN &&
@@ -1966,11 +1963,11 @@ void UpdateNPCs()
                         {
                             if(NPC[A].Type != NPCID_BAT && NPC[A].Type != NPCID_VINE_BUG && NPC[A].Type != NPCID_QUAD_BALL && NPC[A].Type != NPCID_FIRE_BOSS_FIRE && NPC[A].Type != NPCID_ITEM_BUBBLE && NPC[A].Type != NPCID_ITEM_THROWER && NPC[A].Type != NPCID_MAGIC_DOOR && NPC[A].Type != NPCID_COCKPIT && NPC[A].Type != NPCID_CHAR3_HEAVY && NPC[A].Type != NPCID_CHAR4_HEAVY) // no gravity
                             {
-                                if(NPCIsCheep(NPC[A]) && NPC[A].Special == 4 && !NPC[A].Projectile)
+                                if(NPC[A]->IsFish && NPC[A].Special == 4 && !NPC[A].Projectile)
                                     NPC[A].Location.SpeedX = 0;
                                 if(NPC[A].Wet == 2 && (NPC[A].Type == NPCID_RAFT))
                                     NPC[A].Location.SpeedY += -Physics.NPCGravity * 0.5;
-                                else if(NPC[A].Wet == 2 && NPCIsCheep(NPC[A]) && NPC[A].Special != 2 && !NPC[A].Projectile) // Fish cheep
+                                else if(NPC[A].Wet == 2 && NPC[A]->IsFish && NPC[A].Special != 2 && !NPC[A].Projectile) // Fish cheep
                                 {
                                     if((NPC[A].Location.X < NPC[A].DefaultLocation.X - 100 && NPC[A].Direction == -1) || (NPC[A].Location.X > NPC[A].DefaultLocation.X + 100 && NPC[A].Direction == 1))
                                     {
@@ -2020,7 +2017,7 @@ void UpdateNPCs()
                                         }
                                     }
                                 }
-                                else if(NPCIsCheep(NPC[A]) && NPC[A].Special == 1 && NPC[A].Special5 == 1)
+                                else if(NPC[A]->IsFish && NPC[A].Special == 1 && NPC[A].Special5 == 1)
                                     NPC[A].Location.SpeedY += Physics.NPCGravity * 0.6;
                                 else if(NPC[A].Type == NPCID_FLY_BLOCK || (g_compatibility.fix_flamethrower_gravity && NPC[A].Type == NPCID_FLY_CANNON))
                                 {
@@ -2312,7 +2309,7 @@ void UpdateNPCs()
                            !(NPC[A].Type == NPCID_SPIT_BOSS_BALL && NPC[A].Projectile) && NPC[A].Type != NPCID_TOOTHY &&
                             NPC[A].standingOnPlayer == 0 && !(NPCIsVeggie(NPC[A]) && NPC[A].Projectile) &&
                            NPC[A].Type != NPCID_HEAVY_THROWN && NPC[A].Type != NPCID_BIG_BULLET && NPC[A].Type != NPCID_PET_FIRE &&
-                           !(NPCIsCheep(NPC[A]) && NPC[A].Special == 2) && NPC[A].Type != NPCID_VINE_BUG)
+                           !(NPC[A]->IsFish && NPC[A].Special == 2) && NPC[A].Type != NPCID_VINE_BUG)
                         {
                             for(int bCheck = 1; bCheck <= 2; bCheck++)
                             {
@@ -2368,7 +2365,7 @@ void UpdateNPCs()
                                                         else
                                                             HitSpot = FindCollisionBelt(NPC[A].Location, Block[B].Location, oldBeltSpeed);
 
-                                                        if(NPCIsCheep(NPC[A]))
+                                                        if(NPC[A]->IsFish)
                                                         {
                                                             if(NPC[A].Wet == 0)
                                                             {
@@ -2390,7 +2387,7 @@ void UpdateNPCs()
                                                         if(Block[B].IsPlayer > 0 && ((!NPC[A]->StandsOnPlayer && NPC[A].Type != NPCID_PLR_FIREBALL) || NPC[A].Inert))
                                                             HitSpot = 0;
 
-                                                        if((NPCIsCheep(NPC[A]) && NPC[A].Special == 2) && HitSpot != 3)
+                                                        if((NPC[A]->IsFish && NPC[A].Special == 2) && HitSpot != 3)
                                                             HitSpot = 0;
 
                                                         if(Block[B].Invis)
@@ -2772,7 +2769,7 @@ void UpdateNPCs()
 
 
                                                                             NPC[A].Location.Y = Block[B].Location.Y + (Block[B].Location.Height * Slope) - NPC[A].Location.Height - 0.1;
-                                                                            if(NPCIsCheep(NPC[A]))
+                                                                            if(NPC[A]->IsFish)
                                                                                 NPC[A].TurnAround = true;
                                                                             NPC[A].Slope = B;
                                                                             HitSpot = 1;
@@ -3030,9 +3027,9 @@ void UpdateNPCs()
                                                                 NPC[A].Special = 2;
 
                                                             if((NPC[A].Type == NPCID_METALBARREL || NPC[A].Type == NPCID_CANNONENEMY || NPC[A].Type == NPCID_HPIPE_SHORT || NPC[A].Type == NPCID_HPIPE_LONG || NPC[A].Type == NPCID_VPIPE_SHORT || NPC[A].Type == NPCID_VPIPE_LONG) && NPC[A].Location.SpeedY > Physics.NPCGravity * 20)
-                                                                PlaySound(SFX_Stone);
+                                                                PlaySoundSpatial(SFX_Stone, NPC[A].Location);
                                                             if(NPC[A].Type == NPCID_TANK_TREADS && NPC[A].Location.SpeedY > Physics.NPCGravity * 10)
-                                                                PlaySound(SFX_Stone);
+                                                                PlaySoundSpatial(SFX_Stone, NPC[A].Location);
 
                                                             if(WalkingCollision3(NPC[A].Location, Block[B].Location, oldBeltSpeed) || NPC[A].Location.Width > 32)
                                                             {
@@ -3353,7 +3350,7 @@ void UpdateNPCs()
                                                             if(HitSpot == 2 || HitSpot == 4 || HitSpot == 5)
                                                             {
                                                                 BlockHit(B);
-                                                                PlaySound(SFX_BlockHit);
+                                                                PlaySoundSpatial(SFX_BlockHit, NPC[A].Location);
                                                                 if(NPC[A].Type == NPCID_BULLET) // Bullet Bills
                                                                 {
                                                                     NPC[A].Location.SpeedX = -NPC[A].Location.SpeedX;
@@ -3424,7 +3421,7 @@ void UpdateNPCs()
                                     if(NPC[A].Location.SpeedY < -0.05)
                                     {
                                         BlockHit(winningBlock);
-                                        PlaySound(SFX_BlockHit);
+                                        PlaySoundSpatial(SFX_BlockHit, NPC[A].Location);
                                         if(NPCIsAShell(NPC[A]) || NPC[A].Type == NPCID_ICE_CUBE)
                                             BlockHitHard(winningBlock);
                                     }
@@ -3677,7 +3674,7 @@ void UpdateNPCs()
                         {
                             if(!NPCIsACoin(NPC[A]) && NPC[A].Type != NPCID_TIMER_S2 && NPC[A].Type != NPCID_FALL_BLOCK_BROWN &&
                                 NPC[A].Type != NPCID_WALL_BUG && NPC[A].Type != NPCID_WALL_SPARK && NPC[A].Type != NPCID_WALL_TURTLE && NPC[A].Type != NPCID_RED_BOOT &&
-                                NPC[A].Type != NPCID_BLU_BOOT && !(NPCIsCheep(NPC[A]) && NPC[A].Special == 2) &&
+                                NPC[A].Type != NPCID_BLU_BOOT && !(NPC[A]->IsFish && NPC[A].Special == 2) &&
                                !NPC[A].Generator && NPC[A].Type != NPCID_PLANT_FIRE && NPC[A].Type != NPCID_FIRE_CHAIN &&
                                 NPC[A].Type != NPCID_QUAD_BALL && NPC[A].Type != NPCID_FLY_BLOCK && NPC[A].Type != NPCID_FLY_CANNON &&
                                 NPC[A].Type != NPCID_FIRE_BOSS_FIRE && NPC[A].Type != NPCID_DOOR_MAKER && NPC[A].Type != NPCID_MAGIC_DOOR)
@@ -3946,7 +3943,7 @@ void UpdateNPCs()
                                                                                                 else if(NPC[B].Type == NPCID_CANNONENEMY)
                                                                                                 {
                                                                                                     NPC[A].Location.SpeedX = -NPC[A].Location.SpeedX;
-                                                                                                    PlaySound(SFX_BlockHit);
+                                                                                                    PlaySoundSpatial(SFX_BlockHit, NPC[A].Location);
                                                                                                     NPCHit(A, 4, A);
                                                                                                 }
                                                                                             }
@@ -4038,7 +4035,7 @@ void UpdateNPCs()
 
                         if(NPC[A].WallDeath > 0)
                         {
-                            if(NPCIsCheep(NPC[A]))
+                            if(NPC[A]->IsFish)
                                 NPC[A].WallDeath -= 1;
                             else
                                 NPC[A].WallDeath = 0;
@@ -4861,7 +4858,7 @@ void UpdateNPCs()
                             else
                             {
                                 bool legacy = /*NPC[A].Legacy &&*/ (NPC[A].Variant == 1);
-                                PlaySound(SFX_Stone);
+                                PlaySoundSpatial(SFX_Stone, NPC[A].Location);
                                 NPC[A].Special3 = 30;
                                 NPC[A].Frame = 11;
                                 NPC[A].Projectile = false;
@@ -5028,7 +5025,7 @@ void UpdateNPCs()
                                 else if(NPC[numNPCs].Location.SpeedY < -1)
                                     NPC[numNPCs].Location.SpeedY = -1;
                                 syncLayers_NPC(numNPCs);
-                                PlaySound(SFX_BigFireball);
+                                PlaySoundSpatial(SFX_BigFireball, NPC[A].Location);
                             }
                         }
                         else if(NPC[A].Special3 < 45)
@@ -5049,7 +5046,7 @@ void UpdateNPCs()
                         NPC[A].Special3 += 1;
                     if(NPC[A].Special3 >= 20)
                     {
-                        PlaySound(SFX_HeavyToss);
+                        PlaySoundSpatial(SFX_HeavyToss, NPC[A].Location);
                         NPC[A].Special3 = 0; // -15
                         numNPCs++;
                         NPC[numNPCs] = NPC_t();
@@ -5220,7 +5217,7 @@ void UpdateNPCs()
                                     tempLocation.Y = NPC[numNPCs].Location.Y + NPC[numNPCs].Location.Height / 2.0 - EffectHeight[10] / 2.0;
                                     NewEffect(EFFID_SMOKE_S3, tempLocation);
 
-                                    PlaySound(SFX_Bullet);
+                                    PlaySoundSpatial(SFX_Bullet, NPC[A].Location);
                                 }
                             }
                         }

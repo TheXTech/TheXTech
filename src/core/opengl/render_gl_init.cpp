@@ -424,8 +424,8 @@ bool RenderGL::initShaders()
         );
 
         // will assume that this is stored in the GLProgramObject's uniform slot 0 later
-        StdPictureLoad null_load;
-        m_distance_field_2_program.register_uniform("u_step_size", null_load);
+        StdPicture_Sub null_sub;
+        m_distance_field_2_program.register_uniform("u_step_size", null_sub);
 
         dumpFullFile(output_contents, (AppPath + "/graphics/shaders/lighting.frag").c_str());
         if(!output_contents.empty())

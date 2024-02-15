@@ -471,7 +471,7 @@ void UpdateEditor()
                                 if(n.id == 288 || n.id == 289 || (n.id == 91 && int(EditorCursor.NPC.Special) == 288))
                                     n.special_data = (long)EditorCursor.NPC.Special2;
 
-                                if(NPCIsAParaTroopa(n.id) || NPCIsCheep(n.id) || n.id == 260)
+                                if(NPCIsAParaTroopa(n.id) || NPCTraits[n.id].IsFish || n.id == 260)
                                     n.special_data = (long)EditorCursor.NPC.Special;
 
                                 if(n.id == 86)
@@ -607,11 +607,9 @@ void UpdateEditor()
                 {
                     // more difficult to iterate backwards, but that's what we need to do here
                     auto sentinel = treeBackgroundQuery(EditorCursor.Location, SORTMODE_Z);
-                    auto i = sentinel.end();
-                    --i;
-                    for(; i >= sentinel.begin(); i--)
+                    for(auto i = sentinel.end(); i > sentinel.begin();)
                     {
-                        A = *i;
+                        A = *(--i);
 
                         if(CursorCollision(EditorCursor.Location, Background[A].Location) && !Background[A].Hidden)
                         {
@@ -833,11 +831,10 @@ void UpdateEditor()
                     // otherwise it would take a long time for the result vector
                     // to rejoin the pool. -- ds-sloth
                     auto sentinel = treeWorldSceneQuery(EditorCursor.Location, SORTMODE_ID);
-                    auto i = sentinel.end();
-                    --i;
-                    for(; i >= sentinel.begin(); i--)
+                    for(auto i = sentinel.end(); i > sentinel.begin();)
                     {
-                        A = (*i - &Scene[1]) + 1;
+                        A = *(--i);
+
                         if(CursorCollision(EditorCursor.Location, Scene[A].Location))
                         {
                             PlaySound(SFX_Grab);
@@ -1056,11 +1053,9 @@ void UpdateEditor()
                 {
                     // more difficult to iterate backwards, but that's what we need to do here
                     auto sentinel = treeBackgroundQuery(EditorCursor.Location, SORTMODE_Z);
-                    auto i = sentinel.end();
-                    --i;
-                    for(; i >= sentinel.begin(); i--)
+                    for(auto i = sentinel.end(); i > sentinel.begin();)
                     {
-                        A = *i;
+                        A = *(--i);
 
                         if(CursorCollision(EditorCursor.Location, Background[A].Location) && !Background[A].Hidden)
                         {
@@ -1243,11 +1238,9 @@ void UpdateEditor()
                 {
                     // more difficult to iterate backwards, but that's what we need to do here
                     auto sentinel = treeWorldSceneQuery(EditorCursor.Location, SORTMODE_ID);
-                    auto i = sentinel.end();
-                    --i;
-                    for(; i >= sentinel.begin(); i--)
+                    for(auto i = sentinel.end(); i > sentinel.begin();)
                     {
-                        A = *i;
+                        A = *(--i);
 
                         if(CursorCollision(EditorCursor.Location, Scene[A].Location))
                         {
@@ -2105,7 +2098,7 @@ void UpdateInterprocess()
                 EditorCursor.NPC.DefaultSpecial = int(EditorCursor.NPC.Special);
             }
 
-            if(NPCIsCheep(EditorCursor.NPC))
+            if(EditorCursor.NPC->IsFish)
             {
                 EditorCursor.NPC.Special = n.special_data;
                 EditorCursor.NPC.DefaultSpecial = int(EditorCursor.NPC.Special);
@@ -2603,7 +2596,7 @@ void SetCursor()
         // Container NPCs are handled elsewhere in new editor
         if(MagicHand)
         {
-            if(t != 91 && t != 96 && t != 283 && t != 284 && !NPCIsCheep(t) && !NPCIsAParaTroopa(t) && t != NPCID_FIRE_CHAIN)
+            if(t != 91 && t != 96 && t != 283 && t != 284 && !NPCTraits[t].IsFish && !NPCIsAParaTroopa(t) && t != NPCID_FIRE_CHAIN)
                 EditorCursor.NPC.Special = 0;
             if(t != 288 && t != 289 && t != 91 && t != 260)
                 EditorCursor.NPC.Special2 = 0.0;
@@ -2951,6 +2944,7 @@ void zTestLevel(bool magicHand, bool interProcess)
     Score = 0;
     Coins = 0;
     Lives = 3;
+    g_100s = 3;
 
     if(numPlayers == 0)
         numPlayers = editorScreen.num_test_players;
@@ -3000,6 +2994,9 @@ void zTestLevel(bool magicHand, bool interProcess)
     SetupPlayers();
     MagicHand = magicHand;
     FontManager::clearAllCustomFonts();
+
+    // this clears the cached medals and stars data from the level
+    LevelWarpSaveEntries.clear();
 
     if(TestFullscreen)
     {

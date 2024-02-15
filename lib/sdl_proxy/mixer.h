@@ -22,6 +22,8 @@
 #ifndef MIXER_HHHHH
 #define MIXER_HHHHH
 
+#include <cstdint>
+
 // for AudioSetup_t
 #include "sound.h"
 #include "sdl_audio.h"
@@ -112,6 +114,8 @@ extern int Mix_HaltChannel(int channel);
 
 extern int Mix_PlayChannel(int channel, Mix_Chunk *chunk, int loops);
 extern int Mix_PlayChannelVol(int which, Mix_Chunk *chunk, int loops, int volume);
+
+extern int Mix_SetPanning(int which, uint8_t left, uint8_t right);
 
 extern int Mix_PlayingMusicStream(Mix_Music* music);
 

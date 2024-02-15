@@ -88,6 +88,25 @@ struct NPCTraits_t
     int16_t FrameSpeed = 8;
     //Public NPCFrameStyle(0 To maxNPCType) As Integer
     int16_t FrameStyle = 0;
+
+    // Uses fish AI. Redigit's comment: 'Flags the NPC type as a cheep cheep
+    bool IsFish : 1;
+
+    //NEW: does the NPC require the canonical activation zone?
+    bool UseDefaultCam : 1;
+
+    enum InactiveRender_t
+    {
+        SHADE = 0,   // shades NPC until it becomes active
+        SHOW_ALWAYS, // always show the NPC (including animation)
+        SKIP,        // skips NPC's render (assume it handles own intro animation from invisibility)
+        SMOKE,       // hides the NPC and reveals it with a EFFID_SMOKE_S3 effect
+    };
+
+    //NEW: how should the NPC render when inactive?
+    InactiveRender_t InactiveRender : 2;
+
+    constexpr NPCTraits_t() : IsFish(false), UseDefaultCam(false), InactiveRender(SHADE) {}
 };
 
 extern RangeArr<NPCTraits_t, 0, maxNPCType> NPCTraits;

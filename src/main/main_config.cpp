@@ -308,6 +308,7 @@ void OpenConfig()
 
         config.beginGroup("video");
         config.read("display-controllers", g_drawController, false);
+        config.read("show-fails-counter", g_config.show_fails_counter, true);
         config.readEnum("battery-status", g_videoSettings.batteryStatus, (int)BATTERY_STATUS_OFF, batteryStatus);
         config.readEnum("show-episode-title", g_config.show_episode_title, (int)Config_t::EPISODE_TITLE_OFF, showEpisodeTitle);
         config.endGroup();
@@ -447,6 +448,7 @@ void SaveConfig()
         config.setValue("render", renderMode[g_videoSettings.renderMode]);
         config.setValue("vsync", g_videoSettings.vSync);
         config.setValue("background-work", g_videoSettings.allowBgWork);
+        config.setValue("show-fails-counter", g_config.show_fails_counter);
         config.setValue("background-controller-input", g_videoSettings.allowBgControllerInput);
         config.setValue("frame-skip", g_videoSettings.enableFrameSkip);
         config.setValue("show-fps", g_videoSettings.showFrameRate);

@@ -609,6 +609,15 @@ void PlaySound(int A, int loops, int volume)
     PlaySoundMenu(A, loops);
 }
 
+void PlaySoundSpatial(int A, int l, int t, int r, int b, int loops, int volume)
+{
+    UNUSED(l);
+    UNUSED(t);
+    UNUSED(r);
+    UNUSED(b);
+    PlaySound(A, loops, volume);
+}
+
 bool HasSound(int A)
 {
     return A <= (int)g_totalSounds;

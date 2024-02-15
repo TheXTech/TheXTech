@@ -720,7 +720,7 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
             npc.DefaultSpecial = int(npc.Special);
         }
 
-        if(NPCIsCheep(npc))
+        if(npc->IsFish)
         {
             npc.Special = n.special_data;
             npc.DefaultSpecial = int(npc.Special);
@@ -732,7 +732,7 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
             npc.DefaultSpecial = int(npc.Special);
         }
 
-        if(npc.Type == NPCID_STAR_EXIT || npc.Type == NPCID_STAR_COLLECT)
+        if(npc.Type == NPCID_STAR_EXIT || npc.Type == NPCID_STAR_COLLECT || npc.Type == NPCID_MEDAL)
         {
             npc.Variant = n.special_data;
             variantHandled = true;
@@ -1070,7 +1070,8 @@ void OpenLevelDataPost()
         }
     }
 
-    OrderMedals();
+    if(!LevelEditor)
+        OrderMedals();
 
     // If too much locks
     SDL_assert_release(numBackground + numLocked <= (maxBackgrounds + maxWarps));
