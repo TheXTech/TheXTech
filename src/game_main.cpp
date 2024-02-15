@@ -1158,7 +1158,13 @@ int GameMain(const CmdLineSetup_t &setup)
                 }
 
                 if(StartWarp > 0)
+                {
                     StartWarp = 0;
+
+                    // fix a bug where ReturnWarp (from different level) would be used at hub after death if StartWarp was set for hub
+                    if(IsHubLevel && g_compatibility.enable_last_warp_hub_resume)
+                        ReturnWarp = 0;
+                }
                 else
                     ReturnWarp = 0;
             }
