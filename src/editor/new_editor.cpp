@@ -1784,9 +1784,9 @@ void EditorScreen::UpdateSectionsScreen(CallMode mode)
         SuperPrintR(mode, g_mainMenu.caseNone, 3, 54, 60);
 
     SuperPrintR(mode, g_editorStrings.levelStartPos, 3, 10, 110);
-    if(UpdateButton(mode, 240, 100, GFXBlock[622], EditorCursor.SubMode == 4, 0, 0, 32, 32))
+    if(UpdateButton(mode, 240, 100 + 4, GFXBlock[622], EditorCursor.SubMode == 4, 0, 0, 32, 32))
         EditorCursor.SubMode = 4;
-    if(UpdateButton(mode, 280, 100, GFXBlock[623], EditorCursor.SubMode == 5, 0, 0, 32, 32))
+    if(UpdateButton(mode, 280, 100 + 4, GFXBlock[623], EditorCursor.SubMode == 5, 0, 0, 32, 32))
         EditorCursor.SubMode = 5;
 
     // section settings
