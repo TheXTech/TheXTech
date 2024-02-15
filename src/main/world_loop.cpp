@@ -599,10 +599,14 @@ void WorldLoop()
                             StartWarp = lvl.StartWarp;
                             StopMusic();
                             PlaySound(SFX_LevelSelect);
-                            g_worldScreenFader.setupFader(2, 0, 65, ScreenFader::S_RECT,
-                                                          true,
-                                                          getWorldPlayerCenterX(), getWorldPlayerCenterY(), 1);
-                            worldWaitForFade();
+
+                            if(g_config.EnableInterLevelFade)
+                            {
+                                g_worldScreenFader.setupFader(2, 0, 65, ScreenFader::S_RECT,
+                                                              true,
+                                                              getWorldPlayerCenterX(), getWorldPlayerCenterY(), 1);
+                                worldWaitForFade();
+                            }
 
                             SoundPause[26] = 200;
                             curWorldLevel = t;
@@ -645,10 +649,15 @@ void WorldLoop()
 //                        frmMain.repaint();
 //                        DoEvents();
 //                        PGE_Delay(1000);
-                        g_worldScreenFader.setupFader(3, 0, 65, ScreenFader::S_RECT,
-                                                      true,
-                                                      getWorldPlayerCenterX(), getWorldPlayerCenterY(), 1);
-                        worldWaitForFade(65);
+                        if(g_config.EnableInterLevelFade)
+                        {
+                            g_worldScreenFader.setupFader(3, 0, 65, ScreenFader::S_RECT,
+                                                          true,
+                                                          getWorldPlayerCenterX(), getWorldPlayerCenterY(), 1);
+                            worldWaitForFade(65);
+                        }
+                        else
+                            worldWaitForFade(65);
 
                         // Moved from above
                         if(int(lvl.WarpX) != -1)
@@ -672,9 +681,12 @@ void WorldLoop()
                         }
                         // -----------------------
 
-                        g_worldScreenFader.setupFader(3, 65, 0, ScreenFader::S_RECT,
-                                                      true,
-                                                      getWorldPlayerCenterX(), getWorldPlayerCenterY(), 1);
+                        if(g_config.EnableInterLevelFade)
+                        {
+                            g_worldScreenFader.setupFader(3, 65, 0, ScreenFader::S_RECT,
+                                                          true,
+                                                          getWorldPlayerCenterX(), getWorldPlayerCenterY(), 1);
+                        }
 //                        resetFrameTimer();
                     }
                 }
