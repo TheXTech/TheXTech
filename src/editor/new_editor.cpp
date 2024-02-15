@@ -1789,12 +1789,14 @@ void EditorScreen::UpdateSectionsScreen(CallMode mode)
     if(UpdateButton(mode, 280, 100 + 4, GFXBlock[623], EditorCursor.SubMode == 5, 0, 0, 32, 32))
         EditorCursor.SubMode = 5;
 
+#if 0
     if(FileFormat == FileFormats::LVL_PGEX && !IsEpisodeIntro)
     {
         if(UpdateCheckBox(mode, e_ScreenW/2 + 10 + 4, 100 + 4, IsHubLevel))
             IsHubLevel = !IsHubLevel;
         SuperPrintR(mode, g_editorStrings.levelIsHub, 3, e_ScreenW/2 + 54, 110);
     }
+#endif
 
     // section settings
     SuperPrintCenterR(mode, fmt::format_ne(g_editorStrings.phraseSectionIndex, curSection + 1), 3, 320, 166);
