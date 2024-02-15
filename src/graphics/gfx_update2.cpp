@@ -698,7 +698,7 @@ void UpdateGraphics2(bool skipRepaint)
                 SuperPrintScreenCenter(WorldName, 3, y, XTAlphaF(alpha));
             }
             // display at bottom
-            else if(XRender::TargetH >= 480 && g_config.show_episode_title == Config_t::EPISODE_TITLE_BOTTOM)
+            else if(g_config.show_episode_title == Config_t::EPISODE_TITLE_BOTTOM)
             {
                 int y = XRender::TargetH - 60;
                 float alpha = 0.75f;
