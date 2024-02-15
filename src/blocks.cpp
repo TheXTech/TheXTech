@@ -1514,7 +1514,7 @@ void PSwitch(bool enabled)
         }
 
         // sort them in reverse location order
-        if(CompatGetLevel() == 1 || CompatGetLevel() == 2)
+        if(g_compatibility.emulate_classic_block_order)
         {
             std::sort(PSwitchBlocks.begin(), PSwitchBlocks.end(),
                 [](BaseRef_t a, BaseRef_t b) {
@@ -1583,7 +1583,7 @@ void PSwitch(bool enabled)
         PSwitchBlocks.resize(numConverted);
 
         // return them to reverse index order
-        if(CompatGetLevel() == 1 || CompatGetLevel() == 2)
+        if(g_compatibility.emulate_classic_block_order)
         {
             std::sort(PSwitchBlocks.begin(), PSwitchBlocks.end(),
                 [](BaseRef_t a, BaseRef_t b) {
@@ -1655,7 +1655,7 @@ void PSwitch(bool enabled)
         }
 
         // sort them in reverse location order
-        if(CompatGetLevel() == 1 || CompatGetLevel() == 2)
+        if(g_compatibility.emulate_classic_block_order)
         {
             std::sort(PSwitchBlocks.begin(), PSwitchBlocks.end(),
                 [](BaseRef_t a, BaseRef_t b) {
