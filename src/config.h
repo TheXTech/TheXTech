@@ -110,15 +110,6 @@ extern struct Config_t
     //! Camera optimizations that improve the experience at low resolutions
     static constexpr bool small_screen_camera_features = true;
 
-
-    /* ---- Joystick ----*/
-
-    //! Enable usage of the rumble control. Only affects new controller profiles.
-    // bool    JoystickEnableRumble = true;
-    //! Show the battery status for wireless gamepads (if possible). Only affects new controller profiles.
-    // bool    JoystickEnableBatteryStatus = false;
-
-
 } g_config; // main_config.cpp
 
 #endif // CONFIG_H
