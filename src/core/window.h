@@ -48,6 +48,24 @@ extern void quit();
 
 #endif
 
+
+#ifdef WINDOW_CUSTOM
+
+constexpr bool is_nullptr()
+{
+    return false;
+}
+
+#else
+
+SDL_FORCE_INLINE bool is_nullptr()
+{
+    return !g_window;
+}
+
+#endif
+
+
 /*!
  * \brief Show the window
  */
