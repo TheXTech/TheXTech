@@ -109,7 +109,7 @@ void SaveLevel(const std::string& FilePath, int format, int version)   // saves 
     out.LevelName = LevelName;
 
     // Level-wide extra settings (may use full JSON encoder in the future)
-    out.custom_params = fmt::sprintf_ne("{\"is_subhub\": %s}", (!IsEpisodeIntro && IsHubLevel) ? "true" : "false");
+    // none supported yet
 
     // sections
     for(int i = 0; i < numSections; ++i)

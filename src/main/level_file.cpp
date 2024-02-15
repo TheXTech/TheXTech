@@ -22,6 +22,7 @@
 #include "sdl_proxy/sdl_timer.h"
 
 #include <json/json.hpp>
+#include <algorithm>
 
 #ifdef __16M__
 // used to clear loaded textures on level/world load
@@ -203,25 +204,18 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         FileRecentSubHubLevel.clear();
     }
 
+    if(!IsHubLevel)
+    {
+        IsHubLevel = std::find(SubHubLevels.begin(), SubHubLevels.end(), FileNameFull) != SubHubLevels.end();
+
+        if(IsHubLevel)
+            FileRecentSubHubLevel = FileNameFull;
+    }
+
     // Level-wide extra settings
     if(!lvl.custom_params.empty())
     {
-        try
-        {
-            const nlohmann::json level_data = nlohmann::json::parse(lvl.custom_params);
-
-            if(!IsEpisodeIntro && level_data.contains("is_subhub"))
-            {
-                IsHubLevel = level_data.value("is_subhub", false);
-                if(IsHubLevel)
-                    FileRecentSubHubLevel = FileNameFull;
-            }
-        }
-        catch(const std::exception &e)
-        {
-            pLogWarning("Failed to load Level %s JSON data: %s", FileNameFull.c_str(), e.what());
-            IsHubLevel = false;
-        }
+        // none supported yet
     }
 
     FileFormats::smbx64LevelPrepare(lvl);

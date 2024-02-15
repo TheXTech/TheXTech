@@ -21,6 +21,8 @@
 #include "sdl_proxy/sdl_stdinc.h"
 #include "sdl_proxy/sdl_timer.h"
 
+#include <json/json.hpp>
+
 #include "core/render.h"
 
 #include "../globals.h"
@@ -154,7 +156,31 @@ bool OpenWorld(std::string FilePath)
 
     MaxWorldStars = int(wld.stars);
 
+    // world extra settings:
+    WldxCustomParams.clear();
+    SubHubLevels.clear();
 
+    if(!wld.custom_params.empty())
+    {
+        WldxCustomParams = wld.custom_params;
+
+        try
+        {
+            const nlohmann::json world_data = nlohmann::json::parse(wld.custom_params);
+
+            if(world_data.contains("sub_hubs_list"))
+            {
+                for(const nlohmann::json& sub_hub : world_data["sub_hubs_list"])
+                    SubHubLevels.push_back(sub_hub.get<std::string>());
+            }
+        }
+        catch(const std::exception &e)
+        {
+            pLogWarning("Failed to load World %s JSON data: %s", FileNameFull.c_str(), e.what());
+        }
+    }
+
+    // world credits
     numWorldCredits = 0;
     for(int i = 1; i <= maxWorldCredits; i++)
         WorldCredits[i].clear();
@@ -490,6 +516,8 @@ void ClearWorld(bool quick)
     WorldStarsShowPolicy = WorldData::STARS_UNSPECIFIED;
     NoMap = false;
     IsEpisodeIntro = false;
+    WldxCustomParams.clear();
+    SubHubLevels.clear();
     StartLevel.clear();
     BeatTheGame = false;
     numWorldCredits = 0;

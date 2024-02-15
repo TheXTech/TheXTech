@@ -1840,6 +1840,10 @@ extern RangeArrI<bool, 0, maxSections, false> UnderWater;
 // EXTRA: track extra JSON info from a loaded level
 extern RangeArrI<stringindex_t, 0, maxSections, STRINGINDEX_NONE> SectionJSONInfo;
 
+// world custom data
+extern std::string WldxCustomParams;
+extern std::vector<std::string> SubHubLevels;
+
 //Public TestLevel As Boolean
 extern bool TestLevel;
 //Public GameMenu As Boolean
