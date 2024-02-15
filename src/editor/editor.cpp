@@ -2991,6 +2991,7 @@ void zTestLevel(bool magicHand, bool interProcess)
     }
 
     LevelEditor = false;
+    TestLevel = true;
     SetupPlayers();
     MagicHand = magicHand;
     FontManager::clearAllCustomFonts();
@@ -3015,7 +3016,6 @@ void zTestLevel(bool magicHand, bool interProcess)
         for(int i = 1; i <= maxLocalPlayers; i++)
             Player[i].Location.X = -20000.0;
 
-        TestLevel = true;
         LevelBeatCode = -3;
         QuickReconnectScreen::g_active = true;
         PauseGame(PauseCode::PauseScreen);
@@ -3096,7 +3096,6 @@ void zTestLevel(bool magicHand, bool interProcess)
     GameThing(waitms, 0);
 
     SetupScreens();
-    TestLevel = true;
     LevelSelect = false;
     EndLevel = false;
     editorScreen.active = false;
