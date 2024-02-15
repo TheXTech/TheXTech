@@ -892,7 +892,6 @@ else()
         src/core/base/window_base.cpp
         src/core/base/msgbox_base.cpp
         src/core/base/events_base.cpp
-        src/core/sdl/init_sdl.cpp
         src/core/sdl/render_sdl.cpp
         src/core/sdl/window_sdl.cpp
         src/core/sdl/msgbox_sdl.cpp

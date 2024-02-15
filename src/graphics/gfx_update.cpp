@@ -1463,9 +1463,6 @@ void UpdateGraphicsLogic(bool Do_FrameSkip)
             int Z = screen.vScreen_refs[vscreen_i];
             int plr_Z = screen.players[vscreen_i];
 
-            // modern NPC activation logic is required to support more than 2 vScreens (for the Reset array)
-            SDL_assert_release(Z <= 2 || g_compatibility.modern_npc_camera_logic);
-
             int S;
             if(LevelEditor)
                 S = curSection;
@@ -1643,7 +1640,7 @@ void UpdateGraphicsLogic(bool Do_FrameSkip)
             {
                 if(g_compatibility.modern_npc_camera_logic)
                     ModernNPCScreenLogic(screen, vscreen_i, fill_draw_queue, NPC_Draw_Queue_p);
-                else
+                else if(Z <= 2)
                     ClassicNPCScreenLogic(Z, numScreens, fill_draw_queue, NPC_Draw_Queue_p);
             }
             // fill the NPC render queue for the level editor

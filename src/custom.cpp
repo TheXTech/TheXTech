@@ -410,6 +410,8 @@ void LoadCustomNPC(int A, std::string cFileName)
         traits.FrameSpeed = int(npc.framespeed);
     if(npc.en_framestyle)
         traits.FrameStyle = int(npc.framestyle);
+    if(npc.en_usedefaultcam)
+        traits.UseDefaultCam = npc.usedefaultcam;
 }
 
 void LoadCustomPlayerPreviews(const char* preview_players_from)

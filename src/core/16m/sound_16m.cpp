@@ -89,7 +89,6 @@ int CustomWorldMusicId()
 
 void InitMixerX()
 {
-
     std::string SoundbankPath = AppPath + "soundbank.bin";
 
     if(g_mixerLoaded)
@@ -103,8 +102,6 @@ void QuitMixerX()
 {
     if(!g_mixerLoaded)
         return;
-
-    noSound = true;
 
     mmStop();
 
@@ -134,7 +131,7 @@ void InitSoundDefaults()
 
 void SoundPauseAll()
 {
-    if(noSound)
+    if(!g_mixerLoaded)
         return;
 
     mmPause();
@@ -143,7 +140,7 @@ void SoundPauseAll()
 
 void SoundResumeAll()
 {
-    if(noSound)
+    if(!g_mixerLoaded)
         return;
 
     mmResume();
@@ -151,7 +148,7 @@ void SoundResumeAll()
 
 void PauseMusic()
 {
-    if(noSound)
+    if(!g_mixerLoaded)
         return;
 
     mmPause();
@@ -159,7 +156,7 @@ void PauseMusic()
 
 void ResumeMusic()
 {
-    if(noSound)
+    if(!g_mixerLoaded)
         return;
 
     mmResume();
@@ -269,7 +266,7 @@ void delayedMusicReset()
 // only used for credits.
 void PlayMusic(const std::string &Alias, int fadeInMs)
 {
-    if(noSound)
+    if(!g_mixerLoaded)
         return;
 
     StopMusic();
@@ -298,7 +295,7 @@ void StartMusic(int A, int fadeInMs)
 
     D_pLogDebug("Start music A=%d", A);
 
-    if(noSound)
+    if(!g_mixerLoaded)
     {
         // Keep world map music being remembered when sound disabled
         if((LevelSelect || WorldEditor) && !GameMenu && !GameOutro)
@@ -361,7 +358,7 @@ void StartMusic(int A, int fadeInMs)
 
 void StopMusic()
 {
-    if(!musicPlaying || noSound)
+    if(!musicPlaying || !g_mixerLoaded)
         return;
 
     pLogDebug("Stopping music");
@@ -476,7 +473,7 @@ static void loadMusicIni(const std::string &path, bool isLoadingCustom)
 
 void InitSound()
 {
-    if(noSound)
+    if(!g_mixerLoaded)
         return;
 
     std::string musicIni = AppPath + "music.ini";
@@ -589,7 +586,7 @@ static int getFallbackSfx(int A)
 
 void PlaySound(int A, int loops, int volume)
 {
-    if(noSound)
+    if(!g_mixerLoaded)
         return;
 
     if(GameMenu || GameOutro) // || A == 26 || A == 27 || A == 29)
@@ -625,7 +622,7 @@ bool HasSound(int A)
 
 void PlaySoundMenu(int A, int loops)
 {
-    if(noSound)
+    if(!g_mixerLoaded)
         return;
 
     UNUSED(loops);
@@ -662,7 +659,7 @@ void BlockSound()
 
 void UpdateSound()
 {
-    if(noSound)
+    if(!g_mixerLoaded)
         return;
     For(A, 1, numSounds)
     {
@@ -675,7 +672,7 @@ void UpdateSound()
 
 void LoadCustomSound()
 {
-    if(noSound)
+    if(!g_mixerLoaded)
         return;
 
     if(GameMenu || GameOutro)
@@ -684,7 +681,7 @@ void LoadCustomSound()
 
 void UnloadCustomSound()
 {
-    if(noSound)
+    if(!g_mixerLoaded)
         return;
 
     UnloadExtSounds();
@@ -698,13 +695,13 @@ void UpdateYoshiMusic()
 void PreloadExtSound(const std::string& path)
 {
     UNUSED(path);
-    if(noSound)
+    if(!g_mixerLoaded)
         return;
 }
 
 void UnloadExtSounds()
 {
-    if(noSound)
+    if(!g_mixerLoaded)
         return;
 }
 
@@ -715,26 +712,26 @@ void PlayExtSound(const std::string &path, int loops, int volume)
     UNUSED(volume);
     // int play_ch = -1;
 
-    if(noSound)
+    if(!g_mixerLoaded)
         return;
 }
 
 void StopExtSound(const std::string& path)
 {
     UNUSED(path);
-    if(noSound)
+    if(!g_mixerLoaded)
         return;
 }
 
 void StopAllExtSounds()
 {
-    if(noSound)
+    if(!g_mixerLoaded)
         return;
 }
 
 void StopAllSounds()
 {
-    if(noSound)
+    if(!g_mixerLoaded)
         return;
 
     mmEffectCancelAll();

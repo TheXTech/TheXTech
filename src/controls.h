@@ -442,7 +442,7 @@ inline const char *GetButtonName_UI_Init(size_t i)
     case Buttons::DebugInfo:
         return "Debug Info";
     case Buttons::EnterCheats:
-        return "Enter Cheat";
+        return "Enter Code";
     case Buttons::ToggleHUD:
         return "Toggle HUD";
     case Buttons::LegacyPause:

@@ -223,7 +223,7 @@ void DynamicScreen(Screen_t& screen, bool mute)
 
             // observe that in the original code, there is a condition on whether vScreen 2 is visible, and this decides what P1 is compared with
             // (but NOT P2, which is always compared with vScreen 1). This is actually unnecessary and the logic works fine if both players are compared with
-            // vScreen 1. It was likely a vestige from before the GetvScreenAverage call above was added. It must be removed in the modern game
+            // vScreen 1. It was likely a vestige from before the GetvScreenAverage call above was added. It must be removed if modern_section_change is set,
             // because if qScreen is active for vScreen2 (impossible prior to modern section change), the checks no longer work.
             const vScreen_t& p2_compare_vscreen = vscreen1;
             bool use_vscreen2 = !g_compatibility.modern_section_change && vscreen2.Visible;
@@ -687,12 +687,4 @@ bool Update_qScreen(int Z, double camRate, double resizeRate)
     }
 
     return continue_qScreen;
-}
-
-void SetRes()
-{
-//    GetCurrentRes(); // Dummy, useless
-    resChanged = true;
-    ChangeRes(800, 600, 16, 60); // 800x600 pixels, 16 bit Color, 60Hz
-    XWindow::showCursor(0);
 }

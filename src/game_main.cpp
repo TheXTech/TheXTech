@@ -227,8 +227,7 @@ void MainLoadAll(bool reload)
         UnloadGFX(true);
         FontManager::quit();
 
-        if(!noSound)
-            PlayInitSound();
+        PlayInitSound();
     }
 
     LoaderInit();
@@ -392,7 +391,7 @@ int GameMain(const CmdLineSetup_t &setup)
 #endif
     XWindow::show(); // Don't show window until playing an initial sound
 
-    if(!noSound && !setup.testLevelMode)
+    if(!setup.testLevelMode)
         PlayInitSound();
 
 #ifdef THEXTECH_INTERPROC_SUPPORTED
@@ -1879,7 +1878,7 @@ void CheckActive()
 //        SoundPauseEngine(0);
 
 /* // Useless condition
-    if(!noSound && MusicPaused)
+    if(MusicPaused)
     {
         if(MusicPaused)
         {

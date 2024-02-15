@@ -176,7 +176,7 @@ void UpdateEffects()
                 else if(e.Life == 52)
                     e.Location.SpeedY = -14;
             }
-            else if(!HasSound(SFX_MagicBossShell) && e.Life == 100) // Old sound
+            else if(e.Life == 100) // Old sound
             {
                 e.Location.SpeedY = -8;
                 PlaySoundSpatial(SFX_SickBossKilled, e.Location);
