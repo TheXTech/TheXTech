@@ -406,10 +406,7 @@ int PauseGame(PauseCode code, int plr)
     GamePaused = code;
 
     if(PSwitchTime > 0)
-    {
-        // If noSound = False Then mciSendString "pause smusic", 0, 0, 0
         PauseMusic();
-    }
 
     // resetFrameTimer();
 
@@ -529,10 +526,7 @@ int PauseGame(PauseCode code, int plr)
     XWindow::showCursor(prev_cursor);
 
     if(PSwitchTime > 0)
-    {
-        // If noSound = False Then mciSendString "resume smusic", 0, 0, 0
         ResumeMusic();
-    }
 
     // resetFrameTimer();
 
