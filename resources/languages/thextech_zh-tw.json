@@ -122,7 +122,8 @@
                 "featureWorldStarDisplay": "使用了大地圖的設置以顯示星星數量。",
                 "featuresWillBeLost": "下列特性將會丟失：",
                 "formatUnknown": "請求的格式不支持。",
-                "noIssues": "該操作不會造成任何兼容性問題。"
+                "noIssues": "該操作不會造成任何兼容性問題。",
+                "featureBgoOrder": "背景對象設置了自定義疊放次序。"
             },
             "formatLegacy": "舊版本",
             "formatModern": "新版本",
@@ -324,7 +325,9 @@
             "phraseCreditIndex": "地圖製作團隊 第{0}行：",
             "retryOnFail": "失敗之後重新開始",
             "totalStars": "總星星數："
-        }
+        },
+        "labelSortOffset": "疊放次序：",
+        "labelSortLayer": "疊放圖層："
     },
     "game": {
         "connect": {
@@ -366,7 +369,8 @@
             "restartLevel": "重新開始",
             "returnToEditor": "返回編輯器",
             "saveAndContinue": "保存並繼續",
-            "saveAndQuit": "保存並退出"
+            "saveAndQuit": "保存並退出",
+            "playerSetup": "玩家設置"
         },
         "format": {
             "minutesSeconds": "{0}分{1}秒"
@@ -576,7 +580,8 @@
             "mainExit": "退出",
             "mainMultiplayerGame": "雙人遊戲",
             "mainOptions": "設置",
-            "mainStartGame": "開始遊戲"
+            "mainStartGame": "開始遊戲",
+            "mainPlayEpisode": "開始遊戲"
         },
         "options": {
             "optionsModeFullScreen": "全屏模式",
