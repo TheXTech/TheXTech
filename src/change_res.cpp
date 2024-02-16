@@ -61,7 +61,7 @@ void SetOrigRes()
 
 void ChangeRes(int, int, int, int)
 {
-    resChanged = false;
+    resChanged = true;
     XWindow::setFullScreen(true);
 
     if(LoadingInProcess)

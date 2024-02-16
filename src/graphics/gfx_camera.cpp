@@ -68,6 +68,9 @@ void ProcessSmallScreenCam(vScreen_t& vscreen)
             lookX_target = -max_offsetX;
         lookX_target &= ~1;
 
+        if(LevelMacro != LEVELMACRO_OFF || ForcedControls)
+            lookX_target = 0;
+
         int16_t rateX = 1;
         // switching directions
         if((vscreen.small_screen_features.offset_x < 0 && lookX_target > 0)
@@ -81,7 +84,7 @@ void ProcessSmallScreenCam(vScreen_t& vscreen)
             rateX = 2;
         }
 
-        if(GamePaused == PauseCode::None && !qScreen && !ForcedControls)
+        if(GamePaused == PauseCode::None && !qScreen)
         {
             if(vscreen.small_screen_features.offset_x < lookX_target)
                 vscreen.small_screen_features.offset_x += rateX;
@@ -115,7 +118,7 @@ void ProcessSmallScreenCam(vScreen_t& vscreen)
                 vscreen.small_screen_features.offset_y *= -1;
         }
 
-        if(GamePaused == PauseCode::None && !qScreen && !ForcedControls)
+        if(GamePaused == PauseCode::None && !qScreen && !ForcedControls && LevelMacro == LEVELMACRO_OFF)
         {
             if(vscreen.small_screen_features.offset_y < lookY_target)
             {

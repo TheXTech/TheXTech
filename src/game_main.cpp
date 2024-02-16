@@ -1178,7 +1178,7 @@ int GameMain(const CmdLineSetup_t &setup)
             {
                 MessageText = fmt::format_ne(g_gameStrings.errorInvalidEnterWarp,
                                              FullFileName,
-                                             StartWarp,
+                                             Player[1].Warp,
                                              numWarps);
                 startError = true;
             }
