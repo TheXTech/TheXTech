@@ -126,10 +126,7 @@ static AssetPack_t s_scan_asset_pack(const std::string& path, bool skip_graphics
     // don't allow any dirsep characters in asset pack ID
     for(char& c : ret.id)
     {
-        if(c == '/')
-            c = '_';
-
-        if(c == '\\')
+        if(c == '/' || c == '\\')
             c = '_';
     }
 
@@ -153,6 +150,16 @@ static AssetPack_t s_scan_asset_pack(const std::string& path, bool skip_graphics
     return ret;
 }
 
+static void s_strip_id(AssetPack_t& pack)
+{
+    if(!pack.id.empty() && !pack.version.empty())
+        pack.version = pack.id + '-' + pack.version;
+    else if(!pack.id.empty())
+        pack.version = pack.id;
+
+    pack.id.clear();
+}
+
 static void s_find_asset_packs()
 {
     pLogDebug("Looking for asset packs...");
@@ -170,6 +177,9 @@ static void s_find_asset_packs()
         // check for a root passed via `-c`
         bool is_custom_root = !custom_root.empty() && root == custom_root;
 
+        // Normally, root is a legacy asset pack, and <root>/assets/ contains modern asset packs.
+        // If passed via -c, root must be a modern asset pack also.
+
         D_pLogDebug(" Checking %s", root.c_str());
         if(DirMan::exists(root + "graphics/ui/"))
         {
@@ -177,14 +187,7 @@ static void s_find_asset_packs()
 
             // strip the ID from a legacy asset pack
             if(!is_custom_root)
-            {
-                if(!pack.id.empty() && !pack.version.empty())
-                    pack.version = pack.id + '-' + pack.version;
-                else if(!pack.id.empty())
-                    pack.version = pack.id;
-
-                pack.id = "";
-            }
+                s_strip_id(pack);
 
             if(!pack.gfx || !pack.gfx->logo.inited)
                 pLogWarning("Could not load UI assets from %s asset pack [%s], ignoring", (is_custom_root) ? "user-specified" : "possible legacy", pack.path.c_str());
@@ -285,8 +288,11 @@ static AssetPack_t s_find_pack_init(const std::string& full_id)
 
     for(const std::string& root : AppPathManager::assetsSearchPath())
     {
-        // skip a root passed via `-c` (if there are no matches, load that by path later)
+        // check for a root passed via `-c`
         bool is_custom_root = !custom_root.empty() && root == custom_root;
+
+        // Normally, root is a legacy asset pack, and <root>/assets/ contains modern asset packs.
+        // If passed via -c, root must be a modern asset pack also.
 
         // check for legacy debug assets
         if(DirMan::exists(root + "graphics/ui/"))
@@ -295,14 +301,7 @@ static AssetPack_t s_find_pack_init(const std::string& full_id)
 
             // strip the ID from a legacy asset pack
             if(!is_custom_root)
-            {
-                if(!pack.id.empty() && !pack.version.empty())
-                    pack.version = pack.id + '-' + pack.version;
-                else if(!pack.id.empty())
-                    pack.version = pack.id;
-
-                pack.id = "";
-            }
+                s_strip_id(pack);
 
             if(is_custom_root && pack.id.empty())
             {
@@ -335,6 +334,7 @@ static AssetPack_t s_find_pack_init(const std::string& full_id)
                 if(DirMan::exists(subdir + "/graphics/ui/"))
                 {
                     AssetPack_t pack = s_scan_asset_pack(subdir, true);
+
                     if(pack.id.empty())
                         pLogWarning("Could not read ID of possible asset pack [%s], ignoring", pack.path.c_str());
                     else if(pack.id == id && pack.version == version)
