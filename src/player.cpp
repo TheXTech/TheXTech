@@ -2767,10 +2767,10 @@ void YoshiSpit(const int A)
     else
     {
         NPC[p.YoshiNPC].RealSpeedX = 0;
-        if(NPCIsAShell(NPC[p.YoshiNPC]))
+        if(NPC[p.YoshiNPC]->IsAShell)
             NPC[p.YoshiNPC].Special = 0;
 
-        if((NPCIsAShell(NPC[p.YoshiNPC]) || NPCIsABot(NPC[p.YoshiNPC]) || NPC[p.YoshiNPC].Type == NPCID_RAINBOW_SHELL) &&
+        if((NPC[p.YoshiNPC]->IsAShell || NPCIsABot(NPC[p.YoshiNPC]) || NPC[p.YoshiNPC].Type == NPCID_RAINBOW_SHELL) &&
            NPC[p.YoshiNPC].Type != NPCID_GLASS_SHELL && p.YoshiRed)
         {
             NPC[p.YoshiNPC].Killed = 9;
@@ -2844,7 +2844,7 @@ void YoshiSpit(const int A)
 
             if(!p.Controls.Down || (p.Location.SpeedY != 0 && p.StandingOnNPC == 0 && p.Slope == 0))
             {
-                if(NPCIsAShell(NPC[p.YoshiNPC]))
+                if(NPC[p.YoshiNPC]->IsAShell)
                 {
                     SoundPause[9] = 2;
                     // NPCHit .YoshiNPC, 1, A
@@ -3620,7 +3620,7 @@ void YoshiEatCode(const int A)
             }
 
             NPC[p.YoshiNPC].Location.Height = NPC[p.YoshiNPC]->THeight;
-            if((NPC[p.YoshiNPC]->IsGrabbable || NPCIsAShell(NPC[p.YoshiNPC]) || NPC[p.YoshiNPC].Type == NPCID_SPIT_BOSS_BALL || NPCIsABot(NPC[p.YoshiNPC]) || NPC[p.YoshiNPC].Type == NPCID_RAINBOW_SHELL || NPC[p.YoshiNPC].Type == NPCID_WALK_BOMB_S2 || NPC[p.YoshiNPC].Type == NPCID_WALK_BOMB_S3 || NPC[p.YoshiNPC].Type == NPCID_LIT_BOMB_S3) && (NPC[p.YoshiNPC].Type != NPCID_HIT_CARRY_FODDER))
+            if((NPC[p.YoshiNPC]->IsGrabbable || NPC[p.YoshiNPC]->IsAShell || NPC[p.YoshiNPC].Type == NPCID_SPIT_BOSS_BALL || NPCIsABot(NPC[p.YoshiNPC]) || NPC[p.YoshiNPC].Type == NPCID_RAINBOW_SHELL || NPC[p.YoshiNPC].Type == NPCID_WALK_BOMB_S2 || NPC[p.YoshiNPC].Type == NPCID_WALK_BOMB_S3 || NPC[p.YoshiNPC].Type == NPCID_LIT_BOMB_S3) && (NPC[p.YoshiNPC].Type != NPCID_HIT_CARRY_FODDER))
             {
                 if(NPC[p.YoshiNPC].Type == NPCID_WALK_BOMB_S2)
                     NPC[p.YoshiNPC].Special = 450;
@@ -5197,7 +5197,7 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
                     if(p.Location.SpeedY == 0)
                         p.Location.SpeedY = 0.01;
                     p.CanJump = false;
-                    if(NPCIsAShell(NPC[p.StandingOnNPC]))
+                    if(NPC[p.StandingOnNPC]->IsAShell)
                         p.Location.SpeedX = NPC[p.StandingOnNPC].Location.SpeedX;
                     NPC[p.StandingOnNPC].HoldingPlayer = A;
                     NPC[p.StandingOnNPC].CantHurt = Physics.NPCCanHurtWait;
@@ -5476,7 +5476,7 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
 
             if(p.Controls.Up && !NPC[p.HoldingNPC]->IsACoin && NPC[p.HoldingNPC].Type != NPCID_BULLET) // Throw the npc up
             {
-                if(NPCIsAShell(NPC[p.HoldingNPC]) || NPC[p.HoldingNPC].Type == NPCID_SLIDE_BLOCK || NPC[p.HoldingNPC].Type == NPCID_ICE_CUBE)
+                if(NPC[p.HoldingNPC]->IsAShell || NPC[p.HoldingNPC].Type == NPCID_SLIDE_BLOCK || NPC[p.HoldingNPC].Type == NPCID_ICE_CUBE)
                 {
                     if(p.Controls.Left || p.Controls.Right) // Up and forward
                     {
@@ -5580,7 +5580,7 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
                     NPC[p.HoldingNPC].Location.SpeedY = 20;
                 }
             }
-            else if(!NPCIsAShell(NPC[p.HoldingNPC]) &&
+            else if(!NPC[p.HoldingNPC]->IsAShell &&
                     NPC[p.HoldingNPC].Type != NPCID_SLIDE_BLOCK &&
                     NPC[p.HoldingNPC].Type != NPCID_ICE_CUBE &&
                     !NPC[p.HoldingNPC]->IsACoin) // if not a shell or a coin the kick it up and forward
@@ -5627,7 +5627,7 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
                 else
                     PlaySoundSpatial(SFX_ShellHit, p.Location);
             }
-            else if(NPCIsAShell(NPC[p.HoldingNPC]))
+            else if(NPC[p.HoldingNPC]->IsAShell)
             {
                 NPC[p.HoldingNPC].Location.SpeedY = 0;
                 NPC[p.HoldingNPC].Location.SpeedX = 0;

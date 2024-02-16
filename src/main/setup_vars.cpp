@@ -410,7 +410,7 @@ void SetupVars()
 
 
     NPCTraits[254].IsABonus = true;
-    // NPCIsAShell(237) = true;
+    NPCTraits[237].IsAShell = true;
     NPCTraits[237].WontHurt = true;
     NPCTraits[237].CanWalkOn = true;
     NPCTraits[13].JumpHurt = true;
@@ -992,19 +992,19 @@ void SetupVars()
     NPCTraits[113].TWidth = 32; // SMW Green Shell
     NPCTraits[113].THeight = 32;
     NPCTraits[113].FrameOffsetY = 2;
-    // NPCIsAShell(113) = true;
+    NPCTraits[113].IsAShell = true;
     NPCTraits[114].TWidth = 32; // SMW Red Shell
     NPCTraits[114].THeight = 32;
     NPCTraits[114].FrameOffsetY = 2;
-    // NPCIsAShell(114) = true;
+    NPCTraits[114].IsAShell = true;
     NPCTraits[115].TWidth = 32; // SMW Blue Shell
     NPCTraits[115].THeight = 32;
     NPCTraits[115].FrameOffsetY = 2;
-    // NPCIsAShell(115) = true;
+    NPCTraits[115].IsAShell = true;
     NPCTraits[116].TWidth = 32; // SMW Yellow Shell
     NPCTraits[116].THeight = 32;
     NPCTraits[116].FrameOffsetY = 2;
-    // NPCIsAShell(116) = true;
+    NPCTraits[116].IsAShell = true;
     NPCTraits[117].TWidth = 32; // SMW Green Beach Koopa
     NPCTraits[117].THeight = 32;
     NPCTraits[117].FrameOffsetY = 2;
@@ -1241,10 +1241,10 @@ void SetupVars()
     NPCTraits[171].NoYoshi = true;
 
     NPCTraits[172].THeight = 28; //  Green SMB1 Shell
-    // NPCIsAShell(172) = true;
+    NPCTraits[172].IsAShell = true;
     NPCTraits[174].THeight = 28; //  Red SMB1 Shell
-    // NPCIsAShell(174) = true;
-    // NPCIsAShell(195) = true;
+    NPCTraits[174].IsAShell = true;
+    NPCTraits[195].IsAShell = true;
 
     NPCTraits[179].JumpHurt = true; // Razor Blade
     NPCTraits[179].WidthGFX = 64;
@@ -1435,10 +1435,10 @@ void SetupVars()
     // NPCIsBoot(35) = true;
     // NPCIsBoot(191) = true;
     // NPCIsBoot(193) = true;
-    // NPCIsAShell(5) = true;
-    // NPCIsAShell(7) = true;
-    // NPCIsAShell(24) = true;
-    // NPCIsAShell(73) = true;
+    NPCTraits[5].IsAShell = true;
+    NPCTraits[7].IsAShell = true;
+    NPCTraits[24].IsAShell = true;
+    NPCTraits[73].IsAShell = true;
     NPCTraits[9].IsABonus = true;
     NPCTraits[273].IsABonus = true;
     NPCTraits[10].IsABonus = true;

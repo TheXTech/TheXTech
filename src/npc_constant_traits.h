@@ -29,6 +29,7 @@
 // constant traits that determine NPC behavior based on Type
 // will be replaced with other mechanisms during the NPC function pointer update
 
+#if 0
 // Should turn into trait.
 //'Flags the NPC type if it is a shell
 constexpr bool NPCIsAShell(int Type)
@@ -54,7 +55,6 @@ constexpr bool NPCIsAShell(const NPC_t& n)
     return NPCIsAShell(n.Type);
 }
 
-#if 0
 // Should turn into trait.
 //'Flags the NPC type if it is a bonus
 constexpr bool NPCIsABonus(int Type)

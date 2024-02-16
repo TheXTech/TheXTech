@@ -97,6 +97,8 @@ struct NPCTraits_t
     bool IsABonus : 1;
     //'Flags the NPC type if it is a vine
     bool IsAVine : 1;
+    //'Flags the NPC type if it is a shell
+    bool IsAShell : 1;
 
     //NEW: does the NPC require the canonical activation zone?
     bool UseDefaultCam : 1;
@@ -112,7 +114,7 @@ struct NPCTraits_t
     //NEW: how should the NPC render when inactive?
     InactiveRender_t InactiveRender : 2;
 
-    constexpr NPCTraits_t() : IsFish(false), IsACoin(false), IsABonus(false), IsAVine(false), UseDefaultCam(false), InactiveRender(SHADE) {}
+    constexpr NPCTraits_t() : IsFish(false), IsACoin(false), IsABonus(false), IsAVine(false), IsAShell(false), UseDefaultCam(false), InactiveRender(SHADE) {}
 };
 
 extern RangeArr<NPCTraits_t, 0, maxNPCType> NPCTraits;

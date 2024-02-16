@@ -388,7 +388,7 @@ void NPCHit(int A, int B, int C)
             NPC[A].Location.X += -NPC[A].Location.Width / 2.0;
             NPC[A].Location.Y += -NPC[A].Location.Height;
         }
-        if(NPCIsAShell(NPC[A]))
+        if(NPC[A]->IsAShell)
             NPC[A].Location.SpeedX = Physics.NPCShellSpeed * Player[C].Direction;
 
         NPCQueues::Unchecked.push_back(A);
@@ -1452,7 +1452,7 @@ void NPCHit(int A, int B, int C)
             else
                 NPC[A].Killed = B;
         }
-        if(NPCIsAShell(NPC[A]))
+        if(NPC[A]->IsAShell)
             NPC[A].Stuck = false;
     }
     // SMB3 Bowser
@@ -2194,7 +2194,7 @@ void NPCHit(int A, int B, int C)
         if(NPC[A].Type == NPCID_PLR_FIREBALL || NPC[A].Type == NPCID_COIN_SWITCH || NPC[A].Type == NPCID_TIME_SWITCH || NPC[A].Type == NPCID_TNT)
         {
         }
-        else if(oldNPC.Type == 137 || NPC[A].Type == NPCID_SLIDE_BLOCK || oldNPC.Type == 166 || NPC[A].Type == NPCID_BULLY || (NPCIsAShell(oldNPC) && B != 8))
+        else if(oldNPC.Type == 137 || NPC[A].Type == NPCID_SLIDE_BLOCK || oldNPC.Type == 166 || NPC[A].Type == NPCID_BULLY || (oldNPC->IsAShell && B != 8))
         {
             if(B != 8) // (.Type = 45 And B = 8) Then
             {

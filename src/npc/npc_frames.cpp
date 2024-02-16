@@ -1146,7 +1146,7 @@ void NPCFrames(int A)
         else if(NPC[A].Special5 < 16)
             NPC[A].Frame += 12;
     }
-    else if(NPCIsAShell(NPC[A])) // Turtle shell
+    else if(NPC[A]->IsAShell) // Turtle shell
     {
         if(NPC[A].Location.SpeedX == 0)
             NPC[A].Frame = 0;

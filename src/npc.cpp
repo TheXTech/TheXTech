@@ -5597,7 +5597,7 @@ void SpecialNPC(int A)
         }
     }
     // Projectile code
-    if(NPCIsAShell(NPC[A]) || (NPC[A].Type == NPCID_SLIDE_BLOCK && NPC[A].Special == 1))
+    if(NPC[A]->IsAShell || (NPC[A].Type == NPCID_SLIDE_BLOCK && NPC[A].Special == 1))
     {
         if(NPC[A].Location.SpeedX != 0)
             NPC[A].Projectile = true;
