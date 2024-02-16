@@ -1323,9 +1323,9 @@ void UpdateBlocks()
             {
                 if(NPC[B].Active)
                 {
-                    if(NPC[B].Killed == 0 && NPC[B].Effect == 0 && NPC[B].HoldingPlayer == 0 && (!NPC[B]->NoClipping || NPCIsACoin(NPC[B])))
+                    if(NPC[B].Killed == 0 && NPC[B].Effect == 0 && NPC[B].HoldingPlayer == 0 && (!NPC[B]->NoClipping || NPC[B]->IsACoin))
                     {
-                        if(ib.ShakeY3 <= 0 || NPCIsACoin(NPC[B]))
+                        if(ib.ShakeY3 <= 0 || NPC[B]->IsACoin)
                         {
                             if(ShakeCollision(NPC[B].Location, ib.Location, ib.ShakeY3))
                             {
@@ -1450,7 +1450,7 @@ void PSwitch(bool enabled)
     {
         for(A = 1; A <= numNPCs; A++)
         {
-            bool transform = NPCIsACoin(NPC[A]) && NPC[A].Block == 0 && !NPC[A].Hidden && NPC[A].Special == 0.0;
+            bool transform = NPC[A]->IsACoin && NPC[A].Block == 0 && !NPC[A].Hidden && NPC[A].Special == 0.0;
 
             if(NPC[A].Type == NPCID_MEDAL && g_compatibility.fix_special_coin_switch)
                 transform = false;
@@ -1841,7 +1841,7 @@ void PowBlock()
             {
                 for(int A : treeNPCQuery(query_loc, SORTMODE_NONE))
                 {
-                    if(!NPC[A].Active && NPCIsACoin(NPC[A]))
+                    if(!NPC[A].Active && NPC[A]->IsACoin)
                     {
                         NPC[A].JustActivated = vscreen_Z;
 
@@ -1862,7 +1862,7 @@ void PowBlock()
     {
         if(NPC[A].Active)
         {
-            if(NPCIsACoin(NPC[A]))
+            if(NPC[A]->IsACoin)
             {
                 NPC[A].Special = 1;
                 NPC[A].Location.SpeedX = (dRand() * 1.0) - 0.5;

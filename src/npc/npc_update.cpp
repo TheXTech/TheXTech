@@ -548,7 +548,7 @@ void UpdateNPCs()
 
             if(NPC[A].Active && NPC[A].TimeLeft > 1 &&
                NPC[A].Type != NPCID_CONVEYOR && NPC[A].Type != NPCID_FALL_BLOCK_RED &&
-               NPC[A].Type != NPCID_FALL_BLOCK_BROWN && !NPCIsACoin(NPC[A])) // And .Type <> NPCID_SPIKY_THROWER
+               NPC[A].Type != NPCID_FALL_BLOCK_BROWN && !NPC[A]->IsACoin) // And .Type <> NPCID_SPIKY_THROWER
             {
                 // if activated by a shared screen, don't make the event player-specific
                 const vScreen_t& activ_vscreen = vScreen[NPC[A].JustActivated];
@@ -610,7 +610,7 @@ void UpdateNPCs()
                 {
                     if(NPC[newAct[C]].Type != NPCID_CONVEYOR && NPC[newAct[C]].Type != NPCID_FALL_BLOCK_RED &&
                        NPC[newAct[C]].Type != NPCID_FALL_BLOCK_BROWN && NPC[newAct[C]].Type != NPCID_SPIKY_THROWER &&
-                       !NPCIsACoin(NPC[newAct[C]]))
+                       !NPC[newAct[C]]->IsACoin)
                     {
                         Location_t tempLocation2 = NPC[newAct[C]].Location;
                         tempLocation2.Y -= 32;
@@ -959,7 +959,7 @@ void UpdateNPCs()
 
 
 
-        if(NPCIsAVine(NPC[A]))
+        if(NPC[A]->IsAVine)
         {
             // .Location.SpeedX = 0
             // .Location.SpeedY = 0
@@ -1013,7 +1013,7 @@ void UpdateNPCs()
             // water check
 
             // Things immune to water's effects
-            if(NPC[A].Type == NPCID_LAVABUBBLE || NPC[A].Type == NPCID_BULLET || NPC[A].Type == NPCID_BIG_BULLET || NPC[A].Type == NPCID_HEAVY_THROWN || NPC[A].Type == NPCID_GHOST_S3 || NPC[A].Type == NPCID_GHOST_FAST || NPC[A].Type == NPCID_GHOST_S4 || NPC[A].Type == NPCID_BIG_GHOST || NPC[A].Type == NPCID_STATUE_FIRE || NPC[A].Type == NPCID_VILLAIN_FIRE || NPC[A].Type == NPCID_PET_FIRE || NPC[A].Type == NPCID_PLR_HEAVY || NPC[A].Type == NPCID_CHAR4_HEAVY || NPC[A].Type == NPCID_GOALTAPE || NPC[A].Type == NPCID_SICK_BOSS_BALL || NPC[A].Type == NPCID_HOMING_BALL || NPC[A].Type == NPCID_RED_VINE_TOP_S3 || NPC[A].Type == NPCID_GRN_VINE_TOP_S3 || NPC[A].Type == NPCID_GRN_VINE_TOP_S4 || NPC[A].Type == NPCID_SPIKY_THROWER || NPC[A].Type == NPCID_ITEM_THROWER || NPC[A].Type == NPCID_SAW || NPC[A].Type == NPCID_JUMP_PLANT || NPC[A].Type == NPCID_MAGIC_BOSS_BALL || (NPCIsACoin(NPC[A]) && NPC[A].Special == 0) || NPC[A].Type == NPCID_SWORDBEAM || NPC[A].Type == NPCID_FIRE_DISK || NPC[A].Type == NPCID_FIRE_CHAIN)
+            if(NPC[A].Type == NPCID_LAVABUBBLE || NPC[A].Type == NPCID_BULLET || NPC[A].Type == NPCID_BIG_BULLET || NPC[A].Type == NPCID_HEAVY_THROWN || NPC[A].Type == NPCID_GHOST_S3 || NPC[A].Type == NPCID_GHOST_FAST || NPC[A].Type == NPCID_GHOST_S4 || NPC[A].Type == NPCID_BIG_GHOST || NPC[A].Type == NPCID_STATUE_FIRE || NPC[A].Type == NPCID_VILLAIN_FIRE || NPC[A].Type == NPCID_PET_FIRE || NPC[A].Type == NPCID_PLR_HEAVY || NPC[A].Type == NPCID_CHAR4_HEAVY || NPC[A].Type == NPCID_GOALTAPE || NPC[A].Type == NPCID_SICK_BOSS_BALL || NPC[A].Type == NPCID_HOMING_BALL || NPC[A].Type == NPCID_RED_VINE_TOP_S3 || NPC[A].Type == NPCID_GRN_VINE_TOP_S3 || NPC[A].Type == NPCID_GRN_VINE_TOP_S4 || NPC[A].Type == NPCID_SPIKY_THROWER || NPC[A].Type == NPCID_ITEM_THROWER || NPC[A].Type == NPCID_SAW || NPC[A].Type == NPCID_JUMP_PLANT || NPC[A].Type == NPCID_MAGIC_BOSS_BALL || (NPC[A]->IsACoin && NPC[A].Special == 0) || NPC[A].Type == NPCID_SWORDBEAM || NPC[A].Type == NPCID_FIRE_DISK || NPC[A].Type == NPCID_FIRE_CHAIN)
             {
                 NPC[A].Wet = 0;
                 NPC[A].Quicksand = 0;
@@ -1035,7 +1035,7 @@ void UpdateNPCs()
                     {
                         if(CheckCollision(NPC[A].Location, Water[B].Location))
                         {
-                            if(NPC[A].Wet == 0 && !NPCIsACoin(NPC[A]))
+                            if(NPC[A].Wet == 0 && !NPC[A]->IsACoin)
                             {
                                 if(NPC[A].Location.SpeedY >= 1 && (!g_compatibility.fix_submerged_splash_effect || !CheckCollisionIntersect(NPC[A].Location, static_cast<Location_t>(Water[B].Location))))
                                 {
@@ -1328,7 +1328,7 @@ void UpdateNPCs()
                             {
                                 if(B != A && NPC[B].Active &&
                                    (NPC[B].HoldingPlayer == 0 || (BattleMode && NPC[B].HoldingPlayer != NPC[A].HoldingPlayer)) &&
-                                   !NPCIsABonus(NPC[B]) &&
+                                   !NPC[B]->IsABonus &&
                                    (NPC[B].Type != NPCID_PLR_FIREBALL  || (BattleMode && NPC[B].CantHurtPlayer != NPC[A].HoldingPlayer)) &&
                                    (NPC[B].Type != NPCID_PLR_ICEBALL || (BattleMode && NPC[B].CantHurtPlayer != NPC[A].HoldingPlayer)) &&
                                     NPC[B].Type != NPCID_CANNONENEMY && NPC[B].Type != NPCID_CANNONITEM &&  NPC[B].Type != NPCID_SPRING && NPC[B].Type != NPCID_KEY &&
@@ -1955,7 +1955,7 @@ void UpdateNPCs()
                                 NPC[A].Type != NPCID_GHOST_FAST && NPC[A].Type != NPCID_GHOST_S4 && NPC[A].Type != NPCID_BIG_GHOST && NPC[A].Type != NPCID_SPIKY_THROWER &&
                                 NPC[A].Type != NPCID_VEHICLE && NPC[A].Type != NPCID_CONVEYOR && NPC[A].Type != NPCID_YEL_PLATFORM &&
                                 NPC[A].Type != NPCID_BLU_PLATFORM && NPC[A].Type != NPCID_GRN_PLATFORM && NPC[A].Type != NPCID_RED_PLATFORM &&
-                                NPC[A].Type != NPCID_STATUE_FIRE && !(NPCIsACoin(NPC[A]) && NPC[A].Special == 0) &&
+                                NPC[A].Type != NPCID_STATUE_FIRE && !(NPC[A]->IsACoin && NPC[A].Special == 0) &&
                                 NPC[A].Type != NPCID_CHECKER_PLATFORM && NPC[A].Type != NPCID_PLATFORM_S1 && NPC[A].Type != NPCID_PET_FIRE &&
                                 NPC[A].Type != NPCID_GOALTAPE && NPC[A].Type != NPCID_LAVA_MONSTER && NPC[A].Type != NPCID_FLIER &&
                                 NPC[A].Type != NPCID_ROCKET_FLIER &&
@@ -2293,7 +2293,7 @@ void UpdateNPCs()
                     if(NPC[A].Location.X + NPC[A].Location.Width > (FLBlocks + 1) * 32)
                         NPC[A].Location.X = (FLBlocks + 1) * 32 - NPC[A].Location.Width;
 
-                    if(!(NPCIsACoin(NPC[A]) && NPC[A].Special == 0) && !(NPC[A].Type == NPCID_SLIDE_BLOCK && NPC[A].Special == 0) &&
+                    if(!(NPC[A]->IsACoin && NPC[A].Special == 0) && !(NPC[A].Type == NPCID_SLIDE_BLOCK && NPC[A].Special == 0) &&
                        NPC[A].Type != NPCID_CONVEYOR && NPC[A].Type != NPCID_STATUE_FIRE && NPC[A].Type != NPCID_ITEM_BURIED && NPC[A].Type != NPCID_STAR_EXIT &&
                        NPC[A].Type != NPCID_STAR_COLLECT && !(NPC[A].Type >= NPCID_PLATFORM_S3 && NPC[A].Type <= NPCID_PLATFORM_S1) &&
                        !(NPCIsAnExit(NPC[A]) && ((NPC[A].DefaultLocation.X == NPC[A].Location.X &&
@@ -2519,7 +2519,7 @@ void UpdateNPCs()
 
                                                         if(NPC[A].Type == NPCID_PLR_FIREBALL || NPC[A].Type == NPCID_PLR_ICEBALL)
                                                         {
-                                                            if(NPCIsABonus(Block[B].IsNPC))
+                                                            if(NPCTraits[Block[B].IsNPC].IsABonus)
                                                                 HitSpot = 0;
                                                         }
 
@@ -2885,7 +2885,7 @@ void UpdateNPCs()
                                                             }
                                                         }
 
-                                                        if(NPCIsACoin(NPC[A]) && NPC[A].Special == 0 && HitSpot > 0)
+                                                        if(NPC[A]->IsACoin && NPC[A].Special == 0 && HitSpot > 0)
                                                             NPCHit(A, 3, A);
 
                                                         if(Block[B].Location.SpeedX != 0 && (HitSpot == 2 || HitSpot == 4))
@@ -3290,7 +3290,7 @@ void UpdateNPCs()
 
                                                             NPC[A].onWall = true;
 
-                                                            if(NPC[A].WallDeath >= 5 && !NPCIsABonus(NPC[A]) && NPC[A].Type != NPCID_FLY_BLOCK &&
+                                                            if(NPC[A].WallDeath >= 5 && !NPC[A]->IsABonus && NPC[A].Type != NPCID_FLY_BLOCK &&
                                                                NPC[A].Type != NPCID_FLY_CANNON && NPC[A].Type != NPCID_RED_BOOT && NPC[A].Type != NPCID_CANNONENEMY && NPC[A].Type != NPCID_CANNONITEM &&
                                                                NPC[A].Type != NPCID_SPRING && NPC[A].Type != NPCID_HEAVY_THROWER && NPC[A].Type != NPCID_KEY && NPC[A].Type != NPCID_COIN_SWITCH &&
                                                                NPC[A].Type != NPCID_GRN_BOOT &&
@@ -3674,7 +3674,7 @@ void UpdateNPCs()
                            NPC[A].Type != NPCID_SPIT_GUY_BALL && !(!NPCIsToad(NPC[A]) && !NPC[A].Projectile &&
                            NPC[A].Location.SpeedX == 0 && (NPC[A].Location.SpeedY == 0 || NPC[A].Location.SpeedY == Physics.NPCGravity)))
                         {
-                            if(!NPCIsACoin(NPC[A]) && NPC[A].Type != NPCID_TIMER_S2 && NPC[A].Type != NPCID_FALL_BLOCK_BROWN &&
+                            if(!NPC[A]->IsACoin && NPC[A].Type != NPCID_TIMER_S2 && NPC[A].Type != NPCID_FALL_BLOCK_BROWN &&
                                 NPC[A].Type != NPCID_WALL_BUG && NPC[A].Type != NPCID_WALL_SPARK && NPC[A].Type != NPCID_WALL_TURTLE && NPC[A].Type != NPCID_RED_BOOT &&
                                 NPC[A].Type != NPCID_BLU_BOOT && !(NPC[A]->IsFish && NPC[A].Special == 2) &&
                                !NPC[A].Generator && NPC[A].Type != NPCID_PLANT_FIRE && NPC[A].Type != NPCID_FIRE_CHAIN &&
@@ -3686,7 +3686,7 @@ void UpdateNPCs()
                                 {
                                     if(B != A && NPC[B].Active)
                                     {
-                                        if(!NPCIsACoin(NPC[B]))
+                                        if(!NPC[B]->IsACoin)
                                         {
                                             if(CheckCollision(NPC[A].Location, NPC[B].Location))
                                             {
@@ -3694,7 +3694,7 @@ void UpdateNPCs()
                                                 {
                                                     if(!(NPC[B].Type == NPCID_MINIBOSS && NPC[B].Special == 4) && !(NPCIsToad(NPC[B])) &&
                                                        !(NPC[B].Type >= NPCID_PLATFORM_S3 && NPC[B].Type <= NPCID_PLATFORM_S1) && !(NPC[B].Type >= NPCID_CARRY_BLOCK_A && NPC[B].Type <= NPCID_CARRY_BLOCK_D) &&
-                                                       NPC[B].Type != NPCID_LIFT_SAND && NPC[B].Type != NPCID_SICK_BOSS_BALL && !NPCIsAVine(NPC[B]) &&
+                                                       NPC[B].Type != NPCID_LIFT_SAND && NPC[B].Type != NPCID_SICK_BOSS_BALL && !NPC[B]->IsAVine &&
                                                        NPC[B].Type != NPCID_PLR_ICEBALL && NPC[B].Type != NPCID_FIRE_CHAIN && NPC[B].Type != NPCID_CHAR3_HEAVY)
                                                     {
                                                         // If Not (NPC(B).Type = 133) And NPC(B).HoldingPlayer = 0 And .Killed = 0 And NPC(B).JustActivated = 0 And NPC(B).Inert = False And NPC(B).Killed = 0 Then
@@ -3744,7 +3744,7 @@ void UpdateNPCs()
 
                                                                     if(NPC[A].Type == NPCID_SWORDBEAM)
                                                                     {
-                                                                        if(!NPCIsABonus(NPC[B]))
+                                                                        if(!NPC[B]->IsABonus)
                                                                             NPCHit(B, 10, NPC[A].CantHurtPlayer);
                                                                         // HitSpot = 0;
                                                                     }
@@ -3752,7 +3752,7 @@ void UpdateNPCs()
                                                                     // toad code
                                                                     if(NPCIsToad(NPC[A]))
                                                                     {
-                                                                        if(!(NPC[B]->WontHurt && !NPC[B].Projectile) && !NPCIsABonus(NPC[B]) &&
+                                                                        if(!(NPC[B]->WontHurt && !NPC[B].Projectile) && !NPC[B]->IsABonus &&
                                                                            NPC[B].Type != NPCID_PLR_FIREBALL && NPC[B].Type != NPCID_PLR_ICEBALL && !(NPC[B].Type == NPCID_BULLET && NPC[B].CantHurt > 0) &&
                                                                            NPC[B].Type != NPCID_TOOTHY && NPC[B].Type != NPCID_PLR_HEAVY && NPC[B].Type != NPCID_CHAR4_HEAVY && NPC[B].Type != NPCID_FLIPPED_RAINBOW_SHELL)
                                                                         {
@@ -3788,7 +3788,7 @@ void UpdateNPCs()
                                                                     {
                                                                         if(!(NPC[A].Projectile && NPC[B].Projectile && NPC[A].Type == NPCID_BULLET && NPC[B].Type == NPCID_BULLET && NPC[A].CantHurtPlayer != NPC[B].CantHurtPlayer))
                                                                         {
-                                                                            if(!((NPC[A].Type == NPCID_PLR_FIREBALL && NPCIsABonus(NPC[B])) || NPC[B].Type == NPCID_PLR_FIREBALL || NPC[B].Type == NPCID_VILLAIN_FIRE))
+                                                                            if(!((NPC[A].Type == NPCID_PLR_FIREBALL && NPC[B]->IsABonus) || NPC[B].Type == NPCID_PLR_FIREBALL || NPC[B].Type == NPCID_VILLAIN_FIRE))
                                                                             {
                                                                                 if(NPCIsAShell(NPC[A]) &&
                                                                                         (NPC[B].Type == NPCID_EXT_TURTLE || NPC[B].Type == NPCID_BLU_HIT_TURTLE_S4) &&
@@ -3886,7 +3886,7 @@ void UpdateNPCs()
                                                                                     NPCHit(B, 8, A);
                                                                                 else
                                                                                 {
-                                                                                    if(!NPCIsABonus(NPC[B]))
+                                                                                    if(!NPC[B]->IsABonus)
                                                                                     {
                                                                                         if(NPC[A].Type == NPCID_CANNONENEMY && NPC[B].Type == NPCID_BULLET)
                                                                                             NPC[B].Projectile = true;
@@ -5745,7 +5745,7 @@ void UpdateNPCs()
                                 {
                                     // if(NPC[C].Layer == Layer[B].Name)
                                     {
-                                        if(NPCIsAVine(NPC[C]) || NPC[C].Type == NPCID_ITEM_BURIED)
+                                        if(NPC[C]->IsAVine || NPC[C].Type == NPCID_ITEM_BURIED)
                                         {
                                             NPC[C].Location.SpeedX = 0;
                                             NPC[C].Location.SpeedY = 0;

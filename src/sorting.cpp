@@ -526,11 +526,11 @@ void NPCSort()
 
     for(A = 1; A <= numNPCs; A++)
     {
-        if(NPCIsACoin(NPC[A]))
+        if(NPC[A]->IsACoin)
         {
             for(B = 1; B < A; B++)
             {
-                if(!NPCIsACoin(NPC[B]))
+                if(!NPC[B]->IsACoin)
                 {
                     tempNPC = NPC[A];
                     NPC[A] = NPC[B];

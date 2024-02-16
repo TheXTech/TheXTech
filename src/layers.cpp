@@ -387,7 +387,7 @@ void ShowLayer(layerindex_t L, bool NoEffect)
 
             if(!LevelEditor)
             {
-                if(!NPC[A]->WontHurt && !NPCIsABonus(NPC[A]) && NPC[A].Active)
+                if(!NPC[A]->WontHurt && !NPC[A]->IsABonus && NPC[A].Active)
                 {
                     for(B = 1; B <= numPlayers; B++)
                     {
@@ -1262,7 +1262,7 @@ void ProcEvent(eventindex_t index, int whichPlayer, bool NoEffect)
 
                     for(int C : Layer[B].NPCs)
                     {
-                        if(NPCIsAVine(NPC[C]) || NPC[C].Type == NPCID_ITEM_BURIED)
+                        if(NPC[C]->IsAVine || NPC[C].Type == NPCID_ITEM_BURIED)
                         {
                             NPC[C].Location.SpeedX = 0;
                             NPC[C].Location.SpeedY = 0;
@@ -1557,7 +1557,7 @@ void UpdateLayers()
                 {
                     for(int B : Layer[A].NPCs)
                     {
-                        if(NPC[B].Type == NPCID_ITEM_BURIED || NPC[B].Type == NPCID_HOMING_BALL_GEN || NPCIsAVine(NPC[B]))
+                        if(NPC[B].Type == NPCID_ITEM_BURIED || NPC[B].Type == NPCID_HOMING_BALL_GEN || NPC[B]->IsAVine)
                         {
                             NPC[B].Location.SpeedX = 0;
                             NPC[B].Location.SpeedY = 0;
@@ -1659,9 +1659,9 @@ void UpdateLayers()
                         NPC[B].DefaultLocation.Y += double(Layer[A].SpeedY);
 
                         if(!NPC[B].Active || NPC[B].Generator || NPC[B].Effect != 0 ||
-                           NPCIsACoin(NPC[B]) || NPC[B].Type == NPCID_PLANT_S3 || NPC[B].Type == NPCID_STONE_S3 ||
+                           NPC[B]->IsACoin || NPC[B].Type == NPCID_PLANT_S3 || NPC[B].Type == NPCID_STONE_S3 ||
                            NPC[B].Type == NPCID_BOTTOM_PLANT || NPC[B].Type == NPCID_SIDE_PLANT || NPC[B].Type == NPCID_FALL_BLOCK_RED ||
-                           NPC[B].Type == NPCID_PLANT_S1 || NPC[B].Type == NPCID_BIG_PLANT || NPCIsAVine(NPC[B]) ||
+                           NPC[B].Type == NPCID_PLANT_S1 || NPC[B].Type == NPCID_BIG_PLANT || NPC[B]->IsAVine ||
                            NPC[B].Type == NPCID_CHECKPOINT || NPC[B].Type == NPCID_GOALTAPE || NPC[B].Type == NPCID_ITEM_BURIED ||
                            NPC[B].Type == NPCID_HOMING_BALL_GEN || NPC[B].Type == NPCID_LONG_PLANT_UP || NPC[B].Type == NPCID_LONG_PLANT_DOWN ||
                            NPC[B].Type == NPCID_FIRE_PLANT)
@@ -1671,7 +1671,7 @@ void UpdateLayers()
                                 NPC[B].Location.SpeedX = double(Layer[A].SpeedX);
                                 NPC[B].Location.SpeedY = double(Layer[A].SpeedY);
                             }
-                            else if(NPCIsAVine(NPC[B]))
+                            else if(NPC[B]->IsAVine)
                             {
                                 NPC[B].Location.SpeedX = double(Layer[A].SpeedX);
                                 NPC[B].Location.SpeedY = double(Layer[A].SpeedY);

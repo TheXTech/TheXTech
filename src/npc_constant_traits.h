@@ -54,6 +54,7 @@ constexpr bool NPCIsAShell(const NPC_t& n)
     return NPCIsAShell(n.Type);
 }
 
+#if 0
 // Should turn into trait.
 //'Flags the NPC type if it is a bonus
 constexpr bool NPCIsABonus(int Type)
@@ -149,6 +150,7 @@ constexpr bool NPCIsAVine(const NPC_t& n)
 {
     return NPCIsAVine(n.Type);
 }
+#endif
 
 // OKAY TO KEEP AS FUNCTION. Usages outside of NPC methods should be replaced with new usage-specific NPC traits.
 //'Flags the NPC type if it is a level exit

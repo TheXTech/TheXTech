@@ -395,17 +395,20 @@ void NPCHit(int A, int B, int C)
 
         NPCFrames(A);
 
-        if(!NPCIsACoin(NPC[A]))
+        if(!NPC[A]->IsACoin)
             NPC[A].Projectile = true;
         else
             NPC[A].Special = 1;
+
         NPC[A].Immune = 10;
+
         if(NPC[A].Type == NPCID_BOMB)
         {
             // .Location.SpeedX = 5 * Player(C).Direction + Player(C).Location.SpeedX
             // .Location.SpeedY = -5
             NPC[A].Projectile = false;
         }
+
         if(Player[C].StandingOnNPC == A)
             Player[C].StandingOnNPC = 0;
     }
@@ -2070,7 +2073,7 @@ void NPCHit(int A, int B, int C)
         }
     }
     // Coins
-    else if(NPCIsACoin(NPC[A]))
+    else if(NPC[A]->IsACoin)
     {
         if(LevelEditor)
             PlaySoundSpatial(SFX_ShellHit, NPC[A].Location);
@@ -2119,7 +2122,7 @@ void NPCHit(int A, int B, int C)
         }
     }
     // Bonus Items
-    else if(NPCIsABonus(NPC[A]))
+    else if(NPC[A]->IsABonus)
     {
         if(B == 2 && NPC[A].Location.SpeedY > -4)
         {
@@ -2186,7 +2189,7 @@ void NPCHit(int A, int B, int C)
     }
     // Calculate Score
     Player[0].Multiplier = 0;
-    if((B == 1 || B == 8) && C <= numPlayers && !NPCIsABonus(NPC[A]))
+    if((B == 1 || B == 8) && C <= numPlayers && !NPC[A]->IsABonus)
     {
         if(NPC[A].Type == NPCID_PLR_FIREBALL || NPC[A].Type == NPCID_COIN_SWITCH || NPC[A].Type == NPCID_TIME_SWITCH || NPC[A].Type == NPCID_TNT)
         {
@@ -2223,7 +2226,7 @@ void NPCHit(int A, int B, int C)
         }
     }
 
-    if((B == 2 || B == 7) && !NPCIsABonus(NPC[A]) && oldNPC.Type != 194 && NPC[A].Type != NPCID_EARTHQUAKE_BLOCK)
+    if((B == 2 || B == 7) && !NPC[A]->IsABonus && oldNPC.Type != 194 && NPC[A].Type != NPCID_EARTHQUAKE_BLOCK)
     {
         if(NPC[A].Killed != 0 || NPC[A].Type != oldNPC.Type)
         {
@@ -2241,7 +2244,7 @@ void NPCHit(int A, int B, int C)
         }
     }
 
-    if(B == 4 && NPC[A].Killed == 4 && !NPCIsACoin(NPC[A]) && C != A && NPC[A].Type != NPCID_PLR_FIREBALL && NPC[A].Type != NPCID_PLR_ICEBALL && NPC[A].Type != NPCID_PET_FIRE && NPC[A].Type != NPCID_EARTHQUAKE_BLOCK)
+    if(B == 4 && NPC[A].Killed == 4 && !NPC[A]->IsACoin && C != A && NPC[A].Type != NPCID_PLR_FIREBALL && NPC[A].Type != NPCID_PLR_ICEBALL && NPC[A].Type != NPCID_PET_FIRE && NPC[A].Type != NPCID_EARTHQUAKE_BLOCK)
     {
         if(NPC[C].Type != NPCID_BOSS_CASE)
         {
@@ -2263,11 +2266,11 @@ void NPCHit(int A, int B, int C)
 
     if(B == 6 && NPC[A].Killed == 6 && (NPC[A].Type == NPCID_BOSS_FRAGILE || NPC[A].Type == NPCID_VILLAIN_S1 || NPC[A].Type == NPCID_SICK_BOSS || NPC[A].Type == NPCID_MINIBOSS || NPC[A].Type == NPCID_SPIT_BOSS || NPC[A].Type == NPCID_VILLAIN_S3))
     {
-        if(!NPC[A]->WontHurt && !NPCIsABonus(NPC[A]) && NPC[A].Type != NPCID_PLR_FIREBALL)
+        if(!NPC[A]->WontHurt && !NPC[A]->IsABonus && NPC[A].Type != NPCID_PLR_FIREBALL)
             MoreScore(NPC[A]->Score, NPC[A].Location);
     }
 
-    if(!NPCIsACoin(NPC[A]) && B == 3 && C != A &&
+    if(!NPC[A]->IsACoin && B == 3 && C != A &&
        (NPC[A].Killed == B || !fEqual(NPC[A].Damage, oldNPC.Damage)) &&
         NPC[A].Type != NPCID_PLR_FIREBALL && NPC[A].Type != NPCID_PET_FIRE && NPC[A].Type != NPCID_SLIDE_BLOCK &&
         NPC[A].Type != NPCID_HOMING_BALL && NPC[A].Type != NPCID_EARTHQUAKE_BLOCK)

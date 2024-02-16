@@ -124,7 +124,7 @@ static void updateIntroLevelActivity()
 
                 for(int B : treeNPCQuery(tempLocation, SORTMODE_NONE))
                 {
-                    if(NPC[B].Active && !NPCIsABonus(NPC[B]) &&
+                    if(NPC[B].Active && !NPC[B]->IsABonus &&
                        !NPC[B]->WontHurt && NPC[B].HoldingPlayer == 0)
                     {
                         if(CheckCollision(tempLocation, NPC[B].Location))
@@ -158,7 +158,7 @@ static void updateIntroLevelActivity()
 
                 for(int B : treeNPCQuery(tempLocation, SORTMODE_NONE))
                 {
-                    if(NPC[B].Active && !NPCIsABonus(NPC[B]) &&
+                    if(NPC[B].Active && !NPC[B]->IsABonus &&
                       !NPC[B]->WontHurt && NPC[B].HoldingPlayer == 0)
                     {
                         if(CheckCollision(tempLocation, NPC[B].Location))
@@ -183,7 +183,7 @@ static void updateIntroLevelActivity()
 
                     for(int B : treeNPCQuery(tempLocation, SORTMODE_NONE))
                     {
-                        if(NPC[B].Active && !NPCIsABonus(NPC[B]) &&
+                        if(NPC[B].Active && !NPC[B]->IsABonus &&
                            !NPC[B]->WontHurt && NPC[B].HoldingPlayer == 0)
                         {
                             if(CheckCollision(tempLocation, NPC[B].Location))
@@ -204,7 +204,7 @@ static void updateIntroLevelActivity()
 
                     for(int B : treeNPCQuery(tempLocation, SORTMODE_NONE))
                     {
-                        if(NPC[B].Active && !NPCIsABonus(NPC[B]) &&
+                        if(NPC[B].Active && !NPC[B]->IsABonus &&
                            !NPC[B]->WontHurt && NPC[B].HoldingPlayer == 0)
                         {
                             if(CheckCollision(tempLocation, NPC[B].Location))
@@ -561,7 +561,7 @@ void MenuLoop()
             {
                 if(CheckCollision(cursorLoc, NPC[A].Location))
                 {
-                    if(!NPCIsACoin(NPC[A]))
+                    if(!NPC[A]->IsACoin)
                     {
                         NPC[0] = NPC[A];
                         NPC[0].Location.X = SharedCursor.X - vScreen[1].X - vScreen[1].ScreenLeft;

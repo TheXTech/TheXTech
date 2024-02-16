@@ -263,7 +263,7 @@ static void iceAge()
     {
         if(NPC[C].Active)
         {
-            if(!NPC[C]->NoIceBall && NPC[C].Type != NPCID_ICE_CUBE && !NPCIsABonus(NPC[C]))
+            if(!NPC[C]->NoIceBall && NPC[C].Type != NPCID_ICE_CUBE && !NPC[C]->IsABonus)
             {
                 NPC[0].Type = NPCID_PLR_ICEBALL;
                 NPCHit(C, 3, 0);
@@ -1268,8 +1268,8 @@ static void warioTime()
         {
             if(!NPC[B]->WontHurt &&
                !NPC[B]->IsABlock &&
-               !NPCIsABonus(NPC[B]) &&
-               !NPCIsACoin(NPC[B]) &&
+               !NPC[B]->IsABonus &&
+               !NPC[B]->IsACoin &&
                !NPCIsAnExit(NPC[B]) &&
                 NPC[B].Type != NPCID_ITEM_BURIED && !NPC[B].Generator &&
                !NPC[B].Inert

@@ -1024,7 +1024,7 @@ void UpdatePlayer()
 
                         for(int Bi : treeNPCQuery(tempLocation, SORTMODE_NONE))
                         {
-                            if(NPC[Bi].Active && !NPC[Bi].Hidden && NPCIsAVine(NPC[Bi]))
+                            if(NPC[Bi].Active && !NPC[Bi].Hidden && NPC[Bi]->IsAVine)
                             {
                                 if(CheckCollision(tempLocation, NPC[Bi].Location))
                                 {
@@ -3430,7 +3430,7 @@ void UpdatePlayer()
                             NPC[B].Type != NPCID_ICE_BLOCK
                         )
                         {
-                            if(NPC[B].HoldingPlayer == 0 || NPCIsABonus(NPC[B]) || (BattleMode && NPC[B].HoldingPlayer != A))
+                            if(NPC[B].HoldingPlayer == 0 || NPC[B]->IsABonus || (BattleMode && NPC[B].HoldingPlayer != A))
                             {
                                 if(CheckCollision(Player[A].Location, NPC[B].Location))
                                 {
@@ -3702,7 +3702,7 @@ void UpdatePlayer()
                                     }
 
 
-                                    if(NPCIsAVine(NPC[B])) // if the player collided with a vine then see if he should climb it
+                                    if(NPC[B]->IsAVine) // if the player collided with a vine then see if he should climb it
                                     {
                                         if(Player[A].Character == 5)
                                         {
@@ -3911,7 +3911,7 @@ void UpdatePlayer()
                                             }
                                             else
                                             {
-                                                if(NPCIsABonus(NPC[B])) // Bonus
+                                                if(NPC[B]->IsABonus) // Bonus
                                                     TouchBonus(A, B);
                                                 else if(NPCIsAShell(NPC[B]) && NPC[B].Location.SpeedX == 0 && Player[A].HoldingNPC == 0 && Player[A].Controls.Run)
                                                 {
@@ -3922,6 +3922,7 @@ void UpdatePlayer()
                                                             PlaySoundSpatial(SFX_Grab, Player[A].Location);
                                                         else
                                                             UnDuck(Player[A]);
+
                                                         Player[A].HoldingNPC = B;
                                                         NPC[B].HoldingPlayer = A;
                                                         NPC[B].CantHurt = Physics.NPCCanHurtWait;
@@ -3977,7 +3978,7 @@ void UpdatePlayer()
                                                 if(
                                                         !(
                                                                 (Player[A].WetFrame && (NPC[B].Type == NPCID_GRN_FISH_S3 || NPC[B].Type == NPCID_RED_FISH_S3)) ||
-                                                                NPCIsAVine(NPC[B])
+                                                                NPC[B]->IsAVine
                                                         ) && (Player[A].HoldingNPC != B)
                                                         )
                                                 {
@@ -4005,7 +4006,7 @@ void UpdatePlayer()
 */
                                         // grab code
                                         if(
-                                            ((Player[A].CanGrabNPCs || NPC[B]->IsGrabbable || (NPC[B].Effect == 2 && !NPCIsABonus(NPC[B]))) && (NPC[B].Effect == 0 || NPC[B].Effect == 2)) ||
+                                            ((Player[A].CanGrabNPCs || NPC[B]->IsGrabbable || (NPC[B].Effect == 2 && !NPC[B]->IsABonus)) && (NPC[B].Effect == 0 || NPC[B].Effect == 2)) ||
                                              (NPCIsAShell(NPC[B]) && FreezeNPCs)
                                         ) // GRAB EVERYTHING
                                         {
@@ -4084,7 +4085,7 @@ void UpdatePlayer()
                                                 }
                                             }
                                         }
-                                        else if(NPCIsABonus(NPC[B])) // Bonus
+                                        else if(NPC[B]->IsABonus) // Bonus
                                             TouchBonus(A, B);
                                         else // Everything else
                                         {
