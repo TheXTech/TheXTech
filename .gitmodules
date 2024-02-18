@@ -50,4 +50,4 @@
 	branch = master
 [submodule "3rdparty/angle-shader-translator"]
 	path = 3rdparty/angle-shader-translator
-	url = https://github.com/ds-sloth/angle-shader-translator-library.git
+	url = https://github.com/TheXTech/angle-shader-translator-library.git
