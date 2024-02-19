@@ -157,7 +157,7 @@ void DropBonus(int A)
     // finish initializing the NPC
     NPC[numNPCs].Location.SpeedX = 0;
     NPC[numNPCs].Location.SpeedY = 0;
-    NPC[numNPCs].Effect = 2;
+    NPC[numNPCs].Effect = NPCEFF_DROP_ITEM;
     NPC[numNPCs].Effect2 = 1;
     NPC[numNPCs].Active = true;
     NPC[numNPCs].TimeLeft = 200;

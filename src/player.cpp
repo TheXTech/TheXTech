@@ -2684,7 +2684,7 @@ void YoshiEat(const int A)
                 }
                 else
                 {
-                    n.Effect = 5;
+                    n.Effect = NPCEFF_PET_TONGUE;
                     n.Effect2 = A;
                     n.Location.Height = n->THeight;
                     p.YoshiNPC = B;
@@ -2786,7 +2786,7 @@ void YoshiSpit(const int A)
                 NPC[numNPCs].Active = true;
                 NPC[numNPCs].Section = p.Section;
                 NPC[numNPCs].TimeLeft = 100;
-                NPC[numNPCs].Effect = 0;
+                NPC[numNPCs].Effect = NPCEFF_NORMAL;
                 NPC[numNPCs].Location.X = p.Location.X + p.YoshiTX + 32 * p.Direction;
                 NPC[numNPCs].Location.Y = p.Location.Y + p.YoshiTY;
                 NPC[numNPCs].Location.Width = 32;
@@ -2821,7 +2821,7 @@ void YoshiSpit(const int A)
             NPC[p.YoshiNPC].Active = true;
             NPC[p.YoshiNPC].Section = p.Section;
             NPC[p.YoshiNPC].TimeLeft = 100;
-            NPC[p.YoshiNPC].Effect = 0;
+            NPC[p.YoshiNPC].Effect = NPCEFF_NORMAL;
             NPC[p.YoshiNPC].Effect2 = 0;
             NPC[p.YoshiNPC].Location.X = p.Location.X + p.YoshiTX + 32 * p.Direction;
             NPC[p.YoshiNPC].Location.Y = p.Location.Y + p.YoshiTY;
@@ -3633,7 +3633,7 @@ void YoshiEatCode(const int A)
                     NPC[p.YoshiNPC].Location.Height = NPC[p.YoshiNPC]->THeight;
                 }
 
-                NPC[p.YoshiNPC].Effect = 6;
+                NPC[p.YoshiNPC].Effect = NPCEFF_PET_INSIDE;
                 NPC[p.YoshiNPC].Effect2 = A;
 
                 if(NPC[p.YoshiNPC].Active)
@@ -3660,7 +3660,7 @@ void YoshiEatCode(const int A)
                 NPC[p.YoshiNPC].Location.Height = NPC[p.YoshiNPC]->THeight;
                 NPC[p.YoshiNPC].Location.X += -NPC[p.YoshiNPC].Location.Width / 2.0;
                 NPC[p.YoshiNPC].Location.Y += -NPC[p.YoshiNPC].Location.Height / 2.0;
-                NPC[p.YoshiNPC].Effect = 6;
+                NPC[p.YoshiNPC].Effect = NPCEFF_PET_INSIDE;
                 NPC[p.YoshiNPC].Effect2 = A;
 
                 NPCQueues::Unchecked.push_back(p.YoshiNPC);
@@ -3680,7 +3680,7 @@ void YoshiEatCode(const int A)
                 NPC[p.YoshiNPC].Location.Height = NPC[p.YoshiNPC]->THeight;
                 NPC[p.YoshiNPC].Location.X += -NPC[p.YoshiNPC].Location.Width / 2.0;
                 NPC[p.YoshiNPC].Location.Y += -NPC[p.YoshiNPC].Location.Height / 2.0;
-                NPC[p.YoshiNPC].Effect = 6;
+                NPC[p.YoshiNPC].Effect = NPCEFF_PET_INSIDE;
                 NPC[p.YoshiNPC].Effect2 = A;
 
                 NPCQueues::Unchecked.push_back(p.YoshiNPC);
@@ -5381,7 +5381,7 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
         if(NPC[p.HoldingNPC].Type == NPCID_ICE_CUBE)
             NPC[p.HoldingNPC].Special3 = 0;
         NPC[p.HoldingNPC].TimeLeft = Physics.NPCTimeOffScreen;
-        NPC[p.HoldingNPC].Effect = 0;
+        NPC[p.HoldingNPC].Effect = NPCEFF_NORMAL;
         NPC[p.HoldingNPC].CantHurt = Physics.NPCCanHurtWait;
         NPC[p.HoldingNPC].CantHurtPlayer = A;
         if(NPCIsVeggie(NPC[p.HoldingNPC]))
@@ -6933,7 +6933,7 @@ void PlayerEffects(const int A)
             }
 
             if(p.HoldingNPC > 0)
-                NPC[p.HoldingNPC].Effect = 0;
+                NPC[p.HoldingNPC].Effect = NPCEFF_NORMAL;
 
             if(g_ClonedPlayerMode)
             {
@@ -7687,7 +7687,7 @@ void PlayerEffects(const int A)
 
         if(p.HoldingNPC > 0)
         {
-            NPC[p.HoldingNPC].Effect = 0;
+            NPC[p.HoldingNPC].Effect = NPCEFF_NORMAL;
             NPC[p.HoldingNPC].CantHurt = Physics.NPCCanHurtWait;
             NPC[p.HoldingNPC].CantHurtPlayer = A;
 

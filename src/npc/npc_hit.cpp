@@ -222,7 +222,7 @@ void NPCHit(int A, int B, int C)
         if(Player[C].Wet > 0)
             return;
     }
-    if(NPC[A].Inert || StopHit > 2 || NPC[A].Immune > 0 || NPC[A].Killed > 0 || NPC[A].Effect == 208 || NPC[A].Generator)
+    if(NPC[A].Inert || StopHit > 2 || NPC[A].Immune > 0 || NPC[A].Killed > 0 || NPC[A].Effect == NPCEFF_ENCASED || NPC[A].Generator)
         return;
     if(B == 6 && NPC[A].Killed == 6)
         return;
@@ -1553,8 +1553,9 @@ void NPCHit(int A, int B, int C)
     {
         if(B == 1)
         {
-            if(NPC[A].Effect == 2)
-                NPC[A].Effect = 0;
+            if(NPC[A].Effect == NPCEFF_DROP_ITEM)
+                NPC[A].Effect = NPCEFF_NORMAL;
+
             if(Player[C].Dismount <= 0 && Player[C].Mount != 2)
             {
                 if(NPC[A].Location.SpeedX == 0.0 && NPC[A].CantHurtPlayer != C)

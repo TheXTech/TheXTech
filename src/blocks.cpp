@@ -643,13 +643,13 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
 
                 if(NPCIsYoshi(C))
                 {
-                    nn.Effect = 0;
+                    nn.Effect = NPCEFF_NORMAL;
                     nn.Location.Height = 32;
                     nn.Location.Y = b.Location.Y - 32;
                 }
                 else if(nn.Type == NPCID_LEAF_POWER)
                 {
-                    nn.Effect = 0;
+                    nn.Effect = NPCEFF_NORMAL;
                     nn.Location.Y = b.Location.Y - 32;
                     nn.Location.SpeedY = -6;
                     nn.Location.Height = NPCHeight(C);
@@ -657,7 +657,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
                 }
                 else
                 {
-                    nn.Effect = 1;
+                    nn.Effect = NPCEFF_EMERGE_UP;
                     switch(C)
                     {
                     case NPCID_GRN_VINE_TOP_S3:
@@ -680,7 +680,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
                 if(is_ancient)
                     nn.Location.Height = 32;
 
-                nn.Effect = 3;
+                nn.Effect = NPCEFF_EMERGE_DOWN;
                 PlaySoundSpatial(SFX_ItemEmerge, b.Location);
             }
 

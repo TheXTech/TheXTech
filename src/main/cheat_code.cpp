@@ -1532,7 +1532,7 @@ static void rainbowRider()
             NPC[numNPCs].Location.Height = NPC[numNPCs]->THeight;
             NPC[numNPCs].Location.SpeedX = 0;
             NPC[numNPCs].Location.SpeedY = 0;
-            NPC[numNPCs].Effect = 2;
+            NPC[numNPCs].Effect = NPCEFF_DROP_ITEM;
             NPC[numNPCs].Active = true;
             NPC[numNPCs].TimeLeft = 200;
             NPC[numNPCs].HoldingPlayer = B;
@@ -1559,7 +1559,7 @@ static void greenEgg()
             NPC[numNPCs].Location.Height = NPC[numNPCs]->THeight;
             NPC[numNPCs].Location.SpeedX = 0;
             NPC[numNPCs].Location.SpeedY = 0;
-            NPC[numNPCs].Effect = 2;
+            NPC[numNPCs].Effect = NPCEFF_DROP_ITEM;
             NPC[numNPCs].Active = true;
             NPC[numNPCs].TimeLeft = 200;
             NPC[numNPCs].HoldingPlayer = B;
@@ -1587,7 +1587,7 @@ static void blueEgg()
             NPC[numNPCs].Location.Height = NPC[numNPCs]->THeight;
             NPC[numNPCs].Location.SpeedX = 0;
             NPC[numNPCs].Location.SpeedY = 0;
-            NPC[numNPCs].Effect = 2;
+            NPC[numNPCs].Effect = NPCEFF_DROP_ITEM;
             NPC[numNPCs].Active = true;
             NPC[numNPCs].TimeLeft = 200;
             NPC[numNPCs].HoldingPlayer = B;
@@ -1615,7 +1615,7 @@ static void yellowEgg()
             NPC[numNPCs].Location.Height = NPC[numNPCs]->THeight;
             NPC[numNPCs].Location.SpeedX = 0;
             NPC[numNPCs].Location.SpeedY = 0;
-            NPC[numNPCs].Effect = 2;
+            NPC[numNPCs].Effect = NPCEFF_DROP_ITEM;
             NPC[numNPCs].Active = true;
             NPC[numNPCs].TimeLeft = 200;
             NPC[numNPCs].HoldingPlayer = B;
@@ -1643,7 +1643,7 @@ static void redEgg()
             NPC[numNPCs].Location.Height = NPC[numNPCs]->THeight;
             NPC[numNPCs].Location.SpeedX = 0;
             NPC[numNPCs].Location.SpeedY = 0;
-            NPC[numNPCs].Effect = 2;
+            NPC[numNPCs].Effect = NPCEFF_DROP_ITEM;
             NPC[numNPCs].Active = true;
             NPC[numNPCs].TimeLeft = 200;
             NPC[numNPCs].HoldingPlayer = B;
@@ -1672,7 +1672,7 @@ static void blackEgg()
             NPC[numNPCs].Location.Height = NPC[numNPCs]->THeight;
             NPC[numNPCs].Location.SpeedX = 0;
             NPC[numNPCs].Location.SpeedY = 0;
-            NPC[numNPCs].Effect = 2;
+            NPC[numNPCs].Effect = NPCEFF_DROP_ITEM;
             NPC[numNPCs].Active = true;
             NPC[numNPCs].TimeLeft = 200;
             NPC[numNPCs].HoldingPlayer = B;
@@ -1700,7 +1700,7 @@ static void purpleEgg()
             NPC[numNPCs].Location.Height = NPC[numNPCs]->THeight;
             NPC[numNPCs].Location.SpeedX = 0;
             NPC[numNPCs].Location.SpeedY = 0;
-            NPC[numNPCs].Effect = 2;
+            NPC[numNPCs].Effect = NPCEFF_DROP_ITEM;
             NPC[numNPCs].Active = true;
             NPC[numNPCs].TimeLeft = 200;
             NPC[numNPCs].HoldingPlayer = B;
@@ -1728,7 +1728,7 @@ static void pinkEgg()
             NPC[numNPCs].Location.Height = NPC[numNPCs]->THeight;
             NPC[numNPCs].Location.SpeedX = 0;
             NPC[numNPCs].Location.SpeedY = 0;
-            NPC[numNPCs].Effect = 2;
+            NPC[numNPCs].Effect = NPCEFF_DROP_ITEM;
             NPC[numNPCs].Active = true;
             NPC[numNPCs].TimeLeft = 200;
             NPC[numNPCs].HoldingPlayer = B;
@@ -1756,7 +1756,7 @@ static void coldEgg()
             NPC[numNPCs].Location.Height = NPC[numNPCs]->THeight;
             NPC[numNPCs].Location.SpeedX = 0;
             NPC[numNPCs].Location.SpeedY = 0;
-            NPC[numNPCs].Effect = 2;
+            NPC[numNPCs].Effect = NPCEFF_DROP_ITEM;
             NPC[numNPCs].Active = true;
             NPC[numNPCs].TimeLeft = 200;
             NPC[numNPCs].HoldingPlayer = B;

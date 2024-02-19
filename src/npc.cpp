@@ -123,7 +123,7 @@ void Deactivate(int A)
             NPC[A].Stuck = NPC[A].DefaultStuck;
             NPC[A].TimeLeft = 0;
             NPC[A].Projectile = false;
-            NPC[A].Effect = 0;
+            NPC[A].Effect = NPCEFF_NORMAL;
             NPC[A].Effect2 = 0;
             NPC[A].Effect3 = 0;
             NPC[A].Type = NPC[A].DefaultType;
@@ -3571,10 +3571,10 @@ void SpecialNPC(int A)
             NPC[A].Location.SpeedX = 0;
             NPC[A].Location.SpeedY = 0;
             NPC[A].Special3 = 0;
-            NPC[A].Effect = 8;
+            NPC[A].Effect = NPCEFF_WAITING;
+            NPC[A].Effect2 = 16;
             NPC[A].Projectile = false;
             NPC[A].Type = NPCID_MAGIC_DOOR;
-            NPC[A].Effect2 = 16;
             PlaySoundSpatial(SFX_SpitBossBeat, NPC[A].Location);
         }
     }

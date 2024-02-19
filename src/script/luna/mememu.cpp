@@ -1977,7 +1977,8 @@ public:
         insert(0x00000132, &NPC_t::BattleOwner);
         insert(0x00000134, &NPC_t::WallDeath);
         insert(0x00000136, &NPC_t::Projectile);
-        insert(0x00000138, &NPC_t::Effect);
+        static_assert(sizeof(NPC_t::Effect) == sizeof(vbint_t), "underlying type of NPC_t::Effect must be vbint_t");
+        insert(0x00000138, reinterpret_cast<vbint_t NPC_t::*>(&NPC_t::Effect));
         insert(0x0000013c, &NPC_t::Effect2);
         insert(0x00000144, &NPC_t::Effect3);
         insert(0x00000146, &NPC_t::Section);

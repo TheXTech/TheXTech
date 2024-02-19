@@ -35,6 +35,7 @@
 #include "rand.h"
 #include "floats.h"
 #include "npc_id.h"
+#include "npc_effect.h"
 
 #include "global_constants.h"
 #include "global_strings.h"
@@ -309,7 +310,7 @@ struct NPC_t
 //    Effect2 As Double
     double Effect2 = 0.0; // When Effect 4, Used to store a destination position, must be in double!
 //    Effect As Integer 'For starting / stopping effects
-    vbint_t Effect = 0;
+    NPCEffect Effect = NPCEFF_NORMAL;
 //    Effect3 As Integer
     vbint_t Effect3 = 0;
 
