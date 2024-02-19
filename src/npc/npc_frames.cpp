@@ -119,7 +119,7 @@ void NPCFrames(int A)
             NPC[A].Type == NPCID_LONG_WOOD || NPC[A].Type == NPCID_SLANT_WOOD_R || NPC[A].Type == NPCID_SLANT_WOOD_M || NPC[A].Type == NPCID_PLATFORM_S3 ||
             NPC[A].Type == NPCID_CHECKER_PLATFORM || NPC[A].Type == NPCID_PLATFORM_S1 || NPC[A].Type == NPCID_SPIT_GUY_BALL || NPC[A].Type == NPCID_SIGN ||
             (NPC[A].Type >= NPCID_CARRY_BLOCK_A && NPC[A].Type <= NPCID_CARRY_BLOCK_D) || NPC[A].Type == NPCID_LIFT_SAND || NPC[A].Type == NPCID_CHECKPOINT ||
-            NPC[A].Type == NPCID_GOALTAPE || NPCIsAVine(NPC[A]) || NPC[A].Type == NPCID_ICE_BLOCK || NPC[A].Type == NPCID_TNT ||
+            NPC[A].Type == NPCID_GOALTAPE || NPC[A]->IsAVine || NPC[A].Type == NPCID_ICE_BLOCK || NPC[A].Type == NPCID_TNT ||
             NPC[A].Type == NPCID_TIMER_S2 || NPC[A].Type == NPCID_POWER_S5 || NPC[A].Type == NPCID_MAGIC_DOOR || NPC[A].Type == NPCID_COCKPIT) // no frames
     {
         if(!(NPC[A].Type == NPCID_VILLAIN_S3 || NPC[A].Type == NPCID_ITEM_THROWER || NPC[A].Type == NPCID_SPIKY_THROWER) && A == 0) // Reset Frame to 0 unless a specific NPC type
@@ -1146,7 +1146,7 @@ void NPCFrames(int A)
         else if(NPC[A].Special5 < 16)
             NPC[A].Frame += 12;
     }
-    else if(NPCIsAShell(NPC[A])) // Turtle shell
+    else if(NPC[A]->IsAShell) // Turtle shell
     {
         if(NPC[A].Location.SpeedX == 0)
             NPC[A].Frame = 0;
@@ -1547,7 +1547,7 @@ void NPCFrames(int A)
             NPC[A].Frame = 0;
         }
     }
-    else if(NPCIsACoin(NPC[A])) // Coin
+    else if(NPC[A]->IsACoin) // Coin
     {
         NPC[A].Frame = CoinFrame[3];
         if(NPC[A].Type == NPCID_COIN_S2)
@@ -2196,7 +2196,7 @@ void NPCFrames(int A)
                 NPC[A].FrameCount = 0;
         }
     }
-    else if(!(NPCIsABonus(NPC[A]) || NPC[A].Type == NPCID_CANNONENEMY || NPC[A].Type == NPCID_COIN_SWITCH)) // Frame finder for everything else
+    else if(!(NPC[A]->IsABonus || NPC[A].Type == NPCID_CANNONENEMY || NPC[A].Type == NPCID_COIN_SWITCH)) // Frame finder for everything else
     {
         NPC[A].FrameCount += 1;
         if(NPC[A].Type == NPCID_SPIKY_BALL_S3 || NPC[A].Type == NPCID_WALL_SPARK)

@@ -973,7 +973,7 @@ void UpdateEditor()
                             else
                                 NPC[A].Location.SpeedX = -double(Physics.NPCShellSpeed / 2);
 //                            Netplay::sendData Netplay::EraseNPC(A, 0);
-                            if(NPCIsABonus(NPC[A]) || NPCIsACoin(NPC[A]))
+                            if(NPC[A]->IsABonus || NPC[A]->IsACoin)
                                 KillNPC(A, 4); // Kill the bonus/coin
                             else
                                 KillNPC(A, 2); // Kill the NPC
@@ -1578,7 +1578,7 @@ void UpdateEditor()
                         {
                             if((EditorCursor.NPC.Type != 208 && NPC[A].Type != NPCID_BOSS_CASE) || (EditorCursor.NPC.Type == 208 && NPC[A].Type == NPCID_BOSS_CASE))
                             {
-                                if(!NPCIsAVine(NPC[A]))
+                                if(!NPC[A]->IsAVine)
                                 {
                                     CanPlace = false;
                                     break;

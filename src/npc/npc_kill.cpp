@@ -1518,11 +1518,11 @@ void KillNPC(int A, int B)
                 PlaySoundSpatial(SFX_BlockSmashed, NPC[A].Location);
             }
         }
-        else if(NPCIsABonus(NPC[A])) // NPC is a bonus
+        else if(NPC[A]->IsABonus) // NPC is a bonus
         {
             if(B == 3 || B == 4 || B == 5)
             {
-                if(!NPCIsACoin(NPC[A]) || LevelEditor || TestLevel) // Shell hit sound
+                if(!NPC[A]->IsACoin || LevelEditor || TestLevel) // Shell hit sound
                     PlaySoundSpatial(SFX_ShellHit, NPC[A].Location);
                 NPC[A].Location.X += NPC[A].Location.Width / 2.0 - EffectWidth[10] / 2.0;
                 NPC[A].Location.Y += NPC[A].Location.Height / 2.0 - EffectHeight[10] / 2.0;

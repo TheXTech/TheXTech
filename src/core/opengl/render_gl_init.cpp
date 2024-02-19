@@ -60,17 +60,35 @@ void load_gles3_symbols()
 
 
 #ifdef RENDERGL_HAS_DEBUG
+
+static std::map<GLuint, uint64_t> s_gl_message_counts;
+
 static void APIENTRY s_HandleGLDebugMessage(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const char *message, const void *userParam)
 {
+    auto& count = s_gl_message_counts[id];
+
+    if(count >= 3)
+        return;
+
+    s_gl_message_counts[id]++;
+
+    auto log_call = pLogDebug;
+    if(type == GL_DEBUG_TYPE_ERROR || type == GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR || severity == GL_DEBUG_SEVERITY_HIGH)
+        log_call = pLogWarning;
+    else if(type == GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR || type == GL_DEBUG_TYPE_PORTABILITY || type == GL_DEBUG_TYPE_PERFORMANCE || severity == GL_DEBUG_SEVERITY_MEDIUM)
+        log_call = pLogInfo;
+
     UNUSED(source);
-    UNUSED(type);
     UNUSED(id);
-    UNUSED(severity);
     UNUSED(length);
     UNUSED(userParam);
 
-    pLogWarning("Got GL error %s", message);
+    log_call("Render GL: got debug message \"%s\"", message);
+
+    if(count == 3)
+        log_call("Render GL: (Ignoring future debug messages of this type.)");
 }
+
 #endif
 
 void RenderGL::try_init_gl(SDL_GLContext& context, SDL_Window* window, GLint profile, GLint majver, GLint minver, RenderMode_t mode)
