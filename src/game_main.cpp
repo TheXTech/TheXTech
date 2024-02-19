@@ -676,7 +676,7 @@ int GameMain(const CmdLineSetup_t &setup)
                     p.MountType = iRand(8) + 1;
                 }
 
-                p.HeldBonus = 0;
+                p.HeldBonus = NPCID(0);
                 p.Section = 0;
                 p.Location.Height = Physics.PlayerHeight[p.Character][p.State];
                 p.Location.Width = Physics.PlayerWidth[p.Character][p.State];
@@ -850,7 +850,7 @@ int GameMain(const CmdLineSetup_t &setup)
                 // if(A >= 1 && A <= 5)
                 p.Character = g_gameInfo.introCharacterNext();
 
-                p.HeldBonus = 0;
+                p.HeldBonus = NPCID(0);
                 p.Section = 0;
                 p.Location.Height = Physics.PlayerHeight[p.Character][p.State];
                 p.Location.Width = Physics.PlayerWidth[p.Character][p.State];
@@ -2033,7 +2033,7 @@ void StartEpisode()
         Player[i].Mount = 0;
         // reassigned below unless something is wrong
         Player[i].Character = (i - 1) % 5 + 1;
-        Player[i].HeldBonus = 0;
+        Player[i].HeldBonus = NPCID(0);
         Player[i].CanFly = false;
         Player[i].CanFly2 = false;
         Player[i].TailCount = 0;
@@ -2170,7 +2170,7 @@ void StartBattleMode()
         Player[i].Mount = 0;
         // reassigned below unless something is wrong
         Player[i].Character = (i - 1) % 5 + 1;
-        Player[i].HeldBonus = 0;
+        Player[i].HeldBonus = NPCID(0);
         Player[i].CanFly = false;
         Player[i].CanFly2 = false;
         Player[i].TailCount = 0;

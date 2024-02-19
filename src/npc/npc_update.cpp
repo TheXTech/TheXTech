@@ -482,7 +482,7 @@ void UpdateNPCs()
                             NPC[numNPCs].Direction = NPC[numNPCs].DefaultDirection;
                             NPC[numNPCs].Frame = EditorNPCFrame(NPC[numNPCs].Type, NPC[numNPCs].Direction);
                             NPC[numNPCs].DefaultDirection = NPC[numNPCs].Direction;
-                            NPC[numNPCs].DefaultType = 0;
+                            NPC[numNPCs].DefaultType = NPCID_NULL;
                             NPC[numNPCs].Generator = false;
                             NPC[numNPCs].Active = true;
                             NPC[numNPCs].TimeLeft = 100;
@@ -1135,7 +1135,7 @@ void UpdateNPCs()
             if(NPC[A].Type == NPCID_VEGGIE_RANDOM)
             {
                 int B = iRand(9);
-                NPC[A].Type = NPCID_VEGGIE_2 + B;
+                NPC[A].Type = NPCID(NPCID_VEGGIE_2 + B);
                 if(NPC[A].Type == NPCID_VEGGIE_RANDOM)
                     NPC[A].Type = NPCID_VEGGIE_1;
                 NPC[A].Location.X += NPC[A].Location.Width / 2.0;
@@ -1245,7 +1245,7 @@ void UpdateNPCs()
                         if(NPC[A].Type == NPCID_ITEM_BURIED)
                         {
                             if(NPC[A].Special == 0.0)
-                                NPC[A].Special = 147;
+                                NPC[A].Special = NPCID_VEGGIE_RANDOM;
 
                             if(NPC[A].Generator)
                             {
@@ -1254,7 +1254,7 @@ void UpdateNPCs()
                             }
 
                             NPC[A].Frame = 0;
-                            NPC[A].Type = NPC[A].Special;
+                            NPC[A].Type = NPCID(NPC[A].Special);
                             NPC[A].Special = 0;
 
                             if(NPCIsYoshi(NPC[A]))
@@ -1269,7 +1269,9 @@ void UpdateNPCs()
                                  // Duplicated segment [PVS Studio]
                                  // NPC[A].Type == NPCID_BLU_BOOT ||
                                  NPC[A].Type == NPCID_TOOTHYPIPE || NPCIsAnExit(NPC[A])))
-                                NPC[A].DefaultType = 0;
+                            {
+                                NPC[A].DefaultType = NPCID_NULL;
+                            }
 
                             NPC[A].Location.Height = NPC[A]->THeight;
                             NPC[A].Location.Width = NPC[A]->TWidth;
@@ -1277,7 +1279,7 @@ void UpdateNPCs()
                             if(NPC[A].Type == NPCID_VEGGIE_RANDOM)
                             {
                                 int B = iRand(9);
-                                NPC[A].Type = NPCID_VEGGIE_2 + B;
+                                NPC[A].Type = NPCID(NPCID_VEGGIE_2 + B);
                                 if(NPC[A].Type == NPCID_VEGGIE_RANDOM)
                                     NPC[A].Type = NPCID_VEGGIE_1;
                                 NPC[A].Location.X += NPC[A].Location.Width / 2.0;
@@ -3774,7 +3776,7 @@ void UpdateNPCs()
 
                                                                         if(CheckCollision(tempLocation, tempLocation2))
                                                                         {
-                                                                            NPC[B].Type -= NPCID_GRN_TURTLE_S3;
+                                                                            NPC[B].Type = NPCID(NPC[B].Type - 4);
                                                                             if(NPC[B].Type == NPCID_YEL_TURTLE_S4)
                                                                                 NPC[B].Type = NPCID_RAINBOW_SHELL;
                                                                             NPC[A].Killed = 9;

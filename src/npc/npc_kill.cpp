@@ -75,7 +75,7 @@ void KillNPC(int A, int B)
             Effect[numEffects].Frame = iRand(3);
         }
         PlaySoundSpatial(SFX_Icebreak, NPC[A].Location);
-        NPC[A].Type = NPC[A].Special;
+        NPC[A].Type = NPCID(NPC[A].Special);
 
         NPCQueues::update(A);
 

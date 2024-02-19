@@ -264,14 +264,15 @@ void NPCHit(int A, int B, int C)
     {
         if(B == 3 && NPC[C].Type == NPCID_PLR_FIREBALL)
         {
+            NPC[A].Type = NPCID(NPC[A].Special);
 
-            NPC[A].Type = NPC[A].Special;
             if(NPC[A].Location.SpeedX > 0)
                 NPC[A].Direction = 1;
             else if(NPC[A].Location.SpeedX < 0)
                 NPC[A].Direction = -1;
             else
                 NPC[A].Direction = NPC[A].DefaultDirection;
+
             NPC[A].Frame = EditorNPCFrame(NPC[A].Type, NPC[A].Direction);
             NPC[A].Special = NPC[A].DefaultSpecial;
             NPC[A].Special2 = 0;
@@ -279,13 +280,12 @@ void NPCHit(int A, int B, int C)
             NPC[A].Special4 = 0;
             NPC[A].Special5 = 0;
             NPC[A].Special6 = 0;
-
-
         }
         else if(B == 3 || B == 5)
         {
             if(A == C || B == 6 || B == 5)
                 NPC[A].Killed = B;
+
             if(B == 3 && NPC[C].Type == NPC[A].Type)
                 NPC[A].Killed = B;
         }
@@ -330,16 +330,19 @@ void NPCHit(int A, int B, int C)
         if(NPC[A].Type == NPCID_ITEM_BURIED)
         {
             NPC[A].Location.Y += -NPC[A].Location.Height;
-            NPC[A].Type = NPC[A].Special;
+            NPC[A].Type = NPCID(NPC[A].Special);
         }
+
         PlaySoundSpatial(SFX_HeroGrass, NPC[A].Location);
         NewEffect(EFFID_SMOKE_S5, NPC[A].Location);
+
         if(NPC[A].Type == NPCID_BULLET)
         {
             PlaySoundSpatial(SFX_Bullet, NPC[A].Location);
             NPC[A].Location.SpeedX = 5 * Player[C].Direction;
             NPC[A].Location.Y += NPC[A].Location.Height;
         }
+
         NPC[A].Direction = Player[C].Direction;
 
         if(NPC[A].Generator)
@@ -360,7 +363,7 @@ void NPCHit(int A, int B, int C)
         if(!(NPC[A].Type == NPCID_CANNONENEMY || NPC[A].Type == NPCID_CANNONITEM || NPC[A].Type == NPCID_SPRING || NPC[A].Type == NPCID_KEY || NPC[A].Type == NPCID_COIN_SWITCH || NPC[A].Type == NPCID_GRN_BOOT || NPC[A].Type == NPCID_RED_BOOT || NPC[A].Type == NPCID_BLU_BOOT || NPC[A].Type == NPCID_TOOTHYPIPE || NPCIsAnExit(NPC[A])))
         {
             if(!BattleMode)
-                NPC[A].DefaultType = 0;
+                NPC[A].DefaultType = NPCID_NULL;
         }
         NPC[A].Location.Height = NPC[A]->THeight;
         NPC[A].Location.Width = NPC[A]->TWidth;
@@ -1327,7 +1330,7 @@ void NPCHit(int A, int B, int C)
                 NPC[A].Type = NPCID_GLASS_SHELL;
             else if(NPC[A].Type >= NPCID_GRN_FLY_TURTLE_S4 && NPC[A].Type <= NPCID_YEL_FLY_TURTLE_S4) // smw winged koopas
             {
-                NPC[A].Type -= NPCID_LAVABUBBLE;
+                NPC[A].Type = NPCID(NPC[A].Type - 12);
                 NPC[A].Special = 0;
             }
             else
@@ -1336,7 +1339,7 @@ void NPCHit(int A, int B, int C)
                 NPC[numNPCs] = NPC_t();
                 NPC[numNPCs].Location = NPC[A].Location;
                 NPC[numNPCs].Location.Y -= 32.0;
-                NPC[numNPCs].Type = NPC[A].Type + 8;
+                NPC[numNPCs].Type = NPCID(NPC[A].Type + 8);
                 NPC[numNPCs].Projectile = true;
                 NPC[numNPCs].Direction = Player[C].Direction;
                 NPC[numNPCs].Location.SpeedY = 0;
@@ -1348,7 +1351,7 @@ void NPCHit(int A, int B, int C)
                 NPC[numNPCs].Active = true;
                 NPC[numNPCs].TimeLeft = 100;
                 syncLayers_NPC(numNPCs);
-                NPC[A].Type +=  4;
+                NPC[A].Type = NPCID(NPC[A].Type + 4);
             }
             NPC[A].Location.Height = NPC[A]->THeight;
             NPC[A].Location.Width = NPC[A]->TWidth;
@@ -1404,18 +1407,19 @@ void NPCHit(int A, int B, int C)
                 NPC[A].Type = NPCID_GLASS_SHELL;
             else if(NPC[A].Type >= NPCID_GRN_FLY_TURTLE_S4 && NPC[A].Type <= NPCID_YEL_FLY_TURTLE_S4)
             {
-                NPC[A].Type -= NPCID_LAVABUBBLE;
+                NPC[A].Type = NPCID(NPC[A].Type - 12);
                 NPC[A].Special = 0;
             }
             else
-                NPC[A].Type += NPCID_GRN_TURTLE_S3;
+                NPC[A].Type = NPCID(NPC[A].Type + 4);
+
             if(B == 7 && NPC[A].Type >= NPCID_GRN_SHELL_S4 && NPC[A].Type <= NPCID_GRN_HIT_TURTLE_S4)
             {
                 numNPCs++;
                 NPC[numNPCs] = NPC_t();
                 NPC[numNPCs].Location = NPC[A].Location;
                 NPC[numNPCs].Location.Y -= 32.0;
-                NPC[numNPCs].Type = NPC[A].Type + 4;
+                NPC[numNPCs].Type = NPCID(NPC[A].Type + 4);
                 NPC[numNPCs].Projectile = true;
                 NPC[numNPCs].Direction = Player[C].Direction;
                 NPC[numNPCs].Location.SpeedY = 0;
@@ -1428,6 +1432,7 @@ void NPCHit(int A, int B, int C)
                 NPC[numNPCs].TimeLeft = 100;
                 syncLayers_NPC(numNPCs);
             }
+
             NPC[A].Location.Height = NPC[A]->THeight;
             NPC[A].Location.Width = NPC[A]->TWidth;
             NPC[A].Location.Y -= NPC[A].Location.Height;

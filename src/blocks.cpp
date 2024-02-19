@@ -51,7 +51,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
     // int tempPlayer = 0;
     // bool makeShroom = false; // if true make a mushroom
     int newBlock = 0; // what the block should turn into if anything
-    int C = 0;
+    // int C = 0;
 //    int B = 0;
     // Block_t blankBlock;
     int oldSpecial = 0; // previous .Special
@@ -464,9 +464,11 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
         // represents behavior for ancient 101 / 104 / 201 Special values (other ancient values replaced in OpenLevel)
         bool is_ancient = false;
 
+        NPCID C = NPCID_NULL;
+
         if(b.Special >= 1000)
         {
-            C = b.Special - 1000; // this finds the NPC type and puts in the variable C
+            C = NPCID(b.Special - 1000); // this finds the NPC type and puts in the variable C
         }
         else if(b.Special == 201)
         {
@@ -539,7 +541,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
             bool player_gets_full = (whatPlayer > 0 && (Player[whatPlayer].State > 1 || Player[whatPlayer].Character == 5));
 
             // replacement index if full powerup should not be received
-            int replacement = C;
+            NPCID replacement = C;
 
             if(g_ClonedPlayerMode || BattleMode || player_gets_full)
             {

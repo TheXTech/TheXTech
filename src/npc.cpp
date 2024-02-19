@@ -924,7 +924,7 @@ void NPCSpecial(int A)
     }
     else if(npc.Type == NPCID_ITEM_BUBBLE) // bubble
     {
-        if(fiEqual(npc.Special, 287))
+        if(fiEqual(npc.Special, NPCID_RANDOM_POWER))
         {
             npc.Special = RandomBonus();
             npc.DefaultSpecial = npc.Special;
@@ -950,7 +950,7 @@ void NPCSpecial(int A)
         {
             NewEffect(EFFID_BUBBLE_POP, npc.Location);
             PlaySoundSpatial(SFX_Bubble, npc.Location);
-            npc.Type = npc.Special;
+            npc.Type = NPCID(npc.Special);
             npc.Special3 = 0;
             npc.Special2 = 0;
             npc.Special = 0;
@@ -1293,7 +1293,7 @@ void NPCSpecial(int A)
                 npc.Special6 = 0;
                 npc.Location.X += npc.Location.Width / 2.0;
                 npc.Location.Y += npc.Location.Height;
-                npc.Type -= 1;
+                npc.Type = NPCID(npc.Type - 1);
                 npc.Location.Width = npc->TWidth;
                 npc.Location.Height = npc->THeight;
                 npc.Location.X -= npc.Location.Width / 2.0;
@@ -5492,7 +5492,7 @@ void SpecialNPC(int A)
                 else
                     NPC[numNPCs].Direction = 1;
 
-                NPC[numNPCs].Type = NPC[A].Special;
+                NPC[numNPCs].Type = NPCID(NPC[A].Special);
 
                 if(NPC[numNPCs].Type == NPCID_RANDOM_POWER)
                     NPC[numNPCs].Type = RandomBonus();
@@ -5730,7 +5730,7 @@ void CharStuff(int WhatNPC, bool CheckEggs)
     }
 }
 
-int RandomBonus()
+NPCID RandomBonus()
 {
     int B = iRand(6);
 

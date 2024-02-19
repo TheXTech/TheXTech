@@ -22,8 +22,12 @@
 #ifndef EDITOR_H
 #define EDITOR_H
 
-#include "location.h"
 #include <string>
+
+#include "location.h"
+#include "global_constants.h"
+
+enum NPCID : vbint_t;
 
 extern std::string Backup_FullFileName;
 extern int editor_section_toast;
@@ -80,8 +84,8 @@ extern void UpdateEditor();
 extern void UpdateInterprocess();
 #endif
 
-extern int EditorNPCFrame(const int A, int C, int N = 0);
-extern int EditorNPCFrame(const int A, float& C, int N = 0);
+extern int EditorNPCFrame(const NPCID A, int C, int N = 0);
+extern int EditorNPCFrame(const NPCID A, float& C, int N = 0);
 
 extern void GetEditorControls();
 
@@ -99,7 +103,7 @@ extern void zTestLevel(bool magicHand = false, bool interProcess = false);
 
 extern void MouseMove(float X, float Y, bool nCur = false);
 
-extern void ResetNPC(int A);
+extern void ResetNPC(NPCID A);
 
 extern void BlockFill(const Location_t &Loc);
 

@@ -34,6 +34,7 @@
 #include "ref_type.h"
 #include "rand.h"
 #include "floats.h"
+#include "npc_id.h"
 
 #include "global_constants.h"
 #include "global_strings.h"
@@ -252,7 +253,7 @@ struct NPC_t
 {
     // most important and frequently accessed fields at the top of the struct
 //    Type As Integer 'Defines what NPC this is.  1 for goomba, 2 for red goomba, etc.
-    vbint_t Type = 0;
+    NPCID Type = NPCID(0);
 //    Killed As Integer 'Flags the NPC to die a specific way.
     vbint_t Killed = 0;
 //    Frame As Integer 'The graphic to be shown
@@ -441,7 +442,7 @@ struct NPC_t
 
 //'the default values are used when De-Activating an NPC when it goes on screen
 //    DefaultType As Integer
-    vbint_t DefaultType = 0;
+    NPCID DefaultType = NPCID(0);
 //    DefaultLocation As Location
     Location_t DefaultLocation;
 //    DefaultDirection As Single
@@ -537,7 +538,7 @@ struct Player_t
 //    ShellSurf As Boolean 'true if surfing a shell
     bool ShellSurf = false;
 //    StateNPC As Integer
-    int StateNPC = 0;
+    NPCID StateNPC = NPCID(0);
 //    Slope As Integer 'the block that the player is standing on when on a slope
     int Slope = 0;
 //    Stoned As Boolean 'true of a statue form (tanooki suit)
@@ -695,7 +696,7 @@ struct Player_t
 //    CanGrabNPCs As Boolean 'If the player can grab NPCs
     bool CanGrabNPCs = false;
 //    HeldBonus As Integer 'the NPC that is in the player's container
-    int HeldBonus = 0;
+    NPCID HeldBonus = NPCID(0);
 //    Section As Integer 'What section of the level the player is in
     int Section = 0;
 //    WarpCD As Integer 'delay before allowing the player to warp again
@@ -832,11 +833,11 @@ struct Block_t
 //    Invis As Boolean 'for invisible blocks
     bool Invis = false;
 //    NPC As Integer 'when a coin is turned into a block after the p switch is hit
-    vbint_t NPC = 0;
+    NPCID NPC = NPCID(0);
 //    IsPlayer As Integer 'for the clown car
     vbint_t IsPlayer = 0;
 //    IsNPC As Integer 'the type of NPC the block is
-    vbint_t IsNPC = 0;
+    NPCID IsNPC = NPCID(0);
 //    standingOnPlayerY As Integer 'when standing on a player in the clown car
     vbint_t standingOnPlayerY = 0;
 //    noProjClipping As Boolean
@@ -892,7 +893,7 @@ struct Effect_t
     vbint_t FrameCount = 0;
 //    Life As Integer 'timer before the effect disappears
     vbint_t Life = 0;
-//    NewNpc As Integer 'when an effect should create and NPC, such as Yoshi
+//    NewNpc As Integer 'when an effect should create and NPC, such as Yoshi (NOTE: occasionally abused, so not turning into an NPCID)
     vbint_t NewNpc = 0;
 // EXTRA: New NPC's special value
     uint8_t NewNpcSpecial = 0;
@@ -1864,7 +1865,7 @@ extern int PSwitchPlayer;
 
 struct SavedChar_t
 {
-    uint16_t HeldBonus = 0;
+    uint16_t HeldBonus = NPCID(0);
     uint8_t State = 1;
     uint8_t Mount = 0;
     uint8_t MountType = 0;
@@ -1887,7 +1888,7 @@ struct SavedChar_t
     {
         Player_t p;
 
-        p.HeldBonus = HeldBonus;
+        p.HeldBonus = NPCID(HeldBonus);
         p.State = State;
         p.Mount = Mount;
         p.MountType = MountType;

@@ -185,7 +185,7 @@ void EditorScreen::ResetCursor()
     EditorCursor.Background.Type = 1;
     EditorCursor.Background.SetSortPriority(0, 0);
     EditorCursor.NPC = NPC_t();
-    EditorCursor.NPC.Type = 1;
+    EditorCursor.NPC.Type = NPCID(1);
     EditorCursor.NPC.Direction = -1;
     EditorCursor.Water = Water_t();
     EditorCursor.Warp = Warp_t();
@@ -258,14 +258,14 @@ bool AllowBubble()
         return true;
 }
 
-void SetEditorNPCType(int type)
+void SetEditorNPCType(NPCID type)
 {
-    int prev_type;
+    NPCID prev_type;
 
-    if(EditorCursor.NPC.Type == 91 || EditorCursor.NPC.Type == 96
-        || EditorCursor.NPC.Type == 283 || EditorCursor.NPC.Type == 284)
+    if(EditorCursor.NPC.Type == NPCID_ITEM_BURIED || EditorCursor.NPC.Type == NPCID_ITEM_POD
+        || EditorCursor.NPC.Type == NPCID_ITEM_BUBBLE || EditorCursor.NPC.Type == NPCID_ITEM_THROWER)
     {
-        prev_type = EditorCursor.NPC.Special;
+        prev_type = NPCID(EditorCursor.NPC.Special);
         EditorCursor.NPC.Special = type;
     }
     else
@@ -313,7 +313,7 @@ void SetEditorNPCType(int type)
         EditorCursor.NPC.Variant = 0;
 
     // turn into new type if can't be in bubble anymore
-    if(EditorCursor.NPC.Type == 283 && !AllowBubble())
+    if(EditorCursor.NPC.Type == NPCID_ITEM_BUBBLE && !AllowBubble())
     {
         EditorCursor.NPC.Type = type;
         EditorCursor.NPC.Special = 0;
@@ -494,7 +494,7 @@ bool EditorScreen::UpdateCheckBox(CallMode mode, int x, int y, bool sel, const c
         return this->UpdateButton(mode, x, y, GFX.EIcons, sel, 0, 0, 1, 1, tooltip);
 }
 
-bool EditorScreen::UpdateNPCButton(CallMode mode, int x, int y, int type, bool sel)
+bool EditorScreen::UpdateNPCButton(CallMode mode, int x, int y, NPCID type, bool sel)
 {
     int draw_width, draw_height;
     if(NPCWidthGFX(type) == 0)
@@ -511,7 +511,7 @@ bool EditorScreen::UpdateNPCButton(CallMode mode, int x, int y, int type, bool s
     return UpdateButton(mode, x, y, GFXNPC[type], sel, 0, 0, draw_width, draw_height);
 }
 
-void EditorScreen::UpdateNPC(CallMode mode, int x, int y, int type)
+void EditorScreen::UpdateNPC(CallMode mode, int x, int y, NPCID type)
 {
     if((type < 1) || (type >= maxNPCType))
     {
@@ -524,6 +524,7 @@ void EditorScreen::UpdateNPC(CallMode mode, int x, int y, int type)
             (EditorCursor.NPC.Special == type &&
                 (EditorCursor.NPC.Type == 91 || EditorCursor.NPC.Type == 96
                     || EditorCursor.NPC.Type == 283 || EditorCursor.NPC.Type == 284)));
+
         if(UpdateNPCButton(mode, x, y, type, sel) && !sel)
             SetEditorNPCType(type);
     }
@@ -545,7 +546,7 @@ void EditorScreen::UpdateNPCGrid(CallMode mode, int x, int y, const int* types, 
 
         int row = i / n_cols;
         int col = i % n_cols;
-        UpdateNPC(mode, x + col * 40 + 4, y + row * 40 + 4, type);
+        UpdateNPC(mode, x + col * 40 + 4, y + row * 40 + 4, NPCID(type));
     }
 }
 
@@ -580,14 +581,14 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
 
         index++;
 
-        if(UpdateNPCButton(mode, 4, 4 + (40 * index), page.icon, m_NPC_page == index))
+        if(UpdateNPCButton(mode, 4, 4 + (40 * index), NPCID(page.icon), m_NPC_page == index))
             m_NPC_page = index;
     }
 
     if(m_special_page == SPECIAL_PAGE_BLOCK_CONTENTS && mode == CallMode::Render)
         XRender::renderRect(0, (40 * index) + 40 + -2, 40, 4, XTColorF(0.25f, 0.0f, 0.5f), true);
 
-    if(m_special_page == SPECIAL_PAGE_BLOCK_CONTENTS && UpdateNPCButton(mode, 4, 4 + (40 * index) + 40, 10, m_NPC_page == -1))
+    if(m_special_page == SPECIAL_PAGE_BLOCK_CONTENTS && UpdateNPCButton(mode, 4, 4 + (40 * index) + 40, NPCID_COIN_S3, m_NPC_page == -1))
         m_NPC_page = -1;
 
 
@@ -609,7 +610,7 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
         {
             if(EditorCursor.NPC.Type == NPCID_ITEM_BURIED)
             {
-                EditorCursor.NPC.Type = EditorCursor.NPC.Special;
+                EditorCursor.NPC.Type = NPCID(EditorCursor.NPC.Special);
                 EditorCursor.NPC.Special = 0;
             }
             else if(!(EditorCursor.NPC.Type == NPCID_ITEM_BURIED || EditorCursor.NPC.Type == NPCID_ITEM_POD
@@ -627,7 +628,7 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
         {
             if(EditorCursor.NPC.Type == NPCID_ITEM_POD)
             {
-                EditorCursor.NPC.Type = EditorCursor.NPC.Special;
+                EditorCursor.NPC.Type = NPCID(EditorCursor.NPC.Special);
                 EditorCursor.NPC.Special = 0;
             }
             else if(!(EditorCursor.NPC.Type == NPCID_ITEM_BURIED || EditorCursor.NPC.Type == NPCID_ITEM_POD
@@ -645,7 +646,7 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
         {
             if(EditorCursor.NPC.Type == NPCID_ITEM_THROWER)
             {
-                EditorCursor.NPC.Type = EditorCursor.NPC.Special;
+                EditorCursor.NPC.Type = NPCID(EditorCursor.NPC.Special);
                 EditorCursor.NPC.Special = 0;
             }
             else if(!(EditorCursor.NPC.Type == NPCID_ITEM_BURIED || EditorCursor.NPC.Type == NPCID_ITEM_POD
@@ -665,7 +666,7 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
             {
                 if(EditorCursor.NPC.Type == NPCID_ITEM_BUBBLE)
                 {
-                    EditorCursor.NPC.Type = EditorCursor.NPC.Special;
+                    EditorCursor.NPC.Type = NPCID(EditorCursor.NPC.Special);
                     EditorCursor.NPC.Special = 0;
                 }
                 else if(!(EditorCursor.NPC.Type == NPCID_ITEM_BURIED || EditorCursor.NPC.Type == NPCID_ITEM_POD
@@ -3213,15 +3214,15 @@ void EditorScreen::UpdateBlockScreen(CallMode mode)
 
     // Contents
     SuperPrintRightR(mode, g_editorStrings.blockInside, 3, e_ScreenW - 40, 294);
-    int n_type = 0;
+    NPCID n_type = NPCID_NULL;
     if(EditorCursor.Block.Special > 0 && EditorCursor.Block.Special <= 1000)
     {
-        n_type = 10;
+        n_type = NPCID_COIN_S3;
         SuperPrintR(mode, "x" + std::to_string(EditorCursor.Block.Special), 3, e_ScreenW-80, 314);
     }
     else if(EditorCursor.Block.Special != 0)
     {
-        n_type = EditorCursor.Block.Special - 1000;
+        n_type = NPCID(EditorCursor.Block.Special - 1000);
     }
 
     if(((n_type >= 1 && n_type <= maxNPCType) && UpdateNPCButton(mode, e_ScreenW - 40 + 4, 280 + 4, n_type, EditorCursor.Block.Special != 0))

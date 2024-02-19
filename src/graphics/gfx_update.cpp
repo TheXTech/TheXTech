@@ -2533,7 +2533,7 @@ void UpdateGraphicsScreen(Screen_t& screen)
                         tempLocation.X = NPC[A].Location.X + NPC[A].Location.Width / 2.0 - tempLocation.Width / 2.0;
                         tempLocation.Y = NPC[A].Location.Y + NPC[A].Location.Height / 2.0 - tempLocation.Height / 2.0;
 
-                        int B = EditorNPCFrame((int)SDL_floor(NPC[A].Special), NPC[A].Direction);
+                        int B = EditorNPCFrame((NPCID)SDL_floor(NPC[A].Special), NPC[A].Direction);
                         XRender::renderTexture(camX + tempLocation.X + NPC[A]->FrameOffsetX, camY + tempLocation.Y, tempLocation.Width, tempLocation.Height, GFXNPC[NPC[A].Special], 0, B * tempLocation.Height, cn);
                     }
 
