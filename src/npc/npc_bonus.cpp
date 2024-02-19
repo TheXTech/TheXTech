@@ -202,7 +202,7 @@ void TouchBonus(int A, int B)
     bool tempBool = false;
     Location_t tempLocation;
 
-    if(NPC[B].CantHurtPlayer != A || (NPCIsACoin(NPC[B]) && Player[A].HoldingNPC != B && NPC[B].Killed == 0))
+    if(NPC[B].CantHurtPlayer != A || (NPC[B]->IsACoin && Player[A].HoldingNPC != B && NPC[B].Killed == 0))
     {
         //        if(nPlay.Online == true && nPlay.MySlot + 1 == A)
         //            Netplay::sendData "1k" + std::to_string(A) + "|" + std::to_string(B) + "|" + NPC[B].Type + LB;
@@ -538,7 +538,7 @@ void TouchBonus(int A, int B)
             if(NPC[B].Effect != 2)
                 s_PowerupScore(B);
         }
-        else if(NPCIsACoin(NPC[B])) // Bonus is a coin
+        else if(NPC[B]->IsACoin) // Bonus is a coin
         {
             if(NPC[B].Type == NPCID_RING)
                 PlaySoundSpatial(SFX_RingGet, NPC[B].Location);

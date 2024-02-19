@@ -24,18 +24,18 @@
 	branch = master
 [submodule "3rdparty/freetype"]
 	path = 3rdparty/freetype
-	url = https://github.com/Wohlstand/freetype.git
+	url = https://github.com/TheXTech/freetype.git
 	branch = master
 [submodule "3rdparty/harfbuzz"]
 	path = 3rdparty/harfbuzz
-	url = https://github.com/Wohlstand/harfbuzz.git
+	url = https://github.com/TheXTech/harfbuzz.git
     branch = main
 [submodule "3rdparty/thextech-discord-rpc"]
 	path = 3rdparty/thextech-discord-rpc
-	url = https://github.com/Wohlstand/thextech-discord-rpc.git
+	url = https://github.com/TheXTech/thextech-discord-rpc.git
 [submodule "3rdparty/glew-cmake"]
 	path = 3rdparty/glew-cmake
-	url = https://github.com/Wohlstand/thextech-glew-cmake.git
+	url = https://github.com/TheXTech/thextech-glew-cmake.git
 [submodule "3rdparty/DirManager"]
 	path = 3rdparty/DirManager
 	url = https://github.com/WohlSoft/DirManager.git
@@ -50,4 +50,4 @@
 	branch = master
 [submodule "3rdparty/angle-shader-translator"]
 	path = 3rdparty/angle-shader-translator
-	url = https://github.com/ds-sloth/angle-shader-translator-library.git
+	url = https://github.com/TheXTech/angle-shader-translator-library.git

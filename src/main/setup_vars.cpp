@@ -409,8 +409,8 @@ void SetupVars()
 
 
 
-    // NPCIsABonus(254) = true;
-    // NPCIsAShell(237) = true;
+    NPCTraits[254].IsABonus = true;
+    NPCTraits[237].IsAShell = true;
     NPCTraits[237].WontHurt = true;
     NPCTraits[237].CanWalkOn = true;
     NPCTraits[13].JumpHurt = true;
@@ -434,27 +434,27 @@ void SetupVars()
 
     NPCTraits[251].TWidth = 18; // TLOZ Rupee
     NPCTraits[251].THeight = 32;
-    // NPCIsABonus(251) = true;
-    // NPCIsACoin(251) = true;
+    NPCTraits[251].IsABonus = true;
+    NPCTraits[251].IsACoin = true;
 
     NPCTraits[252].TWidth = 18; // TLOZ Rupee
     NPCTraits[252].THeight = 32;
-    // NPCIsABonus(252) = true;
-    // NPCIsACoin(252) = true;
+    NPCTraits[252].IsABonus = true;
+    NPCTraits[252].IsACoin = true;
 
     NPCTraits[253].TWidth = 18; // TLOZ Rupee
     NPCTraits[253].THeight = 32;
-    // NPCIsABonus(253) = true;
-    // NPCIsACoin(253) = true;
+    NPCTraits[253].IsABonus = true;
+    NPCTraits[253].IsACoin = true;
 
     NPCTraits[250].TWidth = 32; // TLOZ Heart
     NPCTraits[250].THeight = 32;
-    // NPCIsABonus(250) = true;
+    NPCTraits[250].IsABonus = true;
 
     // vines
     for(int A = 213; A <= 224; ++A)
     {
-        // NPCIsAVine(A) = true;
+        NPCTraits[A].IsAVine = true;
         NPCTraits[A].WontHurt = true;
         NPCTraits[A].NoClipping = true;
         NPCTraits[A].JumpHurt = true;
@@ -483,11 +483,11 @@ void SetupVars()
 
     NPCTraits[240].TWidth = 32;
     NPCTraits[240].THeight = 32;
-    // NPCIsABonus(240) = true;//32;
+    NPCTraits[240].IsABonus = true;//32;
 
     NPCTraits[248].TWidth = 32;
     NPCTraits[248].THeight = 32;
-    // NPCIsABonus(248) = true;//32;
+    NPCTraits[248].IsABonus = true;//32;
 
     NPCTraits[200].TWidth = 64;
     NPCTraits[200].THeight = 72;
@@ -585,12 +585,12 @@ void SetupVars()
 
     NPCTraits[249].TWidth = 32; // SMB2 Mushroom
     NPCTraits[249].THeight = 32;
-    // NPCIsABonus(249) = true;
+    NPCTraits[249].IsABonus = true;
 
     NPCTraits[274].TWidth = 32; // dragon coin
     NPCTraits[274].THeight = 50;
-    // NPCIsABonus(274) = true;
-    // NPCIsACoin(274) = true;
+    NPCTraits[274].IsABonus = true;
+    NPCTraits[274].IsACoin = true;
     NPCTraits[274].Score = 6;
 
     NPCTraits[10].TWidth = 28; // SMB3 Coin
@@ -992,19 +992,19 @@ void SetupVars()
     NPCTraits[113].TWidth = 32; // SMW Green Shell
     NPCTraits[113].THeight = 32;
     NPCTraits[113].FrameOffsetY = 2;
-    // NPCIsAShell(113) = true;
+    NPCTraits[113].IsAShell = true;
     NPCTraits[114].TWidth = 32; // SMW Red Shell
     NPCTraits[114].THeight = 32;
     NPCTraits[114].FrameOffsetY = 2;
-    // NPCIsAShell(114) = true;
+    NPCTraits[114].IsAShell = true;
     NPCTraits[115].TWidth = 32; // SMW Blue Shell
     NPCTraits[115].THeight = 32;
     NPCTraits[115].FrameOffsetY = 2;
-    // NPCIsAShell(115) = true;
+    NPCTraits[115].IsAShell = true;
     NPCTraits[116].TWidth = 32; // SMW Yellow Shell
     NPCTraits[116].THeight = 32;
     NPCTraits[116].FrameOffsetY = 2;
-    // NPCIsAShell(116) = true;
+    NPCTraits[116].IsAShell = true;
     NPCTraits[117].TWidth = 32; // SMW Green Beach Koopa
     NPCTraits[117].THeight = 32;
     NPCTraits[117].FrameOffsetY = 2;
@@ -1121,12 +1121,12 @@ void SetupVars()
     NPCTraits[137].IsGrabbable = true;
     NPCTraits[138].TWidth = 28; // SMB 2 Coin
     NPCTraits[138].THeight = 32;
-    // NPCIsABonus(138) = true;
-    // NPCIsACoin(138) = true;
+    NPCTraits[138].IsABonus = true;
+    NPCTraits[138].IsACoin = true;
     NPCTraits[152].TWidth = 32; // Sonic Ring
     NPCTraits[152].THeight = 32;
-    // NPCIsABonus(152) = true;
-    // NPCIsACoin(152) = true;
+    NPCTraits[152].IsABonus = true;
+    NPCTraits[152].IsACoin = true;
     For(A, 139, 147) // Veggies
     {
         NPCTraits[A].TWidth = GFXNPC[A].w;
@@ -1219,11 +1219,11 @@ void SetupVars()
     NPCTraits[169].TWidth = 32; // Tanooki Suit
     NPCTraits[169].THeight = 32;
     NPCTraits[169].FrameOffsetY = 2;
-    // NPCIsABonus(169) = true;
+    NPCTraits[169].IsABonus = true;
     NPCTraits[170].TWidth = 32; // Hammer Suit
     NPCTraits[170].THeight = 32;
     NPCTraits[170].FrameOffsetY = 2;
-    // NPCIsABonus(170) = true;
+    NPCTraits[170].IsABonus = true;
 
     NPCTraits[292].WontHurt = true; // Boomerang
     NPCTraits[292].JumpHurt = true;
@@ -1241,10 +1241,10 @@ void SetupVars()
     NPCTraits[171].NoYoshi = true;
 
     NPCTraits[172].THeight = 28; //  Green SMB1 Shell
-    // NPCIsAShell(172) = true;
+    NPCTraits[172].IsAShell = true;
     NPCTraits[174].THeight = 28; //  Red SMB1 Shell
-    // NPCIsAShell(174) = true;
-    // NPCIsAShell(195) = true;
+    NPCTraits[174].IsAShell = true;
+    NPCTraits[195].IsAShell = true;
 
     NPCTraits[179].JumpHurt = true; // Razor Blade
     NPCTraits[179].WidthGFX = 64;
@@ -1273,14 +1273,14 @@ void SetupVars()
     NPCTraits[181].FrameOffsetY = 2;
     NPCTraits[197].TWidth = 48;
     NPCTraits[197].THeight = 16;
-    // NPCIsABonus(197) = true;
-    // NPCIsABonus(182) = true; // SMB1 Flower
-    // NPCIsABonus(183) = true; // SMW Flower
-    // NPCIsABonus(184) = true; // SMB1 Mushroom
-    // NPCIsABonus(185) = true; // SMW Mushroom
-    // NPCIsABonus(186) = true; // SMB1 1-up
-    // NPCIsABonus(187) = true; // SMW 1-up
-    // NPCIsABonus(188) = true; // SMW 3 up
+    NPCTraits[197].IsABonus = true;
+    NPCTraits[182].IsABonus = true; // SMB1 Flower
+    NPCTraits[183].IsABonus = true; // SMW Flower
+    NPCTraits[184].IsABonus = true; // SMB1 Mushroom
+    NPCTraits[185].IsABonus = true; // SMW Mushroom
+    NPCTraits[186].IsABonus = true; // SMB1 1-up
+    NPCTraits[187].IsABonus = true; // SMW 1-up
+    NPCTraits[188].IsABonus = true; // SMW 3 up
     NPCTraits[188].TWidth = 30;
     NPCTraits[189].TWidth = 32;
 
@@ -1365,13 +1365,13 @@ void SetupVars()
 
     NPCTraits[190].NoYoshi = true;
     NPCTraits[192].NoYoshi = true;
-    // NPCIsABonus(192) = true;
+    NPCTraits[192].IsABonus = true;
 
 
 
     // NPCIsAParaTroopa(176) = true;
     // NPCIsAParaTroopa(177) = true;
-    // NPCIsABonus(178) = true;
+    NPCTraits[178].IsABonus = true;
     // NPCDefaultMovement(173) = true;
     // NPCDefaultMovement(175) = true;
     // NPCDefaultMovement(162) = true;
@@ -1435,39 +1435,39 @@ void SetupVars()
     // NPCIsBoot(35) = true;
     // NPCIsBoot(191) = true;
     // NPCIsBoot(193) = true;
-    // NPCIsAShell(5) = true;
-    // NPCIsAShell(7) = true;
-    // NPCIsAShell(24) = true;
-    // NPCIsAShell(73) = true;
-    // NPCIsABonus(9) = true;
-    // NPCIsABonus(273) = true;
-    // NPCIsABonus(10) = true;
-    // NPCIsABonus(11) = true;
-    // NPCIsABonus(14) = true;
-    // NPCIsABonus(264) = true;
-    // NPCIsABonus(277) = true;
-    // NPCIsABonus(16) = true;
-    // NPCIsABonus(33) = true;
-    // NPCIsABonus(258) = true;
-    // NPCIsABonus(34) = true;
-    // NPCIsABonus(41) = true;
-    // NPCIsABonus(75) = true;
-    // NPCIsABonus(88) = true;
-    // NPCIsABonus(90) = true;
-    // NPCIsABonus(94) = true;
-    // NPCIsABonus(198) = true;
-    // NPCIsABonus(97) = true;
-    // NPCIsABonus(101) = true;
-    // NPCIsABonus(102) = true;
-    // NPCIsABonus(103) = true;
-    // NPCIsABonus(107) = true;
-    // NPCIsABonus(153) = true;
-    // NPCIsABonus(196) = true;
-    // NPCIsACoin(10) = true;
-    // NPCIsACoin(33) = true;
-    // NPCIsACoin(258) = true;
-    // NPCIsACoin(88) = true;
-    // NPCIsACoin(103) = true;
+    NPCTraits[5].IsAShell = true;
+    NPCTraits[7].IsAShell = true;
+    NPCTraits[24].IsAShell = true;
+    NPCTraits[73].IsAShell = true;
+    NPCTraits[9].IsABonus = true;
+    NPCTraits[273].IsABonus = true;
+    NPCTraits[10].IsABonus = true;
+    NPCTraits[11].IsABonus = true;
+    NPCTraits[14].IsABonus = true;
+    NPCTraits[264].IsABonus = true;
+    NPCTraits[277].IsABonus = true;
+    NPCTraits[16].IsABonus = true;
+    NPCTraits[33].IsABonus = true;
+    NPCTraits[258].IsABonus = true;
+    NPCTraits[34].IsABonus = true;
+    NPCTraits[41].IsABonus = true;
+    NPCTraits[75].IsABonus = true;
+    NPCTraits[88].IsABonus = true;
+    NPCTraits[90].IsABonus = true;
+    NPCTraits[94].IsABonus = true;
+    NPCTraits[198].IsABonus = true;
+    NPCTraits[97].IsABonus = true;
+    NPCTraits[101].IsABonus = true;
+    NPCTraits[102].IsABonus = true;
+    NPCTraits[103].IsABonus = true;
+    NPCTraits[107].IsABonus = true;
+    NPCTraits[153].IsABonus = true;
+    NPCTraits[196].IsABonus = true;
+    NPCTraits[10].IsACoin = true;
+    NPCTraits[33].IsACoin = true;
+    NPCTraits[258].IsACoin = true;
+    NPCTraits[88].IsACoin = true;
+    NPCTraits[103].IsACoin = true;
     // NPCIsAnExit(11) = true;
     // NPCIsAnExit(16) = true;
     // NPCIsAnExit(41) = true;
@@ -2040,7 +2040,7 @@ void SetupVars()
     // Default NPCs that render differently when inactive
     for(int A = 1; A <= maxNPCType; A++)
     {
-        if(NPCTraits[A].IsABlock || NPCTraits[A].IsAHit1Block || NPCIsACoin(A) || NPCIsAVine(A) || NPCIsABonus(A))
+        if(NPCTraits[A].IsABlock || NPCTraits[A].IsAHit1Block || NPCTraits[A].IsACoin || NPCTraits[A].IsAVine || NPCTraits[A].IsABonus)
             NPCTraits[A].InactiveRender = NPCTraits_t::SHOW_ALWAYS;
     }
 

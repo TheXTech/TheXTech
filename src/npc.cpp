@@ -232,7 +232,7 @@ void Bomb(Location_t Location, int Game, int ImmunePlayer)
 
     for(int i : treeNPCQuery(newLoc(X - Radius, Y - Radius, Radius * 2, Radius * 2), SORTMODE_ID))
     {
-        if(!NPC[i].Hidden && NPC[i].Active && !NPC[i].Inert && !NPC[i].Generator && !NPCIsABonus(NPC[i]))
+        if(!NPC[i].Hidden && NPC[i].Active && !NPC[i].Inert && !NPC[i].Generator && !NPC[i]->IsABonus)
         {
             if(NPC[i].Type != NPCID_PLR_FIREBALL && NPC[i].Type != NPCID_CHAR3_HEAVY)
             {
@@ -347,9 +347,9 @@ void TurnNPCsIntoCoins()
             if(!NPC[A].Hidden && NPC[A].Killed == 0 && !NPCIsAnExit(NPC[A]) && !NPC[A].Inert)
             {
                 if(!NPCIsYoshi(NPC[A]) && !NPCIsBoot(NPC[A]) &&
-                   !NPCIsABonus(NPC[A]) && NPC[A].Type != NPCID_PLR_ICEBALL && NPC[A].Type != NPCID_PLR_FIREBALL &&
+                   !NPC[A]->IsABonus && NPC[A].Type != NPCID_PLR_ICEBALL && NPC[A].Type != NPCID_PLR_FIREBALL &&
                    NPC[A].Type != NPCID_PET_FIRE && NPC[A].Type != NPCID_SPRING && !NPCIsVeggie(NPC[A]) &&
-                   NPC[A].Type != NPCID_ITEM_BURIED && NPC[A].Type != NPCID_PLR_HEAVY && !NPCIsAVine(NPC[A]) &&
+                   NPC[A].Type != NPCID_ITEM_BURIED && NPC[A].Type != NPCID_PLR_HEAVY && !NPC[A]->IsAVine &&
                    NPC[A].Type != NPCID_VEHICLE && NPC[A].Type != NPCID_YEL_PLATFORM && NPC[A].Type != NPCID_BLU_PLATFORM &&
                    NPC[A].Type != NPCID_GRN_PLATFORM && NPC[A].Type != NPCID_RED_PLATFORM && NPC[A].Type != NPCID_PLATFORM_S3 &&
                    !(NPC[A].Projectile && NPC[A].Type == NPCID_HEAVY_THROWN) &&
@@ -671,7 +671,7 @@ void NPCSpecial(int A)
         for(int i = 1; i <= numNPCs; i++)
         {
             auto &n = NPC[i];
-            if(NPCIsAVine(n) && !n.Hidden && CheckCollision(tempLocation, n.Location))
+            if(n->IsAVine && !n.Hidden && CheckCollision(tempLocation, n.Location))
             {
                 tempBool = true;
                 break;
@@ -839,7 +839,7 @@ void NPCSpecial(int A)
             for(int i : treeNPCQuery(tempLocation, SORTMODE_NONE))
             {
                 auto &n = NPC[i];
-                if(n.Active && !n.Hidden && NPCIsAVine(n) && CheckCollision(tempLocation, n.Location))
+                if(n.Active && !n.Hidden && n->IsAVine && CheckCollision(tempLocation, n.Location))
                 {
                     tempBool = true;
                     break;
@@ -970,7 +970,7 @@ void NPCSpecial(int A)
 
             // deferring tree update to end of the NPC physics update
 
-            if(NPCIsACoin(npc))
+            if(npc->IsACoin)
             {
                 npc.Special = 1;
                 npc.Location.SpeedX = dRand() * 1 - 0.5;
@@ -3310,7 +3310,7 @@ void SpecialNPC(int A)
         {
             if(NPC[B].Active)
             {
-                if(NPCIsACoin(NPC[B]))
+                if(NPC[B]->IsACoin)
                 {
                     if(CheckCollision(NPC[A].Location, NPC[B].Location))
                     {
@@ -3343,7 +3343,7 @@ void SpecialNPC(int A)
                 {
                     if(NPC[B].Active)
                     {
-                        if(NPCIsACoin(NPC[B]))
+                        if(NPC[B]->IsACoin)
                         {
                             if(CheckCollision(NPC[A].Location, NPC[B].Location))
                             {
@@ -5517,7 +5517,7 @@ void SpecialNPC(int A)
 
                 NPC[numNPCs].Variant = NPC[A].Variant;
 
-                if(NPCIsACoin(NPC[numNPCs]))
+                if(NPC[numNPCs]->IsACoin)
                 {
                     NPC[numNPCs].Special = 1;
                     NPC[numNPCs].Location.SpeedX = NPC[numNPCs].Location.SpeedX * 0.5;
@@ -5597,7 +5597,7 @@ void SpecialNPC(int A)
         }
     }
     // Projectile code
-    if(NPCIsAShell(NPC[A]) || (NPC[A].Type == NPCID_SLIDE_BLOCK && NPC[A].Special == 1))
+    if(NPC[A]->IsAShell || (NPC[A].Type == NPCID_SLIDE_BLOCK && NPC[A].Special == 1))
     {
         if(NPC[A].Location.SpeedX != 0)
             NPC[A].Projectile = true;
