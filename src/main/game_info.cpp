@@ -20,15 +20,14 @@
 
 #include <fmt_format_ne.h>
 #include <Utils/files.h>
-#include <AppPath/app_path.h>
 #include <IniProcessor/ini_processing.h>
 #include "game_info.h"
 #include "script/luna/luna.h"
 
+#include "globals.h"
+
 #include "../version.h"
 
-
-GameInfo g_gameInfo;
 
 static void readCheats(IniProcessing &conf, std::vector<GameInfo::CheatAlias> &dst, const std::string &group)
 {
@@ -59,62 +58,67 @@ const std::string GameInfo::titleWindow() const
 #endif
 }
 
-void initGameInfo()
+void GameInfo::InitGameInfo()
 {
 #ifdef CUSTOM_GAME_NAME_TITLE
-    g_gameInfo.title = CUSTOM_GAME_NAME_TITLE;
+    title = CUSTOM_GAME_NAME_TITLE;
 #else
 #   ifdef ENABLE_OLD_CREDITS
-    g_gameInfo.title = "Super Mario Bros. X";
+    title = "Super Mario Bros. X";
 #   else
-    g_gameInfo.title = "TheXTech Engine";
+    title = "TheXTech Engine";
 #   endif
 #endif /* CUSTOM_GAME_NAME_TITLE */
 
-    g_gameInfo.statusIconName.clear();
+    statusIconName.clear();
 
-    g_gameInfo.characterName[1] = "Mario";
-    g_gameInfo.characterName[2] = "Luigi";
-    g_gameInfo.characterName[3] = "Peach";
-    g_gameInfo.characterName[4] = "Toad";
-    g_gameInfo.characterName[5] = "Link";
+    characterName[1] = "Mario";
+    characterName[2] = "Luigi";
+    characterName[3] = "Peach";
+    characterName[4] = "Toad";
+    characterName[5] = "Link";
 
-    g_gameInfo.wordStarAccusativeSingular = "star";
-    g_gameInfo.wordStarAccusativeDual_Cnt = "";
-    g_gameInfo.wordStarAccusativePlural = "stars";
+    wordStarAccusativeSingular = "star";
+    wordStarAccusativeDual_Cnt = "";
+    wordStarAccusativePlural = "stars";
 
-    g_gameInfo.creditsFont = 5;
+    creditsFont = 5;
 
 #ifdef CUSTOM_CREDITS_URL
-    g_gameInfo.creditsHomePage = CUSTOM_CREDITS_URL;
+    creditsHomePage = CUSTOM_CREDITS_URL;
 #else
 #   ifdef ENABLE_OLD_CREDITS
-    g_gameInfo.creditsHomePage = "www.SuperMarioBrothers.org";
+    creditsHomePage = "www.SuperMarioBrothers.org";
 #   else
-    g_gameInfo.creditsHomePage = "wohlsoft.ru";
+    creditsHomePage = "wohlsoft.ru";
 #   endif
 #endif
 
-    g_gameInfo.introEnableActivity = true;
-    g_gameInfo.introMaxPlayersCount = 6;
-    g_gameInfo.introCharacters = {1, 2, 3, 4, 5};
-    g_gameInfo.introCharacterCurrent = 0;
-    g_gameInfo.introDeadMode = false;
+    introEnableActivity = true;
+    introMaxPlayersCount = 6;
+    introCharacters = {1, 2, 3, 4, 5};
+    introCharacterCurrent = 0;
+    introDeadMode = false;
 
-    g_gameInfo.outroEnableActivity = true;
-    g_gameInfo.outroMaxPlayersCount = 5;
-    g_gameInfo.outroCharacters = {1, 2, 3, 4, 5};
-    g_gameInfo.outroStates = {4, 7, 5, 3, 6};
-    g_gameInfo.outroMounts = {0, 3, 0, 1, 0};
-    g_gameInfo.outroCharacterCurrent = 0;
-    g_gameInfo.outroInitialDirections = {0, 0, 0, 0, 0};
-    g_gameInfo.outroWalkDirection = -1;
-    g_gameInfo.outroAutoJump = true;
-    g_gameInfo.outroDeadMode = false;
-    g_gameInfo.disableTwoPlayer = false;
-    g_gameInfo.disableBattleMode = false;
+    outroEnableActivity = true;
+    outroMaxPlayersCount = 5;
+    outroCharacters = {1, 2, 3, 4, 5};
+    outroStates = {4, 7, 5, 3, 6};
+    outroMounts = {0, 3, 0, 1, 0};
+    outroCharacterCurrent = 0;
+    outroInitialDirections = {0, 0, 0, 0, 0};
+    outroWalkDirection = -1;
+    outroAutoJump = true;
+    outroDeadMode = false;
+    disableTwoPlayer = false;
+    disableBattleMode = false;
+}
 
-    std::string gameInfoPath = AppPathManager::assetsRoot() + "gameinfo.ini";
+void GameInfo::LoadGameInfo()
+{
+    Clear();
+
+    std::string gameInfoPath = AppPath + "gameinfo.ini";
     if(Files::fileExists(gameInfoPath))
     {
         IniProcessing config(gameInfoPath);
@@ -122,35 +126,58 @@ void initGameInfo()
         config.beginGroup("game");
         {
             if(config.hasKey("title"))
-                config.read("title", g_gameInfo.title, g_gameInfo.title);
-            config.read("disable-two-player", g_gameInfo.disableTwoPlayer, false);
-            config.read("disable-battle-mode", g_gameInfo.disableBattleMode, false);
-            config.read("status-icon-name", g_gameInfo.statusIconName, std::string());
+                config.read("title", title, title);
+            config.read("disable-two-player", disableTwoPlayer, false);
+            config.read("disable-battle-mode", disableBattleMode, false);
+            config.read("status-icon-name", statusIconName, std::string());
         }
         config.endGroup();
 
+        // legacy options
         if(!config.beginGroup("fails-counter"))
             config.beginGroup("death-counter"); // Backup fallback
+        if(config.hasKey("enabled"))
         {
-            config.read("enabled", gEnableDemoCounter, gEnableDemoCounter);
-            config.read("title", gDemoCounterTitleDefault, gDemoCounterTitleDefault);
-            gDemoCounterTitle = gDemoCounterTitleDefault;
+            bool val;
+            config.read("enabled", val, false);
+            enable_fails_counter = val;
+            show_fails_counter = val;
+        }
+        if(config.hasKey("title"))
+        {
+            std::string val;
+            config.read("title", val, fails_counter_title);
+            fails_counter_title = val;
         }
         config.endGroup();
 
         config.beginGroup("luna-script");
+        if(config.hasKey("enable-engine"))
         {
-            config.read("enable-engine", gLunaEnabledGlobally, true);
+            bool val;
+            config.read("enable-engine", val, true);
+            luna_enable_engine = val;
         }
         config.endGroup();
 
         config.beginGroup("objects");
         {
-            config.read("star", g_gameInfo.wordStarAccusativeSingular, "star");
-            config.read("star-singular", g_gameInfo.wordStarAccusativeSingular, g_gameInfo.wordStarAccusativeSingular);
-            config.read("star-plural", g_gameInfo.wordStarAccusativePlural, g_gameInfo.wordStarAccusativeSingular + "s");
+            config.read("star", wordStarAccusativeSingular, "star");
+            config.read("star-singular", wordStarAccusativeSingular, g_gameInfo.wordStarAccusativeSingular);
+            config.read("star-plural", wordStarAccusativePlural, g_gameInfo.wordStarAccusativeSingular + "s");
         }
         config.endGroup();
+
+        config.beginGroup("video");
+        if(config.hasKey("death-counter-title"))
+        {
+            std::string val;
+            config.read("death-counter-title", val, fails_counter_title);
+            fails_counter_title = val;
+        }
+        config.endGroup();
+
+        // end legacy options
 
         config.beginGroup("characters");
         {
@@ -158,49 +185,49 @@ void initGameInfo()
             {
                 std::string name = fmt::format_ne("name{0}", i);
                 config.read(name.c_str(),
-                            g_gameInfo.characterName[i],
-                            g_gameInfo.characterName[i]);
+                            characterName[i],
+                            characterName[i]);
             }
         }
         config.endGroup();
 
         config.beginGroup("intro");
         {
-            config.read("enable-activity", g_gameInfo.introEnableActivity, true);
-            config.read("max-players-count", g_gameInfo.introMaxPlayersCount, 6);
-            config.read("characters", g_gameInfo.introCharacters, {1, 2, 3, 4, 5});
-            g_gameInfo.introDeadMode = !g_gameInfo.introEnableActivity || g_gameInfo.introMaxPlayersCount < 1;
+            config.read("enable-activity", introEnableActivity, true);
+            config.read("max-players-count", introMaxPlayersCount, 6);
+            config.read("characters", introCharacters, {1, 2, 3, 4, 5});
+            introDeadMode = !introEnableActivity || introMaxPlayersCount < 1;
         }
         config.endGroup();
 
         config.beginGroup("outro");
         {
-            config.read("enable-activity", g_gameInfo.outroEnableActivity, true);
-            config.read("max-players-count", g_gameInfo.outroMaxPlayersCount, 5);
-            config.read("characters", g_gameInfo.outroCharacters, {1, 2, 3, 4, 5});
-            config.read("states", g_gameInfo.outroStates, {4, 7, 5, 3, 6});
-            config.read("mounts", g_gameInfo.outroMounts, {0, 3, 0, 1, 0});
-            config.read("auto-jump", g_gameInfo.outroAutoJump, true);
+            config.read("enable-activity", outroEnableActivity, true);
+            config.read("max-players-count", outroMaxPlayersCount, 5);
+            config.read("characters", outroCharacters, {1, 2, 3, 4, 5});
+            config.read("states", outroStates, {4, 7, 5, 3, 6});
+            config.read("mounts", outroMounts, {0, 3, 0, 1, 0});
+            config.read("auto-jump", outroAutoJump, true);
             IniProcessing::StrEnumMap dirs
             {
                 {"left", -1},
                 {"idle", 0},
                 {"right", +1}
             };
-            config.readEnum("walk-direction", g_gameInfo.outroWalkDirection, -1, dirs);
-            config.read("initial-directions", g_gameInfo.outroInitialDirections, {0, 0, 0, 0, 0});
-            g_gameInfo.outroDeadMode = !g_gameInfo.outroEnableActivity || g_gameInfo.outroMaxPlayersCount < 1;
+            config.readEnum("walk-direction", outroWalkDirection, -1, dirs);
+            config.read("initial-directions", outroInitialDirections, {0, 0, 0, 0, 0});
+            outroDeadMode = !outroEnableActivity || outroMaxPlayersCount < 1;
         }
         config.endGroup();
 
         config.beginGroup("credits");
         {
-            config.read("font", g_gameInfo.creditsFont, 5);
-            config.read("homepage", g_gameInfo.creditsHomePage, g_gameInfo.creditsHomePage);
+            config.read("font", creditsFont, 5);
+            config.read("homepage", creditsHomePage, creditsHomePage);
 
             int cr;
             std::string value;
-            g_gameInfo.creditsGame.clear();
+            creditsGame.clear();
 
             for(cr = 1; ; cr++)
             {
@@ -208,17 +235,19 @@ void initGameInfo()
                 if(!config.hasKey(key))
                     break;
                 config.read(key.c_str(), value, value);
-                g_gameInfo.creditsGame.push_back(value);
+                creditsGame.push_back(value);
             }
         }
         config.endGroup();
 
-        readCheats(config, g_gameInfo.cheatsGlobalAliases, "cheats-global-aliases");
-        readCheats(config, g_gameInfo.cheatsGlobalRenames, "cheats-global-renames");
-        readCheats(config, g_gameInfo.cheatsWorldAliases, "cheats-world-aliases");
-        readCheats(config, g_gameInfo.cheatsWorldRenames, "cheats-world-renames");
-        readCheats(config, g_gameInfo.cheatsLevelAliases, "cheats-level-aliases");
-        readCheats(config, g_gameInfo.cheatsLevelRenames, "cheats-level-renames");
+        readCheats(config, cheatsGlobalAliases, "cheats-global-aliases");
+        readCheats(config, cheatsGlobalRenames, "cheats-global-renames");
+        readCheats(config, cheatsWorldAliases, "cheats-world-aliases");
+        readCheats(config, cheatsWorldRenames, "cheats-world-renames");
+        readCheats(config, cheatsLevelAliases, "cheats-level-aliases");
+        readCheats(config, cheatsLevelRenames, "cheats-level-renames");
+
+        Config_t::UpdateFromIni(&config, ConfigSetLevel::game_info);
     }
 }
 
@@ -252,4 +281,10 @@ int GameInfo::outroCharacterNext()
         ret = 1;
 
     return ret;
+}
+
+void initGameInfo()
+{
+    g_gameInfo.InitGameInfo();
+    g_gameInfo.LoadGameInfo();
 }

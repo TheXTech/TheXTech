@@ -35,7 +35,6 @@
 #include "pseudo_vb.h"
 #include "gfx.h"
 #include "config.h"
-#include "compat.h"
 #include "npc_traits.h"
 
 #include <Utils/maths.h>
@@ -62,7 +61,7 @@ void GetvScreen(vScreen_t& vscreen)
         vscreen.Y += -vscreen.TempY;
 
         // allow some overscan (needed for 3DS)
-        int allow_X = (g_compatibility.allow_multires && Screens[vscreen.screen_ref].player_count == 1 && !Screens[vscreen.screen_ref].is_canonical()) ? XRender::TargetOverscanX : 0;
+        int allow_X = (g_config.allow_multires && Screens[vscreen.screen_ref].player_count == 1 && !Screens[vscreen.screen_ref].is_canonical()) ? XRender::TargetOverscanX : 0;
 
         // don't do overscan if at the level bounds
         if(allow_X > 0 && level[p.Section].Width - level[p.Section].X <= vscreen.Width)
@@ -153,7 +152,7 @@ void GetvScreenAverage(vScreen_t& vscreen)
     vscreen.Y = (vscreen.Y / B) + (use_height * 0.5) - vScreenYOffset;
 
     // allow some overscan (needed for 3DS)
-    int allow_X = (g_compatibility.allow_multires && Screens[vscreen.screen_ref].player_count == 1 && !Screens[vscreen.screen_ref].is_canonical()) ? XRender::TargetOverscanX : 0;
+    int allow_X = (g_config.allow_multires && Screens[vscreen.screen_ref].player_count == 1 && !Screens[vscreen.screen_ref].is_canonical()) ? XRender::TargetOverscanX : 0;
 
     // don't do overscan if at the level bounds
     if(allow_X > 0 && section.Width - section.X <= vscreen.Width)
@@ -299,7 +298,7 @@ void GetvScreenAverage3(vScreen_t& vscreen)
     vscreen.Y = vscreen.Y / (plr_count + 1) + (use_height * 0.5) - vScreenYOffset;
 
     // allow some overscan (needed for 3DS)
-    int allow_X = (g_compatibility.allow_multires && Screens[vscreen.screen_ref].player_count == 1 && !Screens[vscreen.screen_ref].is_canonical()) ? XRender::TargetOverscanX : 0;
+    int allow_X = (g_config.allow_multires && Screens[vscreen.screen_ref].player_count == 1 && !Screens[vscreen.screen_ref].is_canonical()) ? XRender::TargetOverscanX : 0;
 
     // don't do overscan if at the level bounds
     if(allow_X > 0 && section.Width - section.X <= vscreen.Width)
@@ -560,19 +559,16 @@ void NPCWarpGFX(int A, Location_t &tempLocation, float &X2, float &Y2)
 // change from fullscreen to windowed mode
 void ChangeScreen()
 {
-//    frmMain.LockSize = True
-//    If resChanged = True Then
-    if(resChanged)
+    // shouldn't be possible
+    if(g_config.fullscreen.m_set > ConfigSetLevel::user_config)
     {
-        SetOrigRes();
-        XEvents::doEvents();
-    } else {
-        ChangeRes(0, 0, 0, 0);
-        XEvents::doEvents();
+        PlaySoundMenu(SFX_BlockHit);
+        return;
     }
-//    SaveConfig
+
+    g_config_game_user.fullscreen = !g_config.fullscreen;
+    UpdateConfig();
     SaveConfig();
-//    frmMain.LockSize = False
 }
 
 void GetvScreenCredits(vScreen_t& vscreen)

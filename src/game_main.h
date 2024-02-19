@@ -33,6 +33,7 @@ enum class PauseCode
     DropAdd,
     TextEntry,
     Prompt,
+    Options,
 };
 
 //Public GamePaused As Boolean 'true if the game is paused
@@ -95,8 +96,6 @@ void DeleteSave(int world, int save);
 void CopySave(int world, int src, int dst);
 
 int PauseGame(PauseCode code, int plr = 0);
-
-void OpenConfig_preSetup();
 
 // reload recent episodes from config (used when asset pack changes)
 void ConfigReloadRecentEpisodes();

@@ -2,7 +2,7 @@
  * TheXTech - A platform game engine ported from old source code for VB6
  *
  * Copyright (c) 2009-2011 Andrew Spinks, original VB6 code
- * Copyright (c) 2020-2024 Vitaly Novichkov <admin@wohlnet.ru>
+ * Copyright (c) 2020-2023 Vitaly Novichkov <admin@wohlnet.ru>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,10 +18,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#pragma once
-#ifndef CONFIG_H
-#define CONFIG_H
+#ifndef SCREEN_OPTIONS_H
 
-#include "config/config_main.h"
+#define SCREEN_OPTIONS_H
 
-#endif // CONFIG_H
+namespace OptionsScreen
+{
+
+void Init();
+
+void Render();
+
+// if returns true, user has exited the screen
+bool Logic();
+
+void ResetStrings();
+
+} // namespace OptionsScreen
+
+#endif // SCREEN_OPTIONS_H

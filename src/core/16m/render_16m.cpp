@@ -30,7 +30,6 @@
 #include <Logger/logger.h>
 
 #include "globals.h"
-#include "video.h"
 #include "frame_timer.h"
 
 #include "core/render.h"
@@ -466,7 +465,7 @@ void repaint()
 
     glFlush(0);
 
-    // if(g_videoSettings.scaleMode == SCALE_DYNAMIC_LINEAR)
+    // if(g_config.scale_mode == SCALE_DYNAMIC_LINEAR)
     //     swiWaitForVBlank();
     g_in_frame = false;
 }
@@ -526,7 +525,7 @@ void minport_ApplyViewport()
     int off_x = g_viewport_offset_x;
     int off_y = g_viewport_offset_y;
     // if linear mode is set, consider doing flicker scaling. (DOESN'T WORK)
-    // if((phys_width < g_viewport_w || phys_height < g_viewport_h) && (g_videoSettings.scaleMode == SCALE_DYNAMIC_LINEAR) && (s_current_frame & 1))
+    // if((phys_width < g_viewport_w || phys_height < g_viewport_h) && (g_config.scale_mode == SCALE_DYNAMIC_LINEAR) && (s_current_frame & 1))
     // {
     //     // want to know which pixel in world coordinates is pixel 0.5 in screen coordinates
     //     int half_pixel_x = 0.5 * g_viewport_w / phys_width + 0.5;

@@ -762,6 +762,8 @@ bool Update(bool check_lost_devices = true);
 
 void SaveConfig(IniProcessing *ctl);
 void LoadConfig(IniProcessing *ctl);
+void SaveConfig();
+void LoadConfig();
 
 // null if no input method is ready and being pressed
 // allocates the new InputMethod on the heap

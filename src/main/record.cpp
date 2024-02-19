@@ -37,7 +37,6 @@
 #include "../globals.h"
 #include "../rand.h"
 #include "../frame_timer.h"
-#include "../compat.h"
 #include "../config.h"
 #include "record.h"
 
@@ -134,7 +133,7 @@ static void write_header()
     fprintf(record_file, "Header\r\n");
     fprintf(record_file, "RecordVersion %d\r\n", c_recordVersion); // Version of record file
     fprintf(record_file, "Version %s\r\n", LONG_VERSION); // game version / commit
-    fprintf(record_file, "CompatLevel %d\r\n", CompatGetLevel()); // compatibility mode
+    fprintf(record_file, "CompatLevel %d\r\n", (int)g_config.compatibility_mode); // compatibility mode
     if(FullFileName.compare(0, AppPath.size(), AppPath) == 0)
         fprintf(record_file, "%s\r\n", FullFileName.c_str()+AppPath.size()); // level that was played
     else
@@ -145,7 +144,7 @@ static void write_header()
     fprintf(record_file, "Seed %d\r\n", readSeed());
     fprintf(record_file, "Checkpoint %d\r\n", (Checkpoint == FullFileName) ? 1 : 0);
 
-    if(g_compatibility.fix_vanilla_checkpoints && Checkpoint == FullFileName)
+    if(g_config.fix_vanilla_checkpoints && Checkpoint == FullFileName)
     {
         fprintf(record_file, "Multipoints %d: ", (int)CheckpointsList.size());
 
@@ -217,13 +216,11 @@ static void read_header()
 
     pLogDebug("  at compat level %d", n);
 
-    if(n == 3)
-        n = 2;
-
-    CompatSetEnforcedLevel(n);
-
-    if(CompatGetLevel() < COMPAT_SMBX2)
+    if(n != Config_t::COMPAT_SMBX13)
         pLogWarning("compatibility mode is not a long-term support version. Do not expect identical results.");
+
+    g_config.compatibility_mode = n;
+    UpdateConfig();
 
     fgets(buffer, 1024, replay_file); // level that was played
 
@@ -262,7 +259,7 @@ static void read_header()
 
     Checkpoint = n ? FullFileName : std::string();
 
-    if(g_compatibility.fix_vanilla_checkpoints && Checkpoint == FullFileName)
+    if(g_config.fix_vanilla_checkpoints && Checkpoint == FullFileName)
     {
         CheckpointsList.clear();
         fscanf(replay_file, "Multipoints %d: ", &n);
@@ -328,9 +325,9 @@ static void read_header()
 
     Cheater = true; // important to avoid losing player save data in replay mode.
     TestLevel = false;
-    MaxFPS = true;
-    ShowFPS = true;
-    FrameSkip = false;
+    g_config.unlimited_framerate = true;
+    g_config.show_fps = true;
+    g_config.enable_frameskip = false;
 }
 
 static void write_end()
@@ -777,7 +774,7 @@ void InitRecording()
     if(LevelEditor || GameMenu || GameOutro)
         return;
 
-    if(!g_config.RecordGameplayData && !replay_file)
+    if(!g_config.record_gameplay_data && !replay_file)
         return;
 
     in_level = true;

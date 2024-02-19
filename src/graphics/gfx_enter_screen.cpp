@@ -30,7 +30,6 @@
 #include "../core/render.h"
 #include "../core/events.h"
 #include "../controls.h"
-#include "compat.h"
 #include "pge_delay.h"
 #include "npc_id.h"
 
@@ -211,7 +210,7 @@ void GameThing(int waitms, int fadeSpeed)
                 XEvents::doEvents();
                 computeFrameTime2();
             }
-            if(!MaxFPS)
+            if(!g_config.unlimited_framerate)
                 PGE_Delay(1);
         }
     }

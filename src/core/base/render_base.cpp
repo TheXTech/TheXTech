@@ -50,7 +50,7 @@
 
 #include "main/cheat_code.h"
 
-#include "video.h"
+#include "config.h"
 #include "globals.h"
 #include "sound.h"
 #include "graphics.h"
@@ -604,18 +604,18 @@ void AbstractRender_t::lazyLoad(StdPicture &target)
     // target.h = static_cast<int>(h);
 
     bool shrink2x;
-    switch(g_videoSettings.scaleDownTextures)
+    switch(g_config.scale_down_textures)
     {
-    case VideoSettings_t::SCALE_ALL:
+    case Config_t::SCALE_DOWN_ALL:
         // only do it if the texture isn't already downscaled
         shrink2x = (w >= Uint32(target.w) && h >= Uint32(target.h));
         break;
-    case VideoSettings_t::SCALE_SAFE:
+    case Config_t::SCALE_DOWN_SAFE:
         shrink2x = GraphicsHelps::validateFor2xScaleDown(sourceImage, StdPictureGetOrigPath(target));
         if(maskImage)
             shrink2x &= GraphicsHelps::validateFor2xScaleDown(maskImage, StdPictureGetOrigPath(target));
         break;
-    case VideoSettings_t::SCALE_NONE:
+    case Config_t::SCALE_DOWN_NONE:
     default:
         shrink2x = false;
         break;

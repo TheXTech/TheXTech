@@ -28,8 +28,7 @@
 #include <Utils/maths.h>
 
 #include "render_sdl.h"
-#include "video.h"
-
+#include "config.h"
 #include "core/window.h"
 #include "core/render.h"
 
@@ -75,7 +74,7 @@ bool RenderSDL::isWorking()
     return m_gRenderer && (m_tBuffer || m_tBufferDisabled);
 }
 
-bool RenderSDL::initRender(const CmdLineSetup_t &setup, SDL_Window *window)
+bool RenderSDL::initRender(SDL_Window *window)
 {
     pLogDebug("Init renderer settings...");
 
@@ -86,14 +85,14 @@ bool RenderSDL::initRender(const CmdLineSetup_t &setup, SDL_Window *window)
 
     Uint32 renderFlags = 0;
 
-    switch(setup.renderType)
+    switch(g_config.render_mode)
     {
-    case RENDER_ACCELERATED_SDL:
+    case Config_t::RENDER_ACCELERATED_SDL:
     default:
-        if(setup.vSync)
+        if(g_config.render_vsync)
         {
             renderFlags = SDL_RENDERER_ACCELERATED|SDL_RENDERER_PRESENTVSYNC;
-            g_videoSettings.renderModeObtained = RENDER_ACCELERATED_SDL;
+            g_config.render_mode.obtained = Config_t::RENDER_ACCELERATED_SDL;
             pLogDebug("Using accelerated rendering with a vertical synchronization");
             m_gRenderer = SDL_CreateRenderer(window, -1, renderFlags | SDL_RENDERER_TARGETTEXTURE); // Try to make renderer
             if(m_gRenderer)
@@ -104,7 +103,7 @@ bool RenderSDL::initRender(const CmdLineSetup_t &setup, SDL_Window *window)
         // continue
 
         renderFlags = SDL_RENDERER_ACCELERATED;
-        g_videoSettings.renderModeObtained = RENDER_ACCELERATED_SDL;
+        g_config.render_mode.obtained = Config_t::RENDER_ACCELERATED_SDL;
         pLogDebug("Using accelerated rendering");
         m_gRenderer = SDL_CreateRenderer(window, -1, renderFlags | SDL_RENDERER_TARGETTEXTURE); // Try to make renderer
         if(m_gRenderer)
@@ -112,9 +111,9 @@ bool RenderSDL::initRender(const CmdLineSetup_t &setup, SDL_Window *window)
         pLogWarning("Failed to initialize accelerated renderer, trying to create a software renderer...");
 
         // fallthrough
-    case RENDER_SOFTWARE:
+    case Config_t::RENDER_SOFTWARE:
         renderFlags = SDL_RENDERER_SOFTWARE;
-        g_videoSettings.renderModeObtained = RENDER_SOFTWARE;
+        g_config.render_mode.obtained = Config_t::RENDER_SOFTWARE;
         pLogDebug("Using software rendering");
         m_gRenderer = SDL_CreateRenderer(window, -1, renderFlags | SDL_RENDERER_TARGETTEXTURE); // Try to make renderer
         if(m_gRenderer)
@@ -264,13 +263,13 @@ void RenderSDL::updateViewport()
 
     float scale = SDL_min(scale_x, scale_y);
 
-    if(g_videoSettings.scaleMode == SCALE_FIXED_05X && scale > 0.5f)
+    if(g_config.scale_mode == Config_t::SCALE_FIXED_05X && scale > 0.5f)
         scale = 0.5f;
-    if(g_videoSettings.scaleMode == SCALE_DYNAMIC_INTEGER && scale > 1.f)
+    if(g_config.scale_mode == Config_t::SCALE_DYNAMIC_INTEGER && scale > 1.f)
         scale = std::floor(scale);
-    if(g_videoSettings.scaleMode == SCALE_FIXED_1X && scale > 1.f)
+    if(g_config.scale_mode == Config_t::SCALE_FIXED_1X && scale > 1.f)
         scale = 1.f;
-    if(g_videoSettings.scaleMode == SCALE_FIXED_2X && scale > 2.f)
+    if(g_config.scale_mode == Config_t::SCALE_FIXED_2X && scale > 2.f)
         scale = 2.f;
 
     int game_w = scale * XRender::TargetW;
@@ -296,7 +295,7 @@ void RenderSDL::updateViewport()
     m_viewport_h = XRender::TargetH;
 
     // update render targets
-    if(ScaleWidth != XRender::TargetW || ScaleHeight != XRender::TargetH || m_current_scale_mode != g_videoSettings.scaleMode)
+    if(ScaleWidth != XRender::TargetW || ScaleHeight != XRender::TargetH || m_current_scale_mode != g_config.scale_mode)
     {
 #ifdef USE_SCREENSHOTS_AND_RECS
         // invalidates GIF recorder handle
@@ -305,7 +304,7 @@ void RenderSDL::updateViewport()
 #endif
 
         // update video settings
-        if(g_videoSettings.scaleMode == SCALE_DYNAMIC_LINEAR || scale < 0.5f)
+        if(g_config.scale_mode == Config_t::SCALE_DYNAMIC_LINEAR || scale < 0.5f)
             SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
         else
             SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");
@@ -319,8 +318,12 @@ void RenderSDL::updateViewport()
 
         ScaleWidth = XRender::TargetW;
         ScaleHeight = XRender::TargetH;
-        m_current_scale_mode = g_videoSettings.scaleMode;
+        m_current_scale_mode = g_config.scale_mode;
     }
+
+#if SDL_COMPILEDVERSION >= SDL_VERSIONNUM(2, 0, 18)
+    SDL_RenderSetVSync(m_gRenderer, g_config.render_vsync);
+#endif
 }
 
 void RenderSDL::resetViewport()

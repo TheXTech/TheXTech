@@ -46,7 +46,6 @@
 
 #include "config.h"
 #include "frame_timer.h"
-#include "compat.h"
 #include "blocks.h"
 #include "change_res.h"
 #include "collision.h"
@@ -86,7 +85,6 @@
 
 #include "controls.h"
 
-#include "config.h"
 #include "main/screen_connect.h"
 #include "main/screen_quickreconnect.h"
 #include "main/screen_asset_pack.h"
@@ -296,18 +294,6 @@ int GameMain(const CmdLineSetup_t &setup)
 //    LB = "\n";
 //    EoT = "";
 
-    FrameSkip = setup.frameSkip;
-    noSound = setup.noSound;
-    neverPause = setup.neverPause;
-
-    CompatSetEnforcedLevel(setup.compatibilityLevel);
-
-    g_speedRunnerMode = setup.speedRunnerMode;
-    g_drawController |= setup.showControllerState;
-    speedRun_setSemitransparentRender(setup.speedRunnerSemiTransparent);
-    speedRun_setBlinkEffect(setup.speedRunnerBlinkEffect);
-
-    ResetCompat();
     // moved into MainLoadAll
     // cheats_reset();
 
@@ -364,11 +350,6 @@ int GameMain(const CmdLineSetup_t &setup)
 
     LoadingInProcess = true;
 
-    ShowFPS = setup.testShowFPS;
-    MaxFPS = setup.testMaxFPS; // || (g_videoSettings.renderModeObtained == RENDER_ACCELERATED_VSYNC);
-
-    OpenConfig();
-
     XEvents::doEvents();
 
 #ifdef __EMSCRIPTEN__ // Workaround for a recent Chrome's policy to avoid sudden sound without user's interaction
@@ -389,8 +370,7 @@ int GameMain(const CmdLineSetup_t &setup)
     }
 #endif
 
-    if(!noSound)
-        InitMixerX();
+    InitMixerX();
 
 #ifndef PGE_NO_THREADING
     gfxLoaderThreadingMode = true;
@@ -419,7 +399,7 @@ int GameMain(const CmdLineSetup_t &setup)
     XRender::repaint();
     XEvents::doEvents();
 
-    if(!neverPause && !XWindow::hasWindowInputFocus())
+    if(!g_config.background_work && !XWindow::hasWindowInputFocus())
         SoundPauseEngine(1);
 
     if(!setup.testLevel.empty() || !setup.testReplay.empty() || setup.interprocess) // Start level testing immediately!
@@ -558,7 +538,7 @@ int GameMain(const CmdLineSetup_t &setup)
             XWindow::setCursor(CURSOR_NONE);
             XWindow::showCursor(0);
         }
-        else if(!resChanged)
+        else if(!g_config.fullscreen)
         {
             XWindow::setCursor(CURSOR_DEFAULT);
             XWindow::showCursor(1);
@@ -807,6 +787,7 @@ int GameMain(const CmdLineSetup_t &setup)
             g_ForceBitmaskMerge = false;
             g_ClonedPlayerMode = false;
             g_CheatLogicScreen = false;
+            g_CheatEditYourFriends = false;
             XRender::unloadGifTextures();
 
             // reinitialize the screens (resets multiplayer preferences)
@@ -948,7 +929,7 @@ int GameMain(const CmdLineSetup_t &setup)
                 FullFileName = FileNamePath + FileNameFull;
             }
 
-            LoadCustomCompat();
+            LoadCustomConfig();
             FindCustomPlayers();
             LoadCustomGFX();
             LoadCustomSound();
@@ -1176,7 +1157,7 @@ int GameMain(const CmdLineSetup_t &setup)
                     StartWarp = 0;
 
                     // fix a bug where ReturnWarp (from different level) would be used at hub after death if StartWarp was set for hub
-                    if(IsHubLevel && g_compatibility.enable_last_warp_hub_resume)
+                    if(IsHubLevel && g_config.enable_last_warp_hub_resume)
                         ReturnWarp = 0;
                 }
                 else
@@ -1216,7 +1197,7 @@ int GameMain(const CmdLineSetup_t &setup)
 
                 PauseGame(PauseCode::Message);
 
-                if(g_compatibility.modern_lives_system)
+                if(g_config.modern_lives_system)
                     ++g_100s;
                 else
                     ++Lives;
@@ -1425,7 +1406,7 @@ void KillIt()
     Integrator::initIntegrations();
 #ifndef RENDER_FULLSCREEN_ALWAYS
     XWindow::hide();
-    if(resChanged)
+    if(g_config.fullscreen)
         SetOrigRes();
 #else
     XRender::clearBuffer();
@@ -1457,7 +1438,7 @@ void NextLevel()
     XRender::repaint();
     XEvents::doEvents();
 
-    if(!TestLevel && GoToLevel.empty() && !NoMap && !MaxFPS)
+    if(!TestLevel && GoToLevel.empty() && !NoMap && !g_config.unlimited_framerate)
         PGE_Delay(500);
 
     if(BattleMode && !LevelEditor && !TestLevel)
@@ -1634,7 +1615,7 @@ void UpdateMacro()
                 return;
             }
 
-            if(!MaxFPS)
+            if(!g_config.unlimited_framerate)
                 PGE_Delay(1);
         } while(true);
 
@@ -1845,7 +1826,7 @@ void CheckActive()
 //    bool MusicPaused = false;
     bool focusLost = false;
 
-    if(neverPause)
+    if(g_config.background_work)
         return;
 
     if(!GameIsActive)
@@ -1976,7 +1957,7 @@ void MoreScore(int addScore, const Location_t &Loc, vbint_t &Multiplier)
 
     if(Points[A] <= 5)
     {
-        if(g_compatibility.modern_lives_system)
+        if(g_config.modern_lives_system)
             g_100s += Points[A];
         else
             Lives += Points[A];
@@ -1992,7 +1973,7 @@ void MoreScore(int addScore, const Location_t &Loc, vbint_t &Multiplier)
 
 void Got100Coins()
 {
-    if(g_compatibility.modern_lives_system)
+    if(g_config.modern_lives_system)
     {
         if(g_100s < 9999)
         {
@@ -2106,7 +2087,7 @@ void StartEpisode()
     XEvents::doEvents();
 
     // Note: this causes the rendered touchscreen controller to freeze with button pressed.
-    if(!MaxFPS)
+    if(!g_config.unlimited_framerate)
         PGE_Delay(500);
 
     ClearGame();
@@ -2247,7 +2228,7 @@ void StartBattleMode()
     StopMusic();
     XEvents::doEvents();
 
-    if(!MaxFPS)
+    if(!g_config.unlimited_framerate)
         PGE_Delay(500);
 
     lunaReset();

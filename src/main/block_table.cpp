@@ -21,7 +21,7 @@
 #include <algorithm>
 
 #include "layers.h"
-#include "compat.h"
+#include "config.h"
 
 #include "main/block_table.h"
 #include "main/block_table.hpp"
@@ -144,7 +144,7 @@ struct TableInterface
 
         // NOTE: there are extremely rare cases when these margins are not sufficient for full compatibility
         //   (such as, when an item is trapped inside a wall during !BlocksSorted)
-        if(g_compatibility.emulate_classic_block_order)
+        if(g_config.emulate_classic_block_order)
         {
             loc.l -= 32;
             loc.r += 32;
@@ -182,7 +182,7 @@ struct TableInterface
 
         if(sort_mode == SORTMODE_COMPAT)
         {
-            if(g_compatibility.emulate_classic_block_order)
+            if(g_config.emulate_classic_block_order)
                 sort_mode = SORTMODE_ID;
             else
                 sort_mode = SORTMODE_LOC;
@@ -411,7 +411,7 @@ TreeResult_Sentinel<BlockRef_t> treeTempBlockQuery(const Location_t &_loc,
 
     // NOTE: there are extremely rare cases when these margins are not sufficient for full compatibility
     //   (such as, when an item is trapped inside a wall during !BlocksSorted)
-    if(g_compatibility.emulate_classic_block_order)
+    if(g_config.emulate_classic_block_order)
     {
         loc.l -= 32;
         loc.r += 32;
@@ -499,7 +499,7 @@ TreeResult_Sentinel<BlockRef_t> treeBlockQueryWithTemp(const Location_t &_loc,
 
     // NOTE: there are extremely rare cases when these margins are not sufficient for full compatibility
     //   (such as, when an item is trapped inside a wall during !BlocksSorted)
-    if(g_compatibility.emulate_classic_block_order)
+    if(g_config.emulate_classic_block_order)
     {
         loc.X -= 32;
         loc.Y -= 32;
@@ -720,7 +720,7 @@ void treeNPCQuery(std::vector<BaseRef_t>& out, const Location_t &_loc, int sort_
 
     // NOTE: there are extremely rare cases when these margins are not sufficient for full compatibility
     //   (such as, when an item is trapped inside a wall during !BlocksSorted)
-    if(g_compatibility.emulate_classic_block_order)
+    if(g_config.emulate_classic_block_order)
     {
         loc.l -= 32;
         loc.r += 32;

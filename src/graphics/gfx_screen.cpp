@@ -30,7 +30,6 @@
 #include "../compat.h"
 #include "config.h"
 
-#include "../compat.h"
 #include "config.h"
 #include "core/render.h"
 
@@ -214,7 +213,7 @@ void DynamicScreen(Screen_t& screen, bool mute)
             const Location_t& section = level[p1.Section];
 
             // use canonical width for checks in NoTurnBack case
-            bool shrink_screen = (NoTurnBack[p1.Section] && g_compatibility.allow_multires);
+            bool shrink_screen = (NoTurnBack[p1.Section] && g_config.allow_multires);
             const double check_W = shrink_screen ? screen.canonical_screen().W : screen.W;
 
             // a number of clauses check whether the section is larger than the screen
@@ -226,7 +225,7 @@ void DynamicScreen(Screen_t& screen, bool mute)
             // vScreen 1. It was likely a vestige from before the GetvScreenAverage call above was added. It must be removed if modern_section_change is set,
             // because if qScreen is active for vScreen2 (impossible prior to modern section change), the checks no longer work.
             const vScreen_t& p2_compare_vscreen = vscreen1;
-            bool use_vscreen2 = !g_compatibility.modern_section_change && vscreen2.Visible;
+            bool use_vscreen2 = !g_config.modern_section_change && vscreen2.Visible;
             const vScreen_t& p1_compare_vscreen = use_vscreen2 ? vscreen2 : vscreen1;
 
             // explanation of logic (example of first case, all are similar):
@@ -482,7 +481,7 @@ void CenterScreens(Screen_t& screen)
         bool no_turn_back = NoTurnBack[p.Section];
 
         // restrict single vScreens on NoTurnBack sections
-        if(g_compatibility.allow_multires && no_turn_back)
+        if(g_config.allow_multires && no_turn_back)
         {
             MaxWidth = SDL_min(MaxWidth, static_cast<double>(screen.canonical_screen().W));
 
@@ -492,7 +491,7 @@ void CenterScreens(Screen_t& screen)
         }
 
         // allow the canonical vScreens to approach normal screen size during dynamic screen
-        if(g_compatibility.allow_multires && !screen.Visible && !no_turn_back)
+        if(g_config.allow_multires && !screen.Visible && !no_turn_back)
         {
             MinWidth = screen.W;
             MinHeight = screen.H;
@@ -570,7 +569,7 @@ void CenterScreens()
 // NEW: moves qScreen towards vScreen, now including the screen size
 bool Update_qScreen(int Z, double camRate, double resizeRate)
 {
-    if(Z == 2 && !g_compatibility.modern_section_change)
+    if(Z == 2 && !g_config.modern_section_change)
         return false;
 
     bool continue_qScreen = true;
@@ -587,7 +586,7 @@ bool Update_qScreen(int Z, double camRate, double resizeRate)
     double camFramesY = std::abs(vScreen[Z].Y - qScreenLoc[Z].Y) / camRateY;
 
     // qScreenLoc Width and Height values are only valid if modern section change is disabled
-    if(g_compatibility.modern_section_change)
+    if(g_config.modern_section_change)
     {
         double camFramesX_r = std::abs(vScreen[Z].X - vScreen[Z].Width - qScreenLoc[Z].X + qScreenLoc[Z].Width) / camRateX;
         double camFramesY_b = std::abs(vScreen[Z].Y - vScreen[Z].Height - qScreenLoc[Z].Y + qScreenLoc[Z].Height) / camRateY;
@@ -599,7 +598,7 @@ bool Update_qScreen(int Z, double camRate, double resizeRate)
     double resizeFramesX = std::abs(vScreen[Z].Width - qScreenLoc[Z].Width) / resizeRateX;
     double resizeFramesY = std::abs(vScreen[Z].Height - qScreenLoc[Z].Height) / resizeRateY;
 
-    if(!g_compatibility.modern_section_change)
+    if(!g_config.modern_section_change)
     {
         resizeFramesX = 0;
         resizeFramesY = 0;
@@ -615,7 +614,7 @@ bool Update_qScreen(int Z, double camRate, double resizeRate)
 
     // but, the original condition occurred *after* adding/subtracting 2, so actually
     // the original game would not continue if it would arrive the frame after next, too
-    if(!g_compatibility.modern_section_change && qFramesX < 3.5 && qFramesY < 3.5)
+    if(!g_config.modern_section_change && qFramesX < 3.5 && qFramesY < 3.5)
         continue_qScreen = false;
 
     if(qFramesX < 1)
@@ -678,7 +677,7 @@ bool Update_qScreen(int Z, double camRate, double resizeRate)
     vScreen[Z].Y = qScreenLoc[Z].Y;
 
     // update vScreen width / height
-    if(g_compatibility.modern_section_change)
+    if(g_config.modern_section_change)
     {
         vScreen[Z].Width = std::floor(qScreenLoc[Z].Width / 2) * 2;
         vScreen[Z].Height = std::floor(qScreenLoc[Z].Height / 2) * 2;

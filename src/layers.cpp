@@ -32,10 +32,9 @@
 #include "sound.h"
 #include "graphics.h"
 #include "game_main.h"
-#include "compat.h"
+#include "config.h"
 #include "frame_timer.h"
 #include "main/speedrunner.h"
-#include "compat.h"
 #include "editor.h"
 #include "blocks.h"
 #include "main/trees.h"
@@ -728,7 +727,7 @@ void ProcEvent(eventindex_t index, int whichPlayer, bool NoEffect)
         {
             recentlyTriggeredEvents.insert(index);
 
-            if(g_compatibility.speedrun_stop_timer_by == Compatibility_t::SPEEDRUN_STOP_EVENT && equalCase(evt.Name.c_str(), g_compatibility.speedrun_stop_timer_at))
+            if(g_config.speedrun_stop_timer_by == Config_t::SPEEDRUN_STOP_EVENT && equalCase(evt.Name.c_str(), g_config.speedrun_stop_timer_at))
                 speedRun_bossDeadEvent();
 
             for(B = 0; B <= numSections; B++)
@@ -770,7 +769,7 @@ void ProcEvent(eventindex_t index, int whichPlayer, bool NoEffect)
                 bool is_reset = int(s.position.X) == EventSection_t::LESet_ResetDefault;
 
                 /* Resize the section boundaries */
-                if(is_reset && !g_compatibility.modern_section_change)
+                if(is_reset && !g_config.modern_section_change)
                 {
                     level[B] = LevelREAL[B];
                     UpdateSectionOverlaps(B);
@@ -807,7 +806,7 @@ void ProcEvent(eventindex_t index, int whichPlayer, bool NoEffect)
 
                                 // If .Section = B Then
                                 // Should set this only if the warp is successful!
-                                if(!g_compatibility.modern_section_change)
+                                if(!g_config.modern_section_change)
                                     Player[C].Section = B;
 
                                 tempBool = false;
@@ -865,7 +864,7 @@ void ProcEvent(eventindex_t index, int whichPlayer, bool NoEffect)
                         }
 
                         // start the modern qScreen animation
-                        if(!equalCase(evt.Name, "Level - Start") && g_compatibility.modern_section_change)
+                        if(!equalCase(evt.Name, "Level - Start") && g_config.modern_section_change)
                         {
                             // check that the onscreen player is here
                             if(onscreen_plr == 0 && warped_plr == 0)
@@ -1248,7 +1247,7 @@ void ProcEvent(eventindex_t index, int whichPlayer, bool NoEffect)
                         Block[C].Location.SpeedY = double(Layer[B].SpeedY);
                     }
 
-                    if(g_compatibility.enable_climb_bgo_layer_move)
+                    if(g_config.fix_climb_bgo_layer_move)
                     {
                         for(int C : Layer[B].BGOs)
                         {
@@ -1290,7 +1289,7 @@ void ProcEvent(eventindex_t index, int whichPlayer, bool NoEffect)
 
             if(!AutoUseModern) // Use legacy auto-scrolling when modern autoscrolling was never used here
             {
-                if(g_compatibility.fix_autoscroll_speed)
+                if(g_config.fix_autoscroll_speed)
                 {
                     if(!autoScrollerChanged)
                     {
@@ -1317,7 +1316,7 @@ void ProcEvent(eventindex_t index, int whichPlayer, bool NoEffect)
                 bool player_valid = whichPlayer >= 1 && whichPlayer <= numPlayers;
                 preProcessMessage(MessageText, player_valid ? whichPlayer : -1);
 
-                bool use_player_pause = (player_valid && g_compatibility.multiplayer_pause_controls);
+                bool use_player_pause = (player_valid && g_config.multiplayer_pause_controls);
                 PauseGame(PauseCode::Message, use_player_pause ? whichPlayer : 0);
 
                 MessageText = "";
@@ -1541,7 +1540,7 @@ void UpdateLayers()
                     Block[B].Location.SpeedY = 0;
                 }
 
-                if(g_compatibility.enable_climb_bgo_layer_move)
+                if(g_config.fix_climb_bgo_layer_move)
                 {
                     for(int B : Layer[A].BGOs)
                     {
@@ -1553,7 +1552,7 @@ void UpdateLayers()
                     }
                 }
 
-                if(g_compatibility.enable_climb_bgo_layer_move)
+                if(g_config.fix_climb_bgo_layer_move)
                 {
                     for(int B : Layer[A].NPCs)
                     {
@@ -1576,7 +1575,7 @@ void UpdateLayers()
 
                 // no longer needed thanks to block quadtree, but used to reproduce some buggy behaviors
                 // move the sort invalidation out of the loop over blocks
-                if(!Layer[A].blocks.empty() && Layer[A].SpeedX != 0.f && g_compatibility.emulate_classic_block_order)
+                if(!Layer[A].blocks.empty() && Layer[A].SpeedX != 0.f && g_config.emulate_classic_block_order)
                 {
                     if(BlocksSorted)
                         BlocksSorted = false;
@@ -1625,7 +1624,7 @@ void UpdateLayers()
                     //{
                     Background[B].Location.X += double(Layer[A].SpeedX);
                     Background[B].Location.Y += double(Layer[A].SpeedY);
-                    if(g_compatibility.enable_climb_bgo_layer_move && BackgroundFence[Background[B].Type])
+                    if(g_config.fix_climb_bgo_layer_move && BackgroundFence[Background[B].Type])
                     {
                         Background[B].Location.SpeedX = double(Layer[A].SpeedX);
                         Background[B].Location.SpeedY = double(Layer[A].SpeedY);

@@ -24,21 +24,18 @@
 #include "globals.h"
 #include "graphics.h"
 #include "core/render.h"
-#include "compat.h"
+#include "config.h"
 #include "../controls.h"
 
 #include "main/screen_quickreconnect.h"
 
 #include "gameplay_timer.h"
 
-
 static      GameplayTimer s_gamePlayTimer;
-int                       g_speedRunnerMode = SPEEDRUN_MODE_OFF;
-bool                      g_drawController = false;
 
 void speedRun_loadStats()
 {
-    if(g_speedRunnerMode == SPEEDRUN_MODE_OFF)
+    if(!g_config.enable_playtime_counter)
         return; // Do nothing
 
     s_gamePlayTimer.load();
@@ -46,7 +43,7 @@ void speedRun_loadStats()
 
 void speedRun_saveStats()
 {
-    if(g_speedRunnerMode == SPEEDRUN_MODE_OFF)
+    if(!g_config.enable_playtime_counter)
         return; // Do nothing
     if(GameMenu || GameOutro || BattleMode)
         return; // Do nothing when out of the game
@@ -56,7 +53,7 @@ void speedRun_saveStats()
 
 void speedRun_resetCurrent()
 {
-    if(g_speedRunnerMode == SPEEDRUN_MODE_OFF)
+    if(!g_config.enable_playtime_counter)
         return; // Do nothing
 
     s_gamePlayTimer.resetCurrent();
@@ -64,7 +61,7 @@ void speedRun_resetCurrent()
 
 void speedRun_resetTotal()
 {
-    if(g_speedRunnerMode == SPEEDRUN_MODE_OFF)
+    if(!g_config.enable_playtime_counter)
         return; // Do nothing
 
     s_gamePlayTimer.reset();
@@ -87,14 +84,21 @@ static Controls_t s_displayControls[maxLocalPlayers] = {Controls_t()};
 
 void speedRun_renderTimer()
 {
-    if(g_speedRunnerMode == SPEEDRUN_MODE_OFF)
+    if((g_config.speedrun_mode == SPEEDRUN_MODE_OFF && g_config.show_playtime_counter == Config_t::PLAYTIME_COUNTER_OFF) || !g_config.enable_playtime_counter)
         return; // Do nothing
+
+    if(g_config.speedrun_mode != SPEEDRUN_MODE_OFF)
+    {
+        SuperPrintRightAlign(fmt::format_ne(Cheater ? "CMode {0}" : "Mode {0}", g_config.speedrun_mode), 3, XRender::TargetW - XRender::TargetOverscanX - 2, 2, XTColorF(1.f, 0.3f, 0.3f, 0.5f));
+
+        if(g_config.allow_multires)
+            SuperPrintRightAlign(fmt::format_ne("{0}x{1}", l_screen->W, l_screen->H), 3, XRender::TargetW - XRender::TargetOverscanX - 2, 22, XTColorF(1.f, 0.3f, 0.3f, 0.5f));
+    }
 
     if(GameMenu || GameOutro || BattleMode)
         return; // Don't draw things at Menu and Outro
 
     s_gamePlayTimer.render();
-    SuperPrintRightAlign(fmt::format_ne(Cheater ? "CMode {0}" : "Mode {0}", g_speedRunnerMode), 3, XRender::TargetW - XRender::TargetOverscanX - 2, 2, XTColorF(1.f, 0.3f, 0.3f, 0.5f));
 }
 
 static void GetControllerColor(int player, XTColor& color, bool* drawLabel = nullptr)
@@ -385,7 +389,7 @@ void speedRun_renderControls(int player, int screenZ, int align)
         by = y + 4;
     }
 
-    bool show_always = (g_speedRunnerMode != SPEEDRUN_MODE_OFF || g_drawController);
+    bool show_always = g_config.show_controllers;
     bool show_controls = false;
 
     // render controls if enabled or quick-reconnect logic is active
@@ -468,7 +472,7 @@ void speedRun_renderControls(int player, int screenZ, int align)
 
 void speedRun_tick()
 {
-    if(g_speedRunnerMode == SPEEDRUN_MODE_OFF)
+    if(!g_config.enable_playtime_counter)
         return; // Do nothing
 
     s_gamePlayTimer.tick();
@@ -476,54 +480,38 @@ void speedRun_tick()
 
 void speedRun_triggerEnter()
 {
-    if(g_speedRunnerMode == SPEEDRUN_MODE_OFF)
+    if(!g_config.enable_playtime_counter)
         return; // Do nothing
 
-    if(g_compatibility.speedrun_stop_timer_by != Compatibility_t::SPEEDRUN_STOP_ENTER_LEVEL)
+    if(g_config.speedrun_stop_timer_by != Config_t::SPEEDRUN_STOP_ENTER_LEVEL)
         return;
 
-    if(SDL_strcasecmp(FileName.c_str(), g_compatibility.speedrun_stop_timer_at) == 0)
+    if(SDL_strcasecmp(FileName.c_str(), static_cast<const std::string&>(g_config.speedrun_stop_timer_at).c_str()) == 0)
         speedRun_bossDeadEvent();
 }
 
 void speedRun_triggerLeave()
 {
-    if(g_speedRunnerMode == SPEEDRUN_MODE_OFF)
+    if(!g_config.enable_playtime_counter)
         return; // Do nothing
 
-    if(g_compatibility.speedrun_stop_timer_by != Compatibility_t::SPEEDRUN_STOP_LEAVE_LEVEL)
+    if(g_config.speedrun_stop_timer_by != Config_t::SPEEDRUN_STOP_LEAVE_LEVEL)
         return;
 
-    if(SDL_strcasecmp(FileName.c_str(), g_compatibility.speedrun_stop_timer_at) == 0)
+    if(SDL_strcasecmp(FileName.c_str(), static_cast<const std::string&>(g_config.speedrun_stop_timer_at).c_str()) == 0)
         speedRun_bossDeadEvent();
 }
 
 
 void speedRun_bossDeadEvent()
 {
-    if(g_speedRunnerMode == SPEEDRUN_MODE_OFF)
+    if(!g_config.enable_playtime_counter)
         return; // Do nothing
 
     if(GameMenu || GameOutro || BattleMode)
         return; // Don't draw things at Menu and Outro
 
     s_gamePlayTimer.onBossDead();
-}
-
-void speedRun_setSemitransparentRender(bool r)
-{
-    if(g_speedRunnerMode == SPEEDRUN_MODE_OFF)
-        return; // Do nothing
-
-    s_gamePlayTimer.setSemitransparent(r);
-}
-
-void speedRun_setBlinkEffect(int be)
-{
-    if(g_speedRunnerMode == SPEEDRUN_MODE_OFF)
-        return; // Do nothing
-
-    s_gamePlayTimer.setBlinkEffect(be);
 }
 
 void speedRun_syncControlKeys(int plr, const Controls_t &keys)

@@ -26,8 +26,8 @@
 #include "mememu.h"
 #include "globals.h"
 #include "global_constants.h"
+#include "config.h"
 #include "layers.h"
-#include "compat.h"
 #include "game_main.h" // GamePaused
 #include "main/trees.h" // treeNPCUpdate
 #include "npc/npc_queues.h"
@@ -563,7 +563,7 @@ public:
         insert(0x00B2C5AC, // HUD lives count
             [](FIELDTYPE ftype)->double
             {
-                int tmp = g_compatibility.modern_lives_system ? g_100s : Lives;
+                int tmp = g_config.modern_lives_system ? g_100s : Lives;
                 if(tmp < 0)
                     tmp = 0;
                 if(tmp > 99)
@@ -572,7 +572,7 @@ public:
             },
             [](double in, FIELDTYPE ftype)->void
             {
-                if(!g_compatibility.modern_lives_system)
+                if(!g_config.modern_lives_system)
                     memToValue(Lives, in, ftype);
 
                 int old = g_100s;
@@ -592,9 +592,10 @@ public:
 
         insert(0x00B2C62C, &PSwitchTime); // P-Switch Timer
         insert(0x00B2C62E, &PSwitchStop); // Stopwatch Timer
-
         insert(0x00B2C630, &PSwitchPlayer); // P-Switch/Stopwatch Player
-        insert(0x00B2C684, &FrameSkip);
+
+        // FIXME: properly report as modified when set
+        insert(0x00B2C684, &g_config.enable_frameskip.m_value);
 
         insert(0x00B2C6DC, &Physics.PlayerJumpHeight);
         insert(0x00B2C6DE, &Physics.PlayerBlockJumpHeight);
@@ -661,7 +662,9 @@ public:
         insert(0x00B2C8B6, &CaptainN);
         insert(0x00B2C8B8, &FlameThrower);
         insert(0x00B2C8BA, &CoinMode);
-        insert(0x00B2C8BE, &MaxFPS);
+
+        // FIXME: properly report as modified when set
+        insert(0x00B2C8BE, &g_config.unlimited_framerate.m_value);
         insert(0x00B2C8C0, &GodMode);
         insert(0x00B2C8C2, &GrabAll);
 
@@ -681,8 +684,10 @@ public:
         insert(0x00B2D6D0, &MenuMouseRelease);
         insert(0x00B2D6D2, &SharedCursor.Move);
         insert(0x00B2D710, &numEvents);
-        // insert(0x00B2D734, &noSound); // deprecated, can read g_mixerLoaded
         insert(0x00B2D740, &BattleMode);
+        // was previously unlinked with sound engine status, replaced by (1) !g_config.audio_enable and (2) !g_mixerLoaded
+        // If we wanted to reimplement, should probably read from (2) and write to (1), including the (expensive!) UpdateConfig hook
+        // insert(0x00B2D734, &noSound);
     }
 
     double getValue(size_t address, FIELDTYPE ftype)

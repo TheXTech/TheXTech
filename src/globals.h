@@ -1227,8 +1227,11 @@ extern RangeArr<Player_t, 1, maxLocalPlayers> testPlayer;
 extern bool ClearBuffer;
 //Public numLocked As Integer
 extern int numLocked;
+
+
+// replaced with g_config.fullscreen
 //Public resChanged As Boolean 'true if in fullscreen mode
-extern bool resChanged;
+// extern bool resChanged;
 
 
 // NEW: start warp for a test level
@@ -1268,11 +1271,13 @@ extern UTF8CharMap_t MessageTextMap;
 //extern RangeArr<SelectWorld_t, 1, maxSelectWorlds> SelectWorld;
 // extern std::vector<SelectWorld_t> SelectWorld;
 
+extern std::string g_recentAssetPack;
 extern std::string g_recentWorld1p;
 extern std::string g_recentWorld2p;
 extern std::string g_recentWorldEditor;
+// replaced with g_config.show_fps
 //Public ShowFPS As Boolean
-extern bool ShowFPS;
+// extern bool ShowFPS;
 //Public PrintFPS As Double
 extern double PrintFPS;
 
@@ -1309,6 +1314,7 @@ struct SelectWorld_t
 //    blockChar(1 To numCharacters) As Boolean
     RangeArrI<bool, 1, numCharacters, false> blockChar;
 // EXTRA:
+    bool bugfixes_on_by_default = false;
     bool editable = false;
     bool highlight = false;
     bool disabled = false;
@@ -1907,6 +1913,7 @@ struct SaveSlotInfo_t
     bool    FailsEnabled = false;
     int32_t Fails = 0;
     int32_t Score = 0;
+    int ConfigDefaults = 0;
 
     RangeArr<SavedChar_t, 1, 5> SavedChar;
 
@@ -1939,8 +1946,9 @@ extern bool BeatTheGame;
 //extern double fpsTime;
 //Public fpsCount As Double
 //extern double fpsCount;
+// replaced with g_config.enable_frameskip
 //Public FrameSkip As Boolean
-extern bool FrameSkip;
+// extern bool FrameSkip;
 //Public GoalTime As Double
 //extern double GoalTime;
 //Public overTime As Double
@@ -2083,8 +2091,9 @@ extern bool FlameThrower;
 extern bool CoinMode;
 //Public WorldUnlock As Boolean
 extern bool WorldUnlock;
+// replaced with g_config.unlimited_framerate
 //Public MaxFPS As Boolean
-extern bool MaxFPS;
+// extern bool MaxFPS;
 //Public GodMode As Boolean
 extern bool GodMode;
 //Public GrabAll As Boolean
@@ -2412,9 +2421,12 @@ extern int SyncCount;
 extern bool noUpdate;
 //Public gameTime As Double
 //extern double gameTime;
+
+// deprecated by g_config.audio_enable
 //Public noSound As Boolean
-extern bool noSound;
-extern bool neverPause;
+//extern bool noSound;
+
+//extern bool neverPause;
 //Public tempTime As Double
 //extern double tempTime;
 //Dim ScrollDelay As Integer [in main.cpp]

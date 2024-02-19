@@ -41,7 +41,7 @@ extern void SetDefaultIO(FreeImageIO *io);
 #include "sdl_proxy/sdl_stdinc.h"
 
 #include "globals.h"
-#include "video.h"
+#include "config.h"
 #include "frame_timer.h"
 #include "main/cheat_code.h"
 #include "core/render.h"
@@ -771,7 +771,7 @@ void minport_ApplyPhysCoords()
 
     g_screen_swapped = should_swap_screen();
 
-    GPU_TEXTURE_FILTER_PARAM filter = (g_videoSettings.scaleMode == SCALE_DYNAMIC_LINEAR || g_videoSettings.scaleMode == SCALE_FIXED_05X)
+    GPU_TEXTURE_FILTER_PARAM filter = (g_config.scale_mode == Config_t::SCALE_DYNAMIC_LINEAR || g_config.scale_mode == Config_t::SCALE_FIXED_05X)
         ? GPU_LINEAR
         : GPU_NEAREST;
 

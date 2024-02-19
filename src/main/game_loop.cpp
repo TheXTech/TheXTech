@@ -25,7 +25,6 @@
 
 #include "../globals.h"
 #include "../config.h"
-#include "../compat.h"
 #include "../frame_timer.h"
 #include "../game_main.h"
 #include "../sound.h"
@@ -48,6 +47,7 @@
 #include "menu_main.h"
 #include "screen_pause.h"
 #include "screen_connect.h"
+#include "screen_options.h"
 #include "screen_quickreconnect.h"
 #include "screen_textentry.h"
 #include "screen_prompt.h"
@@ -92,7 +92,7 @@ void levelWaitForFade()
             updateScreenFaders();
         }
 
-        if(!MaxFPS)
+        if(!g_config.unlimited_framerate)
             PGE_Delay(1);
     }
 }
@@ -118,7 +118,7 @@ void editorWaitForFade()
             updateScreenFaders();
         }
 
-        if(!MaxFPS)
+        if(!g_config.unlimited_framerate)
             PGE_Delay(1);
     }
 }
@@ -137,7 +137,7 @@ void GameLoop()
     {
         QuickReconnectScreen::g_active = true;
 
-        if(!g_config.NoPauseReconnect && g_compatibility.pause_on_disconnect && !TestLevel)
+        if(g_config.pause_on_disconnect && !TestLevel)
             PauseGame(PauseCode::PauseScreen, 0);
     }
 
@@ -205,11 +205,11 @@ void GameLoop()
 
         Controls::Update(false);
     }
-    else if(qScreen || (g_compatibility.allow_multires && qScreen_canonical))
+    else if(qScreen || (g_config.allow_multires && qScreen_canonical))
     {
         g_microStats.start_task(MicroStats::Effects);
         UpdateEffects();
-        if(!g_compatibility.modern_section_change)
+        if(!g_config.modern_section_change)
             speedRun_tick();
         g_microStats.start_task(MicroStats::Graphics);
         UpdateGraphics();
@@ -278,7 +278,7 @@ void GameLoop()
                         continue;
 
                     // use limited, buggy code for non-player 1 in compat case
-                    if(p != 1 && !g_compatibility.multiplayer_pause_controls)
+                    if(p != 1 && !g_config.multiplayer_pause_controls)
                     {
                         if(CaptainN || FreezeNPCs)
                         {
@@ -340,7 +340,7 @@ bool MessageScreen_Logic(int plr)
 
     // there was previously code to copy all players' controls from the main player, but this is no longer necessary (and actively harmful in the SingleCoop case)
 
-    if(!g_compatibility.multiplayer_pause_controls && plr == 0)
+    if(!g_config.multiplayer_pause_controls && plr == 0)
         plr = 1;
 
     if(plr == 0)
@@ -404,6 +404,11 @@ int PauseGame(PauseCode code, int plr)
     else if(code == PauseCode::Prompt)
     {
         PromptScreen::Init();
+    }
+    else if(code == PauseCode::Options)
+    {
+        OptionsScreen::Init();
+        XWindow::showCursor(0);
     }
     else if(code == PauseCode::TextEntry)
     {
@@ -504,6 +509,11 @@ int PauseGame(PauseCode code, int plr)
                 if(result)
                     break;
             }
+            else if(GamePaused == PauseCode::Options)
+            {
+                if(OptionsScreen::Logic())
+                    break;
+            }
             else if(GamePaused == PauseCode::TextEntry)
             {
                 if(TextEntryScreen::Logic())
@@ -513,7 +523,7 @@ int PauseGame(PauseCode code, int plr)
             g_microStats.end_frame();
         }
 
-        if(!MaxFPS)
+        if(!g_config.unlimited_framerate)
             PGE_Delay(1);
 
         if(!GameIsActive)

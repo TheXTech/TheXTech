@@ -78,7 +78,7 @@ public:
      */
     virtual bool isWorking() = 0;
 
-    virtual bool initRender(const CmdLineSetup_t &setup, SDL_Window *window) = 0;
+    virtual bool initRender(SDL_Window *window) = 0;
 
     /*!
      * \brief Initialize defaults of the renderer

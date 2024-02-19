@@ -38,7 +38,7 @@
 #include "../sound.h"
 #include "../sorting.h"
 #include "../layers.h"
-#include "../compat.h"
+#include "../config.h"
 #include "../graphics.h"
 #include "../editor.h"
 #include "../npc_id.h"
@@ -176,7 +176,6 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
     FileNamePath = lvl.meta.path + "/";
     g_dirCustom.setCurDir(FileNamePath + FileName);
 
-    bool compatModern = (CompatGetLevel() == COMPAT_MODERN);
     bool isSmbx64 = (lvl.meta.RecentFormat == LevelData::SMBX64);
     // int  fVersion = lvl.meta.RecentFormatVersion;
 
@@ -235,7 +234,7 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
 //    if(DirMan::exists(FileNamePath + FileName))
 //        FindCustomNPCs(FileNamePath + FileName);
 //    else
-    LoadCustomCompat();
+    LoadCustomConfig();
     FindCustomPlayers();
     FindCustomNPCs();
     LoadCustomGFX();
@@ -245,6 +244,8 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
 //    if(DirMan::exists(FileNamePath + FileName)) // Useless now
 //        LoadCustomGFX2(FileNamePath + FileName);
 // Blah
+
+    bool compatModern = (g_config.compatibility_mode == Config_t::COMPAT_OFF);
 
     if(FilePath == ".lvl" || FilePath == ".lvlx")
         return false;
@@ -1089,7 +1090,8 @@ void ClearLevel()
     RestoreWorldStrings();
     LevelName.clear();
     IsHubLevel = false;
-    ResetCompat();
+    // removed because the same logic is called inside of LoadCustomConfig()
+    // ResetCustomConfig();
     SetupPhysics();
     LoadNPCDefaults();
     LoadPlayerDefaults();

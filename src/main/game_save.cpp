@@ -20,12 +20,14 @@
 
 #include "../globals.h"
 #include "../game_main.h"
-#include "../compat.h"
+#include "../config.h"
+
 #include "speedrunner.h"
 #ifdef THEXTECH_ENABLE_LUNA_AUTOCODE
 #include "../script/luna/lunavarbank.h"
 #endif
 
+#include <IniProcessor/ini_processing.h>
 #include <Utils/files.h>
 #include <DirManager/dirman.h>
 #include <AppPath/app_path.h>
@@ -109,6 +111,7 @@ void FindSaves()
         auto& info = SaveSlotInfo[A];
 
         info = SaveSlotInfo_t();
+        info.ConfigDefaults = 0;
 
         // Modern gamesave file
         std::string saveFile = makeGameSavePath(episode,
@@ -179,6 +182,28 @@ void FindSaves()
                     continue;
                 int i = int(s.id);
                 s_LoadCharacter(info.SavedChar[i], s);
+            }
+
+            // load settings from save file here
+            for(auto &s : f.userData.store)
+            {
+                if(s.name == "_xt_ep_conf" && s.location == saveUserData::DATA_GLOBAL)
+                {
+                    for(const saveUserData::DataEntry& e : s.data)
+                    {
+                        if(e.key == "speedrun-mode" && e.value != "0")
+                        {
+                            info.ConfigDefaults = -atoi(e.value.c_str());
+                            break;
+                        }
+                        else if(e.key == "enable-bugfixes")
+                        {
+                            info.ConfigDefaults = (e.value == "none") ? Config_t::BUGFIXES_NONE : ((e.value == "critical") ? Config_t::BUGFIXES_CRITICAL : Config_t::BUGFIXES_ALL);
+                            info.ConfigDefaults += 1;
+                        }
+                    }
+                    break;
+                }
             }
 
             // load timer info for existing save
@@ -291,6 +316,9 @@ void SaveGame()
         sav.userData.store.push_back(gLunaVarBank);
 #endif
 
+    // save extra settings here
+    g_config.SaveEpisodeConfig(sav.userData);
+
     ExportLevelSaveInfo(sav);
 
     FileFormats::WriteExtendedSaveFileF(savePath, sav);
@@ -359,7 +387,7 @@ void LoadGame()
     curWorldMusic = int(sav.musicID);
     curWorldMusicFile = sav.musicFile;
 
-    if(g_compatibility.enable_last_warp_hub_resume)
+    if(g_config.enable_last_warp_hub_resume)
     {
         ReturnWarp = int(sav.last_hub_warp);
         FileRecentSubHubLevel = sav.last_hub_level_file;
@@ -442,6 +470,9 @@ void LoadGame()
     gSavedVarBank.TryLoadWorldVars();
 #endif
 
+    // load settings from save file here
+    g_config.LoadEpisodeConfig(sav.userData);
+
     ImportLevelSaveInfo(sav);
 }
 
@@ -496,6 +527,23 @@ void ClearGame(bool punnish)
         DeleteSave(selWorld, selSave);
 }
 
+static void clearSaveDir(const SelectWorld_t& w, const char*dir_mask, int ind)
+{
+    std::string dirPathDel = makeGameSavePath(w.WorldPath,
+                                               w.WorldFile,
+                                               fmt::format_ne(dir_mask, ind));
+
+    if(!DirMan::exists(dirPathDel))
+        return;
+
+    DirMan dir(dirPathDel);
+
+    std::vector<std::string> file_list;
+    dir.getListOfFiles(file_list);
+
+    for(const std::string& file : file_list)
+        Files::deleteFile(dirPathDel + file);
+}
 
 void DeleteSave(int world, int save)
 {
@@ -512,6 +560,7 @@ void DeleteSave(int world, int save)
     AddFile("deaths-{0}.rip");
     AddFile("fails-{0}.rip");
     AddFile("demos-{0}.dmo");
+    AddFile("config{0}.ini");
 
     // Clear all files in list
     for(auto &s : deleteList)
@@ -519,6 +568,9 @@ void DeleteSave(int world, int save)
         if(Files::fileExists(s))
             Files::deleteFile(s);
     }
+
+    // delete config folder
+    clearSaveDir(w, "config{0}/", save);
 
     std::string legacySave = w.WorldPath + fmt::format_ne("save{0}.sav", save);
     std::string legacySaveLocker = makeGameSavePath(w.WorldPath,
@@ -553,6 +605,30 @@ static void copySaveFile(const SelectWorld_t& w, const char*file_mask, int src, 
                                                w.WorldFile,
                                                fmt::format_ne(file_mask, dst));
     Files::copyFile(filePathDst, filePathSrc, true);
+}
+
+static void copySaveDir(const SelectWorld_t& w, const char*dir_mask, int src, int dst)
+{
+    std::string dirPathSrc = makeGameSavePath(w.WorldPath,
+                                               w.WorldFile,
+                                               fmt::format_ne(dir_mask, src));
+    std::string dirPathDst = makeGameSavePath(w.WorldPath,
+                                               w.WorldFile,
+                                               fmt::format_ne(dir_mask, dst));
+
+    if(!DirMan::exists(dirPathSrc))
+        return;
+
+    DirMan dir(dirPathSrc);
+
+    if(!DirMan::exists(dirPathDst))
+        DirMan::mkAbsPath(dirPathDst);
+
+    std::vector<std::string> file_list;
+    dir.getListOfFiles(file_list);
+
+    for(const std::string& file : file_list)
+        Files::copyFile(dirPathDst + file, dirPathSrc + file, true);
 }
 
 void CopySave(int world, int src, int dst)
@@ -593,6 +669,10 @@ void CopySave(int world, int src, int dst)
     copySaveFile(w, "fails-{0}.rip", src, dst);
     copySaveFile(w, "deaths-{0}.rip", src, dst);
     copySaveFile(w, "demos-{0}.dmo", src, dst);
+    copySaveFile(w, "config{0}.ini", src, dst);
+
+    // copy config folder
+    copySaveDir(w, "config{0}/", src, dst);
 
 #ifdef __EMSCRIPTEN__
     AppPathManager::syncFs();

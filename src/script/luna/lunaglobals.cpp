@@ -22,14 +22,15 @@
 
 SMBXHUDSettings gSMBXHUDSettings;
 
+bool gEnableDemoCounterByLC = false;
+
+#if 0
+// moved to config
 bool gLunaEnabledGlobally = true;
 bool gLunaEnabled = true;
-bool gShowDemoCounter = true;
 bool gEnableDemoCounter = true;
-bool gEnableDemoCounterByLC = false;
 std::string gDemoCounterTitle = "FAILS";
-std::string gDemoCounterTitleDefault = "FAILS";
-
+#endif
 
 /* Fallback dummy calls for the case when Luna Autocode has been disabled */
 

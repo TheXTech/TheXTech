@@ -31,7 +31,7 @@
 #include "../load_gfx.h"
 #include "../sound.h"
 #include "../custom.h"
-#include "../compat.h"
+#include "../config.h"
 #include "../main/trees.h"
 #include "level_file.h"
 #include "world_file.h"
@@ -114,9 +114,11 @@ bool OpenWorld(std::string FilePath)
     if(wld.meta.RecentFormat == LevelData::SMBX64)
         FileRelease = int(wld.meta.RecentFormatVersion);
 
-    LoadCustomCompat();
+    LoadCustomConfig();
     FindCustomPlayers();
     LoadCustomGFX(true);
+
+    // bool compatModern = (g_config.compatibility_mode == Config_t::COMPAT_OFF);
 
     numTiles = 0;
     numScenes = 0;

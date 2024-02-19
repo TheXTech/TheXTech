@@ -28,13 +28,10 @@
 #include "gfx.h"
 #include "rand.h"
 #include "sound.h"
-#include "video.h"
-#include "main/presetup.h"
 #include "main/game_info.h"
 #include "main/speedrunner.h"
 #include "main/translate.h"
 #include "core/language.h"
-#include "compat.h"
 #include "config.h"
 #include "controls.h"
 #include <AppPath/app_path.h>
@@ -502,48 +499,112 @@ int main(int argc, char**argv)
         }
 #endif
 
-        OpenConfig_preSetup();
+        OpenConfig();
 
+        // Store all of the command-line config options
+        ConfigChangeSentinel sent(ConfigSetLevel::cmdline);
 
-        // Set other settings
+        if(compatLevel.isSet())
+        {
+            std::string compatModeVal = compatLevel.getValue();
+            if(compatModeVal == "classic" || compatModeVal == "smbx2")
+                g_config.compatibility_mode = Config_t::COMPAT_CLASSIC;
+            else if(compatModeVal == "smbx13")
+                g_config.compatibility_mode = Config_t::COMPAT_SMBX13;
+            else if(compatModeVal == "modern")
+                g_config.compatibility_mode = Config_t::COMPAT_MODERN;
+            else
+            {
+                std::cerr << "Error: Invalid value for the --compat-level argument: " << compatModeVal << std::endl;
+                std::cerr.flush();
+                return 2;
+            }
+        }
+
+        if(speedRunMode.isSet())
+            g_config.speedrun_mode = speedRunMode.getValue();
+
+        if(speedRunBlinkMode.isSet())
+        {
+            bool is_transparent = false;
+            if(switchSpeedRunSemiTransparent.isSet())
+                is_transparent = switchSpeedRunSemiTransparent.getValue();
+
+            std::string mode = speedRunBlinkMode.getValue();
+            if(mode == "always")
+                g_config.show_playtime_counter = Config_t::PLAYTIME_COUNTER_ANIMATED;
+            else if(is_transparent)
+                g_config.show_playtime_counter = Config_t::PLAYTIME_COUNTER_SUBTLE;
+            else if(mode == "opaque")
+                g_config.show_playtime_counter = Config_t::PLAYTIME_COUNTER_ANIMATED;
+            else if(mode == "never")
+                g_config.show_playtime_counter = Config_t::PLAYTIME_COUNTER_OPAQUE;
+            else
+            {
+                std::cerr << "Error: Invalid value for the --speed-run-blink argument: " << mode << std::endl;
+                std::cerr.flush();
+                return 2;
+            }
+        }
+        else if(switchSpeedRunSemiTransparent.isSet())
+        {
+            if(switchSpeedRunSemiTransparent.getValue())
+                g_config.show_playtime_counter = Config_t::PLAYTIME_COUNTER_SUBTLE;
+            else
+                g_config.show_playtime_counter = Config_t::PLAYTIME_COUNTER_ANIMATED;
+        }
+
+        if(switchTestShowFPS.isSet())
+            g_config.show_fps = switchTestShowFPS.getValue();
+
+        if(switchTestMaxFPS.isSet())
+            g_config.unlimited_framerate = switchTestMaxFPS.getValue();
+
+        if(switchDisplayControls.isSet())
+            g_config.show_controllers = switchDisplayControls.getValue();
+
+        if(showBatteryStatus.isSet() && IF_INRANGE(showBatteryStatus.getValue(), 1, 4))
+            g_config.show_battery_status = showBatteryStatus.getValue();
 
         if(switchDisableFrameSkip.isSet())
-            setup.frameSkip = !switchDisableFrameSkip.getValue();
+            g_config.enable_frameskip = false;
         else if(switchFrameSkip.isSet())
-            setup.frameSkip = switchFrameSkip.getValue();
-        else
-            setup.frameSkip = g_videoSettings.enableFrameSkip;
+            g_config.enable_frameskip = true;
 
-        setup.noSound   = switchNoSound.isSet() ? switchNoSound.getValue() : g_audioSetup.disableSound;
-        setup.neverPause = switchNoPause.isSet() ? switchNoPause.getValue() : g_videoSettings.allowBgWork;
-        setup.allowBgInput = switchBgInput.isSet() ? switchBgInput.getValue() : g_videoSettings.allowBgControllerInput;
-        setup.vSync = switchVSync.isSet() ? switchVSync.getValue() : g_videoSettings.vSync;
+        if(switchNoSound.isSet())
+            g_config.audio_enable    = !switchNoSound.getValue();
 
-        if(setup.allowBgInput) // The BG-input depends on the never-pause option
-            setup.neverPause = setup.allowBgInput;
+        if(switchVSync.isSet())
+            g_config.render_vsync    = switchVSync.getValue();
+
+        if(switchNoPause.isSet())
+            g_config.background_work = switchNoPause.getValue();
+
+        if(switchBgInput.isSet())
+            g_config.background_work = switchBgInput.getValue();
 
         if(renderType.isSet())
         {
             std::string rt = renderType.getValue();
             if(rt == "sw")
-                setup.renderType = RENDER_SOFTWARE;
+                g_config.render_mode = Config_t::RENDER_SOFTWARE;
             else if(rt == "vsync")
             {
-                setup.renderType = RENDER_ACCELERATED_AUTO;
-                setup.vSync = true;
+                g_config.render_mode = Config_t::RENDER_ACCELERATED_AUTO;
+                g_config.render_vsync = true;
             }
             else if(rt == "hw")
-                setup.renderType = RENDER_ACCELERATED_AUTO;
+                g_config.render_mode = Config_t::RENDER_ACCELERATED_AUTO;
             else if(rt == "sdl")
-                setup.renderType = RENDER_ACCELERATED_SDL;
+                g_config.render_mode = Config_t::RENDER_ACCELERATED_SDL;
             else if(rt == "opengl")
-                setup.renderType = RENDER_ACCELERATED_OPENGL;
+                g_config.render_mode = Config_t::RENDER_ACCELERATED_OPENGL;
             else if(rt == "opengl11")
-                setup.renderType = RENDER_ACCELERATED_OPENGL_LEGACY;
+                g_config.render_mode = Config_t::RENDER_ACCELERATED_OPENGL_LEGACY;
             else if(rt == "opengles")
-                setup.renderType = RENDER_ACCELERATED_OPENGL_ES;
+                g_config.render_mode = Config_t::RENDER_ACCELERATED_OPENGL_ES;
             else if(rt == "opengles11")
-                setup.renderType = RENDER_ACCELERATED_OPENGL_ES_LEGACY;
+                g_config.render_mode = Config_t::RENDER_ACCELERATED_OPENGL_ES_LEGACY;
             else
             {
                 std::cerr << "Error: Invalid value for the --render argument: " << rt << std::endl;
@@ -551,14 +612,12 @@ int main(int argc, char**argv)
                 return 2;
             }
 #ifdef DEBUG_BUILD
-            std::cerr << "Manually selected renderer: " << rt << " - " << setup.renderType << std::endl;
+            std::cerr << "Manually selected renderer: " << rt << " - " << g_config.render_mode << std::endl;
             std::cerr.flush();
 #endif
         }
-        else
-        {
-            setup.renderType = g_videoSettings.renderMode;
-        }
+
+        // store the game setup options
 
         setup.testLevel = testLevel.getValue();
 
@@ -598,80 +657,13 @@ int main(int argc, char**argv)
 
         setup.testGodMode = switchTestGodMode.getValue();
         setup.testGrabAll = switchTestGrabAll.getValue();
-        setup.testShowFPS = switchTestShowFPS.isSet() ?
-                                switchTestShowFPS.getValue() :
-                                g_videoSettings.showFrameRate;
-        setup.testMaxFPS = switchTestMaxFPS.getValue();
         setup.testMagicHand = switchTestMagicHand.getValue();
         setup.testEditor = switchTestEditor.getValue();
         setup.testSave = saveSlot.getValue();
 
-        if(compatLevel.isSet())
-        {
-            std::string compatModeVal = compatLevel.getValue();
-            if(compatModeVal == "smbx2")
-                setup.compatibilityLevel = COMPAT_SMBX2;
-            else if(compatModeVal == "smbx13")
-                setup.compatibilityLevel = COMPAT_SMBX13;
-            else if(compatModeVal == "modern")
-                setup.compatibilityLevel = COMPAT_MODERN;
-            else
-            {
-                std::cerr << "Error: Invalid value for the --compat-level argument: " << compatModeVal << std::endl;
-                std::cerr.flush();
-                return 2;
-            }
-        }
-        else
-        {
-            setup.compatibilityLevel = g_preSetup.compatibilityMode;
-        }
-
-        setup.speedRunnerMode = speedRunMode.isSet() ?
-                                    speedRunMode.getValue() :
-                                    g_preSetup.speedRunMode;
-        setup.speedRunnerSemiTransparent = switchSpeedRunSemiTransparent.isSet() ?
-                                            switchSpeedRunSemiTransparent.getValue() :
-                                            g_preSetup.speedRunSemiTransparentTimer;
-
-        if(speedRunBlinkMode.isSet())
-        {
-            std::string mode = speedRunBlinkMode.getValue();
-            if(mode == "opaque")
-                setup.speedRunnerBlinkEffect = SPEEDRUN_EFFECT_BLINK_OPAQUEONLY;
-            else if(mode == "always")
-                setup.speedRunnerBlinkEffect = SPEEDRUN_EFFECT_BLINK_ALWAYS;
-            else if(mode == "never")
-                setup.speedRunnerBlinkEffect = SPEEDRUN_EFFECT_BLINK_NEVER;
-            else
-            {
-                std::cerr << "Error: Invalid value for the --speed-run-blink argument: " << mode << std::endl;
-                std::cerr.flush();
-                return 2;
-            }
-        }
-        else
-        {
-            setup.speedRunnerBlinkEffect = g_preSetup.speedRunEffectBlink;
-        }
-
-        setup.showControllerState = switchDisplayControls.isSet() ?
-                                        switchDisplayControls.getValue() :
-                                        g_drawController;
-
-        if(showBatteryStatus.isSet() && IF_INRANGE(showBatteryStatus.getValue(), 1, 4))
-            g_videoSettings.batteryStatus = showBatteryStatus.getValue();
-
-        if(setup.speedRunnerMode >= 1) // Always show FPS and don't pause the game work when focusing other windows
-        {
-            setup.testShowFPS = true;
-            setup.neverPause = true;
-        }
-
         if(startWarp.isSet() && startWarp.getValue() > 0 && startWarp.getValue() < maxWarps)
             testStartWarp = startWarp.getValue();
 
-        // override language loaded in OpenConfig_PreSetup()
         if(lang.isSet())
             g_config.language = lang;
     }
@@ -688,11 +680,10 @@ int main(int argc, char**argv)
     printf("Launching AppPath...\n");
     AppPathManager::initAppPath();
 
-    OpenConfig_preSetup();
+    OpenConfig();
 
     setup.verboseLogging = true;
-    setup.frameSkip = false;
-    setup.testShowFPS = true;
+
 #endif
 
 #if defined(__EMSCRIPTEN__) && defined(THEXTECH_DEBUG_INFO)
@@ -703,6 +694,8 @@ int main(int argc, char**argv)
     // setup.testMaxFPS = true;
     setCpuClock(true);
 #endif
+
+    UpdateConfig();
 
     // set this flag before SDL initialization to allow game be quit when closing a window before a loading process will be completed
     GameIsActive = true;
@@ -722,8 +715,6 @@ int main(int argc, char**argv)
         setup.testNumPlayers = 1;
         setup.testGodMode = false;
         setup.testGrabAll = false;
-        setup.testShowFPS = false;
-        setup.testMaxFPS = false;
     }
 #endif
 
@@ -733,6 +724,7 @@ int main(int argc, char**argv)
 #endif
 
     Controls::Init();
+    Controls::LoadConfig();
 
     int ret = GameMain(setup);
 

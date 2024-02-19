@@ -47,6 +47,7 @@
 
 #include "graphics.h"
 #include "controls.h"
+#include "config.h"
 
 
 #ifdef THEXTECH_WIP_FEATURES
@@ -275,7 +276,7 @@ static EM_BOOL s_emscriptenHandleResize(int, const EmscriptenUiEvent *, void *)
 }
 #endif
 
-bool RenderGL::initRender(const CmdLineSetup_t &setup, SDL_Window *window)
+bool RenderGL::initRender(SDL_Window *window)
 {
     pLogDebug("Init renderer settings...");
 
@@ -284,7 +285,7 @@ bool RenderGL::initRender(const CmdLineSetup_t &setup, SDL_Window *window)
     if(!AbstractRender_t::init())
         return false;
 
-    if(!initOpenGL(setup)
+    if(!initOpenGL()
         || !initDebug()
         || !initShaders()
         || !initFramebuffers()
@@ -600,13 +601,13 @@ void RenderGL::updateViewport()
 
     float scale = SDL_min(scale_x, scale_y);
 
-    if(g_videoSettings.scaleMode == SCALE_FIXED_05X && scale > 0.5f)
+    if(g_config.scale_mode == Config_t::SCALE_FIXED_05X && scale > 0.5f)
         scale = 0.5f;
-    if(g_videoSettings.scaleMode == SCALE_DYNAMIC_INTEGER && scale > 1.f)
+    if(g_config.scale_mode == Config_t::SCALE_DYNAMIC_INTEGER && scale > 1.f)
         scale = std::floor(scale);
-    if(g_videoSettings.scaleMode == SCALE_FIXED_1X && scale > 1.f)
+    if(g_config.scale_mode == Config_t::SCALE_FIXED_1X && scale > 1.f)
         scale = 1.f;
-    if(g_videoSettings.scaleMode == SCALE_FIXED_2X && scale > 2.f)
+    if(g_config.scale_mode == Config_t::SCALE_FIXED_2X && scale > 2.f)
         scale = 2.f;
 
     m_phys_w = XRender::TargetW * scale;
@@ -619,7 +620,7 @@ void RenderGL::updateViewport()
 
     resetViewport();
 
-    if(ScaleWidth != XRender::TargetW || ScaleHeight != XRender::TargetH || m_current_scale_mode != g_videoSettings.scaleMode)
+    if(ScaleWidth != XRender::TargetW || ScaleHeight != XRender::TargetH || m_current_scale_mode != g_config.scale_mode)
     {
         // update render targets
         if(ScaleWidth != XRender::TargetW || ScaleHeight != XRender::TargetH)
@@ -637,7 +638,7 @@ void RenderGL::updateViewport()
         }
 
         // update render texture scaling mode
-        bool use_linear = (g_videoSettings.scaleMode == SCALE_DYNAMIC_LINEAR || scale < 0.5f);
+        bool use_linear = (g_config.scale_mode == Config_t::SCALE_DYNAMIC_LINEAR || scale < 0.5f);
 
         if(m_game_texture)
         {
@@ -647,8 +648,10 @@ void RenderGL::updateViewport()
             glBindTexture(GL_TEXTURE_2D, 0);
         }
 
-        m_current_scale_mode = g_videoSettings.scaleMode;
+        m_current_scale_mode = g_config.scale_mode;
     }
+
+    SDL_GL_SetSwapInterval(g_config.render_vsync);
 }
 
 void RenderGL::resetViewport()

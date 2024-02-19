@@ -51,7 +51,7 @@
 #include "main/translate.h"
 #include "core/render.h"
 #include "core/events.h"
-#include "compat.h"
+#include "config.h"
 
 #include "npc/npc_queues.h"
 
@@ -125,7 +125,7 @@ static void setupCheckpoints()
     }
 
     pLogDebug("Trying to restore %zu checkpoints...", CheckpointsList.size());
-    if(!g_compatibility.fix_vanilla_checkpoints && CheckpointsList.empty())
+    if(!g_config.fix_vanilla_checkpoints && CheckpointsList.empty())
     {
         pLogDebug("Using legacy algorithm");
         CheckpointsList.push_back(Checkpoint_t());
@@ -139,22 +139,22 @@ static void setupCheckpoints()
             if(NPC[A].Type != NPCID_CHECKPOINT)
                 continue;
 
-            if(g_compatibility.fix_vanilla_checkpoints && cp.id != Maths::iRound(NPC[A].Special))
+            if(g_config.fix_vanilla_checkpoints && cp.id != Maths::iRound(NPC[A].Special))
                 continue;
 
             NPC[A].Killed = 9;
             NPCQueues::Killed.push_back(A);
 
             // found a last id, leave player here
-            if(!g_compatibility.fix_vanilla_checkpoints || cpId == int(CheckpointsList.size() - 1))
+            if(!g_config.fix_vanilla_checkpoints || cpId == int(CheckpointsList.size() - 1))
             {
                 setupPlayerAtCheckpoints(NPC[A], cp);
-                if(g_compatibility.fix_vanilla_checkpoints)
+                if(g_config.fix_vanilla_checkpoints)
                     break;// Stop to find NPCs
             }
         }// for NPCs
 
-        if(!g_compatibility.fix_vanilla_checkpoints)
+        if(!g_config.fix_vanilla_checkpoints)
             break;
     } // for Check points
 }
@@ -1101,11 +1101,11 @@ void EveryonesDead()
         XRender::repaint();
 //    if(MagicHand)
 //        BitBlt frmLevelWindow::vScreen[1].hdc, 0, 0, frmLevelWindow::vScreen[1].ScaleWidth, frmLevelWindow::vScreen[1].ScaleHeight, 0, 0, 0, vbWhiteness;
-        if(!MaxFPS)
+        if(!g_config.unlimited_framerate)
             PGE_Delay(500);
     }
 
-    if(g_compatibility.modern_lives_system)
+    if(g_config.modern_lives_system)
     {
         g_100s--;
 
@@ -1115,7 +1115,7 @@ void EveryonesDead()
     else
         Lives--;
 
-    if(g_compatibility.modern_lives_system || Lives >= 0.f)
+    if(g_config.modern_lives_system || Lives >= 0.f)
     {
         LevelMacro = LEVELMACRO_OFF;
         LevelMacroCounter = 0;
@@ -1418,7 +1418,7 @@ void PlayerFrame(Player_t &p)
     {
         bool doesPlayerMoves = false;
 
-        if(g_compatibility.fix_climb_bgo_speed_adding && p.VineBGO > 0)
+        if(g_config.fix_climb_bgo_speed_adding && p.VineBGO > 0)
         {
             doesPlayerMoves = !fEqual(p.Location.SpeedX,  Background[p.VineBGO].Location.SpeedX) ||
                                p.Location.SpeedY < Background[p.VineBGO].Location.SpeedY - 0.1;
@@ -2932,7 +2932,7 @@ void YoshiPound(const int A, int mount, bool BreakBlocks)
                 if(b.Hidden || b.Invis || BlockNoClipping[b.Type] || BlockIsSizable[b.Type])
                     continue;
 
-                if(g_compatibility.fix_vehicle_char_switch && mount == 2 &&
+                if(g_config.fix_vehicle_char_switch && mount == 2 &&
                     ((b.Type >= 622 && b.Type <= 625) || b.Type == 631))
                     continue; // Forbid playable character switch when riding a clown car
 
@@ -2954,7 +2954,7 @@ void YoshiPound(const int A, int mount, bool BreakBlocks)
         NewEffect(EFFID_SMOKE_S3, tempLocation);
         Effect[numEffects].Location.SpeedX = 2;
         PlaySoundSpatial(SFX_Stone, p.Location);
-        if(BreakBlocks && g_config.GameplayShakeScreenPound)
+        if(BreakBlocks && g_config.extra_screen_shake)
             doShakeScreen(0, 4, SHAKE_SEQUENTIAL, 4, 0.2);
     }
 }
@@ -3206,7 +3206,7 @@ void PlayerPush(const int A, int HitSpot)
         if(b.Hidden || BlockIsSizable[b.Type])
             continue;
 
-        if(g_compatibility.fix_player_filter_bounce && BlockCheckPlayerFilter(B, A))
+        if(g_config.fix_player_filter_bounce && BlockCheckPlayerFilter(B, A))
             continue;
 
         if(BlockSlope[b.Type] == 0 && BlockSlope2[b.Type] == 0)
@@ -3801,13 +3801,13 @@ void StealBonus()
         if(Player[A].Dead)
         {
             // find other player
-            if((g_compatibility.modern_lives_system || Lives > 0) && LevelMacro == LEVELMACRO_OFF)
+            if((g_config.modern_lives_system || Lives > 0) && LevelMacro == LEVELMACRO_OFF)
             {
                 if(Player[A].Controls.Jump || Player[A].Controls.Run)
                 {
                     B = CheckNearestLiving(A);
 
-                    if(g_compatibility.modern_lives_system)
+                    if(g_config.modern_lives_system)
                     {
                         g_100s--;
 
@@ -4760,7 +4760,7 @@ static inline bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool bac
     {
         int prevFrame = plr.Frame;
 
-        if(g_compatibility.fix_visual_bugs && warp.Effect == 1 && direction == 3 && plr.Duck && plr.SwordPoke == 0)
+        if(g_config.fix_visual_bugs && warp.Effect == 1 && direction == 3 && plr.Duck && plr.SwordPoke == 0)
         {
             // Show the duck frame only when attempting to go down
             plr.Frame = (plr.Character == 5) ? 5 : 7;
@@ -4776,7 +4776,7 @@ static inline bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool bac
         MessageTextMap.clear();
 
         // Restore previous frame
-        if(g_compatibility.fix_visual_bugs && warp.Effect == 1 && direction == 3)
+        if(g_config.fix_visual_bugs && warp.Effect == 1 && direction == 3)
             plr.Frame = prevFrame;
 
         canWarp = false;
@@ -4966,7 +4966,7 @@ static inline bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool bac
         {
             PlaySoundSpatial(SFX_Warp, plr.Location);
             plr.Effect = 3;
-            if(g_compatibility.fix_fairy_stuck_in_pipe)
+            if(g_config.fix_fairy_stuck_in_pipe)
                 plr.Effect2 = 0;
             plr.Warp = B;
             plr.WarpBackward = backward;
@@ -4977,7 +4977,7 @@ static inline bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool bac
         {
             PlaySoundSpatial(SFX_Door, plr.Location);
             plr.Effect = 7;
-            if(g_compatibility.fix_fairy_stuck_in_pipe)
+            if(g_config.fix_fairy_stuck_in_pipe)
                 plr.Effect2 = 0;
             plr.Warp = B;
             plr.WarpBackward = backward;
@@ -5014,7 +5014,7 @@ void SuperWarp(const int A)
 
             // In normal mode, ignore pounds only for pipe / door warps. In compat mode, ignore pounds for all warps.
             bool ground_pound = plr.GroundPound || plr.GroundPound2;
-            bool skip_pounds = !g_compatibility.fix_pound_skip_warp || warp.Effect == 1 || warp.Effect == 2;
+            bool skip_pounds = !g_config.fix_pound_skip_warp || warp.Effect == 1 || warp.Effect == 2;
             if(ground_pound && skip_pounds)
                 continue;
 
@@ -5731,7 +5731,7 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
                                     Block[C].Location.SpeedY = 0;
                                 }
                             }
-                            if(g_compatibility.enable_climb_bgo_layer_move)
+                            if(g_config.fix_climb_bgo_layer_move)
                             {
                                 for(int C : Layer[B].BGOs)
                                 {
@@ -7811,7 +7811,7 @@ void PlayerEffects(const int A)
             for(B = 1; B <= numPlayers; B++)
             {
                 // !Player[B].Dead condition was added to prevent confusing Drop/Add cases where player gets locked in immune state
-                if(B != A && Player[B].Effect != 6 && (!g_compatibility.allow_drop_add || (!Player[B].Dead && Player[B].Effect != 10)) && CheckCollision(p.Location, Player[B].Location))
+                if(B != A && Player[B].Effect != 6 && (!g_config.allow_drop_add || (!Player[B].Dead && Player[B].Effect != 10)) && CheckCollision(p.Location, Player[B].Location))
                     tempBool = false;
             }
             if(tempBool)
@@ -8055,7 +8055,7 @@ void SwapCharacter(int A, int Character, bool FromBlock)
 // returns whether a player is allowed to swap characters
 bool SwapCharAllowed()
 {
-    if(LevelSelect || GameMenu || (g_compatibility.allow_drop_add && IsHubLevel))
+    if(LevelSelect || GameMenu || (g_config.allow_drop_add && IsHubLevel))
         return true;
     else
         return false;

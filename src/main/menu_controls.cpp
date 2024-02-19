@@ -1173,7 +1173,7 @@ int menuControls_MouseLogic()
 int menuControls_Logic()
 {
     // allow input methods to join so long as not currently switching a method
-    if(s_changingProfilePlayer == -1 && !g_pollingInput)
+    if(s_changingProfilePlayer == -1 && !g_pollingInput && GameMenu)
         Controls::PollInputMethod();
 
     const int n_types = (int)Controls::g_InputMethodTypes.size();

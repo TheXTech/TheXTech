@@ -27,7 +27,7 @@
 #include "../version.h"
 
 #include "gfx.h"
-#include "video.h"
+#include "config.h"
 
 #include "core/render.h"
 #include "core/window.h"
@@ -98,7 +98,11 @@ bool FrmMain::initSystem(const CmdLineSetup_t &setup)
 #   ifdef RENDERGL_SUPPORTED
     bool try_gl = false;
 
-    if(setup.renderType == RENDER_ACCELERATED_AUTO || setup.renderType == RENDER_ACCELERATED_OPENGL || setup.renderType == RENDER_ACCELERATED_OPENGL_ES || setup.renderType == RENDER_ACCELERATED_OPENGL_LEGACY || setup.renderType == RENDER_ACCELERATED_OPENGL_ES_LEGACY)
+    if(    g_config.render_mode == Config_t::RENDER_ACCELERATED_AUTO
+        || g_config.render_mode == Config_t::RENDER_ACCELERATED_OPENGL
+        || g_config.render_mode == Config_t::RENDER_ACCELERATED_OPENGL_ES
+        || g_config.render_mode == Config_t::RENDER_ACCELERATED_OPENGL_LEGACY
+        || g_config.render_mode == Config_t::RENDER_ACCELERATED_OPENGL_ES_LEGACY)
     {
         RenderGL *render = new RenderGL();
         m_render.reset(render);
@@ -178,7 +182,7 @@ bool FrmMain::initSystem(const CmdLineSetup_t &setup)
     D_pLogDebugNA("FrmMain: Loading XRender...");
     res &= XRender::init();
 #elif defined(USE_CORE_WINDOW_SDL) && defined(USE_CORE_RENDER_SDL)
-    res = g_render->initRender(setup, window->getWindow());
+    res = g_render->initRender(window->getWindow());
 
 #   ifdef RENDERGL_SUPPORTED
     if(try_gl && !res)
@@ -205,7 +209,7 @@ bool FrmMain::initSystem(const CmdLineSetup_t &setup)
         if(res)
         {
             msgbox->init(window->getWindow());
-            res = g_render->initRender(setup, window->getWindow());
+            res = g_render->initRender(window->getWindow());
         }
     }
 #   endif // #ifdef RENDERGL_SUPPORTED
@@ -314,10 +318,8 @@ bool FrmMain::restartRenderer()
     bool try_gl = false;
 
     CmdLineSetup_t setup;
-    setup.renderType = g_videoSettings.renderMode;
-    setup.vSync = g_videoSettings.vSync;
 
-    if(setup.renderType == RENDER_ACCELERATED_AUTO || setup.renderType == RENDER_ACCELERATED_OPENGL || setup.renderType == RENDER_ACCELERATED_OPENGL_ES || setup.renderType == RENDER_ACCELERATED_OPENGL_LEGACY || setup.renderType == RENDER_ACCELERATED_OPENGL_ES_LEGACY)
+    if(g_config.render_mode == Config_t::RENDER_ACCELERATED_AUTO || g_config.render_mode == Config_t::RENDER_ACCELERATED_OPENGL || g_config.render_mode == Config_t::RENDER_ACCELERATED_OPENGL_ES || g_config.render_mode == Config_t::RENDER_ACCELERATED_OPENGL_LEGACY || g_config.render_mode == Config_t::RENDER_ACCELERATED_OPENGL_ES_LEGACY)
     {
         m_render.reset(new RenderGL());
         try_gl = true;
@@ -334,7 +336,7 @@ bool FrmMain::restartRenderer()
     if(res)
     {
         reinterpret_cast<MsgBoxUsed*>(g_msgBox)->init(reinterpret_cast<WindowUsed*>(g_window)->getWindow());
-        res = m_render->initRender(setup, reinterpret_cast<WindowUsed*>(g_window)->getWindow());
+        res = m_render->initRender(reinterpret_cast<WindowUsed*>(g_window)->getWindow());
     }
 
     if(try_gl && !res)
@@ -360,7 +362,7 @@ bool FrmMain::restartRenderer()
         if(res)
         {
             reinterpret_cast<MsgBoxUsed*>(g_msgBox)->init(reinterpret_cast<WindowUsed*>(g_window)->getWindow());
-            res = g_render->initRender(setup, reinterpret_cast<WindowUsed*>(g_window)->getWindow());
+            res = g_render->initRender(reinterpret_cast<WindowUsed*>(g_window)->getWindow());
         }
 
         res = false;
@@ -383,8 +385,6 @@ bool FrmMain::restartRenderer()
     g_render = m_render.get();
 
     CmdLineSetup_t setup;
-    setup.renderType = g_videoSettings.renderMode;
-    setup.vSync = g_videoSettings.vSync;
 
     res = m_render->initRender(setup, reinterpret_cast<WindowUsed*>(g_window)->getWindow());
 #    endif

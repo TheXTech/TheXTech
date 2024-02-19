@@ -60,7 +60,8 @@ bool MagicHand = false;
 RangeArr<Player_t, 1, maxLocalPlayers> testPlayer;
 bool ClearBuffer = false;
 int numLocked = 0;
-bool resChanged = false;
+// replaced with g_config.fullscreen
+// bool resChanged = false;
 
 int16_t testStartWarp = 0;
 
@@ -73,10 +74,11 @@ UTF8CharMap_t MessageTextMap;
 // int NumSelectWorld  = 0;
 // std::vector<SelectWorld_t> SelectWorld;
 
+std::string g_recentAssetPack;
 std::string g_recentWorld1p;
 std::string g_recentWorld2p;
 std::string g_recentWorldEditor;
-bool ShowFPS = false;
+//bool ShowFPS = false;
 double PrintFPS = 0.0;
 // moved to "screen.cpp"
 // RangeArr<vScreen_t, 0, 2> vScreen;
@@ -337,7 +339,7 @@ bool BeatTheGame = false;
 //int cycleCount = 0;
 //double fpsTime = 0.0;
 //double fpsCount = 0.0;
-bool FrameSkip = false;
+//bool FrameSkip = false;
 //double GoalTime = 0.0;
 //double overTime = 0.0;
 int worldCurs = 0;
@@ -378,7 +380,7 @@ bool CaptainN = false;
 bool FlameThrower = false;
 bool CoinMode = false;
 bool WorldUnlock = false;
-bool MaxFPS = false;
+//bool MaxFPS = false;
 bool GodMode = false;
 bool GrabAll = false;
 bool Cheater = false;
@@ -547,8 +549,11 @@ Controls_t ForcedControl;
 int SyncCount = 0;
 bool noUpdate = false;
 //double gameTime = 0.0;
-bool noSound = false;
-bool neverPause = false;
+
+// deprecated by g_config.audio_enable
+// bool noSound = false;
+
+//bool neverPause = false;
 //double tempTime = 0.0;
 bool BattleMode = false;
 int BattleWinner = 0;

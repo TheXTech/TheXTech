@@ -20,6 +20,10 @@
 
 #include <algorithm>
 
+#include <AppPath/app_path.h>
+#include <Utils/files.h>
+#include <IniProcessor/ini_processing.h>
+
 #include "../config.h"
 #include "../controls.h"
 #include "../main/record.h"
@@ -982,6 +986,38 @@ void LoadConfig(IniProcessing* ctl)
     {
         type->ClearProfiles(g_InputMethods);
         type->LoadConfig(ctl);
+    }
+}
+
+void SaveConfig()
+{
+    std::string controlsPath = AppPathManager::settingsControlsFileSTD();
+    IniProcessing controls(controlsPath);
+    SaveConfig(&controls);
+    controls.writeIniFile();
+    AppPathManager::syncFs();
+
+    pLogDebug("Saved control mappings: %s", controlsPath.c_str());
+}
+
+void LoadConfig()
+{
+    std::string configPath = AppPathManager::settingsFileSTD();
+    std::string controlsPath = AppPathManager::settingsControlsFileSTD();
+
+    // Keep backward compatibility and restore old mappings from the "thextech.ini"
+    const std::string *load_path = Files::fileExists(controlsPath) ? &controlsPath :
+        Files::fileExists(configPath) ? &configPath : nullptr;
+
+    if(!load_path)
+    {
+        // make a new empty config file
+        SaveConfig();
+    }
+    else
+    {
+        IniProcessing controls(*load_path);
+        LoadConfig(&controls);
     }
 }
 

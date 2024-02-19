@@ -9,7 +9,6 @@
 #include "gfx.h"
 #include "graphics.h"
 #include "player.h"
-#include "compat.h"
 #include "config.h"
 #include "npc_id.h"
 

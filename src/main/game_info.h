@@ -26,9 +26,17 @@
 #include <vector>
 #include "global_constants.h"
 #include "range_arr.hpp"
+#include "config.h"
 
-struct GameInfo
+class GameInfo : public Config_t
 {
+public:
+    inline GameInfo() {}
+    inline GameInfo(const _Config_t<false>& base, uint8_t scope) : Config_t(base, scope) {}
+
+    void InitGameInfo();
+    void LoadGameInfo();
+
     std::string title;
     // std::string titleCredits;
     RangeArr<std::string, 1, numCharacters> characterName;
@@ -84,7 +92,7 @@ struct GameInfo
     const std::string titleWindow() const;
 };
 
-extern GameInfo g_gameInfo;
+extern GameInfo g_gameInfo; // config level 2, config_main.cpp
 
 extern void initGameInfo();
 

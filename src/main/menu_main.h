@@ -48,7 +48,9 @@ enum
     // Battle mode level select
     MENU_BATTLE_MODE = 4,
     // Options menu
-    MENU_OPTIONS = 3,
+    // MENU_OPTIONS = 3, // FULLY UNUSED
+    // New options menu
+    MENU_NEW_OPTIONS = 8,
     // Editor mode episode select
     MENU_EDITOR = 9,
 
@@ -87,6 +89,10 @@ enum
     MENU_SELECT_SLOT_1P_DELETE = 13,
     MENU_SELECT_SLOT_2P_DELETE = 23,
     MENU_SELECT_SLOT_DELETE_ADD = 3,
+
+    MENU_SELECT_SLOT_1P_ADVMODE = 14,
+    MENU_SELECT_SLOT_2P_ADVMODE = 24,
+    MENU_SELECT_SLOT_ADVMODE_ADD = 4,
 
     MENU_SELECT_SLOT_END = 30,
 };

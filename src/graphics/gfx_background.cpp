@@ -22,7 +22,7 @@
 #include "../graphics.h"
 #include "../collision.h"
 #include "../core/render.h"
-#include "../compat.h"
+#include "../config.h"
 
 void DrawBackgroundColor(int A, int Z, bool lower = false)
 {
@@ -70,7 +70,7 @@ void DrawTopAnchoredBackground(int S, int Z, int A, int offset = 32, int expecte
             XRender::renderTexture(camX + tempLocation.X, camY + tempLocation.Y,
                 GFXBackground2Width[A], tempLocation.Height, GFXBackground2[A], 0, GFXBackground2Height[A] - tempLocation.Height);
 
-            if(g_compatibility.disable_background2_tiling)
+            if(g_config.disable_background2_tiling)
                 break;
 
             if(expected_height != 0 && GFXBackground2Height[A] != expected_height)
@@ -101,7 +101,7 @@ void DrawCenterAnchoredBackground(int S, int Z, int A, int expected_height = 0, 
             Eff_ScreenH += vScreen[i].Height;
     }
 
-    bool no_tiling = g_compatibility.disable_background2_tiling;
+    bool no_tiling = g_config.disable_background2_tiling;
     if((tile_bottom != 0 || tile_top != 0 || expected_height != 0) && GFXBackground2Height[A] != expected_height)
     {
         // HACK: don't cancel the tiling if we have the slightly incorrect original asset
@@ -314,7 +314,7 @@ void DrawBottomAnchoredBackground(int S, int Z, int A, int offset = 0, int expec
             }
         }
 
-        if(g_compatibility.disable_background2_tiling)
+        if(g_config.disable_background2_tiling)
             continue;
 
         if(expected_height != 0 && GFXBackground2Height[A] != expected_height)
@@ -687,14 +687,14 @@ void DrawBackground(int S, int Z)
     A = 40; // Mystic Cave Zone
     if(Background2[S] == 40)
     {
-        if(g_compatibility.disable_background2_tiling)
+        if(g_config.disable_background2_tiling)
         {
             XRender::lazyPreLoad(GFXBackground2[A]);
             XRender::renderRect(0, 0, vScreen[Z].Width, vScreen[Z].Height,
                 GFXBackground2[A].ColorUpper);
         }
 
-        if(g_compatibility.allow_multires && (vScreen[Z].Height > GFXBackground2Height[A] || (vScreen[Z].Height == screen.H / 2 && screen.H > GFXBackground2Height[A])))
+        if(g_config.allow_multires && (vScreen[Z].Height > GFXBackground2Height[A] || (vScreen[Z].Height == screen.H / 2 && screen.H > GFXBackground2Height[A])))
         {
             tempLocation.Y = level[S].Height - GFXBackground2Height[A];
         }
@@ -881,7 +881,7 @@ void DrawBackground(int S, int Z)
 
         tempLocation.Y -= GFXBackground2Height[A];
 
-        if(g_compatibility.disable_background2_tiling)
+        if(g_config.disable_background2_tiling)
             break;
 
         } while(tempLocation.Y + GFXBackground2Height[A] > -camY);
@@ -1135,7 +1135,7 @@ void DrawBackground(int S, int Z)
 
             tempLocation.Y -= 378;
 
-            if(g_compatibility.disable_background2_tiling)
+            if(g_config.disable_background2_tiling)
                 break;
         }
     }

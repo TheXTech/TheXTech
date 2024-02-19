@@ -19,8 +19,6 @@
  */
 
 #include "globals.h"
-#include "video.h"
-#include "compat.h"
 #include "config.h"
 #include "change_res.h"
 #include "load_gfx.h"
@@ -37,12 +35,11 @@
 void SetOrigRes()
 {
     XWindow::setFullScreen(false);
-    resChanged = false;
 
 #ifndef __EMSCRIPTEN__
-    if(g_videoSettings.scaleMode == SCALE_FIXED_05X)
+    if(g_config.scale_mode == Config_t::SCALE_FIXED_05X)
         XWindow::setWindowSize(XRender::TargetW / 2, XRender::TargetH / 2);
-    else if(g_videoSettings.scaleMode == SCALE_FIXED_2X)
+    else if(g_config.scale_mode == Config_t::SCALE_FIXED_2X)
         XWindow::setWindowSize(XRender::TargetW * 2, XRender::TargetH * 2);
     else
         XWindow::setWindowSize(XRender::TargetW, XRender::TargetH);
@@ -61,7 +58,6 @@ void SetOrigRes()
 
 void ChangeRes(int, int, int, int)
 {
-    resChanged = true;
     XWindow::setFullScreen(true);
 
     if(LoadingInProcess)
@@ -77,8 +73,11 @@ void ChangeRes(int, int, int, int)
 
 void UpdateInternalRes()
 {
-    int req_w = g_config.InternalW;
-    int req_h = g_config.InternalH;
+    int req_w = g_config.internal_res.m_value.first;
+    int req_h = g_config.internal_res.m_value.second;
+
+    if(g_config.dynamic_width)
+        req_w = 0;
 
 #ifdef __3DS__
     req_w += XRender::TargetOverscanX * 2;
@@ -88,7 +87,7 @@ void UpdateInternalRes()
     int canon_w = 800;
     int canon_h = 600;
 
-    if(!g_compatibility.allow_multires)
+    if(!g_config.allow_multires)
     {
         if((req_w != 0 && req_w < canon_w) || (req_h != 0 && req_h < canon_h))
         {
@@ -97,7 +96,7 @@ void UpdateInternalRes()
         }
     }
 
-    if(req_w == 0 || req_h == 0)
+    if(!XRender::is_nullptr() && (req_w == 0 || req_h == 0))
     {
         int int_w, int_h, orig_int_h;
 
@@ -109,15 +108,15 @@ void UpdateInternalRes()
         {
             int_h = req_h;
         }
-        else if(g_videoSettings.scaleMode == SCALE_FIXED_05X)
+        else if(g_config.scale_mode == Config_t::SCALE_FIXED_05X)
         {
             int_h *= 2;
         }
-        else if(g_videoSettings.scaleMode == SCALE_FIXED_2X)
+        else if(g_config.scale_mode == Config_t::SCALE_FIXED_2X)
         {
             int_h /= 2;
         }
-        else if(g_videoSettings.scaleMode == SCALE_DYNAMIC_INTEGER)
+        else if(g_config.scale_mode == Config_t::SCALE_DYNAMIC_INTEGER)
         {
             if(int_h >= 600)
             {
@@ -136,20 +135,20 @@ void UpdateInternalRes()
             int_h = 720;
 
         // now, set width based on height and scaling mode
-        if(g_videoSettings.scaleMode == SCALE_FIXED_05X)
+        if(g_config.scale_mode == Config_t::SCALE_FIXED_05X)
         {
             int_w *= 2;
         }
-        else if(g_videoSettings.scaleMode == SCALE_FIXED_1X)
+        else if(g_config.scale_mode == Config_t::SCALE_FIXED_1X)
         {
             // keep as-is
             // int_w = int_w;
         }
-        else if(g_videoSettings.scaleMode == SCALE_FIXED_2X)
+        else if(g_config.scale_mode == Config_t::SCALE_FIXED_2X)
         {
             int_w /= 2;
         }
-        else if(g_videoSettings.scaleMode == SCALE_DYNAMIC_INTEGER)
+        else if(g_config.scale_mode == Config_t::SCALE_DYNAMIC_INTEGER)
         {
             int scale_factor = orig_int_h / int_h;
             if(scale_factor == 0)
@@ -185,7 +184,7 @@ void UpdateInternalRes()
         }
 
         // force >800x600 resolution if required
-        if(!g_compatibility.allow_multires)
+        if(!g_config.allow_multires)
         {
             if(int_w < canon_w)
             {
@@ -220,19 +219,36 @@ void UpdateInternalRes()
     {
         XRender::TargetW = req_w;
         XRender::TargetH = req_h;
+
+        if(XRender::TargetW == 0)
+            XRender::TargetW = g_config.internal_res.m_value.first;
+
+        if(XRender::TargetH == 0)
+        {
+            XRender::TargetW = 1280;
+            XRender::TargetH = 720;
+        }
     }
 
-    // TODO: above should tweak render target resolution. This should tweak game's screen resolution.
-    if(g_compatibility.allow_multires)
+    // DONE: above should tweak render target resolution. This should tweak game's screen resolution.
+    if(g_config.allow_multires && g_config.dynamic_camera_logic)
     {
         l_screen->W = XRender::TargetW;
         l_screen->H = XRender::TargetH;
+    }
+    else if(g_config.allow_multires)
+    {
+        l_screen->W = SDL_min(XRender::TargetW, canon_w);
+        l_screen->H = SDL_min(XRender::TargetH, canon_h);
     }
     else
     {
         l_screen->W = canon_w;
         l_screen->H = canon_h;
     }
+
+    if(XRender::is_nullptr())
+        return;
 
     XRender::updateViewport();
 
@@ -255,23 +271,23 @@ void UpdateInternalRes()
 
 void UpdateWindowRes()
 {
-    if(XWindow::isFullScreen() || XWindow::isMaximized())
+    if(XWindow::is_nullptr() || XWindow::isFullScreen() || XWindow::isMaximized())
         return;
 
-    int h = g_config.InternalH;
+    int h = g_config.internal_res.m_value.second;
     if(h == 0)
         return;
 
-    int w = g_config.InternalW;
+    int w = g_config.internal_res.m_value.first;
 
     if(w == 0 && h == XRender::TargetH)
         w = XRender::TargetW;
     else if(w == 0)
         return;
 
-    if(g_videoSettings.scaleMode == SCALE_FIXED_05X)
+    if(g_config.scale_mode == Config_t::SCALE_FIXED_05X)
         XWindow::setWindowSize(w / 2, h / 2);
-    else if(g_videoSettings.scaleMode == SCALE_FIXED_2X)
+    else if(g_config.scale_mode == Config_t::SCALE_FIXED_2X)
         XWindow::setWindowSize(w * 2, h * 2);
     else
         XWindow::setWindowSize(w, h);

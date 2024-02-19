@@ -24,7 +24,6 @@
 #include <Utils/maths.h>
 
 #include "../globals.h"
-#include "../config.h"
 #include "../player.h"
 #include "../collision.h"
 #include "../sound.h"
@@ -34,7 +33,7 @@
 #include "../layers.h"
 #include "../editor.h"
 #include "../game_main.h"
-#include "../compat.h"
+#include "../config.h"
 #include "../main/trees.h"
 #include "../main/game_globals.h"
 #include "../frame_timer.h"
@@ -360,7 +359,7 @@ void UpdatePlayer()
                 {
                     if(Player[A].Mount == 3 && Player[A].MountType == 6) // Purple Yoshi Pound
                     {
-                        bool groundPoundByAltRun = !ForcedControls && g_compatibility.pound_by_alt_run;
+                        bool groundPoundByAltRun = !ForcedControls && g_config.pound_by_alt_run;
                         bool poundKeyPressed = groundPoundByAltRun ? Player[A].Controls.AltRun : Player[A].Controls.Down;
                         bool poundKeyRelease = groundPoundByAltRun ? Player[A].AltRunRelease   : Player[A].DuckRelease;
 
@@ -381,7 +380,7 @@ void UpdatePlayer()
                     if(!Player[A].CanPound && Player[A].Location.SpeedY < 0)
                         Player[A].GroundPound = false;
 
-                    bool groundPoundByAltRun = !ForcedControls && g_compatibility.pound_by_alt_run;
+                    bool groundPoundByAltRun = !ForcedControls && g_config.pound_by_alt_run;
                     if(groundPoundByAltRun)
                         Player[A].Controls.AltRun = true;
                     else
@@ -647,7 +646,7 @@ void UpdatePlayer()
                     else
                         Player[A].Location.SpeedY = 0;
 
-                    if(g_compatibility.fix_climb_bgo_speed_adding && Player[A].VineBGO > 0)
+                    if(g_config.fix_climb_bgo_speed_adding && Player[A].VineBGO > 0)
                     {
                         Player[A].Location.SpeedX += Background[Player[A].VineBGO].Location.SpeedX;
                         Player[A].Location.SpeedY += Background[Player[A].VineBGO].Location.SpeedY;
@@ -1541,7 +1540,7 @@ void UpdatePlayer()
 
                         // START ALT JUMP - this code does the player's spin jump
                         if(Player[A].Controls.AltJump && (Player[A].Character == 1 || Player[A].Character == 2 || Player[A].Character == 4 ||
-                                                          (g_compatibility.fix_char3_escape_shell_surf && Player[A].Character == 3 && Player[A].ShellSurf)))
+                                                          (g_config.fix_char3_escape_shell_surf && Player[A].Character == 3 && Player[A].ShellSurf)))
                         {
                             if(Player[A].Location.SpeedX > 0)
                                 tempSpeed = Player[A].Location.SpeedX * 0.2;
@@ -1832,8 +1831,8 @@ void UpdatePlayer()
                 {
                     if(Player[A].State == 4 || Player[A].State == 5)
                     {
-                        bool hasNoMonts = (g_compatibility.fix_char5_vehicle_climb && Player[A].Mount <= 0) ||
-                                           !g_compatibility.fix_char5_vehicle_climb;
+                        bool hasNoMonts = (g_config.fix_char5_vehicle_climb && Player[A].Mount <= 0) ||
+                                           !g_config.fix_char5_vehicle_climb;
 
                         bool turnFairy = Player[A].FlyCount > 0 ||
                                         ((Player[A].Controls.AltJump || (Player[A].Controls.Jump && Player[A].FloatRelease)) &&
@@ -2525,7 +2524,7 @@ void UpdatePlayer()
                                                 {
                                                     // the bug this is fixing is vanilla, but this case happens for a single frame every time a slope falls through ground since TheXTech 1.3.6,
                                                     // and only in the rare case where a slope falls through ground *it was originally below* in vanilla
-                                                    if(g_compatibility.fix_player_downward_clip && !CompareWalkBlock(tempHit3, B, Player[A].Location))
+                                                    if(g_config.fix_player_downward_clip && !CompareWalkBlock(tempHit3, B, Player[A].Location))
                                                     {
                                                         // keep the old block, other conditions are VERY likely to cancel it
                                                     }
@@ -2626,7 +2625,7 @@ void UpdatePlayer()
                                                             movingBlock = true;
                                                             // NOTE: Here was a bug that makes compare bool with 0 is always false
                                                             if(
-                                                                    (g_compatibility.fix_player_slope_speed &&
+                                                                    (g_config.fix_player_slope_speed &&
                                                                      Player[A].Location.SpeedX - NPC[Player[A].StandingOnNPC].Location.SpeedX < 0 &&
                                                                      BlockSlope[Block[B].Type]/*)*/ < 0) ||
                                                                     (Player[A].Location.SpeedX - NPC[Player[A].StandingOnNPC].Location.SpeedX > 0 &&
@@ -2702,7 +2701,7 @@ void UpdatePlayer()
                                         //if(Block[B].Type == 632 && Player[A].Character == 5)
                                         //    HitSpot = 0;
 
-                                        if(g_compatibility.fix_player_clip_wall_at_npc && (HitSpot == 5 || HitSpot == 3) && oldStandingOnNpc > 0 && Player[A].Jump)
+                                        if(g_config.fix_player_clip_wall_at_npc && (HitSpot == 5 || HitSpot == 3) && oldStandingOnNpc > 0 && Player[A].Jump)
                                         {
                                             // Re-compute the collision with a block to avoid the unnecessary clipping through the wall
                                             auto pLoc = Player[A].Location;
@@ -2755,7 +2754,7 @@ void UpdatePlayer()
                                             }
                                             else // Find the best block to walk on if touching multiple blocks
                                             {
-                                                if(g_compatibility.fix_player_downward_clip)
+                                                if(g_config.fix_player_downward_clip)
                                                 {
                                                     if(CompareWalkBlock(tempHit3, B, Player[A].Location))
                                                     {
@@ -2845,7 +2844,7 @@ void UpdatePlayer()
                                         else if(HitSpot == 3) // hit the block from below
                                         {
                                             // add more generous margin to prevent unfair crush death with sloped ceiling
-                                            bool ignore = (g_compatibility.fix_player_crush_death
+                                            bool ignore = (g_config.fix_player_crush_death
                                                 && (Block[B].Location.X + Block[B].Location.Width - 2 < Player[A].Location.X
                                                     || Player[A].Location.X + Player[A].Location.Width - 2 < Block[B].Location.X));
 
@@ -3337,7 +3336,7 @@ void UpdatePlayer()
                     if(B > numBackground)
                         continue;
 
-                    if(BackgroundFence[Background[B].Type] && (!g_compatibility.fix_climb_invisible_fences || !Background[B].Hidden))
+                    if(BackgroundFence[Background[B].Type] && (!g_config.fix_climb_invisible_fences || !Background[B].Hidden))
                     {
                         // FIXME: remove 4 spaces indention as soon as possible from this block below to the next commented brace
                         // if(CheckCollision(Player[A].Location, Background[B].Location))
@@ -3351,8 +3350,8 @@ void UpdatePlayer()
                             {
                                 if(Player[A].Character == 5)
                                 {
-                                    bool hasNoMonts = (g_compatibility.fix_char5_vehicle_climb && Player[A].Mount <= 0) ||
-                                                       !g_compatibility.fix_char5_vehicle_climb;
+                                    bool hasNoMonts = (g_config.fix_char5_vehicle_climb && Player[A].Mount <= 0) ||
+                                                       !g_config.fix_char5_vehicle_climb;
                                     if(hasNoMonts && Player[A].Immune == 0 && Player[A].Controls.Up)
                                     {
                                         Player[A].FairyCD = 0;
@@ -3403,7 +3402,7 @@ void UpdatePlayer()
                                         if(Player[A].Vine > 0)
                                         {
                                             Player[A].VineNPC = -1;
-                                            if(g_compatibility.fix_climb_bgo_speed_adding)
+                                            if(g_config.fix_climb_bgo_speed_adding)
                                                 Player[A].VineBGO = B;
                                         }
 
@@ -3716,8 +3715,8 @@ void UpdatePlayer()
                                     {
                                         if(Player[A].Character == 5)
                                         {
-                                            bool hasNoMonts = (g_compatibility.fix_char5_vehicle_climb && Player[A].Mount <= 0) ||
-                                                               !g_compatibility.fix_char5_vehicle_climb;
+                                            bool hasNoMonts = (g_config.fix_char5_vehicle_climb && Player[A].Mount <= 0) ||
+                                                               !g_config.fix_char5_vehicle_climb;
                                             if(hasNoMonts && Player[A].Immune == 0 && Player[A].Controls.Up)
                                             {
                                                 Player[A].FairyCD = 0;
@@ -3766,7 +3765,7 @@ void UpdatePlayer()
                                                 if(Player[A].Vine > 0)
                                                 {
                                                     Player[A].VineNPC = B;
-                                                    if(g_compatibility.fix_climb_bgo_speed_adding)
+                                                    if(g_config.fix_climb_bgo_speed_adding)
                                                         Player[A].VineBGO = 0.0;
                                                 }
                                             }
@@ -4496,7 +4495,7 @@ void UpdatePlayer()
                        (Player[A].HoldingNPC == 0 || Player[A].Character == 5))
                     {
                         UnDuck(Player[A]);
-                        if(g_compatibility.fix_char5_vehicle_climb && Player[A].Fairy) // Avoid the mortal glitch
+                        if(g_config.fix_char5_vehicle_climb && Player[A].Fairy) // Avoid the mortal glitch
                         {
                             Player[A].Fairy = false;
                             PlaySoundSpatial(SFX_HeroFairy, Player[A].Location);
@@ -4617,7 +4616,7 @@ void UpdatePlayer()
 
                     bool new_condition = (pi.MovingUD && vcrush_plus) || (pi.MovingLR && hcrush);
 
-                    bool pinch_death = (g_compatibility.fix_player_crush_death && !pi.Strict) ? new_condition : old_condition;
+                    bool pinch_death = (g_config.fix_player_crush_death && !pi.Strict) ? new_condition : old_condition;
 
                     if(pinch_death && Player[A].Mount != 2)
                     {

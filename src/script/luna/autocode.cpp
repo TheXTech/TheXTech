@@ -34,6 +34,7 @@
 #include "csprite.h"
 #include "globals.h"
 #include "global_dirs.h"
+#include "config.h"
 #include "player.h"
 #include "graphics.h"
 #include "sound.h"
@@ -54,8 +55,6 @@
 #include "lunacounter.h"
 #include "renderop_string.h"
 #include "mememu.h"
-#include "compat.h"
-#include "main/speedrunner.h"
 
 #include "main/trees.h"
 
@@ -486,14 +485,14 @@ void Autocode::Do(bool init)
 
         case AT_IfCompatMode:
         {
-            if(CheckConditionI(CompatGetLevel(), (int)Param2, (COMPARETYPE)(int)Param1))
+            if(CheckConditionI(g_config.compatibility_mode, (int)Param2, (COMPARETYPE)(int)Param1))
                 gAutoMan.ActivateCustomEvents(0, (int)Param3);
             break;
         }
 
         case AT_IfSpeedRunMode:
         {
-            if(CheckConditionI(g_speedRunnerMode, (int)Param2, (COMPARETYPE)(int)Param1))
+            if(CheckConditionI(g_config.speedrun_mode.m_value, (int)Param2, (COMPARETYPE)(int)Param1))
                 gAutoMan.ActivateCustomEvents(0, (int)Param3);
             break;
         }
@@ -1492,9 +1491,12 @@ void Autocode::LunaControl(LunaControlAct act, int val)
     switch(act)
     {
     case LCA_DemoCounter:
-        gShowDemoCounter = (val == 1);
+        {
+            ConfigChangeSentinel sent(ConfigSetLevel::script);
+            g_config.show_fails_counter = (val == 1);
+        }
 
-        if(gShowDemoCounter && !gEnableDemoCounter && !gEnableDemoCounterByLC) // Initialize the demos counter if wasn't enabled before
+        if(g_config.show_fails_counter && !g_config.enable_fails_counter && !gEnableDemoCounterByLC) // Initialize the demos counter if wasn't enabled before
         {
             if(!GameMenu && !GameOutro && !BattleMode && !LevelEditor && !TestLevel)
             {

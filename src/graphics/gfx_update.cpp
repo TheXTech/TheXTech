@@ -38,10 +38,10 @@
 #include "../main/trees.h"
 #include "../main/screen_pause.h"
 #include "../main/screen_connect.h"
+#include "../main/screen_options.h"
 #include "../main/screen_quickreconnect.h"
 #include "../main/screen_textentry.h"
 #include "../main/cheat_code.h"
-#include "../compat.h"
 #include "../config.h"
 #include "../game_main.h"
 #include "../main/game_globals.h"
@@ -124,7 +124,7 @@ struct ScreenShake_t
 
     void apply()
     {
-        if(!active || GameMenu)
+        if(!active || GameMenu || !g_config.show_screen_shake)
         {
             XRender::offsetViewport(0, 0);
             return;
@@ -1151,6 +1151,7 @@ void ModernNPCScreenLogic(Screen_t& screen, int vscreen_i, bool fill_draw_queue,
                    ForcedControls
                 || LevelMacro != LEVELMACRO_OFF
                 || qScreen_canonical
+                || !g_config.dynamic_camera_logic
                 || NPC_MustBeCanonical(A)
             )
                 can_activate = onscreen_canonical;
@@ -1378,7 +1379,7 @@ void UpdateGraphics(bool skipRepaint)
     // frame skip code
     cycleNextInc();
 
-    if(FrameSkip && !TakeScreen && frameSkipNeeded())
+    if(g_config.enable_frameskip && !TakeScreen && frameSkipNeeded())
         Do_FrameSkip = true;
 
     UpdateGraphicsLogic(Do_FrameSkip);
@@ -1412,7 +1413,7 @@ void UpdateGraphicsLogic(bool Do_FrameSkip)
     NPCQueues::NoReset.clear();
 
     // mark the last-frame reset state of NPCs that may have Reset[0] set to false, and clear their this-frame reset state
-    if(g_compatibility.modern_npc_camera_logic)
+    if(g_config.fix_npc_camera_logic)
     {
         for(NPC_t& n : s_NoReset_NPCs_LastFrame)
         {
@@ -1448,7 +1449,7 @@ void UpdateGraphicsLogic(bool Do_FrameSkip)
                     continue_qScreen_canonical |= Update_qScreen(Z_i);
 
                     // the original code was badly written and made THIS happen (always exactly one frame of qScreen in 2P mode)
-                    if(i >= 1 && !g_compatibility.modern_section_change)
+                    if(i >= 1 && !g_config.modern_section_change)
                         continue_qScreen_canonical = false;
                 }
             }
@@ -1481,11 +1482,11 @@ void UpdateGraphicsLogic(bool Do_FrameSkip)
             }
 
             // the original code was badly written and made THIS happen (always exactly one frame of qScreen in 2P mode)
-            if(Z == 2 && !g_compatibility.modern_section_change)
+            if(Z == 2 && !g_config.modern_section_change)
                 continue_qScreen = false;
 
             // noturningback
-            if(!LevelEditor && NoTurnBack[Player[plr_Z].Section] && g_compatibility.allow_multires)
+            if(!LevelEditor && NoTurnBack[Player[plr_Z].Section] && g_config.allow_multires)
             {
                 // goal: find canonical vScreen currently on this section that is the furthest left
                 // only do anything with the last vScreen (of a Visible screen) in the section
@@ -1636,7 +1637,7 @@ void UpdateGraphicsLogic(bool Do_FrameSkip)
             // we'll check the NPCs and do some logic for the game,
             if(!LevelEditor)
             {
-                if(g_compatibility.modern_npc_camera_logic)
+                if(g_config.fix_npc_camera_logic)
                     ModernNPCScreenLogic(screen, vscreen_i, fill_draw_queue, NPC_Draw_Queue_p);
                 else if(Z <= 2)
                     ClassicNPCScreenLogic(Z, numScreens, fill_draw_queue, NPC_Draw_Queue_p);
@@ -1708,14 +1709,14 @@ void UpdateGraphicsLogic(bool Do_FrameSkip)
     }
 
     // clear the last-frame reset state of NPCs
-    if(g_compatibility.modern_npc_camera_logic)
+    if(g_config.fix_npc_camera_logic)
     {
         for(NPC_t& n : s_NoReset_NPCs_LastFrame)
             n.Reset[2] = true;
     }
 
     // use screen-shake to indicate if invisible screen is currently causing qScreen
-    if(g_compatibility.allow_multires)
+    if(g_config.allow_multires)
     {
         // TODO: do loop over visible screens here once s_shakeScreen, s_forcedShakeScreen, and continue_qScreen_local are separated by screen
 
@@ -3161,6 +3162,12 @@ void UpdateGraphicsMeta()
         XRender::renderTexture(int(SharedCursor.X), int(SharedCursor.Y), GFX.ECursor[2]);
     }
 
+    if(GamePaused == PauseCode::Options)
+    {
+        OptionsScreen::Render();
+        XRender::renderTexture(int(SharedCursor.X), int(SharedCursor.Y), GFX.ECursor[2]);
+    }
+
     if(GamePaused == PauseCode::TextEntry)
         TextEntryScreen::Render();
 
@@ -3168,7 +3175,7 @@ void UpdateGraphicsMeta()
 
     speedRun_renderTimer();
 
-    if(PrintFPS > 0 && ShowFPS)
+    if(PrintFPS > 0 && g_config.show_fps)
         SuperPrint(fmt::format_ne("{0}", int(PrintFPS)), 1, XRender::TargetOverscanX + 8, 8, {0, 255, 0});
 
     g_stats.print();

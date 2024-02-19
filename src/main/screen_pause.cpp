@@ -33,7 +33,7 @@
 #include "../sound.h"
 #include "../gfx.h"
 #include "../graphics.h"
-#include "../compat.h"
+#include "../frm_main.h"
 #include "../config.h"
 #include "../core/render.h"
 #include "../core/events.h"
@@ -47,6 +47,8 @@
 
 #include "main/game_strings.h"
 #include "main/level_medals.h"
+
+#include "controls.h"
 
 #include "editor.h"
 
@@ -119,9 +121,21 @@ static bool s_DropAddScreen()
         return false;
     }
 
+    PlaySound(SFX_Do);
+
     if(PauseGame(PauseCode::DropAdd, 0) == 1)
         return true;
 
+    MenuCursorCanMove = false;
+    return false;
+}
+
+
+static bool s_OptionsScreen()
+{
+    PlaySound(SFX_Do);
+
+    PauseGame(PauseCode::Options, 0);
     MenuCursorCanMove = false;
     return false;
 }
@@ -244,11 +258,13 @@ void Init(int plr, bool LegacyPause)
         if(!start_screen && !BattleMode)
             s_items.push_back(MenuItem{g_gameStrings.pauseItemResetCheckpoints, s_ResetCheckpoints});
 
-        if(g_compatibility.allow_drop_add)
+        if(g_config.allow_drop_add)
             s_items.push_back(MenuItem{g_gameStrings.pauseItemPlayerSetup, s_DropAddScreen});
 
         if(!inter_screen && s_cheat_menu_bits == 14 && !BattleMode)
             s_items.push_back(MenuItem{g_gameStrings.pauseItemEnterCode, s_CheatScreen});
+
+        s_items.push_back(MenuItem{g_mainMenu.mainOptions, s_OptionsScreen});
 
         s_items.push_back(MenuItem{editor_test ? g_gameStrings.pauseItemReturnToEditor : g_gameStrings.pauseItemQuitTesting, s_QuitTesting});
     }
@@ -257,11 +273,14 @@ void Init(int plr, bool LegacyPause)
     {
         s_items.push_back(MenuItem{g_gameStrings.pauseItemContinue, s_Continue});
 
-        if(g_compatibility.allow_drop_add && s_pause_type != PauseType::Legacy)
+        if(g_config.allow_drop_add && s_pause_type != PauseType::Legacy)
             s_items.push_back(MenuItem{g_gameStrings.pauseItemPlayerSetup, s_DropAddScreen});
 
         if(s_cheat_menu_bits == 14 && s_pause_type != PauseType::Legacy && !BattleMode)
             s_items.push_back(MenuItem{g_gameStrings.pauseItemEnterCode, s_CheatScreen});
+
+        if(s_pause_type != PauseType::Legacy)
+            s_items.push_back(MenuItem{g_mainMenu.mainOptions, s_OptionsScreen});
 
         if(CanSave)
         {
@@ -380,7 +399,7 @@ bool Logic(int plr)
 
     // there was previously code to copy all players' controls from the main player, but this is no longer necessary (and actively harmful in the SingleCoop case)
 
-    if(!g_compatibility.multiplayer_pause_controls && plr == 0)
+    if(!g_config.multiplayer_pause_controls && plr == 0)
         plr = 1;
 
     if(plr == 0)
