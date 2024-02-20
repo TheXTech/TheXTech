@@ -75,7 +75,7 @@ void KillNPC(int A, int B)
             Effect[numEffects].Frame = iRand(3);
         }
         PlaySoundSpatial(SFX_Icebreak, NPC[A].Location);
-        NPC[A].Type = NPC[A].Special;
+        NPC[A].Type = NPCID(NPC[A].Special);
 
         NPCQueues::update(A);
 
@@ -1603,7 +1603,7 @@ void KillNPC(int A, int B)
 //                Netplay::sendData "K" + std::to_string(C) + "|" + NPC[A].Type + "|" + NPC[A].Location.X + "|" + NPC[A].Location.Y + "|" + std::to_string(NPC[A].Location.Width) + "|" + std::to_string(NPC[A].Location.Height) + "|" + NPC[A].Location.SpeedX + "|" + NPC[A].Location.SpeedY + "|" + NPC[A].Section + "|" + NPC[A].TimeLeft + "|" + NPC[A].Direction + "|" + std::to_string(static_cast<int>(floor(static_cast<double>(NPC[A].Projectile)))) + "|" + NPC[A].Special + "|" + NPC[A].Special2 + "|" + NPC[A].Special3 + "|" + NPC[A].Special4 + "|" + NPC[A].Special5 + "|" + NPC[A].Effect + LB + "1n" + NPC[A].HoldingPlayer + "|" + std::to_string(A) + "|" + NPC[A].Type + LB;
         }
 
-        if(NPC[A].Effect == 5 || NPC[A].Effect == 6)
+        if(NPC[A].Effect == NPCEFF_PET_TONGUE || NPC[A].Effect == NPCEFF_PET_INSIDE)
             Player[NPC[A].Effect2].YoshiNPC = A;
 
         if(NPC[A].Type == NPCID_TOOTHYPIPE && NPC[A].Special == 1)

@@ -67,10 +67,11 @@ void DrawEditorLevel(int Z)
                 {
                     if(vScreenCollision(Z, Block[A].Location))
                     {
+                        NPCID C = NPCID_NULL;
                         if(Block[A].Special > 1000)
-                            C = Block[A].Special - 1000;
+                            C = NPCID(Block[A].Special - 1000);
                         else
-                            C = 10;
+                            C = NPCID_COIN_S3;
 
                         if(NPCWidthGFX(C) == 0)
                         {
@@ -115,7 +116,7 @@ void DrawEditorLevel(int Z)
                 {
                     if(vScreenCollision(Z, NPC[A].Location))
                     {
-                        C = NPC[A].Special;
+                        NPCID C = NPCID(NPC[A].Special);
                         if(NPCWidthGFX(C) == 0)
                         {
                             tempLocation.Height = NPCHeight(C);
@@ -372,10 +373,11 @@ void DrawEditorLevel(int Z)
             {
                 if(vScreenCollision(Z, b.Location))
                 {
+                    NPCID C = NPCID_NULL;
                     if(b.Special > 1000)
-                        C = b.Special - 1000;
+                        C = NPCID(b.Special - 1000);
                     else
-                        C = 10;
+                        C = NPCID_COIN_S3;
 
                     if(NPCWidthGFX(C) == 0)
                     {
@@ -516,7 +518,7 @@ void DrawEditorLevel(int Z)
 
                     tempLocation.X = n.Location.X + n.Location.Width / 2 - tempLocation.Width / 2;
                     tempLocation.Y = n.Location.Y + n.Location.Height / 2 - tempLocation.Height / 2;
-                    B = EditorNPCFrame(int(n.Special), n.Direction);
+                    B = EditorNPCFrame(NPCID(n.Special), n.Direction);
 
                     XRender::renderTexture(vScreen[Z].X + tempLocation.X + n->FrameOffsetX,
                                           vScreen[Z].Y + tempLocation.Y,
@@ -536,7 +538,7 @@ void DrawEditorLevel(int Z)
             {
                 if(vScreenCollision(Z, n.Location))
                 {
-                    C = n.Special;
+                    NPCID C = NPCID(n.Special);
                     if(NPCWidthGFX(C) == 0)
                     {
                         tempLocation.Height = NPCHeight(C);

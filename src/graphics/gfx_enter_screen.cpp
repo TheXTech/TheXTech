@@ -32,6 +32,7 @@
 #include "../controls.h"
 #include "compat.h"
 #include "pge_delay.h"
+#include "npc_id.h"
 
 
 static void initPlayers(Player_t tempPlayer[maxLocalPlayers])
@@ -68,7 +69,7 @@ static void initPlayers(Player_t tempPlayer[maxLocalPlayers])
             if(dst.HeldBonus > 0)
             {
                 dst.Hearts += 1;
-                dst.HeldBonus = 0;
+                dst.HeldBonus = NPCID(0);
             }
 
             if(dst.State == 1 && dst.Hearts > 1)
@@ -83,7 +84,7 @@ static void initPlayers(Player_t tempPlayer[maxLocalPlayers])
         else // Mario and Luigi
         {
             if(dst.Hearts == 3 && dst.HeldBonus == 0)
-                dst.HeldBonus = 9;
+                dst.HeldBonus = NPCID_POWER_S3;
             dst.Hearts = 0;
         }
 

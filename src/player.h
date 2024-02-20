@@ -66,7 +66,7 @@ void CheckSection(const int A);
 void PlayerFrame(const int A);
 void PlayerFrame(struct Player_t &p);
 // Public Sub UpdatePlayerBonus(A As Integer, B As Integer)
-void UpdatePlayerBonus(const int A, const int B);
+void UpdatePlayerBonus(const int A, const NPCID B);
 // Public Sub TailSwipe(plr As Integer, Optional bool As Boolean = False, Optional Stab As Boolean = False, Optional StabDir As Integer = 0)  'for whacking something with the tail
 // for whacking something with the tail
 void TailSwipe(const int plr, bool boo = false, bool Stab = false, int StabDir = 0);

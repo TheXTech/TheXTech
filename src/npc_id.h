@@ -23,8 +23,12 @@
 #ifndef ENUMNPCID_HHH
 #define ENUMNPCID_HHH
 
-enum NPCID
+#include "global_constants.h"
+
+enum NPCID : vbint_t
 {
+    NPCID_NULL = 0,
+
     NPCID_FODDER_S3 = 1,
     NPCID_RED_FODDER = 2,
     NPCID_RED_FLY_FODDER = 3,

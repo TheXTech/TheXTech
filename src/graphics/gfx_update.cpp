@@ -236,7 +236,7 @@ public:
             }
         }
 
-        if(NPC[A].Effect == 2)
+        if(NPC[A].Effect == NPCEFF_DROP_ITEM)
         {
             if(std::fmod(NPC[A].Effect2, 3) == 0.0)
                 return;
@@ -252,7 +252,7 @@ public:
                     (NPC[A].HoldingPlayer > 0 && Player[NPC[A].HoldingPlayer].Effect != 3) ||
                     (NPC[A].Type == NPCID_TOOTHY && NPC[A].standingOnPlayer == 0) ||
                     (NPC[A].Type == NPCID_BULLET && NPC[A].CantHurt > 0)
-                  ) || NPC[A].Effect == 5
+                  ) || NPC[A].Effect == NPCEFF_PET_TONGUE
                 ) && NPC[A].Type != NPCID_ITEM_BURIED && !Player[NPC[A].HoldingPlayer].Dead
             )
         {
@@ -290,12 +290,12 @@ public:
             g_stats.renderedNPCs += 1;
         }
         else if(NPC[A].Type == NPCID_SAW || NPC[A].Type == NPCID_JUMP_PLANT ||
-            ((NPC[A].Effect == 208 || NPC[A]->IsAVine ||
+            ((NPC[A].Effect == NPCEFF_ENCASED || NPC[A]->IsAVine ||
                     NPC[A].Type == NPCID_BOSS_FRAGILE || NPC[A].Type == NPCID_LIFT_SAND || NPC[A].Type == NPCID_FIRE_PLANT ||
                     NPC[A].Type == NPCID_PLANT_S3 || NPC[A].Type == NPCID_PLANT_S1 || NPC[A].Type == NPCID_BIG_PLANT ||
                     NPC[A].Type == NPCID_LONG_PLANT_UP || NPC[A].Type == NPCID_LONG_PLANT_DOWN || NPC[A].Type == NPCID_BOTTOM_PLANT ||
-                    NPC[A].Type == NPCID_SIDE_PLANT || NPC[A].Effect == 1 || NPC[A].Effect == 3 ||
-                    NPC[A].Effect == 4 || (NPC[A].Type == NPCID_SLIDE_BLOCK && NPC[A].Special == 0.0))
+                    NPC[A].Type == NPCID_SIDE_PLANT || NPC[A].Effect == NPCEFF_EMERGE_UP || NPC[A].Effect == NPCEFF_EMERGE_DOWN ||
+                    NPC[A].Effect == NPCEFF_WARP || (NPC[A].Type == NPCID_SLIDE_BLOCK && NPC[A].Special == 0.0))
                 && NPC[A].standingOnPlayer == 0))
         {
             if(BG_n == sizeof(BG) / sizeof(uint16_t))
@@ -834,16 +834,16 @@ void ClassicNPCScreenLogic(int Z, int numScreens, bool fill_draw_queue, NPC_Draw
         bool can_check = false;
         bool reset_all = true;
 
-        if(((NPC[A].Effect == 208 || NPC[A]->IsAVine ||
+        if(((NPC[A].Effect == NPCEFF_ENCASED || NPC[A]->IsAVine ||
              NPC[A].Type == NPCID_BOSS_FRAGILE || NPC[A].Type == NPCID_LIFT_SAND || NPC[A].Type == NPCID_FIRE_PLANT ||
              NPC[A].Type == NPCID_PLANT_S3 || NPC[A].Type == NPCID_PLANT_S1 || NPC[A].Type == NPCID_BIG_PLANT ||
              NPC[A].Type == NPCID_LONG_PLANT_UP || NPC[A].Type == NPCID_LONG_PLANT_DOWN || NPC[A].Type == NPCID_BOTTOM_PLANT ||
-             NPC[A].Type == NPCID_SIDE_PLANT || NPC[A].Effect == 1 || NPC[A].Effect == 3 ||
-             NPC[A].Effect == 4 || (NPC[A].Type == NPCID_SLIDE_BLOCK && NPC[A].Special == 0.0)) &&
+             NPC[A].Type == NPCID_SIDE_PLANT || NPC[A].Effect == NPCEFF_EMERGE_UP || NPC[A].Effect == NPCEFF_EMERGE_DOWN ||
+             NPC[A].Effect == NPCEFF_WARP || (NPC[A].Type == NPCID_SLIDE_BLOCK && NPC[A].Special == 0.0)) &&
              (NPC[A].standingOnPlayer == 0 && (!NPC[A].Generator || LevelEditor))) ||
              NPC[A].Type == NPCID_SAW || NPC[A].Type == NPCID_JUMP_PLANT)
         {
-            if(NPC[A].Effect != 2 && (!NPC[A].Generator || LevelEditor))
+            if(NPC[A].Effect != NPCEFF_DROP_ITEM && (!NPC[A].Generator || LevelEditor))
             {
                 can_check = true;
             }
@@ -904,7 +904,7 @@ void ClassicNPCScreenLogic(int Z, int numScreens, bool fill_draw_queue, NPC_Draw
                 (NPC[A].HoldingPlayer > 0 && hp.Effect != 3 && !hp_door_scroll) ||
                 (NPC[A].Type == NPCID_TOOTHY && NPC[A].standingOnPlayer == 0) ||
                 (NPC[A].Type == NPCID_BULLET && NPC[A].CantHurt > 0)
-              ) || NPC[A].Effect == 5
+              ) || NPC[A].Effect == NPCEFF_PET_TONGUE
             ) && NPC[A].Type != NPCID_ITEM_BURIED && !Player[NPC[A].HoldingPlayer].Dead
         )
         {
@@ -929,7 +929,7 @@ void ClassicNPCScreenLogic(int Z, int numScreens, bool fill_draw_queue, NPC_Draw
                 NPC[A].GeneratorActive = true;
         }
 
-        if(NPC[A].Effect == 2)
+        if(NPC[A].Effect == NPCEFF_DROP_ITEM)
         {
             if(std::fmod(NPC[A].Effect2, 3) != 0.0)
             {
@@ -2147,7 +2147,7 @@ void UpdateGraphicsScreen(Screen_t& screen)
                     XRender::renderTexture(camX + NPC[A].Location.X + NPC[A]->FrameOffsetX, camY + NPC[A].Location.Y + NPC[A]->FrameOffsetY, NPC[A].Location.Width, NPC[A].Location.Height, GFXNPC[NPC[A].Type], NPC[A]->TWidth - NPC[A].Location.Width, NPC[A].Frame * NPC[A]->THeight, cn);
                 }
             }
-            else if(NPC[A]->WidthGFX == 0 || NPC[A].Effect == 1)
+            else if(NPC[A]->WidthGFX == 0 || NPC[A].Effect == NPCEFF_EMERGE_UP)
             {
                 XRender::renderTexture(camX + NPC[A].Location.X + NPC[A]->FrameOffsetX, camY + NPC[A].Location.Y + NPC[A]->FrameOffsetY, NPC[A].Location.Width, NPC[A].Location.Height, GFXNPC[NPC[A].Type], 0, NPC[A].Frame * NPC[A]->THeight, cn);
             }
@@ -2533,7 +2533,7 @@ void UpdateGraphicsScreen(Screen_t& screen)
                         tempLocation.X = NPC[A].Location.X + NPC[A].Location.Width / 2.0 - tempLocation.Width / 2.0;
                         tempLocation.Y = NPC[A].Location.Y + NPC[A].Location.Height / 2.0 - tempLocation.Height / 2.0;
 
-                        int B = EditorNPCFrame((int)SDL_floor(NPC[A].Special), NPC[A].Direction);
+                        int B = EditorNPCFrame((NPCID)SDL_floor(NPC[A].Special), NPC[A].Direction);
                         XRender::renderTexture(camX + tempLocation.X + NPC[A]->FrameOffsetX, camY + tempLocation.Y, tempLocation.Width, tempLocation.Height, GFXNPC[NPC[A].Special], 0, B * tempLocation.Height, cn);
                     }
 

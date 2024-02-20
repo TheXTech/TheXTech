@@ -62,7 +62,7 @@ void UpdateEffects()
                     numNPCs++;
                     auto &nn = NPC[numNPCs];
                     nn = NPC_t();
-                    nn.Type = e.NewNpc;
+                    nn.Type = NPCID(e.NewNpc);
                     nn.Location.Height = nn->THeight;
                     nn.Location.Width = nn->TWidth;
                     nn.Location.X = e.Location.X + e.Location.Width / 2.0 - NPC[numNPCs].Location.Width / 2.0;
@@ -724,7 +724,7 @@ void UpdateEffects()
                         nn.Active = true;
                         nn.TimeLeft = 100;
                         nn.Direction = 0;
-                        nn.Type = e.NewNpc;
+                        nn.Type = NPCID(e.NewNpc);
                         nn.Location.Height = nn->THeight;
                         nn.Location.Width = nn->TWidth;
                         nn.Location.Y += 32 - nn.Location.Height;
@@ -785,7 +785,7 @@ void UpdateEffects()
                 nn.Active = true;
                 nn.TimeLeft = 100;
                 nn.Direction = 1;
-                nn.Type = e.NewNpc;
+                nn.Type = NPCID(e.NewNpc);
                 nn.Location.Height = nn->THeight;
                 nn.Location.Width = nn->TWidth;
                 syncLayers_NPC(numNPCs);

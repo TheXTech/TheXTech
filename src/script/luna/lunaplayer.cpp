@@ -100,7 +100,7 @@ void PlayerF::FilterToSmall(Player_t *player)
 
 void PlayerF::FilterReservePowerup(Player_t *player)
 {
-    player->HeldBonus = 0;
+    player->HeldBonus = NPCID(0);
 }
 
 void PlayerF::FilterMount(Player_t *player)

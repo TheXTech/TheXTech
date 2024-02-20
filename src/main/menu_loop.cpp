@@ -242,7 +242,7 @@ static void updateIntroLevelActivity()
 //            if(A >= 1 && A <= 5)
             p.Character = g_gameInfo.introCharacterNext();
 
-            p.HeldBonus = 0;
+            p.HeldBonus = NPCID(0);
             p.Section = 0;
             p.Mount = 0;
             p.MountType = 0;
@@ -340,7 +340,7 @@ static void updateIntroLevelActivity()
                     {
                         do
                         {
-                            n.Type = iRand(286) + 1;
+                            n.Type = NPCID(iRand(286) + 1);
                         } while(n.Type == 11 || n.Type == 16 || n.Type == 18 || n.Type == 15 ||
                                 n.Type == 21 || n.Type == 12 || n.Type == 13 || n.Type == 30 ||
                                 n.Type == 17 || n.Type == 31 || n.Type == 32 ||

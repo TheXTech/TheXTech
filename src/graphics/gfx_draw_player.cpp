@@ -327,7 +327,7 @@ void DrawPlayer(Player_t &p, const int Z, XTColor color)
                                  (NPC[p.HoldingNPC].Type == NPCID_TOOTHY && NPC[p.HoldingNPC].standingOnPlayer == 0) ||
                                  (NPC[p.HoldingNPC].Type == NPCID_BULLET && NPC[p.HoldingNPC].CantHurt > 0)
                              ) ||
-                          NPC[p.HoldingNPC].Effect == 5
+                          NPC[p.HoldingNPC].Effect == NPCEFF_PET_TONGUE
                         ) &&
                         NPC[p.HoldingNPC].Type != NPCID_ITEM_BURIED &&
                      !Player[NPC[p.HoldingNPC].HoldingPlayer].Dead

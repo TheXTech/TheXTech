@@ -434,8 +434,8 @@ void UpdateEditor()
                             OptCursorSync();
 
                             EditorCursor.Mode = OptCursor_t::LVL_NPCS;
-                            ResetNPC(A);
                             EditorCursor.NPC = NPC[A];
+                            ResetNPC(EditorCursor.NPC.Type);
                             EditorCursor.NPC.Hidden = false;
                             EditorCursor.Layer = NPC[A].Layer;
                             EditorCursor.Location = NPC[A].Location;
@@ -443,6 +443,7 @@ void UpdateEditor()
                             EditorCursor.Location.Y = NPC[A].Location.Y;
                             SetCursor();
 //                            Netplay::sendData Netplay::EraseNPC(A, 1) + "p23" + LB;
+                            NPC[A].DefaultType = NPCID_NULL;
                             KillNPC(A, 9);
                             editorScreen.FocusNPC();
                             MouseRelease = false;
@@ -973,6 +974,7 @@ void UpdateEditor()
                             else
                                 NPC[A].Location.SpeedX = -double(Physics.NPCShellSpeed / 2);
 //                            Netplay::sendData Netplay::EraseNPC(A, 0);
+                            NPC[A].DefaultType = NPCID_NULL;
                             if(NPC[A]->IsABonus || NPC[A]->IsACoin)
                                 KillNPC(A, 4); // Kill the bonus/coin
                             else
@@ -2072,16 +2074,16 @@ void UpdateInterprocess()
 
             EditorCursor.Mode = OptCursor_t::LVL_NPCS;
             EditorCursor.NPC = NPC_t();
-            EditorCursor.NPC.Type = int(n.id);
+            EditorCursor.NPC.Type = NPCID(n.id);
             EditorCursor.NPC.Hidden = false;
             EditorCursor.Location.X = n.x;
             EditorCursor.Location.Y = n.y;
             EditorCursor.NPC.Direction = n.direct;
 
-            if(EditorCursor.NPC.Type > maxNPCType) // Avoid out of range crash
-                EditorCursor.NPC.Type = 1;
+            if(n.id > maxNPCType) // Avoid out of range crash
+                EditorCursor.NPC.Type = NPCID(1);
 
-            if(EditorCursor.NPC.Type == 91 || EditorCursor.NPC.Type == 96 || EditorCursor.NPC.Type == 283 || EditorCursor.NPC.Type == 284)
+            if(EditorCursor.NPC.Type == NPCID_ITEM_BURIED || EditorCursor.NPC.Type == NPCID_ITEM_POD || EditorCursor.NPC.Type == NPCID_ITEM_THROWER || EditorCursor.NPC.Type == NPCID_ITEM_BUBBLE)
             {
                 EditorCursor.NPC.Special = n.contents;
                 EditorCursor.NPC.DefaultSpecial = int(EditorCursor.NPC.Special);
@@ -2165,13 +2167,13 @@ void UpdateInterprocess()
 }
 #endif // THEXTECH_INTERPROC_SUPPORTED
 
-int EditorNPCFrame(const int A, int C, int N)
+int EditorNPCFrame(const NPCID A, int C, int N)
 {
     float C_ = C;
     return EditorNPCFrame(A, C_, N);
 }
 
-int EditorNPCFrame(const int A, float& C, int N)
+int EditorNPCFrame(const NPCID A, float& C, int N)
 {
     int ret = 0;
 // find the default left/right frames for NPCs
@@ -2960,7 +2962,7 @@ void zTestLevel(bool magicHand, bool interProcess)
             {
                 Player[A].Hearts = 0;
                 Player[A].State = testPlayer[1].State;
-                Player[A].HeldBonus = 0;
+                Player[A].HeldBonus = NPCID_NULL;
                 Player[A].Dead = false;
                 Player[A].Mount = testPlayer[1].Mount;
                 Player[A].MountType = testPlayer[1].MountType;
@@ -2975,7 +2977,7 @@ void zTestLevel(bool magicHand, bool interProcess)
             for(A = 2; A >= 1; A--)
             {
                 Player[A].State = testPlayer[A].State;
-                Player[A].HeldBonus = 0;
+                Player[A].HeldBonus = NPCID_NULL;
                 Player[A].Dead = false;
                 Player[A].Mount = testPlayer[A].Mount;
                 Player[A].MountType = testPlayer[A].MountType;
@@ -3251,7 +3253,7 @@ void MouseMove(float X, float Y, bool /*nCur*/)
     }
 }
 
-void ResetNPC(int A)
+void ResetNPC(NPCID A)
 {
     NPC_t blankNPC;
     NPC[0] = blankNPC;

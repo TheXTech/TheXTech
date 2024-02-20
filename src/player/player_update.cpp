@@ -1801,7 +1801,7 @@ void UpdatePlayer()
                 // princess peach and toad stuff
                 if(Player[A].Character == 3 || Player[A].Character == 4 || Player[A].Character == 5)
                 {
-                    Player[A].HeldBonus = 0;
+                    Player[A].HeldBonus = NPCID(0);
                     // power up limiter
                     // If (.Character = 3 Or .Character = 4) And .State > 3 And .State <> 7 Then .State = 2
 

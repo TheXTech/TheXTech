@@ -664,13 +664,14 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         if(!LevelEditor)
             npc.Location.Y -= 0.01;
         npc.Direction = n.direct;
-        npc.Type = int(n.id);
 
-        if(IF_OUTRANGE(npc.Type, 0, maxNPCType)) // Drop ID to 1 for NPCs of out of range IDs
+        if(n.id > maxNPCType) // Drop ID to 1 for NPCs of out of range IDs
         {
-            pLogWarning("NPC-%d ID is out of range (max types %d), reset to NPC-1", npc.Type, maxNPCType);
-            npc.Type = 1;
+            pLogWarning("NPC-%d ID is out of range (max types %d), reset to NPC-1", (int)n.id, maxNPCType);
+            npc.Type = NPCID(1);
         }
+        else
+            npc.Type = NPCID(n.id);
 
         if(npc.Type == NPCID_ITEM_BURIED || npc.Type == NPCID_ITEM_POD ||
            npc.Type == NPCID_ITEM_BUBBLE || npc.Type == NPCID_ITEM_THROWER)
