@@ -444,6 +444,7 @@ void UpdateEditor()
                             EditorCursor.Location.Y = NPC[A].Location.Y;
                             SetCursor();
 //                            Netplay::sendData Netplay::EraseNPC(A, 1) + "p23" + LB;
+                            NPC[A].DefaultType = 0;
                             KillNPC(A, 9);
                             editorScreen.FocusNPC();
                             MouseRelease = false;
@@ -953,6 +954,7 @@ void UpdateEditor()
                             else
                                 NPC[A].Location.SpeedX = -double(Physics.NPCShellSpeed / 2);
 //                            Netplay::sendData Netplay::EraseNPC(A, 0);
+                            NPC[A].DefaultType = 0;
                             if(NPCIsABonus[NPC[A].Type] || NPCIsACoin[NPC[A].Type])
                                 KillNPC(A, 4); // Kill the bonus/coin
                             else
