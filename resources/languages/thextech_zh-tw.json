@@ -421,7 +421,7 @@
                 "primary": "鼠標左鍵",
                 "right": "鼠標向右移動",
                 "secondary": "鼠標右鍵",
-                "tertiary": "鼠標第三按鍵",
+                "tertiary": "鼠標滾輪",
                 "up": "鼠標向上移動"
             },
             "editor": {
