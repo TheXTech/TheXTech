@@ -499,7 +499,7 @@ void FontManager::loadCustomFonts()
         pLogDebug("Attempt to load custom fonts at %sfonts", episodeRoot.c_str());
     }
     else
-        pLogDebug("Fonts at %sfonts already loaded", episodeRoot.c_str());
+        pLogDebug("Custom fonts at %sfonts already loaded", episodeRoot.c_str());
 
     if(doLoadWorld && s_loadFontsFromDir(g_dirEpisode,
                                          "fonts",
@@ -522,7 +522,7 @@ void FontManager::loadCustomFonts()
         pLogDebug("Attempt to load custom fonts at %sfonts", dataSubDir.c_str());
     }
     else
-        pLogDebug("Fonts at %sfonts already loaded", dataSubDir.c_str());
+        pLogDebug("Custom fonts at %sfonts already loaded", dataSubDir.c_str());
 
     if(doLoadCustom && s_loadFontsFromDir(g_dirCustom,
                                          "fonts",

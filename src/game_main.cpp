@@ -73,6 +73,7 @@
 #include "main/game_strings.h"
 #include "main/translate.h"
 #include "main/record.h"
+#include "main/asset_pack.h"
 #include "core/render.h"
 #include "core/window.h"
 #include "core/events.h"
@@ -88,6 +89,7 @@
 #include "config.h"
 #include "main/screen_connect.h"
 #include "main/screen_quickreconnect.h"
+#include "main/screen_asset_pack.h"
 
 #include "main/level_medals.h"
 
@@ -114,6 +116,9 @@ static int loadingThread(void *waiter_ptr)
     LoaderUpdateDebugString("Translations");
     XLanguage::findLanguages(); // find present translations
     ReloadTranslations(); // load translations
+
+    LoaderUpdateDebugString("Asset packs");
+    GetAssetPacks();
 
     SetupPhysics(); // Setup Physics
     SetupGraphics(); // setup graphics
@@ -342,8 +347,8 @@ int GameMain(const CmdLineSetup_t &setup)
 //    Unload frmLoader
     gfxLoaderTestMode = setup.testLevelMode;
 
-    // TODO: check locations in search path
-    if(!GFX.load()) // Load UI graphics
+    // find asset pack and load required UI graphics
+    if(!InitUIAssetsFrom(setup.assetPack))
         return 1;
 
 //    If LevelEditor = False Then
@@ -547,7 +552,7 @@ int GameMain(const CmdLineSetup_t &setup)
 
     do
     {
-        if(GameMenu || MagicHand || LevelEditor)
+        if(GameMenu || MagicHand || LevelEditor || ScreenAssetPack::g_LoopActive)
         {
             XWindow::setCursor(CURSOR_NONE);
             XWindow::showCursor(0);
@@ -559,7 +564,16 @@ int GameMain(const CmdLineSetup_t &setup)
         }
 
 
-        if(LevelEditor) // Load the level editor
+        if(ScreenAssetPack::g_LoopActive)
+        {
+            // Run the frame-loop
+            runFrameLoop(&ScreenAssetPack::Loop,
+                         nullptr,
+                        []()->bool{ return ScreenAssetPack::g_LoopActive;}, nullptr,
+                        nullptr,
+                        nullptr);
+        }
+        else if(LevelEditor) // Load the level editor
         {
             // if(resChanged)
             //     ChangeScreen();

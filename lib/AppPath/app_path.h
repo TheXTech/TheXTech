@@ -32,19 +32,19 @@ class AppPathManager
 {
 public:
     /*!
-     * \brief Set the custom assets directory (will be used instead of default)
+     * \brief Prepend a single custom assets directory to the search path
      * \param root Path to the assets directory to use
      *
      * This function must be called BEFORE calling the initAppPath()
      */
-    static void setAssetsRoot(const std::string &root);
+    static void addAssetsRoot(const std::string &root);
 
     /*!
      * \brief Custom user directory (will be used instead of default)
      * \param root Path to the writable user directory to use
      *
-     * This function also sets the assets root in condition if a different one
-     * hasn't specified.
+     * The custom user directory is prepended to the search path but has lower precedence than an added assets root.
+     * Overrides a custom-set GameDirName
      *
      * This function must be called BEFORE calling the initAppPath()
      */
@@ -62,6 +62,27 @@ public:
      * \brief Initialise all paths
      */
     static void initAppPath();
+
+    /*!
+     * \brief Check the user added assets root (so that it can be treated differently than other members of the search path)
+     * \return root passed to addAssetsRoot()
+     */
+    static std::string userAddedAssetsRoot(); // Read-Only
+
+    /*!
+     * \brief Get a list of folders that should be searched for asset packs (each folder directly, and also each subdirectory in folder + "/assets"). Does not change after initAppPath() is called.
+     * \return Vector of paths to the read-only assets directory, always ends with a slash
+     */
+    static std::vector<std::string> assetsSearchPath(); // Read-Only
+
+    /*!
+     * \brief Set the custom assets directory by ID and absolute path (will be used instead of default)
+     * \param id Name of the asset pack (used to postfix user paths if not empty)
+     * \param path Path to the assets directory to use
+     *
+     * This function should be called AFTER calling the initAppPath(), and it will update all other paths
+     */
+    static void setCurrentAssetPack(const std::string &id, const std::string &path);
 
     /*!
      * \brief Get the path to the game settings file
@@ -156,14 +177,17 @@ private:
     static std::string m_gamesavesPath;
     //! Location for writable user directory
     static std::string m_userPath;
-    //! Location for read-only assets directory
-    static std::string m_assetsPath;
     //! Screenshots output directory
     static std::string m_screenshotsPath;
     //! GIF recordings output directory
     static std::string m_gifrecordingsPath;
     //! Logs output directory
     static std::string m_logsPath;
+
+    //! Location for read-only current asset pack
+    static std::string m_currentAssetPackPath;
+    //! Asset pack-specific postfix for some user directories (either "id/" or "")
+    static std::string m_assetPackPostfix;
 
     //! Location for read-only custom assets root
     static std::string m_customAssetsRoot;

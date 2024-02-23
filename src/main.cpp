@@ -268,9 +268,9 @@ int main(int argc, char**argv)
                             "Copyright (c) 2020-2024 Vitaly Novichkov <admin@wohlnet.ru>\n\n"
                             "This program is distributed under the GPLv3 license\n\n", ' ', V_LATEST_STABLE " [" V_BUILD_BRANCH ", #" V_BUILD_VER "]");
 
-        TCLAP::ValueArg<std::string> customAssetsPath("c", "assets-root", "Specify the different assets root directory to play",
+        TCLAP::ValueArg<std::string> customAssetsPath("c", "asset-pack", "Specify the different assets pack name or directory to play",
                                                       false, "",
-                                                      "directory path",
+                                                      "string or directory path",
                                                       cmd);
 
         TCLAP::ValueArg<std::string> customUserDirectory("u", "user-directory", "Specify the different writable user directory to store settings, gamesaves, logs, screenshots, etc.",
@@ -279,7 +279,7 @@ int main(int argc, char**argv)
                                                          cmd);
 
         TCLAP::ValueArg<std::string> customGameDirName(std::string(), "game-dirname",
-                                                       "Specify the game directory name for default locations",
+                                                       "Specify the game directory name for default locations (ignored if user-directory is specified)",
                                                        false, "",
                                                        "directory name",
                                                        cmd);
@@ -457,12 +457,12 @@ int main(int argc, char**argv)
 
         // Initialize the assets and user paths
         {
-            std::string customAssets = customAssetsPath.getValue();
+            setup.assetPack = customAssetsPath.getValue();
             std::string customUserDir = customUserDirectory.getValue();
             std::string customGameDir = customGameDirName.getValue();
 
-            if(!customAssets.empty())
-                AppPathManager::setAssetsRoot(customAssets);
+            if(!setup.assetPack.empty())
+                AppPathManager::addAssetsRoot(setup.assetPack);
 
             if(!customUserDir.empty())
                 AppPathManager::setUserDirectory(customUserDir);
@@ -471,7 +471,6 @@ int main(int argc, char**argv)
                 AppPathManager::setGameDirName(customGameDir);
 
             AppPathManager::initAppPath();
-            AppPath = AppPathManager::assetsRoot();
         }
 
 #ifdef THEXTECH_INTERPROC_SUPPORTED
@@ -688,8 +687,6 @@ int main(int argc, char**argv)
 
     printf("Launching AppPath...\n");
     AppPathManager::initAppPath();
-    AppPath = AppPathManager::assetsRoot();
-    printf("Will load from %s...\n", AppPath.c_str());
 
     OpenConfig_preSetup();
 

@@ -29,10 +29,10 @@
 #include "../../version.h"
 #include "app_path_private.h"
 
+#include "sdl_proxy/sdl_assert.h"
 
 std::string AppPathManager::m_settingsPath;
 std::string AppPathManager::m_gamesavesPath;
-std::string AppPathManager::m_assetsPath;
 std::string AppPathManager::m_userPath;
 
 std::string AppPathManager::m_screenshotsPath;
@@ -42,6 +42,9 @@ std::string AppPathManager::m_logsPath;
 std::string AppPathManager::m_customAssetsRoot;
 std::string AppPathManager::m_customUserDirectory;
 std::string AppPathManager::m_customGameDirName;
+
+std::string AppPathManager::m_currentAssetPackPath;
+std::string AppPathManager::m_assetPackPostfix;
 
 bool AppPathManager::m_isPortable = false;
 
@@ -74,7 +77,7 @@ static void appendSlash(std::string &path)
 #endif
 }
 
-void AppPathManager::setAssetsRoot(const std::string &root)
+void AppPathManager::addAssetsRoot(const std::string &root)
 {
     m_customAssetsRoot = root;
     appendSlash(m_customAssetsRoot);
@@ -105,20 +108,12 @@ void AppPathManager::initAppPath()
     {
         m_userPath = m_customUserDirectory;
         // Assets root matches to user directory if not specified other
-        m_assetsPath = (m_customAssetsRoot.empty() ? m_userPath : m_customAssetsRoot);
         initSettingsPath();
         return;
     }
 
     if(AppPathP::portableAvailable() && checkPortable())
         return;
-
-#if defined(FIXED_ASSETS_PATH) // Fixed assets path, for the rest of UNIX-like OS packages
-    m_assetsPath = FIXED_ASSETS_PATH;
-#else
-    m_assetsPath = (m_customAssetsRoot.empty() ? AppPathP::assetsRoot() : m_customAssetsRoot);
-#endif
-    appendSlash(m_assetsPath);
 
     std::string userDirPath = AppPathP::userDirectory();
 
@@ -141,14 +136,72 @@ void AppPathManager::initAppPath()
 
 defaultSettingsPath:
     m_userPath = AppPathP::appDirectory();
-    m_assetsPath = AppPathP::appDirectory();
     initSettingsPath();
 
 #if defined(__EMSCRIPTEN__) && !defined(DISABLE_LOGGING)
-    std::printf("== Default Assets Path is %s\n", m_assetsPath.c_str());
     std::printf("== Default User Path is %s\n", m_userPath.c_str());
     fflush(stdout);
 #endif
+}
+
+std::string AppPathManager::userAddedAssetsRoot()
+{
+    return m_customAssetsRoot;
+}
+
+std::vector<std::string> AppPathManager::assetsSearchPath()
+{
+    std::vector<std::string> out;
+
+    if(!m_customAssetsRoot.empty())
+        out.push_back(m_customAssetsRoot);
+
+    if(!m_customUserDirectory.empty())
+        out.push_back(m_customUserDirectory);
+
+    out.push_back(AppPathP::appDirectory());
+
+    if(!m_isPortable)
+    {
+#ifdef FIXED_ASSETS_PATH // Fixed assets path, for the rest of UNIX-like OS packages
+        out.push_back(FIXED_ASSETS_PATH);
+#endif
+
+        out.push_back(m_userPath);
+
+        out.push_back(AppPathP::assetsRoot());
+    }
+
+    // add slashes to all strings
+    for(size_t i = 0; i < out.size(); i++)
+        appendSlash(out[i]);
+
+    // remove any duplicates
+    for(size_t i = 0; i < out.size(); i++)
+    {
+        for(size_t j = i + 1; j < out.size();)
+        {
+            if(out[i] == out[j])
+                out.erase(out.begin() + j);
+            else
+                j++;
+        }
+    }
+
+    return out;
+}
+
+void AppPathManager::setCurrentAssetPack(const std::string &id, const std::string &path)
+{
+    m_currentAssetPackPath = path;
+    appendSlash(m_currentAssetPackPath);
+
+    if(!id.empty())
+        m_assetPackPostfix = id + "/";
+    else
+        m_assetPackPostfix = "";
+
+    initSettingsPath();
 }
 
 bool AppPathManager::checkPortable()
@@ -175,10 +228,7 @@ bool AppPathManager::checkPortable()
     checkForPort.endGroup();
 
     if(m_isPortable)
-    {
-        m_assetsPath = appPath;
         initSettingsPath();
-    }
 
     return m_isPortable;
 }
@@ -189,13 +239,13 @@ void AppPathManager::initSettingsPath()
     initString(m_settingsPath, AppPathP::settingsRoot(), m_userPath + "settings/");
 
     // Default settings path
-    initString(m_gamesavesPath, AppPathP::gamesavesRoot(), m_settingsPath + "gamesaves/");
+    initString(m_gamesavesPath, AppPathP::gamesavesRoot(), m_settingsPath + "gamesaves/" + m_assetPackPostfix);
 
     // Check if need to use system-wide screenshots directory
-    initString(m_screenshotsPath, AppPathP::screenshotsRoot(), m_userPath + "screenshots/");
+    initString(m_screenshotsPath, AppPathP::screenshotsRoot(), m_userPath + "screenshots/" + m_assetPackPostfix);
 
     // Check if need to use system-wide gif recording directory
-    initString(m_gifrecordingsPath, AppPathP::gifRecsRoot(), m_userPath + "gif-recordings/");
+    initString(m_gifrecordingsPath, AppPathP::gifRecsRoot(), m_userPath + "gif-recordings/" + m_assetPackPostfix);
 
     // Check if need to use system-wide logs directory
     initString(m_logsPath, AppPathP::logsRoot(), m_userPath + "logs/");
@@ -256,7 +306,8 @@ std::string AppPathManager::userAppDirSTD() // Writable
 
 std::string AppPathManager::assetsRoot() // Readable
 {
-    return m_assetsPath;
+    SDL_assert_release(!m_currentAssetPackPath.empty());
+    return m_currentAssetPackPath;
 }
 
 std::string AppPathManager::logsDir() // Writable
@@ -266,7 +317,8 @@ std::string AppPathManager::logsDir() // Writable
 
 std::string AppPathManager::languagesDir() // Readable
 {
-    return m_assetsPath + "languages/";
+    SDL_assert_release(!m_currentAssetPackPath.empty());
+    return m_currentAssetPackPath + "languages/";
 }
 
 std::string AppPathManager::screenshotsDir() // Writable
@@ -286,17 +338,17 @@ std::string AppPathManager::gameSaveRootDir() // Writable
 
 std::string AppPathManager::gameplayRecordsRootDir() // Writable
 {
-    return m_userPath + "gameplay-records/";
+    return m_userPath + "gameplay-records/" + m_assetPackPostfix;
 }
 
 std::string AppPathManager::userWorldsRootDir() // Readable
 {
-    return m_userPath + "worlds/";
+    return m_userPath + "worlds/" + m_assetPackPostfix;
 }
 
 std::string AppPathManager::userBattleRootDir() // Readable
 {
-    return m_userPath + "battle/";
+    return m_userPath + "battle/" + m_assetPackPostfix;
 }
 
 void AppPathManager::install()
@@ -313,7 +365,8 @@ void AppPathManager::install()
 
 bool AppPathManager::userDirIsAvailable()
 {
-    return (m_userPath != m_assetsPath);
+    SDL_assert_release(!m_currentAssetPackPath.empty());
+    return (m_userPath != m_currentAssetPackPath);
 }
 
 void AppPathManager::syncFs()

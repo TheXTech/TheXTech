@@ -696,6 +696,8 @@ set(THEXTECH_SRC
     src/main/outro_loop.cpp
     src/main/trees.cpp
     src/main/block_table.cpp
+    src/main/asset_pack.cpp
+    src/main/screen_asset_pack.cpp
     src/graphics/gfx_update2.cpp
     src/graphics/gfx_update.cpp
     src/graphics/gfx_background.cpp
