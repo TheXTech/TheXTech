@@ -4,6 +4,7 @@ Changelog for 1.3.6.5-dev
 -Fix TheXTech 1.3.6 bug where auto movement on the world map was not reset when switching episodes (@ds-sloth)
 -Fix TheXTech 1.3.6 bug where dropping a player at the world map removed their mount (@ds-sloth)
 -Fix TheXTech 1.3.6.4 editor bug where NPCs could not be erased from a battle level (@ds-sloth)
+-Fix vanilla bug where an incorrect frame gets shown when player attempts to enter the star-locked pipe (@Wohlstand)
 
 Changelog for 1.3.6.4
 -Use OpenGL as the default renderer on supported platforms ("sdl" may be used in config.ini or at at the command line to request the SDL2 renderer)
