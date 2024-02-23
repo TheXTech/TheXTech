@@ -95,6 +95,8 @@ struct Compatibility_t
     unsigned int bitblit_background_colour[3];
     // 1.3.6.3
     bool pound_by_alt_run; // use alt run for pound action when player is in a purple pet mount
+    // 1.3.6.5
+    bool fix_visual_bugs; // fix misc visual bugs from SMBX 1.3
 
     // SpeedRun section
     enum
