@@ -58,6 +58,11 @@ public:
      */
     void hide() override;
 
+    /*!
+     * \brief Updates the window icon based on AppPath
+     */
+    void updateWindowIcon() override;
+
     /**
      *  \brief Toggle whether or not the cursor is shown.
      *

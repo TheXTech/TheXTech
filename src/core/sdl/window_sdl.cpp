@@ -198,6 +198,18 @@ bool WindowSDL::initSDL(uint32_t windowInitFlags)
     s_emscriptenFillBrowser();
 #endif
 
+    return res;
+}
+
+void WindowSDL::close()
+{
+    if(m_window)
+        SDL_DestroyWindow(m_window);
+    m_window = nullptr;
+}
+
+void WindowSDL::updateWindowIcon()
+{
 #ifdef _WIN32
     FIBITMAP *img[2];
     img[0] = GraphicsHelps::loadImage(AppPath + "/graphics/ui/icon/thextech_16.png");
@@ -240,15 +252,6 @@ bool WindowSDL::initSDL(uint32_t windowInitFlags)
         }
     }
 #endif//IF _WIN32 #else
-
-    return res;
-}
-
-void WindowSDL::close()
-{
-    if(m_window)
-        SDL_DestroyWindow(m_window);
-    m_window = nullptr;
 }
 
 SDL_Window *WindowSDL::getWindow()

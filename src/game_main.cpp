@@ -278,6 +278,7 @@ void MainLoadAll(bool reload)
 
     Integrator::setGameName(g_gameInfo.title, g_gameInfo.statusIconName);
     XWindow::setTitle(g_gameInfo.titleWindow().c_str());
+    XWindow::updateWindowIcon();
 
     LoaderFinish();
 }

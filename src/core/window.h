@@ -86,6 +86,17 @@ E_INLINE void hide() TAIL
 }
 #endif
 
+
+/*!
+ * \brief Updates the window icon based on AppPath
+ */
+E_INLINE void updateWindowIcon() TAIL
+#ifndef WINDOW_CUSTOM
+{
+    g_window->updateWindowIcon();
+}
+#endif
+
 /**
  *  \brief Toggle whether or not the cursor is shown.
  *
