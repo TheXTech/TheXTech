@@ -32,6 +32,7 @@
 
 #include "speedrunner.h"
 #include "presetup.h"
+#include "main/asset_pack.h"
 
 #include <Utils/files.h>
 #include <Utils/strings.h>
@@ -148,6 +149,9 @@ void OpenConfig_preSetup()
 
     InitSoundDefaults();
 
+    g_pLogGlobalSetup.logPathDefault = AppPathManager::logsDir();
+    g_pLogGlobalSetup.logPathFallBack = AppPathManager::userAppDirSTD();
+
     if(Files::fileExists(configPath))
     {
         IniProcessing config(configPath);
@@ -160,8 +164,6 @@ void OpenConfig_preSetup()
         config.read("log-path", g_pLogGlobalSetup.logPathCustom, std::string());
         config.read("max-log-count", g_pLogGlobalSetup.maxFilesCount, 10);
         config.readEnum("log-level", g_pLogGlobalSetup.level, c_defaultLogLevel, logLevelEnum);
-        g_pLogGlobalSetup.logPathDefault = AppPathManager::logsDir();
-        g_pLogGlobalSetup.logPathFallBack = AppPathManager::userAppDirSTD();
         config.endGroup();
 
         config.beginGroup("video");
@@ -228,11 +230,39 @@ void OpenConfig_preSetup()
         config.readEnum("compatibility-mode", g_preSetup.compatibilityMode, 0, compatMode);
         config.endGroup();
 
+        config.beginGroup("recent");
+        config.read("asset-pack", g_preSetup.assetPack, std::string());
+        config.endGroup();
+
         config.beginGroup("speedrun");
         config.read("mode", g_preSetup.speedRunMode, 0);
         config.read("semi-transparent-timer", g_preSetup.speedRunSemiTransparentTimer, false);
         config.readEnum("blink-effect", g_preSetup.speedRunEffectBlink, (int)SPEEDRUN_EFFECT_BLINK_UNDEFINED, speedRunBlinkMode);
         config.endGroup();
+    }
+}
+
+
+void ConfigReloadRecentEpisodes()
+{
+    // reload recently used episodes for the new asset pack
+    std::string configPath = AppPathManager::settingsFileSTD();
+
+    if(Files::fileExists(configPath))
+    {
+        IniProcessing config(configPath);
+
+        std::string asset_pack_prefix = g_AssetPackID;
+        if(!asset_pack_prefix.empty())
+            asset_pack_prefix += '-';
+
+        config.beginGroup("recent");
+        config.read((asset_pack_prefix + "episode-1p").c_str(), g_recentWorld1p, std::string());
+        config.read((asset_pack_prefix + "episode-2p").c_str(), g_recentWorld2p, std::string());
+        config.read((asset_pack_prefix + "episode-editor").c_str(), g_recentWorldEditor, std::string());
+        config.endGroup();
+
+        pLogDebug("Loaded recent episodes for asset pack [id: %s] from [%s]", g_AssetPackID.c_str(), configPath.c_str());
     }
 }
 
@@ -313,10 +343,14 @@ void OpenConfig()
         config.readEnum("show-episode-title", g_config.show_episode_title, (int)Config_t::EPISODE_TITLE_OFF, showEpisodeTitle);
         config.endGroup();
 
+        std::string asset_pack_prefix = g_AssetPackID;
+        if(!asset_pack_prefix.empty())
+            asset_pack_prefix += '-';
+
         config.beginGroup("recent");
-        config.read("episode-1p", g_recentWorld1p, std::string());
-        config.read("episode-2p", g_recentWorld2p, std::string());
-        config.read("episode-editor", g_recentWorldEditor, std::string());
+        config.read((asset_pack_prefix + "episode-1p").c_str(), g_recentWorld1p, std::string());
+        config.read((asset_pack_prefix + "episode-2p").c_str(), g_recentWorld2p, std::string());
+        config.read((asset_pack_prefix + "episode-editor").c_str(), g_recentWorldEditor, std::string());
         config.endGroup();
 
         config.beginGroup("gameplay");
@@ -403,10 +437,15 @@ void SaveConfig()
     }
     config.endGroup();
 
+    std::string asset_pack_prefix = g_AssetPackID;
+    if(!asset_pack_prefix.empty())
+        asset_pack_prefix += '-';
+
     config.beginGroup("recent");
-    config.setValue("episode-1p", g_recentWorld1p);
-    config.setValue("episode-2p", g_recentWorld2p);
-    config.setValue("episode-editor", g_recentWorldEditor);
+    config.setValue("asset-pack", g_AssetPackID);
+    config.setValue((asset_pack_prefix + "episode-1p").c_str(), g_recentWorld1p);
+    config.setValue((asset_pack_prefix + "episode-2p").c_str(), g_recentWorld2p);
+    config.setValue((asset_pack_prefix + "episode-editor").c_str(), g_recentWorldEditor);
     config.endGroup();
 
     config.beginGroup("video");

@@ -399,7 +399,7 @@ void UpdateNPCs()
                             {
                                 NPC[numNPCs].Layer = NPC[A].Layer;
                                 NPC[numNPCs].Effect3 = NPC[A].GeneratorDirection;
-                                NPC[numNPCs].Effect = 4;
+                                NPC[numNPCs].Effect = NPCEFF_WARP;
                                 NPC[numNPCs].Location.SpeedX = 0;
                                 NPC[numNPCs].TimeLeft = 100;
                                 if(NPC[A].GeneratorDirection == 1)
@@ -482,7 +482,7 @@ void UpdateNPCs()
                             NPC[numNPCs].Direction = NPC[numNPCs].DefaultDirection;
                             NPC[numNPCs].Frame = EditorNPCFrame(NPC[numNPCs].Type, NPC[numNPCs].Direction);
                             NPC[numNPCs].DefaultDirection = NPC[numNPCs].Direction;
-                            NPC[numNPCs].DefaultType = 0;
+                            NPC[numNPCs].DefaultType = NPCID_NULL;
                             NPC[numNPCs].Generator = false;
                             NPC[numNPCs].Active = true;
                             NPC[numNPCs].TimeLeft = 100;
@@ -672,7 +672,7 @@ void UpdateNPCs()
                                         if(NPC[A].Location.Y + NPC[A].Location.Height > NPC[B].Location.Y + NPC[B].Location.Height)
                                         {
                                             NPC[B].Frame = EditorNPCFrame(NPC[B].Type, NPC[B].Direction);
-                                            NPC[B].Effect = 208;
+                                            NPC[B].Effect = NPCEFF_ENCASED;
                                         }
                                     }
                                 }
@@ -1135,7 +1135,7 @@ void UpdateNPCs()
             if(NPC[A].Type == NPCID_VEGGIE_RANDOM)
             {
                 int B = iRand(9);
-                NPC[A].Type = NPCID_VEGGIE_2 + B;
+                NPC[A].Type = NPCID(NPCID_VEGGIE_2 + B);
                 if(NPC[A].Type == NPCID_VEGGIE_RANDOM)
                     NPC[A].Type = NPCID_VEGGIE_1;
                 NPC[A].Location.X += NPC[A].Location.Width / 2.0;
@@ -1208,7 +1208,7 @@ void UpdateNPCs()
             if(NPC[A].TimeLeft < 1)
                 Deactivate(A);
             NPC[A].TimeLeft -= 1;
-            if(NPC[A].Effect == 0)
+            if(NPC[A].Effect == NPCEFF_NORMAL)
             {
 
 
@@ -1245,7 +1245,7 @@ void UpdateNPCs()
                         if(NPC[A].Type == NPCID_ITEM_BURIED)
                         {
                             if(NPC[A].Special == 0.0)
-                                NPC[A].Special = 147;
+                                NPC[A].Special = NPCID_VEGGIE_RANDOM;
 
                             if(NPC[A].Generator)
                             {
@@ -1254,7 +1254,7 @@ void UpdateNPCs()
                             }
 
                             NPC[A].Frame = 0;
-                            NPC[A].Type = NPC[A].Special;
+                            NPC[A].Type = NPCID(NPC[A].Special);
                             NPC[A].Special = 0;
 
                             if(NPCIsYoshi(NPC[A]))
@@ -1269,7 +1269,9 @@ void UpdateNPCs()
                                  // Duplicated segment [PVS Studio]
                                  // NPC[A].Type == NPCID_BLU_BOOT ||
                                  NPC[A].Type == NPCID_TOOTHYPIPE || NPCIsAnExit(NPC[A])))
-                                NPC[A].DefaultType = 0;
+                            {
+                                NPC[A].DefaultType = NPCID_NULL;
+                            }
 
                             NPC[A].Location.Height = NPC[A]->THeight;
                             NPC[A].Location.Width = NPC[A]->TWidth;
@@ -1277,7 +1279,7 @@ void UpdateNPCs()
                             if(NPC[A].Type == NPCID_VEGGIE_RANDOM)
                             {
                                 int B = iRand(9);
-                                NPC[A].Type = NPCID_VEGGIE_2 + B;
+                                NPC[A].Type = NPCID(NPCID_VEGGIE_2 + B);
                                 if(NPC[A].Type == NPCID_VEGGIE_RANDOM)
                                     NPC[A].Type = NPCID_VEGGIE_1;
                                 NPC[A].Location.X += NPC[A].Location.Width / 2.0;
@@ -3774,7 +3776,7 @@ void UpdateNPCs()
 
                                                                         if(CheckCollision(tempLocation, tempLocation2))
                                                                         {
-                                                                            NPC[B].Type -= NPCID_GRN_TURTLE_S3;
+                                                                            NPC[B].Type = NPCID(NPC[B].Type - 4);
                                                                             if(NPC[B].Type == NPCID_YEL_TURTLE_S4)
                                                                                 NPC[B].Type = NPCID_RAINBOW_SHELL;
                                                                             NPC[A].Killed = 9;
@@ -5456,7 +5458,7 @@ void UpdateNPCs()
 
                 // Effects
             }
-            else if(NPC[A].Effect == 1) // Bonus coming out of a block effect
+            else if(NPC[A].Effect == NPCEFF_EMERGE_UP) // Bonus coming out of a block effect
             {
 
                 if(NPC[A].Direction == 0.0f) // Move toward the closest player
@@ -5482,7 +5484,7 @@ void UpdateNPCs()
                 {
                     if(NPC[A].Effect2 >= NPC[A]->HeightGFX)
                     {
-                        NPC[A].Effect = 0;
+                        NPC[A].Effect = NPCEFF_NORMAL;
                         NPC[A].Effect2 = 0;
                         NPC[A].Location.Y += NPC[A].Location.Height;
                         NPC[A].Location.Height = NPC[A]->THeight;
@@ -5493,17 +5495,19 @@ void UpdateNPCs()
                 {
                     if(NPC[A].Effect2 >= NPC[A]->THeight)
                     {
-                        NPC[A].Effect = 0;
+                        NPC[A].Effect = NPCEFF_NORMAL;
                         NPC[A].Effect2 = 0;
                         NPC[A].Location.Height = NPC[A]->THeight;
                     }
                 }
             }
-            else if(NPC[A].Effect == 208)
+            else if(NPC[A].Effect == NPCEFF_ENCASED)
             {
                 bool tempBool = false;
 
-                for(int B = 1; B <= numNPCs; B++)
+                // Note: since SMBX64, this logic doesn't check for Hidden or Active, so an encased NPC will not escape encased mode properly in Battle Mode
+                // Note 2: NPCID_BOSS_FRAGILE does not use the encased logic, it has its own specific logic to check for nearby NPCID_BOSS_CASE
+                for(int B : treeNPCQuery(NPC[A].Location, SORTMODE_NONE))
                 {
                     if(NPC[B].Type == NPCID_BOSS_CASE)
                     {
@@ -5516,16 +5520,16 @@ void UpdateNPCs()
                 }
 
                 if(!tempBool)
-                    NPC[A].Effect = 0;
+                    NPC[A].Effect = NPCEFF_NORMAL;
             }
-            else if(NPC[A].Effect == 2) // Bonus item is falling from the players container effect
+            else if(NPC[A].Effect == NPCEFF_DROP_ITEM) // Bonus item is falling from the players container effect
             {
                 NPC[A].Location.Y += 2.2;
                 NPC[A].Effect2 += 1;
                 if(NPC[A].Effect2 == 5)
                     NPC[A].Effect2 = 1;
             }
-            else if(NPC[A].Effect == 3) // Bonus falling out of a block
+            else if(NPC[A].Effect == NPCEFF_EMERGE_DOWN) // Bonus falling out of a block
             {
                 if(NPC[A].Type == NPCID_LEAF_POWER)
                     NPC[A].Direction = 1;
@@ -5550,7 +5554,7 @@ void UpdateNPCs()
 
                 if(fEqual(NPC[A].Effect2, 32.0))
                 {
-                    NPC[A].Effect = 0;
+                    NPC[A].Effect = NPCEFF_NORMAL;
                     NPC[A].Effect2 = 0;
                     NPC[A].Location.Height = 32;
 
@@ -5591,7 +5595,7 @@ void UpdateNPCs()
                     }
                 }
             }
-            else if(NPC[A].Effect == 4) // Warp Generator
+            else if(NPC[A].Effect == NPCEFF_WARP) // Warp Generator
             {
                 if(NPC[A].Effect3 == 1)
                 {
@@ -5601,7 +5605,7 @@ void UpdateNPCs()
 
                     if(NPC[A].Location.Y + NPC[A].Location.Height <= NPC[A].Effect2)
                     {
-                        NPC[A].Effect = 0;
+                        NPC[A].Effect = NPCEFF_NORMAL;
                         NPC[A].Effect2 = 0;
                         NPC[A].Effect3 = 0;
                     }
@@ -5615,7 +5619,7 @@ void UpdateNPCs()
 
                     if(NPC[A].Location.Y >= NPC[A].Effect2)
                     {
-                        NPC[A].Effect = 0;
+                        NPC[A].Effect = NPCEFF_NORMAL;
                         NPC[A].Effect2 = 0;
                         NPC[A].Effect3 = 0;
                     }
@@ -5631,7 +5635,7 @@ void UpdateNPCs()
 
                     if(NPC[A].Location.X + NPC[A].Location.Width <= NPC[A].Effect2)
                     {
-                        NPC[A].Effect = 0;
+                        NPC[A].Effect = NPCEFF_NORMAL;
                         NPC[A].Effect2 = 0;
                         NPC[A].Effect3 = 0;
                     }
@@ -5647,7 +5651,7 @@ void UpdateNPCs()
 
                     if(NPC[A].Location.X >= NPC[A].Effect2)
                     {
-                        NPC[A].Effect = 0;
+                        NPC[A].Effect = NPCEFF_NORMAL;
                         NPC[A].Effect2 = 0;
                         NPC[A].Effect3 = 0;
                     }
@@ -5661,33 +5665,33 @@ void UpdateNPCs()
                     syncLayers_NPC(A);
                 }
             }
-            else if(NPC[A].Effect == 5) // Grabbed by Yoshi
+            else if(NPC[A].Effect == NPCEFF_PET_TONGUE) // Grabbed by Yoshi
             {
                 NPC[A].TimeLeft = 100;
                 NPC[A].Effect3 -= 1;
                 if(NPC[A].Effect3 <= 0)
                 {
-                    NPC[A].Effect = 0;
+                    NPC[A].Effect = NPCEFF_NORMAL;
                     NPC[A].Effect2 = 0;
                     NPC[A].Effect3 = 0;
                 }
             }
-            else if(NPC[A].Effect == 6) // Held by Yoshi
+            else if(NPC[A].Effect == NPCEFF_PET_INSIDE) // Held by Yoshi
             {
                 NPC[A].TimeLeft = 100;
                 if(Player[NPC[A].Effect2].YoshiNPC != A)
                 {
-                    NPC[A].Effect = 0;
+                    NPC[A].Effect = NPCEFF_NORMAL;
                     NPC[A].Effect2 = 0;
                     NPC[A].Effect3 = 0;
                 }
             }
-            else if(NPC[A].Effect == 8) // Holding Pattern
+            else if(NPC[A].Effect == NPCEFF_WAITING) // Holding Pattern
             {
                 NPC[A].Effect2 -= 1;
                 if(NPC[A].Effect2 <= 0)
                 {
-                    NPC[A].Effect = 0;
+                    NPC[A].Effect = NPCEFF_NORMAL;
                     NPC[A].Effect2 = 0;
                     NPC[A].Effect3 = 0;
                 }

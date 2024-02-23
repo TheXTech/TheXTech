@@ -22,10 +22,15 @@
 #ifndef NEW_EDITOR_H
 #define NEW_EDITOR_H
 
-#include "std_picture.h"
 #include <string>
 #include <vector>
+
 #include <DirManager/dirman.h>
+
+#include "std_picture.h"
+#include "global_constants.h"
+
+enum NPCID : vbint_t;
 
 namespace Icon
 {
@@ -188,8 +193,8 @@ private:
 
     bool UpdateCheckBox(CallMode mode, int x, int y, bool sel, const char* tooltip = nullptr);
 
-    bool UpdateNPCButton(CallMode mode, int x, int y, int type, bool sel);
-    void UpdateNPC(CallMode mode, int x, int y, int type);
+    bool UpdateNPCButton(CallMode mode, int x, int y, NPCID type, bool sel);
+    void UpdateNPC(CallMode mode, int x, int y, NPCID type);
     void UpdateNPCGrid(CallMode mode, int x, int y, const int* types, int n_npcs, int n_cols);
     void UpdateNPCScreen(CallMode mode);
 

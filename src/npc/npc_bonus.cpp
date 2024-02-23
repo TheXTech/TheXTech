@@ -87,14 +87,14 @@ void DropBonus(int A)
     // is player a clone?
     if(g_ClonedPlayerMode && A != 1)
     {
-        Player[A].HeldBonus = 0;
+        Player[A].HeldBonus = NPCID(0);
         return;
     }
 
     // is player not meant to have a bonus?
     if(Player[A].Character == 3 || Player[A].Character == 4)
     {
-        Player[A].HeldBonus = 0;
+        Player[A].HeldBonus = NPCID(0);
         return;
     }
 
@@ -157,7 +157,7 @@ void DropBonus(int A)
     // finish initializing the NPC
     NPC[numNPCs].Location.SpeedX = 0;
     NPC[numNPCs].Location.SpeedY = 0;
-    NPC[numNPCs].Effect = 2;
+    NPC[numNPCs].Effect = NPCEFF_DROP_ITEM;
     NPC[numNPCs].Effect2 = 1;
     NPC[numNPCs].Active = true;
     NPC[numNPCs].TimeLeft = 200;
@@ -165,7 +165,7 @@ void DropBonus(int A)
     CheckSectionNPC(numNPCs);
 
     // erase bonus
-    Player[A].HeldBonus = 0;
+    Player[A].HeldBonus = NPCID(0);
 }
 
 void CheckAfterStarTake(bool many)
@@ -198,7 +198,7 @@ void TouchBonus(int A, int B)
 {
     int C = 0;
     // int D = 0;
-    int toadBool = 0;
+    NPCID toadBool = NPCID(0);
     bool tempBool = false;
     Location_t tempLocation;
 
@@ -283,7 +283,7 @@ void TouchBonus(int A, int B)
         }
         if(NPC[B].Type == NPCID_TIMER_S3 && NPC[B].Effect != 2 && (Player[A].Character == 1 || Player[A].Character == 2)) // send the clock to the item container
         {
-            Player[A].HeldBonus = 248;
+            Player[A].HeldBonus = NPCID_TIMER_S3;
             NPC[B].Killed = 9;
             NPCQueues::Killed.push_back(B);
             PlaySoundSpatial(SFX_GotItem, NPC[B].Location);

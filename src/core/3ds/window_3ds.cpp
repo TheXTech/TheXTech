@@ -44,6 +44,8 @@ bool init()
 
 void quit() {}
 
+void updateWindowIcon() {}
+
 void show() {}
 void hide() {}
 int showCursor(int show) { return show; }

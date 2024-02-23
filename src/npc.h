@@ -23,6 +23,9 @@
 #define NPC_H
 
 #include "location.h"
+#include "global_constants.h"
+
+enum NPCID : vbint_t;
 
 // Public Sub UpdateNPCs()
 void UpdateNPCs();
@@ -70,7 +73,7 @@ void SpecialNPC(int A);
 // Public Sub CharStuff(Optional WhatNPC As Integer = 0, Optional CheckEggs As Boolean = False)
 void CharStuff(int WhatNPC = 0, bool CheckEggs = false);
 // Public Function RandomBonus()
-int RandomBonus();
+NPCID RandomBonus();
 
 bool npcHasFloor(const struct NPC_t &npc);
 

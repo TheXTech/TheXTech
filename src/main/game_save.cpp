@@ -462,7 +462,7 @@ void ClearGame(bool punnish)
     for(int A = 1, i = 0; A <= 5; A++, i++)
     {
         SavedChar[A].State = 1;
-        SavedChar[A].HeldBonus = 0;
+        SavedChar[A].HeldBonus = NPCID(0);
         SavedChar[A].Mount = 0;
         SavedChar[A].MountType = 0;
         SavedChar[A].Hearts = 1;

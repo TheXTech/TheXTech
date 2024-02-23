@@ -258,7 +258,7 @@ void SetupPlayers()
             if(Player[A].HeldBonus > 0)
             {
                 Player[A].Hearts += 1;
-                Player[A].HeldBonus = 0;
+                Player[A].HeldBonus = NPCID(0);
             }
             if(Player[A].State == 1 && Player[A].Hearts > 1)
                 Player[A].State = 2;
@@ -270,7 +270,7 @@ void SetupPlayers()
         else // Mario and Luigi
         {
             if(Player[A].Hearts == 3 && Player[A].HeldBonus == 0)
-                Player[A].HeldBonus = 9;
+                Player[A].HeldBonus = NPCID_POWER_S3;
             Player[A].Hearts = 0;
         }
         if(Player[A].Character == 5)
@@ -683,7 +683,7 @@ void PlayerHurt(const int A)
                 if(p.State > 1)
                 {
                     PlaySoundSpatial(SFX_PlayerShrink, p.Location);
-                    p.StateNPC = 0;
+                    p.StateNPC = NPCID_NULL;
                     p.Effect = 2;
                 }
                 else
@@ -2245,7 +2245,7 @@ void PlayerFrame(Player_t &p)
     }
 }
 
-void UpdatePlayerBonus(const int A, const int B)
+void UpdatePlayerBonus(const int A, const NPCID B)
 {
     auto &p = Player[A];
 
@@ -2254,7 +2254,7 @@ void UpdatePlayerBonus(const int A, const int B)
     // 5 leaf
     if(p.State != 1 || (p.Effect == 1 || p.Effect == 4 || p.Effect == 5))
     {
-        if(B == 9 || B == 185 || B == 184 || B == 250)
+        if(B == NPCID_POWER_S3 || B == NPCID_POWER_S4 || B == NPCID_POWER_S1 || B == NPCID_POWER_S5)
         {
             if(p.HeldBonus == 0)
                 p.HeldBonus = B;
@@ -2263,43 +2263,43 @@ void UpdatePlayerBonus(const int A, const int B)
         {
             if(p.HeldBonus == 0)
             {
-                if(p.StateNPC == 184)
-                    p.HeldBonus = 184;
-                else if(p.StateNPC == 185)
-                    p.HeldBonus = 185;
+                if(p.StateNPC == NPCID_POWER_S1)
+                    p.HeldBonus = NPCID_POWER_S1;
+                else if(p.StateNPC == NPCID_POWER_S4)
+                    p.HeldBonus = NPCID_POWER_S4;
                 else
-                    p.HeldBonus = 9;
+                    p.HeldBonus = NPCID_POWER_S3;
             }
         }
         else
         {
             if(p.State == 3 || p.Effect == 4)
             {
-                if(p.StateNPC == 183)
-                    p.HeldBonus = 183;
-                else if(p.StateNPC == 182)
-                    p.HeldBonus = 182;
+                if(p.StateNPC == NPCID_FIRE_POWER_S4)
+                    p.HeldBonus = NPCID_FIRE_POWER_S4;
+                else if(p.StateNPC == NPCID_FIRE_POWER_S1)
+                    p.HeldBonus = NPCID_FIRE_POWER_S1;
                 else
-                    p.HeldBonus = 14;
+                    p.HeldBonus = NPCID_FIRE_POWER_S3;
             }
             if(p.State == 4 || p.Effect == 5)
-                p.HeldBonus = 34;
+                p.HeldBonus = NPCID_LEAF_POWER;
             if(p.State == 5 || p.Effect == 11)
-                p.HeldBonus = 169;
+                p.HeldBonus = NPCID_STATUE_POWER;
             if(p.State == 6 || p.Effect == 12)
-                p.HeldBonus = 170;
+                p.HeldBonus = NPCID_HEAVY_POWER;
             if(p.State == 7 || p.Effect == 41)
             {
-                if(p.StateNPC == 277)
-                    p.HeldBonus = 277;
+                if(p.StateNPC == NPCID_ICE_POWER_S4)
+                    p.HeldBonus = NPCID_ICE_POWER_S4;
                 else
-                    p.HeldBonus = 264;
+                    p.HeldBonus = NPCID_ICE_POWER_S3;
             }
         }
     }
 
     if(p.Character == 3 || p.Character == 4 || p.Character == 5)
-        p.HeldBonus = 0;
+        p.HeldBonus = NPCID(0);
 }
 
 void TailSwipe(const int plr, bool boo, bool Stab, int StabDir)
@@ -2684,7 +2684,7 @@ void YoshiEat(const int A)
                 }
                 else
                 {
-                    n.Effect = 5;
+                    n.Effect = NPCEFF_PET_TONGUE;
                     n.Effect2 = A;
                     n.Location.Height = n->THeight;
                     p.YoshiNPC = B;
@@ -2693,7 +2693,7 @@ void YoshiEat(const int A)
 
                 if(n.Type == NPCID_VEGGIE_RANDOM)
                 {
-                    n.Type = NPCID_VEGGIE_2 + iRand(9);
+                    n.Type = NPCID(NPCID_VEGGIE_2 + iRand(9));
                     if(n.Type == NPCID_VEGGIE_RANDOM)
                         n.Type = NPCID_VEGGIE_1;
 
@@ -2786,7 +2786,7 @@ void YoshiSpit(const int A)
                 NPC[numNPCs].Active = true;
                 NPC[numNPCs].Section = p.Section;
                 NPC[numNPCs].TimeLeft = 100;
-                NPC[numNPCs].Effect = 0;
+                NPC[numNPCs].Effect = NPCEFF_NORMAL;
                 NPC[numNPCs].Location.X = p.Location.X + p.YoshiTX + 32 * p.Direction;
                 NPC[numNPCs].Location.Y = p.Location.Y + p.YoshiTY;
                 NPC[numNPCs].Location.Width = 32;
@@ -2821,7 +2821,7 @@ void YoshiSpit(const int A)
             NPC[p.YoshiNPC].Active = true;
             NPC[p.YoshiNPC].Section = p.Section;
             NPC[p.YoshiNPC].TimeLeft = 100;
-            NPC[p.YoshiNPC].Effect = 0;
+            NPC[p.YoshiNPC].Effect = NPCEFF_NORMAL;
             NPC[p.YoshiNPC].Effect2 = 0;
             NPC[p.YoshiNPC].Location.X = p.Location.X + p.YoshiTX + 32 * p.Direction;
             NPC[p.YoshiNPC].Location.Y = p.Location.Y + p.YoshiTY;
@@ -3602,10 +3602,10 @@ void YoshiEatCode(const int A)
             else if(NPC[p.YoshiNPC].Type == NPCID_BIG_TURTLE)
                 NPC[p.YoshiNPC].Type = NPCID_BIG_SHELL;
             else if(NPC[p.YoshiNPC].Type >= NPCID_GRN_TURTLE_S4 && NPC[p.YoshiNPC].Type <= NPCID_YEL_TURTLE_S4)
-                NPC[p.YoshiNPC].Type += NPCID_GRN_TURTLE_S3;
+                NPC[p.YoshiNPC].Type = NPCID(NPC[p.YoshiNPC].Type + 4);
             else if(NPC[p.YoshiNPC].Type >= NPCID_GRN_FLY_TURTLE_S4 && NPC[p.YoshiNPC].Type <= NPCID_YEL_FLY_TURTLE_S4)
             {
-                NPC[p.YoshiNPC].Type -= NPCID_PLANT_S3;
+                NPC[p.YoshiNPC].Type = NPCID(NPC[p.YoshiNPC].Type - 8);
                 NPC[p.YoshiNPC].Special = 0;
             }
             else if(NPC[p.YoshiNPC].Type == NPCID_GRN_TURTLE_S1 || NPC[p.YoshiNPC].Type == NPCID_GRN_FLY_TURTLE_S1)
@@ -3633,7 +3633,7 @@ void YoshiEatCode(const int A)
                     NPC[p.YoshiNPC].Location.Height = NPC[p.YoshiNPC]->THeight;
                 }
 
-                NPC[p.YoshiNPC].Effect = 6;
+                NPC[p.YoshiNPC].Effect = NPCEFF_PET_INSIDE;
                 NPC[p.YoshiNPC].Effect2 = A;
 
                 if(NPC[p.YoshiNPC].Active)
@@ -3651,7 +3651,7 @@ void YoshiEatCode(const int A)
             else if(p.MountType == 7 && !NPC[p.YoshiNPC]->IsABonus)
             {
                 B = iRand(9);
-                NPC[p.YoshiNPC].Type = NPCID_VEGGIE_2 + B;
+                NPC[p.YoshiNPC].Type = NPCID(NPCID_VEGGIE_2 + B);
                 if(NPC[p.YoshiNPC].Type == NPCID_VEGGIE_RANDOM)
                     NPC[p.YoshiNPC].Type = NPCID_VEGGIE_1;
                 NPC[p.YoshiNPC].Location.X += NPC[p.YoshiNPC].Location.Width / 2.0;
@@ -3660,7 +3660,7 @@ void YoshiEatCode(const int A)
                 NPC[p.YoshiNPC].Location.Height = NPC[p.YoshiNPC]->THeight;
                 NPC[p.YoshiNPC].Location.X += -NPC[p.YoshiNPC].Location.Width / 2.0;
                 NPC[p.YoshiNPC].Location.Y += -NPC[p.YoshiNPC].Location.Height / 2.0;
-                NPC[p.YoshiNPC].Effect = 6;
+                NPC[p.YoshiNPC].Effect = NPCEFF_PET_INSIDE;
                 NPC[p.YoshiNPC].Effect2 = A;
 
                 NPCQueues::Unchecked.push_back(p.YoshiNPC);
@@ -3680,7 +3680,7 @@ void YoshiEatCode(const int A)
                 NPC[p.YoshiNPC].Location.Height = NPC[p.YoshiNPC]->THeight;
                 NPC[p.YoshiNPC].Location.X += -NPC[p.YoshiNPC].Location.Width / 2.0;
                 NPC[p.YoshiNPC].Location.Y += -NPC[p.YoshiNPC].Location.Height / 2.0;
-                NPC[p.YoshiNPC].Effect = 6;
+                NPC[p.YoshiNPC].Effect = NPCEFF_PET_INSIDE;
                 NPC[p.YoshiNPC].Effect2 = A;
 
                 NPCQueues::Unchecked.push_back(p.YoshiNPC);
@@ -4750,6 +4750,14 @@ static inline bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool bac
 
     if(warp.Stars > numStars && canWarp)
     {
+        int prevFrame = plr.Frame;
+
+        if(g_compatibility.fix_visual_bugs && warp.Effect == 1 && direction == 3 && plr.Duck && plr.SwordPoke == 0)
+        {
+            // Show the duck frame only when attempting to go down
+            plr.Frame = (plr.Character == 5) ? 5 : 7;
+        }
+
         if(warp.StarsMsg == STRINGINDEX_NONE)
             MessageText = fmt::format_ne(g_gameStrings.warpNeedStarCount, warp.Stars, LanguageFormatNumber(warp.Stars, g_gameInfo.wordStarAccusativeSingular, g_gameInfo.wordStarAccusativeDual_Cnt, g_gameInfo.wordStarAccusativePlural), g_gameInfo.wordStarAccusativeDual_Cnt);
         else
@@ -4758,6 +4766,11 @@ static inline bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool bac
         PauseGame(PauseCode::Message, A);
         MessageText.clear();
         MessageTextMap.clear();
+
+        // Restore previous frame
+        if(g_compatibility.fix_visual_bugs && warp.Effect == 1 && direction == 3)
+            plr.Frame = prevFrame;
+
         canWarp = false;
     }
 
@@ -5212,7 +5225,7 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
                         NPC[p.StandingOnNPC].Generator = false;
                         NPC[p.StandingOnNPC].Frame = 0;
                         NPC[p.StandingOnNPC].Frame = EditorNPCFrame(NPC[p.StandingOnNPC].Type, NPC[p.StandingOnNPC].Direction);
-                        NPC[p.StandingOnNPC].Type = NPC[p.StandingOnNPC].Special;
+                        NPC[p.StandingOnNPC].Type = NPCID(NPC[p.StandingOnNPC].Special);
 
                         if(NPC[p.StandingOnNPC].Type == NPCID_RANDOM_POWER)
                         {
@@ -5232,7 +5245,7 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
                         if(!(NPC[p.StandingOnNPC].Type == NPCID_CANNONENEMY || NPC[p.StandingOnNPC].Type == NPCID_CANNONITEM || NPC[p.StandingOnNPC].Type == NPCID_SPRING || NPC[p.StandingOnNPC].Type == NPCID_KEY || NPC[p.StandingOnNPC].Type == NPCID_COIN_SWITCH || NPC[p.StandingOnNPC].Type == NPCID_GRN_BOOT || NPC[p.StandingOnNPC].Type == NPCID_RED_BOOT || NPC[p.StandingOnNPC].Type == NPCID_BLU_BOOT || NPC[p.StandingOnNPC].Type == NPCID_TOOTHYPIPE || NPCIsAnExit(NPC[p.StandingOnNPC])))
                         {
                             if(!BattleMode)
-                                NPC[p.StandingOnNPC].DefaultType = 0;
+                                NPC[p.StandingOnNPC].DefaultType = NPCID_NULL;
                         }
 
                         NPC[p.StandingOnNPC].Location.Height = NPC[p.StandingOnNPC]->THeight;
@@ -5241,7 +5254,7 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
                         if(NPC[p.StandingOnNPC].Type == NPCID_VEGGIE_RANDOM)
                         {
                             B = iRand(9);
-                            NPC[p.StandingOnNPC].Type = NPCID_VEGGIE_2 + B;
+                            NPC[p.StandingOnNPC].Type = NPCID(NPCID_VEGGIE_2 + B);
                             if(NPC[p.StandingOnNPC].Type == NPCID_VEGGIE_RANDOM)
                                 NPC[p.StandingOnNPC].Type = NPCID_VEGGIE_1;
                             NPC[p.StandingOnNPC].Location.X += NPC[p.StandingOnNPC].Location.Width / 2.0;
@@ -5381,7 +5394,7 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
         if(NPC[p.HoldingNPC].Type == NPCID_ICE_CUBE)
             NPC[p.HoldingNPC].Special3 = 0;
         NPC[p.HoldingNPC].TimeLeft = Physics.NPCTimeOffScreen;
-        NPC[p.HoldingNPC].Effect = 0;
+        NPC[p.HoldingNPC].Effect = NPCEFF_NORMAL;
         NPC[p.HoldingNPC].CantHurt = Physics.NPCCanHurtWait;
         NPC[p.HoldingNPC].CantHurtPlayer = A;
         if(NPCIsVeggie(NPC[p.HoldingNPC]))
@@ -6933,7 +6946,7 @@ void PlayerEffects(const int A)
             }
 
             if(p.HoldingNPC > 0)
-                NPC[p.HoldingNPC].Effect = 0;
+                NPC[p.HoldingNPC].Effect = NPCEFF_NORMAL;
 
             if(g_ClonedPlayerMode)
             {
@@ -7687,7 +7700,7 @@ void PlayerEffects(const int A)
 
         if(p.HoldingNPC > 0)
         {
-            NPC[p.HoldingNPC].Effect = 0;
+            NPC[p.HoldingNPC].Effect = NPCEFF_NORMAL;
             NPC[p.HoldingNPC].CantHurt = Physics.NPCCanHurtWait;
             NPC[p.HoldingNPC].CantHurtPlayer = A;
 
@@ -7856,7 +7869,7 @@ void AddPlayer(int Character)
     p = Player_t();
     p.Character = Character;
     p.State = SavedChar[p.Character].State;
-    p.HeldBonus = SavedChar[p.Character].HeldBonus;
+    p.HeldBonus = NPCID(SavedChar[p.Character].HeldBonus);
     p.Mount = SavedChar[p.Character].Mount;
     p.MountType = SavedChar[p.Character].MountType;
     p.Hearts = SavedChar[p.Character].Hearts;
@@ -7967,7 +7980,7 @@ void SwapCharacter(int A, int Character, bool FromBlock)
     Player[A].Character = Character;
     auto &p = Player[A];
     p.State = SavedChar[p.Character].State;
-    p.HeldBonus = SavedChar[p.Character].HeldBonus;
+    p.HeldBonus = NPCID(SavedChar[p.Character].HeldBonus);
     p.Mount = SavedChar[p.Character].Mount;
     p.MountType = SavedChar[p.Character].MountType;
     p.Hearts = SavedChar[p.Character].Hearts;

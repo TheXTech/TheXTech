@@ -45,6 +45,11 @@ public:
      */
     virtual void hide() = 0;
 
+    /*!
+     * \brief Updates the window icon based on AppPath
+     */
+    virtual void updateWindowIcon() = 0;
+
     /**
      *  \brief Toggle whether or not the cursor is shown.
      *

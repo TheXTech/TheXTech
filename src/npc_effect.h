@@ -19,31 +19,24 @@
  */
 
 #pragma once
-#ifndef PRESETUP_H
-#define PRESETUP_H
 
-// Game settings loaded on initial startup and used to manipulate options
-// controllable via command line arguments
+#ifndef ENUMNPCEFFECT_HHH
+#define ENUMNPCEFFECT_HHH
 
-enum
+#include "global_constants.h"
+
+enum NPCEffect : vbint_t
 {
-    SPEEDRUN_EFFECT_BLINK_UNDEFINED = 0,
-    SPEEDRUN_EFFECT_BLINK_OPAQUEONLY,
-    SPEEDRUN_EFFECT_BLINK_ALWAYS,
-    SPEEDRUN_EFFECT_BLINK_NEVER
+    NPCEFF_NORMAL = 0,
+    NPCEFF_EMERGE_UP = 1,
+    NPCEFF_DROP_ITEM = 2,
+    NPCEFF_EMERGE_DOWN = 3,
+    NPCEFF_WARP = 4,
+    NPCEFF_PET_TONGUE = 5,
+    NPCEFF_PET_INSIDE = 6,
+    NPCEFF_WAITING = 8,
+    NPCEFF_ENCASED = 208,
 };
 
-extern struct PreSetup_t
-{
-    int     speedRunMode = 0;
-    bool    speedRunSemiTransparentTimer = false;
-    int     speedRunEffectBlink = SPEEDRUN_EFFECT_BLINK_UNDEFINED;
 
-    int     compatibilityMode = 0;
-
-    std::string assetPack;
-} g_preSetup; // main_config.cpp
-
-
-#endif // PRESETUP_H
-
+#endif // ENUMNPCEFFECT_HHH

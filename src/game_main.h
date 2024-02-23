@@ -42,6 +42,9 @@ void SetupPhysics();
 
 void initAll();
 
+//! NEW: (re)load all file-based assets from the current asset pack directory
+void MainLoadAll(bool reload);
+
 int GameMain(const CmdLineSetup_t &setup);
 //! Set up object sizes and frame offsets for blocks/npcs/effects
 void SetupVars();
@@ -94,6 +97,9 @@ void CopySave(int world, int src, int dst);
 int PauseGame(PauseCode code, int plr = 0);
 
 void OpenConfig_preSetup();
+
+// reload recent episodes from config (used when asset pack changes)
+void ConfigReloadRecentEpisodes();
 
 void OpenConfig();
 

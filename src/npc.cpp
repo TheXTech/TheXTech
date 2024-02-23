@@ -123,7 +123,7 @@ void Deactivate(int A)
             NPC[A].Stuck = NPC[A].DefaultStuck;
             NPC[A].TimeLeft = 0;
             NPC[A].Projectile = false;
-            NPC[A].Effect = 0;
+            NPC[A].Effect = NPCEFF_NORMAL;
             NPC[A].Effect2 = 0;
             NPC[A].Effect3 = 0;
             NPC[A].Type = NPC[A].DefaultType;
@@ -924,7 +924,7 @@ void NPCSpecial(int A)
     }
     else if(npc.Type == NPCID_ITEM_BUBBLE) // bubble
     {
-        if(fiEqual(npc.Special, 287))
+        if(fiEqual(npc.Special, NPCID_RANDOM_POWER))
         {
             npc.Special = RandomBonus();
             npc.DefaultSpecial = npc.Special;
@@ -950,7 +950,7 @@ void NPCSpecial(int A)
         {
             NewEffect(EFFID_BUBBLE_POP, npc.Location);
             PlaySoundSpatial(SFX_Bubble, npc.Location);
-            npc.Type = npc.Special;
+            npc.Type = NPCID(npc.Special);
             npc.Special3 = 0;
             npc.Special2 = 0;
             npc.Special = 0;
@@ -1293,7 +1293,7 @@ void NPCSpecial(int A)
                 npc.Special6 = 0;
                 npc.Location.X += npc.Location.Width / 2.0;
                 npc.Location.Y += npc.Location.Height;
-                npc.Type -= 1;
+                npc.Type = NPCID(npc.Type - 1);
                 npc.Location.Width = npc->TWidth;
                 npc.Location.Height = npc->THeight;
                 npc.Location.X -= npc.Location.Width / 2.0;
@@ -3571,10 +3571,10 @@ void SpecialNPC(int A)
             NPC[A].Location.SpeedX = 0;
             NPC[A].Location.SpeedY = 0;
             NPC[A].Special3 = 0;
-            NPC[A].Effect = 8;
+            NPC[A].Effect = NPCEFF_WAITING;
+            NPC[A].Effect2 = 16;
             NPC[A].Projectile = false;
             NPC[A].Type = NPCID_MAGIC_DOOR;
-            NPC[A].Effect2 = 16;
             PlaySoundSpatial(SFX_SpitBossBeat, NPC[A].Location);
         }
     }
@@ -5492,7 +5492,7 @@ void SpecialNPC(int A)
                 else
                     NPC[numNPCs].Direction = 1;
 
-                NPC[numNPCs].Type = NPC[A].Special;
+                NPC[numNPCs].Type = NPCID(NPC[A].Special);
 
                 if(NPC[numNPCs].Type == NPCID_RANDOM_POWER)
                     NPC[numNPCs].Type = RandomBonus();
@@ -5730,7 +5730,7 @@ void CharStuff(int WhatNPC, bool CheckEggs)
     }
 }
 
-int RandomBonus()
+NPCID RandomBonus()
 {
     int B = iRand(6);
 

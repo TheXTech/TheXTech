@@ -73,6 +73,7 @@
 #include "main/game_strings.h"
 #include "main/translate.h"
 #include "main/record.h"
+#include "main/asset_pack.h"
 #include "core/render.h"
 #include "core/window.h"
 #include "core/events.h"
@@ -88,6 +89,7 @@
 #include "config.h"
 #include "main/screen_connect.h"
 #include "main/screen_quickreconnect.h"
+#include "main/screen_asset_pack.h"
 
 #include "main/level_medals.h"
 
@@ -114,6 +116,9 @@ static int loadingThread(void *waiter_ptr)
     LoaderUpdateDebugString("Translations");
     XLanguage::findLanguages(); // find present translations
     ReloadTranslations(); // load translations
+
+    LoaderUpdateDebugString("Asset packs");
+    GetAssetPacks();
 
     SetupPhysics(); // Setup Physics
     SetupGraphics(); // setup graphics
@@ -273,6 +278,7 @@ void MainLoadAll(bool reload)
 
     Integrator::setGameName(g_gameInfo.title, g_gameInfo.statusIconName);
     XWindow::setTitle(g_gameInfo.titleWindow().c_str());
+    XWindow::updateWindowIcon();
 
     LoaderFinish();
 }
@@ -342,8 +348,8 @@ int GameMain(const CmdLineSetup_t &setup)
 //    Unload frmLoader
     gfxLoaderTestMode = setup.testLevelMode;
 
-    // TODO: check locations in search path
-    if(!GFX.load()) // Load UI graphics
+    // find asset pack and load required UI graphics
+    if(!InitUIAssetsFrom(setup.assetPack))
         return 1;
 
 //    If LevelEditor = False Then
@@ -547,7 +553,7 @@ int GameMain(const CmdLineSetup_t &setup)
 
     do
     {
-        if(GameMenu || MagicHand || LevelEditor)
+        if(GameMenu || MagicHand || LevelEditor || ScreenAssetPack::g_LoopActive)
         {
             XWindow::setCursor(CURSOR_NONE);
             XWindow::showCursor(0);
@@ -559,7 +565,16 @@ int GameMain(const CmdLineSetup_t &setup)
         }
 
 
-        if(LevelEditor) // Load the level editor
+        if(ScreenAssetPack::g_LoopActive)
+        {
+            // Run the frame-loop
+            runFrameLoop(&ScreenAssetPack::Loop,
+                         nullptr,
+                        []()->bool{ return ScreenAssetPack::g_LoopActive;}, nullptr,
+                        nullptr,
+                        nullptr);
+        }
+        else if(LevelEditor) // Load the level editor
         {
             // if(resChanged)
             //     ChangeScreen();
@@ -676,7 +691,7 @@ int GameMain(const CmdLineSetup_t &setup)
                     p.MountType = iRand(8) + 1;
                 }
 
-                p.HeldBonus = 0;
+                p.HeldBonus = NPCID(0);
                 p.Section = 0;
                 p.Location.Height = Physics.PlayerHeight[p.Character][p.State];
                 p.Location.Width = Physics.PlayerWidth[p.Character][p.State];
@@ -850,7 +865,7 @@ int GameMain(const CmdLineSetup_t &setup)
                 // if(A >= 1 && A <= 5)
                 p.Character = g_gameInfo.introCharacterNext();
 
-                p.HeldBonus = 0;
+                p.HeldBonus = NPCID(0);
                 p.Section = 0;
                 p.Location.Height = Physics.PlayerHeight[p.Character][p.State];
                 p.Location.Width = Physics.PlayerWidth[p.Character][p.State];
@@ -2052,7 +2067,7 @@ void StartEpisode()
         Player[i].Mount = 0;
         // reassigned below unless something is wrong
         Player[i].Character = (i - 1) % 5 + 1;
-        Player[i].HeldBonus = 0;
+        Player[i].HeldBonus = NPCID(0);
         Player[i].CanFly = false;
         Player[i].CanFly2 = false;
         Player[i].TailCount = 0;
@@ -2193,7 +2208,7 @@ void StartBattleMode()
         Player[i].Mount = 0;
         // reassigned below unless something is wrong
         Player[i].Character = (i - 1) % 5 + 1;
-        Player[i].HeldBonus = 0;
+        Player[i].HeldBonus = NPCID(0);
         Player[i].CanFly = false;
         Player[i].CanFly2 = false;
         Player[i].TailCount = 0;
