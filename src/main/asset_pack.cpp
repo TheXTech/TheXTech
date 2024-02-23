@@ -60,20 +60,35 @@ static inline void s_load_image(StdPicture& dest, std::string nameWithPng)
 #if defined(X_IMG_EXT)
     if(nameWithPng.size() > 4)
     {
-        size_t base_size = nameWithPng.size() - 4;
+        std::string orig_ext;
+        size_t base_size = nameWithPng.find_last_of('.');
 
-        std::string orig_ext = nameWithPng.substr(base_size);
-        nameWithPng.resize(base_size);
+        if(base_size == std::string::npos)
+            base_size = nameWithPng.size();
+        else
+        {
+            orig_ext = nameWithPng.substr(base_size);
+            nameWithPng.resize(base_size);
+        }
 
         nameWithPng += X_IMG_EXT;
 
         if(Files::fileExists(nameWithPng))
+        {
             XRender::lazyLoadPicture(dest, nameWithPng);
 
+            if(dest.inited)
+                return; // Success
+        }
+
+#   if !defined(X_NO_PNG_GIF)
         nameWithPng.resize(base_size);
-        nameWithPng += orig_ext;
+
+        if(!orig_ext.empty())
+            nameWithPng += orig_ext;
+#   endif // !defined(X_NO_PNG_GIF)
     }
-#endif
+#endif // defined(X_IMG_EXT)
 
 #if !defined(X_NO_PNG_GIF)
     if(!dest.inited && Files::fileExists(nameWithPng))
