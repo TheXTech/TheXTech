@@ -405,11 +405,15 @@ bool ReloadAssetsFrom(const AssetPack_t& pack)
         GFX.load();
 
         // also, remove from list of valid asset packs
-        auto it = std::find(s_asset_packs.begin(), s_asset_packs.end(), pack);
-        if(it != s_asset_packs.end())
+        for(auto it = s_asset_packs.begin(); it != s_asset_packs.end(); ++it)
         {
-            pLogDebug("Removed %s from asset pack list because it is missing UI assets", pack.path.c_str());
+            // find the requested pack exactly (by identity, not contents)
+            if(&*it != &pack)
+                continue;
+
+            pLogInfo("Removed %s from asset pack list because it is missing UI assets", pack.path.c_str());
             s_asset_packs.erase(it);
+            break;
         }
 
         return false;

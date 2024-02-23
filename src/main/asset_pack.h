@@ -54,11 +54,6 @@ struct AssetPack_t
     bool show_version = false;
     bool logo_override = false;
 
-    bool operator==(const AssetPack_t& o) const
-    {
-        return this == &o;
-    }
-
     std::string full_id() const
     {
         if(id.empty() && version.empty())
