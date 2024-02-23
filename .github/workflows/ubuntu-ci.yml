@@ -54,7 +54,7 @@ jobs:
             && ./cmake-3.15.4-Linux-x86_64.sh --skip-license --prefix=/usr \
             && git config --global --add safe.directory '*'",
 
-            executable_name: "thextech-smbx",
+            executable_name: "thextech",
             generator: "Ninja",
             build_type: "MinSizeRel",
             executable_name_suffix: "",
@@ -99,7 +99,7 @@ jobs:
             && ./cmake-3.15.4-Linux-x86_64.sh --skip-license --prefix=/usr \
             && git config --global --add safe.directory '*'",
 
-            executable_name: "thextech-smbx",
+            executable_name: "thextech",
             generator: "Ninja",
             build_type: "MinSizeRel",
             executable_name_suffix: "",
@@ -142,7 +142,7 @@ jobs:
             && ./cmake-3.15.4-Linux-x86_64.sh --skip-license --prefix=/usr \
             && git config --global --add safe.directory '*'",
 
-            executable_name: "thextech-smbx",
+            executable_name: "thextech",
             generator: "Ninja",
             build_type: "MinSizeRel",
             executable_name_suffix: "",
@@ -174,7 +174,7 @@ jobs:
             libgles2-mesa libgles2-mesa-dev libgles-dev libmirclient-dev libproxy-dev libsdl2-dev \
             libpng-dev libjpeg-dev hashdeep dpkg debconf lintian",
 
-            executable_name: "thextech-smbx",
+            executable_name: "thextech",
             generator: "Ninja",
             build_type: "MinSizeRel",
             executable_name_suffix: "",
@@ -206,7 +206,7 @@ jobs:
             libgles2-mesa libgles2-mesa-dev libgles-dev libproxy-dev libsdl2-dev \
             libpng-dev libjpeg-dev hashdeep dpkg debconf lintian",
 
-            executable_name: "thextech-smbx",
+            executable_name: "thextech",
             generator: "Ninja",
             build_type: "MinSizeRel",
             executable_name_suffix: "",
@@ -229,7 +229,7 @@ jobs:
 
     - uses: styfle/cancel-workflow-action@0.11.0
       with:
-        workflow_id: ubuntu-deb-smbx-ci.yml
+        workflow_id: ubuntu-ci.yml
         all_but_latest: true
         access_token: ${{ github.token }}
 
