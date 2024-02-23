@@ -30,6 +30,8 @@
 
 static std::string s_userDirectory;
 
+static std::string s_gameInstallDirectory;
+
 static std::string s_applicationPath;
 
 //! The legacy debug root
@@ -52,6 +54,10 @@ void AppPathP::initDefaultPaths(const std::string &userDirName)
 {
     std::string homePath;
     std::string userDir;
+
+    // check for deployment as AppImage when looking for system-installed assets
+    s_gameInstallDirectory = s_getEnvNotNull("APPDIR");
+    s_gameInstallDirectory += s_gamesSysDir;
 
     // Environment
     const char *env_home = SDL_getenv("HOME");
@@ -126,7 +132,7 @@ std::string AppPathP::userDirectory()
 
 std::string AppPathP::assetsRoot()
 {
-    return s_gamesSysDir;
+    return s_gameInstallDirectory;
 }
 
 std::string AppPathP::settingsRoot()
