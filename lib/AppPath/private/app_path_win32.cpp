@@ -93,7 +93,7 @@ void AppPathP::initDefaultPaths(const std::string &userDirName)
     SDL_assert_release(path_len);
     s_toUtf8(s_userDirectory, pathBuffer, path_len);
 
-    if(s_userDirectory.empty() && localPath.empty() && roamingPath.empty())
+    if(s_userDirectory.empty() && roamingPath.empty())
         s_userDirectory = s_applicationPath;
     else
     {
