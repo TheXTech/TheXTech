@@ -193,6 +193,16 @@ void TouchScreenGFX_t::load()
     m_gfxPath = AppPath + "graphics/touchscreen/";
     loadAll();
 
+    // try loading from other paths if unsuccessful
+    for(const std::string& root : AppPathManager::assetsSearchPath())
+    {
+        if(m_success)
+            break;
+
+        m_gfxPath = root + "graphics/touchscreen/";
+        loadAll();
+    }
+
     if(m_success)
         pLogDebug("Loaded touchscreen GFX from %s", m_gfxPath.c_str());
     else

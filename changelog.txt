@@ -24,6 +24,9 @@ Changelog for 1.3.7-dev
 -COMPATIBILITY CHANGE: remove automatic version targeting for pre-SMBX 1.3 content (@ds-sloth)
 -Sounds now get quieter when they are further from the screen (@ds-sloth)
 -In non-compat modes, now allow negative lives instead of game over (@ds-sloth, @0lhi)
+-Game looks for asset packs in the assets/ subdirectory of the user and system directories (@ds-sloth)
+-Add ability to specify asset pack by ID in the command line (as well as by path) (@ds-sloth)
+-Add ability to switch asset pack at main menu screen by holding select button (@ds-sloth)
 
 Changelog for 1.3.6.5-dev
 -Fix TheXTech 1.3.6 bug where auto movement on the world map was not reset when switching episodes (@ds-sloth)

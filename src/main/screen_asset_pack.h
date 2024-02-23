@@ -19,31 +19,24 @@
  */
 
 #pragma once
-#ifndef PRESETUP_H
-#define PRESETUP_H
 
-// Game settings loaded on initial startup and used to manipulate options
-// controllable via command line arguments
+#ifndef SCREEN_ASSET_PACK_H
+#define SCREEN_ASSET_PACK_H
 
-enum
+#include "xt_color.h"
+
+// The asset pack screen is special, because after exiting from it with a success, EVERYTHING gets reloaded. So, it gets its own main loop.
+
+namespace ScreenAssetPack
 {
-    SPEEDRUN_EFFECT_BLINK_UNDEFINED = 0,
-    SPEEDRUN_EFFECT_BLINK_OPAQUEONLY,
-    SPEEDRUN_EFFECT_BLINK_ALWAYS,
-    SPEEDRUN_EFFECT_BLINK_NEVER
-};
 
-extern struct PreSetup_t
-{
-    int     speedRunMode = 0;
-    bool    speedRunSemiTransparentTimer = false;
-    int     speedRunEffectBlink = SPEEDRUN_EFFECT_BLINK_UNDEFINED;
+extern bool g_LoopActive;
 
-    int     compatibilityMode = 0;
+// this method is public so that it is possible to fade in the asset pack screen from the main menu
+void DrawBackground(double fade);
 
-    std::string assetPack;
-} g_preSetup; // main_config.cpp
+void Loop();
 
+} // namespace ScreenAssetPack
 
-#endif // PRESETUP_H
-
+#endif // #ifndef SCREEN_ASSET_PACK_H
