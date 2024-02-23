@@ -4752,7 +4752,7 @@ static inline bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool bac
     {
         int prevFrame = plr.Frame;
 
-        if(warp.Effect == 1 && direction == 3 && plr.Duck && plr.SwordPoke == 0 && g_compatibility.fix_visual_bugs)
+        if(g_compatibility.fix_visual_bugs && warp.Effect == 1 && direction == 3 && plr.Duck && plr.SwordPoke == 0)
         {
             // Show the duck frame only when attempting to go down
             plr.Frame = (plr.Character == 5) ? 5 : 7;
@@ -4768,7 +4768,7 @@ static inline bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool bac
         MessageTextMap.clear();
 
         // Restore previous frame
-        if(warp.Effect == 1 && direction == 3)
+        if(g_compatibility.fix_visual_bugs && warp.Effect == 1 && direction == 3)
             plr.Frame = prevFrame;
 
         canWarp = false;
