@@ -324,7 +324,8 @@ static int FindWorldsThread(void *)
 }
 #endif
 
-#if (defined(__APPLE__) && defined(USE_BUNDLED_ASSETS)) || defined(FIXED_ASSETS_PATH) || defined(__EMSCRIPTEN__)
+// there's an additional detection step for other platforms, checking whether the AppPath is different from the user dir
+#if defined(__EMSCRIPTEN__)
 #   define CAN_WRITE_APPPATH_WORLDS false
 #else
 #   define CAN_WRITE_APPPATH_WORLDS true

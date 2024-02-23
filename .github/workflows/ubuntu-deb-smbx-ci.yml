@@ -28,9 +28,8 @@ jobs:
             extra_options: "-DPGE_SHARED_SDLMIXER=OFF -DUSE_SYSTEM_SDL2=OFF -DUSE_FREEIMAGE_SYSTEM_LIBS=ON \
             -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=MinSizeRel \
             -DTHEXTECH_BUILD_GL_ES_LEGACY=OFF \
-            -DTHEXTECH_FIXED_ASSETS_PATH=/usr/share/games/smbx \
+            -DTHEXTECH_TARGET_ASSETS_PATH=/usr/share/games/thextech/assets/smbx \
             -DTHEXTECH_SOURCE_ASSETS_PATH=\"${GITHUB_WORKSPACE}/smbx13\" \
-            -DTHEXTECH_USER_DIR_NAME=\".thextech-smbx\" \
             -DDESKTOP_NAME=\"Super Mario Bros. X\" \
             -DDESKTOP_GENERIC_NAME=\"Super Mario Bros. X\" \
             -DDESKTOP_COMMENT=\"The Mario fan game\" \
@@ -75,9 +74,8 @@ jobs:
             extra_options: "-DPGE_SHARED_SDLMIXER=OFF -DUSE_SYSTEM_SDL2=OFF -DUSE_FREEIMAGE_SYSTEM_LIBS=ON \
             -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=MinSizeRel \
             -DTHEXTECH_BUILD_GL_ES_LEGACY=OFF \
-            -DTHEXTECH_FIXED_ASSETS_PATH=/usr/share/games/smbx \
+            -DTHEXTECH_TARGET_ASSETS_PATH=/usr/share/games/thextech/assets/smbx \
             -DTHEXTECH_SOURCE_ASSETS_PATH=\"${GITHUB_WORKSPACE}/smbx13\" \
-            -DTHEXTECH_USER_DIR_NAME=\".thextech-smbx\" \
             -DDESKTOP_NAME=\"Super Mario Bros. X\" \
             -DDESKTOP_GENERIC_NAME=\"Super Mario Bros. X\" \
             -DDESKTOP_COMMENT=\"The Mario fan game\" \
@@ -126,9 +124,8 @@ jobs:
             extra_options: "-DPGE_SHARED_SDLMIXER=OFF -DUSE_SYSTEM_SDL2=ON -DUSE_FREEIMAGE_SYSTEM_LIBS=ON \
             -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=MinSizeRel \
             -DTHEXTECH_BUILD_GL_ES_LEGACY=OFF \
-            -DTHEXTECH_FIXED_ASSETS_PATH=/usr/share/games/smbx \
+            -DTHEXTECH_TARGET_ASSETS_PATH=/usr/share/games/thextech/assets/smbx \
             -DTHEXTECH_SOURCE_ASSETS_PATH=\"${GITHUB_WORKSPACE}/smbx13\" \
-            -DTHEXTECH_USER_DIR_NAME=\".thextech-smbx\" \
             -DDESKTOP_NAME=\"Super Mario Bros. X\" \
             -DDESKTOP_GENERIC_NAME=\"Super Mario Bros. X\" \
             -DDESKTOP_COMMENT=\"The Mario fan game\" \
@@ -173,9 +170,8 @@ jobs:
 
             extra_options: "-DPGE_SHARED_SDLMIXER=OFF -DUSE_SYSTEM_SDL2=ON -DUSE_FREEIMAGE_SYSTEM_LIBS=ON \
             -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=MinSizeRel \
-            -DTHEXTECH_FIXED_ASSETS_PATH=/usr/share/games/smbx \
+            -DTHEXTECH_TARGET_ASSETS_PATH=/usr/share/games/thextech/assets/smbx \
             -DTHEXTECH_SOURCE_ASSETS_PATH=\"${GITHUB_WORKSPACE}/smbx13\" \
-            -DTHEXTECH_USER_DIR_NAME=\".thextech-smbx\" \
             -DDESKTOP_NAME=\"Super Mario Bros. X\" \
             -DDESKTOP_GENERIC_NAME=\"Super Mario Bros. X\" \
             -DDESKTOP_COMMENT=\"The Mario fan game\" \
@@ -211,9 +207,8 @@ jobs:
 
             extra_options: "-DPGE_SHARED_SDLMIXER=OFF -DUSE_SYSTEM_SDL2=ON -DUSE_FREEIMAGE_SYSTEM_LIBS=ON \
             -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=MinSizeRel \
-            -DTHEXTECH_FIXED_ASSETS_PATH=/usr/share/games/smbx \
+            -DTHEXTECH_TARGET_ASSETS_PATH=/usr/share/games/thextech/assets/smbx \
             -DTHEXTECH_SOURCE_ASSETS_PATH=\"${GITHUB_WORKSPACE}/smbx13\" \
-            -DTHEXTECH_USER_DIR_NAME=\".thextech-smbx\" \
             -DDESKTOP_NAME=\"Super Mario Bros. X\" \
             -DDESKTOP_GENERIC_NAME=\"Super Mario Bros. X\" \
             -DDESKTOP_COMMENT=\"The Mario fan game\" \

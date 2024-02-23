@@ -28,6 +28,9 @@ namespace AppPathP
 //! If this flag set to TRUE, the legacy debug assets root will be completely ignored
 extern bool ignoreLegacyDebugDir;
 
+//! If this is set, an asset pack with that matches this postfix will not use nested subdirectories
+extern std::string legacyUserDirPostfix;
+
 /*!
  * \brief Initialize all default internals
  */

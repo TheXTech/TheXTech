@@ -101,8 +101,14 @@ void AppPathP::initDefaultPaths(const std::string &userDirName)
         const char *homeDir = SDL_getenv("HOME");
         if(homeDir)
         {
+            // legacy per-bundle user directory
             s_userDirectory = std::string(homeDir) + "/TheXTech Games/" + s_bundleName;
             s_userDirectory.append("/");
+
+            // modern user directory
+            if(!DirMan::exists(s_userDirectory))
+                s_userDirectory = std::string(homeDir) + userDirName;
+
             // Automatically create an infrastructure
             if(!DirMan::exists(s_userDirectory))
                 DirMan::mkAbsPath(s_userDirectory);
@@ -111,7 +117,10 @@ void AppPathP::initDefaultPaths(const std::string &userDirName)
             if(!DirMan::exists(s_userDirectory + "battle"))
                 DirMan::mkAbsPath(s_userDirectory + "battle");
 
+            // legacy assets root
             s_assetsRoot = std::string(homeDir) + "/TheXTech Games/Debug Assets/";
+            if(!DirMan::exists(s_assetsRoot))
+                s_assetsRoot = s_userDirectory;
         }
         else
         {
