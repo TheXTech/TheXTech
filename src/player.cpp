@@ -4750,6 +4750,14 @@ static inline bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool bac
 
     if(warp.Stars > numStars && canWarp)
     {
+        int prevFrame = plr.Frame;
+
+        if(warp.Effect == 1 && direction == 3 && plr.Duck && plr.SwordPoke == 0 && g_compatibility.fix_visual_bugs)
+        {
+            // Show the duck frame only when attempting to go down
+            plr.Frame = (plr.Character == 5) ? 5 : 7;
+        }
+
         if(warp.StarsMsg == STRINGINDEX_NONE)
             MessageText = fmt::format_ne(g_gameStrings.warpNeedStarCount, warp.Stars, LanguageFormatNumber(warp.Stars, g_gameInfo.wordStarAccusativeSingular, g_gameInfo.wordStarAccusativeDual_Cnt, g_gameInfo.wordStarAccusativePlural), g_gameInfo.wordStarAccusativeDual_Cnt);
         else
@@ -4758,6 +4766,11 @@ static inline bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool bac
         PauseGame(PauseCode::Message, A);
         MessageText.clear();
         MessageTextMap.clear();
+
+        // Restore previous frame
+        if(warp.Effect == 1 && direction == 3)
+            plr.Frame = prevFrame;
+
         canWarp = false;
     }
 
