@@ -451,7 +451,7 @@
                 "groundPoundButton": "震地按键",
                 "maxPlayers": "玩家上限",
                 "rumble": "Rumble控制器",
-                "textEntryStyle": "按键名称显示"
+                "textEntryStyle": "文字输入使用设备"
             },
             "phraseNewProfOldJoy": "新建老式手柄配置",
             "profile": {
