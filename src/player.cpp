@@ -1085,6 +1085,9 @@ void EveryonesDead()
     LevelMacro = LEVELMACRO_OFF;
     FreezeNPCs = false;
 
+    if(!NoMap && IsHubLevel && !FileRecentSubHubLevel.empty())
+        FileRecentSubHubLevel.clear(); // Quit to world map if died on sub-hub
+
 // Play fade effect instead of wait (see ProcessLastDead() above)
     if(!g_config.EnableInterLevelFade)
     {
