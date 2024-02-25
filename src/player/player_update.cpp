@@ -2186,8 +2186,13 @@ void UpdatePlayer()
 
                     if(offScreenExit)
                     {
-                        if(!NoMap) // Always quit to the world map by off-screen exit
+                        // Always quit to the world map by off-screen exit
+                        if(!NoMap && !FileRecentSubHubLevel.empty())
+                        {
                             FileRecentSubHubLevel.clear();
+                            ReturnWarp = 0;
+                            ReturnWarpSaved = 0;
+                        }
 
                         LevelBeatCode = 3;
                         EndLevel = true;
