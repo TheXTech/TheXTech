@@ -958,7 +958,7 @@ int GameMain(const CmdLineSetup_t &setup)
             if(!NoMap)
                 FindWldStars();
 
-            if((!StartLevel.empty() && NoMap) || !GoToLevel.empty())
+            if((!StartLevel.empty() && NoMap) || !GoToLevel.empty() || !FileRecentSubHubLevel.empty())
             {
                 if(NoMap)
                     SaveGame();
