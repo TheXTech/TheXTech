@@ -559,6 +559,7 @@ void NPCWarpGFX(int A, Location_t &tempLocation, float &X2, float &Y2)
 // change from fullscreen to windowed mode
 void ChangeScreen()
 {
+#ifndef RENDER_FULLSCREEN_ALWAYS
     // shouldn't be possible
     if(g_config.fullscreen.m_set > ConfigSetLevel::user_config)
     {
@@ -569,6 +570,7 @@ void ChangeScreen()
     g_config_game_user.fullscreen = !g_config.fullscreen;
     UpdateConfig();
     SaveConfig();
+#endif
 }
 
 void GetvScreenCredits(vScreen_t& vscreen)
