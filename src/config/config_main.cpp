@@ -246,11 +246,6 @@ void LoadCustomConfig()
     // Level-wide custom creator setup
     customCompat = g_dirCustom.resolveFileCaseExistsAbs("compat.ini");
 
-    // Episode-wide custom creator setup (new)
-    episodeConfig = g_dirEpisode.resolveFileCaseExistsAbs("config.ini");
-    // Level-wide custom creator setup (new)
-    customConfig = g_dirCustom.resolveFileCaseExistsAbs("config.ini");
-
     IniProcessing ini;
 
     if(!episodeCompat.empty())
@@ -259,20 +254,10 @@ void LoadCustomConfig()
         g_config_episode_creator.LoadLegacyCompat(&ini, ConfigSetLevel::ep_compat);
         g_config_episode_creator.UpdateFromIni(&ini, ConfigSetLevel::ep_compat);
     }
-    if(!episodeConfig.empty())
-    {
-        ini.open(episodeConfig);
-        g_config_episode_creator.UpdateFromIni(&ini, ConfigSetLevel::ep_compat);
-    }
     if(!customCompat.empty())
     {
         ini.open(customCompat);
         g_config_file_creator.LoadLegacyCompat(&ini, ConfigSetLevel::file_compat);
-        g_config_file_creator.UpdateFromIni(&ini, ConfigSetLevel::file_compat);
-    }
-    if(!customConfig.empty())
-    {
-        ini.open(customConfig);
         g_config_file_creator.UpdateFromIni(&ini, ConfigSetLevel::file_compat);
     }
 
