@@ -21,9 +21,8 @@
 #include "sdl_proxy/sdl_stdinc.h"
 #include "sdl_proxy/sdl_timer.h"
 
-#ifdef THEXTECH_BUILD_GL_MODERN
 #include <json/json.hpp>
-#endif
+#include <algorithm>
 
 #ifdef __16M__
 // used to clear loaded textures on level/world load
@@ -199,6 +198,26 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
 
     IsEpisodeIntro = (StartLevel == FileNameFull);
 
+    if(IsEpisodeIntro)
+    {
+        IsHubLevel = NoMap;
+        FileRecentSubHubLevel.clear();
+    }
+
+    if(!IsHubLevel)
+    {
+        IsHubLevel = std::find(SubHubLevels.begin(), SubHubLevels.end(), FileNameFull) != SubHubLevels.end();
+
+        if(IsHubLevel)
+            FileRecentSubHubLevel = FileNameFull;
+    }
+
+    // Level-wide extra settings
+    if(!lvl.custom_params.empty())
+    {
+        // none supported yet
+    }
+
     FileFormats::smbx64LevelPrepare(lvl);
     FileFormats::smbx64LevelSortBlocks(lvl);
     FileFormats::smbx64LevelSortBGOs(lvl);
@@ -235,6 +254,7 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
 
     g_curLevelMedals.prepare_lvl(lvl);
 
+    // Level-wide settings
     maxStars = lvl.stars;
     LevelName = lvl.LevelName;
 
@@ -1068,6 +1088,7 @@ void ClearLevel()
     NPCTraits[NPCID_MEDAL].Score = 6;
     RestoreWorldStrings();
     LevelName.clear();
+    IsHubLevel = false;
     ResetCompat();
     SetupPhysics();
     LoadNPCDefaults();

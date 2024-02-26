@@ -184,6 +184,14 @@ void GameLoop()
                 Checkpoint.clear();
                 CheckpointsList.clear();
             }
+
+            // Quit to world map when finishing the sub-hub
+            if(!NoMap && IsHubLevel && !FileRecentSubHubLevel.empty() && GoToLevel.empty())
+            {
+                FileRecentSubHubLevel.clear();
+                ReturnWarp = 0;
+                ReturnWarpSaved = 0;
+            }
         }
 
         if(SwapCharAllowed())

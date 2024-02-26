@@ -1085,6 +1085,14 @@ void EveryonesDead()
     LevelMacro = LEVELMACRO_OFF;
     FreezeNPCs = false;
 
+    // Quit to world map if died on sub-hub
+    if(!NoMap && IsHubLevel && !FileRecentSubHubLevel.empty())
+    {
+        FileRecentSubHubLevel.clear();
+        ReturnWarp = 0;
+        ReturnWarpSaved = 0;
+    }
+
 // Play fade effect instead of wait (see ProcessLastDead() above)
     if(!g_config.EnableInterLevelFade)
     {
@@ -4891,7 +4899,7 @@ static inline bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool bac
                     plr.Warp = B;
                     plr.WarpBackward = backward;
                     ReturnWarp = B;
-                    if(IsEpisodeIntro && NoMap)
+                    if(IsHubLevel)
                         ReturnWarpSaved = ReturnWarp;
                     StartWarp = warp.LevelWarp;
                     return true;
@@ -6644,7 +6652,7 @@ void PlayerEffects(const int A)
                 p.Effect = 8;
                 p.Effect2 = 2970;
                 ReturnWarp = p.Warp;
-                if(IsEpisodeIntro && NoMap)
+                if(IsHubLevel)
                     ReturnWarpSaved = ReturnWarp;
                 StartWarp = warp.LevelWarp;
             }
@@ -7235,7 +7243,7 @@ void PlayerEffects(const int A)
                 p.Effect2 = 3000;
                 ReturnWarp = p.Warp;
 
-                if(IsEpisodeIntro && NoMap)
+                if(IsHubLevel)
                     ReturnWarpSaved = ReturnWarp;
 
                 StartWarp = warp.LevelWarp;
@@ -8047,7 +8055,7 @@ void SwapCharacter(int A, int Character, bool FromBlock)
 // returns whether a player is allowed to swap characters
 bool SwapCharAllowed()
 {
-    if(LevelSelect || GameMenu || (g_compatibility.allow_drop_add && InHub()))
+    if(LevelSelect || GameMenu || (g_compatibility.allow_drop_add && IsHubLevel))
         return true;
     else
         return false;

@@ -1785,6 +1785,8 @@ extern std::string FileNameFull;
 extern std::string FullFileName;
 //Public FileNamePath As String
 extern std::string FileNamePath;
+//! EXTRA: The recent sub-hub level file
+extern std::string FileRecentSubHubLevel;
 //! EXTRA: The format of the current file
 extern int FileFormat;
 
@@ -1799,6 +1801,8 @@ extern int FileFormatWorld;
 
 //! EXTRA: Identify that episode is an intro level
 extern bool IsEpisodeIntro;
+//! EXTRA: Identify that level is a hub or sub-hub where player can save the game
+extern bool IsHubLevel;
 //Public Coins As Integer 'number of coins
 extern int Coins;
 //Public Lives As Single 'number of lives
@@ -1812,13 +1816,6 @@ extern bool ExitMenu;
 //Public LevelSelect As Boolean 'true if game should load the world map
 extern bool LevelSelect;
 
-/**
- * \brief NEW: utility function to check if in a hub level
- */
-inline bool InHub()
-{
-    return NoMap && IsEpisodeIntro;
-}
 
 extern bool LevelRestartRequested;
 //Public WorldPlayer(1) As WorldPlayer
@@ -1844,6 +1841,10 @@ extern RangeArrI<bool, 0, maxSections, false> UnderWater;
 
 // EXTRA: track extra JSON info from a loaded level
 extern RangeArrI<stringindex_t, 0, maxSections, STRINGINDEX_NONE> SectionJSONInfo;
+
+// world custom data
+extern std::string WldxCustomParams;
+extern std::vector<std::string> SubHubLevels;
 
 //Public TestLevel As Boolean
 extern bool TestLevel;

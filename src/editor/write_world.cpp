@@ -42,6 +42,7 @@ void SaveWorld(const std::string& FilePath, int format, int version)   // Saves 
     out.HubStyledWorld = NoMap;
     out.restartlevel = RestartLevel;
     out.stars = MaxWorldStars;
+    out.custom_params = WldxCustomParams;
 
     out.nocharacter.clear();
     for(int i = 1; i <= 5; ++i)
