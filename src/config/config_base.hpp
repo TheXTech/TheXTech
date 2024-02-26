@@ -90,7 +90,7 @@ class ConfigChangeSentinel
     ConfigSetLevel m_prev_level;
 
 public:
-    ConfigChangeSentinel(ConfigSetLevel level);
+    ConfigChangeSentinel(ConfigSetLevel set_level);
     ~ConfigChangeSentinel();
 };
 
@@ -290,13 +290,13 @@ public:
     virtual bool rotate_right() { return false; }
     virtual bool change() { return rotate_right(); }
 
-    virtual void set_from_default(ConfigSetLevel level) { (void)level; }
-    virtual void update_from_ini(IniProcessing* ini, ConfigSetLevel level) { (void)ini; (void)level; }
+    virtual void set_from_default(ConfigSetLevel set_level) { (void)set_level; }
+    virtual void update_from_ini(IniProcessing* ini, ConfigSetLevel set_level) { (void)ini; (void)set_level; }
 
-    virtual void disable_bugfixes(ConfigSetLevel level) { (void)level; }
+    virtual void disable_bugfixes(ConfigSetLevel set_level) { (void)set_level; }
 
-    virtual void update_from_compat(CompatMode compat_mode, ConfigSetLevel level) { (void)compat_mode; (void)level; }
-    virtual void update_from(const BaseConfigOption_t<true>& o, ConfigSetLevel level) { (void)o; (void)level; }
+    virtual void update_from_compat(CompatMode compat_mode, ConfigSetLevel set_level) { (void)compat_mode; (void)set_level; }
+    virtual void update_from(const BaseConfigOption_t<true>& o, ConfigSetLevel set_level) { (void)o; (void)set_level; }
 
     virtual void save_to_ini(IniProcessing* ini) { (void)ini; }
 
@@ -332,13 +332,13 @@ public:
 
     const ConfigOption_t<true, value_t>& operator=(value_t value);
 
-    virtual void set_from_default(ConfigSetLevel level) override;
-    virtual void update_from_ini(IniProcessing* ini, ConfigSetLevel level) override;
+    virtual void set_from_default(ConfigSetLevel set_level) override;
+    virtual void update_from_ini(IniProcessing* ini, ConfigSetLevel set_level) override;
 
-    virtual void disable_bugfixes(ConfigSetLevel level) override;
+    virtual void disable_bugfixes(ConfigSetLevel set_level) override;
 
-    virtual void update_from_compat(CompatMode compat_mode, ConfigSetLevel level) override;
-    virtual void update_from(const BaseConfigOption_t<true>& o, ConfigSetLevel level) override;
+    virtual void update_from_compat(CompatMode compat_mode, ConfigSetLevel set_level) override;
+    virtual void update_from(const BaseConfigOption_t<true>& o, ConfigSetLevel set_level) override;
 
     virtual void save_to_ini(IniProcessing* ini) override;
 
@@ -369,7 +369,7 @@ public:
     virtual bool rotate_left() override;
     virtual bool rotate_right() override;
 
-    virtual void update_from_ini(IniProcessing* ini, ConfigSetLevel level) override;
+    virtual void update_from_ini(IniProcessing* ini, ConfigSetLevel set_level) override;
 
     virtual void save_to_ini(IniProcessing* ini) override;
 
@@ -421,7 +421,7 @@ public:
     ConfigSection_t(_Config_t<true>* parent, uint8_t scope,
         const char* internal_name, const char* display_name, const char* display_tooltip = nullptr);
 
-    virtual void update_from_ini(IniProcessing* ini, ConfigSetLevel level) override;
+    virtual void update_from_ini(IniProcessing* ini, ConfigSetLevel set_level) override;
     virtual void save_to_ini(IniProcessing* ini) override { update_from_ini(ini, ConfigSetLevel::unset); };
 };
 
