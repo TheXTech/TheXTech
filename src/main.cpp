@@ -577,11 +577,13 @@ int main(int argc, char**argv)
         if(switchVSync.isSet())
             g_config.render_vsync    = switchVSync.getValue();
 
+#ifndef NO_WINDOW_FOCUS_TRACKING
         if(switchNoPause.isSet())
             g_config.background_work = switchNoPause.getValue();
 
         if(switchBgInput.isSet())
             g_config.background_work = switchBgInput.getValue();
+#endif // NO_WINDOW_FOCUS_TRACKING
 
         if(renderType.isSet())
         {

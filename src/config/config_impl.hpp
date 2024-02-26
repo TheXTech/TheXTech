@@ -504,7 +504,7 @@ bool ConfigEnumOption_t<true, value_t>::rotate_left()
     // possibly misconfigured
     if(current_i == found_i)
     {
-        pLogDebug("Cycled through enum option [%s] without finding new value", base->m_display_name);
+        pLogDebug("Cycled through enum option [%s] without finding new value", base->m_display_name.c_str());
         return false;
     }
 
@@ -552,7 +552,7 @@ bool ConfigEnumOption_t<true, value_t>::rotate_right()
     // possibly misconfigured
     if(current_i == found_i)
     {
-        pLogDebug("Cycled through enum option [%s] without finding new value", base->m_display_name);
+        pLogDebug("Cycled through enum option [%s] without finding new value", base->m_display_name.c_str());
         return false;
     }
 

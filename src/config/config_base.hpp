@@ -319,7 +319,7 @@ public:
         void (*onupdate)() = nullptr, bool (*active)() = nullptr, bool (*validate)(void*) = nullptr) :
             BaseConfigOption_t<true>(parent) { (void)default_value; (void)compat_info; (void)scope; (void)internal_name; (void)display_name; (void)display_tooltip; (void)onupdate; (void)active; (void)validate; }
 
-    virtual bool operator==(const BaseConfigOption_t<true>& o) const;
+    virtual bool operator==(const BaseConfigOption_t<true>& o) const override;
 
     inline operator value_t() const
     {
@@ -338,7 +338,7 @@ public:
     virtual void disable_bugfixes(ConfigSetLevel level) override;
 
     virtual void update_from_compat(CompatMode compat_mode, ConfigSetLevel level) override;
-    virtual void update_from(const BaseConfigOption_t<true>& o, ConfigSetLevel level)  override;
+    virtual void update_from(const BaseConfigOption_t<true>& o, ConfigSetLevel level) override;
 
     virtual void save_to_ini(IniProcessing* ini) override;
 

@@ -37,6 +37,8 @@
 #include "game_main.h"
 #include "sound.h"
 
+#include "Integrator/integrator.h"
+
 #ifndef THEXTECH_NO_SDL_BUILD
 #include <Graphics/graphics_funcs.h>
 #endif
@@ -128,4 +130,10 @@ void config_log_level_set()
     g_pLogGlobalSetup.level = (PGE_LogLevel::Level)(int)g_config.log_level;
     LogWriter::m_logLevel = g_pLogGlobalSetup.level;
     pLogInfo("Updated log level to %d", (int)g_config.log_level);
+}
+
+void config_integrations_set()
+{
+    Integrator::quitIntegrations();
+    Integrator::initIntegrations();
 }

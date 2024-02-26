@@ -105,7 +105,7 @@ protected:
     // }
 
     template<class value_t>
-    constexpr value_t defaults(const value_t& value)
+    constexpr value_t defaults(const value_t& value) const
     {
         return value;
     }
@@ -194,6 +194,12 @@ public:
         {}, Scope::UserGlobal,
         "log-level", "Log level", "Log events at or above this severity",
         config_log_level_set};
+
+#ifdef ENABLE_XTECH_DISCORD_RPC
+    opt<bool> discord_rpc{this, defaults(false), {}, Scope::UserGlobal,
+        "discord-rpc", "Discord Integration", "Share your play data on Discord!",
+        config_integrations_set};
+#endif
 
     /* ---- Main - Input ----*/
     subsection main_input{this, "input", "Input"};
