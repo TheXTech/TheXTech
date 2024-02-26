@@ -20,6 +20,9 @@
 
 #include "sdl_proxy/sdl_stdinc.h"
 
+#include <json/json.hpp>
+#include <algorithm>
+
 #ifdef __16M__
 // used to clear loaded textures on level/world load
 #include "core/render.h"
@@ -209,6 +212,26 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
     }
 
     IsEpisodeIntro = (StartLevel == FileNameFull);
+
+    if(IsEpisodeIntro)
+    {
+        IsHubLevel = NoMap;
+        FileRecentSubHubLevel.clear();
+    }
+
+    if(!IsHubLevel)
+    {
+        IsHubLevel = std::find(SubHubLevels.begin(), SubHubLevels.end(), FileNameFull) != SubHubLevels.end();
+
+        if(IsHubLevel)
+            FileRecentSubHubLevel = FileNameFull;
+    }
+
+    // Level-wide extra settings
+    if(!lvl.custom_params.empty())
+    {
+        // none supported yet
+    }
 
     FileFormats::smbx64LevelPrepare(lvl);
     FileFormats::smbx64LevelSortBlocks(lvl);
@@ -1035,6 +1058,7 @@ void ClearLevel()
     NPCScore[NPCID_MEDAL] = 6;
     RestoreWorldStrings();
     LevelName.clear();
+    IsHubLevel = false;
     ResetCompat();
     SetupPhysics();
     LoadNPCDefaults();

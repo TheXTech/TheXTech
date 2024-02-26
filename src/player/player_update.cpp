@@ -2051,14 +2051,24 @@ void UpdatePlayer()
 
                     if(offScreenExit)
                     {
+                        // Always quit to the world map by off-screen exit
+                        if(!NoMap && !FileRecentSubHubLevel.empty())
+                        {
+                            FileRecentSubHubLevel.clear();
+                            ReturnWarp = 0;
+                            ReturnWarpSaved = 0;
+                        }
+
                         LevelBeatCode = 3;
                         EndLevel = true;
                         LevelMacro = LEVELMACRO_OFF;
                         LevelMacroCounter = 0;
+
                         if(g_config.EnableInterLevelFade)
                             g_levelScreenFader.setupFader(4, 0, 65, ScreenFader::S_FADE);
                         else
                             g_levelScreenFader.setupFader(65, 0, 65, ScreenFader::S_FADE);
+
                         levelWaitForFade();
                     }
 

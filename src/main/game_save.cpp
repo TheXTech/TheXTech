@@ -262,6 +262,7 @@ void SaveGame()
     sav.musicID = uint32_t(curWorldMusic);
     sav.musicFile = curWorldMusicFile;
     sav.last_hub_warp = static_cast<unsigned long>(ReturnWarpSaved);
+    sav.last_hub_level_file = FileRecentSubHubLevel;
 
     // ABOVE GETS SKIPPED BY FINDSAVES
     sav.gameCompleted = BeatTheGame; // Can only get 99% until you finish the game;
@@ -349,6 +350,7 @@ void LoadGame()
     if(g_compatibility.enable_last_warp_hub_resume)
     {
         ReturnWarp = int(sav.last_hub_warp);
+        FileRecentSubHubLevel = sav.last_hub_level_file;
         if(ReturnWarp > maxWarps)
             ReturnWarp = 0; // Invalid value
     }
@@ -356,6 +358,7 @@ void LoadGame()
     {
         // Keep the vanilla behavior, and let players feel the pain!, MuhahahahA! >:-D
         ReturnWarp = 0;
+        FileRecentSubHubLevel.clear();
     }
 
     ReturnWarpSaved = ReturnWarp;
@@ -435,6 +438,9 @@ void ClearGame(bool punnish)
 
     ReturnWarp = 0;
     ReturnWarpSaved = ReturnWarp;
+
+    IsHubLevel = false;
+    FileRecentSubHubLevel.clear();
 
     WorldPlayer[1].Location.X = -1;
     WorldPlayer[1].Location.Y = -1;

@@ -870,7 +870,7 @@ int GameMain(const CmdLineSetup_t &setup)
                 FindWldStars();
 #endif
 
-            if((!StartLevel.empty() && NoMap) || !GoToLevel.empty())
+            if((!StartLevel.empty() && NoMap) || !GoToLevel.empty() || !FileRecentSubHubLevel.empty())
             {
                 if(NoMap)
                     SaveGame();
@@ -894,7 +894,12 @@ int GameMain(const CmdLineSetup_t &setup)
 
                 std::string levelPath;
                 if(GoToLevel.empty())
-                    levelPath = SelectWorld[selWorld].WorldPath + StartLevel;
+                {
+                    if(FileRecentSubHubLevel.empty())
+                        levelPath = SelectWorld[selWorld].WorldPath + StartLevel;
+                    else
+                        levelPath = SelectWorld[selWorld].WorldPath + FileRecentSubHubLevel;
+                }
                 else
                 {
                     levelPath = SelectWorld[selWorld].WorldPath + GoToLevel;
@@ -932,6 +937,9 @@ int GameMain(const CmdLineSetup_t &setup)
 
                 // On a world map, reset this into default state
                 GoToLevelNoGameThing = false;
+
+                // Clear the recent hub level when entering a world map
+                FileRecentSubHubLevel.clear();
 
                 // Update graphics before loop begin (to process inital lazy-unpacking of used sprites)
                 UpdateGraphics2(true);
@@ -980,6 +988,11 @@ int GameMain(const CmdLineSetup_t &setup)
             if(LevelRestartRequested && Checkpoint.empty())
                 StartWarp = lastWarpEntered; // When restarting a level (after death), don't restore an entered warp on checkpoints
 
+            if(IsHubLevel && StartWarp > 0) // Save the warp where player entered the hub
+                ReturnWarpSaved = StartWarp;
+            else if(IsHubLevel && ReturnWarp == 0)
+                ReturnWarpSaved = 0;
+
             qScreen = false;
             LevelRestartRequested = false;
 
@@ -987,7 +1000,7 @@ int GameMain(const CmdLineSetup_t &setup)
                 lastWarpEntered = StartWarp; // Re-use it when player re-enters a level after death (when option is toggled on)
 
 // for warp entrances
-            if((ReturnWarp > 0 && IsEpisodeIntro/*FileName == StartLevel*/) || (StartWarp > 0))
+            if((ReturnWarp > 0 && (IsEpisodeIntro || IsHubLevel)/*FileName == StartLevel*/) || (StartWarp > 0))
             {
                 for(int numPlayersMax = numPlayers, A = 1; A <= numPlayersMax; ++A)
                 {
@@ -1067,7 +1080,13 @@ int GameMain(const CmdLineSetup_t &setup)
                 }
 
                 if(StartWarp > 0)
+                {
                     StartWarp = 0;
+
+                    // fix a bug where ReturnWarp (from different level) would be used at hub after death if StartWarp was set for hub
+                    if(IsHubLevel && g_compatibility.enable_last_warp_hub_resume)
+                        ReturnWarp = 0;
+                }
                 else
                     ReturnWarp = 0;
             }
@@ -2003,7 +2022,7 @@ void StartEpisode()
 
     SetupPlayers();
 
-    if(!StartLevel.empty())
+    if(!StartLevel.empty() || !FileRecentSubHubLevel.empty())
     {
         // TODO: why did Wohlstand disable this?
         PlaySoundMenu(SFX_LevelSelect);
@@ -2013,13 +2032,17 @@ void StartEpisode()
         ResetSoundFX();
         // todo: update this!
         ClearLevel();
-        std::string levelPath = SelectWorld[selWorld].WorldPath + StartLevel;
+
+        std::string levelName = (FileRecentSubHubLevel.empty() ? StartLevel : FileRecentSubHubLevel);
+        std::string levelPath = SelectWorld[selWorld].WorldPath + levelName;
+
         if(!OpenLevel(levelPath))
         {
-            MessageText = fmt::format_ne(g_gameStrings.errorOpenFileFailed, StartLevel);
+            MessageText = fmt::format_ne(g_gameStrings.errorOpenFileFailed, levelName);
             PauseGame(PauseCode::Message);
             ErrorQuit = true;
         }
+
         GameThing(1000, 3);
     }
 }
