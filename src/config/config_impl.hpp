@@ -390,7 +390,8 @@ void ConfigEnumOption_t<false, value_t>::make_translation(XTechTranslate& transl
 {
     translate.m_engineMap.insert({fmt::format_ne("menu.options.{0}.{1}._name", cur_section_id, m_internal_name), &m_display_name});
 
-    if(!m_display_tooltip.empty())
+    // some obscure behavior of the GCC version in Ubuntu 16.04 necessitates qualifying m_display_tooltip with the base class scope
+    if(!BaseConfigOption_t<false>::m_display_tooltip.empty())
         translate.m_engineMap.insert({fmt::format_ne("menu.options.{0}.{1}._tooltip", cur_section_id, m_internal_name), &m_display_tooltip});
 
     for(auto& value : m_enum_values)
