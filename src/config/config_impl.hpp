@@ -161,7 +161,7 @@ void ConfigOption_t<true, value_t>::update_from_ini(IniProcessing* ini, ConfigSe
     if(!ini->hasKey(m_base->m_internal_name))
         return;
 
-    value_t read_value;
+    value_t read_value{};
     ini->read(m_base->m_internal_name, read_value, read_value);
 
     *this = read_value;
