@@ -672,6 +672,13 @@ void Autocode::Do(bool init)
             break;
         }
 
+        case AT_CopyVar:
+        {
+            if(ReferenceOK() && MyString != STRINGINDEX_NONE && gAutoMan.VarExists(GetS(MyString)))
+                gAutoMan.VarOperation(GetS(MyRef), gAutoMan.GetVar(GetS(MyString)), (OPTYPE)(int)Param1);
+            break;
+        }
+
         case AT_LoadPlayerVar:
         {
             if(!this->ReferenceOK() || Param1 > (0x184 * 99))
@@ -1578,6 +1585,7 @@ static const std::unordered_map<std::string, AutocodeType> s_commandMap =
     {"RunCheat", AT_RunCheat},
 
     {"SetVar", AT_SetVar},
+    {"CopyVar", AT_CopyVar},
     {"LoadPlayerVar", AT_LoadPlayerVar},
     {"LoadNPCVar", AT_LoadNPCVar},
     {"LoadGlobalVar", AT_LoadGlobalVar},

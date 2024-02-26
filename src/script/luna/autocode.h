@@ -80,6 +80,7 @@ enum AutocodeType
     AT_RunCheat,                //1:        2:              3:              4:          5: Delay        6: Cheat string
 
     AT_SetVar,                  //1:        2: Op           3: Value        4:          5: Active time  6:
+    AT_CopyVar,                 //1:        2: Op           3:              4:          5: Active time  6: Source variable name; $ Target Variable Name
     AT_LoadPlayerVar,           //1:        2: Offset       3: Op           4:          5: Active time  6: Type (b, w, dw, f, qw/df)
     AT_LoadNPCVar,              //1: Type   2: Offset       3: Op           4: Section  5: Active time  6: Type (b, w, dw, f, qw/df)
     AT_LoadGlobalVar,           //1: Addr   2: Op           3:              4:          5: Active time  6: Type (b, w, dw, f, qw/df)
