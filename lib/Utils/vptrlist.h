@@ -499,6 +499,7 @@ public:
     {
         size_t m_size = vecPTR::size();
         SHptr *m_data = vecPTR::data();
+        (void)m_size;
         assert(m_size > from);
         assert(m_size > to);
         if (from == to)
