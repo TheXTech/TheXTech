@@ -28,19 +28,17 @@
 #include "../app_path.h"
 #include "app_path_private.h"
 
-static std::string s_assetRoot;
-
 void AppPathP::initDefaultPaths(const std::string &userDirName)
 {
     (void)userDirName;
 
     fatInitDefault();
-    s_assetRoot = "/thextech/";
+    s_assetRoot.clear();
 }
 
 std::string AppPathP::appDirectory()
 {
-    return s_assetRoot;
+    return std::string();
 }
 
 std::string AppPathP::userDirectory()
@@ -50,7 +48,7 @@ std::string AppPathP::userDirectory()
 
 std::string AppPathP::assetsRoot()
 {
-    return s_assetRoot;
+    return std::string();
 }
 
 std::string AppPathP::settingsRoot()

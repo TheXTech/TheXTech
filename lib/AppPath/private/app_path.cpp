@@ -160,7 +160,8 @@ std::vector<std::string> AppPathManager::assetsSearchPath()
     if(!m_customUserDirectory.empty())
         out.push_back(m_customUserDirectory);
 
-    out.push_back(AppPathP::appDirectory());
+    if(!AppPathP::appDirectory().empty())
+        out.push_back(AppPathP::appDirectory());
 
     if(!m_isPortable)
     {
@@ -168,9 +169,11 @@ std::vector<std::string> AppPathManager::assetsSearchPath()
         out.push_back(INSTALLED_ASSETS_PATH);
 #endif
 
-        out.push_back(m_userPath);
+        if(m_customUserDirectory.empty())
+            out.push_back(m_userPath);
 
-        out.push_back(AppPathP::assetsRoot());
+        if(!AppPathP::assetsRoot().empty())
+            out.push_back(AppPathP::assetsRoot());
     }
 
     // add slashes to all strings

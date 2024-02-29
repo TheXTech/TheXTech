@@ -37,7 +37,7 @@ void AppPathP::initDefaultPaths(const std::string &userDirName)
 
 std::string AppPathP::appDirectory()
 {
-    return s_assetRoot;
+    return std::string();
 }
 
 std::string AppPathP::userDirectory()
@@ -47,7 +47,7 @@ std::string AppPathP::userDirectory()
 
 std::string AppPathP::assetsRoot()
 {
-    return s_assetRoot;
+    return std::string();
 }
 
 std::string AppPathP::settingsRoot()

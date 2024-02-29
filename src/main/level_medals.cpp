@@ -73,7 +73,7 @@ static inline LevelSaveInfo_t* s_nextSaveInfo(LevelSaveInfo_t* prev)
 void CurLevelMedals_t::get(uint8_t idx)
 {
     // don't save star coins in hub level
-    if(InHub())
+    if(IsHubLevel)
         return;
 
     if(idx < c_max_track_medals && idx < max)
@@ -86,7 +86,7 @@ void CurLevelMedals_t::get(uint8_t idx)
 bool CurLevelMedals_t::gotten(uint8_t idx) const
 {
     // don't save star coins in hub level
-    if(InHub())
+    if(IsHubLevel)
         return false;
 
     if(idx < c_max_track_medals && idx < max)
@@ -108,7 +108,7 @@ void CurLevelMedals_t::on_all_dead()
 
 void CurLevelMedals_t::on_checkpoint()
 {
-    if(InHub())
+    if(IsHubLevel)
         return;
 
     m_checkpoint = got;

@@ -1085,6 +1085,14 @@ void EveryonesDead()
     LevelMacro = LEVELMACRO_OFF;
     FreezeNPCs = false;
 
+    // Quit to world map if died on sub-hub
+    if(!NoMap && IsHubLevel && !FileRecentSubHubLevel.empty())
+    {
+        FileRecentSubHubLevel.clear();
+        ReturnWarp = 0;
+        ReturnWarpSaved = 0;
+    }
+
 // Play fade effect instead of wait (see ProcessLastDead() above)
     if(!g_config.EnableInterLevelFade)
     {
@@ -4752,7 +4760,7 @@ static inline bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool bac
     {
         int prevFrame = plr.Frame;
 
-        if(warp.Effect == 1 && direction == 3 && plr.Duck && plr.SwordPoke == 0 && g_compatibility.fix_visual_bugs)
+        if(g_compatibility.fix_visual_bugs && warp.Effect == 1 && direction == 3 && plr.Duck && plr.SwordPoke == 0)
         {
             // Show the duck frame only when attempting to go down
             plr.Frame = (plr.Character == 5) ? 5 : 7;
@@ -4768,7 +4776,7 @@ static inline bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool bac
         MessageTextMap.clear();
 
         // Restore previous frame
-        if(warp.Effect == 1 && direction == 3)
+        if(g_compatibility.fix_visual_bugs && warp.Effect == 1 && direction == 3)
             plr.Frame = prevFrame;
 
         canWarp = false;
@@ -4891,7 +4899,7 @@ static inline bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool bac
                     plr.Warp = B;
                     plr.WarpBackward = backward;
                     ReturnWarp = B;
-                    if(IsEpisodeIntro && NoMap)
+                    if(IsHubLevel)
                         ReturnWarpSaved = ReturnWarp;
                     StartWarp = warp.LevelWarp;
                     return true;
@@ -6644,7 +6652,7 @@ void PlayerEffects(const int A)
                 p.Effect = 8;
                 p.Effect2 = 2970;
                 ReturnWarp = p.Warp;
-                if(IsEpisodeIntro && NoMap)
+                if(IsHubLevel)
                     ReturnWarpSaved = ReturnWarp;
                 StartWarp = warp.LevelWarp;
             }
@@ -7235,7 +7243,7 @@ void PlayerEffects(const int A)
                 p.Effect2 = 3000;
                 ReturnWarp = p.Warp;
 
-                if(IsEpisodeIntro && NoMap)
+                if(IsHubLevel)
                     ReturnWarpSaved = ReturnWarp;
 
                 StartWarp = warp.LevelWarp;
@@ -8047,7 +8055,7 @@ void SwapCharacter(int A, int Character, bool FromBlock)
 // returns whether a player is allowed to swap characters
 bool SwapCharAllowed()
 {
-    if(LevelSelect || GameMenu || (g_compatibility.allow_drop_add && InHub()))
+    if(LevelSelect || GameMenu || (g_compatibility.allow_drop_add && IsHubLevel))
         return true;
     else
         return false;

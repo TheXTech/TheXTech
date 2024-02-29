@@ -30,7 +30,6 @@
 
 #include "app_path_private.h"
 
-static std::string s_assetsRoot;
 static std::string s_userDirectory;
 static std::string s_applicationPath;
 //! The legacy debug root
@@ -121,7 +120,7 @@ std::string AppPathP::userDirectory()
 
 std::string AppPathP::assetsRoot()
 {
-    return s_userDirectory;
+    return std::string();
 }
 
 std::string AppPathP::settingsRoot()

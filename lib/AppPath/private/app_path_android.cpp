@@ -148,10 +148,13 @@ void AppPathP::initDefaultPaths(const std::string &userDirName)
     if(!m_androidGameAssetsPath.empty())
         s_assetsRoot = m_androidGameAssetsPath;
     else
-        s_assetsRoot = s_userDirectory;
+        s_assetsRoot.clear();
 
     if(!s_assetsRoot.empty() && s_assetsRoot.back() != '/')
         s_assetsRoot.push_back('/');
+
+    if(s_assetsRoot == s_userDirectory)
+        s_assetsRoot.clear();
 }
 
 std::string AppPathP::appDirectory()

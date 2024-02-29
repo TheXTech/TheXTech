@@ -19,21 +19,17 @@
 
 #include "app_path_private.h"
 
-static std::string s_assetsRoot;
 static std::string s_userDirectory;
-static std::string s_applicationPath;
 
 
 void AppPathP::initDefaultPaths(const std::string & /*userDirName*/)
 {
-    s_applicationPath = "ux0:data/TheXTech/";
-    s_assetsRoot = s_applicationPath;
-    s_userDirectory = s_applicationPath;
+    s_userDirectory = "ux0:data/TheXTech/";
 }
 
 std::string AppPathP::appDirectory()
 {
-    return s_applicationPath;
+    return std::string();
 }
 
 std::string AppPathP::userDirectory()
@@ -43,7 +39,7 @@ std::string AppPathP::userDirectory()
 
 std::string AppPathP::assetsRoot()
 {
-    return s_assetsRoot;
+    return std::string();
 }
 
 std::string AppPathP::settingsRoot()

@@ -185,7 +185,8 @@ static void s_find_asset_packs()
     std::vector<std::string> subdirList;
     std::string subdir;
 
-    bool found_debug = false;
+    bool found_debug_any = false;
+    bool found_debug_match = false;
 
     for(const std::string& root : AppPathManager::assetsSearchPath())
     {
@@ -208,11 +209,16 @@ static void s_find_asset_packs()
                 pLogWarning("Could not load UI assets from %s asset pack [%s], ignoring", (is_custom_root) ? "user-specified" : "possible legacy", pack.path.c_str());
             else if(is_custom_root && pack.id.empty())
                 pLogWarning("Could not read ID of user-specified asset pack [%s], ignoring", pack.path.c_str());
-            else if(found_debug && (g_AssetPackID.empty() || pack.full_id() != g_AssetPackID))
-                pLogDebug("Legacy/debug assets already found, ignoring assets at [%s]", pack.path.c_str());
+            else if(found_debug_match)
+                pLogDebug("Current legacy/debug assets already found, ignoring assets at [%s]", pack.path.c_str());
+            else if(found_debug_any && pack.full_id() != g_AssetPackID)
+                pLogDebug("Generic legacy/debug assets already found, ignoring assets at [%s]", pack.path.c_str());
             else
             {
-                found_debug = true;
+                found_debug_any = true;
+                if(pack.full_id() == g_AssetPackID)
+                    found_debug_match = true;
+
                 s_asset_packs.push_back(std::move(pack));
             }
         }
@@ -292,6 +298,10 @@ static AssetPack_t s_find_pack_init(const std::string& full_id)
         id.resize(slash_pos);
     }
 
+    std::string id_as_path = full_id;
+
+    appendSlash(id_as_path);
+
     std::string custom_root = AppPathManager::userAddedAssetsRoot();
 
     DirMan assets;
@@ -327,9 +337,9 @@ static AssetPack_t s_find_pack_init(const std::string& full_id)
                                      "gameinfo.ini of command-line specified asset pack has not been updated to specify its asset pack ID.\n"
                                      "After updating, you will need to manually move your gamesaves to settings/gamesaves/<ID>.\n");
             }
-            else if(is_custom_root && pack.path == full_id)
+            else if(is_custom_root && pack.path == id_as_path)
                 return pack;
-            else if(pack.id == id && pack.version == version)
+            else if(pack.id == id && pack.version == version && !full_id.empty())
                 return pack;
             else if(!pack.id.empty() && pack.id == id && id_match.path.empty())
                 id_match = std::move(pack);
