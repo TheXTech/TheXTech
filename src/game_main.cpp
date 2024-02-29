@@ -824,7 +824,8 @@ int GameMain(const CmdLineSetup_t &setup)
             }
 
             OpenLevel(introPath);
-            vScreen[1].X = -level[0].X;
+            Screens[0].vScreen(1).X = -level[0].X;
+            Screens[0].canonical_screen().vScreen(1).X = -level[0].X;
             s_ExpandSectionForMenu();
 
             if(g_config.EnableInterLevelFade)

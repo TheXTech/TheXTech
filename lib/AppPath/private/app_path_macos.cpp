@@ -115,8 +115,8 @@ void AppPathP::initDefaultPaths(const std::string &userDirName)
         }
         else
         {
-            s_assetsRoot = appSupport;
             s_userDirectory = appSupport;
+            s_assetsRoot.clear();
         }
 
         s_logsPath = s_userDirectory + "logs/";

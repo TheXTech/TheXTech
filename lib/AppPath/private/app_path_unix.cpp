@@ -121,7 +121,7 @@ void AppPathP::initDefaultPaths(const std::string &userDirName)
             homePath.push_back('/');
 
         s_userDirectory = homePath;
-        s_assetsRoot = homePath;
+        s_assetsRoot.clear();
         s_logsDirectory.clear();
         s_settingsDirectory.clear();
         s_gamesavesDirectory.clear();
@@ -149,7 +149,7 @@ void AppPathP::initDefaultPaths(const std::string &userDirName)
         homePath.push_back('/');
 
     s_userDirectory = homePath;
-    s_assetsRoot = homePath;
+    s_assetsRoot.clear();
     s_logsDirectory.clear();
     s_settingsDirectory.clear();
     s_gamesavesDirectory.clear();

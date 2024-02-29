@@ -116,7 +116,7 @@ void AppPathP::initDefaultPaths(const std::string &userDirName)
         if(!ignoreLegacyDebugDir && DirMan::exists(s_userDirectory + s_legacyDebugDir))
         {
             s_userDirectory += s_legacyDebugDir;
-            s_assetsRoot = s_userDirectory;
+            s_assetsRoot.clear();
             s_logsDirectory.clear();
         }
         else
@@ -128,7 +128,7 @@ void AppPathP::initDefaultPaths(const std::string &userDirName)
     }
 #else
     s_userDirectory += s_legacyDebugDir;
-    s_assetsRoot = s_userDirectory;
+    s_assetsRoot.clear();
     s_logsDirectory.clear();
 #endif
 }
