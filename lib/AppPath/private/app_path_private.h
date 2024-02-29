@@ -34,8 +34,8 @@ extern bool ignoreLegacyDebugDir;
 extern void initDefaultPaths(const std::string &userDirName);
 
 /*!
- * \brief Get the path to the executable's directory (On some platforms may be empty, so, use user directory instead)
- * \return Path to the executable's directory
+ * \brief Get the path to the executable's directory (on some platforms may be empty)
+ * \return Path to the executable's directory, or an empty string if unsupported
  */
 extern std::string appDirectory();
 
@@ -46,8 +46,8 @@ extern std::string appDirectory();
 extern std::string userDirectory();
 
 /*!
- * \brief Get the default path to the read-only assets root
- * \return Path to the assets root directory
+ * \brief Get the default path to the system's read-only assets root
+ * \return Path to the assets root directory, or an empty string if none is present
  */
 extern std::string assetsRoot();
 
