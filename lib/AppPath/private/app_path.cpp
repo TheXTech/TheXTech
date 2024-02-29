@@ -167,7 +167,8 @@ std::vector<std::string> AppPathManager::assetsSearchPath()
         out.push_back(FIXED_ASSETS_PATH);
 #endif
 
-        out.push_back(m_userPath);
+        if(m_customUserDirectory.empty())
+            out.push_back(m_userPath);
 
         out.push_back(AppPathP::assetsRoot());
     }
