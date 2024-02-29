@@ -44,7 +44,7 @@ int vScreen_t::TargetY() const
 
 double vScreen_t::CameraAddX() const
 {
-#ifdef PGE_MIN_PORT
+#if 0
     return SDL_round(X / 2) * 2;
 #else
     return X;
@@ -53,7 +53,7 @@ double vScreen_t::CameraAddX() const
 
 double vScreen_t::CameraAddY() const
 {
-#ifdef PGE_MIN_PORT
+#if 0
     return SDL_round(Y / 2) * 2;
 #else
     return Y;
