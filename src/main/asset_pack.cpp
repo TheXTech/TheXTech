@@ -292,6 +292,10 @@ static AssetPack_t s_find_pack_init(const std::string& full_id)
         id.resize(slash_pos);
     }
 
+    std::string id_as_path = full_id;
+
+    appendSlash(id_as_path);
+
     std::string custom_root = AppPathManager::userAddedAssetsRoot();
 
     DirMan assets;
@@ -327,7 +331,7 @@ static AssetPack_t s_find_pack_init(const std::string& full_id)
                                      "gameinfo.ini of command-line specified asset pack has not been updated to specify its asset pack ID.\n"
                                      "After updating, you will need to manually move your gamesaves to settings/gamesaves/<ID>.\n");
             }
-            else if(is_custom_root && pack.path == full_id)
+            else if(is_custom_root && pack.path == id_as_path)
                 return pack;
             else if(pack.id == id && pack.version == version)
                 return pack;
