@@ -185,7 +185,8 @@ static void s_find_asset_packs()
     std::vector<std::string> subdirList;
     std::string subdir;
 
-    bool found_debug = false;
+    bool found_debug_any = false;
+    bool found_debug_match = false;
 
     for(const std::string& root : AppPathManager::assetsSearchPath())
     {
@@ -208,11 +209,16 @@ static void s_find_asset_packs()
                 pLogWarning("Could not load UI assets from %s asset pack [%s], ignoring", (is_custom_root) ? "user-specified" : "possible legacy", pack.path.c_str());
             else if(is_custom_root && pack.id.empty())
                 pLogWarning("Could not read ID of user-specified asset pack [%s], ignoring", pack.path.c_str());
-            else if(found_debug && (g_AssetPackID.empty() || pack.full_id() != g_AssetPackID))
-                pLogDebug("Legacy/debug assets already found, ignoring assets at [%s]", pack.path.c_str());
+            else if(found_debug_match)
+                pLogDebug("Current legacy/debug assets already found, ignoring assets at [%s]", pack.path.c_str());
+            else if(found_debug_any && pack.full_id() != g_AssetPackID)
+                pLogDebug("Generic legacy/debug assets already found, ignoring assets at [%s]", pack.path.c_str());
             else
             {
-                found_debug = true;
+                found_debug_any = true;
+                if(pack.full_id() == g_AssetPackID)
+                    found_debug_match = true;
+
                 s_asset_packs.push_back(std::move(pack));
             }
         }
