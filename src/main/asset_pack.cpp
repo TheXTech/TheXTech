@@ -339,7 +339,7 @@ static AssetPack_t s_find_pack_init(const std::string& full_id)
             }
             else if(is_custom_root && pack.path == id_as_path)
                 return pack;
-            else if(pack.id == id && pack.version == version)
+            else if(pack.id == id && pack.version == version && !full_id.empty())
                 return pack;
             else if(!pack.id.empty() && pack.id == id && id_match.path.empty())
                 id_match = std::move(pack);
