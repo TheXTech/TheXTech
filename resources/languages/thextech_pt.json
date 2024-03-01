@@ -1,1 +1,363 @@
-{}
+{
+    "editor": {
+        "file": {
+            "convert": {
+                "featureLevelStarDisplay": "Um nível usa configurações para visualizar estrelas.",
+                "featuresWillBeLost": "Os recursos a seguir serão PERDIDOS:",
+                "_38aUnsupported": "O formato SMBX38-A não é suportado para conversões.",
+                "featureBgoOrder": "Um objeto de fundo (BGO) usa ordem de desenho personalizada.",
+                "featureBlockForceSmashable": "Um bloco giratório usa método de quebrar antigo.",
+                "featureCustomWorldMusic": "Usa música personalizada de mundo.",
+                "featureEventAutoscroll": "Um evento usa rolagem automática moderna.",
+                "featureEventCustomMusic": "Um evento altera música por um arquivo.",
+                "featureNPCVariant": "Um NPC usa uma variante de comportamento.",
+                "featureWarpCannonExit": "Um teleporte tem efeito de saída estilo canhão.",
+                "featureWarpCustomStarsMsg": "Um teleporte mostra mensagem personalizada com estrelas.",
+                "featureWarpEnterEvent": "Um teleporte ativa um evento na entrada.",
+                "featureWarpNeedsStand": "Um teleporte necessitar ter jogador parado em pé.",
+                "featureWarpNoPrintStars": "Um teleporte esconde objetivo de estrelas do nível.",
+                "featureWarpNoStartScene": "Um teleporte de nível pula cena inicial.",
+                "featureWarpPortal": "Um teleporte usa efeito estilo portal.",
+                "featureWarpTransit": "Um tteleporte usa um tipo de transição nova.",
+                "featureWorldStarDisplay": "Usa configurações de mundo para visualizar estrelas.",
+                "formatUnknown": "O formato especificado é desconhecido.",
+                "noIssues": "Não há problemas de compatibilidade.",
+                "desc": "A extensão do arquivo será alterada mas o arquivo antigo NÃO será apagado."
+            },
+            "formatLegacy": "Antigo (SMBX-64)",
+            "formatModern": "Moderno (PGE-X)",
+            "labelCurrentFile": "Arquivo atual: \\",
+            "labelFormat": "Formato:",
+            "optionActionWithoutSave": "{0} sem guardar",
+            "optionCancelAction": "Cancelar: não {0}",
+            "optionCancelConversion": "Cancelar conversão",
+            "optionProceedWithConversion": "Confirmar conversão",
+            "optionYesSaveThenAction": "SIM: Guardar, depois {0}",
+            "sectionLevel": "Nível",
+            "actionOpen": "Abrir",
+            "confirmConfirmAction": "Certeza que quer {0}?",
+            "confirmConvertFormatTo": "Converter formato para {0}?",
+            "confirmSaveBeforeAction": "Guardar antes de {0}?",
+            "sectionWorld": "Mundo",
+            "actionClearLevel": "Limpar Nível",
+            "actionClearWorld": "Limpar Mundo",
+            "actionExit": "Sair",
+            "commandNew": "Novo",
+            "commandOpen": "Abrir...",
+            "commandSave": "Guardar",
+            "commandSaveAs": "Guardar como...",
+            "actionRevert": "Redefinir"
+        },
+        "labelSortLayer": "Organizar Camadas:",
+        "layers": {
+            "abbrevAttLayer": "Anexa: ",
+            "default": "Padrão",
+            "deletion": {
+                "cancel": "Cancelar: Não apagar camada",
+                "confirmDelete": "NÃO: *APAGA TODO O CONTEÚDO*",
+                "preserveLayerContents": "Preservar o conteúdo da camada?",
+                "confirmPreserve": "SIM: Mover para a camada padrão",
+                "header": "Apagando camada {0}"
+            },
+            "header": "Camadas:",
+            "itemNewLayer": "<Nova Camada>",
+            "label": "Camada:",
+            "labelAttached": "Anexado:",
+            "labelAttachedLayer": "Camada Anexada:",
+            "labelMoveLayer": "Mover Camada:",
+            "promptLayerName": "Nome da camada",
+            "desc": {
+                "att": "Quando o NPC se mover, a camada anexada o seguira"
+            }
+        },
+        "letterCoordY": "Y",
+        "letterDown": "B",
+        "letterLeft": "E",
+        "letterUp": "C",
+        "level": {
+            "alwaysVis": "Sempre Vis",
+            "bigBG": "Fundo Grande",
+            "gameStart": "Iniciar Jogo",
+            "levelName": "Nome do Nível",
+            "pathBG": "Caminho",
+            "pathUnlocks": "Caminhos Desbloqueáveis",
+            "startPos": "Pos. Inicial"
+        },
+        "mapPos": "Pos. Mapa:",
+        "npc": {
+            "inertNice": "Amigo",
+            "props": {
+                "active": "Ativo",
+                "attachSurface": "Anexa",
+                "facing": "Olhando"
+            },
+            "inContainer": "-",
+            "stuckStop": "Ficar",
+            "ai": {
+                "LR": "Esq-Dir",
+                "UD": "Cim-Bai",
+                "aiIs": "IA: {0}",
+                "headerCustomAi": "IA Person.:",
+                "leap": "Saltar",
+                "swim": "Nadar",
+                "target": "Perseguir",
+                "jump": "Pular",
+                "use1_0Ai": "Usar IA 1.0?"
+            },
+            "gen": {
+                "effectWarp": "Teleporte",
+                "effectIs": "Efeito: {0}",
+                "effectShoot": "Atirar",
+                "header": "Configurações de Gerador",
+                "direction": "Direção"
+            },
+            "abbrevGen": "Gera.",
+            "tooltipExpandSection": "Expandir Seção"
+        },
+        "phraseAreYouSure": "Tem certeza?",
+        "phraseCountMore": "Mais {0}",
+        "phraseDelayIsMs": "Intervalo: {0} ms",
+        "phraseRadiusIndex": "Raio {0}",
+        "phraseSectionIndex": "Seção {0}",
+        "section": {
+            "horizWrap": "Ligar Esq-Dir",
+            "noTurnBack": "Sem Volta",
+            "offscreenExit": "Sair Pela Borda",
+            "scroll": "Deslizar",
+            "setBounds": "Definir Bordas",
+            "underwater": "Subaquático"
+        },
+        "select": {
+            "pathBlankUnlock": "Caminho {0} Desbloqueia Por",
+            "sectionBlankPropBlank": "Seção {0}{1}",
+            "allSectPropBlankForEventN": "Todas Seções {0} para {1}",
+            "sectBlankPropBlankForEventN": "Seção {0} {1} para {2}",
+            "soundForEventN": "Som para Evento {0}",
+            "warpTransitEffect": "Efeito de Transição do Teleporte",
+            "worldMusic": "Música do Mundo"
+        },
+        "testPlay": {
+            "boot": "Bota",
+            "char": "Personagem",
+            "magicHand": "Mão Mágica",
+            "pet": "Mascote",
+            "power": "Poder"
+        },
+        "tooltip": {
+            "area": "Área",
+            "erase": "Apagar",
+            "NPCs": "NPCs",
+            "music": "Música",
+            "scenes": "Cenas",
+            "BGOs": "Obj. de Fundo",
+            "eraseAll": "Apagar Tudo",
+            "blocks": "Blocos",
+            "file": "Arquivo",
+            "layers": "Camadas",
+            "levels": "Níveis",
+            "paths": "Caminhos",
+            "select": "Selecionar",
+            "show": "Mostrar",
+            "settings": "Configurações",
+            "tiles": "Peças",
+            "warps": "Teleportes",
+            "water": "Água",
+            "events": "Eventos"
+        },
+        "warp": {
+            "effect": "Efeito:",
+            "in": "Em",
+            "out": "Fora",
+            "placing": "Colocando:",
+            "ride": "Montar",
+            "speed": "Velocidade ",
+            "style": {
+                "blipInstant": "Inst.",
+                "door": "Porta",
+                "portal": "Port",
+                "style": "Estilo: ",
+                "pipe": "Cano"
+            },
+            "to": "Para: {0}",
+            "toMap": "Para Mapa",
+            "transit": {
+                "name1": "DESLIZAR",
+                "name4": "VIRAR (H)",
+                "name0": "NENHUM",
+                "name2": "TRANSIÇÃO",
+                "name3": "CÍRCULO",
+                "name5": "VIRAR (V)"
+            },
+            "twoWay": "Ida-Volta",
+            "cannonExit": "Saída de Canhão",
+            "allow": "Permitir:",
+            "dir": "Dire.",
+            "item": "Item",
+            "needStarCount": "Precisa de {0} {1}",
+            "lvlWarp": "Tele.Nív.",
+            "needFloor": "Precisa de Chão",
+            "needKey": "Precisa de Chave",
+            "showStarCount": "Mostrar Estrelas",
+            "showStartScene": "Mostrar Cena Inicial",
+            "starLockMessage": "Mens. de Bloq. de Estrela",
+            "target": "Alvo: ",
+            "title": "Config. de Teleporte"
+        },
+        "water": {
+            "title": "Config. de Água"
+        },
+        "wordEvent": {
+            "typeLabel": "Evento {0}:",
+            "nominative": "Evento",
+            "genitive": "Evento"
+        },
+        "wordInstant": "Instantâneo",
+        "wordNPC": {
+            "nominative": "NPC",
+            "genitive": "NPC"
+        },
+        "wordText": "Texto",
+        "wordWidth": "Largura",
+        "world": {
+            "hubWorld": "Mundo Central",
+            "introLevel": "Nível Inicial",
+            "name": "Nome do Mundo",
+            "allowChars": "Permitir Personagens",
+            "phraseCreditIndex": "Linha {0} - Créditos do Mundo:",
+            "totalStars": "Estrelas Totais: ",
+            "retryOnFail": "Tentar Nov. ao Falhar"
+        },
+        "block": {
+            "canBreak": "Quebrável",
+            "pickContents": "Escolha o conteúdo do bloco",
+            "canBreakTooltip": "Antigo \"Quebrar ao bater\"",
+            "inside": "Contém:",
+            "letterHeight": "A-",
+            "letterWidth": "L-",
+            "slick": "Escorr.",
+            "invis": "Inv."
+        },
+        "events": {
+            "desc": {
+                "hit": "bater no bloco",
+                "layerClear": "tudo na camada de objetos estiver limpa",
+                "phraseTriggersAfterTemplate": "{0} ativa {1} ms depois do evento {2}",
+                "phraseTriggersWhenTemplate": "{0} ativa quando {1}",
+                "talk": "o jogador fala com o NPC",
+                "death": "o NPC morre",
+                "destroy": "o bloco é destruído",
+                "enter": "entrar no teleporte",
+                "activate": "o NPC entrar na tela"
+            },
+            "deletion": {
+                "cancel": "NÃO: Não apagar o evento",
+                "confirm": "SIM: Apagar o evento",
+                "deletingEvent": "Apagando o evento {0}"
+            },
+            "header": "Eventos:",
+            "headerTriggerEvent": "Ativação:",
+            "itemNewEvent": "<Novo Evento>",
+            "label": {
+                "activate": "Ativar",
+                "death": "Morte",
+                "layerClear": "Camada Limpa",
+                "destroy": "Destruir",
+                "enter": "Entrar",
+                "hit": "Bater",
+                "next": "Próximo",
+                "talk": "Falar"
+            },
+            "layers": {
+                "headerMove": "Mover:",
+                "headerHide": "Esconder:",
+                "headerShow": "Mostrar:",
+                "headerToggle": "Alternar:"
+            },
+            "letter": {
+                "enter": "E:",
+                "layerClear": "L:",
+                "activate": "A:",
+                "death": "M:",
+                "destroy": "D:",
+                "hit": "B:",
+                "talk": "F:"
+            },
+            "props": {
+                "sound": "Som",
+                "autostart": "Ativo ao iniciar",
+                "controls": "Controles",
+                "endGame": "Fim do Jogo",
+                "layerSmoke": "Fumaça"
+            },
+            "sections": {
+                "actionKeep": "Manter",
+                "actionReset": "Reiniciar",
+                "actionSet": "Definir",
+                "phraseAllSections": "Todas as Seções",
+                "propBackground": "Fundo",
+                "propBounds": "Bordas",
+                "propMusic": "Música"
+            },
+            "promptEventName": "Nome do evento",
+            "promptEventText": "Texto do evento",
+            "bounds": {
+                "changeAllSectionBoundsToCurrent": "Mudar todos os limites de borda da seção atual?",
+                "changeSectionBoundsToCurrent": "Mudar os limites de borda da seção {0} aos valores atuais?",
+                "shouldEvent": "Editar Evento {0}"
+            },
+            "controlsForEventN": "Controles para o evento {0}",
+            "settingsForEvent": "Configurações do evento {0}"
+        },
+        "browser": {
+            "itemNewFile": "<Novo Arquivo>",
+            "askOverwriteFile": "Sobrescrever {0}?",
+            "itemNewFolder": "<Nova Pasta>",
+            "openFile": "Abrir arquivo",
+            "newFile": "Criar arquivo",
+            "saveFile": "Guardar arquivo"
+        },
+        "labelSortOffset": "Organizar Deslocamento (Offset):",
+        "letterCoordX": "X",
+        "letterRight": "D",
+        "pageBlankOfBlank": "Pagina {0} de {1}",
+        "phraseGenericIndex": "Número {0}",
+        "phraseTextOf": "Texto - {0}",
+        "phraseWarpIndex": "Teleporte {0}",
+        "toggleMagicBlock": "Bloco Mágico",
+        "wordEnabled": "Ativado",
+        "wordCoins": "Moedas",
+        "wordHeight": "Altura",
+        "wordMode": "Modo"
+    },
+    "game": {
+        "connect": {
+            "phraseHoldStart": "Pressione Start",
+            "splitPressSelect_2": "Opções de Controle",
+            "dropAddTitle": "Ger. Jogadores",
+            "phraseChangeChar": "Mudar Personagem",
+            "phraseDropMe": "Retirar",
+            "phraseDropPX": "Tirar J{0}",
+            "phraseForceResume": "Forçar Continuação",
+            "phrasePressAButton": "Pressione A",
+            "phraseSetControls": "Definir Controles",
+            "phraseStartToForceRes": "Pressione Start para Forçar Continuar",
+            "phraseStartToResume": "Pressione Start para Continuar",
+            "phraseTestControls": "Testar Controles",
+            "phraseTestProfile": "Testar Perfil",
+            "phraseWaitingForInput": "Esperando por Controles...",
+            "reconnectTitle": "Reconectar",
+            "splitPressSelect_1": "Pressione Select para",
+            "wordDisconnect": "Desconectar"
+        }
+    },
+    "menu": {
+        "controls": {
+            "touchscreen": {
+                "style": {
+                    "XODA": "𐄂○□△"
+                }
+            }
+        }
+    },
+    "languageName": "Português Brasileiro"
+}
