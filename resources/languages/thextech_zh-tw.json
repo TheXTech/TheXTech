@@ -122,7 +122,8 @@
                 "featureWorldStarDisplay": "使用了大地圖的設置以顯示星星數量。",
                 "featuresWillBeLost": "下列特性將會丟失：",
                 "formatUnknown": "請求的格式不支持。",
-                "noIssues": "該操作不會造成任何兼容性問題。"
+                "noIssues": "該操作不會造成任何兼容性問題。",
+                "featureBgoOrder": "背景對象設置了自定義疊放次序。"
             },
             "formatLegacy": "舊版本",
             "formatModern": "新版本",
@@ -324,7 +325,9 @@
             "phraseCreditIndex": "地圖製作團隊 第{0}行：",
             "retryOnFail": "失敗之後重新開始",
             "totalStars": "總星星數："
-        }
+        },
+        "labelSortOffset": "疊放次序：",
+        "labelSortLayer": "疊放圖層："
     },
     "game": {
         "connect": {
@@ -366,7 +369,8 @@
             "restartLevel": "重新開始",
             "returnToEditor": "返回編輯器",
             "saveAndContinue": "保存並繼續",
-            "saveAndQuit": "保存並退出"
+            "saveAndQuit": "保存並退出",
+            "playerSetup": "玩家設置"
         },
         "format": {
             "minutesSeconds": "{0}分{1}秒"
@@ -417,7 +421,7 @@
                 "primary": "鼠標左鍵",
                 "right": "鼠標向右移動",
                 "secondary": "鼠標右鍵",
-                "tertiary": "鼠標第三按鍵",
+                "tertiary": "鼠標滾輪",
                 "up": "鼠標向上移動"
             },
             "editor": {
@@ -447,7 +451,7 @@
                 "groundPoundButton": "震地按鍵",
                 "maxPlayers": "玩家上限",
                 "rumble": "Rumble 控制器",
-                "textEntryStyle": "按鍵名稱顯示"
+                "textEntryStyle": "文字輸入使用設備"
             },
             "phraseNewProfOldJoy": "新建老式手柄配置",
             "profile": {
@@ -576,7 +580,8 @@
             "mainExit": "退出",
             "mainMultiplayerGame": "雙人遊戲",
             "mainOptions": "設置",
-            "mainStartGame": "開始遊戲"
+            "mainStartGame": "開始遊戲",
+            "mainPlayEpisode": "開始遊戲"
         },
         "options": {
             "optionsModeFullScreen": "全屏模式",
@@ -616,7 +621,8 @@
         "nameVitalyNovichkov": "維塔利·諾維奇科夫",
         "originalBy": "原始VB6代碼：",
         "psVitaPortBy": "PS Vita移植：",
-        "specialThanks": "特別鳴謝："
+        "specialThanks": "特別鳴謝：",
+        "qualityControl": "品質管理："
     },
     "pluralRules": "singular-only"
 }

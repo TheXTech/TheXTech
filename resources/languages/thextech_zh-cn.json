@@ -122,7 +122,8 @@
                 "featureWorldStarDisplay": "使用了大地图的设置以显示星星数量。",
                 "featuresWillBeLost": "下列特性将会丢失：",
                 "formatUnknown": "请求的格式不支持。",
-                "noIssues": "该操作不会造成任何兼容性问题。"
+                "noIssues": "该操作不会造成任何兼容性问题。",
+                "featureBgoOrder": "背景对象设置了自定义叠放次序。"
             },
             "formatLegacy": "旧版本",
             "formatModern": "新版本",
@@ -324,7 +325,9 @@
             "phraseCreditIndex": "地图制作团队 第{0}行：",
             "retryOnFail": "失败之后重新开始",
             "totalStars": "总星星数："
-        }
+        },
+        "labelSortLayer": "叠放图层：",
+        "labelSortOffset": "叠放次序："
     },
     "game": {
         "connect": {
@@ -369,7 +372,8 @@
             "restartLevel": "重新开始",
             "returnToEditor": "返回编辑器",
             "saveAndContinue": "保存并继续",
-            "saveAndQuit": "保存并退出"
+            "saveAndQuit": "保存并退出",
+            "playerSetup": "玩家设置"
         },
         "message": {
             "scanningLevels": "扫描关卡中……"
@@ -417,7 +421,7 @@
                 "primary": "鼠标左键",
                 "right": "鼠标向右移动",
                 "secondary": "鼠标右键",
-                "tertiary": "鼠标第三按键",
+                "tertiary": "鼠标滚轮",
                 "up": "鼠标向上移动"
             },
             "editor": {
@@ -447,7 +451,7 @@
                 "groundPoundButton": "震地按键",
                 "maxPlayers": "玩家上限",
                 "rumble": "Rumble控制器",
-                "textEntryStyle": "按键名称显示"
+                "textEntryStyle": "文字输入使用设备"
             },
             "phraseNewProfOldJoy": "新建老式手柄配置",
             "profile": {
@@ -576,7 +580,8 @@
             "mainExit": "退出",
             "mainMultiplayerGame": "双人游戏",
             "mainOptions": "设置",
-            "mainStartGame": "开始游戏"
+            "mainStartGame": "开始游戏",
+            "mainPlayEpisode": "开始游戏"
         },
         "options": {
             "optionsModeFullScreen": "全屏模式",
@@ -616,7 +621,8 @@
         "nameVitalyNovichkov": "维塔利·诺维奇科夫",
         "originalBy": "原始VB6代码：",
         "psVitaPortBy": "PS Vita移植：",
-        "specialThanks": "特别鸣谢："
+        "specialThanks": "特别鸣谢：",
+        "qualityControl": "品质管理："
     },
     "pluralRules": "singular-only"
 }

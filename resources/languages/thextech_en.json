@@ -105,6 +105,7 @@
             "convert": {
                 "_38aUnsupported": "The SMBX38-A format is not supported for conversion.",
                 "desc": "The file extension will change but the old file will NOT be deleted.",
+                "featureBgoOrder": "A BGO uses custom draw order.",
                 "featureBlockForceSmashable": "A spin block uses legacy smash.",
                 "featureCustomWorldMusic": "Uses custom world music file.",
                 "featureEventAutoscroll": "An event uses modern autoscroll.",
@@ -136,6 +137,8 @@
             "sectionLevel": "Level",
             "sectionWorld": "World"
         },
+        "labelSortLayer": "Sort Layer:",
+        "labelSortOffset": "Sort Offset:",
         "layers": {
             "abbrevAttLayer": "Att: ",
             "default": "Default",
@@ -435,7 +438,7 @@
             },
             "hotkeys": {
                 "debugInfo": "Debug Info",
-                "enterCheats": "Enter Cheat",
+                "enterCheats": "Enter Code",
                 "fullscreen": "Fullscreen",
                 "legacyPause": "Old Pause",
                 "recordGif": "Record GIF",
@@ -576,7 +579,7 @@
             "mainExit": "Exit",
             "mainMultiplayerGame": "2 Player Game",
             "mainOptions": "Options",
-            "mainStartGame": "Start Game"
+            "mainPlayEpisode": "Play Episode"
         },
         "options": {
             "optionsModeFullScreen": "Fullscreen mode",
