@@ -71,7 +71,7 @@
                 "sound": "Sonido",
                 "layerSmoke": "Humo"
             },
-            "settingsForEvent": "Ajustes para el Evento",
+            "settingsForEvent": "Ajustes para el Evento {0}",
             "bounds": {
                 "shouldEvent": "Debería el Evento {0}",
                 "changeAllSectionBoundsToCurrent": "Cambiar todos los límites de la sección a los actuales?",
