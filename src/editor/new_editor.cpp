@@ -61,6 +61,7 @@
 #include "main/game_info.h"
 #include "main/translate.h"
 
+
 template<typename... Args>
 inline void SuperPrintR(EditorScreen::CallMode mode, Args... args)
 {
@@ -236,19 +237,28 @@ void EditorScreen::ResetCursor()
 bool AllowBubble()
 {
     int type;
-    if(EditorCursor.NPC.Type == 91 || EditorCursor.NPC.Type == 96
-        || EditorCursor.NPC.Type == 283 || EditorCursor.NPC.Type == 284)
+
+    if(EditorCursor.NPC.Type == 91 || EditorCursor.NPC.Type == 96 ||
+       EditorCursor.NPC.Type == 283 || EditorCursor.NPC.Type == 284)
         type = EditorCursor.NPC.Special;
     else
         type = EditorCursor.NPC.Type;
-    if(type == 134) return true;
+
+    if(type == 134)
+        return true;
+
     if(NPCHeight(type) > 36 || NPCWidth(type) > 36
         || NPCWidthGFX(type) > 36 || NPCHeightGFX(type) > 36)
     {
         int W = NPCWidth(type);
         int H = NPCHeight(type);
-        if(NPCWidthGFX(type) > W) W = NPCWidthGFX(type);
-        if(NPCHeightGFX(type) > H) H = NPCHeightGFX(type);
+
+        if(NPCWidthGFX(type) > W)
+            W = NPCWidthGFX(type);
+
+        if(NPCHeightGFX(type) > H)
+            H = NPCHeightGFX(type);
+
         if((W <= 32 && H <= 54) || (H <= 32 && W <= 54))
             return true;
         else
@@ -301,9 +311,7 @@ void SetEditorNPCType(NPCID type)
     if(find_Variant_Data(prev_type) != find_Variant_Data(type))
     {
         if(FileFormat == FileFormats::LVL_PGEX)
-        {
             EditorCursor.NPC.Variant = find_modern_Variant(type);
-        }
         else
             EditorCursor.NPC.Variant = 0;
     }
@@ -378,6 +386,7 @@ void EditorScreen::FocusNPC()
         type = EditorCursor.NPC.Special;
     else
         type = EditorCursor.NPC.Type;
+
     if(m_special_page == SPECIAL_PAGE_BLOCK_CONTENTS && (type == 10 || type == 9 || type == 90 || type == 14 || type == 264 || type == 34 || type == 169 || type == 170 || type == 226 || type == 287 || type == 33 || type == 185 || type == 187 || type == 183 || type == 188 || type == 277 || type == 95 || type == 31 || type == 227 || type == 88 || type == 184 || type == 186 || type == 182 || type == 153 || type == 138 || type == 249 || type == 134 || type == 241 || type == 240 || type == 152 || type == 250 || type == 254 || type == 251 || type == 252 || type == 253))
         m_NPC_page = -1;
     else if(!EditorCustom::npc_families.empty() && type >= 1 && type <= maxNPCType && EditorCustom::npc_family_by_type[type - 1] != EditorCustom::FAMILY_NONE)
@@ -624,6 +633,7 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
                 EditorCursor.NPC.Type = NPCID_ITEM_BURIED;
             }
         }
+
         if(UpdateButton(mode, e_ScreenW - 40 + 4, 100 + 4, GFXNPC[NPCID_ITEM_POD], EditorCursor.NPC.Type == NPCID_ITEM_POD))
         {
             if(EditorCursor.NPC.Type == NPCID_ITEM_POD)
@@ -642,6 +652,7 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
                 EditorCursor.NPC.Type = NPCID_ITEM_POD;
             }
         }
+
         if(UpdateButton(mode, e_ScreenW - 40 + 4, 140 + 4, GFXNPC[NPCID_ITEM_THROWER], EditorCursor.NPC.Type == NPCID_ITEM_THROWER, 0, 0, NPCWidthGFX(NPCID_ITEM_THROWER), NPCHeightGFX(NPCID_ITEM_THROWER)))
         {
             if(EditorCursor.NPC.Type == NPCID_ITEM_THROWER)
@@ -660,6 +671,7 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
                 EditorCursor.NPC.Type = NPCID_ITEM_THROWER;
             }
         }
+
         if(AllowBubble())
         {
             if(UpdateButton(mode, e_ScreenW - 40 + 4, 180 + 4, GFXNPC[NPCID_ITEM_BUBBLE], EditorCursor.NPC.Type == NPCID_ITEM_BUBBLE, 0, 0, NPCWidthGFX(NPCID_ITEM_BUBBLE), NPCHeightGFX(NPCID_ITEM_BUBBLE)))
@@ -731,8 +743,10 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
         // show and apply direction
         if(UpdateButton(mode, e_ScreenW - 180 + 4, 60 + 4, GFX.EIcons, EditorCursor.NPC.Direction == -1, 0, 32 * dir_neg_icon, 32, 32))
             EditorCursor.NPC.Direction = -1;
+
         if(show_random && UpdateButton(mode, e_ScreenW - 140 + 4, 60 + 4, GFX.EIcons, EditorCursor.NPC.Direction == 0, 0, 32 * Icon::unk, 32, 32))
             EditorCursor.NPC.Direction = 0;
+
         if(UpdateButton(mode, e_ScreenW - 100 + 4, 60 + 4, GFX.EIcons, EditorCursor.NPC.Direction == 1, 0, 32 * dir_pos_icon, 32, 32))
             EditorCursor.NPC.Direction = 1;
 
@@ -802,10 +816,13 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
 
             if(UpdateButton(mode, e_ScreenW - 200 + 4, 240 + 4, GFX.EIcons, EditorCursor.NPC.Special == 1, 0, 32*Icon::hop, 32, 32))
                 EditorCursor.NPC.Special = 1;
+
             if(UpdateButton(mode, e_ScreenW - 160 + 4, 240 + 4, GFX.EIcons, EditorCursor.NPC.Special == 0, 0, 32*Icon::target, 32, 32))
                 EditorCursor.NPC.Special = 0;
+
             if(UpdateButton(mode, e_ScreenW - 120 + 4, 240 + 4, GFX.EIcons, EditorCursor.NPC.Special == 2, 0, 32*Icon::lr, 32, 32))
                 EditorCursor.NPC.Special = 2;
+
             if(UpdateButton(mode, e_ScreenW - 80 + 4, 240 + 4, GFX.EIcons, EditorCursor.NPC.Special == 3, 0, 32*Icon::ud, 32, 32))
                 EditorCursor.NPC.Special = 3;
         }
@@ -840,12 +857,16 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
 
             if(UpdateButton(mode, e_ScreenW - 200 + 4, 240 + 4, GFX.EIcons, EditorCursor.NPC.Special == 0, 0, 32*Icon::wave, 32, 32))
                 EditorCursor.NPC.Special = 0;
+
             if(UpdateButton(mode, e_ScreenW - 160 + 4, 240 + 4, GFX.EIcons, EditorCursor.NPC.Special == 1, 0, 32*Icon::hop, 32, 32))
                 EditorCursor.NPC.Special = 1;
+
             if(UpdateButton(mode, e_ScreenW - 120 + 4, 240 + 4, GFX.EIcons, EditorCursor.NPC.Special == 2, 0, 32*Icon::leap, 32, 32))
                 EditorCursor.NPC.Special = 2;
+
             if(UpdateButton(mode, e_ScreenW - 80 + 4, 240 + 4, GFX.EIcons, EditorCursor.NPC.Special == 3, 0, 32*Icon::lr, 32, 32))
                 EditorCursor.NPC.Special = 3;
+
             if(UpdateButton(mode, e_ScreenW - 40 + 4, 240 + 4, GFX.EIcons, EditorCursor.NPC.Special == 4, 0, 32*Icon::ud, 32, 32))
                 EditorCursor.NPC.Special = 4;
         }
@@ -855,6 +876,7 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
             SuperPrintR(mode, g_editorStrings.npcUse1_0Ai, 3, e_ScreenW - 200, 220);
             if(UpdateButton(mode, e_ScreenW - 200 + 4, 240 + 4, GFX.EIcons, EditorCursor.NPC.Legacy, 0, 32*Icon::_10, 32, 32))
                 EditorCursor.NPC.Legacy = true;
+
             if(UpdateButton(mode, e_ScreenW - 160 + 4, 240 + 4, GFX.EIcons, !EditorCursor.NPC.Legacy, 0, 32*Icon::_1x, 32, 32))
                 EditorCursor.NPC.Legacy = false;
         }
@@ -865,6 +887,7 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
 
             if(EditorCursor.NPC.Special > 0 && UpdateButton(mode, e_ScreenW - 160 + 4, 240 + 4, GFX.EIcons, false, 0, 32*Icon::left, 32, 32))
                 EditorCursor.NPC.Special --;
+
             if(UpdateButton(mode, e_ScreenW - 120 + 4, 240 + 4, GFX.EIcons, false, 0, 32*Icon::right, 32, 32))
                 EditorCursor.NPC.Special ++;
         }
@@ -877,6 +900,7 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
 
             if(EditorCursor.NPC.Special2 > 0 && UpdateButton(mode, e_ScreenW - 160 + 4, 240 + 4, GFX.EIcons, false, 0, 32*Icon::left, 32, 32))
                 EditorCursor.NPC.Special2 --;
+
             if(EditorCursor.NPC.Special2 < 20 && UpdateButton(mode, e_ScreenW - 120 + 4, 240 + 4, GFX.EIcons, false, 0, 32*Icon::right, 32, 32))
                 EditorCursor.NPC.Special2 ++;
         }
@@ -891,6 +915,7 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
 
             if(EditorCursor.NPC.Variant > 0 && UpdateButton(mode, e_ScreenW - 160 + 4, 240 + 4, GFX.EIcons, false, 0, 32*Icon::left, 32, 32))
                 EditorCursor.NPC.Variant --;
+
             if(EditorCursor.NPC.Variant < max_index && UpdateButton(mode, e_ScreenW - 120 + 4, 240 + 4, GFX.EIcons, false, 0, 32*Icon::right, 32, 32))
                 EditorCursor.NPC.Variant ++;
         }
@@ -937,6 +962,7 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
                 else
                     EditorCursor.NPC.Variant = data->values[i-1];
             }
+
             if(show_next_button && UpdateButton(mode, e_ScreenW - 40 + 4, 240 + 4, GFX.EIcons, false, 0, 32*Icon::right, 32, 32))
             {
                 if(!valid)
@@ -955,6 +981,7 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
             SuperPrint(g_editorStrings.eventsLetterTalk       + GetE(EditorCursor.NPC.TriggerTalk), 3, e_ScreenW - 200, 360);
             SuperPrint(g_editorStrings.eventsLetterLayerClear + GetE(EditorCursor.NPC.TriggerLast), 3, e_ScreenW - 200, 380);
         }
+
         if(UpdateButton(mode, e_ScreenW - 40 + 4, 280 + 4, GFX.EIcons, false, 0, 32*Icon::subscreen, 32, 32))
             m_special_page = SPECIAL_PAGE_OBJ_TRIGGERS;
 
@@ -969,6 +996,7 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
             if(EditorCursor.NPC.AttLayer != LAYER_NONE && EditorCursor.NPC.AttLayer != LAYER_DEFAULT)
                 SuperPrint(g_editorStrings.layersAbbrevAttLayer + GetL(EditorCursor.NPC.AttLayer), 3, e_ScreenW - 200, 460);
         }
+
         if(UpdateButton(mode, e_ScreenW - 40 + 4, 400 + 4, GFX.EIcons, false, 0, 32*Icon::subscreen, 32, 32))
             m_special_page = SPECIAL_PAGE_OBJ_LAYER;
     }
@@ -1013,8 +1041,10 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
             EditorCursor.NPC.Generator = true;
             if(!EditorCursor.NPC.GeneratorDirection)
                 EditorCursor.NPC.GeneratorDirection = 1;
+
             if(!EditorCursor.NPC.GeneratorEffect)
                 EditorCursor.NPC.GeneratorEffect = 1;
+
             if(EditorCursor.NPC.GeneratorTimeMax < 1.f)
                 EditorCursor.NPC.GeneratorTimeMax = 1.f;
         }
@@ -1029,10 +1059,13 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
 
             if(UpdateButton(mode, 280 + 4, 140 + 4, GFX.EIcons, EditorCursor.NPC.GeneratorDirection == 1, 0, 32*Icon::up, 32, 32))
                 EditorCursor.NPC.GeneratorDirection = 1;
+
             if(UpdateButton(mode, 320 + 4, 140 + 4, GFX.EIcons, EditorCursor.NPC.GeneratorDirection == 3, 0, 32*Icon::down, 32, 32))
                 EditorCursor.NPC.GeneratorDirection = 3;
+
             if(UpdateButton(mode, 360 + 4, 140 + 4, GFX.EIcons, EditorCursor.NPC.GeneratorDirection == 2, 0, 32*Icon::left, 32, 32))
                 EditorCursor.NPC.GeneratorDirection = 2;
+
             if(UpdateButton(mode, 400 + 4, 140 + 4, GFX.EIcons, EditorCursor.NPC.GeneratorDirection == 4, 0, 32*Icon::right, 32, 32))
                 EditorCursor.NPC.GeneratorDirection = 4;
 
@@ -1045,6 +1078,7 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
 
             if(UpdateButton(mode, 280 + 4, 180 + 4, GFX.EIcons, EditorCursor.NPC.GeneratorEffect == 1, 0, 32*Icon::bottom, 32, 32))
                 EditorCursor.NPC.GeneratorEffect = 1;
+
             if(UpdateButton(mode, 320 + 4, 180 + 4, GFX.EIcons, EditorCursor.NPC.GeneratorEffect == 2, 0, 32*Icon::up, 32, 32))
                 EditorCursor.NPC.GeneratorEffect = 2;
 
@@ -1053,6 +1087,7 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
 
             if(EditorCursor.NPC.GeneratorTimeMax > 1.f && UpdateButton(mode, 280 + 4, 220 + 4, GFX.EIcons, false, 0, 32*Icon::left, 32, 32))
                 EditorCursor.NPC.GeneratorTimeMax --;
+
             if(UpdateButton(mode, 320 + 4, 220 + 4, GFX.EIcons, false, 0, 32*Icon::right, 32, 32))
                 EditorCursor.NPC.GeneratorTimeMax ++;
         }
@@ -1069,6 +1104,7 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
             EditorCursor.Block.Special = 1;
             currently_coins = true;
         }
+
         if(currently_coins)
         {
             SuperPrint("x" + std::to_string(EditorCursor.Block.Special), 3, 100, 74);
@@ -1176,12 +1212,14 @@ void EditorScreen::UpdateEventsScreen(CallMode mode)
         SuperPrintR(mode, fmt::format_ne(g_editorStrings.eventsDeletingEvent, Events[m_current_event].Name), 3, 60, 40);
         SuperPrintR(mode, g_editorStrings.phraseAreYouSure, 3, 10, 60);
         SuperPrintR(mode, g_editorStrings.eventsDeletionConfirm, 3, 60, 110);
+
         if(UpdateButton(mode, 20 + 4, 100 + 4, GFX.EIcons, false, 0, 32*Icon::action, 32, 32))
         {
             DeleteEvent((eventindex_t)m_current_event);
             m_special_page = SPECIAL_PAGE_EVENTS;
             m_current_event = 0;
         }
+
         SuperPrintR(mode, g_editorStrings.eventsDeletionCancel, 3, 60, 150);
         if(UpdateButton(mode, 20 + 4, 140 + 4, GFX.EIcons, false, 0, 32*Icon::action, 32, 32))
         {
@@ -1195,8 +1233,10 @@ void EditorScreen::UpdateEventsScreen(CallMode mode)
     SuperPrintR(mode, g_editorStrings.eventsHeader, 3, 60, 40);
     int page_max = numEvents / 10;
     SuperPrintR(mode, fmt::format_ne(g_editorStrings.pageBlankOfBlank, m_events_page + 1, page_max + 1), 3, e_ScreenW - 330, 40);
+
     if(m_events_page > 0 && UpdateButton(mode, e_ScreenW - 120 + 4, 40 + 4, GFX.EIcons, false, 0, 32*Icon::left, 32, 32))
         m_events_page --;
+
     if(m_events_page < page_max && UpdateButton(mode, e_ScreenW - 80 + 4, 40 + 4, GFX.EIcons, false, 0, 32*Icon::right, 32, 32))
         m_events_page ++;
 
@@ -1315,7 +1355,7 @@ void EditorScreen::UpdateEventSettingsScreen(CallMode mode)
                                                                          Events[m_current_event].Name),
                                                           titlePosX, titlePosY,
                                                           590,
-                                                          FontManager::fontIdFromSmbxFont(3));;
+                                                          FontManager::fontIdFromSmbxFont(3));
 
         int elementsListBaseY = 80;
         const int elementsLabelOffset = 10;
@@ -1394,11 +1434,13 @@ void EditorScreen::UpdateEventSettingsScreen(CallMode mode)
     // RIGHT PANE: layers
     if(mode == CallMode::Render)
         XRender::renderRect(e_ScreenW - 240, 40, 240, e_ScreenH - 40, XTColorF(0.7f, 0.7f, 0.9f, 0.75f), true);
+
     if(UpdateButton(mode, e_ScreenW - 40 + 4, 40 + 4, GFX.EIcons, false, 0, 32*Icon::x, 32, 32))
     {
         m_special_page = SPECIAL_PAGE_EVENTS;
         m_current_event = 0;
     }
+
     // layers
     int layer_line = 1;
     if(!Events[m_current_event].ShowLayer.empty())
@@ -1426,6 +1468,7 @@ void EditorScreen::UpdateEventSettingsScreen(CallMode mode)
             layer_line ++;
         }
     }
+
     if(!Events[m_current_event].HideLayer.empty())
     {
         layer_line ++;
@@ -1451,6 +1494,7 @@ void EditorScreen::UpdateEventSettingsScreen(CallMode mode)
             layer_line ++;
         }
     }
+
     if(!Events[m_current_event].ToggleLayer.empty())
     {
         layer_line ++;
@@ -1458,11 +1502,13 @@ void EditorScreen::UpdateEventSettingsScreen(CallMode mode)
         layer_line ++;
         SuperPrintR(mode, GetL(Events[m_current_event].ToggleLayer[0]), 3, e_ScreenW - 240, 40 + (20 * layer_line));
         layer_line ++;
+
         if(Events[m_current_event].ToggleLayer.size() >= 2)
         {
             SuperPrintR(mode, GetL(Events[m_current_event].ToggleLayer[1]), 3, e_ScreenW - 240, 40 + (20 * layer_line));
             layer_line ++;
         }
+
         if(Events[m_current_event].ToggleLayer.size() == 3)
         {
             SuperPrintR(mode, GetL(Events[m_current_event].ToggleLayer[2]), 3, e_ScreenW - 240, 40 + (20 * layer_line));
@@ -1474,6 +1520,7 @@ void EditorScreen::UpdateEventSettingsScreen(CallMode mode)
             layer_line ++;
         }
     }
+
     // MoveLayer is a layerindex_t, not a vector
     if(Events[m_current_event].MoveLayer != LAYER_NONE)
     {
@@ -1507,10 +1554,13 @@ void EditorScreen::UpdateEventSettingsScreen(CallMode mode)
 
         if(UpdateButton(mode, e_ScreenW - 160 + 4, 40 + (20 * layer_line) + 4, GFX.EIcons, false, 0, 32*Icon::down, 32, 32))
             Events[m_current_event].SpeedY = 0.1f*(sy+1);
+
         if(UpdateButton(mode, e_ScreenW - 120 + 4, 40 + (20 * layer_line) + 4, GFX.EIcons, false, 0, 32*Icon::up, 32, 32))
             Events[m_current_event].SpeedY = 0.1f*(sy-1);
+
         if(UpdateButton(mode, e_ScreenW - 80 + 4, 40 + (20 * layer_line) + 4, GFX.EIcons, false, 0, 32*Icon::left, 32, 32))
             Events[m_current_event].SpeedX = 0.1f*(sx-1);
+
         if(UpdateButton(mode, e_ScreenW - 40 + 4, 40 + (20 * layer_line) + 4, GFX.EIcons, false, 0, 32*Icon::right, 32, 32))
             Events[m_current_event].SpeedX = 0.1f*(sx+1);
 
@@ -1540,8 +1590,10 @@ void EditorScreen::UpdateEventSettingsScreen(CallMode mode)
     // BOTTOM PANE: sections - background, music, autoscroll
     if(mode == CallMode::Render)
         XRender::renderRect(0, e_ScreenH - 180, e_ScreenW - 240, 180, XTColorF(0.6f, 0.6f, 0.8f), true);
+
     if(m_special_subpage > 0 && UpdateButton(mode, 40 + 4, e_ScreenH - 180 + 4, GFX.EIcons, false, 0, 32*Icon::left, 32, 32))
         m_special_subpage --;
+
     if(m_special_subpage < maxSections + 1 && UpdateButton(mode, 320 + 4, e_ScreenH - 180 + 4, GFX.EIcons, false, 0, 32*Icon::right, 32, 32))
         m_special_subpage ++;
 
@@ -1564,12 +1616,15 @@ void EditorScreen::UpdateEventSettingsScreen(CallMode mode)
         bool all_reset = true;
         bool all_set = true;
         int set_same = -1;
+
         for(int s = 0; s <= maxSections; s++)
         {
             if(Events[m_current_event].section[s].music_id != LESet_Nothing)
                 all_keep = false;
+
             if(Events[m_current_event].section[s].music_id != LESet_ResetDefault)
                 all_reset = false;
+
             if(Events[m_current_event].section[s].music_id < 0)
                 all_set = false;
             else if(set_same == -1)
@@ -1577,16 +1632,19 @@ void EditorScreen::UpdateEventSettingsScreen(CallMode mode)
             else if(set_same != Events[m_current_event].section[s].music_id)
                 all_set = false;
         }
+
         if(UpdateButton(mode, 150 + 4, e_ScreenH - 120 + 4, GFX.EIcons, all_keep, 0, 0, 1, 1) && !all_keep)
         {
             for(int s = 0; s <= maxSections; s++)
                 Events[m_current_event].section[s].music_id = LESet_Nothing;
         }
+
         if(UpdateButton(mode, 250 + 4, e_ScreenH - 120 + 4, GFX.EIcons, all_reset, 0, 32*Icon::x, 32, 32) && !all_reset)
         {
             for(int s = 0; s <= maxSections; s++)
                 Events[m_current_event].section[s].music_id = LESet_ResetDefault;
         }
+
         if(UpdateButton(mode, 350 + 4, e_ScreenH - 120 + 4, GFX.EIcons, all_set, 0, 32*Icon::subscreen, 32, 32))
             m_special_page = SPECIAL_PAGE_EVENT_MUSIC;
 
@@ -1595,6 +1653,7 @@ void EditorScreen::UpdateEventSettingsScreen(CallMode mode)
         all_reset = true;
         all_set = true;
         set_same = -1;
+
         for(int s = 0; s <= maxSections; s++)
         {
             if(Events[m_current_event].section[s].background_id != LESet_Nothing)
@@ -1608,16 +1667,19 @@ void EditorScreen::UpdateEventSettingsScreen(CallMode mode)
             else if(set_same != Events[m_current_event].section[s].background_id)
                 all_set = false;
         }
+
         if(UpdateButton(mode, 150 + 4, e_ScreenH - 80 + 4, GFX.EIcons, all_keep, 0, 0, 1, 1) && !all_keep)
         {
             for(int s = 0; s <= maxSections; s++)
                 Events[m_current_event].section[s].background_id = LESet_Nothing;
         }
+
         if(UpdateButton(mode, 250 + 4, e_ScreenH - 80 + 4, GFX.EIcons, all_reset, 0, 32*Icon::x, 32, 32) && !all_reset)
         {
             for(int s = 0; s <= maxSections; s++)
                 Events[m_current_event].section[s].background_id = LESet_ResetDefault;
         }
+
         if(UpdateButton(mode, 350 + 4, e_ScreenH - 80 + 4, GFX.EIcons, all_set, 0, 32*Icon::subscreen, 32, 32))
             m_special_page = SPECIAL_PAGE_EVENT_BACKGROUND;
 
@@ -1643,16 +1705,19 @@ void EditorScreen::UpdateEventSettingsScreen(CallMode mode)
                 all_reset = false;
             }
         }
+
         if(UpdateButton(mode, 150 + 4, e_ScreenH - 40 + 4, GFX.EIcons, all_keep, 0, 0, 1, 1) && !all_keep)
         {
             for(int s = 0; s <= maxSections; s++)
                 Events[m_current_event].section[s].position.X = -1;
         }
+
         if(UpdateButton(mode, 250 + 4, e_ScreenH - 40 + 4, GFX.EIcons, all_reset, 0, 32*Icon::x, 32, 32) && !all_reset)
         {
             for(int s = 0; s <= maxSections; s++)
                 Events[m_current_event].section[s].position.X = -2;
         }
+
         if(UpdateButton(mode, 350 + 4, e_ScreenH - 40 + 4, GFX.EIcons, all_set, 0, 32*Icon::subscreen, 32, 32))
             m_special_page = SPECIAL_PAGE_EVENT_BOUNDS;
     }
@@ -1765,11 +1830,13 @@ void UpdateStartLevelEventBounds()
 {
     Events[0].AutoSection = 0;
     Events[0].section[0].position = static_cast<SpeedlessLocation_t>(level[0]);
+
     // not sure why 800 is also used for height in the default code, but I will stick with it.
     if(Events[0].AutoX < 0)
         Events[0].section[0].position.X = Events[0].section[0].position.Width - 800;
     else if(Events[0].AutoX > 0)
         Events[0].section[0].position.Width = Events[0].section[0].position.X + 800;
+
     if(Events[0].AutoY < 0)
         Events[0].section[0].position.Y = Events[0].section[0].position.Height - 800;
     else if(Events[0].AutoY > 0)
@@ -1785,6 +1852,7 @@ void EditorScreen::UpdateSectionsScreen(CallMode mode)
         LevelName = TextEntryScreen::Run(g_editorStrings.levelName, LevelName);
         MouseMove(SharedCursor.X, SharedCursor.Y);
     }
+
     SuperPrintR(mode, g_editorStrings.levelName, 3, 54, 42);
     if(!LevelName.empty())
         SuperPrintR(mode, LevelName, 3, 54, 60);
@@ -1794,6 +1862,7 @@ void EditorScreen::UpdateSectionsScreen(CallMode mode)
     SuperPrintR(mode, g_editorStrings.levelStartPos, 3, 10, 110);
     if(UpdateButton(mode, 240, 100 + 4, GFXBlock[622], EditorCursor.SubMode == 4, 0, 0, 32, 32))
         EditorCursor.SubMode = 4;
+
     if(UpdateButton(mode, 280, 100 + 4, GFXBlock[623], EditorCursor.SubMode == 5, 0, 0, 32, 32))
         EditorCursor.SubMode = 5;
 
@@ -1801,6 +1870,7 @@ void EditorScreen::UpdateSectionsScreen(CallMode mode)
     SuperPrintCenterR(mode, fmt::format_ne(g_editorStrings.phraseSectionIndex, curSection + 1), 3, 320, 166);
     if(curSection > 0 && UpdateButton(mode, 160 + 4, 160 + 4, GFX.EIcons, false, 0, 32*Icon::left, 32, 32))
         SetSection(curSection - 1);
+
     if(curSection < maxSections && UpdateButton(mode, 440 + 4, 160 + 4, GFX.EIcons, false, 0, 32*Icon::right, 32, 32))
         SetSection(curSection + 1);
 
@@ -1868,10 +1938,13 @@ void EditorScreen::UpdateSectionsScreen(CallMode mode)
     SuperPrintR(mode, g_editorStrings.sectionSetBounds, 3, 10, 206);
     if(UpdateButton(mode, 240, 200, GFX.EIcons, EditorCursor.SubMode == 0, 0, 32*Icon::up, 32, 32))
         EditorCursor.SubMode = 0;
+
     if(UpdateButton(mode, 280, 200, GFX.EIcons, EditorCursor.SubMode == 3, 0, 32*Icon::down, 32, 32))
         EditorCursor.SubMode = 3;
+
     if(UpdateButton(mode, 320, 200, GFX.EIcons, EditorCursor.SubMode == 1, 0, 32*Icon::left, 32, 32))
         EditorCursor.SubMode = 1;
+
     if(UpdateButton(mode, 360, 200, GFX.EIcons, EditorCursor.SubMode == 2, 0, 32*Icon::right, 32, 32))
         EditorCursor.SubMode = 2;
 
@@ -1879,14 +1952,17 @@ void EditorScreen::UpdateSectionsScreen(CallMode mode)
     if(UpdateCheckBox(mode, 10 + 4, 320 + 4, LevelWrap[curSection]))
         LevelWrap[curSection] = !LevelWrap[curSection];
     SuperPrintR(mode, g_editorStrings.sectionHorizWrap, 3, 54, 326);
+
     // underwater - UnderWater
     if(UpdateCheckBox(mode, e_ScreenW/2 + 10 + 4, 320 + 4, UnderWater[curSection]))
         UnderWater[curSection] = !UnderWater[curSection];
     SuperPrintR(mode, g_editorStrings.sectionUnderwater, 3, e_ScreenW/2 + 54, 326);
+
     // no turn back - NoTurnBack
     if(UpdateCheckBox(mode, 10 + 4, 360 + 4, NoTurnBack[curSection]))
         NoTurnBack[curSection] = !NoTurnBack[curSection];
     SuperPrintR(mode, g_editorStrings.sectionNoTurnBack, 3, 54, 366);
+
     // leave to exit - OffScreenExit
     if(UpdateCheckBox(mode, e_ScreenW/2 + 10 + 4, 360 + 4, OffScreenExit[curSection]))
         OffScreenExit[curSection] = !OffScreenExit[curSection];
@@ -2008,12 +2084,16 @@ void EditorScreen::UpdateEditorSettingsScreen(CallMode mode)
 
     if(m_special_subpage < 1)
         m_special_subpage = 1;
+
     if(m_special_subpage > maxLocalPlayers)
         m_special_subpage = maxLocalPlayers;
+
     if(this->num_test_players < 1)
         this->num_test_players = 1;
+
     if(BattleMode /*&& this->num_test_players < 2*/) // currently >2P battle is not supported
         this->num_test_players = 2;
+
     if(m_special_subpage > this->num_test_players + 1)
         m_special_subpage = this->num_test_players;
 
@@ -2059,6 +2139,7 @@ void EditorScreen::UpdateEditorSettingsScreen(CallMode mode)
     SuperPrintCenterR(mode, g_mainMenu.wordPlayer + " " + std::to_string(m_special_subpage), 3, 510, 154);
     if(m_special_subpage > 1 && UpdateButton(mode, 400 + 4, 140 + 4, GFX.EIcons, false, 0, 32*Icon::left, 32, 32))
         m_special_subpage --;
+
     if(m_special_subpage < maxLocalPlayers && m_special_subpage <= this->num_test_players && UpdateButton(mode, 580 + 4, 140 + 4, GFX.EIcons, false, 0, 32*Icon::right, 32, 32))
         m_special_subpage ++;
 
@@ -2670,8 +2751,10 @@ void EditorScreen::UpdateEventsSubScreen(CallMode mode)
 
     int page_max = numEvents / 10;
     SuperPrintR(mode, fmt::format_ne(g_editorStrings.pageBlankOfBlank, m_events_page + 1, page_max + 1), 3, e_ScreenW - 228, e_ScreenH - 60);
+
     if(m_events_page > 0 && UpdateButton(mode, e_ScreenW - 160 + 4, e_ScreenH - 40 + 4, GFX.EIcons, false, 0, 32*Icon::left, 32, 32))
         m_events_page --;
+
     if(m_events_page < page_max && UpdateButton(mode, e_ScreenW - 120 + 4, e_ScreenH - 40 + 4, GFX.EIcons, false, 0, 32*Icon::right, 32, 32))
         m_events_page ++;
 
@@ -2793,6 +2876,7 @@ void EditorScreen::UpdateEventsSubScreen(CallMode mode)
                 SuperPrintR(mode, Events[e].Name.substr(0,19), 3, 54, 80 + 40*i + 2);
                 SuperPrintR(mode, Events[e].Name.substr(19), 3, 54, 80 + 40*i + 20);
             }
+
             if(UpdateButton(mode, 10 + 4, 80 + 40*i + 4, GFX.ECursor[2], *event_to_set == e, 0, 0, 32, 32))
                 *event_to_set = e;
         }
@@ -2863,6 +2947,7 @@ void EditorScreen::UpdateLayersScreen(CallMode mode)
             SuperPrintR(mode, g_editorStrings.layersLayerDefault, 3, e_ScreenW - 200, 220 + 2);
         else
             SuperPrintR(mode, GetL(EditorCursor.Layer), 3, e_ScreenW - 200, 220 + 2);
+
         if(UpdateButton(mode, e_ScreenW - 240 + 4, 200 + 4, GFX.EIcons, m_special_subpage == 0, 0, 32*Icon::action, 32, 32))
             m_special_subpage = 0;
 
@@ -2871,6 +2956,7 @@ void EditorScreen::UpdateLayersScreen(CallMode mode)
             SuperPrintR(mode, g_mainMenu.caseNone, 3, e_ScreenW - 200, 280 + 2);
         else
             SuperPrintR(mode, GetL(EditorCursor.NPC.AttLayer), 3, e_ScreenW - 200, 280 + 2);
+
         if(UpdateButton(mode, e_ScreenW - 240 + 4, 260 + 4, GFX.EIcons, m_special_subpage == 1, 0, 32*Icon::action, 32, 32))
             m_special_subpage = 1;
     }
@@ -2888,6 +2974,7 @@ void EditorScreen::UpdateLayersScreen(CallMode mode)
         SuperPrintR(mode, fmt::format_ne(g_editorStrings.pageBlankOfBlank, m_layers_page + 1, page_max + 1), 3, e_ScreenW - 330, 40);
         if(m_layers_page > 0 && UpdateButton(mode, e_ScreenW - 120 + 4, 40 + 4, GFX.EIcons, false, 0, 32*Icon::left, 32, 32))
             m_layers_page --;
+
         if(m_layers_page < page_max && UpdateButton(mode, e_ScreenW - 80 + 4, 40 + 4, GFX.EIcons, false, 0, 32*Icon::right, 32, 32))
             m_layers_page ++;
     }
@@ -2896,6 +2983,7 @@ void EditorScreen::UpdateLayersScreen(CallMode mode)
         SuperPrintR(mode, fmt::format_ne(g_editorStrings.pageBlankOfBlank, m_layers_page + 1, page_max + 1), 3, e_ScreenW - 228, e_ScreenH - 60);
         if(m_layers_page > 0 && UpdateButton(mode, e_ScreenW - 160 + 4, e_ScreenH - 40 + 4, GFX.EIcons, false, 0, 32*Icon::left, 32, 32))
             m_layers_page --;
+
         if(m_layers_page < page_max && UpdateButton(mode, e_ScreenW - 120 + 4, e_ScreenH - 40 + 4, GFX.EIcons, false, 0, 32*Icon::right, 32, 32))
             m_layers_page ++;
     }
@@ -2965,6 +3053,7 @@ void EditorScreen::UpdateLayersScreen(CallMode mode)
 
             if(m_special_page != SPECIAL_PAGE_EVENT_LAYERS && UpdateButton(mode, 10 + 4, 80 + 40*i + 4, GFX.ECursor[2], *layer_to_set == LAYER_NONE, 0, 0, 32, 32))
                 *layer_to_set = LAYER_NONE;
+
             if(m_special_page == SPECIAL_PAGE_EVENT_LAYERS && UpdateButton(mode, 10 + 4, 80 + 40*i + 4, GFX.EIcons, *layer_to_set == LAYER_NONE, 0, 32*Icon::move, 32, 32))
                 *layer_to_set = LAYER_NONE;
         }
@@ -3090,13 +3179,14 @@ void EditorScreen::UpdateLayersScreen(CallMode mode)
             if(UpdateButton(mode, 400 + 4, 80 + 40*i + 4, GFX.EIcons, false, 0, 32*Icon::pencil, 32, 32))
             {
                 DisableCursorNew();
-                std::string new_name = TextEntryScreen::Run(g_editorStrings.layersPromptLayerName, "");
+                std::string new_name = TextEntryScreen::Run(g_editorStrings.layersPromptLayerName, "");                
                 if(!new_name.empty() && FindLayer(new_name) == LAYER_NONE)
                 {
                     Layer[l] = Layer_t();
                     Layer[l].Name = new_name;
                     numLayers ++;
                 }
+
                 MouseMove((float)SharedCursor.X, (float)SharedCursor.Y);
             }
         }
@@ -3111,6 +3201,7 @@ bool EditorScreen::UpdateBlockButton(CallMode mode, int x, int y, int type, bool
     {
         if(BlockWidth[type] > 0)
             draw_width = BlockWidth[type];
+
         if(BlockHeight[type] > 0)
             draw_height = BlockHeight[type];
     }
@@ -3122,7 +3213,9 @@ void EditorScreen::UpdateBlock(CallMode mode, int x, int y, int type)
 {
     if((type < 1) || (type >= maxBlockType))
         return;
+
     bool sel = EditorCursor.Block.Type == type;
+
     if(UpdateBlockButton(mode, x, y, type, sel) && !sel)
     {
         // printf("Block %d\n", type);
@@ -3179,22 +3272,29 @@ void EditorScreen::UpdateBlockScreen(CallMode mode)
                                      120,
                                      FontManager::fontIdFromSmbxFont(3));
     }
+
     if(UpdateButton(mode, e_ScreenW - 160 + 4, 40 + 4, GFXNPC[NPCID_COIN_SWITCH], MagicBlock::enabled, 0, 0, 32, 32))
         MagicBlock::enabled = !MagicBlock::enabled;
 
     // Resizing
     if(BlockIsSizable[EditorCursor.Block.Type])
     {
-        int H = ((int)EditorCursor.Block.Location.Height)/32;
-        int W = ((int)EditorCursor.Block.Location.Width)/32;
+        int H = ((int)EditorCursor.Block.Location.Height) / 32;
+        int W = ((int)EditorCursor.Block.Location.Width) / 32;
+
         SuperPrintR(mode, g_editorStrings.blockLetterWidth  + std::to_string(W), 3, e_ScreenW - 160, 112);
+
         if(W > 2 && UpdateButton(mode, e_ScreenW - 80 + 4, 100 + 4, GFX.EIcons, false, 0, 32*Icon::left, 32, 32))
             EditorCursor.Block.Location.Width = 32 * (W - 1);
+
         if(UpdateButton(mode, e_ScreenW - 40 + 4, 100 + 4, GFX.EIcons, false, 0, 32*Icon::right, 32, 32))
             EditorCursor.Block.Location.Width = 32 * (W + 1);
+
         SuperPrintR(mode, g_editorStrings.blockLetterHeight + std::to_string(H), 3, e_ScreenW - 160, 152);
+
         if(H > 2 && UpdateButton(mode, e_ScreenW - 80 + 4, 140 + 4, GFX.EIcons, false, 0, 32*Icon::left, 32, 32))
             EditorCursor.Block.Location.Height = 32 * (H - 1);
+
         if(UpdateButton(mode, e_ScreenW - 40 + 4, 140 + 4, GFX.EIcons, false, 0, 32*Icon::right, 32, 32))
             EditorCursor.Block.Location.Height = 32 * (H + 1);
     }
@@ -3215,6 +3315,7 @@ void EditorScreen::UpdateBlockScreen(CallMode mode)
     SuperPrintRightR(mode, g_editorStrings.blockSlick, 3, e_ScreenW - 40, 214);
     if(UpdateCheckBox(mode, e_ScreenW - 40 + 4, 200 + 4, EditorCursor.Block.Slippy))
         EditorCursor.Block.Slippy = !EditorCursor.Block.Slippy;
+
     SuperPrintRightR(mode, g_editorStrings.blockInvis, 3, e_ScreenW - 40, 254);
     if(UpdateCheckBox(mode, e_ScreenW - 40 + 4, 240 + 4, EditorCursor.Block.Invis))
         EditorCursor.Block.Invis = !EditorCursor.Block.Invis;
@@ -3244,6 +3345,7 @@ void EditorScreen::UpdateBlockScreen(CallMode mode)
     SuperPrintR(mode, g_editorStrings.eventsLetterHit + GetE(EditorCursor.Block.TriggerHit), 3, e_ScreenW - 160, 360);
     SuperPrintR(mode, g_editorStrings.eventsLetterDestroy + GetE(EditorCursor.Block.TriggerDeath), 3, e_ScreenW - 160, 380);
     SuperPrintR(mode, g_editorStrings.eventsLetterLayerClear + GetE(EditorCursor.Block.TriggerLast), 3, e_ScreenW - 160, 400);
+
     if(UpdateButton(mode, e_ScreenW - 40 + 4, 320 + 4, GFX.EIcons, false, 0, 32*Icon::subscreen, 32, 32))
         m_special_page = SPECIAL_PAGE_OBJ_TRIGGERS;
 
@@ -3253,6 +3355,7 @@ void EditorScreen::UpdateBlockScreen(CallMode mode)
         SuperPrintR(mode, g_editorStrings.layersLayerDefault, 3, e_ScreenW - 160, 460);
     else
         SuperPrintR(mode, GetL(EditorCursor.Block.Layer), 3, e_ScreenW - 160, 460);
+
     if(UpdateButton(mode, e_ScreenW - 40 + 4, 420 + 4, GFX.EIcons, false, 0, 32*Icon::subscreen, 32, 32))
         m_special_page = SPECIAL_PAGE_OBJ_LAYER;
 
@@ -3289,6 +3392,7 @@ void EditorScreen::UpdateBGO(CallMode mode, int x, int y, int type)
 {
     if((type < 1) || (type >= maxBackgroundType))
         return;
+
     bool sel = EditorCursor.Background.Type == type;
     if(UpdateBGOButton(mode, x, y, type, sel) && !sel)
     {
@@ -3347,6 +3451,7 @@ void EditorScreen::UpdateBGOScreen(CallMode mode)
                                      120,
                                      FontManager::fontIdFromSmbxFont(3));
     }
+
     if(UpdateButton(mode, e_ScreenW - 160 + 4, 40 + 4, GFXNPC[NPCID_COIN_SWITCH], MagicBlock::enabled, 0, 0, 32, 32))
         MagicBlock::enabled = !MagicBlock::enabled;
 
@@ -3370,6 +3475,7 @@ void EditorScreen::UpdateBGOScreen(CallMode mode)
 
         if(layer < 2 && UpdateButton(mode, e_ScreenW - 160 + 4, 100 + 4, GFX.EIcons, false, 0, 32*Icon::up, 32, 32))
             EditorCursor.Background.SetSortPriority(layer + 1, offset);
+
         if(layer > -2 && UpdateButton(mode, e_ScreenW - 160 + 4, 160 + 4, GFX.EIcons, false, 0, 32*Icon::down, 32, 32))
             EditorCursor.Background.SetSortPriority(layer - 1, offset);
 
@@ -3392,6 +3498,7 @@ void EditorScreen::UpdateBGOScreen(CallMode mode)
 
         if(offset < 3 && UpdateButton(mode, e_ScreenW - 160 + 4, 220 + 4, GFX.EIcons, false, 0, 32*Icon::up, 32, 32))
             EditorCursor.Background.SetSortPriority(layer, offset + 1);
+
         if(offset > -3 && UpdateButton(mode, e_ScreenW - 160 + 4, 280 + 4, GFX.EIcons, false, 0, 32*Icon::down, 32, 32))
             EditorCursor.Background.SetSortPriority(layer, offset - 1);
     }
@@ -3573,10 +3680,13 @@ void EditorScreen::UpdateWarpScreen(CallMode mode)
 
         if(UpdateButton(mode, 220 + 4, 100 + 4, GFX.EIcons, EditorCursor.Warp.Direction == 1, 0, 32*Icon::up, 32, 32))
             EditorCursor.Warp.Direction = 1;
+
         if(UpdateButton(mode, 260 + 4, 100 + 4, GFX.EIcons, EditorCursor.Warp.Direction == 3, 0, 32*Icon::down, 32, 32))
             EditorCursor.Warp.Direction = 3;
+
         if(UpdateButton(mode, 300 + 4, 100 + 4, GFX.EIcons, EditorCursor.Warp.Direction == 2, 0, 32*Icon::left, 32, 32))
             EditorCursor.Warp.Direction = 2;
+
         if(UpdateButton(mode, 340 + 4, 100 + 4, GFX.EIcons, EditorCursor.Warp.Direction == 4, 0, 32*Icon::right, 32, 32))
             EditorCursor.Warp.Direction = 4;
     }
@@ -3595,10 +3705,13 @@ void EditorScreen::UpdateWarpScreen(CallMode mode)
 
         if(UpdateButton(mode, 220 + 4, 140 + 4, GFX.EIcons, EditorCursor.Warp.Direction2 == 1, 0, 32*Icon::down, 32, 32))
             EditorCursor.Warp.Direction2 = 1;
+
         if(UpdateButton(mode, 260 + 4, 140 + 4, GFX.EIcons, EditorCursor.Warp.Direction2 == 3, 0, 32*Icon::up, 32, 32))
             EditorCursor.Warp.Direction2 = 3;
+
         if(UpdateButton(mode, 300 + 4, 140 + 4, GFX.EIcons, EditorCursor.Warp.Direction2 == 2, 0, 32*Icon::right, 32, 32))
             EditorCursor.Warp.Direction2 = 2;
+
         if(UpdateButton(mode, 340 + 4, 140 + 4, GFX.EIcons, EditorCursor.Warp.Direction2 == 4, 0, 32*Icon::left, 32, 32))
             EditorCursor.Warp.Direction2 = 4;
     }
@@ -3619,6 +3732,7 @@ void EditorScreen::UpdateWarpScreen(CallMode mode)
             SuperPrintRightAlign(g_editorStrings.eventsHeader, 3, e_ScreenW - 80, 334);
             SuperPrint(g_editorStrings.eventsLetterEnter + GetE(EditorCursor.Warp.eventEnter), 3, e_ScreenW - 240, 360);
         }
+
         if(UpdateButton(mode, e_ScreenW - 80 + 4, 320 + 4, GFX.EIcons, false, 0, 32*Icon::subscreen, 32, 32))
             m_special_page = SPECIAL_PAGE_OBJ_TRIGGERS;
     }
@@ -3639,8 +3753,10 @@ void EditorScreen::UpdateWarpScreen(CallMode mode)
     // page selector
     if(UpdateButton(mode, e_ScreenW - 240 + 4, 180 + 4, GFXBlock[294], m_Warp_page == WARP_PAGE_MAIN, 0, 0, 32, 32))
         m_Warp_page = WARP_PAGE_MAIN;
+
     if(UpdateButton(mode, e_ScreenW - 240 + 4, 220 + 4, GFXNPC[31], m_Warp_page == WARP_PAGE_REQS, 0, 0, 32, 32))
         m_Warp_page = WARP_PAGE_REQS;
+
     if(UpdateButton(mode, e_ScreenW - 240 + 4, 260 + 4, GFXLevelBMP[2], m_Warp_page == WARP_PAGE_LEVEL, 0, 0, 32, 32))
         m_Warp_page = WARP_PAGE_LEVEL;
 
@@ -3916,6 +4032,7 @@ void EditorScreen::UpdateTile(CallMode mode, int x, int y, int type)
 {
     if((type < 1) || (type >= maxTileType))
         return;
+
     bool sel = EditorCursor.Tile.Type == type;
     if(UpdateTileButton(mode, x, y, type, sel) && !sel)
     {
@@ -4018,7 +4135,17 @@ void EditorScreen::UpdateSceneScreen(CallMode mode)
     // Scene GUI (none)
 
     // SuperPrintR(mode, "SCENERY", 3, 10, 40);
-    static const int scenes[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 48, 49, 42, 47, 46, 43, 45, 64, 65, 44, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63};
+    static const int scenes[] =
+    {
+        1,  2, 3, 4, 5, 6, 7, 8, 9, 10,
+        11, 12, 13, 14, 15, 16, 17, 18,
+        19, 20, 21, 22, 23, 24, 25, 26,
+        27, 28, 29, 30, 31, 32, 33, 34,
+        35, 36, 37, 38, 39, 40, 41, 48,
+        49, 42, 47, 46, 43, 45, 64, 65,
+        44, 50, 51, 52, 53, 54, 55, 56,
+        57, 58, 59, 60, 61, 62, 63
+    };
     UpdateSceneGrid(mode, 0, 60, scenes, sizeof(scenes)/sizeof(int), 10);
 }
 
@@ -4026,12 +4153,15 @@ void EditorScreen::UpdateLevel(CallMode mode, int x, int y, int type)
 {
     if((type < 1) || (type >= maxLevelType))
         return;
+
     bool sel = EditorCursor.WorldLevel.Type == type;
     int draw_height;
+
     if(GFXLevelBig[type])
         draw_height = GFXLevelHeight[type];
     else
         draw_height = 32;
+
     if(UpdateButton(mode, x, y, GFXLevelBMP[type], sel, 0, 32 * LevelFrame[type], GFXLevelWidth[type], draw_height) && !sel)
     {
         // printf("%d\n", type);
@@ -4143,6 +4273,7 @@ void EditorScreen::UpdateLevelScreen(CallMode mode)
     SuperPrintR(mode, EditorCursor.WorldLevel.LevelName.substr(0, 19), 3, 10 + 44, e_ScreenH - 240 + 20);
     if(EditorCursor.WorldLevel.LevelName.length() > 19)
         SuperPrintR(mode, EditorCursor.WorldLevel.LevelName.substr(19), 3, 10 + 44 + 18, e_ScreenH - 240 + 38);
+
     if(UpdateButton(mode, 10 + 4, e_ScreenH - 240 + 4, GFX.EIcons, false, 0, 32*Icon::pencil, 32, 32))
     {
         DisableCursorNew();
@@ -4156,6 +4287,7 @@ void EditorScreen::UpdateLevelScreen(CallMode mode)
         SuperPrintR(mode, EditorCursor.WorldLevel.FileName, 3, 10 + 44, e_ScreenH - 180 + 20);
     else
         SuperPrintR(mode, g_mainMenu.caseNone, 3, 10 + 44, e_ScreenH - 180 + 20);
+
     if(UpdateButton(mode, 10 + 4, e_ScreenH - 180 + 4, GFX.EIcons, false, 0, 32*Icon::open, 32, 32))
         StartFileBrowser(&EditorCursor.WorldLevel.FileName, FileNamePath, "", {".lvl", ".lvlx"}, BROWSER_MODE_OPEN);
 
@@ -4216,6 +4348,7 @@ void EditorScreen::UpdatePath(CallMode mode, int x, int y, int type)
 {
     if((type < 1) || (type >= maxPathType))
         return;
+
     bool sel = EditorCursor.WorldPath.Type == type;
     if(UpdateButton(mode, x, y, GFXPathBMP[type], sel, 0, 0, 32, 32) && !sel)
     {
@@ -4240,10 +4373,13 @@ void EditorScreen::UpdatePathScreen(CallMode mode)
     // Path GUI (none)
 
     // SuperPrintR(mode, "PATH GRAPHIC", 3, 10, 40);
-    static const int paths[] = { 2, 1, 18, 19, 31, 22, 32,
+    static const int paths[] =
+    {
+        2,  1, 18, 19, 31, 22, 32,
         11, 6, 10, 30, 25, 27, 23,
          9, 5,  7, 21,  3, 20, 26,
-        13, 8, 12, 29, 24, 28,  4};
+        13, 8, 12, 29, 24, 28,  4
+    };
     UpdatePathGrid(mode, 0, 60, paths, sizeof(paths)/sizeof(int), 7);
 }
 
@@ -4328,7 +4464,7 @@ void EditorScreen::UpdateFileScreen(CallMode mode)
             if(m_special_subpage == 1) // new level
             {
                 int cur_FileFormat = FileFormat;
-                if(cur_FileFormat < 0 || cur_FileFormat > 2)
+                if((cur_FileFormat < 0) || (cur_FileFormat > 2))
                     cur_FileFormat = g_config.editor_preferred_file_format;
 
                 if(cur_FileFormat == FileFormats::LVL_SMBX64 || cur_FileFormat == FileFormats::LVL_SMBX38A)
@@ -4349,7 +4485,7 @@ void EditorScreen::UpdateFileScreen(CallMode mode)
             else if(m_special_subpage == 11) // new world
             {
                 int cur_FileFormat = FileFormat;
-                if(cur_FileFormat < 0 || cur_FileFormat > 2)
+                if((cur_FileFormat < 0) || (cur_FileFormat > 2))
                     cur_FileFormat = g_config.editor_preferred_file_format;
 
                 if(cur_FileFormat == FileFormats::LVL_SMBX64 || cur_FileFormat == FileFormats::LVL_SMBX38A)
@@ -4585,7 +4721,9 @@ void EditorScreen::StartFileBrowser(std::string* file_target,
 
 void EditorScreen::FileBrowserSuccess()
 {
-    if(m_file_target) *m_file_target = m_cur_file;
+    if(m_file_target)
+        *m_file_target = m_cur_file;
+
     if(m_browser_callback == BROWSER_CALLBACK_OPEN_LEVEL)
     {
         EnsureLevel();
@@ -4603,7 +4741,7 @@ void EditorScreen::FileBrowserSuccess()
     else if(m_browser_callback == BROWSER_CALLBACK_NEW_LEVEL)
     {
         int cur_FileFormat = FileFormat;
-        if(cur_FileFormat < 0 || cur_FileFormat > 2)
+        if((cur_FileFormat < 0) || (cur_FileFormat > 2))
             cur_FileFormat = g_config.editor_preferred_file_format;
         EnsureLevel();
         ClearLevel();
@@ -4630,7 +4768,7 @@ void EditorScreen::FileBrowserSuccess()
     else if(m_browser_callback == BROWSER_CALLBACK_NEW_WORLD)
     {
         int cur_FileFormat = FileFormat;
-        if(cur_FileFormat < 0 || cur_FileFormat > 2)
+        if((cur_FileFormat < 0) || (cur_FileFormat > 2))
             cur_FileFormat = g_config.editor_preferred_file_format;
         EnsureWorld();
         ClearWorld();
@@ -4644,6 +4782,7 @@ void EditorScreen::FileBrowserSuccess()
     {
         StartMusic(curSection);
     }
+
     FileBrowserCleanup();
 }
 
@@ -5000,6 +5139,7 @@ void EditorScreen::UpdateSelectorBar(CallMode mode, bool select_bar_only)
         if(in_excl_special)
             exit_special = true;
     }
+
     if(currently_in && UpdateButton(mode, sx+2*40+4, 4, GFXNPC[NPCID_AXE], currently_in && EditorCursor.SubMode == -1, 0, 0, 32, 32, g_editorStrings.tooltipEraseAll.c_str()))
     {
         if(editorScreen.active)
@@ -5223,6 +5363,7 @@ void EditorScreen::UpdateSelectorBar(CallMode mode, bool select_bar_only)
         switch_screens_icon = Icon::up;
         switch_screens_tooltip = nullptr;
     }
+
     if(UpdateButton(mode, sx+15*40 + 4, 4, GFX.EIcons, false, 0, 32*switch_screens_icon, 32, 32, switch_screens_tooltip))
         swap_screens();
 
