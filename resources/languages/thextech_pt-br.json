@@ -364,7 +364,7 @@
         },
         "pause": {
             "playerSetup": "Configurar Jogadores",
-            "enterCode": "Usar Comandos",
+            "enterCode": "Comandos",
             "returnToEditor": "Retornar ao Editor",
             "saveAndContinue": "Guardar e Continuar",
             "saveAndQuit": "Guardar e Sair",
@@ -445,13 +445,13 @@
                 "typeWiimote": "Wiimote"
             },
             "hotkeys": {
-                "enterCheats": "Usar Comandos",
+                "enterCheats": "Comandos",
                 "fullscreen": "Tela Cheia",
-                "debugInfo": "Inf. Depuração",
-                "legacyPause": "Menu Pausa Antigo",
+                "debugInfo": "Depurar",
+                "legacyPause": "Pausa Alt",
                 "recordGif": "Gravar GIF",
-                "screenshot": "Captura de Tela",
-                "toggleHUD": "Alternar Interface"
+                "screenshot": "Capt. Tela",
+                "toggleHUD": "Interface"
             },
             "tDS": {
                 "buttonA": "A",
@@ -471,8 +471,8 @@
             },
             "cursor": {
                 "down": "Mouse Baixo",
-                "left": "Mouse Esquerda",
-                "right": "Mouse Direita",
+                "left": "Mouse Esq",
+                "right": "Mouse Dir",
                 "up": "Mouse Cima",
                 "primary": "Primário",
                 "secondary": "Secundário",
@@ -482,7 +482,7 @@
                 "altJump": "Pulo Alt",
                 "altRun": "Correr Alt",
                 "down": "Baixo",
-                "drop": "Queda de Item",
+                "drop": "Cham.Item",
                 "jump": "Pular",
                 "left": "Esquerda",
                 "right": "Direita",
@@ -502,15 +502,15 @@
             "controlsTitle": "Controles",
             "editor": {
                 "fastScroll": "Desl. Rápido",
-                "switchScreens": "Mostrar Painel",
+                "switchScreens": "Painel",
                 "nextSection": "Prox. Seção",
                 "scrollLeft": "Desl. Esq",
                 "scrollRight": "Desl. Dir",
                 "scrollUp": "Desl. Acima",
                 "testPlay": "Rodar Teste",
-                "modeErase": "Modo Apagar",
-                "modeSelect": "Modo Selecionar",
-                "prevSection": "Seção Anterior",
+                "modeErase": "M Apagar",
+                "modeSelect": "M Selec",
+                "prevSection": "Seção Anter",
                 "scrollDown": "Desl. Abaixo"
             },
             "options": {
