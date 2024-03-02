@@ -1381,8 +1381,15 @@ void EditorScreen::UpdateEventSettingsScreen(CallMode mode)
         return;
     }
 
-    SuperPrintR(mode, g_editorStrings.eventsSettingsForEvent, 3, 60, 40);
-    SuperPrintR(mode, Events[m_current_event].Name, 3, 10, 60);
+    // SuperPrintR(mode, g_editorStrings.eventsSettingsForEvent, 3, 60, 40);
+    // SuperPrintR(mode, Events[m_current_event].Name, 3, 10, 60);
+    FontManager_printTextOptiPxR(mode,
+                                 fmt::format_ne(g_editorStrings.eventsSettingsForEvent,
+                                                Events[m_current_event].Name),
+                                 60, 40,
+                                 300,
+                                 FontManager::fontIdFromSmbxFont(3));
+
 
     // RIGHT PANE: layers
     if(mode == CallMode::Render)
