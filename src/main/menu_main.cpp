@@ -337,14 +337,13 @@ struct WorldRoot_t
 };
 
 // helper functions used by FindWorlds() and LoadSingleWorld()
-static void s_LoadSingleWorld(const std::string& epDir, const std::string& fName, WorldData& head, TranslateEpisode& tr, bool compatModern, bool editable);
+static void s_LoadSingleWorld(const std::string& epDir, const std::string& fName, WorldData& head, TranslateEpisode& tr, bool editable);
 static void s_FinishFindWorlds();
 
 void FindWorlds()
 {
     TranslateEpisode tr;
     WorldData head;
-    bool compatModern = (CompatGetLevel() == COMPAT_MODERN);
     NumSelectWorld = 0;
 
     std::vector<WorldRoot_t> worldRoots =
@@ -398,7 +397,7 @@ void FindWorlds()
             episode.getListOfFiles(files, {".wld", ".wldx"});
 
             for(std::string &fName : files)
-                s_LoadSingleWorld(epDir, fName, head, tr, compatModern, worldsRoot.editable);
+                s_LoadSingleWorld(epDir, fName, head, tr, worldsRoot.editable);
 
 #ifndef PGE_NO_THREADING
             SDL_AtomicAdd(&loadingProgrss, 1);
@@ -409,7 +408,7 @@ void FindWorlds()
     s_FinishFindWorlds();
 }
 
-static void s_LoadSingleWorld(const std::string& epDir, const std::string& fName, WorldData& head, TranslateEpisode& tr, bool compatModern, bool editable)
+static void s_LoadSingleWorld(const std::string& epDir, const std::string& fName, WorldData& head, TranslateEpisode& tr, bool editable)
 {
     std::string wPath = epDir + fName;
 
@@ -425,19 +424,9 @@ static void s_LoadSingleWorld(const std::string& epDir, const std::string& fName
 
         w.blockChar[1] = head.nocharacter1;
         w.blockChar[2] = head.nocharacter2;
-
-        if(head.meta.RecentFormat != LevelData::SMBX64 || head.meta.RecentFormatVersion >= 30 || !compatModern)
-        {
-            w.blockChar[3] = head.nocharacter3;
-            w.blockChar[4] = head.nocharacter4;
-            w.blockChar[5] = head.nocharacter5;
-        }
-        else
-        {
-            w.blockChar[3] = true;
-            w.blockChar[4] = true;
-            w.blockChar[5] = true;
-        }
+        w.blockChar[3] = head.nocharacter3;
+        w.blockChar[4] = head.nocharacter4;
+        w.blockChar[5] = head.nocharacter5;
 
         w.editable = editable;
 
@@ -497,7 +486,6 @@ void LoadSingleWorld(const std::string wPath)
 {
     TranslateEpisode tr;
     WorldData head;
-    bool compatModern = (CompatGetLevel() == COMPAT_MODERN);
     NumSelectWorld = 0;
 
     SelectWorld.clear();
@@ -513,7 +501,7 @@ void LoadSingleWorld(const std::string wPath)
 
     epDir = DirMan(epDir).absolutePath() + "/";
 
-    s_LoadSingleWorld(epDir, fName, head, tr, compatModern, true);
+    s_LoadSingleWorld(epDir, fName, head, tr, true);
 
     s_FinishFindWorlds();
 }
