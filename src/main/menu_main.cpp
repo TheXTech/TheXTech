@@ -1571,6 +1571,20 @@ bool mainMenuUpdate()
                 {
                     PlaySoundMenu(SFX_BlockHit);
                 }
+                // enter vanilla mode if an existing save slot
+                else if(MenuCursorCanMove && homePressed && SaveSlotInfo[MenuCursor + 1].Progress >= 0)
+                {
+                    int target_bugfixes = (SelectWorld[selWorld].bugfixes_on_by_default) ? Config_t::BUGFIXES_ALL : Config_t::BUGFIXES_CRITICAL;
+
+                    if(g_config.enable_bugfixes == Config_t::BUGFIXES_NONE)
+                        g_config.enable_bugfixes = target_bugfixes;
+                    else
+                        g_config.enable_bugfixes = Config_t::BUGFIXES_NONE;
+
+                    PlaySoundMenu(SFX_PSwitch);
+                    MenuCursorCanMove = false;
+                }
+                // go to speedrun menu otherwise
                 else if(MenuCursorCanMove && homePressed)
                 {
                     PlaySoundMenu(SFX_PlayerGrow);
