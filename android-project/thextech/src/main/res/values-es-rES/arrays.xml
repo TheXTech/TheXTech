@@ -13,4 +13,5 @@
     <string name="batteryStatusShow0">Nunca mostrar</string>
     <string name="batteryStatusShow1">Mostrar con batería baja</string>
     <string name="batteryStatusShow2">Mostrar siempre</string>
+    <string name="rendererDefault">Por defecto</string>
 </resources>

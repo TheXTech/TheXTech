@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="setup_general_cat">일반 사항</string>
+    <string name="setup_feedback">피드백</string>
+    <string name="start_game_button">게임 시작</string>
+    <string name="settings_enable_frameskip">프레임 건너뛰기 활성화</string>
+    <string name="setup_max_framerate_mode">최대 프레임 속도 모드</string>
+    <string name="title_activity_game_settings">게임 설정</string>
+    <string name="setup_touchscreen_controller_enable">터치스크린 컨트롤러 사용</string>
+    <string name="cheat_dialog_ok">시작</string>
+    <string name="launcher_gameSelect_clearList">목록 지우기</string>
+    <string name="launcher_gameselect_toast_selected">게임 전환: %s</string>
+    <string name="setup_feedback_vibration_strength">진동 강도</string>
+    <string name="setup_renderer_label">렌더 시스템</string>
+    <string name="managePermExplainText">이 게임은 사용자가 로컬 스토어에 직접 배치한 리소스 (예: 레벨, 에피소드, 그래픽, 음악, 사운드, 구성 등)를 사용합니다. 이 개념을 통해 사용자는 이 게임의 데스크톱 버전에서 수행된 것처럼 자신의 목적에 맞게 콘텐츠를 수정하고 확장할 수 있습니다. 안타깝게도 안드로이드 11 이상에서는 단일 파일 대신 지정된 디렉터리에 대해 개별 읽기 권한을 부여하는 방법을 제공하지 않습니다. 이 게임을 실행하려면 설명된 이유 때문에 게임의 모든 파일에 대한 그랜드 접속이 필요합니다.</string>
+    <string name="touchscreen_vibration_test_label">테스트 피드백</string>
+    <string name="setup_speedrunner">스피드러너</string>
+    <string name="setup_touchpad_style">컨트롤러 스타일</string>
+    <string name="setup_sr_speedrunMode">스피드런 모드</string>
+    <string name="launcher_openfile_indirectly">열린 파일의 직접 절대 경로를 검색할 수 없어 게임 내부 저장소에 대처했습니다. 추가 리소스 (예: 사용자 정의 그래픽, 음악, 구성, 스크립트 등)는 불러올 수 없습니다. 어떤 방식으로든 게임을 시작하겠습니까?</string>
+    <string name="setup_show_framerate">프레임 속도 값 표시</string>
+    <string name="managePermExplainTitle">모든 파일 접근 권한 필요함</string>
+    <string name="setup_feedback_enable_vibration">진동 활성화</string>
+    <string name="setup_disable_sound">사운드 비활성화</string>
+    <string name="cheat_dialog_cancel">취소</string>
+    <string name="launcher_no_resources_question">게임에는 작업을 위한 리소스 패키지가 필요합니다. 게임 리소스를 다운로드하고 편리한 디렉터리에 압축을 풀어보세요. 이미 압축이 풀린 폴더를 선택하겠습니까?</string>
+    <string name="launcher_gameselect_clearlist_question">정말로 게임 목록을 지우겠습니까?</string>
+    <string name="setup_show_battery_status_label">기기 배터리 상태</string>
+    <string name="settings_button">설정</string>
+    <string name="setup_touchscreen_alwaysshow">시작 시 터치스크린 컨트롤러 표시</string>
+    <string name="setup_control_cat">터치스크린 컨트롤러</string>
+    <string name="setup_touchscreen_mode">컨트롤러 모드</string>
+    <string name="launcher_gameselect_toast_listclean">게임 목록이 깨끗해졌습니다.</string>
+    <string name="setup_assets_path_label">리소스 절대 경로 변경</string>
+    <string name="setup_show_controller_state_label">게임 컨트롤러 상태 표시</string>
+    <string name="setup_display_cat">디스플레이</string>
+    <string name="launcher_gameselect_clearlist_title">게임 목록 지우기</string>
+    <string name="launcher_gameSelect_pickTheDir">디렉토리 선택...</string>
+    <string name="cheat_dialog_title">명령 입력 :</string>
+    <string name="game_logo_label">게임 로고</string>
+    <string name="setup_feedback_vibration_length">진동 길이</string>
+    <string name="setup_sr_stopwatchSemiTransparent">스톱워치를 반투명하게 만들기</string>
+</resources>
