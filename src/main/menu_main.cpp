@@ -419,6 +419,8 @@ static void s_LoadSingleWorld(const std::string& epDir, const std::string& fName
         if(w.WorldName.empty())
             w.WorldName = fName;
 
+        w.bugfixes_on_by_default = (head.meta.RecentFormat != LevelData::SMBX64);
+
         w.blockChar[1] = head.nocharacter1;
         w.blockChar[2] = head.nocharacter2;
         w.blockChar[3] = head.nocharacter3;
