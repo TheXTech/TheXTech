@@ -262,7 +262,7 @@ void UpdateNPCs()
             Coins += 1;
             if(Coins >= 100)
             {
-                if(g_config.modern_lives_system && g_100s >= -1)
+                if(g_config.modern_lives_system)
                     CoinMode = false;
 
                 Got100Coins();
