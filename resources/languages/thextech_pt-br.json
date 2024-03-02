@@ -21,7 +21,7 @@
                 "featureWarpTransit": "Um tteleporte usa um tipo de transição nova.",
                 "featureWorldStarDisplay": "Usa configurações de mundo para visualizar estrelas.",
                 "formatUnknown": "O formato especificado é desconhecido.",
-                "noIssues": "Não há problemas de compatibilidade.",
+                "noIssues": "Sem problemas de compatibilidade.",
                 "desc": "A extensão do arquivo será alterada mas o arquivo antigo NÃO será apagado."
             },
             "formatLegacy": "Antigo (SMBX-64)",
@@ -36,7 +36,7 @@
             "sectionLevel": "Nível",
             "actionOpen": "Abrir",
             "confirmConfirmAction": "Certeza que quer {0}?",
-            "confirmConvertFormatTo": "Converter formato para {0}?",
+            "confirmConvertFormatTo": "Converter para {0}?",
             "confirmSaveBeforeAction": "Guardar antes de {0}?",
             "sectionWorld": "Mundo",
             "actionClearLevel": "Limpar Nível",
@@ -76,11 +76,11 @@
         "letterUp": "C",
         "level": {
             "alwaysVis": "Sempre Vis",
-            "bigBG": "Fundo Grande",
+            "bigBG": "Cam.Grande",
             "gameStart": "Iniciar Jogo",
             "levelName": "Nome do Nível",
             "pathBG": "Caminho",
-            "pathUnlocks": "Caminhos Desbloqueáveis",
+            "pathUnlocks": "Caminhos Desbloq.",
             "startPos": "Pos. Inicial"
         },
         "mapPos": "Pos. Mapa:",
@@ -148,7 +148,7 @@
             "erase": "Apagar",
             "NPCs": "NPCs",
             "music": "Música",
-            "scenes": "Cenas",
+            "scenes": "Cenário",
             "BGOs": "Obj. de Fundo",
             "eraseAll": "Apagar Tudo",
             "blocks": "Blocos",
@@ -178,7 +178,7 @@
                 "style": "Estilo: ",
                 "pipe": "Cano"
             },
-            "to": "Para: {0}",
+            "to": "A: {0}",
             "toMap": "Para Mapa",
             "transit": {
                 "name1": "DESLIZAR",
@@ -200,7 +200,7 @@
             "showStarCount": "Mostrar Estrelas",
             "showStartScene": "Mostrar Cena Inicial",
             "starLockMessage": "Mens. de Bloq. de Estrela",
-            "target": "Alvo: ",
+            "target": "Abre: ",
             "title": "Config. de Teleporte"
         },
         "water": {
@@ -222,10 +222,10 @@
             "hubWorld": "Mundo Central",
             "introLevel": "Nível Inicial",
             "name": "Nome do Mundo",
-            "allowChars": "Permitir Personagens",
+            "allowChars": "Jogáveis",
             "phraseCreditIndex": "Linha {0} - Créditos do Mundo:",
-            "totalStars": "Estrelas Totais: ",
-            "retryOnFail": "Tentar Nov. ao Falhar"
+            "totalStars": "Núm.Estrelas:",
+            "retryOnFail": "AutoRessurgir"
         },
         "block": {
             "canBreak": "Quebrável",
@@ -254,7 +254,7 @@
                 "confirm": "SIM: Apagar o evento",
                 "deletingEvent": "Apagando o evento {0}"
             },
-            "header": "Eventos:",
+            "header": "Evento:",
             "headerTriggerEvent": "Ativação:",
             "itemNewEvent": "<Novo Evento>",
             "label": {
@@ -284,7 +284,7 @@
             },
             "props": {
                 "sound": "Som",
-                "autostart": "Ativo ao iniciar",
+                "autostart": "Ao iniciar",
                 "controls": "Controles",
                 "endGame": "Fim do Jogo",
                 "layerSmoke": "Fumaça"
@@ -565,7 +565,7 @@
         "options": {
             "optionsModeFullScreen": "Modo Tela Cheia",
             "scale": {
-                "nearest": "Vizinho Mais Próximo",
+                "nearest": "Aproximado",
                 "integer": "Inteiros",
                 "linear": "Linear",
                 "label": "Escala"
@@ -608,7 +608,7 @@
         "wordShow": "Mostrar",
         "wordYes": "Sim"
     },
-    "languageName": "Português Brasileiro",
+    "languageName": "Português-BR",
     "outro": {
         "specialThanks": "Agradecimentos Especiais:",
         "cppPortDevelopers": "Desenvolvedores da versão C++:",
