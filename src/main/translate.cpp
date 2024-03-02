@@ -428,7 +428,7 @@ XTechTranslate::XTechTranslate()
         {"game.pause.resetCheckpoints",     &g_gameStrings.pauseItemResetCheckpoints},
         {"game.pause.quitTesting",          &g_gameStrings.pauseItemQuitTesting},
         {"game.pause.returnToEditor",       &g_gameStrings.pauseItemReturnToEditor},
-        {"game.pause.dropAddPlayers",       &g_gameStrings.pauseItemDropAddPlayers},
+        {"game.pause.playerSetup",          &g_gameStrings.pauseItemPlayerSetup},
         {"game.pause.enterCode",            &g_gameStrings.pauseItemEnterCode},
         {"game.pause.saveAndContinue",      &g_gameStrings.pauseItemSaveAndContinue},
         {"game.pause.saveAndQuit",          &g_gameStrings.pauseItemSaveAndQuit},

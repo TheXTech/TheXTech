@@ -367,7 +367,7 @@
         },
         "pause": {
             "continue": "Continue",
-            "dropAddPlayers": "Drop/Add Players",
+            "playerSetup": "Player Setup",
             "enterCode": "Enter Code",
             "quit": "Quit",
             "quitTesting": "Quit Testing",

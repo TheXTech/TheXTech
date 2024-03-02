@@ -364,7 +364,6 @@
         },
         "pause": {
             "playerSetup": "Configurar Jogadores",
-            "dropAddTitle": "Ger. Jogadores",
             "enterCode": "Usar Comandos",
             "returnToEditor": "Retornar ao Editor",
             "saveAndContinue": "Guardar e Continuar",
