@@ -358,16 +358,269 @@
             "errorNoStartPoint": "========= ERRO! ==========\n\nNão foi possível iniciar o nível por este nível não conter ponto de inicio ou entradas de teleporte especificadas.\n\nArquivo: {0}",
             "openFileFailed": "ERRO: \"{0}\" nao foi aberto: Arquivo inexistente ou corrompido.",
             "warpNeedStarCount": "Você precisa de {0} {1} para entrar."
+        },
+        "message": {
+            "scanningLevels": "Buscando níveis..."
+        },
+        "pause": {
+            "playerSetup": "Configurar Jogadores",
+            "enterCode": "Usar Comandos",
+            "returnToEditor": "Retornar ao Editor",
+            "saveAndContinue": "Guardar e Continuar",
+            "saveAndQuit": "Guardar e Sair",
+            "quit": "Sair",
+            "quitTesting": "Sair do Teste",
+            "resetCheckpoints": "Reiniciar Ponto de Ressurgimento",
+            "continue": "Continuar",
+            "restartLevel": "Reiniciar Nível"
+        },
+        "format": {
+            "minutesSeconds": "{0}m{1}s"
         }
     },
     "menu": {
         "controls": {
             "touchscreen": {
                 "style": {
-                    "XODA": "𐄂○□△"
+                    "XODA": "𐄂○□△",
+                    "ABXY": "ABXY",
+                    "actions": "Ações"
+                },
+                "layout": {
+                    "tinyOld": "Pequeno (Antigo)",
+                    "longOld": "Longo (Antigo)",
+                    "phabletOld": "Phablet (Antigo)",
+                    "phoneOld": "Telefone (Antigo)",
+                    "tabletOld": "Tablet (Antigo)",
+                    "tight": "Apertado",
+                    "standard": "Def. Padrão"
+                },
+                "option": {
+                    "feedbackLength": "Duração da Vibração",
+                    "feedbackStrength": "Força da Vibração",
+                    "holdRun": "Segurar \"Correr\" ao Iniciar",
+                    "interfaceStyle": "Estilo da interface",
+                    "layoutStyle": "Estilo do Layout",
+                    "resetLayout": "Reiniciar Layout",
+                    "scaleButtons": "Escala dos Botões",
+                    "scaleDPad": "Escala do Direcional",
+                    "scaleFactor": "Fator de Escala",
+                    "showCodeButton": "Mostrar Botão de Comandos",
+                    "sStartSpacing": "Espaçamento S-Start"
                 }
-            }
-        }
+            },
+            "phraseNewProfOldJoy": "Novo Perfil para Joystick Antigo",
+            "wii": {
+                "typeNunchuck": "Nunchuck",
+                "wiimote": {
+                    "caseIR": "(Infravermelho)",
+                    "shake": "Sacudir",
+                    "button1": "1",
+                    "button2": "2",
+                    "buttonA": "A",
+                    "buttonB": "B",
+                    "buttonHome": "Bot. Home",
+                    "dPad": "Direcionais",
+                    "buttonMinus": "-",
+                    "buttonPlus": "+"
+                },
+                "classic": {
+                    "buttonLT": "LT",
+                    "buttonRT": "RT",
+                    "buttonX": "X",
+                    "buttonY": "Y",
+                    "buttonZL": "ZL",
+                    "buttonZR": "ZR",
+                    "lStick": "Direcional Esq",
+                    "rStick": "Direcional Dir"
+                },
+                "nunchuck": {
+                    "buttonC": "C",
+                    "buttonZ": "Z",
+                    "prefixN": "N"
+                },
+                "phraseNewClassic": "Novo Perfil - Classic",
+                "phraseNewNunchuck": "Novo Perfil - Nunchuck",
+                "typeClassic": "Classic",
+                "typeWiimote": "Wiimote"
+            },
+            "hotkeys": {
+                "enterCheats": "Usar Comandos",
+                "fullscreen": "Tela Cheia",
+                "debugInfo": "Inf. Depuração",
+                "legacyPause": "Menu Pausa Antigo",
+                "recordGif": "Gravar GIF",
+                "screenshot": "Captura de Tela",
+                "toggleHUD": "Alternar Interface"
+            },
+            "tDS": {
+                "buttonA": "A",
+                "buttonB": "B",
+                "buttonR": "R",
+                "buttonZL": "ZL",
+                "buttonZR": "ZR",
+                "casePen": "(Stylus)",
+                "buttonL": "L",
+                "buttonSelect": "Select",
+                "buttonStart": "Start",
+                "buttonX": "X",
+                "buttonY": "Y",
+                "cStick": "Analógico-C",
+                "dPad": "Direcionais",
+                "tStick": "Bot. do Analógico"
+            },
+            "cursor": {
+                "down": "Mouse Baixo",
+                "left": "Mouse Esquerda",
+                "right": "Mouse Direita",
+                "up": "Mouse Cima",
+                "primary": "Primário",
+                "secondary": "Secundário",
+                "tertiary": "Terciário"
+            },
+            "buttons": {
+                "altJump": "Pulo Alt",
+                "altRun": "Correr Alt",
+                "down": "Baixo",
+                "drop": "Queda de Item",
+                "jump": "Pular",
+                "left": "Esquerda",
+                "right": "Direita",
+                "start": "Iniciar",
+                "up": "Cima",
+                "run": "Correr"
+            },
+            "caseInvalid": "(Invalido)",
+            "caseMouse": "(Mouse)",
+            "caseTouch": "(Toque)",
+            "controlsConnected": "Conectado:",
+            "controlsDeviceTypes": "Tipos de Dispositivos",
+            "controlsInUse": "(Em Uso)",
+            "controlsNewProfile": "<Novo Perfil>",
+            "controlsNotInUse": "(Não Usado)",
+            "controlsReallyDeleteProfile": "Apagar perfil?",
+            "controlsTitle": "Controles",
+            "editor": {
+                "fastScroll": "Desl. Rápido",
+                "switchScreens": "Mostrar Painel",
+                "nextSection": "Prox. Seção",
+                "scrollLeft": "Desl. Esq",
+                "scrollRight": "Desl. Dir",
+                "scrollUp": "Desl. Acima",
+                "testPlay": "Rodar Teste",
+                "modeErase": "Modo Apagar",
+                "modeSelect": "Modo Selecionar",
+                "prevSection": "Seção Anterior",
+                "scrollDown": "Desl. Abaixo"
+            },
+            "options": {
+                "batteryStatus": "Estado da Bateria",
+                "maxPlayers": "Jogadores Máximos",
+                "rumble": "Vibrar",
+                "textEntryStyle": "Estilo de Entrada de Texto",
+                "groundPoundButton": "Botão de Ground Pound"
+            },
+            "profile": {
+                "hotkeys": "Atalhos",
+                "activateProfile": "Ativar Perfil",
+                "cursorControls": "Controles do cursor",
+                "deleteProfile": "Apagar Perfil",
+                "editorControls": "Controles do editor",
+                "playerControls": "Controles do jogador",
+                "renameProfile": "Renomear perfil"
+            },
+            "wordButtons": "Botões",
+            "wordProfiles": "Perfis",
+            "types": {
+                "touchscreen": "Tela de Toque",
+                "keyboard": "Teclado",
+                "gamepad": "Controle",
+                "oldJoystick": "Joystick Antigo"
+            },
+            "controlsDeleteKey": "(Pulo Alt para Apagar)"
+        },
+        "game": {
+            "gameBattleRandom": "Nível Aleatório",
+            "gameCopySave": "Copiar Jogo",
+            "gameEraseSave": "Apagar Jogo",
+            "gameEraseSlot": "Selecione um Jogo para apagar",
+            "gameSlotNew": "JOGO {0} ... NOVO JOGO",
+            "gameNoBattleLevels": "<Sem níveis de batalha>",
+            "gameNoEpisodesToPlay": "<Sem episódios para jogar>",
+            "gameSourceSlot": "Selecione o Jogo de origem",
+            "gameTargetSlot": "Agora, o Jogo de destino",
+            "phraseScore": "Pontos: {0}",
+            "phraseTime": "Tempo: {0}",
+            "gameSlotContinue": "JOGO {0} ... {1}%"
+        },
+        "main": {
+            "mainPlayEpisode": "Jogar Episódio",
+            "main1PlayerGame": "Um Jogador",
+            "mainEditor": "Editor",
+            "mainOptions": "Opções",
+            "mainBattleGame": "Modo Batalha",
+            "mainExit": "Sair",
+            "mainMultiplayerGame": "Dois Jogadores"
+        },
+        "options": {
+            "optionsModeFullScreen": "Modo Tela Cheia",
+            "scale": {
+                "nearest": "Vizinho Mais Próximo",
+                "integer": "Inteiros",
+                "linear": "Linear",
+                "label": "Escala"
+            },
+            "restartEngine": "Reinicie a Engine para aplicar as mudanças.",
+            "render": "Render.: {0}",
+            "renderAuto": "Render.: Automático ({0})",
+            "renderX": "Render.: {0} (X)",
+            "optionsModeWindowed": "Modo Janela",
+            "optionsViewCredits": "Ver créditos"
+        },
+        "editor": {
+            "errorMissingResources": "Desculpe! {0} esta faltando, é necessário para o editor no jogo.",
+            "battles": "<Níveis de Batalha>",
+            "newWorld": "<Novo Mundo>",
+            "promptNewWorldName": "Nome do novo mundo",
+            "errorResolution": "Desculpe! O editor no jogo não é suportado na resolução atual."
+        },
+        "wordBack": "Voltar",
+        "wordWaiting": "Esperando",
+        "loading": "Carregando...",
+        "abbrevMilliseconds": "MS",
+        "battle": {
+            "errorNoLevels": "Não foi possível iniciar uma batalha por falta de níveis"
+        },
+        "caseNone": "<Nenhum>",
+        "character": {
+            "selectCharacter": "Jogo do {0}",
+            "startGame": "Iniciar Jogo",
+            "charSelTitle": "Seleção de Personagem"
+        },
+        "wordHide": "Esconder",
+        "wordLanguage": "Idioma",
+        "wordNo": "Não",
+        "wordOff": "Desl.",
+        "wordOn": "Ligado",
+        "wordPlayer": "Jogador",
+        "wordProfile": "Perfil",
+        "wordResume": "Continuar",
+        "wordShow": "Mostrar",
+        "wordYes": "Sim"
     },
-    "languageName": "Português Brasileiro"
+    "languageName": "Português Brasileiro",
+    "outro": {
+        "specialThanks": "Agradecimentos Especiais:",
+        "cppPortDevelopers": "Desenvolvedores da versão C++:",
+        "customSprites": "Sprite Personalizado:",
+        "engineCredits": "Créditos da Engine:",
+        "gameCredits": "Créditos do jogo:",
+        "levelDesign": "Design de níveis:",
+        "nameAndrewSpinks": "Andrew Spinks",
+        "nameVitalyNovichkov": "Vitaly Novichkov",
+        "originalBy": "Código original VB6 Por:",
+        "psVitaPortBy": "Port para PS Vita Por:",
+        "qualityControl": "Controle de Qualidade:"
+    },
+    "pluralRules": "one-is-singular"
 }
