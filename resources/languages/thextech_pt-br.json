@@ -85,14 +85,14 @@
         },
         "mapPos": "Pos. Mapa:",
         "npc": {
-            "inertNice": "Amigo",
+            "inertNice": "Amig",
             "props": {
                 "active": "Ativo",
                 "attachSurface": "Anexa",
                 "facing": "Olhando"
             },
             "inContainer": "-",
-            "stuckStop": "Ficar",
+            "stuckStop": "Fica",
             "ai": {
                 "LR": "Esq-Dir",
                 "UD": "Cim-Bai",
@@ -105,10 +105,10 @@
                 "use1_0Ai": "Usar IA 1.0?"
             },
             "gen": {
-                "effectWarp": "Teleporte",
+                "effectWarp": "Telep",
                 "effectIs": "Efeito: {0}",
                 "effectShoot": "Atirar",
-                "header": "Configurações de Gerador",
+                "header": "Config. de Gerador",
                 "direction": "Direção"
             },
             "abbrevGen": "Gera.",
@@ -116,7 +116,7 @@
         },
         "phraseAreYouSure": "Tem certeza?",
         "phraseCountMore": "Mais {0}",
-        "phraseDelayIsMs": "Intervalo: {0} ms",
+        "phraseDelayIsMs": "Interv.: {0} ms",
         "phraseRadiusIndex": "Raio {0}",
         "phraseSectionIndex": "Seção {0}",
         "section": {
@@ -124,7 +124,7 @@
             "noTurnBack": "Sem Volta",
             "offscreenExit": "Sair Pela Borda",
             "scroll": "Deslizar",
-            "setBounds": "Definir Bordas",
+            "setBounds": "Def. Bordas",
             "underwater": "Subaquático"
         },
         "select": {
@@ -138,9 +138,9 @@
         },
         "testPlay": {
             "boot": "Bota",
-            "char": "Personagem",
+            "char": "Pers",
             "magicHand": "Mão Mágica",
-            "pet": "Mascote",
+            "pet": "Mont.",
             "power": "Poder"
         },
         "tooltip": {
@@ -166,8 +166,8 @@
         },
         "warp": {
             "effect": "Efeito:",
-            "in": "Em",
-            "out": "Fora",
+            "in": "Ent.",
+            "out": "Saí.",
             "placing": "Colocando:",
             "ride": "Montar",
             "speed": "Velocidade ",
@@ -189,7 +189,7 @@
                 "name5": "VIRAR (V)"
             },
             "twoWay": "Ida-Volta",
-            "cannonExit": "Saída de Canhão",
+            "cannonExit": "Saí. Canhão",
             "allow": "Permitir:",
             "dir": "Dire.",
             "item": "Item",
@@ -285,14 +285,14 @@
             "props": {
                 "sound": "Som",
                 "autostart": "Ao iniciar",
-                "controls": "Controles",
-                "endGame": "Fim do Jogo",
+                "controls": "Control.",
+                "endGame": "Fin.Jogo",
                 "layerSmoke": "Fumaça"
             },
             "sections": {
                 "actionKeep": "Manter",
-                "actionReset": "Reiniciar",
-                "actionSet": "Definir",
+                "actionReset": "Rein.",
+                "actionSet": "Def.",
                 "phraseAllSections": "Todas as Seções",
                 "propBackground": "Fundo",
                 "propBounds": "Bordas",
@@ -306,7 +306,7 @@
                 "shouldEvent": "Editar Evento {0}"
             },
             "controlsForEventN": "Controles para o evento {0}",
-            "settingsForEvent": "Configurações do evento {0}"
+            "settingsForEvent": "Config. do evento {0}"
         },
         "browser": {
             "itemNewFile": "<Novo Arquivo>",
