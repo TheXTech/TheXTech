@@ -719,10 +719,9 @@ XTechTranslate::XTechTranslate()
         {"editor.file.commandSave",         &g_editorStrings.fileCommandSave},
         {"editor.file.commandSaveAs",       &g_editorStrings.fileCommandSaveAs},
 
-        {"editor.file.convert.desc",                &g_editorStrings.fileConvertDesc},
-        {"editor.file.convert.noIssues",            &g_editorStrings.fileConvertNoIssues},
-        {"editor.file.convert.featuresWillBeLost",  &g_editorStrings.fileConvertFeaturesWillBeLost},
+        {"editor.file.convert.descNew",             &g_editorStrings.fileConvertDesc},
 
+#if 0
         {"editor.file.convert._38aUnsupported",     &g_editorStrings.fileConvert38aUnsupported},
         {"editor.file.convert.formatUnknown",       &g_editorStrings.fileConvertFormatUnknown},
 
@@ -746,6 +745,7 @@ XTechTranslate::XTechTranslate()
         {"editor.file.convert.featureWorldStarDisplay", &g_editorStrings.fileConvertFeatureWorldStarDisplay},
         {"editor.file.convert.featureLevelStarDisplay", &g_editorStrings.fileConvertFeatureLevelStarDisplay},
         {"editor.file.convert.featureWorldMapSections", &g_editorStrings.fileConvertFeatureWorldMapSections},
+#endif
 
         {"editor.browser.newFile",          &g_editorStrings.browserNewFile},
         {"editor.browser.saveFile",         &g_editorStrings.browserSaveFile},
