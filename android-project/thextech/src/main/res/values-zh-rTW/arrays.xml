@@ -1,2 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources></resources>
+<resources>
+    <string name="touchscreenControllerType0">啓用</string>
+    <string name="touchscreenControllerType1">僅在未連接實體鍵盤時啓用</string>
+    <string name="touchscreenControllerType2">禁用</string>
+    <string name="speedRunMode0">禁用</string>
+    <string name="speedRunMode1">模式1（原始TheXTech）</string>
+    <string name="speedRunMode2">模式 2（禁用計時過關）</string>
+    <string name="speedRunMode3">模式 3（SMBX 1.3，啓用所有Bug）</string>
+    <string name="touchPadStyle0">遊戲內動作</string>
+    <string name="touchPadStyle1">字母風格（A/B/X/Y）</string>
+    <string name="touchPadStyle2">PS風格（X/O/D/A）</string>
+    <string name="batteryStatusShow0">不顯示</string>
+    <string name="batteryStatusShow1">僅在電池電量低時顯示</string>
+    <string name="batteryStatusShow2">顯示</string>
+    <string name="rendererDefault">默認</string>
+</resources>
