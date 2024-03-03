@@ -753,9 +753,11 @@ bool mainMenuUpdate()
 
                 if(MenuMode >= MENU_SELECT_SLOT_BASE && MenuMode <= MENU_SELECT_SLOT_END)
                 {
-                    g_config.enable_bugfixes.unset();
+                    ConfigChangeSentinel sent(ConfigSetLevel::ep_config);
+
+                    g_config.enable_bugfixes = SelectWorld[selWorld].bugfixes_on_by_default ? Config_t::BUGFIXES_ALL : Config_t::BUGFIXES_CRITICAL;
                     if(g_config.speedrun_mode.m_set != ConfigSetLevel::cmdline)
-                        g_config.speedrun_mode.unset();
+                        g_config.speedrun_mode = 0;
                 }
 
                 PlaySoundMenu(SFX_Slide);
@@ -1439,13 +1441,26 @@ bool mainMenuUpdate()
                     // enter save select
                     else
                     {
-                        g_config.enable_bugfixes.unset();
-                        if(g_config.speedrun_mode.m_set != ConfigSetLevel::cmdline)
-                            g_config.speedrun_mode.unset();
-
                         FindSaves();
                         MenuMode *= MENU_SELECT_SLOT_BASE;
                         MenuCursor = 0;
+
+                        {
+                            ConfigChangeSentinel sent(ConfigSetLevel::ep_config);
+
+                            int save_configs = SaveSlotInfo[MenuCursor + 1].ConfigDefaults;
+
+                            if(save_configs > 0)
+                                g_config.enable_bugfixes = save_configs - 1;
+                            else if(save_configs < 0 && g_config.speedrun_mode.m_set != ConfigSetLevel::cmdline)
+                                g_config.speedrun_mode = -save_configs;
+                            else
+                            {
+                                g_config.enable_bugfixes = SelectWorld[selWorld].bugfixes_on_by_default ? Config_t::BUGFIXES_ALL : Config_t::BUGFIXES_CRITICAL;
+                                if(g_config.speedrun_mode.m_set != ConfigSetLevel::cmdline)
+                                    g_config.speedrun_mode = 0;
+                            }
+                        }
                     }
 
                     MenuCursorCanMove = false;
@@ -1526,6 +1541,8 @@ bool mainMenuUpdate()
         // Save Select
         else if(MenuMode == MENU_SELECT_SLOT_1P || MenuMode == MENU_SELECT_SLOT_2P)
         {
+            ConfigChangeSentinel sent(ConfigSetLevel::ep_config);
+
             if(SharedCursor.Move)
             {
                 int old_item = MenuCursor;
@@ -1533,27 +1550,15 @@ bool mainMenuUpdate()
 
                 if(MenuCursor != old_item)
                 {
-                    g_config.enable_bugfixes.unset();
+                    g_config.enable_bugfixes = SelectWorld[selWorld].bugfixes_on_by_default ? Config_t::BUGFIXES_ALL : Config_t::BUGFIXES_CRITICAL;
                     if(g_config.speedrun_mode.m_set != ConfigSetLevel::cmdline)
-                        g_config.speedrun_mode.unset();
+                        g_config.speedrun_mode = 0;
                 }
             }
 
             // new mode selection logic
             if(MenuCursor >= 0 && MenuCursor < maxSaveSlots && SaveSlotInfo[MenuCursor + 1].ConfigDefaults == 0)
             {
-                ConfigChangeSentinel sent(ConfigSetLevel::ep_config);
-
-                // initialize with defaults if needed
-                if(!g_config.enable_bugfixes.is_set())
-                {
-                    g_config.enable_bugfixes = SelectWorld[selWorld].bugfixes_on_by_default ? Config_t::BUGFIXES_ALL : Config_t::BUGFIXES_CRITICAL;
-
-                    // if there's no speed run mode from command line, set as off by default
-                    if(g_config.speedrun_mode.m_set != ConfigSetLevel::cmdline)
-                        g_config.speedrun_mode = 0;
-                }
-
                 // switch mode
                 if(MenuCursorCanMove && altPressed && g_config.speedrun_mode.m_value == 0)
                 {
@@ -1600,15 +1605,24 @@ bool mainMenuUpdate()
                     MenuMouseClick = false;
                 }
             }
+            else if(MenuCursor >= 0 && MenuCursor < maxSaveSlots)
+            {
+                int save_configs = SaveSlotInfo[MenuCursor + 1].ConfigDefaults;
+
+                if(save_configs > 0)
+                    g_config.enable_bugfixes = save_configs - 1;
+                else if(save_configs < 0 && g_config.speedrun_mode.m_set != ConfigSetLevel::cmdline)
+                    g_config.speedrun_mode = -save_configs;
+            }
 
             if(MenuCursorCanMove || MenuMouseClick)
             {
                 if(menuBackPress)
                 {
 //'save select back
-                    g_config.enable_bugfixes.unset();
+                    g_config.enable_bugfixes = Config_t::BUGFIXES_ALL;
                     if(g_config.speedrun_mode.m_set != ConfigSetLevel::cmdline)
-                        g_config.speedrun_mode.unset();
+                        g_config.speedrun_mode = 0;
 
                     MenuMode /= MENU_SELECT_SLOT_BASE;
 

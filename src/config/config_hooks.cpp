@@ -43,6 +43,10 @@
 #include <Graphics/graphics_funcs.h>
 #endif
 
+
+// config_main.cpp
+extern bool g_configInTransaction;
+
 void config_res_set()
 {
     if(GameIsActive && (GameMenu || GamePaused == PauseCode::Options || g_config.internal_res.m_set == ConfigSetLevel::cheat))
@@ -136,4 +140,10 @@ void config_integrations_set()
 {
     Integrator::quitIntegrations();
     Integrator::initIntegrations();
+}
+
+void config_compat_changed()
+{
+    if(!g_configInTransaction)
+        UpdateConfig();
 }

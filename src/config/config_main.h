@@ -606,7 +606,8 @@ public:
             {BUGFIXES_NONE, "none", "None", nullptr},
         },
         defaults(BUGFIXES_ALL), {CompatClass::pure_preference, BUGFIXES_NONE}, Scope::UserEpisode,
-        "enable-patches", "Enable patches", "Enable fixes for SMBX 1.3 bugs and defects"};
+        "enable-patches", "Enable patches", "Enable fixes for SMBX 1.3 bugs and defects",
+        config_compat_changed};
 
     enum
     {
@@ -828,7 +829,8 @@ public:
             {3, "3", "Mode 3 (SMBX64)", nullptr},
         },
         defaults<int>(0), {}, Scope::UserEpisode,
-        "mode", "Speedrun mode", "This enables the speedrun timer and enforces compatibility options"};
+        "mode", "Speedrun mode", "This enables the speedrun timer and enforces compatibility options",
+        config_compat_changed};
 
     enum
     {

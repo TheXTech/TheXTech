@@ -39,16 +39,13 @@ void Config_t::Clear()
     // only update backup variables for main config class
     if(this == &g_config)
     {
+        if(enable_bugfixes.m_set == ConfigSetLevel::ep_config)
+            s_backup_bugfixes = enable_bugfixes;
+
         if(GameMenu)
-        {
-            s_backup_bugfixes = Config_t::BUGFIXES_ALL;
             s_backup_creator_compat = Config_t::CREATORCOMPAT_ENABLE;
-        }
         else
         {
-            if(enable_bugfixes.m_set == ConfigSetLevel::ep_config)
-                s_backup_bugfixes = enable_bugfixes;
-
             if(creator_compat.m_set == ConfigSetLevel::ep_config)
                 s_backup_creator_compat = creator_compat;
         }

@@ -729,6 +729,14 @@ int GameMain(const CmdLineSetup_t &setup)
         // The Game Menu
         else if(GameMenu)
         {
+            {
+                ConfigChangeSentinel sent(ConfigSetLevel::ep_config);
+
+                g_config.enable_bugfixes = Config_t::BUGFIXES_ALL;
+                if(g_config.speedrun_mode.m_set != ConfigSetLevel::cmdline)
+                    g_config.speedrun_mode = 0;
+            }
+
             Integrator::clearEpisodeName();
             Integrator::clearLevelName();
             Integrator::clearEditorFile();
