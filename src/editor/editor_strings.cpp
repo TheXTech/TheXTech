@@ -283,10 +283,9 @@ void initEditorStrings()
     g_editorStrings.fileCommandSave = "Save";
     g_editorStrings.fileCommandSaveAs = "Save as...";
 
-    g_editorStrings.fileConvertDesc = "The file extension will change but the old file will NOT be deleted.";
-    g_editorStrings.fileConvertNoIssues = "There are no compatibility issues.";
-    g_editorStrings.fileConvertFeaturesWillBeLost = "The features below will be LOST:";
+    g_editorStrings.fileConvertDesc = "The file extension will change but the old file will NOT be deleted.\n\nPlease check for lost features after saving.";
 
+#if 0
     g_editorStrings.fileConvert38aUnsupported = "The SMBX38-A format is not supported for conversion.";
     g_editorStrings.fileConvertFormatUnknown = "Requested format is unknown.";
 
@@ -310,6 +309,7 @@ void initEditorStrings()
     g_editorStrings.fileConvertFeatureWorldStarDisplay = "Uses world setting for star display.";
     g_editorStrings.fileConvertFeatureLevelStarDisplay = "A level uses setting for star display.";
     g_editorStrings.fileConvertFeatureWorldMapSections = "The world includes world map sections.";
+#endif
 
     g_editorStrings.browserNewFile = "New file";
     g_editorStrings.browserSaveFile = "Save file";

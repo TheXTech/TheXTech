@@ -1366,6 +1366,7 @@ void FindStars()
     }
 }
 
+#if 0
 // Is there any unsupported content for this format in the level?
 bool CanConvertLevel(int format, std::string* reasons)
 {
@@ -1639,3 +1640,4 @@ void ConvertLevel(int format)
     for(int i = 1; i <= numBlock; i++)
         Block[i].forceSmashable = 0;
 }
+#endif

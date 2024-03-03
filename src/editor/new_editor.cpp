@@ -4548,28 +4548,35 @@ void EditorScreen::UpdateFileScreen(CallMode mode)
                                          606,
                                          FontManager::fontIdFromSmbxFont(4));
         }
-        // SuperPrintR(mode, g_editorStrings.fileConvertDesc, 4, 20, 90);
-
-        if(m_saved_message.empty())
-            SuperPrintR(mode, g_editorStrings.fileConvertNoIssues, 4, 20, 150);
-        else
-        {
-            SuperPrintR(mode, g_editorStrings.fileConvertFeaturesWillBeLost, 4, 20, 150, XTColorF(1.0f, 0.5f, 0.5f));
-            SuperPrintR(mode, m_saved_message, 4, 4, 180);
-        }
 
         SuperPrintR(mode, g_editorStrings.fileOptionProceedWithConversion, 3, 60, 390);
         if(UpdateButton(mode, 20 + 4, 380 + 4, GFX.EIcons, false, 0, 32*Icon::action, 32, 32))
         {
+            FileFormat = m_special_subpage;
+            if(FileFormat == FileFormats::LVL_SMBX64 || FileFormat == FileFormats::LVL_SMBX38A)
+            {
+                if(!FileNameFull.empty() && FileNameFull.back() == 'x')
+                    FileNameFull.resize(FileNameFull.size() - 1);
+                if(!FullFileName.empty() && FullFileName.back() == 'x')
+                    FullFileName.resize(FullFileName.size() - 1);
+            }
+            else
+            {
+                if(!FileNameFull.empty() && FileNameFull.back() != 'x')
+                    FileNameFull += "x";
+                if(!FullFileName.empty() && FullFileName.back() != 'x')
+                    FullFileName += "x";
+            }
+
             if(WorldEditor)
             {
-                ConvertWorld(m_special_subpage);
+                // ConvertWorld(m_special_subpage);
                 SaveWorld(FullFileName, FileFormat);
                 OpenWorld(FullFileName);
             }
             else
             {
-                ConvertLevel(m_special_subpage);
+                // ConvertLevel(m_special_subpage);
                 SaveLevel(FullFileName, FileFormat);
                 OpenLevel(FullFileName);
             }
@@ -4578,7 +4585,6 @@ void EditorScreen::UpdateFileScreen(CallMode mode)
 
             m_special_page = SPECIAL_PAGE_FILE;
             m_special_subpage = 0;
-            m_saved_message.clear();
         }
 
         SuperPrintR(mode, g_editorStrings.fileOptionCancelConversion, 3, 60, 430);
@@ -4586,7 +4592,6 @@ void EditorScreen::UpdateFileScreen(CallMode mode)
         {
             m_special_page = SPECIAL_PAGE_FILE;
             m_special_subpage = 0;
-            m_saved_message.clear();
         }
 
         return;
@@ -4594,20 +4599,21 @@ void EditorScreen::UpdateFileScreen(CallMode mode)
 
     SuperPrintR(mode, g_editorStrings.fileLabelCurrentFile + FileNameFull, 3, 10, 50);
 
-    SuperPrintR(mode, g_editorStrings.fileLabelFormat, 3, 150, 90);
-
-    if(UpdateButton(mode, 320 + 4, 80 + 4, GFXNPC[NPCID_POWER_S3], FileFormat == FileFormats::LVL_SMBX64, 0, 0, 32, 32, g_editorStrings.fileFormatLegacy.c_str()) && FileFormat != FileFormats::LVL_SMBX64)
+    if(selWorld == 0)
     {
-        m_special_page = SPECIAL_PAGE_FILE_CONVERT;
-        m_special_subpage = FileFormats::LVL_SMBX64;
-        CanConvertLevel(FileFormats::LVL_SMBX64, &m_saved_message);
-    }
+        SuperPrintR(mode, g_editorStrings.fileLabelFormat, 3, 150, 90);
 
-    if(UpdateButton(mode, 360 + 4, 80 + 4, GFX.EIcons, FileFormat == FileFormats::LVL_PGEX, 0, 32*Icon::thextech, 32, 32, g_editorStrings.fileFormatModern.c_str()) && FileFormat != FileFormats::LVL_PGEX)
-    {
-        m_special_page = SPECIAL_PAGE_FILE_CONVERT;
-        m_special_subpage = FileFormats::LVL_PGEX;
-        CanConvertLevel(FileFormats::LVL_PGEX, &m_saved_message);
+        if(UpdateButton(mode, 320 + 4, 80 + 4, GFXNPC[NPCID_POWER_S3], FileFormat == FileFormats::LVL_SMBX64, 0, 0, 32, 32, g_editorStrings.fileFormatLegacy.c_str()) && FileFormat != FileFormats::LVL_SMBX64)
+        {
+            m_special_page = SPECIAL_PAGE_FILE_CONVERT;
+            m_special_subpage = FileFormats::LVL_SMBX64;
+        }
+
+        if(UpdateButton(mode, 360 + 4, 80 + 4, GFX.EIcons, FileFormat == FileFormats::LVL_PGEX, 0, 32*Icon::thextech, 32, 32, g_editorStrings.fileFormatModern.c_str()) && FileFormat != FileFormats::LVL_PGEX)
+        {
+            m_special_page = SPECIAL_PAGE_FILE_CONVERT;
+            m_special_subpage = FileFormats::LVL_PGEX;
+        }
     }
 
     SuperPrintR(mode, g_editorStrings.fileSectionLevel, 3, 110, 140);
