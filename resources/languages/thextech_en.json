@@ -103,7 +103,7 @@
             "confirmConvertFormatTo": "Convert format to {0}?",
             "confirmSaveBeforeAction": "Save before you {0}?",
             "convert": {
-                "descNew": "The file extension will change but the old file will NOT be deleted.\n\nPlease check for lost features after saving.",
+                "descNew": "The file extension will change but the old file will NOT be deleted.\n\nPlease check for lost features after saving."
             },
             "formatLegacy": "Legacy",
             "formatModern": "Modern",
