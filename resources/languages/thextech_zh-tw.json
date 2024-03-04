@@ -123,7 +123,8 @@
                 "featuresWillBeLost": "下列特性將會丟失：",
                 "formatUnknown": "請求的格式不支持。",
                 "noIssues": "該操作不會造成任何兼容性問題。",
-                "featureBgoOrder": "背景對象設置了自定義疊放次序。"
+                "featureBgoOrder": "背景對象設置了自定義疊放次序。",
+                "descNew": "檔案格式將會轉換，但不會刪除原始檔。\n\n請在保存檔案之後檢查不支持的功能。"
             },
             "formatLegacy": "舊版本",
             "formatModern": "新版本",
