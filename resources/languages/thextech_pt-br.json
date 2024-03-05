@@ -22,7 +22,8 @@
                 "featureWorldStarDisplay": "Usa configurações de mundo para visualizar estrelas.",
                 "formatUnknown": "O formato especificado é desconhecido.",
                 "noIssues": "Sem problemas de compatibilidade.",
-                "desc": "A extensão do arquivo será alterada mas o arquivo antigo NÃO será apagado."
+                "desc": "A extensão do arquivo será alterada mas o arquivo antigo NÃO será apagado.",
+                "descNew": "A extensão será alterada, mas o arquivo NÃO será deletado.\n\nPor favor, confira os recursos que serão perdidos antes."
             },
             "formatLegacy": "Antigo (SMBX-64)",
             "formatModern": "Moderno (PGE-X)",
