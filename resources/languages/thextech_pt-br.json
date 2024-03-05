@@ -2,27 +2,6 @@
     "editor": {
         "file": {
             "convert": {
-                "featureLevelStarDisplay": "Um nível usa configurações para visualizar estrelas.",
-                "featuresWillBeLost": "Os recursos a seguir serão PERDIDOS:",
-                "_38aUnsupported": "O formato SMBX38-A não é suportado para conversões.",
-                "featureBgoOrder": "Um objeto de fundo (BGO) usa ordem de desenho personalizada.",
-                "featureBlockForceSmashable": "Um bloco giratório usa método de quebrar antigo.",
-                "featureCustomWorldMusic": "Usa música personalizada de mundo.",
-                "featureEventAutoscroll": "Um evento usa rolagem automática moderna.",
-                "featureEventCustomMusic": "Um evento altera música por um arquivo.",
-                "featureNPCVariant": "Um NPC usa uma variante de comportamento.",
-                "featureWarpCannonExit": "Um teleporte tem efeito de saída estilo canhão.",
-                "featureWarpCustomStarsMsg": "Um teleporte mostra mensagem personalizada com estrelas.",
-                "featureWarpEnterEvent": "Um teleporte ativa um evento na entrada.",
-                "featureWarpNeedsStand": "Um teleporte necessitar ter jogador parado em pé.",
-                "featureWarpNoPrintStars": "Um teleporte esconde objetivo de estrelas do nível.",
-                "featureWarpNoStartScene": "Um teleporte de nível pula cena inicial.",
-                "featureWarpPortal": "Um teleporte usa efeito estilo portal.",
-                "featureWarpTransit": "Um tteleporte usa um tipo de transição nova.",
-                "featureWorldStarDisplay": "Usa configurações de mundo para visualizar estrelas.",
-                "formatUnknown": "O formato especificado é desconhecido.",
-                "noIssues": "Sem problemas de compatibilidade.",
-                "desc": "A extensão do arquivo será alterada mas o arquivo antigo NÃO será apagado.",
                 "descNew": "A extensão será alterada, mas o arquivo NÃO será deletado.\n\nPor favor, confira os recursos que serão perdidos antes."
             },
             "formatLegacy": "Antigo (SMBX-64)",
