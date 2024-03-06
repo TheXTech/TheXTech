@@ -2,7 +2,7 @@
     "editor": {
         "block": {
             "canBreak": "Se rompe",
-            "canBreakTooltip": "Legado: se rompe cuando se golpea",
+            "canBreakTooltip": "Legado: se rompe cuando es golpeado",
             "inside": "Tiene:",
             "invis": "Invis",
             "slick": "Resbala",
@@ -81,7 +81,7 @@
             "layers": {
                 "headerMove": "Mover:",
                 "headerHide": "Esconde:",
-                "headerToggle": "Conmutar:",
+                "headerToggle": "Alternar:",
                 "headerShow": "Muestra:"
             }
         },
@@ -108,7 +108,10 @@
             "optionYesSaveThenAction": "Sí: guardar entonces {0}",
             "actionClearWorld": "Mundo terminado",
             "actionClearLevel": "Nivel terminado",
-            "labelCurrentFile": "Archivo actual: "
+            "labelCurrentFile": "Archivo actual: ",
+            "convert": {
+                "descNew": "La extensión de archivo cambiará, pero el archivo viejo NO SERÁ ELIMINADO.\n\nPor favor, revise las características perdidas después de guardar."
+            }
         },
         "layers": {
             "deletion": {
@@ -179,7 +182,9 @@
             "needKey": "Requiere Llave",
             "in": "Entrada",
             "out": "Salida",
-            "title": "Configuración de Pasaje"
+            "title": "Configuración de Pasaje",
+            "ride": "Montar",
+            "lvlWarp": "Pasaje de Nivel"
         },
         "letterRight": "R",
         "select": {
@@ -282,10 +287,13 @@
             "name": "Nombre del Mundo",
             "phraseCreditIndex": "Línea {0} de Créditos del Mundo:",
             "retryOnFail": "Reintentar En Fallo",
-            "allowChars": "Permitir Personajes"
+            "allowChars": "Permitir Personajes",
+            "totalStars": "Estrellas en total: "
         },
         "wordMode": "Modo",
-        "wordText": "Texto"
+        "wordText": "Texto",
+        "labelSortLayer": "Ordenar Capa:",
+        "labelSortOffset": "Ordenar Desplazamiento:"
     },
     "menu": {
         "game": {
@@ -306,7 +314,8 @@
             "errorResolution": "Lo sentimos. El editor del juego no es compatible con tu resolución actual.",
             "newWorld": "<Nuevo Mundo>",
             "errorMissingResources": "Lo sentimos. Te falta {0}, necesario para el editor del juego.",
-            "promptNewWorldName": "Nuevo nombre del mundo"
+            "promptNewWorldName": "Nuevo nombre del mundo",
+            "battles": "<Niveles de Batalla>"
         },
         "wordHide": "Ocultar",
         "options": {
@@ -330,7 +339,8 @@
             "mainMultiplayerGame": "Juego para 2 jugadores",
             "mainBattleGame": "Juego de batalla",
             "mainOptions": "Opciones",
-            "mainExit": "Salida"
+            "mainExit": "Salir",
+            "mainPlayEpisode": "Jugar Episodio"
         },
         "controls": {
             "wii": {
@@ -362,7 +372,8 @@
             "controlsDeleteKey": "(Salto Alternativo para Borrar)",
             "controlsNotInUse": "(No en uso)",
             "tDS": {
-                "buttonStart": "Comenzar"
+                "buttonStart": "Comenzar",
+                "casePen": "(Lápiz)"
             },
             "controlsDeviceTypes": "Tipos de Dispositivo",
             "caseInvalid": "(Inválido)",
@@ -370,9 +381,42 @@
             "controlsTitle": "Controles",
             "touchscreen": {
                 "option": {
-                    "holdRun": "Mantener \"Correr\" al Comenzar"
+                    "holdRun": "Mantener \"Correr\" al Comenzar",
+                    "showCodeButton": "Mostrar Botón de Código"
+                },
+                "layout": {
+                    "standard": "Estándar"
                 }
-            }
+            },
+            "cursor": {
+                "secondary": "Secundario",
+                "tertiary": "Terciario",
+                "primary": "Primario"
+            },
+            "hotkeys": {
+                "screenshot": "Captura de Pantalla",
+                "debugInfo": "Información de Depuración",
+                "enterCheats": "Introducir Código",
+                "fullscreen": "Pantalla Completa",
+                "toggleHUD": "Alternar HUD",
+                "recordGif": "Grabar GIF"
+            },
+            "profile": {
+                "activateProfile": "Activar perfil",
+                "deleteProfile": "Eliminar perfil"
+            },
+            "types": {
+                "keyboard": "Teclado",
+                "touchscreen": "Pantalla Táctil"
+            },
+            "caseTouch": "(Táctil)",
+            "options": {
+                "batteryStatus": "Estado de Batería"
+            },
+            "editor": {
+                "testPlay": "Juego de Prueba"
+            },
+            "controlsConnected": "Conectado:"
         },
         "wordLanguage": "Idioma",
         "wordPlayer": "Jugador",
@@ -392,7 +436,8 @@
         "battle": {
             "errorNoLevels": "Imposible comenzar batalla debido a que no hay niveles disponibles"
         },
-        "caseNone": "<Ninguno>"
+        "caseNone": "<Ninguno>",
+        "wordResume": "Reanudar"
     },
     "outro": {
         "originalBy": "Código original VB6 Por:",
@@ -404,7 +449,8 @@
         "engineCredits": "Créditos del motor:",
         "levelDesign": "Diseño de niveles:",
         "nameVitalyNovichkov": "Vitaly Novichkov",
-        "gameCredits": "Créditos del juego:"
+        "gameCredits": "Créditos del juego:",
+        "qualityControl": "Control de Calidad:"
     },
     "pluralRules": "one-is-singular",
     "game": {
@@ -436,10 +482,14 @@
             "saveAndQuit": "Guardar y Salir",
             "returnToEditor": "Regresar al Editor",
             "continue": "Continuar",
-            "quitTesting": "Dejar de Probar"
+            "quitTesting": "Dejar de Probar",
+            "enterCode": "Introducir Código"
         },
         "controls": {
             "phrasePlayerDisconnected": "P{0} desconectado"
+        },
+        "message": {
+            "scanningLevels": "Escaneando niveles..."
         }
     },
     "languageName": "Español"
