@@ -188,8 +188,48 @@
                 "wmusic16": "Cueva",
                 "wmusic14": "Cielo",
                 "wmusic15": "Isla",
-                "wmusic7": "Bosque"
+                "wmusic7": "Bosque",
+                "header": "Mundo",
+                "wmusic12": "Especial"
+            },
+            "fam-set3": {
+                "wmusic1": "Mundo 1",
+                "wmusic3": "Mundo 7",
+                "wmusic10": "Mundo 6",
+                "wmusic11": "Mundo 5",
+                "wmusic2": "Mundo 4",
+                "wmusic9": "Mundo 8",
+                "wmusic8": "Mundo 3",
+                "wmusic6": "Mundo 2"
+            },
+            "fam-new": {
+                "header": "Nuevo"
+            },
+            "auto": {
+                "wmusic0": "Ninguno"
             }
+        },
+        "sound": {
+            "fam-world": {
+                "header": "Mundo"
+            },
+            "fam-ui": {
+                "sound13": "Cámara",
+                "sound11": "Soltar Objeto",
+                "sound47": "Mensaje",
+                "sound30": "Pausa"
+            },
+            "fam-player": {
+                "sound75": "Lanzar Vegetal",
+                "sound76": "Perder Corazón"
+            }
+        },
+        "tile": {
+            "fam-wall2": "Pared de Tierra",
+            "fam-stonewall3": "Pared de Piedra",
+            "fam-lava3": "Lava",
+            "fam-dirt2": "Césped Muerto",
+            "fam-clouds4": "Nubes"
         }
     },
     "languageName": "Español",

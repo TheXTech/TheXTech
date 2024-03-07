@@ -194,22 +194,20 @@ bool DeathCounter::TryLoadStats()
     return true;
 }
 
-// UPDATE DEATHS - Determine if the main player has died and update death counter state if so
-void DeathCounter::UpdateDeaths(bool write_save)
+// mark that a death occurred in the current level
+void DeathCounter::MarkDeath(bool write_save)
 {
-    Player_t *demo = PlayerF::Get(1);
-    if(!demo)
+    bool dcAllow = (gEnableDemoCounterByLC || g_config.enable_fails_counter);
+
+    if(!dcAllow)
         return;
 
-    // For now, we'll assume the player died if player 1's death timer is at exactly 50 frames
-    if(demo->TimeToLive == 50)
+    AddDeath(FileNameFull, 1);
+
+    if(write_save)
     {
-        AddDeath(FileNameFull, 1);
-        if(write_save)
-        {
-            TrySave();
-            Recount();
-        }
+        TrySave();
+        Recount();
     }
 }
 

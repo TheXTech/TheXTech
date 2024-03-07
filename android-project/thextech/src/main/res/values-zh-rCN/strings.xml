@@ -3,9 +3,9 @@
     <string name="title_activity_game_settings">游戏设置</string>
     <string name="start_game_button">开始游戏</string>
     <string name="settings_button">设置</string>
-    <string name="setup_speedrunner">计时器</string>
-    <string name="setup_sr_stopwatchSemiTransparent">半透明计时器</string>
-    <string name="setup_sr_speedrunMode">计时模式</string>
+    <string name="setup_speedrunner">秒表计时</string>
+    <string name="setup_sr_stopwatchSemiTransparent">半透明秒表计时器</string>
+    <string name="setup_sr_speedrunMode">秒表计时模式</string>
     <string name="setup_touchscreen_mode">按键模式</string>
     <string name="setup_max_framerate_mode">禁用锁帧</string>
     <string name="setup_show_framerate">显示帧数</string>
@@ -16,12 +16,12 @@
     <string name="setup_general_cat">常规</string>
     <string name="setup_disable_sound">禁用声音</string>
     <string name="settings_enable_frameskip">启用跳帧</string>
-    <string name="game_logo_label">游戏 Logo</string>
+    <string name="game_logo_label">游戏Logo</string>
     <string name="setup_touchpad_style">控制器样式</string>
     <string name="managePermExplainTitle">需要文件访问权限</string>
     <string name="setup_assets_path_label">更改组件所在文件夹</string>
-    <string name="managePermExplainText">此游戏使用的是用户在直接在本地存储的数据（例如关卡、素材、音乐、声音、设置等），即允许用户修改或扩展内容。不幸的是安卓 11 以上的版本不支持设置目录权限。因此当游戏运行时，请您开启所有文件的访问权限。</string>
-    <string name="launcher_no_resources_question">此游戏需要组件才能运行，请您下载游戏组件并解压。现在要选择已经解压的游戏组件所在的文件夹吗？</string>
+    <string name="managePermExplainText">此游戏使用的是用户在直接在本地存储的数据（例如关卡、素材、音乐、音效、设置等），即允许用户修改或扩展内容。不幸的是安卓 11 以上的版本不支持设置文件夹权限。因此当游戏运行时，请您开启所有文件的访问权限。</string>
+    <string name="launcher_no_resources_question">此游戏需要相关的组件才能运行，请您下载游戏组件并解压。现在要选择已经解压的游戏组件所在的文件夹吗？</string>
     <string name="setup_feedback">反馈</string>
     <string name="setup_feedback_enable_vibration">启用震动</string>
     <string name="setup_feedback_vibration_strength">震动强度</string>
@@ -39,5 +39,5 @@
     <string name="launcher_gameselect_toast_selected">游戏已更改为：%s</string>
     <string name="launcher_gameselect_clearlist_question">要清除游戏列表吗？</string>
     <string name="launcher_openfile_indirectly">无法检索所打开文件的指定绝对路径，但已复制到该游戏所在的内置存储位置，因此无法加载外部资源（例如自定义素材、音乐、设置、脚本等）。您还要启动游戏吗？</string>
-    <string name="setup_renderer_label">图形渲染方式</string>
+    <string name="setup_renderer_label">图形渲染类型</string>
 </resources>
