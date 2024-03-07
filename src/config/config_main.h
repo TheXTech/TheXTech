@@ -803,6 +803,8 @@ public:
     // 1.3.6.5
     opt<bool> fix_visual_bugs{this, defaults(true), {CompatClass::standard_bugfix, false}, Scope::File,
         "fix-visual-bugs", "Fix visual bugs", "Fix misc visual bugs from SMBX 1.3"};
+    opt<bool> fix_npc_emerge_size{this, defaults(true), {CompatClass::standard_bugfix, false}, Scope::File,
+        "fix-npc-emerge-size", "Fix NPC emerge size", "Fix size of NPC emerging from a block"};
 
     // 1.3.7
     opt<bool> fix_npc_camera_logic{this, defaults(true), {CompatClass::critical_update, false}, Scope::File,

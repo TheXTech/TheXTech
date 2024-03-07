@@ -2148,6 +2148,11 @@ void UpdateGraphicsScreen(Screen_t& screen)
                     XRender::renderTexture(camX + NPC[A].Location.X + NPC[A]->FrameOffsetX, camY + NPC[A].Location.Y + NPC[A]->FrameOffsetY, NPC[A].Location.Width, NPC[A].Location.Height, GFXNPC[NPC[A].Type], NPC[A]->TWidth - NPC[A].Location.Width, NPC[A].Frame * NPC[A]->THeight, cn);
                 }
             }
+            // fix a graphical SMBX64 bug where the draw width and frame stride were incorrect
+            else if(NPC[A]->WidthGFX != 0 && NPC[A].Effect == NPCEFF_EMERGE_UP && g_config.fix_visual_bugs)
+            {
+                XRender::renderTexture(camX + NPC[A].Location.X + NPC[A]->FrameOffsetX - NPC[A]->WidthGFX / 2.0 + NPC[A].Location.Width / 2.0, camY + NPC[A].Location.Y + NPC[A]->FrameOffsetY, NPC[A]->WidthGFX, NPC[A].Location.Height, GFXNPC[NPC[A].Type], 0, NPC[A].Frame * NPC[A]->HeightGFX, cn);
+            }
             else if(NPC[A]->WidthGFX == 0 || NPC[A].Effect == NPCEFF_EMERGE_UP)
             {
                 XRender::renderTexture(camX + NPC[A].Location.X + NPC[A]->FrameOffsetX, camY + NPC[A].Location.Y + NPC[A]->FrameOffsetY, NPC[A].Location.Width, NPC[A].Location.Height, GFXNPC[NPC[A].Type], 0, NPC[A].Frame * NPC[A]->THeight, cn);

@@ -5459,7 +5459,6 @@ void UpdateNPCs()
             }
             else if(NPC[A].Effect == NPCEFF_EMERGE_UP) // Bonus coming out of a block effect
             {
-
                 if(NPC[A].Direction == 0.0f) // Move toward the closest player
                 {
                     double C = 0;
@@ -5555,7 +5554,8 @@ void UpdateNPCs()
                 {
                     NPC[A].Effect = NPCEFF_NORMAL;
                     NPC[A].Effect2 = 0;
-                    NPC[A].Location.Height = 32;
+
+                    NPC[A].Location.Height = (g_config.fix_npc_emerge_size) ? NPC[A]->THeight : 32;
 
                     for(int bCheck = 1; bCheck <= 2; bCheck++)
                     {
