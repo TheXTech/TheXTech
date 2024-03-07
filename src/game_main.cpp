@@ -2089,6 +2089,7 @@ void StartEpisode()
     Lives = 3;
     LevelSelect = true;
     GameMenu = false;
+    UpdateInternalRes();
     XRender::setTargetTexture();
     XRender::clearBuffer();
     XRender::repaint();

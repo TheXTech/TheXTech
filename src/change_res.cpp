@@ -73,6 +73,8 @@ void ChangeRes(int, int, int, int)
 
 void UpdateInternalRes()
 {
+    bool ignore_compat = GameMenu && (g_config.speedrun_mode.m_set < ConfigSetLevel::cmdline);
+
     int req_w = g_config.internal_res.m_value.first;
     int req_h = g_config.internal_res.m_value.second;
 
@@ -87,7 +89,7 @@ void UpdateInternalRes()
     int canon_w = 800;
     int canon_h = 600;
 
-    if(!g_config.allow_multires)
+    if(!g_config.allow_multires && !ignore_compat)
     {
         if((req_w != 0 && req_w < canon_w) || (req_h != 0 && req_h < canon_h))
         {
@@ -184,7 +186,7 @@ void UpdateInternalRes()
         }
 
         // force >800x600 resolution if required
-        if(!g_config.allow_multires)
+        if(!g_config.allow_multires && !ignore_compat)
         {
             if(int_w < canon_w)
             {
@@ -231,7 +233,7 @@ void UpdateInternalRes()
     }
 
     // DONE: above should tweak render target resolution. This should tweak game's screen resolution.
-    if(g_config.allow_multires && g_config.dynamic_camera_logic)
+    if(ignore_compat || (g_config.allow_multires && g_config.dynamic_camera_logic))
     {
         l_screen->W = XRender::TargetW;
         l_screen->H = XRender::TargetH;
