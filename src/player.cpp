@@ -52,6 +52,7 @@
 #include "core/render.h"
 #include "core/events.h"
 #include "compat.h"
+#include "script/luna/lunacounter.h"
 
 #include "npc/npc_queues.h"
 
@@ -1104,6 +1105,9 @@ void EveryonesDead()
         if(!MaxFPS)
             PGE_Delay(500);
     }
+
+    if(g_ClonedPlayerMode)
+        gDeathCounter.MarkDeath();
 
     if(g_compatibility.modern_lives_system)
     {
