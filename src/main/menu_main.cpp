@@ -2352,16 +2352,8 @@ static void s_drawGameSaves(int MenuX, int MenuY)
     int infobox_x = XRender::TargetW / 2 - 240;
     int infobox_y = MenuY + 145 + c_menuSavesOffsetY;
 
-    // forbid continuing speedrun on old save
-    if(info.ConfigDefaults == 0 && info.Progress >= 0 && g_config.speedrun_mode != 0)
-    {
-        XRender::renderRect(XRender::TargetW / 2 - 240, infobox_y, 480, 68, {0, 0, 0});
-        SuperPrintScreenCenter("YOU CAN'T START SPEEDRUN", 3, infobox_y + 4, XTColorF(1.0f, 0.0f, 0.0f, 1.0f));
-        SuperPrintScreenCenter("ON AN EXISTING SAVE.", 3, infobox_y + 24, XTColorF(1.0f, 0.0f, 0.0f, 1.0f));
-        SuperPrintScreenCenter("SORRY.", 3, infobox_y + 44, XTColorF(1.0f, 0.0f, 0.0f, 1.0f));
-    }
     // forbid incompatible speedrun
-    else if(g_config.speedrun_mode != 0 && g_config.speedrun_mode.m_set == ConfigSetLevel::cmdline && g_config.speedrun_mode != -info.ConfigDefaults
+    if(g_config.speedrun_mode != 0 && g_config.speedrun_mode.m_set >= ConfigSetLevel::cmdline && g_config.speedrun_mode != -info.ConfigDefaults
         && (info.ConfigDefaults != 0 || info.Progress >= 0))
     {
         XRender::renderRect(XRender::TargetW / 2 - 240, infobox_y, 480, 68, XTColorF(0, 0, 0, 1.0f));

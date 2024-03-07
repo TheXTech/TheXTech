@@ -206,6 +206,17 @@ void FindSaves()
                 }
             }
 
+            // default config if not present
+            if(info.ConfigDefaults == 0)
+            {
+                if(f.meta.smbx64strict)
+                    info.ConfigDefaults = Config_t::BUGFIXES_NONE + 1;
+                else if(w.bugfixes_on_by_default)
+                    info.ConfigDefaults = Config_t::BUGFIXES_ALL + 1;
+                else
+                    info.ConfigDefaults = Config_t::BUGFIXES_CRITICAL + 1;
+            }
+
             // load timer info for existing save
             std::string savePath = makeGameSavePath(episode,
                                                      w.WorldFile,
