@@ -112,8 +112,6 @@ void lunaLoad()
 
 void lunaLoop()
 {
-    bool dcAllow = (gEnableDemoCounter || gEnableDemoCounterByLC || g_compatibility.demos_counter_enable);
-
     if(gLunaEnabledGlobally)
     {
         // Clean up
@@ -123,9 +121,6 @@ void lunaLoop()
         Input::CheckSpecialCheats();
         Input::UpdateInputTasks();
     }
-
-    if(dcAllow)
-        gDeathCounter.UpdateDeaths(true);
 
     if(!LevelEditor && gLunaEnabled && lunaAllowed())
     {

@@ -41,6 +41,7 @@
 #include "../graphics.h"
 #include "../controls.h"
 #include "../script/msg_preprocessor.h"
+#include "script/luna/lunacounter.h"
 
 #include "npc_id.h"
 #include "eff_id.h"
@@ -206,6 +207,10 @@ void UpdatePlayer()
         if(Player[A].TimeToLive > 0)
         {
             Player[A].TimeToLive += 1;
+
+            if(Player[A].TimeToLive == 50 && !g_ClonedPlayerMode)
+                gDeathCounter.MarkDeath();
+
             if(Player[A].TimeToLive >= 200 || ScreenType != 5)
             {
                 B = CheckLiving();
