@@ -97,6 +97,7 @@ struct Compatibility_t
     bool pound_by_alt_run; // use alt run for pound action when player is in a purple pet mount
     // 1.3.6.5
     bool fix_visual_bugs; // fix misc visual bugs from SMBX 1.3
+    bool fix_npc_emerge_size; // fix size of NPC emerging from a block
 
     // SpeedRun section
     enum

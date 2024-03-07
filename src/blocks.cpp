@@ -670,7 +670,9 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
             }
 
             CharStuff(numNPCs);
-            nn.Location.Width = NPCWidth[C];
+            // note: minor SMBX64 bugfix, should be NPCWidth[nn.Type] in case nn's type has changed
+            nn.Location.Width = (g_compatibility.fix_npc_emerge_size) ? NPCWidth[nn.Type] : NPCWidth[C];
+
 
             // Make block a bit smaller to allow player take a bonus easier (Redigit's idea)
             if(fEqual(b.Location.Width, 32)/* && !b.getShrinkResized()*/) // moved check above so that the width is not reset to 32 in the first place
