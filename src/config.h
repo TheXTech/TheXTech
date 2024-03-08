@@ -33,9 +33,9 @@ extern struct Config_t
     //! Use the native onscreen keyboard instead of the TheXTech one
     bool    use_native_osk = false;
     //! Enable the in-game editor
-    bool    enable_editor = true;
+    static constexpr bool enable_editor = true;
     //! Preferred file format for editor (0 is Moondust engine lvlx format)
-    int     editor_preferred_file_format = 0;
+    // int     editor_preferred_file_format = 0;
     //! User's preferred language / dialect
     std::string language = "auto";
 

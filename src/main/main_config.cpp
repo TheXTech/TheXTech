@@ -332,8 +332,8 @@ void OpenConfig()
         config.read("full-screen", resBool, false);
         config.read("record-gameplay", g_config.RecordGameplayData, false);
         config.read("use-native-osk", g_config.use_native_osk, false);
-        config.read("new-editor", g_config.enable_editor, false);
-        config.read("enable-editor", g_config.enable_editor, g_config.enable_editor);
+        // config.read("new-editor", g_config.enable_editor, false);
+        // config.read("enable-editor", g_config.enable_editor, g_config.enable_editor);
         config.endGroup();
 
         config.beginGroup("video");
@@ -413,8 +413,8 @@ void SaveConfig()
     config.setValue("full-screen", resChanged);
 #endif
     config.setValue("record-gameplay", g_config.RecordGameplayData);
-    config.setValue("use-native-osk", g_config.use_native_osk);
-    config.setValue("enable-editor", g_config.enable_editor);
+    // config.setValue("use-native-osk", g_config.use_native_osk);
+    // config.setValue("enable-editor", g_config.enable_editor);
     config.setValue("language", g_config.language);
     config.endGroup();
 
