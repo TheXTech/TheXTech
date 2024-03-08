@@ -152,8 +152,10 @@ public:
         "language", "Language", "Language in which to display all game engine text",
         config_language_set};
 
-    opt<bool> record_gameplay_data{this, defaults(false), {}, Scope::UserGlobal,
-        "record-gameplay-data", "Record gameplay data", "Records your control input for replay or debugging purposes"};
+        static constexpr bool record_gameplay_data = false;
+
+    // opt<bool> record_gameplay_data{this, defaults(false), {}, Scope::UserGlobal,
+    //     "record-gameplay-data", "Record gameplay data", "Records your control input for replay or debugging purposes"};
 
     // opt<bool> loading_show_debug{this, defaults(false), {}, Scope::UserGlobal,
     //     "loading-show-debug", "Show loading messages", "Show debug string during the loading process"};
