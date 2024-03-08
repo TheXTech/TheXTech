@@ -98,14 +98,6 @@ void Config_t::LoadLegacySettings(IniProcessing* ini, ConfigSetLevel level)
     ini->endGroup();
 #endif
 
-    ini->beginGroup("video");
-    if(ini->hasKey("scale-down-all-textures"))
-    {
-        bool scale_down_all;
-        ini->read("scale-down-all-textures", scale_down_all, false);
-        scale_down_textures = scale_down_all ? SCALE_DOWN_ALL : SCALE_DOWN_SAFE;
-        scale_down_textures.m_set = level;
-    }
 #ifndef NO_WINDOW_FOCUS_TRACKING
     if(ini->hasKey("background-controller-input"))
     {

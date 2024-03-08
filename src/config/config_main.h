@@ -331,6 +331,10 @@ public:
         SCALE_DOWN_SAFE = 1,
         SCALE_DOWN_ALL = 2,
     };
+
+    static constexpr int scale_down_textures = SCALE_DOWN_SAFE;
+
+#if 0
     opt_enum<int> scale_down_textures{this,
         {
             {SCALE_DOWN_NONE, "none", "None", nullptr},
@@ -339,6 +343,7 @@ public:
         },
         defaults(SCALE_DOWN_SAFE), {}, Scope::UserGlobal,
         "scale-down-textures", "Scale down textures", "The game should scale textures from 2x to 1x to save video memory at the expense of texture load stutter"};
+#endif
 
     /* ---- Video - Meta Info ----*/
     subsection info_meta{this, "info-meta", "Onscreen meta info"};
