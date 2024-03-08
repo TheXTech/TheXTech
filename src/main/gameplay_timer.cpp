@@ -131,6 +131,7 @@ GameplayTimer::GameplayTimer() = default;
 
 void GameplayTimer::reset()
 {
+    m_invalidContinue = false;
     m_cyclesInt = false;
     m_cyclesFin = false;
     m_cyclesCurrent = 0;
@@ -168,12 +169,15 @@ void GameplayTimer::load()
     o.read("total", m_cyclesTotal, 0);
     m_cyclesCurrent = 0; // Reset the counter
     o.endGroup();
+
+    if(!m_cyclesInt)
+        m_invalidContinue = true;
 }
 
 void GameplayTimer::save()
 {
     // should Cheater also be a condition here?
-    if(TestLevel || !selSave)
+    if(TestLevel || !selSave || m_invalidContinue)
         return;
 
     IniProcessing o;
@@ -193,6 +197,9 @@ void GameplayTimer::save()
 
 void GameplayTimer::tick()
 {
+    if(m_invalidContinue)
+        return;
+
     // initialize timer
     if(!m_cyclesInt)
     {
@@ -236,6 +243,9 @@ void GameplayTimer::onBossDead()
 
 void GameplayTimer::render()
 {
+    if(m_invalidContinue)
+        return;
+
     float a = (g_config.show_playtime_counter == Config_t::PLAYTIME_COUNTER_SUBTLE) ? 0.5f : 1.f;
     // int x = (XRender::TargetW / 2) - (144 / 2);
     int y = XRender::TargetH;
