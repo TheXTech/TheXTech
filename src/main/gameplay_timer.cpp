@@ -197,9 +197,6 @@ void GameplayTimer::save()
 
 void GameplayTimer::tick()
 {
-    if(m_invalidContinue)
-        return;
-
     // initialize timer
     if(!m_cyclesInt)
     {
@@ -243,9 +240,6 @@ void GameplayTimer::onBossDead()
 
 void GameplayTimer::render()
 {
-    if(m_invalidContinue)
-        return;
-
     float a = (g_config.show_playtime_counter == Config_t::PLAYTIME_COUNTER_SUBTLE) ? 0.5f : 1.f;
     // int x = (XRender::TargetW / 2) - (144 / 2);
     int y = XRender::TargetH;
@@ -260,6 +254,8 @@ void GameplayTimer::render()
 
     SuperPrintScreenCenter(formatTime(m_cyclesCurrent), 3, y - 34, XTColorF(lc[0], lc[1], lc[2], a));
 
-    if(!TestLevel)
+    if(m_invalidContinue)
+        SuperPrintScreenCenter(g_mainMenu.caseNone,         3, y - 18, XTColorF(0.5f, 0.5f, 0.5f, a));
+    else if(!TestLevel)
         SuperPrintScreenCenter(formatTime(m_cyclesTotal),   3, y - 18, XTColorF(wc, 1.0f, wc, a));
 }
