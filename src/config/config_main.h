@@ -160,19 +160,6 @@ public:
     // opt<bool> loading_show_debug{this, defaults(false), {}, Scope::UserGlobal,
     //     "loading-show-debug", "Show loading messages", "Show debug string during the loading process"};
 
-    opt<bool> enable_frameskip{this, defaults(false), {}, Scope::UserGlobal,
-        "frame-skip", "Enable frameskip", "The game should skip rendering some frames to attempt to maintain normal game speed"};
-
-    opt<bool> unlimited_framerate{this, defaults(false), {}, Scope::UserGlobal,
-        "unlimited-framerate", "Unlimited framerate", "The game should not limit the framerate to 66 FPS"};
-
-#ifndef NO_WINDOW_FOCUS_TRACKING
-    opt<bool> background_work{this, defaults(false), {}, Scope::UserGlobal,
-        "background-work", "Run in background", "The game should not pause when the window focus is lost (input only works with game controllers)"};
-#else
-    static constexpr bool background_work = true;
-#endif
-
     opt_enum<int> log_level{this,
         {
             {PGE_LogLevel::NoLog, "none", "None", nullptr},
@@ -203,13 +190,30 @@ public:
         config_integrations_set};
 #endif
 
-    /* ---- Main - Input ----*/
-    subsection main_input{this, "input", "Input"};
-
 #if defined(__ANDROID__) || defined(__3DS__)
     opt<bool> use_native_osk{this, defaults(false), {}, Scope::UserGlobal,
         "use-native-osk", "Use native OSK", "Use system's native onscreen keyboard instead of the TheXTech one"};
 #endif
+
+    /* ---- Main - Frame Timing ----*/
+    subsection main_frame_timing{this, "timing", "Frame Timing"};
+
+    opt<bool> enable_frameskip{this, defaults(false), {}, Scope::UserGlobal,
+        "frame-skip", "Enable frameskip", "The game should skip rendering some frames to attempt to maintain normal game speed"};
+
+    opt<bool> unlimited_framerate{this, defaults(false), {}, Scope::UserGlobal,
+        "unlimited-framerate", "Unlimited framerate", "The game should not limit the framerate to 66 FPS"};
+
+#ifndef NO_WINDOW_FOCUS_TRACKING
+    opt<bool> background_work{this, defaults(false), {}, Scope::UserGlobal,
+        "background-work", "Run in background", "The game should not pause when the window focus is lost (input only works with game controllers)"};
+#else
+    static constexpr bool background_work = true;
+#endif
+
+    opt<bool> render_vsync{this, defaults(false), {}, Scope::UserGlobal,
+        "vsync", "V-Sync", "Synchronizes the game speed to the screen refresh rate",
+        config_res_set};
 
     /* ---- Main - Editor ----*/
     // subsection editor{this, "editor", "Editor"};
@@ -269,10 +273,6 @@ public:
         "render", "Render mode", "Describes whether the game should use the platform's accelerated rendering",
         config_rendermode_set};
 #endif
-
-    opt<bool> render_vsync{this, defaults(false), {}, Scope::UserGlobal,
-        "vsync", "V-Sync", "Synchronizes the game speed to the screen refresh rate",
-        config_res_set};
 
 #ifndef RENDER_FULLSCREEN_ALWAYS
     opt<bool> fullscreen{this, defaults(false), {}, Scope::UserGlobal,
