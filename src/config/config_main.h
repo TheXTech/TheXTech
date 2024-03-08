@@ -664,16 +664,16 @@ public:
     opt<bool> world_map_lvlname_marquee{this, defaults(false), {CompatClass::pure_preference, false}, Scope::Episode,
     "world-map-lvlname-marquee", "Level name marquee", "In the world map, use a marquee effect for the level name instead of splitting it over two lines"};
 
-    opt<bool> fix_vanilla_checkpoints{this, defaults(true), {CompatClass::standard_bugfix, false}, Scope::File,
+    opt<bool> fix_vanilla_checkpoints{this, defaults(true), {CompatClass::standard_update, false}, Scope::File,
         "fix-vanilla-checkpoints", "Fix vanilla checkpoints", "Resume from the most recently touched checkpoint after death"};
-    opt<bool> enable_last_warp_hub_resume{this, defaults(true), {CompatClass::standard_bugfix, false}, Scope::Episode,
+    opt<bool> enable_last_warp_hub_resume{this, defaults(true), {CompatClass::standard_update, false}, Scope::Episode,
         "enable-last-warp-hub-resume", "Save warp in hub", "In a hub world, resume play at the last warp you entered the hub level from"};
-    opt<bool> disable_background2_tiling{this, defaults(false), {CompatClass::standard_bugfix, true}, Scope::Local,
+    opt<bool> disable_background2_tiling{this, defaults(false), {CompatClass::standard_update, true}, Scope::Local,
         "disable-background2-tiling", "Disable BG tiling", "Disable tiling of the level background texture if it causes visual disturbances"};
     opt<bool> modern_section_change{this, defaults(true), {CompatClass::critical_update, false}, Scope::File,
         "modern-section-change", "Modern section change", "Animate sections resizing when they shrink or during 2-player mode"};
 
-    opt<bool> extra_screen_shake{this, defaults(true), {CompatClass::gameplay_enhancement, false}, Scope::Local,
+    opt<bool> extra_screen_shake{this, defaults(true), {CompatClass::standard_update, false}, Scope::Local,
         "extra-screen-shake", "Extra screen shake", "Shake screen for large enemy and player ground pounds"};
 
     opt<bool> enable_playtime_counter{this, defaults(true), {CompatClass::pure_preference, false}, Scope::File,
@@ -681,7 +681,7 @@ public:
     opt<bool> enable_fails_counter{this, defaults(true), {}, Scope::File,
         "enable-fails-counter", "Enable fails counter", "Count the number of fails on the current level and world"};
 
-    opt<bool> world_map_fast_move{this, defaults(true), {CompatClass::gameplay_enhancement, false}, Scope::Local,
+    opt<bool> world_map_fast_move{this, defaults(true), {CompatClass::standard_update, false}, Scope::Local,
         "world-map-fast-move", "Automatic movement", "Moves automatically between forks on the path"};
 
     /* ---- Compatibility - Autocode ----*/
@@ -700,9 +700,9 @@ public:
     subsection bugfixes{this, "bugfixes", "Bugfixes"};
 
     // <1.3.4
-    opt<bool> fix_restored_block_move{this, defaults(true), {CompatClass::standard_bugfix, false}, Scope::File,
+    opt<bool> fix_restored_block_move{this, defaults(true), {CompatClass::standard_update, false}, Scope::File,
         "fix-restored-block-move", "Fix restored block move", "Don't move powerup blocks to the right when they are hit after restoring"};
-    opt<bool> fix_player_slope_speed{this, defaults(true), {CompatClass::standard_bugfix, false}, Scope::File,
+    opt<bool> fix_player_slope_speed{this, defaults(true), {CompatClass::standard_update, false}, Scope::File,
         "fix-player-slope-speed", "Player slope speed", nullptr};
     // 1.3.4
     opt<bool> fix_player_filter_bounce{this, defaults(true), {CompatClass::critical_update, false}, Scope::File,
@@ -713,25 +713,25 @@ public:
         "fix-player-downward-clip", "Player downward clip", nullptr};
     opt<bool> fix_npc_downward_clip{this, defaults(true), {CompatClass::critical_update, false}, Scope::File,
         "fix-npc-downward-clip", "NPC downward clip", nullptr};
-    opt<bool> fix_npc247_collapse{this, defaults(true), {CompatClass::standard_bugfix, false}, Scope::File,
+    opt<bool> fix_npc247_collapse{this, defaults(true), {CompatClass::standard_update, false}, Scope::File,
         "fix-npc247-collapse", "NPC 247 collapse", "Prevents the stacked spiky plants from collapsing incorrectly"};
     opt<bool> fix_platforms_acceleration{this, defaults(true), {CompatClass::critical_update, false}, Scope::File,
         "fix-platform-acceleration", "Platform acceleration", nullptr};
-    opt<bool> fix_npc55_kick_ice_blocks{this, defaults(true), {CompatClass::standard_bugfix, false}, Scope::File,
+    opt<bool> fix_npc55_kick_ice_blocks{this, defaults(true), {CompatClass::standard_update, false}, Scope::File,
         "fix-npc55-kick-ice-blocks", "NPC55 kick ice blocks", "The beached turtle should not sadly kick ice blocks"};
-    opt<bool> fix_climb_invisible_fences{this, defaults(true), {CompatClass::standard_bugfix, false}, Scope::File,
+    opt<bool> fix_climb_invisible_fences{this, defaults(true), {CompatClass::standard_update, false}, Scope::File,
         "fix-climb-invisible-fences", "Don't climb hidden fences", nullptr};
-    opt<bool> fix_climb_bgo_speed_adding{this, defaults(true), {CompatClass::standard_bugfix, false}, Scope::File,
+    opt<bool> fix_climb_bgo_speed_adding{this, defaults(true), {CompatClass::standard_update, false}, Scope::File,
         "fix-climb-bgo-speed-adding", "Climb BGO speed adding", nullptr};
-    opt<bool> fix_climb_bgo_layer_move{this, defaults(true), {CompatClass::standard_bugfix, false}, Scope::File,
+    opt<bool> fix_climb_bgo_layer_move{this, defaults(true), {CompatClass::standard_update, false}, Scope::File,
         "enable-climb-bgo-layer-move", "Climb moving BGOs", nullptr};
-    opt<bool> fix_skull_raft{this, defaults(true), {CompatClass::standard_bugfix, false}, Scope::File,
+    opt<bool> fix_skull_raft{this, defaults(true), {CompatClass::standard_update, false}, Scope::File,
         "fix-skull-raft", "Skull raft", nullptr};
     opt<bool> fix_char3_escape_shell_surf{this, defaults(true), {CompatClass::critical_update, false}, Scope::File,
         "fix-char3-escape-shell-surf", "Char 3 escape shell surf", nullptr};
-    opt<bool> fix_plant_wobble{this, defaults(true), {CompatClass::standard_bugfix, false}, Scope::File,
+    opt<bool> fix_plant_wobble{this, defaults(true), {CompatClass::standard_update, false}, Scope::File,
         "fix-plant-wobble", "Fix plant wobble", "Plants should correctly resize instead of appearing to change size / position"};
-    opt<bool> fix_powerup_lava_bug{this, defaults(true), {CompatClass::standard_bugfix, false}, Scope::File,
+    opt<bool> fix_powerup_lava_bug{this, defaults(true), {CompatClass::standard_update, false}, Scope::File,
         "fix-powerup-lava-bug", "Fix powerup lava bug", "Powerups should be destroyed when hitting lava instead of surviving depending on the current NPC array"};
     // opt<bool> fix_keyhole_framerate{this, defaults(true), {VER_THEXTECH134, CompatClass::critical_update, false}, Scope::File,
     //     "fix-keyhole-framerate", "Fix keyhole framerate", nullptr};
@@ -740,22 +740,22 @@ public:
         "fix-char5-vehicle-climb", "Fix char 5 car fairy", nullptr};
     opt<bool> fix_vehicle_char_switch{this, defaults(true), {CompatClass::critical_update, false}, Scope::File,
         "fix-vehicle-char-switch", "Don't switch character by car", nullptr};
-    opt<bool> fix_autoscroll_speed{this, defaults(true), {CompatClass::standard_bugfix, false}, Scope::File,
+    opt<bool> fix_autoscroll_speed{this, defaults(true), {CompatClass::standard_update, false}, Scope::File,
         "fix-autoscroll-speed", "Autoscroll speed", nullptr};
-    opt<bool> fix_submerged_splash_effect{this, defaults(true), {CompatClass::standard_bugfix, false}, Scope::File,
+    opt<bool> fix_submerged_splash_effect{this, defaults(true), {CompatClass::standard_update, false}, Scope::File,
         "fix-submerged-splash-effect", "Fix submerged splash effect", "Don't make a splash effect for items already underwater"};
     // 1.3.5.1
-    opt<bool> fix_squid_stomp_effect{this, defaults(true), {CompatClass::standard_bugfix, false}, Scope::File,
+    opt<bool> fix_squid_stomp_effect{this, defaults(true), {CompatClass::standard_update, false}, Scope::File,
         "fix-squid-stomp-effect", "Fix calamari stomp effect", nullptr};
     // deprecated, fixed non-vanilla bug
     // opt<bool> keep_bullet_bill_dir{this, defaults(true), {VER_THEXTECH1351, CompatClass::critical_update, false}, Scope::File,
     //     "keep-bullet-bill-direction", "Keep bullet dir", nullptr};
-    opt<bool> fix_special_coin_switch{this, defaults(true), {CompatClass::standard_bugfix, false}, Scope::File,
+    opt<bool> fix_special_coin_switch{this, defaults(true), {CompatClass::standard_update, false}, Scope::File,
         "fix-special-coin-switch", "Preserve special coins", "Don't turn special coins into blocks when pressing switch"};
     // 1.3.5.2
-    opt<bool> fix_bat_start_while_inactive{this, defaults(true), {CompatClass::standard_bugfix, false}, Scope::File,
+    opt<bool> fix_bat_start_while_inactive{this, defaults(true), {CompatClass::standard_update, false}, Scope::File,
         "fix-bat-start-while-inactive", "Bat start", "Don't activate the bats until they are onscreen"};
-    // opt<bool> fix_FreezeNPCs_no_reset{this, defaults(false), {VER_THEXTECH137, CompatClass::standard_bugfix, false}, Scope::None,
+    // opt<bool> fix_FreezeNPCs_no_reset{this, defaults(false), {VER_THEXTECH137, CompatClass::standard_update, false}, Scope::None,
     //     "fix-FreezeNPCs-no-reset", "'Fix' FreezeNPCs", "There is a bug that results in NPCs vanishing after getting a freeze clock, but this 'fix' introduces other bugs"};
     static constexpr bool fix_FreezeNPCs_no_reset = false;
     // 1.3.5.3
@@ -764,22 +764,22 @@ public:
     // 1.3.6
     opt<bool> fix_fairy_stuck_in_pipe{this, defaults(true), {CompatClass::critical_update, false}, Scope::File,
         "fix-fairy-stuck-in-pipe", "Fairy stuck in pipe", nullptr};
-    opt<bool> fix_flamethrower_gravity{this, defaults(true), {CompatClass::standard_bugfix, false}, Scope::File,
+    opt<bool> fix_flamethrower_gravity{this, defaults(true), {CompatClass::standard_update, false}, Scope::File,
         "fix-flamethrower-gravity", "Flamethrower gravity", "Should this have even been made?"};
     // 1.3.6.1
-    opt<bool> fix_npc_ceiling_speed{this, defaults(true), {CompatClass::standard_bugfix, false}, Scope::File,
+    opt<bool> fix_npc_ceiling_speed{this, defaults(true), {CompatClass::standard_update, false}, Scope::File,
         "fix-npc-ceiling-speed", "Fix NPC ceiling speed", "Don't stick a thrown NPC to ceiling when a layer is moving"};
     opt<bool> emulate_classic_block_order{this, defaults(false), {CompatClass::critical_update, true}, Scope::File,
         "emulate-classic-block-order", "Emulate classic block order", "Use the classic game's block sorting methods internally for frame-perfect compatibility"};
-    opt<bool> custom_powerup_collect_score{this, defaults(true), {CompatClass::standard_bugfix, false}, Scope::File,
+    opt<bool> custom_powerup_collect_score{this, defaults(true), {CompatClass::standard_update, false}, Scope::File,
         "custom-powerup-collect-score", "Custom powerup collect score", "Collected powerups give score from npc-X.txt"};
     opt<bool> fix_player_crush_death{this, defaults(true), {CompatClass::critical_update, false}, Scope::File,
         "fix-player-crush-death", "Fix player crush death", "Player should not be crushed by corners of slopes or by hitting a horizontally moving ceiling"};
     opt<bool> fix_pound_skip_warp{this, defaults(true), {CompatClass::critical_update, false}, Scope::File,
         "fix-pound-skip-warp", "Fix pound skip warp", "Pound move should not skip instant / portal warps"};
-    opt<bool> fix_held_item_cancel{this, defaults(true), {CompatClass::standard_bugfix, false}, Scope::File,
+    opt<bool> fix_held_item_cancel{this, defaults(true), {CompatClass::standard_update, false}, Scope::File,
         "fix-held-item-cancel", "Fix held item cancel", "Do not cancel held item hitting hostile NPC that intersects with an immune NPC"};
-    opt<bool> fix_frame_perfect_despawn{this, defaults(true), {CompatClass::standard_bugfix, false}, Scope::File,
+    opt<bool> fix_frame_perfect_despawn{this, defaults(true), {CompatClass::standard_update, false}, Scope::File,
         "fix-frame-perfect-despawn", "Fix frame perfect despawn", "If NPC comes onscreen later in the same frame it timed out, should still be able to spawn"};
 
     // TODO: implement proper read/write operations
@@ -791,19 +791,19 @@ public:
         "pound-by-alt-run", "Pound by alt run", "Use Alt Run for Pound action when player is in a purple pet mount"};
 
     // 1.3.6.5
-    opt<bool> fix_visual_bugs{this, defaults(true), {CompatClass::standard_bugfix, false}, Scope::File,
+    opt<bool> fix_visual_bugs{this, defaults(true), {CompatClass::standard_update, false}, Scope::File,
         "fix-visual-bugs", "Fix visual bugs", "Fix misc visual bugs from SMBX 1.3"};
-    opt<bool> fix_npc_emerge_size{this, defaults(true), {CompatClass::standard_bugfix, false}, Scope::File,
+    opt<bool> fix_npc_emerge_size{this, defaults(true), {CompatClass::standard_update, false}, Scope::File,
         "fix-npc-emerge-size", "Fix NPC emerge size", "Fix size of NPC emerging from a block"};
 
     // 1.3.7
     opt<bool> fix_npc_camera_logic{this, defaults(true), {CompatClass::critical_update, false}, Scope::File,
         "fix-npc-camera-logic", "Fix NPC camera logic", "NPCs should support more than two cameras"};
-    opt<bool> modern_npc_targeting{this, defaults(true), {CompatClass::standard_bugfix, false}, Scope::File,
+    opt<bool> modern_npc_targeting{this, defaults(true), {CompatClass::standard_update, false}, Scope::File,
         "modern-npc-targeting", "Modern NPC targeting", "Updated NPC targeting logic in multiplayer"};
     opt<bool> allow_multires{this, defaults(true), {CompatClass::critical_update, false}, Scope::Local,
         "allow-multires", "Allow multires", "Allows the gameplay field to be <800x600", config_res_set};
-    opt<bool> dynamic_camera_logic{this, defaults(true), {CompatClass::standard_bugfix, false}, Scope::File,
+    opt<bool> dynamic_camera_logic{this, defaults(true), {CompatClass::standard_update, false}, Scope::File,
         "dynamic-camera-logic", "Dynamic camera logic", "Allow a non-800x600 camera for most logic, and only use the event logic camera in rare cases",
         config_res_set};
     opt<bool> modern_lives_system{this, defaults(true), {CompatClass::critical_update, false}, Scope::None,

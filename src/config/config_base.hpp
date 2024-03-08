@@ -108,8 +108,7 @@ enum class CompatClass
 {
     pure_preference,      // user-side preference (or gameinfo value) that does not impact game logic at all
     critical_update,      // performance- and flexibility-critical enhancements and bugfixes that prevent predictable unfair deaths, disabled in SMBX64 compat mode only
-    gameplay_enhancement, // these are normally preferences: cosmetic enhancements that interact in some way with the game's logic (such as world map movement, medals display, or screen shake)
-    standard_bugfix,      // ordinary fixes of vanilla bugs that get disabled during non-modern gameplay; these are determined by a user's Modern / Classic setting for a world even when compat mode is off
+    standard_update,      // ordinary fixes of vanilla bugs that get disabled during non-modern gameplay; these are determined by a user's Modern / Classic setting for a world even when compat mode is off
 };
 
 
