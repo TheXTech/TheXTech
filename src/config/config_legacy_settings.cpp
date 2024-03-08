@@ -137,15 +137,5 @@ void Config_t::LoadLegacySettings(IniProcessing* ini, ConfigSetLevel level)
         }
     }
 
-    if(ini->hasKey("no-pause-reconnect"))
-    {
-        bool val;
-        ini->read("no-pause-reconnect", val, false);
-
-        pause_on_disconnect = !val;
-        pause_on_disconnect.m_set = level;
-    }
-    ini->endGroup();
-
     // old way of setting death counter
 }

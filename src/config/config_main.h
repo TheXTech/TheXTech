@@ -583,9 +583,6 @@ public:
     /* ---- Preferences ----*/
     section gameplay{this, Scope::All, "gameplay", "Gameplay", "Gameplay options"};
 
-    opt<bool> pause_on_disconnect{this, defaults(false), {CompatClass::gameplay_enhancement, false}, Scope::UserGlobal,
-        "pause-on-disconnect", "Pause on disconnect", "Pause game when a controller is disconnected"};
-
     /* ---- Gameplay - Episode options ----*/
     subsection episode_options{this, "episode-options", "Episode Options"};
 
