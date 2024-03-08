@@ -620,12 +620,6 @@ public:
         defaults(CREATORCOMPAT_ENABLE), {CompatClass::critical_update, CREATORCOMPAT_DISABLE}, Scope::UserEpisode,
         "creator-compat", "Creator compatibility", "Which creator compatibility settings should be used?"};
 
-    /* ---- Prefs - World Map ----*/
-    subsection prefs_world_map{this, "world-map", "World Map"};
-
-    opt<bool> world_map_fast_move{this, defaults(true), {CompatClass::gameplay_enhancement, false}, Scope::UserGlobal,
-        "world-map-fast-move", "Automatic movement", "Moves automatically between forks on the path"};
-
     // /* ---- Prefs - Effects ----*/
     // subsection effects{this, "effects", "Visual Effects"};
 
@@ -689,6 +683,9 @@ public:
         "enable-playtime-counter", "Enable playtime counter", "Track the amount of time spent playing an episode"};
     opt<bool> enable_fails_counter{this, defaults(true), {}, Scope::File,
         "enable-fails-counter", "Enable fails counter", "Count the number of fails on the current level and world"};
+
+    opt<bool> world_map_fast_move{this, defaults(true), {CompatClass::gameplay_enhancement, false}, Scope::Local,
+        "world-map-fast-move", "Automatic movement", "Moves automatically between forks on the path"};
 
     /* ---- Compatibility - Autocode ----*/
     subsection compat_autocode{this, "autocode", "Autocode"};
