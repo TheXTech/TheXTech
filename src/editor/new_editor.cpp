@@ -4465,7 +4465,7 @@ void EditorScreen::UpdateFileScreen(CallMode mode)
             {
                 int cur_FileFormat = FileFormat;
                 if((cur_FileFormat < 0) || (cur_FileFormat > 2))
-                    cur_FileFormat = g_config.editor_preferred_file_format;
+                    cur_FileFormat = FileFormats::LVL_PGEX;
 
                 if(cur_FileFormat == FileFormats::LVL_SMBX64 || cur_FileFormat == FileFormats::LVL_SMBX38A)
                     StartFileBrowser(&FullFileName, "", FileNamePath, {".lvl"}, BROWSER_MODE_SAVE_NEW, BROWSER_CALLBACK_NEW_LEVEL);
@@ -4486,7 +4486,7 @@ void EditorScreen::UpdateFileScreen(CallMode mode)
             {
                 int cur_FileFormat = FileFormat;
                 if((cur_FileFormat < 0) || (cur_FileFormat > 2))
-                    cur_FileFormat = g_config.editor_preferred_file_format;
+                    cur_FileFormat = FileFormats::LVL_PGEX;
 
                 if(cur_FileFormat == FileFormats::LVL_SMBX64 || cur_FileFormat == FileFormats::LVL_SMBX38A)
                     StartFileBrowser(&FullFileName, "", FileNamePath, {".wld"}, BROWSER_MODE_SAVE_NEW, BROWSER_CALLBACK_NEW_WORLD);
@@ -4748,7 +4748,7 @@ void EditorScreen::FileBrowserSuccess()
     {
         int cur_FileFormat = FileFormat;
         if((cur_FileFormat < 0) || (cur_FileFormat > 2))
-            cur_FileFormat = g_config.editor_preferred_file_format;
+            cur_FileFormat = FileFormats::LVL_PGEX;
         EnsureLevel();
         ClearLevel();
         SaveLevel(FullFileName, cur_FileFormat);
@@ -4775,7 +4775,7 @@ void EditorScreen::FileBrowserSuccess()
     {
         int cur_FileFormat = FileFormat;
         if((cur_FileFormat < 0) || (cur_FileFormat > 2))
-            cur_FileFormat = g_config.editor_preferred_file_format;
+            cur_FileFormat = FileFormats::LVL_PGEX;
         EnsureWorld();
         ClearWorld();
         SaveWorld(FullFileName, cur_FileFormat);
