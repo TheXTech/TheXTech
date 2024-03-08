@@ -2245,7 +2245,10 @@ static void s_drawGameTypeTitle(int x, int y)
         SuperPrint(g_mainMenu.mainBattleGame, 3, x, y, XTColorF(0.3f, 0.3f, 1.0f));
     else
     {
-        if(!s_show_separate_2P())
+        // show "Play Episode" when at the save slot selecting and adjusting settings (not when the game was started in compat / speedrun mode)
+        bool changing_settings = (MenuMode >= MENU_SELECT_SLOT_BASE && MenuMode < MENU_SELECT_SLOT_END && g_config.speedrun_mode.m_set != ConfigSetLevel::cmdline && g_config.compatibility_mode.m_set != ConfigSetLevel::cmdline);
+
+        if(!s_show_separate_2P() || changing_settings)
             SuperPrint(g_mainMenu.mainPlayEpisode, 3, x, y, XTColorF(1.0f, 0.3f, 0.3f));
         else if(menuPlayersNum == 1)
             SuperPrint(g_mainMenu.main1PlayerGame, 3, x, y, XTColorF(1.0f, 0.3f, 0.3f));
