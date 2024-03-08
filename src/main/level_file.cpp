@@ -218,10 +218,6 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         // none supported yet
     }
 
-    FileFormats::smbx64LevelPrepare(lvl);
-    FileFormats::smbx64LevelSortBlocks(lvl);
-    FileFormats::smbx64LevelSortBGOs(lvl);
-
     numBlock = 0;
     numBackground = 0;
     numLocked = 0;
