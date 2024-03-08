@@ -210,25 +210,19 @@ public:
 #endif
 
     /* ---- Main - Editor ----*/
-    subsection editor{this, "editor", "Editor"};
+    // subsection editor{this, "editor", "Editor"};
 
-    opt<bool> enable_editor{this, defaults(true), {}, Scope::UserGlobal,
-        "enable-editor", "Enable editor", "Enables the in-game editor"};
+    // opt<bool> enable_editor{this, defaults(true), {}, Scope::UserGlobal,
+    //     "enable-editor", "Enable editor", "Enables the in-game editor"};
+
     // opt<bool> editor_edge_scroll{this, defaults(false), {}, Scope::UserGlobal,
     //     "editor-edge-scroll", "Cursor edge scroll", "Scroll when the cursor is at the edge of the editor screen"};
+
+    static constexpr bool enable_editor = true;
 
     // isn't this just a patently good option?
     //! Enter the pause menu after dying while testing a level
     static constexpr bool editor_pause_on_death = true;
-
-    opt_enum<int> editor_preferred_file_format{this,
-        {
-            {FileFormats::LVL_SMBX64, "smbx64", "SMBX64", "The file format used by the final version of the SMBX fan game."},
-            // {FileFormats::LVL_SMBX38A, "smbx38a", "SMBX38A (1.4)", "The file format used by the SMBX by 38A (SMBX 1.4) fan game."},
-            {FileFormats::LVL_PGEX, "lvlx", "TheXTech", "The native file format of TheXTech."},
-        },
-        defaults(FileFormats::LVL_PGEX), {}, Scope::UserGlobal,
-        "editor-preferred-file-format", "Preferred file format", "Preferred file format for saving files in the editor"};
 
 
     /* ---- Video ----*/
