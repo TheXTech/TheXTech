@@ -580,11 +580,8 @@ public:
     section controls{this, Scope::UserGlobal, "controls", "Controls"};
 
 
-    /* ---- Preferences ----*/
-    section gameplay{this, Scope::All, "gameplay", "Gameplay", "Gameplay options"};
-
-    /* ---- Gameplay - Episode options ----*/
-    subsection episode_options{this, "episode-options", "Episode Options"};
+    /* ---- Episode options ----*/
+    section episode_options{this, Scope::UserLocal, "episode-options", "Episode Options"};
 
     enum
     {
