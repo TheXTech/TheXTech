@@ -790,19 +790,27 @@ bool Mouse_Render(bool mouse, bool render)
             vcolor = XTColorF(0.0f, 0.5f, 1.0f, 1.0f);
             break;
         case(ConfigSetLevel::file_compat):
-            vcolor = XTColorF(1.0f, 0.0f, 0.0f, 1.0f);
-            break;
         case(ConfigSetLevel::ep_compat):
-            vcolor = XTColorF(0.0f, 1.0f, 0.0f, 1.0f);
+            vcolor = XTColorF(1.0f, 1.0f, 0.0f, 1.0f);
             break;
         default:
         case(ConfigSetLevel::user_config):
-            vcolor = XTColorF(1.0f, 1.0f, 1.0f, 1.0f);
+            if(s_temp_string == "✓" || s_temp_string == "+")
+                vcolor = XTColorF(0.5f, 1.0f, 0.5f, 1.0f);
+            else if(s_temp_string == "×" || s_temp_string == "-")
+                vcolor = XTColorF(1.0f, 0.5f, 0.5f, 1.0f);
+            else
+                vcolor = XTColorF(1.0f, 1.0f, 1.0f, 1.0f);
             break;
         case(ConfigSetLevel::game_info):
         case(ConfigSetLevel::game_defaults):
         case(ConfigSetLevel::bugfix_defaults):
-            vcolor = XTColorF(0.5f, 0.5f, 0.5f, 1.0f);
+            if(s_temp_string == "✓" || s_temp_string == "+")
+                vcolor = XTColorF(0.25f, 0.5f, 0.25f, 1.0f);
+            else if(s_temp_string == "×" || s_temp_string == "-")
+                vcolor = XTColorF(0.5f, 0.25f, 0.25f, 1.0f);
+            else
+                vcolor = XTColorF(0.5f, 0.5f, 0.5f, 1.0f);
             break;
         }
 
