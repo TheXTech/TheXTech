@@ -927,7 +927,11 @@ bool Logic()
         controls_ready = false;
 
         if(Back())
+        {
+            MenuCursorCanMove = false;
+            MenuMouseRelease = false;
             return true;
+        }
     }
 
     if(controls_ready && menuDoPress)

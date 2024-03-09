@@ -2113,7 +2113,7 @@ bool mainMenuUpdate()
             if(OptionsScreen::Logic())
             {
                 int optionsIndex = 1;
-                if(!g_gameInfo.disableTwoPlayer)
+                if(s_show_separate_2P())
                     optionsIndex++;
                 if(!g_gameInfo.disableBattleMode)
                     optionsIndex++;
