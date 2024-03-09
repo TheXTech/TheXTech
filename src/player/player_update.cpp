@@ -41,6 +41,7 @@
 #include "../graphics.h"
 #include "../controls.h"
 #include "../script/msg_preprocessor.h"
+#include "script/luna/lunacounter.h"
 
 #include "npc_id.h"
 #include "npc_traits.h"
@@ -207,6 +208,9 @@ void UpdatePlayer()
         if(Player[A].TimeToLive > 0)
         {
             Player[A].TimeToLive += 1;
+
+            if(Player[A].TimeToLive == 50 && !g_ClonedPlayerMode)
+                gDeathCounter.MarkDeath();
 
             const Screen_t& screen = ScreenByPlayer(A);
             bool dynamic_screen = (screen.Type == ScreenTypes::Dynamic);

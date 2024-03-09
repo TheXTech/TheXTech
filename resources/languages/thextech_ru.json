@@ -38,7 +38,6 @@
                 "hit": "по блоку ударят",
                 "layerClear": "слой будет очищен от объектов",
                 "phraseTriggersAfterTemplate": "Событие, которое сработает через {1} мс. после события \\\"{2}\\\"",
-                "phraseTriggersWhen": "Актив., когда:",
                 "phraseTriggersWhenTemplate": "{0}: Сработает, когда {1}",
                 "talk": "игрок поговорит с НИП"
             },
@@ -104,27 +103,7 @@
             "confirmConvertFormatTo": "Преобразовать в {0} формат?",
             "confirmSaveBeforeAction": "Сохранить, прежде чем {0}?",
             "convert": {
-                "_38aUnsupported": "Формат SMBX-38A не поддерживает преобразование.",
-                "desc": "Расширение имени файла изменится, но старый файл удалён не будет.",
-                "featureBlockForceSmashable": "Старое поведение крут. блока.",
-                "featureCustomWorldMusic": "Внешние файлы мызки в мире.",
-                "featureEventAutoscroll": "Современная автопрокрутка.",
-                "featureEventCustomMusic": "Изм. файла музыки событием.",
-                "featureLevelStarDisplay": "Кол-во звёзд на уровне.",
-                "featureNPCVariant": "Настраиваемое поведение НИПов.",
-                "featureWarpCannonExit": "Эффект выхода-пушки.",
-                "featureWarpCustomStarsMsg": "Своё сообщение о звёздах.",
-                "featureWarpEnterEvent": "Триггер события на вход в проход.",
-                "featureWarpNeedsStand": "Проход, требующий стояния на земле.",
-                "featureWarpNoPrintStars": "Откл. отобр. звёзд на проходах.",
-                "featureWarpNoStartScene": "Откл. перех. сцены на проходах.",
-                "featureWarpPortal": "Поддержка поральных проходов.",
-                "featureWarpTransit": "Визуальные переходы в проходах.",
-                "featureWorldStarDisplay": "Кол-во звёзд в мире.",
-                "featuresWillBeLost": "Функционал, который будет ПОТЕРЯН:",
-                "formatUnknown": "Запрошенный формат неизвестен.",
-                "noIssues": "Проблемы совместимости не найдены.",
-                "featureBgoOrder": "Фон.Об. исп. другой порядок отрисовки."
+                "descNew": "Расширение имени файла будет изменено, однако старый файл СОХРАНИТСЯ.\n\nНе забудьте проверить файл на предмет потерянной функциональности после сохранения."
             },
             "formatLegacy": "Устаревший",
             "formatModern": "Современный",
@@ -358,11 +337,10 @@
             "errorInvalidEnterWarp": "========= ОШИБКА! ========\n\nНевозможно запустить уровень, потому что указан некорректный входной проход {1}.\nВсего проходов: {2}\n\nФайл: {0}",
             "errorNoStartPoint": "========= ОШИБКА! ========\n\nНевозможно запустить уровень из-за отсутствия начальных точек, либо не указан входной проход.\n\nФайл: {0}",
             "openFileFailed": "ОШИБКА: Не удаётся открыть \"{0}\": файл не существует или повреждён.",
-            "warpNeedStarCount": "Требуется {0} {1}, чтобы войти."
+            "warpNeedStarCount": "Чтобы войти, нужно найти\n{0} {1}."
         },
         "pause": {
             "continue": "Продолжить",
-            "dropAddPlayers": "Убр./Доб. игроков",
             "enterCode": "Ввести код",
             "quit": "Выйти",
             "quitTesting": "Закрыть тест",
@@ -440,7 +418,7 @@
             },
             "hotkeys": {
                 "debugInfo": "Отл.инф.",
-                "enterCheats": "Ввести чит",
+                "enterCheats": "Ввести код",
                 "fullscreen": "Полн.экран",
                 "legacyPause": "Ст.пауза",
                 "recordGif": "Зап.GIF",
@@ -581,7 +559,6 @@
             "mainExit": "Выйти",
             "mainMultiplayerGame": "Игра вдвоём",
             "mainOptions": "Настройки",
-            "mainStartGame": "Начать игру",
             "mainPlayEpisode": "Сыграть в эпизод"
         },
         "options": {

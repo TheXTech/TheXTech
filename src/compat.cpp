@@ -128,6 +128,7 @@ static void compatInit(Compatibility_t &c)
     c.pound_by_alt_run = true;
     // 1.3.6.5
     c.fix_visual_bugs = true;
+    c.fix_npc_emerge_size = true;
     // 1.3.7
     c.modern_npc_camera_logic = true;
     c.allow_multires = true;
@@ -185,6 +186,7 @@ static void compatInit(Compatibility_t &c)
         c.fix_frame_perfect_despawn = false;
         // 1.3.6.5
         c.fix_visual_bugs = false;
+        c.fix_npc_emerge_size = false;
         // 1.3.7
         c.modern_npc_camera_logic = false;
         c.allow_multires = false;
@@ -443,6 +445,7 @@ static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
         // compat.read("pound-by-alt-run", c.pound_by_alt_run, c.pound_by_alt_run); // compat mode only flag
         // 1.3.6.5
         compat.read("fix-visual-bugs", c.fix_visual_bugs, c.fix_visual_bugs);
+        compat.read("fix-npc-emerge-size", c.fix_npc_emerge_size, c.fix_npc_emerge_size);
         // 1.3.7 (but these will be changed in the Compat update)
         compat.read("modern-npc-camera-logic", c.modern_npc_camera_logic, c.modern_npc_camera_logic);
         compat.read("allow-multires", c.allow_multires, c.allow_multires);

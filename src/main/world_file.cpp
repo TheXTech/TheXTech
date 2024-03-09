@@ -582,6 +582,7 @@ void FindWldStars()
     }
 }
 
+#if 0
 // Is there any unsupported content for this format in the world?
 bool CanConvertWorld(int format, std::string* reasons)
 {
@@ -694,3 +695,4 @@ void ConvertWorld(int format)
 
     numWorldAreas = 0;
 }
+#endif

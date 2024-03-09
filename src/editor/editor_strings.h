@@ -287,6 +287,8 @@ struct EditorContent
     std::string fileCommandSaveAs;
 
     std::string fileConvertDesc;
+
+#if 0
     std::string fileConvertNoIssues;
     std::string fileConvertFeaturesWillBeLost;
 
@@ -313,6 +315,7 @@ struct EditorContent
     std::string fileConvertFeatureWorldStarDisplay;
     std::string fileConvertFeatureLevelStarDisplay;
     std::string fileConvertFeatureWorldMapSections;
+#endif
 
     std::string browserNewFile;
     std::string browserSaveFile;

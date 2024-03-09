@@ -218,10 +218,6 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         // none supported yet
     }
 
-    FileFormats::smbx64LevelPrepare(lvl);
-    FileFormats::smbx64LevelSortBlocks(lvl);
-    FileFormats::smbx64LevelSortBGOs(lvl);
-
     numBlock = 0;
     numBackground = 0;
     numLocked = 0;
@@ -1366,6 +1362,7 @@ void FindStars()
     }
 }
 
+#if 0
 // Is there any unsupported content for this format in the level?
 bool CanConvertLevel(int format, std::string* reasons)
 {
@@ -1639,3 +1636,4 @@ void ConvertLevel(int format)
     for(int i = 1; i <= numBlock; i++)
         Block[i].forceSmashable = 0;
 }
+#endif

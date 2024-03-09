@@ -39,7 +39,8 @@ struct DeathCounter
     void quit();
 
     bool TryLoadStats();
-    void UpdateDeaths(bool write_save);
+    // Marks a death on the current level
+    void MarkDeath(bool write_save = true);
     void AddDeath(const std::string &, int amount);
     void TrySave();
     void Draw(int screenZ);

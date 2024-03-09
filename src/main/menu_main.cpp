@@ -97,6 +97,8 @@ static constexpr int c_menuItemSavesCopy = maxSaveSlots;
 static constexpr int c_menuItemSavesDelete = maxSaveSlots + 1;
 static constexpr int c_menuSavesOffsetY = (maxSaveSlots - 3) * 30;
 
+static bool s_editor_target_thextech = true;
+
 int NumSelectWorld = 0;
 int NumSelectWorldEditable = 0;
 int NumSelectBattle = 0;
@@ -338,14 +340,13 @@ struct WorldRoot_t
 };
 
 // helper functions used by FindWorlds() and LoadSingleWorld()
-static void s_LoadSingleWorld(const std::string& epDir, const std::string& fName, WorldData& head, TranslateEpisode& tr, bool compatModern, bool editable);
+static void s_LoadSingleWorld(const std::string& epDir, const std::string& fName, WorldData& head, TranslateEpisode& tr, bool editable);
 static void s_FinishFindWorlds();
 
 void FindWorlds()
 {
     TranslateEpisode tr;
     WorldData head;
-    bool compatModern = (CompatGetLevel() == COMPAT_MODERN);
     NumSelectWorld = 0;
 
     std::vector<WorldRoot_t> worldRoots =
@@ -399,7 +400,7 @@ void FindWorlds()
             episode.getListOfFiles(files, {".wld", ".wldx"});
 
             for(std::string &fName : files)
-                s_LoadSingleWorld(epDir, fName, head, tr, compatModern, worldsRoot.editable);
+                s_LoadSingleWorld(epDir, fName, head, tr, worldsRoot.editable);
 
 #ifndef PGE_NO_THREADING
             SDL_AtomicAdd(&loadingProgrss, 1);
@@ -410,7 +411,7 @@ void FindWorlds()
     s_FinishFindWorlds();
 }
 
-static void s_LoadSingleWorld(const std::string& epDir, const std::string& fName, WorldData& head, TranslateEpisode& tr, bool compatModern, bool editable)
+static void s_LoadSingleWorld(const std::string& epDir, const std::string& fName, WorldData& head, TranslateEpisode& tr, bool editable)
 {
     std::string wPath = epDir + fName;
 
@@ -426,19 +427,9 @@ static void s_LoadSingleWorld(const std::string& epDir, const std::string& fName
 
         w.blockChar[1] = head.nocharacter1;
         w.blockChar[2] = head.nocharacter2;
-
-        if(head.meta.RecentFormat != LevelData::SMBX64 || head.meta.RecentFormatVersion >= 30 || !compatModern)
-        {
-            w.blockChar[3] = head.nocharacter3;
-            w.blockChar[4] = head.nocharacter4;
-            w.blockChar[5] = head.nocharacter5;
-        }
-        else
-        {
-            w.blockChar[3] = true;
-            w.blockChar[4] = true;
-            w.blockChar[5] = true;
-        }
+        w.blockChar[3] = head.nocharacter3;
+        w.blockChar[4] = head.nocharacter4;
+        w.blockChar[5] = head.nocharacter5;
 
         w.editable = editable;
 
@@ -498,7 +489,6 @@ void LoadSingleWorld(const std::string wPath)
 {
     TranslateEpisode tr;
     WorldData head;
-    bool compatModern = (CompatGetLevel() == COMPAT_MODERN);
     NumSelectWorld = 0;
 
     SelectWorld.clear();
@@ -514,7 +504,7 @@ void LoadSingleWorld(const std::string wPath)
 
     epDir = DirMan(epDir).absolutePath() + "/";
 
-    s_LoadSingleWorld(epDir, fName, head, tr, compatModern, true);
+    s_LoadSingleWorld(epDir, fName, head, tr, true);
 
     s_FinishFindWorlds();
 }
@@ -654,6 +644,8 @@ bool mainMenuUpdate()
     bool menuDoPress = SharedControls.MenuDo || SharedControls.Pause;
     bool menuBackPress = SharedControls.MenuBack;
 
+    bool altPressed = false;
+
     for(int i = 0; i < maxLocalPlayers; i++)
     {
         Controls_t &c = Player[i + 1].Controls;
@@ -667,6 +659,7 @@ bool mainMenuUpdate()
         rightPressed |= c.Right;
 
         homePressed |= c.Drop;
+        altPressed |= c.AltJump;
     }
 
     menuBackPress |= SharedCursor.Secondary && MenuMouseRelease;
@@ -715,6 +708,7 @@ bool mainMenuUpdate()
             k |= leftPressed;
             k |= rightPressed;
             k |= homePressed;
+            k |= altPressed;
 
             if(!k)
                 MenuCursorCanMove = true;
@@ -1298,6 +1292,12 @@ bool mainMenuUpdate()
                     PlaySoundMenu(SFX_Slide);
                     MenuCursorCanMove = false;
                 }
+                else if(altPressed && MenuMode == MENU_EDITOR && MenuCursor + 1 >= NumSelectWorldEditable - 1)
+                {
+                    s_editor_target_thextech = !s_editor_target_thextech;
+                    PlaySoundMenu(SFX_PSwitch);
+                    MenuCursorCanMove = false;
+                }
                 else if(menuDoPress || MenuMouseClick)
                 {
                     bool disabled = false;
@@ -1346,11 +1346,11 @@ bool mainMenuUpdate()
                                 DirMan::mkAbsPath(AppPathManager::userWorldsRootDir() + fn);
 
                                 std::string wPath = AppPathManager::userWorldsRootDir() + fn + "/world.wld";
-                                if(g_config.editor_preferred_file_format != FileFormats::WLD_SMBX64 && g_config.editor_preferred_file_format != FileFormats::WLD_SMBX38A)
+                                if(s_editor_target_thextech)
                                     wPath += "x";
                                 g_recentWorldEditor = wPath;
 
-                                SaveWorld(wPath, g_config.editor_preferred_file_format);
+                                SaveWorld(wPath, (s_editor_target_thextech) ? FileFormats::WLD_PGEX : FileFormats::WLD_SMBX64);
 
 #ifdef PGE_NO_THREADING
                                 FindWorlds();
@@ -1378,7 +1378,7 @@ bool mainMenuUpdate()
                                 // find a single battle level to open first
                                 std::vector<std::string> files;
                                 DirMan battleLvls(lPath);
-                                battleLvls.getListOfFiles(files, {".lvl", ".lvlx"});
+                                battleLvls.getListOfFiles(files, {(s_editor_target_thextech) ? ".lvlx" : ".lvl"});
                                 if(files.empty())
                                     lPath += "newbattle.lvl";
                                 else
@@ -1387,9 +1387,10 @@ bool mainMenuUpdate()
 
                             if(!Files::fileExists(lPath))
                             {
-                                if(g_config.editor_preferred_file_format != FileFormats::WLD_SMBX64 && g_config.editor_preferred_file_format != FileFormats::WLD_SMBX38A)
+                                if(s_editor_target_thextech)
                                     lPath += "x";
-                                SaveLevel(lPath, g_config.editor_preferred_file_format);
+
+                                SaveLevel(lPath, (s_editor_target_thextech) ? FileFormats::LVL_PGEX : FileFormats::LVL_SMBX64);
                             }
 
                             OpenLevel(lPath);
@@ -2418,6 +2419,49 @@ void mainMenuDraw()
             B = A - minShow + 1;
 
             SuperPrint(w.WorldName, 3, MenuX, MenuY - 30 + (B * 30), color);
+        }
+
+        // preview type of content being created
+        if(MenuMode == MENU_EDITOR && MenuCursor + 1 >= NumSelectWorldEditable - 1)
+        {
+            B = MenuCursor + 1 - minShow + 1;
+
+            // draw mode icon
+            int mode_icon_X = MenuX + 340;
+            int mode_icon_Y = MenuY - 34 + (B * 30);
+
+            float rot = 0;
+            rot = std::abs((int)(CommonFrame % 90) - 45);
+            rot = rot - 22.5;
+
+            if(!s_editor_target_thextech)
+                XRender::renderTextureScaleEx(mode_icon_X, mode_icon_Y, 24, 24, GFXNPC[NPCID_POWER_S3], 0, 0, 32, 32, rot, nullptr, X_FLIP_NONE);
+            else if(GFX.EIcons.inited)
+                XRender::renderTextureScaleEx(mode_icon_X, mode_icon_Y, 24, 24, GFX.EIcons, 0, 32*Icon::thextech, 32, 32, rot, nullptr, X_FLIP_NONE);
+            else
+                XRender::renderTextureScaleEx(mode_icon_X, mode_icon_Y, 24, 24, GFXNPC[NPCID_ICE_POWER_S3], 0, 0, 32, 32, rot, nullptr, X_FLIP_NONE);
+
+            // draw infobox
+            int infobox_x = XRender::TargetW / 2 - 240;
+            int infobox_y = MenuY + 145;
+
+            XRender::renderRect(infobox_x, infobox_y, 480, 68, {0, 0, 0, 192});
+
+            XTColor color;
+
+            if(s_editor_target_thextech)
+                color = XTColorF(0.5f, 0.8f, 1.0f);
+            else
+                color = XTColorF(1.0f, 0.5f, 0.5f);
+
+            SuperPrintScreenCenter("MAKE FOR:", 3, infobox_y + 4, color);
+
+            if(s_editor_target_thextech)
+                SuperPrintScreenCenter("TheXTech", 3, infobox_y + 24, color);
+            else
+                SuperPrintScreenCenter("SMBX 1.3", 3, infobox_y + 24, color);
+
+            SuperPrintScreenCenter("ALT JUMP TO SWITCH", 3, infobox_y + 44, XTColorF(0.8f, 0.8f, 0.8f, 0.8f));
         }
 
         // render the scroll indicators

@@ -2,7 +2,7 @@
     "editor": {
         "block": {
             "canBreak": "Se rompe",
-            "canBreakTooltip": "Legado: se rompe cuando se golpea",
+            "canBreakTooltip": "Legado: se rompe cuando es golpeado",
             "inside": "Tiene:",
             "invis": "Invis",
             "slick": "Resbala",
@@ -71,7 +71,7 @@
                 "sound": "Sonido",
                 "layerSmoke": "Humo"
             },
-            "settingsForEvent": "Ajustes para el Evento",
+            "settingsForEvent": "Ajustes para el Evento {0}",
             "bounds": {
                 "shouldEvent": "Debería el Evento {0}",
                 "changeAllSectionBoundsToCurrent": "Cambiar todos los límites de la sección a los actuales?",
@@ -81,7 +81,7 @@
             "layers": {
                 "headerMove": "Mover:",
                 "headerHide": "Esconde:",
-                "headerToggle": "Conmutar:",
+                "headerToggle": "Alternar:",
                 "headerShow": "Muestra:"
             }
         },
@@ -96,28 +96,6 @@
             "optionCancelConversion": "Cancelar conversión",
             "commandSaveAs": "Guardar como...",
             "confirmConfirmAction": "Estás seguro de que quieres {0}?",
-            "convert": {
-                "desc": "La extensión del archivo cambiará, pero el archivo antiguo NO será eliminado.",
-                "featureCustomWorldMusic": "Usa archivo de música de mundo personalizada.",
-                "featuresWillBeLost": "Las características de abajo se PERDERÁN:",
-                "_38aUnsupported": "El formato SMBX38-A no es soportado para conversión.",
-                "noIssues": "No hay problemas de compatibilidad.",
-                "formatUnknown": "El formato solicitado es desconocido.",
-                "featureWarpNeedsStand": "Un warp requiere que el jugador se ponga de pie.",
-                "featureWarpNoStartScene": "Un pasaje del nivel omite la escena inicial.",
-                "featureWorldStarDisplay": "Utiliza la configuración del mundo para la visualización de las estrellas.",
-                "featureEventAutoscroll": "Un evento utiliza el autoscroll moderno.",
-                "featureEventCustomMusic": "Un evento pone música a un archivo.",
-                "featureNPCVariant": "Un NPC utiliza una variante de comportamiento.",
-                "featureBlockForceSmashable": "Un bloqueo giratorio utiliza el smash heredado.",
-                "featureLevelStarDisplay": "Un nivel utiliza el ajuste para la visualización de estrellas.",
-                "featureWarpCustomStarsMsg": "Una warp tiene un mensaje de estrellas personalizado.",
-                "featureWarpCannonExit": "Un warp tiene el efecto de salida de cañón.",
-                "featureWarpTransit": "Una warp utiliza un nuevo efecto de transición.",
-                "featureWarpNoPrintStars": "Una warp oculta las estrellas de nivel objetivo.",
-                "featureWarpPortal": "Una warp utiliza el efecto portal.",
-                "featureWarpEnterEvent": "Una warp desencadena un evento al entrar."
-            },
             "formatLegacy": "Legado",
             "optionActionWithoutSave": "{0} sin guardar",
             "optionProceedWithConversion": "Proceder con la conversión",
@@ -130,7 +108,10 @@
             "optionYesSaveThenAction": "Sí: guardar entonces {0}",
             "actionClearWorld": "Mundo terminado",
             "actionClearLevel": "Nivel terminado",
-            "labelCurrentFile": "Archivo actual: "
+            "labelCurrentFile": "Archivo actual: ",
+            "convert": {
+                "descNew": "La extensión de archivo cambiará, pero el archivo viejo NO SERÁ ELIMINADO.\n\nPor favor, revise las características perdidas después de guardar."
+            }
         },
         "layers": {
             "deletion": {
@@ -201,7 +182,9 @@
             "needKey": "Requiere Llave",
             "in": "Entrada",
             "out": "Salida",
-            "title": "Configuración de Pasaje"
+            "title": "Configuración de Pasaje",
+            "ride": "Montar",
+            "lvlWarp": "Pasaje de Nivel"
         },
         "letterRight": "R",
         "select": {
@@ -304,10 +287,13 @@
             "name": "Nombre del Mundo",
             "phraseCreditIndex": "Línea {0} de Créditos del Mundo:",
             "retryOnFail": "Reintentar En Fallo",
-            "allowChars": "Permitir Personajes"
+            "allowChars": "Permitir Personajes",
+            "totalStars": "Estrellas en total: "
         },
         "wordMode": "Modo",
-        "wordText": "Texto"
+        "wordText": "Texto",
+        "labelSortLayer": "Ordenar Capa:",
+        "labelSortOffset": "Ordenar Desplazamiento:"
     },
     "menu": {
         "game": {
@@ -328,7 +314,8 @@
             "errorResolution": "Lo sentimos. El editor del juego no es compatible con tu resolución actual.",
             "newWorld": "<Nuevo Mundo>",
             "errorMissingResources": "Lo sentimos. Te falta {0}, necesario para el editor del juego.",
-            "promptNewWorldName": "Nuevo nombre del mundo"
+            "promptNewWorldName": "Nuevo nombre del mundo",
+            "battles": "<Niveles de Batalla>"
         },
         "wordHide": "Ocultar",
         "options": {
@@ -348,12 +335,12 @@
         "wordWaiting": "En espera",
         "main": {
             "mainEditor": "Editor",
-            "mainStartGame": "Comenzar el juego",
             "main1PlayerGame": "Juego para 1 jugador",
             "mainMultiplayerGame": "Juego para 2 jugadores",
             "mainBattleGame": "Juego de batalla",
             "mainOptions": "Opciones",
-            "mainExit": "Salida"
+            "mainExit": "Salir",
+            "mainPlayEpisode": "Jugar Episodio"
         },
         "controls": {
             "wii": {
@@ -385,7 +372,8 @@
             "controlsDeleteKey": "(Salto Alternativo para Borrar)",
             "controlsNotInUse": "(No en uso)",
             "tDS": {
-                "buttonStart": "Comenzar"
+                "buttonStart": "Comenzar",
+                "casePen": "(Lápiz)"
             },
             "controlsDeviceTypes": "Tipos de Dispositivo",
             "caseInvalid": "(Inválido)",
@@ -393,9 +381,42 @@
             "controlsTitle": "Controles",
             "touchscreen": {
                 "option": {
-                    "holdRun": "Mantener \"Correr\" al Comenzar"
+                    "holdRun": "Mantener \"Correr\" al Comenzar",
+                    "showCodeButton": "Mostrar Botón de Código"
+                },
+                "layout": {
+                    "standard": "Estándar"
                 }
-            }
+            },
+            "cursor": {
+                "secondary": "Secundario",
+                "tertiary": "Terciario",
+                "primary": "Primario"
+            },
+            "hotkeys": {
+                "screenshot": "Captura de Pantalla",
+                "debugInfo": "Información de Depuración",
+                "enterCheats": "Introducir Código",
+                "fullscreen": "Pantalla Completa",
+                "toggleHUD": "Alternar HUD",
+                "recordGif": "Grabar GIF"
+            },
+            "profile": {
+                "activateProfile": "Activar perfil",
+                "deleteProfile": "Eliminar perfil"
+            },
+            "types": {
+                "keyboard": "Teclado",
+                "touchscreen": "Pantalla Táctil"
+            },
+            "caseTouch": "(Táctil)",
+            "options": {
+                "batteryStatus": "Estado de Batería"
+            },
+            "editor": {
+                "testPlay": "Juego de Prueba"
+            },
+            "controlsConnected": "Conectado:"
         },
         "wordLanguage": "Idioma",
         "wordPlayer": "Jugador",
@@ -415,7 +436,8 @@
         "battle": {
             "errorNoLevels": "Imposible comenzar batalla debido a que no hay niveles disponibles"
         },
-        "caseNone": "<Ninguno>"
+        "caseNone": "<Ninguno>",
+        "wordResume": "Reanudar"
     },
     "outro": {
         "originalBy": "Código original VB6 Por:",
@@ -427,7 +449,8 @@
         "engineCredits": "Créditos del motor:",
         "levelDesign": "Diseño de niveles:",
         "nameVitalyNovichkov": "Vitaly Novichkov",
-        "gameCredits": "Créditos del juego:"
+        "gameCredits": "Créditos del juego:",
+        "qualityControl": "Control de Calidad:"
     },
     "pluralRules": "one-is-singular",
     "game": {
@@ -452,7 +475,6 @@
             "errorNoStartPoint": "========= ERROR! =========\n\nImposible empezar nivel debido a que no hay puntos de comienzo colocados ni pasajes de entrada especificados.\n\nArchivo: {0}"
         },
         "pause": {
-            "dropAddPlayers": "Quitar/Añadir Jugadores",
             "restartLevel": "Reiniciar Nivel",
             "quit": "Salir",
             "saveAndContinue": "Guardar y Continuar",
@@ -460,10 +482,14 @@
             "saveAndQuit": "Guardar y Salir",
             "returnToEditor": "Regresar al Editor",
             "continue": "Continuar",
-            "quitTesting": "Dejar de Probar"
+            "quitTesting": "Dejar de Probar",
+            "enterCode": "Introducir Código"
         },
         "controls": {
             "phrasePlayerDisconnected": "P{0} desconectado"
+        },
+        "message": {
+            "scanningLevels": "Escaneando niveles..."
         }
     },
     "languageName": "Español"

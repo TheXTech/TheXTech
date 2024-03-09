@@ -176,7 +176,9 @@ struct SFX_t
     std::string path;
     std::string customPath;
     Mix_Chunk *chunk = nullptr;
+    Mix_Music *music = nullptr;
     Mix_Chunk *chunkOrig = nullptr;
+    Mix_Music *musicOrig = nullptr;
     bool isCustom = false;
     bool isSilent = false;
     bool isSilentOrig = false;
@@ -194,6 +196,12 @@ static std::unordered_map<int, std::string>        extSfxPlaying;
 static void extSfxStopCallback(int channel);
 
 static const int maxSfxChannels = 91;
+
+#ifdef LOW_MEM
+static const double c_max_chunk_duration = 0.75; // max length of an in-memory chunk in seconds
+#else
+static const double c_max_chunk_duration = 5.0;  // max length of an in-memory chunk in seconds
+#endif
 
 static const char *audio_format_to_string(SDL_AudioFormat f)
 {
@@ -356,6 +364,13 @@ void QuitMixerX()
             Mix_FreeChunk(s.chunk);
         if(s.chunkOrig)
             Mix_FreeChunk(s.chunkOrig);
+        if(s.music)
+        {
+            Mix_HaltMusicStream(s.music);
+            Mix_FreeMusic(s.music);
+        }
+        if(s.musicOrig)
+            Mix_FreeMusic(s.musicOrig);
     }
     sound.clear();
     music.clear();
@@ -404,13 +419,17 @@ static void RestoreSfx(SFX_t &u)
 {
     if(u.isCustom)
     {
-        if((u.chunk || u.isSilent) && (u.chunkOrig || u.isSilentOrig))
+        if((u.chunk || u.music || u.isSilent) && (u.chunkOrig || u.musicOrig || u.isSilentOrig))
         {
             if(u.chunk)
                 Mix_FreeChunk(u.chunk);
+            if(u.music)
+                Mix_FreeMusic(u.music);
             u.chunk = u.chunkOrig;
+            u.music = u.musicOrig;
             u.isSilent = u.isSilentOrig;
             u.chunkOrig = nullptr;
+            u.musicOrig = nullptr;
         }
         u.isCustom = false;
     }
@@ -454,29 +473,54 @@ static void AddSfx(SoundScope root,
                     return;  // Don't load the same file twice!
                 }
 
-                Mix_Chunk *backup = m.chunk;
+                Mix_Chunk *backup_chunk = m.chunk;
+                Mix_Music *backup_music = m.music;
                 bool backup_isSilent = m.isSilent;
                 m.customPath = newPath;
 
                 if(!isSilent)
-                    m.chunk = Mix_LoadWAV((newPath).c_str());
-
-                if(m.chunk || isSilent)
                 {
-                    if(!m.isCustom && !m.chunkOrig)
+                    m.music = Mix_LoadMUS((newPath).c_str());
+                    if(m.music)
                     {
-                        m.chunkOrig = backup;
+                        // check, if short enough, load it as a chunk instead
+                        double duration = Mix_MusicDuration(m.music);
+                        if(duration >= 0 && duration < c_max_chunk_duration)
+                        {
+                            Mix_FreeMusic(m.music);
+                            m.music = nullptr;
+                        }
+                        else
+                            pLogInfo("Will load SFX %s as a multi-music", newPath.c_str());
+                    }
+
+                    if(!m.music)
+                        m.chunk = Mix_LoadWAV((newPath).c_str());
+                }
+
+                if(m.chunk || m.music || isSilent)
+                {
+                    if(!m.isCustom && !m.chunkOrig && !m.musicOrig)
+                    {
+                        m.chunkOrig = backup_chunk;
+                        m.musicOrig = backup_music;
                         m.isSilentOrig = backup_isSilent;
                     }
-                    else if(backup)
-                        Mix_FreeChunk(backup);
+                    else
+                    {
+                        if(backup_chunk)
+                            Mix_FreeChunk(backup_chunk);
+                        if(backup_music)
+                            Mix_FreeMusic(backup_music);
+                    }
 
                     m.isCustom = true;
                     m.isSilent = isSilent;
                 }
                 else
                 {
-                    m.chunk = backup;
+                    m.chunk = backup_chunk;
+                    m.music = backup_music;
                     m.isSilent = backup_isSilent;
                     pLogWarning("ERROR: SFX '%s' loading error: %s", m.path.c_str(), Mix_GetError());
                 }
@@ -496,13 +540,30 @@ static void AddSfx(SoundScope root,
             m.isSilent = isSilent;
             pLogDebug("Adding SFX [%s] '%s'", alias.c_str(), isSilent ? "<silence>" : m.path.c_str());
             if(!isSilent)
-                m.chunk = Mix_LoadWAV(m.path.c_str());
+            {
+                m.music = Mix_LoadMUS((m.path).c_str());
+                if(m.music)
+                {
+                    // check, if short enough, load it as a chunk instead
+                    double duration = Mix_MusicDuration(m.music);
+                    if(duration >= 0 && duration < c_max_chunk_duration)
+                    {
+                        Mix_FreeMusic(m.music);
+                        m.music = nullptr;
+                    }
+                    else
+                        pLogInfo("Will load SFX %s as a multi-music", m.path.c_str());
+                }
 
-            if(m.chunk || isSilent)
+                if(!m.music)
+                    m.chunk = Mix_LoadWAV((m.path).c_str());
+            }
+
+            if(m.chunk || m.music || isSilent)
             {
                 bool isSingleChannel = false;
                 ini.read("single-channel", isSingleChannel, false);
-                if(isSingleChannel)
+                if(isSingleChannel && m.chunk)
                     m.channel = g_reservedChannels++;
                 sound.insert({alias, m});
             }
@@ -642,11 +703,21 @@ void PlaySfx(const std::string &Alias, int loops, int volume, uint8_t left, uint
     if(sfx != sound.end())
     {
         auto &s = sfx->second;
-        if(!s.isSilent)
+        if(s.chunk)
         {
             int channel = Mix_PlayChannelVol(s.channel, s.chunk, loops, volume);
+
             if(channel >= 0)
                 Mix_SetPanning(channel, left, right);
+        }
+        else if(s.music)
+        {
+            if(Mix_PlayingMusicStream(s.music))
+                Mix_RewindMusicStream(s.music);
+
+            Mix_VolumeMusicStream(s.music, volume);
+            Mix_SetMusicEffectPanning(s.music, left, right);
+            Mix_PlayMusicStream(s.music, loops);
         }
     }
 }
@@ -657,8 +728,10 @@ void StopSfx(const std::string &Alias)
     if(sfx != sound.end())
     {
         auto &s = sfx->second;
-        if(!s.isSilent)
+        if(s.chunk)
             Mix_HaltChannel(s.channel);
+        else if(s.music)
+            Mix_HaltMusicStream(s.music);
     }
 }
 
@@ -1159,6 +1232,15 @@ void UnloadSound()
         auto &s = it.second;
         if(s.chunk)
             Mix_FreeChunk(s.chunk);
+        if(s.chunkOrig)
+            Mix_FreeChunk(s.chunkOrig);
+        if(s.music)
+        {
+            Mix_HaltMusicStream(s.music);
+            Mix_FreeMusic(s.music);
+        }
+        if(s.musicOrig)
+            Mix_FreeMusic(s.musicOrig);
     }
 
     sound.clear();

@@ -103,27 +103,7 @@
             "confirmConvertFormatTo": "是否转换格式到{0}？",
             "confirmSaveBeforeAction": "{0}前是否保存文件？",
             "convert": {
-                "_38aUnsupported": "不支持转换SMBX-38A格式的关卡。",
-                "desc": "文件格式将会转换，但不会删除源文件。",
-                "featureBlockForceSmashable": "旋转方块设置了旧版本的破碎方式。",
-                "featureCustomWorldMusic": "在大地图中设置了自定义音乐。",
-                "featureEventAutoscroll": "在事件中设置了新版的强制卷轴。",
-                "featureEventCustomMusic": "在事件中设置了自定义音乐。",
-                "featureLevelStarDisplay": "在关卡中使用了星星数量的显示设置。",
-                "featureNPCVariant": "在NPC中采用了其他的AI。",
-                "featureWarpCannonExit": "传送点设置了水管炮出口。",
-                "featureWarpCustomStarsMsg": "传送点设置了需要星星进入的自定义信息。",
-                "featureWarpEnterEvent": "传送点设置了进入触发事件。",
-                "featureWarpNeedsStand": "传送点设置了需要角色站立时才可进入。",
-                "featureWarpNoPrintStars": "传送点设置了不显示星星数量。",
-                "featureWarpNoStartScene": "传送点设置了不显示开始界面。",
-                "featureWarpPortal": "传送点使用了传送门。",
-                "featureWarpTransit": "传送点使用了过渡效果。",
-                "featureWorldStarDisplay": "使用了大地图的设置以显示星星数量。",
-                "featuresWillBeLost": "下列特性将会丢失：",
-                "formatUnknown": "请求的格式不支持。",
-                "noIssues": "该操作不会造成任何兼容性问题。",
-                "featureBgoOrder": "背景对象设置了自定义叠放次序。"
+                "descNew": "文件格式将会转换，但不会删除源文件。\n\n请在保存文件之后检查不支持的功能。"
             },
             "formatLegacy": "旧版本",
             "formatModern": "新版本",
@@ -364,7 +344,6 @@
         },
         "pause": {
             "continue": "继续游戏",
-            "dropAddPlayers": "加入/离开游戏",
             "enterCode": "输入指令",
             "quit": "退出",
             "quitTesting": "结束测试",
@@ -580,7 +559,6 @@
             "mainExit": "退出",
             "mainMultiplayerGame": "双人游戏",
             "mainOptions": "设置",
-            "mainStartGame": "开始游戏",
             "mainPlayEpisode": "开始游戏"
         },
         "options": {

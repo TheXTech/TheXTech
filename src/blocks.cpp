@@ -589,8 +589,8 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
 
             CharStuff(numNPCs);
 
-            // note: minor SMBX64 bug, should be nn->TWidth
-            nn.Location.Width = NPCWidth(C);
+            // note: minor SMBX64 bugfix, should be nn->TWidth in case nn's type has changed
+            nn.Location.Width = (g_compatibility.fix_npc_emerge_size) ? nn->TWidth : NPCWidth(C);
 
             // bug from ancient 101 case
             if(is_ancient && C == NPCID_FODDER_S3)

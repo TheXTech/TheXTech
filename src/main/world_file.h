@@ -33,7 +33,8 @@ void FindWldStars();
 void ClearWorld(bool quick = false);
 
 //! NEW: routines to check if it is possible to convert to legacy file formats and to remove all non-legacy content
-bool CanConvertWorld(int format, std::string* reasons);
-void ConvertWorld(int format);
+// Removed, let PGE-FL handle conversion on its own.
+// bool CanConvertWorld(int format, std::string* reasons);
+// void ConvertWorld(int format);
 
 #endif // WORLD_FILE_H

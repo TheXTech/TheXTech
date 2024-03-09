@@ -30,7 +30,6 @@
 #include "sound.h"
 #include "video.h"
 #include "main/presetup.h"
-#include "main/game_info.h"
 #include "main/speedrunner.h"
 #include "main/translate.h"
 #include "core/language.h"
@@ -486,8 +485,8 @@ int main(int argc, char**argv)
         // Print the language template to the screen
         if(switchMakeLangTemplate.isSet() && switchMakeLangTemplate.getValue())
         {
-            initGameInfo();
             XTechTranslate translate;
+            translate.reset();
             translate.exportTemplate();
             return 0;
         }
@@ -495,8 +494,8 @@ int main(int argc, char**argv)
         // Update all translation files at current assets pack
         if(switchLangUpdate.isSet() && switchLangUpdate.getValue())
         {
-            initGameInfo();
             XTechTranslate translate;
+            translate.reset();
             translate.updateLanguages(langOutputPath.getValue(), switchLangNoBlank.isSet());
             return 0;
         }

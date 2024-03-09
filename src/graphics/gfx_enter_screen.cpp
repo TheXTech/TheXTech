@@ -122,7 +122,7 @@ static void initPlayers(Player_t tempPlayer[maxLocalPlayers])
         dst.Location.SpeedY = 0;
     }
 
-    if(numPlayers == 1)
+    if(numPlayers == 1 || g_ClonedPlayerMode)
     {
         tempPlayer[0].Location.X = XRender::TargetW / 2.0 - tempPlayer[0].Location.Width / 2.0;
         tempPlayer[0].Location.Y = XRender::TargetH / 2.0 - tempPlayer[0].Location.Height + 24;
@@ -157,7 +157,12 @@ static void initPlayers(Player_t tempPlayer[maxLocalPlayers])
 static void drawEnterScreen(Player_t tempPlayer[maxLocalPlayers])
 {
     for(int A = 0; A < numPlayers && A < maxLocalPlayers; ++A)
+    {
         DrawPlayer(tempPlayer[A], 0);
+
+        if(g_ClonedPlayerMode)
+            break;
+    }
 
     if(TestLevel)
         SuperPrintScreenCenter("LOADING...", 3, XRender::TargetH / 2.0f + 32);
