@@ -370,3 +370,45 @@ void RenderFrameFill(const Location_t& internal, FrameBorder& frame, XTColor col
 		    color);
 	}
 }
+
+// renders a simple colored frame, optimized for an opaque frame
+void DrawSimpleFrameOpaque(int x, int y, int w, int h, XTColor border_1, XTColor border_2, XTColor fill)
+{
+	int bg_l = x;
+	int bg_r = x + w;
+	int bg_t = y;
+	int bg_b = y + h;
+
+	// border 1
+	XRender::renderRect(bg_l, bg_t, bg_r - bg_l, bg_b - bg_t, border_1);
+
+	// border 2
+	XRender::renderRect(bg_l + 2, bg_t + 2, bg_r - bg_l - 4, bg_b - bg_t - 4, border_2);
+
+	// fill
+	XRender::renderRect(bg_l + 4, bg_t + 4, bg_r - bg_l - 8, bg_b - bg_t - 8, fill);
+}
+
+// renders a simple colored frame
+void DrawSimpleFrame(int x, int y, int w, int h, XTColor border_1, XTColor border_2, XTColor fill)
+{
+	int bg_l = x;
+	int bg_r = x + w;
+	int bg_t = y;
+	int bg_b = y + h;
+
+	// border 1
+	XRender::renderRect(bg_l, bg_t, 2, bg_b - bg_t, border_1);
+	XRender::renderRect(bg_r - 2, bg_t, 2, bg_b - bg_t, border_1);
+	XRender::renderRect(bg_l + 2, bg_t, bg_r - bg_l - 4, 2, border_1);
+	XRender::renderRect(bg_l + 2, bg_b - 2, bg_r - bg_l - 4, 2, border_1);
+
+	// border 2
+	XRender::renderRect(bg_l + 2, bg_t + 2, 2, bg_b - bg_t - 4, border_2);
+	XRender::renderRect(bg_r - 4, bg_t + 2, 2, bg_b - bg_t - 4, border_2);
+	XRender::renderRect(bg_l + 4, bg_t + 2, bg_r - bg_l - 8, 2, border_2);
+	XRender::renderRect(bg_l + 4, bg_b - 4, bg_r - bg_l - 8, 2, border_2);
+
+	// fill
+	XRender::renderRect(bg_l + 4, bg_t + 4, bg_r - bg_l - 8, bg_b - bg_t - 8, fill);
+}

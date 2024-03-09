@@ -59,4 +59,10 @@ void RenderFrameBorder(const Location_t& external, const Location_t& internal,
 // the frame fills the internal rect
 void RenderFrameFill(const Location_t& internal, FrameBorder& frame, XTColor color = XTColor());
 
+// renders a simple colored frame, optimized for an opaque frame
+void DrawSimpleFrameOpaque(int x, int y, int w, int h, XTColor border_1, XTColor border_2, XTColor fill);
+
+// renders a simple colored frame
+void DrawSimpleFrame(int x, int y, int w, int h, XTColor border_1, XTColor border_2, XTColor fill);
+
 #endif // GFX_FRAME_H

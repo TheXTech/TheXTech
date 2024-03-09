@@ -41,6 +41,7 @@
 #include "main/menu_main.h"
 #include "main/screen_options.h"
 // #include "main/unicode_marqueeer.hpp"
+#include "graphics/gfx_frame.h"
 #include "graphics/gfx_marquee.h"
 #include "main/menu_controls.h"
 
@@ -692,17 +693,14 @@ bool Mouse_Render(bool mouse, bool render)
     // render logic
 
     // render the background
-    XRender::renderRect(sX, sY - (line-18), width, line*max_line + (line-18), XTColorF(0.0f, 0.0f, 0.0f, 0.5f));
+    DrawSimpleFrame(sX, sY - (line - 18), width, line * max_line + (line - 18), {0, 0, 0, 127}, {255, 255, 255, 127}, {0, 0, 0, 127});
 
     // render the title
     if(section_index != SECTION_NONE && section_index < g_config.m_options.size())
-    {
         g_config.m_options[section_index]->get_display_name(s_temp_string);
-    }
     else
-    {
         s_temp_string = g_mainMenu.mainOptions;
-    }
+
     SuperPrintScreenCenter(s_temp_string, 3, sY);
 
     // locate the cursor

@@ -30,6 +30,8 @@
 #include "../gfx.h"
 #include "../core/render.h"
 
+#include "graphics/gfx_frame.h"
+
 #include "main/screen_textentry.h"
 
 #include "main/speedrunner.h"
@@ -173,7 +175,7 @@ int menuControls_Mouse_Render(bool mouse, bool render)
 
     // render the background
     if(render)
-        XRender::renderRect(sX, sY - (line-18), width, line*max_line + (line-18), {0, 0, 0, 127});
+        DrawSimpleFrame(sX, sY - (line-18), width, line*max_line + (line-18), {0, 0, 0, 127}, {255, 255, 255, 127}, {0, 0, 0, 127});
 
     // rendering of profile deletion screen
     if(s_deleteProfileSel)
