@@ -544,7 +544,7 @@ bool Mouse_Render(bool mouse, bool render)
             mouse_scroll_cooldown--;
     }
 
-    // want 680px width. if not possible, use double-line mode on settable option screens
+    // want 680px width.
     int width;
     if(XRender::TargetW < 640)
         width = XRender::TargetW - 16;
@@ -693,7 +693,7 @@ bool Mouse_Render(bool mouse, bool render)
     // render logic
 
     // render the background
-    DrawSimpleFrame(sX, sY - (line - 18), width, line * max_line + (line - 18), {0, 0, 0, 127}, {255, 255, 255, 127}, {0, 0, 0, 127});
+    DrawSimpleFrame(sX, sY - (line - 18) - 4, width, line * max_line + (line - 18) + 8, {0, 0, 0, 127}, {255, 255, 255, 127}, {0, 0, 0, 127});
 
     // render the title
     if(section_index != SECTION_NONE && section_index < g_config.m_options.size())

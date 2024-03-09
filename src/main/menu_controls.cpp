@@ -147,11 +147,13 @@ int menuControls_Mouse_Render(bool mouse, bool render)
     const int n_types = (int)Controls::g_InputMethodTypes.size();
 
     // want 680px width. if not possible, use double-line mode on settable option screens
-    int width = 680;
-    if(XRender::TargetW < 720)
-    {
+    int width;
+    if(XRender::TargetW < 640)
+        width = XRender::TargetW - 16;
+    else if(XRender::TargetW < 720)
         width = XRender::TargetW - 40;
-    }
+    else
+        width = 680;
 
     // want up to 15 lines of text
     int line = (XRender::TargetH - 60) / 15;
@@ -175,7 +177,7 @@ int menuControls_Mouse_Render(bool mouse, bool render)
 
     // render the background
     if(render)
-        DrawSimpleFrame(sX, sY - (line-18), width, line*max_line + (line-18), {0, 0, 0, 127}, {255, 255, 255, 127}, {0, 0, 0, 127});
+        DrawSimpleFrame(sX, sY - (line - 18) - 4, width, line * max_line + (line - 18) + 8, {0, 0, 0, 127}, {255, 255, 255, 127}, {0, 0, 0, 127});
 
     // rendering of profile deletion screen
     if(s_deleteProfileSel)
