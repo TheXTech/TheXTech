@@ -739,6 +739,7 @@ bool mainMenuUpdate()
 
             if(cursorDelta != 0)
             {
+#if 0
                 if(MenuMode >= MENU_CHARACTER_SELECT_BASE && MenuMode <= MENU_CHARACTER_SELECT_BASE_END)
                 {
                     while((MenuCursor == (PlayerCharacter - 1) &&
@@ -752,6 +753,7 @@ bool mainMenuUpdate()
                             MenuCursor = 0;
                     }
                 }
+#endif
 
                 if(MenuMode >= MENU_SELECT_SLOT_BASE && MenuMode < MENU_SELECT_SLOT_END)
                 {

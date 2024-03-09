@@ -54,6 +54,7 @@ enum
     // Editor mode episode select
     MENU_EDITOR = 9,
 
+#if 0
     // Character select for single player game
     MENU_CHARACTER_SELECT_1P    = 100,
     // Character select for two player game, step 1
@@ -64,12 +65,14 @@ enum
     MENU_CHARACTER_SELECT_BM_S1 = 400,
     // Character select for battle game, step 2
     MENU_CHARACTER_SELECT_BM_S2 = 500,
-    // New character select for main game
-    MENU_CHARACTER_SELECT_NEW    = 1000,
-    MENU_CHARACTER_SELECT_NEW_BM = 1001,
 
     MENU_CHARACTER_SELECT_BASE  = MENU_CHARACTER_SELECT_1P,
     MENU_CHARACTER_SELECT_BASE_END = MENU_CHARACTER_SELECT_BM_S2,
+#endif
+
+    // New character select for main game
+    MENU_CHARACTER_SELECT_NEW    = 1000,
+    MENU_CHARACTER_SELECT_NEW_BM = 1001,
 
     MENU_INPUT_SETTINGS = 30,
 
