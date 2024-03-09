@@ -2522,7 +2522,7 @@ void mainMenuDraw()
         int LogoMode = 0;
         if(XRender::TargetH >= TinyScreenH || MenuMode == MENU_INTRO)
             LogoMode = 1;
-        else if(MenuMode == MENU_MAIN || MenuMode == MENU_NEW_OPTIONS)
+        else if(MenuMode == MENU_MAIN)
             LogoMode = 2;
 
         if(LogoMode == 1)
