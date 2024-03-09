@@ -697,8 +697,12 @@ static void s_UnloadPreviewPlayers()
     // check that no textures have been loaded since player preview
     SDL_assert_release(s_previewPlayersEnd == g_defaultLevelGfxBackup.size());
 
-    for(auto it = g_defaultLevelGfxBackup.begin() + (s_previewPlayersEnd - 1); it >= g_defaultLevelGfxBackup.begin() + s_previewPlayersBegin; --it)
+    for(auto it = g_defaultLevelGfxBackup.begin() + s_previewPlayersEnd;
+        it > g_defaultLevelGfxBackup.begin() + s_previewPlayersBegin;
+        )
     {
+        --it;
+
         auto &t = *it;
 
         if(t.remote_width)
