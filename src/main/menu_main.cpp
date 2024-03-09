@@ -753,7 +753,7 @@ bool mainMenuUpdate()
                     }
                 }
 
-                if(MenuMode >= MENU_SELECT_SLOT_BASE && MenuMode <= MENU_SELECT_SLOT_END)
+                if(MenuMode >= MENU_SELECT_SLOT_BASE && MenuMode < MENU_SELECT_SLOT_END)
                 {
                     ConfigChangeSentinel sent(ConfigSetLevel::ep_config);
 
