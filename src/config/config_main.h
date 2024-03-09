@@ -195,6 +195,13 @@ public:
         "use-native-osk", "Use native OSK", "Use system's native onscreen keyboard instead of the TheXTech one"};
 #endif
 
+#ifndef NO_WINDOW_FOCUS_TRACKING
+    opt<bool> background_work{this, defaults(false), {}, Scope::UserGlobal,
+        "background-work", "Run in background", "The game should not pause when the window focus is lost (input only works with game controllers)"};
+#else
+    static constexpr bool background_work = true;
+#endif
+
     /* ---- Main - Frame Timing ----*/
     subsection main_frame_timing{this, "timing", "Frame Timing"};
 
@@ -203,13 +210,6 @@ public:
 
     opt<bool> unlimited_framerate{this, defaults(false), {}, Scope::UserGlobal,
         "unlimited-framerate", "Unlimited framerate", "The game should not limit the framerate to 66 FPS"};
-
-#ifndef NO_WINDOW_FOCUS_TRACKING
-    opt<bool> background_work{this, defaults(false), {}, Scope::UserGlobal,
-        "background-work", "Run in background", "The game should not pause when the window focus is lost (input only works with game controllers)"};
-#else
-    static constexpr bool background_work = true;
-#endif
 
     opt<bool> render_vsync{this, defaults(false), {}, Scope::UserGlobal,
         "vsync", "V-Sync", "Synchronizes the game speed to the screen refresh rate",
