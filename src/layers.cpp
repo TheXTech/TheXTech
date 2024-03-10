@@ -1314,7 +1314,8 @@ void ProcEvent(eventindex_t index, int whichPlayer, bool NoEffect)
                 MessageText = GetS(evt.Text);
 
                 bool player_valid = whichPlayer >= 1 && whichPlayer <= numPlayers;
-                preProcessMessage(MessageText, player_valid ? whichPlayer : -1);
+                int base_player = (numPlayers > 1) ? -1 : 1;
+                preProcessMessage(MessageText, player_valid ? whichPlayer : base_player);
 
                 bool use_player_pause = (player_valid && g_config.multiplayer_pause_controls);
                 PauseGame(PauseCode::Message, use_player_pause ? whichPlayer : 0);

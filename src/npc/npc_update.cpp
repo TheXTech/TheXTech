@@ -552,7 +552,7 @@ void UpdateNPCs()
                 // if activated by a shared screen, don't make the event player-specific
                 const vScreen_t& activ_vscreen = vScreen[NPC[A].JustActivated];
                 const Screen_t& activ_screen = Screens[activ_vscreen.screen_ref];
-                bool shared_screen = (g_config.multiplayer_pause_controls) && (activ_screen.player_count > 1) && (activ_screen.active_end() - activ_screen.active_begin() == 1);
+                bool shared_screen = (activ_screen.player_count > 1) && (activ_screen.active_end() - activ_screen.active_begin() == 1);
 
                 int activ_player = (shared_screen) ? 0 : activ_vscreen.player;
 
@@ -579,7 +579,7 @@ void UpdateNPCs()
                             NPC[B].TimeLeft = NPC[A].TimeLeft;
                             NPC[B].Section = NPC[A].Section;
 
-                            if(g_config.multiplayer_pause_controls)
+                            if(g_config.modern_npc_camera_logic)
                                 NPC[B].JustActivated = NPC[A].JustActivated;
                             else
                                 NPC[B].JustActivated = 1;
@@ -633,7 +633,7 @@ void UpdateNPCs()
                                     NPC[B].TimeLeft = NPC[newAct[C]].TimeLeft;
                                     NPC[B].Section = NPC[newAct[C]].Section;
 
-                                    if(g_config.multiplayer_pause_controls)
+                                    if(g_config.modern_npc_camera_logic)
                                         NPC[B].JustActivated = NPC[A].JustActivated;
                                     else
                                         NPC[B].JustActivated = 1;
