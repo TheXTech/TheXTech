@@ -39,6 +39,7 @@ Changelog for 1.3.6.5-dev
 -The fails counter now increments whenever any player dies (not just P1) (@ds-sloth)
 -Fix a graphical bug where an NPC emerging upwards from a block might use the wrong frame and width (@ds-sloth)
 -Fix the logical size of an NPC emerging downwards from a block, guarded by compat flag fix-npc-emerge-size (@ds-sloth)
+-Fix a vanilla bug where blocks could become intangible to NPCs after a coin switch was used (@ds-sloth)
 
 Changelog for 1.3.6.4
 -Use OpenGL as the default renderer on supported platforms ("sdl" may be used in config.ini or at at the command line to request the SDL2 renderer)
