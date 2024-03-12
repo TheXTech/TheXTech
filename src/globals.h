@@ -816,8 +816,8 @@ struct Block_t
     eventindex_t TriggerLast = EVENT_NONE;
 //    Layer As String
     layerindex_t Layer = LAYER_NONE;
-//    Hidden As Boolean
-    bool Hidden = false;
+//    NPC As Integer 'when a coin is turned into a block after the p switch is hit
+    NPCID coinSwitchNpcType = NPCID(0);
 //    Type As Integer 'the block's type
     vbint_t Type = 0;
 //    Special As Integer 'what is in the block?
@@ -832,8 +832,8 @@ struct Block_t
     bool Kill = false;
 //    Invis As Boolean 'for invisible blocks
     bool Invis = false;
-//    NPC As Integer 'when a coin is turned into a block after the p switch is hit
-    NPCID coinSwitchNpcType = NPCID(0);
+//    Hidden As Boolean
+    bool Hidden = false;
 //    IsPlayer As Integer 'for the clown car
     uint8_t tempBlockVehiclePlr = 0;
 //    IsNPC As Integer 'the type of NPC the block is
