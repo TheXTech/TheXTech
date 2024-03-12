@@ -5457,6 +5457,7 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
                     NPC[p.HoldingNPC].Location.X = p.Location.X + p.Location.Width - Physics.PlayerGrabSpotX[p.Character][p.State] - NPC[p.HoldingNPC].Location.Width;
                 NPC[p.HoldingNPC].Location.Y = p.Location.Y + Physics.PlayerGrabSpotY[p.Character][p.State] + 32 - NPC[p.HoldingNPC].Location.Height;
             }
+
             if(NPC[p.HoldingNPC].Type == NPCID_TOOTHYPIPE && !FreezeNPCs)
             {
                 if(NPC[p.HoldingNPC].Special == 0.0)
@@ -5476,7 +5477,8 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
                         NPC[numNPCs].Frame = 2;
                     syncLayers_NPC(numNPCs);
                 }
-                for(B = 1; B <= numNPCs; B++)
+
+                for(int B : NPCQueues::Active.no_change)
                 {
                     if(NPC[B].Type == NPCID_TOOTHY && NPC[B].Special == A)
                     {
