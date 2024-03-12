@@ -361,7 +361,7 @@ void DrawEditorLevel(int Z)
                 if(vScreenCollision(Z, b.Location))
                 {
                     XRender::renderTexture(vScreen[Z].X + b.Location.X,
-                                          vScreen[Z].Y + b.Location.Y + b.ShakeY3,
+                                          vScreen[Z].Y + b.Location.Y + b.ShakeOffset,
                                           b.Location.Width,
                                           b.Location.Height,
                                           GFXBlock[b.Type], 0, BlockFrame[b.Type] * 32);

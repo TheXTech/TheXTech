@@ -721,16 +721,16 @@ void PlayerHurt(const int A)
 
                         for(int B = 1; B <= numNPCs; B++)
                         {
-                            if(NPC[B].standingOnPlayer == A)
+                            if(NPC[B].vehiclePlr == A)
                             {
-                                NPC[B].standingOnPlayer = 0;
+                                NPC[B].vehiclePlr = 0;
                                 NPC[B].Location.SpeedY = 0;
-                                NPC[B].Location.Y = NPC[numNPCs].Location.Y - 0.1 - NPC[B].standingOnPlayerY;
+                                NPC[B].Location.Y = NPC[numNPCs].Location.Y - 0.1 - NPC[B].vehicleYOffset;
                                 treeNPCUpdate(B);
                                 if(NPC[B].tempBlock > 0)
                                     treeNPCSplitTempBlock(B);
 
-                                NPC[B].standingOnPlayerY = 0;
+                                NPC[B].vehicleYOffset = 0;
                                 if(NPC[B].Type == NPCID_CANNONITEM)
                                     NPC[B].Special = 0;
                                 if(NPC[B].Type == NPCID_TOOTHY)
@@ -2396,7 +2396,7 @@ void TailSwipe(const int plr, bool boo, bool Stab, int StabDir)
         // lBlock = LastBlock[((tailLoc.X + tailLoc.Width) / 32.0) + 1];
         // blockTileGet(tailLoc, fBlock, lBlock);
 
-        for(BlockRef_t block_p : treeBlockQuery(tailLoc, SORTMODE_COMPAT))
+        for(BlockRef_t block_p : treeFLBlockQuery(tailLoc, SORTMODE_COMPAT))
         {
             Block_t& block = *block_p;
             A = (int)block_p;
@@ -2405,7 +2405,8 @@ void TailSwipe(const int plr, bool boo, bool Stab, int StabDir)
             {
                 if(CheckCollision(tailLoc, block.Location))
                 {
-                    if(block.ShakeY == 0 && block.ShakeY2 == 0 && block.ShakeY3 == 0)
+                    // if(block.ShakeY == 0 && block.ShakeY2 == 0 && block.ShakeY3 == 0)
+                    if(block.ShakeCounter == 0)
                     {
                         if(block.Special > 0 || block.Type == 55 || block.Type == 159 || block.Type == 90)
                             PlaySoundSpatial(SFX_BlockHit, block.Location);
@@ -2428,7 +2429,8 @@ void TailSwipe(const int plr, bool boo, bool Stab, int StabDir)
                         BlockHitHard(A);
                         if(!Stab)
                         {
-                            if(block.ShakeY != 0)
+                            // if(block.ShakeY != 0)
+                            if(block.ShakeCounter != 0)
                             {
                                 tempLoc.X = (block.Location.X + tailLoc.X + (block.Location.Width + tailLoc.Width) / 2.0) / 2 - 16;
                                 tempLoc.Y = (block.Location.Y + tailLoc.Y + (block.Location.Height + tailLoc.Height) / 2.0) / 2 - 16;
@@ -2440,7 +2442,10 @@ void TailSwipe(const int plr, bool boo, bool Stab, int StabDir)
                         {
                             if(StabDir == 2)
                             {
-                                if(block.Type == 293 || block.Type == 370 || block.ShakeY != 0 || block.ShakeY2 != 0 || block.ShakeY3 != 0 || block.Hidden || BlockHurts[block.Type])
+                                if(block.Type == 293 || block.Type == 370
+                                    /* || block.ShakeY != 0 || block.ShakeY2 != 0 || block.ShakeY3 != 0 */
+                                    || block.ShakeCounter != 0
+                                    || block.Hidden || BlockHurts[block.Type])
                                 {
                                     if(BlockHurts[block.Type])
                                         PlaySoundSpatial(SFX_Spring, block.Location);
@@ -3076,14 +3081,14 @@ void PlayerDismount(const int A)
 
         for(int numNPCsMax3 = numNPCs, B = 1; B <= numNPCsMax3; B++)
         {
-            if(NPC[B].standingOnPlayer == A)
+            if(NPC[B].vehiclePlr == A)
             {
-                NPC[B].standingOnPlayer = 0;
+                NPC[B].vehiclePlr = 0;
                 NPC[B].Location.SpeedY = 0;
-                NPC[B].Location.Y = NPC[numNPCs].Location.Y - 0.1 - NPC[B].standingOnPlayerY;
+                NPC[B].Location.Y = NPC[numNPCs].Location.Y - 0.1 - NPC[B].vehicleYOffset;
                 treeNPCUpdate(B);
 
-                NPC[B].standingOnPlayerY = 0;
+                NPC[B].vehicleYOffset = 0;
                 if(NPC[B].Type == NPCID_CANNONITEM)
                     NPC[B].Special = 0;
                 if(NPC[B].Type == NPCID_TOOTHY)
@@ -3202,7 +3207,7 @@ void PlayerPush(const int A, int HitSpot)
     // lBlock = LastBlock[((p.Location.X + p.Location.Width) / 32.0) + 1];
     // blockTileGet(p.Location, fBlock, lBlock);
 
-    for(BlockRef_t block : treeBlockQuery(p.Location, SORTMODE_COMPAT))
+    for(BlockRef_t block : treeFLBlockQuery(p.Location, SORTMODE_COMPAT))
     {
         int B = block;
         Block_t& b = *block;
@@ -3943,7 +3948,7 @@ void ClownCar()
 
             for(int numNPCsMax8 = numNPCs, B = 1; B <= numNPCsMax8; B++)
             {
-                if(NPC[B].standingOnPlayer == A && NPC[B].Type != NPCID_TOOTHY)
+                if(NPC[B].vehiclePlr == A && NPC[B].Type != NPCID_TOOTHY)
                 {
                     if(Player[A].Effect == 0)
                         NPC[B].Location.X += Player[A].Location.SpeedX + double(Player[A].mountBump);
@@ -3952,7 +3957,7 @@ void ClownCar()
                     NPC[B].Location.SpeedX = 0;
                     if(Player[A].Effect != 0)
                         NPC[B].Location.SpeedY = 0;
-                    NPC[B].Location.Y = Player[A].Location.Y + NPC[B].Location.SpeedY + 0.1 - NPC[B].standingOnPlayerY;
+                    NPC[B].Location.Y = Player[A].Location.Y + NPC[B].Location.SpeedY + 0.1 - NPC[B].vehicleYOffset;
                     treeNPCUpdate(B);
 
                     if(Player[A].Controls.Run)
@@ -3983,7 +3988,7 @@ void ClownCar()
                             {
                                 if(NPC[C].Type == NPCID_TOOTHY && Maths::iRound(NPC[C].Special) == A && Maths::iRound(NPC[C].Special2) == B)
                                 {
-                                    NPC[C].standingOnPlayer = A;
+                                    NPC[C].vehiclePlr = A;
                                     NPC[C].Projectile = true;
                                     NPC[C].Direction = NPC[B].Direction;
                                     if(NPC[C].Direction > 0)
@@ -4008,7 +4013,7 @@ void ClownCar()
 
                     for(int C : treeNPCQuery(tempLocation, SORTMODE_NONE))
                     {
-                        if(B != C && (NPC[C].standingOnPlayer == A || NPC[C].playerTemp))
+                        if(B != C && (NPC[C].vehiclePlr == A || NPC[C].playerTemp))
                         {
                             if(CheckCollision(tempLocation, NPC[C].Location))
                             {
@@ -4020,8 +4025,8 @@ void ClownCar()
 
                     if(!tempBool)
                     {
-                        NPC[B].standingOnPlayer = 0;
-                        NPC[B].standingOnPlayerY = 0;
+                        NPC[B].vehiclePlr = 0;
+                        NPC[B].vehicleYOffset = 0;
                     }
                     else
                         NPC[B].Location.SpeedX = 0;
@@ -7927,10 +7932,10 @@ void DropPlayer(const int A)
     {
         NPC_t& n = NPC[C];
         // most of these should not be equal because PlayerGone has already been called.
-        if(n.standingOnPlayer > A)
-            n.standingOnPlayer --;
-        else if(n.standingOnPlayer == A)
-            n.standingOnPlayer = 0;
+        if(n.vehiclePlr > A)
+            n.vehiclePlr --;
+        else if(n.vehiclePlr == A)
+            n.vehiclePlr = 0;
         if(n.HoldingPlayer > A)
             n.HoldingPlayer --;
         else if(n.HoldingPlayer == A)

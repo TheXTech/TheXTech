@@ -322,7 +322,7 @@ void DrawPlayer(Player_t &p, const int Z, XTColor color)
                                         NPC[p.HoldingNPC].HoldingPlayer > 0 &&
                                         Player[NPC[p.HoldingNPC].HoldingPlayer].Effect != 3
                                   ) ||
-                                 (NPC[p.HoldingNPC].Type == NPCID_TOOTHY && NPC[p.HoldingNPC].standingOnPlayer == 0) ||
+                                 (NPC[p.HoldingNPC].Type == NPCID_TOOTHY && NPC[p.HoldingNPC].vehiclePlr == 0) ||
                                  (NPC[p.HoldingNPC].Type == NPCID_BULLET && NPC[p.HoldingNPC].CantHurt > 0)
                              ) ||
                           NPC[p.HoldingNPC].Effect == NPCEFF_PET_TONGUE

@@ -33,7 +33,6 @@ void AppPathP::initDefaultPaths(const std::string &userDirName)
     (void)userDirName;
 
     fatInitDefault();
-    s_assetRoot.clear();
 }
 
 std::string AppPathP::appDirectory()

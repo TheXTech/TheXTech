@@ -161,4 +161,14 @@ inline bool NPCNoYoshi(int Type)
     return NPCTraits[Type].NoYoshi;
 }
 
+inline bool Block_t::tempBlockNoProjClipping() const
+{
+    if(tempBlockNpcType <= 0)
+        return false;
+
+    // cross-ref NPC temp block creation code in UpdateNPCs
+    const NPCTraits_t& npc_tr = NPCTraits[tempBlockNpcType];
+    return (npc_tr.CanWalkOn && !npc_tr.IsAHit1Block && !npc_tr.IsABlock);
+}
+
 #endif // #ifndef NPC_TRAITS_H

@@ -100,6 +100,7 @@ const int maxBlocks = 10000;
 const int maxBlocks = 20000;
 #endif
 //Public Const maxPlayers As Integer = 200  'Holds the max number of players
+// Must not exceed 255 (largest uint8_t)
 #ifdef __16M__
 const int maxPlayers = 16;
 #else

@@ -346,9 +346,9 @@ struct NPC_t
     PinchedInfo_t Pinched = PinchedInfo_t();
 
 //    standingOnPlayer As Integer 'If this NPC is standing on a player in the clown car
-    vbint_t standingOnPlayer = 0;
+    uint8_t vehiclePlr = 0;
 //    standingOnPlayerY As Integer
-    vbint_t standingOnPlayerY = 0;
+    vbint_t vehicleYOffset = 0;
 //    Slope As Integer 'the block that the NPC is on a slope with
     vbint_t Slope = 0;
 //    Multiplier As Integer 'for upping the points the player recieves
@@ -816,35 +816,38 @@ struct Block_t
     eventindex_t TriggerLast = EVENT_NONE;
 //    Layer As String
     layerindex_t Layer = LAYER_NONE;
-//    Hidden As Boolean
-    bool Hidden = false;
+//    NPC As Integer 'when a coin is turned into a block after the p switch is hit
+    NPCID coinSwitchNpcType = NPCID(0);
 //    Type As Integer 'the block's type
     vbint_t Type = 0;
 //    Special As Integer 'what is in the block?
     vbint_t Special = 0;
 //'for the shake effect after hitting ablock
 //    ShakeY As Integer
-    vbint_t ShakeY = 0;
 //    ShakeY2 As Integer
-    vbint_t ShakeY2 = 0;
 //    ShakeY3 As Integer
-    vbint_t ShakeY3 = 0;
+    uint8_t ShakeCounter = 0;
+    int8_t ShakeOffset = 0;
 //    Kill As Boolean 'if true the game will destroy the block
     bool Kill = false;
 //    Invis As Boolean 'for invisible blocks
     bool Invis = false;
-//    NPC As Integer 'when a coin is turned into a block after the p switch is hit
-    NPCID NPC = NPCID(0);
+//    Hidden As Boolean
+    bool Hidden = false;
 //    IsPlayer As Integer 'for the clown car
-    vbint_t IsPlayer = 0;
+    uint8_t tempBlockVehiclePlr = 0;
 //    IsNPC As Integer 'the type of NPC the block is
-    NPCID IsNPC = NPCID(0);
+    NPCID tempBlockNpcType = NPCID(0);
 //    standingOnPlayerY As Integer 'when standing on a player in the clown car
-    vbint_t standingOnPlayerY = 0;
+    vbint_t tempBlockVehicleYOffset = 0;
 //    noProjClipping As Boolean
-    bool noProjClipping = false;
+    // bool noProjClipping = false;
 //    IsReally As Integer 'the NPC that is this block
-    vbint_t IsReally = 0;
+    vbint_t tempBlockNpcIdx = 0;
+
+    inline bool tempBlockNoProjClipping() const;
+
+public:
 
 // EXTRA: Indicate the fact that block was resized by a hit
 #ifdef LOW_MEM

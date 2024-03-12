@@ -25,6 +25,7 @@
 #include "location.h"
 
 struct NPC_t;
+struct Block_t;
 
 enum CollisionSpot
 {
@@ -79,7 +80,7 @@ bool CursorCollision(const Location_t &Loc1, const SpeedlessLocation_t &Loc2);
 bool CursorCollision(const Location_t &Loc1, const TinyLocation_t &Loc2);
 // Public Function ShakeCollision(Loc1 As Location, Loc2 As Location, ShakeY3 As Integer) As Boolean 'Shakey block collision
 // Shakey block collision
-bool ShakeCollision(const Location_t &Loc1, const Location_t &Loc2, int ShakeY3);
+bool ShakeCollision(const Location_t &Loc1, const Block_t &b);
 // Public Function vScreenCollision(A As Integer, Loc2 As Location) As Boolean  'vScreen collisions
 // vScreen collisions
 bool vScreenCollision(int A, const Location_t &Loc2);

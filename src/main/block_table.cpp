@@ -307,19 +307,19 @@ void treeBlockRemoveLayer(int layer, BlockRef_t block)
     s_block_tables.erase(layer, block);
 }
 
-TreeResult_Sentinel<BlockRef_t> treeBlockQuery(double Left, double Top, double Right, double Bottom,
+TreeResult_Sentinel<BlockRef_t> treeFLBlockQuery(double Left, double Top, double Right, double Bottom,
                          int sort_mode,
                          double margin)
 {
     return s_block_tables.query(Left, Top, Right, Bottom, sort_mode, margin);
 }
 
-void treeBlockQuery(std::vector<BaseRef_t>& out, const Location_t &loc, int sort_mode)
+void treeFLBlockQuery(std::vector<BaseRef_t>& out, const Location_t &loc, int sort_mode)
 {
     s_block_tables.query(out, loc, sort_mode);
 }
 
-TreeResult_Sentinel<BlockRef_t> treeBlockQuery(const Location_t &loc,
+TreeResult_Sentinel<BlockRef_t> treeFLBlockQuery(const Location_t &loc,
                          int sort_mode)
 {
     return s_block_tables.query(loc, sort_mode);
@@ -436,7 +436,10 @@ TreeResult_Sentinel<BlockRef_t> treeTempBlockQuery(const Location_t &_loc,
 
     if(sort_mode == SORTMODE_COMPAT)
     {
-        sort_mode = SORTMODE_LOC;
+        if(g_config.emulate_classic_block_order)
+            sort_mode = SORTMODE_ID;
+        else
+            sort_mode = SORTMODE_LOC;
     }
 
     if(sort_mode == SORTMODE_LOC)
@@ -486,7 +489,7 @@ TreeResult_Sentinel<BlockRef_t> treeTempBlockQuery(double Left, double Top, doub
 
 /* ================= Combined Block Query ============== */
 
-TreeResult_Sentinel<BlockRef_t> treeBlockQueryWithTemp(const Location_t &_loc,
+TreeResult_Sentinel<BlockRef_t> treeBlockQuery(const Location_t &_loc,
                          int sort_mode)
 {
     TreeResult_Sentinel<BlockRef_t> result;
@@ -533,11 +536,12 @@ TreeResult_Sentinel<BlockRef_t> treeBlockQueryWithTemp(const Location_t &_loc,
         loc.Y = oY;
     }
 
-    auto pre_temp_size = result.i_vec->size();
 
-
+    // this is where this function differs from the standard TableInterface::query
     if(s_temp_blocks_enabled)
     {
+        auto pre_temp_size = result.i_vec->size();
+
         s_npc_table.query(*result.i_vec, loc);
 
         s_NPCsToTempBlocks(*result.i_vec, pre_temp_size);
@@ -546,24 +550,13 @@ TreeResult_Sentinel<BlockRef_t> treeBlockQueryWithTemp(const Location_t &_loc,
     }
 
 
-    // sort real ones by ID, temp ones by loc, and have them arranged this way
     if(sort_mode == SORTMODE_COMPAT)
     {
-        std::sort(result.i_vec->begin(), result.i_vec->begin() + pre_temp_size,
-        [](BaseRef_t a, BaseRef_t b)
-        {
-            return a.index < b.index;
-        });
-
-        std::sort(result.i_vec->begin() + pre_temp_size, result.i_vec->end(),
-        [](BaseRef_t a, BaseRef_t b)
-        {
-            return (((BlockRef_t)a)->Location.X <= ((BlockRef_t)b)->Location.X
-                && (((BlockRef_t)a)->Location.X < ((BlockRef_t)b)->Location.X
-                    || ((BlockRef_t)a)->Location.Y < ((BlockRef_t)b)->Location.Y));
-        });
+        if(g_config.emulate_classic_block_order)
+            sort_mode = SORTMODE_ID;
+        else
+            sort_mode = SORTMODE_LOC;
     }
-
 
     if(sort_mode == SORTMODE_LOC)
     {

@@ -317,6 +317,31 @@ SDL_FORCE_INLINE void memToValue(short &target, double value, FIELDTYPE ftype)
     }
 }
 
+SDL_FORCE_INLINE void memToValue(uint8_t &target, double value, FIELDTYPE ftype)
+{
+    switch(ftype)
+    {
+    case FT_BYTE:
+        target = static_cast<uint8_t>(f2i_cast<uint8_t>(value));
+        break;
+    case FT_WORD:
+        target = static_cast<uint8_t>(static_cast<int16_t>(f2i_cast<uint16_t>(value)));
+        break;
+    case FT_DWORD:
+    case FT_DFLOAT:
+        target = static_cast<uint8_t>(value);
+        break;
+    case FT_FLOAT:
+        target = static_cast<uint8_t>(f2i_cast<float>(value));
+        break;
+//    case FT_DFLOAT: // United with FT_DWORD
+//        target = static_cast<int32_t>(value);
+//        break;
+    default: //Don't change
+        break;
+    }
+}
+
 SDL_FORCE_INLINE void memToValue(bool &target, double value, FIELDTYPE ftype)
 {
     UNUSED(ftype);
@@ -382,6 +407,24 @@ SDL_FORCE_INLINE double valueToMem(const int &source, FIELDTYPE ftype)
 }
 
 SDL_FORCE_INLINE double valueToMem(const short &source, FIELDTYPE ftype)
+{
+    switch(ftype)
+    {
+    case FT_BYTE:
+        return static_cast<double>(static_cast<uint8_t>(source));
+    case FT_WORD:
+        return static_cast<double>(static_cast<int16_t>(source));
+    default:
+    case FT_DWORD:
+        return static_cast<double>(source);
+    case FT_FLOAT:
+        return static_cast<double>(static_cast<float>(source));
+    case FT_DFLOAT:
+        return static_cast<double>(source);
+    }
+}
+
+SDL_FORCE_INLINE double valueToMem(const uint8_t &source, FIELDTYPE ftype)
 {
     switch(ftype)
     {
@@ -911,6 +954,7 @@ protected:
         VT_UNKNOWN = 0,
         VT_DOUBLE,
         VT_FLOAT,
+        VT_UINT8,
         VT_INT16,
         VT_INT32,
         VT_BOOL,
@@ -934,6 +978,8 @@ protected:
         double      T::* field_d = nullptr;
         //! Float-type field pointer
         float       T::* field_f = nullptr;
+        //! UInt8-type field pointer (note: used exclusively for i16s converted to u8s)
+        uint8_t     T::* field_u8 = nullptr;
         //! Int-type field pointer
         short       T::* field_i16 = nullptr;
         //! Int-type field pointer
@@ -950,6 +996,19 @@ protected:
     Value m_type[maxAddr];
     //! Byte map of addresses
     Value m_byte[maxAddr];
+
+    void insert(size_t address, uint8_t T::*field)
+    {
+        Value v;
+
+        // Normal field
+        v.field_u8 = field;
+        v.type = VT_UINT8;
+        v.baseType = VT_UINT8;
+        v.offset = 0; //-V1048
+        v.baseAddress = address;
+        m_type[address] = v;
+    }
 
     void insert(size_t address, short T::*field)
     {
@@ -1151,6 +1210,14 @@ public:
             return valueToMem(obj->*(t->field_i16), ftype);
         }
 
+        case VT_UINT8:
+        {
+            SDL_assert(t->field_u8);
+            if(ftype != FT_WORD)
+                pLogWarning("MemEmu: Read type missmatched at %s 0x%x (SInt16 expected, %s actually)", objName, address, FieldtypeToStr(ftype));
+            return valueToMem(obj->*(t->field_u8), ftype);
+        }
+
         case VT_BOOL:
         {
             SDL_assert(t->field_b);
@@ -1286,6 +1353,15 @@ public:
             if(ftype != FT_WORD)
                 pLogWarning("MemEmu: Write type missmatched at %s 0x%x (SInt16 expected, %s actually)", objName, address, FieldtypeToStr(ftype));
             memToValue(obj->*(t->field_i16), value, ftype);
+            return;
+        }
+
+        case VT_UINT8:
+        {
+            SDL_assert(t->field_u8);
+            if(ftype != FT_WORD)
+                pLogWarning("MemEmu: Write type missmatched at %s 0x%x (SInt16 expected, %s actually)", objName, address, FieldtypeToStr(ftype));
+            memToValue(obj->*(t->field_u8), value, ftype);
             return;
         }
 
@@ -1844,8 +1920,8 @@ public:
         // insert(0x00000056, &NPC_t::Pinched); // unused since SMBX64, now removed
         // insert(0x00000058, &NPC_t::PinchedDirection); // unused since SMBX64, now removed
         insert(0x0000005c, &NPC_t::BeltSpeed);
-        insert(0x00000060, &NPC_t::standingOnPlayer);
-        insert(0x00000062, &NPC_t::standingOnPlayerY);
+        insert(0x00000060, &NPC_t::vehiclePlr);
+        insert(0x00000062, &NPC_t::vehicleYOffset);
         insert(0x00000064, // Generator
             [](const NPC_t& n, FIELDTYPE ftype)->double
             {

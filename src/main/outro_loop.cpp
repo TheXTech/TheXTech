@@ -208,7 +208,7 @@ void OutroLoop()
 
             bool doJump = true;
 
-            for(const Block_t& bb : treeBlockQuery(tempLocation, SORTMODE_NONE))
+            for(const Block_t& bb : treeFLBlockQuery(tempLocation, SORTMODE_NONE))
             {
 //                if(tempLocation.X + tempLocation.Width >= Block[B].Location.X &&
 //                   tempLocation.X <= Block[B].Location.X + Block[B].Location.Width &&

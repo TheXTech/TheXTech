@@ -548,7 +548,7 @@ void UpdatePlayer()
                         // lBlock = LastBlock[((tempLocation.X + tempLocation.Width) / 32.0) + 1];
                         // blockTileGet(tempLocation, fBlock, lBlock);
 
-                        for(int B : treeBlockQuery(tempLocation, SORTMODE_NONE))
+                        for(int B : treeFLBlockQuery(tempLocation, SORTMODE_NONE))
                         {
                             if(!Block[B].Invis && !BlockIsSizable[Block[B].Type] && !BlockOnlyHitspot1[Block[B].Type] &&
                                !BlockNoClipping[Block[B].Type] && !Block[B].Hidden)
@@ -2340,7 +2340,7 @@ void UpdatePlayer()
                 // lBlock = LastBlock[((Player[A].Location.X + Player[A].Location.Width) / 32.0) + 1];
                 // blockTileGet(Player[A].Location, fBlock, lBlock);
 
-                for(int B : treeBlockQuery(Player[A].Location, SORTMODE_COMPAT))
+                for(int B : treeFLBlockQuery(Player[A].Location, SORTMODE_COMPAT))
                 {
                     // checks to see if a collision happened
                     if(Player[A].Location.X + Player[A].Location.Width >= Block[B].Location.X)
@@ -2914,7 +2914,7 @@ void UpdatePlayer()
                                                 // lBlock = LastBlock[((tempLocation.X + tempLocation.Width) / 32.0) + 1];
                                                 // blockTileGet(tempLocation, fBlock, lBlock);
 
-                                                for(int C : treeBlockQuery(tempLocation, SORTMODE_COMPAT))
+                                                for(int C : treeFLBlockQuery(tempLocation, SORTMODE_COMPAT))
                                                 {
                                                     if(CheckCollision(tempLocation, Block[C].Location) && !Block[C].Hidden)
                                                     {
@@ -3436,9 +3436,9 @@ void UpdatePlayer()
                 {
                     if(NPC[B].Active && NPC[B].Killed == 0 && NPC[B].Effect != 5 && NPC[B].Effect != 6)
                     {
-                        // If Not (NPC(B).Type = 17 And NPC(B).CantHurt > 0) And Not (.Mount = 2 And NPC(B).Type = 56) And Not NPC(B).standingOnPlayer = A And Not NPC(B).Type = 197 And Not NPC(B).Type = 237 Then
+                        // If Not (NPC(B).Type = 17 And NPC(B).CantHurt > 0) And Not (.Mount = 2 And NPC(B).Type = 56) And Not NPC(B).vehiclePlr = A And Not NPC(B).Type = 197 And Not NPC(B).Type = 237 Then
                         if(!(Player[A].Mount == 2 && NPC[B].Type == NPCID_VEHICLE) &&
-                            NPC[B].standingOnPlayer != A &&
+                            NPC[B].vehiclePlr != A &&
                             NPC[B].Type != NPCID_GOALTAPE &&
                             NPC[B].Type != NPCID_ICE_BLOCK
                         )
@@ -3667,7 +3667,7 @@ void UpdatePlayer()
                                     }
                                     else if(Player[A].Mount == 2)
                                     {
-                                        if(NPC[B].standingOnPlayer == A)
+                                        if(NPC[B].vehiclePlr == A)
                                             HitSpot = 0;
                                         else if(!(NPC[B].Type == NPCID_BULLET && NPC[B].CantHurt > 0))
                                         {
@@ -4162,7 +4162,7 @@ void UpdatePlayer()
                                                     // lBlock = LastBlock[((Player[A].Location.X + Player[A].Location.Width) / 32.0) + 1];
                                                     // blockTileGet(Player[A].Location, fBlock, lBlock);
 
-                                                    for(int C : treeBlockQuery(Player[A].Location, SORTMODE_NONE))
+                                                    for(int C : treeFLBlockQuery(Player[A].Location, SORTMODE_NONE))
                                                     {
                                                         if(CheckCollision(Player[A].Location, Block[C].Location) &&
                                                            !Block[C].Hidden && !BlockIsSizable[Block[C].Type] &&
@@ -4274,7 +4274,7 @@ void UpdatePlayer()
                                                         D = Player[A].Location.X - D;
                                                         for(int C = 1; C <= numNPCs; C++)
                                                         {
-                                                            if(NPC[C].standingOnPlayer == A)
+                                                            if(NPC[C].vehiclePlr == A)
                                                             {
                                                                 NPC[C].Location.X += D;
                                                                 treeNPCUpdate(C);

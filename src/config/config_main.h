@@ -797,6 +797,9 @@ public:
         "fix-visual-bugs", "Fix visual bugs", "Fix misc visual bugs from SMBX 1.3"};
     opt<bool> fix_npc_emerge_size{this, defaults(true), {CompatClass::standard_update, false}, Scope::File,
         "fix-npc-emerge-size", "Fix NPC emerge size", "Fix size of NPC emerging from a block"};
+    opt<bool> fix_switched_block_clipping{this, defaults(true), {CompatClass::standard_update, false}, Scope::File,
+        "fix-switched-block-clipping", "Fix switched block clipping", "Don't let blocks become intangible to NPCs after coin switch"};
+
 
     // 1.3.7
     opt<bool> fix_npc_camera_logic{this, defaults(true), {CompatClass::critical_update, false}, Scope::File,

@@ -75,6 +75,7 @@ void CharStuff(int WhatNPC = 0, bool CheckEggs = false);
 // Public Function RandomBonus()
 NPCID RandomBonus();
 
+// totally new function, used in the Raft logic
 bool npcHasFloor(const struct NPC_t &npc);
 
 #endif // NPC_H

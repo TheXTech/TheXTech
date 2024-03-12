@@ -171,9 +171,22 @@ extern void treeLevelCleanBlockLayers();
 extern void treeBlockAddLayer(int layer, BlockRef_t obj);
 extern void treeBlockRemoveLayer(int layer, BlockRef_t obj);
 extern void treeBlockUpdateLayer(int layer, BlockRef_t obj);
-extern TreeResult_Sentinel<BlockRef_t> treeBlockQuery(double Left, double Top, double Right, double Bottom,
+
+/**
+ * \brief queries the block table, and excludes tempBlocks from the results if called while tempBlocks are active
+ *
+ * use this to replace VB6 iterations over block columns (that previously used FLBlock), or code that specifically wants to exclude tempBlocks
+ **/
+extern TreeResult_Sentinel<BlockRef_t> treeFLBlockQuery(double Left, double Top, double Right, double Bottom,
                                int sort_mode, double margin = 2.0);
-extern void treeBlockQuery(std::vector<BaseRef_t>& out, const Location_t &loc, int sort_mode);
+extern void treeFLBlockQuery(std::vector<BaseRef_t>& out, const Location_t &loc, int sort_mode);
+extern TreeResult_Sentinel<BlockRef_t> treeFLBlockQuery(const Location_t &loc, int sort_mode);
+
+/**
+ * \brief queries the block table, and includes tempBlocks in the results if called while tempBlocks are active
+ *
+ * use this in new code, and to replace VB6 iterations over the full block array
+ **/
 extern TreeResult_Sentinel<BlockRef_t> treeBlockQuery(const Location_t &loc, int sort_mode);
 
 extern void treeTempBlockFullClear();
@@ -185,8 +198,6 @@ extern void treeTempBlockRemove(BlockRef_t obj);
 extern TreeResult_Sentinel<BlockRef_t> treeTempBlockQuery(double Left, double Top, double Right, double Bottom,
                                int sort_mode, double margin = 2.0);
 extern TreeResult_Sentinel<BlockRef_t> treeTempBlockQuery(const Location_t &loc, int sort_mode);
-
-extern TreeResult_Sentinel<BlockRef_t> treeBlockQueryWithTemp(const Location_t &loc, int sort_mode);
 
 extern void treeLevelCleanBackgroundLayers();
 extern void treeBackgroundAddLayer(int layer, BackgroundRef_t obj);

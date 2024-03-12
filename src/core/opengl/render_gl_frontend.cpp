@@ -177,6 +177,7 @@ std::array<RenderGL::Vertex_t, 4> RenderGL::genTriangleStrip(const RectI& loc, c
 
 void RenderGL::addLights(const GLPictureLightInfo& light_info, const QuadI& loc, const RectF& texcoord, GLshort depth)
 {
+#ifdef THEXTECH_BUILD_GL_MODERN
     if(!m_lighting_calc_program.inited() || m_light_count >= (int)m_light_queue.lights.size())
         return;
 
@@ -263,6 +264,12 @@ void RenderGL::addLights(const GLPictureLightInfo& light_info, const QuadI& loc,
         else
             target = nullptr;
     }
+#else
+    UNUSED(light_info);
+    UNUSED(loc);
+    UNUSED(texcoord);
+    UNUSED(depth);
+#endif
 }
 
 #ifdef __EMSCRIPTEN__
@@ -376,11 +383,13 @@ void RenderGL::close()
     for(int i = BUFFER_GAME; i < BUFFER_MAX; i++)
         destroyFramebuffer((BufferIndex_t)i);
 
+#ifdef RENDERGL_HAS_SHADERS
     if(m_null_light_texture)
     {
         glDeleteTextures(1, &m_null_light_texture);
         m_null_light_texture = 0;
     }
+#endif
 
 #ifdef RENDERGL_HAS_VBO
     if(m_vertex_buffer[0])
@@ -1489,8 +1498,10 @@ void RenderGL::renderTextureScaleEx(double xDstD, double yDstD, double wDstD, do
 
     addVertices(vertex_list, draw_loc, draw_source, cur_depth, tint);
 
+#ifdef THEXTECH_BUILD_GL_MODERN
     if(tx.l.light_info)
         addLights(*tx.l.light_info, QuadI(draw_loc), draw_source_raw, cur_depth);
+#endif
 
     m_drawQueued = true;
 }
@@ -1531,8 +1542,10 @@ void RenderGL::renderTextureScale(double xDst, double yDst, double wDst, double 
 
     addVertices(vertex_list, draw_loc, draw_source, cur_depth, tint);
 
+#ifdef THEXTECH_BUILD_GL_MODERN
     if(tx.l.light_info)
         addLights(*tx.l.light_info, QuadI(draw_loc), draw_source_raw, cur_depth);
+#endif
 
     m_drawQueued = true;
 }
@@ -1626,8 +1639,10 @@ void RenderGL::renderTexture(double xDstD, double yDstD, double wDstD, double hD
 
     addVertices(vertex_list, draw_loc, draw_source, cur_depth, tint);
 
+#ifdef THEXTECH_BUILD_GL_MODERN
     if(tx.l.light_info)
         addLights(*tx.l.light_info, QuadI(draw_loc), draw_source_raw, cur_depth);
+#endif
 
     m_drawQueued = true;
 }
@@ -1712,8 +1727,10 @@ void RenderGL::renderTextureFL(double xDstD, double yDstD, double wDstD, double 
 
     addVertices(vertex_list, draw_loc, draw_source, cur_depth, tint);
 
+#ifdef THEXTECH_BUILD_GL_MODERN
     if(tx.l.light_info)
         addLights(*tx.l.light_info, QuadI(draw_loc), draw_source_raw, cur_depth);
+#endif
 
     m_drawQueued = true;
 }
@@ -1754,8 +1771,10 @@ void RenderGL::renderTexture(float xDst, float yDst,
 
     addVertices(vertex_list, draw_loc, draw_source, cur_depth, tint);
 
+#ifdef THEXTECH_BUILD_GL_MODERN
     if(tx.l.light_info)
         addLights(*tx.l.light_info, QuadI(draw_loc), draw_source_raw, cur_depth);
+#endif
 
     m_drawQueued = true;
 }
