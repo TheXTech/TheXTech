@@ -2408,7 +2408,7 @@ void UpdateNPCs()
 
                                                         if(NPC[A].Type == NPCID_METALBARREL || NPC[A].Type == NPCID_CANNONENEMY || NPC[A].Type == NPCID_HPIPE_SHORT || NPC[A].Type == NPCID_HPIPE_LONG || NPC[A].Type == NPCID_VPIPE_SHORT || NPC[A].Type == NPCID_VPIPE_LONG)
                                                         {
-                                                            if(Block[B].IsPlayer > 0 || Block[B].IsNPC == 56)
+                                                            if(Block[B].IsPlayer > 0 || Block[B].IsNPC == NPCID_VEHICLE)
                                                             {
                                                                 HitSpot = 0;
                                                                 NPC[A].Location.SpeedX = -NPC[A].Location.SpeedX;
@@ -2418,7 +2418,7 @@ void UpdateNPCs()
                                                         if(NPC[A].Type >= NPCID_TANK_TREADS && NPC[A].Type <= NPCID_SLANT_WOOD_M && HitSpot != 1)
                                                             HitSpot = 0;
 
-                                                        if(NPC[A].Type == NPCID_SPIKY_BALL_S3 && (Block[B].IsNPC == 22 || Block[B].IsNPC == 49)) // spiney eggs don't walk on special items
+                                                        if(NPC[A].Type == NPCID_SPIKY_BALL_S3 && (Block[B].IsNPC == NPCID_CANNONITEM || Block[B].IsNPC == NPCID_TOOTHYPIPE)) // spiney eggs don't walk on special items
                                                             HitSpot = 0;
 
                                                         if(NPC[A].Type == NPCID_RAFT) // Skull raft
@@ -2511,7 +2511,7 @@ void UpdateNPCs()
                                                         if((NPC[A].Type == NPCID_STONE_S3 || NPC[A].Type == NPCID_STONE_S4) && HitSpot != 1)
                                                             HitSpot = 0;
 
-                                                        if(Block[B].IsNPC == 57 && HitSpot == 5)
+                                                        if(Block[B].IsNPC == NPCID_CONVEYOR && HitSpot == 5)
                                                         {
                                                             if(NPC[A].Location.X + NPC[A].Location.Width / 2.0 < Block[B].Location.X + Block[B].Location.Width / 2.0)
                                                                 HitSpot = 4;
@@ -2820,7 +2820,7 @@ void UpdateNPCs()
                                                         if(BlockKills[Block[B].Type] && (HitSpot > 0 || NPC[A].Slope == B))
                                                             NPCHit(A, 6, B);
 
-                                                        if(NPC[A].Type == NPCID_PLR_FIREBALL && Block[B].IsNPC == 263)
+                                                        if(NPC[A].Type == NPCID_PLR_FIREBALL && Block[B].IsNPC == NPCID_ICE_CUBE)
                                                             HitSpot = 0;
 
                                                         if(NPC[A].Type == NPCID_ITEM_POD && HitSpot == 1)
@@ -2837,7 +2837,7 @@ void UpdateNPCs()
                                                             }
                                                         }
                                                         // beech koopa kicking an ice block
-                                                        if(((g_compatibility.fix_npc55_kick_ice_blocks && NPC[A].Type == NPCID_EXT_TURTLE) || NPC[A].Type == NPCID_BLU_HIT_TURTLE_S4) && Block[B].IsNPC == 45)
+                                                        if(((g_compatibility.fix_npc55_kick_ice_blocks && NPC[A].Type == NPCID_EXT_TURTLE) || NPC[A].Type == NPCID_BLU_HIT_TURTLE_S4) && Block[B].IsNPC == NPCID_SLIDE_BLOCK)
                                                         {
                                                             if(HitSpot == 2 || HitSpot == 4)
                                                             {
@@ -2856,7 +2856,7 @@ void UpdateNPCs()
                                                         }
                                                         if(NPC[A].Type == NPCID_SAW && Block[B].IsNPC > 0)
                                                             HitSpot = 0;
-                                                        if(Block[B].IsNPC == 208 || Block[B].IsNPC == 209)
+                                                        if(Block[B].IsNPC == NPCID_BOSS_CASE || Block[B].IsNPC == NPCID_BOSS_FRAGILE)
                                                         {
                                                             if(NPC[A].Projectile)
                                                             {
@@ -2869,7 +2869,7 @@ void UpdateNPCs()
 
                                                         if((NPC[A].Type == NPCID_ICE_BLOCK || NPC[A].Type == NPCID_ICE_CUBE) && (HitSpot == 2 || HitSpot == 4 || HitSpot == 5))
                                                         {
-                                                            if(Block[B].IsNPC == 263)
+                                                            if(Block[B].IsNPC == NPCID_ICE_CUBE)
                                                             {
                                                                 NPCHit(Block[B].IsReally, 3, Block[B].IsReally);
                                                                 NPC[Block[B].IsReally].Location.SpeedX = -NPC[A].Location.SpeedX;
@@ -3041,7 +3041,7 @@ void UpdateNPCs()
 
                                                                 if(Block[B].IsNPC != 0)
                                                                 {
-                                                                    if(Block[B].Location.SpeedY > 0 && Block[B].IsNPC >= 60 && Block[B].IsNPC <= 66)
+                                                                    if(Block[B].Location.SpeedY > 0 && Block[B].IsNPC >= NPCID_YEL_PLATFORM && Block[B].IsNPC <= NPCID_RED_PLATFORM)
                                                                         tempHit = Block[B].Location.Y - NPC[A].Location.Height - 0.01 + Block[B].Location.SpeedY;
                                                                     else
                                                                         tempHit = Block[B].Location.Y - NPC[A].Location.Height - 0.01;
@@ -3052,7 +3052,7 @@ void UpdateNPCs()
                                                                     tempHitBlock = B;
                                                                     tempHit = Block[B].Location.Y - NPC[A].Location.Height - 0.01;
                                                                 }
-                                                                if(Block[B].IsNPC >= 60 && Block[B].IsNPC <= 66)
+                                                                if(Block[B].IsNPC >= NPCID_YEL_PLATFORM && Block[B].IsNPC <= NPCID_RED_PLATFORM)
                                                                 {
                                                                     NPC[A].BeltSpeed = 0;
                                                                     beltCount = 0;
@@ -3098,7 +3098,7 @@ void UpdateNPCs()
                                                                 {
                                                                     NPC[A].standingOnPlayerY = Block[B].standingOnPlayerY + NPC[A].Location.Height;
                                                                     NPC[A].standingOnPlayer = Block[B].IsPlayer;
-                                                                    if(NPC[A].standingOnPlayer == 0 && Block[B].IsNPC == 56)
+                                                                    if(NPC[A].standingOnPlayer == 0 && Block[B].IsNPC == NPCID_VEHICLE)
                                                                         NPC[A].TimeLeft = 100;
                                                                 }
 
@@ -3316,7 +3316,7 @@ void UpdateNPCs()
                                                                     NPCQueues::Killed.push_back(A);
                                                                 }
                                                             }
-                                                            else if(NPC[A].Type != NPCID_SPIKY_BALL_S3 && !(NPC[A]->IsABlock && Block[B].IsNPC > 0) && Block[B].IsNPC != 57)
+                                                            else if(NPC[A].Type != NPCID_SPIKY_BALL_S3 && !(NPC[A]->IsABlock && Block[B].IsNPC > 0) && Block[B].IsNPC != NPCID_CONVEYOR)
                                                             {
                                                                 addBelt = NPC[A].Location.X;
                                                                 if(NPC[A].Location.X + NPC[A].Location.Width / 2.0 < Block[B].Location.X + Block[B].Location.Width * 0.5)
@@ -4185,7 +4185,7 @@ void UpdateNPCs()
                                         //If BlockNoClipping(Block(B).Type) = False And Block(B).Invis = False And Block(B).Hidden = False And Not (BlockIsSizable(Block(B).Type) And Block(B).Location.Y < .Location.Y + .Location.Height - 3) Then
 
                                         // Don't collapse Pokey during walking on slopes and other touching surfaces
-                                        if(g_compatibility.fix_npc247_collapse && isPokeyHead && Block[B].IsNPC != 247)
+                                        if(g_compatibility.fix_npc247_collapse && isPokeyHead && Block[B].IsNPC != NPCID_STACKER)
                                             continue;
 
                                         if((tempLocation.X + tempLocation.Width >= Block[B].Location.X) &&
