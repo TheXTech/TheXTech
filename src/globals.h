@@ -346,7 +346,7 @@ struct NPC_t
     PinchedInfo_t Pinched = PinchedInfo_t();
 
 //    standingOnPlayer As Integer 'If this NPC is standing on a player in the clown car
-    vbint_t vehiclePlr = 0;
+    uint8_t vehiclePlr = 0;
 //    standingOnPlayerY As Integer
     vbint_t vehicleYOffset = 0;
 //    Slope As Integer 'the block that the NPC is on a slope with
@@ -836,7 +836,7 @@ struct Block_t
 //    NPC As Integer 'when a coin is turned into a block after the p switch is hit
     NPCID coinSwitchNpcType = NPCID(0);
 //    IsPlayer As Integer 'for the clown car
-    vbint_t tempBlockVehiclePlr = 0;
+    uint8_t tempBlockVehiclePlr = 0;
 //    IsNPC As Integer 'the type of NPC the block is
     NPCID tempBlockNpcType = NPCID(0);
 //    standingOnPlayerY As Integer 'when standing on a player in the clown car
