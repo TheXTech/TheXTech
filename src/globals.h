@@ -842,9 +842,13 @@ struct Block_t
 //    standingOnPlayerY As Integer 'when standing on a player in the clown car
     vbint_t tempBlockVehicleYOffset = 0;
 //    noProjClipping As Boolean
-    bool noProjClipping = false;
+    // bool noProjClipping = false;
 //    IsReally As Integer 'the NPC that is this block
     vbint_t tempBlockNpcIdx = 0;
+
+    inline bool tempBlockNoProjClipping() const;
+
+public:
 
 // EXTRA: Indicate the fact that block was resized by a hit
 #ifdef LOW_MEM

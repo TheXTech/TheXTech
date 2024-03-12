@@ -755,8 +755,11 @@ void UpdateNPCs()
                         Block[numBlock].Type = 25;
                     if(NPC[A]->IsAHit1Block || (NPC[A]->CanWalkOn && !NPC[A]->IsABlock))
                         Block[numBlock].Type = 26;
-                    if(NPC[A]->CanWalkOn && !NPC[A]->IsAHit1Block && !NPC[A]->IsABlock)
-                        Block[numBlock].noProjClipping = true;
+
+                    // moved to Block_t::tempBlockNoProjClipping(), defined in npc_traits.h
+                    // if(NPC[A]->CanWalkOn && !NPC[A]->IsAHit1Block && !NPC[A]->IsABlock)
+                    //     Block[numBlock].noProjClipping = true;
+
                     if(NPC[A].Type == NPCID_SPRING && Block[numBlock].Location.Height != 32)
                     {
                         Block[numBlock].Location.Y -= 16;
@@ -2167,7 +2170,7 @@ void UpdateNPCs()
                                 int B = block;
                                 if(!CheckCollision(loc, Block[B].Location))
                                     continue;
-                                if(NPC[A].Block == B || Block[B].noProjClipping ||
+                                if(NPC[A].Block == B || Block[B].tempBlockNoProjClipping() ||
                                    BlockOnlyHitspot1[Block[B].Type] || BlockIsSizable[Block[B].Type] ||
                                    BlockNoClipping[Block[B].Type] || Block[B].Hidden)
                                     continue;
@@ -2368,7 +2371,7 @@ void UpdateNPCs()
 
 
                                                     if(NPC[A].Block != B && NPC[A].tempBlock != B &&
-                                                       !(NPC[A].Projectile && Block[B].noProjClipping) &&
+                                                       !(NPC[A].Projectile && Block[B].tempBlockNoProjClipping()) &&
                                                        !BlockNoClipping[Block[B].Type] && !Block[B].Hidden)
                                                     {
                                                         if(Block[B].tempBlockNpcType == NPCID_TANK_TREADS && !NPC[A]->NoClipping && NPC[A].Type != NPCID_BULLET)

@@ -1497,7 +1497,6 @@ void PSwitch(bool enabled)
                     {
                         nb.tempBlockNpcIdx = 0;
                         nb.tempBlockNpcType = NPCID_NULL;
-                        nb.noProjClipping = false;
                         nb.tempBlockVehiclePlr = 0;
                         nb.tempBlockVehicleYOffset = 0;
                     }
@@ -1649,7 +1648,6 @@ void PSwitch(bool enabled)
                         nb.coinSwitchNpcType = NPCID_NULL;
                         nb.tempBlockNpcIdx = 0;
                         nb.tempBlockNpcType = NPCID_NULL;
-                        nb.noProjClipping = false;
                         nb.tempBlockVehiclePlr = 0;
                         nb.tempBlockVehicleYOffset = 0;
                     }
