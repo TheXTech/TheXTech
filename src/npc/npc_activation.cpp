@@ -29,6 +29,8 @@
 #include "npc_id.h"
 #include "npc_traits.h"
 
+#include "main/trees.h"
+
 inline static bool s_Event_SoundOnly(const Events_t& evt, int test_section)
 {
     if(!(evt.Text == STRINGINDEX_NONE
@@ -119,7 +121,7 @@ void NPC_ConstructCanonicalSet()
         tempLocation.Width += 64;
         tempLocation.Height += 64;
 
-        for(int16_t B = 1; B <= numNPCs; B++)
+        for(int16_t B : treeNPCQuery(tempLocation, SORTMODE_NONE))
         {
             if(B != n && CheckCollision(tempLocation, NPC[B].Location))
             {

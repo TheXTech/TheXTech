@@ -11,6 +11,7 @@
 #include "player.h"
 #include "config.h"
 #include "npc_id.h"
+#include "npc/npc_queues.h"
 
 #include "graphics/gfx_frame.h"
 #include "graphics/gfx_marquee.h"
@@ -617,7 +618,7 @@ static void DoTransform(int p, int ch)
         }
     }
 
-    for(int A = 1; A <= numNPCs; A++)
+    for(int A : NPCQueues::Active.no_change)
     {
         if(A % (p + 1) == 0 && NPC[A].Type == NPCID_PLR_FIREBALL)
             NPC[A].Special = ch;
