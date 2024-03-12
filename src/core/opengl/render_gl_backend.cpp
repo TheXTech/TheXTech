@@ -526,6 +526,7 @@ void RenderGL::executeOrderedDrawQueue(bool clear)
 
 void RenderGL::calculateDistanceField()
 {
+#if defined(RENDERGL_HAS_FBO) && defined(RENDERGL_HAS_SHADERS)
     if(!m_distance_field_1_program.inited() || !m_distance_field_2_program.inited())
         return;
 
@@ -599,10 +600,12 @@ void RenderGL::calculateDistanceField()
 
     glViewport(viewport_scaled.x, viewport_scaled.y,
         viewport_scaled.w, viewport_scaled.h);
+#endif
 }
 
 void RenderGL::coalesceLights()
 {
+#if defined(RENDERGL_HAS_FBO) && defined(RENDERGL_HAS_SHADERS)
     constexpr bool debug_coalesce = false;
     const GLfloat tolerance = 0.1;
 
@@ -765,6 +768,7 @@ void RenderGL::coalesceLights()
         pLogDebug("Coalesced %d lights to %d", m_light_count, int(lights_end_it - lights_begin_it));
 
     m_light_count = lights_end_it - lights_begin_it;
+#endif
 }
 
 void RenderGL::calculateLighting()
