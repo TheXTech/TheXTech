@@ -1498,6 +1498,8 @@ void PSwitch(bool enabled)
                         nb.IsReally = 0;
                         nb.IsNPC = NPCID_NULL;
                         nb.noProjClipping = false;
+                        nb.IsPlayer = 0;
+                        nb.standingOnPlayerY = 0;
                     }
 
                     syncLayersTrees_Block(numBlock);
@@ -1648,6 +1650,8 @@ void PSwitch(bool enabled)
                         nb.IsReally = 0;
                         nb.IsNPC = NPCID_NULL;
                         nb.noProjClipping = false;
+                        nb.IsPlayer = 0;
+                        nb.standingOnPlayerY = 0;
                     }
 
                     syncLayersTrees_Block(numBlock);
