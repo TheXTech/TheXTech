@@ -2405,7 +2405,8 @@ void TailSwipe(const int plr, bool boo, bool Stab, int StabDir)
             {
                 if(CheckCollision(tailLoc, block.Location))
                 {
-                    if(block.ShakeY == 0 && block.ShakeY2 == 0 && block.ShakeY3 == 0)
+                    // if(block.ShakeY == 0 && block.ShakeY2 == 0 && block.ShakeY3 == 0)
+                    if(block.ShakeCounter == 0)
                     {
                         if(block.Special > 0 || block.Type == 55 || block.Type == 159 || block.Type == 90)
                             PlaySoundSpatial(SFX_BlockHit, block.Location);
@@ -2428,7 +2429,8 @@ void TailSwipe(const int plr, bool boo, bool Stab, int StabDir)
                         BlockHitHard(A);
                         if(!Stab)
                         {
-                            if(block.ShakeY != 0)
+                            // if(block.ShakeY != 0)
+                            if(block.ShakeCounter != 0)
                             {
                                 tempLoc.X = (block.Location.X + tailLoc.X + (block.Location.Width + tailLoc.Width) / 2.0) / 2 - 16;
                                 tempLoc.Y = (block.Location.Y + tailLoc.Y + (block.Location.Height + tailLoc.Height) / 2.0) / 2 - 16;
@@ -2440,7 +2442,10 @@ void TailSwipe(const int plr, bool boo, bool Stab, int StabDir)
                         {
                             if(StabDir == 2)
                             {
-                                if(block.Type == 293 || block.Type == 370 || block.ShakeY != 0 || block.ShakeY2 != 0 || block.ShakeY3 != 0 || block.Hidden || BlockHurts[block.Type])
+                                if(block.Type == 293 || block.Type == 370
+                                    /* || block.ShakeY != 0 || block.ShakeY2 != 0 || block.ShakeY3 != 0 */
+                                    || block.ShakeCounter != 0
+                                    || block.Hidden || BlockHurts[block.Type])
                                 {
                                     if(BlockHurts[block.Type])
                                         PlaySoundSpatial(SFX_Spring, block.Location);

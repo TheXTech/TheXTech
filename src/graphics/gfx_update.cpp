@@ -2440,7 +2440,7 @@ void UpdateGraphicsScreen(Screen_t& screen)
                     double offX = wasShrinkResized ? 0.05 : 0.0;
                     double offW = wasShrinkResized ? 0.1 : 0.0;
                     XRender::renderTexture(sX - offX,
-                                          sY + block.ShakeY3,
+                                          sY + block.ShakeOffset,
                                           block.Location.Width + offW,
                                           block.Location.Height,
                                           GFXBlock[block.Type],
@@ -2872,7 +2872,7 @@ void UpdateGraphicsScreen(Screen_t& screen)
                 double offX = wasShrinkResized ? 0.05 : 0.0;
                 double offW = wasShrinkResized ? 0.1 : 0.0;
                 XRender::renderTexture(camX + block.Location.X - offX,
-                                      camY + block.Location.Y + block.ShakeY3,
+                                      camY + block.Location.Y + block.ShakeOffset,
                                       block.Location.Width + offW,
                                       block.Location.Height,
                                       GFXBlock[block.Type],

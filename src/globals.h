@@ -824,11 +824,10 @@ struct Block_t
     vbint_t Special = 0;
 //'for the shake effect after hitting ablock
 //    ShakeY As Integer
-    vbint_t ShakeY = 0;
 //    ShakeY2 As Integer
-    vbint_t ShakeY2 = 0;
 //    ShakeY3 As Integer
-    vbint_t ShakeY3 = 0;
+    uint8_t ShakeCounter = 0;
+    int8_t ShakeOffset = 0;
 //    Kill As Boolean 'if true the game will destroy the block
     bool Kill = false;
 //    Invis As Boolean 'for invisible blocks

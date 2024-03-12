@@ -126,7 +126,8 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
 
     oldSpecial = b.Special;
 
-    if(b.ShakeY != 0 || b.ShakeY2 != 0 || b.ShakeY3 != 0) // if the block has just been hit, ignore
+    // if(b.ShakeY != 0 || b.ShakeY2 != 0 || b.ShakeY3 != 0) // if the block has just been hit, ignore
+    if(b.ShakeCounter != 0) // if the block has just been hit, ignore
     {
         if(b.RapidHit > 0 && IF_INRANGE(whatPlayer, 1, maxPlayers) && Player[whatPlayer].Character == 4)
             b.RapidHit = iRand(3) + 1;
@@ -759,14 +760,32 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
         BlockHitHard(A);
 }
 
+enum BlockShakeProgram : uint8_t
+{
+    SHAKE_UPDOWN12_BEG = 16 + 0,
+    SHAKE_UPDOWN12_MID = 16 + 6,
+    SHAKE_UPDOWN12_END = 16 + 12,
+
+    SHAKE_DOWNUP12_BEG = 32 + 0,
+    SHAKE_DOWNUP12_MID = 32 + 6,
+    SHAKE_DOWNUP12_END = 32 + 12,
+
+    SHAKE_UPDOWN06_BEG = 48 + 0,
+    SHAKE_UPDOWN06_MID = 48 + 3,
+    SHAKE_UPDOWN06_END = 48 + 6,
+};
+
 void BlockShakeUp(int A)
 {
     if(Block[A].Hidden)
         return;
 
-    Block[A].ShakeY = -12; // Go up
-    Block[A].ShakeY2 = 12; // Come back down
-    Block[A].ShakeY3 = 0;
+    // Block[A].ShakeY = -12; // Go up
+    // Block[A].ShakeY2 = 12; // Come back down
+    // Block[A].ShakeY3 = 0;
+
+    Block[A].ShakeCounter = SHAKE_UPDOWN12_BEG;
+    Block[A].ShakeOffset = 0;
 
     if(A != iBlock[iBlocks])
     {
@@ -780,9 +799,13 @@ void BlockShakeUpPow(int A)
     if(Block[A].Hidden)
         return;
 
-    Block[A].ShakeY = -6; // Go up
-    Block[A].ShakeY2 = 6; // Come back down
-    Block[A].ShakeY3 = 0;
+    // Block[A].ShakeY = -6; // Go up
+    // Block[A].ShakeY2 = 6; // Come back down
+    // Block[A].ShakeY3 = 0;
+
+    Block[A].ShakeCounter = SHAKE_UPDOWN06_BEG;
+    Block[A].ShakeOffset = 0;
+
     if(A != iBlock[iBlocks])
     {
         iBlocks++;
@@ -795,9 +818,12 @@ void BlockShakeDown(int A)
     if(Block[A].Hidden)
         return;
 
-    Block[A].ShakeY = 12; // Go down
-    Block[A].ShakeY2 = -12; // Come back up
-    Block[A].ShakeY3 = 0;
+    // Block[A].ShakeY = 12; // Go down
+    // Block[A].ShakeY2 = -12; // Come back up
+    // Block[A].ShakeY3 = 0;
+
+    Block[A].ShakeCounter = SHAKE_DOWNUP12_BEG;
+    Block[A].ShakeOffset = 0;
 
     if(A != iBlock[iBlocks])
     {
@@ -1244,82 +1270,80 @@ void UpdateBlocks()
         // Update the shake effect
         if(ib.Hidden)
         {
-            ib.ShakeY = 0;
-            ib.ShakeY2 = 0;
-            ib.ShakeY3 = 0;
+            // ib.ShakeY = 0;
+            // ib.ShakeY2 = 0;
+            // ib.ShakeY3 = 0;
+
+            ib.ShakeCounter = 0;
+            ib.ShakeOffset = 0;
         }
 
+        // check modBlocks.bas for the old shake logic
+#if 0
         if(ib.ShakeY < 0) // Block Shake Up
-        {
-            ib.ShakeY += 2;
-            ib.ShakeY3 -= 2;
-
-            if(ib.ShakeY == 0)
-            {
-                if(ib.TriggerHit != EVENT_NONE)
-                {
-                    ProcEvent(ib.TriggerHit, 0);
-                }
-
-                if(ib.Type == 282)
-                    ib.Type = 283;
-                else if(ib.Type == 283)
-                    ib.Type = 282;
-                if(ib.Type == 90 && ib.Special == 0 && !ib.forceSmashable)
-                {
-                    ib.Hidden = true;
-                    invalidateDrawBlocks();
-                    NewEffect(EFFID_SPINBLOCK, ib.Location, 1, iBlock[A]);
-                    ib.ShakeY = 0;
-                    ib.ShakeY2 = 0;
-                    ib.ShakeY3 = 0;
-                }
-            }
-        }
         else if(ib.ShakeY > 0) // Block Shake Down
-        {
-            ib.ShakeY -= 2;
-            ib.ShakeY3 += 2;
+        else if(ib.ShakeY2 > 0) // Come back down
+        else if(ib.ShakeY2 < 0) // Go back up
+#endif
 
-            if(ib.ShakeY == 0)
+        if(ib.ShakeCounter != 0)
+        {
+            if(    (ib.ShakeCounter >= SHAKE_UPDOWN06_BEG && ib.ShakeCounter < SHAKE_UPDOWN06_MID)
+                || (ib.ShakeCounter >= SHAKE_UPDOWN12_BEG && ib.ShakeCounter < SHAKE_UPDOWN12_MID)
+                || (ib.ShakeCounter >= SHAKE_DOWNUP12_MID && ib.ShakeCounter < SHAKE_DOWNUP12_END))
+            {
+                ib.ShakeOffset -= 2;
+            }
+            else
+                ib.ShakeOffset += 2;
+
+            ib.ShakeCounter++;
+
+            // do hit events at the middle of the shake program
+            if(    ib.ShakeCounter == SHAKE_UPDOWN06_MID
+                || ib.ShakeCounter == SHAKE_UPDOWN12_MID
+                || ib.ShakeCounter == SHAKE_DOWNUP12_MID)
             {
                 if(ib.TriggerHit != EVENT_NONE)
                     ProcEvent(ib.TriggerHit, 0);
 
+                // on/off block
                 if(ib.Type == 282)
                     ib.Type = 283;
                 else if(ib.Type == 283)
                     ib.Type = 282;
 
-                if(ib.Type == 90)
+                // spin block
+                if(ib.Type == 90 && (ib.ShakeCounter == SHAKE_DOWNUP12_MID || ib.Special == 0) && !ib.forceSmashable)
                 {
                     ib.Hidden = true;
                     invalidateDrawBlocks();
                     NewEffect(EFFID_SPINBLOCK, ib.Location, 1, iBlock[A]);
-                    ib.ShakeY = 0;
-                    ib.ShakeY2 = 0;
-                    ib.ShakeY3 = 0;
+                    ib.ShakeCounter = 0;
+                    ib.ShakeOffset = 0;
                 }
             }
-        }
-        else if(ib.ShakeY2 > 0) // Come back down
-        {
-            ib.ShakeY2 -= 2;
-            ib.ShakeY3 += 2;
 
-            if(ib.RapidHit > 0 && ib.Special > 0 && ib.ShakeY3 == 0)
+            // finish the shake program
+            if(    ib.ShakeCounter == SHAKE_UPDOWN06_END
+                || ib.ShakeCounter == SHAKE_UPDOWN12_END
+                || ib.ShakeCounter == SHAKE_DOWNUP12_END)
             {
-                BlockHit(iBlock[A]);
-                ib.RapidHit -= 1;
+                SDL_assert(ib.ShakeOffset == 0);
+
+                if(ib.RapidHit > 0 && ib.Special > 0 && ib.ShakeCounter != SHAKE_DOWNUP12_END)
+                {
+                    ib.ShakeCounter = 0;
+
+                    BlockHit(iBlock[A]);
+                    ib.RapidHit -= 1;
+                }
+                else
+                    ib.ShakeCounter = 0;
             }
         }
-        else if(ib.ShakeY2 < 0) // Go back up
-        {
-            ib.ShakeY2 += 2;
-            ib.ShakeY3 -= 2;
-        }
 
-        if(ib.ShakeY3 != 0)
+        if(ib.ShakeOffset != 0)
         {
             for(auto B = 1; B <= numNPCs; B++)
             {
@@ -1327,9 +1351,9 @@ void UpdateBlocks()
                 {
                     if(NPC[B].Killed == 0 && NPC[B].Effect == 0 && NPC[B].HoldingPlayer == 0 && (!NPC[B]->NoClipping || NPC[B]->IsACoin))
                     {
-                        if(ib.ShakeY3 <= 0 || NPC[B]->IsACoin)
+                        if(ib.ShakeOffset <= 0 || NPC[B]->IsACoin)
                         {
-                            if(ShakeCollision(NPC[B].Location, ib.Location, ib.ShakeY3))
+                            if(ShakeCollision(NPC[B].Location, ib.Location, ib.ShakeOffset))
                             {
                                 if(iBlock[A] != NPC[B].tempBlock)
                                 {
@@ -1359,7 +1383,7 @@ void UpdateBlocks()
                 {
                     if(Player[B].Effect == 0 && ib.Type != 55)
                     {
-                        if(ShakeCollision(Player[B].Location, ib.Location, ib.ShakeY3))
+                        if(ShakeCollision(Player[B].Location, ib.Location, ib.ShakeOffset))
                         {
                             if(!BlockIsSizable[ib.Type] && !BlockOnlyHitspot1[ib.Type])
                             {
@@ -1400,16 +1424,12 @@ void UpdateBlocks()
     for(auto A = iBlocks; A >= 1; A--)
     {
         auto &ib = Block[iBlock[A]];
-        if(ib.ShakeY == 0)
+
+        // if(ib.ShakeY1 == 0 && ib.ShakeY2 == 0 && ib.ShakeY3 == 0)
+        if(ib.ShakeCounter == 0)
         {
-            if(ib.ShakeY2 == 0)
-            {
-                if(ib.ShakeY3 == 0)
-                {
-                    iBlock[A] = iBlock[iBlocks];
-                    iBlocks -= 1;
-                }
-            }
+            iBlock[A] = iBlock[iBlocks];
+            iBlocks -= 1;
         }
     }
 
