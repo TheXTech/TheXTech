@@ -1345,7 +1345,10 @@ void UpdateBlocks()
 
         if(ib.ShakeOffset != 0)
         {
-            for(auto B = 1; B <= numNPCs; B++)
+            Location_t query_loc = ib.Location;
+            query_loc.Y += ib.ShakeOffset;
+
+            for(int B : treeNPCQuery(query_loc, SORTMODE_ID))
             {
                 if(NPC[B].Active)
                 {
