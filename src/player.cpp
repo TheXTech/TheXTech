@@ -719,7 +719,7 @@ void PlayerHurt(const int A)
                         p.ForceHitSpot3 = true;
                         p.Location.Y = NPC[numNPCs].Location.Y - p.Location.Height;
 
-                        for(int B = 1; B <= numNPCs; B++)
+                        for(int B : NPCQueues::Active.no_change)
                         {
                             if(NPC[B].vehiclePlr == A)
                             {
@@ -3079,7 +3079,7 @@ void PlayerDismount(const int A)
             }
         }
 
-        for(int numNPCsMax3 = numNPCs, B = 1; B <= numNPCsMax3; B++)
+        for(int B : NPCQueues::Active.no_change)
         {
             if(NPC[B].vehiclePlr == A)
             {
@@ -3946,7 +3946,7 @@ void ClownCar()
                 }
             }
 
-            for(int numNPCsMax8 = numNPCs, B = 1; B <= numNPCsMax8; B++)
+            for(int B : NPCQueues::Active.may_insert)
             {
                 if(NPC[B].vehiclePlr == A && NPC[B].Type != NPCID_TOOTHY)
                 {
@@ -3984,17 +3984,19 @@ void ClownCar()
                                 syncLayers_NPC(numNPCs);
                             }
 
-                            for(int numNPCsMax9 = numNPCs, C = 1; C <= numNPCsMax9; C++)
+                            for(int C : NPCQueues::Active.no_change)
                             {
                                 if(NPC[C].Type == NPCID_TOOTHY && Maths::iRound(NPC[C].Special) == A && Maths::iRound(NPC[C].Special2) == B)
                                 {
                                     NPC[C].vehiclePlr = A;
                                     NPC[C].Projectile = true;
                                     NPC[C].Direction = NPC[B].Direction;
+
                                     if(NPC[C].Direction > 0)
                                         NPC[C].Location.X = NPC[B].Location.X + 32;
                                     else
                                         NPC[C].Location.X = NPC[B].Location.X - NPC[C].Location.Width;
+
                                     NPC[C].Location.Y = NPC[B].Location.Y;
                                     NPC[C].TimeLeft = 100;
                                     treeNPCUpdate(C);

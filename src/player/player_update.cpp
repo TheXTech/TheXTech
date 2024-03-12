@@ -4270,10 +4270,12 @@ void UpdatePlayer()
                                                                 tempBlockHit[2] = 0;
                                                         }
                                                     }
+
                                                     if(Player[A].Mount == 2)
                                                     {
                                                         D = Player[A].Location.X - D;
-                                                        for(int C = 1; C <= numNPCs; C++)
+
+                                                        for(int C : NPCQueues::Active.no_change)
                                                         {
                                                             if(NPC[C].vehiclePlr == A)
                                                             {
@@ -4281,6 +4283,7 @@ void UpdatePlayer()
                                                                 treeNPCUpdate(C);
                                                             }
                                                         }
+
                                                         for(int C = 1; C <= numPlayers; C++)
                                                         {
                                                             if(Player[C].StandingOnTempNPC == 56)
