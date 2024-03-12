@@ -1350,36 +1350,24 @@ void UpdateBlocks()
 
             for(int B : treeNPCQuery(query_loc, SORTMODE_ID))
             {
-                if(NPC[B].Active)
+                if(NPC[B].Active && NPC[B].Killed == 0 && NPC[B].Effect == 0 && NPC[B].HoldingPlayer == 0 && (!NPC[B]->NoClipping || NPC[B]->IsACoin))
                 {
-                    if(NPC[B].Killed == 0 && NPC[B].Effect == 0 && NPC[B].HoldingPlayer == 0 && (!NPC[B]->NoClipping || NPC[B]->IsACoin))
+                    if(ib.ShakeOffset <= 0 || NPC[B]->IsACoin)
                     {
-                        if(ib.ShakeOffset <= 0 || NPC[B]->IsACoin)
+                        if(ShakeCollision(NPC[B].Location, ib))
                         {
-                            if(ShakeCollision(NPC[B].Location, ib))
+                            if(iBlock[A] != NPC[B].tempBlock && ib.tempBlockNpcIdx != B)
                             {
-                                if(iBlock[A] != NPC[B].tempBlock)
-                                {
-                                    if(ib.tempBlockNpcIdx != B)
-                                    {
-                                        if(!BlockIsSizable[ib.Type] && !BlockOnlyHitspot1[ib.Type])
-                                        {
-                                            NPCHit(B, 2, iBlock[A]);
-                                        }
-                                        else
-                                        {
-                                            if(ib.Location.Y + 1 >= NPC[B].Location.Y + NPC[B].Location.Height - 1)
-                                            {
-                                                NPCHit(B, 2, iBlock[A]);
-                                            }
-                                        }
-                                    }
-                                }
+                                if(!BlockIsSizable[ib.Type] && !BlockOnlyHitspot1[ib.Type])
+                                    NPCHit(B, 2, iBlock[A]);
+                                else if(ib.Location.Y + 1 >= NPC[B].Location.Y + NPC[B].Location.Height - 1)
+                                    NPCHit(B, 2, iBlock[A]);
                             }
                         }
                     }
                 }
             }
+
             for(auto B = 1; B <= numPlayers; B++)
             {
                 if(!Player[B].Dead)
@@ -1394,14 +1382,11 @@ void UpdateBlocks()
                                 Player[B].StandUp = true;
                                 PlaySoundSpatial(SFX_Stomp, Player[B].Location);
                             }
-                            else
+                            else if(ib.Location.Y + 1 >= Player[B].Location.Y + Player[B].Location.Height - 1)
                             {
-                                if(ib.Location.Y + 1 >= Player[B].Location.Y + Player[B].Location.Height - 1)
-                                {
-                                    Player[B].Location.SpeedY = double(Physics.PlayerJumpVelocity);
-                                    Player[B].StandUp = true;
-                                    PlaySoundSpatial(SFX_Stomp, Player[B].Location);
-                                }
+                                Player[B].Location.SpeedY = double(Physics.PlayerJumpVelocity);
+                                Player[B].StandUp = true;
+                                PlaySoundSpatial(SFX_Stomp, Player[B].Location);
                             }
                         }
                     }
