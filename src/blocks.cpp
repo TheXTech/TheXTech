@@ -1333,7 +1333,7 @@ void UpdateBlocks()
                             {
                                 if(iBlock[A] != NPC[B].tempBlock)
                                 {
-                                    if(ib.IsReally != B)
+                                    if(ib.tempBlockNpcIdx != B)
                                     {
                                         if(!BlockIsSizable[ib.Type] && !BlockOnlyHitspot1[ib.Type])
                                         {
@@ -1491,15 +1491,15 @@ void PSwitch(bool enabled)
                     nb.Location.SpeedY = 0;
                     nb.Special = 0;
                     nb.Kill = false;
-                    nb.NPC = NPC[A].Type;
+                    nb.coinSwitchNpcType = NPC[A].Type;
 
                     if(g_compatibility.fix_switched_block_clipping)
                     {
-                        nb.IsReally = 0;
-                        nb.IsNPC = NPCID_NULL;
+                        nb.tempBlockNpcIdx = 0;
+                        nb.tempBlockNpcType = NPCID_NULL;
                         nb.noProjClipping = false;
-                        nb.IsPlayer = 0;
-                        nb.standingOnPlayerY = 0;
+                        nb.tempBlockVehiclePlr = 0;
+                        nb.tempBlockVehicleYOffset = 0;
                     }
 
                     syncLayersTrees_Block(numBlock);
@@ -1519,7 +1519,7 @@ void PSwitch(bool enabled)
         // fill it with the PSwitch-affected blocks
         for(A = numBlock; A >= 1; A--)
         {
-            if(BlockPSwitch[Block[A].Type] && Block[A].Special == 0 && Block[A].NPC == 0 && !Block[A].Hidden)
+            if(BlockPSwitch[Block[A].Type] && Block[A].Special == 0 && Block[A].coinSwitchNpcType == 0 && !Block[A].Hidden)
             {
                 PSwitchBlocks.push_back(A);
             }
@@ -1646,12 +1646,12 @@ void PSwitch(bool enabled)
 
                     if(g_compatibility.fix_switched_block_clipping)
                     {
-                        nb.NPC = NPCID_NULL;
-                        nb.IsReally = 0;
-                        nb.IsNPC = NPCID_NULL;
+                        nb.coinSwitchNpcType = NPCID_NULL;
+                        nb.tempBlockNpcIdx = 0;
+                        nb.tempBlockNpcType = NPCID_NULL;
                         nb.noProjClipping = false;
-                        nb.IsPlayer = 0;
-                        nb.standingOnPlayerY = 0;
+                        nb.tempBlockVehiclePlr = 0;
+                        nb.tempBlockVehicleYOffset = 0;
                     }
 
                     syncLayersTrees_Block(numBlock);
@@ -1671,7 +1671,7 @@ void PSwitch(bool enabled)
         // fill it with the PSwitch-affected blocks
         for(A = numBlock; A >= 1; A--)
         {
-            if(Block[A].NPC > 0 && !Block[A].Hidden)
+            if(Block[A].coinSwitchNpcType > 0 && !Block[A].Hidden)
             {
                 PSwitchBlocks.push_back(A);
             }
@@ -1705,7 +1705,7 @@ void PSwitch(bool enabled)
                     nn.Active = true;
                     nn.TimeLeft = 1;
                     nn.Hidden = Block[A].Hidden;
-                    nn.Type = Block[A].NPC;
+                    nn.Type = Block[A].coinSwitchNpcType;
                     nn.Location = Block[A].Location;
                     nn.Location.SpeedX = 0;
                     nn.Location.SpeedY = 0;

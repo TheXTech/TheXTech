@@ -834,17 +834,17 @@ struct Block_t
 //    Invis As Boolean 'for invisible blocks
     bool Invis = false;
 //    NPC As Integer 'when a coin is turned into a block after the p switch is hit
-    NPCID NPC = NPCID(0);
+    NPCID coinSwitchNpcType = NPCID(0);
 //    IsPlayer As Integer 'for the clown car
-    vbint_t IsPlayer = 0;
+    vbint_t tempBlockVehiclePlr = 0;
 //    IsNPC As Integer 'the type of NPC the block is
-    NPCID IsNPC = NPCID(0);
+    NPCID tempBlockNpcType = NPCID(0);
 //    standingOnPlayerY As Integer 'when standing on a player in the clown car
-    vbint_t standingOnPlayerY = 0;
+    vbint_t tempBlockVehicleYOffset = 0;
 //    noProjClipping As Boolean
     bool noProjClipping = false;
 //    IsReally As Integer 'the NPC that is this block
-    vbint_t IsReally = 0;
+    vbint_t tempBlockNpcIdx = 0;
 
 // EXTRA: Indicate the fact that block was resized by a hit
 #ifdef LOW_MEM
