@@ -436,7 +436,10 @@ TreeResult_Sentinel<BlockRef_t> treeTempBlockQuery(const Location_t &_loc,
 
     if(sort_mode == SORTMODE_COMPAT)
     {
-        sort_mode = SORTMODE_LOC;
+        if(g_compatibility.emulate_classic_block_order)
+            sort_mode = SORTMODE_ID;
+        else
+            sort_mode = SORTMODE_LOC;
     }
 
     if(sort_mode == SORTMODE_LOC)
@@ -533,11 +536,12 @@ TreeResult_Sentinel<BlockRef_t> treeBlockQueryWithTemp(const Location_t &_loc,
         loc.Y = oY;
     }
 
-    auto pre_temp_size = result.i_vec->size();
 
-
+    // this is where this function differs from the standard TableInterface::query
     if(s_temp_blocks_enabled)
     {
+        auto pre_temp_size = result.i_vec->size();
+
         s_npc_table.query(*result.i_vec, loc);
 
         s_NPCsToTempBlocks(*result.i_vec, pre_temp_size);
@@ -546,24 +550,13 @@ TreeResult_Sentinel<BlockRef_t> treeBlockQueryWithTemp(const Location_t &_loc,
     }
 
 
-    // sort real ones by ID, temp ones by loc, and have them arranged this way
     if(sort_mode == SORTMODE_COMPAT)
     {
-        std::sort(result.i_vec->begin(), result.i_vec->begin() + pre_temp_size,
-        [](BaseRef_t a, BaseRef_t b)
-        {
-            return a.index < b.index;
-        });
-
-        std::sort(result.i_vec->begin() + pre_temp_size, result.i_vec->end(),
-        [](BaseRef_t a, BaseRef_t b)
-        {
-            return (((BlockRef_t)a)->Location.X <= ((BlockRef_t)b)->Location.X
-                && (((BlockRef_t)a)->Location.X < ((BlockRef_t)b)->Location.X
-                    || ((BlockRef_t)a)->Location.Y < ((BlockRef_t)b)->Location.Y));
-        });
+        if(g_compatibility.emulate_classic_block_order)
+            sort_mode = SORTMODE_ID;
+        else
+            sort_mode = SORTMODE_LOC;
     }
-
 
     if(sort_mode == SORTMODE_LOC)
     {

@@ -788,15 +788,29 @@ void UpdateNPCs()
             Block[numBlock].Location.Width = static_cast<int>(floor(static_cast<double>(Block[numBlock].Location.Width))) + 1;
             Block[numBlock].IsPlayer = A;
 
-            treeTempBlockAdd(numBlock);
+            // delay add to below if it will be sorted
+            if(!g_compatibility.emulate_classic_block_order)
+                treeTempBlockAdd(numBlock);
+
             numTempBlock++;
         }
     }
 
-    // if(numTempBlock > 1)
-    //     qSortBlocksX(numBlock + 1 - numTempBlock, numBlock);
-    // for(int A = numBlock + 1 - numTempBlock; A <= numBlock; A++)
-    //     NPC[Block[A].IsReally].tempBlock = A;
+    // need to sort the temp blocks in strict compatibility mode, to fully emulate the specific way that switched block clipping works in X64
+    if(g_compatibility.emulate_classic_block_order)
+    {
+        if(numTempBlock > 1)
+            qSortBlocksX(numBlock + 1 - numTempBlock, numBlock);
+
+        // restore tempBlock tracking
+        for(int A = numBlock + 1 - numTempBlock; A <= numBlock; A++)
+        {
+            if(Block[A].IsReally > 0)
+                NPC[Block[A].IsReally].tempBlock = A;
+            else if(Block[A].IsPlayer > 0)
+                treeTempBlockAdd(A);
+        }
+    }
 
     for(int A : NPCQueues::Unchecked)
     {
