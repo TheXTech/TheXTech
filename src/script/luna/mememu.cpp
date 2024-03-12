@@ -1839,8 +1839,8 @@ public:
         // insert(0x00000056, &NPC_t::Pinched); // unused since SMBX64, now removed
         // insert(0x00000058, &NPC_t::PinchedDirection); // unused since SMBX64, now removed
         insert(0x0000005c, &NPC_t::BeltSpeed);
-        insert(0x00000060, &NPC_t::standingOnPlayer);
-        insert(0x00000062, &NPC_t::standingOnPlayerY);
+        insert(0x00000060, &NPC_t::vehiclePlr);
+        insert(0x00000062, &NPC_t::vehicleYOffset);
         insert(0x00000064, // Generator
             [](const NPC_t& n, FIELDTYPE ftype)->double
             {

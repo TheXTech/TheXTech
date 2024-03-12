@@ -1568,7 +1568,7 @@ void NPCFrames(int A)
     }
     else if(NPC[A].Type == NPCID_TOOTHY) // killer plant
     {
-        // .standingOnPlayer = A
+        // .vehiclePlr = A
         NPC[A].Frame = 0;
         if(NPC[A].Direction == 1)
             NPC[A].Frame = 2;
@@ -1580,7 +1580,7 @@ void NPCFrames(int A)
     }
     else if(NPC[A].Type == NPCID_TOOTHYPIPE) // killer pipe
     {
-        if(NPC[A].HoldingPlayer == 0 && !Player[NPC[A].standingOnPlayer].Controls.Run && !NPC[A].Projectile)
+        if(NPC[A].HoldingPlayer == 0 && !Player[NPC[A].vehiclePlr].Controls.Run && !NPC[A].Projectile)
         {
             NPC[A].FrameCount += 1;
             if(NPC[A].FrameCount >= 4)

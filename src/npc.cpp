@@ -128,8 +128,8 @@ void Deactivate(int A)
             NPC[A].Effect3 = 0;
             NPC[A].Type = NPC[A].DefaultType;
             NPC[A].BeltSpeed = 0;
-            NPC[A].standingOnPlayer = 0;
-            NPC[A].standingOnPlayerY = 0;
+            NPC[A].vehiclePlr = 0;
+            NPC[A].vehicleYOffset = 0;
             NPC[A].Frame = 0;
             NPC[A].Killed = 0;
             NPC[A].Shadow = false;

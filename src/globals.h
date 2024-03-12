@@ -346,9 +346,9 @@ struct NPC_t
     PinchedInfo_t Pinched = PinchedInfo_t();
 
 //    standingOnPlayer As Integer 'If this NPC is standing on a player in the clown car
-    vbint_t standingOnPlayer = 0;
+    vbint_t vehiclePlr = 0;
 //    standingOnPlayerY As Integer
-    vbint_t standingOnPlayerY = 0;
+    vbint_t vehicleYOffset = 0;
 //    Slope As Integer 'the block that the NPC is on a slope with
     vbint_t Slope = 0;
 //    Multiplier As Integer 'for upping the points the player recieves

@@ -748,8 +748,8 @@ void UpdateNPCs()
                     Block[numBlock].Type = 0;
                     Block[numBlock].Location = NPC[A].Location;
                     Block[numBlock].Location.Y = static_cast<int>(floor(static_cast<double>(Block[numBlock].Location.Y + 0.02)));
-                    Block[numBlock].tempBlockVehiclePlr = NPC[A].standingOnPlayer;
-                    Block[numBlock].tempBlockVehicleYOffset = NPC[A].standingOnPlayerY;
+                    Block[numBlock].tempBlockVehiclePlr = NPC[A].vehiclePlr;
+                    Block[numBlock].tempBlockVehicleYOffset = NPC[A].vehicleYOffset;
                     Block[numBlock].tempBlockNpcIdx = A;
                     if(NPC[A].Type == NPCID_VEHICLE)
                         Block[numBlock].Type = 25;
@@ -1234,7 +1234,7 @@ void UpdateNPCs()
 
                 if(NPC[A].HoldingPlayer > 0) // NPC is held
                 {
-                    NPC[A].standingOnPlayer = 0;
+                    NPC[A].vehiclePlr = 0;
                     if(NPC[A].Type == NPCID_VEHICLE)
                     {
                         Player[NPC[A].HoldingPlayer].HoldingNPC = 0;
@@ -2328,7 +2328,7 @@ void UpdateNPCs()
 
                         if((!NPC[A]->NoClipping || NPC[A].Projectile) &&
                            !(NPC[A].Type == NPCID_SPIT_BOSS_BALL && NPC[A].Projectile) && NPC[A].Type != NPCID_TOOTHY &&
-                            NPC[A].standingOnPlayer == 0 && !(NPCIsVeggie(NPC[A]) && NPC[A].Projectile) &&
+                            NPC[A].vehiclePlr == 0 && !(NPCIsVeggie(NPC[A]) && NPC[A].Projectile) &&
                            NPC[A].Type != NPCID_HEAVY_THROWN && NPC[A].Type != NPCID_BIG_BULLET && NPC[A].Type != NPCID_PET_FIRE &&
                            !(NPC[A]->IsFish && NPC[A].Special == 2) && NPC[A].Type != NPCID_VINE_BUG)
                         {
@@ -3113,9 +3113,9 @@ void UpdateNPCs()
 
                                                                 if(((NPC[A]->StandsOnPlayer && !NPC[A].Projectile) || (NPC[A]->IsAShell && NPC[A].Location.SpeedX == 0.0)) && Block[B].tempBlockVehiclePlr > 0)
                                                                 {
-                                                                    NPC[A].standingOnPlayerY = Block[B].tempBlockVehicleYOffset + NPC[A].Location.Height;
-                                                                    NPC[A].standingOnPlayer = Block[B].tempBlockVehiclePlr;
-                                                                    if(NPC[A].standingOnPlayer == 0 && Block[B].tempBlockNpcType == NPCID_VEHICLE)
+                                                                    NPC[A].vehicleYOffset = Block[B].tempBlockVehicleYOffset + NPC[A].Location.Height;
+                                                                    NPC[A].vehiclePlr = Block[B].tempBlockVehiclePlr;
+                                                                    if(NPC[A].vehiclePlr == 0 && Block[B].tempBlockNpcType == NPCID_VEHICLE)
                                                                         NPC[A].TimeLeft = 100;
                                                                 }
 
@@ -3617,7 +3617,7 @@ void UpdateNPCs()
                                 {
                                     if(A != C && NPC[C].Active && !NPC[C].Projectile)
                                     {
-                                        if(NPC[C].Killed == 0 && NPC[C].standingOnPlayer == 0 && NPC[C].HoldingPlayer == 0 &&
+                                        if(NPC[C].Killed == 0 && NPC[C].vehiclePlr == 0 && NPC[C].HoldingPlayer == 0 &&
                                            !NPC[C]->NoClipping && NPC[C].Effect == 0 && !NPC[C].Inert) // And Not NPCIsABlock(NPC(C).Type) Then
                                         {
                                             Location_t tempLocation2 = preBeltLoc;
@@ -5142,7 +5142,7 @@ void UpdateNPCs()
                                     NPC[A].Special += shootStep;
                             }
                         }
-                        else if(NPC[A].standingOnPlayer > 0)
+                        else if(NPC[A].vehiclePlr > 0)
                             NPC[A].Special += shootStepCar;
                         else if(NPC[A].Projectile && keepProjectile)
                             NPC[A].Special += shootStep;
@@ -5158,7 +5158,7 @@ void UpdateNPCs()
                                 Player[NPC[A].HoldingPlayer].SpinFireDir = int(NPC[A].Direction);
                         }
 
-                        if(NPC[A].HoldingPlayer == 0 && NPC[A].standingOnPlayer == 0 && NPC[A].Type == NPCID_CANNONENEMY)
+                        if(NPC[A].HoldingPlayer == 0 && NPC[A].vehiclePlr == 0 && NPC[A].Type == NPCID_CANNONENEMY)
                         {
                             C = 0;
                             for(int B = 1; B <= numPlayers; B++)
@@ -5181,9 +5181,9 @@ void UpdateNPCs()
 
                         if(numNPCs < maxNPCs)
                         {
-                            if(fEqual(C, -1) && NPC[A].HoldingPlayer == 0 && NPC[A].standingOnPlayer == 0)
+                            if(fEqual(C, -1) && NPC[A].HoldingPlayer == 0 && NPC[A].vehiclePlr == 0)
                                 NPC[A].Special = 0;
-                            else if(Player[NPC[A].standingOnPlayer].Controls.Run || NPC[A].standingOnPlayer == 0)
+                            else if(Player[NPC[A].vehiclePlr].Controls.Run || NPC[A].vehiclePlr == 0)
                             {
                                 NPC[A].Special = 0;
                                 numNPCs++;
@@ -5192,7 +5192,7 @@ void UpdateNPCs()
                                 bool tempBool = false;
                                 NPC[numNPCs].Direction = NPC[A].Direction;
                                 NPC[numNPCs].DefaultDirection = NPC[A].Direction;
-                                if(NPC[A].HoldingPlayer > 0 || NPC[A].standingOnPlayer > 0 || (NPC[A].Type == NPCID_CANNONITEM && NPC[A].Projectile))
+                                if(NPC[A].HoldingPlayer > 0 || NPC[A].vehiclePlr > 0 || (NPC[A].Type == NPCID_CANNONITEM && NPC[A].Projectile))
                                 {
                                     NPC[numNPCs].Projectile = true;
                                     NPC[numNPCs].CantHurt = 10000;
@@ -5267,7 +5267,7 @@ void UpdateNPCs()
                         NPC[A].Location.Y = NPC[(int)NPC[A].Special2].Location.Y;
                     }
 
-                    if(Player[NPC[A].standingOnPlayer].Controls.Run)
+                    if(Player[NPC[A].vehiclePlr].Controls.Run)
                         B = 1;
 
                     if(NPC[A].Special2 > 0 && NPC[(int)NPC[A].Special2].Special2 != A)
@@ -5287,7 +5287,7 @@ void UpdateNPCs()
                 }
                 else if(NPC[A].Type == NPCID_TOOTHYPIPE)
                 {
-                    if(NPC[A].HoldingPlayer == 0 && NPC[A].standingOnPlayer == 0)
+                    if(NPC[A].HoldingPlayer == 0 && NPC[A].vehiclePlr == 0)
                         NPC[A].Special = 0;
                     if(NPC[A].HoldingPlayer > 0 && NPC[A].Special2 > 0)
                         NPC[(int)NPC[A].Special2].Direction = NPC[A].Direction;
@@ -5341,7 +5341,7 @@ void UpdateNPCs()
                             treeNPCSplitTempBlock((int)NPC[A].Special2);
                     }
 
-                    if(NPC[A].standingOnPlayer > 0 && !Player[NPC[A].standingOnPlayer].Controls.Run)
+                    if(NPC[A].vehiclePlr > 0 && !Player[NPC[A].vehiclePlr].Controls.Run)
                         NPC[A].Special = 0;
                 }
                 else if(NPC[A].Type == NPCID_KEY)

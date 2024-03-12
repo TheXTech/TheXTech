@@ -3437,9 +3437,9 @@ void UpdatePlayer()
                 {
                     if(NPC[B].Active && NPC[B].Killed == 0 && NPC[B].Effect != 5 && NPC[B].Effect != 6)
                     {
-                        // If Not (NPC(B).Type = 17 And NPC(B).CantHurt > 0) And Not (.Mount = 2 And NPC(B).Type = 56) And Not NPC(B).standingOnPlayer = A And Not NPC(B).Type = 197 And Not NPC(B).Type = 237 Then
+                        // If Not (NPC(B).Type = 17 And NPC(B).CantHurt > 0) And Not (.Mount = 2 And NPC(B).Type = 56) And Not NPC(B).vehiclePlr = A And Not NPC(B).Type = 197 And Not NPC(B).Type = 237 Then
                         if(!(Player[A].Mount == 2 && NPC[B].Type == NPCID_VEHICLE) &&
-                            NPC[B].standingOnPlayer != A &&
+                            NPC[B].vehiclePlr != A &&
                             NPC[B].Type != NPCID_GOALTAPE &&
                             NPC[B].Type != NPCID_ICE_BLOCK
                         )
@@ -3668,7 +3668,7 @@ void UpdatePlayer()
                                     }
                                     else if(Player[A].Mount == 2)
                                     {
-                                        if(NPC[B].standingOnPlayer == A)
+                                        if(NPC[B].vehiclePlr == A)
                                             HitSpot = 0;
                                         else if(!(NPC[B].Type == NPCID_BULLET && NPC[B].CantHurt > 0))
                                         {
@@ -4275,7 +4275,7 @@ void UpdatePlayer()
                                                         D = Player[A].Location.X - D;
                                                         for(int C = 1; C <= numNPCs; C++)
                                                         {
-                                                            if(NPC[C].standingOnPlayer == A)
+                                                            if(NPC[C].vehiclePlr == A)
                                                             {
                                                                 NPC[C].Location.X += D;
                                                                 treeNPCUpdate(C);
