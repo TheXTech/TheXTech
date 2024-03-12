@@ -98,6 +98,7 @@ struct Compatibility_t
     // 1.3.6.5
     bool fix_visual_bugs; // fix misc visual bugs from SMBX 1.3
     bool fix_npc_emerge_size; // fix size of NPC emerging from a block
+    bool fix_switched_block_clipping; // don't let blocks become intangible to NPCs after coin switch
     // 1.3.7
     bool modern_npc_camera_logic; // NPCs should support more than two cameras, and consider the event logic camera when activating
     bool allow_multires;

@@ -129,6 +129,7 @@ static void compatInit(Compatibility_t &c)
     // 1.3.6.5
     c.fix_visual_bugs = true;
     c.fix_npc_emerge_size = true;
+    c.fix_switched_block_clipping = true;
     // 1.3.7
     c.modern_npc_camera_logic = true;
     c.allow_multires = true;
@@ -187,6 +188,7 @@ static void compatInit(Compatibility_t &c)
         // 1.3.6.5
         c.fix_visual_bugs = false;
         c.fix_npc_emerge_size = false;
+        c.fix_switched_block_clipping = false;
         // 1.3.7
         c.modern_npc_camera_logic = false;
         c.allow_multires = false;
@@ -446,6 +448,7 @@ static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
         // 1.3.6.5
         compat.read("fix-visual-bugs", c.fix_visual_bugs, c.fix_visual_bugs);
         compat.read("fix-npc-emerge-size", c.fix_npc_emerge_size, c.fix_npc_emerge_size);
+        compat.read("fix-switched-block-clipping", c.fix_switched_block_clipping, c.fix_switched_block_clipping);
         // 1.3.7 (but these will be changed in the Compat update)
         compat.read("modern-npc-camera-logic", c.modern_npc_camera_logic, c.modern_npc_camera_logic);
         compat.read("allow-multires", c.allow_multires, c.allow_multires);

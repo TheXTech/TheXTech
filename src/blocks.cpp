@@ -1492,6 +1492,14 @@ void PSwitch(bool enabled)
                     nb.Special = 0;
                     nb.Kill = false;
                     nb.NPC = NPC[A].Type;
+
+                    if(g_compatibility.fix_switched_block_clipping)
+                    {
+                        nb.IsReally = 0;
+                        nb.IsNPC = NPCID_NULL;
+                        nb.noProjClipping = false;
+                    }
+
                     syncLayersTrees_Block(numBlock);
                 }
 
@@ -1633,6 +1641,15 @@ void PSwitch(bool enabled)
                     nb.Location.X += (NPC[A].Location.Width - nb.Location.Width) / 2.0;
                     nb.Special = 0;
                     nb.Kill = false;
+
+                    if(g_compatibility.fix_switched_block_clipping)
+                    {
+                        nb.NPC = NPCID_NULL;
+                        nb.IsReally = 0;
+                        nb.IsNPC = NPCID_NULL;
+                        nb.noProjClipping = false;
+                    }
+
                     syncLayersTrees_Block(numBlock);
                 }
                 NPC[A].Killed = 9;
