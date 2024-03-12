@@ -668,7 +668,7 @@ void NPCSpecial(int A)
         tempLocation.X = npc.Location.X + npc.Location.Width / 2.0 - tempLocation.Width / 2.0;
         tempBool = false;
 
-        for(int i = 1; i <= numNPCs; i++)
+        for(int i : treeNPCQuery(tempLocation, SORTMODE_NONE))
         {
             auto &n = NPC[i];
             if(n->IsAVine && !n.Hidden && CheckCollision(tempLocation, n.Location))
