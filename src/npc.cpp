@@ -255,7 +255,7 @@ void Bomb(Location_t Location, int Game, int ImmunePlayer)
         }
     }
 
-    for(int i : treeBlockQueryWithTemp(newLoc(X - Radius, Y - Radius, Radius * 2, Radius * 2), SORTMODE_COMPAT))
+    for(int i : treeBlockQuery(newLoc(X - Radius, Y - Radius, Radius * 2, Radius * 2), SORTMODE_COMPAT))
     {
         if(!Block[i].Hidden && !BlockNoClipping[Block[i].Type])
         {
@@ -685,7 +685,7 @@ void NPCSpecial(int A)
             // fBlock = FirstBlock[static_cast<int>(floor(static_cast<double>(tempLocation.X / 32))) - 1];
             // lBlock = LastBlock[floor((tempLocation.X + tempLocation.Width) / 32.0) + 1];
 
-            for(Block_t* block : treeBlockQuery(tempLocation, false))
+            for(Block_t* block : treeFLBlockQuery(tempLocation, false))
             {
                 auto &b = *block;
                 if(!b.Hidden && !BlockNoClipping[b.Type] && !BlockIsSizable[b.Type] && !BlockOnlyHitspot1[b.Type])
@@ -2157,7 +2157,7 @@ void NPCSpecial(int A)
             // lBlock = LastBlock[floor((tempLocation.X + tempLocation.Width) / 32.0) + 1];
             // blockTileGet(tempLocation, fBlock, lBlock);
 
-            for(Block_t& block : treeBlockQuery(tempLocation, SORTMODE_NONE))
+            for(Block_t& block : treeFLBlockQuery(tempLocation, SORTMODE_NONE))
             {
                 if(!block.Hidden && !BlockNoClipping[block.Type] && !BlockIsSizable[block.Type] && !BlockOnlyHitspot1[block.Type])
                 {
@@ -2192,7 +2192,7 @@ void NPCSpecial(int A)
                 // lBlock = LastBlock[floor((tempLocation.X + tempLocation.Width) / 32.0) + 1];
                 // blockTileGet(tempLocation, fBlock, lBlock);
 
-                for(BlockRef_t block_p : treeBlockQuery(tempLocation, SORTMODE_NONE))
+                for(BlockRef_t block_p : treeFLBlockQuery(tempLocation, SORTMODE_NONE))
                 {
                     Block_t& block = *block_p;
                     int i = (int)block_p;
@@ -2243,7 +2243,7 @@ void NPCSpecial(int A)
             // lBlock = LastBlock[floor((tempLocation.X + tempLocation.Width) / 32.0) + 1];
             // blockTileGet(tempLocation, fBlock, lBlock);
 
-            for(int i : treeBlockQuery(tempLocation, SORTMODE_NONE))
+            for(int i : treeFLBlockQuery(tempLocation, SORTMODE_NONE))
             {
                 if(!Block[i].Hidden && !BlockNoClipping[Block[i].Type] && !BlockIsSizable[Block[i].Type] && !BlockOnlyHitspot1[Block[i].Type])
                 {
@@ -2275,7 +2275,7 @@ void NPCSpecial(int A)
                 // lBlock = LastBlock[floor((tempLocation.X + tempLocation.Width) / 32.0) + 1];
                 // blockTileGet(tempLocation, fBlock, lBlock);
 
-                for(int i : treeBlockQuery(tempLocation, SORTMODE_NONE))
+                for(int i : treeFLBlockQuery(tempLocation, SORTMODE_NONE))
                 {
                     if(!Block[i].Hidden && !BlockNoClipping[Block[i].Type] && !BlockIsSizable[Block[i].Type] && !BlockOnlyHitspot1[Block[i].Type])
                     {
@@ -2315,7 +2315,7 @@ void NPCSpecial(int A)
             // lBlock = LastBlock[floor((tempLocation.X + tempLocation.Width) / 32.0) + 1];
             // blockTileGet(tempLocation, fBlock, lBlock);
 
-            for(int i : treeBlockQuery(tempLocation, SORTMODE_NONE))
+            for(int i : treeFLBlockQuery(tempLocation, SORTMODE_NONE))
             {
                 if(!Block[i].Hidden && !BlockNoClipping[Block[i].Type] && !BlockIsSizable[Block[i].Type] && !BlockOnlyHitspot1[Block[i].Type])
                 {
@@ -2347,7 +2347,7 @@ void NPCSpecial(int A)
                 // lBlock = LastBlock[floor((tempLocation.X + tempLocation.Width) / 32.0) + 1];
                 // blockTileGet(tempLocation, fBlock, lBlock);
 
-                for(int i : treeBlockQuery(tempLocation, SORTMODE_NONE))
+                for(int i : treeFLBlockQuery(tempLocation, SORTMODE_NONE))
                 {
                     if(!Block[i].Hidden && !BlockNoClipping[Block[i].Type] && !BlockIsSizable[Block[i].Type] && !BlockOnlyHitspot1[Block[i].Type])
                     {
@@ -2388,7 +2388,7 @@ void NPCSpecial(int A)
             // lBlock = LastBlock[floor((tempLocation.X + tempLocation.Width) / 32.0) + 1];
             // blockTileGet(tempLocation, fBlock, lBlock);
 
-            for(int i : treeBlockQuery(tempLocation, SORTMODE_NONE))
+            for(int i : treeFLBlockQuery(tempLocation, SORTMODE_NONE))
             {
                 if(!Block[i].Hidden && !BlockNoClipping[Block[i].Type] && !BlockIsSizable[Block[i].Type] && !BlockOnlyHitspot1[Block[i].Type])
                 {
@@ -2420,7 +2420,7 @@ void NPCSpecial(int A)
                 // lBlock = LastBlock[floor((tempLocation.X + tempLocation.Width) / 32.0) + 1];
                 // blockTileGet(tempLocation, fBlock, lBlock);
 
-                for(int i : treeBlockQuery(tempLocation, SORTMODE_NONE))
+                for(int i : treeFLBlockQuery(tempLocation, SORTMODE_NONE))
                 {
                     if(!Block[i].Hidden && !BlockNoClipping[Block[i].Type] && !BlockIsSizable[Block[i].Type] && !BlockOnlyHitspot1[Block[i].Type])
                     {
@@ -2935,7 +2935,7 @@ void NPCSpecial(int A)
             tempLocation = npc.Location;
             tempLocation.Height = 8000;
             int C = 0;
-            for(int i : treeBlockQueryWithTemp(tempLocation, SORTMODE_COMPAT))
+            for(int i : treeBlockQuery(tempLocation, SORTMODE_COMPAT))
             {
                 if(CheckCollision(tempLocation, Block[i].Location))
                 {
@@ -4903,7 +4903,7 @@ void SpecialNPC(int A)
                 D = 1;
             else
             {
-                for(int Ei : treeBlockQueryWithTemp(tempLocation, SORTMODE_NONE))
+                for(int Ei : treeBlockQuery(tempLocation, SORTMODE_NONE))
                 {
                     if(!BlockNoClipping[Block[Ei].Type] &&
                        !BlockIsSizable[Block[Ei].Type] &&
@@ -5469,7 +5469,7 @@ void SpecialNPC(int A)
                 D = 1;
             else
             {
-                for(int Ei : treeBlockQueryWithTemp(tempLocation, SORTMODE_NONE))
+                for(int Ei : treeBlockQuery(tempLocation, SORTMODE_NONE))
                 {
                     if(CheckCollision(tempLocation, Block[Ei].Location) && !BlockNoClipping[Block[Ei].Type])
                     {
@@ -5612,7 +5612,7 @@ void SpecialNPC(int A)
         NPC[A].Projectile = false;
     else if(NPC[A].Type == NPCID_TOOTHY) // killer plant destroys blocks
     {
-        for(int B : treeBlockQueryWithTemp(NPC[A].Location, SORTMODE_COMPAT))
+        for(int B : treeBlockQuery(NPC[A].Location, SORTMODE_COMPAT))
         {
             if(CheckCollision(NPC[A].Location, Block[B].Location))
             {
@@ -5771,31 +5771,21 @@ bool npcHasFloor(const struct NPC_t &npc)
     checkLoc.X = l.X + (l.Width / 2) - (checkLoc.Width / 2);
 
     // Ensure that there is a floor under feet
-    for(int subCheck = 1; subCheck <= 2; subCheck++)
+    for(BlockRef_t sb : treeBlockQuery(checkLoc, SORTMODE_NONE))
     {
-        auto subQuery = (subCheck == 1)
-            ? treeBlockQuery(checkLoc, SORTMODE_NONE)
-            : treeTempBlockQuery(checkLoc, SORTMODE_NONE);
+        int idx = sb;
 
-        for(BlockRef_t sb : subQuery)
+        if(npc.tempBlock == idx)
+            continue; // Skip collision check to self
+
+        if(BlockNoClipping[sb->Type] || sb->Hidden || sb->Invis)
+            continue;
+
+        if(CheckCollision(checkLoc, sb->Location))
         {
-            int idx = sb;
-
-            if(npc.tempBlock == idx)
-                continue; // Skip collision check to self
-
-            if(BlockNoClipping[sb->Type] || sb->Hidden || sb->Invis)
-                continue;
-
-            if(CheckCollision(checkLoc, sb->Location))
-            {
-                hasFloor = true;
-                break;
-            }
-        }
-
-        if(hasFloor)
+            hasFloor = true;
             break;
+        }
     }
 
     return hasFloor;

@@ -97,7 +97,7 @@ bool BlocksF::IsPlayerTouchingType(int type, int sought, Player_t *demo)
     double playerX2 = demo->Location.X + demo->Location.Width + 0.20;
     double playerY2 = demo->Location.Y + demo->Location.Height + 0.20;
 
-    for(Block_t* block : treeBlockQuery(demo->Location, SORTMODE_NONE))
+    for(Block_t* block : treeFLBlockQuery(demo->Location, SORTMODE_NONE))
     {
         if(block->Type == type)
         {

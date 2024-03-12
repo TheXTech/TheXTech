@@ -307,19 +307,19 @@ void treeBlockRemoveLayer(int layer, BlockRef_t block)
     s_block_tables.erase(layer, block);
 }
 
-TreeResult_Sentinel<BlockRef_t> treeBlockQuery(double Left, double Top, double Right, double Bottom,
+TreeResult_Sentinel<BlockRef_t> treeFLBlockQuery(double Left, double Top, double Right, double Bottom,
                          int sort_mode,
                          double margin)
 {
     return s_block_tables.query(Left, Top, Right, Bottom, sort_mode, margin);
 }
 
-void treeBlockQuery(std::vector<BaseRef_t>& out, const Location_t &loc, int sort_mode)
+void treeFLBlockQuery(std::vector<BaseRef_t>& out, const Location_t &loc, int sort_mode)
 {
     s_block_tables.query(out, loc, sort_mode);
 }
 
-TreeResult_Sentinel<BlockRef_t> treeBlockQuery(const Location_t &loc,
+TreeResult_Sentinel<BlockRef_t> treeFLBlockQuery(const Location_t &loc,
                          int sort_mode)
 {
     return s_block_tables.query(loc, sort_mode);
@@ -489,7 +489,7 @@ TreeResult_Sentinel<BlockRef_t> treeTempBlockQuery(double Left, double Top, doub
 
 /* ================= Combined Block Query ============== */
 
-TreeResult_Sentinel<BlockRef_t> treeBlockQueryWithTemp(const Location_t &_loc,
+TreeResult_Sentinel<BlockRef_t> treeBlockQuery(const Location_t &_loc,
                          int sort_mode)
 {
     TreeResult_Sentinel<BlockRef_t> result;

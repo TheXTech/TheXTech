@@ -600,7 +600,7 @@ void s_UpdateDrawItems(Screen_t& screen, int i)
             vscreen.Height + i_drawBlocks_margin * 2);
 
         // make query (sort by ID as done in vanilla)
-        TreeResult_Sentinel<BlockRef_t> areaBlocks = treeBlockQuery(s_drawBlocks_bounds[i], SORTMODE_ID);
+        TreeResult_Sentinel<BlockRef_t> areaBlocks = treeFLBlockQuery(s_drawBlocks_bounds[i], SORTMODE_ID);
 
         // load query results into different sets of blocks
         s_drawSBlocks[i].clear();

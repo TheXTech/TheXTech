@@ -881,7 +881,7 @@ void UpdateNPCs()
                     Location_t tempLocation = NPC[A].Location;
                     tempLocation.Height = 8000;
                     int C = 0;
-                    for(int B : treeBlockQueryWithTemp(tempLocation, SORTMODE_COMPAT))
+                    for(int B : treeBlockQuery(tempLocation, SORTMODE_COMPAT))
                     {
                         if(CheckCollision(tempLocation, Block[B].Location))
                         {
@@ -2165,7 +2165,7 @@ void UpdateNPCs()
                             // blockTileGet(loc, fBlock, lBlock);
                             bool stillCollide = false;
 
-                            for(BlockRef_t block : treeBlockQuery(loc, SORTMODE_NONE))
+                            for(BlockRef_t block : treeFLBlockQuery(loc, SORTMODE_NONE))
                             {
                                 int B = block;
                                 if(!CheckCollision(loc, Block[B].Location))
@@ -2346,7 +2346,7 @@ void UpdateNPCs()
                                 //     lBlock = numBlock;
                                 // }
                                 auto collBlockSentinel = (bCheck == 1)
-                                    ? treeBlockQuery(NPC[A].Location, SORTMODE_COMPAT)
+                                    ? treeFLBlockQuery(NPC[A].Location, SORTMODE_COMPAT)
                                     : treeTempBlockQuery(NPC[A].Location, SORTMODE_LOC);
 
                                 for(BlockRef_t block : collBlockSentinel)
@@ -3871,7 +3871,7 @@ void UpdateNPCs()
                                                                                         // }
 
                                                                                         auto collBlockSentinel2 = (bCheck2 == 1)
-                                                                                            ? treeBlockQuery(NPC[B].Location, SORTMODE_COMPAT)
+                                                                                            ? treeFLBlockQuery(NPC[B].Location, SORTMODE_COMPAT)
                                                                                             : treeTempBlockQuery(NPC[B].Location, SORTMODE_LOC);
 
                                                                                         for(BlockRef_t block2 : collBlockSentinel2)
@@ -4193,7 +4193,7 @@ void UpdateNPCs()
                                     //     lBlock2 = numBlock;
                                     // }
                                     auto collBlockSentinel2 = (bCheck2 == 1)
-                                        ? treeBlockQuery(tempLocation, SORTMODE_NONE)
+                                        ? treeFLBlockQuery(tempLocation, SORTMODE_NONE)
                                         : treeTempBlockQuery(tempLocation, SORTMODE_NONE);
 
                                     for(BlockRef_t block : collBlockSentinel2)
@@ -4271,7 +4271,7 @@ void UpdateNPCs()
                                     //     lBlock2 = numBlock;
                                     // }
                                     auto collBlockSentinel2 = (bCheck2 == 1)
-                                        ? treeBlockQuery(tempLocation, SORTMODE_NONE)
+                                        ? treeFLBlockQuery(tempLocation, SORTMODE_NONE)
                                         : treeTempBlockQuery(tempLocation, SORTMODE_NONE);
 
                                     for(BlockRef_t block : collBlockSentinel2)
@@ -4319,7 +4319,7 @@ void UpdateNPCs()
                                     //     lBlock2 = numBlock;
                                     // }
                                     auto collBlockSentinel2 = (bCheck2 == 1)
-                                        ? treeBlockQuery(tempLocation, SORTMODE_NONE)
+                                        ? treeFLBlockQuery(tempLocation, SORTMODE_NONE)
                                         : treeTempBlockQuery(tempLocation, SORTMODE_NONE);
 
                                     for(BlockRef_t block : collBlockSentinel2)
@@ -4895,7 +4895,7 @@ void UpdateNPCs()
                                 // lBlock = LastBlock[long((NPC[A].Location.X + NPC[A].Location.Width) / 32.0) + 1];
                                 // blockTileGet(NPC[A].Location, fBlock, lBlock);
 
-                                for(BlockRef_t block : treeBlockQuery(tempLocation, false))
+                                for(BlockRef_t block : treeFLBlockQuery(tempLocation, false))
                                 {
                                     int B = block;
                                     if(Block[B].Type == 186 && CheckCollision(tempLocation, Block[B].Location) && !Block[B].Hidden)
@@ -4927,7 +4927,7 @@ void UpdateNPCs()
                                         toShake.Width = (sec.Width - sec.X);
                                         toShake.Y = sec.Y;
                                         toShake.Height = (sec.Height - sec.Y);
-                                        for(BlockRef_t block : treeBlockQuery(toShake, false))
+                                        for(BlockRef_t block : treeFLBlockQuery(toShake, false))
                                         {
                                             int B = block;
                                             BlockShakeUp(B);
@@ -5593,7 +5593,7 @@ void UpdateNPCs()
                         // }
 
                         auto collBlockSentinel = (bCheck == 1)
-                            ? treeBlockQuery(NPC[A].Location, SORTMODE_COMPAT)
+                            ? treeFLBlockQuery(NPC[A].Location, SORTMODE_COMPAT)
                             : treeTempBlockQuery(NPC[A].Location, SORTMODE_LOC);
 
                         for(BlockRef_t block : collBlockSentinel)

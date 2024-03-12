@@ -549,7 +549,7 @@ void UpdatePlayer()
                         // lBlock = LastBlock[((tempLocation.X + tempLocation.Width) / 32.0) + 1];
                         // blockTileGet(tempLocation, fBlock, lBlock);
 
-                        for(int B : treeBlockQuery(tempLocation, SORTMODE_NONE))
+                        for(int B : treeFLBlockQuery(tempLocation, SORTMODE_NONE))
                         {
                             if(!Block[B].Invis && !BlockIsSizable[Block[B].Type] && !BlockOnlyHitspot1[Block[B].Type] &&
                                !BlockNoClipping[Block[B].Type] && !Block[B].Hidden)
@@ -2341,7 +2341,7 @@ void UpdatePlayer()
                 // lBlock = LastBlock[((Player[A].Location.X + Player[A].Location.Width) / 32.0) + 1];
                 // blockTileGet(Player[A].Location, fBlock, lBlock);
 
-                for(int B : treeBlockQuery(Player[A].Location, SORTMODE_COMPAT))
+                for(int B : treeFLBlockQuery(Player[A].Location, SORTMODE_COMPAT))
                 {
                     // checks to see if a collision happened
                     if(Player[A].Location.X + Player[A].Location.Width >= Block[B].Location.X)
@@ -2915,7 +2915,7 @@ void UpdatePlayer()
                                                 // lBlock = LastBlock[((tempLocation.X + tempLocation.Width) / 32.0) + 1];
                                                 // blockTileGet(tempLocation, fBlock, lBlock);
 
-                                                for(int C : treeBlockQuery(tempLocation, SORTMODE_COMPAT))
+                                                for(int C : treeFLBlockQuery(tempLocation, SORTMODE_COMPAT))
                                                 {
                                                     if(CheckCollision(tempLocation, Block[C].Location) && !Block[C].Hidden)
                                                     {
@@ -4163,7 +4163,7 @@ void UpdatePlayer()
                                                     // lBlock = LastBlock[((Player[A].Location.X + Player[A].Location.Width) / 32.0) + 1];
                                                     // blockTileGet(Player[A].Location, fBlock, lBlock);
 
-                                                    for(int C : treeBlockQuery(Player[A].Location, SORTMODE_NONE))
+                                                    for(int C : treeFLBlockQuery(Player[A].Location, SORTMODE_NONE))
                                                     {
                                                         if(CheckCollision(Player[A].Location, Block[C].Location) &&
                                                            !Block[C].Hidden && !BlockIsSizable[Block[C].Type] &&
