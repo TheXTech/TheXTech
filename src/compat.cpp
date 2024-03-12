@@ -128,6 +128,8 @@ static void compatInit(Compatibility_t &c)
     // 1.3.6.5
     c.fix_visual_bugs = true;
     c.fix_npc_emerge_size = true;
+    c.fix_switched_block_clipping = true;
+    // 1.3.7
 
 
     if(s_compatLevel >= COMPAT_SMBX2) // Make sure that bugs were same as on SMBX2 Beta 4 on this moment
@@ -180,6 +182,8 @@ static void compatInit(Compatibility_t &c)
         // 1.3.6.5
         c.fix_visual_bugs = false;
         c.fix_npc_emerge_size = false;
+        c.fix_switched_block_clipping = false;
+        // 1.3.7
     }
 
     if(s_compatLevel >= COMPAT_SMBX13) // Strict vanilla SMBX
@@ -434,6 +438,8 @@ static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
         // 1.3.6.5
         compat.read("fix-visual-bugs", c.fix_visual_bugs, c.fix_visual_bugs);
         compat.read("fix-npc-emerge-size", c.fix_npc_emerge_size, c.fix_npc_emerge_size);
+        compat.read("fix-switched-block-clipping", c.fix_switched_block_clipping, c.fix_switched_block_clipping);
+        // 1.3.7 (but these will be changed in the Compat update)
     }
     // 1.3.4
     compat.read("fix-player-filter-bounce", c.fix_player_filter_bounce, c.fix_player_filter_bounce);
