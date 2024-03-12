@@ -1353,7 +1353,7 @@ void UpdateBlocks()
                     {
                         if(ib.ShakeOffset <= 0 || NPC[B]->IsACoin)
                         {
-                            if(ShakeCollision(NPC[B].Location, ib.Location, ib.ShakeOffset))
+                            if(ShakeCollision(NPC[B].Location, ib))
                             {
                                 if(iBlock[A] != NPC[B].tempBlock)
                                 {
@@ -1383,7 +1383,7 @@ void UpdateBlocks()
                 {
                     if(Player[B].Effect == 0 && ib.Type != 55)
                     {
-                        if(ShakeCollision(Player[B].Location, ib.Location, ib.ShakeOffset))
+                        if(ShakeCollision(Player[B].Location, ib))
                         {
                             if(!BlockIsSizable[ib.Type] && !BlockOnlyHitspot1[ib.Type])
                             {

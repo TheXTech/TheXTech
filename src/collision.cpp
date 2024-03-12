@@ -384,17 +384,19 @@ bool CursorCollision(const Location_t &Loc1, const TinyLocation_t &Loc2)
 }
 
 // Shakey block collision
-bool ShakeCollision(const Location_t &Loc1, const Location_t &Loc2, int ShakeY3)
+bool ShakeCollision(const Location_t &Loc1, const Block_t &b)
 {
+    const Location_t &Loc2 = b.Location;
+
     bool tempShakeCollision = false;
 
     if(Loc1.X + 1 <= Loc2.X + Loc2.Width)
     {
         if(Loc1.X + Loc1.Width - 1 >= Loc2.X)
         {
-            if(Loc1.Y <= Loc2.Y + Loc2.Height + ShakeY3)
+            if(Loc1.Y <= Loc2.Y + Loc2.Height + b.ShakeOffset)
             {
-                if(Loc1.Y + Loc1.Height >= Loc2.Y + ShakeY3)
+                if(Loc1.Y + Loc1.Height >= Loc2.Y + b.ShakeOffset)
                 {
                     tempShakeCollision = true;
                 }
