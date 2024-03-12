@@ -1608,7 +1608,7 @@ void KillNPC(int A, int B)
 
         if(NPC[A].Type == NPCID_TOOTHYPIPE && NPC[A].Special == 1)
         {
-            for(C = 1; C <= numNPCs; C++)
+            for(int C : NPCQueues::Active.no_change)
             {
                 if(NPC[C].Type == NPCID_TOOTHY && NPC[C].Special2 == numNPCs + 1)
                     NPC[C].Special2 = A;

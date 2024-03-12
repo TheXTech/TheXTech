@@ -259,7 +259,7 @@ static void fairyMagic()
 
 static void iceAge()
 {
-    for(int C = 1; C <= numNPCs; C++)
+    for(int C : NPCQueues::Active.may_insert_erase)
     {
         if(NPC[C].Active)
         {
