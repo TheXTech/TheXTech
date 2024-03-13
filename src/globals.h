@@ -386,9 +386,11 @@ struct NPC_t
 //    Generator As Boolean 'for spawning new NPCs
     bool Generator = false;
 //    GeneratorDirection As Integer
-    vbint_t GeneratorDirection = 0;
+    // valid values: 0, 1, 2, 3, 4
+    uint8_t GeneratorDirection = 0;
 //    GeneratorEffect As Integer
-    vbint_t GeneratorEffect = 0;
+    // valid values: 0, 1, 2
+    uint8_t GeneratorEffect = 0;
 //    GeneratorTimeMax As Single
     float GeneratorTimeMax = 0.0f;
 //    GeneratorTime As Single
