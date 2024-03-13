@@ -1045,8 +1045,8 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
             if(!EditorCursor.NPC.GeneratorEffect)
                 EditorCursor.NPC.GeneratorEffect = 1;
 
-            if(EditorCursor.NPC.GeneratorTimeMax < 1.f)
-                EditorCursor.NPC.GeneratorTimeMax = 1.f;
+            if(EditorCursor.NPC.GeneratorTimeMax < 1)
+                EditorCursor.NPC.GeneratorTimeMax = 1;
         }
 
         if(UpdateButton(mode, 320 + 4, 100 + 4, GFX.EIcons, !EditorCursor.NPC.Generator, 0, 32*Icon::x, 32, 32))
@@ -1083,9 +1083,9 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
                 EditorCursor.NPC.GeneratorEffect = 2;
 
             // delay change
-            SuperPrintR(mode, fmt::format_ne(g_editorStrings.phraseDelayIsMs, ((int)EditorCursor.NPC.GeneratorTimeMax) * 100), 3, 50, 230);
+            SuperPrintR(mode, fmt::format_ne(g_editorStrings.phraseDelayIsMs, EditorCursor.NPC.GeneratorTimeMax * 100), 3, 50, 230);
 
-            if(EditorCursor.NPC.GeneratorTimeMax > 1.f && UpdateButton(mode, 280 + 4, 220 + 4, GFX.EIcons, false, 0, 32*Icon::left, 32, 32))
+            if(EditorCursor.NPC.GeneratorTimeMax > 1 && UpdateButton(mode, 280 + 4, 220 + 4, GFX.EIcons, false, 0, 32*Icon::left, 32, 32))
                 EditorCursor.NPC.GeneratorTimeMax --;
 
             if(UpdateButton(mode, 320 + 4, 220 + 4, GFX.EIcons, false, 0, 32*Icon::right, 32, 32))

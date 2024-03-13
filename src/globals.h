@@ -392,9 +392,11 @@ struct NPC_t
     // valid values: 0, 1, 2
     uint8_t GeneratorEffect = 0;
 //    GeneratorTimeMax As Single
-    float GeneratorTimeMax = 0.0f;
+    // surprisingly, never stores any floating point variables. expressed in deci-seconds.
+    vbint_t GeneratorTimeMax = 0;
 //    GeneratorTime As Single
-    float GeneratorTime = 0.0f;
+    // surprisingly, only stores its own limit as a floating point variables. expressed in ticks.
+    vbint_t GeneratorTime = 0;
 
     // Misc floating-point variables
 //    RealSpeedX As Single 'the real speed of the NPC

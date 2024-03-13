@@ -325,15 +325,23 @@ void UpdateNPCs()
             if(!NPC[A].Hidden)
             {
                 NPC[A].TimeLeft = 0;
+
+                // Old timer logic
+                // this did not achieve anything other than keeping the value from growing large, but was likely the reason Redigit thought floats were necessary
+#if 0
                 NPC[A].GeneratorTime += 1;
 
                 if(NPC[A].GeneratorTime >= NPC[A].GeneratorTimeMax * 6.5f)
                     NPC[A].GeneratorTime = NPC[A].GeneratorTimeMax * 6.5f;
+#endif
+
+                if(NPC[A].GeneratorTime * 10 < NPC[A].GeneratorTimeMax * 65)
+                    NPC[A].GeneratorTime += 1;
 
                 if(NPC[A].GeneratorActive)
                 {
                     NPC[A].GeneratorActive = false;
-                    if(NPC[A].GeneratorTime >= NPC[A].GeneratorTimeMax * 6.5f)
+                    if(NPC[A].GeneratorTime * 10 >= NPC[A].GeneratorTimeMax * 65)
                     {
                         bool tempBool = false;
 
