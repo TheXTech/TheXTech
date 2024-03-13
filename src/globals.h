@@ -316,11 +316,7 @@ struct NPC_t
     // rarely used for warping NPCs (direction) and for NPCs being eaten (countdown timer initialized to 5)
     uint8_t Effect3 = 0;
 
-//    Direction As Single 'The direction the NPC is walking
-    // we have confirmed that this is never assigned a value other than 0, -1, or 1
-    vbint_t Direction = 0;
-
-    // Moderately important integer variables
+    // Moderately important counter variables
 //    Section As Integer 'what section of the level the NPC is in
     // never set to any non-section values
     uint8_t Section = 0;
@@ -330,13 +326,17 @@ struct NPC_t
 //    Quicksand As Integer
     // counter for whether NPC is in quicksand, set to 2 when detected, decremented otherwise
     uint8_t Quicksand = 0;
-//    TimeLeft As Integer 'Time left before reset when not on screen
-    vbint_t TimeLeft = 0;
 //    TailCD As Integer 'if greater then 0 the player can't hit with it's tail
     // set to values up to 12 when whipped / kicked, decremented otherwise
     uint8_t TailCD = 0;
 //    JustActivated As Integer 'The player that activated the NPC
     uint8_t JustActivated = 0;
+//    TimeLeft As Integer 'Time left before reset when not on screen
+    vbint_t TimeLeft = 0;
+
+//    Direction As Single 'The direction the NPC is walking
+    // we have confirmed that this is never assigned a value other than 0, -1, or 1
+    vbint_t Direction = 0;
 
 //    Pinched1 As Integer  'getting smashed by a block
     // int Pinched1 = 0;
@@ -351,15 +351,6 @@ struct NPC_t
 
     // NEW: replaces above with bitfield
     PinchedInfo_t Pinched = PinchedInfo_t();
-
-//    standingOnPlayer As Integer 'If this NPC is standing on a player in the clown car
-    uint8_t vehiclePlr = 0;
-//    standingOnPlayerY As Integer
-    vbint_t vehicleYOffset = 0;
-//    Slope As Integer 'the block that the NPC is on a slope with
-    vbint_t Slope = 0;
-//    Multiplier As Integer 'for upping the points the player recieves
-    vbint_t Multiplier = 0;
 
     // indexes to layers / events / text
 //    TriggerActivate As String 'for events - triggers when NPC gets activated
@@ -381,6 +372,16 @@ struct NPC_t
     bool Projectile = false;
 // EXTRA: Variant (previously Special7)
     uint8_t Variant = 0;
+
+    // some misc variables
+//    Slope As Integer 'the block that the NPC is on a slope with
+    vbint_t Slope = 0;
+//    Multiplier As Integer 'for upping the points the player recieves
+    vbint_t Multiplier = 0;
+//    standingOnPlayerY As Integer
+    vbint_t vehicleYOffset = 0;
+//    standingOnPlayer As Integer 'If this NPC is standing on a player in the clown car
+    uint8_t vehiclePlr = 0;
 
     // Information about Generator state (GeneratorActive in bitfield at the bottom of the struct)
 //    Generator As Boolean 'for spawning new NPCs
@@ -411,30 +412,32 @@ struct NPC_t
     // never set to a non-integer value, likely used a float for saturation arithemtic
     vbint_t Damage = 0;
 
-    // Misc integer variables
-//    HoldingPlayer As Integer 'Who is holding it
-    // only ever set to 0 or a player index
-    uint8_t HoldingPlayer = 0;
-//    CantHurt As Integer 'Won't hurt the player
-    // timer for how long the NPC will be harmless to a certain player, set to values up to 10000
-    vbint_t CantHurt = 0;
+    // Player reference variables
 //    CantHurtPlayer As Integer
     // almost always set to a valid player index; very rarely set to an invalid index for NPCID_FLIPPED_RAINBOW_SHELL, only used to index the player array by NPCID_SWORDBEAM
     uint8_t CantHurtPlayer = 0;
 //    BattleOwner As Integer 'Owner of the projectile
     // not only used in battle mode; almost always set to a valid player index, (see above)
     uint8_t BattleOwner = 0;
-//    WallDeath As Integer
-    // tracks whether the NPC was activated in a wall (or is not in water, for fish). set to values between 0 and 10, used as a counter bounded at these values, sometimes very briefly 11.
-    uint8_t WallDeath = 0;
+//    HoldingPlayer As Integer 'Who is holding it
+    // only ever set to 0 or a player index
+    uint8_t HoldingPlayer = 0;
+
+    // some more misc counter variables
+//    Immune As Integer 'time that the NPC is immune
+    // set to values up to 100, decremented each frame
+    uint8_t Immune = 0;
+//    CantHurt As Integer 'Won't hurt the player
+    // timer for how long the NPC will be harmless to a certain player, set to values up to 10000
+    vbint_t CantHurt = 0;
 //    RespawnDelay As Integeri
     // used to respawn an NPC in Battle Mode, set to 65 * 30 (30s) on deactivation and decremented each frame
     vbint_t RespawnDelay = 0;
 //    Block As Integer 'Used when a P-Switch turns a block into a coint
     vbint_t coinSwitchBlockType = 0;
-//    Immune As Integer 'time that the NPC is immune
-    // set to values up to 100, decremented each frame
-    uint8_t Immune = 0;
+//    WallDeath As Integer
+    // tracks whether the NPC was activated in a wall (or is not in water, for fish). set to values between 0 and 10, used as a counter bounded at these values, sometimes very briefly 11.
+    uint8_t WallDeath = 0;
 
     // rarely used bools turned into bitfields
 //    TurnAround As Boolean 'if the NPC needs to turn around
@@ -461,17 +464,17 @@ struct NPC_t
     bool _priv_force_canonical : 1;
 
 //'the default values are used when De-Activating an NPC when it goes on screen
-//    DefaultType As Integer
-    NPCID DefaultType = NPCID(0);
-//    DefaultLocation As Location
-    SpeedlessLocation_t DefaultLocation;
 //    DefaultDirection As Single
     // changed to int8_t, only ever holds values -1, 0, and 1
     int8_t DefaultDirection = 0;
+//    DefaultType As Integer
+    NPCID DefaultType = NPCID(0);
 //    DefaultSpecial As Integer
     vbint_t DefaultSpecial = 0;
 //    DefaultSpecial2 As Integer
     vbint_t DefaultSpecial2 = 0;
+//    DefaultLocation As Location
+    SpeedlessLocation_t DefaultLocation;
 
     // obsolete and removed fields
 //    PinchCount As Integer 'obsolete
