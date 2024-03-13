@@ -5778,7 +5778,7 @@ bool npcHasFloor(const struct NPC_t &npc)
         if(npc.tempBlock == idx)
             continue; // Skip collision check to self
 
-        if(BlockNoClipping[sb->Type] || sb->Hidden || sb->Invis)
+        if(BlockNoClipping[sb->Type] || sb->Hidden || sb->Invis || (npc.Projectile && sb->tempBlockNoProjClipping()))
             continue;
 
         if(CheckCollision(checkLoc, sb->Location))
