@@ -1851,7 +1851,7 @@ void PowBlock()
 
         for(; Z <= numScreens; Z++)
         {
-            int vscreen_Z = screen.vScreen_refs[Z - 1];
+            uint8_t vscreen_Z = screen.vScreen_refs[Z - 1];
             const vScreen_t& vscreen = vScreen[vscreen_Z];
             const Location_t query_loc = newLoc(-vscreen.X, -vscreen.Y, vscreen.Width, vscreen.Height);
 

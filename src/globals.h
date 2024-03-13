@@ -331,7 +331,7 @@ struct NPC_t
 //    TailCD As Integer 'if greater then 0 the player can't hit with it's tail
     vbint_t TailCD = 0;
 //    JustActivated As Integer 'The player that activated the NPC
-    vbint_t JustActivated = 0;
+    uint8_t JustActivated = 0;
 
 //    Pinched1 As Integer  'getting smashed by a block
     // int Pinched1 = 0;

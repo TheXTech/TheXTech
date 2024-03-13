@@ -957,7 +957,7 @@ void ClassicNPCScreenLogic(int Z, int numScreens, bool fill_draw_queue, NPC_Draw
             if((NPC[A].Reset[Z] && (!check_both_reset || NPC[A].Reset[3 - Z])) || NPC[A].Active || (activate_conveyer && NPC[A].Type == NPCID_CONVEYOR))
             {
                 if(set_justactivated && !NPC[A].Active)
-                    NPC[A].JustActivated = Z;
+                    NPC[A].JustActivated = static_cast<uint8_t>(Z);
 
                 NPC[A].TimeLeft = Physics.NPCTimeOffScreen;
                 if(check_long_life && (NPCIsYoshi(NPC[A]) || NPCIsBoot(NPC[A]) || NPC[A].Type == NPCID_POWER_S3 || NPC[A].Type == NPCID_FIRE_POWER_S3 || NPC[A].Type == NPCID_CANNONITEM || NPC[A].Type == NPCID_LIFE_S3 || NPC[A].Type == NPCID_POISON || NPC[A].Type == NPCID_STATUE_POWER || NPC[A].Type == NPCID_HEAVY_POWER || NPC[A].Type == NPCID_FIRE_POWER_S1 || NPC[A].Type == NPCID_FIRE_POWER_S4 || NPC[A].Type == NPCID_POWER_S1 || NPC[A].Type == NPCID_POWER_S4 || NPC[A].Type == NPCID_LIFE_S1 || NPC[A].Type == NPCID_LIFE_S4 || NPC[A].Type == NPCID_3_LIFE || NPC[A].Type == NPCID_FLIPPED_RAINBOW_SHELL || NPC[A].Type == NPCID_PLATFORM_S3))
@@ -1264,7 +1264,7 @@ void ModernNPCScreenLogic(Screen_t& screen, int vscreen_i, bool fill_draw_queue,
             else if(!NPC[A].Active && NPC[A].Effect != 2
                 && ((NPC[A].Reset[1] && NPC[A].Reset[2]) || NPC[A].Type == NPCID_CONVEYOR))
             {
-                NPC[A].JustActivated = Z;
+                NPC[A].JustActivated = static_cast<uint8_t>(Z);
 
                 if(!NPC[A].Active)
                 {

@@ -7956,6 +7956,8 @@ void DropPlayer(const int A)
             n.BattleOwner --;
         else if(n.BattleOwner == A)
             n.BattleOwner = 0;
+
+        // this is not quite right (the vScreen index doesn't necessarily equal the player index, and might not get removed)
         if(n.JustActivated > A)
             n.JustActivated --;
         else if(n.JustActivated == A)
