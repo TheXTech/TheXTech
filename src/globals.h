@@ -260,6 +260,7 @@ struct NPC_t
 //    Frame As Integer 'The graphic to be shown
     vbint_t Frame = 0;
 //    tempBlock As Integer
+    // temp block index in the block array
     vbint_t tempBlock = 0;
 
 //    Active As Boolean 'If on screen
@@ -312,7 +313,8 @@ struct NPC_t
 //    Effect As Integer 'For starting / stopping effects
     NPCEffect Effect = NPCEFF_NORMAL;
 //    Effect3 As Integer
-    vbint_t Effect3 = 0;
+    // rarely used for warping NPCs (direction) and for NPCs being eaten (countdown timer initialized to 5)
+    uint8_t Effect3 = 0;
 
 //    Direction As Single 'The direction the NPC is walking
     // we have confirmed that this is never assigned a value other than 0, -1, or 1
@@ -323,13 +325,16 @@ struct NPC_t
     // never set to any non-section values
     uint8_t Section = 0;
 //    Wet As Integer ' greater then 0 of the NPC is in water
-    vbint_t Wet = 0;
+    // counter for whether NPC is in water, set to 2 when detected, decremented otherwise
+    uint8_t Wet = 0;
 //    Quicksand As Integer
-    vbint_t Quicksand = 0;
+    // counter for whether NPC is in quicksand, set to 2 when detected, decremented otherwise
+    uint8_t Quicksand = 0;
 //    TimeLeft As Integer 'Time left before reset when not on screen
     vbint_t TimeLeft = 0;
 //    TailCD As Integer 'if greater then 0 the player can't hit with it's tail
-    vbint_t TailCD = 0;
+    // set to values up to 12 when whipped / kicked, decremented otherwise
+    uint8_t TailCD = 0;
 //    JustActivated As Integer 'The player that activated the NPC
     uint8_t JustActivated = 0;
 
@@ -405,19 +410,23 @@ struct NPC_t
 //    HoldingPlayer As Integer 'Who is holding it
     vbint_t HoldingPlayer = 0;
 //    CantHurt As Integer 'Won't hurt the player
+    // timer for how long the NPC will be harmless to a certain player, set to values up to 10000
     vbint_t CantHurt = 0;
 //    CantHurtPlayer As Integer
     vbint_t CantHurtPlayer = 0;
 //    BattleOwner As Integer 'Owner of the projectile
     vbint_t BattleOwner = 0;
 //    WallDeath As Integer
-    vbint_t WallDeath = 0;
+    // tracks whether the NPC was activated in a wall (or is not in water, for fish). set to values between 0 and 10, used as a counter bounded at these values, sometimes very briefly 11.
+    uint8_t WallDeath = 0;
 //    RespawnDelay As Integeri
+    // used to respawn an NPC in Battle Mode, set to 65 * 30 (30s) on deactivation and decremented each frame
     vbint_t RespawnDelay = 0;
 //    Block As Integer 'Used when a P-Switch turns a block into a coint
     vbint_t Block = 0;
 //    Immune As Integer 'time that the NPC is immune
-    vbint_t Immune = 0;
+    // set to values up to 100, decremented each frame
+    uint8_t Immune = 0;
 
     // rarely used bools turned into bitfields
 //    TurnAround As Boolean 'if the NPC needs to turn around

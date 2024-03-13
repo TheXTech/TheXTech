@@ -1694,7 +1694,7 @@ void UpdateLayers()
                                 NPC[B].Location.Y += double(Layer[A].SpeedY);
                             }
 
-                            if(NPC[B].Effect == 4)
+                            if(NPC[B].Effect == NPCEFF_WARP)
                             {
                                 if(NPC[B].Effect3 == 1 || NPC[B].Effect3 == 3)
                                     NPC[B].Effect2 += double(Layer[A].SpeedY);
