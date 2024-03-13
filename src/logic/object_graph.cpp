@@ -199,7 +199,7 @@ void FillGraph(Graph& graph)
         // add a warp from the NPC's position to the corresponding position in the target section
 
         // check current section (backing up whatever value was already there)
-        int old_section = n.Section;
+        uint8_t old_section = n.Section;
         CheckSectionNPC(i);
 
         int cur_section = n.Section;

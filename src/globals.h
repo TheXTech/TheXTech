@@ -320,7 +320,8 @@ struct NPC_t
 
     // Moderately important integer variables
 //    Section As Integer 'what section of the level the NPC is in
-    vbint_t Section = 0;
+    // never set to any non-section values
+    uint8_t Section = 0;
 //    Wet As Integer ' greater then 0 of the NPC is in water
     vbint_t Wet = 0;
 //    Quicksand As Integer
