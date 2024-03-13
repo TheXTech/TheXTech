@@ -1987,7 +1987,19 @@ public:
         );
         // insert(0x00000078, &NPC_t::Location); // between 0x78 and 0xA8
         // insert(0x000000a8, &NPC_t::DefaultLocation); // between 0xA8 and 0xD8
-        insert(0x000000d8, &NPC_t::DefaultDirection);
+        insert(0x000000d8, // DefaultDirection
+            [](const NPC_t& n, FIELDTYPE ftype)->double
+            {
+                return valueToMem((float)n.DefaultDirection, ftype);
+            },
+            [](NPC_t& n, double in, FIELDTYPE ftype)->void
+            {
+                float direction = 0.0;
+                memToValue(direction, in, ftype);
+
+                n.DefaultDirection = (int8_t)direction;
+            }
+        );
         static_assert(sizeof(NPC_t::DefaultType) == sizeof(vbint_t), "underlying type of NPC_t::DefaultType must be vbint_t");
         insert(0x000000dc, reinterpret_cast<vbint_t NPC_t::*>(&NPC_t::DefaultType));
         insert(0x000000de, &NPC_t::DefaultSpecial);

@@ -827,7 +827,7 @@ void PlayerDead(int A)
         numNPCs++;
         NPC[numNPCs] = NPC_t();
         NPC[numNPCs].Direction = p.Direction;
-        if(Maths::iRound(NPC[numNPCs].Direction) == 1)
+        if(NPC[numNPCs].Direction == 1)
             NPC[numNPCs].Frame = 4;
         NPC[numNPCs].Frame += SpecialFrame[2];
         NPC[numNPCs].Active = true;
@@ -3041,7 +3041,7 @@ void PlayerDismount(const int A)
         Player[A].Mount = 0;
         numNPCs++;
         NPC[numNPCs].Direction = Player[A].Direction;
-        if(Maths::iRound(NPC[numNPCs].Direction) == 1)
+        if(NPC[numNPCs].Direction == 1)
             NPC[numNPCs].Frame = 4;
         NPC[numNPCs].Frame = NPC[numNPCs].Frame + SpecialFrame[2];
         NPC[numNPCs].Active = true;
@@ -3979,7 +3979,7 @@ void ClownCar()
                                 NPC[numNPCs].Special = A;
                                 NPC[numNPCs].Special2 = B;
                                 NPC[numNPCs].Direction = NPC[B].Direction;
-                                if(Maths::iRound(NPC[numNPCs].Direction) == 1)
+                                if(NPC[numNPCs].Direction == 1)
                                     NPC[numNPCs].Frame = 2;
                                 syncLayers_NPC(numNPCs);
                             }

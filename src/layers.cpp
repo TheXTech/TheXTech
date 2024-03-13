@@ -1685,7 +1685,7 @@ void UpdateLayers()
                                 if(NPC[B].Type == NPCID_PLANT_S3 || NPC[B].Type == NPCID_BIG_PLANT || NPC[B].Type == NPCID_PLANT_S1 ||
                                    NPC[B].Type == NPCID_LONG_PLANT_UP || NPC[B].Type == NPCID_FIRE_PLANT)
                                     NPC[B].Location.Y += NPC[B].DefaultLocation.Height;
-                                else if(NPC[B].Type == NPCID_SIDE_PLANT && fiEqual(NPC[B].Direction, -1))
+                                else if(NPC[B].Type == NPCID_SIDE_PLANT && NPC[B].Direction == -1)
                                     NPC[B].Location.X += NPC[B].DefaultLocation.Width;
                             }
                             else

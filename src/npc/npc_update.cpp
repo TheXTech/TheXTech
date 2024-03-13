@@ -923,13 +923,13 @@ void UpdateNPCs()
                         NPC[A].Active = false;
                         NPC[A].TimeLeft = 0;
                     }
-                    else if(Maths::iRound(NPC[A].Direction) == -1 && NPC[A].Location.X < Player[NPC[A].JustActivated].Location.X)
+                    else if(NPC[A].Direction == -1 && NPC[A].Location.X < Player[NPC[A].JustActivated].Location.X)
                     {
                         NPCQueues::Active.erase(A);
                         NPC[A].Active = false;
                         NPC[A].TimeLeft = 0;
                     }
-                    else if(Maths::iRound(NPC[A].Direction) == 1 && NPC[A].Location.X > Player[NPC[A].JustActivated].Location.X)
+                    else if(NPC[A].Direction == 1 && NPC[A].Location.X > Player[NPC[A].JustActivated].Location.X)
                     {
                         NPCQueues::Active.erase(A);
                         NPC[A].Active = false;
@@ -4686,7 +4686,7 @@ void UpdateNPCs()
 
                     if(NPC[A].HoldingPlayer > 0)
                     {
-                        if(fiEqual(NPC[A].Direction, -1))
+                        if(NPC[A].Direction == -1)
                             NPC[A].Frame = 0;
                         else
                             NPC[A].Frame = 5;

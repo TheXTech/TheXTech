@@ -315,7 +315,8 @@ struct NPC_t
     vbint_t Effect3 = 0;
 
 //    Direction As Single 'The direction the NPC is walking
-    float Direction = 0.0f;
+    // we have confirmed that this is never assigned a value other than 0, -1, or 1
+    vbint_t Direction = 0;
 
     // Moderately important integer variables
 //    Section As Integer 'what section of the level the NPC is in
@@ -447,7 +448,8 @@ struct NPC_t
 //    DefaultLocation As Location
     SpeedlessLocation_t DefaultLocation;
 //    DefaultDirection As Single
-    float DefaultDirection = 0.0f;
+    // changed to int8_t, only ever holds values -1, 0, and 1
+    int8_t DefaultDirection = 0;
 //    DefaultSpecial As Integer
     vbint_t DefaultSpecial = 0;
 //    DefaultSpecial2 As Integer
