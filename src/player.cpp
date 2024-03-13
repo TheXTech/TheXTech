@@ -7935,24 +7935,24 @@ void DropPlayer(const int A)
     for(int C = 1; C <= numNPCs; C++)
     {
         NPC_t& n = NPC[C];
+
         // most of these should not be equal because PlayerGone has already been called.
-        if(n.vehiclePlr > A)
+        if(n.vehiclePlr > A && n.vehiclePlr <= numPlayers)
             n.vehiclePlr --;
         else if(n.vehiclePlr == A)
             n.vehiclePlr = 0;
-        if(n.HoldingPlayer > A)
+
+        if(n.HoldingPlayer > A && n.HoldingPlayer <= numPlayers)
             n.HoldingPlayer --;
         else if(n.HoldingPlayer == A)
             n.HoldingPlayer = 0;
-        if(n.CantHurt > A)
-            n.CantHurt --;
-        else if(n.CantHurt == A)
-            n.CantHurt = 0;
-        if(n.CantHurtPlayer > A)
+
+        if(n.CantHurtPlayer > A && n.CantHurtPlayer <= numPlayers)
             n.CantHurtPlayer --;
         else if(n.CantHurtPlayer == A)
             n.CantHurtPlayer = 0;
-        if(n.BattleOwner > A)
+
+        if(n.BattleOwner > A && n.BattleOwner <= numPlayers)
             n.BattleOwner --;
         else if(n.BattleOwner == A)
             n.BattleOwner = 0;

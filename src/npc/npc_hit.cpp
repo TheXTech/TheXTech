@@ -1633,6 +1633,11 @@ void NPCHit(int A, int B, int C)
                 NPC[A].Location.X += NPC[A].Location.SpeedX;
                 NPC[A].CantHurt = Physics.NPCCanHurtWait;
                 NPC[A].CantHurtPlayer = C;
+
+                // NEW code: does not alter behavior, but keeps the value in uint8_t range
+                if(C > maxPlayers)
+                    NPC[A].CantHurtPlayer = maxPlayers + 1;
+
                 NPC[A].Projectile = true;
                 NPC[A].Location.SpeedY = 0;
                 Player[NPC[A].HoldingPlayer].HoldingNPC = 0;

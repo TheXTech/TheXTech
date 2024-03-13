@@ -408,14 +408,17 @@ struct NPC_t
 
     // Misc integer variables
 //    HoldingPlayer As Integer 'Who is holding it
-    vbint_t HoldingPlayer = 0;
+    // only ever set to 0 or a player index
+    uint8_t HoldingPlayer = 0;
 //    CantHurt As Integer 'Won't hurt the player
     // timer for how long the NPC will be harmless to a certain player, set to values up to 10000
     vbint_t CantHurt = 0;
 //    CantHurtPlayer As Integer
-    vbint_t CantHurtPlayer = 0;
+    // almost always set to a valid player index; very rarely set to an invalid index for NPCID_FLIPPED_RAINBOW_SHELL, only used to index the player array by NPCID_SWORDBEAM
+    uint8_t CantHurtPlayer = 0;
 //    BattleOwner As Integer 'Owner of the projectile
-    vbint_t BattleOwner = 0;
+    // not only used in battle mode; almost always set to a valid player index, (see above)
+    uint8_t BattleOwner = 0;
 //    WallDeath As Integer
     // tracks whether the NPC was activated in a wall (or is not in water, for fish). set to values between 0 and 10, used as a counter bounded at these values, sometimes very briefly 11.
     uint8_t WallDeath = 0;
