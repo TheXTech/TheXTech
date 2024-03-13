@@ -2148,6 +2148,8 @@ void UpdateNPCs()
                             }
                         }
 
+                        // the following is all new code!
+
                         if((NPC[A].Special == 2 || NPC[A].Special == 3) && (NPC[A].Special3 != 0))
                         {
                             NPC[A].Location.X = NPC[A].Special3; // Finish alignment
@@ -2165,13 +2167,13 @@ void UpdateNPCs()
                             // blockTileGet(loc, fBlock, lBlock);
                             bool stillCollide = false;
 
-                            for(BlockRef_t block : treeFLBlockQuery(loc, SORTMODE_NONE))
+                            for(BlockRef_t block : treeBlockQuery(loc, SORTMODE_NONE))
                             {
                                 int B = block;
                                 if(!CheckCollision(loc, Block[B].Location))
                                     continue;
 
-                                if(NPC[A].coinSwitchBlockType == B || Block[B].tempBlockNoProjClipping() ||
+                                if(NPC[A].tempBlock == B || Block[B].tempBlockNoProjClipping() ||
                                    BlockOnlyHitspot1[Block[B].Type] || BlockIsSizable[Block[B].Type] ||
                                    BlockNoClipping[Block[B].Type] || Block[B].Hidden)
                                 {
