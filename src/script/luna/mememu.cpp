@@ -2106,7 +2106,7 @@ public:
                     NPCQueues::Active.erase(n);
             }
         );
-        insert(0x0000014e, &NPC_t::Block);
+        insert(0x0000014e, &NPC_t::coinSwitchBlockType);
         insert(0x00000150, &NPC_t::tempBlock);
         insert(0x00000152, // onWall
             [](const NPC_t& n, FIELDTYPE ftype)->double

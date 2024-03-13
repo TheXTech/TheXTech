@@ -2170,10 +2170,13 @@ void UpdateNPCs()
                                 int B = block;
                                 if(!CheckCollision(loc, Block[B].Location))
                                     continue;
-                                if(NPC[A].Block == B || Block[B].tempBlockNoProjClipping() ||
+
+                                if(NPC[A].coinSwitchBlockType == B || Block[B].tempBlockNoProjClipping() ||
                                    BlockOnlyHitspot1[Block[B].Type] || BlockIsSizable[Block[B].Type] ||
                                    BlockNoClipping[Block[B].Type] || Block[B].Hidden)
+                                {
                                     continue;
+                                }
 
                                 int hs = NPCFindCollision(loc, Block[B].Location);
                                 if(Block[B].tempBlockNpcType > 0)
@@ -2370,7 +2373,8 @@ void UpdateNPCs()
 
 
 
-                                                    if(NPC[A].Block != B && NPC[A].tempBlock != B &&
+                                                    // the coinSwitchBlockType != B check is an SMBX 1.3 bug, probably because the field was called "Block"
+                                                    if(NPC[A].coinSwitchBlockType != B && NPC[A].tempBlock != B &&
                                                        !(NPC[A].Projectile && Block[B].tempBlockNoProjClipping()) &&
                                                        !BlockNoClipping[Block[B].Type] && !Block[B].Hidden)
                                                     {

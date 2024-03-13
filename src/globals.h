@@ -426,7 +426,7 @@ struct NPC_t
     // used to respawn an NPC in Battle Mode, set to 65 * 30 (30s) on deactivation and decremented each frame
     vbint_t RespawnDelay = 0;
 //    Block As Integer 'Used when a P-Switch turns a block into a coint
-    vbint_t Block = 0;
+    vbint_t coinSwitchBlockType = 0;
 //    Immune As Integer 'time that the NPC is immune
     // set to values up to 100, decremented each frame
     uint8_t Immune = 0;
