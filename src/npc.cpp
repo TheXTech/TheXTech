@@ -118,7 +118,7 @@ void Deactivate(int A)
             NPC[A].Quicksand = 0;
             NPC[A].NoLavaSplash = false;
             NPC[A].Active = false;
-            NPC[A].Location = NPC[A].DefaultLocation;
+            NPC[A].Location = static_cast<Location_t>(NPC[A].DefaultLocation);
             NPC[A].Direction = NPC[A].DefaultDirection;
             NPC[A].Stuck = NPC[A].DefaultStuck;
             NPC[A].TimeLeft = 0;
@@ -717,7 +717,7 @@ void NPCSpecial(int A)
             NPC[numNPCs].Active = true;
             NPC[numNPCs].TimeLeft = 100;
             NPC[numNPCs].Section = npc.Section;
-            NPC[numNPCs].DefaultLocation = NPC[numNPCs].Location;
+            NPC[numNPCs].DefaultLocation = static_cast<SpeedlessLocation_t>(NPC[numNPCs].Location);
             NPC[numNPCs].DefaultType = NPC[numNPCs].Type;
             NPC[numNPCs].Layer = npc.Layer;
             NPC[numNPCs].Shadow = npc.Shadow;
@@ -2033,7 +2033,7 @@ void NPCSpecial(int A)
         }
         else
         {
-            npc.Location = npc.DefaultLocation;
+            npc.Location = static_cast<Location_t>(npc.DefaultLocation);
             NPCQueues::Unchecked.push_back(A);
             // deferring tree update to end of the NPC physics update
         }

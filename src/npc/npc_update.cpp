@@ -2517,7 +2517,7 @@ void UpdateNPCs()
                                                                     NPC[numNPCs].Location.X = Block[B].Location.X + 2;
                                                                     NPC[numNPCs].Active = true;
                                                                     NPC[numNPCs].DefaultType = NPC[numNPCs].Type;
-                                                                    NPC[numNPCs].DefaultLocation = NPC[numNPCs].Location;
+                                                                    NPC[numNPCs].DefaultLocation = static_cast<SpeedlessLocation_t>(NPC[numNPCs].Location);
                                                                     NPC[numNPCs].TimeLeft = 100;
                                                                     syncLayers_NPC(numNPCs);
                                                                     CheckSectionNPC(numNPCs);

@@ -748,7 +748,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
         nn.Location.Height = nn->THeight;
         nn.Location.X += (b.Location.Width - nn.Location.Width) / 2.0;
         nn.Location.Y -= 0.01;
-        nn.DefaultLocation = nn.Location;
+        nn.DefaultLocation = static_cast<SpeedlessLocation_t>(nn.Location);
         nn.DefaultType = nn.Type;
         syncLayers_NPC(numNPCs);
         CheckSectionNPC(numNPCs);
@@ -1578,7 +1578,7 @@ void PSwitch(bool enabled)
                     nn.Location.Width = nn->TWidth;
                     nn.Location.Height = nn->THeight;
                     nn.Location.X += (Block[A].Location.Width - nn.Location.Width) / 2.0;
-                    nn.DefaultLocation = nn.Location;
+                    nn.DefaultLocation = static_cast<SpeedlessLocation_t>(nn.Location);
                     nn.DefaultType = nn.Type;
 
                     // WARNING: this is new logic from #167. Check in case of any inconsistencies after Coin Switch is activated.
@@ -1717,7 +1717,7 @@ void PSwitch(bool enabled)
                     nn.Location.Width = nn->TWidth;
                     nn.Location.Height = nn->THeight;
                     nn.Location.X += (Block[A].Location.Width - nn.Location.Width) / 2.0;
-                    nn.DefaultLocation = nn.Location;
+                    nn.DefaultLocation = static_cast<SpeedlessLocation_t>(nn.Location);
                     nn.DefaultType = nn.Type;
 
                     // WARNING: this is new logic from #167. Check in case of any inconsistencies after Coin Switch is activated.

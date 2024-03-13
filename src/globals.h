@@ -445,7 +445,7 @@ struct NPC_t
 //    DefaultType As Integer
     NPCID DefaultType = NPCID(0);
 //    DefaultLocation As Location
-    Location_t DefaultLocation;
+    SpeedlessLocation_t DefaultLocation;
 //    DefaultDirection As Single
     float DefaultDirection = 0.0f;
 //    DefaultSpecial As Integer
