@@ -404,7 +404,8 @@ struct NPC_t
 //    oldAddBelt As Single
     float oldAddBelt = 0.0f;
 //    Damage As Single
-    float Damage = 0.0f;
+    // never set to a non-integer value, likely used a float for saturation arithemtic
+    vbint_t Damage = 0;
 
     // Misc integer variables
 //    HoldingPlayer As Integer 'Who is holding it

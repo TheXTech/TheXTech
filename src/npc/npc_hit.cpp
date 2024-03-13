@@ -2282,7 +2282,7 @@ void NPCHit(int A, int B, int C)
     }
 
     if(!NPC[A]->IsACoin && B == 3 && C != A &&
-       (NPC[A].Killed == B || !fEqual(NPC[A].Damage, oldNPC.Damage)) &&
+       (NPC[A].Killed == B || NPC[A].Damage != oldNPC.Damage) &&
         NPC[A].Type != NPCID_PLR_FIREBALL && NPC[A].Type != NPCID_PET_FIRE && NPC[A].Type != NPCID_SLIDE_BLOCK &&
         NPC[A].Type != NPCID_HOMING_BALL && NPC[A].Type != NPCID_EARTHQUAKE_BLOCK)
     {

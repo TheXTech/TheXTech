@@ -2983,6 +2983,13 @@ void UpdateNPCs()
                                                                     if(HitSpot > 1)
                                                                         HitSpot = 0;
                                                                     NPC[A].Damage += 10000;
+
+                                                                    // NEW bounds check
+                                                                    // this reduces the risk of a signed integer overflow, and SMBX 1.3 includes no comparisons to values above 20000
+                                                                    // SMBX 1.3 uses a float for Damage, which effectively saturates at such high values
+                                                                    if(NPC[A].Damage > 16000)
+                                                                        NPC[A].Damage = 16000;
+
                                                                     NPC[A].Immune = 0;
                                                                     NPC[0].Multiplier = 0;
                                                                     NPCHit(A, 3, 0);

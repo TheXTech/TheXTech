@@ -306,7 +306,7 @@ void Autocode::Do(bool init)
             if(npc != nullptr)
             {
                 //float hits = *(((float *)((&(*(uint8_t *)npc)) + 0x148)));
-                int hits = Maths::iRound(npc->Damage);
+                int hits = npc->Damage;
                 Renderer::Get().AddOp(new RenderStringOp(fmt::format_ne("{0}", (base_health - hits)), 3, (float)Param1, (float)Param2));
             }
             else
