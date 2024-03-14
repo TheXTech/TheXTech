@@ -2252,6 +2252,8 @@ int PlayerBox::Logic()
                 PlaySoundMenu(SFX_Slide);
                 return -1;
             }
+            else
+                PlaySoundMenu(SFX_PlayerDied2);
 
             m_menu_item = 0;
         }
