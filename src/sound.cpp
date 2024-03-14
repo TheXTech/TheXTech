@@ -478,6 +478,10 @@ static void AddSfx(SoundScope root,
                 bool backup_isSilent = m.isSilent;
                 m.customPath = newPath;
 
+                m.chunk = nullptr;
+                m.music = nullptr;
+                m.isSilent = false;
+
                 if(!isSilent)
                 {
                     m.music = Mix_LoadMUS((newPath).c_str());
