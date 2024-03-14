@@ -45,6 +45,7 @@ extern void SetDefaultIO(FreeImageIO *io);
 #include "frame_timer.h"
 #include "main/cheat_code.h"
 #include "core/render.h"
+#include "core/msgbox.h"
 #include "editor/new_editor.h"
 
 #include "change_res.h"
@@ -69,6 +70,7 @@ uint32_t s_current_frame = 0;
 float s_depth_slider = 0.;
 
 static RenderPlanes_t s_render_planes;
+static bool s_render_inited = false;
 
 bool g_in_frame = false;
 bool g_screen_swapped = false;
@@ -134,8 +136,6 @@ static void s_createSceneTargets()
         s_single_layer_mode = true;
     else if(mem_w >= 512 && mem_h == 512)
         s_single_layer_mode = true;
-    else if(mem_w >= 512 && mem_h == 512)
-        s_single_layer_mode = true;
     else if(should_swap_screen())
         s_single_layer_mode = true;
     else
@@ -143,7 +143,22 @@ static void s_createSceneTargets()
 
     for(int i = 0; i < 4; i++)
     {
-        C3D_TexInitVRAM(&s_layer_texs[i], mem_w, mem_h, GPU_RGBA8);
+        // this allocation might fail
+        if(!C3D_TexInitVRAM(&s_layer_texs[i], mem_w, mem_h, GPU_RGBA8))
+        {
+            if(i == 0)
+            {
+                // for some reason unable to allocate necessary buffer; the game is about to crash
+                XMsgBox::errorMsgBox("Fatal Error", "The engine ran out of video memory");
+                return;
+            }
+            else
+            {
+                s_single_layer_mode = true;
+                break;
+            }
+        }
+
         s_layer_targets[i] = C3D_RenderTargetCreateFromTex(&s_layer_texs[i], GPU_TEXFACE_2D, 0, GPU_RB_DEPTH16);
         s_layer_subtexs[i] = {(uint16_t)s_tex_w, (uint16_t)s_tex_h, 0.0, 1.0, (float)((double)s_tex_w / (double)mem_w), 1.0f - (float)((double)s_tex_h / (double)mem_h)};
         s_layer_ims[i].tex = &s_layer_texs[i];
@@ -492,6 +507,8 @@ bool init()
     s_bottom_screen = C2D_CreateScreenTarget(GFX_BOTTOM, GFX_LEFT);
     // s_bottom_screen = s_right_screen;
 
+    s_render_inited = true;
+
     updateViewport();
 
     return true;
@@ -763,6 +780,9 @@ void minport_TransformPhysCoords() {}
 
 void minport_ApplyPhysCoords()
 {
+    if(!s_render_inited)
+        return;
+
     int tex_w = XRender::TargetW / 2;
     int tex_h = XRender::TargetH / 2;
 
