@@ -680,8 +680,31 @@ const std::string& ConfigRenderMode_t<true>::get_display_value(std::string& out)
 
     if(m_value != obtained)
     {
-        // FIXME: should update g_mainMenu.optionsRenderX to not include the "Render: ", then use that.
-        out += " (X)";
+        const ConfigEnumOption_t<false, int>* base = dynamic_cast<const ConfigEnumOption_t<false, int>*>(m_base);
+
+        if(m_value == Config_t::RENDER_ACCELERATED_AUTO && base)
+        {
+            out += " (";
+
+            for(const ConfigEnumValueInfo_t<int>& val : base->m_enum_values)
+            {
+                if(obtained == val.m_value)
+                {
+                    if(!val.m_display_name.empty())
+                        out += val.m_display_name;
+                    else if(val.m_internal_name)
+                        out += val.m_internal_name;
+                    else
+                        continue;
+
+                    break;
+                }
+            }
+
+            out += ")";
+        }
+        else
+            out += " (X)";
     }
 
     return out;
