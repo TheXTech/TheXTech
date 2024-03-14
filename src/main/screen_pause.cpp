@@ -138,6 +138,21 @@ static bool s_OptionsScreen()
 
     PauseGame(PauseCode::Options, 0);
     MenuCursorCanMove = false;
+
+    // re-initialize / re-translate pause menu
+    SoundPause[SFX_Pause] = 1;
+    Init(s_pause_plr, s_pause_type == PauseType::Legacy);
+
+    // set MenuCursor correctly
+    for(size_t i = 0; i < s_items.size(); i++)
+    {
+        if(s_items[i].callback == s_OptionsScreen)
+        {
+            MenuCursor = i;
+            break;
+        }
+    }
+
     return false;
 }
 
