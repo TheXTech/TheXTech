@@ -77,6 +77,10 @@ void RenderGL::m_Ortho(GLfloat left, GLfloat right, GLfloat bottom, GLfloat top,
         glOrtho(left, right, bottom, top, near, far);
 #endif
     }
+
+#if !defined(RENDERGL_HAS_ORTHO) && !defined(RENDERGL_HAS_ORTHOF)
+    UNUSED(left); UNUSED(right); UNUSED(bottom); UNUSED(top); UNUSED(near); UNUSED(far);
+#endif
 }
 
 void RenderGL::framebufferCopy(BufferIndex_t dest, BufferIndex_t source, RectSizeI r)
