@@ -359,17 +359,17 @@ public:
     enum
     {
         BATTERY_STATUS_OFF = 0,
-        BATTERY_STATUS_FULLSCREEN_WHEN_LOW,
-        BATTERY_STATUS_ANY_WHEN_LOW,
-        BATTERY_STATUS_FULLSCREEN_ON,
+        BATTERY_STATUS_LOW,
+        BATTERY_STATUS_FULLSCREEN,
         BATTERY_STATUS_ALWAYS_ON,
     };
     opt_enum<int> show_battery_status{this,
         {
             {BATTERY_STATUS_OFF, "off", "Off", nullptr},
-            {BATTERY_STATUS_FULLSCREEN_WHEN_LOW, "fullscreen-low", "Fullscreen + low", "Show when the game is fullscreen and the battery is low"},
-            {BATTERY_STATUS_ANY_WHEN_LOW, "low", "Low", "Show when the battery is low"},
-            {BATTERY_STATUS_FULLSCREEN_ON, "fullscreen", "Fullscreen", "Show when the game is fullscreen"},
+            {BATTERY_STATUS_LOW, "low", "Low", "Show when the battery is low"},
+#ifndef RENDER_FULLSCREEN_ALWAYS
+            {BATTERY_STATUS_FULLSCREEN, "fullscreen", "Fullscreen", "Show when the game is fullscreen"},
+#endif
             {BATTERY_STATUS_ALWAYS_ON, "on", "Always", nullptr},
             {BATTERY_STATUS_OFF, "never"},
             {BATTERY_STATUS_ALWAYS_ON, "always"},
