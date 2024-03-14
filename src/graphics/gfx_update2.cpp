@@ -706,9 +706,8 @@ void UpdateGraphics2(bool skipRepaint)
             }
         }
 
-        speedRun_renderControls(1, -1);
-        if(numPlayers >= 2)
-            speedRun_renderControls(2, -1);
+        for(int plr_i = 0; plr_i < Screens[0].player_count; plr_i++)
+            speedRun_renderControls(Screens[0].players[plr_i], -1, SPEEDRUN_ALIGN_AUTO);
 
 
         speedRun_renderTimer();
