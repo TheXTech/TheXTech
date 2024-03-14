@@ -1462,6 +1462,25 @@ public:
     }
 };
 
+static constexpr char speedless_location_t_name[] = "SpeedlessLocation_t";
+typedef SMBXObjectMemoryEmulator<SpeedlessLocation_t, speedless_location_t_name, 0x20> SpeedlessLocationParent;
+class SpeedlessLocationMemory final : public SpeedlessLocationParent
+{
+public:
+    SpeedlessLocationMemory() noexcept : SpeedlessLocationParent()
+    {
+        buildTable();
+    }
+
+    void buildTable()
+    {
+        insert(0x00, &SpeedlessLocation_t::X);
+        insert(0x08, &SpeedlessLocation_t::Y);
+        insert(0x10, &SpeedlessLocation_t::Height);
+        insert(0x18, &SpeedlessLocation_t::Width);
+    }
+};
+
 
 static constexpr char controls_t_name[] = "Controls_t";
 typedef SMBXObjectMemoryEmulator<Controls_t, controls_t_name, 0x16> ControlsParent;
@@ -1490,6 +1509,7 @@ public:
 
 static ControlsMemory s_conMem;
 static LocationMemory s_locMem;
+static SpeedlessLocationMemory s_spLocMem;
 
 
 static constexpr char playere_t_name[] = "Player_t";
@@ -1972,7 +1992,19 @@ public:
         );
         // insert(0x00000078, &NPC_t::Location); // between 0x78 and 0xA8
         // insert(0x000000a8, &NPC_t::DefaultLocation); // between 0xA8 and 0xD8
-        insert(0x000000d8, &NPC_t::DefaultDirection);
+        insert(0x000000d8, // DefaultDirection
+            [](const NPC_t& n, FIELDTYPE ftype)->double
+            {
+                return valueToMem((float)n.DefaultDirection, ftype);
+            },
+            [](NPC_t& n, double in, FIELDTYPE ftype)->void
+            {
+                float direction = 0.0;
+                memToValue(direction, in, ftype);
+
+                n.DefaultDirection = (int8_t)direction;
+            }
+        );
         static_assert(sizeof(NPC_t::DefaultType) == sizeof(vbint_t), "underlying type of NPC_t::DefaultType must be vbint_t");
         insert(0x000000dc, reinterpret_cast<vbint_t NPC_t::*>(&NPC_t::DefaultType));
         insert(0x000000de, &NPC_t::DefaultSpecial);
@@ -2079,7 +2111,7 @@ public:
                     NPCQueues::Active.erase(n);
             }
         );
-        insert(0x0000014e, &NPC_t::Block);
+        insert(0x0000014e, &NPC_t::coinSwitchBlockType);
         insert(0x00000150, &NPC_t::tempBlock);
         insert(0x00000152, // onWall
             [](const NPC_t& n, FIELDTYPE ftype)->double
@@ -2122,8 +2154,10 @@ public:
     {
         if(address >= 0x78 && address < 0xA8) // Location
             return s_locMem.getValue(&obj->Location, address - 0x78, ftype);
-        else if(address >= 0xA8 && address < 0xD8) // DefaultLocation
-            return s_locMem.getValue(&obj->DefaultLocation, address - 0xA8, ftype);
+        else if(address >= 0xC8 && address < 0xD8) // invalid part of DefaultLocation
+            pLogWarning("MemEmu: Attempt to read NPC address 0x%x (removed part of DefaultLocation)", address);
+        else if(address >= 0xA8 && address < 0xC8) // DefaultLocation
+            return s_spLocMem.getValue(&obj->DefaultLocation, address - 0xA8, ftype);
         else if(address == 0x126)
             return obj->Reset[1] ? 0xFFFF : 0;
         else if(address == 0x128)
@@ -2160,9 +2194,14 @@ public:
             treeNPCUpdate(obj);
             return;
         }
-        else if(address >= 0xA8 && address < 0xD8) // DefaultLocation
+        else if(address >= 0xC8 && address < 0xD8) // DefaultLocation, invalid part
         {
-            s_locMem.setValue(&obj->DefaultLocation, address - 0xA8, value, ftype);
+            pLogWarning("MemEmu: Attempt to set NPC address 0x%x (removed part of DefaultLocation)", address);
+            return;
+        }
+        else if(address >= 0xA8 && address < 0xC8) // DefaultLocation
+        {
+            s_spLocMem.setValue(&obj->DefaultLocation, address - 0xA8, value, ftype);
             return;
         }
         else if(address == 0x126)

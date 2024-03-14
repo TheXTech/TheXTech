@@ -33,6 +33,8 @@
 #include "pge_delay.h"
 #include "npc_id.h"
 
+#include "main/hints.h"
+
 
 static void initPlayers(Player_t tempPlayer[maxLocalPlayers])
 {
@@ -167,6 +169,8 @@ static void drawEnterScreen(Player_t tempPlayer[maxLocalPlayers])
         SuperPrintScreenCenter("LOADING...", 3, XRender::TargetH / 2.0f + 32);
     else
         DrawLives(XRender::TargetW / 2 - 14, XRender::TargetH / 2 + 31, Lives, g_100s);
+
+    XHints::Draw(XRender::TargetH / 2.0 + 64, 0);
 }
 
 
@@ -174,6 +178,8 @@ void GameThing(int waitms, int fadeSpeed)
 {
     Player_t tempPlayer[maxLocalPlayers];
     initPlayers(tempPlayer);
+
+    XHints::Select();
 
     if(waitms <= 0)
     {

@@ -1632,7 +1632,7 @@ void UpdateEditor()
                             n.Active = true;
                             n.TimeLeft = 10;
                             n.DefaultDirection = n.Direction;
-                            n.DefaultLocation = n.Location;
+                            n.DefaultLocation = static_cast<SpeedlessLocation_t>(n.Location);
                             n.DefaultSpecial = int(n.Special);
                             CheckSectionNPC(numNPCs);
                         }
@@ -2149,7 +2149,7 @@ void UpdateInterprocess()
             EditorCursor.NPC.DefaultType = EditorCursor.NPC.Type;
             EditorCursor.NPC.Location.Width = EditorCursor.NPC->TWidth;
             EditorCursor.NPC.Location.Height = EditorCursor.NPC->THeight;
-            EditorCursor.NPC.DefaultLocation = EditorCursor.NPC.Location;
+            EditorCursor.NPC.DefaultLocation = static_cast<SpeedlessLocation_t>(EditorCursor.NPC.Location);
             EditorCursor.NPC.DefaultDirection = EditorCursor.NPC.Direction;
             EditorCursor.NPC.TimeLeft = 1;
             EditorCursor.NPC.Active = true;

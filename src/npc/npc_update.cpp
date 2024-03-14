@@ -324,15 +324,23 @@ void UpdateNPCs()
             if(!NPC[A].Hidden)
             {
                 NPC[A].TimeLeft = 0;
+
+                // Old timer logic
+                // this did not achieve anything other than keeping the value from growing large, but was likely the reason Redigit thought floats were necessary
+#if 0
                 NPC[A].GeneratorTime += 1;
 
                 if(NPC[A].GeneratorTime >= NPC[A].GeneratorTimeMax * 6.5f)
                     NPC[A].GeneratorTime = NPC[A].GeneratorTimeMax * 6.5f;
+#endif
+
+                if(NPC[A].GeneratorTime * 10 < NPC[A].GeneratorTimeMax * 65)
+                    NPC[A].GeneratorTime += 1;
 
                 if(NPC[A].GeneratorActive)
                 {
                     NPC[A].GeneratorActive = false;
-                    if(NPC[A].GeneratorTime >= NPC[A].GeneratorTimeMax * 6.5f)
+                    if(NPC[A].GeneratorTime * 10 >= NPC[A].GeneratorTimeMax * 65)
                     {
                         bool tempBool = false;
 
@@ -922,13 +930,13 @@ void UpdateNPCs()
                         NPC[A].Active = false;
                         NPC[A].TimeLeft = 0;
                     }
-                    else if(Maths::iRound(NPC[A].Direction) == -1 && NPC[A].Location.X < Player[NPC[A].JustActivated].Location.X)
+                    else if(NPC[A].Direction == -1 && NPC[A].Location.X < Player[NPC[A].JustActivated].Location.X)
                     {
                         NPCQueues::Active.erase(A);
                         NPC[A].Active = false;
                         NPC[A].TimeLeft = 0;
                     }
-                    else if(Maths::iRound(NPC[A].Direction) == 1 && NPC[A].Location.X > Player[NPC[A].JustActivated].Location.X)
+                    else if(NPC[A].Direction == 1 && NPC[A].Location.X > Player[NPC[A].JustActivated].Location.X)
                     {
                         NPCQueues::Active.erase(A);
                         NPC[A].Active = false;
@@ -2147,6 +2155,8 @@ void UpdateNPCs()
                             }
                         }
 
+                        // the following is all new code!
+
                         if((NPC[A].Special == 2 || NPC[A].Special == 3) && (NPC[A].Special3 != 0))
                         {
                             NPC[A].Location.X = NPC[A].Special3; // Finish alignment
@@ -2164,15 +2174,18 @@ void UpdateNPCs()
                             // blockTileGet(loc, fBlock, lBlock);
                             bool stillCollide = false;
 
-                            for(BlockRef_t block : treeFLBlockQuery(loc, SORTMODE_NONE))
+                            for(BlockRef_t block : treeBlockQuery(loc, SORTMODE_NONE))
                             {
                                 int B = block;
                                 if(!CheckCollision(loc, Block[B].Location))
                                     continue;
-                                if(NPC[A].Block == B || Block[B].tempBlockNoProjClipping() ||
+
+                                if(NPC[A].tempBlock == B || Block[B].tempBlockNoProjClipping() ||
                                    BlockOnlyHitspot1[Block[B].Type] || BlockIsSizable[Block[B].Type] ||
                                    BlockNoClipping[Block[B].Type] || Block[B].Hidden)
+                                {
                                     continue;
+                                }
 
                                 int hs = NPCFindCollision(loc, Block[B].Location);
                                 if(Block[B].tempBlockNpcType > 0)
@@ -2369,7 +2382,8 @@ void UpdateNPCs()
 
 
 
-                                                    if(NPC[A].Block != B && NPC[A].tempBlock != B &&
+                                                    // the coinSwitchBlockType != B check is an SMBX 1.3 bug, probably because the field was called "Block"
+                                                    if(NPC[A].coinSwitchBlockType != B && NPC[A].tempBlock != B &&
                                                        !(NPC[A].Projectile && Block[B].tempBlockNoProjClipping()) &&
                                                        !BlockNoClipping[Block[B].Type] && !Block[B].Hidden)
                                                     {
@@ -2516,7 +2530,7 @@ void UpdateNPCs()
                                                                     NPC[numNPCs].Location.X = Block[B].Location.X + 2;
                                                                     NPC[numNPCs].Active = true;
                                                                     NPC[numNPCs].DefaultType = NPC[numNPCs].Type;
-                                                                    NPC[numNPCs].DefaultLocation = NPC[numNPCs].Location;
+                                                                    NPC[numNPCs].DefaultLocation = static_cast<SpeedlessLocation_t>(NPC[numNPCs].Location);
                                                                     NPC[numNPCs].TimeLeft = 100;
                                                                     syncLayers_NPC(numNPCs);
                                                                     CheckSectionNPC(numNPCs);
@@ -2976,6 +2990,13 @@ void UpdateNPCs()
                                                                     if(HitSpot > 1)
                                                                         HitSpot = 0;
                                                                     NPC[A].Damage += 10000;
+
+                                                                    // NEW bounds check
+                                                                    // this reduces the risk of a signed integer overflow, and SMBX 1.3 includes no comparisons to values above 20000
+                                                                    // SMBX 1.3 uses a float for Damage, which effectively saturates at such high values
+                                                                    if(NPC[A].Damage > 16000)
+                                                                        NPC[A].Damage = 16000;
+
                                                                     NPC[A].Immune = 0;
                                                                     NPC[0].Multiplier = 0;
                                                                     NPCHit(A, 3, 0);
@@ -4685,7 +4706,7 @@ void UpdateNPCs()
 
                     if(NPC[A].HoldingPlayer > 0)
                     {
-                        if(fiEqual(NPC[A].Direction, -1))
+                        if(NPC[A].Direction == -1)
                             NPC[A].Frame = 0;
                         else
                             NPC[A].Frame = 5;

@@ -2423,12 +2423,14 @@ void UpdatePlayer()
                                                 HitSpot = 0;
                                         }
 
-                                        // fixes a bug with holding an npc that is really a block
+                                        // unclear that this does what Redigit thought; maybe it did with a previous version of the coin switch code
+
+                                        // ' fixes a bug with holding an npc that is really a block
                                         if(Player[A].HoldingNPC > 0)
                                         {
-                                            if(NPC[Player[A].HoldingNPC].Block > 0)
+                                            if(NPC[Player[A].HoldingNPC].coinSwitchBlockType > 0)
                                             {
-                                                if(NPC[Player[A].HoldingNPC].Block == B)
+                                                if(NPC[Player[A].HoldingNPC].coinSwitchBlockType == B)
                                                     HitSpot = 0;
                                             }
                                         }

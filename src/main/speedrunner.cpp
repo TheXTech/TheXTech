@@ -70,7 +70,7 @@ void speedRun_resetTotal()
 static constexpr XTColor s_green  = XTColorF(0.0f, 1.0f, 0.0f);
 static constexpr XTColor s_blue   = XTColorF(0.0f, 0.0f, 1.0f);
 static constexpr XTColor s_red    = XTColorF(1.0f, 0.0f, 0.0f);
-static constexpr XTColor s_yellow = XTColorF(1.0f, 1.0f, 0.0f);
+static constexpr XTColor s_yellow = XTColorF(0.9f, 0.9f, 0.0f);
 static constexpr XTColor s_gray   = XTColorF(0.9f, 0.9f, 0.9f);
 static constexpr XTColor s_legacy = XTColorF(0.7f, 0.7f, 0.7f);
 
@@ -138,9 +138,9 @@ static void GetControllerColor(int player, XTColor& color, bool* drawLabel = nul
     }
 }
 
-void RenderControls(int player, int x, int y, int w, int h, bool missing, uint8_t alpha, bool connect_screen)
+void RenderControls_priv(int player, const Controls_t* controls, int x, int y, int w, int h, bool missing, uint8_t alpha, bool connect_screen)
 {
-    if(player < 1 || player > maxLocalPlayers)
+    if(!controls && (player < 1 || player > maxLocalPlayers))
         return;
 
     uint8_t alphaBtn = uint8_t((missing ? 0.4f : 0.8f) * alpha);
@@ -151,6 +151,8 @@ void RenderControls(int player, int x, int y, int w, int h, bool missing, uint8_
 
     if(!connect_screen)
         GetControllerColor(player, color, &drawLabel);
+    else if(player == 0)
+        color = XTColorF(0.4f, 0.4f, 0.4f);
 
     XRender::renderRect(x, y, w, h, {0, 0, 0, alpha}, true);//Edge
     XRender::renderRect(x + 2, y + 2, w - 4, h - 4, {color, alpha}, true);//Box
@@ -163,7 +165,7 @@ void RenderControls(int player, int x, int y, int w, int h, bool missing, uint8_
         alphaText *= coord;
     }
 
-    const Controls_t& c = s_displayControls[player-1];
+    const Controls_t& c = (controls) ? *controls : s_displayControls[player - 1];
 
     XRender::renderRect(x + 10, y + 12, 6, 6, {0, 0, 0, alphaBtn}, true);//Cender of D-Pad
 
@@ -193,6 +195,18 @@ void RenderControls(int player, int x, int y, int w, int h, bool missing, uint8_
         SuperPrintCenter("?", 3, x + w / 2, y + 4, XTAlpha(alphaText));
     }
 }
+
+void RenderControls(int player, int x, int y, int w, int h, bool missing, uint8_t alpha, bool connect_screen)
+{
+    return RenderControls_priv(player, nullptr, x, y, w, h, missing, alpha, connect_screen);
+}
+
+void RenderControls(const Controls_t& controls, int x, int y, int w, int h, bool missing, uint8_t alpha)
+{
+    return RenderControls_priv(0, &controls, x, y, w, h, missing, alpha, true);
+}
+
+
 
 void RenderPowerInfo(int player, int bx, int by, int bw, int bh, uint8_t alpha, const XPower::StatusInfo* status)
 {

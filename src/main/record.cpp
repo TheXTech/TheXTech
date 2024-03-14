@@ -20,7 +20,7 @@
 
 // needed because there are a lot of writes / scans whose failure is detected at the end of the function
 // updated versions of glibc don't even seem to trigger this warning in this context
-#if defined(__GNUC__) || defined(__MINGW32__)
+#if !defined(__clang__) && (defined(__GNUC__) || defined(__MINGW32__))
 #   pragma GCC diagnostic ignored "-Wunused-result"
 #   define XTECH_GCC_UNUSED_RESULT_IGNORED
 #endif
@@ -639,7 +639,7 @@ static void write_NPCs()
         fprintf(record_file, "NPC %d\r\n", i);
         fprintf(record_file, "Type %d\r\n", n.Type);
         fprintf(record_file, "Active %d\r\n", n.Active);
-        fprintf(record_file, "Dir %lf\r\n", n.Direction);
+        fprintf(record_file, "Dir %lf\r\n", (double)n.Direction);
         fprintf(record_file, "XYWH %lf %lf %lf %lf\r\n", n.Location.X, n.Location.Y, n.Location.Width, n.Location.Height);
         fprintf(record_file, "S %lf %lf %lf %lf %lf %lf %lf\r\n", n.Special, n.Special2, n.Special3, n.Special4, n.Special5, n.Special6, (double)n.Variant);
     }

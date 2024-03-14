@@ -47,6 +47,7 @@
 
 #include "main/game_strings.h"
 #include "main/level_medals.h"
+#include "main/hints.h"
 
 #include "controls.h"
 
@@ -221,6 +222,8 @@ static bool s_Quit()
 
 void Init(int plr, bool LegacyPause)
 {
+    XHints::Select();
+
     PlaySound(SFX_Pause);
     MenuCursor = 0;
     MenuCursorCanMove = false;
@@ -385,6 +388,9 @@ void Render()
         else
             XRender::renderTexture(menu_left_X - 20, menu_top_Y + (MenuCursor * 36), 16, 16, GFX.MCursor[0], 0, 0);
     }
+
+    if(XRender::TargetH > XRender::TargetH / 2 + menu_box_height / 2 + 16 + 96 + 8)
+        XHints::Draw(XRender::TargetH / 2 + menu_box_height / 2 + 16, 100);
 }
 
 bool Logic(int plr)

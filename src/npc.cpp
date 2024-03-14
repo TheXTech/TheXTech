@@ -118,7 +118,7 @@ void Deactivate(int A)
             NPC[A].Quicksand = 0;
             NPC[A].NoLavaSplash = false;
             NPC[A].Active = false;
-            NPC[A].Location = NPC[A].DefaultLocation;
+            NPC[A].Location = static_cast<Location_t>(NPC[A].DefaultLocation);
             NPC[A].Direction = NPC[A].DefaultDirection;
             NPC[A].Stuck = NPC[A].DefaultStuck;
             NPC[A].TimeLeft = 0;
@@ -717,7 +717,7 @@ void NPCSpecial(int A)
             NPC[numNPCs].Active = true;
             NPC[numNPCs].TimeLeft = 100;
             NPC[numNPCs].Section = npc.Section;
-            NPC[numNPCs].DefaultLocation = NPC[numNPCs].Location;
+            NPC[numNPCs].DefaultLocation = static_cast<SpeedlessLocation_t>(NPC[numNPCs].Location);
             NPC[numNPCs].DefaultType = NPC[numNPCs].Type;
             NPC[numNPCs].Layer = npc.Layer;
             NPC[numNPCs].Shadow = npc.Shadow;
@@ -976,7 +976,7 @@ void NPCSpecial(int A)
                 npc.Location.SpeedX = dRand() * 1 - 0.5;
             }
 
-            if(Maths::iRound(npc.Direction) == 0)
+            if(npc.Direction == 0)
             {
                 if(iRand(2) == 0)
                     npc.Direction = 1;
@@ -1427,7 +1427,7 @@ void NPCSpecial(int A)
                 NPC[numNPCs].Frame = 3;
                 NPC[numNPCs].Special2 = npc.Special3;
 
-                if(Maths::iRound(NPC[numNPCs].Direction) == -1)
+                if(NPC[numNPCs].Direction == -1)
                     NPC[numNPCs].Location.X = npc.Location.X - 20;
                 else
                     NPC[numNPCs].Location.X = npc.Location.X + npc.Location.Width - NPC[numNPCs].Location.Width + 20;
@@ -1598,7 +1598,7 @@ void NPCSpecial(int A)
                 NPC[numNPCs].Location.Height = NPC[numNPCs]->THeight;
                 NPC[numNPCs].Frame = 0;
 
-                if(Maths::iRound(NPC[numNPCs].Direction) == -1)
+                if(NPC[numNPCs].Direction == -1)
                     NPC[numNPCs].Location.X = npc.Location.X - 24;
                 else
                     NPC[numNPCs].Location.X = npc.Location.X + npc.Location.Width - NPC[numNPCs].Location.Width + 24;
@@ -2033,7 +2033,7 @@ void NPCSpecial(int A)
         }
         else
         {
-            npc.Location = npc.DefaultLocation;
+            npc.Location = static_cast<Location_t>(npc.DefaultLocation);
             NPCQueues::Unchecked.push_back(A);
             // deferring tree update to end of the NPC physics update
         }
@@ -2108,7 +2108,7 @@ void NPCSpecial(int A)
 
         if(npc.Special == 0.0)
         {
-            if(Maths::iRound(npc.Direction) == 0)
+            if(npc.Direction == 0)
             {
                 if(iRand(2) == 1)
                     npc.Direction = 1;
@@ -4117,10 +4117,10 @@ void SpecialNPC(int A)
     // smb3 belt code
     else if(NPC[A].Type == NPCID_CONVEYOR)
     {
-        NPC[A].Location.SpeedX = 0.8 * NPC[A].DefaultDirection * (float)BeltDirection;
+        NPC[A].Location.SpeedX = 0.8 * NPC[A].DefaultDirection * BeltDirection;
         NPC[A].Location.X = NPC[A].DefaultLocation.X;
         NPC[A].Location.Y = NPC[A].DefaultLocation.Y;
-        NPC[A].Direction = NPC[A].DefaultDirection * (float)BeltDirection;
+        NPC[A].Direction = NPC[A].DefaultDirection * BeltDirection;
         // deferring tree update to end of the NPC physics update
     }
     else if(NPC[A].Type == NPCID_CIVILIAN_SCARED)
@@ -5778,7 +5778,7 @@ bool npcHasFloor(const struct NPC_t &npc)
         if(npc.tempBlock == idx)
             continue; // Skip collision check to self
 
-        if(BlockNoClipping[sb->Type] || sb->Hidden || sb->Invis)
+        if(BlockNoClipping[sb->Type] || sb->Hidden || sb->Invis || (npc.Projectile && sb->tempBlockNoProjClipping()))
             continue;
 
         if(CheckCollision(checkLoc, sb->Location))

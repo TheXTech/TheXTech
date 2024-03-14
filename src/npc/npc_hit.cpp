@@ -1633,6 +1633,11 @@ void NPCHit(int A, int B, int C)
                 NPC[A].Location.X += NPC[A].Location.SpeedX;
                 NPC[A].CantHurt = Physics.NPCCanHurtWait;
                 NPC[A].CantHurtPlayer = C;
+
+                // NEW code: does not alter behavior, but keeps the value in uint8_t range
+                if(C > maxPlayers)
+                    NPC[A].CantHurtPlayer = maxPlayers + 1;
+
                 NPC[A].Projectile = true;
                 NPC[A].Location.SpeedY = 0;
                 Player[NPC[A].HoldingPlayer].HoldingNPC = 0;
@@ -1951,7 +1956,7 @@ void NPCHit(int A, int B, int C)
                     if(!NPC[A].NoLavaSplash)
                         NewEffect(EFFID_LAVA_SPLASH, NPC[A].Location);
                     PlaySoundSpatial(SFX_Lava, NPC[A].Location);
-                    NPC[A].Location = NPC[A].DefaultLocation;
+                    NPC[A].Location = static_cast<Location_t>(NPC[A].DefaultLocation);
 
                     if(NPC[A].Active)
                     {
@@ -2074,7 +2079,7 @@ void NPCHit(int A, int B, int C)
             NewEffect(EFFID_SMOKE_S3, NPC[A].Location);
             NewEffect(EFFID_LAVA_SPLASH, NPC[A].Location);
             PlaySoundSpatial(SFX_Lava, NPC[A].Location);
-            NPC[A].Location = NPC[A].DefaultLocation;
+            NPC[A].Location = static_cast<Location_t>(NPC[A].DefaultLocation);
             NPCQueues::Unchecked.push_back(A);
         }
     }
@@ -2277,7 +2282,7 @@ void NPCHit(int A, int B, int C)
     }
 
     if(!NPC[A]->IsACoin && B == 3 && C != A &&
-       (NPC[A].Killed == B || !fEqual(NPC[A].Damage, oldNPC.Damage)) &&
+       (NPC[A].Killed == B || NPC[A].Damage != oldNPC.Damage) &&
         NPC[A].Type != NPCID_PLR_FIREBALL && NPC[A].Type != NPCID_PET_FIRE && NPC[A].Type != NPCID_SLIDE_BLOCK &&
         NPC[A].Type != NPCID_HOMING_BALL && NPC[A].Type != NPCID_EARTHQUAKE_BLOCK)
     {

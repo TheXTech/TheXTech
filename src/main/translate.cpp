@@ -42,6 +42,7 @@
 #include "main/game_info.h"
 #include "main/outro_loop.h"
 #include "main/game_strings.h"
+#include "main/hints.h"
 
 #include "controls.h"
 #include "config.h"
@@ -816,6 +817,8 @@ XTechTranslate::XTechTranslate()
     // adds dynamic fields to the asset map
     EditorCustom::Load(this);
 #endif
+
+    XHints::InitTranslations(*this);
 }
 
 void XTechTranslate::reset()
@@ -836,6 +839,8 @@ void XTechTranslate::reset()
 
     Controls::InitStrings();
     g_controlsStrings = ControlsStrings_t();
+
+    XHints::ResetStrings();
 
     s_CurrentPluralRules = PluralRules::OneIsSingular;
 }
