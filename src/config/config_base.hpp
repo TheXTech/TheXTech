@@ -397,6 +397,9 @@ public:
 
     virtual bool rotate_left() override;
     virtual bool rotate_right() override;
+    virtual bool change() override;
+
+    virtual const std::string& get_display_value(std::string& out) const override;
 };
 
 template<>

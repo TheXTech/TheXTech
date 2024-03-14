@@ -37,6 +37,7 @@
 #include "fontman/font_manager.h"
 
 #include "main/translate.h"
+#include "main/menu_main.h"
 
 // config_base.cpp
 extern ConfigSetLevel g_configWriteLevel;
@@ -653,6 +654,21 @@ bool ConfigLanguage_t<true>::rotate_right()
     _on_change();
 
     return true;
+}
+
+bool ConfigLanguage_t<true>::change()
+{
+    return rotate_right();
+}
+
+const std::string& ConfigLanguage_t<true>::get_display_value(std::string& out) const
+{
+    out = g_mainMenu.languageName;
+    out += " (";
+    out += m_value;
+    out += ")";
+
+    return out;
 }
 
 // implementation for ConfigRenderMode_t<true>
