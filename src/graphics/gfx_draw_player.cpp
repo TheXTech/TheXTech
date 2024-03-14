@@ -30,8 +30,6 @@
 
 #include "graphics/gfx_keyhole.h"
 
-#include "compat.h"
-
 //! Get left pixel at the player sprite
 int pfrX(const StdPicture& tx, const Player_t& p)
 {

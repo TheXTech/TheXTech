@@ -34,7 +34,6 @@
 #include "compat.h"
 #include "frame_timer.h"
 #include "main/speedrunner.h"
-#include "compat.h"
 #include "editor.h"
 #include "blocks.h"
 #include "main/trees.h"

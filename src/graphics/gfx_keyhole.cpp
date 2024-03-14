@@ -19,7 +19,6 @@
  */
 
 #include "globals.h"
-#include "compat.h"
 #include "core/render.h"
 
 #include "graphics/gfx_keyhole.h"
