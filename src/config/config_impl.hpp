@@ -672,6 +672,7 @@ const std::string& ConfigLanguage_t<true>::get_display_value(std::string& out) c
 }
 
 // implementation for ConfigRenderMode_t<true>
+#ifndef RENDER_CUSTOM
 int ConfigRenderMode_t<true>::obtained = -1;
 
 const std::string& ConfigRenderMode_t<true>::get_display_value(std::string& out) const
@@ -709,6 +710,7 @@ const std::string& ConfigRenderMode_t<true>::get_display_value(std::string& out)
 
     return out;
 }
+#endif
 
 
 // implementation for ConfigEnumOption_t<true, value_t>
