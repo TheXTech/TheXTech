@@ -57,6 +57,7 @@ void speedRun_bossDeadEvent();
 
 void RenderPowerInfo(int player, int bx, int by, int bw, int bh, uint8_t alpha, const XPower::StatusInfo* status);
 void RenderControls(int player, int x, int y, int w, int h, bool missing, uint8_t alpha, bool connect_screen = false);
+void RenderControls(const Controls_t& controls, int x, int y, int w, int h, bool missing, uint8_t alpha);
 
 enum
 {
