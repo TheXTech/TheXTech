@@ -20,7 +20,7 @@
 
 // needed because there are a lot of writes / scans whose failure is detected at the end of the function
 // updated versions of glibc don't even seem to trigger this warning in this context
-#if defined(__GNUC__) || defined(__MINGW32__)
+#if !defined(__clang__) && (defined(__GNUC__) || defined(__MINGW32__))
 #   pragma GCC diagnostic ignored "-Wunused-result"
 #   define XTECH_GCC_UNUSED_RESULT_IGNORED
 #endif
