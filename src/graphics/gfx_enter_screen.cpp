@@ -30,7 +30,6 @@
 #include "../core/render.h"
 #include "../core/events.h"
 #include "../controls.h"
-#include "compat.h"
 #include "pge_delay.h"
 #include "npc_id.h"
 

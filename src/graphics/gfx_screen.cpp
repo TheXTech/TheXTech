@@ -27,8 +27,6 @@
 #include "../change_res.h"
 #include "../load_gfx.h"
 #include "../core/window.h"
-#include "../compat.h"
-#include "config.h"
 
 #include "../compat.h"
 #include "config.h"
