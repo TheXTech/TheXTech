@@ -1826,7 +1826,7 @@ void UpdateGraphicsScreen(Screen_t& screen)
         // Note: this was guarded by an if(!LevelEditor) condition in the past
         if(Background2[S] == 0)
         {
-            XRender::renderRect(vScreen[Z].ScreenLeft, vScreen[Z].ScreenTop,
+            XRender::renderRect(vScreen[Z].TargetX(), vScreen[Z].TargetY(),
                                 vScreen[Z].Width, vScreen[Z].Height, {0, 0, 0}, true);
         }
 
