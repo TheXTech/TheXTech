@@ -149,9 +149,9 @@ int menuControls_Mouse_Render(bool mouse, bool render)
     // want 680px width. if not possible, use double-line mode on settable option screens
     int width;
     if(XRender::TargetW < 640)
-        width = XRender::TargetW - 16;
+        width = XRender::TargetW - 16 - XRender::TargetOverscanX * 2;
     else if(XRender::TargetW < 720)
-        width = XRender::TargetW - 40;
+        width = XRender::TargetW - 40 - XRender::TargetOverscanX * 2;
     else
         width = 680;
 
