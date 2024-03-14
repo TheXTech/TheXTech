@@ -81,10 +81,6 @@ void UpdateInternalRes()
     if(g_config.dynamic_width)
         req_w = 0;
 
-#ifdef __3DS__
-    req_w += XRender::TargetOverscanX * 2;
-#endif
-
     // TODO: use the correct canonical screen's resolution here
     int canon_w = 800;
     int canon_h = 600;
@@ -231,6 +227,11 @@ void UpdateInternalRes()
             XRender::TargetH = 720;
         }
     }
+
+#ifdef __3DS__
+    if(g_config.allow_multires || ignore_compat)
+        XRender::TargetW += XRender::TargetOverscanX * 2;
+#endif
 
     // DONE: above should tweak render target resolution. This should tweak game's screen resolution.
     if(ignore_compat || (g_config.allow_multires && g_config.dynamic_camera_logic))
