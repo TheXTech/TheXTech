@@ -73,7 +73,7 @@ void speedRun_resetTotal()
 static constexpr XTColor s_green  = XTColorF(0.0f, 1.0f, 0.0f);
 static constexpr XTColor s_blue   = XTColorF(0.0f, 0.0f, 1.0f);
 static constexpr XTColor s_red    = XTColorF(1.0f, 0.0f, 0.0f);
-static constexpr XTColor s_yellow = XTColorF(1.0f, 1.0f, 0.0f);
+static constexpr XTColor s_yellow = XTColorF(0.9f, 0.9f, 0.0f);
 static constexpr XTColor s_gray   = XTColorF(0.9f, 0.9f, 0.9f);
 static constexpr XTColor s_legacy = XTColorF(0.7f, 0.7f, 0.7f);
 
