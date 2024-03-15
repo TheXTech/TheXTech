@@ -2592,17 +2592,16 @@ void NPCSpecial(int A)
             // deferring tree update to end of the NPC physics update
         }
 
-        if((npc.Direction == 1 && tempBool) || npc.Type == 179) // Player in same section, enabled, or, grinder
+        if((npc.Direction == 1 && tempBool) || npc.Type == NPCID_SAW) // Player in same section, enabled, or, grinder
         {
             bool pausePlatforms = false;
             for(int B = 1; B <= numPlayers; B++)
             {
                 if(!(Player[B].Effect == 0 || Player[B].Effect == 3 || Player[B].Effect == 9 || Player[B].Effect == 10))
-                {
                     pausePlatforms = true;
-                }
             }
 
+            // this code ran unconditionally in SMBX 1.3
             if(!g_compatibility.fix_platforms_acceleration || !pausePlatforms) // Keep zeroed speed when player required the pause of the move effect
             {
                 npc.Location.SpeedY = npc.Special;
@@ -2752,12 +2751,47 @@ void NPCSpecial(int A)
                 npc.Location.SpeedY += D;
             }
 
+            // this code ran unconditionally in SMBX 1.3
+            // it does not run in modern mode so that the Special / Special2 keep the speed from before the pause
             if(!g_compatibility.fix_platforms_acceleration || !pausePlatforms)
             {
                 npc.Special = npc.Location.SpeedY;
                 npc.Special2 = npc.Location.SpeedX;
             }
 
+            // NEW: add a terminal velocity for the platforms in modern mode
+            if(npc.Special > 16)
+            {
+                if(g_compatibility.fix_platforms_acceleration)
+                    npc.Special = 16;
+
+                // in either mode, try to "cancel" the NPC once it has fallen below everything
+                // fixes some serious memory exhaustion bugs
+                if(npc.Location.Y > level[npc.Section].Height + 128)
+                {
+                    bool below_all = true;
+
+                    for(int B = 0; B <= numSections; B++)
+                    {
+                        if(NPC[A].Location.Y < level[B].Height)
+                        {
+                            if(NPC[A].Location.X >= level[B].X && NPC[A].Location.X + NPC[A].Location.Width <= level[B].Width)
+                            {
+                                below_all = false;
+                                break;
+                            }
+                        }
+                    }
+
+                    if(below_all)
+                    {
+                        npc.Effect = 8; // NPCEFF_WAITING
+                        npc.Effect2 = npc.TimeLeft + 1;
+                    }
+                }
+            }
+
+            // SMBX 1.3 logic: zero the actual speed of the platforms
             if(pausePlatforms) // Or zero the speed and don't change special values
             {
                 npc.Location.SpeedX = 0;
