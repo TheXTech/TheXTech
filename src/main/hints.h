@@ -50,8 +50,9 @@ void Select();
  *
  * \param top top y coordinate for hint box
  * \param min_priority required priority for the hint to get drawn
+ * \param width width of hint box
  **/
-void Draw(int top, int min_priority);
+void Draw(int top, int min_priority, int width = 460);
 
 } // namespace XHints
 

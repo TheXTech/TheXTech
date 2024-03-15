@@ -277,7 +277,7 @@ void Select()
     }
 }
 
-void Draw(int top, int min_priority)
+void Draw(int top, int min_priority, int width)
 {
     if(s_select_hint == -1 || s_hint_text_index[s_select_hint] >= (int)s_translated_hint_text.size())
         return;
@@ -289,7 +289,7 @@ void Draw(int top, int min_priority)
         return;
 
     constexpr int hint_box_height = 96;
-    constexpr int hint_box_width = 460;
+    const int hint_box_width = width;
     constexpr int text_start = 110;
 
     int hint_box_left = XRender::TargetW / 2 - hint_box_width / 2;

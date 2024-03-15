@@ -328,7 +328,7 @@ void Init(int plr, bool LegacyPause)
 
     // GBA bounds
     if(total_menu_height > 320 || total_menu_width > 480)
-        pLogDebug("Menu doesn't fit within bounds (actual size %dx%d, bounds 480x320)", total_menu_width, total_menu_height);
+        pLogWarning("Menu doesn't fit within bounds (actual size %dx%d, bounds 480x320)", total_menu_width, total_menu_height);
 }
 
 void Render()
@@ -405,7 +405,7 @@ void Render()
     }
 
     if(XRender::TargetH > XRender::TargetH / 2 + menu_box_height / 2 + 16 + 96 + 8)
-        XHints::Draw(XRender::TargetH / 2 + menu_box_height / 2 + 16, 100);
+        XHints::Draw(XRender::TargetH / 2 + menu_box_height / 2 + 16, 100, menu_box_width);
 }
 
 bool Logic(int plr)
