@@ -408,18 +408,21 @@ void UpdatableQuery<BlockRef_t>::update(const Location_t& loc, const UpdatableQu
         treeTempBlockQuery(*sent.i_vec, bounds, SORTMODE_NONE);
 
     // filter out the invalid blocks
-    for(size_t i = start_new; i < sent.i_vec->size();)
+    if(current_step_valid)
     {
-        // need lower_bound to be strictly before the new item
-        if(compare_func(lower_bound, (*sent.i_vec)[i]))
+        for(size_t i = start_new; i < sent.i_vec->size();)
         {
-            i++;
-            continue;
-        }
+            // need lower_bound to be strictly before the new item
+            if(compare_func(lower_bound, (*sent.i_vec)[i]))
+            {
+                i++;
+                continue;
+            }
 
-        // must remove the item!
-        (*sent.i_vec)[i] = (*sent.i_vec)[sent.i_vec->size() - 1];
-        sent.i_vec->resize(sent.i_vec->size() - 1);
+            // must remove the item!
+            (*sent.i_vec)[i] = (*sent.i_vec)[sent.i_vec->size() - 1];
+            sent.i_vec->resize(sent.i_vec->size() - 1);
+        }
     }
 
     // sort all of the blocks after the current step (manually separating cases to maximize chances of successful inlining)
