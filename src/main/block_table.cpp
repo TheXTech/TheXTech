@@ -138,6 +138,8 @@ struct TableInterface
 
         // NOTE: there are extremely rare cases when these margins are not sufficient for full compatibility
         //   (such as, when an item is trapped inside a wall during !BlocksSorted)
+        // This should be fixed for players now.
+        // Conversely, there may be cases where this is too much when BlocksSorted is true and an FLBlock query was made.
         if(g_compatibility.emulate_classic_block_order)
         {
             loc.l -= 32;
