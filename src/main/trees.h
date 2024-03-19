@@ -39,6 +39,41 @@ enum SortMode
     SORTMODE_COMPAT = 4, // sort according to ID (location at last sort) in compat mode, and according to current location normally
 };
 
+namespace Comparisons
+{
+    // sort by location
+    template<class ItemRef_t>
+    inline bool Loc(BaseRef_t a, BaseRef_t b)
+    {
+        return (((ItemRef_t)a)->Location.X <= ((ItemRef_t)b)->Location.X
+            && (((ItemRef_t)a)->Location.X < ((ItemRef_t)b)->Location.X
+                || ((ItemRef_t)a)->Location.Y < ((ItemRef_t)b)->Location.Y));
+    }
+
+    // sort by index
+    template<class ItemRef_t>
+    inline bool ID(BaseRef_t a, BaseRef_t b)
+    {
+        return a < b;
+    }
+
+    // sort by index when unimplemented
+    template<class ItemRef_t>
+    inline bool Z(BaseRef_t a, BaseRef_t b)
+    {
+        return a < b;
+    }
+
+    // sort BGOs by SortPriority
+    template<>
+    inline bool Z<BackgroundRef_t>(BaseRef_t a, BaseRef_t b)
+    {
+        return (((BackgroundRef_t)a)->SortPriority < ((BackgroundRef_t)b)->SortPriority)
+            || (((BackgroundRef_t)a)->SortPriority == ((BackgroundRef_t)b)->SortPriority
+                && ((BackgroundRef_t)a)->Location.X < ((BackgroundRef_t)b)->Location.X);
+    }
+}
+
 template<class ItemRef_t>
 class TreeResult_Sentinel
 {
