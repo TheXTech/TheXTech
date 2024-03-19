@@ -365,17 +365,16 @@ void treeTempBlockRemove(BlockRef_t obj)
     s_temp_block_table.erase(obj);
 }
 
-TreeResult_Sentinel<BlockRef_t> treeTempBlockQuery(const Location_t &_loc,
-                         int sort_mode)
+void treeTempBlockQuery(std::vector<BaseRef_t>& out,
+                        const Location_t &_loc,
+                        int sort_mode)
 {
-    TreeResult_Sentinel<BlockRef_t> result;
-
     if(!s_temp_blocks_enabled)
-        return result;
+        return;
 
     // ignore improper rects
     if(_loc.Width < 0 || _loc.Height < 0)
-        return result;
+        return;
 
     rect_external loc = _loc;
 
@@ -397,11 +396,11 @@ TreeResult_Sentinel<BlockRef_t> treeTempBlockQuery(const Location_t &_loc,
     }
 
 
-    s_npc_table.query(*result.i_vec, loc);
+    s_npc_table.query(out, loc);
 
-    s_NPCsToTempBlocks(*result.i_vec);
+    s_NPCsToTempBlocks(out);
 
-    s_temp_block_table.query(*result.i_vec, loc);
+    s_temp_block_table.query(out, loc);
 
 
     if(sort_mode == SORTMODE_COMPAT)
@@ -410,11 +409,19 @@ TreeResult_Sentinel<BlockRef_t> treeTempBlockQuery(const Location_t &_loc,
     }
 
     if(sort_mode == SORTMODE_LOC)
-        std::sort(result.i_vec->begin(), result.i_vec->end(), Comparisons::Loc<BlockRef_t>);
+        std::sort(out.begin(), out.end(), Comparisons::Loc<BlockRef_t>);
     else if(sort_mode == SORTMODE_ID)
-        std::sort(result.i_vec->begin(), result.i_vec->end(), Comparisons::ID<BlockRef_t>);
+        std::sort(out.begin(), out.end(), Comparisons::ID<BlockRef_t>);
     else if(sort_mode == SORTMODE_Z)
-        std::sort(result.i_vec->begin(), result.i_vec->end(), Comparisons::Z<BlockRef_t>);
+        std::sort(out.begin(), out.end(), Comparisons::Z<BlockRef_t>);
+}
+
+TreeResult_Sentinel<BlockRef_t> treeTempBlockQuery(const Location_t &_loc,
+                        int sort_mode)
+{
+    TreeResult_Sentinel<BlockRef_t> result;
+
+    treeTempBlockQuery(*result.i_vec, _loc, sort_mode);
 
     return result;
 }

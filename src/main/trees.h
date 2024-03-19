@@ -219,6 +219,7 @@ extern void treeTempBlockUpdate(BlockRef_t obj);
 extern void treeTempBlockRemove(BlockRef_t obj);
 extern TreeResult_Sentinel<BlockRef_t> treeTempBlockQuery(double Left, double Top, double Right, double Bottom,
                                int sort_mode, double margin = 2.0);
+extern void treeTempBlockQuery(std::vector<BaseRef_t>& out, const Location_t &loc, int sort_mode);
 extern TreeResult_Sentinel<BlockRef_t> treeTempBlockQuery(const Location_t &loc, int sort_mode);
 
 extern TreeResult_Sentinel<BlockRef_t> treeBlockQueryWithTemp(const Location_t &loc, int sort_mode);
