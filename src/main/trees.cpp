@@ -21,9 +21,10 @@
 #include <memory>
 #include <algorithm>
 
-#include "trees.h"
 #include "layers.h"
+#include "compat.h"
 
+#include "main/trees.h"
 #include "main/block_table.h"
 #include "main/block_table.hpp"
 
@@ -345,3 +346,87 @@ void blockTileGet(double x, double w, int64_t &fBlock, int64_t &lBlock)
     lBlock = LastBlock[l > FLBlocks ? FLBlocks : l];
 }
 #endif
+
+template<>
+void UpdatableQuery<BlockRef_t>::update(const Location_t& loc, const UpdatableQuery<BlockRef_t>::it& current_step)
+{
+    SDL_assert(sort_mode != SORTMODE_NONE); // impossible to update unsorted query
+
+    bool use_fl_block = (block_query_mode == QUERY_FLBLOCK && BlocksSorted);
+
+    // check if this query is a subset of the previous query
+    if((loc.Y >= bounds.Y && loc.Y + loc.Height <= bounds.Y + bounds.Height)
+        && (use_fl_block || (loc.X >= bounds.X && loc.X + loc.Width <= bounds.X + bounds.Width)))
+    {
+        return;
+    }
+
+    // update bounds, and expand by 6px on each side
+    bounds.Y = loc.Y - 6;
+    bounds.Height = loc.Height + 6;
+
+    // in compat mode, use a special formula for the FLBlock bounds
+    if(use_fl_block && g_compatibility.emulate_classic_block_order)
+    {
+        bounds.X = vb6Round(loc.X / 32.0 - 1) * 32;
+        bounds.Width = vb6Round((loc.X + loc.Width) / 32.0 + 1) * 32 - bounds.X;
+    }
+    else
+    {
+        bounds.X = loc.X - 6;
+        bounds.Width = loc.Width + 6;
+    }
+
+    // set up comparison functions
+    int sort_mode_use = sort_mode;
+
+    if(sort_mode_use == SORTMODE_COMPAT)
+    {
+        if(g_compatibility.emulate_classic_block_order)
+            sort_mode_use = SORTMODE_ID;
+        else
+            sort_mode_use = SORTMODE_LOC;
+    }
+
+    auto compare_func = (sort_mode_use == SORTMODE_Z) ? Comparisons::Z<BlockRef_t>
+        : (sort_mode_use == SORTMODE_LOC) ? Comparisons::Loc<BlockRef_t>
+        : Comparisons::ID<BlockRef_t>;
+
+    // helps track range to sort following update
+    bool current_step_valid = (current_step != end());
+    ptrdiff_t start_sort = current_step_valid ? current_step.index + 1 : end().index;
+    BlockRef_t lower_bound = current_step_valid ? *current_step : BlockRef_t();
+
+    size_t start_new = sent.i_vec->size();
+
+    // add the normal blocks
+    if(block_query_mode != QUERY_TEMPBLOCK)
+        treeBlockQuery(*sent.i_vec, bounds, SORTMODE_NONE);
+
+    // add the temp blocks
+    if(block_query_mode != QUERY_FLBLOCK)
+        treeTempBlockQuery(*sent.i_vec, bounds, SORTMODE_NONE);
+
+    // filter out the invalid blocks
+    for(size_t i = start_new; i < sent.i_vec->size();)
+    {
+        // need lower_bound to be strictly before the new item
+        if(compare_func(lower_bound, (*sent.i_vec)[i]))
+        {
+            i++;
+            continue;
+        }
+
+        // must remove the item!
+        (*sent.i_vec)[i] = (*sent.i_vec)[sent.i_vec->size() - 1];
+        sent.i_vec->resize(sent.i_vec->size() - 1);
+    }
+
+    // sort all of the blocks after the current step (manually separating cases to maximize chances of successful inlining)
+    if(sort_mode_use == SORTMODE_Z)
+        std::sort(sent.i_vec->begin() + start_sort, sent.i_vec->end(), Comparisons::Z<BlockRef_t>);
+    else if(sort_mode_use == SORTMODE_LOC)
+        std::sort(sent.i_vec->begin() + start_sort, sent.i_vec->end(), Comparisons::Loc<BlockRef_t>);
+    else
+        std::sort(sent.i_vec->begin() + start_sort, sent.i_vec->end(), Comparisons::ID<BlockRef_t>);
+}
