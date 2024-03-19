@@ -405,7 +405,7 @@ void UpdatableQuery<BlockRef_t>::update(const Location_t& loc, const UpdatableQu
 
     // add the temp blocks
     if(block_query_mode != QUERY_FLBLOCK)
-        treeFLBlockQuery(*sent.i_vec, bounds, SORTMODE_NONE);
+        treeTempBlockQuery(*sent.i_vec, bounds, SORTMODE_NONE);
 
     // filter out the invalid blocks
     for(size_t i = start_new; i < sent.i_vec->size();)
