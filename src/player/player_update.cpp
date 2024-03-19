@@ -2340,8 +2340,12 @@ void UpdatePlayer()
                 // lBlock = LastBlock[((Player[A].Location.X + Player[A].Location.Width) / 32.0) + 1];
                 // blockTileGet(Player[A].Location, fBlock, lBlock);
 
-                for(int B : treeFLBlockQuery(Player[A].Location, SORTMODE_COMPAT))
+                UpdatableQuery<BlockRef_t> q(Player[A].Location, SORTMODE_COMPAT, QUERY_FLBLOCK);
+
+                for(auto it = q.begin(); it != q.end(); ++it)
                 {
+                    int B = *it;
+
                     // checks to see if a collision happened
                     if(Player[A].Location.X + Player[A].Location.Width >= Block[B].Location.X)
                     {
@@ -2949,6 +2953,8 @@ void UpdatePlayer()
                                                     Player[A].Location.Y += -Player[A].Location.SpeedY;
                                                     Player[A].Location.SpeedX = 0;
                                                     Player[A].Location.SpeedY = 0;
+
+                                                    q.update(Player[A].Location, it);
                                                 }
                                             }
                                         }

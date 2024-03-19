@@ -107,6 +107,8 @@ extern void Mix_PauseAudio(int pause);
 extern Mix_Music* Mix_LoadMUS(const char* path);
 extern Mix_Chunk* Mix_LoadWAV(const char* path);
 
+extern double Mix_MusicDuration(Mix_Music* music);
+
 extern int Mix_VolumeMusicStream(Mix_Music* music, int volume);
 extern int Mix_HaltMusicStream(Mix_Music* music);
 extern int Mix_FadeOutMusicStream(Mix_Music* music, int ms);
@@ -118,6 +120,9 @@ extern int Mix_PlayChannelVol(int which, Mix_Chunk *chunk, int loops, int volume
 extern int Mix_SetPanning(int which, uint8_t left, uint8_t right);
 
 extern int Mix_PlayingMusicStream(Mix_Music* music);
+
+extern int Mix_RewindMusicStream(Mix_Music* music);
+extern int Mix_SetMusicEffectPanning(Mix_Music* music, uint8_t left, uint8_t right);
 
 extern int Mix_PlayMusic(Mix_Music *music, int loops);
 extern int Mix_FadeInMusic(Mix_Music* music, int loops, int fadeInMs);

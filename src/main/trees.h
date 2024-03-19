@@ -39,6 +39,48 @@ enum SortMode
     SORTMODE_COMPAT = 4, // sort according to ID (location at last sort) in compat mode, and according to current location normally
 };
 
+enum QueryMode
+{
+    QUERY_NORMAL = 0,
+    QUERY_FLBLOCK = 1,
+    QUERY_TEMPBLOCK = 2,
+};
+
+namespace Comparisons
+{
+    // sort by location
+    template<class ItemRef_t>
+    inline bool Loc(BaseRef_t a, BaseRef_t b)
+    {
+        return (((ItemRef_t)a)->Location.X <= ((ItemRef_t)b)->Location.X
+            && (((ItemRef_t)a)->Location.X < ((ItemRef_t)b)->Location.X
+                || ((ItemRef_t)a)->Location.Y < ((ItemRef_t)b)->Location.Y));
+    }
+
+    // sort by index
+    template<class ItemRef_t>
+    inline bool ID(BaseRef_t a, BaseRef_t b)
+    {
+        return a < b;
+    }
+
+    // sort by index when unimplemented
+    template<class ItemRef_t>
+    inline bool Z(BaseRef_t a, BaseRef_t b)
+    {
+        return a < b;
+    }
+
+    // sort BGOs by SortPriority
+    template<>
+    inline bool Z<BackgroundRef_t>(BaseRef_t a, BaseRef_t b)
+    {
+        return (((BackgroundRef_t)a)->SortPriority < ((BackgroundRef_t)b)->SortPriority)
+            || (((BackgroundRef_t)a)->SortPriority == ((BackgroundRef_t)b)->SortPriority
+                && ((BackgroundRef_t)a)->Location.X < ((BackgroundRef_t)b)->Location.X);
+    }
+}
+
 template<class ItemRef_t>
 class TreeResult_Sentinel
 {
@@ -197,6 +239,7 @@ extern void treeTempBlockUpdate(BlockRef_t obj);
 extern void treeTempBlockRemove(BlockRef_t obj);
 extern TreeResult_Sentinel<BlockRef_t> treeTempBlockQuery(double Left, double Top, double Right, double Bottom,
                                int sort_mode, double margin = 2.0);
+extern void treeTempBlockQuery(std::vector<BaseRef_t>& out, const Location_t &loc, int sort_mode);
 extern TreeResult_Sentinel<BlockRef_t> treeTempBlockQuery(const Location_t &loc, int sort_mode);
 
 extern void treeLevelCleanBackgroundLayers();
@@ -231,5 +274,75 @@ extern TreeResult_Sentinel<WaterRef_t> treeWaterQuery(const Location_t &loc, int
 
 // extern void blockTileGet(const Location_t &loc, int64_t &fBlock, int64_t &lBlock);
 // extern void blockTileGet(double x, double w, int64_t &fBlock, int64_t &lBlock);
+
+// special class used to handle situation where query may need to be significantly updated after location changes
+template<class ItemRef_t>
+class UpdatableQuery
+{
+    TreeResult_Sentinel<ItemRef_t> sent;
+    Location_t bounds; // bounds that were used for the previous query, including margin
+    const SortMode sort_mode;
+    const QueryMode block_query_mode;
+
+public:
+    struct it
+    {
+        using iterator_category = std::input_iterator_tag;
+        using difference_type   = std::ptrdiff_t;
+        using value_type        = typename ItemRef_t::value_type;
+        using pointer           = ItemRef_t*;
+        using reference         = ItemRef_t;
+
+        it(const TreeResult_Sentinel<ItemRef_t>& sent, ptrdiff_t index)
+            : parent(*sent.i_vec), index(index) {}
+
+        reference operator*() const { return (reference)(parent[index]); }
+        pointer operator->() { return &*this; }
+
+        // Prefix increment
+        it& operator++() { index++; return *this; }
+
+        // Postfix increment
+        it operator++(int) { it tmp = *this; ++(*this); return tmp; }
+
+        // Prefix decrement
+        it& operator--() { index--; return *this; }
+
+        // Postfix decrement
+        it operator--(int) { it tmp = *this; --(*this); return tmp; }
+
+        friend bool operator== (const it& a, const it& b) { return a.index == b.index; }
+        friend bool operator!= (const it& a, const it& b) { return a.index != b.index; }
+        friend bool operator<= (const it& a, const it& b) { return a.index <= b.index; }
+        friend bool operator>= (const it& a, const it& b) { return a.index >= b.index; }
+        friend bool operator< (const it& a, const it& b) { return a.index < b.index; }
+        friend bool operator> (const it& a, const it& b) { return a.index > b.index; }
+
+        const std::vector<BaseRef_t>& parent;
+        ptrdiff_t index;
+    };
+
+    UpdatableQuery(const Location_t& target, SortMode sort_mode, QueryMode block_query_mode = QUERY_NORMAL)
+        : sort_mode(sort_mode), block_query_mode(block_query_mode)
+    {
+        update(target, end());
+    }
+
+    it begin() const
+    {
+        SDL_assert(sent.i_vec); // invalid use of discarded sentinel
+        it ret(sent, 0);
+        return ret;
+    }
+
+    it end() const
+    {
+        SDL_assert(sent.i_vec); // invalid use of discarded sentinel
+        it ret(sent, sent.i_vec->size());
+        return ret;
+    }
+
+    void update(const Location_t& loc, const it& current_step);
+};
 
 #endif // TREES_HHHH

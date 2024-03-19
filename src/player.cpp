@@ -3207,14 +3207,17 @@ void PlayerPush(const int A, int HitSpot)
     // lBlock = LastBlock[((p.Location.X + p.Location.Width) / 32.0) + 1];
     // blockTileGet(p.Location, fBlock, lBlock);
 
-    for(BlockRef_t block : treeFLBlockQuery(p.Location, SORTMODE_COMPAT))
+    UpdatableQuery<BlockRef_t> q(p.Location, SORTMODE_COMPAT, QUERY_FLBLOCK);
+
+    for(auto it = q.begin(); it != q.end(); ++it)
     {
-        int B = block;
-        Block_t& b = *block;
+        int B = *it;
+        Block_t& b = **it;
 
         if(b.Hidden || BlockIsSizable[b.Type])
             continue;
 
+        // Note: could also apply this for a downwards clip when colliding with an invisible block
         if(g_config.fix_player_filter_bounce && BlockCheckPlayerFilter(B, A))
             continue;
 
@@ -3228,13 +3231,17 @@ void PlayerPush(const int A, int HitSpot)
                 {
                     if(HitSpot == 2)
                     {
-                        // TODO: investigate this vanilla bug and see if it's worth making a fix
+                        // Note: this vanilla peculiarity (Width should be subtracted) only affects a victim spat rightwards out of a pet's mouth.
+                        // If spat rightwards against a wall, the victim teleports to the left through the player who spat them out.
+                        // If spat leftwards against a wall (non-bugged behavior), the player who spat them out gets pushed rightwards.
                         p.Location.X = b.Location.X - p.Location.Height - 0.01;
                     }
                     else if(HitSpot == 3)
                         p.Location.Y = b.Location.Y + b.Location.Height + 0.01;
                     else if(HitSpot == 4)
                         p.Location.X = b.Location.X + b.Location.Width + 0.01;
+
+                    q.update(p.Location, it);
                 }
             }
         }

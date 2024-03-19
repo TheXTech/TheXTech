@@ -82,6 +82,12 @@ Mix_Chunk* Mix_LoadWAV(const char* path)
     return nullptr; // Always fail
 }
 
+double Mix_MusicDuration(Mix_Music* music)
+{
+    UNUSED(music);
+    return 0;
+}
+
 const char* Mix_GetError()
 {
     return "";
@@ -174,6 +180,20 @@ int Mix_PlayingMusicStream(Mix_Music* music)
 int Mix_PausedMusicStream(Mix_Music* music)
 {
     UNUSED(music);
+    return -1;
+}
+
+int Mix_RewindMusicStream(Mix_Music* music)
+{
+    UNUSED(music);
+    return -1;
+}
+
+int Mix_SetMusicEffectPanning(Mix_Music* music, uint8_t left, uint8_t right)
+{
+    UNUSED(music);
+    UNUSED(left);
+    UNUSED(right);
     return -1;
 }
 
