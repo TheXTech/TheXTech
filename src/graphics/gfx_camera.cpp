@@ -36,12 +36,13 @@ void ResetCameraPanning()
 
 void ProcessSmallScreenCam(vScreen_t& vscreen)
 {
-    Screen_t& screen = Screens[vscreen.screen_ref];
-    Player_t& p = Player[vscreen.player];
+    const Screen_t& screen = Screens[vscreen.screen_ref];
+    const Screen_t& c_screen = screen.canonical_screen();
+    const Player_t& p = Player[vscreen.player];
 
     // slowly disable small screen camera features as player cameras approach each other
     double rate = 1.0;
-    if(screen.Type == ScreenTypes::Dynamic && (screen.W < 800 || screen.H < 600))
+    if(screen.Type == ScreenTypes::Dynamic && (screen.W < c_screen.W || screen.H < c_screen.H))
     {
         double dx = std::abs(screen.vScreen(1).X - screen.vScreen(2).X);
         double dy = std::abs(screen.vScreen(1).Y - screen.vScreen(2).Y);
@@ -55,11 +56,14 @@ void ProcessSmallScreenCam(vScreen_t& vscreen)
             rate = 1.0;
     }
 
-    if(g_config.small_screen_camera_features && screen.W < 800 && !NoTurnBack[p.Section])
+    if(g_config.small_screen_camera_features && screen.W < c_screen.W && !NoTurnBack[p.Section])
     {
         int16_t max_offsetX = 360;
         if(max_offsetX > vscreen.Width - p.Location.Width * 4)
             max_offsetX = vscreen.Width - p.Location.Width * 4;
+
+        if(max_offsetX > c_screen.W - screen.W)
+            max_offsetX = c_screen.W - screen.W;
 
         int16_t lookX_target = max_offsetX * p.Location.SpeedX * 1.5 / Physics.PlayerRunSpeed;
         if(lookX_target > max_offsetX)
@@ -95,9 +99,11 @@ void ProcessSmallScreenCam(vScreen_t& vscreen)
         vscreen.X -= rate * vscreen.small_screen_features.offset_x / 2;
     }
 
-    if(g_config.small_screen_camera_features && screen.H < 600)
+    if(g_config.small_screen_camera_features && screen.H < c_screen.H)
     {
         int16_t max_offsetY = 200;
+        if(max_offsetY > (c_screen.H - screen.H) + 50)
+            max_offsetY = (c_screen.H - screen.H) + 50;
 
         int16_t lookY_target = max_offsetY;
 
@@ -118,7 +124,7 @@ void ProcessSmallScreenCam(vScreen_t& vscreen)
                 vscreen.small_screen_features.offset_y *= -1;
         }
 
-        if(GamePaused == PauseCode::None && !qScreen && !ForcedControls && LevelMacro == LEVELMACRO_OFF)
+        if(GamePaused == PauseCode::None && !qScreen && !ForcedControls && LevelMacro == LEVELMACRO_OFF && p.Effect == 0)
         {
             if(vscreen.small_screen_features.offset_y < lookY_target)
             {
@@ -167,13 +173,25 @@ void ProcessSmallScreenCam(vScreen_t& vscreen)
             lookY /= 2;
         }
 
-        vscreen.Y += rate * (lookY + 32);
+        // lower the default offset by 32px
+        int fix_default_offset = 32;
+
+        // weaken this effect when very close to the original canonical resolution
+        if(fix_default_offset > (c_screen.H - screen.H) / 2)
+            fix_default_offset = (c_screen.H - screen.H) / 2;
+
+        // fade this out if approaching the canonical screen ounbds
+        fix_default_offset *= (c_screen.H - screen.H) - std::abs(lookY) * 2;
+        fix_default_offset /= (c_screen.H - screen.H);
+
+        vscreen.Y += rate * (lookY + fix_default_offset);
     }
 }
 
 void DrawSmallScreenCam(vScreen_t& vscreen)
 {
     const Screen_t& screen = Screens[vscreen.screen_ref];
+    const Screen_t& c_screen = screen.canonical_screen();
 
     int CamX = vscreen.Width - 54;
     int CamY = vscreen.Height - 42;
@@ -202,6 +220,10 @@ void DrawSmallScreenCam(vScreen_t& vscreen)
             rate = 1.0;
     }
 
+    int16_t max_offsetY = 200;
+    if(max_offsetY > (c_screen.H - screen.H) + 50)
+        max_offsetY = (c_screen.H - screen.H) + 50;
+
     // color for camera
     XTColor color;
 
@@ -214,7 +236,7 @@ void DrawSmallScreenCam(vScreen_t& vscreen)
         else
             XRender::renderTexture(CamX + 4, CamY + 18, GFX.MCursor[2], XTAlphaF(rate));
     }
-    else if(vscreen.small_screen_features.offset_y < -160 || vscreen.small_screen_features.offset_y > 160)
+    else if(vscreen.small_screen_features.offset_y < -max_offsetY * 4 / 5 || vscreen.small_screen_features.offset_y > max_offsetY * 4 / 5)
     {
         color = XTColorF(0.5f, 1.0f, 0.5f, 0.7f);
 
