@@ -88,7 +88,7 @@ void ProcessSmallScreenCam(vScreen_t& vscreen)
             rateX = 2;
         }
 
-        if(GamePaused == PauseCode::None && !qScreen)
+        if(GamePaused == PauseCode::None && !qScreen && !ForcedControls && LevelMacro == LEVELMACRO_OFF && p.Effect == 0)
         {
             if(vscreen.small_screen_features.offset_x < lookX_target)
                 vscreen.small_screen_features.offset_x += rateX;
