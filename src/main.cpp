@@ -367,7 +367,7 @@ int main(int argc, char**argv)
                                                    "  smbx2  - Disables all features and bugfixes except fixed at SMBX2\n"
                                                    "  smbx13 - Enforces the full compatibility with the SMBX 1.3 behaviour\n"
                                                    "\n"
-                                                   "  Note: If speed-run mode is set, the compatibility level will be overridden by the speed-run mode",
+                                                   "  Deprecated: acts as an alias for speed-run mode. Will be overridden if speed-run mode is set.",
                                                     false, "modern",
                                                    "modern, smbx2, smbx3",
                                                    cmd);
@@ -504,15 +504,15 @@ int main(int argc, char**argv)
         // Store all of the command-line config options
         ConfigChangeSentinel sent(ConfigSetLevel::cmdline);
 
-        if(compatLevel.isSet())
+        if(compatLevel.isSet() && !speedRunMode.isSet())
         {
             std::string compatModeVal = compatLevel.getValue();
             if(compatModeVal == "classic" || compatModeVal == "smbx2")
-                g_config.compatibility_mode = Config_t::COMPAT_CLASSIC;
+                g_config.speedrun_mode = 2;
             else if(compatModeVal == "smbx13")
-                g_config.compatibility_mode = Config_t::COMPAT_SMBX13;
+                g_config.speedrun_mode = 3;
             else if(compatModeVal == "modern")
-                g_config.compatibility_mode = Config_t::COMPAT_MODERN;
+                g_config.speedrun_mode = 1;
             else
             {
                 std::cerr << "Error: Invalid value for the --compat-level argument: " << compatModeVal << std::endl;
