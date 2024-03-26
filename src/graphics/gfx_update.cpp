@@ -3137,6 +3137,35 @@ void UpdateGraphicsMeta()
 {
     XRender::resetViewport();
 
+    XRender::setDrawPlane(PLANE_GAME_META);
+
+    speedRun_renderTimer();
+
+    if(PrintFPS > 0 && ShowFPS)
+        SuperPrint(fmt::format_ne("{0}", int(PrintFPS)), 1, XRender::TargetOverscanX + 8, 8, {0, 255, 0});
+
+    g_stats.print();
+
+    if(!BattleMode && !GameMenu && !GameOutro && g_config.show_episode_title)
+    {
+        // big screen, display at top
+        if(XRender::TargetH >= 640 && g_config.show_episode_title == Config_t::EPISODE_TITLE_TOP)
+        {
+            int y = 20;
+            float alpha = 1.0f;
+            SuperPrintScreenCenter(WorldName, 3, y, XTAlphaF(alpha));
+        }
+        // display at bottom
+        else if(g_config.show_episode_title == Config_t::EPISODE_TITLE_BOTTOM)
+        {
+            int y = XRender::TargetH - 60;
+            float alpha = 0.75f;
+            SuperPrintScreenCenter(WorldName, 3, y, XTAlphaF(alpha));
+        }
+    }
+
+    DrawDeviceBattery();
+
     XRender::setDrawPlane(PLANE_GAME_MENUS);
 
     if(GameMenu && !GameOutro)
@@ -3169,39 +3198,12 @@ void UpdateGraphicsMeta()
     if(GamePaused == PauseCode::TextEntry)
         TextEntryScreen::Render();
 
-    XRender::setDrawPlane(PLANE_GAME_META);
-
-    speedRun_renderTimer();
-
-    if(PrintFPS > 0 && ShowFPS)
-        SuperPrint(fmt::format_ne("{0}", int(PrintFPS)), 1, XRender::TargetOverscanX + 8, 8, {0, 255, 0});
-
-    g_stats.print();
-
-    if(!BattleMode && !GameMenu && !GameOutro && g_config.show_episode_title)
-    {
-        // big screen, display at top
-        if(XRender::TargetH >= 640 && g_config.show_episode_title == Config_t::EPISODE_TITLE_TOP)
-        {
-            int y = 20;
-            float alpha = 1.0f;
-            SuperPrintScreenCenter(WorldName, 3, y, XTAlphaF(alpha));
-        }
-        // display at bottom
-        else if(g_config.show_episode_title == Config_t::EPISODE_TITLE_BOTTOM)
-        {
-            int y = XRender::TargetH - 60;
-            float alpha = 0.75f;
-            SuperPrintScreenCenter(WorldName, 3, y, XTAlphaF(alpha));
-        }
-    }
-
-    DrawDeviceBattery();
-
     // Draw screen fader below level menu when game is paused
     // This makes sure that the level test menu is drawn above the screen fader during level tests
     if(GamePaused != PauseCode::None)
         XRender::setDrawPlane(PLANE_GAME_MENUS - 1);
+    else
+        XRender::setDrawPlane(PLANE_GAME_FADER);
 
     g_levelScreenFader.draw();
 

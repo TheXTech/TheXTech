@@ -677,10 +677,12 @@ void UpdateGraphics2(bool skipRepaint)
             }
         }
 
-        XRender::setDrawPlane(PLANE_WLD_META);
+        XRender::setDrawPlane(PLANE_GAME_FADER);
         XRender::resetViewport();
 
         g_worldScreenFader.draw();
+
+        XRender::setDrawPlane(PLANE_GAME_META);
 
         if(PrintFPS > 0 && ShowFPS)
             SuperPrint(std::to_string(int(PrintFPS)), 1, XRender::TargetOverscanX + 8, 8, {0, 255, 0});
