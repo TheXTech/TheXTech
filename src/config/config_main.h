@@ -152,47 +152,13 @@ public:
         "language", "Language", "Language in which to display all game engine text",
         config_language_set};
 
-        static constexpr bool record_gameplay_data = false;
-
-    // opt<bool> record_gameplay_data{this, defaults(false), {}, Scope::UserGlobal,
-    //     "record-gameplay-data", "Record gameplay data", "Records your control input for replay or debugging purposes"};
-
     // opt<bool> loading_show_debug{this, defaults(false), {}, Scope::UserGlobal,
     //     "loading-show-debug", "Show loading messages", "Show debug string during the loading process"};
-
-    opt_enum<int> log_level{this,
-        {
-            {PGE_LogLevel::NoLog, "none", "None", nullptr},
-            {PGE_LogLevel::Fatal, "fatal", "Fatal", nullptr},
-            {PGE_LogLevel::Critical, "critical", "Critical", nullptr},
-            {PGE_LogLevel::Warning, "warning", "Warning", nullptr},
-            {PGE_LogLevel::Info, "info", "Info", nullptr},
-            {PGE_LogLevel::Debug, "debug", "Debug", nullptr},
-            {PGE_LogLevel::NoLog, "0", nullptr, nullptr},
-            {PGE_LogLevel::Fatal, "1", nullptr, nullptr},
-            {PGE_LogLevel::Critical, "2", nullptr, nullptr},
-            {PGE_LogLevel::Warning, "3", nullptr, nullptr},
-            {PGE_LogLevel::Info, "4", nullptr, nullptr},
-            {PGE_LogLevel::Debug, "5", nullptr, nullptr},
-        },
-#if defined(DEBUG_BUILD)
-        defaults(PGE_LogLevel::Debug),
-#else
-        defaults(PGE_LogLevel::Info),
-#endif
-        {}, Scope::UserGlobal,
-        "log-level", "Log level", "Log events at or above this severity",
-        config_log_level_set};
 
 #ifdef ENABLE_XTECH_DISCORD_RPC
     opt<bool> discord_rpc{this, defaults(false), {}, Scope::UserGlobal,
         "discord-rpc", "Discord Integration", "Share your play data on Discord!",
         config_integrations_set};
-#endif
-
-#if defined(__ANDROID__) || defined(__3DS__)
-    opt<bool> use_native_osk{this, defaults(false), {}, Scope::UserGlobal,
-        "use-native-osk", "Use native OSK", "Use system's native onscreen keyboard instead of the TheXTech one"};
 #endif
 
 #ifndef NO_WINDOW_FOCUS_TRACKING
@@ -236,43 +202,6 @@ public:
 
     /* ---- Video - System ----*/
     subsection video_system{this, "video-system", "System"};
-
-#ifndef RENDER_CUSTOM
-    enum
-    {
-        RENDER_SOFTWARE = 0,
-        RENDER_ACCELERATED_AUTO,
-        RENDER_ACCELERATED_SDL,
-        RENDER_ACCELERATED_OPENGL,
-        RENDER_ACCELERATED_OPENGL_ES,
-        RENDER_ACCELERATED_OPENGL_LEGACY,
-        RENDER_ACCELERATED_OPENGL_ES_LEGACY,
-        RENDER_END
-    };
-    rendermode_t render_mode{this,
-        {
-            {RENDER_SOFTWARE, "sw", "Software", nullptr},
-            {RENDER_ACCELERATED_AUTO, "hw", "Auto", ""},
-            {RENDER_ACCELERATED_SDL, "sdl", "SDL2", "Basic cross-platform render API"},
-#ifdef THEXTECH_BUILD_GL_DESKTOP_MODERN
-            {RENDER_ACCELERATED_OPENGL, "opengl", "OpenGL 3+", "Desktop API with full support for all visual effects"},
-#endif
-#ifdef THEXTECH_BUILD_GL_ES_MODERN
-            {RENDER_ACCELERATED_OPENGL_ES, "opengles", "OpenGL ES 2+", "Mobile API with support for all visual effects"},
-#endif
-#ifdef THEXTECH_BUILD_GL_DESKTOP_LEGACY
-            {RENDER_ACCELERATED_OPENGL_LEGACY, "opengl11", "OpenGL 1.1", "Legacy desktop API with support for SMBX64 visual effects"},
-#endif
-#ifdef THEXTECH_BUILD_GL_ES_LEGACY
-            {RENDER_ACCELERATED_OPENGL_ES_LEGACY, "opengles11", "OpenGL ES 1.1", "Legacy mobile API with support for SMBX64 visual effects"},
-#endif
-            {RENDER_SOFTWARE, "0"},
-            {RENDER_ACCELERATED_SDL, "1"},
-        },
-        defaults(RENDER_ACCELERATED_AUTO), {}, Scope::UserGlobal,
-        "render", "Render mode", "Describes whether the game should use the platform's accelerated rendering",
-        config_rendermode_set};
-#endif
 
 #ifndef RENDER_FULLSCREEN_ALWAYS
     opt<bool> fullscreen{this, defaults(false), {}, Scope::UserGlobal,
@@ -324,27 +253,6 @@ public:
         "scale-mode", "Scale mode", "How should the game field be scaled onscreen?",
         config_res_set
     };
-
-    enum ScaleDownTextures
-    {
-        SCALE_DOWN_NONE = 0,
-        SCALE_DOWN_SAFE = 1,
-        SCALE_DOWN_ALL = 2,
-    };
-
-    static constexpr int scale_down_textures = SCALE_DOWN_SAFE;
-
-#if 0
-    opt_enum<int> scale_down_textures{this,
-        {
-            {SCALE_DOWN_NONE, "none", "None", nullptr},
-            {SCALE_DOWN_SAFE, "safe", "Safe", "Only scales down the textures that are in 2x format"},
-            {SCALE_DOWN_ALL, "all", "All", "Creates less texture load stutter than 'Safe'"},
-        },
-        defaults(SCALE_DOWN_SAFE), {}, Scope::UserGlobal,
-        "scale-down-textures", "Scale down textures", "The game should scale textures from 2x to 1x to save video memory at the expense of texture load stutter"};
-#endif
-
     /* ---- Video - Meta Info ----*/
     subsection info_meta{this, "info-meta", "Onscreen meta info"};
 
@@ -463,27 +371,12 @@ public:
     opt<bool> EnableInterLevelFade{this, defaults(true), {CompatClass::pure_preference, false}, Scope::UserGlobal,
         "enable-inter-level-fade-effect", "Fade effects", "Use fullscreen fade effects when entering or exiting a level"};
 
+
     /* ---- Audio ----*/
     section audio{this, Scope::UserGlobal, "audio", "Audio", "Options affecting the game's audio"};
 
     opt<bool> audio_enable{this, defaults(true), {}, Scope::UserGlobal,
-        "audio-enable", "Enable", "Enable audio",
-        config_audio_set};
-
-    /* ---- Audio - System ----*/
-    subsection audio_system{this, "audio-system", "System"};
-
-    opt_enum<int> audio_sample_rate{this,
-        {
-            {11025, "11025", "11025 Hz", nullptr},
-            {16000, "16000", "16000 Hz", nullptr},
-            {22050, "22050", "22050 Hz", nullptr},
-            {32000, "32000", "32000 Hz", nullptr},
-            {44100, "44100", "44100 Hz", nullptr},
-            {48000, "48000", "48000 Hz", nullptr},
-        },
-        defaults(g_audioDefaults.sampleRate), {}, Scope::UserGlobal,
-        "audio-sample-rate", "Sample rate", "Sets the maximum pitch, quality, and processing load",
+        "audio-enable", "Enable", nullptr,
         config_audio_set};
 
     opt_enum<int> audio_channels{this,
@@ -492,57 +385,7 @@ public:
             {2, "stereo", "Stereo", nullptr},
         },
         defaults(g_audioDefaults.channels), {}, Scope::UserGlobal,
-        "audio-channels", "Channels", "Sets how many independent audio channels to use",
-        config_audio_set};
-
-#ifndef THEXTECH_NO_SDL_BUILD
-    opt_enum<int> audio_format{this,
-        {
-            {AUDIO_S8, "s8", "s8"},
-            {AUDIO_S8, "pcm_s8"},
-            {AUDIO_U8, "u8", "u8"},
-            {AUDIO_U8, "pcm_u8"},
-            {AUDIO_S16SYS, "s16", "s16"},
-            {AUDIO_S16SYS, "pcm_s16"},
-            {AUDIO_S16LSB, "s16le", "s16le"},
-            {AUDIO_S16LSB, "pcm_s16le"},
-            {AUDIO_S16MSB, "s16be", "s16be"},
-            {AUDIO_S16MSB, "pcm_s16be"},
-            {AUDIO_U16SYS, "u16", "u16"},
-            {AUDIO_U16SYS, "pcm_u16"},
-            {AUDIO_U16LSB, "u16le", "u16le"},
-            {AUDIO_U16LSB, "pcm_u16le"},
-            {AUDIO_U16MSB, "u16be", "u16be"},
-            {AUDIO_U16MSB, "pcm_u16be"},
-            {AUDIO_S32SYS, "s32", "s32"},
-            {AUDIO_S32SYS, "pcm_s32"},
-            {AUDIO_S32LSB, "s32le", "s32le"},
-            {AUDIO_S32LSB, "pcm_s32le"},
-            {AUDIO_S32MSB, "s32be", "s32be"},
-            {AUDIO_S32MSB, "pcm_s32be"},
-            {AUDIO_F32SYS, "float32", "float32"},
-            {AUDIO_F32SYS, "pcm_f32"},
-            {AUDIO_F32LSB, "float32le", "float32le"},
-            {AUDIO_F32LSB, "pcm_f32le"},
-            {AUDIO_F32MSB, "float32be", "float32be"},
-            {AUDIO_F32MSB, "pcm_f32be"},
-        },
-        defaults(g_audioDefaults.format), {}, Scope::UserGlobal,
-        "audio-format", "Audio format", "(Advanced) format of audio passed to sound driver",
-        config_audio_set};
-#endif
-
-    opt_enum<int> audio_buffer_size{this,
-        {
-            {512, "512", "512"},
-            {768, "768", "768"},
-            {1024, "1024", "1024"},
-            {1536, "1536", "1536"},
-            {2048, "2048", "2048"},
-            {4096, "4096", "4096"},
-        },
-        defaults(g_audioDefaults.bufferSize), {}, Scope::UserGlobal,
-        "audio-buffer-size", "Buffer size", "(Advanced) amount of audio processed at one time -- higher values for fewer pops and more delay",
+        "audio-channels", "Channels", nullptr,
         config_audio_set};
 
     /* ---- Audio - Preferences ----*/
@@ -583,6 +426,166 @@ public:
 
     /* ---- Controls ----*/
     section controls{this, Scope::UserGlobal, "controls", "Controls"};
+
+
+    /* ---- Advanced ----*/
+    section advanced{this, Scope::UserGlobal, "advanced", "Advanced", "Technical options affecting internal operations"};
+
+    // static constexpr bool record_gameplay_data = false;
+
+    opt<bool> record_gameplay_data{this, defaults(false), {}, Scope::UserGlobal,
+        "record-gameplay-data", "Record gameplay data", "Records your control input for replay or debugging purposes"};
+
+    opt_enum<int> log_level{this,
+        {
+            {PGE_LogLevel::NoLog, "none", "None", nullptr},
+            {PGE_LogLevel::Fatal, "fatal", "Fatal", nullptr},
+            {PGE_LogLevel::Critical, "critical", "Critical", nullptr},
+            {PGE_LogLevel::Warning, "warning", "Warning", nullptr},
+            {PGE_LogLevel::Info, "info", "Info", nullptr},
+            {PGE_LogLevel::Debug, "debug", "Debug", nullptr},
+            {PGE_LogLevel::NoLog, "0", nullptr, nullptr},
+            {PGE_LogLevel::Fatal, "1", nullptr, nullptr},
+            {PGE_LogLevel::Critical, "2", nullptr, nullptr},
+            {PGE_LogLevel::Warning, "3", nullptr, nullptr},
+            {PGE_LogLevel::Info, "4", nullptr, nullptr},
+            {PGE_LogLevel::Debug, "5", nullptr, nullptr},
+        },
+#if defined(DEBUG_BUILD)
+        defaults(PGE_LogLevel::Debug),
+#else
+        defaults(PGE_LogLevel::Info),
+#endif
+        {}, Scope::UserGlobal,
+        "log-level", "Log level", "Log events at or above this severity",
+        config_log_level_set};
+
+#if defined(__ANDROID__) || defined(__3DS__)
+    opt<bool> use_native_osk{this, defaults(false), {}, Scope::UserGlobal,
+        "use-native-osk", "Use native OSK", "Use system's native onscreen keyboard instead of the TheXTech one"};
+#endif
+
+    /* ---- Advanced - Video ----*/
+    subsection advanced_video{this, "advanced-video", "Video"};
+
+#ifndef RENDER_CUSTOM
+    enum
+    {
+        RENDER_SOFTWARE = 0,
+        RENDER_ACCELERATED_AUTO,
+        RENDER_ACCELERATED_SDL,
+        RENDER_ACCELERATED_OPENGL,
+        RENDER_ACCELERATED_OPENGL_ES,
+        RENDER_ACCELERATED_OPENGL_LEGACY,
+        RENDER_ACCELERATED_OPENGL_ES_LEGACY,
+        RENDER_END
+    };
+    rendermode_t render_mode{this,
+        {
+            {RENDER_SOFTWARE, "sw", "Software", nullptr},
+            {RENDER_ACCELERATED_AUTO, "hw", "Auto", ""},
+            {RENDER_ACCELERATED_SDL, "sdl", "SDL2", "Basic cross-platform render API"},
+#ifdef THEXTECH_BUILD_GL_DESKTOP_MODERN
+            {RENDER_ACCELERATED_OPENGL, "opengl", "OpenGL 3+", "Desktop API with support for all new visual effects and full accuracy to SMBX64"},
+#endif
+#ifdef THEXTECH_BUILD_GL_ES_MODERN
+            {RENDER_ACCELERATED_OPENGL_ES, "opengles", "OpenGL ES 2+", "Mobile API with support for all new visual effects and high accuracy to SMBX64"},
+#endif
+#ifdef THEXTECH_BUILD_GL_DESKTOP_LEGACY
+            {RENDER_ACCELERATED_OPENGL_LEGACY, "opengl11", "OpenGL 1.1", "Legacy desktop API with full accuracy to SMBX64"},
+#endif
+#ifdef THEXTECH_BUILD_GL_ES_LEGACY
+            {RENDER_ACCELERATED_OPENGL_ES_LEGACY, "opengles11", "OpenGL ES 1.1", "Legacy mobile API with full accuracy to SMBX64"},
+#endif
+            {RENDER_SOFTWARE, "0"},
+            {RENDER_ACCELERATED_SDL, "1"},
+        },
+        defaults(RENDER_ACCELERATED_AUTO), {}, Scope::UserGlobal,
+        "render", "Render mode", "Describes whether the game should use the platform's accelerated rendering",
+        config_rendermode_set};
+#endif
+
+    enum ScaleDownTextures
+    {
+        SCALE_DOWN_NONE = 0,
+        SCALE_DOWN_SAFE = 1,
+        SCALE_DOWN_ALL = 2,
+    };
+
+    opt_enum<int> scale_down_textures{this,
+        {
+            {SCALE_DOWN_NONE, "none", "None", nullptr},
+            {SCALE_DOWN_SAFE, "safe", "Safe", "Only scales down the textures that are in 2x format"},
+            {SCALE_DOWN_ALL, "all", "All", "Creates less texture load stutter than 'Safe'"},
+        },
+        defaults(SCALE_DOWN_SAFE), {}, Scope::UserGlobal,
+        "scale-down-textures", "Scale down textures", "The game should scale textures from 2x to 1x to save video memory at the expense of texture load stutter"};
+
+#ifndef THEXTECH_NO_SDL_BUILD
+    /* ---- Advanced - Audio ----*/
+    subsection advanced_audio{this, "advanced-audio", "Audio"};
+
+    opt_enum<int> audio_sample_rate{this,
+        {
+            {11025, "11025", "11025 Hz", nullptr},
+            {16000, "16000", "16000 Hz", nullptr},
+            {22050, "22050", "22050 Hz", nullptr},
+            {32000, "32000", "32000 Hz", nullptr},
+            {44100, "44100", "44100 Hz", nullptr},
+            {48000, "48000", "48000 Hz", nullptr},
+        },
+        defaults(g_audioDefaults.sampleRate), {}, Scope::UserGlobal,
+        "audio-sample-rate", "Sample rate", "Sets the maximum pitch, quality, and processing load",
+        config_audio_set};
+
+    opt_enum<int> audio_format{this,
+        {
+            {AUDIO_S8, "s8", "s8"},
+            {AUDIO_S8, "pcm_s8"},
+            {AUDIO_U8, "u8", "u8"},
+            {AUDIO_U8, "pcm_u8"},
+            {AUDIO_S16SYS, "s16", "s16"},
+            {AUDIO_S16SYS, "pcm_s16"},
+            {AUDIO_S16LSB, "s16le", "s16le"},
+            {AUDIO_S16LSB, "pcm_s16le"},
+            {AUDIO_S16MSB, "s16be", "s16be"},
+            {AUDIO_S16MSB, "pcm_s16be"},
+            {AUDIO_U16SYS, "u16", "u16"},
+            {AUDIO_U16SYS, "pcm_u16"},
+            {AUDIO_U16LSB, "u16le", "u16le"},
+            {AUDIO_U16LSB, "pcm_u16le"},
+            {AUDIO_U16MSB, "u16be", "u16be"},
+            {AUDIO_U16MSB, "pcm_u16be"},
+            {AUDIO_S32SYS, "s32", "s32"},
+            {AUDIO_S32SYS, "pcm_s32"},
+            {AUDIO_S32LSB, "s32le", "s32le"},
+            {AUDIO_S32LSB, "pcm_s32le"},
+            {AUDIO_S32MSB, "s32be", "s32be"},
+            {AUDIO_S32MSB, "pcm_s32be"},
+            {AUDIO_F32SYS, "float32", "float32"},
+            {AUDIO_F32SYS, "pcm_f32"},
+            {AUDIO_F32LSB, "float32le", "float32le"},
+            {AUDIO_F32LSB, "pcm_f32le"},
+            {AUDIO_F32MSB, "float32be", "float32be"},
+            {AUDIO_F32MSB, "pcm_f32be"},
+        },
+        defaults(g_audioDefaults.format), {}, Scope::UserGlobal,
+        "audio-format", "Audio format", "(Advanced) format of audio passed to sound driver",
+        config_audio_set};
+
+    opt_enum<int> audio_buffer_size{this,
+        {
+            {512, "512", "512"},
+            {768, "768", "768"},
+            {1024, "1024", "1024"},
+            {1536, "1536", "1536"},
+            {2048, "2048", "2048"},
+            {4096, "4096", "4096"},
+        },
+        defaults(g_audioDefaults.bufferSize), {}, Scope::UserGlobal,
+        "audio-buffer-size", "Buffer size", "(Advanced) amount of audio processed at one time -- higher values for fewer pops and more delay",
+        config_audio_set};
+#endif
 
 
     /* ---- Episode options ----*/
@@ -708,7 +711,7 @@ public:
         "fix-player-slope-speed", "Player slope speed", nullptr};
     // 1.3.4
     opt<bool> fix_player_filter_bounce{this, defaults(true), {CompatClass::critical_update, false}, Scope::File,
-        "fix-player-filter-bounce", "Player filter bounce", nullptr};
+        "fix-player-filter-bounce", "Player filter bounce", "Fix a glitch where player could clip downwards"};
     opt<bool> fix_player_clip_wall_at_npc{this, defaults(true), {CompatClass::critical_update, false}, Scope::File,
         "fix-player-clip-wall-at-npc", "Player clip wall at NPC", nullptr};
     opt<bool> fix_player_downward_clip{this, defaults(true), {CompatClass::critical_update, false}, Scope::File,
