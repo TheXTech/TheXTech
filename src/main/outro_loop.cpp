@@ -358,7 +358,7 @@ void SetupCredits()
     AddCredit("MrDoubleA"); // Contribution with the "NPC got frozen" SFX
     AddCredit("Slash-18"); // Contribution with the better iceball shooting SFX
     AddCredit("Eclipsed"); // For the help to verify and polish the speed-run mode
-    AddCredit("ThatRoadRunnerfan727 (Matthew)"); // For Nintendo Switch alpha testing on hardware
+    AddCredit("RunninPigeon"); // For Nintendo Switch alpha testing on hardware (Formerly "ThatRoadRunnerfan727 (Matthew)")
     AddCredit("RMN Community"); // For Quality Episodes that allowed us to refine the Engine
     AddCredit("Savby"); // For important design work on the character select screen (ConnectScreen)
     AddCredit("Otabo"); /* For the "Sarasaland Adventure" projects (both 1 and 2) that was being widely used in

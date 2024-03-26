@@ -54,6 +54,9 @@
 #include <fmt_format_ne.h>
 
 
+//! extra non-gameplay related draws (menus and information display), defined in gfx_update.cpp
+void UpdateGraphicsMeta();
+
 static inline int computeStarsShowingPolicy(int ll, int cur)
 {
     // Disable if not allowed globally
@@ -673,65 +676,14 @@ void UpdateGraphics2(bool skipRepaint)
             }
         }
 
-        XRender::setDrawPlane(PLANE_WLD_META);
         XRender::resetViewport();
-
-        g_worldScreenFader.draw();
-
-        if(PrintFPS > 0 && g_config.show_fps)
-            SuperPrint(std::to_string(int(PrintFPS)), 1, XRender::TargetOverscanX + 8, 8, {0, 255, 0});
-
-        g_stats.print();
-
-        // FIXME: split into own function
-        if(!BattleMode && !GameMenu && g_config.show_episode_title)
-        {
-            // big screen, display at top
-            if(XRender::TargetH >= 640 && g_config.show_episode_title == Config_t::EPISODE_TITLE_TOP)
-            {
-                int y = 20;
-                float alpha = 1.0f;
-                SuperPrintScreenCenter(WorldName, 3, y, XTAlphaF(alpha));
-            }
-            // display at bottom
-            else if(g_config.show_episode_title == Config_t::EPISODE_TITLE_BOTTOM)
-            {
-                int y = XRender::TargetH - 60;
-                float alpha = 0.75f;
-                SuperPrintScreenCenter(WorldName, 3, y, XTAlphaF(alpha));
-            }
-        }
 
         for(int plr_i = 0; plr_i < Screens[0].player_count; plr_i++)
             speedRun_renderControls(Screens[0].players[plr_i], -1, SPEEDRUN_ALIGN_AUTO);
-
-
-        speedRun_renderTimer();
     }
 
-    DrawDeviceBattery();
-
-    XRender::setDrawPlane(PLANE_GAME_MENUS);
-
-    // this code is for both non-editor and editor cases
-    // render special screens
-    if(GamePaused == PauseCode::PauseScreen)
-        PauseScreen::Render();
-
-    if(GamePaused == PauseCode::DropAdd)
-    {
-        ConnectScreen::Render();
-        XRender::renderTexture(int(SharedCursor.X), int(SharedCursor.Y), GFX.ECursor[2]);
-    }
-
-    if(GamePaused == PauseCode::Options)
-    {
-        OptionsScreen::Render();
-        XRender::renderTexture(int(SharedCursor.X), int(SharedCursor.Y), GFX.ECursor[2]);
-    }
-
-    if(GamePaused == PauseCode::TextEntry)
-        TextEntryScreen::Render();
+    // draw on-screen menus and meta-information
+    UpdateGraphicsMeta();
 
     if(!skipRepaint)
         XRender::repaint();

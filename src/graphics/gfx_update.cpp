@@ -45,6 +45,7 @@
 #include "../config.h"
 #include "../game_main.h"
 #include "../main/game_globals.h"
+#include "main/world_globals.h"
 #include "main/level_medals.h"
 #include "../core/render.h"
 #include "../script/luna/luna.h"
@@ -3119,24 +3120,51 @@ void UpdateGraphicsScreen(Screen_t& screen)
 
     XRender::setDrawPlane(PLANE_GAME_META);
 
-    // 1P controls indicator
-    if(screen.Type != 5 && numScreens == 1)
+    // 1P / shared screen controls indicator
+    bool show_controls_one_vscreen = (screen.Type != 5 && numScreens == 1);
+
+    // fix missing controls info when the vScreen didn't get rendered at all
+    bool show_controls_no_vscreen = (screen.Type == 5 && numScreens == 1 && screen.vScreen(1).Width == 0);
+
+    if(show_controls_one_vscreen || show_controls_no_vscreen)
     {
         for(int plr_i = 0; plr_i < screen.player_count; plr_i++)
             speedRun_renderControls(screen.players[plr_i], -1, SPEEDRUN_ALIGN_AUTO);
-    }
-
-    // fix missing controls info when the vScreen didn't get rendered at all
-    if(screen.Type == 5 && numScreens == 1 && screen.vScreen(1).Width == 0)
-    {
-        speedRun_renderControls(screen.players[0], -1);
-        speedRun_renderControls(screen.players[1], -1);
     }
 }
 
 void UpdateGraphicsMeta()
 {
     XRender::resetViewport();
+
+    XRender::setDrawPlane(PLANE_GAME_META);
+
+    speedRun_renderTimer();
+
+    if(PrintFPS > 0 && g_config.show_fps)
+        SuperPrint(fmt::format_ne("{0}", int(PrintFPS)), 1, XRender::TargetOverscanX + 8, 8, {0, 255, 0});
+
+    g_stats.print();
+
+    if(!BattleMode && !GameMenu && !GameOutro && !LevelEditor && g_config.show_episode_title)
+    {
+        // big screen, display at top
+        if(XRender::TargetH >= 640 && g_config.show_episode_title == Config_t::EPISODE_TITLE_TOP)
+        {
+            int y = 20;
+            float alpha = 1.0f;
+            SuperPrintScreenCenter(WorldName, 3, y, XTAlphaF(alpha));
+        }
+        // display at bottom
+        else if(g_config.show_episode_title == Config_t::EPISODE_TITLE_BOTTOM)
+        {
+            int y = XRender::TargetH - 60;
+            float alpha = 0.75f;
+            SuperPrintScreenCenter(WorldName, 3, y, XTAlphaF(alpha));
+        }
+    }
+
+    DrawDeviceBattery();
 
     XRender::setDrawPlane(PLANE_GAME_MENUS);
 
@@ -3176,41 +3204,17 @@ void UpdateGraphicsMeta()
     if(GamePaused == PauseCode::TextEntry)
         TextEntryScreen::Render();
 
-    XRender::setDrawPlane(PLANE_GAME_META);
-
-    speedRun_renderTimer();
-
-    if(PrintFPS > 0 && g_config.show_fps)
-        SuperPrint(fmt::format_ne("{0}", int(PrintFPS)), 1, XRender::TargetOverscanX + 8, 8, {0, 255, 0});
-
-    g_stats.print();
-
-    if(!BattleMode && !GameMenu && !GameOutro && g_config.show_episode_title)
-    {
-        // big screen, display at top
-        if(XRender::TargetH >= 640 && g_config.show_episode_title == Config_t::EPISODE_TITLE_TOP)
-        {
-            int y = 20;
-            float alpha = 1.0f;
-            SuperPrintScreenCenter(WorldName, 3, y, XTAlphaF(alpha));
-        }
-        // display at bottom
-        else if(g_config.show_episode_title == Config_t::EPISODE_TITLE_BOTTOM)
-        {
-            int y = XRender::TargetH - 60;
-            float alpha = 0.75f;
-            SuperPrintScreenCenter(WorldName, 3, y, XTAlphaF(alpha));
-        }
-    }
-
-    DrawDeviceBattery();
-
     // Draw screen fader below level menu when game is paused
     // This makes sure that the level test menu is drawn above the screen fader during level tests
     if(GamePaused != PauseCode::None)
         XRender::setDrawPlane(PLANE_GAME_MENUS - 1);
+    else
+        XRender::setDrawPlane(PLANE_GAME_FADER);
 
-    g_levelScreenFader.draw();
+    if(LevelSelect && !GameMenu && !GameOutro)
+        g_worldScreenFader.draw();
+    else
+        g_levelScreenFader.draw();
 
     XRender::offsetViewportIgnore(false);
 }

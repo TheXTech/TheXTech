@@ -95,7 +95,7 @@ void speedRun_renderTimer()
             SuperPrintRightAlign(fmt::format_ne("{0}x{1}", l_screen->W, l_screen->H), 3, XRender::TargetW - XRender::TargetOverscanX - 2, 22, XTColorF(1.f, 0.3f, 0.3f, 0.5f));
     }
 
-    if(GameMenu || GameOutro || BattleMode)
+    if(GameMenu || GameOutro || BattleMode || LevelEditor)
         return; // Don't draw things at Menu and Outro
 
     s_gamePlayTimer.render();

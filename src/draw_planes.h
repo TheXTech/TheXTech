@@ -68,10 +68,11 @@ enum PLANE
     PLANE_WLD_FRAME      = 0x98, // world map frame, drawn below HUD
     PLANE_WLD_3D_POS1    = 0xA0, // start of +1 plane on 3DS (world)
     PLANE_WLD_HUD        = 0xA0, // world map HUD (player preview, level title, etc)
-    PLANE_WLD_META       = 0xA8, // information drawn above the HUD but still in the screen (includes world screen fader)
+    PLANE_WLD_META       = 0xA8, // information drawn above the HUD but still in the screen (currently unused)
 
-    PLANE_GAME_MENUS     = 0xD0, // game menus drawn above the level / world graphics (including main menu, pause menu, message box, etc)
-    PLANE_GAME_META      = 0xD8, // information drawn above the game menus (including game screen fader)
+    PLANE_GAME_META      = 0xC8, // information drawn above the game but below menus
+    PLANE_GAME_MENUS     = 0xD0, // game menus drawn above everything (including main menu, pause menu, message box, etc)
+    PLANE_GAME_FADER     = 0xD8, // game screen fader
     PLANE_INTERNAL_FG    = 0xF0, // reserved for engine-internal purposes
 };
 

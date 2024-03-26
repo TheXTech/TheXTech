@@ -482,7 +482,20 @@ void mapFromScreen(int scr_x, int scr_y, int *window_x, int *window_y)
     *window_y = (scr_y * g_screen_phys_h / XRender::TargetH) + g_screen_phys_y;
 }
 
-void minport_TransformPhysCoords() {}
+void minport_TransformPhysCoords()
+{
+    if(g_screen_phys_x < 0)
+    {
+        g_screen_phys_x = 0;
+        g_screen_phys_w = 256;
+    }
+
+    if(g_screen_phys_y < 0)
+    {
+        g_screen_phys_y = 0;
+        g_screen_phys_h = 192;
+    }
+}
 
 void minport_ApplyPhysCoords()
 {
