@@ -3146,7 +3146,7 @@ void UpdateGraphicsMeta()
 
     g_stats.print();
 
-    if(!BattleMode && !GameMenu && !GameOutro && g_config.show_episode_title)
+    if(!BattleMode && !GameMenu && !GameOutro && !LevelEditor && g_config.show_episode_title)
     {
         // big screen, display at top
         if(XRender::TargetH >= 640 && g_config.show_episode_title == Config_t::EPISODE_TITLE_TOP)

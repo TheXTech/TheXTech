@@ -90,7 +90,7 @@ void speedRun_renderTimer()
     if(g_speedRunnerMode == SPEEDRUN_MODE_OFF)
         return; // Do nothing
 
-    if(GameMenu || GameOutro || BattleMode)
+    if(GameMenu || GameOutro || BattleMode || LevelEditor)
         return; // Don't draw things at Menu and Outro
 
     s_gamePlayTimer.render();
