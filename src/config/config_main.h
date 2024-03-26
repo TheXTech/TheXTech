@@ -542,32 +542,49 @@ public:
         {
             {AUDIO_S8, "s8", "s8"},
             {AUDIO_S8, "pcm_s8"},
+
             {AUDIO_U8, "u8", "u8"},
             {AUDIO_U8, "pcm_u8"},
+
             {AUDIO_S16SYS, "s16", "s16"},
             {AUDIO_S16SYS, "pcm_s16"},
+#       if AUDIO_S16LSB != AUDIO_S16SYS
             {AUDIO_S16LSB, "s16le", "s16le"},
             {AUDIO_S16LSB, "pcm_s16le"},
+#       else
             {AUDIO_S16MSB, "s16be", "s16be"},
             {AUDIO_S16MSB, "pcm_s16be"},
+#       endif
+
             {AUDIO_U16SYS, "u16", "u16"},
             {AUDIO_U16SYS, "pcm_u16"},
+#       if AUDIO_U16LSB != AUDIO_U16SYS
             {AUDIO_U16LSB, "u16le", "u16le"},
             {AUDIO_U16LSB, "pcm_u16le"},
+#       else
             {AUDIO_U16MSB, "u16be", "u16be"},
             {AUDIO_U16MSB, "pcm_u16be"},
+#       endif
+
             {AUDIO_S32SYS, "s32", "s32"},
             {AUDIO_S32SYS, "pcm_s32"},
+#       if AUDIO_S32LSB != AUDIO_S32SYS
             {AUDIO_S32LSB, "s32le", "s32le"},
             {AUDIO_S32LSB, "pcm_s32le"},
+#       else
             {AUDIO_S32MSB, "s32be", "s32be"},
             {AUDIO_S32MSB, "pcm_s32be"},
+#       endif
+
             {AUDIO_F32SYS, "float32", "float32"},
             {AUDIO_F32SYS, "pcm_f32"},
+#       if AUDIO_F32LSB != AUDIO_F32SYS
             {AUDIO_F32LSB, "float32le", "float32le"},
             {AUDIO_F32LSB, "pcm_f32le"},
+#       else
             {AUDIO_F32MSB, "float32be", "float32be"},
             {AUDIO_F32MSB, "pcm_f32be"},
+#       endif
         },
         defaults(g_audioDefaults.format), {}, Scope::UserGlobal,
         "audio-format", "Audio format", "(Advanced) format of audio passed to sound driver",
