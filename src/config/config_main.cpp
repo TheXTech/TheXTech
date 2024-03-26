@@ -331,7 +331,7 @@ void UpdateConfig()
             g_config.compatibility_mode = Config_t::COMPAT_MODERN;
         else
             g_config.compatibility_mode = g_config.speedrun_mode - 1;
-        g_config.enable_playtime_counter = true;
+        g_config.enable_playtime_tracking = true;
     }
 
     if(g_config.compatibility_mode)

@@ -112,8 +112,8 @@ void Config_t::LoadLegacyCompat(IniProcessing* ini, ConfigSetLevel level)
         bool val;
         ini->read("enabled", val, false);
 
-        enable_fails_counter = val;
-        enable_fails_counter.m_set = level;
+        enable_fails_tracking = val;
+        enable_fails_tracking.m_set = level;
 
         show_fails_counter = val;
         show_fails_counter.m_set = level;

@@ -197,7 +197,7 @@ bool DeathCounter::TryLoadStats()
 // mark that a death occurred in the current level
 void DeathCounter::MarkDeath(bool write_save)
 {
-    bool dcAllow = (gEnableDemoCounterByLC || g_config.enable_fails_counter);
+    bool dcAllow = (gEnableDemoCounterByLC || g_config.enable_fails_tracking);
 
     if(!dcAllow)
         return;

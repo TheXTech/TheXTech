@@ -216,7 +216,7 @@ void Input::CheckSpecialCheats()
         return;
     }
 
-    if(g_config.enable_fails_counter)
+    if(g_config.enable_fails_tracking)
     {
         if(cheats_contains(TOGGLE_DEMO_COUNTER_CHT))
         {

@@ -80,7 +80,7 @@ void lunaLoad()
     lunaReset();
 
     bool isGame = !GameMenu && !GameOutro && !BattleMode && !LevelEditor && !TestLevel;
-    bool dcAllow = g_config.enable_fails_counter;
+    bool dcAllow = g_config.enable_fails_tracking;
 
     if(dcAllow && isGame)
     {
@@ -141,7 +141,7 @@ void lunaLoop()
 
 void lunaRenderHud(int screenZ)
 {
-    bool dcAllow = g_config.enable_fails_counter || gEnableDemoCounterByLC;
+    bool dcAllow = g_config.enable_fails_tracking || gEnableDemoCounterByLC;
     if(dcAllow && g_config.show_fails_counter && ShowOnScreenHUD)
         gDeathCounter.Draw(screenZ);
 }

@@ -140,7 +140,7 @@ void GameInfo::LoadGameInfo()
         {
             bool val;
             config.read("enabled", val, false);
-            enable_fails_counter = val;
+            enable_fails_tracking = val;
             show_fails_counter = val;
         }
         if(config.hasKey("title"))

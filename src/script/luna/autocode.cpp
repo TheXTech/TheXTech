@@ -1496,7 +1496,7 @@ void Autocode::LunaControl(LunaControlAct act, int val)
             g_config.show_fails_counter = (val == 1);
         }
 
-        if(g_config.show_fails_counter && !g_config.enable_fails_counter && !gEnableDemoCounterByLC) // Initialize the demos counter if wasn't enabled before
+        if(g_config.show_fails_counter && !g_config.enable_fails_tracking && !gEnableDemoCounterByLC) // Initialize the demos counter if wasn't enabled before
         {
             if(!GameMenu && !GameOutro && !BattleMode && !LevelEditor && !TestLevel)
             {

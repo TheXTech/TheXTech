@@ -35,7 +35,7 @@ static      GameplayTimer s_gamePlayTimer;
 
 void speedRun_loadStats()
 {
-    if(!g_config.enable_playtime_counter)
+    if(!g_config.enable_playtime_tracking)
         return; // Do nothing
 
     s_gamePlayTimer.load();
@@ -43,7 +43,7 @@ void speedRun_loadStats()
 
 void speedRun_saveStats()
 {
-    if(!g_config.enable_playtime_counter)
+    if(!g_config.enable_playtime_tracking)
         return; // Do nothing
     if(GameMenu || GameOutro || BattleMode)
         return; // Do nothing when out of the game
@@ -53,7 +53,7 @@ void speedRun_saveStats()
 
 void speedRun_resetCurrent()
 {
-    if(!g_config.enable_playtime_counter)
+    if(!g_config.enable_playtime_tracking)
         return; // Do nothing
 
     s_gamePlayTimer.resetCurrent();
@@ -61,7 +61,7 @@ void speedRun_resetCurrent()
 
 void speedRun_resetTotal()
 {
-    if(!g_config.enable_playtime_counter)
+    if(!g_config.enable_playtime_tracking)
         return; // Do nothing
 
     s_gamePlayTimer.reset();
@@ -84,7 +84,7 @@ static Controls_t s_displayControls[maxLocalPlayers] = {Controls_t()};
 
 void speedRun_renderTimer()
 {
-    if((g_config.speedrun_mode == SPEEDRUN_MODE_OFF && g_config.show_playtime_counter == Config_t::PLAYTIME_COUNTER_OFF) || !g_config.enable_playtime_counter)
+    if((g_config.speedrun_mode == SPEEDRUN_MODE_OFF && g_config.show_playtime_counter == Config_t::PLAYTIME_COUNTER_OFF) || !g_config.enable_playtime_tracking)
         return; // Do nothing
 
     if(g_config.speedrun_mode != SPEEDRUN_MODE_OFF)
@@ -486,7 +486,7 @@ void speedRun_renderControls(int player, int screenZ, int align)
 
 void speedRun_tick()
 {
-    if(!g_config.enable_playtime_counter)
+    if(!g_config.enable_playtime_tracking)
         return; // Do nothing
 
     s_gamePlayTimer.tick();
@@ -494,7 +494,7 @@ void speedRun_tick()
 
 void speedRun_triggerEnter()
 {
-    if(!g_config.enable_playtime_counter)
+    if(!g_config.enable_playtime_tracking)
         return; // Do nothing
 
     if(g_config.speedrun_stop_timer_by != Config_t::SPEEDRUN_STOP_ENTER_LEVEL)
@@ -506,7 +506,7 @@ void speedRun_triggerEnter()
 
 void speedRun_triggerLeave()
 {
-    if(!g_config.enable_playtime_counter)
+    if(!g_config.enable_playtime_tracking)
         return; // Do nothing
 
     if(g_config.speedrun_stop_timer_by != Config_t::SPEEDRUN_STOP_LEAVE_LEVEL)
@@ -519,7 +519,7 @@ void speedRun_triggerLeave()
 
 void speedRun_bossDeadEvent()
 {
-    if(!g_config.enable_playtime_counter)
+    if(!g_config.enable_playtime_tracking)
         return; // Do nothing
 
     if(GameMenu || GameOutro || BattleMode)

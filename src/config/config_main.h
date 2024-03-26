@@ -698,10 +698,10 @@ public:
     opt<bool> extra_screen_shake{this, defaults(true), {CompatClass::standard_update, false}, Scope::Local,
         "extra-screen-shake", "Extra screen shake", "Shake screen for large enemy and player ground pounds"};
 
-    opt<bool> enable_playtime_counter{this, defaults(true), {CompatClass::pure_preference, false}, Scope::File,
-        "enable-playtime-counter", "Enable playtime counter", "Track the amount of time spent playing an episode"};
-    opt<bool> enable_fails_counter{this, defaults(true), {}, Scope::File,
-        "enable-fails-counter", "Enable fails counter", "Count the number of fails on the current level and world"};
+    opt<bool> enable_playtime_tracking{this, defaults(true), {CompatClass::pure_preference, false}, Scope::File,
+        "enable-playtime-tracking", "Playtime tracking", "Record the amount of time spent playing an episode"};
+    opt<bool> enable_fails_tracking{this, defaults(true), {CompatClass::pure_preference, false}, Scope::File,
+        "enable-fails-tracking", "Fails tracking", "Record the number of fails on the current level and world"};
 
     opt<bool> world_map_fast_move{this, defaults(true), {CompatClass::standard_update, false}, Scope::Local,
         "world-map-fast-move", "Automatic movement", "Moves automatically between forks on the path"};
