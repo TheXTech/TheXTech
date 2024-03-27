@@ -24,7 +24,7 @@ body:
 
         **Note:** The development team can classify this issue in a different way depending on the result of the analysis.
       options:
-        - \[Not specified\]
+        - [Not specified]
         - Native bug (bug of TheXTech itself)
         - Vanilla bug (bug of original SMBX)
         - Compatibility bug
@@ -53,6 +53,7 @@ body:
       label: Platform
       description: What the platform where you run the game?
       options:
+        - [Not specified]
         - Linux
         - Windows
         - macOS
@@ -75,6 +76,7 @@ body:
       label: Processor architecture
       description: Which architecture your processor where you ran the game have?
       options:
+        - [Not specified]
         - x86_64 / x64 (64-bit x86)
         - i386 / x86_32 (32-bit x86)
         - ARM64 / AARCH64 (64-bit ARM)
