@@ -5,6 +5,7 @@ projects: ["TheXTech/1"]
 
 body:
   - type: textarea
+    id: description
     attributes:
       label: Describe the issue
       description: A clear and concise description of what the bug.
@@ -12,7 +13,7 @@ body:
       required: true
 
   - type: dropdown
-    id: os
+    id: bug_type
     attributes:
       label: A type of bug
       description: |
@@ -89,6 +90,7 @@ body:
       required: true
 
   - type: textarea
+    id: log_file
     attributes:
       label: Log file (if presented)
       description: |
@@ -97,6 +99,7 @@ body:
       required: false
 
   - type: textarea
+    id: example_case
     attributes:
       label: Example Case
       description: |
@@ -107,6 +110,7 @@ body:
       required: false
 
   - type: textarea
+    id: recording
     attributes:
       label: Recording
       description: Embed or add a link to a Recording here. If it's an in-game issue, you can use TheXTech's built-in GIF Recorder (Press F11 or F10 on macOS). If it's a crash, use a Screen Capture program such as OBS or vokoscreen.
@@ -114,6 +118,7 @@ body:
       required: false
 
   - type: textarea
+    id: vanilla_recording
     attributes:
       label: Vanilla Recording
       description: Not required, but if you can run SMBX 1.3 (or [use our Research Version](https://github.com/Wohlstand/smbx-experiments/releases) that will work better on Linux under Wine because of the improved audio engine), it would be appreciated if you made a recording of whether the bug occurs here as well.
@@ -121,6 +126,7 @@ body:
       required: false
 
   - type: textarea
+    id: misc_info
     attributes:
       label: Additional context
       description: Add any other context that could be useful for solving the problem here. If your problem is tied to your Operating System, add it at the beginning of the Title ("[Windows] Windows Issue").
