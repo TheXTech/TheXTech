@@ -1,0 +1,132 @@
+name: Build/Compilation failure report
+description: Create a report of the problems to compile the game from the source code
+labels: ["NEW-BUG"]
+projects: ["TheXTech/1"]
+
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: Describe the issue
+      description: A clear and concise description of what the bug.
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: What version of TheXtech you are using? Do you trying to build the stable version or the latest state of the GIT?
+    validations:
+      required: true
+
+  - type: input
+    id: version_hash
+    attributes:
+      label: Version Hash
+      description: If you build the game from the source source code clonned from the GIT, retrieve the hash of the commit where your current state is.
+    validations:
+      required: false
+
+  - type: dropdown
+    id: os_host
+    attributes:
+      label: Build platform
+      description: What the platform where you build the game?
+      options:
+        - [Not specified]
+        - Linux
+        - Windows
+        - macOS
+        - Android
+        - Haiku
+        - xBSD
+        - Other (tell in the bug description)
+    validations:
+      required: true
+
+  - type: dropdown
+    id: os_target
+    attributes:
+      label: Target platform
+      description: For which platform you trying to build the game?
+      options:
+        - [Not specified]
+        - Linux
+        - Windows
+        - macOS
+        - Android
+        - Haiku
+        - xBSD
+        - Web-browser (Emscripten)
+        - 3DS
+        - Wii
+        - Wii U
+        - Switch
+        - PS Vita
+        - Other (tell in the bug description)
+    validations:
+      required: true
+
+  - type: dropdown
+    id: cpu
+    attributes:
+      label: Target processor architecture
+      description: Which target architecture for which you attempted to build the game?
+      options:
+        - [Not specified]
+        - x86_64 / x64 (64-bit x86)
+        - i386 / x86_32 (32-bit x86)
+        - ARM64 / AARCH64 (64-bit ARM)
+        - ARM32 / ARMv7 (32-bit ARM)
+        - PPC64LE (64-bit Power PC with Little-Endian)
+        - PPC64 (64-bit Power PC with Big-Endian)
+        - PPC32 (32-bit Power PC with Big-Endian)
+        - MIPS64 (32-bit MIPS)
+        - MIPS32 (64-bit MIPS)
+        - RISC-V
+        - Other (tell in the bug description)
+    validations:
+      required: true
+
+  - type: dropdown
+    id: compiler
+    attributes:
+      label: Compiler name
+      description: What the compiler you used to build the game?
+      options:
+        - [Not specified]
+        - GCC
+        - Clang
+        - MSVC
+        - Intel-CC
+        - ARM-CC
+        - Other (tell in the bug description)
+    validations:
+      required: true
+
+  - type: textarea
+    id: build_log
+    attributes:
+      label: Build log
+      description: |
+        Please save your full build output log into a text file and upload it here.
+    validations:
+      required: false
+
+  - type: textarea
+    id: build_commands
+    attributes:
+      label: What commands you typed in the terminal or what you did in your IDE?
+      description: |
+        Explain step-by-step what you did before you got an error.
+    validations:
+      required: false
+
+  - type: textarea
+    id: misc_info
+    attributes:
+      label: Additional context
+      description: Add any other context that could be useful for solving the problem here. If your problem is tied to your Operating System, add it at the beginning of the Title ("[Windows] Windows Issue").
+    validations:
+      required: false

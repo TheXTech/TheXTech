@@ -1,5 +1,5 @@
 name: Bug Report
-description: Create a report to help us improve
+description: Create a report of the issue ocurred with the game during its use
 labels: ["NEW-BUG"]
 projects: ["TheXTech/1"]
 
@@ -87,6 +87,7 @@ body:
         - MIPS64 (32-bit MIPS)
         - MIPS32 (64-bit MIPS)
         - RISC-V
+        - WebAssembly (Emscripten)
         - Other (tell in the bug description)
     validations:
       required: true
