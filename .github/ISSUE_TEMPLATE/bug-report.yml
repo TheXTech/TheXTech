@@ -25,8 +25,8 @@ body:
         **Note:** The development team can classify this issue in a different way depending on the result of the analysis.
       options:
         - [Not specified]
-        - Native bug (bug of TheXTech itself)
-        - Vanilla bug (bug of original SMBX)
+        - Native bug
+        - Vanilla bug
         - Compatibility bug
     validations:
       required: true
