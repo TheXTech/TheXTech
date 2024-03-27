@@ -49,17 +49,18 @@ std::string AppPathManager::m_assetPackPostfix;
 bool AppPathManager::m_isPortable = false;
 
 bool AppPathP::ignoreLegacyDebugDir = false;
+std::string AppPathP::legacyUserDirPostfix;
 
 
 #if defined(USER_DIR_NAME)
 #   define UserDirName "/" USER_DIR_NAME
-#elif defined(__ANDROID__) || defined(__APPLE__) || defined(__HAIKU__)
+#elif defined(__ANDROID__) || defined(__HAIKU__)
 #   define UserDirName "/PGE Project/thextech/"
 #elif defined(__3DS__)
 #   define UserDirName "/3ds/thextech/"
 #elif defined(__WII__)
 #   define UserDirName "/thextech/"
-#elif defined(_WIN32)
+#elif defined(_WIN32) || defined(__APPLE__)
 #   define UserDirName "/TheXTech/"
 #else
 #   define UserDirName "/thextech/"
@@ -164,8 +165,8 @@ std::vector<std::string> AppPathManager::assetsSearchPath()
 
     if(!m_isPortable)
     {
-#ifdef FIXED_ASSETS_PATH // Fixed assets path, for the rest of UNIX-like OS packages
-        out.push_back(FIXED_ASSETS_PATH);
+#ifdef INSTALLED_ASSETS_PATH // Installed assets path, for the rest of UNIX-like OS packages
+        out.push_back(INSTALLED_ASSETS_PATH);
 #endif
 
         if(m_customUserDirectory.empty())
@@ -199,7 +200,7 @@ void AppPathManager::setCurrentAssetPack(const std::string &id, const std::strin
     m_currentAssetPackPath = path;
     appendSlash(m_currentAssetPackPath);
 
-    if(!id.empty())
+    if(!id.empty() && id != AppPathP::legacyUserDirPostfix)
         m_assetPackPostfix = id + "/";
     else
         m_assetPackPostfix = "";
