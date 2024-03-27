@@ -76,7 +76,7 @@ body:
       label: Processor architecture
       description: Which architecture your processor where you ran the game have?
       options:
-        - [Not specified]
+        - [Not specified / I don't know]
         - x86_64 / x64 (64-bit x86)
         - i386 / x86_32 (32-bit x86)
         - ARM64 / AARCH64 (64-bit ARM)
@@ -90,7 +90,7 @@ body:
         - WebAssembly (Emscripten)
         - Other (tell in the bug description)
     validations:
-      required: true
+      required: false
 
   - type: textarea
     id: log_file
