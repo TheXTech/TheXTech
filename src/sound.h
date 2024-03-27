@@ -44,14 +44,14 @@ extern const struct AudioDefaults_t
     uint16_t format;
 } g_audioDefaults;
 
-extern struct AudioSetup_t
+struct AudioSetup_t
 {
     bool disableSound = false;
     int sampleRate = 44100;
     int channels = 2;
     int bufferSize = 512;
     uint16_t format = 0x8120;
-} g_audioSetup;
+};
 
 
 enum
@@ -170,6 +170,8 @@ void InitSoundDefaults();
 
 // Public Sub InitMixerX()
 void InitMixerX();
+// Public Sub RestartMixerX()
+void RestartMixerX();
 // Public Sub QuitMixerX()
 void QuitMixerX();
 // Public Sub SetMusicVolume(Alias As String, Volume As Long)

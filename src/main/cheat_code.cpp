@@ -45,7 +45,6 @@
 #include "game_main.h"
 #include "change_res.h"
 #include "config.h"
-#include "compat.h"
 #include "frm_main.h"
 
 #include "core/render.h"
@@ -66,6 +65,7 @@
 
 bool g_ForceBitmaskMerge = false;
 bool g_CheatLogicScreen = false;
+int g_CheatEditYourFriends = 0;
 
 static void redigitIsCool()
 {
@@ -132,7 +132,7 @@ static void dieCheater()
         StopMusic();
         XEvents::doEvents();
 
-        if(!MaxFPS)
+        if(!g_config.unlimited_framerate)
             PGE_Delay(500);
     }
 }
@@ -1250,8 +1250,8 @@ static void fourSplit()
 {
     fourShared();
 
-    // more than 2 vScreens requires modern camera logic
-    if(g_compatibility.modern_npc_camera_logic)
+    // more than 2 vScreens requires fixed camera logic
+    if(g_config.fix_npc_camera_logic)
     {
         Screens[0].multiplayer_pref = MultiplayerPrefs::Split;
         SetupScreens();
@@ -1833,14 +1833,24 @@ static void ahippinAndAHopping()
 
 static void frameRate()
 {
-    ShowFPS = !ShowFPS;
-    PlaySound(ShowFPS ? SFX_PlayerGrow : SFX_PlayerShrink);
+    ConfigChangeSentinel sent(ConfigSetLevel::cheat);
+
+    g_config.show_fps = !g_config.show_fps;
+    PlaySound(g_config.show_fps ? SFX_PlayerGrow : SFX_PlayerShrink);
 }
 
 static void speedDemon()
 {
-    MaxFPS = !MaxFPS;
-    PlaySound(MaxFPS ? SFX_PlayerGrow : SFX_PlayerShrink);
+    ConfigChangeSentinel sent(ConfigSetLevel::cheat);
+
+    g_config.unlimited_framerate = !g_config.unlimited_framerate;
+    PlaySound(g_config.unlimited_framerate ? SFX_PlayerGrow : SFX_PlayerShrink);
+
+    if(g_config.compatibility_mode != Config_t::COMPAT_OFF)
+    {
+        pLogDebug("Marking Cheater by unlimited framerate cheat code");
+        Cheater = true;
+    }
 }
 
 static void gifs2png()
@@ -1856,11 +1866,22 @@ static void logicScreen()
     g_CheatLogicScreen = !g_CheatLogicScreen;
 }
 
+static void editYourFriends()
+{
+    g_CheatEditYourFriends = 2;
+    PauseGame(PauseCode::Options);
+}
+
 static void newLeaf()
 {
+    if(g_config.show_fps.m_set == ConfigSetLevel::cheat || g_config.unlimited_framerate.m_set == ConfigSetLevel::cheat)
+    {
+        g_config.show_fps.unset();
+        g_config.unlimited_framerate.unset();
+        UpdateConfig();
+    }
+
     GodMode = false;
-    MaxFPS = false;
-    ShowFPS = false;
     MultiHop = false;
     SuperSpeed = false;
     FlyForever = false;
@@ -2012,10 +2033,9 @@ static void itsVegas()
 
 static void setRes(int w, int h)
 {
-    g_config.InternalW = w;
-    g_config.InternalH = h;
-    UpdateWindowRes();
-    UpdateInternalRes();
+    ConfigChangeSentinel sent(ConfigSetLevel::cheat);
+
+    g_config.internal_res = {w, h};
 }
 
 static void setResGb()
@@ -2134,6 +2154,9 @@ static const CheatCodeDefault_t s_cheatsListGlobalDefault[] =
     // cheat to show the logical screens
     {"logicscreen", logicScreen, false},
 
+    // cheat to allow editing any setting
+    {"edityourfriends", editYourFriends, false},
+
     // resolution cheats
     {"gameboyview", setResGb, false},
     {"tinyview", setResGba, false},
@@ -2245,8 +2268,8 @@ static const CheatCodeDefault_t s_cheatsListLevelDefault[] =
     {"tooslow", tooSlow, true},
     {"ahippinandahoppin", ahippinAndAHopping, true}, {"jumpman", ahippinAndAHopping, true},
     {"framerate", frameRate, false},
-    {"speeddemon", speedDemon, true},
-
+    {"speeddemon", speedDemon, false},
+    
     {"getmeouttahere", getMeOuttaHere, true},
     {"newleaf", newLeaf, true},
 

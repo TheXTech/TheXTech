@@ -34,13 +34,7 @@ enum
     SPEEDRUN_MODE_3
 };
 
-extern int  g_speedRunnerMode;
-extern bool g_drawController;
-
 void speedRun_tick();
-
-void speedRun_setSemitransparentRender(bool r);
-void speedRun_setBlinkEffect(int be);
 
 void speedRun_syncControlKeys(int plr, const Controls_t &keys);
 

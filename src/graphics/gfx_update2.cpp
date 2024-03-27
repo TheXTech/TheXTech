@@ -28,13 +28,13 @@
 #include "../graphics.h"
 #include "../collision.h"
 #include "../player.h"
-#include "../compat.h"
 #include "../config.h"
 #include "../sound.h"
 #include "../main/speedrunner.h"
 #include "../main/trees.h"
 #include "../main/screen_pause.h"
 #include "../main/screen_connect.h"
+#include "../main/screen_options.h"
 #include "../main/screen_quickreconnect.h"
 #include "../main/screen_textentry.h"
 #include "../game_main.h"
@@ -59,36 +59,32 @@ void UpdateGraphicsMeta();
 
 static inline int computeStarsShowingPolicy(int ll, int cur)
 {
+    // Disable if not allowed globally
+    if(!g_config.world_map_stars_show)
+        return Config_t::MAP_STARS_HIDE;
+
     // Level individual
-    if(ll > Compatibility_t::STARS_UNSPECIFIED)
+    if(ll > Config_t::MAP_STARS_UNSPECIFIED)
     {
-        if(ll == Compatibility_t::STARS_SHOW_COLLECTED_ONLY && cur <= 0)
-            return Compatibility_t::STARS_DONT_SHOW;
+        if(ll == Config_t::MAP_STARS_COLLECTED && cur <= 0)
+            return Config_t::MAP_STARS_HIDE;
         return ll;
     }
 
     // World map-wide
-    if(WorldStarsShowPolicy > Compatibility_t::STARS_UNSPECIFIED)
+    // (IMPORTANT NOTE: "hide" is now ignored as a map-wide setting, since the user has responsibility for setting this)
+    if(WorldStarsShowPolicy > Config_t::MAP_STARS_HIDE)
     {
-        if(WorldStarsShowPolicy == Compatibility_t::STARS_SHOW_COLLECTED_ONLY && cur <= 0)
-            return Compatibility_t::STARS_DONT_SHOW;
+        if(WorldStarsShowPolicy == Config_t::MAP_STARS_COLLECTED && cur <= 0)
+            return Config_t::MAP_STARS_HIDE;
         return WorldStarsShowPolicy;
     }
 
-    // Compatibility settings
-    if(g_compatibility.world_map_stars_show_policy > Compatibility_t::STARS_UNSPECIFIED)
-    {
-        if(g_compatibility.world_map_stars_show_policy == Compatibility_t::STARS_SHOW_COLLECTED_ONLY && cur <= 0)
-            return Compatibility_t::STARS_DONT_SHOW;
+    // Default behavior if not disabled is collected only
+    if(cur <= 0)
+        return Config_t::MAP_STARS_HIDE;
 
-        return g_compatibility.world_map_stars_show_policy;
-    }
-
-    // Gameplay settings
-    if(g_config.WorldMapStarShowPolicyGlobal == Compatibility_t::STARS_SHOW_COLLECTED_ONLY && cur <= 0)
-        return Compatibility_t::STARS_DONT_SHOW;
-
-    return g_config.WorldMapStarShowPolicyGlobal;
+    return Config_t::MAP_STARS_COLLECTED;
 }
 
 
@@ -105,7 +101,7 @@ void UpdateGraphics2(bool skipRepaint)
 
     cycleNextInc();
 
-    if(FrameSkip && frameSkipNeeded())
+    if(g_config.enable_frameskip && frameSkipNeeded())
         return;
 
     XRender::setTargetTexture();
@@ -557,11 +553,11 @@ void UpdateGraphics2(bool skipRepaint)
             int p_center_x = camX + WorldPlayer[1].Location.X + (WorldPlayer[1].Location.Width / 2);
             int info_y = camY + WorldPlayer[1].Location.Y - 32;
 
-            if(l.save_info.inited() && l.save_info.max_stars > 0 && policy > Compatibility_t::STARS_DONT_SHOW)
+            if(l.save_info.inited() && l.save_info.max_stars > 0 && policy > Config_t::MAP_STARS_HIDE)
             {
                 std::string label;
 
-                if(policy >= Compatibility_t::STARS_SHOW_COLLECTED_AND_AVAILABLE)
+                if(policy >= Config_t::MAP_STARS_SHOW)
                     label = fmt::format_ne("{0}/{1}", l.curStars, l.save_info.max_stars);
                 else
                     label = fmt::format_ne("{0}", l.curStars);
@@ -667,7 +663,7 @@ void UpdateGraphics2(bool skipRepaint)
                 cache_LevelName_H = FontManager::optimizeTextPx(cache_LevelName_Split, max_width, font).h();
             }
 
-            if(g_compatibility.world_map_lvlname_marquee || cache_LevelName_H > vScreen[Z].ScreenTop - 21 - 8)
+            if(g_config.world_map_lvlname_marquee || cache_LevelName_H > vScreen[Z].ScreenTop - 21 - 8)
             {
                 SuperPrintMarquee(WorldLevel[WorldPlayer[1].LevelIndex].LevelName, 2, lnlx, vScreen[Z].ScreenTop - 21, marquee_spec, marquee_state);
                 marquee_state.advance(marquee_spec);

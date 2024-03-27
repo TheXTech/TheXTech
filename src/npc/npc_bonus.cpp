@@ -29,7 +29,6 @@
 #include "../player.h"
 #include "../game_main.h"
 #include "../core/events.h"
-#include "../compat.h"
 #include "../config.h"
 #include "../layers.h"
 
@@ -50,21 +49,12 @@
 
 static bool doPlayGrowWithGotItem()
 {
-    switch(g_compatibility.sfx_player_grow_with_got_item)
-    {
-    default:
-    case Compatibility_t::SPGWGI_UNSPECIFIED:
-        return g_config.SoundPlayerGrowWithGetItem;
-    case Compatibility_t::SPGWGI_ENABLE:
-        return true;
-    case Compatibility_t::SPGWGI_DISABLE:
-        return false;
-    }
+    return g_config.sfx_player_grow_with_got_item;
 }
 
 static void s_PowerupScore(NPCRef_t n)
 {
-    if(g_compatibility.custom_powerup_collect_score)
+    if(g_config.custom_powerup_collect_score)
         MoreScore((*n)->Score, n->Location);
     else
         MoreScore(6, n->Location);

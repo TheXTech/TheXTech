@@ -33,7 +33,6 @@
 #include "../editor.h"
 #include "../blocks.h"
 #include "../sorting.h"
-#include "../compat.h"
 #include "../config.h"
 #include "../main/trees.h"
 #include "../npc_id.h"
@@ -222,7 +221,7 @@ void UpdateNPCs()
             if(NPC[A].TimeLeft == 0)
             {
                 Deactivate(A);
-                if(g_compatibility.fix_FreezeNPCs_no_reset)
+                if(g_config.fix_FreezeNPCs_no_reset)
                     NPC[A].TimeLeft = -1;
             }
 
@@ -255,7 +254,7 @@ void UpdateNPCs()
 
     if(CoinMode) // this is a cheat code
     {
-        if(!g_compatibility.modern_lives_system && Lives >= 99 && Coins >= 99)
+        if(!g_config.modern_lives_system && Lives >= 99 && Coins >= 99)
             CoinMode = false;
         else
         {
@@ -263,7 +262,7 @@ void UpdateNPCs()
             Coins += 1;
             if(Coins >= 100)
             {
-                if(g_compatibility.modern_lives_system)
+                if(g_config.modern_lives_system)
                     CoinMode = false;
 
                 Got100Coins();
@@ -588,7 +587,7 @@ void UpdateNPCs()
                             NPC[B].TimeLeft = NPC[A].TimeLeft;
                             NPC[B].Section = NPC[A].Section;
 
-                            if(g_compatibility.modern_npc_camera_logic)
+                            if(g_config.fix_npc_camera_logic)
                                 NPC[B].JustActivated = NPC[A].JustActivated;
                             else
                                 NPC[B].JustActivated = 1;
@@ -629,7 +628,7 @@ void UpdateNPCs()
                         for(int B : treeNPCQuery(tempLocation2, SORTMODE_ID))
                         {
                             if(!NPC[B].Active &&
-                              (!NPC[B].Hidden || !g_compatibility.fix_npc_activation_event_loop_bug) &&
+                              (!NPC[B].Hidden || !g_config.fix_npc_activation_event_loop_bug) &&
                                B != A && NPC[B].Reset[1] && NPC[B].Reset[2])
                             {
                                 if(CheckCollision(tempLocation2, NPC[B].Location))
@@ -642,7 +641,7 @@ void UpdateNPCs()
                                     NPC[B].TimeLeft = NPC[newAct[C]].TimeLeft;
                                     NPC[B].Section = NPC[newAct[C]].Section;
 
-                                    if(g_compatibility.modern_npc_camera_logic)
+                                    if(g_config.fix_npc_camera_logic)
                                         NPC[B].JustActivated = NPC[A].JustActivated;
                                     else
                                         NPC[B].JustActivated = 1;
@@ -800,7 +799,7 @@ void UpdateNPCs()
             Block[numBlock].tempBlockVehiclePlr = A;
 
             // delay add to below if it will be sorted
-            if(!g_compatibility.emulate_classic_block_order)
+            if(!g_config.emulate_classic_block_order)
                 treeTempBlockAdd(numBlock);
 
             numTempBlock++;
@@ -808,7 +807,7 @@ void UpdateNPCs()
     }
 
     // need to sort the temp blocks in strict compatibility mode, to fully emulate the specific way that switched block clipping works in X64
-    if(g_compatibility.emulate_classic_block_order)
+    if(g_config.emulate_classic_block_order)
     {
         if(numTempBlock > 1)
             qSortBlocksX(numBlock + 1 - numTempBlock, numBlock);
@@ -1062,7 +1061,7 @@ void UpdateNPCs()
                         {
                             if(NPC[A].Wet == 0 && !NPC[A]->IsACoin)
                             {
-                                if(NPC[A].Location.SpeedY >= 1 && (!g_compatibility.fix_submerged_splash_effect || !CheckCollisionIntersect(NPC[A].Location, static_cast<Location_t>(Water[B].Location))))
+                                if(NPC[A].Location.SpeedY >= 1 && (!g_config.fix_submerged_splash_effect || !CheckCollisionIntersect(NPC[A].Location, static_cast<Location_t>(Water[B].Location))))
                                 {
                                     Location_t tempLocation;
                                     tempLocation.Width = 32;
@@ -1381,7 +1380,7 @@ void UpdateNPCs()
                                             if(NPC[A].Killed > 0)
                                                 NPC[A].Location.SpeedX = Physics.NPCShellSpeed * 0.5 * Player[NPC[A].HoldingPlayer].Direction;
 
-                                            if(!g_compatibility.fix_held_item_cancel || NPC[A].Killed || NPC[B].Killed)
+                                            if(!g_config.fix_held_item_cancel || NPC[A].Killed || NPC[B].Killed)
                                                 break;
                                         }
                                     }
@@ -2048,7 +2047,7 @@ void UpdateNPCs()
                                 }
                                 else if(NPC[A]->IsFish && NPC[A].Special == 1 && NPC[A].Special5 == 1)
                                     NPC[A].Location.SpeedY += Physics.NPCGravity * 0.6;
-                                else if(NPC[A].Type == NPCID_FLY_BLOCK || (g_compatibility.fix_flamethrower_gravity && NPC[A].Type == NPCID_FLY_CANNON))
+                                else if(NPC[A].Type == NPCID_FLY_BLOCK || (g_config.fix_flamethrower_gravity && NPC[A].Type == NPCID_FLY_CANNON))
                                 {
                                     NPC[A].Location.SpeedY += Physics.NPCGravity * 0.75;
                                     if(NPC[A].Location.SpeedY > Physics.NPCGravity * 15)
@@ -2457,7 +2456,7 @@ void UpdateNPCs()
                                                             if(Block[B].tempBlockNpcType > 0)
                                                                 HitSpot = 0;
 
-                                                            if(g_compatibility.fix_skull_raft) // reached a solid wall
+                                                            if(g_config.fix_skull_raft) // reached a solid wall
                                                             {
                                                                 auto bt = Block[B].Type;
                                                                 if(Block[B].tempBlockNpcType <= 0 && NPC[A].Special == 1 &&
@@ -2868,7 +2867,7 @@ void UpdateNPCs()
                                                             }
                                                         }
                                                         // beech koopa kicking an ice block
-                                                        if(((g_compatibility.fix_npc55_kick_ice_blocks && NPC[A].Type == NPCID_EXT_TURTLE) || NPC[A].Type == NPCID_BLU_HIT_TURTLE_S4) && Block[B].tempBlockNpcType == NPCID_SLIDE_BLOCK)
+                                                        if(((g_config.fix_npc55_kick_ice_blocks && NPC[A].Type == NPCID_EXT_TURTLE) || NPC[A].Type == NPCID_BLU_HIT_TURTLE_S4) && Block[B].tempBlockNpcType == NPCID_SLIDE_BLOCK)
                                                         {
                                                             if(HitSpot == 2 || HitSpot == 4)
                                                             {
@@ -3032,11 +3031,11 @@ void UpdateNPCs()
                                                         if(NPC[A].Type == NPCID_CHAR3_HEAVY && HitSpot > 0)
                                                             NPCHit(A, 3, A);
 
-                                                        // safe to leave uninitialized, they're only read if g_compatibility.fix_npc_downward_clip is set
+                                                        // safe to leave uninitialized, they're only read if g_config.fix_npc_downward_clip is set
                                                         double tempHitOld;
                                                         int tempHitOldBlock;
 
-                                                        if(g_compatibility.fix_npc_downward_clip)
+                                                        if(g_config.fix_npc_downward_clip)
                                                         {
                                                             tempHitOld = tempHit;
                                                             tempHitOldBlock = tempHitBlock;
@@ -3380,7 +3379,7 @@ void UpdateNPCs()
                                                         }
 
                                                         // Find best block here
-                                                        if(g_compatibility.fix_npc_downward_clip && (tempHitBlock != tempHitOldBlock))
+                                                        if(g_config.fix_npc_downward_clip && (tempHitBlock != tempHitOldBlock))
                                                         {
                                                             CompareNpcWalkBlock(tempHitBlock, tempHitOldBlock,
                                                                                 tempHit, tempHitOld,
@@ -3476,7 +3475,7 @@ void UpdateNPCs()
                             {
                                 NPC[A].Location.Y = Block[winningBlock].Location.Y + Block[winningBlock].Location.Height + 0.01;
 
-                                if(g_compatibility.fix_npc_ceiling_speed)
+                                if(g_config.fix_npc_ceiling_speed)
                                     NPC[A].Location.SpeedY = 0.01 + Block[winningBlock].Location.SpeedY;
                                 else
                                 {
@@ -3554,7 +3553,7 @@ void UpdateNPCs()
                                                     first_after_y = by;
 
                                                     // want the first one in the SMBX sorted order, which might not be accurate
-                                                    if(g_compatibility.emulate_classic_block_order && numTempBlock == 0)
+                                                    if(g_config.emulate_classic_block_order && numTempBlock == 0)
                                                         break;
                                                 }
                                             }
@@ -4086,7 +4085,7 @@ void UpdateNPCs()
                         if(tempHit != 0) // Walking   // VERIFY ME
                         {
                             // tempSpeedA does not check for walking collisions in vanilla
-                            if(g_compatibility.fix_npc_downward_clip)
+                            if(g_config.fix_npc_downward_clip)
                             {
                                 tempSpeedA = Block[tempHitBlock].Location.SpeedY;
                                 if(tempSpeedA < 0)
@@ -4223,7 +4222,7 @@ void UpdateNPCs()
                                         //If BlockNoClipping(Block(B).Type) = False And Block(B).Invis = False And Block(B).Hidden = False And Not (BlockIsSizable(Block(B).Type) And Block(B).Location.Y < .Location.Y + .Location.Height - 3) Then
 
                                         // Don't collapse Pokey during walking on slopes and other touching surfaces
-                                        if(g_compatibility.fix_npc247_collapse && isPokeyHead && Block[B].tempBlockNpcType != NPCID_STACKER)
+                                        if(g_config.fix_npc247_collapse && isPokeyHead && Block[B].tempBlockNpcType != NPCID_STACKER)
                                             continue;
 
                                         if((tempLocation.X + tempLocation.Width >= Block[B].Location.X) &&
@@ -4923,7 +4922,7 @@ void UpdateNPCs()
                                         KillBlock(B);
                                 }
 
-                                if(!legacy && g_config.GameplayShakeScreenBowserIIIrd)
+                                if(!legacy && g_config.extra_screen_shake)
                                     doShakeScreen(0, 4, SHAKE_SEQUENTIAL, 7, 0.15);
 
                                 if(legacy) // Classic SMBX 1.0's behavior when Bowser stomps a floor
@@ -5594,7 +5593,7 @@ void UpdateNPCs()
                     NPC[A].Effect = NPCEFF_NORMAL;
                     NPC[A].Effect2 = 0;
 
-                    NPC[A].Location.Height = (g_compatibility.fix_npc_emerge_size) ? NPC[A]->THeight : 32;
+                    NPC[A].Location.Height = (g_config.fix_npc_emerge_size) ? NPC[A]->THeight : 32;
 
                     for(int bCheck = 1; bCheck <= 2; bCheck++)
                     {

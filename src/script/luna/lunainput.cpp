@@ -18,6 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "config.h"
 #include "luna.h"
 #include "lunainput.h"
 #include "lunaplayer.h"
@@ -199,7 +200,7 @@ void Input::CheckSpecialCheats()
 {
     if(cheats_contains(FULL_LUNA_TOGGLE_CHT))
     {
-        gLunaEnabled = !gLunaEnabled;
+        g_config.luna_enable_engine = !g_config.luna_enable_engine;
         PlaySound(SFX_Smash);
         cheats_clearBuffer();
         return;
@@ -215,11 +216,11 @@ void Input::CheckSpecialCheats()
         return;
     }
 
-    if(gEnableDemoCounter)
+    if(g_config.enable_fails_tracking)
     {
         if(cheats_contains(TOGGLE_DEMO_COUNTER_CHT))
         {
-            gShowDemoCounter = !gShowDemoCounter;
+            g_config.show_fails_counter = !g_config.show_fails_counter;
             PlaySound(SFX_Smash);
             cheats_clearBuffer();
             return;

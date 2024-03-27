@@ -20,12 +20,14 @@
 
 #include "../globals.h"
 #include "../game_main.h"
-#include "../compat.h"
+#include "../config.h"
+
 #include "speedrunner.h"
 #ifdef THEXTECH_ENABLE_LUNA_AUTOCODE
 #include "../script/luna/lunavarbank.h"
 #endif
 
+#include <IniProcessor/ini_processing.h>
 #include <Utils/files.h>
 #include <DirManager/dirman.h>
 #include <AppPath/app_path.h>
@@ -109,6 +111,7 @@ void FindSaves()
         auto& info = SaveSlotInfo[A];
 
         info = SaveSlotInfo_t();
+        info.ConfigDefaults = 0;
 
         // Modern gamesave file
         std::string saveFile = makeGameSavePath(episode,
@@ -179,6 +182,39 @@ void FindSaves()
                     continue;
                 int i = int(s.id);
                 s_LoadCharacter(info.SavedChar[i], s);
+            }
+
+            // load settings from save file here
+            for(auto &s : f.userData.store)
+            {
+                if(s.name == "_xt_ep_conf" && s.location == saveUserData::DATA_GLOBAL)
+                {
+                    for(const saveUserData::DataEntry& e : s.data)
+                    {
+                        if(e.key == "speedrun-mode" && e.value != "0")
+                        {
+                            info.ConfigDefaults = -atoi(e.value.c_str());
+                            break;
+                        }
+                        else if(e.key == "enable-bugfixes")
+                        {
+                            info.ConfigDefaults = (e.value == "none") ? Config_t::BUGFIXES_NONE : ((e.value == "critical") ? Config_t::BUGFIXES_CRITICAL : Config_t::BUGFIXES_ALL);
+                            info.ConfigDefaults += 1;
+                        }
+                    }
+                    break;
+                }
+            }
+
+            // default config if not present
+            if(info.ConfigDefaults == 0)
+            {
+                if(f.meta.smbx64strict)
+                    info.ConfigDefaults = Config_t::BUGFIXES_NONE + 1;
+                else if(w.bugfixes_on_by_default)
+                    info.ConfigDefaults = Config_t::BUGFIXES_ALL + 1;
+                else
+                    info.ConfigDefaults = Config_t::BUGFIXES_CRITICAL + 1;
             }
 
             // load timer info for existing save
@@ -291,6 +327,9 @@ void SaveGame()
         sav.userData.store.push_back(gLunaVarBank);
 #endif
 
+    // save extra settings here
+    g_config.SaveEpisodeConfig(sav.userData);
+
     ExportLevelSaveInfo(sav);
 
     FileFormats::WriteExtendedSaveFileF(savePath, sav);
@@ -359,7 +398,7 @@ void LoadGame()
     curWorldMusic = int(sav.musicID);
     curWorldMusicFile = sav.musicFile;
 
-    if(g_compatibility.enable_last_warp_hub_resume)
+    if(g_config.enable_last_warp_hub_resume)
     {
         ReturnWarp = int(sav.last_hub_warp);
         FileRecentSubHubLevel = sav.last_hub_level_file;
@@ -441,6 +480,9 @@ void LoadGame()
 
     gSavedVarBank.TryLoadWorldVars();
 #endif
+
+    // load settings from save file here
+    g_config.LoadEpisodeConfig(sav.userData);
 
     ImportLevelSaveInfo(sav);
 }

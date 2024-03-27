@@ -252,11 +252,11 @@ void XLanguage::rotateLanguage(std::string& nextLanguage, int step)
     }
 
     // find current filename
-    std::string seek_fn = fmt::format_ne("thextech_{0}.json", g_config.language);
+    std::string seek_fn = fmt::format_ne("thextech_{0}.json", (const std::string&) g_config.language);
 
     auto curr_lang_fn = std::find(s_languages.cbegin(), s_languages.cend(), seek_fn);
 
-    if(g_config.language == "auto")
+    if(static_cast<const std::string &>(g_config.language) == "auto")
         curr_lang_fn = s_languages.cend();
 
     // pick next filename

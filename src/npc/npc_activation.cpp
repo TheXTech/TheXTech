@@ -23,7 +23,7 @@
 
 #include "globals.h"
 #include "layers.h"
-#include "compat.h"
+#include "config.h"
 #include "collision.h"
 
 #include "npc_id.h"
@@ -45,7 +45,7 @@ inline static bool s_Event_SoundOnly(const Events_t& evt, int test_section)
     }
 
     bool autoscroll_okay = !AutoUseModern || evt.AutoSection != test_section
-        || (g_compatibility.fix_autoscroll_speed
+        || (g_config.fix_autoscroll_speed
             ? (!(evt.AutoX != 0.0 || evt.AutoY != 0.0)
                 || (AutoX[evt.AutoSection] == evt.AutoX && AutoY[evt.AutoSection] == evt.AutoY))
             : (!IF_INRANGE(evt.AutoSection, 0, SDL_min(maxSections, maxEvents))

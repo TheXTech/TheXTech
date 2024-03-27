@@ -22,7 +22,7 @@
 #include <algorithm>
 
 #include "layers.h"
-#include "compat.h"
+#include "config.h"
 
 #include "main/trees.h"
 #include "main/block_table.h"
@@ -366,7 +366,7 @@ void UpdatableQuery<BlockRef_t>::update(const Location_t& loc, const UpdatableQu
     bounds.Height = loc.Height + 6;
 
     // in compat mode, use a special formula for the FLBlock bounds
-    if(use_fl_block && g_compatibility.emulate_classic_block_order)
+    if(use_fl_block && g_config.emulate_classic_block_order)
     {
         bounds.X = vb6Round(loc.X / 32.0 - 1) * 32;
         bounds.Width = vb6Round((loc.X + loc.Width) / 32.0 + 1) * 32 - bounds.X;
@@ -382,7 +382,7 @@ void UpdatableQuery<BlockRef_t>::update(const Location_t& loc, const UpdatableQu
 
     if(sort_mode_use == SORTMODE_COMPAT)
     {
-        if(g_compatibility.emulate_classic_block_order)
+        if(g_config.emulate_classic_block_order)
             sort_mode_use = SORTMODE_ID;
         else
             sort_mode_use = SORTMODE_LOC;

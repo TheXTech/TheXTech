@@ -19,7 +19,8 @@
  */
 
 #include "globals.h"
-#include "compat.h"
+#include "config.h"
+
 #include "effect.h"
 #include "npc.h"
 #include "npc_id.h"
@@ -165,7 +166,7 @@ void UpdateEffects()
             if(e.Frame > 7)
                 e.Frame = 0;
 
-            if(HasSound(SFX_MagicBossShell)) // When new sound is presented, do animation a bit differently
+            if(HasSound(SFX_MagicBossShell) && g_config.sfx_modern) // When new sound is presented, do animation a bit differently
             {
                 if(e.Life == 75)
                     e.Location.SpeedY = -5;
@@ -1114,7 +1115,7 @@ void NewEffect(int A, const Location_t &Location, float Direction, int NewNpc, b
                 {
                     // note: NOT a reference
                     auto t = b.Location;
-                    if(t.Height > 8 && g_compatibility.fix_submerged_splash_effect)
+                    if(t.Height > 8 && g_config.fix_submerged_splash_effect)
                         t.Height = 8; // Limit the height
                     if(CheckCollision(ne.Location, t))
                     {

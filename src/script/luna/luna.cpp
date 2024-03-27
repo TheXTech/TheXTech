@@ -31,7 +31,6 @@
 #include "lunacounter.h"
 #include "lunalevels.h"
 #include "lunavarbank.h"
-#include "compat.h"
 #include "config.h"
 
 #include "globals.h"
@@ -39,10 +38,7 @@
 
 SDL_FORCE_INLINE bool lunaAllowed()
 {
-    if(g_compatibility.luna_enable_engine == Compatibility_t::LUNA_ENGINE_UNSPECIFIED)
-        return gLunaEnabledGlobally;
-
-    return g_compatibility.luna_enable_engine == Compatibility_t::LUNA_ENGINE_ENABLE;
+    return g_config.luna_enable_engine;
 }
 
 void lunaReset()
@@ -84,17 +80,14 @@ void lunaLoad()
     lunaReset();
 
     bool isGame = !GameMenu && !GameOutro && !BattleMode && !LevelEditor && !TestLevel;
-    bool dcAllow = (gEnableDemoCounter || g_compatibility.demos_counter_enable);
+    bool dcAllow = g_config.enable_fails_tracking;
 
     if(dcAllow && isGame)
     {
         gDeathCounter.init();
-        gDemoCounterTitle = gDemoCounterTitleDefault;
-        if(g_compatibility.demos_counter_title[0])
-            gDemoCounterTitle = std::string(g_compatibility.demos_counter_title);
     }
 
-    if(!LevelEditor && gLunaEnabled && lunaAllowed())
+    if(!LevelEditor && g_config.luna_enable_engine && lunaAllowed())
     {
         // Load autocode
         gAutoMan.LoadFiles();
@@ -103,7 +96,7 @@ void lunaLoad()
         gSavedVarBank.CopyBank(&gAutoMan.m_UserVars);
 
         // Init some stuff
-        if(g_compatibility.luna_allow_level_codes)
+        if(g_config.luna_allow_level_codes)
             lunaLevelsInit();
         gAutoMan.m_Hearts = 2;
     }
@@ -114,7 +107,7 @@ void lunaLoad()
 
 void lunaLoop()
 {
-    if(gLunaEnabledGlobally)
+    if(g_config.luna_enable_engine)
     {
         // Clean up
         gAutoMan.ClearExpired();
@@ -124,7 +117,7 @@ void lunaLoop()
         Input::UpdateInputTasks();
     }
 
-    if(!LevelEditor && gLunaEnabled && lunaAllowed())
+    if(!LevelEditor && g_config.luna_enable_engine && lunaAllowed())
     {
 #if COMPILE_PLAYGROUND
         Playground::doPlaygroundStuff();
@@ -140,7 +133,7 @@ void lunaLoop()
 
         // Run any framecode
 //        TestFrameCode();
-        if(g_compatibility.luna_allow_level_codes)
+        if(g_config.luna_allow_level_codes)
             lunaLevelsDo();
     }
 }
@@ -148,14 +141,14 @@ void lunaLoop()
 
 void lunaRenderHud(int screenZ)
 {
-    bool dcAllow = (gEnableDemoCounter || gEnableDemoCounterByLC || g_compatibility.demos_counter_enable);
-    if(dcAllow && g_config.show_fails_counter && gShowDemoCounter && ShowOnScreenHUD)
+    bool dcAllow = g_config.enable_fails_tracking || gEnableDemoCounterByLC;
+    if(dcAllow && g_config.show_fails_counter && ShowOnScreenHUD)
         gDeathCounter.Draw(screenZ);
 }
 
 void lunaRender(int screenZ)
 {
-    if(!LevelEditor && gLunaEnabled && lunaAllowed())
+    if(!LevelEditor && g_config.luna_enable_engine && lunaAllowed())
     {
         Renderer::Get().StartCameraRender(screenZ);
         gSpriteMan.RunSprites();
@@ -165,12 +158,12 @@ void lunaRender(int screenZ)
 
 void lunaRenderStart()
 {
-    if(!LevelEditor && gLunaEnabled && lunaAllowed())
+    if(!LevelEditor && g_config.luna_enable_engine && lunaAllowed())
         Renderer::Get().StartFrameRender();
 }
 
 void lunaRenderEnd()
 {
-    if(!LevelEditor && gLunaEnabled && lunaAllowed())
+    if(!LevelEditor && g_config.luna_enable_engine && lunaAllowed())
         Renderer::Get().EndFrameRender();
 }

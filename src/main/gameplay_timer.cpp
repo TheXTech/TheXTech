@@ -30,8 +30,7 @@
 #include "graphics.h"
 #include "game_main.h"
 #include "globals.h"
-#include "presetup.h"
-#include "compat.h"
+#include "config.h"
 
 #include "menu_main.h"
 
@@ -127,49 +126,12 @@ void GameplayTimer::updateColorSpin(float delta)
     }
 }
 
-void GameplayTimer::updateAllowBlink()
-{
-    int effectBlink = (m_blinkEffect == SPEEDRUN_EFFECT_BLINK_UNDEFINED) ?
-                          g_compatibility.speedrun_blink_effect :
-                          m_blinkEffect;
-
-    switch(effectBlink)
-    {
-    default:
-    case SPEEDRUN_EFFECT_BLINK_OPAQUEONLY:
-        m_allowBlink = !m_semiTransparent;
-        break;
-
-    case SPEEDRUN_EFFECT_BLINK_ALWAYS:
-        m_allowBlink = true;
-        break;
-
-    case SPEEDRUN_EFFECT_BLINK_NEVER:
-        m_allowBlink = false;
-        break;
-    }
-}
-
-void GameplayTimer::setSemitransparent(bool t)
-{
-    m_semiTransparent = t;
-}
-
-void GameplayTimer::setBlinkEffect(int be)
-{
-    m_blinkEffect = be;
-}
-
-bool GameplayTimer::semitransparent()
-{
-    return m_semiTransparent;
-}
-
 GameplayTimer::GameplayTimer() = default;
 
 
 void GameplayTimer::reset()
 {
+    m_invalidContinue = false;
     m_cyclesInt = false;
     m_cyclesFin = false;
     m_cyclesCurrent = 0;
@@ -177,7 +139,6 @@ void GameplayTimer::reset()
     m_levelBlinkActive = false;
     m_worldBlinkActive = false;
     m_blinkingFactor = 0.0f;
-    updateAllowBlink();
 }
 
 void GameplayTimer::resetCurrent()
@@ -186,7 +147,6 @@ void GameplayTimer::resetCurrent()
     m_levelBlinkActive = false;
     m_worldBlinkActive = false;
     m_blinkingFactor = 0.0f;
-    updateAllowBlink();
 }
 
 void GameplayTimer::load()
@@ -209,13 +169,15 @@ void GameplayTimer::load()
     o.read("total", m_cyclesTotal, 0);
     m_cyclesCurrent = 0; // Reset the counter
     o.endGroup();
-    updateAllowBlink();
+
+    if(!m_cyclesInt)
+        m_invalidContinue = true;
 }
 
 void GameplayTimer::save()
 {
     // should Cheater also be a condition here?
-    if(TestLevel || !selSave)
+    if(TestLevel || !selSave || m_invalidContinue)
         return;
 
     IniProcessing o;
@@ -252,7 +214,7 @@ void GameplayTimer::tick()
 
     if(!in_leveltest_restart_screen && (LevelSelect || in_normal_level_play))
         m_cyclesCurrent += 1;
-    else if(!in_leveltest_restart_screen && m_allowBlink && !m_levelBlinkActive)
+    else if(!in_leveltest_restart_screen && g_config.show_playtime_counter == Config_t::PLAYTIME_COUNTER_ANIMATED)
         m_levelBlinkActive = true;
 
     if(!m_cyclesFin)
@@ -272,13 +234,13 @@ void GameplayTimer::tick()
 void GameplayTimer::onBossDead()
 {
     m_cyclesFin = true;
-    if(m_allowBlink)
+    if(g_config.show_playtime_counter == Config_t::PLAYTIME_COUNTER_ANIMATED)
         m_worldBlinkActive = true;
 }
 
 void GameplayTimer::render()
 {
-    float a = m_semiTransparent ? 0.5f : 1.f;
+    float a = (g_config.show_playtime_counter == Config_t::PLAYTIME_COUNTER_SUBTLE) ? 0.5f : 1.f;
     // int x = (XRender::TargetW / 2) - (144 / 2);
     int y = XRender::TargetH;
 
@@ -292,6 +254,8 @@ void GameplayTimer::render()
 
     SuperPrintScreenCenter(formatTime(m_cyclesCurrent), 3, y - 34, XTColorF(lc[0], lc[1], lc[2], a));
 
-    if(!TestLevel)
+    if(m_invalidContinue)
+        SuperPrintScreenCenter(g_mainMenu.caseNone,         3, y - 18, XTColorF(0.5f, 0.5f, 0.5f, a));
+    else if(!TestLevel)
         SuperPrintScreenCenter(formatTime(m_cyclesTotal),   3, y - 18, XTColorF(wc, 1.0f, wc, a));
 }

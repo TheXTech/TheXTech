@@ -25,7 +25,7 @@
 #include "sdl_proxy/sdl_stdinc.h"
 
 #include "custom.h"
-#include "compat.h"
+#include "config.h"
 #include "npc_traits.h"
 
 #include <utility>
@@ -151,7 +151,7 @@ void LoadPlayerDefaults()
 SDL_FORCE_INLINE void loadNpcSetupFixes()
 {
     // TODO: Implement settings fixing logic here!
-    if(g_compatibility.custom_powerup_collect_score)
+    if(g_config.custom_powerup_collect_score)
     {
         NPCTraits[9].Score = 6; // Set Default Scores for PowerUps (6=1000)
         NPCTraits[184].Score = 6; // Mushrooms

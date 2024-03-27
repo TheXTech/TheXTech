@@ -52,7 +52,6 @@ std::string musicName;
 int playerHammerSFX = SFX_Fireball;
 
 const AudioDefaults_t g_audioDefaults{0, 0, 0, 0};
-AudioSetup_t g_audioSetup;
 
 static bool g_mixerLoaded = false;
 
@@ -119,11 +118,17 @@ void QuitMixerX()
     g_mixerLoaded = false;
 }
 
-void UnloadSound()
+void RestartMixerX()
 {
     QuitMixerX();
     InitMixerX();
 }
+
+void UnloadSound()
+{
+    RestartMixerX();
+}
+
 
 void InitSoundDefaults()
 {

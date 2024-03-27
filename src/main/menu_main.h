@@ -48,10 +48,13 @@ enum
     // Battle mode level select
     MENU_BATTLE_MODE = 4,
     // Options menu
-    MENU_OPTIONS = 3,
+    // MENU_OPTIONS = 3, // FULLY UNUSED
+    // New options menu
+    MENU_NEW_OPTIONS = 8,
     // Editor mode episode select
     MENU_EDITOR = 9,
 
+#if 0
     // Character select for single player game
     MENU_CHARACTER_SELECT_1P    = 100,
     // Character select for two player game, step 1
@@ -62,12 +65,14 @@ enum
     MENU_CHARACTER_SELECT_BM_S1 = 400,
     // Character select for battle game, step 2
     MENU_CHARACTER_SELECT_BM_S2 = 500,
-    // New character select for main game
-    MENU_CHARACTER_SELECT_NEW    = 1000,
-    MENU_CHARACTER_SELECT_NEW_BM = 1001,
 
     MENU_CHARACTER_SELECT_BASE  = MENU_CHARACTER_SELECT_1P,
     MENU_CHARACTER_SELECT_BASE_END = MENU_CHARACTER_SELECT_BM_S2,
+#endif
+
+    // New character select for main game
+    MENU_CHARACTER_SELECT_NEW    = 1000,
+    MENU_CHARACTER_SELECT_NEW_BM = 1001,
 
     MENU_INPUT_SETTINGS = 30,
 
@@ -87,6 +92,10 @@ enum
     MENU_SELECT_SLOT_1P_DELETE = 13,
     MENU_SELECT_SLOT_2P_DELETE = 23,
     MENU_SELECT_SLOT_DELETE_ADD = 3,
+
+    MENU_SELECT_SLOT_1P_ADVMODE = 14,
+    MENU_SELECT_SLOT_2P_ADVMODE = 24,
+    MENU_SELECT_SLOT_ADVMODE_ADD = 4,
 
     MENU_SELECT_SLOT_END = 30,
 };

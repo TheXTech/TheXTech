@@ -9,11 +9,11 @@
 #include "gfx.h"
 #include "graphics.h"
 #include "player.h"
-#include "compat.h"
 #include "config.h"
 #include "npc_id.h"
 #include "npc/npc_queues.h"
 
+#include "graphics/gfx_frame.h"
 #include "graphics/gfx_marquee.h"
 
 #include "main/game_info.h"
@@ -1945,6 +1945,7 @@ int Mouse_Render(bool mouse, bool render)
     {
         if(render)
         {
+            // DrawSimpleFrame(start_x, draw_y, full_width, full_height, {0, 0, 0, 127}, {255, 255, 255, 127}, {0, 0, 0, 127});
             XRender::renderRect(start_x, draw_y, full_width, full_height, XTColorF(0.0f, 0.0f, 0.0f, 0.5f));
             SuperPrintScreenCenter(g_gameStrings.pauseItemPlayerSetup, 3, draw_y + 8);
         }

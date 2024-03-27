@@ -30,7 +30,7 @@
 #endif
 
 #include "globals.h"
-#include "video.h"
+#include "config.h"
 
 #include "core/render.h"
 #include "core/opengl/render_gl.h"
@@ -91,7 +91,7 @@ static void APIENTRY s_HandleGLDebugMessage(GLenum source, GLenum type, GLuint i
 
 #endif
 
-void RenderGL::try_init_gl(SDL_GLContext& context, SDL_Window* window, GLint profile, GLint majver, GLint minver, RenderMode_t mode)
+void RenderGL::try_init_gl(SDL_GLContext& context, SDL_Window* window, GLint profile, GLint majver, GLint minver, int mode)
 {
     // context already initialized
     if(context)
@@ -105,12 +105,12 @@ void RenderGL::try_init_gl(SDL_GLContext& context, SDL_Window* window, GLint pro
     context = SDL_GL_CreateContext(window);
 
     if(context)
-        g_videoSettings.renderModeObtained = mode;
+        g_config.render_mode.obtained = mode;
     else
         pLogInfo("Render GL: context creation failed.");
 }
 
-bool RenderGL::initOpenGL(const CmdLineSetup_t &setup)
+bool RenderGL::initOpenGL()
 {
     SDL_version compiled, linked;
     SDL_VERSION(&compiled);
@@ -127,52 +127,52 @@ bool RenderGL::initOpenGL(const CmdLineSetup_t &setup)
     // user request sequence
 
 #ifdef THEXTECH_BUILD_GL_DESKTOP_MODERN
-    if(setup.renderType == RENDER_ACCELERATED_OPENGL)
+    if(g_config.render_mode == Config_t::RENDER_ACCELERATED_OPENGL)
     {
-        try_init_gl(m_gContext, m_window, SDL_GL_CONTEXT_PROFILE_COMPATIBILITY, 3, 3, RENDER_ACCELERATED_OPENGL);
-        try_init_gl(m_gContext, m_window, SDL_GL_CONTEXT_PROFILE_CORE, 3, 3, RENDER_ACCELERATED_OPENGL);
+        try_init_gl(m_gContext, m_window, SDL_GL_CONTEXT_PROFILE_COMPATIBILITY, 3, 3, Config_t::RENDER_ACCELERATED_OPENGL);
+        try_init_gl(m_gContext, m_window, SDL_GL_CONTEXT_PROFILE_CORE, 3, 3, Config_t::RENDER_ACCELERATED_OPENGL);
     }
 #endif
 
 #ifdef THEXTECH_BUILD_GL_ES_MODERN
-    if(setup.renderType == RENDER_ACCELERATED_OPENGL_ES)
+    if(g_config.render_mode == Config_t::RENDER_ACCELERATED_OPENGL_ES)
     {
-        try_init_gl(m_gContext, m_window, SDL_GL_CONTEXT_PROFILE_ES, 3, 0, RENDER_ACCELERATED_OPENGL_ES);
-        try_init_gl(m_gContext, m_window, SDL_GL_CONTEXT_PROFILE_ES, 2, 0, RENDER_ACCELERATED_OPENGL_ES);
+        try_init_gl(m_gContext, m_window, SDL_GL_CONTEXT_PROFILE_ES, 3, 0, Config_t::RENDER_ACCELERATED_OPENGL_ES);
+        try_init_gl(m_gContext, m_window, SDL_GL_CONTEXT_PROFILE_ES, 2, 0, Config_t::RENDER_ACCELERATED_OPENGL_ES);
     }
 #endif
 
 #ifdef THEXTECH_BUILD_GL_DESKTOP_LEGACY
-    if(setup.renderType == RENDER_ACCELERATED_OPENGL_LEGACY)
-        try_init_gl(m_gContext, m_window, SDL_GL_CONTEXT_PROFILE_COMPATIBILITY, 1, 1, RENDER_ACCELERATED_OPENGL_LEGACY);
+    if(g_config.render_mode == Config_t::RENDER_ACCELERATED_OPENGL_LEGACY)
+        try_init_gl(m_gContext, m_window, SDL_GL_CONTEXT_PROFILE_COMPATIBILITY, 1, 1, Config_t::RENDER_ACCELERATED_OPENGL_LEGACY);
 #endif
 
 #ifdef THEXTECH_BUILD_GL_ES_LEGACY
-    if(setup.renderType == RENDER_ACCELERATED_OPENGL_ES_LEGACY)
-        try_init_gl(m_gContext, m_window, SDL_GL_CONTEXT_PROFILE_ES, 1, 1, RENDER_ACCELERATED_OPENGL_ES_LEGACY);
+    if(g_config.render_mode == Config_t::RENDER_ACCELERATED_OPENGL_ES_LEGACY)
+        try_init_gl(m_gContext, m_window, SDL_GL_CONTEXT_PROFILE_ES, 1, 1, Config_t::RENDER_ACCELERATED_OPENGL_ES_LEGACY);
 #endif
 
     // default fallback sequence
 
 #ifdef THEXTECH_BUILD_GL_DESKTOP_MODERN
-    try_init_gl(m_gContext, m_window, SDL_GL_CONTEXT_PROFILE_COMPATIBILITY, 3, 3, RENDER_ACCELERATED_OPENGL);
+    try_init_gl(m_gContext, m_window, SDL_GL_CONTEXT_PROFILE_COMPATIBILITY, 3, 3, Config_t::RENDER_ACCELERATED_OPENGL);
 #endif
 
 #ifdef THEXTECH_BUILD_GL_ES_MODERN
-    try_init_gl(m_gContext, m_window, SDL_GL_CONTEXT_PROFILE_ES, 3, 0, RENDER_ACCELERATED_OPENGL_ES);
-    try_init_gl(m_gContext, m_window, SDL_GL_CONTEXT_PROFILE_ES, 2, 0, RENDER_ACCELERATED_OPENGL_ES);
+    try_init_gl(m_gContext, m_window, SDL_GL_CONTEXT_PROFILE_ES, 3, 0, Config_t::RENDER_ACCELERATED_OPENGL_ES);
+    try_init_gl(m_gContext, m_window, SDL_GL_CONTEXT_PROFILE_ES, 2, 0, Config_t::RENDER_ACCELERATED_OPENGL_ES);
 #endif
 
 #ifdef THEXTECH_BUILD_GL_DESKTOP_MODERN
-    try_init_gl(m_gContext, m_window, SDL_GL_CONTEXT_PROFILE_CORE, 3, 3, RENDER_ACCELERATED_OPENGL);
+    try_init_gl(m_gContext, m_window, SDL_GL_CONTEXT_PROFILE_CORE, 3, 3, Config_t::RENDER_ACCELERATED_OPENGL);
 #endif
 
 #ifdef THEXTECH_BUILD_GL_DESKTOP_LEGACY
-    try_init_gl(m_gContext, m_window, SDL_GL_CONTEXT_PROFILE_COMPATIBILITY, 1, 1, RENDER_ACCELERATED_OPENGL_LEGACY);
+    try_init_gl(m_gContext, m_window, SDL_GL_CONTEXT_PROFILE_COMPATIBILITY, 1, 1, Config_t::RENDER_ACCELERATED_OPENGL_LEGACY);
 #endif
 
 #ifdef THEXTECH_BUILD_GL_ES_LEGACY
-    try_init_gl(m_gContext, m_window, SDL_GL_CONTEXT_PROFILE_ES, 1, 1, RENDER_ACCELERATED_OPENGL_ES_LEGACY);
+    try_init_gl(m_gContext, m_window, SDL_GL_CONTEXT_PROFILE_ES, 1, 1, Config_t::RENDER_ACCELERATED_OPENGL_ES_LEGACY);
 #endif
 
     if(!m_gContext)
@@ -267,7 +267,7 @@ bool RenderGL::initOpenGL(const CmdLineSetup_t &setup)
 #ifdef RENDERGL_HAS_SHADERS
     if(m_gl_majver >= 2 && m_gl_profile != SDL_GL_CONTEXT_PROFILE_COMPATIBILITY)
         m_use_shaders = true;
-    else if(m_gl_majver >= 2 && setup.renderType != RENDER_ACCELERATED_OPENGL_LEGACY)
+    else if(m_gl_majver >= 2 && g_config.render_mode != Config_t::RENDER_ACCELERATED_OPENGL_LEGACY)
         m_use_shaders = true;
     else
         m_use_shaders = false;
@@ -287,7 +287,7 @@ bool RenderGL::initOpenGL(const CmdLineSetup_t &setup)
 #ifdef RENDERGL_HAS_FBO
     bool fbo_supported = (m_gl_majver >= 3) || (m_gl_profile == SDL_GL_CONTEXT_PROFILE_ES && m_gl_majver >= 2);
 
-    if(fbo_supported && setup.renderType != RENDER_ACCELERATED_OPENGL_LEGACY)
+    if(fbo_supported && g_config.render_mode != Config_t::RENDER_ACCELERATED_OPENGL_LEGACY)
         m_has_fbo = true;
     else
         m_has_fbo = false;
@@ -298,7 +298,7 @@ bool RenderGL::initOpenGL(const CmdLineSetup_t &setup)
     // should check for NPOT and BGRA textures
 
     // setup vSync
-    SDL_GL_SetSwapInterval(setup.vSync);
+    SDL_GL_SetSwapInterval(g_config.render_vsync);
 
     GLenum err = glGetError();
 

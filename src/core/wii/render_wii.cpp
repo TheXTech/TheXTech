@@ -39,8 +39,8 @@
 #include <Utils/files.h>
 
 #include "globals.h"
-#include "video.h"
 #include "frame_timer.h"
+#include "config.h"
 
 #include "main/cheat_code.h"
 
@@ -486,9 +486,7 @@ void repaint()
     g_microStats.start_sleep();
 
     // video settings: VSync
-#if 0
-
-    if(g_videoSettings.scaleMode == SCALE_DYNAMIC_LINEAR)
+    if(g_config.render_vsync)
     {
         VIDEO_WaitVSync();
 
@@ -496,7 +494,6 @@ void repaint()
             VIDEO_WaitVSync();
     }
 
-#endif
     g_microStats.start_task(MicroStats::Graphics);
 
     g_in_frame = false;

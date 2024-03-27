@@ -26,18 +26,6 @@
 
 struct CmdLineSetup_t
 {
-    //! Disable game sound
-    bool noSound = false;
-    //! Skip frames when laggy rendering is
-    bool frameSkip = false;
-    //! Don't pause game while window is not active
-    bool neverPause = false;
-    //! Allow background input for joysticks
-    bool allowBgInput = false;
-    //! TYpe of a render
-    int renderType = -1;
-    //! Enable vSync support
-    bool vSync = false;
     //! Is a level testing mode
     bool testLevelMode = false;
     //! Level file to test
@@ -61,10 +49,6 @@ struct CmdLineSetup_t
     bool testGrabAll = false;
     //! Make playable character be inmortal
     bool testGodMode = false;
-    //! Show FPS during level test
-    bool testShowFPS = false;
-    //! Do not limit framerate
-    bool testMaxFPS = false;
     //! Enable magic-hand functionality
     bool testMagicHand = false;
     //! Open in editor
@@ -72,18 +56,6 @@ struct CmdLineSetup_t
 
     //! Force log output into console
     bool verboseLogging = false;
-
-    //! Enforce spefic compatibiltiy level (If Speed-Run mode is enabled, this will be overwritten)
-    int  compatibilityLevel = 0;
-
-    //! Enable the speed-run mode
-    int  speedRunnerMode = 0;
-    //! Draw the speed-run timer semi-transparently
-    bool speedRunnerSemiTransparent = false;
-    //! Speed-run timer blink effect policy
-    int  speedRunnerBlinkEffect = 0;
-
-    bool showControllerState = false;
 };
 
 #endif // CMD_LINE_SETUP_H

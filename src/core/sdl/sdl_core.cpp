@@ -26,10 +26,13 @@
 
 bool CoreSDL::init(const CmdLineSetup_t &setup)
 {
+    (void)(setup);
+
     bool res;
 
-    if(setup.allowBgInput)
-        SDL_SetHint(SDL_HINT_JOYSTICK_ALLOW_BACKGROUND_EVENTS, "1");
+    // if(g_config.background_work)
+    // apply this unconditionally -- otherwise, need to restart game for background-work to function as expected
+    SDL_SetHint(SDL_HINT_JOYSTICK_ALLOW_BACKGROUND_EVENTS, "1");
 
 #if defined(__ANDROID__) || (defined(__APPLE__) && (defined(TARGET_IPHONE_SIMULATOR) || defined(TARGET_OS_IPHONE)))
     // Restrict the landscape orientation only

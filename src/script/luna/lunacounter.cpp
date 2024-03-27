@@ -29,12 +29,13 @@
 #include "lunarender.h"
 #include "renderop_string.h"
 #include "globals.h"
+#include "config.h"
 #include "graphics.h"
 #include "config.h"
 #include "game_main.h"
 #include "core/render.h"
 #include "main/menu_main.h"
-#include "compat.h"
+#include "main/game_info.h"
 
 
 DeathCounter gDeathCounter;
@@ -196,7 +197,7 @@ bool DeathCounter::TryLoadStats()
 // mark that a death occurred in the current level
 void DeathCounter::MarkDeath(bool write_save)
 {
-    bool dcAllow = (gEnableDemoCounter || gEnableDemoCounterByLC || g_compatibility.demos_counter_enable);
+    bool dcAllow = (gEnableDemoCounterByLC || g_config.enable_fails_tracking);
 
     if(!dcAllow)
         return;
@@ -367,7 +368,7 @@ void DeathCounter::Draw(int screenZ)
 
     // Format string to print
     m_print.syncCache(mCurLevelDeaths, mCurTotalDeaths);
-    m_print.syncCache(gDemoCounterTitle);
+    m_print.syncCache(g_config.fails_counter_title);
 
     XRender::offsetViewportIgnore(true);
 
@@ -392,7 +393,7 @@ void DeathCounter::Draw(int screenZ)
         title_X &= ~1;
         counter_X &= ~1;
 
-        SuperPrint(gDemoCounterTitle, m_print.font, HUDLeft + title_X, ScreenTop + 26);
+        SuperPrint(g_config.fails_counter_title, m_print.font, HUDLeft + title_X, ScreenTop + 26);
         SuperPrint(m_print.counterOut, m_print.font, HUDLeft + counter_X, ScreenTop + 48);
     }
     // At low res, print to top of screen
@@ -406,7 +407,7 @@ void DeathCounter::Draw(int screenZ)
         title_X &= ~1;
         counter_X &= ~1;
 
-        SuperPrint(gDemoCounterTitle, m_print.font, title_X, ScreenTop);
+        SuperPrint(g_config.fails_counter_title, m_print.font, title_X, ScreenTop);
         SuperPrint(m_print.counterOut, m_print.font, counter_X, ScreenTop);
     }
 
@@ -416,7 +417,7 @@ void DeathCounter::Draw(int screenZ)
 // PRINT DEBUG - Prints all death records to the screen
 void DeathCounter::PrintDebug() const
 {
-    if(!gLunaEnabled || !gLunaEnabledGlobally)
+    if(!g_config.luna_enable_engine)
         return;
 
     if(!mDeathRecords.empty())

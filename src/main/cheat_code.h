@@ -30,6 +30,9 @@ extern bool g_ForceBitmaskMerge;
 //! if true, the boundaries of logical screens are shown over the visible screen
 extern bool g_CheatLogicScreen;
 
+//! if 1, the player may edit compat settings (but they won't get saved). if 2, the player goes directly to compat on the next Options Screen start.
+extern int g_CheatEditYourFriends;
+
 /*!
  * \brief Reset all customized cheats state into default
  */
