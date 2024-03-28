@@ -31,6 +31,19 @@ body:
     validations:
       required: true
 
+  - type: dropdown
+    id: frequency
+    attributes:
+      label: Does this issue happens always or randomly?
+      description: Is it possible to reproduce this issue easily, or it happens very rare?
+      options:
+        - Always happens
+        - Happens randomly, often
+        - Happens randomly, rare
+        - Happens very rare
+    validations:
+      required: true
+
   - type: input
     id: version
     attributes:
