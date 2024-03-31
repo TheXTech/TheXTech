@@ -41,6 +41,7 @@
 #include "main/block_table.h"
 #include "script/msg_preprocessor.h"
 
+#include "npc/npc_activation.h"
 #include "npc/npc_queues.h"
 #include "npc/section_overlap.h"
 #include "graphics/gfx_update.h"
@@ -403,10 +404,41 @@ void ShowLayer(layerindex_t L, bool NoEffect)
 
         if(!NPC[A].Generator)
         {
-            NPC[A].Active = true;
-            NPC[A].TimeLeft = 1;
+            bool do_activate = true;
 
-            NPCQueues::Active.insert(A);
+            // new logic: if an NPC must follow canonical screen logic, only activate it if on a canonical vScreen
+            // Fixes bug at star exit on SRW2:YA - Searing Skull Stepping
+            if(g_config.fix_npc_camera_logic && !NPC[A].Active && NPC_MustBeCanonical(A))
+            {
+                bool hit = false;
+
+                for(int screen_i = 0; !hit && screen_i < c_screenCount; screen_i++)
+                {
+                    const Screen_t& screen = Screens[screen_i];
+
+                    if(!screen.is_canonical())
+                        continue;
+
+                    for(int vscreen_i = screen.active_begin(); !hit && vscreen_i < screen.active_end(); vscreen_i++)
+                    {
+                        int vscreen_Z = screen.vScreen_refs[vscreen_i];
+
+                        if(vScreenCollision(vscreen_Z, NPC[A].Location))
+                            hit = true;
+                    }
+                }
+
+                if(!hit)
+                    do_activate = false;
+            }
+
+            if(do_activate)
+            {
+                NPC[A].Active = true;
+                NPC[A].TimeLeft = 1;
+
+                NPCQueues::Active.insert(A);
+            }
         }
 
         CheckSectionNPC(A);
