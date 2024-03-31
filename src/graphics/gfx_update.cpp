@@ -1210,11 +1210,11 @@ void ModernNPCScreenLogic(Screen_t& screen, int vscreen_i, bool fill_draw_queue,
         if(NPC_intro_index < NPC_intro_count && NPC_intro_frame[NPC_intro_index] > 0 && NPC[A].Active && NPC_InactiveSmoke(NPC[A]))
         {
             Location_t tempLocation = NPC[A].Location;
-            tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[10] / 2.0;
-                tempLocation.Y += tempLocation.Height / 2.0 - EffectHeight[10] / 2.0;
-                NewEffect(EFFID_SMOKE_S3, tempLocation);
+            tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[EFFID_SMOKE_S3] / 2.0;
+            tempLocation.Y += tempLocation.Height / 2.0 - EffectHeight[EFFID_SMOKE_S3] / 2.0;
+            NewEffect(EFFID_SMOKE_S3, tempLocation);
 
-                // disable the NPC intro
+            // disable the NPC intro
             s_RemoveIntroNPC(NPC_intro_index);
             NPC_intro_index = NPC_intro_count;
         }
@@ -1263,7 +1263,7 @@ void ModernNPCScreenLogic(Screen_t& screen, int vscreen_i, bool fill_draw_queue,
 
                 NPCQueues::Killed.push_back(A);
             }
-            else if(!NPC[A].Active && NPC[A].Effect != 2
+            else if(!NPC[A].Active && NPC[A].Effect != NPCEFF_DROP_ITEM
                 && (NPC[A].Reset[2] || NPC[A].Type == NPCID_CONVEYOR))
             {
                 NPC[A].JustActivated = static_cast<uint8_t>(Z);
