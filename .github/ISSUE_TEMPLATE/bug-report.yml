@@ -1,0 +1,150 @@
+name: Bug Report
+description: Create a report of the issue ocurred with the game during its use
+labels: ["NEW-BUG"]
+projects: ["TheXTech/1"]
+
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: Describe the issue
+      description: A clear and concise description of what the bug.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: bug_type
+    attributes:
+      label: A type of bug
+      description: |
+        How you would classify this bug by yourself?
+        * **Natibe bug** - The own bug of TheXTech itself that was never happen in the original SMBX.
+        * **Vanilla bug** - The bug of original SMBX that got being inherited by TheXTech during its initial creation.
+        * **Compatibility bug** - The deviation of behaviour from the original even with the strict compatibility mode (run the game with `--compat-level smbx13` command-line argument).
+
+        **Note:** The development team can classify this issue in a different way depending on the result of the analysis.
+      options:
+        - [Not specified]
+        - Native bug
+        - Vanilla bug
+        - Compatibility bug
+    validations:
+      required: true
+
+  - type: dropdown
+    id: frequency
+    attributes:
+      label: Does this issue happens always or randomly?
+      description: Is it possible to reproduce this issue easily, or it happens very rare?
+      options:
+        - Always happens
+        - Happens randomly, often
+        - Happens randomly, rare
+        - Happens very rare
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: What version of TheXtech you are using? You can see it in the title of the window.
+    validations:
+      required: true
+
+  - type: input
+    id: version_hash
+    attributes:
+      label: Version Hash
+      description: If you run a **DEVEL** version, please also tell the hash tag (like `#1A2BC3E`) that can be found in the window title or in the main menu at the right-bottom of the screen.
+    validations:
+      required: false
+
+  - type: dropdown
+    id: os
+    attributes:
+      label: Platform
+      description: What the platform where you run the game?
+      options:
+        - [Not specified]
+        - Linux
+        - Windows
+        - macOS
+        - Android
+        - Haiku
+        - xBSD
+        - Web-browser (Emscripten)
+        - 3DS
+        - Wii
+        - Wii U
+        - Switch
+        - PS Vita
+        - Other (tell in the bug description)
+    validations:
+      required: true
+
+  - type: dropdown
+    id: cpu
+    attributes:
+      label: Processor architecture
+      description: Which architecture your processor where you ran the game have?
+      options:
+        - [Not specified / I don't know]
+        - x86_64 / x64 (64-bit x86)
+        - i386 / x86_32 (32-bit x86)
+        - ARM64 / AARCH64 (64-bit ARM)
+        - ARM32 / ARMv7 (32-bit ARM)
+        - PPC64LE (64-bit Power PC with Little-Endian)
+        - PPC64 (64-bit Power PC with Big-Endian)
+        - PPC32 (32-bit Power PC with Big-Endian)
+        - MIPS64 (32-bit MIPS)
+        - MIPS32 (64-bit MIPS)
+        - RISC-V
+        - WebAssembly (Emscripten)
+        - Other (tell in the bug description)
+    validations:
+      required: false
+
+  - type: textarea
+    id: log_file
+    attributes:
+      label: Log file (if presented)
+      description: |
+        Please upload the log file that have the `TheXTech_log_YYYY_MM_DD_HH_mm_ss.txt` name which can be found in the `logs` sub-directory in the game's user directory.
+    validations:
+      required: false
+
+  - type: textarea
+    id: example_case
+    attributes:
+      label: Example Case
+      description: |
+        Post a link to the level where the issue occurs:
+        *levelname.lvl* from `[Episode name](https://link.to.episode/)`
+        Even better: If you make a dedicated test level and attach it to your GitHub Post (pack it as `.zip` or `.7z` first, and then drag it and drop into this text area).
+    validations:
+      required: false
+
+  - type: textarea
+    id: recording
+    attributes:
+      label: Recording
+      description: Embed or add a link to a Recording here. If it's an in-game issue, you can use TheXTech's built-in GIF Recorder (Press F11 or F10 on macOS). If it's a crash, use a Screen Capture program such as OBS or vokoscreen.
+    validations:
+      required: false
+
+  - type: textarea
+    id: vanilla_recording
+    attributes:
+      label: Vanilla Recording
+      description: Not required, but if you can run SMBX 1.3 (or [use our Research Version](https://github.com/Wohlstand/smbx-experiments/releases) that will work better on Linux under Wine because of the improved audio engine), it would be appreciated if you made a recording of whether the bug occurs here as well.
+    validations:
+      required: false
+
+  - type: textarea
+    id: misc_info
+    attributes:
+      label: Additional context
+      description: Add any other context that could be useful for solving the problem here. If your problem is tied to your Operating System, add it at the beginning of the Title ("[Windows] Windows Issue").
+    validations:
+      required: false
