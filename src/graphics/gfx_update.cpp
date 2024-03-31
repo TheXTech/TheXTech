@@ -1183,7 +1183,7 @@ void ModernNPCScreenLogic(Screen_t& screen, int vscreen_i, bool fill_draw_queue,
 
         // Note that this condition, NPC[A].TimeLeft == 0 or 1, is practically never encountered when the NPC is onscreen,
         //   except in the conditional activation code.
-        if((NPC[A].TimeLeft == 0 || NPC[A].TimeLeft == 1) && (!NPC[A].Reset[1] || !NPC[A].Reset[2]))
+        if((NPC[A].TimeLeft == 0 || NPC[A].TimeLeft == 1) && !NPC[A].Reset[2])
         {
             if(render && !can_activate)
             {
@@ -1264,7 +1264,7 @@ void ModernNPCScreenLogic(Screen_t& screen, int vscreen_i, bool fill_draw_queue,
                 NPCQueues::Killed.push_back(A);
             }
             else if(!NPC[A].Active && NPC[A].Effect != 2
-                && ((NPC[A].Reset[1] && NPC[A].Reset[2]) || NPC[A].Type == NPCID_CONVEYOR))
+                && (NPC[A].Reset[2] || NPC[A].Type == NPCID_CONVEYOR))
             {
                 NPC[A].JustActivated = static_cast<uint8_t>(Z);
 
@@ -1279,8 +1279,8 @@ void ModernNPCScreenLogic(Screen_t& screen, int vscreen_i, bool fill_draw_queue,
         // track the NPC's reset timer
         if(cannot_reset)
         {
-            if(NPC[A].Type != 0
-                && ((NPC[A].Reset[1] && NPC[A].Reset[2]) || NPC[A].Active || NPC[A].Type == NPCID_CONVEYOR))
+            // update TimeLeft (despawn timer) if active and in the no-reset zone
+            if(NPC[A].Active)
             {
                 if(
                        NPCIsYoshi(NPC[A]) || NPCIsBoot(NPC[A]) || NPC[A].Type == NPCID_POWER_S3
@@ -1299,9 +1299,6 @@ void ModernNPCScreenLogic(Screen_t& screen, int vscreen_i, bool fill_draw_queue,
             if((NPC[A].Active || !NPC[A].Reset[2]) && NPC[A].Reset[1])
             {
                 NPC[A].Reset[1] = false;
-                // only need to mark current-frame state
-                // NPC[A].Reset[2] = false;
-
                 NPCQueues::NoReset.push_back(A);
             }
         }
@@ -1323,7 +1320,7 @@ void ModernNPCScreenLogic(Screen_t& screen, int vscreen_i, bool fill_draw_queue,
         if(hp_door_scroll)
             render = false;
 
-        if(fill_draw_queue && render && ((NPC[A].Reset[1] && NPC[A].Reset[2]) || NPC[A].Active || NPC[A].Type == NPCID_CONVEYOR))
+        if(fill_draw_queue && render && (NPC[A].Reset[2] || NPC[A].Active || NPC[A].Type == NPCID_CONVEYOR))
         {
             NPC_Draw_Queue_p.add(A);
 
@@ -1413,7 +1410,9 @@ void UpdateGraphicsLogic(bool Do_FrameSkip)
     std::swap(NPCQueues::NoReset, s_NoReset_NPCs_LastFrame);
     NPCQueues::NoReset.clear();
 
-    // mark the last-frame reset state of NPCs that may have Reset[0] set to false, and clear their this-frame reset state
+    // mark the last-frame reset state of NPCs that may have Reset[1] or Reset[2] set to false, and clear their this-frame reset state
+    //     Reset[1] could have been set by the last frame's modern NPC logic, or by external code
+    //     Reset[2] could only have been set by external code
     if(g_compatibility.modern_npc_camera_logic)
     {
         for(NPC_t& n : s_NoReset_NPCs_LastFrame)
