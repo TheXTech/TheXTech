@@ -1195,9 +1195,10 @@ void ModernNPCScreenLogic(Screen_t& screen, int vscreen_i, bool fill_draw_queue,
                 }
 
                 // if it was already in the set, or if it was successfully added,
-                // set its intro frame to -2 to give it 2 frames of allowing it to reset while onscreen
+                // set its intro frame to -3 to give it 3 frames of allowing it to reset while onscreen
+                //   (was previously 2, but 3 fixes some rare bugs, esp. during level testing)
                 if(NPC_intro_index < NPC_intro_count)
-                    NPC_intro_frame[NPC_intro_index] = -2;
+                    NPC_intro_frame[NPC_intro_index] = -3;
             }
         }
 
