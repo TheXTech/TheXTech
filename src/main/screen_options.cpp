@@ -274,7 +274,7 @@ inline BaseConfigOption_t<true>* PrepareAction(bool to_delete = false)
         return nullptr;
 
     // is it one of the other unique episode config options?
-    bool is_ep_config = (g_config.m_options[i] == &g_config.creator_compat) || (g_config.m_options[i] == &g_config.enable_bugfixes);
+    bool is_ep_config = (g_config.m_options[i] == &g_config.creator_compat) || (g_config.m_options[i] == &g_config.playstyle);
 
     // check some info about the option
     ConfigSetLevel prev_level = g_config.m_options[i]->m_set;
@@ -458,7 +458,7 @@ void Delete()
 
     BaseConfigOption_t<true>* opt = PrepareAction(true);
 
-    if(opt && opt->is_set() && opt != &g_config.enable_bugfixes && opt != &g_config.creator_compat)
+    if(opt && opt->is_set() && opt != &g_config.playstyle && opt != &g_config.creator_compat)
     {
         s_set_dirty();
         s_change_item();

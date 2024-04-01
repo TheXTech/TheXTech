@@ -30,7 +30,7 @@
 #include "main/menu_main.h"
 #include "sound.h"
 
-static int s_backup_bugfixes = Config_t::BUGFIXES_ALL;
+static int s_backup_bugfixes = Config_t::MODE_MODERN;
 static int s_backup_creator_compat = Config_t::CREATORCOMPAT_ENABLE;
 
 template<>
@@ -39,8 +39,8 @@ void Config_t::Clear()
     // only update backup variables for main config class
     if(this == &g_config)
     {
-        if(enable_bugfixes.m_set == ConfigSetLevel::ep_config)
-            s_backup_bugfixes = enable_bugfixes;
+        if(playstyle.m_set == ConfigSetLevel::ep_config)
+            s_backup_bugfixes = playstyle;
 
         if(GameMenu)
             s_backup_creator_compat = Config_t::CREATORCOMPAT_ENABLE;
@@ -75,8 +75,8 @@ void Config_t::Clear()
     }
 
     // restore episode config
-    enable_bugfixes.m_value = s_backup_bugfixes;
-    enable_bugfixes.m_set = ConfigSetLevel::ep_config;
+    playstyle.m_value = s_backup_bugfixes;
+    playstyle.m_set = ConfigSetLevel::ep_config;
 
     creator_compat.m_value = s_backup_creator_compat;
     creator_compat.m_set = ConfigSetLevel::ep_config;
@@ -106,8 +106,8 @@ void Config_t::SaveEpisodeConfig(saveUserData& userdata)
     if(speedrun_mode.m_set >= ConfigSetLevel::ep_config)
         ep_config.data.emplace_back(saveUserData::DataEntry{"speedrun-mode", std::to_string(speedrun_mode.m_value)});
 
-    int enable_bugfixes_value = (enable_bugfixes.m_set == ConfigSetLevel::ep_config) ? enable_bugfixes : s_backup_bugfixes;
-    ep_config.data.emplace_back(saveUserData::DataEntry{"enable-bugfixes", (enable_bugfixes_value == BUGFIXES_NONE) ? "none" : ((enable_bugfixes_value == BUGFIXES_CRITICAL) ? "critical" : "all")});
+    int playstyle_value = (playstyle.m_set == ConfigSetLevel::ep_config) ? playstyle : s_backup_bugfixes;
+    ep_config.data.emplace_back(saveUserData::DataEntry{"playstyle", (playstyle_value == MODE_VANILLA) ? "vanilla" : ((playstyle_value == MODE_CLASSIC) ? "classic" : "modern")});
 
     int creator_compat_value = (creator_compat.m_set == ConfigSetLevel::ep_config) ? creator_compat : s_backup_creator_compat;
     ep_config.data.emplace_back(saveUserData::DataEntry{"creator-compat", (creator_compat_value == CREATORCOMPAT_DISABLE) ? "disable" : ((creator_compat_value == CREATORCOMPAT_FILEONLY) ? "file-only" : "enable")});
@@ -136,16 +136,28 @@ void Config_t::LoadEpisodeConfig(const saveUserData& userdata)
                     speedrun_mode.m_set = ConfigSetLevel::ep_config;
                 }
             }
+            // TODO: remove this legacy clause
             else if(entry.key == "enable-bugfixes")
             {
                 if(entry.value == "none")
-                    enable_bugfixes.m_value = BUGFIXES_NONE;
+                    playstyle.m_value = MODE_VANILLA;
                 else if(entry.value == "critical")
-                    enable_bugfixes.m_value = BUGFIXES_CRITICAL;
+                    playstyle.m_value = MODE_CLASSIC;
                 else
-                    enable_bugfixes.m_value = BUGFIXES_ALL;
+                    playstyle.m_value = MODE_MODERN;
 
-                enable_bugfixes.m_set = ConfigSetLevel::ep_config;
+                playstyle.m_set = ConfigSetLevel::ep_config;
+            }
+            else if(entry.key == "playstyle")
+            {
+                if(entry.value == "vanilla")
+                    playstyle.m_value = MODE_VANILLA;
+                else if(entry.value == "classic")
+                    playstyle.m_value = MODE_CLASSIC;
+                else
+                    playstyle.m_value = MODE_MODERN;
+
+                playstyle.m_set = ConfigSetLevel::ep_config;
             }
             else if(entry.key == "creator-compat")
             {
@@ -343,17 +355,17 @@ void UpdateConfig()
         if(g_config.compatibility_mode == Config_t::COMPAT_SMBX13)
         {
             compat_mode = CompatMode::smbx64;
-            g_config.enable_bugfixes = Config_t::BUGFIXES_NONE;
+            g_config.playstyle = Config_t::MODE_VANILLA;
         }
         else if(g_config.compatibility_mode == Config_t::COMPAT_CLASSIC)
         {
             compat_mode = CompatMode::classic;
-            g_config.enable_bugfixes = Config_t::BUGFIXES_CRITICAL;
+            g_config.playstyle = Config_t::MODE_CLASSIC;
         }
         else if(g_config.compatibility_mode == Config_t::COMPAT_MODERN)
         {
             compat_mode = CompatMode::modern;
-            g_config.enable_bugfixes = Config_t::BUGFIXES_ALL;
+            g_config.playstyle = Config_t::MODE_MODERN;
         }
 
         g_config.UpdateFromCompat(compat_mode, ConfigSetLevel::compat);

@@ -196,9 +196,15 @@ void FindSaves()
                             info.ConfigDefaults = -atoi(e.value.c_str());
                             break;
                         }
+                        // TODO: remove this legacy clause
                         else if(e.key == "enable-bugfixes")
                         {
-                            info.ConfigDefaults = (e.value == "none") ? Config_t::BUGFIXES_NONE : ((e.value == "critical") ? Config_t::BUGFIXES_CRITICAL : Config_t::BUGFIXES_ALL);
+                            info.ConfigDefaults = (e.value == "none") ? Config_t::MODE_VANILLA : ((e.value == "critical") ? Config_t::MODE_CLASSIC : Config_t::MODE_MODERN);
+                            info.ConfigDefaults += 1;
+                        }
+                        else if(e.key == "playstyle")
+                        {
+                            info.ConfigDefaults = (e.value == "vanilla") ? Config_t::MODE_VANILLA : ((e.value == "classic") ? Config_t::MODE_CLASSIC : Config_t::MODE_MODERN);
                             info.ConfigDefaults += 1;
                         }
                     }
@@ -210,11 +216,11 @@ void FindSaves()
             if(info.ConfigDefaults == 0)
             {
                 if(f.meta.smbx64strict)
-                    info.ConfigDefaults = Config_t::BUGFIXES_NONE + 1;
+                    info.ConfigDefaults = Config_t::MODE_VANILLA + 1;
                 else if(w.bugfixes_on_by_default)
-                    info.ConfigDefaults = Config_t::BUGFIXES_ALL + 1;
+                    info.ConfigDefaults = Config_t::MODE_MODERN + 1;
                 else
-                    info.ConfigDefaults = Config_t::BUGFIXES_CRITICAL + 1;
+                    info.ConfigDefaults = Config_t::MODE_CLASSIC + 1;
             }
 
             // load timer info for existing save

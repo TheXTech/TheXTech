@@ -610,18 +610,18 @@ public:
 
     enum
     {
-        BUGFIXES_ALL = 0,
-        BUGFIXES_CRITICAL,
-        BUGFIXES_NONE,
+        MODE_MODERN = 0,
+        MODE_CLASSIC,
+        MODE_VANILLA,
     };
-    opt_enum<int> enable_bugfixes{this,
+    opt_enum<int> playstyle{this,
         {
-            {BUGFIXES_ALL, "all", "All", nullptr},
-            {BUGFIXES_CRITICAL, "critical", "Critical", nullptr},
-            {BUGFIXES_NONE, "none", "None", nullptr},
+            {MODE_MODERN, "modern", "Modern", "Enables all updates"},
+            {MODE_CLASSIC, "classic", "Classic", "Critical updates only"},
+            {MODE_VANILLA, "vanilla", "Vanilla", "Preserves all known bugs"},
         },
-        defaults(BUGFIXES_ALL), {CompatClass::pure_preference, BUGFIXES_NONE}, Scope::UserEpisode,
-        "enable-patches", "Enable patches", "Enable fixes for SMBX 1.3 bugs and defects",
+        defaults(MODE_MODERN), {CompatClass::pure_preference, MODE_VANILLA}, Scope::UserEpisode,
+        "playstyle", "Playstyle", "Enable fixes for SMBX 1.3 bugs and defects",
         config_compat_changed};
 
     enum
@@ -840,13 +840,13 @@ public:
 
     opt_enum<int> speedrun_mode{this,
         {
-            {0, "0", "Off", nullptr},
-            {1, "1", "Mode 1 (TheXTech)", nullptr},
-            {2, "2", "Mode 2 (SMBX2)", nullptr},
-            {3, "3", "Mode 3 (SMBX64)", nullptr},
+            {0, "0", "0", nullptr},
+            {1, "1", "1", nullptr},
+            {2, "2", "2", nullptr},
+            {3, "3", "3", nullptr},
         },
         defaults<int>(0), {}, Scope::UserEpisode,
-        "mode", "Speedrun mode", "This enables the speedrun timer and enforces compatibility options",
+        "mode", "Speedrun mode", nullptr,
         config_compat_changed};
 
     enum

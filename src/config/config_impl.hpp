@@ -136,13 +136,13 @@ void ConfigOption_t<true, value_t>::disable_bugfixes(ConfigSetLevel level)
     if(!base)
         return;
 
-    if(g_config.enable_bugfixes == Config_t::BUGFIXES_ALL)
+    if(g_config.playstyle == Config_t::MODE_MODERN)
         return;
 
     if(base->m_compat_info.mode == CompatClass::pure_preference)
         return;
 
-    if(g_config.enable_bugfixes != Config_t::BUGFIXES_NONE && base->m_compat_info.mode == CompatClass::critical_update)
+    if(g_config.playstyle != Config_t::MODE_VANILLA && base->m_compat_info.mode == CompatClass::critical_update)
         return;
 
     *this = base->m_compat_info.prev_value;

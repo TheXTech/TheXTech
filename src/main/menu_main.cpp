@@ -759,7 +759,7 @@ bool mainMenuUpdate()
                 {
                     ConfigChangeSentinel sent(ConfigSetLevel::ep_config);
 
-                    g_config.enable_bugfixes = SelectWorld[selWorld].bugfixes_on_by_default ? Config_t::BUGFIXES_ALL : Config_t::BUGFIXES_CRITICAL;
+                    g_config.playstyle = SelectWorld[selWorld].bugfixes_on_by_default ? Config_t::MODE_MODERN : Config_t::MODE_CLASSIC;
                     if(g_config.speedrun_mode.m_set != ConfigSetLevel::cmdline)
                         g_config.speedrun_mode = 0;
                 }
@@ -1462,12 +1462,12 @@ bool mainMenuUpdate()
                             int save_configs = SaveSlotInfo[MenuCursor + 1].ConfigDefaults;
 
                             if(save_configs > 0)
-                                g_config.enable_bugfixes = save_configs - 1;
+                                g_config.playstyle = save_configs - 1;
                             else if(save_configs < 0 && g_config.speedrun_mode.m_set != ConfigSetLevel::cmdline)
                                 g_config.speedrun_mode = -save_configs;
                             else
                             {
-                                g_config.enable_bugfixes = SelectWorld[selWorld].bugfixes_on_by_default ? Config_t::BUGFIXES_ALL : Config_t::BUGFIXES_CRITICAL;
+                                g_config.playstyle = SelectWorld[selWorld].bugfixes_on_by_default ? Config_t::MODE_MODERN : Config_t::MODE_CLASSIC;
                                 if(g_config.speedrun_mode.m_set != ConfigSetLevel::cmdline)
                                     g_config.speedrun_mode = 0;
                             }
@@ -1561,7 +1561,7 @@ bool mainMenuUpdate()
 
                 if(MenuCursor != old_item)
                 {
-                    g_config.enable_bugfixes = SelectWorld[selWorld].bugfixes_on_by_default ? Config_t::BUGFIXES_ALL : Config_t::BUGFIXES_CRITICAL;
+                    g_config.playstyle = SelectWorld[selWorld].bugfixes_on_by_default ? Config_t::MODE_MODERN : Config_t::MODE_CLASSIC;
                     if(g_config.speedrun_mode.m_set != ConfigSetLevel::cmdline)
                         g_config.speedrun_mode = 0;
                 }
@@ -1573,10 +1573,10 @@ bool mainMenuUpdate()
                 // switch mode
                 if(MenuCursorCanMove && altPressed && g_config.speedrun_mode.m_value == 0)
                 {
-                    if(g_config.enable_bugfixes == Config_t::BUGFIXES_ALL)
-                        g_config.enable_bugfixes = Config_t::BUGFIXES_CRITICAL;
+                    if(g_config.playstyle == Config_t::MODE_MODERN)
+                        g_config.playstyle = Config_t::MODE_CLASSIC;
                     else
-                        g_config.enable_bugfixes = Config_t::BUGFIXES_ALL;
+                        g_config.playstyle = Config_t::MODE_MODERN;
 
                     PlaySoundMenu(SFX_PSwitch);
                     MenuCursorCanMove = false;
@@ -1590,12 +1590,12 @@ bool mainMenuUpdate()
                 // enter vanilla mode if an existing save slot
                 else if(MenuCursorCanMove && homePressed && SaveSlotInfo[MenuCursor + 1].Progress >= 0)
                 {
-                    int target_bugfixes = (SelectWorld[selWorld].bugfixes_on_by_default) ? Config_t::BUGFIXES_ALL : Config_t::BUGFIXES_CRITICAL;
+                    int target_bugfixes = (SelectWorld[selWorld].bugfixes_on_by_default) ? Config_t::MODE_MODERN : Config_t::MODE_CLASSIC;
 
-                    if(g_config.enable_bugfixes == Config_t::BUGFIXES_NONE)
-                        g_config.enable_bugfixes = target_bugfixes;
+                    if(g_config.playstyle == Config_t::MODE_VANILLA)
+                        g_config.playstyle = target_bugfixes;
                     else
-                        g_config.enable_bugfixes = Config_t::BUGFIXES_NONE;
+                        g_config.playstyle = Config_t::MODE_VANILLA;
 
                     PlaySoundMenu(SFX_PSwitch);
                     MenuCursorCanMove = false;
@@ -1607,7 +1607,7 @@ bool mainMenuUpdate()
                     selSave = MenuCursor + 1;
 
                     if(g_config.speedrun_mode.m_value == 0)
-                        MenuCursor = g_config.enable_bugfixes;
+                        MenuCursor = g_config.playstyle;
                     else
                         MenuCursor = g_config.speedrun_mode + 2;
 
@@ -1621,7 +1621,7 @@ bool mainMenuUpdate()
                 int save_configs = SaveSlotInfo[MenuCursor + 1].ConfigDefaults;
 
                 if(save_configs > 0)
-                    g_config.enable_bugfixes = save_configs - 1;
+                    g_config.playstyle = save_configs - 1;
                 else if(save_configs < 0 && g_config.speedrun_mode.m_set != ConfigSetLevel::cmdline)
                     g_config.speedrun_mode = -save_configs;
             }
@@ -1631,7 +1631,7 @@ bool mainMenuUpdate()
                 if(menuBackPress)
                 {
 //'save select back
-                    g_config.enable_bugfixes = Config_t::BUGFIXES_ALL;
+                    g_config.playstyle = Config_t::MODE_MODERN;
                     if(g_config.speedrun_mode.m_set != ConfigSetLevel::cmdline)
                         g_config.speedrun_mode = 0;
 
@@ -1821,14 +1821,14 @@ bool mainMenuUpdate()
 
                     if(MenuCursor < 3)
                     {
-                        g_config.enable_bugfixes = MenuCursor;
+                        g_config.playstyle = MenuCursor;
 
                         if(g_config.speedrun_mode.m_set != ConfigSetLevel::cmdline)
                             g_config.speedrun_mode = 0;
                     }
                     else
                     {
-                        g_config.enable_bugfixes = Config_t::BUGFIXES_ALL;
+                        g_config.playstyle = Config_t::MODE_MODERN;
 
                         if(g_config.speedrun_mode.m_set != ConfigSetLevel::cmdline)
                             g_config.speedrun_mode = MenuCursor - 2;
@@ -2304,7 +2304,7 @@ static void s_drawGameSaves(int MenuX, int MenuY)
         int save_configs = info.ConfigDefaults;
         if(save_configs == 0 && A == MenuCursor + 1 && (MenuMode == MENU_SELECT_SLOT_1P || MenuMode == MENU_SELECT_SLOT_2P))
         {
-            save_configs = g_config.enable_bugfixes + 1;
+            save_configs = g_config.playstyle + 1;
             if(g_config.speedrun_mode != 0)
                 save_configs = -g_config.speedrun_mode;
         }
@@ -2326,11 +2326,11 @@ static void s_drawGameSaves(int MenuX, int MenuY)
                 op += 0.5f;
             }
 
-            if(save_configs == Config_t::BUGFIXES_CRITICAL + 1)
+            if(save_configs == Config_t::MODE_CLASSIC + 1)
             {
                 XRender::renderTextureScaleEx(mode_icon_X, mode_icon_Y, 24, 24, GFXNPC[NPCID_POWER_S3], 0, 0, 32, 32, rot, nullptr, X_FLIP_NONE, XTAlphaF(op));
             }
-            else if(save_configs == Config_t::BUGFIXES_NONE + 1)
+            else if(save_configs == Config_t::MODE_VANILLA + 1)
             {
                 XRender::renderTextureScaleEx(mode_icon_X, mode_icon_Y, 24, 24, GFXNPC[NPCID_FODDER_S3], 0, 0, 32, 32, rot, nullptr, X_FLIP_NONE, XTAlphaF(op));
             }
@@ -2380,54 +2380,49 @@ static void s_drawGameSaves(int MenuX, int MenuY)
     {
         XRender::renderRect(infobox_x, infobox_y, 480, 68, {0, 0, 0, 192});
 
+        XTColor color;
+
+        if(g_config.playstyle == Config_t::MODE_MODERN)
+            color = XTColorF(0.5f, 0.8f, 1.0f);
+        else if(g_config.playstyle == Config_t::MODE_CLASSIC)
+            color = XTColorF(1.0f, 0.5f, 0.5f);
+        else
+            color = XTColorF(0.8f, 0.5f, 0.2f);
+
         if(g_config.speedrun_mode != 0)
-        {
-            XTColor color;
-
-            if(g_config.speedrun_mode == 1)
-                color = XTColorF(0.5f, 0.8f, 1.0f);
-            else if(g_config.speedrun_mode == 2)
-                color = XTColorF(1.0f, 0.5f, 0.5f);
-            else
-                color = XTColorF(0.8f, 0.5f, 0.2f);
-
             SuperPrintScreenCenter("SPEEDRUN MODE " + std::to_string(g_config.speedrun_mode), 3, infobox_y + 4, color);
-
-            if(g_config.speedrun_mode == 1)
-                SuperPrintScreenCenter("ALL PATCHES ON", 3, infobox_y + 24, color);
-            else if(g_config.speedrun_mode == 2)
-                SuperPrintScreenCenter("CRITICAL PATCHES ONLY", 3, infobox_y + 24, color);
-            else
-                SuperPrintScreenCenter("*NO* PATCHES", 3, infobox_y + 24, color);
-        }
         else
         {
-            int target_bugfixes = (SelectWorld[selWorld].bugfixes_on_by_default) ? Config_t::BUGFIXES_ALL : Config_t::BUGFIXES_CRITICAL;
-            int config_bugfixes = g_config.enable_bugfixes;
+            // int target_bugfixes = (SelectWorld[selWorld].bugfixes_on_by_default) ? Config_t::MODE_MODERN : Config_t::MODE_CLASSIC;
 
-            XTColor color;
+            std::string playstyle_string;
+            playstyle_string += g_options.playstyle.m_display_name;
+            playstyle_string += ": ";
 
-            if(config_bugfixes == Config_t::BUGFIXES_ALL)
-                color = XTColorF(0.5f, 0.8f, 1.0f);
-            else if(config_bugfixes == Config_t::BUGFIXES_CRITICAL)
-                color = XTColorF(1.0f, 0.5f, 0.5f);
+            if(g_config.playstyle == Config_t::MODE_MODERN)
+                playstyle_string += g_options.playstyle.m_enum_values[0].m_display_name;
+            else if(g_config.playstyle == Config_t::MODE_CLASSIC)
+                playstyle_string += g_options.playstyle.m_enum_values[1].m_display_name;
             else
-                color = XTColorF(0.8f, 0.5f, 0.2f);
+                playstyle_string += g_options.playstyle.m_enum_values[2].m_display_name;
 
-            if(target_bugfixes == config_bugfixes)
-                SuperPrintScreenCenter("WE SUGGEST:", 3, infobox_y + 4, color.with_alphaF(0.9f));
-            else
-                SuperPrintScreenCenter("PLAY WITH:", 3, infobox_y + 4, color.with_alphaF(0.9f));
+            // if(target_bugfixes == g_config.playstyle)
+            //     playstyle_string += " (Recommended)";
 
-            if(config_bugfixes == Config_t::BUGFIXES_ALL)
-                SuperPrintScreenCenter("ALL PATCHES ON", 3, infobox_y + 24, color);
-            else if(config_bugfixes == Config_t::BUGFIXES_CRITICAL)
-                SuperPrintScreenCenter("CRITICAL PATCHES ONLY", 3, infobox_y + 24, color);
-            else
-                SuperPrintScreenCenter("*NO* PATCHES", 3, infobox_y + 24, color);
+            SuperPrintScreenCenter(playstyle_string, 3, infobox_y + 4, color);
 
             SuperPrintScreenCenter("ALT JUMP TO SWITCH", 3, infobox_y + 44, XTColorF(0.8f, 0.8f, 0.8f, 0.8f));
         }
+
+        const std::string& playstyle_description
+            = (g_config.playstyle == Config_t::MODE_MODERN) ?
+                g_options.playstyle.m_enum_values[0].m_display_tooltip
+            : (g_config.playstyle == Config_t::MODE_CLASSIC) ?
+                g_options.playstyle.m_enum_values[1].m_display_tooltip
+            :
+                g_options.playstyle.m_enum_values[2].m_display_tooltip;
+
+        SuperPrintScreenCenter(playstyle_description, 5, infobox_y + 24, color);
     }
     // display fun save slot info
     else if(info.Progress >= 0)

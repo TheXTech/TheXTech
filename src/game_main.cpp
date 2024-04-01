@@ -732,7 +732,7 @@ int GameMain(const CmdLineSetup_t &setup)
             {
                 ConfigChangeSentinel sent(ConfigSetLevel::ep_config);
 
-                g_config.enable_bugfixes = Config_t::BUGFIXES_ALL;
+                g_config.playstyle = Config_t::MODE_MODERN;
                 if(g_config.speedrun_mode.m_set != ConfigSetLevel::cmdline)
                     g_config.speedrun_mode = 0;
             }
