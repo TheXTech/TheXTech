@@ -106,6 +106,9 @@ static AudioSetup_t s_audioSetupObtained;
 static Mix_Music *g_curMusic = nullptr;
 static bool g_mixerLoaded = false;
 
+//! most recent argument to StartMusic. Could be a world map music ID or a section index.
+static int  s_recentMusicA = 0;
+
 static int g_customLvlMusicId = 24;
 static int g_customWldMusicId = 17;
 static int g_reservedChannels = 0;
@@ -347,12 +350,20 @@ void InitMixerX()
 
 void RestartMixerX()
 {
+    constexpr int null_music = -5;
+
+    if(!musicPlaying)
+        s_recentMusicA = null_music;
+
     UnloadSound();
     QuitMixerX();
 
     InitMixerX();
     InitSound();
     LoadCustomSound();
+
+    if(s_recentMusicA != null_music)
+        StartMusic(s_recentMusicA);
 }
 
 void QuitMixerX()
@@ -803,6 +814,9 @@ void StartMusic(int A, int fadeInMs)
         // Keep world map music being remembered when sound disabled
         if((LevelSelect || WorldEditor) && !GameMenu && !GameOutro)
             curWorldMusic = A;
+
+        s_recentMusicA = A;
+
         return;
     }
 

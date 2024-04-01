@@ -107,16 +107,7 @@ void config_audio_set()
     RestartMixerX();
 
     if(GameMenu || !LevelSelect)
-    {
-        PlayMusic(musicName);
-
         UpdateSoundFX(Player[1].Section);
-    }
-    else
-    {
-        if(curWorldMusic > 0)
-            StartMusic(curWorldMusic);
-    }
 }
 
 void config_language_set()
