@@ -37,7 +37,8 @@
 
 #include "main/game_strings.h"
 
-static const uint32_t c_gfxLoaderShowInterval = 250;
+static const uint32_t c_progress_screen_min_elapsed = 1000;
+static const uint32_t c_progress_screen_tick_duration = 250;
 
 void IndicateProgress(uint32_t start_time, double progress, const std::string& message)
 {
@@ -46,18 +47,24 @@ void IndicateProgress(uint32_t start_time, double progress, const std::string& m
         return;
 #endif
 
-    bool progress_valid = (progress > 0) && (progress <= 1);
+    bool progress_valid = (progress > 0);
+
+    if(progress > 1)
+        progress = 1;
 
     uint32_t cur_time = SDL_GetTicks();
     uint32_t elapsed = cur_time - start_time;
     uint32_t total = progress_valid ? uint32_t(elapsed / progress) : 0;
 
-    if(elapsed <= c_gfxLoaderShowInterval)
+    if(elapsed < c_progress_screen_min_elapsed && total < c_progress_screen_min_elapsed)
         return;
 
-    LoadCoins += 1;
-    if(LoadCoins > 3)
-        LoadCoins = 0;
+    int load_coins_new = (elapsed / c_progress_screen_tick_duration) % 4;
+
+    if(load_coins_new == LoadCoins)
+        return;
+
+    LoadCoins = load_coins_new;
 
     XRender::setTargetTexture();
     XRender::clearBuffer();
@@ -68,19 +75,15 @@ void IndicateProgress(uint32_t start_time, double progress, const std::string& m
 
     int time_y = XRender::TargetH / 2 - 20;
 
-    if(progress_valid)
-    {
-        // outline
-        XRender::renderRect(XRender::TargetW * 0.25, time_y + 4, XRender::TargetW * 0.50, 32, {255, 255, 255});
-        // empty progress
-        XRender::renderRect(XRender::TargetW * 0.25 + 2, time_y + 6, XRender::TargetW * 0.50 - 4, 28, {0, 0, 0});
-        // progress fill
+    // outline
+    XRender::renderRect(XRender::TargetW * 0.25, time_y + 4, XRender::TargetW * 0.50, 32, {255, 255, 255});
+    // empty progress
+    XRender::renderRect(XRender::TargetW * 0.25 + 2, time_y + 6, XRender::TargetW * 0.50 - 4, 28, {0, 0, 0});
+    // progress fill
+    if(progress > 0)
         XRender::renderRect(XRender::TargetW * 0.25 + 2, time_y + 6, (XRender::TargetW * 0.50 - 4) * progress, 28, {127, 255, 127});
-        // push text down
-        time_y += 60;
-    }
-    else
-        time_y += 20;
+    // push text down
+    time_y += 60;
 
     std::string time_message = fmt::format_ne(g_gameStrings.formatMinutesSeconds, elapsed / 60000, (elapsed / 1000) % 60);
     if(progress_valid)
