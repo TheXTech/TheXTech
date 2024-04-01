@@ -21,6 +21,7 @@
 #include "sdl_proxy/sdl_stdinc.h"
 #include "sdl_proxy/sdl_atomic.h"
 #include "sdl_proxy/sdl_assert.h"
+#include "sdl_proxy/sdl_timer.h"
 #include "sdl_proxy/mixer.h"
 
 #include "globals.h"
@@ -30,6 +31,7 @@
 
 #include "load_gfx.h"
 #include "core/msgbox.h"
+#include "main/screen_progress.h"
 
 #include "sound.h"
 
@@ -456,7 +458,8 @@ static void AddSfx(SoundScope root,
 
     if(!f.empty() || isSilent)
     {
-        LoaderUpdateDebugString(fmt::format_ne("sound {0}", f));
+        if(LoadingInProcess)
+            LoaderUpdateDebugString(fmt::format_ne("sound {0}", f));
 
         if(isCustom)
         {
@@ -997,7 +1000,8 @@ static void loadMusicIni(SoundScope root, const std::string &path, bool isLoadin
         musicSetup.read("world-custom-music-id", g_customWldMusicId, 0);
         musicSetup.endGroup();
 
-        UpdateLoad();
+        if(LoadingInProcess)
+            UpdateLoad();
     }
 
     for(unsigned int i = 1; i <= g_totalMusicLevel; ++i)
@@ -1007,8 +1011,9 @@ static void loadMusicIni(SoundScope root, const std::string &path, bool isLoadin
         AddMusic(root, musicSetup, alias, group, 52);
     }
 
-    if(!isLoadingCustom)
+    if(!isLoadingCustom && LoadingInProcess)
         UpdateLoad();
+
     for(unsigned int i = 1; i <= g_totalMusicWorld; ++i)
     {
         std::string alias = fmt::format_ne("wmusic{0}", i);
@@ -1016,8 +1021,9 @@ static void loadMusicIni(SoundScope root, const std::string &path, bool isLoadin
         AddMusic(root, musicSetup, alias, group, 64);
     }
 
-    if(!isLoadingCustom)
+    if(!isLoadingCustom && LoadingInProcess)
         UpdateLoad();
+
     for(unsigned int i = 1; i <= g_totalMusicSpecial; ++i)
     {
         std::string alias = fmt::format_ne("smusic{0}", i);
@@ -1150,15 +1156,21 @@ void InitSound()
     if(!g_mixerLoaded)
         return;
 
+    uint32_t start_time = SDL_GetTicks();
+
     MusicRoot = AppPath + "music/";
     SfxRoot = AppPath + "sound/";
 
     musicIni = AppPath + "music.ini";
     sfxIni = AppPath + "sounds.ini";
 
-    LoaderUpdateDebugString("Sound configs");
 
-    UpdateLoad();
+    if(LoadingInProcess)
+    {
+        LoaderUpdateDebugString("Sound configs");
+        UpdateLoad();
+    }
+
     if(!Files::fileExists(musicIni) && !Files::fileExists(sfxIni))
     {
         pLogWarning("music.ini and sounds.ini are missing");
@@ -1186,7 +1198,11 @@ void InitSound()
 
     loadMusicIni(SoundScope::global, musicIni, false);
 
-    UpdateLoad();
+    if(LoadingInProcess)
+        UpdateLoad();
+    else
+        IndicateProgress(start_time, 0.2, "");
+
     IniProcessing sounds(sfxIni);
     sounds.beginGroup("sound-main");
     sounds.read("total", g_totalSounds, 0);
@@ -1205,18 +1221,28 @@ void InitSound()
     else
         playerHammerSFX = SFX_Fireball;
 
-    UpdateLoad();
+    if(LoadingInProcess)
+        UpdateLoad();
+    else
+        IndicateProgress(start_time, 0.4, "");
+
     for(unsigned int i = 1; i <= g_totalSounds; ++i)
     {
         std::string alias = fmt::format_ne("sound{0}", i);
         std::string group = fmt::format_ne("sound-{0}", i);
         AddSfx(SoundScope::global, sounds, alias, group);
 
+        if(!LoadingInProcess)
+            IndicateProgress(start_time, 0.4 + (double)i / g_totalSounds, "");
 #ifdef PGE_NO_THREADING
-        UpdateLoad();
+        else
+            UpdateLoad();
 #endif
     }
-    UpdateLoad();
+
+    if(LoadingInProcess)
+        UpdateLoad();
+
     Mix_ReserveChannels(g_reservedChannels);
 
     if(g_errorsSfx > 0)
