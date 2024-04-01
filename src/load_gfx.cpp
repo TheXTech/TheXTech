@@ -1653,6 +1653,6 @@ void UpdateLoadREAL()
 
 void UpdateLoad()
 {
-    if(!gfxLoaderThreadingMode)
+    if(LoadingInProcess && !gfxLoaderThreadingMode)
         UpdateLoadREAL();
 }
