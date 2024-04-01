@@ -3138,6 +3138,12 @@ void UpdateGraphicsMeta()
 
     XRender::setDrawPlane(PLANE_GAME_META);
 
+    if(GameMenu && !GameOutro)
+        mainMenuDraw();
+
+    if(GameOutro)
+        DrawCredits();
+
     speedRun_renderTimer();
 
     if(PrintFPS > 0 && ShowFPS)
@@ -3166,12 +3172,6 @@ void UpdateGraphicsMeta()
     DrawDeviceBattery();
 
     XRender::setDrawPlane(PLANE_GAME_MENUS);
-
-    if(GameMenu && !GameOutro)
-        mainMenuDraw();
-
-    if(GameOutro)
-        DrawCredits();
 
     if(LevelEditor || MagicHand)
         DrawEditorLevel_UI();
