@@ -3144,6 +3144,8 @@ void UpdateGraphicsMeta()
     if(GameOutro)
         DrawCredits();
 
+    DrawDeviceBattery();
+
     speedRun_renderTimer();
 
     if(PrintFPS > 0 && ShowFPS)
@@ -3168,8 +3170,6 @@ void UpdateGraphicsMeta()
             SuperPrintScreenCenter(WorldName, 3, y, XTAlphaF(alpha));
         }
     }
-
-    DrawDeviceBattery();
 
     XRender::setDrawPlane(PLANE_GAME_MENUS);
 
