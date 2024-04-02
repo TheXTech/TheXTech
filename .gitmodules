@@ -51,3 +51,4 @@
 [submodule "3rdparty/angle-shader-translator"]
 	path = 3rdparty/angle-shader-translator
 	url = https://github.com/TheXTech/angle-shader-translator-library.git
+	branch = dist-no-spirv
