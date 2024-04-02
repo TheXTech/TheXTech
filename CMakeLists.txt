@@ -966,9 +966,8 @@ elseif(NINTENDO_SWITCH)
     add_definitions(-DTHEXTECH_DISABLE_SDL_LOCALE) # SDL for Switch doesn't support language detection
     list(APPEND THEXTECH_SRC src/core/language/language_switch.cpp)
 elseif(VITA)
-    # FIXME: Implement the PS Vita language initializer
     add_definitions(-DTHEXTECH_DISABLE_SDL_LOCALE)
-    list(APPEND THEXTECH_SRC src/core/language/language_dummy.cpp)
+    list(APPEND THEXTECH_SRC src/core/language/language_vita.cpp)
 elseif(UNIX)
     list(APPEND THEXTECH_SRC src/core/language/language_unix.cpp)
 else()
