@@ -294,7 +294,8 @@ void DrawEditorLevel(int Z)
     XRender::setTargetLayer(3);
 #endif
 
-    // In-Editor message box preview
+#ifdef __3DS__
+    // In-Editor message box preview (actually only useful on 3DS)
     if(editorScreen.active && !MessageText.empty())
     {
         if(MessageTextMap.empty())
@@ -302,6 +303,7 @@ void DrawEditorLevel(int Z)
         else
             DrawMessage(MessageTextMap);
     }
+#endif
 
 #ifdef __3DS__
     // disable cursor rendering on main screen when editor screen is active
