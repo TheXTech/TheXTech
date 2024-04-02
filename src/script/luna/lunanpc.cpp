@@ -26,7 +26,7 @@
 
 NPC_t *NpcF::Get(int index)
 {
-    if(index < 0 || index > numNPCs)
+    if(index < 0 || index >= numNPCs)
         return nullptr;
 
     return &NPC[index + 1];
@@ -43,7 +43,7 @@ void NpcF::FindAll(int ID, int section, std::list<NPC_t *> *return_list)
     bool anySec = (section == -1);
     NPC_t *thisnpc = nullptr;
 
-    for(int i = 0; i <= numNPCs; i++)
+    for(int i = 1; i <= numNPCs; i++)
     {
         thisnpc = &NPC[i];
         if(thisnpc->Type == ID || anyID)
@@ -60,7 +60,7 @@ NPC_t *NpcF::GetFirstMatch(int ID, int section)
     bool anySec = (section == -1);
     NPC_t *thisnpc = nullptr;
 
-    for(int i = 0; i <= numNPCs; i++)
+    for(int i = 1; i <= numNPCs; i++)
     {
         thisnpc = &NPC[i];
         if(thisnpc->Type == ID || anyID)
@@ -82,7 +82,7 @@ void NpcF::MemSet(int ID, size_t offset, double value, OPTYPE operation, FIELDTY
     bool anyID = (ID == -1);
     NPC_t *thisnpc;
 
-    for(int i = 0; i <= numNPCs; i++)
+    for(int i = 1; i <= numNPCs; i++)
     {
         thisnpc = &NPC[i];
         if(anyID || thisnpc->Type == ID)
@@ -96,7 +96,7 @@ void NpcF::AllSetHits(int identity, int section, float hits)
     bool anySec = (section == -1);
     NPC_t *thisnpc;
 
-    for(int i = 0; i <= numNPCs; i++)
+    for(int i = 1; i <= numNPCs; i++)
     {
         thisnpc = Get(i);
         if(anyID || thisnpc->Type == identity)
@@ -113,7 +113,7 @@ void NpcF::AllFace(int identity, int section, double x)
     bool anySec = (section == -1);
     NPC_t *thisnpc;
 
-    for(int i = 0; i <= numNPCs; i++)
+    for(int i = 1; i <= numNPCs; i++)
     {
         thisnpc = Get(i);
         if(anyID || thisnpc->Type == identity)
