@@ -1173,7 +1173,7 @@ if(VITA)
 
     # Set explicit flags for this project
     target_compile_definitions(thextech PRIVATE
-        -DVITA -DNO_SCREENSHOT -DLOW_MEM -DTHEXTECH_PRELOAD_LEVELS -DNO_INTPTROC)
+        -DVITA -DNO_SCREENSHOT -DTHEXTECH_PRELOAD_LEVELS -DNO_INTPTROC)
 endif()
 
 if(WIN32 AND WINDOWS_STORE)
