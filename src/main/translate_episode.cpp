@@ -164,6 +164,8 @@ void TranslateEpisode::loadLevelTranslation(const std::string& key)
         pLogDebug("JSON SaX returned TRUE");
     else
         pLogDebug("JSON SaX returned FALSE");
+
+    std::fclose(f_in);
 }
 
 void TranslateEpisode::loadWorldTranslation(const std::string& key)
@@ -190,6 +192,8 @@ void TranslateEpisode::loadWorldTranslation(const std::string& key)
         pLogDebug("JSON SaX returned TRUE");
     else
         pLogDebug("JSON SaX returned FALSE");
+
+    std::fclose(f_in);
 }
 
 void TranslateEpisode::loadLunaScript(const std::string& key)
@@ -221,6 +225,8 @@ void TranslateEpisode::loadLunaScript(const std::string& key)
         pLogDebug("JSON SaX returned TRUE");
     else
         pLogDebug("JSON SaX returned FALSE");
+
+    std::fclose(f_in);
 }
 
 bool TranslateEpisode::tryTranslateTitle(const std::string& episodePath,
@@ -250,6 +256,8 @@ bool TranslateEpisode::tryTranslateTitle(const std::string& episodePath,
         pLogDebug("JSON SaX returned TRUE");
     else
         pLogDebug("JSON SaX returned FALSE");
+
+    std::fclose(f_in);
 
     return true;
 }
