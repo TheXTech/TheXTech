@@ -328,9 +328,22 @@ void InitMixerX()
                       s_audioSetupObtained.bufferSize);
         }
 
-#ifdef __3DS__
+#if defined(__3DS__)
         // Set fastest emulators to be default
         Mix_OPNMIDI_setEmulator(OPNMIDI_OPN2_EMU_GENS);
+        Mix_OPNMIDI_setChannelAllocMode(MIX_CHIP_CHANALLOC_SameInst);
+        Mix_OPNMIDI_setChipsCount(2);
+        Mix_ADLMIDI_setEmulator(ADLMIDI_OPL3_EMU_DOSBOX);
+        Mix_ADLMIDI_setChannelAllocMode(MIX_CHIP_CHANALLOC_SameInst);
+        Mix_ADLMIDI_setChipsCount(2);
+#elif defined(__WII__)
+        // Set fastest emulators to be default
+        Mix_OPNMIDI_setEmulator(OPNMIDI_OPN2_EMU_MAME_OPN2);
+        Mix_OPNMIDI_setChipsCount(2);
+        Mix_ADLMIDI_setEmulator(ADLMIDI_OPL3_EMU_DOSBOX);
+        Mix_ADLMIDI_setChipsCount(2);
+#elif defined(__vita__)
+        Mix_OPNMIDI_setEmulator(OPNMIDI_OPN2_EMU_YMFM_OPN2);
         Mix_OPNMIDI_setChipsCount(2);
         Mix_ADLMIDI_setEmulator(ADLMIDI_OPL3_EMU_DOSBOX);
         Mix_ADLMIDI_setChipsCount(2);
