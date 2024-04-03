@@ -1321,7 +1321,15 @@ void LoadCustomGFX(bool include_world, const char* preview_players_from)
 
 #if defined(PGE_MIN_PORT) || defined(THEXTECH_CLI_BUILD)
         bool success = LoadGFXFromList(g_dirEpisode.getCurDir(), true, !include_world);
+
+        if(s_useLangDirEp)
+            success |= LoadGFXFromList(g_dirEpisode.getCurDir() + s_langSubDirEp, true, !include_world);
+
         success |= LoadGFXFromList(g_dirCustom.getCurDir(), true, !include_world);
+
+        if(s_useLangDir)
+            success |= LoadGFXFromList(g_dirCustom.getCurDir() + s_langSubDir, true, !include_world);
+
         if(success)
             return;
 #endif
