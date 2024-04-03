@@ -1218,6 +1218,23 @@ void InitSound()
                               "Sounds loading error",
                               fmt::format_ne("Failed to load some SFX assets. Loo a log file to get more details:\n{0}", getLogFilePath()));
     }
+
+    // Print the stats of loaded sound files
+    int statSfxDump = 0;
+    int statSfxAsMusic = 0;
+
+    for(auto & it : sound)
+    {
+        auto &s = it.second;
+
+        if(s.music)
+            statSfxAsMusic++;
+
+        if(s.chunk)
+            statSfxDump++;
+    }
+
+    pLogInfo("Loaded sound effects: dumped=%d; as music=%d", statSfxDump, statSfxAsMusic);
 }
 
 void UnloadSound()
