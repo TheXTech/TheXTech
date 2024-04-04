@@ -34,6 +34,7 @@ Changelog for 1.3.6.4
 -Fix TheXTech 1.3.6 bug where the editor could occasionally crash when placing warps (@ds-sloth)
 -Fix TheXTech 1.3.6 bug where the editor could not set the level name (used in battle mode) (@ds-sloth)
 -Fix TheXTech 1.3.6.1 bug affecting debug builds where the editor could crash when erasing objects (@ds-sloth)
+-Improve the performance of MixerX on low-end targets (3DS, Wii, Vita) (@Wohlstand)
 
 Changelog for 1.3.6.3
 -Fixed a TheXTech 1.3.6.1 crash where object lookup table could not process items with negative size (@ds-sloth)
