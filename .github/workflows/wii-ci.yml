@@ -135,9 +135,9 @@ jobs:
         mkdir "package/${{ matrix.config.subdir_name }}"
         cp ../changelog.txt "package/${{ matrix.config.subdir_name }}/"
         cp ../LICENSE "package/${{ matrix.config.subdir_name }}/License.TheXTech.txt"
-        cp meta.xml "package/${{ matrix.config.subdir_name }}/"
-        cp icon.png "package/${{ matrix.config.subdir_name }}/"
-        cp thextech.dol "package/${{ matrix.config.subdir_name }}/boot.dol"
+        mv "package/meta.xml" "package/${{ matrix.config.subdir_name }}/"
+        mv "package/icon.png" "package/${{ matrix.config.subdir_name }}/"
+        mv "package/boot.dool" "package/${{ matrix.config.subdir_name }}/boot.dol"
         cat ../docs/README_WII.md ../README.md >> "package/${{ matrix.config.subdir_name }}/README.md"
         cd package
         zip -9 -r "thextech-wii-${BRANCH_NAME_RES}.zip" "${{ matrix.config.subdir_name }}"

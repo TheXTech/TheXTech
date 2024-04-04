@@ -1461,9 +1461,21 @@ elseif(NINTENDO_3DS)
     ctr_create_3dsx(thextech SMDH "thextech.smdh")
 elseif(NINTENDO_WII)
     string(TIMESTAMP XTECH_WIIMETA_RELEASE_DATE "%Y%m%d")
-    configure_file(${CMAKE_SOURCE_DIR}/resources/wii/icon.png ${CMAKE_BINARY_DIR}/icon.png COPYONLY)
-    configure_file(${CMAKE_SOURCE_DIR}/resources/wii/meta.xml.in ${CMAKE_BINARY_DIR}/meta.xml)
+    if(NOT "${THEXTECH_VERSION_REL}" STREQUAL "")
+        set(XTECH_WIIMETA_SHORT_DESC "git ${GIT_BRANCH} #${GIT_COMMIT_HASH}")
+    else()
+        set(XTECH_WIIMETA_SHORT_DESC "Based on SMBX 1.3 by Redigit")
+    endif()
+
+    configure_file(${CMAKE_SOURCE_DIR}/resources/wii/icon.png ${CMAKE_BINARY_DIR}/package/icon.png COPYONLY)
+    configure_file(${CMAKE_SOURCE_DIR}/resources/wii/meta.xml.in ${CMAKE_BINARY_DIR}/package/meta.xml)
+
     ogc_create_dol(thextech)
+    add_custom_command(TARGET thextech POST_BUILD
+                       COMMAND ${CMAKE_COMMAND} -E copy
+                           $<TARGET_FILE:thextech>
+                           ${CMAKE_BINARY_DIR}/package/boot.dol
+                       COMMENT "Copying thextech executable into package")
 elseif(NINTENDO_WIIU)
     string(TIMESTAMP XTECH_WIIMETA_RELEASE_DATE "%Y%m%d")
     configure_file(${CMAKE_SOURCE_DIR}/resources/wiiu/icon.png ${CMAKE_BINARY_DIR}/icon.png COPYONLY)
