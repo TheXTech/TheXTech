@@ -131,7 +131,6 @@ jobs:
         fi
 
         cd build
-        mkdir package
         mkdir "package/${{ matrix.config.subdir_name }}"
         cp ../changelog.txt "package/${{ matrix.config.subdir_name }}/"
         cp ../LICENSE "package/${{ matrix.config.subdir_name }}/License.TheXTech.txt"
