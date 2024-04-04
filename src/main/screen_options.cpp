@@ -690,6 +690,9 @@ bool Mouse_Render(bool mouse, bool render)
                 PlaySoundMenu(SFX_Slide);
         }
 
+        if(SharedCursor.Primary)
+            MenuMouseRelease = false;
+
         return false;
     }
 
