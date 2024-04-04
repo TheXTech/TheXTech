@@ -46,6 +46,8 @@ Changelog for 1.3.6.5-dev
 -Add a workaround for a memory exhaustion error from lineguide platform blocks (@ds-sloth)
 -Fix TheXTech 1.3.6 bug where carefully-constructed single-frame wall clips would not work in TheXTech (@ds-sloth)
 -Fix TheXTech 1.3.6 bug where the vanilla player-filter-bounce bug was not correctly reproduced in TheXTech (@ds-sloth)
+-Added automatical language detection for Vita (@Wohlstand)
+-Fixed a leak of file descriptors in the translations sub-system (@Wohlstand)
 
 Changelog for 1.3.6.4
 -Use OpenGL as the default renderer on supported platforms ("sdl" may be used in config.ini or at at the command line to request the SDL2 renderer)
@@ -63,6 +65,7 @@ Changelog for 1.3.6.4
 -Fix TheXTech 1.3.6 bug where the editor could occasionally crash when placing warps (@ds-sloth)
 -Fix TheXTech 1.3.6 bug where the editor could not set the level name (used in battle mode) (@ds-sloth)
 -Fix TheXTech 1.3.6.1 bug affecting debug builds where the editor could crash when erasing objects (@ds-sloth)
+-Improve the performance of MixerX on low-end targets (3DS, Wii, Vita) (@Wohlstand)
 
 Changelog for 1.3.6.3
 -Fixed a TheXTech 1.3.6.1 crash where object lookup table could not process items with negative size (@ds-sloth)

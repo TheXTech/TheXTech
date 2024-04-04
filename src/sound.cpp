@@ -330,9 +330,22 @@ void InitMixerX()
                       s_audioSetupObtained.bufferSize);
         }
 
-#ifdef __3DS__
+#if defined(__3DS__)
         // Set fastest emulators to be default
         Mix_OPNMIDI_setEmulator(OPNMIDI_OPN2_EMU_GENS);
+        Mix_OPNMIDI_setChannelAllocMode(MIX_CHIP_CHANALLOC_SameInst);
+        Mix_OPNMIDI_setChipsCount(2);
+        Mix_ADLMIDI_setEmulator(ADLMIDI_OPL3_EMU_DOSBOX);
+        Mix_ADLMIDI_setChannelAllocMode(MIX_CHIP_CHANALLOC_SameInst);
+        Mix_ADLMIDI_setChipsCount(2);
+#elif defined(__WII__)
+        // Set fastest emulators to be default
+        Mix_OPNMIDI_setEmulator(OPNMIDI_OPN2_EMU_MAME_OPN2);
+        Mix_OPNMIDI_setChipsCount(2);
+        Mix_ADLMIDI_setEmulator(ADLMIDI_OPL3_EMU_DOSBOX);
+        Mix_ADLMIDI_setChipsCount(2);
+#elif defined(__vita__)
+        Mix_OPNMIDI_setEmulator(OPNMIDI_OPN2_EMU_MAME_OPN2);
         Mix_OPNMIDI_setChipsCount(2);
         Mix_ADLMIDI_setEmulator(ADLMIDI_OPL3_EMU_DOSBOX);
         Mix_ADLMIDI_setChipsCount(2);
@@ -1265,6 +1278,23 @@ void InitSound()
                               "Sounds loading error",
                               fmt::format_ne("Failed to load some SFX assets. Loo a log file to get more details:\n{0}", getLogFilePath()));
     }
+
+    // Print the stats of loaded sound files
+    int statSfxDump = 0;
+    int statSfxAsMusic = 0;
+
+    for(auto & it : sound)
+    {
+        auto &s = it.second;
+
+        if(s.music)
+            statSfxAsMusic++;
+
+        if(s.chunk)
+            statSfxDump++;
+    }
+
+    pLogInfo("Loaded sound effects: dumped=%d; as music=%d", statSfxDump, statSfxAsMusic);
 }
 
 void UnloadSound()

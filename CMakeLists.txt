@@ -971,9 +971,8 @@ elseif(NINTENDO_SWITCH)
     add_definitions(-DTHEXTECH_DISABLE_SDL_LOCALE) # SDL for Switch doesn't support language detection
     list(APPEND THEXTECH_SRC src/core/language/language_switch.cpp)
 elseif(VITA)
-    # FIXME: Implement the PS Vita language initializer
     add_definitions(-DTHEXTECH_DISABLE_SDL_LOCALE)
-    list(APPEND THEXTECH_SRC src/core/language/language_dummy.cpp)
+    list(APPEND THEXTECH_SRC src/core/language/language_vita.cpp)
 elseif(UNIX)
     list(APPEND THEXTECH_SRC src/core/language/language_unix.cpp)
 else()
@@ -1179,7 +1178,7 @@ if(VITA)
 
     # Set explicit flags for this project
     target_compile_definitions(thextech PRIVATE
-        -DVITA -DNO_SCREENSHOT -DLOW_MEM -DTHEXTECH_PRELOAD_LEVELS -DNO_INTPTROC)
+        -DVITA -DNO_SCREENSHOT -DTHEXTECH_PRELOAD_LEVELS -DNO_INTPTROC)
 endif()
 
 if(WIN32 AND WINDOWS_STORE)
@@ -1467,9 +1466,21 @@ elseif(NINTENDO_3DS)
     ctr_create_3dsx(thextech SMDH "thextech.smdh")
 elseif(NINTENDO_WII)
     string(TIMESTAMP XTECH_WIIMETA_RELEASE_DATE "%Y%m%d")
-    configure_file(${CMAKE_SOURCE_DIR}/resources/wii/icon.png ${CMAKE_BINARY_DIR}/icon.png COPYONLY)
-    configure_file(${CMAKE_SOURCE_DIR}/resources/wii/meta.xml.in ${CMAKE_BINARY_DIR}/meta.xml)
+    if(NOT "${THEXTECH_VERSION_REL}" STREQUAL "")
+        set(XTECH_WIIMETA_SHORT_DESC "git ${GIT_BRANCH} #${GIT_COMMIT_HASH}")
+    else()
+        set(XTECH_WIIMETA_SHORT_DESC "Based on SMBX 1.3 by Redigit")
+    endif()
+
+    configure_file(${CMAKE_SOURCE_DIR}/resources/wii/icon.png ${CMAKE_BINARY_DIR}/package/icon.png COPYONLY)
+    configure_file(${CMAKE_SOURCE_DIR}/resources/wii/meta.xml.in ${CMAKE_BINARY_DIR}/package/meta.xml)
+
     ogc_create_dol(thextech)
+    add_custom_command(TARGET thextech POST_BUILD
+                       COMMAND ${CMAKE_COMMAND} -E copy
+                           ${CMAKE_BINARY_DIR}/thextech.dol
+                           ${CMAKE_BINARY_DIR}/package/boot.dol
+                       COMMENT "Copying thextech executable into package")
 elseif(NINTENDO_WIIU)
     string(TIMESTAMP XTECH_WIIMETA_RELEASE_DATE "%Y%m%d")
     configure_file(${CMAKE_SOURCE_DIR}/resources/wiiu/icon.png ${CMAKE_BINARY_DIR}/icon.png COPYONLY)
