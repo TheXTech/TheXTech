@@ -1473,7 +1473,7 @@ elseif(NINTENDO_WII)
     ogc_create_dol(thextech)
     add_custom_command(TARGET thextech POST_BUILD
                        COMMAND ${CMAKE_COMMAND} -E copy
-                           $<TARGET_FILE:thextech>
+                           ${CMAKE_BINARY_DIR}/thextech.dol
                            ${CMAKE_BINARY_DIR}/package/boot.dol
                        COMMENT "Copying thextech executable into package")
 elseif(NINTENDO_WIIU)
