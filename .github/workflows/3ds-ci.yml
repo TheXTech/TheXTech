@@ -25,16 +25,15 @@ jobs:
         - {
             name: "3DS build",
 
-            extra_options: "-DCMAKE_TOOLCHAIN_FILE=$DEVKITPRO/cmake/3DS.cmake",
+            extra_options: "-DCMAKE_TOOLCHAIN_FILE=$DEVKITPRO/cmake/3DS.cmake -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=ON",
 
             deps_cmdline: "sudo apt-get update -qq \
             && sudo apt-get install -qq cmake ninja-build make lftp git-core python zip \
             && git config --global --add safe.directory '*'",
 
             generator: "Ninja",
-            build_type: "MinSizeRel",
+            build_type: "Release",
             executable_name: "thextech",
-            assets_url: "https://wohlsoft.ru/projects/TheXTech/_downloads/thextech-adventure-of-demo-assets-full.7z",
             subdir_name: "thextech-3ds",
             upload_directory: "www/3ds/"
           }
