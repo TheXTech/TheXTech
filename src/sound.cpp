@@ -343,7 +343,7 @@ void InitMixerX()
         Mix_ADLMIDI_setEmulator(ADLMIDI_OPL3_EMU_DOSBOX);
         Mix_ADLMIDI_setChipsCount(2);
 #elif defined(__vita__)
-        Mix_OPNMIDI_setEmulator(OPNMIDI_OPN2_EMU_YMFM_OPN2);
+        Mix_OPNMIDI_setEmulator(OPNMIDI_OPN2_EMU_MAME_OPN2);
         Mix_OPNMIDI_setChipsCount(2);
         Mix_ADLMIDI_setEmulator(ADLMIDI_OPL3_EMU_DOSBOX);
         Mix_ADLMIDI_setChipsCount(2);
