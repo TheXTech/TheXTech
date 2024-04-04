@@ -61,7 +61,7 @@ void GetvScreen(vScreen_t& vscreen)
         vscreen.Y += -vscreen.TempY;
 
         // allow some overscan (needed for 3DS)
-        int allow_X = (g_config.allow_multires && Screens[vscreen.screen_ref].player_count == 1 && !Screens[vscreen.screen_ref].is_canonical()) ? XRender::TargetOverscanX : 0;
+        int allow_X = (g_config.allow_multires && vscreen.Width == XRender::TargetW && !Screens[vscreen.screen_ref].is_canonical()) ? XRender::TargetOverscanX : 0;
 
         // don't do overscan if at the level bounds
         if(allow_X > 0 && level[p.Section].Width - level[p.Section].X <= vscreen.Width)
@@ -152,7 +152,7 @@ void GetvScreenAverage(vScreen_t& vscreen)
     vscreen.Y = (vscreen.Y / B) + (use_height * 0.5) - vScreenYOffset;
 
     // allow some overscan (needed for 3DS)
-    int allow_X = (g_config.allow_multires && Screens[vscreen.screen_ref].player_count == 1 && !Screens[vscreen.screen_ref].is_canonical()) ? XRender::TargetOverscanX : 0;
+    int allow_X = (g_config.allow_multires && vscreen.Width == XRender::TargetW && !Screens[vscreen.screen_ref].is_canonical()) ? XRender::TargetOverscanX : 0;
 
     // don't do overscan if at the level bounds
     if(allow_X > 0 && section.Width - section.X <= vscreen.Width)
@@ -298,7 +298,7 @@ void GetvScreenAverage3(vScreen_t& vscreen)
     vscreen.Y = vscreen.Y / (plr_count + 1) + (use_height * 0.5) - vScreenYOffset;
 
     // allow some overscan (needed for 3DS)
-    int allow_X = (g_config.allow_multires && Screens[vscreen.screen_ref].player_count == 1 && !Screens[vscreen.screen_ref].is_canonical()) ? XRender::TargetOverscanX : 0;
+    int allow_X = (g_config.allow_multires && vscreen.Width == XRender::TargetW && !Screens[vscreen.screen_ref].is_canonical()) ? XRender::TargetOverscanX : 0;
 
     // don't do overscan if at the level bounds
     if(allow_X > 0 && section.Width - section.X <= vscreen.Width)
