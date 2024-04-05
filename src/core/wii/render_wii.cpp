@@ -336,6 +336,8 @@ bool init()
     frameBuffer[1] = MEM_K0_TO_K1(SYS_AllocateFramebuffer(rmode));
 
     VIDEO_Configure(rmode);
+    VIDEO_ClearFrameBuffer(rmode, frameBuffer[0], COLOR_BLACK);
+    VIDEO_ClearFrameBuffer(rmode, frameBuffer[1], COLOR_BLACK);
     VIDEO_SetNextFramebuffer(frameBuffer[cur_buffer]);
     VIDEO_SetBlack(FALSE);
     VIDEO_Flush();
@@ -369,8 +371,7 @@ bool init()
     GX_SetAlphaUpdate(1);
     GX_SetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_SET);
 
-
-    printf("Initialized video with rMode %d x %d\n", (int)rmode->viWidth, (int)rmode->viHeight);
+    pLogInfo("RenderWii: initialized GX video with rMode %d x %d", (int)rmode->viWidth, (int)rmode->viHeight);
 
     g_rmode_w = rmode->fbWidth;
     g_rmode_h = rmode->efbHeight;
@@ -420,6 +421,7 @@ bool init()
 
 void quit()
 {
+    VIDEO_SetBlack(TRUE);
 }
 
 void setTargetTexture()

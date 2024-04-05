@@ -110,13 +110,15 @@ void SuperPrintMarquee(int SuperN, const char* SuperChars, int Font, float X, fl
 {
     bool outline = false;
 
-    if(Font == 5)
+    int dFont = FontManager::fontIdFromSmbxFont(Font);
+    if(dFont < 0 && Font == 5)
     {
         Font = 4;
         outline = true;
+
+        dFont = FontManager::fontIdFromSmbxFont(Font);
     }
 
-    int dFont = FontManager::fontIdFromSmbxFont(Font);
     if(dFont < 0)
     {
         pLogWarning("SuperPrint: Invalid font %d is specified", Font);
