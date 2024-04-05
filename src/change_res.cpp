@@ -94,7 +94,7 @@ void UpdateInternalRes()
         }
     }
 
-    if(!XRender::is_nullptr() && (req_w == 0 || req_h == 0))
+    if(!XRender::is_nullptr() && GameIsActive && (req_w == 0 || req_h == 0))
     {
         int int_w, int_h, orig_int_h;
 
@@ -250,7 +250,7 @@ void UpdateInternalRes()
         l_screen->H = canon_h;
     }
 
-    if(XRender::is_nullptr())
+    if(XRender::is_nullptr() || !GameIsActive)
         return;
 
     XRender::updateViewport();
