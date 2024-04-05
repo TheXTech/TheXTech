@@ -30,6 +30,7 @@
 #include <Logger/logger.h>
 
 #include "globals.h"
+#include "config.h"
 #include "frame_timer.h"
 
 #include "core/render.h"
@@ -465,8 +466,9 @@ void repaint()
 
     glFlush(0);
 
-    // if(g_config.scale_mode == SCALE_DYNAMIC_LINEAR)
-    //     swiWaitForVBlank();
+    if(g_config.render_vsync)
+        swiWaitForVBlank();
+
     g_in_frame = false;
 }
 
