@@ -253,6 +253,13 @@ public:
         "scale-mode", "Scale mode", "How should the game field be scaled onscreen?",
         config_res_set
     };
+
+#ifdef __WII__
+    opt<bool> hq_widescreen{this, defaults(false), {}, Scope::UserGlobal,
+        "hq-widescreen", "HQ Widescreen", "Requires TV zoom mode",
+        config_res_set};
+#endif
+
     /* ---- Video - Meta Info ----*/
     subsection info_meta{this, "info-meta", "Onscreen meta info"};
 

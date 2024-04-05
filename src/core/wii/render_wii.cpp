@@ -521,7 +521,7 @@ void minport_TransformPhysCoords()
     hardware_w /= 2;
     hardware_h /= 2;
 
-    if(CONF_GetAspectRatio()) // widescreen_stretch
+    if(CONF_GetAspectRatio() && !g_config.hq_widescreen) // widescreen_stretch
     {
         g_screen_phys_h = g_screen_phys_h * g_rmode_h / hardware_h;
 
