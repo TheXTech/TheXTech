@@ -791,9 +791,7 @@ void minport_ApplyPhysCoords()
 
     g_screen_swapped = should_swap_screen();
 
-    GPU_TEXTURE_FILTER_PARAM filter = (g_config.scale_mode == Config_t::SCALE_DYNAMIC_LINEAR || g_config.scale_mode == Config_t::SCALE_FIXED_05X)
-        ? GPU_LINEAR
-        : GPU_NEAREST;
+    GPU_TEXTURE_FILTER_PARAM filter = GPU_LINEAR;
 
     for(int layer = 0; layer < 4; layer++)
     {

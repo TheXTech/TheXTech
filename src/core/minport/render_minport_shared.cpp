@@ -83,7 +83,7 @@ void updateViewport()
     int TargetW_Show = TargetW;
 #endif
 
-    if(g_config.scale_mode == Config_t::SCALE_DYNAMIC_LINEAR || g_config.scale_mode == Config_t::SCALE_DYNAMIC_NEAREST)
+    if(g_config.fit_to_screen)
     {
         int res_h = hardware_h;
         int res_w = TargetW_Show * hardware_h / TargetH;
@@ -91,40 +91,27 @@ void updateViewport()
         if(res_w > hardware_w)
         {
             res_w = hardware_w;
-            res_h = TargetH * res_w / TargetW;
+            res_h = TargetH * res_w / TargetW_Show;
         }
 
         g_screen_phys_w = res_w;
         g_screen_phys_h = res_h;
     }
-    else if(g_config.scale_mode == Config_t::SCALE_FIXED_1X)
+    else
     {
         g_screen_phys_w = TargetW_Show / 2;
         g_screen_phys_h = TargetH / 2;
-    }
-    else if(g_config.scale_mode == Config_t::SCALE_FIXED_2X)
-    {
-        g_screen_phys_w = TargetW_Show;
-        g_screen_phys_h = TargetH;
-    }
-    else if(g_config.scale_mode == Config_t::SCALE_FIXED_05X)
-    {
-        g_screen_phys_w = TargetW_Show / 4;
-        g_screen_phys_h = TargetH / 4;
-    }
-    else if(g_config.scale_mode == Config_t::SCALE_DYNAMIC_INTEGER)
-    {
-        g_screen_phys_w = TargetW_Show / 2;
-        g_screen_phys_h = TargetH / 2;
-        while(g_screen_phys_w <= hardware_w && g_screen_phys_h <= hardware_h)
+
+        if(g_screen_phys_w > hardware_w)
         {
-            g_screen_phys_w += TargetW_Show / 2;
-            g_screen_phys_h += TargetH / 2;
+            g_screen_phys_w = hardware_w;
+            g_screen_phys_h = TargetH * g_screen_phys_w / TargetW_Show;
         }
-        if(g_screen_phys_w > TargetW_Show / 2)
+
+        if(g_screen_phys_h > hardware_h)
         {
-            g_screen_phys_w -= TargetW_Show / 2;
-            g_screen_phys_h -= TargetH / 2;
+            g_screen_phys_h = hardware_h;
+            g_screen_phys_w = TargetW_Show * g_screen_phys_h / TargetH;
         }
     }
 

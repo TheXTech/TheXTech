@@ -227,9 +227,14 @@ public:
         "internal-res", "Resolution", "The base resolution for gameplay",
         config_res_set
     };
+
+#ifndef __16M__
     opt<bool> dynamic_width{this, defaults(false), {}, Scope::UserGlobal,
-        "dynamic-width", "Dynamic width", "Stretch the game's width to fit the screen",
+        "dynamic-width", "Dynamic width", "Match screen aspect ratio",
         config_res_set};
+#else
+    static constexpr bool dynamic_width = false;
+#endif
 
     enum ScaleModes
     {
@@ -240,6 +245,8 @@ public:
         SCALE_FIXED_1X = 1,
         SCALE_FIXED_2X = 2,
     };
+
+#ifndef PGE_MIN_PORT
     opt_enum<int> scale_mode{this,
         {
             {SCALE_DYNAMIC_INTEGER, "integer", "Integer"},
@@ -250,9 +257,20 @@ public:
             {SCALE_FIXED_2X, "2x", "2x"},
         },
         defaults(SCALE_DYNAMIC_NEAREST), {}, Scope::UserGlobal,
-        "scale-mode", "Scale mode", "How should the game field be scaled onscreen?",
+        "scale-mode", "Scale mode", "How should the game field be shown onscreen?",
         config_res_set
     };
+#else
+    static constexpr int scale_mode = SCALE_DYNAMIC_NEAREST;
+#endif
+
+#ifdef __WII__
+    opt<bool> fit_to_screen{this, defaults(false), {}, Scope::UserGlobal,
+        "fit-to-screen", "Fit to screen", "Zoom game view (reduces quality)",
+        config_res_set};
+#elif PGE_MIN_PORT
+    static constexpr bool fit_to_screen = false;
+#endif
 
 #ifdef __WII__
     opt<bool> hq_widescreen{this, defaults(false), {}, Scope::UserGlobal,
