@@ -48,6 +48,7 @@ Changelog for 1.3.6.5-dev
 -Fix TheXTech 1.3.6 bug where the vanilla player-filter-bounce bug was not correctly reproduced in TheXTech (@ds-sloth)
 -Added automatical language detection for Vita (@Wohlstand)
 -Fixed a leak of file descriptors in the translations sub-system (@Wohlstand)
+-Allow asset packs to customize Font 5 (outlined mixed-case font) (@ds-sloth)
 
 Changelog for 1.3.6.4
 -Use OpenGL as the default renderer on supported platforms ("sdl" may be used in config.ini or at at the command line to request the SDL2 renderer)

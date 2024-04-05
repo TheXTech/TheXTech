@@ -98,7 +98,7 @@ private:
     //! Height of one letter
     uint32_t m_letterHeight = 0;
     //! Space between printing letters
-    uint32_t m_interLetterSpace = 0;
+    int32_t m_interLetterSpace = 0;
     //! Width of space symbol
     uint32_t m_spaceWidth = 0;
     //! Distance between top of one line and top of next
