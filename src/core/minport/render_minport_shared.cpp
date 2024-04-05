@@ -201,21 +201,6 @@ void getRenderSize(int* w, int* h)
     return XWindow::getWindowSize(w, h);
 }
 
-inline int ROUNDDIV2(int x)
-{
-    return (x < 0) ? (x - 1) / 2 : (x + 1) / 2;
-}
-
-inline float ROUNDDIV2(float x)
-{
-    return std::roundf(x / 2.0f);
-}
-
-inline double ROUNDDIV2(double x)
-{
-    return std::round(x / 2.0);
-}
-
 inline int FLOORDIV2(int x)
 {
     return (x < 0) ? (x - 1) / 2 : x / 2;
@@ -223,12 +208,12 @@ inline int FLOORDIV2(int x)
 
 inline float FLOORDIV2(float x)
 {
-    return std::floor(std::roundf(x) / 2.0f);
+    return std::floor((x + 0.5f) / 2.0f);
 }
 
 inline double FLOORDIV2(double x)
 {
-    return std::floor(std::round(x) / 2.0);
+    return std::floor((x + 0.5) / 2.0);
 }
 
 #ifndef __WII__
