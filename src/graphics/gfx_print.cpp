@@ -31,10 +31,12 @@
 
 int SuperTextPixLen(int SuperN, const char* SuperChars, int Font)
 {
-    if(Font == 5)
-        Font = 4;
-
     int dFont = FontManager::fontIdFromSmbxFont(Font);
+    if(dFont < 0 && Font == 5)
+    {
+        Font = 4;
+        dFont = FontManager::fontIdFromSmbxFont(Font);
+    }
 
     if(dFont < 0)
     {
@@ -58,13 +60,14 @@ void SuperPrintRightAlign(int SuperN, const char* SuperChars, int Font, float X,
     int RealFont = Font;
     bool outline = false;
 
-    if(Font == 5)
+    int dFont = FontManager::fontIdFromSmbxFont(Font);
+    if(dFont < 0 && Font == 5)
     {
         Font = 4;
         outline = true;
-    }
 
-    int dFont = FontManager::fontIdFromSmbxFont(Font);
+        dFont = FontManager::fontIdFromSmbxFont(Font);
+    }
 
     if(dFont >= 0)
     {
@@ -73,7 +76,7 @@ void SuperPrintRightAlign(int SuperN, const char* SuperChars, int Font, float X,
         return;
     }
 
-    X -= SuperTextPixLen(SuperN, SuperChars, Font);
+    X -= SuperTextPixLen(SuperN, SuperChars, RealFont);
     SuperPrint(SuperN, SuperChars, RealFont, X, Y, color);
 }
 
@@ -82,13 +85,14 @@ void SuperPrintCenter(int SuperN, const char* SuperChars, int Font, float X, flo
     int RealFont = Font;
     bool outline = false;
 
-    if(Font == 5)
+    int dFont = FontManager::fontIdFromSmbxFont(Font);
+    if(dFont < 0 && Font == 5)
     {
         Font = 4;
         outline = true;
-    }
 
-    int dFont = FontManager::fontIdFromSmbxFont(Font);
+        dFont = FontManager::fontIdFromSmbxFont(Font);
+    }
 
     if(dFont >= 0)
     {
@@ -97,7 +101,7 @@ void SuperPrintCenter(int SuperN, const char* SuperChars, int Font, float X, flo
         return;
     }
 
-    X -= SuperTextPixLen(SuperN, SuperChars, Font) / 2;
+    X -= SuperTextPixLen(SuperN, SuperChars, RealFont) / 2;
     SuperPrint(SuperN, SuperChars, RealFont, X, Y, color);
 }
 
@@ -106,13 +110,14 @@ void SuperPrintScreenCenter(int SuperN, const char* SuperChars, int Font, float 
     int RealFont = Font;
     bool outline = false;
 
-    if(Font == 5)
+    int dFont = FontManager::fontIdFromSmbxFont(Font);
+    if(dFont < 0 && Font == 5)
     {
         Font = 4;
         outline = true;
-    }
 
-    int dFont = FontManager::fontIdFromSmbxFont(Font);
+        dFont = FontManager::fontIdFromSmbxFont(Font);
+    }
 
     if(dFont >= 0)
     {
@@ -121,7 +126,7 @@ void SuperPrintScreenCenter(int SuperN, const char* SuperChars, int Font, float 
         return;
     }
 
-    float X = (XRender::TargetW / 2) - (SuperTextPixLen(SuperN, SuperChars, Font) / 2);
+    float X = (XRender::TargetW / 2) - (SuperTextPixLen(SuperN, SuperChars, RealFont) / 2);
     SuperPrint(SuperN, SuperChars, RealFont, X, Y, color);
 }
 
@@ -130,13 +135,15 @@ void SuperPrint(int SuperN, const char* SuperChars, int Font, float X, float Y,
 {
     bool outline = false;
 
-    if(Font == 5)
+    int dFont = FontManager::fontIdFromSmbxFont(Font);
+    if(dFont < 0 && Font == 5)
     {
         Font = 4;
         outline = true;
+
+        dFont = FontManager::fontIdFromSmbxFont(Font);
     }
 
-    int dFont = FontManager::fontIdFromSmbxFont(Font);
     if(dFont < 0)
     {
         pLogWarning("SuperPrint: Invalid font %d is specified", Font);
