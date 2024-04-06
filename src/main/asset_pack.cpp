@@ -188,30 +188,34 @@ static void s_find_asset_packs()
     bool found_debug_any = false;
     bool found_debug_match = false;
 
-    for(const std::string& root : AppPathManager::assetsSearchPath())
+    for(const auto& root_ : AppPathManager::assetsSearchPath())
     {
+        const std::string& root = root_.first;
+        AppPathManager::AssetsPathType type = root_.second;
+
         // check for a root passed via `-c`
-        bool is_custom_root = !custom_root.empty() && root == custom_root;
+        bool is_modern_root = (type == AppPathManager::AssetsPathType::Single);
+        bool is_multiple_root = (type == AppPathManager::AssetsPathType::Multiple);
 
         // Normally, root is a legacy asset pack, and <root>/assets/ contains modern asset packs.
         // If passed via -c, root must be a modern asset pack also.
 
         D_pLogDebug(" Checking %s", root.c_str());
-        if(DirMan::exists(root + "graphics/ui/"))
+        if(!is_multiple_root && DirMan::exists(root + "graphics/ui/"))
         {
             AssetPack_t pack = s_scan_asset_pack(root);
 
             // strip the ID from a legacy asset pack
-            if(!is_custom_root)
+            if(!is_modern_root)
                 s_strip_id(pack);
 
             if(!pack.gfx || !pack.gfx->logo.inited)
-                pLogWarning("Could not load UI assets from %s asset pack [%s], ignoring", (is_custom_root) ? "user-specified" : "possible legacy", pack.path.c_str());
-            else if(is_custom_root && pack.id.empty())
+                pLogWarning("Could not load UI assets from %s asset pack [%s], ignoring", (is_modern_root) ? "user-specified" : "possible legacy", pack.path.c_str());
+            else if(is_modern_root && pack.id.empty())
                 pLogWarning("Could not read ID of user-specified asset pack [%s], ignoring", pack.path.c_str());
-            else if(found_debug_match)
+            else if(!is_modern_root && found_debug_match)
                 pLogDebug("Current legacy/debug assets already found, ignoring assets at [%s]", pack.path.c_str());
-            else if(found_debug_any && pack.full_id() != g_AssetPackID)
+            else if(!is_modern_root && found_debug_any && pack.full_id() != g_AssetPackID)
                 pLogDebug("Generic legacy/debug assets already found, ignoring assets at [%s]", pack.path.c_str());
             else
             {
@@ -223,7 +227,7 @@ static void s_find_asset_packs()
             }
         }
 
-        if(!is_custom_root && DirMan::exists(root + "assets/"))
+        if(!is_modern_root && DirMan::exists(root + "assets/"))
         {
             assets.setPath(root + "assets/");
             assets.getListOfFolders(subdirList);
@@ -311,31 +315,39 @@ static AssetPack_t s_find_pack_init(const std::string& full_id)
     AssetPack_t any_pack;
     AssetPack_t id_match;
 
-    for(const std::string& root : AppPathManager::assetsSearchPath())
+    for(const auto& root_ : AppPathManager::assetsSearchPath())
     {
+        const std::string& root = root_.first;
+        AppPathManager::AssetsPathType type = root_.second;
+
         // check for a root passed via `-c`
+        bool is_modern_root = (type == AppPathManager::AssetsPathType::Single);
+        bool is_multiple_root = (type == AppPathManager::AssetsPathType::Multiple);
         bool is_custom_root = !custom_root.empty() && root == custom_root;
 
         // Normally, root is a legacy asset pack, and <root>/assets/ contains modern asset packs.
         // If passed via -c, root must be a modern asset pack also.
 
         // check for legacy debug assets
-        if(DirMan::exists(root + "graphics/ui/"))
+        if(!is_multiple_root && DirMan::exists(root + "graphics/ui/"))
         {
             AssetPack_t pack = s_scan_asset_pack(root, true);
 
             // strip the ID from a legacy asset pack
-            if(!is_custom_root)
+            if(!is_modern_root)
                 s_strip_id(pack);
 
-            if(is_custom_root && pack.id.empty())
+            if(is_modern_root && pack.id.empty())
             {
                 pLogWarning("Could not read ID of command-line specified asset pack [%s], ignoring", pack.path.c_str());
                 pLogCritical("gameinfo.ini of command-line specified asset pack [%s] has not been updated to specify its asset pack ID. After updating, you will need to move your gamesaves to settings/gamesaves/<ID>.", pack.path.c_str());
 
-                XMsgBox::errorMsgBox("Critical error",
-                                     "gameinfo.ini of command-line specified asset pack has not been updated to specify its asset pack ID.\n"
-                                     "After updating, you will need to manually move your gamesaves to settings/gamesaves/<ID>.\n");
+                if(is_custom_root)
+                {
+                    XMsgBox::errorMsgBox("Critical error",
+                                         "gameinfo.ini of command-line specified asset pack has not been updated to specify its asset pack ID.\n"
+                                         "After updating, you will need to manually move your gamesaves to settings/gamesaves/<ID>.\n");
+                }
             }
             else if(is_custom_root && pack.path == id_as_path)
                 return pack;
@@ -347,7 +359,7 @@ static AssetPack_t s_find_pack_init(const std::string& full_id)
                 any_pack = std::move(pack);
         }
 
-        if(!is_custom_root && DirMan::exists(root + "assets/"))
+        if(!is_modern_root && DirMan::exists(root + "assets/"))
         {
             assets.setPath(root + "assets/");
             assets.getListOfFolders(subdirList);
@@ -440,15 +452,24 @@ bool ReloadAssetsFrom(const AssetPack_t& pack)
 
 bool InitUIAssetsFrom(const std::string& id)
 {
-    std::string custom_root = AppPathManager::userAddedAssetsRoot();
-
     pLogDebug("Searching for asset packs in:");
-    for(const std::string& root : AppPathManager::assetsSearchPath())
+    for(const auto& root_ : AppPathManager::assetsSearchPath())
     {
+        const std::string& root = root_.first;
+        AppPathManager::AssetsPathType type = root_.second;
+
+        // check for a root passed via `-c`
+        bool is_modern_root = (type == AppPathManager::AssetsPathType::Single);
+        bool is_multiple_root = (type == AppPathManager::AssetsPathType::Multiple);
+
         // treat command-line specified locations as direct storage
-        if(!custom_root.empty() && root == custom_root)
+        if(is_modern_root)
         {
             pLogDebug("- %s", root.c_str());
+        }
+        else if(is_multiple_root)
+        {
+            pLogDebug("- %sassets/*", root.c_str());
         }
         else
         {

@@ -149,42 +149,42 @@ std::string AppPathManager::userAddedAssetsRoot()
     return m_customAssetsRoot;
 }
 
-std::vector<std::string> AppPathManager::assetsSearchPath()
+std::vector<std::pair<std::string, AppPathManager::AssetsPathType>> AppPathManager::assetsSearchPath()
 {
-    std::vector<std::string> out;
+    std::vector<std::pair<std::string, AssetsPathType>> out;
 
     if(!m_customAssetsRoot.empty())
-        out.push_back(m_customAssetsRoot);
+        out.push_back({m_customAssetsRoot, AssetsPathType::Single});
 
     if(!m_customUserDirectory.empty())
-        out.push_back(m_customUserDirectory);
+        out.push_back({m_customUserDirectory, AssetsPathType::Legacy});
 
     if(!AppPathP::appDirectory().empty())
-        out.push_back(AppPathP::appDirectory());
+        out.push_back({AppPathP::appDirectory(), AssetsPathType::Legacy});
 
     if(!m_isPortable)
     {
 #ifdef FIXED_ASSETS_PATH // Fixed assets path, for the rest of UNIX-like OS packages
-        out.push_back(FIXED_ASSETS_PATH);
+        out.push_back({FIXED_ASSETS_PATH, AssetsPathType::Legacy});
 #endif
 
         if(m_customUserDirectory.empty())
-            out.push_back(m_userPath);
+            out.push_back({m_userPath, AssetsPathType::Legacy});
 
         if(!AppPathP::assetsRoot().empty())
-            out.push_back(AppPathP::assetsRoot());
+            out.push_back({AppPathP::assetsRoot(), AssetsPathType::Legacy});
     }
 
     // add slashes to all strings
     for(size_t i = 0; i < out.size(); i++)
-        appendSlash(out[i]);
+        appendSlash(out[i].first);
 
     // remove any duplicates
     for(size_t i = 0; i < out.size(); i++)
     {
         for(size_t j = i + 1; j < out.size();)
         {
-            if(out[i] == out[j])
+            if(out[i].first == out[j].first)
                 out.erase(out.begin() + j);
             else
                 j++;
