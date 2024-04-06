@@ -194,12 +194,12 @@ void TouchScreenGFX_t::load()
     loadAll();
 
     // try loading from other paths if unsuccessful
-    for(const std::string& root : AppPathManager::assetsSearchPath())
+    for(const auto& root_ : AppPathManager::assetsSearchPath())
     {
         if(m_success)
             break;
 
-        m_gfxPath = root + "graphics/touchscreen/";
+        m_gfxPath = root_.first + "graphics/touchscreen/";
         loadAll();
     }
 

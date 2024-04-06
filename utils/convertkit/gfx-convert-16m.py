@@ -103,6 +103,16 @@ for dirpath, _, files in os.walk(datadir, topdown=True):
                     os.system(f'convert {downscale} "{rfn}" "{bmpfn}"')
             else:
                 os.system(f'convert {downscale} "{rfn}" "{bmpfn}"')
+
+            # handle animated GIFs
+            if not os.path.isfile(bmpfn) and os.path.isfile(bmpfn[:-4]+'-0.bmp'):
+                shutil.move(bmpfn[:-4]+'-0.bmp', bmpfn)
+
+                # get rid of junk frames
+                i = 1
+                while os.path.isfile(bmpfn[:-4]+f'-{i}.bmp'):
+                    os.remove(bmpfn[:-4]+f'-{i}.bmp')
+                    i += 1
         elif fn.endswith('.db'):
             continue
         elif fn.endswith('.ogg') and '/sound/' in rfn:

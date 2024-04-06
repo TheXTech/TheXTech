@@ -70,10 +70,20 @@ public:
     static std::string userAddedAssetsRoot(); // Read-Only
 
     /*!
-     * \brief Get a list of folders that should be searched for asset packs (each folder directly, and also each subdirectory in folder + "/assets"). Does not change after initAppPath() is called.
-     * \return Vector of paths to the read-only assets directory, always ends with a slash
+     * \brief Set of possible asset pack search path types
      */
-    static std::vector<std::string> assetsSearchPath(); // Read-Only
+    enum AssetsPathType
+    {
+        Legacy,   // search the path directly for asset pack (as legacy), and check for additional packs in assets subdirectory
+        Single,   // single modern asset pack
+        Multiple, // directory containing multiple subdirectories with modern asset packs
+    };
+
+    /*!
+     * \brief Get a list of folders that should be searched for asset packs (each folder directly, and also each subdirectory in folder + "/assets"). Does not change after initAppPath() is called.
+     * \return Vector of paths to the read-only assets directory, always ends with a slash. Type of each path is specified.
+     */
+    static std::vector<std::pair<std::string, AssetsPathType>> assetsSearchPath(); // Read-Only
 
     /*!
      * \brief Set the custom assets directory by ID and absolute path (will be used instead of default)
