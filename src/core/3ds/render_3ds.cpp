@@ -476,7 +476,6 @@ void quit()
     C2D_Fini();
     C3D_Fini();
     gfxExit();
-    aptExit();
 }
 
 void setTargetTexture()
