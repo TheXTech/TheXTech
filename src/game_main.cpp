@@ -221,6 +221,8 @@ static void s_ExpandSectionForMenu()
 
 void MainLoadAll(bool reload)
 {
+    LoadingInProcess = true;
+
     if(reload)
     {
         StopAllSounds();
@@ -279,6 +281,8 @@ void MainLoadAll(bool reload)
     XWindow::updateWindowIcon();
 
     LoaderFinish();
+
+    LoadingInProcess = false;
 }
 
 
