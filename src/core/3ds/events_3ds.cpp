@@ -52,7 +52,7 @@ void quit()
 void doEvents()
 {
     if(!aptMainLoop())
-        KillIt(); // could add panic save of some sort here...
+        GameIsActive = false; // could add panic save of some sort here...
 }
 
 void waitEvents() {}
