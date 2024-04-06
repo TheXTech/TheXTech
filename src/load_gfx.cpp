@@ -618,7 +618,7 @@ bool LoadGFXFromList(std::string source_dir, bool custom, bool skip_world)
 
             loadImageFromList(f, source_dir,
                 (*GFXCharacterBMP[c])[A], &(*GFXCharacterWidth[c])[A], &(*GFXCharacterHeight[c])[A], (*GFXCharacterCustom[c])[A],
-                true, custom);
+                false, custom);
         }
 
         failed = false;
