@@ -1316,7 +1316,7 @@ void EditorLoop()
 void KillIt()
 {
     GameIsActive = false;
-    Integrator::initIntegrations();
+    Integrator::quitIntegrations();
 #ifndef RENDER_FULLSCREEN_ALWAYS
     XWindow::hide();
     if(resChanged)
