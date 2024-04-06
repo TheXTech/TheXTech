@@ -173,6 +173,12 @@ std::vector<std::pair<std::string, AppPathManager::AssetsPathType>> AppPathManag
 
         if(!AppPathP::assetsRoot().empty())
             out.push_back({AppPathP::assetsRoot(), AssetsPathType::Legacy});
+
+#ifdef APP_PATH_HAS_EXTRA_WORLDS
+        // 3DS: add assets from additional romfs packages
+        for(const std::string& root : AppPathManager::worldRootDirs())
+            out.push_back({root, AssetsPathType::Single});
+#endif
     }
 
     // add slashes to all strings
