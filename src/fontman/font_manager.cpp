@@ -472,10 +472,15 @@ void FontManager::quit()
 
     g_fontNameToId.clear();
     g_anyFonts.clear();
+
 #ifdef THEXTECH_ENABLE_TTF_SUPPORT
     g_ttfFonts.clear();
+    g_defaultTtfFont = nullptr;
 #endif
+
     g_rasterFonts.clear();
+    g_defaultRasterFont = nullptr;
+
 #ifdef THEXTECH_ENABLE_TTF_SUPPORT
     closeFreeType();
 #endif
