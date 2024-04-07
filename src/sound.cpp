@@ -822,13 +822,13 @@ void StartMusic(int A, int fadeInMs)
 
     D_pLogDebug("Start music A=%d", A);
 
+    s_recentMusicA = A;
+
     if(!g_mixerLoaded)
     {
         // Keep world map music being remembered when sound disabled
         if((LevelSelect || WorldEditor) && !GameMenu && !GameOutro)
             curWorldMusic = A;
-
-        s_recentMusicA = A;
 
         return;
     }
