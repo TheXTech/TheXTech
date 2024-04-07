@@ -111,10 +111,10 @@ public:
 
 
     /* ---- Main ----*/
-    section main{this, Scope::All, "main", "Main", "Options affecting the overall game"};
+    section main{this, Scope::All, "main", "Main", nullptr};
 
     language_t language{this, defaults(std::string("auto")), {}, Scope::UserGlobal,
-        "language", "Language", "Language in which to display all game engine text",
+        "language", "Language", nullptr,
         config_language_set};
 
 #ifdef ENABLE_XTECH_DISCORD_RPC
@@ -125,7 +125,7 @@ public:
 
 #ifndef NO_WINDOW_FOCUS_TRACKING
     opt<bool> background_work{this, defaults(false), {}, Scope::UserGlobal,
-        "background-work", "Run in background", "Play with game controller while game is unfocused"};
+        "background-work", "Run in background", "Play with joystick while game is unfocused"};
 #else
     static constexpr bool background_work = true;
 #endif
@@ -136,25 +136,25 @@ public:
     subsection main_frame_timing{this, "timing", "Frame Timing"};
 
     opt<bool> enable_frameskip{this, defaults(false), {}, Scope::UserGlobal,
-        "frame-skip", "Frameskip", "Skip frames to maintain normal game speed"};
+        "frame-skip", "Frameskip", "Skip frames to maintain game speed"};
 
     opt<bool> unlimited_framerate{this, defaults(false), {}, Scope::UserGlobal,
         "unlimited-framerate", "Unlimited framerate", "Allow framerate above 66 FPS"};
 
     opt<bool> render_vsync{this, defaults(false), {}, Scope::UserGlobal,
-        "vsync", "V-Sync", "Sync frames to display refresh, reduces tearing",
+        "vsync", "V-Sync", "Sync frames to screen refresh, reduces tearing",
         config_res_set};
 
 
     /* ---- Video ----*/
-    section video{this, Scope::UserGlobal, "video", "Video", "Options affecting the game's rendering"};
+    section video{this, Scope::UserGlobal, "video", "Video", nullptr};
 
     /* ---- Video - System ----*/
     subsection video_system{this, "video-system", "System"};
 
 #ifndef RENDER_FULLSCREEN_ALWAYS
     opt<bool> fullscreen{this, defaults(false), {}, Scope::UserGlobal,
-        "fullscreen", "Fullscreen", "Renders the game in fullscreen",
+        "fullscreen", "Fullscreen", nullptr,
         config_fullscreen_set};
 #else
     static constexpr bool fullscreen = true;
@@ -173,7 +173,7 @@ public:
             {{0, 0}, "dynamic", "Dynamic"},
         },
         defaults(std::pair<int, int>({0, 0})), {}, Scope::UserGlobal,
-        "internal-res", "Resolution", "The base resolution for gameplay",
+        "internal-res", "Screen size", "Resolution of gameplay field",
         config_res_set
     };
 
@@ -200,13 +200,13 @@ public:
         {
             {SCALE_DYNAMIC_INTEGER, "integer", "Integer"},
             {SCALE_DYNAMIC_NEAREST, "nearest", "Nearest"},
-            {SCALE_DYNAMIC_LINEAR, "linear", "Linear"},
+            {SCALE_DYNAMIC_LINEAR, "linear", "Smooth"},
             {SCALE_FIXED_05X, "0.5x", "0.5x"},
             {SCALE_FIXED_1X, "1x", "1x"},
             {SCALE_FIXED_2X, "2x", "2x"},
         },
         defaults(SCALE_DYNAMIC_NEAREST), {}, Scope::UserGlobal,
-        "scale-mode", "Scale mode", "How should the game field be shown onscreen?",
+        "scale-mode", "Scale mode", nullptr,
         config_res_set
     };
 #else
@@ -233,7 +233,7 @@ public:
     static constexpr bool show_backdrop = true;
 
     opt<bool> show_controllers{this, defaults(false), {}, Scope::UserGlobal,
-        "display-controllers", "Controller activity", "Show which buttons players press"};
+        "display-controllers", "Controls activity", "Show which buttons players press"};
 
     opt<bool> show_fps{this, defaults(false), {}, Scope::UserGlobal,
         "show-fps", "Framerate", nullptr};
@@ -332,10 +332,10 @@ public:
     opt_enum<int> show_playtime_counter{this,
         {
             {PLAYTIME_COUNTER_OFF, "off", "Off", "Show only during speedruns"},
-            {PLAYTIME_COUNTER_SUBTLE, "subtle", "Subtle", "A transparent effect"},
-            {PLAYTIME_COUNTER_SUBTLE, "transparent"},
-            {PLAYTIME_COUNTER_OPAQUE, "opaque", "Opaque", "Opaque text"},
-            {PLAYTIME_COUNTER_ANIMATED, "animated", "Animated", "Opaque text with a rainbow blinking effect at the end of a level"},
+            {PLAYTIME_COUNTER_SUBTLE, "transparent", "Transparent", nullptr},
+            {PLAYTIME_COUNTER_SUBTLE, "subtle"},
+            {PLAYTIME_COUNTER_OPAQUE, "opaque", "Opaque", nullptr},
+            {PLAYTIME_COUNTER_ANIMATED, "animated", "Animated", "Adds a rainbow effect on level end"},
         },
         defaults(PLAYTIME_COUNTER_OFF), {}, Scope::UserGlobal,
         "show-playtime-counter", "Playtime counter", "Show time spent on the episode and current attempt"};
@@ -352,7 +352,7 @@ public:
 
 
     /* ---- Audio ----*/
-    section audio{this, Scope::UserGlobal, "audio", "Audio", "Options affecting the game's audio"};
+    section audio{this, Scope::UserGlobal, "audio", "Audio", nullptr};
 
     opt<bool> audio_enable{this, defaults(true), {}, Scope::UserGlobal,
         "audio-enable", "Enable", nullptr,
@@ -375,7 +375,7 @@ public:
     static constexpr bool sfx_player_grow_with_got_item = false;
 
     opt<bool> sfx_modern{this, defaults(true), {CompatClass::pure_preference, false}, Scope::UserGlobal,
-        "sfx-modern", "Modern SFX", "Play sound effects added in TheXTech", nullptr};
+        "sfx-modern", "Modern SFX", "Use sounds added in TheXTech", nullptr};
 
 #if 0
     enum
@@ -396,7 +396,7 @@ public:
 #endif
 
     opt<bool> sfx_pet_beat{this, defaults(true), {CompatClass::pure_preference, false}, Scope::UserGlobal,
-        "sfx-pet-beat", "Pet beat", "Play special beat when player rides a pet",
+        "sfx-pet-beat", "Pet grooves", "Play special groove when riding a pet",
         config_mountdrums_set};
 
 #ifdef THEXTECH_ENABLE_AUDIO_FX
@@ -426,7 +426,7 @@ public:
     // static constexpr bool record_gameplay_data = false;
 
     opt<bool> record_gameplay_data{this, defaults(false), {}, Scope::UserGlobal,
-        "record-gameplay-data", "Record gameplay", "Record control input for replay or debug purposes"};
+        "record-gameplay-data", "Record gameplay", "Save play data for replay or debugging"};
 
     opt_enum<int> log_level{this,
         {
@@ -449,12 +449,12 @@ public:
         defaults(PGE_LogLevel::Info),
 #endif
         {}, Scope::UserGlobal,
-        "log-level", "Log level", "Log events at or above this severity",
+        "log-level", "Log level", "Log events at or above this level",
         config_log_level_set};
 
 #if defined(__ANDROID__) || defined(__3DS__)
     opt<bool> use_native_osk{this, defaults(false), {}, Scope::UserGlobal,
-        "use-native-osk", "Native OSK", "Use system's native keyboard for non-Latin input"};
+        "use-native-osk", "Native OSK", "Use system's native keyboard"};
 #endif
 
     /* ---- Advanced - Video ----*/
@@ -507,12 +507,12 @@ public:
 
     opt_enum<int> scale_down_textures{this,
         {
-            {SCALE_DOWN_NONE, "none", "None", nullptr},
-            {SCALE_DOWN_SAFE, "safe", "Safe", "Only scales down the textures that are in 2x format"},
-            {SCALE_DOWN_ALL, "all", "All", "Less texture stutter than 'Safe'"},
+            {SCALE_DOWN_NONE, "none", "None", "Least loading stutter"},
+            {SCALE_DOWN_SAFE, "safe", "Safe", "Checks if images are in 2x format"},
+            {SCALE_DOWN_ALL, "all", "All", "Less loading stutter than 'Safe'"},
         },
         defaults(SCALE_DOWN_SAFE), {}, Scope::UserGlobal,
-        "scale-down-textures", "Scale down textures", "Store textures as 1x to save memory"};
+        "scale-down-textures", "Scale down images", "Store images as 1x to save memory"};
 #endif
 
 #ifndef THEXTECH_NO_SDL_BUILD
@@ -529,7 +529,7 @@ public:
             {48000, "48000", "48000 Hz", nullptr},
         },
         defaults(g_audioDefaults.sampleRate), {}, Scope::UserGlobal,
-        "audio-sample-rate", "Sample rate", "Sets maximum pitch, quality, and processing load",
+        "audio-sample-rate", "Sample rate", nullptr,
         config_audio_set};
 
     opt_enum<int> audio_format{this,
@@ -594,7 +594,7 @@ public:
             {4096, "4096", "4096"},
         },
         defaults(g_audioDefaults.bufferSize), {}, Scope::UserGlobal,
-        "audio-buffer-size", "Buffer size", "(Advanced) higher values result in fewer pops and more delay",
+        "audio-buffer-size", "Buffer size", "(Advanced) increase for fewer pops but more lag",
         config_audio_set};
 #endif
 
@@ -610,12 +610,12 @@ public:
     };
     opt_enum<int> playstyle{this,
         {
-            {MODE_MODERN, "modern", "Modern", "Enables all updates"},
+            {MODE_MODERN, "modern", "Modern", "Enables all gameplay updates"},
             {MODE_CLASSIC, "classic", "Classic", "Critical updates only"},
             {MODE_VANILLA, "vanilla", "Vanilla", "Preserves all known bugs"},
         },
         defaults(MODE_MODERN), {CompatClass::pure_preference, MODE_VANILLA}, Scope::UserEpisode,
-        "playstyle", "Playstyle", "Enable fixes for SMBX 1.3 bugs and defects",
+        "playstyle", "Playstyle", nullptr,
         config_compat_changed};
 
     enum
@@ -631,7 +631,7 @@ public:
             {CREATORCOMPAT_DISABLE, "disable", "Disable", nullptr},
         },
         defaults(CREATORCOMPAT_ENABLE), {CompatClass::critical_update, CREATORCOMPAT_DISABLE}, Scope::UserEpisode,
-        "creator-compat", "Creator compat", "Enable logic tweaks by content creator"};
+        "creator-compat", "Creator compat", "Logic tweaks by content creator"};
 
     // /* ---- Prefs - Effects ----*/
     // subsection effects{this, "effects", "Visual Effects"};
@@ -643,10 +643,11 @@ public:
 
 
     /* ---- Compatibility ----*/
-    section compat{this, Scope::File, "compatibility", "Session Tweaks", "Advanced options to improve compatibility with old content or experiment with the engine"};
+    section compat{this, Scope::File, "compatibility", "Session Tweaks", "Options for compat or debugging"};
 
     subsection reset_all{this, "reset-all", "Reset All"};
 
+    // TODO: make sure that Modern / Classic do not override compat.ini settings
     enum
     {
         COMPAT_OFF = 0,
@@ -657,15 +658,15 @@ public:
     };
     opt_enum<int> compatibility_mode{this,
         {
-            {COMPAT_OFF, "off", "Off", "Does not override any settings"},
+            {COMPAT_OFF, "off", "Off", nullptr},
             {COMPAT_OFF, "native"},
-            {COMPAT_MODERN, "modern", "TheXTech", "Enforces the gameplay logic of the current version of TheXTech"},
-            {COMPAT_CLASSIC, "classic", "Classic", "Enforces SMBX 1.3 logic with only critical bugfixes enabled"},
-            {COMPAT_SMBX13, "smbx13", "SMBX 1.3", "Preserves the gameplay of the final version of the SMBX fan game"},
+            {COMPAT_MODERN, "modern", "Modern", nullptr},
+            {COMPAT_CLASSIC, "classic", "Classic", nullptr},
+            {COMPAT_SMBX13, "smbx13", "Vanilla", nullptr},
             // {COMPAT_CONTENT, "content", "Content", "Preserves the gameplay of the version for which the content was released"},
         },
         defaults(COMPAT_OFF), {}, Scope::None,
-        "compatibility-mode", "Compatibility mode", "Overrides settings (even custom ones in a world or level) to guarantee behavior compatible with an older fan game"};
+        "compatibility-mode", "Compat mode", "Overrides settings (even custom ones in a world or level) to guarantee behavior compatible with an older fan game"};
 
     /* ---- Compatibility - Features ----*/
     subsection compat_features{this, "features", "Features"};
