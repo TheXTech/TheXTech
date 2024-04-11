@@ -692,6 +692,8 @@ int main(int argc, char**argv)
     setup.verboseLogging = true;
     setup.frameSkip = false;
     setup.testShowFPS = true;
+
+    setup.noSound = g_audioSetup.disableSound;
 #endif
 
 #if defined(__EMSCRIPTEN__) && defined(THEXTECH_DEBUG_INFO)
