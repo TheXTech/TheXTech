@@ -1635,19 +1635,20 @@ void UpdateLoadREAL()
         if(gfxLoaderThreadingMode && alphaFader > 0)
             XRender::renderRect(0, 0, XRender::TargetW, XRender::TargetH, {0, 0, 0, alphaFader});
 
+#ifndef PGE_NO_THREADING
+        SDL_LockMutex(gfxLoaderDebugMutex);
+#endif
+
         if(!gfxLoaderDebugString.empty() && gfxLoaderDebugStart + c_gfxLoaderShowInterval < SDL_GetTicks())
         {
-#ifndef PGE_NO_THREADING
-            SDL_LockMutex(gfxLoaderDebugMutex);
-#endif
             SuperPrint(gfxLoaderDebugString.c_str(), 3,
                        Left + 10, Bottom - 24,
                        {255, 255, 0, 127});
+        }
 
 #ifndef PGE_NO_THREADING
-            SDL_UnlockMutex(gfxLoaderDebugMutex);
+        SDL_UnlockMutex(gfxLoaderDebugMutex);
 #endif
-        }
 
         XRender::repaint();
         XRender::setTargetScreen();
