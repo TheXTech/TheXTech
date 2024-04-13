@@ -160,6 +160,225 @@ static void setupCheckpoints()
     } // for Check points
 }
 
+struct PlayerStartInfo_t
+{
+    static constexpr int start_pos_count = 2;
+    std::array<uint8_t, start_pos_count> players_at_start;
+    std::array<uint8_t, c_screenCount> start_for_screen; // used by shared screens only
+};
+
+static void s_PlacePlayerAtStart(int A, PlayerStartInfo_t& player_start_info)
+{
+    /**************************************
+    ** (1) pick which start point to use **
+    **************************************/
+    int use_start = -1;
+
+    // check for shared screen
+    const int plr_screen_i = ScreenIdxByPlayer(A);
+    const Screen_t& plr_screen = ScreenByPlayer(A);
+    if(plr_screen.multiplayer_pref == MultiplayerPrefs::Shared)
+        use_start = (int)player_start_info.start_for_screen[plr_screen_i] - 1;
+
+    // if not forced by shared screen, choose start with the least players
+    if(use_start == -1)
+    {
+        // default to initial start
+        use_start = 0;
+
+        // check whether a later start has fewer players
+        for(int start = 1; start < PlayerStartInfo_t::start_pos_count; start++)
+        {
+            if(PlayerStart[start + 1].isNull())
+                continue;
+
+            if(player_start_info.players_at_start[start] < player_start_info.players_at_start[use_start])
+                use_start = start;
+        }
+
+        // add either the player alone, or all players on the player's screen, to the count
+        if(plr_screen.multiplayer_pref == MultiplayerPrefs::Shared)
+        {
+            player_start_info.players_at_start[use_start] += plr_screen.player_count;
+            player_start_info.start_for_screen[plr_screen_i] = use_start + 1;
+        }
+        else
+            player_start_info.players_at_start[use_start] += 1;
+    }
+
+
+    /*******************************
+    ** (2) basic player placement **
+    *******************************/
+
+    // place at start
+    const auto& ps = PlayerStart[use_start + 1];
+    auto& pLoc = Player[A].Location;
+
+    double ps_X = ps.X + ps.Width * 0.5 - pLoc.Width * 0.5;
+    double ps_Y = ps.Y + ps.Height - pLoc.Height;
+
+    pLoc.X = ps_X;
+    pLoc.Y = ps_Y;
+    Player[A].Direction = ps.Direction;
+
+
+
+    // check section of start for later use
+    int found_section = -1;
+    for(int B = 0; B <= numSections; B++)
+    {
+        if(pLoc.X + pLoc.Width >= level[B].X
+            && pLoc.X <= level[B].Width
+            && pLoc.Y + pLoc.Height >= level[B].Y
+            && pLoc.Y <= level[B].Height)
+        {
+            found_section = B;
+        }
+    }
+
+
+    /**********************************
+    ** (3) logic to avoid collisions **
+    **********************************/
+
+    // ignore collisions in clone mode
+    if(g_ClonedPlayerMode)
+        return;
+
+    // first try to place players backwards from P1, then do forwards if that doesn't work
+    bool forwards_direction = false;
+
+    // this loop repeats each time the player is placed to avoid collisions
+    while(true)
+    {
+        // (a) check for player collision
+        bool hit = false;
+
+        for(int B = 1; B < A; B++)
+        {
+            if(CheckCollision(pLoc, Player[B].Location))
+            {
+                hit = true;
+                break;
+            }
+        }
+
+        if(!hit)
+            break;
+
+
+        // (b) prepare to restore old position on failure
+        bool failed = false;
+
+        double old_X = pLoc.X;
+        double old_Y = pLoc.Y;
+
+
+        // (c) X logic: move player backwards, and check it hasn't moved off section / off screen
+        constexpr int plr_spacing = 40;
+        pLoc.X -= (plr_spacing - plr_spacing * 2 * forwards_direction) * Player[A].Direction;
+
+        // check for failures of being outside of section X bounds
+        if(!failed && found_section != -1 && (pLoc.X < level[found_section].X || pLoc.X + pLoc.Width > level[found_section].Width))
+            failed = true;
+
+        // also check being too far from start point (Shared Screen mode)
+        if(!failed && plr_screen.multiplayer_pref == MultiplayerPrefs::Shared && std::abs(pLoc.X - ps_X) > plr_screen.W * 0.75)
+            failed = true;
+
+
+        // (d) Y logic: do floor check, check player hasn't moved off screen, and confirm the player didn't cross a ceiling
+        constexpr int max_height_add = 160;
+        double top_bound = pLoc.Y - max_height_add;
+        bool check_floor = true;
+        while(!failed && check_floor)
+        {
+            check_floor = false;
+
+            for(BlockRef_t b_ref : treeBlockQuery(pLoc, SORTMODE_NONE))
+            {
+                const Block_t& b = b_ref;
+                int B = (int)b_ref;
+
+                if(b.Hidden || b.Invis || BlockIsSizable[b.Type] || BlockOnlyHitspot1[b.Type] || BlockNoClipping[b.Type])
+                    continue;
+
+                if(BlockCheckPlayerFilter(B, A))
+                    continue;
+
+                if(CheckCollision(pLoc, b.Location))
+                {
+                    double new_Y = blockGetTopYTouching(b, pLoc);
+
+                    if(new_Y - pLoc.Height < pLoc.Y)
+                    {
+                        check_floor = true;
+                        pLoc.Y = b.Location.Y - pLoc.Height;
+                    }
+
+                    break;
+                }
+            }
+
+            // check we didn't go too high
+            if(pLoc.Y < top_bound)
+                failed = true;
+        }
+
+        // check being too far from start point (Shared Screen mode)
+        if(!failed && plr_screen.multiplayer_pref == MultiplayerPrefs::Shared && std::abs(pLoc.Y - ps_Y) > plr_screen.H * 0.75)
+            failed = true;
+
+        // check we didn't cross a ceiling block (in the previous column)
+        if(!failed && pLoc.Y < old_Y)
+        {
+            const Location_t ceiling_check = newLoc(old_X + pLoc.Width / 2, pLoc.Y, 1, old_Y - pLoc.Y);
+
+            for(BlockRef_t b_ref : treeBlockQuery(pLoc, SORTMODE_NONE))
+            {
+                const Block_t& b = b_ref;
+                int B = (int)b_ref;
+
+                if(b.Hidden || b.Invis || BlockIsSizable[b.Type] || BlockOnlyHitspot1[b.Type] || BlockNoClipping[b.Type])
+                    continue;
+
+                if(BlockCheckPlayerFilter(B, A))
+                    continue;
+
+                if(CheckCollision(ceiling_check, b.Location))
+                {
+                    failed = true;
+                    break;
+                }
+            }
+        }
+
+        // TODO, possibly:
+        // - check player wasn't placed off a cliff (perform downwards floor check if original player start is on solid ground)
+        // - check player wasn't placed on lava
+
+
+        // (d) on failure, first restart and try forwards direction
+        if(failed && !forwards_direction)
+        {
+            pLoc.X = ps_X;
+            pLoc.Y = ps_Y;
+            forwards_direction = true;
+        }
+        // otherwise, restore old position and disable player collisions
+        else if(failed)
+        {
+            pLoc.X = old_X;
+            pLoc.Y = old_Y;
+
+            Player[A].Effect = 6;
+            Player[A].Effect2 = pLoc.Y;
+            break;
+        }
+    }
+}
+
 void SetupPlayers()
 {
 //    Location_t tempLocation;
@@ -217,6 +436,9 @@ void SetupPlayers()
         BattleOutro = 0;
     }
 
+
+    // new-added struct to handle start points in >2P
+    PlayerStartInfo_t player_start_info;
 
     for(int numPlayersMax = numPlayers, A = 1; A <= numPlayersMax; A++) // set up players
     {
@@ -282,21 +504,36 @@ void SetupPlayers()
         Player[A].Location.Height = Physics.PlayerHeight[Player[A].Character][Player[A].State]; // set width
         if(Player[A].State == 1 && Player[A].Mount == 1) // if small and in a shoe then set the height to super mario
             Player[A].Location.Height = Physics.PlayerHeight[1][2];
-        if(numPlayers == 2 && A == 2)
-            B = 2;
-        else
-            B = 1;
-        if(A == 2 && PlayerStart[B].X == 0.0 && PlayerStart[B].Y == 0.0)
+
+        // moved from below to here
+        Player[A].Effect = 0;
+        Player[A].Effect2 = 0;
+
+        // modern multiplayer placement code
+        if(g_compatibility.multiplayer_pause_controls)
         {
-            Player[A].Location.X = PlayerStart[1].X + PlayerStart[1].Width * 0.5 - Player[A].Location.Width * 0.5;
+            s_PlacePlayerAtStart(A, player_start_info);
+        }
+        // legacy multiplayer placement code
+        else
+        {
+            if(numPlayers == 2 && A == 2)
+                B = 2;
+            else
+                B = 1;
+
+            if(A == 2 && PlayerStart[B].X == 0.0 && PlayerStart[B].Y == 0.0)
+            {
+                Player[A].Location.X = PlayerStart[1].X + PlayerStart[1].Width * 0.5 - Player[A].Location.Width * 0.5;
             Player[A].Location.Y = PlayerStart[1].Y + PlayerStart[1].Height - Player[A].Location.Height; // - 2
             Player[A].Direction = PlayerStart[1].Direction; // manually defined direction of player
         }
         else
         {
             Player[A].Location.X = PlayerStart[B].X + PlayerStart[B].Width * 0.5 - Player[A].Location.Width * 0.5;
-            Player[A].Location.Y = PlayerStart[B].Y + PlayerStart[B].Height - Player[A].Location.Height; // - 2
-            Player[A].Direction = PlayerStart[B].Direction; // manually defined direction of player
+                Player[A].Location.Y = PlayerStart[B].Y + PlayerStart[B].Height - Player[A].Location.Height; // - 2
+                Player[A].Direction = PlayerStart[B].Direction; // manually defined direction of player
+            }
         }
 
         Player[A].CanGrabNPCs = GrabAll;
@@ -385,8 +622,8 @@ void SetupPlayers()
         Player[A].TimeToLive = 0;
         Player[A].Bumped = false;
         Player[A].Bumped2 = 0;
-        Player[A].Effect = 0;
-        Player[A].Effect2 = 0;
+        // Player[A].Effect = 0; // moved above, possibly set in start-pos code
+        // Player[A].Effect2 = 0;
         Player[A].Immune = 0;
         Player[A].Immune2 = false;
         Player[A].Jump = 0;
@@ -407,27 +644,23 @@ void SetupPlayers()
                 Player[A].Hearts = 2;
         }
 
-        bool shared_screen = (ScreenByPlayer(A).Type == ScreenTypes::SharedScreen);
-        if((shared_screen || numPlayers > 2) && !GameMenu) // find correct positions without start locations
+        // legacy code for >2P, unused in modern gameplay
+        if(numPlayers > 2 && !GameMenu) // find correct positions without start locations
         {
             if(GameOutro)
             {
                 Player[A].Location = Player[1].Location;
                 Player[A].Location.X += A * 52 - 52;
             }
-            // >2P shared screen
-            else if(!g_ClonedPlayerMode) //(nPlay.Online)
-            {
-                Player[A].Location = Player[1].Location;
-                Player[A].Location.X += A * 32 - 32;
-            }
             // many-player code
-            else
+            else if(g_ClonedPlayerMode)
             {
                 Player[A].Location = Player[1].Location;
                 Player[A].Location.SpeedY = dRand() * -12 - 6;
             }
         }
+
+        // section check
         Player[A].Section = -1;
         CheckSection(A); // find the section the player is in
         if(Player[A].Section == -1)
