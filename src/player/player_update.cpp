@@ -4687,9 +4687,9 @@ void UpdatePlayer()
                         check_right = false;
 
                     // do use shared screen push if there's a different player at the other side of the screen
-                    for(int o_p_i = 1; o_p_i <= numPlayers; o_p_i++)
+                    for(int o_p_i = 0; o_p_i < screen.player_count; o_p_i++)
                     {
-                        const Player_t& o_p = Player[o_p_i];
+                        const Player_t& o_p = Player[screen.players[o_p_i]];
 
                         if(o_p.Location.X <= -vscreen.X + 8 && !vscreen_at_section_bound_left)
                             check_right = true;
