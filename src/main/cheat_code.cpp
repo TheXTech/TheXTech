@@ -1163,8 +1163,57 @@ static void twoPlayer()
 
         SingleCoop = 0;
         g_ClonedPlayerMode = false;
-        Screens[0].multiplayer_pref = MultiplayerPrefs::Dynamic;
         SetupScreens();
+
+        if(Player[B].Effect == 9)
+            Player[B].Effect = 0;
+
+        Player[B].Immune = 1;
+        for(int C = 1; C <= numPlayers; C++)
+        {
+            if(C != B)
+            {
+                Player[C] = Player[B];
+                Player[C].Location.SpeedY = dRand() * -12;
+            }
+
+            Player[C].Character = C;
+            if(Player[C].Mount <= 1)
+            {
+                Player[C].Location.Y += Player[C].Location.Height;
+                Player[C].Location.Height = Physics.PlayerHeight[Player[C].Character][Player[C].State];
+                if(Player[C].Mount == 1 && Player[C].State == 1)
+                    Player[C].Location.Height = Physics.PlayerHeight[1][2];
+                Player[C].Location.Y += -Player[C].Location.Height;
+                Player[C].StandUp = true;
+            }
+        }
+
+        Bomb(Player[B].Location, iRand(2) + 2);
+    }
+}
+
+static void fourPlayer()
+{
+    int B = CheckLiving();
+    if(B > 0)
+    {
+        numPlayers = 4;
+
+        // setup so there are exactly two controller slots,
+        // activate quick-reconnect if needed
+        while(Controls::g_InputMethods.size() > 4)
+        {
+            Controls::DeleteInputMethodSlot(4);
+        }
+        while(Controls::g_InputMethods.size() < 4)
+        {
+            Controls::g_InputMethods.push_back(nullptr);
+            QuickReconnectScreen::g_active = true;
+        }
+
+        SingleCoop = 0;
+        g_ClonedPlayerMode = false;
 
         if(Player[B].Effect == 9)
             Player[B].Effect = 0;
@@ -1196,66 +1245,18 @@ static void twoPlayer()
 
 static void fourShared()
 {
-    int B = CheckLiving();
-    if(B > 0)
-    {
-        numPlayers = 4;
+    fourPlayer();
 
-        // setup so there are exactly two controller slots,
-        // activate quick-reconnect if needed
-        while(Controls::g_InputMethods.size() > 4)
-        {
-            Controls::DeleteInputMethodSlot(4);
-        }
-        while(Controls::g_InputMethods.size() < 4)
-        {
-            Controls::g_InputMethods.push_back(nullptr);
-            QuickReconnectScreen::g_active = true;
-        }
-
-        SingleCoop = 0;
-        g_ClonedPlayerMode = false;
-        Screens[0].multiplayer_pref = MultiplayerPrefs::Shared;
-        SetupScreens();
-
-        if(Player[B].Effect == 9)
-            Player[B].Effect = 0;
-
-        Player[B].Immune = 1;
-        for(int C = 1; C <= numPlayers; C++)
-        {
-            if(C != B)
-            {
-                Player[C] = Player[B];
-                Player[C].Location.SpeedY = dRand() * -12;
-            }
-
-            Player[C].Character = C;
-            if(Player[C].Mount <= 1)
-            {
-                Player[C].Location.Y += Player[C].Location.Height;
-                Player[C].Location.Height = Physics.PlayerHeight[Player[C].Character][Player[C].State];
-                if(Player[C].Mount == 1 && Player[C].State == 1)
-                    Player[C].Location.Height = Physics.PlayerHeight[1][2];
-                Player[C].Location.Y += -Player[C].Location.Height;
-                Player[C].StandUp = true;
-            }
-        }
-
-        Bomb(Player[B].Location, iRand(2) + 2);
-    }
+    Screens[0].four_screen_pref = MultiplayerPrefs::Shared;
+    SetupScreens();
 }
 
 static void fourSplit()
 {
-    fourShared();
+    fourPlayer();
 
-    // more than 2 vScreens requires modern camera logic
-    if(g_compatibility.modern_npc_camera_logic)
-    {
-        Screens[0].multiplayer_pref = MultiplayerPrefs::Split;
-        SetupScreens();
-    }
+    Screens[0].four_screen_pref = MultiplayerPrefs::Split;
+    SetupScreens();
 }
 
 static void warioTime()

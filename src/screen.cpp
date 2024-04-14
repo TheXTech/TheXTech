@@ -173,7 +173,10 @@ void InitScreens()
 
     // set multiplayer prefs
     for(int s = 0; s < c_screenCount; s++)
-        Screens[s].multiplayer_pref = MultiplayerPrefs::Dynamic;
+    {
+        Screens[s].two_screen_pref = MultiplayerPrefs::Dynamic;
+        Screens[s].four_screen_pref = MultiplayerPrefs::Shared;
+    }
 }
 
 // finds the visible Screen that contains a specific player
