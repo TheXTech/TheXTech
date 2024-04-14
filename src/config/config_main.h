@@ -157,7 +157,7 @@ public:
             {MultiplayerPrefs::TopBottom, "topbottom", "Top/Bottom"},
         },
         defaults(MultiplayerPrefs::Dynamic), {CompatClass::critical_update, MultiplayerPrefs::Dynamic}, Scope::UserGlobal,
-        "two-screen-mode", "2P Screen Mode", nullptr,
+        "two-screen-mode", "2P screen mode", nullptr,
         config_screenmode_set
     };
 
@@ -167,7 +167,7 @@ public:
             {MultiplayerPrefs::Split, "split", "Split"},
         },
         defaults(MultiplayerPrefs::Shared), {CompatClass::critical_update, MultiplayerPrefs::Shared}, Scope::UserGlobal,
-        "four-screen-mode", "4P Screen Mode", nullptr,
+        "four-screen-mode", "4P screen mode", nullptr,
         config_screenmode_set
     };
 
