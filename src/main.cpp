@@ -685,7 +685,6 @@ int main(int argc, char**argv)
     OpenConfig();
 
     setup.verboseLogging = true;
-
 #endif
 
 #if defined(__EMSCRIPTEN__) && defined(THEXTECH_DEBUG_INFO)

@@ -605,7 +605,7 @@ bool CheckHitSpot1(const Location_t &Loc1, const Location_t &Loc2)
     return tempCheckHitSpot1;
 }
 
-static inline double blockGetTopYTouching(const Block_t &block, const Location_t& loc)
+double blockGetTopYTouching(const Block_t &block, const Location_t& loc)
 {
     // Get slope type
     int blockType = block.Type;

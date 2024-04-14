@@ -212,10 +212,19 @@ public:
     int TargetY() const;
 };
 
+//! a list of all screens (local and remote, visible and virtual)
+extern RangeArr<Screen_t, 0, c_screenCount - 1> Screens;
+
 void InitScreens();
 
 // finds the visible Screen that contains a specific player
-Screen_t& ScreenByPlayer(int player);
+int ScreenIdxByPlayer(int player);
+
+// finds the visible Screen that contains a specific player
+inline Screen_t& ScreenByPlayer(int player)
+{
+    return Screens[ScreenIdxByPlayer(player)];
+}
 
 // finds the canonical Screen that contains a specific player
 Screen_t& ScreenByPlayer_canonical(int player);
@@ -237,9 +246,6 @@ inline vScreen_t& vScreenByPlayer_canonical(int player)
 {
     return vScreen[vScreenIdxByPlayer_canonical(player)];
 }
-
-//! a list of all screens (local and remote, visible and virtual)
-extern RangeArr<Screen_t, 0, c_screenCount - 1> Screens;
 
 //! the screen being rendered by the local client (or, try to make all uses of ScreenW / ScreenH occur in functions that get passed a screen?)
 extern Screen_t* l_screen;

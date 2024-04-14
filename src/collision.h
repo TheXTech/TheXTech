@@ -113,6 +113,8 @@ bool CanComeOut(const Location_t &Loc1, const Location_t &Loc2);
 // Fixes NPCs sinking through the ground
 bool CheckHitSpot1(const Location_t &Loc1, const Location_t &Loc2);
 
+double blockGetTopYTouching(const Block_t &block, const Location_t& loc);
+
 bool CompareWalkBlock(int oldBlockIdx, int newBlockIdx, const Location_t &referenceLoc);
 
 void CompareNpcWalkBlock(int &tempHitBlock, int &tempHitOldBlock,

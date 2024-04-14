@@ -177,11 +177,11 @@ void InitScreens()
 }
 
 // finds the visible Screen that contains a specific player
-Screen_t& ScreenByPlayer(int player)
+int ScreenIdxByPlayer(int player)
 {
     // FIXME: update this for netplay
     (void)player;
-    return Screens[0];
+    return 0;
 }
 
 // finds the canonical Screen that contains a specific player
