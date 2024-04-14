@@ -104,7 +104,12 @@ static void setupPlayerAtCheckpoints(NPC_t &npc, Checkpoint_t &cp)
                   B, cp.id, Player[B].Location.X, Player[B].Location.Y);
     }
 
-    if(numPlayers > 1)
+    if(numPlayers > 1 && g_compatibility.multiplayer_pause_controls && !g_ClonedPlayerMode)
+    {
+        for(B = 1; B <= numPlayers; B++)
+            DodgePlayers(B);
+    }
+    else if(numPlayers > 1)
     {
         Player[1].Location.X -= 16;
         Player[2].Location.X += 16;
@@ -620,12 +625,12 @@ void SetupPlayers()
             if(A == 2 && PlayerStart[B].X == 0.0 && PlayerStart[B].Y == 0.0)
             {
                 Player[A].Location.X = PlayerStart[1].X + PlayerStart[1].Width * 0.5 - Player[A].Location.Width * 0.5;
-            Player[A].Location.Y = PlayerStart[1].Y + PlayerStart[1].Height - Player[A].Location.Height; // - 2
-            Player[A].Direction = PlayerStart[1].Direction; // manually defined direction of player
-        }
-        else
-        {
-            Player[A].Location.X = PlayerStart[B].X + PlayerStart[B].Width * 0.5 - Player[A].Location.Width * 0.5;
+                Player[A].Location.Y = PlayerStart[1].Y + PlayerStart[1].Height - Player[A].Location.Height; // - 2
+                Player[A].Direction = PlayerStart[1].Direction; // manually defined direction of player
+            }
+            else
+            {
+                Player[A].Location.X = PlayerStart[B].X + PlayerStart[B].Width * 0.5 - Player[A].Location.Width * 0.5;
                 Player[A].Location.Y = PlayerStart[B].Y + PlayerStart[B].Height - Player[A].Location.Height; // - 2
                 Player[A].Direction = PlayerStart[B].Direction; // manually defined direction of player
             }
