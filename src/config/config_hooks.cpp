@@ -36,6 +36,7 @@
 #include "globals.h"
 #include "game_main.h"
 #include "sound.h"
+#include "graphics.h"
 
 #include "Integrator/integrator.h"
 
@@ -88,6 +89,19 @@ void config_mountdrums_set()
         return;
 
     UpdateYoshiMusic();
+}
+
+void config_screenmode_set()
+{
+    // TODO: only update the locally-controlled screens for NetPlay
+
+    Screens[0].two_screen_pref = g_config.two_screen_mode;
+    Screens[0].four_screen_pref = g_config.four_screen_mode;
+
+    Screens[0].canonical_screen().two_screen_pref = g_config.two_screen_mode;
+    Screens[0].canonical_screen().four_screen_pref = g_config.four_screen_mode;
+
+    SetupScreens();
 }
 
 void config_audiofx_set()

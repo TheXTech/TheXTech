@@ -26,6 +26,7 @@
 
 #include "sdl_proxy/sdl_audio.h"
 #include "sound.h"
+#include "screen.h"
 
 #include "Logger/logger_level.h"
 
@@ -144,6 +145,31 @@ public:
     opt<bool> render_vsync{this, defaults(false), {}, Scope::UserGlobal,
         "vsync", "V-Sync", "Sync frames to screen refresh, reduces tearing",
         config_res_set};
+
+    /* ---- Main - Multiplayer ----*/
+    subsection main_multiplayer{this, "multiplayer", "Multiplayer"};
+
+    opt_enum<int> two_screen_mode{this,
+        {
+            {MultiplayerPrefs::Dynamic, "smbx", "SMBX"},
+            {MultiplayerPrefs::Shared, "shared", "Shared"},
+            {MultiplayerPrefs::Split, "split", "Left/Right"},
+            {MultiplayerPrefs::TopBottom, "topbottom", "Top/Bottom"},
+        },
+        defaults(MultiplayerPrefs::Dynamic), {CompatClass::critical_update, MultiplayerPrefs::Dynamic}, Scope::UserGlobal,
+        "two-screen-mode", "2P Screen Mode", nullptr,
+        config_screenmode_set
+    };
+
+    opt_enum<int> four_screen_mode{this,
+        {
+            {MultiplayerPrefs::Shared, "shared", "Shared"},
+            {MultiplayerPrefs::Split, "split", "Split"},
+        },
+        defaults(MultiplayerPrefs::Shared), {CompatClass::critical_update, MultiplayerPrefs::Shared}, Scope::UserGlobal,
+        "four-screen-mode", "4P Screen Mode", nullptr,
+        config_screenmode_set
+    };
 
 
     /* ---- Video ----*/

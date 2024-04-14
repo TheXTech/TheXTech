@@ -22,6 +22,7 @@
 
 #include "screen.h"
 #include "globals.h" // SingleCoop
+#include "config.h"
 
 #include "core/render.h" // XRender::TargetX
 
@@ -174,8 +175,9 @@ void InitScreens()
     // set multiplayer prefs
     for(int s = 0; s < c_screenCount; s++)
     {
-        Screens[s].two_screen_pref = MultiplayerPrefs::Dynamic;
-        Screens[s].four_screen_pref = MultiplayerPrefs::Shared;
+        // TODO: only do this for the locally-owned screen(s)
+        Screens[s].two_screen_pref = g_config.two_screen_mode;
+        Screens[s].four_screen_pref = g_config.four_screen_mode;
     }
 }
 

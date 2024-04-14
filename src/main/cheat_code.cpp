@@ -1247,16 +1247,20 @@ static void fourShared()
 {
     fourPlayer();
 
-    Screens[0].four_screen_pref = MultiplayerPrefs::Shared;
-    SetupScreens();
+    {
+        ConfigChangeSentinel sent(ConfigSetLevel::cheat);
+        g_config.four_screen_mode = MultiplayerPrefs::Shared;
+    }
 }
 
 static void fourSplit()
 {
     fourPlayer();
 
-    Screens[0].four_screen_pref = MultiplayerPrefs::Split;
-    SetupScreens();
+    {
+        ConfigChangeSentinel sent(ConfigSetLevel::cheat);
+        g_config.four_screen_mode = MultiplayerPrefs::Split;
+    }
 }
 
 static void warioTime()

@@ -28,6 +28,7 @@ void config_language_set();
 void config_rendermode_set();
 void config_fullscreen_set();
 void config_mountdrums_set();
+void config_screenmode_set();
 void config_audiofx_set();
 void config_audio_set();
 void config_log_level_set();
