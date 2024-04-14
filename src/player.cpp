@@ -426,8 +426,32 @@ void DodgePlayers(int plr_A)
             }
         }
 
-        // TODO, possibly:
-        // - check player wasn't placed on lava
+        // perform lava check
+        if(!failed)
+        {
+            const Location_t lava_check = newLoc(pLoc.X, pLoc.Y + pLoc.Height, pLoc.Width, 31);
+
+            for(BlockRef_t b_ref : treeBlockQuery(lava_check, SORTMODE_NONE))
+            {
+                const Block_t& b = b_ref;
+                int B = (int)b_ref;
+
+                if(b.Hidden || b.Invis || BlockNoClipping[b.Type])
+                    continue;
+
+                if(BlockCheckPlayerFilter(B, plr_A))
+                    continue;
+
+                if(CheckCollision(lava_check, b.Location))
+                {
+                    if(BlockHurts[b.Type] || BlockKills[b.Type])
+                    {
+                        failed = true;
+                        break;
+                    }
+                }
+            }
+        }
 
 
         // (d) on failure, first restart and try forwards direction
