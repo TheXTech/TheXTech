@@ -37,6 +37,7 @@
 #include "game_main.h"
 #include "sound.h"
 #include "graphics.h"
+#include "player.h"
 
 #include "Integrator/integrator.h"
 
@@ -102,6 +103,7 @@ void config_screenmode_set()
     Screens[0].canonical_screen().four_screen_pref = g_config.four_screen_mode;
 
     SetupScreens();
+    PlayersEnsureNearby(Screens[0]);
 }
 
 void config_audiofx_set()

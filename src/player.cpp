@@ -8203,6 +8203,113 @@ void PlayerEffects(const int A)
 //    }
 }
 
+// NEW: ensures the players on a screen are nearby if the screen is shared
+void PlayersEnsureNearby(const Screen_t& screen)
+{
+    if(screen.Type != ScreenTypes::SharedScreen)
+        return;
+
+    // get extreme bounds on screen players
+    double l = 0.0;
+    double r = 0.0;
+    double t = 0.0;
+    double b = 0.0;
+
+    // also get center of alive screen players
+    double cx = 0.0;
+    double cy = 0.0;
+    int c_count = 0;
+
+    for(int plr_i = 0; plr_i < screen.player_count; plr_i++)
+    {
+        int plr_A = screen.players[plr_i];
+        const Player_t& p = Player[plr_A];
+        const Location_t& pLoc = p.Location;
+
+        double p_x = pLoc.X + pLoc.Width / 2;
+        double p_y = pLoc.Y + pLoc.Height / 2;
+
+        if(plr_i == 0 || p_x < l)
+            l = p_x;
+
+        if(plr_i == 0 || p_x > r)
+            r = p_x;
+
+        if(plr_i == 0 || p_y < t)
+            t = p_y;
+
+        if(plr_i == 0 || p_y > b)
+            b = p_y;
+
+        if(!p.Dead && p.TimeToLive == 0)
+        {
+            cx += p_x;
+            cy += p_y;
+            c_count += 1;
+        }
+    }
+
+    // no problem if players are nearby, just return
+    if(r - l <= screen.W && b - t <= screen.H)
+        return;
+
+    // need to calculate center and figure out which player is closest
+    if(c_count > 0)
+    {
+        cx /= c_count;
+        cy /= c_count;
+    }
+    else
+    {
+        cx = (l + r) / 2;
+        cy = (t + b) / 2;
+    }
+
+    // figure out which player is closest
+    int    closest      = 0;
+    double closest_dist = 0;
+
+    for(int plr_i = 0; plr_i < screen.player_count; plr_i++)
+    {
+        int plr_A = screen.players[plr_i];
+        const Player_t& p = Player[plr_A];
+        const Location_t& pLoc = p.Location;
+
+        if(!p.Dead && p.TimeToLive == 0)
+        {
+            double dist = (pLoc.X - cx) * (pLoc.X - cx) + (pLoc.Y - cy) * (pLoc.Y - cy);
+
+            if(closest == 0 || closest_dist > dist)
+            {
+                closest = plr_A;
+                closest_dist = dist;
+            }
+        }
+    }
+
+    // if all players dead, choose randomly
+    if(closest == 0)
+        closest = screen.players[0];
+
+    // move all players to winning player's location, and set effect if alive
+    for(int plr_i = 0; plr_i < screen.player_count; plr_i++)
+    {
+        int plr_A = screen.players[plr_i];
+
+        if(plr_A == closest)
+            continue;
+
+        Player_t& p = Player[plr_A];
+        Location_t& pLoc = p.Location;
+
+        pLoc.X = Player[closest].Location.X + Player[closest].Location.Width / 2 - pLoc.Width / 2;
+        pLoc.Y = Player[closest].Location.Y + Player[closest].Location.Height / 2 - pLoc.Height / 2;
+
+        p.Effect = 6;
+        p.Effect2 = pLoc.Y;
+    }
+}
+
 // make a death effect for player and release all items linked to them.
 // used for the Die SwapCharacter and for the DropPlayer.
 // do this BEFORE changing/erasing any player fields
@@ -8226,6 +8333,7 @@ void AddPlayer(int Character)
     numPlayers++;
 
     Player_t& p = Player[numPlayers];
+    const Screen_t& screen = ScreenByPlayer(numPlayers);
 
     p = Player_t();
     p.Character = Character;
@@ -8256,13 +8364,20 @@ void AddPlayer(int Character)
     p.Section = Player[alivePlayer].Section;
     RespawnPlayerTo(numPlayers, alivePlayer);
 
+    // the rest only matters during level play
+    if(LevelSelect)
+        return;
+
     SetupScreens();
+    PlayersEnsureNearby(screen);
 }
 
 void DropPlayer(const int A)
 {
     if(A < 1 || A > numPlayers)
         return;
+
+    const Screen_t& screen = ScreenByPlayer(A);
 
     // in levels, make a death effect (and leave behind mount)
     if(!LevelSelect)
@@ -8333,6 +8448,7 @@ void DropPlayer(const int A)
         return;
 
     SetupScreens();
+    PlayersEnsureNearby(screen);
 }
 
 void SwapCharacter(int A, int Character, bool FromBlock)

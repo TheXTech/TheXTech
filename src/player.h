@@ -125,6 +125,9 @@ void LinkFrame(struct Player_t &p);
 // Private Sub PlayerEffects(A As Integer)
 void PlayerEffects(const int A);
 
+// NEW: ensures the players on a screen are nearby if the screen is shared
+void PlayersEnsureNearby(const Screen_t& screen);
+
 // main Drop/Add functions
 void DropPlayer(const int A);
 void AddPlayer(int Character);
