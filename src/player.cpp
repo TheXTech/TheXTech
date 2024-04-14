@@ -182,7 +182,7 @@ static void s_PlacePlayerAtStart(int A, PlayerStartInfo_t& player_start_info)
     // check for shared screen
     const int plr_screen_i = ScreenIdxByPlayer(A);
     const Screen_t& plr_screen = ScreenByPlayer(A);
-    if(plr_screen.multiplayer_pref == MultiplayerPrefs::Shared)
+    if(plr_screen.Type == ScreenTypes::SharedScreen)
         use_start = (int)player_start_info.start_for_screen[plr_screen_i] - 1;
 
     // if not forced by shared screen, choose start with the least players
@@ -202,7 +202,7 @@ static void s_PlacePlayerAtStart(int A, PlayerStartInfo_t& player_start_info)
         }
 
         // add either the player alone, or all players on the player's screen, to the count
-        if(plr_screen.multiplayer_pref == MultiplayerPrefs::Shared)
+        if(plr_screen.Type == ScreenTypes::SharedScreen)
         {
             player_start_info.players_at_start[use_start] += plr_screen.player_count;
             player_start_info.start_for_screen[plr_screen_i] = use_start + 1;
@@ -324,7 +324,7 @@ void DodgePlayers(int plr_A)
             failed = true;
 
         // also check being too far from start point (Shared Screen mode)
-        if(!failed && plr_screen.multiplayer_pref == MultiplayerPrefs::Shared && std::abs(pLoc.X - orig_X) > plr_screen.W * 0.75)
+        if(!failed && plr_screen.Type == ScreenTypes::SharedScreen && std::abs(pLoc.X - orig_X) > plr_screen.W * 0.75)
             failed = true;
 
 
@@ -404,7 +404,7 @@ void DodgePlayers(int plr_A)
         }
 
         // check being too far from original position (Shared Screen mode)
-        if(!failed && plr_screen.multiplayer_pref == MultiplayerPrefs::Shared && std::abs(pLoc.Y - orig_Y) > plr_screen.H * 0.75)
+        if(!failed && plr_screen.Type == ScreenTypes::SharedScreen && std::abs(pLoc.Y - orig_Y) > plr_screen.H * 0.75)
             failed = true;
 
         // check we didn't cross a ceiling block (in the previous column)
