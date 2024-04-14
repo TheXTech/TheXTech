@@ -349,10 +349,10 @@ void DodgePlayers(int plr_A)
                     if(new_Y - pLoc.Height < pLoc.Y)
                     {
                         check_floor = true;
-                        pLoc.Y = b.Location.Y - pLoc.Height;
-                    }
+                        pLoc.Y = new_Y - pLoc.Height;
 
-                    break;
+                        break;
+                    }
                 }
             }
 
