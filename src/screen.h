@@ -177,8 +177,9 @@ public:
     //! the currently active dynamic split mode for the screen
     int DType = DScreenTypes::Inactive;
 
-    //! the currently requested multiplayer mode for the screen
-    int multiplayer_pref = MultiplayerPrefs::Dynamic;
+    //! the currently requested multiplayer modes for the screen
+    int two_screen_pref = MultiplayerPrefs::Dynamic;
+    int four_screen_pref = MultiplayerPrefs::Shared;
 
     inline bool is_canonical() const
     {
