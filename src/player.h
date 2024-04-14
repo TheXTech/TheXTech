@@ -24,6 +24,9 @@
 
 struct Screen_t;
 
+// NEW: moves a player to avoid collisions with other players, and sets to no-clipping if this is impossible
+void DodgePlayers(int plr_A);
+
 // Public Sub SetupPlayers() 'this set's the players values to their defaults and prepares them for playing a level
 // this set's the players values to their defaults and prepares them for playing a level
 void SetupPlayers();

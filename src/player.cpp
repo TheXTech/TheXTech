@@ -223,21 +223,6 @@ static void s_PlacePlayerAtStart(int A, PlayerStartInfo_t& player_start_info)
     Player[A].Direction = ps.Direction;
 
 
-
-    // check section of start for later use
-    int found_section = -1;
-    for(int B = 0; B <= numSections; B++)
-    {
-        if(pLoc.X + pLoc.Width >= level[B].X
-            && pLoc.X <= level[B].Width
-            && pLoc.Y + pLoc.Height >= level[B].Y
-            && pLoc.Y <= level[B].Height)
-        {
-            found_section = B;
-        }
-    }
-
-
     /**********************************
     ** (3) logic to avoid collisions **
     **********************************/
@@ -246,7 +231,34 @@ static void s_PlacePlayerAtStart(int A, PlayerStartInfo_t& player_start_info)
     if(g_ClonedPlayerMode)
         return;
 
-    // first try to place players backwards from P1, then do forwards if that doesn't work
+    DodgePlayers(A);
+}
+
+void DodgePlayers(int plr_A)
+{
+    auto& pLoc = Player[plr_A].Location;
+    const Screen_t& plr_screen = ScreenByPlayer(plr_A);
+
+    // save current position
+    double orig_X = pLoc.X;
+    double orig_Y = pLoc.Y;
+
+
+    // check section of current position for later use
+    int cur_section = -1;
+    for(int B = 0; B <= numSections; B++)
+    {
+        if(pLoc.X + pLoc.Width >= level[B].X
+            && pLoc.X <= level[B].Width
+            && pLoc.Y + pLoc.Height >= level[B].Y
+            && pLoc.Y <= level[B].Height)
+        {
+            cur_section = B;
+        }
+    }
+
+
+    // first try to place players backwards from current position, then do forwards if that doesn't work
     bool forwards_direction = false;
 
     // this loop repeats each time the player is placed to avoid collisions
@@ -255,7 +267,7 @@ static void s_PlacePlayerAtStart(int A, PlayerStartInfo_t& player_start_info)
         // (a) check for player collision
         bool hit = false;
 
-        for(int B = 1; B < A; B++)
+        for(int B = 1; B < plr_A; B++)
         {
             if(CheckCollision(pLoc, Player[B].Location))
             {
@@ -277,14 +289,14 @@ static void s_PlacePlayerAtStart(int A, PlayerStartInfo_t& player_start_info)
 
         // (c) X logic: move player backwards, and check it hasn't moved off section / off screen
         constexpr int plr_spacing = 40;
-        pLoc.X -= (plr_spacing - plr_spacing * 2 * forwards_direction) * Player[A].Direction;
+        pLoc.X -= (plr_spacing - plr_spacing * 2 * forwards_direction) * Player[plr_A].Direction;
 
         // check for failures of being outside of section X bounds
-        if(!failed && found_section != -1 && (pLoc.X < level[found_section].X || pLoc.X + pLoc.Width > level[found_section].Width))
+        if(!failed && cur_section != -1 && (pLoc.X < level[cur_section].X || pLoc.X + pLoc.Width > level[cur_section].Width))
             failed = true;
 
         // also check being too far from start point (Shared Screen mode)
-        if(!failed && plr_screen.multiplayer_pref == MultiplayerPrefs::Shared && std::abs(pLoc.X - ps_X) > plr_screen.W * 0.75)
+        if(!failed && plr_screen.multiplayer_pref == MultiplayerPrefs::Shared && std::abs(pLoc.X - orig_X) > plr_screen.W * 0.75)
             failed = true;
 
 
@@ -304,7 +316,7 @@ static void s_PlacePlayerAtStart(int A, PlayerStartInfo_t& player_start_info)
                 if(b.Hidden || b.Invis || BlockIsSizable[b.Type] || BlockOnlyHitspot1[b.Type] || BlockNoClipping[b.Type])
                     continue;
 
-                if(BlockCheckPlayerFilter(B, A))
+                if(BlockCheckPlayerFilter(B, plr_A))
                     continue;
 
                 if(CheckCollision(pLoc, b.Location))
@@ -327,7 +339,7 @@ static void s_PlacePlayerAtStart(int A, PlayerStartInfo_t& player_start_info)
         }
 
         // check being too far from start point (Shared Screen mode)
-        if(!failed && plr_screen.multiplayer_pref == MultiplayerPrefs::Shared && std::abs(pLoc.Y - ps_Y) > plr_screen.H * 0.75)
+        if(!failed && plr_screen.multiplayer_pref == MultiplayerPrefs::Shared && std::abs(pLoc.Y - orig_Y) > plr_screen.H * 0.75)
             failed = true;
 
         // check we didn't cross a ceiling block (in the previous column)
@@ -343,7 +355,7 @@ static void s_PlacePlayerAtStart(int A, PlayerStartInfo_t& player_start_info)
                 if(b.Hidden || b.Invis || BlockIsSizable[b.Type] || BlockOnlyHitspot1[b.Type] || BlockNoClipping[b.Type])
                     continue;
 
-                if(BlockCheckPlayerFilter(B, A))
+                if(BlockCheckPlayerFilter(B, plr_A))
                     continue;
 
                 if(CheckCollision(ceiling_check, b.Location))
@@ -362,8 +374,8 @@ static void s_PlacePlayerAtStart(int A, PlayerStartInfo_t& player_start_info)
         // (d) on failure, first restart and try forwards direction
         if(failed && !forwards_direction)
         {
-            pLoc.X = ps_X;
-            pLoc.Y = ps_Y;
+            pLoc.X = orig_X;
+            pLoc.Y = orig_Y;
             forwards_direction = true;
         }
         // otherwise, restore old position and disable player collisions
@@ -372,8 +384,8 @@ static void s_PlacePlayerAtStart(int A, PlayerStartInfo_t& player_start_info)
             pLoc.X = old_X;
             pLoc.Y = old_Y;
 
-            Player[A].Effect = 6;
-            Player[A].Effect2 = pLoc.Y;
+            Player[plr_A].Effect = 6;
+            Player[plr_A].Effect2 = pLoc.Y;
             break;
         }
     }
