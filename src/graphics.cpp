@@ -255,7 +255,8 @@ void GetvScreenAverage3(vScreen_t& vscreen)
         if(plr_count == 0)
             section_idx = plr.Section;
 
-        double cx = plr.Location.X + plr.Location.Width / 2.0;
+        double pl = plr.Location.X;
+        double pr = pl + plr.Location.Width;
         double by = plr.Location.Y + plr.Location.Height;
 
         if(plr.Effect != 6)
@@ -271,10 +272,10 @@ void GetvScreenAverage3(vScreen_t& vscreen)
         }
 
         // still set left and right bounds for respawning players
-        if(!horiz_bounds_inited || cx < l)
-            l = cx;
-        if(!horiz_bounds_inited || r < cx)
-            r = cx;
+        if(!horiz_bounds_inited || pl < l)
+            l = pl;
+        if(!horiz_bounds_inited || r < pr)
+            r = pr;
 
         horiz_bounds_inited = true;
     }
