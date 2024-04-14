@@ -258,6 +258,29 @@ void DodgePlayers(int plr_A)
     }
 
 
+    // check for floor of current position for later use
+    bool orig_has_floor = false;
+    const Location_t orig_floor_check = newLoc(orig_X + pLoc.Width / 2, pLoc.Y + pLoc.Height, 1, 48);
+
+    for(BlockRef_t b_ref : treeBlockQuery(orig_floor_check, SORTMODE_NONE))
+    {
+        const Block_t& b = b_ref;
+        int B = (int)b_ref;
+
+        if(b.Hidden || b.Invis || BlockNoClipping[b.Type])
+            continue;
+
+        if(BlockCheckPlayerFilter(B, plr_A))
+            continue;
+
+        if(CheckCollision(orig_floor_check, b.Location))
+        {
+            orig_has_floor = true;
+            break;
+        }
+    }
+
+
     // first try to place players backwards from current position, then do forwards if that doesn't work
     bool forwards_direction = false;
 
@@ -300,7 +323,7 @@ void DodgePlayers(int plr_A)
             failed = true;
 
 
-        // (d) Y logic: do floor check, check player hasn't moved off screen, and confirm the player didn't cross a ceiling
+        // (d) Y logic: do floor checks, check player hasn't moved off screen, and confirm the player didn't cross a ceiling
         constexpr int max_height_add = 160;
         double top_bound = pLoc.Y - max_height_add;
         bool check_floor = true;
@@ -338,7 +361,44 @@ void DodgePlayers(int plr_A)
                 failed = true;
         }
 
-        // check being too far from start point (Shared Screen mode)
+        // perform downwards floor check (cliff check) if the original position had a floor
+        if(!failed && orig_has_floor && pLoc.Y >= old_Y)
+        {
+            bool found_floor = false;
+            double top_Y = 0.0;
+
+            const Location_t new_floor_check = newLoc(pLoc.X, pLoc.Y + pLoc.Height, pLoc.Width, max_height_add);
+
+            for(BlockRef_t b_ref : treeBlockQuery(new_floor_check, SORTMODE_NONE))
+            {
+                const Block_t& b = b_ref;
+                int B = (int)b_ref;
+
+                if(b.Hidden || b.Invis || BlockNoClipping[b.Type])
+                    continue;
+
+                if(BlockCheckPlayerFilter(B, plr_A))
+                    continue;
+
+                if(CheckCollision(new_floor_check, b.Location))
+                {
+                    double new_Y = blockGetTopYTouching(b, new_floor_check);
+
+                    if(!found_floor || new_Y < top_Y)
+                    {
+                        found_floor = true;
+                        top_Y = new_Y;
+                    }
+                }
+            }
+
+            if(found_floor)
+                pLoc.Y = top_Y - pLoc.Height;
+            else
+                failed = true;
+        }
+
+        // check being too far from original position (Shared Screen mode)
         if(!failed && plr_screen.multiplayer_pref == MultiplayerPrefs::Shared && std::abs(pLoc.Y - orig_Y) > plr_screen.H * 0.75)
             failed = true;
 
@@ -367,7 +427,6 @@ void DodgePlayers(int plr_A)
         }
 
         // TODO, possibly:
-        // - check player wasn't placed off a cliff (perform downwards floor check if original player start is on solid ground)
         // - check player wasn't placed on lava
 
 
