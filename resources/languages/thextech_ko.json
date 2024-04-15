@@ -605,7 +605,6 @@
             "continue": "계속하기",
             "quit": "종료",
             "quitTesting": "종료 테스트",
-            "dropAddPlayers": "플레이어 삭제/추가",
             "enterCode": "코드 입력",
             "saveAndQuit": "저장하고 종료",
             "resetCheckpoints": "체크포인트 재설정",

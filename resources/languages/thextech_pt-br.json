@@ -357,7 +357,7 @@
             "errorInvalidEnterWarp": "========= ERRO! ==========\n\nNão foi possível iniciar o nível devido a um teleporte de entrada invalido em {1}.\nTotal de entradas no teleporte: {2}\n\nArquivo: {0}",
             "errorNoStartPoint": "========= ERRO! ==========\n\nNão foi possível iniciar o nível por este nível não conter ponto de inicio ou entradas de teleporte especificadas.\n\nArquivo: {0}",
             "openFileFailed": "ERRO: \"{0}\" nao foi aberto: Arquivo inexistente ou corrompido.",
-            "warpNeedStarCount": "Você precisa de {0} {1} para entrar."
+            "warpNeedStarCount": "Você precisa de\n{0} {1} para entrar."
         },
         "message": {
             "scanningLevels": "Buscando níveis..."

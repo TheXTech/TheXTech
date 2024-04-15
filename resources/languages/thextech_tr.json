@@ -352,7 +352,6 @@
         },
         "pause": {
             "continue": "",
-            "dropAddPlayers": "",
             "enterCode": "",
             "quit": "",
             "quitTesting": "",

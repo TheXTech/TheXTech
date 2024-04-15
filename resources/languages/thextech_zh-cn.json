@@ -364,7 +364,6 @@
         },
         "pause": {
             "continue": "继续游戏",
-            "dropAddPlayers": "加入/离开游戏",
             "enterCode": "输入指令",
             "quit": "退出",
             "quitTesting": "结束测试",
@@ -377,6 +376,11 @@
         },
         "message": {
             "scanningLevels": "扫描关卡中……"
+        },
+        "hint": {
+            "pound-key": "按下该按键进行震地！",
+            "no-lives-old": "如果生命值为0，游戏将会结束。",
+            "no-lives-new": "如果生命值为0，得分将会清零。"
         }
     },
     "languageName": "简体中文",
