@@ -75,7 +75,7 @@ protected:
     using rendermode_t = ConfigRenderMode_t<writable>;
 
     template<class value_t>
-    constexpr value_t defaults(const value_t& value) const
+    static constexpr value_t defaults(value_t value)
     {
         return value;
     }
