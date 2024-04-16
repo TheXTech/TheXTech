@@ -43,6 +43,9 @@
 #include "../layers.h"
 #include "../controls.h"
 #include "../game_main.h"
+#ifdef ENABLE_ANTICHEAT_TRAP
+#   include "editor.h" // For the `Backup_FullFileName` only
+#endif
 #include "game_info.h"
 #include "screen_quickreconnect.h"
 #include "frm_main.h"
@@ -69,6 +72,13 @@ static void redigitIsCool()
 #ifdef ENABLE_ANTICHEAT_TRAP
 static void dieCheater()
 {
+    if(LevelEditor || WorldEditor || BattleMode || TestLevel || !Backup_FullFileName.empty())
+    {
+        // Don't perform the punish when running a level test or the editor
+        redigitIsCool();
+        return;
+    }
+
     pLogCritical("redigitiscool code was been used, player got a punish!");
     PlaySound(SFX_SMExplosion);
     Score = 0; // Being very evil here, mu-ha-ha-ha-ha! >:D
