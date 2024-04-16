@@ -164,6 +164,14 @@ void DropBonus(int A)
     syncLayers_NPC(numNPCs);
     CheckSectionNPC(numNPCs);
 
+    // enable modern NPC spawn code
+    if(g_compatibility.modern_item_drop && !ForcedControls)
+    {
+        NPC[numNPCs].Special6 = 120.0;
+        NPC[numNPCs].Effect3 = A;
+        NPC[numNPCs].Effect2 = 1;
+    }
+
     // erase bonus
     Player[A].HeldBonus = NPCID(0);
 }

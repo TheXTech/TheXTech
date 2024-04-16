@@ -5561,10 +5561,112 @@ void UpdateNPCs()
             }
             else if(NPC[A].Effect == NPCEFF_DROP_ITEM) // Bonus item is falling from the players container effect
             {
-                NPC[A].Location.Y += 2.2;
-                NPC[A].Effect2 += 1;
-                if(NPC[A].Effect2 == 5)
-                    NPC[A].Effect2 = 1;
+                // modern item drop
+                if(NPC[A].Effect3 != 0)
+                {
+                    const Player_t& p = Player[NPC[A].Effect3];
+                    const Location_t& pLoc = p.Location;
+                    Location_t& nLoc = NPC[A].Location;
+
+                    // Y logic
+                    vScreen_t& vscreen = vScreenByPlayer(NPC[A].Effect3);
+
+                    double ScreenTop = -vscreen.Y;
+
+                    if(vscreen.Height > 600)
+                        ScreenTop += vscreen.Height / 2 - 300;
+
+                    // default target is HUD box
+                    double target_Y = ScreenTop + 16 + 12;
+
+                    // when screen is large, or player is far below HUD box, put above player
+                    if(vscreen.Height > 600 || pLoc.Y - 120 > target_Y)
+                        target_Y = pLoc.Y - 120;
+
+                    // never allow item to go fully offscreen
+                    if(target_Y < -vscreen.Y - 8)
+                        target_Y = -vscreen.Y - 8;
+
+                    // track whether the initial target is above the NPC's initial position
+                    double& init_target_above = NPC[A].Special5;
+                    if(NPC[A].Special6 == 120.0)
+                        init_target_above = (target_Y < nLoc.Y);
+
+                    // if the target has suddenly become higher than current position, set position immediately
+                    if(!init_target_above && target_Y < nLoc.Y)
+                        nLoc.Y = target_Y;
+
+                    // cancel special condition as soon as it does not hold
+                    if(target_Y >= nLoc.Y)
+                        init_target_above = false;
+
+                    // perform Y movement
+                    double delta_Y = target_Y - nLoc.Y;
+                    double move_Y = delta_Y / 8.0;
+
+                    if(std::abs(move_Y) > 8.0)
+                        move_Y = (move_Y > 0) ? 8.0 : -8.0;
+                    else if(std::abs(move_Y) < 2.2)
+                        move_Y = (move_Y > 0) ? 2.2 : -2.2;
+
+                    if(std::abs(delta_Y) < std::abs(move_Y))
+                    {
+                        nLoc.Y = target_Y;
+
+                        // when target Y is reached, start second 60 frames
+                        if(NPC[A].Special6 >= 60.0)
+                            NPC[A].Special6 = 60.0;
+                    }
+                    else
+                        nLoc.Y += move_Y;
+
+
+                    // X logic
+                    double p_SpeedX = pLoc.SpeedX;
+                    if(!(p.Effect == 0 || p.Effect == 3 || p.Effect == 9 || p.Effect == 10))
+                        p_SpeedX = 0;
+
+                    // set X target where player is expected to be
+                    double target_X = pLoc.X + p_SpeedX * 8.0 + pLoc.Width / 2 - nLoc.Width / 2;
+                    double delta_X = target_X - nLoc.X;
+                    double move_X = delta_X / 8.0;
+
+                    // perform X movement
+                    if(std::abs(move_X) > 16.0)
+                        move_X = (move_X > 0) ? 16.0 : -16.0;
+                    else if(std::abs(move_X) < 2.0 && p_SpeedX == 0)
+                        move_X = (move_X > 0) ? 2.0 : -2.0;
+
+                    if(std::abs(move_X) > std::abs(delta_X))
+                    {
+                        move_X = delta_X;
+
+                        // when target X is reached after 15 frames of phase 2, skip the rest of the phase
+                        if(NPC[A].Special6 <= 45.0)
+                            NPC[A].Special6 = 0.0;
+                    }
+
+                    nLoc.X += move_X;
+
+                    // timer logic
+                    NPC[A].Special6 -= 1.0;
+
+                    // enter SMBX mode on timer expiration
+                    if(NPC[A].Special6 <= 0)
+                    {
+                        NPC[A].Effect3 = 0;
+                        NPC[A].Special6 = 0;
+                        NPC[A].Special5 = 0;
+                    }
+                }
+                else
+                {
+                    NPC[A].Location.Y += 2.2;
+
+                    NPC[A].Effect2 += 1;
+                    if(NPC[A].Effect2 == 5)
+                        NPC[A].Effect2 = 1;
+                }
             }
             else if(NPC[A].Effect == NPCEFF_EMERGE_DOWN) // Bonus falling out of a block
             {

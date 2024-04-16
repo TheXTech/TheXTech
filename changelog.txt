@@ -30,6 +30,7 @@ Changelog for 1.3.7-dev
 -Very long SFX are now played from disk to save memory (@ds-sloth)
 -Made some internal memory optimizations to the Block and NPC objects, saving 360KB RAM (@ds-sloth)
 -Add hints system to the loading and pause screens (@ds-sloth)
+-Add new item drop system, used by default in Modern Mode (@ds-sloth, @ChristianSilvermoon)
 
 Changelog for 1.3.6.5-dev
 -Fix TheXTech 1.3.6 bug where auto movement on the world map was not reset when switching episodes (@ds-sloth)
