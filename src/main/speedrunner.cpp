@@ -382,7 +382,7 @@ void speedRun_renderControls(int player, int screenZ, int align)
 
         if(GameMenu)
         {
-            num_players = SDL_min(num_players, Controls::g_InputMethods.size());
+            num_players = SDL_min(num_players, (int)Controls::g_InputMethods.size());
 
             if(plr_i >= num_players)
                 return;
