@@ -31,7 +31,7 @@ Changelog for 1.3.7-dev
 -Made some internal memory optimizations to the Block and NPC objects, saving 360KB RAM (@ds-sloth)
 -Add hints system to the loading and pause screens (@ds-sloth)
 
-Changelog for 1.3.6.5-dev
+Changelog for 1.3.6.5
 -Fix TheXTech 1.3.6 bug where auto movement on the world map was not reset when switching episodes (@ds-sloth)
 -Fix TheXTech 1.3.6 bug where dropping a player at the world map removed their mount (@ds-sloth)
 -Fix TheXTech 1.3.6.4 editor bug where NPCs could not be erased from a battle level (@ds-sloth)
@@ -49,6 +49,7 @@ Changelog for 1.3.6.5-dev
 -Added automatical language detection for Vita (@Wohlstand)
 -Fixed a leak of file descriptors in the translations sub-system (@Wohlstand)
 -Allow asset packs to customize Font 5 (outlined mixed-case font) (@ds-sloth)
+-Fixed the problem when anti-cheat trap will break levels in the editor (@Wohlstand)
 
 Changelog for 1.3.6.4
 -Use OpenGL as the default renderer on supported platforms ("sdl" may be used in config.ini or at at the command line to request the SDL2 renderer)
