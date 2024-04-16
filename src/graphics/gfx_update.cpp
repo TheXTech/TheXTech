@@ -3044,11 +3044,12 @@ void UpdateGraphicsScreen(Screen_t& screen)
             for(size_t i = 0; i < NPC_Draw_Queue_p.Dropped_n; i++)
             {
                 int A = NPC_Draw_Queue_p.Dropped[i];
+                XTColor cn = (NPC[A].Effect3 != 0) ? XTAlphaF(0.5f) : XTColor();
 
                 if(NPC[A]->WidthGFX == 0)
-                    XRender::renderTexture(camX + NPC[A].Location.X + NPC[A]->FrameOffsetX, camY + NPC[A].Location.Y + NPC[A]->FrameOffsetY, NPC[A].Location.Width, NPC[A].Location.Height, GFXNPC[NPC[A].Type], 0, NPC[A].Frame * NPC[A].Location.Height);
+                    XRender::renderTexture(camX + NPC[A].Location.X + NPC[A]->FrameOffsetX, camY + NPC[A].Location.Y + NPC[A]->FrameOffsetY, NPC[A].Location.Width, NPC[A].Location.Height, GFXNPC[NPC[A].Type], 0, NPC[A].Frame * NPC[A].Location.Height, cn);
                 else
-                    XRender::renderTexture(camX + NPC[A].Location.X + NPC[A]->FrameOffsetX - NPC[A]->WidthGFX / 2.0 + NPC[A].Location.Width / 2.0, camY + NPC[A].Location.Y + NPC[A]->FrameOffsetY - NPC[A]->HeightGFX + NPC[A].Location.Height, NPC[A]->WidthGFX, NPC[A]->HeightGFX, GFXNPC[NPC[A].Type], 0, NPC[A].Frame * NPC[A]->HeightGFX);
+                    XRender::renderTexture(camX + NPC[A].Location.X + NPC[A]->FrameOffsetX - NPC[A]->WidthGFX / 2.0 + NPC[A].Location.Width / 2.0, camY + NPC[A].Location.Y + NPC[A]->FrameOffsetY - NPC[A]->HeightGFX + NPC[A].Location.Height, NPC[A]->WidthGFX, NPC[A]->HeightGFX, GFXNPC[NPC[A].Type], 0, NPC[A].Frame * NPC[A]->HeightGFX, cn);
             }
         }
 

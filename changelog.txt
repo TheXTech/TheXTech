@@ -36,6 +36,7 @@ Changelog for 1.3.7-dev
 -Add cheat "edityourfriends" to experiment with compatibility settings (@ds-sloth)
 -Add option to always use shared or split screen in 2P (@ds-sloth)
 -Add ability to play >2P mode with shared or split screen (@ds-sloth)
+-Add new item drop system, used by default in Modern Mode (@ds-sloth, @ChristianSilvermoon)
 
 Changelog for 1.3.6.5-dev
 -Fix TheXTech 1.3.6 bug where auto movement on the world map was not reset when switching episodes (@ds-sloth)
