@@ -204,6 +204,10 @@ void CheckAfterStarTake(bool many)
 
 void TouchBonus(int A, int B)
 {
+    // ban collecting dropped item during first stage of drop process
+    if(NPC[B].Effect == NPCEFF_DROP_ITEM && NPC[B].Effect3 != 0)
+        return;
+
     int C = 0;
     // int D = 0;
     NPCID toadBool = NPCID(0);
