@@ -3043,7 +3043,7 @@ void UpdateGraphicsScreen(Screen_t& screen)
             for(size_t i = 0; i < NPC_Draw_Queue_p.Dropped_n; i++)
             {
                 int A = NPC_Draw_Queue_p.Dropped[i];
-                XTColor cn = (NPC[A].Effect3 != 0) ? XTAlphaF(0.5f) : XTColor();
+                XTColor cn = (NPC[A].Effect3 != 0) ? (NPC[A].Special6 <= 45 ? XTAlpha(128 + 2 * (45 - (int)NPC[A].Special6) + (int)(32 * cos(NPC[A].Special6 / 4))) : XTAlpha(128)) : XTColor();
 
                 if(NPC[A]->WidthGFX == 0)
                     XRender::renderTexture(camX + NPC[A].Location.X + NPC[A]->FrameOffsetX, camY + NPC[A].Location.Y + NPC[A]->FrameOffsetY, NPC[A].Location.Width, NPC[A].Location.Height, GFXNPC[NPC[A].Type], 0, NPC[A].Frame * NPC[A].Location.Height, cn);
