@@ -328,6 +328,7 @@ bool init()
 
     // init the vi.
     VIDEO_Init();
+    // VIDEO_Init();
 
     rmode = VIDEO_GetPreferredMode(NULL);
 
