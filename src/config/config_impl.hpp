@@ -422,9 +422,7 @@ void ConfigEnumOption_t<true, value_t>::update_from_ini(IniProcessing* ini, Conf
         return;
 
     if(!ini->hasKey(base->m_internal_name))
-    {
         return;
-    }
 
     std::string key_name;
     ini->read(base->m_internal_name, key_name, key_name);
@@ -439,7 +437,8 @@ void ConfigEnumOption_t<true, value_t>::update_from_ini(IniProcessing* ini, Conf
         }
     }
 
-    ConfigOption_t<true, value_t>::update_from_ini(ini, level);
+    ConfigOption_t<true, value_t>::operator=(base->m_default_value);
+    m_set = level;
 }
 
 template<class value_t>
