@@ -62,8 +62,16 @@ StdPicture* g_render_chain_tail = nullptr;
 
 uint32_t g_current_frame = 0;
 
+#ifdef __WII__
+extern void video_set_rmode();
+#endif
+
 void updateViewport()
 {
+#ifdef __WII__
+    video_set_rmode();
+#endif
+
     resetViewport();
     offsetViewport(0, 0);
 
@@ -83,36 +91,19 @@ void updateViewport()
     int TargetW_Show = TargetW;
 #endif
 
-    if(g_config.fit_to_screen)
+    g_screen_phys_w = TargetW_Show / 2;
+    g_screen_phys_h = TargetH / 2;
+
+    if(g_screen_phys_w > hardware_w)
     {
-        int res_h = hardware_h;
-        int res_w = TargetW_Show * hardware_h / TargetH;
-
-        if(res_w > hardware_w)
-        {
-            res_w = hardware_w;
-            res_h = TargetH * res_w / TargetW_Show;
-        }
-
-        g_screen_phys_w = res_w;
-        g_screen_phys_h = res_h;
+        g_screen_phys_w = hardware_w;
+        g_screen_phys_h = TargetH * g_screen_phys_w / TargetW_Show;
     }
-    else
+
+    if(g_screen_phys_h > hardware_h)
     {
-        g_screen_phys_w = TargetW_Show / 2;
-        g_screen_phys_h = TargetH / 2;
-
-        if(g_screen_phys_w > hardware_w)
-        {
-            g_screen_phys_w = hardware_w;
-            g_screen_phys_h = TargetH * g_screen_phys_w / TargetW_Show;
-        }
-
-        if(g_screen_phys_h > hardware_h)
-        {
-            g_screen_phys_h = hardware_h;
-            g_screen_phys_w = TargetW_Show * g_screen_phys_h / TargetH;
-        }
+        g_screen_phys_h = hardware_h;
+        g_screen_phys_w = TargetW_Show * g_screen_phys_h / TargetH;
     }
 
     pLogDebug("Phys screen is %d x %d", g_screen_phys_w, g_screen_phys_h);
@@ -185,7 +176,12 @@ void setTransparentColor(StdPicture &target, uint32_t rgb)
 
 void getRenderSize(int* w, int* h)
 {
+#ifdef __WII__
+    *w = 1280;
+    *h = (CONF_GetAspectRatio()) ? 720 : 960;
+#else
     return XWindow::getWindowSize(w, h);
+#endif
 }
 
 inline int FLOORDIV2(int x)

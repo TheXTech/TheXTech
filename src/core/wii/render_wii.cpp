@@ -33,6 +33,7 @@
 #undef BOOL
 
 #include <gccore.h>
+#include <wiiuse/wpad.h>
 
 #include <Graphics/graphics_funcs.h>
 #include <Logger/logger.h>
@@ -63,7 +64,7 @@ static RenderPlanes_t s_render_planes;
 
 void* frameBuffer[2] = { NULL, NULL};
 int cur_buffer = 0;
-GXRModeObj* rmode = nullptr;
+GXRModeObj rmode;
 Mtx view;
 
 int s_num_textures_loaded = 0;
@@ -319,34 +320,137 @@ void videoPreTraceCB(u32 /*retraceCnt*/)
     VIDEO_Flush();
 }
 
-bool init()
+void video_set_rmode()
 {
-    f32 yscale;
-    u32 xfbHeight;
+    GXRModeObj new_rmode = *VIDEO_GetPreferredMode(NULL);
 
-    GXColor background = {0, 0, 0, 0xff};
+    // use custom video position
+    if(g_config.scale_mode != Config_t::SCALE_FIXED_1X)
+    {
+        int goal_w = XRender::TargetW / 2;
+        int goal_h = XRender::TargetH / 2;
 
-    // init the vi.
-    VIDEO_Init();
-    // VIDEO_Init();
+        if(CONF_GetAspectRatio())
+        {
+            if(goal_w < goal_h * 16 / 9)
+                goal_w = goal_h * 16 / 9;
+            else if(goal_h < goal_w * 9 / 16)
+                goal_h = goal_w * 9 / 16;
+        }
+        else
+        {
+            if(goal_w < goal_h * 4 / 3)
+                goal_w = goal_h * 4 / 3;
+            else if(goal_h < goal_w * 3 / 4)
+                goal_h = goal_w * 3 / 4;
+        }
 
-    rmode = VIDEO_GetPreferredMode(NULL);
+        if(goal_w > 640)
+            goal_w = 640;
+
+        if(goal_w > new_rmode.viWidth)
+            goal_w = new_rmode.viWidth;
+
+        if(goal_h > 480)
+            goal_h = 480;
+
+        if(goal_h > new_rmode.viHeight)
+            goal_h = new_rmode.viHeight;
+
+        if(CONF_GetAspectRatio())
+        {
+            if(goal_w > goal_h * 16 / 9)
+                goal_w = goal_h * 16 / 9;
+            else if(goal_h > goal_w * 9 / 16)
+                goal_h = goal_w * 9 / 16;
+        }
+        else
+        {
+            if(goal_w > goal_h * 4 / 3)
+                goal_w = goal_h * 4 / 3;
+            else if(goal_h > goal_w * 3 / 4)
+                goal_h = goal_w * 3 / 4;
+        }
+
+        if(goal_w & 15)
+            goal_w += (16 - (goal_w & 15));
+
+        if(goal_h & 1)
+            goal_h += 1;
+
+        new_rmode.fbWidth = goal_w;
+        new_rmode.efbHeight = goal_h;
+    }
+    else if(CONF_GetAspectRatio())
+    {
+        new_rmode.efbHeight = new_rmode.efbHeight * 3 / 4;
+    }
+
+    if(new_rmode.fbWidth == rmode.fbWidth && new_rmode.efbHeight == rmode.efbHeight)
+        return;
+
+    VIDEO_SetBlack(TRUE);
+    VIDEO_SetPreRetraceCallback(nullptr);
+    VIDEO_SetNextFramebuffer(nullptr);
+    VIDEO_Flush();
+
+    if(frameBuffer[0])
+        free(MEM_K1_TO_K0(frameBuffer[0]));
+    if(frameBuffer[1])
+        free(MEM_K1_TO_K0(frameBuffer[1]));
+    frameBuffer[0] = nullptr;
+    frameBuffer[1] = nullptr;
+
+    rmode = new_rmode;
+
+    // pixel aspect ratio
+    if((rmode.viTVMode >> 2) != VI_PAL)
+    {
+        rmode.viWidth = rmode.viWidth * 11 / 10;
+        if(rmode.viWidth & 1)
+            rmode.viWidth += 1;
+
+        rmode.viXOrigin = (VI_MAX_WIDTH_NTSC - rmode.viWidth) / 2;
+    }
 
     // allocate 2 framebuffers for double buffering
-    frameBuffer[0] = MEM_K0_TO_K1(SYS_AllocateFramebuffer(rmode));
-    frameBuffer[1] = MEM_K0_TO_K1(SYS_AllocateFramebuffer(rmode));
+    frameBuffer[0] = MEM_K0_TO_K1(SYS_AllocateFramebuffer(&rmode));
+    frameBuffer[1] = MEM_K0_TO_K1(SYS_AllocateFramebuffer(&rmode));
 
-    VIDEO_Configure(rmode);
-    VIDEO_ClearFrameBuffer(rmode, frameBuffer[0], COLOR_BLACK);
-    VIDEO_ClearFrameBuffer(rmode, frameBuffer[1], COLOR_BLACK);
+    VIDEO_Configure(&rmode);
+    VIDEO_ClearFrameBuffer(&rmode, frameBuffer[0], COLOR_BLACK);
+    VIDEO_ClearFrameBuffer(&rmode, frameBuffer[1], COLOR_BLACK);
     VIDEO_SetNextFramebuffer(frameBuffer[cur_buffer]);
     VIDEO_SetBlack(FALSE);
     VIDEO_Flush();
     VIDEO_WaitVSync();
 
-    if(rmode->viTVMode & VI_NON_INTERLACE) VIDEO_WaitVSync();
+    if(rmode.viTVMode & VI_NON_INTERLACE) VIDEO_WaitVSync();
 
     VIDEO_SetPreRetraceCallback(videoPreTraceCB);
+
+    // other gx setup
+    GX_SetViewport(0, 0, rmode.fbWidth, rmode.efbHeight, 0, 1);
+    GX_SetScissor(0, 0, rmode.fbWidth, rmode.efbHeight);
+    GX_SetDispCopySrc(0, 0, rmode.fbWidth, rmode.efbHeight);
+
+    GX_SetDispCopyYScale(SDL_max(1.0f, (rmode.xfbHeight - 3.0f) / rmode.efbHeight));
+
+    GX_SetDispCopyDst(rmode.fbWidth, rmode.xfbHeight);
+    GX_SetCopyFilter(rmode.aa, rmode.sample_pattern, GX_TRUE, rmode.vfilter);
+    GX_SetFieldMode(rmode.field_rendering, ((rmode.viHeight == 2 * rmode.xfbHeight) ? GX_ENABLE : GX_DISABLE));
+
+    pLogInfo("RenderWii: initialized GX video with rMode %d x %d", (int)rmode.fbWidth, (int)rmode.efbHeight);
+
+    g_rmode_w = rmode.fbWidth;
+    g_rmode_h = rmode.efbHeight;
+
+    WPAD_SetVRes(WPAD_CHAN_ALL, g_rmode_w, g_rmode_h);
+}
+
+bool init()
+{
+    GXColor background = {0, 0, 0, 0xff};
 
     // setup the fifo and then init the flipper
     void* gp_fifo = NULL;
@@ -358,27 +462,11 @@ bool init()
     // clears the bg to color and clears the z buffer
     GX_SetCopyClear(background, GX_MAX_Z24);
     GX_SetDrawDoneCallback(gxDrawDoneCB);
-
-    // other gx setup
-    GX_SetViewport(0, 0, rmode->fbWidth, rmode->efbHeight, 0, 1);
-    yscale = GX_GetYScaleFactor(rmode->efbHeight, rmode->xfbHeight);
-    xfbHeight = GX_SetDispCopyYScale(yscale);
-    GX_SetScissor(0, 0, rmode->fbWidth, rmode->efbHeight);
-    GX_SetDispCopySrc(0, 0, rmode->fbWidth, rmode->efbHeight);
-    GX_SetDispCopyDst(rmode->fbWidth, xfbHeight);
-    GX_SetCopyFilter(rmode->aa, rmode->sample_pattern, GX_TRUE, rmode->vfilter);
-    GX_SetFieldMode(rmode->field_rendering, ((rmode->viHeight == 2 * rmode->xfbHeight) ? GX_ENABLE : GX_DISABLE));
     GX_SetColorUpdate(1);
     GX_SetAlphaUpdate(1);
     GX_SetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_SET);
 
-    pLogInfo("RenderWii: initialized GX video with rMode %d x %d", (int)rmode->viWidth, (int)rmode->viHeight);
-
-    g_rmode_w = rmode->fbWidth;
-    g_rmode_h = rmode->efbHeight;
-
     GX_SetCullMode(GX_CULL_NONE);
-    GX_CopyDisp(frameBuffer[cur_buffer], GX_TRUE);
     GX_SetDispCopyGamma(GX_GM_1_0);
 
 
@@ -493,7 +581,7 @@ void repaint()
     {
         VIDEO_WaitVSync();
 
-        if(rmode->viTVMode & VI_NON_INTERLACE)
+        if(rmode.viTVMode & VI_NON_INTERLACE)
             VIDEO_WaitVSync();
     }
 
@@ -516,31 +604,6 @@ void mapFromScreen(int scr_x, int scr_y, int* window_x, int* window_y)
 
 void minport_TransformPhysCoords()
 {
-    int hardware_w, hardware_h;
-    XWindow::getWindowSize(&hardware_w, &hardware_h);
-
-    hardware_w /= 2;
-    hardware_h /= 2;
-
-    if(CONF_GetAspectRatio() && !g_config.hq_widescreen) // widescreen_stretch
-    {
-        g_screen_phys_h = g_screen_phys_h * g_rmode_h / hardware_h;
-
-        if(g_screen_phys_h > g_rmode_h)
-        {
-            g_screen_phys_w = g_screen_phys_w * g_rmode_h / g_screen_phys_h;
-            g_screen_phys_h = g_rmode_h;
-        }
-
-        if(g_screen_phys_w > g_rmode_w)
-        {
-            g_screen_phys_h = g_screen_phys_h * g_rmode_w / g_screen_phys_w;
-            g_screen_phys_w = g_rmode_w;
-        }
-
-        pLogDebug("Phys screen stretched to %d x %d", g_screen_phys_w, g_screen_phys_h);
-    }
-
     g_screen_phys_x = g_rmode_w / 2 - g_screen_phys_w / 2;
     g_screen_phys_y = g_rmode_h / 2 - g_screen_phys_h / 2;
 

@@ -218,15 +218,20 @@ public:
         SCALE_FIXED_2X = 2,
     };
 
-#ifndef PGE_MIN_PORT
+#if defined(__WII__) || !defined(PGE_MIN_PORT)
     opt_enum<int> scale_mode{this,
         {
+#   ifdef __WII__
+            {SCALE_DYNAMIC_NEAREST, "full", "Full"},
+            {SCALE_FIXED_1X, "center", "Center"},
+#   else
             {SCALE_DYNAMIC_INTEGER, "integer", "Integer"},
             {SCALE_DYNAMIC_NEAREST, "nearest", "Nearest"},
             {SCALE_DYNAMIC_LINEAR, "linear", "Smooth"},
             {SCALE_FIXED_05X, "0.5x", "0.5x"},
             {SCALE_FIXED_1X, "1x", "1x"},
             {SCALE_FIXED_2X, "2x", "2x"},
+#   endif
         },
         defaults(SCALE_DYNAMIC_NEAREST), {}, Scope::UserGlobal,
         "scale-mode", "Scale mode", nullptr,
@@ -234,20 +239,6 @@ public:
     };
 #else
     static constexpr int scale_mode = SCALE_DYNAMIC_NEAREST;
-#endif
-
-#ifdef __WII__
-    opt<bool> fit_to_screen{this, defaults(false), {}, Scope::UserGlobal,
-        "fit-to-screen", "Fill screen", "Stretch game view (reduces quality)",
-        config_res_set};
-#elif PGE_MIN_PORT
-    static constexpr bool fit_to_screen = false;
-#endif
-
-#ifdef __WII__
-    opt<bool> hq_widescreen{this, defaults(false), {}, Scope::UserGlobal,
-        "hq-widescreen", "HQ widescreen", "Must set TV to zoom mode",
-        config_res_set};
 #endif
 
     /* ---- Video - Meta Info ----*/
