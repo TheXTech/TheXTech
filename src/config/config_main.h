@@ -268,6 +268,8 @@ public:
         BATTERY_STATUS_FULLSCREEN,
         BATTERY_STATUS_ALWAYS_ON,
     };
+
+#if !defined(__WII__) && !defined(__WIIU__)
     opt_enum<int> show_battery_status{this,
         {
             {BATTERY_STATUS_OFF, "off", "Off", nullptr},
@@ -281,6 +283,9 @@ public:
         },
         defaults<int>(BATTERY_STATUS_OFF), {}, Scope::UserGlobal,
         "battery-status", "Device battery status", nullptr};
+#else
+    static constexpr bool show_battery_status = BATTERY_STATUS_OFF;
+#endif
 
     /* ---- Video - Game Info ----*/
     subsection info_game{this, "info-game", "Onscreen game info"};
