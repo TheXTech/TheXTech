@@ -195,6 +195,9 @@ public:
             {{768, 432}, "hello", "768x432 (HELLO)"},
             {{800, 480}, "3ds", "800x480 (3DS)"},
             {{800, 600}, "smbx", "800x600 (SMBX)"},
+#ifndef __16M__
+            {{0, 600}, "smbx-wide", "SMBX (wide)"},
+#endif
             {{1280, 720}, "hd", "1280x720 (HD)"},
             {{0, 0}, "dynamic", "Dynamic"},
         },
@@ -203,13 +206,7 @@ public:
         config_res_set
     };
 
-#ifndef __16M__
-    opt<bool> dynamic_width{this, defaults(false), {}, Scope::UserGlobal,
-        "dynamic-width", "Widescreen", "Override width to match screen aspect ratio",
-        config_res_set};
-#else
     static constexpr bool dynamic_width = false;
-#endif
 
     enum ScaleModes
     {
