@@ -23,6 +23,8 @@
 
 #include <Logger/logger.h>
 
+#include "sdl_proxy/sdl_stdinc.h"
+
 #include "../globals.h"
 #include "../npc.h"
 #include "../sound.h"
