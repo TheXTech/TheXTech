@@ -444,9 +444,6 @@ public:
 
     // static constexpr bool record_gameplay_data = false;
 
-    opt<bool> modern_item_drop{this, defaults(false), {CompatClass::standard_update, false}, Scope::UserGlobal,
-        "modern-item-drop", "Modern item drop", "Experimental implementation of modern item drop"};
-
     opt<bool> record_gameplay_data{this, defaults(false), {}, Scope::UserGlobal,
         "record-gameplay-data", "Record gameplay", "Save play data for replay or debugging"};
 
@@ -722,6 +719,9 @@ public:
 
     opt<bool> world_map_fast_move{this, defaults(true), {CompatClass::standard_update, false}, Scope::Local,
         "world-map-fast-move", "Automatic movement", "Moves automatically between forks on the path"};
+
+    opt<bool> modern_item_drop{this, defaults(true), {CompatClass::standard_update, false}, Scope::Local,
+        "modern-item-drop", "Modern item drop", "Experimental implementation of modern item drop"};
 
     /* ---- Compatibility - Autocode ----*/
     subsection compat_autocode{this, "autocode", "Autocode"};
