@@ -58,7 +58,7 @@ struct MenuItem
 {
     std::string name;
     bool (*callback)();
-    MenuItem(std::string n, bool(*cb)()) : name(n), callback(cb) {};
+    MenuItem(const std::string &n, bool(*cb)()) : name(n), callback(cb) {}
 };
 
 enum class PauseType
