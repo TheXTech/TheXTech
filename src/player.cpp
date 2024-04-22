@@ -6800,8 +6800,10 @@ void PlayerEffects(const int A)
             {
                 p.Location.X = warp_exit.X + warp_exit.Width / 2.0 - p.Location.Width / 2.0;
                 p.Location.Y = warp_exit.Y - p.Location.Height - 8;
+
                 if(p.Mount == 0)
                     p.Frame = 15;
+
                 if(p.HoldingNPC > 0)
                 {
                     NPC[p.HoldingNPC].Location.Y = p.Location.Y + Physics.PlayerGrabSpotY[p.Character][p.State] + 32 - NPC[p.HoldingNPC].Location.Height;
@@ -6813,8 +6815,10 @@ void PlayerEffects(const int A)
             {
                 p.Location.X = warp_exit.X + warp_exit.Width / 2.0 - p.Location.Width / 2.0;
                 p.Location.Y = warp_exit.Y + warp_exit.Height + 8;
+
                 if(p.Mount == 0)
                     p.Frame = 15;
+
                 if(p.HoldingNPC > 0)
                 {
                     NPC[p.HoldingNPC].Location.Y = p.Location.Y + Physics.PlayerGrabSpotY[p.Character][p.State] + 32 - NPC[p.HoldingNPC].Location.Height;
@@ -6829,17 +6833,22 @@ void PlayerEffects(const int A)
                     p.Duck = true;
                     p.Location.Height = 30;
                 }
+
                 p.Location.X = warp_exit.X - p.Location.Width - 8;
                 p.Location.Y = warp_exit.Y + warp_exit.Height - p.Location.Height - 2;
+
                 if(p.Mount == 0)
                     p.Frame = 1;
+
                 p.Direction = 1;
+
                 if(p.HoldingNPC > 0)
                 {
                     if(p.State == 1)
                         p.Frame = 5;
                     else
                         p.Frame = 8;
+
                     NPC[p.HoldingNPC].Location.Y = p.Location.Y + Physics.PlayerGrabSpotY[p.Character][p.State] + 32 - NPC[p.HoldingNPC].Location.Height;
                     p.Direction = -1; // Makes (p.Direction > 0) always false
 //                    if(p.Direction > 0) // always false
@@ -6856,10 +6865,13 @@ void PlayerEffects(const int A)
                     p.Duck = true;
                     p.Location.Height = 30;
                 }
+
                 p.Location.X = warp_exit.X + warp_exit.Width + 8;
                 p.Location.Y = warp_exit.Y + warp_exit.Height - p.Location.Height - 2;
+
                 if(p.Mount == 0)
                     p.Frame = 1;
+
                 p.Direction = -1;
                 if(p.HoldingNPC > 0)
                 {
@@ -6867,6 +6879,7 @@ void PlayerEffects(const int A)
                         p.Frame = 5;
                     else
                         p.Frame = 8;
+
                     p.Direction = 1; // Makes always true
                     NPC[p.HoldingNPC].Location.Y = p.Location.Y + Physics.PlayerGrabSpotY[p.Character][p.State] + 32 - NPC[p.HoldingNPC].Location.Height;
 //                    if(p.Direction > 0) // always true
@@ -6881,9 +6894,7 @@ void PlayerEffects(const int A)
             if(p.Duck)
             {
                 if(warp_dir_exit == 1 || warp_dir_exit == 3)
-                {
                     UnDuck(Player[A]);
-                }
             }
 
             int last_section = p.Section;
@@ -6893,9 +6904,7 @@ void PlayerEffects(const int A)
             bool same_section = (last_section == p.Section);
 
             if(p.HoldingNPC > 0)
-            {
                 CheckSectionNPC(p.HoldingNPC);
-            }
 
             // set any other players warping to the same pipe to this state (needed to avoid splitting a shared screen)
             if(is_shared_screen)
@@ -6956,15 +6965,15 @@ void PlayerEffects(const int A)
                             Player[B].Location.Y = p.Location.Y + p.Location.Height - Player[B].Location.Height;
                         else
                             Player[B].Location.Y = p.Location.Y;
+
                         Player[B].Location.X = p.Location.X + p.Location.Width / 2.0 - Player[B].Location.Width / 2.0;
                         Player[B].Location.SpeedY = dRand() * 24 - 12;
                         Player[B].Effect = 8;
                         Player[B].Effect2 = 0;
                         CheckSection(B);
+
                         if(Player[B].HoldingNPC > 0)
-                        {
                             CheckSectionNPC(Player[B].HoldingNPC);
-                        }
                     }
                 }
             }
@@ -7023,8 +7032,10 @@ void PlayerEffects(const int A)
                 p.Effect = 8;
                 p.Effect2 = 2970;
                 ReturnWarp = p.Warp;
+
                 if(IsHubLevel)
                     ReturnWarpSaved = ReturnWarp;
+
                 StartWarp = warp.LevelWarp;
             }
             else if(warp.MapWarp)
