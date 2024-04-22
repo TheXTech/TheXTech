@@ -615,6 +615,10 @@ public:
         defaults(g_audioDefaults.bufferSize), {}, Scope::UserGlobal,
         "audio-buffer-size", "Buffer size", "(Advanced) increase for fewer pops but more lag",
         config_audio_set};
+#else
+    static constexpr int audio_sample_rate = 44100;
+    static constexpr int audio_format = AUDIO_F32SYS;
+    static constexpr int audio_buffer_size = 1024;
 #endif
 
 

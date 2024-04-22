@@ -594,6 +594,7 @@ int main(int argc, char**argv)
             g_config.background_work = switchBgInput.getValue();
 #endif // NO_WINDOW_FOCUS_TRACKING
 
+#ifndef RENDER_CUSTOM
         if(renderType.isSet())
         {
             std::string rt = renderType.getValue();
@@ -622,11 +623,12 @@ int main(int argc, char**argv)
                 std::cerr.flush();
                 return 2;
             }
-#ifdef DEBUG_BUILD
+#   ifdef DEBUG_BUILD
             std::cerr << "Manually selected renderer: " << rt << " - " << g_config.render_mode << std::endl;
             std::cerr.flush();
-#endif
+#   endif
         }
+#endif
 
         // store the game setup options
 
