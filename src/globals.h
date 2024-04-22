@@ -2118,6 +2118,11 @@ extern bool GrabAll;
 //Public Cheater As Boolean 'if the player is a cheater
 extern bool Cheater;
 
+#ifdef ENABLE_ANTICHEAT_TRAP
+//EXTRA: Quit the game like "game over" even with enough lifes
+extern bool CheaterMustDie;
+#endif
+
 //'--------------------------------
 //Public WorldCredits(1 To 5) As String
 extern RangeArr<std::string, 1, maxWorldCredits> WorldCredits;

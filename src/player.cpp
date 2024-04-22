@@ -1409,6 +1409,25 @@ void ProcessLastDead()
     }
 }
 
+static void s_gameOver()
+{
+    Lives = 3;
+    Coins = 0;
+    Score = 0;
+    SaveGame();
+    LevelMacro = LEVELMACRO_OFF;
+    LevelMacroCounter = 0;
+    ResetSoundFX();
+    ClearLevel();
+    LevelSelect = true;
+    GameMenu = true;
+    MenuMode = MENU_INTRO;
+    MenuCursor = 0;
+#ifdef ENABLE_ANTICHEAT_TRAP
+    CheaterMustDie = false;
+#endif
+}
+
 void EveryonesDead()
 {
 //    int A = 0; // UNUSED
@@ -1439,6 +1458,14 @@ void EveryonesDead()
             PGE_Delay(500);
     }
 
+#ifdef ENABLE_ANTICHEAT_TRAP
+    if(CheaterMustDie)
+    {
+        s_gameOver();
+        return;
+    }
+#endif
+
     if(g_ClonedPlayerMode)
         gDeathCounter.MarkDeath();
 
@@ -1459,6 +1486,7 @@ void EveryonesDead()
 
         ResetSoundFX();
         ClearLevel();
+
         if(RestartLevel)
         {
             OpenLevel(FullFileName);
@@ -1472,19 +1500,9 @@ void EveryonesDead()
     else // no more lives
     {
 // GAME OVER
-        Lives = 3;
-        Coins = 0;
-        Score = 0;
-        SaveGame();
-        LevelMacro = LEVELMACRO_OFF;
-        LevelMacroCounter = 0;
-        ResetSoundFX();
-        ClearLevel();
-        LevelSelect = true;
-        GameMenu = true;
-        MenuMode = MENU_INTRO;
-        MenuCursor = 0;
+        s_gameOver();
     }
+
     XEvents::doEvents();
 }
 
