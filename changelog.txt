@@ -19,6 +19,7 @@ Changelog for 1.3.6.5
 -Fixed a leak of file descriptors in the translations sub-system (@Wohlstand)
 -Allow asset packs to customize Font 5 (outlined mixed-case font) (@ds-sloth)
 -Fixed the problem when anti-cheat trap will break levels in the editor (@Wohlstand)
+-Fixed the unexpected fade-in effect that gets played during any level quits by warps (@Wohlstand)
 
 Changelog for 1.3.6.4
 -Use OpenGL as the default renderer on supported platforms ("sdl" may be used in config.ini or at at the command line to request the SDL2 renderer)

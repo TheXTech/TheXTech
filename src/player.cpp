@@ -5996,6 +5996,7 @@ void PlayerEffects(const int A)
 
         bool same_section = SectionCollision(p.Section, warp_exit);
         bool do_scroll = (warp.transitEffect == LevelDoor::TRANSIT_SCROLL) && same_section;
+        bool is_level_quit = warp.level != STRINGINDEX_NONE || warp.MapWarp;
 
         if(p.Effect2 == 0.0) // Entering pipe
         {
@@ -6147,7 +6148,7 @@ void PlayerEffects(const int A)
                 default:
                     if(warp.transitEffect >= ScreenFader::S_CUSTOM)
                     {
-                        if(Maths::iRound(leftToGoal) == 8 && warp.level == STRINGINDEX_NONE && !warp.MapWarp)
+                        if(Maths::iRound(leftToGoal) == 8 && !is_level_quit)
                             g_levelVScreenFader[A].setupFader(3, 0, 65, warp.transitEffect,
                                                               true,
                                                               Maths::iRound(warp_enter.X + warp_enter.Width / 2),
@@ -6156,7 +6157,7 @@ void PlayerEffects(const int A)
                     }
                 // fallthrough
                 case LevelDoor::TRANSIT_NONE:
-                    if(Maths::iRound(leftToGoal) == 0 && warp.level == STRINGINDEX_NONE && !warp.MapWarp && !same_section)
+                    if(Maths::iRound(leftToGoal) == 0 && !is_level_quit && !same_section)
                         g_levelVScreenFader[A].setupFader(g_config.EnableInterLevelFade ? 8 : 64, 0, 65, ScreenFader::S_FADE);
                     break;
 
@@ -6341,7 +6342,7 @@ void PlayerEffects(const int A)
                 }
             }
 
-            if(A >= 1 && A <= 2 && (g_levelVScreenFader[A].isVisible() || warp.transitEffect == LevelDoor::TRANSIT_SCROLL))
+            if(!is_level_quit && A >= 1 && A <= 2 && (g_levelVScreenFader[A].isVisible() || warp.transitEffect == LevelDoor::TRANSIT_SCROLL))
             {
                 switch(warp.transitEffect)
                 {
@@ -6716,6 +6717,7 @@ void PlayerEffects(const int A)
 
         bool same_section = SectionCollision(p.Section, warp_exit);
         bool do_scroll = (warp.transitEffect == LevelDoor::TRANSIT_SCROLL) && same_section;
+        bool is_level_quit = warp.level != STRINGINDEX_NONE || warp.MapWarp;
 
         if(p.HoldingNPC > 0)
         {
@@ -6740,7 +6742,7 @@ void PlayerEffects(const int A)
             default:
                 if(warp.transitEffect >= ScreenFader::S_CUSTOM)
                 {
-                    if(fEqual(p.Effect2, 5) && warp.level == STRINGINDEX_NONE && !warp.MapWarp)
+                    if(fEqual(p.Effect2, 5) && !is_level_quit)
                         g_levelVScreenFader[A].setupFader(3, 0, 65, warp.transitEffect,
                                                           true,
                                                           Maths::iRound(warp_enter.X + warp_enter.Width / 2),
@@ -6749,7 +6751,7 @@ void PlayerEffects(const int A)
                 }
             // fallthrough
             case LevelDoor::TRANSIT_NONE:
-                if(fEqual(p.Effect2, 20) && warp.level == STRINGINDEX_NONE && !warp.MapWarp && !same_section)
+                if(fEqual(p.Effect2, 20) && !is_level_quit && !same_section)
                     g_levelVScreenFader[A].setupFader(g_config.EnableInterLevelFade ? 9 : 64, 0, 65, ScreenFader::S_FADE);
                 break;
 
@@ -6860,7 +6862,7 @@ void PlayerEffects(const int A)
             p.Effect2 = 0;
             p.WarpCD = 40;
 
-            if(A >= 1 && A <= 2 && (g_levelVScreenFader[A].isVisible() || warp.transitEffect == LevelDoor::TRANSIT_SCROLL))
+            if(!is_level_quit && A >= 1 && A <= 2 && (g_levelVScreenFader[A].isVisible() || warp.transitEffect == LevelDoor::TRANSIT_SCROLL))
             {
                 switch(warp.transitEffect)
                 {
