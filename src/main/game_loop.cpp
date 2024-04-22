@@ -64,7 +64,7 @@ RangeArr<ScreenFader, 0, c_vScreenCount> g_levelVScreenFader;
 void clearScreenFaders()
 {
     g_levelScreenFader.clearFader();
-    for(int s = 0; s < 3; ++s)
+    for(int s = 0; s <= c_vScreenCount; ++s)
         g_levelVScreenFader[s].clearFader();
 }
 
@@ -72,7 +72,7 @@ void updateScreenFaders()
 {
     g_levelScreenFader.update();
 
-    for(int s = 0; s < 3; ++s)
+    for(int s = 0; s <= c_vScreenCount; ++s)
         g_levelVScreenFader[s].update();
 }
 
