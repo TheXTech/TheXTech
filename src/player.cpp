@@ -6738,55 +6738,59 @@ void PlayerEffects(const int A)
             // D_pLogDebug("Warping: %g (same section? %s!)", leftToGoal, SectionCollision(p.Section, warp_exit) ? "yes" : "no");
 
             // must limit to the number of actual vScreens to avoid RangeArr out-of-bounds access
-            if(A >= 1 && A <= 2)
+            int fader_index = vScreenIdxByPlayer(A);
+            SDL_assert_release(0 <= fader_index && fader_index <= c_vScreenCount);
+
+            auto& fader = g_levelVScreenFader[fader_index];
+
+            switch(warp.transitEffect)
             {
-                switch(warp.transitEffect)
+            default:
+                if(warp.transitEffect >= ScreenFader::S_CUSTOM)
                 {
-                default:
-                    if(warp.transitEffect >= ScreenFader::S_CUSTOM)
-                    {
-                        if(Maths::iRound(leftToGoal) == 8 && !is_level_quit)
-                            g_levelVScreenFader[A].setupFader(3, 0, 65, warp.transitEffect,
-                                                              true,
-                                                              Maths::iRound(warp_enter.X + warp_enter.Width / 2),
-                                                              Maths::iRound(warp_enter.Y + warp_enter.Height / 2), A);
-                        break;
-                    }
-                // fallthrough
-                case LevelDoor::TRANSIT_NONE:
-                    if(Maths::iRound(leftToGoal) == 0 && !is_level_quit && !same_section)
-                        g_levelVScreenFader[A].setupFader(g_config.EnableInterLevelFade ? 8 : 64, 0, 65, ScreenFader::S_FADE);
-                    break;
-
-                case LevelDoor::TRANSIT_SCROLL:
-                    // uses fade effect if not same section
-                    if(Maths::iRound(leftToGoal) == 24 && !same_section)
-                        g_levelVScreenFader[A].setupFader(3, 0, 65, ScreenFader::S_FADE);
-                    break;
-
-                case LevelDoor::TRANSIT_FADE:
-                    if(Maths::iRound(leftToGoal) == 24)
-                        g_levelVScreenFader[A].setupFader(3, 0, 65, ScreenFader::S_FADE);
-                    break;
-
-                case LevelDoor::TRANSIT_CIRCLE_FADE:
-                    if(Maths::iRound(leftToGoal) == 24)
-                        g_levelVScreenFader[A].setupFader(3, 0, 65, ScreenFader::S_CIRCLE,
-                                                          true,
-                                                          Maths::iRound(warp_enter.X + warp_enter.Width / 2),
-                                                          Maths::iRound(warp_enter.Y + warp_enter.Height / 2), A);
-                    break;
-
-                case LevelDoor::TRANSIT_FLIP_H:
-                    if(Maths::iRound(leftToGoal) == 24)
-                        g_levelVScreenFader[A].setupFader(3, 0, 65, ScreenFader::S_FLIP_H);
-                    break;
-
-                case LevelDoor::TRANSIT_FLIP_V:
-                    if(Maths::iRound(leftToGoal) == 24)
-                        g_levelVScreenFader[A].setupFader(3, 0, 65, ScreenFader::S_FLIP_V);
+                    if(Maths::iRound(leftToGoal) == 8 && !is_level_quit)
+                        fader.setupFader(3, 0, 65, warp.transitEffect,
+                                         true,
+                                         Maths::iRound(warp_enter.X + warp_enter.Width / 2),
+                                         Maths::iRound(warp_enter.Y + warp_enter.Height / 2),
+                                         fader_index);
                     break;
                 }
+            // fallthrough
+            case LevelDoor::TRANSIT_NONE:
+                if(Maths::iRound(leftToGoal) == 0 && !is_level_quit && !same_section)
+                    fader.setupFader(g_config.EnableInterLevelFade ? 8 : 64, 0, 65, ScreenFader::S_FADE);
+                break;
+
+            case LevelDoor::TRANSIT_SCROLL:
+                // uses fade effect if not same section
+                if(Maths::iRound(leftToGoal) == 24 && !same_section)
+                    fader.setupFader(3, 0, 65, ScreenFader::S_FADE);
+                break;
+
+            case LevelDoor::TRANSIT_FADE:
+                if(Maths::iRound(leftToGoal) == 24)
+                    fader.setupFader(3, 0, 65, ScreenFader::S_FADE);
+                break;
+
+            case LevelDoor::TRANSIT_CIRCLE_FADE:
+                if(Maths::iRound(leftToGoal) == 24)
+                    fader.setupFader(3, 0, 65, ScreenFader::S_CIRCLE,
+                                     true,
+                                     Maths::iRound(warp_enter.X + warp_enter.Width / 2),
+                                     Maths::iRound(warp_enter.Y + warp_enter.Height / 2),
+                                     fader_index);
+                break;
+
+            case LevelDoor::TRANSIT_FLIP_H:
+                if(Maths::iRound(leftToGoal) == 24)
+                    fader.setupFader(3, 0, 65, ScreenFader::S_FLIP_H);
+                break;
+
+            case LevelDoor::TRANSIT_FLIP_V:
+                if(Maths::iRound(leftToGoal) == 24)
+                    fader.setupFader(3, 0, 65, ScreenFader::S_FLIP_V);
+                break;
             }
         }
         else if(fEqual(p.Effect2, 1))  // Exiting pipe (initialization)
@@ -6979,49 +6983,55 @@ void PlayerEffects(const int A)
                 }
             }
 
-            if(!is_level_quit && A >= 1 && A <= 2 && (g_levelVScreenFader[A].isVisible() || warp.transitEffect == LevelDoor::TRANSIT_SCROLL))
+            // reverse screen fade
+            int fader_index = vScreenIdxByPlayer(A);
+            SDL_assert_release(0 <= fader_index && fader_index <= c_vScreenCount);
+
+            auto& fader = g_levelVScreenFader[fader_index];
+
+            if(!is_level_quit && (fader.isVisible() || warp.transitEffect == LevelDoor::TRANSIT_SCROLL))
             {
                 switch(warp.transitEffect)
                 {
                 default:
                     if(warp.transitEffect >= ScreenFader::S_CUSTOM)
                     {
-                        g_levelVScreenFader[A].setupFader(3, 65, 0, warp.transitEffect,
-                                                          true,
-                                                          Maths::iRound(warp_exit.X + warp_exit.Width / 2),
-                                                          Maths::iRound(warp_exit.Y + warp_exit.Height /2),
-                                                          A);
+                        fader.setupFader(3, 65, 0, warp.transitEffect,
+                                         true,
+                                         Maths::iRound(warp_exit.X + warp_exit.Width / 2),
+                                         Maths::iRound(warp_exit.Y + warp_exit.Height / 2),
+                                         fader_index);
                         break;
                     }
                 // fallthrough
                 case LevelDoor::TRANSIT_NONE:
-                    g_levelVScreenFader[A].setupFader(g_config.EnableInterLevelFade ? 8 : 64, 65, 0, ScreenFader::S_FADE);
+                    fader.setupFader(g_config.EnableInterLevelFade ? 8 : 64, 65, 0, ScreenFader::S_FADE);
                     break;
 
                 case LevelDoor::TRANSIT_SCROLL:
                     // follows fade logic if cross section
-                    if(!same_section && g_levelVScreenFader[A].isVisible())
-                        g_levelVScreenFader[A].setupFader(3, 65, 0, ScreenFader::S_FADE);
+                    if(!same_section && fader.isVisible())
+                        fader.setupFader(3, 65, 0, ScreenFader::S_FADE);
                     break;
 
                 case LevelDoor::TRANSIT_FADE:
-                    g_levelVScreenFader[A].setupFader(3, 65, 0, ScreenFader::S_FADE);
+                    fader.setupFader(3, 65, 0, ScreenFader::S_FADE);
                     break;
 
                 case LevelDoor::TRANSIT_CIRCLE_FADE:
-                    g_levelVScreenFader[A].setupFader(2, 65, 0, ScreenFader::S_CIRCLE,
-                                                      true,
-                                                      Maths::iRound(warp_exit.X + warp_exit.Width / 2),
-                                                      Maths::iRound(warp_exit.Y + warp_exit.Height /2),
-                                                      A);
+                    fader.setupFader(2, 65, 0, ScreenFader::S_CIRCLE,
+                                     true,
+                                     Maths::iRound(warp_exit.X + warp_exit.Width / 2),
+                                     Maths::iRound(warp_exit.Y + warp_exit.Height /2),
+                                     fader_index);
                     break;
 
                 case LevelDoor::TRANSIT_FLIP_H:
-                    g_levelVScreenFader[A].setupFader(3, 65, 0, ScreenFader::S_FLIP_H);
+                    fader.setupFader(3, 65, 0, ScreenFader::S_FLIP_H);
                     break;
 
                 case LevelDoor::TRANSIT_FLIP_V:
-                    g_levelVScreenFader[A].setupFader(3, 65, 0, ScreenFader::S_FLIP_V);
+                    fader.setupFader(3, 65, 0, ScreenFader::S_FLIP_V);
                     break;
                 }
             }
@@ -7387,53 +7397,60 @@ void PlayerEffects(const int A)
             p.Frame = 1;
 
         // must limit to the number of actual vScreens to avoid RangeArr out-of-bounds access
-        if(A >= 1 && A <= 2)
+        // scoping fader_index and fader
         {
+            int fader_index = vScreenIdxByPlayer(A);
+            SDL_assert_release(0 <= fader_index && fader_index <= c_vScreenCount);
+
+            auto& fader = g_levelVScreenFader[fader_index];
+
             switch(warp.transitEffect)
             {
             default:
                 if(warp.transitEffect >= ScreenFader::S_CUSTOM)
                 {
                     if(fEqual(p.Effect2, 5) && !is_level_quit)
-                        g_levelVScreenFader[A].setupFader(3, 0, 65, warp.transitEffect,
-                                                          true,
-                                                          Maths::iRound(warp_enter.X + warp_enter.Width / 2),
-                                                          Maths::iRound(warp_enter.Y + warp_enter.Height / 2), A);
+                        fader.setupFader(3, 0, 65, warp.transitEffect,
+                                         true,
+                                         Maths::iRound(warp_enter.X + warp_enter.Width / 2),
+                                         Maths::iRound(warp_enter.Y + warp_enter.Height / 2),
+                                         fader_index);
                     break;
                 }
             // fallthrough
             case LevelDoor::TRANSIT_NONE:
                 if(fEqual(p.Effect2, 20) && !is_level_quit && !same_section)
-                    g_levelVScreenFader[A].setupFader(g_config.EnableInterLevelFade ? 9 : 64, 0, 65, ScreenFader::S_FADE);
+                    fader.setupFader(g_config.EnableInterLevelFade ? 9 : 64, 0, 65, ScreenFader::S_FADE);
                 break;
 
             case LevelDoor::TRANSIT_SCROLL:
                 // uses fade effect if not same section
                 if(fEqual(p.Effect2, 5) && !same_section)
-                    g_levelVScreenFader[A].setupFader(3, 0, 65, ScreenFader::S_FADE);
+                    fader.setupFader(3, 0, 65, ScreenFader::S_FADE);
                 break;
 
             case LevelDoor::TRANSIT_FADE:
                 if(fEqual(p.Effect2, 5))
-                    g_levelVScreenFader[A].setupFader(3, 0, 65, ScreenFader::S_FADE);
+                    fader.setupFader(3, 0, 65, ScreenFader::S_FADE);
                 break;
 
             case LevelDoor::TRANSIT_CIRCLE_FADE:
                 if(fEqual(p.Effect2, 5))
-                    g_levelVScreenFader[A].setupFader(3, 0, 65, ScreenFader::S_CIRCLE,
-                                                      true,
-                                                      Maths::iRound(warp_enter.X + warp_enter.Width / 2),
-                                                      Maths::iRound(warp_enter.Y + warp_enter.Height / 2), A);
+                    fader.setupFader(3, 0, 65, ScreenFader::S_CIRCLE,
+                                     true,
+                                     Maths::iRound(warp_enter.X + warp_enter.Width / 2),
+                                     Maths::iRound(warp_enter.Y + warp_enter.Height / 2),
+                                     fader_index);
                 break;
 
             case LevelDoor::TRANSIT_FLIP_H:
                 if(fEqual(p.Effect2, 5))
-                    g_levelVScreenFader[A].setupFader(3, 0, 65, ScreenFader::S_FLIP_H);
+                    fader.setupFader(3, 0, 65, ScreenFader::S_FLIP_H);
                 break;
 
             case LevelDoor::TRANSIT_FLIP_V:
                 if(fEqual(p.Effect2, 5))
-                    g_levelVScreenFader[A].setupFader(3, 0, 65, ScreenFader::S_FLIP_V);
+                    fader.setupFader(3, 0, 65, ScreenFader::S_FLIP_V);
                 break;
             }
         }
@@ -7572,49 +7589,52 @@ void PlayerEffects(const int A)
             p.Effect2 = 0;
             p.WarpCD = 40;
 
-            if(!is_level_quit && A >= 1 && A <= 2 && (g_levelVScreenFader[A].isVisible() || warp.transitEffect == LevelDoor::TRANSIT_SCROLL))
+            int fader_index = vScreenIdxByPlayer(A);
+            auto& fader = g_levelVScreenFader[fader_index];
+
+            if(!is_level_quit && (fader.isVisible() || warp.transitEffect == LevelDoor::TRANSIT_SCROLL))
             {
                 switch(warp.transitEffect)
                 {
                 default:
                     if(warp.transitEffect >= ScreenFader::S_CUSTOM)
                     {
-                        g_levelVScreenFader[A].setupFader(3, 65, 0, warp.transitEffect,
-                                                          true,
-                                                          Maths::iRound(warp_exit.X + warp_exit.Width / 2),
-                                                          Maths::iRound(warp_exit.Y + warp_exit.Height /2),
-                                                          A);
+                        fader.setupFader(3, 65, 0, warp.transitEffect,
+                                         true,
+                                         Maths::iRound(warp_exit.X + warp_exit.Width / 2),
+                                         Maths::iRound(warp_exit.Y + warp_exit.Height /2),
+                                         fader_index);
                         break;
                     }
                 // fallthrough
                 case LevelDoor::TRANSIT_NONE:
-                    g_levelVScreenFader[A].setupFader(g_config.EnableInterLevelFade ? 8 : 64, 65, 0, ScreenFader::S_FADE);
+                    fader.setupFader(g_config.EnableInterLevelFade ? 8 : 64, 65, 0, ScreenFader::S_FADE);
                     break;
 
                 case LevelDoor::TRANSIT_SCROLL:
                     // follows fade logic if cross section
-                    if(!same_section && g_levelVScreenFader[A].isVisible())
-                        g_levelVScreenFader[A].setupFader(3, 65, 0, ScreenFader::S_FADE);
+                    if(!same_section && fader.isVisible())
+                        fader.setupFader(3, 65, 0, ScreenFader::S_FADE);
                     break;
 
                 case LevelDoor::TRANSIT_FADE:
-                    g_levelVScreenFader[A].setupFader(3, 65, 0, ScreenFader::S_FADE);
+                    fader.setupFader(3, 65, 0, ScreenFader::S_FADE);
                     break;
 
                 case LevelDoor::TRANSIT_CIRCLE_FADE:
-                    g_levelVScreenFader[A].setupFader(2, 65, 0, ScreenFader::S_CIRCLE,
-                                                      true,
-                                                      Maths::iRound(warp_exit.X + warp_exit.Width / 2),
-                                                      Maths::iRound(warp_exit.Y + warp_exit.Height /2),
-                                                      A);
+                    fader.setupFader(2, 65, 0, ScreenFader::S_CIRCLE,
+                                     true,
+                                     Maths::iRound(warp_exit.X + warp_exit.Width / 2),
+                                     Maths::iRound(warp_exit.Y + warp_exit.Height /2),
+                                     fader_index);
                     break;
 
                 case LevelDoor::TRANSIT_FLIP_H:
-                    g_levelVScreenFader[A].setupFader(3, 65, 0, ScreenFader::S_FLIP_H);
+                    fader.setupFader(3, 65, 0, ScreenFader::S_FLIP_H);
                     break;
 
                 case LevelDoor::TRANSIT_FLIP_V:
-                    g_levelVScreenFader[A].setupFader(3, 65, 0, ScreenFader::S_FLIP_V);
+                    fader.setupFader(3, 65, 0, ScreenFader::S_FLIP_V);
                     break;
                 }
             }
