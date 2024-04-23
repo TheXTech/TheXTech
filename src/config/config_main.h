@@ -854,6 +854,10 @@ public:
         config_res_set};
     opt<bool> modern_lives_system{this, defaults(true), {CompatClass::critical_update, false}, Scope::None,
         "modern-lives-system", "Modern lives system", "Allow negative lives instead of returning to the main menu"};
+#ifdef __3DS__
+    opt<bool> tune_bgo_order{this, defaults(true), {CompatClass::critical_update, false}, Scope::None,
+        "tune-bgo-order", "Tune BGO order", "Draw some BGOs at the same screen layer as blocks"};
+#endif
 
     /* ---- Compatibility - Speedrun ----*/
 

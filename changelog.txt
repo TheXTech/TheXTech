@@ -30,6 +30,7 @@ Changelog for 1.3.7-dev
 -Very long SFX are now played from disk to save memory (@ds-sloth)
 -Made some internal memory optimizations to the Block and NPC objects, saving 360KB RAM (@ds-sloth)
 -Add hints system to the loading and pause screens (@ds-sloth)
+-3DS: draw some BGOs at the same screen layer as blocks to reduce visual glitches, guarded by compat flag tune-bgo-order (@ds-sloth)
 -Overhaul the Main Menu and in-game Options menu with support for editing all "thextech.ini" options (@ds-sloth)
 -Add "Modern", "Classic", and "Vanilla" playstyles which determine which bugfixes and gameplay updates are applied (@ds-sloth, @0lhi)
 -Add ability to start speedrun in-game by pressing Select when making a new game save (@ds-sloth, @0lhi)
