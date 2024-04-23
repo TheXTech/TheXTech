@@ -232,11 +232,9 @@ int TouchScreenController::numDevices() const
 
 bool TouchScreenController::touchOn()
 {
-    for(int dev_i = 0; dev_i < m_touchDevicesCount; dev_i++)
+    for(auto it = m_devices.begin(); it != m_devices.end(); ++it)
     {
-        const SDL_TouchID dev = SDL_GetTouchDevice(dev_i);
-        int fingers = SDL_GetNumTouchFingers(dev);
-
+        int fingers = SDL_GetNumTouchFingers(it->id);
         if(fingers > 0)
             return true;
     }
@@ -987,11 +985,15 @@ void TouchScreenController::scanTouchDevices()
         {
             auto &d = m_devices[i];
             d.id = SDL_GetTouchDevice(i);
+
+#if defined(ANDROID)
             if(!d.id) // Invalid touch device, will be dropped from the list
             {
+                d.id = -1;
                 pLogDebug("Touch device %d: <Invalid device>", i);
                 continue;
             }
+#endif
 
 #if SDL_VERSION_ATLEAST(2, 0, 10)
             const char *typeText = "Invalid type";
@@ -1017,7 +1019,7 @@ void TouchScreenController::scanTouchDevices()
 
             if(ty != SDL_TOUCH_DEVICE_DIRECT)
             {
-                d.id = 0; // Drop any indirect devices
+                d.id = -1; // Drop any indirect devices
                 continue;
             }
 #endif
@@ -1028,11 +1030,14 @@ void TouchScreenController::scanTouchDevices()
         // Remove unnecessary devices from the list
         for(auto it = m_devices.begin(); it != m_devices.end(); )
         {
-            if(!it->id)
+            if(it->id < 0)
                 it = m_devices.erase(it);
             else
                 ++it;
         }
+
+        // Set number of touch devices to be equal to the `m_devices`
+        m_touchDevicesCount = (int)m_devices.size();
     }
 
     pLogDebug("Totally loaded valid touch devices: %d", (int)m_devices.size());

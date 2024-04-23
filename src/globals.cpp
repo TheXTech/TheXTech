@@ -384,6 +384,9 @@ bool WorldUnlock = false;
 bool GodMode = false;
 bool GrabAll = false;
 bool Cheater = false;
+#ifdef ENABLE_ANTICHEAT_TRAP
+bool CheaterMustDie = false;
+#endif
 
 RangeArr<std::string, 1, maxWorldCredits> WorldCredits;
 int Score = 0;
