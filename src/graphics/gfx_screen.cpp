@@ -47,7 +47,9 @@ void SetScreenType(Screen_t& screen)
         screen.Type = ScreenTypes::SinglePlayer; // Follow 1 player
     else if(screen.player_count == 2)
     {
-        if(screen.two_screen_pref == MultiplayerPrefs::Split)
+        if(BattleMode)
+            screen.Type = ScreenTypes::Dynamic;
+        else if(screen.two_screen_pref == MultiplayerPrefs::Split)
             screen.Type = ScreenTypes::LeftRight;
         else if(screen.two_screen_pref == MultiplayerPrefs::Shared)
             screen.Type = ScreenTypes::SharedScreen;
@@ -58,7 +60,7 @@ void SetScreenType(Screen_t& screen)
     }
     else
     {
-        if(g_compatibility.modern_npc_camera_logic && screen.four_screen_pref == MultiplayerPrefs::Split)
+        if(g_compatibility.modern_npc_camera_logic && (BattleMode || screen.four_screen_pref == MultiplayerPrefs::Split))
             screen.Type = ScreenTypes::Quad;
         else
             screen.Type = ScreenTypes::SharedScreen; // Average, no one leaves the screen
