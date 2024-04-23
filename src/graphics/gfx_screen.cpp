@@ -474,6 +474,10 @@ void CenterScreens(Screen_t& screen)
         double MaxWidth = section.Width - section.X;
         double MaxHeight = section.Height - section.Y;
 
+        // on 3DS allow a slight amount of expansion for 3D overdraw
+        int allow_X = (g_compatibility.allow_multires && vscreen.Width == XRender::TargetW && !screen.is_canonical()) ? XRender::TargetOverscanX : 0;
+        MaxWidth += allow_X * 2;
+
         double MinWidth = 0;
         double MinHeight = 0;
 

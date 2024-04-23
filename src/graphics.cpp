@@ -64,10 +64,6 @@ void GetvScreen(vScreen_t& vscreen)
         // allow some overscan (needed for 3DS)
         int allow_X = (g_compatibility.allow_multires && vscreen.Width == XRender::TargetW && !Screens[vscreen.screen_ref].is_canonical()) ? XRender::TargetOverscanX : 0;
 
-        // don't do overscan if at the level bounds
-        if(allow_X > 0 && level[p.Section].Width - level[p.Section].X <= vscreen.Width)
-            allow_X = 0;
-
         // shift the level so that it is onscreen
         if(-vscreen.X < level[p.Section].X - allow_X)
             vscreen.X = -(level[p.Section].X - allow_X);
