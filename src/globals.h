@@ -1400,6 +1400,12 @@ extern float LevelChop[maxSections + 1];
 
 //Public MidBackground As Integer 'for drawing backgrounds
 extern int MidBackground;
+
+#ifdef __3DS__
+//NEW: first background to be drawn at main screen plane (for backgrounds that look like blocks)
+extern int BlkBackground;
+#endif
+
 //Public LastBackground As Integer 'last backgrounds to be drawn
 extern int LastBackground;
 //Public iBlocks As Integer 'blocks that are doing something. this keeps the number of interesting blocks
