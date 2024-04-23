@@ -281,7 +281,7 @@ void Select()
 
 void Draw(int top, int min_priority, int width)
 {
-    if(s_select_hint == -1 || s_hint_text_index[s_select_hint] >= (int)s_translated_hint_text.size())
+    if(BattleMode || s_select_hint == -1 || s_hint_text_index[s_select_hint] >= (int)s_translated_hint_text.size())
         return;
 
     const Hint& hint = s_hints[s_select_hint];
