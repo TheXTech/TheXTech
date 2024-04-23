@@ -1259,6 +1259,7 @@ static void fourShared()
     fourPlayer();
 
     Screens[0].four_screen_pref = MultiplayerPrefs::Shared;
+    Screens[0].canonical_screen().four_screen_pref = MultiplayerPrefs::Shared;
     SetupScreens();
 }
 
@@ -1267,6 +1268,7 @@ static void fourSplit()
     fourPlayer();
 
     Screens[0].four_screen_pref = MultiplayerPrefs::Split;
+    Screens[0].canonical_screen().four_screen_pref = MultiplayerPrefs::Split;
     SetupScreens();
 }
 
