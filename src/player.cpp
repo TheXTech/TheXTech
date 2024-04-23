@@ -385,6 +385,9 @@ void DodgePlayers(int plr_A)
                 if(BlockCheckPlayerFilter(B, plr_A))
                     continue;
 
+                if((BlockIsSizable[b.Type] || BlockOnlyHitspot1[b.Type]) && b.Location.Y < new_floor_check.Y)
+                    continue;
+
                 if(CheckCollision(new_floor_check, b.Location))
                 {
                     double new_Y = blockGetTopYTouching(b, new_floor_check);
