@@ -385,6 +385,9 @@ void DodgePlayers(int plr_A)
                 if(BlockCheckPlayerFilter(B, plr_A))
                     continue;
 
+                if((BlockIsSizable[b.Type] || BlockOnlyHitspot1[b.Type]) && b.Location.Y < new_floor_check.Y)
+                    continue;
+
                 if(CheckCollision(new_floor_check, b.Location))
                 {
                     double new_Y = blockGetTopYTouching(b, new_floor_check);
@@ -8271,6 +8274,10 @@ void PlayersEnsureNearby(const Screen_t& screen)
     double cy = 0.0;
     int c_count = 0;
 
+    // if a player is currently warping, always re-calculate position, and prefer to center players on another player
+    bool exists_warping = false;
+    bool exists_non_warping = false;
+
     for(int plr_i = 0; plr_i < screen.player_count; plr_i++)
     {
         int plr_A = screen.players[plr_i];
@@ -8297,11 +8304,16 @@ void PlayersEnsureNearby(const Screen_t& screen)
             cx += p_x;
             cy += p_y;
             c_count += 1;
+
+            if(p.Effect == 3 || p.Effect == 7)
+                exists_warping = true;
+            else
+                exists_non_warping = true;
         }
     }
 
     // no problem if players are nearby, just return
-    if(r - l <= screen.W && b - t <= screen.H)
+    if(!exists_warping && r - l <= screen.W && b - t <= screen.H)
         return;
 
     // need to calculate center and figure out which player is closest
@@ -8326,6 +8338,10 @@ void PlayersEnsureNearby(const Screen_t& screen)
         const Player_t& p = Player[plr_A];
         const Location_t& pLoc = p.Location;
 
+        // prefer non-warping player
+        if(exists_non_warping && (p.Effect == 3 || p.Effect == 7))
+            continue;
+
         if(!p.Dead && p.TimeToLive == 0)
         {
             double dist = (pLoc.X - cx) * (pLoc.X - cx) + (pLoc.Y - cy) * (pLoc.Y - cy);
@@ -8342,6 +8358,9 @@ void PlayersEnsureNearby(const Screen_t& screen)
     if(closest == 0)
         closest = screen.players[0];
 
+    const Player_t& pClosest = Player[closest];
+    const Location_t& pClosestLoc = pClosest.Location;
+
     // move all players to winning player's location, and set effect if alive
     for(int plr_i = 0; plr_i < screen.player_count; plr_i++)
     {
@@ -8353,11 +8372,29 @@ void PlayersEnsureNearby(const Screen_t& screen)
         Player_t& p = Player[plr_A];
         Location_t& pLoc = p.Location;
 
-        pLoc.X = Player[closest].Location.X + Player[closest].Location.Width / 2 - pLoc.Width / 2;
-        pLoc.Y = Player[closest].Location.Y + Player[closest].Location.Height / 2 - pLoc.Height / 2;
+        p.Section = pClosest.Section;
 
-        p.Effect = 6;
-        p.Effect2 = pLoc.Y;
+        pLoc.X = pClosestLoc.X + pClosestLoc.Width / 2 - pLoc.Width / 2;
+        pLoc.Y = pClosestLoc.Y + pClosestLoc.Height - pLoc.Height;
+    }
+
+    for(int plr_i = 0; plr_i < screen.player_count; plr_i++)
+    {
+        int plr_A = screen.players[plr_i];
+
+        Player_t& p = Player[plr_A];
+
+        if(p.Dead || p.TimeToLive != 0)
+            continue;
+
+        p.Effect = 0;
+        p.Effect2 = 0;
+        p.Warp = 0;
+        p.WarpCD = 0;
+        p.WarpBackward = false;
+        p.WarpShooted = false;
+
+        DodgePlayers(plr_A);
     }
 }
 
