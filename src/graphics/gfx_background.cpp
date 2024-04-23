@@ -94,11 +94,18 @@ void DrawCenterAnchoredBackground(int S, int Z, int A, int expected_height = 0, 
     double camX = vScreen[Z].CameraAddX();
     double camY = vScreen[Z].CameraAddY();
 
-    double Eff_ScreenH = 0;
-    for(int i = 1; i <= 2; i++)
+    double Eff_ScreenH = vScreen[Z].Height;
+    double Eff_Top = 0;
+    if(screen.Type == ScreenTypes::Dynamic)
     {
-        if((i == 1 || vScreen[i].Visible) && vScreen[i].Left == vScreen[Z].Left)
-            Eff_ScreenH += vScreen[i].Height;
+        Eff_Top = vScreen[Z].Top;
+        Eff_ScreenH = 0;
+        for(int i = screen.active_begin(); i < screen.active_end(); i++)
+        {
+            const auto& s = screen.vScreen(i + 1);
+            if(s.Left == vScreen[Z].Left)
+                Eff_ScreenH += s.Height;
+        }
     }
 
     bool no_tiling = g_compatibility.disable_background2_tiling;
@@ -146,7 +153,7 @@ void DrawCenterAnchoredBackground(int S, int Z, int A, int expected_height = 0, 
         {
             // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - (600 - vScreen(Z).Top)) * (GFXBackground2Height(A) / 4 - (600 - vScreen(Z).Top))
             // .Y = -vScreenY(Z) - .Y
-            tempLocation.Y = (-camY - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - Eff_ScreenH) * (CanvasH - Eff_ScreenH) + vScreen[Z].Top;
+            tempLocation.Y = (-camY - Eff_Top - level[S].Y) / (level[S].Height - level[S].Y - Eff_ScreenH) * (CanvasH - Eff_ScreenH) + Eff_Top;
             tempLocation.Y = -camY - tempLocation.Y;
             tempLocation.Y += CanvasOffset;
         }
@@ -399,12 +406,15 @@ void DrawBackground(int S, int Z)
     A = 5; // Pipes
     if(Background2[S] == 4)
     {
+        double Eff_Top = 0;
+        if(screen.Type == ScreenTypes::Dynamic)
+            Eff_Top = vScreen[Z].Top;
 
         int tempVar6 = static_cast<int>(floor(static_cast<double>((level[S].Height - level[S].Y) / GFXBackground2Height[A] * 0.5 + (double)screen.H * 2 / GFXBackground2Height[A]))) + 1;
         for(B = 0; B <= tempVar6; B++)
         {
             // why is the background 381px...
-            tempLocation.Y = level[S].Y + ((B * GFXBackground2Height[A] - B) - (camY + vScreen[Z].Top + level[S].Y) * 0.5) - 32;
+            tempLocation.Y = level[S].Y + ((B * GFXBackground2Height[A] - B) - (camY + Eff_Top + level[S].Y) * 0.5) - 32;
             if(GameMenu && level[S].Y > -camY)
             {
                 tempLocation.Y = -camY + B * (GFXBackground2Height[A] - 1);
@@ -560,11 +570,14 @@ void DrawBackground(int S, int Z)
     if(Background2[S] == 25)
     {
         // another y-tiled one
+        double Eff_Top = 0;
+        if(screen.Type == ScreenTypes::Dynamic)
+            Eff_Top = vScreen[Z].Top;
 
         int tempVar26 = static_cast<int>(floor(static_cast<double>((level[S].Height - level[S].Y) / GFXBackground2Height[A] * 0.5 + (double)screen.H * 2 / GFXBackground2Height[A]))) + 1;
         for(B = 0; B <= tempVar26; B++)
         {
-            tempLocation.Y = level[S].Y + ((B * GFXBackground2Height[A] - B) - (camY + vScreen[Z].Top + level[S].Y) * 0.5) - 32;
+            tempLocation.Y = level[S].Y + ((B * GFXBackground2Height[A] - B) - (camY + Eff_Top + level[S].Y) * 0.5) - 32;
             if(GameMenu && level[S].Y > -camY)
             {
                 tempLocation.Y -= level[S].Y + camY;
@@ -687,6 +700,10 @@ void DrawBackground(int S, int Z)
     A = 40; // Mystic Cave Zone
     if(Background2[S] == 40)
     {
+        double Eff_Top = 0;
+        if(screen.Type == ScreenTypes::Dynamic)
+            Eff_Top = vScreen[Z].Top;
+
         if(g_compatibility.disable_background2_tiling)
         {
             XRender::lazyPreLoad(GFXBackground2[A]);
@@ -708,7 +725,7 @@ void DrawBackground(int S, int Z)
 
 
 
-            tempLocation.Y = (-camY - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - screen.H) * (GFXBackground2Height[A] - screen.H) + vScreen[Z].Top;
+            tempLocation.Y = (-camY - Eff_Top - level[S].Y) / (level[S].Height - level[S].Y - screen.H) * (GFXBackground2Height[A] - screen.H) + Eff_Top;
             tempLocation.Y = -camY - tempLocation.Y;
         }
         else
@@ -931,12 +948,20 @@ void DrawBackground(int S, int Z)
     A = 49; // Desert Night
     if(Background2[S] == 49)
     {
-        double Eff_ScreenH = 0;
-        for(int i = 1; i <= 2; i++)
+        double Eff_ScreenH = vScreen[Z].Height;
+        double Eff_Top = 0;
+        if(screen.Type == ScreenTypes::Dynamic)
         {
-            if((i == 1 || vScreen[i].Visible) && vScreen[i].Left == vScreen[Z].Left)
-                Eff_ScreenH += vScreen[i].Height;
+            Eff_Top = vScreen[Z].Top;
+            Eff_ScreenH = 0;
+            for(int i = screen.active_begin(); i < screen.active_end(); i++)
+            {
+                const auto& s = screen.vScreen(i + 1);
+                if(s.Left == vScreen[Z].Left)
+                    Eff_ScreenH += s.Height;
+            }
         }
+
         double CanvasH = GFXBackground2Height[A];
         double CanvasOffset = 0;
 
@@ -950,7 +975,7 @@ void DrawBackground(int S, int Z)
         if(level[S].Height - level[S].Y > CanvasH)
         {
             // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - 600) * (GFXBackground2Height(A) - 600)
-            tempLocation.Y = (-camY - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - Eff_ScreenH) * (CanvasH - Eff_ScreenH) + vScreen[Z].Top;
+            tempLocation.Y = (-camY - Eff_Top - level[S].Y) / (level[S].Height - level[S].Y - Eff_ScreenH) * (CanvasH - Eff_ScreenH) + Eff_Top;
             tempLocation.Y = -camY - tempLocation.Y;
             tempLocation.Y += CanvasOffset;
         }
@@ -1069,12 +1094,20 @@ void DrawBackground(int S, int Z)
         XRender::renderRect(0, 0, vScreen[Z].Width, vScreen[Z].Height,
             GFXBackground2[A].ColorLower);
 
-        double Eff_ScreenH = 0;
-        for(int i = 1; i <= 2; i++)
+        double Eff_ScreenH = vScreen[Z].Height;
+        double Eff_Top = 0;
+        if(screen.Type == ScreenTypes::Dynamic)
         {
-            if((i == 1 || vScreen[i].Visible) && vScreen[i].Left == vScreen[Z].Left)
-                Eff_ScreenH += vScreen[i].Height;
+            Eff_Top = vScreen[Z].Top;
+            Eff_ScreenH = 0;
+            for(int i = screen.active_begin(); i < screen.active_end(); i++)
+            {
+                const auto& s = screen.vScreen(i + 1);
+                if(s.Left == vScreen[Z].Left)
+                    Eff_ScreenH += s.Height;
+            }
         }
+
         double CanvasH = GFXBackground2Height[A];
         double CanvasOffset = 0;
 
@@ -1088,7 +1121,7 @@ void DrawBackground(int S, int Z)
         if(level[S].Height - level[S].Y > CanvasH)
         {
             // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - 600) * (GFXBackground2Height(A) - 600)
-            tempLocation.Y = (-camY - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - Eff_ScreenH) * (CanvasH - Eff_ScreenH) + vScreen[Z].Top;
+            tempLocation.Y = (-camY - Eff_Top - level[S].Y) / (level[S].Height - level[S].Y - Eff_ScreenH) * (CanvasH - Eff_ScreenH) + Eff_Top;
             tempLocation.Y = -camY - tempLocation.Y;
             tempLocation.Y += CanvasOffset;
         }
@@ -1143,12 +1176,20 @@ void DrawBackground(int S, int Z)
     A = 51; // SMB1 Desert
     if(Background2[S] == 51)
     {
-        double Eff_ScreenH = 0;
-        for(int i = 1; i <= 2; i++)
+        double Eff_ScreenH = vScreen[Z].Height;
+        double Eff_Top = 0;
+        if(screen.Type == ScreenTypes::Dynamic)
         {
-            if((i == 1 || vScreen[i].Visible) && vScreen[i].Left == vScreen[Z].Left)
-                Eff_ScreenH += vScreen[i].Height;
+            Eff_Top = vScreen[Z].Top;
+            Eff_ScreenH = 0;
+            for(int i = screen.active_begin(); i < screen.active_end(); i++)
+            {
+                const auto& s = screen.vScreen(i + 1);
+                if(s.Left == vScreen[Z].Left)
+                    Eff_ScreenH += s.Height;
+            }
         }
+
         double CanvasH = GFXBackground2Height[A];
         double CanvasOffset = 0;
 
@@ -1162,7 +1203,7 @@ void DrawBackground(int S, int Z)
         if(level[S].Height - level[S].Y > CanvasH)
         {
             // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - 600) * (GFXBackground2Height(A) - 600)
-            tempLocation.Y = (-camY - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - Eff_ScreenH) * (CanvasH - Eff_ScreenH) + vScreen[Z].Top;
+            tempLocation.Y = (-camY - Eff_Top - level[S].Y) / (level[S].Height - level[S].Y - Eff_ScreenH) * (CanvasH - Eff_ScreenH) + Eff_Top;
             tempLocation.Y = -camY - tempLocation.Y;
             tempLocation.Y += CanvasOffset;
         }
@@ -1207,12 +1248,20 @@ void DrawBackground(int S, int Z)
     A = 52; // SMB2 Desert Night
     if(Background2[S] == 52)
     {
-        double Eff_ScreenH = 0;
-        for(int i = 1; i <= 2; i++)
+        double Eff_ScreenH = vScreen[Z].Height;
+        double Eff_Top = 0;
+        if(screen.Type == ScreenTypes::Dynamic)
         {
-            if((i == 1 || vScreen[i].Visible) && vScreen[i].Left == vScreen[Z].Left)
-                Eff_ScreenH += vScreen[i].Height;
+            Eff_Top = vScreen[Z].Top;
+            Eff_ScreenH = 0;
+            for(int i = screen.active_begin(); i < screen.active_end(); i++)
+            {
+                const auto& s = screen.vScreen(i + 1);
+                if(s.Left == vScreen[Z].Left)
+                    Eff_ScreenH += s.Height;
+            }
         }
+
         double CanvasH = GFXBackground2Height[A];
         double CanvasOffset = 0;
 
@@ -1226,7 +1275,7 @@ void DrawBackground(int S, int Z)
         if(level[S].Height - level[S].Y > CanvasH)
         {
             // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - 600) * (GFXBackground2Height(A) - 600)
-            tempLocation.Y = (-camY - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - Eff_ScreenH) * (CanvasH - Eff_ScreenH) + vScreen[Z].Top;
+            tempLocation.Y = (-camY - Eff_Top - level[S].Y) / (level[S].Height - level[S].Y - Eff_ScreenH) * (CanvasH - Eff_ScreenH) + Eff_Top;
             tempLocation.Y = -camY - tempLocation.Y;
             tempLocation.Y += CanvasOffset;
         }
@@ -1358,12 +1407,20 @@ void DrawBackground(int S, int Z)
     A = 56; // SMB3 Water
     if(Background2[S] == 56)
     {
-        double Eff_ScreenH = 0;
-        for(int i = 1; i <= 2; i++)
+        double Eff_ScreenH = vScreen[Z].Height;
+        double Eff_Top = 0;
+        if(screen.Type == ScreenTypes::Dynamic)
         {
-            if((i == 1 || vScreen[i].Visible) && vScreen[i].Left == vScreen[Z].Left)
-                Eff_ScreenH += vScreen[i].Height;
+            Eff_Top = vScreen[Z].Top;
+            Eff_ScreenH = 0;
+            for(int i = screen.active_begin(); i < screen.active_end(); i++)
+            {
+                const auto& s = screen.vScreen(i + 1);
+                if(s.Left == vScreen[Z].Left)
+                    Eff_ScreenH += s.Height;
+            }
         }
+
         double CanvasH = GFXBackground2Height[A];
         double CanvasOffset = 0;
 
@@ -1377,7 +1434,7 @@ void DrawBackground(int S, int Z)
         if(level[S].Height - level[S].Y > CanvasH)
         {
             // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - 600) * (GFXBackground2Height(A) - 600)
-            tempLocation.Y = (-camY - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - Eff_ScreenH) * (CanvasH - Eff_ScreenH) + vScreen[Z].Top;
+            tempLocation.Y = (-camY - Eff_Top - level[S].Y) / (level[S].Height - level[S].Y - Eff_ScreenH) * (CanvasH - Eff_ScreenH) + Eff_Top;
             tempLocation.Y = -camY - tempLocation.Y;
             tempLocation.Y += CanvasOffset;
         }
