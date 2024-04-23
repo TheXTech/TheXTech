@@ -778,10 +778,11 @@ struct Background_t
 //    Location As Location
     Location_t Location;
 
-    //! SortPriority at which PLANE_LVL_BGO_NORM, PLANE_LVL_BGO_FG, and PLANE_LVL_BGO_TOP start
+    //! SortPriority at which PLANE_LVL_BGO_NORM, PLANE_LVL_3D_MAIN, PLANE_LVL_BGO_FG, and PLANE_LVL_BGO_TOP start
     static constexpr uint8_t PRI_NORM_START = 0x30;
-    static constexpr uint8_t PRI_FG_START = 0xA0;
-    static constexpr uint8_t PRI_TOP_START = 0xC0;
+    static constexpr uint8_t PRI_BLK_START = 0xA0;
+    static constexpr uint8_t PRI_FG_START = 0xC0;
+    static constexpr uint8_t PRI_TOP_START = 0xF8;
 
     // all defined in sorting.cpp:
 

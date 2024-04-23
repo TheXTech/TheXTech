@@ -345,10 +345,10 @@ int Background_t::GetCustomLayer() const
     case(0x48):
     case(0x98):
         return -1;
-    case(0xA0):
-    case(0xB8):
-        return +1;
     case(0xC0):
+    case(0xD8):
+        return +1;
+    case(0xF8):
         return +2;
     default:
         return 0;
@@ -388,11 +388,11 @@ void Background_t::UpdateSortPriority()
         else if(user_order == -1)
             SortPriority |= 0x98;
         else if(user_order == +1 && user_offset <= 0)
-            SortPriority |= 0xA0;
-        else if(user_order == +1)
-            SortPriority |= 0xB8;
-        else
             SortPriority |= 0xC0;
+        else if(user_order == +1)
+            SortPriority |= 0xD8;
+        else
+            SortPriority |= 0xF8;
 
         return;
     }
@@ -433,14 +433,14 @@ void Background_t::UpdateSortPriority()
         SortPriority |= 0x90; // Always doors + 1
     // custom -1 with + offset is 0x98
     // PLANE_LVL_BGO_FG
-    // custom +1 with - or 0 offset is 0xA0
+    // custom +1 with - or 0 offset is 0xC0
     else if(Foreground[Type])
-        SortPriority |= 0xA8;
+        SortPriority |= 0xC8;
     else if(Type == 65 || Type == 165)
-        SortPriority |= 0xB0;
-    // custom +1 with + offset is 0xB8
+        SortPriority |= 0xD0;
+    // custom +1 with + offset is 0xD8
     // PLANE_LVL_BGO_TOP
-    // custom +2 is 0xC0
+    // custom +2 is 0xF8
     else
         SortPriority |= 0x60;
 }
@@ -456,9 +456,9 @@ void Background_t::SetSortPriority(int layer, int offset)
     else if(layer == -1)
         SortPriority = 0x48;
     else if(layer == +1)
-        SortPriority = 0xA0;
-    else if(layer == +2)
         SortPriority = 0xC0;
+    else if(layer == +2)
+        SortPriority = 0xF8;
 
     // set lower 3 bits by offset
     uint8_t offset_bits = uint8_t(offset + 4) & 7;
