@@ -2934,14 +2934,15 @@ void zTestLevel(bool magicHand, bool interProcess)
     MessageText.clear();
     MessageTextMap.clear();
 //  frmNPCs::chkMessage.Value = 0;
-    BattleLives[1] = 3;
-    BattleLives[2] = 3;
+    for(int i = 1; i <= numPlayers; i++)
+    {
+        BattleLives[i] = 3;
+        Player[i].Hearts = 1;
+    }
     BattleIntro = 150;
     BattleWinner = 0;
     BattleOutro = 0;
 //  frmLevelEditor::mnuOnline.Enabled = false;
-    Player[1].Hearts = 1;
-    Player[2].Hearts = 1;
     StopMusic();
     Score = 0;
     Coins = 0;
@@ -2974,7 +2975,7 @@ void zTestLevel(bool magicHand, bool interProcess)
         }
         else
         {
-            for(A = 2; A >= 1; A--)
+            for(A = numPlayers; A >= 1; A--)
             {
                 Player[A].State = testPlayer[A].State;
                 Player[A].HeldBonus = NPCID_NULL;
