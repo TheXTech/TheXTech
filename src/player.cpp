@@ -1244,26 +1244,41 @@ void KillPlayer(const int A)
     {
         if(BattleLives[A] <= 0)
         {
-            if(BattleOutro == 0)
+            int other_alive = 0;
+            bool two_others_alive = false;
+            for(int o_A = 1; o_A <= numPlayers; o_A++)
+            {
+                if(o_A == A)
+                    continue;
+
+                if(!Player[o_A].Dead || BattleLives[o_A] > 0)
+                {
+                    if(other_alive != 0)
+                    {
+                        two_others_alive = true;
+                        break;
+                    }
+                    else
+                        other_alive = o_A;
+                }
+            }
+
+            if(!two_others_alive && BattleOutro == 0)
             {
                 BattleOutro = 1;
                 PlaySound(SFX_GotStar);
                 StopMusic();
             }
 
-            if(BattleWinner == 0)
-            {
-                if(A == 1)
-                    BattleWinner = 2;
-                else
-                    BattleWinner = 1;
-            }
+            if(!two_others_alive && BattleWinner == 0)
+                BattleWinner = other_alive;
         }
 
-        if(A == BattleWinner || BattleWinner == 0)
+        if(A == BattleWinner || (BattleWinner == 0 && BattleLives[A] > 0))
         {
             if(BattleLives[A] > 0)
                 BattleLives[A] -= 1;
+
             PlaySoundSpatial(SFX_Transform, p.Location);
             p.Frame = 1;
             p.Location.SpeedX = 0;
@@ -1272,11 +1287,18 @@ void KillPlayer(const int A)
             p.State = 2;
             p.Hearts = 2;
             p.Effect = 0;
+
             p.Location.Width = Physics.PlayerWidth[p.Character][p.State];
             p.Location.Height = Physics.PlayerHeight[p.Character][p.State];
-            p.Location.X = PlayerStart[A].X + PlayerStart[A].Width * 0.5 - p.Location.Width * 0.5;
-            p.Location.Y = PlayerStart[A].Y + PlayerStart[A].Height - p.Location.Height;
+
+            // eventually, check for valid starts
+            constexpr int valid_start_count = 2;
+            int use_start = (A - 1) % valid_start_count + 1;
+
+            p.Location.X = PlayerStart[use_start].X + PlayerStart[use_start].Width * 0.5 - p.Location.Width * 0.5;
+            p.Location.Y = PlayerStart[use_start].Y + PlayerStart[use_start].Height - p.Location.Height;
             p.Direction = 1;
+
             p.Dead = false;
             CheckSection(A);
             if(p.Location.X + p.Location.Width / 2.0 > level[p.Section].X + (level[p.Section].Width - level[p.Section].X) / 2)

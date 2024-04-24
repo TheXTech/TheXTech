@@ -222,14 +222,34 @@ void UpdatePlayer()
             {
                 B = CheckNearestLiving(A);
 
+                bool someone_else_alive = false;
+                for(int o_A = 1; o_A <= numPlayers; o_A++)
+                {
+                    if(o_A == A)
+                        continue;
+
+                    if(!Player[o_A].Dead || BattleLives[o_A] > 0)
+                    {
+                        someone_else_alive = true;
+                        break;
+                    }
+                }
+
                 // move dead player towards start point in BattleMode
-                if(BattleMode && BattleLives[1] > 0 && BattleLives[2] > 0 && BattleWinner == 0)
+                if(BattleMode && BattleLives[A] > 0 && someone_else_alive && BattleWinner == 0)
                 {
                     B = 20 + A;
                     Player[20 + A].Location.Width = Player[A].Location.Width;
                     Player[20 + A].Location.Height = Player[A].Location.Height;
-                    Player[20 + A].Location.X = PlayerStart[A].X + PlayerStart[A].Width * 0.5 - Player[A].Location.Width;
-                    Player[20 + A].Location.Y = PlayerStart[A].Y + PlayerStart[A].Height - Player[A].Location.Height;
+
+                    // eventually, check for valid starts
+                    constexpr int valid_start_count = 2;
+                    int use_start = (A - 1) % valid_start_count + 1;
+
+                    // NOTE, there is a bugfix here without a compat flag, previously the * 0.5 did not exist
+                    constexpr bool do_bugfix = true;
+                    Player[20 + A].Location.X = PlayerStart[use_start].X + PlayerStart[use_start].Width * 0.5 - Player[A].Location.Width * (do_bugfix ? 0.5 : 1.0);
+                    Player[20 + A].Location.Y = PlayerStart[use_start].Y + PlayerStart[use_start].Height - Player[A].Location.Height;
                     CheckSection(20 + A);
                     if(Player[A].Section != Player[B].Section)
                     {
@@ -243,7 +263,10 @@ void UpdatePlayer()
                     if(split_screen || shared_screen)
                     {
                         A1 = (Player[B].Location.X + Player[B].Location.Width * 0.5) - (Player[A].Location.X + Player[A].Location.Width * 0.5);
-                        B1 = Player[B].Location.Y - Player[A].Location.Y;
+                        if(dynamic_screen)
+                            B1 = Player[B].Location.Y - Player[A].Location.Y;
+                        else
+                            B1 = Player[B].Location.Y + Player[B].Location.Height - Player[A].Location.Y - Player[A].Location.Height;
                     }
                     else
                     {
@@ -282,14 +305,16 @@ void UpdatePlayer()
                         KillPlayer(A);
 
                         // new logic: mark which player A's ghost is following
-                        if(!BattleMode && Player[A].Dead)
+                        if(Player[A].Dead)
+                        {
                             Player[A].Effect2 = -B;
 
-                        // new logic: fix player's location in split-screen mode
-                        if(!dynamic_screen)
-                        {
-                            Player[A].Location.X = Player[B].Location.X;
-                            Player[A].Location.Y = Player[B].Location.Y;
+                            // new logic: fix player's location in split-screen mode
+                            if(!dynamic_screen)
+                            {
+                                Player[A].Location.X = Player[B].Location.X + Player[B].Location.Width / 2 - Player[A].Location.Width / 2;
+                                Player[A].Location.Y = Player[B].Location.Y + Player[B].Location.Height - Player[A].Location.Height;
+                            }
                         }
                     }
                 }
@@ -306,8 +331,11 @@ void UpdatePlayer()
         }
         else if(Player[A].Dead)
         {
+            const Screen_t& screen = ScreenByPlayer(A);
+            bool dynamic_screen = (screen.Type == ScreenTypes::Dynamic);
+
             // safer than the below code, should always be used except for compatibility concerns
-            if(numPlayers > 2)
+            if(numPlayers > 2 || !dynamic_screen)
             {
                 // continue following currently-tracked player if possible
                 if(Player[A].Effect2 < 0)
@@ -329,8 +357,8 @@ void UpdatePlayer()
 
                 if(B)
                 {
-                    Player[A].Location.X = Player[B].Location.X;
-                    Player[A].Location.Y = Player[B].Location.Y;
+                    Player[A].Location.X = Player[B].Location.X + Player[B].Location.Width / 2 - Player[A].Location.Width / 2;
+                    Player[A].Location.Y = Player[B].Location.Y + Player[B].Location.Height - Player[A].Location.Height;
                     Player[A].Section = Player[B].Section;
                 }
             }
