@@ -46,7 +46,9 @@ void SetScreenType(Screen_t& screen)
         screen.Type = ScreenTypes::SinglePlayer; // Follow 1 player
     else if(screen.player_count == 2)
     {
-        if(screen.two_screen_pref == MultiplayerPrefs::Split)
+        if(BattleMode)
+            screen.Type = ScreenTypes::Dynamic;
+        else if(screen.two_screen_pref == MultiplayerPrefs::Split)
             screen.Type = ScreenTypes::LeftRight;
         else if(screen.two_screen_pref == MultiplayerPrefs::Shared)
             screen.Type = ScreenTypes::SharedScreen;
@@ -57,7 +59,7 @@ void SetScreenType(Screen_t& screen)
     }
     else
     {
-        if(g_config.fix_npc_camera_logic && screen.four_screen_pref == MultiplayerPrefs::Split)
+        if(g_config.fix_npc_camera_logic && (BattleMode || screen.four_screen_pref == MultiplayerPrefs::Split))
             screen.Type = ScreenTypes::Quad;
         else
             screen.Type = ScreenTypes::SharedScreen; // Average, no one leaves the screen
@@ -472,6 +474,10 @@ void CenterScreens(Screen_t& screen)
         // restrict the vScreen to the level if the level is smaller than the screen
         double MaxWidth = section.Width - section.X;
         double MaxHeight = section.Height - section.Y;
+
+        // on 3DS allow a slight amount of expansion for 3D overdraw
+        int allow_X = (g_config.allow_multires && vscreen.Width == XRender::TargetW && !screen.is_canonical()) ? XRender::TargetOverscanX : 0;
+        MaxWidth += allow_X * 2;
 
         double MinWidth = 0;
         double MinHeight = 0;

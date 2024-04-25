@@ -215,7 +215,7 @@ void DrawInterface(int Z, int numScreens)
     {
         // lives in battle mode
         int lives_x = left_margin - 60; // excludes life icon width
-        auto& oneup_twoup = (first_plr_idx == 1) ? GFX.Interface[3] : GFX.Interface[7];
+        auto& oneup_twoup = (first_plr_idx == 2 && numPlayers == 2) ? GFX.Interface[7] : GFX.Interface[3];
 
         XRender::renderTexture(lives_x - oneup_twoup.w,
                               ScreenTop + 16 + 10,
@@ -243,12 +243,50 @@ void DrawInterface(int Z, int numScreens)
     {
         if(BattleIntro > 45 || BattleIntro % 2 == 1)
         {
-            auto& P1_charname = GFX.CharacterName[Player[1].Character];
-            auto& P2_charname = GFX.CharacterName[Player[2].Character];
+            int nextPlr = 1;
 
-            XRender::renderTexture(vScreen[Z].Width / 2.0 - GFX.BMVs.w / 2, -96 + vScreen[Z].Height / 2.0 - GFX.BMVs.h / 2, GFX.BMVs);
-            XRender::renderTexture(-50 + vScreen[Z].Width / 2.0 - P1_charname.w, -96 + vScreen[Z].Height / 2.0 - P1_charname.h / 2, P1_charname);
-            XRender::renderTexture(50 + vScreen[Z].Width / 2.0, -96 + vScreen[Z].Height / 2.0 - P2_charname.h / 2, P2_charname);
+            int nextY = -96 + vScreen[Z].Height / 2.0 - 24 * (numPlayers / 2 - 1);
+
+            while(numPlayers > nextPlr)
+            {
+                auto& P1_charname = GFX.CharacterName[Player[nextPlr].Character];
+                auto& P2_charname = GFX.CharacterName[Player[nextPlr + 1].Character];
+
+                int w = P1_charname.w + P2_charname.w + GFX.BMVs.w + 16 * 2;
+                if(nextPlr > 1)
+                    w += GFX.BMVs.w + 16;
+
+                int l = vScreen[Z].Width / 2 - w / 2;
+
+                if(nextPlr > 1)
+                {
+                    XRender::renderTexture(l, nextY - GFX.BMVs.h / 2, GFX.BMVs);
+                    l += GFX.BMVs.w + 16;
+                }
+
+                XRender::renderTexture(l, nextY - P1_charname.h / 2, P1_charname);
+                l += P1_charname.w + 16;
+
+                XRender::renderTexture(l, nextY - GFX.BMVs.h / 2, GFX.BMVs);
+                l += GFX.BMVs.w + 16;
+
+                XRender::renderTexture(l, nextY - P2_charname.h / 2, P2_charname);
+
+                nextY += 48;
+                nextPlr += 2;
+            }
+
+            // final row if odd number of players
+            if(numPlayers == nextPlr)
+            {
+                auto& last_charname = GFX.CharacterName[Player[nextPlr].Character];
+
+                int w = last_charname.w + GFX.BMVs.w + 16;
+                int l = vScreen[Z].Width / 2 - w / 2;
+
+                XRender::renderTexture(l, nextY - GFX.BMVs.h / 2, GFX.BMVs);
+                XRender::renderTexture(l + GFX.BMVs.w + 16, nextY - last_charname.h / 2, last_charname);
+            }
         }
     }
 

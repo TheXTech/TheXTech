@@ -553,6 +553,8 @@ void FindWldStars()
     LevelData tempData;
     uint32_t start_time = SDL_GetTicks();
 
+    bool world_must_show_stars = (WorldStarsShowPolicy == Config_t::MAP_STARS_SHOW);
+
     for(int A = 1; A <= numWorldLevels; A++)
     {
         IndicateProgress(start_time, (double)A / numWorldLevels, g_gameStrings.messageScanningLevels);
@@ -569,8 +571,11 @@ void FindWldStars()
                     l.curStars++;
             }
 
-            // skip check for max stars and medals if it's already been inited
-            if(l.save_info.inited())
+            bool level_must_show_stars = (l.starsShowPolicy == Config_t::MAP_STARS_SHOW);
+            bool level_can_show_stars = (world_must_show_stars && l.starsShowPolicy == Config_t::MAP_STARS_UNSPECIFIED);
+
+            // skip check for max stars and medals if it's already been inited, OR if the star count isn't needed
+            if(l.save_info.inited() || !(level_must_show_stars || level_can_show_stars))
                 continue;
 
             std::string lFile = l.FileName;

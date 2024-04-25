@@ -2231,8 +2231,8 @@ void StartBattleMode()
     Score = 0;
     g_100s = 0;
     Lives = 99;
-    BattleLives[1] = 3;
-    BattleLives[2] = 3;
+    for(int i = 1; i <= numPlayers; i++)
+        BattleLives[i] = 3;
     LevelSelect = false;
     GameMenu = false;
     BattleMode = true;

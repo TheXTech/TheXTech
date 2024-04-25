@@ -291,7 +291,8 @@ static inline int BoxCount()
 {
     int n = (int)Controls::g_InputMethods.size();
 
-    n += 1;
+    if(!BattleMode)
+        n += 1;
 
     if(n < s_minPlayers)
         n = s_minPlayers;
@@ -312,9 +313,6 @@ static inline int BoxCount()
 
     if(g_gameInfo.disableTwoPlayer && !g_forceCharacter)
         n = 1;
-
-    if(BattleMode && n > 2)
-        n = 2;
 
     return n;
 }
@@ -396,7 +394,7 @@ void LegacyMenu_Start()
 void DropAdd_Start()
 {
     if(BattleMode)
-        s_minPlayers = 2;
+        s_minPlayers = numPlayers;
     else
         s_minPlayers = 1;
 
