@@ -168,8 +168,8 @@ static void setupCheckpoints()
 struct PlayerStartInfo_t
 {
     static constexpr int start_pos_count = 2;
-    std::array<uint8_t, start_pos_count> players_at_start;
-    std::array<uint8_t, c_screenCount> start_for_screen; // used by shared screens only
+    std::array<uint8_t, start_pos_count> players_at_start{};
+    std::array<uint8_t, c_screenCount> start_for_screen{}; // used by shared screens only
 };
 
 static void s_PlacePlayerAtStart(int A, PlayerStartInfo_t& player_start_info)
@@ -541,7 +541,7 @@ void SetupPlayers()
 
 
     // new-added struct to handle start points in >2P
-    PlayerStartInfo_t player_start_info;
+    PlayerStartInfo_t player_start_info; ////// Some sort of corruption here?? Seems unable to select the start correctly. Fix before pushing.
 
     for(int numPlayersMax = numPlayers, A = 1; A <= numPlayersMax; A++) // set up players
     {
