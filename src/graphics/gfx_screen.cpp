@@ -175,6 +175,18 @@ void SetupScreens(Screen_t& screen, bool reset)
         }
         break;
     }
+
+    // clear dynamic screen / section resize offsets when called with reset
+    if(reset)
+    {
+        for(int i = screen.active_begin(); i < screen.active_end(); i++)
+        {
+            vScreen_t& vscreen_i = screen.vScreen(i + 1);
+            vscreen_i.TempDelay = 0;
+            vscreen_i.tempX = 0;
+            vscreen_i.TempY = 0;
+        }
+    }
 }
 
 void SetupScreens(bool reset)
