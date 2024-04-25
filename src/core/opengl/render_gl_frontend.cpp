@@ -1233,7 +1233,9 @@ void RenderGL::renderLighting()
 
     auto& vertex_list = getOrderedDrawVertexList(context, cur_depth);
 
-    RectI draw_loc = RectI(0, 0, m_viewport.w, m_viewport.h);
+    PointI off = m_viewport_offset_ignore ? PointI(0, 0) : m_viewport_offset;
+
+    RectI draw_loc = RectI(0 + off.x, 0 + off.y, m_viewport.w + off.x, m_viewport.h + off.y);
     RectF draw_source = RectF(0.0f, 0.0f, 1.0f, 1.0f);
 
     addVertices(vertex_list, draw_loc, draw_source, cur_depth, tint);
