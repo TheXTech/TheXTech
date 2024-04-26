@@ -233,8 +233,22 @@ public:
 static int s_minPlayers = 1;
 
 static std::array<PlayerBox, maxLocalPlayers> s_players;
+static std::array<uint8_t, maxLocalPlayers> s_recent_char{};
 
 static CharInfo s_char_info;
+
+static void s_logRecentChars()
+{
+    // reset recent chars to 0
+    s_recent_char = {};
+
+    // update
+    for(int i = 0; i < maxLocalPlayers; i++)
+    {
+        if(s_players[i].m_state != PlayerState::Disconnected)
+            s_recent_char[i] = g_charSelect[i];
+    }
+}
 
 static inline void Render_PCursor(int x, int y)
 {
@@ -460,7 +474,7 @@ void PlayerBox::Init()
     }
     else
     {
-        g_charSelect[p] = 1;
+        g_charSelect[p] = s_recent_char[p];
         ValidateChar(true);
     }
 }
@@ -1532,7 +1546,7 @@ int PlayerBox::Mouse_Render(bool render, int x, int y, int w, int h)
     if(inactive)
     {
         if(show_inactive)
-            g_charSelect[p] = 1;
+            g_charSelect[p] = s_recent_char[p];
         ValidateChar(true);
     }
 
@@ -2039,7 +2053,7 @@ int PlayerBox::Logic()
 
                 m_menu_item = 0;
                 if(p >= s_minPlayers)
-                    g_charSelect[p] = 1;
+                    g_charSelect[p] = s_recent_char[p];
                 m_state = PlayerState::SelectChar;
                 ValidateChar();
             }
@@ -2050,7 +2064,7 @@ int PlayerBox::Logic()
             if(p >= numPlayers)
             {
                 m_menu_item = 0;
-                g_charSelect[p] = 1;
+                g_charSelect[p] = s_recent_char[p];
                 m_state = PlayerState::SelectChar;
 
                 // check whether a novel add
@@ -2338,6 +2352,8 @@ int Logic()
         if(p_ret)
         {
             s_char_info.mark_present();
+            if(p_ret == 1 || s_context == Context::DropAdd)
+                s_logRecentChars();
             return p_ret;
         }
     }
@@ -2346,6 +2362,8 @@ int Logic()
     if(ret)
     {
         s_char_info.mark_present();
+        if(ret == 1 || s_context == Context::DropAdd)
+            s_logRecentChars();
         return ret;
     }
 
