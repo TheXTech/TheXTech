@@ -331,11 +331,12 @@ static void s_InitBlockCharacter()
 
 void MainMenu_Start(int minPlayers)
 {
-    if((int)Controls::g_InputMethods.size() != minPlayers)
-        Controls::ClearInputMethods();
-
     s_minPlayers = minPlayers;
     s_context = Context::MainMenu;
+
+    // clear input methods if invalid
+    if((int)Controls::g_InputMethods.size() > BoxCount())
+        Controls::ClearInputMethods();
 
     for(int i = 0; i < maxLocalPlayers; i++)
         g_charSelect[i] = 0;
@@ -359,11 +360,12 @@ void MainMenu_Start(int minPlayers)
 
 void LegacyMenu_Start()
 {
-    if(Controls::g_InputMethods.size() != 1)
-        Controls::ClearInputMethods();
-
     s_minPlayers = 1;
     s_context = Context::LegacyMenu;
+
+    // clear input methods if invalid
+    if((int)Controls::g_InputMethods.size() > BoxCount())
+        Controls::ClearInputMethods();
 
     for(int i = 0; i < maxLocalPlayers; i++)
         g_charSelect[i] = 0;
@@ -735,7 +737,7 @@ bool PlayerBox::Back()
         // adding player at main menu
         if(IsMenu())
         {
-            // jsut go back!
+            // just go back!
             PlaySoundMenu(SFX_Slide);
             return true;
         }
@@ -2097,9 +2099,9 @@ int PlayerBox::Logic()
         if(m_input_ready && (c.Down || c.Up || c.Left || c.Right))
             play_noise = false;
 
-        // if about to go forwards (at menu screen), don't play drop item noise
+        // don't allow going forwards at main menu
         if(s_context == Context::MainMenu && m_input_ready && (c.Jump || c.Start))
-            play_noise = false;
+            m_input_ready = false;
 
         if(play_noise)
             PlaySoundMenu(SFX_DropItem);

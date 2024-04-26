@@ -1003,6 +1003,9 @@ bool mainMenuUpdate()
             int ret = ConnectScreen::Logic();
             if(ret == -1)
             {
+                // disconnect input methods for convenience
+                Controls::ClearInputMethods();
+
                 if(MenuMode == MENU_CHARACTER_SELECT_NEW_BM)
                 {
                     MenuCursor = selWorld - 1;
