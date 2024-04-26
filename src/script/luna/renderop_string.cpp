@@ -74,11 +74,5 @@ void RenderStringOp::Draw(Renderer *renderer)
         Render::TranslateScreenCoords(x, y, w, 18);
     }
 
-    if(!sceneCoords)
-        XRender::offsetViewportIgnore(true);
-
     SuperPrint(m_StringSize, m_String, m_FontType, x, y);
-
-    if(!sceneCoords)
-        XRender::offsetViewportIgnore(false);
 }

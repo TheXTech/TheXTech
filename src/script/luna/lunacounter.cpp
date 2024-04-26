@@ -370,8 +370,6 @@ void DeathCounter::Draw(int screenZ)
     m_print.syncCache(mCurLevelDeaths, mCurTotalDeaths);
     m_print.syncCache(g_config.fails_counter_title);
 
-    XRender::offsetViewportIgnore(true);
-
     const vScreen_t& vscreen = vScreen[screenZ];
     const Screen_t& screen = Screens[vscreen.screen_ref];
 
@@ -410,8 +408,6 @@ void DeathCounter::Draw(int screenZ)
         SuperPrint(g_config.fails_counter_title, m_print.font, title_X, ScreenTop);
         SuperPrint(m_print.counterOut, m_print.font, counter_X, ScreenTop);
     }
-
-    XRender::offsetViewportIgnore(false);
 }
 
 // PRINT DEBUG - Prints all death records to the screen

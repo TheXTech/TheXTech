@@ -144,6 +144,8 @@ void lunaRenderHud(int screenZ)
     bool dcAllow = g_config.enable_fails_tracking || gEnableDemoCounterByLC;
     if(dcAllow && g_config.show_fails_counter && ShowOnScreenHUD)
         gDeathCounter.Draw(screenZ);
+
+    Renderer::Get().RenderBelowPriority(5);
 }
 
 void lunaRender(int screenZ)
@@ -152,7 +154,7 @@ void lunaRender(int screenZ)
     {
         Renderer::Get().StartCameraRender(screenZ);
         gSpriteMan.RunSprites();
-        Renderer::Get().RenderBelowPriority(5);
+        Renderer::Get().RenderBelowPriority(0);
     }
 }
 

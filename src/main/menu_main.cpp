@@ -1014,6 +1014,9 @@ bool mainMenuUpdate()
             int ret = ConnectScreen::Logic();
             if(ret == -1)
             {
+                // disconnect input methods for convenience
+                Controls::ClearInputMethods();
+
                 if(MenuMode == MENU_CHARACTER_SELECT_NEW_BM)
                 {
                     MenuCursor = selWorld - 1;
@@ -2482,9 +2485,6 @@ void mainMenuDraw()
     GetMenuPos(&MenuX, &MenuY);
 
     int B = 0;
-
-    // just don't call this during an offset!
-    // XRender::offsetViewportIgnore(true);
 
     if(MenuMode != MENU_1PLAYER_GAME && MenuMode != MENU_2PLAYER_GAME && MenuMode != MENU_BATTLE_MODE && MenuMode != MENU_EDITOR)
         worldCurs = 0;

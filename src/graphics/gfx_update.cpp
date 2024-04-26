@@ -132,6 +132,7 @@ struct ScreenShake_t
         }
 
         XRender::offsetViewport(offsetX, offsetY);
+        XRender::offsetViewportIgnore(false);
     }
 
     void setup(int i_forceX, int i_forceY, int i_type, int i_duration, double i_decay)
@@ -3038,6 +3039,7 @@ void UpdateGraphicsScreen(Screen_t& screen)
 #endif
 
         XRender::splitFrame();
+        XRender::offsetViewportIgnore(true);
 
 #ifdef __3DS__
         XRender::setTargetLayer(3);
@@ -3094,7 +3096,6 @@ void UpdateGraphicsScreen(Screen_t& screen)
         // Screen shake logic was here; moved into the logic section of the file because it affects the random state of the game
 
         // draw onscreen controls display
-        XRender::offsetViewportIgnore(true);
 
         if(screen.Type == 5 && numScreens == 1)
         {
@@ -3112,8 +3113,6 @@ void UpdateGraphicsScreen(Screen_t& screen)
         {
             DrawSmallScreenCam(vScreen[Z]);
         }
-
-        XRender::offsetViewportIgnore(false);
     } // For(Z, 2, numScreens)
 
 
@@ -3238,6 +3237,4 @@ void UpdateGraphicsMeta()
         g_worldScreenFader.draw();
     else
         g_levelScreenFader.draw();
-
-    XRender::offsetViewportIgnore(false);
 }

@@ -175,8 +175,6 @@ void ScreenFader::draw(bool fullscreen)
     if(!m_active)
         return;
 
-    XRender::offsetViewportIgnore(true);
-
     int drawW = XRender::TargetW;
     int drawH = XRender::TargetH;
 
@@ -314,6 +312,4 @@ void ScreenFader::draw(bool fullscreen)
         }
         break;
     }
-
-    XRender::offsetViewportIgnore(false);
 }
