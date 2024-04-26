@@ -2176,9 +2176,6 @@ void mainMenuDraw()
 
     int B = 0;
 
-    // just don't call this during an offset!
-    // XRender::offsetViewportIgnore(true);
-
     if(MenuMode != MENU_1PLAYER_GAME && MenuMode != MENU_2PLAYER_GAME && MenuMode != MENU_BATTLE_MODE && MenuMode != MENU_EDITOR)
         worldCurs = 0;
 

@@ -48,8 +48,6 @@ void DrawInterface(int Z, int numScreens)
     std::string coinsStr = std::to_string(Coins);
     std::string numStarsStr = std::to_string(numStars);
 
-    XRender::offsetViewportIgnore(true);
-
     bool is_multiplayer = screen.player_count > 1;
     bool shared_screen = (is_multiplayer && numScreens == 1 && screen.Type != 6);
 
@@ -298,8 +296,6 @@ void DrawInterface(int Z, int numScreens)
         XRender::renderTexture(10 + vScreen[Z].Width / 2.0, -96 + vScreen[Z].Height / 2.0 - GFX.BMWin.h / 2, GFX.BMWin);
         XRender::renderTexture(-10 + vScreen[Z].Width / 2.0 - win_charname.w, -96 + vScreen[Z].Height / 2.0 - win_charname.h / 2, win_charname);
     }
-
-    XRender::offsetViewportIgnore(false);
 }
 
 void DrawLives(int X, int Y, int lives, int hunds)

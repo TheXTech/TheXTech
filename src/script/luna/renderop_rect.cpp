@@ -59,9 +59,6 @@ void RenderRectOp::Draw(Renderer *renderer)
         }
     }
 
-    if(!sceneCoords)
-        XRender::offsetViewportIgnore(true);
-
     if(fillColor.a > 0.0f)
         XRender::renderRect(Maths::iRound(sx1),
                             Maths::iRound(sy1),
@@ -75,8 +72,5 @@ void RenderRectOp::Draw(Renderer *renderer)
                             Maths::iRound(sx2 - sx1),
                             Maths::iRound(sy2 - sy1),
                             XTColor(borderColor), false);
-
-    if(!sceneCoords)
-        XRender::offsetViewportIgnore(false);
 }
 

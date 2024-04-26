@@ -135,8 +135,6 @@ void PerformanceStats_t::print()
     if(!enabled)
         return;
 
-    XRender::offsetViewportIgnore(true);
-
 #define YLINE (8 + (y++ * 18))
 
     int y = 0;
@@ -228,7 +226,6 @@ void PerformanceStats_t::print()
     }
 
 #undef YLINE
-    XRender::offsetViewportIgnore(false);
 }
 
 //#if !defined(__EMSCRIPTEN__)

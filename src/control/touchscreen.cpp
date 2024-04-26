@@ -1459,8 +1459,6 @@ void TouchScreenController::render(int player_no)
 
     int style = m_touchpad_style;
 
-    XRender::offsetViewportIgnore(true);
-
     for(int key = key_BEGIN; key < key_END; key++)
     {
         if((m_touchHidden && key != TouchScreenController::key_toggleKeysView) || LoadingInProcess || LevelEditor)
@@ -1557,8 +1555,6 @@ void TouchScreenController::render(int player_no)
             break;
         }
     }
-
-    XRender::offsetViewportIgnore(false);
 }
 
 void TouchScreenController::resetState()
