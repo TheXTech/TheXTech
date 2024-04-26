@@ -47,6 +47,8 @@ enum class Context
     DropAdd,
 };
 
+static Context s_context;
+
 struct CharInfo
 {
 private:
@@ -62,7 +64,7 @@ public:
             return false;
 
         // don't accept a blocked char, unless it has been present before
-        if(blockCharacter[c] && !this->char_present[c - 1])
+        if(blockCharacter[c] && !(s_context == Context::DropAdd && this->char_present[c - 1]))
             return false;
 
         // allow everything if char swap is allowed
@@ -228,7 +230,6 @@ public:
     bool Ready() const;
 };
 
-static Context s_context;
 static int s_minPlayers = 1;
 
 static std::array<PlayerBox, maxLocalPlayers> s_players;
