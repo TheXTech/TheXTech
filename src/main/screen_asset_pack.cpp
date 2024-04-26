@@ -456,7 +456,7 @@ bool Logic()
 void Loop()
 {
     Controls::PollInputMethod();
-    Controls::Update();
+    Controls::Update(false);
 
     if(Logic())
         return;
