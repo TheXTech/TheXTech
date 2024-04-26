@@ -814,6 +814,7 @@ void SpriteFunc::RelativeDraw(CSprite *me)
             else
                 op->direct_img = Renderer::Get().GetImageForResourceCode(me->m_ImgResCode);
             op->sceneCoords = true;
+            op->m_renderPriority = RENDEROP_DEFAULT_PRIORITY_RENDEROP_SCENE;
 
             Renderer::Get().AddOp(op);
             return;

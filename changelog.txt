@@ -7,6 +7,7 @@ Changelog for 1.3.7-dev
 -Save the number of medals / stars that exist in levels to speed up subsequent loads (@ds-sloth)
 -Fix thrower vertical position logic in split-screen, guarded by compat flag modern-npc-camera-logic (@ds-sloth)
 -Internal change: added draw plane system to track different object groups' scene depth (@ds-sloth)
+-Note: screen-space autocode draws now occur in the HUD plane instead of the level plane (@ds-sloth)
 -Add cheats "4shared" and "4split" to test HIGHLY EXPERIMENTAL 4-player shared / split screen modes (@ds-sloth)
 -Added "opensesame" world map cheat to unlock paths from level (@ds-sloth)
 -Added smooth path unlock animations at the world map (@ds-sloth)

@@ -33,6 +33,10 @@ static const double RENDEROP_DEFAULT_PRIORITY_RENDEROP = 1.0; // Default priorit
 static const double RENDEROP_DEFAULT_PRIORITY_CGFX = 2.0; // Default priority for Custom GFX
 static const double RENDEROP_DEFAULT_PRIORITY_TEXT = 3.0; // Default priority for Text
 
+static const double RENDEROP_DEFAULT_PRIORITY_RENDEROP_SCENE = RENDEROP_DEFAULT_PRIORITY_RENDEROP - 5.0; // Default priority for RenderOp and RenderImage (scene)
+static const double RENDEROP_DEFAULT_PRIORITY_CGFX_SCENE = RENDEROP_DEFAULT_PRIORITY_CGFX - 5.0; // Default priority for Custom GFX (scene)
+static const double RENDEROP_DEFAULT_PRIORITY_TEXT_SCENE = RENDEROP_DEFAULT_PRIORITY_TEXT - 5.0; // Default priority for Text (scene)
+
 struct RenderOpColor
 {
     float r;
