@@ -1381,11 +1381,15 @@ void UpdateGraphics(bool skipRepaint)
     if(FrameSkip && !TakeScreen && frameSkipNeeded())
         Do_FrameSkip = true;
 
+    g_microStats.start_task(MicroStats::Camera);
+
     UpdateGraphicsLogic(Do_FrameSkip);
 
     // we've now done all the logic that UpdateGraphics can do.
     if(Do_FrameSkip)
         return;
+
+    g_microStats.start_task(MicroStats::Graphics);
 
     UpdateGraphicsDraw(skipRepaint);
 }

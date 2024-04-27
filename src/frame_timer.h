@@ -37,9 +37,10 @@ public:
         Blocks,
         Effects,
         Player,
+        Camera,
         Graphics,
-        Sound,
         Events,
+        Sound,
         TASK_END
     };
 
@@ -52,9 +53,10 @@ public:
         "Blk",
         "Eff",
         "Plr",
+        "Cam",
         "Gfx",
-        "Snd",
         "Evt",
+        "Snd",
     };
 
 private:

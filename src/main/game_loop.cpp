@@ -211,13 +211,11 @@ void GameLoop()
         UpdateEffects();
         if(!g_compatibility.modern_section_change)
             speedRun_tick();
-        g_microStats.start_task(MicroStats::Graphics);
         UpdateGraphics();
         updateScreenFaders();
     }
     else if(BattleIntro > 0)
     {
-        g_microStats.start_task(MicroStats::Graphics);
         UpdateGraphics();
         BlockFrames();
         g_microStats.start_task(MicroStats::Sound);
@@ -251,7 +249,7 @@ void GameLoop()
         g_microStats.start_task(MicroStats::Player);
         UpdatePlayer();
         speedRun_tick();
-        g_microStats.start_task(MicroStats::Graphics);
+        // UpdateGraphics() now calls start_task internally
         if(LivingPlayers() || BattleMode)
             UpdateGraphics();
         g_microStats.start_task(MicroStats::Sound);
@@ -447,9 +445,7 @@ int PauseGame(PauseCode code, int plr)
             g_microStats.start_task(MicroStats::Controls);
 
             if(!Controls::Update())
-            {
                 QuickReconnectScreen::g_active = true;
-            }
 
             if(QuickReconnectScreen::g_active)
                 QuickReconnectScreen::Logic();
