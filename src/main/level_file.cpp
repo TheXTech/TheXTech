@@ -53,6 +53,7 @@
 #include "graphics/gfx_camera.h"
 #include "graphics/gfx_update.h"
 #include "npc/npc_activation.h"
+#include "npc/npc_queues.h"
 #include "translate_episode.h"
 #include "fontman/font_manager.h"
 
@@ -1115,6 +1116,7 @@ void ClearLevel()
 
     invalidateDrawBlocks();
     invalidateDrawBGOs();
+    NPCQueues::clear();
 
     AutoUseModern = false;
 
