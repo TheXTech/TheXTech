@@ -334,7 +334,9 @@ InputMethodProfile_Keyboard::InputMethodProfile_Keyboard()
     this->m_hotkeys[Hotkeys::Buttons::Fullscreen] = SDL_SCANCODE_F7;
 #endif
 
-#ifdef __APPLE__ // on macOS the F11 key is reserved by the "Show Desktop" global action
+#ifndef PGE_ENABLE_VIDEO_REC
+    // nothing to define
+#elif defined(__APPLE__) // on macOS the F11 key is reserved by the "Show Desktop" global action
     this->m_hotkeys[Hotkeys::Buttons::RecordGif] = SDL_SCANCODE_F10;
 #else
     this->m_hotkeys[Hotkeys::Buttons::RecordGif] = SDL_SCANCODE_F11;
@@ -1196,12 +1198,14 @@ bool InputMethodType_Keyboard::DefaultHotkey(const SDL_Event* ev)
             g_hotkeysPressed[Hotkeys::Buttons::Screenshot] = 0;
 #endif
 
-#ifdef __APPLE__
+#ifdef PGE_ENABLE_VIDEO_REC
+#   ifdef __APPLE__
         else if(KeyCode == SDL_SCANCODE_F10) // Reserved by macOS as "show desktop"
-#else
+#   else
         else if(KeyCode == SDL_SCANCODE_F11)
-#endif
+#   endif
             g_hotkeysPressed[Hotkeys::Buttons::RecordGif] = 0;
+#endif
     }
 
     if(this->m_directText && GamePaused == PauseCode::TextEntry)

@@ -186,18 +186,18 @@ void RenderSDL::repaint()
 
     int w, h, off_x, off_y, wDst, hDst;
 
-    #ifdef USE_SCREENSHOTS_AND_RECS
-        if(TakeScreen)
-        {
-            makeShot();
-            PlaySoundMenu(SFX_GotItem);
-            TakeScreen = false;
-        }
-    #endif
+#ifdef USE_SCREENSHOTS_AND_RECS
+    if(TakeScreen)
+    {
+        makeShot();
+        PlaySoundMenu(SFX_GotItem);
+        TakeScreen = false;
+    }
+#endif
 
     setTargetScreen();
 
-#ifdef USE_SCREENSHOTS_AND_RECS
+#ifdef PGE_ENABLE_VIDEO_REC
     processRecorder();
 #endif
 
@@ -298,7 +298,7 @@ void RenderSDL::updateViewport()
     // update render targets
     if(ScaleWidth != XRender::TargetW || ScaleHeight != XRender::TargetH || m_current_scale_mode != g_videoSettings.scaleMode)
     {
-#ifdef USE_SCREENSHOTS_AND_RECS
+#ifdef PGE_ENABLE_VIDEO_REC
         // invalidates GIF recorder handle
         if(recordInProcess())
             toggleGifRecorder();

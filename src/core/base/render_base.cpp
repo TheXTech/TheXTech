@@ -38,10 +38,6 @@
 #include <Utils/files.h>
 #include <fmt_time_ne.h>
 #include <fmt_format_ne.h>
-#ifdef USE_SCREENSHOTS_AND_RECS
-#include <gif.h>
-#endif
-#include <pge_delay.h>
 
 #include <chrono>
 
@@ -55,8 +51,10 @@
 #include "sound.h"
 #include "graphics.h"
 
-#ifdef USE_SCREENSHOTS_AND_RECS
-#include <deque>
+#ifdef PGE_ENABLE_VIDEO_REC
+#   include <SDL2/SDL_mixer_ext.h>
+#   include "sdl_proxy/sdl_timer.h"
+#   include "pge_video_rec/pge_video_rec.h"
 #endif
 
 
@@ -85,10 +83,6 @@ bool   AbstractRender_t::m_blockRender = false;
 static int makeShot_action(void *_pixels);
 static SDL_Thread *s_screenshot_thread = nullptr;
 
-static int processRecorder_action(void *_recorder);
-
-GifRecorder *AbstractRender_t::m_gif = nullptr;
-
 
 struct PGE_GL_shoot
 {
@@ -97,46 +91,51 @@ struct PGE_GL_shoot
     int w = 0, h = 0;
 };
 
+#endif // USE_SCREENSHOTS_AND_RECS
+
+#ifdef PGE_ENABLE_VIDEO_REC
+
+static int processRecorder_action(void *_recorder);
+
+GifRecorder *AbstractRender_t::m_gif = nullptr;
+
 struct GifRecorder
 {
     AbstractRender_t *m_self = nullptr;
-    GIF_H::GifWriter  writer      = {nullptr, nullptr, true, false};
-    SDL_Thread *worker      = nullptr;
+
+    // used to lock recording and worker.
+    // mutex not held for reads from main thread after confirming recording is active,
+    // because any write processes are initiated from main thread
+    SDL_mutex* mutex = nullptr;
+    std::unique_ptr<PGE_VideoRecording> recording;
+    SDL_Thread       *worker = nullptr;
+
     uint32_t    delay       = 4;
     uint32_t    delayTimer  = 0;
-    bool        enabled     = false;
-    unsigned char padding[7] = {0, 0, 0, 0, 0, 0, 0};
     bool        fadeForward = true;
     float       fadeValue = 0.5f;
-
-    std::deque<PGE_GL_shoot> queue;
-    SDL_mutex  *mutex = nullptr;
-    bool        doFinalize = false;
 
     void init(AbstractRender_t *self);
     void quit();
 
-    void drawRecCircle();
-    bool hasSome();
-    void enqueue(const PGE_GL_shoot &entry);
-    PGE_GL_shoot dequeue();
+    void drawRecCircle(bool saving);
 };
 
-#endif // USE_SCREENSHOTS_AND_RECS
+#endif // PGE_ENABLE_VIDEO_REC
 
 
 
 
 AbstractRender_t::AbstractRender_t()
 {
-#ifdef USE_SCREENSHOTS_AND_RECS
+#ifdef PGE_ENABLE_VIDEO_REC
     m_gif = new GifRecorder();
 #endif
 }
 
 AbstractRender_t::~AbstractRender_t()
 {
-#ifdef USE_SCREENSHOTS_AND_RECS
+#ifdef PGE_ENABLE_VIDEO_REC
     delete m_gif;
     m_gif = nullptr;
 #endif
@@ -147,7 +146,7 @@ bool AbstractRender_t::init()
     ScaleWidth = XRender::TargetW;
     ScaleHeight = XRender::TargetH;
 
-#ifdef USE_SCREENSHOTS_AND_RECS
+#ifdef PGE_ENABLE_VIDEO_REC
     m_gif->init(this);
 #endif
     return true;
@@ -155,7 +154,7 @@ bool AbstractRender_t::init()
 
 void AbstractRender_t::close()
 {
-#ifdef USE_SCREENSHOTS_AND_RECS
+#ifdef PGE_ENABLE_VIDEO_REC
     m_gif->quit();
 #endif
 }
@@ -929,94 +928,146 @@ static int makeShot_action(void *_pixels)
     return 0;
 }
 
+#endif // USE_SCREENSHOTS_AND_RECS
+
+#ifdef PGE_ENABLE_VIDEO_REC
+
 bool AbstractRender_t::recordInProcess()
 {
-    return m_gif->enabled;
+    SDL_LockMutex(m_gif->mutex);
+    bool ret = m_gif->recording.get();
+    SDL_UnlockMutex(m_gif->mutex);
+
+    return ret;
+}
+
+void SDLCALL store_audio_chunk(void* _recorder, uint8_t* stream, int len)
+{
+    GifRecorder *recorder = reinterpret_cast<GifRecorder *>(_recorder);
+
+    PGE_AudioChunk ch;
+    ch.audio_buffer.resize(len);
+    memcpy((uint8_t*)ch.audio_buffer.data(), stream, len & ~1);
+
+    SDL_LockMutex(recorder->mutex);
+
+    // this condition is extremely likely but should be confirmed before enqueueing
+    if(recorder->recording && !recorder->recording->exit_requested && recorder->recording->spec.audio_enabled)
+        recorder->recording->enqueue_audio(std::move(ch));
+
+    SDL_UnlockMutex(recorder->mutex);
 }
 
 void AbstractRender_t::toggleGifRecorder()
 {
-    UNUSED(GIF_H::GifOverwriteLastDelay);// shut up a warning about unused function
+    SDL_LockMutex(m_gif->mutex);
+    bool recording_present = m_gif->recording.get();
+    bool recording_active = m_gif->recording && !m_gif->recording->exit_requested;
 
-    if(!m_gif->enabled)
+    // this should never happen
+    if(!recording_present && m_gif->worker)
+    {
+        SDL_DetachThread(m_gif->worker);
+        m_gif->worker = nullptr;
+    }
+
+    SDL_UnlockMutex(m_gif->mutex);
+
+    if(!recording_present)
     {
         auto outDir = AppPathManager::gifRecordsDir();
 
         if(!DirMan::exists(outDir))
             DirMan::mkAbsPath(outDir);
 
-        std::string saveTo = shoot_getTimedString(outDir, "gif");
+        PGE_VideoSpec spec;
+        spec.frame_w = XRender::TargetW;
+        spec.frame_h = XRender::TargetH;
+        spec.frame_pitch = XRender::TargetW * 4;
 
-        if(m_gif->worker)
-            SDL_WaitThread(m_gif->worker, nullptr);
-        m_gif->worker = nullptr;
+#ifdef PGE_VIDEO_REC_WEBM_SUPPORTED
+        spec.frame_rate = 120;
+        spec.video_quality = 10;
+        spec.audio_enabled = true;
+        spec.audio_sample_rate = g_audioSetup.sampleRate;
+        auto recording = PGE_new_recording_VP8(spec);
+#else
+        spec.frame_rate = 25;
+        auto recording = PGE_new_recording_GIF(spec);
+#endif
 
-        FILE *gifFile = Files::utf8_fopen(saveTo.data(), "wb");
-        if(GIF_H::GifBegin(&m_gif->writer, gifFile, XRender::TargetW, XRender::TargetH, m_gif->delay, false))
+        std::string saveTo = shoot_getTimedString(outDir, recording->extension());
+
+        if(recording->initialize(saveTo.c_str()))
         {
-            m_gif->enabled = true;
-            m_gif->doFinalize = false;
-            PlaySoundMenu(SFX_PlayerGrow);
-        }
+            SDL_LockMutex(m_gif->mutex);
+            m_gif->recording = std::move(recording);
+            m_gif->worker = SDL_CreateThread(processRecorder_action, "gif_recorder", reinterpret_cast<void *>(m_gif));
+            SDL_UnlockMutex(m_gif->mutex);
 
-        m_gif->worker = SDL_CreateThread(processRecorder_action, "gif_recorder", reinterpret_cast<void *>(m_gif));
+            if(m_gif->recording->spec.audio_enabled)
+                Mix_SetPostMix(store_audio_chunk, reinterpret_cast<void *>(m_gif));
+            else
+                PlaySoundMenu(SFX_PlayerGrow);
+        }
+    }
+    else if(recording_active)
+    {
+        Mix_SetPostMix(nullptr, nullptr);
+
+        PGE_VideoFrame final_timestamp;
+        final_timestamp.timestamp = SDL_GetMicroTicks();
+        final_timestamp.end_frame = true;
+
+        m_gif->recording->enqueue_frame(std::move(final_timestamp));
+        m_gif->recording->exit_requested = true;
+
+        if(m_gif->recording->spec.audio_enabled)
+            PlaySoundMenu(SFX_GotItem);
+        else
+            PlaySoundMenu(SFX_PlayerShrink);
     }
     else
     {
-        if(!m_gif->doFinalize)
-        {
-            m_gif->doFinalize = true;
-            SDL_DetachThread(m_gif->worker);
-            m_gif->worker = nullptr;
-            PlaySoundMenu(SFX_PlayerShrink);
-        }
-        else
-        {
-            PlaySoundMenu(SFX_BlockHit);
-        }
+        PlaySoundMenu(SFX_BlockHit);
     }
 }
 
 void AbstractRender_t::processRecorder()
 {
-    if(!m_gif->enabled)
+    SDL_LockMutex(m_gif->mutex);
+    bool recording_present = m_gif->recording.get();
+    bool recording_active = m_gif->recording && !m_gif->recording->exit_requested;
+    SDL_UnlockMutex(m_gif->mutex);
+
+    if(!recording_present)
         return;
 
     XRender::setTargetTexture();
 
     m_gif->delayTimer += int(1000.0 / 65.0);
 
-    if(m_gif->delayTimer >= m_gif->delay * 10)
+    if(m_gif->recording->spec.audio_enabled || int(m_gif->delayTimer) >= 1000 / m_gif->recording->spec.frame_rate)
         m_gif->delayTimer = 0.0;
 
-    if(m_gif->doFinalize || (m_gif->delayTimer != 0.0))
+    if(!recording_active || (m_gif->delayTimer != 0.0))
     {
-        m_gif->drawRecCircle();
+        m_gif->drawRecCircle(!recording_active);
         XRender::setTargetScreen();
         return;
     }
 
     const int w = XRender::TargetW, h = XRender::TargetH;
 
-    uint8_t *pixels = reinterpret_cast<uint8_t*>(SDL_malloc(size_t(4 * w * h) + 42));
-    if(!pixels)
-    {
-        pLogCritical("Can't allocate memory for a next GIF frame: out of memory");
-        XRender::setTargetScreen();
-        return; // Drop frame (out of memory)
-    }
+    PGE_VideoFrame shoot;
+    shoot.pixels.resize(4 * w * h);
+    shoot.timestamp = SDL_GetMicroTicks();
 
-    g_render->getScreenPixelsRGBA(0, 0, w, h, pixels);
+    g_render->getScreenPixelsRGBA(0, 0, w, h, shoot.pixels.data());
 
-    PGE_GL_shoot shoot;
-    shoot.pixels = pixels;
-    shoot.w = w;
-    shoot.h = h;
-    shoot.pitch = w * 4;
+    m_gif->recording->enqueue_frame(std::move(shoot));
 
-    m_gif->enqueue(shoot);
-
-    m_gif->drawRecCircle();
+    m_gif->drawRecCircle(!recording_active);
     XRender::setTargetScreen();
 }
 
@@ -1024,31 +1075,21 @@ static int processRecorder_action(void *_recorder)
 {
     GifRecorder *recorder = reinterpret_cast<GifRecorder *>(_recorder);
 
-    while(true)
-    {
-        if(!recorder->hasSome()) // Wait for a next frame
-        {
-            if(recorder->doFinalize)
-                break;
-            PGE_Delay(1);
-            continue;
-        }
+    int ret = -1;
 
-        PGE_GL_shoot sh = recorder->dequeue();
-        GifWriteFrame(&recorder->writer, sh.pixels,
-                      unsigned(sh.w),
-                      unsigned(sh.h),
-                      recorder->delay/*uint32_t((ticktime)/10.0)*/, 8, false);
-        SDL_free(sh.pixels);
-        sh.pixels = nullptr;
-    }
+    if(recorder->recording)
+        ret = recorder->recording->encoding_thread();
 
-    // Once GIF recorder was been disabled, finalize it
-    GIF_H::GifEnd(&recorder->writer);
+    SDL_LockMutex(recorder->mutex);
+
+    recorder->recording.reset();
+    if(recorder->worker)
+        SDL_DetachThread(recorder->worker);
     recorder->worker = nullptr;
-    recorder->enabled = false;
 
-    return 0;
+    SDL_UnlockMutex(recorder->mutex);
+
+    return ret;
 }
 
 void GifRecorder::init(AbstractRender_t *self)
@@ -1060,21 +1101,26 @@ void GifRecorder::init(AbstractRender_t *self)
 
 void GifRecorder::quit()
 {
-    if(enabled)
+    SDL_Thread* worker_to_kill = nullptr;
+
+    SDL_LockMutex(mutex);
+    if(recording)
     {
-        enabled = false;
-        doFinalize = true;
-        if(worker) // Let worker complete it's mad job
-            SDL_WaitThread(worker, nullptr);
-        worker = nullptr; // and only then, quit a thing
+        recording->exit_requested = true;
+        worker_to_kill = worker;
+        worker = nullptr;
     }
+    SDL_UnlockMutex(mutex);
+
+    if(worker_to_kill) // Let worker complete it's mad job
+        SDL_WaitThread(worker_to_kill, nullptr);
 
     if(mutex)
         SDL_DestroyMutex(mutex);
     mutex = nullptr;
 }
 
-void GifRecorder::drawRecCircle()
+void GifRecorder::drawRecCircle(bool saving)
 {
     if(fadeForward)
     {
@@ -1097,7 +1143,7 @@ void GifRecorder::drawRecCircle()
 
     m_self->offsetViewportIgnore(true);
 
-    if(doFinalize)
+    if(saving)
     {
         m_self->renderCircle(50, 50, 20, XTColorF(0.f, 0.6f, 0.f, fadeValue), true);
         SuperPrint("SAVING", 3, 2, 80, XTColorF(0.f, 0.6f, 0.f, fadeValue));
@@ -1111,27 +1157,4 @@ void GifRecorder::drawRecCircle()
     m_self->offsetViewportIgnore(false);
 }
 
-bool GifRecorder::hasSome()
-{
-    SDL_LockMutex(mutex);
-    bool ret = !queue.empty();
-    SDL_UnlockMutex(mutex);
-    return ret;
-}
-
-void GifRecorder::enqueue(const PGE_GL_shoot &entry)
-{
-    SDL_LockMutex(mutex);
-    queue.push_back(entry);
-    SDL_UnlockMutex(mutex);
-}
-
-PGE_GL_shoot GifRecorder::dequeue()
-{
-    SDL_LockMutex(mutex);
-    PGE_GL_shoot ret = queue.front();
-    queue.pop_front();
-    SDL_UnlockMutex(mutex);
-    return ret;
-}
-#endif // USE_SCREENSHOTS_AND_RECS
+#endif // PGE_ENABLE_VIDEO_REC

@@ -336,6 +336,9 @@ public:
 #ifdef USE_SCREENSHOTS_AND_RECS
     static void makeShot();
 
+#endif
+
+#ifdef PGE_ENABLE_VIDEO_REC
     static void toggleGifRecorder();
     static void processRecorder();
 
