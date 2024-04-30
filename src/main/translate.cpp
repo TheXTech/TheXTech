@@ -282,8 +282,12 @@ XTechTranslate::XTechTranslate()
         {"menu.controls.editor.switchScreens", &Controls::EditorControls::g_button_name_UI[Controls::EditorControls::SwitchScreens]},
         {"menu.controls.editor.testPlay",      &Controls::EditorControls::g_button_name_UI[Controls::EditorControls::TestPlay]},
 
+#ifndef RENDER_FULLSCREEN_ALWAYS
         {"menu.controls.hotkeys.fullscreen",  &Controls::Hotkeys::g_button_name_UI[Controls::Hotkeys::Fullscreen]},
+#endif
+#ifdef USE_SCREENSHOTS_AND_RECS
         {"menu.controls.hotkeys.screenshot",  &Controls::Hotkeys::g_button_name_UI[Controls::Hotkeys::Screenshot]},
+#endif
         {"menu.controls.hotkeys.recordGif",   &Controls::Hotkeys::g_button_name_UI[Controls::Hotkeys::RecordGif]},
         {"menu.controls.hotkeys.debugInfo",   &Controls::Hotkeys::g_button_name_UI[Controls::Hotkeys::DebugInfo]},
         {"menu.controls.hotkeys.enterCheats", &Controls::Hotkeys::g_button_name_UI[Controls::Hotkeys::EnterCheats]},

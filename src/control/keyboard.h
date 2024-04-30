@@ -62,8 +62,8 @@ public:
 
     int m_cursor_keys2[CursorControls::n_buttons] = {null_key, null_key, null_key, null_key, null_key, null_key, null_key};
 
-    int m_hotkeys[Hotkeys::n_buttons] = {null_key, null_key, null_key, null_key, null_key, null_key, null_key};
-    int m_hotkeys2[Hotkeys::n_buttons] = {null_key, null_key, null_key, null_key, null_key, null_key, null_key};
+    int m_hotkeys[Hotkeys::n_buttons];
+    int m_hotkeys2[Hotkeys::n_buttons];
 
     InputMethodProfile_Keyboard();
 
@@ -95,7 +95,11 @@ private:
 
     int m_lastNumKeyboards = 0;
     bool m_touchscreenActive = false;
+
+#ifndef RENDER_FULLSCREEN_ALWAYS
     Uint32 m_lastMousePress = 0;
+#endif
+
     int m_scroll = 0;
 
     InputMethodProfile *AllocateProfile() noexcept override;

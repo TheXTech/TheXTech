@@ -390,8 +390,13 @@ namespace Hotkeys
 // enumerate of the Hotkey indices (which are almost never used)
 enum Buttons : size_t
 {
-    Fullscreen = 0,
-    Screenshot, RecordGif,
+#ifndef RENDER_FULLSCREEN_ALWAYS
+    Fullscreen,
+#endif
+#ifdef USE_SCREENSHOTS_AND_RECS
+    Screenshot,
+#endif
+    RecordGif,
     DebugInfo, EnterCheats,
     ToggleHUD, LegacyPause,
 #ifdef DEBUG_BUILD
@@ -406,10 +411,14 @@ inline const char *GetButtonName_INI(size_t i)
 {
     switch(i)
     {
+#ifndef RENDER_FULLSCREEN_ALWAYS
     case Buttons::Fullscreen:
         return "fullscreen";
+#endif
+#ifdef USE_SCREENSHOTS_AND_RECS
     case Buttons::Screenshot:
         return "screenshot";
+#endif
     case Buttons::RecordGif:
         return "record-gif";
     case Buttons::DebugInfo:
@@ -433,10 +442,14 @@ inline const char *GetButtonName_UI_Init(size_t i)
 {
     switch(i)
     {
+#ifndef RENDER_FULLSCREEN_ALWAYS
     case Buttons::Fullscreen:
         return "Fullscreen";
+#endif
+#ifdef USE_SCREENSHOTS_AND_RECS
     case Buttons::Screenshot:
         return "Screenshot";
+#endif
     case Buttons::RecordGif:
         return "Record GIF";
     case Buttons::DebugInfo:
