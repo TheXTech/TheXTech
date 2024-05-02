@@ -33,7 +33,7 @@ Changelog for 1.3.7-dev
 -Add hints system to the loading and pause screens (@ds-sloth)
 -3DS: draw some BGOs at the same screen layer as blocks to reduce visual glitches, guarded by compat flag tune-bgo-order (@ds-sloth)
 -Fix SMBX 1.3 bug where camera would not track respawning player, guarded by compat flag multiplayer-pause-controls (@ds-sloth)
--Fix SMBX 1.3.6.1 bug where level fadeout did not properly occur on fail in 2P mode (@ds-sloth)
+-Fix TheXTech 1.3.6.1 bug where level fadeout did not properly occur on fail in 2P mode (@ds-sloth)
 
 Changelog for 1.3.6.5
 -Fix TheXTech 1.3.6 bug where auto movement on the world map was not reset when switching episodes (@ds-sloth)
