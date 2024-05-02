@@ -49,30 +49,29 @@ void GetvScreen(vScreen_t& vscreen)
     if(p.Mount == 2)
         pLoc.Height = 0;
 
-    // this guard is new because players can now respawn in 1P mode through DropAdd
-    if(p.Effect != 6)
-    {
-        vscreen.X = -pLoc.X + (vscreen.Width * 0.5) - pLoc.Width / 2.0;
-        vscreen.Y = -pLoc.Y + (vscreen.Height * 0.5) - vScreenYOffset - pLoc.Height;
+    // this check is new because players can now respawn in 1P mode through DropAdd
+    double pLocY = (p.Effect == 6) ? p.Effect2 : pLoc.Y;
 
-        ProcessSmallScreenCam(vscreen);
+    vscreen.X = -pLoc.X + (vscreen.Width * 0.5) - pLoc.Width / 2.0;
+    vscreen.Y = -pLocY + (vscreen.Height * 0.5) - vScreenYOffset - pLoc.Height;
 
-        vscreen.X += -vscreen.tempX;
-        vscreen.Y += -vscreen.TempY;
+    ProcessSmallScreenCam(vscreen);
 
-        // allow some overscan (needed for 3DS)
-        int allow_X = (g_config.allow_multires && vscreen.Width == XRender::TargetW && !Screens[vscreen.screen_ref].is_canonical()) ? XRender::TargetOverscanX : 0;
+    vscreen.X += -vscreen.tempX;
+    vscreen.Y += -vscreen.TempY;
 
-        // shift the level so that it is onscreen
-        if(-vscreen.X < level[p.Section].X - allow_X)
-            vscreen.X = -(level[p.Section].X - allow_X);
-        if(-vscreen.X + vscreen.Width > level[p.Section].Width + allow_X)
-            vscreen.X = -(level[p.Section].Width - vscreen.Width + allow_X);
-        if(-vscreen.Y < level[p.Section].Y)
-            vscreen.Y = -level[p.Section].Y;
-        if(-vscreen.Y + vscreen.Height > level[p.Section].Height)
-            vscreen.Y = -(level[p.Section].Height - vscreen.Height);
-    }
+    // allow some overscan (needed for 3DS)
+    int allow_X = (g_config.allow_multires && vscreen.Width == XRender::TargetW && !Screens[vscreen.screen_ref].is_canonical()) ? XRender::TargetOverscanX : 0;
+
+    // shift the level so that it is onscreen
+    if(-vscreen.X < level[p.Section].X - allow_X)
+        vscreen.X = -(level[p.Section].X - allow_X);
+    if(-vscreen.X + vscreen.Width > level[p.Section].Width + allow_X)
+        vscreen.X = -(level[p.Section].Width - vscreen.Width + allow_X);
+    if(-vscreen.Y < level[p.Section].Y)
+        vscreen.Y = -level[p.Section].Y;
+    if(-vscreen.Y + vscreen.Height > level[p.Section].Height)
+        vscreen.Y = -(level[p.Section].Height - vscreen.Height);
 
     if(vscreen.TempDelay > 0)
         vscreen.TempDelay -= 1;
@@ -108,13 +107,17 @@ void GetvScreenAverage(vScreen_t& vscreen)
 
     for(A = 1; A <= numPlayers; A++)
     {
-        if(!Player[A].Dead && Player[A].Effect != 6)
+        if(!Player[A].Dead && (Player[A].Effect != 6 || g_config.multiplayer_pause_controls))
         {
             vscreen.X += -Player[A].Location.X - Player[A].Location.Width / 2.0;
+
+            double pLocY = (Player[A].Effect == 6) ? Player[A].Effect2 : Player[A].Location.Y;
+
             if(Player[A].Mount == 2)
-                vscreen.Y += -Player[A].Location.Y;
+                vscreen.Y += -pLocY;
             else
-                vscreen.Y += -Player[A].Location.Y - Player[A].Location.Height;
+                vscreen.Y += -pLocY - Player[A].Location.Height;
+
             B += 1;
         }
     }
@@ -249,19 +252,19 @@ void GetvScreenAverage3(vScreen_t& vscreen)
 
         double pl = plr.Location.X;
         double pr = pl + plr.Location.Width;
-        double by = plr.Location.Y + plr.Location.Height;
 
-        if(plr.Effect != 6)
-        {
-            vscreen.Y -= by;
+        double pLocY = (plr.Effect == 6) ? plr.Effect2 : plr.Location.Y;
 
-            if(plr_count == 0 || by < t)
-                t = by;
-            if(plr_count == 0 || b < by)
-                b = by;
+        double by = pLocY + plr.Location.Height;
 
-            plr_count += 1;
-        }
+        vscreen.Y -= by;
+
+        if(plr_count == 0 || by < t)
+            t = by;
+        if(plr_count == 0 || b < by)
+            b = by;
+
+        plr_count += 1;
 
         // still set left and right bounds for respawning players
         if(!horiz_bounds_inited || pl < l)

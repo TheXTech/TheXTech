@@ -203,10 +203,13 @@ void DynamicScreen(Screen_t& screen, bool mute)
 
     GetvScreenAverage(vscreen1);
 
-    for(A = 1; A <= numPlayers; A++)
+    if(!g_config.multiplayer_pause_controls)
     {
-        if(Player[A].Effect == 6)
-            return;
+        for(A = 1; A <= numPlayers; A++)
+        {
+            if(Player[A].Effect == 6)
+                return;
+        }
     }
 
     for(A = 1; A <= numPlayers; A++)
@@ -218,7 +221,10 @@ void DynamicScreen(Screen_t& screen, bool mute)
     Player_t& p1 = Player[screen.players[0]];
     Player_t& p2 = Player[screen.players[1]];
 
-    if(CheckDead() == 0)
+    double p1LocY = (p1.Effect == 6) ? p1.Effect2 : p1.Location.Y;
+    double p2LocY = (p2.Effect == 6) ? p2.Effect2 : p2.Location.Y;
+
+    if(!p1.Dead && !p2.Dead)
     {
         if(p1.Section == p2.Section)
         {
@@ -269,10 +275,11 @@ void DynamicScreen(Screen_t& screen, bool mute)
                 {
                     vScreen_t& vscreena = screen.vScreen(A);
                     Player_t& p = Player[screen.players[A - 1]];
+                    double pLocY = (A == 1) ? p1LocY : p2LocY;
 
                     vscreena.TempDelay = 200;
                     vscreena.tempX = 0;
-                    vscreena.TempY = -vscreen1.Y + screen.H * 0.5 - p.Location.Y - vScreenYOffset - p.Location.Height;
+                    vscreena.TempY = -vscreen1.Y + screen.H * 0.5 - pLocY - vScreenYOffset - p.Location.Height;
                 }
                 vscreen2.Visible = true;
                 screen.DType = 1;
@@ -300,10 +307,11 @@ void DynamicScreen(Screen_t& screen, bool mute)
                 {
                     vScreen_t& vscreena = screen.vScreen(A);
                     Player_t& p = Player[screen.players[A - 1]];
+                    double pLocY = (A == 1) ? p1LocY : p2LocY;
 
                     vscreena.TempDelay = 200;
                     vscreena.tempX = 0;
-                    vscreena.TempY = -vscreen1.Y + screen.H * 0.5 - p.Location.Y - vScreenYOffset - p.Location.Height;
+                    vscreena.TempY = -vscreen1.Y + screen.H * 0.5 - pLocY - vScreenYOffset - p.Location.Height;
                 }
                 screen.DType = 2;
                 vscreen2.Visible = true;
@@ -314,7 +322,7 @@ void DynamicScreen(Screen_t& screen, bool mute)
             //  (vScreen(2).Visible = True  And Player(1).Location.Y + vScreenY(2) >= ScreenH * 0.75 - vScreenYOffset - Player(1).Location.Height))
             // And (Player(2).Location.Y < level(Player(1).Section).Height - ScreenH * 0.75 - vScreenYOffset - Player(2).Location.Height)) Then
 
-            else if(section_tall && (p1.Location.Y + p1_compare_vscreen.Y >= screen.H * 0.75 - vScreenYOffset - p1.Location.Height) && (p2.Location.Y < section.Height - screen.H * 0.75 - vScreenYOffset - p2.Location.Height))
+            else if(section_tall && (p1LocY + p1_compare_vscreen.Y >= screen.H * 0.75 - vScreenYOffset - p1.Location.Height) && (p2LocY < section.Height - screen.H * 0.75 - vScreenYOffset - p2.Location.Height))
             {
                 vscreen1.Height = screen.H / 2;
                 vscreen1.Width = screen.W;
@@ -345,7 +353,7 @@ void DynamicScreen(Screen_t& screen, bool mute)
             //  (vScreen(2).Visible = True  And Player(2).Location.Y + vScreenY(1) >= ScreenH * 0.75 - vScreenYOffset - Player(2).Location.Height))
             // And (Player(1).Location.Y < level(Player(1).Section).Height - ScreenH * 0.75 - vScreenYOffset - Player(1).Location.Height)) Then
 
-            else if(section_tall && (p2.Location.Y + p2_compare_vscreen.Y >= screen.H * 0.75 - vScreenYOffset - p2.Location.Height) && (p1.Location.Y < section.Height - screen.H * 0.75 - vScreenYOffset - p1.Location.Height))
+            else if(section_tall && (p2LocY + p2_compare_vscreen.Y >= screen.H * 0.75 - vScreenYOffset - p2.Location.Height) && (p1LocY < section.Height - screen.H * 0.75 - vScreenYOffset - p1.Location.Height))
             {
                 vscreen1.Height = screen.H / 2;
                 vscreen1.Width = screen.W;
