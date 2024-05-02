@@ -103,6 +103,7 @@ struct Compatibility_t
     bool modern_npc_camera_logic; // NPCs should support more than two cameras, and consider the event logic camera when activating
     bool dynamic_camera_logic;    // use visible onscreen camera to determine NPC spawn behavior
     bool allow_multires;
+    bool fix_multiplayer_targeting; // fix NPC targeting in >2P mode
     bool disable_background2_tiling;
     bool world_map_lvlname_marquee;
     bool modern_lives_system;

@@ -1674,9 +1674,10 @@ void UpdateNPCs()
                             {
                                 if(!Player[B].Dead && Player[B].Section == NPC[A].Section)
                                 {
-                                    if(C == 0.0 || std::abs(NPC[A].Location.X + NPC[A].Location.Width / 2.0 - (Player[B].Location.X + Player[B].Location.Width / 2.0)) < C)
+                                    double dist = NPCPlayerTargetDist(NPC[A], Player[B]);
+                                    if(C == 0.0 || dist < C)
                                     {
-                                        C = std::abs(NPC[A].Location.X + NPC[A].Location.Width / 2.0 - (Player[B].Location.X + Player[B].Location.Width / 2.0));
+                                        C = dist;
                                         NPC[A].Direction = -Player[B].Direction;
                                     }
                                 }
@@ -1702,9 +1703,10 @@ void UpdateNPCs()
                         {
                             if(!Player[B].Dead && Player[B].Section == NPC[A].Section)
                             {
-                                if(C == 0.0 || std::abs(NPC[A].Location.X + NPC[A].Location.Width / 2.0 - (Player[B].Location.X + Player[B].Location.Width / 2.0)) < C)
+                                double dist = NPCPlayerTargetDist(NPC[A], Player[B]);
+                                if(C == 0.0 || dist < C)
                                 {
-                                    C = std::abs(NPC[A].Location.X + NPC[A].Location.Width / 2.0 - (Player[B].Location.X + Player[B].Location.Width / 2.0));
+                                    C = dist;
                                     if(NPC[A].Location.X + NPC[A].Location.Width / 2.0 > Player[B].Location.X + Player[B].Location.Width / 2.0)
                                         NPC[A].Direction = -1;
                                     else
@@ -1735,9 +1737,10 @@ void UpdateNPCs()
                             {
                                 if(!Player[B].Dead && Player[B].Section == NPC[A].Section)
                                 {
-                                    if(C == 0.0 || std::abs(NPC[A].Location.X + NPC[A].Location.Width / 2.0 - (Player[B].Location.X + Player[B].Location.Width / 2.0)) < C)
+                                    double dist = NPCPlayerTargetDist(NPC[A], Player[B]);
+                                    if(C == 0.0 || dist < C)
                                     {
-                                        C = std::abs(NPC[A].Location.X + NPC[A].Location.Width / 2.0 - (Player[B].Location.X + Player[B].Location.Width / 2.0));
+                                        C = dist;
                                         if(NPC[A].Location.X + NPC[A].Location.Width / 2.0 > Player[B].Location.X + Player[B].Location.Width / 2.0)
                                             NPC[A].Direction = -1;
                                         else
@@ -1815,9 +1818,10 @@ void UpdateNPCs()
                             {
                                 if(!Player[B].Dead && Player[B].Section == NPC[A].Section)
                                 {
-                                    if(C == 0.0 || std::abs(NPC[A].Location.X + NPC[A].Location.Width / 2.0 - (Player[B].Location.X + Player[B].Location.Width / 2.0)) < C)
+                                    double dist = NPCPlayerTargetDist(NPC[A], Player[B]);
+                                    if(C == 0.0 || dist < C)
                                     {
-                                        C = std::abs(NPC[A].Location.X + NPC[A].Location.Width / 2.0 - (Player[B].Location.X + Player[B].Location.Width / 2.0));
+                                        C = dist;
                                         if(NPC[A].Location.X + NPC[A].Location.Width / 2.0 > Player[B].Location.X + Player[B].Location.Width / 2.0)
                                             NPC[A].Direction = -1;
                                         else
@@ -2227,9 +2231,10 @@ void UpdateNPCs()
                             {
                                 if(!Player[B].Dead && Player[B].Section == NPC[A].Section)
                                 {
-                                    if(C == 0.0 || std::abs(NPC[A].Location.X + NPC[A].Location.Width / 2.0 - (Player[B].Location.X + Player[B].Location.Width / 2.0)) < C)
+                                    double dist = NPCPlayerTargetDist(NPC[A], Player[B]);
+                                    if(C == 0.0 || dist < C)
                                     {
-                                        C = std::abs(NPC[A].Location.X + NPC[A].Location.Width / 2.0 - (Player[B].Location.X + Player[B].Location.Width / 2.0));
+                                        C = dist;
                                         if(NPC[A].Location.X + NPC[A].Location.Width / 2.0 > Player[B].Location.X + Player[B].Location.Width / 2.0)
                                             NPC[A].Direction = -1;
                                         else
@@ -5186,9 +5191,10 @@ void UpdateNPCs()
                             {
                                 if(!Player[B].Dead && Player[B].Section == NPC[A].Section)
                                 {
-                                    if(C == 0.0 || std::abs(NPC[A].Location.X + NPC[A].Location.Width / 2.0 - (Player[B].Location.X + Player[B].Location.Width / 2.0)) < C)
+                                    double dist = NPCPlayerTargetDist(NPC[A], Player[B]);
+                                    if(C == 0.0 || dist < C)
                                     {
-                                        C = std::abs(NPC[A].Location.X + NPC[A].Location.Width / 2.0 - (Player[B].Location.X + Player[B].Location.Width / 2.0));
+                                        C = dist;
                                         if(NPC[A].Location.X + NPC[A].Location.Width / 2.0 > Player[B].Location.X + Player[B].Location.Width / 2.0)
                                             NPC[A].Direction = -1;
                                         else
@@ -5412,9 +5418,10 @@ void UpdateNPCs()
                             {
                                 if(!Player[B].Dead && Player[B].Section == NPC[A].Section)
                                 {
-                                    if(C == 0.0 || std::abs(NPC[A].Location.X + NPC[A].Location.Width / 2.0 - (Player[B].Location.X + Player[B].Location.Width / 2.0)) < C)
+                                    double dist = NPCPlayerTargetDist(NPC[A], Player[B]);
+                                    if(C == 0.0 || dist < C)
                                     {
-                                        C = std::abs(NPC[A].Location.X + NPC[A].Location.Width / 2.0 - (Player[B].Location.X + Player[B].Location.Width / 2.0));
+                                        C = dist;
                                         D = B;
                                     }
                                 }
@@ -5505,9 +5512,10 @@ void UpdateNPCs()
                     {
                         if(!Player[B].Dead && Player[B].Section == NPC[A].Section)
                         {
-                            if(C == 0.0 || std::abs(NPC[A].Location.X + NPC[A].Location.Width / 2.0 - (Player[B].Location.X + Player[B].Location.Width / 2.0)) < C)
+                            double dist = NPCPlayerTargetDist(NPC[A], Player[B]);
+                            if(C == 0.0 || dist < C)
                             {
-                                C = std::abs(NPC[A].Location.X + NPC[A].Location.Width / 2.0 - (Player[B].Location.X + Player[B].Location.Width / 2.0));
+                                C = dist;
                                 NPC[A].Direction = -Player[B].Direction;
                             }
                         }
@@ -5577,9 +5585,10 @@ void UpdateNPCs()
                     {
                         if(!Player[B].Dead && Player[B].Section == NPC[A].Section)
                         {
-                            if(C == 0.0 || std::abs(NPC[A].Location.X + NPC[A].Location.Width / 2.0 - (Player[B].Location.X + Player[B].Location.Width / 2.0)) < C)
+                            double dist = NPCPlayerTargetDist(NPC[A], Player[B]);
+                            if(C == 0.0 || dist < C)
                             {
-                                C = std::abs(NPC[A].Location.X + NPC[A].Location.Width / 2.0 - (Player[B].Location.X + Player[B].Location.Width / 2.0));
+                                C = dist;
                                 NPC[A].Direction = -Player[B].Direction;
                             }
                         }
