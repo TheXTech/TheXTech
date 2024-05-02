@@ -151,10 +151,6 @@ void GetvScreenAverage(vScreen_t& vscreen)
     // allow some overscan (needed for 3DS)
     int allow_X = (g_compatibility.allow_multires && vscreen.Width == XRender::TargetW && !Screens[vscreen.screen_ref].is_canonical()) ? XRender::TargetOverscanX : 0;
 
-    // don't do overscan if at the level bounds
-    if(allow_X > 0 && section.Width - section.X <= vscreen.Width)
-        allow_X = 0;
-
     if(-vscreen.X < section.X - allow_X)
         vscreen.X = -(section.X - allow_X);
     if(-vscreen.X + use_width > section.Width + allow_X)
@@ -297,10 +293,6 @@ void GetvScreenAverage3(vScreen_t& vscreen)
 
     // allow some overscan (needed for 3DS)
     int allow_X = (g_compatibility.allow_multires && vscreen.Width == XRender::TargetW && !Screens[vscreen.screen_ref].is_canonical()) ? XRender::TargetOverscanX : 0;
-
-    // don't do overscan if at the level bounds
-    if(allow_X > 0 && section.Width - section.X <= vscreen.Width)
-        allow_X = 0;
 
     if(-vscreen.X < section.X - allow_X)
         vscreen.X = -(section.X - allow_X);
