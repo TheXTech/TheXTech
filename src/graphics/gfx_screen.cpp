@@ -225,7 +225,7 @@ void DynamicScreen(Screen_t& screen, bool mute)
     double p1LocY = (p1.Effect == 6) ? p1.Effect2 : p1.Location.Y;
     double p2LocY = (p2.Effect == 6) ? p2.Effect2 : p2.Location.Y;
 
-    if(CheckDead() == 0)
+    if(!p1.Dead && !p2.Dead)
     {
         if(p1.Section == p2.Section)
         {
