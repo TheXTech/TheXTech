@@ -351,7 +351,7 @@ void UpdatePlayer()
             {
                 ProcessLastDead(); // Fade out screen if the last player died
             }
-            else if(player_timer_done) // ScreenType = 1
+            else if(!BattleMode && player_timer_done) // ScreenType = 1
             {
                 double old_LocX = Player[A].Location.X;
                 double old_LocY = Player[A].Location.Y;
