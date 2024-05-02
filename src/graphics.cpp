@@ -150,10 +150,6 @@ void GetvScreenAverage(vScreen_t& vscreen)
     // allow some overscan (needed for 3DS)
     int allow_X = (g_config.allow_multires && vscreen.Width == XRender::TargetW && !Screens[vscreen.screen_ref].is_canonical()) ? XRender::TargetOverscanX : 0;
 
-    // don't do overscan if at the level bounds
-    if(allow_X > 0 && section.Width - section.X <= vscreen.Width)
-        allow_X = 0;
-
     if(-vscreen.X < section.X - allow_X)
         vscreen.X = -(section.X - allow_X);
     if(-vscreen.X + use_width > section.Width + allow_X)
@@ -288,18 +284,48 @@ void GetvScreenAverage3(vScreen_t& vscreen)
 
     const Location_t& section = level[section_idx];
 
-    double use_width  = SDL_min(static_cast<double>(screen.W), section.Width  - section.X);
-    double use_height = SDL_min(static_cast<double>(screen.H), section.Height - section.Y);
+    double use_width  = screen.W;
+    double use_height = screen.H;
+
+    // allow canonical screen to expand to reach size of main screen, if there are players near the side of the screen
+    if(g_config.allow_multires && !screen.Visible)
+    {
+        // vScreen boundaries that would have been present in SMBX 1.3 splitscreen
+        double want_l = l - screen.W / 4;
+        double want_r = r + screen.W / 4;
+        double want_t = t - screen.H / 4;
+        double want_b = b + screen.H / 4;
+
+        if(want_l < section.X)
+            want_l = section.X;
+        if(want_r > section.Width)
+            want_r = section.Width;
+        if(want_t < section.Y)
+            want_t = section.Y;
+        if(want_b > section.Height)
+            want_b = section.Height;
+
+        if(want_r - want_l > use_width)
+            use_width = want_r - want_l;
+
+        if(want_b - want_t > use_height)
+            use_height = want_b - want_t;
+
+        use_width  = SDL_min(use_width,  static_cast<double>(screen.visible_screen().W));
+        use_height = SDL_min(use_height, static_cast<double>(screen.visible_screen().H));
+
+        vscreen.Width = use_width;
+        vscreen.Height = use_height;
+    }
+
+    use_width  = SDL_min(use_width,  section.Width  - section.X);
+    use_height = SDL_min(use_height, section.Height - section.Y);
 
     vscreen.X = -(l + r) / 2 + (use_width * 0.5);
     vscreen.Y = vscreen.Y / (plr_count + 1) + (use_height * 0.5) - vScreenYOffset;
 
     // allow some overscan (needed for 3DS)
     int allow_X = (g_config.allow_multires && vscreen.Width == XRender::TargetW && !Screens[vscreen.screen_ref].is_canonical()) ? XRender::TargetOverscanX : 0;
-
-    // don't do overscan if at the level bounds
-    if(allow_X > 0 && section.Width - section.X <= vscreen.Width)
-        allow_X = 0;
 
     if(-vscreen.X < section.X - allow_X)
         vscreen.X = -(section.X - allow_X);

@@ -53,6 +53,7 @@
 #include "graphics/gfx_camera.h"
 #include "graphics/gfx_update.h"
 #include "npc/npc_activation.h"
+#include "npc/npc_queues.h"
 #include "translate_episode.h"
 #include "fontman/font_manager.h"
 
@@ -215,6 +216,14 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
     if(!lvl.custom_params.empty())
     {
         // none supported yet
+    }
+
+    // FIXME: disable this if the file indicates that it is already sorted
+    if(g_config.emulate_classic_block_order && FileFormat == FileFormats::LVL_PGEX)
+    {
+        FileFormats::smbx64LevelPrepare(lvl);
+        FileFormats::smbx64LevelSortBlocks(lvl);
+        FileFormats::smbx64LevelSortBGOs(lvl);
     }
 
     numBlock = 0;
@@ -1117,6 +1126,7 @@ void ClearLevel()
 
     invalidateDrawBlocks();
     invalidateDrawBGOs();
+    NPCQueues::clear();
 
     AutoUseModern = false;
 

@@ -825,8 +825,6 @@ void ClassicNPCScreenLogic(int Z, int numScreens, bool fill_draw_queue, NPC_Draw
     // from each NPC check in the original UpdateGraphics to determine how to handle each NPC
     for(int A : checkNPCs)
     {
-        g_stats.checkedNPCs++;
-
         bool has_ALoc = false;
         bool check_both_reset = false;
         bool check_long_life = false;
@@ -1090,8 +1088,6 @@ void ModernNPCScreenLogic(Screen_t& screen, int vscreen_i, bool fill_draw_queue,
 
     for(int A : checkNPCs)
     {
-        g_stats.checkedNPCs++;
-
         // there are three related things we will determine:
         // - is the NPC onscreen for rendering?
         // - can we reset the NPC (respawn it to its original location)?
@@ -1382,11 +1378,15 @@ void UpdateGraphics(bool skipRepaint)
     if(g_config.enable_frameskip && !TakeScreen && frameSkipNeeded())
         Do_FrameSkip = true;
 
+    g_microStats.start_task(MicroStats::Camera);
+
     UpdateGraphicsLogic(Do_FrameSkip);
 
     // we've now done all the logic that UpdateGraphics can do.
     if(Do_FrameSkip)
         return;
+
+    g_microStats.start_task(MicroStats::Graphics);
 
     UpdateGraphicsDraw(skipRepaint);
 }
@@ -1649,8 +1649,6 @@ void UpdateGraphicsLogic(bool Do_FrameSkip)
             {
                 for(int A = 1; A <= numNPCs; A++)
                 {
-                    g_stats.checkedNPCs++;
-
                     if(NPC[A].Hidden)
                         continue;
 
@@ -1958,7 +1956,7 @@ void UpdateGraphicsScreen(Screen_t& screen)
 
         for(Block_t& b : screenSBlocks) // Display sizable blocks
         {
-            g_stats.checkedSzBlocks++;
+            g_stats.checkedBlocks++;
             if(/*BlockIsSizable[b.Type] &&*/ (!b.Invis || LevelEditor))
             {
                 double bLeftOnscreen = camX + b.Location.X;
@@ -1975,7 +1973,7 @@ void UpdateGraphicsScreen(Screen_t& screen)
                 if(bBottomOnscreen < 0)
                     continue;
 
-                g_stats.renderedSzBlocks++;
+                g_stats.renderedBlocks++;
 
                 int left_sx = 0;
                 if(bLeftOnscreen <= -32)
@@ -2480,7 +2478,6 @@ void UpdateGraphicsScreen(Screen_t& screen)
         //'effects in back
         for(int A = 1; A <= numEffects; A++)
         {
-            g_stats.checkedEffects++;
             if(Effect[A].Type == EFFID_BOSS_FRAGILE_DIE || Effect[A].Type == EFFID_DOOR_S2_OPEN || Effect[A].Type == EFFID_DOOR_DOUBLE_S3_OPEN ||
                Effect[A].Type == EFFID_DOOR_SIDE_S3_OPEN || Effect[A].Type == EFFID_PLR_FIREBALL_TRAIL || Effect[A].Type == EFFID_COIN_SWITCH_PRESS ||
                Effect[A].Type == EFFID_SPINBLOCK || Effect[A].Type == EFFID_BIG_DOOR_OPEN || Effect[A].Type == EFFID_LAVA_MONSTER_LOOK ||
@@ -2911,7 +2908,6 @@ void UpdateGraphicsScreen(Screen_t& screen)
         // effects on top
         For(A, 1, numEffects)
         {
-            g_stats.checkedEffects++;
             auto &e = Effect[A];
 
             if(e.Type != EFFID_BOSS_FRAGILE_DIE && e.Type != EFFID_DOOR_S2_OPEN && e.Type != EFFID_DOOR_DOUBLE_S3_OPEN && e.Type != EFFID_DOOR_SIDE_S3_OPEN &&

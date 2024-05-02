@@ -1428,6 +1428,8 @@ void UpdateEvents()
 
     if(!GameMenu)
     {
+        // be sure to keep in sync with UpdateLayers code above.
+        // possibly undesirable: doesn't advance event timer at all if any players are (for example) in doors or in holding pattern
         for(B = 1; B <= numPlayers; B++)
         {
             if(!(Player[B].Effect == 0 || Player[B].Effect == 3 || Player[B].Effect == 9 || Player[B].Effect == 10))
@@ -1525,6 +1527,8 @@ void UpdateLayers()
 
     if(!GameMenu)
     {
+        // be sure to keep in sync with UpdateEvents code above.
+        // possibly undesirable: doesn't advance layer movement at all if any players are (for example) in doors or in holding pattern
         for(B = 1; B <= numPlayers; B++)
         {
             if(!(Player[B].Effect == 0 || Player[B].Effect == 3 || Player[B].Effect == 9 || Player[B].Effect == 10))

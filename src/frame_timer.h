@@ -37,9 +37,10 @@ public:
         Blocks,
         Effects,
         Player,
+        Camera,
         Graphics,
-        Sound,
         Events,
+        Sound,
         TASK_END
     };
 
@@ -52,9 +53,10 @@ public:
         "Blk",
         "Eff",
         "Plr",
+        "Cam",
         "Gfx",
-        "Snd",
         "Evt",
+        "Snd",
     };
 
 private:
@@ -84,17 +86,17 @@ struct PerformanceStats_t
 {
     // How many objects got drawn in one frame
     int renderedBlocks = 0;
-    int renderedSzBlocks = 0;
+    // int renderedSzBlocks = 0; // combined with normal blocks
     int renderedBGOs = 0;
     int renderedNPCs = 0;
     int renderedEffects = 0;
 
     // How many objects got scanned to find what to render
     int checkedBlocks = 0;
-    int checkedSzBlocks = 0;
+    // int checkedSzBlocks = 0;
     int checkedBGOs = 0;
-    int checkedNPCs = 0;
-    int checkedEffects = 0;
+    // int checkedNPCs = 0; // use active NPCs
+    // int checkedEffects = 0; // use total effects
 
     int renderedTiles = 0;
     int renderedScenes = 0;
@@ -106,18 +108,19 @@ struct PerformanceStats_t
     int checkedPaths = 0;
     int checkedLevels = 0;
 
-    // How many objects got checked during the physics processing
-    int physScannedBlocks = 0;
-    int physScannedBGOs = 0;
-    int physScannedNPCs = 0;
-
-    bool enabled = false;
+    int page = 0;
 
     // Displays title of the music OR filename
     std::string currentMusic;
     std::string currentMusicFile;
 
+    void next_page();
+
     void reset();
+    void print_filenames(int x, int y);
+    void print_obj_stats(int x, int y);
+    void print_cpu_stats(int x, int y);
+    // void print_ram_stats();
     void print();
 };
 

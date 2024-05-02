@@ -464,7 +464,6 @@ static void write_status()
     {
         g_stats.renderedNPCs = 0;
         g_stats.renderedBlocks = 0;
-        g_stats.renderedSzBlocks = 0;
         g_stats.renderedBGOs = 0;
     }
 
@@ -488,7 +487,7 @@ static void write_status()
 
     fprintf(record_file, "numActiveNPCs %d\r\n", numActiveNPCs);
     fprintf(record_file, "numRenderNPCs %d\r\nnumRenderBlocks %d\r\nnumRenderBGOs %d\r\n",
-        g_stats.renderedNPCs, g_stats.renderedBlocks + g_stats.renderedSzBlocks, g_stats.renderedBGOs);
+        g_stats.renderedNPCs, g_stats.renderedBlocks, g_stats.renderedBGOs);
 
     for(int i = 1; i <= numPlayers; i++)
     {
@@ -505,7 +504,6 @@ static void read_status()
     {
         g_stats.renderedNPCs = 0;
         g_stats.renderedBlocks = 0;
-        g_stats.renderedSzBlocks = 0;
         g_stats.renderedBGOs = 0;
     }
 
@@ -588,9 +586,9 @@ static void read_status()
         diverged_minor = true;
     }
 
-    if(o_renderedBlocks != g_stats.renderedBlocks + g_stats.renderedSzBlocks)
+    if(o_renderedBlocks != g_stats.renderedBlocks)
     {
-        pLogWarning("renderedBlocks diverged (old: %d, new: %d) at frame %" PRId64 ".", o_renderedBlocks, g_stats.renderedBlocks + g_stats.renderedSzBlocks, frame_no);
+        pLogWarning("renderedBlocks diverged (old: %d, new: %d) at frame %" PRId64 ".", o_renderedBlocks, g_stats.renderedBlocks, frame_no);
         diverged_minor = true;
     }
 
