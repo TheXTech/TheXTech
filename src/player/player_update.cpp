@@ -220,6 +220,9 @@ void UpdatePlayer()
 
             bool player_timer_done = (Player[A].TimeToLive >= 200);
 
+            // checks if the dead player can move towards a target location
+            bool player_can_move = (player_timer_done || shared_screen || !normal_multiplayer);
+
             // there was a guard here that has now been moved into the subclauses
             // if(Player[A].TimeToLive >= 200 || ScreenType != 5)
             B = CheckNearestLiving(A);
@@ -236,6 +239,10 @@ void UpdatePlayer()
                     break;
                 }
             }
+
+            // allow smooth panning in cloned player mode
+            if(g_compatibility.multiplayer_pause_controls && !normal_multiplayer && g_ClonedPlayerMode && B == 0 && someone_else_alive)
+                B = 1;
 
             // move dead player towards start point in BattleMode
             bool battle_respawn = (BattleMode && BattleLives[A] > 0 && someone_else_alive && BattleWinner == 0);
@@ -263,7 +270,7 @@ void UpdatePlayer()
                 }
             }
 
-            if(B > 0 && player_timer_done) // Move camera to the other living players
+            if(B > 0 && player_can_move) // Move camera to the other living players
             {
                 if(normal_multiplayer)
                 {
@@ -277,7 +284,10 @@ void UpdatePlayer()
                 {
                     const vScreen_t& vscreen = screen.vScreen(screen.active_begin() + 1);
                     A1 = (float)((-vscreen.X + vscreen.Width * 0.5) - (Player[A].Location.X + Player[A].Location.Width * 0.5));
-                    B1 = (float)((-vscreen.Y + vscreen.Height * 0.5) - Player[A].Location.Y);
+                    if(!g_compatibility.multiplayer_pause_controls)
+                        B1 = (float)((-vscreen.Y + vscreen.Height * 0.5) - Player[A].Location.Y);
+                    else
+                        B1 = (float)((-vscreen.Y + vscreen.Height * 0.5) - Player[A].Location.Y - Player[A].Location.Height);
                 }
 
                 C1 = std::sqrt((A1 * A1) + (B1 * B1));
@@ -310,7 +320,7 @@ void UpdatePlayer()
                     KillPlayer(A);
 
                     // new logic: mark which player A's ghost is following
-                    if(Player[A].Dead)
+                    if(normal_multiplayer && Player[A].Dead)
                     {
                         Player[A].Effect2 = -B;
 
