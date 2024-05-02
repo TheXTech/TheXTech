@@ -1149,6 +1149,7 @@ void ModernNPCScreenLogic(Screen_t& screen, int vscreen_i, bool fill_draw_queue,
                    ForcedControls
                 || LevelMacro != LEVELMACRO_OFF
                 || qScreen_canonical
+                || !g_compatibility.dynamic_camera_logic
                 || NPC_MustBeCanonical(A)
             )
                 can_activate = onscreen_canonical;

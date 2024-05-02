@@ -101,6 +101,7 @@ struct Compatibility_t
     bool fix_switched_block_clipping; // don't let blocks become intangible to NPCs after coin switch
     // 1.3.7
     bool modern_npc_camera_logic; // NPCs should support more than two cameras, and consider the event logic camera when activating
+    bool dynamic_camera_logic;    // use visible onscreen camera to determine NPC spawn behavior
     bool allow_multires;
     bool disable_background2_tiling;
     bool world_map_lvlname_marquee;

@@ -132,6 +132,7 @@ static void compatInit(Compatibility_t &c)
     c.fix_switched_block_clipping = true;
     // 1.3.7
     c.modern_npc_camera_logic = true;
+    c.dynamic_camera_logic = true;
     c.allow_multires = true;
     c.disable_background2_tiling = false;
     c.world_map_lvlname_marquee = false;
@@ -193,8 +194,7 @@ static void compatInit(Compatibility_t &c)
         c.fix_npc_emerge_size = false;
         c.fix_switched_block_clipping = false;
         // 1.3.7
-        c.modern_npc_camera_logic = false;
-        c.allow_multires = false;
+        c.dynamic_camera_logic = false;
     }
 
     if(s_compatLevel >= COMPAT_SMBX13) // Strict vanilla SMBX
@@ -207,6 +207,8 @@ static void compatInit(Compatibility_t &c)
         c.pound_by_alt_run = false;
         // 1.3.7
         c.modern_lives_system = false;
+        c.modern_npc_camera_logic = false;
+        c.allow_multires = false;
 #ifdef __3DS__
         c.tune_bgo_order = false;
 #endif
@@ -457,6 +459,7 @@ static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
         compat.read("fix-switched-block-clipping", c.fix_switched_block_clipping, c.fix_switched_block_clipping);
         // 1.3.7 (but these will be changed in the Compat update)
         compat.read("modern-npc-camera-logic", c.modern_npc_camera_logic, c.modern_npc_camera_logic);
+        compat.read("dynamic-camera-logic", c.dynamic_camera_logic, c.dynamic_camera_logic);
         compat.read("allow-multires", c.allow_multires, c.allow_multires);
         compat.read("disable-background2-tiling", c.disable_background2_tiling, c.disable_background2_tiling);
         compat.read("world-map-lvlname-marquee", c.world_map_lvlname_marquee, c.world_map_lvlname_marquee);

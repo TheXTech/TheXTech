@@ -222,11 +222,16 @@ void UpdateInternalRes()
         XRender::TargetH = req_h;
     }
 
-    // TODO: above should tweak render target resolution. This should tweak game's screen resolution.
-    if(g_compatibility.allow_multires)
+    // DONE: above should tweak render target resolution. This should tweak game's screen resolution.
+    if(g_compatibility.allow_multires && g_compatibility.dynamic_camera_logic)
     {
         l_screen->W = XRender::TargetW;
         l_screen->H = XRender::TargetH;
+    }
+    else if(g_compatibility.allow_multires)
+    {
+        l_screen->W = SDL_min(XRender::TargetW, canon_w);
+        l_screen->H = SDL_min(XRender::TargetH, canon_h);
     }
     else
     {
