@@ -219,6 +219,14 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         // none supported yet
     }
 
+    // FIXME: disable this if the file indicates that it is already sorted
+    if(g_compatibility.emulate_classic_block_order && FileFormat == FileFormats::LVL_PGEX)
+    {
+        FileFormats::smbx64LevelPrepare(lvl);
+        FileFormats::smbx64LevelSortBlocks(lvl);
+        FileFormats::smbx64LevelSortBGOs(lvl);
+    }
+
     numBlock = 0;
     numBackground = 0;
     numLocked = 0;
