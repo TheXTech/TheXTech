@@ -233,9 +233,13 @@ void UpdatePlayer()
                 if(o_A == A)
                     continue;
 
-                if(!Player[o_A].Dead || BattleLives[o_A] > 0)
+                if(!Player[o_A].Dead || (BattleMode && BattleLives[o_A] > 0))
                 {
                     someone_else_alive = true;
+
+                    if(shared_screen && B == 0 && Player[o_A].TimeToLive < Player[A].TimeToLive)
+                        B = o_A;
+
                     break;
                 }
             }
@@ -272,7 +276,16 @@ void UpdatePlayer()
 
             if(B > 0 && player_can_move) // Move camera to the other living players
             {
-                if(normal_multiplayer)
+                if(shared_screen)
+                {
+                    const vScreen_t& vscreen = screen.vScreen(screen.active_begin() + 1);
+                    A1 = (Player[B].Location.X + Player[B].Location.Width * 0.5) - (Player[A].Location.X + Player[A].Location.Width * 0.5);
+                    if(!g_compatibility.multiplayer_pause_controls)
+                        B1 = (float)((-vscreen.Y + vscreen.Height * 0.5) - Player[A].Location.Y);
+                    else
+                        B1 = (float)((-vscreen.Y + vscreen.Height * 0.5) - Player[A].Location.Y - Player[A].Location.Height);
+                }
+                else if(normal_multiplayer)
                 {
                     A1 = (Player[B].Location.X + Player[B].Location.Width * 0.5) - (Player[A].Location.X + Player[A].Location.Width * 0.5);
                     if(!g_compatibility.multiplayer_pause_controls)
@@ -320,7 +333,7 @@ void UpdatePlayer()
                     KillPlayer(A);
 
                     // new logic: mark which player A's ghost is following
-                    if(normal_multiplayer && Player[A].Dead)
+                    if(normal_multiplayer && !shared_screen && Player[A].Dead)
                     {
                         Player[A].Effect2 = -B;
 
