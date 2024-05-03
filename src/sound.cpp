@@ -107,7 +107,8 @@ static Mix_Music *g_curMusic = nullptr;
 static bool g_mixerLoaded = false;
 
 //! most recent argument to StartMusic. Could be a world map music ID or a section index.
-static int  s_recentMusicA = 0;
+static constexpr int s_null_music = -5;
+static int s_recentMusicA = s_null_music;
 
 static int g_customLvlMusicId = 24;
 static int g_customWldMusicId = 17;
@@ -364,10 +365,10 @@ void InitMixerX()
 
 void RestartMixerX()
 {
-    constexpr int null_music = -5;
+    int recent_music = s_recentMusicA;
 
-    if(!musicPlaying)
-        s_recentMusicA = null_music;
+    if(g_mixerLoaded && !musicPlaying)
+        recent_music = s_null_music;
 
     UnloadSound();
     QuitMixerX();
@@ -376,8 +377,8 @@ void RestartMixerX()
     InitSound();
     LoadCustomSound();
 
-    if(s_recentMusicA != null_music)
-        StartMusic(s_recentMusicA);
+    if(recent_music != s_null_music)
+        StartMusic(recent_music);
 }
 
 void QuitMixerX()
@@ -827,13 +828,17 @@ void StartMusic(int A, int fadeInMs)
 
     D_pLogDebug("Start music A=%d", A);
 
-    s_recentMusicA = A;
-
-    if(!g_mixerLoaded)
+    if(!g_mixerLoaded || (int)g_config.audio_mus_volume == 0)
     {
+        if(g_mixerLoaded && g_curMusic)
+            StopMusic();
+
         // Keep world map music being remembered when sound disabled
         if((LevelSelect || WorldEditor) && !GameMenu && !GameOutro)
             curWorldMusic = A;
+
+        s_recentMusicA = A;
+        musicPlaying = true;
 
         return;
     }
@@ -933,6 +938,7 @@ void StartMusic(int A, int fadeInMs)
         musicName = std::move(mus);
     }
 
+    s_recentMusicA = A;
     musicPlaying = true;
 }
 
@@ -968,6 +974,7 @@ void StopMusic()
     }
     g_curMusic = nullptr;
     musicPlaying = false;
+    s_recentMusicA = s_null_music;
     g_stats.currentMusic.clear();
     g_stats.currentMusicFile.clear();
 }
@@ -981,6 +988,7 @@ void FadeOutMusic(int ms)
     if(g_curMusic)
         Mix_FadeOutMusicStream(g_curMusic, ms);
     musicPlaying = false;
+    s_recentMusicA = s_null_music;
 }
 
 void UpdateMusicVolume()
@@ -989,7 +997,14 @@ void UpdateMusicVolume()
         return;
 
     if(g_curMusic)
-        Mix_VolumeMusicStream(g_curMusic, s_musicDefaultVolume * g_config.audio_mus_volume / 100);
+    {
+        if((int)g_config.audio_mus_volume == 0)
+            StartMusic(s_recentMusicA); // will actually STOP it
+        else
+            Mix_VolumeMusicStream(g_curMusic, s_musicDefaultVolume * g_config.audio_mus_volume / 100);
+    }
+    else if(s_recentMusicA != s_null_music)
+        StartMusic(s_recentMusicA); // will restart it
 }
 
 void PlayInitSound()
