@@ -209,10 +209,23 @@ void TouchBonus(int A, int B)
         int sfx_grow_item      = (Player[A].Character == 5) ? SFX_HeroHeart : SFX_PlayerGrow;
         int sfx_transform_item = (Player[A].Character == 5) ? SFX_HeroHeart : SFX_Transform;
 
+        // moved up here so that the hearts logic works
+        NPCID civilian_type = NPCID(0);
+
+        if(NPCIsToad(NPC[B]))
+        {
+            civilian_type = NPC[B].Type;
+            NPC[B].Type = NPCID_POWER_S3;
+        }
+
         // give hearts to heart chars
         if(Player[A].Character == 3 || Player[A].Character == 4 || Player[A].Character == 5)
         {
-            if(NPC[B].Type == NPCID_LEAF_POWER || NPC[B].Type == NPCID_STATUE_POWER || NPC[B].Type == NPCID_HEAVY_POWER)
+            // only the first three types were checked in SMBX 1.3, the others were moved here for simplicity
+            if(NPC[B].Type == NPCID_LEAF_POWER || NPC[B].Type == NPCID_STATUE_POWER || NPC[B].Type == NPCID_HEAVY_POWER
+                || NPC[B].Type == NPCID_POWER_S3 || NPC[B].Type == NPCID_POWER_S1 || NPC[B].Type == NPCID_POWER_S4 || NPC[B].Type == NPCID_POWER_S2 || NPC[B].Type == NPCID_POWER_S5
+                || NPC[B].Type == NPCID_FIRE_POWER_S3 || NPC[B].Type == NPCID_FIRE_POWER_S1 || NPC[B].Type == NPCID_FIRE_POWER_S4
+                || NPC[B].Type == NPCID_ICE_POWER_S3 || NPC[B].Type == NPCID_ICE_POWER_S4)
             {
                 Player[A].Hearts += 1;
 
@@ -369,27 +382,12 @@ void TouchBonus(int A, int B)
             return;
         }
 
-        NPCID civilian_type = NPCID(0);
-
-        if(NPCIsToad(NPC[B]))
-        {
-            civilian_type = NPC[B].Type;
-            NPC[B].Type = NPCID_POWER_S3;
-        }
-
         if(NPC[B].Type == NPCID_POISON) // Bonus is a POISON mushroom
             PlayerHurt(A);
         else if(NPC[B].Type == NPCID_POWER_S3 || NPC[B].Type == NPCID_POWER_S1 || NPC[B].Type == NPCID_POWER_S4 || NPC[B].Type == NPCID_POWER_S2 || NPC[B].Type == NPCID_POWER_S5) // Bonus is a mushroom
         {
             if(Player[A].Character == 5 && Player[A].State == 1)
                 Player[A].State = 2;
-
-            if(Player[A].Character == 3 || Player[A].Character == 4 || Player[A].Character == 5)
-            {
-                Player[A].Hearts += 1;
-                if(Player[A].Hearts > 3)
-                    Player[A].Hearts = 3;
-            }
 
             UpdatePlayerBonus(A, NPC[B].Type);
 
@@ -419,13 +417,6 @@ void TouchBonus(int A, int B)
         }
         else if(NPC[B].Type == NPCID_FIRE_POWER_S3 || NPC[B].Type == NPCID_FIRE_POWER_S1 || NPC[B].Type == NPCID_FIRE_POWER_S4) // Bonus is a fire flower
         {
-            if(Player[A].Character == 3 || Player[A].Character == 4 || Player[A].Character == 5)
-            {
-                Player[A].Hearts += 1;
-                if(Player[A].Hearts > 3)
-                    Player[A].Hearts = 3;
-            }
-
             UpdatePlayerBonus(A, NPC[B].Type);
             Player[A].StateNPC = NPC[B].Type;
 
@@ -447,13 +438,6 @@ void TouchBonus(int A, int B)
         }
         else if(NPC[B].Type == NPCID_ICE_POWER_S3 || NPC[B].Type == NPCID_ICE_POWER_S4) // Bonus is an ice flower
         {
-            if(Player[A].Character == 3 || Player[A].Character == 4 || Player[A].Character == 5)
-            {
-                Player[A].Hearts += 1;
-                if(Player[A].Hearts > 3)
-                    Player[A].Hearts = 3;
-            }
-
             UpdatePlayerBonus(A, NPC[B].Type);
             Player[A].StateNPC = NPC[B].Type;
 
