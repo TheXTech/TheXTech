@@ -130,6 +130,8 @@ static void compatInit(Compatibility_t &c)
     c.fix_visual_bugs = true;
     c.fix_npc_emerge_size = true;
     c.fix_switched_block_clipping = true;
+    // 1.3.6.6
+    c.fix_vehicle_altjump_bug = true;
     // 1.3.7
     c.modern_npc_camera_logic = true;
     c.dynamic_camera_logic = true;
@@ -207,6 +209,8 @@ static void compatInit(Compatibility_t &c)
         c.fix_player_clip_wall_at_npc = false;
         // 1.3.6.3
         c.pound_by_alt_run = false;
+        // 1.3.6.6
+        c.fix_vehicle_altjump_bug = false;
         // 1.3.7
         c.modern_lives_system = false;
         c.modern_npc_camera_logic = false;
@@ -459,6 +463,8 @@ static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
         compat.read("fix-visual-bugs", c.fix_visual_bugs, c.fix_visual_bugs);
         compat.read("fix-npc-emerge-size", c.fix_npc_emerge_size, c.fix_npc_emerge_size);
         compat.read("fix-switched-block-clipping", c.fix_switched_block_clipping, c.fix_switched_block_clipping);
+        // 1.3.6.6
+        compat.read("fix-vehicle-altjump-bug", c.fix_vehicle_altjump_bug, c.fix_vehicle_altjump_bug);
         // 1.3.7 (but these will be changed in the Compat update)
         compat.read("modern-npc-camera-logic", c.modern_npc_camera_logic, c.modern_npc_camera_logic);
         compat.read("dynamic-camera-logic", c.dynamic_camera_logic, c.dynamic_camera_logic);

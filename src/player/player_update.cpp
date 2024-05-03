@@ -4576,12 +4576,17 @@ void UpdatePlayer()
                        (Player[A].HoldingNPC == 0 || Player[A].Character == 5))
                     {
                         UnDuck(Player[A]);
+
                         if(g_compatibility.fix_char5_vehicle_climb && Player[A].Fairy) // Avoid the mortal glitch
                         {
                             Player[A].Fairy = false;
                             PlaySoundSpatial(SFX_HeroFairy, Player[A].Location);
                             NewEffect(EFFID_SMOKE_S5, Player[A].Location);
                         }
+
+                        if(g_compatibility.fix_vehicle_altjump_bug)
+                            Player[A].SpinJump = false;
+
                         Player[A].Location = NPC[B].Location;
                         Player[A].Mount = 2;
                         NPC[B].Killed = 9;
