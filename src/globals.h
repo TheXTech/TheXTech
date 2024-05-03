@@ -752,7 +752,7 @@ struct Player_t
 //    StandingOnNPC As Integer 'The NPC the player is standing on
     int StandingOnNPC = 0;
 //    StandingOnTempNPC As Integer 'The NPC the player is standing on
-    int StandingOnTempNPC = 0;
+    int StandingOnVehiclePlr = 0;
 //    UnStart As Boolean 'Player let go of the start button
     bool UnStart = false;
 //    mountBump As Single 'Player hit something while in a mount

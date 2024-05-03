@@ -714,7 +714,7 @@ void SetupPlayers()
         Player[A].Pinched = PinchedInfo_t();
 
         Player[A].StandingOnNPC = 0;
-        Player[A].StandingOnTempNPC = 0;
+        Player[A].StandingOnVehiclePlr = 0;
         Player[A].HoldingNPC = 0;
         Player[A].Dead = false;
         //        if(nPlay.Online && nPlay.Mode == 0)
@@ -3448,10 +3448,11 @@ void PlayerDismount(const int A)
         {
             if(B != A && Player[B].Mount != 2 && CheckCollision(Player[A].Location, Player[B].Location))
                 Player[B].Location.Y = Player[A].Location.Y - Player[B].Location.Height;
-            if(Player[B].StandingOnTempNPC == 56)
+
+            if(Player[B].StandingOnVehiclePlr == 56)
             {
                 Player[B].StandingOnNPC = numNPCs;
-                Player[B].StandingOnTempNPC = 0;
+                Player[B].StandingOnVehiclePlr = 0;
             }
         }
 
@@ -4317,7 +4318,7 @@ void ClownCar()
 
             for(B = 1; B <= numPlayers; B++)
             {
-                if(Player[B].StandingOnTempNPC == 56)
+                if(Player[B].StandingOnVehiclePlr == 56)
                 {
                     Player[B].StandingOnNPC = numNPCs;
                     Player[B].Location.X += double(Player[A].mountBump);
