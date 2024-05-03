@@ -31,6 +31,7 @@ void config_mountdrums_set();
 void config_screenmode_set();
 void config_audiofx_set();
 void config_audio_set();
+void config_music_volume_set();
 void config_log_level_set();
 void config_integrations_set();
 void config_compat_changed();

@@ -126,6 +126,14 @@ void config_audio_set()
         UpdateSoundFX(Player[1].Section);
 }
 
+void config_music_volume_set()
+{
+    if(!GameIsActive)
+        return;
+
+    UpdateMusicVolume();
+}
+
 void config_language_set()
 {
     if(!GameIsActive)

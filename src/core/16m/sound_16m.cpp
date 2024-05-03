@@ -384,6 +384,11 @@ void FadeOutMusic(int ms)
 }
 
 
+void UpdateMusicVolume()
+{
+    // currently unused
+}
+
 void PlayInitSound()
 {
     if(!g_mixerLoaded)

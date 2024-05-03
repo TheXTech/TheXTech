@@ -387,6 +387,13 @@ public:
         "audio-channels", "Channels", nullptr,
         config_audio_set};
 
+    opt_range<int> audio_mus_volume{this, {0, 100, 5}, defaults(100), {}, Scope::UserGlobal,
+        "audio-music-volume", "Music volume", nullptr,
+        config_music_volume_set};
+
+    opt_range<int> audio_sfx_volume{this, {0, 100, 5}, defaults(100), {}, Scope::UserGlobal,
+        "audio-sfx-volume", "SFX volume", nullptr};
+
     /* ---- Audio - Preferences ----*/
     subsection audio_preferences{this, "audio-prefs", "Preferences"};
 
@@ -395,7 +402,7 @@ public:
     static constexpr bool sfx_player_grow_with_got_item = false;
 
     opt<bool> sfx_modern{this, defaults(true), {CompatClass::pure_preference, false}, Scope::UserGlobal,
-        "sfx-modern", "Modern SFX", "Use sounds added in TheXTech", nullptr};
+        "sfx-modern", "Modern SFX", "Use sounds added in TheXTech"};
 
 #if 0
     enum

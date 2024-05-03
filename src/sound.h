@@ -250,6 +250,8 @@ void LoadCustomSound();
 // EXTRA: Unload custom-loaded music and sounds, and restore originals
 void UnloadCustomSound();
 
+void UpdateMusicVolume();
+
 void PreloadExtSound(const std::string &path);
 void UnloadExtSounds();
 void PlayExtSound(const std::string &path, int loops = 0, int volume = 128);
