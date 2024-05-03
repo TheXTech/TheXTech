@@ -222,33 +222,53 @@ void TouchBonus(int A, int B)
 
         if(NPC[B].Type == NPCID_SWAP_POWER && numPlayers > 1) // ? mushroom
         {
-            // TODO: generalize this for >2P (find another living player besides A and swap A with it)
+            int touched_power_i = A;
+            int target_i = CheckNearestLiving(A);
 
-            if(!Player[1].Dead && Player[1].TimeToLive == 0 && !Player[2].Dead &&
-                Player[2].TimeToLive == 0 && Player[1].Immune == 0 && Player[2].Immune == 0)
+            // NOTE: this previously used hardcoded 1 and 2; now it targets the living player nearest A, prioritizing local players
+            if(g_ClonedPlayerMode)
             {
-                tempLocation = Player[1].Location;
-                Player[1].Location.X = Player[2].Location.X + Player[2].Location.Width / 2.0 - Player[1].Location.Width / 2.0;
-                Player[1].Location.Y = Player[2].Location.Y + Player[2].Location.Height - Player[1].Location.Height;
-                Player[2].Location.X = tempLocation.X + Player[1].Location.Width / 2.0 - Player[2].Location.Width / 2.0;
-                Player[2].Location.Y = tempLocation.Y + Player[1].Location.Height - Player[2].Location.Height;
-                C = Player[1].Direction;
-                Player[1].Direction = Player[2].Direction;
-                Player[2].Direction = C;
-                C = Player[1].Slope;
-                Player[1].Slope = Player[2].Slope;
-                Player[2].Slope = C;
-                C = Player[1].StandingOnNPC;
-                Player[1].StandingOnNPC = Player[2].StandingOnNPC;
-                Player[2].StandingOnNPC = C;
-                if(Player[1].Immune < 10)
-                    Player[1].Immune = 10;
-                if(Player[2].Immune < 10)
-                    Player[2].Immune = 10;
+                touched_power_i = 1;
+                target_i = 2;
+            }
+
+            Player_t& p_touched = Player[touched_power_i];
+            Player_t& p_target = Player[target_i];
+
+            if(!p_touched.Dead && p_touched.TimeToLive == 0 && !p_target.Dead &&
+                p_target.TimeToLive == 0 && p_touched.Immune == 0 && p_target.Immune == 0)
+            {
+                // tempLocation = p_touched.Location;
+
+                // swap location
+                double touched_X = p_touched.Location.X;
+                double touched_Y = p_touched.Location.Y;
+                p_touched.Location.X = p_target.Location.X + p_target.Location.Width / 2.0  - p_touched.Location.Width / 2.0;
+                p_touched.Location.Y = p_target.Location.Y + p_target.Location.Height       - p_touched.Location.Height;
+                p_target.Location.X  = touched_X           + p_touched.Location.Width / 2.0 - p_target.Location.Width / 2.0;
+                p_target.Location.Y  = touched_Y           + p_touched.Location.Height      - p_target.Location.Height;
+
+                // swap some variables
+                std::swap(p_touched.Direction, p_target.Direction);
+                std::swap(p_touched.Slope, p_target.Slope);
+                std::swap(p_touched.StandingOnNPC, p_target.StandingOnNPC);
+
+                // make players immune
+                if(p_touched.Immune < 10)
+                    p_touched.Immune = 10;
+                if(p_target.Immune < 10)
+                    p_target.Immune = 10;
+
+                // kill the power
                 NPC[B].Killed = 9;
                 NPCQueues::Killed.push_back(B);
-                PlaySoundSpatial(SFX_BossBeat, Player[1].Location);
-                PlaySoundSpatial(SFX_BossBeat, Player[2].Location);
+
+                // play sound in both locations (so both players will hear if remote)
+                int old_pause = SoundPause[SFX_BossBeat];
+                PlaySoundSpatial(SFX_BossBeat, p_touched.Location);
+                SoundPause[SFX_BossBeat] = old_pause;
+                PlaySoundSpatial(SFX_BossBeat, p_target.Location);
+
                 return;
             }
         }
