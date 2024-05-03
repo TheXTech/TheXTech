@@ -350,7 +350,7 @@ void UpdatePlayer()
             {
                 ProcessLastDead(); // Fade out screen if the last player died
             }
-            else if(player_timer_done) // ScreenType = 1
+            else if(!BattleMode && player_timer_done) // ScreenType = 1
             {
                 double old_LocX = Player[A].Location.X;
                 double old_LocY = Player[A].Location.Y;
@@ -2310,7 +2310,7 @@ void UpdatePlayer()
                     }
                 }
 
-                if(Player[A].Location.Y < level[Player[A].Section].Y - Player[A].Location.Height - 32 && Player[A].StandingOnTempNPC == 0)
+                if(Player[A].Location.Y < level[Player[A].Section].Y - Player[A].Location.Height - 32 && Player[A].StandingOnVehiclePlr == 0)
                 {
                     Player[A].Location.Y = level[Player[A].Section].Y - Player[A].Location.Height - 32;
                     if(AutoY[Player[A].Section] != 0.f)
@@ -2432,7 +2432,8 @@ void UpdatePlayer()
                                         {
                                             if(HitSpot != 1)
                                                 HitSpot = 0;
-                                            if(Player[A].Mount == 2 || Player[A].StandingOnTempNPC == 56)
+
+                                            if(Player[A].Mount == 2 || Player[A].StandingOnVehiclePlr != 0)
                                                 HitSpot = 0;
                                         }
 
@@ -4358,7 +4359,7 @@ void UpdatePlayer()
 
                                                         for(int C = 1; C <= numPlayers; C++)
                                                         {
-                                                            if(Player[C].StandingOnTempNPC == 56)
+                                                            if(Player[C].StandingOnVehiclePlr && (g_ClonedPlayerMode || Player[C].StandingOnVehiclePlr == A))
                                                                 Player[C].Location.X += D;
                                                         }
                                                     }
@@ -4504,7 +4505,9 @@ void UpdatePlayer()
 
                 if(Player[A].HoldingNPC == B) // cant hold an npc that you are standing on
                     B = 0;
-                if(B == 0 && Player[A].StandingOnTempNPC > 0 && Player[A].Mount == 0)
+
+                // confusing logic, but safe, because StandingOnNPC gets set in ClownCar()
+                if(B == 0 && Player[A].StandingOnVehiclePlr > 0 && Player[A].Mount == 0)
                     Player[A].Location.SpeedX += (NPC[Player[A].StandingOnNPC].Location.SpeedX + NPC[Player[A].StandingOnNPC].BeltSpeed);
                 else if(B > 0 && Player[A].StandingOnNPC == 0 && NPC[B].playerTemp && Player[A].Location.SpeedY >= 0)
                     Player[A].Location.SpeedX += -(NPC[B].Location.SpeedX + NPC[B].BeltSpeed);
@@ -4551,7 +4554,7 @@ void UpdatePlayer()
                         }
                     }
                     if(NPC[B].playerTemp == 0)
-                        Player[A].StandingOnTempNPC = 0;
+                        Player[A].StandingOnVehiclePlr = 0;
                     if(Player[A].Location.SpeedY >= 0)
                         Player[A].StandingOnNPC = B;
                     Player[A].Location.Y = NPC[B].Location.Y - Player[A].Location.Height;
@@ -4575,12 +4578,17 @@ void UpdatePlayer()
                        (Player[A].HoldingNPC == 0 || Player[A].Character == 5))
                     {
                         UnDuck(Player[A]);
+
                         if(g_config.fix_char5_vehicle_climb && Player[A].Fairy) // Avoid the mortal glitch
                         {
                             Player[A].Fairy = false;
                             PlaySoundSpatial(SFX_HeroFairy, Player[A].Location);
                             NewEffect(EFFID_SMOKE_S5, Player[A].Location);
                         }
+
+                        if(g_config.fix_vehicle_altjump_bug)
+                            Player[A].SpinJump = false;
+
                         Player[A].Location = NPC[B].Location;
                         Player[A].Mount = 2;
                         NPC[B].Killed = 9;
@@ -4591,7 +4599,7 @@ void UpdatePlayer()
                         for(C = 1; C <= numPlayers; ++C)
                         {
                             if(Player[C].StandingOnNPC == B)
-                                Player[C].StandingOnTempNPC = 56;
+                                Player[C].StandingOnVehiclePlr = A;
                         }
                     }
                     else if(Player[A].Mount == 2)
@@ -4610,7 +4618,7 @@ void UpdatePlayer()
                         if(Player[A].Location.X > NPC[Player[A].StandingOnNPC].Location.X + NPC[Player[A].StandingOnNPC].Location.Width || Player[A].Location.X + Player[A].Location.Width < NPC[Player[A].StandingOnNPC].Location.X)
                         {
                             Player[A].StandingOnNPC = 0;
-                            Player[A].StandingOnTempNPC = 0;
+                            Player[A].StandingOnVehiclePlr = 0;
                             if(Player[A].Location.SpeedY > 4.1)
                             {
                                 Player[A].Location.Y += -Player[A].Location.SpeedY;
@@ -4624,12 +4632,14 @@ void UpdatePlayer()
                 }
                 else if(Player[A].Mount == 1 && Player[A].Jump > 0)
                 {
-                    if(B == 0 && Player[A].StandingOnTempNPC > 0)
+                    // confusing logic, but safe, because StandingOnNPC gets set in ClownCar()
+                    if(B == 0 && Player[A].StandingOnVehiclePlr > 0)
                         Player[A].Location.SpeedX += (NPC[Player[A].StandingOnNPC].Location.SpeedX + NPC[Player[A].StandingOnNPC].BeltSpeed);
                     else if(B > 0 && Player[A].StandingOnNPC == 0 && NPC[B].playerTemp)
                         Player[A].Location.SpeedX += -(NPC[B].Location.SpeedX + NPC[B].BeltSpeed);
+
                     Player[A].StandingOnNPC = 0;
-                    Player[A].StandingOnTempNPC = 0;
+                    Player[A].StandingOnVehiclePlr = 0;
                 }
                 else
                 {
@@ -4647,7 +4657,7 @@ void UpdatePlayer()
                         Player[A].Location.Y += Player[A].Location.SpeedY;
                     }
                     Player[A].StandingOnNPC = 0;
-                    Player[A].StandingOnTempNPC = 0;
+                    Player[A].StandingOnVehiclePlr = 0;
                 }
 
                 if(Player[A].StandingOnNPC > 0 && Player[A].Mount == 0) // driving stuff
@@ -4888,7 +4898,7 @@ void UpdatePlayer()
             for(B = 1; B <= numPlayers; B++)
             {
                 if(Player[B].StandingOnNPC == A)
-                    Player[B].StandingOnTempNPC = NPC[A].Type;
+                    Player[B].StandingOnVehiclePlr = NPC[A].Variant; // newly stores the player who owns the vehicle
             }
             NPC[0] = NPC[A]; // was NPC[C] = NPC[A] but C was not mutated
             KillNPC(A, 9);

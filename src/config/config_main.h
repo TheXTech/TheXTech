@@ -841,12 +841,15 @@ public:
     opt<bool> fix_switched_block_clipping{this, defaults(true), {CompatClass::standard_update, false}, Scope::File,
         "fix-switched-block-clipping", "Fix switched block clipping", "Don't let blocks become intangible to NPCs after coin switch"};
 
+    // 1.3.6.6
+    opt<bool> fix_vehicle_altjump_bug{this, defaults(true), {CompatClass::critical_update, false}, Scope::File,
+        "fix-vehicle-altjump-bug", "Fix vehicle AltJump bug", "Don't become vulnerable after AltJump into car"};
 
     // 1.3.7
     opt<bool> fix_npc_camera_logic{this, defaults(true), {CompatClass::critical_update, false}, Scope::File,
         "fix-npc-camera-logic", "Fix NPC camera logic", "NPCs should support more than two cameras"};
-    opt<bool> modern_npc_targeting{this, defaults(true), {CompatClass::standard_update, false}, Scope::File,
-        "modern-npc-targeting", "Modern NPC targeting", "Updated NPC targeting logic in multiplayer"};
+    opt<bool> fix_multiplayer_targeting{this, defaults(true), {CompatClass::standard_update, false}, Scope::File,
+        "fix-multiplayer-targeting", "Fix NPC targeting", "Updated NPC targeting logic in multiplayer"};
     opt<bool> allow_multires{this, defaults(true), {CompatClass::critical_update, false}, Scope::Local,
         "allow-multires", "Allow multires", "Allows the gameplay field to be <800x600", config_res_set};
     opt<bool> dynamic_camera_logic{this, defaults(true), {CompatClass::standard_update, false}, Scope::File,

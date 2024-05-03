@@ -1650,7 +1650,7 @@ public:
         insert(0x00000172, &Player_t::RunRelease);
         insert(0x00000174, &Player_t::JumpRelease);
         insert(0x00000176, &Player_t::StandingOnNPC);
-        insert(0x00000178, &Player_t::StandingOnTempNPC);
+        insert(0x00000178, &Player_t::StandingOnVehiclePlr);
         insert(0x0000017a, &Player_t::UnStart);
         insert(0x0000017c, &Player_t::mountBump);
         insert(0x00000180, &Player_t::SpeedFixY);

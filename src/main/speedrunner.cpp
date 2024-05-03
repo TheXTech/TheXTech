@@ -151,7 +151,7 @@ void RenderControls_priv(int player, const Controls_t* controls, int x, int y, i
     uint8_t alphaText = alpha / 2;
 
     XTColor color;
-    bool drawLabel;
+    bool drawLabel = false;
 
     if(!connect_screen)
         GetControllerColor(player, color, &drawLabel);

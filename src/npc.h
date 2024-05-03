@@ -26,6 +26,8 @@
 #include "global_constants.h"
 
 enum NPCID : vbint_t;
+struct NPC_t;
+struct Player_t;
 
 // Public Sub UpdateNPCs()
 void UpdateNPCs();
@@ -77,5 +79,8 @@ NPCID RandomBonus();
 
 // totally new function, used in the Raft logic
 bool npcHasFloor(const struct NPC_t &npc);
+
+// totally new function, used for compatibility (in compat mode, horizontal distance; in modern mode, squared Euclidean distance)
+double NPCPlayerTargetDist(const NPC_t& npc, const Player_t& player);
 
 #endif // NPC_H
