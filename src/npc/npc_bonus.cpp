@@ -194,6 +194,27 @@ void CheckAfterStarTake(bool many)
     }
 }
 
+static void s_MovePlayersToExit(int got_exit_A)
+{
+    const auto& p_A = Player[got_exit_A];
+
+    for(int C = 1; C <= numPlayers; C++)
+    {
+        if(got_exit_A == C) // And DScreenType <> 5 Then
+            continue;
+
+        auto& p_C = Player[C];
+
+        p_C.Section = p_A.Section;
+        p_C.Location.Y = p_A.Location.Y + p_A.Location.Height      - p_C.Location.Height;
+        p_C.Location.X = p_A.Location.X + p_A.Location.Width / 2.0 - p_C.Location.Width / 2.0;
+        p_C.Location.SpeedX = 0;
+        p_C.Location.SpeedY = 0;
+        p_C.Effect = 8;
+        p_C.Effect2 = -got_exit_A;
+    }
+}
+
 void TouchBonus(int A, int B)
 {
     if(NPC[B].CantHurtPlayer != A || (NPC[B]->IsACoin && Player[A].HoldingNPC != B && NPC[B].Killed == 0))
@@ -648,19 +669,7 @@ void TouchBonus(int A, int B)
 
                 LevelMacro = LEVELMACRO_CARD_ROULETTE_EXIT;
 
-                for(int C = 1; C <= numPlayers; C++)
-                {
-                    if(A != C) // And DScreenType <> 5 Then
-                    {
-                        Player[C].Section = Player[A].Section;
-                        Player[C].Location.Y = Player[A].Location.Y + Player[A].Location.Height - Player[C].Location.Height;
-                        Player[C].Location.X = Player[A].Location.X + Player[A].Location.Width / 2.0 - Player[C].Location.Width / 2.0;
-                        Player[C].Location.SpeedX = 0;
-                        Player[C].Location.SpeedY = 0;
-                        Player[C].Effect = 8;
-                        Player[C].Effect2 = -A;
-                    }
-                }
+                s_MovePlayersToExit(A);
 
                 StopMusic();
                 XEvents::doEvents();
@@ -670,19 +679,7 @@ void TouchBonus(int A, int B)
             {
                 LevelMacro = LEVELMACRO_QUESTION_SPHERE_EXIT;
 
-                for(int C = 1; C <= numPlayers; C++)
-                {
-                    if(A != C) // And DScreenType <> 5 Then
-                    {
-                        Player[C].Section = Player[A].Section;
-                        Player[C].Location.Y = Player[A].Location.Y + Player[A].Location.Height - Player[C].Location.Height;
-                        Player[C].Location.X = Player[A].Location.X + Player[A].Location.Width / 2.0 - Player[C].Location.Width / 2.0;
-                        Player[C].Location.SpeedX = 0;
-                        Player[C].Location.SpeedY = 0;
-                        Player[C].Effect = 8;
-                        Player[C].Effect2 = -A;
-                    }
-                }
+                s_MovePlayersToExit(A);
 
                 StopMusic();
                 PlaySound(SFX_DungeonClear);
@@ -691,19 +688,7 @@ void TouchBonus(int A, int B)
             {
                 LevelMacro = LEVELMACRO_CRYSTAL_BALL_EXIT;
 
-                for(int C = 1; C <= numPlayers; C++)
-                {
-                    if(A != C) // And DScreenType <> 5 Then
-                    {
-                        Player[C].Section = Player[A].Section;
-                        Player[C].Location.Y = Player[A].Location.Y + Player[A].Location.Height - Player[C].Location.Height;
-                        Player[C].Location.X = Player[A].Location.X + Player[A].Location.Width / 2.0 - Player[C].Location.Width / 2.0;
-                        Player[C].Location.SpeedX = 0;
-                        Player[C].Location.SpeedY = 0;
-                        Player[C].Effect = 8;
-                        Player[C].Effect2 = -A;
-                    }
-                }
+                s_MovePlayersToExit(A);
 
                 StopMusic();
                 PlaySound(SFX_CrystalBallExit);
@@ -742,19 +727,7 @@ void TouchBonus(int A, int B)
                 {
                     LevelMacro = LEVELMACRO_STAR_EXIT;
 
-                    for(int C = 1; C <= numPlayers; C++)
-                    {
-                        if(A != C) // And DScreenType <> 5 Then
-                        {
-                            Player[C].Section = Player[A].Section;
-                            Player[C].Location.Y = Player[A].Location.Y + Player[A].Location.Height - Player[C].Location.Height;
-                            Player[C].Location.X = Player[A].Location.X + Player[A].Location.Width / 2.0 - Player[C].Location.Width / 2.0;
-                            Player[C].Location.SpeedX = 0;
-                            Player[C].Location.SpeedY = 0;
-                            Player[C].Effect = 8;
-                            Player[C].Effect2 = -A;
-                        }
-                    }
+                    s_MovePlayersToExit(A);
 
                     StopMusic();
                     PlaySound(SFX_GotStar);
