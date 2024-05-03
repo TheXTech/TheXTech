@@ -399,10 +399,6 @@ public:
     /* ---- Audio - Preferences ----*/
     subsection audio_preferences{this, "audio-prefs", "Preferences"};
 
-    // opt<bool> sfx_player_grow_with_got_item{this, defaults(false), {VER_THEXTECH136, CompatClass::critical_update, false}, Scope::UserGlobal | Scope::CreatorEpisode,
-    //     "sfx-player-grow-with-got-item", "Player grow on get item", "Play \"player grow\" SFX together with \"get item\" SFX like early SNES games"};
-    static constexpr bool sfx_player_grow_with_got_item = false;
-
     opt<bool> sfx_modern{this, defaults(true), {CompatClass::pure_preference, false}, Scope::UserGlobal,
         "sfx-modern", "Modern SFX", "Use sounds added in TheXTech"};
 
