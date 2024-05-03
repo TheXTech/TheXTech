@@ -374,6 +374,7 @@ public:
     /* ---- Audio ----*/
     section audio{this, Scope::UserGlobal, "audio", "Audio", nullptr};
 
+#ifndef __16M__
     opt<bool> audio_enable{this, defaults(true), {}, Scope::UserGlobal,
         "audio-enable", "Enable", nullptr,
         config_audio_set};
@@ -393,6 +394,7 @@ public:
 
     opt_range<int> audio_sfx_volume{this, {0, 100, 5}, defaults(100), {}, Scope::UserGlobal,
         "audio-sfx-volume", "SFX volume", nullptr};
+#endif
 
     /* ---- Audio - Preferences ----*/
     subsection audio_preferences{this, "audio-prefs", "Preferences"};
@@ -422,9 +424,11 @@ public:
         config_mountdrums_set};
 #endif
 
+#ifndef __16M__
     opt<bool> sfx_pet_beat{this, defaults(true), {CompatClass::pure_preference, false}, Scope::UserGlobal,
         "sfx-pet-beat", "Pet grooves", "Play special groove when riding a pet",
         config_mountdrums_set};
+#endif
 
 #ifdef THEXTECH_ENABLE_AUDIO_FX
 

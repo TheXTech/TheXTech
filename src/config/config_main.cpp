@@ -307,7 +307,9 @@ void UpdateConfig()
     {
         ConfigChangeSentinel sent(ConfigSetLevel::game_defaults);
 
+#ifndef __16M__
         g_config.audio_channels = g_audioDefaults.channels;
+#endif
 
 #ifndef THEXTECH_NO_SDL_BUILD
         g_config.audio_sample_rate = g_audioDefaults.sampleRate;
