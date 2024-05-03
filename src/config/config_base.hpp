@@ -55,6 +55,9 @@ class ConfigOption_t;
 template<bool writable, class value_t>
 class ConfigEnumOption_t;
 
+template<bool writable, class value_t>
+class ConfigRangeOption_t;
+
 template<bool writable>
 class ConfigLanguage_t;
 
@@ -136,6 +139,17 @@ struct ConfigEnumValueInfo_t
         : m_value(value), m_internal_name(internal_name), m_display_name(display_name ? display_name : ""), m_display_tooltip(display_tooltip ? display_tooltip : "") {}
 };
 
+template<class value_t>
+struct ConfigRangeInfo_t
+{
+    const value_t min;
+    const value_t max;
+    const value_t step;
+
+    ConfigRangeInfo_t(const value_t min, const value_t max, const value_t step)
+        : min(min), max(max), step(step) {}
+};
+
 // read-only classes
 
 template<>
@@ -203,6 +217,28 @@ public:
             m_enum_values(enum_values) {}
 
     virtual void make_translation(XTechTranslate& translate, const char* cur_section_id) override;
+};
+
+template<class value_t>
+class ConfigRangeOption_t<false, value_t> : public ConfigOption_t<false, value_t>
+{
+public:
+    using BaseConfigOption_t<false>::m_internal_name;
+    using BaseConfigOption_t<false>::m_display_name;
+    using BaseConfigOption_t<false>::m_display_tooltip;
+
+    ConfigRangeInfo_t<value_t> m_range_info;
+
+    ConfigRangeOption_t(_Config_t<false>* parent,
+        const ConfigRangeInfo_t<value_t>& range_info,
+        const value_t default_value,
+        const ConfigCompatInfo_t<value_t>& compat_info, uint8_t scope,
+        const char* internal_name, const char* display_name, const char* display_tooltip,
+        void (*onupdate)() = nullptr, bool (*active)() = nullptr, bool (*validate)(void*) = nullptr) :
+            ConfigOption_t<false, value_t>(parent, default_value, compat_info, scope,
+                internal_name, display_name, display_tooltip,
+                onupdate, active, validate),
+            m_range_info(range_info) {}
 };
 
 template<>
@@ -374,6 +410,31 @@ public:
 
     virtual const std::string& get_display_value(std::string& out) const override;
     virtual const std::string& get_value_tooltip(std::string& out) const override;
+};
+
+template<class value_t>
+class ConfigRangeOption_t<true, value_t> : public ConfigOption_t<true, value_t>
+{
+public:
+    using BaseConfigOption_t<true>::is_set;
+    using BaseConfigOption_t<true>::m_set;
+    using ConfigOption_t<true, value_t>::m_value;
+    using BaseConfigOption_t<true>::m_base;
+    using ConfigOption_t<true, value_t>::operator=;
+    using BaseConfigOption_t<true>::_on_change;
+
+    ConfigRangeOption_t(_Config_t<true>* parent,
+        const ConfigRangeInfo_t<value_t>& range_info,
+        const value_t default_value,
+        const ConfigCompatInfo_t<value_t>& compat_info, uint8_t scope,
+        const char* internal_name, const char* display_name, const char* display_tooltip,
+        void (*onupdate)() = nullptr, bool (*active)() = nullptr, bool (*validate)(void*) = nullptr) :
+            ConfigOption_t<true, value_t>(parent, default_value, compat_info, scope,
+                internal_name, display_name, display_tooltip,
+                onupdate, active, validate) { (void)range_info; }
+
+    virtual bool rotate_left() override;
+    virtual bool rotate_right() override;
 };
 
 template<>

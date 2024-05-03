@@ -69,6 +69,7 @@ public:
 protected:
     template<class value_t> using opt = ConfigOption_t<writable, value_t>;
     template<class value_t> using opt_enum = ConfigEnumOption_t<writable, value_t>;
+    template<class value_t> using opt_range = ConfigRangeOption_t<writable, value_t>;
     using section = ConfigSection_t<writable>;
     using subsection = ConfigSubSection_t<writable>;
     using language_t = ConfigLanguage_t<writable>;

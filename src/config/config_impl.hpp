@@ -621,6 +621,55 @@ const std::string& ConfigEnumOption_t<true, value_t>::get_value_tooltip(std::str
 }
 
 
+// implementation for ConfigRangeOption_t<true, value_t>
+
+template<class value_t>
+bool ConfigRangeOption_t<true, value_t>::rotate_left()
+{
+    const ConfigRangeOption_t<false, value_t>* base = dynamic_cast<const ConfigRangeOption_t<false, value_t>*>(m_base);
+
+    if(!base)
+        return false;
+
+    if(m_value == base->m_range_info.min)
+        return false;
+
+    m_value -= base->m_range_info.step;
+    if(m_value < base->m_range_info.min)
+        m_value = base->m_range_info.min;
+
+    if(!is_set())
+        m_set = ConfigSetLevel::set;
+
+    _on_change();
+
+    return true;
+}
+
+template<class value_t>
+bool ConfigRangeOption_t<true, value_t>::rotate_right()
+{
+    const ConfigRangeOption_t<false, value_t>* base = dynamic_cast<const ConfigRangeOption_t<false, value_t>*>(m_base);
+
+    if(!base)
+        return false;
+
+    if(m_value == base->m_range_info.max)
+        return false;
+
+    m_value += base->m_range_info.step;
+    if(m_value > base->m_range_info.max)
+        m_value = base->m_range_info.max;
+
+    if(!is_set())
+        m_set = ConfigSetLevel::set;
+
+    _on_change();
+
+    return true;
+}
+
+
 // implementation for ConfigLanguage_t<true>
 
 bool ConfigLanguage_t<true>::rotate_left()
