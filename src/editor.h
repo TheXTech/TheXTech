@@ -49,13 +49,14 @@ namespace OptCursor_t
 {
     enum Modes {
         LVL_SELECT = 13,
-        LVL_ERASER = 0,
+        LVL_ERASER = 6,
         LVL_BLOCKS = 1,
         LVL_BGOS = 3,
         LVL_NPCS = 4,
         LVL_SETTINGS = 2,
         LVL_WARPS = 5,
         LVL_WATER = 15,
+        LVL_EVENTS = 17,
         WLD_PATHS = 10,
         WLD_MUSIC = 11,
         WLD_SCENES = 8,
@@ -98,7 +99,5 @@ extern void zTestLevel(bool magicHand = false, bool interProcess = false);
 extern void MouseMove(float X, float Y, bool nCur = false);
 
 extern void ResetNPC(NPCID A);
-
-extern void BlockFill(const Location_t &Loc);
 
 #endif // EDITOR_H

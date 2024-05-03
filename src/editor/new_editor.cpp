@@ -179,6 +179,9 @@ void EditorScreen::EnsureLevel()
 void EditorScreen::ResetCursor()
 {
     EditorCursor.Mode = OptCursor_t::LVL_SELECT;
+    EditorCursor.InteractMode = 0;
+    EditorCursor.InteractFlags = 0;
+    EditorCursor.InteractIndex = 0;
 
     EditorCursor.Block = Block_t();
     EditorCursor.Block.Type = 1;

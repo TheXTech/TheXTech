@@ -1147,6 +1147,17 @@ struct EditorCursor_t
 //    Y As Single
     float Y = -50.0f;
 //    SelectedMode As Integer 'cursor mode. eraser/npc/block/background
+
+    // class of object (uses same enum as Mode)
+    int InteractMode = 0;
+    // NEW: modifiers for type of interaction
+    int InteractFlags = 0;
+    // index of currently interacted / highlighted object
+    int InteractIndex = 0;
+    // coordinates where interaction began
+    int InteractX = 0;
+    int InteractY = 0;
+
 //    Location As Location
     Location_t Location;
 //    Layer As String 'current layer
