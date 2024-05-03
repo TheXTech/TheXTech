@@ -254,6 +254,21 @@ void DrawEditorLevel(int Z)
                 }
             }
         }
+
+        // render event section resizes
+        for(int A = 0; A < numEvents; A++)
+        {
+            const auto& e = Events[A];
+            const auto& sectPos = e.section[curSection].position;
+            if(sectPos.X == EventSection_t::LESet_Nothing || sectPos.X == EventSection_t::LESet_ResetDefault)
+                continue;
+
+            XTColor ev_color = {uint8_t(64 + 128 * (A & 1)), uint8_t(64 + 64 * (A & 2)), uint8_t(64 + 32 * (A & 4))};
+            DrawSimpleFrame(vScreen[Z].X + sectPos.X, vScreen[Z].Y + sectPos.Y, sectPos.Width - sectPos.X, sectPos.Height - sectPos.Y, {0, 0, 0}, ev_color, {0, 0, 0, 0});
+            SuperPrint(g_editorStrings.wordEvent, 3, vScreen[Z].X + sectPos.X + 8, vScreen[Z].Y + sectPos.Y + 8);
+            SuperPrint(e.Name, 3, vScreen[Z].X + sectPos.X + 8, vScreen[Z].Y + sectPos.Y + 28, ev_color);
+            SuperPrint(g_editorStrings.eventsCaseBounds, 3, vScreen[Z].X + sectPos.X + 8, vScreen[Z].Y + sectPos.Y + 48);
+        }
     }
 
 #ifdef __3DS__
