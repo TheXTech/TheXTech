@@ -240,7 +240,7 @@ void TouchBonus(int A, int B)
     // If NPC(B).Type = 34 Or NPC(B).Type = 169 Or NPC(B).Type = 170 Then NPC(B).Type = 9
     // End If
 
-    if(NPC[B].Type == NPCID_SWAP_POWER && numPlayers > 1) // ? mushroom
+    if(NPC[B].Type == NPCID_SWAP_POWER) // ? mushroom
     {
         int touched_power_i = A;
         int target_i = CheckNearestLiving(A);
@@ -255,8 +255,9 @@ void TouchBonus(int A, int B)
         Player_t& p_touched = Player[touched_power_i];
         Player_t& p_target = Player[target_i];
 
-        if(!p_touched.Dead && p_touched.TimeToLive == 0 && !p_target.Dead &&
-            p_target.TimeToLive == 0 && p_touched.Immune == 0 && p_target.Immune == 0)
+        if(target_i != 0
+            && !p_touched.Dead && p_touched.TimeToLive == 0 && p_touched.Immune == 0
+            && !p_target.Dead && p_target.TimeToLive == 0 && p_target.Immune == 0)
         {
             // tempLocation = p_touched.Location;
 
@@ -279,72 +280,48 @@ void TouchBonus(int A, int B)
             if(p_target.Immune < 10)
                 p_target.Immune = 10;
 
-            // kill the power
-            NPC[B].Killed = 9;
-            NPCQueues::Killed.push_back(B);
-
             // play sound in both locations (so both players will hear if remote)
             int old_pause = SoundPause[SFX_BossBeat];
             PlaySoundSpatial(SFX_BossBeat, p_touched.Location);
             SoundPause[SFX_BossBeat] = old_pause;
             PlaySoundSpatial(SFX_BossBeat, p_target.Location);
-
-            return;
         }
     }
-
-    if(NPC[B].Type == NPCID_FLY_POWER) // Player is a fairy
+    else if(NPC[B].Type == NPCID_FLY_POWER) // Player is a fairy
     {
+        // don't kill the powerup if it can't be used!
         if(Player[A].Mount == 2)
             return;
-        else
+
+        if(!Player[A].Fairy)
         {
-            if(!Player[A].Fairy)
-            {
-                Player[A].Immune = 30;
-                Player[A].Effect = 8;
-                Player[A].Effect2 = 4;
-                Player[A].Fairy = true;
-                SizeCheck(Player[A]);
-                NewEffect(EFFID_SMOKE_S5, Player[A].Location);
-            }
-
-            PlaySoundSpatial(SFX_HeroFairy, NPC[B].Location);
-            Player[A].FairyTime = -1;
-
-            NPC[B].Killed = 9;
-            NPCQueues::Killed.push_back(B);
+            Player[A].Immune = 30;
+            Player[A].Effect = 8;
+            Player[A].Effect2 = 4;
+            Player[A].Fairy = true;
+            SizeCheck(Player[A]);
+            NewEffect(EFFID_SMOKE_S5, Player[A].Location);
         }
-    }
 
-    if(NPC[B].Type == NPCID_LIFE_S3 || NPC[B].Type == NPCID_LIFE_S4 || NPC[B].Type == NPCID_LIFE_S1) // player touched a 1up mushroom
+        PlaySoundSpatial(SFX_HeroFairy, NPC[B].Location);
+        Player[A].FairyTime = -1;
+    }
+    else if(NPC[B].Type == NPCID_LIFE_S3 || NPC[B].Type == NPCID_LIFE_S4 || NPC[B].Type == NPCID_LIFE_S1) // player touched a 1up mushroom
     {
-        NPC[B].Killed = 9;
-        NPCQueues::Killed.push_back(B);
         MoreScore(10, NPC[B].Location);
-        return;
     }
-
-    if(NPC[B].Type == NPCID_TIMER_S3 && NPC[B].Effect != NPCEFF_DROP_ITEM && (Player[A].Character == 1 || Player[A].Character == 2)) // send the clock to the item container
+    else if(NPC[B].Type == NPCID_TIMER_S3 && NPC[B].Effect != NPCEFF_DROP_ITEM && (Player[A].Character == 1 || Player[A].Character == 2)) // send the clock to the item container
     {
         Player[A].HeldBonus = NPCID_TIMER_S3;
-        NPC[B].Killed = 9;
-        NPCQueues::Killed.push_back(B);
         PlaySoundSpatial(SFX_GotItem, NPC[B].Location);
-        return;
     }
-
-    if(NPC[B].Type == NPCID_TIMER_S2 || NPC[B].Type == NPCID_TIMER_S3) // player touched the clock
+    else if(NPC[B].Type == NPCID_TIMER_S2 || NPC[B].Type == NPCID_TIMER_S3) // player touched the clock
     {
         PSwitchStop = Physics.NPCPSwitch;
         FreezeNPCs = true;
         PSwitchPlayer = A;
-        NPC[B].Killed = 9;
-        NPCQueues::Killed.push_back(B);
-        return;
     }
-
-    if(NPC[B].Type == NPCID_CHECKPOINT) // player touched the chekpoint
+    else if(NPC[B].Type == NPCID_CHECKPOINT) // player touched the chekpoint
     {
         RumbleForPowerup(A);
 
@@ -354,9 +331,6 @@ void TouchBonus(int A, int B)
             Player[A].Hearts = 2;
         SizeCheck(Player[A]);
 
-        NPC[B].Killed = 9;
-        NPCQueues::Killed.push_back(B);
-
         PlaySoundSpatial(SFX_Checkpoint, NPC[B].Location);
 
         Checkpoint = FullFileName;
@@ -365,27 +339,19 @@ void TouchBonus(int A, int B)
         CheckpointsList.push_back(cp);
         g_curLevelMedals.on_checkpoint();
         pLogDebug("Added checkpoint ID %d", cp.id);
-
-        return;
     }
-
-    if(NPC[B].Type == NPCID_3_LIFE) // player touched the 3up moon
+    else if(NPC[B].Type == NPCID_3_LIFE) // player touched the 3up moon
     {
-        NPC[B].Killed = 9;
-        NPCQueues::Killed.push_back(B);
         MoreScore(12, NPC[B].Location);
-        return;
     }
-
-    if(NPC[B].Type == NPCID_AXE)
+    else if(NPC[B].Type == NPCID_AXE)
     {
-        NPC[B].Killed = 9;
-        NPCQueues::Killed.push_back(B);
-        return;
+        // go straight to code to kill NPC
     }
-
-    if(NPC[B].Type == NPCID_POISON) // Bonus is a POISON mushroom
+    else if(NPC[B].Type == NPCID_POISON) // Bonus is a POISON mushroom
+    {
         PlayerHurt(A);
+    }
     else if(NPC[B].Type == NPCID_POWER_S3 || NPC[B].Type == NPCID_POWER_S1 || NPC[B].Type == NPCID_POWER_S4 || NPC[B].Type == NPCID_POWER_S2 || NPC[B].Type == NPCID_POWER_S5) // Bonus is a mushroom
     {
         if(Player[A].Character == 5 && Player[A].State == 1)
