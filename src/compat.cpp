@@ -100,7 +100,6 @@ static void compatInit(Compatibility_t &c)
     // 1.3.5.3
     // c.require_ground_to_enter_warps = false; // REMOVED SINCE 1.3.6
     c.fix_npc_activation_event_loop_bug = true;
-    c.sfx_player_grow_with_got_item = Compatibility_t::SPGWGI_UNSPECIFIED;
     // 1.3.6
     c.pause_on_disconnect = true;
     c.allow_drop_add = true;
@@ -331,20 +330,6 @@ static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
         compat.read("stop-timer-at", buffer, std::string(c.speedrun_stop_timer_at));
         SDL_strlcpy(c.speedrun_stop_timer_at, buffer.c_str(), sizeof(c.speedrun_stop_timer_at));
         compat.readEnum("blink-effect", c.speedrun_blink_effect, c.speedrun_blink_effect, speedRunBlinkMode);
-    }
-    compat.endGroup();
-
-    compat.beginGroup("effects");
-    {
-        const IniProcessing::StrEnumMap spgwgi
-        {
-            {"unspecified", Compatibility_t::SPGWGI_UNSPECIFIED},
-            {"enable", Compatibility_t::SPGWGI_ENABLE},
-            {"true", Compatibility_t::SPGWGI_ENABLE},
-            {"disable", Compatibility_t::SPGWGI_DISABLE},
-            {"false", Compatibility_t::SPGWGI_DISABLE}
-        };
-        compat.readEnum("sfx-player-grow-with-got-item", c.sfx_player_grow_with_got_item, c.sfx_player_grow_with_got_item, spgwgi);
     }
     compat.endGroup();
 

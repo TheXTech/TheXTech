@@ -93,7 +93,7 @@ extern struct Config_t
     //! Shake screen on Bowser III'rd ground pound
     bool    GameplayShakeScreenBowserIIIrd = true;
     //! Play "player grow" together with the "get item" sound to represent original games behaviour
-    bool    SoundPlayerGrowWithGetItem = false;
+    // bool    SoundPlayerGrowWithGetItem = false; // removed in TheXTech v1.3.7
     //! Enables the inter-level fade effect
     bool    EnableInterLevelFade = true;
     //! Hide an event trigger NPC that is inactive but onscreen

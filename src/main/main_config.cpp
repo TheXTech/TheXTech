@@ -367,7 +367,7 @@ void OpenConfig()
         config.read("enable-thwomp-screen-shake", g_config.GameplayShakeScreenThwomp, true);
         config.read("enable-yoshi-ground-pound-screen-shake", g_config.GameplayShakeScreenPound, true);
         config.read("enable-bowser-iiird-screen-shake", g_config.GameplayShakeScreenBowserIIIrd, true);
-        config.read("sfx-player-grow-with-got-item", g_config.SoundPlayerGrowWithGetItem, false);
+        // config.read("sfx-player-grow-with-got-item", g_config.SoundPlayerGrowWithGetItem, false);
         config.read("enable-inter-level-fade-effect", g_config.EnableInterLevelFade, true);
         // config.readEnum("render-inactive-npc", g_config.render_inactive_NPC, (int)Config_t::INACTIVE_NPC_SHADE, renderInactiveNPC);
         // config.read("autocode-translate-coords", g_config.autocode_translate_coords, true);
@@ -578,7 +578,7 @@ void SaveConfig()
         config.setValue("enable-thwomp-screen-shake", g_config.GameplayShakeScreenThwomp);
         config.setValue("enable-yoshi-ground-pound-screen-shake", g_config.GameplayShakeScreenPound);
         config.setValue("enable-bowser-iiird-screen-shake", g_config.GameplayShakeScreenBowserIIIrd);
-        config.setValue("sfx-player-grow-with-got-item", g_config.SoundPlayerGrowWithGetItem);
+        // config.setValue("sfx-player-grow-with-got-item", g_config.SoundPlayerGrowWithGetItem);
         config.setValue("enable-inter-level-fade-effect", g_config.EnableInterLevelFade);
 
         // config.setValue("autocode-translate-coords", g_config.autocode_translate_coords);
