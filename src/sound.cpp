@@ -134,6 +134,7 @@ static int  s_musicYoshiTrackNumber = -1;
 #ifdef THEXTECH_ENABLE_AUDIO_FX
 static bool s_musicDisableSpcEcho = false;
 #endif
+static int s_musicDefaultVolume = 64;
 
 static std::string MusicRoot;
 static std::string SfxRoot;
@@ -196,6 +197,8 @@ static std::unordered_map<int, std::string>        extSfxPlaying;
 static void extSfxStopCallback(int channel);
 
 static const int maxSfxChannels = 91;
+static int s_sfx_vol_scale = 100;
+static int s_mus_vol_scale = 100;
 
 #ifdef LOW_MEM
 static const double c_max_chunk_duration = 0.75; // max length of an in-memory chunk in seconds
@@ -686,9 +689,10 @@ void PlayMusic(const std::string &Alias, int fadeInMs)
         {
             int ret;
 
-            Mix_VolumeMusicStream(g_curMusic, m.volume);
+            Mix_VolumeMusicStream(g_curMusic, m.volume * s_mus_vol_scale / 100);
             s_musicYoshiTrackNumber = m.yoshiModeTrack;
             s_musicHasYoshiMode = (s_musicYoshiTrackNumber >= 0 && (Mix_GetMusicTracks(g_curMusic) > s_musicYoshiTrackNumber));
+            s_musicDefaultVolume = m.volume;
             UpdateYoshiMusic();
 
 #ifdef THEXTECH_ENABLE_AUDIO_FX
@@ -716,13 +720,16 @@ void PlayMusic(const std::string &Alias, int fadeInMs)
 
 void PlaySfx(const std::string &Alias, int loops, int volume, uint8_t left, uint8_t right)
 {
+    if(!g_mixerLoaded || s_sfx_vol_scale == 0)
+        return;
+
     auto sfx = sound.find(Alias);
     if(sfx != sound.end())
     {
         auto &s = sfx->second;
         if(s.chunk)
         {
-            int channel = Mix_PlayChannelVol(s.channel, s.chunk, loops, volume);
+            int channel = Mix_PlayChannelVol(s.channel, s.chunk, loops, volume * s_sfx_vol_scale / 100);
 
             if(channel >= 0)
                 Mix_SetPanning(channel, left, right);
@@ -732,7 +739,7 @@ void PlaySfx(const std::string &Alias, int loops, int volume, uint8_t left, uint
             if(Mix_PlayingMusicStream(s.music))
                 Mix_RewindMusicStream(s.music);
 
-            Mix_VolumeMusicStream(s.music, volume);
+            Mix_VolumeMusicStream(s.music, volume * s_sfx_vol_scale / 100);
             Mix_SetMusicEffectPanning(s.music, left, right);
             Mix_PlayMusicStream(s.music, loops);
         }
@@ -824,7 +831,8 @@ void StartMusic(int A, int fadeInMs)
             g_curMusic = Mix_LoadMUS(p.c_str());
             s_musicHasYoshiMode = false;
             s_musicYoshiTrackNumber = -1;
-            Mix_VolumeMusicStream(g_curMusic, 64);
+            Mix_VolumeMusicStream(g_curMusic, 64 * s_mus_vol_scale / 100);
+            s_musicDefaultVolume = 64;
             if(fadeInMs > 0)
                 Mix_FadeInMusic(g_curMusic, -1, fadeInMs);
             else
@@ -873,7 +881,8 @@ void StartMusic(int A, int fadeInMs)
             {
                 s_musicHasYoshiMode = (s_musicYoshiTrackNumber >= 0 && (Mix_GetMusicTracks(g_curMusic) > s_musicYoshiTrackNumber));
                 UpdateYoshiMusic();
-                Mix_VolumeMusicStream(g_curMusic, 52);
+                Mix_VolumeMusicStream(g_curMusic, 52 * s_mus_vol_scale / 100);
+                s_musicDefaultVolume = 52;
                 if(fadeInMs > 0)
                 {
                     ret = Mix_FadeInMusic(g_curMusic, -1, fadeInMs);
@@ -952,6 +961,14 @@ void FadeOutMusic(int ms)
     musicPlaying = false;
 }
 
+void UpdateMusicVolume()
+{
+    if(!musicPlaying || !g_mixerLoaded)
+        return;
+
+    if(g_curMusic)
+        Mix_VolumeMusicStream(g_curMusic, s_musicDefaultVolume * s_mus_vol_scale / 100);
+}
 
 void PlayInitSound()
 {
@@ -1551,7 +1568,7 @@ void PlayExtSound(const std::string &path, int loops, int volume)
 {
     int play_ch = -1;
 
-    if(!g_mixerLoaded)
+    if(!g_mixerLoaded || s_sfx_vol_scale == 0)
         return;
 
     auto f = extSfx.find(path);
@@ -1565,10 +1582,10 @@ void PlayExtSound(const std::string &path, int loops, int volume)
         }
 
         extSfx.insert({path, ch});
-        play_ch = Mix_PlayChannelVol(-1, ch, loops, volume);
+        play_ch = Mix_PlayChannelVol(-1, ch, loops, volume * s_sfx_vol_scale / 100);
     }
     else
-        play_ch = Mix_PlayChannelVol(-1, f->second, loops, volume);
+        play_ch = Mix_PlayChannelVol(-1, f->second, loops, volume * s_sfx_vol_scale / 100);
 
     if(play_ch >= 0)
     {
