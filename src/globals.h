@@ -1147,9 +1147,6 @@ struct EditorCursor_t
 //    Y As Single
     float Y = -50.0f;
 //    SelectedMode As Integer 'cursor mode. eraser/npc/block/background
-    int SelectedMode = 0;
-//    Selected As Integer
-    int Selected = 0;
 //    Location As Location
     Location_t Location;
 //    Layer As String 'current layer

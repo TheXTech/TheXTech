@@ -5135,12 +5135,12 @@ void EditorScreen::UpdateSelectorBar(CallMode mode, bool select_bar_only)
     }
 
     // erase
-    currently_in = !in_excl_special && (EditorCursor.Mode == OptCursor_t::LVL_ERASER0 || EditorCursor.Mode == OptCursor_t::LVL_ERASER);
+    currently_in = !in_excl_special && EditorCursor.Mode == OptCursor_t::LVL_ERASER;
     if(UpdateButton(mode, sx+1*40+4, 4, GFX.ECursor[3], currently_in && EditorCursor.SubMode != -1, 0, 0, 22, 30, g_editorStrings.tooltipErase.c_str()))
     {
         if(editorScreen.active)
             swap_screens();
-        EditorCursor.Mode = OptCursor_t::LVL_ERASER0;
+        EditorCursor.Mode = OptCursor_t::LVL_ERASER;
         EditorCursor.SubMode = 0;
         if(in_excl_special)
             exit_special = true;
@@ -5150,7 +5150,7 @@ void EditorScreen::UpdateSelectorBar(CallMode mode, bool select_bar_only)
     {
         if(editorScreen.active)
             swap_screens();
-        EditorCursor.Mode = OptCursor_t::LVL_ERASER0;
+        EditorCursor.Mode = OptCursor_t::LVL_ERASER;
         EditorCursor.SubMode = -1;
         if(in_excl_special)
             exit_special = true;
@@ -5231,7 +5231,6 @@ void EditorScreen::UpdateSelectorBar(CallMode mode, bool select_bar_only)
             if(in_layers || !editorScreen.active)
                 swap_screens();
             EditorCursor.Mode = OptCursor_t::LVL_SELECT;
-            optCursor.current = OptCursor_t::LVL_SELECT;
             m_last_mode = OptCursor_t::LVL_SELECT;
             if(!in_layers)
                 m_special_page = SPECIAL_PAGE_LAYERS;
@@ -5243,7 +5242,6 @@ void EditorScreen::UpdateSelectorBar(CallMode mode, bool select_bar_only)
             if(in_events || !editorScreen.active)
                 swap_screens();
             EditorCursor.Mode = OptCursor_t::LVL_SELECT;
-            optCursor.current = OptCursor_t::LVL_SELECT;
             m_last_mode = OptCursor_t::LVL_SELECT;
             if(!in_events)
                 m_special_page = SPECIAL_PAGE_EVENTS;
@@ -5325,7 +5323,6 @@ void EditorScreen::UpdateSelectorBar(CallMode mode, bool select_bar_only)
             if(in_world_settings || !editorScreen.active)
                 swap_screens();
             EditorCursor.Mode = OptCursor_t::LVL_SELECT;
-            optCursor.current = OptCursor_t::LVL_SELECT;
             m_last_mode = OptCursor_t::LVL_SELECT;
             if(!in_world_settings)
                 m_special_page = SPECIAL_PAGE_WORLD_SETTINGS;
@@ -5338,7 +5335,6 @@ void EditorScreen::UpdateSelectorBar(CallMode mode, bool select_bar_only)
         if(in_file || !editorScreen.active)
             swap_screens();
         EditorCursor.Mode = OptCursor_t::LVL_SELECT;
-        optCursor.current = OptCursor_t::LVL_SELECT;
         m_last_mode = OptCursor_t::LVL_SELECT;
         if(!in_file)
             m_special_page = SPECIAL_PAGE_FILE;
@@ -5350,7 +5346,6 @@ void EditorScreen::UpdateSelectorBar(CallMode mode, bool select_bar_only)
         if(in_leveltest_settings || !editorScreen.active)
             swap_screens();
         EditorCursor.Mode = OptCursor_t::LVL_SELECT;
-        optCursor.current = OptCursor_t::LVL_SELECT;
         m_last_mode = OptCursor_t::LVL_SELECT;
         if(!in_leveltest_settings)
             m_special_page = SPECIAL_PAGE_EDITOR_SETTINGS;
@@ -5381,7 +5376,6 @@ void EditorScreen::UpdateSelectorBar(CallMode mode, bool select_bar_only)
             FileBrowserCleanup();
         m_special_page = SPECIAL_PAGE_NONE;
         m_special_subpage = 0;
-        optCursor.current = EditorCursor.Mode;
         m_last_mode = EditorCursor.Mode;
     }
 

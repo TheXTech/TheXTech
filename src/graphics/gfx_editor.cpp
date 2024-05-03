@@ -809,7 +809,7 @@ void DrawEditorWorld()
     else
 #endif
 
-    if(EditorCursor.Mode == OptCursor_t::LVL_ERASER || EditorCursor.Mode == OptCursor_t::LVL_ERASER0)
+    if(EditorCursor.Mode == OptCursor_t::LVL_ERASER)
     {
         if(EditorCursor.SubMode == -1)
         {
