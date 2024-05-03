@@ -48,20 +48,6 @@
 #endif
 
 
-static bool doPlayGrowWithGotItem()
-{
-    switch(g_compatibility.sfx_player_grow_with_got_item)
-    {
-    default:
-    case Compatibility_t::SPGWGI_UNSPECIFIED:
-        return g_config.SoundPlayerGrowWithGetItem;
-    case Compatibility_t::SPGWGI_ENABLE:
-        return true;
-    case Compatibility_t::SPGWGI_DISABLE:
-        return false;
-    }
-}
-
 static void s_PowerupScore(NPCRef_t n)
 {
     if(g_compatibility.custom_powerup_collect_score)
@@ -219,6 +205,10 @@ void TouchBonus(int A, int B)
 {
     if(NPC[B].CantHurtPlayer != A || (NPC[B]->IsACoin && Player[A].HoldingNPC != B && NPC[B].Killed == 0))
     {
+        int sfx_extra_item     = (Player[A].Character == 5) ? SFX_HeroHeart : SFX_GotItem;
+        int sfx_grow_item      = (Player[A].Character == 5) ? SFX_HeroHeart : SFX_PlayerGrow;
+        int sfx_transform_item = (Player[A].Character == 5) ? SFX_HeroHeart : SFX_Transform;
+
         // give hearts to heart chars
         if(Player[A].Character == 3 || Player[A].Character == 4 || Player[A].Character == 5)
         {
@@ -422,11 +412,7 @@ void TouchBonus(int A, int B)
             else if(NPC[B].Type == NPCID_POWER_S5)
                 PlaySoundSpatial(SFX_HeroHeart, NPC[B].Location);
             else
-            {
-                if(doPlayGrowWithGotItem())
-                    PlaySoundSpatial(SFX_PlayerGrow, NPC[B].Location);
                 PlaySoundSpatial(SFX_GotItem, NPC[B].Location);
-            }
 
             if(NPC[B].Effect != 2)
                 s_PowerupScore(B);
@@ -451,22 +437,10 @@ void TouchBonus(int A, int B)
                 if(Player[A].Mount > 0)
                     UnDuck(Player[A]);
 
-                if(Player[A].Character == 5)
-                    PlaySoundSpatial(SFX_HeroItem, NPC[B].Location);
-                else
-                    PlaySoundSpatial(SFX_PlayerGrow, NPC[B].Location);
+                PlaySoundSpatial(sfx_grow_item, NPC[B].Location);
             }
             else
-            {
-                if(Player[A].Character == 5)
-                    PlaySoundSpatial(SFX_HeroHeart, NPC[B].Location);
-                else
-                {
-                    if(doPlayGrowWithGotItem())
-                        PlaySoundSpatial(SFX_PlayerGrow, NPC[B].Location);
-                    PlaySoundSpatial(SFX_GotItem, NPC[B].Location);
-                }
-            }
+                PlaySoundSpatial(sfx_extra_item, NPC[B].Location);
 
             if(NPC[B].Effect != 2)
                 s_PowerupScore(B);
@@ -491,22 +465,10 @@ void TouchBonus(int A, int B)
                 if(Player[A].Mount > 0)
                     UnDuck(Player[A]);
 
-                if(Player[A].Character == 5)
-                    PlaySoundSpatial(SFX_HeroItem, NPC[B].Location);
-                else
-                    PlaySoundSpatial(SFX_PlayerGrow, NPC[B].Location);
+                PlaySoundSpatial(sfx_grow_item, NPC[B].Location);
             }
             else
-            {
-                if(Player[A].Character == 5)
-                    PlaySoundSpatial(SFX_HeroHeart, NPC[B].Location);
-                else
-                {
-                    if(doPlayGrowWithGotItem())
-                        PlaySoundSpatial(SFX_PlayerGrow, NPC[B].Location);
-                    PlaySoundSpatial(SFX_GotItem, NPC[B].Location);
-                }
-            }
+                PlaySoundSpatial(sfx_extra_item, NPC[B].Location);
 
             if(NPC[B].Effect != 2)
                 s_PowerupScore(B);
@@ -525,22 +487,10 @@ void TouchBonus(int A, int B)
                 if(Player[A].Mount > 0)
                     UnDuck(Player[A]);
 
-                if(Player[A].Character == 5)
-                    PlaySoundSpatial(SFX_HeroItem, NPC[B].Location);
-                else
-                    PlaySoundSpatial(SFX_Transform, NPC[B].Location);
+                PlaySoundSpatial(sfx_transform_item, NPC[B].Location);
             }
             else
-            {
-                if(Player[A].Character == 5)
-                    PlaySoundSpatial(SFX_HeroHeart, NPC[B].Location);
-                else
-                {
-                    if(doPlayGrowWithGotItem())
-                        PlaySoundSpatial(SFX_PlayerGrow, NPC[B].Location);
-                    PlaySoundSpatial(SFX_GotItem, NPC[B].Location);
-                }
-            }
+                PlaySoundSpatial(sfx_extra_item, NPC[B].Location);
 
             if(NPC[B].Effect != 2)
                 s_PowerupScore(B);
@@ -559,22 +509,10 @@ void TouchBonus(int A, int B)
                 if(Player[A].Mount > 0)
                     UnDuck(Player[A]);
 
-                if(Player[A].Character == 5)
-                    PlaySoundSpatial(SFX_HeroItem, NPC[B].Location);
-                else
-                    PlaySoundSpatial(SFX_Transform, NPC[B].Location);
+                PlaySoundSpatial(sfx_transform_item, NPC[B].Location);
             }
             else
-            {
-                if(Player[A].Character == 5)
-                    PlaySoundSpatial(SFX_HeroHeart, NPC[B].Location);
-                else
-                {
-                    if(doPlayGrowWithGotItem())
-                        PlaySoundSpatial(SFX_PlayerGrow, NPC[B].Location);
-                    PlaySoundSpatial(SFX_GotItem, NPC[B].Location);
-                }
-            }
+                PlaySoundSpatial(sfx_extra_item, NPC[B].Location);
 
             if(NPC[B].Effect != 2)
                 s_PowerupScore(B);
@@ -593,22 +531,10 @@ void TouchBonus(int A, int B)
                 if(Player[A].Mount > 0)
                     UnDuck(Player[A]);
 
-                if(Player[A].Character == 5)
-                    PlaySoundSpatial(SFX_HeroItem, NPC[B].Location);
-                else
-                    PlaySoundSpatial(SFX_Transform, NPC[B].Location);
+                PlaySoundSpatial(sfx_transform_item, NPC[B].Location);
             }
             else
-            {
-                if(Player[A].Character == 5)
-                    PlaySoundSpatial(SFX_HeroHeart, NPC[B].Location);
-                else
-                {
-                    if(doPlayGrowWithGotItem())
-                        PlaySoundSpatial(SFX_PlayerGrow, NPC[B].Location);
-                    PlaySoundSpatial(SFX_GotItem, NPC[B].Location);
-                }
-            }
+                PlaySoundSpatial(sfx_extra_item, NPC[B].Location);
 
             if(NPC[B].Effect != 2)
                 s_PowerupScore(B);
