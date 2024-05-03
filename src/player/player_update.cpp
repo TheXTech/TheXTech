@@ -2434,7 +2434,7 @@ void UpdatePlayer()
                                             if(HitSpot != 1)
                                                 HitSpot = 0;
 
-                                            if(Player[A].Mount == 2 || Player[A].StandingOnVehiclePlr == 56)
+                                            if(Player[A].Mount == 2 || Player[A].StandingOnVehiclePlr != 0)
                                                 HitSpot = 0;
                                         }
 
@@ -4360,7 +4360,7 @@ void UpdatePlayer()
 
                                                         for(int C = 1; C <= numPlayers; C++)
                                                         {
-                                                            if(Player[C].StandingOnVehiclePlr == 56)
+                                                            if(Player[C].StandingOnVehiclePlr && (g_ClonedPlayerMode || Player[C].StandingOnVehiclePlr == A))
                                                                 Player[C].Location.X += D;
                                                         }
                                                     }
@@ -4506,6 +4506,8 @@ void UpdatePlayer()
 
                 if(Player[A].HoldingNPC == B) // cant hold an npc that you are standing on
                     B = 0;
+
+                // confusing logic, but safe, because StandingOnNPC gets set in ClownCar()
                 if(B == 0 && Player[A].StandingOnVehiclePlr > 0 && Player[A].Mount == 0)
                     Player[A].Location.SpeedX += (NPC[Player[A].StandingOnNPC].Location.SpeedX + NPC[Player[A].StandingOnNPC].BeltSpeed);
                 else if(B > 0 && Player[A].StandingOnNPC == 0 && NPC[B].playerTemp && Player[A].Location.SpeedY >= 0)
@@ -4598,7 +4600,7 @@ void UpdatePlayer()
                         for(C = 1; C <= numPlayers; ++C)
                         {
                             if(Player[C].StandingOnNPC == B)
-                                Player[C].StandingOnVehiclePlr = 56;
+                                Player[C].StandingOnVehiclePlr = A;
                         }
                     }
                     else if(Player[A].Mount == 2)
@@ -4631,10 +4633,12 @@ void UpdatePlayer()
                 }
                 else if(Player[A].Mount == 1 && Player[A].Jump > 0)
                 {
+                    // confusing logic, but safe, because StandingOnNPC gets set in ClownCar()
                     if(B == 0 && Player[A].StandingOnVehiclePlr > 0)
                         Player[A].Location.SpeedX += (NPC[Player[A].StandingOnNPC].Location.SpeedX + NPC[Player[A].StandingOnNPC].BeltSpeed);
                     else if(B > 0 && Player[A].StandingOnNPC == 0 && NPC[B].playerTemp)
                         Player[A].Location.SpeedX += -(NPC[B].Location.SpeedX + NPC[B].BeltSpeed);
+
                     Player[A].StandingOnNPC = 0;
                     Player[A].StandingOnVehiclePlr = 0;
                 }
@@ -4895,7 +4899,7 @@ void UpdatePlayer()
             for(B = 1; B <= numPlayers; B++)
             {
                 if(Player[B].StandingOnNPC == A)
-                    Player[B].StandingOnVehiclePlr = NPC[A].Type;
+                    Player[B].StandingOnVehiclePlr = NPC[A].Variant; // newly stores the player who owns the vehicle
             }
             NPC[0] = NPC[A]; // was NPC[C] = NPC[A] but C was not mutated
             KillNPC(A, 9);

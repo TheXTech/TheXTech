@@ -3449,7 +3449,7 @@ void PlayerDismount(const int A)
             if(B != A && Player[B].Mount != 2 && CheckCollision(Player[A].Location, Player[B].Location))
                 Player[B].Location.Y = Player[A].Location.Y - Player[B].Location.Height;
 
-            if(Player[B].StandingOnVehiclePlr == 56)
+            if(Player[B].StandingOnVehiclePlr && (g_ClonedPlayerMode || Player[B].StandingOnVehiclePlr == A))
             {
                 Player[B].StandingOnNPC = numNPCs;
                 Player[B].StandingOnVehiclePlr = 0;
@@ -4301,6 +4301,7 @@ void ClownCar()
             NPC[numNPCs] = NPC_t();
             NPC[numNPCs].playerTemp = true;
             NPC[numNPCs].Type = NPCID_VEHICLE;
+            NPC[numNPCs].Variant = A; // newly-added to allow setting StandingOnVehiclePlr
             NPC[numNPCs].Active = true;
             NPC[numNPCs].TimeLeft = 100;
             NPC[numNPCs].Location = Player[A].Location;
@@ -4318,7 +4319,7 @@ void ClownCar()
 
             for(B = 1; B <= numPlayers; B++)
             {
-                if(Player[B].StandingOnVehiclePlr == 56)
+                if(Player[B].StandingOnVehiclePlr && (g_ClonedPlayerMode || Player[B].StandingOnVehiclePlr == A))
                 {
                     Player[B].StandingOnNPC = numNPCs;
                     Player[B].Location.X += double(Player[A].mountBump);
@@ -8540,6 +8541,11 @@ void DropPlayer(const int A)
             Player[B].YoshiPlayer = 0;
         else if(Player[B].YoshiPlayer > A)
             Player[B].YoshiPlayer --;
+
+        if(Player[B].StandingOnVehiclePlr == A)
+            Player[B].StandingOnVehiclePlr = 0;
+        else if(Player[B].StandingOnVehiclePlr > A)
+            Player[B].StandingOnVehiclePlr --;
     }
 
     // saves player without their mount, but mount is still onscreen and available
