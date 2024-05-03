@@ -120,14 +120,14 @@ int numTiles = 0;
 int numScenes = 0;
 RangeArr<std::string, 0, maxSections> CustomMusic;
 int numSections = 0;
-RangeArr<Location_t, 0, maxSections> level;
+RangeArr<SpeedlessLocation_t, 0, maxSections> level;
 RangeArrI<bool, 0, maxSections, false> LevelWrap;
 RangeArrI<bool, 0, maxSections, false> LevelVWrap;
 RangeArrI<bool, 0, maxSections, false> OffScreenExit;
 RangeArrI<vbint_t, 0, maxSections, 0> bgMusic;
 RangeArrI<vbint_t, 0, maxSections, 0> bgMusicREAL;
 RangeArrI<vbint_t, 0, maxSections, 0> Background2REAL;
-RangeArr<Location_t, 0, maxSections> LevelREAL;
+RangeArr<SpeedlessLocation_t, 0, maxSections> LevelREAL;
 int curMusic = 0;
 // RangeArrI<long, 0, maxSections, 0> bgColor;    // unused since SMBX64, removed
 RangeArrI<vbint_t, 0, maxSections, 0> Background2;
@@ -614,7 +614,7 @@ void initAll()
     // LastBlock.fill(0);
     iBlock.fill(0);
     CustomMusic.fill(std::string());
-    level.fill(Location_t());
+    level.fill(SpeedlessLocation_t());
     LevelWrap.fill(false);
     LevelVWrap.fill(false);
     OffScreenExit.fill(false);

@@ -54,6 +54,7 @@
 #include "core/window.h"
 #include "core/events.h"
 #include "fontman/font_manager.h"
+#include "npc/section_overlap.h"
 
 #include "controls.h"
 
@@ -82,8 +83,6 @@ bool MouseCancel = false;
 bool HasCursor = false;
 // bool NoReallyKillIt = false; //Unused
 int curSection = 0;
-
-OptCursor_t optCursor;
 
 bool enableAutoAlign = true;
 
@@ -252,6 +251,21 @@ void EditorCursor_t::ClearStrings()
     FreeS(this->WorldMusic.MusicFile);
 }
 
+enum InteractFlags
+{
+    IF_AltMode =  1,
+    IF_ResizeT =  2,
+    IF_ResizeB =  4,
+    IF_ResizeL =  8,
+    IF_ResizeR = 16,
+};
+
+void UpdateInteract();
+template<class LocType>
+void InteractResize(LocType& loc, int min, int snap);
+
+void InteractResizeSection(SpeedlessLocation_t& section);
+
 // this sub handles the level editor
 // it is still called when the player is testing a level in the editor in windowed mode
 void UpdateEditor()
@@ -260,11 +274,10 @@ void UpdateEditor()
         Controls::PollInputMethod();
 
     int A = 0;
-    int B = 0;
+    // int B = 0;
 //    int C = 0;
     int qLevel = 0;
     bool CanPlace = false; // Determines if something is in the way
-    bool tempBool = false;
 //    bool grabBool = false;
     Location_t tempLocation;
 //    if(Debugger == true)
@@ -277,12 +290,17 @@ void UpdateEditor()
     {
         MouseRelease = true;
         MouseCancel = false;
-        if(EditorCursor.SubMode > 0 && (EditorCursor.Mode == OptCursor_t::LVL_ERASER || EditorCursor.Mode == OptCursor_t::LVL_ERASER0))
+        if(EditorCursor.SubMode > 0 && EditorCursor.Mode == OptCursor_t::LVL_ERASER)
             EditorCursor.SubMode = 0;
     }
 
     if(EditorCursor.Y < 40)
+    {
         MouseCancel = true;
+        EditorCursor.InteractMode = 0;
+        EditorCursor.InteractFlags = 0;
+        EditorCursor.InteractIndex = 0;
+    }
 
     bool MouseClick_Current = SharedCursor.Primary && !MouseCancel;
 
@@ -293,11 +311,9 @@ void UpdateEditor()
     {
         // keep the cursor's position correct when the player moves!
         MouseMove(EditorCursor.X, EditorCursor.Y, true);
-//        frmNPCs::chkMessage.Enabled = false;
     }
     else
     {
-//        frmNPCs::chkMessage.Enabled = true;
         FreezeNPCs = false;
         LevelMacro = LEVELMACRO_OFF;
         LevelMacroCounter = 0;
@@ -310,11 +326,8 @@ void UpdateEditor()
             if(ScrollRelease)
             {
                 ScrollRelease = false;
-//                frmLevelSettings::optSection(curSection).Value = false;
                 if(curSection != 0)
                     SetSection(curSection - 1);
-//                if(EditorCursor.Mode == 2)
-//                    frmLevelSettings::optSection(curSection).Value = true;
             }
         }
         else if(EditorControls.NextSection && !WorldEditor)
@@ -322,11 +335,8 @@ void UpdateEditor()
             if(ScrollRelease)
             {
                 ScrollRelease = false;
-//                frmLevelSettings::optSection(curSection).Value = false;
                 if(curSection != maxSections)
                     SetSection(curSection + 1);
-//                if(EditorCursor.Mode == 2)
-//                    frmLevelSettings::optSection(curSection).Value = true;
             }
         }
         else
@@ -365,7 +375,6 @@ void UpdateEditor()
             {
                 vScreen[1].X -= 32 * to_scroll_x;
                 EditorCursor.Location.X += 32 * to_scroll_x;
-                MouseRelease = true;
                 scroll_buffer_x -= to_scroll_x * scroll_required;
             }
 
@@ -373,7 +382,6 @@ void UpdateEditor()
             {
                 vScreen[1].Y -= 32 * to_scroll_y;
                 EditorCursor.Location.Y += 32 * to_scroll_y;
-                MouseRelease = true;
                 scroll_buffer_y -= to_scroll_y * scroll_required;
             }
         }
@@ -388,543 +396,626 @@ void UpdateEditor()
             UpdateInterprocess();
 #endif
 
+        UpdateInteract();
+
         if(MouseClick_Current && !editorScreen.active && EditorCursor.Y > 40)
         {
             CanPlace = true;
-            if(EditorCursor.Mode == OptCursor_t::LVL_SELECT || EditorCursor.Mode == 14)
+            if(EditorCursor.Mode == OptCursor_t::LVL_SELECT)
             {
-                if(MouseRelease && !MagicHand) // Player start points
+                if(EditorCursor.InteractMode == OptCursor_t::LVL_SETTINGS && EditorCursor.InteractFlags == IF_AltMode) // Player start points
                 {
-                    for(A = 1; A <= 2; A++)
-                    {
-                        if(CursorCollision(EditorCursor.Location, PlayerStart[A]))
-                        {
-                            PlaySound(SFX_Grab);
-                            EditorCursor.Location = PlayerStart[A];
-                            PlayerStart[A] = PlayerStart_t();
-                            optCursor.current = OptCursor_t::LVL_SETTINGS;
-//                            frmLevelSettings::optLevel(3 + A).Value = true;
-                            EditorCursor.Mode = OptCursor_t::LVL_SETTINGS;
-                            EditorCursor.SubMode = 3 + A;
-                            MouseMove(EditorCursor.X, EditorCursor.Y);
-                            MouseRelease = false;
-                            MouseCancel = true; /* Simulate "Focus out" inside of SMBX Editor */
-//                            Netplay::sendData "v" + std::to_string(A) + "|" + PlayerStart[A].X + "|" + PlayerStart[A].Y + "|" + std::to_string(PlayerStart[A].Width) + "|" + std::to_string(PlayerStart[A].Height) + LB;
+                    int A = EditorCursor.InteractIndex;
+                    PlaySound(SFX_Grab);
 
-                            // TODO: send info to INTERPROCESS
-                        }
-                    }
+                    EditorCursor.Mode = OptCursor_t::LVL_SETTINGS;
+                    EditorCursor.SubMode = 3 + A;
+
+                    EditorCursor.Location = PlayerStart[A];
+                    PlayerStart[A] = PlayerStart_t();
+                    MouseMove(EditorCursor.X, EditorCursor.Y);
+                    MouseRelease = false;
+                    MouseCancel = true; /* Simulate "Focus out" inside of SMBX Editor */
+                }
+                else if(EditorCursor.InteractMode == OptCursor_t::LVL_SETTINGS)
+                {
+                    MouseRelease = false;
+                    InteractResizeSection(level[curSection]);
+                    UpdateSectionOverlaps(curSection);
                 }
 
-                if(MouseRelease) // NPCs
+                // event section resize
+                if(EditorCursor.InteractMode == OptCursor_t::LVL_EVENTS)
                 {
-                    for(A = 1; A <= numNPCs; A++)
-                    {
-                        tempLocation = NPC[A].Location;
+                    int A = EditorCursor.InteractIndex;
+                    InteractResizeSection(Events[A].section[curSection].position);
+                    MouseRelease = false;
+                }
 
-                        if(NPC[A].Type == NPCID_ITEM_BURIED) // Herb's container offset
-                            tempLocation.Y -= 16;
+                if(EditorCursor.InteractMode == OptCursor_t::LVL_NPCS) // NPCs
+                {
+                    int A = EditorCursor.InteractIndex;
+                    PlaySound(SFX_Grab);
 
-                        if(CursorCollision(EditorCursor.Location, tempLocation) && !NPC[A].Hidden)
-                        {
-                            PlaySound(SFX_Grab);
-                            B = 0;
-//                            frmLevelEditor::optCursor(4).Value = true;
-                            optCursor.current = OptCursor_t::LVL_NPCS;
-                            OptCursorSync();
+                    EditorCursor.Mode = OptCursor_t::LVL_NPCS;
+                    EditorCursor.NPC = NPC[A];
+                    EditorCursor.NPC.Hidden = false;
+                    EditorCursor.Layer = NPC[A].Layer;
+                    EditorCursor.Location = NPC[A].Location;
+                    EditorCursor.Location.X = NPC[A].Location.X;
+                    EditorCursor.Location.Y = NPC[A].Location.Y;
+                    SetCursor();
+                    ResetNPC(EditorCursor.NPC.Type);
 
-                            EditorCursor.Mode = OptCursor_t::LVL_NPCS;
-                            EditorCursor.NPC = NPC[A];
-                            ResetNPC(EditorCursor.NPC.Type);
-                            EditorCursor.NPC.Hidden = false;
-                            EditorCursor.Layer = NPC[A].Layer;
-                            EditorCursor.Location = NPC[A].Location;
-                            EditorCursor.Location.X = NPC[A].Location.X;
-                            EditorCursor.Location.Y = NPC[A].Location.Y;
-                            SetCursor();
-//                            Netplay::sendData Netplay::EraseNPC(A, 1) + "p23" + LB;
-                            NPC[A].DefaultType = NPCID_NULL;
-                            KillNPC(A, 9);
-                            editorScreen.FocusNPC();
-                            MouseRelease = false;
-                            MouseCancel = true; /* Simulate "Focus out" inside of SMBX Editor */
-                            tempBool = true;
-                            UNUSED(tempBool);
+                    NPC[A].DefaultType = NPCID_NULL;
+                    KillNPC(A, 9);
+
+                    editorScreen.FocusNPC();
+                    MouseRelease = false;
+                    MouseCancel = true;
 
 #ifdef THEXTECH_INTERPROC_SUPPORTED
-                            if(IntProc::isEnabled()) // Report the taken block into the Editor
-                            {
-                                LevelNPC n;
-                                n.id = EditorCursor.NPC.Type;
-                                n.direct = EditorCursor.NPC.Direction;
+                    if(IntProc::isEnabled()) // Report the taken block into the Editor
+                    {
+                        LevelNPC n;
+                        n.id = EditorCursor.NPC.Type;
+                        n.direct = EditorCursor.NPC.Direction;
 
-                                n.generator = EditorCursor.NPC.Generator;
-                                if(n.generator)
-                                {
-                                    n.generator_direct = EditorCursor.NPC.GeneratorDirection;
-                                    n.generator_type = EditorCursor.NPC.GeneratorEffect;
-                                    n.generator_period = EditorCursor.NPC.GeneratorTimeMax;
-                                }
+                        n.generator = EditorCursor.NPC.Generator;
+                        if(n.generator)
+                        {
+                            n.generator_direct = EditorCursor.NPC.GeneratorDirection;
+                            n.generator_type = EditorCursor.NPC.GeneratorEffect;
+                            n.generator_period = EditorCursor.NPC.GeneratorTimeMax;
+                        }
 
-                                if(n.id == 91 || n.id == 96 || n.id == 283 || n.id == 284)
-                                    n.contents = (long)EditorCursor.NPC.Special;
+                        if(n.id == 91 || n.id == 96 || n.id == 283 || n.id == 284)
+                            n.contents = (long)EditorCursor.NPC.Special;
 
-                                if(n.id == 288 || n.id == 289 || (n.id == 91 && int(EditorCursor.NPC.Special) == 288))
-                                    n.special_data = (long)EditorCursor.NPC.Special2;
+                        if(n.id == 288 || n.id == 289 || (n.id == 91 && int(EditorCursor.NPC.Special) == 288))
+                            n.special_data = (long)EditorCursor.NPC.Special2;
 
-                                if(NPCIsAParaTroopa(n.id) || NPCTraits[n.id].IsFish || n.id == 260)
-                                    n.special_data = (long)EditorCursor.NPC.Special;
+                        if(NPCIsAParaTroopa(n.id) || NPCTraits[n.id].IsFish || n.id == 260)
+                            n.special_data = (long)EditorCursor.NPC.Special;
 
-                                if(n.id == 86)
-                                    n.special_data = (long)EditorCursor.NPC.Variant;
+                        if(n.id == 86)
+                            n.special_data = (long)EditorCursor.NPC.Variant;
 
-                                n.msg = GetS(EditorCursor.NPC.Text);
-                                n.friendly = EditorCursor.NPC.Inert;
-                                n.nomove = EditorCursor.NPC.Stuck;
-                                n.is_boss = EditorCursor.NPC.Legacy;
+                        n.msg = GetS(EditorCursor.NPC.Text);
+                        n.friendly = EditorCursor.NPC.Inert;
+                        n.nomove = EditorCursor.NPC.Stuck;
+                        n.is_boss = EditorCursor.NPC.Legacy;
 
-                                n.layer = GetL(EditorCursor.NPC.Layer);
-                                n.event_activate = GetE(EditorCursor.NPC.TriggerActivate);
-                                n.event_die = GetE(EditorCursor.NPC.TriggerDeath);
-                                n.event_emptylayer = GetE(EditorCursor.NPC.TriggerLast);
-                                n.event_talk = GetE(EditorCursor.NPC.TriggerTalk);
-                                n.attach_layer = GetL(EditorCursor.NPC.AttLayer);
-                                IntProc::sendTakenNPC(n);
-                            }
+                        n.layer = GetL(EditorCursor.NPC.Layer);
+                        n.event_activate = GetE(EditorCursor.NPC.TriggerActivate);
+                        n.event_die = GetE(EditorCursor.NPC.TriggerDeath);
+                        n.event_emptylayer = GetE(EditorCursor.NPC.TriggerLast);
+                        n.event_talk = GetE(EditorCursor.NPC.TriggerTalk);
+                        n.attach_layer = GetL(EditorCursor.NPC.AttLayer);
+                        IntProc::sendTakenNPC(n);
+                    }
 #endif
-                            break;
-                        }
-                    }
                 }
 
-                if(MouseRelease) // non-sizable blocks
+                if(EditorCursor.InteractMode == OptCursor_t::LVL_BLOCKS && EditorCursor.InteractFlags > 1) // resizing block
                 {
-                    for(A = 1; A <= numBlock; A++)
-                    {
-                        if(!BlockIsSizable[Block[A].Type])
-                        {
-                            if(CursorCollision(EditorCursor.Location, Block[A].Location) && !Block[A].Hidden)
-                            {
-                                PlaySound(SFX_Grab);
-//                                frmLevelEditor::optCursor(1).Value = true;
-                                optCursor.current = OptCursor_t::LVL_BLOCKS;
-                                OptCursorSync();
+                    MouseRelease = false;
 
-                                EditorCursor.Mode = OptCursor_t::LVL_BLOCKS;
-                                EditorCursor.Block = Block[A];
-                                EditorCursor.Layer = Block[A].Layer;
-                                EditorCursor.Location.X = Block[A].Location.X;
-                                EditorCursor.Location.Y = Block[A].Location.Y;
-                                EditorCursor.Location.Width = Block[A].Location.Width;
-                                EditorCursor.Location.Height = Block[A].Location.Height;
-                                SetCursor();
-//                                Netplay::sendData Netplay::EraseBlock(A, 1);
+                    Location_t& iLoc = Block[EditorCursor.InteractIndex].Location;
+                    InteractResize(iLoc, 64, 32);
 
-                                Location_t loc = Block[A].Location;
-                                int type = Block[A].Type;
-                                KillBlock(A, false);
+                    syncLayersTrees_Block(EditorCursor.InteractIndex);
+                }
+                else if(EditorCursor.InteractMode == OptCursor_t::LVL_BLOCKS) // Blocks
+                {
+                    int A = EditorCursor.InteractIndex;
+                    PlaySound(SFX_Grab);
 
-                                MagicBlock::MagicBlock(type, loc);
+                    EditorCursor.Mode = OptCursor_t::LVL_BLOCKS;
+                    EditorCursor.Block = Block[A];
+                    EditorCursor.Layer = Block[A].Layer;
+                    EditorCursor.Location.X = Block[A].Location.X;
+                    EditorCursor.Location.Y = Block[A].Location.Y;
+                    EditorCursor.Location.Width = Block[A].Location.Width;
+                    EditorCursor.Location.Height = Block[A].Location.Height;
+                    SetCursor();
 
-                                editorScreen.FocusBlock();
-                                MouseRelease = false;
-                                MouseCancel = true; /* Simulate "Focus out" inside of SMBX Editor */
-                                // FindSBlocks();
+                    Location_t loc = Block[A].Location;
+                    int type = Block[A].Type;
+                    KillBlock(A, false);
+
+                    MagicBlock::MagicBlock(type, loc);
+
+                    editorScreen.FocusBlock();
+                    MouseRelease = false;
+                    MouseCancel = true; /* Simulate "Focus out" inside of SMBX Editor */
 
 #ifdef THEXTECH_INTERPROC_SUPPORTED
-                                if(IntProc::isEnabled()) // Report the taken block into the Editor
-                                {
-                                    LevelBlock block;
-                                    block.id = EditorCursor.Block.Type;
-                                    block.w = EditorCursor.Location.Width;
-                                    block.h = EditorCursor.Location.Height;
-                                    block.invisible = EditorCursor.Block.Invis;
-                                    block.slippery = EditorCursor.Block.Slippy;
-                                    block.layer = GetL(EditorCursor.Block.Layer);
-                                    if(EditorCursor.Block.Special >= 1000)
-                                        block.npc_id = EditorCursor.Block.Special - 1000;
-                                    else if(EditorCursor.Block.Special <= 0)
-                                        block.npc_id = 0;
-                                    else if(EditorCursor.Block.Special < 1000)
-                                        block.npc_id = -EditorCursor.Block.Special;
-                                    block.event_hit = GetE(EditorCursor.Block.TriggerHit);
-                                    block.event_emptylayer = GetE(EditorCursor.Block.TriggerLast);
-                                    block.event_destroy = GetE(EditorCursor.Block.TriggerDeath);
-                                    IntProc::sendTakenBlock(block);
-                                }
-#endif // THEXTECH_INTERPROC_SUPPORTED
-
-                                break;
-                            }
-                        }
+                    if(IntProc::isEnabled()) // Report the taken block into the Editor
+                    {
+                        LevelBlock block;
+                        block.id = EditorCursor.Block.Type;
+                        block.w = EditorCursor.Location.Width;
+                        block.h = EditorCursor.Location.Height;
+                        block.invisible = EditorCursor.Block.Invis;
+                        block.slippery = EditorCursor.Block.Slippy;
+                        block.layer = GetL(EditorCursor.Block.Layer);
+                        if(EditorCursor.Block.Special >= 1000)
+                            block.npc_id = EditorCursor.Block.Special - 1000;
+                        else if(EditorCursor.Block.Special <= 0)
+                            block.npc_id = 0;
+                        else if(EditorCursor.Block.Special < 1000)
+                            block.npc_id = -EditorCursor.Block.Special;
+                        block.event_hit = GetE(EditorCursor.Block.TriggerHit);
+                        block.event_emptylayer = GetE(EditorCursor.Block.TriggerLast);
+                        block.event_destroy = GetE(EditorCursor.Block.TriggerDeath);
+                        IntProc::sendTakenBlock(block);
                     }
+#endif // THEXTECH_INTERPROC_SUPPORTED
                 }
 
-                if(MouseRelease && !MagicHand) // Warps
+                if(EditorCursor.InteractMode == OptCursor_t::LVL_WARPS) // Warps
                 {
-                    for(A = 1; A <= numWarps; A++)
+                    int A = EditorCursor.InteractIndex;
+                    PlaySound(SFX_Grab);
+                    MouseRelease = false;
+                    EditorCursor.Mode = OptCursor_t::LVL_WARPS;
+                    MouseCancel = true; /* Simulate "Focus out" inside of SMBX Editor */
+
+                    if(EditorCursor.InteractFlags == 0)
                     {
-                        if(CursorCollision(EditorCursor.Location, Warp[A].Entrance) && !Warp[A].Hidden)
-                        {
-                            PlaySound(SFX_Grab);
-                            Warp[A].PlacedEnt = false;
-                            optCursor.current = OptCursor_t::LVL_WARPS;
-                            OptCursorSync();
-                            MouseRelease = false;
-                            EditorCursor.Mode = OptCursor_t::LVL_WARPS;
-                            EditorCursor.SubMode = 1;
-                            MouseCancel = true; /* Simulate "Focus out" inside of SMBX Editor */
-                            if(Warp[A].LevelEnt || EditorCursor.Warp.MapWarp || EditorCursor.Warp.level != STRINGINDEX_NONE)
-                                Warp[A].PlacedExit = false;
-//                            if(nPlay.Online == true)
-//                                Netplay::sendData Netplay::AddWarp[A];
-                            EditorCursor.Warp = Warp[A];
-                            if(!Warp[A].PlacedEnt && !Warp[A].PlacedExit)
-                                KillWarp(A);
-                            break;
-                        }
-                        else if(CursorCollision(EditorCursor.Location, Warp[A].Exit) && !Warp[A].Hidden)
-                        {
-                            PlaySound(SFX_Grab);
+                        Warp[A].PlacedEnt = false;
+                        EditorCursor.SubMode = 1;
+
+                        if(Warp[A].LevelEnt || EditorCursor.Warp.MapWarp || EditorCursor.Warp.level != STRINGINDEX_NONE)
                             Warp[A].PlacedExit = false;
-                            optCursor.current = OptCursor_t::LVL_WARPS;
-                            OptCursorSync();
-                            MouseRelease = false;
-                            EditorCursor.Mode = OptCursor_t::LVL_WARPS;
-                            EditorCursor.SubMode = 2;
-                            MouseCancel = true; /* Simulate "Focus out" inside of SMBX Editor */
-                            // TODO: additional testing of these situations
-                            if(Warp[A].LevelEnt || EditorCursor.Warp.MapWarp || EditorCursor.Warp.level != STRINGINDEX_NONE)
-                                Warp[A].PlacedEnt = false;
-                            EditorCursor.Warp = Warp[A];
-                            if(!Warp[A].PlacedEnt && !Warp[A].PlacedExit)
-                                KillWarp(A);
-                            break;
-                        }
+
                     }
+                    else
+                    {
+                        Warp[A].PlacedExit = false;
+                        EditorCursor.SubMode = 2;
+
+                        // TODO: additional testing of these situations
+                        if(Warp[A].LevelEnt || EditorCursor.Warp.MapWarp || EditorCursor.Warp.level != STRINGINDEX_NONE)
+                            Warp[A].PlacedEnt = false;
+                    }
+
+                    EditorCursor.Warp = Warp[A];
+                    if(!Warp[A].PlacedEnt && !Warp[A].PlacedExit)
+                        KillWarp(A);
                 }
 
-                if(MouseRelease) // BGOs
+                if(EditorCursor.InteractMode == OptCursor_t::LVL_BGOS) // BGOs
                 {
-                    // more difficult to iterate backwards, but that's what we need to do here
-                    auto sentinel = treeBackgroundQuery(EditorCursor.Location, SORTMODE_Z);
-                    for(auto i = sentinel.end(); i > sentinel.begin();)
+                    int A = EditorCursor.InteractIndex;
+
+                    PlaySound(SFX_Grab);
+
+                    EditorCursor.Mode = OptCursor_t::LVL_BGOS;
+                    EditorCursor.Background = Background[A];
+                    EditorCursor.Layer = Background[A].Layer;
+                    EditorCursor.Location.X = Background[A].Location.X;
+                    EditorCursor.Location.Y = Background[A].Location.Y;
+                    SetCursor();
+
+                    Location_t loc = Background[A].Location;
+                    int type = Background[A].Type;
+
+                    Background[A] = Background[numBackground];
+                    numBackground--;
+
+                    editorScreen.FocusBGO();
+                    if(MagicHand)
                     {
-                        A = *(--i);
+                        qSortBackgrounds(1, numBackground);
+                        UpdateBackgrounds();
+                        syncLayers_AllBGOs();
+                    }
+                    else
+                    {
+                        syncLayers_BGO(A);
+                        syncLayers_BGO(numBackground+1);
+                    }
 
-                        if(CursorCollision(EditorCursor.Location, Background[A].Location) && !Background[A].Hidden)
-                        {
-                            PlaySound(SFX_Grab);
-                            optCursor.current = OptCursor_t::LVL_BGOS;
-                            OptCursorSync();
-                            EditorCursor.Mode = OptCursor_t::LVL_BGOS;
-                            EditorCursor.Background = Background[A];
-                            EditorCursor.Layer = Background[A].Layer;
-                            EditorCursor.Location.X = Background[A].Location.X;
-                            EditorCursor.Location.Y = Background[A].Location.Y;
-                            SetCursor();
-//                            Netplay::sendData Netplay::EraseBackground(A, 1) + "p23" + LB;
+                    MagicBlock::MagicBackground(type, loc);
 
-                            Location_t loc = Background[A].Location;
-                            int type = Background[A].Type;
-
-                            Background[A] = Background[numBackground];
-                            numBackground--;
-
-                            editorScreen.FocusBGO();
-                            if(MagicHand)
-                            {
-                                qSortBackgrounds(1, numBackground);
-                                UpdateBackgrounds();
-                                syncLayers_AllBGOs();
-                            }
-                            else
-                            {
-                                syncLayers_BGO(A);
-                                syncLayers_BGO(numBackground+1);
-                            }
-
-                            MagicBlock::MagicBackground(type, loc);
-
-                            MouseRelease = false;
-                            MouseCancel = true; /* Simulate "Focus out" inside of SMBX Editor */
+                    MouseRelease = false;
+                    MouseCancel = true; /* Simulate "Focus out" inside of SMBX Editor */
 
 #ifdef THEXTECH_INTERPROC_SUPPORTED
-                            if(IntProc::isEnabled()) // Report the taken block into the Editor
-                            {
-                                LevelBGO b;
-                                b.id = EditorCursor.Background.Type;
-                                b.layer = GetL(EditorCursor.Background.Layer);
-                                b.z_mode = EditorCursor.Background.GetCustomLayer();
-                                b.z_offset = EditorCursor.Background.GetCustomOffset();
-                                IntProc::sendTakenBGO(b);
-                            }
+                    if(IntProc::isEnabled()) // Report the taken block into the Editor
+                    {
+                        LevelBGO b;
+                        b.id = EditorCursor.Background.Type;
+                        b.layer = GetL(EditorCursor.Background.Layer);
+                        b.z_mode = EditorCursor.Background.GetCustomLayer();
+                        b.z_offset = EditorCursor.Background.GetCustomOffset();
+                        IntProc::sendTakenBGO(b);
+                    }
 #endif // THEXTECH_INTERPROC_SUPPORTED
-                            break;
-                        }
-                    }
                 }
 
-                if(MouseRelease) // Sizable blocks
+                if(EditorCursor.InteractMode == OptCursor_t::LVL_WATER && EditorCursor.InteractFlags > 1) // resizing water
                 {
-                    for(A = 1; A <= numBlock; A++)
-                    {
-                        if(BlockIsSizable[Block[A].Type])
-                        {
-                            if(CursorCollision(EditorCursor.Location, Block[A].Location) && !Block[A].Hidden)
-                            {
-                                PlaySound(SFX_Grab);
-//                                frmLevelEditor::optCursor(1).Value = true;
-                                optCursor.current = 1;
-                                OptCursorSync();
+                    MouseRelease = false;
 
-                                EditorCursor.Mode = OptCursor_t::LVL_BLOCKS;
-                                EditorCursor.Block = Block[A];
-                                EditorCursor.Layer = Block[A].Layer;
-                                EditorCursor.Location.X = Block[A].Location.X;
-                                EditorCursor.Location.Y = Block[A].Location.Y;
-                                EditorCursor.Location.Width = Block[A].Location.Width;
-                                EditorCursor.Location.Height = Block[A].Location.Height;
-                                SetCursor();
-//                                Netplay::sendData Netplay::EraseBlock(A, 1);
-                                KillBlock(A, false);
-                                editorScreen.FocusBlock();
-                                MouseRelease = false;
-                                MouseCancel = true; /* Simulate "Focus out" inside of SMBX Editor */
-                                // FindSBlocks();
-#ifdef THEXTECH_INTERPROC_SUPPORTED
-                                if(IntProc::isEnabled()) // Report the taken block into the Editor
-                                {
-                                    LevelBlock block;
-                                    block.id = EditorCursor.Block.Type;
-                                    block.w = EditorCursor.Location.Width;
-                                    block.h = EditorCursor.Location.Height;
-                                    block.invisible = EditorCursor.Block.Invis;
-                                    block.slippery = EditorCursor.Block.Slippy;
-                                    block.layer = GetL(EditorCursor.Block.Layer);
-                                    if(EditorCursor.Block.Special >= 1000)
-                                        block.npc_id = EditorCursor.Block.Special - 1000;
-                                    else if(EditorCursor.Block.Special <= 0)
-                                        block.npc_id = 0;
-                                    else if(EditorCursor.Block.Special < 1000)
-                                        block.npc_id = -EditorCursor.Block.Special;
-                                    block.event_hit = GetE(EditorCursor.Block.TriggerHit);
-                                    block.event_emptylayer = GetE(EditorCursor.Block.TriggerLast);
-                                    block.event_destroy = GetE(EditorCursor.Block.TriggerDeath);
-                                    IntProc::sendTakenBlock(block);
-                                }
-#endif // THEXTECH_INTERPROC_SUPPORTED
-                                break;
-                            }
-                        }
-                    }
+                    SpeedlessLocation_t& iLoc = Water[EditorCursor.InteractIndex].Location;
+                    InteractResize(iLoc, 32, 32);
+
+                    syncLayers_Water(EditorCursor.InteractIndex);
+                }
+                else if(EditorCursor.InteractMode == OptCursor_t::LVL_WATER) // water
+                {
+                    int A = EditorCursor.InteractIndex;
+
+                    PlaySound(SFX_Grab);
+                    EditorCursor.Mode = OptCursor_t::LVL_WATER;
+                    EditorCursor.Location = static_cast<Location_t>(Water[A].Location);
+                    EditorCursor.Layer = Water[A].Layer;
+                    EditorCursor.Water = Water[A];
+                    Water[A] = Water[numWater];
+                    numWater--;
+                    syncLayers_Water(A);
+                    syncLayers_Water(numWater+1);
+                    MouseRelease = false;
+                    MouseCancel = true; /* Simulate "Focus out" inside of SMBX Editor */
                 }
 
-                if(MouseRelease && !MagicHand) // Water boxes
+                if(EditorCursor.InteractMode == OptCursor_t::WLD_AREA && EditorCursor.InteractFlags > 1) // resizing world map area
                 {
-                    for(int numWaterMax = numWater, A = 1; A <= numWaterMax; A++)
-                    {
-                        if(CursorCollision(EditorCursor.Location, Water[A].Location))
-                        {
-                            PlaySound(SFX_Grab);
-//                            frmLevelEditor::optCursor(15).Value = true;
-                            optCursor.current = OptCursor_t::LVL_WATER;
-                            OptCursorSync();
-                            EditorCursor.Mode = OptCursor_t::LVL_WATER;
-                            EditorCursor.Location = static_cast<Location_t>(Water[A].Location);
-                            EditorCursor.Layer = Water[A].Layer;
-                            EditorCursor.Water = Water[A];
-                            Water[A] = Water[numWater];
-                            numWater--;
-                            syncLayers_Water(A);
-                            syncLayers_Water(numWater+1);
-                            MouseRelease = false;
-                            MouseCancel = true; /* Simulate "Focus out" inside of SMBX Editor */
-                            break;
-                        }
-                    }
+                    MouseRelease = false;
+
+                    IntegerLocation_t& iLoc = WorldArea[EditorCursor.InteractIndex].Location;
+                    InteractResize(iLoc, 32, 32);
+                }
+                else if(EditorCursor.InteractMode == OptCursor_t::WLD_AREA) // World map areas
+                {
+                    int A = EditorCursor.InteractIndex;
+                    PlaySound(SFX_Grab);
+                    EditorCursor.Mode = OptCursor_t::WLD_AREA;
+                    EditorCursor.Location = static_cast<Location_t>(WorldArea[A].Location);
+                    SetCursor();
+                    EditorCursor.WorldArea = WorldArea[A];
+                    if(A != numWorldAreas)
+                        WorldArea[A] = WorldArea[numWorldAreas];
+                    numWorldAreas--;
+                    MouseRelease = false;
+                    MouseCancel = true; /* Simulate "Focus out" inside of SMBX Editor */
                 }
 
-                if(MouseRelease && !MagicHand) // World map areas
+                if(EditorCursor.InteractMode == OptCursor_t::WLD_MUSIC) // World map music
                 {
-                    for(int A = numWorldAreas; A >= 1; A--)
+                    int A = EditorCursor.InteractIndex;
+                    PlaySound(SFX_Grab);
+                    EditorCursor.Mode = OptCursor_t::WLD_MUSIC;
+                    EditorCursor.Location = static_cast<Location_t>(WorldMusic[A].Location);
+                    SetCursor();
+                    EditorCursor.WorldMusic = WorldMusic[A];
+                    if(A != numWorldMusic)
                     {
-                        if(CursorCollision(EditorCursor.Location, newLoc(WorldArea[A].Location.X, WorldArea[A].Location.Y, 32, 32)))
-                        {
-                            PlaySound(SFX_Grab);
-                            optCursor.current = OptCursor_t::WLD_AREA;
-                            OptCursorSync();
-                            EditorCursor.Mode = OptCursor_t::WLD_AREA;
-                            EditorCursor.Location = static_cast<Location_t>(WorldArea[A].Location);
-                            SetCursor();
-                            EditorCursor.WorldArea = WorldArea[A];
-                            if(A != numWorldAreas)
-                                WorldArea[A] = WorldArea[numWorldAreas];
-                            numWorldAreas--;
-                            MouseRelease = false;
-                            MouseCancel = true; /* Simulate "Focus out" inside of SMBX Editor */
-                            break;
-                        }
+                        WorldMusic[A] = WorldMusic[numWorldMusic];
+                        treeWorldMusicUpdate(&WorldMusic[A]);
                     }
+                    treeWorldMusicRemove(&WorldMusic[numWorldMusic]);
+                    numWorldMusic--;
+                    MouseRelease = false;
+                    MouseCancel = true; /* Simulate "Focus out" inside of SMBX Editor */
                 }
 
-                if(MouseRelease && !MagicHand) // World map music
+                if(EditorCursor.InteractMode == OptCursor_t::WLD_PATHS) // World paths
                 {
-                    for(int A : treeWorldMusicQuery(EditorCursor.Location, SORTMODE_NONE))
+                    int A = EditorCursor.InteractIndex;
+                    PlaySound(SFX_Grab);
+                    EditorCursor.Mode = OptCursor_t::WLD_PATHS;
+                    EditorCursor.Location = static_cast<Location_t>(WorldPath[A].Location);
+                    EditorCursor.WorldPath = WorldPath[A];
+                    SetCursor();
+                    if(A != numWorldPaths)
                     {
-                        if(CursorCollision(EditorCursor.Location, WorldMusic[A].Location))
-                        {
-                            PlaySound(SFX_Grab);
-                            optCursor.current = OptCursor_t::WLD_MUSIC;
-                            OptCursorSync();
-                            EditorCursor.Mode = OptCursor_t::WLD_MUSIC;
-                            EditorCursor.Location = static_cast<Location_t>(WorldMusic[A].Location);
-                            SetCursor();
-//                            frmMusic::optMusic(WorldMusic[A].Type).Value = true;
-                            EditorCursor.WorldMusic = WorldMusic[A];
-                            if(A != numWorldMusic)
-                            {
-                                WorldMusic[A] = WorldMusic[numWorldMusic];
-                                treeWorldMusicUpdate(&WorldMusic[A]);
-                            }
-                            treeWorldMusicRemove(&WorldMusic[numWorldMusic]);
-                            numWorldMusic--;
-                            MouseRelease = false;
-                            MouseCancel = true; /* Simulate "Focus out" inside of SMBX Editor */
-                            break;
-                        }
+                        WorldPath[A] = WorldPath[numWorldPaths];
+                        treeWorldPathUpdate(&WorldPath[A]);
                     }
+                    treeWorldPathRemove(&WorldPath[numWorldPaths]);
+                    numWorldPaths--;
+                    MouseRelease = false;
+                    MouseCancel = true; /* Simulate "Focus out" inside of SMBX Editor */
                 }
 
-                if(MouseRelease && !MagicHand) // World paths
+                if(EditorCursor.InteractMode == OptCursor_t::WLD_SCENES) // World scenes
                 {
-                    for(int A : treeWorldPathQuery(EditorCursor.Location, SORTMODE_NONE))
+                    int A = EditorCursor.InteractIndex;
+                    PlaySound(SFX_Grab);
+                    EditorCursor.Mode = OptCursor_t::WLD_SCENES;
+                    EditorCursor.Location = static_cast<Location_t>(Scene[A].Location);
+                    EditorCursor.Scene = Scene[A];
+                    SetCursor();
+                    MouseMove(EditorCursor.X, EditorCursor.Y);
+                    // this maintains the order of the scenes
+                    // but makes for a hellish quadtree update
+                    for(int B = A; B < numScenes; B++)
                     {
-                        if(CursorCollision(EditorCursor.Location, WorldPath[A].Location))
-                        {
-                            PlaySound(SFX_Grab);
-//                            frmLevelEditor::optCursor(10).Value = true;
-                            optCursor.current = OptCursor_t::WLD_PATHS;
-                            OptCursorSync();
-//                            frmPaths::WorldPath(WorldPath[A].Type).Value = true;
-                            EditorCursor.Mode = OptCursor_t::WLD_PATHS;
-                            EditorCursor.Location = static_cast<Location_t>(WorldPath[A].Location);
-                            EditorCursor.WorldPath = WorldPath[A];
-                            SetCursor();
-                            if(A != numWorldPaths)
-                            {
-                                WorldPath[A] = WorldPath[numWorldPaths];
-                                treeWorldPathUpdate(&WorldPath[A]);
-                            }
-                            treeWorldPathRemove(&WorldPath[numWorldPaths]);
-                            numWorldPaths--;
-                            MouseRelease = false;
-                            MouseCancel = true; /* Simulate "Focus out" inside of SMBX Editor */
-                            break;
-                        }
+                        Scene[B] = Scene[B + 1];
+                        treeWorldSceneUpdate(&Scene[B]);
                     }
+                    treeWorldSceneRemove(&Scene[numScenes]);
+                    numScenes--;
+                    MouseRelease = false;
+                    MouseCancel = true; /* Simulate "Focus out" inside of SMBX Editor */
                 }
 
-                if(MouseRelease && !MagicHand) // World sceneries
+                if(EditorCursor.InteractMode == OptCursor_t::WLD_LEVELS) // World map level points
                 {
-                    // harder to go backwards, but that's all we're doing here.
-                    // it's a good thing that the sentinel's scope ends quickly,
-                    // otherwise it would take a long time for the result vector
-                    // to rejoin the pool. -- ds-sloth
-                    auto sentinel = treeWorldSceneQuery(EditorCursor.Location, SORTMODE_ID);
-                    for(auto i = sentinel.end(); i > sentinel.begin();)
+                    int A = EditorCursor.InteractIndex;
+                    PlaySound(SFX_Grab);
+                    EditorCursor.Mode = OptCursor_t::WLD_LEVELS;
+                    EditorCursor.Location = static_cast<Location_t>(WorldLevel[A].Location);
+                    EditorCursor.WorldLevel = WorldLevel[A];
+                    SetCursor();
+                    if(A != numWorldLevels)
                     {
-                        A = *(--i);
-
-                        if(CursorCollision(EditorCursor.Location, Scene[A].Location))
-                        {
-                            PlaySound(SFX_Grab);
-//                            frmLevelEditor::optCursor(8).Value = true;
-                            optCursor.current = OptCursor_t::WLD_SCENES;
-                            OptCursorSync();
-//                            frmScene::Scene(Scene[A].Type).Value = true;
-                            EditorCursor.Mode = OptCursor_t::WLD_SCENES;
-                            EditorCursor.Location = static_cast<Location_t>(Scene[A].Location);
-                            EditorCursor.Scene = Scene[A];
-                            SetCursor();
-                            MouseMove(EditorCursor.X, EditorCursor.Y);
-                            // this maintains the order of the scenes
-                            // but makes for a hellish quadtree update
-                            for(B = A; B < numScenes; B++)
-                            {
-                                Scene[B] = Scene[B + 1];
-                                treeWorldSceneUpdate(&Scene[B]);
-                            }
-                            treeWorldSceneRemove(&Scene[numScenes]);
-                            numScenes--;
-                            MouseRelease = false;
-                            MouseCancel = true; /* Simulate "Focus out" inside of SMBX Editor */
-                            break;
-                        }
+                        WorldLevel[A] = WorldLevel[numWorldLevels];
+                        treeWorldLevelUpdate(&WorldLevel[A]);
                     }
+                    treeWorldLevelRemove(&WorldLevel[numWorldLevels]);
+                    numWorldLevels--;
+                    MouseRelease = false;
+                    MouseCancel = true; /* Simulate "Focus out" inside of SMBX Editor */
                 }
 
-                if(MouseRelease && !MagicHand) // World map level points
+                if(EditorCursor.InteractMode == OptCursor_t::WLD_TILES) // World map tiles
                 {
-                    for(int A : treeWorldLevelQuery(EditorCursor.Location, SORTMODE_NONE))
+                    int A = EditorCursor.InteractIndex;
+                    PlaySound(SFX_Grab);
+                    EditorCursor.Mode = OptCursor_t::WLD_TILES;
+                    EditorCursor.Location = static_cast<Location_t>(Tile[A].Location);
+                    EditorCursor.Tile = Tile[A];
+                    SetCursor();
+
+                    Location_t loc = static_cast<Location_t>(Tile[A].Location);
+                    int type = Tile[A].Type;
+
+                    if(A != numTiles)
                     {
-                        if(CursorCollision(EditorCursor.Location, WorldLevel[A].Location))
-                        {
-                            PlaySound(SFX_Grab);
-                            optCursor.current = OptCursor_t::WLD_LEVELS;
-                            OptCursorSync();
-                            EditorCursor.Mode = OptCursor_t::WLD_LEVELS;
-                            EditorCursor.Location = static_cast<Location_t>(WorldLevel[A].Location);
-                            EditorCursor.WorldLevel = WorldLevel[A];
-                            SetCursor();
-                            if(A != numWorldLevels)
-                            {
-                                WorldLevel[A] = WorldLevel[numWorldLevels];
-                                treeWorldLevelUpdate(&WorldLevel[A]);
-                            }
-                            treeWorldLevelRemove(&WorldLevel[numWorldLevels]);
-                            numWorldLevels--;
-                            MouseRelease = false;
-                            MouseCancel = true; /* Simulate "Focus out" inside of SMBX Editor */
-                            break;
-                        }
+                        Tile[A] = Tile[numTiles];
+                        treeWorldTileUpdate(&Tile[A]);
                     }
+                    treeWorldTileRemove(&Tile[numTiles]);
+
+                    numTiles--;
+
+                    MagicBlock::MagicTile(type, loc);
+
+                    editorScreen.FocusTile();
+                    MouseRelease = false;
+                    MouseCancel = true; /* Simulate "Focus out" inside of SMBX Editor */
+                }
+            }
+            else if(EditorCursor.Mode == OptCursor_t::LVL_ERASER && (SharedCursor.Move || MouseRelease)) // Eraser
+            {
+                if(EditorCursor.InteractMode == OptCursor_t::LVL_NPCS)
+                {
+                    int A = EditorCursor.InteractIndex;
+
+                    if(iRand(2) == 0)
+                        NPC[A].Location.SpeedX = double(Physics.NPCShellSpeed / 2);
+                    else
+                        NPC[A].Location.SpeedX = -double(Physics.NPCShellSpeed / 2);
+
+                    NPC[A].DefaultType = NPCID_NULL;
+                    if(NPC[A]->IsABonus || NPC[A]->IsACoin)
+                        KillNPC(A, 4); // Kill the bonus/coin
+                    else
+                        KillNPC(A, 2); // Kill the NPC
+
+                    MouseRelease = false;
+
+                    if(EditorCursor.SubMode == 0)
+                        EditorCursor.SubMode = OptCursor_t::LVL_NPCS;
                 }
 
-                if(MouseRelease && !MagicHand) // Terrain tiles
+                if(EditorCursor.InteractMode == OptCursor_t::LVL_BLOCKS)
                 {
-                    for(int A : treeWorldTileQuery(EditorCursor.Location, SORTMODE_NONE))
+                    int A = EditorCursor.InteractIndex;
+
+                    Location_t loc = Block[A].Location;
+                    int type = Block[A].Type;
+                    KillBlock(A);
+
+                    MagicBlock::MagicBlock(type, loc);
+
+                    MouseRelease = false;
+                    if(EditorCursor.SubMode == 0)
+                        EditorCursor.SubMode = OptCursor_t::LVL_BLOCKS;
+                }
+
+                if(EditorCursor.InteractMode == OptCursor_t::LVL_WARPS)
+                {
+                    int A = EditorCursor.InteractIndex;
+                    KillWarp(A);
+                    MouseRelease = false;
+                    if(EditorCursor.SubMode == 0)
+                        EditorCursor.SubMode = OptCursor_t::LVL_WARPS;
+                }
+
+                if(EditorCursor.InteractMode == OptCursor_t::LVL_BGOS)
+                {
+                    int A = EditorCursor.InteractIndex;
+
+                    Location_t loc = Background[A].Location;
+                    int type = Background[A].Type;
+
+                    auto &b = Background[A];
+                    b.Location.X += b.Location.Width / 2.0 - EffectWidth[10] / 2;
+                    b.Location.Y += b.Location.Height / 2.0 - EffectHeight[10] / 2;
+                    NewEffect(EFFID_SMOKE_S3, b.Location);
+                    PlaySound(SFX_Smash);
+
+                    Background[A] = Background[numBackground];
+                    numBackground--;
+
+                    MouseRelease = false;
+                    if(EditorCursor.SubMode == 0)
+                        EditorCursor.SubMode = OptCursor_t::LVL_BGOS;
+
+                    if(MagicHand)
                     {
-                        if(CursorCollision(EditorCursor.Location, Tile[A].Location))
+                        qSortBackgrounds(1, numBackground);
+                        UpdateBackgrounds();
+                        syncLayers_AllBGOs();
+                        syncLayers_BGO(numBackground + 1);
+                    }
+                    else
+                    {
+                        syncLayers_BGO(A);
+                        syncLayers_BGO(numBackground + 1);
+                    }
+
+                    MagicBlock::MagicBackground(type, loc);
+                }
+
+                if(EditorCursor.InteractMode == OptCursor_t::LVL_WATER)
+                {
+                    int A = EditorCursor.InteractIndex;
+                    PlaySound(SFX_Smash);
+                    Water[A] = Water[numWater];
+                    numWater--;
+                    syncLayers_Water(A);
+                    syncLayers_Water(numWater + 1);
+                    MouseRelease = false;
+                    if(EditorCursor.SubMode == 0)
+                        EditorCursor.SubMode = OptCursor_t::LVL_WATER;
+                }
+
+                if(EditorCursor.InteractMode == OptCursor_t::WLD_AREA)
+                {
+                    int A = EditorCursor.InteractIndex;
+                    for(int X = 16; X < WorldArea[A].Location.Width; X += 32)
+                    {
+                        for(int Y = 16; Y < WorldArea[A].Location.Height; Y += 32)
                         {
-                            PlaySound(SFX_Grab);
-                            optCursor.current = OptCursor_t::WLD_TILES;
-                            OptCursorSync();
-                            EditorCursor.Mode = OptCursor_t::WLD_TILES;
-                            EditorCursor.Location = static_cast<Location_t>(Tile[A].Location);
-                            EditorCursor.Tile = Tile[A];
-                            SetCursor();
-
-                            Location_t loc = static_cast<Location_t>(Tile[A].Location);
-                            int type = Tile[A].Type;
-
-                            if(A != numTiles)
-                            {
-                                Tile[A] = Tile[numTiles];
-                                treeWorldTileUpdate(&Tile[A]);
-                            }
-                            treeWorldTileRemove(&Tile[numTiles]);
-
-                            numTiles--;
-
-                            MagicBlock::MagicTile(type, loc);
-
-                            editorScreen.FocusTile();
-                            MouseRelease = false;
-                            MouseCancel = true; /* Simulate "Focus out" inside of SMBX Editor */
-                            break;
+                            tempLocation = static_cast<Location_t>(WorldArea[A].Location);
+                            tempLocation.X += X - EffectWidth[10] / 2;
+                            tempLocation.Y += Y - EffectHeight[10] / 2;
+                            NewEffect(EFFID_SMOKE_S3, tempLocation);
                         }
                     }
+
+                    PlaySound(SFX_ShellHit);
+                    if(A != numWorldAreas)
+                        WorldArea[A] = WorldArea[numWorldAreas];
+                    numWorldAreas--;
+                    MouseRelease = false;
+                    if(EditorCursor.SubMode == 0)
+                        EditorCursor.SubMode = OptCursor_t::WLD_AREA;
+                }
+
+                if(EditorCursor.InteractMode == OptCursor_t::WLD_MUSIC)
+                {
+                    int A = EditorCursor.InteractIndex;
+                    tempLocation = static_cast<Location_t>(WorldMusic[A].Location);
+                    tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[10] / 2;
+                    tempLocation.Y += tempLocation.Height / 2.0 - EffectHeight[10] / 2;
+                    NewEffect(EFFID_SMOKE_S3, tempLocation);
+                    PlaySound(SFX_ShellHit);
+                    if(A != numWorldMusic)
+                    {
+                        WorldMusic[A] = WorldMusic[numWorldMusic];
+                        treeWorldMusicUpdate(&WorldMusic[A]);
+                    }
+                    treeWorldMusicRemove(&WorldMusic[numWorldMusic]);
+                    numWorldMusic--;
+                    MouseRelease = false;
+                    if(EditorCursor.SubMode == 0)
+                        EditorCursor.SubMode = OptCursor_t::WLD_MUSIC;
+                }
+
+                if(EditorCursor.InteractMode == OptCursor_t::WLD_PATHS)
+                {
+                    int A = EditorCursor.InteractIndex;
+                    tempLocation = static_cast<Location_t>(WorldPath[A].Location);
+                    tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[10] / 2;
+                    tempLocation.Y += tempLocation.Height / 2.0 - EffectHeight[10] / 2;
+                    NewEffect(EFFID_SMOKE_S3, tempLocation);
+                    PlaySound(SFX_ShellHit);
+                    if(A != numWorldPaths)
+                    {
+                        WorldPath[A] = WorldPath[numWorldPaths];
+                        treeWorldPathUpdate(&WorldPath[A]);
+                    }
+                    treeWorldPathRemove(&WorldPath[numWorldPaths]);
+                    numWorldPaths--;
+                    MouseRelease = false;
+                    if(EditorCursor.SubMode == 0)
+                        EditorCursor.SubMode = OptCursor_t::WLD_PATHS;
+                }
+
+                if(EditorCursor.InteractMode == OptCursor_t::WLD_SCENES)
+                {
+                    int A = EditorCursor.InteractIndex;
+                    tempLocation = static_cast<Location_t>(Scene[A].Location);
+                    tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[10] / 2;
+                    tempLocation.Y += tempLocation.Height / 2.0 - EffectHeight[10] / 2;
+                    NewEffect(EFFID_SMOKE_S3, tempLocation);
+                    PlaySound(SFX_ShellHit);
+                    for(int B = A; B < numScenes; B++)
+                    {
+                        Scene[B] = Scene[B + 1];
+                        treeWorldSceneUpdate(&Scene[B]);
+                    }
+                    treeWorldSceneRemove(&Scene[numScenes]);
+                    numScenes--;
+                    MouseRelease = false;
+                    if(EditorCursor.SubMode == 0)
+                        EditorCursor.SubMode = OptCursor_t::WLD_SCENES;
+                }
+
+                if(EditorCursor.InteractMode == OptCursor_t::WLD_LEVELS)
+                {
+                    int A = EditorCursor.InteractIndex;
+                    tempLocation = static_cast<Location_t>(WorldLevel[A].Location);
+                    tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[10] / 2;
+                    tempLocation.Y += tempLocation.Height / 2.0 - EffectHeight[10] / 2;
+                    NewEffect(EFFID_SMOKE_S3, tempLocation);
+                    PlaySound(SFX_ShellHit);
+                    if(A != numWorldLevels)
+                    {
+                        WorldLevel[A] = WorldLevel[numWorldLevels];
+                        treeWorldLevelUpdate(&WorldLevel[A]);
+                    }
+                    treeWorldLevelRemove(&WorldLevel[numWorldLevels]);
+                    numWorldLevels--;
+                    MouseRelease = false;
+                    if(EditorCursor.SubMode == 0)
+                        EditorCursor.SubMode = OptCursor_t::WLD_LEVELS;
+                }
+
+                if(EditorCursor.InteractMode == OptCursor_t::WLD_TILES)
+                {
+                    int A = EditorCursor.InteractIndex;
+                    tempLocation = static_cast<Location_t>(Tile[A].Location);
+                    tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[10] / 2;
+                    tempLocation.Y += tempLocation.Height / 2.0 - EffectHeight[10] / 2;
+                    NewEffect(EFFID_SMOKE_S3, tempLocation);
+                    PlaySound(SFX_ShellHit);
+
+                    Location_t loc = static_cast<Location_t>(Tile[A].Location);
+                    int type = Tile[A].Type;
+
+                    if(A != numTiles)
+                    {
+                        Tile[A] = Tile[numTiles];
+                        treeWorldTileUpdate(&Tile[A]);
+                    }
+                    treeWorldTileRemove(&Tile[numTiles]);
+
+                    numTiles--;
+
+                    MagicBlock::MagicTile(type, loc);
+
+                    MouseRelease = false;
+                    if(EditorCursor.SubMode == 0)
+                        EditorCursor.SubMode = OptCursor_t::WLD_TILES;
                 }
             }
             else if(EditorCursor.Mode == OptCursor_t::LVL_WATER) // Water
@@ -950,383 +1041,6 @@ void UpdateEditor()
                         numWater++;
                         Water[numWater] = EditorCursor.Water;
                         syncLayers_Water(numWater);
-//                        if(nPlay.Online == true)
-//                            Netplay::sendData Netplay::AddWater(numWater);
-                    }
-                }
-            }
-            else if(EditorCursor.Mode == OptCursor_t::LVL_ERASER || EditorCursor.Mode == OptCursor_t::LVL_ERASER0) // Eraser
-            {
-                if((SharedCursor.Move || MouseRelease)
-                    && (EditorCursor.SubMode == -1 || EditorCursor.SubMode == 0
-                        || EditorCursor.SubMode == OptCursor_t::LVL_NPCS))
-                {
-                    for(A = 1; A <= numNPCs; A++)
-                    {
-                        tempLocation = NPC[A].Location;
-                        if(NPC[A].Type == NPCID_ITEM_BURIED)
-                            tempLocation.Y -= 16;
-
-                        if(CursorCollision(EditorCursor.Location, tempLocation) && !NPC[A].Hidden)
-                        {
-                            if(iRand(2) == 0)
-                                NPC[A].Location.SpeedX = double(Physics.NPCShellSpeed / 2);
-                            else
-                                NPC[A].Location.SpeedX = -double(Physics.NPCShellSpeed / 2);
-//                            Netplay::sendData Netplay::EraseNPC(A, 0);
-                            NPC[A].DefaultType = NPCID_NULL;
-                            if(NPC[A]->IsABonus || NPC[A]->IsACoin)
-                                KillNPC(A, 4); // Kill the bonus/coin
-                            else
-                                KillNPC(A, 2); // Kill the NPC
-                            MouseRelease = false;
-                            if(EditorCursor.SubMode == 0)
-                                EditorCursor.SubMode = OptCursor_t::LVL_NPCS;
-                            break;
-                        }
-                    }
-                }
-
-                if((SharedCursor.Move || MouseRelease)
-                    && (EditorCursor.SubMode == -1 || EditorCursor.SubMode == 0
-                        || EditorCursor.SubMode == OptCursor_t::LVL_BLOCKS))
-                {
-                    for(A = 1; A <= numBlock; A++)
-                    {
-                        if(!BlockIsSizable[Block[A].Type])
-                        {
-                            if(CursorCollision(EditorCursor.Location, Block[A].Location) && !Block[A].Hidden)
-                            {
-//                                Netplay::sendData Netplay::EraseBlock[A];
-
-                                Location_t loc = Block[A].Location;
-                                int type = Block[A].Type;
-                                KillBlock(A);
-
-                                MagicBlock::MagicBlock(type, loc);
-
-                                // FindSBlocks();
-                                MouseRelease = false;
-                                if(EditorCursor.SubMode == 0)
-                                    EditorCursor.SubMode = OptCursor_t::LVL_BLOCKS;
-                                break;
-                            }
-                        }
-                    }
-                }
-
-                if(!MagicHand && (SharedCursor.Move || MouseRelease)
-                    && (EditorCursor.SubMode == -1 || EditorCursor.SubMode == 0
-                        || EditorCursor.SubMode == OptCursor_t::LVL_WARPS))
-                {
-                    for(A = 1; A <= numWarps; A++)
-                    {
-                        tempLocation = static_cast<Location_t>(Warp[A].Entrance);
-                        tempLocation.Height = 32;
-                        tempLocation.Width = 32;
-                        if(CursorCollision(EditorCursor.Location, tempLocation))
-                        {
-                            KillWarp(A);
-//                            if(nPlay.Online == true)
-//                                Netplay::sendData "B" + std::to_string(A) + LB;
-                            MouseRelease = false;
-                            if(EditorCursor.SubMode == 0)
-                                EditorCursor.SubMode = OptCursor_t::LVL_WARPS;
-                            break;
-                        }
-                        tempLocation = static_cast<Location_t>(Warp[A].Exit);
-                        tempLocation.Height = 32;
-                        tempLocation.Width = 32;
-                        if(CursorCollision(EditorCursor.Location, tempLocation))
-                        {
-                            KillWarp(A);
-//                            if(nPlay.Online == true)
-//                                Netplay::sendData "B" + std::to_string(A) + LB;
-                            MouseRelease = false;
-                            if(EditorCursor.SubMode == 0)
-                                EditorCursor.SubMode = OptCursor_t::LVL_WARPS;
-                            break;
-                        }
-                    }
-                }
-                if((SharedCursor.Move || MouseRelease)
-                    && (EditorCursor.SubMode == -1 || EditorCursor.SubMode == 0
-                        || EditorCursor.SubMode == OptCursor_t::LVL_BGOS))
-                {
-                    // more difficult to iterate backwards, but that's what we need to do here
-                    auto sentinel = treeBackgroundQuery(EditorCursor.Location, SORTMODE_Z);
-                    for(auto i = sentinel.end(); i > sentinel.begin();)
-                    {
-                        A = *(--i);
-
-                        if(CursorCollision(EditorCursor.Location, Background[A].Location) && !Background[A].Hidden)
-                        {
-//                            Netplay::sendData Netplay::EraseBackground(A, 0);
-                            auto &b = Background[A];
-                            b.Location.X += b.Location.Width / 2.0 - EffectWidth[10] / 2;
-                            b.Location.Y += b.Location.Height / 2.0 - EffectHeight[10] / 2;
-                            NewEffect(EFFID_SMOKE_S3, b.Location);
-                            PlaySound(SFX_Smash);
-
-                            Location_t loc = Background[A].Location;
-                            int type = Background[A].Type;
-
-                            Background[A] = Background[numBackground];
-                            numBackground--;
-
-                            MouseRelease = false;
-                            if(EditorCursor.SubMode == 0)
-                                EditorCursor.SubMode = OptCursor_t::LVL_BGOS;
-                            if(MagicHand)
-                            {
-                                qSortBackgrounds(1, numBackground);
-                                UpdateBackgrounds();
-                                syncLayers_AllBGOs();
-                                syncLayers_BGO(numBackground + 1);
-                            }
-                            else
-                            {
-                                syncLayers_BGO(A);
-                                syncLayers_BGO(numBackground + 1);
-                            }
-
-                            MagicBlock::MagicBackground(type, loc);
-
-                            break;
-                        }
-                    }
-                }
-
-                if((SharedCursor.Move || MouseRelease)
-                    && (EditorCursor.SubMode == -1 || EditorCursor.SubMode == 0
-                        || EditorCursor.SubMode == OptCursor_t::LVL_BLOCKS))
-                {
-                    for(A = numBlock; A >= 1; A--)
-                    {
-                        if(BlockIsSizable[Block[A].Type])
-                        {
-                            if(CursorCollision(EditorCursor.Location, Block[A].Location) && !Block[A].Hidden)
-                            {
-//                                Netplay::sendData Netplay::EraseBlock[A];
-                                KillBlock(A); // Erase the block
-                                // FindSBlocks();
-                                MouseRelease = false;
-                                if(EditorCursor.SubMode == 0)
-                                    EditorCursor.SubMode = OptCursor_t::LVL_BLOCKS;
-                                break;
-                            }
-                        }
-                    }
-                }
-
-                if(LevelEditor && (SharedCursor.Move || MouseRelease)
-                    && (EditorCursor.SubMode == -1 || EditorCursor.SubMode == 0
-                        || EditorCursor.SubMode == OptCursor_t::LVL_WATER))
-                {
-                    for(int numWaterMax = numWater, A = 1; A <= numWaterMax; A++)
-                    {
-                        tempLocation = static_cast<Location_t>(Water[A].Location);
-                        if(CursorCollision(EditorCursor.Location, tempLocation) && !Water[A].Hidden)
-                        {
-                            PlaySound(SFX_Smash);
-//                            if(nPlay.Online == true)
-//                                Netplay::sendData "y" + std::to_string(A) + LB + "p36" + LB;
-                            Water[A] = Water[numWater];
-                            numWater--;
-                            syncLayers_Water(A);
-                            syncLayers_Water(numWater + 1);
-                            MouseRelease = false;
-                            if(EditorCursor.SubMode == 0)
-                                EditorCursor.SubMode = OptCursor_t::LVL_WATER;
-                            break;
-                        }
-                    }
-                }
-
-                if((SharedCursor.Move || MouseRelease)
-                    && (EditorCursor.SubMode == -1 || EditorCursor.SubMode == 0
-                        || EditorCursor.SubMode == OptCursor_t::WLD_AREA))
-                {
-                    for(int A = numWorldAreas; A >= 1; A--)
-                    {
-                        if(CursorCollision(EditorCursor.Location, newLoc(WorldArea[A].Location.X, WorldArea[A].Location.Y, 32, 32)))
-                        {
-                            for(int X = 16; X < WorldArea[A].Location.Width; X += 32)
-                            {
-                                for(int Y = 16; Y < WorldArea[A].Location.Height; Y += 32)
-                                {
-                                    tempLocation = static_cast<Location_t>(WorldArea[A].Location);
-                                    tempLocation.X += X - EffectWidth[10] / 2;
-                                    tempLocation.Y += Y - EffectHeight[10] / 2;
-                                    NewEffect(EFFID_SMOKE_S3, tempLocation);
-                                }
-                            }
-
-                            PlaySound(SFX_ShellHit);
-                            if(A != numWorldAreas)
-                            {
-                                WorldArea[A] = WorldArea[numWorldAreas];
-                            }
-                            numWorldAreas--;
-                            MouseRelease = false;
-                            if(EditorCursor.SubMode == 0)
-                                EditorCursor.SubMode = OptCursor_t::WLD_AREA;
-                            break;
-                        }
-                    }
-                }
-
-                if((SharedCursor.Move || MouseRelease)
-                    && (EditorCursor.SubMode == -1 || EditorCursor.SubMode == 0
-                        || EditorCursor.SubMode == OptCursor_t::WLD_MUSIC))
-                {
-                    // for(int numWorldMusicMax = numWorldMusic, A = 1; A <= numWorldMusicMax; A++)
-                    for(int A : treeWorldMusicQuery(EditorCursor.Location, SORTMODE_NONE))
-                    {
-                        if(CursorCollision(EditorCursor.Location, WorldMusic[A].Location))
-                        {
-                            tempLocation = static_cast<Location_t>(WorldMusic[A].Location);
-                            tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[10] / 2;
-                            tempLocation.Y += tempLocation.Height / 2.0 - EffectHeight[10] / 2;
-                            NewEffect(EFFID_SMOKE_S3, tempLocation);
-                            PlaySound(SFX_ShellHit);
-                            if(A != numWorldMusic)
-                            {
-                                WorldMusic[A] = WorldMusic[numWorldMusic];
-                                treeWorldMusicUpdate(&WorldMusic[A]);
-                            }
-                            treeWorldMusicRemove(&WorldMusic[numWorldMusic]);
-                            numWorldMusic--;
-                            MouseRelease = false;
-                            if(EditorCursor.SubMode == 0)
-                                EditorCursor.SubMode = OptCursor_t::WLD_MUSIC;
-                            break;
-                        }
-                    }
-                }
-
-                if((SharedCursor.Move || MouseRelease)
-                    && (EditorCursor.SubMode == -1 || EditorCursor.SubMode == 0
-                        || EditorCursor.SubMode == OptCursor_t::WLD_PATHS))
-                {
-                    for(int A : treeWorldPathQuery(EditorCursor.Location, SORTMODE_NONE))
-                    {
-
-                        if(CursorCollision(EditorCursor.Location, WorldPath[A].Location))
-                        {
-                            tempLocation = static_cast<Location_t>(WorldPath[A].Location);
-                            tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[10] / 2;
-                            tempLocation.Y += tempLocation.Height / 2.0 - EffectHeight[10] / 2;
-                            NewEffect(EFFID_SMOKE_S3, tempLocation);
-                            PlaySound(SFX_ShellHit);
-                            if(A != numWorldPaths)
-                            {
-                                WorldPath[A] = WorldPath[numWorldPaths];
-                                treeWorldPathUpdate(&WorldPath[A]);
-                            }
-                            treeWorldPathRemove(&WorldPath[numWorldPaths]);
-                            numWorldPaths--;
-                            MouseRelease = false;
-                            if(EditorCursor.SubMode == 0)
-                                EditorCursor.SubMode = OptCursor_t::WLD_PATHS;
-                            break;
-                        }
-                    }
-                }
-
-                if((SharedCursor.Move || MouseRelease)
-                    && (EditorCursor.SubMode == -1 || EditorCursor.SubMode == 0
-                        || EditorCursor.SubMode == OptCursor_t::WLD_SCENES))
-                {
-                    // more difficult to iterate backwards, but that's what we need to do here
-                    auto sentinel = treeWorldSceneQuery(EditorCursor.Location, SORTMODE_ID);
-                    for(auto i = sentinel.end(); i > sentinel.begin();)
-                    {
-                        A = *(--i);
-
-                        if(CursorCollision(EditorCursor.Location, Scene[A].Location))
-                        {
-                            tempLocation = static_cast<Location_t>(Scene[A].Location);
-                            tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[10] / 2;
-                            tempLocation.Y += tempLocation.Height / 2.0 - EffectHeight[10] / 2;
-                            NewEffect(EFFID_SMOKE_S3, tempLocation);
-                            PlaySound(SFX_ShellHit);
-                            for(B = A; B < numScenes; B++)
-                            {
-                                Scene[B] = Scene[B + 1];
-                                treeWorldSceneUpdate(&Scene[B]);
-                            }
-                            treeWorldSceneRemove(&Scene[numScenes]);
-                            numScenes--;
-                            MouseRelease = false;
-                            if(EditorCursor.SubMode == 0)
-                                EditorCursor.SubMode = OptCursor_t::WLD_SCENES;
-                            break;
-                        }
-                    }
-                }
-
-                if((SharedCursor.Move || MouseRelease)
-                    && (EditorCursor.SubMode == -1 || EditorCursor.SubMode == 0
-                        || EditorCursor.SubMode == OptCursor_t::WLD_LEVELS))
-                {
-                    for(int A : treeWorldLevelQuery(EditorCursor.Location, SORTMODE_NONE))
-                    {
-                        if(CursorCollision(EditorCursor.Location, WorldLevel[A].Location))
-                        {
-                            tempLocation = static_cast<Location_t>(WorldLevel[A].Location);
-                            tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[10] / 2;
-                            tempLocation.Y += tempLocation.Height / 2.0 - EffectHeight[10] / 2;
-                            NewEffect(EFFID_SMOKE_S3, tempLocation);
-                            PlaySound(SFX_ShellHit);
-                            if(A != numWorldLevels)
-                            {
-                                WorldLevel[A] = WorldLevel[numWorldLevels];
-                                treeWorldLevelUpdate(&WorldLevel[A]);
-                            }
-                            treeWorldLevelRemove(&WorldLevel[numWorldLevels]);
-                            numWorldLevels--;
-                            MouseRelease = false;
-                            if(EditorCursor.SubMode == 0)
-                                EditorCursor.SubMode = OptCursor_t::WLD_LEVELS;
-                            break;
-                        }
-                    }
-                }
-
-                if((SharedCursor.Move || MouseRelease)
-                    && (EditorCursor.SubMode == -1 || EditorCursor.SubMode == 0
-                        || EditorCursor.SubMode == OptCursor_t::WLD_TILES))
-                {
-                    for(int A : treeWorldTileQuery(EditorCursor.Location, SORTMODE_NONE))
-                    {
-                        if(CursorCollision(EditorCursor.Location, Tile[A].Location))
-                        {
-                            tempLocation = static_cast<Location_t>(Tile[A].Location);
-                            tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[10] / 2;
-                            tempLocation.Y += tempLocation.Height / 2.0 - EffectHeight[10] / 2;
-                            NewEffect(EFFID_SMOKE_S3, tempLocation);
-                            PlaySound(SFX_ShellHit);
-
-                            Location_t loc = static_cast<Location_t>(Tile[A].Location);
-                            int type = Tile[A].Type;
-
-                            if(A != numTiles)
-                            {
-                                Tile[A] = Tile[numTiles];
-                                treeWorldTileUpdate(&Tile[A]);
-                            }
-                            treeWorldTileRemove(&Tile[numTiles]);
-
-                            numTiles--;
-
-                            MagicBlock::MagicTile(type, loc);
-
-                            MouseRelease = false;
-                            if(EditorCursor.SubMode == 0)
-                                EditorCursor.SubMode = OptCursor_t::WLD_TILES;
-                            break;
-                        }
                     }
                 }
             }
@@ -1452,39 +1166,12 @@ void UpdateEditor()
 
                 }
             }
-            else if(EditorCursor.Mode == OptCursor_t::LVL_SETTINGS && !MagicHand) // Level
+            else if(EditorCursor.Mode == OptCursor_t::LVL_SETTINGS && !MagicHand) // player start points
             {
-                if(EditorCursor.SubMode == 0) // Top
-                {
-                    level[curSection].Y = static_cast<int>(floor(static_cast<double>(EditorCursor.Location.Y / 32))) * 32;
-                    if(level[curSection].Height - level[curSection].Y < 600)
-                        level[curSection].Y = level[curSection].Height - 600;
-                }
-                else if(EditorCursor.SubMode == 1) // Left
-                {
-                    level[curSection].X = static_cast<int>(floor(static_cast<double>(EditorCursor.Location.X / 32))) * 32;
-                    if(level[curSection].Width - level[curSection].X < 800)
-                        level[curSection].X = level[curSection].Width - 800;
-                }
-                else if(EditorCursor.SubMode == 2) // Right
-                {
-                    level[curSection].Width = static_cast<int>(floor(static_cast<double>(EditorCursor.Location.X / 32))) * 32;
-                    if(level[curSection].Width - level[curSection].X < 800)
-                        level[curSection].Width = level[curSection].X + 800;
-                }
-                else if(EditorCursor.SubMode == 3) // Bottom
-                {
-                    level[curSection].Height = static_cast<int>(floor(static_cast<double>(EditorCursor.Location.Y / 32))) * 32;
-                    if(level[curSection].Height - level[curSection].Y < 600)
-                        level[curSection].Height = level[curSection].Y + 600;
-                }
-                else if(EditorCursor.SubMode == 4 || EditorCursor.SubMode == 5)
+                if(EditorCursor.SubMode >= 4)
                 {
                     // printf("Trying to place player at %f, %f...\n", EditorCursor.Location.X, EditorCursor.Location.Y);
-                    if(EditorCursor.SubMode == 4)
-                        B = 1;
-                    else
-                        B = 2;
+                    int B = EditorCursor.SubMode - 3;
 
                     for(A = 1; A <= 2; A++)
                     {
@@ -1550,7 +1237,6 @@ void UpdateEditor()
                             // ugh
                             syncLayers_AllBGOs();
                         }
-//                        Netplay::sendData Netplay::AddBackground(numBackground);
                     }
                 }
             }
@@ -1884,7 +1570,7 @@ void UpdateEditor()
                     treeWorldMusicAdd(&WorldMusic[numWorldMusic]);
                 }
             }
-            else if(EditorCursor.Mode == OptCursor_t::WLD_AREA) // Areas
+            else if(EditorCursor.Mode == OptCursor_t::WLD_AREA && MouseRelease) // Areas
             {
                 for(A = 1; A <= numWorldAreas; A++)
                 {
@@ -1902,6 +1588,7 @@ void UpdateEditor()
                     EditorCursor.WorldArea.Location.Y = EditorCursor.Location.Y;
                     numWorldAreas++;
                     WorldArea[numWorldAreas] = EditorCursor.WorldArea;
+                    MouseRelease = false;
                 }
             }
         }
@@ -1989,9 +1676,6 @@ void UpdateInterprocess()
             if(got.blocks.empty())
                 break;
 
-            optCursor.current = 1;
-            OptCursorSync();
-
             const LevelBlock &b = got.blocks[0];
 
             if(EditorCursor.Mode != OptCursor_t::LVL_BLOCKS ||
@@ -2032,9 +1716,6 @@ void UpdateInterprocess()
             if(got.bgo.empty())
                 break;
 
-            optCursor.current = 3;
-            OptCursorSync();
-
             const LevelBGO &b = got.bgo[0];
 
             if(EditorCursor.Mode != OptCursor_t::LVL_BGOS ||
@@ -2060,9 +1741,6 @@ void UpdateInterprocess()
         {
             if(got.npc.empty())
                 break;
-
-            optCursor.current = 4;
-            OptCursorSync();
 
             const LevelNPC &n = got.npc[0];
 
@@ -2332,6 +2010,15 @@ int EditorNPCFrame(const NPCID A, float& C, int N)
     return ret;
 }
 
+inline void s_CloseProps()
+{
+#ifdef THEXTECH_INTERPROC_SUPPORTED
+    // Tell the IPC Editor to close the properties dialog
+    if(IntProc::isWorking())
+        IntProc::sendCloseProperties();
+#endif
+}
+
 void GetEditorControls()
 {
     if(GamePaused != PauseCode::None)
@@ -2345,14 +2032,22 @@ void GetEditorControls()
     {
         MouseMove(SharedCursor.X, SharedCursor.Y);
     }
+
     if(SharedCursor.Secondary || (EditorControls.ModeSelect && !MagicHand))
     {
-        optCursor.current = OptCursor_t::LVL_SELECT;
+        if(EditorCursor.Mode != OptCursor_t::LVL_SELECT && EditorCursor.Mode != OptCursor_t::LVL_ERASER)
+            s_CloseProps();
+
+        EditorCursor.Mode = OptCursor_t::LVL_SELECT;
         SetCursor();
     }
+
     if(SharedCursor.Tertiary || (EditorControls.ModeErase && !MagicHand))
     {
-        optCursor.current = OptCursor_t::LVL_ERASER;
+        if(EditorCursor.Mode != OptCursor_t::LVL_SELECT && EditorCursor.Mode != OptCursor_t::LVL_ERASER)
+            s_CloseProps();
+
+        EditorCursor.Mode = OptCursor_t::LVL_ERASER;
         SetCursor();
     }
 
@@ -2401,47 +2096,6 @@ void GetEditorControls()
         PlaySound(SFX_Pause);
     }
 
-#if 0
-    if(g_config.editor_edge_scroll && !editorScreen.active && !MagicHand) // scroll-by-edge
-    {
-        bool scrolled = false;
-        int scroll_margin = EditorControls.FastScroll ? 16 : 32;
-        if(SharedCursor.X < 4 && SharedCursor.Y >= 0 && SharedCursor.Y < XRender::TargetH)
-        {
-            SharedCursor.X += scroll_margin;
-            EditorControls.ScrollLeft += scroll_margin;
-            scrolled = true;
-        }
-        if(SharedCursor.X >= XRender::TargetW - 4 && SharedCursor.Y >= 0 && SharedCursor.Y < XRender::TargetH)
-        {
-            SharedCursor.X -= scroll_margin;
-            EditorControls.ScrollRight += scroll_margin;
-            scrolled = true;
-        }
-
-        if(SharedCursor.Y < 4 && SharedCursor.X >= 0 && SharedCursor.X < XRender::TargetW)
-        {
-            SharedCursor.Y += scroll_margin;
-            EditorControls.ScrollUp += scroll_margin;
-            scrolled = true;
-        }
-
-        if(SharedCursor.Y >= XRender::TargetH - 4 && SharedCursor.X >= 0 && SharedCursor.X < XRender::TargetW)
-        {
-            SharedCursor.Y -= scroll_margin;
-            EditorControls.ScrollDown += scroll_margin;
-            scrolled = true;
-        }
-
-        if(scrolled)
-        {
-            int window_x, window_y;
-            XRender::mapFromScreen(SharedCursor.X, SharedCursor.Y, &window_x, &window_y);
-            XWindow::placeCursor(window_x, window_y);
-        }
-    }
-#endif
-
     if(EditorControls.ScrollDown || EditorControls.ScrollUp || EditorControls.ScrollLeft || EditorControls.ScrollRight)
     {
         scroll_buffer_x += EditorControls.ScrollRight;
@@ -2458,39 +2112,8 @@ void GetEditorControls()
 
 void SetCursor()
 {
-#ifdef THEXTECH_INTERPROC_SUPPORTED
-    if(IntProc::isWorking() && EditorCursor.Mode != optCursor.current)
-    {
-        switch(optCursor.current) // Tell the IPC Editor to close the properties dialog
-        {
-        case OptCursor_t::LVL_ERASER:
-        case OptCursor_t::LVL_SELECT:
-            switch(EditorCursor.Mode)
-            {
-            case OptCursor_t::LVL_BLOCKS:
-            case OptCursor_t::LVL_BGOS:
-            case OptCursor_t::LVL_NPCS:
-            case OptCursor_t::LVL_WARPS:
-            case OptCursor_t::LVL_WATER:
-                IntProc::sendCloseProperties();
-                break;
-            default:
-                break;
-            }
-            break;
-        default:
-            break;
-        }
-    }
-#endif
-
-    EditorCursor.Mode = optCursor.current;
-
-    if(EditorCursor.Mode == OptCursor_t::LVL_ERASER && WorldEditor)
-        EditorCursor.Mode = OptCursor_t::LVL_SELECT;
-
 //    EditorCursor.Layer = frmLayers::lstLayer::List(frmLayers::lstLayer::ListIndex);
-    if(EditorCursor.Mode == OptCursor_t::LVL_ERASER0 || EditorCursor.Mode == OptCursor_t::LVL_ERASER) // Eraser
+    if(EditorCursor.Mode == OptCursor_t::LVL_ERASER) // Eraser
     {
         EditorCursor.Location.Width = 18;
         EditorCursor.Location.Height = 8;
@@ -2638,109 +2261,32 @@ void SetCursor()
         // EditorCursor.Warp.Entrance = EditorCursor.Location;
         // EditorCursor.Warp.Exit = EditorCursor.Location;
     }
-#if 0 // Dead code because of condition above: if(EditorCursor.Mode == OptCursor_t::LVL_ERASER0 || EditorCursor.Mode == OptCursor_t::LVL_ERASER) // Eraser
-    else if(EditorCursor.Mode == OptCursor_t::LVL_ERASER) // Eraser
+    else if(EditorCursor.Mode == OptCursor_t::WLD_TILES) // Tiles
     {
-        EditorCursor.Location.Width = 32;
-        EditorCursor.Location.Height = 32;
-    }
-#endif
-    else if(EditorCursor.Mode == 7) // Tiles
-    {
-//        for(A = 1; A <= frmTiles::Tile.Count; A++)
-//        {
-//            if(frmTiles::Tile(A).Value == true)
-//            {
-//                EditorCursor.Tile.Type = A;
-//                break;
-//            }
-//        }
         if(EditorCursor.Tile.Type == 0)
             EditorCursor.Tile.Type = 1;
         EditorCursor.Location.Width = TileWidth[EditorCursor.Tile.Type];
         EditorCursor.Location.Height = TileHeight[EditorCursor.Tile.Type];
         EditorCursor.Tile.Location = static_cast<TinyLocation_t>(EditorCursor.Location);
     }
-    else if(EditorCursor.Mode == 8) // Scene
+    else if(EditorCursor.Mode == OptCursor_t::WLD_SCENES) // Scene
     {
-//        for(A = 1; A <= frmScene::Scene.Count; A++)
-//        {
-//            if(frmScene::Scene(A).Value == true)
-//            {
-//                EditorCursor.Scene.Type = A;
-//                EditorCursor.Scene.Active = true;
-//                break;
-//            }
-//        }
-//        EditorCursor.Location.Width = SceneWidth(EditorCursor.Scene::Type);
-//        EditorCursor.Location.Height = SceneHeight(EditorCursor.Scene::Type);
         if(EditorCursor.Scene.Type == 0)
             EditorCursor.Scene.Type = 1;
         EditorCursor.Location.Width = SceneWidth[EditorCursor.Scene.Type];
         EditorCursor.Location.Height = SceneHeight[EditorCursor.Scene.Type];
         EditorCursor.Scene.Location = static_cast<TinyLocation_t>(EditorCursor.Location);
     }
-    else if(EditorCursor.Mode == 9) // Levels
+    else if(EditorCursor.Mode == OptCursor_t::WLD_LEVELS) // Levels
     {
-//        for(A = 1; A < frmLevels::WorldLevel.Count; A++)
-//        {
-//            if(frmLevels::WorldLevel(A).Value == true)
-//            {
-//                EditorCursor.WorldLevel.Type = A;
-//                EditorCursor.WorldLevel.Active = true;
-//                break;
-//            }
-//        }
         if(EditorCursor.WorldLevel.Type == 0)
             EditorCursor.WorldLevel.Type = 1;
         EditorCursor.Location.Width = 32;
         EditorCursor.Location.Height = 32;
         EditorCursor.WorldLevel.Location = static_cast<TinyLocation_t>(EditorCursor.Location);
-//        EditorCursor.WorldLevel.FileName = frmLevels::txtFilename.Text;
-//        if(EditorCursor.WorldLevel::FileName != "" && EditorCursor.WorldLevel::FileName.substr(EditorCursor.WorldLevel::FileName.Length - 4) != StringHelper::toLower(".lvl"))
-//            EditorCursor.WorldLevel.FileName = EditorCursor.WorldLevel::FileName + ".lvl";
-//        EditorCursor.WorldLevel.StartWarp = SDL_atoi(frmLevels::scrWarp.Value);
-//        EditorCursor.WorldLevel.LevelName = frmLevels::txtLevelName.Text;
-        // these are set in the new editor screen.
-        // EditorCursor.WorldLevel.Visible = false;
-        // EditorCursor.WorldLevel.Start = false;
-        // EditorCursor.WorldLevel.Path = false;
-        // EditorCursor.WorldLevel.Path2 = false;
-//        if(frmLevels::chkVisible.Value > 0)
-//            EditorCursor.WorldLevel.Visible = true;
-//        if(frmLevels::chkStart.Value > 0)
-//            EditorCursor.WorldLevel.Start = true;
-//        if(frmLevels::chkPath.Value > 0)
-//            EditorCursor.WorldLevel.Path = true;
-//        if(frmLevels::chkPath2.Value > 0)
-//            EditorCursor.WorldLevel.Path2 = true;
-//        if(frmLevels::txtX.Text == "")
-//            EditorCursor.WorldLevel.WarpX = -1;
-//        else
-//            EditorCursor.WorldLevel.WarpX = SDL_atoi(frmLevels::txtX.Text);
-//        if(frmLevels::txtX.Text == "")
-//            EditorCursor.WorldLevel.WarpY = -1;
-//        else
-//            EditorCursor.WorldLevel.WarpY = SDL_atoi(frmLevels::txtY.Text);
-
-//        for(A = 1; A <= 4; A++)
-//        {
-//            if(frmLevels::cmbExit(A).ListIndex < 0)
-//                frmLevels::cmbExit(A).ListIndex = 0;
-//            EditorCursor.WorldLevel::LevelExit(A) = frmLevels::cmbExit(A).ListIndex - 1;
-//        }
     }
     else if(EditorCursor.Mode == OptCursor_t::WLD_PATHS) // Paths
     {
-//        for(A = 1; A <= frmPaths::WorldPath.Count; A++)
-//        {
-//            if(frmPaths::WorldPath(A).Value == true)
-//            {
-//                EditorCursor.WorldPath.Type = A;
-//                EditorCursor.WorldPath.Active = true;
-//                break;
-//            }
-//        }
         if(EditorCursor.WorldPath.Type == 0)
             EditorCursor.WorldPath.Type = 1;
         EditorCursor.Location.Width = 32;
@@ -2755,15 +2301,6 @@ void SetCursor()
         // make it play the music
         if(g_isWorldMusicNotSame(EditorCursor.WorldMusic))
             g_playWorldMusic(EditorCursor.WorldMusic);
-
-//        for(A = 0; A < frmMusic::optMusic.Count; A++)
-//        {
-//            if(frmMusic::optMusic(A).Value == true)
-//            {
-//                EditorCursor.WorldMusic.Type = A;
-//                break;
-//            }
-//        }
     }
     else if(EditorCursor.Mode == OptCursor_t::WLD_AREA) // World Area
     {
@@ -2785,13 +2322,7 @@ void PositionCursor()
 //    if(EditorCursor.Mode == 4 && frmNPCs::Buried.Caption == "Yes")
 //        EditorCursor.Location.Y += 16;
 
-    if(EditorCursor.Mode == 9)
-    {
-//        frmLevels.lblX = EditorCursor.Location.X;
-//        frmLevels.lblY = EditorCursor.Location.Y;
-    }
-
-    if(EditorCursor.Mode == OptCursor_t::LVL_SELECT || EditorCursor.Mode == 14 ||
+    if(EditorCursor.Mode == OptCursor_t::LVL_SELECT ||
       (EditorCursor.Mode == OptCursor_t::LVL_SETTINGS && EditorCursor.SubMode < 4))
         return;
 
@@ -2869,7 +2400,7 @@ void PositionCursor()
             EditorCursor.Location.Y -= 8;
     }
 
-    if(EditorCursor.Mode == 4)
+    if(EditorCursor.Mode == OptCursor_t::LVL_NPCS)
     {
         if(EditorCursor.NPC->THeight < 32)
             EditorCursor.Location.Y += 32;
@@ -3104,9 +2635,501 @@ void zTestLevel(bool magicHand, bool interProcess)
     editorScreen.active = false;
     ReturnWarp = 0;
 
-    optCursor.current = OptCursor_t::LVL_SELECT;
     EditorCursor.Mode = OptCursor_t::LVL_SELECT;
-    OptCursorSync();
+}
+
+static constexpr int s_resize_border = 8;
+
+template<class LocType>
+static inline int s_find_flags(const LocType& loc)
+{
+    // require cursor to be at least nearby
+    if(    EditorCursor.Location.X < loc.X - s_resize_border
+        || EditorCursor.Location.X > loc.X + loc.Width + s_resize_border
+        || EditorCursor.Location.Y < loc.Y - s_resize_border
+        || EditorCursor.Location.Y > loc.Y + loc.Height + s_resize_border)
+    {
+        return 0;
+    }
+
+    int found_flags = 0;
+
+    if(EditorCursor.Location.X < loc.X + s_resize_border)
+        found_flags |= IF_ResizeL;
+    else if(EditorCursor.Location.X > loc.X + loc.Width - s_resize_border)
+        found_flags |= IF_ResizeR;
+
+    if(EditorCursor.Location.Y < loc.Y + s_resize_border)
+        found_flags |= IF_ResizeT;
+    else if(EditorCursor.Location.Y > loc.Y + loc.Height - s_resize_border)
+        found_flags |= IF_ResizeB;
+
+    return found_flags;
+}
+
+static inline int s_find_flags_section(const SpeedlessLocation_t& loc)
+{
+    // require cursor to be at least nearby
+    if(    EditorCursor.Location.X < loc.X - s_resize_border
+        || EditorCursor.Location.X > loc.Width + s_resize_border
+        || EditorCursor.Location.Y < loc.Y - s_resize_border
+        || EditorCursor.Location.Y > loc.Height + s_resize_border)
+    {
+        return 0;
+    }
+
+    int found_flags = 0;
+
+    if(EditorCursor.Location.X < loc.X + s_resize_border)
+        found_flags |= IF_ResizeL;
+    else if(EditorCursor.Location.X > loc.Width - s_resize_border)
+        found_flags |= IF_ResizeR;
+
+    if(EditorCursor.Location.Y < loc.Y + s_resize_border)
+        found_flags |= IF_ResizeT;
+    else if(EditorCursor.Location.Y > loc.Height - s_resize_border)
+        found_flags |= IF_ResizeB;
+
+    return found_flags;
+}
+
+void UpdateInteract()
+{
+    // only update items in select mode (mouse up or just pressed) or erase mode
+    bool mouse_held = (SharedCursor.Primary && !MouseRelease);
+    bool select_mode = EditorCursor.Mode == OptCursor_t::LVL_SELECT;
+    bool erase_mode = EditorCursor.Mode == OptCursor_t::LVL_ERASER;
+
+    if(select_mode && mouse_held)
+        return;
+
+    EditorCursor.InteractMode = 0;
+    EditorCursor.InteractFlags = 0;
+    EditorCursor.InteractIndex = 0;
+    EditorCursor.InteractX = EditorCursor.Location.X;
+    EditorCursor.InteractY = EditorCursor.Location.Y;
+
+     if(!select_mode && !erase_mode)
+        return;
+
+    if(MouseCancel)
+        return;
+
+   // class filter for eraser
+    int need_class = 0;
+    if(erase_mode && EditorCursor.SubMode > 0)
+        need_class = EditorCursor.SubMode;
+
+    // player start points
+    if(!MagicHand && select_mode)
+    {
+        for(int A = 1; A <= 2; A++)
+        {
+            if(CursorCollision(EditorCursor.Location, PlayerStart[A]))
+            {
+                EditorCursor.InteractMode = OptCursor_t::LVL_SETTINGS;
+                EditorCursor.InteractFlags = IF_AltMode;
+                EditorCursor.InteractIndex = A;
+                break;
+            }
+        }
+    }
+
+    // NPCs
+    // never sizable, so only do this if nothing found yet
+    if(EditorCursor.InteractMode == 0 && (!need_class || need_class == OptCursor_t::LVL_NPCS))
+    {
+        for(int A = 1; A <= numNPCs; A++)
+        {
+            Location_t tempLocation = NPC[A].Location;
+
+            if(NPC[A].Type == NPCID_ITEM_BURIED) // Herb's container offset
+                tempLocation.Y -= 16;
+
+            if(CursorCollision(EditorCursor.Location, tempLocation) && !NPC[A].Hidden)
+            {
+                EditorCursor.InteractMode = OptCursor_t::LVL_NPCS;
+                EditorCursor.InteractFlags = 0;
+                EditorCursor.InteractIndex = A;
+                break;
+            }
+        }
+    }
+
+    // non-sizable blocks (same condition)
+    if(EditorCursor.InteractMode == 0 && (!need_class || need_class == OptCursor_t::LVL_BLOCKS))
+    {
+        for(int A = 1; A <= numBlock; A++)
+        {
+            if(BlockIsSizable[Block[A].Type])
+                continue;
+
+            if(CursorCollision(EditorCursor.Location, Block[A].Location) && !Block[A].Hidden)
+            {
+                EditorCursor.InteractMode = OptCursor_t::LVL_BLOCKS;
+                EditorCursor.InteractFlags = 0;
+                EditorCursor.InteractIndex = A;
+                break;
+            }
+        }
+    }
+
+    // warps (same condition for now, until warps become sizable)
+    if(!MagicHand && EditorCursor.InteractMode == 0 && (!need_class || need_class == OptCursor_t::LVL_WARPS))
+    {
+        for(int A = 1; A <= numWarps; A++)
+        {
+            if(CursorCollision(EditorCursor.Location, Warp[A].Entrance) && !Warp[A].Hidden)
+            {
+                EditorCursor.InteractMode = OptCursor_t::LVL_WARPS;
+                EditorCursor.InteractFlags = 0;
+                EditorCursor.InteractIndex = A;
+                break;
+            }
+            else if(CursorCollision(EditorCursor.Location, Warp[A].Exit) && !Warp[A].Hidden)
+            {
+                EditorCursor.InteractMode = OptCursor_t::LVL_WARPS;
+                EditorCursor.InteractFlags = IF_AltMode;
+                EditorCursor.InteractIndex = A;
+                break;
+            }
+        }
+    }
+
+    // BGOs
+    // never sizable, so only do this if nothing found yet
+    if(EditorCursor.InteractMode == 0 && (!need_class || need_class == OptCursor_t::LVL_BGOS))
+    {
+        // more difficult to iterate backwards, but that's what we need to do here
+        auto sentinel = treeBackgroundQuery(EditorCursor.Location, SORTMODE_Z);
+        for(auto i = sentinel.end(); i > sentinel.begin();)
+        {
+            int A = *(--i);
+
+            if(CursorCollision(EditorCursor.Location, Background[A].Location) && !Background[A].Hidden)
+            {
+                EditorCursor.InteractMode = OptCursor_t::LVL_BGOS;
+                EditorCursor.InteractFlags = 0;
+                EditorCursor.InteractIndex = A;
+                break;
+            }
+        }
+    }
+
+    // Sizable blocks
+    // now things get exciting
+    if(((select_mode && EditorCursor.InteractFlags < 2) || EditorCursor.InteractMode == 0)
+        && (!need_class || need_class == OptCursor_t::LVL_BLOCKS)) // Sizable blocks
+    {
+        for(int A = 1; A <= numBlock; A++)
+        {
+            if(!BlockIsSizable[Block[A].Type] || Block[A].Hidden)
+                continue;
+
+            int found_flags = (select_mode) ? s_find_flags(Block[A].Location) : 0;
+
+            if(found_flags || CursorCollision(EditorCursor.Location, Block[A].Location))
+            {
+                if(found_flags || EditorCursor.InteractMode == 0)
+                {
+                    EditorCursor.InteractMode = OptCursor_t::LVL_BLOCKS;
+                    EditorCursor.InteractFlags = found_flags;
+                    EditorCursor.InteractIndex = A;
+                    break;
+                }
+            }
+        }
+    }
+
+    // Water boxes
+    // can resize
+    if(!MagicHand
+        && ((select_mode && EditorCursor.InteractFlags < 2) || EditorCursor.InteractMode == 0)
+        && (!need_class || need_class == OptCursor_t::LVL_WATER))
+    {
+        for(int A = 1; A <= numWater; A++)
+        {
+            if(Water[A].Hidden)
+                continue;
+
+            int found_flags = (select_mode) ? s_find_flags(Water[A].Location) : 0;
+
+            if(found_flags || CursorCollision(EditorCursor.Location, Water[A].Location))
+            {
+                if(found_flags || EditorCursor.InteractMode == 0)
+                {
+                    EditorCursor.InteractMode = OptCursor_t::LVL_WATER;
+                    EditorCursor.InteractFlags = found_flags;
+                    EditorCursor.InteractIndex = A;
+                    break;
+                }
+            }
+        }
+    }
+
+    // event section borders
+    if(!MagicHand && select_mode && EditorCursor.InteractFlags < 2)
+    {
+        for(int A = numEvents - 1; A >= 0; A--)
+        {
+            const auto& sectPos = Events[A].section[curSection].position;
+            if(sectPos.X == EventSection_t::LESet_Nothing || sectPos.X == EventSection_t::LESet_ResetDefault)
+                continue;
+
+            int found_flags = s_find_flags_section(sectPos);
+
+            if(found_flags)
+            {
+                EditorCursor.InteractMode = OptCursor_t::LVL_EVENTS;
+                EditorCursor.InteractFlags = found_flags;
+                EditorCursor.InteractIndex = A;
+                break;
+            }
+        }
+    }
+
+    // section borders
+    if(!MagicHand && select_mode && EditorCursor.InteractFlags < 2)
+    {
+        int found_flags = s_find_flags_section(level[curSection]);
+
+        if(found_flags)
+        {
+            EditorCursor.InteractMode = OptCursor_t::LVL_SETTINGS;
+            EditorCursor.InteractFlags = found_flags;
+            EditorCursor.InteractIndex = 0;
+        }
+    }
+
+    // world map areas
+    // can resize
+    if(((select_mode && EditorCursor.InteractFlags < 2) || EditorCursor.InteractMode == 0)
+         && (!need_class || need_class == OptCursor_t::WLD_AREA))
+    {
+        for(int A = numWorldAreas; A >= 1; A--)
+        {
+            int found_flags = (select_mode) ? s_find_flags(WorldArea[A].Location) : 0;
+
+            // count as collision if on corner, or if in top-left
+            if(found_flags || (EditorCursor.InteractMode == 0 && CursorCollision(EditorCursor.Location, newLoc(WorldArea[A].Location.X, WorldArea[A].Location.Y, 32, 32))))
+            {
+                EditorCursor.InteractMode = OptCursor_t::WLD_AREA;
+                EditorCursor.InteractFlags = found_flags;
+                EditorCursor.InteractIndex = A;
+                break;
+            }
+        }
+    }
+
+    // world map music
+    if(EditorCursor.InteractMode == 0 && (!need_class || need_class == OptCursor_t::WLD_MUSIC))
+    {
+        for(int A : treeWorldMusicQuery(EditorCursor.Location, SORTMODE_NONE))
+        {
+            if(CursorCollision(EditorCursor.Location, WorldMusic[A].Location))
+            {
+                EditorCursor.InteractMode = OptCursor_t::WLD_MUSIC;
+                EditorCursor.InteractFlags = 0;
+                EditorCursor.InteractIndex = A;
+                break;
+            }
+        }
+    }
+
+    // world paths
+    if(EditorCursor.InteractMode == 0 && (!need_class || need_class == OptCursor_t::WLD_PATHS))
+    {
+        for(int A : treeWorldPathQuery(EditorCursor.Location, SORTMODE_NONE))
+        {
+            if(CursorCollision(EditorCursor.Location, WorldPath[A].Location))
+            {
+                EditorCursor.InteractMode = OptCursor_t::WLD_PATHS;
+                EditorCursor.InteractFlags = 0;
+                EditorCursor.InteractIndex = A;
+                break;
+            }
+        }
+    }
+
+    // world sceneries
+    if(EditorCursor.InteractMode == 0 && (!need_class || need_class == OptCursor_t::WLD_SCENES))
+    {
+        // harder to go backwards, but that's all we're doing here.
+        // it's a good thing that the sentinel's scope ends quickly,
+        // otherwise it would take a long time for the result vector
+        // to rejoin the pool. -- ds-sloth
+        auto sentinel = treeWorldSceneQuery(EditorCursor.Location, SORTMODE_ID);
+        for(auto i = sentinel.end(); i > sentinel.begin();)
+        {
+            int A = *(--i);
+
+            if(CursorCollision(EditorCursor.Location, Scene[A].Location))
+            {
+                EditorCursor.InteractMode = OptCursor_t::WLD_SCENES;
+                EditorCursor.InteractFlags = 0;
+                EditorCursor.InteractIndex = A;
+                break;
+            }
+        }
+    }
+
+    // world levels
+    if(EditorCursor.InteractMode == 0 && (!need_class || need_class == OptCursor_t::WLD_LEVELS))
+    {
+        for(int A : treeWorldLevelQuery(EditorCursor.Location, SORTMODE_NONE))
+        {
+            if(CursorCollision(EditorCursor.Location, WorldLevel[A].Location))
+            {
+                EditorCursor.InteractMode = OptCursor_t::WLD_LEVELS;
+                EditorCursor.InteractFlags = 0;
+                EditorCursor.InteractIndex = A;
+                break;
+            }
+        }
+    }
+
+    // world tiles
+    if(EditorCursor.InteractMode == 0 && (!need_class || need_class == OptCursor_t::WLD_TILES))
+    {
+        for(int A : treeWorldTileQuery(EditorCursor.Location, SORTMODE_NONE))
+        {
+            if(CursorCollision(EditorCursor.Location, Tile[A].Location))
+            {
+                EditorCursor.InteractMode = OptCursor_t::WLD_TILES;
+                EditorCursor.InteractFlags = 0;
+                EditorCursor.InteractIndex = A;
+                break;
+            }
+        }
+    }
+}
+
+template<class LocType>
+void InteractResize(LocType& loc, int min, int snap)
+{
+    if(EditorCursor.InteractFlags & IF_ResizeL)
+    {
+        double dl = EditorCursor.Location.X - loc.X;
+        if(dl > snap && loc.Width > min)
+        {
+            loc.X += snap;
+            loc.Width -= snap;
+            PlaySound(SFX_Saw);
+        }
+        else if(dl < -snap)
+        {
+            loc.X -= snap;
+            loc.Width += snap;
+            PlaySound(SFX_Saw);
+        }
+    }
+
+    if(EditorCursor.InteractFlags & IF_ResizeR)
+    {
+        double dr = EditorCursor.Location.X - (loc.X + loc.Width);
+        if(dr < -snap && loc.Width > min)
+        {
+            loc.Width -= snap;
+            PlaySound(SFX_Saw);
+        }
+        else if(dr > snap)
+        {
+            loc.Width += snap;
+            PlaySound(SFX_Saw);
+        }
+    }
+
+    if(EditorCursor.InteractFlags & IF_ResizeT)
+    {
+        double dt = EditorCursor.Location.Y - loc.Y;
+        if(dt > snap && loc.Height > min)
+        {
+            loc.Y += snap;
+            loc.Height -= snap;
+            PlaySound(SFX_Saw);
+        }
+        else if(dt < -snap)
+        {
+            loc.Y -= snap;
+            loc.Height += snap;
+            PlaySound(SFX_Saw);
+        }
+    }
+
+    if(EditorCursor.InteractFlags & IF_ResizeB)
+    {
+        double db = EditorCursor.Location.Y - (loc.Y + loc.Height);
+        if(db < -snap && loc.Height > min)
+        {
+            loc.Height -= snap;
+            PlaySound(SFX_Saw);
+        }
+        else if(db > snap)
+        {
+            loc.Height += snap;
+            PlaySound(SFX_Saw);
+        }
+    }
+}
+
+void InteractResizeSection(SpeedlessLocation_t& section)
+{
+    bool resized = false;
+
+    if(EditorCursor.InteractFlags & IF_ResizeT)
+    {
+        int new_Y = static_cast<int>(round(static_cast<double>(EditorCursor.Location.Y / 32))) * 32;
+        if(section.Height - new_Y < 600)
+            new_Y = section.Height - 600;
+
+        if(new_Y != section.Y)
+        {
+            section.Y = new_Y;
+            resized = true;
+        }
+    }
+
+    if(EditorCursor.InteractFlags & IF_ResizeL)
+    {
+        int new_X = static_cast<int>(round(static_cast<double>(EditorCursor.Location.X / 32))) * 32;
+        if(section.Width - new_X < 800)
+            new_X = section.Width - 800;
+
+        if(new_X != section.X)
+        {
+            section.X = new_X;
+            resized = true;
+        }
+    }
+
+    if(EditorCursor.InteractFlags & IF_ResizeR)
+    {
+        int new_Width = static_cast<int>(round(static_cast<double>(EditorCursor.Location.X / 32))) * 32;
+        if(new_Width - section.X < 800)
+            new_Width = section.X + 800;
+
+        if(new_Width != section.Width)
+        {
+            section.Width = new_Width;
+            resized = true;
+        }
+    }
+
+    if(EditorCursor.InteractFlags & IF_ResizeB)
+    {
+        int new_Height = static_cast<int>(round(static_cast<double>(EditorCursor.Location.Y / 32))) * 32;
+        if(new_Height - section.Y < 600)
+            new_Height = section.Y + 600;
+
+        if(new_Height != section.Height)
+        {
+            section.Height = new_Height;
+            resized = true;
+        }
+    }
+
+    if(resized)
+        PlaySound(SFX_Saw);
 }
 
 void MouseMove(float X, float Y, bool /*nCur*/)
@@ -3147,7 +3170,7 @@ void MouseMove(float X, float Y, bool /*nCur*/)
         Y -= Layer[EditorCursor.Layer].OffsetY;
     }
 
-    if(EditorCursor.Mode == 0 || EditorCursor.Mode == 6 || EditorCursor.Mode == 13 || EditorCursor.Mode == 14 /*|| frmLevelEditor::chkAlign.Value == 0*/)
+    if(EditorCursor.Mode == OptCursor_t::LVL_ERASER || EditorCursor.Mode == OptCursor_t::LVL_SELECT /*|| frmLevelEditor::chkAlign.Value == 0*/)
     {
         EditorCursor.Location.X = double(X) - vScreen[A].X;
         EditorCursor.Location.Y = double(Y) - vScreen[A].Y;
@@ -3262,193 +3285,4 @@ void ResetNPC(NPCID A)
     EditorCursor.NPC.Frame = NPC[0].Frame;
     EditorCursor.NPC.FrameCount = NPC[0].FrameCount;
     NPC[0].Frame = 0;
-}
-
-// SCARY FUNCTION, I don't support it in my editor. --ds-sloth
-void BlockFill(const Location_t &Loc)
-{
-    bool tempBool = false;
-    Location_t tempLoc;
-    int A = 0;
-
-    if(Loc.X >= level[curSection].X - 30)
-    {
-        if(Loc.Y >= level[curSection].Y - 30)
-        {
-            if(Loc.X + Loc.Width <= level[curSection].Width + 30)
-            {
-                if(Loc.Y + Loc.Height <= level[curSection].Height + 30)
-                {
-                    tempBool = true;
-                    for(A = 1; A <= numBlock; A++)
-                    {
-                        if(!Block[A].Hidden)
-                        {
-                            if(CursorCollision(Loc, Block[A].Location))
-                            {
-                                tempBool = false;
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    if(tempBool)
-    {
-        numBlock++;
-        Block[numBlock] = EditorCursor.Block;
-        Block[numBlock].DefaultType = Block[numBlock].Type;
-        Block[numBlock].DefaultSpecial = Block[numBlock].Special;
-        Block[numBlock].Location = Loc;
-        syncLayersTrees_Block(numBlock);
-        tempLoc = Loc;
-        tempLoc.X += -Loc.Width;
-        BlockFill(tempLoc); // left
-        tempLoc = Loc;
-        tempLoc.X += Loc.Width;
-        BlockFill(tempLoc); // right
-        tempLoc = Loc;
-        tempLoc.Y += -Loc.Height;
-        BlockFill(tempLoc); // top
-        tempLoc = Loc;
-        tempLoc.Y += Loc.Height;
-        BlockFill(tempLoc); // bottom
-    }
-}
-
-void OptCursorSync()
-{
-//    On Error Resume Next
-//    Dim A As Integer
-//    int A = 0;
-//    EditorCursor.Selected = 0
-    EditorCursor.Selected = 0;
-//    EditorCursor.SelectedMode = 0
-    EditorCursor.SelectedMode = 0;
-//    For A = 1 To optCursor.Count
-//        If Index <> A Then optCursor(A).Value = False
-//    Next A
-
-//    If Index = 1 Then
-    if(optCursor.current == 1)
-    {
-//        frmBlocks.Show
-//        frmBlocks.FocusNinja.SetFocus
-//    Else
-    }
-//        frmBlocks.Hide
-//        frmAdvancedBlock.Hide
-//    End If
-
-
-//    If Index = 2 Then
-    if(optCursor.current == 2)
-    {
-//        frmLevelSettings.optLevel(0).Value = False
-//        frmLevelSettings.optLevel(1).Value = False
-//        frmLevelSettings.optLevel(2).Value = False
-//        frmLevelSettings.optLevel(3).Value = False
-//        frmLevelSettings.optLevel(4).Value = False
-//        frmLevelSettings.optLevel(5).Value = False
-//        frmLevelSettings.Show
-//        frmLevelSettings.FocusNinja.SetFocus
-//    Else
-    }
-//        frmLevelSettings.Hide
-//    End If
-
-
-//    If Index = 3 Then
-    if(optCursor.current == 3)
-    {
-//        frmBackgrounds.Show
-//        frmBackgrounds.FocusNinja.SetFocus
-//    Else
-    }
-//        frmBackgrounds.Hide
-//    End If
-
-
-//    If Index = 4 Then
-    if(optCursor.current == 4)
-    {
-//        frmNPCs.Show
-//        frmNPCs.FocusNinja.SetFocus
-    }
-//    Else
-//        frmNPCs.Hide
-//        Unload frmGenerator
-//        Unload frmAdvanced
-//        Unload frmNPCAdvanced
-//    End If
-
-
-//    If Index = 5 Then
-//        frmWarp.Show
-//        frmWarp.FocusNinja.SetFocus
-//    Else
-//        frmWarp.Hide
-//    End If
-
-
-//    If Index = 7 Then
-//        frmTiles.Show
-//        frmTiles.FocusNinja.SetFocus
-//    Else
-//        frmTiles.Hide
-//    End If
-
-
-//    If Index = 8 Then
-//        frmScene.Show
-//        frmScene.FocusNinja.SetFocus
-//    Else
-//        frmScene.Hide
-//    End If
-
-
-//    If Index = 9 Then
-//        frmLevels.Show
-//        frmLevels.FocusNinja.SetFocus
-//    Else
-//        frmLevels.Hide
-//    End If
-
-
-//    If Index = 10 Then
-//        frmPaths.Show
-//        frmPaths.FocusNinja.SetFocus
-//    Else
-//        frmPaths.Hide
-//    End If
-//    If Index = 11 Then
-//        frmMusic.Show
-//        frmMusic.FocusNinja.SetFocus
-//    Else
-//        frmMusic.Hide
-//    End If
-
-
-//    If Index = 12 Then
-//        frmWorld.Show
-//        frmWorld.FocusNinja.SetFocus
-//    Else
-//        frmWorld.Hide
-//    End If
-
-
-//    If Index = 15 Then
-//        frmWater.Show
-//        'frmWater.FocusNinja.SetFocus
-//    Else
-//        frmWater.Hide
-//    End If
-
-
-//    If Index = 0 Or Index = 6 Or Index = 13 Or Index = 14 Then
-//        frmLevelWindow.SetFocus
-//    End If
 }

@@ -254,6 +254,21 @@ void DrawEditorLevel(int Z)
                 }
             }
         }
+
+        // render event section resizes
+        for(int A = 0; A < numEvents; A++)
+        {
+            const auto& e = Events[A];
+            const auto& sectPos = e.section[curSection].position;
+            if(sectPos.X == EventSection_t::LESet_Nothing || sectPos.X == EventSection_t::LESet_ResetDefault)
+                continue;
+
+            XTColor ev_color = {uint8_t(64 + 128 * (A & 1)), uint8_t(64 + 64 * (A & 2)), uint8_t(64 + 32 * (A & 4))};
+            DrawSimpleFrame(vScreen[Z].X + sectPos.X, vScreen[Z].Y + sectPos.Y, sectPos.Width - sectPos.X, sectPos.Height - sectPos.Y, {0, 0, 0}, ev_color, {0, 0, 0, 0});
+            SuperPrint(g_editorStrings.wordEvent, 3, vScreen[Z].X + sectPos.X + 8, vScreen[Z].Y + sectPos.Y + 8);
+            SuperPrint(e.Name, 3, vScreen[Z].X + sectPos.X + 8, vScreen[Z].Y + sectPos.Y + 28, ev_color);
+            SuperPrint(g_editorStrings.eventsCaseBounds, 3, vScreen[Z].X + sectPos.X + 8, vScreen[Z].Y + sectPos.Y + 48);
+        }
     }
 
 #ifdef __3DS__
@@ -605,20 +620,6 @@ void DrawEditorLevel(int Z)
                 XTColorF(1.f, 0.f, 0.f, 1.f), false);
         }
 
-#if 0
-        if(g_config.editor_edge_scroll && !editorScreen.active && !MagicHand)
-        {
-            if(curX >= 0 && curX < 36)
-                curX = 36;
-            if(curY >= 0 && curY < 36)
-                curY = 36;
-            if(curX >= XRender::TargetW - 36)
-                curX = XRender::TargetW - 36;
-            if(curY >= XRender::TargetH - 36)
-                curY = XRender::TargetH - 36;
-        }
-#endif
-
         if(EditorCursor.Mode == 0 || EditorCursor.Mode == 6) // Eraser
         {
             if(EditorCursor.SubMode == -1)
@@ -630,6 +631,24 @@ void DrawEditorLevel(int Z)
             }
             else
                 XRender::renderTexture(curX - 2, curY, GFX.ECursor[3]);
+        }
+
+        // left-right resize
+        else if(EditorCursor.InteractFlags > 1 && !(EditorCursor.InteractFlags & 2) && !(EditorCursor.InteractFlags & 4))
+        {
+            XRender::renderTexture(curX - 16, curY - 16, 32, 32, GFX.EIcons, 0, 32 * Icon::lr);
+        }
+
+        // up-down resize
+        else if(EditorCursor.InteractFlags > 1 && !(EditorCursor.InteractFlags & 8) && !(EditorCursor.InteractFlags & 16))
+        {
+            XRender::renderTexture(curX - 16, curY - 16, 32, 32, GFX.EIcons, 0, 32 * Icon::ud);
+        }
+
+        // resize
+        else if(EditorCursor.InteractFlags > 1)
+        {
+            XRender::renderTexture(curX - 16, curY - 16, 32, 32, GFX.EIcons, 0, 32 * Icon::target);
         }
 
         else if(EditorCursor.Mode == 13 || EditorCursor.Mode == 14) // Selector
@@ -646,11 +665,8 @@ void DrawEditorLevel(int Z)
         {
             XRender::renderTexture(curX, curY, GFX.ECursor[1]);
         }
-
-//                Else
         else
         {
-//                    If .Mode = 5 Then
             if(MagicBlock::enabled)
                 XRender::renderTexture(curX, curY, GFX.ECursor[2], XTColorF(0.7f, 1.0f, 0.7f, 1.0f));
             else
@@ -809,7 +825,7 @@ void DrawEditorWorld()
     else
 #endif
 
-    if(EditorCursor.Mode == OptCursor_t::LVL_ERASER || EditorCursor.Mode == OptCursor_t::LVL_ERASER0)
+    if(EditorCursor.Mode == OptCursor_t::LVL_ERASER)
     {
         if(EditorCursor.SubMode == -1)
         {
@@ -820,6 +836,23 @@ void DrawEditorWorld()
         }
         else
             XRender::renderTexture(X - 2, Y, GFX.ECursor[3]);
+    }
+    // left-right resize
+    else if(EditorCursor.InteractFlags > 1 && !(EditorCursor.InteractFlags & 2) && !(EditorCursor.InteractFlags & 4))
+    {
+        XRender::renderTexture(X - 16, Y - 16, 32, 32, GFX.EIcons, 0, 32 * Icon::lr);
+    }
+
+    // up-down resize
+    else if(EditorCursor.InteractFlags > 1 && !(EditorCursor.InteractFlags & 8) && !(EditorCursor.InteractFlags & 16))
+    {
+        XRender::renderTexture(X - 16, Y - 16, 32, 32, GFX.EIcons, 0, 32 * Icon::ud);
+    }
+
+    // resize
+    else if(EditorCursor.InteractFlags > 1)
+    {
+        XRender::renderTexture(X - 16, Y - 16, 32, 32, GFX.EIcons, 0, 32 * Icon::target);
     }
     else
     {

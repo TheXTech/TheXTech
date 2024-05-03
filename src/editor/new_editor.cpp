@@ -179,6 +179,9 @@ void EditorScreen::EnsureLevel()
 void EditorScreen::ResetCursor()
 {
     EditorCursor.Mode = OptCursor_t::LVL_SELECT;
+    EditorCursor.InteractMode = 0;
+    EditorCursor.InteractFlags = 0;
+    EditorCursor.InteractIndex = 0;
 
     EditorCursor.Block = Block_t();
     EditorCursor.Block.Type = 1;
@@ -1315,37 +1318,6 @@ void EditorScreen::UpdateEventsScreen(CallMode mode)
 
 void EditorScreen::UpdateEventSettingsScreen(CallMode mode)
 {
-    if(m_special_page == SPECIAL_PAGE_EVENT_BOUNDS)
-    {
-        SuperPrintR(mode, fmt::format_ne(g_editorStrings.eventsShouldEvent, Events[m_current_event].Name), 3, 60, 40);
-
-        if(m_special_subpage != 0)
-            SuperPrintR(mode, fmt::format_ne(g_editorStrings.eventsChangeSectionBoundsToCurrent, m_special_subpage), 3, 10, 60);
-        else
-            SuperPrintR(mode, g_editorStrings.eventsChangeAllSectionBoundsToCurrent, 3, 10, 60);
-
-        SuperPrintR(mode, g_mainMenu.wordYes, 3, 60, 110);
-        if(UpdateButton(mode, 20 + 4, 100 + 4, GFX.EIcons, false, 0, 32*Icon::action, 32, 32))
-        {
-            if(m_special_subpage == 0)
-            {
-                for(int s = 0; s <= maxSections; s++)
-                    Events[m_current_event].section[s].position = static_cast<SpeedlessLocation_t>(level[s]);
-            }
-            else
-                Events[m_current_event].section[m_special_subpage-1].position = static_cast<SpeedlessLocation_t>(level[m_special_subpage-1]);
-            m_special_page = SPECIAL_PAGE_EVENT_SETTINGS;
-        }
-
-        SuperPrintR(mode, g_mainMenu.wordNo, 3, 60, 150);
-        if(UpdateButton(mode, 20 + 4, 140 + 4, GFX.EIcons, false, 0, 32*Icon::action, 32, 32))
-        {
-            m_special_page = SPECIAL_PAGE_EVENT_SETTINGS;
-        }
-
-        return;
-    }
-
     if(m_special_page == SPECIAL_PAGE_EVENT_CONTROLS)
     {
         const int titlePosX = 10;
@@ -1717,43 +1689,42 @@ void EditorScreen::UpdateEventSettingsScreen(CallMode mode)
             for(int s = 0; s <= maxSections; s++)
                 Events[m_current_event].section[s].position.X = -2;
         }
-
-        if(UpdateButton(mode, 350 + 4, e_ScreenH - 40 + 4, GFX.EIcons, all_set, 0, 32*Icon::subscreen, 32, 32))
-            m_special_page = SPECIAL_PAGE_EVENT_BOUNDS;
     }
     else
     {
         SuperPrintCenterR(mode, fmt::format_ne(g_editorStrings.phraseSectionIndex, m_special_subpage), 3, 190, e_ScreenH - 174);
 
+        auto& es = Events[m_current_event].section[m_special_subpage-1];
+
         // music
-        if(UpdateButton(mode, 150 + 4, e_ScreenH - 120 + 4, GFX.EIcons, Events[m_current_event].section[m_special_subpage-1].music_id == LESet_Nothing, 0, 0, 1, 1))
-            Events[m_current_event].section[m_special_subpage-1].music_id = LESet_Nothing;
+        if(UpdateButton(mode, 150 + 4, e_ScreenH - 120 + 4, GFX.EIcons, es.music_id == LESet_Nothing, 0, 0, 1, 1))
+            es.music_id = LESet_Nothing;
 
-        if(UpdateButton(mode, 250 + 4, e_ScreenH - 120 + 4, GFX.EIcons, Events[m_current_event].section[m_special_subpage-1].music_id == LESet_ResetDefault, 0, 32*Icon::x, 32, 32))
-            Events[m_current_event].section[m_special_subpage-1].music_id = LESet_ResetDefault;
+        if(UpdateButton(mode, 250 + 4, e_ScreenH - 120 + 4, GFX.EIcons, es.music_id == LESet_ResetDefault, 0, 32*Icon::x, 32, 32))
+            es.music_id = LESet_ResetDefault;
 
-        if(UpdateButton(mode, 350 + 4, e_ScreenH - 120 + 4, GFX.EIcons, Events[m_current_event].section[m_special_subpage-1].music_id >= 0, 0, 32*Icon::subscreen, 32, 32))
+        if(UpdateButton(mode, 350 + 4, e_ScreenH - 120 + 4, GFX.EIcons, es.music_id >= 0, 0, 32*Icon::subscreen, 32, 32))
             m_special_page = SPECIAL_PAGE_EVENT_MUSIC;
 
         // background
-        if(UpdateButton(mode, 150 + 4, e_ScreenH - 80 + 4, GFX.EIcons, Events[m_current_event].section[m_special_subpage-1].background_id == LESet_Nothing, 0, 0, 1, 1))
-            Events[m_current_event].section[m_special_subpage-1].background_id = LESet_Nothing;
+        if(UpdateButton(mode, 150 + 4, e_ScreenH - 80 + 4, GFX.EIcons, es.background_id == LESet_Nothing, 0, 0, 1, 1))
+            es.background_id = LESet_Nothing;
 
-        if(UpdateButton(mode, 250 + 4, e_ScreenH - 80 + 4, GFX.EIcons, Events[m_current_event].section[m_special_subpage-1].background_id == LESet_ResetDefault, 0, 32*Icon::x, 32, 32))
-            Events[m_current_event].section[m_special_subpage-1].background_id = LESet_ResetDefault;
+        if(UpdateButton(mode, 250 + 4, e_ScreenH - 80 + 4, GFX.EIcons, es.background_id == LESet_ResetDefault, 0, 32*Icon::x, 32, 32))
+            es.background_id = LESet_ResetDefault;
 
-        if(UpdateButton(mode, 350 + 4, e_ScreenH - 80 + 4, GFX.EIcons, Events[m_current_event].section[m_special_subpage-1].background_id >= 0, 0, 32*Icon::subscreen, 32, 32))
+        if(UpdateButton(mode, 350 + 4, e_ScreenH - 80 + 4, GFX.EIcons, es.background_id >= 0, 0, 32*Icon::subscreen, 32, 32))
             m_special_page = SPECIAL_PAGE_EVENT_BACKGROUND;
 
         // bounds
-        if(UpdateButton(mode, 150 + 4, e_ScreenH - 40 + 4, GFX.EIcons, (int)Events[m_current_event].section[m_special_subpage-1].position.X == LESet_Nothing, 0, 0, 1, 1))
-            Events[m_current_event].section[m_special_subpage-1].position.X = LESet_Nothing;
+        if(UpdateButton(mode, 150 + 4, e_ScreenH - 40 + 4, GFX.EIcons, (int)es.position.X == LESet_Nothing, 0, 0, 1, 1))
+            es.position.X = LESet_Nothing;
 
-        if(UpdateButton(mode, 250 + 4, e_ScreenH - 40 + 4, GFX.EIcons, (int)Events[m_current_event].section[m_special_subpage-1].position.X == LESet_ResetDefault, 0, 32*Icon::x, 32, 32))
-            Events[m_current_event].section[m_special_subpage-1].position.X = LESet_ResetDefault;
+        if(UpdateButton(mode, 250 + 4, e_ScreenH - 40 + 4, GFX.EIcons, (int)es.position.X == LESet_ResetDefault, 0, 32*Icon::x, 32, 32))
+            es.position.X = LESet_ResetDefault;
 
-        if(UpdateButton(mode, 350 + 4, e_ScreenH - 40 + 4, GFX.EIcons, (int)Events[m_current_event].section[m_special_subpage-1].position.X != LESet_Nothing && (int)Events[m_current_event].section[m_special_subpage-1].position.X != LESet_ResetDefault, 0, 32*Icon::subscreen, 32, 32))
-            m_special_page = SPECIAL_PAGE_EVENT_BOUNDS;
+        if(UpdateButton(mode, 350 + 4, e_ScreenH - 40 + 4, GFX.EIcons, (int)es.position.X != LESet_Nothing && (int)es.position.X != LESet_ResetDefault, 0, 32*Icon::subscreen, 32, 32))
+            es.position = static_cast<SpeedlessLocation_t>(level[m_special_subpage-1]);
     }
 
     // autostart (top left)
@@ -1859,11 +1830,11 @@ void EditorScreen::UpdateSectionsScreen(CallMode mode)
     else
         SuperPrintR(mode, g_mainMenu.caseNone, 3, 54, 60);
 
-    SuperPrintR(mode, g_editorStrings.levelStartPos, 3, 10, 110);
-    if(UpdateButton(mode, 240, 100 + 4, GFXBlock[622], EditorCursor.SubMode == 4, 0, 0, 32, 32))
+    SuperPrintR(mode, g_editorStrings.levelStartPos, 3, 10, 90);
+    if(UpdateButton(mode, 240, 80 + 4, GFXBlock[622], EditorCursor.SubMode == 4, 0, 0, 32, 32))
         EditorCursor.SubMode = 4;
 
-    if(UpdateButton(mode, 280, 100 + 4, GFXBlock[623], EditorCursor.SubMode == 5, 0, 0, 32, 32))
+    if(UpdateButton(mode, 280, 80 + 4, GFXBlock[623], EditorCursor.SubMode == 5, 0, 0, 32, 32))
         EditorCursor.SubMode = 5;
 
     // section settings
@@ -1874,46 +1845,8 @@ void EditorScreen::UpdateSectionsScreen(CallMode mode)
     if(curSection < maxSections && UpdateButton(mode, 440 + 4, 160 + 4, GFX.EIcons, false, 0, 32*Icon::right, 32, 32))
         SetSection(curSection + 1);
 
-    // music
-    if(UpdateButton(mode, 10 + 4, 280 + 4, GFX.EIcons, false, 0, 32*Icon::subscreen, 32, 32))
-        m_special_page = SPECIAL_PAGE_SECTION_MUSIC;
-
-    if(mode == CallMode::Render)
-    {
-        const auto& indices = EditorCustom::music_list.indices;
-        const auto& names = EditorCustom::music_list.names;
-
-        size_t i;
-        for(i = 0; i < indices.size(); i++)
-        {
-            if(indices[i] == bgMusic[curSection])
-                break;
-        }
-
-        if(i == indices.size())
-            SuperPrint(g_editorStrings.eventsCaseMusic + ": " + std::to_string(bgMusic[curSection]), 3, 54, 286);
-        else
-            SuperPrint(g_editorStrings.eventsCaseMusic + ": " + names[i], 3, 54, 286);
-    }
-
-    if(bgMusic[curSection] == 24)
-    {
-        if(CustomMusic[curSection].length() < 15)
-        {
-            SuperPrintR(mode, CustomMusic[curSection], 3, 374, 292);
-        }
-        else
-        {
-            SuperPrintR(mode, CustomMusic[curSection].substr(0,14), 3, 374, 282);
-            SuperPrintR(mode, CustomMusic[curSection].substr(14,14), 3, 374, 300);
-        }
-
-        if(UpdateButton(mode, 330 + 4, 280 + 4, GFX.EIcons, false, 0, 32*Icon::open, 32, 32))
-            StartFileBrowser(&CustomMusic[curSection], FileNamePath, "", c_musicFormats, BROWSER_MODE_OPEN, BROWSER_CALLBACK_CUSTOM_MUSIC);
-    }
-
     // background
-    if(UpdateButton(mode, 10 + 4, 240 + 4, GFX.EIcons, false, 0, 32*Icon::subscreen, 32, 32))
+    if(UpdateButton(mode, 10 + 4, 200 + 4, GFX.EIcons, false, 0, 32*Icon::subscreen, 32, 32))
         m_special_page = SPECIAL_PAGE_SECTION_BACKGROUND;
 
     if(mode == CallMode::Render)
@@ -1929,34 +1862,68 @@ void EditorScreen::UpdateSectionsScreen(CallMode mode)
         }
 
         if(i == indices.size())
-            SuperPrintR(mode, g_editorStrings.eventsCaseBackground + ": " + std::to_string(Background2[curSection]), 3, 54, 246);
+            SuperPrintR(mode, g_editorStrings.eventsCaseBackground + ": " + std::to_string(Background2[curSection]), 3, 54, 206);
         else
-            SuperPrintR(mode, g_editorStrings.eventsCaseBackground + ": " + names[i], 3, 54, 246);
+            SuperPrintR(mode, g_editorStrings.eventsCaseBackground + ": " + names[i], 3, 54, 206);
     }
 
-    // set bounds
-    SuperPrintR(mode, g_editorStrings.sectionSetBounds, 3, 10, 206);
-    if(UpdateButton(mode, 240, 200, GFX.EIcons, EditorCursor.SubMode == 0, 0, 32*Icon::up, 32, 32))
-        EditorCursor.SubMode = 0;
+    // music
+    if(UpdateButton(mode, 10 + 4, 240 + 4, GFX.EIcons, false, 0, 32*Icon::subscreen, 32, 32))
+        m_special_page = SPECIAL_PAGE_SECTION_MUSIC;
 
-    if(UpdateButton(mode, 280, 200, GFX.EIcons, EditorCursor.SubMode == 3, 0, 32*Icon::down, 32, 32))
-        EditorCursor.SubMode = 3;
+    if(mode == CallMode::Render)
+    {
+        const auto& indices = EditorCustom::music_list.indices;
+        const auto& names = EditorCustom::music_list.names;
 
-    if(UpdateButton(mode, 320, 200, GFX.EIcons, EditorCursor.SubMode == 1, 0, 32*Icon::left, 32, 32))
-        EditorCursor.SubMode = 1;
+        size_t i;
+        for(i = 0; i < indices.size(); i++)
+        {
+            if(indices[i] == bgMusic[curSection])
+                break;
+        }
 
-    if(UpdateButton(mode, 360, 200, GFX.EIcons, EditorCursor.SubMode == 2, 0, 32*Icon::right, 32, 32))
-        EditorCursor.SubMode = 2;
+        if(i == indices.size())
+            SuperPrint(g_editorStrings.eventsCaseMusic + ": " + std::to_string(bgMusic[curSection]), 3, 54, 246);
+        else
+            SuperPrint(g_editorStrings.eventsCaseMusic + ": " + names[i], 3, 54, 246);
+    }
 
-    // hwrap - LevelWrap
-    if(UpdateCheckBox(mode, 10 + 4, 320 + 4, LevelWrap[curSection]))
-        LevelWrap[curSection] = !LevelWrap[curSection];
-    SuperPrintR(mode, g_editorStrings.sectionHorizWrap, 3, 54, 326);
+    if(bgMusic[curSection] == 24)
+    {
+        if(CustomMusic[curSection].length() < 15)
+        {
+            SuperPrintR(mode, CustomMusic[curSection], 3, 374, 252);
+        }
+        else
+        {
+            SuperPrintR(mode, CustomMusic[curSection].substr(0,14), 3, 374, 242);
+            SuperPrintR(mode, CustomMusic[curSection].substr(14,14), 3, 374, 260);
+        }
+
+        if(UpdateButton(mode, 330 + 4, 240 + 4, GFX.EIcons, false, 0, 32*Icon::open, 32, 32))
+            StartFileBrowser(&CustomMusic[curSection], FileNamePath, "", c_musicFormats, BROWSER_MODE_OPEN, BROWSER_CALLBACK_CUSTOM_MUSIC);
+    }
+
+    // will put section special effects below music
+
+    // vwrap - LevelVWrap
+    if(FileFormat == FileFormats::LVL_PGEX)
+    {
+        if(UpdateCheckBox(mode, e_ScreenW/2 + 10 + 4, 280 + 4, LevelVWrap[curSection]))
+            LevelVWrap[curSection] = !LevelVWrap[curSection];
+        SuperPrintR(mode, g_editorStrings.sectionVertWrap, 3, e_ScreenW/2 + 54, 286);
+    }
 
     // underwater - UnderWater
-    if(UpdateCheckBox(mode, e_ScreenW/2 + 10 + 4, 320 + 4, UnderWater[curSection]))
+    if(UpdateCheckBox(mode, 10 + 4, 320 + 4, UnderWater[curSection]))
         UnderWater[curSection] = !UnderWater[curSection];
-    SuperPrintR(mode, g_editorStrings.sectionUnderwater, 3, e_ScreenW/2 + 54, 326);
+    SuperPrintR(mode, g_editorStrings.sectionUnderwater, 3, 54, 326);
+
+    // hwrap - LevelWrap
+    if(UpdateCheckBox(mode, e_ScreenW/2 + 10 + 4, 320 + 4, LevelWrap[curSection]))
+        LevelWrap[curSection] = !LevelWrap[curSection];
+    SuperPrintR(mode, g_editorStrings.sectionHorizWrap, 3, e_ScreenW/2 + 54, 326);
 
     // no turn back - NoTurnBack
     if(UpdateCheckBox(mode, 10 + 4, 360 + 4, NoTurnBack[curSection]))
@@ -5111,7 +5078,7 @@ void EditorScreen::UpdateSelectorBar(CallMode mode, bool select_bar_only)
     bool in_layers = (m_special_page == SPECIAL_PAGE_LAYERS || m_special_page == SPECIAL_PAGE_LAYER_DELETION);
     bool in_events = (m_special_page == SPECIAL_PAGE_EVENTS || m_special_page == SPECIAL_PAGE_EVENT_LAYERS
         || m_special_page == SPECIAL_PAGE_EVENT_TRIGGER || m_special_page == SPECIAL_PAGE_EVENT_SETTINGS
-        || m_special_page == SPECIAL_PAGE_EVENT_BOUNDS || m_special_page == SPECIAL_PAGE_EVENT_DELETION
+        || m_special_page == SPECIAL_PAGE_EVENT_DELETION
         || m_special_page == SPECIAL_PAGE_EVENT_MUSIC || m_special_page == SPECIAL_PAGE_EVENT_BACKGROUND
         || m_special_page == SPECIAL_PAGE_EVENT_CONTROLS || m_special_page == SPECIAL_PAGE_EVENT_SOUND);
     bool in_file = (m_special_page == SPECIAL_PAGE_FILE || m_special_page == SPECIAL_PAGE_FILE_CONFIRM
@@ -5135,12 +5102,12 @@ void EditorScreen::UpdateSelectorBar(CallMode mode, bool select_bar_only)
     }
 
     // erase
-    currently_in = !in_excl_special && (EditorCursor.Mode == OptCursor_t::LVL_ERASER0 || EditorCursor.Mode == OptCursor_t::LVL_ERASER);
+    currently_in = !in_excl_special && EditorCursor.Mode == OptCursor_t::LVL_ERASER;
     if(UpdateButton(mode, sx+1*40+4, 4, GFX.ECursor[3], currently_in && EditorCursor.SubMode != -1, 0, 0, 22, 30, g_editorStrings.tooltipErase.c_str()))
     {
         if(editorScreen.active)
             swap_screens();
-        EditorCursor.Mode = OptCursor_t::LVL_ERASER0;
+        EditorCursor.Mode = OptCursor_t::LVL_ERASER;
         EditorCursor.SubMode = 0;
         if(in_excl_special)
             exit_special = true;
@@ -5150,7 +5117,7 @@ void EditorScreen::UpdateSelectorBar(CallMode mode, bool select_bar_only)
     {
         if(editorScreen.active)
             swap_screens();
-        EditorCursor.Mode = OptCursor_t::LVL_ERASER0;
+        EditorCursor.Mode = OptCursor_t::LVL_ERASER;
         EditorCursor.SubMode = -1;
         if(in_excl_special)
             exit_special = true;
@@ -5231,7 +5198,6 @@ void EditorScreen::UpdateSelectorBar(CallMode mode, bool select_bar_only)
             if(in_layers || !editorScreen.active)
                 swap_screens();
             EditorCursor.Mode = OptCursor_t::LVL_SELECT;
-            optCursor.current = OptCursor_t::LVL_SELECT;
             m_last_mode = OptCursor_t::LVL_SELECT;
             if(!in_layers)
                 m_special_page = SPECIAL_PAGE_LAYERS;
@@ -5243,7 +5209,6 @@ void EditorScreen::UpdateSelectorBar(CallMode mode, bool select_bar_only)
             if(in_events || !editorScreen.active)
                 swap_screens();
             EditorCursor.Mode = OptCursor_t::LVL_SELECT;
-            optCursor.current = OptCursor_t::LVL_SELECT;
             m_last_mode = OptCursor_t::LVL_SELECT;
             if(!in_events)
                 m_special_page = SPECIAL_PAGE_EVENTS;
@@ -5325,7 +5290,6 @@ void EditorScreen::UpdateSelectorBar(CallMode mode, bool select_bar_only)
             if(in_world_settings || !editorScreen.active)
                 swap_screens();
             EditorCursor.Mode = OptCursor_t::LVL_SELECT;
-            optCursor.current = OptCursor_t::LVL_SELECT;
             m_last_mode = OptCursor_t::LVL_SELECT;
             if(!in_world_settings)
                 m_special_page = SPECIAL_PAGE_WORLD_SETTINGS;
@@ -5338,7 +5302,6 @@ void EditorScreen::UpdateSelectorBar(CallMode mode, bool select_bar_only)
         if(in_file || !editorScreen.active)
             swap_screens();
         EditorCursor.Mode = OptCursor_t::LVL_SELECT;
-        optCursor.current = OptCursor_t::LVL_SELECT;
         m_last_mode = OptCursor_t::LVL_SELECT;
         if(!in_file)
             m_special_page = SPECIAL_PAGE_FILE;
@@ -5350,7 +5313,6 @@ void EditorScreen::UpdateSelectorBar(CallMode mode, bool select_bar_only)
         if(in_leveltest_settings || !editorScreen.active)
             swap_screens();
         EditorCursor.Mode = OptCursor_t::LVL_SELECT;
-        optCursor.current = OptCursor_t::LVL_SELECT;
         m_last_mode = OptCursor_t::LVL_SELECT;
         if(!in_leveltest_settings)
             m_special_page = SPECIAL_PAGE_EDITOR_SETTINGS;
@@ -5381,7 +5343,6 @@ void EditorScreen::UpdateSelectorBar(CallMode mode, bool select_bar_only)
             FileBrowserCleanup();
         m_special_page = SPECIAL_PAGE_NONE;
         m_special_subpage = 0;
-        optCursor.current = EditorCursor.Mode;
         m_last_mode = EditorCursor.Mode;
     }
 
@@ -5496,7 +5457,7 @@ void EditorScreen::UpdateEditorScreen(CallMode mode, bool second_screen)
         UpdateLayersScreen(mode);
     else if(m_special_page == SPECIAL_PAGE_EVENTS || m_special_page == SPECIAL_PAGE_EVENT_DELETION)
         UpdateEventsScreen(mode);
-    else if(m_special_page == SPECIAL_PAGE_EVENT_SETTINGS || m_special_page == SPECIAL_PAGE_EVENT_BOUNDS || m_special_page == SPECIAL_PAGE_EVENT_CONTROLS)
+    else if(m_special_page == SPECIAL_PAGE_EVENT_SETTINGS || m_special_page == SPECIAL_PAGE_EVENT_CONTROLS)
         UpdateEventSettingsScreen(mode);
     else if(m_special_page == SPECIAL_PAGE_OBJ_TRIGGERS || m_special_page == SPECIAL_PAGE_EVENT_TRIGGER)
         UpdateEventsSubScreen(mode);

@@ -26,7 +26,7 @@
 
 void LevelF::PushSectionBoundary(int section, int which_boundary_UDLR, double push_val)
 {
-    Location_t &boundarray = level[section];
+    SpeedlessLocation_t &boundarray = level[section];
 
     switch(which_boundary_UDLR)
     {
@@ -55,7 +55,7 @@ void LevelF::PushSectionBoundary(int section, int which_boundary_UDLR, double pu
 
 void LevelF::SetSectionBounds(int section, double left_bound, double top_bound, double right_bound, double bot_bound)
 {
-    Location_t &boundarray = level[section];
+    SpeedlessLocation_t &boundarray = level[section];
     boundarray.X = left_bound;
     boundarray.Y = top_bound;
     boundarray.Height = bot_bound;
@@ -65,7 +65,7 @@ void LevelF::SetSectionBounds(int section, double left_bound, double top_bound, 
 
 double LevelF::GetBoundary(int section, int which_boundary_UDLR)
 {
-    const Location_t &boundarray = level[section];
+    const SpeedlessLocation_t &boundarray = level[section];
 
     switch(which_boundary_UDLR)
     {
@@ -88,7 +88,7 @@ void LevelF::GetBoundary(LunaRect *rect, int section)
 {
     if(section >= 0 && section < numSections)
     {
-        const Location_t &boundarray = level[section];
+        const SpeedlessLocation_t &boundarray = level[section];
         rect->top = (int)boundarray.Y;
         rect->bottom = (int)boundarray.Height;
         rect->left = (int)boundarray.X;

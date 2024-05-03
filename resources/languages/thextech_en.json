@@ -197,6 +197,7 @@
         "phraseWarpIndex": "Warp {0}",
         "section": {
             "horizWrap": "Horiz. Wrap",
+            "vertWrap": "Vert. Wrap",
             "noTurnBack": "No Turn Back",
             "offscreenExit": "Offscreen Exit",
             "scroll": "Scroll",

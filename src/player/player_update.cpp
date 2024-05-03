@@ -2127,7 +2127,7 @@ void UpdatePlayer()
                     const Screen_t& screen = ScreenByPlayer(A);
                     vScreen_t& vscreen = vScreenByPlayer(A);
                     Location_t& pLoc = Player[A].Location;
-                    const Location_t& section = level[Player[A].Section];
+                    const SpeedlessLocation_t& section = level[Player[A].Section];
 
                     // track whether screen wrapped in each of the four ways
                     bool did_wrap_lr = false;
@@ -4742,7 +4742,7 @@ void UpdatePlayer()
                 if(screen.Type == ScreenTypes::SharedScreen)
                 {
                     Player_t& p = Player[A];
-                    const Location_t& section = level[p.Section];
+                    const SpeedlessLocation_t& section = level[p.Section];
 
                     const vScreen_t& vscreen = vScreenByPlayer(A);
 

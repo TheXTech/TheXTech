@@ -178,10 +178,6 @@ struct EditorContent
     std::string eventsPromptEventName;
     std::string eventsItemNewEvent;
 
-    std::string eventsShouldEvent;
-    std::string eventsChangeSectionBoundsToCurrent;
-    std::string eventsChangeAllSectionBoundsToCurrent;
-
     std::string eventsControlsForEvent;
     std::string eventsSettingsForEvent;
     std::string eventsHeaderShow;
@@ -215,9 +211,9 @@ struct EditorContent
     std::string levelAlwaysVis;
     std::string levelPathUnlocks;
 
-    std::string sectionSetBounds;
     std::string sectionScroll;
     std::string sectionHorizWrap;
+    std::string sectionVertWrap;
     std::string sectionUnderwater;
     std::string sectionNoTurnBack;
     std::string sectionOffscreenExit;

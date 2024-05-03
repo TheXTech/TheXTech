@@ -410,5 +410,6 @@ void DrawSimpleFrame(int x, int y, int w, int h, XTColor border_1, XTColor borde
 	XRender::renderRect(bg_l + 4, bg_b - 4, bg_r - bg_l - 8, 2, border_2);
 
 	// fill
-	XRender::renderRect(bg_l + 4, bg_t + 4, bg_r - bg_l - 8, bg_b - bg_t - 8, fill);
+	if(fill.a)
+		XRender::renderRect(bg_l + 4, bg_t + 4, bg_r - bg_l - 8, bg_b - bg_t - 8, fill);
 }

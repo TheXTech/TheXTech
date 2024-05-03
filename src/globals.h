@@ -1147,9 +1147,17 @@ struct EditorCursor_t
 //    Y As Single
     float Y = -50.0f;
 //    SelectedMode As Integer 'cursor mode. eraser/npc/block/background
-    int SelectedMode = 0;
-//    Selected As Integer
-    int Selected = 0;
+
+    // class of object (uses same enum as Mode)
+    int InteractMode = 0;
+    // NEW: modifiers for type of interaction
+    int InteractFlags = 0;
+    // index of currently interacted / highlighted object
+    int InteractIndex = 0;
+    // coordinates where interaction began
+    int InteractX = 0;
+    int InteractY = 0;
+
 //    Location As Location
     Location_t Location;
 //    Layer As String 'current layer
@@ -1427,7 +1435,7 @@ extern RangeArr<std::string, 0, maxSections> CustomMusic;
 //EXTRA: Max count of used sections
 extern int numSections;
 //Public level(0 To maxSections) As Location 'sections
-extern RangeArr<Location_t, 0, maxSections> level;
+extern RangeArr<SpeedlessLocation_t, 0, maxSections> level;
 //Public LevelWrap(0 To maxSections) As Boolean 'Wrap around the level
 extern RangeArrI<bool, 0, maxSections, false> LevelWrap;
 //EXTRA: Wrap vertically around the level
@@ -1441,7 +1449,7 @@ extern RangeArrI<vbint_t, 0, maxSections, 0> bgMusicREAL;
 //Public Background2REAL(0 To maxSections) As Integer 'background
 extern RangeArrI<vbint_t, 0, maxSections, 0> Background2REAL;
 //Public LevelREAL(0 To maxSections) As Location 'default background
-extern RangeArr<Location_t, 0, maxSections> LevelREAL;
+extern RangeArr<SpeedlessLocation_t, 0, maxSections> LevelREAL;
 //Public curMusic As Integer 'current music playing
 extern int curMusic;
 //Public bgColor(0 To maxSections) As Long 'obsolete

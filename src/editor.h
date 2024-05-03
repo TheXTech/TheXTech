@@ -45,11 +45,10 @@ extern int curSection;
 
 extern bool enableAutoAlign;
 
-struct OptCursor_t
+namespace OptCursor_t
 {
     enum Modes {
         LVL_SELECT = 13,
-        LVL_ERASER0 = 0,
         LVL_ERASER = 6,
         LVL_BLOCKS = 1,
         LVL_BGOS = 3,
@@ -57,6 +56,7 @@ struct OptCursor_t
         LVL_SETTINGS = 2,
         LVL_WARPS = 5,
         LVL_WATER = 15,
+        LVL_EVENTS = 17,
         WLD_PATHS = 10,
         WLD_MUSIC = 11,
         WLD_SCENES = 8,
@@ -64,10 +64,7 @@ struct OptCursor_t
         WLD_TILES = 7,
         WLD_AREA = 16,
     };
-    int current = LVL_SELECT;
 };
-
-extern OptCursor_t optCursor;
 
 // NEW: set / reset the scrolls when changing sections
 void ResetSectionScrolls();
@@ -89,8 +86,6 @@ extern int EditorNPCFrame(const NPCID A, float& C, int N = 0);
 
 extern void GetEditorControls();
 
-extern void OptCursorSync();
-
 extern void SetCursor();
 
 extern void PositionCursor();
@@ -104,7 +99,5 @@ extern void zTestLevel(bool magicHand = false, bool interProcess = false);
 extern void MouseMove(float X, float Y, bool nCur = false);
 
 extern void ResetNPC(NPCID A);
-
-extern void BlockFill(const Location_t &Loc);
 
 #endif // EDITOR_H

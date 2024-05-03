@@ -175,10 +175,6 @@ void initEditorStrings()
     g_editorStrings.eventsPromptEventName = "Event name";
     g_editorStrings.eventsItemNewEvent = "<New Event>";
 
-    g_editorStrings.eventsShouldEvent = "Should Event {0}";
-    g_editorStrings.eventsChangeSectionBoundsToCurrent = "Change sect {0} bounds to current?";
-    g_editorStrings.eventsChangeAllSectionBoundsToCurrent = "Change all sect bounds to current?";
-
     g_editorStrings.eventsControlsForEvent = "Controls for event {0}";
     g_editorStrings.eventsSettingsForEvent = "Settings for event";
     g_editorStrings.eventsHeaderShow = "Show:";
@@ -212,9 +208,9 @@ void initEditorStrings()
     g_editorStrings.levelAlwaysVis = "Always Vis";
     g_editorStrings.levelPathUnlocks = "Path Unlocks";
 
-    g_editorStrings.sectionSetBounds = "Set Bounds";
     g_editorStrings.sectionScroll = "Scroll";
     g_editorStrings.sectionHorizWrap = "Horiz. Wrap";
+    g_editorStrings.sectionVertWrap = "Vert. Wrap";
     g_editorStrings.sectionUnderwater = "Underwater";
     g_editorStrings.sectionNoTurnBack = "No Turn Back";
     g_editorStrings.sectionOffscreenExit = "Offscreen Exit";

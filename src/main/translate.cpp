@@ -616,10 +616,6 @@ XTechTranslate::XTechTranslate()
         {"editor.events.promptEventName",  &g_editorStrings.eventsPromptEventName},
         {"editor.events.itemNewEvent",     &g_editorStrings.eventsItemNewEvent},
 
-        {"editor.events.bounds.shouldEvent",     &g_editorStrings.eventsShouldEvent},
-        {"editor.events.bounds.changeSectionBoundsToCurrent",     &g_editorStrings.eventsChangeSectionBoundsToCurrent},
-        {"editor.events.bounds.changeAllSectionBoundsToCurrent",     &g_editorStrings.eventsChangeAllSectionBoundsToCurrent},
-
         {"editor.events.controlsForEventN",      &g_editorStrings.eventsControlsForEvent},
         {"editor.events.settingsForEvent",       &g_editorStrings.eventsSettingsForEvent},
 
@@ -654,9 +650,9 @@ XTechTranslate::XTechTranslate()
         {"editor.level.alwaysVis",            &g_editorStrings.levelAlwaysVis},
         {"editor.level.pathUnlocks",          &g_editorStrings.levelPathUnlocks},
 
-        {"editor.section.setBounds",          &g_editorStrings.sectionSetBounds},
         {"editor.section.scroll",             &g_editorStrings.sectionScroll},
         {"editor.section.horizWrap",          &g_editorStrings.sectionHorizWrap},
+        {"editor.section.vertWrap",           &g_editorStrings.sectionVertWrap},
         {"editor.section.underwater",         &g_editorStrings.sectionUnderwater},
         {"editor.section.noTurnBack",         &g_editorStrings.sectionNoTurnBack},
         {"editor.section.offscreenExit",      &g_editorStrings.sectionOffscreenExit},

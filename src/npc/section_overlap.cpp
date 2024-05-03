@@ -27,7 +27,7 @@
 std::array<uint8_t, maxSections + 1> g_SectionFirstOverlap;
 
 //! Check if two section bounds collide
-static bool s_SectionCollide(const Location_t& bounds, const Location_t& other_bounds)
+static bool s_SectionCollide(const SpeedlessLocation_t& bounds, const SpeedlessLocation_t& other_bounds)
 {
     // remember that section bounds are stored "incorrectly" with "Width" / "Height" referring to the Right / Bottom
     return (bounds.Width >= other_bounds.X

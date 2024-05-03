@@ -1090,6 +1090,7 @@ void ClearLevel()
     const Block_t blankBlock = Block_t();
     const Background_t BlankBackground = Background_t();
     const Location_t BlankLocation = Location_t();
+    const SpeedlessLocation_t BlankSpeedless;
     const Effect_t blankEffect = Effect_t();
     NPCTraits[NPCID_MEDAL].Score = 6;
     RestoreWorldStrings();
@@ -1234,7 +1235,7 @@ void ClearLevel()
         Background2[A] = 0;
         // bgColor[A] = 0xF89868;    // unused since SMBX64, removed
         bgMusic[A] = 0;
-        level[A] = BlankLocation;
+        level[A] = BlankSpeedless;
         LevelWrap[A] = false;
         LevelVWrap[A] = false;
         LevelChop[A] = 0;
@@ -1260,36 +1261,6 @@ void ClearLevel()
     LastBackground = 0;
     PlayerStart[1] = BlankLocation;
     PlayerStart[2] = BlankLocation;
-
-//    If LevelEditor = True Then
-//        Unload frmLevelAdv
-//        noUpdate = True
-//        numPlayers = 0
-//        frmLevelSettings.txtMusic.Enabled = False
-//        frmLevelSettings.txtMusic.Text = ""
-//        frmLevelSettings.txtMusic.Enabled = True
-//        frmLevelSettings.optBackgroundColor(1).Value = 1
-//        frmLevelSettings.cmdWrap.Caption = "Off"
-//        frmLevelSettings.optMusic(bgMusic(0)).Value = True
-//        vScreenX(1) = 0
-//        vScreenY(1) = 0
-//        curSection = 0
-//        level(curSection).Height = 20000 * (curSection - maxSections / 2)
-//        level(curSection).Height = Int(level(curSection).Height / 32) * 32
-//        level(curSection).Y = level(curSection).Height - 600
-//        level(curSection).X = 20000 * (curSection - maxSections / 2)
-//        level(curSection).X = Int(level(curSection).X / 32) * 32
-//        level(curSection).Width = level(curSection).X + 800
-//        vScreenY(1) = -(level(curSection).Height - 600)
-//        vScreenX(1) = -level(curSection).X
-//        numWarps = 1
-//        frmLevelSettings.optSection(0).Value = True
-//        frmLevelSettings.optBackground(0).Value = True
-//        frmLevelSettings.optLevel(0).Value = True
-//        For A = 1 To frmLevelSettings.optBackground.Count - 1
-//            frmLevelSettings.optBackground(A).Value = False
-//        Next A
-//    End If
 
     noUpdate = false;
 }

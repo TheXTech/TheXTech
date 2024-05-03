@@ -228,7 +228,7 @@ void DynamicScreen(Screen_t& screen, bool mute)
     {
         if(p1.Section == p2.Section)
         {
-            const Location_t& section = level[p1.Section];
+            const SpeedlessLocation_t& section = level[p1.Section];
 
             // use canonical width for checks in NoTurnBack case
             bool shrink_screen = (NoTurnBack[p1.Section] && g_config.allow_multires);
@@ -480,7 +480,7 @@ void CenterScreens(Screen_t& screen)
     {
         vScreen_t& vscreen = screen.vScreen(v);
         const Player_t& p = Player[screen.players[v - 1]];
-        const Location_t& section = level[p.Section];
+        const SpeedlessLocation_t& section = level[p.Section];
 
         vscreen.ScreenLeft = vscreen.Left;
         vscreen.ScreenTop  = vscreen.Top;

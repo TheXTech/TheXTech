@@ -365,7 +365,7 @@ void DrawBackground(int S, int Z)
     int A = 0;
     int B = 0;
     Location_t tempLocation;
-    Location_t tempLevel;
+    SpeedlessLocation_t tempLevel;
     tempLevel = level[S];
     if(LevelEditor)
         LevelREAL[S] = level[S];
