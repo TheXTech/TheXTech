@@ -199,7 +199,7 @@ static std::string findIntroLevel()
 // expand the section vertically if the top 8px of the level are empty
 static void s_ExpandSectionForMenu()
 {
-    Location_t& menu_section = level[0];
+    SpeedlessLocation_t& menu_section = level[0];
 
     // check current section top for expandability
     Location_t tempLocation = newLoc(menu_section.X, menu_section.Y, menu_section.Width - menu_section.X, 8);

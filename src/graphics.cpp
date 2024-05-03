@@ -142,7 +142,7 @@ void GetvScreenAverage(vScreen_t& vscreen)
     // used ScreenW / ScreenH in VB6 code
     const Screen_t& screen = Screens[vscreen.screen_ref];
 
-    const Location_t& section = level[Player[1].Section];
+    const SpeedlessLocation_t& section = level[Player[1].Section];
 
     // remember that the screen will be limited to the section's size in all cases
     double use_width  = SDL_min(static_cast<double>(screen.W), section.Width  - section.X);
@@ -209,7 +209,7 @@ void GetvScreenAverage2(vScreen_t& vscreen)
 
     const Screen_t& screen = Screens[vscreen.screen_ref];
 
-    const Location_t& section = level[Player[1].Section];
+    const SpeedlessLocation_t& section = level[Player[1].Section];
 
     double use_width  = SDL_min(static_cast<double>(screen.W), section.Width  - section.X);
     double use_height = SDL_min(static_cast<double>(screen.H), section.Height - section.Y);
@@ -286,7 +286,7 @@ void GetvScreenAverage3(vScreen_t& vscreen)
     // double the contribution of the top player to the result
     vscreen.Y -= t;
 
-    const Location_t& section = level[section_idx];
+    const SpeedlessLocation_t& section = level[section_idx];
 
     double use_width  = screen.W;
     double use_height = screen.H;
@@ -628,7 +628,7 @@ void GetvScreenCredits(vScreen_t& vscreen)
 
     // used ScreenW / ScreenH in VB6 code, using vScreen.Width / Height here
 
-    const Location_t& section = level[Player[1].Section];
+    const SpeedlessLocation_t& section = level[Player[1].Section];
 
     // remember that the screen will be limited to the section's size in all cases
     double use_width  = SDL_min(vscreen.Width,  section.Width  - section.X);

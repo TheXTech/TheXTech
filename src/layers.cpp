@@ -748,8 +748,8 @@ void ProcEvent(eventindex_t index, int whichPlayer, bool NoEffect)
     // int C = 0;
     int D = 0;
     bool tempBool = false;
-    Location_t tempLevel;
-    Location_t newLevel;
+    SpeedlessLocation_t tempLevel;
+    SpeedlessLocation_t newLevel;
 
     // Ignore vanilla autoscroll if newer way has been used
     bool autoScrollerChanged = false;
@@ -809,7 +809,7 @@ void ProcEvent(eventindex_t index, int whichPlayer, bool NoEffect)
                 else if(int(s.position.X) != EventSection_t::LESet_Nothing)
                 {
                     tempLevel = level[B];
-                    newLevel = (is_reset) ? LevelREAL[B] : static_cast<Location_t>(s.position);
+                    newLevel = (is_reset) ? LevelREAL[B] : s.position;
                     level[B] = newLevel;
                     UpdateSectionOverlaps(B);
 
@@ -1192,7 +1192,7 @@ void ProcEvent(eventindex_t index, int whichPlayer, bool NoEffect)
                                     qScreenLoc[Z1].Y = -(level[B].Height - use_height);
 
                                 // restore the new level
-                                level[B] = static_cast<Location_t>(s.position);
+                                level[B] = s.position;
                             }
                             else
                             {
