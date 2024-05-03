@@ -213,6 +213,7 @@ struct EditorContent
 
     std::string sectionScroll;
     std::string sectionHorizWrap;
+    std::string sectionVertWrap;
     std::string sectionUnderwater;
     std::string sectionNoTurnBack;
     std::string sectionOffscreenExit;

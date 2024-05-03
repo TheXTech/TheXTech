@@ -1830,11 +1830,11 @@ void EditorScreen::UpdateSectionsScreen(CallMode mode)
     else
         SuperPrintR(mode, g_mainMenu.caseNone, 3, 54, 60);
 
-    SuperPrintR(mode, g_editorStrings.levelStartPos, 3, 10, 110);
-    if(UpdateButton(mode, 240, 100 + 4, GFXBlock[622], EditorCursor.SubMode == 4, 0, 0, 32, 32))
+    SuperPrintR(mode, g_editorStrings.levelStartPos, 3, 10, 90);
+    if(UpdateButton(mode, 240, 80 + 4, GFXBlock[622], EditorCursor.SubMode == 4, 0, 0, 32, 32))
         EditorCursor.SubMode = 4;
 
-    if(UpdateButton(mode, 280, 100 + 4, GFXBlock[623], EditorCursor.SubMode == 5, 0, 0, 32, 32))
+    if(UpdateButton(mode, 280, 80 + 4, GFXBlock[623], EditorCursor.SubMode == 5, 0, 0, 32, 32))
         EditorCursor.SubMode = 5;
 
     // section settings
@@ -1845,46 +1845,8 @@ void EditorScreen::UpdateSectionsScreen(CallMode mode)
     if(curSection < maxSections && UpdateButton(mode, 440 + 4, 160 + 4, GFX.EIcons, false, 0, 32*Icon::right, 32, 32))
         SetSection(curSection + 1);
 
-    // music
-    if(UpdateButton(mode, 10 + 4, 280 + 4, GFX.EIcons, false, 0, 32*Icon::subscreen, 32, 32))
-        m_special_page = SPECIAL_PAGE_SECTION_MUSIC;
-
-    if(mode == CallMode::Render)
-    {
-        const auto& indices = EditorCustom::music_list.indices;
-        const auto& names = EditorCustom::music_list.names;
-
-        size_t i;
-        for(i = 0; i < indices.size(); i++)
-        {
-            if(indices[i] == bgMusic[curSection])
-                break;
-        }
-
-        if(i == indices.size())
-            SuperPrint(g_editorStrings.eventsCaseMusic + ": " + std::to_string(bgMusic[curSection]), 3, 54, 286);
-        else
-            SuperPrint(g_editorStrings.eventsCaseMusic + ": " + names[i], 3, 54, 286);
-    }
-
-    if(bgMusic[curSection] == 24)
-    {
-        if(CustomMusic[curSection].length() < 15)
-        {
-            SuperPrintR(mode, CustomMusic[curSection], 3, 374, 292);
-        }
-        else
-        {
-            SuperPrintR(mode, CustomMusic[curSection].substr(0,14), 3, 374, 282);
-            SuperPrintR(mode, CustomMusic[curSection].substr(14,14), 3, 374, 300);
-        }
-
-        if(UpdateButton(mode, 330 + 4, 280 + 4, GFX.EIcons, false, 0, 32*Icon::open, 32, 32))
-            StartFileBrowser(&CustomMusic[curSection], FileNamePath, "", c_musicFormats, BROWSER_MODE_OPEN, BROWSER_CALLBACK_CUSTOM_MUSIC);
-    }
-
     // background
-    if(UpdateButton(mode, 10 + 4, 240 + 4, GFX.EIcons, false, 0, 32*Icon::subscreen, 32, 32))
+    if(UpdateButton(mode, 10 + 4, 200 + 4, GFX.EIcons, false, 0, 32*Icon::subscreen, 32, 32))
         m_special_page = SPECIAL_PAGE_SECTION_BACKGROUND;
 
     if(mode == CallMode::Render)
@@ -1900,20 +1862,68 @@ void EditorScreen::UpdateSectionsScreen(CallMode mode)
         }
 
         if(i == indices.size())
-            SuperPrintR(mode, g_editorStrings.eventsCaseBackground + ": " + std::to_string(Background2[curSection]), 3, 54, 246);
+            SuperPrintR(mode, g_editorStrings.eventsCaseBackground + ": " + std::to_string(Background2[curSection]), 3, 54, 206);
         else
-            SuperPrintR(mode, g_editorStrings.eventsCaseBackground + ": " + names[i], 3, 54, 246);
+            SuperPrintR(mode, g_editorStrings.eventsCaseBackground + ": " + names[i], 3, 54, 206);
     }
 
-    // hwrap - LevelWrap
-    if(UpdateCheckBox(mode, 10 + 4, 320 + 4, LevelWrap[curSection]))
-        LevelWrap[curSection] = !LevelWrap[curSection];
-    SuperPrintR(mode, g_editorStrings.sectionHorizWrap, 3, 54, 326);
+    // music
+    if(UpdateButton(mode, 10 + 4, 240 + 4, GFX.EIcons, false, 0, 32*Icon::subscreen, 32, 32))
+        m_special_page = SPECIAL_PAGE_SECTION_MUSIC;
+
+    if(mode == CallMode::Render)
+    {
+        const auto& indices = EditorCustom::music_list.indices;
+        const auto& names = EditorCustom::music_list.names;
+
+        size_t i;
+        for(i = 0; i < indices.size(); i++)
+        {
+            if(indices[i] == bgMusic[curSection])
+                break;
+        }
+
+        if(i == indices.size())
+            SuperPrint(g_editorStrings.eventsCaseMusic + ": " + std::to_string(bgMusic[curSection]), 3, 54, 246);
+        else
+            SuperPrint(g_editorStrings.eventsCaseMusic + ": " + names[i], 3, 54, 246);
+    }
+
+    if(bgMusic[curSection] == 24)
+    {
+        if(CustomMusic[curSection].length() < 15)
+        {
+            SuperPrintR(mode, CustomMusic[curSection], 3, 374, 252);
+        }
+        else
+        {
+            SuperPrintR(mode, CustomMusic[curSection].substr(0,14), 3, 374, 242);
+            SuperPrintR(mode, CustomMusic[curSection].substr(14,14), 3, 374, 260);
+        }
+
+        if(UpdateButton(mode, 330 + 4, 240 + 4, GFX.EIcons, false, 0, 32*Icon::open, 32, 32))
+            StartFileBrowser(&CustomMusic[curSection], FileNamePath, "", c_musicFormats, BROWSER_MODE_OPEN, BROWSER_CALLBACK_CUSTOM_MUSIC);
+    }
+
+    // will put section special effects below music
+
+    // vwrap - LevelVWrap
+    if(FileFormat == FileFormats::LVL_PGEX)
+    {
+        if(UpdateCheckBox(mode, e_ScreenW/2 + 10 + 4, 280 + 4, LevelVWrap[curSection]))
+            LevelVWrap[curSection] = !LevelVWrap[curSection];
+        SuperPrintR(mode, g_editorStrings.sectionVertWrap, 3, e_ScreenW/2 + 54, 286);
+    }
 
     // underwater - UnderWater
-    if(UpdateCheckBox(mode, e_ScreenW/2 + 10 + 4, 320 + 4, UnderWater[curSection]))
+    if(UpdateCheckBox(mode, 10 + 4, 320 + 4, UnderWater[curSection]))
         UnderWater[curSection] = !UnderWater[curSection];
-    SuperPrintR(mode, g_editorStrings.sectionUnderwater, 3, e_ScreenW/2 + 54, 326);
+    SuperPrintR(mode, g_editorStrings.sectionUnderwater, 3, 54, 326);
+
+    // hwrap - LevelWrap
+    if(UpdateCheckBox(mode, e_ScreenW/2 + 10 + 4, 320 + 4, LevelWrap[curSection]))
+        LevelWrap[curSection] = !LevelWrap[curSection];
+    SuperPrintR(mode, g_editorStrings.sectionHorizWrap, 3, e_ScreenW/2 + 54, 326);
 
     // no turn back - NoTurnBack
     if(UpdateCheckBox(mode, 10 + 4, 360 + 4, NoTurnBack[curSection]))

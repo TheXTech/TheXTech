@@ -210,6 +210,7 @@ void initEditorStrings()
 
     g_editorStrings.sectionScroll = "Scroll";
     g_editorStrings.sectionHorizWrap = "Horiz. Wrap";
+    g_editorStrings.sectionVertWrap = "Vert. Wrap";
     g_editorStrings.sectionUnderwater = "Underwater";
     g_editorStrings.sectionNoTurnBack = "No Turn Back";
     g_editorStrings.sectionOffscreenExit = "Offscreen Exit";

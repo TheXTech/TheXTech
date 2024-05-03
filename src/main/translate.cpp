@@ -652,6 +652,7 @@ XTechTranslate::XTechTranslate()
 
         {"editor.section.scroll",             &g_editorStrings.sectionScroll},
         {"editor.section.horizWrap",          &g_editorStrings.sectionHorizWrap},
+        {"editor.section.vertWrap",           &g_editorStrings.sectionVertWrap},
         {"editor.section.underwater",         &g_editorStrings.sectionUnderwater},
         {"editor.section.noTurnBack",         &g_editorStrings.sectionNoTurnBack},
         {"editor.section.offscreenExit",      &g_editorStrings.sectionOffscreenExit},
