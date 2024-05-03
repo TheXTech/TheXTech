@@ -424,6 +424,14 @@ void UpdateEditor()
                     UpdateSectionOverlaps(curSection);
                 }
 
+                // event section resize
+                if(EditorCursor.InteractMode == OptCursor_t::LVL_EVENTS)
+                {
+                    int A = EditorCursor.InteractIndex;
+                    InteractResizeSection(Events[A].section[curSection].position);
+                    MouseRelease = false;
+                }
+
                 if(EditorCursor.InteractMode == OptCursor_t::LVL_NPCS) // NPCs
                 {
                     int A = EditorCursor.InteractIndex;
@@ -2859,8 +2867,29 @@ void UpdateInteract()
         }
     }
 
+    // event section borders
+    if(!MagicHand && select_mode && EditorCursor.InteractFlags < 2)
+    {
+        for(int A = numEvents - 1; A >= 0; A--)
+        {
+            const auto& sectPos = Events[A].section[curSection].position;
+            if(sectPos.X == EventSection_t::LESet_Nothing || sectPos.X == EventSection_t::LESet_ResetDefault)
+                continue;
+
+            int found_flags = s_find_flags_section(sectPos);
+
+            if(found_flags)
+            {
+                EditorCursor.InteractMode = OptCursor_t::LVL_EVENTS;
+                EditorCursor.InteractFlags = found_flags;
+                EditorCursor.InteractIndex = A;
+                break;
+            }
+        }
+    }
+
     // section borders
-    if(!MagicHand && (select_mode && EditorCursor.InteractFlags < 2))
+    if(!MagicHand && select_mode && EditorCursor.InteractFlags < 2)
     {
         int found_flags = s_find_flags_section(level[curSection]);
 
@@ -2871,8 +2900,6 @@ void UpdateInteract()
             EditorCursor.InteractIndex = 0;
         }
     }
-
-    // TODO: EVENT SECTION BORDERS!
 
     // world map areas
     // can resize
