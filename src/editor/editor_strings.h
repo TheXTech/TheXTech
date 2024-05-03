@@ -215,7 +215,6 @@ struct EditorContent
     std::string levelAlwaysVis;
     std::string levelPathUnlocks;
 
-    std::string sectionSetBounds;
     std::string sectionScroll;
     std::string sectionHorizWrap;
     std::string sectionUnderwater;

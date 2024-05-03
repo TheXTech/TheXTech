@@ -654,7 +654,6 @@ XTechTranslate::XTechTranslate()
         {"editor.level.alwaysVis",            &g_editorStrings.levelAlwaysVis},
         {"editor.level.pathUnlocks",          &g_editorStrings.levelPathUnlocks},
 
-        {"editor.section.setBounds",          &g_editorStrings.sectionSetBounds},
         {"editor.section.scroll",             &g_editorStrings.sectionScroll},
         {"editor.section.horizWrap",          &g_editorStrings.sectionHorizWrap},
         {"editor.section.underwater",         &g_editorStrings.sectionUnderwater},

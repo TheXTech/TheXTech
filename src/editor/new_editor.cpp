@@ -1937,20 +1937,6 @@ void EditorScreen::UpdateSectionsScreen(CallMode mode)
             SuperPrintR(mode, g_editorStrings.eventsCaseBackground + ": " + names[i], 3, 54, 246);
     }
 
-    // set bounds
-    SuperPrintR(mode, g_editorStrings.sectionSetBounds, 3, 10, 206);
-    if(UpdateButton(mode, 240, 200, GFX.EIcons, EditorCursor.SubMode == 0, 0, 32*Icon::up, 32, 32))
-        EditorCursor.SubMode = 0;
-
-    if(UpdateButton(mode, 280, 200, GFX.EIcons, EditorCursor.SubMode == 3, 0, 32*Icon::down, 32, 32))
-        EditorCursor.SubMode = 3;
-
-    if(UpdateButton(mode, 320, 200, GFX.EIcons, EditorCursor.SubMode == 1, 0, 32*Icon::left, 32, 32))
-        EditorCursor.SubMode = 1;
-
-    if(UpdateButton(mode, 360, 200, GFX.EIcons, EditorCursor.SubMode == 2, 0, 32*Icon::right, 32, 32))
-        EditorCursor.SubMode = 2;
-
     // hwrap - LevelWrap
     if(UpdateCheckBox(mode, 10 + 4, 320 + 4, LevelWrap[curSection]))
         LevelWrap[curSection] = !LevelWrap[curSection];

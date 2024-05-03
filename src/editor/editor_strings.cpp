@@ -212,7 +212,6 @@ void initEditorStrings()
     g_editorStrings.levelAlwaysVis = "Always Vis";
     g_editorStrings.levelPathUnlocks = "Path Unlocks";
 
-    g_editorStrings.sectionSetBounds = "Set Bounds";
     g_editorStrings.sectionScroll = "Scroll";
     g_editorStrings.sectionHorizWrap = "Horiz. Wrap";
     g_editorStrings.sectionUnderwater = "Underwater";

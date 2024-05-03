@@ -54,6 +54,7 @@
 #include "core/window.h"
 #include "core/events.h"
 #include "fontman/font_manager.h"
+#include "npc/section_overlap.h"
 
 #include "controls.h"
 
@@ -263,6 +264,8 @@ void UpdateInteract();
 template<class LocType>
 void InteractResize(LocType& loc, int min, int snap);
 
+void InteractResizeSection(SpeedlessLocation_t& section);
+
 // this sub handles the level editor
 // it is still called when the player is testing a level in the editor in windowed mode
 void UpdateEditor()
@@ -292,7 +295,12 @@ void UpdateEditor()
     }
 
     if(EditorCursor.Y < 40)
+    {
         MouseCancel = true;
+        EditorCursor.InteractMode = 0;
+        EditorCursor.InteractFlags = 0;
+        EditorCursor.InteractIndex = 0;
+    }
 
     bool MouseClick_Current = SharedCursor.Primary && !MouseCancel;
 
@@ -408,6 +416,12 @@ void UpdateEditor()
                     MouseMove(EditorCursor.X, EditorCursor.Y);
                     MouseRelease = false;
                     MouseCancel = true; /* Simulate "Focus out" inside of SMBX Editor */
+                }
+                else if(EditorCursor.InteractMode == OptCursor_t::LVL_SETTINGS)
+                {
+                    MouseRelease = false;
+                    InteractResizeSection(level[curSection]);
+                    UpdateSectionOverlaps(curSection);
                 }
 
                 if(EditorCursor.InteractMode == OptCursor_t::LVL_NPCS) // NPCs
@@ -1144,33 +1158,9 @@ void UpdateEditor()
 
                 }
             }
-            else if(EditorCursor.Mode == OptCursor_t::LVL_SETTINGS && !MagicHand) // Level
+            else if(EditorCursor.Mode == OptCursor_t::LVL_SETTINGS && !MagicHand) // player start points
             {
-                if(EditorCursor.SubMode == 0) // Top
-                {
-                    level[curSection].Y = static_cast<int>(floor(static_cast<double>(EditorCursor.Location.Y / 32))) * 32;
-                    if(level[curSection].Height - level[curSection].Y < 600)
-                        level[curSection].Y = level[curSection].Height - 600;
-                }
-                else if(EditorCursor.SubMode == 1) // Left
-                {
-                    level[curSection].X = static_cast<int>(floor(static_cast<double>(EditorCursor.Location.X / 32))) * 32;
-                    if(level[curSection].Width - level[curSection].X < 800)
-                        level[curSection].X = level[curSection].Width - 800;
-                }
-                else if(EditorCursor.SubMode == 2) // Right
-                {
-                    level[curSection].Width = static_cast<int>(floor(static_cast<double>(EditorCursor.Location.X / 32))) * 32;
-                    if(level[curSection].Width - level[curSection].X < 800)
-                        level[curSection].Width = level[curSection].X + 800;
-                }
-                else if(EditorCursor.SubMode == 3) // Bottom
-                {
-                    level[curSection].Height = static_cast<int>(floor(static_cast<double>(EditorCursor.Location.Y / 32))) * 32;
-                    if(level[curSection].Height - level[curSection].Y < 600)
-                        level[curSection].Height = level[curSection].Y + 600;
-                }
-                else if(EditorCursor.SubMode == 4 || EditorCursor.SubMode == 5)
+                if(EditorCursor.SubMode >= 4)
                 {
                     // printf("Trying to place player at %f, %f...\n", EditorCursor.Location.X, EditorCursor.Location.Y);
                     int B = EditorCursor.SubMode - 3;
@@ -1239,7 +1229,6 @@ void UpdateEditor()
                             // ugh
                             syncLayers_AllBGOs();
                         }
-//                        Netplay::sendData Netplay::AddBackground(numBackground);
                     }
                 }
             }
@@ -2700,10 +2689,10 @@ void UpdateInteract()
 {
     // only update items in select mode (mouse up or just pressed) or erase mode
     bool mouse_held = (SharedCursor.Primary && !MouseRelease);
-    bool select_mode = (EditorCursor.Mode == OptCursor_t::LVL_SELECT && !mouse_held);
-    bool erase_mode = (EditorCursor.Mode == OptCursor_t::LVL_ERASER);
+    bool select_mode = EditorCursor.Mode == OptCursor_t::LVL_SELECT;
+    bool erase_mode = EditorCursor.Mode == OptCursor_t::LVL_ERASER;
 
-    if(!select_mode && !erase_mode)
+    if(select_mode && mouse_held)
         return;
 
     EditorCursor.InteractMode = 0;
@@ -2712,7 +2701,13 @@ void UpdateInteract()
     EditorCursor.InteractX = EditorCursor.Location.X;
     EditorCursor.InteractY = EditorCursor.Location.Y;
 
-    // class filter for eraser
+     if(!select_mode && !erase_mode)
+        return;
+
+    if(MouseCancel)
+        return;
+
+   // class filter for eraser
     int need_class = 0;
     if(erase_mode && EditorCursor.SubMode > 0)
         need_class = EditorCursor.SubMode;
@@ -2864,7 +2859,18 @@ void UpdateInteract()
         }
     }
 
-    // TODO: SECTION BORDERS!
+    // section borders
+    if(!MagicHand && (select_mode && EditorCursor.InteractFlags < 2))
+    {
+        int found_flags = s_find_flags_section(level[curSection]);
+
+        if(found_flags)
+        {
+            EditorCursor.InteractMode = OptCursor_t::LVL_SETTINGS;
+            EditorCursor.InteractFlags = found_flags;
+            EditorCursor.InteractIndex = 0;
+        }
+    }
 
     // TODO: EVENT SECTION BORDERS!
 
@@ -3037,6 +3043,66 @@ void InteractResize(LocType& loc, int min, int snap)
             PlaySound(SFX_Saw);
         }
     }
+}
+
+void InteractResizeSection(SpeedlessLocation_t& section)
+{
+    bool resized = false;
+
+    if(EditorCursor.InteractFlags & IF_ResizeT)
+    {
+        int new_Y = static_cast<int>(round(static_cast<double>(EditorCursor.Location.Y / 32))) * 32;
+        if(section.Height - new_Y < 600)
+            new_Y = section.Height - 600;
+
+        if(new_Y != section.Y)
+        {
+            section.Y = new_Y;
+            resized = true;
+        }
+    }
+
+    if(EditorCursor.InteractFlags & IF_ResizeL)
+    {
+        int new_X = static_cast<int>(round(static_cast<double>(EditorCursor.Location.X / 32))) * 32;
+        if(section.Width - new_X < 800)
+            new_X = section.Width - 800;
+
+        if(new_X != section.X)
+        {
+            section.X = new_X;
+            resized = true;
+        }
+    }
+
+    if(EditorCursor.InteractFlags & IF_ResizeR)
+    {
+        int new_Width = static_cast<int>(round(static_cast<double>(EditorCursor.Location.X / 32))) * 32;
+        if(new_Width - section.X < 800)
+            new_Width = section.X + 800;
+
+        if(new_Width != section.Width)
+        {
+            section.Width = new_Width;
+            resized = true;
+        }
+    }
+
+    if(EditorCursor.InteractFlags & IF_ResizeB)
+    {
+        int new_Height = static_cast<int>(round(static_cast<double>(EditorCursor.Location.Y / 32))) * 32;
+        if(new_Height - section.Y < 600)
+            new_Height = section.Y + 600;
+
+        if(new_Height != section.Height)
+        {
+            section.Height = new_Height;
+            resized = true;
+        }
+    }
+
+    if(resized)
+        PlaySound(SFX_Saw);
 }
 
 void MouseMove(float X, float Y, bool /*nCur*/)
