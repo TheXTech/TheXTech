@@ -178,10 +178,6 @@ struct EditorContent
     std::string eventsPromptEventName;
     std::string eventsItemNewEvent;
 
-    std::string eventsShouldEvent;
-    std::string eventsChangeSectionBoundsToCurrent;
-    std::string eventsChangeAllSectionBoundsToCurrent;
-
     std::string eventsControlsForEvent;
     std::string eventsSettingsForEvent;
     std::string eventsHeaderShow;

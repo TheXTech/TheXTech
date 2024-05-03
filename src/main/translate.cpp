@@ -616,10 +616,6 @@ XTechTranslate::XTechTranslate()
         {"editor.events.promptEventName",  &g_editorStrings.eventsPromptEventName},
         {"editor.events.itemNewEvent",     &g_editorStrings.eventsItemNewEvent},
 
-        {"editor.events.bounds.shouldEvent",     &g_editorStrings.eventsShouldEvent},
-        {"editor.events.bounds.changeSectionBoundsToCurrent",     &g_editorStrings.eventsChangeSectionBoundsToCurrent},
-        {"editor.events.bounds.changeAllSectionBoundsToCurrent",     &g_editorStrings.eventsChangeAllSectionBoundsToCurrent},
-
         {"editor.events.controlsForEventN",      &g_editorStrings.eventsControlsForEvent},
         {"editor.events.settingsForEvent",       &g_editorStrings.eventsSettingsForEvent},
 

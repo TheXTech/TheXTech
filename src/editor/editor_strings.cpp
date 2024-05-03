@@ -175,10 +175,6 @@ void initEditorStrings()
     g_editorStrings.eventsPromptEventName = "Event name";
     g_editorStrings.eventsItemNewEvent = "<New Event>";
 
-    g_editorStrings.eventsShouldEvent = "Should Event {0}";
-    g_editorStrings.eventsChangeSectionBoundsToCurrent = "Change sect {0} bounds to current?";
-    g_editorStrings.eventsChangeAllSectionBoundsToCurrent = "Change all sect bounds to current?";
-
     g_editorStrings.eventsControlsForEvent = "Controls for event {0}";
     g_editorStrings.eventsSettingsForEvent = "Settings for event";
     g_editorStrings.eventsHeaderShow = "Show:";
