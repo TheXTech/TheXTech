@@ -435,7 +435,7 @@ public:
 #   endif
 
     opt<bool> sfx_audio_fx{this, defaults(sfx_audio_fx_default), {CompatClass::pure_preference, false}, Scope::UserGlobal,
-        "sfx-audio-fx", "Echo effects", "Add echo in some sections",
+        "sfx-audio-fx", "Echo effects", nullptr,
         config_audiofx_set};
 #endif
 
@@ -456,7 +456,7 @@ public:
         "choose-assets-on-launch", "Choose assets on launch", nullptr};
 
     opt<bool> record_gameplay_data{this, defaults(false), {}, Scope::UserGlobal,
-        "record-gameplay-data", "Record gameplay", "Save play data for replay or debugging"};
+        "record-gameplay-data", "Record gameplay", nullptr};
 
     opt_enum<int> log_level{this,
         {
@@ -479,7 +479,7 @@ public:
         defaults(PGE_LogLevel::Info),
 #endif
         {}, Scope::UserGlobal,
-        "log-level", "Log level", "Log events at or above this level",
+        "log-level", "Log level", nullptr,
         config_log_level_set};
 
 #if defined(__ANDROID__) || defined(__3DS__)
