@@ -354,6 +354,7 @@ if(USE_STATIC_LIBC)
 endif()
 
 include(lib/Allocator/pool-allocator.cmake)
+include(lib/pge_video_rec/pge-video-rec.cmake)
 include(3rdparty/DirManager/dirman.cmake)
 
 if(NOT VITA AND NOT NINTENDO_SWITCH AND NOT NINTENDO_3DS AND NOT NINTENDO_WII AND NOT NINTENDO_WIIU AND NOT NINTENDO_DS)
@@ -538,6 +539,12 @@ if(THEXTECH_ENABLE_DISCORD_RPC)
     set(THEXTECH_ENABLE_INTEGRATOR ON)  # This feature needs for an Integrator
 endif()
 
+if(PGE_ENABLE_VIDEO_REC)
+    list(APPEND A2XT_LIBS ${VIDEO_REC_LIBS})
+    list(APPEND A2XT_DEPS ${VIDEO_REC_DEPS})
+    list(APPEND A2XT_INCS ${VIDEO_REC_INCS})
+endif()
+
 if(THEXTECH_BUILD_GL_DESKTOP_MODERN AND THEXTECH_USE_ANGLE_TRANSLATOR)
     add_subdirectory(3rdparty/angle-shader-translator)
 
@@ -634,6 +641,9 @@ if(NINTENDO_3DS OR NINTENDO_WII OR NOT PGE_MIN_PORT)
     set(THEXTECH_CRASHHANDLER_SUPPORTED ON)
 endif()
 
+if(PGE_ENABLE_VIDEO_REC)
+    list(APPEND LIB_SRC ${VIDEO_REC_SRCS})
+endif()
 
 if(APPLE)
     file(GLOB PGE_FILE_ICONS "${CMAKE_CURRENT_SOURCE_DIR}/resources/file_icons/*.icns")
@@ -869,7 +879,7 @@ elseif(NINTENDO_DS)
         src/core/16m/window_16m.cpp
         src/core/null/events_null.cpp
         src/core/16m/sound_16m.cpp
-        src/core/power/power_null.cpp
+        src/core/power/power_16m.cpp
     )
 elseif(THEXTECH_NO_SDL_BUILD)
     add_definitions(-DWINDOW_CUSTOM -DMSGBOX_CUSTOM -DEVENTS_CUSTOM -DRENDER_CUSTOM -DTHEXTECH_NO_SDL_CORE)
@@ -1278,6 +1288,14 @@ endif()
 
 if(THEXTECH_ENABLE_DISCORD_RPC)
     target_compile_definitions(thextech PRIVATE -DENABLE_XTECH_DISCORD_RPC -DXTECH_DISCORD_APPID=${THEXTECH_DISCORD_APPID})
+endif()
+
+if(PGE_ENABLE_VIDEO_REC)
+    target_compile_definitions(thextech PRIVATE -DPGE_ENABLE_VIDEO_REC)
+
+    if(PGE_VIDEO_REC_WEBM_SUPPORTED)
+        target_compile_definitions(thextech PRIVATE -DPGE_VIDEO_REC_WEBM_SUPPORTED)
+    endif()
 endif()
 
 if(ENABLE_ADDRESS_SANITIZER)

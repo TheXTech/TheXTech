@@ -77,7 +77,7 @@ static constexpr XTColor s_legacy = XTColorF(0.7f, 0.7f, 0.7f);
 
 static constexpr inline XTColor bool2(XTColor color, bool btn, uint8_t alpha)
 {
-    return btn ? color.with_alpha(alpha) : XTColor(0, 0, 0, alpha);
+    return btn ? color.with_alpha(alpha) : XTColor(32, 32, 32, alpha);
 }
 
 static Controls_t s_displayControls[maxLocalPlayers] = {Controls_t()};
@@ -147,7 +147,7 @@ void RenderControls_priv(int player, const Controls_t* controls, int x, int y, i
     if(!controls && (player < 1 || player > maxLocalPlayers))
         return;
 
-    uint8_t alphaBtn = uint8_t((missing ? 0.4f : 0.8f) * alpha);
+    uint8_t alphaBtn = missing ? alpha / 2 : alpha;
     uint8_t alphaText = alpha / 2;
 
     XTColor color;
@@ -171,7 +171,7 @@ void RenderControls_priv(int player, const Controls_t* controls, int x, int y, i
 
     const Controls_t& c = (controls) ? *controls : s_displayControls[player - 1];
 
-    XRender::renderRect(x + 10, y + 12, 6, 6, {0, 0, 0, alphaBtn}, true);//Cender of D-Pad
+    XRender::renderRect(x + 10, y + 12, 6, 6, {32, 32, 32, alphaBtn}, true);//Cender of D-Pad
 
     XRender::renderRect(x + 10, y + 6, 6, 6, bool2(s_gray, c.Up, alphaBtn), true);
     XRender::renderRect(x + 10, y + 18, 6, 6, bool2(s_gray, c.Down, alphaBtn), true);
@@ -220,11 +220,18 @@ void RenderPowerInfo(int player, int bx, int by, int bw, int bh, uint8_t alpha, 
     bw &= ~1;
     bh &= ~1;
 
-    uint8_t alphaBox = uint8_t(0.7f * alpha);
-    uint8_t alphaBtn = uint8_t(0.8f * alpha);
+    uint8_t alphaBox = alpha;
+    uint8_t alphaBtn = alpha;
 
     XTColor color;
     GetControllerColor(player, color);
+    if(color.r >= 128 || color.g >= 128 || color.b >= 128)
+    {
+        // make it darker so it can be distinguished from segments
+        color.r /= 2;
+        color.g /= 2;
+        color.b /= 2;
+    }
 
     XPower::StatusInfo status_info;
 

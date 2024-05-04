@@ -453,7 +453,7 @@ void RenderGL::repaint()
     }
 #endif
 
-#ifdef USE_SCREENSHOTS_AND_RECS
+#ifdef PGE_ENABLE_VIDEO_REC
     processRecorder();
 #endif
 
@@ -634,7 +634,7 @@ void RenderGL::updateViewport()
         // update render targets
         if(ScaleWidth != XRender::TargetW || ScaleHeight != XRender::TargetH)
         {
-#ifdef USE_SCREENSHOTS_AND_RECS
+#ifdef PGE_ENABLE_VIDEO_REC
             // invalidates GIF recorder handle
             if(recordInProcess())
                 toggleGifRecorder();

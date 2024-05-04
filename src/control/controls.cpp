@@ -107,7 +107,9 @@ void Hotkeys::Activate(size_t i, int player)
     case Buttons::Screenshot:
         TakeScreen = true;
         return;
+#endif
 
+#ifdef PGE_ENABLE_VIDEO_REC
     case Buttons::RecordGif:
         XRender::toggleGifRecorder();
         return;

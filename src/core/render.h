@@ -705,6 +705,10 @@ E_INLINE void makeShot() TAIL
 }
 #   endif
 
+#endif
+
+#ifdef PGE_ENABLE_VIDEO_REC
+
 E_INLINE void toggleGifRecorder() TAIL
 #   ifndef RENDER_CUSTOM
 {

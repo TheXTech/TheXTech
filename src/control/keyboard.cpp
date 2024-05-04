@@ -330,14 +330,23 @@ InputMethodProfile_Keyboard::InputMethodProfile_Keyboard()
     // ALSO UPDATE InputMethodType_Keyboard::DefaultHotkey
     this->m_hotkeys[Hotkeys::Buttons::ToggleHUD] = SDL_SCANCODE_F1;
     this->m_hotkeys[Hotkeys::Buttons::DebugInfo] = SDL_SCANCODE_F3;
+#ifndef RENDER_FULLSCREEN_ALWAYS
     this->m_hotkeys[Hotkeys::Buttons::Fullscreen] = SDL_SCANCODE_F7;
-#ifdef __APPLE__ // on macOS the F11 key is reserved by the "Show Desktop" global action
+#endif
+
+#ifndef PGE_ENABLE_VIDEO_REC
+    // nothing to define
+#elif defined(__APPLE__) // on macOS the F11 key is reserved by the "Show Desktop" global action
     this->m_hotkeys[Hotkeys::Buttons::RecordGif] = SDL_SCANCODE_F10;
 #else
     this->m_hotkeys[Hotkeys::Buttons::RecordGif] = SDL_SCANCODE_F11;
 #endif
+
+#ifdef USE_SCREENSHOTS_AND_RECS
     this->m_hotkeys[Hotkeys::Buttons::Screenshot] = SDL_SCANCODE_F12;
     this->m_hotkeys2[Hotkeys::Buttons::Screenshot] = SDL_SCANCODE_F2;
+#endif
+
 #ifdef DEBUG_BUILD
     this->m_hotkeys[Hotkeys::Buttons::ReloadLanguage] = SDL_SCANCODE_F5;
 #endif
@@ -1160,11 +1169,13 @@ bool InputMethodType_Keyboard::DefaultHotkey(const SDL_Event* ev)
 
     int KeyCode = evt.keysym.scancode;
 
+#ifndef RENDER_FULLSCREEN_ALWAYS
     bool ctrlF = ((evt.keysym.mod & KMOD_CTRL) != 0 && evt.keysym.scancode == SDL_SCANCODE_F);
     bool altEnter = ((evt.keysym.mod & KMOD_ALT) != 0 && (evt.keysym.scancode == SDL_SCANCODE_RETURN || evt.keysym.scancode == SDL_SCANCODE_KP_ENTER));
 
     if(ctrlF || altEnter)
         g_hotkeysPressed[Hotkeys::Buttons::Fullscreen] = 0;
+#endif
 
     bool use_defaults = false;
 
@@ -1177,19 +1188,24 @@ bool InputMethodType_Keyboard::DefaultHotkey(const SDL_Event* ev)
     if(use_defaults && evt.repeat == 0)
     {
         // ALSO UPDATE InputMethodProfile_Keyboard::InputMethodProfile_Keyboard
-        if(KeyCode == SDL_SCANCODE_F12 || KeyCode == SDL_SCANCODE_F2)
-            g_hotkeysPressed[Hotkeys::Buttons::Screenshot] = 0;
-        else if(KeyCode == SDL_SCANCODE_F3)
+        if(KeyCode == SDL_SCANCODE_F3)
             g_hotkeysPressed[Hotkeys::Buttons::DebugInfo] = 0;
         else if(KeyCode == SDL_SCANCODE_F1)
             g_hotkeysPressed[Hotkeys::Buttons::ToggleHUD] = 0;
 
-#ifdef __APPLE__
-        else if(KeyCode == SDL_SCANCODE_F10) // Reserved by macOS as "show desktop"
-#else
-        else if(KeyCode == SDL_SCANCODE_F11)
+#ifdef USE_SCREENSHOTS_AND_RECS
+        else if(KeyCode == SDL_SCANCODE_F12 || KeyCode == SDL_SCANCODE_F2)
+            g_hotkeysPressed[Hotkeys::Buttons::Screenshot] = 0;
 #endif
+
+#ifdef PGE_ENABLE_VIDEO_REC
+#   ifdef __APPLE__
+        else if(KeyCode == SDL_SCANCODE_F10) // Reserved by macOS as "show desktop"
+#   else
+        else if(KeyCode == SDL_SCANCODE_F11)
+#   endif
             g_hotkeysPressed[Hotkeys::Buttons::RecordGif] = 0;
+#endif
     }
 
     if(this->m_directText && GamePaused == PauseCode::TextEntry)
@@ -1388,6 +1404,7 @@ bool InputMethodType_Keyboard::ConsumeEvent(const SDL_Event* ev)
             return false;
 
     case SDL_MOUSEBUTTONUP:
+#ifndef RENDER_FULLSCREEN_ALWAYS
         if(ev->button.button == SDL_BUTTON_LEFT && ev->button.which != SDL_TOUCH_MOUSEID)
         {
             bool doubleClick = (this->m_lastMousePress + 300) >= SDL_GetTicks();
@@ -1400,6 +1417,7 @@ bool InputMethodType_Keyboard::ConsumeEvent(const SDL_Event* ev)
                 return true;
             }
         }
+#endif
 
     // intentional fallthrough
     case SDL_MOUSEBUTTONDOWN:
