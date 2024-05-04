@@ -988,8 +988,10 @@ void AbstractRender_t::toggleGifRecorder()
 #ifdef PGE_VIDEO_REC_WEBM_SUPPORTED
         spec.frame_rate = 120;
         spec.video_quality = 10;
-        spec.audio_enabled = true;
-        spec.audio_sample_rate = g_audioSetup.sampleRate;
+        spec.audio_enabled = g_config.audio_enable;
+        spec.audio_sample_rate = g_config.audio_sample_rate.obtained;
+        spec.audio_channel_count = g_config.audio_channels.obtained;
+        spec.audio_sample_format = g_config.audio_format.obtained;
         auto recording = PGE_new_recording_VP8(spec);
 #else
         spec.frame_rate = 25;

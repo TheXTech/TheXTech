@@ -82,6 +82,9 @@ struct PGE_VideoSpec
 
     //! audio channel count
     int audio_channel_count = 0;
+
+    //! audio sample format (uses SDL_MixerX sample formats)
+    int audio_sample_format = 0;
 };
 
 
