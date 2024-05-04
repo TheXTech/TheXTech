@@ -2720,285 +2720,290 @@ void UpdateInteract()
     if(erase_mode && EditorCursor.SubMode > 0)
         need_class = EditorCursor.SubMode;
 
-    // player start points
-    if(!MagicHand && select_mode)
+    if(!WorldEditor)
     {
-        for(int A = 1; A <= 2; A++)
+        // player start points
+        if(!MagicHand && select_mode)
         {
-            if(CursorCollision(EditorCursor.Location, PlayerStart[A]))
+            for(int A = 1; A <= 2; A++)
             {
-                EditorCursor.InteractMode = OptCursor_t::LVL_SETTINGS;
-                EditorCursor.InteractFlags = IF_AltMode;
-                EditorCursor.InteractIndex = A;
-                break;
+                if(CursorCollision(EditorCursor.Location, PlayerStart[A]))
+                {
+                    EditorCursor.InteractMode = OptCursor_t::LVL_SETTINGS;
+                    EditorCursor.InteractFlags = IF_AltMode;
+                    EditorCursor.InteractIndex = A;
+                    break;
+                }
             }
         }
-    }
 
-    // NPCs
-    // never sizable, so only do this if nothing found yet
-    if(EditorCursor.InteractMode == 0 && (!need_class || need_class == OptCursor_t::LVL_NPCS))
-    {
-        for(int A = 1; A <= numNPCs; A++)
+        // NPCs
+        // never sizable, so only do this if nothing found yet
+        if(EditorCursor.InteractMode == 0 && (!need_class || need_class == OptCursor_t::LVL_NPCS))
         {
-            Location_t tempLocation = NPC[A].Location;
-
-            if(NPC[A].Type == NPCID_ITEM_BURIED) // Herb's container offset
-                tempLocation.Y -= 16;
-
-            if(CursorCollision(EditorCursor.Location, tempLocation) && !NPC[A].Hidden)
+            for(int A : treeNPCQuery(EditorCursor.Location, SORTMODE_ID))
             {
-                EditorCursor.InteractMode = OptCursor_t::LVL_NPCS;
-                EditorCursor.InteractFlags = 0;
-                EditorCursor.InteractIndex = A;
-                break;
+                Location_t tempLocation = NPC[A].Location;
+
+                if(NPC[A].Type == NPCID_ITEM_BURIED) // Herb's container offset
+                    tempLocation.Y -= 16;
+
+                if(CursorCollision(EditorCursor.Location, tempLocation) && !NPC[A].Hidden)
+                {
+                    EditorCursor.InteractMode = OptCursor_t::LVL_NPCS;
+                    EditorCursor.InteractFlags = 0;
+                    EditorCursor.InteractIndex = A;
+                    break;
+                }
             }
         }
-    }
 
-    // non-sizable blocks (same condition)
-    if(EditorCursor.InteractMode == 0 && (!need_class || need_class == OptCursor_t::LVL_BLOCKS))
-    {
-        for(int A = 1; A <= numBlock; A++)
+        // non-sizable blocks (same condition)
+        if(EditorCursor.InteractMode == 0 && (!need_class || need_class == OptCursor_t::LVL_BLOCKS))
         {
-            if(BlockIsSizable[Block[A].Type])
-                continue;
-
-            if(CursorCollision(EditorCursor.Location, Block[A].Location) && !Block[A].Hidden)
+            for(int A : treeBlockQuery(EditorCursor.Location, SORTMODE_ID))
             {
-                EditorCursor.InteractMode = OptCursor_t::LVL_BLOCKS;
-                EditorCursor.InteractFlags = 0;
-                EditorCursor.InteractIndex = A;
-                break;
-            }
-        }
-    }
+                if(BlockIsSizable[Block[A].Type])
+                    continue;
 
-    // warps (same condition for now, until warps become sizable)
-    if(!MagicHand && EditorCursor.InteractMode == 0 && (!need_class || need_class == OptCursor_t::LVL_WARPS))
-    {
-        for(int A = 1; A <= numWarps; A++)
-        {
-            if(CursorCollision(EditorCursor.Location, Warp[A].Entrance) && !Warp[A].Hidden)
-            {
-                EditorCursor.InteractMode = OptCursor_t::LVL_WARPS;
-                EditorCursor.InteractFlags = 0;
-                EditorCursor.InteractIndex = A;
-                break;
-            }
-            else if(CursorCollision(EditorCursor.Location, Warp[A].Exit) && !Warp[A].Hidden)
-            {
-                EditorCursor.InteractMode = OptCursor_t::LVL_WARPS;
-                EditorCursor.InteractFlags = IF_AltMode;
-                EditorCursor.InteractIndex = A;
-                break;
-            }
-        }
-    }
-
-    // BGOs
-    // never sizable, so only do this if nothing found yet
-    if(EditorCursor.InteractMode == 0 && (!need_class || need_class == OptCursor_t::LVL_BGOS))
-    {
-        // more difficult to iterate backwards, but that's what we need to do here
-        auto sentinel = treeBackgroundQuery(EditorCursor.Location, SORTMODE_Z);
-        for(auto i = sentinel.end(); i > sentinel.begin();)
-        {
-            int A = *(--i);
-
-            if(CursorCollision(EditorCursor.Location, Background[A].Location) && !Background[A].Hidden)
-            {
-                EditorCursor.InteractMode = OptCursor_t::LVL_BGOS;
-                EditorCursor.InteractFlags = 0;
-                EditorCursor.InteractIndex = A;
-                break;
-            }
-        }
-    }
-
-    // Sizable blocks
-    // now things get exciting
-    if(((select_mode && EditorCursor.InteractFlags < 2) || EditorCursor.InteractMode == 0)
-        && (!need_class || need_class == OptCursor_t::LVL_BLOCKS)) // Sizable blocks
-    {
-        for(int A = 1; A <= numBlock; A++)
-        {
-            if(!BlockIsSizable[Block[A].Type] || Block[A].Hidden)
-                continue;
-
-            int found_flags = (select_mode) ? s_find_flags(Block[A].Location) : 0;
-
-            if(found_flags || CursorCollision(EditorCursor.Location, Block[A].Location))
-            {
-                if(found_flags || EditorCursor.InteractMode == 0)
+                if(CursorCollision(EditorCursor.Location, Block[A].Location) && !Block[A].Hidden)
                 {
                     EditorCursor.InteractMode = OptCursor_t::LVL_BLOCKS;
-                    EditorCursor.InteractFlags = found_flags;
+                    EditorCursor.InteractFlags = 0;
                     EditorCursor.InteractIndex = A;
                     break;
                 }
             }
         }
-    }
 
-    // Water boxes
-    // can resize
-    if(!MagicHand
-        && ((select_mode && EditorCursor.InteractFlags < 2) || EditorCursor.InteractMode == 0)
-        && (!need_class || need_class == OptCursor_t::LVL_WATER))
-    {
-        for(int A = 1; A <= numWater; A++)
+        // warps (same condition for now, until warps become sizable)
+        if(!MagicHand && EditorCursor.InteractMode == 0 && (!need_class || need_class == OptCursor_t::LVL_WARPS))
         {
-            if(Water[A].Hidden)
-                continue;
-
-            int found_flags = (select_mode) ? s_find_flags(Water[A].Location) : 0;
-
-            if(found_flags || CursorCollision(EditorCursor.Location, Water[A].Location))
+            for(int A = 1; A <= numWarps; A++)
             {
-                if(found_flags || EditorCursor.InteractMode == 0)
+                if(CursorCollision(EditorCursor.Location, Warp[A].Entrance) && !Warp[A].Hidden)
                 {
-                    EditorCursor.InteractMode = OptCursor_t::LVL_WATER;
+                    EditorCursor.InteractMode = OptCursor_t::LVL_WARPS;
+                    EditorCursor.InteractFlags = 0;
+                    EditorCursor.InteractIndex = A;
+                    break;
+                }
+                else if(CursorCollision(EditorCursor.Location, Warp[A].Exit) && !Warp[A].Hidden)
+                {
+                    EditorCursor.InteractMode = OptCursor_t::LVL_WARPS;
+                    EditorCursor.InteractFlags = IF_AltMode;
+                    EditorCursor.InteractIndex = A;
+                    break;
+                }
+            }
+        }
+
+        // BGOs
+        // never sizable, so only do this if nothing found yet
+        if(EditorCursor.InteractMode == 0 && (!need_class || need_class == OptCursor_t::LVL_BGOS))
+        {
+            // more difficult to iterate backwards, but that's what we need to do here
+            auto sentinel = treeBackgroundQuery(EditorCursor.Location, SORTMODE_Z);
+            for(auto i = sentinel.end(); i > sentinel.begin();)
+            {
+                int A = *(--i);
+
+                if(CursorCollision(EditorCursor.Location, Background[A].Location) && !Background[A].Hidden)
+                {
+                    EditorCursor.InteractMode = OptCursor_t::LVL_BGOS;
+                    EditorCursor.InteractFlags = 0;
+                    EditorCursor.InteractIndex = A;
+                    break;
+                }
+            }
+        }
+
+        // Sizable blocks
+        // now things get exciting
+        if(((select_mode && EditorCursor.InteractFlags < 2) || EditorCursor.InteractMode == 0)
+            && (!need_class || need_class == OptCursor_t::LVL_BLOCKS)) // Sizable blocks
+        {
+            for(int A : treeBlockQuery(EditorCursor.Location, SORTMODE_ID))
+            {
+                if(!BlockIsSizable[Block[A].Type] || Block[A].Hidden)
+                    continue;
+
+                int found_flags = (select_mode) ? s_find_flags(Block[A].Location) : 0;
+
+                if(found_flags || CursorCollision(EditorCursor.Location, Block[A].Location))
+                {
+                    if(found_flags || EditorCursor.InteractMode == 0)
+                    {
+                        EditorCursor.InteractMode = OptCursor_t::LVL_BLOCKS;
+                        EditorCursor.InteractFlags = found_flags;
+                        EditorCursor.InteractIndex = A;
+                        break;
+                    }
+                }
+            }
+        }
+
+        // Water boxes
+        // can resize
+        if(!MagicHand
+            && ((select_mode && EditorCursor.InteractFlags < 2) || EditorCursor.InteractMode == 0)
+            && (!need_class || need_class == OptCursor_t::LVL_WATER))
+        {
+            for(int A : treeWaterQuery(EditorCursor.Location, SORTMODE_ID))
+            {
+                if(Water[A].Hidden)
+                    continue;
+
+                int found_flags = (select_mode) ? s_find_flags(Water[A].Location) : 0;
+
+                if(found_flags || CursorCollision(EditorCursor.Location, Water[A].Location))
+                {
+                    if(found_flags || EditorCursor.InteractMode == 0)
+                    {
+                        EditorCursor.InteractMode = OptCursor_t::LVL_WATER;
+                        EditorCursor.InteractFlags = found_flags;
+                        EditorCursor.InteractIndex = A;
+                        break;
+                    }
+                }
+            }
+        }
+
+        // event section borders
+        if(!MagicHand && select_mode && EditorCursor.InteractFlags < 2)
+        {
+            for(int A = numEvents - 1; A >= 0; A--)
+            {
+                const auto& sectPos = Events[A].section[curSection].position;
+                if(sectPos.X == EventSection_t::LESet_Nothing || sectPos.X == EventSection_t::LESet_ResetDefault)
+                    continue;
+
+                int found_flags = s_find_flags_section(sectPos);
+
+                if(found_flags)
+                {
+                    EditorCursor.InteractMode = OptCursor_t::LVL_EVENTS;
                     EditorCursor.InteractFlags = found_flags;
                     EditorCursor.InteractIndex = A;
                     break;
                 }
             }
         }
-    }
 
-    // event section borders
-    if(!MagicHand && select_mode && EditorCursor.InteractFlags < 2)
-    {
-        for(int A = numEvents - 1; A >= 0; A--)
+        // section borders
+        if(!MagicHand && select_mode && EditorCursor.InteractFlags < 2)
         {
-            const auto& sectPos = Events[A].section[curSection].position;
-            if(sectPos.X == EventSection_t::LESet_Nothing || sectPos.X == EventSection_t::LESet_ResetDefault)
-                continue;
-
-            int found_flags = s_find_flags_section(sectPos);
+            int found_flags = s_find_flags_section(level[curSection]);
 
             if(found_flags)
             {
-                EditorCursor.InteractMode = OptCursor_t::LVL_EVENTS;
+                EditorCursor.InteractMode = OptCursor_t::LVL_SETTINGS;
                 EditorCursor.InteractFlags = found_flags;
-                EditorCursor.InteractIndex = A;
-                break;
+                EditorCursor.InteractIndex = 0;
             }
         }
     }
-
-    // section borders
-    if(!MagicHand && select_mode && EditorCursor.InteractFlags < 2)
+    else
     {
-        int found_flags = s_find_flags_section(level[curSection]);
-
-        if(found_flags)
+        // world map areas
+        // can resize
+        if(((select_mode && EditorCursor.InteractFlags < 2) || EditorCursor.InteractMode == 0)
+             && (!need_class || need_class == OptCursor_t::WLD_AREA))
         {
-            EditorCursor.InteractMode = OptCursor_t::LVL_SETTINGS;
-            EditorCursor.InteractFlags = found_flags;
-            EditorCursor.InteractIndex = 0;
-        }
-    }
-
-    // world map areas
-    // can resize
-    if(((select_mode && EditorCursor.InteractFlags < 2) || EditorCursor.InteractMode == 0)
-         && (!need_class || need_class == OptCursor_t::WLD_AREA))
-    {
-        for(int A = numWorldAreas; A >= 1; A--)
-        {
-            int found_flags = (select_mode) ? s_find_flags(WorldArea[A].Location) : 0;
-
-            // count as collision if on corner, or if in top-left
-            if(found_flags || (EditorCursor.InteractMode == 0 && CursorCollision(EditorCursor.Location, newLoc(WorldArea[A].Location.X, WorldArea[A].Location.Y, 32, 32))))
+            for(int A = numWorldAreas; A >= 1; A--)
             {
-                EditorCursor.InteractMode = OptCursor_t::WLD_AREA;
-                EditorCursor.InteractFlags = found_flags;
-                EditorCursor.InteractIndex = A;
-                break;
+                int found_flags = (select_mode) ? s_find_flags(WorldArea[A].Location) : 0;
+
+                // count as collision if on corner, or if in top-left
+                if(found_flags || (EditorCursor.InteractMode == 0 && CursorCollision(EditorCursor.Location, newLoc(WorldArea[A].Location.X, WorldArea[A].Location.Y, 32, 32))))
+                {
+                    EditorCursor.InteractMode = OptCursor_t::WLD_AREA;
+                    EditorCursor.InteractFlags = found_flags;
+                    EditorCursor.InteractIndex = A;
+                    break;
+                }
             }
         }
-    }
 
-    // world map music
-    if(EditorCursor.InteractMode == 0 && (!need_class || need_class == OptCursor_t::WLD_MUSIC))
-    {
-        for(int A : treeWorldMusicQuery(EditorCursor.Location, SORTMODE_NONE))
+        // world map music
+        if(EditorCursor.InteractMode == 0 && (!need_class || need_class == OptCursor_t::WLD_MUSIC))
         {
-            if(CursorCollision(EditorCursor.Location, WorldMusic[A].Location))
+            for(int A : treeWorldMusicQuery(EditorCursor.Location, SORTMODE_NONE))
             {
-                EditorCursor.InteractMode = OptCursor_t::WLD_MUSIC;
-                EditorCursor.InteractFlags = 0;
-                EditorCursor.InteractIndex = A;
-                break;
+                if(CursorCollision(EditorCursor.Location, WorldMusic[A].Location))
+                {
+                    EditorCursor.InteractMode = OptCursor_t::WLD_MUSIC;
+                    EditorCursor.InteractFlags = 0;
+                    EditorCursor.InteractIndex = A;
+                    break;
+                }
             }
         }
-    }
 
-    // world paths
-    if(EditorCursor.InteractMode == 0 && (!need_class || need_class == OptCursor_t::WLD_PATHS))
-    {
-        for(int A : treeWorldPathQuery(EditorCursor.Location, SORTMODE_NONE))
+        // world paths
+        if(EditorCursor.InteractMode == 0 && (!need_class || need_class == OptCursor_t::WLD_PATHS))
         {
-            if(CursorCollision(EditorCursor.Location, WorldPath[A].Location))
+            for(int A : treeWorldPathQuery(EditorCursor.Location, SORTMODE_NONE))
             {
-                EditorCursor.InteractMode = OptCursor_t::WLD_PATHS;
-                EditorCursor.InteractFlags = 0;
-                EditorCursor.InteractIndex = A;
-                break;
+                if(CursorCollision(EditorCursor.Location, WorldPath[A].Location))
+                {
+                    EditorCursor.InteractMode = OptCursor_t::WLD_PATHS;
+                    EditorCursor.InteractFlags = 0;
+                    EditorCursor.InteractIndex = A;
+                    break;
+                }
             }
         }
-    }
 
-    // world sceneries
-    if(EditorCursor.InteractMode == 0 && (!need_class || need_class == OptCursor_t::WLD_SCENES))
-    {
-        // harder to go backwards, but that's all we're doing here.
-        // it's a good thing that the sentinel's scope ends quickly,
-        // otherwise it would take a long time for the result vector
-        // to rejoin the pool. -- ds-sloth
-        auto sentinel = treeWorldSceneQuery(EditorCursor.Location, SORTMODE_ID);
-        for(auto i = sentinel.end(); i > sentinel.begin();)
+        // world sceneries
+        if(EditorCursor.InteractMode == 0 && (!need_class || need_class == OptCursor_t::WLD_SCENES))
         {
-            int A = *(--i);
-
-            if(CursorCollision(EditorCursor.Location, Scene[A].Location))
+            // harder to go backwards, but that's all we're doing here.
+            // it's a good thing that the sentinel's scope ends quickly,
+            // otherwise it would take a long time for the result vector
+            // to rejoin the pool. -- ds-sloth
+            auto sentinel = treeWorldSceneQuery(EditorCursor.Location, SORTMODE_ID);
+            for(auto i = sentinel.end(); i > sentinel.begin();)
             {
-                EditorCursor.InteractMode = OptCursor_t::WLD_SCENES;
-                EditorCursor.InteractFlags = 0;
-                EditorCursor.InteractIndex = A;
-                break;
+                int A = *(--i);
+
+                if(CursorCollision(EditorCursor.Location, Scene[A].Location))
+                {
+                    EditorCursor.InteractMode = OptCursor_t::WLD_SCENES;
+                    EditorCursor.InteractFlags = 0;
+                    EditorCursor.InteractIndex = A;
+                    break;
+                }
             }
         }
-    }
 
-    // world levels
-    if(EditorCursor.InteractMode == 0 && (!need_class || need_class == OptCursor_t::WLD_LEVELS))
-    {
-        for(int A : treeWorldLevelQuery(EditorCursor.Location, SORTMODE_NONE))
+        // world levels
+        if(EditorCursor.InteractMode == 0 && (!need_class || need_class == OptCursor_t::WLD_LEVELS))
         {
-            if(CursorCollision(EditorCursor.Location, WorldLevel[A].Location))
+            for(int A : treeWorldLevelQuery(EditorCursor.Location, SORTMODE_NONE))
             {
-                EditorCursor.InteractMode = OptCursor_t::WLD_LEVELS;
-                EditorCursor.InteractFlags = 0;
-                EditorCursor.InteractIndex = A;
-                break;
+                if(CursorCollision(EditorCursor.Location, WorldLevel[A].Location))
+                {
+                    EditorCursor.InteractMode = OptCursor_t::WLD_LEVELS;
+                    EditorCursor.InteractFlags = 0;
+                    EditorCursor.InteractIndex = A;
+                    break;
+                }
             }
         }
-    }
 
-    // world tiles
-    if(EditorCursor.InteractMode == 0 && (!need_class || need_class == OptCursor_t::WLD_TILES))
-    {
-        for(int A : treeWorldTileQuery(EditorCursor.Location, SORTMODE_NONE))
+        // world tiles
+        if(EditorCursor.InteractMode == 0 && (!need_class || need_class == OptCursor_t::WLD_TILES))
         {
-            if(CursorCollision(EditorCursor.Location, Tile[A].Location))
+            for(int A : treeWorldTileQuery(EditorCursor.Location, SORTMODE_NONE))
             {
-                EditorCursor.InteractMode = OptCursor_t::WLD_TILES;
-                EditorCursor.InteractFlags = 0;
-                EditorCursor.InteractIndex = A;
-                break;
+                if(CursorCollision(EditorCursor.Location, Tile[A].Location))
+                {
+                    EditorCursor.InteractMode = OptCursor_t::WLD_TILES;
+                    EditorCursor.InteractFlags = 0;
+                    EditorCursor.InteractIndex = A;
+                    break;
+                }
             }
         }
     }
