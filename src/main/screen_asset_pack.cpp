@@ -343,13 +343,18 @@ bool Logic()
         s_ensure_idx_valid();
 
         // if not still on the same asset pack, reload assets!!
-        if(cur_idx != s_cur_idx)
+        if(cur_idx != s_cur_idx || !g_AssetsLoaded)
         {
             s_cur_idx = cur_idx;
             CommonFrame = 0; // don't show indicators
             if(!ReloadAssetsFrom(GetAssetPacks()[cur_idx]))
             {
                 s_cur_idx = -1;
+
+                // stay in the asset pack screen if we haven't loaded any assets yet
+                if(!g_AssetsLoaded)
+                    return false;
+
                 s_AnimatingBack = true;
             }
             else
@@ -369,7 +374,7 @@ bool Logic()
         MenuMouseRelease = false;
         return true;
     }
-    else if(menuBackPress)
+    else if(menuBackPress && g_AssetsLoaded)
     {
         PlaySoundMenu(SFX_Slide);
 

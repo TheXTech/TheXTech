@@ -452,6 +452,9 @@ public:
 
     // static constexpr bool record_gameplay_data = false;
 
+    opt<bool> pick_assets_on_start{this, defaults(false), {}, Scope::UserGlobal,
+        "choose-assets-on-launch", "Choose assets on launch", nullptr};
+
     opt<bool> record_gameplay_data{this, defaults(false), {}, Scope::UserGlobal,
         "record-gameplay-data", "Record gameplay", "Save play data for replay or debugging"};
 
