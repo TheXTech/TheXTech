@@ -121,7 +121,9 @@ void DrawBackground(double fade)
     int menu_logo_y = XRender::TargetH / 2 - 230;
 
     // place manually on small screens
-    if(XRender::TargetH < 500)
+    if(XRender::TargetH < 400)
+        menu_logo_y = 16 + (XRender::TargetH - 320) / 2;
+    else if(XRender::TargetH < 500)
         menu_logo_y = 16;
     else if(XRender::TargetH <= 600)
         menu_logo_y = 40;

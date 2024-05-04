@@ -2221,7 +2221,9 @@ void mainMenuDraw()
             int logo_y = XRender::TargetH / 2 - 230;
 
             // place manually on small screens
-            if(XRender::TargetH < SmallScreenH)
+            if(XRender::TargetH < TinyScreenH)
+                logo_y = 16 + (XRender::TargetH - 320) / 2;
+            else if(XRender::TargetH < SmallScreenH)
                 logo_y = 16;
             else if(XRender::TargetH <= 600)
                 logo_y = 40;
@@ -2241,7 +2243,7 @@ void mainMenuDraw()
     if(MenuMode == MENU_INTRO)
     {
         if((CommonFrame % 90) < 45)
-            SuperPrintScreenCenter(g_mainMenu.introPressStart, 3, (16 + 240 + XRender::TargetH - 48) / 2);
+            SuperPrintScreenCenter(g_mainMenu.introPressStart, 3, XRender::TargetH - 48 - (XRender::TargetH - 320) / 4);
     }
 
 #ifndef PGE_NO_THREADING
