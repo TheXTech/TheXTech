@@ -291,6 +291,9 @@ void minport_RenderBoxFilled( int x1, int y1, int x2, int y2, XTColor color)
         s_gxVertex2i( x2, y1 );
     glEnd();
 
+    for(int i = 0; i < 7; ++i)
+        s_render_planes.next(); // actually advance 8 slots rather than 1, to handle some imprecision of the DSi depth buffer (unknown cause)
+
     if((color.a >> 3) < 31)
         glPolyFmt(POLY_ALPHA(31) | POLY_CULL_NONE | POLY_FOG_Q);
 }
