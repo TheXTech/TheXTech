@@ -18,48 +18,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <3ds.h>
-
+#include <nds.h>
 #include "sdl_proxy/sdl_timer.h"
+
 #include "core/power.h"
+
+#include <Logger/logger.h>
 
 
 namespace XPower
 {
 
 static uint32_t s_last_power_check = -10000;
-static StatusInfo s_recent_status;
-static bool s_inited = false;
-
-static StatusInfo s_devicePowerStatus_REAL()
-{
-    if(!s_inited)
-    {
-        ptmuInit();
-        mcuHwcInit();
-    }
-
-    uint8_t percent;
-    uint8_t charging;
-    bool plugged;
-
-    MCUHWC_GetBatteryLevel(&percent);
-    PTMU_GetBatteryChargeState(&charging);
-    PTMU_GetAdapterState(&plugged);
-
-    StatusInfo res;
-
-    if(charging)
-        res.power_status = StatusInfo::POWER_CHARGING;
-    else if(plugged)
-        res.power_status = StatusInfo::POWER_CHARGED;
-    else
-        res.power_status = StatusInfo::POWER_DISCHARGING;
-
-    res.power_level = percent / 100.f;
-
-    return res;
-}
+static uint32_t s_sys_status;
 
 StatusInfo devicePowerStatus()
 {
@@ -68,10 +39,30 @@ StatusInfo devicePowerStatus()
     if(ticks - s_last_power_check > 10000)
     {
         s_last_power_check = ticks;
-        s_recent_status = s_devicePowerStatus_REAL();
+        s_sys_status = getBatteryLevel();
     }
 
-    return s_recent_status;
+    StatusInfo res;
+
+    res.power_status = StatusInfo::POWER_DISCHARGING;
+    res.power_level = 0.5f;
+
+    if(s_sys_status & 0x80)
+        res.power_status = StatusInfo::POWER_CHARGING;
+    else if(s_sys_status == 0xf)
+        res.power_level = 1.0f;
+    else if(s_sys_status == 0xb)
+        res.power_level = 0.75f;
+    else if(s_sys_status == 0x7)
+        res.power_level = 0.5f;
+    else if(s_sys_status == 0x3)
+        res.power_level = 0.25f;
+    else if(s_sys_status == 0x1)
+        res.power_level = 0.1f;
+    else
+        res.power_status = StatusInfo::POWER_UNKNOWN;
+
+    return res;
 }
 
 }

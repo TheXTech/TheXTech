@@ -874,7 +874,7 @@ elseif(NINTENDO_DS)
         src/core/16m/window_16m.cpp
         src/core/null/events_null.cpp
         src/core/16m/sound_16m.cpp
-        src/core/power/power_null.cpp
+        src/core/power/power_16m.cpp
     )
 elseif(THEXTECH_NO_SDL_BUILD)
     add_definitions(-DWINDOW_CUSTOM -DMSGBOX_CUSTOM -DEVENTS_CUSTOM -DRENDER_CUSTOM -DTHEXTECH_NO_SDL_CORE)
