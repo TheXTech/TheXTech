@@ -221,19 +221,22 @@ static void s_ExpandSectionForMenu()
         menu_section.Y = menu_section.Height - 2160;
 }
 
-void MainLoadAll(bool reload)
+void MainLoadAll()
 {
-    if(reload)
+    if(g_AssetsLoaded)
     {
         StopAllSounds();
         StopMusic();
 
         UnloadSound();
         UnloadGFX(true);
-        FontManager::quit();
-
-        PlayInitSound();
     }
+
+    if(ScreenAssetPack::g_LoopActive)
+        PlayInitSound();
+
+    if(FontManager::isInitied())
+        FontManager::quit();
 
     LoaderInit();
 
@@ -281,6 +284,8 @@ void MainLoadAll(bool reload)
     XWindow::updateWindowIcon();
 
     LoaderFinish();
+
+    g_AssetsLoaded = true;
 }
 
 
@@ -407,7 +412,20 @@ int GameMain(const CmdLineSetup_t &setup)
 
     Integrator::initIntegrations();
 
-    MainLoadAll(false);
+    // want to go directly to game content
+    bool cmdline_content = (!setup.testLevel.empty() || !setup.testReplay.empty() || setup.interprocess);
+
+    // special case: go straight to asset pack menu
+    if(g_config.pick_assets_on_start && !cmdline_content && GetAssetPacks().size() > 1)
+    {
+        FontManager::initFull();
+        Controls::LoadTouchScreenGFX();
+        GameMenu = false;
+        ScreenAssetPack::g_LoopActive = true;
+    }
+    // normal case: load everything and go to menu
+    else
+        MainLoadAll();
 
     LevelSelect = true; // world map is to be shown
 
@@ -422,7 +440,7 @@ int GameMain(const CmdLineSetup_t &setup)
     if(!neverPause && !XWindow::hasWindowInputFocus())
         SoundPauseEngine(1);
 
-    if(!setup.testLevel.empty() || !setup.testReplay.empty() || setup.interprocess) // Start level testing immediately!
+    if(cmdline_content) // Start level testing immediately!
     {
         bool is_world = (Files::hasSuffix(setup.testLevel, ".wld") || Files::hasSuffix(setup.testLevel, ".wldx"));
 

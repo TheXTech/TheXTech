@@ -40,6 +40,7 @@ static std::vector<AssetPack_t> s_asset_packs;
 static bool s_found_asset_packs = false;
 
 std::string g_AssetPackID;
+bool g_AssetsLoaded = false;
 
 static void appendSlash(std::string &path)
 {
@@ -445,7 +446,7 @@ bool ReloadAssetsFrom(const AssetPack_t& pack)
 
     pLogDebug("Successfully loaded UI assets; now loading all other assets from [%s]", AppPath.c_str());
 
-    MainLoadAll(true);
+    MainLoadAll();
     return true;
 }
 

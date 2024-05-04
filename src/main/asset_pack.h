@@ -29,7 +29,11 @@
 
 #include "std_picture.h"
 
+// string ID of the current asset pack
 extern std::string g_AssetPackID;
+
+// true if any asset pack has been loaded yet
+extern bool g_AssetsLoaded;
 
 struct AssetPack_t
 {

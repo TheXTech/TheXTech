@@ -36,6 +36,7 @@
 #include "graphics/gfx_frame.h" // FrameBorderInfo, loadFrameInfo
 #include "core/render.h"
 #include "core/events.h"
+#include "main/asset_pack.h"
 #include "main/screen_asset_pack.h"
 
 #include <IniProcessor/ini_processing.h>
@@ -1612,7 +1613,7 @@ void UpdateLoadREAL()
         Left += XRender::TargetOverscanX;
         Right -= XRender::TargetOverscanX;
 
-        if(ScreenAssetPack::g_LoopActive)
+        if(ScreenAssetPack::g_LoopActive && g_AssetsLoaded)
         {
             ScreenAssetPack::DrawBackground(1.0);
             DrawDeviceBattery();

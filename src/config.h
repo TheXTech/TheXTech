@@ -36,6 +36,8 @@ extern struct Config_t
     static constexpr bool enable_editor = true;
     //! Preferred file format for editor (0 is Moondust engine lvlx format)
     // int     editor_preferred_file_format = 0;
+    //! Choose asset pack on game startup
+    bool    pick_assets_on_start = false;
     //! User's preferred language / dialect
     std::string language = "auto";
 
