@@ -199,7 +199,8 @@
             "offscreenExit": "场景边缘出口",
             "scroll": "强制卷轴",
             "setBounds": "设置范围",
-            "underwater": "水下"
+            "underwater": "水下",
+            "vertWrap": "纵向循环"
         },
         "select": {
             "allSectPropBlankForEventN": "更改所有场景{0}于{1}事件",
