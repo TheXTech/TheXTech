@@ -44,6 +44,7 @@
 #include "graphics/gfx_frame.h"
 #include "graphics/gfx_marquee.h"
 #include "main/menu_controls.h"
+#include "controls.h"
 
 namespace OptionsScreen
 {
@@ -923,6 +924,7 @@ bool Logic()
 
         if(menuControls_Logic() == -1)
         {
+            Controls::SaveConfig();
             MenuMode = MENU_NEW_OPTIONS;
             MenuMouseRelease = false;
             controls_ready = false;

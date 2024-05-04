@@ -2105,6 +2105,7 @@ bool mainMenuUpdate()
             int ret = menuControls_Logic();
             if(ret == -1)
             {
+                Controls::SaveConfig();
                 MenuMode = MENU_NEW_OPTIONS;
                 MenuCursorCanMove = false;
             }
