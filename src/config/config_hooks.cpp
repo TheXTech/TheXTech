@@ -24,7 +24,7 @@
 #include "core/msgbox.h"
 #include "core/events.h"
 
-#include "config/config_main.h"
+#include "config.h"
 #include "config/config_hooks.h"
 
 #include "main/translate.h"

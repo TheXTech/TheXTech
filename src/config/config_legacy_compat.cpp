@@ -23,10 +23,10 @@
 #include <fmt_format_ne.h>
 
 #include "globals.h"
+#include "config.h"
 
 #include "main/menu_main.h"
 #include "main/screen_prompt.h"
-#include "config/config_main.h"
 
 // support variables for autoconversion to avoid repeated nags
 static int s_cur_load_iter = 0;

@@ -23,7 +23,7 @@
 #include <fmt_format_ne.h>
 
 #include "config/config_base.hpp"
-#include "config/config_main.h"
+#include "config.h"
 
 #include "main/translate.h"
 

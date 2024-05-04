@@ -40,7 +40,6 @@
 #include "main/game_info.h"
 #include "main/menu_main.h"
 #include "main/screen_options.h"
-// #include "main/unicode_marqueeer.hpp"
 #include "graphics/gfx_frame.h"
 #include "graphics/gfx_marquee.h"
 #include "main/menu_controls.h"

@@ -22,7 +22,7 @@
 #include <IniProcessor/ini_processing.h>
 #include <fmt_format_ne.h>
 
-#include "config/config_main.h"
+#include "config.h"
 #include "config/config_impl.hpp"
 #include "main/game_info.h"
 #include "globals.h"
