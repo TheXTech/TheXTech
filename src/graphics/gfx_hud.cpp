@@ -516,7 +516,7 @@ void DrawDeviceBattery()
     if(status_info.power_status == XPower::StatusInfo::POWER_DISABLED || status_info.power_status == XPower::StatusInfo::POWER_UNKNOWN || status_info.power_status == XPower::StatusInfo::POWER_WIRED)
         return;
 
-    bool isLow = (status_info.power_status <= 0.35f);
+    bool isLow = (status_info.power_level <= 0.35f);
 
     bool showBattery = false;
 
