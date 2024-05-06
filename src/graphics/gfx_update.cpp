@@ -1887,7 +1887,7 @@ void UpdateGraphicsScreen(Screen_t& screen)
         // moved many-player (superbdemo128) handling code to logic section above
 
 #ifdef __3DS__
-        XRender::setTargetLayer(1);
+        XRender::setTargetLayer(g_config.td_compat_mode ? 2 : 1);
 #endif
 
         // update the vectors of all the onscreen blocks and backgrounds for use at multiple places

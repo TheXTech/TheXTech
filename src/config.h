@@ -242,6 +242,11 @@ public:
     static constexpr int scale_mode = SCALE_DYNAMIC_NEAREST;
 #endif
 
+#ifdef __3DS__
+    opt<bool> td_compat_mode{this, defaults(false), {}, Scope::UserGlobal,
+        "3d-compat-mode", "3D compat mode", "Draw all objects in one 3D plane"};
+#endif
+
     /* ---- Video - Meta Info ----*/
     subsection info_meta{this, "info-meta", "Onscreen meta info"};
 
