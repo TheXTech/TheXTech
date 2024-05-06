@@ -97,29 +97,6 @@ static bool s_purple_pet_present()
             return true;
     }
 
-    if(LevelSelect)
-        return false;
-
-    for(int A = 1; A <= numNPCs; A++)
-    {
-        int type = NPC[A].Type;
-
-        if(type == NPCID_ITEM_BURIED || type == NPCID_ITEM_POD ||
-           type == NPCID_ITEM_BUBBLE || type == NPCID_ITEM_THROWER)
-        {
-            type = int(NPC[A].Special);
-        }
-
-        if(type == NPCID_PET_PURPLE)
-            return true;
-    }
-
-    for(int A = 1; A <= numBlock; A++)
-    {
-        if(Block[A].Special != 0 && Block[A].Special == 1000 + NPCID_PET_PURPLE)
-            return true;
-    }
-
     return false;
 }
 
