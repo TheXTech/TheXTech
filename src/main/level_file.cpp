@@ -1253,9 +1253,6 @@ void ClearLevel()
     numBackground = 0;
     numLocked = 0;
     MidBackground = 1;
-#ifdef __3DS__
-    BlkBackground = 0;
-#endif
     LastBackground = 0;
     PlayerStart[1] = BlankLocation;
     PlayerStart[2] = BlankLocation;

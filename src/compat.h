@@ -103,9 +103,6 @@ struct Compatibility_t
     bool disable_background2_tiling;
     bool world_map_lvlname_marquee;
     bool modern_lives_system;
-#ifdef __3DS__
-    bool tune_bgo_order;
-#endif
 
     // SpeedRun section
     enum

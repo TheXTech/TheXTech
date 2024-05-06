@@ -2037,105 +2037,83 @@ void UpdateGraphicsScreen(Screen_t& screen)
 
         XRender::setDrawPlane(PLANE_LVL_BGO_NORM);
 
-#ifdef __3DS__
-        constexpr int loop_start = 0;
-#else
-        constexpr int loop_start = 1;
-#endif
-
-        // on 3DS, draw background in two rounds, first in the BG layer and second in the main layer
-        for(int loop = loop_start; loop < 2; loop++)
+        if(LevelEditor)
         {
-#ifdef __3DS__
-            if(loop == 1)
-                XRender::setTargetLayer(2);
-
-            const uint8_t pri_limit = (loop == 1) ? Background_t::PRI_FG_START : Background_t::PRI_BLK_START;
-            const int index_limit = (loop == 1) ? LastBackground : BlkBackground;
-#else
-            constexpr uint8_t pri_limit = Background_t::PRI_FG_START;
-            const int index_limit = LastBackground;
-#endif
-
-            if(LevelEditor)
+            for(; nextBackground < (int)screenBackgrounds.size(); nextBackground++)  // Second backgrounds
             {
-                for(; nextBackground < (int)screenBackgrounds.size(); nextBackground++)  // Second backgrounds
-                {
-                    int A = screenBackgrounds[nextBackground];
+                int A = screenBackgrounds[nextBackground];
 
-                    if(A > numBackground)
-                        break;
+                if(A > numBackground)
+                    break;
 
-                    if(Background[A].SortPriority >= pri_limit)
-                        break;
-
-                    g_stats.checkedBGOs++;
-                    if(vScreenCollision(Z, Background[A].Location) && !Background[A].Hidden)
-                    {
-                        g_stats.renderedBGOs++;
-                        XRender::renderTexture(camX + Background[A].Location.X,
-                                              camY + Background[A].Location.Y,
-                                              GFXBackgroundWidth[Background[A].Type],
-                                              BackgroundHeight[Background[A].Type],
-                                              GFXBackgroundBMP[Background[A].Type], 0,
-                                              BackgroundHeight[Background[A].Type] * BackgroundFrame[Background[A].Type]);
-                    }
-                }
-            }
-            else if(numBackground > 0)
-            {
-                for(; nextBackground < (int)screenBackgrounds.size() && (int)screenBackgrounds[nextBackground] <= index_limit; nextBackground++)  // Second backgrounds
-                {
-                    int A = screenBackgrounds[nextBackground];
-
-                    g_stats.checkedBGOs++;
-
-                    if(Background[A].Hidden)
-                        continue;
-
-                    double sX = camX + Background[A].Location.X;
-                    if(sX > vScreen[Z].Width)
-                        continue;
-
-                    double sY = camY + Background[A].Location.Y;
-                    if(sY > vScreen[Z].Height)
-                        continue;
-
-                    if(sX + Background[A].Location.Width >= 0 && sY + Background[A].Location.Height >= 0 /*&& !Background[A].Hidden*/)
-                    {
-                        g_stats.renderedBGOs++;
-                        XRender::renderTexture(sX,
-                                              sY,
-                                              BackgroundWidth[Background[A].Type],
-                                              BackgroundHeight[Background[A].Type],
-                                              GFXBackgroundBMP[Background[A].Type],
-                                              0, BackgroundHeight[Background[A].Type] * BackgroundFrame[Background[A].Type]);
-                    }
-                }
-            }
-
-#ifdef __3DS__
-            if(loop == 1)
-                break;
-#endif
-
-            for(int oBackground = (int)screenBackgrounds.size() - 1; oBackground > 0 && (int)screenBackgrounds[oBackground] > numBackground; oBackground--)  // Locked doors
-            {
-                int A = screenBackgrounds[oBackground];
+                if(Background[A].SortPriority >= Background_t::PRI_FG_START)
+                    break;
 
                 g_stats.checkedBGOs++;
-                if(vScreenCollision(Z, Background[A].Location) &&
-                    (Background[A].Type == 98 || Background[A].Type == 160) && !Background[A].Hidden)
+                if(vScreenCollision(Z, Background[A].Location) && !Background[A].Hidden)
                 {
                     g_stats.renderedBGOs++;
                     XRender::renderTexture(camX + Background[A].Location.X,
                                           camY + Background[A].Location.Y,
-                                          BackgroundWidth[Background[A].Type], BackgroundHeight[Background[A].Type],
+                                          GFXBackgroundWidth[Background[A].Type],
+                                          BackgroundHeight[Background[A].Type],
+                                          GFXBackgroundBMP[Background[A].Type], 0,
+                                          BackgroundHeight[Background[A].Type] * BackgroundFrame[Background[A].Type]);
+                }
+            }
+        }
+        else if(numBackground > 0)
+        {
+            for(; nextBackground < (int)screenBackgrounds.size() && (int)screenBackgrounds[nextBackground] <= LastBackground; nextBackground++)  // Second backgrounds
+            {
+                int A = screenBackgrounds[nextBackground];
+
+                g_stats.checkedBGOs++;
+
+                if(Background[A].Hidden)
+                    continue;
+
+                double sX = camX + Background[A].Location.X;
+                if(sX > vScreen[Z].Width)
+                    continue;
+
+                double sY = camY + Background[A].Location.Y;
+                if(sY > vScreen[Z].Height)
+                    continue;
+
+                if(sX + Background[A].Location.Width >= 0 && sY + Background[A].Location.Height >= 0 /*&& !Background[A].Hidden*/)
+                {
+                    g_stats.renderedBGOs++;
+                    XRender::renderTexture(sX,
+                                          sY,
+                                          BackgroundWidth[Background[A].Type],
+                                          BackgroundHeight[Background[A].Type],
                                           GFXBackgroundBMP[Background[A].Type],
                                           0, BackgroundHeight[Background[A].Type] * BackgroundFrame[Background[A].Type]);
                 }
             }
         }
+
+        for(int oBackground = (int)screenBackgrounds.size() - 1; oBackground > 0 && (int)screenBackgrounds[oBackground] > numBackground; oBackground--)  // Locked doors
+        {
+            int A = screenBackgrounds[oBackground];
+
+            g_stats.checkedBGOs++;
+            if(vScreenCollision(Z, Background[A].Location) &&
+                (Background[A].Type == 98 || Background[A].Type == 160) && !Background[A].Hidden)
+            {
+                g_stats.renderedBGOs++;
+                XRender::renderTexture(camX + Background[A].Location.X,
+                                      camY + Background[A].Location.Y,
+                                      BackgroundWidth[Background[A].Type], BackgroundHeight[Background[A].Type],
+                                      GFXBackgroundBMP[Background[A].Type],
+                                      0, BackgroundHeight[Background[A].Type] * BackgroundFrame[Background[A].Type]);
+            }
+        }
+
+#ifdef __3DS__
+        XRender::setTargetLayer(2);
+#endif
 
         XRender::setDrawPlane(PLANE_LVL_NPC_BG);
 
