@@ -199,7 +199,8 @@
             "offscreenExit": "場景邊緣出口",
             "scroll": "強制卷軸",
             "setBounds": "設置範圍",
-            "underwater": "水下"
+            "underwater": "水下",
+            "vertWrap": "縱向循環"
         },
         "select": {
             "allSectPropBlankForEventN": "更改所有場景{0}於{1}事件",

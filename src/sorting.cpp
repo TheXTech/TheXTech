@@ -21,7 +21,6 @@
 #include "globals.h"
 #include "sorting.h"
 #include "npc_traits.h"
-#include "config.h"
 
 #include <algorithm>
 
@@ -400,17 +399,6 @@ void Background_t::UpdateSortPriority()
 
     // set upper 5 bits by Type-based order
 
-    // For 3DS: special, PLANE_LVL_BGO_NORM but at render layer 2
-#ifdef __3DS__
-    if(g_config.tune_bgo_order && !GFXBackgroundCustom[Type] &&
-          (Type == 13 || Type == 14 || Type == 15 || Type == 21 || Type == 22
-        || Type == 30 || Type == 39 || Type == 40 || Type == 41 || Type == 42
-        || Type == 64 || Type == 132 || Type == 43 || Type == 44))
-    {
-        SortPriority |= 0xA0;
-    }
-    else
-#endif
     // PLANE_LVL_BGO_LOW
     // custom -2 with - offset is 0x08
     if(Type == 75 || Type == 76 || Type == 77 || Type == 78 || Type == 14)
@@ -670,9 +658,6 @@ void UpdateBackgrounds()
     int A = 0;
     int B = 0;
     LastBackground = numBackground;
-#ifdef __3DS__
-    BlkBackground = numBackground;
-#endif
     MidBackground = 1;
     for(A = 1; A <= numBackground; A++)
     {
@@ -680,11 +665,6 @@ void UpdateBackgrounds()
         {
             for(B = A; B <= numBackground; B++)
             {
-#ifdef __3DS__
-                if(B < BlkBackground && Background[B].SortPriority >= Background_t::PRI_BLK_START)
-                    BlkBackground = B - 1;
-#endif
-
                 if(Background[B].SortPriority >= Background_t::PRI_FG_START)
                 {
                     LastBackground = B - 1;

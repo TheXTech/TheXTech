@@ -54,7 +54,10 @@
             "commandSaveAs": "다른 이름으로 저장...",
             "confirmConfirmAction": "정말 {0} 할까요?",
             "confirmConvertFormatTo": "형식을 {0} 변환할까요?",
-            "confirmSaveBeforeAction": "{0} 전에 저장할까요?"
+            "confirmSaveBeforeAction": "{0} 전에 저장할까요?",
+            "convert": {
+                "descNew": "파일 확장명은 변경되지만 이전 파일은 삭제되지 않습니다.\n\n저장 후 손실된 기능을 확인하십시오."
+            }
         },
         "warp": {
             "speed": "속도 ",
@@ -598,6 +601,11 @@
         "controls": {
             "phrasePlayerConnected": "플레이어 {0}가 {1}에 연결됨, 프로파일: {2}",
             "phrasePlayerDisconnected": "플레이어 {0} 연결 끊김"
+        },
+        "hint": {
+            "no-lives-new": "실패하면 점수가 재설정됩니다.",
+            "no-lives-old": "실패하면 게임이 끝납니다.",
+            "pound-key": "아래로 두드리려면 누르세요!"
         }
     }
 }

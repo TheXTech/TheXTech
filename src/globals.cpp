@@ -108,11 +108,6 @@ float LevelChop[maxSections + 1];
 // RangeArr<int, -FLBlocks, FLBlocks> FirstBlock;
 // RangeArr<int, -FLBlocks, FLBlocks> LastBlock;
 int MidBackground = 1;
-
-#ifdef __3DS__
-int BlkBackground = 1;
-#endif
-
 int LastBackground = 1;
 int iBlocks = 0;
 RangeArrI<vbint_t, 0, maxBlocks, 0> iBlock;

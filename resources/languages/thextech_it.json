@@ -1,1 +1,182 @@
-{}
+{
+    "editor": {
+        "file": {
+            "convert": {
+                "descNew": "L'estensione del file cambierà però il file originale NON verrà eliminato.\n\nControlla se ci sono mancanze nel file nuovo"
+            },
+            "optionProceedWithConversion": "Procedi con la conversione",
+            "optionYesSaveThenAction": "Sì: salva e {0}",
+            "confirmConfirmAction": "Sei sicuro di {0}?",
+            "optionCancelConversion": "Cancella conversione",
+            "formatModern": "Versione Moderna (PGE-X)",
+            "formatLegacy": "Versione Vecchia (SMBX64)",
+            "labelFormat": "Formato:",
+            "optionActionWithoutSave": "{0} senza salvare",
+            "optionCancelAction": "Cancella: non {0}",
+            "labelCurrentFile": "File attuale:",
+            "sectionLevel": "Livello",
+            "sectionWorld": "Mondo",
+            "actionClearLevel": "Cancella Livello",
+            "actionClearWorld": "Cancella il mondo",
+            "actionExit": "Uscire",
+            "actionOpen": "Aprire",
+            "actionRevert": "Ritornare",
+            "commandNew": "Nuovo",
+            "commandOpen": "Apri...",
+            "commandSave": "Salva",
+            "commandSaveAs": "Salva come...",
+            "confirmConvertFormatTo": "Convertire il formato a {0}?",
+            "confirmSaveBeforeAction": "Salvare prima di {0}?"
+        },
+        "layers": {
+            "abbrevAttLayer": "Att:",
+            "deletion": {
+                "header": "Rimozione strato {0}",
+                "preserveLayerContents": "Preservare i contenuti dello strato?",
+                "confirmPreserve": "Sì: muovi sullo strato predefinito",
+                "cancel": "Cancella: non eliminare lo strato",
+                "confirmDelete": "No: *CANCELLA TUTTI I CONTENTUTI*"
+            },
+            "labelAttached": "Attaccato:",
+            "default": "Predefinito",
+            "desc": {
+                "att": "Ogni volta che NPC si muove, lo strato attaccato si muoverà seguendolo"
+            },
+            "header": "Strati:",
+            "label": "Strato:",
+            "itemNewLayer": "<Nuovo Strato>",
+            "labelMoveLayer": "Muovi Strato:",
+            "promptLayerName": "Nome dello strato",
+            "labelAttachedLayer": "Strati Attaccato:"
+        },
+        "letterCoordX": "X (orizzontale)",
+        "letterCoordY": "Y (verticale)",
+        "letterDown": "D",
+        "npc": {
+            "ai": {
+                "UD": "Su-Giù",
+                "target": "Bersaglio",
+                "LR": "Sinistra-Destra",
+                "swim": "Nuota",
+                "aiIs": "IA: {0}",
+                "headerCustomAi": "IA Perosonalizzata:",
+                "jump": "Salta",
+                "use1_0Ai": "Usare IA 1.0?"
+            },
+            "gen": {
+                "effectWarp": "Warp",
+                "header": "Impostazioni Generatore",
+                "direction": "Direzione",
+                "effectIs": "Effetto: {0}",
+                "effectShoot": "Spara"
+            },
+            "inContainer": "In",
+            "inertNice": "Amichevole",
+            "props": {
+                "active": "Attivo",
+                "facing": "Affacciato",
+                "attachSurface": "Attacca"
+            },
+            "abbrevGen": "Generatore",
+            "stuckStop": "Fermo",
+            "tooltipExpandSection": "Sezione di espansione"
+        },
+        "events": {
+            "deletion": {
+                "deletingEvent": "Rimozione Evento {0}",
+                "cancel": "No: non eliminare l'evento",
+                "confirm": "Sì: elimina l'evento"
+            },
+            "desc": {
+                "activate": "Quando gli NPC entrano nello schermo",
+                "death": "Quando NPC muore",
+                "destroy": "Quando il blocco è distrutto",
+                "enter": "Quando si è entrati nella warp",
+                "hit": "Quando il blocco viene colpito",
+                "layerClear": "Quando lo strato è vuoto",
+                "phraseTriggersWhenTemplate": "{0} bersagli quando {1}",
+                "talk": "Quando il giocatore parla con NPC"
+            },
+            "sections": {
+                "actionSet": "Imposta",
+                "actionKeep": "Mantieni",
+                "actionReset": "Ripristina",
+                "phraseAllSections": "Tutte le sezioni",
+                "propBackground": "Sfondo",
+                "propMusic": "Musica"
+            },
+            "bounds": {
+                "changeAllSectionBoundsToCurrent": "Cambiare tutte le sezioni collegate a quella attuale"
+            },
+            "controlsForEventN": "Controlli per evento {0}",
+            "header": "Eventi:",
+            "headerTriggerEvent": "Bersaglio:",
+            "itemNewEvent": "<Nuovo Evento>",
+            "label": {
+                "activate": "Attiva",
+                "death": "Morte",
+                "destroy": "Distruggi",
+                "enter": "Entra",
+                "hit": "Colpisci",
+                "layerClear": "Strato Vuoto",
+                "next": "Prossimo",
+                "talk": "Parla"
+            },
+            "layers": {
+                "headerHide": "Nascondi:",
+                "headerMove": "Muovi:",
+                "headerShow": "Mostra:"
+            },
+            "letter": {
+                "activate": "A:",
+                "death": "D:",
+                "destroy": "D:",
+                "enter": "E:",
+                "hit": "H:",
+                "layerClear": "L:",
+                "talk": "T:"
+            },
+            "promptEventName": "Nome dell'evento",
+            "promptEventText": "Testo dell'evento",
+            "props": {
+                "autostart": "Avvio Automatico",
+                "controls": "Controlli",
+                "endGame": "Fine Gioco",
+                "layerSmoke": "Fumo",
+                "sound": "Suono"
+            },
+            "settingsForEvent": "Impostazioni per evento {0}"
+        },
+        "level": {
+            "gameStart": "Inizio Gioco",
+            "startPos": "Posizione d'inizio",
+            "levelName": "Nome Livello",
+            "pathUnlocks": "Quando il percorso si sblocca"
+        },
+        "block": {
+            "pickContents": "Scegli il contenuto del blocco",
+            "canBreak": "Distrugge",
+            "canBreakTooltip": "Distrugge quando viene colpito da",
+            "inside": "Dentro",
+            "letterHeight": "H",
+            "letterWidth": "W"
+        },
+        "browser": {
+            "askOverwriteFile": "Sovrascrivere{0}?",
+            "itemNewFile": "<Nuovo File>",
+            "itemNewFolder": "<Nuova Cartella>",
+            "newFile": "Nuovo File",
+            "openFile": "Apri File",
+            "saveFile": "Salva File"
+        },
+        "letterLeft": "L",
+        "letterRight": "R",
+        "letterUp": "U",
+        "mapPos": "Posizione Mappa:",
+        "pageBlankOfBlank": "Pagina {0} di {1}",
+        "phraseAreYouSure": "Sei sicuro?",
+        "phraseCountMore": "{0} Altro",
+        "phraseDelayIsMs": "Ritardo: {0} ms",
+        "phraseGenericIndex": "Numero {0}"
+    }
+}
