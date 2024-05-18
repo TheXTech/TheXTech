@@ -958,7 +958,7 @@ void TouchScreenController::scanTouchDevices()
             auto &d = m_devices[i];
             d.id = SDL_GetTouchDevice(i);
 
-#if defined(ANDROID)
+#if !defined(VITA) // || SDL_VERSION_ATLEAST(2, 30, 4) // FIXME: Enable this tweak after SDL2 side will be fixed
             if(!d.id) // Invalid touch device, will be dropped from the list
             {
                 d.id = -1;
@@ -1002,7 +1002,7 @@ void TouchScreenController::scanTouchDevices()
         // Remove unnecessary devices from the list
         for(auto it = m_devices.begin(); it != m_devices.end(); )
         {
-            if(it->id < 0)
+            if(it->id == -1)
                 it = m_devices.erase(it);
             else
                 ++it;
