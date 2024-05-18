@@ -1037,9 +1037,9 @@ void RenderGL::clearAllTextures()
 
 void RenderGL::clearBuffer()
 {
-#ifdef USE_RENDER_BLOCKING
-    SDL_assert(!m_blockRender);
-#endif
+//#ifdef USE_RENDER_BLOCKING
+//    SDL_assert(!m_blockRender);
+//#endif
 
     clearDrawQueues();
 
