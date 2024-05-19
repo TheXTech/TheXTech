@@ -69,6 +69,9 @@ BaseConfigOption_t<false>::BaseConfigOption_t(_Config_t<false>* parent, uint8_t 
 
 void BaseConfigOption_t<false>::make_translation(XTechTranslate& translate, const char* cur_section_id)
 {
+    if((m_scope & Options_t::Scope::User) == 0)
+        return;
+
     translate.m_engineMap.insert({fmt::format_ne("menu.options.{0}.{1}", cur_section_id, m_internal_name), &m_display_name});
 
     if(!m_display_tooltip.empty())
@@ -121,6 +124,9 @@ const std::string& BaseConfigOption_t<true>::get_tooltip(std::string& out) const
 
 void ConfigSection_t<false>::make_translation(XTechTranslate& translate, const char* cur_section_id)
 {
+    if((m_scope & Options_t::Scope::User) == 0)
+        return;
+
     translate.m_engineMap.insert({fmt::format_ne("menu.options.{0}._header", cur_section_id), &m_display_name});
 
     if(!m_display_tooltip.empty())

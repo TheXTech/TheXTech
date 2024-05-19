@@ -388,6 +388,9 @@ const std::string& ConfigOption_t<true, bool>::get_display_value(std::string& ou
 template<class value_t>
 void ConfigEnumOption_t<false, value_t>::make_translation(XTechTranslate& translate, const char* cur_section_id)
 {
+    if((ConfigOption_t<false, value_t>::m_scope & Options_t::Scope::User) == 0)
+        return;
+
     translate.m_engineMap.insert({fmt::format_ne("menu.options.{0}.{1}._name", cur_section_id, m_internal_name), &m_display_name});
 
     // some obscure behavior of the GCC version in Ubuntu 16.04 necessitates qualifying m_display_tooltip with the base class scope

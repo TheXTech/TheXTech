@@ -44,24 +44,26 @@ public:
         enum
         {
             None = 0,
-            UserGlobal = 1 << 0,
-            UserEpisode = 1 << 1,
-            UserFile = 1 << 2,
+            // UserGlobal = 1 << 0,
+            // UserEpisode = 1 << 1,
+            // UserFile = 1 << 2,
 
-            UserLocal = UserEpisode | UserFile,
-            User = UserGlobal | UserLocal,
+            // UserLocal = UserEpisode | UserFile,
+            User = 1 << 0,
+            EpisodeOptions = 1 << 1,
 
-            CreatorGlobal = 1 << 3,
-            CreatorEpisode = 1 << 4,
-            CreatorFile = 1 << 5,
+            Assets = 1 << 2,
 
-            CreatorLocal = CreatorEpisode | CreatorFile,
-            Creator = CreatorGlobal | CreatorLocal,
+            CreatorEpisode = 1 << 3,
+            CreatorFile = 1 << 4,
 
-            Episode = UserEpisode | CreatorEpisode,
-            File = UserFile | CreatorFile,
-            Local = Episode | File,
-            Global = UserGlobal | CreatorGlobal,
+            Creator = CreatorEpisode | CreatorFile,
+            // Creator = CreatorGlobal | CreatorLocal,
+
+            // Episode = UserEpisode | CreatorEpisode,
+            // File = UserFile | CreatorFile,
+            // Local = Episode | File,
+            // Global = UserGlobal | CreatorGlobal,
             All = 0xff,
         };
     };
@@ -115,18 +117,18 @@ public:
     /* ---- Main ----*/
     section main{this, Scope::All, "main", "Main", nullptr};
 
-    language_t language{this, defaults(std::string("auto")), {}, Scope::UserGlobal,
+    language_t language{this, defaults(std::string("auto")), {}, Scope::User,
         "language", "Language", nullptr,
         config_language_set};
 
 #ifdef ENABLE_XTECH_DISCORD_RPC
-    opt<bool> discord_rpc{this, defaults(false), {}, Scope::UserGlobal,
+    opt<bool> discord_rpc{this, defaults(false), {}, Scope::User,
         "discord-rpc", "Discord Integration", "Share your play data on Discord!",
         config_integrations_set};
 #endif
 
 #ifndef NO_WINDOW_FOCUS_TRACKING
-    opt<bool> background_work{this, defaults(false), {}, Scope::UserGlobal,
+    opt<bool> background_work{this, defaults(false), {}, Scope::User,
         "background-work", "Run in background", "Play with joystick while game is unfocused"};
 #else
     static constexpr bool background_work = true;
@@ -137,13 +139,13 @@ public:
     /* ---- Main - Frame Timing ----*/
     subsection main_frame_timing{this, "timing", "Frame Timing"};
 
-    opt<bool> enable_frameskip{this, defaults(false), {}, Scope::UserGlobal,
+    opt<bool> enable_frameskip{this, defaults(false), {}, Scope::User,
         "frame-skip", "Frameskip", "Skip frames to maintain game speed"};
 
-    opt<bool> unlimited_framerate{this, defaults(false), {}, Scope::UserGlobal,
+    opt<bool> unlimited_framerate{this, defaults(false), {}, Scope::User,
         "unlimited-framerate", "Unlimited framerate", "Allow framerate above 66 FPS"};
 
-    opt<bool> render_vsync{this, defaults(false), {}, Scope::UserGlobal,
+    opt<bool> render_vsync{this, defaults(false), {}, Scope::User,
         "vsync", "V-Sync", "Sync frames to screen refresh, reduces tearing",
         config_res_set};
 
@@ -157,7 +159,7 @@ public:
             {MultiplayerPrefs::Split, "split", "Left/Right"},
             {MultiplayerPrefs::TopBottom, "topbottom", "Top/Bottom"},
         },
-        defaults(MultiplayerPrefs::Dynamic), {CompatClass::critical_update, MultiplayerPrefs::Dynamic}, Scope::UserGlobal,
+        defaults(MultiplayerPrefs::Dynamic), {CompatClass::critical_update, MultiplayerPrefs::Dynamic}, Scope::User,
         "two-screen-mode", "2P screen mode", nullptr,
         config_screenmode_set
     };
@@ -167,20 +169,20 @@ public:
             {MultiplayerPrefs::Shared, "shared", "Shared"},
             {MultiplayerPrefs::Split, "split", "Split"},
         },
-        defaults(MultiplayerPrefs::Shared), {CompatClass::critical_update, MultiplayerPrefs::Shared}, Scope::UserGlobal,
+        defaults(MultiplayerPrefs::Shared), {CompatClass::critical_update, MultiplayerPrefs::Shared}, Scope::User,
         "four-screen-mode", "4P screen mode", nullptr,
         config_screenmode_set
     };
 
 
     /* ---- Video ----*/
-    section video{this, Scope::UserGlobal, "video", "Video", nullptr};
+    section video{this, Scope::User, "video", "Video", nullptr};
 
     /* ---- Video - System ----*/
     subsection video_system{this, "video-system", "System"};
 
 #ifndef RENDER_FULLSCREEN_ALWAYS
-    opt<bool> fullscreen{this, defaults(false), {}, Scope::UserGlobal,
+    opt<bool> fullscreen{this, defaults(false), {}, Scope::User,
         "fullscreen", "Fullscreen", nullptr,
         config_fullscreen_set};
 #else
@@ -202,7 +204,7 @@ public:
             {{1280, 720}, "hd", "1280x720 (HD)"},
             {{0, 0}, "dynamic", "Dynamic"},
         },
-        defaults(std::pair<int, int>({0, 0})), {}, Scope::UserGlobal,
+        defaults(std::pair<int, int>({0, 0})), {}, Scope::User,
         "internal-res", "Screen size", "Resolution of gameplay field",
         config_res_set
     };
@@ -234,7 +236,7 @@ public:
             {SCALE_FIXED_2X, "2x", "2x"},
 #   endif
         },
-        defaults(SCALE_DYNAMIC_NEAREST), {}, Scope::UserGlobal,
+        defaults(SCALE_DYNAMIC_NEAREST), {}, Scope::User,
         "scale-mode", "Scale mode", nullptr,
         config_res_set
     };
@@ -243,7 +245,7 @@ public:
 #endif
 
 #ifdef __3DS__
-    opt<bool> td_compat_mode{this, defaults(false), {}, Scope::UserGlobal,
+    opt<bool> td_compat_mode{this, defaults(false), {}, Scope::User,
         "3d-compat-mode", "3D compat mode", "Draw all objects in one 3D plane"};
 #endif
 
@@ -252,10 +254,10 @@ public:
 
     static constexpr bool show_backdrop = true;
 
-    opt<bool> show_controllers{this, defaults(false), {}, Scope::UserGlobal,
+    opt<bool> show_controllers{this, defaults(false), {}, Scope::User,
         "display-controllers", "Controls activity", "Show which buttons players press"};
 
-    opt<bool> show_fps{this, defaults(false), {}, Scope::UserGlobal,
+    opt<bool> show_fps{this, defaults(false), {}, Scope::User,
         "show-fps", "Framerate", nullptr};
 
     enum
@@ -278,7 +280,7 @@ public:
             {BATTERY_STATUS_OFF, "never"},
             {BATTERY_STATUS_ALWAYS_ON, "always"},
         },
-        defaults<int>(BATTERY_STATUS_OFF), {}, Scope::UserGlobal,
+        defaults<int>(BATTERY_STATUS_OFF), {}, Scope::User,
         "battery-status", "Device battery status", nullptr};
 #else
     static constexpr bool show_battery_status = BATTERY_STATUS_OFF;
@@ -287,7 +289,7 @@ public:
     /* ---- Video - Game Info ----*/
     subsection info_game{this, "info-game", "Onscreen game info"};
 
-    opt<bool> show_fails_counter{this, defaults(false), {}, Scope::UserGlobal,
+    opt<bool> show_fails_counter{this, defaults(false), {}, Scope::User,
         "show-fails-counter", "Fails counter", "Show fails on the episode and current level"};
 
     enum
@@ -305,14 +307,14 @@ public:
             {MEDALS_SHOW_COUNTS, "counts-only", "Counts", "Show counts of gotten and available medals"},
             {MEDALS_SHOW_FULL, "show-full", "Full", "Show order of gotten and available medals"},
         },
-        defaults<int>(MEDALS_SHOW_FULL), {}, Scope::UserGlobal,
+        defaults<int>(MEDALS_SHOW_FULL), {}, Scope::User,
         "show-medals-policy", "Medals policy"};
 #else
     static constexpr int medals_show_policy = MEDALS_SHOW_FULL;
 #endif
 
     opt<bool> show_medals_counter{this,
-        defaults<bool>(true), {CompatClass::pure_preference, false}, Scope::UserGlobal,
+        defaults<bool>(true), {CompatClass::pure_preference, false}, Scope::User,
         "show-medals-counter", "Medals counter", "Show medals in HUD and at level entrance"};
 
     // used elsewhere to track creator-specified options
@@ -324,7 +326,7 @@ public:
         MAP_STARS_SHOW,
     };
 
-    opt<bool> world_map_stars_show{this, defaults(true), {CompatClass::pure_preference, false}, Scope::UserGlobal,
+    opt<bool> world_map_stars_show{this, defaults(true), {CompatClass::pure_preference, false}, Scope::User,
         "world-map-stars-show", "World map stars", "Show collected stars above levels"};
 
     /* ---- Video - Run Info ----*/
@@ -344,7 +346,7 @@ public:
             {EPISODE_TITLE_BOTTOM, "transparent"},
             {EPISODE_TITLE_BOTTOM, "on"},
         },
-        defaults(EPISODE_TITLE_OFF), {}, Scope::UserGlobal,
+        defaults(EPISODE_TITLE_OFF), {}, Scope::User,
         "show-episode-title", "Episode name", nullptr};
 
     enum
@@ -362,25 +364,25 @@ public:
             {PLAYTIME_COUNTER_OPAQUE, "opaque", "Opaque", nullptr},
             {PLAYTIME_COUNTER_ANIMATED, "animated", "Animated", "Adds a rainbow effect on level end"},
         },
-        defaults(PLAYTIME_COUNTER_OFF), {}, Scope::UserGlobal,
+        defaults(PLAYTIME_COUNTER_OFF), {}, Scope::User,
         "show-playtime-counter", "Playtime counter", "Show time spent on the episode and current attempt"};
 
     /* ---- Video - Effects ----*/
     subsection effects{this, "effects", "Screen Effects"};
 
     opt<bool> show_screen_shake{this,
-        defaults(true), {CompatClass::pure_preference, true}, Scope::UserGlobal,
+        defaults(true), {CompatClass::pure_preference, true}, Scope::User,
         "show-screen-shake", "Screen shake", nullptr};
 
-    opt<bool> EnableInterLevelFade{this, defaults(true), {CompatClass::pure_preference, false}, Scope::UserGlobal,
+    opt<bool> EnableInterLevelFade{this, defaults(true), {CompatClass::pure_preference, false}, Scope::User,
         "enable-inter-level-fade-effect", "Fade transitions", nullptr};
 
 
     /* ---- Audio ----*/
-    section audio{this, Scope::UserGlobal, "audio", "Audio", nullptr};
+    section audio{this, Scope::User, "audio", "Audio", nullptr};
 
 #ifndef __16M__
-    opt<bool> audio_enable{this, defaults(true), {}, Scope::UserGlobal,
+    opt<bool> audio_enable{this, defaults(true), {}, Scope::User,
         "audio-enable", "Enable", nullptr,
         config_audio_set};
 
@@ -389,22 +391,22 @@ public:
             {1, "mono", "Mono", nullptr},
             {2, "stereo", "Stereo", nullptr},
         },
-        defaults(g_audioDefaults.channels), {}, Scope::UserGlobal,
+        defaults(g_audioDefaults.channels), {}, Scope::User,
         "audio-channels", "Channels", nullptr,
         config_audio_set};
 
-    opt_range<int> audio_mus_volume{this, {0, 100, 5}, defaults(100), {}, Scope::UserGlobal,
+    opt_range<int> audio_mus_volume{this, {0, 100, 5}, defaults(100), {}, Scope::User,
         "audio-music-volume", "Music volume", nullptr,
         config_music_volume_set};
 
-    opt_range<int> audio_sfx_volume{this, {0, 100, 5}, defaults(100), {}, Scope::UserGlobal,
+    opt_range<int> audio_sfx_volume{this, {0, 100, 5}, defaults(100), {}, Scope::User,
         "audio-sfx-volume", "SFX volume", nullptr};
 #endif
 
     /* ---- Audio - Preferences ----*/
     subsection audio_preferences{this, "audio-prefs", "Preferences"};
 
-    opt<bool> sfx_modern{this, defaults(true), {CompatClass::pure_preference, false}, Scope::UserGlobal,
+    opt<bool> sfx_modern{this, defaults(true), {CompatClass::pure_preference, false}, Scope::User,
         "sfx-modern", "Modern SFX", "Use sounds added in TheXTech"};
 
 #if 0
@@ -420,13 +422,13 @@ public:
             {MOUNTDRUMS_NORMAL, "normal", "Normal", "Plays the special drums when you are riding a pet mount"},
             {MOUNTDRUMS_ALWAYS, "always", "Always", "Always plays the special drums"},
         },
-        defaults<int>(MOUNTDRUMS_NORMAL), {CompatClass::pure_preference, MOUNTDRUMS_NEVER}, Scope::UserGlobal,
+        defaults<int>(MOUNTDRUMS_NORMAL), {CompatClass::pure_preference, MOUNTDRUMS_NEVER}, Scope::User,
         "sfx-mount-drums", "Mount drums", "Should special drums play while the player is riding a pet?",
         config_mountdrums_set};
 #endif
 
 #ifndef __16M__
-    opt<bool> sfx_pet_beat{this, defaults(true), {CompatClass::pure_preference, false}, Scope::UserGlobal,
+    opt<bool> sfx_pet_beat{this, defaults(true), {CompatClass::pure_preference, false}, Scope::User,
         "sfx-pet-beat", "Pet grooves", "Play special groove when riding a pet",
         config_mountdrums_set};
 #endif
@@ -439,28 +441,28 @@ public:
     static constexpr bool sfx_audio_fx_default = true;
 #   endif
 
-    opt<bool> sfx_audio_fx{this, defaults(sfx_audio_fx_default), {CompatClass::pure_preference, false}, Scope::UserGlobal,
+    opt<bool> sfx_audio_fx{this, defaults(sfx_audio_fx_default), {CompatClass::pure_preference, false}, Scope::User,
         "sfx-audio-fx", "Echo effects", nullptr,
         config_audiofx_set};
 #endif
 
-    opt<bool> sfx_spatial_audio{this, defaults(true), {CompatClass::pure_preference, false}, Scope::UserGlobal,
+    opt<bool> sfx_spatial_audio{this, defaults(true), {CompatClass::pure_preference, false}, Scope::User,
         "sfx-spatial-audio", "Spatial audio", "Reduce volume of offscreen sounds"};
 
 
     /* ---- Controls ----*/
-    section controls{this, Scope::UserGlobal, "controls", "Controls"};
+    section controls{this, Scope::User, "controls", "Controls"};
 
 
     /* ---- Advanced ----*/
-    section advanced{this, Scope::UserGlobal, "advanced", "Advanced", "Technical options for internal operations"};
+    section advanced{this, Scope::User, "advanced", "Advanced", "Technical options for internal operations"};
 
     // static constexpr bool record_gameplay_data = false;
 
-    opt<bool> pick_assets_on_start{this, defaults(false), {}, Scope::UserGlobal,
+    opt<bool> pick_assets_on_start{this, defaults(false), {}, Scope::User,
         "choose-assets-on-launch", "Choose assets on launch", nullptr};
 
-    opt<bool> record_gameplay_data{this, defaults(false), {}, Scope::UserGlobal,
+    opt<bool> record_gameplay_data{this, defaults(false), {}, Scope::User,
         "record-gameplay-data", "Record gameplay", nullptr};
 
     opt_enum<int> log_level{this,
@@ -483,12 +485,12 @@ public:
 #else
         defaults(PGE_LogLevel::Info),
 #endif
-        {}, Scope::UserGlobal,
+        {}, Scope::User,
         "log-level", "Log level", nullptr,
         config_log_level_set};
 
 #if defined(__ANDROID__) || defined(__3DS__)
-    opt<bool> use_native_osk{this, defaults(false), {}, Scope::UserGlobal,
+    opt<bool> use_native_osk{this, defaults(false), {}, Scope::User,
         "use-native-osk", "Native OSK", "Use system's native keyboard"};
 #endif
 
@@ -527,7 +529,7 @@ public:
             {RENDER_SOFTWARE, "0"},
             {RENDER_ACCELERATED_SDL, "1"},
         },
-        defaults(RENDER_ACCELERATED_AUTO), {}, Scope::UserGlobal,
+        defaults(RENDER_ACCELERATED_AUTO), {}, Scope::User,
         "render", "Render mode", nullptr,
         config_rendermode_set};
 #endif
@@ -546,7 +548,7 @@ public:
             {SCALE_DOWN_SAFE, "safe", "Safe", "Checks if images are in 2x format"},
             {SCALE_DOWN_ALL, "all", "All", "Less loading stutter than 'Safe'"},
         },
-        defaults(SCALE_DOWN_SAFE), {}, Scope::UserGlobal,
+        defaults(SCALE_DOWN_SAFE), {}, Scope::User,
         "scale-down-textures", "Scale down images", "Store images as 1x to save memory"};
 #endif
 
@@ -563,7 +565,7 @@ public:
             {44100, "44100", "44100 Hz", nullptr},
             {48000, "48000", "48000 Hz", nullptr},
         },
-        defaults(g_audioDefaults.sampleRate), {}, Scope::UserGlobal,
+        defaults(g_audioDefaults.sampleRate), {}, Scope::User,
         "audio-sample-rate", "Sample rate", nullptr,
         config_audio_set};
 
@@ -615,7 +617,7 @@ public:
             {AUDIO_F32MSB, "pcm_f32be"},
 #       endif
         },
-        defaults(g_audioDefaults.format), {}, Scope::UserGlobal,
+        defaults(g_audioDefaults.format), {}, Scope::User,
         "audio-format", "Audio format", "(Advanced) format for sound driver",
         config_audio_set};
 
@@ -628,7 +630,7 @@ public:
             {2048, "2048", "2048"},
             {4096, "4096", "4096"},
         },
-        defaults(g_audioDefaults.bufferSize), {}, Scope::UserGlobal,
+        defaults(g_audioDefaults.bufferSize), {}, Scope::User,
         "audio-buffer-size", "Buffer size", "(Advanced) increase for fewer pops but more lag",
         config_audio_set};
 #else
@@ -639,7 +641,7 @@ public:
 
 
     /* ---- Episode options ----*/
-    section episode_options{this, Scope::UserLocal, "episode-options", "Episode Options"};
+    section episode_options{this, Scope::EpisodeOptions, "episode-options", "Episode Options"};
 
     enum
     {
@@ -653,7 +655,7 @@ public:
             {MODE_CLASSIC, "classic", "Classic", "Critical updates only"},
             {MODE_VANILLA, "vanilla", "Vanilla", "Preserves all known bugs"},
         },
-        defaults(MODE_MODERN), {CompatClass::pure_preference, MODE_VANILLA}, Scope::UserEpisode,
+        defaults(MODE_MODERN), {CompatClass::pure_preference, MODE_VANILLA}, Scope::EpisodeOptions,
         "playstyle", "Playstyle", nullptr,
         config_compat_changed};
 
@@ -669,20 +671,20 @@ public:
             {CREATORCOMPAT_FILEONLY, "file-only", "File only", nullptr},
             {CREATORCOMPAT_DISABLE, "disable", "Disable", nullptr},
         },
-        defaults(CREATORCOMPAT_ENABLE), {CompatClass::critical_update, CREATORCOMPAT_DISABLE}, Scope::UserEpisode,
+        defaults(CREATORCOMPAT_ENABLE), {CompatClass::critical_update, CREATORCOMPAT_DISABLE}, Scope::EpisodeOptions,
         "creator-compat", "Creator compat", "Logic tweaks by content creator"};
 
     // /* ---- Prefs - Effects ----*/
     // subsection effects{this, "effects", "Visual Effects"};
 
-    // opt<bool> small_screen_camera_features{this, defaults(true), {VER_THEXTECH137}, Scope::UserGlobal,
+    // opt<bool> small_screen_camera_features{this, defaults(true), {VER_THEXTECH137}, Scope::User,
     //     "small-screen-camera-features", "Small screen camera features", "Camera optimizations that improve the experience at low resolutions"};
     static constexpr bool small_screen_camera_features = true;
 
 
 
     /* ---- Compatibility ----*/
-    section compat{this, Scope::File, "compatibility", "Session Tweaks", "Options for compat or debugging"};
+    section compat{this, Scope::CreatorFile, "compatibility", "Session Tweaks", "Options for compat or debugging"};
 
     subsection reset_all{this, "reset-all", "Reset All"};
 
@@ -717,160 +719,162 @@ public:
     opt<bool> multiplayer_pause_controls{this, defaults(true), {CompatClass::critical_update, false}, Scope::None,
         "multiplayer-pause-controls", "Multiplayer pause controls", "Allows players other than P1 to pause the game and control the pause menu"};
 
-    opt<bool> world_map_lvlname_marquee{this, defaults(false), {CompatClass::pure_preference, false}, Scope::Episode,
+    opt<bool> world_map_lvlname_marquee{this, defaults(false), {CompatClass::pure_preference, false}, Scope::CreatorEpisode,
     "world-map-lvlname-marquee", "Level name marquee", "In the world map, use a marquee effect for the level name instead of splitting it over two lines"};
 
-    opt<bool> fix_vanilla_checkpoints{this, defaults(true), {CompatClass::standard_update, false}, Scope::File,
+    opt<bool> fix_vanilla_checkpoints{this, defaults(true), {CompatClass::standard_update, false}, Scope::CreatorFile,
         "fix-vanilla-checkpoints", "Fix vanilla checkpoints", "Resume from the most recently touched checkpoint after death"};
-    opt<bool> enable_last_warp_hub_resume{this, defaults(true), {CompatClass::standard_update, false}, Scope::Episode,
+    opt<bool> enable_last_warp_hub_resume{this, defaults(true), {CompatClass::standard_update, false}, Scope::CreatorEpisode,
         "enable-last-warp-hub-resume", "Save warp in hub", "In a hub world, resume play at the last warp you entered the hub level from"};
-    opt<bool> disable_background2_tiling{this, defaults(false), {CompatClass::standard_update, true}, Scope::Local,
+    opt<bool> disable_background2_tiling{this, defaults(false), {CompatClass::standard_update, true}, Scope::Creator,
         "disable-background2-tiling", "Disable BG tiling", "Disable tiling of the level background texture if it causes visual disturbances"};
-    opt<bool> modern_section_change{this, defaults(true), {CompatClass::critical_update, false}, Scope::File,
+    opt<bool> modern_section_change{this, defaults(true), {CompatClass::critical_update, false}, Scope::CreatorFile,
         "modern-section-change", "Modern section change", "Animate sections resizing when they shrink or during 2-player mode"};
 
-    opt<bool> extra_screen_shake{this, defaults(true), {CompatClass::standard_update, false}, Scope::Local,
+    opt<bool> extra_screen_shake{this, defaults(true), {CompatClass::standard_update, false}, Scope::Creator,
         "extra-screen-shake", "Extra screen shake", "Shake screen for large enemy and player ground pounds"};
 
-    opt<bool> enable_playtime_tracking{this, defaults(true), {CompatClass::pure_preference, false}, Scope::File,
+    opt<bool> enable_playtime_tracking{this, defaults(true), {CompatClass::pure_preference, false}, Scope::CreatorFile,
         "enable-playtime-tracking", "Playtime tracking", "Record the amount of time spent playing an episode"};
-    opt<bool> enable_fails_tracking{this, defaults(true), {CompatClass::pure_preference, false}, Scope::File,
+    opt<bool> enable_fails_tracking{this, defaults(true), {CompatClass::pure_preference, false}, Scope::CreatorFile,
         "enable-fails-tracking", "Fails tracking", "Record the number of fails on the current level and world"};
 
-    opt<bool> world_map_fast_move{this, defaults(true), {CompatClass::standard_update, false}, Scope::Local,
+    opt<bool> world_map_fast_move{this, defaults(true), {CompatClass::standard_update, false}, Scope::Creator,
         "world-map-fast-move", "Automatic movement", "Moves automatically between forks on the path"};
 
-    opt<bool> modern_item_drop{this, defaults(true), {CompatClass::standard_update, false}, Scope::Local,
+    opt<bool> modern_item_drop{this, defaults(true), {CompatClass::standard_update, false}, Scope::Creator,
         "modern-item-drop", "Modern item drop", "Experimental implementation of modern item drop"};
 
     /* ---- Compatibility - Autocode ----*/
     subsection compat_autocode{this, "autocode", "Autocode"};
 
     // Luna
-    opt<bool> luna_enable_engine{this, defaults(true), {CompatClass::critical_update, false}, Scope::File,
+    opt<bool> luna_enable_engine{this, defaults(true), {CompatClass::critical_update, false}, Scope::CreatorFile,
         "luna-script-enable-engine", "Enable engine", nullptr};
-    opt<bool> luna_allow_level_codes{this, defaults(true), {CompatClass::critical_update, false}, Scope::File,
+    opt<bool> luna_allow_level_codes{this, defaults(true), {CompatClass::critical_update, false}, Scope::CreatorFile,
         "luna-script-allow-level-codes", "Allow level codes", nullptr};
     static constexpr bool autocode_translate_coords = true;
-    // opt<bool> autocode_translate_coords{this, defaults(true), {}, Scope::File,
+    // opt<bool> autocode_translate_coords{this, defaults(true), {}, Scope::CreatorFile,
     //     "autocode-translate-coords", "Translate coords", "Translate the coordinates of autocode screen-space objects based on the HUD location"};
 
     /* ---- Compatibility - Bugfixes ----*/
     subsection bugfixes{this, "bugfixes", "Bugfixes"};
 
     // <1.3.4
-    opt<bool> fix_restored_block_move{this, defaults(true), {CompatClass::standard_update, false}, Scope::File,
+    opt<bool> fix_restored_block_move{this, defaults(true), {CompatClass::standard_update, false}, Scope::CreatorFile,
         "fix-restored-block-move", "Fix restored block move", "Don't move powerup blocks to the right when they are hit after restoring"};
-    opt<bool> fix_player_slope_speed{this, defaults(true), {CompatClass::standard_update, false}, Scope::File,
+    opt<bool> fix_player_slope_speed{this, defaults(true), {CompatClass::standard_update, false}, Scope::CreatorFile,
         "fix-player-slope-speed", "Player slope speed", nullptr};
     // 1.3.4
-    opt<bool> fix_player_filter_bounce{this, defaults(true), {CompatClass::critical_update, false}, Scope::File,
+    opt<bool> fix_player_filter_bounce{this, defaults(true), {CompatClass::critical_update, false}, Scope::CreatorFile,
         "fix-player-filter-bounce", "Player filter bounce", "Fix a glitch where player could clip downwards"};
-    opt<bool> fix_player_clip_wall_at_npc{this, defaults(true), {CompatClass::critical_update, false}, Scope::File,
+    opt<bool> fix_player_clip_wall_at_npc{this, defaults(true), {CompatClass::critical_update, false}, Scope::CreatorFile,
         "fix-player-clip-wall-at-npc", "Player clip wall at NPC", nullptr};
-    opt<bool> fix_player_downward_clip{this, defaults(true), {CompatClass::critical_update, false}, Scope::File,
+    opt<bool> fix_player_downward_clip{this, defaults(true), {CompatClass::critical_update, false}, Scope::CreatorFile,
         "fix-player-downward-clip", "Player downward clip", nullptr};
-    opt<bool> fix_npc_downward_clip{this, defaults(true), {CompatClass::critical_update, false}, Scope::File,
+    opt<bool> fix_npc_downward_clip{this, defaults(true), {CompatClass::critical_update, false}, Scope::CreatorFile,
         "fix-npc-downward-clip", "NPC downward clip", nullptr};
-    opt<bool> fix_npc247_collapse{this, defaults(true), {CompatClass::standard_update, false}, Scope::File,
+    opt<bool> fix_npc247_collapse{this, defaults(true), {CompatClass::standard_update, false}, Scope::CreatorFile,
         "fix-npc247-collapse", "NPC 247 collapse", "Prevents the stacked spiky plants from collapsing incorrectly"};
-    opt<bool> fix_platforms_acceleration{this, defaults(true), {CompatClass::critical_update, false}, Scope::File,
+    opt<bool> fix_platforms_acceleration{this, defaults(true), {CompatClass::critical_update, false}, Scope::CreatorFile,
         "fix-platform-acceleration", "Platform acceleration", nullptr};
-    opt<bool> fix_npc55_kick_ice_blocks{this, defaults(true), {CompatClass::standard_update, false}, Scope::File,
+    opt<bool> fix_npc55_kick_ice_blocks{this, defaults(true), {CompatClass::standard_update, false}, Scope::CreatorFile,
         "fix-npc55-kick-ice-blocks", "NPC55 kick ice blocks", "The beached turtle should not sadly kick ice blocks"};
-    opt<bool> fix_climb_invisible_fences{this, defaults(true), {CompatClass::standard_update, false}, Scope::File,
+    opt<bool> fix_climb_invisible_fences{this, defaults(true), {CompatClass::standard_update, false}, Scope::CreatorFile,
         "fix-climb-invisible-fences", "Don't climb hidden fences", nullptr};
-    opt<bool> fix_climb_bgo_speed_adding{this, defaults(true), {CompatClass::standard_update, false}, Scope::File,
+    opt<bool> fix_climb_bgo_speed_adding{this, defaults(true), {CompatClass::standard_update, false}, Scope::CreatorFile,
         "fix-climb-bgo-speed-adding", "Climb BGO speed adding", nullptr};
-    opt<bool> fix_climb_bgo_layer_move{this, defaults(true), {CompatClass::standard_update, false}, Scope::File,
+    opt<bool> fix_climb_bgo_layer_move{this, defaults(true), {CompatClass::standard_update, false}, Scope::CreatorFile,
         "enable-climb-bgo-layer-move", "Climb moving BGOs", nullptr};
-    opt<bool> fix_skull_raft{this, defaults(true), {CompatClass::standard_update, false}, Scope::File,
+    opt<bool> fix_skull_raft{this, defaults(true), {CompatClass::standard_update, false}, Scope::CreatorFile,
         "fix-skull-raft", "Skull raft", nullptr};
-    opt<bool> fix_char3_escape_shell_surf{this, defaults(true), {CompatClass::critical_update, false}, Scope::File,
+    opt<bool> fix_char3_escape_shell_surf{this, defaults(true), {CompatClass::critical_update, false}, Scope::CreatorFile,
         "fix-char3-escape-shell-surf", "Char 3 escape shell surf", nullptr};
-    opt<bool> fix_plant_wobble{this, defaults(true), {CompatClass::standard_update, false}, Scope::File,
+    opt<bool> fix_plant_wobble{this, defaults(true), {CompatClass::standard_update, false}, Scope::CreatorFile,
         "fix-plant-wobble", "Fix plant wobble", "Plants should correctly resize instead of appearing to change size / position"};
-    opt<bool> fix_powerup_lava_bug{this, defaults(true), {CompatClass::standard_update, false}, Scope::File,
+    opt<bool> fix_powerup_lava_bug{this, defaults(true), {CompatClass::standard_update, false}, Scope::CreatorFile,
         "fix-powerup-lava-bug", "Fix powerup lava bug", "Powerups should be destroyed when hitting lava instead of surviving depending on the current NPC array"};
-    // opt<bool> fix_keyhole_framerate{this, defaults(true), {VER_THEXTECH134, CompatClass::critical_update, false}, Scope::File,
+    // opt<bool> fix_keyhole_framerate{this, defaults(true), {VER_THEXTECH134, CompatClass::critical_update, false}, Scope::CreatorFile,
     //     "fix-keyhole-framerate", "Fix keyhole framerate", nullptr};
     // 1.3.5
-    opt<bool> fix_char5_vehicle_climb{this, defaults(true), {CompatClass::critical_update, false}, Scope::File,
+    opt<bool> fix_char5_vehicle_climb{this, defaults(true), {CompatClass::critical_update, false}, Scope::CreatorFile,
         "fix-char5-vehicle-climb", "Fix char 5 car fairy", nullptr};
-    opt<bool> fix_vehicle_char_switch{this, defaults(true), {CompatClass::critical_update, false}, Scope::File,
+    opt<bool> fix_vehicle_char_switch{this, defaults(true), {CompatClass::critical_update, false}, Scope::CreatorFile,
         "fix-vehicle-char-switch", "Don't switch character by car", nullptr};
-    opt<bool> fix_autoscroll_speed{this, defaults(true), {CompatClass::standard_update, false}, Scope::File,
+    opt<bool> fix_autoscroll_speed{this, defaults(true), {CompatClass::standard_update, false}, Scope::CreatorFile,
         "fix-autoscroll-speed", "Autoscroll speed", nullptr};
-    opt<bool> fix_submerged_splash_effect{this, defaults(true), {CompatClass::standard_update, false}, Scope::File,
+    opt<bool> fix_submerged_splash_effect{this, defaults(true), {CompatClass::standard_update, false}, Scope::CreatorFile,
         "fix-submerged-splash-effect", "Fix submerged splash effect", "Don't make a splash effect for items already underwater"};
     // 1.3.5.1
-    opt<bool> fix_squid_stomp_effect{this, defaults(true), {CompatClass::standard_update, false}, Scope::File,
+    opt<bool> fix_squid_stomp_effect{this, defaults(true), {CompatClass::standard_update, false}, Scope::CreatorFile,
         "fix-squid-stomp-effect", "Fix calamari stomp effect", nullptr};
     // deprecated, fixed non-vanilla bug
-    // opt<bool> keep_bullet_bill_dir{this, defaults(true), {VER_THEXTECH1351, CompatClass::critical_update, false}, Scope::File,
+    // opt<bool> keep_bullet_bill_dir{this, defaults(true), {VER_THEXTECH1351, CompatClass::critical_update, false}, Scope::CreatorFile,
     //     "keep-bullet-bill-direction", "Keep bullet dir", nullptr};
-    opt<bool> fix_special_coin_switch{this, defaults(true), {CompatClass::standard_update, false}, Scope::File,
+    opt<bool> fix_special_coin_switch{this, defaults(true), {CompatClass::standard_update, false}, Scope::CreatorFile,
         "fix-special-coin-switch", "Preserve special coins", "Don't turn special coins into blocks when pressing switch"};
     // 1.3.5.2
-    opt<bool> fix_bat_start_while_inactive{this, defaults(true), {CompatClass::standard_update, false}, Scope::File,
+    opt<bool> fix_bat_start_while_inactive{this, defaults(true), {CompatClass::standard_update, false}, Scope::CreatorFile,
         "fix-bat-start-while-inactive", "Bat start", "Don't activate the bats until they are onscreen"};
     // opt<bool> fix_FreezeNPCs_no_reset{this, defaults(false), {VER_THEXTECH137, CompatClass::standard_update, false}, Scope::None,
     //     "fix-FreezeNPCs-no-reset", "'Fix' FreezeNPCs", "There is a bug that results in NPCs vanishing after getting a freeze clock, but this 'fix' introduces other bugs"};
     static constexpr bool fix_FreezeNPCs_no_reset = false;
     // 1.3.5.3
-    opt<bool> fix_npc_activation_event_loop_bug{this, defaults(true), {CompatClass::critical_update, false}, Scope::File,
+    opt<bool> fix_npc_activation_event_loop_bug{this, defaults(true), {CompatClass::critical_update, false}, Scope::CreatorFile,
         "fix-npc-activation-event-loop-bug", "NPC activation loop", "Fixes softlock bug that results when NPCs activate each other in a loop"};
     // 1.3.6
-    opt<bool> fix_fairy_stuck_in_pipe{this, defaults(true), {CompatClass::critical_update, false}, Scope::File,
+    opt<bool> fix_fairy_stuck_in_pipe{this, defaults(true), {CompatClass::critical_update, false}, Scope::CreatorFile,
         "fix-fairy-stuck-in-pipe", "Fairy stuck in pipe", nullptr};
-    opt<bool> fix_flamethrower_gravity{this, defaults(true), {CompatClass::standard_update, false}, Scope::File,
+    opt<bool> fix_flamethrower_gravity{this, defaults(true), {CompatClass::standard_update, false}, Scope::CreatorFile,
         "fix-flamethrower-gravity", "Flamethrower gravity", "Should this have even been made?"};
     // 1.3.6.1
-    opt<bool> fix_npc_ceiling_speed{this, defaults(true), {CompatClass::standard_update, false}, Scope::File,
+    opt<bool> fix_npc_ceiling_speed{this, defaults(true), {CompatClass::standard_update, false}, Scope::CreatorFile,
         "fix-npc-ceiling-speed", "Fix NPC ceiling speed", "Don't stick a thrown NPC to ceiling when a layer is moving"};
-    opt<bool> emulate_classic_block_order{this, defaults(false), {CompatClass::critical_update, true}, Scope::File,
+    opt<bool> emulate_classic_block_order{this, defaults(false), {CompatClass::critical_update, true}, Scope::CreatorFile,
         "emulate-classic-block-order", "Emulate classic block order", "Use the classic game's block sorting methods internally for frame-perfect compatibility"};
-    opt<bool> custom_powerup_collect_score{this, defaults(true), {CompatClass::standard_update, false}, Scope::File,
+    opt<bool> custom_powerup_collect_score{this, defaults(true), {CompatClass::standard_update, false}, Scope::CreatorFile,
         "custom-powerup-collect-score", "Custom powerup collect score", "Collected powerups give score from npc-X.txt"};
-    opt<bool> fix_player_crush_death{this, defaults(true), {CompatClass::critical_update, false}, Scope::File,
+    opt<bool> fix_player_crush_death{this, defaults(true), {CompatClass::critical_update, false}, Scope::CreatorFile,
         "fix-player-crush-death", "Fix player crush death", "Player should not be crushed by corners of slopes or by hitting a horizontally moving ceiling"};
-    opt<bool> fix_pound_skip_warp{this, defaults(true), {CompatClass::critical_update, false}, Scope::File,
+    opt<bool> fix_pound_skip_warp{this, defaults(true), {CompatClass::critical_update, false}, Scope::CreatorFile,
         "fix-pound-skip-warp", "Fix pound skip warp", "Pound move should not skip instant / portal warps"};
-    opt<bool> fix_held_item_cancel{this, defaults(true), {CompatClass::standard_update, false}, Scope::File,
+    opt<bool> fix_held_item_cancel{this, defaults(true), {CompatClass::standard_update, false}, Scope::CreatorFile,
         "fix-held-item-cancel", "Fix held item cancel", "Do not cancel held item hitting hostile NPC that intersects with an immune NPC"};
-    opt<bool> fix_frame_perfect_despawn{this, defaults(true), {CompatClass::standard_update, false}, Scope::File,
+    opt<bool> fix_frame_perfect_despawn{this, defaults(true), {CompatClass::standard_update, false}, Scope::CreatorFile,
         "fix-frame-perfect-despawn", "Fix frame perfect despawn", "If NPC comes onscreen later in the same frame it timed out, should still be able to spawn"};
 
     // TODO: implement proper read/write operations
-    // opt<std::array<uint8_t, 3>> bitblit_background_colour{this, defaults<std::array<uint8_t, 3>>({0, 0, 0}), {VER_THEXTECH1361}, Scope::File,
+    // opt<std::array<uint8_t, 3>> bitblit_background_colour{this, defaults<std::array<uint8_t, 3>>({0, 0, 0}), {VER_THEXTECH1361}, Scope::CreatorFile,
     //     "bitblit-background-colour", "Bitblit background colour", "Background colour for legacy transparency effects", config_bitblit_background_set};
 
     // 1.3.6.3
-    opt<bool> pound_by_alt_run{this, defaults(true), {CompatClass::critical_update, false}, Scope::File,
+    opt<bool> pound_by_alt_run{this, defaults(true), {CompatClass::critical_update, false}, Scope::CreatorFile,
         "pound-by-alt-run", "Pound by alt run", "Use Alt Run for Pound action when player is in a purple pet mount"};
 
     // 1.3.6.5
-    opt<bool> fix_visual_bugs{this, defaults(true), {CompatClass::standard_update, false}, Scope::File,
+    opt<bool> fix_visual_bugs{this, defaults(true), {CompatClass::standard_update, false}, Scope::CreatorFile,
         "fix-visual-bugs", "Fix visual bugs", "Fix misc visual bugs from SMBX 1.3"};
-    opt<bool> fix_npc_emerge_size{this, defaults(true), {CompatClass::standard_update, false}, Scope::File,
+    opt<bool> fix_npc_emerge_size{this, defaults(true), {CompatClass::standard_update, false}, Scope::CreatorFile,
         "fix-npc-emerge-size", "Fix NPC emerge size", "Fix size of NPC emerging from a block"};
-    opt<bool> fix_switched_block_clipping{this, defaults(true), {CompatClass::standard_update, false}, Scope::File,
+    opt<bool> fix_switched_block_clipping{this, defaults(true), {CompatClass::standard_update, false}, Scope::CreatorFile,
         "fix-switched-block-clipping", "Fix switched block clipping", "Don't let blocks become intangible to NPCs after coin switch"};
 
     // 1.3.6.6
-    opt<bool> fix_vehicle_altjump_bug{this, defaults(true), {CompatClass::critical_update, false}, Scope::File,
+    opt<bool> fix_vehicle_altjump_bug{this, defaults(true), {CompatClass::critical_update, false}, Scope::CreatorFile,
         "fix-vehicle-altjump-bug", "Fix vehicle AltJump bug", "Don't become vulnerable after AltJump into car"};
 
     // 1.3.7
-    opt<bool> fix_npc_camera_logic{this, defaults(true), {CompatClass::critical_update, false}, Scope::File,
+    opt<bool> fix_npc_camera_logic{this, defaults(true), {CompatClass::critical_update, false}, Scope::CreatorFile,
         "fix-npc-camera-logic", "Fix NPC camera logic", "NPCs should support more than two cameras"};
-    opt<bool> fix_multiplayer_targeting{this, defaults(true), {CompatClass::standard_update, false}, Scope::File,
+    opt<bool> fix_multiplayer_targeting{this, defaults(true), {CompatClass::standard_update, false}, Scope::CreatorFile,
         "fix-multiplayer-targeting", "Fix NPC targeting", "Updated NPC targeting logic in multiplayer"};
-    opt<bool> allow_multires{this, defaults(true), {CompatClass::critical_update, false}, Scope::Local,
+    opt<bool> allow_multires{this, defaults(true), {CompatClass::critical_update, false}, Scope::Creator,
         "allow-multires", "Allow multires", "Allows the gameplay field to be <800x600", config_res_set};
-    opt<bool> dynamic_camera_logic{this, defaults(true), {CompatClass::standard_update, false}, Scope::File,
+    opt<bool> dynamic_camera_logic{this, defaults(true), {CompatClass::standard_update, false}, Scope::CreatorFile,
         "dynamic-camera-logic", "Dynamic camera logic", "Allow a non-800x600 camera for most logic, and only use the event logic camera in rare cases",
         config_res_set};
+
+    // if we make the scope below be Scope::CreatorEpisode, episodes can force this in both modern / classic mode
     opt<bool> modern_lives_system{this, defaults(true), {CompatClass::critical_update, false}, Scope::None,
         "modern-lives-system", "Modern lives system", "Allow negative lives instead of returning to the main menu"};
 
@@ -885,7 +889,7 @@ public:
             {2, "2", "2", nullptr},
             {3, "3", "3", nullptr},
         },
-        defaults<int>(0), {}, Scope::UserEpisode,
+        defaults<int>(0), {}, Scope::EpisodeOptions,
         "mode", "Speedrun mode", nullptr,
         config_compat_changed};
 
@@ -903,16 +907,16 @@ public:
             {SPEEDRUN_STOP_LEAVE_LEVEL, "leave", "Leave level (specify)", nullptr},
             {SPEEDRUN_STOP_ENTER_LEVEL, "enter", "Enter level (specify)", nullptr},
         },
-        defaults<int>(SPEEDRUN_STOP_NONE), {}, Scope::Episode,
+        defaults<int>(SPEEDRUN_STOP_NONE), {}, Scope::CreatorEpisode,
         "stop-timer-by", "Stop speedrun timer on", "This triggers the speedrun timer to stop"};
-    opt<std::string> speedrun_stop_timer_at{this, defaults<std::string>("Boss Dead"), {}, Scope::Episode,
+    opt<std::string> speedrun_stop_timer_at{this, defaults<std::string>("Boss Dead"), {}, Scope::CreatorEpisode,
         "stop-timer-at", "Stop speedrun timer event/level", "If above is 'Event' or 'Level', this specifies which"};
 
-    opt<std::string> fails_counter_title{this, defaults<std::string>("FAILS"), {}, Scope::CreatorGlobal,
+    opt<std::string> fails_counter_title{this, defaults<std::string>("FAILS"), {}, Scope::Assets | Scope::Creator,
         "fails-counter-title", "Fails counter title", "Label used for the fails counter"};
 
     /* ---- View Credits ----*/
-    section view_credits{this, Scope::Global, "view-credits", "View Credits"};
+    section view_credits{this, Scope::All, "view-credits", "View Credits"};
 };
 
 void OpenConfig();
@@ -924,7 +928,7 @@ void SaveConfig();
 using Options_t = _Config_t<false>;
 using Config_t = _Config_t<true>;
 
-extern const std::vector<const Config_t*> g_config_levels;
+// extern const std::vector<const Config_t*> g_config_levels;
 
 extern _Config_t<false> g_options;
 

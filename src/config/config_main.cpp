@@ -398,21 +398,18 @@ std::set<BaseConfigOption_t<true>*> g_configModified;
 Options_t g_options;
 
 // <defaults>                                                                     1
-GameInfo g_gameInfo(g_options, Config_t::Scope::CreatorGlobal);                // 2, decl in game_info.h
-Config_t g_config_game_user(g_options, Config_t::Scope::UserGlobal);           // 3
+GameInfo g_gameInfo(g_options, Config_t::Scope::Assets);                       // 2, decl in game_info.h
+Config_t g_config_game_user(g_options, Config_t::Scope::User);                 // 3
 Config_t g_config_episode_creator(g_options, Config_t::Scope::CreatorEpisode); // 4
-Config_t g_config_episode_user(g_options, Config_t::Scope::UserEpisode);       // 5
 Config_t g_config_file_creator(g_options, Config_t::Scope::CreatorFile);       // 6
-Config_t g_config_file_user(g_options, Config_t::Scope::UserFile);             // 7
-Config_t g_config_cmdline(g_options, Config_t::Scope::All);                    // 8
 // <compat>                                                                       9
 
-const std::vector<const Config_t*> g_config_levels =
-{
-    &g_gameInfo, &g_config_game_user,
-    &g_config_episode_creator, &g_config_episode_user,
-    &g_config_file_creator, &g_config_file_user,
-    &g_config_cmdline
-};
+// const std::vector<const Config_t*> g_config_levels =
+// {
+//     &g_gameInfo, &g_config_game_user,
+//     &g_config_episode_creator, &g_config_episode_user,
+//     &g_config_file_creator, &g_config_file_user,
+//     &g_config_cmdline
+// };
 
 Config_t g_config(g_options, Config_t::Scope::All);

@@ -207,7 +207,7 @@ void RefreshVisibleItems()
 {
     visible_items.clear();
 
-    auto current_scope = (GameMenu) ? Config_t::Scope::UserGlobal : Config_t::Scope::User;
+    auto current_scope = Config_t::Scope::User;
 
     if(section_index == SECTION_NONE)
     {
