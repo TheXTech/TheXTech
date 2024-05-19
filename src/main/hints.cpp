@@ -33,11 +33,14 @@
 #include "main/hints.h"
 #include "main/speedrunner.h"
 #include "main/translate.h"
+#include "game_main.h"
 
 #include "std_picture.h"
 #include "screen.h"
 #include "globals.h"
 #include "npc_id.h"
+#include "npc_traits.h"
+#include "npc/npc_queues.h"
 #include "config.h"
 #include "controls.h"
 #include "graphics.h"
@@ -89,34 +92,32 @@ static void s_draw_no_lives(int x, int y)
     DrawLives(x + 40, y + 48 - 8, Lives, g_100s);
 }
 
+static void s_draw_rainbow_surf(int x, int y)
+{
+    Controls_t c;
+    c.Down = true;
+
+    if(Player[1].Direction < 0)
+        c.Left = true;
+    else
+        c.Right = true;
+
+    if(GamePaused == PauseCode::None || CommonFrame % 128 < 64)
+        c.Run = true;
+
+    RenderControls(c, x + 96 / 2 - 76 / 2, y + 96 - 34, 76, 30, false, 255);
+
+    StdPicture& tex = GFXNPC[NPCID_FLIPPED_RAINBOW_SHELL];
+    int frame_h = NPCTraits[NPCID_FLIPPED_RAINBOW_SHELL].THeight;
+    int frame_idx = 1 + 4 * ((CommonFrame % 16) / 4);
+    XRender::renderTexture(x + 96 / 2 - tex.w / 2, y + 96 - 34 - 4 - frame_h, tex.w, frame_h, tex, 0, frame_h * frame_idx);
+}
+
 static bool s_purple_pet_present()
 {
     for(int A = 1; A <= numPlayers; A++)
     {
         if(Player[A].Mount == 3 && Player[A].MountType == 6)
-            return true;
-    }
-
-    if(LevelSelect)
-        return false;
-
-    for(int A = 1; A <= numNPCs; A++)
-    {
-        int type = NPC[A].Type;
-
-        if(type == NPCID_ITEM_BURIED || type == NPCID_ITEM_POD ||
-           type == NPCID_ITEM_BUBBLE || type == NPCID_ITEM_THROWER)
-        {
-            type = int(NPC[A].Special);
-        }
-
-        if(type == NPCID_PET_PURPLE)
-            return true;
-    }
-
-    for(int A = 1; A <= numBlock; A++)
-    {
-        if(Block[A].Special != 0 && Block[A].Special == 1000 + NPCID_PET_PURPLE)
             return true;
     }
 
@@ -169,11 +170,23 @@ static uint8_t s_no_lives_old()
     return 0;
 }
 
+static uint8_t s_rainbow_surf_applies()
+{
+    for(NPCRef_t n : NPCQueues::Active.no_change)
+    {
+        if(n->Type == NPCID_FLIPPED_RAINBOW_SHELL)
+            return 107;
+    }
+
+    return 0;
+}
+
 static const Hint s_hints[] = {
     {"Press to pound downwards!", "pound-key", s_altrun_pound_applies, s_draw_purple_pet_altrun},
     {"Press to pound downwards!", "pound-key", s_down_pound_applies,   s_draw_purple_pet_down},
     {"If you fail, your score will reset.",   "no-lives-new", s_no_lives_new, s_draw_no_lives},
     {"If you fail, the game will end.", "no-lives-old", s_no_lives_old, s_draw_no_lives},
+    {"Grab, run, hold down, and let go to surf.", "rainbow-surf", s_rainbow_surf_applies, s_draw_rainbow_surf},
 };
 
 static constexpr size_t s_hint_count = sizeof(s_hints) / sizeof(Hint);
