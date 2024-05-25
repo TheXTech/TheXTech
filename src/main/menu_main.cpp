@@ -789,21 +789,26 @@ bool mainMenuUpdate()
         {
             if(MenuMouseRelease && SharedCursor.Primary)
                 MenuMouseClick = true;
+
             if(menuBackPress && MenuCursorCanMove)
             {
                 int quitKeyPos = 2;
+
                 if(s_show_separate_2P())
-                    quitKeyPos ++;
+                    quitKeyPos++;
+
                 if(!g_gameInfo.disableBattleMode)
-                    quitKeyPos ++;
+                    quitKeyPos++;
+
                 if(g_config.enable_editor)
-                    quitKeyPos ++;
+                    quitKeyPos++;
 
                 MenuMode = MENU_MAIN;
                 MenuCursor = quitKeyPos;
                 MenuCursorCanMove = false;
                 PlaySoundMenu(SFX_Slide);
             }
+
             if((menuDoPress && MenuCursorCanMove) || MenuMouseClick)
             {
                 MenuCursorCanMove = false;
@@ -855,12 +860,15 @@ bool mainMenuUpdate()
             if(menuBackPress && MenuCursorCanMove)
             {
                 int quitKeyPos = 2;
+
                 if(s_show_separate_2P())
-                    quitKeyPos ++;
+                    quitKeyPos++;
+
                 if(!g_gameInfo.disableBattleMode)
-                    quitKeyPos ++;
+                    quitKeyPos++;
+
                 if(g_config.enable_editor)
-                    quitKeyPos ++;
+                    quitKeyPos++;
 
                 if(XRender::TargetH < TinyScreenH)
                 {
@@ -994,15 +1002,20 @@ bool mainMenuUpdate()
 
 
             int quitKeyPos = 2;
+
             if(s_show_separate_2P())
-                quitKeyPos ++;
+                quitKeyPos++;
+
             if(!g_gameInfo.disableBattleMode)
-                quitKeyPos ++;
+                quitKeyPos++;
+
             if(g_config.enable_editor)
-                quitKeyPos ++;
+                quitKeyPos++;
+
 
             if(MenuCursor > quitKeyPos)
                 MenuCursor = 0;
+
             if(MenuCursor < 0)
                 MenuCursor = quitKeyPos;
         } // Main Menu

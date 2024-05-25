@@ -263,6 +263,7 @@ void LoadCustomConfig()
         g_config_episode_creator.LoadLegacyCompat(&ini, ConfigSetLevel::ep_compat);
         g_config_episode_creator.UpdateFromIni(&ini, ConfigSetLevel::ep_compat);
     }
+
     if(!customCompat.empty())
     {
         ini.open(customCompat);
@@ -382,6 +383,7 @@ void UpdateConfig()
         if(!(*changed_opt == *g_config_backup.m_options[index]))
             changed_opt->m_base->m_onupdate();
     }
+
     g_configModified.clear();
     g_configInTransaction = false;
 

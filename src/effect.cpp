@@ -117,6 +117,7 @@ void UpdateEffects()
                 e.FrameCount = 0;
                 e.Frame += 1;
             }
+
             if(e.Frame >= 7)
                 e.Life = 0;
         }
@@ -163,6 +164,7 @@ void UpdateEffects()
                 e.Frame += 1;
                 e.FrameCount = 0;
             }
+
             if(e.Frame > 7)
                 e.Frame = 0;
 
@@ -216,6 +218,7 @@ void UpdateEffects()
                         break;
                     }
                 }
+
                 if(!tempBool)
                     e.Life = 0;
             }
@@ -302,8 +305,10 @@ void UpdateEffects()
         else if(e.Type == EFFID_GRN_BOOT_DIE || e.Type == EFFID_RED_BOOT_DIE || e.Type == EFFID_BLU_BOOT_DIE) // Goombas shoes
         {
             e.Location.SpeedY += 0.5;
+
             if(e.Location.SpeedY >= 10)
                 e.Location.SpeedY = 10;
+
             if(e.Location.SpeedX > 0)
                 e.Frame = 0 + SpecialFrame[1];
             else
@@ -595,6 +600,7 @@ void UpdateEffects()
                     if(e.Frame >= 4)
                         e.Frame = 0;
                 }
+
             if(e.Type == EFFID_CHAR3_HEAVY_EXPLODE && iRand(10) >= 8)
             {
                 NewEffect(EFFID_PLR_FIREBALL_TRAIL, e.Location, 3);
@@ -757,6 +763,7 @@ void UpdateEffects()
                 e.Frame += 1;
                 e.FrameCount = 0;
             }
+
             if(e.Frame >= 3)
                 e.Life = 0;
         }
@@ -792,6 +799,7 @@ void UpdateEffects()
                 syncLayers_NPC(numNPCs);
                 CheckSectionNPC(numNPCs);
             }
+
             if(e.NewNpc == 98)
                 e.Frame += 2;
             else if(e.NewNpc == 99)
@@ -1014,6 +1022,7 @@ void NewEffect(int A, const Location_t &Location, float Direction, int NewNpc, b
                 ne.Location.SpeedY = -7;
                 ne.Location.SpeedX = 1.5;
             }
+
             if(B == 1 || B == 3)
                 ne.Location.SpeedX = -ne.Location.SpeedX;
             ne.Location.SpeedX += ((dRand() * 0.5) - 0.25);
@@ -1327,6 +1336,7 @@ void NewEffect(int A, const Location_t &Location, float Direction, int NewNpc, b
                     ne.Location.SpeedY = 0;
                     ne.Location.SpeedX = 4;
                 }
+
                 if(B <= 3)
                     ne.Location.SpeedX = -ne.Location.SpeedX;
                 if(B == 1 || B == 6)
@@ -1377,6 +1387,7 @@ void NewEffect(int A, const Location_t &Location, float Direction, int NewNpc, b
                     ne.Location.SpeedY = 0;
                     ne.Location.SpeedX = 4;
                 }
+
                 if(B <= 3)
                     ne.Location.SpeedX = -ne.Location.SpeedX;
                 if(B == 1 || B == 6)

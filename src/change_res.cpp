@@ -191,6 +191,7 @@ void UpdateInternalRes()
                 if(int_h > 720)
                     int_h = 720;
             }
+
             if(int_h < canon_h)
             {
                 int_w = (int_w * canon_h) / int_h;

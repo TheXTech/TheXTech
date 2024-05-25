@@ -186,9 +186,12 @@ void UpdateNPCs()
             StartMusic(-1);
             PlaySound(SFX_PSwitch);
         }
+
         if(PSwitchTime > 2)
             PSwitchTime = 2;
+
         PSwitchStop -= 1;
+
         if(PSwitchStop <= 0)
         {
             FreezeNPCs = false;
@@ -903,6 +906,7 @@ void UpdateNPCs()
                             }
                         }
                     }
+
                     if(C > 0)
                     {
                         NPC[A].Special2 = Block[C].Location.Y + 4;
@@ -964,11 +968,14 @@ void UpdateNPCs()
 
             if(NPC[A].Type == NPCID_STATUE_S3 || NPC[A].Type == NPCID_STATUE_S4)
                 NPC[A].Special = iRand(200);
+
             NPC[A].JustActivated = 0;
             NPC[A].CantHurt = 0;
             NPC[A].CantHurtPlayer = 0;
+
             if(NPC[A].Type == NPCID_CANNONENEMY)
                 NPC[A].Projectile = false;
+
             if(NPC[A].Type == NPCID_CANNONITEM)
                 NPC[A].Projectile = false;
         }
@@ -1198,6 +1205,7 @@ void UpdateNPCs()
                     if(NPC[A].Type == NPCID_BIG_BULLET)
                         NPC[A].Location.SpeedX = 4 * NPC[A].Direction;
                 }
+
                 if(NPC[A].TimeLeft > 3 && !BattleMode)
                     NPC[A].TimeLeft = 3;
             }
@@ -1224,21 +1232,24 @@ void UpdateNPCs()
                     if(Player[B].Section == NPC[A].Section)
                         C = 1;
                 }
+
                 if(C == 0 && NPC[A].TimeLeft > 1)
                     NPC[A].TimeLeft = 0;
             }
+
             if((NPC[A].Type == NPCID_RED_VINE_TOP_S3 || NPC[A].Type == NPCID_GRN_VINE_TOP_S3 || NPC[A].Type == NPCID_GRN_VINE_TOP_S4) && NPC[A].TimeLeft > 10)
                 NPC[A].TimeLeft = 100;
+
             if(NPC[A].TimeLeft > 10 && NoTurnBack[NPC[A].Section])
                 NPC[A].TurnBackWipe = true;
+
             if(NPC[A].TimeLeft < 1)
                 Deactivate(A);
+
             NPC[A].TimeLeft -= 1;
+
             if(NPC[A].Effect == NPCEFF_NORMAL)
             {
-
-
-
                 // this code is for NPCs that are being held by a player
 
                 if(NPC[A].HoldingPlayer > 0) // NPC is held
@@ -1249,6 +1260,7 @@ void UpdateNPCs()
                         Player[NPC[A].HoldingPlayer].HoldingNPC = 0;
                         NPC[A].HoldingPlayer = 0;
                     }
+
                     if(Player[NPC[A].HoldingPlayer].HoldingNPC == A && Player[NPC[A].HoldingPlayer].TimeToLive == 0 && !Player[NPC[A].HoldingPlayer].Dead) // Player and NPC are on the same page
                     {
                         NPC[A].Multiplier = 0;
@@ -1306,8 +1318,10 @@ void UpdateNPCs()
                             {
                                 int B = iRand(9);
                                 NPC[A].Type = NPCID(NPCID_VEGGIE_2 + B);
+
                                 if(NPC[A].Type == NPCID_VEGGIE_RANDOM)
                                     NPC[A].Type = NPCID_VEGGIE_1;
+
                                 NPC[A].Location.X += NPC[A].Location.Width / 2.0;
                                 NPC[A].Location.Y += NPC[A].Location.Height / 2.0;
                                 NPC[A].Location.Width = NPC[A]->TWidth;
@@ -1406,16 +1420,20 @@ void UpdateNPCs()
                     else // Player and NPC are not on the same page
                     {
                         Player[NPC[A].HoldingPlayer].HoldingNPC = 0;
+
                         if(NPC[A].Type == NPCID_VINE_BUG)
                             NPC[A].Projectile = true;
+
                         NPC[A].Location.SpeedX = 0;
                         NPC[A].Location.SpeedY = 0;
+
                         if(NPC[A].Type == NPCID_HEAVY_THROWER)
                         {
                             NPC[A].Killed = 3;
                             NPCQueues::Killed.push_back(A);
                             NPC[A].Direction = -NPC[A].Direction;
                         }
+
                         if(NPC[A].Type == NPCID_BULLET)
                         {
                             PlaySoundSpatial(SFX_Bullet, NPC[A].Location);
@@ -1424,6 +1442,7 @@ void UpdateNPCs()
                             NPC[A].CantHurt = 1000;
                             NPC[A].CantHurtPlayer = NPC[A].HoldingPlayer;
                         }
+
                         NPC[A].HoldingPlayer = 0;
                     }
                 }
@@ -1585,6 +1604,7 @@ void UpdateNPCs()
                                 if(!NPC[A].Projectile)
                                     NPC[A].Location.SpeedX = 2 * NPC[A].Direction;
                             }
+
                             if(NPC[A].Location.SpeedX > 2)
                                 NPC[A].Location.SpeedX -= 0.05;
                             else if(NPC[A].Location.SpeedX < -2)
@@ -1597,6 +1617,7 @@ void UpdateNPCs()
                                 if(!NPC[A].Projectile)
                                     NPC[A].Location.SpeedX = Physics.NPCWalkingSpeed * NPC[A].Direction;
                             }
+
                             if(NPC[A].Location.SpeedX > Physics.NPCWalkingSpeed)
                                 NPC[A].Location.SpeedX -= 0.05;
                             else if(NPC[A].Location.SpeedX < -Physics.NPCWalkingSpeed)
@@ -1636,14 +1657,17 @@ void UpdateNPCs()
                             NPC[A].Location.SpeedX -= 0.05;
                         else if(NPC[A].Location.SpeedX < 0)
                             NPC[A].Location.SpeedX += 0.05;
+
                         if(NPC[A].Location.SpeedX >= -0.05 && NPC[A].Location.SpeedX <= 0.05)
                             NPC[A].Location.SpeedX = 0;
+
                         if(NPC[A].Location.SpeedY >= -Physics.NPCGravity && NPC[A].Location.SpeedY <= Physics.NPCGravity)
                         {
                             if(NPC[A].Location.SpeedX > 0)
                                 NPC[A].Location.SpeedX -= 0.3;
                             else if(NPC[A].Location.SpeedX < 0)
                                 NPC[A].Location.SpeedX += 0.3;
+
                             if(NPC[A].Location.SpeedX >= -0.3 && NPC[A].Location.SpeedX <= 0.3)
                                 NPC[A].Location.SpeedX = 0;
                         }
@@ -1653,6 +1677,7 @@ void UpdateNPCs()
                         NPC[A].Projectile = true;
                         NPC[A].Direction = NPC[A].DefaultDirection;
                         NPC[A].Location.SpeedX = 1 * NPC[A].DefaultDirection;
+
                         for(int B = 1; B <= numPlayers; B++)
                         {
                             if(!(Player[B].Effect == 0 || Player[B].Effect == 3))
@@ -1690,6 +1715,7 @@ void UpdateNPCs()
                             if(!NPC[A].Projectile)
                                 NPC[A].Location.SpeedX = Physics.NPCMushroomSpeed * NPC[A].Direction;
                         }
+
                         if(NPC[A].Location.SpeedX > Physics.NPCMushroomSpeed)
                             NPC[A].Location.SpeedX -= 0.05;
                         else if(NPC[A].Location.SpeedX < -Physics.NPCMushroomSpeed)
@@ -1715,9 +1741,12 @@ void UpdateNPCs()
                                 }
                             }
                         }
+
                         NPC[A].Location.SpeedX += 0.1 * double(NPC[A].Direction);
+
                         if(NPC[A].Location.SpeedX < -4)
                             NPC[A].Location.SpeedX = -4;
+
                         if(NPC[A].Location.SpeedX > 4)
                             NPC[A].Location.SpeedX = 4;
                         // Yoshi Fireball
@@ -1751,8 +1780,10 @@ void UpdateNPCs()
                             }
 
                             NPC[A].Location.SpeedX += 0.05 * double(NPC[A].Direction);
+
                             if(NPC[A].Location.SpeedX >= 3)
                                 NPC[A].Location.SpeedX = 3;
+
                             if(NPC[A].Location.SpeedX <= -3)
                                 NPC[A].Location.SpeedX = -3;
                         }
@@ -1762,6 +1793,7 @@ void UpdateNPCs()
                                 NPC[A].Location.SpeedX -= 0.075;
                             else if(NPC[A].Location.SpeedX < -0.1)
                                 NPC[A].Location.SpeedX += 0.075;
+
                             if(NPC[A].Location.SpeedX >= -0.1 && NPC[A].Location.SpeedX <= 0.1)
                                 NPC[A].Special2 = 0;
                         }
@@ -1779,14 +1811,17 @@ void UpdateNPCs()
                             NPC[A].Direction = -1;
                         else
                             NPC[A].Direction = 1;
+
                         if(NPC[A].Special == 0 || NPC[A].Special == 3)
                         {
                             if(NPC[A].Location.SpeedX < 3.5 && NPC[A].Location.SpeedX > -3.5)
                                 NPC[A].Location.SpeedX += (0.1 * NPC[A].Direction);
+
                             if(NPC[A].Location.SpeedX > 3.5)
                                 NPC[A].Location.SpeedX -= 0.05;
                             else if(NPC[A].Location.SpeedX < -3.5)
                                 NPC[A].Location.SpeedX += 0.05;
+
                             if(NPC[A].Special == 3)
                                 NPC[A].Location.SpeedY = -6;
                         }
@@ -1800,6 +1835,7 @@ void UpdateNPCs()
                                 NPC[A].Location.SpeedX -= 0.05;
                             else if(NPC[A].Location.SpeedX < 0)
                                 NPC[A].Location.SpeedX += 0.05;
+
                             if(NPC[A].Location.SpeedX > -0.5 && NPC[A].Location.SpeedX < 0.5)
                                 NPC[A].Location.SpeedX = 0.0001 * NPC[A].Direction;
                         }
@@ -1830,6 +1866,7 @@ void UpdateNPCs()
                                     }
                                 }
                             }
+
                             if(NPC[A].Direction == 1 && NPC[A].Location.SpeedX < 4)
                                 NPC[A].Location.SpeedX += 0.04;
                             if(NPC[A].Direction == -1 && NPC[A].Location.SpeedX > -4)
@@ -1865,6 +1902,7 @@ void UpdateNPCs()
                             }
                         }
                     }
+
                     if(NPC[A].Type != NPCID_SPIT_BOSS && NPC[A].Type != NPCID_FALL_BLOCK_RED && NPC[A].Type != NPCID_FALL_BLOCK_BROWN && NPC[A].Type != NPCID_VEHICLE &&
                        NPC[A].Type != NPCID_CONVEYOR && NPC[A].Type != NPCID_YEL_PLATFORM && NPC[A].Type != NPCID_BLU_PLATFORM && NPC[A].Type != NPCID_GRN_PLATFORM &&
                        NPC[A].Type != NPCID_RED_PLATFORM && NPC[A].Type != NPCID_STATUE_S3 && NPC[A].Type != NPCID_STATUE_S4 && NPC[A].Type != NPCID_STATUE_FIRE &&
@@ -1902,6 +1940,7 @@ void UpdateNPCs()
                                     NPC[A].Special2 = 6;
                                     NPC[A].Special3 = NPC[A].Location.SpeedX;
                                 }
+
                                 if(NPC[A].Special2 <= 0)
                                 {
                                     NPC[A].Special3 = NPC[A].Special3 * 0.99;
@@ -1917,6 +1956,7 @@ void UpdateNPCs()
 
                         }
                     }
+
                     if(NPC[A].Type == NPCID_WALK_BOMB_S2 && !NPC[A].Projectile && NPC[A].Special2 == 1)
                         NPC[A].Location.SpeedX = 0;
 
@@ -2008,6 +2048,7 @@ void UpdateNPCs()
                                         if(NPC[A].Special == 3)
                                             NPC[A].TurnAround = true;
                                     }
+
                                     if(NPC[A].Special == 4)
                                     {
 
@@ -2104,6 +2145,7 @@ void UpdateNPCs()
                                 NPC[A].Projectile = true;
                         }
                     }
+
                     if((NPC[A].Type == NPCID_SLIDE_BLOCK || NPC[A].Type == NPCID_FALL_BLOCK_RED || NPC[A].Type == NPCID_FALL_BLOCK_BROWN) && NPC[A].Special == 0)
                         NPC[A].Location.SpeedY = 0;
                     if(NPC[A].Type == NPCID_TOOTHY || NPC[A].Type == NPCID_HOMING_BALL_GEN)
@@ -2126,6 +2168,7 @@ void UpdateNPCs()
                             }
                         }
                     }
+
                     if(NPC[A].Type == NPCID_ICE_CUBE)
                     {
                         if(NPC[A].Projectile || NPC[A].Wet > 0 || NPC[A].HoldingPlayer > 0)
@@ -2136,6 +2179,7 @@ void UpdateNPCs()
                             NPC[A].Location.SpeedY = 0;
                         }
                     }
+
                     if((NPC[A].Type == NPCID_ITEM_POD && NPC[A].Special2 == 1) || NPC[A].Type == NPCID_SIGN || NPC[A].Type == NPCID_LIFT_SAND)
                     {
                         NPC[A].Location.SpeedX = 0;
@@ -2288,6 +2332,7 @@ void UpdateNPCs()
                         else
                             NPC[A].Projectile = false;
                     }
+
                     if(NPC[A].Type == NPCID_TANK_TREADS)
                         NPC[A].Projectile = true;
                     if(NPC[A].Type == NPCID_EARTHQUAKE_BLOCK && (NPC[A].Location.SpeedY > 2 || NPC[A].Location.SpeedY < -2))
@@ -2666,6 +2711,7 @@ void UpdateNPCs()
                                                                     NPC[A].Special2 = 1;
                                                                     NPC[A].Special = 3;
                                                                 }
+
                                                                 if(NPC[A].Special == 4 && NPC[A].Special2 == 1)
                                                                 {
                                                                     NPC[A].Special2 = -1;
@@ -2740,6 +2786,7 @@ void UpdateNPCs()
                                                                         tempBlockHit[1] = 0;
                                                                         tempBlockHit[2] = 0;
                                                                     }
+
                                                                     if(NPC[A].Location.SpeedY < -0.01)
                                                                         NPC[A].Location.SpeedY = -0.01 + Block[B].Location.SpeedY;
 
@@ -2825,6 +2872,7 @@ void UpdateNPCs()
                                                                                         HitSpot = 4;
                                                                                 }
                                                                             }
+
                                                                             if(NPC[A]->IsAShell || (NPC[A].Type == NPCID_SLIDE_BLOCK && NPC[A].Special == 1) || NPC[A].Type == NPCID_ICE_CUBE)
                                                                             {
                                                                                 if(NPC[A].Location.SpeedY > NPC[A].Location.SpeedX * (Block[B].Location.Height / static_cast<double>(Block[B].Location.Width)) * BlockSlope[Block[B].Type])
@@ -2850,6 +2898,7 @@ void UpdateNPCs()
                                                                 if(Block[B].Location.Y + Block[B].Location.Height <= NPC[A].Location.Y + 1)
                                                                     HitSpot = 3;
                                                             }
+
                                                             if(Block[B].tempBlockNpcType > 0)
                                                                 HitSpot = 0;
                                                         }
@@ -2865,6 +2914,7 @@ void UpdateNPCs()
                                                             if((NPC[A].Location.SpeedY > 2 && HitSpot == 1) || (NPC[A].Location.SpeedY < -2 && HitSpot == 3) || (NPC[A].Location.SpeedX > 2 && HitSpot == 4) || (NPC[A].Location.SpeedX < -2 && HitSpot == 2))
                                                                 NPC[A].Special2 = 1;
                                                         }
+
                                                         if(HitSpot == 5)
                                                         {
                                                             if(NPC[A].Slope > 0 && Block[B].Location.Y + Block[B].Location.Height < NPC[A].Location.Y + 4)
@@ -2891,6 +2941,7 @@ void UpdateNPCs()
                                                                 }
                                                             }
                                                         }
+
                                                         if(NPC[A].Type == NPCID_SAW && Block[B].tempBlockNpcType > 0)
                                                             HitSpot = 0;
                                                         if(Block[B].tempBlockNpcType == NPCID_BOSS_CASE || Block[B].tempBlockNpcType == NPCID_BOSS_FRAGILE)
@@ -2990,6 +3041,7 @@ void UpdateNPCs()
                                                                 // If Not (.Location.X + .Location.Width - .Location.SpeedX <= Block(B).Location.X - Block(B).Location.SpeedX) Then .Pinched2 = 2
                                                                 // If Not (.Location.X - .Location.SpeedX >= Block(B).Location.X + Block(B).Location.Width - Block(B).Location.SpeedX) Then .Pinched4 = 2
                                                             }
+
                                                             if(NPC[A].Pinched.Moving > 0)
                                                             {
                                                                 if((NPC[A].Pinched.Bottom1 > 0 && NPC[A].Pinched.Top3 > 0) || (NPC[A].Pinched.Left2 > 0 && NPC[A].Pinched.Right4 > 0))
@@ -3035,6 +3087,7 @@ void UpdateNPCs()
                                                             NPC[A].Special3 = 1;
                                                             NPC[A].Projectile = false;
                                                         }
+
                                                         if(NPC[A].Type == NPCID_CHAR3_HEAVY && HitSpot > 0)
                                                             NPCHit(A, 3, A);
 
@@ -3069,6 +3122,7 @@ void UpdateNPCs()
                                                                 else if(NPC[Block[B].tempBlockNpcIdx].TimeLeft - 1 > NPC[A].TimeLeft)
                                                                     NPC[A].TimeLeft = NPC[Block[B].tempBlockNpcIdx].TimeLeft - 1;
                                                             }
+
                                                             if(NPC[A].Type == NPCID_SLIDE_BLOCK && NPC[A].Special == 1 && NPC[A].Location.SpeedX == 0 && NPC[A].Location.SpeedY > 7.95)
                                                                 NPCHit(A, 4, A);
                                                             if(NPC[A].Type == NPCID_STONE_S3 || NPC[A].Type == NPCID_STONE_S4)
@@ -3096,6 +3150,7 @@ void UpdateNPCs()
                                                                     tempHitBlock = B;
                                                                     tempHit = Block[B].Location.Y - NPC[A].Location.Height - 0.01;
                                                                 }
+
                                                                 if(Block[B].tempBlockNpcType >= NPCID_YEL_PLATFORM && Block[B].tempBlockNpcType <= NPCID_RED_PLATFORM)
                                                                 {
                                                                     NPC[A].BeltSpeed = 0;
@@ -3224,6 +3279,7 @@ void UpdateNPCs()
                                                                                         break;
                                                                                     }
                                                                                 }
+
                                                                                 if(!tempBool)
                                                                                     NPC[A].Projectile = false;
                                                                             }
@@ -3373,6 +3429,7 @@ void UpdateNPCs()
                                                                     NPC[A].Location.SpeedY = 0;
                                                                     NPC[A].Location.Y = Block[B].Location.Y - NPC[A].Location.Height - 0.01;
                                                                 }
+
                                                                 if(NPC[A].Type != NPCID_PLR_FIREBALL && NPC[A].Type != NPCID_TANK_TREADS && NPC[A].Type != NPCID_PLR_ICEBALL)
                                                                     NPC[A].TurnAround = true;
                                                                 if(NPC[A]->IsAShell)
@@ -3406,6 +3463,7 @@ void UpdateNPCs()
                                                                     BlockHitHard(B);
                                                                     break;
                                                                 }
+
                                                                 if(NPC[A]->IsAShell || (NPC[A].Type == NPCID_SLIDE_BLOCK && NPC[A].Special == 1) || NPC[A].Type == NPCID_ICE_CUBE)
                                                                 {
                                                                     BlockHitHard(B);
@@ -3429,6 +3487,7 @@ void UpdateNPCs()
                                             break;
                                     }
                                 }
+
                                 if(numTempBlock == 0)
                                     break;
                             }
@@ -3670,6 +3729,7 @@ void UpdateNPCs()
                                     }
                                 }
                             }
+
                             if(NPC[A].Location.X == preBeltLoc.X)
                             {
                                 NPC[A].BeltSpeed = 0;
@@ -3678,6 +3738,7 @@ void UpdateNPCs()
                                     Block[NPC[A].tempBlock].Location.SpeedX = 0;
                             }
                         }
+
                         if(!NPC[A].onWall)
                             NPC[A].BeltSpeed += addBelt;
                         NPC[A].oldAddBelt = addBelt;
@@ -3852,6 +3913,7 @@ void UpdateNPCs()
                                                                                         NPC[B].Frame = 0;
                                                                                         NPC[B].FrameCount = 0;
                                                                                     }
+
                                                                                     if(NPC[A].CantHurt < 25)
                                                                                         NPC[A].Special = 1;
                                                                                     if(NPC[A].Location.X + NPC[A].Location.Width / 2.0 > NPC[B].Location.X + NPC[B].Location.Width / 2.0)
@@ -3864,6 +3926,7 @@ void UpdateNPCs()
                                                                                         NPC[B].Location.X = NPC[A].Location.X + NPC[A].Location.Width + 1;
                                                                                         NPC[B].Direction = -1;
                                                                                     }
+
                                                                                     if(NPC[A].Location.SpeedY < NPC[B].Location.SpeedY)
                                                                                         NPC[A].Location.SpeedY = NPC[B].Location.SpeedY;
                                                                                     NPC[A].Frame = 0;
@@ -4111,6 +4174,7 @@ void UpdateNPCs()
                                         if(NPC[A].Location.SpeedY < 0)
                                             NPC[A].Location.SpeedY = 0;
                                     }
+
                                     if(tempSpeedA != 0)
                                         NPC[A].Location.SpeedY = tempSpeedA;
                                 }
@@ -4147,6 +4211,7 @@ void UpdateNPCs()
                                         if(NPC[A].Location.SpeedY < 0)
                                             NPC[A].Location.SpeedY = 0;
                                     }
+
                                     if(tempSpeedA != 0)
                                         NPC[A].Location.SpeedY = tempSpeedA;
                                 }
@@ -4265,6 +4330,7 @@ void UpdateNPCs()
                                     if(NPC[A].Location.SpeedY < 0)
                                         NPC[A].Location.SpeedY = 0;
                                 }
+
                                 if(tempSpeedA != 0)
                                     NPC[A].Location.SpeedY = tempSpeedA;
                             }
@@ -4412,6 +4478,7 @@ void UpdateNPCs()
                                             NPC[A].Location.SpeedY = 0;
                                     }
                                 }
+
                                 if(NPC[A].Type == NPCID_BIRD)
                                 {
                                     NPC[A].Special += 1;
@@ -4423,6 +4490,7 @@ void UpdateNPCs()
                                         NPC[A].Special = 0;
                                     }
                                 }
+
                                 if(NPC[A].Type == NPCID_KNIGHT)
                                 {
                                     NPC[A].FrameCount += 1;
@@ -4430,12 +4498,14 @@ void UpdateNPCs()
                                         NPC[A].FrameCount = 0;
                                     NPC[A].Location.SpeedY = -3;
                                 }
+
                                 if(tempSpeedA != 0)
                                     NPC[A].Location.SpeedY = tempSpeedA;
                                 if(NPC[A].Type == NPCID_SAW)
                                     NPC[A].Special = NPC[A].Location.SpeedY;
 
                             }
+
                             if(NPC[A].Slope == 0)
                                 NPC[A].Location.Y = tempHit;
                             tempHit = 0;
@@ -4449,6 +4519,7 @@ void UpdateNPCs()
                         }
                     }
                 }
+
                 if(NPC[A].tempBlock > 0 && (NPC[A].Type < 60 || NPC[A].Type > 66) && NPC[A].Type != NPCID_CONVEYOR)
                 {
                     if((NPC[A].Type < 78 || NPC[A].Type > 83) && NPC[A].Type != NPCID_SPRING)
@@ -5238,6 +5309,7 @@ void UpdateNPCs()
                                     tempBool = true;
                                     numNPCs--;
                                 }
+
                                 if(!tempBool)
                                 {
                                     NPC[numNPCs].Shadow = NPC[A].Shadow;
@@ -5427,6 +5499,7 @@ void UpdateNPCs()
                                     }
                                 }
                             }
+
                             if(Player[D].Location.X + Player[D].Location.Width / 2.0 > NPC[A].Location.X + 16)
                                 NPC[A].Direction = 1;
                             else

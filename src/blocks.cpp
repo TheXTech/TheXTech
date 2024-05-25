@@ -922,6 +922,7 @@ void KillBlock(int A, bool Splode)
                         break;
                     }
                 }
+
                 if(!tempBool)
                 {
                     for(int other_block : Layer[C].blocks)
@@ -964,27 +965,35 @@ void BlockFrames()
     BlockFrame2[4] += 1;
     if(BlockFrame2[4] == 8)
         BlockFrame2[4] = 0;
+
     BlockFrame2[5] += 1;
     if(BlockFrame2[5] == 8)
         BlockFrame2[5] = 0;
+
     BlockFrame2[30] += 1;
     if(BlockFrame2[30] == 8)
         BlockFrame2[30] = 0;
+
     BlockFrame2[55] += 1;
     if(BlockFrame2[55] == 8)
         BlockFrame2[55] = 0;
+
     BlockFrame2[88] += 1;
     if(BlockFrame2[88] == 8)
         BlockFrame2[88] = 0;
+
     BlockFrame2[109] += 1;
     if(BlockFrame2[109] == 4)
         BlockFrame2[109] = 0;
+
     BlockFrame2[371] += 1;
     if(BlockFrame2[371] == 8)
         BlockFrame2[371] = 0;
+
     BlockFrame2[379] += 1;
     if(BlockFrame2[379] >= 12)
         BlockFrame2[379] = 0;
+
     // Check if the block type is ready for the next frame
     if(BlockFrame2[4] == 0)
     {
@@ -992,12 +1001,14 @@ void BlockFrames()
         if(BlockFrame[4] == 4)
             BlockFrame[4] = 0;
     }
+
     if(BlockFrame2[5] == 0)
     {
         BlockFrame[5] += 1;
         if(BlockFrame[5] == 4)
             BlockFrame[5] = 0;
     }
+
     BlockFrame[598] = BlockFrame[5];
     BlockFrame[511] = BlockFrame[5];
     BlockFrame[169] = BlockFrame[5];
@@ -1047,12 +1058,16 @@ void BlockFrames()
     {
         if(Player[A].Character == 1)
             BlockFrame[622] = 4;
+
         if(Player[A].Character == 2)
             BlockFrame[623] = 4;
+
         if(Player[A].Character == 3)
             BlockFrame[624] = 4;
+
         if(Player[A].Character == 4)
             BlockFrame[625] = 4;
+
         if(Player[A].Character == 5)
             BlockFrame[631] = 4;
     }
@@ -1083,12 +1098,16 @@ void BlockFrames()
 
     if(!pChar[1])
         BlockFrame[626] = 0;
+
     if(!pChar[2])
         BlockFrame[627] = 0;
+
     if(!pChar[3])
         BlockFrame[628] = 0;
+
     if(!pChar[4])
         BlockFrame[629] = 0;
+
     if(!pChar[5])
         BlockFrame[632] = 0;
 
@@ -1173,6 +1192,7 @@ void BlockFrames()
                 break;
             }
         }
+
         if(BlockFrame[458] < 5 && tempBool)
         {
             BlockFrame2[458] += 1;
@@ -1226,6 +1246,7 @@ void UpdateBlocks()
                                 break;
                             }
                         }
+
                         if(B > 0)
                         {
                             if(b.Layer == LAYER_DESTROYED_BLOCKS)

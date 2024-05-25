@@ -911,6 +911,7 @@ bool Logic()
             MenuCursor--;
             MenuCursorCanMove = false;
         }
+
         if(MenuCursorCanMove && downPressed)
         {
             PlaySoundMenu(SFX_Slide);

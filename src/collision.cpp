@@ -714,6 +714,7 @@ bool CompareWalkBlock(int oldBlockIdx, int newBlockIdx, const Location_t &refere
         // New block is closer, replace
         return true;
     }
+
     if(newBlockDist > oldBlockDist)
     {
         // New block further, don't replace
