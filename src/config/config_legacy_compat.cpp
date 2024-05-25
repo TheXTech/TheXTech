@@ -107,6 +107,7 @@ void Config_t::LoadLegacyCompat(IniProcessing* ini, ConfigSetLevel level)
 {
     if(!ini->beginGroup("fails-counter"))
         ini->beginGroup("death-counter");
+
     if(ini->hasKey("enabled"))
     {
         bool val;
@@ -170,15 +171,16 @@ void Config_t::LoadLegacyCompat(IniProcessing* ini, ConfigSetLevel level)
 
             show_playtime_counter.m_set = level;
         }
-    }
-    if(ini->hasKey("stop-timer-at"))
-    {
-        std::string buffer;
-        ini->read("stop-timer-at", buffer, "<<unspecified>>");
-        if(buffer != "<<unspecified>>")
+
+        if(ini->hasKey("stop-timer-at"))
         {
-            speedrun_stop_timer_at = buffer;
-            speedrun_stop_timer_at.m_set = level;
+            std::string buffer;
+            ini->read("stop-timer-at", buffer, "<<unspecified>>");
+            if(buffer != "<<unspecified>>")
+            {
+                speedrun_stop_timer_at = buffer;
+                speedrun_stop_timer_at.m_set = level;
+            }
         }
     }
     ini->endGroup();

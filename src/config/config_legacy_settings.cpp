@@ -60,40 +60,46 @@ void Config_t::LoadLegacySettings(IniProcessing* ini, ConfigSetLevel level)
     };
 
     ini->beginGroup("sound");
-    if(ini->hasKey("disable-sound"))
     {
-        bool audio_disabled;
-        ini->read("disable-sound", audio_disabled, false);
-        audio_enable = !audio_disabled;
-        audio_enable.m_set = level;
-    }
-    if(ini->hasKey("sample-rate"))
-    {
-        int sample_rate;
-        ini->read("sample-rate", sample_rate, g_audioDefaults.sampleRate);
-        audio_sample_rate = sample_rate;
-        audio_sample_rate.m_set = level;
-    }
-    if(ini->hasKey("channels"))
-    {
-        int channels;
-        ini->read("channels", channels, g_audioDefaults.channels);
-        audio_channels = channels;
-        audio_channels.m_set = level;
-    }
-    if(ini->hasKey("buffer-size"))
-    {
-        int buffer_size;
-        ini->read("buffer-size", buffer_size, g_audioDefaults.bufferSize);
-        audio_buffer_size = buffer_size;
-        audio_buffer_size.m_set = level;
-    }
-    if(ini->hasKey("format"))
-    {
-        uint16_t format;
-        ini->readEnum("format", format, g_audioDefaults.format, sampleFormats);
-        audio_format = format;
-        audio_format.m_set = level;
+        if(ini->hasKey("disable-sound"))
+        {
+            bool audio_disabled;
+            ini->read("disable-sound", audio_disabled, false);
+            audio_enable = !audio_disabled;
+            audio_enable.m_set = level;
+        }
+
+        if(ini->hasKey("sample-rate"))
+        {
+            int sample_rate;
+            ini->read("sample-rate", sample_rate, g_audioDefaults.sampleRate);
+            audio_sample_rate = sample_rate;
+            audio_sample_rate.m_set = level;
+        }
+
+        if(ini->hasKey("channels"))
+        {
+            int channels;
+            ini->read("channels", channels, g_audioDefaults.channels);
+            audio_channels = channels;
+            audio_channels.m_set = level;
+        }
+
+        if(ini->hasKey("buffer-size"))
+        {
+            int buffer_size;
+            ini->read("buffer-size", buffer_size, g_audioDefaults.bufferSize);
+            audio_buffer_size = buffer_size;
+            audio_buffer_size.m_set = level;
+        }
+
+        if(ini->hasKey("format"))
+        {
+            uint16_t format;
+            ini->readEnum("format", format, g_audioDefaults.format, sampleFormats);
+            audio_format = format;
+            audio_format.m_set = level;
+        }
     }
     ini->endGroup();
 #endif
