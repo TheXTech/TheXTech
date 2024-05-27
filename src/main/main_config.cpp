@@ -78,7 +78,6 @@ void OpenConfig()
 
         config.beginGroup("main");
         config.read("release", FileRelease, curRelease);
-        bool default_set = config.hasKey("default-set");
         config.endGroup();
 
         std::string asset_pack_prefix = g_AssetPackID;
@@ -98,8 +97,6 @@ void OpenConfig()
         config.endGroup();
 
         g_config_game_user.Clear();
-        if(!default_set)
-            g_config_game_user.LoadLegacySettings(&config);
         g_config_game_user.UpdateFromIni(&config);
 
         g_config.log_level.set_from_default(ConfigSetLevel::set);

@@ -93,7 +93,6 @@ public:
 
     void Clear();
 
-    void LoadLegacySettings(IniProcessing* ini, ConfigSetLevel level = ConfigSetLevel::set);
     void LoadLegacyCompat(IniProcessing* ini, ConfigSetLevel level = ConfigSetLevel::set);
 
     void SetFromDefaults(ConfigSetLevel level = ConfigSetLevel::set);

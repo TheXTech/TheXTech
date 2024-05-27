@@ -676,7 +676,6 @@ set(THEXTECH_SRC
     src/global_strings.cpp
     src/config/config_base.cpp
     src/config/config_hooks.cpp
-    src/config/config_legacy_settings.cpp
     src/config/config_legacy_compat.cpp
     src/config/config_main.cpp
     src/main/world_loop.cpp
