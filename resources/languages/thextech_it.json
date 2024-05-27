@@ -106,7 +106,7 @@
                 "propMusic": "Musica"
             },
             "bounds": {
-                "changeAllSectionBoundsToCurrent": "Cambiare tutte le sezioni collegate a quella attuale"
+                "changeAllSectionBoundsToCurrent": "Cambiare tutte le sezioni collegate a quella attuale?"
             },
             "controlsForEventN": "Controlli per evento {0}",
             "header": "Eventi:",
@@ -125,7 +125,8 @@
             "layers": {
                 "headerHide": "Nascondi:",
                 "headerMove": "Muovi:",
-                "headerShow": "Mostra:"
+                "headerShow": "Mostra:",
+                "headerToggle": "Attivazione:"
             },
             "letter": {
                 "activate": "A:",
@@ -156,10 +157,12 @@
         "block": {
             "pickContents": "Scegli il contenuto del blocco",
             "canBreak": "Distrugge",
-            "canBreakTooltip": "Distrugge quando viene colpito da",
-            "inside": "Dentro",
+            "canBreakTooltip": "Viene distrutto se colpito da",
+            "inside": "Dentro:",
             "letterHeight": "H",
-            "letterWidth": "W"
+            "letterWidth": "W",
+            "slick": "Scivola",
+            "invis": "Invisib"
         },
         "browser": {
             "askOverwriteFile": "Sovrascrivere{0}?",
@@ -177,6 +180,7 @@
         "phraseAreYouSure": "Sei sicuro?",
         "phraseCountMore": "{0} Altro",
         "phraseDelayIsMs": "Ritardo: {0} ms",
-        "phraseGenericIndex": "Numero {0}"
+        "phraseGenericIndex": "Numero {0}",
+        "labelSortLayer": "Livello Strato:"
     }
 }

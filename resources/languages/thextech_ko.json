@@ -186,7 +186,8 @@
             "offscreenExit": "오프스크린 종료",
             "scroll": "스크롤",
             "setBounds": "경계 설정",
-            "underwater": "수중"
+            "underwater": "수중",
+            "vertWrap": "수직 순환"
         },
         "select": {
             "sectBlankPropBlankForEventN": "{2}에 대한 {0} {1} 섹션",
