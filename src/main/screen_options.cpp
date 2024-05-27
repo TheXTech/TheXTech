@@ -80,12 +80,6 @@ inline void s_set_dirty()
     global_dirty = true;
 }
 
-inline void s_switch_section()
-{
-    if(section_index == SECTION_NONE || section_index >= g_options.m_options.size())
-        return;
-}
-
 inline void s_switch_item()
 {
     cur_item_changed = false;
@@ -381,8 +375,6 @@ void Do()
         }
         else
         {
-            s_switch_section();
-
             cur_item = 0;
             s_switch_item();
             while(is_subsection(cur_item) && cur_item + 1 < visible_items.size())
