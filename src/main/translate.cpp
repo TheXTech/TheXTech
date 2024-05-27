@@ -803,7 +803,7 @@ XTechTranslate::XTechTranslate()
         {"objects.wordStarAccusativeDualOrCounter", &g_gameInfo.wordStarAccusativeDual_Cnt},
         {"objects.wordStarAccusativePlural",        &g_gameInfo.wordStarAccusativePlural},
 
-        {"objects.wordFails", &g_gameInfo.fails_counter_title.m_value}
+        {"objects.wordFails", &g_gameInfo.fails_counter_title}
     };
 
     for(int i = 1; i <= numCharacters; ++i)

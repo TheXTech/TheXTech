@@ -368,7 +368,7 @@ void DeathCounter::Draw(int screenZ)
 
     // Format string to print
     m_print.syncCache(mCurLevelDeaths, mCurTotalDeaths);
-    m_print.syncCache(g_config.fails_counter_title);
+    m_print.syncCache(g_gameInfo.fails_counter_title);
 
     const vScreen_t& vscreen = vScreen[screenZ];
     const Screen_t& screen = Screens[vscreen.screen_ref];
@@ -391,7 +391,7 @@ void DeathCounter::Draw(int screenZ)
         title_X &= ~1;
         counter_X &= ~1;
 
-        SuperPrint(g_config.fails_counter_title, m_print.font, HUDLeft + title_X, ScreenTop + 26);
+        SuperPrint(g_gameInfo.fails_counter_title, m_print.font, HUDLeft + title_X, ScreenTop + 26);
         SuperPrint(m_print.counterOut, m_print.font, HUDLeft + counter_X, ScreenTop + 48);
     }
     // At low res, print to top of screen
@@ -405,7 +405,7 @@ void DeathCounter::Draw(int screenZ)
         title_X &= ~1;
         counter_X &= ~1;
 
-        SuperPrint(g_config.fails_counter_title, m_print.font, title_X, ScreenTop);
+        SuperPrint(g_gameInfo.fails_counter_title, m_print.font, title_X, ScreenTop);
         SuperPrint(m_print.counterOut, m_print.font, counter_X, ScreenTop);
     }
 }

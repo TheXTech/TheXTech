@@ -28,6 +28,8 @@
 
 #include "../version.h"
 
+GameInfo g_gameInfo;
+
 
 static void readCheats(IniProcessing &conf, std::vector<GameInfo::CheatAlias> &dst, const std::string &group)
 {
@@ -78,6 +80,8 @@ void GameInfo::InitGameInfo()
     characterName[4] = "Toad";
     characterName[5] = "Link";
 
+    fails_counter_title = "FAILS";
+
     wordStarAccusativeSingular = "star";
     wordStarAccusativeDual_Cnt = "";
     wordStarAccusativePlural = "stars";
@@ -116,7 +120,7 @@ void GameInfo::InitGameInfo()
 
 void GameInfo::LoadGameInfo()
 {
-    Clear();
+    InitGameInfo();
 
     std::string gameInfoPath = AppPath + "gameinfo.ini";
     if(Files::fileExists(gameInfoPath))
@@ -135,27 +139,11 @@ void GameInfo::LoadGameInfo()
 
         // legacy options
         if(!config.beginGroup("fails-counter"))
+        {
             config.beginGroup("death-counter"); // Backup fallback
-        if(config.hasKey("enabled"))
-        {
-            bool val;
-            config.read("enabled", val, false);
-            show_fails_counter = val;
         }
-        if(config.hasKey("title"))
         {
-            std::string val;
-            config.read("title", val, fails_counter_title);
-            fails_counter_title = val;
-        }
-        config.endGroup();
-
-        config.beginGroup("luna-script");
-        if(config.hasKey("enable-engine"))
-        {
-            bool val;
-            config.read("enable-engine", val, true);
-            luna_enable_engine = val;
+            config.read("title", fails_counter_title, fails_counter_title);
         }
         config.endGroup();
 
@@ -166,17 +154,6 @@ void GameInfo::LoadGameInfo()
             config.read("star-plural", wordStarAccusativePlural, g_gameInfo.wordStarAccusativeSingular + "s");
         }
         config.endGroup();
-
-        config.beginGroup("video");
-        if(config.hasKey("death-counter-title"))
-        {
-            std::string val;
-            config.read("death-counter-title", val, fails_counter_title);
-            fails_counter_title = val;
-        }
-        config.endGroup();
-
-        // end legacy options
 
         config.beginGroup("characters");
         {
@@ -245,8 +222,6 @@ void GameInfo::LoadGameInfo()
         readCheats(config, cheatsWorldRenames, "cheats-world-renames");
         readCheats(config, cheatsLevelAliases, "cheats-level-aliases");
         readCheats(config, cheatsLevelRenames, "cheats-level-renames");
-
-        Config_t::UpdateFromIni(&config, ConfigSetLevel::game_info);
     }
 }
 

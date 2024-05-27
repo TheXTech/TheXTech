@@ -28,18 +28,16 @@
 #include "range_arr.hpp"
 #include "config.h"
 
-class GameInfo : public Config_t
+struct GameInfo
 {
-public:
-    inline GameInfo() {}
-    inline GameInfo(const _Config_t<false>& base, uint8_t scope) : Config_t(base, scope) {}
-
     void InitGameInfo();
     void LoadGameInfo();
 
     std::string title;
     // std::string titleCredits;
     RangeArr<std::string, 1, numCharacters> characterName;
+
+    std::string fails_counter_title;
 
     std::string statusIconName;
 

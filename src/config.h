@@ -915,9 +915,6 @@ public:
     opt<std::string> speedrun_stop_timer_at{this, defaults<std::string>("Boss Dead"), {}, Scope::CreatorEpisode,
         "stop-timer-at", "Stop speedrun timer event/level", "If above is 'Event' or 'Level', this specifies which"};
 
-    opt<std::string> fails_counter_title{this, defaults<std::string>("FAILS"), {}, Scope::Assets | Scope::Creator,
-        "fails-counter-title", "Fails counter title", "Label used for the fails counter"};
-
     /* ---- View Credits ----*/
     section view_credits{this, Scope::All, "view-credits", "View Credits"};
 };
@@ -936,7 +933,6 @@ using Config_t = _Config_t<true>;
 extern _Config_t<false> g_options;
 
 // <defaults>                                1
-// extern GameInfo g_gameInfo;            // 2, decl game_info.h, defn config_main.cpp
 extern Config_t g_config_game_user;       // 3
 extern Config_t g_config_episode_creator; // 4
 // extern Config_t g_config_episode_user;    // 5

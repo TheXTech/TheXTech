@@ -320,8 +320,6 @@ void UpdateConfig()
     }
 
     // load from all levels of config
-    g_config.UpdateFrom(g_gameInfo, ConfigSetLevel::game_info);
-
     g_config.UpdateFrom(g_config_game_user, ConfigSetLevel::user_config);
 
     g_config.DisableBugfixes(ConfigSetLevel::bugfix_defaults);
@@ -400,7 +398,6 @@ std::set<BaseConfigOption_t<true>*> g_configModified;
 Options_t g_options;
 
 // <defaults>                                                                     1
-GameInfo g_gameInfo(g_options, Config_t::Scope::Assets);                       // 2, decl in game_info.h
 Config_t g_config_game_user(g_options, Config_t::Scope::User);                 // 3
 Config_t g_config_episode_creator(g_options, Config_t::Scope::CreatorEpisode); // 4
 Config_t g_config_file_creator(g_options, Config_t::Scope::CreatorFile);       // 6
