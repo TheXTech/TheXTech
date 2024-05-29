@@ -556,7 +556,8 @@ public:
         "audio-channels", "Channels", nullptr,
         config_audio_set};
 #else // #ifndef _WIN32
-    static constexpr int audio_channels = 2;
+    // FIXME: Make it being read-writeable by INI file only and never appear in GUI
+    int audio_channels = 2;
 #endif // #ifndef _WIN32
 
     opt_enum<int> audio_sample_rate{this,
