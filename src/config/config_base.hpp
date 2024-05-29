@@ -62,7 +62,7 @@ template<bool writable>
 class ConfigLanguage_t;
 
 template<bool writable>
-class ConfigRenderMode_t;
+class ConfigSetupEnum_t;
 
 template<bool writable>
 class _Config_t;
@@ -258,7 +258,7 @@ public:
 };
 
 template<>
-class ConfigRenderMode_t<false> : public ConfigEnumOption_t<false, int>
+class ConfigSetupEnum_t<false> : public ConfigEnumOption_t<false, int>
 {
     using ConfigEnumOption_t<false, int>::ConfigEnumOption_t;
 };
@@ -464,7 +464,7 @@ public:
 };
 
 template<>
-class ConfigRenderMode_t<true> : public ConfigEnumOption_t<true, int>
+class ConfigSetupEnum_t<true> : public ConfigEnumOption_t<true, int>
 {
 public:
     using ConfigEnumOption_t<true, int>::ConfigEnumOption_t;
@@ -472,7 +472,7 @@ public:
 
     virtual const std::string& get_display_value(std::string& out) const override;
 
-    static int obtained;
+    int obtained = -1;
 };
 
 template<>

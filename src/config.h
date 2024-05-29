@@ -75,7 +75,7 @@ protected:
     using section = ConfigSection_t<writable>;
     using subsection = ConfigSubSection_t<writable>;
     using language_t = ConfigLanguage_t<writable>;
-    using rendermode_t = ConfigRenderMode_t<writable>;
+    using setup_enum_t = ConfigSetupEnum_t<writable>;
 
     template<class value_t>
     static constexpr value_t defaults(value_t value)
@@ -495,7 +495,7 @@ public:
         RENDER_ACCELERATED_OPENGL_ES_LEGACY,
         RENDER_END
     };
-    rendermode_t render_mode{this,
+    setup_enum_t render_mode{this,
         {
             {RENDER_SOFTWARE, "sw", "Software", nullptr},
             {RENDER_ACCELERATED_AUTO, "hw", "Auto", ""},
@@ -546,8 +546,7 @@ public:
         "audio-enable", "Enable", nullptr,
         config_audio_set};
 
-#ifndef _WIN32
-    opt_enum<int> audio_channels{this,
+    setup_enum_t audio_channels{this,
         {
             {1, "mono", "Mono", nullptr},
             {2, "stereo", "Stereo", nullptr},
@@ -555,12 +554,8 @@ public:
         defaults(g_audioDefaults.channels), {}, Scope::User,
         "audio-channels", "Channels", nullptr,
         config_audio_set};
-#else // #ifndef _WIN32
-    // FIXME: Make it being read-writeable by INI file only and never appear in GUI
-    int audio_channels = 2;
-#endif // #ifndef _WIN32
 
-    opt_enum<int> audio_sample_rate{this,
+    setup_enum_t audio_sample_rate{this,
         {
             {11025, "11025", "11025 Hz", nullptr},
             {16000, "16000", "16000 Hz", nullptr},
@@ -573,7 +568,7 @@ public:
         "audio-sample-rate", "Sample rate", nullptr,
         config_audio_set};
 
-    opt_enum<int> audio_format{this,
+    setup_enum_t audio_format{this,
         {
             {AUDIO_S8, "s8", "s8"},
             {AUDIO_S8, "pcm_s8"},
@@ -622,10 +617,10 @@ public:
 #       endif
         },
         defaults(g_audioDefaults.format), {}, Scope::User,
-        "audio-format", "Audio format", "(Advanced) format for sound driver",
+        "audio-format", "Audio format", "Format for sound driver",
         config_audio_set};
 
-    opt_enum<int> audio_buffer_size{this,
+    setup_enum_t audio_buffer_size{this,
         {
             {512, "512", "512"},
             {768, "768", "768"},
@@ -635,7 +630,7 @@ public:
             {4096, "4096", "4096"},
         },
         defaults(g_audioDefaults.bufferSize), {}, Scope::User,
-        "audio-buffer-size", "Buffer size", "(Advanced) increase for fewer pops but more lag",
+        "audio-buffer-size", "Buffer size", "Increase for fewer pops but more lag",
         config_audio_set};
 #else
     static constexpr int audio_sample_rate = 44100;

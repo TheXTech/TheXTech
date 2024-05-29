@@ -101,8 +101,6 @@ const AudioDefaults_t g_audioDefaults =
 };
 #endif
 
-static AudioSetup_t s_audioSetupObtained;
-
 static Mix_Music *g_curMusic = nullptr;
 static bool g_mixerLoaded = false;
 
@@ -313,23 +311,23 @@ void InitMixerX()
         if(ret == 0)
         {
             pLogCritical("Failed to call the Mix_QuerySpec!");
-            s_audioSetupObtained.sampleRate = g_config.audio_sample_rate;
-            s_audioSetupObtained.format = g_config.audio_format;
-            s_audioSetupObtained.channels = g_config.audio_channels;
-            s_audioSetupObtained.bufferSize = g_config.audio_buffer_size;
+            g_config.audio_sample_rate.obtained = g_config.audio_sample_rate;
+            g_config.audio_format.obtained = g_config.audio_format;
+            g_config.audio_channels.obtained = g_config.audio_channels;
+            g_config.audio_buffer_size.obtained = g_config.audio_buffer_size;
         }
         else
         {
-            s_audioSetupObtained.sampleRate = ob.freq;
-            s_audioSetupObtained.format = ob.format;
-            s_audioSetupObtained.channels = ob.channels;
-            s_audioSetupObtained.bufferSize = ob.samples;
+            g_config.audio_sample_rate.obtained = ob.freq;
+            g_config.audio_format.obtained = ob.format;
+            g_config.audio_channels.obtained = ob.channels;
+            g_config.audio_buffer_size.obtained = ob.samples;
 
             pLogDebug("Sound opened (obtained: rate=%d hz, format=%s, channels=%d, buffer=%d frames)...",
-                      s_audioSetupObtained.sampleRate,
-                      audio_format_to_string(s_audioSetupObtained.format),
-                      s_audioSetupObtained.channels,
-                      s_audioSetupObtained.bufferSize);
+                      ob.freq,
+                      audio_format_to_string(ob.format),
+                      ob.channels,
+                      ob.samples);
         }
 
 #if defined(__3DS__)
@@ -1755,9 +1753,9 @@ void SoundFX_SetEcho(const SoundFXEchoSetup& setup)
     {
         SoundFX_Clear();
 
-        effectEcho = echoEffectInit(s_audioSetupObtained.sampleRate,
-                                    s_audioSetupObtained.format,
-                                    s_audioSetupObtained.channels);
+        effectEcho = echoEffectInit(g_config.audio_sample_rate.obtained,
+                                    g_config.audio_format.obtained,
+                                    g_config.audio_channels.obtained);
         isNew = true;
     }
 
@@ -1812,9 +1810,9 @@ void SoundFX_SetReverb(const SoundFXReverb& setup)
         // Clear previously installed effects first
         SoundFX_Clear();
 
-        effectReverb = reverbEffectInit(s_audioSetupObtained.sampleRate,
-                                        s_audioSetupObtained.format,
-                                        s_audioSetupObtained.channels);
+        effectReverb = reverbEffectInit(g_config.audio_sample_rate.obtained,
+                                        g_config.audio_format.obtained,
+                                        g_config.audio_channels.obtained);
         isNew = true;
     }
 

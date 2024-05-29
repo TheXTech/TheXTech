@@ -722,11 +722,8 @@ const std::string& ConfigLanguage_t<true>::get_display_value(std::string& out) c
     return out;
 }
 
-// implementation for ConfigRenderMode_t<true>
-#ifndef RENDER_CUSTOM
-int ConfigRenderMode_t<true>::obtained = -1;
-
-const std::string& ConfigRenderMode_t<true>::get_display_value(std::string& out) const
+// implementation for ConfigSetupEnum_t<true>
+const std::string& ConfigSetupEnum_t<true>::get_display_value(std::string& out) const
 {
     ConfigEnumOption_t<true, int>::get_display_value(out);
 
@@ -734,7 +731,9 @@ const std::string& ConfigRenderMode_t<true>::get_display_value(std::string& out)
     {
         const ConfigEnumOption_t<false, int>* base = dynamic_cast<const ConfigEnumOption_t<false, int>*>(m_base);
 
-        if(m_value == Config_t::RENDER_ACCELERATED_AUTO && base)
+#ifndef RENDER_CUSTOM
+        // special case for "auto" render mode
+        if(base && base == &g_options.render_mode && m_value == Config_t::RENDER_ACCELERATED_AUTO)
         {
             out += " (";
 
@@ -756,12 +755,14 @@ const std::string& ConfigRenderMode_t<true>::get_display_value(std::string& out)
             out += ")";
         }
         else
+#endif
+        {
             out += " (X)";
+        }
     }
 
     return out;
 }
-#endif
 
 
 // implementation for ConfigEnumOption_t<true, value_t>
