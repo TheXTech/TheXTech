@@ -64,7 +64,7 @@ namespace OptCursor_t
         WLD_TILES = 7,
         WLD_AREA = 16,
     };
-};
+}
 
 // NEW: set / reset the scrolls when changing sections
 void ResetSectionScrolls();
