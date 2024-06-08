@@ -222,6 +222,8 @@ bool FrmMain::initSystem(const CmdLineSetup_t &setup)
         return true;
     }
 
+    XEvents::doEvents();
+
     FontManager::initFull();
 
     return !res;

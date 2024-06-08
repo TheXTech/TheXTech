@@ -45,7 +45,6 @@ EventsSDL::~EventsSDL()
 void EventsSDL::init(FrmMain *form)
 {
     AbstractEvents_t::init(form);
-    doEvents();
 }
 
 void EventsSDL::doEvents()
