@@ -122,7 +122,7 @@ public:
 
 #ifdef ENABLE_XTECH_DISCORD_RPC
     opt<bool> discord_rpc{this, defaults(false), {}, Scope::User,
-        "discord-rpc", "Discord Integration", "Share your play data on Discord!",
+        "discord-rpc", "Discord Integration", nullptr,
         config_integrations_set};
 #endif
 
@@ -139,13 +139,13 @@ public:
     subsection main_frame_timing{this, "timing", "Frame Timing"};
 
     opt<bool> enable_frameskip{this, defaults(false), {}, Scope::User,
-        "frame-skip", "Frameskip", "Skip frames to maintain game speed"};
+        "frame-skip", "Frameskip", nullptr};
 
     opt<bool> unlimited_framerate{this, defaults(false), {}, Scope::User,
-        "unlimited-framerate", "Unlimited framerate", "Allow framerate above 66 FPS"};
+        "unlimited-framerate", "Unlimited framerate", nullptr};
 
     opt<bool> render_vsync{this, defaults(false), {}, Scope::User,
-        "vsync", "V-Sync", "Sync frames to screen refresh, reduces tearing",
+        "vsync", "V-Sync", nullptr,
         config_res_set};
 
     /* ---- Main - Multiplayer ----*/
@@ -254,7 +254,7 @@ public:
     static constexpr bool show_backdrop = true;
 
     opt<bool> show_controllers{this, defaults(false), {}, Scope::User,
-        "display-controllers", "Controls activity", "Show which buttons players press"};
+        "display-controllers", "Controls activity", nullptr};
 
     opt<bool> show_fps{this, defaults(false), {}, Scope::User,
         "show-fps", "Framerate", nullptr};
@@ -339,8 +339,8 @@ public:
     };
     opt_enum<int> show_episode_title{this,
         {
-            {EPISODE_TITLE_OFF, "off", "Off", "Never show"},
-            {EPISODE_TITLE_TOP, "top", "Top", "Show above HUD at high resolutions"},
+            {EPISODE_TITLE_OFF, "off", "Off"},
+            {EPISODE_TITLE_TOP, "top", "Top", "Show above HUD at high resolution"},
             {EPISODE_TITLE_BOTTOM, "bottom", "Bottom", "Show above speedrun timer"},
             {EPISODE_TITLE_BOTTOM, "transparent"},
             {EPISODE_TITLE_BOTTOM, "on"},
@@ -477,7 +477,7 @@ public:
 
 #if defined(__ANDROID__) || defined(__3DS__)
     opt<bool> use_native_osk{this, defaults(false), {}, Scope::User,
-        "use-native-osk", "Native OSK", "Use system's native keyboard"};
+        "use-native-osk", "Native OSK", nullptr};
 #endif
 
     /* ---- Advanced - Video ----*/
