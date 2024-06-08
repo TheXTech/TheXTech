@@ -221,6 +221,8 @@ bool FrmMain::initSystem(const CmdLineSetup_t &setup)
         return true;
     }
 
+    XEvents::doEvents();
+
     return !res;
 }
 
