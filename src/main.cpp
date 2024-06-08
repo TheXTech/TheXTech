@@ -31,6 +31,8 @@
 #include "video.h"
 #include "main/presetup.h"
 #include "main/speedrunner.h"
+#include "main/game_info.h"
+#include "main/asset_pack.h"
 #include "main/translate.h"
 #include "core/language.h"
 #include "compat.h"
@@ -481,10 +483,21 @@ int main(int argc, char**argv)
         }
 #endif
 
+        OpenConfig_preSetup();
+
+
 #ifndef THEXTECH_DISABLE_LANG_TOOLS
         // Print the language template to the screen
         if(switchMakeLangTemplate.isSet() && switchMakeLangTemplate.getValue())
         {
+            // Locate asset pack. The `true` here indicates to skip actually loading UI GFX.
+            if(!InitUIAssetsFrom(setup.assetPack, true))
+                return 1;
+
+            printf("== Language template for [%s] ==\n", AppPath.c_str());
+
+            initGameInfo();
+
             XTechTranslate translate;
             translate.reset();
             translate.exportTemplate();
@@ -494,14 +507,20 @@ int main(int argc, char**argv)
         // Update all translation files at current assets pack
         if(switchLangUpdate.isSet() && switchLangUpdate.getValue())
         {
+            // Locate asset pack. The `true` here indicates to skip actually loading UI GFX.
+            if(!InitUIAssetsFrom(setup.assetPack, true))
+                return 1;
+
+            printf("== Updating language files at [%s] ==\n", AppPath.c_str());
+
+            initGameInfo();
+
             XTechTranslate translate;
             translate.reset();
             translate.updateLanguages(langOutputPath.getValue(), switchLangNoBlank.isSet());
             return 0;
         }
 #endif
-
-        OpenConfig_preSetup();
 
 
         // Set other settings
