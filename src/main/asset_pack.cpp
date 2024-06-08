@@ -450,7 +450,7 @@ bool ReloadAssetsFrom(const AssetPack_t& pack)
 }
 
 
-bool InitUIAssetsFrom(const std::string& id)
+bool InitUIAssetsFrom(const std::string& id, bool skip_gfx)
 {
     pLogDebug("Searching for asset packs in:");
     for(const auto& root_ : AppPathManager::assetsSearchPath())
@@ -514,7 +514,7 @@ bool InitUIAssetsFrom(const std::string& id)
 
     pLogDebug("Loading assets from %s", AppPath.c_str());
 
-    if(!GFX.load())
+    if(!skip_gfx && !GFX.load())
         return false;
 
     ConfigReloadRecentEpisodes();
