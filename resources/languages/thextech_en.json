@@ -343,7 +343,8 @@
         "hint": {
             "pound-key": "Press to pound downwards!",
             "no-lives-new": "If you fail, your score will reset.",
-            "no-lives-old": "If you fail, the game will end."
+            "no-lives-old": "If you fail, the game will end.",
+            "rainbow-surf": "Grab, run, hold down, and let go to surf."
         },
         "message": {
             "scanningLevels": "Scanning levels..."
@@ -580,6 +581,230 @@
                 "label": "Scale",
                 "linear": "Linear",
                 "nearest": "Nearest"
+            },
+            "advanced": {
+                "_header": "Advanced",
+                "_tooltip": "Technical options for internal operations",
+                "advanced-audio": "Audio",
+                "advanced-video": "Video",
+                "audio-buffer-size": {
+                    "1024": "1024",
+                    "1536": "1536",
+                    "2048": "2048",
+                    "4096": "4096",
+                    "512": "512",
+                    "768": "768",
+                    "_name": "Buffer size",
+                    "_tooltip": "Increase for fewer pops but more lag"
+                },
+                "audio-channels": {
+                    "_name": "Channels",
+                    "mono": "Mono",
+                    "stereo": "Stereo"
+                },
+                "audio-enable": "Enable",
+                "audio-format": {
+                    "_name": "Audio format",
+                    "_tooltip": "Format for sound driver",
+                    "float32": "float32",
+                    "float32be": "float32be",
+                    "s16": "s16",
+                    "s16be": "s16be",
+                    "s32": "s32",
+                    "s32be": "s32be",
+                    "s8": "s8",
+                    "u16": "u16",
+                    "u16be": "u16be",
+                    "u8": "u8"
+                },
+                "audio-sample-rate": {
+                    "11025": "11025 Hz",
+                    "16000": "16000 Hz",
+                    "22050": "22050 Hz",
+                    "32000": "32000 Hz",
+                    "44100": "44100 Hz",
+                    "48000": "48000 Hz",
+                    "_name": "Sample rate"
+                },
+                "choose-assets-on-launch": "Choose assets on launch",
+                "log-level": {
+                    "_name": "Log level",
+                    "critical": "Critical",
+                    "debug": "Debug",
+                    "fatal": "Fatal",
+                    "info": "Info",
+                    "none": "None",
+                    "warning": "Warning"
+                },
+                "record-gameplay-data": "Record gameplay",
+                "render": {
+                    "_name": "Render mode",
+                    "hw": "Auto",
+                    "opengl": "OpenGL 3+",
+                    "opengl-tip": "Desktop API with support for all new visual effects and full accuracy to SMBX64",
+                    "opengl11": "OpenGL 1.1",
+                    "opengl11-tip": "Legacy desktop API with full accuracy to SMBX64",
+                    "opengles": "OpenGL ES 2+",
+                    "opengles-tip": "Mobile API with support for all new visual effects and high accuracy to SMBX64",
+                    "opengles11": "OpenGL ES 1.1+",
+                    "opengles11-tip": "Legacy mobile API with full accuracy to SMBX64",
+                    "sdl": "SDL2",
+                    "sdl-tip": "Basic cross-platform render API",
+                    "sw": "Software"
+                },
+                "scale-down-textures": {
+                    "_name": "Scale down images",
+                    "_tooltip": "Store images as 1x to save memory",
+                    "all": "All",
+                    "all-tip": "Less loading stutter than 'Safe'",
+                    "none": "None",
+                    "none-tip": "Least loading stutter",
+                    "safe": "Safe",
+                    "safe-tip": "Checks if images are in 2x format"
+                }
+            },
+            "audio": {
+                "_header": "Audio",
+                "audio-music-volume": "Music volume",
+                "audio-prefs": "Preferences",
+                "audio-sfx-volume": "SFX volume",
+                "sfx-audio-fx": "Echo effects",
+                "sfx-modern": "Modern SFX",
+                "sfx-modern-tip": "Use sounds added in TheXTech",
+                "sfx-pet-beat": "Pet grooves",
+                "sfx-pet-beat-tip": "Play special groove when riding a pet",
+                "sfx-spatial-audio": "Spatial audio",
+                "sfx-spatial-audio-tip": "Reduce volume of offscreen sounds"
+            },
+            "compatibility": {
+                "_header": "Session Tweaks",
+                "_tooltip": "Options for compat or debugging",
+                "autocode": "Autocode",
+                "bugfixes": "Bugfixes",
+                "features": "Features",
+                "reset-all": "Reset All"
+            },
+            "controls": {
+                "_header": "Controls"
+            },
+            "episode-options": {
+                "_header": "Episode Options",
+                "creator-compat": {
+                    "_name": "Creator compat",
+                    "_tooltip": "Logic tweaks by content creator",
+                    "disable": "Disable",
+                    "enable": "Enable",
+                    "file-only": "File only"
+                },
+                "playstyle": {
+                    "_name": "Playstyle",
+                    "classic": "Classic",
+                    "classic-tip": "Critical updates only",
+                    "modern": "Modern",
+                    "modern-tip": "Enables all gameplay updates",
+                    "vanilla": "Vanilla",
+                    "vanilla-tip": "Preserves all known bugs"
+                }
+            },
+            "main": {
+                "_header": "Main",
+                "background-work": "Run in background",
+                "background-work-tip": "Play with joystick while game is unfocused",
+                "four-screen-mode": {
+                    "_name": "4P screen mode",
+                    "shared": "Shared",
+                    "split": "Split"
+                },
+                "frame-skip": "Frameskip",
+                "discord-rpc": "Discord Integration",
+                "language": "Language",
+                "multiplayer": "Multiplayer",
+                "timing": "Frame Timing",
+                "two-screen-mode": {
+                    "_name": "2P screen mode",
+                    "shared": "Shared",
+                    "smbx": "SMBX",
+                    "split": "Left/Right",
+                    "topbottom": "Top/Bottom"
+                },
+                "unlimited-framerate": "Unlimited framerate",
+                "vsync": "V-Sync"
+            },
+            "video": {
+                "_header": "Video",
+                "battery-status": {
+                    "_name": "Device battery status",
+                    "fullscreen": "Fullscreen",
+                    "fullscreen-tip": "Show when the game is fullscreen",
+                    "low": "Low",
+                    "low-tip": "Show when the battery is low",
+                    "off": "Off",
+                    "on": "Always"
+                },
+                "display-controllers": "Controls activity",
+                "effects": "Screen Effects",
+                "enable-inter-level-fade-effect": "Fade transitions",
+                "fullscreen": "Fullscreen",
+                "info-game": "Onscreen game info",
+                "info-meta": "Onscreen meta info",
+                "info-run": "Onscreen run info",
+                "internal-res": {
+                    "3ds": "800x480 (3DS)",
+                    "_name": "Screen size",
+                    "_tooltip": "Resolution of gameplay field",
+                    "dynamic": "Dynamic",
+                    "gba": "480x320 (GBA)",
+                    "hd": "1280x720 (HD)",
+                    "hello": "768x432 (HELLO)",
+                    "nds": "512x384 (NDS)",
+                    "smbx": "800x600 (SMBX)",
+                    "smbx-wide": "SMBX (wide)",
+                    "snes": "512x448 (SNES)",
+                    "vga": "640x480 (VGA)"
+                },
+                "scale-mode": {
+                    "0_5x": "0.5x",
+                    "1x": "1x",
+                    "2x": "2x",
+                    "_name": "Scale mode",
+                    "integer": "Integer",
+                    "linear": "Smooth",
+                    "nearest": "Nearest",
+                    "full": "Full",
+                    "center": "Center"
+                },
+                "show-episode-title": {
+                    "_name": "Episode name",
+                    "bottom": "Bottom",
+                    "bottom-tip": "Show above speedrun timer",
+                    "off": "Off",
+                    "top": "Top",
+                    "top-tip": "Show above HUD at high resolution"
+                },
+                "3d-compat-mode": "3D compat mode",
+                "3d-compat-mode-tip": "Draw all objects in one 3D plane",
+                "show-fails-counter": "Fails counter",
+                "show-fails-counter-tip": "Show fails on the episode and current level",
+                "show-fps": "Framerate",
+                "show-medals-counter": "Medals counter",
+                "show-medals-counter-tip": "Show medals in HUD and at level entrance",
+                "show-playtime-counter": {
+                    "_name": "Playtime counter",
+                    "_tooltip": "Show time spent on the episode and current attempt",
+                    "animated": "Animated",
+                    "animated-tip": "Adds a rainbow effect on level end",
+                    "off": "Off",
+                    "off-tip": "Show only during speedruns",
+                    "opaque": "Opaque",
+                    "transparent": "Transparent"
+                },
+                "show-screen-shake": "Screen shake",
+                "video-system": "System",
+                "world-map-stars-show": "World map stars",
+                "world-map-stars-show-tip": "Show collected stars above levels"
+            },
+            "view-credits": {
+                "_header": "View Credits"
             }
         },
         "wordBack": "Back",
