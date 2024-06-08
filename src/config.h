@@ -230,7 +230,7 @@ public:
             {SCALE_DYNAMIC_INTEGER, "integer", "Integer"},
             {SCALE_DYNAMIC_NEAREST, "nearest", "Nearest"},
             {SCALE_DYNAMIC_LINEAR, "linear", "Smooth"},
-            {SCALE_FIXED_05X, "0.5x", "0.5x"},
+            {SCALE_FIXED_05X, "0_5x", "0.5x"},
             {SCALE_FIXED_1X, "1x", "1x"},
             {SCALE_FIXED_2X, "2x", "2x"},
 #   endif
