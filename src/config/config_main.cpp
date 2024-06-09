@@ -398,7 +398,7 @@ std::set<BaseConfigOption_t<true>*> g_configModified;
 Options_t g_options;
 
 // <defaults>                                                                     1
-Config_t g_config_game_user(g_options, Config_t::Scope::User);                 // 3
+Config_t g_config_game_user(g_options, Config_t::Scope::Config);               // 3
 Config_t g_config_episode_creator(g_options, Config_t::Scope::CreatorEpisode); // 4
 Config_t g_config_file_creator(g_options, Config_t::Scope::CreatorFile);       // 6
 // <compat>                                                                       9
