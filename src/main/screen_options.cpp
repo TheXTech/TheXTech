@@ -201,7 +201,7 @@ void RefreshVisibleItems()
 {
     visible_items.clear();
 
-    auto current_scope = Config_t::Scope::User;
+    auto current_scope = Config_t::Scope::UserVisible;
 
     if(section_index == SECTION_NONE)
     {

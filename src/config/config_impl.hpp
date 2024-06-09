@@ -388,7 +388,7 @@ const std::string& ConfigOption_t<true, bool>::get_display_value(std::string& ou
 template<class value_t>
 void ConfigEnumOption_t<false, value_t>::make_translation(XTechTranslate& translate, const char* cur_section_id)
 {
-    if((ConfigOption_t<false, value_t>::m_scope & (Options_t::Scope::User | Options_t::Scope::EpisodeOptions)) == 0)
+    if((ConfigOption_t<false, value_t>::m_scope & Options_t::Scope::UserVisible) == 0)
         return;
 
     translate.m_engineMap.insert({fmt::format_ne("menu.options.{0}.{1}._name", cur_section_id, m_internal_name), &m_display_name});
@@ -729,9 +729,9 @@ const std::string& ConfigSetupEnum_t<true>::get_display_value(std::string& out) 
 
     if(m_value != obtained)
     {
+#ifndef RENDER_CUSTOM
         const ConfigEnumOption_t<false, int>* base = dynamic_cast<const ConfigEnumOption_t<false, int>*>(m_base);
 
-#ifndef RENDER_CUSTOM
         // special case for "auto" render mode
         if(base && base == &g_options.render_mode && m_value == Config_t::RENDER_ACCELERATED_AUTO)
         {

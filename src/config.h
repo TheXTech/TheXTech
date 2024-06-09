@@ -49,10 +49,12 @@ public:
             // UserFile = 1 << 2,
 
             // UserLocal = UserEpisode | UserFile,
-            User = 1 << 0,
+            Config = 1 << 0,
             EpisodeOptions = 1 << 1,
 
-            Assets = 1 << 2,
+            UserVisible = Config | EpisodeOptions,
+
+            // Assets = 1 << 2,
 
             CreatorEpisode = 1 << 3,
             CreatorFile = 1 << 4,
@@ -116,18 +118,18 @@ public:
     /* ---- Main ----*/
     section main{this, Scope::All, "main", "Main", nullptr};
 
-    language_t language{this, defaults(std::string("auto")), {}, Scope::User,
+    language_t language{this, defaults(std::string("auto")), {}, Scope::Config,
         "language", "Language", nullptr,
         config_language_set};
 
 #ifdef ENABLE_XTECH_DISCORD_RPC
-    opt<bool> discord_rpc{this, defaults(false), {}, Scope::User,
+    opt<bool> discord_rpc{this, defaults(false), {}, Scope::Config,
         "discord-rpc", "Discord Integration", nullptr,
         config_integrations_set};
 #endif
 
 #ifndef NO_WINDOW_FOCUS_TRACKING
-    opt<bool> background_work{this, defaults(false), {}, Scope::User,
+    opt<bool> background_work{this, defaults(false), {}, Scope::Config,
         "background-work", "Run in background", "Play with joystick while game is unfocused"};
 #else
     static constexpr bool background_work = true;
@@ -138,13 +140,13 @@ public:
     /* ---- Main - Frame Timing ----*/
     subsection main_frame_timing{this, "timing", "Frame Timing"};
 
-    opt<bool> enable_frameskip{this, defaults(false), {}, Scope::User,
+    opt<bool> enable_frameskip{this, defaults(false), {}, Scope::Config,
         "frame-skip", "Frameskip", nullptr};
 
-    opt<bool> unlimited_framerate{this, defaults(false), {}, Scope::User,
+    opt<bool> unlimited_framerate{this, defaults(false), {}, Scope::Config,
         "unlimited-framerate", "Unlimited framerate", nullptr};
 
-    opt<bool> render_vsync{this, defaults(false), {}, Scope::User,
+    opt<bool> render_vsync{this, defaults(false), {}, Scope::Config,
         "vsync", "V-Sync", nullptr,
         config_res_set};
 
@@ -158,7 +160,7 @@ public:
             {MultiplayerPrefs::Split, "split", "Left/Right"},
             {MultiplayerPrefs::TopBottom, "topbottom", "Top/Bottom"},
         },
-        defaults(MultiplayerPrefs::Dynamic), {CompatClass::critical_update, MultiplayerPrefs::Dynamic}, Scope::User,
+        defaults(MultiplayerPrefs::Dynamic), {CompatClass::critical_update, MultiplayerPrefs::Dynamic}, Scope::Config,
         "two-screen-mode", "2P screen mode", nullptr,
         config_screenmode_set
     };
@@ -168,20 +170,20 @@ public:
             {MultiplayerPrefs::Shared, "shared", "Shared"},
             {MultiplayerPrefs::Split, "split", "Split"},
         },
-        defaults(MultiplayerPrefs::Shared), {CompatClass::critical_update, MultiplayerPrefs::Shared}, Scope::User,
+        defaults(MultiplayerPrefs::Shared), {CompatClass::critical_update, MultiplayerPrefs::Shared}, Scope::Config,
         "four-screen-mode", "4P screen mode", nullptr,
         config_screenmode_set
     };
 
 
     /* ---- Video ----*/
-    section video{this, Scope::User, "video", "Video", nullptr};
+    section video{this, Scope::Config, "video", "Video", nullptr};
 
     /* ---- Video - System ----*/
     subsection video_system{this, "video-system", "System"};
 
 #ifndef RENDER_FULLSCREEN_ALWAYS
-    opt<bool> fullscreen{this, defaults(false), {}, Scope::User,
+    opt<bool> fullscreen{this, defaults(false), {}, Scope::Config,
         "fullscreen", "Fullscreen", nullptr,
         config_fullscreen_set};
 #else
@@ -203,7 +205,7 @@ public:
             {{1280, 720}, "hd", "1280x720 (HD)"},
             {{0, 0}, "dynamic", "Dynamic"},
         },
-        defaults(std::pair<int, int>({0, 0})), {}, Scope::User,
+        defaults(std::pair<int, int>({0, 0})), {}, Scope::Config,
         "internal-res", "Screen size", "Resolution of gameplay field",
         config_res_set
     };
@@ -235,7 +237,7 @@ public:
             {SCALE_FIXED_2X, "2x", "2x"},
 #   endif
         },
-        defaults(SCALE_DYNAMIC_NEAREST), {}, Scope::User,
+        defaults(SCALE_DYNAMIC_NEAREST), {}, Scope::Config,
         "scale-mode", "Scale mode", nullptr,
         config_res_set
     };
@@ -244,7 +246,7 @@ public:
 #endif
 
 #ifdef __3DS__
-    opt<bool> td_compat_mode{this, defaults(false), {}, Scope::User,
+    opt<bool> td_compat_mode{this, defaults(false), {}, Scope::Config,
         "3d-compat-mode", "3D compat mode", "Draw all objects in one 3D plane"};
 #endif
 
@@ -253,10 +255,10 @@ public:
 
     static constexpr bool show_backdrop = true;
 
-    opt<bool> show_controllers{this, defaults(false), {}, Scope::User,
+    opt<bool> show_controllers{this, defaults(false), {}, Scope::Config,
         "display-controllers", "Controls activity", nullptr};
 
-    opt<bool> show_fps{this, defaults(false), {}, Scope::User,
+    opt<bool> show_fps{this, defaults(false), {}, Scope::Config,
         "show-fps", "Framerate", nullptr};
 
     enum
@@ -279,7 +281,7 @@ public:
             {BATTERY_STATUS_OFF, "never"},
             {BATTERY_STATUS_ALWAYS_ON, "always"},
         },
-        defaults<int>(BATTERY_STATUS_OFF), {}, Scope::User,
+        defaults<int>(BATTERY_STATUS_OFF), {}, Scope::Config,
         "battery-status", "Device battery status", nullptr};
 #else
     static constexpr bool show_battery_status = BATTERY_STATUS_OFF;
@@ -288,7 +290,7 @@ public:
     /* ---- Video - Game Info ----*/
     subsection info_game{this, "info-game", "Onscreen game info"};
 
-    opt<bool> show_fails_counter{this, defaults(false), {}, Scope::User,
+    opt<bool> show_fails_counter{this, defaults(false), {}, Scope::Config,
         "show-fails-counter", "Fails counter", "Show fails on the episode and current level"};
 
     enum
@@ -306,14 +308,14 @@ public:
             {MEDALS_SHOW_COUNTS, "counts-only", "Counts", "Show counts of gotten and available medals"},
             {MEDALS_SHOW_FULL, "show-full", "Full", "Show order of gotten and available medals"},
         },
-        defaults<int>(MEDALS_SHOW_FULL), {}, Scope::User,
+        defaults<int>(MEDALS_SHOW_FULL), {}, Scope::Config,
         "show-medals-policy", "Medals policy"};
 #else
     static constexpr int medals_show_policy = MEDALS_SHOW_FULL;
 #endif
 
     opt<bool> show_medals_counter{this,
-        defaults<bool>(true), {CompatClass::pure_preference, false}, Scope::User,
+        defaults<bool>(true), {CompatClass::pure_preference, false}, Scope::Config,
         "show-medals-counter", "Medals counter", "Show medals in HUD and at level entrance"};
 
     // used elsewhere to track creator-specified options
@@ -325,7 +327,7 @@ public:
         MAP_STARS_SHOW,
     };
 
-    opt<bool> world_map_stars_show{this, defaults(true), {CompatClass::pure_preference, false}, Scope::User,
+    opt<bool> world_map_stars_show{this, defaults(true), {CompatClass::pure_preference, false}, Scope::Config,
         "world-map-stars-show", "World map stars", "Show collected stars above levels"};
 
     /* ---- Video - Run Info ----*/
@@ -345,7 +347,7 @@ public:
             {EPISODE_TITLE_BOTTOM, "transparent"},
             {EPISODE_TITLE_BOTTOM, "on"},
         },
-        defaults(EPISODE_TITLE_OFF), {}, Scope::User,
+        defaults(EPISODE_TITLE_OFF), {}, Scope::Config,
         "show-episode-title", "Episode name", nullptr};
 
     enum
@@ -363,36 +365,36 @@ public:
             {PLAYTIME_COUNTER_OPAQUE, "opaque", "Opaque", nullptr},
             {PLAYTIME_COUNTER_ANIMATED, "animated", "Animated", "Adds a rainbow effect on level end"},
         },
-        defaults(PLAYTIME_COUNTER_OFF), {}, Scope::User,
+        defaults(PLAYTIME_COUNTER_OFF), {}, Scope::Config,
         "show-playtime-counter", "Playtime counter", "Show time spent on the episode and current attempt"};
 
     /* ---- Video - Effects ----*/
     subsection effects{this, "effects", "Screen Effects"};
 
     opt<bool> show_screen_shake{this,
-        defaults(true), {CompatClass::pure_preference, true}, Scope::User,
+        defaults(true), {CompatClass::pure_preference, true}, Scope::Config,
         "show-screen-shake", "Screen shake", nullptr};
 
-    opt<bool> EnableInterLevelFade{this, defaults(true), {CompatClass::pure_preference, false}, Scope::User,
+    opt<bool> EnableInterLevelFade{this, defaults(true), {CompatClass::pure_preference, false}, Scope::Config,
         "enable-inter-level-fade-effect", "Fade transitions", nullptr};
 
 
     /* ---- Audio ----*/
-    section audio{this, Scope::User, "audio", "Audio", nullptr};
+    section audio{this, Scope::Config, "audio", "Audio", nullptr};
 
 #ifndef __16M__
-    opt_range<int> audio_mus_volume{this, {0, 100, 5}, defaults(100), {}, Scope::User,
+    opt_range<int> audio_mus_volume{this, {0, 100, 5}, defaults(100), {}, Scope::Config,
         "audio-music-volume", "Music volume", nullptr,
         config_music_volume_set};
 
-    opt_range<int> audio_sfx_volume{this, {0, 100, 5}, defaults(100), {}, Scope::User,
+    opt_range<int> audio_sfx_volume{this, {0, 100, 5}, defaults(100), {}, Scope::Config,
         "audio-sfx-volume", "SFX volume", nullptr};
 #endif
 
     /* ---- Audio - Preferences ----*/
     subsection audio_preferences{this, "audio-prefs", "Preferences"};
 
-    opt<bool> sfx_modern{this, defaults(true), {CompatClass::pure_preference, false}, Scope::User,
+    opt<bool> sfx_modern{this, defaults(true), {CompatClass::pure_preference, false}, Scope::Config,
         "sfx-modern", "Modern SFX", "Use sounds added in TheXTech"};
 
 #if 0
@@ -408,13 +410,13 @@ public:
             {MOUNTDRUMS_NORMAL, "normal", "Normal", "Plays the special drums when you are riding a pet mount"},
             {MOUNTDRUMS_ALWAYS, "always", "Always", "Always plays the special drums"},
         },
-        defaults<int>(MOUNTDRUMS_NORMAL), {CompatClass::pure_preference, MOUNTDRUMS_NEVER}, Scope::User,
+        defaults<int>(MOUNTDRUMS_NORMAL), {CompatClass::pure_preference, MOUNTDRUMS_NEVER}, Scope::Config,
         "sfx-mount-drums", "Mount drums", "Should special drums play while the player is riding a pet?",
         config_mountdrums_set};
 #endif
 
 #ifndef __16M__
-    opt<bool> sfx_pet_beat{this, defaults(true), {CompatClass::pure_preference, false}, Scope::User,
+    opt<bool> sfx_pet_beat{this, defaults(true), {CompatClass::pure_preference, false}, Scope::Config,
         "sfx-pet-beat", "Pet grooves", "Play special groove when riding a pet",
         config_mountdrums_set};
 #endif
@@ -427,28 +429,28 @@ public:
     static constexpr bool sfx_audio_fx_default = true;
 #   endif
 
-    opt<bool> sfx_audio_fx{this, defaults(sfx_audio_fx_default), {CompatClass::pure_preference, false}, Scope::User,
+    opt<bool> sfx_audio_fx{this, defaults(sfx_audio_fx_default), {CompatClass::pure_preference, false}, Scope::Config,
         "sfx-audio-fx", "Echo effects", nullptr,
         config_audiofx_set};
 #endif
 
-    opt<bool> sfx_spatial_audio{this, defaults(true), {CompatClass::pure_preference, false}, Scope::User,
+    opt<bool> sfx_spatial_audio{this, defaults(true), {CompatClass::pure_preference, false}, Scope::Config,
         "sfx-spatial-audio", "Spatial audio", "Reduce volume of offscreen sounds"};
 
 
     /* ---- Controls ----*/
-    section controls{this, Scope::User, "controls", "Controls"};
+    section controls{this, Scope::Config, "controls", "Controls"};
 
 
     /* ---- Advanced ----*/
-    section advanced{this, Scope::User, "advanced", "Advanced", "Technical options for internal operations"};
+    section advanced{this, Scope::Config, "advanced", "Advanced", "Technical options for internal operations"};
 
     // static constexpr bool record_gameplay_data = false;
 
-    opt<bool> pick_assets_on_start{this, defaults(false), {}, Scope::User,
+    opt<bool> pick_assets_on_start{this, defaults(false), {}, Scope::Config,
         "choose-assets-on-launch", "Choose assets on launch", nullptr};
 
-    opt<bool> record_gameplay_data{this, defaults(false), {}, Scope::User,
+    opt<bool> record_gameplay_data{this, defaults(false), {}, Scope::Config,
         "record-gameplay-data", "Record gameplay", nullptr};
 
     opt_enum<int> log_level{this,
@@ -471,12 +473,12 @@ public:
 #else
         defaults(PGE_LogLevel::Info),
 #endif
-        {}, Scope::User,
+        {}, Scope::Config,
         "log-level", "Log level", nullptr,
         config_log_level_set};
 
 #if defined(__ANDROID__) || defined(__3DS__)
-    opt<bool> use_native_osk{this, defaults(false), {}, Scope::User,
+    opt<bool> use_native_osk{this, defaults(false), {}, Scope::Config,
         "use-native-osk", "Native OSK", nullptr};
 #endif
 
@@ -515,7 +517,7 @@ public:
             {RENDER_SOFTWARE, "0"},
             {RENDER_ACCELERATED_SDL, "1"},
         },
-        defaults(RENDER_ACCELERATED_AUTO), {}, Scope::User,
+        defaults(RENDER_ACCELERATED_AUTO), {}, Scope::Config,
         "render", "Render mode", nullptr,
         config_rendermode_set};
 #endif
@@ -534,7 +536,7 @@ public:
             {SCALE_DOWN_SAFE, "safe", "Safe", "Checks if images are in 2x format"},
             {SCALE_DOWN_ALL, "all", "All", "Less loading stutter than 'Safe'"},
         },
-        defaults(SCALE_DOWN_SAFE), {}, Scope::User,
+        defaults(SCALE_DOWN_SAFE), {}, Scope::Config,
         "scale-down-textures", "Scale down images", "Store images as 1x to save memory"};
 #endif
 
@@ -542,7 +544,7 @@ public:
     /* ---- Advanced - Audio ----*/
     subsection advanced_audio{this, "advanced-audio", "Audio"};
 
-    opt<bool> audio_enable{this, defaults(true), {}, Scope::User,
+    opt<bool> audio_enable{this, defaults(true), {}, Scope::Config,
         "audio-enable", "Enable", nullptr,
         config_audio_set};
 
@@ -551,7 +553,7 @@ public:
             {1, "mono", "Mono", nullptr},
             {2, "stereo", "Stereo", nullptr},
         },
-        defaults(g_audioDefaults.channels), {}, Scope::User,
+        defaults(g_audioDefaults.channels), {}, Scope::Config,
         "audio-channels", "Channels", nullptr,
         config_audio_set};
 
@@ -564,7 +566,7 @@ public:
             {44100, "44100", "44100 Hz", nullptr},
             {48000, "48000", "48000 Hz", nullptr},
         },
-        defaults(g_audioDefaults.sampleRate), {}, Scope::User,
+        defaults(g_audioDefaults.sampleRate), {}, Scope::Config,
         "audio-sample-rate", "Sample rate", nullptr,
         config_audio_set};
 
@@ -616,7 +618,7 @@ public:
             {AUDIO_F32MSB, "pcm_f32be"},
 #       endif
         },
-        defaults(g_audioDefaults.format), {}, Scope::User,
+        defaults(g_audioDefaults.format), {}, Scope::Config,
         "audio-format", "Audio format", "Format for sound driver",
         config_audio_set};
 
@@ -629,7 +631,7 @@ public:
             {2048, "2048", "2048"},
             {4096, "4096", "4096"},
         },
-        defaults(g_audioDefaults.bufferSize), {}, Scope::User,
+        defaults(g_audioDefaults.bufferSize), {}, Scope::Config,
         "audio-buffer-size", "Buffer size", "Increase for fewer pops but more lag",
         config_audio_set};
 #else
@@ -676,14 +678,14 @@ public:
     // /* ---- Prefs - Effects ----*/
     // subsection effects{this, "effects", "Visual Effects"};
 
-    // opt<bool> small_screen_camera_features{this, defaults(true), {VER_THEXTECH137}, Scope::User,
+    // opt<bool> small_screen_camera_features{this, defaults(true), {VER_THEXTECH137}, Scope::Config,
     //     "small-screen-camera-features", "Small screen camera features", "Camera optimizations that improve the experience at low resolutions"};
     static constexpr bool small_screen_camera_features = true;
 
 
 
     /* ---- Compatibility ----*/
-    section compat{this, Scope::CreatorFile, "compatibility", "Session Tweaks", "Options for compat or debugging"};
+    section compat{this, Scope::All, "compatibility", "Session Tweaks", "Options for compat or debugging"};
 
     subsection reset_all{this, "reset-all", "Reset All"};
 
