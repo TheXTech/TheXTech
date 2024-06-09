@@ -729,9 +729,9 @@ const std::string& ConfigSetupEnum_t<true>::get_display_value(std::string& out) 
 
     if(m_value != obtained)
     {
+#ifndef RENDER_CUSTOM
         const ConfigEnumOption_t<false, int>* base = dynamic_cast<const ConfigEnumOption_t<false, int>*>(m_base);
 
-#ifndef RENDER_CUSTOM
         // special case for "auto" render mode
         if(base && base == &g_options.render_mode && m_value == Config_t::RENDER_ACCELERATED_AUTO)
         {
