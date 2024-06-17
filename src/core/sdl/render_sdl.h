@@ -38,6 +38,9 @@ class RenderSDL final : public AbstractRender_t
 
     SDL_Renderer *m_gRenderer = nullptr;
     SDL_Texture  *m_tBuffer = nullptr;
+#ifdef __WIIU__
+    SDL_Texture  *m_tBuffer_old = nullptr;
+#endif
     bool          m_tBufferDisabled = false;
     SDL_Texture  *m_recentTarget = nullptr;
     std::set<StdPicture *> m_loadedPictures;
