@@ -380,7 +380,8 @@ void WindowSDL::restoreWindow()
 
 void WindowSDL::setWindowSize(int w, int h)
 {
-#ifndef __EMSCRIPTEN__
+    // doesn't make sense on Emscripten, actually causes crashes on Wii U
+#if !defined(__EMSCRIPTEN__) && !defined(__WIIU__)
     // try to figure out whether requested size is bigger than the screen
     int display = SDL_GetWindowDisplayIndex(m_window);
     if(display >= 0)

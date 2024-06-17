@@ -162,6 +162,12 @@ void RenderSDL::close()
     RenderSDL::clearAllTextures();
     AbstractRender_t::close();
 
+#ifdef __WIIU__
+    if(m_tBuffer_old)
+        SDL_DestroyTexture(m_tBuffer_old);
+    m_tBuffer_old = nullptr;
+#endif
+
     if(m_tBuffer)
         SDL_DestroyTexture(m_tBuffer);
     m_tBuffer = nullptr;
@@ -309,7 +315,17 @@ void RenderSDL::updateViewport()
         else
             SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");
 
+#ifdef __WIIU__
+        // workaround for Wii U SDL2 bug: it's unsafe on Wii U to destroy a texture that was recently a render target (even if all cleanup functions are used here)
+        // this wastes memory so shouldn't be applied on all targets
+        if(m_tBuffer_old)
+            SDL_DestroyTexture(m_tBuffer_old);
+
+        m_tBuffer_old = m_tBuffer;
+#else
         SDL_DestroyTexture(m_tBuffer);
+#endif
+
         m_tBuffer = SDL_CreateTexture(m_gRenderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, XRender::TargetW, XRender::TargetH);
         SDL_SetRenderTarget(m_gRenderer, m_tBuffer);
 
