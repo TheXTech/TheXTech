@@ -42,6 +42,7 @@ Changelog for 1.3.6.6-dev
 -Fix bug where vehicle could be vulnerable if player entered it during AltJump (requires frame perfect down press), guarded by compat flag "fix-vehicle-altjump-bug" (@ds-sloth)
 -Fixed the problem when a touch screen is not detected on some Android devices (@Wohlstand)
 -Fix minor bug that caused certain configurations on macOS to crash on startup (@ds-sloth)
+-Fix Wii U bug where resizing the game screen could cause the game to crash (@ds-sloth)
 
 Changelog for 1.3.6.5
 -Fix TheXTech 1.3.6 bug where auto movement on the world map was not reset when switching episodes (@ds-sloth)
