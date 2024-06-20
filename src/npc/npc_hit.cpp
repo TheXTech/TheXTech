@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "compat.h"
+#include "config.h"
 
 #include "../globals.h"
 #include "../npc.h"
@@ -2142,7 +2142,7 @@ void NPCHit(int A, int B, int C)
             NPC[A].Location.Y = Block[C].Location.Y - NPC[A].Location.Height - 0.01;
         }
         // B == 6 - touched a lava block, C is a block, not NPC!!!
-        else if(B == 6 && g_compatibility.fix_powerup_lava_bug)
+        else if(B == 6 && g_config.fix_powerup_lava_bug)
         {
             NPC[A].Killed = B;
         }

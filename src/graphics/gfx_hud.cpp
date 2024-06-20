@@ -31,7 +31,6 @@
 #include "video.h"
 #include "main/speedrunner.h"
 
-#include "compat.h"
 #include "config.h"
 #include "main/level_medals.h"
 
@@ -304,7 +303,7 @@ void DrawLives(int X, int Y, int lives, int hunds)
     int count = 0;
     int text_X = X + 8 + GFX.Interface[1].w + 8;
 
-    if(g_compatibility.modern_lives_system)
+    if(g_config.modern_lives_system)
     {
         bool debt = (hunds < 0);
         count = (debt) ? -hunds : hunds;

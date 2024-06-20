@@ -54,7 +54,7 @@
 #include "lunacounter.h"
 #include "renderop_string.h"
 #include "mememu.h"
-#include "compat.h"
+#include "config.h"
 #include "main/speedrunner.h"
 
 #include "main/trees.h"

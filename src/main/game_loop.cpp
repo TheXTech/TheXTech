@@ -25,7 +25,6 @@
 
 #include "../globals.h"
 #include "../config.h"
-#include "../compat.h"
 #include "../frame_timer.h"
 #include "../game_main.h"
 #include "../sound.h"
@@ -137,7 +136,7 @@ void GameLoop()
     {
         QuickReconnectScreen::g_active = true;
 
-        if(!g_config.NoPauseReconnect && g_compatibility.pause_on_disconnect && !TestLevel)
+        if(!g_config.NoPauseReconnect && g_config.pause_on_disconnect && !TestLevel)
             PauseGame(PauseCode::PauseScreen, 0);
     }
 
@@ -205,11 +204,11 @@ void GameLoop()
 
         Controls::Update(false);
     }
-    else if(qScreen || (g_compatibility.allow_multires && qScreen_canonical))
+    else if(qScreen || (g_config.allow_multires && qScreen_canonical))
     {
         g_microStats.start_task(MicroStats::Effects);
         UpdateEffects();
-        if(!g_compatibility.modern_section_change)
+        if(!g_config.modern_section_change)
             speedRun_tick();
         UpdateGraphics();
         updateScreenFaders();
@@ -276,7 +275,7 @@ void GameLoop()
                         continue;
 
                     // use limited, buggy code for non-player 1 in compat case
-                    if(p != 1 && !g_compatibility.multiplayer_pause_controls)
+                    if(p != 1 && !g_config.multiplayer_pause_controls)
                     {
                         if(CaptainN || FreezeNPCs)
                         {
@@ -338,7 +337,7 @@ bool MessageScreen_Logic(int plr)
 
     // there was previously code to copy all players' controls from the main player, but this is no longer necessary (and actively harmful in the SingleCoop case)
 
-    if(!g_compatibility.multiplayer_pause_controls && plr == 0)
+    if(!g_config.multiplayer_pause_controls && plr == 0)
         plr = 1;
 
     if(plr == 0)

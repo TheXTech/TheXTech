@@ -131,8 +131,6 @@ struct Compatibility_t
     bool luna_allow_level_codes;
 };
 
-extern Compatibility_t g_compatibility;
-
 void LoadCustomCompat();
 void ResetCompat();
 

@@ -35,7 +35,6 @@
 #include "core/render.h"
 #include "main/game_info.h"
 #include "main/menu_main.h"
-#include "compat.h"
 
 
 DeathCounter gDeathCounter;
@@ -197,7 +196,7 @@ bool DeathCounter::TryLoadStats()
 // mark that a death occurred in the current level
 void DeathCounter::MarkDeath(bool write_save)
 {
-    bool dcAllow = (gEnableDemoCounter || gEnableDemoCounterByLC || g_compatibility.demos_counter_enable);
+    bool dcAllow = (gEnableDemoCounter || gEnableDemoCounterByLC || g_config.demos_counter_enable);
 
     if(!dcAllow)
         return;

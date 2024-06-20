@@ -27,7 +27,7 @@
 #include "../layers.h"
 #include "../game_main.h"
 #include "../main/speedrunner.h"
-#include "../compat.h"
+#include "config.h"
 #include "../controls.h"
 #include "../layers.h"
 
@@ -261,13 +261,13 @@ void KillNPC(int A, int B)
                     NewEffect(EFFID_FODDER_S3_SQUISH, NPC[A].Location);
                 else if(NPC[A].Type == NPCID_FODDER_S5)
                     NewEffect(EFFID_FODDER_S5_SQUISH, NPC[A].Location);
-                else if(NPC[A].Type == NPCID_SQUID_S1 && g_compatibility.fix_squid_stomp_effect)
+                else if(NPC[A].Type == NPCID_SQUID_S1 && g_config.fix_squid_stomp_effect)
                 {
                     NPC[A].Location.SpeedY = 0.123;
                     NewEffect(EFFID_SQUID_S1_DIE, NPC[A].Location, NPC[A].Direction);
                     PlaySoundSpatial(SFX_ShellHit, NPC[A].Location);
                 }
-                else if(NPC[A].Type == NPCID_SQUID_S3 && g_compatibility.fix_squid_stomp_effect)
+                else if(NPC[A].Type == NPCID_SQUID_S3 && g_config.fix_squid_stomp_effect)
                 {
                     NPC[A].Location.SpeedY = 0.123;
                     NewEffect(EFFID_SQUID_S3_DIE, NPC[A].Location, NPC[A].Direction);

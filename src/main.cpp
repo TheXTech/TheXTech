@@ -35,7 +35,6 @@
 #include "main/asset_pack.h"
 #include "main/translate.h"
 #include "core/language.h"
-#include "compat.h"
 #include "config.h"
 #include "controls.h"
 #include <AppPath/app_path.h>

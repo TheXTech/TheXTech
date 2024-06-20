@@ -38,7 +38,7 @@
 #include "../sound.h"
 #include "../sorting.h"
 #include "../layers.h"
-#include "../compat.h"
+#include "config.h"
 #include "../graphics.h"
 #include "../editor.h"
 #include "../npc_id.h"
@@ -220,7 +220,7 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
     }
 
     // FIXME: disable this if the file indicates that it is already sorted
-    if(g_compatibility.emulate_classic_block_order && FileFormat == FileFormats::LVL_PGEX)
+    if(g_config.emulate_classic_block_order && FileFormat == FileFormats::LVL_PGEX)
     {
         FileFormats::smbx64LevelPrepare(lvl);
         FileFormats::smbx64LevelSortBlocks(lvl);

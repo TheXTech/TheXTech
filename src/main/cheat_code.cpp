@@ -45,7 +45,6 @@
 #include "game_main.h"
 #include "change_res.h"
 #include "config.h"
-#include "compat.h"
 #ifdef ENABLE_ANTICHEAT_TRAP
 #include "editor.h" // For the `Backup_FullFileName` only
 #endif

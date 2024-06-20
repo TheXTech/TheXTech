@@ -46,7 +46,6 @@
 
 #include "config.h"
 #include "frame_timer.h"
-#include "compat.h"
 #include "blocks.h"
 #include "change_res.h"
 #include "collision.h"
@@ -1197,7 +1196,7 @@ int GameMain(const CmdLineSetup_t &setup)
                     StartWarp = 0;
 
                     // fix a bug where ReturnWarp (from different level) would be used at hub after death if StartWarp was set for hub
-                    if(IsHubLevel && g_compatibility.enable_last_warp_hub_resume)
+                    if(IsHubLevel && g_config.enable_last_warp_hub_resume)
                         ReturnWarp = 0;
                 }
                 else
@@ -1237,7 +1236,7 @@ int GameMain(const CmdLineSetup_t &setup)
 
                 PauseGame(PauseCode::Message);
 
-                if(g_compatibility.modern_lives_system)
+                if(g_config.modern_lives_system)
                     ++g_100s;
                 else
                     ++Lives;
@@ -1997,7 +1996,7 @@ void MoreScore(int addScore, const Location_t &Loc, vbint_t &Multiplier)
 
     if(Points[A] <= 5)
     {
-        if(g_compatibility.modern_lives_system)
+        if(g_config.modern_lives_system)
             g_100s += Points[A];
         else
             Lives += Points[A];
@@ -2013,7 +2012,7 @@ void MoreScore(int addScore, const Location_t &Loc, vbint_t &Multiplier)
 
 void Got100Coins()
 {
-    if(g_compatibility.modern_lives_system)
+    if(g_config.modern_lives_system)
     {
         if(g_100s < 9999)
         {

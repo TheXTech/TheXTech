@@ -35,7 +35,6 @@
 #include "pseudo_vb.h"
 #include "gfx.h"
 #include "config.h"
-#include "compat.h"
 #include "npc_traits.h"
 
 #include <Utils/maths.h>
@@ -62,7 +61,7 @@ void GetvScreen(vScreen_t& vscreen)
     vscreen.Y += -vscreen.TempY;
 
     // allow some overscan (needed for 3DS)
-    int allow_X = (g_compatibility.allow_multires && vscreen.Width == XRender::TargetW && !Screens[vscreen.screen_ref].is_canonical()) ? XRender::TargetOverscanX : 0;
+    int allow_X = (g_config.allow_multires && vscreen.Width == XRender::TargetW && !Screens[vscreen.screen_ref].is_canonical()) ? XRender::TargetOverscanX : 0;
 
     // shift the level so that it is onscreen
     if(-vscreen.X < level[p.Section].X - allow_X)
@@ -108,7 +107,7 @@ void GetvScreenAverage(vScreen_t& vscreen)
 
     for(A = 1; A <= numPlayers; A++)
     {
-        if(!Player[A].Dead && (Player[A].Effect != 6 || g_compatibility.multiplayer_pause_controls))
+        if(!Player[A].Dead && (Player[A].Effect != 6 || g_config.multiplayer_pause_controls))
         {
             vscreen.X += -Player[A].Location.X - Player[A].Location.Width / 2.0;
 
@@ -152,7 +151,7 @@ void GetvScreenAverage(vScreen_t& vscreen)
     vscreen.Y = (vscreen.Y / B) + (use_height * 0.5) - vScreenYOffset;
 
     // allow some overscan (needed for 3DS)
-    int allow_X = (g_compatibility.allow_multires && vscreen.Width == XRender::TargetW && !Screens[vscreen.screen_ref].is_canonical()) ? XRender::TargetOverscanX : 0;
+    int allow_X = (g_config.allow_multires && vscreen.Width == XRender::TargetW && !Screens[vscreen.screen_ref].is_canonical()) ? XRender::TargetOverscanX : 0;
 
     if(-vscreen.X < section.X - allow_X)
         vscreen.X = -(section.X - allow_X);
@@ -292,7 +291,7 @@ void GetvScreenAverage3(vScreen_t& vscreen)
     double use_height = screen.H;
 
     // allow canonical screen to expand to reach size of main screen, if there are players near the side of the screen
-    if(g_compatibility.allow_multires && !screen.Visible)
+    if(g_config.allow_multires && !screen.Visible)
     {
         // vScreen boundaries that would have been present in SMBX 1.3 splitscreen
         double want_l = l - screen.W / 4;
@@ -329,7 +328,7 @@ void GetvScreenAverage3(vScreen_t& vscreen)
     vscreen.Y = vscreen.Y / (plr_count + 1) + (use_height * 0.5) - vScreenYOffset;
 
     // allow some overscan (needed for 3DS)
-    int allow_X = (g_compatibility.allow_multires && vscreen.Width == XRender::TargetW && !Screens[vscreen.screen_ref].is_canonical()) ? XRender::TargetOverscanX : 0;
+    int allow_X = (g_config.allow_multires && vscreen.Width == XRender::TargetW && !Screens[vscreen.screen_ref].is_canonical()) ? XRender::TargetOverscanX : 0;
 
     if(-vscreen.X < section.X - allow_X)
         vscreen.X = -(section.X - allow_X);

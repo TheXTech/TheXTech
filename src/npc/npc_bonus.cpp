@@ -29,7 +29,6 @@
 #include "../player.h"
 #include "../game_main.h"
 #include "../core/events.h"
-#include "../compat.h"
 #include "../config.h"
 #include "../layers.h"
 
@@ -50,7 +49,7 @@
 
 static void s_PowerupScore(NPCRef_t n)
 {
-    if(g_compatibility.custom_powerup_collect_score)
+    if(g_config.custom_powerup_collect_score)
         MoreScore((*n)->Score, n->Location);
     else
         MoreScore(6, n->Location);

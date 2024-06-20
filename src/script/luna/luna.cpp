@@ -31,7 +31,6 @@
 #include "lunacounter.h"
 #include "lunalevels.h"
 #include "lunavarbank.h"
-#include "compat.h"
 #include "config.h"
 
 #include "globals.h"
@@ -39,10 +38,10 @@
 
 SDL_FORCE_INLINE bool lunaAllowed()
 {
-    if(g_compatibility.luna_enable_engine == Compatibility_t::LUNA_ENGINE_UNSPECIFIED)
+    if(g_config.luna_enable_engine == Compatibility_t::LUNA_ENGINE_UNSPECIFIED)
         return gLunaEnabledGlobally;
 
-    return g_compatibility.luna_enable_engine == Compatibility_t::LUNA_ENGINE_ENABLE;
+    return g_config.luna_enable_engine == Compatibility_t::LUNA_ENGINE_ENABLE;
 }
 
 void lunaReset()
@@ -84,7 +83,7 @@ void lunaLoad()
     lunaReset();
 
     bool isGame = !GameMenu && !GameOutro && !BattleMode && !LevelEditor && !TestLevel;
-    bool dcAllow = (gEnableDemoCounter || g_compatibility.demos_counter_enable);
+    bool dcAllow = (gEnableDemoCounter || g_config.demos_counter_enable);
 
     if(dcAllow && isGame)
         gDeathCounter.init();
@@ -98,7 +97,7 @@ void lunaLoad()
         gSavedVarBank.CopyBank(&gAutoMan.m_UserVars);
 
         // Init some stuff
-        if(g_compatibility.luna_allow_level_codes)
+        if(g_config.luna_allow_level_codes)
             lunaLevelsInit();
         gAutoMan.m_Hearts = 2;
     }
@@ -135,7 +134,7 @@ void lunaLoop()
 
         // Run any framecode
 //        TestFrameCode();
-        if(g_compatibility.luna_allow_level_codes)
+        if(g_config.luna_allow_level_codes)
             lunaLevelsDo();
     }
 }
@@ -143,7 +142,7 @@ void lunaLoop()
 
 void lunaRenderHud(int screenZ)
 {
-    bool dcAllow = (gEnableDemoCounter || gEnableDemoCounterByLC || g_compatibility.demos_counter_enable);
+    bool dcAllow = (gEnableDemoCounter || gEnableDemoCounterByLC || g_config.demos_counter_enable);
     if(dcAllow && g_config.show_fails_counter && gShowDemoCounter && ShowOnScreenHUD)
         gDeathCounter.Draw(screenZ);
 

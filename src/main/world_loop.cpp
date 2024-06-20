@@ -34,7 +34,6 @@
 #include "../player.h"
 #include "../main/trees.h"
 #include "../core/events.h"
-#include "../compat.h"
 #include "../config.h"
 #include "gfx.h"
 #include "world_globals.h"
@@ -222,7 +221,7 @@ void WorldLoop()
     Location_t tempLocation;
     int A = 0;
     int B = 0;
-    bool allowFastMove = (g_config.worldMapFastMove || g_compatibility.world_map_fast_move) && CompatGetLevel() == COMPAT_MODERN;
+    bool allowFastMove = (g_config.worldMapFastMove || g_config.world_map_fast_move) && CompatGetLevel() == COMPAT_MODERN;
 
     if(SingleCoop > 0)
         SingleCoop = 1;
@@ -259,7 +258,7 @@ void WorldLoop()
     {
         QuickReconnectScreen::g_active = true;
 
-        if(!g_config.NoPauseReconnect && g_compatibility.pause_on_disconnect)
+        if(!g_config.NoPauseReconnect && g_config.pause_on_disconnect)
             PauseGame(PauseCode::PauseScreen, 0);
     }
 
@@ -401,7 +400,7 @@ void WorldLoop()
             if(Player[i].Controls.Start && Player[i].UnStart)
                 PauseGame(PauseCode::PauseScreen, 0);
             // only allow P1 to pause if multiplayer pause controls disabled
-            if(!g_compatibility.multiplayer_pause_controls)
+            if(!g_config.multiplayer_pause_controls)
                 break;
         }
 

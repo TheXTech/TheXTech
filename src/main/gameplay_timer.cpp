@@ -31,7 +31,7 @@
 #include "game_main.h"
 #include "globals.h"
 #include "presetup.h"
-#include "compat.h"
+#include "config.h"
 
 #include "menu_main.h"
 
@@ -130,7 +130,7 @@ void GameplayTimer::updateColorSpin(float delta)
 void GameplayTimer::updateAllowBlink()
 {
     int effectBlink = (m_blinkEffect == SPEEDRUN_EFFECT_BLINK_UNDEFINED) ?
-                          g_compatibility.speedrun_blink_effect :
+                          g_config.speedrun_blink_effect :
                           m_blinkEffect;
 
     switch(effectBlink)

@@ -20,7 +20,7 @@
 
 #include "../globals.h"
 #include "../game_main.h"
-#include "../compat.h"
+#include "config.h"
 #include "speedrunner.h"
 #ifdef THEXTECH_ENABLE_LUNA_AUTOCODE
 #include "../script/luna/lunavarbank.h"
@@ -359,7 +359,7 @@ void LoadGame()
     curWorldMusic = int(sav.musicID);
     curWorldMusicFile = sav.musicFile;
 
-    if(g_compatibility.enable_last_warp_hub_resume)
+    if(g_config.enable_last_warp_hub_resume)
     {
         ReturnWarp = int(sav.last_hub_warp);
         FileRecentSubHubLevel = sav.last_hub_level_file;

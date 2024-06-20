@@ -31,7 +31,6 @@
 #include "collision.h"
 #include "editor.h"
 #include "blocks.h"
-#include "compat.h"
 #include "controls.h"
 #include "config.h"
 #include "main/trees.h"
@@ -54,7 +53,7 @@ double NPCPlayerTargetDist(const NPC_t& npc, const Player_t& player)
 {
     double dx = (npc.Location.X + npc.Location.Width / 2) - (player.Location.X + player.Location.Width / 2);
 
-    if(g_compatibility.fix_multiplayer_targeting)
+    if(g_config.fix_multiplayer_targeting)
     {
         double dy = (npc.Location.Y + npc.Location.Height / 2) - (player.Location.Y + player.Location.Height / 2);
         return (dx * dx) + (dy * dy);
@@ -168,7 +167,7 @@ void Deactivate(int A)
             NPC[A].Pinched = PinchedInfo_t();
 
             // new-added logic: if CURRENTLY offscreen for all vScreens, allow it to reset
-            if(g_compatibility.fix_frame_perfect_despawn && !FreezeNPCs)
+            if(g_config.fix_frame_perfect_despawn && !FreezeNPCs)
             {
                 bool hit = false;
 
@@ -418,7 +417,7 @@ void SkullRide(int A, bool reEnable)
     Location_t loc = NPC[A].Location;
     loc.Width += 16;
     loc.X -= 8;
-    if(g_compatibility.fix_skull_raft) // Detect by height in condition skull ruft cells were on slopes
+    if(g_config.fix_skull_raft) // Detect by height in condition skull ruft cells were on slopes
     {
         loc.Height += 30;
         loc.Y -= 15;
@@ -472,7 +471,7 @@ void SkullRide(int A, bool reEnable)
         loc.Width += 16;
         loc.X -= 8;
 
-        if(g_compatibility.fix_skull_raft) // Detect by height in condition skull ruft cells were on slopes
+        if(g_config.fix_skull_raft) // Detect by height in condition skull ruft cells were on slopes
         {
             loc.Height += 30;
             loc.Y -= 15;
@@ -1110,7 +1109,7 @@ void NPCSpecial(int A)
     {
         if(npc.Special == 0)
         {
-            if(!g_compatibility.fix_bat_start_while_inactive || npc.Active)
+            if(!g_config.fix_bat_start_while_inactive || npc.Active)
             {
                 for(int i = 1; i <= numPlayers; i++)
                 {
@@ -1203,7 +1202,7 @@ void NPCSpecial(int A)
             do
             {
                 // COMPAT BUGFIX. Should be iRand(numPlayers) + 1
-                int i = (g_compatibility.fix_multiplayer_targeting) ? (iRand(numPlayers) + 1) : (iRand(1) * numPlayers + 1); // always 1
+                int i = (g_config.fix_multiplayer_targeting) ? (iRand(numPlayers) + 1) : (iRand(1) * numPlayers + 1); // always 1
                 if(!Player[i].Dead && Player[i].Section == npc.Section && Player[i].TimeToLive == 0)
                     npc.Special5 = i;
                 C += 1;
@@ -1341,7 +1340,7 @@ void NPCSpecial(int A)
             do
             {
                 // COMPAT BUGFIX. Should be iRand(numPlayers) + 1
-                int i = (g_compatibility.fix_multiplayer_targeting) ? (iRand(numPlayers) + 1) : (iRand(1) * numPlayers + 1); // always 1
+                int i = (g_config.fix_multiplayer_targeting) ? (iRand(numPlayers) + 1) : (iRand(1) * numPlayers + 1); // always 1
                 // should be int i = iRand(numPlayers) + 1;
                 if(!Player[i].Dead && Player[i].Section == npc.Section && Player[i].TimeToLive == 0)
                     npc.Special5 = i;
@@ -1494,7 +1493,7 @@ void NPCSpecial(int A)
             do
             {
                 // COMPAT BUGFIX. Should be iRand(numPlayers) + 1
-                int i = (g_compatibility.fix_multiplayer_targeting) ? (iRand(numPlayers) + 1) : (iRand(1) * numPlayers + 1); // always 1
+                int i = (g_config.fix_multiplayer_targeting) ? (iRand(numPlayers) + 1) : (iRand(1) * numPlayers + 1); // always 1
                 if(!Player[i].Dead && Player[i].Section == npc.Section && Player[i].TimeToLive == 0)
                     npc.Special5 = i;
                 C += 1;
@@ -2596,7 +2595,7 @@ void NPCSpecial(int A)
             }
 
             // this code ran unconditionally in SMBX 1.3
-            if(!g_compatibility.fix_platforms_acceleration || !pausePlatforms) // Keep zeroed speed when player required the pause of the move effect
+            if(!g_config.fix_platforms_acceleration || !pausePlatforms) // Keep zeroed speed when player required the pause of the move effect
             {
                 npc.Location.SpeedY = npc.Special;
                 npc.Location.SpeedX = npc.Special2;
@@ -2747,7 +2746,7 @@ void NPCSpecial(int A)
 
             // this code ran unconditionally in SMBX 1.3
             // it does not run in modern mode so that the Special / Special2 keep the speed from before the pause
-            if(!g_compatibility.fix_platforms_acceleration || !pausePlatforms)
+            if(!g_config.fix_platforms_acceleration || !pausePlatforms)
             {
                 npc.Special = npc.Location.SpeedY;
                 npc.Special2 = npc.Location.SpeedX;
@@ -2756,7 +2755,7 @@ void NPCSpecial(int A)
             // NEW: add a terminal velocity for the platforms in modern mode
             if(npc.Special > 16)
             {
-                if(g_compatibility.fix_platforms_acceleration)
+                if(g_config.fix_platforms_acceleration)
                     npc.Special = 16;
 
                 // in either mode, try to "cancel" the NPC once it has fallen below everything
@@ -3909,7 +3908,7 @@ void SpecialNPC(int A)
                 NPC[A].Location.Y -= 1.5;
                 if(NPC[A].Special >= NPC[A]->THeight * 0.65 + 1)
                 {
-                    if(g_compatibility.fix_plant_wobble)
+                    if(g_config.fix_plant_wobble)
                     {
                         NPC[A].Location.Y = vb6Round(NPC[A].Location.Y);
                         NPC[A].Location.Height = NPC[A]->THeight;
@@ -4013,7 +4012,7 @@ void SpecialNPC(int A)
                 NPC[A].Location.Height += 1.5;
                 if(NPC[A].Special >= NPC[A]->THeight * 0.65 + 1)
                 {
-                    if(g_compatibility.fix_plant_wobble)
+                    if(g_config.fix_plant_wobble)
                         NPC[A].Location.Height = NPC[A]->THeight;
 
                     NPC[A].Special2 = 2;
@@ -4038,7 +4037,7 @@ void SpecialNPC(int A)
                 NPC[A].Location.Height -= 1.5;
                 if(NPC[A].Special >= NPC[A]->THeight * 0.65 + 1)
                 {
-                    if(g_compatibility.fix_plant_wobble)
+                    if(g_config.fix_plant_wobble)
                         NPC[A].Location.Height = 0;
 
                     NPC[A].Special2 = 4;
@@ -4096,7 +4095,7 @@ void SpecialNPC(int A)
 
                 if(NPC[A].Special >= NPC[A]->TWidth * 0.65 + 1)
                 {
-                    if(g_compatibility.fix_plant_wobble)
+                    if(g_config.fix_plant_wobble)
                     {
                         NPC[A].Location.Width = NPC[A]->TWidth;
                         NPCQueues::Unchecked.push_back(A);
@@ -4129,7 +4128,7 @@ void SpecialNPC(int A)
                 {
                     NPC[A].Special2 = 4;
 
-                    if(g_compatibility.fix_plant_wobble)
+                    if(g_config.fix_plant_wobble)
                     {
                         NPC[A].Location.Width = 0;
                         NPCQueues::Unchecked.push_back(A);
@@ -4834,7 +4833,7 @@ void SpecialNPC(int A)
 
             // C is the targeted player
 
-            if(g_compatibility.modern_npc_camera_logic)
+            if(g_config.modern_npc_camera_logic)
                 D = vScreenIdxByPlayer_canonical(C);
             else
             {
@@ -5402,7 +5401,7 @@ void SpecialNPC(int A)
 
             // C is the targeted player
 
-            if(g_compatibility.modern_npc_camera_logic)
+            if(g_config.modern_npc_camera_logic)
                 D = vScreenIdxByPlayer_canonical(C);
             else
             {

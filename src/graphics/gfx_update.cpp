@@ -41,7 +41,6 @@
 #include "../main/screen_quickreconnect.h"
 #include "../main/screen_textentry.h"
 #include "../main/cheat_code.h"
-#include "../compat.h"
 #include "../config.h"
 #include "../game_main.h"
 #include "../main/game_globals.h"
@@ -1149,7 +1148,7 @@ void ModernNPCScreenLogic(Screen_t& screen, int vscreen_i, bool fill_draw_queue,
                    ForcedControls
                 || LevelMacro != LEVELMACRO_OFF
                 || qScreen_canonical
-                || !g_compatibility.dynamic_camera_logic
+                || !g_config.dynamic_camera_logic
                 || NPC_MustBeCanonical(A)
             )
                 can_activate = onscreen_canonical;
@@ -1415,7 +1414,7 @@ void UpdateGraphicsLogic(bool Do_FrameSkip)
     // mark the last-frame reset state of NPCs that may have Reset[1] or Reset[2] set to false, and clear their this-frame reset state
     //     Reset[1] could have been set by the last frame's modern NPC logic, or by external code
     //     Reset[2] could only have been set by external code
-    if(g_compatibility.modern_npc_camera_logic)
+    if(g_config.modern_npc_camera_logic)
     {
         for(NPC_t& n : s_NoReset_NPCs_LastFrame)
         {
@@ -1451,7 +1450,7 @@ void UpdateGraphicsLogic(bool Do_FrameSkip)
                     continue_qScreen_canonical |= Update_qScreen(Z_i);
 
                     // the original code was badly written and made THIS happen (always exactly one frame of qScreen in 2P mode)
-                    if(i >= 1 && !g_compatibility.modern_section_change)
+                    if(i >= 1 && !g_config.modern_section_change)
                         continue_qScreen_canonical = false;
                 }
             }
@@ -1484,11 +1483,11 @@ void UpdateGraphicsLogic(bool Do_FrameSkip)
             }
 
             // the original code was badly written and made THIS happen (always exactly one frame of qScreen in 2P mode)
-            if(Z == 2 && !g_compatibility.modern_section_change)
+            if(Z == 2 && !g_config.modern_section_change)
                 continue_qScreen = false;
 
             // noturningback
-            if(!LevelEditor && NoTurnBack[Player[plr_Z].Section] && g_compatibility.allow_multires)
+            if(!LevelEditor && NoTurnBack[Player[plr_Z].Section] && g_config.allow_multires)
             {
                 // goal: find canonical vScreen currently on this section that is the furthest left
                 // only do anything with the last vScreen (of a Visible screen) in the section
@@ -1639,7 +1638,7 @@ void UpdateGraphicsLogic(bool Do_FrameSkip)
             // we'll check the NPCs and do some logic for the game,
             if(!LevelEditor)
             {
-                if(g_compatibility.modern_npc_camera_logic)
+                if(g_config.modern_npc_camera_logic)
                     ModernNPCScreenLogic(screen, vscreen_i, fill_draw_queue, NPC_Draw_Queue_p);
                 else if(Z <= 2)
                     ClassicNPCScreenLogic(Z, numScreens, fill_draw_queue, NPC_Draw_Queue_p);
@@ -1709,14 +1708,14 @@ void UpdateGraphicsLogic(bool Do_FrameSkip)
     }
 
     // clear the last-frame reset state of NPCs
-    if(g_compatibility.modern_npc_camera_logic)
+    if(g_config.modern_npc_camera_logic)
     {
         for(NPC_t& n : s_NoReset_NPCs_LastFrame)
             n.Reset[2] = true;
     }
 
     // use screen-shake to indicate if invisible screen is currently causing qScreen
-    if(g_compatibility.allow_multires)
+    if(g_config.allow_multires)
     {
         // TODO: do loop over visible screens here once s_shakeScreen, s_forcedShakeScreen, and continue_qScreen_local are separated by screen
 
@@ -2149,7 +2148,7 @@ void UpdateGraphicsScreen(Screen_t& screen)
                 }
             }
             // fix a graphical SMBX64 bug where the draw width and frame stride were incorrect
-            else if(NPC[A]->WidthGFX != 0 && NPC[A].Effect == NPCEFF_EMERGE_UP && g_compatibility.fix_visual_bugs)
+            else if(NPC[A]->WidthGFX != 0 && NPC[A].Effect == NPCEFF_EMERGE_UP && g_config.fix_visual_bugs)
             {
                 XRender::renderTexture(camX + NPC[A].Location.X + NPC[A]->FrameOffsetX - NPC[A]->WidthGFX / 2.0 + NPC[A].Location.Width / 2.0, camY + NPC[A].Location.Y + NPC[A]->FrameOffsetY, NPC[A]->WidthGFX, NPC[A].Location.Height, GFXNPC[NPC[A].Type], 0, NPC[A].Frame * NPC[A]->HeightGFX, cn);
             }

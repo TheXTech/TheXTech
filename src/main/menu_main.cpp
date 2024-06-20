@@ -54,7 +54,6 @@
 #include "../core/events.h"
 #include "../controls.h"
 #include "../config.h"
-#include "../compat.h"
 #include "level_file.h"
 #include "world_file.h"
 #include "pge_delay.h"

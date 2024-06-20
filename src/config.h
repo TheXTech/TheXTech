@@ -24,7 +24,9 @@
 
 #include <string>
 
-extern struct Config_t
+#include "compat.h"
+
+extern struct Config_t : Compatibility_t
 {
     /* ---- Main ----*/
 

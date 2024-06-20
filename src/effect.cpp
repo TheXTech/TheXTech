@@ -19,7 +19,7 @@
  */
 
 #include "globals.h"
-#include "compat.h"
+#include "config.h"
 #include "effect.h"
 #include "npc.h"
 #include "npc_id.h"
@@ -1123,7 +1123,7 @@ void NewEffect(int A, const Location_t &Location, float Direction, int NewNpc, b
                 {
                     // note: NOT a reference
                     auto t = b.Location;
-                    if(t.Height > 8 && g_compatibility.fix_submerged_splash_effect)
+                    if(t.Height > 8 && g_config.fix_submerged_splash_effect)
                         t.Height = 8; // Limit the height
                     if(CheckCollision(ne.Location, t))
                     {

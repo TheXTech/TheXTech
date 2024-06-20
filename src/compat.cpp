@@ -27,7 +27,6 @@
 #include "Graphics/graphics_funcs.h"
 #include "globals.h"
 #include "global_dirs.h"
-#include "compat.h"
 #include "change_res.h"
 #include "main/speedrunner.h"
 #include "main/presetup.h"
@@ -44,8 +43,6 @@ static int s_cur_load_iter = 0;
 static std::unordered_map<std::string, int> s_first_load_iter;
 
 static int s_compatLevel = COMPAT_MODERN;
-
-Compatibility_t g_compatibility;
 
 static void compatInit(Compatibility_t &c)
 {
@@ -478,17 +475,17 @@ void LoadCustomCompat()
     // Level-wide custom player setup
     customCompat = g_dirCustom.resolveFileCaseExistsAbs("compat.ini");
 
-    compatInit(g_compatibility);
+    compatInit(g_config);
 
     if(!episodeCompat.empty())
-        loadCompatIni(g_compatibility, episodeCompat);
+        loadCompatIni(g_config, episodeCompat);
     if(!customCompat.empty())
-        loadCompatIni(g_compatibility, customCompat);
+        loadCompatIni(g_config, customCompat);
 
 #ifndef SDLRPOXY_NULL
-    GraphicsHelps::setBitBlitBG((uint8_t)g_compatibility.bitblit_background_colour[0],
-                                (uint8_t)g_compatibility.bitblit_background_colour[1],
-                                (uint8_t)g_compatibility.bitblit_background_colour[2]);
+    GraphicsHelps::setBitBlitBG((uint8_t)g_config.bitblit_background_colour[0],
+                                (uint8_t)g_config.bitblit_background_colour[1],
+                                (uint8_t)g_config.bitblit_background_colour[2]);
 #endif
 
     UpdateInternalRes();
@@ -498,7 +495,7 @@ void LoadCustomCompat()
 
 void ResetCompat()
 {
-    compatInit(g_compatibility);
+    compatInit(g_config);
 
 #ifndef SDLRPOXY_NULL
     GraphicsHelps::resetBitBlitBG();

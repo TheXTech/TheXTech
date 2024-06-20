@@ -28,7 +28,6 @@
 #include "../graphics.h"
 #include "../collision.h"
 #include "../player.h"
-#include "../compat.h"
 #include "../config.h"
 #include "../sound.h"
 #include "../main/speedrunner.h"
@@ -76,12 +75,12 @@ static inline int computeStarsShowingPolicy(int ll, int cur)
     }
 
     // Compatibility settings
-    if(g_compatibility.world_map_stars_show_policy > Compatibility_t::STARS_UNSPECIFIED)
+    if(g_config.world_map_stars_show_policy > Compatibility_t::STARS_UNSPECIFIED)
     {
-        if(g_compatibility.world_map_stars_show_policy == Compatibility_t::STARS_SHOW_COLLECTED_ONLY && cur <= 0)
+        if(g_config.world_map_stars_show_policy == Compatibility_t::STARS_SHOW_COLLECTED_ONLY && cur <= 0)
             return Compatibility_t::STARS_DONT_SHOW;
 
-        return g_compatibility.world_map_stars_show_policy;
+        return g_config.world_map_stars_show_policy;
     }
 
     // Gameplay settings
@@ -667,7 +666,7 @@ void UpdateGraphics2(bool skipRepaint)
                 cache_LevelName_H = FontManager::optimizeTextPx(cache_LevelName_Split, max_width, font).h();
             }
 
-            if(g_compatibility.world_map_lvlname_marquee || cache_LevelName_H > vScreen[Z].ScreenTop - 21 - 8)
+            if(g_config.world_map_lvlname_marquee || cache_LevelName_H > vScreen[Z].ScreenTop - 21 - 8)
             {
                 SuperPrintMarquee(WorldLevel[WorldPlayer[1].LevelIndex].LevelName, 2, lnlx, vScreen[Z].ScreenTop - 21, marquee_spec, marquee_state);
                 marquee_state.advance(marquee_spec);

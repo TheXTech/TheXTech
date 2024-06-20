@@ -21,7 +21,7 @@
 #include <algorithm>
 
 #include "layers.h"
-#include "compat.h"
+#include "config.h"
 
 #include "main/block_table.h"
 #include "main/block_table.hpp"
@@ -140,7 +140,7 @@ struct TableInterface
         //   (such as, when an item is trapped inside a wall during !BlocksSorted)
         // This should be fixed for players now.
         // Conversely, there may be cases where this is too much when BlocksSorted is true and an FLBlock query was made.
-        if(g_compatibility.emulate_classic_block_order)
+        if(g_config.emulate_classic_block_order)
         {
             loc.l -= 32;
             loc.r += 32;
@@ -178,7 +178,7 @@ struct TableInterface
 
         if(sort_mode == SORTMODE_COMPAT)
         {
-            if(g_compatibility.emulate_classic_block_order)
+            if(g_config.emulate_classic_block_order)
                 sort_mode = SORTMODE_ID;
             else
                 sort_mode = SORTMODE_LOC;
@@ -382,7 +382,7 @@ void treeTempBlockQuery(std::vector<BaseRef_t>& out,
 
     // NOTE: there are extremely rare cases when these margins are not sufficient for full compatibility
     //   (such as, when an item is trapped inside a wall during !BlocksSorted)
-    if(g_compatibility.emulate_classic_block_order)
+    if(g_config.emulate_classic_block_order)
     {
         loc.l -= 32;
         loc.r += 32;
@@ -407,7 +407,7 @@ void treeTempBlockQuery(std::vector<BaseRef_t>& out,
 
     if(sort_mode == SORTMODE_COMPAT)
     {
-        if(g_compatibility.emulate_classic_block_order)
+        if(g_config.emulate_classic_block_order)
             sort_mode = SORTMODE_ID;
         else
             sort_mode = SORTMODE_LOC;
@@ -458,7 +458,7 @@ TreeResult_Sentinel<BlockRef_t> treeBlockQuery(const Location_t &_loc,
 
     // NOTE: there are extremely rare cases when these margins are not sufficient for full compatibility
     //   (such as, when an item is trapped inside a wall during !BlocksSorted)
-    if(g_compatibility.emulate_classic_block_order)
+    if(g_config.emulate_classic_block_order)
     {
         loc.X -= 32;
         loc.Y -= 32;
@@ -508,7 +508,7 @@ TreeResult_Sentinel<BlockRef_t> treeBlockQuery(const Location_t &_loc,
 
     if(sort_mode == SORTMODE_COMPAT)
     {
-        if(g_compatibility.emulate_classic_block_order)
+        if(g_config.emulate_classic_block_order)
             sort_mode = SORTMODE_ID;
         else
             sort_mode = SORTMODE_LOC;
@@ -646,7 +646,7 @@ void treeNPCQuery(std::vector<BaseRef_t>& out, const Location_t &_loc, int sort_
 
     // NOTE: there are extremely rare cases when these margins are not sufficient for full compatibility
     //   (such as, when an item is trapped inside a wall during !BlocksSorted)
-    if(g_compatibility.emulate_classic_block_order)
+    if(g_config.emulate_classic_block_order)
     {
         loc.l -= 32;
         loc.r += 32;

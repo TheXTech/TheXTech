@@ -31,7 +31,7 @@
 #include "../load_gfx.h"
 #include "../sound.h"
 #include "../custom.h"
-#include "../compat.h"
+#include "config.h"
 #include "../main/trees.h"
 #include "level_file.h"
 #include "world_file.h"

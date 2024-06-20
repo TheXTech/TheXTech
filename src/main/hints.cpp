@@ -41,7 +41,7 @@
 #include "npc_id.h"
 #include "npc_traits.h"
 #include "npc/npc_queues.h"
-#include "compat.h"
+#include "config.h"
 #include "controls.h"
 #include "graphics.h"
 
@@ -126,7 +126,7 @@ static bool s_purple_pet_present()
 
 static uint8_t s_altrun_pound_applies()
 {
-    if(!g_compatibility.pound_by_alt_run)
+    if(!g_config.pound_by_alt_run)
         return 0;
 
     if(!s_purple_pet_present())
@@ -137,7 +137,7 @@ static uint8_t s_altrun_pound_applies()
 
 static uint8_t s_down_pound_applies()
 {
-    if(g_compatibility.pound_by_alt_run)
+    if(g_config.pound_by_alt_run)
         return 0;
 
     if(!s_purple_pet_present())
@@ -148,7 +148,7 @@ static uint8_t s_down_pound_applies()
 
 static uint8_t s_no_lives_new()
 {
-    if(!g_compatibility.modern_lives_system)
+    if(!g_config.modern_lives_system)
         return 0;
 
     if(g_100s == 0)
@@ -161,7 +161,7 @@ static uint8_t s_no_lives_new()
 
 static uint8_t s_no_lives_old()
 {
-    if(g_compatibility.modern_lives_system)
+    if(g_config.modern_lives_system)
         return 0;
 
     if(Lives == 0)

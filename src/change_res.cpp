@@ -20,7 +20,6 @@
 
 #include "globals.h"
 #include "video.h"
-#include "compat.h"
 #include "config.h"
 #include "change_res.h"
 #include "load_gfx.h"
@@ -88,7 +87,7 @@ void UpdateInternalRes()
     int canon_w = 800;
     int canon_h = 600;
 
-    if(!g_compatibility.allow_multires)
+    if(!g_config.allow_multires)
     {
         if((req_w != 0 && req_w < canon_w) || (req_h != 0 && req_h < canon_h))
         {
@@ -185,7 +184,7 @@ void UpdateInternalRes()
         }
 
         // force >800x600 resolution if required
-        if(!g_compatibility.allow_multires)
+        if(!g_config.allow_multires)
         {
             if(int_w < canon_w)
             {
@@ -223,12 +222,12 @@ void UpdateInternalRes()
     }
 
     // DONE: above should tweak render target resolution. This should tweak game's screen resolution.
-    if(g_compatibility.allow_multires && g_compatibility.dynamic_camera_logic)
+    if(g_config.allow_multires && g_config.dynamic_camera_logic)
     {
         l_screen->W = XRender::TargetW;
         l_screen->H = XRender::TargetH;
     }
-    else if(g_compatibility.allow_multires)
+    else if(g_config.allow_multires)
     {
         l_screen->W = SDL_min(XRender::TargetW, canon_w);
         l_screen->H = SDL_min(XRender::TargetH, canon_h);

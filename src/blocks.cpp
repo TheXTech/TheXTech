@@ -37,7 +37,7 @@
 #include "player.h"
 #include "sorting.h"
 #include "layers.h"
-#include "compat.h"
+#include "config.h"
 #include "editor.h"
 #include "game_main.h"
 
@@ -499,7 +499,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
             b.Location.Height = BlockHeight[newBlock];
 
             // Was always set in SMBX64. Doing this check here keeps the easy bonus pickup and prevents movement. -- ds-sloth
-            if(!g_compatibility.fix_restored_block_move || !b.getShrinkResized())
+            if(!g_config.fix_restored_block_move || !b.getShrinkResized())
                 b.Location.Width = BlockWidth[newBlock];
         }
 
@@ -590,7 +590,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
             CharStuff(numNPCs);
 
             // note: minor SMBX64 bugfix, should be nn->TWidth in case nn's type has changed
-            nn.Location.Width = (g_compatibility.fix_npc_emerge_size) ? nn->TWidth : NPCWidth(C);
+            nn.Location.Width = (g_config.fix_npc_emerge_size) ? nn->TWidth : NPCWidth(C);
 
             // bug from ancient 101 case
             if(is_ancient && C == NPCID_FODDER_S3)
@@ -1482,7 +1482,7 @@ void PSwitch(bool enabled)
         {
             bool transform = NPC[A]->IsACoin && NPC[A].coinSwitchBlockType == 0 && !NPC[A].Hidden && NPC[A].Special == 0.0;
 
-            if(NPC[A].Type == NPCID_MEDAL && g_compatibility.fix_special_coin_switch)
+            if(NPC[A].Type == NPCID_MEDAL && g_config.fix_special_coin_switch)
                 transform = false;
 
             if(transform)
@@ -1521,7 +1521,7 @@ void PSwitch(bool enabled)
                     nb.Kill = false;
                     nb.coinSwitchNpcType = NPC[A].Type;
 
-                    if(g_compatibility.fix_switched_block_clipping)
+                    if(g_config.fix_switched_block_clipping)
                     {
                         nb.tempBlockNpcIdx = 0;
                         nb.tempBlockNpcType = NPCID_NULL;
@@ -1553,7 +1553,7 @@ void PSwitch(bool enabled)
         }
 
         // sort them in reverse location order
-        if(g_compatibility.emulate_classic_block_order)
+        if(g_config.emulate_classic_block_order)
         {
             std::sort(PSwitchBlocks.begin(), PSwitchBlocks.end(),
                 [](BaseRef_t a, BaseRef_t b) {
@@ -1622,7 +1622,7 @@ void PSwitch(bool enabled)
         PSwitchBlocks.resize(numConverted);
 
         // return them to reverse index order
-        if(g_compatibility.emulate_classic_block_order)
+        if(g_config.emulate_classic_block_order)
         {
             std::sort(PSwitchBlocks.begin(), PSwitchBlocks.end(),
                 [](BaseRef_t a, BaseRef_t b) {
@@ -1671,7 +1671,7 @@ void PSwitch(bool enabled)
                     nb.Special = 0;
                     nb.Kill = false;
 
-                    if(g_compatibility.fix_switched_block_clipping)
+                    if(g_config.fix_switched_block_clipping)
                     {
                         nb.coinSwitchNpcType = NPCID_NULL;
                         nb.tempBlockNpcIdx = 0;
@@ -1704,7 +1704,7 @@ void PSwitch(bool enabled)
         }
 
         // sort them in reverse location order
-        if(g_compatibility.emulate_classic_block_order)
+        if(g_config.emulate_classic_block_order)
         {
             std::sort(PSwitchBlocks.begin(), PSwitchBlocks.end(),
                 [](BaseRef_t a, BaseRef_t b) {
@@ -1798,7 +1798,7 @@ void PSwitch(bool enabled)
     // SO expensive, can't wait to get rid of this.
     // syncLayersTrees_AllBlocks();
 
-    if(g_compatibility.emulate_classic_block_order)
+    if(g_config.emulate_classic_block_order)
     {
         // Doing this just to replicate some unusual, unpredictable glitches
         // that sometimes occur when blocks' relative order is changing during the level
@@ -1845,7 +1845,7 @@ void PowBlock()
         Screen_t& screen = Screens[screen_i];
 
         // use modern screen iteration bounds
-        if(g_compatibility.allow_multires)
+        if(g_config.allow_multires)
         {
             Z = screen.active_begin() + 1;
             numScreens = screen.active_end();
@@ -1886,7 +1886,7 @@ void PowBlock()
             }
 
             // force-activate coins on the canonical screens
-            if(g_compatibility.allow_multires && screen.is_canonical())
+            if(g_config.allow_multires && screen.is_canonical())
             {
                 for(int A : treeNPCQuery(query_loc, SORTMODE_NONE))
                 {
@@ -1903,7 +1903,7 @@ void PowBlock()
             }
         }
 
-        if(!g_compatibility.allow_multires)
+        if(!g_config.allow_multires)
             break;
     }
 
