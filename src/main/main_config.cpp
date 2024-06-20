@@ -166,19 +166,19 @@ void OpenConfig_preSetup()
         config.endGroup();
 
         config.beginGroup("video");
-        config.readEnum("render", g_config.renderMode, (int)Config_t::RENDER_ACCELERATED_AUTO, renderMode);
-        config.read("vsync", g_config.vSync, (g_config.renderMode == Config_t::RENDER_ACCELERATED_VSYNC_DEPRECATED));
-        config.read("background-work", g_config.allowBgWork, false);
+        config.readEnum("render", g_config.render_mode, (int)Config_t::RENDER_ACCELERATED_AUTO, renderMode);
+        config.read("vsync", g_config.vSync, (g_config.render_mode == Config_t::RENDER_ACCELERATED_VSYNC_DEPRECATED));
+        config.read("background-work", g_config.background_work, false);
         config.read("background-controller-input", g_config.allowBgControllerInput, false);
-        config.read("frame-skip", g_config.enableFrameSkip, true);
-        config.read("show-fps", g_config.showFrameRate, false);
+        config.read("frame-skip", g_config.enable_frameskip, true);
+        config.read("show-fps", g_config.show_fps, false);
 
-        if(g_config.renderMode == Config_t::RENDER_ACCELERATED_VSYNC_DEPRECATED)
-            g_config.renderMode = Config_t::RENDER_ACCELERATED_AUTO;
+        if(g_config.render_mode == Config_t::RENDER_ACCELERATED_VSYNC_DEPRECATED)
+            g_config.render_mode = Config_t::RENDER_ACCELERATED_AUTO;
 
         bool scale_down_all;
         config.read("scale-down-all-textures", scale_down_all, false);
-        config.readEnum("scale-down-textures", g_config.scaleDownTextures, scale_down_all ? (int)Config_t::SCALE_ALL : (int)Config_t::SCALE_SAFE, scaleDownTextures);
+        config.readEnum("scale-down-textures", g_config.scale_down_textures, scale_down_all ? (int)Config_t::SCALE_ALL : (int)Config_t::SCALE_SAFE, scaleDownTextures);
         config.read("internal-width", g_config.InternalW, 800);
         config.read("internal-height", g_config.InternalH, 600);
 
@@ -211,7 +211,7 @@ void OpenConfig_preSetup()
             {"1x", Config_t::SCALE_FIXED_1X},
             {"2x", Config_t::SCALE_FIXED_2X},
         };
-        config.readEnum("scale-mode", g_config.scaleMode, (int)Config_t::SCALE_DYNAMIC_NEAREST, scaleModes);
+        config.readEnum("scale-mode", g_config.scale_mode, (int)Config_t::SCALE_DYNAMIC_NEAREST, scaleModes);
         config.endGroup();
 
 #ifndef THEXTECH_NO_SDL_BUILD
@@ -335,7 +335,7 @@ void OpenConfig()
         config.beginGroup("video");
         config.read("display-controllers", g_drawController, false);
         config.read("show-fails-counter", g_config.show_fails_counter, true);
-        config.readEnum("battery-status", g_config.batteryStatus, (int)Config_t::BATTERY_STATUS_OFF, batteryStatus);
+        config.readEnum("battery-status", g_config.show_battery_status, (int)Config_t::BATTERY_STATUS_OFF, batteryStatus);
         config.readEnum("show-episode-title", g_config.show_episode_title, (int)Config_t::EPISODE_TITLE_OFF, showEpisodeTitle);
         config.endGroup();
 
@@ -469,20 +469,20 @@ void SaveConfig()
             {Config_t::SCALE_ALL, "all"},
         };
 
-        config.setValue("render", renderMode[g_config.renderMode]);
+        config.setValue("render", renderMode[g_config.render_mode]);
         config.setValue("vsync", g_config.vSync);
-        config.setValue("background-work", g_config.allowBgWork);
+        config.setValue("background-work", g_config.background_work);
         config.setValue("show-fails-counter", g_config.show_fails_counter);
         config.setValue("background-controller-input", g_config.allowBgControllerInput);
-        config.setValue("frame-skip", g_config.enableFrameSkip);
-        config.setValue("show-fps", g_config.showFrameRate);
-        config.setValue("scale-down-textures", scaleDownTextures[g_config.scaleDownTextures]);
+        config.setValue("frame-skip", g_config.enable_frameskip);
+        config.setValue("show-fps", g_config.show_fps);
+        config.setValue("scale-down-textures", scaleDownTextures[g_config.scale_down_textures]);
         config.setValue("display-controllers", g_drawController);
-        config.setValue("battery-status", batteryStatus[g_config.batteryStatus]);
+        config.setValue("battery-status", batteryStatus[g_config.show_battery_status]);
         config.setValue("show-episode-title", showEpisodeTitle[g_config.show_episode_title]);
         config.setValue("internal-width", g_config.InternalW);
         config.setValue("internal-height", g_config.InternalH);
-        config.setValue("scale-mode", ScaleMode_strings.at(g_config.scaleMode));
+        config.setValue("scale-mode", ScaleMode_strings.at(g_config.scale_mode));
     }
     config.endGroup();
 

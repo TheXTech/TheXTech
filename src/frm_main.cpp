@@ -316,7 +316,7 @@ bool FrmMain::restartRenderer()
     bool try_gl = false;
 
     CmdLineSetup_t setup;
-    setup.renderType = g_config.renderMode;
+    setup.renderType = g_config.render_mode;
     setup.vSync = g_config.vSync;
 
     if(setup.renderType == Config_t::RENDER_ACCELERATED_AUTO || setup.renderType == Config_t::RENDER_ACCELERATED_OPENGL || setup.renderType == Config_t::RENDER_ACCELERATED_OPENGL_ES || setup.renderType == Config_t::RENDER_ACCELERATED_OPENGL_LEGACY || setup.renderType == Config_t::RENDER_ACCELERATED_OPENGL_ES_LEGACY)
@@ -385,7 +385,7 @@ bool FrmMain::restartRenderer()
     g_render = m_render.get();
 
     CmdLineSetup_t setup;
-    setup.renderType = g_config.renderMode;
+    setup.renderType = g_config.render_mode;
     setup.vSync = g_config.vSync;
 
     res = m_render->initRender(setup, reinterpret_cast<WindowUsed*>(g_window)->getWindow());

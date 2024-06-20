@@ -603,7 +603,7 @@ void AbstractRender_t::lazyLoad(StdPicture &target)
     // target.h = static_cast<int>(h);
 
     bool shrink2x;
-    switch(g_config.scaleDownTextures)
+    switch(g_config.scale_down_textures)
     {
     case Config_t::SCALE_ALL:
         // only do it if the texture isn't already downscaled

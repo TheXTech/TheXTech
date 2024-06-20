@@ -537,10 +537,10 @@ int main(int argc, char**argv)
         else if(switchFrameSkip.isSet())
             setup.frameSkip = switchFrameSkip.getValue();
         else
-            setup.frameSkip = g_config.enableFrameSkip;
+            setup.frameSkip = g_config.enable_frameskip;
 
         setup.noSound   = switchNoSound.isSet() ? switchNoSound.getValue() : g_audioSetup.disableSound;
-        setup.neverPause = switchNoPause.isSet() ? switchNoPause.getValue() : g_config.allowBgWork;
+        setup.neverPause = switchNoPause.isSet() ? switchNoPause.getValue() : g_config.background_work;
         setup.allowBgInput = switchBgInput.isSet() ? switchBgInput.getValue() : g_config.allowBgControllerInput;
         setup.vSync = switchVSync.isSet() ? switchVSync.getValue() : g_config.vSync;
 
@@ -582,7 +582,7 @@ int main(int argc, char**argv)
         }
         else
         {
-            setup.renderType = g_config.renderMode;
+            setup.renderType = g_config.render_mode;
         }
 
         setup.testLevel = testLevel.getValue();
@@ -625,7 +625,7 @@ int main(int argc, char**argv)
         setup.testGrabAll = switchTestGrabAll.getValue();
         setup.testShowFPS = switchTestShowFPS.isSet() ?
                                 switchTestShowFPS.getValue() :
-                                g_config.showFrameRate;
+                                g_config.show_fps;
         setup.testMaxFPS = switchTestMaxFPS.getValue();
         setup.testMagicHand = switchTestMagicHand.getValue();
         setup.testEditor = switchTestEditor.getValue();
@@ -685,7 +685,7 @@ int main(int argc, char**argv)
                                         g_drawController;
 
         if(showBatteryStatus.isSet() && IF_INRANGE(showBatteryStatus.getValue(), 1, 4))
-            g_config.batteryStatus = showBatteryStatus.getValue();
+            g_config.show_battery_status = showBatteryStatus.getValue();
 
         if(setup.speedRunnerMode >= 1) // Always show FPS and don't pause the game work when focusing other windows
         {

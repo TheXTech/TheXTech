@@ -67,25 +67,25 @@ struct VideoSettings_t
     };
 
     //! Render mode
-    int    renderMode = RENDER_ACCELERATED_AUTO;
+    int    render_mode = RENDER_ACCELERATED_AUTO;
     //! The currently running render mode
-    int    renderModeObtained = RENDER_ACCELERATED_AUTO;
+    int    render_mode_obtained = RENDER_ACCELERATED_AUTO;
     //! Attempt to enable vSync
     bool   vSync = false;
     //! Render scaling mode
-    int    scaleMode = SCALE_DYNAMIC_NEAREST;
+    int    scale_mode = SCALE_DYNAMIC_NEAREST;
     //! Device battery status indicator
-    int    batteryStatus = BATTERY_STATUS_OFF;
+    int    show_battery_status = BATTERY_STATUS_OFF;
     //! Allow game to work when window is not active
-    bool   allowBgWork = false;
+    bool   background_work = false;
     //! Allow background input handling for game controllers
     bool   allowBgControllerInput = false;
     //! Enable frameskip
-    bool   enableFrameSkip = true;
+    bool   enable_frameskip = true;
     //! Show FPS counter
-    bool   showFrameRate = false;
+    bool   show_fps = false;
     //! 2x scale down all textures to reduce the memory usage
-    int    scaleDownTextures = SCALE_SAFE;
+    int    scale_down_textures = SCALE_SAFE;
 };
 
 static const std::unordered_map<int, std::string> ScaleMode_strings =

@@ -105,7 +105,7 @@ void RenderGL::try_init_gl(SDL_GLContext& context, SDL_Window* window, GLint pro
     context = SDL_GL_CreateContext(window);
 
     if(context)
-        g_config.renderModeObtained = mode;
+        g_config.render_mode_obtained = mode;
     else
         pLogInfo("Render GL: context creation failed.");
 }

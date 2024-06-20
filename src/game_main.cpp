@@ -371,7 +371,7 @@ int GameMain(const CmdLineSetup_t &setup)
     LoadingInProcess = true;
 
     ShowFPS = setup.testShowFPS;
-    MaxFPS = setup.testMaxFPS; // || (g_config.renderModeObtained == RENDER_ACCELERATED_VSYNC);
+    MaxFPS = setup.testMaxFPS; // || (g_config.render_mode_obtained == RENDER_ACCELERATED_VSYNC);
 
     OpenConfig();
 

@@ -731,7 +731,7 @@ void repaint()
 
     // leave the draw context and wait for vblank...
     g_microStats.start_sleep();
-    // if(g_config.renderMode == RENDER_ACCELERATED_VSYNC)
+    // if(g_config.render_mode == RENDER_ACCELERATED_VSYNC)
     //     C3D_FrameSync();
 
     g_microStats.start_task(MicroStats::Graphics);
@@ -784,7 +784,7 @@ void minport_ApplyPhysCoords()
 
     g_screen_swapped = should_swap_screen();
 
-    GPU_TEXTURE_FILTER_PARAM filter = (g_config.scaleMode == Config_t::SCALE_DYNAMIC_LINEAR || g_config.scaleMode == Config_t::SCALE_FIXED_05X)
+    GPU_TEXTURE_FILTER_PARAM filter = (g_config.scale_mode == Config_t::SCALE_DYNAMIC_LINEAR || g_config.scale_mode == Config_t::SCALE_FIXED_05X)
         ? GPU_LINEAR
         : GPU_NEAREST;
 
