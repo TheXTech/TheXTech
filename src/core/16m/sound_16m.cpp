@@ -119,11 +119,17 @@ void QuitMixerX()
     g_mixerLoaded = false;
 }
 
-void UnloadSound()
+void RestartMixerX()
 {
     QuitMixerX();
     InitMixerX();
 }
+
+void UnloadSound()
+{
+    RestartMixerX();
+}
+
 
 void InitSoundDefaults()
 {
@@ -378,6 +384,11 @@ void FadeOutMusic(int ms)
     s_MusicSetupFade(0, ms);
 }
 
+
+void UpdateMusicVolume()
+{
+    // currently unused
+}
 
 void PlayInitSound()
 {

@@ -170,6 +170,8 @@ void InitSoundDefaults();
 
 // Public Sub InitMixerX()
 void InitMixerX();
+// Public Sub RestartMixerX()
+void RestartMixerX();
 // Public Sub QuitMixerX()
 void QuitMixerX();
 // Public Sub SetMusicVolume(Alias As String, Volume As Long)
@@ -247,6 +249,8 @@ void FadeOutMusic(int ms);
 void LoadCustomSound();
 // EXTRA: Unload custom-loaded music and sounds, and restore originals
 void UnloadCustomSound();
+
+void UpdateMusicVolume();
 
 void PreloadExtSound(const std::string &path);
 void UnloadExtSounds();

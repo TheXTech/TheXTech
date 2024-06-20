@@ -21,14 +21,17 @@
 #include "sdl_proxy/sdl_stdinc.h"
 #include "sdl_proxy/sdl_atomic.h"
 #include "sdl_proxy/sdl_assert.h"
+#include "sdl_proxy/sdl_timer.h"
 #include "sdl_proxy/mixer.h"
 
 #include "globals.h"
+#include "config.h"
 #include "global_dirs.h"
 #include "frame_timer.h"
 
 #include "load_gfx.h"
 #include "core/msgbox.h"
+#include "main/screen_progress.h"
 
 #include "sound.h"
 
@@ -104,6 +107,10 @@ static AudioSetup_t s_audioSetupObtained;
 
 static Mix_Music *g_curMusic = nullptr;
 static bool g_mixerLoaded = false;
+
+//! most recent argument to StartMusic. Could be a world map music ID or a section index.
+static constexpr int s_null_music = -5;
+static int s_recentMusicA = s_null_music;
 
 static int g_customLvlMusicId = 24;
 static int g_customWldMusicId = 17;
@@ -251,6 +258,9 @@ void InitSoundDefaults()
 
 void InitMixerX()
 {
+    if(!g_config.audio_enable)
+        return;
+
     int ret;
     const int initFlags = MIX_INIT_MID | MIX_INIT_MOD | MIX_INIT_FLAC | MIX_INIT_OGG | MIX_INIT_OPUS | MIX_INIT_MP3;
 
@@ -362,6 +372,24 @@ void InitMixerX()
     }
 }
 
+void RestartMixerX()
+{
+    int recent_music = s_recentMusicA;
+
+    if(g_mixerLoaded && !musicPlaying)
+        recent_music = s_null_music;
+
+    UnloadSound();
+    QuitMixerX();
+
+    InitMixerX();
+    InitSound();
+    LoadCustomSound();
+
+    if(recent_music != s_null_music)
+        StartMusic(recent_music);
+}
+
 void QuitMixerX()
 {
     if(!g_mixerLoaded)
@@ -465,7 +493,8 @@ static void AddSfx(SoundScope root,
 
     if(!f.empty() || isSilent)
     {
-        LoaderUpdateDebugString(fmt::format_ne("sound {0}", f));
+        if(LoadingInProcess)
+            LoaderUpdateDebugString(fmt::format_ne("sound {0}", f));
 
         if(isCustom)
         {
@@ -813,6 +842,10 @@ void StartMusic(int A, int fadeInMs)
         // Keep world map music being remembered when sound disabled
         if((LevelSelect || WorldEditor) && !GameMenu && !GameOutro)
             curWorldMusic = A;
+
+        s_recentMusicA = A;
+        musicPlaying = true;
+
         return;
     }
 
@@ -911,6 +944,7 @@ void StartMusic(int A, int fadeInMs)
         musicName = std::move(mus);
     }
 
+    s_recentMusicA = A;
     musicPlaying = true;
 }
 
@@ -946,6 +980,7 @@ void StopMusic()
     }
     g_curMusic = nullptr;
     musicPlaying = false;
+    s_recentMusicA = s_null_music;
     g_stats.currentMusic.clear();
     g_stats.currentMusicFile.clear();
 }
@@ -959,6 +994,7 @@ void FadeOutMusic(int ms)
     if(g_curMusic)
         Mix_FadeOutMusicStream(g_curMusic, ms);
     musicPlaying = false;
+    s_recentMusicA = s_null_music;
 }
 
 void UpdateMusicVolume()
@@ -967,7 +1003,14 @@ void UpdateMusicVolume()
         return;
 
     if(g_curMusic)
-        Mix_VolumeMusicStream(g_curMusic, s_musicDefaultVolume * s_mus_vol_scale / 100);
+    {
+        if((int)s_mus_vol_scale == 0)
+            StartMusic(s_recentMusicA); // will actually STOP it
+        else
+            Mix_VolumeMusicStream(g_curMusic, s_musicDefaultVolume * s_mus_vol_scale / 100);
+    }
+    else if(s_recentMusicA != s_null_music)
+        StartMusic(s_recentMusicA); // will restart it
 }
 
 void PlayInitSound()
@@ -1020,7 +1063,8 @@ static void loadMusicIni(SoundScope root, const std::string &path, bool isLoadin
         musicSetup.read("world-custom-music-id", g_customWldMusicId, 0);
         musicSetup.endGroup();
 
-        UpdateLoad();
+        if(LoadingInProcess)
+            UpdateLoad();
     }
 
     for(unsigned int i = 1; i <= g_totalMusicLevel; ++i)
@@ -1030,8 +1074,9 @@ static void loadMusicIni(SoundScope root, const std::string &path, bool isLoadin
         AddMusic(root, musicSetup, alias, group, 52);
     }
 
-    if(!isLoadingCustom)
+    if(!isLoadingCustom && LoadingInProcess)
         UpdateLoad();
+
     for(unsigned int i = 1; i <= g_totalMusicWorld; ++i)
     {
         std::string alias = fmt::format_ne("wmusic{0}", i);
@@ -1039,8 +1084,9 @@ static void loadMusicIni(SoundScope root, const std::string &path, bool isLoadin
         AddMusic(root, musicSetup, alias, group, 64);
     }
 
-    if(!isLoadingCustom)
+    if(!isLoadingCustom && LoadingInProcess)
         UpdateLoad();
+
     for(unsigned int i = 1; i <= g_totalMusicSpecial; ++i)
     {
         std::string alias = fmt::format_ne("smusic{0}", i);
@@ -1173,15 +1219,21 @@ void InitSound()
     if(!g_mixerLoaded)
         return;
 
+    uint32_t start_time = SDL_GetTicks();
+
     MusicRoot = AppPath + "music/";
     SfxRoot = AppPath + "sound/";
 
     musicIni = AppPath + "music.ini";
     sfxIni = AppPath + "sounds.ini";
 
-    LoaderUpdateDebugString("Sound configs");
 
-    UpdateLoad();
+    if(LoadingInProcess)
+    {
+        LoaderUpdateDebugString("Sound configs");
+        UpdateLoad();
+    }
+
     if(!Files::fileExists(musicIni) && !Files::fileExists(sfxIni))
     {
         pLogWarning("music.ini and sounds.ini are missing");
@@ -1209,7 +1261,11 @@ void InitSound()
 
     loadMusicIni(SoundScope::global, musicIni, false);
 
-    UpdateLoad();
+    if(LoadingInProcess)
+        UpdateLoad();
+    else
+        IndicateProgress(start_time, 0.01, "");
+
     IniProcessing sounds(sfxIni);
     sounds.beginGroup("sound-main");
     sounds.read("total", g_totalSounds, 0);
@@ -1228,18 +1284,28 @@ void InitSound()
     else
         playerHammerSFX = SFX_Fireball;
 
-    UpdateLoad();
+    if(LoadingInProcess)
+        UpdateLoad();
+    else
+        IndicateProgress(start_time, 0.75 / g_totalSounds, "");
+
     for(unsigned int i = 1; i <= g_totalSounds; ++i)
     {
         std::string alias = fmt::format_ne("sound{0}", i);
         std::string group = fmt::format_ne("sound-{0}", i);
         AddSfx(SoundScope::global, sounds, alias, group);
 
+        if(!LoadingInProcess)
+            IndicateProgress(start_time, (double)i / g_totalSounds, "");
 #ifdef PGE_NO_THREADING
-        UpdateLoad();
+        else
+            UpdateLoad();
 #endif
     }
-    UpdateLoad();
+
+    if(LoadingInProcess)
+        UpdateLoad();
+
     Mix_ReserveChannels(g_reservedChannels);
 
     if(g_errorsSfx > 0)
