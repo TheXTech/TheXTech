@@ -91,7 +91,7 @@ void levelWaitForFade()
             updateScreenFaders();
         }
 
-        if(!MaxFPS)
+        if(!g_config.unlimited_framerate)
             PGE_Delay(1);
     }
 }
@@ -117,7 +117,7 @@ void editorWaitForFade()
             updateScreenFaders();
         }
 
-        if(!MaxFPS)
+        if(!g_config.unlimited_framerate)
             PGE_Delay(1);
     }
 }
@@ -508,7 +508,7 @@ int PauseGame(PauseCode code, int plr)
             g_microStats.end_frame();
         }
 
-        if(!MaxFPS)
+        if(!g_config.unlimited_framerate)
             PGE_Delay(1);
 
         if(!GameIsActive)

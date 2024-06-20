@@ -497,7 +497,7 @@ void DrawDeviceBattery()
 #ifdef RENDER_FULLSCREEN_ALWAYS
     constexpr bool isFullScreen = true;
 #else
-    const bool isFullScreen = resChanged;
+    const bool isFullScreen = g_config.fullscreen;
 #endif
 
     if(g_config.show_battery_status == Config_t::BATTERY_STATUS_OFF)

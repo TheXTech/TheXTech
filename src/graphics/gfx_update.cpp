@@ -1374,7 +1374,7 @@ void UpdateGraphics(bool skipRepaint)
     // frame skip code
     cycleNextInc();
 
-    if(FrameSkip && !TakeScreen && frameSkipNeeded())
+    if(g_config.enable_frameskip && !TakeScreen && frameSkipNeeded())
         Do_FrameSkip = true;
 
     g_microStats.start_task(MicroStats::Camera);
@@ -3143,7 +3143,7 @@ void UpdateGraphicsMeta()
 
     speedRun_renderTimer();
 
-    if(PrintFPS > 0 && ShowFPS)
+    if(PrintFPS > 0 && g_config.show_fps)
         SuperPrint(fmt::format_ne("{0}", int(PrintFPS)), 1, XRender::TargetOverscanX + 8, 8, {0, 255, 0});
 
     g_stats.print();

@@ -1478,7 +1478,7 @@ void EveryonesDead()
         XRender::repaint();
 //    if(MagicHand)
 //        BitBlt frmLevelWindow::vScreen[1].hdc, 0, 0, frmLevelWindow::vScreen[1].ScaleWidth, frmLevelWindow::vScreen[1].ScaleHeight, 0, 0, 0, vbWhiteness;
-        if(!MaxFPS)
+        if(!g_config.unlimited_framerate)
             PGE_Delay(500);
     }
 

@@ -587,7 +587,7 @@ void ChangeScreen()
 {
 //    frmMain.LockSize = True
 //    If resChanged = True Then
-    if(resChanged)
+    if(g_config.fullscreen)
     {
         SetOrigRes();
         XEvents::doEvents();

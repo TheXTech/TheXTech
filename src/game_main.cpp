@@ -302,9 +302,9 @@ int GameMain(const CmdLineSetup_t &setup)
 //    LB = "\n";
 //    EoT = "";
 
-    FrameSkip = setup.frameSkip;
-    noSound = setup.noSound;
-    neverPause = setup.neverPause;
+    g_config.enable_frameskip = setup.frameSkip;
+    g_config.audio_enable = !setup.noSound;
+    g_config.background_work = setup.neverPause;
 
     CompatSetEnforcedLevel(setup.compatibilityLevel);
 
@@ -370,8 +370,8 @@ int GameMain(const CmdLineSetup_t &setup)
 
     LoadingInProcess = true;
 
-    ShowFPS = setup.testShowFPS;
-    MaxFPS = setup.testMaxFPS; // || (g_config.render_mode_obtained == RENDER_ACCELERATED_VSYNC);
+    g_config.show_fps = setup.testShowFPS;
+    g_config.unlimited_framerate = setup.testMaxFPS; // || (g_config.render_mode_obtained == RENDER_ACCELERATED_VSYNC);
 
     OpenConfig();
 
@@ -395,7 +395,7 @@ int GameMain(const CmdLineSetup_t &setup)
     }
 #endif
 
-    if(!noSound)
+    if(g_config.audio_enable)
         InitMixerX();
 
 #ifndef PGE_NO_THREADING
@@ -438,7 +438,7 @@ int GameMain(const CmdLineSetup_t &setup)
     XRender::repaint();
     XEvents::doEvents();
 
-    if(!neverPause && !XWindow::hasWindowInputFocus())
+    if(!g_config.background_work && !XWindow::hasWindowInputFocus())
         SoundPauseEngine(1);
 
     if(cmdline_content) // Start level testing immediately!
@@ -577,7 +577,7 @@ int GameMain(const CmdLineSetup_t &setup)
             XWindow::setCursor(CURSOR_NONE);
             XWindow::showCursor(0);
         }
-        else if(!resChanged)
+        else if(!g_config.fullscreen)
         {
             XWindow::setCursor(CURSOR_DEFAULT);
             XWindow::showCursor(1);
@@ -1445,7 +1445,7 @@ void KillIt()
     Integrator::quitIntegrations();
 #ifndef RENDER_FULLSCREEN_ALWAYS
     XWindow::hide();
-    if(resChanged)
+    if(g_config.fullscreen)
         SetOrigRes();
 #else
     XRender::clearBuffer();
@@ -1477,7 +1477,7 @@ void NextLevel()
     XRender::repaint();
     XEvents::doEvents();
 
-    if(!TestLevel && GoToLevel.empty() && !NoMap && !MaxFPS)
+    if(!TestLevel && GoToLevel.empty() && !NoMap && !g_config.unlimited_framerate)
         PGE_Delay(500);
 
     if(BattleMode && !LevelEditor && !TestLevel)
@@ -1654,7 +1654,7 @@ void UpdateMacro()
                 return;
             }
 
-            if(!MaxFPS)
+            if(!g_config.unlimited_framerate)
                 PGE_Delay(1);
         } while(true);
 
@@ -1865,7 +1865,7 @@ void CheckActive()
 //    bool MusicPaused = false;
     bool focusLost = false;
 
-    if(neverPause)
+    if(g_config.background_work)
         return;
 
     if(!GameIsActive)
@@ -2126,7 +2126,7 @@ void StartEpisode()
     XEvents::doEvents();
 
     // Note: this causes the rendered touchscreen controller to freeze with button pressed.
-    if(!MaxFPS)
+    if(!g_config.unlimited_framerate)
         PGE_Delay(500);
 
     ClearGame();
@@ -2267,7 +2267,7 @@ void StartBattleMode()
     StopMusic();
     XEvents::doEvents();
 
-    if(!MaxFPS)
+    if(!g_config.unlimited_framerate)
         PGE_Delay(500);
 
     lunaReset();

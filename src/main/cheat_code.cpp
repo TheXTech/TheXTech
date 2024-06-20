@@ -142,7 +142,7 @@ static void dieCheater()
         StopMusic();
         XEvents::doEvents();
 
-        if(!MaxFPS)
+        if(!g_config.unlimited_framerate)
             PGE_Delay(500);
     }
 }
@@ -1846,14 +1846,14 @@ static void ahippinAndAHopping()
 
 static void frameRate()
 {
-    ShowFPS = !ShowFPS;
-    PlaySound(ShowFPS ? SFX_PlayerGrow : SFX_PlayerShrink);
+    g_config.show_fps = !g_config.show_fps;
+    PlaySound(g_config.show_fps ? SFX_PlayerGrow : SFX_PlayerShrink);
 }
 
 static void speedDemon()
 {
-    MaxFPS = !MaxFPS;
-    PlaySound(MaxFPS ? SFX_PlayerGrow : SFX_PlayerShrink);
+    g_config.unlimited_framerate = !g_config.unlimited_framerate;
+    PlaySound(g_config.unlimited_framerate ? SFX_PlayerGrow : SFX_PlayerShrink);
 }
 
 static void gifs2png()
@@ -1872,8 +1872,8 @@ static void logicScreen()
 static void newLeaf()
 {
     GodMode = false;
-    MaxFPS = false;
-    ShowFPS = false;
+    g_config.unlimited_framerate = false;
+    g_config.show_fps = false;
     MultiHop = false;
     SuperSpeed = false;
     FlyForever = false;

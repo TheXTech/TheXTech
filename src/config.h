@@ -32,7 +32,7 @@ extern struct Config_t : public Compatibility_t, public VideoSettings_t
     /* ---- Main ----*/
 
     //! Record gameplay data
-    bool    RecordGameplayData = false;
+    bool    record_gameplay_data = false;
     //! Use the native onscreen keyboard instead of the TheXTech one
     bool    use_native_osk = false;
     //! Enable the in-game editor
@@ -114,6 +114,13 @@ extern struct Config_t : public Compatibility_t, public VideoSettings_t
     static constexpr bool autocode_translate_coords = true;
     //! Camera optimizations that improve the experience at low resolutions
     static constexpr bool small_screen_camera_features = true;
+
+    // temporary fields replacing global flags at the main branch, in preparation to merge the config branch
+    bool fullscreen = false;
+    bool show_fps = false;
+    bool enable_frameskip = false;
+    bool unlimited_framerate = false;
+    bool audio_enable = true;
 
 } g_config; // main_config.cpp
 

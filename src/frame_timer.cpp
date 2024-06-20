@@ -27,6 +27,7 @@
 
 #include "frame_timer.h"
 #include "globals.h"
+#include "config.h"
 #include "graphics.h"
 #include "core/render.h"
 #include "core/events.h"
@@ -398,7 +399,7 @@ extern void CheckActive(); // game_main.cpp
 
 static inline bool canProcessFrameCond()
 {
-    bool ret = s_currentTicks >= s_gameTime + c_frameRate || s_currentTicks < s_gameTime || MaxFPS;
+    bool ret = s_currentTicks >= s_gameTime + c_frameRate || s_currentTicks < s_gameTime || g_config.unlimited_framerate;
 #ifdef USE_NEW_FRAMESKIP
     if(ret && s_doUpdate <= 0)
         s_startProcessing = getNanoTime();
@@ -450,7 +451,7 @@ static inline void computeFrameTime2Real()
         //      if(Debugger == true)
         //          frmLevelDebugger.lblFPS = fpsCount;
 
-        // if(ShowFPS)
+        // if(g_config.show_fps)
         PrintFPS = s_fpsCount;
 
         s_fpsCount = 0;
@@ -489,13 +490,13 @@ static inline void computeFrameTime2Real_2()
         s_fpsTime = SDL_GetTicks() + 1000;
         s_goalTime = s_fpsTime;
 
-        // if(ShowFPS)
+        // if(g_config.show_fps)
         PrintFPS = s_fpsCount;
 
         s_fpsCount = 0;
     }
 
-    if(!MaxFPS)
+    if(!g_config.unlimited_framerate)
     {
         nanotime_t start = getNanoTime();
         nanotime_t sleepTime = getSleepTime(s_oldTime, c_frameRateNano);
@@ -572,7 +573,7 @@ void runFrameLoop(LoopCall_t doLoopCallbackPre,
                 break;
         }
 
-        if(!MaxFPS)
+        if(!g_config.unlimited_framerate)
             PGE_Delay(1);
 
         if(!GameIsActive)
@@ -595,7 +596,7 @@ void frameRenderEnd()
     if(s_doUpdate <= 0)
     {
         s_stopProcessing = getNanoTime();
-        nanotime_t newTime = FrameSkip ? (s_stopProcessing - s_startProcessing) : 0;
+        nanotime_t newTime = g_config.enable_frameskip ? (s_stopProcessing - s_startProcessing) : 0;
         // D_pLogDebug("newTime/nano=%lld (%lld)", newTime/c_frameRateNano, newTime / 1000000);
         if(newTime > c_frameRateNano * 25) // Limit 25 frames being skipped maximum
         {

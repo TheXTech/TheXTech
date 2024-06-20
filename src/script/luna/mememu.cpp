@@ -637,7 +637,7 @@ public:
         insert(0x00B2C62E, &PSwitchStop); // Stopwatch Timer
         insert(0x00B2C630, &PSwitchPlayer); // P-Switch/Stopwatch Player
 
-        insert(0x00B2C684, &FrameSkip);
+        insert(0x00B2C684, &g_config.enable_frameskip);
 
         insert(0x00B2C6DC, &Physics.PlayerJumpHeight);
         insert(0x00B2C6DE, &Physics.PlayerBlockJumpHeight);
@@ -704,7 +704,7 @@ public:
         insert(0x00B2C8B6, &CaptainN);
         insert(0x00B2C8B8, &FlameThrower);
         insert(0x00B2C8BA, &CoinMode);
-        insert(0x00B2C8BE, &MaxFPS);
+        insert(0x00B2C8BE, &g_config.unlimited_framerate);
         insert(0x00B2C8C0, &GodMode);
         insert(0x00B2C8C2, &GrabAll);
 

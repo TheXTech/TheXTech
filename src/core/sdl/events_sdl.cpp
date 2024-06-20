@@ -27,6 +27,7 @@
 #ifdef USE_RENDER_BLOCKING
 #include "core/render.h"
 #endif
+#include "config.h"
 #include "frm_main.h"
 #include "game_main.h"
 #include "sound.h"
@@ -93,11 +94,11 @@ void EventsSDL::processEvent()
             break;
 #if !defined(NO_WINDOW_FOCUS_TRACKING)
         case SDL_WINDOWEVENT_FOCUS_GAINED:
-            if(!neverPause && !LoadingInProcess)
+            if(!g_config.background_work && !LoadingInProcess)
                 SoundPauseEngine(0);
             break;
         case SDL_WINDOWEVENT_FOCUS_LOST:
-            if(!neverPause && !LoadingInProcess)
+            if(!g_config.background_work && !LoadingInProcess)
                 SoundPauseEngine(1);
             break;
 #endif

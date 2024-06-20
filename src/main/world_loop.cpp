@@ -74,7 +74,7 @@ void worldWaitForFade(int waitTicks)
                 waitTicks--;
         }
 
-        if(!MaxFPS)
+        if(!g_config.unlimited_framerate)
             PGE_Delay(1);
     }
 }
@@ -1191,7 +1191,7 @@ void PathWait()
             computeFrameTime2();
         }
 
-        if(!MaxFPS)
+        if(!g_config.unlimited_framerate)
             PGE_Delay(1);
     } while(C < 24);
 

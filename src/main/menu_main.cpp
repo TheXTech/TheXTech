@@ -977,7 +977,7 @@ bool mainMenuUpdate()
                     XRender::repaint();
                     XEvents::doEvents();
 
-                    if(!MaxFPS)
+                    if(!g_config.unlimited_framerate)
                         PGE_Delay(500);
 
                     KillIt();
@@ -1723,7 +1723,7 @@ bool mainMenuUpdate()
 #ifndef RENDER_FULLSCREEN_ALWAYS
                         else if(A == i++)
                         {
-                            if(resChanged)
+                            if(g_config.fullscreen)
                                 menuLen = 18 * 13; // std::strlen("windowed mode")
                             else
                                 menuLen = 18 * 15; // std::strlen("fullscreen mode")
@@ -2538,7 +2538,7 @@ void mainMenuDraw()
         int i = 0;
         SuperPrint(g_mainMenu.controlsTitle, 3, MenuX, MenuY + (30 * i++));
 #ifndef RENDER_FULLSCREEN_ALWAYS
-        if(resChanged)
+        if(g_config.fullscreen)
             SuperPrint(g_mainMenu.optionsModeWindowed, 3, MenuX, MenuY + (30 * i++));
         else
             SuperPrint(g_mainMenu.optionsModeFullScreen, 3, MenuX, MenuY + (30 * i++));

@@ -104,7 +104,7 @@ void UpdateGraphics2(bool skipRepaint)
 
     cycleNextInc();
 
-    if(FrameSkip && frameSkipNeeded())
+    if(g_config.enable_frameskip && frameSkipNeeded())
         return;
 
     XRender::setTargetTexture();

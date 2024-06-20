@@ -35,7 +35,7 @@
 void SetOrigRes()
 {
     XWindow::setFullScreen(false);
-    resChanged = false;
+    g_config.fullscreen = false;
 
 #ifndef __EMSCRIPTEN__
     if(g_config.scale_mode == Config_t::SCALE_FIXED_05X)
@@ -59,7 +59,7 @@ void SetOrigRes()
 
 void ChangeRes(int, int, int, int)
 {
-    resChanged = true;
+    g_config.fullscreen = true;
     XWindow::setFullScreen(true);
 
     if(LoadingInProcess)

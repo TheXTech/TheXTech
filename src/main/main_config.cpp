@@ -325,7 +325,7 @@ void OpenConfig()
         config.beginGroup("main");
         config.read("release", FileRelease, curRelease);
         config.read("full-screen", resBool, false);
-        config.read("record-gameplay", g_config.RecordGameplayData, false);
+        config.read("record-gameplay", g_config.record_gameplay_data, false);
         config.read("use-native-osk", g_config.use_native_osk, false);
         config.read("pick-assets-on-start", g_config.pick_assets_on_start, false);
         // config.read("new-editor", g_config.enable_editor, false);
@@ -379,7 +379,7 @@ void OpenConfig()
     }
 //    If resBool = True And resChanged = False And LevelEditor = False Then ChangeScreen
 #ifndef RENDER_FULLSCREEN_ALWAYS
-    if(resBool && !resChanged)
+    if(resBool && !g_config.fullscreen)
         ChangeScreen();
 #endif
 
@@ -394,9 +394,9 @@ void SaveConfig()
     config.beginGroup("main");
     config.setValue("release", curRelease);
 #if !defined(RENDER_FULLSCREEN_ALWAYS) // Don't remember fullscreen
-    config.setValue("full-screen", resChanged);
+    config.setValue("full-screen", g_config.fullscreen);
 #endif
-    config.setValue("record-gameplay", g_config.RecordGameplayData);
+    config.setValue("record-gameplay", g_config.record_gameplay_data);
     config.setValue("pick-assets-on-start", g_config.pick_assets_on_start);
     // config.setValue("use-native-osk", g_config.use_native_osk);
     // config.setValue("enable-editor", g_config.enable_editor);

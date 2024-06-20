@@ -327,9 +327,9 @@ static void read_header()
 
     Cheater = true; // important to avoid losing player save data in replay mode.
     TestLevel = false;
-    MaxFPS = true;
-    ShowFPS = true;
-    FrameSkip = false;
+    g_config.unlimited_framerate = true;
+    g_config.show_fps = true;
+    g_config.enable_frameskip = false;
 }
 
 static void write_end()
@@ -774,7 +774,7 @@ void InitRecording()
     if(LevelEditor || GameMenu || GameOutro)
         return;
 
-    if(!g_config.RecordGameplayData && !replay_file)
+    if(!g_config.record_gameplay_data && !replay_file)
         return;
 
     in_level = true;
