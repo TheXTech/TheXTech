@@ -75,6 +75,10 @@
 #include <sysapp/launch.h>
 #endif
 
+#ifdef __WII__
+#include <gccore.h>
+#endif
+
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
 #endif
@@ -234,6 +238,11 @@ int main(int argc, char**argv)
 
 #ifdef __WIIU__
     WHBProcInit();
+#endif
+
+#ifdef __WII__
+    VIDEO_Init();
+    VIDEO_SetBlack(TRUE);
 #endif
 
     CmdLineSetup_t setup;
