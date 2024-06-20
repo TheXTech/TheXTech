@@ -78,10 +78,6 @@ struct CmdLineSetup_t
 
     //! Enable the speed-run mode
     int  speedRunnerMode = 0;
-    //! Draw the speed-run timer semi-transparently
-    bool speedRunnerSemiTransparent = false;
-    //! Speed-run timer blink effect policy
-    int  speedRunnerBlinkEffect = 0;
 
     bool showControllerState = false;
 };

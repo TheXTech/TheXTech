@@ -36,9 +36,6 @@ enum
 extern struct PreSetup_t
 {
     int     speedRunMode = 0;
-    bool    speedRunSemiTransparentTimer = false;
-    int     speedRunEffectBlink = SPEEDRUN_EFFECT_BLINK_UNDEFINED;
-
     int     compatibilityMode = 0;
 } g_preSetup; // main_config.cpp
 

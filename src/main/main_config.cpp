@@ -105,12 +105,11 @@ void OpenConfig_preSetup()
 
     const IniProcessing::StrEnumMap speedRunBlinkMode =
     {
-        {"undefined", SPEEDRUN_EFFECT_BLINK_UNDEFINED},
-        {"opaque", SPEEDRUN_EFFECT_BLINK_OPAQUEONLY},
-        {"always", SPEEDRUN_EFFECT_BLINK_ALWAYS},
-        {"true", SPEEDRUN_EFFECT_BLINK_ALWAYS},
-        {"never", SPEEDRUN_EFFECT_BLINK_NEVER},
-        {"false", SPEEDRUN_EFFECT_BLINK_NEVER}
+        {"opaque", Config_t::PLAYTIME_COUNTER_ANIMATED}, // meaning was "animate if opaque"
+        {"always", Config_t::PLAYTIME_COUNTER_ANIMATED},
+        {"true", Config_t::PLAYTIME_COUNTER_ANIMATED},
+        {"never", Config_t::PLAYTIME_COUNTER_OPAQUE},
+        {"false", Config_t::PLAYTIME_COUNTER_OPAQUE}
     };
 
     const IniProcessing::StrEnumMap scaleDownTextures =
@@ -235,8 +234,13 @@ void OpenConfig_preSetup()
 
         config.beginGroup("speedrun");
         config.read("mode", g_preSetup.speedRunMode, 0);
-        config.read("semi-transparent-timer", g_preSetup.speedRunSemiTransparentTimer, false);
-        config.readEnum("blink-effect", g_preSetup.speedRunEffectBlink, (int)SPEEDRUN_EFFECT_BLINK_UNDEFINED, speedRunBlinkMode);
+        bool do_semi_transparent = false;
+
+        config.readEnum("blink-effect", g_config.show_playtime_counter, (int)Config_t::PLAYTIME_COUNTER_OPAQUE, speedRunBlinkMode);
+
+        config.read("semi-transparent-timer", do_semi_transparent, false);
+        if(do_semi_transparent)
+            g_config.show_playtime_counter = Config_t::PLAYTIME_COUNTER_SUBTLE;
         config.endGroup();
     }
 }
@@ -541,17 +545,6 @@ void SaveConfig()
 
     config.beginGroup("speedrun");
     config.setValue("mode", g_preSetup.speedRunMode);
-    config.setValue("semi-transparent-timer", g_preSetup.speedRunSemiTransparentTimer);
-    {
-        std::unordered_map<int, std::string>  speedRunBlinkMode =
-        {
-            {SPEEDRUN_EFFECT_BLINK_UNDEFINED, "undefined"},
-            {SPEEDRUN_EFFECT_BLINK_OPAQUEONLY, "opaque"},
-            {SPEEDRUN_EFFECT_BLINK_ALWAYS, "always"},
-            {SPEEDRUN_EFFECT_BLINK_NEVER, "never"}
-        };
-        config.setValue("blink-effect", speedRunBlinkMode[g_preSetup.speedRunEffectBlink]);
-    }
     config.endGroup();
 
     config.beginGroup("effects");

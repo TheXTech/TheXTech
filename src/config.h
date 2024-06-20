@@ -129,6 +129,16 @@ extern struct Config_t : public Compatibility_t, public VideoSettings_t
     bool show_screen_shake = true;
     bool td_compat_mode = false;
 
+    // temporary field for playtime counter
+    enum
+    {
+        PLAYTIME_COUNTER_OFF = 0,
+        PLAYTIME_COUNTER_SUBTLE = 1,
+        PLAYTIME_COUNTER_OPAQUE,
+        PLAYTIME_COUNTER_ANIMATED,
+    };
+    int show_playtime_counter = PLAYTIME_COUNTER_OPAQUE;
+
 } g_config; // main_config.cpp
 
 #endif // CONFIG_H

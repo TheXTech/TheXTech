@@ -655,29 +655,22 @@ int main(int argc, char**argv)
         setup.speedRunnerMode = speedRunMode.isSet() ?
                                     speedRunMode.getValue() :
                                     g_preSetup.speedRunMode;
-        setup.speedRunnerSemiTransparent = switchSpeedRunSemiTransparent.isSet() ?
-                                            switchSpeedRunSemiTransparent.getValue() :
-                                            g_preSetup.speedRunSemiTransparentTimer;
 
-        if(speedRunBlinkMode.isSet())
+        if(switchSpeedRunSemiTransparent.isSet() && switchSpeedRunSemiTransparent.getValue())
+            g_config.show_playtime_counter = Config_t::PLAYTIME_COUNTER_SUBTLE;
+        else if(speedRunBlinkMode.isSet())
         {
             std::string mode = speedRunBlinkMode.getValue();
-            if(mode == "opaque")
-                setup.speedRunnerBlinkEffect = SPEEDRUN_EFFECT_BLINK_OPAQUEONLY;
-            else if(mode == "always")
-                setup.speedRunnerBlinkEffect = SPEEDRUN_EFFECT_BLINK_ALWAYS;
+            if(mode == "opaque" || mode == "always")
+                g_config.show_playtime_counter = Config_t::PLAYTIME_COUNTER_ANIMATED;
             else if(mode == "never")
-                setup.speedRunnerBlinkEffect = SPEEDRUN_EFFECT_BLINK_NEVER;
+                g_config.show_playtime_counter = Config_t::PLAYTIME_COUNTER_OPAQUE;
             else
             {
                 std::cerr << "Error: Invalid value for the --speed-run-blink argument: " << mode << std::endl;
                 std::cerr.flush();
                 return 2;
             }
-        }
-        else
-        {
-            setup.speedRunnerBlinkEffect = g_preSetup.speedRunEffectBlink;
         }
 
         setup.showControllerState = switchDisplayControls.isSet() ?
