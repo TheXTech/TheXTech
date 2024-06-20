@@ -29,6 +29,7 @@
 
 #include "render_sdl.h"
 #include "config.h"
+
 #include "core/window.h"
 #include "core/render.h"
 

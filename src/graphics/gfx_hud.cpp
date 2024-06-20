@@ -28,7 +28,6 @@
 #include "../gfx.h"
 #include "npc_traits.h"
 
-#include "config.h"
 #include "main/speedrunner.h"
 
 #include "config.h"

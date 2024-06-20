@@ -486,7 +486,7 @@ public:
     subsection advanced_video{this, "advanced-video", "Video"};
 
 #ifndef RENDER_CUSTOM
-    enum
+    enum RenderMode_t
     {
         RENDER_SOFTWARE = 0,
         RENDER_ACCELERATED_AUTO,

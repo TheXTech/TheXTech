@@ -44,6 +44,7 @@
 
 #include "globals.h"
 #include "sound.h"
+#include "config.h"
 
 #include "graphics.h"
 #include "controls.h"
