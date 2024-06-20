@@ -1306,6 +1306,7 @@ extern UTF8CharMap_t MessageTextMap;
 //extern RangeArr<SelectWorld_t, 1, maxSelectWorlds> SelectWorld;
 // extern std::vector<SelectWorld_t> SelectWorld;
 
+extern std::string g_recentAssetPack;
 extern std::string g_recentWorld1p;
 extern std::string g_recentWorld2p;
 extern std::string g_recentWorldEditor;

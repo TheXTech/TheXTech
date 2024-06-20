@@ -74,6 +74,7 @@ UTF8CharMap_t MessageTextMap;
 // int NumSelectWorld  = 0;
 // std::vector<SelectWorld_t> SelectWorld;
 
+std::string g_recentAssetPack;
 std::string g_recentWorld1p;
 std::string g_recentWorld2p;
 std::string g_recentWorldEditor;

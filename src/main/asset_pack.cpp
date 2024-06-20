@@ -496,8 +496,8 @@ bool InitUIAssetsFrom(const std::string& id, bool skip_gfx)
     }
     else
     {
-        pLogDebug("Trying to load most recent asset pack [ID: %s]", g_preSetup.assetPack.c_str());
-        pack = s_find_pack_init(g_preSetup.assetPack);
+        pLogDebug("Trying to load most recent asset pack [ID: %s]", g_recentAssetPack.c_str());
+        pack = s_find_pack_init(g_recentAssetPack);
 
         if(pack.path.empty())
         {

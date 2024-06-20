@@ -40,8 +40,6 @@ extern struct PreSetup_t
     int     speedRunEffectBlink = SPEEDRUN_EFFECT_BLINK_UNDEFINED;
 
     int     compatibilityMode = 0;
-
-    std::string assetPack;
 } g_preSetup; // main_config.cpp
 
 

@@ -230,7 +230,7 @@ void OpenConfig_preSetup()
         config.endGroup();
 
         config.beginGroup("recent");
-        config.read("asset-pack", g_preSetup.assetPack, std::string());
+        config.read("asset-pack", g_recentAssetPack, std::string());
         config.endGroup();
 
         config.beginGroup("speedrun");
