@@ -1862,7 +1862,7 @@ static void speedDemon()
     g_config.unlimited_framerate = !g_config.unlimited_framerate;
     PlaySound(g_config.unlimited_framerate ? SFX_PlayerGrow : SFX_PlayerShrink);
 
-    if(g_config.compatibility_mode != Config_t::COMPAT_OFF)
+    if(g_config.compatibility_mode != Config_t::COMPAT_OFF && g_config.compatibility_mode != Config_t::COMPAT_MODERN)
     {
         pLogDebug("Marking Cheater by unlimited framerate cheat code");
         Cheater = true;
@@ -2285,7 +2285,7 @@ static const CheatCodeDefault_t s_cheatsListLevelDefault[] =
     {"ahippinandahoppin", ahippinAndAHopping, true}, {"jumpman", ahippinAndAHopping, true},
     {"framerate", frameRate, false},
     {"speeddemon", speedDemon, false},
-    
+
     {"getmeouttahere", getMeOuttaHere, true},
     {"newleaf", newLeaf, true},
 
