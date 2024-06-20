@@ -28,8 +28,8 @@
 
 #include "../version.h"
 
-GameInfo g_gameInfo;
 
+GameInfo g_gameInfo;
 
 static void readCheats(IniProcessing &conf, std::vector<GameInfo::CheatAlias> &dst, const std::string &group)
 {

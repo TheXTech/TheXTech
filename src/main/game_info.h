@@ -26,7 +26,6 @@
 #include <vector>
 #include "global_constants.h"
 #include "range_arr.hpp"
-#include "config.h"
 
 struct GameInfo
 {
@@ -90,7 +89,7 @@ struct GameInfo
     const std::string titleWindow() const;
 };
 
-extern GameInfo g_gameInfo; // config level 2, config_main.cpp
+extern GameInfo g_gameInfo;
 
 extern void initGameInfo();
 
