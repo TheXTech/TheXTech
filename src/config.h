@@ -91,12 +91,8 @@ extern struct Config_t : public Compatibility_t, public VideoSettings_t
 
     /* ---- Effects ----*/
 
-    //! Shake screen on thwomp falling
-    bool    GameplayShakeScreenThwomp = true;
-    //! Shake screen on Yoshi ground pount
-    bool    GameplayShakeScreenPound = true;
-    //! Shake screen on Bowser III'rd ground pound
-    bool    GameplayShakeScreenBowserIIIrd = true;
+    //! Shake screen on thwomp falling, Pet ground pount, and Set III Villain ground pound
+    bool    extra_screen_shake = true;
     //! Play "player grow" together with the "get item" sound to represent original games behaviour
     // bool    SoundPlayerGrowWithGetItem = false; // removed in TheXTech v1.3.7
     //! Enables the inter-level fade effect

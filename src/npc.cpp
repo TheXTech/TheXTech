@@ -5054,7 +5054,7 @@ void SpecialNPC(int A)
                 if(NPC[A].Special2 == 0)
                 {
                     PlaySoundSpatial(SFX_Stone, NPC[A].Location);
-                    if(g_config.GameplayShakeScreenThwomp)
+                    if(g_config.extra_screen_shake)
                         doShakeScreen(0, 4, SHAKE_SEQUENTIAL, 5, 0.2);
                     tempLocation.Width = 32;
                     tempLocation.Height = 32;
