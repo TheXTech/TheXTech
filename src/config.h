@@ -126,6 +126,8 @@ extern struct Config_t : public Compatibility_t, public VideoSettings_t
 
     // temporary fields for new features, in preparation to merge the config branch
     bool modern_item_drop = false;
+    bool show_screen_shake = true;
+    bool td_compat_mode = false;
 
 } g_config; // main_config.cpp
 
