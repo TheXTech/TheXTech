@@ -551,7 +551,7 @@ void FindWldStars()
     LevelData tempData;
     uint32_t start_time = SDL_GetTicks();
 
-    bool world_must_show_stars = (WorldStarsShowPolicy == Config_t::STARS_SHOW_COLLECTED_AND_AVAILABLE);
+    bool world_must_show_stars = (WorldStarsShowPolicy == Config_t::MAP_STARS_SHOW);
 
     for(int A = 1; A <= numWorldLevels; A++)
     {
@@ -569,8 +569,8 @@ void FindWldStars()
                     l.curStars++;
             }
 
-            bool level_must_show_stars = (l.starsShowPolicy == Config_t::STARS_SHOW_COLLECTED_AND_AVAILABLE);
-            bool level_can_show_stars = (world_must_show_stars && l.starsShowPolicy == Config_t::STARS_UNSPECIFIED);
+            bool level_must_show_stars = (l.starsShowPolicy == Config_t::MAP_STARS_SHOW);
+            bool level_can_show_stars = (world_must_show_stars && l.starsShowPolicy == Config_t::MAP_STARS_UNSPECIFIED);
 
             // skip check for max stars and medals if it's already been inited, OR if the star count isn't needed
             if(l.save_info.inited() || !(level_must_show_stars || level_can_show_stars))
@@ -632,7 +632,7 @@ bool CanConvertWorld(int format, std::string* reasons)
         }
     }
 
-    if(WorldStarsShowPolicy != WorldData::STARS_UNSPECIFIED)
+    if(WorldStarsShowPolicy != WorldData::MAP_STARS_UNSPECIFIED)
     {
         can_convert = false;
         if(reasons)
@@ -644,7 +644,7 @@ bool CanConvertWorld(int format, std::string* reasons)
 
     for(int i = 1; i <= numWorldLevels; i++)
     {
-        if(WorldLevel[i].starsShowPolicy != WorldData::STARS_UNSPECIFIED)
+        if(WorldLevel[i].starsShowPolicy != WorldData::MAP_STARS_UNSPECIFIED)
         {
             can_convert = false;
             if(reasons)
@@ -693,10 +693,10 @@ void ConvertWorld(int format)
     for(int i = 1; i <= numWorldMusic; i++)
         SetS(WorldMusic[i].MusicFile, "");
 
-    WorldStarsShowPolicy = WorldData::STARS_UNSPECIFIED;
+    WorldStarsShowPolicy = WorldData::MAP_STARS_UNSPECIFIED;
 
     for(int i = 1; i <= numWorldLevels; i++)
-        WorldLevel[i].starsShowPolicy = WorldData::STARS_UNSPECIFIED;
+        WorldLevel[i].starsShowPolicy = WorldData::MAP_STARS_UNSPECIFIED;
 
     numWorldAreas = 0;
 }

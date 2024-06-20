@@ -408,7 +408,7 @@ void ShowLayer(layerindex_t L, bool NoEffect)
 
             // new logic: if an NPC must follow canonical screen logic, only activate it if on a canonical vScreen
             // Fixes bug at star exit on SRW2:YA - Searing Skull Stepping
-            if(g_config.modern_npc_camera_logic && !NPC[A].Active && NPC_MustBeCanonical(A))
+            if(g_config.fix_npc_camera_logic && !NPC[A].Active && NPC_MustBeCanonical(A))
             {
                 bool hit = false;
 
@@ -1279,7 +1279,7 @@ void ProcEvent(eventindex_t index, int whichPlayer, bool NoEffect)
                         Block[C].Location.SpeedY = double(Layer[B].SpeedY);
                     }
 
-                    if(g_config.enable_climb_bgo_layer_move)
+                    if(g_config.fix_climb_bgo_layer_move)
                     {
                         for(int C : Layer[B].BGOs)
                         {
@@ -1577,7 +1577,7 @@ void UpdateLayers()
                     Block[B].Location.SpeedY = 0;
                 }
 
-                if(g_config.enable_climb_bgo_layer_move)
+                if(g_config.fix_climb_bgo_layer_move)
                 {
                     for(int B : Layer[A].BGOs)
                     {
@@ -1589,7 +1589,7 @@ void UpdateLayers()
                     }
                 }
 
-                if(g_config.enable_climb_bgo_layer_move)
+                if(g_config.fix_climb_bgo_layer_move)
                 {
                     for(int B : Layer[A].NPCs)
                     {
@@ -1661,7 +1661,7 @@ void UpdateLayers()
                     //{
                     Background[B].Location.X += double(Layer[A].SpeedX);
                     Background[B].Location.Y += double(Layer[A].SpeedY);
-                    if(g_config.enable_climb_bgo_layer_move && BackgroundFence[Background[B].Type])
+                    if(g_config.fix_climb_bgo_layer_move && BackgroundFence[Background[B].Type])
                     {
                         Background[B].Location.SpeedX = double(Layer[A].SpeedX);
                         Background[B].Location.SpeedY = double(Layer[A].SpeedY);

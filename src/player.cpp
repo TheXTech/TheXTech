@@ -6130,7 +6130,7 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
                                 }
                             }
 
-                            if(g_config.enable_climb_bgo_layer_move)
+                            if(g_config.fix_climb_bgo_layer_move)
                             {
                                 for(int C : Layer[B].BGOs)
                                 {

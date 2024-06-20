@@ -115,9 +115,9 @@ void OpenConfig_preSetup()
 
     const IniProcessing::StrEnumMap scaleDownTextures =
     {
-        {"none", Config_t::SCALE_NONE},
-        {"safe", Config_t::SCALE_SAFE},
-        {"all", Config_t::SCALE_ALL}
+        {"none", Config_t::SCALE_DOWN_NONE},
+        {"safe", Config_t::SCALE_DOWN_SAFE},
+        {"all", Config_t::SCALE_DOWN_ALL}
     };
 
     const IniProcessing::StrEnumMap logLevelEnum =
@@ -178,7 +178,7 @@ void OpenConfig_preSetup()
 
         bool scale_down_all;
         config.read("scale-down-all-textures", scale_down_all, false);
-        config.readEnum("scale-down-textures", g_config.scale_down_textures, scale_down_all ? (int)Config_t::SCALE_ALL : (int)Config_t::SCALE_SAFE, scaleDownTextures);
+        config.readEnum("scale-down-textures", g_config.scale_down_textures, scale_down_all ? (int)Config_t::SCALE_DOWN_ALL : (int)Config_t::SCALE_DOWN_SAFE, scaleDownTextures);
         config.read("internal-width", g_config.InternalW, 800);
         config.read("internal-height", g_config.InternalH, 600);
 
@@ -464,9 +464,9 @@ void SaveConfig()
 
         std::unordered_map<int, std::string> scaleDownTextures =
         {
-            {Config_t::SCALE_NONE, "none"},
-            {Config_t::SCALE_SAFE, "safe"},
-            {Config_t::SCALE_ALL, "all"},
+            {Config_t::SCALE_DOWN_NONE, "none"},
+            {Config_t::SCALE_DOWN_SAFE, "safe"},
+            {Config_t::SCALE_DOWN_ALL, "all"},
         };
 
         config.setValue("render", renderMode[g_config.render_mode]);

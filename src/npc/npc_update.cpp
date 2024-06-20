@@ -590,7 +590,7 @@ void UpdateNPCs()
                             NPC[B].TimeLeft = NPC[A].TimeLeft;
                             NPC[B].Section = NPC[A].Section;
 
-                            if(g_config.modern_npc_camera_logic)
+                            if(g_config.fix_npc_camera_logic)
                                 NPC[B].JustActivated = NPC[A].JustActivated;
                             else
                                 NPC[B].JustActivated = 1;
@@ -644,7 +644,7 @@ void UpdateNPCs()
                                     NPC[B].TimeLeft = NPC[newAct[C]].TimeLeft;
                                     NPC[B].Section = NPC[newAct[C]].Section;
 
-                                    if(g_config.modern_npc_camera_logic)
+                                    if(g_config.fix_npc_camera_logic)
                                         NPC[B].JustActivated = NPC[A].JustActivated;
                                     else
                                         NPC[B].JustActivated = 1;

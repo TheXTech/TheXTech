@@ -36,7 +36,7 @@ struct Compatibility_t
     bool fix_npc55_kick_ice_blocks;
     bool fix_climb_invisible_fences;
     bool fix_climb_bgo_speed_adding;
-    bool enable_climb_bgo_layer_move;
+    bool fix_climb_bgo_layer_move;
     bool fix_player_clip_wall_at_npc;
     bool fix_skull_raft;
     bool fix_char3_escape_shell_surf;
@@ -57,13 +57,13 @@ struct Compatibility_t
     enum StarsShowPolicy_t
     {
         //! Prefer global settings
-        STARS_UNSPECIFIED = -1,
+        MAP_STARS_UNSPECIFIED = -1,
         //! Never show stars counter
-        STARS_DONT_SHOW = 0,
+        MAP_STARS_HIDE = 0,
         //! Show collected only
-        STARS_SHOW_COLLECTED_ONLY = 1,
+        MAP_STARS_COLLECTED = 1,
         //! Show collected and available
-        STARS_SHOW_COLLECTED_AND_AVAILABLE = 2
+        MAP_STARS_SHOW = 2
     };
     int world_map_stars_show_policy;
     // 1.3.5.3
@@ -96,7 +96,7 @@ struct Compatibility_t
     // 1.3.6.6
     bool fix_vehicle_altjump_bug; // don't become vulnerable on sides after altjump into car
     // 1.3.7
-    bool modern_npc_camera_logic; // NPCs should support more than two cameras, and consider the event logic camera when activating
+    bool fix_npc_camera_logic; // NPCs should support more than two cameras, and consider the event logic camera when activating
     bool dynamic_camera_logic;    // use visible onscreen camera to determine NPC spawn behavior
     bool allow_multires;
     bool fix_multiplayer_targeting; // fix NPC targeting in >2P mode

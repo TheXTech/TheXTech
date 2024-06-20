@@ -4833,7 +4833,7 @@ void SpecialNPC(int A)
 
             // C is the targeted player
 
-            if(g_config.modern_npc_camera_logic)
+            if(g_config.fix_npc_camera_logic)
                 D = vScreenIdxByPlayer_canonical(C);
             else
             {
@@ -5401,7 +5401,7 @@ void SpecialNPC(int A)
 
             // C is the targeted player
 
-            if(g_config.modern_npc_camera_logic)
+            if(g_config.fix_npc_camera_logic)
                 D = vScreenIdxByPlayer_canonical(C);
             else
             {

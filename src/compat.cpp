@@ -75,7 +75,7 @@ static void compatInit(Compatibility_t &c)
     c.fix_npc55_kick_ice_blocks = false;
     c.fix_climb_invisible_fences = true;
     c.fix_climb_bgo_speed_adding = true;
-    c.enable_climb_bgo_layer_move = true;
+    c.fix_climb_bgo_layer_move = true;
     c.fix_player_clip_wall_at_npc = true;
     c.fix_skull_raft = true;
     c.fix_char3_escape_shell_surf = true;
@@ -93,7 +93,7 @@ static void compatInit(Compatibility_t &c)
     // 1.3.5.2
     c.fix_bat_start_while_inactive = true;
     c.fix_FreezeNPCs_no_reset = false;
-    c.world_map_stars_show_policy = Config_t::STARS_UNSPECIFIED;
+    c.world_map_stars_show_policy = Config_t::MAP_STARS_UNSPECIFIED;
     // 1.3.5.3
     // c.require_ground_to_enter_warps = false; // REMOVED SINCE 1.3.6
     c.fix_npc_activation_event_loop_bug = true;
@@ -129,7 +129,7 @@ static void compatInit(Compatibility_t &c)
     // 1.3.6.6
     c.fix_vehicle_altjump_bug = true;
     // 1.3.7
-    c.modern_npc_camera_logic = true;
+    c.fix_npc_camera_logic = true;
     c.dynamic_camera_logic = true;
     c.fix_multiplayer_targeting = true;
     c.allow_multires = true;
@@ -150,7 +150,7 @@ static void compatInit(Compatibility_t &c)
         c.fix_npc55_kick_ice_blocks = false; //-V1048
         c.fix_climb_invisible_fences = false;
         c.fix_climb_bgo_speed_adding = false;
-        c.enable_climb_bgo_layer_move = false;
+        c.fix_climb_bgo_layer_move = false;
         c.fix_skull_raft = false;
         c.fix_plant_wobble = false;
         c.fix_powerup_lava_bug = false;
@@ -206,7 +206,7 @@ static void compatInit(Compatibility_t &c)
         c.fix_vehicle_altjump_bug = false;
         // 1.3.7
         c.modern_lives_system = false;
-        c.modern_npc_camera_logic = false;
+        c.fix_npc_camera_logic = false;
         c.allow_multires = false;
     }
 
@@ -377,7 +377,7 @@ static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
         compat.read("fix-npc55-kick-ice-blocks", c.fix_npc55_kick_ice_blocks, c.fix_npc55_kick_ice_blocks);
         compat.read("fix-climb-invisible-fences", c.fix_climb_invisible_fences, c.fix_climb_invisible_fences);
         compat.read("fix-climb-bgo-speed-adding", c.fix_climb_bgo_speed_adding, c.fix_climb_bgo_speed_adding);
-        compat.read("enable-climb-bgo-layer-move", c.enable_climb_bgo_layer_move, c.enable_climb_bgo_layer_move);
+        compat.read("enable-climb-bgo-layer-move", c.fix_climb_bgo_layer_move, c.fix_climb_bgo_layer_move);
         compat.read("fix-player-clip-wall-at-npc", c.fix_player_clip_wall_at_npc, c.fix_player_clip_wall_at_npc);
         compat.read("fix-skull-raft", c.fix_skull_raft, c.fix_skull_raft);
         compat.read("fix-peach-escape-shell-surf", c.fix_char3_escape_shell_surf, c.fix_char3_escape_shell_surf);// DEPRECATED since 1.3.6
@@ -404,10 +404,10 @@ static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
         compat.read("fix-FreezeNPCs-no-reset", c.fix_FreezeNPCs_no_reset, c.fix_FreezeNPCs_no_reset);
         IniProcessing::StrEnumMap starsShowPolicy
         {
-            {"unspecified", Config_t::STARS_UNSPECIFIED},
-            {"hide", Config_t::STARS_DONT_SHOW},
-            {"show-collected", Config_t::STARS_SHOW_COLLECTED_ONLY},
-            {"show", Config_t::STARS_SHOW_COLLECTED_AND_AVAILABLE}
+            {"unspecified", Config_t::MAP_STARS_UNSPECIFIED},
+            {"hide", Config_t::MAP_STARS_HIDE},
+            {"show-collected", Config_t::MAP_STARS_COLLECTED},
+            {"show", Config_t::MAP_STARS_SHOW}
         };
         compat.readEnum("world-map-stars-show-policy", c.world_map_stars_show_policy, c.world_map_stars_show_policy, starsShowPolicy);
         // 1.3.6
@@ -442,7 +442,7 @@ static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
         // 1.3.6.6
         compat.read("fix-vehicle-altjump-bug", c.fix_vehicle_altjump_bug, c.fix_vehicle_altjump_bug);
         // 1.3.7 (but these will be changed in the Compat update)
-        compat.read("modern-npc-camera-logic", c.modern_npc_camera_logic, c.modern_npc_camera_logic);
+        compat.read("modern-npc-camera-logic", c.fix_npc_camera_logic, c.fix_npc_camera_logic);
         compat.read("dynamic-camera-logic", c.dynamic_camera_logic, c.dynamic_camera_logic);
         compat.read("fix-multiplayer-targeting", c.fix_multiplayer_targeting, c.fix_multiplayer_targeting);
         compat.read("allow-multires", c.allow_multires, c.allow_multires);

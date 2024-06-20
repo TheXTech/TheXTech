@@ -29,9 +29,9 @@ struct VideoSettings_t
 {
     enum ScaleDownTextures
     {
-        SCALE_NONE = 0,
-        SCALE_SAFE = 1,
-        SCALE_ALL = 2,
+        SCALE_DOWN_NONE = 0,
+        SCALE_DOWN_SAFE = 1,
+        SCALE_DOWN_ALL = 2,
     };
 
     enum RenderMode_t
@@ -85,7 +85,7 @@ struct VideoSettings_t
     //! Show FPS counter
     bool   show_fps = false;
     //! 2x scale down all textures to reduce the memory usage
-    int    scale_down_textures = SCALE_SAFE;
+    int    scale_down_textures = SCALE_DOWN_SAFE;
 };
 
 static const std::unordered_map<int, std::string> ScaleMode_strings =

@@ -59,7 +59,7 @@ void SetScreenType(Screen_t& screen)
     }
     else
     {
-        if(g_config.modern_npc_camera_logic && (BattleMode || screen.four_screen_pref == MultiplayerPrefs::Split))
+        if(g_config.fix_npc_camera_logic && (BattleMode || screen.four_screen_pref == MultiplayerPrefs::Split))
             screen.Type = ScreenTypes::Quad;
         else
             screen.Type = ScreenTypes::SharedScreen; // Average, no one leaves the screen

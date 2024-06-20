@@ -1414,7 +1414,7 @@ void UpdateGraphicsLogic(bool Do_FrameSkip)
     // mark the last-frame reset state of NPCs that may have Reset[1] or Reset[2] set to false, and clear their this-frame reset state
     //     Reset[1] could have been set by the last frame's modern NPC logic, or by external code
     //     Reset[2] could only have been set by external code
-    if(g_config.modern_npc_camera_logic)
+    if(g_config.fix_npc_camera_logic)
     {
         for(NPC_t& n : s_NoReset_NPCs_LastFrame)
         {
@@ -1638,7 +1638,7 @@ void UpdateGraphicsLogic(bool Do_FrameSkip)
             // we'll check the NPCs and do some logic for the game,
             if(!LevelEditor)
             {
-                if(g_config.modern_npc_camera_logic)
+                if(g_config.fix_npc_camera_logic)
                     ModernNPCScreenLogic(screen, vscreen_i, fill_draw_queue, NPC_Draw_Queue_p);
                 else if(Z <= 2)
                     ClassicNPCScreenLogic(Z, numScreens, fill_draw_queue, NPC_Draw_Queue_p);
@@ -1708,7 +1708,7 @@ void UpdateGraphicsLogic(bool Do_FrameSkip)
     }
 
     // clear the last-frame reset state of NPCs
-    if(g_config.modern_npc_camera_logic)
+    if(g_config.fix_npc_camera_logic)
     {
         for(NPC_t& n : s_NoReset_NPCs_LastFrame)
             n.Reset[2] = true;

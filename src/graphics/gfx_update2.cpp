@@ -59,33 +59,33 @@ void UpdateGraphicsMeta();
 static inline int computeStarsShowingPolicy(int ll, int cur)
 {
     // Level individual
-    if(ll > Config_t::STARS_UNSPECIFIED)
+    if(ll > Config_t::MAP_STARS_UNSPECIFIED)
     {
-        if(ll == Config_t::STARS_SHOW_COLLECTED_ONLY && cur <= 0)
-            return Config_t::STARS_DONT_SHOW;
+        if(ll == Config_t::MAP_STARS_COLLECTED && cur <= 0)
+            return Config_t::MAP_STARS_HIDE;
         return ll;
     }
 
     // World map-wide
-    if(WorldStarsShowPolicy > Config_t::STARS_UNSPECIFIED)
+    if(WorldStarsShowPolicy > Config_t::MAP_STARS_UNSPECIFIED)
     {
-        if(WorldStarsShowPolicy == Config_t::STARS_SHOW_COLLECTED_ONLY && cur <= 0)
-            return Config_t::STARS_DONT_SHOW;
+        if(WorldStarsShowPolicy == Config_t::MAP_STARS_COLLECTED && cur <= 0)
+            return Config_t::MAP_STARS_HIDE;
         return WorldStarsShowPolicy;
     }
 
     // Compatibility settings
-    if(g_config.world_map_stars_show_policy > Config_t::STARS_UNSPECIFIED)
+    if(g_config.world_map_stars_show_policy > Config_t::MAP_STARS_UNSPECIFIED)
     {
-        if(g_config.world_map_stars_show_policy == Config_t::STARS_SHOW_COLLECTED_ONLY && cur <= 0)
-            return Config_t::STARS_DONT_SHOW;
+        if(g_config.world_map_stars_show_policy == Config_t::MAP_STARS_COLLECTED && cur <= 0)
+            return Config_t::MAP_STARS_HIDE;
 
         return g_config.world_map_stars_show_policy;
     }
 
     // Gameplay settings
-    if(g_config.WorldMapStarShowPolicyGlobal == Config_t::STARS_SHOW_COLLECTED_ONLY && cur <= 0)
-        return Config_t::STARS_DONT_SHOW;
+    if(g_config.WorldMapStarShowPolicyGlobal == Config_t::MAP_STARS_COLLECTED && cur <= 0)
+        return Config_t::MAP_STARS_HIDE;
 
     return g_config.WorldMapStarShowPolicyGlobal;
 }
@@ -556,11 +556,11 @@ void UpdateGraphics2(bool skipRepaint)
             int p_center_x = camX + WorldPlayer[1].Location.X + (WorldPlayer[1].Location.Width / 2);
             int info_y = camY + WorldPlayer[1].Location.Y - 32;
 
-            if(l.save_info.inited() && l.save_info.max_stars > 0 && policy > Config_t::STARS_DONT_SHOW)
+            if(l.save_info.inited() && l.save_info.max_stars > 0 && policy > Config_t::MAP_STARS_HIDE)
             {
                 std::string label;
 
-                if(policy >= Config_t::STARS_SHOW_COLLECTED_AND_AVAILABLE)
+                if(policy >= Config_t::MAP_STARS_SHOW)
                     label = fmt::format_ne("{0}/{1}", l.curStars, l.save_info.max_stars);
                 else
                     label = fmt::format_ne("{0}", l.curStars);
