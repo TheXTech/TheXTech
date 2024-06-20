@@ -632,7 +632,7 @@ bool CanConvertWorld(int format, std::string* reasons)
         }
     }
 
-    if(WorldStarsShowPolicy != WorldData::MAP_STARS_UNSPECIFIED)
+    if(WorldStarsShowPolicy != WorldData::STARS_UNSPECIFIED)
     {
         can_convert = false;
         if(reasons)
@@ -644,7 +644,7 @@ bool CanConvertWorld(int format, std::string* reasons)
 
     for(int i = 1; i <= numWorldLevels; i++)
     {
-        if(WorldLevel[i].starsShowPolicy != WorldData::MAP_STARS_UNSPECIFIED)
+        if(WorldLevel[i].starsShowPolicy != WorldData::STARS_UNSPECIFIED)
         {
             can_convert = false;
             if(reasons)
@@ -693,10 +693,10 @@ void ConvertWorld(int format)
     for(int i = 1; i <= numWorldMusic; i++)
         SetS(WorldMusic[i].MusicFile, "");
 
-    WorldStarsShowPolicy = WorldData::MAP_STARS_UNSPECIFIED;
+    WorldStarsShowPolicy = WorldData::STARS_UNSPECIFIED;
 
     for(int i = 1; i <= numWorldLevels; i++)
-        WorldLevel[i].starsShowPolicy = WorldData::MAP_STARS_UNSPECIFIED;
+        WorldLevel[i].starsShowPolicy = WorldData::STARS_UNSPECIFIED;
 
     numWorldAreas = 0;
 }
