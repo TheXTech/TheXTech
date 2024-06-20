@@ -28,6 +28,7 @@
 #include "../controls.h"
 
 #include "main/screen_quickreconnect.h"
+#include "main/menu_main.h"
 
 #include "gameplay_timer.h"
 
@@ -48,6 +49,7 @@ void speedRun_saveStats()
 {
     if(g_speedRunnerMode == SPEEDRUN_MODE_OFF)
         return; // Do nothing
+
     if(GameMenu || GameOutro || BattleMode)
         return; // Do nothing when out of the game
 
@@ -102,6 +104,9 @@ static void GetControllerColor(int player, XTColor& color, bool* drawLabel = nul
     color = XTColorF(0.4f, 0.4f, 0.4f);
     if(drawLabel)
         *drawLabel = false;
+
+    if(GameMenu)
+        return;
 
     if(player < 1 || player > maxLocalPlayers)
         return;
@@ -321,8 +326,11 @@ void RenderPowerInfo(int player, int bx, int by, int bw, int bh, uint8_t alpha, 
 
 void speedRun_renderControls(int player, int screenZ, int align)
 {
-    if(GameMenu || GameOutro || LevelEditor)
-        return; // Don't draw things at Menu and Outro
+    if(GameOutro || LevelEditor)
+        return; // Don't draw things at Editor and Outro
+
+    if(GameMenu && (!g_drawController || MenuMode == MENU_CHARACTER_SELECT_NEW || MenuMode == MENU_CHARACTER_SELECT_NEW_BM))
+        return;
 
     if(player < 1 || player > maxLocalPlayers)
         return;
@@ -379,8 +387,15 @@ void speedRun_renderControls(int player, int screenZ, int align)
                 break;
         }
 
+        if(GameMenu)
+        {
+            num_players = SDL_min(num_players, (int)Controls::g_InputMethods.size());
 
-        if(align == SPEEDRUN_ALIGN_AUTO)
+            if(plr_i >= num_players)
+                return;
+        }
+
+        if(align == SPEEDRUN_ALIGN_AUTO && !GameMenu)
         {
             if(plr_i == 0 || num_players <= 1)
                 align = SPEEDRUN_ALIGN_LEFT;
@@ -397,6 +412,11 @@ void speedRun_renderControls(int player, int screenZ, int align)
         {
             x = (XRender::TargetW - XRender::TargetOverscanX - (w + 4));
             bx = x - (bw + 4);
+        }
+        else if(GameMenu)
+        {
+            x = XRender::TargetOverscanX + 4 + (w + 4) * plr_i;
+            bx = x + w + 4;
         }
         else
         {
@@ -485,7 +505,8 @@ void speedRun_renderControls(int player, int screenZ, int align)
         }
     }
 
-    RenderPowerInfo(player, bx, by, bw, bh, battery_alpha, &status_info);
+    if(!GameMenu)
+        RenderPowerInfo(player, bx, by, bw, bh, battery_alpha, &status_info);
 
     if(show_controls)
         RenderControls(player, x, y, w, h, player_missing, controls_alpha);
