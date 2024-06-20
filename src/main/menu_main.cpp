@@ -778,21 +778,26 @@ bool mainMenuUpdate()
         {
             if(MenuMouseRelease && SharedCursor.Primary)
                 MenuMouseClick = true;
+
             if(menuBackPress && MenuCursorCanMove)
             {
                 int quitKeyPos = 2;
+
                 if(s_show_separate_2P())
-                    quitKeyPos ++;
+                    quitKeyPos++;
+
                 if(!g_gameInfo.disableBattleMode)
-                    quitKeyPos ++;
+                    quitKeyPos++;
+
                 if(g_config.enable_editor)
-                    quitKeyPos ++;
+                    quitKeyPos++;
 
                 MenuMode = MENU_MAIN;
                 MenuCursor = quitKeyPos;
                 MenuCursorCanMove = false;
                 PlaySoundMenu(SFX_Slide);
             }
+
             if((menuDoPress && MenuCursorCanMove) || MenuMouseClick)
             {
                 MenuCursorCanMove = false;
@@ -844,12 +849,15 @@ bool mainMenuUpdate()
             if(menuBackPress && MenuCursorCanMove)
             {
                 int quitKeyPos = 2;
+
                 if(s_show_separate_2P())
-                    quitKeyPos ++;
+                    quitKeyPos++;
+
                 if(!g_gameInfo.disableBattleMode)
-                    quitKeyPos ++;
+                    quitKeyPos++;
+
                 if(g_config.enable_editor)
-                    quitKeyPos ++;
+                    quitKeyPos++;
 
                 if(XRender::TargetH < TinyScreenH)
                 {
@@ -983,15 +991,20 @@ bool mainMenuUpdate()
 
 
             int quitKeyPos = 2;
+
             if(s_show_separate_2P())
-                quitKeyPos ++;
+                quitKeyPos++;
+
             if(!g_gameInfo.disableBattleMode)
-                quitKeyPos ++;
+                quitKeyPos++;
+
             if(g_config.enable_editor)
-                quitKeyPos ++;
+                quitKeyPos++;
+
 
             if(MenuCursor > quitKeyPos)
                 MenuCursor = 0;
+
             if(MenuCursor < 0)
                 MenuCursor = quitKeyPos;
         } // Main Menu
@@ -1552,12 +1565,14 @@ bool mainMenuUpdate()
                         LoadCustomPlayerPreviews(SelectWorld[selWorld].WorldPath.c_str());
 
                         selSave = MenuCursor + 1;
+
                         if(MenuMode == MENU_SELECT_SLOT_2P)
                             ConnectScreen::MainMenu_Start(2);
                         else if(s_prefer_modern_char_sel())
                             ConnectScreen::MainMenu_Start(1);
                         else
                             ConnectScreen::LegacyMenu_Start();
+
                         MenuMode = MENU_CHARACTER_SELECT_NEW;
                         MenuCursorCanMove = false;
                     }
@@ -2077,8 +2092,9 @@ static void s_drawGameSaves(int MenuX, int MenuY)
     for(A = 1; A <= maxSaveSlots; A++)
     {
         int posY = MenuY - 30 + (A * 30);
+        const auto& info = SaveSlotInfo[A];
 
-        if(SaveSlotInfo[A].Progress >= 0)
+        if(info.Progress >= 0)
         {
             // "SLOT {0} ... {1}%"
             std::string p = fmt::format_ne(g_mainMenu.gameSlotContinue, A, SaveSlotInfo[A].Progress);
@@ -2086,7 +2102,7 @@ static void s_drawGameSaves(int MenuX, int MenuY)
 
             SuperPrint(p, 3, MenuX, posY);
 
-            if(SaveSlotInfo[A].Stars > 0)
+            if(info.Stars > 0)
             {
                 len += 4;
                 XRender::renderTexture(MenuX + len, posY + 1,
@@ -2099,7 +2115,7 @@ static void s_drawGameSaves(int MenuX, int MenuY)
                                       GFX.Interface[1], 0, 0);
 
                 len += GFX.Interface[1].w + 4;
-                SuperPrint(fmt::format_ne("{0}", SaveSlotInfo[A].Stars), 3, MenuX + len, posY);
+                SuperPrint(fmt::format_ne("{0}", info.Stars), 3, MenuX + len, posY);
             }
         }
         else
@@ -2116,7 +2132,8 @@ static void s_drawGameSaves(int MenuX, int MenuY)
         SuperPrint(g_mainMenu.gameEraseSave, 3, MenuX, MenuY - 30 + (A * 30));
     }
 
-    if(MenuCursor < 0 || MenuCursor >= maxSaveSlots || (MenuMode != MENU_SELECT_SLOT_1P && MenuMode != MENU_SELECT_SLOT_2P) || SaveSlotInfo[MenuCursor + 1].Progress < 0)
+
+    if(MenuCursor < 0 || MenuCursor >= maxSaveSlots || (MenuMode != MENU_SELECT_SLOT_1P && MenuMode != MENU_SELECT_SLOT_2P))
         return;
 
     const auto& info = SaveSlotInfo[MenuCursor + 1];
@@ -2507,7 +2524,7 @@ void mainMenuDraw()
             XRender::renderTexture(MenuX - 20, MenuY + (MenuCursor * 30), GFX.MCursor[0]);
     }
 
-    else if(MenuMode == MENU_SELECT_SLOT_1P_DELETE || MenuMode == MENU_SELECT_SLOT_2P_DELETE) // Copy save
+    else if(MenuMode == MENU_SELECT_SLOT_1P_DELETE || MenuMode == MENU_SELECT_SLOT_2P_DELETE) // Delete save
     {
         s_drawGameTypeTitle(MenuX, MenuY - 70);
         SuperPrint(SelectWorld[selWorld].WorldName, 3, MenuX, MenuY - 40, XTColorF(0.6f, 1.f, 1.f));
@@ -2522,7 +2539,7 @@ void mainMenuDraw()
     else if(MenuMode == MENU_OPTIONS)
     {
         int i = 0;
-        SuperPrint(g_mainMenu.controlsTitle, 3, MenuX, MenuY + 30*i++);
+        SuperPrint(g_mainMenu.controlsTitle, 3, MenuX, MenuY + (30 * i++));
 #ifndef RENDER_FULLSCREEN_ALWAYS
         if(resChanged)
             SuperPrint(g_mainMenu.optionsModeWindowed, 3, MenuX, MenuY + (30 * i++));

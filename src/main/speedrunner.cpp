@@ -304,10 +304,13 @@ void RenderPowerInfo(int player, int bx, int by, int bw, int bh, uint8_t alpha, 
             XRender::renderRect(bx + 4, by + 4, s*2, 14, {color, alphaBtn}, true);
             break;
         }
+
         if(status_info.power_status == XPower::StatusInfo::POWER_UNKNOWN)
             SuperPrintCenter("?", 3, (bx + bw / 2) & ~1, (by + bh / 2 - 8) & ~1, XTAlpha(alpha));
+
         if(status_info.power_status == XPower::StatusInfo::POWER_WIRED)
             SuperPrintCenter("W", 3, (bx + bw / 2) & ~1, (by + bh / 2 - 8) & ~1, XTAlpha(alpha));
+
         if(status_info.power_status == XPower::StatusInfo::POWER_CHARGING)
             SuperPrintCenter("+", 3, (bx + bw / 2) & ~1, (by + bh / 2 - 7) & ~1, XTAlpha(alpha));
     }
@@ -368,6 +371,7 @@ void speedRun_renderControls(int player, int screenZ, int align)
     {
         const Screen_t& plr_screen = ScreenByPlayer(player);
         num_players = plr_screen.player_count;
+
         int plr_i = 0;
         for(; plr_i < plr_screen.player_count; plr_i++)
         {

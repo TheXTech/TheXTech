@@ -1155,6 +1155,7 @@ void Autocode::Do(bool init)
                 ftype = FT_BYTE;
                 ftype = StrToFieldtype(GetS(MyString));
             }
+
             if(ReferenceOK())
             {
                 double gotval = gAutoMan.GetVar(GetS(MyRef));
@@ -1176,6 +1177,7 @@ void Autocode::Do(bool init)
                     ftype = FT_BYTE;
                     ftype = StrToFieldtype(GetS(MyString));
                 }
+
                 if(ReferenceOK())
                 {
                     double gotval = gAutoMan.GetVar(GetS(MyRef));

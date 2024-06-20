@@ -331,11 +331,13 @@ void WorldLoop()
     if(WorldPlayer[1].Move > 0)
     {
         WorldPlayer[1].Frame2 += 1;
+
         if(WorldPlayer[1].Frame2 >= 8)
         {
             WorldPlayer[1].Frame2 = 0;
             WorldPlayer[1].Frame += 1;
         }
+
         if(WorldPlayer[1].Move == 1)
         {
             if(WorldPlayer[1].Frame < 6)
@@ -343,6 +345,7 @@ void WorldLoop()
             if(WorldPlayer[1].Frame > 7)
                 WorldPlayer[1].Frame = 6;
         }
+
         if(WorldPlayer[1].Move == 4)
         {
             if(WorldPlayer[1].Frame < 2)
@@ -350,6 +353,7 @@ void WorldLoop()
             if(WorldPlayer[1].Frame > 3)
                 WorldPlayer[1].Frame = 2;
         }
+
         if(WorldPlayer[1].Move == 3)
         {
             if(WorldPlayer[1].Frame < 0)
@@ -357,6 +361,7 @@ void WorldLoop()
             if(WorldPlayer[1].Frame > 1)
                 WorldPlayer[1].Frame = 0;
         }
+
         if(WorldPlayer[1].Move == 2)
         {
             if(WorldPlayer[1].Frame < 4)
@@ -428,8 +433,10 @@ void WorldLoop()
                     }
                 }
             }
+
             if(WalkAnywhere)
                 WorldPlayer[1].Move = 1;
+
             if(WorldPlayer[1].Move == 0)
             {
                 WorldPlayer[1].Move3 = false;
@@ -1111,8 +1118,10 @@ void PathPath(WorldPath_t &Pth, bool Skp)
                 }
             }
         }
+
         if(found)
             PathPath(*found, Skp);
+
 
         //for(A = 1; A <= numWorldLevels; A++)
         for(auto t : treeWorldLevelQuery(tempLocation, SORTMODE_ID))

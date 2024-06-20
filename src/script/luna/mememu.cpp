@@ -635,8 +635,8 @@ public:
 
         insert(0x00B2C62C, &PSwitchTime); // P-Switch Timer
         insert(0x00B2C62E, &PSwitchStop); // Stopwatch Timer
-
         insert(0x00B2C630, &PSwitchPlayer); // P-Switch/Stopwatch Player
+
         insert(0x00B2C684, &FrameSkip);
 
         insert(0x00B2C6DC, &Physics.PlayerJumpHeight);

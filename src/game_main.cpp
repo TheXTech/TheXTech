@@ -86,7 +86,6 @@
 
 #include "controls.h"
 
-#include "config.h"
 #include "main/screen_connect.h"
 #include "main/screen_quickreconnect.h"
 #include "main/screen_asset_pack.h"
