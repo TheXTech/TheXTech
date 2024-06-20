@@ -146,9 +146,14 @@ public:
     opt<bool> unlimited_framerate{this, defaults(false), {}, Scope::Config,
         "unlimited-framerate", "Unlimited framerate", nullptr};
 
+#ifdef __WIIU__
+    // Wii U SDL2 has a bug that requires vSync to always be enabled
+    static constexpr bool render_vsync = true;
+#else
     opt<bool> render_vsync{this, defaults(false), {}, Scope::Config,
         "vsync", "V-Sync", nullptr,
         config_res_set};
+#endif
 
     /* ---- Main - Multiplayer ----*/
     subsection main_multiplayer{this, "multiplayer", "Multiplayer"};
@@ -696,7 +701,6 @@ public:
         COMPAT_CLASSIC,
         COMPAT_SMBX13,
         COMPAT_MODERN,
-        COMPAT_CONTENT,
     };
     opt_enum<int> compatibility_mode{this,
         {
