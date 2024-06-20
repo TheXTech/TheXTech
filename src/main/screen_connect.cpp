@@ -229,6 +229,7 @@ public:
     bool Ready() const;
 };
 
+static bool s_controls_dirty = false;
 static int s_minPlayers = 1;
 
 static std::array<PlayerBox, maxLocalPlayers> s_players;
@@ -246,6 +247,13 @@ static void s_logRecentChars()
     {
         if(s_players[i].m_state != PlayerState::Disconnected)
             s_recent_char[i] = g_charSelect[i];
+    }
+
+    // if controls dirty, save them
+    if(s_controls_dirty)
+    {
+        Controls::SaveConfig();
+        s_controls_dirty = false;
     }
 }
 
@@ -2205,6 +2213,7 @@ int PlayerBox::Logic()
             }
             else
             {
+                s_controls_dirty = true;
                 m_state = PlayerState::ControlsMenu;
                 m_menu_item = 1;
             }
