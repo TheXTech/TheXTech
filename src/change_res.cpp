@@ -78,9 +78,6 @@ void UpdateInternalRes()
     int req_w = g_config.internal_res.m_value.first;
     int req_h = g_config.internal_res.m_value.second;
 
-    if(g_config.dynamic_width)
-        req_w = 0;
-
     // TODO: use the correct canonical screen's resolution here
     int canon_w = 800;
     int canon_h = 600;

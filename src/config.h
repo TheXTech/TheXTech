@@ -215,8 +215,6 @@ public:
         config_res_set
     };
 
-    static constexpr bool dynamic_width = false;
-
     enum ScaleModes
     {
         SCALE_DYNAMIC_INTEGER = -3,
