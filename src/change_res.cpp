@@ -78,10 +78,6 @@ void UpdateInternalRes()
     int req_w = g_config.InternalW;
     int req_h = g_config.InternalH;
 
-#ifdef __3DS__
-    req_w += XRender::TargetOverscanX * 2;
-#endif
-
     // TODO: use the correct canonical screen's resolution here
     int canon_w = 800;
     int canon_h = 600;
@@ -95,7 +91,7 @@ void UpdateInternalRes()
         }
     }
 
-    if(req_w == 0 || req_h == 0)
+    if(!XRender::is_nullptr() && (req_w == 0 || req_h == 0))
     {
         int int_w, int_h, orig_int_h;
 
@@ -192,6 +188,7 @@ void UpdateInternalRes()
                 if(int_h > 720)
                     int_h = 720;
             }
+
             if(int_h < canon_h)
             {
                 int_w = (int_w * canon_h) / int_h;
@@ -218,7 +215,21 @@ void UpdateInternalRes()
     {
         XRender::TargetW = req_w;
         XRender::TargetH = req_h;
+
+        if(XRender::TargetW == 0)
+            XRender::TargetW = g_config.InternalW;
+
+        if(XRender::TargetH == 0)
+        {
+            XRender::TargetW = 1280;
+            XRender::TargetH = 720;
+        }
     }
+
+#ifdef __3DS__
+    if(g_config.allow_multires)
+        XRender::TargetW += XRender::TargetOverscanX * 2;
+#endif
 
     // DONE: above should tweak render target resolution. This should tweak game's screen resolution.
     if(g_config.allow_multires && g_config.dynamic_camera_logic)
@@ -236,6 +247,9 @@ void UpdateInternalRes()
         l_screen->W = canon_w;
         l_screen->H = canon_h;
     }
+
+    if(XRender::is_nullptr() || !GameIsActive)
+        return;
 
     XRender::updateViewport();
 
@@ -258,7 +272,7 @@ void UpdateInternalRes()
 
 void UpdateWindowRes()
 {
-    if(XWindow::isFullScreen() || XWindow::isMaximized())
+    if(XWindow::is_nullptr() || XWindow::isFullScreen() || XWindow::isMaximized())
         return;
 
     int h = g_config.InternalH;
