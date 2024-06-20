@@ -6120,6 +6120,7 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
                             Layer[B].EffectStop = true;
                             Layer[B].SpeedX = 0;
                             Layer[B].SpeedY = 0;
+
                             for(int C : Layer[B].blocks)
                             {
                                 // if(Block[C].Layer == Layer[B].Name)
@@ -6128,6 +6129,7 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
                                     Block[C].Location.SpeedY = 0;
                                 }
                             }
+
                             if(g_config.enable_climb_bgo_layer_move)
                             {
                                 for(int C : Layer[B].BGOs)
@@ -6139,6 +6141,7 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
                                     }
                                 }
                             }
+
                             for(int C : Layer[B].NPCs)
                             {
                                 // if(NPC[C].Layer == Layer[B].Name)

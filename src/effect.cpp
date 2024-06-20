@@ -20,6 +20,7 @@
 
 #include "globals.h"
 #include "config.h"
+
 #include "effect.h"
 #include "npc.h"
 #include "npc_id.h"
