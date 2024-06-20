@@ -518,6 +518,8 @@ bool InitUIAssetsFrom(const std::string& id, bool skip_gfx)
     if(!skip_gfx && !GFX.load())
         return false;
 
+    ConfigReloadRecentEpisodes();
+
     return true;
 }
 
