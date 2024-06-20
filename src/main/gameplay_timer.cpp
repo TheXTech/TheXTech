@@ -131,6 +131,7 @@ GameplayTimer::GameplayTimer() = default;
 
 void GameplayTimer::reset()
 {
+    m_invalidContinue = false;
     m_cyclesInt = false;
     m_cyclesFin = false;
     m_cyclesCurrent = 0;
@@ -168,12 +169,15 @@ void GameplayTimer::load()
     o.read("total", m_cyclesTotal, 0);
     m_cyclesCurrent = 0; // Reset the counter
     o.endGroup();
+
+    if(!m_cyclesInt)
+        m_invalidContinue = true;
 }
 
 void GameplayTimer::save()
 {
     // should Cheater also be a condition here?
-    if(TestLevel || !selSave)
+    if(TestLevel || !selSave || m_invalidContinue)
         return;
 
     IniProcessing o;
@@ -250,6 +254,8 @@ void GameplayTimer::render()
 
     SuperPrintScreenCenter(formatTime(m_cyclesCurrent), 3, y - 34, XTColorF(lc[0], lc[1], lc[2], a));
 
-    if(!TestLevel)
+    if(m_invalidContinue)
+        SuperPrintScreenCenter(g_mainMenu.caseNone,         3, y - 18, XTColorF(0.5f, 0.5f, 0.5f, a));
+    else if(!TestLevel)
         SuperPrintScreenCenter(formatTime(m_cyclesTotal),   3, y - 18, XTColorF(wc, 1.0f, wc, a));
 }
