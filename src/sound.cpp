@@ -1436,7 +1436,7 @@ void PlaySound(int A, int loops, int volume)
     if(GameMenu || GameOutro) // || A == 26 || A == 27 || A == 29)
         return;
 
-    if(A > (int)g_totalSounds) // Play fallback sound for the missing SFX
+    if(A > (int)g_totalSounds || !g_config.sfx_modern) // Play fallback sound for the missing SFX
         A = getFallbackSfx(A);
     else if(!s_useIceBallSfx && A == SFX_Iceball)
         A = SFX_Fireball; // Fell back into fireball when iceball sound isn't preferred
@@ -1478,8 +1478,10 @@ void PlaySoundSpatial(int A, int l, int t, int r, int b, int loops, int volume)
 
     if(SoundPause[A] == 0) // if the sound wasn't just played
     {
-        uint8_t left, right;
-        Sound_ResolveSpatialMod(left, right, l, t, r, b);
+        uint8_t left = 255, right = 255;
+
+        if(g_config.sfx_spatial_audio)
+            Sound_ResolveSpatialMod(left, right, l, t, r, b);
 
         std::string alias = fmt::format_ne("sound{0}", A);
         PlaySfx(alias, loops, volume, left, right);
@@ -1590,8 +1592,13 @@ void UpdateYoshiMusic()
 
     bool hasYoshi = false;
 
-    for(int i = 1; i <= numPlayers; ++i)
-        hasYoshi |= (Player[i].Mount == 3);
+    if(!g_config.sfx_pet_beat)
+        hasYoshi = false;
+    else
+    {
+        for(int i = 1; i <= numPlayers; ++i)
+            hasYoshi |= (Player[i].Mount == 3);
+    }
 
     Mix_SetMusicTrackMute(g_curMusic, s_musicYoshiTrackNumber, hasYoshi ? 0 : 1);
 }
@@ -1877,7 +1884,7 @@ void UpdateSoundFX(int recentSection)
         return;
 
     SDL_assert_release(recentSection >= 0 && recentSection <= maxSections);
-    auto &s = s_sectionEffect[recentSection];
+    const auto &s = g_config.sfx_audio_fx ? s_sectionEffect[recentSection] : SectionEffect_t();
 
     s_musicDisableSpcEcho = s.disableSpcEcho;
     if(g_curMusic)

@@ -118,6 +118,12 @@ extern struct Config_t : public Compatibility_t, public VideoSettings_t
     bool unlimited_framerate = false;
     bool audio_enable = true;
 
+    // temporary fields for new SFX settings, in preparation to merge the config branch
+    bool sfx_pet_beat = true;
+    bool sfx_modern = true;
+    bool sfx_audio_fx = true;
+    bool sfx_spatial_audio = true;
+
 } g_config; // main_config.cpp
 
 #endif // CONFIG_H

@@ -168,7 +168,7 @@ void UpdateEffects()
             if(e.Frame > 7)
                 e.Frame = 0;
 
-            if(HasSound(SFX_MagicBossShell)) // When new sound is presented, do animation a bit differently
+            if(HasSound(SFX_MagicBossShell) && g_config.sfx_modern) // When new sound is presented, do animation a bit differently
             {
                 if(e.Life == 75)
                     e.Location.SpeedY = -5;
