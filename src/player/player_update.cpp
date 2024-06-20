@@ -1875,7 +1875,7 @@ void UpdatePlayer()
                               ((Player[A].Location.SpeedY > Physics.PlayerGravity * 5 && Player[A].Character != 3 && Player[A].Character != 4) ||
                                 (Player[A].Location.SpeedY > Physics.PlayerGravity * 10 && Player[A].Character == 3) ||
                                 (Player[A].Location.SpeedY > Physics.PlayerGravity * 7.5 && Player[A].Character == 4)) &&
-                               !Player[A].GroundPound && Player[A].Slope == 0 && Player[A].Character != 5)
+                                !Player[A].GroundPound && Player[A].Slope == 0 && Player[A].Character != 5)
                             {
                                 if(!Player[A].ShellSurf)
                                 {
@@ -1893,11 +1893,11 @@ void UpdatePlayer()
                                 }
 
                                 if(
-                                        !(
-                                                (!Player[A].YoshiBlue && (Player[A].CanFly || Player[A].CanFly2)) ||
-                                                (Player[A].Mount == 3 && Player[A].CanFly2)
-                                        )
-                                 )
+                                    !(
+                                        (!Player[A].YoshiBlue && (Player[A].CanFly || Player[A].CanFly2)) ||
+                                        (Player[A].Mount == 3 && Player[A].CanFly2)
+                                    )
+                                )
                                 {
                                     if(iRand(10) == 0)
                                     {
@@ -4217,11 +4217,11 @@ void UpdatePlayer()
 
                                                 // If Not (.WetFrame = True And (NPC(B).Type = 229 Or NPC(B).Type = 230) Or NPCIsAVine(NPC(B).Type)) And .HoldingNPC <> B Then
                                                 if(
-                                                        !(
-                                                                (Player[A].WetFrame && (NPC[B].Type == NPCID_GRN_FISH_S3 || NPC[B].Type == NPCID_RED_FISH_S3)) ||
-                                                                NPC[B]->IsAVine
-                                                        ) && (Player[A].HoldingNPC != B)
-                                                        )
+                                                    !(
+                                                        (Player[A].WetFrame && (NPC[B].Type == NPCID_GRN_FISH_S3 || NPC[B].Type == NPCID_RED_FISH_S3)) ||
+                                                        NPC[B]->IsAVine
+                                                    ) && (Player[A].HoldingNPC != B)
+                                                )
                                                 {
                                                     if(Player[A].Vine > 0)
                                                     {
