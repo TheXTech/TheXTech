@@ -91,10 +91,13 @@ void speedRun_renderTimer()
 
     if(g_config.speedrun_mode != SPEEDRUN_MODE_OFF)
     {
-        SuperPrintRightAlign(fmt::format_ne(Cheater ? "CMode {0}" : "Mode {0}", g_config.speedrun_mode), 3, XRender::TargetW - XRender::TargetOverscanX - 2, 2, XTColorF(1.f, 0.3f, 0.3f, 0.5f));
+        // place speedrun mode below game version display on main menu
+        int topY = (GameMenu) ? 22 : 2;
+
+        SuperPrintRightAlign(fmt::format_ne(Cheater ? "CMode {0}" : "Mode {0}", g_config.speedrun_mode), 3, XRender::TargetW - XRender::TargetOverscanX - 2, topY, XTColorF(1.f, 0.3f, 0.3f, 0.5f));
 
         if(g_config.allow_multires)
-            SuperPrintRightAlign(fmt::format_ne("{0}x{1}", l_screen->W, l_screen->H), 3, XRender::TargetW - XRender::TargetOverscanX - 2, 22, XTColorF(1.f, 0.3f, 0.3f, 0.5f));
+            SuperPrintRightAlign(fmt::format_ne("{0}x{1}", l_screen->W, l_screen->H), 3, XRender::TargetW - XRender::TargetOverscanX - 2, topY + 20, XTColorF(1.f, 0.3f, 0.3f, 0.5f));
     }
 
     if(GameMenu || GameOutro || BattleMode || LevelEditor)
