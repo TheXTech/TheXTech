@@ -30,7 +30,6 @@
 #include <Logger/logger.h>
 
 #include "globals.h"
-#include "video.h"
 #include "frame_timer.h"
 
 #include "core/render.h"

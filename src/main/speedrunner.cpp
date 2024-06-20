@@ -504,7 +504,7 @@ void speedRun_triggerEnter()
     if(g_speedRunnerMode == SPEEDRUN_MODE_OFF)
         return; // Do nothing
 
-    if(g_config.speedrun_stop_timer_by != Compatibility_t::SPEEDRUN_STOP_ENTER_LEVEL)
+    if(g_config.speedrun_stop_timer_by != Config_t::SPEEDRUN_STOP_ENTER_LEVEL)
         return;
 
     if(SDL_strcasecmp(FileName.c_str(), g_config.speedrun_stop_timer_at) == 0)
@@ -516,7 +516,7 @@ void speedRun_triggerLeave()
     if(g_speedRunnerMode == SPEEDRUN_MODE_OFF)
         return; // Do nothing
 
-    if(g_config.speedrun_stop_timer_by != Compatibility_t::SPEEDRUN_STOP_LEAVE_LEVEL)
+    if(g_config.speedrun_stop_timer_by != Config_t::SPEEDRUN_STOP_LEAVE_LEVEL)
         return;
 
     if(SDL_strcasecmp(FileName.c_str(), g_config.speedrun_stop_timer_at) == 0)

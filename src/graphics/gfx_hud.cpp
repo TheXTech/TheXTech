@@ -28,7 +28,6 @@
 #include "../gfx.h"
 #include "npc_traits.h"
 
-#include "video.h"
 #include "main/speedrunner.h"
 
 #include "config.h"
@@ -501,12 +500,12 @@ void DrawDeviceBattery()
     const bool isFullScreen = resChanged;
 #endif
 
-    if(g_config.batteryStatus == BATTERY_STATUS_OFF)
+    if(g_config.batteryStatus == Config_t::BATTERY_STATUS_OFF)
         return;
 
     if(!isFullScreen)
     {
-        if(g_config.batteryStatus == BATTERY_STATUS_FULLSCREEN_WHEN_LOW || g_config.batteryStatus == BATTERY_STATUS_FULLSCREEN_ON)
+        if(g_config.batteryStatus == Config_t::BATTERY_STATUS_FULLSCREEN_WHEN_LOW || g_config.batteryStatus == Config_t::BATTERY_STATUS_FULLSCREEN_ON)
             return;
     }
 
@@ -519,10 +518,10 @@ void DrawDeviceBattery()
 
     bool showBattery = false;
 
-    showBattery |= (g_config.batteryStatus == BATTERY_STATUS_ALWAYS_ON);
-    showBattery |= (g_config.batteryStatus == BATTERY_STATUS_ANY_WHEN_LOW && isLow);
-    showBattery |= (g_config.batteryStatus == BATTERY_STATUS_FULLSCREEN_WHEN_LOW && isLow && isFullScreen);
-    showBattery |= (g_config.batteryStatus == BATTERY_STATUS_FULLSCREEN_ON && isFullScreen);
+    showBattery |= (g_config.batteryStatus == Config_t::BATTERY_STATUS_ALWAYS_ON);
+    showBattery |= (g_config.batteryStatus == Config_t::BATTERY_STATUS_ANY_WHEN_LOW && isLow);
+    showBattery |= (g_config.batteryStatus == Config_t::BATTERY_STATUS_FULLSCREEN_WHEN_LOW && isLow && isFullScreen);
+    showBattery |= (g_config.batteryStatus == Config_t::BATTERY_STATUS_FULLSCREEN_ON && isFullScreen);
 
     if(showBattery)
     {

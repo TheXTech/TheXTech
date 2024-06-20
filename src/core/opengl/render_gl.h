@@ -41,7 +41,7 @@
 
 #include "core/base/render_base.h"
 #include "cmd_line_setup.h"
-#include "video.h"
+#include "config.h"
 
 #include "core/opengl/gl_program_object.h"
 #include "core/opengl/gl_light_info.h"
@@ -236,7 +236,7 @@ private:
     std::set<StdPicture *> m_loadedPictures;
 
     // Current scaling mode
-    int m_current_scale_mode = SCALE_DYNAMIC_NEAREST;
+    int m_current_scale_mode = Config_t::SCALE_DYNAMIC_NEAREST;
 
     // Offset to shake screen
     PointI m_viewport_offset = PointI(0, 0);
@@ -435,7 +435,7 @@ private:
      * \param majver: minimum OpenGL major version to initialize
      * \param minver: minimum OpenGL minor version to initialize
      */
-    static void try_init_gl(SDL_GLContext& context, SDL_Window* window, GLint profile, GLint majver, GLint minver, RenderMode_t mode);
+    static void try_init_gl(SDL_GLContext& context, SDL_Window* window, GLint profile, GLint majver, GLint minver, Config_t::RenderMode_t mode);
 
     // initializes a single framebuffer with the game's current screen resolution scaled by the appropriate scaling factor
     // if a render target (BUFFER_GAME, BUFFER_INT_PASS_1, BUFFER_INT_PASS_2), will include depth

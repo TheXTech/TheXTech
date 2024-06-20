@@ -25,48 +25,6 @@
 #include <string>
 #include <unordered_map>
 
-enum RenderMode_t
-{
-    RENDER_ACCELERATED_VSYNC_DEPRECATED = -1,
-    RENDER_SOFTWARE = 0,
-    RENDER_ACCELERATED_AUTO,
-    RENDER_ACCELERATED_SDL,
-    RENDER_ACCELERATED_OPENGL,
-    RENDER_ACCELERATED_OPENGL_ES,
-    RENDER_ACCELERATED_OPENGL_LEGACY,
-    RENDER_ACCELERATED_OPENGL_ES_LEGACY,
-    RENDER_END
-};
-
-enum BatteryStatus_t
-{
-    BATTERY_STATUS_OFF = 0,
-    BATTERY_STATUS_FULLSCREEN_WHEN_LOW,
-    BATTERY_STATUS_ANY_WHEN_LOW,
-    BATTERY_STATUS_FULLSCREEN_ON,
-    BATTERY_STATUS_ALWAYS_ON,
-};
-
-enum ScaleModes
-{
-    SCALE_DYNAMIC_INTEGER = -3,
-    SCALE_DYNAMIC_NEAREST = -2,
-    SCALE_DYNAMIC_LINEAR = -1,
-    SCALE_FIXED_05X = 0,
-    SCALE_FIXED_1X = 1,
-    SCALE_FIXED_2X = 2,
-};
-
-static const std::unordered_map<int, std::string> ScaleMode_strings =
-{
-    {SCALE_DYNAMIC_INTEGER, "integer"},
-    {SCALE_DYNAMIC_NEAREST, "nearest"},
-    {SCALE_DYNAMIC_LINEAR, "linear"},
-    {SCALE_FIXED_05X, "0.5x"},
-    {SCALE_FIXED_1X, "1x"},
-    {SCALE_FIXED_2X, "2x"},
-};
-
 struct VideoSettings_t
 {
     enum ScaleDownTextures
@@ -74,6 +32,38 @@ struct VideoSettings_t
         SCALE_NONE = 0,
         SCALE_SAFE = 1,
         SCALE_ALL = 2,
+    };
+
+    enum RenderMode_t
+    {
+        RENDER_ACCELERATED_VSYNC_DEPRECATED = -1,
+        RENDER_SOFTWARE = 0,
+        RENDER_ACCELERATED_AUTO,
+        RENDER_ACCELERATED_SDL,
+        RENDER_ACCELERATED_OPENGL,
+        RENDER_ACCELERATED_OPENGL_ES,
+        RENDER_ACCELERATED_OPENGL_LEGACY,
+        RENDER_ACCELERATED_OPENGL_ES_LEGACY,
+        RENDER_END
+    };
+
+    enum BatteryStatus_t
+    {
+        BATTERY_STATUS_OFF = 0,
+        BATTERY_STATUS_FULLSCREEN_WHEN_LOW,
+        BATTERY_STATUS_ANY_WHEN_LOW,
+        BATTERY_STATUS_FULLSCREEN_ON,
+        BATTERY_STATUS_ALWAYS_ON,
+    };
+
+    enum ScaleModes
+    {
+        SCALE_DYNAMIC_INTEGER = -3,
+        SCALE_DYNAMIC_NEAREST = -2,
+        SCALE_DYNAMIC_LINEAR = -1,
+        SCALE_FIXED_05X = 0,
+        SCALE_FIXED_1X = 1,
+        SCALE_FIXED_2X = 2,
     };
 
     //! Render mode
@@ -96,6 +86,16 @@ struct VideoSettings_t
     bool   showFrameRate = false;
     //! 2x scale down all textures to reduce the memory usage
     int    scaleDownTextures = SCALE_SAFE;
+};
+
+static const std::unordered_map<int, std::string> ScaleMode_strings =
+{
+    {VideoSettings_t::SCALE_DYNAMIC_INTEGER, "integer"},
+    {VideoSettings_t::SCALE_DYNAMIC_NEAREST, "nearest"},
+    {VideoSettings_t::SCALE_DYNAMIC_LINEAR, "linear"},
+    {VideoSettings_t::SCALE_FIXED_05X, "0.5x"},
+    {VideoSettings_t::SCALE_FIXED_1X, "1x"},
+    {VideoSettings_t::SCALE_FIXED_2X, "2x"},
 };
 
 #endif // VIDEO_H

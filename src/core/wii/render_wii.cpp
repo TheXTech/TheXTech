@@ -39,7 +39,6 @@
 #include <Utils/files.h>
 
 #include "globals.h"
-#include "video.h"
 #include "frame_timer.h"
 
 #include "main/cheat_code.h"

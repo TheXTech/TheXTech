@@ -98,7 +98,7 @@ bool FrmMain::initSystem(const CmdLineSetup_t &setup)
 #   ifdef RENDERGL_SUPPORTED
     bool try_gl = false;
 
-    if(setup.renderType == RENDER_ACCELERATED_AUTO || setup.renderType == RENDER_ACCELERATED_OPENGL || setup.renderType == RENDER_ACCELERATED_OPENGL_ES || setup.renderType == RENDER_ACCELERATED_OPENGL_LEGACY || setup.renderType == RENDER_ACCELERATED_OPENGL_ES_LEGACY)
+    if(setup.renderType == Config_t::RENDER_ACCELERATED_AUTO || setup.renderType == Config_t::RENDER_ACCELERATED_OPENGL || setup.renderType == Config_t::RENDER_ACCELERATED_OPENGL_ES || setup.renderType == Config_t::RENDER_ACCELERATED_OPENGL_LEGACY || setup.renderType == Config_t::RENDER_ACCELERATED_OPENGL_ES_LEGACY)
     {
         RenderGL *render = new RenderGL();
         m_render.reset(render);
@@ -319,7 +319,7 @@ bool FrmMain::restartRenderer()
     setup.renderType = g_config.renderMode;
     setup.vSync = g_config.vSync;
 
-    if(setup.renderType == RENDER_ACCELERATED_AUTO || setup.renderType == RENDER_ACCELERATED_OPENGL || setup.renderType == RENDER_ACCELERATED_OPENGL_ES || setup.renderType == RENDER_ACCELERATED_OPENGL_LEGACY || setup.renderType == RENDER_ACCELERATED_OPENGL_ES_LEGACY)
+    if(setup.renderType == Config_t::RENDER_ACCELERATED_AUTO || setup.renderType == Config_t::RENDER_ACCELERATED_OPENGL || setup.renderType == Config_t::RENDER_ACCELERATED_OPENGL_ES || setup.renderType == Config_t::RENDER_ACCELERATED_OPENGL_LEGACY || setup.renderType == Config_t::RENDER_ACCELERATED_OPENGL_ES_LEGACY)
     {
         m_render.reset(new RenderGL());
         try_gl = true;

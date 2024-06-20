@@ -49,17 +49,17 @@ void OpenConfig_preSetup()
 {
     const IniProcessing::StrEnumMap renderMode =
     {
-        {"sw", RENDER_SOFTWARE},
-        {"hw", RENDER_ACCELERATED_AUTO},
-        {"vsync", RENDER_ACCELERATED_VSYNC_DEPRECATED},
-        {"sdl", RENDER_ACCELERATED_SDL},
-        {"opengl", RENDER_ACCELERATED_OPENGL},
-        {"opengles", RENDER_ACCELERATED_OPENGL_ES},
-        {"opengl11", RENDER_ACCELERATED_OPENGL_LEGACY},
-        {"opengles11", RENDER_ACCELERATED_OPENGL_ES_LEGACY},
-        {"0", RENDER_SOFTWARE},
-        {"1", RENDER_ACCELERATED_SDL},
-        {"2", RENDER_ACCELERATED_VSYNC_DEPRECATED}
+        {"sw", Config_t::RENDER_SOFTWARE},
+        {"hw", Config_t::RENDER_ACCELERATED_AUTO},
+        {"vsync", Config_t::RENDER_ACCELERATED_VSYNC_DEPRECATED},
+        {"sdl", Config_t::RENDER_ACCELERATED_SDL},
+        {"opengl", Config_t::RENDER_ACCELERATED_OPENGL},
+        {"opengles", Config_t::RENDER_ACCELERATED_OPENGL_ES},
+        {"opengl11", Config_t::RENDER_ACCELERATED_OPENGL_LEGACY},
+        {"opengles11", Config_t::RENDER_ACCELERATED_OPENGL_ES_LEGACY},
+        {"0", Config_t::RENDER_SOFTWARE},
+        {"1", Config_t::RENDER_ACCELERATED_SDL},
+        {"2", Config_t::RENDER_ACCELERATED_VSYNC_DEPRECATED}
     };
 
 #ifndef THEXTECH_NO_SDL_BUILD
@@ -115,9 +115,9 @@ void OpenConfig_preSetup()
 
     const IniProcessing::StrEnumMap scaleDownTextures =
     {
-        {"none", VideoSettings_t::SCALE_NONE},
-        {"safe", VideoSettings_t::SCALE_SAFE},
-        {"all", VideoSettings_t::SCALE_ALL}
+        {"none", Config_t::SCALE_NONE},
+        {"safe", Config_t::SCALE_SAFE},
+        {"all", Config_t::SCALE_ALL}
     };
 
     const IniProcessing::StrEnumMap logLevelEnum =
@@ -166,19 +166,19 @@ void OpenConfig_preSetup()
         config.endGroup();
 
         config.beginGroup("video");
-        config.readEnum("render", g_config.renderMode, (int)RENDER_ACCELERATED_AUTO, renderMode);
-        config.read("vsync", g_config.vSync, (g_config.renderMode == RENDER_ACCELERATED_VSYNC_DEPRECATED));
+        config.readEnum("render", g_config.renderMode, (int)Config_t::RENDER_ACCELERATED_AUTO, renderMode);
+        config.read("vsync", g_config.vSync, (g_config.renderMode == Config_t::RENDER_ACCELERATED_VSYNC_DEPRECATED));
         config.read("background-work", g_config.allowBgWork, false);
         config.read("background-controller-input", g_config.allowBgControllerInput, false);
         config.read("frame-skip", g_config.enableFrameSkip, true);
         config.read("show-fps", g_config.showFrameRate, false);
 
-        if(g_config.renderMode == RENDER_ACCELERATED_VSYNC_DEPRECATED)
-            g_config.renderMode = RENDER_ACCELERATED_AUTO;
+        if(g_config.renderMode == Config_t::RENDER_ACCELERATED_VSYNC_DEPRECATED)
+            g_config.renderMode = Config_t::RENDER_ACCELERATED_AUTO;
 
         bool scale_down_all;
         config.read("scale-down-all-textures", scale_down_all, false);
-        config.readEnum("scale-down-textures", g_config.scaleDownTextures, scale_down_all ? (int)VideoSettings_t::SCALE_ALL : (int)VideoSettings_t::SCALE_SAFE, scaleDownTextures);
+        config.readEnum("scale-down-textures", g_config.scaleDownTextures, scale_down_all ? (int)Config_t::SCALE_ALL : (int)Config_t::SCALE_SAFE, scaleDownTextures);
         config.read("internal-width", g_config.InternalW, 800);
         config.read("internal-height", g_config.InternalH, 600);
 
@@ -204,14 +204,14 @@ void OpenConfig_preSetup()
 
         IniProcessing::StrEnumMap scaleModes =
         {
-            {"linear", SCALE_DYNAMIC_LINEAR},
-            {"integer", SCALE_DYNAMIC_INTEGER},
-            {"nearest", SCALE_DYNAMIC_NEAREST},
-            {"0.5x", SCALE_FIXED_05X},
-            {"1x", SCALE_FIXED_1X},
-            {"2x", SCALE_FIXED_2X},
+            {"linear", Config_t::SCALE_DYNAMIC_LINEAR},
+            {"integer", Config_t::SCALE_DYNAMIC_INTEGER},
+            {"nearest", Config_t::SCALE_DYNAMIC_NEAREST},
+            {"0.5x", Config_t::SCALE_FIXED_05X},
+            {"1x", Config_t::SCALE_FIXED_1X},
+            {"2x", Config_t::SCALE_FIXED_2X},
         };
-        config.readEnum("scale-mode", g_config.scaleMode, (int)SCALE_DYNAMIC_NEAREST, scaleModes);
+        config.readEnum("scale-mode", g_config.scaleMode, (int)Config_t::SCALE_DYNAMIC_NEAREST, scaleModes);
         config.endGroup();
 
 #ifndef THEXTECH_NO_SDL_BUILD
@@ -278,11 +278,11 @@ void OpenConfig()
 
         const IniProcessing::StrEnumMap batteryStatus =
         {
-            {"off", BATTERY_STATUS_OFF},
-            {"fullscreen-low", BATTERY_STATUS_FULLSCREEN_WHEN_LOW},
-            {"low", BATTERY_STATUS_ANY_WHEN_LOW},
-            {"fullscreen", BATTERY_STATUS_FULLSCREEN_ON},
-            {"on", BATTERY_STATUS_ALWAYS_ON}
+            {"off", Config_t::BATTERY_STATUS_OFF},
+            {"fullscreen-low", Config_t::BATTERY_STATUS_FULLSCREEN_WHEN_LOW},
+            {"low", Config_t::BATTERY_STATUS_ANY_WHEN_LOW},
+            {"fullscreen", Config_t::BATTERY_STATUS_FULLSCREEN_ON},
+            {"on", Config_t::BATTERY_STATUS_ALWAYS_ON}
         };
 
         const IniProcessing::StrEnumMap showEpisodeTitle
@@ -335,7 +335,7 @@ void OpenConfig()
         config.beginGroup("video");
         config.read("display-controllers", g_drawController, false);
         config.read("show-fails-counter", g_config.show_fails_counter, true);
-        config.readEnum("battery-status", g_config.batteryStatus, (int)BATTERY_STATUS_OFF, batteryStatus);
+        config.readEnum("battery-status", g_config.batteryStatus, (int)Config_t::BATTERY_STATUS_OFF, batteryStatus);
         config.readEnum("show-episode-title", g_config.show_episode_title, (int)Config_t::EPISODE_TITLE_OFF, showEpisodeTitle);
         config.endGroup();
 
@@ -437,22 +437,22 @@ void SaveConfig()
     {
         std::unordered_map<int, std::string> renderMode =
         {
-            {RENDER_SOFTWARE, "sw"},
-            {RENDER_ACCELERATED_AUTO, "hw"},
-            {RENDER_ACCELERATED_SDL, "sdl"},
-            {RENDER_ACCELERATED_OPENGL, "opengl"},
-            {RENDER_ACCELERATED_OPENGL_ES, "opengles"},
-            {RENDER_ACCELERATED_OPENGL_LEGACY, "opengl11"},
-            {RENDER_ACCELERATED_OPENGL_ES_LEGACY, "opengles11"},
+            {Config_t::RENDER_SOFTWARE, "sw"},
+            {Config_t::RENDER_ACCELERATED_AUTO, "hw"},
+            {Config_t::RENDER_ACCELERATED_SDL, "sdl"},
+            {Config_t::RENDER_ACCELERATED_OPENGL, "opengl"},
+            {Config_t::RENDER_ACCELERATED_OPENGL_ES, "opengles"},
+            {Config_t::RENDER_ACCELERATED_OPENGL_LEGACY, "opengl11"},
+            {Config_t::RENDER_ACCELERATED_OPENGL_ES_LEGACY, "opengles11"},
         };
 
         std::unordered_map<int, std::string> batteryStatus =
         {
-            {BATTERY_STATUS_OFF, "off"},
-            {BATTERY_STATUS_FULLSCREEN_WHEN_LOW, "fullscreen-low"},
-            {BATTERY_STATUS_ANY_WHEN_LOW, "low"},
-            {BATTERY_STATUS_FULLSCREEN_ON, "fullscreen"},
-            {BATTERY_STATUS_ALWAYS_ON, "on"}
+            {Config_t::BATTERY_STATUS_OFF, "off"},
+            {Config_t::BATTERY_STATUS_FULLSCREEN_WHEN_LOW, "fullscreen-low"},
+            {Config_t::BATTERY_STATUS_ANY_WHEN_LOW, "low"},
+            {Config_t::BATTERY_STATUS_FULLSCREEN_ON, "fullscreen"},
+            {Config_t::BATTERY_STATUS_ALWAYS_ON, "on"}
         };
 
         std::unordered_map<int, std::string> showEpisodeTitle =
@@ -464,9 +464,9 @@ void SaveConfig()
 
         std::unordered_map<int, std::string> scaleDownTextures =
         {
-            {VideoSettings_t::SCALE_NONE, "none"},
-            {VideoSettings_t::SCALE_SAFE, "safe"},
-            {VideoSettings_t::SCALE_ALL, "all"},
+            {Config_t::SCALE_NONE, "none"},
+            {Config_t::SCALE_SAFE, "safe"},
+            {Config_t::SCALE_ALL, "all"},
         };
 
         config.setValue("render", renderMode[g_config.renderMode]);

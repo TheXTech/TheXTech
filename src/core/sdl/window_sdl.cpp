@@ -28,7 +28,6 @@
 #include "window_sdl.h"
 #include "../render.h"
 #include "config.h"
-#include "video.h"
 #include "screen.h"
 #include "../version.h"
 
@@ -180,9 +179,9 @@ bool WindowSDL::initSDL(uint32_t windowInitFlags)
 #elif defined(VITA)
     SDL_SetWindowSize(m_window, 960, 544);
 #else
-    if(g_config.scaleMode == SCALE_FIXED_05X)
+    if(g_config.scaleMode == Config_t::SCALE_FIXED_05X)
         SDL_SetWindowSize(m_window, XRender::TargetW / 2, XRender::TargetH / 2);
-    else if(g_config.scaleMode == SCALE_FIXED_2X)
+    else if(g_config.scaleMode == Config_t::SCALE_FIXED_2X)
         SDL_SetWindowSize(m_window, XRender::TargetW * 2, XRender::TargetH * 2);
     else
         SDL_SetWindowSize(m_window, XRender::TargetW, XRender::TargetH);

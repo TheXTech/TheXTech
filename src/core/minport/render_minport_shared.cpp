@@ -31,7 +31,7 @@
 #include <Logger/logger.h>
 
 #include "globals.h"
-#include "video.h"
+#include "config.h"
 #include "frame_timer.h"
 #include "core/window.h"
 #include "core/render.h"
@@ -83,7 +83,7 @@ void updateViewport()
     int TargetW_Show = TargetW;
 #endif
 
-    if(g_config.scaleMode == SCALE_DYNAMIC_LINEAR || g_config.scaleMode == SCALE_DYNAMIC_NEAREST)
+    if(g_config.scaleMode == Config_t::SCALE_DYNAMIC_LINEAR || g_config.scaleMode == Config_t::SCALE_DYNAMIC_NEAREST)
     {
         int res_h = hardware_h;
         int res_w = TargetW_Show * hardware_h / TargetH;
@@ -97,22 +97,22 @@ void updateViewport()
         g_screen_phys_w = res_w;
         g_screen_phys_h = res_h;
     }
-    else if(g_config.scaleMode == SCALE_FIXED_1X)
+    else if(g_config.scaleMode == Config_t::SCALE_FIXED_1X)
     {
         g_screen_phys_w = TargetW_Show / 2;
         g_screen_phys_h = TargetH / 2;
     }
-    else if(g_config.scaleMode == SCALE_FIXED_2X)
+    else if(g_config.scaleMode == Config_t::SCALE_FIXED_2X)
     {
         g_screen_phys_w = TargetW_Show;
         g_screen_phys_h = TargetH;
     }
-    else if(g_config.scaleMode == SCALE_FIXED_05X)
+    else if(g_config.scaleMode == Config_t::SCALE_FIXED_05X)
     {
         g_screen_phys_w = TargetW_Show / 4;
         g_screen_phys_h = TargetH / 4;
     }
-    else if(g_config.scaleMode == SCALE_DYNAMIC_INTEGER)
+    else if(g_config.scaleMode == Config_t::SCALE_DYNAMIC_INTEGER)
     {
         g_screen_phys_w = TargetW_Show / 2;
         g_screen_phys_h = TargetH / 2;

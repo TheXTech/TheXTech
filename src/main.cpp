@@ -28,7 +28,6 @@
 #include "gfx.h"
 #include "rand.h"
 #include "sound.h"
-#include "video.h"
 #include "main/presetup.h"
 #include "main/speedrunner.h"
 #include "main/game_info.h"
@@ -552,24 +551,24 @@ int main(int argc, char**argv)
         {
             std::string rt = renderType.getValue();
             if(rt == "sw")
-                setup.renderType = RENDER_SOFTWARE;
+                setup.renderType = Config_t::RENDER_SOFTWARE;
             else if(rt == "vsync")
             {
-                setup.renderType = RENDER_ACCELERATED_AUTO;
+                setup.renderType = Config_t::RENDER_ACCELERATED_AUTO;
                 setup.vSync = true;
             }
             else if(rt == "hw")
-                setup.renderType = RENDER_ACCELERATED_AUTO;
+                setup.renderType = Config_t::RENDER_ACCELERATED_AUTO;
             else if(rt == "sdl")
-                setup.renderType = RENDER_ACCELERATED_SDL;
+                setup.renderType = Config_t::RENDER_ACCELERATED_SDL;
             else if(rt == "opengl")
-                setup.renderType = RENDER_ACCELERATED_OPENGL;
+                setup.renderType = Config_t::RENDER_ACCELERATED_OPENGL;
             else if(rt == "opengl11")
-                setup.renderType = RENDER_ACCELERATED_OPENGL_LEGACY;
+                setup.renderType = Config_t::RENDER_ACCELERATED_OPENGL_LEGACY;
             else if(rt == "opengles")
-                setup.renderType = RENDER_ACCELERATED_OPENGL_ES;
+                setup.renderType = Config_t::RENDER_ACCELERATED_OPENGL_ES;
             else if(rt == "opengles11")
-                setup.renderType = RENDER_ACCELERATED_OPENGL_ES_LEGACY;
+                setup.renderType = Config_t::RENDER_ACCELERATED_OPENGL_ES_LEGACY;
             else
             {
                 std::cerr << "Error: Invalid value for the --render argument: " << rt << std::endl;

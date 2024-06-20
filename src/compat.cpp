@@ -93,7 +93,7 @@ static void compatInit(Compatibility_t &c)
     // 1.3.5.2
     c.fix_bat_start_while_inactive = true;
     c.fix_FreezeNPCs_no_reset = false;
-    c.world_map_stars_show_policy = Compatibility_t::STARS_UNSPECIFIED;
+    c.world_map_stars_show_policy = Config_t::STARS_UNSPECIFIED;
     // 1.3.5.3
     // c.require_ground_to_enter_warps = false; // REMOVED SINCE 1.3.6
     c.fix_npc_activation_event_loop_bug = true;
@@ -104,7 +104,7 @@ static void compatInit(Compatibility_t &c)
     c.demos_counter_enable = false;
     SDL_strlcpy(c.demos_counter_title, "", sizeof(c.demos_counter_title));
     c.luna_allow_level_codes = false;
-    c.luna_enable_engine = Compatibility_t::LUNA_ENGINE_UNSPECIFIED;
+    c.luna_enable_engine = Config_t::LUNA_ENGINE_UNSPECIFIED;
     c.fix_fairy_stuck_in_pipe = true;
     c.world_map_fast_move = false;
     c.fix_flamethrower_gravity = true;
@@ -210,7 +210,7 @@ static void compatInit(Compatibility_t &c)
         c.allow_multires = false;
     }
 
-    c.speedrun_stop_timer_by = Compatibility_t::SPEEDRUN_STOP_NONE;
+    c.speedrun_stop_timer_by = Config_t::SPEEDRUN_STOP_NONE;
     SDL_memset(c.speedrun_stop_timer_at, 0, sizeof(c.speedrun_stop_timer_at));
     SDL_strlcpy(c.speedrun_stop_timer_at, "Boss Dead", sizeof(c.speedrun_stop_timer_at));
     c.speedrun_blink_effect = SPEEDRUN_EFFECT_BLINK_OPAQUEONLY;
@@ -302,10 +302,10 @@ static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
         std::string buffer;
         const IniProcessing::StrEnumMap stopBy
         {
-            {"none", Compatibility_t::SPEEDRUN_STOP_NONE},
-            {"event", Compatibility_t::SPEEDRUN_STOP_EVENT},
-            {"leave", Compatibility_t::SPEEDRUN_STOP_LEAVE_LEVEL},
-            {"enter", Compatibility_t::SPEEDRUN_STOP_ENTER_LEVEL}
+            {"none", Config_t::SPEEDRUN_STOP_NONE},
+            {"event", Config_t::SPEEDRUN_STOP_EVENT},
+            {"leave", Config_t::SPEEDRUN_STOP_LEAVE_LEVEL},
+            {"enter", Config_t::SPEEDRUN_STOP_ENTER_LEVEL}
         };
 
         const IniProcessing::StrEnumMap speedRunBlinkMode =
@@ -338,11 +338,11 @@ static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
     {
         const IniProcessing::StrEnumMap lunaEnable
         {
-            {"unspecified", Compatibility_t::LUNA_ENGINE_UNSPECIFIED},
-            {"enable", Compatibility_t::LUNA_ENGINE_ENABLE},
-            {"true", Compatibility_t::LUNA_ENGINE_ENABLE},
-            {"disable", Compatibility_t::LUNA_ENGINE_DISABLE},
-            {"false", Compatibility_t::LUNA_ENGINE_DISABLE}
+            {"unspecified", Config_t::LUNA_ENGINE_UNSPECIFIED},
+            {"enable", Config_t::LUNA_ENGINE_ENABLE},
+            {"true", Config_t::LUNA_ENGINE_ENABLE},
+            {"disable", Config_t::LUNA_ENGINE_DISABLE},
+            {"false", Config_t::LUNA_ENGINE_DISABLE}
         };
         compat.readEnum("enable-engine", c.luna_enable_engine, c.luna_enable_engine, lunaEnable);
         compat.read("allow-level-codes", c.luna_allow_level_codes, c.luna_allow_level_codes);
@@ -404,10 +404,10 @@ static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
         compat.read("fix-FreezeNPCs-no-reset", c.fix_FreezeNPCs_no_reset, c.fix_FreezeNPCs_no_reset);
         IniProcessing::StrEnumMap starsShowPolicy
         {
-            {"unspecified", Compatibility_t::STARS_UNSPECIFIED},
-            {"hide", Compatibility_t::STARS_DONT_SHOW},
-            {"show-collected", Compatibility_t::STARS_SHOW_COLLECTED_ONLY},
-            {"show", Compatibility_t::STARS_SHOW_COLLECTED_AND_AVAILABLE}
+            {"unspecified", Config_t::STARS_UNSPECIFIED},
+            {"hide", Config_t::STARS_DONT_SHOW},
+            {"show-collected", Config_t::STARS_SHOW_COLLECTED_ONLY},
+            {"show", Config_t::STARS_SHOW_COLLECTED_AND_AVAILABLE}
         };
         compat.readEnum("world-map-stars-show-policy", c.world_map_stars_show_policy, c.world_map_stars_show_policy, starsShowPolicy);
         // 1.3.6

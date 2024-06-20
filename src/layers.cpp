@@ -759,7 +759,7 @@ void ProcEvent(eventindex_t index, int whichPlayer, bool NoEffect)
         {
             recentlyTriggeredEvents.insert(index);
 
-            if(g_config.speedrun_stop_timer_by == Compatibility_t::SPEEDRUN_STOP_EVENT && equalCase(evt.Name.c_str(), g_config.speedrun_stop_timer_at))
+            if(g_config.speedrun_stop_timer_by == Config_t::SPEEDRUN_STOP_EVENT && equalCase(evt.Name.c_str(), g_config.speedrun_stop_timer_at))
                 speedRun_bossDeadEvent();
 
             for(B = 0; B <= numSections; B++)

@@ -19,7 +19,6 @@
  */
 
 #include "globals.h"
-#include "video.h"
 #include "config.h"
 #include "change_res.h"
 #include "load_gfx.h"
@@ -39,9 +38,9 @@ void SetOrigRes()
     resChanged = false;
 
 #ifndef __EMSCRIPTEN__
-    if(g_config.scaleMode == SCALE_FIXED_05X)
+    if(g_config.scaleMode == Config_t::SCALE_FIXED_05X)
         XWindow::setWindowSize(XRender::TargetW / 2, XRender::TargetH / 2);
-    else if(g_config.scaleMode == SCALE_FIXED_2X)
+    else if(g_config.scaleMode == Config_t::SCALE_FIXED_2X)
         XWindow::setWindowSize(XRender::TargetW * 2, XRender::TargetH * 2);
     else
         XWindow::setWindowSize(XRender::TargetW, XRender::TargetH);
@@ -108,15 +107,15 @@ void UpdateInternalRes()
         {
             int_h = req_h;
         }
-        else if(g_config.scaleMode == SCALE_FIXED_05X)
+        else if(g_config.scaleMode == Config_t::SCALE_FIXED_05X)
         {
             int_h *= 2;
         }
-        else if(g_config.scaleMode == SCALE_FIXED_2X)
+        else if(g_config.scaleMode == Config_t::SCALE_FIXED_2X)
         {
             int_h /= 2;
         }
-        else if(g_config.scaleMode == SCALE_DYNAMIC_INTEGER)
+        else if(g_config.scaleMode == Config_t::SCALE_DYNAMIC_INTEGER)
         {
             if(int_h >= 600)
             {
@@ -135,20 +134,20 @@ void UpdateInternalRes()
             int_h = 720;
 
         // now, set width based on height and scaling mode
-        if(g_config.scaleMode == SCALE_FIXED_05X)
+        if(g_config.scaleMode == Config_t::SCALE_FIXED_05X)
         {
             int_w *= 2;
         }
-        else if(g_config.scaleMode == SCALE_FIXED_1X)
+        else if(g_config.scaleMode == Config_t::SCALE_FIXED_1X)
         {
             // keep as-is
             // int_w = int_w;
         }
-        else if(g_config.scaleMode == SCALE_FIXED_2X)
+        else if(g_config.scaleMode == Config_t::SCALE_FIXED_2X)
         {
             int_w /= 2;
         }
-        else if(g_config.scaleMode == SCALE_DYNAMIC_INTEGER)
+        else if(g_config.scaleMode == Config_t::SCALE_DYNAMIC_INTEGER)
         {
             int scale_factor = orig_int_h / int_h;
             if(scale_factor == 0)
@@ -273,9 +272,9 @@ void UpdateWindowRes()
     else if(w == 0)
         return;
 
-    if(g_config.scaleMode == SCALE_FIXED_05X)
+    if(g_config.scaleMode == Config_t::SCALE_FIXED_05X)
         XWindow::setWindowSize(w / 2, h / 2);
-    else if(g_config.scaleMode == SCALE_FIXED_2X)
+    else if(g_config.scaleMode == Config_t::SCALE_FIXED_2X)
         XWindow::setWindowSize(w * 2, h * 2);
     else
         XWindow::setWindowSize(w, h);

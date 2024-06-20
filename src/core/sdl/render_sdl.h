@@ -26,7 +26,7 @@
 
 #include "../base/render_base.h"
 #include "cmd_line_setup.h"
-#include "video.h"
+#include "config.h"
 
 #include "core/sdl/render_op_sdl.h"
 
@@ -78,7 +78,7 @@ class RenderSDL final : public AbstractRender_t
     int m_viewport_h = 0;
 
     // Current scaling mode
-    int m_current_scale_mode = SCALE_DYNAMIC_NEAREST;
+    int m_current_scale_mode = Config_t::SCALE_DYNAMIC_NEAREST;
 
     //Need for HiDPI rendering (number of draw pixels per cursor pixel)
     float m_hidpi_x = 1.0f;

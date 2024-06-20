@@ -38,10 +38,10 @@
 
 SDL_FORCE_INLINE bool lunaAllowed()
 {
-    if(g_config.luna_enable_engine == Compatibility_t::LUNA_ENGINE_UNSPECIFIED)
+    if(g_config.luna_enable_engine == Config_t::LUNA_ENGINE_UNSPECIFIED)
         return gLunaEnabledGlobally;
 
-    return g_config.luna_enable_engine == Compatibility_t::LUNA_ENGINE_ENABLE;
+    return g_config.luna_enable_engine == Config_t::LUNA_ENGINE_ENABLE;
 }
 
 void lunaReset()
