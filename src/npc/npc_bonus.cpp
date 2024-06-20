@@ -149,6 +149,14 @@ void DropBonus(int A)
     syncLayers_NPC(numNPCs);
     CheckSectionNPC(numNPCs);
 
+    // enable modern NPC spawn code
+    if(g_config.modern_item_drop && !ForcedControls)
+    {
+        NPC[numNPCs].Special6 = 120.0;
+        NPC[numNPCs].Effect3 = A;
+        NPC[numNPCs].Effect2 = 1;
+    }
+
     // erase bonus
     Player[A].HeldBonus = NPCID(0);
 }
@@ -202,6 +210,10 @@ static void s_MovePlayersToExit(int got_exit_A)
 
 void TouchBonus(int A, int B)
 {
+    // ban collecting dropped item during first stage of modern item drop process
+    if(NPC[B].Effect == NPCEFF_DROP_ITEM && NPC[B].Effect3 != 0)
+        return;
+
     // don't get just-thrown items, except coins
     if(NPC[B].CantHurtPlayer == A && !(NPC[B]->IsACoin && Player[A].HoldingNPC != B && NPC[B].Killed == 0))
         return;

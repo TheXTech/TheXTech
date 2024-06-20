@@ -124,6 +124,9 @@ extern struct Config_t : public Compatibility_t, public VideoSettings_t
     bool sfx_audio_fx = true;
     bool sfx_spatial_audio = true;
 
+    // temporary fields for new features, in preparation to merge the config branch
+    bool modern_item_drop = false;
+
 } g_config; // main_config.cpp
 
 #endif // CONFIG_H

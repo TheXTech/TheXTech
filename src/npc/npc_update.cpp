@@ -23,6 +23,8 @@
 
 #include <Logger/logger.h>
 
+#include "sdl_proxy/sdl_stdinc.h"
+
 #include "../globals.h"
 #include "../npc.h"
 #include "../sound.h"
@@ -5641,11 +5643,79 @@ void UpdateNPCs()
             }
             else if(NPC[A].Effect == NPCEFF_DROP_ITEM) // Bonus item is falling from the players container effect
             {
+                // modern item drop
+                if(NPC[A].Effect3 != 0)
+                {
+                    const Player_t& p = Player[NPC[A].Effect3];
+                    const Location_t& pLoc = p.Location;
+                    Location_t& nLoc = NPC[A].Location;
+
+                    // Y logic
+                    vScreen_t& vscreen = vScreenByPlayer(NPC[A].Effect3);
+
+                    // put above player
+                    double target_X = pLoc.X + pLoc.Width / 2 - nLoc.Width / 2;
+                    double target_Y = pLoc.Y - 160;
+
+                    // anticipate player movement
+                    if(p.Effect == 0 || p.Effect == 3 || p.Effect == 9 || p.Effect == 10)
+                    {
+                        target_X += pLoc.SpeedX;
+                        target_Y += pLoc.SpeedY;
+                    }
+
+                    // never allow item to go fully offscreen
+                    if(target_Y < -vscreen.Y - 8)
+                        target_Y = -vscreen.Y - 8;
+
+                    // perform movement
+                    double delta_X = target_X - nLoc.X;
+                    double delta_Y = target_Y - nLoc.Y;
+
+                    double move_X = delta_X / 8.0;
+                    double move_Y = delta_Y / 8.0;
+
+                    double dist_sq = (move_X * move_X + move_Y * move_Y);
+
+                    if(dist_sq > 0.0 && dist_sq < 128.0)
+                    {
+                        double dist = SDL_sqrt(dist_sq);
+                        move_X *= (8.0 * 1.4142135623730951) / dist;
+                        move_Y *= (8.0 * 1.4142135623730951) / dist;
+                    }
+
+                    if(std::abs(delta_Y) < std::abs(move_Y) || NPC[A].Special6 <= 45)
+                        nLoc.Y = target_Y;
+                    else
+                        nLoc.Y += move_Y;
+
+                    if(std::abs(delta_X) < std::abs(move_X) || NPC[A].Special6 <= 45)
+                        nLoc.X = target_X;
+                    else
+                        nLoc.X += move_X;
+
+                    // timer logic
+                    if(NPC[A].Special6 <= 45)
+                        NPC[A].Special6 -= 1.0;
+                    else if(nLoc.X == target_X && nLoc.Y == target_Y)
+                        NPC[A].Special6 = 45;
+
+                    // enter SMBX mode on timer expiration
+                    if(NPC[A].Special6 <= 0)
+                    {
+                        NPC[A].Effect3 = 0;
+                        NPC[A].Special6 = 0;
+                        NPC[A].Special5 = 0;
+                    }
+                }
+                else
+                {
                     NPC[A].Location.Y += 2.2;
 
                     NPC[A].Effect2 += 1;
                     if(NPC[A].Effect2 == 5)
-                    NPC[A].Effect2 = 1;
+                        NPC[A].Effect2 = 1;
+                }
             }
             else if(NPC[A].Effect == NPCEFF_EMERGE_DOWN) // Bonus falling out of a block
             {
