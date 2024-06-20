@@ -71,7 +71,7 @@ struct VideoSettings_t
     //! The currently running render mode
     int    render_mode_obtained = RENDER_ACCELERATED_AUTO;
     //! Attempt to enable vSync
-    bool   vSync = false;
+    bool   render_vsync = false;
     //! Render scaling mode
     int    scale_mode = SCALE_DYNAMIC_NEAREST;
     //! Device battery status indicator

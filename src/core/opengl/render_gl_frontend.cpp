@@ -48,6 +48,7 @@
 
 #include "graphics.h"
 #include "controls.h"
+#include "config.h"
 
 
 #ifdef THEXTECH_WIP_FEATURES
@@ -659,6 +660,8 @@ void RenderGL::updateViewport()
 
         m_current_scale_mode = g_config.scale_mode;
     }
+
+    SDL_GL_SetSwapInterval(g_config.render_vsync);
 }
 
 void RenderGL::resetViewport()

@@ -298,7 +298,7 @@ bool RenderGL::initOpenGL(const CmdLineSetup_t &setup)
     // should check for NPOT and BGRA textures
 
     // setup vSync
-    SDL_GL_SetSwapInterval(setup.vSync);
+    SDL_GL_SetSwapInterval(g_config.render_vsync);
 
     GLenum err = glGetError();
 

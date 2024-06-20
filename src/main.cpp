@@ -542,7 +542,7 @@ int main(int argc, char**argv)
         setup.noSound   = switchNoSound.isSet() ? switchNoSound.getValue() : g_audioSetup.disableSound;
         setup.neverPause = switchNoPause.isSet() ? switchNoPause.getValue() : g_config.background_work;
         setup.allowBgInput = switchBgInput.isSet() ? switchBgInput.getValue() : g_config.allowBgControllerInput;
-        setup.vSync = switchVSync.isSet() ? switchVSync.getValue() : g_config.vSync;
+        setup.vSync = switchVSync.isSet() ? switchVSync.getValue() : g_config.render_vsync;
 
         if(setup.allowBgInput) // The BG-input depends on the never-pause option
             setup.neverPause = setup.allowBgInput;

@@ -167,7 +167,7 @@ void OpenConfig_preSetup()
 
         config.beginGroup("video");
         config.readEnum("render", g_config.render_mode, (int)Config_t::RENDER_ACCELERATED_AUTO, renderMode);
-        config.read("vsync", g_config.vSync, (g_config.render_mode == Config_t::RENDER_ACCELERATED_VSYNC_DEPRECATED));
+        config.read("vsync", g_config.render_vsync, (g_config.render_mode == Config_t::RENDER_ACCELERATED_VSYNC_DEPRECATED));
         config.read("background-work", g_config.background_work, false);
         config.read("background-controller-input", g_config.allowBgControllerInput, false);
         config.read("frame-skip", g_config.enable_frameskip, true);
@@ -470,7 +470,7 @@ void SaveConfig()
         };
 
         config.setValue("render", renderMode[g_config.render_mode]);
-        config.setValue("vsync", g_config.vSync);
+        config.setValue("vsync", g_config.render_vsync);
         config.setValue("background-work", g_config.background_work);
         config.setValue("show-fails-counter", g_config.show_fails_counter);
         config.setValue("background-controller-input", g_config.allowBgControllerInput);

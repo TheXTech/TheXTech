@@ -70,6 +70,7 @@ uint32_t s_current_frame = 0;
 float s_depth_slider = 0.;
 
 static RenderPlanes_t s_render_planes;
+static bool s_render_inited = false;
 
 bool g_in_frame = false;
 bool g_screen_swapped = false;
@@ -506,6 +507,8 @@ bool init()
     s_bottom_screen = C2D_CreateScreenTarget(GFX_BOTTOM, GFX_LEFT);
     // s_bottom_screen = s_right_screen;
 
+    s_render_inited = true;
+
     updateViewport();
 
     return true;
@@ -731,8 +734,8 @@ void repaint()
 
     // leave the draw context and wait for vblank...
     g_microStats.start_sleep();
-    // if(g_config.render_mode == RENDER_ACCELERATED_VSYNC)
-    //     C3D_FrameSync();
+    if(g_config.render_vsync)
+        C3D_FrameSync();
 
     g_microStats.start_task(MicroStats::Graphics);
     C3D_FrameEnd(0);
@@ -776,6 +779,9 @@ void minport_TransformPhysCoords() {}
 
 void minport_ApplyPhysCoords()
 {
+    if(!s_render_inited)
+        return;
+
     int tex_w = XRender::TargetW / 2;
     int tex_h = XRender::TargetH / 2;
 

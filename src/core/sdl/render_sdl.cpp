@@ -337,6 +337,10 @@ void RenderSDL::updateViewport()
         ScaleHeight = XRender::TargetH;
         m_current_scale_mode = g_config.scale_mode;
     }
+
+#if SDL_COMPILEDVERSION >= SDL_VERSIONNUM(2, 0, 18)
+    SDL_RenderSetVSync(m_gRenderer, g_config.render_vsync);
+#endif
 }
 
 void RenderSDL::resetViewport()
