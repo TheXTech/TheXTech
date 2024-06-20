@@ -2862,7 +2862,7 @@ void mainMenuDraw()
         int i = 0;
         SuperPrint(g_mainMenu.controlsTitle, 3, MenuX, MenuY + (30 * i++));
 #ifndef RENDER_FULLSCREEN_ALWAYS
-        if(resChanged)
+        if(g_config.fullscreen)
             SuperPrint(g_mainMenu.optionsModeWindowed, 3, MenuX, MenuY + (30 * i++));
         else
             SuperPrint(g_mainMenu.optionsModeFullScreen, 3, MenuX, MenuY + (30 * i++));
