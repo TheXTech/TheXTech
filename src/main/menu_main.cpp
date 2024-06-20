@@ -1947,7 +1947,7 @@ bool mainMenuUpdate()
             int ret = menuControls_Logic();
             if(ret == -1)
             {
-                SaveConfig();
+                Controls::SaveConfig();
                 MenuCursor = 0; // index of controls within options
                 MenuMode = MENU_OPTIONS;
                 MenuCursorCanMove = false;

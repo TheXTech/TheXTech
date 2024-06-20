@@ -761,6 +761,7 @@ int main(int argc, char**argv)
 #endif
 
     Controls::Init();
+    Controls::LoadConfig();
 
     int ret = GameMain(setup);
 

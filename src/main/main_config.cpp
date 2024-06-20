@@ -272,14 +272,10 @@ void OpenConfig()
     int FileRelease = 0;
     bool resBool = false;
     std::string configPath = AppPathManager::settingsFileSTD();
-    std::string controlsPath = AppPathManager::settingsControlsFileSTD();
 
     if(Files::fileExists(configPath))
     {
         IniProcessing config(configPath);
-        IniProcessing controls(controlsPath);
-         // Keep backward compatibility and restore old mappings from the "thextech.ini"
-        IniProcessing *ctl = Files::fileExists(controlsPath) ? &controls : &config;
 
         const IniProcessing::StrEnumMap batteryStatus =
         {
@@ -375,17 +371,7 @@ void OpenConfig()
         // config.read("small-screen-camera-features", g_config.small_screen_camera_features, false);
         config.endGroup();
 
-        Controls::LoadConfig(ctl);
-
         pLogDebug("Loaded config: %s", configPath.c_str());
-    }
-    else if(Files::fileExists(controlsPath))
-    {
-        IniProcessing controls(controlsPath);
-        Controls::LoadConfig(&controls);
-
-        pLogDebug("Loaded controls: %s; writing new config post deletion.", controlsPath.c_str());
-        SaveConfig(); // Create the config file post deletion
     }
     else
     {
@@ -403,10 +389,8 @@ void OpenConfig()
 void SaveConfig()
 {
     std::string configPath = AppPathManager::settingsFileSTD();
-    std::string controlsPath = AppPathManager::settingsControlsFileSTD();
 
     IniProcessing config(configPath);
-    IniProcessing controls(controlsPath);
 
     config.beginGroup("main");
     config.setValue("release", curRelease);
@@ -588,11 +572,8 @@ void SaveConfig()
     }
     config.endGroup();
 
-    Controls::SaveConfig(&controls);
-
     config.writeIniFile();
-    controls.writeIniFile();
     AppPathManager::syncFs();
 
-    pLogDebug("Saved config: %s, control mappings: %s", configPath.c_str(), controlsPath.c_str());
+    pLogDebug("Saved config: %s", configPath.c_str());
 }
