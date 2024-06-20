@@ -389,6 +389,8 @@ void WindowSDL::setWindowSize(int w, int h)
     }
 
     SDL_SetWindowSize(m_window, w, h);
+#else
+    UNUSED(w); UNUSED(h);
 #endif
 }
 
