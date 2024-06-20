@@ -338,7 +338,8 @@ void RenderSDL::updateViewport()
         m_current_scale_mode = g_config.scale_mode;
     }
 
-#if SDL_COMPILEDVERSION >= SDL_VERSIONNUM(2, 0, 18)
+    // currently disabled on Wii U due to SDL2 bug that requires vSync to be enabled
+#if (SDL_COMPILEDVERSION >= SDL_VERSIONNUM(2, 0, 18)) && !defined(__WIIU__)
     SDL_RenderSetVSync(m_gRenderer, g_config.render_vsync);
 #endif
 }
