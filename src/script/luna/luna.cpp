@@ -83,9 +83,7 @@ void lunaLoad()
     bool dcAllow = g_config.enable_fails_tracking;
 
     if(dcAllow && isGame)
-    {
         gDeathCounter.init();
-    }
 
     if(!LevelEditor && g_config.luna_enable_engine && lunaAllowed())
     {
