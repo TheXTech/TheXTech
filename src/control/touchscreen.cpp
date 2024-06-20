@@ -37,6 +37,7 @@
 #include "../core/window.h"
 
 #include "main/menu_main.h"
+#include "main/screen_asset_pack.h"
 #include "control/controls_strings.h"
 
 #include "core/power.h"
@@ -1461,7 +1462,7 @@ void TouchScreenController::render(int player_no)
 
     for(int key = key_BEGIN; key < key_END; key++)
     {
-        if((m_touchHidden && key != TouchScreenController::key_toggleKeysView) || LoadingInProcess || LevelEditor)
+        if((m_touchHidden && key != TouchScreenController::key_toggleKeysView) || (LoadingInProcess && !ScreenAssetPack::g_LoopActive) || LevelEditor)
             continue;
 
         const auto& k = g_touchKeyMap.touchKeysMap[key];

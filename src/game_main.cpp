@@ -222,6 +222,8 @@ static void s_ExpandSectionForMenu()
 
 void MainLoadAll()
 {
+    LoadingInProcess = true;
+
     if(g_AssetsLoaded)
     {
         StopAllSounds();
@@ -283,6 +285,7 @@ void MainLoadAll()
     XWindow::updateWindowIcon();
 
     LoaderFinish();
+    LoadingInProcess = false;
 
     g_AssetsLoaded = true;
 }
