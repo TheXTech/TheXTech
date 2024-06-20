@@ -395,8 +395,7 @@ int GameMain(const CmdLineSetup_t &setup)
     }
 #endif
 
-    if(g_config.audio_enable)
-        InitMixerX();
+    InitMixerX();
 
 #ifndef PGE_NO_THREADING
     gfxLoaderThreadingMode = true;
