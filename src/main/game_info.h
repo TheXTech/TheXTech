@@ -29,9 +29,14 @@
 
 struct GameInfo
 {
+    void InitGameInfo();
+    void LoadGameInfo();
+
     std::string title;
     // std::string titleCredits;
     RangeArr<std::string, 1, numCharacters> characterName;
+
+    std::string fails_counter_title;
 
     std::string statusIconName;
 
