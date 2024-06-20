@@ -2186,7 +2186,7 @@ static void s_drawGameSaves(int MenuX, int MenuY)
 
     // Fails Counter
     if(hasFails)
-        SuperPrintRightAlign(fmt::format_ne("{0}: {1}", gDemoCounterTitle, info.Fails), 3, infobox_x + 480 - 10, row_2);
+        SuperPrintRightAlign(fmt::format_ne("{0}: {1}", g_gameInfo.fails_counter_title, info.Fails), 3, infobox_x + 480 - 10, row_2);
 }
 
 void mainMenuDraw()

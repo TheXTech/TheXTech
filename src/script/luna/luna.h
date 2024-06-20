@@ -41,9 +41,6 @@ extern bool gShowDemoCounter;
 extern bool gEnableDemoCounter;
 //! Enable Demos counter locally by LunaControl command
 extern bool gEnableDemoCounterByLC;
-//! Title shown at demos counter
-extern std::string gDemoCounterTitle;
-extern std::string gDemoCounterTitleDefault;
 
 extern void lunaReset();
 extern void lunaLoad();

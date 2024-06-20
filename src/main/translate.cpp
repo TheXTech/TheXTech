@@ -803,7 +803,7 @@ XTechTranslate::XTechTranslate()
         {"objects.wordStarAccusativeDualOrCounter", &g_gameInfo.wordStarAccusativeDual_Cnt},
         {"objects.wordStarAccusativePlural",        &g_gameInfo.wordStarAccusativePlural},
 
-        {"objects.wordFails", &gDemoCounterTitleDefault}
+        {"objects.wordFails", &g_gameInfo.fails_counter_title}
     };
 
     for(int i = 1; i <= numCharacters; ++i)
@@ -986,8 +986,6 @@ bool XTechTranslate::translate()
         // assets translations
         if(!translateFile(langAssetsFile, m_assetsMap, "assets"))
             pLogWarning("Failed to apply the assets translation file %s", langAssetsFile.c_str());
-
-        gDemoCounterTitle = gDemoCounterTitleDefault;
     }
 
     if(langEngineFile.empty() && langAssetsFile.empty())
