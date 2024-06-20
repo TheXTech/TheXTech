@@ -490,7 +490,7 @@ void repaint()
     // video settings: VSync
 #if 0
 
-    if(g_videoSettings.scaleMode == SCALE_DYNAMIC_LINEAR)
+    if(g_config.scaleMode == SCALE_DYNAMIC_LINEAR)
     {
         VIDEO_WaitVSync();
 

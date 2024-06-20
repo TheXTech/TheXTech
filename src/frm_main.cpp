@@ -27,7 +27,7 @@
 #include "../version.h"
 
 #include "gfx.h"
-#include "video.h"
+#include "config.h"
 
 #include "core/render.h"
 #include "core/window.h"
@@ -316,8 +316,8 @@ bool FrmMain::restartRenderer()
     bool try_gl = false;
 
     CmdLineSetup_t setup;
-    setup.renderType = g_videoSettings.renderMode;
-    setup.vSync = g_videoSettings.vSync;
+    setup.renderType = g_config.renderMode;
+    setup.vSync = g_config.vSync;
 
     if(setup.renderType == RENDER_ACCELERATED_AUTO || setup.renderType == RENDER_ACCELERATED_OPENGL || setup.renderType == RENDER_ACCELERATED_OPENGL_ES || setup.renderType == RENDER_ACCELERATED_OPENGL_LEGACY || setup.renderType == RENDER_ACCELERATED_OPENGL_ES_LEGACY)
     {
@@ -385,8 +385,8 @@ bool FrmMain::restartRenderer()
     g_render = m_render.get();
 
     CmdLineSetup_t setup;
-    setup.renderType = g_videoSettings.renderMode;
-    setup.vSync = g_videoSettings.vSync;
+    setup.renderType = g_config.renderMode;
+    setup.vSync = g_config.vSync;
 
     res = m_render->initRender(setup, reinterpret_cast<WindowUsed*>(g_window)->getWindow());
 #    endif

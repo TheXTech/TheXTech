@@ -1736,7 +1736,7 @@ bool mainMenuUpdate()
                             menuLen = 18 * 25; // Render Mode: XXXXXXXX
 #endif
                         else if(A == i++)
-                            menuLen = 18 * (7 + (int)ScaleMode_strings.at(g_videoSettings.scaleMode).length());
+                            menuLen = 18 * (7 + (int)ScaleMode_strings.at(g_config.scaleMode).length());
                         else if(A == i++)
                             menuLen = 18 * std::strlen("res: WWWxHHH (word)");
                         else if(A == i++)
@@ -1804,24 +1804,24 @@ bool mainMenuUpdate()
                         // check for and skip unsupported modes
                         while(first
 #   ifndef THEXTECH_BUILD_GL_DESKTOP_MODERN
-                            || g_videoSettings.renderMode == RENDER_ACCELERATED_OPENGL
+                            || g_config.renderMode == RENDER_ACCELERATED_OPENGL
 #   endif
 #   ifndef THEXTECH_BUILD_GL_DESKTOP_LEGACY
-                            || g_videoSettings.renderMode == RENDER_ACCELERATED_OPENGL_LEGACY
+                            || g_config.renderMode == RENDER_ACCELERATED_OPENGL_LEGACY
 #   endif
 #   ifndef THEXTECH_BUILD_GL_ES_MODERN
-                            || g_videoSettings.renderMode == RENDER_ACCELERATED_OPENGL_ES
+                            || g_config.renderMode == RENDER_ACCELERATED_OPENGL_ES
 #   endif
 #   ifndef THEXTECH_BUILD_GL_ES_LEGACY
-                            || g_videoSettings.renderMode == RENDER_ACCELERATED_OPENGL_ES_LEGACY
+                            || g_config.renderMode == RENDER_ACCELERATED_OPENGL_ES_LEGACY
 #   endif
                         )
                         {
-                            g_videoSettings.renderMode += delta;
-                            if(g_videoSettings.renderMode < RENDER_SOFTWARE)
-                                g_videoSettings.renderMode = RENDER_END - 1;
-                            else if(g_videoSettings.renderMode >= RENDER_END)
-                                g_videoSettings.renderMode = RENDER_SOFTWARE;
+                            g_config.renderMode += delta;
+                            if(g_config.renderMode < RENDER_SOFTWARE)
+                                g_config.renderMode = RENDER_END - 1;
+                            else if(g_config.renderMode >= RENDER_END)
+                                g_config.renderMode = RENDER_SOFTWARE;
 
                             first = false;
                         }
@@ -1841,13 +1841,13 @@ bool mainMenuUpdate()
                     {
                         PlaySoundMenu(SFX_Do);
                         if(!leftPressed)
-                            g_videoSettings.scaleMode = g_videoSettings.scaleMode + 1;
+                            g_config.scaleMode = g_config.scaleMode + 1;
                         else
-                            g_videoSettings.scaleMode = g_videoSettings.scaleMode - 1;
-                        if(g_videoSettings.scaleMode > SCALE_FIXED_2X)
-                            g_videoSettings.scaleMode = SCALE_DYNAMIC_INTEGER;
-                        if(g_videoSettings.scaleMode < SCALE_DYNAMIC_INTEGER)
-                            g_videoSettings.scaleMode = SCALE_FIXED_2X;
+                            g_config.scaleMode = g_config.scaleMode - 1;
+                        if(g_config.scaleMode > SCALE_FIXED_2X)
+                            g_config.scaleMode = SCALE_DYNAMIC_INTEGER;
+                        if(g_config.scaleMode < SCALE_DYNAMIC_INTEGER)
+                            g_config.scaleMode = SCALE_FIXED_2X;
                         UpdateWindowRes();
                         UpdateInternalRes();
                     }
@@ -2557,20 +2557,20 @@ void mainMenuDraw()
             "OpenGL ES 1.1",
         };
 
-        if(g_videoSettings.renderMode == RENDER_ACCELERATED_AUTO)
-            SuperPrint(fmt::format_ne(g_mainMenu.optionsRenderAuto, renderers[g_videoSettings.renderModeObtained]), 3, MenuX, MenuY + (30 * i++));
-        else if(g_videoSettings.renderMode != g_videoSettings.renderModeObtained)
-            SuperPrint(fmt::format_ne(g_mainMenu.optionsRenderX, renderers[g_videoSettings.renderMode]), 3, MenuX, MenuY + (30 * i++));
+        if(g_config.renderMode == RENDER_ACCELERATED_AUTO)
+            SuperPrint(fmt::format_ne(g_mainMenu.optionsRenderAuto, renderers[g_config.renderModeObtained]), 3, MenuX, MenuY + (30 * i++));
+        else if(g_config.renderMode != g_config.renderModeObtained)
+            SuperPrint(fmt::format_ne(g_mainMenu.optionsRenderX, renderers[g_config.renderMode]), 3, MenuX, MenuY + (30 * i++));
         else
-            SuperPrint(fmt::format_ne(g_mainMenu.optionsRender, renderers[g_videoSettings.renderMode]), 3, MenuX, MenuY + (30 * i++));
+            SuperPrint(fmt::format_ne(g_mainMenu.optionsRender, renderers[g_config.renderMode]), 3, MenuX, MenuY + (30 * i++));
 #endif
 
-        const std::string* scale_str = &ScaleMode_strings.at(g_videoSettings.scaleMode);
-        if(g_videoSettings.scaleMode == SCALE_DYNAMIC_INTEGER)
+        const std::string* scale_str = &ScaleMode_strings.at(g_config.scaleMode);
+        if(g_config.scaleMode == SCALE_DYNAMIC_INTEGER)
             scale_str = &g_mainMenu.optionsScaleInteger;
-        else if(g_videoSettings.scaleMode == SCALE_DYNAMIC_NEAREST)
+        else if(g_config.scaleMode == SCALE_DYNAMIC_NEAREST)
             scale_str = &g_mainMenu.optionsScaleNearest;
-        else if(g_videoSettings.scaleMode == SCALE_DYNAMIC_LINEAR)
+        else if(g_config.scaleMode == SCALE_DYNAMIC_LINEAR)
             scale_str = &g_mainMenu.optionsScaleLinear;
 
         SuperPrint(fmt::format_ne("{0}: {1}", g_mainMenu.optionsScaleMode, *scale_str), 3, MenuX, MenuY + (30 * i++));

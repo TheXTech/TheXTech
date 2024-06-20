@@ -30,7 +30,7 @@
 #endif
 
 #include "globals.h"
-#include "video.h"
+#include "config.h"
 
 #include "core/render.h"
 #include "core/opengl/render_gl.h"
@@ -105,7 +105,7 @@ void RenderGL::try_init_gl(SDL_GLContext& context, SDL_Window* window, GLint pro
     context = SDL_GL_CreateContext(window);
 
     if(context)
-        g_videoSettings.renderModeObtained = mode;
+        g_config.renderModeObtained = mode;
     else
         pLogInfo("Render GL: context creation failed.");
 }

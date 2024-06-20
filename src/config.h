@@ -25,8 +25,9 @@
 #include <string>
 
 #include "compat.h"
+#include "video.h"
 
-extern struct Config_t : Compatibility_t
+extern struct Config_t : public Compatibility_t, public VideoSettings_t
 {
     /* ---- Main ----*/
 

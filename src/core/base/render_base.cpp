@@ -46,7 +46,7 @@
 
 #include "main/cheat_code.h"
 
-#include "video.h"
+#include "config.h"
 #include "globals.h"
 #include "sound.h"
 #include "graphics.h"
@@ -603,7 +603,7 @@ void AbstractRender_t::lazyLoad(StdPicture &target)
     // target.h = static_cast<int>(h);
 
     bool shrink2x;
-    switch(g_videoSettings.scaleDownTextures)
+    switch(g_config.scaleDownTextures)
     {
     case VideoSettings_t::SCALE_ALL:
         // only do it if the texture isn't already downscaled

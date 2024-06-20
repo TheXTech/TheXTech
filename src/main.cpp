@@ -538,12 +538,12 @@ int main(int argc, char**argv)
         else if(switchFrameSkip.isSet())
             setup.frameSkip = switchFrameSkip.getValue();
         else
-            setup.frameSkip = g_videoSettings.enableFrameSkip;
+            setup.frameSkip = g_config.enableFrameSkip;
 
         setup.noSound   = switchNoSound.isSet() ? switchNoSound.getValue() : g_audioSetup.disableSound;
-        setup.neverPause = switchNoPause.isSet() ? switchNoPause.getValue() : g_videoSettings.allowBgWork;
-        setup.allowBgInput = switchBgInput.isSet() ? switchBgInput.getValue() : g_videoSettings.allowBgControllerInput;
-        setup.vSync = switchVSync.isSet() ? switchVSync.getValue() : g_videoSettings.vSync;
+        setup.neverPause = switchNoPause.isSet() ? switchNoPause.getValue() : g_config.allowBgWork;
+        setup.allowBgInput = switchBgInput.isSet() ? switchBgInput.getValue() : g_config.allowBgControllerInput;
+        setup.vSync = switchVSync.isSet() ? switchVSync.getValue() : g_config.vSync;
 
         if(setup.allowBgInput) // The BG-input depends on the never-pause option
             setup.neverPause = setup.allowBgInput;
@@ -583,7 +583,7 @@ int main(int argc, char**argv)
         }
         else
         {
-            setup.renderType = g_videoSettings.renderMode;
+            setup.renderType = g_config.renderMode;
         }
 
         setup.testLevel = testLevel.getValue();
@@ -626,7 +626,7 @@ int main(int argc, char**argv)
         setup.testGrabAll = switchTestGrabAll.getValue();
         setup.testShowFPS = switchTestShowFPS.isSet() ?
                                 switchTestShowFPS.getValue() :
-                                g_videoSettings.showFrameRate;
+                                g_config.showFrameRate;
         setup.testMaxFPS = switchTestMaxFPS.getValue();
         setup.testMagicHand = switchTestMagicHand.getValue();
         setup.testEditor = switchTestEditor.getValue();
@@ -686,7 +686,7 @@ int main(int argc, char**argv)
                                         g_drawController;
 
         if(showBatteryStatus.isSet() && IF_INRANGE(showBatteryStatus.getValue(), 1, 4))
-            g_videoSettings.batteryStatus = showBatteryStatus.getValue();
+            g_config.batteryStatus = showBatteryStatus.getValue();
 
         if(setup.speedRunnerMode >= 1) // Always show FPS and don't pause the game work when focusing other windows
         {
