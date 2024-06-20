@@ -479,6 +479,7 @@ void RenderGL::executeOrderedDrawQueue(bool clear)
         // (4) draw! (separate logic for particle system, OpenGL LogicOp draw, and standard vertex-based draw)
         if(program->get_flags() & GLProgramObject::particles)
         {
+#if defined(THEXTECH_BUILD_GL_DESKTOP_MODERN) || defined(THEXTECH_BUILD_GL_ES_MODERN)
             bool state_valid = program->inited() && texture && texture->d.particle_system;
             SDL_assert(state_valid);
 
@@ -487,6 +488,7 @@ void RenderGL::executeOrderedDrawQueue(bool clear)
                 glBindTexture(GL_TEXTURE_2D, texture->d.texture_id);
                 texture->d.particle_system->fill_and_draw(m_shader_clock);
             }
+#endif
         }
         else if(use_gl_logic_op)
         {

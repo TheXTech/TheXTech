@@ -522,7 +522,7 @@ void RenderGL::repaint()
 
 void RenderGL::applyViewport()
 {
-    if(m_recentTargetScreen)
+    if(m_recentTargetScreen || !m_gContext)
         return;
 
     PointI off = m_viewport_offset_ignore ? PointI(0, 0) : m_viewport_offset;
@@ -1152,6 +1152,9 @@ void RenderGL::clearAllTextures()
 
 void RenderGL::clearBuffer()
 {
+    if(!m_gContext)
+        return;
+
 //#ifdef USE_RENDER_BLOCKING
 //    SDL_assert(!m_blockRender);
 //#endif
