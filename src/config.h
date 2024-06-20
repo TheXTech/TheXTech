@@ -283,8 +283,6 @@ public:
             {BATTERY_STATUS_FULLSCREEN, "fullscreen", "Fullscreen", "Show when the game is fullscreen"},
 #endif
             {BATTERY_STATUS_ALWAYS_ON, "on", "Always", nullptr},
-            {BATTERY_STATUS_OFF, "never"},
-            {BATTERY_STATUS_ALWAYS_ON, "always"},
         },
         defaults<int>(BATTERY_STATUS_OFF), {}, Scope::Config,
         "battery-status", "Device battery status", nullptr};
