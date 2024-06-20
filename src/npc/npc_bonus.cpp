@@ -210,7 +210,7 @@ static void s_MovePlayersToExit(int got_exit_A)
 
 void TouchBonus(int A, int B)
 {
-    // ban collecting dropped item during first stage of drop process
+    // ban collecting dropped item during first stage of modern item drop process
     if(NPC[B].Effect == NPCEFF_DROP_ITEM && NPC[B].Effect3 != 0)
         return;
 

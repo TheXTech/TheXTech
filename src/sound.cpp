@@ -1586,10 +1586,6 @@ void UpdateYoshiMusic()
 
     if(!g_config.sfx_pet_beat)
         hasYoshi = false;
-#if 0
-    else if(g_config.sfx_mount_drums == Config_t::MOUNTDRUMS_ALWAYS)
-        hasYoshi = true;
-#endif
     else
     {
         for(int i = 1; i <= numPlayers; ++i)

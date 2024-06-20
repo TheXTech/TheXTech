@@ -327,7 +327,7 @@ static inline int BoxCount()
         n = 2;
 
     // disable entering >2P in vanilla mode
-    if(n > 2 && Controls::g_InputMethods.size() == 2 && !g_config.multiplayer_pause_controls)
+    if(n > 2 && !g_config.multiplayer_pause_controls)
         n = 2;
 
     // disable entering >1P from legacy menu
