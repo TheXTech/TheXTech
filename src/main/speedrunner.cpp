@@ -92,11 +92,21 @@ void speedRun_renderTimer()
     if(g_speedRunnerMode == SPEEDRUN_MODE_OFF)
         return; // Do nothing
 
+    if(g_speedRunnerMode != SPEEDRUN_MODE_OFF)
+    {
+        // place speedrun mode below game version display on main menu
+        int topY = (GameMenu) ? 22 : 2;
+
+        SuperPrintRightAlign(fmt::format_ne(Cheater ? "CMode {0}" : "Mode {0}", g_speedRunnerMode), 3, XRender::TargetW - XRender::TargetOverscanX - 2, topY, XTColorF(1.f, 0.3f, 0.3f, 0.5f));
+
+        if(g_config.allow_multires)
+            SuperPrintRightAlign(fmt::format_ne("{0}x{1}", l_screen->W, l_screen->H), 3, XRender::TargetW - XRender::TargetOverscanX - 2, topY + 20, XTColorF(1.f, 0.3f, 0.3f, 0.5f));
+    }
+
     if(GameMenu || GameOutro || BattleMode || LevelEditor)
         return; // Don't draw things at Menu and Outro
 
     s_gamePlayTimer.render();
-    SuperPrintRightAlign(fmt::format_ne(Cheater ? "CMode {0}" : "Mode {0}", g_speedRunnerMode), 3, XRender::TargetW - XRender::TargetOverscanX - 2, 2, XTColorF(1.f, 0.3f, 0.3f, 0.5f));
 }
 
 static void GetControllerColor(int player, XTColor& color, bool* drawLabel = nullptr)
