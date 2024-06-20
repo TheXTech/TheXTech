@@ -34,7 +34,6 @@
 #include "csprite.h"
 #include "globals.h"
 #include "global_dirs.h"
-#include "config.h"
 #include "player.h"
 #include "graphics.h"
 #include "sound.h"
@@ -55,6 +54,7 @@
 #include "lunacounter.h"
 #include "renderop_string.h"
 #include "mememu.h"
+#include "config.h"
 
 #include "main/trees.h"
 

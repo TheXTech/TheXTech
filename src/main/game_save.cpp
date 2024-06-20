@@ -20,14 +20,13 @@
 
 #include "../globals.h"
 #include "../game_main.h"
-#include "../config.h"
+#include "config.h"
 
 #include "speedrunner.h"
 #ifdef THEXTECH_ENABLE_LUNA_AUTOCODE
 #include "../script/luna/lunavarbank.h"
 #endif
 
-#include <IniProcessor/ini_processing.h>
 #include <Utils/files.h>
 #include <DirManager/dirman.h>
 #include <AppPath/app_path.h>

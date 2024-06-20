@@ -22,7 +22,7 @@
 #include "../graphics.h"
 #include "../collision.h"
 #include "../core/render.h"
-#include "../config.h"
+#include "config.h"
 
 void DrawBackgroundColor(int A, int Z, bool lower = false)
 {

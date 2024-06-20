@@ -24,6 +24,7 @@
 #include <Utils/maths.h>
 
 #include "../globals.h"
+#include "../config.h"
 #include "../player.h"
 #include "../collision.h"
 #include "../sound.h"
@@ -33,7 +34,6 @@
 #include "../layers.h"
 #include "../editor.h"
 #include "../game_main.h"
-#include "../config.h"
 #include "../main/trees.h"
 #include "../main/game_globals.h"
 #include "../frame_timer.h"

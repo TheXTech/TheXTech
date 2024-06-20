@@ -26,8 +26,8 @@
 #include "mememu.h"
 #include "globals.h"
 #include "global_constants.h"
-#include "config.h"
 #include "layers.h"
+#include "config.h"
 #include "game_main.h" // GamePaused
 #include "main/trees.h" // treeNPCUpdate
 #include "npc/npc_queues.h"

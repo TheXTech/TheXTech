@@ -38,7 +38,7 @@
 #include "../sound.h"
 #include "../sorting.h"
 #include "../layers.h"
-#include "../config.h"
+#include "config.h"
 #include "../graphics.h"
 #include "../editor.h"
 #include "../npc_id.h"

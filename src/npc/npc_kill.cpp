@@ -27,7 +27,7 @@
 #include "../layers.h"
 #include "../game_main.h"
 #include "../main/speedrunner.h"
-#include "../config.h"
+#include "config.h"
 #include "../controls.h"
 #include "../layers.h"
 

@@ -31,7 +31,6 @@
 #include "collision.h"
 #include "editor.h"
 #include "blocks.h"
-#include "config.h"
 #include "controls.h"
 #include "config.h"
 #include "main/trees.h"
