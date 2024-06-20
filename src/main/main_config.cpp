@@ -279,10 +279,10 @@ void OpenConfig()
         const IniProcessing::StrEnumMap batteryStatus =
         {
             {"off", Config_t::BATTERY_STATUS_OFF},
-            {"fullscreen-low", Config_t::BATTERY_STATUS_FULLSCREEN_WHEN_LOW},
-            {"low", Config_t::BATTERY_STATUS_ANY_WHEN_LOW},
-            {"fullscreen", Config_t::BATTERY_STATUS_FULLSCREEN_ON},
-            {"on", Config_t::BATTERY_STATUS_ALWAYS_ON}
+            {"fullscreen-low", Config_t::BATTERY_STATUS_LOW},
+            {"low", Config_t::BATTERY_STATUS_LOW},
+            {"fullscreen", Config_t::BATTERY_STATUS_FULLSCREEN},
+            {"on", Config_t::BATTERY_STATUS_ON}
         };
 
         const IniProcessing::StrEnumMap showEpisodeTitle
@@ -446,10 +446,9 @@ void SaveConfig()
         std::unordered_map<int, std::string> batteryStatus =
         {
             {Config_t::BATTERY_STATUS_OFF, "off"},
-            {Config_t::BATTERY_STATUS_FULLSCREEN_WHEN_LOW, "fullscreen-low"},
-            {Config_t::BATTERY_STATUS_ANY_WHEN_LOW, "low"},
-            {Config_t::BATTERY_STATUS_FULLSCREEN_ON, "fullscreen"},
-            {Config_t::BATTERY_STATUS_ALWAYS_ON, "on"}
+            {Config_t::BATTERY_STATUS_LOW, "low"},
+            {Config_t::BATTERY_STATUS_FULLSCREEN, "fullscreen"},
+            {Config_t::BATTERY_STATUS_ON, "on"}
         };
 
         std::unordered_map<int, std::string> showEpisodeTitle =

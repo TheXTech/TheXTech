@@ -494,20 +494,13 @@ void DrawMedals(int X, int Y, bool warp, uint8_t max, uint8_t prev, uint8_t ckpt
 
 void DrawDeviceBattery()
 {
-#ifdef RENDER_FULLSCREEN_ALWAYS
-    constexpr bool isFullScreen = true;
-#else
-    const bool isFullScreen = g_config.fullscreen;
+#ifndef RENDER_FULLSCREEN_ALWAYS
+    if(!g_config.fullscreen && g_config.show_battery_status == Config_t::BATTERY_STATUS_FULLSCREEN)
+        return;
 #endif
 
     if(g_config.show_battery_status == Config_t::BATTERY_STATUS_OFF)
         return;
-
-    if(!isFullScreen)
-    {
-        if(g_config.show_battery_status == Config_t::BATTERY_STATUS_FULLSCREEN_WHEN_LOW || g_config.show_battery_status == Config_t::BATTERY_STATUS_FULLSCREEN_ON)
-            return;
-    }
 
     XPower::StatusInfo status_info = XPower::devicePowerStatus();
 
@@ -516,20 +509,13 @@ void DrawDeviceBattery()
 
     bool isLow = (status_info.power_level <= 0.35f);
 
-    bool showBattery = false;
+    if(g_config.show_battery_status == Config_t::BATTERY_STATUS_LOW && !isLow)
+        return;
 
-    showBattery |= (g_config.show_battery_status == Config_t::BATTERY_STATUS_ALWAYS_ON);
-    showBattery |= (g_config.show_battery_status == Config_t::BATTERY_STATUS_ANY_WHEN_LOW && isLow);
-    showBattery |= (g_config.show_battery_status == Config_t::BATTERY_STATUS_FULLSCREEN_WHEN_LOW && isLow && isFullScreen);
-    showBattery |= (g_config.show_battery_status == Config_t::BATTERY_STATUS_FULLSCREEN_ON && isFullScreen);
+    int bw = 40;
+    int bh = 22;
+    int bx = XRender::TargetW - XRender::TargetOverscanX - (bw + 8);
+    int by = 24;
 
-    if(showBattery)
-    {
-        int bw = 40;
-        int bh = 22;
-        int bx = XRender::TargetW - XRender::TargetOverscanX - (bw + 8);
-        int by = 24;
-
-        RenderPowerInfo(0, bx, by, bw, bh, 255, &status_info);
-    }
+    RenderPowerInfo(0, bx, by, bw, bh, 255, &status_info);
 }

@@ -50,10 +50,9 @@ struct VideoSettings_t
     enum BatteryStatus_t
     {
         BATTERY_STATUS_OFF = 0,
-        BATTERY_STATUS_FULLSCREEN_WHEN_LOW,
-        BATTERY_STATUS_ANY_WHEN_LOW,
-        BATTERY_STATUS_FULLSCREEN_ON,
-        BATTERY_STATUS_ALWAYS_ON,
+        BATTERY_STATUS_LOW,
+        BATTERY_STATUS_FULLSCREEN,
+        BATTERY_STATUS_ON,
     };
 
     enum ScaleModes
