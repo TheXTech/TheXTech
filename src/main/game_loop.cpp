@@ -136,8 +136,8 @@ void GameLoop()
     {
         QuickReconnectScreen::g_active = true;
 
-        if(!g_config.NoPauseReconnect && g_config.pause_on_disconnect && !TestLevel)
-            PauseGame(PauseCode::PauseScreen, 0);
+        if(g_config.allow_drop_add && !TestLevel)
+            PauseGame(PauseCode::DropAdd, 0);
     }
 
     if(QuickReconnectScreen::g_active)

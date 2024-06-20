@@ -258,8 +258,8 @@ void WorldLoop()
     {
         QuickReconnectScreen::g_active = true;
 
-        if(!g_config.NoPauseReconnect && g_config.pause_on_disconnect)
-            PauseGame(PauseCode::PauseScreen, 0);
+        if(g_config.allow_drop_add)
+            PauseGame(PauseCode::DropAdd, 0);
     }
 
     if(QuickReconnectScreen::g_active)
