@@ -9,7 +9,8 @@ modules:
     name: thextech
     sources:
       - type: git
-        url: https://github.com/Wohlstand/TheXTech
+        url: https://github.com/TheXTech/TheXTech
+        branch: main
     config-opts:
       - -DCMAKE_BUILD_TYPE=MinSizeRel
       - -DTHEXTECH_EXECUTABLE_NAME=ru.wohlsoft.TheXTech
@@ -17,11 +18,14 @@ modules:
       - -DFLATPAK_BUILD=On
       - -DOVERRIDE_GIT_BRANCH=
 finish-args:
+  # remove this after the new paths update, use $XDG_DATA_HOME inside the sandbox instead
   - --filesystem=host
   - --device=dri
+  # drop to --device=input once supported on Ubuntu and Debian
   - --device=all
   - --socket=x11
   - --socket=wayland
+  # set fallback-x11 whenever we have SDL client-side decorations on Wayland GNOME
+  # - --socket=fallback-x11
   - --socket=pulseaudio
   - --share=ipc
-  - --share=network
