@@ -5985,6 +5985,10 @@ void UpdateNPCs()
     {
         int A = NPCQueues::Killed[i];
 
+        // in rare cases, the game may accidentally kill an NPC outside of the NPC array (storage glitch example)
+        if(A > numNPCs)
+            continue;
+
         // duplicated entry, no problem
         if(A == last_NPC)
             continue;
