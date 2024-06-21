@@ -3223,9 +3223,12 @@ void YoshiSpit(const int A)
             NPC[p.YoshiNPC].Location.SpeedX = 0;
             NPC[p.YoshiNPC].Location.SpeedY = 0;
 
-            NPCQueues::Active.insert(p.YoshiNPC);
-            NPCQueues::Unchecked.push_back(p.YoshiNPC);
-            treeNPCUpdate(p.YoshiNPC);
+            if(p.YoshiNPC > 0 && p.YoshiNPC <= numNPCs)
+            {
+                NPCQueues::Active.insert(p.YoshiNPC);
+                NPCQueues::Unchecked.push_back(p.YoshiNPC);
+                treeNPCUpdate(p.YoshiNPC);
+            }
 
 
 
@@ -3976,7 +3979,9 @@ void YoshiEatCode(const int A)
                     p.YoshiTonugeBool = true;
                 NPC[p.YoshiNPC].Location.X = p.YoshiTongue.X - NPC[p.YoshiNPC].Location.Width / 2.0 + 8 + 4 * p.Direction;
                 NPC[p.YoshiNPC].Location.Y = p.YoshiTongue.Y - NPC[p.YoshiNPC].Location.Height / 2.0 + 6;
-                treeNPCUpdate(p.YoshiNPC);
+
+                if(p.YoshiNPC <= numNPCs)
+                    treeNPCUpdate(p.YoshiNPC);
             }
 
             if(p.YoshiPlayer > 0)
@@ -4118,7 +4123,9 @@ void YoshiEatCode(const int A)
             if(p.YoshiNPC != 0)
             {
                 NPCQueues::Unchecked.push_back(p.YoshiNPC);
-                treeNPCUpdate(p.YoshiNPC);
+
+                if(p.YoshiNPC <= numNPCs)
+                    treeNPCUpdate(p.YoshiNPC);
             }
         }
         else if(p.MountSpecial == 0 && p.YoshiPlayer > 0)
@@ -5036,7 +5043,7 @@ static void s_WarpReleaseItems(const Warp_t& warp, int A, bool backward, bool re
         {
             NPC[plr.HoldingNPC].Location.Y = entrance.Y;
 
-            if(plr.HoldingNPC > 0)
+            if(plr.HoldingNPC > 0 && plr.HoldingNPC <= numNPCs)
                 treeNPCUpdate(plr.HoldingNPC);
         }
 
@@ -5670,7 +5677,7 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
 
                         NPCFrames(p.StandingOnNPC);
 
-                        if(p.StandingOnNPC > 0)
+                        if(p.StandingOnNPC > 0 && p.StandingOnNPC <= numNPCs)
                         {
                             NPCQueues::Unchecked.push_back(p.StandingOnNPC);
                             treeNPCUpdate(p.StandingOnNPC);
@@ -6100,7 +6107,7 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
             p.HoldingNPC = 0;
         }
 
-        if(LayerNPC > 0 && (NPC[LayerNPC].Location.X != lyrX || NPC[LayerNPC].Location.Y != lyrY))
+        if(LayerNPC > 0 && LayerNPC <= numNPCs && (NPC[LayerNPC].Location.X != lyrX || NPC[LayerNPC].Location.Y != lyrY))
             treeNPCUpdate(LayerNPC);
     }
 
@@ -6615,7 +6622,6 @@ void PlayerEffects(const int A)
                 {
                     NPC[p.HoldingNPC].Location.Y = p.Location.Y + Physics.PlayerGrabSpotY[p.Character][p.State] + 32 - NPC[p.HoldingNPC].Location.Height;
                     NPC[p.HoldingNPC].Location.X = p.Location.X + p.Location.Width / 2.0 - NPC[p.HoldingNPC].Location.Width / 2.0;
-                    treeNPCUpdate(p.HoldingNPC);
                 }
             }
             else if(warp_dir_enter == 1)
@@ -6641,7 +6647,6 @@ void PlayerEffects(const int A)
                 {
                     NPC[p.HoldingNPC].Location.Y = p.Location.Y + Physics.PlayerGrabSpotY[p.Character][p.State] + 32 - NPC[p.HoldingNPC].Location.Height;
                     NPC[p.HoldingNPC].Location.X = p.Location.X + p.Location.Width / 2.0 - NPC[p.HoldingNPC].Location.Width / 2.0;
-                    treeNPCUpdate(p.HoldingNPC);
                 }
                 if(p.Mount == 0)
                     p.Frame = 15;
@@ -6679,7 +6684,6 @@ void PlayerEffects(const int A)
 //                        NPC[p.HoldingNPC].Location.X = p.Location.X + Physics.PlayerGrabSpotX[p.Character][p.State];
 //                    else
                     NPC[p.HoldingNPC].Location.X = p.Location.X + p.Location.Width - Physics.PlayerGrabSpotX[p.Character][p.State] - NPC[p.HoldingNPC].Location.Width;
-                    treeNPCUpdate(p.HoldingNPC);
                 }
                 p.Location.SpeedX = -0.5;
                 PlayerFrame(p);
@@ -6717,12 +6721,14 @@ void PlayerEffects(const int A)
                     NPC[p.HoldingNPC].Location.X = p.Location.X + Physics.PlayerGrabSpotX[p.Character][p.State];
 //                    else
 //                        NPC[p.HoldingNPC].Location.X = p.Location.X + p.Location.Width - Physics.PlayerGrabSpotX[p.Character][p.State] - NPC[p.HoldingNPC].Location.Width;
-                    treeNPCUpdate(p.HoldingNPC);
                 }
                 p.Location.SpeedX = 0.5;
                 PlayerFrame(p);
                 p.Location.SpeedX = 0;
             }
+
+            if(p.HoldingNPC > 0 && p.HoldingNPC <= numNPCs)
+                treeNPCUpdate(p.HoldingNPC);
 
             // teleport other players into the pipe warp
             if(Maths::iRound(leftToGoal) == 8)
@@ -6842,7 +6848,6 @@ void PlayerEffects(const int A)
                 {
                     NPC[p.HoldingNPC].Location.Y = p.Location.Y + Physics.PlayerGrabSpotY[p.Character][p.State] + 32 - NPC[p.HoldingNPC].Location.Height;
                     NPC[p.HoldingNPC].Location.X = p.Location.X + p.Location.Width / 2.0 - NPC[p.HoldingNPC].Location.Width / 2.0;
-                    treeNPCUpdate(p.HoldingNPC);
                 }
             }
             else if(warp_dir_exit == 3)
@@ -6857,7 +6862,6 @@ void PlayerEffects(const int A)
                 {
                     NPC[p.HoldingNPC].Location.Y = p.Location.Y + Physics.PlayerGrabSpotY[p.Character][p.State] + 32 - NPC[p.HoldingNPC].Location.Height;
                     NPC[p.HoldingNPC].Location.X = p.Location.X + p.Location.Width / 2.0 - NPC[p.HoldingNPC].Location.Width / 2.0;
-                    treeNPCUpdate(p.HoldingNPC);
                 }
             }
             else if(warp_dir_exit == 2)
@@ -6889,7 +6893,6 @@ void PlayerEffects(const int A)
 //                        NPC[p.HoldingNPC].Location.X = p.Location.X + Physics.PlayerGrabSpotX[p.Character][p.State];
 //                    else
                     NPC[p.HoldingNPC].Location.X = p.Location.X + p.Location.Width - Physics.PlayerGrabSpotX[p.Character][p.State] - NPC[p.HoldingNPC].Location.Width;
-                    treeNPCUpdate(p.HoldingNPC);
                 }
             }
             else if(warp_dir_exit == 4)
@@ -6920,9 +6923,11 @@ void PlayerEffects(const int A)
                     NPC[p.HoldingNPC].Location.X = p.Location.X + Physics.PlayerGrabSpotX[p.Character][p.State];
 //                    else
 //                        NPC[p.HoldingNPC].Location.X = p.Location.X + p.Location.Width - Physics.PlayerGrabSpotX[p.Character][p.State] - NPC[p.HoldingNPC].Location.Width;
-                    treeNPCUpdate(p.HoldingNPC);
                 }
             }
+
+            if(p.HoldingNPC > 0 && p.HoldingNPC <= numNPCs)
+                treeNPCUpdate(p.HoldingNPC);
 
             p.Effect2 = 100;
             if(p.Duck)
@@ -7188,7 +7193,6 @@ void PlayerEffects(const int A)
                 {
                     NPC[p.HoldingNPC].Location.Y = p.Location.Y + Physics.PlayerGrabSpotY[p.Character][p.State] + 32 - NPC[p.HoldingNPC].Location.Height;
                     NPC[p.HoldingNPC].Location.X = p.Location.X + p.Location.Width / 2.0 - NPC[p.HoldingNPC].Location.Width / 2.0;
-                    treeNPCUpdate(p.HoldingNPC);
                 }
 
                 if(p.Mount == 0)
@@ -7205,7 +7209,6 @@ void PlayerEffects(const int A)
                 {
                     NPC[p.HoldingNPC].Location.Y = p.Location.Y + Physics.PlayerGrabSpotY[p.Character][p.State] + 32 - NPC[p.HoldingNPC].Location.Height;
                     NPC[p.HoldingNPC].Location.X = p.Location.X + p.Location.Width / 2.0 - NPC[p.HoldingNPC].Location.Width / 2.0;
-                    treeNPCUpdate(p.HoldingNPC);
                 }
 
                 if(p.Mount == 0)
@@ -7252,7 +7255,6 @@ void PlayerEffects(const int A)
 //                        else
 //                            NPC[p.HoldingNPC].Location.X = p.Location.X + p.Location.Width - Physics.PlayerGrabSpotX[p.Character][p.State] - NPC[p.HoldingNPC].Location.Width;
                     }
-                    treeNPCUpdate(p.HoldingNPC);
                 }
                 else
                 {
@@ -7298,7 +7300,6 @@ void PlayerEffects(const int A)
 //                        else
                         NPC[p.HoldingNPC].Location.X = p.Location.X + p.Location.Width - Physics.PlayerGrabSpotX[p.Character][p.State] - NPC[p.HoldingNPC].Location.Width;
                     }
-                    treeNPCUpdate(p.HoldingNPC);
                 }
                 else
                 {
@@ -7307,6 +7308,9 @@ void PlayerEffects(const int A)
                     p.Location.SpeedX = 0;
                 }
             }
+
+            if(p.HoldingNPC > 0 && p.HoldingNPC <= numNPCs)
+                treeNPCUpdate(p.HoldingNPC);
         }
         else if(fEqual(p.Effect2, 3)) // Finishing the pipe exiting / shooting
         {
@@ -7709,11 +7713,12 @@ void PlayerEffects(const int A)
                             NPC[p.HoldingNPC].Location.Y = p.Location.Y + Physics.PlayerGrabSpotY[p.Character][p.State] + 32 - NPC[p.HoldingNPC].Location.Height;
                             NPC[Player[B].HoldingNPC].Section = Player[B].Section;
 
-                            if(p.HoldingNPC > 0)
+                            if(p.HoldingNPC > 0 && p.HoldingNPC <= numNPCs)
                                 treeNPCUpdate(p.HoldingNPC);
 
-                            // already checked this one above
-                            treeNPCUpdate(Player[B].HoldingNPC);
+                            // already checked this one > 0 above
+                            if(Player[B].HoldingNPC <= numNPCs)
+                                treeNPCUpdate(Player[B].HoldingNPC);
                         }
                     }
                 }
@@ -8151,7 +8156,9 @@ void PlayerEffects(const int A)
                 NPC[p.HoldingNPC].Location.X = p.Location.X + p.Location.Width - Physics.PlayerGrabSpotX[p.Character][p.State] - NPC[p.HoldingNPC].Location.Width;
 
             NPC[p.HoldingNPC].Location.Y = p.Location.Y + Physics.PlayerGrabSpotY[p.Character][p.State] + 32 - NPC[p.HoldingNPC].Location.Height;
-            treeNPCUpdate(p.HoldingNPC);
+
+            if(p.HoldingNPC <= numNPCs)
+                treeNPCUpdate(p.HoldingNPC);
         }
 
         p.MountSpecial = 0;
