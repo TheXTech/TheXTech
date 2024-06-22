@@ -480,6 +480,11 @@ static inline void s_mergeBlend()
     C3D_AlphaBlend(GPU_BLEND_ADD, GPU_BLEND_ADD, GPU_ONE, GPU_ONE_MINUS_SRC_ALPHA, GPU_ONE, GPU_ONE_MINUS_SRC_ALPHA);
 }
 
+static inline void s_fadeBlend()
+{
+    C3D_AlphaBlend(GPU_BLEND_ADD, GPU_BLEND_ADD, GPU_ZERO, GPU_SRC_ALPHA, GPU_ZERO, GPU_SRC_ALPHA);
+}
+
 bool init()
 {
     // 3ds libs
@@ -588,6 +593,21 @@ void setTargetLayer(int layer)
     }
 
     minport_ApplyViewport();
+}
+
+void targetFade(uint8_t rate)
+{
+    if(rate < 8)
+    {
+        C2D_TargetClear(s_cur_target, C2D_Color32f(0.0f, 0.0f, 0.0f, 0.0f));
+        return;
+    }
+
+    C2D_Flush();
+    s_fadeBlend();
+    renderRect(0, 0, g_viewport_w * 2, g_viewport_h * 2, {0, 0, 0, rate}, true);
+    C2D_Flush();
+    s_resetBlend();
 }
 
 void clearBuffer()

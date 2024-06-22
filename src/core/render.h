@@ -311,6 +311,13 @@ E_INLINE void clearAllTextures() TAIL
 E_INLINE void setTargetLayer(int layer) TAIL
 
 /*!
+ * \brief Multiply the alpha of the current screen layer by rate.
+ *
+ * Exclusively used in fade from asset pack select screen to main menu.
+ */
+E_INLINE void targetFade(uint8_t rate) TAIL
+
+/*!
  * \brief Set render target to directly render to the 3DS top screen
  */
 E_INLINE void setTargetMainScreen() TAIL

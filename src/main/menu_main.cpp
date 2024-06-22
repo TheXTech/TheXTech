@@ -2213,7 +2213,7 @@ static constexpr int find_in_string(const char* haystack, char needle)
     return find_in_string(haystack, haystack, needle);
 }
 
-void drawGameVersion(bool disable_git)
+void drawGameVersion(bool disable_git, bool git_only)
 {
     constexpr bool is_release = !in_string(V_LATEST_STABLE, '-');
     constexpr bool is_main = str_prefix(V_BUILD_BRANCH, "main");
@@ -2226,7 +2226,8 @@ void drawGameVersion(bool disable_git)
     constexpr bool show_commit = (!is_release || (!is_main && !is_stable));
 
     // show version
-    SuperPrintRightAlign("v" V_LATEST_STABLE, 5, XRender::TargetW - XRender::TargetOverscanX - 2, 2);
+    if(!git_only)
+        SuperPrintRightAlign("v" V_LATEST_STABLE, 5, XRender::TargetW - XRender::TargetOverscanX - 2, 2);
 
     // show branch
     if(show_branch && !disable_git)
@@ -2512,7 +2513,8 @@ void mainMenuDraw()
     if(XRender::TargetH >= SmallScreenH)
         XRender::renderTexture(XRender::TargetW / 2 - GFX.MenuGFX[3].w / 2, XRender::TargetH - 24, GFX.MenuGFX[3]);
 
-    bool draw_in_asset_pack = (MenuMode == MENU_MAIN || MenuMode == MENU_INTRO) && s_startAssetPackTimer >= 2;
+    bool at_main_title = (MenuMode == MENU_MAIN || MenuMode == MENU_INTRO);
+    bool draw_in_asset_pack = at_main_title && s_startAssetPackTimer >= 2;
 
     if(!draw_in_asset_pack)
     {
@@ -2525,6 +2527,11 @@ void mainMenuDraw()
 
         for(int i = 0; i < curtain_horiz_reps; i++)
             XRender::renderTexture(curtain_draw_w * i, 0, curtain_draw_w, GFX.MenuGFX[1].h, GFX.MenuGFX[1], 0, 0);
+
+#ifdef __3DS__
+        if(at_main_title)
+            XRender::setTargetLayer(3);
+#endif
 
         // game logo
         int LogoMode = 0;
@@ -2556,8 +2563,12 @@ void mainMenuDraw()
         }
     }
 
+#ifdef __3DS__
+    XRender::setTargetLayer(3);
+#endif
 
-    drawGameVersion(false);
+    drawGameVersion(false, draw_in_asset_pack);
+
 
     // Menu Intro
     if(MenuMode == MENU_INTRO)

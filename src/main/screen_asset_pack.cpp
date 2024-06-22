@@ -36,7 +36,7 @@
 #include "gfx.h"
 #include "game_main.h"
 
-void drawGameVersion(bool disable_git);
+void drawGameVersion(bool disable_git, bool git_only);
 
 namespace ScreenAssetPack
 {
@@ -147,6 +147,10 @@ void DrawBackground(double fade)
 
     AssetPack_t::Gfx& gfx = *pack.gfx;
 
+#ifdef __3DS__
+    XRender::setTargetLayer(2);
+#endif
+
     // draw background
     s_renderBackground(gfx, color_no_switch);
 
@@ -180,6 +184,14 @@ void DrawBackground(double fade)
         XTColor bg_color = color_no_switch * XTAlphaF(-0.5f * s_switch_coord);
         s_renderBackground(*next_pack.gfx, bg_color);
     }
+
+#ifdef __3DS__
+    XRender::setTargetLayer(3);
+
+    // fade the existing display
+    if(!g_LoopActive)
+        XRender::targetFade(static_cast<uint8_t>(255 * (1.0f - fade)));
+#endif
 
     // calculate how much the pack logos should be shifted
     int logo_shift = (XRender::TargetW / 2) - 100;
@@ -247,7 +259,7 @@ void DrawBackground(double fade)
         }
     }
 
-    drawGameVersion(true);
+    drawGameVersion(true, false);
 
     // reset all variables when alpha is low enough during exit
     if(fade < 3.0 / 60.0)
