@@ -948,9 +948,10 @@ TouchScreenController::TouchScreenController() noexcept
     m_vibrator = nullptr;
     int numHaptics = SDL_NumHaptics();
 
-    std::array<const char*, 2> allowlist = {
+    const std::array<const char*, 3> allowlist = {
         "VIBRATOR_SERVICE", // Android haptics device
         "spmi_haptics",     // device name on sdm845 linux
+        "gpio-vibrator",    // device name on PinePhone and some Raspberry Pi-based devices
     };
 
     for(int i = 0; i < numHaptics; ++i)
