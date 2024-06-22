@@ -948,23 +948,38 @@ TouchScreenController::TouchScreenController() noexcept
     m_vibrator = nullptr;
     int numHaptics = SDL_NumHaptics();
 
+    std::array<const char*, 2> allowlist = {
+        "VIBRATOR_SERVICE", // Android haptics device
+        "spmi_haptics",     // device name on sdm845 linux
+    };
+
     for(int i = 0; i < numHaptics; ++i)
     {
-        // not sure what or why...
-        if(SDL_strcmp(SDL_HapticName(i), "VIBRATOR_SERVICE") == 0)
+        bool is_allowed = false;
+        for(const char* allowed_device : allowlist)
+        {
+            if(SDL_strcmp(SDL_HapticName(i), allowed_device) == 0)
+            {
+                is_allowed = true;
+                break;
+            }
+        }
+
+        if(is_allowed)
         {
             m_vibrator = SDL_HapticOpen(i);
 
             if(m_vibrator)
             {
-                pLogDebug("TouchScreen: Opened the vibrator service");
+                pLogDebug("TouchScreen: Opened haptics device %d [%s]", i, SDL_HapticName(i));
                 SDL_HapticRumbleInit(m_vibrator);
+                break;
             }
             else
-                pLogWarning("TouchScreen: Can't open the vibrator service");
-
-            break;
+                pLogWarning("TouchScreen: Can't open haptics device %d [%s]", i, SDL_HapticName(i));
         }
+        else
+            pLogInfo("TouchScreen: ignoring haptics device [%s]", SDL_HapticName(i));
     }
 }
 
