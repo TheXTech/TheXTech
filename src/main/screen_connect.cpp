@@ -309,7 +309,7 @@ static inline bool ControlsMenu_ShowDrop(int p)
     return false;
 }
 
-static inline int BoxCount()
+static inline int BoxCount(bool strict = false)
 {
     int n = (int)Controls::g_InputMethods.size();
 
@@ -318,9 +318,6 @@ static inline int BoxCount()
 
     if(n < s_minPlayers)
         n = s_minPlayers;
-
-    if(n > maxLocalPlayers)
-        n = maxLocalPlayers;
 
     if(s_context == Context::MainMenu && n < 2)
         n = 2;
@@ -333,8 +330,17 @@ static inline int BoxCount()
     if(s_context == Context::LegacyMenu)
         n = 1;
 
+    // disable entering >1P when 2P is disabled
     if(g_gameInfo.disableTwoPlayer && !g_forceCharacter)
         n = 1;
+
+    // but do show all players once they are already present
+    if(!strict && n < (int)Controls::g_InputMethods.size())
+        n = (int)Controls::g_InputMethods.size();
+
+    // limit to maxLocalPlayers to prevent out-of-bounds access
+    if(n > maxLocalPlayers)
+        n = maxLocalPlayers;
 
     return n;
 }
@@ -357,7 +363,7 @@ void MainMenu_Start(int minPlayers)
     s_context = Context::MainMenu;
 
     // clear input methods if invalid
-    if((int)Controls::g_InputMethods.size() > BoxCount())
+    if((int)Controls::g_InputMethods.size() > BoxCount(true))
         Controls::ClearInputMethods();
 
     for(int i = 0; i < maxLocalPlayers; i++)
@@ -386,7 +392,7 @@ void LegacyMenu_Start()
     s_context = Context::LegacyMenu;
 
     // clear input methods if invalid
-    if((int)Controls::g_InputMethods.size() > BoxCount())
+    if((int)Controls::g_InputMethods.size() > BoxCount(true))
         Controls::ClearInputMethods();
 
     for(int i = 0; i < maxLocalPlayers; i++)
