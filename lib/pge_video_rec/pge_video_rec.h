@@ -101,7 +101,7 @@ public:
     PGE_VideoSpec spec;
 
     PGE_VideoSink();
-    ~PGE_VideoSink();
+    virtual ~PGE_VideoSink();
 
     bool has_frame();
     int frame_backlog();
