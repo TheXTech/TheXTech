@@ -5655,7 +5655,7 @@ void UpdateNPCs()
 
                     // put above player
                     double target_X = pLoc.X + pLoc.Width / 2 - nLoc.Width / 2;
-                    double target_Y = pLoc.Y - 160;
+                    double target_Y = pLoc.Y + pLoc.Height - 192;
 
                     // anticipate player movement
                     if(p.Effect == 0 || p.Effect == 3 || p.Effect == 9 || p.Effect == 10)
