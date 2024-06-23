@@ -399,6 +399,9 @@ void ConfigEnumOption_t<false, value_t>::make_translation(XTechTranslate& transl
 
     for(auto& value : m_enum_values)
     {
+        if(!value.m_is_translatable)
+            continue;
+
         if(!value.m_display_name.empty())
             translate.m_engineMap.insert({fmt::format_ne("menu.options.{0}.{1}.{2}", cur_section_id, m_internal_name, value.m_internal_name), &value.m_display_name});
 

@@ -131,12 +131,16 @@ template<class value_t>
 struct ConfigEnumValueInfo_t
 {
     const value_t m_value;
+    bool m_is_translatable = true;
     const char* m_internal_name;
     std::string m_display_name;
     std::string m_display_tooltip;
 
     ConfigEnumValueInfo_t(const value_t value, const char* internal_name, const char* display_name = "", const char* display_tooltip = "")
         : m_value(value), m_internal_name(internal_name), m_display_name(display_name ? display_name : ""), m_display_tooltip(display_tooltip ? display_tooltip : "") {}
+
+    ConfigEnumValueInfo_t(const value_t value, bool is_translatable, const char* internal_name, const char* display_name = "")
+        : m_value(value), m_is_translatable(is_translatable), m_internal_name(internal_name), m_display_name(display_name ? display_name : ""), m_display_tooltip("") {}
 };
 
 template<class value_t>
