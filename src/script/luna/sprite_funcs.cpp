@@ -370,7 +370,7 @@ void SpriteFunc::BumpMove(CSprite *me, SpriteComponent *obj)
     me->m_Xpos += me->m_Xspd;
     me->m_Ypos += me->m_Yspd;
 
-    uint32_t COLOR = 0x11111111;
+    // uint32_t COLOR = 0x11111111; // ACTUALLY UNUSED
 
     bool collided_left = false;
     bool collided_right = false;
@@ -424,7 +424,9 @@ void SpriteFunc::BumpMove(CSprite *me, SpriteComponent *obj)
                         //double camtop = -vScreen[1].Y;
                         //double camleft = -vScreen[1].X;
                         //debug_rect.color = COLOR;
-                        COLOR += 0x55000055;
+
+                        //COLOR += 0x55000055; // ACTUALLY UNUSED
+
                         //debug_rect.m_FramesLeft = 1;
                         //debug_rect.x1 = block->XPos - camleft;
                         //debug_rect.y1 = block->YPos - camtop;

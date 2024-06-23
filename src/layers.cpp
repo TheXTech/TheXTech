@@ -827,7 +827,7 @@ void ProcEvent(eventindex_t index, int whichPlayer, bool NoEffect)
                         int warped_plr = 0;
 
                         // warp other players to resized section, if not a reset
-                        if(!evt.AutoStart && !equalCase(evt.Name, "Level - Start"))
+                        if(!evt.AutoStart && !equalCase(evt.Name.c_str(), "Level - Start"))
                         {
                             // warp EVERYONE in cloned player mode, otherwise just warp players of this screen
                             int i_start = g_ClonedPlayerMode ? 1 : 0;
@@ -896,7 +896,7 @@ void ProcEvent(eventindex_t index, int whichPlayer, bool NoEffect)
                         }
 
                         // start the modern qScreen animation
-                        if(!equalCase(evt.Name, "Level - Start") && g_config.modern_section_change)
+                        if(!equalCase(evt.Name.c_str(), "Level - Start") && g_config.modern_section_change)
                         {
                             // check that the onscreen player is here
                             if(onscreen_plr == 0 && warped_plr == 0)
@@ -1129,7 +1129,7 @@ void ProcEvent(eventindex_t index, int whichPlayer, bool NoEffect)
                             }
                         }
                         // legacy qScreen animation
-                        else if(!equalCase(evt.Name, "Level - Start"))
+                        else if(!equalCase(evt.Name.c_str(), "Level - Start"))
                         {
                             int Z1 = screen.vScreen_refs[0];
                             int Z2 = screen.vScreen_refs[1];

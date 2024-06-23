@@ -153,7 +153,7 @@ typedef __int64          intmax_t;
 # define FMT_HAS_CPP_ATTRIBUTE(x) 0
 #endif
 
-#if FMT_HAS_CPP_ATTRIBUTE(maybe_unused)
+#if FMT_HAS_CPP_ATTRIBUTE(maybe_unused) && __cplusplus >= 201703L
 # define FMT_HAS_CXX17_ATTRIBUTE_MAYBE_UNUSED
 // VC++ 1910 support /std: option and that will set _MSVC_LANG macro
 // Clang with Microsoft CodeGen doesn't define _MSVC_LANG macro

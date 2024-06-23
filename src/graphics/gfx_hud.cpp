@@ -458,6 +458,9 @@ void DrawMedals(int X, int Y, bool warp, uint8_t max, uint8_t prev, uint8_t ckpt
     int got_count = 0;
     int prev_count = 0;
 
+    UNUSED(best_count);
+    UNUSED(prev_count);
+
     for(int i = 0; i < max; ++i)
     {
         int bit = (1 << i);
