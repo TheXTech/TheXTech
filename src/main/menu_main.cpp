@@ -2564,7 +2564,8 @@ void mainMenuDraw()
     }
 
 #ifdef __3DS__
-    XRender::setTargetLayer(3);
+    if(MenuMode != MENU_NEW_OPTIONS)
+        XRender::setTargetLayer(3);
 #endif
 
     drawGameVersion(false, draw_in_asset_pack);
@@ -2956,6 +2957,11 @@ void mainMenuDraw()
     // New options screen
     else if(MenuMode == MENU_NEW_OPTIONS)
     {
+#ifdef __3DS__
+        // draw options screen (only) in top draw plane
+        XRender::setTargetLayer(3);
+#endif
+
         OptionsScreen::Render();
     }
 

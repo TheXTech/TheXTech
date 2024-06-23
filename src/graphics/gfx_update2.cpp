@@ -678,7 +678,8 @@ void UpdateGraphics2(bool skipRepaint)
         }
 
 #ifdef __3DS__
-        XRender::setTargetLayer(3);
+        if(GamePaused != PauseCode::Options)
+            XRender::setTargetLayer(3);
 #endif
 
         XRender::resetViewport();

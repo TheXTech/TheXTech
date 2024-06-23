@@ -3016,7 +3016,8 @@ void UpdateGraphicsScreen(Screen_t& screen)
         XRender::offsetViewportIgnore(true);
 
 #ifdef __3DS__
-        XRender::setTargetLayer(3);
+        if(GamePaused != PauseCode::Options && !(GameMenu && MenuMode == MENU_NEW_OPTIONS))
+            XRender::setTargetLayer(3);
 #endif
 
         // HUD and dropped NPCs
@@ -3138,7 +3139,15 @@ void UpdateGraphicsMeta()
     XRender::setDrawPlane(PLANE_GAME_META);
 
     if(GameMenu && !GameOutro)
+    {
         mainMenuDraw();
+
+#ifdef __3DS__
+        // draw everything else below new options screen on 3DS
+        if(MenuMode == MENU_NEW_OPTIONS)
+            XRender::setTargetLayer(2);
+#endif
+    }
 
     if(GameOutro)
         DrawCredits();
@@ -3195,6 +3204,10 @@ void UpdateGraphicsMeta()
 
     if(GamePaused == PauseCode::Options)
     {
+#ifdef __3DS__
+        XRender::setTargetLayer(3);
+#endif
+
         OptionsScreen::Render();
         XRender::renderTexture(int(SharedCursor.X), int(SharedCursor.Y), GFX.ECursor[2]);
     }
