@@ -588,12 +588,6 @@
                 "advanced-audio": "Audio",
                 "advanced-video": "Video",
                 "audio-buffer-size": {
-                    "1024": "1024",
-                    "1536": "1536",
-                    "2048": "2048",
-                    "4096": "4096",
-                    "512": "512",
-                    "768": "768",
                     "_name": "Buffer size",
                     "_tooltip": "Increase for fewer pops but more lag"
                 },
@@ -605,17 +599,7 @@
                 "audio-enable": "Enable",
                 "audio-format": {
                     "_name": "Audio format",
-                    "_tooltip": "Format for sound driver",
-                    "float32": "float32",
-                    "float32be": "float32be",
-                    "s16": "s16",
-                    "s16be": "s16be",
-                    "s32": "s32",
-                    "s32be": "s32be",
-                    "s8": "s8",
-                    "u16": "u16",
-                    "u16be": "u16be",
-                    "u8": "u8"
+                    "_tooltip": "Format for sound driver"
                 },
                 "audio-sample-rate": {
                     "11025": "11025 Hz",
