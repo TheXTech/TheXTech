@@ -228,7 +228,7 @@ void UpdateInternalRes()
 
 #ifdef __3DS__
     if(g_config.allow_multires || ignore_compat)
-        XRender::TargetW += XRender::TargetOverscanX * 2;
+        XRender::TargetW += XRender::MAX_3D_OFFSET * 2;
 #endif
 
     // DONE: above should tweak render target resolution. This should tweak game's screen resolution.

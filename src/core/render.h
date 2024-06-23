@@ -48,10 +48,12 @@ namespace XRender
 #ifdef __3DS__
 
 constexpr int MAX_3D_OFFSET = 20;
-constexpr int TargetOverscanX = 20;
+constexpr int TargetCameraOverscanX = 20;
+constexpr int TargetOverscanX = 28;
 
 #else
 
+constexpr int TargetCameraOverscanX = 0;
 constexpr int TargetOverscanX = 0;
 
 #endif
