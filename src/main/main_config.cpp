@@ -23,15 +23,12 @@
 #include "../graphics.h"
 #include "../sound.h"
 #include "../config.h"
-#include "../video.h"
 #include "../controls.h"
 
 #include "core/render.h"
 
-#include "sdl_proxy/sdl_audio.h"
-
 #include "speedrunner.h"
-#include "presetup.h"
+#include "record.h"
 #include "main/asset_pack.h"
 
 #include <Utils/files.h>
@@ -40,210 +37,6 @@
 #include <fmt_format_ne.h>
 #include <AppPath/app_path.h>
 #include <Logger/logger.h>
-
-Config_t g_config;
-
-PreSetup_t g_preSetup;
-
-void OpenConfig_preSetup()
-{
-    const IniProcessing::StrEnumMap renderMode =
-    {
-        {"sw", Config_t::RENDER_SOFTWARE},
-        {"hw", Config_t::RENDER_ACCELERATED_AUTO},
-        {"vsync", Config_t::RENDER_ACCELERATED_VSYNC_DEPRECATED},
-        {"sdl", Config_t::RENDER_ACCELERATED_SDL},
-        {"opengl", Config_t::RENDER_ACCELERATED_OPENGL},
-        {"opengles", Config_t::RENDER_ACCELERATED_OPENGL_ES},
-        {"opengl11", Config_t::RENDER_ACCELERATED_OPENGL_LEGACY},
-        {"opengles11", Config_t::RENDER_ACCELERATED_OPENGL_ES_LEGACY},
-        {"0", Config_t::RENDER_SOFTWARE},
-        {"1", Config_t::RENDER_ACCELERATED_SDL},
-        {"2", Config_t::RENDER_ACCELERATED_VSYNC_DEPRECATED}
-    };
-
-#ifndef THEXTECH_NO_SDL_BUILD
-    const IniProcessing::StrEnumMap sampleFormats =
-    {
-        {"s8", AUDIO_S8},
-        {"pcm_s8", AUDIO_S8},
-        {"u8", AUDIO_U8},
-        {"pcm_u8", AUDIO_U8},
-        {"s16", AUDIO_S16SYS},
-        {"pcm_s16", AUDIO_S16SYS},
-        {"s16le", AUDIO_S16LSB},
-        {"pcm_s16le", AUDIO_S16LSB},
-        {"s16be", AUDIO_S16MSB},
-        {"pcm_s16be", AUDIO_S16MSB},
-        {"u16", AUDIO_U16SYS},
-        {"pcm_u16", AUDIO_U16SYS},
-        {"u16le", AUDIO_U16LSB},
-        {"pcm_u16le", AUDIO_U16LSB},
-        {"u16be", AUDIO_U16MSB},
-        {"pcm_u16be", AUDIO_U16MSB},
-        {"s32", AUDIO_S32SYS},
-        {"pcm_s32", AUDIO_S32SYS},
-        {"s32le", AUDIO_S32LSB},
-        {"pcm_s32le", AUDIO_S32LSB},
-        {"s32be", AUDIO_S32MSB},
-        {"pcm_s32be", AUDIO_S32MSB},
-        {"float32", AUDIO_F32SYS},
-        {"pcm_f32", AUDIO_F32SYS},
-        {"float32le", AUDIO_F32LSB},
-        {"pcm_f32le", AUDIO_F32LSB},
-        {"float32be", AUDIO_F32MSB},
-        {"pcm_f32be", AUDIO_F32MSB}
-    };
-#endif
-
-    const IniProcessing::StrEnumMap compatMode =
-    {
-        {"native", 0},
-        {"smbx2", 1},
-        {"smbx13", 2}
-    };
-
-    const IniProcessing::StrEnumMap speedRunBlinkMode =
-    {
-        {"opaque", Config_t::PLAYTIME_COUNTER_ANIMATED}, // meaning was "animate if opaque"
-        {"always", Config_t::PLAYTIME_COUNTER_ANIMATED},
-        {"true", Config_t::PLAYTIME_COUNTER_ANIMATED},
-        {"never", Config_t::PLAYTIME_COUNTER_OPAQUE},
-        {"false", Config_t::PLAYTIME_COUNTER_OPAQUE}
-    };
-
-    const IniProcessing::StrEnumMap scaleDownTextures =
-    {
-        {"none", Config_t::SCALE_DOWN_NONE},
-        {"safe", Config_t::SCALE_DOWN_SAFE},
-        {"all", Config_t::SCALE_DOWN_ALL}
-    };
-
-    const IniProcessing::StrEnumMap logLevelEnum =
-    {
-        {"0", PGE_LogLevel::NoLog},
-        {"1", PGE_LogLevel::Fatal},
-        {"2", PGE_LogLevel::Critical},
-        {"3", PGE_LogLevel::Warning},
-        {"4", PGE_LogLevel::Info},
-        {"5", PGE_LogLevel::Debug},
-        {"disabled", PGE_LogLevel::NoLog},
-        {"nolog",    PGE_LogLevel::NoLog},
-        {"off",      PGE_LogLevel::NoLog},
-        {"fatal",    PGE_LogLevel::Fatal},
-        {"critical", PGE_LogLevel::Critical},
-        {"warning",  PGE_LogLevel::Warning},
-        {"info",     PGE_LogLevel::Info},
-        {"debug",    PGE_LogLevel::Debug}
-    };
-
-#if defined(DEBUG_BUILD)
-    const PGE_LogLevel::Level c_defaultLogLevel = PGE_LogLevel::Debug;
-#else
-    const PGE_LogLevel::Level c_defaultLogLevel = PGE_LogLevel::Info;
-#endif
-
-    const std::string configPath = AppPathManager::settingsFileSTD();
-
-    InitSoundDefaults();
-
-    g_pLogGlobalSetup.logPathDefault = AppPathManager::logsDir();
-    g_pLogGlobalSetup.logPathFallBack = AppPathManager::userAppDirSTD();
-
-    if(Files::fileExists(configPath))
-    {
-        IniProcessing config(configPath);
-
-        config.beginGroup("main");
-        config.read("language", g_config.language, g_config.language);
-        config.endGroup();
-
-        config.beginGroup("logging");
-        config.read("log-path", g_pLogGlobalSetup.logPathCustom, std::string());
-        config.read("max-log-count", g_pLogGlobalSetup.maxFilesCount, 10);
-        config.readEnum("log-level", g_pLogGlobalSetup.level, c_defaultLogLevel, logLevelEnum);
-        config.endGroup();
-
-        config.beginGroup("video");
-        config.readEnum("render", g_config.render_mode, (int)Config_t::RENDER_ACCELERATED_AUTO, renderMode);
-        config.read("vsync", g_config.render_vsync, (g_config.render_mode == Config_t::RENDER_ACCELERATED_VSYNC_DEPRECATED));
-        config.read("background-work", g_config.background_work, false);
-        config.read("background-controller-input", g_config.allowBgControllerInput, false);
-        config.read("frame-skip", g_config.enable_frameskip, true);
-        config.read("show-fps", g_config.show_fps, false);
-
-        if(g_config.render_mode == Config_t::RENDER_ACCELERATED_VSYNC_DEPRECATED)
-            g_config.render_mode = Config_t::RENDER_ACCELERATED_AUTO;
-
-        bool scale_down_all;
-        config.read("scale-down-all-textures", scale_down_all, false);
-        config.readEnum("scale-down-textures", g_config.scale_down_textures, scale_down_all ? (int)Config_t::SCALE_DOWN_ALL : (int)Config_t::SCALE_DOWN_SAFE, scaleDownTextures);
-        config.read("internal-width", g_config.InternalW, 800);
-        config.read("internal-height", g_config.InternalH, 600);
-
-        // resolution smaller than CGA? forbid it!
-        if(g_config.InternalW > 0 && g_config.InternalW < 320)
-            g_config.InternalW = 320;
-        if(g_config.InternalH > 0 && g_config.InternalH < 200)
-            g_config.InternalH = 200;
-
-        XRender::TargetW = g_config.InternalW;
-        XRender::TargetH = g_config.InternalH;
-        // default res for full dynamic res
-        if(XRender::TargetH == 0)
-        {
-            XRender::TargetW = 1280;
-            XRender::TargetH = 720;
-        }
-        // default res for dynamic width
-        else if(XRender::TargetW == 0)
-        {
-            XRender::TargetW = 800;
-        }
-
-        IniProcessing::StrEnumMap scaleModes =
-        {
-            {"linear", Config_t::SCALE_DYNAMIC_LINEAR},
-            {"integer", Config_t::SCALE_DYNAMIC_INTEGER},
-            {"nearest", Config_t::SCALE_DYNAMIC_NEAREST},
-            {"0.5x", Config_t::SCALE_FIXED_05X},
-            {"1x", Config_t::SCALE_FIXED_1X},
-            {"2x", Config_t::SCALE_FIXED_2X},
-        };
-        config.readEnum("scale-mode", g_config.scale_mode, (int)Config_t::SCALE_DYNAMIC_NEAREST, scaleModes);
-        config.endGroup();
-
-#ifndef THEXTECH_NO_SDL_BUILD
-        config.beginGroup("sound");
-        config.read("disable-sound", g_audioSetup.disableSound, false);
-        // Defaults for audio setum at sounds.cpp, at g_audioDefaults
-        config.read("sample-rate", g_audioSetup.sampleRate, g_audioDefaults.sampleRate);
-        config.read("channels", g_audioSetup.channels, g_audioDefaults.channels);
-        config.readEnum("format", g_audioSetup.format, g_audioDefaults.format, sampleFormats);
-        config.read("buffer-size", g_audioSetup.bufferSize, g_audioDefaults.bufferSize);
-        config.endGroup();
-#endif
-
-        config.beginGroup("gameplay");
-        config.readEnum("compatibility-mode", g_preSetup.compatibilityMode, 0, compatMode);
-        config.endGroup();
-
-        config.beginGroup("recent");
-        config.read("asset-pack", g_recentAssetPack, std::string());
-        config.endGroup();
-
-        config.beginGroup("speedrun");
-        config.read("mode", g_preSetup.speedRunMode, 0);
-        bool do_semi_transparent = false;
-
-        config.readEnum("blink-effect", g_config.show_playtime_counter, (int)Config_t::PLAYTIME_COUNTER_OPAQUE, speedRunBlinkMode);
-
-        config.read("semi-transparent-timer", do_semi_transparent, false);
-        if(do_semi_transparent)
-            g_config.show_playtime_counter = Config_t::PLAYTIME_COUNTER_SUBTLE;
-        config.endGroup();
-    }
-}
 
 
 void ConfigReloadRecentEpisodes()
@@ -272,75 +65,19 @@ void ConfigReloadRecentEpisodes()
 
 void OpenConfig()
 {
+    g_pLogGlobalSetup.logPathDefault = AppPathManager::logsDir();
+    g_pLogGlobalSetup.logPathFallBack = AppPathManager::userAppDirSTD();
+
     int FileRelease = 0;
-    bool resBool = false;
+
     std::string configPath = AppPathManager::settingsFileSTD();
 
     if(Files::fileExists(configPath))
     {
         IniProcessing config(configPath);
 
-        const IniProcessing::StrEnumMap batteryStatus =
-        {
-            {"off", Config_t::BATTERY_STATUS_OFF},
-            {"fullscreen-low", Config_t::BATTERY_STATUS_LOW},
-            {"low", Config_t::BATTERY_STATUS_LOW},
-            {"fullscreen", Config_t::BATTERY_STATUS_FULLSCREEN},
-            {"on", Config_t::BATTERY_STATUS_ON}
-        };
-
-        const IniProcessing::StrEnumMap showEpisodeTitle
-        {
-            {"off", Config_t::EPISODE_TITLE_OFF},
-            {"on", Config_t::EPISODE_TITLE_BOTTOM},
-            {"transparent", Config_t::EPISODE_TITLE_BOTTOM},
-            {"bottom", Config_t::EPISODE_TITLE_BOTTOM},
-            {"top", Config_t::EPISODE_TITLE_TOP},
-            {"0", Config_t::EPISODE_TITLE_OFF},
-            {"1", Config_t::EPISODE_TITLE_BOTTOM},
-            {"2", Config_t::EPISODE_TITLE_BOTTOM}
-        };
-
-        const IniProcessing::StrEnumMap starsShowPolicy =
-        {
-            {"hide", 0},
-            {"dont-show", 0},
-            {"collected-only", 1},
-            {"show", 2},
-            {"show-all", 2}
-        };
-
-        const IniProcessing::StrEnumMap medalsShowPolicy =
-        {
-            {"hide", Config_t::MEDALS_SHOW_OFF},
-            {"collected-only", Config_t::MEDALS_SHOW_GOT},
-            {"counts-only", Config_t::MEDALS_SHOW_COUNTS},
-            {"show", Config_t::MEDALS_SHOW_FULL},
-            {"show-full", Config_t::MEDALS_SHOW_FULL}
-        };
-
-        const IniProcessing::StrEnumMap renderInactiveNPC =
-        {
-            {"hide", Config_t::INACTIVE_NPC_HIDE},
-            {"shade", Config_t::INACTIVE_NPC_SHADE},
-            {"show", Config_t::INACTIVE_NPC_SHOW},
-        };
-
         config.beginGroup("main");
         config.read("release", FileRelease, curRelease);
-        config.read("full-screen", resBool, false);
-        config.read("record-gameplay", g_config.record_gameplay_data, false);
-        config.read("use-native-osk", g_config.use_native_osk, false);
-        config.read("pick-assets-on-start", g_config.pick_assets_on_start, false);
-        // config.read("new-editor", g_config.enable_editor, false);
-        // config.read("enable-editor", g_config.enable_editor, g_config.enable_editor);
-        config.endGroup();
-
-        config.beginGroup("video");
-        config.read("display-controllers", g_drawController, false);
-        config.read("show-fails-counter", g_config.show_fails_counter, true);
-        config.readEnum("battery-status", g_config.show_battery_status, (int)Config_t::BATTERY_STATUS_OFF, batteryStatus);
-        config.readEnum("show-episode-title", g_config.show_episode_title, (int)Config_t::EPISODE_TITLE_OFF, showEpisodeTitle);
         config.endGroup();
 
         std::string asset_pack_prefix = g_AssetPackID;
@@ -348,28 +85,23 @@ void OpenConfig()
             asset_pack_prefix += '-';
 
         config.beginGroup("recent");
+        config.read("asset-pack", g_recentAssetPack, std::string());
         config.read((asset_pack_prefix + "episode-1p").c_str(), g_recentWorld1p, std::string());
         config.read((asset_pack_prefix + "episode-2p").c_str(), g_recentWorld2p, std::string());
         config.read((asset_pack_prefix + "episode-editor").c_str(), g_recentWorldEditor, std::string());
         config.endGroup();
 
-        config.beginGroup("gameplay");
-        config.readEnum("world-map-stars-show-policy", g_config.WorldMapStarShowPolicyGlobal, 0, starsShowPolicy);
-        config.readEnum("medals-show-policy", g_config.medals_show_policy, 0, medalsShowPolicy);
-        config.read("no-pause-reconnect", g_config.NoPauseReconnect, false);
-        config.read("world-map-fast-move", g_config.worldMapFastMove, false);
-#ifdef ENABLE_XTECH_DISCORD_RPC
-        config.read("discord-rpc", g_config.discord_rpc, false);
-#endif
+        config.beginGroup("logging");
+        config.read("log-path", g_pLogGlobalSetup.logPathCustom, std::string());
+        config.read("max-log-count", g_pLogGlobalSetup.maxFilesCount, 10);
         config.endGroup();
 
-        config.beginGroup("effects");
-        // config.read("sfx-player-grow-with-got-item", g_config.SoundPlayerGrowWithGetItem, false);
-        config.read("enable-inter-level-fade-effect", g_config.EnableInterLevelFade, true);
-        // config.readEnum("render-inactive-npc", g_config.render_inactive_NPC, (int)Config_t::INACTIVE_NPC_SHADE, renderInactiveNPC);
-        // config.read("autocode-translate-coords", g_config.autocode_translate_coords, true);
-        // config.read("small-screen-camera-features", g_config.small_screen_camera_features, false);
-        config.endGroup();
+        g_config_game_user.Clear();
+        g_config_game_user.UpdateFromIni(&config);
+
+        g_config.log_level.set_from_default(ConfigSetLevel::set);
+
+        g_pLogGlobalSetup.level = (PGE_LogLevel::Level)(int)(g_config_game_user.log_level.is_set() ? g_config_game_user.log_level : g_config.log_level);
 
         pLogDebug("Loaded config: %s", configPath.c_str());
     }
@@ -378,11 +110,6 @@ void OpenConfig()
         pLogDebug("Writing new config on first run.");
         SaveConfig(); // Create the config file on first run
     }
-//    If resBool = True And resChanged = False And LevelEditor = False Then ChangeScreen
-#ifndef RENDER_FULLSCREEN_ALWAYS
-    if(resBool && !g_config.fullscreen)
-        ChangeScreen();
-#endif
 
 }
 
@@ -391,35 +118,15 @@ void SaveConfig()
     std::string configPath = AppPathManager::settingsFileSTD();
 
     IniProcessing config(configPath);
-
     config.beginGroup("main");
     config.setValue("release", curRelease);
-#if !defined(RENDER_FULLSCREEN_ALWAYS) // Don't remember fullscreen
-    config.setValue("full-screen", g_config.fullscreen);
-#endif
-    config.setValue("record-gameplay", g_config.record_gameplay_data);
-    config.setValue("pick-assets-on-start", g_config.pick_assets_on_start);
-    // config.setValue("use-native-osk", g_config.use_native_osk);
-    // config.setValue("enable-editor", g_config.enable_editor);
-    config.setValue("language", g_config.language);
     config.endGroup();
 
     config.beginGroup("logging");
     {
-        std::unordered_map<int, std::string> logLevels =
-        {
-            {PGE_LogLevel::NoLog, "disabled"},
-            {PGE_LogLevel::Fatal, "fatal"},
-            {PGE_LogLevel::Critical, "info"},
-            {PGE_LogLevel::Warning, "warning"},
-            {PGE_LogLevel::Info, "info"},
-            {PGE_LogLevel::Debug, "debug"},
-        };
-
         if(!g_pLogGlobalSetup.logPathCustom.empty())
             config.setValue("log-path", g_pLogGlobalSetup.logPathCustom);
         config.setValue("max-log-count", g_pLogGlobalSetup.maxFilesCount);
-        config.setValue("log-level", logLevels[g_pLogGlobalSetup.level]);
     }
     config.endGroup();
 
@@ -434,128 +141,7 @@ void SaveConfig()
     config.setValue((asset_pack_prefix + "episode-editor").c_str(), g_recentWorldEditor);
     config.endGroup();
 
-    config.beginGroup("video");
-    {
-        std::unordered_map<int, std::string> renderMode =
-        {
-            {Config_t::RENDER_SOFTWARE, "sw"},
-            {Config_t::RENDER_ACCELERATED_AUTO, "hw"},
-            {Config_t::RENDER_ACCELERATED_SDL, "sdl"},
-            {Config_t::RENDER_ACCELERATED_OPENGL, "opengl"},
-            {Config_t::RENDER_ACCELERATED_OPENGL_ES, "opengles"},
-            {Config_t::RENDER_ACCELERATED_OPENGL_LEGACY, "opengl11"},
-            {Config_t::RENDER_ACCELERATED_OPENGL_ES_LEGACY, "opengles11"},
-        };
-
-        std::unordered_map<int, std::string> batteryStatus =
-        {
-            {Config_t::BATTERY_STATUS_OFF, "off"},
-            {Config_t::BATTERY_STATUS_LOW, "low"},
-            {Config_t::BATTERY_STATUS_FULLSCREEN, "fullscreen"},
-            {Config_t::BATTERY_STATUS_ON, "on"}
-        };
-
-        std::unordered_map<int, std::string> showEpisodeTitle =
-        {
-            {Config_t::EPISODE_TITLE_OFF, "off"},
-            {Config_t::EPISODE_TITLE_TOP, "top"},
-            {Config_t::EPISODE_TITLE_BOTTOM, "bottom"}
-        };
-
-        std::unordered_map<int, std::string> scaleDownTextures =
-        {
-            {Config_t::SCALE_DOWN_NONE, "none"},
-            {Config_t::SCALE_DOWN_SAFE, "safe"},
-            {Config_t::SCALE_DOWN_ALL, "all"},
-        };
-
-        config.setValue("render", renderMode[g_config.render_mode]);
-        config.setValue("vsync", g_config.render_vsync);
-        config.setValue("background-work", g_config.background_work);
-        config.setValue("show-fails-counter", g_config.show_fails_counter);
-        config.setValue("background-controller-input", g_config.allowBgControllerInput);
-        config.setValue("frame-skip", g_config.enable_frameskip);
-        config.setValue("show-fps", g_config.show_fps);
-        config.setValue("scale-down-textures", scaleDownTextures[g_config.scale_down_textures]);
-        config.setValue("display-controllers", g_drawController);
-        config.setValue("battery-status", batteryStatus[g_config.show_battery_status]);
-        config.setValue("show-episode-title", showEpisodeTitle[g_config.show_episode_title]);
-        config.setValue("internal-width", g_config.InternalW);
-        config.setValue("internal-height", g_config.InternalH);
-        config.setValue("scale-mode", ScaleMode_strings.at(g_config.scale_mode));
-    }
-    config.endGroup();
-
-#ifndef THEXTECH_NO_SDL_BUILD
-    config.beginGroup("sound");
-    config.setValue("disable-sound", g_audioSetup.disableSound);
-    config.setValue("sample-rate", g_audioSetup.sampleRate);
-    config.setValue("channels", g_audioSetup.channels);
-    config.setValue("buffer-size", g_audioSetup.bufferSize);
-    static const std::unordered_map<int, std::string> formats_back = {
-        {AUDIO_S8 , "s8"},
-        {AUDIO_U8 , "u8"},
-        {AUDIO_S16LSB, "s16le"},
-        {AUDIO_U16LSB, "u16le"},
-        {AUDIO_S32LSB, "s32le"},
-        {AUDIO_F32LSB, "float32le"},
-        {AUDIO_S16MSB, "s16be"},
-        {AUDIO_U16MSB, "u16be"},
-        {AUDIO_S32MSB, "s32be"},
-        {AUDIO_F32MSB, "float32be"}
-    };
-    config.setValue("format", formats_back.at(g_audioSetup.format));
-    config.endGroup();
-#endif
-
-    config.beginGroup("gameplay");
-    {
-        std::unordered_map<int, std::string> starsShowPolicy =
-        {
-            {0, "hide"},
-            {1, "collected-only"},
-            {2, "show-all"}
-        };
-
-        std::unordered_map<int, std::string> medalsShowPolicy =
-        {
-            {Config_t::MEDALS_SHOW_OFF, "hide"},
-            {Config_t::MEDALS_SHOW_GOT, "collected-only"},
-            {Config_t::MEDALS_SHOW_COUNTS, "counts-only"},
-            {Config_t::MEDALS_SHOW_FULL, "show-full"}
-        };
-
-        std::unordered_map<int, std::string> compatMode =
-        {
-            {0, "native"},
-            {1, "smbx2"},
-            {2, "smbx13"}
-        };
-
-        config.setValue("world-map-stars-show-policy", starsShowPolicy[g_config.WorldMapStarShowPolicyGlobal]);
-        config.setValue("medals-show-policy", medalsShowPolicy[g_config.medals_show_policy]);
-        config.setValue("compatibility-mode", compatMode[g_preSetup.compatibilityMode]);
-    }
-    config.setValue("no-pause-reconnect", g_config.NoPauseReconnect);
-    config.setValue("world-map-fast-move", g_config.worldMapFastMove);
-#ifdef ENABLE_XTECH_DISCORD_RPC
-    config.setValue("discord-rpc", g_config.discord_rpc);
-#endif
-    config.endGroup();
-
-    config.beginGroup("speedrun");
-    config.setValue("mode", g_preSetup.speedRunMode);
-    config.endGroup();
-
-    config.beginGroup("effects");
-    {
-        // config.setValue("sfx-player-grow-with-got-item", g_config.SoundPlayerGrowWithGetItem);
-        config.setValue("enable-inter-level-fade-effect", g_config.EnableInterLevelFade);
-
-        // config.setValue("autocode-translate-coords", g_config.autocode_translate_coords);
-        // config.setValue("small-screen-camera-features", g_config.small_screen_camera_features);
-    }
-    config.endGroup();
+    g_config_game_user.SaveToIni(&config);
 
     config.writeIniFile();
     AppPathManager::syncFs();

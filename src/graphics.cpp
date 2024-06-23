@@ -585,19 +585,18 @@ void NPCWarpGFX(int A, Location_t &tempLocation, float &X2, float &Y2)
 // change from fullscreen to windowed mode
 void ChangeScreen()
 {
-//    frmMain.LockSize = True
-//    If resChanged = True Then
-    if(g_config.fullscreen)
+#ifndef RENDER_FULLSCREEN_ALWAYS
+    // shouldn't be possible
+    if(g_config.fullscreen.m_set > ConfigSetLevel::user_config)
     {
-        SetOrigRes();
-        XEvents::doEvents();
-    } else {
-        ChangeRes(0, 0, 0, 0);
-        XEvents::doEvents();
+        PlaySoundMenu(SFX_BlockHit);
+        return;
     }
-//    SaveConfig
+
+    g_config_game_user.fullscreen = !g_config.fullscreen;
+    UpdateConfig();
     SaveConfig();
-//    frmMain.LockSize = False
+#endif
 }
 
 void GetvScreenCredits(vScreen_t& vscreen)

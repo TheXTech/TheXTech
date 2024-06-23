@@ -75,7 +75,7 @@ bool RenderSDL::isWorking()
     return m_gRenderer && (m_tBuffer || m_tBufferDisabled);
 }
 
-bool RenderSDL::initRender(const CmdLineSetup_t &setup, SDL_Window *window)
+bool RenderSDL::initRender(SDL_Window *window)
 {
     pLogDebug("Init renderer settings...");
 
@@ -86,14 +86,14 @@ bool RenderSDL::initRender(const CmdLineSetup_t &setup, SDL_Window *window)
 
     Uint32 renderFlags = 0;
 
-    switch(setup.renderType)
+    switch(g_config.render_mode)
     {
     case Config_t::RENDER_ACCELERATED_SDL:
     default:
-        if(setup.vSync)
+        if(g_config.render_vsync)
         {
             renderFlags = SDL_RENDERER_ACCELERATED|SDL_RENDERER_PRESENTVSYNC;
-            g_config.render_mode_obtained = Config_t::RENDER_ACCELERATED_SDL;
+            g_config.render_mode.obtained = Config_t::RENDER_ACCELERATED_SDL;
             pLogDebug("Using accelerated rendering with a vertical synchronization");
             m_gRenderer = SDL_CreateRenderer(window, -1, renderFlags | SDL_RENDERER_TARGETTEXTURE); // Try to make renderer
             if(m_gRenderer)
@@ -104,7 +104,7 @@ bool RenderSDL::initRender(const CmdLineSetup_t &setup, SDL_Window *window)
         // continue
 
         renderFlags = SDL_RENDERER_ACCELERATED;
-        g_config.render_mode_obtained = Config_t::RENDER_ACCELERATED_SDL;
+        g_config.render_mode.obtained = Config_t::RENDER_ACCELERATED_SDL;
         pLogDebug("Using accelerated rendering");
         m_gRenderer = SDL_CreateRenderer(window, -1, renderFlags | SDL_RENDERER_TARGETTEXTURE); // Try to make renderer
         if(m_gRenderer)
@@ -114,7 +114,7 @@ bool RenderSDL::initRender(const CmdLineSetup_t &setup, SDL_Window *window)
         // fallthrough
     case Config_t::RENDER_SOFTWARE:
         renderFlags = SDL_RENDERER_SOFTWARE;
-        g_config.render_mode_obtained = Config_t::RENDER_SOFTWARE;
+        g_config.render_mode.obtained = Config_t::RENDER_SOFTWARE;
         pLogDebug("Using software rendering");
         m_gRenderer = SDL_CreateRenderer(window, -1, renderFlags | SDL_RENDERER_TARGETTEXTURE); // Try to make renderer
         if(m_gRenderer)

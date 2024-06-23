@@ -2543,7 +2543,7 @@ void zTestLevel(bool magicHand, bool interProcess)
     }
 
     // in speedrun mode, confirm that controls are set up before game starts
-    if(g_speedRunnerMode != SPEEDRUN_MODE_OFF && !Controls::Update())
+    if(g_config.speedrun_mode != 0 && !Controls::Update())
     {
         ClearLevel();
         // force players offscreen
@@ -2626,7 +2626,7 @@ void zTestLevel(bool magicHand, bool interProcess)
     // reset Drop/Add allowed characters
     ConnectScreen::SaveChars();
 
-    int waitms = (g_speedRunnerMode != SPEEDRUN_MODE_OFF) ? 750 : 0;
+    int waitms = (g_config.speedrun_mode != 0) ? 750 : 0;
     GameThing(waitms, 0);
 
     SetupScreens();

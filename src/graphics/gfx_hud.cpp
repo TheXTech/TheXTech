@@ -391,6 +391,9 @@ static inline void s_DrawMedal(int i, int x, int y, int coin_width, int coin_hei
 
 void DrawMedals(int X, int Y, bool warp, uint8_t max, uint8_t prev, uint8_t ckpt, uint8_t got, uint8_t best)
 {
+    if(!g_config.show_medals_counter)
+        return;
+
     if(g_config.medals_show_policy == Config_t::MEDALS_SHOW_OFF)
         return;
 

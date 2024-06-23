@@ -284,7 +284,7 @@ static EM_BOOL s_emscriptenHandleResize(int, const EmscriptenUiEvent *, void *)
 }
 #endif
 
-bool RenderGL::initRender(const CmdLineSetup_t &setup, SDL_Window *window)
+bool RenderGL::initRender(SDL_Window *window)
 {
     pLogDebug("Init renderer settings...");
 
@@ -293,7 +293,7 @@ bool RenderGL::initRender(const CmdLineSetup_t &setup, SDL_Window *window)
     if(!AbstractRender_t::init())
         return false;
 
-    if(!initOpenGL(setup)
+    if(!initOpenGL()
         || !initDebug()
         || !initShaders()
         || !initFramebuffers()

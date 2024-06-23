@@ -33,6 +33,7 @@
 #include "../sound.h"
 #include "../gfx.h"
 #include "../graphics.h"
+#include "../frm_main.h"
 #include "../config.h"
 #include "../core/render.h"
 #include "../core/events.h"
@@ -47,6 +48,8 @@
 #include "main/game_strings.h"
 #include "main/level_medals.h"
 #include "main/hints.h"
+
+#include "controls.h"
 
 #include "editor.h"
 
@@ -119,10 +122,37 @@ static bool s_DropAddScreen()
         return false;
     }
 
+    PlaySound(SFX_Do);
+
     if(PauseGame(PauseCode::DropAdd, 0) == 1)
         return true;
 
     MenuCursorCanMove = false;
+    return false;
+}
+
+
+static bool s_OptionsScreen()
+{
+    PlaySound(SFX_Do);
+
+    PauseGame(PauseCode::Options, 0);
+    MenuCursorCanMove = false;
+
+    // re-initialize / re-translate pause menu
+    SoundPause[SFX_Pause] = 1;
+    Init(s_pause_plr, s_pause_type == PauseType::Legacy);
+
+    // set MenuCursor correctly
+    for(size_t i = 0; i < s_items.size(); i++)
+    {
+        if(s_items[i].callback == s_OptionsScreen)
+        {
+            MenuCursor = i;
+            break;
+        }
+    }
+
     return false;
 }
 
@@ -252,6 +282,8 @@ void Init(int plr, bool LegacyPause)
         if(!inter_screen && s_cheat_menu_bits == 14 && !BattleMode)
             s_items.push_back(MenuItem{g_gameStrings.pauseItemEnterCode, s_CheatScreen});
 
+        s_items.push_back(MenuItem{g_mainMenu.mainOptions, s_OptionsScreen});
+
         s_items.push_back(MenuItem{editor_test ? g_gameStrings.pauseItemReturnToEditor : g_gameStrings.pauseItemQuitTesting, s_QuitTesting});
     }
     // main game pause
@@ -264,6 +296,9 @@ void Init(int plr, bool LegacyPause)
 
         if(s_cheat_menu_bits == 14 && s_pause_type != PauseType::Legacy && !BattleMode)
             s_items.push_back(MenuItem{g_gameStrings.pauseItemEnterCode, s_CheatScreen});
+
+        if(s_pause_type != PauseType::Legacy)
+            s_items.push_back(MenuItem{g_mainMenu.mainOptions, s_OptionsScreen});
 
         if(CanSave)
         {

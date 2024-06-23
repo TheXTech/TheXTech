@@ -95,7 +95,7 @@ public:
 
     bool isWorking() override;
 
-    bool initRender(const CmdLineSetup_t &setup, SDL_Window *window) override;
+    bool initRender(SDL_Window *window) override;
 
     /*!
      * \brief Close the renderer

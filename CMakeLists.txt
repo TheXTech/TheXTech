@@ -666,7 +666,6 @@ if(APPLE)
 endif()
 
 set(THEXTECH_SRC
-    src/compat.cpp
     src/game_main.cpp
     src/globals.cpp
     src/npc.cpp
@@ -675,6 +674,10 @@ set(THEXTECH_SRC
     src/frame_timer.cpp
     src/global_dirs.cpp
     src/global_strings.cpp
+    src/config/config_base.cpp
+    src/config/config_hooks.cpp
+    src/config/config_legacy_compat.cpp
+    src/config/config_main.cpp
     src/main/world_loop.cpp
     src/main/world_file.cpp
     src/main/game_info.cpp
@@ -694,6 +697,7 @@ set(THEXTECH_SRC
     src/main/menu_main.cpp
     src/main/screen_pause.cpp
     src/main/screen_connect.cpp
+    src/main/screen_options.cpp
     src/main/screen_quickreconnect.cpp
     src/main/screen_textentry.cpp
     src/main/screen_prompt.cpp

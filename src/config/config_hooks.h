@@ -19,26 +19,21 @@
  */
 
 #pragma once
-#ifndef PRESETUP_H
-#define PRESETUP_H
+#ifndef CONFIG_HOOKS_H
+#define CONFIG_HOOKS_H
 
-// Game settings loaded on initial startup and used to manipulate options
-// controllable via command line arguments
+void config_res_set();
+void config_asset_pack_set();
+void config_language_set();
+void config_rendermode_set();
+void config_fullscreen_set();
+void config_mountdrums_set();
+void config_screenmode_set();
+void config_audiofx_set();
+void config_audio_set();
+void config_music_volume_set();
+void config_log_level_set();
+void config_integrations_set();
+void config_compat_changed();
 
-enum
-{
-    SPEEDRUN_EFFECT_BLINK_UNDEFINED = 0,
-    SPEEDRUN_EFFECT_BLINK_OPAQUEONLY,
-    SPEEDRUN_EFFECT_BLINK_ALWAYS,
-    SPEEDRUN_EFFECT_BLINK_NEVER
-};
-
-extern struct PreSetup_t
-{
-    int     speedRunMode = 0;
-    int     compatibilityMode = 0;
-} g_preSetup; // main_config.cpp
-
-
-#endif // PRESETUP_H
-
+#endif

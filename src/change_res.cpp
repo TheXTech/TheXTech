@@ -35,7 +35,6 @@
 void SetOrigRes()
 {
     XWindow::setFullScreen(false);
-    g_config.fullscreen = false;
 
 #ifndef __EMSCRIPTEN__
     if(g_config.scale_mode == Config_t::SCALE_FIXED_05X)
@@ -59,7 +58,6 @@ void SetOrigRes()
 
 void ChangeRes(int, int, int, int)
 {
-    g_config.fullscreen = true;
     XWindow::setFullScreen(true);
 
     if(LoadingInProcess)
@@ -75,14 +73,16 @@ void ChangeRes(int, int, int, int)
 
 void UpdateInternalRes()
 {
-    int req_w = g_config.InternalW;
-    int req_h = g_config.InternalH;
+    bool ignore_compat = GameMenu && (g_config.speedrun_mode.m_set < ConfigSetLevel::cmdline);
+
+    int req_w = g_config.internal_res.m_value.first;
+    int req_h = g_config.internal_res.m_value.second;
 
     // TODO: use the correct canonical screen's resolution here
     int canon_w = 800;
     int canon_h = 600;
 
-    if(!g_config.allow_multires)
+    if(!g_config.allow_multires && !ignore_compat)
     {
         if((req_w != 0 && req_w < canon_w) || (req_h != 0 && req_h < canon_h))
         {
@@ -179,7 +179,7 @@ void UpdateInternalRes()
         }
 
         // force >800x600 resolution if required
-        if(!g_config.allow_multires)
+        if(!g_config.allow_multires && !ignore_compat)
         {
             if(int_w < canon_w)
             {
@@ -217,7 +217,7 @@ void UpdateInternalRes()
         XRender::TargetH = req_h;
 
         if(XRender::TargetW == 0)
-            XRender::TargetW = g_config.InternalW;
+            XRender::TargetW = g_config.internal_res.m_value.first;
 
         if(XRender::TargetH == 0)
         {
@@ -227,12 +227,12 @@ void UpdateInternalRes()
     }
 
 #ifdef __3DS__
-    if(g_config.allow_multires)
+    if(g_config.allow_multires || ignore_compat)
         XRender::TargetW += XRender::TargetOverscanX * 2;
 #endif
 
     // DONE: above should tweak render target resolution. This should tweak game's screen resolution.
-    if(g_config.allow_multires && g_config.dynamic_camera_logic)
+    if(ignore_compat || (g_config.allow_multires && g_config.dynamic_camera_logic))
     {
         l_screen->W = XRender::TargetW;
         l_screen->H = XRender::TargetH;
@@ -275,11 +275,11 @@ void UpdateWindowRes()
     if(XWindow::is_nullptr() || XWindow::isFullScreen() || XWindow::isMaximized())
         return;
 
-    int h = g_config.InternalH;
+    int h = g_config.internal_res.m_value.second;
     if(h == 0)
         return;
 
-    int w = g_config.InternalW;
+    int w = g_config.internal_res.m_value.first;
 
     if(w == 0 && h == XRender::TargetH)
         w = XRender::TargetW;

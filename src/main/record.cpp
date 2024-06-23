@@ -133,7 +133,7 @@ static void write_header()
     fprintf(record_file, "Header\r\n");
     fprintf(record_file, "RecordVersion %d\r\n", c_recordVersion); // Version of record file
     fprintf(record_file, "Version %s\r\n", LONG_VERSION); // game version / commit
-    fprintf(record_file, "CompatLevel %d\r\n", CompatGetLevel()); // compatibility mode
+    fprintf(record_file, "CompatLevel %d\r\n", (int)g_config.compatibility_mode); // compatibility mode
     if(FullFileName.compare(0, AppPath.size(), AppPath) == 0)
         fprintf(record_file, "%s\r\n", FullFileName.c_str()+AppPath.size()); // level that was played
     else
@@ -216,13 +216,11 @@ static void read_header()
 
     pLogDebug("  at compat level %d", n);
 
-    if(n == 3)
-        n = 2;
-
-    CompatSetEnforcedLevel(n);
-
-    if(CompatGetLevel() < COMPAT_SMBX2)
+    if(n != Config_t::COMPAT_SMBX13)
         pLogWarning("compatibility mode is not a long-term support version. Do not expect identical results.");
+
+    g_config.compatibility_mode = n;
+    UpdateConfig();
 
     fgets(buffer, 1024, replay_file); // level that was played
 

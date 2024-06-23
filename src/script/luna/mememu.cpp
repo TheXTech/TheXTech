@@ -637,7 +637,8 @@ public:
         insert(0x00B2C62E, &PSwitchStop); // Stopwatch Timer
         insert(0x00B2C630, &PSwitchPlayer); // P-Switch/Stopwatch Player
 
-        insert(0x00B2C684, &g_config.enable_frameskip);
+        // FIXME: properly report as modified when set
+        insert(0x00B2C684, &g_config.enable_frameskip.m_value);
 
         insert(0x00B2C6DC, &Physics.PlayerJumpHeight);
         insert(0x00B2C6DE, &Physics.PlayerBlockJumpHeight);
@@ -704,7 +705,9 @@ public:
         insert(0x00B2C8B6, &CaptainN);
         insert(0x00B2C8B8, &FlameThrower);
         insert(0x00B2C8BA, &CoinMode);
-        insert(0x00B2C8BE, &g_config.unlimited_framerate);
+
+        // FIXME: properly report as modified when set
+        insert(0x00B2C8BE, &g_config.unlimited_framerate.m_value);
         insert(0x00B2C8C0, &GodMode);
         insert(0x00B2C8C2, &GrabAll);
 
@@ -724,8 +727,10 @@ public:
         insert(0x00B2D6D0, &MenuMouseRelease);
         insert(0x00B2D6D2, &SharedCursor.Move);
         insert(0x00B2D710, &numEvents);
-        // insert(0x00B2D734, &noSound); // deprecated, can read g_mixerLoaded
         insert(0x00B2D740, &BattleMode);
+        // was previously unlinked with sound engine status, replaced by (1) !g_config.audio_enable and (2) !g_mixerLoaded
+        // If we wanted to reimplement, should probably read from (2) and write to (1), including the (expensive!) UpdateConfig hook
+        // insert(0x00B2D734, &noSound);
     }
 
     double getValue(size_t address, FIELDTYPE ftype)

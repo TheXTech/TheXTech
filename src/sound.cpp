@@ -101,10 +101,6 @@ const AudioDefaults_t g_audioDefaults =
 };
 #endif
 
-AudioSetup_t g_audioSetup;
-
-static AudioSetup_t s_audioSetupObtained;
-
 static Mix_Music *g_curMusic = nullptr;
 static bool g_mixerLoaded = false;
 
@@ -204,8 +200,6 @@ static std::unordered_map<int, std::string>        extSfxPlaying;
 static void extSfxStopCallback(int channel);
 
 static const int maxSfxChannels = 91;
-static int s_sfx_vol_scale = 100;
-static int s_mus_vol_scale = 100;
 
 #ifdef LOW_MEM
 static const double c_max_chunk_duration = 0.75; // max length of an in-memory chunk in seconds
@@ -248,14 +242,6 @@ int CustomWorldMusicId()
     return g_customWldMusicId;
 }
 
-void InitSoundDefaults()
-{
-    g_audioSetup.sampleRate = g_audioDefaults.sampleRate;
-    g_audioSetup.channels = g_audioDefaults.channels;
-    g_audioSetup.format = g_audioDefaults.format;
-    g_audioSetup.bufferSize = g_audioDefaults.bufferSize;
-}
-
 void InitMixerX()
 {
     if(!g_config.audio_enable)
@@ -282,10 +268,10 @@ void InitMixerX()
 #endif
 
     pLogDebug("Opening sound (wanted: rate=%d hz, format=%s, channels=%d, buffer=%d frames)...",
-              g_audioSetup.sampleRate,
-              audio_format_to_string(g_audioSetup.format),
-              g_audioSetup.channels,
-              g_audioSetup.bufferSize);
+              (int)g_config.audio_sample_rate,
+              audio_format_to_string((int)g_config.audio_format),
+              (int)g_config.audio_channels,
+              (int)g_config.audio_buffer_size);
 
     ret = Mix_Init(initFlags);
 
@@ -306,10 +292,10 @@ void InitMixerX()
             pLogWarning("MixerX: Failed to initialize MP3 module");
     }
 
-    ret = Mix_OpenAudio(g_audioSetup.sampleRate,
-                        g_audioSetup.format,
-                        g_audioSetup.channels,
-                        g_audioSetup.bufferSize);
+    ret = Mix_OpenAudio(g_config.audio_sample_rate,
+                        g_config.audio_format,
+                        g_config.audio_channels,
+                        g_config.audio_buffer_size);
 
     if(ret < 0)
     {
@@ -325,20 +311,23 @@ void InitMixerX()
         if(ret == 0)
         {
             pLogCritical("Failed to call the Mix_QuerySpec!");
-            s_audioSetupObtained = g_audioSetup;
+            g_config.audio_sample_rate.obtained = g_config.audio_sample_rate;
+            g_config.audio_format.obtained = g_config.audio_format;
+            g_config.audio_channels.obtained = g_config.audio_channels;
+            g_config.audio_buffer_size.obtained = g_config.audio_buffer_size;
         }
         else
         {
-            s_audioSetupObtained.sampleRate = ob.freq;
-            s_audioSetupObtained.format = ob.format;
-            s_audioSetupObtained.channels = ob.channels;
-            s_audioSetupObtained.bufferSize = ob.samples;
+            g_config.audio_sample_rate.obtained = ob.freq;
+            g_config.audio_format.obtained = ob.format;
+            g_config.audio_channels.obtained = ob.channels;
+            g_config.audio_buffer_size.obtained = ob.samples;
 
             pLogDebug("Sound opened (obtained: rate=%d hz, format=%s, channels=%d, buffer=%d frames)...",
-                      s_audioSetupObtained.sampleRate,
-                      audio_format_to_string(s_audioSetupObtained.format),
-                      s_audioSetupObtained.channels,
-                      s_audioSetupObtained.bufferSize);
+                      ob.freq,
+                      audio_format_to_string(ob.format),
+                      ob.channels,
+                      ob.samples);
         }
 
 #if defined(__3DS__)
@@ -718,7 +707,7 @@ void PlayMusic(const std::string &Alias, int fadeInMs)
         {
             int ret;
 
-            Mix_VolumeMusicStream(g_curMusic, m.volume * s_mus_vol_scale / 100);
+            Mix_VolumeMusicStream(g_curMusic, m.volume * g_config.audio_mus_volume / 100);
             s_musicYoshiTrackNumber = m.yoshiModeTrack;
             s_musicHasYoshiMode = (s_musicYoshiTrackNumber >= 0 && (Mix_GetMusicTracks(g_curMusic) > s_musicYoshiTrackNumber));
             s_musicDefaultVolume = m.volume;
@@ -749,7 +738,7 @@ void PlayMusic(const std::string &Alias, int fadeInMs)
 
 void PlaySfx(const std::string &Alias, int loops, int volume, uint8_t left, uint8_t right)
 {
-    if(!g_mixerLoaded || s_sfx_vol_scale == 0)
+    if(!g_mixerLoaded || (int)g_config.audio_sfx_volume == 0)
         return;
 
     auto sfx = sound.find(Alias);
@@ -758,7 +747,7 @@ void PlaySfx(const std::string &Alias, int loops, int volume, uint8_t left, uint
         auto &s = sfx->second;
         if(s.chunk)
         {
-            int channel = Mix_PlayChannelVol(s.channel, s.chunk, loops, volume * s_sfx_vol_scale / 100);
+            int channel = Mix_PlayChannelVol(s.channel, s.chunk, loops, volume * g_config.audio_sfx_volume / 100);
 
             if(channel >= 0)
                 Mix_SetPanning(channel, left, right);
@@ -768,7 +757,7 @@ void PlaySfx(const std::string &Alias, int loops, int volume, uint8_t left, uint
             if(Mix_PlayingMusicStream(s.music))
                 Mix_RewindMusicStream(s.music);
 
-            Mix_VolumeMusicStream(s.music, volume * s_sfx_vol_scale / 100);
+            Mix_VolumeMusicStream(s.music, volume * g_config.audio_sfx_volume / 100);
             Mix_SetMusicEffectPanning(s.music, left, right);
             Mix_PlayMusicStream(s.music, loops);
         }
@@ -837,7 +826,7 @@ void StartMusic(int A, int fadeInMs)
 
     D_pLogDebug("Start music A=%d", A);
 
-    if(!g_mixerLoaded || (int)s_mus_vol_scale == 0)
+    if(!g_mixerLoaded || (int)g_config.audio_mus_volume == 0)
     {
         if(g_mixerLoaded && g_curMusic)
             StopMusic();
@@ -867,7 +856,7 @@ void StartMusic(int A, int fadeInMs)
             g_curMusic = Mix_LoadMUS(p.c_str());
             s_musicHasYoshiMode = false;
             s_musicYoshiTrackNumber = -1;
-            Mix_VolumeMusicStream(g_curMusic, 64 * s_mus_vol_scale / 100);
+            Mix_VolumeMusicStream(g_curMusic, 64 * g_config.audio_mus_volume / 100);
             s_musicDefaultVolume = 64;
             if(fadeInMs > 0)
                 Mix_FadeInMusic(g_curMusic, -1, fadeInMs);
@@ -917,7 +906,7 @@ void StartMusic(int A, int fadeInMs)
             {
                 s_musicHasYoshiMode = (s_musicYoshiTrackNumber >= 0 && (Mix_GetMusicTracks(g_curMusic) > s_musicYoshiTrackNumber));
                 UpdateYoshiMusic();
-                Mix_VolumeMusicStream(g_curMusic, 52 * s_mus_vol_scale / 100);
+                Mix_VolumeMusicStream(g_curMusic, 52 * g_config.audio_mus_volume / 100);
                 s_musicDefaultVolume = 52;
                 if(fadeInMs > 0)
                 {
@@ -1007,10 +996,10 @@ void UpdateMusicVolume()
 
     if(g_curMusic)
     {
-        if((int)s_mus_vol_scale == 0)
+        if((int)g_config.audio_mus_volume == 0)
             StartMusic(s_recentMusicA); // will actually STOP it
         else
-            Mix_VolumeMusicStream(g_curMusic, s_musicDefaultVolume * s_mus_vol_scale / 100);
+            Mix_VolumeMusicStream(g_curMusic, s_musicDefaultVolume * g_config.audio_mus_volume / 100);
     }
     else if(s_recentMusicA != s_null_music)
         StartMusic(s_recentMusicA); // will restart it
@@ -1644,7 +1633,7 @@ void PlayExtSound(const std::string &path, int loops, int volume)
 {
     int play_ch = -1;
 
-    if(!g_mixerLoaded || s_sfx_vol_scale == 0)
+    if(!g_mixerLoaded || (int)g_config.audio_sfx_volume == 0)
         return;
 
     auto f = extSfx.find(path);
@@ -1658,10 +1647,10 @@ void PlayExtSound(const std::string &path, int loops, int volume)
         }
 
         extSfx.insert({path, ch});
-        play_ch = Mix_PlayChannelVol(-1, ch, loops, volume * s_sfx_vol_scale / 100);
+        play_ch = Mix_PlayChannelVol(-1, ch, loops, volume * g_config.audio_sfx_volume / 100);
     }
     else
-        play_ch = Mix_PlayChannelVol(-1, f->second, loops, volume * s_sfx_vol_scale / 100);
+        play_ch = Mix_PlayChannelVol(-1, f->second, loops, volume * g_config.audio_sfx_volume / 100);
 
     if(play_ch >= 0)
     {
@@ -1760,9 +1749,9 @@ void SoundFX_SetEcho(const SoundFXEchoSetup& setup)
     {
         SoundFX_Clear();
 
-        effectEcho = echoEffectInit(s_audioSetupObtained.sampleRate,
-                                    s_audioSetupObtained.format,
-                                    s_audioSetupObtained.channels);
+        effectEcho = echoEffectInit(g_config.audio_sample_rate.obtained,
+                                    g_config.audio_format.obtained,
+                                    g_config.audio_channels.obtained);
         isNew = true;
     }
 
@@ -1817,9 +1806,9 @@ void SoundFX_SetReverb(const SoundFXReverb& setup)
         // Clear previously installed effects first
         SoundFX_Clear();
 
-        effectReverb = reverbEffectInit(s_audioSetupObtained.sampleRate,
-                                        s_audioSetupObtained.format,
-                                        s_audioSetupObtained.channels);
+        effectReverb = reverbEffectInit(g_config.audio_sample_rate.obtained,
+                                        g_config.audio_format.obtained,
+                                        g_config.audio_channels.obtained);
         isNew = true;
     }
 

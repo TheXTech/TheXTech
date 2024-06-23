@@ -30,6 +30,18 @@
 
 const std::string& LanguageFormatNumber(int number, const std::string& singular, const std::string& dual, const std::string& plural);
 
+template<bool writable>
+class _Config_t;
+
+template<bool writable>
+class BaseConfigOption_t;
+
+template<bool writable>
+class ConfigSection_t;
+
+template<bool writable, class value_t>
+class ConfigEnumOption_t;
+
 class XTechTranslate
 {
     typedef std::map<std::string, std::string*> TrList;
@@ -69,6 +81,13 @@ public:
 #endif
 
     friend void XHints::InitTranslations(XTechTranslate& translate);
+
+    friend class _Config_t<false>;
+    friend class BaseConfigOption_t<false>;
+    friend class ConfigSection_t<false>;
+
+    template<bool writable, class value_t>
+    friend class ConfigEnumOption_t;
 
 private:
     bool translateFile(const std::string &file, TrList &list, const char* trTypeName);

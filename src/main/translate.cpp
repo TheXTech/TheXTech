@@ -809,6 +809,12 @@ XTechTranslate::XTechTranslate()
     for(int i = 1; i <= numCharacters; ++i)
         m_assetsMap.insert({fmt::format_ne("character.name{0}", i), &g_gameInfo.characterName[i]});
 
+    // reset all strings for options to hardcoded defaults
+    g_options.reset_options();
+
+    // add config fields to engine map
+    g_options.make_translation(*this);
+
 #ifdef THEXTECH_ENABLE_EDITOR
     // adds dynamic fields to the asset map
     EditorCustom::Load(this);
@@ -829,6 +835,9 @@ void XTechTranslate::reset()
     // don't need to reset EditorCustom because we reloaded it in the initializer
     // it would be dangerous to reload it here because it would invalidate a lot of references
 #endif
+
+    // likewise, unsafe to reset g_options here because it would invalidate pointers to data inside vectors
+    // g_options.reset_options();
 
     Controls::InitStrings();
     g_controlsStrings = ControlsStrings_t();

@@ -47,6 +47,7 @@
 #include "menu_main.h"
 #include "screen_pause.h"
 #include "screen_connect.h"
+#include "screen_options.h"
 #include "screen_quickreconnect.h"
 #include "screen_textentry.h"
 #include "screen_prompt.h"
@@ -402,6 +403,11 @@ int PauseGame(PauseCode code, int plr)
     {
         PromptScreen::Init();
     }
+    else if(code == PauseCode::Options)
+    {
+        OptionsScreen::Init();
+        XWindow::showCursor(0);
+    }
     else if(code == PauseCode::TextEntry)
     {
         // assume TextEntryScreen has already been inited through its Run function.
@@ -497,6 +503,11 @@ int PauseGame(PauseCode code, int plr)
             {
                 result = ConnectScreen::Logic();
                 if(result)
+                    break;
+            }
+            else if(GamePaused == PauseCode::Options)
+            {
+                if(OptionsScreen::Logic())
                     break;
             }
             else if(GamePaused == PauseCode::TextEntry)

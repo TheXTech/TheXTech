@@ -448,7 +448,7 @@ private:
      * \brief Initialize the SDL OpenGL bindings according to version preferences and compile-time support, sets the version, and sets profile/version-dependent flags
      * \returns false no supported OpenGL profile can be initialized
      */
-    bool initOpenGL(const CmdLineSetup_t &setup);
+    bool initOpenGL();
 
     /*!
      * \brief Initialize the OpenGL debug bindings if requested and possible
@@ -573,7 +573,7 @@ public:
 
     bool isWorking() override;
 
-    bool initRender(const CmdLineSetup_t &setup, SDL_Window *window) override;
+    bool initRender(SDL_Window *window) override;
 
     /*!
      * \brief Close the renderer

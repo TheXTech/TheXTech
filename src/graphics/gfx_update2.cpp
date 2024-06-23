@@ -34,6 +34,7 @@
 #include "../main/trees.h"
 #include "../main/screen_pause.h"
 #include "../main/screen_connect.h"
+#include "../main/screen_options.h"
 #include "../main/screen_quickreconnect.h"
 #include "../main/screen_textentry.h"
 #include "../game_main.h"
@@ -58,6 +59,10 @@ void UpdateGraphicsMeta();
 
 static inline int computeStarsShowingPolicy(int ll, int cur)
 {
+    // Disable if not allowed globally
+    if(!g_config.world_map_stars_show)
+        return Config_t::MAP_STARS_HIDE;
+
     // Level individual
     if(ll > Config_t::MAP_STARS_UNSPECIFIED)
     {
@@ -67,27 +72,19 @@ static inline int computeStarsShowingPolicy(int ll, int cur)
     }
 
     // World map-wide
-    if(WorldStarsShowPolicy > Config_t::MAP_STARS_UNSPECIFIED)
+    // (IMPORTANT NOTE: "hide" is now ignored as a map-wide setting, since the user has responsibility for setting this)
+    if(WorldStarsShowPolicy > Config_t::MAP_STARS_HIDE)
     {
         if(WorldStarsShowPolicy == Config_t::MAP_STARS_COLLECTED && cur <= 0)
             return Config_t::MAP_STARS_HIDE;
         return WorldStarsShowPolicy;
     }
 
-    // Compatibility settings
-    if(g_config.world_map_stars_show_policy > Config_t::MAP_STARS_UNSPECIFIED)
-    {
-        if(g_config.world_map_stars_show_policy == Config_t::MAP_STARS_COLLECTED && cur <= 0)
-            return Config_t::MAP_STARS_HIDE;
-
-        return g_config.world_map_stars_show_policy;
-    }
-
-    // Gameplay settings
-    if(g_config.WorldMapStarShowPolicyGlobal == Config_t::MAP_STARS_COLLECTED && cur <= 0)
+    // Default behavior if not disabled is collected only
+    if(cur <= 0)
         return Config_t::MAP_STARS_HIDE;
 
-    return g_config.WorldMapStarShowPolicyGlobal;
+    return Config_t::MAP_STARS_COLLECTED;
 }
 
 

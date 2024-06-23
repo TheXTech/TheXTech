@@ -1349,6 +1349,7 @@ struct SelectWorld_t
 //    blockChar(1 To numCharacters) As Boolean
     RangeArrI<bool, 1, numCharacters, false> blockChar;
 // EXTRA:
+    bool bugfixes_on_by_default = false;
     bool editable = false;
     bool highlight = false;
     bool disabled = false;
@@ -1947,6 +1948,7 @@ struct SaveSlotInfo_t
     bool    FailsEnabled = false;
     int32_t Fails = 0;
     int32_t Score = 0;
+    int ConfigDefaults = 0;
 
     RangeArr<SavedChar_t, 1, 5> SavedChar;
 

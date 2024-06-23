@@ -31,7 +31,6 @@
 #include "core/render.h"
 #include "core/msgbox.h"
 
-#include "presetup.h"
 #include "gfx.h"
 #include "load_gfx.h"
 #include "game_main.h"

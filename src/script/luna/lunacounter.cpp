@@ -29,6 +29,7 @@
 #include "lunarender.h"
 #include "renderop_string.h"
 #include "globals.h"
+#include "config.h"
 #include "graphics.h"
 #include "config.h"
 #include "game_main.h"
@@ -196,7 +197,7 @@ bool DeathCounter::TryLoadStats()
 // mark that a death occurred in the current level
 void DeathCounter::MarkDeath(bool write_save)
 {
-    bool dcAllow = (gEnableDemoCounter || gEnableDemoCounterByLC || g_config.demos_counter_enable);
+    bool dcAllow = (gEnableDemoCounterByLC || g_config.enable_fails_tracking);
 
     if(!dcAllow)
         return;
@@ -412,7 +413,7 @@ void DeathCounter::Draw(int screenZ)
 // PRINT DEBUG - Prints all death records to the screen
 void DeathCounter::PrintDebug() const
 {
-    if(!gLunaEnabled || !gLunaEnabledGlobally)
+    if(!g_config.luna_enable_engine)
         return;
 
     if(!mDeathRecords.empty())

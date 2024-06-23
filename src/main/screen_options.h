@@ -18,30 +18,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#pragma once
-#ifndef LUNA_H
-#define LUNA_H
+#ifndef SCREEN_OPTIONS_H
 
-#include <string>
+#define SCREEN_OPTIONS_H
 
-struct SMBXHUDSettings
+namespace OptionsScreen
 {
-    bool              skip = false; // Skip the whole HUD drawing
-    // WORLD_HUD_CONTROL overworldHudState;
-    // bool              skipStarCount;
-};
 
-extern SMBXHUDSettings gSMBXHUDSettings;
+void Init();
 
-//! Enable Demos counter locally by LunaControl command
-extern bool gEnableDemoCounterByLC;
+void Render();
 
-extern void lunaReset();
-extern void lunaLoad();
-extern void lunaLoop();
-extern void lunaRenderStart();
-extern void lunaRenderHud(int screenZ);
-extern void lunaRender(int screenZ);
-extern void lunaRenderEnd();
+// if returns true, user has exited the screen
+bool Logic();
 
-#endif // LUNA_H
+void ResetStrings();
+
+} // namespace OptionsScreen
+
+#endif // SCREEN_OPTIONS_H

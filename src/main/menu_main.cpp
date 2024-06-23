@@ -38,9 +38,10 @@
 #include "game_info.h"
 #include "../version.h"
 #include "../gfx.h"
-#include "screen_connect.h"
-#include "menu_controls.h"
-#include "translate_episode.h"
+#include "main/screen_connect.h"
+#include "main/screen_options.h"
+#include "main/menu_controls.h"
+#include "main/translate_episode.h"
 
 #include "speedrunner.h"
 #include "main/gameplay_timer.h"
@@ -61,6 +62,9 @@
 #include "game_globals.h"
 #include "core/language.h"
 #include "main/translate.h"
+#include "change_res.h"
+#include "game_globals.h"
+#include "npc_id.h"
 #include "fontman/font_manager.h"
 #include "custom.h"
 
@@ -237,7 +241,7 @@ static const int TinyScreenW = 600;
 
 static bool s_prefer_modern_char_sel()
 {
-    return (CompatGetLevel() < COMPAT_SMBX2);
+    return (g_config.compatibility_mode == Config_t::COMPAT_OFF || g_config.compatibility_mode == Config_t::COMPAT_MODERN);
 }
 
 static bool s_show_separate_2P()
@@ -268,12 +272,7 @@ void GetMenuPos(int* MenuX, int* MenuY)
     if(XRender::TargetH < TinyScreenH)
         *MenuY = 100;
     else if(XRender::TargetH < SmallScreenH)
-    {
-        if(MenuMode == MENU_OPTIONS)
-            *MenuY = XRender::TargetH - 250;
-        else
-            *MenuY = XRender::TargetH - 220;
-    }
+        *MenuY = XRender::TargetH - 220;
 
     if(MenuMode >= MENU_SELECT_SLOT_BASE && MenuMode < MENU_SELECT_SLOT_END)
         *MenuY -= c_menuSavesOffsetY;
@@ -420,6 +419,8 @@ static void s_LoadSingleWorld(const std::string& epDir, const std::string& fName
         w.WorldFile = fName;
         if(w.WorldName.empty())
             w.WorldName = fName;
+
+        w.bugfixes_on_by_default = (head.meta.RecentFormat != LevelData::SMBX64);
 
         w.blockChar[1] = head.nocharacter1;
         w.blockChar[2] = head.nocharacter2;
@@ -710,7 +711,7 @@ bool mainMenuUpdate()
                 MenuCursorCanMove = true;
         }
 
-        if(!g_pollingInput && (MenuMode != MENU_CHARACTER_SELECT_NEW && MenuMode != MENU_CHARACTER_SELECT_NEW_BM && MenuMode != MENU_INTRO))
+        if(!g_pollingInput && (MenuMode != MENU_CHARACTER_SELECT_NEW && MenuMode != MENU_CHARACTER_SELECT_NEW_BM && MenuMode != MENU_NEW_OPTIONS && MenuMode != MENU_INTRO))
         {
             int cursorDelta = 0;
 
@@ -737,6 +738,7 @@ bool mainMenuUpdate()
 
             if(cursorDelta != 0)
             {
+#if 0
                 if(MenuMode >= MENU_CHARACTER_SELECT_BASE && MenuMode <= MENU_CHARACTER_SELECT_BASE_END)
                 {
                     while((MenuCursor == (PlayerCharacter - 1) &&
@@ -750,6 +752,17 @@ bool mainMenuUpdate()
                             MenuCursor = 0;
                     }
                 }
+#endif
+
+                if(MenuMode >= MENU_SELECT_SLOT_BASE && MenuMode < MENU_SELECT_SLOT_END)
+                {
+                    ConfigChangeSentinel sent(ConfigSetLevel::ep_config);
+
+                    g_config.playstyle = SelectWorld[selWorld].bugfixes_on_by_default ? Config_t::MODE_MODERN : Config_t::MODE_CLASSIC;
+                    if(g_config.speedrun_mode.m_set != ConfigSetLevel::cmdline)
+                        g_config.speedrun_mode = 0;
+                }
+
                 PlaySoundMenu(SFX_Slide);
             }
 
@@ -965,8 +978,8 @@ bool mainMenuUpdate()
                 else if(MenuCursor == i++)
                 {
                     PlaySoundMenu(SFX_Do);
-                    MenuMode = MENU_OPTIONS;
-                    MenuCursor = 0;
+                    MenuMode = MENU_NEW_OPTIONS;
+                    OptionsScreen::Init();
                 }
                 else if(MenuCursor == i++)
                 {
@@ -1457,6 +1470,23 @@ bool mainMenuUpdate()
                         FindSaves();
                         MenuMode *= MENU_SELECT_SLOT_BASE;
                         MenuCursor = 0;
+
+                        {
+                            ConfigChangeSentinel sent(ConfigSetLevel::ep_config);
+
+                            int save_configs = SaveSlotInfo[MenuCursor + 1].ConfigDefaults;
+
+                            if(save_configs > 0)
+                                g_config.playstyle = save_configs - 1;
+                            else if(save_configs < 0 && g_config.speedrun_mode.m_set != ConfigSetLevel::cmdline)
+                                g_config.speedrun_mode = -save_configs;
+                            else
+                            {
+                                g_config.playstyle = SelectWorld[selWorld].bugfixes_on_by_default ? Config_t::MODE_MODERN : Config_t::MODE_CLASSIC;
+                                if(g_config.speedrun_mode.m_set != ConfigSetLevel::cmdline)
+                                    g_config.speedrun_mode = 0;
+                            }
+                        }
                     }
 
                     MenuCursorCanMove = false;
@@ -1537,15 +1567,91 @@ bool mainMenuUpdate()
         // Save Select
         else if(MenuMode == MENU_SELECT_SLOT_1P || MenuMode == MENU_SELECT_SLOT_2P)
         {
+            ConfigChangeSentinel sent(ConfigSetLevel::ep_config);
+
             if(SharedCursor.Move)
+            {
+                int old_item = MenuCursor;
                 s_handleMouseMove(c_menuItemSavesDelete, MenuX, MenuY, 300, 30);
+
+                if(MenuCursor != old_item)
+                {
+                    g_config.playstyle = SelectWorld[selWorld].bugfixes_on_by_default ? Config_t::MODE_MODERN : Config_t::MODE_CLASSIC;
+                    if(g_config.speedrun_mode.m_set != ConfigSetLevel::cmdline)
+                        g_config.speedrun_mode = 0;
+                }
+            }
+
+            // new mode selection logic
+            if(MenuCursor >= 0 && MenuCursor < maxSaveSlots && SaveSlotInfo[MenuCursor + 1].ConfigDefaults == 0)
+            {
+                // switch mode
+                if(MenuCursorCanMove && altPressed && g_config.speedrun_mode.m_value == 0)
+                {
+                    if(g_config.playstyle == Config_t::MODE_MODERN)
+                        g_config.playstyle = Config_t::MODE_CLASSIC;
+                    else
+                        g_config.playstyle = Config_t::MODE_MODERN;
+
+                    PlaySoundMenu(SFX_PSwitch);
+                    MenuCursorCanMove = false;
+                }
+
+                // only enter the menu if allowed by the global speedrun mode
+                if(MenuCursorCanMove && homePressed && g_config.speedrun_mode.m_set == ConfigSetLevel::cmdline)
+                {
+                    PlaySoundMenu(SFX_BlockHit);
+                }
+                // enter vanilla mode if an existing save slot
+                else if(MenuCursorCanMove && homePressed && SaveSlotInfo[MenuCursor + 1].Progress >= 0)
+                {
+                    int target_bugfixes = (SelectWorld[selWorld].bugfixes_on_by_default) ? Config_t::MODE_MODERN : Config_t::MODE_CLASSIC;
+
+                    if(g_config.playstyle == Config_t::MODE_VANILLA)
+                        g_config.playstyle = target_bugfixes;
+                    else
+                        g_config.playstyle = Config_t::MODE_VANILLA;
+
+                    PlaySoundMenu(SFX_PSwitch);
+                    MenuCursorCanMove = false;
+                }
+                // go to speedrun menu otherwise
+                else if(MenuCursorCanMove && homePressed)
+                {
+                    PlaySoundMenu(SFX_PlayerGrow);
+                    selSave = MenuCursor + 1;
+
+                    if(g_config.speedrun_mode.m_value == 0)
+                        MenuCursor = g_config.playstyle;
+                    else
+                        MenuCursor = g_config.speedrun_mode + 2;
+
+                    MenuMode += MENU_SELECT_SLOT_ADVMODE_ADD;
+                    MenuCursorCanMove = false;
+                    MenuMouseClick = false;
+                }
+            }
+            else if(MenuCursor >= 0 && MenuCursor < maxSaveSlots)
+            {
+                int save_configs = SaveSlotInfo[MenuCursor + 1].ConfigDefaults;
+
+                if(save_configs > 0)
+                    g_config.playstyle = save_configs - 1;
+                else if(save_configs < 0 && g_config.speedrun_mode.m_set != ConfigSetLevel::cmdline)
+                    g_config.speedrun_mode = -save_configs;
+            }
 
             if(MenuCursorCanMove || MenuMouseClick)
             {
                 if(menuBackPress)
                 {
 //'save select back
+                    g_config.playstyle = Config_t::MODE_MODERN;
+                    if(g_config.speedrun_mode.m_set != ConfigSetLevel::cmdline)
+                        g_config.speedrun_mode = 0;
+
                     MenuMode /= MENU_SELECT_SLOT_BASE;
+
                     // Restore menu state
                     worldCurs = listMenuLastScroll;
                     MenuCursor = listMenuLastCursor;
@@ -1555,10 +1661,31 @@ bool mainMenuUpdate()
                 }
                 else if(menuDoPress || MenuMouseClick)
                 {
-                    PlaySoundMenu(SFX_Do);
-
-                    if(MenuCursor >= 0 && MenuCursor <= c_menuItemSavesEndList) // Select the save slot, but still need to select players
+                    if(MenuCursor == c_menuItemSavesCopy) // Copy the gamesave
                     {
+                        PlaySoundMenu(SFX_Do);
+                        MenuCursor = 0;
+                        MenuMode += MENU_SELECT_SLOT_COPY_S1_ADD;
+                        MenuCursorCanMove = false;
+                    }
+                    else if(MenuCursor == c_menuItemSavesDelete) // Delete the gamesave
+                    {
+                        PlaySoundMenu(SFX_Do);
+                        MenuCursor = 0;
+                        MenuMode += MENU_SELECT_SLOT_DELETE_ADD;
+                        MenuCursorCanMove = false;
+                    }
+                    else if(MenuCursor >= 0 && MenuCursor <= c_menuItemSavesEndList
+                        && g_config.speedrun_mode != 0 && g_config.speedrun_mode != -SaveSlotInfo[MenuCursor + 1].ConfigDefaults
+                        && (SaveSlotInfo[MenuCursor + 1].ConfigDefaults != 0 || SaveSlotInfo[MenuCursor + 1].Progress >= 0))
+                    {
+                        PlaySoundMenu(SFX_BlockHit);
+                        MenuCursorCanMove = false;
+                    }
+                    else if(MenuCursor >= 0 && MenuCursor <= c_menuItemSavesEndList) // Select the save slot, but still need to select players
+                    {
+                        PlaySoundMenu(SFX_Do);
+
                         LoadCustomPlayerPreviews(SelectWorld[selWorld].WorldPath.c_str());
 
                         selSave = MenuCursor + 1;
@@ -1571,18 +1698,6 @@ bool mainMenuUpdate()
                             ConnectScreen::LegacyMenu_Start();
 
                         MenuMode = MENU_CHARACTER_SELECT_NEW;
-                        MenuCursorCanMove = false;
-                    }
-                    else if(MenuCursor == c_menuItemSavesCopy) // Copy the gamesave
-                    {
-                        MenuCursor = 0;
-                        MenuMode += MENU_SELECT_SLOT_COPY_S1_ADD;
-                        MenuCursorCanMove = false;
-                    }
-                    else if(MenuCursor == c_menuItemSavesDelete) // Delete the gamesave
-                    {
-                        MenuCursor = 0;
-                        MenuMode += MENU_SELECT_SLOT_DELETE_ADD;
                         MenuCursorCanMove = false;
                     }
                 }
@@ -1698,6 +1813,58 @@ bool mainMenuUpdate()
             }
         }
 
+        // Advanced mode selection
+        else if(MenuMode == MENU_SELECT_SLOT_1P_ADVMODE || MenuMode == MENU_SELECT_SLOT_2P_ADVMODE)
+        {
+            if(SharedCursor.Move)
+                s_handleMouseMove(5, MenuX, MenuY, MenuX, 30);
+
+            if(MenuCursorCanMove || MenuMouseClick)
+            {
+                if(menuBackPress)
+                {
+//'save select back
+                    MenuMode -= MENU_SELECT_SLOT_ADVMODE_ADD;
+                    MenuCursor = selSave - 1;
+                    selSave = 0;
+                    PlaySoundMenu(SFX_Slide);
+                    MenuCursorCanMove = false;
+                }
+                else if(menuDoPress || MenuMouseClick)
+                {
+                    ConfigChangeSentinel sent(ConfigSetLevel::ep_config);
+
+                    if(MenuCursor < 3)
+                    {
+                        g_config.playstyle = MenuCursor;
+
+                        if(g_config.speedrun_mode.m_set != ConfigSetLevel::cmdline)
+                            g_config.speedrun_mode = 0;
+                    }
+                    else
+                    {
+                        g_config.playstyle = Config_t::MODE_MODERN;
+
+                        if(g_config.speedrun_mode.m_set != ConfigSetLevel::cmdline)
+                            g_config.speedrun_mode = MenuCursor - 2;
+                    }
+
+                    PlaySoundMenu(SFX_Do);
+                    MenuMode -= MENU_SELECT_SLOT_ADVMODE_ADD;
+                    MenuCursor = selSave - 1;
+                    selSave = 0;
+                    MenuCursorCanMove = false;
+                }
+            }
+
+            if(MenuMode == MENU_SELECT_SLOT_1P_ADVMODE || MenuMode == MENU_SELECT_SLOT_2P_ADVMODE)
+            {
+                if(MenuCursor > 5) MenuCursor = 0;
+                if(MenuCursor < 0) MenuCursor = 5;
+            }
+        }
+
+#if 0 // unused now
         // Options
         else if(MenuMode == MENU_OPTIONS)
         {
@@ -1925,9 +2092,13 @@ bool mainMenuUpdate()
                         EndCredits = 0;
                         SetupCredits();
                     }
-
+                    else if(MenuCursor == i++)
+                    {
+                        MenuMode = MENU_NEW_OPTIONS;
+                        PlaySoundMenu(SFX_Do);
+                        OptionsScreen::Init();
+                    }
                 }
-
             }
 
             if(MenuMode == MENU_OPTIONS)
@@ -1938,6 +2109,7 @@ bool mainMenuUpdate()
                     MenuCursor = optionsMenuLength;
             }
         }
+#endif
 
         // Input Settings
         else if(MenuMode == MENU_INPUT_SETTINGS)
@@ -1946,9 +2118,27 @@ bool mainMenuUpdate()
             if(ret == -1)
             {
                 Controls::SaveConfig();
-                MenuCursor = 0; // index of controls within options
-                MenuMode = MENU_OPTIONS;
+                MenuMode = MENU_NEW_OPTIONS;
                 MenuCursorCanMove = false;
+            }
+        }
+
+        // New Settings
+        else if(MenuMode == MENU_NEW_OPTIONS)
+        {
+            if(OptionsScreen::Logic())
+            {
+                int optionsIndex = 1;
+                if(s_show_separate_2P())
+                    optionsIndex++;
+                if(!g_gameInfo.disableBattleMode)
+                    optionsIndex++;
+                if(g_config.enable_editor)
+                    optionsIndex++;
+                MenuMode = MENU_MAIN;
+                MenuCursor = optionsIndex;
+                MenuCursorCanMove = false;
+                PlaySoundMenu(SFX_Slide);
             }
         }
     }
@@ -2073,7 +2263,10 @@ static void s_drawGameTypeTitle(int x, int y)
         SuperPrint(g_mainMenu.mainBattleGame, 3, x, y, XTColorF(0.3f, 0.3f, 1.0f));
     else
     {
-        if(!s_show_separate_2P())
+        // show "Play Episode" when at the save slot selecting and adjusting settings (not when the game was started in compat / speedrun mode)
+        bool changing_settings = (MenuMode >= MENU_SELECT_SLOT_BASE && MenuMode < MENU_SELECT_SLOT_END && g_config.speedrun_mode.m_set != ConfigSetLevel::cmdline && g_config.compatibility_mode.m_set != ConfigSetLevel::cmdline);
+
+        if(!s_show_separate_2P() || changing_settings)
             SuperPrint(g_mainMenu.mainPlayEpisode, 3, x, y, XTColorF(1.0f, 0.3f, 0.3f));
         else if(menuPlayersNum == 1)
             SuperPrint(g_mainMenu.main1PlayerGame, 3, x, y, XTColorF(1.0f, 0.3f, 0.3f));
@@ -2120,6 +2313,57 @@ static void s_drawGameSaves(int MenuX, int MenuY)
             // "SLOT {0} ... NEW GAME"
             SuperPrint(fmt::format_ne(g_mainMenu.gameSlotNew, A), 3, MenuX, posY);
         }
+
+        int mode_icon_X = MenuX + 340;
+        int mode_icon_Y = MenuY - 34 + (A * 30);
+
+        int save_configs = info.ConfigDefaults;
+        if(save_configs == 0 && A == MenuCursor + 1 && (MenuMode == MENU_SELECT_SLOT_1P || MenuMode == MENU_SELECT_SLOT_2P))
+        {
+            save_configs = g_config.playstyle + 1;
+            if(g_config.speedrun_mode != 0)
+                save_configs = -g_config.speedrun_mode;
+        }
+
+        if(save_configs != 0)
+        {
+            float rot = 0;
+            float op = 1.0f;
+            if(A == MenuCursor + 1)
+            {
+                rot = std::abs((int)(CommonFrame % 90) - 45);
+                rot = rot - 22.5;
+            }
+
+            if(info.ConfigDefaults == 0)
+            {
+                op = std::abs((int)(CommonFrame % 30) - 15);
+                op /= 100.0f;
+                op += 0.5f;
+            }
+
+            if(save_configs == Config_t::MODE_CLASSIC + 1)
+            {
+                XRender::renderTextureScaleEx(mode_icon_X, mode_icon_Y, 24, 24, GFXNPC[NPCID_POWER_S3], 0, 0, 32, 32, rot, nullptr, X_FLIP_NONE, XTAlphaF(op));
+            }
+            else if(save_configs == Config_t::MODE_VANILLA + 1)
+            {
+                XRender::renderTextureScaleEx(mode_icon_X, mode_icon_Y, 24, 24, GFXNPC[NPCID_FODDER_S3], 0, 0, 32, 32, rot, nullptr, X_FLIP_NONE, XTAlphaF(op));
+            }
+            else if(save_configs < 0)
+            {
+                XRender::renderTextureScaleEx(mode_icon_X, mode_icon_Y, 24, 24, GFXNPC[NPCID_TIMER_S2], 0, 0, 32, 32, rot, nullptr, X_FLIP_NONE, XTAlphaF(op));
+                if(save_configs > -10)
+                    XRender::renderTexture(mode_icon_X + 12, mode_icon_Y + 12, GFX.Font1[-save_configs]);
+            }
+            else
+            {
+                if(GFX.EIcons.inited)
+                    XRender::renderTextureScaleEx(mode_icon_X, mode_icon_Y, 24, 24, GFX.EIcons, 0, 32*Icon::thextech, 32, 32, rot, nullptr, X_FLIP_NONE, XTAlphaF(op));
+                else
+                    XRender::renderTextureScaleEx(mode_icon_X, mode_icon_Y, 24, 24, GFXNPC[NPCID_ICE_POWER_S3], 0, 0, 32, 32, rot, nullptr, X_FLIP_NONE, XTAlphaF(op));
+            }
+        }
     }
 
     if(MenuMode == MENU_SELECT_SLOT_1P || MenuMode == MENU_SELECT_SLOT_2P)
@@ -2138,52 +2382,114 @@ static void s_drawGameSaves(int MenuX, int MenuY)
     int infobox_x = XRender::TargetW / 2 - 240;
     int infobox_y = MenuY + 145 + c_menuSavesOffsetY;
 
-    int row_1 = infobox_y + 10;
-    int row_2 = infobox_y + 42;
-    int row_c = infobox_y + 26;
-
-    bool hasFails = (gEnableDemoCounter || info.FailsEnabled);
-
-    // recenter if single row
-    if((info.Time <= 0 || g_speedRunnerMode == SPEEDRUN_MODE_OFF) && !hasFails)
-        row_1 = infobox_y + 26;
-
-    XRender::renderRect(infobox_x, infobox_y, 480, 68, {0, 0, 0, 127});
-
-    // Temp string
-    std::string t;
-
-    // Score
-    bool show_timer = info.Time > 0 && g_speedRunnerMode != SPEEDRUN_MODE_OFF;
-    int row_score = show_timer ? row_1 : row_c;
-    SuperPrint(t = fmt::format_ne(g_mainMenu.phraseScore, info.Score), 3, infobox_x + 10, row_score);
-
-    // Gameplay Timer
-    if(show_timer)
+    // forbid incompatible speedrun
+    if(g_config.speedrun_mode != 0 && g_config.speedrun_mode.m_set >= ConfigSetLevel::cmdline && g_config.speedrun_mode != -info.ConfigDefaults
+        && (info.ConfigDefaults != 0 || info.Progress >= 0))
     {
-        std::string ts = GameplayTimer::formatTime(info.Time);
-
-        if(ts.size() > 9)
-            ts = ts.substr(0, ts.size() - 4);
-
-        SuperPrint(fmt::format_ne(g_mainMenu.phraseTime, ts), 3, infobox_x + 10, row_2);
+        XRender::renderRect(XRender::TargetW / 2 - 240, infobox_y, 480, 68, XTColorF(0, 0, 0, 1.0f));
+        SuperPrintScreenCenter("SAVE INCOMPATIBLE", 3, infobox_y + 4, XTColorF(1.0f, 0.0f, 0.0f, 1.0f));
+        SuperPrintScreenCenter(fmt::format_ne("WITH SPEEDRUN MODE {0}", (int)g_config.speedrun_mode), 3, infobox_y + 24, XTColorF(1.0f, 0.0f, 0.0f, 1.0f));
+        SuperPrintScreenCenter("(COMMAND LINE FLAG)", 3, infobox_y + 44, XTColorF(0.8f, 0.8f, 0.8f, 1.0f));
     }
+    // initialize config
+    else if(info.ConfigDefaults == 0)
+    {
+        XRender::renderRect(infobox_x, infobox_y, 480, 68, {0, 0, 0, 192});
 
-    // If demos off, put (l)ives and (c)oins on center
-    int row_lc = (hasFails) ? row_1 : row_c;
+        XTColor color;
 
-    // Print lives on the screen (from gfx_update2.cpp)
-    DrawLives(infobox_x + 272 + 32, row_lc, info.Lives, info.Hundreds);
+        if(g_config.playstyle == Config_t::MODE_MODERN)
+            color = XTColorF(0.5f, 0.8f, 1.0f);
+        else if(g_config.playstyle == Config_t::MODE_CLASSIC)
+            color = XTColorF(1.0f, 0.5f, 0.5f);
+        else
+            color = XTColorF(0.8f, 0.5f, 0.2f);
 
-    // Print coins on the screen (from gfx_update2.cpp)
-    int coins_x = infobox_x + 480 - 10 - 36 - 62;
-    XRender::renderTexture(coins_x + 16, row_lc, GFX.Interface[2]);
-    XRender::renderTexture(coins_x + 40, row_lc + 2, GFX.Interface[1]);
-    SuperPrintRightAlign(t = std::to_string(info.Coins), 1, coins_x + 62 + 36, row_lc + 2);
+        if(g_config.speedrun_mode != 0)
+            SuperPrintScreenCenter("SPEEDRUN MODE " + std::to_string(g_config.speedrun_mode), 3, infobox_y + 4, color);
+        else
+        {
+            // int target_bugfixes = (SelectWorld[selWorld].bugfixes_on_by_default) ? Config_t::MODE_MODERN : Config_t::MODE_CLASSIC;
 
-    // Fails Counter
-    if(hasFails)
-        SuperPrintRightAlign(fmt::format_ne("{0}: {1}", g_gameInfo.fails_counter_title, info.Fails), 3, infobox_x + 480 - 10, row_2);
+            std::string playstyle_string;
+            playstyle_string += g_options.playstyle.m_display_name;
+            playstyle_string += ": ";
+
+            if(g_config.playstyle == Config_t::MODE_MODERN)
+                playstyle_string += g_options.playstyle.m_enum_values[0].m_display_name;
+            else if(g_config.playstyle == Config_t::MODE_CLASSIC)
+                playstyle_string += g_options.playstyle.m_enum_values[1].m_display_name;
+            else
+                playstyle_string += g_options.playstyle.m_enum_values[2].m_display_name;
+
+            // if(target_bugfixes == g_config.playstyle)
+            //     playstyle_string += " (Recommended)";
+
+            SuperPrintScreenCenter(playstyle_string, 3, infobox_y + 4, color);
+
+            SuperPrintScreenCenter("ALT JUMP TO SWITCH", 3, infobox_y + 44, XTColorF(0.8f, 0.8f, 0.8f, 0.8f));
+        }
+
+        const std::string& playstyle_description
+            = (g_config.playstyle == Config_t::MODE_MODERN) ?
+                g_options.playstyle.m_enum_values[0].m_display_tooltip
+            : (g_config.playstyle == Config_t::MODE_CLASSIC) ?
+                g_options.playstyle.m_enum_values[1].m_display_tooltip
+            :
+                g_options.playstyle.m_enum_values[2].m_display_tooltip;
+
+        SuperPrintScreenCenter(playstyle_description, 5, infobox_y + 24, color);
+    }
+    // display fun save slot info
+    else if(info.Progress >= 0)
+    {
+        int row_1 = infobox_y + 10;
+        int row_2 = infobox_y + 42;
+        int row_c = infobox_y + 26;
+
+        bool hasFails = (g_config.enable_fails_tracking || info.FailsEnabled);
+        bool show_timer = info.Time > 0 && (g_config.enable_playtime_tracking || info.ConfigDefaults < 0);
+
+        // recenter if single row
+        if(!show_timer && !hasFails)
+            row_1 = infobox_y + 26;
+
+        XRender::renderRect(infobox_x, infobox_y, 480, 68, {0, 0, 0, 127});
+
+        // Temp string
+        std::string t;
+
+        // Score
+        int row_score = show_timer ? row_1 : row_c;
+        SuperPrint(t = fmt::format_ne(g_mainMenu.phraseScore, info.Score), 3, infobox_x + 10, row_score);
+
+        // Gameplay Timer
+        if(show_timer)
+        {
+            std::string t = GameplayTimer::formatTime(info.Time);
+
+            if(t.size() > 9)
+                t = t.substr(0, t.size() - 4);
+
+            SuperPrint(fmt::format_ne(g_mainMenu.phraseTime, t), 3, infobox_x + 10, row_2);
+        }
+
+        // If demos off, put (l)ives and (c)oins on center
+        int row_lc = (hasFails) ? row_1 : row_c;
+
+        // Print lives on the screen (from gfx_update2.cpp)
+        DrawLives(infobox_x + 272 + 32, row_lc, info.Lives, info.Hundreds);
+
+        // Print coins on the screen (from gfx_update2.cpp)
+        int coins_x = infobox_x + 480 - 10 - 36 - 62;
+        XRender::renderTexture(coins_x + 16, row_lc, GFX.Interface[2]);
+        XRender::renderTexture(coins_x + 40, row_lc + 2, GFX.Interface[1]);
+        SuperPrintRightAlign(t = std::to_string(info.Coins), 1, coins_x + 62 + 36, row_lc + 2);
+
+        // Fails Counter
+        if(hasFails)
+            SuperPrintRightAlign(fmt::format_ne("{0}: {1}", g_gameInfo.fails_counter_title, info.Fails), 3, infobox_x + 480 - 10, row_2);
+    }
 }
 
 void mainMenuDraw()
@@ -2224,7 +2530,7 @@ void mainMenuDraw()
         int LogoMode = 0;
         if(XRender::TargetH >= TinyScreenH || MenuMode == MENU_INTRO)
             LogoMode = 1;
-        else if(MenuMode == MENU_MAIN || MenuMode == MENU_OPTIONS)
+        else if(MenuMode == MENU_MAIN)
             LogoMode = 2;
 
         if(LogoMode == 1)
@@ -2532,6 +2838,24 @@ void mainMenuDraw()
         XRender::renderTexture(MenuX - 20, MenuY + (MenuCursor * 30), GFX.MCursor[0]);
     }
 
+    else if(MenuMode == MENU_SELECT_SLOT_1P_ADVMODE || MenuMode == MENU_SELECT_SLOT_2P_ADVMODE) // Advanced mode select
+    {
+        s_drawGameTypeTitle(MenuX, MenuY - 70);
+        SuperPrint(SelectWorld[selWorld].WorldName, 3, MenuX, MenuY - 40, XTColorF(0.6f, 1.f, 1.f));
+
+        int A = 0;
+
+        SuperPrint("Modern Game", 3, MenuX, MenuY + (A++ * 30), XTColorF(0.5f, 0.7f, 1.0f));
+        SuperPrint("Classic Game", 3, MenuX, MenuY + (A++ * 30), XTColorF(1.0f, 0.7f, 0.7f));
+        SuperPrint("Vanilla Game", 3, MenuX, MenuY + (A++ * 30), XTColorF(0.8f, 0.5f, 0.2f));
+        SuperPrint("Speedrun Mode 1", 3, MenuX, MenuY + (A++ * 30), XTColorF(0.5f, 0.7f, 1.0f));
+        SuperPrint("Speedrun Mode 2", 3, MenuX, MenuY + (A++ * 30), XTColorF(1.0f, 0.7f, 0.7f));
+        SuperPrint("Speedrun Mode 3", 3, MenuX, MenuY + (A++ * 30), XTColorF(0.8f, 0.5f, 0.2f));
+
+        XRender::renderTexture(MenuX - 20, MenuY + (MenuCursor * 30), GFX.MCursor[0]);
+    }
+
+#if 0
     // Options Menu
     else if(MenuMode == MENU_OPTIONS)
     {
@@ -2610,11 +2934,18 @@ void mainMenuDraw()
         XRender::renderTexture(MenuX - 20, MenuY + (MenuCursor * 30),
                                GFX.MCursor[0].w, GFX.MCursor[0].h, GFX.MCursor[0], 0, 0);
     }
+#endif
 
     // Player controls setup
     else if(MenuMode == MENU_INPUT_SETTINGS)
     {
         menuControls_Render();
+    }
+
+    // New options screen
+    else if(MenuMode == MENU_NEW_OPTIONS)
+    {
+        OptionsScreen::Render();
     }
 
     // fade to / from asset pack screen

@@ -197,6 +197,13 @@ bool WindowSDL::initSDL(uint32_t windowInitFlags)
     s_emscriptenFillBrowser();
 #endif
 
+#if RENDER_FULLSCREEN_ALWAYS // Use a full-screen on Android & PS Vita mode by default
+    setFullScreen(true);
+    show();
+#else
+    setFullScreen(g_config.fullscreen);
+#endif
+
     return res;
 }
 

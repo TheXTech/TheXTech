@@ -302,16 +302,6 @@ int GameMain(const CmdLineSetup_t &setup)
 //    LB = "\n";
 //    EoT = "";
 
-    g_config.enable_frameskip = setup.frameSkip;
-    g_config.audio_enable = !setup.noSound;
-    g_config.background_work = setup.neverPause;
-
-    CompatSetEnforcedLevel(setup.compatibilityLevel);
-
-    g_speedRunnerMode = setup.speedRunnerMode;
-    g_drawController |= setup.showControllerState;
-
-    ResetCompat();
     // moved into MainLoadAll
     // cheats_reset();
 
@@ -367,11 +357,6 @@ int GameMain(const CmdLineSetup_t &setup)
 //    End If
 
     LoadingInProcess = true;
-
-    g_config.show_fps = setup.testShowFPS;
-    g_config.unlimited_framerate = setup.testMaxFPS; // || (g_config.render_mode_obtained == RENDER_ACCELERATED_VSYNC);
-
-    OpenConfig();
 
     XEvents::doEvents();
 
@@ -765,6 +750,14 @@ int GameMain(const CmdLineSetup_t &setup)
         // The Game Menu
         else if(GameMenu)
         {
+            {
+                ConfigChangeSentinel sent(ConfigSetLevel::ep_config);
+
+                g_config.playstyle = Config_t::MODE_MODERN;
+                if(g_config.speedrun_mode.m_set != ConfigSetLevel::cmdline)
+                    g_config.speedrun_mode = 0;
+            }
+
             Integrator::clearEpisodeName();
             Integrator::clearLevelName();
             Integrator::clearEditorFile();
@@ -823,6 +816,7 @@ int GameMain(const CmdLineSetup_t &setup)
             g_ForceBitmaskMerge = false;
             g_ClonedPlayerMode = false;
             g_CheatLogicScreen = false;
+            g_CheatEditYourFriends = false;
             XRender::unloadGifTextures();
 
             // reinitialize the screens (resets multiplayer preferences)
@@ -965,7 +959,7 @@ int GameMain(const CmdLineSetup_t &setup)
                 FullFileName = FileNamePath + FileNameFull;
             }
 
-            LoadCustomCompat();
+            LoadCustomConfig();
             FindCustomPlayers();
             LoadCustomGFX();
             LoadCustomSound();
@@ -2116,6 +2110,7 @@ void StartEpisode()
     Lives = 3;
     LevelSelect = true;
     GameMenu = false;
+    UpdateInternalRes();
     XRender::setTargetTexture();
     XRender::clearBuffer();
     XRender::repaint();

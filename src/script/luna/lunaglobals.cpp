@@ -22,12 +22,7 @@
 
 SMBXHUDSettings gSMBXHUDSettings;
 
-bool gLunaEnabledGlobally = true;
-bool gLunaEnabled = true;
-bool gShowDemoCounter = true;
-bool gEnableDemoCounter = true;
 bool gEnableDemoCounterByLC = false;
-
 
 /* Fallback dummy calls for the case when Luna Autocode has been disabled */
 

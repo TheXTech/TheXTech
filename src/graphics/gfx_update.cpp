@@ -38,6 +38,7 @@
 #include "../main/trees.h"
 #include "../main/screen_pause.h"
 #include "../main/screen_connect.h"
+#include "../main/screen_options.h"
 #include "../main/screen_quickreconnect.h"
 #include "../main/screen_textentry.h"
 #include "../main/cheat_code.h"
@@ -3041,6 +3042,7 @@ void UpdateGraphicsScreen(Screen_t& screen)
             for(size_t i = 0; i < NPC_Draw_Queue_p.Dropped_n; i++)
             {
                 int A = NPC_Draw_Queue_p.Dropped[i];
+
                 // pulse alpha during modern item drop
                 XTColor cn = (NPC[A].Effect3 != 0) ? (NPC[A].Special6 <= 45 ? XTAlpha(128 + 2 * (45 - (int)NPC[A].Special6) + (int)(32 * cos(NPC[A].Special6 / 4))) : XTAlpha(128)) : XTColor();
 
@@ -3188,6 +3190,12 @@ void UpdateGraphicsMeta()
     if(GamePaused == PauseCode::DropAdd)
     {
         ConnectScreen::Render();
+        XRender::renderTexture(int(SharedCursor.X), int(SharedCursor.Y), GFX.ECursor[2]);
+    }
+
+    if(GamePaused == PauseCode::Options)
+    {
+        OptionsScreen::Render();
         XRender::renderTexture(int(SharedCursor.X), int(SharedCursor.Y), GFX.ECursor[2]);
     }
 
