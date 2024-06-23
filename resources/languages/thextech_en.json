@@ -699,11 +699,11 @@
                 "playstyle": {
                     "_name": "Playstyle",
                     "classic": "Classic",
-                    "classic-tip": "Critical updates only",
+                    "classic-tip": "Minimal updates",
                     "modern": "Modern",
-                    "modern-tip": "Enables all gameplay updates",
+                    "modern-tip": "All updates",
                     "vanilla": "Vanilla",
-                    "vanilla-tip": "Preserves all known bugs"
+                    "vanilla-tip": "No updates"
                 }
             },
             "main": {

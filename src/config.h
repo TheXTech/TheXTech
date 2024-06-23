@@ -653,9 +653,9 @@ public:
     };
     opt_enum<int> playstyle{this,
         {
-            {MODE_MODERN, "modern", "Modern", "Enables all gameplay updates"},
-            {MODE_CLASSIC, "classic", "Classic", "Critical updates only"},
-            {MODE_VANILLA, "vanilla", "Vanilla", "Preserves all known bugs"},
+            {MODE_MODERN, "modern", "Modern", "All updates"},
+            {MODE_CLASSIC, "classic", "Classic", "Minimal updates"},
+            {MODE_VANILLA, "vanilla", "Vanilla", "No updates"},
         },
         defaults(MODE_MODERN), {CompatClass::pure_preference, MODE_VANILLA}, Scope::EpisodeOptions,
         "playstyle", "Playstyle", nullptr,
