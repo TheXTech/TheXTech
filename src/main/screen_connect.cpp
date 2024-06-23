@@ -1967,7 +1967,11 @@ int Mouse_Render(bool mouse, bool render)
     {
         if(render)
         {
-            XRender::renderRect(start_x, draw_y, full_width, full_height, XTColorF(0.0f, 0.0f, 0.0f, 0.5f));
+            if(full_width < 440)
+                XRender::renderRect((XRender::TargetW / 2 - 440 / 2) & ~1, draw_y, 440, full_height, XTColorF(0.0f, 0.0f, 0.0f, 0.5f));
+            else
+                XRender::renderRect(start_x, draw_y, full_width, full_height, XTColorF(0.0f, 0.0f, 0.0f, 0.5f));
+
             SuperPrintScreenCenter(g_gameStrings.pauseItemPlayerSetup, 3, draw_y + 8);
         }
 
