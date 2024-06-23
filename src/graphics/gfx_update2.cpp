@@ -258,7 +258,7 @@ void UpdateGraphics2(bool skipRepaint)
 //    }
 
 #ifdef __3DS__
-        XRender::setTargetLayer(0);
+    XRender::setTargetLayer(0);
 #endif
 
     XRender::setDrawPlane(PLANE_GAME_BACKDROP);
@@ -321,6 +321,10 @@ void UpdateGraphics2(bool skipRepaint)
 //            End With
 //        Next A
 //    Else
+
+#ifdef __3DS__
+    XRender::setTargetLayer(1);
+#endif
 
     XRender::setViewport(vScreen[Z].TargetX() - XRender::TargetOverscanX, vScreen[Z].TargetY(), vScreen[Z].Width + 2 * XRender::TargetOverscanX, vScreen[Z].Height);
 
@@ -595,9 +599,6 @@ void UpdateGraphics2(bool skipRepaint)
         int pX = vScreen[Z].ScreenLeft + 32 - 64 + 48;
         int pY = vScreen[Z].ScreenTop - 6;
 
-#ifdef __3DS__
-        XRender::setTargetLayer(3);
-#endif
 
         XRender::setDrawPlane(PLANE_WLD_HUD);
 
@@ -675,6 +676,10 @@ void UpdateGraphics2(bool skipRepaint)
                                         font);
             }
         }
+
+#ifdef __3DS__
+        XRender::setTargetLayer(3);
+#endif
 
         XRender::resetViewport();
 
