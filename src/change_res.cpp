@@ -217,7 +217,7 @@ void UpdateInternalRes()
         XRender::TargetH = req_h;
 
         if(XRender::TargetW == 0)
-            XRender::TargetW = g_config.internal_res.m_value.first;
+            XRender::TargetW = (XRender::TargetH * 16 / 9) & ~1;
 
         if(XRender::TargetH == 0)
         {
