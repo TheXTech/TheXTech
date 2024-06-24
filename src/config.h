@@ -863,6 +863,8 @@ public:
     // 1.3.6.6
     opt<bool> fix_vehicle_altjump_bug{this, defaults(true), {CompatClass::critical_update, false}, Scope::CreatorFile,
         "fix-vehicle-altjump-bug", "Fix vehicle AltJump bug", "Don't become vulnerable after AltJump into car"};
+    opt<bool> fix_vehicle_altjump_lock{this, defaults(true), {CompatClass::critical_update, false}, Scope::CreatorFile,
+        "fix-vehicle-altjump-lock", "Fix vehicle AltJump lock", "Don't get stuck in car entered while holding AltJump"};
 
     // 1.3.7
     opt<bool> fix_npc_camera_logic{this, defaults(true), {CompatClass::critical_update, false}, Scope::CreatorFile,

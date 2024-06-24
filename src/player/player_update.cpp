@@ -603,14 +603,21 @@ void UpdatePlayer()
                     if(Player[A].Controls.Jump || Player[A].Controls.AltJump)
                         Player[A].Slide = false;
 
-                    // if not sliding and in the clown car
                 }
+                // if not sliding and in the clown car
                 else if(Player[A].Mount == 2)
                 {
                     if(!Player[A].Controls.Jump)
                         Player[A].CanJump = true;
+
+                    if(!Player[A].Controls.AltJump && g_config.fix_vehicle_altjump_lock)
+                        Player[A].CanAltJump = true;
+
                     if(Player[A].Controls.AltJump && Player[A].CanAltJump) // Jump out of the Clown Car
                     {
+                        if(g_config.fix_vehicle_altjump_lock)
+                            Player[A].CanAltJump = false;
+
                         Player[A].CanJump = false;
                         tempBool = true;
                         tempLocation = Player[A].Location;
