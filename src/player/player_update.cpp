@@ -59,7 +59,7 @@ void UpdatePlayer()
     float speedVar = 0; // adjusts the players speed by percentages
     // int64_t fBlock = 0; // for collision detection optimizations
     // int64_t lBlock = 0;
-    double tempSpeed = 0;
+    // double tempSpeed = 0;
     int HitSpot = 0;
     // the hitspot is used for collision detection to find out where to put the player after it collides with a block
     // the numbers tell what side the collision happened so it can move the plaer to the correct position
@@ -1457,6 +1457,7 @@ void UpdatePlayer()
                            ((Player[A].Character > 2 && Player[A].Character != 4) || Player[A].Quicksand > 0) &&
                            Player[A].CanAltJump))
                         {
+                            double tempSpeed;
                             if(Player[A].Location.SpeedX > 0)
                                 tempSpeed = Player[A].Location.SpeedX * 0.2; // tempSpeed gives the player a height boost when jumping while running, based off his SpeedX
                             else
@@ -1642,6 +1643,7 @@ void UpdatePlayer()
                         if(Player[A].Controls.AltJump && (Player[A].Character == 1 || Player[A].Character == 2 || Player[A].Character == 4 ||
                                                           (g_config.fix_char3_escape_shell_surf && Player[A].Character == 3 && Player[A].ShellSurf)))
                         {
+                            double tempSpeed;
                             if(Player[A].Location.SpeedX > 0)
                                 tempSpeed = Player[A].Location.SpeedX * 0.2;
                             else
