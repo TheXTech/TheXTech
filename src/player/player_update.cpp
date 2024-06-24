@@ -1648,7 +1648,8 @@ void UpdatePlayer()
 
                         // START ALT JUMP - this code does the player's spin jump
                         if(Player[A].Controls.AltJump && (Player[A].Character == 1 || Player[A].Character == 2 || Player[A].Character == 4 ||
-                                                          (g_config.fix_char3_escape_shell_surf && Player[A].Character == 3 && Player[A].ShellSurf)))
+                                                          (g_config.fix_char3_escape_shell_surf && Player[A].Character == 3 && Player[A].ShellSurf))
+                                                      && (!g_config.disable_spin_jump || Player[A].ShellSurf))
                         {
                             double tempSpeed;
                             if(Player[A].Location.SpeedX > 0)
