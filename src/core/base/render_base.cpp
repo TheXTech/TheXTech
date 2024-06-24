@@ -985,22 +985,32 @@ void AbstractRender_t::toggleGifRecorder()
         spec.frame_h = XRender::TargetH;
         spec.frame_pitch = XRender::TargetW * 4;
 
+        std::unique_ptr<PGE_VideoRecording> recording;
+
 #ifdef PGE_VIDEO_REC_WEBM_SUPPORTED
+        if(g_config.webm_recording)
+        {
         spec.frame_rate = 120;
         spec.video_quality = 10;
         spec.audio_enabled = g_config.audio_enable;
-        spec.audio_sample_rate = g_config.audio_sample_rate.obtained;
-        spec.audio_channel_count = g_config.audio_channels.obtained;
-        spec.audio_sample_format = g_config.audio_format.obtained;
-        auto recording = PGE_new_recording_VP8(spec);
-#else
-        spec.frame_rate = 25;
-        auto recording = PGE_new_recording_GIF(spec);
+            spec.audio_sample_rate = g_config.audio_sample_rate.obtained;
+            spec.audio_channel_count = g_config.audio_channels.obtained;
+            spec.audio_sample_format = g_config.audio_format.obtained;
+            recording = PGE_new_recording_VP8(spec);
+        }
+        else
 #endif
+        {
+            spec.frame_rate = 25;
+            recording = PGE_new_recording_GIF(spec);
+        }
 
-        std::string saveTo = shoot_getTimedString(outDir, recording->extension());
+        std::string saveTo;
 
-        if(recording->initialize(saveTo.c_str()))
+        if(recording)
+            saveTo = shoot_getTimedString(outDir, recording->extension());
+
+        if(recording && recording->initialize(saveTo.c_str()))
         {
             SDL_LockMutex(m_gif->mutex);
             m_gif->recording = std::move(recording);
