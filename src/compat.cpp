@@ -131,6 +131,7 @@ static void compatInit(Compatibility_t &c)
     c.fix_switched_block_clipping = true;
     // 1.3.6.6
     c.fix_vehicle_altjump_bug = true;
+    c.fix_vehicle_altjump_lock = true;
     // 1.3.7
 
 
@@ -198,6 +199,7 @@ static void compatInit(Compatibility_t &c)
         c.pound_by_alt_run = false;
         // 1.3.6.6
         c.fix_vehicle_altjump_bug = false;
+        c.fix_vehicle_altjump_lock = false;
     }
 
     c.speedrun_stop_timer_by = Compatibility_t::SPEEDRUN_STOP_NONE;
@@ -445,6 +447,7 @@ static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
         compat.read("fix-switched-block-clipping", c.fix_switched_block_clipping, c.fix_switched_block_clipping);
         // 1.3.6.6
         compat.read("fix-vehicle-altjump-bug", c.fix_vehicle_altjump_bug, c.fix_vehicle_altjump_bug);
+        compat.read("fix-vehicle-altjump-lock", c.fix_vehicle_altjump_lock, c.fix_vehicle_altjump_lock);
         // 1.3.7 (but these will be changed in the Compat update)
     }
     // 1.3.4

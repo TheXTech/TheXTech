@@ -101,6 +101,7 @@ struct Compatibility_t
     bool fix_switched_block_clipping; // don't let blocks become intangible to NPCs after coin switch
     // 1.3.6.6
     bool fix_vehicle_altjump_bug; // don't become vulnerable on sides after altjump into car
+    bool fix_vehicle_altjump_lock; // don't get stuck in car entered while holding AltJump
     // 1.3.7
 
     // SpeedRun section
