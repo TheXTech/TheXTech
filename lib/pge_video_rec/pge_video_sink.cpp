@@ -52,11 +52,18 @@ int PGE_VideoSink::frame_backlog()
     return ret;
 }
 
-void PGE_VideoSink::enqueue_frame(PGE_VideoFrame&& frame)
+int PGE_VideoSink::enqueue_frame(PGE_VideoFrame&& frame, int max_backlog)
 {
     SDL_LockMutex(mutex_frame);
-    queue_frame.push_back(std::move(frame));
+    int backlog_size = queue_frame.size();
+    if(max_backlog >= 0 && backlog_size < max_backlog)
+    {
+        queue_frame.push_back(std::move(frame));
+        backlog_size += 1;
+    }
     SDL_UnlockMutex(mutex_frame);
+
+    return backlog_size;
 }
 
 PGE_VideoFrame PGE_VideoSink::dequeue_frame()
