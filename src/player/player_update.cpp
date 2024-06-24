@@ -496,12 +496,12 @@ void UpdatePlayer()
                     if(!Player[A].Controls.Jump)
                         Player[A].CanJump = true;
 
-                    if(!Player[A].Controls.AltJump && g_config.fix_vehicle_altjump_lock)
+                    if(!Player[A].Controls.AltJump && g_compatibility.fix_vehicle_altjump_lock)
                         Player[A].CanAltJump = true;
 
                     if(Player[A].Controls.AltJump && Player[A].CanAltJump) // Jump out of the Clown Car
                     {
-                        if(g_config.fix_vehicle_altjump_lock)
+                        if(g_compatibility.fix_vehicle_altjump_lock)
                             Player[A].CanAltJump = false;
 
                         Player[A].CanJump = false;
