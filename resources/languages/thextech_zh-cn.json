@@ -621,12 +621,12 @@
                 "record-gameplay-data": "生成录像",
                 "render": {
                     "_name": "图形渲染类型",
-                    "hw": "自动",
+                    "hw": "自动选择",
                     "opengl": "OpenGL 3+",
-                    "opengl-tip": "新版电脑渲染器，用于最精确的SMBX64模拟，以及增强的视觉效果。",
-                    "opengl11-tip": "旧版电脑渲染器，仅用于最精确的SMBX64模拟。",
-                    "opengles-tip": "新版手机渲染器，用于高精确度的SMBX64模拟，以及增强的视觉效果。",
-                    "opengles11-tip": "旧版手机渲染器，仅用于最精确的SMBX64模拟。",
+                    "opengl-tip": "新版电脑渲染器，用于最精确的SMBX64模拟，且支持视觉效果增强。",
+                    "opengl11-tip": "旧版电脑渲染器，仅用于最精确的SMBX64模拟，无视觉效果增强。",
+                    "opengles-tip": "新版手机渲染器，用于高精确度的SMBX64模拟，且支持视觉效果增强。",
+                    "opengles11-tip": "旧版手机渲染器，仅用于最精确的SMBX64模拟，无视觉效果增强。",
                     "sdl": "SDL2",
                     "sw": "软件渲染器",
                     "opengl11": "OpenGL 1.1",
@@ -685,9 +685,9 @@
                     "classic": "经典模式",
                     "modern": "现代模式",
                     "vanilla": "怀旧模式",
-                    "classic-tip": "仅修复必要的BUG",
+                    "classic-tip": "启用部分游戏更新",
                     "modern-tip": "启用全部游戏更新",
-                    "vanilla-tip": "启用全部已知的BUG"
+                    "vanilla-tip": "禁用全部游戏更新"
                 }
             },
             "main": {
@@ -735,7 +735,7 @@
                     "3ds": "800x480 (3DS)",
                     "_name": "画面大小",
                     "_tooltip": "设置游戏画面大小",
-                    "dynamic": "动态大小",
+                    "dynamic": "自适应",
                     "vga": "640x480（VGA）",
                     "hd": "1280x720（高清）",
                     "gba": "480x320（GBA）",
