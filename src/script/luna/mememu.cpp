@@ -1608,7 +1608,22 @@ public:
         insert(0x00000118, &Player_t::FrameCount);
         insert(0x0000011c, &Player_t::Jump);
         insert(0x0000011e, &Player_t::CanJump);
-        insert(0x00000120, &Player_t::CanAltJump);
+
+        // CanAltJump -- enforce read-only if compat flag `disable-spin-jump` is set
+        insert(0x00000120, // CanAltJump
+            [](const Player_t& p, FIELDTYPE ftype)->double
+            {
+                return valueToMem(p.CanAltJump, ftype);
+            },
+            [](Player_t& p, double in, FIELDTYPE ftype)->void
+            {
+                bool temp = p.CanAltJump;
+                memToValue(temp, in, ftype);
+                if(!g_config.disable_spin_jump)
+                    p.CanAltJump = temp;
+            }
+        );
+
         insert(0x00000122, &Player_t::Effect);
         insert(0x00000124, &Player_t::Effect2);
         // pound state handled below

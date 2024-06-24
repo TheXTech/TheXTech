@@ -182,6 +182,9 @@ void RenderControls_priv(int player, const Controls_t* controls, int x, int y, i
     XRender::renderRect(x + 4, y + 12, 6, 6, bool2(s_gray, c.Left, alphaBtn), true);
     XRender::renderRect(x + 16, y + 12, 6, 6, bool2(s_gray, c.Right, alphaBtn), true);
 
+    // This was suggested before, but perhaps don't do it: AltJump is still used for dismounting.
+    // auto altjump_color = (g_config.disable_spin_jump) ? s_green : s_red;
+
     XRender::renderRect(x + 64, y + 18, 6, 6, bool2(s_green, c.Jump, alphaBtn), true);
     XRender::renderRect(x + 66, y + 8, 6, 6, bool2(s_red, c.AltJump, alphaBtn), true);
     XRender::renderRect(x + 54, y + 16, 6, 6, bool2(s_blue, c.Run, alphaBtn), true);

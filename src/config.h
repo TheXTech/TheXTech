@@ -746,6 +746,9 @@ public:
     opt<bool> modern_item_drop{this, defaults(true), {CompatClass::standard_update, false}, Scope::Creator,
         "modern-item-drop", "Modern item drop", "Experimental implementation of modern item drop"};
 
+    opt<bool> disable_spin_jump{this, defaults(false), {CompatClass::critical_update, false}, Scope::Creator,
+        "disable-spin-jump", "Disable spin jump", "The alt jump key should trigger an ordinary jump instead of a spin jump"};
+
     /* ---- Compatibility - Autocode ----*/
     subsection compat_autocode{this, "autocode", "Autocode"};
 

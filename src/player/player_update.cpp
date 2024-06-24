@@ -1461,7 +1461,7 @@ void UpdatePlayer()
 
                         // handles the regular jump
                         if(Player[A].Controls.Jump || (Player[A].Controls.AltJump &&
-                           ((Player[A].Character > 2 && Player[A].Character != 4) || Player[A].Quicksand > 0) &&
+                           ((Player[A].Character > 2 && Player[A].Character != 4) || Player[A].Quicksand > 0 || g_config.disable_spin_jump) &&
                            Player[A].CanAltJump))
                         {
                             double tempSpeed;
@@ -1690,6 +1690,9 @@ void UpdatePlayer()
                                         Player[A].ShellSurf = false;
                                         Player[A].Location.SpeedX = NPC[Player[A].StandingOnNPC].Location.SpeedX + NPC[Player[A].StandingOnNPC].BeltSpeed * 0.8;
                                         Player[A].Jump = 0;
+
+                                        if(g_config.disable_spin_jump)
+                                            Player[A].SpinJump = false;
                                     }
 
                                     Player[A].StandingOnNPC = 0;
