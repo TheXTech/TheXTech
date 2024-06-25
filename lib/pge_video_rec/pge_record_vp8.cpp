@@ -64,6 +64,8 @@ extern "C"
 
 #include "pge_video_rec.h"
 
+#define HAS_CHANNELLAYOUT (LIBAVUTIL_VERSION_MAJOR >= 58)
+
 #undef av_err2str
 
 static char s_errbuf[(AV_ERROR_MAX_STRING_SIZE > 512) ? AV_ERROR_MAX_STRING_SIZE : 512];
@@ -178,7 +180,11 @@ struct PGE_VideoRecording_VP8 : public PGE_VideoRecording
     OutputStream video_st;
     OutputStream audio_st;
     AVFormatContext *oc = nullptr;
+#if HAS_CHANNELLAYOUT
     AVChannelLayout src_ch_layout;
+#else
+    int64_t src_ch_layout;
+#endif
     AVSampleFormat src_sample_fmt = AV_SAMPLE_FMT_NONE;
 
     PGE_VideoFrame current_frame;
@@ -224,7 +230,11 @@ bool PGE_VideoRecording_VP8::set_src_sample_fmt()
         return false;
     }
 
+#if HAS_CHANNELLAYOUT
     av_channel_layout_default(&src_ch_layout, spec.audio_channel_count);
+#else
+    src_ch_layout = av_get_default_channel_layout(spec.audio_channel_count);
+#endif
 
     return true;
 }
@@ -314,9 +324,7 @@ static bool init_stream(OutputStream *ost, AVFormatContext *oc,
 /**************************************************************/
 /* audio output */
 
-static AVFrame *alloc_audio_frame(enum AVSampleFormat sample_fmt,
-                                  const AVChannelLayout *channel_layout,
-                                  int sample_rate, int nb_samples)
+static AVFrame *alloc_audio_frame(AVCodecContext* enc, int nb_samples)
 {
     AVFrame *frame = av_frame_alloc();
     if (!frame) {
@@ -324,9 +332,14 @@ static AVFrame *alloc_audio_frame(enum AVSampleFormat sample_fmt,
         return NULL;
     }
 
-    frame->format = sample_fmt;
-    av_channel_layout_copy(&frame->ch_layout, channel_layout);
-    frame->sample_rate = sample_rate;
+
+    frame->format = enc->sample_fmt;
+#if HAS_CHANNELLAYOUT
+    av_channel_layout_copy(&frame->ch_layout, &enc->ch_layout);
+#else
+    frame->channel_layout = enc->channel_layout;
+#endif
+    frame->sample_rate = enc->sample_rate;
     frame->nb_samples = nb_samples;
 
     if (nb_samples) {
@@ -370,9 +383,13 @@ static bool open_audio(const PGE_VideoRecording_VP8* THIS,
             ost->enc->sample_rate = codec->supported_samplerates[0];
     }
 
+#if HAS_CHANNELLAYOUT
     const AVChannelLayout& layout = (THIS->spec.audio_channel_count == 1) ? AVChannelLayout AV_CHANNEL_LAYOUT_MONO : AVChannelLayout AV_CHANNEL_LAYOUT_STEREO;
-
     av_channel_layout_copy(&ost->enc->ch_layout, &layout);
+#else
+    ost->enc->channel_layout = (THIS->spec.audio_channel_count == 1) ? av_get_default_channel_layout(1) : av_get_default_channel_layout(2);
+#endif
+
     ost->st->time_base = AVRational { 1, ost->enc->sample_rate };
 
     /* open it */
@@ -391,8 +408,7 @@ static bool open_audio(const PGE_VideoRecording_VP8* THIS,
     else
         nb_samples = ost->enc->frame_size;
 
-    ost->frame     = alloc_audio_frame(ost->enc->sample_fmt, &ost->enc->ch_layout,
-                                       ost->enc->sample_rate, nb_samples);
+    ost->frame     = alloc_audio_frame(ost->enc, nb_samples);
 
     if(!ost->frame)
         return false;
@@ -412,12 +428,17 @@ static bool open_audio(const PGE_VideoRecording_VP8* THIS,
     }
 
     /* set options */
+#if HAS_CHANNELLAYOUT
     av_opt_set_chlayout  (ost->swr_ctx, "in_chlayout",       &THIS->src_ch_layout,          0);
+    av_opt_set_chlayout  (ost->swr_ctx, "out_chlayout",      &ost->enc->ch_layout,          0);
+#else
+    av_opt_set_channel_layout  (ost->swr_ctx, "in_channel_layout",  THIS->src_ch_layout,          0);
+    av_opt_set_channel_layout  (ost->swr_ctx, "out_channel_layout", ost->enc->channel_layout,     0);
+#endif
     av_opt_set_int       (ost->swr_ctx, "in_sample_rate",     THIS->spec.audio_sample_rate, 0);
     av_opt_set_sample_fmt(ost->swr_ctx, "in_sample_fmt",      THIS->src_sample_fmt,         0);
-    av_opt_set_chlayout  (ost->swr_ctx, "out_chlayout",      &ost->enc->ch_layout,      0);
-    av_opt_set_int       (ost->swr_ctx, "out_sample_rate",    ost->enc->sample_rate,    0);
-    av_opt_set_sample_fmt(ost->swr_ctx, "out_sample_fmt",     ost->enc->sample_fmt,     0);
+    av_opt_set_int       (ost->swr_ctx, "out_sample_rate",    ost->enc->sample_rate,        0);
+    av_opt_set_sample_fmt(ost->swr_ctx, "out_sample_fmt",     ost->enc->sample_fmt,         0);
 
     /* initialize the resampling context */
     if ((ret = swr_init(ost->swr_ctx)) < 0) {
@@ -468,27 +489,40 @@ static AVFrame *get_audio_frame(PGE_VideoRecording_VP8* THIS, OutputStream *ost)
         dest_bytes_per_sample *= frame->ch_layout.nb_channels;
 
     ptrdiff_t src_bytes_per_sample = THIS->spec.audio_channel_count * av_get_bytes_per_sample(THIS->src_sample_fmt);
+    bool first_loop = true;
 
     while (samples_left > 0)
     {
-        while(!THIS->has_audio())
-        {
-            // no more samples
-            if(THIS->exit_requested)
-                return NULL;
+        const uint8_t* src[1] = {NULL};
+        int src_samples = 0;
 
-            PGE_Delay(1);
-            continue;
+        // use remaining samples from buffer if possible
+        if(!first_loop || swr_get_out_samples(ost->swr_ctx, 0) < samples_left)
+        {
+            // poll from game audio if buffer is empty
+            while(!THIS->has_audio())
+            {
+                // no more samples
+                if(THIS->exit_requested)
+                    return NULL;
+
+                PGE_Delay(1);
+                continue;
+            }
+
+            THIS->current_chunk = THIS->dequeue_audio();
+            THIS->current_chunk_offset = THIS->current_chunk.audio_buffer.begin();
+
+            src[0] = {THIS->current_chunk.audio_buffer.data()};
+            src_samples = THIS->current_chunk.audio_buffer.size() / src_bytes_per_sample;
         }
 
-        THIS->current_chunk = THIS->dequeue_audio();
-        THIS->current_chunk_offset = THIS->current_chunk.audio_buffer.begin();
+        first_loop = false;
 
         /* convert to destination format */
-        const uint8_t* src[1] = {THIS->current_chunk.audio_buffer.data()};
         int samples_done = swr_convert(ost->swr_ctx,
                           dest, samples_left,
-                          src, THIS->current_chunk.audio_buffer.size() / src_bytes_per_sample);
+                          src, src_samples);
 
         if(samples_done < 0)
         {
@@ -880,7 +914,9 @@ bool PGE_VideoRecording_VP8::encoding_thread()
     /* free the stream */
     avformat_free_context(oc);
 
+#if HAS_CHANNELLAYOUT
     av_channel_layout_uninit(&src_ch_layout);
+#endif
 
     return true;
 }
