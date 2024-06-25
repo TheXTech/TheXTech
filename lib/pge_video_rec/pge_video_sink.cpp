@@ -29,10 +29,12 @@ PGE_VideoSink::~PGE_VideoSink()
 {
     if(mutex_frame)
         SDL_DestroyMutex(mutex_frame);
+
     mutex_frame = nullptr;
 
     if(mutex_audio)
         SDL_DestroyMutex(mutex_audio);
+
     mutex_audio = nullptr;
 }
 
@@ -56,11 +58,13 @@ int PGE_VideoSink::enqueue_frame(PGE_VideoFrame&& frame, int max_backlog)
 {
     SDL_LockMutex(mutex_frame);
     int backlog_size = queue_frame.size();
+
     if(max_backlog >= 0 && backlog_size < max_backlog)
     {
         queue_frame.push_back(std::move(frame));
         backlog_size += 1;
     }
+
     SDL_UnlockMutex(mutex_frame);
 
     return backlog_size;
