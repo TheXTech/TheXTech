@@ -1432,6 +1432,11 @@ void EditorLoop()
 
 void KillIt()
 {
+#ifdef __WIIU__
+    if(!GameIsActive)
+        return; // Don't call this twice
+#endif
+
     GameIsActive = false;
     Integrator::quitIntegrations();
 #ifndef RENDER_FULLSCREEN_ALWAYS

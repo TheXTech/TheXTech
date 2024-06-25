@@ -65,14 +65,6 @@
 #include <nds.h>
 #endif
 
-#ifdef __WIIU__
-#include <whb/proc.h>
-#include <whb/log.h>
-#include <whb/log_console.h>
-#include <coreinit/filesystem.h>
-#include <sysapp/launch.h>
-#endif
-
 #ifdef __WII__
 #include <gccore.h>
 #endif
@@ -232,10 +224,6 @@ int main(int argc, char**argv)
     consoleInit(nullptr, defaultConsole->bgLayer, BgType_Text4bpp, BgSize_T_256x256, defaultConsole->mapBase, defaultConsole->gfxBase, false, true);
 
     printf("Hello, 16MB world!\n");
-#endif
-
-#ifdef __WIIU__
-    WHBProcInit();
 #endif
 
 #ifdef __WII__
@@ -767,11 +755,6 @@ int main(int argc, char**argv)
     Controls::Quit();
 
     g_frmMain.freeSystem();
-
-#ifdef __WIIU__
-    WHBProcShutdown();
-    SYSLaunchMenu();
-#endif
 
 #ifdef __EMSCRIPTEN__
     AppPathManager::syncFs();
