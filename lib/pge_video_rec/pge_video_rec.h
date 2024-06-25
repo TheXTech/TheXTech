@@ -82,6 +82,9 @@ struct PGE_VideoSpec
 
     //! audio channel count
     int audio_channel_count = 0;
+
+    //! audio sample format (uses SDL_MixerX sample formats)
+    int audio_sample_format = 0;
 };
 
 
@@ -105,7 +108,7 @@ public:
 
     bool has_frame();
     int frame_backlog();
-    void enqueue_frame(PGE_VideoFrame&& frame);
+    int enqueue_frame(PGE_VideoFrame&& frame, int max_backlog);
     PGE_VideoFrame dequeue_frame();
 
     bool has_audio();

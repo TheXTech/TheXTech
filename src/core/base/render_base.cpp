@@ -118,7 +118,7 @@ struct GifRecorder
     void init(AbstractRender_t *self);
     void quit();
 
-    void drawRecCircle(bool saving);
+    void drawRecCircle(bool saving, int frame_count);
 };
 
 #endif // PGE_ENABLE_VIDEO_REC
@@ -985,20 +985,32 @@ void AbstractRender_t::toggleGifRecorder()
         spec.frame_h = XRender::TargetH;
         spec.frame_pitch = XRender::TargetW * 4;
 
+        std::unique_ptr<PGE_VideoRecording> recording;
+
 #ifdef PGE_VIDEO_REC_WEBM_SUPPORTED
+        if(g_config.webm_recording)
+        {
         spec.frame_rate = 120;
         spec.video_quality = 10;
-        spec.audio_enabled = true;
-        spec.audio_sample_rate = g_audioSetup.sampleRate;
-        auto recording = PGE_new_recording_VP8(spec);
-#else
-        spec.frame_rate = 25;
-        auto recording = PGE_new_recording_GIF(spec);
+        spec.audio_enabled = g_config.audio_enable;
+            spec.audio_sample_rate = g_config.audio_sample_rate.obtained;
+            spec.audio_channel_count = g_config.audio_channels.obtained;
+            spec.audio_sample_format = g_config.audio_format.obtained;
+            recording = PGE_new_recording_VP8(spec);
+        }
+        else
 #endif
+        {
+            spec.frame_rate = 25;
+            recording = PGE_new_recording_GIF(spec);
+        }
 
-        std::string saveTo = shoot_getTimedString(outDir, recording->extension());
+        std::string saveTo;
 
-        if(recording->initialize(saveTo.c_str()))
+        if(recording)
+            saveTo = shoot_getTimedString(outDir, recording->extension());
+
+        if(recording && recording->initialize(saveTo.c_str()))
         {
             SDL_LockMutex(m_gif->mutex);
             m_gif->recording = std::move(recording);
@@ -1019,7 +1031,7 @@ void AbstractRender_t::toggleGifRecorder()
         final_timestamp.timestamp = SDL_GetMicroTicks();
         final_timestamp.end_frame = true;
 
-        m_gif->recording->enqueue_frame(std::move(final_timestamp));
+        m_gif->recording->enqueue_frame(std::move(final_timestamp), -1);
         m_gif->recording->exit_requested = true;
 
         if(m_gif->recording->spec.audio_enabled)
@@ -1052,7 +1064,8 @@ void AbstractRender_t::processRecorder()
 
     if(!recording_active || (m_gif->delayTimer != 0.0))
     {
-        m_gif->drawRecCircle(!recording_active);
+        int frame_count = m_gif->recording->frame_backlog();
+        m_gif->drawRecCircle(!recording_active, frame_count);
         XRender::setTargetScreen();
         return;
     }
@@ -1065,9 +1078,9 @@ void AbstractRender_t::processRecorder()
 
     g_render->getScreenPixelsRGBA(0, 0, w, h, shoot.pixels.data());
 
-    m_gif->recording->enqueue_frame(std::move(shoot));
+    int frame_count = m_gif->recording->enqueue_frame(std::move(shoot), 65);
 
-    m_gif->drawRecCircle(!recording_active);
+    m_gif->drawRecCircle(!recording_active, frame_count);
     XRender::setTargetScreen();
 }
 
@@ -1120,7 +1133,7 @@ void GifRecorder::quit()
     mutex = nullptr;
 }
 
-void GifRecorder::drawRecCircle(bool saving)
+void GifRecorder::drawRecCircle(bool saving, int frame_count)
 {
     if(fadeForward)
     {
@@ -1143,16 +1156,17 @@ void GifRecorder::drawRecCircle(bool saving)
 
     m_self->offsetViewportIgnore(true);
 
-    if(saving)
-    {
-        m_self->renderCircle(50, 50, 20, XTColorF(0.f, 0.6f, 0.f, fadeValue), true);
-        SuperPrint("SAVING", 3, 2, 80, XTColorF(0.f, 0.6f, 0.f, fadeValue));
-    }
-    else
-    {
-        m_self->renderCircle(50, 50, 20, XTColorF(1.f, 0.f, 0.f, fadeValue), true);
-        SuperPrint("REC", 3, 25, 80, XTColorF(1.f, 0.f, 0.f, fadeValue));
-    }
+    XTColor circ_color = (saving) ? XTColorF(0.f, 0.6f, 0.f, fadeValue) : XTColorF(1.f, 0.f, 0.f, fadeValue);
+    const char* text = (saving) ? "SAVING" : "REC";
+    int text_offset = (saving) ? 2 : 25;
+
+    if(frame_count == 1)
+        frame_count = 0;
+
+    m_self->renderCircle(50, 50, 20, XTColorF(0.5f, 0.5f, 0.5f, fadeValue), true);
+    m_self->renderCircle(50, 50, 20 * (65 - frame_count) / 65, circ_color, true);
+
+    SuperPrint(text, 3, text_offset, 80, circ_color);
 
     m_self->offsetViewportIgnore(false);
 }

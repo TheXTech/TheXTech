@@ -483,6 +483,11 @@ public:
         "use-native-osk", "Native OSK", nullptr};
 #endif
 
+#ifdef PGE_VIDEO_REC_WEBM_SUPPORTED
+    opt<bool> webm_recording{this, defaults(true), {}, Scope::Config,
+        "webm-recording", "WEBM recording", nullptr};
+#endif
+
     /* ---- Advanced - Video ----*/
     subsection advanced_video{this, "advanced-video", "Video"};
 
