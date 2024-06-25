@@ -459,8 +459,7 @@ int PauseGame(PauseCode code, int plr)
 
             g_microStats.start_task(MicroStats::Sound);
 
-            if(GamePaused != PauseCode::Message)
-                UpdateSound();
+            UpdateSound();
             BlockFrames();
 
             g_microStats.start_task(MicroStats::Effects);
