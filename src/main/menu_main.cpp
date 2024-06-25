@@ -852,7 +852,7 @@ bool mainMenuUpdate()
                     XEvents::doEvents();
 
 #ifdef __WIIU__
-                    if(GameIsActive)
+                    if(GameIsActive && !g_isHBLauncher)
                         SYSLaunchMenu(); // Trigger the SDL_QUIT and the leading quit into Wii U main menu
                     XEvents::doEvents();
 #endif
