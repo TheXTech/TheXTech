@@ -66,12 +66,8 @@
 #include <nds.h>
 #endif
 
-#ifdef __WIIU__
-#include <whb/proc.h>
-#include <whb/log.h>
-#include <whb/log_console.h>
-#include <coreinit/filesystem.h>
-#include <sysapp/launch.h>
+#ifdef __WII__
+#include <gccore.h>
 #endif
 
 #ifdef __EMSCRIPTEN__
@@ -231,8 +227,9 @@ int main(int argc, char**argv)
     printf("Hello, 16MB world!\n");
 #endif
 
-#ifdef __WIIU__
-    WHBProcInit();
+#ifdef __WII__
+    VIDEO_Init();
+    VIDEO_SetBlack(TRUE);
 #endif
 
     CmdLineSetup_t setup;
@@ -751,11 +748,6 @@ int main(int argc, char**argv)
     Controls::Quit();
 
     g_frmMain.freeSystem();
-
-#ifdef __WIIU__
-    WHBProcShutdown();
-    SYSLaunchMenu();
-#endif
 
 #ifdef __EMSCRIPTEN__
     AppPathManager::syncFs();
