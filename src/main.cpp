@@ -69,6 +69,16 @@
 #include <gccore.h>
 #endif
 
+#ifdef __WIIU__
+#include <coreinit/title.h>
+#include <coreinit/systeminfo.h>
+#include <sysapp/launch.h>
+#   define HBL_TITLE_ID             (0x0005000013374842)
+#   define MII_MAKER_JPN_TITLE_ID   (0x000500101004A000)
+#   define MII_MAKER_USA_TITLE_ID   (0x000500101004A100)
+#   define MII_MAKER_EUR_TITLE_ID   (0x000500101004A200)
+#endif
+
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
 #endif
@@ -229,6 +239,21 @@ int main(int argc, char**argv)
 #ifdef __WII__
     VIDEO_Init();
     VIDEO_SetBlack(TRUE);
+#endif
+
+#ifdef __WIIU__
+    g_isHBLauncher = false;
+    uint64_t titleID = OSGetTitleID();
+
+    if(titleID == HBL_TITLE_ID ||
+       titleID == MII_MAKER_JPN_TITLE_ID ||
+       titleID == MII_MAKER_USA_TITLE_ID ||
+       titleID == MII_MAKER_EUR_TITLE_ID)
+    {
+        // Important: OSEnableHomeButtonMenu must come befoe ProcUIInitEx.
+        OSEnableHomeButtonMenu(FALSE);
+        g_isHBLauncher = true;
+    }
 #endif
 
     CmdLineSetup_t setup;
@@ -750,6 +775,11 @@ int main(int argc, char**argv)
 #ifdef ENABLE_XTECH_LUA
     if(!xtech_lua_quit())
         ret = 1;
+#endif
+
+#ifdef __WIIU__
+    if(g_isHBLauncher)
+        SYSRelaunchTitle(0, NULL);
 #endif
 
     Controls::Quit();

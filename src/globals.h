@@ -2490,4 +2490,8 @@ const int curRelease = 64;
 extern std::string CurrentLanguage;
 extern std::string CurrentLangDialect;
 
+#ifdef __WIIU__
+extern bool g_isHBLauncher;
+#endif
+
 #endif // GLOBALS_H

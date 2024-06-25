@@ -567,6 +567,10 @@ std::string LevelName;
 std::string CurrentLanguage;
 std::string CurrentLangDialect;
 
+#ifdef __WIIU__
+bool g_isHBLauncher = false;
+#endif
+
 //void DoEvents()
 //{
 //    g_events->doEvents();
