@@ -43,6 +43,7 @@
 
 extern "C"
 {
+#include <stdint.h>
 #include <libavutil/avassert.h>
 #include <libavutil/channel_layout.h>
 #include <libavutil/opt.h>
@@ -478,7 +479,13 @@ static AVFrame *get_audio_frame(PGE_VideoRecording_VP8* THIS, OutputStream *ost)
             dest_active++;
     }
 
-    if(dest_active != 1 && dest_active != frame->ch_layout.nb_channels)
+#if HAS_CHANNELLAYOUT
+    int num_channels = frame->ch_layout.nb_channels;
+#else
+    int num_channels = av_get_channel_layout_nb_channels(frame->channel_layout);
+#endif
+
+    if(dest_active != 1 && dest_active != num_channels)
     {
         pLogWarning("PGEVideoRec: invalid number of channels in dest buffer");
         return NULL;
@@ -486,7 +493,7 @@ static AVFrame *get_audio_frame(PGE_VideoRecording_VP8* THIS, OutputStream *ost)
 
     ptrdiff_t dest_bytes_per_sample = av_get_bytes_per_sample((AVSampleFormat)frame->format);
     if(dest_active == 1)
-        dest_bytes_per_sample *= frame->ch_layout.nb_channels;
+        dest_bytes_per_sample *= num_channels;
 
     ptrdiff_t src_bytes_per_sample = THIS->spec.audio_channel_count * av_get_bytes_per_sample(THIS->src_sample_fmt);
     bool first_loop = true;
