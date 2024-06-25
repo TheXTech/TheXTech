@@ -776,7 +776,7 @@
                 "show-fps": "Частота кадров",
                 "video-system": "Система",
                 "world-map-stars-show-tip": "Отображает собранные звёзды над уровнями",
-                "world-map-stars-show": "Показывать вёзды на карте мира"
+                "world-map-stars-show": "Показывать звёзды на карте мира"
             },
             "view-credits": {
                 "_header": "Показать титры"
