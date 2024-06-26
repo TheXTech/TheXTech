@@ -474,6 +474,11 @@ elseif(NOT THEXTECH_NO_SDL_BUILD)
     list(APPEND A2XT_DEPS FreeImage_Local)
     list(APPEND A2XT_LIBS PGE_FreeImage)
 
+    if(PGE_ENABLE_VIDEO_REC AND NOT PGE_VIDEO_REC_PREFER_GIF)
+        include(cmake/library_libvpx.cmake)
+    endif()
+    include(cmake/library_ffmpeg.cmake)
+
     include(cmake/library_SDLMixerX.cmake)
     list(APPEND A2XT_INCS "${DEPENDENCIES_INSTALL_DIR}/include" ${SDL2_INCLUDE_DIRS})
 
