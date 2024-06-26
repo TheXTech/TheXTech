@@ -354,7 +354,6 @@ if(USE_STATIC_LIBC)
 endif()
 
 include(lib/Allocator/pool-allocator.cmake)
-include(lib/pge_video_rec/pge-video-rec.cmake)
 include(3rdparty/DirManager/dirman.cmake)
 
 if(NOT VITA AND NOT NINTENDO_SWITCH AND NOT NINTENDO_3DS AND NOT NINTENDO_WII AND NOT NINTENDO_WIIU AND NOT NINTENDO_DS)
@@ -454,6 +453,34 @@ endif()
 
 include(cmake/library_glew.cmake)
 
+if(NOT EMSCRIPTEN AND
+   NOT NINTENDO_3DS AND
+   NOT NINTENDO_WII AND
+   NOT NINTENDO_WIIU AND
+   NOT PGE_MIN_PORT AND
+   NOT THEXTECH_CLI_BUILD)
+    option(PGE_ENABLE_VIDEO_REC "Enable the PGE video recording system" ON)
+else()
+    set(PGE_ENABLE_VIDEO_REC OFF)
+endif()
+
+
+if(PGE_ENABLE_VIDEO_REC)
+    option(PGE_VIDEO_REC_PREFER_GIF "Prefer GIF even if WEBM is available" ON)
+endif()
+
+if(PGE_ENABLE_VIDEO_REC AND NOT PGE_VIDEO_REC_PREFER_GIF)
+    include(cmake/library_libvpx.cmake)
+    set(PGE_VIDEO_REC_WEBM_SUPPORTED ON)
+endif()
+include(cmake/library_ffmpeg.cmake)
+
+
+if(PGE_ENABLE_VIDEO_REC)
+    include(lib/pge_video_rec/pge-video-rec.cmake)
+endif()
+
+
 if(USE_SYSTEM_LIBS)
     find_package(SDL2 REQUIRED)
 
@@ -473,11 +500,6 @@ elseif(NOT THEXTECH_NO_SDL_BUILD)
     include(cmake/library_FreeImage.cmake)
     list(APPEND A2XT_DEPS FreeImage_Local)
     list(APPEND A2XT_LIBS PGE_FreeImage)
-
-    if(PGE_ENABLE_VIDEO_REC AND NOT PGE_VIDEO_REC_PREFER_GIF)
-        include(cmake/library_libvpx.cmake)
-    endif()
-    include(cmake/library_ffmpeg.cmake)
 
     include(cmake/library_SDLMixerX.cmake)
     list(APPEND A2XT_INCS "${DEPENDENCIES_INSTALL_DIR}/include" ${SDL2_INCLUDE_DIRS})
@@ -538,17 +560,22 @@ elseif(NOT THEXTECH_NO_SDL_BUILD)
     list(APPEND A2XT_LIBS PGE_ZLib)
 endif()
 
+if(PGE_FFMPEG_AVAILABLE)
+    list(APPEND A2XT_DEPS FFMPEG_Local)
+    list(APPEND A2XT_LIBS PGE_FFMPEG)
+
+    if(PGE_ENABLE_VIDEO_REC AND NOT PGE_VIDEO_REC_PREFER_GIF)
+        list(APPEND A2XT_DEPS LIBVPX_Local)
+        list(APPEND A2XT_LIBS PGE_libVPX)
+    endif()
+endif()
+
 if(THEXTECH_ENABLE_DISCORD_RPC)
     list(APPEND A2XT_DEPS DiscordPRC_Local)
     list(APPEND A2XT_LIBS PGE_DiscordRPC)
     set(THEXTECH_ENABLE_INTEGRATOR ON)  # This feature needs for an Integrator
 endif()
 
-if(PGE_ENABLE_VIDEO_REC)
-    list(APPEND A2XT_LIBS ${VIDEO_REC_LIBS})
-    list(APPEND A2XT_DEPS ${VIDEO_REC_DEPS})
-    list(APPEND A2XT_INCS ${VIDEO_REC_INCS})
-endif()
 
 if(THEXTECH_BUILD_GL_DESKTOP_MODERN AND THEXTECH_USE_ANGLE_TRANSLATOR)
     add_subdirectory(3rdparty/angle-shader-translator)

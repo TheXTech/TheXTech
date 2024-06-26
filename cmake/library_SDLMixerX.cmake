@@ -253,14 +253,20 @@ list(APPEND MixerX_CodecLibs
     "${AC_MODPLUG}"
 )
 
+
+set(MixerX_Deps)
+set(AudioCodecs_Deps)
+set(AUDIO_CODECS_BUILD_ARGS)
+set(MIXERX_CMAKE_FLAGS)
+
 if(VITA)
-    set(VITA_AUDIOCODECS_CMAKE_FLAGS
+    list(APPEND AUDIO_CODECS_BUILD_ARGS
         "-DBUILD_OGG_VORBIS=OFF"
         "-DBUILD_FLAC=OFF"
         "-DBUILD_OPUS=ON"
     )
 
-    set(VITA_MIXERX_CMAKE_FLAGS
+    list(APPEND MIXERX_CMAKE_FLAGS
         "-DUSE_OGG_VORBIS_TREMOR=OFF"
         "-DUSE_SYSTEM_SDL2=ON"
         "-DUSE_SYSTEM_AUDIO_LIBRARIES_DEFAULT=ON"
@@ -293,9 +299,6 @@ if(VITA)
     )
 endif()
 
-set(MixerX_Deps)
-set(AudioCodecs_Deps)
-set(AUDIO_CODECS_BUILD_ARGS)
 
 if(THEXTECH_NO_MIXER_X)
     # Disable everything except of SDL2
@@ -325,6 +328,17 @@ else()
         "-DBUILD_MPG123=OFF"
         "-DBUILD_GME_SYSTEM_ZLIB=${USE_SYSTEM_ZLIB}"
         "-DBUILD_WAVPACK=${MIXERX_ENABLE_WAVPACK}"
+    )
+endif()
+
+if(PGE_FFMPEG_AVAILABLE)
+    list(APPEND MIXERX_CMAKE_FLAGS
+        "-DUSE_FFMPEG=ON"
+        "-DFFMPEG_INCLUDE_DIRS=${FFMPEG_INCLUDE_DIRS}"
+        "-DFFMPEG_avcodec_LIBRARY=${AVCODEC_LIBRARY}"
+        "-DFFMPEG_avformat_LIBRARY=${AVFORMAT_LIBRARY}"
+        "-DFFMPEG_avutil_LIBRARY=${AVUTIL_LIBRARY}"
+        "-DFFMPEG_swresample_LIBRARY=${SWRESAMPLE_LIBRARY}"
     )
 endif()
 
@@ -391,7 +405,6 @@ ExternalProject_Add(
 list(APPEND MixerX_Deps AudioCodecs_Local)
 
 if(NOT THEXTECH_NO_MIXER_X)
-    set(MIXERX_CMAKE_FLAGS)
     if(USE_SYSTEM_SDL2)
         # Ensure the SAME SDL2 directory will be used
         list(APPEND MIXERX_CMAKE_FLAGS
@@ -433,7 +446,6 @@ if(NOT THEXTECH_NO_MIXER_X)
             ${MIXERX_CMAKE_FLAGS}
             ${ANDROID_CMAKE_FLAGS}
             ${VITA_CMAKE_FLAGS}
-            ${VITA_MIXERX_CMAKE_FLAGS}
             $<$<BOOL:APPLE>:-DCMAKE_OSX_DEPLOYMENT_TARGET=${CMAKE_OSX_DEPLOYMENT_TARGET}>
             $<$<BOOL:APPLE>:-DCMAKE_OSX_ARCHITECTURES=${CMAKE_OSX_ARCHITECTURES}>
             $<$<BOOL:WIN32>:-DCMAKE_SHARED_LIBRARY_PREFIX="">
