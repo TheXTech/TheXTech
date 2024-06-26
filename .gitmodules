@@ -62,3 +62,12 @@
 	path = 3rdparty/SDL_net
 	url = https://github.com/TheXTech/SDL_net.git
 	branch = SDL2
+[submodule "3rdparty/libvpx"]
+	path = 3rdparty/libvpx
+	url = https://github.com/WohlSoft/libvpx.git
+	branch = stable-moondust
+[submodule "3rdparty/ffmpeg"]
+	path = 3rdparty/ffmpeg
+	url = https://github.com/WohlSoft/MixerX-FFmpeg.git
+	branch = release/7.0
+
