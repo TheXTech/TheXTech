@@ -52,3 +52,11 @@
 	path = 3rdparty/angle-shader-translator
 	url = https://github.com/TheXTech/angle-shader-translator-library.git
 	branch = dist-no-spirv
+[submodule "3rdparty/libvpx"]
+	path = 3rdparty/libvpx
+	url = https://github.com/WohlSoft/libvpx.git
+	branch = stable-moondust
+[submodule "3rdparty/ffmpeg"]
+	path = 3rdparty/ffmpeg
+	url = https://github.com/WohlSoft/MixerX-FFmpeg.git
+	branch = release/7.0
