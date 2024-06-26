@@ -540,9 +540,9 @@
         "editor": {
             "errorMissingResources": "抱歉，需要文件：{0}，才能进入编辑器。",
             "errorResolution": "抱歉，在当前设置的分辨率下，无法进入编辑器。",
-            "newWorld": "<新地图>",
+            "newWorld": "<创建新地图>",
             "promptNewWorldName": "新地图名称",
-            "battles": "<对战关卡>"
+            "battles": "<创建对战模式关卡>"
         },
         "game": {
             "gameBattleRandom": "随机关卡",
@@ -615,7 +615,7 @@
                     "info": "信息",
                     "warning": "警告",
                     "debug": "调试",
-                    "none": "不记录",
+                    "none": "关闭",
                     "_name": "日志记录等级"
                 },
                 "record-gameplay-data": "生成录像",
