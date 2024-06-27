@@ -64,7 +64,7 @@ else()
     endif()
 
     if(PGE_ENABLE_VIDEO_REC AND NOT PGE_VIDEO_REC_PREFER_GIF)
-        set(FFMPEG_VPX_ARGS --enable-libvpx --enable-encoder=opus,libvpx_vp8,libvpx_vp9 --enable-muxer=webm --enable-swscale)
+        set(FFMPEG_VPX_ARGS --enable-libvpx --enable-encoder=opus,libvpx_vp8,libvpx_vp9 --enable-muxer=webm --enable-swscale --extra-cflags="-I${DEPENDENCIES_INSTALL_DIR}/include/" --extra-ldflags="-L${DEPENDENCIES_INSTALL_DIR}/lib/")
         set(FFMPEG_DEPENDS LIBVPX_Local)
     endif()
 
