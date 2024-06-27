@@ -40,6 +40,8 @@ else()
             --disable-tools
             --disable-docs
             --disable-unit-tests
+            --disable-vp8-decoder
+            --disable-vp9
             ${LIBVPX_PICARGS}
             ${LIBVPX_DEBUG_ARGS}
 
