@@ -431,7 +431,7 @@ static bool open_audio(const PGE_VideoRecording_VP8* THIS,
     if(ret < 0)
     {
         pLogWarning("PGEVideoRec: Could not open audio codec: %s", av_err2str(ret));
-        exit(1);
+        return false;
     }
 
     /* init signal generator */
@@ -804,7 +804,7 @@ static AVFrame* get_video_frame(PGE_VideoRecording_VP8* THIS, OutputStream* ost)
     /* when we pass a frame to the encoder, it may keep a reference to it
      * internally; make sure we do not overwrite it here */
     if(av_frame_make_writable(ost->frame) < 0)
-        exit(1);
+        return NULL;
 
     if(c->pix_fmt != AV_PIX_FMT_RGB24)
     {
@@ -820,9 +820,8 @@ static AVFrame* get_video_frame(PGE_VideoRecording_VP8* THIS, OutputStream* ost)
 
             if(!ost->sws_ctx)
             {
-                fprintf(stderr,
-                        "Could not initialize the conversion context");
-                exit(1);
+                pLogWarning("Could not initialize the conversion context");
+                return NULL;
             }
         }
 
