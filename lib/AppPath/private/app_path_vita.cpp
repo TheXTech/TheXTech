@@ -42,6 +42,11 @@ std::string AppPathP::assetsRoot()
     return std::string();
 }
 
+AssetsPathType AppPathP::assetsRootType()
+{
+    return AssetsPathType::Single;
+}
+
 std::string AppPathP::settingsRoot()
 {
     /*

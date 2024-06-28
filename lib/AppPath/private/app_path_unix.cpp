@@ -35,7 +35,7 @@ static std::string s_gameInstallDirectory;
 static std::string s_applicationPath;
 
 //! The root for installed data (note: asset packs are placed at /usr/share/games/thextech/assets/...)
-static const char* s_gamesSysDir = "/usr/share/games/" THEXTECH_DIRECTORY_PREFIX "/";
+static const char* s_gamesSysDir = "/usr/share/games/" THEXTECH_DIRECTORY_PREFIX "/assets/";
 
 static std::string s_getEnvNotNull(const char *env)
 {
@@ -108,6 +108,11 @@ std::string AppPathP::userDirectory()
 std::string AppPathP::assetsRoot()
 {
     return s_gameInstallDirectory;
+}
+
+AssetsPathType AppPathP::assetsRootType()
+{
+    return AssetsPathType::Multiple;
 }
 
 std::string AppPathP::settingsRoot()

@@ -163,6 +163,11 @@ std::string AppPathP::assetsRoot()
     return s_assetsRoot;
 }
 
+AssetsPathType AppPathP::assetsRootType()
+{
+    return AssetsPathType::Single;
+}
+
 std::string AppPathP::settingsRoot()
 {
     /*

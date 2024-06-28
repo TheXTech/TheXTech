@@ -135,7 +135,7 @@ std::string AppPathManager::userAddedAssetsRoot()
     return m_customAssetsRoot;
 }
 
-std::vector<std::pair<std::string, AppPathManager::AssetsPathType>> AppPathManager::assetsSearchPath()
+std::vector<std::pair<std::string, AssetsPathType>> AppPathManager::assetsSearchPath()
 {
     std::vector<std::pair<std::string, AssetsPathType>> out;
 
@@ -154,7 +154,7 @@ std::vector<std::pair<std::string, AppPathManager::AssetsPathType>> AppPathManag
             out.push_back({m_userPath + "/assets/", AssetsPathType::Multiple});
 
         if(!AppPathP::assetsRoot().empty())
-            out.push_back({AppPathP::assetsRoot(), AssetsPathType::Legacy});
+            out.push_back({AppPathP::assetsRoot(), AppPathP::assetsRootType()});
 
 #ifdef APP_PATH_HAS_EXTRA_WORLDS
         // 3DS: add assets from additional romfs packages

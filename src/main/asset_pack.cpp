@@ -191,11 +191,11 @@ static void s_find_asset_packs()
     for(const auto& root_ : AppPathManager::assetsSearchPath())
     {
         const std::string& root = root_.first;
-        AppPathManager::AssetsPathType type = root_.second;
+        AssetsPathType type = root_.second;
 
         // check for a root passed via `-c`
-        bool is_modern_root = (type == AppPathManager::AssetsPathType::Single);
-        bool is_multiple_root = (type == AppPathManager::AssetsPathType::Multiple);
+        bool is_modern_root = (type == AssetsPathType::Single);
+        bool is_multiple_root = (type == AssetsPathType::Multiple);
 
         // Normally, root is a legacy asset pack, and <root>/assets/ contains modern asset packs.
         // If passed via -c, root must be a modern asset pack also.
@@ -318,11 +318,11 @@ static AssetPack_t s_find_pack_init(const std::string& full_id)
     for(const auto& root_ : AppPathManager::assetsSearchPath())
     {
         const std::string& root = root_.first;
-        AppPathManager::AssetsPathType type = root_.second;
+        AssetsPathType type = root_.second;
 
         // check for a root passed via `-c`
-        bool is_modern_root = (type == AppPathManager::AssetsPathType::Single);
-        bool is_multiple_root = (type == AppPathManager::AssetsPathType::Multiple);
+        bool is_modern_root = (type == AssetsPathType::Single);
+        bool is_multiple_root = (type == AssetsPathType::Multiple);
         bool is_custom_root = !custom_root.empty() && root == custom_root;
 
         // Normally, root is a legacy asset pack, and <root>/assets/ contains modern asset packs.
@@ -456,11 +456,11 @@ bool InitUIAssetsFrom(const std::string& id, bool skip_gfx)
     for(const auto& root_ : AppPathManager::assetsSearchPath())
     {
         const std::string& root = root_.first;
-        AppPathManager::AssetsPathType type = root_.second;
+        AssetsPathType type = root_.second;
 
         // check for a root passed via `-c`
-        bool is_modern_root = (type == AppPathManager::AssetsPathType::Single);
-        bool is_multiple_root = (type == AppPathManager::AssetsPathType::Multiple);
+        bool is_modern_root = (type == AssetsPathType::Single);
+        bool is_multiple_root = (type == AssetsPathType::Multiple);
 
         // treat command-line specified locations as direct storage
         if(is_modern_root)
