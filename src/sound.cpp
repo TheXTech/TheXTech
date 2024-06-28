@@ -388,6 +388,7 @@ void QuitMixerX()
 
     if(g_curMusic)
         Mix_FreeMusic(g_curMusic);
+
     g_curMusic = nullptr;
 
     for(auto & it : sound)
@@ -395,16 +396,20 @@ void QuitMixerX()
         auto &s = it.second;
         if(s.chunk)
             Mix_FreeChunk(s.chunk);
+
         if(s.chunkOrig)
             Mix_FreeChunk(s.chunkOrig);
+
         if(s.music)
         {
             Mix_HaltMusicStream(s.music);
             Mix_FreeMusic(s.music);
         }
+
         if(s.musicOrig)
             Mix_FreeMusic(s.musicOrig);
     }
+
     sound.clear();
     music.clear();
 
@@ -433,6 +438,7 @@ static void AddMusic(SoundScope root,
             m.path = g_dirEpisode.resolveFileCaseAbs(f);
         else if(root == SoundScope::custom)
             m.path = g_dirCustom.resolveFileCaseAbs(f);
+
         ini.read("yoshi-mode-track", m.yoshiModeTrack, -1);
         m.volume = volume;
         pLogDebug("Adding music [%s] '%s'", alias.c_str(), m.path.c_str());
@@ -456,8 +462,10 @@ static void RestoreSfx(SFX_t &u)
         {
             if(u.chunk)
                 Mix_FreeChunk(u.chunk);
+
             if(u.music)
                 Mix_FreeMusic(u.music);
+
             u.chunk = u.chunkOrig;
             u.music = u.musicOrig;
             u.isSilent = u.isSilentOrig;
