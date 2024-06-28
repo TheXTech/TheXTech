@@ -197,12 +197,10 @@ option(ENABLE_ADDRESS_SANITIZER "Enable the Address Sanitizer GCC feature" OFF)
 
 # ============ Customization ==============
 set(LIB_SRC_EXTRA)
-set(THEXTECH_GAME_NAME_TITLE "" CACHE STRING "Custom game title, shown in the titlebar of window")
-set(THEXTECH_CREDITS_URL "" CACHE STRING "Custom URL title, shown at the outro screen")
-set(THEXTECH_CREDITS_TITLE "" CACHE STRING "Custom game title, shown at the outro screen")
 
 set(THEXTECH_PACKAGE_NAME "thextech" CACHE STRING "Name of package archive file")
 set(THEXTECH_EXECUTABLE_NAME "thextech" CACHE STRING "Name of executable file")
+set(THEXTECH_DIRECTORY_PREFIX "TheXTech" CACHE STRING "Name used for directories on installed targets (should vary across forks, not asset packs)")
 
 if(APPLE)
     set(THEXTECH_PRELOAD_ENVIRONMENT "" CACHE STRING "Path to resources root to pack")
@@ -225,8 +223,7 @@ if(NOT APPLE AND NOT ANDROID AND NOT EMSCRIPTEN)
         unset(DEFAULT_THEXTECH_SOURCE_ASSETS_PATH)
     endif()
 
-    set(THEXTECH_FIXED_ASSETS_PATH "${DEFAULT_THEXTECH_FIXED_ASSETS_PATH}" CACHE STRING "Fixed assets path (The '/usr/share/games/<game-name>/' suggested). Unused by default.")
-    set(THEXTECH_USER_DIR_NAME "" CACHE STRING "The name of the user directory at user's home to store settings/episodes/etc. The 'PGE_Project/thextech' will be used by default.")
+    set(THEXTECH_FIXED_ASSETS_PATH "${DEFAULT_THEXTECH_FIXED_ASSETS_PATH}" CACHE STRING "Deprecated: path to install assets, platform-dependent. (The '/usr/share/games/TheXTech/assets/<game-name>/' suggested on Ubuntu). Unused by default.")
     set(THEXTECH_SOURCE_ASSETS_PATH "${DEFAULT_THEXTECH_SOURCE_ASSETS_PATH}" CACHE STRING "Path to resources root used with the package to create")
     set(THEXTECH_UNIX_INSTALL TRUE)
 endif()
@@ -1257,25 +1254,7 @@ if(THEXTECH_ENABLE_WIP_FEATURES)
     target_compile_definitions(thextech PRIVATE -DTHEXTECH_WIP_FEATURES)
 endif()
 
-if(THEXTECH_FIXED_ASSETS_PATH AND NOT THEXTECH_FIXED_ASSETS_PATH STREQUAL "")
-    target_compile_definitions(thextech PRIVATE -DFIXED_ASSETS_PATH="${THEXTECH_FIXED_ASSETS_PATH}")
-endif()
-
-if(THEXTECH_USER_DIR_NAME AND NOT THEXTECH_USER_DIR_NAME STREQUAL "")
-    target_compile_definitions(thextech PRIVATE -DUSER_DIR_NAME="${THEXTECH_USER_DIR_NAME}")
-endif()
-
-if(THEXTECH_GAME_NAME_TITLE AND NOT THEXTECH_GAME_NAME_TITLE STREQUAL "")
-    target_compile_definitions(thextech PRIVATE -DCUSTOM_GAME_NAME_TITLE="${THEXTECH_GAME_NAME_TITLE}")
-endif()
-
-if(THEXTECH_CREDITS_URL AND NOT THEXTECH_CREDITS_URL STREQUAL "")
-    target_compile_definitions(thextech PRIVATE -DCUSTOM_CREDITS_URL="${THEXTECH_CREDITS_URL}")
-endif()
-
-if(THEXTECH_CREDITS_TITLE AND NOT THEXTECH_CREDITS_TITLE STREQUAL "")
-    target_compile_definitions(thextech PRIVATE -DCUSTOM_CREDITS_TITLE="${THEXTECH_CREDITS_TITLE}")
-endif()
+target_compile_definitions(thextech PRIVATE -DTHEXTECH_DIRECTORY_PREFIX="${THEXTECH_DIRECTORY_PREFIX}")
 
 if(THEXTECH_ENABLE_LUA)
     target_compile_definitions(thextech PRIVATE -DENABLE_XTECH_LUA)

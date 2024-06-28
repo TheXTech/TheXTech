@@ -49,21 +49,8 @@ std::string AppPathManager::m_assetPackPostfix;
 bool AppPathManager::m_isPortable = false;
 
 bool AppPathP::ignoreLegacyDebugDir = false;
+std::string AppPathP::legacyUserDirPostfix;
 
-
-#if defined(USER_DIR_NAME)
-#   define UserDirName "/" USER_DIR_NAME
-#elif defined(__ANDROID__) || defined(__APPLE__) || defined(__HAIKU__)
-#   define UserDirName "/PGE Project/thextech/"
-#elif defined(__3DS__)
-#   define UserDirName "/3ds/thextech/"
-#elif defined(__WII__)
-#   define UserDirName "/thextech/"
-#elif defined(_WIN32)
-#   define UserDirName "/TheXTech/"
-#else
-#   define UserDirName "/thextech/"
-#endif
 
 static void appendSlash(std::string &path)
 {
@@ -101,7 +88,7 @@ void AppPathManager::setGameDirName(const std::string& dirName)
 void AppPathManager::initAppPath()
 {
     AppPathP::ignoreLegacyDebugDir = !m_customGameDirName.empty();
-    AppPathP::initDefaultPaths(m_customGameDirName.empty() ? UserDirName : m_customGameDirName);
+    AppPathP::initDefaultPaths(m_customGameDirName.empty() ? THEXTECH_DIRECTORY_PREFIX : m_customGameDirName);
 
     // When user directory is redefined externally
     if(!m_customUserDirectory.empty())
@@ -164,10 +151,6 @@ std::vector<std::pair<std::string, AppPathManager::AssetsPathType>> AppPathManag
 
     if(!m_isPortable)
     {
-#ifdef FIXED_ASSETS_PATH // Fixed assets path, for the rest of UNIX-like OS packages
-        out.push_back({FIXED_ASSETS_PATH, AssetsPathType::Legacy});
-#endif
-
         if(m_customUserDirectory.empty())
             out.push_back({m_userPath, AssetsPathType::Legacy});
 
@@ -205,7 +188,7 @@ void AppPathManager::setCurrentAssetPack(const std::string &id, const std::strin
     m_currentAssetPackPath = path;
     appendSlash(m_currentAssetPackPath);
 
-    if(!id.empty())
+    if(!id.empty() && id != AppPathP::legacyUserDirPostfix)
         m_assetPackPostfix = id + "/";
     else
         m_assetPackPostfix = "";

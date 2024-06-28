@@ -28,26 +28,19 @@
 
 #include "app_path_private.h"
 
-static std::string s_assetsRoot;
 static std::string s_userDirectory;
 
-static std::string s_logsDirectory;
-static std::string s_settingsDirectory;
-static std::string s_gamesavesDirectory;
+static std::string s_gameInstallDirectory;
 
 static std::string s_applicationPath;
+
 //! The legacy debug root
-static const char* s_legacyDebugDir = "/.PGE_Project/thextech/";
+static const char* s_legacyUserDirs[] = {"/.PGE_Project/thextech/", "/.thextech-smbx/", "/.thextech-aod/"};
+static const char* s_legacyUserDirPostfix[] = {"", "smbx", "aod"};
 
-#ifdef THEXTECH_NEW_USER_PATHS
-#   ifndef THEXTECH_SYSTEM_GAMES_DIR
-static const char* s_gamesSysDir = "/usr/share/games";
-#   else
-static const char* s_gamesSysDir = THEXTECH_SYSTEM_GAMES_DIR;
-#   endif
-#endif
+//! The root for installed data (note: asset packs are placed at /usr/share/games/thextech/assets/...)
+static const char* s_gamesSysDir = "/usr/share/games/" THEXTECH_DIRECTORY_PREFIX "/";
 
-#if defined(THEXTECH_NEW_USER_PATHS)
 static std::string s_getEnvNotNull(const char *env)
 {
     const char *e = SDL_getenv(env);
@@ -56,24 +49,19 @@ static std::string s_getEnvNotNull(const char *env)
     else
         return std::string();
 }
-#endif
 
 void AppPathP::initDefaultPaths(const std::string &userDirName)
 {
     std::string homePath;
-#if defined(THEXTECH_NEW_USER_PATHS)
     std::string userDir;
-    std::string logsDir;
-    std::string setupDir;
-#endif
+
+    // check for deployment as AppImage when looking for system-installed assets
+    s_gameInstallDirectory = s_getEnvNotNull("APPDIR");
+    s_gameInstallDirectory += s_gamesSysDir;
 
     // Environment
     const char *env_home = SDL_getenv("HOME");
-#if defined(THEXTECH_NEW_USER_PATHS)
-    setupDir = s_getEnvNotNull("XDG_CONFIG_HOME");
-    logsDir = s_getEnvNotNull("XDG_STATE_HOME");
     userDir = s_getEnvNotNull("XDG_DATA_HOME");
-#endif
 
     // Init home directory
 #if defined(__HAIKU__)
@@ -87,73 +75,36 @@ void AppPathP::initDefaultPaths(const std::string &userDirName)
         homePath.append(env_home);
 #endif
 
-#if defined(THEXTECH_NEW_USER_PATHS)
     // Set default paths if environments aren't defined
     if(!homePath.empty())
     {
-        if(setupDir.empty())
-            setupDir = homePath + "/.config";
-
-        if(logsDir.empty())
-            logsDir = homePath + "/.local/state";
-
         if(userDir.empty())
             userDir = homePath + "/.local/share";
     }
-#endif
 
     if(homePath.empty())
         homePath = std::string(".");
 
-#if defined(THEXTECH_NEW_USER_PATHS)
-
-    bool legacyRoot = DirMan::exists(homePath + s_legacyDebugDir);
-    bool legacyRoot2 = DirMan::exists(homePath + userDirName);
-
-    if(!ignoreLegacyDebugDir && (legacyRoot || legacyRoot2)) // Legacy debug root has the highest priority!
+    // look for legacy roots
+    if(!ignoreLegacyDebugDir)
     {
-        if(legacyRoot2)
-            homePath.append(userDirName);
-        else
-            homePath.append(s_legacyDebugDir);
+        for(size_t i = 0; i < sizeof(s_legacyUserDirs) / sizeof(*s_legacyUserDirs); i++)
+        {
+            s_userDirectory = homePath + s_legacyUserDirs[i];
 
-        if(!homePath.empty() && homePath.back() != '/')
-            homePath.push_back('/');
+            if(DirMan::exists(s_userDirectory))
+            {
+                legacyUserDirPostfix = s_legacyUserDirPostfix[i];
+                break;
+            }
 
-        s_userDirectory = homePath;
-        s_assetsRoot.clear();
-        s_logsDirectory.clear();
-        s_settingsDirectory.clear();
-        s_gamesavesDirectory.clear();
-    }
-    else
-    {
-        s_userDirectory = userDir + userDirName + "userdata/";
-        s_assetsRoot = userDir + userDirName + "debug-assets/";
-        s_logsDirectory = logsDir + userDirName;
-        s_settingsDirectory = setupDir + userDirName;
-        s_gamesavesDirectory = userDir + userDirName + "gamesaves/";
-        // If debug assets are not exists, find the globally installed assets instead
-        if(!DirMan::exists(s_assetsRoot))
-            s_assetsRoot = s_gamesSysDir + userDirName;
+            s_userDirectory.clear();
+        }
     }
 
-#else // THEXTECH_NEW_USER_PATHS
-    // Use old default paths logic
-    if(DirMan::exists(homePath + userDirName))
-        homePath.append(userDirName);
-    else
-        homePath.append(s_legacyDebugDir);
-
-    if(!homePath.empty() && homePath.back() != '/')
-        homePath.push_back('/');
-
-    s_userDirectory = homePath;
-    s_assetsRoot.clear();
-    s_logsDirectory.clear();
-    s_settingsDirectory.clear();
-    s_gamesavesDirectory.clear();
-#endif // THEXTECH_NEW_USER_PATHS
+    // use modern user directory
+    if(s_userDirectory.empty())
+        s_userDirectory = userDir + userDirName;
 
     char *appPath = SDL_GetBasePath();
     if(!appPath)
@@ -181,7 +132,7 @@ std::string AppPathP::userDirectory()
 
 std::string AppPathP::assetsRoot()
 {
-    return s_assetsRoot;
+    return s_gameInstallDirectory;
 }
 
 std::string AppPathP::settingsRoot()
@@ -191,7 +142,7 @@ std::string AppPathP::settingsRoot()
      * directory out of user directory. Keep it empty if you want to keep the
      * default behaviour (i.e. settings saved at the user directory)
      */
-    return s_settingsDirectory;
+    return std::string();
 }
 
 std::string AppPathP::gamesavesRoot()
@@ -201,7 +152,7 @@ std::string AppPathP::gamesavesRoot()
      * directory out of user directory. Keep it empty if you want to keep the
      * default behaviour (i.e. gamesaves saved at the settings directory)
      */
-    return s_gamesavesDirectory;
+    return std::string();
 }
 
 std::string AppPathP::screenshotsRoot()
@@ -231,7 +182,7 @@ std::string AppPathP::logsRoot()
      * directory out of user directory. Keep it empty if you want to keep the
      * default behaviour (i.e. logs saved at the user directory)
      */
-    return s_logsDirectory;
+    return std::string();
 }
 
 bool AppPathP::portableAvailable()

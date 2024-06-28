@@ -114,7 +114,7 @@ void AppPathP::initDefaultPaths(const std::string& userDirName)
     if(R_FAILED(romfsInit()))
     {
         // fallback to assets.romfs
-        if(!mountRomfsFile("/3ds/thextech/assets.romfs", "romfs"))
+        if(!mountRomfsFile("/3ds/" THEXTECH_DIRECTORY_PREFIX "/assets.romfs", "romfs"))
         {
             // just use user dir for assets. this is really bad. everything will be insanely slow.
             s_assetRoot.clear();
@@ -131,7 +131,7 @@ std::string AppPathP::appDirectory()
 
 std::string AppPathP::userDirectory()
 {
-    return "/3ds/thextech/";
+    return "/3ds/" THEXTECH_DIRECTORY_PREFIX "/";
 }
 
 std::string AppPathP::assetsRoot()

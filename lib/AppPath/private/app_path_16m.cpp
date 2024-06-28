@@ -42,7 +42,7 @@ std::string AppPathP::appDirectory()
 
 std::string AppPathP::userDirectory()
 {
-    return "/thextech/";
+    return "/" THEXTECH_DIRECTORY_PREFIX "/";
 }
 
 std::string AppPathP::assetsRoot()
