@@ -46,6 +46,7 @@ Changelog for 1.3.7-dev
 -Add new item drop system, used by default in Modern Mode (@ds-sloth, @ChristianSilvermoon)
 -GIF recorder now turns grey and skips frames when recording is slower than gameplay (@ds-sloth)
 -Add compat flag "disable-spin-jump", which causes the AltJump key to map to a normal jump, but still allows players to dismount. The flag replaces a hack used to force-disable the key in Superb Demo Sisters. (@ds-sloth)
+-Fix vanilla peculiarity where plants would make a sound when dying in a no-turn-back level, guarded by compat flag "fix-visual-bugs" [Modern Mode] (@ds-sloth)
 
 Changelog for 1.3.6.6-dev
 -Fix vanilla bug where vehicle could be vulnerable if player entered it during AltJump (requires frame perfect down press), guarded by compat flag "fix-vehicle-altjump-bug" (@ds-sloth)
