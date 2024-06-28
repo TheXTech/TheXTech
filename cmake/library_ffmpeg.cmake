@@ -45,7 +45,7 @@ else()
 
     list(APPEND FFMPEG_Libs ${AVFORMAT_LIBRARY} ${AVCODEC_LIBRARY} ${SWRESAMPLE_LIBRARY})
 
-    if(PGE_ENABLE_VIDEO_REC AND NOT PGE_VIDEO_REC_PREFER_GIF)
+    if(PGE_VIDEO_REC_WEBM_SUPPORTED)
         list(APPEND FFMPEG_Libs ${SWSCALE_LIBRARY})
     endif()
 
@@ -63,8 +63,8 @@ else()
         set(FFMPEG_PIC_ARGS --disable-pic)
     endif()
 
-    if(PGE_ENABLE_VIDEO_REC AND NOT PGE_VIDEO_REC_PREFER_GIF)
-        set(FFMPEG_VPX_ARGS --enable-libvpx --enable-encoder=libvorbis,libvpx_vp8 --enable-muxer=webm --enable-swscale --extra-cflags="-I${DEPENDENCIES_INSTALL_DIR}/include/" --extra-ldflags="-L${DEPENDENCIES_INSTALL_DIR}/lib/")
+    if(PGE_VIDEO_REC_WEBM_SUPPORTED)
+        set(FFMPEG_VPX_ARGS --enable-libvpx --enable-libvorbis --enable-encoder=libvorbis,libvpx_vp8 --enable-muxer=webm --enable-swscale --extra-cflags="-I${DEPENDENCIES_INSTALL_DIR}/include/" --extra-ldflags="-L${DEPENDENCIES_INSTALL_DIR}/lib/")
         set(FFMPEG_DEPENDS LIBVPX_Local)
     endif()
 

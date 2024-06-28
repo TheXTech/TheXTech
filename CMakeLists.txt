@@ -562,11 +562,8 @@ endif()
 
 if(PGE_FFMPEG_AVAILABLE)
     list(APPEND A2XT_DEPS FFMPEG_Local)
-    list(APPEND A2XT_LIBS PGE_FFMPEG)
-
     if(PGE_ENABLE_VIDEO_REC AND NOT PGE_VIDEO_REC_PREFER_GIF)
         list(APPEND A2XT_DEPS LIBVPX_Local)
-        list(APPEND A2XT_LIBS PGE_libVPX)
     endif()
 endif()
 
