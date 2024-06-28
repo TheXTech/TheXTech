@@ -978,25 +978,7 @@ bool PGE_VideoRecording_VP8::encoding_thread()
 
     av_write_trailer(oc);
 
-    /* Close each codec. */
-    if(have_video)
-        close_stream(&video_st);
-
-    if(have_audio)
-        close_stream(&audio_st);
-
-    const AVOutputFormat* fmt = oc->oformat;
-
-    if(!(fmt->flags & AVFMT_NOFILE))
-        avio_closep(&oc->pb); /* Close the output file. */
-
-    /* free the stream */
-    avformat_free_context(oc);
-    oc = nullptr;
-
-#if HAS_CHANNELLAYOUT
-    av_channel_layout_uninit(&src_ch_layout);
-#endif
+    clean_up();
 
     return true;
 }
