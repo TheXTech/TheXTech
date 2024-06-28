@@ -34,10 +34,6 @@ static std::string s_gameInstallDirectory;
 
 static std::string s_applicationPath;
 
-//! The legacy debug root
-static const char* s_legacyUserDirs[] = {"/.PGE_Project/thextech/", "/.thextech-smbx/", "/.thextech-aod/"};
-static const char* s_legacyUserDirPostfix[] = {"", "smbx", "aod"};
-
 //! The root for installed data (note: asset packs are placed at /usr/share/games/thextech/assets/...)
 static const char* s_gamesSysDir = "/usr/share/games/" THEXTECH_DIRECTORY_PREFIX "/";
 
@@ -76,35 +72,14 @@ void AppPathP::initDefaultPaths(const std::string &userDirName)
 #endif
 
     // Set default paths if environments aren't defined
-    if(!homePath.empty())
-    {
-        if(userDir.empty())
-            userDir = homePath + "/.local/share";
-    }
-
     if(homePath.empty())
         homePath = std::string(".");
 
-    // look for legacy roots
-    if(!ignoreLegacyDebugDir)
-    {
-        for(size_t i = 0; i < sizeof(s_legacyUserDirs) / sizeof(*s_legacyUserDirs); i++)
-        {
-            s_userDirectory = homePath + s_legacyUserDirs[i];
-
-            if(DirMan::exists(s_userDirectory))
-            {
-                legacyUserDirPostfix = s_legacyUserDirPostfix[i];
-                break;
-            }
-
-            s_userDirectory.clear();
-        }
-    }
+    if(userDir.empty())
+        userDir = homePath + "/.local/share";
 
     // use modern user directory
-    if(s_userDirectory.empty())
-        s_userDirectory = userDir + userDirName;
+    s_userDirectory = userDir + userDirName;
 
     char *appPath = SDL_GetBasePath();
     if(!appPath)

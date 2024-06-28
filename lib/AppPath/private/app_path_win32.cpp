@@ -95,17 +95,7 @@ void AppPathP::initDefaultPaths(const std::string &userDirName)
     if(s_userDirectory.empty() && roamingPath.empty())
         s_userDirectory = s_applicationPath;
     else
-    {
-        // Priority the legacy path for compatibility
-        if(!ignoreLegacyDebugDir && DirMan::exists(s_userDirectory + s_legacyDebugDir))
-        {
-            s_userDirectory += s_legacyDebugDir;
-        }
-        else
-        {
-            s_userDirectory = roamingPath + userDirName;
-        }
-    }
+        s_userDirectory = roamingPath + userDirName;
 }
 
 std::string AppPathP::appDirectory()

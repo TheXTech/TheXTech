@@ -49,7 +49,6 @@ std::string AppPathManager::m_assetPackPostfix;
 bool AppPathManager::m_isPortable = false;
 
 bool AppPathP::ignoreLegacyDebugDir = false;
-std::string AppPathP::legacyUserDirPostfix;
 
 
 static void appendSlash(std::string &path)
@@ -188,7 +187,7 @@ void AppPathManager::setCurrentAssetPack(const std::string &id, const std::strin
     m_currentAssetPackPath = path;
     appendSlash(m_currentAssetPackPath);
 
-    if(!id.empty() && id != AppPathP::legacyUserDirPostfix)
+    if(!id.empty())
         m_assetPackPostfix = id + "/";
     else
         m_assetPackPostfix = "";
