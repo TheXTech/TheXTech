@@ -64,8 +64,10 @@ else()
     endif()
 
     if(PGE_VIDEO_REC_WEBM_SUPPORTED)
-        set(FFMPEG_VPX_ARGS --enable-libvpx --enable-libvorbis --enable-encoder=libvorbis,libvpx_vp8 --enable-muxer=webm --enable-swscale --extra-cflags="-I${DEPENDENCIES_INSTALL_DIR}/include/" --extra-ldflags="-L${DEPENDENCIES_INSTALL_DIR}/lib/")
+        set(FFMPEG_VPX_ARGS --enable-pthreads --enable-libvpx --enable-libvorbis --enable-encoder=libvorbis,libvpx_vp8 --enable-muxer=webm --enable-swscale --extra-cflags="-I${DEPENDENCIES_INSTALL_DIR}/include/" --extra-ldflags="-L${DEPENDENCIES_INSTALL_DIR}/lib/")
         set(FFMPEG_DEPENDS LIBVPX_Local)
+    else()
+        set(FFMPEG_VPX_ARGS --disable-pthreads)
     endif()
 
     if("${TARGET_PROCESSOR}" STREQUAL "ppc")
@@ -98,7 +100,7 @@ else()
 
             --disable-bzlib
             --disable-zlib
-            --enable-static --disable-pthreads
+            --enable-static
 
             --disable-cuvid --disable-d3d11va --disable-dxva2 --disable-ffnvcodec --disable-vaapi --disable-vdpau
 
