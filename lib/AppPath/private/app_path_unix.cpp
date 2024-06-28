@@ -78,6 +78,8 @@ void AppPathP::initDefaultPaths(const std::string &userDirName)
     if(userDir.empty())
         userDir = homePath + "/.local/share";
 
+    userDir += "/";
+
     // use modern user directory
     s_userDirectory = userDir + userDirName;
 

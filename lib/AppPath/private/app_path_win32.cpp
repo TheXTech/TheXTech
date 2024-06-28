@@ -32,8 +32,6 @@
 
 static std::string s_userDirectory;
 static std::string s_applicationPath;
-//! The legacy debug root
-static const char* s_legacyDebugDir = "/.PGE_Project/thextech/";
 
 static void s_toUtf8(std::string &ret, wchar_t *str, DWORD len)
 {
@@ -56,8 +54,6 @@ static void s_toUtf8(std::string &ret, wchar_t *str, DWORD len)
 
 void AppPathP::initDefaultPaths(const std::string &userDirName)
 {
-    // FIXME: Implement new default directories format later
-    (void)userDirName;
     wchar_t pathBuffer[MAX_PATH] = L"";
 
     std::string roamingPath;
@@ -95,7 +91,7 @@ void AppPathP::initDefaultPaths(const std::string &userDirName)
     if(s_userDirectory.empty() && roamingPath.empty())
         s_userDirectory = s_applicationPath;
     else
-        s_userDirectory = roamingPath + userDirName;
+        s_userDirectory = roamingPath + "/" + userDirName;
 }
 
 std::string AppPathP::appDirectory()

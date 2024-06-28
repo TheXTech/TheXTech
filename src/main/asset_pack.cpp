@@ -190,7 +190,7 @@ static void s_find_asset_packs()
 
     for(const auto& root_ : AppPathManager::assetsSearchPath())
     {
-        const std::string& root = root_.first;
+        std::string root = root_.first;
         AssetsPathType type = root_.second;
 
         // check for a root passed via `-c`
@@ -227,14 +227,17 @@ static void s_find_asset_packs()
             }
         }
 
-        if(!is_modern_root && DirMan::exists(root + "assets/"))
+        if(type == AssetsPathType::Legacy)
+            root += "assets/";
+
+        if(!is_modern_root && DirMan::exists(root))
         {
-            assets.setPath(root + "assets/");
+            assets.setPath(root);
             assets.getListOfFolders(subdirList);
 
             for(const std::string& sub : subdirList)
             {
-                subdir = root + "assets/" + sub;
+                subdir = root + sub;
 
                 D_pLogDebug("  Checking %s", subdir.c_str());
 
@@ -317,7 +320,7 @@ static AssetPack_t s_find_pack_init(const std::string& full_id)
 
     for(const auto& root_ : AppPathManager::assetsSearchPath())
     {
-        const std::string& root = root_.first;
+        std::string root = root_.first;
         AssetsPathType type = root_.second;
 
         // check for a root passed via `-c`
@@ -359,14 +362,17 @@ static AssetPack_t s_find_pack_init(const std::string& full_id)
                 any_pack = std::move(pack);
         }
 
-        if(!is_modern_root && DirMan::exists(root + "assets/"))
+        if(type == AssetsPathType::Legacy)
+            root += "assets/";
+
+        if(!is_modern_root && DirMan::exists(root))
         {
-            assets.setPath(root + "assets/");
+            assets.setPath(root);
             assets.getListOfFolders(subdirList);
 
             for(const std::string& sub : subdirList)
             {
-                subdir = root + "assets/" + sub;
+                subdir = root + sub;
 
                 if(DirMan::exists(subdir + "/graphics/ui/"))
                 {
@@ -469,7 +475,7 @@ bool InitUIAssetsFrom(const std::string& id, bool skip_gfx)
         }
         else if(is_multiple_root)
         {
-            pLogDebug("- %sassets/*", root.c_str());
+            pLogDebug("- %s*", root.c_str());
         }
         else
         {
