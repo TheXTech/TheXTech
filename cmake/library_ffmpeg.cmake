@@ -107,6 +107,7 @@ else()
             --enable-decoder=wmav1,wmav2,wmavoice,wmapro,wmalossless,aac,opus
             --enable-demuxer=asf,asf_o,aac,mov,matroska
             --enable-parser=aac,mpegaudio
+            --enable-protocol=file,data
             --extra-ldflags=-Wl,--no-undefined
 
             ${FFMPEG_VPX_ARGS}

@@ -871,6 +871,7 @@ static void close_stream(OutputStream* ost)
     sws_freeContext(ost->sws_ctx);
     ost->sws_ctx = NULL;
     swr_free(&ost->swr_ctx);
+    ost->st = nullptr;
 }
 
 
@@ -991,6 +992,7 @@ bool PGE_VideoRecording_VP8::encoding_thread()
 
     /* free the stream */
     avformat_free_context(oc);
+    oc = nullptr;
 
 #if HAS_CHANNELLAYOUT
     av_channel_layout_uninit(&src_ch_layout);
@@ -1018,11 +1020,9 @@ void PGE_VideoRecording_VP8::clean_up()
 {
     if(video_st.st)
         close_stream(&video_st);
-    video_st.st = nullptr;
 
     if(audio_st.st)
         close_stream(&audio_st);
-    audio_st.st = nullptr;
 
     if(oc)
     {
