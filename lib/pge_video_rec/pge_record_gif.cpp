@@ -27,6 +27,9 @@
 
 struct PGE_VideoRecording_GIF : public PGE_VideoRecording
 {
+    PGE_VideoRecording_GIF() : PGE_VideoRecording() {}
+    virtual ~PGE_VideoRecording_GIF() = default;
+
     GIF_H::GifWriter  writer      = {nullptr, nullptr, true, false};
     unsigned char padding[7] = {0, 0, 0, 0, 0, 0, 0};
 
@@ -48,6 +51,10 @@ const char* PGE_VideoRecording_GIF::extension() const
 bool PGE_VideoRecording_GIF::initialize(const char* filename)
 {
     FILE *gifFile = Files::utf8_fopen(filename, "wb");
+
+    if(!gifFile)
+        return false;
+
     return GIF_H::GifBegin(&writer, gifFile, spec.frame_w, spec.frame_h, 100 / spec.frame_rate, false);
 }
 
