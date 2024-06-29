@@ -5322,8 +5322,9 @@ static inline bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool bac
             plr.WarpCD = (warp.Effect == 3) ? 10 : 50;
 
             const Screen_t& screen = ScreenByPlayer(A);
+            int vscreen_A = vScreenIdxByPlayer(A);
             bool is_shared_screen = (screen.Type == 3);
-            bool do_tele = is_shared_screen && !vScreenCollision(vScreenIdxByPlayer(A), exit);
+            bool do_tele = is_shared_screen && !vScreenCollision(vscreen_A, exit);
 
             // teleport other players using the instant/portal warp in shared screen mode
             if(do_tele)
@@ -5343,8 +5344,8 @@ static inline bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool bac
                     {
                         RemoveFromPet(o_A);
 
-                        o_p.Location.X = exit.X + exit.Width / 2.0 - plr.Location.Width / 2.0;
-                        o_p.Location.Y = exit.Y + exit.Height - plr.Location.Height - 0.1;
+                        o_p.Location.X = exit.X + exit.Width / 2.0 - o_p.Location.Width / 2.0;
+                        o_p.Location.Y = exit.Y + exit.Height - o_p.Location.Height - 0.1;
                         CheckSection(o_A);
 
                         if(warp.Effect != 3) // Don't zero speed when passing a portal warp
@@ -5353,6 +5354,7 @@ static inline bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool bac
                             o_p.Location.SpeedY = 0;
                         }
 
+                        o_p.Vine = plr.Vine;
                         o_p.WarpCD = (warp.Effect == 3) ? 10 : 50;
 
                         // put other player in no-collide mode
@@ -5360,6 +5362,8 @@ static inline bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool bac
                         o_p.Effect2 = A;
                     }
                 }
+
+                GetvScreenAuto(vScreen[vscreen_A]);
             }
 
             return true; // break
