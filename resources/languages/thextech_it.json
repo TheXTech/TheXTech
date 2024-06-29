@@ -2,7 +2,7 @@
     "editor": {
         "file": {
             "convert": {
-                "descNew": "L'estensione del file cambierà però il file originale NON verrà eliminato.\n\nControlla se ci sono mancanze nel file nuovo"
+                "descNew": "L'estensione del file cambierà, ma il vecchio file NON verrà eliminato.\n\nControlla se ci sono elementi persi dopo il salvataggio."
             },
             "optionProceedWithConversion": "Procedi con la conversione",
             "optionYesSaveThenAction": "Sì: salva e {0}",

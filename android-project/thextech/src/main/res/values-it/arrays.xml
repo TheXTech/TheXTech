@@ -1,2 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources></resources>
+<resources>
+    <string name="rendererDefault">Predefinito</string>
+    <string name="speedRunMode0">Off</string>
+    <string name="speedRunMode1">Modalità 1 (nativa di TheXTech)</string>
+    <string name="speedRunMode3">Modalità 3 (SMBX 1.3 con tutti i bug abilitati)</string>
+    <string name="touchPadStyle0">Azioni in gioco</string>
+    <string name="touchPadStyle1">Stile Nintendo/Xbox (A/B/X/Y)</string>
+    <string name="touchPadStyle2">Stile PlayStation (X/O/D/A)</string>
+    <string name="batteryStatusShow0">Non mostrare</string>
+    <string name="batteryStatusShow1">Mostra quando la batteria è scarica</string>
+    <string name="batteryStatusShow2">Mostra sempre</string>
+</resources>
