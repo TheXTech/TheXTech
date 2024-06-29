@@ -27,6 +27,7 @@
 
 #include "../globals.h"
 #include "../npc.h"
+#include "player.h"
 #include "../sound.h"
 #include "../graphics.h"
 #include "../collision.h"
@@ -2163,14 +2164,8 @@ void UpdateNPCs()
                     // lots of speed cancel code (and some TheXTech logic for the Raft NPC); fine to move into NPCSpecial
                     if(NPC[A].Type == NPCID_TANK_TREADS)
                     {
-                        for(int B = 1; B <= numPlayers; B++)
-                        {
-                            if(!(Player[B].Effect == PLREFF_NORMAL || Player[B].Effect == PLREFF_WARP_PIPE || Player[B].Effect == PLREFF_NO_COLLIDE || Player[B].Effect == PLREFF_PET_INSIDE))
-                            {
-                                NPC[A].Location.SpeedX = 0;
-                                break;
-                            }
-                        }
+                        if(!AllPlayersNormal())
+                            NPC[A].Location.SpeedX = 0;
                     }
 
                     if(NPC[A].Type == NPCID_ICE_CUBE)
@@ -2200,13 +2195,10 @@ void UpdateNPCs()
 
                     if(NPC[A].Type == NPCID_RAFT) // Skull raft
                     {
-                        for(int B = 1; B <= numPlayers; B++)
+                        if(!AllPlayersNormal())
                         {
-                            if(!(Player[B].Effect == PLREFF_NORMAL || Player[B].Effect == PLREFF_WARP_PIPE || Player[B].Effect == PLREFF_NO_COLLIDE || Player[B].Effect == PLREFF_PET_INSIDE))
-                            {
-                                NPC[A].Location.SpeedX = 0;
-                                NPC[A].Location.SpeedY = 0;
-                            }
+                            NPC[A].Location.SpeedX = 0;
+                            NPC[A].Location.SpeedY = 0;
                         }
 
                         // the following is all new code!
@@ -5664,7 +5656,7 @@ void UpdateNPCs()
                     double target_X = pLoc.X + pLoc.Width / 2 - nLoc.Width / 2;
                     double target_Y = pLoc.Y + pLoc.Height - 192;
 
-                    // anticipate player movement
+                    // anticipate player movement (cross-ref AllPlayersNormal())
                     if(p.Effect == PLREFF_NORMAL || p.Effect == PLREFF_WARP_PIPE || p.Effect == PLREFF_NO_COLLIDE || p.Effect == PLREFF_PET_INSIDE)
                     {
                         target_X += pLoc.SpeedX;

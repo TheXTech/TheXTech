@@ -2587,12 +2587,7 @@ void NPCSpecial(int A)
 
         if((npc.Direction == 1 && tempBool) || npc.Type == NPCID_SAW) // Player in same section, enabled, or, grinder
         {
-            bool pausePlatforms = false;
-            for(int B = 1; B <= numPlayers; B++)
-            {
-                if(!(Player[B].Effect == PLREFF_NORMAL || Player[B].Effect == PLREFF_WARP_PIPE || Player[B].Effect == PLREFF_NO_COLLIDE || Player[B].Effect == PLREFF_PET_INSIDE))
-                    pausePlatforms = true;
-            }
+            bool pausePlatforms = !AllPlayersNormal();
 
             // this code ran unconditionally in SMBX 1.3
             if(!g_config.fix_platforms_acceleration || !pausePlatforms) // Keep zeroed speed when player required the pause of the move effect
@@ -2790,15 +2785,6 @@ void NPCSpecial(int A)
                 npc.Location.SpeedX = 0;
                 npc.Location.SpeedY = 0;
             }
-
-//            for(B = 1; B <= numPlayers; B++) // Move this code to up
-//            {
-//                if(!(Player[B].Effect == PLREFF_NORMAL || Player[B].Effect == PLREFF_WARP_PIPE || Player[B].Effect == PLREFF_NO_COLLIDE || Player[B].Effect == PLREFF_PET_INSIDE))
-//                {
-//                    npc.Location.SpeedX = 0;
-//                    npc.Location.SpeedY = 0;
-//                }
-//            }
         }
         else
         {

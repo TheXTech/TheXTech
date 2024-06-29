@@ -36,6 +36,7 @@
 #include "frame_timer.h"
 #include "main/speedrunner.h"
 #include "editor.h"
+#include "player.h"
 #include "blocks.h"
 #include "main/trees.h"
 #include "main/block_table.h"
@@ -1422,19 +1423,14 @@ void UpdateEvents()
     // this is for events that have a delay to call other events
     // this sub also updates the screen position for autoscroll levels
     int A = 0;
-    int B = 0;
     if(FreezeNPCs)
         return;
 
     if(!GameMenu)
     {
-        // be sure to keep in sync with UpdateLayers code above.
         // possibly undesirable: doesn't advance event timer at all if any players are (for example) in doors or in holding pattern
-        for(B = 1; B <= numPlayers; B++)
-        {
-            if(!(Player[B].Effect == PLREFF_NORMAL || Player[B].Effect == PLREFF_WARP_PIPE || Player[B].Effect == PLREFF_NO_COLLIDE || Player[B].Effect == PLREFF_PET_INSIDE))
-                return;
-        }
+        if(!AllPlayersNormal())
+            return;
     }
 
     if(newEventNum > 0)
@@ -1520,39 +1516,34 @@ void UpdateLayers()
 {
     // this is mainly for moving layers
     int A = 0;
-    int B = 0;
     // int C = 0;
 
     bool FreezeLayers = false;
 
     if(!GameMenu)
     {
-        // be sure to keep in sync with UpdateEvents code above.
         // possibly undesirable: doesn't advance layer movement at all if any players are (for example) in doors or in holding pattern
-        for(B = 1; B <= numPlayers; B++)
+        if(!AllPlayersNormal())
         {
-            if(!(Player[B].Effect == PLREFF_NORMAL || Player[B].Effect == PLREFF_WARP_PIPE || Player[B].Effect == PLREFF_NO_COLLIDE || Player[B].Effect == PLREFF_PET_INSIDE))
-            {
-                // moved this code into the loop over layers instead of repeating it per player
-                // it has also been combined with the FreezeNPCs code since they did the same thing
-                // in the original game
+            // moved this code into the loop over layers instead of repeating it per player
+            // it has also been combined with the FreezeNPCs code since they did the same thing
+            // in the original game
 
-                // for(A = 0; A <= maxLayers; A++)
-                // {
-                //     if(Layer[A].Name != "" && (Layer[A].SpeedX != 0.f || Layer[A].SpeedY != 0.f) && Layer[A].EffectStop)
-                //     {
-                //         for(C = 1; C <= numBlock; C++)
-                //         {
-                //             if(Block[C].Layer == Layer[A].Name)
-                //             {
-                //                 Block[C].Location.SpeedX = 0;
-                //                 Block[C].Location.SpeedY = 0;
-                //             }
-                //         }
-                //     }
-                // }
-                FreezeLayers = true;
-            }
+            // for(A = 0; A <= maxLayers; A++)
+            // {
+            //     if(Layer[A].Name != "" && (Layer[A].SpeedX != 0.f || Layer[A].SpeedY != 0.f) && Layer[A].EffectStop)
+            //     {
+            //         for(C = 1; C <= numBlock; C++)
+            //         {
+            //             if(Block[C].Layer == Layer[A].Name)
+            //             {
+            //                 Block[C].Location.SpeedX = 0;
+            //                 Block[C].Location.SpeedY = 0;
+            //             }
+            //         }
+            //     }
+            // }
+            FreezeLayers = true;
         }
     }
 

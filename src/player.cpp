@@ -8303,6 +8303,18 @@ void PlayerEffects(const int A)
 //    }
 }
 
+bool AllPlayersNormal()
+{
+    for(int B = 1; B <= numPlayers; B++)
+    {
+        // cross-ref modern item spawn code
+        if(!(Player[B].Effect == PLREFF_NORMAL || Player[B].Effect == PLREFF_WARP_PIPE || Player[B].Effect == PLREFF_NO_COLLIDE || Player[B].Effect == PLREFF_PET_INSIDE))
+            return false;
+    }
+
+    return true;
+}
+
 // NEW: ensures the players on a screen are nearby if the screen is shared
 void PlayersEnsureNearby(const Screen_t& screen)
 {
