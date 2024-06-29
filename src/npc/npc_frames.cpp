@@ -966,16 +966,18 @@ void NPCFrames(int A)
     else if(NPC[A].Type == NPCID_FLY_CARRY_FODDER) // smw paragoomba
     {
         NPC[A].FrameCount += 1;
+
         if(NPC[A].Direction == 1)
             NPC[A].Frame = 4;
         else
             NPC[A].Frame = 0;
+
         if(NPC[A].FrameCount >= 16)
             NPC[A].FrameCount = 0;
         else if(NPC[A].FrameCount >= 8)
             NPC[A].Frame += 1;
 
-        if(NPC[A].Effect == 0)
+        if(NPC[A].Effect == NPCEFF_NORMAL)
         {
             if(NPC[A].Special == 0)
                 NPC[A].Special2 += 2;
@@ -985,6 +987,7 @@ void NPCFrames(int A)
                 NPC[A].Special2 += 1;
             else
                 NPC[A].Special2 += 2;
+
             if(NPC[A].Special2 >= 16)
                 NPC[A].Special2 = 0;
             else if(NPC[A].Special2 >= 8)

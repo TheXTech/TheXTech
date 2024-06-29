@@ -251,7 +251,7 @@ public:
         else if(
                 (
                   (
-                    (NPC[A].HoldingPlayer > 0 && Player[NPC[A].HoldingPlayer].Effect != 3) ||
+                    (NPC[A].HoldingPlayer > 0 && Player[NPC[A].HoldingPlayer].Effect != PLREFF_WARP_PIPE) ||
                     (NPC[A].Type == NPCID_TOOTHY && NPC[A].vehiclePlr == 0) ||
                     (NPC[A].Type == NPCID_BULLET && NPC[A].CantHurt > 0)
                   ) || NPC[A].Effect == NPCEFF_PET_TONGUE
@@ -264,7 +264,7 @@ public:
             Held_n += 1;
             g_stats.renderedNPCs += 1;
         }
-        else if(NPC[A].Effect == 0 && NPC[A]->Foreground && NPC[A].HoldingPlayer == 0 && !NPC[A]->IsACoin)
+        else if(NPC[A].Effect == NPCEFF_NORMAL && NPC[A]->Foreground && NPC[A].HoldingPlayer == 0 && !NPC[A]->IsACoin)
         {
             if(FG_n == sizeof(FG) / sizeof(uint16_t))
                 return;
@@ -272,7 +272,7 @@ public:
             FG_n += 1;
             g_stats.renderedNPCs += 1;
         }
-        else if(NPC[A].Type == NPCID_ICE_CUBE && NPC[A].Effect == 0 && NPC[A].HoldingPlayer == 0)
+        else if(NPC[A].Type == NPCID_ICE_CUBE && NPC[A].Effect == NPCEFF_NORMAL && NPC[A].HoldingPlayer == 0)
         {
             if(Iced_n == sizeof(Iced) / sizeof(uint16_t))
                 return;
@@ -280,7 +280,7 @@ public:
             Iced_n += 1;
             g_stats.renderedNPCs += 1;
         }
-        else if(NPC[A].Effect == 0 && NPC[A].HoldingPlayer == 0 &&
+        else if(NPC[A].Effect == NPCEFF_NORMAL && NPC[A].HoldingPlayer == 0 &&
             (NPC[A].vehiclePlr > 0 || NPC[A].Type == NPCID_VEHICLE || NPC[A].Type == NPCID_CANNONITEM ||
                 NPC[A].Type == NPCID_TOOTHYPIPE || NPC[A].Type == NPCID_ITEM_BURIED || NPC[A].Type == NPCID_ROCKET_WOOD ||
                 NPC[A].Type == NPCID_FIRE_BOSS_FIRE || NPC[A]->IsACoin))
@@ -306,7 +306,7 @@ public:
             BG_n += 1;
             g_stats.renderedNPCs += 1;
         }
-        else if(NPC[A].Effect == 0 && NPC[A].HoldingPlayer == 0)
+        else if(NPC[A].Effect == NPCEFF_NORMAL && NPC[A].HoldingPlayer == 0)
         {
             if(Normal_n == sizeof(Normal) / sizeof(uint16_t))
                 return;
@@ -849,7 +849,7 @@ void ClassicNPCScreenLogic(int Z, int numScreens, bool fill_draw_queue, NPC_Draw
             }
         }
 
-        if(NPC[A].Effect == 0 && ((NPC[A].HoldingPlayer == 0 && (NPC[A].vehiclePlr > 0 || NPC[A].Type == NPCID_VEHICLE ||
+        if(NPC[A].Effect == NPCEFF_NORMAL && ((NPC[A].HoldingPlayer == 0 && (NPC[A].vehiclePlr > 0 || NPC[A].Type == NPCID_VEHICLE ||
                                    NPC[A].Type == NPCID_CANNONITEM || NPC[A].Type == NPCID_TOOTHYPIPE || NPC[A].Type == NPCID_ITEM_BURIED || NPC[A].Type == NPCID_ROCKET_WOOD ||
                                    NPC[A].Type == NPCID_FIRE_BOSS_FIRE || NPC[A]->IsACoin) && (!NPC[A].Generator || LevelEditor))))
         {
@@ -861,7 +861,7 @@ void ClassicNPCScreenLogic(int Z, int numScreens, bool fill_draw_queue, NPC_Draw
             can_check = true;
         }
 
-        if(NPC[A].Type == NPCID_ICE_CUBE && NPC[A].Effect == 0 && NPC[A].HoldingPlayer == 0)
+        if(NPC[A].Type == NPCID_ICE_CUBE && NPC[A].Effect == NPCEFF_NORMAL && NPC[A].HoldingPlayer == 0)
         {
             npcALoc = newLoc(NPC[A].Location.X - (NPC[A]->WidthGFX - NPC[A].Location.Width) / 2.0,
                                   NPC[A].Location.Y,
@@ -873,7 +873,7 @@ void ClassicNPCScreenLogic(int Z, int numScreens, bool fill_draw_queue, NPC_Draw
         }
 
 
-        if(NPC[A].Effect == 0)
+        if(NPC[A].Effect == NPCEFF_NORMAL)
         {
             if(!(NPC[A].HoldingPlayer > 0 || NPC[A]->IsAVine || NPC[A].Type == NPCID_BOSS_FRAGILE || NPC[A].Type == NPCID_FIRE_BOSS_FIRE ||
                  NPC[A].Type == NPCID_JUMP_PLANT || NPC[A].Type == NPCID_ROCKET_WOOD || NPC[A].Type == NPCID_LIFT_SAND || NPC[A].Type == NPCID_PLANT_S3 || NPC[A].Type == NPCID_FIRE_PLANT ||
@@ -896,12 +896,12 @@ void ClassicNPCScreenLogic(int Z, int numScreens, bool fill_draw_queue, NPC_Draw
 
 
         const Player_t& hp = Player[NPC[A].HoldingPlayer];
-        bool hp_door_scroll = (NPC[A].HoldingPlayer > 0 && hp.Effect == 7 && hp.Effect2 >= 128);
+        bool hp_door_scroll = (NPC[A].HoldingPlayer > 0 && hp.Effect == PLREFF_WARP_DOOR && hp.Effect2 >= 128);
 
         if(
             (
               (
-                (NPC[A].HoldingPlayer > 0 && hp.Effect != 3 && !hp_door_scroll) ||
+                (NPC[A].HoldingPlayer > 0 && hp.Effect != PLREFF_WARP_PIPE && !hp_door_scroll) ||
                 (NPC[A].Type == NPCID_TOOTHY && NPC[A].vehiclePlr == 0) ||
                 (NPC[A].Type == NPCID_BULLET && NPC[A].CantHurt > 0)
               ) || NPC[A].Effect == NPCEFF_PET_TONGUE
@@ -911,7 +911,7 @@ void ClassicNPCScreenLogic(int Z, int numScreens, bool fill_draw_queue, NPC_Draw
             NPC_Draw_Queue_p.add(A);
         }
 
-        if(NPC[A].Effect == 0)
+        if(NPC[A].Effect == NPCEFF_NORMAL)
         {
             if(NPC[A]->Foreground && NPC[A].HoldingPlayer == 0 && (!NPC[A].Generator || LevelEditor))
             {
@@ -1096,7 +1096,7 @@ void ModernNPCScreenLogic(Screen_t& screen, int vscreen_i, bool fill_draw_queue,
         // they are normally the same thing -- onscreen -- but we need to separate them to support multiple resolutions.
 
         bool loc2_exists;
-        if(NPC[A].Effect == 0 && NPC[A].HoldingPlayer == 0 && !NPC[A].Generator &&
+        if(NPC[A].Effect == NPCEFF_NORMAL && NPC[A].HoldingPlayer == 0 && !NPC[A].Generator &&
                 (NPC[A].vehiclePlr > 0 || NPC[A].Type == 56 || NPC[A].Type == 22
                     || NPC[A].Type == 49 || NPC[A].Type == 91 || NPC[A].Type == 160
                     || NPC[A].Type == 282 || NPC[A]->IsACoin || NPC[A].Type == 263))
@@ -1313,7 +1313,7 @@ void ModernNPCScreenLogic(Screen_t& screen, int vscreen_i, bool fill_draw_queue,
         }
 
         const Player_t& hp = Player[NPC[A].HoldingPlayer];
-        bool hp_door_scroll = (NPC[A].HoldingPlayer > 0 && hp.Effect == 7 && hp.Effect2 >= 128);
+        bool hp_door_scroll = (NPC[A].HoldingPlayer > 0 && hp.Effect == PLREFF_WARP_DOOR && hp.Effect2 >= 128);
 
         if(hp_door_scroll)
             render = false;
@@ -2169,7 +2169,7 @@ void UpdateGraphicsScreen(Screen_t& screen)
         // Player warp effects 'Players behind blocks
         for(int A = 1; A <= numPlayers; A++)
         {
-            if(!Player[A].Dead && !Player[A].Immune2 && Player[A].TimeToLive == 0 && Player[A].Effect == 3)
+            if(!Player[A].Dead && !Player[A].Immune2 && Player[A].TimeToLive == 0 && Player[A].Effect == PLREFF_WARP_PIPE)
             {
                 float Y2 = 0;
                 float X2 = 0;
@@ -2685,7 +2685,7 @@ void UpdateGraphicsScreen(Screen_t& screen)
         For(A, 1, numPlayers) // The clown car
         {
             if(!Player[A].Dead && !Player[A].Immune2 && Player[A].TimeToLive == 0 &&
-               !(Player[A].Effect == 3 || Player[A].Effect == 5) && Player[A].Mount == 2)
+               !(Player[A].Effect == PLREFF_WARP_PIPE || Player[A].Effect == PLREFF_TURN_LEAF) && Player[A].Mount == 2)
             {
                 const Player_t& p = Player[A];
 

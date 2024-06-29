@@ -341,7 +341,7 @@ void DropNPC(int A, int NPCType)
         }
         NPC[numNPCs].Location.SpeedX = 0;
         NPC[numNPCs].Location.SpeedY = 0;
-        NPC[numNPCs].Effect = 2;
+        NPC[numNPCs].Effect = NPCEFF_DROP_ITEM;
         NPC[numNPCs].Active = true;
         NPC[numNPCs].TimeLeft = 200;
         syncLayers_NPC(numNPCs);
@@ -2590,7 +2590,7 @@ void NPCSpecial(int A)
             bool pausePlatforms = false;
             for(int B = 1; B <= numPlayers; B++)
             {
-                if(!(Player[B].Effect == 0 || Player[B].Effect == 3 || Player[B].Effect == 9 || Player[B].Effect == 10))
+                if(!(Player[B].Effect == PLREFF_NORMAL || Player[B].Effect == PLREFF_WARP_PIPE || Player[B].Effect == PLREFF_NO_COLLIDE || Player[B].Effect == PLREFF_PET_INSIDE))
                     pausePlatforms = true;
             }
 
@@ -2793,7 +2793,7 @@ void NPCSpecial(int A)
 
 //            for(B = 1; B <= numPlayers; B++) // Move this code to up
 //            {
-//                if(!(Player[B].Effect == 0 || Player[B].Effect == 3 || Player[B].Effect == 9 || Player[B].Effect == 10))
+//                if(!(Player[B].Effect == PLREFF_NORMAL || Player[B].Effect == PLREFF_WARP_PIPE || Player[B].Effect == PLREFF_NO_COLLIDE || Player[B].Effect == PLREFF_PET_INSIDE))
 //                {
 //                    npc.Location.SpeedX = 0;
 //                    npc.Location.SpeedY = 0;
@@ -3228,7 +3228,7 @@ void SpecialNPC(int A)
         for(B = 1; B <= numPlayers; B++)
         {
             if(Player[B].Character == 5 && !Player[B].Dead && Player[B].TimeToLive == 0 &&
-               Player[B].Effect == 0 && Player[B].SwordPoke == 0 && !Player[B].Fairy &&
+               Player[B].Effect == PLREFF_NORMAL && Player[B].SwordPoke == 0 && !Player[B].Fairy &&
                !(NPC[A].Type == NPCID_PLR_FIREBALL && NPC[A].CantHurtPlayer == B) &&
                !(NPC[A].Type == NPCID_PLR_HEAVY && NPC[A].CantHurtPlayer == B))
             {

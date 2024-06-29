@@ -169,9 +169,9 @@ void DrawPlayer(Player_t &p, const int Z, XTColor color)
     XTColor s = (ShadowMode ? XTColor(0, 0, 0) : color);
     //auto &p = Player[A];
 
-    bool player_door_scroll = (p.Effect == 7 && p.Effect2 >= 128);
+    bool player_door_scroll = (p.Effect == PLREFF_WARP_DOOR && p.Effect2 >= 128);
 
-    if(!p.Dead && !p.Immune2 && p.TimeToLive == 0 && !(p.Effect == 3 || p.Effect == 5 || p.Effect == 8 || p.Effect == 10 || player_door_scroll))
+    if(!p.Dead && !p.Immune2 && p.TimeToLive == 0 && !(p.Effect == PLREFF_WARP_PIPE || p.Effect == PLREFF_TURN_LEAF || p.Effect == PLREFF_WAITING || p.Effect == PLREFF_PET_INSIDE || player_door_scroll))
     {
         if(vScreenCollision(Z, p.Location))
         {
@@ -311,7 +311,7 @@ void DrawPlayer(Player_t &p, const int Z, XTColor color)
             }
 
         // peach/toad held npcs
-            if((p.Character == 3 || p.Character == 4) && p.HoldingNPC > 0 && p.Effect != 7)
+            if((p.Character == 3 || p.Character == 4) && p.HoldingNPC > 0 && p.Effect != PLREFF_WARP_DOOR)
             {
                 if(NPC[p.HoldingNPC].Type != NPCID_ICE_CUBE)
                 {
@@ -320,7 +320,7 @@ void DrawPlayer(Player_t &p, const int Z, XTColor color)
                             (
                                  (
                                         NPC[p.HoldingNPC].HoldingPlayer > 0 &&
-                                        Player[NPC[p.HoldingNPC].HoldingPlayer].Effect != 3
+                                        Player[NPC[p.HoldingNPC].HoldingPlayer].Effect != PLREFF_WARP_PIPE
                                   ) ||
                                  (NPC[p.HoldingNPC].Type == NPCID_TOOTHY && NPC[p.HoldingNPC].vehiclePlr == 0) ||
                                  (NPC[p.HoldingNPC].Type == NPCID_BULLET && NPC[p.HoldingNPC].CantHurt > 0)

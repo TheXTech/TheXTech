@@ -1317,7 +1317,7 @@ static void carKeys()
 {
     for(int B = 1; B <= numPlayers; B++)
     {
-        if(Player[B].Mount == 0 && !Player[B].Dead && Player[B].TimeToLive == 0 && Player[B].Effect == 0)
+        if(Player[B].Mount == 0 && !Player[B].Dead && Player[B].TimeToLive == 0 && Player[B].Effect == PLREFF_NORMAL)
         {
             numNPCs++;
             NPC[numNPCs] = NPC_t();
@@ -1344,7 +1344,7 @@ static void boingyBoing()
 {
     for(int B = 1; B <= numPlayers; B++)
     {
-        if(Player[B].Mount == 0 && !Player[B].Dead && Player[B].TimeToLive == 0 && Player[B].Effect == 0)
+        if(Player[B].Mount == 0 && !Player[B].Dead && Player[B].TimeToLive == 0 && Player[B].Effect == PLREFF_NORMAL)
         {
             numNPCs++;
             NPC[numNPCs] = NPC_t();
@@ -1370,7 +1370,7 @@ static void bombsAway()
 {
     for(int B = 1; B <= numPlayers; B++)
     {
-        if(Player[B].Mount == 0 && !Player[B].Dead && Player[B].TimeToLive == 0 && Player[B].Effect == 0)
+        if(Player[B].Mount == 0 && !Player[B].Dead && Player[B].TimeToLive == 0 && Player[B].Effect == PLREFF_NORMAL)
         {
             numNPCs++;
             NPC[numNPCs] = NPC_t();
@@ -1399,7 +1399,7 @@ static void fireMissiles()
     for(int B = 1; B <= numPlayers; B++)
     {
         if(Player[B].Mount == 0 && !Player[B].Dead &&
-           Player[B].TimeToLive == 0 && Player[B].Effect == 0)
+           Player[B].TimeToLive == 0 && Player[B].Effect == PLREFF_NORMAL)
         {
             numNPCs++;
             NPC[numNPCs] = NPC_t();
@@ -1425,7 +1425,7 @@ static void hellFire()
 {
     for(int B = 1; B <= numPlayers; B++)
     {
-        if(Player[B].Mount == 0 && !Player[B].Dead && Player[B].TimeToLive == 0 && Player[B].Effect == 0)
+        if(Player[B].Mount == 0 && !Player[B].Dead && Player[B].TimeToLive == 0 && Player[B].Effect == PLREFF_NORMAL)
         {
             numNPCs++;
             NPC[numNPCs] = NPC_t();
@@ -1453,7 +1453,7 @@ static void upAndOut()
 {
     for(int B = 1; B <= numPlayers; B++)
     {
-        if(Player[B].Mount == 0 && !Player[B].Dead && Player[B].TimeToLive == 0 && Player[B].Effect == 0)
+        if(Player[B].Mount == 0 && !Player[B].Dead && Player[B].TimeToLive == 0 && Player[B].Effect == PLREFF_NORMAL)
         {
             numNPCs++;
             NPC[numNPCs] = NPC_t();
@@ -1481,7 +1481,7 @@ static void powHammer()
 {
     for(int B = 1; B <= numPlayers; B++)
     {
-        if(Player[B].Mount == 0 && !Player[B].Dead && Player[B].TimeToLive == 0 && Player[B].Effect == 0)
+        if(Player[B].Mount == 0 && !Player[B].Dead && Player[B].TimeToLive == 0 && Player[B].Effect == PLREFF_NORMAL)
         {
             numNPCs++;
             NPC[numNPCs] = NPC_t();
@@ -1510,7 +1510,7 @@ static void hammerInMyPants()
     for(int B = 1; B <= numPlayers; B++)
     {
         if(Player[B].Mount == 0 && !Player[B].Dead &&
-           Player[B].TimeToLive == 0 && Player[B].Effect == 0)
+           Player[B].TimeToLive == 0 && Player[B].Effect == PLREFF_NORMAL)
         {
             numNPCs++;
             NPC[numNPCs] = NPC_t();
@@ -1539,7 +1539,7 @@ static void rainbowRider()
     for(int B = 1; B <= numPlayers; B++)
     {
         if(Player[B].Mount == 0 && !Player[B].Dead &&
-           Player[B].TimeToLive == 0 && Player[B].Effect == 0)
+           Player[B].TimeToLive == 0 && Player[B].Effect == PLREFF_NORMAL)
         {
             numNPCs++;
             NPC[numNPCs] = NPC_t();
@@ -1565,7 +1565,7 @@ static void greenEgg()
 {
     for(int B = 1; B <= numPlayers; B++)
     {
-        if(Player[B].Mount == 0 && !Player[B].Dead && Player[B].TimeToLive == 0 && Player[B].Effect == 0)
+        if(Player[B].Mount == 0 && !Player[B].Dead && Player[B].TimeToLive == 0 && Player[B].Effect == PLREFF_NORMAL)
         {
             numNPCs++;
             NPC[numNPCs] = NPC_t();
@@ -1592,7 +1592,7 @@ static void blueEgg()
 {
     for(int B = 1; B <= numPlayers; B++)
     {
-        if(Player[B].Mount == 0 && !Player[B].Dead && Player[B].TimeToLive == 0 && Player[B].Effect == 0)
+        if(Player[B].Mount == 0 && !Player[B].Dead && Player[B].TimeToLive == 0 && Player[B].Effect == PLREFF_NORMAL)
         {
             numNPCs++;
             NPC[numNPCs] = NPC_t();
@@ -1620,7 +1620,7 @@ static void yellowEgg()
 {
     for(int B = 1; B <= numPlayers; B++)
     {
-        if(Player[B].Mount == 0 && !Player[B].Dead && Player[B].TimeToLive == 0 && Player[B].Effect == 0)
+        if(Player[B].Mount == 0 && !Player[B].Dead && Player[B].TimeToLive == 0 && Player[B].Effect == PLREFF_NORMAL)
         {
             numNPCs++;
             NPC[numNPCs] = NPC_t();
@@ -1648,7 +1648,7 @@ static void redEgg()
 {
     for(int B = 1; B <= numPlayers; B++)
     {
-        if(Player[B].Mount == 0 && !Player[B].Dead && Player[B].TimeToLive == 0 && Player[B].Effect == 0)
+        if(Player[B].Mount == 0 && !Player[B].Dead && Player[B].TimeToLive == 0 && Player[B].Effect == PLREFF_NORMAL)
         {
             numNPCs++;
             NPC[numNPCs] = NPC_t();
@@ -1677,7 +1677,7 @@ static void blackEgg()
     for(int B = 1; B <= numPlayers; B++)
     {
         if(Player[B].Mount == 0 && !Player[B].Dead &&
-           Player[B].TimeToLive == 0 && Player[B].Effect == 0)
+           Player[B].TimeToLive == 0 && Player[B].Effect == PLREFF_NORMAL)
         {
             numNPCs++;
             NPC[numNPCs] = NPC_t();
@@ -1705,7 +1705,7 @@ static void purpleEgg()
 {
     for(int B = 1; B <= numPlayers; B++)
     {
-        if(Player[B].Mount == 0 && !Player[B].Dead && Player[B].TimeToLive == 0 && Player[B].Effect == 0)
+        if(Player[B].Mount == 0 && !Player[B].Dead && Player[B].TimeToLive == 0 && Player[B].Effect == PLREFF_NORMAL)
         {
             numNPCs++;
             NPC[numNPCs] = NPC_t();
@@ -1733,7 +1733,7 @@ static void pinkEgg()
 {
     for(int B = 1; B <= numPlayers; B++)
     {
-        if(Player[B].Mount == 0 && !Player[B].Dead && Player[B].TimeToLive == 0 && Player[B].Effect == 0)
+        if(Player[B].Mount == 0 && !Player[B].Dead && Player[B].TimeToLive == 0 && Player[B].Effect == PLREFF_NORMAL)
         {
             numNPCs++;
             NPC[numNPCs] = NPC_t();
@@ -1761,7 +1761,7 @@ static void coldEgg()
 {
     for(int B = 1; B <= numPlayers; B++)
     {
-        if(Player[B].Mount == 0 && !Player[B].Dead && Player[B].TimeToLive == 0 && Player[B].Effect == 0)
+        if(Player[B].Mount == 0 && !Player[B].Dead && Player[B].TimeToLive == 0 && Player[B].Effect == PLREFF_NORMAL)
         {
             numNPCs++;
             NPC[numNPCs] = NPC_t();

@@ -2173,7 +2173,7 @@ void NPCHit(int A, int B, int C)
         }
         else if(B == 10 && NPC[A].Type != NPCID_POISON)
         {
-            if(C > 0 && NPC[A].Effect == 0)
+            if(C > 0 && NPC[A].Effect == NPCEFF_NORMAL)
                 TouchBonus(C, A);
         }
     }

@@ -669,7 +669,7 @@ void UpdateNPCs()
             {
                 for(int B : NPCQueues::Active.no_change)
                 {
-                    if(NPC[B].Type != NPCID_BOSS_CASE && NPC[B].Effect == 0 && NPC[B].Active)
+                    if(NPC[B].Type != NPCID_BOSS_CASE && NPC[B].Effect == NPCEFF_NORMAL && NPC[B].Active)
                     {
                         if(!NPC[B]->NoClipping)
                         {
@@ -749,7 +749,7 @@ void UpdateNPCs()
                 if(
                     (
                         !NPC[A].Projectile && NPC[A].HoldingPlayer == 0 &&
-                        NPC[A].Effect == 0 && !(NPC[A].Type == NPCID_SLIDE_BLOCK && NPC[A].Special == 1) &&
+                        NPC[A].Effect == NPCEFF_NORMAL && !(NPC[A].Type == NPCID_SLIDE_BLOCK && NPC[A].Special == 1) &&
                        !((NPC[A].Type == NPCID_FALL_BLOCK_RED || NPC[A].Type == NPCID_FALL_BLOCK_BROWN) && NPC[A].Special == 1)
                     ) || NPC[A].Type == NPCID_METALBARREL || NPC[A].Type == NPCID_HPIPE_SHORT || NPC[A].Type == NPCID_HPIPE_LONG ||
                     NPC[A].Type == NPCID_VPIPE_SHORT || NPC[A].Type == NPCID_VPIPE_LONG
@@ -1672,21 +1672,25 @@ void UpdateNPCs()
                                 NPC[A].Location.SpeedX = 0;
                         }
                     }
+#if 0
+                    // dead code because NPCDefaultMovement(NPCID_TANK_TREADS) is true
                     else if(NPC[A].Type == NPCID_TANK_TREADS)
                     {
                         NPC[A].Projectile = true;
                         NPC[A].Direction = NPC[A].DefaultDirection;
                         NPC[A].Location.SpeedX = 1 * NPC[A].DefaultDirection;
 
+                        // the conditions here are outdated
                         for(int B = 1; B <= numPlayers; B++)
                         {
-                            if(!(Player[B].Effect == 0 || Player[B].Effect == 3))
+                            if(!(Player[B].Effect == PLREFF_NORMAL || Player[B].Effect == PLREFF_WARP_PIPE))
                             {
                                 NPC[A].Location.SpeedX = 0;
                                 NPC[A].Location.SpeedY = 0;
                             }
                         }
                     }
+#endif
                     // Mushroom Movement Code
                     else if(NPC[A].Type == NPCID_POWER_S3 || NPC[A].Type == NPCID_SWAP_POWER || NPC[A].Type == NPCID_LIFE_S3 ||
                             NPC[A].Type == NPCID_POISON || NPC[A].Type == NPCID_POWER_S1 || NPC[A].Type == NPCID_POWER_S4 ||
@@ -2161,7 +2165,7 @@ void UpdateNPCs()
                     {
                         for(int B = 1; B <= numPlayers; B++)
                         {
-                            if(!(Player[B].Effect == 0 || Player[B].Effect == 3 || Player[B].Effect == 9 || Player[B].Effect == 10))
+                            if(!(Player[B].Effect == PLREFF_NORMAL || Player[B].Effect == PLREFF_WARP_PIPE || Player[B].Effect == PLREFF_NO_COLLIDE || Player[B].Effect == PLREFF_PET_INSIDE))
                             {
                                 NPC[A].Location.SpeedX = 0;
                                 break;
@@ -2198,7 +2202,7 @@ void UpdateNPCs()
                     {
                         for(int B = 1; B <= numPlayers; B++)
                         {
-                            if(!(Player[B].Effect == 0 || Player[B].Effect == 3 || Player[B].Effect == 9 || Player[B].Effect == 10))
+                            if(!(Player[B].Effect == PLREFF_NORMAL || Player[B].Effect == PLREFF_WARP_PIPE || Player[B].Effect == PLREFF_NO_COLLIDE || Player[B].Effect == PLREFF_PET_INSIDE))
                             {
                                 NPC[A].Location.SpeedX = 0;
                                 NPC[A].Location.SpeedY = 0;
@@ -3704,7 +3708,7 @@ void UpdateNPCs()
                                     if(A != C && NPC[C].Active && !NPC[C].Projectile)
                                     {
                                         if(NPC[C].Killed == 0 && NPC[C].vehiclePlr == 0 && NPC[C].HoldingPlayer == 0 &&
-                                           !NPC[C]->NoClipping && NPC[C].Effect == 0 && !NPC[C].Inert) // And Not NPCIsABlock(NPC(C).Type) Then
+                                           !NPC[C]->NoClipping && NPC[C].Effect == NPCEFF_NORMAL && !NPC[C].Inert) // And Not NPCIsABlock(NPC(C).Type) Then
                                         {
                                             Location_t tempLocation2 = preBeltLoc;
                                             tempLocation2.Width -= 4;
@@ -4094,7 +4098,7 @@ void UpdateNPCs()
                                                                                         if((NPC[A].Direction == 1  && NPC[A].Location.X + NPC[A].Location.Width < NPC[B].Location.X + 4) ||
                                                                                            (NPC[A].Direction == -1 && NPC[A].Location.X > NPC[B].Location.X + NPC[B].Location.Width - 4))
                                                                                         {
-                                                                                            if(NPC[B].Location.SpeedX == 0.0 && NPC[B].Effect == 0)
+                                                                                            if(NPC[B].Location.SpeedX == 0.0 && NPC[B].Effect == NPCEFF_NORMAL)
                                                                                             {
                                                                                                 NPC[A].Special = 10;
                                                                                                 Player[numPlayers + 1].Direction = NPC[A].Direction;
@@ -5161,8 +5165,9 @@ void UpdateNPCs()
                 }
                 else if(NPC[A].Type == NPCID_HEAVY_THROWER && NPC[A].HoldingPlayer > 0)
                 {
-                    if(Player[NPC[A].HoldingPlayer].Effect == 0)
+                    if(Player[NPC[A].HoldingPlayer].Effect == PLREFF_NORMAL)
                         NPC[A].Special3 += 1;
+
                     if(NPC[A].Special3 >= 20)
                     {
                         PlaySoundSpatial(SFX_HeavyToss, NPC[A].Location);
@@ -5193,7 +5198,7 @@ void UpdateNPCs()
                         NPC[A].Special += 1;
                         if(NPC[A].HoldingPlayer > 0)
                         {
-                            if(Player[NPC[A].HoldingPlayer].Effect == 0)
+                            if(Player[NPC[A].HoldingPlayer].Effect == PLREFF_NORMAL)
                                 NPC[A].Special += 6;
                         }
                     }
@@ -5230,13 +5235,13 @@ void UpdateNPCs()
                             {
                                 if(NPC[A].Direction != Player[NPC[A].HoldingPlayer].SpinFireDir)
                                 {
-                                    if(Player[NPC[A].HoldingPlayer].Effect == 0)
+                                    if(Player[NPC[A].HoldingPlayer].Effect == PLREFF_NORMAL)
                                         NPC[A].Special += shootStepSpin;
                                 }
                             }
                             else
                             {
-                                if(Player[NPC[A].HoldingPlayer].Effect == 0)
+                                if(Player[NPC[A].HoldingPlayer].Effect == PLREFF_NORMAL)
                                     NPC[A].Special += shootStep;
                             }
                         }
@@ -5375,7 +5380,7 @@ void UpdateNPCs()
 
                     if(NPC[A].Special > 0)
                     {
-                        if(Player[NPC[A].Special].Effect != 0)
+                        if(Player[NPC[A].Special].Effect != PLREFF_NORMAL)
                             B = 0;
                     }
 
@@ -5389,9 +5394,11 @@ void UpdateNPCs()
                 {
                     if(NPC[A].HoldingPlayer == 0 && NPC[A].vehiclePlr == 0)
                         NPC[A].Special = 0;
+
                     if(NPC[A].HoldingPlayer > 0 && NPC[A].Special2 > 0)
                         NPC[(int)NPC[A].Special2].Direction = NPC[A].Direction;
-                    if(Player[NPC[A].HoldingPlayer].Effect != 0)
+
+                    if(Player[NPC[A].HoldingPlayer].Effect != PLREFF_NORMAL)
                         NPC[A].Special = 0;
 #if 0
                     // Important: this also makes a thrown handheld plant harm NPCs, so it is a major balance change.
@@ -5658,7 +5665,7 @@ void UpdateNPCs()
                     double target_Y = pLoc.Y + pLoc.Height - 192;
 
                     // anticipate player movement
-                    if(p.Effect == 0 || p.Effect == 3 || p.Effect == 9 || p.Effect == 10)
+                    if(p.Effect == PLREFF_NORMAL || p.Effect == PLREFF_WARP_PIPE || p.Effect == PLREFF_NO_COLLIDE || p.Effect == PLREFF_PET_INSIDE)
                     {
                         target_X += pLoc.SpeedX;
                         target_Y += pLoc.SpeedY;
@@ -5849,7 +5856,7 @@ void UpdateNPCs()
 
                 NPCFrames(A);
 
-                if(NPC[A].Effect == 0 && NPC[A].Type != NPCID_ITEM_BURIED)
+                if(NPC[A].Effect == NPCEFF_NORMAL && NPC[A].Type != NPCID_ITEM_BURIED)
                 {
                     NPC[A].Layer = LAYER_SPAWNED_NPCS;
                     syncLayers_NPC(A);
@@ -6085,7 +6092,7 @@ void UpdateNPCs()
     //                        if(NPC[A].HoldingPlayer <= 1)
     //                        {
     //                            tempStr += "K" + std::to_string(A) + "|" + NPC[A].Type + "|" + NPC[A].Location.X + "|" + NPC[A].Location.Y + "|" + std::to_string(NPC[A].Location.Width) + "|" + std::to_string(NPC[A].Location.Height) + "|" + NPC[A].Location.SpeedX + "|" + NPC[A].Location.SpeedY + "|" + NPC[A].Section + "|" + NPC[A].TimeLeft + "|" + NPC[A].Direction + "|" + std::to_string(static_cast<int>(floor(static_cast<double>(NPC[A].Projectile)))) + "|" + NPC[A].Special + "|" + NPC[A].Special2 + "|" + NPC[A].Special3 + "|" + NPC[A].Special4 + "|" + NPC[A].Special5 + "|" + NPC[A].Effect + LB;
-    //                            if(NPC[A].Effect != 0)
+    //                            if(NPC[A].Effect != NPCEFF_NORMAL)
     //                                tempStr += "2c" + std::to_string(A) + "|" + NPC[A].Effect2 + "|" + NPC[A].Effect3 + LB;
     //                        }
     //                    }

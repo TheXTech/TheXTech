@@ -88,7 +88,7 @@ void ProcessSmallScreenCam(vScreen_t& vscreen)
             rateX = 2;
         }
 
-        if(GamePaused == PauseCode::None && !qScreen && p.Effect == 0)
+        if(GamePaused == PauseCode::None && !qScreen && p.Effect == PLREFF_NORMAL)
         {
             if(vscreen.small_screen_features.offset_x < lookX_target)
                 vscreen.small_screen_features.offset_x += rateX;
@@ -124,7 +124,7 @@ void ProcessSmallScreenCam(vScreen_t& vscreen)
                 vscreen.small_screen_features.offset_y *= -1;
         }
 
-        if(GamePaused == PauseCode::None && !qScreen && !ForcedControls && LevelMacro == LEVELMACRO_OFF && p.Effect == 0)
+        if(GamePaused == PauseCode::None && !qScreen && !ForcedControls && LevelMacro == LEVELMACRO_OFF && p.Effect == PLREFF_NORMAL)
         {
             if(vscreen.small_screen_features.offset_y < lookY_target)
             {

@@ -207,7 +207,7 @@ void DynamicScreen(Screen_t& screen, bool mute)
     {
         for(A = 1; A <= numPlayers; A++)
         {
-            if(Player[A].Effect == 6)
+            if(Player[A].Effect == PLREFF_RESPAWN)
                 return;
         }
     }
@@ -221,8 +221,8 @@ void DynamicScreen(Screen_t& screen, bool mute)
     Player_t& p1 = Player[screen.players[0]];
     Player_t& p2 = Player[screen.players[1]];
 
-    double p1LocY = (p1.Effect == 6) ? p1.Effect2 : p1.Location.Y;
-    double p2LocY = (p2.Effect == 6) ? p2.Effect2 : p2.Location.Y;
+    double p1LocY = (p1.Effect == PLREFF_RESPAWN) ? p1.Effect2 : p1.Location.Y;
+    double p2LocY = (p2.Effect == PLREFF_RESPAWN) ? p2.Effect2 : p2.Location.Y;
 
     if(!p1.Dead && !p2.Dead)
     {

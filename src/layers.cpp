@@ -1058,7 +1058,7 @@ void ProcEvent(eventindex_t index, int whichPlayer, bool NoEffect)
                                     double old_y = qScreenLoc[Z_i].Y;
 
                                     // (0) player should not have warped
-                                    if(plr.Effect == 9)
+                                    if(plr.Effect == PLREFF_NO_COLLIDE)
                                         use_new_resize = false;
 
                                     // (1) old bounds shouldn't be outside of the new level
@@ -1099,7 +1099,7 @@ void ProcEvent(eventindex_t index, int whichPlayer, bool NoEffect)
                                     else
                                     {
                                         // limit qScreen duration if player was warped
-                                        if(plr.Effect == 9)
+                                        if(plr.Effect == PLREFF_NO_COLLIDE)
                                         {
                                             Location_t old_section_loc = newLoc(tempLevel.X, tempLevel.Y, tempLevel.Width - tempLevel.X, tempLevel.Height - tempLevel.Y);
                                             Location_t qScreen_loc = newLoc(-qScreenLoc[Z_i].X, -qScreenLoc[Z_i].Y, qScreenLoc[Z_i].Width, qScreenLoc[Z_i].Height);
@@ -1432,7 +1432,7 @@ void UpdateEvents()
         // possibly undesirable: doesn't advance event timer at all if any players are (for example) in doors or in holding pattern
         for(B = 1; B <= numPlayers; B++)
         {
-            if(!(Player[B].Effect == 0 || Player[B].Effect == 3 || Player[B].Effect == 9 || Player[B].Effect == 10))
+            if(!(Player[B].Effect == PLREFF_NORMAL || Player[B].Effect == PLREFF_WARP_PIPE || Player[B].Effect == PLREFF_NO_COLLIDE || Player[B].Effect == PLREFF_PET_INSIDE))
                 return;
         }
     }
@@ -1531,7 +1531,7 @@ void UpdateLayers()
         // possibly undesirable: doesn't advance layer movement at all if any players are (for example) in doors or in holding pattern
         for(B = 1; B <= numPlayers; B++)
         {
-            if(!(Player[B].Effect == 0 || Player[B].Effect == 3 || Player[B].Effect == 9 || Player[B].Effect == 10))
+            if(!(Player[B].Effect == PLREFF_NORMAL || Player[B].Effect == PLREFF_WARP_PIPE || Player[B].Effect == PLREFF_NO_COLLIDE || Player[B].Effect == PLREFF_PET_INSIDE))
             {
                 // moved this code into the loop over layers instead of repeating it per player
                 // it has also been combined with the FreezeNPCs code since they did the same thing
