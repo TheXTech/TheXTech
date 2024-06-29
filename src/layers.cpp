@@ -881,7 +881,7 @@ void ProcEvent(eventindex_t index, int whichPlayer, bool NoEffect)
                                                             Player[C].Section = B;
                                                             Player[C].Location.X = Player[D].Location.X + Player[D].Location.Width / 2.0 - Player[C].Location.Width / 2.0;
                                                             Player[C].Location.Y = Player[D].Location.Y + Player[D].Location.Height - Player[C].Location.Height;
-                                                            Player[C].Effect = 9;
+                                                            Player[C].Effect = PLREFF_NO_COLLIDE;
                                                             Player[C].Effect2 = D;
                                                             break;
                                                         }
@@ -1694,7 +1694,7 @@ void UpdateLayers()
                         NPC[B].DefaultLocation.X += double(Layer[A].SpeedX);
                         NPC[B].DefaultLocation.Y += double(Layer[A].SpeedY);
 
-                        if(!NPC[B].Active || NPC[B].Generator || NPC[B].Effect != 0 ||
+                        if(!NPC[B].Active || NPC[B].Generator || NPC[B].Effect != NPCEFF_NORMAL ||
                            NPC[B]->IsACoin || NPC[B].Type == NPCID_PLANT_S3 || NPC[B].Type == NPCID_STONE_S3 ||
                            NPC[B].Type == NPCID_BOTTOM_PLANT || NPC[B].Type == NPCID_SIDE_PLANT || NPC[B].Type == NPCID_FALL_BLOCK_RED ||
                            NPC[B].Type == NPCID_PLANT_S1 || NPC[B].Type == NPCID_BIG_PLANT || NPC[B]->IsAVine ||

@@ -203,7 +203,7 @@ static void s_MovePlayersToExit(int got_exit_A)
         p_C.Location.X = p_A.Location.X + p_A.Location.Width / 2.0 - p_C.Location.Width / 2.0;
         p_C.Location.SpeedX = 0;
         p_C.Location.SpeedY = 0;
-        p_C.Effect = 8;
+        p_C.Effect = PLREFF_WAITING;
         p_C.Effect2 = -got_exit_A;
     }
 }
@@ -307,7 +307,7 @@ void TouchBonus(int A, int B)
         if(!Player[A].Fairy)
         {
             Player[A].Immune = 30;
-            Player[A].Effect = 8;
+            Player[A].Effect = PLREFF_WAITING;
             Player[A].Effect2 = 4;
             Player[A].Fairy = true;
             SizeCheck(Player[A]);
@@ -379,7 +379,7 @@ void TouchBonus(int A, int B)
 
             Player[A].StateNPC = NPC[B].Type;
             Player[A].Frame = 1;
-            Player[A].Effect = 1;
+            Player[A].Effect = PLREFF_TURN_BIG;
 
             if(Player[A].Mount > 0)
                 UnDuck(Player[A]);
@@ -391,7 +391,7 @@ void TouchBonus(int A, int B)
         else
             PlaySoundSpatial(SFX_GotItem, NPC[B].Location);
 
-        if(NPC[B].Effect != 2)
+        if(NPC[B].Effect != NPCEFF_DROP_ITEM)
             s_PowerupScore(B);
     }
     else if(NPC[B].Type == NPCID_FIRE_POWER_S3 || NPC[B].Type == NPCID_FIRE_POWER_S1 || NPC[B].Type == NPCID_FIRE_POWER_S4) // Bonus is a fire flower
@@ -403,7 +403,7 @@ void TouchBonus(int A, int B)
         {
             RumbleForPowerup(A);
             Player[A].Frame = 1;
-            Player[A].Effect = 4;
+            Player[A].Effect = PLREFF_TURN_FIRE;
             if(Player[A].Mount > 0)
                 UnDuck(Player[A]);
 
@@ -412,7 +412,7 @@ void TouchBonus(int A, int B)
         else
             PlaySoundSpatial(sfx_extra_item, NPC[B].Location);
 
-        if(NPC[B].Effect != 2)
+        if(NPC[B].Effect != NPCEFF_DROP_ITEM)
             s_PowerupScore(B);
     }
     else if(NPC[B].Type == NPCID_ICE_POWER_S3 || NPC[B].Type == NPCID_ICE_POWER_S4) // Bonus is an ice flower
@@ -424,7 +424,7 @@ void TouchBonus(int A, int B)
         {
             RumbleForPowerup(A);
             Player[A].Frame = 1;
-            Player[A].Effect = 41;
+            Player[A].Effect = PLREFF_TURN_ICE;
             if(Player[A].Mount > 0)
                 UnDuck(Player[A]);
 
@@ -433,7 +433,7 @@ void TouchBonus(int A, int B)
         else
             PlaySoundSpatial(sfx_extra_item, NPC[B].Location);
 
-        if(NPC[B].Effect != 2)
+        if(NPC[B].Effect != NPCEFF_DROP_ITEM)
             s_PowerupScore(B);
     }
     else if(NPC[B].Type == NPCID_LEAF_POWER) // Bonus is a leaf
@@ -445,7 +445,7 @@ void TouchBonus(int A, int B)
         {
             RumbleForPowerup(A);
             Player[A].Frame = 1;
-            Player[A].Effect = 5;
+            Player[A].Effect = PLREFF_TURN_LEAF;
             Player[A].Effect2 = 0;
             if(Player[A].Mount > 0)
                 UnDuck(Player[A]);
@@ -455,7 +455,7 @@ void TouchBonus(int A, int B)
         else
             PlaySoundSpatial(sfx_extra_item, NPC[B].Location);
 
-        if(NPC[B].Effect != 2)
+        if(NPC[B].Effect != NPCEFF_DROP_ITEM)
             s_PowerupScore(B);
     }
     else if(NPC[B].Type == NPCID_STATUE_POWER) // Bonus is a Tanooki Suit
@@ -467,7 +467,7 @@ void TouchBonus(int A, int B)
         {
             RumbleForPowerup(A);
             Player[A].Frame = 1;
-            Player[A].Effect = 11;
+            Player[A].Effect = PLREFF_TURN_STATUE;
             Player[A].Effect2 = 0;
             if(Player[A].Mount > 0)
                 UnDuck(Player[A]);
@@ -477,7 +477,7 @@ void TouchBonus(int A, int B)
         else
             PlaySoundSpatial(sfx_extra_item, NPC[B].Location);
 
-        if(NPC[B].Effect != 2)
+        if(NPC[B].Effect != NPCEFF_DROP_ITEM)
             s_PowerupScore(B);
     }
     else if(NPC[B].Type == NPCID_HEAVY_POWER) // Bonus is a Hammer Suit
@@ -489,7 +489,7 @@ void TouchBonus(int A, int B)
         {
             RumbleForPowerup(A);
             Player[A].Frame = 1;
-            Player[A].Effect = 12;
+            Player[A].Effect = PLREFF_TURN_HEAVY;
             Player[A].Effect2 = 0;
             if(Player[A].Mount > 0)
                 UnDuck(Player[A]);
@@ -499,7 +499,7 @@ void TouchBonus(int A, int B)
         else
             PlaySoundSpatial(sfx_extra_item, NPC[B].Location);
 
-        if(NPC[B].Effect != 2)
+        if(NPC[B].Effect != NPCEFF_DROP_ITEM)
             s_PowerupScore(B);
     }
     else if(NPC[B]->IsACoin) // Bonus is a coin

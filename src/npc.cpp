@@ -3034,7 +3034,7 @@ void NPCSpecial(int A)
                                 Player[j].Location.X = p.Location.X + p.Location.Width / 2.0 - p.Location.Width / 2.0;
                                 Player[j].Location.SpeedX = 0;
                                 Player[j].Location.SpeedY = 0;
-                                Player[j].Effect = 8;
+                                Player[j].Effect = PLREFF_WAITING;
                                 Player[j].Effect2 = -i;
                             }
 

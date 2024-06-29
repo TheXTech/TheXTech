@@ -257,7 +257,7 @@ static void updateIntroLevelActivity()
             p.Bumped2 = 0;
             p.Direction = 1;
             p.Dismount = 0;
-            p.Effect = 0;
+            p.Effect = PLREFF_NORMAL;
             p.Effect2 = 0;
             p.FireBallCD = 0;
             p.ForceHold = 0;

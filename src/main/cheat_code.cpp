@@ -244,7 +244,7 @@ static void fairyMagic()
         {
             PlaySound(SFX_HeroFairy);
             Player[B].Immune = 10;
-            Player[B].Effect = 8;
+            Player[B].Effect = PLREFF_WAITING;
             Player[B].Effect2 = 4;
             Player[B].Fairy = false;
             Player[B].FairyTime = 0;
@@ -258,7 +258,7 @@ static void fairyMagic()
         {
             PlaySound(SFX_HeroFairy);
             Player[B].Immune = 10;
-            Player[B].Effect = 8;
+            Player[B].Effect = PLREFF_WAITING;
             Player[B].Effect2 = 4;
             Player[B].Fairy = true;
             Player[B].FairyTime = -1;
@@ -476,7 +476,7 @@ static void needATanookiSuit()
         {
             PlaySound(SFX_Transform);
             Player[B].Immune = 30;
-            Player[B].Effect = 8;
+            Player[B].Effect = PLREFF_WAITING;
             Player[B].Effect2 = 4;
             Player[B].State = 5;
             SizeCheck(Player[B]);
@@ -502,7 +502,7 @@ static void needAHammerSuit()
         {
             PlaySound(SFX_Transform);
             Player[B].Immune = 30;
-            Player[B].Effect = 8;
+            Player[B].Effect = PLREFF_WAITING;
             Player[B].Effect2 = 4;
             Player[B].State = 6;
             SizeCheck(Player[B]);
@@ -528,7 +528,7 @@ static void needAMushroom()
         {
             PlaySound(SFX_Transform);
             Player[B].Immune = 30;
-            Player[B].Effect = 8;
+            Player[B].Effect = PLREFF_WAITING;
             Player[B].Effect2 = 4;
             Player[B].State = 2;
             SizeCheck(Player[B]);
@@ -554,7 +554,7 @@ static void needAFlower()
         {
             PlaySound(SFX_Transform);
             Player[B].Immune = 30;
-            Player[B].Effect = 8;
+            Player[B].Effect = PLREFF_WAITING;
             Player[B].Effect2 = 4;
             Player[B].State = 3;
             SizeCheck(Player[B]);
@@ -580,7 +580,7 @@ static void needAnIceFlower()
         {
             PlaySound(SFX_Transform);
             Player[B].Immune = 30;
-            Player[B].Effect = 8;
+            Player[B].Effect = PLREFF_WAITING;
             Player[B].Effect2 = 4;
             Player[B].State = 7;
             SizeCheck(Player[B]);
@@ -605,7 +605,7 @@ static void needALeaf()
         {
             PlaySound(SFX_Transform);
             Player[B].Immune = 30;
-            Player[B].Effect = 8;
+            Player[B].Effect = PLREFF_WAITING;
             Player[B].Effect2 = 4;
             Player[B].State = 4;
             SizeCheck(Player[B]);
@@ -865,8 +865,8 @@ static void superbDemo200()
 
         SetupScreens();
 
-        if(Player[B].Effect == 9)
-            Player[B].Effect = 0;
+        if(Player[B].Effect == PLREFF_NO_COLLIDE)
+            Player[B].Effect = PLREFF_NORMAL;
         Player[B].Immune = 1;
 
         for(int C = 1; C <= numPlayers; C++)
@@ -892,8 +892,8 @@ static void superbDemo128()
 
         SetupScreens();
 
-        if(Player[B].Effect == 9)
-            Player[B].Effect = 0;
+        if(Player[B].Effect == PLREFF_NO_COLLIDE)
+            Player[B].Effect = PLREFF_NORMAL;
         Player[B].Immune = 1;
 
         for(int C = 1; C <= numPlayers; C++)
@@ -919,8 +919,8 @@ static void superbDemo64()
 
         SetupScreens();
 
-        if(Player[B].Effect == 9)
-            Player[B].Effect = 0;
+        if(Player[B].Effect == PLREFF_NO_COLLIDE)
+            Player[B].Effect = PLREFF_NORMAL;
         Player[B].Immune = 1;
 
         for(int C = 1; C <= numPlayers; C++)
@@ -946,8 +946,8 @@ static void superbDemo32()
 
         SetupScreens();
 
-        if(Player[B].Effect == 9)
-            Player[B].Effect = 0;
+        if(Player[B].Effect == PLREFF_NO_COLLIDE)
+            Player[B].Effect = PLREFF_NORMAL;
 
         Player[B].Immune = 1;
 
@@ -974,8 +974,8 @@ static void superbDemo16()
 
         SetupScreens();
 
-        if(Player[B].Effect == 9)
-            Player[B].Effect = 0;
+        if(Player[B].Effect == PLREFF_NO_COLLIDE)
+            Player[B].Effect = PLREFF_NORMAL;
 
         Player[B].Immune = 1;
 
@@ -1002,8 +1002,8 @@ static void superbDemo8()
 
         SetupScreens();
 
-        if(Player[B].Effect == 9)
-            Player[B].Effect = 0;
+        if(Player[B].Effect == PLREFF_NO_COLLIDE)
+            Player[B].Effect = PLREFF_NORMAL;
 
         Player[B].Immune = 1;
 
@@ -1030,8 +1030,8 @@ static void superbDemo4()
 
         SetupScreens();
 
-        if(Player[B].Effect == 9)
-            Player[B].Effect = 0;
+        if(Player[B].Effect == PLREFF_NO_COLLIDE)
+            Player[B].Effect = PLREFF_NORMAL;
 
         Player[B].Immune = 1;
 
@@ -1058,8 +1058,8 @@ static void superbDemo2()
         numPlayers = 2;
         SingleCoop = 1;
         SetupScreens();
-        if(Player[B].Effect == 9)
-            Player[B].Effect = 0;
+        if(Player[B].Effect == PLREFF_NO_COLLIDE)
+            Player[B].Effect = PLREFF_NORMAL;
         Player[B].Immune = 1;
 
         for(int C = 1; C <= numPlayers; C++)
@@ -1131,8 +1131,8 @@ static void onePlayer()
         SingleCoop = 1;
         g_ClonedPlayerMode = false;
         SetupScreens();
-        if(Player[B].Effect == 9)
-            Player[B].Effect = 0;
+        if(Player[B].Effect == PLREFF_NO_COLLIDE)
+            Player[B].Effect = PLREFF_NORMAL;
 
         // move the living player into slot 1
         int C = 1;
@@ -1176,8 +1176,8 @@ static void twoPlayer()
         g_ClonedPlayerMode = false;
         SetupScreens();
 
-        if(Player[B].Effect == 9)
-            Player[B].Effect = 0;
+        if(Player[B].Effect == PLREFF_NO_COLLIDE)
+            Player[B].Effect = PLREFF_NORMAL;
 
         Player[B].Immune = 1;
         for(int C = 1; C <= numPlayers; C++)
@@ -1226,8 +1226,8 @@ static void fourPlayer()
         SingleCoop = 0;
         g_ClonedPlayerMode = false;
 
-        if(Player[B].Effect == 9)
-            Player[B].Effect = 0;
+        if(Player[B].Effect == PLREFF_NO_COLLIDE)
+            Player[B].Effect = PLREFF_NORMAL;
 
         Player[B].Immune = 1;
         for(int C = 1; C <= numPlayers; C++)

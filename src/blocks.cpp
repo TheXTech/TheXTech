@@ -1370,7 +1370,7 @@ void UpdateBlocks()
 
             for(int B : treeNPCQuery(query_loc, SORTMODE_ID))
             {
-                if(NPC[B].Active && NPC[B].Killed == 0 && NPC[B].Effect == 0 && NPC[B].HoldingPlayer == 0 && (!NPC[B]->NoClipping || NPC[B]->IsACoin))
+                if(NPC[B].Active && NPC[B].Killed == 0 && NPC[B].Effect == NPCEFF_NORMAL && NPC[B].HoldingPlayer == 0 && (!NPC[B]->NoClipping || NPC[B]->IsACoin))
                 {
                     if(ib.ShakeOffset <= 0 || NPC[B]->IsACoin)
                     {
@@ -1392,7 +1392,7 @@ void UpdateBlocks()
             {
                 if(!Player[B].Dead)
                 {
-                    if(Player[B].Effect == 0 && ib.Type != 55)
+                    if(Player[B].Effect == PLREFF_NORMAL && ib.Type != 55)
                     {
                         if(ShakeCollision(Player[B].Location, ib))
                         {
