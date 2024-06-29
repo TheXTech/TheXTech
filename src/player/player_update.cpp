@@ -26,6 +26,7 @@
 #include "../globals.h"
 #include "../config.h"
 #include "../player.h"
+#include "player/player_effect.h"
 #include "../collision.h"
 #include "../sound.h"
 #include "../blocks.h"
@@ -126,7 +127,7 @@ void UpdatePlayer()
 //                Netplay::sendData "1p" + std::to_string(A) + LB;
 //            }
 //        }
-//        else if(Player[A].Effect != 0)
+//        else if(Player[A].Effect != PLREFF_NORMAL)
 //        {
 //            if(nPlay.PlayerWaitCount >= 10)
 //            {
@@ -424,7 +425,7 @@ void UpdatePlayer()
                 Player[A].SlideCounter -= 1;
 
             // for the purple yoshi ground pound
-            if(Player[A].Effect == 0)
+            if(Player[A].Effect == PLREFF_NORMAL)
             {
                 // for the pound pet mount logic
                 if(Player[A].Location.SpeedY != 0 && Player[A].StandingOnNPC == 0 && Player[A].Slope == 0)
@@ -1148,7 +1149,7 @@ void UpdatePlayer()
                 {
                     PlaySoundSpatial(SFX_HeroFairy, Player[A].Location);
                     Player[A].Immune = 10;
-                    Player[A].Effect = 8;
+                    Player[A].Effect = PLREFF_WAITING;
                     Player[A].Effect2 = 4;
                     Player[A].Fairy = false;
                     SizeCheck(Player[A]);
@@ -1990,13 +1991,13 @@ void UpdatePlayer()
                                 SizeCheck(Player[A]);
                                 PlaySoundSpatial(SFX_HeroFairy, Player[A].Location);
                                 Player[A].Immune = 10;
-                                Player[A].Effect = 8;
+                                Player[A].Effect = PLREFF_WAITING;
                                 Player[A].Effect2 = 4;
                                 NewEffect(EFFID_SMOKE_S5, Player[A].Location);
                             }
                         }
 
-                        if(Player[A].Controls.Run && Player[A].RunRelease && (Player[A].FairyTime > 0 || Player[A].Effect == 8))
+                        if(Player[A].Controls.Run && Player[A].RunRelease && (Player[A].FairyTime > 0 || Player[A].Effect == PLREFF_WAITING))
                         {
                             Player[A].FairyTime = 0;
                             Player[A].Controls.Run = false;
@@ -2315,7 +2316,7 @@ void UpdatePlayer()
                             if(!onscreen_pet)
                             {
                                 RemoveFromPet(o_A);
-                                o_p.Effect = 6;
+                                o_p.Effect = PLREFF_RESPAWN;
                                 o_p.Effect2 = o_p.Location.Y;
                             }
                         }
@@ -2476,7 +2477,7 @@ void UpdatePlayer()
                     }
                 }
 
-                if(Player[A].Effect == 0 && Player[A].Pinched.Strict > 0)
+                if(Player[A].Effect == PLREFF_NORMAL && Player[A].Pinched.Strict > 0)
                     Player[A].Pinched.Strict -= 1;
 
                 if(Player[A].Character == 5 && Player[A].Duck && (Player[A].Location.SpeedY == Physics.PlayerGravity || Player[A].StandingOnNPC != 0 || Player[A].Slope != 0))
@@ -3570,7 +3571,7 @@ void UpdatePlayer()
                                             SizeCheck(Player[A]);
                                             PlaySoundSpatial(SFX_HeroFairy, Player[A].Location);
                                             Player[A].Immune = 10;
-                                            Player[A].Effect = 8;
+                                            Player[A].Effect = PLREFF_WAITING;
                                             Player[A].Effect2 = 4;
                                             NewEffect(EFFID_SMOKE_S5, Player[A].Location);
                                         }
@@ -3952,7 +3953,7 @@ void UpdatePlayer()
                                                     SizeCheck(Player[A]);
                                                     PlaySoundSpatial(SFX_HeroFairy, Player[A].Location);
                                                     Player[A].Immune = 10;
-                                                    Player[A].Effect = 8;
+                                                    Player[A].Effect = PLREFF_WAITING;
                                                     Player[A].Effect2 = 4;
                                                     NewEffect(EFFID_SMOKE_S5, Player[A].Location);
                                                 }
@@ -4011,7 +4012,7 @@ void UpdatePlayer()
                                             NPC[B].Killed = 9;
                                             NPCQueues::Killed.push_back(B);
                                             PlaySoundSpatial(SFX_Door, Player[A].Location);
-                                            Player[A].Effect = 7;
+                                            Player[A].Effect = PLREFF_WARP_DOOR;
                                             Player[A].Warp = numWarps + 1;
                                             Player[A].WarpBackward = false;
                                             Warp[numWarps + 1].Entrance = static_cast<SpeedlessLocation_t>(NPC[B].Location);
@@ -4395,7 +4396,7 @@ void UpdatePlayer()
                                                     if(HitSpot == 5 && Player[A].Location.Y + Player[A].Location.Height - Physics.PlayerDuckHeight[Player[A].Character][Player[A].State] - Player[A].Location.SpeedY >= NPC[B].Location.Y + NPC[B].Location.Height)
                                                         HitSpot = 3;
                                                 }
-                                                
+
                                                 if(HitSpot == 3)
                                                 {
                                                     if(NPC[B].Type == NPCID_ICE_CUBE && Player[A].Character != 5 && Player[A].State > 1)
