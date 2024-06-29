@@ -938,7 +938,7 @@ void ProcEvent(eventindex_t index, int whichPlayer, bool NoEffect)
                                 SoundPause[13] = 10;
 
                                 // need two cycles to fully update the dynamic screens in the new level
-                                SetupScreens(false);
+                                SetupScreens(screen, false);
                                 DynamicScreen(screen);
                                 CenterScreens(screen);
 
@@ -951,7 +951,7 @@ void ProcEvent(eventindex_t index, int whichPlayer, bool NoEffect)
                                     GetvScreenAverage(vScreen[Z1]);
 
                                 // set up the dynamic screens in the new level
-                                SetupScreens(false);
+                                SetupScreens(screen, false);
                                 DynamicScreen(screen);
 
                                 // set the positions (including screen positions) in the old level, but with the NEW dynamic splits
@@ -1039,7 +1039,7 @@ void ProcEvent(eventindex_t index, int whichPlayer, bool NoEffect)
                                 }
 
                                 // now, update the screen positions here before proceeding
-                                SetupScreens(false);
+                                SetupScreens(screen, false);
                                 CenterScreens(screen);
 
                                 for(int i = screen.active_begin(); i < screen.active_end(); i++)
@@ -1076,7 +1076,7 @@ void ProcEvent(eventindex_t index, int whichPlayer, bool NoEffect)
                                         use_new_resize = false;
 
                                     // (3) qScreen should not have occurred in old game
-                                    if(int(s.position.X) != EventSection_t::LESet_ResetDefault)
+                                    if(use_new_resize && int(s.position.X) != EventSection_t::LESet_ResetDefault)
                                     {
                                         double cx, cy, old_cx, old_cy;
 
