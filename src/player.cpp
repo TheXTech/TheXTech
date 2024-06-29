@@ -2860,7 +2860,7 @@ void TailSwipe(const int plr, bool boo, bool Stab, int StabDir)
         if(A > numNPCsMax5)
             continue;
 
-        if(NPC[A].Active && NPC[A].Effect == 0 && !(NPCIsAnExit(NPC[A]) || (NPC[A]->IsACoin && !Stab)) &&
+        if(NPC[A].Active && NPC[A].Effect == NPCEFF_NORMAL && !(NPCIsAnExit(NPC[A]) || (NPC[A]->IsACoin && !Stab)) &&
             NPC[A].CantHurtPlayer != plr && !(p.StandingOnNPC == A && p.ShellSurf))
         {
             if(NPC[A].Type != NPCID_PLR_FIREBALL && NPC[A].Type != NPCID_PLR_ICEBALL && !(NPC[A].Type == NPCID_BULLET && NPC[A].Projectile) &&
@@ -3024,7 +3024,7 @@ void YoshiEat(const int A)
         if(((n->IsACoin && n.Special == 1) || !n->NoYoshi) &&
            n.Active && ((!n->IsACoin || n.Special == 1) || n.Type == 103) &&
            !NPCIsAnExit(n) && !n.Generator && !n.Inert && !NPCIsYoshi(n) &&
-            n.Effect != 5 && n.Immune == 0 && n.Type != NPCID_ITEM_BURIED &&
+            n.Effect != NPCEFF_PET_TONGUE && n.Immune == 0 && n.Type != NPCID_ITEM_BURIED &&
             !(n.Projectile && n.Type == NPCID_BULLET) && n.HoldingPlayer == 0)
         {
             tempLocation = n.Location;
@@ -3296,7 +3296,7 @@ void YoshiPound(const int A, int mount, bool BreakBlocks)
 
         for(int B : NPCQueues::Active.may_erase)
         {
-            if(!NPC[B].Hidden && NPC[B].Active && NPC[B].Effect == 0)
+            if(!NPC[B].Hidden && NPC[B].Active && NPC[B].Effect == NPCEFF_NORMAL)
             {
                 tempLocation2 = NPC[B].Location;
                 tempLocation2.Y += tempLocation2.Height - 4;

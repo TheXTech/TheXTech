@@ -3642,7 +3642,7 @@ void UpdatePlayer()
 
                 for(int B : treeNPCQuery(Player[A].Location, SORTMODE_ID))
                 {
-                    if(NPC[B].Active && NPC[B].Killed == 0 && NPC[B].Effect != 5 && NPC[B].Effect != 6)
+                    if(NPC[B].Active && NPC[B].Killed == 0 && NPC[B].Effect != NPCEFF_PET_TONGUE && NPC[B].Effect != NPCEFF_PET_INSIDE)
                     {
                         // If Not (NPC(B).Type = 17 And NPC(B).CantHurt > 0) And Not (.Mount = 2 And NPC(B).Type = 56) And Not NPC(B).vehiclePlr = A And Not NPC(B).Type = 197 And Not NPC(B).Type = 237 Then
                         if(!(Player[A].Mount == 2 && NPC[B].Type == NPCID_VEHICLE) &&
@@ -4260,7 +4260,7 @@ void UpdatePlayer()
 */
                                         // grab code
                                         if(
-                                            ((Player[A].CanGrabNPCs || NPC[B]->IsGrabbable || (NPC[B].Effect == 2 && !NPC[B]->IsABonus)) && (NPC[B].Effect == 0 || NPC[B].Effect == 2)) ||
+                                            ((Player[A].CanGrabNPCs || NPC[B]->IsGrabbable || (NPC[B].Effect == NPCEFF_DROP_ITEM && !NPC[B]->IsABonus)) && (NPC[B].Effect == NPCEFF_NORMAL || NPC[B].Effect == NPCEFF_DROP_ITEM)) ||
                                              (NPC[B]->IsAShell && FreezeNPCs)
                                         ) // GRAB EVERYTHING
                                         {
@@ -4268,7 +4268,7 @@ void UpdatePlayer()
                                             {
                                                 if((HitSpot == 2 && Player[A].Direction == -1) ||
                                                    (HitSpot == 4 && Player[A].Direction == 1) ||
-                                                   (NPC[B].Type == NPCID_CANNONITEM || NPC[B].Type == NPCID_TOOTHYPIPE || NPC[B].Effect == 2 || (NPCIsVeggie(NPC[B]) && NPC[B].CantHurtPlayer != A)))
+                                                   (NPC[B].Type == NPCID_CANNONITEM || NPC[B].Type == NPCID_TOOTHYPIPE || NPC[B].Effect == NPCEFF_DROP_ITEM || (NPCIsVeggie(NPC[B]) && NPC[B].CantHurtPlayer != A)))
                                                 {
                                                     if(Player[A].HoldingNPC == 0)
                                                     {
@@ -4364,10 +4364,11 @@ void UpdatePlayer()
                                                         NPCHit(B, 3, B);
                                                     else
                                                     {
-                                                        if(NPC[B].Effect != 2)
+                                                        if(NPC[B].Effect != NPCEFF_DROP_ITEM)
                                                         {
                                                             if(Player[A].SlideKill && !NPC[B]->JumpHurt)
                                                                 NPCHit(B, 3, B);
+
                                                             if(NPC[B].Killed == 0)
                                                             {
                                                                 if(n00bCollision(Player[A].Location, NPC[B].Location))
@@ -4387,7 +4388,7 @@ void UpdatePlayer()
                                             // this is for NPC that physically push the player
                                             if(NPC[B]->MovesPlayer && NPC[B].Projectile == 0 && Player[A].HoldingNPC != B &&
                                                !(Player[A].Mount == 2 && (NPC[B].Type == NPCID_KEY || NPC[B].Type == NPCID_COIN_SWITCH)) &&
-                                               !ShadowMode && NPC[B].Effect != 2)
+                                               !ShadowMode && NPC[B].Effect != NPCEFF_DROP_ITEM)
                                             {
                                                 if(Player[A].StandUp && Player[A].StandingOnNPC == 0)
                                                 {
@@ -4674,8 +4675,9 @@ void UpdatePlayer()
                 else if(NPC[tempBlockHit[2]].Type >= 60 && NPC[tempBlockHit[2]].Type <= 66)
                     B = tempBlockHit[2];
 
-                if(NPC[B].Effect == 2)
+                if(NPC[B].Effect == NPCEFF_DROP_ITEM)
                     B = 0;
+
                 if(NPC[B].Projectile != 0 && NPCIsVeggie(NPC[B]))
                     B = 0;
 
