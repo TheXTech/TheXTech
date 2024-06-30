@@ -32,4 +32,6 @@ void PlayerVineLogic(int A);
 
 void PlayerSharedScreenLogic(int A);
 
+void PlayerLevelWrapLogic(int A);
+
 #endif // PLAYER_UPDATE_PRIV_H
