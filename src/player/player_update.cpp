@@ -639,28 +639,7 @@ void UpdatePlayer()
                     Player[A].Location.SpeedX = 0;
                 }
                 else if(Player[A].Fairy) // if a fairy
-                {
-                    if(Player[A].Controls.Right)
-                    {
-                        if(Player[A].Location.SpeedX < 3)
-                            Player[A].Location.SpeedX += 0.15;
-                        if(Player[A].Location.SpeedX < 0)
-                            Player[A].Location.SpeedX += 0.1;
-                    }
-                    else if(Player[A].Controls.Left)
-                    {
-                        if(Player[A].Location.SpeedX > -3)
-                            Player[A].Location.SpeedX -= 0.15;
-                        if(Player[A].Location.SpeedX > 0)
-                            Player[A].Location.SpeedX -= 0.1;
-                    }
-                    else if(Player[A].Location.SpeedX > 0.1)
-                        Player[A].Location.SpeedX -= 0.1;
-                    else if(Player[A].Location.SpeedX < -0.1)
-                        Player[A].Location.SpeedX += 0.1;
-                    else
-                        Player[A].Location.SpeedX = 0;
-                }
+                    PlayerFairyMovementX(A);
                 // if the player is climbing a vine
                 else if(Player[A].Vine > 0)
                 {
@@ -1102,57 +1081,7 @@ void UpdatePlayer()
                     Player[A].Location.Y += Block[Player[A].Slope].Location.SpeedY;
 
                 if(Player[A].Fairy) // the player is a fairy
-                {
-                    Player[A].WetFrame = false;
-                    Player[A].Wet = 0;
-                    if(Player[A].FairyCD == 0)
-                    {
-                        if(Player[A].Controls.Jump || Player[A].Controls.AltJump || Player[A].Controls.Up)
-                        {
-                            Player[A].Location.SpeedY -= 0.15;
-                            if(Player[A].Location.SpeedY > 0)
-                                Player[A].Location.SpeedY -= 0.1;
-                        }
-                        else if(Player[A].Location.SpeedY < -0.1 || Player[A].Controls.Down)
-                        {
-                            if(Player[A].Location.SpeedY < 3)
-                                Player[A].Location.SpeedY += double(Physics.PlayerGravity * 0.05f);
-                            if(Player[A].Location.SpeedY < 0)
-                                Player[A].Location.SpeedY += double(Physics.PlayerGravity * 0.05f);
-                            Player[A].Location.SpeedY += double(Physics.PlayerGravity * 0.1f);
-                            if(Player[A].Controls.Down)
-                                Player[A].Location.SpeedY += 0.05;
-                        }
-                        else if(Player[A].Location.SpeedY > 0.1)
-                            Player[A].Location.SpeedY -= 0.15;
-                        else
-                            Player[A].Location.SpeedY = 0;
-                    }
-                    else
-                    {
-                        if(Player[A].Controls.Jump || Player[A].Controls.AltJump || Player[A].Controls.Up)
-                        {
-                            Player[A].Location.SpeedY -= 0.15;
-                            if(Player[A].Location.SpeedY > 0)
-                                Player[A].Location.SpeedY -= 0.1;
-                        }
-                        else
-                        {
-                            if(Player[A].Location.SpeedY < 3)
-                                Player[A].Location.SpeedY += Physics.PlayerGravity * 0.05;
-                            if(Player[A].Location.SpeedY < 0)
-                                Player[A].Location.SpeedY += Physics.PlayerGravity * 0.05;
-                            Player[A].Location.SpeedY += Physics.PlayerGravity * 0.1;
-                            if(Player[A].Controls.Down)
-                                Player[A].Location.SpeedY += 0.05;
-                        }
-                    }
-
-                    if(Player[A].Location.SpeedY > 4)
-                        Player[A].Location.SpeedY = 4;
-                    else if(Player[A].Location.SpeedY < -3)
-                        Player[A].Location.SpeedY = -3;
-                }
+                    PlayerFairyMovementY(A);
                 else if(Player[A].Wet > 0 && Player[A].Quicksand == 0) // the player is swimming
                 {
                     if(Player[A].Mount == 1)
