@@ -424,66 +424,10 @@ void UpdatePlayer()
             if(Player[A].SlideCounter > 0) // for making the slide Effect
                 Player[A].SlideCounter -= 1;
 
-            // for the purple yoshi ground pound
             if(Player[A].Effect == PLREFF_NORMAL)
             {
                 // for the pound pet mount logic
-                if(Player[A].Location.SpeedY != 0 && Player[A].StandingOnNPC == 0 && Player[A].Slope == 0)
-                {
-                    if(Player[A].Mount == 3 && Player[A].MountType == 6) // Purple Yoshi Pound
-                    {
-                        bool groundPoundByAltRun = !ForcedControls && g_config.pound_by_alt_run;
-                        bool poundKeyPressed = groundPoundByAltRun ? Player[A].Controls.AltRun : Player[A].Controls.Down;
-                        bool poundKeyRelease = groundPoundByAltRun ? Player[A].AltRunRelease   : Player[A].DuckRelease;
-
-                        if(poundKeyPressed && poundKeyRelease && Player[A].CanPound)
-                        {
-                            Player[A].GroundPound = true;
-                            Player[A].GroundPound2 = true;
-                            if(Player[A].Location.SpeedY < 0)
-                                Player[A].Location.SpeedY = 0;
-                        }
-                    }
-                }
-                else
-                    Player[A].CanPound = false;
-
-                if(Player[A].GroundPound)
-                {
-                    if(!Player[A].CanPound && Player[A].Location.SpeedY < 0)
-                        Player[A].GroundPound = false;
-
-                    bool groundPoundByAltRun = !ForcedControls && g_config.pound_by_alt_run;
-                    if(groundPoundByAltRun)
-                        Player[A].Controls.AltRun = true;
-                    else
-                        Player[A].Controls.Down = true;
-
-                    Player[A].CanJump = false;
-                    Player[A].Controls.Left = false;
-                    Player[A].Controls.Up = false;
-                    Player[A].Controls.Right = false;
-                    Player[A].Controls.Jump = true;
-                    Player[A].Location.SpeedX = Player[A].Location.SpeedX * 0.95;
-                    Player[A].RunRelease = false;
-                    Player[A].CanFly = false;
-                    Player[A].FlyCount = 0;
-                    Player[A].CanFly2 = false;
-                    Player[A].Location.SpeedY += 1;
-                    Player[A].CanPound = false;
-                    Player[A].Jump = 0;
-                }
-                else
-                {
-                    if(Player[A].Location.SpeedY < -5 && ((Player[A].Jump < 15 && Player[A].Jump != 0) || Player[A].CanFly))
-                        Player[A].CanPound = true;
-                    if(Player[A].GroundPound2)
-                    {
-                        Player[A].Location.SpeedY = -4;
-                        Player[A].StandingOnNPC = 0;
-                        Player[A].GroundPound2 = false;
-                    }
-                }
+                PlayerPoundLogic(A);
 
                 SizeCheck(Player[A]); // check that the player is the correct size for it's character/state/mount and set it if not
 

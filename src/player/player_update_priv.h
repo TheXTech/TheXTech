@@ -38,4 +38,6 @@ bool PlayerFairyOnVine(int A);
 
 void PlayerFairyTimerUpdate(int A);
 
+void PlayerPoundLogic(int A);
+
 #endif // PLAYER_UPDATE_PRIV_H
