@@ -38,6 +38,7 @@ void PlayerFairyTimerUpdate(int A);
 void PlayerFairyMovementX(int A);
 void PlayerFairyMovementY(int A);
 
+void PlayerMovementX(int A, float& cursed_value_C, const float speedVar);
 void PlayerMovementY(int A);
 
 void PlayerPoundLogic(int A);

@@ -25,6 +25,339 @@
 #include "effect.h"
 #include "eff_id.h"
 
+void PlayerMovementX(int A, float& cursed_value_C, const float speedVar)
+{
+    // ducking for link
+    if(Player[A].Duck && Player[A].WetFrame)
+    {
+        if(Player[A].Location.SpeedY != 0.0 && Player[A].Slope == 0 && Player[A].StandingOnNPC == 0)
+            UnDuck(Player[A]);
+    }
+
+    // the following code controls the players ability to duck
+    if(!(Player[A].Character == 5 && ((Player[A].Location.SpeedY != 0.0 && Player[A].Slope == 0 && Player[A].StandingOnNPC == 0) || Player[A].FireBallCD != 0))) // Link can't duck/unduck in air
+    {
+        if(Player[A].Controls.Down && !Player[A].SpinJump &&
+           !Player[A].Stoned && Player[A].Vine == 0 && !Player[A].Slide &&
+           (Player[A].Slope == 0 || Player[A].Mount > 0 || Player[A].WetFrame ||
+            Player[A].Character >= 3 || Player[A].GrabTime > 0) &&
+           ((!Player[A].WetFrame || Player[A].Character >= 3) ||
+            Player[A].Location.SpeedY == 0.0 || Player[A].StandingOnNPC != 0 ||
+            Player[A].Slope != 0 || Player[A].Mount == 1) &&
+           !Player[A].Fairy && !Player[A].ShellSurf && !Player[A].Driving)
+        {
+            Player[A].Bumped = false;
+            if(Player[A].Mount != 2) // cant duck in the clown car
+            {
+                if(Player[A].Mount == 3) // duck on a yoshi
+                {
+                    if(!Player[A].Duck)
+                    {
+                        Player[A].Location.Y += Player[A].Location.Height;
+                        Player[A].Location.Height = 31;
+                        Player[A].Location.Y += -Player[A].Location.Height;
+                        Player[A].Duck = true;
+                        // If nPlay.Online = True And A = nPlay.MySlot + 1 Then Netplay.sendData Netplay.PutPlayerLoc(nPlay.MySlot) & "1q" & A & LB
+//                                        if(nPlay.Online == true && A == nPlay.MySlot + 1)
+//                                            Netplay::sendData "1q" + std::to_string(A) + LB;
+                    }
+                }
+                else // normal duck
+                {
+                    if((Player[A].State > 1 && Player[A].HoldingNPC <= 0) || (Player[A].Character == 3 || Player[A].Character == 4 || Player[A].Character == 5))
+                    {
+                        if(!Player[A].Duck && Player[A].TailCount == 0) // Player ducks
+                        {
+                            if(Player[A].Character == 5)
+                                Player[A].SwordPoke = 0;
+                            Player[A].Duck = true;
+                            Player[A].Location.Y += Player[A].Location.Height;
+                            Player[A].Location.Height = Physics.PlayerDuckHeight[Player[A].Character][Player[A].State];
+                            Player[A].Location.Y += -Player[A].Location.Height;
+//                                            if(nPlay.Online == true && A == nPlay.MySlot + 1)
+//                                                Netplay::sendData "1q" + std::to_string(A) + LB;
+                        }
+                    }
+                    else if(Player[A].Mount == 1)
+                    {
+                        if(!Player[A].Duck && Player[A].TailCount == 0) // Player ducks
+                        {
+                            Player[A].Duck = true;
+                            Player[A].Location.Height = Physics.PlayerDuckHeight[1][2];
+                            Player[A].Location.Y += -Physics.PlayerDuckHeight[1][2] + Physics.PlayerHeight[1][2];
+//                                            if(nPlay.Online == true && A == nPlay.MySlot + 1)
+//                                                Netplay::sendData "1q" + std::to_string(A) + LB;
+                        }
+                    }
+                }
+            }
+        }
+        else
+        {
+            if(Player[A].Duck)
+                UnDuck(Player[A]);
+        }
+    }
+
+    cursed_value_C = 1;
+    // If .Character = 5 Then C = 0.94
+    if(Player[A].Character == 5)
+        cursed_value_C = 0.95F;
+    if(Player[A].Controls.Left &&
+       ((!Player[A].Duck && Player[A].GrabTime == 0) ||
+        (Player[A].Location.SpeedY != 0.0 && Player[A].StandingOnNPC == 0 && Player[A].Slope == 0) ||
+        Player[A].Mount == 1)
+    )
+    {
+        Player[A].Bumped = false;
+        if(Player[A].Controls.Run || Player[A].Location.SpeedX > -Physics.PlayerWalkSpeed * speedVar || Player[A].Character == 5)
+        {
+            if(Player[A].Location.SpeedX > -Physics.PlayerWalkSpeed * speedVar * cursed_value_C)
+            {
+                if(Player[A].Character == 2) // LUIGI
+                    Player[A].Location.SpeedX += 0.1 * 0.175;
+                if(Player[A].Character == 3) // PEACH
+                    Player[A].Location.SpeedX += 0.05 * 0.175;
+                if(Player[A].Character == 4) // toad
+                    Player[A].Location.SpeedX += -0.05 * 0.175;
+                Player[A].Location.SpeedX += -0.1 * speedVar;
+            }
+            else // Running
+            {
+                if(Player[A].Character == 2) // LUIGI
+                    Player[A].Location.SpeedX += 0.05 * 0.175;
+                if(Player[A].Character == 3) // PEACH
+                    Player[A].Location.SpeedX += 0.025 * 0.175;
+                if(Player[A].Character == 4) // toad
+                    Player[A].Location.SpeedX += -0.025 * 0.175;
+                if(Player[A].Character == 5) // Link
+                    Player[A].Location.SpeedX += -0.025 * speedVar;
+                else // Mario
+                    Player[A].Location.SpeedX += -0.05 * speedVar;
+            }
+
+            if(Player[A].Location.SpeedX > 0)
+            {
+                Player[A].Location.SpeedX -= 0.18;
+                if(Player[A].Character == 2) // LUIGI
+                    Player[A].Location.SpeedX += 0.18 * 0.29;
+                if(Player[A].Character == 3) // PEACH
+                    Player[A].Location.SpeedX += 0.09 * 0.29;
+                if(Player[A].Character == 4) // toad
+                    Player[A].Location.SpeedX += -0.09 * 0.29;
+                if(SuperSpeed)
+                    Player[A].Location.SpeedX = Player[A].Location.SpeedX * 0.95;
+            }
+        }
+
+        if(SuperSpeed && Player[A].Controls.Run)
+            Player[A].Location.SpeedX -= 0.1;
+    }
+    else if(Player[A].Controls.Right && ((!Player[A].Duck && Player[A].GrabTime == 0) || (Player[A].Location.SpeedY != 0 && Player[A].StandingOnNPC == 0 && Player[A].Slope == 0) || Player[A].Mount == 1))
+    {
+        Player[A].Bumped = false;
+        if(Player[A].Controls.Run || Player[A].Location.SpeedX < Physics.PlayerWalkSpeed * speedVar || Player[A].Character == 5)
+        {
+            if(Player[A].Location.SpeedX < Physics.PlayerWalkSpeed * speedVar * cursed_value_C)
+            {
+                if(Player[A].Character == 2) // LUIGI
+                    Player[A].Location.SpeedX += -0.1 * 0.175;
+                if(Player[A].Character == 3) // PEACH
+                    Player[A].Location.SpeedX += -0.05 * 0.175;
+                if(Player[A].Character == 4) // toad
+                    Player[A].Location.SpeedX += 0.05 * 0.175;
+                Player[A].Location.SpeedX += 0.1 * speedVar;
+            }
+            else
+            {
+                if(Player[A].Character == 2) // LUIGI
+                    Player[A].Location.SpeedX += -0.05 * 0.175;
+                if(Player[A].Character == 3) // PEACH
+                    Player[A].Location.SpeedX += -0.025 * 0.175;
+                if(Player[A].Character == 4) // toad
+                    Player[A].Location.SpeedX += 0.025 * 0.175;
+                if(Player[A].Character == 5) // Link
+                    Player[A].Location.SpeedX += 0.025 * speedVar;
+                else // Mario
+                    Player[A].Location.SpeedX += 0.05 * speedVar;
+            }
+
+            if(Player[A].Location.SpeedX < 0)
+            {
+                Player[A].Location.SpeedX += 0.18;
+                if(Player[A].Character == 2) // LUIGI
+                    Player[A].Location.SpeedX += -0.18 * 0.29;
+                if(Player[A].Character == 3) // PEACH
+                    Player[A].Location.SpeedX += -0.09 * 0.29;
+                if(Player[A].Character == 4) // toad
+                    Player[A].Location.SpeedX += 0.09 * 0.29;
+                if(SuperSpeed)
+                    Player[A].Location.SpeedX = Player[A].Location.SpeedX * 0.95;
+            }
+        }
+
+        if(SuperSpeed && Player[A].Controls.Run)
+            Player[A].Location.SpeedX += 0.1;
+    }
+    else
+    {
+        if(Player[A].Location.SpeedY == 0.0 || Player[A].StandingOnNPC != 0 || Player[A].Slope > 0 || Player[A].WetFrame) // Only lose speed when not in the air
+        {
+            if(Player[A].Location.SpeedX > 0)
+                Player[A].Location.SpeedX += -0.07 * speedVar;
+            if(Player[A].Location.SpeedX < 0)
+                Player[A].Location.SpeedX += 0.07 * speedVar;
+            if(Player[A].Character == 2) // LUIGI
+                Player[A].Location.SpeedX = Player[A].Location.SpeedX * 1.003;
+            if(Player[A].Character == 3) // PEACH
+                Player[A].Location.SpeedX = Player[A].Location.SpeedX * 1.0015;
+            if(Player[A].Character == 4) // toad
+                Player[A].Location.SpeedX = Player[A].Location.SpeedX * 0.9985;
+            if(SuperSpeed)
+                Player[A].Location.SpeedX = Player[A].Location.SpeedX * 0.95;
+        }
+
+        if(Player[A].Location.SpeedX > -0.18 && Player[A].Location.SpeedX < 0.18)
+        {
+            Player[A].Bumped = false;
+            Player[A].Location.SpeedX = 0;
+        }
+    }
+
+    if(Player[A].Location.SpeedX < -16)
+        Player[A].Location.SpeedX = -16;
+    else if(Player[A].Location.SpeedX > 16)
+        Player[A].Location.SpeedX = 16;
+
+    if(Player[A].WarpShooted &&
+       Player[A].Location.SpeedX < Physics.PlayerRunSpeed * speedVar &&
+       Player[A].Location.SpeedX > -Physics.PlayerRunSpeed * speedVar)
+    {
+        Player[A].WarpShooted = false;
+    }
+
+    if(!Player[A].WarpShooted && (Player[A].Controls.Run || Player[A].Character == 5))
+    {
+        if(Player[A].Location.SpeedX >= Physics.PlayerRunSpeed * speedVar)
+        {
+            if(!SuperSpeed)
+                Player[A].Location.SpeedX = Physics.PlayerRunSpeed * speedVar;
+        }
+        else if(Player[A].Location.SpeedX <= -Physics.PlayerRunSpeed * speedVar)
+        {
+            if(!SuperSpeed)
+                Player[A].Location.SpeedX = -Physics.PlayerRunSpeed * speedVar;
+        }
+//                        else  // REDURANT GARBAGE
+//                        {
+//                        }
+    }
+    else
+    {
+        if(Player[A].Location.SpeedX > Physics.PlayerWalkSpeed + 0.1 * speedVar)
+            Player[A].Location.SpeedX -= 0.1;
+        else if(Player[A].Location.SpeedX < -Physics.PlayerWalkSpeed - 0.1 * speedVar)
+            Player[A].Location.SpeedX += 0.1;
+        else if(std::abs(Player[A].Location.SpeedX) > Physics.PlayerWalkSpeed * speedVar)
+        {
+            if(Player[A].Location.SpeedX > 0)
+                Player[A].Location.SpeedX = Physics.PlayerWalkSpeed * speedVar;
+            else
+                Player[A].Location.SpeedX = -Physics.PlayerWalkSpeed * speedVar;
+        }
+    }
+
+    if(Player[A].Mount == 1 && Player[A].MountType == 3)
+    {
+        Player[A].CanFly2 = true;
+        Player[A].FlyCount = 1000;
+    }
+
+    if(Player[A].Mount != 3)
+        Player[A].YoshiBlue = false;
+
+    if(FlyForever && !Player[A].GroundPound)
+    {
+        if(Player[A].Mount == 3)
+            Player[A].YoshiBlue = true;
+
+        if((Player[A].State == 4 || Player[A].State == 5) || (Player[A].YoshiBlue && Player[A].Mount == 3) || (Player[A].Mount == 1 && Player[A].MountType == 3))
+            Player[A].CanFly2 = true;
+        else
+        {
+            Player[A].CanFly2 = false;
+            Player[A].CanFly = false;
+            Player[A].FlyCount = 0;
+            Player[A].YoshiBlue = false;
+        }
+    }
+
+    // Racoon/Tanooki Mario.  this handles the ability to fly after running
+    if((Player[A].State == 4 || Player[A].State == 5) && Player[A].Wet == 0)
+    {
+        if( (Player[A].Location.SpeedY == 0.0 ||
+             Player[A].CanFly2 ||
+             Player[A].StandingOnNPC != 0 ||
+             Player[A].Slope > 0) &&
+            (std::abs(Player[A].Location.SpeedX) >= double(Physics.PlayerRunSpeed) ||
+            (Player[A].Character == 3 && std::abs(Player[A].Location.SpeedX) >= 5.58 - 0.001))) // Rounding error of SpeedX makes an evil here
+        {
+            Player[A].RunCount += 1;
+        }
+        else
+        {
+            if(!(std::abs(Player[A].Location.SpeedX) >= double(Physics.PlayerRunSpeed) ||
+                 (Player[A].Character == 3 && std::abs(Player[A].Location.SpeedX) >= 5.58 - 0.001)) )
+            {
+                Player[A].RunCount -= 0.3f;
+            }
+        }
+
+        if(Player[A].RunCount >= 35 && Player[A].Character == 1)
+        {
+            Player[A].CanFly = true;
+            Player[A].RunCount = 35;
+        }
+        else if(Player[A].RunCount >= 40 && Player[A].Character == 2)
+        {
+            Player[A].CanFly = true;
+            Player[A].RunCount = 40;
+        }
+        else if(Player[A].RunCount >= 80 && Player[A].Character == 3)
+        {
+            Player[A].CanFly = true;
+            Player[A].RunCount = 80;
+        }
+        else if(Player[A].RunCount >= 60 && Player[A].Character == 4)
+        {
+            Player[A].CanFly = true;
+            Player[A].RunCount = 60;
+        }
+        else if(Player[A].RunCount >= 10 && Player[A].Character == 5) // link flying
+        {
+            Player[A].CanFly = true;
+            Player[A].RunCount = 10;
+        }
+        else
+        {
+            Player[A].CanFly = false;
+            if(Player[A].RunCount < 0)
+                Player[A].RunCount = 0;
+        }
+    }
+
+    if(Player[A].Location.SpeedY == 0.0 || Player[A].StandingOnNPC != 0 || Player[A].Slope > 0)
+        Player[A].FlyCount = 1;
+
+    if(Player[A].FlyCount > 1)
+        Player[A].FlyCount -= 1;
+    else if(Player[A].FlyCount == 1)
+    {
+        Player[A].CanFly2 = false;
+        Player[A].FlyCount = 0;
+    }
+}
+
 void PlayerMovementY(int A)
 {
     if(Player[A].Mount == 1) // this gives the player the bounce when in the kurbio's shoe
