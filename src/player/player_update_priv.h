@@ -23,7 +23,7 @@
 #ifndef PLAYER_UPDATE_PRIV_H
 #define PLAYER_UPDATE_PRIV_H
 
-// these routines were originally part of UpdatePlayer
+// most of these routines were originally part of UpdatePlayer
 void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, const bool movingBlock, const int tempHit3, const float oldSpeedY);
 
 void PlayerBlockLogic(int A, int& tempHit3, bool& movingBlock, bool& DontResetGrabTime, float cursed_value_C);
@@ -50,10 +50,10 @@ void PlayerSwimMovementY(int A);
 
 void PlayerPoundLogic(int A);
 void PlayerShootChar5Beam(int A);
-void PlayerThrowBomb(int A);
+void PlayerThrowBomb(int A); // (from PowerUps)
 
 void PlayerChar5Logic(int A);
-void PlayerChar5StabLogic(int A);
+void PlayerChar5StabLogic(int A); // (from PowerUps)
 
 void UpdatePlayerTimeToLive(int A);
 void UpdatePlayerDead(int A);
