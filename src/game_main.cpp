@@ -1286,6 +1286,8 @@ int GameMain(const CmdLineSetup_t &setup)
             // store to level save info if level won
             if(LevelBeatCode > 0 || !GoToLevel.empty())
             {
+                CommitBeatCode(LevelBeatCode);
+
                 g_curLevelMedals.commit();
                 g_curLevelMedals.reset_checkpoint();
             }

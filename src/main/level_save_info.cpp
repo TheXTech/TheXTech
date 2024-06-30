@@ -38,6 +38,7 @@ static bool s_exportSingleSaveInfo(saveLevelInfo& s, const LevelSaveInfo_t& info
 
     s.max_stars = info.max_stars;
     s.max_medals = info.max_medals;
+    s.exits_got = info.exits_got;
 
     int size = SDL_min(static_cast<int>(info.max_medals), c_max_track_medals);
 
@@ -59,6 +60,7 @@ static bool s_importSingleSaveInfo(LevelSaveInfo_t& info, const saveLevelInfo& s
 
     unsigned max_stars = s.max_stars;
     unsigned max_medals = s.max_medals;
+    unsigned exits_got = s.exits_got;
 
     // validate limits
     static_assert(c_max_track_stars <= 255, "c_max_track_stars used to limit values of uint8_t");
@@ -69,9 +71,12 @@ static bool s_importSingleSaveInfo(LevelSaveInfo_t& info, const saveLevelInfo& s
     if(max_medals > c_max_track_medals)
         max_medals = c_max_track_medals;
 
+    exits_got &= 0xFFFF;
+
     // load maximums
     info.max_stars = max_stars;
     info.max_medals = max_medals;
+    info.exits_got = exits_got;
 
     // load medals
     for(unsigned i = 0; i < max_medals; ++i)

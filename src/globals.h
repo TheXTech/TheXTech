@@ -945,6 +945,9 @@ struct LevelSaveInfo_t
     uint8_t medals_got = 0;
     uint8_t medals_best = 0;
 
+    // BITMASK
+    uint16_t exits_got = 0;
+
     inline bool inited() const
     {
         return max_medals != 255;
@@ -986,13 +989,13 @@ struct WorldLevel_t
 //    Start As Boolean 'true if the game starts here
     bool Start = false;
 
+//    Visible As Boolean 'true if it should be shown on the map
+    bool Visible = false;
+
 //    WarpX As Double 'for warping to another location on the world map
     double WarpX = 0.0;
 //    WarpY As Double
     double WarpY = 0.0;
-
-//    Visible As Boolean 'true if it should be shown on the map
-    bool Visible = false;
 
 //End Type
 
