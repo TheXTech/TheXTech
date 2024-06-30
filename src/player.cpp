@@ -29,6 +29,7 @@
 #include "globals.h"
 #include "player.h"
 #include "player/player_effect.h"
+#include "player/player_update_priv.h"
 #include "graphics.h"
 #include "collision.h"
 #include "npc.h"
@@ -4931,83 +4932,7 @@ void PowerUps(const int A)
 
 // link stab
     if(p.Character == 5 && p.Vine == 0 && p.Mount == 0 && !p.Stoned && p.FireBallCD == 0)
-    {
-        if(p.Bombs > 0 && p.Controls.AltRun && p.RunRelease)
-        {
-            p.FireBallCD = 10;
-            p.Bombs -= 1;
-
-            numNPCs++;
-            NPC[numNPCs] = NPC_t();
-            NPC[numNPCs].Active = true;
-            NPC[numNPCs].TimeLeft = Physics.NPCTimeOffScreen;
-            NPC[numNPCs].Section = p.Section;
-            NPC[numNPCs].Type = NPCID_BOMB;
-            NPC[numNPCs].Location.Width = NPC[numNPCs]->TWidth;
-            NPC[numNPCs].Location.Height = NPC[numNPCs]->THeight;
-            NPC[numNPCs].CantHurtPlayer = A;
-            NPC[numNPCs].CantHurt = 1000;
-
-            if(p.Duck && (p.Location.SpeedY == 0 || p.Slope > 0 || p.StandingOnNPC != 0))
-            {
-                NPC[numNPCs].Location.X = p.Location.X + p.Location.Width / 2.0 - NPC[numNPCs].Location.Width / 2.0;
-                NPC[numNPCs].Location.Y = p.Location.Y + p.Location.Height - NPC[numNPCs].Location.Height;
-                NPC[numNPCs].Location.SpeedX = 0;
-                NPC[numNPCs].Location.SpeedY = 0;
-                PlaySoundSpatial(SFX_Grab, p.Location);
-            }
-            else
-            {
-                NPC[numNPCs].Location.X = p.Location.X + p.Location.Width / 2.0 - NPC[numNPCs].Location.Width / 2.0;
-                NPC[numNPCs].Location.Y = p.Location.Y;
-                NPC[numNPCs].Location.SpeedX = 5 * p.Direction;
-                NPC[numNPCs].Location.SpeedY = -6;
-                NPC[numNPCs].Projectile = true;
-
-                if(p.Location.SpeedY == 0 || p.Slope > 0 || p.StandingOnNPC != 0)
-                    p.SwordPoke = -10;
-
-                PlaySoundSpatial(SFX_Throw, p.Location);
-            }
-
-            syncLayers_NPC(numNPCs);
-        }
-        else if(/*p.FireBallCD == 0 && */ p.Controls.Run && p.RunRelease) // cooldown is 0 whenever this code is reached
-        {
-            p.FireBallCD = 20;
-
-            if(p.Location.SpeedY != Physics.PlayerGravity && p.StandingOnNPC == 0 && p.Slope == 0) // Link ducks when jumping
-            {
-                if(p.Wet == 0 && !p.WetFrame)
-                {
-                    if(p.Controls.Down && !p.Duck && p.Mount == 0)
-                    {
-                        p.Duck = true;
-                        p.Location.Y += p.Location.Height;
-                        p.Location.Height = Physics.PlayerDuckHeight[p.Character][p.State];
-                        p.Location.Y += -p.Location.Height;
-                    }
-                    else if(!p.Controls.Down && p.Duck)
-                        UnDuck(Player[A]);
-                }
-            }
-
-            if(p.Duck)
-                p.SwordPoke = 1;
-            else
-                p.SwordPoke = -1;
-        }
-        else if(p.Controls.Up && p.Location.SpeedY < 0 && !p.Duck && p.SwordPoke == 0) // Link stabs up
-        {
-            if(!p.WetFrame && p.Frame == 10)
-                TailSwipe(A, true, true, 1);
-        }
-        else if(p.Controls.Down && (p.Location.SpeedY > 0 && p.StandingOnNPC == 0 && p.Slope == 0) && !p.Duck && p.SwordPoke == 0) // Link stabs down
-        {
-            if(!p.WetFrame && p.Frame == 9)
-                TailSwipe(A, true, true, 2);
-        }
-    }
+        PlayerChar5StabLogic(A);
 
 
 // cooldown timer

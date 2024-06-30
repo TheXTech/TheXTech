@@ -29,6 +29,7 @@
 #include "player/player_update_priv.h"
 #include "main/trees.h"
 
+// called after movement code and before block / NPC / player collisions
 void PlayerChar5Logic(int A)
 {
     if(Player[A].State == 4 || Player[A].State == 5)
@@ -194,4 +195,51 @@ void PlayerChar5Logic(int A)
     }
 
     Player[A].HoldingNPC = -1;
+}
+
+// called in PowerUps() -- executes before movement code
+void PlayerChar5StabLogic(int A)
+{
+    Player_t& p = Player[A];
+
+    if(p.Bombs > 0 && p.Controls.AltRun && p.RunRelease)
+    {
+        p.FireBallCD = 10;
+        PlayerThrowBomb(A);
+    }
+    else if(/*p.FireBallCD == 0 && */ p.Controls.Run && p.RunRelease) // cooldown is 0 whenever this code is reached
+    {
+        p.FireBallCD = 20;
+
+        if(p.Location.SpeedY != Physics.PlayerGravity && p.StandingOnNPC == 0 && p.Slope == 0) // Link ducks when jumping
+        {
+            if(p.Wet == 0 && !p.WetFrame)
+            {
+                if(p.Controls.Down && !p.Duck && p.Mount == 0)
+                {
+                    p.Duck = true;
+                    p.Location.Y += p.Location.Height;
+                    p.Location.Height = Physics.PlayerDuckHeight[p.Character][p.State];
+                    p.Location.Y += -p.Location.Height;
+                }
+                else if(!p.Controls.Down && p.Duck)
+                    UnDuck(Player[A]);
+            }
+        }
+
+        if(p.Duck)
+            p.SwordPoke = 1;
+        else
+            p.SwordPoke = -1;
+    }
+    else if(p.Controls.Up && p.Location.SpeedY < 0 && !p.Duck && p.SwordPoke == 0) // Link stabs up
+    {
+        if(!p.WetFrame && p.Frame == 10)
+            TailSwipe(A, true, true, 1);
+    }
+    else if(p.Controls.Down && (p.Location.SpeedY > 0 && p.StandingOnNPC == 0 && p.Slope == 0) && !p.Duck && p.SwordPoke == 0) // Link stabs down
+    {
+        if(!p.WetFrame && p.Frame == 9)
+            TailSwipe(A, true, true, 2);
+    }
 }

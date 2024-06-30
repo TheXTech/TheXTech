@@ -49,8 +49,10 @@ void PlayerSwimMovementY(int A);
 
 void PlayerPoundLogic(int A);
 void PlayerShootChar5Beam(int A);
+void PlayerThrowBomb(int A);
 
 void PlayerChar5Logic(int A);
+void PlayerChar5StabLogic(int A);
 
 void UpdatePlayerTimeToLive(int A);
 void UpdatePlayerDead(int A);

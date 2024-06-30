@@ -156,3 +156,45 @@ void PlayerShootChar5Beam(int A)
     syncLayers_NPC(numNPCs);
     CheckSectionNPC(numNPCs);
 }
+
+void PlayerThrowBomb(int A)
+{
+    Player_t& p = Player[A];
+
+    p.Bombs -= 1;
+
+    numNPCs++;
+    NPC[numNPCs] = NPC_t();
+    NPC[numNPCs].Active = true;
+    NPC[numNPCs].TimeLeft = Physics.NPCTimeOffScreen;
+    NPC[numNPCs].Section = p.Section;
+    NPC[numNPCs].Type = NPCID_BOMB;
+    NPC[numNPCs].Location.Width = NPC[numNPCs]->TWidth;
+    NPC[numNPCs].Location.Height = NPC[numNPCs]->THeight;
+    NPC[numNPCs].CantHurtPlayer = A;
+    NPC[numNPCs].CantHurt = 1000;
+
+    if(p.Duck && (p.Location.SpeedY == 0 || p.Slope > 0 || p.StandingOnNPC != 0))
+    {
+        NPC[numNPCs].Location.X = p.Location.X + p.Location.Width / 2.0 - NPC[numNPCs].Location.Width / 2.0;
+        NPC[numNPCs].Location.Y = p.Location.Y + p.Location.Height - NPC[numNPCs].Location.Height;
+        NPC[numNPCs].Location.SpeedX = 0;
+        NPC[numNPCs].Location.SpeedY = 0;
+        PlaySoundSpatial(SFX_Grab, p.Location);
+    }
+    else
+    {
+        NPC[numNPCs].Location.X = p.Location.X + p.Location.Width / 2.0 - NPC[numNPCs].Location.Width / 2.0;
+        NPC[numNPCs].Location.Y = p.Location.Y;
+        NPC[numNPCs].Location.SpeedX = 5 * p.Direction;
+        NPC[numNPCs].Location.SpeedY = -6;
+        NPC[numNPCs].Projectile = true;
+
+        if(p.Location.SpeedY == 0 || p.Slope > 0 || p.StandingOnNPC != 0)
+            p.SwordPoke = -10;
+
+        PlaySoundSpatial(SFX_Throw, p.Location);
+    }
+
+    syncLayers_NPC(numNPCs);
+}
