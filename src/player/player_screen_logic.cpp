@@ -251,3 +251,52 @@ void PlayerOffscreenExitCheck(int A)
         levelWaitForFade();
     }
 }
+
+void PlayerLevelEdgeCheck(int A, bool check_X)
+{
+    if(check_X)
+    {
+        // Check edge of levels
+        if(Player[A].Location.X < level[Player[A].Section].X)
+        {
+            Player[A].Location.X = level[Player[A].Section].X;
+
+            if(Player[A].Location.SpeedX < 0)
+                Player[A].Location.SpeedX = 0;
+
+            Player[A].Pinched.Left2 = 2;
+
+            if(AutoX[Player[A].Section] != 0.0f)
+            {
+                Player[A].Pinched.Moving = 2;
+                Player[A].Pinched.MovingLR = true;
+            }
+        }
+        else if(Player[A].Location.X + Player[A].Location.Width > level[Player[A].Section].Width)
+        {
+            Player[A].Location.X = level[Player[A].Section].Width - Player[A].Location.Width;
+
+            if(Player[A].Location.SpeedX > 0)
+                Player[A].Location.SpeedX = 0;
+
+            Player[A].Pinched.Right4 = 2;
+
+            if(AutoX[Player[A].Section] != 0.f)
+            {
+                Player[A].Pinched.Moving = 2;
+                Player[A].Pinched.MovingLR = true;
+            }
+        }
+    }
+
+    if(Player[A].Location.Y < level[Player[A].Section].Y - Player[A].Location.Height - 32 && Player[A].StandingOnVehiclePlr == 0)
+    {
+        Player[A].Location.Y = level[Player[A].Section].Y - Player[A].Location.Height - 32;
+
+        if(AutoY[Player[A].Section] != 0.f)
+        {
+            Player[A].Pinched.Moving = 3;
+            Player[A].Pinched.MovingUD = true;
+        }
+    }
+}

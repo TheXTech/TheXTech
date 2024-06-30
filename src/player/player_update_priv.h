@@ -35,6 +35,7 @@ void PlayerVineMovement(int A);
 void PlayerSharedScreenLogic(int A);
 void PlayerLevelWrapLogic(int A);
 void PlayerOffscreenExitCheck(int A);
+void PlayerLevelEdgeCheck(int A, bool check_X);
 
 void PlayerFairyTimerUpdate(int A);
 void PlayerFairyMovementX(int A);
