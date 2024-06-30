@@ -770,6 +770,7 @@ set(THEXTECH_SRC
     src/player/player_pinched_logic.cpp
     src/player/player_death_logic.cpp
     src/player/player_vehicle_logic.cpp
+    src/player/player_char5_logic.cpp
     src/fontman/font_manager.cpp
     src/fontman/font_manager_private.cpp
     src/fontman/raster_font.cpp

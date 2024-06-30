@@ -49,6 +49,8 @@ void PlayerSwimMovementY(int A);
 
 void PlayerPoundLogic(int A);
 
+void PlayerChar5Logic(int A, const bool wasSlippy);
+
 void UpdatePlayerTimeToLive(int A);
 void UpdatePlayerDead(int A);
 
