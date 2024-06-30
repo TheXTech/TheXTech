@@ -3552,11 +3552,6 @@ void UpdatePlayer()
                 if(Player[A].Vine > 0)
                     Player[A].Vine -= 1;
 
-                int floorNpc1 = 0;
-                int floorNpc2 = 0;
-                float tempHitSpeed = 0;
-                bool spinKill = false;
-
                 // check vine backgrounds
                 for(int B : treeBackgroundQuery(Player[A].Location, SORTMODE_NONE))
                 {
@@ -3657,11 +3652,16 @@ void UpdatePlayer()
                     }
                 }
 
-                // cleanup variables for NPC collisions
                 int MessageNPC = 0;
+                int floorNpc1 = 0;
+                int floorNpc2 = 0;
+                float tempHitSpeed = 0;
+                bool spinKill = false;
 
-                tempHit = false; // Used for JUMP detection
-                tempHit2 = false;
+                // cleanup variables for NPC collisions
+
+                bool tempHit = false; // Used for JUMP detection
+                bool tempHit2 = false;
                 Location_t tempLocation;
 
                 for(int B : treeNPCQuery(Player[A].Location, SORTMODE_ID))
@@ -3942,7 +3942,7 @@ void UpdatePlayer()
                                             HitSpot = 0;
                                             NPC[B].Killed = 9;
                                             NPCQueues::Killed.push_back(B);
-                                            for(C = 1; C <= 10; ++C)
+                                            for(int C = 1; C <= 10; ++C)
                                             {
                                                 NewEffect(EFFID_PLR_FIREBALL_TRAIL, NPC[B].Location, static_cast<float>(NPC[B].Special));
                                                 Effect[numEffects].Location.SpeedX = dRand() * 3 - 1.5 + NPC[B].Location.SpeedX * 0.1;
@@ -4092,8 +4092,8 @@ void UpdatePlayer()
                                             else if(Player[A].StandingOnNPC == B)
                                             {
                                                 // if standing on 2 or more NPCs find out the best one to stand on
-                                                C = NPC[floorNpc1].Location.X + NPC[floorNpc1].Location.Width * 0.5;
-                                                D = NPC[floorNpc2].Location.X + NPC[floorNpc2].Location.Width * 0.5;
+                                                float C = NPC[floorNpc1].Location.X + NPC[floorNpc1].Location.Width * 0.5;
+                                                float D = NPC[floorNpc2].Location.X + NPC[floorNpc2].Location.Width * 0.5;
                                                 C += -(Player[A].Location.X + Player[A].Location.Width * 0.5);
                                                 D += -(Player[A].Location.X + Player[A].Location.Width * 0.5);
 
@@ -4281,8 +4281,8 @@ void UpdatePlayer()
                                     else if(!(NPC[B].Type == NPCID_MINIBOSS && NPC[B].Special == 4)) // Player touched an NPC
                                     {
 
-/* If (.CanGrabNPCs = True Or NPCIsGrabbable(NPC(B).Type) = True Or (NPC(B).Effect = 2 And NPCIsABonus(NPC(B).Type) = False)) And (NPC(B).Effect = 0 Or NPC(B).Effect = 2) Or (NPCIsAShell(NPC(B).Type) And FreezeNPCs = True) Then      'GRAB EVERYTHING
-*/
+            /* If (.CanGrabNPCs = True Or NPCIsGrabbable(NPC(B).Type) = True Or (NPC(B).Effect = 2 And NPCIsABonus(NPC(B).Type) = False)) And (NPC(B).Effect = 0 Or NPC(B).Effect = 2) Or (NPCIsAShell(NPC(B).Type) And FreezeNPCs = True) Then      'GRAB EVERYTHING
+            */
                                         // grab code
                                         if(
                                             ((Player[A].CanGrabNPCs || NPC[B]->IsGrabbable || (NPC[B].Effect == NPCEFF_DROP_ITEM && !NPC[B]->IsABonus)) && (NPC[B].Effect == NPCEFF_NORMAL || NPC[B].Effect == NPCEFF_DROP_ITEM)) ||
@@ -4464,7 +4464,7 @@ void UpdatePlayer()
                                                             tempBool = true;
                                                     }
 
-                                                    D = Player[A].Location.X;
+                                                    float D = Player[A].Location.X;
                                                     if(Player[A].Location.X + Player[A].Location.Width / 2.0 < NPC[B].Location.X + NPC[B].Location.Width / 2.0)
                                                     {
                                                         Player[A].Pinched.Right4 = 2;
@@ -4481,6 +4481,7 @@ void UpdatePlayer()
                                                         tempHit2 = true;
                                                         Player[A].RunCount = 0;
                                                         tempHitSpeed = NPC[B].Location.SpeedX + NPC[B].BeltSpeed;
+
                                                         if(tempHit3 != 0)
                                                         {
                                                             if(std::abs(Block[tempHit3].Location.X - NPC[B].Location.X) < 1)
@@ -4662,13 +4663,15 @@ void UpdatePlayer()
 
                 // Find out which NPC to stand on
 
+                int B = 0;
+
                 // this code is for standing on moving NPCs.
                 if(floorNpc2 != 0)
                 {
                     if(NPC[floorNpc1].Location.Y == NPC[floorNpc2].Location.Y)
                     {
-                        C = NPC[floorNpc1].Location.X + NPC[floorNpc1].Location.Width * 0.5;
-                        D = NPC[floorNpc2].Location.X + NPC[floorNpc2].Location.Width * 0.5;
+                        float C = NPC[floorNpc1].Location.X + NPC[floorNpc1].Location.Width * 0.5;
+                        float D = NPC[floorNpc2].Location.X + NPC[floorNpc2].Location.Width * 0.5;
                         C += -(Player[A].Location.X + Player[A].Location.Width * 0.5);
                         D += -(Player[A].Location.X + Player[A].Location.Width * 0.5);
 
@@ -4693,8 +4696,6 @@ void UpdatePlayer()
                 }
                 else if(floorNpc1 != 0)
                     B = floorNpc1;
-                else
-                    B = 0;
 
                 if(NPC[floorNpc1].Type >= 60 && NPC[floorNpc1].Type <= 66)
                     B = floorNpc1;
@@ -4748,7 +4749,9 @@ void UpdatePlayer()
                     if(B > 0)
                     {
                         if(NPC[B].Type == NPCID_ITEM_BURIED)
-                            movingBlock = false;
+                        {
+                            // movingBlock = false;
+                        }
                         else
                             B = -A;
                     }
@@ -4835,7 +4838,7 @@ void UpdatePlayer()
                         Player[A].HoldingNPC = 0;
                         Player[A].StandingOnNPC = 0;
                         PlaySoundSpatial(SFX_Stomp, Player[A].Location);
-                        for(C = 1; C <= numPlayers; ++C)
+                        for(int C = 1; C <= numPlayers; ++C)
                         {
                             if(Player[C].StandingOnNPC == B)
                                 Player[C].StandingOnVehiclePlr = A;
@@ -4848,7 +4851,6 @@ void UpdatePlayer()
                             PlaySoundSpatial(SFX_Stone, Player[A].Location);
                         Player[A].Location.SpeedY = NPC[B].Location.SpeedY;
                     }
-
                 }
                 else if(Player[A].Mount == 1 && Player[A].Jump == 0)
                 {
