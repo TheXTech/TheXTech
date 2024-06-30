@@ -207,63 +207,7 @@ void UpdatePlayer()
                 }
                 // if not sliding and in the clown car
                 else if(Player[A].Mount == 2)
-                {
-                    if(!Player[A].Controls.Jump)
-                        Player[A].CanJump = true;
-
-                    if(!Player[A].Controls.AltJump && g_config.fix_vehicle_altjump_lock)
-                        Player[A].CanAltJump = true;
-
-                    if(Player[A].Controls.AltJump && Player[A].CanAltJump) // Jump out of the Clown Car
-                    {
-                        if(g_config.fix_vehicle_altjump_lock)
-                            Player[A].CanAltJump = false;
-
-                        Player[A].CanJump = false;
-
-                        bool dismount_safe = true;
-
-                        Location_t tempLocation = Player[A].Location;
-                        tempLocation.Height = Physics.PlayerHeight[Player[A].Character][Player[A].State];
-                        tempLocation.Y += -Physics.PlayerHeight[Player[A].Character][Player[A].State];
-                        tempLocation.Width = Physics.PlayerWidth[Player[A].Character][Player[A].State];
-                        tempLocation.X += 64 - tempLocation.Width / 2.0;
-
-                        // fBlock = FirstBlock[(tempLocation.X / 32) - 1];
-                        // lBlock = LastBlock[((tempLocation.X + tempLocation.Width) / 32.0) + 1];
-                        // blockTileGet(tempLocation, fBlock, lBlock);
-
-                        for(int B : treeFLBlockQuery(tempLocation, SORTMODE_NONE))
-                        {
-                            if(!Block[B].Invis && !BlockIsSizable[Block[B].Type] && !BlockOnlyHitspot1[Block[B].Type] &&
-                               !BlockNoClipping[Block[B].Type] && !Block[B].Hidden)
-                            {
-                                if(CheckCollision(tempLocation, Block[B].Location))
-                                {
-                                    dismount_safe = false;
-                                    PlaySoundSpatial(SFX_BlockHit, Player[A].Location);
-                                    break;
-                                }
-                            }
-                        }
-
-                        if(dismount_safe) for(int B : treeNPCQuery(tempLocation, SORTMODE_NONE))
-                        {
-                            if(NPC[B]->IsABlock && !NPC[B]->StandsOnPlayer && NPC[B].Active && NPC[B].Type != NPCID_VEHICLE)
-                            {
-                                if(CheckCollision(tempLocation, NPC[B].Location))
-                                {
-                                    dismount_safe = false;
-                                    PlaySoundSpatial(SFX_BlockHit, Player[A].Location);
-                                    break;
-                                }
-                            }
-                        }
-
-                        if(dismount_safe)
-                            PlayerDismount(A);
-                    }
-                }
+                    PlayerVehicleDismountCheck(A);
                 else if(Player[A].Driving) // driving
                 {
                     if(Player[A].Duck)
