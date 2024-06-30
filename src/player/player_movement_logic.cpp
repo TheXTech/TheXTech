@@ -25,8 +25,40 @@
 #include "effect.h"
 #include "eff_id.h"
 
-void PlayerMovementX(int A, float& cursed_value_C, const float speedVar)
+void PlayerMovementX(int A, float& cursed_value_C)
 {
+    // Modify player's speed if he is running up/down hill
+    float speedVar = 1; // Speed var is a percentage of the player's speed
+    if(Player[A].Slope > 0)
+    {
+        if(
+                (Player[A].Location.SpeedX > 0 && BlockSlope[Block[Player[A].Slope].Type] == -1) ||
+                (Player[A].Location.SpeedX < 0 && BlockSlope[Block[Player[A].Slope].Type] == 1)
+                )
+            speedVar = (float)(1 - Block[Player[A].Slope].Location.Height / Block[Player[A].Slope].Location.Width * 0.5);
+        else if(!Player[A].Slide)
+            speedVar = (float)(1 + (Block[Player[A].Slope].Location.Height / Block[Player[A].Slope].Location.Width * 0.5) * 0.5);
+    }
+
+    if(Player[A].Stoned) // if statue form reset to normal
+        speedVar = 1;
+
+    if(Player[A].Character == 3)
+        speedVar = (speedVar * 0.93f);
+
+    if(Player[A].Character == 4)
+        speedVar = (speedVar * 1.07f);
+
+    // modify speedvar to slow the player down under water
+    if(Player[A].Wet > 0)
+    {
+        if(Player[A].Location.SpeedY == 0.0 || Player[A].Slope > 0 || Player[A].StandingOnNPC != 0)
+            speedVar = (float)(speedVar * 0.25f); // if walking go really slow
+        else
+            speedVar = (float)(speedVar * 0.5f); // if swimming go slower faster the walking
+    }
+
+
     // ducking for link
     if(Player[A].Duck && Player[A].WetFrame)
     {
