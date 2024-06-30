@@ -26,4 +26,6 @@
 // these routines were originally part of UpdatePlayer
 void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, const bool movingBlock, const int tempHit3, const float oldSpeedY);
 
+void PlayerBlockLogic(int A, int& tempHit3, bool& movingBlock, bool& DontResetGrabTime, float cursed_value_C);
+
 #endif // PLAYER_UPDATE_PRIV_H

@@ -761,6 +761,7 @@ set(THEXTECH_SRC
     src/npc/npc_activation.cpp
     src/player/player_update.cpp
     src/player/player_npc_logic.cpp
+    src/player/player_block_logic.cpp
     src/fontman/font_manager.cpp
     src/fontman/font_manager_private.cpp
     src/fontman/raster_font.cpp
