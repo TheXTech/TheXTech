@@ -568,7 +568,9 @@ void UpdatePlayer()
                             Player[A].CanAltJump = false;
 
                         Player[A].CanJump = false;
-                        bool tempBool = true;
+
+                        bool dismount_safe = true;
+
                         Location_t tempLocation = Player[A].Location;
                         tempLocation.Height = Physics.PlayerHeight[Player[A].Character][Player[A].State];
                         tempLocation.Y += -Physics.PlayerHeight[Player[A].Character][Player[A].State];
@@ -585,46 +587,47 @@ void UpdatePlayer()
                             {
                                 if(CheckCollision(tempLocation, Block[B].Location))
                                 {
-                                    tempBool = false;
+                                    dismount_safe = false;
                                     PlaySoundSpatial(SFX_BlockHit, Player[A].Location);
                                     break;
                                 }
                             }
                         }
 
-                        if(tempBool) for(int B : treeNPCQuery(tempLocation, SORTMODE_NONE))
+                        if(dismount_safe) for(int B : treeNPCQuery(tempLocation, SORTMODE_NONE))
                         {
                             if(NPC[B]->IsABlock && !NPC[B]->StandsOnPlayer && NPC[B].Active && NPC[B].Type != NPCID_VEHICLE)
                             {
                                 if(CheckCollision(tempLocation, NPC[B].Location))
                                 {
-                                    tempBool = false;
+                                    dismount_safe = false;
                                     PlaySoundSpatial(SFX_BlockHit, Player[A].Location);
                                     break;
                                 }
                             }
                         }
 
-                        if(tempBool)
-                        {
+                        if(dismount_safe)
                             PlayerDismount(A);
-                        }
                     }
                 }
                 else if(Player[A].Driving) // driving
                 {
                     if(Player[A].Duck)
                         UnDuck(Player[A]);
+
                     Player[A].Driving = false;
                     if(Player[A].StandingOnNPC > 0)
                     {
                         NPC[Player[A].StandingOnNPC].Special4 = 1;
+
                         if(Player[A].Controls.Left)
                             NPC[Player[A].StandingOnNPC].Special5 = -1;
                         else if(Player[A].Controls.Right)
                             NPC[Player[A].StandingOnNPC].Special5 = 1;
                         else
                             NPC[Player[A].StandingOnNPC].Special5 = 0;
+
                         if(Player[A].Controls.Up)
                             NPC[Player[A].StandingOnNPC].Special6 = -1;
                         else if(Player[A].Controls.Down)
@@ -632,8 +635,8 @@ void UpdatePlayer()
                         else
                             NPC[Player[A].StandingOnNPC].Special6 = 0;
                     }
-                    Player[A].Location.SpeedX = 0;
 
+                    Player[A].Location.SpeedX = 0;
                 }
                 else if(Player[A].Fairy) // if a fairy
                 {
@@ -658,7 +661,7 @@ void UpdatePlayer()
                     else
                         Player[A].Location.SpeedX = 0;
                 }
-                    // if the player is climbing a vine
+                // if the player is climbing a vine
                 else if(Player[A].Vine > 0)
                 {
                     if(Player[A].StandingOnNPC > 0 && !Player[A].Controls.Up)
@@ -667,12 +670,14 @@ void UpdatePlayer()
                     Player[A].CanFly2 = false;
                     Player[A].RunCount = 0;
                     Player[A].SpinJump = false;
+
                     if(Player[A].Controls.Left)
                         Player[A].Location.SpeedX = -1.5;
                     else if(Player[A].Controls.Right)
                         Player[A].Location.SpeedX = 1.5;
                     else
                         Player[A].Location.SpeedX = 0;
+
                     if(Player[A].Controls.Up && Player[A].Vine > 2)
                         Player[A].Location.SpeedY = -2;
                     else if(Player[A].Controls.Down)
@@ -703,6 +708,7 @@ void UpdatePlayer()
                         if(Player[A].Location.SpeedY != 0.0 && Player[A].Slope == 0 && Player[A].StandingOnNPC == 0)
                             UnDuck(Player[A]);
                     }
+
                     // the following code controls the players ability to duck
                     if(!(Player[A].Character == 5 && ((Player[A].Location.SpeedY != 0.0 && Player[A].Slope == 0 && Player[A].StandingOnNPC == 0) || Player[A].FireBallCD != 0))) // Link can't duck/unduck in air
                     {
@@ -767,6 +773,7 @@ void UpdatePlayer()
                                 UnDuck(Player[A]);
                         }
                     }
+
                     cursed_value_C = 1;
                     // If .Character = 5 Then C = 0.94
                     if(Player[A].Character == 5)
@@ -948,6 +955,7 @@ void UpdatePlayer()
                     {
                         if(Player[A].Mount == 3)
                             Player[A].YoshiBlue = true;
+
                         if((Player[A].State == 4 || Player[A].State == 5) || (Player[A].YoshiBlue && Player[A].Mount == 3) || (Player[A].Mount == 1 && Player[A].MountType == 3))
                             Player[A].CanFly2 = true;
                         else
@@ -1144,23 +1152,18 @@ void UpdatePlayer()
                         Player[A].Location.SpeedY = 4;
                     else if(Player[A].Location.SpeedY < -3)
                         Player[A].Location.SpeedY = -3;
-                    Player[A].Location.Y += Player[A].Location.SpeedY;
                 }
                 else if(Player[A].Wet > 0 && Player[A].Quicksand == 0) // the player is swimming
                 {
                     if(Player[A].Mount == 1)
                     {
                         if(Player[A].Controls.AltJump && Player[A].CanAltJump)
-                        {
                             PlayerDismount(A);
-                        }
                     }
                     else if(Player[A].Mount == 3)
                     {
                         if(Player[A].Controls.AltJump && Player[A].CanAltJump)
-                        {
                             PlayerDismount(A);
-                        }
                     }
 
                     if(Player[A].Duck)
@@ -1187,6 +1190,7 @@ void UpdatePlayer()
                                     Player[A].Location.SpeedY = -1.1 + NPC[Player[A].StandingOnNPC].Location.SpeedY;
                                 else
                                     PlaySoundSpatial(SFX_Skid, Player[A].Location);
+
                                 Player[A].MountSpecial = 1;
                             }
                         }
@@ -1209,6 +1213,7 @@ void UpdatePlayer()
 
                     if(Player[A].SwimCount > 0)
                         Player[A].SwimCount -= 1;
+
                     if(Player[A].SwimCount == 0)
                     {
                         if(Player[A].Mount != 1 || Player[A].Location.SpeedY == Physics.PlayerGravity * 0.1 || Player[A].Slope != 0 || Player[A].StandingOnNPC != 0)
@@ -1259,16 +1264,8 @@ void UpdatePlayer()
                         }
                     }
 
-                    // FIXME: Can be simplified
-                    if(Player[A].Controls.Jump)
-                        Player[A].CanJump = false;
-                    else
-                        Player[A].CanJump = true;
-
-                    if(Player[A].Controls.AltJump)
-                        Player[A].CanAltJump = false;
-                    else
-                        Player[A].CanAltJump = true;
+                    Player[A].CanJump = !Player[A].Controls.Jump;
+                    Player[A].CanAltJump = !Player[A].Controls.AltJump;
 
                     if(Player[A].Controls.Up)
                     {
@@ -1280,13 +1277,9 @@ void UpdatePlayer()
                         if(Player[A].Location.SpeedY < -3)
                             Player[A].Location.SpeedY = -3;
                     }
-
-                    Player[A].Location.Y += Player[A].Location.SpeedY;
-
                 }
                 else // the player is not swimming
                 {
-
                     if(Player[A].Mount != 2) // if not in the clown car
                     {
                         if(Player[A].Mount == 1) // this gives the player the bounce when in the kurbio's shoe
@@ -1358,7 +1351,6 @@ void UpdatePlayer()
                                 }
                                 else if(Player[A].Jump > 0)
                                     NPC[Player[A].StandingOnNPC].Location.SpeedY = Physics.PlayerJumpVelocity * 0.9;
-
                             }
                             // if not surfing a shell then proceed like normal
                             else
@@ -1696,8 +1688,6 @@ void UpdatePlayer()
                         }
 
                         // princess float
-
-
                         if(Player[A].Character == 3 && Player[A].Wet == 0 && !Player[A].WetFrame)
                         {
                             if(Player[A].Location.SpeedY == 0 || Player[A].StandingOnNPC > 0 || Player[A].Slope > 0 || Player[A].CanFly2)
@@ -1747,7 +1737,7 @@ void UpdatePlayer()
 
                                 if(Player[A].FloatSpeed > 0.8)
                                     Player[A].FloatDir = -1;
-                                    
+
                                 if(Player[A].FloatSpeed < -0.8)
                                     Player[A].FloatDir = 1;
 
@@ -1804,8 +1794,9 @@ void UpdatePlayer()
                             }
                         }
                     }
-                    Player[A].Location.Y += Player[A].Location.SpeedY;
                 }
+
+                Player[A].Location.Y += Player[A].Location.SpeedY;
 
                 // princess peach and toad stuff
                 if(Player[A].Character == 3 || Player[A].Character == 4 || Player[A].Character == 5)
@@ -1858,6 +1849,7 @@ void UpdatePlayer()
                         {
                             if(Player[A].FlyCount > 0)
                                 Player[A].FairyCD = 0;
+
                             if(!Player[A].Fairy && Player[A].FairyCD == 0 && Player[A].Jump == 0 && Player[A].Wet == 0)
                             {
                                 Player[A].Jump = 0;
@@ -2343,16 +2335,7 @@ void UpdatePlayer()
 
                 PlayerGrabCode(A, DontResetGrabTime); // Player holding NPC code **GRAB CODE**
 
-//                if(Player[A].Controls.Run == false && Player[A].Controls.AltRun == false) // Simplified below
-//                    Player[A].RunRelease = true;
-//                else
-//                    Player[A].RunRelease = false;
                 Player[A].RunRelease = !Player[A].Controls.Run && !Player[A].Controls.AltRun;
-
-//                if(Player[A].Controls.Jump == false && Player[A].Controls.AltJump == false) // Simplified below
-//                    Player[A].JumpRelease = true;
-//                else
-//                    Player[A].JumpRelease = false;
                 Player[A].JumpRelease = !Player[A].Controls.Jump && !Player[A].Controls.AltJump;
 
                 PlayerFrame(Player[A]); // Update players frames
@@ -2395,10 +2378,6 @@ void UpdatePlayer()
 //            }
         }
 
-//        if(Player[A].Controls.Down == true) // Simplified below
-//            Player[A].DuckRelease = false;
-//        else
-//            Player[A].DuckRelease = true;
         Player[A].DuckRelease = !Player[A].Controls.Down;
         Player[A].AltRunRelease = !Player[A].Controls.AltRun;
     }
