@@ -569,27 +569,8 @@ void UpdatePlayer()
                 if(Player[A].Mount == 0)
                     Player[A].YoshiYellow = false;
 
-                // When it's true - don't check horizontal section's bounds
-                bool hBoundsHandled = false;
-
-                // level wrap
-                if(LevelWrap[Player[A].Section] || LevelVWrap[Player[A].Section])
-                    PlayerLevelWrapLogic(A);
-
-                if(LevelWrap[Player[A].Section])
-                    hBoundsHandled = true;
-
-                // Walk offscreen exit
-                if(!hBoundsHandled && OffScreenExit[Player[A].Section])
-                {
-                    PlayerOffscreenExitCheck(A);
-                    hBoundsHandled = true;
-                }
-
-                if(LevelMacro == LEVELMACRO_CARD_ROULETTE_EXIT || LevelMacro == LEVELMACRO_GOAL_TAPE_EXIT || GameMenu)
-                    hBoundsHandled = true;
-
-                PlayerLevelEdgeCheck(A, !hBoundsHandled);
+                // perform various level bounds checks (level wrap, offscreen exit, left/right/top boundaries)
+                PlayerLevelBoundsLogic(A);
 
                 // gives the players the sparkles when he is flying
                 if(
@@ -651,7 +632,6 @@ void UpdatePlayer()
 
                 // Vine collisions.
                 PlayerVineLogic(A);
-
 
                 // Check NPC collisions
                 int MessageNPC = 0;

@@ -300,3 +300,28 @@ void PlayerLevelEdgeCheck(int A, bool check_X)
         }
     }
 }
+
+void PlayerLevelBoundsLogic(int A)
+{
+    // When it's true - don't check horizontal section's bounds
+    bool hBoundsHandled = false;
+
+    // level wrap
+    if(LevelWrap[Player[A].Section] || LevelVWrap[Player[A].Section])
+        PlayerLevelWrapLogic(A);
+
+    if(LevelWrap[Player[A].Section])
+        hBoundsHandled = true;
+
+    // Walk offscreen exit
+    if(!hBoundsHandled && OffScreenExit[Player[A].Section])
+    {
+        PlayerOffscreenExitCheck(A);
+        hBoundsHandled = true;
+    }
+
+    if(LevelMacro == LEVELMACRO_CARD_ROULETTE_EXIT || LevelMacro == LEVELMACRO_GOAL_TAPE_EXIT || GameMenu)
+        hBoundsHandled = true;
+
+    PlayerLevelEdgeCheck(A, !hBoundsHandled);
+}
