@@ -4189,7 +4189,6 @@ void StealBonus()
     int B = 0;
     int C = 0;
     UNUSED(C);
-//    Location_t tempLocation;
 
     // dead players steal life
     if(BattleMode || GameMenu || GameOutro || g_ClonedPlayerMode)
@@ -4455,7 +4454,6 @@ void ClownCar()
 void WaterCheck(const int A)
 {
     Location_t tempLocation;
-    // int B = 0;
     auto &p = Player[A];
 
     if(p.Wet > 0)
@@ -4623,13 +4621,7 @@ void Tanooki(const int A)
         {
             p.Immune += 1;
             if(p.Immune % 3 == 0)
-            {
                 p.Immune2 = !p.Immune2;
-//                if(p.Immune2)
-//                    p.Immune2 = false;
-//                else
-//                    p.Immune2 = true;
-            }
         }
     }
 }
@@ -4677,8 +4669,6 @@ void PowerUps(const int A)
             {
                 if(numNPCs < maxNPCs - 100)
                 {
-//                        if(nPlay.Online && A - 1 == nPlay.MySlot)
-//                            Netplay::sendData Netplay::PutPlayerControls(nPlay.MySlot) + "1f" + std::to_string(A) + "|" + p.FireBallCD - 1;
                     p.FrameCount = 110;
                     p.FireBallCD = 25;
 
@@ -4794,8 +4784,6 @@ void PowerUps(const int A)
 
                 if(numNPCs < maxNPCs - 100)
                 {
-//                        if(nPlay.Online && A - 1 == nPlay.MySlot)
-//                            Netplay::sendData Netplay::PutPlayerControls(nPlay.MySlot) + "1f" + std::to_string(A) + "|" + p.FireBallCD - 1;
                     if(!p.SpinJump)
                         p.FrameCount = 110;
 
@@ -4984,7 +4972,7 @@ void PowerUps(const int A)
 
             syncLayers_NPC(numNPCs);
         }
-        else if(p.FireBallCD == 0 && p.Controls.Run && p.RunRelease)
+        else if(/*p.FireBallCD == 0 && */ p.Controls.Run && p.RunRelease) // cooldown is 0 whenever this code is reached
         {
             p.FireBallCD = 20;
 
@@ -5000,9 +4988,7 @@ void PowerUps(const int A)
                         p.Location.Y += -p.Location.Height;
                     }
                     else if(!p.Controls.Down && p.Duck)
-                    {
                         UnDuck(Player[A]);
-                    }
                 }
             }
 
@@ -5014,16 +5000,12 @@ void PowerUps(const int A)
         else if(p.Controls.Up && p.Location.SpeedY < 0 && !p.Duck && p.SwordPoke == 0) // Link stabs up
         {
             if(!p.WetFrame && p.Frame == 10)
-            {
                 TailSwipe(A, true, true, 1);
-            }
         }
         else if(p.Controls.Down && (p.Location.SpeedY > 0 && p.StandingOnNPC == 0 && p.Slope == 0) && !p.Duck && p.SwordPoke == 0) // Link stabs down
         {
             if(!p.WetFrame && p.Frame == 9)
-            {
                 TailSwipe(A, true, true, 2);
-            }
         }
     }
 
@@ -7792,6 +7774,7 @@ void PlayerEffects(const int A)
             if(Player[-p.Effect2].Dead)
                 p.Dead = true;
         }
+        // temporary immunity and invisibility
         else if(p.Effect2 <= 30)
         {
             p.Effect2 -= 1;
