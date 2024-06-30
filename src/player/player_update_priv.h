@@ -48,4 +48,7 @@ void PlayerSwimMovementY(int A);
 
 void PlayerPoundLogic(int A);
 
+void UpdatePlayerTimeToLive(int A);
+void UpdatePlayerDead(int A);
+
 #endif // PLAYER_UPDATE_PRIV_H
