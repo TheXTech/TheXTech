@@ -174,33 +174,9 @@ void UpdatePlayer()
                 // if not sliding and in the clown car
                 else if(Player[A].Mount == 2)
                     PlayerVehicleDismountCheck(A);
-                else if(Player[A].Driving) // driving
-                {
-                    if(Player[A].Duck)
-                        UnDuck(Player[A]);
-
-                    Player[A].Driving = false;
-                    if(Player[A].StandingOnNPC > 0)
-                    {
-                        NPC[Player[A].StandingOnNPC].Special4 = 1;
-
-                        if(Player[A].Controls.Left)
-                            NPC[Player[A].StandingOnNPC].Special5 = -1;
-                        else if(Player[A].Controls.Right)
-                            NPC[Player[A].StandingOnNPC].Special5 = 1;
-                        else
-                            NPC[Player[A].StandingOnNPC].Special5 = 0;
-
-                        if(Player[A].Controls.Up)
-                            NPC[Player[A].StandingOnNPC].Special6 = -1;
-                        else if(Player[A].Controls.Down)
-                            NPC[Player[A].StandingOnNPC].Special6 = 1;
-                        else
-                            NPC[Player[A].StandingOnNPC].Special6 = 0;
-                    }
-
-                    Player[A].Location.SpeedX = 0;
-                }
+                // driving (standing on NPCID_COCKPIT)
+                else if(Player[A].Driving)
+                    PlayerCockpitMovementX(A);
                 // if a fairy
                 else if(Player[A].Fairy)
                     PlayerFairyMovementX(A);
@@ -289,7 +265,7 @@ void UpdatePlayer()
                     PlayerSwimMovementY(A);
                 else if(Player[A].Mount == 2)
                 {
-                    // vehicle has own Y movement code elsewhere
+                    // vehicle has own Y movement code in ClownCar()
                 }
                 else // the player is not swimming
                     PlayerMovementY(A);

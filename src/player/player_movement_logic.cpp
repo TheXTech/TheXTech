@@ -427,6 +427,34 @@ void PlayerSlideMovementX(int A)
         Player[A].Slide = false;
 }
 
+void PlayerCockpitMovementX(int A)
+{
+    if(Player[A].Duck)
+        UnDuck(Player[A]);
+
+    Player[A].Driving = false;
+    if(Player[A].StandingOnNPC > 0)
+    {
+        NPC[Player[A].StandingOnNPC].Special4 = 1;
+
+        if(Player[A].Controls.Left)
+            NPC[Player[A].StandingOnNPC].Special5 = -1;
+        else if(Player[A].Controls.Right)
+            NPC[Player[A].StandingOnNPC].Special5 = 1;
+        else
+            NPC[Player[A].StandingOnNPC].Special5 = 0;
+
+        if(Player[A].Controls.Up)
+            NPC[Player[A].StandingOnNPC].Special6 = -1;
+        else if(Player[A].Controls.Down)
+            NPC[Player[A].StandingOnNPC].Special6 = 1;
+        else
+            NPC[Player[A].StandingOnNPC].Special6 = 0;
+    }
+
+    Player[A].Location.SpeedX = 0;
+}
+
 void PlayerMovementY(int A)
 {
     if(Player[A].Mount == 1) // this gives the player the bounce when in the kurbio's shoe
