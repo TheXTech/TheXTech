@@ -4234,14 +4234,12 @@ void StealBonus()
 void ClownCar()
 {
     // for when the player is in the clown car
-    int A = 0;
-    int B = 0;
+    // int A = 0;
+    // int B = 0;
 //    int C = 0;
-    NPC_t blankNPC;
-    bool tempBool = false;
-    Location_t tempLocation;
+    // NPC_t blankNPC;
 
-    for(A = 1; A <= numPlayers; A++) // Code for running the Koopa Clown Car
+    for(int A = 1; A <= numPlayers; A++) // Code for running the Koopa Clown Car
     {
         // commenting out because:
         //   (1) misplaced; (2) doesn't work with abstract controls
@@ -4250,189 +4248,206 @@ void ClownCar()
         // if(numPlayers > 2 && GameMenu == false && LevelMacro == LEVELMACRO_OFF && nPlay.Online == false)
         //     Player[A].Controls = Player[1].Controls;
 
-        if(Player[A].Mount == 2 && Player[A].Dead == false && Player[A].TimeToLive == 0)
+        Player_t& p = Player[A];
+        Location_t& pLoc = p.Location;
+
+        // this code should only apply to living players on the vehicle mount
+        if(!(p.Mount == 2 && p.Dead == false && p.TimeToLive == 0))
+            continue;
+
+        // vehicle movement code
+        if(p.Effect == PLREFF_NORMAL)
         {
-            if(Player[A].Effect == PLREFF_NORMAL)
+            if(p.Controls.Left)
             {
-                if(Player[A].Controls.Left)
-                {
-                    Player[A].Location.SpeedX -= 0.1;
-                    if(Player[A].Location.SpeedX > 0)
-                        Player[A].Location.SpeedX -= 0.15;
-                }
-                else if(Player[A].Controls.Right)
-                {
-                    Player[A].Location.SpeedX += 0.1;
-                    if(Player[A].Location.SpeedX < 0)
-                        Player[A].Location.SpeedX += 0.15;
-                }
+                pLoc.SpeedX -= 0.1;
+
+                if(pLoc.SpeedX > 0)
+                    pLoc.SpeedX -= 0.15;
+            }
+            else if(p.Controls.Right)
+            {
+                pLoc.SpeedX += 0.1;
+
+                if(pLoc.SpeedX < 0)
+                    pLoc.SpeedX += 0.15;
+            }
+            else
+            {
+                if(pLoc.SpeedX > 0.2)
+                    pLoc.SpeedX -= 0.05;
+                else if(pLoc.SpeedX < -0.2)
+                    pLoc.SpeedX += 0.05;
                 else
-                {
-                    if(Player[A].Location.SpeedX > 0.2)
-                        Player[A].Location.SpeedX -= 0.05;
-                    else if(Player[A].Location.SpeedX < -0.2)
-                        Player[A].Location.SpeedX += 0.05;
-                    else
-                        Player[A].Location.SpeedX = 0;
-                }
+                    pLoc.SpeedX = 0;
+            }
 
-                if(Player[A].Controls.Up)
-                {
-                    Player[A].Location.SpeedY -= 0.1;
-                    if(Player[A].Location.SpeedY > 0)
-                        Player[A].Location.SpeedY -= 0.2;
-                }
-                else if(Player[A].Controls.Down)
-                {
-                    Player[A].Location.SpeedY += 0.2;
-                    if(Player[A].Location.SpeedY < 0)
-                        Player[A].Location.SpeedY += 0.2;
-                }
+            if(p.Controls.Up)
+            {
+                pLoc.SpeedY -= 0.1;
+
+                if(pLoc.SpeedY > 0)
+                    pLoc.SpeedY -= 0.2;
+            }
+            else if(p.Controls.Down)
+            {
+                pLoc.SpeedY += 0.2;
+
+                if(pLoc.SpeedY < 0)
+                    pLoc.SpeedY += 0.2;
+            }
+            else
+            {
+                if(pLoc.SpeedY > 0.1)
+                    pLoc.SpeedY -= 0.1;
+                else if(pLoc.SpeedY < -0.1)
+                    pLoc.SpeedY += 0.1;
                 else
-                {
-                    if(Player[A].Location.SpeedY > 0.1)
-                        Player[A].Location.SpeedY -= 0.1;
-                    else if(Player[A].Location.SpeedY < -0.1)
-                        Player[A].Location.SpeedY += 0.1;
-                    else
-                        Player[A].Location.SpeedY = 0;
-                }
-
-                if(Player[A].Location.SpeedX > 4)
-                    Player[A].Location.SpeedX = 4;
-                else if(Player[A].Location.SpeedX < -4)
-                    Player[A].Location.SpeedX = -4;
-                if(Player[A].Location.SpeedY > 10)
-                    Player[A].Location.SpeedY = 10;
-                else if(Player[A].Location.SpeedY < -4)
-                    Player[A].Location.SpeedY = -4;
+                    pLoc.SpeedY = 0;
             }
 
-            numNPCs++;
-            NPC[numNPCs] = NPC_t();
-            NPC[numNPCs].playerTemp = true;
-            NPC[numNPCs].Type = NPCID_VEHICLE;
-            NPC[numNPCs].Variant = A; // newly-added to allow setting StandingOnVehiclePlr
-            NPC[numNPCs].Active = true;
-            NPC[numNPCs].TimeLeft = 100;
-            NPC[numNPCs].Location = Player[A].Location;
+            if(pLoc.SpeedX > 4)
+                pLoc.SpeedX = 4;
+            else if(pLoc.SpeedX < -4)
+                pLoc.SpeedX = -4;
+            if(pLoc.SpeedY > 10)
+                pLoc.SpeedY = 10;
+            else if(pLoc.SpeedY < -4)
+                pLoc.SpeedY = -4;
+        }
 
-            if(Player[A].Effect != PLREFF_NORMAL)
+        // create playerTemp NPC for the Vehicle
+        numNPCs++;
+        NPC[numNPCs] = NPC_t();
+        NPC[numNPCs].playerTemp = true;
+        NPC[numNPCs].Type = NPCID_VEHICLE;
+        NPC[numNPCs].Variant = A; // newly-added to allow setting StandingOnVehiclePlr
+        NPC[numNPCs].Active = true;
+        NPC[numNPCs].TimeLeft = 100;
+        NPC[numNPCs].Location = pLoc;
+
+        if(p.Effect != PLREFF_NORMAL)
+        {
+            NPC[numNPCs].Location.SpeedX = 0;
+            NPC[numNPCs].Location.SpeedY = 0;
+        }
+
+        NPC[numNPCs].Location.Y += NPC[numNPCs].Location.SpeedY;
+        NPC[numNPCs].Location.X += NPC[numNPCs].Location.SpeedX;
+        NPC[numNPCs].Section = p.Section;
+        syncLayers_NPC(numNPCs);
+
+        // update other players' StandingOnNPC
+        for(int B = 1; B <= numPlayers; B++)
+        {
+            if(Player[B].StandingOnVehiclePlr && (g_ClonedPlayerMode || Player[B].StandingOnVehiclePlr == A))
             {
-                NPC[numNPCs].Location.SpeedX = 0;
-                NPC[numNPCs].Location.SpeedY = 0;
-            }
+                Player[B].StandingOnNPC = numNPCs;
+                Player[B].Location.X += double(p.mountBump);
 
-            NPC[numNPCs].Location.Y += NPC[numNPCs].Location.SpeedY;
-            NPC[numNPCs].Location.X += NPC[numNPCs].Location.SpeedX;
-            NPC[numNPCs].Section = Player[A].Section;
-            syncLayers_NPC(numNPCs);
-
-            for(B = 1; B <= numPlayers; B++)
-            {
-                if(Player[B].StandingOnVehiclePlr && (g_ClonedPlayerMode || Player[B].StandingOnVehiclePlr == A))
+                if(Player[B].Effect != PLREFF_NORMAL)
                 {
-                    Player[B].StandingOnNPC = numNPCs;
-                    Player[B].Location.X += double(Player[A].mountBump);
-                    if(Player[B].Effect != PLREFF_NORMAL)
-                    {
-                        Player[B].Location.Y = Player[A].Location.Y - Player[B].Location.Height;
-                        Player[B].Location.X += Player[A].Location.SpeedX;
-                    }
+                    Player[B].Location.Y = pLoc.Y - Player[B].Location.Height;
+                    Player[B].Location.X += pLoc.SpeedX;
                 }
             }
+        }
 
-            for(int B : NPCQueues::Active.may_insert)
+        // handle NPCs on the vehicle
+        for(int B : NPCQueues::Active.may_insert)
+        {
+            // only want non-toothy NPCs on A's vehicle
+            if(!(NPC[B].vehiclePlr == A && NPC[B].Type != NPCID_TOOTHY))
+                continue;
+
+            if(p.Effect == PLREFF_NORMAL)
+                NPC[B].Location.X += pLoc.SpeedX + double(p.mountBump);
+
+            NPC[B].TimeLeft = 100;
+            NPC[B].Location.SpeedY = pLoc.SpeedY;
+            NPC[B].Location.SpeedX = 0;
+
+            if(p.Effect != PLREFF_NORMAL)
+                NPC[B].Location.SpeedY = 0;
+
+            NPC[B].Location.Y = pLoc.Y + NPC[B].Location.SpeedY + 0.1 - NPC[B].vehicleYOffset;
+            treeNPCUpdate(B);
+
+            // extend toothy pipe
+            if(p.Controls.Run && NPC[B].Type == NPCID_TOOTHYPIPE)
             {
-                if(NPC[B].vehiclePlr == A && NPC[B].Type != NPCID_TOOTHY)
+                // create toothy if it doesn't exist already
+                if(NPC[B].Special == 0.0)
                 {
-                    if(Player[A].Effect == PLREFF_NORMAL)
-                        NPC[B].Location.X += Player[A].Location.SpeedX + double(Player[A].mountBump);
+                    NPC[B].Special = 1;
+                    numNPCs++;
+                    NPC[numNPCs] = NPC_t();
+                    NPC[B].Special2 = numNPCs;
 
-                    NPC[B].TimeLeft = 100;
-                    NPC[B].Location.SpeedY = Player[A].Location.SpeedY;
-                    NPC[B].Location.SpeedX = 0;
+                    NPC[numNPCs].Active = true;
+                    NPC[numNPCs].Section = p.Section;
+                    NPC[numNPCs].TimeLeft = 100;
+                    NPC[numNPCs].Type = NPCID_TOOTHY;
+                    NPC[numNPCs].Location.Height = 32;
+                    NPC[numNPCs].Location.Width = 48;
+                    NPC[numNPCs].Special = A;
+                    NPC[numNPCs].Special2 = B;
+                    NPC[numNPCs].Direction = NPC[B].Direction;
 
-                    if(Player[A].Effect != PLREFF_NORMAL)
-                        NPC[B].Location.SpeedY = 0;
+                    if(NPC[numNPCs].Direction == 1)
+                        NPC[numNPCs].Frame = 2;
+                    syncLayers_NPC(numNPCs);
+                }
 
-                    NPC[B].Location.Y = Player[A].Location.Y + NPC[B].Location.SpeedY + 0.1 - NPC[B].vehicleYOffset;
-                    treeNPCUpdate(B);
-
-                    if(Player[A].Controls.Run)
+                // update toothy's position
+                for(int C : NPCQueues::Active.no_change)
+                {
+                    if(NPC[C].Type == NPCID_TOOTHY && Maths::iRound(NPC[C].Special) == A && Maths::iRound(NPC[C].Special2) == B)
                     {
-                        if(NPC[B].Type == NPCID_TOOTHYPIPE)
-                        {
-                            if(NPC[B].Special == 0.0)
-                            {
-                                NPC[B].Special = 1;
-                                numNPCs++;
-                                NPC[numNPCs] = NPC_t();
-                                NPC[B].Special2 = numNPCs;
-                                NPC[numNPCs].Active = true;
-                                NPC[numNPCs].Section = Player[A].Section;
-                                NPC[numNPCs].TimeLeft = 100;
-                                NPC[numNPCs].Type = NPCID_TOOTHY;
-                                NPC[numNPCs].Location.Height = 32;
-                                NPC[numNPCs].Location.Width = 48;
-                                NPC[numNPCs].Special = A;
-                                NPC[numNPCs].Special2 = B;
-                                NPC[numNPCs].Direction = NPC[B].Direction;
-                                if(NPC[numNPCs].Direction == 1)
-                                    NPC[numNPCs].Frame = 2;
-                                syncLayers_NPC(numNPCs);
-                            }
+                        NPC[C].vehiclePlr = A;
+                        NPC[C].Projectile = true;
+                        NPC[C].Direction = NPC[B].Direction;
 
-                            for(int C : NPCQueues::Active.no_change)
-                            {
-                                if(NPC[C].Type == NPCID_TOOTHY && Maths::iRound(NPC[C].Special) == A && Maths::iRound(NPC[C].Special2) == B)
-                                {
-                                    NPC[C].vehiclePlr = A;
-                                    NPC[C].Projectile = true;
-                                    NPC[C].Direction = NPC[B].Direction;
+                        if(NPC[C].Direction > 0)
+                            NPC[C].Location.X = NPC[B].Location.X + 32;
+                        else
+                            NPC[C].Location.X = NPC[B].Location.X - NPC[C].Location.Width;
 
-                                    if(NPC[C].Direction > 0)
-                                        NPC[C].Location.X = NPC[B].Location.X + 32;
-                                    else
-                                        NPC[C].Location.X = NPC[B].Location.X - NPC[C].Location.Width;
-
-                                    NPC[C].Location.Y = NPC[B].Location.Y;
-                                    NPC[C].TimeLeft = 100;
-                                    treeNPCUpdate(C);
-                                    break;
-                                }
-                            }
-                        }
+                        NPC[C].Location.Y = NPC[B].Location.Y;
+                        NPC[C].TimeLeft = 100;
+                        treeNPCUpdate(C);
+                        break;
                     }
-
-                    tempBool = false;
-                    tempLocation = NPC[B].Location;
-                    tempLocation.Y += tempLocation.Height + 0.1;
-                    tempLocation.X += 0.5;
-                    tempLocation.Width -= 1;
-                    tempLocation.Height = 1;
-
-                    for(int C : treeNPCQuery(tempLocation, SORTMODE_NONE))
-                    {
-                        if(B != C && (NPC[C].vehiclePlr == A || NPC[C].playerTemp))
-                        {
-                            if(CheckCollision(tempLocation, NPC[C].Location))
-                            {
-                                tempBool = true;
-                                break;
-                            }
-                        }
-                    }
-
-                    if(!tempBool)
-                    {
-                        NPC[B].vehiclePlr = 0;
-                        NPC[B].vehicleYOffset = 0;
-                    }
-                    else
-                        NPC[B].Location.SpeedX = 0;
                 }
             }
+
+            // check if NPC should stay on the vehicle
+            bool still_on_vehicle = false;
+            Location_t query_loc = NPC[B].Location;
+            query_loc.Y += query_loc.Height + 0.1;
+            query_loc.X += 0.5;
+            query_loc.Width -= 1;
+            query_loc.Height = 1;
+
+            for(int C : treeNPCQuery(query_loc, SORTMODE_NONE))
+            {
+                if(B != C && (NPC[C].vehiclePlr == A || NPC[C].playerTemp))
+                {
+                    if(CheckCollision(query_loc, NPC[C].Location))
+                    {
+                        still_on_vehicle = true;
+                        break;
+                    }
+                }
+            }
+
+            if(!still_on_vehicle)
+            {
+                NPC[B].vehiclePlr = 0;
+                NPC[B].vehicleYOffset = 0;
+            }
+            else
+                NPC[B].Location.SpeedX = 0;
         }
     }
 }
