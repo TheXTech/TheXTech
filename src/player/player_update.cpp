@@ -592,7 +592,7 @@ void UpdatePlayer()
                             }
                         }
 
-                        if(!tempBool) for(int B : treeNPCQuery(tempLocation, SORTMODE_NONE))
+                        if(tempBool) for(int B : treeNPCQuery(tempLocation, SORTMODE_NONE))
                         {
                             if(NPC[B]->IsABlock && !NPC[B]->StandsOnPlayer && NPC[B].Active && NPC[B].Type != NPCID_VEHICLE)
                             {
