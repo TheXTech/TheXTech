@@ -37,7 +37,6 @@
 #include "../editor.h"
 #include "../game_main.h"
 #include "../main/trees.h"
-#include "../main/game_globals.h"
 #include "../frame_timer.h"
 #include "../graphics.h"
 #include "../controls.h"
@@ -673,41 +672,7 @@ void UpdatePlayer()
                 // Walk offscreen exit
                 if(!hBoundsHandled && OffScreenExit[Player[A].Section])
                 {
-                    bool offScreenExit = false;
-                    if(Player[A].Location.X + Player[A].Location.Width < level[Player[A].Section].X)
-                    {
-                        offScreenExit = true;
-                        for(int B = 1; B <= numPlayers; B++)
-                            Player[B].TailCount = 0;
-                    }
-                    else if(Player[A].Location.X > level[Player[A].Section].Width)
-                    {
-                        offScreenExit = true;
-                    }
-
-                    if(offScreenExit)
-                    {
-                        // Always quit to the world map by off-screen exit
-                        if(!NoMap && !FileRecentSubHubLevel.empty())
-                        {
-                            FileRecentSubHubLevel.clear();
-                            ReturnWarp = 0;
-                            ReturnWarpSaved = 0;
-                        }
-
-                        LevelBeatCode = 3;
-                        EndLevel = true;
-                        LevelMacro = LEVELMACRO_OFF;
-                        LevelMacroCounter = 0;
-
-                        if(g_config.EnableInterLevelFade)
-                            g_levelScreenFader.setupFader(4, 0, 65, ScreenFader::S_FADE);
-                        else
-                            g_levelScreenFader.setupFader(65, 0, 65, ScreenFader::S_FADE);
-
-                        levelWaitForFade();
-                    }
-
+                    PlayerOffscreenExitCheck(A);
                     hBoundsHandled = true;
                 }
 
