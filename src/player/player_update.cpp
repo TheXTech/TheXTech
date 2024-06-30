@@ -55,7 +55,6 @@ void UpdatePlayer()
 {
     // int A = 0;
     int B = 0;
-    float C = 0;
     float D = 0;
 //    Controls_t blankControls;
     // float speedVar = 0; // adjusts the players speed by percentages
@@ -165,15 +164,15 @@ void UpdatePlayer()
         bool DontResetGrabTime = false; // helps with grabbing things from the top
 //        oldGrab = Player[A].HoldingNPC; // SET BUT NOT UNUSED
         bool movingBlock = false; // helps with collisions for moving blocks
-        int blockPushX = 0;
         Player[A].ShowWarp = 0;
         Player[A].mountBump = 0;
         // bool spinKill = false;
-        bool tempHit = false;
-        bool tempHit2 = false;
         int tempHit3 = 0;
-        Location_t tempLocation3;
-        int oldStandingOnNpc = Player[A].StandingOnNPC;
+
+        // this was shared over players in SMBX 1.3 -- if the line marked "MOST CURSED LINE" in player_block_logic.cpp becomes a source of incompatibility, we will need to restore that logic
+        float cursed_value_C = 0;
+
+        // Location_t tempLocation3;
 //        tempBlockA[1] = 0; // Unused
 //        tempBlockA[2] = 0;
         if(Player[A].GrabTime > 0) // if grabbing something, take control away from the player
@@ -821,10 +820,10 @@ void UpdatePlayer()
                                 UnDuck(Player[A]);
                         }
                     }
-                    C = 1;
+                    cursed_value_C = 1;
                     // If .Character = 5 Then C = 0.94
                     if(Player[A].Character == 5)
-                        C = 0.95F;
+                        cursed_value_C = 0.95F;
                     if(Player[A].Controls.Left &&
                        ((!Player[A].Duck && Player[A].GrabTime == 0) ||
                         (Player[A].Location.SpeedY != 0.0 && Player[A].StandingOnNPC == 0 && Player[A].Slope == 0) ||
@@ -834,7 +833,7 @@ void UpdatePlayer()
                         Player[A].Bumped = false;
                         if(Player[A].Controls.Run || Player[A].Location.SpeedX > -Physics.PlayerWalkSpeed * speedVar || Player[A].Character == 5)
                         {
-                            if(Player[A].Location.SpeedX > -Physics.PlayerWalkSpeed * speedVar * C)
+                            if(Player[A].Location.SpeedX > -Physics.PlayerWalkSpeed * speedVar * cursed_value_C)
                             {
                                 if(Player[A].Character == 2) // LUIGI
                                     Player[A].Location.SpeedX += 0.1 * 0.175;
@@ -880,7 +879,7 @@ void UpdatePlayer()
                         Player[A].Bumped = false;
                         if(Player[A].Controls.Run || Player[A].Location.SpeedX < Physics.PlayerWalkSpeed * speedVar || Player[A].Character == 5)
                         {
-                            if(Player[A].Location.SpeedX < Physics.PlayerWalkSpeed * speedVar * C)
+                            if(Player[A].Location.SpeedX < Physics.PlayerWalkSpeed * speedVar * cursed_value_C)
                             {
                                 if(Player[A].Character == 2) // LUIGI
                                     Player[A].Location.SpeedX += -0.1 * 0.175;
@@ -2461,19 +2460,6 @@ void UpdatePlayer()
 #endif
 
 
-                // Block collisions.
-                int oldSlope = Player[A].Slope;
-                Player[A].Slope = 0;
-                int tempSlope = 0;
-                int tempSlope2 = 0;
-                int tempSlope3 = 0; // keeps track of hit 5 for slope detection
-
-                int ceilingBlock1 = 0;
-                int ceilingBlock2 = 0;
-
-                // NEW and not provably safe, but can only fail if Block[0] is in the same place as a block the player collides with
-                double tempSlope2X = 0; // The old X before player was moved
-
                 if(Player[A].Pinched.Bottom1 > 0)
                     Player[A].Pinched.Bottom1 -= 1;
                 if(Player[A].Pinched.Left2 > 0)
@@ -2495,6 +2481,30 @@ void UpdatePlayer()
 
                 if(Player[A].Effect == PLREFF_NORMAL && Player[A].Pinched.Strict > 0)
                     Player[A].Pinched.Strict -= 1;
+
+                // Block collisions.
+                int oldSlope = Player[A].Slope;
+                Player[A].Slope = 0;
+
+                int oldStandingOnNpc = Player[A].StandingOnNPC;
+
+                int blockPushX = 0;
+                bool tempHit = false;
+                bool tempHit2 = false;
+
+                int tempSlope = 0;
+                int tempSlope2 = 0;
+                int tempSlope3 = 0; // keeps track of hit 5 for slope detection
+
+                int ceilingBlock1 = 0;
+                int ceilingBlock2 = 0;
+
+                Location_t tempLocation3;
+
+                int B = 0;
+
+                // NEW and not provably safe, but can only fail if Block[0] is in the same place as a block the player collides with
+                double tempSlope2X = 0; // The old X before player was moved
 
                 if(Player[A].Character == 5 && Player[A].Duck && (Player[A].Location.SpeedY == Physics.PlayerGravity || Player[A].StandingOnNPC != 0 || Player[A].Slope != 0))
                 {
@@ -2567,10 +2577,10 @@ void UpdatePlayer()
                                                 {
                                                     if(Player[A].Mount > 0 && HitSpot == 1)
                                                     {
-                                                        C = Player[A].Location.Y + Player[A].Location.Height;
+                                                        cursed_value_C = Player[A].Location.Y + Player[A].Location.Height;
                                                         Player[A].Location.Y = Block[B].Location.Y - Player[A].Location.Height;
                                                         PlayerHurt(A);
-                                                        Player[A].Location.Y = C - Player[A].Location.Height;
+                                                        Player[A].Location.Y = cursed_value_C - Player[A].Location.Height;
                                                     }
                                                     else
                                                         PlayerHurt(A);
@@ -2689,7 +2699,8 @@ void UpdatePlayer()
                                         }
 
                                         // collision for blocks that are sloped on the top
-                                        if(BlockSlope[Block[B].Type] != 0 && HitSpot != 3 && !(BlockSlope[Block[B].Type] == -1 && HitSpot == 2) && !(BlockSlope[Block[B].Type] == 1 && HitSpot == 4) && (Player[A].Location.Y + Player[A].Location.Height - 4 - C <= Block[B].Location.Y + Block[B].Location.Height || (Player[A].Location.Y + Player[A].Location.Height - 12 <= Block[B].Location.Y + Block[B].Location.Height && Player[A].StandingOnNPC != 0)))
+                                        // MOST CURSED LINE: cursed_value_C (C in VB6 code) is entirely arbitrary at this point. BE WARNED, this may be a cause of incompatibilities with SMBX 1.3, and if so, we will need to improve this logic in the future.
+                                        if(BlockSlope[Block[B].Type] != 0 && HitSpot != 3 && !(BlockSlope[Block[B].Type] == -1 && HitSpot == 2) && !(BlockSlope[Block[B].Type] == 1 && HitSpot == 4) && (Player[A].Location.Y + Player[A].Location.Height - 4 - cursed_value_C <= Block[B].Location.Y + Block[B].Location.Height || (Player[A].Location.Y + Player[A].Location.Height - 12 <= Block[B].Location.Y + Block[B].Location.Height && Player[A].StandingOnNPC != 0)))
                                         {
                                             HitSpot = 0;
                                             if(
@@ -2790,8 +2801,8 @@ void UpdatePlayer()
                                                         {
                                                             if(!Player[A].WetFrame)
                                                             {
-                                                                C = Player[A].Location.SpeedX * (Block[B].Location.Height / static_cast<double>(Block[B].Location.Width)) * BlockSlope[Block[B].Type];
-                                                                Player[A].Location.SpeedY = C;
+                                                                cursed_value_C = Player[A].Location.SpeedX * (Block[B].Location.Height / static_cast<double>(Block[B].Location.Width)) * BlockSlope[Block[B].Type];
+                                                                Player[A].Location.SpeedY = cursed_value_C;
                                                                 if(Player[A].Location.SpeedY > 0 && !Player[A].Slide && Player[A].Mount != 1 && Player[A].Mount != 2)
                                                                     Player[A].Location.SpeedY = Player[A].Location.SpeedY * 4;
                                                             }
@@ -2977,16 +2988,16 @@ void UpdatePlayer()
                                                     }
                                                     else
                                                     {
-                                                        C = Block[B].Location.X + Block[B].Location.Width * 0.5;
-                                                        D = Block[tempHit3].Location.X + Block[tempHit3].Location.Width * 0.5;
+                                                        cursed_value_C = Block[B].Location.X + Block[B].Location.Width * 0.5;
+                                                        float D = Block[tempHit3].Location.X + Block[tempHit3].Location.Width * 0.5;
 
-                                                        C += -(Player[A].Location.X + Player[A].Location.Width * 0.5);
+                                                        cursed_value_C += -(Player[A].Location.X + Player[A].Location.Width * 0.5);
                                                         D += -(Player[A].Location.X + Player[A].Location.Width * 0.5);
-                                                        if(C < 0)
-                                                            C = -C;
+                                                        if(cursed_value_C < 0)
+                                                            cursed_value_C = -cursed_value_C;
                                                         if(D < 0)
                                                             D = -D;
-                                                        if(C < D)
+                                                        if(cursed_value_C < D)
                                                             tempHit3 = B;
                                                     }
 
@@ -3139,6 +3150,13 @@ void UpdatePlayer()
                                                     }
                                                 }
 
+                                                // arbitrary but fine for here (for now)
+                                                // FIXME: look for cases where this is too high
+                                                cursed_value_C = numBlock;
+
+                                                /// TODO: find all cases where C is set and could "stick", and make them persistent
+                                                //// decided whether or not to care about 2P and higher (C values from NPC checks)
+
                                                 if(tempBool)
                                                 {
                                                     Player[A].CanJump = false;
@@ -3175,7 +3193,7 @@ void UpdatePlayer()
                 {
                     if(Player[A].Location.SpeedY > 0)
                     {
-                        C = Player[A].Location.SpeedX * (Block[oldSlope].Location.Height / static_cast<double>(Block[oldSlope].Location.Width)) * BlockSlope[Block[oldSlope].Type];
+                        float C = Player[A].Location.SpeedX * (Block[oldSlope].Location.Height / static_cast<double>(Block[oldSlope].Location.Width)) * BlockSlope[Block[oldSlope].Type];
                         if(C > 0)
                             Player[A].Location.SpeedY = C;
                     }
@@ -3452,8 +3470,8 @@ void UpdatePlayer()
 
                 if(ceilingBlock2 != 0) // Hitting a block from below
                 {
-                    C = Block[ceilingBlock1].Location.X + Block[ceilingBlock1].Location.Width * 0.5;
-                    D = Block[ceilingBlock2].Location.X + Block[ceilingBlock2].Location.Width * 0.5;
+                    float C = Block[ceilingBlock1].Location.X + Block[ceilingBlock1].Location.Width * 0.5;
+                    float D = Block[ceilingBlock2].Location.X + Block[ceilingBlock2].Location.Width * 0.5;
                     C += -(Player[A].Location.X + Player[A].Location.Width * 0.5);
                     D += -(Player[A].Location.X + Player[A].Location.Width * 0.5);
 
@@ -3526,6 +3544,17 @@ void UpdatePlayer()
                     }
                 }
 
+                if(Player[A].StandingOnNPC != 0)
+                {
+                    if(!tempHit2)
+                    {
+                        // the single Pinched variable has always been false since SMBX64
+                        // if(!NPC[Player[A].StandingOnNPC].Pinched && !FreezeNPCs)
+                        if(!FreezeNPCs)
+                            Player[A].Location.SpeedX += -NPC[Player[A].StandingOnNPC].Location.SpeedX - NPC[Player[A].StandingOnNPC].BeltSpeed;
+                    }
+                }
+
                 if(Player[A].Slide && oldSlope > 0 && Player[A].Slope == 0 && Player[A].Location.SpeedY < 0)
                 {
                     if(Player[A].NoGravity == 0)
@@ -3543,11 +3572,8 @@ void UpdatePlayer()
 //                }
 //                else
 //                    Player[A].SlideKill = false;
+
                 Player[A].SlideKill = Player[A].Slide && (std::abs(Player[A].Location.SpeedX) > 1);
-
-
-
-
 
                 // Check NPC collisions
                 if(Player[A].Vine > 0)
@@ -3642,16 +3668,6 @@ void UpdatePlayer()
                     } // Is BGO climbable and visible?
                 } // Next A
 
-                if(Player[A].StandingOnNPC != 0)
-                {
-                    if(!tempHit2)
-                    {
-                        // the single Pinched variable has always been false since SMBX64
-                        // if(!NPC[Player[A].StandingOnNPC].Pinched && !FreezeNPCs)
-                        if(!FreezeNPCs)
-                            Player[A].Location.SpeedX += -NPC[Player[A].StandingOnNPC].Location.SpeedX - NPC[Player[A].StandingOnNPC].BeltSpeed;
-                    }
-                }
 
                 int MessageNPC = 0;
                 PlayerNPCLogic(A, tempSpring, tempShell, MessageNPC, movingBlock, tempHit3, oldSpeedY);
