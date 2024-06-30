@@ -447,6 +447,7 @@ void UpdatePlayer()
                 // let the player slide if not on a mount and holding something
                 if(Player[A].GrabTime > 0)
                     Player[A].Slide = false;
+
                 if(Player[A].Slope > 0 && Player[A].Controls.Down &&
                    Player[A].Mount == 0 && Player[A].HoldingNPC == 0 &&
                    !(Player[A].Character == 3 || Player[A].Character == 4 || Player[A].Character == 5) &&
@@ -458,10 +459,11 @@ void UpdatePlayer()
                 }
                 else if(Player[A].Location.SpeedX == 0.0)
                     Player[A].Slide = false;
+
                 if(Player[A].Mount > 0 || Player[A].HoldingNPC > 0)
                     Player[A].Slide = false;
 
-                // unduck a player that should be able to duck
+                // unduck a player that shouldn't be able to duck
                 if(Player[A].Duck && (Player[A].Character == 1 || Player[A].Character == 2) && Player[A].State == 1 && (Player[A].Mount == 0 || Player[A].Mount == 2))
                     UnDuck(Player[A]);
 
@@ -474,9 +476,10 @@ void UpdatePlayer()
 
                 if(Player[A].StandingOnNPC > 0)
                 {
-                    if(NPC[Player[A].StandingOnNPC].Type == 263 && NPC[Player[A].StandingOnNPC].Location.SpeedX == 0.0)
+                    if(NPC[Player[A].StandingOnNPC].Type == NPCID_ICE_CUBE && NPC[Player[A].StandingOnNPC].Location.SpeedX == 0.0)
                         Player[A].Slippy = true;
                 }
+
                 double SlippySpeedX = Player[A].Location.SpeedX;
 
 
@@ -1286,7 +1289,6 @@ void UpdatePlayer()
 
                     if(Player[A].Mount != 2) // if not in the clown car
                     {
-
                         if(Player[A].Mount == 1) // this gives the player the bounce when in the kurbio's shoe
                         {
                             if(Player[A].Controls.Left || Player[A].Controls.Right)
@@ -1318,16 +1320,12 @@ void UpdatePlayer()
                         if(Player[A].Mount == 1)
                         {
                             if(Player[A].Controls.AltJump && Player[A].CanAltJump) // check to see if the player should jump out of the shoe
-                            {
                                 PlayerDismount(A);
-                            }
                         }
                         else if(Player[A].Mount == 3)
                         {
                             if(Player[A].Controls.AltJump && Player[A].CanAltJump) // jump off of yoshi
-                            {
                                 PlayerDismount(A);
-                            }
                         }
 
                         if((Player[A].Location.SpeedY == 0.0 || Player[A].Jump > 0 || Player[A].Vine > 0) && Player[A].FloatTime == 0) // princess float
@@ -1447,10 +1445,13 @@ void UpdatePlayer()
                         }
                         else
                             Player[A].CanJump = true;
+
                         if(Player[A].Jump > 0)
                             Player[A].Slope = 0;
+
                         if(Player[A].SpinJump || (Player[A].State != 4 && Player[A].State != 5) || Player[A].StandingOnNPC > 0 || Player[A].Slope > 0 || Player[A].Location.SpeedY == 0)
                             Player[A].DoubleJump = false;
+
                         // double jump code
                         if(Player[A].DoubleJump && Player[A].Jump == 0 && Player[A].Location.SpeedY != 0 && Player[A].Slope == 0 &&
                            Player[A].StandingOnNPC == 0 && Player[A].Wet == 0 && Player[A].Vine == 0 &&
@@ -1467,6 +1468,7 @@ void UpdatePlayer()
                                 tempLocation.Height = EffectHeight[80];
                                 tempLocation.Width = EffectWidth[80];
                                 tempLocation.X = Player[A].Location.X;
+
                                 for(int B = 1; B <= 10; B++)
                                 {
                                     NewEffect(EFFID_SPARKLE, tempLocation);
@@ -2071,10 +2073,6 @@ void UpdatePlayer()
                 }
 
                 Player[A].FloatRelease = !Player[A].Controls.Jump;
-//                if(Player[A].Controls.Jump == true)
-//                    Player[A].FloatRelease = false;
-//                else
-//                    Player[A].FloatRelease = true;
 
                 // Player interactions
                 Player[A].Location.SpeedX += Player[A].Bumped2;
