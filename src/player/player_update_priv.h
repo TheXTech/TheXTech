@@ -30,4 +30,6 @@ void PlayerBlockLogic(int A, int& tempHit3, bool& movingBlock, bool& DontResetGr
 
 void PlayerVineLogic(int A);
 
+void PlayerSharedScreenLogic(int A);
+
 #endif // PLAYER_UPDATE_PRIV_H
