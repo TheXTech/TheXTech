@@ -30,6 +30,7 @@ void PlayerBlockLogic(int A, int& tempHit3, bool& movingBlock, bool& DontResetGr
 
 void PlayerVineLogic(int A);
 bool PlayerFairyOnVine(int A);
+void PlayerVineMovement(int A);
 
 void PlayerSharedScreenLogic(int A);
 void PlayerLevelWrapLogic(int A);

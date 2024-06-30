@@ -611,39 +611,7 @@ void UpdatePlayer()
                     PlayerFairyMovementX(A);
                 // if the player is climbing a vine
                 else if(Player[A].Vine > 0)
-                {
-                    if(Player[A].StandingOnNPC > 0 && !Player[A].Controls.Up)
-                        Player[A].Vine = 0;
-                    Player[A].CanFly = false;
-                    Player[A].CanFly2 = false;
-                    Player[A].RunCount = 0;
-                    Player[A].SpinJump = false;
-
-                    if(Player[A].Controls.Left)
-                        Player[A].Location.SpeedX = -1.5;
-                    else if(Player[A].Controls.Right)
-                        Player[A].Location.SpeedX = 1.5;
-                    else
-                        Player[A].Location.SpeedX = 0;
-
-                    if(Player[A].Controls.Up && Player[A].Vine > 2)
-                        Player[A].Location.SpeedY = -2;
-                    else if(Player[A].Controls.Down)
-                        Player[A].Location.SpeedY = 3;
-                    else
-                        Player[A].Location.SpeedY = 0;
-
-                    if(g_config.fix_climb_bgo_speed_adding && Player[A].VineBGO > 0)
-                    {
-                        Player[A].Location.SpeedX += Background[Player[A].VineBGO].Location.SpeedX;
-                        Player[A].Location.SpeedY += Background[Player[A].VineBGO].Location.SpeedY;
-                    }
-                    else
-                    {
-                        Player[A].Location.SpeedX += NPC[(int)Player[A].VineNPC].Location.SpeedX;
-                        Player[A].Location.SpeedY += NPC[(int)Player[A].VineNPC].Location.SpeedY;
-                    }
-                }
+                    PlayerVineMovement(A);
                 // if none of the above apply then the player controls like normal. remeber this is for the players X movement
                 else
                     PlayerMovementX(A, cursed_value_C);
