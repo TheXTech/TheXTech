@@ -675,12 +675,9 @@ void UpdatePlayer()
                         Player[A].Location.SpeedY += NPC[(int)Player[A].VineNPC].Location.SpeedY;
                     }
                 }
+                // if none of the above apply then the player controls like normal. remeber this is for the players X movement
                 else
                 {
-
-                    // if none of the above apply then the player controls like normal. remeber this is for the players X movement
-
-
                     // ducking for link
                     if(Player[A].Duck && Player[A].WetFrame)
                     {
@@ -1063,6 +1060,7 @@ void UpdatePlayer()
                             Player[A].Location.SpeedX = 0;
                     }
                 }
+
                 bool wasSlippy = Player[A].Slippy;
                 Player[A].Slippy = false;
 
@@ -1207,318 +1205,151 @@ void UpdatePlayer()
                             Player[A].Location.SpeedY = -3;
                     }
                 }
+                else if(Player[A].Mount == 2)
+                {
+                    // vehicle has own Y movement code elsewhere
+                }
                 else // the player is not swimming
                 {
-                    if(Player[A].Mount != 2) // if not in the clown car
+                    if(Player[A].Mount == 1) // this gives the player the bounce when in the kurbio's shoe
                     {
-                        if(Player[A].Mount == 1) // this gives the player the bounce when in the kurbio's shoe
+                        if(Player[A].Controls.Left || Player[A].Controls.Right)
                         {
-                            if(Player[A].Controls.Left || Player[A].Controls.Right)
+                            if(Player[A].Location.SpeedY == 0 || Player[A].Slope > 0 || (Player[A].StandingOnNPC != 0 && Player[A].Location.Y + Player[A].Location.Height >= NPC[Player[A].StandingOnNPC].Location.Y - NPC[Player[A].StandingOnNPC].Location.SpeedY))
                             {
-                                if(Player[A].Location.SpeedY == 0 || Player[A].Slope > 0 || (Player[A].StandingOnNPC != 0 && Player[A].Location.Y + Player[A].Location.Height >= NPC[Player[A].StandingOnNPC].Location.Y - NPC[Player[A].StandingOnNPC].Location.SpeedY))
-                                {
-                                    if(Player[A].Controls.Left && Player[A].Location.SpeedX - NPC[Player[A].StandingOnNPC].Location.SpeedX - NPC[Player[A].StandingOnNPC].BeltSpeed <= 0)
-                                        Player[A].Location.SpeedY = -4.1 + NPC[Player[A].StandingOnNPC].Location.SpeedY;
-                                    else if(Player[A].Controls.Right && Player[A].Location.SpeedX - NPC[Player[A].StandingOnNPC].Location.SpeedX - NPC[Player[A].StandingOnNPC].BeltSpeed >= 0)
-                                        Player[A].Location.SpeedY = -4.1 + NPC[Player[A].StandingOnNPC].Location.SpeedY;
-                                    else
-                                        PlaySoundSpatial(SFX_Skid, Player[A].Location);
-                                    Player[A].MountSpecial = 1;
-                                }
-                            }
-
-                            if(Player[A].Location.SpeedY < -4.1)
-                                Player[A].MountSpecial = 0;
-                            else if(Player[A].Location.SpeedY > 4.1)
-                                Player[A].MountSpecial = 0;
-
-                            if(Player[A].Controls.Jump && Player[A].MountSpecial == 1 && Player[A].CanJump)
-                            {
-                                Player[A].Location.SpeedY = 0;
-                                Player[A].StandUp = true;
+                                if(Player[A].Controls.Left && Player[A].Location.SpeedX - NPC[Player[A].StandingOnNPC].Location.SpeedX - NPC[Player[A].StandingOnNPC].BeltSpeed <= 0)
+                                    Player[A].Location.SpeedY = -4.1 + NPC[Player[A].StandingOnNPC].Location.SpeedY;
+                                else if(Player[A].Controls.Right && Player[A].Location.SpeedX - NPC[Player[A].StandingOnNPC].Location.SpeedX - NPC[Player[A].StandingOnNPC].BeltSpeed >= 0)
+                                    Player[A].Location.SpeedY = -4.1 + NPC[Player[A].StandingOnNPC].Location.SpeedY;
+                                else
+                                    PlaySoundSpatial(SFX_Skid, Player[A].Location);
+                                Player[A].MountSpecial = 1;
                             }
                         }
 
-                        if(Player[A].Mount == 1)
+                        if(Player[A].Location.SpeedY < -4.1)
+                            Player[A].MountSpecial = 0;
+                        else if(Player[A].Location.SpeedY > 4.1)
+                            Player[A].MountSpecial = 0;
+
+                        if(Player[A].Controls.Jump && Player[A].MountSpecial == 1 && Player[A].CanJump)
                         {
-                            if(Player[A].Controls.AltJump && Player[A].CanAltJump) // check to see if the player should jump out of the shoe
-                                PlayerDismount(A);
+                            Player[A].Location.SpeedY = 0;
+                            Player[A].StandUp = true;
                         }
-                        else if(Player[A].Mount == 3)
-                        {
-                            if(Player[A].Controls.AltJump && Player[A].CanAltJump) // jump off of yoshi
-                                PlayerDismount(A);
-                        }
+                    }
 
-                        if((Player[A].Location.SpeedY == 0.0 || Player[A].Jump > 0 || Player[A].Vine > 0) && Player[A].FloatTime == 0) // princess float
-                            Player[A].CanFloat = true;
+                    if(Player[A].Mount == 1)
+                    {
+                        if(Player[A].Controls.AltJump && Player[A].CanAltJump) // check to see if the player should jump out of the shoe
+                            PlayerDismount(A);
+                    }
+                    else if(Player[A].Mount == 3)
+                    {
+                        if(Player[A].Controls.AltJump && Player[A].CanAltJump) // jump off of yoshi
+                            PlayerDismount(A);
+                    }
 
-                        if(Player[A].Wet > 0 || Player[A].WetFrame)
-                            Player[A].CanFloat = false;
+                    if((Player[A].Location.SpeedY == 0.0 || Player[A].Jump > 0 || Player[A].Vine > 0) && Player[A].FloatTime == 0) // princess float
+                        Player[A].CanFloat = true;
 
-                        // handles the regular jump
-                        if(Player[A].Controls.Jump || (Player[A].Controls.AltJump &&
-                           ((Player[A].Character > 2 && Player[A].Character != 4) || Player[A].Quicksand > 0 || g_config.disable_spin_jump) &&
-                           Player[A].CanAltJump))
-                        {
-                            double tempSpeed;
-                            if(Player[A].Location.SpeedX > 0)
-                                tempSpeed = Player[A].Location.SpeedX * 0.2; // tempSpeed gives the player a height boost when jumping while running, based off his SpeedX
-                            else
-                                tempSpeed = -Player[A].Location.SpeedX * 0.2;
+                    if(Player[A].Wet > 0 || Player[A].WetFrame)
+                        Player[A].CanFloat = false;
 
-                            if(Player[A].ShellSurf) // this code modifies the jump based on him riding a shell
-                            {
-                                if(NPC[Player[A].StandingOnNPC].Location.SpeedY == 0 || NPC[Player[A].StandingOnNPC].Slope > 0)
-                                {
-                                    if(Player[A].CanJump)
-                                    {
-                                        PlaySoundSpatial(SFX_Whip, Player[A].Location); // Jump sound
-                                        Player[A].Jump = Physics.PlayerJumpHeight * 0.6;
-                                        NPC[Player[A].StandingOnNPC].Location.SpeedY = Physics.PlayerJumpVelocity * 0.9;
-                                    }
-                                }
-                                else if(Player[A].Jump > 0)
-                                    NPC[Player[A].StandingOnNPC].Location.SpeedY = Physics.PlayerJumpVelocity * 0.9;
-                            }
-                            // if not surfing a shell then proceed like normal
-                            else
-                            {
-                                if((Player[A].Vine > 0 || Player[A].Location.SpeedY == 0 || Player[A].StandingOnNPC != 0 ||
-                                    MultiHop || Player[A].Slope > 0 || (Player[A].Location.SpeedY > 0 && Player[A].Quicksand > 0)) && Player[A].CanJump)
-                                {
-                                    PlaySoundSpatial(SFX_Jump, Player[A].Location); // Jump sound
-                                    Player[A].Location.SpeedY = Physics.PlayerJumpVelocity - tempSpeed;
-                                    Player[A].Jump = Physics.PlayerJumpHeight;
-
-                                    if(Player[A].Character == 4 && (Player[A].State == 4 || Player[A].State == 5) && !Player[A].SpinJump)
-                                        Player[A].DoubleJump = true;
-
-                                    if(Player[A].Character == 2)
-                                        Player[A].Jump += 3;
-
-                                    if(Player[A].SpinJump)
-                                        Player[A].Jump -= 6;
-
-                                    if(Player[A].StandingOnNPC > 0 && !FreezeNPCs)
-                                    {
-                                        if(NPC[Player[A].StandingOnNPC].Type != 91)
-                                            Player[A].Location.SpeedX += -NPC[Player[A].StandingOnNPC].Location.SpeedX;
-                                    }
-
-                                    Player[A].StandingOnNPC = 0; // the player can't stand on an NPC after jumping
-
-                                    if(Player[A].CanFly) // let's the player fly if the conditions are met
-                                    {
-                                        Player[A].StandingOnNPC = 0;
-                                        Player[A].Jump = 30;
-                                        if(Player[A].Character == 2)
-                                            Player[A].Jump += 3;
-                                        if(Player[A].SpinJump)
-                                            Player[A].Jump -= 6;
-                                        Player[A].CanFly = false;
-                                        Player[A].RunCount = 0;
-                                        Player[A].CanFly2 = true;
-
-                                        if(Player[A].Character == 2) // luigi doesn't fly as long as mario
-                                            Player[A].FlyCount = 300; // Length of flight time
-                                        else if(Player[A].Character == 3) // special handling for peach
-                                        {
-                                            Player[A].FlyCount = 0;
-                                            Player[A].RunCount = 80;
-                                            Player[A].CanFly2 = false;
-                                            Player[A].Jump = 70;
-                                            Player[A].CanFloat = true;
-                                            Player[A].FlySparks = true;
-                                        }
-#if 0
-                                        // FIXME: Duplicated "Character == 3" condition branch [PVS Studio]
-                                        else if(Player[A].Character == 3) // special handling for peach
-                                            Player[A].FlyCount = 280; // Length of flight time
-#endif
-                                        else
-                                            Player[A].FlyCount = 320; // Length of flight time
-                                    }
-                                }
-                                else if(Player[A].Jump > 0) // controls the height of the jump
-                                {
-                                    Player[A].Location.SpeedY = Physics.PlayerJumpVelocity - tempSpeed;
-                                    if(Player[A].Jump > 20)
-                                    {
-                                        if(Player[A].Jump > 40)
-                                            Player[A].Location.SpeedY += -(40 - 20) * 0.2;
-                                        else
-                                            Player[A].Location.SpeedY += -(Player[A].Jump - 20) * 0.2;
-                                    }
-                                }
-                                else if(Player[A].CanFly2)
-                                {
-                                    if(Player[A].Location.SpeedY > Physics.PlayerJumpVelocity * 0.5)
-                                    {
-                                        Player[A].Location.SpeedY -= 1;
-                                        Player[A].CanPound = true;
-                                        if(Player[A].YoshiBlue || (Player[A].Mount == 1 && Player[A].MountType == 3))
-                                            PlaySoundSpatial(SFX_PetTongue, Player[A].Location);
-                                    }
-                                }
-                            }
-                            Player[A].CanJump = false;
-                        }
+                    // handles the regular jump
+                    if(Player[A].Controls.Jump || (Player[A].Controls.AltJump &&
+                       ((Player[A].Character > 2 && Player[A].Character != 4) || Player[A].Quicksand > 0 || g_config.disable_spin_jump) &&
+                       Player[A].CanAltJump))
+                    {
+                        double tempSpeed;
+                        if(Player[A].Location.SpeedX > 0)
+                            tempSpeed = Player[A].Location.SpeedX * 0.2; // tempSpeed gives the player a height boost when jumping while running, based off his SpeedX
                         else
-                            Player[A].CanJump = true;
+                            tempSpeed = -Player[A].Location.SpeedX * 0.2;
 
-                        if(Player[A].Jump > 0)
-                            Player[A].Slope = 0;
-
-                        if(Player[A].SpinJump || (Player[A].State != 4 && Player[A].State != 5) || Player[A].StandingOnNPC > 0 || Player[A].Slope > 0 || Player[A].Location.SpeedY == 0)
-                            Player[A].DoubleJump = false;
-
-                        // double jump code
-                        if(Player[A].DoubleJump && Player[A].Jump == 0 && Player[A].Location.SpeedY != 0 && Player[A].Slope == 0 &&
-                           Player[A].StandingOnNPC == 0 && Player[A].Wet == 0 && Player[A].Vine == 0 &&
-                           !Player[A].WetFrame && !Player[A].Fairy && !Player[A].CanFly2)
+                        if(Player[A].ShellSurf) // this code modifies the jump based on him riding a shell
                         {
-                            if(Player[A].Controls.Jump && Player[A].JumpRelease)
+                            if(NPC[Player[A].StandingOnNPC].Location.SpeedY == 0 || NPC[Player[A].StandingOnNPC].Slope > 0)
                             {
-                                PlaySoundSpatial(SFX_Jump, Player[A].Location);
-                                Player[A].Location.SpeedY = Physics.PlayerJumpVelocity;
-                                Player[A].Jump = 10;
-                                Player[A].DoubleJump = false;
-                                Location_t tempLocation = Player[A].Location;
-                                tempLocation.Y = Player[A].Location.Y + Player[A].Location.Height - EffectHeight[80] / 2.0 + Player[A].Location.SpeedY;
-                                tempLocation.Height = EffectHeight[80];
-                                tempLocation.Width = EffectWidth[80];
-                                tempLocation.X = Player[A].Location.X;
-
-                                for(int B = 1; B <= 10; B++)
+                                if(Player[A].CanJump)
                                 {
-                                    NewEffect(EFFID_SPARKLE, tempLocation);
-                                    Effect[numEffects].Location.SpeedX = (dRand() * 3) - 1.5;
-                                    Effect[numEffects].Location.SpeedY = (dRand() * 0.5) + (1.5 - std::abs(Effect[numEffects].Location.SpeedX)) * 0.5;
-                                    Effect[numEffects].Location.SpeedX += -Player[A].Location.SpeedX * 0.2;
-                                }
-                            }
-                        }
-
-
-
-                        if(Player[A].NoShellKick > 0) // countdown for the next time the player kicks a turtle shell
-                            Player[A].NoShellKick--;
-
-                        if(Player[A].ShellSurf)
-                        {
-                            if(Player[A].Mount != 0)
-                                Player[A].ShellSurf = false;
-
-                            // FIXME: SOME DEAD CODE BECAUSE OF "1 == 2"
-#if 0
-                            if(Player[A].Direction != NPC[Player[A].StandingOnNPC].Direction && 1 == 2)
-                            {
-                                Player[A].ShellSurf = false;
-                                Player[A].Location.SpeedY = NPC[Player[A].StandingOnNPC].Location.SpeedY;
-                                if(Player[A].Location.SpeedY > 0)
-                                    Player[A].Location.SpeedY = 0;
-                                PlaySoundSpatial(SFX_Skid, Player[A].Location);
-                                NPC[Player[A].StandingOnNPC].CantHurt = 30;
-                                NPC[Player[A].StandingOnNPC].CantHurtPlayer = A;
-                                Player[A].Location.SpeedX = NPC[Player[A].StandingOnNPC].Location.SpeedX / 2;
-                                Player[A].StandingOnNPC = 0;
-                                Player[A].NoShellKick = 30;
-                            }
-                            else
-#endif
-                            {
-                                if(iRand(10) >= 3)
-                                {
-                                    Location_t tempLocation;
-                                    tempLocation.Y = Player[A].Location.Y + Player[A].Location.Height - 2 + dRand() * (NPC[Player[A].StandingOnNPC].Location.Height - 8) + 4;
-                                    tempLocation.X = Player[A].Location.X - 4 + dRand() * (Player[A].Location.Width - 8) + 4 - 8 * Player[A].Direction;
-                                    NewEffect(EFFID_SPARKLE, tempLocation, 1, 0, ShadowMode);
-                                    Effect[numEffects].Frame = iRand(3);
-                                    Effect[numEffects].Location.SpeedY = (Player[A].Location.Y + Player[A].Location.Height + NPC[Player[A].StandingOnNPC].Location.Height / 32.0 - tempLocation.Y + 12) * 0.05;
-                                }
-                            }
-
-                            if(NPC[Player[A].StandingOnNPC].Wet == 2)
-                            {
-                                if(NPC[Player[A].StandingOnNPC].Type == 195)
-                                    NPC[Player[A].StandingOnNPC].Special4 = 1;
-                                NPC[Player[A].StandingOnNPC].Location.SpeedY += -Physics.NPCGravity * 1.5;
-                            }
-                        }
-
-                        // START ALT JUMP - this code does the player's spin jump
-                        if(Player[A].Controls.AltJump && (Player[A].Character == 1 || Player[A].Character == 2 || Player[A].Character == 4 ||
-                                                          (g_config.fix_char3_escape_shell_surf && Player[A].Character == 3 && Player[A].ShellSurf))
-                                                      && (!g_config.disable_spin_jump || Player[A].ShellSurf))
-                        {
-                            double tempSpeed;
-                            if(Player[A].Location.SpeedX > 0)
-                                tempSpeed = Player[A].Location.SpeedX * 0.2;
-                            else
-                                tempSpeed = -Player[A].Location.SpeedX * 0.2;
-
-                            if((Player[A].Vine > 0 || Player[A].Location.SpeedY == 0 || Player[A].StandingOnNPC != 0 || Player[A].Slope > 0 || MultiHop) && Player[A].CanAltJump) // Player Jumped
-                            {
-                                if(!Player[A].Duck)
-                                {
-                                    Player[A].Slope = 0;
-                                    Player[A].SpinFireDir = Player[A].Direction;
-                                    Player[A].Location.SpeedY = Physics.PlayerJumpVelocity - tempSpeed;
-                                    Player[A].Jump = Physics.PlayerJumpHeight;
-                                    if(Player[A].Character == 2)
-                                        Player[A].Jump += 3;
-
-                                    if(Player[A].StandingOnNPC > 0 && !FreezeNPCs)
-                                    {
-                                        if(NPC[Player[A].StandingOnNPC].Type != 91)
-                                            Player[A].Location.SpeedX += -NPC[Player[A].StandingOnNPC].Location.SpeedX;
-                                    }
-
                                     PlaySoundSpatial(SFX_Whip, Player[A].Location); // Jump sound
-                                    Player[A].Jump -= 6;
-                                    if(Player[A].Direction == 1)
-                                        Player[A].SpinFrame = 0;
-                                    else
-                                        Player[A].SpinFrame = 6;
-                                    Player[A].SpinJump = true;
-//                                    if(nPlay.Online == true && nPlay.MySlot + 1 == A)
-//                                        Netplay::sendData Netplay::PutPlayerLoc(nPlay.MySlot) + "1l" + std::to_string(A) + LB;
-                                    if(Player[A].Duck)
-                                        UnDuck(Player[A]);
-
-                                    if(Player[A].ShellSurf)
-                                    {
-                                        Player[A].ShellSurf = false;
-                                        Player[A].Location.SpeedX = NPC[Player[A].StandingOnNPC].Location.SpeedX + NPC[Player[A].StandingOnNPC].BeltSpeed * 0.8;
-                                        Player[A].Jump = 0;
-
-                                        if(g_config.disable_spin_jump)
-                                            Player[A].SpinJump = false;
-                                    }
-
-                                    Player[A].StandingOnNPC = 0;
-
-                                    if(Player[A].CanFly)
-                                    {
-                                        Player[A].StandingOnNPC = 0;
-                                        Player[A].Jump = 30;
-                                        if(Player[A].Character == 2)
-                                            Player[A].Jump += 3;
-                                        if(Player[A].SpinJump)
-                                            Player[A].Jump -= 6;
-                                        Player[A].CanFly = false;
-                                        Player[A].RunCount = 0;
-                                        Player[A].CanFly2 = true;
-                                        Player[A].FlyCount = 150; // Length of flight time
-                                    }
+                                    Player[A].Jump = Physics.PlayerJumpHeight * 0.6;
+                                    NPC[Player[A].StandingOnNPC].Location.SpeedY = Physics.PlayerJumpVelocity * 0.9;
                                 }
                             }
                             else if(Player[A].Jump > 0)
+                                NPC[Player[A].StandingOnNPC].Location.SpeedY = Physics.PlayerJumpVelocity * 0.9;
+                        }
+                        // if not surfing a shell then proceed like normal
+                        else
+                        {
+                            if((Player[A].Vine > 0 || Player[A].Location.SpeedY == 0 || Player[A].StandingOnNPC != 0 ||
+                                MultiHop || Player[A].Slope > 0 || (Player[A].Location.SpeedY > 0 && Player[A].Quicksand > 0)) && Player[A].CanJump)
+                            {
+                                PlaySoundSpatial(SFX_Jump, Player[A].Location); // Jump sound
+                                Player[A].Location.SpeedY = Physics.PlayerJumpVelocity - tempSpeed;
+                                Player[A].Jump = Physics.PlayerJumpHeight;
+
+                                if(Player[A].Character == 4 && (Player[A].State == 4 || Player[A].State == 5) && !Player[A].SpinJump)
+                                    Player[A].DoubleJump = true;
+
+                                if(Player[A].Character == 2)
+                                    Player[A].Jump += 3;
+
+                                if(Player[A].SpinJump)
+                                    Player[A].Jump -= 6;
+
+                                if(Player[A].StandingOnNPC > 0 && !FreezeNPCs)
+                                {
+                                    if(NPC[Player[A].StandingOnNPC].Type != 91)
+                                        Player[A].Location.SpeedX += -NPC[Player[A].StandingOnNPC].Location.SpeedX;
+                                }
+
+                                Player[A].StandingOnNPC = 0; // the player can't stand on an NPC after jumping
+
+                                if(Player[A].CanFly) // let's the player fly if the conditions are met
+                                {
+                                    Player[A].StandingOnNPC = 0;
+                                    Player[A].Jump = 30;
+                                    if(Player[A].Character == 2)
+                                        Player[A].Jump += 3;
+                                    if(Player[A].SpinJump)
+                                        Player[A].Jump -= 6;
+                                    Player[A].CanFly = false;
+                                    Player[A].RunCount = 0;
+                                    Player[A].CanFly2 = true;
+
+                                    if(Player[A].Character == 2) // luigi doesn't fly as long as mario
+                                        Player[A].FlyCount = 300; // Length of flight time
+                                    else if(Player[A].Character == 3) // special handling for peach
+                                    {
+                                        Player[A].FlyCount = 0;
+                                        Player[A].RunCount = 80;
+                                        Player[A].CanFly2 = false;
+                                        Player[A].Jump = 70;
+                                        Player[A].CanFloat = true;
+                                        Player[A].FlySparks = true;
+                                    }
+#if 0
+                                    // FIXME: Duplicated "Character == 3" condition branch [PVS Studio]
+                                    else if(Player[A].Character == 3) // special handling for peach
+                                        Player[A].FlyCount = 280; // Length of flight time
+#endif
+                                    else
+                                        Player[A].FlyCount = 320; // Length of flight time
+                                }
+                            }
+                            else if(Player[A].Jump > 0) // controls the height of the jump
                             {
                                 Player[A].Location.SpeedY = Physics.PlayerJumpVelocity - tempSpeed;
                                 if(Player[A].Jump > 20)
-                                    Player[A].Location.SpeedY += -(Player[A].Jump - 20) * 0.2;
+                                {
+                                    if(Player[A].Jump > 40)
+                                        Player[A].Location.SpeedY += -(40 - 20) * 0.2;
+                                    else
+                                        Player[A].Location.SpeedY += -(Player[A].Jump - 20) * 0.2;
+                                }
                             }
                             else if(Player[A].CanFly2)
                             {
@@ -1526,199 +1357,367 @@ void UpdatePlayer()
                                 {
                                     Player[A].Location.SpeedY -= 1;
                                     Player[A].CanPound = true;
-                                    if(Player[A].YoshiBlue)
+                                    if(Player[A].YoshiBlue || (Player[A].Mount == 1 && Player[A].MountType == 3))
                                         PlaySoundSpatial(SFX_PetTongue, Player[A].Location);
                                 }
                             }
-                            // End If
-                            Player[A].CanAltJump = false;
+                        }
+                        Player[A].CanJump = false;
+                    }
+                    else
+                        Player[A].CanJump = true;
 
+                    if(Player[A].Jump > 0)
+                        Player[A].Slope = 0;
+
+                    if(Player[A].SpinJump || (Player[A].State != 4 && Player[A].State != 5) || Player[A].StandingOnNPC > 0 || Player[A].Slope > 0 || Player[A].Location.SpeedY == 0)
+                        Player[A].DoubleJump = false;
+
+                    // double jump code
+                    if(Player[A].DoubleJump && Player[A].Jump == 0 && Player[A].Location.SpeedY != 0 && Player[A].Slope == 0 &&
+                       Player[A].StandingOnNPC == 0 && Player[A].Wet == 0 && Player[A].Vine == 0 &&
+                       !Player[A].WetFrame && !Player[A].Fairy && !Player[A].CanFly2)
+                    {
+                        if(Player[A].Controls.Jump && Player[A].JumpRelease)
+                        {
+                            PlaySoundSpatial(SFX_Jump, Player[A].Location);
+                            Player[A].Location.SpeedY = Physics.PlayerJumpVelocity;
+                            Player[A].Jump = 10;
+                            Player[A].DoubleJump = false;
+                            Location_t tempLocation = Player[A].Location;
+                            tempLocation.Y = Player[A].Location.Y + Player[A].Location.Height - EffectHeight[80] / 2.0 + Player[A].Location.SpeedY;
+                            tempLocation.Height = EffectHeight[80];
+                            tempLocation.Width = EffectWidth[80];
+                            tempLocation.X = Player[A].Location.X;
+
+                            for(int B = 1; B <= 10; B++)
+                            {
+                                NewEffect(EFFID_SPARKLE, tempLocation);
+                                Effect[numEffects].Location.SpeedX = (dRand() * 3) - 1.5;
+                                Effect[numEffects].Location.SpeedY = (dRand() * 0.5) + (1.5 - std::abs(Effect[numEffects].Location.SpeedX)) * 0.5;
+                                Effect[numEffects].Location.SpeedX += -Player[A].Location.SpeedX * 0.2;
+                            }
+                        }
+                    }
+
+
+
+                    if(Player[A].NoShellKick > 0) // countdown for the next time the player kicks a turtle shell
+                        Player[A].NoShellKick--;
+
+                    if(Player[A].ShellSurf)
+                    {
+                        if(Player[A].Mount != 0)
+                            Player[A].ShellSurf = false;
+
+                        // FIXME: SOME DEAD CODE BECAUSE OF "1 == 2"
+#if 0
+                        if(Player[A].Direction != NPC[Player[A].StandingOnNPC].Direction && 1 == 2)
+                        {
+                            Player[A].ShellSurf = false;
+                            Player[A].Location.SpeedY = NPC[Player[A].StandingOnNPC].Location.SpeedY;
+                            if(Player[A].Location.SpeedY > 0)
+                                Player[A].Location.SpeedY = 0;
+                            PlaySoundSpatial(SFX_Skid, Player[A].Location);
+                            NPC[Player[A].StandingOnNPC].CantHurt = 30;
+                            NPC[Player[A].StandingOnNPC].CantHurtPlayer = A;
+                            Player[A].Location.SpeedX = NPC[Player[A].StandingOnNPC].Location.SpeedX / 2;
+                            Player[A].StandingOnNPC = 0;
+                            Player[A].NoShellKick = 30;
                         }
                         else
-                            Player[A].CanAltJump = true;
-                        // END ALT JUMP
-
-
-                        if((Player[A].Location.SpeedY == 0 || Player[A].StandingOnNPC != 0 || Player[A].Slope > 0) && Player[A].SpinJump)
+#endif
                         {
-                            Player[A].SpinJump = false;
+                            if(iRand(10) >= 3)
+                            {
+                                Location_t tempLocation;
+                                tempLocation.Y = Player[A].Location.Y + Player[A].Location.Height - 2 + dRand() * (NPC[Player[A].StandingOnNPC].Location.Height - 8) + 4;
+                                tempLocation.X = Player[A].Location.X - 4 + dRand() * (Player[A].Location.Width - 8) + 4 - 8 * Player[A].Direction;
+                                NewEffect(EFFID_SPARKLE, tempLocation, 1, 0, ShadowMode);
+                                Effect[numEffects].Frame = iRand(3);
+                                Effect[numEffects].Location.SpeedY = (Player[A].Location.Y + Player[A].Location.Height + NPC[Player[A].StandingOnNPC].Location.Height / 32.0 - tempLocation.Y + 12) * 0.05;
+                            }
+                        }
+
+                        if(NPC[Player[A].StandingOnNPC].Wet == 2)
+                        {
+                            if(NPC[Player[A].StandingOnNPC].Type == 195)
+                                NPC[Player[A].StandingOnNPC].Special4 = 1;
+                            NPC[Player[A].StandingOnNPC].Location.SpeedY += -Physics.NPCGravity * 1.5;
+                        }
+                    }
+
+                    // START ALT JUMP - this code does the player's spin jump
+                    if(Player[A].Controls.AltJump && (Player[A].Character == 1 || Player[A].Character == 2 || Player[A].Character == 4 ||
+                                                      (g_config.fix_char3_escape_shell_surf && Player[A].Character == 3 && Player[A].ShellSurf))
+                                                  && (!g_config.disable_spin_jump || Player[A].ShellSurf))
+                    {
+                        double tempSpeed;
+                        if(Player[A].Location.SpeedX > 0)
+                            tempSpeed = Player[A].Location.SpeedX * 0.2;
+                        else
+                            tempSpeed = -Player[A].Location.SpeedX * 0.2;
+
+                        if((Player[A].Vine > 0 || Player[A].Location.SpeedY == 0 || Player[A].StandingOnNPC != 0 || Player[A].Slope > 0 || MultiHop) && Player[A].CanAltJump) // Player Jumped
+                        {
+                            if(!Player[A].Duck)
+                            {
+                                Player[A].Slope = 0;
+                                Player[A].SpinFireDir = Player[A].Direction;
+                                Player[A].Location.SpeedY = Physics.PlayerJumpVelocity - tempSpeed;
+                                Player[A].Jump = Physics.PlayerJumpHeight;
+                                if(Player[A].Character == 2)
+                                    Player[A].Jump += 3;
+
+                                if(Player[A].StandingOnNPC > 0 && !FreezeNPCs)
+                                {
+                                    if(NPC[Player[A].StandingOnNPC].Type != 91)
+                                        Player[A].Location.SpeedX += -NPC[Player[A].StandingOnNPC].Location.SpeedX;
+                                }
+
+                                PlaySoundSpatial(SFX_Whip, Player[A].Location); // Jump sound
+                                Player[A].Jump -= 6;
+                                if(Player[A].Direction == 1)
+                                    Player[A].SpinFrame = 0;
+                                else
+                                    Player[A].SpinFrame = 6;
+                                Player[A].SpinJump = true;
+//                                    if(nPlay.Online == true && nPlay.MySlot + 1 == A)
+//                                        Netplay::sendData Netplay::PutPlayerLoc(nPlay.MySlot) + "1l" + std::to_string(A) + LB;
+                                if(Player[A].Duck)
+                                    UnDuck(Player[A]);
+
+                                if(Player[A].ShellSurf)
+                                {
+                                    Player[A].ShellSurf = false;
+                                    Player[A].Location.SpeedX = NPC[Player[A].StandingOnNPC].Location.SpeedX + NPC[Player[A].StandingOnNPC].BeltSpeed * 0.8;
+                                    Player[A].Jump = 0;
+
+                                    if(g_config.disable_spin_jump)
+                                        Player[A].SpinJump = false;
+                                }
+
+                                Player[A].StandingOnNPC = 0;
+
+                                if(Player[A].CanFly)
+                                {
+                                    Player[A].StandingOnNPC = 0;
+                                    Player[A].Jump = 30;
+                                    if(Player[A].Character == 2)
+                                        Player[A].Jump += 3;
+                                    if(Player[A].SpinJump)
+                                        Player[A].Jump -= 6;
+                                    Player[A].CanFly = false;
+                                    Player[A].RunCount = 0;
+                                    Player[A].CanFly2 = true;
+                                    Player[A].FlyCount = 150; // Length of flight time
+                                }
+                            }
+                        }
+                        else if(Player[A].Jump > 0)
+                        {
+                            Player[A].Location.SpeedY = Physics.PlayerJumpVelocity - tempSpeed;
+                            if(Player[A].Jump > 20)
+                                Player[A].Location.SpeedY += -(Player[A].Jump - 20) * 0.2;
+                        }
+                        else if(Player[A].CanFly2)
+                        {
+                            if(Player[A].Location.SpeedY > Physics.PlayerJumpVelocity * 0.5)
+                            {
+                                Player[A].Location.SpeedY -= 1;
+                                Player[A].CanPound = true;
+                                if(Player[A].YoshiBlue)
+                                    PlaySoundSpatial(SFX_PetTongue, Player[A].Location);
+                            }
+                        }
+                        // End If
+                        Player[A].CanAltJump = false;
+
+                    }
+                    else
+                        Player[A].CanAltJump = true;
+                    // END ALT JUMP
+
+
+                    if((Player[A].Location.SpeedY == 0 || Player[A].StandingOnNPC != 0 || Player[A].Slope > 0) && Player[A].SpinJump)
+                    {
+                        Player[A].SpinJump = false;
 //                            if(nPlay.Online == true && nPlay.MySlot + 1 == A)
 //                                Netplay::sendData Netplay::PutPlayerLoc(nPlay.MySlot) + "1m" + std::to_string(A) + LB;
-                            Player[A].TailCount = 0;
-                        }
+                        Player[A].TailCount = 0;
+                    }
 
-                        if(Player[A].Mount > 0)
-                            Player[A].SpinJump = false;
+                    if(Player[A].Mount > 0)
+                        Player[A].SpinJump = false;
 
-                        if(!Player[A].Controls.AltJump && !Player[A].Controls.Jump)
-                            Player[A].Jump = 0;
+                    if(!Player[A].Controls.AltJump && !Player[A].Controls.Jump)
+                        Player[A].Jump = 0;
 
-                        if(Player[A].Jump > 0)
+                    if(Player[A].Jump > 0)
+                        Player[A].Jump -= 1;
+
+                    if(Player[A].Jump > 0)
+                        Player[A].Vine = 0;
+
+
+                    if(Player[A].Quicksand > 1)
+                    {
+                        Player[A].Slide = false;
+                        if(Player[A].Location.SpeedY < -0.7)
+                        {
+                            Player[A].Location.SpeedY = -0.7;
                             Player[A].Jump -= 1;
-
-                        if(Player[A].Jump > 0)
-                            Player[A].Vine = 0;
-
-
-                        if(Player[A].Quicksand > 1)
+                        }
+                        else if(Player[A].Location.SpeedY < 0)
                         {
-                            Player[A].Slide = false;
-                            if(Player[A].Location.SpeedY < -0.7)
-                            {
-                                Player[A].Location.SpeedY = -0.7;
-                                Player[A].Jump -= 1;
-                            }
-                            else if(Player[A].Location.SpeedY < 0)
-                            {
-                                Player[A].Location.SpeedY += 0.1;
-                                Player[A].Jump = 0;
-                            }
-
-                            if(Player[A].Location.SpeedY >= 0.1)
-                                Player[A].Location.SpeedY = 0.1;
-                            Player[A].Location.Y += Player[A].Location.SpeedY;
+                            Player[A].Location.SpeedY += 0.1;
+                            Player[A].Jump = 0;
                         }
 
+                        if(Player[A].Location.SpeedY >= 0.1)
+                            Player[A].Location.SpeedY = 0.1;
+                        Player[A].Location.Y += Player[A].Location.SpeedY;
+                    }
 
-                        // gravity
-                        if(Player[A].Vine == 0)
+
+                    // gravity
+                    if(Player[A].Vine == 0)
+                    {
+                        if(Player[A].NoGravity == 0)
                         {
-                            if(Player[A].NoGravity == 0)
+                            if(Player[A].Character == 2)
+                                Player[A].Location.SpeedY += Physics.PlayerGravity * 0.9;
+                            else
+                                Player[A].Location.SpeedY += Physics.PlayerGravity;
+
+                            if(Player[A].HoldingNPC > 0)
                             {
-                                if(Player[A].Character == 2)
-                                    Player[A].Location.SpeedY += Physics.PlayerGravity * 0.9;
-                                else
-                                    Player[A].Location.SpeedY += Physics.PlayerGravity;
-
-                                if(Player[A].HoldingNPC > 0)
+                                if(NPC[Player[A].HoldingNPC].Type == 278 || NPC[Player[A].HoldingNPC].Type == 279)
                                 {
-                                    if(NPC[Player[A].HoldingNPC].Type == 278 || NPC[Player[A].HoldingNPC].Type == 279)
+                                    if(Player[A].Controls.Jump || Player[A].Controls.AltJump)
                                     {
-                                        if(Player[A].Controls.Jump || Player[A].Controls.AltJump)
-                                        {
-                                            if(Player[A].Character == 2)
-                                                Player[A].Location.SpeedY += -Physics.PlayerGravity * 0.9 * 0.8;
-                                            else
-                                                Player[A].Location.SpeedY += -Physics.PlayerGravity * 0.8;
-
-                                            if(Player[A].Location.SpeedY > Physics.PlayerGravity * 3)
-                                                Player[A].Location.SpeedY = Physics.PlayerGravity * 3;
-                                        }
+                                        if(Player[A].Character == 2)
+                                            Player[A].Location.SpeedY += -Physics.PlayerGravity * 0.9 * 0.8;
                                         else
-                                            NPC[Player[A].HoldingNPC].Special = 0;
-                                    }
-                                }
+                                            Player[A].Location.SpeedY += -Physics.PlayerGravity * 0.8;
 
-                                if(Player[A].Location.SpeedY > Physics.PlayerTerminalVelocity)
-                                    Player[A].Location.SpeedY = Physics.PlayerTerminalVelocity;
-                            }
-                            else
-                                Player[A].NoGravity -= 1;
-                        }
-
-                        // princess float
-                        if(Player[A].Character == 3 && Player[A].Wet == 0 && !Player[A].WetFrame)
-                        {
-                            if(Player[A].Location.SpeedY == 0 || Player[A].StandingOnNPC > 0 || Player[A].Slope > 0 || Player[A].CanFly2)
-                                Player[A].CanFloat = true;
-                            else if(Player[A].CanFloat)
-                            {
-                                if(Player[A].Jump == 0 && ((Player[A].Controls.Jump && Player[A].FloatRelease) ||
-                                  (Player[A].Controls.AltJump && Player[A].Location.SpeedY > 0)))
-                                {
-                                    if(Player[A].State == 4 || Player[A].State == 5)
-                                    {
-                                        Player[A].FloatTime = 100;
-                                        Player[A].FlySparks = true;
+                                        if(Player[A].Location.SpeedY > Physics.PlayerGravity * 3)
+                                            Player[A].Location.SpeedY = Physics.PlayerGravity * 3;
                                     }
                                     else
-                                        Player[A].FloatTime = 65;
-
-                                    Player[A].FloatDir = 1;
-
-                                    if(Player[A].Location.SpeedY < -0.5)
-                                        Player[A].FloatSpeed = 0.5;
-                                    else if(Player[A].Location.SpeedY > 0.5)
-                                        Player[A].FloatSpeed = 0.5;
-                                    else
-                                        Player[A].FloatSpeed = Player[A].Location.SpeedY;
-
-                                    Player[A].CanFloat = false;
+                                        NPC[Player[A].HoldingNPC].Special = 0;
                                 }
                             }
+
+                            if(Player[A].Location.SpeedY > Physics.PlayerTerminalVelocity)
+                                Player[A].Location.SpeedY = Physics.PlayerTerminalVelocity;
                         }
+                        else
+                            Player[A].NoGravity -= 1;
+                    }
 
-                        if(Player[A].Character == 3 && Player[A].FlySparks)
+                    // princess float
+                    if(Player[A].Character == 3 && Player[A].Wet == 0 && !Player[A].WetFrame)
+                    {
+                        if(Player[A].Location.SpeedY == 0 || Player[A].StandingOnNPC > 0 || Player[A].Slope > 0 || Player[A].CanFly2)
+                            Player[A].CanFloat = true;
+                        else if(Player[A].CanFloat)
                         {
-                            if(Player[A].FloatTime == 0 && Player[A].Location.SpeedY >= 0)
-                                Player[A].FlySparks = false;
-                        }
-
-                        if(Player[A].CanFloat)
-                            Player[A].FloatTime = 0;
-
-                        if(Player[A].FloatTime > 0 && Player[A].Character == 3)
-                        {
-                            if((Player[A].Controls.Jump || Player[A].Controls.AltJump) && Player[A].Vine == 0)
+                            if(Player[A].Jump == 0 && ((Player[A].Controls.Jump && Player[A].FloatRelease) ||
+                              (Player[A].Controls.AltJump && Player[A].Location.SpeedY > 0)))
                             {
-                                Player[A].FloatTime -= 1;
-                                Player[A].FloatSpeed += Player[A].FloatDir * 0.1;
-
-                                if(Player[A].FloatSpeed > 0.8)
-                                    Player[A].FloatDir = -1;
-
-                                if(Player[A].FloatSpeed < -0.8)
-                                    Player[A].FloatDir = 1;
-
-                                Player[A].Location.SpeedY = Player[A].FloatSpeed;
-
-                                if(Player[A].FloatTime == 0 && Player[A].Location.SpeedY == 0)
-                                    Player[A].Location.SpeedY = 0.1;
-                            }
-                            else
-                                Player[A].FloatTime = 0;
-                        }
-
-
-                        // Racoon Mario
-                        if((Player[A].State == 4 || Player[A].State == 5) || Player[A].YoshiBlue || (Player[A].Mount == 1 && Player[A].MountType == 3))
-                        {
-                            if((Player[A].Controls.Jump || Player[A].Controls.AltJump) &&
-                              ((Player[A].Location.SpeedY > Physics.PlayerGravity * 5 && Player[A].Character != 3 && Player[A].Character != 4) ||
-                                (Player[A].Location.SpeedY > Physics.PlayerGravity * 10 && Player[A].Character == 3) ||
-                                (Player[A].Location.SpeedY > Physics.PlayerGravity * 7.5 && Player[A].Character == 4)) &&
-                                !Player[A].GroundPound && Player[A].Slope == 0 && Player[A].Character != 5)
-                            {
-                                if(!Player[A].ShellSurf)
+                                if(Player[A].State == 4 || Player[A].State == 5)
                                 {
-                                    if(Player[A].Character == 3)
-                                        Player[A].Location.SpeedY = Physics.PlayerGravity * 10;
-                                    else if(Player[A].Character == 4)
-                                        Player[A].Location.SpeedY = Physics.PlayerGravity * 7.5;
-                                    else
-                                        Player[A].Location.SpeedY = Physics.PlayerGravity * 5;
+                                    Player[A].FloatTime = 100;
+                                    Player[A].FlySparks = true;
                                 }
                                 else
-                                {
-                                    if(NPC[Player[A].StandingOnNPC].Location.SpeedY > Physics.PlayerGravity * 5)
-                                        NPC[Player[A].StandingOnNPC].Location.SpeedY = Physics.PlayerGravity * 5;
-                                }
+                                    Player[A].FloatTime = 65;
 
-                                if(
-                                    !(
-                                        (!Player[A].YoshiBlue && (Player[A].CanFly || Player[A].CanFly2)) ||
-                                        (Player[A].Mount == 3 && Player[A].CanFly2)
-                                    )
+                                Player[A].FloatDir = 1;
+
+                                if(Player[A].Location.SpeedY < -0.5)
+                                    Player[A].FloatSpeed = 0.5;
+                                else if(Player[A].Location.SpeedY > 0.5)
+                                    Player[A].FloatSpeed = 0.5;
+                                else
+                                    Player[A].FloatSpeed = Player[A].Location.SpeedY;
+
+                                Player[A].CanFloat = false;
+                            }
+                        }
+                    }
+
+                    if(Player[A].Character == 3 && Player[A].FlySparks)
+                    {
+                        if(Player[A].FloatTime == 0 && Player[A].Location.SpeedY >= 0)
+                            Player[A].FlySparks = false;
+                    }
+
+                    if(Player[A].CanFloat)
+                        Player[A].FloatTime = 0;
+
+                    if(Player[A].FloatTime > 0 && Player[A].Character == 3)
+                    {
+                        if((Player[A].Controls.Jump || Player[A].Controls.AltJump) && Player[A].Vine == 0)
+                        {
+                            Player[A].FloatTime -= 1;
+                            Player[A].FloatSpeed += Player[A].FloatDir * 0.1;
+
+                            if(Player[A].FloatSpeed > 0.8)
+                                Player[A].FloatDir = -1;
+
+                            if(Player[A].FloatSpeed < -0.8)
+                                Player[A].FloatDir = 1;
+
+                            Player[A].Location.SpeedY = Player[A].FloatSpeed;
+
+                            if(Player[A].FloatTime == 0 && Player[A].Location.SpeedY == 0)
+                                Player[A].Location.SpeedY = 0.1;
+                        }
+                        else
+                            Player[A].FloatTime = 0;
+                    }
+
+
+                    // Racoon Mario
+                    if((Player[A].State == 4 || Player[A].State == 5) || Player[A].YoshiBlue || (Player[A].Mount == 1 && Player[A].MountType == 3))
+                    {
+                        if((Player[A].Controls.Jump || Player[A].Controls.AltJump) &&
+                          ((Player[A].Location.SpeedY > Physics.PlayerGravity * 5 && Player[A].Character != 3 && Player[A].Character != 4) ||
+                            (Player[A].Location.SpeedY > Physics.PlayerGravity * 10 && Player[A].Character == 3) ||
+                            (Player[A].Location.SpeedY > Physics.PlayerGravity * 7.5 && Player[A].Character == 4)) &&
+                            !Player[A].GroundPound && Player[A].Slope == 0 && Player[A].Character != 5)
+                        {
+                            if(!Player[A].ShellSurf)
+                            {
+                                if(Player[A].Character == 3)
+                                    Player[A].Location.SpeedY = Physics.PlayerGravity * 10;
+                                else if(Player[A].Character == 4)
+                                    Player[A].Location.SpeedY = Physics.PlayerGravity * 7.5;
+                                else
+                                    Player[A].Location.SpeedY = Physics.PlayerGravity * 5;
+                            }
+                            else
+                            {
+                                if(NPC[Player[A].StandingOnNPC].Location.SpeedY > Physics.PlayerGravity * 5)
+                                    NPC[Player[A].StandingOnNPC].Location.SpeedY = Physics.PlayerGravity * 5;
+                            }
+
+                            if(
+                                !(
+                                    (!Player[A].YoshiBlue && (Player[A].CanFly || Player[A].CanFly2)) ||
+                                    (Player[A].Mount == 3 && Player[A].CanFly2)
                                 )
+                            )
+                            {
+                                if(iRand(10) == 0)
                                 {
-                                    if(iRand(10) == 0)
-                                    {
-                                        NewEffect(EFFID_SPARKLE, newLoc(Player[A].Location.X - 8 + dRand() * (Player[A].Location.Width + 16) - 4,
-                                                             Player[A].Location.Y - 8 + dRand() * (Player[A].Location.Height + 16)), 1, 0, ShadowMode);
-                                        Effect[numEffects].Location.SpeedX = (dRand() * 0.5) - 0.25;
-                                        Effect[numEffects].Location.SpeedY = (dRand() * 0.5) - 0.25;
-                                        Effect[numEffects].Frame = 1;
-                                    }
+                                    NewEffect(EFFID_SPARKLE, newLoc(Player[A].Location.X - 8 + dRand() * (Player[A].Location.Width + 16) - 4,
+                                                         Player[A].Location.Y - 8 + dRand() * (Player[A].Location.Height + 16)), 1, 0, ShadowMode);
+                                    Effect[numEffects].Location.SpeedX = (dRand() * 0.5) - 0.25;
+                                    Effect[numEffects].Location.SpeedY = (dRand() * 0.5) - 0.25;
+                                    Effect[numEffects].Frame = 1;
                                 }
                             }
                         }
