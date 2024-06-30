@@ -2242,8 +2242,6 @@ void UpdatePlayer()
                             if(vscreen.Width < section.Width - section.X)
                                 did_wrap_rl = true;
                         }
-
-                        hBoundsHandled = true;
                     }
 
                     // vertically
@@ -2326,6 +2324,9 @@ void UpdatePlayer()
                         GetvScreenAuto(vscreen);
                     }
                 }
+
+                if(LevelWrap[Player[A].Section])
+                    hBoundsHandled = true;
 
                 // Walk offscreen exit
                 if(!hBoundsHandled && OffScreenExit[Player[A].Section])
@@ -2459,7 +2460,7 @@ void UpdatePlayer()
                 }
 #endif
 
-
+                // decrement pinched timers
                 if(Player[A].Pinched.Bottom1 > 0)
                     Player[A].Pinched.Bottom1 -= 1;
                 if(Player[A].Pinched.Left2 > 0)
@@ -2488,19 +2489,22 @@ void UpdatePlayer()
                 int tempHit3 = 0;
                 PlayerBlockLogic(A, tempHit3, movingBlock, DontResetGrabTime, cursed_value_C);
 
-                // Check NPC collisions
+                // Vine collisions.
                 PlayerVineLogic(A);
 
 
+                // Check NPC collisions
                 int MessageNPC = 0;
                 PlayerNPCLogic(A, tempSpring, tempShell, MessageNPC, movingBlock, tempHit3, oldSpeedY);
 
+                // reduce player's multiplier
                 if((Player[A].Location.SpeedY == 0 || Player[A].StandingOnNPC != 0 || Player[A].Slope > 0) && !Player[A].Slide && !FreezeNPCs)
                     Player[A].Multiplier = 0;
 
                 if(Player[A].Mount == 2)
                     Player[A].Multiplier = 0;
 
+                // Player-player collisions
                 PlayerCollide(A);
 
                 // Talk to NPC
