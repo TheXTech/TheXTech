@@ -31,7 +31,7 @@
 
 #include "main/trees.h"
 
-void PlayerChar5Logic(int A, const bool wasSlippy)
+void PlayerChar5Logic(int A)
 {
     if(Player[A].State == 4 || Player[A].State == 5)
     {
@@ -129,7 +129,7 @@ void PlayerChar5Logic(int A, const bool wasSlippy)
         if(Player[A].SwordPoke == -40)
             Player[A].SwordPoke = 0;
 
-        if(!(wasSlippy && !Player[A].Controls.Left && !Player[A].Controls.Right))
+        if(!(Player[A].Slippy && !Player[A].Controls.Left && !Player[A].Controls.Right))
         {
             if(Player[A].FireBallCD == 0 && Player[A].Location.SpeedX != 0)
                 Player[A].SwordPoke = 0;

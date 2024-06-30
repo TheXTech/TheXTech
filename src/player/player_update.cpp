@@ -264,8 +264,9 @@ void UpdatePlayer()
                     }
                 }
 
-                bool wasSlippy = Player[A].Slippy;
-                Player[A].Slippy = false;
+                // moved Slippy reset to immediately before the player Block logic
+                // bool wasSlippy = Player[A].Slippy;
+                // Player[A].Slippy = false;
 
                 if(Player[A].Quicksand > 1)
                 {
@@ -274,8 +275,9 @@ void UpdatePlayer()
                         Player[A].Location.SpeedX = Player[A].Location.SpeedX * 0.5;
                 }
 
+                // Apply movement -- this is where the actual movement happens
+                Player[A].Location.X += Player[A].Location.SpeedX;
 
-                Player[A].Location.X += Player[A].Location.SpeedX; // This is where the actual movement happens
 
                 // Players Y movement.
                 if(Block[Player[A].Slope].Location.SpeedY != 0.0 && Player[A].Slope != 0)
@@ -330,7 +332,7 @@ void UpdatePlayer()
 
                 // link stuff
                 if(Player[A].Character == 5)
-                    PlayerChar5Logic(A, wasSlippy);
+                    PlayerChar5Logic(A);
 
                 Player[A].FloatRelease = !Player[A].Controls.Jump;
 
@@ -365,8 +367,6 @@ void UpdatePlayer()
 
                 Tanooki(A); // tanooki suit code
 
-                float oldSpeedY = Player[A].Location.SpeedY; // holds the players previous Y speed
-
                 // this whole section is dead code, since there are no uses of these definitions of PlrMid and Slope
 #if 0
                 if(Player[A].StandingOnNPC == -A)
@@ -397,9 +397,13 @@ void UpdatePlayer()
                 PlayerPinchedTimerUpdate(A);
 
                 // Block collisions.
+                float oldSpeedY = Player[A].Location.SpeedY; // holds the players previous Y speed
                 bool DontResetGrabTime = false; // helps with grabbing things from the top
                 bool movingBlock = false; // helps with collisions for moving blocks
                 int tempHit3 = 0;
+
+                Player[A].Slippy = false;
+
                 PlayerBlockLogic(A, tempHit3, movingBlock, DontResetGrabTime, cursed_value_C);
 
                 // Vine collisions.
