@@ -28,4 +28,6 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
 
 void PlayerBlockLogic(int A, int& tempHit3, bool& movingBlock, bool& DontResetGrabTime, float cursed_value_C);
 
+void PlayerVineLogic(int A);
+
 #endif // PLAYER_UPDATE_PRIV_H
