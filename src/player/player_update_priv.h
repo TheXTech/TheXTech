@@ -29,18 +29,16 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
 void PlayerBlockLogic(int A, int& tempHit3, bool& movingBlock, bool& DontResetGrabTime, float cursed_value_C);
 
 void PlayerVineLogic(int A);
-
-void PlayerSharedScreenLogic(int A);
-
-void PlayerLevelWrapLogic(int A);
-
 bool PlayerFairyOnVine(int A);
 
+void PlayerSharedScreenLogic(int A);
+void PlayerLevelWrapLogic(int A);
+
 void PlayerFairyTimerUpdate(int A);
-
 void PlayerFairyMovementX(int A);
-
 void PlayerFairyMovementY(int A);
+
+void PlayerMovementY(int A);
 
 void PlayerPoundLogic(int A);
 

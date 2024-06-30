@@ -766,6 +766,7 @@ set(THEXTECH_SRC
     src/player/player_screen_logic.cpp
     src/player/player_fairy_logic.cpp
     src/player/player_action_logic.cpp
+    src/player/player_movement_logic.cpp
     src/fontman/font_manager.cpp
     src/fontman/font_manager_private.cpp
     src/fontman/raster_font.cpp
