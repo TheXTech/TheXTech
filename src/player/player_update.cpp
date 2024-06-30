@@ -53,124 +53,23 @@
 
 void UpdatePlayer()
 {
-    // int A = 0;
-    // int B = 0;
-//    Controls_t blankControls;
-    // float speedVar = 0; // adjusts the players speed by percentages
-    // int64_t fBlock = 0; // for collision detection optimizations
-    // int64_t lBlock = 0;
-    // double tempSpeed = 0;
-    // int HitSpot = 0;
-    // the hitspot is used for collision detection to find out where to put the player after it collides with a block
-    // the numbers tell what side the collision happened so it can move the plaer to the correct position
-    // 1 means the player hit the block from the top
-    // 2 is from the right
-    // 3 is from the bottom
-    // 4 is from the left
-    // int tempBlockHit[3] = {0};
-//    double tempBlockA[3] = {0};
-    // bool tempHit = false;
     bool tempSpring = false;
     bool tempShell = false;
-    // bool tempHit2 = false;
-    // int tempHit3 = 0;
-    // float tempHitSpeed = 0;
-    // float oldSpeedY = 0; // holds the players previous Y speed
-    // int oldStandingOnNpc = 0;
-    // Location_t tempLocation;
-    // Location_t tempLocation3;
-    // bool spinKill = false;
-    // int oldSlope = 0;
-    // float A1 = 0;
-    // float B1 = 0;
-    // float C1 = 0;
-    // float X = 0;
-    // float Y = 0;
-//    bool canWarp = false;
-    // bool tempBool = false;
-    // NPC_t blankNPC;
-    // int MessageNPC = 0;
-    // used for slope calculations
-    // double PlrMid = 0;
-    // double Slope = 0;
-    // int tempSlope = 0;
-    // int tempSlope2 = 0;
-    // double tempSlope2X = 0; // The old X before player was moved
-    // int tempSlope3 = 0; // keeps track of hit 5 for slope detection
-    // bool movingBlock = false; // helps with collisions for moving blocks
-    // int blockPushX = 0;
-    // Location_t oldLoc;
-//    Location_t curLoc;
-//    int oldGrab = 0; // SET BUT NOT USED
-    // bool DontResetGrabTime = false; // helps with grabbing things from the top
-    // double SlippySpeedX = 0;
-    // bool wasSlippy = false;
-    // double Angle = 0;
-    // double slideSpeed = 0;
-//    void *maxSlideSpeed = nullptr;
-
 
     StealBonus(); // allows a dead player to come back to life by using a 1-up
     ClownCar(); // updates players in the clown car
-
-    // online stuff
-//    if(nPlay.Online == true)
-//    {
-//        A = nPlay.MySlot + 1;
-//        nPlay.PlayerWaitCount += 1;
-//        if(Player[A].Dead == true || Player[A].TimeToLive > 0)
-//        {
-//            if(nPlay.PlayerWaitCount == 10)
-//            {
-//                nPlay.PlayerWaitCount = 0;
-//                Netplay::sendData "1p" + std::to_string(A) + LB;
-//            }
-//        }
-//        else if(Player[A].Effect != PLREFF_NORMAL)
-//        {
-//            if(nPlay.PlayerWaitCount >= 10)
-//            {
-//                Netplay::sendData Netplay::PutPlayerLoc(nPlay.MySlot) + "1c" + std::to_string(A) + "|" + Player[A].Effect + "|" + Player[A].Effect2 + LB + "1h" + std::to_string(A) + "|" + Player[A].State + LB;
-//                nPlay.PlayerWaitCount = 0;
-//            }
-//        }
-//        else
-//        {
-//            if(nPlay.PlayerWaitCount >= 6 && (Player[nPlay.MySlot + 1].Location.SpeedX != 0 || Player[nPlay.MySlot + 1].Location.SpeedY != 0) || nPlay.PlayerWaitCount >= 60)
-//            {
-//                Netplay::sendData Netplay::PutPlayerLoc(nPlay.MySlot);
-//                if(Player[A].YoshiPlayer > 0)
-//                    Netplay::sendData Netplay::PutPlayerLoc(Player[A].YoshiPlayer - 1) + "1c" + Player[A].YoshiPlayer + "|" + Player[Player[A].YoshiPlayer].Effect + "|" + Player[Player[A].YoshiPlayer].Effect2 + LB + "1h" + std::to_string(A) + "|" + Player[Player[A].YoshiPlayer].State + LB;
-//                if(Player[A].Mount == 3)
-//                    Netplay::sendData "1r" + std::to_string(A) + "|" + Player[A].YoshiPlayer + LB;
-//                nPlay.PlayerWaitCount = 0;
-//            }
-//        }
-//    }
 
 
     // A is the current player, numPlayers is the last player. this loop updates all the players
     for(int tmpNumPlayers = numPlayers, A = 1; A <= tmpNumPlayers; A++)
     {
-//        if(nPlay.Online == true && A > 1)
-//        {
-//            if(nPlay.Player[A - 1].Active == false)
-//                Player[A].Dead = true;
-//            if(Player[A].Dead == true)
-//                nPlay.Player[A - 1].Controls = blankControls;
-//        }
-        // reset variables from the previous player
-//        oldGrab = Player[A].HoldingNPC; // SET BUT NOT UNUSED
+        // reset variables
         Player[A].ShowWarp = 0;
         Player[A].mountBump = 0;
-        // bool spinKill = false;
 
         // this was shared over players in SMBX 1.3 -- if the line marked "MOST CURSED LINE" in player_block_logic.cpp becomes a source of incompatibility, we will need to restore that logic
         float cursed_value_C = 0;
 
-        // Location_t tempLocation3;
-//        tempBlockA[1] = 0; // Unused
-//        tempBlockA[2] = 0;
         if(Player[A].GrabTime > 0) // if grabbing something, take control away from the player
         {
             Player[A].Slide = false;
@@ -196,12 +95,10 @@ void UpdatePlayer()
             else
                 DropBonus(A);
         }
+
         // for dropping something from the container. this makes the player have to let go of the drop button before dropping something else
         Player[A].DropRelease = !Player[A].Controls.Drop;
-//        if(Player[A].Controls.Drop == true)
-//            Player[A].DropRelease = false;
-//        else
-//            Player[A].DropRelease = true;
+
         // Handle the death effecs
         if(Player[A].TimeToLive > 0)
         {
@@ -419,8 +316,6 @@ void UpdatePlayer()
         }
         else if(!Player[A].Dead)
         {
-            // Location_t oldLoc = Player[A].Location; // only used in online code
-
             if(Player[A].SlideCounter > 0) // for making the slide Effect
                 Player[A].SlideCounter -= 1;
 
@@ -545,6 +440,7 @@ void UpdatePlayer()
                         tempLocation.Y += -Physics.PlayerHeight[Player[A].Character][Player[A].State];
                         tempLocation.Width = Physics.PlayerWidth[Player[A].Character][Player[A].State];
                         tempLocation.X += 64 - tempLocation.Width / 2.0;
+
                         // fBlock = FirstBlock[(tempLocation.X / 32) - 1];
                         // lBlock = LastBlock[((tempLocation.X + tempLocation.Width) / 32.0) + 1];
                         // blockTileGet(tempLocation, fBlock, lBlock);
@@ -607,7 +503,8 @@ void UpdatePlayer()
 
                     Player[A].Location.SpeedX = 0;
                 }
-                else if(Player[A].Fairy) // if a fairy
+                // if a fairy
+                else if(Player[A].Fairy)
                     PlayerFairyMovementX(A);
                 // if the player is climbing a vine
                 else if(Player[A].Vine > 0)
@@ -638,6 +535,7 @@ void UpdatePlayer()
                 {
                     if(Player[A].StandingOnNPC < 0)
                         NPC[Player[A].StandingOnNPC].Location = Block[(int)NPC[Player[A].StandingOnNPC].Special].Location;
+
                     Player[A].Location.SpeedX += NPC[Player[A].StandingOnNPC].Location.SpeedX + NPC[Player[A].StandingOnNPC].BeltSpeed;
                 }
 
@@ -973,7 +871,7 @@ void UpdatePlayer()
                 if(Player[A].Mount == 0)
                     Player[A].YoshiYellow = false;
 
-                // When it's true - don't check horizonta' section's bounds
+                // When it's true - don't check horizontal section's bounds
                 bool hBoundsHandled = false;
 
                 // level wrap
@@ -1200,33 +1098,6 @@ void UpdatePlayer()
             }
             else // Player special effects
                 PlayerEffects(A);
-//            if(nPlay.Online == true)
-//            {
-//                if(A == nPlay.MySlot + 1)
-//                {
-//                    if(Player[A].HoldingNPC != oldGrab)
-//                    {
-//                        if(Player[A].HoldingNPC > 0)
-//                        {
-//                            NPC[Player[A].HoldingNPC].NetTimeout = 10;
-//                            C = Player[A].HoldingNPC;
-//                            Netplay::sendData "K" + std::to_string(C) + "|" + NPC[C].Type + "|" + NPC[C].Location.X + "|" + NPC[C].Location.Y + "|" + std::to_string(NPC[C].Location.Width) + "|" + std::to_string(NPC[C].Location.Height) + "|" + NPC[C].Location.SpeedX + "|" + NPC[C].Location.SpeedY + "|" + NPC[C].Section + "|" + NPC[C].TimeLeft + "|" + NPC[C].Direction + "|" + std::to_string(static_cast<int>(floor(static_cast<double>(NPC[C].Projectile)))) + "|" + NPC[C].Special + "|" + NPC[C].Special2 + "|" + NPC[C].Special3 + "|" + NPC[C].Special4 + "|" + NPC[C].Special5 + "|" + NPC[C].Effect + LB + "1n" + std::to_string(A) + "|" + Player[A].HoldingNPC + "|" + NPC[Player[A].HoldingNPC].Type + LB;
-//                        }
-//                        else
-//                        {
-//                            C = oldGrab;
-//                            Netplay::sendData Netplay::PutPlayerControls(nPlay.MySlot) + "K" + std::to_string(C) + "|" + NPC[C].Type + "|" + NPC[C].Location.X + "|" + NPC[C].Location.Y + "|" + std::to_string(NPC[C].Location.Width) + "|" + std::to_string(NPC[C].Location.Height) + "|" + NPC[C].Location.SpeedX + "|" + NPC[C].Location.SpeedY + "|" + NPC[C].Section + "|" + NPC[C].TimeLeft + "|" + NPC[C].Direction + "|" + std::to_string(static_cast<int>(floor(static_cast<double>(NPC[C].Projectile)))) + "|" + NPC[C].Special + "|" + NPC[C].Special2 + "|" + NPC[C].Special3 + "|" + NPC[C].Special4 + "|" + NPC[C].Special5 + "|" + NPC[C].Effect + LB + "1o" + std::to_string(A) + "|" + std::to_string(oldGrab) + LB;
-//                        }
-//                    }
-//                    else if(Player[A].HoldingNPC > 0)
-//                    {
-//                        C = Player[A].HoldingNPC;
-//                        NPC[Player[A].HoldingNPC].NetTimeout = 10;
-//                        if(nPlay.PlayerWaitCount % 3 == 0)
-//                            Netplay::sendData "K" + std::to_string(C) + "|" + NPC[C].Type + "|" + NPC[C].Location.X + "|" + NPC[C].Location.Y + "|" + std::to_string(NPC[C].Location.Width) + "|" + std::to_string(NPC[C].Location.Height) + "|" + NPC[C].Location.SpeedX + "|" + NPC[C].Location.SpeedY + "|" + NPC[C].Section + "|" + NPC[C].TimeLeft + "|" + NPC[C].Direction + "|" + std::to_string(static_cast<int>(floor(static_cast<double>(NPC[C].Projectile)))) + "|" + NPC[C].Special + "|" + NPC[C].Special2 + "|" + NPC[C].Special3 + "|" + NPC[C].Special4 + "|" + NPC[C].Special5 + "|" + NPC[C].Effect + LB + "1n" + std::to_string(A) + "|" + Player[A].HoldingNPC + "|" + NPC[Player[A].HoldingNPC].Type + LB;
-//                    }
-//                }
-//            }
         }
 
         Player[A].DuckRelease = !Player[A].Controls.Down;

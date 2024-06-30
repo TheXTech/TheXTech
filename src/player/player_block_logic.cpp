@@ -56,7 +56,7 @@ void PlayerBlockLogic(int A, int& tempHit3, bool& movingBlock, bool& DontResetGr
 
     int B = 0;
 
-    // NEW and not provably safe, but can only fail if Block[0] is in the same place as a block the player collides with
+    // This was previously shared between players, but is safe unless Block[tempSlope2] satisfies certain properties before tempSlope2 gets set
     double tempSlope2X = 0; // The old X before player was moved
 
     if(Player[A].Character == 5 && Player[A].Duck && (Player[A].Location.SpeedY == Physics.PlayerGravity || Player[A].StandingOnNPC != 0 || Player[A].Slope != 0))
@@ -90,6 +90,12 @@ void PlayerBlockLogic(int A, int& tempHit3, bool& movingBlock, bool& DontResetGr
 
                         if(!Block[B].Hidden)
                         {
+                            // the hitspot is used for collision detection to find out where to put the player after it collides with a block
+                            // the numbers tell what side the collision happened so it can move the plaer to the correct position
+                            // 1 means the player hit the block from the top
+                            // 2 is from the right
+                            // 3 is from the bottom
+                            // 4 is from the left
                             int HitSpot = FindRunningCollision(Player[A].Location, Block[B].Location); // this finds what part of the block the player collided
 
                             if(BlockNoClipping[Block[B].Type]) // blocks that the player can't touch are forced to hitspot 0 (which means no collision)
