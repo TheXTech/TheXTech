@@ -41,6 +41,7 @@ void PlayerFairyMovementY(int A);
 
 void PlayerMovementX(int A, float& cursed_value_C);
 void PlayerMovementY(int A);
+void PlayerSwimMovementY(int A);
 
 void PlayerPoundLogic(int A);
 
