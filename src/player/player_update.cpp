@@ -57,57 +57,57 @@ void UpdatePlayer()
     float C = 0;
     float D = 0;
 //    Controls_t blankControls;
-    float speedVar = 0; // adjusts the players speed by percentages
+    // float speedVar = 0; // adjusts the players speed by percentages
     // int64_t fBlock = 0; // for collision detection optimizations
     // int64_t lBlock = 0;
     // double tempSpeed = 0;
-    int HitSpot = 0;
+    // int HitSpot = 0;
     // the hitspot is used for collision detection to find out where to put the player after it collides with a block
     // the numbers tell what side the collision happened so it can move the plaer to the correct position
     // 1 means the player hit the block from the top
     // 2 is from the right
     // 3 is from the bottom
     // 4 is from the left
-    int tempBlockHit[3] = {0};
+    // int tempBlockHit[3] = {0};
 //    double tempBlockA[3] = {0};
-    bool tempHit = false;
+    // bool tempHit = false;
     bool tempSpring = false;
     bool tempShell = false;
-    bool tempHit2 = false;
-    int tempHit3 = 0;
-    float tempHitSpeed = 0;
-    float oldSpeedY = 0; // holds the players previous Y speed
-    int oldStandingOnNpc = 0;
-    Location_t tempLocation;
-    Location_t tempLocation3;
-    bool spinKill = false;
-    int oldSlope = 0;
+    // bool tempHit2 = false;
+    // int tempHit3 = 0;
+    // float tempHitSpeed = 0;
+    // float oldSpeedY = 0; // holds the players previous Y speed
+    // int oldStandingOnNpc = 0;
+    // Location_t tempLocation;
+    // Location_t tempLocation3;
+    // bool spinKill = false;
+    // int oldSlope = 0;
     float A1 = 0;
     float B1 = 0;
     float C1 = 0;
     float X = 0;
     float Y = 0;
 //    bool canWarp = false;
-    bool tempBool = false;
-    NPC_t blankNPC;
-    int MessageNPC = 0;
+    // bool tempBool = false;
+    // NPC_t blankNPC;
+    // int MessageNPC = 0;
     // used for slope calculations
-    double PlrMid = 0;
-    double Slope = 0;
-    int tempSlope = 0;
-    int tempSlope2 = 0;
-    double tempSlope2X = 0; // The old X before player was moved
-    int tempSlope3 = 0; // keeps track of hit 5 for slope detection
-    bool movingBlock = false; // helps with collisions for moving blocks
-    int blockPushX = 0;
-    Location_t oldLoc;
+    // double PlrMid = 0;
+    // double Slope = 0;
+    // int tempSlope = 0;
+    // int tempSlope2 = 0;
+    // double tempSlope2X = 0; // The old X before player was moved
+    // int tempSlope3 = 0; // keeps track of hit 5 for slope detection
+    // bool movingBlock = false; // helps with collisions for moving blocks
+    // int blockPushX = 0;
+    // Location_t oldLoc;
 //    Location_t curLoc;
 //    int oldGrab = 0; // SET BUT NOT USED
-    bool DontResetGrabTime = false; // helps with grabbing things from the top
-    double SlippySpeedX = 0;
-    bool wasSlippy = false;
-    double Angle = 0;
-    double slideSpeed = 0;
+    // bool DontResetGrabTime = false; // helps with grabbing things from the top
+    // double SlippySpeedX = 0;
+    // bool wasSlippy = false;
+    // double Angle = 0;
+    // double slideSpeed = 0;
 //    void *maxSlideSpeed = nullptr;
 
 
@@ -161,19 +161,20 @@ void UpdatePlayer()
 //                nPlay.Player[A - 1].Controls = blankControls;
 //        }
         // reset variables from the previous player
-        DontResetGrabTime = false;
+        bool DontResetGrabTime = false; // helps with grabbing things from the top
 //        oldGrab = Player[A].HoldingNPC; // SET BUT NOT UNUSED
-        movingBlock = false;
-        blockPushX = 0;
+        bool movingBlock = false; // helps with collisions for moving blocks
+        int blockPushX = 0;
         Player[A].ShowWarp = 0;
         Player[A].mountBump = 0;
-        spinKill = false;
-        tempHit = false;
-        tempHit2 = false;
-        tempHit3 = 0;
-        tempBlockHit[1] = 0;
-        tempBlockHit[2] = 0;
-        oldStandingOnNpc = Player[A].StandingOnNPC;
+        // bool spinKill = false;
+        bool tempHit = false;
+        bool tempHit2 = false;
+        int tempHit3 = 0;
+        Location_t tempLocation3;
+        int tempBlockHit1 = 0;
+        int tempBlockHit2 = 0;
+        int oldStandingOnNpc = Player[A].StandingOnNPC;
 //        tempBlockA[1] = 0; // Unused
 //        tempBlockA[2] = 0;
         if(Player[A].GrabTime > 0) // if grabbing something, take control away from the player
@@ -420,7 +421,8 @@ void UpdatePlayer()
         }
         else if(!Player[A].Dead)
         {
-            oldLoc = Player[A].Location;
+            // Location_t oldLoc = Player[A].Location; // only used in online code
+
             if(Player[A].SlideCounter > 0) // for making the slide Effect
                 Player[A].SlideCounter -= 1;
 
@@ -533,13 +535,13 @@ void UpdatePlayer()
                     if(NPC[Player[A].StandingOnNPC].Type == 263 && NPC[Player[A].StandingOnNPC].Location.SpeedX == 0.0)
                         Player[A].Slippy = true;
                 }
-                SlippySpeedX = Player[A].Location.SpeedX;
+                double SlippySpeedX = Player[A].Location.SpeedX;
 
 
                 // Player's X movement. ---------------------------
 
                 // Modify player's speed if he is running up/down hill
-                speedVar = 1; // Speed var is a percentage of the player's speed
+                float speedVar = 1; // Speed var is a percentage of the player's speed
                 if(Player[A].Slope > 0)
                 {
                     if(
@@ -573,8 +575,9 @@ void UpdatePlayer()
                 {
                     if(Player[A].Slope > 0)
                     {
-                        Angle = 1 / (Block[Player[A].Slope].Location.Width / static_cast<double>(Block[Player[A].Slope].Location.Height));
-                        slideSpeed = 0.1 * Angle * BlockSlope[Block[Player[A].Slope].Type];
+                        double Angle = 1 / (Block[Player[A].Slope].Location.Width / static_cast<double>(Block[Player[A].Slope].Location.Height));
+                        double slideSpeed = 0.1 * Angle * BlockSlope[Block[Player[A].Slope].Type];
+
                         if(slideSpeed > 0 && Player[A].Location.SpeedX < 0)
                             Player[A].Location.SpeedX += slideSpeed * 2;
                         else if(slideSpeed < 0 && Player[A].Location.SpeedX > 0)
@@ -620,8 +623,8 @@ void UpdatePlayer()
                             Player[A].CanAltJump = false;
 
                         Player[A].CanJump = false;
-                        tempBool = true;
-                        tempLocation = Player[A].Location;
+                        bool tempBool = true;
+                        Location_t tempLocation = Player[A].Location;
                         tempLocation.Height = Physics.PlayerHeight[Player[A].Character][Player[A].State];
                         tempLocation.Y += -Physics.PlayerHeight[Player[A].Character][Player[A].State];
                         tempLocation.Width = Physics.PlayerWidth[Player[A].Character][Player[A].State];
@@ -1108,7 +1111,7 @@ void UpdatePlayer()
 
                     if(Player[A].FairyTime != -1 && Player[A].FairyTime < 20 && Player[A].Character == 5)
                     {
-                        tempLocation = Player[A].Location;
+                        Location_t tempLocation = Player[A].Location;
                         tempLocation.Width += 32;
                         tempLocation.Height += 32;
                         tempLocation.X -= 16;
@@ -1197,7 +1200,7 @@ void UpdatePlayer()
                             Player[A].Location.SpeedX = 0;
                     }
                 }
-                wasSlippy = Player[A].Slippy;
+                bool wasSlippy = Player[A].Slippy;
                 Player[A].Slippy = false;
 
                 if(Player[A].Quicksand > 1)
@@ -1586,7 +1589,7 @@ void UpdatePlayer()
                                 Player[A].Location.SpeedY = Physics.PlayerJumpVelocity;
                                 Player[A].Jump = 10;
                                 Player[A].DoubleJump = false;
-                                tempLocation = Player[A].Location;
+                                Location_t tempLocation = Player[A].Location;
                                 tempLocation.Y = Player[A].Location.Y + Player[A].Location.Height - EffectHeight[80] / 2.0 + Player[A].Location.SpeedY;
                                 tempLocation.Height = EffectHeight[80];
                                 tempLocation.Width = EffectWidth[80];
@@ -1631,6 +1634,7 @@ void UpdatePlayer()
                             {
                                 if(iRand(10) >= 3)
                                 {
+                                    Location_t tempLocation;
                                     tempLocation.Y = Player[A].Location.Y + Player[A].Location.Height - 2 + dRand() * (NPC[Player[A].StandingOnNPC].Location.Height - 8) + 4;
                                     tempLocation.X = Player[A].Location.X - 4 + dRand() * (Player[A].Location.Width - 8) + 4 - 8 * Player[A].Direction;
                                     NewEffect(EFFID_SPARKLE, tempLocation, 1, 0, ShadowMode);
@@ -2033,7 +2037,7 @@ void UpdatePlayer()
 
                             if(Background[B].Type == 35)
                             {
-                                tempLocation = Background[B].Location;
+                                Location_t tempLocation = Background[B].Location;
                                 tempLocation.Width = 16;
                                 tempLocation.X += 8;
                                 tempLocation.Height = 26;
@@ -2429,18 +2433,24 @@ void UpdatePlayer()
 
                 Tanooki(A); // tanooki suit code
 
-                oldSpeedY = Player[A].Location.SpeedY;
+                float oldSpeedY = Player[A].Location.SpeedY; // holds the players previous Y speed
 
+                // this whole section is dead code, since there are no uses of these definitions of PlrMid and Slope
+#if 0
                 if(Player[A].StandingOnNPC == -A)
                 {
                     if(Player[A].Slope != 0)
                     {
                         B = NPC[Player[A].StandingOnNPC].Special;
+
+                        double PlrMid;
                         if(BlockSlope[Block[B].Type] == 1)
                             PlrMid = Player[A].Location.X;
                         else
                             PlrMid = Player[A].Location.X + Player[A].Location.Width;
-                        Slope = (PlrMid - Block[B].Location.X) / Block[B].Location.Width;
+
+                        double Slope = (PlrMid - Block[B].Location.X) / Block[B].Location.Width;
+
                         if(BlockSlope[Block[B].Type] < 0)
                             Slope = 1 - Slope;
                         if(Slope < 0)
@@ -2449,15 +2459,19 @@ void UpdatePlayer()
                             Slope = 1;
                     }
                 }
-
+#endif
 
 
                 // Block collisions.
-                oldSlope = Player[A].Slope;
+                int oldSlope = Player[A].Slope;
                 Player[A].Slope = 0;
-                tempSlope = 0;
-                tempSlope2 = 0;
-                tempSlope3 = 0;
+                int tempSlope = 0;
+                int tempSlope2 = 0;
+                int tempSlope3 = 0; // keeps track of hit 5 for slope detection
+
+                // NEW and not provably safe, but can only fail if Block[0] is in the same place as a block the player collides with
+                double tempSlope2X = 0; // The old X before player was moved
+
                 if(Player[A].Pinched.Bottom1 > 0)
                     Player[A].Pinched.Bottom1 -= 1;
                 if(Player[A].Pinched.Left2 > 0)
@@ -2511,7 +2525,7 @@ void UpdatePlayer()
 
                                     if(!Block[B].Hidden)
                                     {
-                                        HitSpot = FindRunningCollision(Player[A].Location, Block[B].Location); // this finds what part of the block the player collided
+                                        int HitSpot = FindRunningCollision(Player[A].Location, Block[B].Location); // this finds what part of the block the player collided
 
                                         if(BlockNoClipping[Block[B].Type]) // blocks that the player can't touch are forced to hitspot 0 (which means no collision)
                                             HitSpot = 0;
@@ -2610,12 +2624,13 @@ void UpdatePlayer()
                                             HitSpot = 0;
                                             tempSlope = B;
 
+                                            double PlrMid;
                                             if(BlockSlope2[Block[B].Type] == 1)
                                                 PlrMid = Player[A].Location.X + Player[A].Location.Width;
                                             else
                                                 PlrMid = Player[A].Location.X;
 
-                                            Slope = (PlrMid - Block[B].Location.X) / Block[B].Location.Width;
+                                            double Slope = (PlrMid - Block[B].Location.X) / Block[B].Location.Width;
 
                                             if(BlockSlope2[Block[B].Type] > 0)
                                                 Slope = 1 - Slope;
@@ -2637,7 +2652,7 @@ void UpdatePlayer()
                                                 if(Player[A].Location.SpeedY == 0.0 ||
                                                    fEqual(float(Player[A].Location.SpeedY), Physics.PlayerGravity) || Player[A].Slope > 0 || Player[A].StandingOnNPC != 0)
                                                 {
-                                                    PlrMid = Player[A].Location.Y;
+                                                    double PlrMid = Player[A].Location.Y;
                                                     Slope = (PlrMid - Block[B].Location.Y) / Block[B].Location.Height;
 
                                                     if(Slope < 0)
@@ -2682,12 +2697,13 @@ void UpdatePlayer()
                                                      (Player[A].Slope == 0 && Block[B].Location.SpeedY < 0))
                                                     )
                                             {
+                                                double PlrMid;
                                                 if(BlockSlope[Block[B].Type] == 1)
                                                     PlrMid = Player[A].Location.X;
                                                 else
                                                     PlrMid = Player[A].Location.X + Player[A].Location.Width;
 
-                                                Slope = (PlrMid - Block[B].Location.X) / Block[B].Location.Width;
+                                                double Slope = (PlrMid - Block[B].Location.X) / Block[B].Location.Width;
 
                                                 if(BlockSlope[Block[B].Type] < 0)
                                                     Slope = 1 - Slope;
@@ -2734,8 +2750,8 @@ void UpdatePlayer()
                                                 if(tempSlope3 > 0)
                                                 {
                                                     Player[A].Location.Y = Block[tempSlope3].Location.Y + Block[tempSlope3].Location.Height + 0.01;
-                                                    PlrMid = Player[A].Location.Y + Player[A].Location.Height;
-                                                    Slope = 1 - (PlrMid - Block[B].Location.Y) / Block[B].Location.Height;
+                                                    double PlrMid = Player[A].Location.Y + Player[A].Location.Height;
+                                                    double Slope = 1 - (PlrMid - Block[B].Location.Y) / Block[B].Location.Height;
 
                                                     if(Slope < 0)
                                                         Slope = 0;
@@ -2796,7 +2812,7 @@ void UpdatePlayer()
                                                             Player[A].Location.SpeedY = 0;
                                                         if(Block[B].Location.SpeedX != 0.0 || Block[B].Location.SpeedY != 0.0)
                                                         {
-                                                            NPC[-A] = blankNPC;
+                                                            NPC[-A] = NPC_t();
                                                             NPC[-A].Location = Block[B].Location;
                                                             NPC[-A].Type = NPCID_METALBARREL;
                                                             NPC[-A].Active = true;
@@ -2852,6 +2868,7 @@ void UpdatePlayer()
                                                 }
                                                 else
                                                 {
+                                                    Location_t tempLocation;
                                                     tempLocation.Y = Player[A].Location.Y + Player[A].Location.Height - 2;
                                                     tempLocation.X = Player[A].Location.X - 4 + dRand() * (Player[A].Location.Width + 8) - 4;
                                                     NewEffect(EFFID_SKID_DUST, tempLocation);
@@ -3042,18 +3059,18 @@ void UpdatePlayer()
                                             }
 
                                             tempHit = true;
-                                            if(tempBlockHit[1] == 0)
-                                                tempBlockHit[1] = B;
+                                            if(tempBlockHit1 == 0)
+                                                tempBlockHit1 = B;
                                             else
-                                                tempBlockHit[2] = B;
+                                                tempBlockHit2 = B;
                                         }
                                         else if(HitSpot == 5) // try to find out where the player hit the block from
                                         {
                                             if(oldSlope > 0)
                                             {
                                                 Player[A].Location.Y = Block[B].Location.Y + Block[B].Location.Height + 0.01;
-                                                PlrMid = Player[A].Location.Y + Player[A].Location.Height;
-                                                Slope = 1 - (PlrMid - Block[oldSlope].Location.Y) / Block[oldSlope].Location.Height;
+                                                double PlrMid = Player[A].Location.Y + Player[A].Location.Height;
+                                                double Slope = 1 - (PlrMid - Block[oldSlope].Location.Y) / Block[oldSlope].Location.Height;
                                                 if(Slope < 0)
                                                     Slope = 0;
                                                 if(Slope > 1)
@@ -3081,11 +3098,12 @@ void UpdatePlayer()
                                                     if(Block[B].Location.SpeedY != 0)
                                                         Player[A].Pinched.MovingUD = true;
                                                 }
+                                                Location_t tempLocation;
                                                 tempLocation.X = Player[A].Location.X;
                                                 tempLocation.Width = Player[A].Location.Width;
                                                 tempLocation.Y = Player[A].Location.Y + Player[A].Location.Height;
                                                 tempLocation.Height = 0.1;
-                                                tempBool = false;
+                                                bool tempBool = false;
 
                                                 // this could have caused an unusual TheXTech bug where lBlock would get overwritten
                                                 // (this wouldn't affect VB6 because loop bounds are evaluated only on loop start)
@@ -3103,8 +3121,8 @@ void UpdatePlayer()
                                                         else
                                                         {
                                                             Player[A].Location.Y = Block[B].Location.Y + Block[B].Location.Height; // + 0.01
-                                                            PlrMid = Player[A].Location.Y + Player[A].Location.Height;
-                                                            Slope = 1 - (PlrMid - Block[C].Location.Y) / Block[C].Location.Height;
+                                                            double PlrMid = Player[A].Location.Y + Player[A].Location.Height;
+                                                            double Slope = 1 - (PlrMid - Block[C].Location.Y) / Block[C].Location.Height;
                                                             if(Slope < 0)
                                                                 Slope = 0;
                                                             if(Slope > 1)
@@ -3234,7 +3252,7 @@ void UpdatePlayer()
                             Player[A].Location.SpeedY = 0;
                             if(tempLocation3.SpeedX != 0.0 || tempLocation3.SpeedY != 0.0)
                             {
-                                NPC[-A] = blankNPC;
+                                NPC[-A] = NPC_t();
                                 NPC[-A].Location = tempLocation3;
                                 NPC[-A].Type = NPCID_METALBARREL;
                                 NPC[-A].Active = true;
@@ -3270,7 +3288,7 @@ void UpdatePlayer()
                                 Block[tempHit3].Kill = true;
                                 iBlocks += 1;
                                 iBlock[iBlocks] = tempHit3;
-                                HitSpot = 0;
+                                // HitSpot = 0; // this definition is never used
                                 tempHit3 = 0;
                                 Player[A].Jump = 7;
 
@@ -3318,7 +3336,7 @@ void UpdatePlayer()
 
                         if(tempLocation3.SpeedX != 0.0 || tempLocation3.SpeedY != 0.0)
                         {
-                            NPC[-A] = blankNPC;
+                            NPC[-A] = NPC_t();
                             NPC[-A].Location = tempLocation3;
                             NPC[-A].Type = NPCID_METALBARREL;
                             NPC[-A].Active = true;
@@ -3430,10 +3448,10 @@ void UpdatePlayer()
                         Player[A].Location.SpeedX = 0;
                 }
 
-                if(tempBlockHit[2] != 0) // Hitting a block from below
+                if(tempBlockHit2 != 0) // Hitting a block from below
                 {
-                    C = Block[tempBlockHit[1]].Location.X + Block[tempBlockHit[1]].Location.Width * 0.5;
-                    D = Block[tempBlockHit[2]].Location.X + Block[tempBlockHit[2]].Location.Width * 0.5;
+                    C = Block[tempBlockHit1].Location.X + Block[tempBlockHit1].Location.Width * 0.5;
+                    D = Block[tempBlockHit2].Location.X + Block[tempBlockHit2].Location.Width * 0.5;
                     C += -(Player[A].Location.X + Player[A].Location.Width * 0.5);
                     D += -(Player[A].Location.X + Player[A].Location.Width * 0.5);
 
@@ -3444,13 +3462,13 @@ void UpdatePlayer()
                         D = -D;
 
                     if(C < D)
-                        B = tempBlockHit[1];
+                        B = tempBlockHit1;
                     else
-                        B = tempBlockHit[2];
+                        B = tempBlockHit2;
                 }
-                else if(tempBlockHit[1] != 0)
+                else if(tempBlockHit1 != 0)
                 {
-                    B = tempBlockHit[1];
+                    B = tempBlockHit1;
                     if(Block[B].Location.X + Block[B].Location.Width - Player[A].Location.X <= 4)
                     {
                         Player[A].Location.X = Block[B].Location.X + Block[B].Location.Width + 0.1;
@@ -3533,11 +3551,10 @@ void UpdatePlayer()
                 if(Player[A].Vine > 0)
                     Player[A].Vine -= 1;
 
-                tempBlockHit[1] = 0;
-                tempBlockHit[2] = 0;
-                tempHitSpeed = 0;
-                spinKill = false;
-
+                tempBlockHit1 = 0;
+                tempBlockHit2 = 0;
+                float tempHitSpeed = 0;
+                bool spinKill = false;
 
                 // check vine backgrounds
                 for(int B : treeBackgroundQuery(Player[A].Location, SORTMODE_NONE))
@@ -3550,7 +3567,7 @@ void UpdatePlayer()
                         // FIXME: remove 4 spaces indention as soon as possible from this block below to the next commented brace
                         // if(CheckCollision(Player[A].Location, Background[B].Location))
                         //{
-                            tempLocation = Background[B].Location;
+                            Location_t tempLocation = Background[B].Location;
                             tempLocation.Height -= 16;
                             tempLocation.Width -= 20;
                             tempLocation.X += 10;
@@ -3638,8 +3655,13 @@ void UpdatePlayer()
                             Player[A].Location.SpeedX += -NPC[Player[A].StandingOnNPC].Location.SpeedX - NPC[Player[A].StandingOnNPC].BeltSpeed;
                     }
                 }
+
+                // cleanup variables for NPC collisions
+                int MessageNPC = 0;
+
                 tempHit = false; // Used for JUMP detection
                 tempHit2 = false;
+                Location_t tempLocation;
 
                 for(int B : treeNPCQuery(Player[A].Location, SORTMODE_ID))
                 {
@@ -3659,6 +3681,7 @@ void UpdatePlayer()
                                     if((NPC[B].Type == NPCID_METALBARREL || NPC[B].Type == NPCID_CANNONENEMY || NPC[B].Type == NPCID_HPIPE_SHORT || NPC[B].Type == NPCID_HPIPE_LONG || NPC[B].Type == NPCID_VPIPE_SHORT || NPC[B].Type == NPCID_VPIPE_LONG) && NPC[B].Projectile)
                                         PlayerHurt(A);
 
+                                    int HitSpot;
                                     if((Player[A].Mount == 1 || Player[A].Mount == 3 || Player[A].SpinJump || (Player[A].ShellSurf && NPC[B]->IsAShell) || (Player[A].Stoned && !NPC[B]->CanWalkOn)) && !NPC[B]->MovesPlayer)
                                         HitSpot = BootCollision(Player[A].Location, NPC[B].Location, NPC[B]->CanWalkOn); // find the hitspot for normal mario
                                     else
@@ -4061,15 +4084,15 @@ void UpdatePlayer()
                                         if(NPC[B]->CanWalkOn || (Player[A].ShellSurf && NPC[B]->IsAShell)) // NPCs that can be walked on
                                         {
                                             // the player landed on an NPC he can stand on
-                                            if(tempBlockHit[1] == 0)
-                                                tempBlockHit[1] = B;
-                                            else if(tempBlockHit[2] == 0)
-                                                tempBlockHit[2] = B;
+                                            if(tempBlockHit1 == 0)
+                                                tempBlockHit1 = B;
+                                            else if(tempBlockHit2 == 0)
+                                                tempBlockHit2 = B;
                                             else if(Player[A].StandingOnNPC == B)
                                             {
                                                 // if standing on 2 or more NPCs find out the best one to stand on
-                                                C = NPC[tempBlockHit[1]].Location.X + NPC[tempBlockHit[1]].Location.Width * 0.5;
-                                                D = NPC[tempBlockHit[2]].Location.X + NPC[tempBlockHit[2]].Location.Width * 0.5;
+                                                C = NPC[tempBlockHit1].Location.X + NPC[tempBlockHit1].Location.Width * 0.5;
+                                                D = NPC[tempBlockHit2].Location.X + NPC[tempBlockHit2].Location.Width * 0.5;
                                                 C += -(Player[A].Location.X + Player[A].Location.Width * 0.5);
                                                 D += -(Player[A].Location.X + Player[A].Location.Width * 0.5);
 
@@ -4080,12 +4103,12 @@ void UpdatePlayer()
                                                     D = -D;
 
                                                 if(C < D)
-                                                    tempBlockHit[2] = B;
+                                                    tempBlockHit2 = B;
                                                 else
-                                                    tempBlockHit[1] = B;
+                                                    tempBlockHit1 = B;
                                             }
                                             else
-                                                tempBlockHit[2] = B;
+                                                tempBlockHit2 = B;
 
                                             // if landing on a yoshi or boot, mount up!
                                         }
@@ -4433,7 +4456,7 @@ void UpdatePlayer()
                                                 }
                                                 else
                                                 {
-                                                    tempBool = false;
+                                                    bool tempBool = false;
                                                     if(Player[A].StandingOnNPC != 0)
                                                     {
                                                         if(NPC[Player[A].StandingOnNPC].Type == 57)
@@ -4472,16 +4495,16 @@ void UpdatePlayer()
                                                         if(NPC[Player[A].StandingOnNPC].Type == 57)
                                                             Player[A].Location.X -= 1;
 
-                                                        if(tempBlockHit[1] > 0)
+                                                        if(tempBlockHit1 > 0)
                                                         {
-                                                            if(NPC[B].Location.X >= NPC[tempBlockHit[1]].Location.X - 2 && NPC[B].Location.X <= NPC[tempBlockHit[1]].Location.X + 2)
-                                                                tempBlockHit[1] = tempBlockHit[2];
+                                                            if(NPC[B].Location.X >= NPC[tempBlockHit1].Location.X - 2 && NPC[B].Location.X <= NPC[tempBlockHit1].Location.X + 2)
+                                                                tempBlockHit1 = tempBlockHit2;
                                                         }
 
-                                                        if(tempBlockHit[2] > 0)
+                                                        if(tempBlockHit2 > 0)
                                                         {
-                                                            if(NPC[B].Location.X >= NPC[tempBlockHit[2]].Location.X - 2 && NPC[B].Location.X <= NPC[tempBlockHit[2]].Location.X + 2)
-                                                                tempBlockHit[2] = 0;
+                                                            if(NPC[B].Location.X >= NPC[tempBlockHit2].Location.X - 2 && NPC[B].Location.X <= NPC[tempBlockHit2].Location.X + 2)
+                                                                tempBlockHit2 = 0;
                                                         }
                                                     }
                                                     else
@@ -4513,16 +4536,16 @@ void UpdatePlayer()
                                                         if(!tempBool && NPC[B].Type != NPCID_BULLY)
                                                             Player[A].Location.SpeedX = 0.2 * Player[A].Direction;
 
-                                                        if(tempBlockHit[1] > 0)
+                                                        if(tempBlockHit1 > 0)
                                                         {
-                                                            if(NPC[B].Location.X + NPC[B].Location.Width >= NPC[tempBlockHit[1]].Location.X + NPC[tempBlockHit[1]].Location.Width - 2 && NPC[B].Location.X + NPC[B].Location.Width <= NPC[tempBlockHit[1]].Location.X + NPC[tempBlockHit[1]].Location.Width + 2)
-                                                                tempBlockHit[1] = tempBlockHit[2];
+                                                            if(NPC[B].Location.X + NPC[B].Location.Width >= NPC[tempBlockHit1].Location.X + NPC[tempBlockHit1].Location.Width - 2 && NPC[B].Location.X + NPC[B].Location.Width <= NPC[tempBlockHit1].Location.X + NPC[tempBlockHit1].Location.Width + 2)
+                                                                tempBlockHit1 = tempBlockHit2;
                                                         }
 
-                                                        if(tempBlockHit[2] > 0)
+                                                        if(tempBlockHit2 > 0)
                                                         {
-                                                            if(NPC[B].Location.X + NPC[B].Location.Width >= NPC[tempBlockHit[2]].Location.X + NPC[tempBlockHit[2]].Location.Width - 2 && NPC[B].Location.X + NPC[B].Location.Width <= NPC[tempBlockHit[2]].Location.X + NPC[tempBlockHit[2]].Location.Width + 2)
-                                                                tempBlockHit[2] = 0;
+                                                            if(NPC[B].Location.X + NPC[B].Location.Width >= NPC[tempBlockHit2].Location.X + NPC[tempBlockHit2].Location.Width - 2 && NPC[B].Location.X + NPC[B].Location.Width <= NPC[tempBlockHit2].Location.X + NPC[tempBlockHit2].Location.Width + 2)
+                                                                tempBlockHit2 = 0;
                                                         }
                                                     }
 
@@ -4609,6 +4632,7 @@ void UpdatePlayer()
                             Player[A].Location.SpeedY = Player[A].Location.SpeedY * 0.3;
                     }
 
+                    // this is very likely but not certain to be the y value stored when tempHit was set
                     Player[A].Location.Y = tempLocation.Y;
 
                     if(tempShell)
@@ -4638,12 +4662,12 @@ void UpdatePlayer()
                 // Find out which NPC to stand on
 
                 // this code is for standing on moving NPCs.
-                if(tempBlockHit[2] != 0)
+                if(tempBlockHit2 != 0)
                 {
-                    if(NPC[tempBlockHit[1]].Location.Y == NPC[tempBlockHit[2]].Location.Y)
+                    if(NPC[tempBlockHit1].Location.Y == NPC[tempBlockHit2].Location.Y)
                     {
-                        C = NPC[tempBlockHit[1]].Location.X + NPC[tempBlockHit[1]].Location.Width * 0.5;
-                        D = NPC[tempBlockHit[2]].Location.X + NPC[tempBlockHit[2]].Location.Width * 0.5;
+                        C = NPC[tempBlockHit1].Location.X + NPC[tempBlockHit1].Location.Width * 0.5;
+                        D = NPC[tempBlockHit2].Location.X + NPC[tempBlockHit2].Location.Width * 0.5;
                         C += -(Player[A].Location.X + Player[A].Location.Width * 0.5);
                         D += -(Player[A].Location.X + Player[A].Location.Width * 0.5);
 
@@ -4654,27 +4678,27 @@ void UpdatePlayer()
                             D = -D;
 
                         if(C < D)
-                            B = tempBlockHit[1];
+                            B = tempBlockHit1;
                         else
-                            B = tempBlockHit[2];
+                            B = tempBlockHit2;
                     }
                     else
                     {
-                        if(NPC[tempBlockHit[1]].Location.Y < NPC[tempBlockHit[2]].Location.Y)
-                            B = tempBlockHit[1];
+                        if(NPC[tempBlockHit1].Location.Y < NPC[tempBlockHit2].Location.Y)
+                            B = tempBlockHit1;
                         else
-                            B = tempBlockHit[2];
+                            B = tempBlockHit2;
                     }
                 }
-                else if(tempBlockHit[1] != 0)
-                    B = tempBlockHit[1];
+                else if(tempBlockHit1 != 0)
+                    B = tempBlockHit1;
                 else
                     B = 0;
 
-                if(NPC[tempBlockHit[1]].Type >= 60 && NPC[tempBlockHit[1]].Type <= 66)
-                    B = tempBlockHit[1];
-                else if(NPC[tempBlockHit[2]].Type >= 60 && NPC[tempBlockHit[2]].Type <= 66)
-                    B = tempBlockHit[2];
+                if(NPC[tempBlockHit1].Type >= 60 && NPC[tempBlockHit1].Type <= 66)
+                    B = tempBlockHit1;
+                else if(NPC[tempBlockHit2].Type >= 60 && NPC[tempBlockHit2].Type <= 66)
+                    B = tempBlockHit2;
 
                 if(NPC[B].Effect == NPCEFF_DROP_ITEM)
                     B = 0;
