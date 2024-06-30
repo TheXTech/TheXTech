@@ -34,4 +34,8 @@ void PlayerSharedScreenLogic(int A);
 
 void PlayerLevelWrapLogic(int A);
 
+bool PlayerFairyOnVine(int A);
+
+void PlayerFairyTimerUpdate(int A);
+
 #endif // PLAYER_UPDATE_PRIV_H

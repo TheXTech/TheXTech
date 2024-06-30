@@ -1092,76 +1092,7 @@ void UpdatePlayer()
                 }
 
                 // fairy stuff
-                if(Player[A].FairyTime != 0 && Player[A].Fairy)
-                {
-                    if(iRand(10) == 0)
-                    {
-                        NewEffect(EFFID_SPARKLE,
-                                  newLoc(Player[A].Location.X - 8 + dRand() * (Player[A].Location.Width + 16) - 4,
-                                         Player[A].Location.Y - 8 + dRand() * (Player[A].Location.Height + 16)), 1, 0, ShadowMode);
-                        Effect[numEffects].Location.SpeedX = dRand() * 0.5 - 0.25;
-                        Effect[numEffects].Location.SpeedY = dRand() * 0.5 - 0.25;
-                        Effect[numEffects].Frame = 1;
-                    }
-
-                    if(Player[A].FairyTime > 0)
-                        Player[A].FairyTime -= 1;
-
-                    if(Player[A].FairyTime != -1 && Player[A].FairyTime < 20 && Player[A].Character == 5)
-                    {
-                        Location_t tempLocation = Player[A].Location;
-                        tempLocation.Width += 32;
-                        tempLocation.Height += 32;
-                        tempLocation.X -= 16;
-                        tempLocation.Y -= 16;
-
-                        for(int Bi : treeNPCQuery(tempLocation, SORTMODE_NONE))
-                        {
-                            if(NPC[Bi].Active && !NPC[Bi].Hidden && NPC[Bi]->IsAVine)
-                            {
-                                if(CheckCollision(tempLocation, NPC[Bi].Location))
-                                {
-                                    Player[A].FairyTime = 20;
-                                    Player[A].FairyCD = 0;
-                                    break;
-                                }
-                            }
-                        }
-
-                        for(int B : treeBackgroundQuery(tempLocation, SORTMODE_NONE))
-                        {
-                            if(B > numBackground)
-                                continue;
-
-                            if(BackgroundFence[Background[B].Type] && !Background[B].Hidden)
-                            {
-                                if(CheckCollision(tempLocation, Background[B].Location))
-                                {
-                                    Player[A].FairyTime = 20;
-                                    Player[A].FairyCD = 0;
-                                    break;
-                                }
-                            }
-                        }
-
-                    }
-                }
-                else if(Player[A].Fairy)
-                {
-                    PlaySoundSpatial(SFX_HeroFairy, Player[A].Location);
-                    Player[A].Immune = 10;
-                    Player[A].Effect = PLREFF_WAITING;
-                    Player[A].Effect2 = 4;
-                    Player[A].Fairy = false;
-                    SizeCheck(Player[A]);
-                    NewEffect(EFFID_SMOKE_S5, Player[A].Location);
-                    PlayerPush(A, 3);
-                }
-                else
-                    Player[A].FairyTime = 0;
-
-                if(Player[A].FairyCD != 0 && (Player[A].Location.SpeedY == 0.0 || Player[A].Slope != 0 || Player[A].StandingOnNPC != 0 || Player[A].WetFrame))
-                    Player[A].FairyCD -= 1;
+                PlayerFairyTimerUpdate(A);
 
 
                 // the single pinched variable has been always false since SMBX64

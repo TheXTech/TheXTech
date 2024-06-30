@@ -25,6 +25,7 @@
 #include "eff_id.h"
 #include "sound.h"
 #include "config.h"
+#include "npc_traits.h"
 
 #include "main/trees.h"
 
@@ -120,4 +121,36 @@ void PlayerVineLogic(int A)
             // }// Collide player and BGO
         } // Is BGO climbable and visible?
     } // Next A
+}
+
+bool PlayerFairyOnVine(int A)
+{
+    Location_t tempLocation = Player[A].Location;
+    tempLocation.Width += 32;
+    tempLocation.Height += 32;
+    tempLocation.X -= 16;
+    tempLocation.Y -= 16;
+
+    for(int Bi : treeNPCQuery(tempLocation, SORTMODE_NONE))
+    {
+        if(NPC[Bi].Active && !NPC[Bi].Hidden && NPC[Bi]->IsAVine)
+        {
+            if(CheckCollision(tempLocation, NPC[Bi].Location))
+                return true;
+        }
+    }
+
+    for(int B : treeBackgroundQuery(tempLocation, SORTMODE_NONE))
+    {
+        if(B > numBackground)
+            continue;
+
+        if(BackgroundFence[Background[B].Type] && !Background[B].Hidden)
+        {
+            if(CheckCollision(tempLocation, Background[B].Location))
+                return true;
+        }
+    }
+
+    return false;
 }
