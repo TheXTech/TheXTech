@@ -48,6 +48,7 @@ void PlayerMovementY(int A);
 void PlayerSwimMovementY(int A);
 
 void PlayerPoundLogic(int A);
+void PlayerShootChar5Beam(int A);
 
 void PlayerChar5Logic(int A);
 

@@ -20,6 +20,9 @@
 
 #include "globals.h"
 #include "config.h"
+#include "layers.h"
+#include "npc.h"
+#include "npc_traits.h"
 
 void PlayerPoundLogic(int A)
 {
@@ -82,4 +85,74 @@ void PlayerPoundLogic(int A)
             Player[A].GroundPound2 = false;
         }
     }
+}
+
+void PlayerShootChar5Beam(int A)
+{
+    Player[A].FireBallCD2 = 40;
+    if(Player[A].State == 6)
+        Player[A].FireBallCD2 = 25;
+
+    if(Player[A].State == 6)
+        PlaySoundSpatial(SFX_HeroSwordBeam, Player[A].Location);
+    else if(Player[A].State == 7)
+        PlaySoundSpatial(SFX_HeroIce, Player[A].Location);
+    else
+        PlaySoundSpatial(SFX_HeroFireRod, Player[A].Location);
+
+    numNPCs++;
+    NPC[numNPCs] = NPC_t();
+
+    if(ShadowMode)
+        NPC[numNPCs].Shadow = true;
+
+    NPC[numNPCs].Type = NPCID_PLR_FIREBALL;
+
+    if(Player[A].State == 7)
+        NPC[numNPCs].Type = NPCID_PLR_ICEBALL;
+
+    if(Player[A].State == 6)
+        NPC[numNPCs].Type = NPCID_SWORDBEAM;
+
+    NPC[numNPCs].Projectile = true;
+    NPC[numNPCs].Location.Height = NPC[numNPCs]->THeight;
+    NPC[numNPCs].Location.Width = NPC[numNPCs]->TWidth;
+    NPC[numNPCs].Location.X = Player[A].Location.X + Player[A].Location.Width / 2.0 + (40 * Player[A].Direction) - 8;
+
+    if(!Player[A].Duck)
+    {
+        NPC[numNPCs].Location.Y = Player[A].Location.Y + 5;
+        if(Player[A].State == 6)
+            NPC[numNPCs].Location.Y += 7;
+    }
+    else
+    {
+        NPC[numNPCs].Location.Y = Player[A].Location.Y + 18;
+        if(Player[A].State == 6)
+            NPC[numNPCs].Location.Y += 4;
+    }
+
+
+    NPC[numNPCs].Active = true;
+    NPC[numNPCs].TimeLeft = 100;
+    NPC[numNPCs].Location.SpeedY = 20;
+    NPC[numNPCs].CantHurt = 100;
+    NPC[numNPCs].CantHurtPlayer = A;
+    NPC[numNPCs].Special = Player[A].Character;
+
+    if(NPC[numNPCs].Type == NPCID_PLR_FIREBALL)
+        NPC[numNPCs].Frame = 16;
+
+    NPC[numNPCs].WallDeath = 5;
+    NPC[numNPCs].Location.SpeedY = 0;
+    NPC[numNPCs].Location.SpeedX = 5 * Player[A].Direction + (Player[A].Location.SpeedX / 3);
+
+    if(Player[A].State == 6)
+        NPC[numNPCs].Location.SpeedX = 9 * Player[A].Direction + (Player[A].Location.SpeedX / 3);
+
+    if(Player[A].StandingOnNPC != 0)
+        NPC[numNPCs].Location.Y += -Player[A].Location.SpeedY;
+
+    syncLayers_NPC(numNPCs);
+    CheckSectionNPC(numNPCs);
 }

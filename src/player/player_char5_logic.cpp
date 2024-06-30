@@ -22,13 +22,11 @@
 #include "player.h"
 #include "config.h"
 #include "sound.h"
-#include "npc_traits.h"
 #include "effect.h"
 #include "eff_id.h"
-#include "layers.h"
 #include "collision.h"
-#include "npc.h"
 
+#include "player/player_update_priv.h"
 #include "main/trees.h"
 
 void PlayerChar5Logic(int A)
@@ -143,74 +141,7 @@ void PlayerChar5Logic(int A)
             PlaySoundSpatial(SFX_HeroStab, Player[A].Location);
 
             if((Player[A].State == 3 || Player[A].State == 7 || Player[A].State == 6) && Player[A].FireBallCD2 == 0)
-            {
-                Player[A].FireBallCD2 = 40;
-                if(Player[A].State == 6)
-                    Player[A].FireBallCD2 = 25;
-
-                if(Player[A].State == 6)
-                    PlaySoundSpatial(SFX_HeroSwordBeam, Player[A].Location);
-                else if(Player[A].State == 7)
-                    PlaySoundSpatial(SFX_HeroIce, Player[A].Location);
-                else
-                    PlaySoundSpatial(SFX_HeroFireRod, Player[A].Location);
-
-                numNPCs++;
-                NPC[numNPCs] = NPC_t();
-
-                if(ShadowMode)
-                    NPC[numNPCs].Shadow = true;
-
-                NPC[numNPCs].Type = NPCID_PLR_FIREBALL;
-
-                if(Player[A].State == 7)
-                    NPC[numNPCs].Type = NPCID_PLR_ICEBALL;
-
-                if(Player[A].State == 6)
-                    NPC[numNPCs].Type = NPCID_SWORDBEAM;
-
-                NPC[numNPCs].Projectile = true;
-                NPC[numNPCs].Location.Height = NPC[numNPCs]->THeight;
-                NPC[numNPCs].Location.Width = NPC[numNPCs]->TWidth;
-                NPC[numNPCs].Location.X = Player[A].Location.X + Player[A].Location.Width / 2.0 + (40 * Player[A].Direction) - 8;
-
-                if(!Player[A].Duck)
-                {
-                    NPC[numNPCs].Location.Y = Player[A].Location.Y + 5;
-                    if(Player[A].State == 6)
-                        NPC[numNPCs].Location.Y += 7;
-                }
-                else
-                {
-                    NPC[numNPCs].Location.Y = Player[A].Location.Y + 18;
-                    if(Player[A].State == 6)
-                        NPC[numNPCs].Location.Y += 4;
-                }
-
-
-                NPC[numNPCs].Active = true;
-                NPC[numNPCs].TimeLeft = 100;
-                NPC[numNPCs].Location.SpeedY = 20;
-                NPC[numNPCs].CantHurt = 100;
-                NPC[numNPCs].CantHurtPlayer = A;
-                NPC[numNPCs].Special = Player[A].Character;
-
-                if(NPC[numNPCs].Type == NPCID_PLR_FIREBALL)
-                    NPC[numNPCs].Frame = 16;
-
-                NPC[numNPCs].WallDeath = 5;
-                NPC[numNPCs].Location.SpeedY = 0;
-                NPC[numNPCs].Location.SpeedX = 5 * Player[A].Direction + (Player[A].Location.SpeedX / 3);
-
-                if(Player[A].State == 6)
-                    NPC[numNPCs].Location.SpeedX = 9 * Player[A].Direction + (Player[A].Location.SpeedX / 3);
-
-                if(Player[A].StandingOnNPC != 0)
-                    NPC[numNPCs].Location.Y += -Player[A].Location.SpeedY;
-
-                syncLayers_NPC(numNPCs);
-                CheckSectionNPC(numNPCs);
-            }
+                PlayerShootChar5Beam(A);
         }
         else
             TailSwipe(A, false, true);
@@ -237,8 +168,10 @@ void PlayerChar5Logic(int A)
 
     if(Player[A].FireBallCD == 0 && Player[A].Wet == 0 && !Player[A].Fairy && Player[A].Mount == 0)
     {
+        // Link ducks when jumping
+        // Holding Up cancels this and allows upwards stab
         if(!Player[A].Duck && Player[A].Location.SpeedY < Physics.PlayerGravity && Player[A].StandingOnNPC == 0 &&
-            Player[A].Slope == 0 && !Player[A].Controls.Up && !Player[A].Stoned) // Link ducks when jumping
+            Player[A].Slope == 0 && !Player[A].Controls.Up && !Player[A].Stoned)
         {
             Player[A].SwordPoke = 0;
             Player[A].Duck = true;
@@ -246,7 +179,8 @@ void PlayerChar5Logic(int A)
             Player[A].Location.Height = Physics.PlayerDuckHeight[Player[A].Character][Player[A].State];
             Player[A].Location.Y += -Player[A].Location.Height;
         }
-        else if(Player[A].Duck && Player[A].Location.SpeedY > Physics.PlayerGravity && Player[A].StandingOnNPC == 0 && Player[A].Slope == 0) // Link stands when falling
+        // Link stands when falling
+        else if(Player[A].Duck && Player[A].Location.SpeedY > Physics.PlayerGravity && Player[A].StandingOnNPC == 0 && Player[A].Slope == 0)
         {
             Player[A].SwordPoke = 0;
             UnDuck(Player[A]);
