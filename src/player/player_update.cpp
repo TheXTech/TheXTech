@@ -5102,6 +5102,11 @@ void UpdatePlayer()
         Player[A].AltRunRelease = !Player[A].Controls.AltRun;
     }
 
+    CleanupVehicleNPCs();
+}
+
+void CleanupVehicleNPCs()
+{
     // int C = 0;
 
     // kill the player temp NPCs, from last to first
@@ -5122,7 +5127,7 @@ void UpdatePlayer()
 
         if(NPC[A].playerTemp)
         {
-            for(B = 1; B <= numPlayers; B++)
+            for(int B = 1; B <= numPlayers; B++)
             {
                 if(Player[B].StandingOnNPC == A)
                     Player[B].StandingOnVehiclePlr = NPC[A].Variant; // newly stores the player who owns the vehicle

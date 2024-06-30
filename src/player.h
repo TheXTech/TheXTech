@@ -106,6 +106,8 @@ void StealBonus();
 // Public Sub ClownCar()
 void ClownCar();
 
+void CleanupVehicleNPCs();
+
 // Private Sub WaterCheck(A As Integer)
 void WaterCheck(const int A); //PRIVATE
 // Private Sub Tanooki(A As Integer)
