@@ -54,8 +54,7 @@
 void UpdatePlayer()
 {
     // int A = 0;
-    int B = 0;
-    float D = 0;
+    // int B = 0;
 //    Controls_t blankControls;
     // float speedVar = 0; // adjusts the players speed by percentages
     // int64_t fBlock = 0; // for collision detection optimizations
@@ -82,11 +81,11 @@ void UpdatePlayer()
     // Location_t tempLocation3;
     // bool spinKill = false;
     // int oldSlope = 0;
-    float A1 = 0;
-    float B1 = 0;
-    float C1 = 0;
-    float X = 0;
-    float Y = 0;
+    // float A1 = 0;
+    // float B1 = 0;
+    // float C1 = 0;
+    // float X = 0;
+    // float Y = 0;
 //    bool canWarp = false;
     // bool tempBool = false;
     // NPC_t blankNPC;
@@ -161,13 +160,10 @@ void UpdatePlayer()
 //                nPlay.Player[A - 1].Controls = blankControls;
 //        }
         // reset variables from the previous player
-        bool DontResetGrabTime = false; // helps with grabbing things from the top
 //        oldGrab = Player[A].HoldingNPC; // SET BUT NOT UNUSED
-        bool movingBlock = false; // helps with collisions for moving blocks
         Player[A].ShowWarp = 0;
         Player[A].mountBump = 0;
         // bool spinKill = false;
-        int tempHit3 = 0;
 
         // this was shared over players in SMBX 1.3 -- if the line marked "MOST CURSED LINE" in player_block_logic.cpp becomes a source of incompatibility, we will need to restore that logic
         float cursed_value_C = 0;
@@ -227,7 +223,7 @@ void UpdatePlayer()
 
             // there was a guard here that has now been moved into the subclauses
             // if(Player[A].TimeToLive >= 200 || ScreenType != 5)
-            B = CheckNearestLiving(A);
+            int B = CheckNearestLiving(A);
 
             bool someone_else_alive = false;
             for(int o_A = 1; o_A <= numPlayers; o_A++)
@@ -278,6 +274,7 @@ void UpdatePlayer()
 
             if(B > 0 && player_can_move) // Move camera to the other living players
             {
+                float A1, B1;
                 if(shared_screen)
                 {
                     const vScreen_t& vscreen = screen.vScreen(screen.active_begin() + 1);
@@ -305,7 +302,8 @@ void UpdatePlayer()
                         B1 = (float)((-vscreen.Y + vscreen.Height * 0.5) - Player[A].Location.Y - Player[A].Location.Height);
                 }
 
-                C1 = std::sqrt((A1 * A1) + (B1 * B1));
+                float C1 = std::sqrt((A1 * A1) + (B1 * B1));
+                float X, Y;
                 if(C1 != 0.0f)
                 {
                     X = A1 / C1;
@@ -372,6 +370,8 @@ void UpdatePlayer()
             // safer than the below code, should always be used except for compatibility concerns
             if(numPlayers > 2 || g_config.multiplayer_pause_controls)
             {
+                int B;
+
                 // continue following currently-tracked player if possible
                 if(Player[A].Effect2 < 0)
                 {
@@ -1592,7 +1592,7 @@ void UpdatePlayer()
                                 tempLocation.Height = EffectHeight[80];
                                 tempLocation.Width = EffectWidth[80];
                                 tempLocation.X = Player[A].Location.X;
-                                for(B = 1; B <= 10; B++)
+                                for(int B = 1; B <= 10; B++)
                                 {
                                     NewEffect(EFFID_SPARKLE, tempLocation);
                                     Effect[numEffects].Location.SpeedX = (dRand() * 3) - 1.5;
@@ -2334,7 +2334,7 @@ void UpdatePlayer()
                     if(Player[A].Location.X + Player[A].Location.Width < level[Player[A].Section].X)
                     {
                         offScreenExit = true;
-                        for(B = 1; B <= numPlayers; B++)
+                        for(int B = 1; B <= numPlayers; B++)
                             Player[B].TailCount = 0;
                     }
                     else if(Player[A].Location.X > level[Player[A].Section].Width)
@@ -2483,6 +2483,9 @@ void UpdatePlayer()
                     Player[A].Pinched.Strict -= 1;
 
                 // Block collisions.
+                bool DontResetGrabTime = false; // helps with grabbing things from the top
+                bool movingBlock = false; // helps with collisions for moving blocks
+                int tempHit3 = 0;
                 PlayerBlockLogic(A, tempHit3, movingBlock, DontResetGrabTime, cursed_value_C);
 
                 // Check NPC collisions
