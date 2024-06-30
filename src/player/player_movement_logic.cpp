@@ -390,6 +390,43 @@ void PlayerMovementX(int A, float& cursed_value_C)
     }
 }
 
+void PlayerSlideMovementX(int A)
+{
+    if(Player[A].Slope > 0)
+    {
+        double Angle = 1 / (Block[Player[A].Slope].Location.Width / static_cast<double>(Block[Player[A].Slope].Location.Height));
+        double slideSpeed = 0.1 * Angle * BlockSlope[Block[Player[A].Slope].Type];
+
+        if(slideSpeed > 0 && Player[A].Location.SpeedX < 0)
+            Player[A].Location.SpeedX += slideSpeed * 2;
+        else if(slideSpeed < 0 && Player[A].Location.SpeedX > 0)
+            Player[A].Location.SpeedX += slideSpeed * 2;
+        else
+            Player[A].Location.SpeedX += slideSpeed;
+    }
+    else if(Player[A].Location.SpeedY == 0.0 || Player[A].StandingOnNPC != 0)
+    {
+        if(Player[A].Location.SpeedX > 0.2)
+            Player[A].Location.SpeedX -= 0.1;
+        else if(Player[A].Location.SpeedX < -0.2)
+            Player[A].Location.SpeedX += 0.1;
+        else
+        {
+            Player[A].Location.SpeedX = 0;
+            Player[A].Slide = false;
+        }
+    }
+
+    if(Player[A].Location.SpeedX > 11)
+        Player[A].Location.SpeedX = 11;
+
+    if(Player[A].Location.SpeedX < -11)
+        Player[A].Location.SpeedX = -11;
+
+    if(Player[A].Controls.Jump || Player[A].Controls.AltJump)
+        Player[A].Slide = false;
+}
+
 void PlayerMovementY(int A)
 {
     if(Player[A].Mount == 1) // this gives the player the bounce when in the kurbio's shoe

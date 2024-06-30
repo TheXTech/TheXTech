@@ -45,6 +45,7 @@ void PlayerPinchedTimerUpdate(int A);
 void PlayerPinchedDeathCheck(int A);
 
 void PlayerMovementX(int A, float& cursed_value_C);
+void PlayerSlideMovementX(int A);
 void PlayerMovementY(int A);
 void PlayerSwimMovementY(int A);
 
