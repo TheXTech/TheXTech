@@ -53,38 +53,6 @@ void NPCCollide(int A)
     //     return;
     // }
 
-    if(NPC[A].Inert)
-        return;
-
-    if(NPC[A].Type == NPCID_LIFT_SAND || NPC[A].Type == NPCID_CANNONITEM || NPC[A].Type == NPCID_SPRING || NPC[A].Type == NPCID_COIN_SWITCH || NPC[A].Type == NPCID_GRN_BOOT)
-        return;
-
-    if(!NPC[A].Projectile && (NPC[A].Type == NPCID_HEAVY_THROWN || NPC[A].Type == NPCID_SPIT_BOSS_BALL || NPC[A].Type == NPCID_METALBARREL || NPC[A].Type == NPCID_YEL_PLATFORM || NPC[A].Type == NPCID_BLU_PLATFORM || NPC[A].Type == NPCID_GRN_PLATFORM ||
-       NPC[A].Type == NPCID_RED_PLATFORM || NPC[A].Type == NPCID_HPIPE_SHORT || NPC[A].Type == NPCID_HPIPE_LONG || NPC[A].Type == NPCID_VPIPE_SHORT ||
-       NPC[A].Type == NPCID_VPIPE_LONG || NPC[A].Type == NPCID_CANNONENEMY || NPC[A].Type == NPCID_SPIKY_BALL_S3 || NPC[A].Type == NPCID_ITEM_POD || NPC[A]->IsAShell))
-    {
-        return;
-    }
-
-    if(NPC[A].Type == NPCID_TOOTHYPIPE || NPC[A].Type == NPCID_FALL_BLOCK_RED || NPC[A].Type == NPCID_VEHICLE || NPC[A].Type == NPCID_CONVEYOR ||
-        NPCIsYoshi(NPC[A]) || (NPC[A].Type >= NPCID_TANK_TREADS && NPC[A].Type <= NPCID_SLANT_WOOD_M) || NPC[A].Type == NPCID_SPIT_GUY_BALL)
-    {
-        return;
-    }
-
-    if(NPC[A].Type == NPCID_SLIDE_BLOCK && NPC[A].Special == 0)
-        return;
-
-    if(NPC[A].Projectile && NPC[A].Type >= NPCID_GRN_HIT_TURTLE_S4 && NPC[A].Type <= NPCID_YEL_HIT_TURTLE_S4)
-        return;
-
-    // duplicate condition
-    // if(NPC[A].Projectile && NPC[A].Type >= NPCID_GRN_HIT_TURTLE_S4 && NPC[A].Type <= NPCID_YEL_HIT_TURTLE_S4 && NPC[A].CantHurt > 0)
-    //     return;
-
-    if(!NPCIsToad(NPC[A]) && !NPC[A].Projectile && NPC[A].Location.SpeedX == 0 && (NPC[A].Location.SpeedY == 0 || NPC[A].Location.SpeedY == Physics.NPCGravity))
-        return;
-
     // second exclusion condition
     // if(!(!NPC[A]->IsACoin && NPC[A].Type != NPCID_TIMER_S2 && NPC[A].Type != NPCID_FALL_BLOCK_BROWN &&
     //     NPC[A].Type != NPCID_WALL_BUG && NPC[A].Type != NPCID_WALL_SPARK && NPC[A].Type != NPCID_WALL_TURTLE && NPC[A].Type != NPCID_RED_BOOT &&
@@ -96,21 +64,54 @@ void NPCCollide(int A)
     //     return;
     // }
 
-    if(NPC[A]->IsACoin || NPC[A].Type == NPCID_TIMER_S2 || NPC[A].Type == NPCID_FALL_BLOCK_BROWN
-        || NPC[A].Type == NPCID_WALL_BUG || NPC[A].Type == NPCID_WALL_SPARK || NPC[A].Type == NPCID_WALL_TURTLE || NPC[A].Type == NPCID_RED_BOOT
-        || NPC[A].Type == NPCID_BLU_BOOT)
+    // NPC properties that block collision query
+    if(NPC[A].Inert || NPC[A].Generator)
+        return;
+
+    // NPC traits that prevent collision query
+    if(NPC[A]->IsACoin || NPCIsYoshi(NPC[A]))
+        return;
+
+    // NPC types that prevent collision query
+    if(NPC[A].Type == NPCID_LIFT_SAND || NPC[A].Type == NPCID_CANNONITEM || NPC[A].Type == NPCID_SPRING || NPC[A].Type == NPCID_COIN_SWITCH || NPC[A].Type == NPCID_GRN_BOOT
+        || NPC[A].Type == NPCID_TOOTHYPIPE || NPC[A].Type == NPCID_FALL_BLOCK_RED || NPC[A].Type == NPCID_VEHICLE || NPC[A].Type == NPCID_CONVEYOR
+        || (NPC[A].Type >= NPCID_TANK_TREADS && NPC[A].Type <= NPCID_SLANT_WOOD_M) || NPC[A].Type == NPCID_SPIT_GUY_BALL
+        || NPC[A].Type == NPCID_TIMER_S2 || NPC[A].Type == NPCID_FALL_BLOCK_BROWN
+        || NPC[A].Type == NPCID_WALL_BUG || NPC[A].Type == NPCID_WALL_SPARK || NPC[A].Type == NPCID_WALL_TURTLE
+        || NPC[A].Type == NPCID_RED_BOOT || NPC[A].Type == NPCID_BLU_BOOT
+        || NPC[A].Type == NPCID_PLANT_FIRE || NPC[A].Type == NPCID_FIRE_CHAIN || NPC[A].Type == NPCID_QUAD_BALL
+        || NPC[A].Type == NPCID_FLY_BLOCK || NPC[A].Type == NPCID_FLY_CANNON || NPC[A].Type == NPCID_FIRE_BOSS_FIRE
+        || NPC[A].Type == NPCID_DOOR_MAKER || NPC[A].Type == NPCID_MAGIC_DOOR)
     {
         return;
     }
+
+    // NPC types that can only query collisions as projectiles
+    if(!NPC[A].Projectile && (NPC[A].Type == NPCID_HEAVY_THROWN || NPC[A].Type == NPCID_SPIT_BOSS_BALL || NPC[A].Type == NPCID_METALBARREL || NPC[A].Type == NPCID_YEL_PLATFORM || NPC[A].Type == NPCID_BLU_PLATFORM || NPC[A].Type == NPCID_GRN_PLATFORM ||
+       NPC[A].Type == NPCID_RED_PLATFORM || NPC[A].Type == NPCID_HPIPE_SHORT || NPC[A].Type == NPCID_HPIPE_LONG || NPC[A].Type == NPCID_VPIPE_SHORT ||
+       NPC[A].Type == NPCID_VPIPE_LONG || NPC[A].Type == NPCID_CANNONENEMY || NPC[A].Type == NPCID_SPIKY_BALL_S3 || NPC[A].Type == NPCID_ITEM_POD || NPC[A]->IsAShell))
+    {
+        return;
+    }
+
+    // most NPCs cannot query collisions if static and not projectile
+    if(!NPCIsToad(NPC[A]) && !NPC[A].Projectile && NPC[A].Location.SpeedX == 0 && (NPC[A].Location.SpeedY == 0 || NPC[A].Location.SpeedY == Physics.NPCGravity))
+        return;
+
+    // slide blocks only query collisions after activation
+    if(NPC[A].Type == NPCID_SLIDE_BLOCK && NPC[A].Special == 0)
+        return;
+
+    // newly spawned hit turtles do not query collisions
+    if(NPC[A].Projectile && NPC[A].Type >= NPCID_GRN_HIT_TURTLE_S4 && NPC[A].Type <= NPCID_YEL_HIT_TURTLE_S4)
+        return;
+
+    // duplicate condition
+    // if(NPC[A].Projectile && NPC[A].Type >= NPCID_GRN_HIT_TURTLE_S4 && NPC[A].Type <= NPCID_YEL_HIT_TURTLE_S4 && NPC[A].CantHurt > 0)
+    //     return;
 
     if(NPC[A]->IsFish && NPC[A].Special == 2)
         return;
-
-    if(NPC[A].Generator || NPC[A].Type == NPCID_PLANT_FIRE || NPC[A].Type == NPCID_FIRE_CHAIN || NPC[A].Type == NPCID_QUAD_BALL
-        || NPC[A].Type == NPCID_FLY_BLOCK || NPC[A].Type == NPCID_FLY_CANNON || NPC[A].Type == NPCID_FIRE_BOSS_FIRE || NPC[A].Type == NPCID_DOOR_MAKER || NPC[A].Type == NPCID_MAGIC_DOOR)
-    {
-        return;
-    }
 
     for(int B : treeNPCQuery(NPC[A].Location, SORTMODE_ID))
     {
