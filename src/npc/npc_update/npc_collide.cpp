@@ -121,9 +121,6 @@ void NPCCollide(int A)
         if(!CheckCollision(NPC[A].Location, NPC[B].Location))
             continue;
 
-        // if(!(B != A))
-        //     continue;
-
         // first exclusion condition
         // if(!(!(NPC[B].Type == NPCID_MINIBOSS && NPC[B].Special == 4) && !(NPCIsToad(NPC[B])) &&
         //    !(NPC[B].Type >= NPCID_PLATFORM_S3 && NPC[B].Type <= NPCID_PLATFORM_S1) && !(NPC[B].Type >= NPCID_CARRY_BLOCK_A && NPC[B].Type <= NPCID_CARRY_BLOCK_D) &&
@@ -133,27 +130,6 @@ void NPCCollide(int A)
         //     continue;
         // }
 
-        if(NPC[B].Type == NPCID_MINIBOSS && NPC[B].Special == 4)
-            continue;
-
-        if(NPCIsToad(NPC[B]))
-            continue;
-
-        if(NPC[B].Type >= NPCID_PLATFORM_S3 && NPC[B].Type <= NPCID_PLATFORM_S1)
-            continue;
-
-        if(NPC[B].Type >= NPCID_CARRY_BLOCK_A && NPC[B].Type <= NPCID_CARRY_BLOCK_D)
-            continue;
-
-        if(NPC[B].Type == NPCID_LIFT_SAND || NPC[B].Type == NPCID_SICK_BOSS_BALL)
-            continue;
-
-        if(NPC[B]->IsAVine)
-            continue;
-
-        if(NPC[B].Type == NPCID_PLR_ICEBALL || NPC[B].Type == NPCID_FIRE_CHAIN || NPC[B].Type == NPCID_CHAR3_HEAVY)
-            continue;
-
         // second exclusion condition
         // If Not (NPC(B).Type = 133) And NPC(B).HoldingPlayer = 0 And .Killed = 0 And NPC(B).JustActivated = 0 And NPC(B).Inert = False And NPC(B).Killed = 0 Then
         // if(!(NPC[B].Type != NPCID_SPIT_GUY_BALL && !(NPCIsVeggie(NPC[B]) && NPCIsVeggie(NPC[A])) &&
@@ -162,18 +138,6 @@ void NPCCollide(int A)
         // {
         //     continue;
         // }
-
-        if(NPC[B].Type == NPCID_SPIT_GUY_BALL)
-            continue;
-
-        if(NPCIsVeggie(NPC[B]) && NPCIsVeggie(NPC[A]))
-            continue;
-
-        if(NPC[B].HoldingPlayer != 0 || NPC[A].Killed != 0 ||
-           NPC[B].JustActivated != 0 || NPC[B].Inert || NPC[B].Killed != 0)
-        {
-            continue;
-        }
 
         // third exclusion condition
         // if(!(NPC[B].Type != NPCID_CANNONITEM && NPC[B].Type != NPCID_SWORDBEAM && NPC[B].Type != NPCID_TOOTHYPIPE && NPC[B].Type != NPCID_SPRING &&
@@ -186,26 +150,6 @@ void NPCCollide(int A)
         // {
         //     continue;
         // }
-
-        if(NPC[B].Type == NPCID_CANNONITEM || NPC[B].Type == NPCID_SWORDBEAM || NPC[B].Type == NPCID_TOOTHYPIPE || NPC[B].Type == NPCID_SPRING ||
-           NPC[B].Type == NPCID_HEAVY_THROWN || NPC[B].Type == NPCID_KEY || NPC[B].Type == NPCID_COIN_SWITCH || NPC[B].Type == NPCID_GRN_BOOT ||
-           NPC[B].Type == NPCID_VEHICLE || NPC[B].Type == NPCID_TOOTHY || NPC[B].Type == NPCID_CONVEYOR || NPC[B].Type == NPCID_METALBARREL ||
-           NPC[B].Type == NPCID_RED_BOOT || NPC[B].Type == NPCID_BLU_BOOT)
-        {
-            continue;
-        }
-
-        if(NPC[B].Generator)
-            continue;
-
-        if((NPC[A].Type == NPCID_PLR_FIREBALL || NPC[A].Type == NPCID_PLR_ICEBALL) && NPC[B].Type == NPCID_FLIPPED_RAINBOW_SHELL)
-            continue;
-
-        if(NPC[B].Type == NPCID_TIMER_S2 || NPC[B].Type == NPCID_FLY_BLOCK || NPC[B].Type == NPCID_FLY_CANNON || NPC[B].Type == NPCID_DOOR_MAKER ||
-           NPC[B].Type == NPCID_MAGIC_DOOR || NPC[B].Type == NPCID_CHAR3_HEAVY || NPC[B].Type == NPCID_PLR_HEAVY || NPC[B].Type == NPCID_CHAR4_HEAVY)
-        {
-            continue;
-        }
 
         // fourth exclusion condition
         // if(!(!(NPC[B].Type == NPCID_HPIPE_SHORT || NPC[B].Type == NPCID_YEL_PLATFORM || NPC[B].Type == NPCID_BLU_PLATFORM ||
@@ -223,44 +167,81 @@ void NPCCollide(int A)
         //     continue;
         // }
 
-        if(NPC[B].Type == NPCID_HPIPE_SHORT || NPC[B].Type == NPCID_YEL_PLATFORM || NPC[B].Type == NPCID_BLU_PLATFORM ||
-           NPC[B].Type == NPCID_GRN_PLATFORM || NPC[B].Type == NPCID_RED_PLATFORM || NPC[B].Type == NPCID_HPIPE_LONG ||
-           NPC[B].Type == NPCID_VPIPE_SHORT || NPC[B].Type == NPCID_VPIPE_LONG)
-        {
-            continue;
-        }
-
-        if(!NPC[A].Projectile && NPC[B].Type == NPCID_SPIKY_BALL_S3)
+        // don't allow vines to be collision targets
+        if(NPC[B]->IsAVine)
             continue;
 
-        if(NPCIsYoshi(NPC[B]) || NPC[B].Type == NPCID_FALL_BLOCK_RED || NPC[B].Type == NPCID_FALL_BLOCK_BROWN)
+        // don't allow killed NPCs to collide, and don't allow held, just-activated, or friendly NPCs to be collision targets
+        if(NPC[A].Killed != 0 || NPC[B].Killed != 0 || NPC[B].HoldingPlayer != 0 || NPC[B].JustActivated != 0 || NPC[B].Inert)
             continue;
 
-        if(NPC[B].Type == NPCID_SLIDE_BLOCK && NPC[B].Special == 0)
+        // don't allow generators to be collision targets
+        if(NPC[B].Generator)
             continue;
 
-        if(NPC[B].Type == NPCID_CONVEYOR || (NPC[B].Type >= NPCID_TANK_TREADS && NPC[B].Type <= NPCID_SLANT_WOOD_M) ||
-           NPC[B].Type == NPCID_STATUE_S3 || NPC[B].Type == NPCID_STATUE_FIRE)
-        {
-            continue;
-        }
-
-        if(NPC[B].Type == NPCID_BULLET && NPC[B].CantHurt > 0)
-            continue;
-
-        if(NPC[B].Type == NPCID_ITEM_BURIED)
-            continue;
-
+        // don't allow friendly fire
         if(NPC[A].CantHurtPlayer == NPC[B].CantHurtPlayer && NPC[A].CantHurtPlayer > 0)
             continue;
 
-        if(NPC[B].Type == NPCID_ITEM_POD && !NPC[B].Projectile)
-            continue;
-
-        if(NPC[B].Type == NPCID_PET_FIRE || NPC[B].Type == NPCID_PLANT_FIRE || NPC[B].Type == NPCID_QUAD_BALL
-            || NPC[B].Type == NPCID_FIRE_BOSS_FIRE || NPC[B].Type == NPCID_RED_VINE_TOP_S3 || NPC[B].Type == NPCID_GRN_VINE_TOP_S3 || NPC[B].Type == NPCID_GRN_VINE_TOP_S4)
+        // these types can't be collision targets
+        if((NPC[B].Type >= NPCID_PLATFORM_S3 && NPC[B].Type <= NPCID_PLATFORM_S1) || (NPC[B].Type >= NPCID_CARRY_BLOCK_A && NPC[B].Type <= NPCID_CARRY_BLOCK_D) ||
+            NPC[B].Type == NPCID_LIFT_SAND || NPC[B].Type == NPCID_SICK_BOSS_BALL || NPC[B].Type == NPCID_PLR_ICEBALL || NPC[B].Type == NPCID_FIRE_CHAIN || NPC[B].Type == NPCID_CHAR3_HEAVY ||
+            NPC[B].Type == NPCID_FALL_BLOCK_RED || NPC[B].Type == NPCID_FALL_BLOCK_BROWN ||
+            NPC[B].Type == NPCID_SPIT_GUY_BALL || NPC[B].Type == NPCID_CANNONITEM || NPC[B].Type == NPCID_SWORDBEAM || NPC[B].Type == NPCID_TOOTHYPIPE || NPC[B].Type == NPCID_SPRING ||
+            NPC[B].Type == NPCID_HEAVY_THROWN || NPC[B].Type == NPCID_KEY || NPC[B].Type == NPCID_COIN_SWITCH || NPC[B].Type == NPCID_GRN_BOOT ||
+            NPC[B].Type == NPCID_VEHICLE || NPC[B].Type == NPCID_TOOTHY || NPC[B].Type == NPCID_CONVEYOR || NPC[B].Type == NPCID_METALBARREL ||
+            NPC[B].Type == NPCID_RED_BOOT || NPC[B].Type == NPCID_BLU_BOOT ||
+            NPC[B].Type == NPCID_TIMER_S2 || NPC[B].Type == NPCID_FLY_BLOCK || NPC[B].Type == NPCID_FLY_CANNON || NPC[B].Type == NPCID_DOOR_MAKER ||
+            NPC[B].Type == NPCID_MAGIC_DOOR || NPC[B].Type == NPCID_CHAR3_HEAVY || NPC[B].Type == NPCID_PLR_HEAVY || NPC[B].Type == NPCID_CHAR4_HEAVY ||
+            NPC[B].Type == NPCID_HPIPE_SHORT || NPC[B].Type == NPCID_YEL_PLATFORM || NPC[B].Type == NPCID_BLU_PLATFORM ||
+            NPC[B].Type == NPCID_GRN_PLATFORM || NPC[B].Type == NPCID_RED_PLATFORM || NPC[B].Type == NPCID_HPIPE_LONG ||
+            NPC[B].Type == NPCID_VPIPE_SHORT || NPC[B].Type == NPCID_VPIPE_LONG || NPC[B].Type == NPCID_CONVEYOR || (NPC[B].Type >= NPCID_TANK_TREADS && NPC[B].Type <= NPCID_SLANT_WOOD_M) ||
+            NPC[B].Type == NPCID_STATUE_S3 || NPC[B].Type == NPCID_STATUE_FIRE || NPC[B].Type == NPCID_ITEM_BURIED || NPC[B].Type == NPCID_PET_FIRE || NPC[B].Type == NPCID_PLANT_FIRE || NPC[B].Type == NPCID_QUAD_BALL ||
+            NPC[B].Type == NPCID_FIRE_BOSS_FIRE || NPC[B].Type == NPCID_RED_VINE_TOP_S3 || NPC[B].Type == NPCID_GRN_VINE_TOP_S3 || NPC[B].Type == NPCID_GRN_VINE_TOP_S4 || NPCIsYoshi(NPC[B].Type) || NPCIsToad(NPC[B].Type))
         {
             continue;
+        }
+        // miniboss can't be collision target if in guard state
+        else if(NPC[B].Type == NPCID_MINIBOSS)
+        {
+            if(NPC[B].Special == 4)
+                continue;
+        }
+        // bullet can't be collision target if player-shot
+        else if(NPC[B].Type == NPCID_BULLET)
+        {
+            if(NPC[B].CantHurt > 0)
+                continue;
+        }
+        // item pod can't be collision target until thrown
+        else if(NPC[B].Type == NPCID_ITEM_POD)
+        {
+            if(!NPC[B].Projectile)
+                continue;
+        }
+        // slide block can't be collision target until activation
+        else if(NPC[B].Type == NPCID_SLIDE_BLOCK)
+        {
+            if(NPC[B].Special == 0)
+                continue;
+        }
+        // spiky balls can't be collision target unless hit by thrown item
+        else if(NPC[B].Type == NPCID_SPIKY_BALL_S3)
+        {
+            if(!NPC[A].Projectile)
+                continue;
+        }
+        // flipped rainbow shells can't be collision target of fireball / iceball
+        else if(NPC[B].Type == NPCID_FLIPPED_RAINBOW_SHELL)
+        {
+            if(NPC[A].Type == NPCID_PLR_FIREBALL || NPC[A].Type == NPCID_PLR_ICEBALL)
+                continue;
+        }
+        // veggies can't be collision target of other veggies
+        else if(NPCIsVeggie(NPC[B].Type))
+        {
+            if(NPCIsVeggie(NPC[A].Type))
+                continue;
         }
 
         // NPC-NPC collisions must be handled a function pointer defined by NPC A, but also shouldn't be hardcoded based on NPC B's type
