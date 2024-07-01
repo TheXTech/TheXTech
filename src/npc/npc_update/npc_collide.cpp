@@ -207,7 +207,7 @@ void NPCCollide(int A)
             if(NPC[B].Special == 4)
                 continue;
         }
-        // bullet can't be collision target if player-shot
+        // bullet can't be collision target if just player-shot
         else if(NPC[B].Type == NPCID_BULLET)
         {
             if(NPC[B].CantHurt > 0)
@@ -274,8 +274,8 @@ void NPCCollide(int A)
         if(NPCIsToad(NPC[A]))
         {
             if(!(NPC[B]->WontHurt && !NPC[B].Projectile) && !NPC[B]->IsABonus &&
-               NPC[B].Type != NPCID_PLR_FIREBALL && NPC[B].Type != NPCID_PLR_ICEBALL && !(NPC[B].Type == NPCID_BULLET && NPC[B].CantHurt > 0) &&
-               NPC[B].Type != NPCID_TOOTHY && NPC[B].Type != NPCID_PLR_HEAVY && NPC[B].Type != NPCID_CHAR4_HEAVY && NPC[B].Type != NPCID_FLIPPED_RAINBOW_SHELL)
+               NPC[B].Type != NPCID_PLR_FIREBALL && /* NPC[B].Type != NPCID_PLR_ICEBALL && !(NPC[B].Type == NPCID_BULLET && NPC[B].CantHurt > 0) &&
+               NPC[B].Type != NPCID_TOOTHY && NPC[B].Type != NPCID_PLR_HEAVY && NPC[B].Type != NPCID_CHAR4_HEAVY && */ NPC[B].Type != NPCID_FLIPPED_RAINBOW_SHELL)
             {
                 NPCHit(A, 3, B);
                 // HitSpot = 0;
@@ -283,7 +283,7 @@ void NPCCollide(int A)
         }
 
         // turtle enters a shell
-        if((NPC[A].Type == NPCID_GRN_HIT_TURTLE_S4 || NPC[A].Type == NPCID_RED_HIT_TURTLE_S4 || NPC[A].Type == NPCID_YEL_HIT_TURTLE_S4) && !NPC[A].Projectile &&
+        if((NPC[A].Type == NPCID_GRN_HIT_TURTLE_S4 || NPC[A].Type == NPCID_RED_HIT_TURTLE_S4 || NPC[A].Type == NPCID_YEL_HIT_TURTLE_S4) && /* !NPC[A].Projectile && */
            (!NPC[B].Projectile && NPC[B].Type >= NPCID_GRN_SHELL_S4 && NPC[B].Type <= NPCID_YEL_SHELL_S4))
         {
             Location_t tempLocation = NPC[A].Location;
@@ -305,12 +305,13 @@ void NPCCollide(int A)
             }
         }
         // NPC is a projectile
-        else if(NPC[A].Projectile && !(NPC[B].Type == NPCID_SLIDE_BLOCK && NPC[B].Special == 0.0) && NPC[A].Type != NPCID_SWORDBEAM)
+        else if(NPC[A].Projectile && /*!(NPC[B].Type == NPCID_SLIDE_BLOCK && NPC[B].Special == 0.0) &&*/ NPC[A].Type != NPCID_SWORDBEAM)
         {
             if(!(NPC[A].Projectile && NPC[B].Projectile && NPC[A].Type == NPCID_BULLET && NPC[B].Type == NPCID_BULLET && NPC[A].CantHurtPlayer != NPC[B].CantHurtPlayer))
             {
                 if(!((NPC[A].Type == NPCID_PLR_FIREBALL && NPC[B]->IsABonus) || NPC[B].Type == NPCID_PLR_FIREBALL || NPC[B].Type == NPCID_VILLAIN_FIRE))
                 {
+                    // allow turtle (B) to kick shell (A) if it is facing the shell
                     if(NPC[A]->IsAShell &&
                             (NPC[B].Type == NPCID_EXT_TURTLE || NPC[B].Type == NPCID_BLU_HIT_TURTLE_S4) &&
                             (int(NPC[A].Direction) != int(NPC[B].Direction) || NPC[A].Special > 0) && !NPC[B].Projectile)
@@ -481,40 +482,43 @@ void NPCCollide(int A)
         else if(!(NPC[B].Type == NPCID_SPIT_BOSS_BALL && !NPC[B].Projectile))
         {
             int HitSpot = FindCollision(NPC[A].Location, NPC[B].Location);
+
             if(NPCIsToad(NPC[A]) && NPC[A].Killed > 0)
                 HitSpot = 0;
+
             if(NPCIsAParaTroopa(NPC[A]) && NPCIsAParaTroopa(NPC[B]))
             {
                 if(NPC[A].Location.X + NPC[A].Location.Width / 2.0 > NPC[B].Location.X + NPC[B].Location.Width / 2.0)
                     NPC[A].Location.SpeedX += 0.05;
                 else
                     NPC[A].Location.SpeedX -= 0.05;
+
                 if(NPC[A].Location.Y + NPC[A].Location.Height / 2.0 > NPC[B].Location.Y + NPC[B].Location.Height / 2.0)
                     NPC[A].Location.SpeedY += 0.05;
                 else
                     NPC[A].Location.SpeedY -= 0.05;
+
                 HitSpot = 0;
             }
 
             if(!NPC[B].Projectile && !NPC[A]->NoClipping && !NPC[B]->NoClipping)
             {
-                if(((NPC[A].Type == NPCID_EXT_TURTLE || NPC[A].Type == NPCID_BLU_HIT_TURTLE_S4) && NPC[B]->IsAShell) || ((NPC[B].Type == NPCID_EXT_TURTLE || NPC[B].Type == NPCID_BLU_HIT_TURTLE_S4) && NPC[A]->IsAShell)) // Nekkid koopa kicking a shell
+                // NPC A can't be a shell in this condition, because A is not a projectile, and shells only query collisions as projectiles
+                if(((NPC[A].Type == NPCID_EXT_TURTLE || NPC[A].Type == NPCID_BLU_HIT_TURTLE_S4) && NPC[B]->IsAShell) /* || ((NPC[B].Type == NPCID_EXT_TURTLE || NPC[B].Type == NPCID_BLU_HIT_TURTLE_S4) && NPC[A]->IsAShell)*/) // Nekkid koopa kicking a shell
                 {
-                    if(NPC[A].Type == NPCID_EXT_TURTLE || NPC[A].Type == NPCID_BLU_HIT_TURTLE_S4)
+                    // if(NPC[A].Type == NPCID_EXT_TURTLE || NPC[A].Type == NPCID_BLU_HIT_TURTLE_S4)
+                    if(NPC[A].Location.SpeedY == Physics.NPCGravity || NPC[A].Slope > 0)
                     {
-                        if(NPC[A].Location.SpeedY == Physics.NPCGravity || NPC[A].Slope > 0)
+                        // If .Direction = 1 And .Location.X + .Location.Width < NPC(B).Location.X + 3 Or (.Direction = -1 And .Location.X > NPC(B).Location.X + NPC(B).Location.Width - 3) Then
+                        if((NPC[A].Direction == 1  && NPC[A].Location.X + NPC[A].Location.Width < NPC[B].Location.X + 4) ||
+                           (NPC[A].Direction == -1 && NPC[A].Location.X > NPC[B].Location.X + NPC[B].Location.Width - 4))
                         {
-                            // If .Direction = 1 And .Location.X + .Location.Width < NPC(B).Location.X + 3 Or (.Direction = -1 And .Location.X > NPC(B).Location.X + NPC(B).Location.Width - 3) Then
-                            if((NPC[A].Direction == 1  && NPC[A].Location.X + NPC[A].Location.Width < NPC[B].Location.X + 4) ||
-                               (NPC[A].Direction == -1 && NPC[A].Location.X > NPC[B].Location.X + NPC[B].Location.Width - 4))
+                            if(NPC[B].Location.SpeedX == 0.0 && NPC[B].Effect == NPCEFF_NORMAL)
                             {
-                                if(NPC[B].Location.SpeedX == 0.0 && NPC[B].Effect == NPCEFF_NORMAL)
-                                {
-                                    NPC[A].Special = 10;
-                                    Player[numPlayers + 1].Direction = NPC[A].Direction;
-                                    NPC[A].Location.X += -NPC[A].Direction;
-                                    NPCHit(B, 1, numPlayers + 1);
-                                }
+                                NPC[A].Special = 10;
+                                Player[numPlayers + 1].Direction = NPC[A].Direction;
+                                NPC[A].Location.X += -NPC[A].Direction;
+                                NPCHit(B, 1, numPlayers + 1);
                             }
                         }
                     }
