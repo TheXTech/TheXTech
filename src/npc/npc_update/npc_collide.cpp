@@ -33,7 +33,7 @@
 
 void NPCCollide(int A)
 {
-    if(!NPC[A].Inert && NPC[A].Type != NPCID_LIFT_SAND && NPC[A].Type != NPCID_CANNONITEM && NPC[A].Type != NPCID_SPRING &&
+    if(!(!NPC[A].Inert && NPC[A].Type != NPCID_LIFT_SAND && NPC[A].Type != NPCID_CANNONITEM && NPC[A].Type != NPCID_SPRING &&
             !(NPC[A].Type == NPCID_HEAVY_THROWN && !NPC[A].Projectile) && NPC[A].Type != NPCID_COIN_SWITCH && NPC[A].Type != NPCID_GRN_BOOT &&
             !(NPC[A].Type == NPCID_SPIT_BOSS_BALL && !NPC[A].Projectile) &&
             !((NPC[A].Type == NPCID_METALBARREL || NPC[A].Type == NPCID_YEL_PLATFORM || NPC[A].Type == NPCID_BLU_PLATFORM || NPC[A].Type == NPCID_GRN_PLATFORM ||
@@ -47,365 +47,375 @@ void NPCCollide(int A)
             !(NPC[A]->IsAShell && !NPC[A].Projectile) &&
             !(NPC[A].Projectile && NPC[A].Type >= NPCID_GRN_HIT_TURTLE_S4 && NPC[A].Type <= NPCID_YEL_HIT_TURTLE_S4) &&
        NPC[A].Type != NPCID_SPIT_GUY_BALL && !(!NPCIsToad(NPC[A]) && !NPC[A].Projectile &&
-       NPC[A].Location.SpeedX == 0 && (NPC[A].Location.SpeedY == 0 || NPC[A].Location.SpeedY == Physics.NPCGravity)))
+       NPC[A].Location.SpeedX == 0 && (NPC[A].Location.SpeedY == 0 || NPC[A].Location.SpeedY == Physics.NPCGravity))))
     {
-        if(!NPC[A]->IsACoin && NPC[A].Type != NPCID_TIMER_S2 && NPC[A].Type != NPCID_FALL_BLOCK_BROWN &&
-            NPC[A].Type != NPCID_WALL_BUG && NPC[A].Type != NPCID_WALL_SPARK && NPC[A].Type != NPCID_WALL_TURTLE && NPC[A].Type != NPCID_RED_BOOT &&
-            NPC[A].Type != NPCID_BLU_BOOT && !(NPC[A]->IsFish && NPC[A].Special == 2) &&
-           !NPC[A].Generator && NPC[A].Type != NPCID_PLANT_FIRE && NPC[A].Type != NPCID_FIRE_CHAIN &&
-            NPC[A].Type != NPCID_QUAD_BALL && NPC[A].Type != NPCID_FLY_BLOCK && NPC[A].Type != NPCID_FLY_CANNON &&
-            NPC[A].Type != NPCID_FIRE_BOSS_FIRE && NPC[A].Type != NPCID_DOOR_MAKER && NPC[A].Type != NPCID_MAGIC_DOOR)
+        return;
+    }
+
+    if(!(!NPC[A]->IsACoin && NPC[A].Type != NPCID_TIMER_S2 && NPC[A].Type != NPCID_FALL_BLOCK_BROWN &&
+        NPC[A].Type != NPCID_WALL_BUG && NPC[A].Type != NPCID_WALL_SPARK && NPC[A].Type != NPCID_WALL_TURTLE && NPC[A].Type != NPCID_RED_BOOT &&
+        NPC[A].Type != NPCID_BLU_BOOT && !(NPC[A]->IsFish && NPC[A].Special == 2) &&
+       !NPC[A].Generator && NPC[A].Type != NPCID_PLANT_FIRE && NPC[A].Type != NPCID_FIRE_CHAIN &&
+        NPC[A].Type != NPCID_QUAD_BALL && NPC[A].Type != NPCID_FLY_BLOCK && NPC[A].Type != NPCID_FLY_CANNON &&
+        NPC[A].Type != NPCID_FIRE_BOSS_FIRE && NPC[A].Type != NPCID_DOOR_MAKER && NPC[A].Type != NPCID_MAGIC_DOOR))
+    {
+        return;
+    }
+
+    for(int B : treeNPCQuery(NPC[A].Location, SORTMODE_ID))
+    {
+        if(!(B != A && NPC[B].Active))
+            continue;
+
+        if(!(!NPC[B]->IsACoin))
+            continue;
+
+        if(!CheckCollision(NPC[A].Location, NPC[B].Location))
+            continue;
+
+        // if(!(B != A))
+        //     continue;
+
+        if(!(!(NPC[B].Type == NPCID_MINIBOSS && NPC[B].Special == 4) && !(NPCIsToad(NPC[B])) &&
+           !(NPC[B].Type >= NPCID_PLATFORM_S3 && NPC[B].Type <= NPCID_PLATFORM_S1) && !(NPC[B].Type >= NPCID_CARRY_BLOCK_A && NPC[B].Type <= NPCID_CARRY_BLOCK_D) &&
+           NPC[B].Type != NPCID_LIFT_SAND && NPC[B].Type != NPCID_SICK_BOSS_BALL && !NPC[B]->IsAVine &&
+           NPC[B].Type != NPCID_PLR_ICEBALL && NPC[B].Type != NPCID_FIRE_CHAIN && NPC[B].Type != NPCID_CHAR3_HEAVY))
         {
+            continue;
+        }
 
-            for(int B : treeNPCQuery(NPC[A].Location, SORTMODE_ID))
+        // If Not (NPC(B).Type = 133) And NPC(B).HoldingPlayer = 0 And .Killed = 0 And NPC(B).JustActivated = 0 And NPC(B).Inert = False And NPC(B).Killed = 0 Then
+        if(!(NPC[B].Type != NPCID_SPIT_GUY_BALL && !(NPCIsVeggie(NPC[B]) && NPCIsVeggie(NPC[A])) &&
+           NPC[B].HoldingPlayer == 0 && NPC[A].Killed == 0 &&
+           NPC[B].JustActivated == 0 && !NPC[B].Inert && NPC[B].Killed == 0))
+        {
+            continue;
+        }
+
+        if(!(NPC[B].Type != NPCID_CANNONITEM && NPC[B].Type != NPCID_SWORDBEAM && NPC[B].Type != NPCID_TOOTHYPIPE && NPC[B].Type != NPCID_SPRING &&
+           NPC[B].Type != NPCID_HEAVY_THROWN && NPC[B].Type != NPCID_KEY && NPC[B].Type != NPCID_COIN_SWITCH && NPC[B].Type != NPCID_GRN_BOOT &&
+           NPC[B].Type != NPCID_VEHICLE && NPC[B].Type != NPCID_TOOTHY && NPC[B].Type != NPCID_CONVEYOR && NPC[B].Type != NPCID_METALBARREL &&
+           NPC[B].Type != NPCID_RED_BOOT && NPC[B].Type != NPCID_BLU_BOOT && !NPC[B].Generator &&
+           !((NPC[A].Type == NPCID_PLR_FIREBALL || NPC[A].Type == NPCID_PLR_ICEBALL) && NPC[B].Type == NPCID_FLIPPED_RAINBOW_SHELL) &&
+           NPC[B].Type != NPCID_TIMER_S2 && NPC[B].Type != NPCID_FLY_BLOCK && NPC[B].Type != NPCID_FLY_CANNON && NPC[B].Type != NPCID_DOOR_MAKER &&
+           NPC[B].Type != NPCID_MAGIC_DOOR && NPC[B].Type != NPCID_CHAR3_HEAVY && NPC[B].Type != NPCID_PLR_HEAVY && NPC[B].Type != NPCID_CHAR4_HEAVY))
+        {
+            continue;
+        }
+
+        if(!(!(NPC[B].Type == NPCID_HPIPE_SHORT || NPC[B].Type == NPCID_YEL_PLATFORM || NPC[B].Type == NPCID_BLU_PLATFORM ||
+           NPC[B].Type == NPCID_GRN_PLATFORM || NPC[B].Type == NPCID_RED_PLATFORM || NPC[B].Type == NPCID_HPIPE_LONG ||
+           NPC[B].Type == NPCID_VPIPE_SHORT || NPC[B].Type == NPCID_VPIPE_LONG) && !(!NPC[A].Projectile &&
+           NPC[B].Type == NPCID_SPIKY_BALL_S3) && !NPCIsYoshi(NPC[B]) && NPC[B].Type != NPCID_FALL_BLOCK_RED &&
+           NPC[B].Type != NPCID_FALL_BLOCK_BROWN && !(NPC[B].Type == NPCID_SLIDE_BLOCK && NPC[B].Special == 0) &&
+           NPC[B].Type != NPCID_CONVEYOR && !(NPC[B].Type >= NPCID_TANK_TREADS && NPC[B].Type <= NPCID_SLANT_WOOD_M) &&
+           NPC[B].Type != NPCID_STATUE_S3 && NPC[B].Type != NPCID_STATUE_FIRE && !(NPC[B].Type == NPCID_BULLET &&
+           NPC[B].CantHurt > 0) && NPC[B].Type != NPCID_ITEM_BURIED && !(NPC[A].CantHurtPlayer == NPC[B].CantHurtPlayer &&
+           NPC[A].CantHurtPlayer > 0) && !(NPC[B].Type == NPCID_ITEM_POD && !NPC[B].Projectile) &&
+           NPC[B].Type != NPCID_PET_FIRE && NPC[B].Type != NPCID_PLANT_FIRE && NPC[B].Type != NPCID_QUAD_BALL &&
+           NPC[B].Type != NPCID_FIRE_BOSS_FIRE && NPC[B].Type != NPCID_RED_VINE_TOP_S3 && NPC[B].Type != NPCID_GRN_VINE_TOP_S3 && NPC[B].Type != NPCID_GRN_VINE_TOP_S4))
+        {
+            continue;
+        }
+
+        // NPC-NPC collisions must be handled a function pointer defined by NPC A, but also shouldn't be hardcoded based on NPC B's type
+        //   this logic will be quite difficult (but necessary) to convert
+
+        // NOTE: There are a number of assignments to HitSpot here, but they are never read from (in the entire UpdateNPCs routine).
+        // All reads are preceded by other writes.
+        // I am commenting out these assignments.
+
+        // if(NPC[A].Type == NPCID_MAGIC_BOSS_BALL || NPC[B].Type == NPCID_MAGIC_BOSS_BALL || NPC[A].Type == NPCID_FIRE_BOSS_FIRE || NPC[B].Type == NPCID_FIRE_BOSS_FIRE)
+        //     HitSpot = 0;
+
+        if(NPC[A].Type == NPCID_ITEM_BUBBLE)
+        {
+            NPCHit(A, 3, B);
+            // HitSpot = 0;
+        }
+        else if(NPC[B].Type == NPCID_ITEM_BUBBLE)
+            NPCHit(B, 3, A);
+
+
+        if(NPC[A].Type == NPCID_SWORDBEAM)
+        {
+            if(!NPC[B]->IsABonus)
+                NPCHit(B, 10, NPC[A].CantHurtPlayer);
+            // HitSpot = 0;
+        }
+
+        // toad code
+        if(NPCIsToad(NPC[A]))
+        {
+            if(!(NPC[B]->WontHurt && !NPC[B].Projectile) && !NPC[B]->IsABonus &&
+               NPC[B].Type != NPCID_PLR_FIREBALL && NPC[B].Type != NPCID_PLR_ICEBALL && !(NPC[B].Type == NPCID_BULLET && NPC[B].CantHurt > 0) &&
+               NPC[B].Type != NPCID_TOOTHY && NPC[B].Type != NPCID_PLR_HEAVY && NPC[B].Type != NPCID_CHAR4_HEAVY && NPC[B].Type != NPCID_FLIPPED_RAINBOW_SHELL)
             {
-                if(B != A && NPC[B].Active)
+                NPCHit(A, 3, B);
+                // HitSpot = 0;
+            }
+        }
+
+        // turtle enters a shell
+        if((NPC[A].Type == NPCID_GRN_HIT_TURTLE_S4 || NPC[A].Type == NPCID_RED_HIT_TURTLE_S4 || NPC[A].Type == NPCID_YEL_HIT_TURTLE_S4) && !NPC[A].Projectile &&
+           (!NPC[B].Projectile && NPC[B].Type >= NPCID_GRN_SHELL_S4 && NPC[B].Type <= NPCID_YEL_SHELL_S4))
+        {
+            Location_t tempLocation = NPC[A].Location;
+            Location_t tempLocation2 = NPC[B].Location;
+            tempLocation.Width = 8;
+            tempLocation.X += 12;
+            tempLocation2.Width = 8;
+            tempLocation2.X += 12;
+
+            if(CheckCollision(tempLocation, tempLocation2))
+            {
+                NPC[B].Type = NPCID(NPC[B].Type - 4);
+                if(NPC[B].Type == NPCID_YEL_TURTLE_S4)
+                    NPC[B].Type = NPCID_RAINBOW_SHELL;
+                NPC[A].Killed = 9;
+                NPCQueues::Killed.push_back(A);
+                NPC[B].Direction = NPC[A].Direction;
+                NPC[B].Frame = EditorNPCFrame(NPC[B].Type, NPC[B].Direction);
+            }
+        }
+        // NPC is a projectile
+        else if(NPC[A].Projectile && !(NPC[B].Type == NPCID_SLIDE_BLOCK && NPC[B].Special == 0.0) && NPC[A].Type != NPCID_SWORDBEAM)
+        {
+            if(!(NPC[A].Projectile && NPC[B].Projectile && NPC[A].Type == NPCID_BULLET && NPC[B].Type == NPCID_BULLET && NPC[A].CantHurtPlayer != NPC[B].CantHurtPlayer))
+            {
+                if(!((NPC[A].Type == NPCID_PLR_FIREBALL && NPC[B]->IsABonus) || NPC[B].Type == NPCID_PLR_FIREBALL || NPC[B].Type == NPCID_VILLAIN_FIRE))
                 {
-                    if(!NPC[B]->IsACoin)
+                    if(NPC[A]->IsAShell &&
+                            (NPC[B].Type == NPCID_EXT_TURTLE || NPC[B].Type == NPCID_BLU_HIT_TURTLE_S4) &&
+                            (int(NPC[A].Direction) != int(NPC[B].Direction) || NPC[A].Special > 0) && !NPC[B].Projectile)
                     {
-                        if(CheckCollision(NPC[A].Location, NPC[B].Location))
+                        if(int(NPC[A].Direction) == -1)
                         {
-                            // if(B != A)
+                            NPC[B].Frame = 3;
+                            if(NPC[B].Type == NPCID_BLU_HIT_TURTLE_S4)
+                                NPC[B].Frame = 5;
+                            NPC[B].FrameCount = 0;
+                        }
+                        else
+                        {
+                            NPC[B].Frame = 0;
+                            NPC[B].FrameCount = 0;
+                        }
+
+                        if(NPC[A].CantHurt < 25)
+                            NPC[A].Special = 1;
+                        if(NPC[A].Location.X + NPC[A].Location.Width / 2.0 > NPC[B].Location.X + NPC[B].Location.Width / 2.0)
+                        {
+                            NPC[B].Location.X = NPC[A].Location.X - NPC[B].Location.Width - 1;
+                            NPC[B].Direction = 1;
+                        }
+                        else
+                        {
+                            NPC[B].Location.X = NPC[A].Location.X + NPC[A].Location.Width + 1;
+                            NPC[B].Direction = -1;
+                        }
+
+                        if(NPC[A].Location.SpeedY < NPC[B].Location.SpeedY)
+                            NPC[A].Location.SpeedY = NPC[B].Location.SpeedY;
+                        NPC[A].Frame = 0;
+                        NPC[A].FrameCount = 0;
+                        if(NPC[A].CantHurt < 25)
+                            NPC[A].Special = 2;
+                        NPC[B].Special = 0;
+                        Location_t tempLocation = NPC[B].Location;
+                        tempLocation.Y += 1;
+                        tempLocation.Height -= 2;
+
+                        for(int bCheck2 = 1; bCheck2 <= 2; bCheck2++)
+                        {
+                            // if(bCheck2 == 1)
+                            // {
+                            //     // fBlock2 = FirstBlock[(NPC[B].Location.X / 32) - 1];
+                            //     // lBlock2 = LastBlock[((NPC[B].Location.X + NPC[B].Location.Width) / 32.0) + 1];
+                            //     blockTileGet(NPC[B].Location, fBlock2, lBlock2);
+                            // }
+                            // else
+                            // {
+                                   // ds-sloth comment: this was a "bug",
+                                   // but it never affected the result so wasn't fixed
+                                   // should be numBlock - numTempBlock + 1,
+                                   // this will double-count numBlock - numTempBlock.
+                                   // not a problem because it is the last of the non-temp blocks
+                                   // and the first of the temp blocks in the original check,
+                                   // so order is the same if we exclusively count it is a non-temp block,
+                                   // which is what the new code does
+                            //     fBlock2 = numBlock - numTempBlock;
+                            //     lBlock2 = numBlock;
+                            // }
+
+                            auto collBlockSentinel2 = (bCheck2 == 1)
+                                ? treeFLBlockQuery(NPC[B].Location, SORTMODE_COMPAT)
+                                : treeTempBlockQuery(NPC[B].Location, SORTMODE_LOC);
+
+                            for(BlockRef_t block2 : collBlockSentinel2)
                             {
-                                if(!(NPC[B].Type == NPCID_MINIBOSS && NPC[B].Special == 4) && !(NPCIsToad(NPC[B])) &&
-                                   !(NPC[B].Type >= NPCID_PLATFORM_S3 && NPC[B].Type <= NPCID_PLATFORM_S1) && !(NPC[B].Type >= NPCID_CARRY_BLOCK_A && NPC[B].Type <= NPCID_CARRY_BLOCK_D) &&
-                                   NPC[B].Type != NPCID_LIFT_SAND && NPC[B].Type != NPCID_SICK_BOSS_BALL && !NPC[B]->IsAVine &&
-                                   NPC[B].Type != NPCID_PLR_ICEBALL && NPC[B].Type != NPCID_FIRE_CHAIN && NPC[B].Type != NPCID_CHAR3_HEAVY)
+                                int C = block2;
+
+                                if(!BlockIsSizable[Block[C].Type] && !BlockOnlyHitspot1[Block[C].Type] && !Block[C].Hidden && BlockSlope[Block[C].Type] == 0)
                                 {
-                                    // If Not (NPC(B).Type = 133) And NPC(B).HoldingPlayer = 0 And .Killed = 0 And NPC(B).JustActivated = 0 And NPC(B).Inert = False And NPC(B).Killed = 0 Then
-                                    if(NPC[B].Type != NPCID_SPIT_GUY_BALL && !(NPCIsVeggie(NPC[B]) && NPCIsVeggie(NPC[A])) &&
-                                       NPC[B].HoldingPlayer == 0 && NPC[A].Killed == 0 &&
-                                       NPC[B].JustActivated == 0 && !NPC[B].Inert && NPC[B].Killed == 0)
+                                    if(CheckCollision(tempLocation, Block[C].Location))
                                     {
-
-                                        if(NPC[B].Type != NPCID_CANNONITEM && NPC[B].Type != NPCID_SWORDBEAM && NPC[B].Type != NPCID_TOOTHYPIPE && NPC[B].Type != NPCID_SPRING &&
-                                           NPC[B].Type != NPCID_HEAVY_THROWN && NPC[B].Type != NPCID_KEY && NPC[B].Type != NPCID_COIN_SWITCH && NPC[B].Type != NPCID_GRN_BOOT &&
-                                           NPC[B].Type != NPCID_VEHICLE && NPC[B].Type != NPCID_TOOTHY && NPC[B].Type != NPCID_CONVEYOR && NPC[B].Type != NPCID_METALBARREL &&
-                                           NPC[B].Type != NPCID_RED_BOOT && NPC[B].Type != NPCID_BLU_BOOT && !NPC[B].Generator &&
-                                           !((NPC[A].Type == NPCID_PLR_FIREBALL || NPC[A].Type == NPCID_PLR_ICEBALL) && NPC[B].Type == NPCID_FLIPPED_RAINBOW_SHELL) &&
-                                           NPC[B].Type != NPCID_TIMER_S2 && NPC[B].Type != NPCID_FLY_BLOCK && NPC[B].Type != NPCID_FLY_CANNON && NPC[B].Type != NPCID_DOOR_MAKER &&
-                                           NPC[B].Type != NPCID_MAGIC_DOOR && NPC[B].Type != NPCID_CHAR3_HEAVY && NPC[B].Type != NPCID_PLR_HEAVY && NPC[B].Type != NPCID_CHAR4_HEAVY)
+                                        if(int(NPC[A].Direction) == -1)
                                         {
-                                            if(!(NPC[B].Type == NPCID_HPIPE_SHORT || NPC[B].Type == NPCID_YEL_PLATFORM || NPC[B].Type == NPCID_BLU_PLATFORM ||
-                                               NPC[B].Type == NPCID_GRN_PLATFORM || NPC[B].Type == NPCID_RED_PLATFORM || NPC[B].Type == NPCID_HPIPE_LONG ||
-                                               NPC[B].Type == NPCID_VPIPE_SHORT || NPC[B].Type == NPCID_VPIPE_LONG) && !(!NPC[A].Projectile &&
-                                               NPC[B].Type == NPCID_SPIKY_BALL_S3) && !NPCIsYoshi(NPC[B]) && NPC[B].Type != NPCID_FALL_BLOCK_RED &&
-                                               NPC[B].Type != NPCID_FALL_BLOCK_BROWN && !(NPC[B].Type == NPCID_SLIDE_BLOCK && NPC[B].Special == 0) &&
-                                               NPC[B].Type != NPCID_CONVEYOR && !(NPC[B].Type >= NPCID_TANK_TREADS && NPC[B].Type <= NPCID_SLANT_WOOD_M) &&
-                                               NPC[B].Type != NPCID_STATUE_S3 && NPC[B].Type != NPCID_STATUE_FIRE && !(NPC[B].Type == NPCID_BULLET &&
-                                               NPC[B].CantHurt > 0) && NPC[B].Type != NPCID_ITEM_BURIED && !(NPC[A].CantHurtPlayer == NPC[B].CantHurtPlayer &&
-                                               NPC[A].CantHurtPlayer > 0) && !(NPC[B].Type == NPCID_ITEM_POD && !NPC[B].Projectile) &&
-                                               NPC[B].Type != NPCID_PET_FIRE && NPC[B].Type != NPCID_PLANT_FIRE && NPC[B].Type != NPCID_QUAD_BALL &&
-                                               NPC[B].Type != NPCID_FIRE_BOSS_FIRE && NPC[B].Type != NPCID_RED_VINE_TOP_S3 && NPC[B].Type != NPCID_GRN_VINE_TOP_S3 && NPC[B].Type != NPCID_GRN_VINE_TOP_S4)
-                                            {
-                                                // NPC-NPC collisions must be handled a function pointer defined by NPC A, but also shouldn't be hardcoded based on NPC B's type
-                                                //   this logic will be quite difficult (but necessary) to convert
-
-                                                // NOTE: There are a number of assignments to HitSpot here, but they are never read from (in the entire UpdateNPCs routine).
-                                                // All reads are preceded by other writes.
-                                                // I am commenting out these assignments.
-
-                                                // if(NPC[A].Type == NPCID_MAGIC_BOSS_BALL || NPC[B].Type == NPCID_MAGIC_BOSS_BALL || NPC[A].Type == NPCID_FIRE_BOSS_FIRE || NPC[B].Type == NPCID_FIRE_BOSS_FIRE)
-                                                //     HitSpot = 0;
-
-                                                if(NPC[A].Type == NPCID_ITEM_BUBBLE)
-                                                {
-                                                    NPCHit(A, 3, B);
-                                                    // HitSpot = 0;
-                                                }
-                                                else if(NPC[B].Type == NPCID_ITEM_BUBBLE)
-                                                    NPCHit(B, 3, A);
-
-
-                                                if(NPC[A].Type == NPCID_SWORDBEAM)
-                                                {
-                                                    if(!NPC[B]->IsABonus)
-                                                        NPCHit(B, 10, NPC[A].CantHurtPlayer);
-                                                    // HitSpot = 0;
-                                                }
-
-                                                // toad code
-                                                if(NPCIsToad(NPC[A]))
-                                                {
-                                                    if(!(NPC[B]->WontHurt && !NPC[B].Projectile) && !NPC[B]->IsABonus &&
-                                                       NPC[B].Type != NPCID_PLR_FIREBALL && NPC[B].Type != NPCID_PLR_ICEBALL && !(NPC[B].Type == NPCID_BULLET && NPC[B].CantHurt > 0) &&
-                                                       NPC[B].Type != NPCID_TOOTHY && NPC[B].Type != NPCID_PLR_HEAVY && NPC[B].Type != NPCID_CHAR4_HEAVY && NPC[B].Type != NPCID_FLIPPED_RAINBOW_SHELL)
-                                                    {
-                                                        NPCHit(A, 3, B);
-                                                        // HitSpot = 0;
-                                                    }
-                                                }
-
-                                                // turtle enters a shell
-                                                if((NPC[A].Type == NPCID_GRN_HIT_TURTLE_S4 || NPC[A].Type == NPCID_RED_HIT_TURTLE_S4 || NPC[A].Type == NPCID_YEL_HIT_TURTLE_S4) && !NPC[A].Projectile &&
-                                                   (!NPC[B].Projectile && NPC[B].Type >= NPCID_GRN_SHELL_S4 && NPC[B].Type <= NPCID_YEL_SHELL_S4))
-                                                {
-                                                    Location_t tempLocation = NPC[A].Location;
-                                                    Location_t tempLocation2 = NPC[B].Location;
-                                                    tempLocation.Width = 8;
-                                                    tempLocation.X += 12;
-                                                    tempLocation2.Width = 8;
-                                                    tempLocation2.X += 12;
-
-                                                    if(CheckCollision(tempLocation, tempLocation2))
-                                                    {
-                                                        NPC[B].Type = NPCID(NPC[B].Type - 4);
-                                                        if(NPC[B].Type == NPCID_YEL_TURTLE_S4)
-                                                            NPC[B].Type = NPCID_RAINBOW_SHELL;
-                                                        NPC[A].Killed = 9;
-                                                        NPCQueues::Killed.push_back(A);
-                                                        NPC[B].Direction = NPC[A].Direction;
-                                                        NPC[B].Frame = EditorNPCFrame(NPC[B].Type, NPC[B].Direction);
-                                                    }
-                                                }
-                                                // NPC is a projectile
-                                                else if(NPC[A].Projectile && !(NPC[B].Type == NPCID_SLIDE_BLOCK && NPC[B].Special == 0.0) && NPC[A].Type != NPCID_SWORDBEAM)
-                                                {
-                                                    if(!(NPC[A].Projectile && NPC[B].Projectile && NPC[A].Type == NPCID_BULLET && NPC[B].Type == NPCID_BULLET && NPC[A].CantHurtPlayer != NPC[B].CantHurtPlayer))
-                                                    {
-                                                        if(!((NPC[A].Type == NPCID_PLR_FIREBALL && NPC[B]->IsABonus) || NPC[B].Type == NPCID_PLR_FIREBALL || NPC[B].Type == NPCID_VILLAIN_FIRE))
-                                                        {
-                                                            if(NPC[A]->IsAShell &&
-                                                                    (NPC[B].Type == NPCID_EXT_TURTLE || NPC[B].Type == NPCID_BLU_HIT_TURTLE_S4) &&
-                                                                    (int(NPC[A].Direction) != int(NPC[B].Direction) || NPC[A].Special > 0) && !NPC[B].Projectile)
-                                                            {
-                                                                if(int(NPC[A].Direction) == -1)
-                                                                {
-                                                                    NPC[B].Frame = 3;
-                                                                    if(NPC[B].Type == NPCID_BLU_HIT_TURTLE_S4)
-                                                                        NPC[B].Frame = 5;
-                                                                    NPC[B].FrameCount = 0;
-                                                                }
-                                                                else
-                                                                {
-                                                                    NPC[B].Frame = 0;
-                                                                    NPC[B].FrameCount = 0;
-                                                                }
-
-                                                                if(NPC[A].CantHurt < 25)
-                                                                    NPC[A].Special = 1;
-                                                                if(NPC[A].Location.X + NPC[A].Location.Width / 2.0 > NPC[B].Location.X + NPC[B].Location.Width / 2.0)
-                                                                {
-                                                                    NPC[B].Location.X = NPC[A].Location.X - NPC[B].Location.Width - 1;
-                                                                    NPC[B].Direction = 1;
-                                                                }
-                                                                else
-                                                                {
-                                                                    NPC[B].Location.X = NPC[A].Location.X + NPC[A].Location.Width + 1;
-                                                                    NPC[B].Direction = -1;
-                                                                }
-
-                                                                if(NPC[A].Location.SpeedY < NPC[B].Location.SpeedY)
-                                                                    NPC[A].Location.SpeedY = NPC[B].Location.SpeedY;
-                                                                NPC[A].Frame = 0;
-                                                                NPC[A].FrameCount = 0;
-                                                                if(NPC[A].CantHurt < 25)
-                                                                    NPC[A].Special = 2;
-                                                                NPC[B].Special = 0;
-                                                                Location_t tempLocation = NPC[B].Location;
-                                                                tempLocation.Y += 1;
-                                                                tempLocation.Height -= 2;
-
-                                                                for(int bCheck2 = 1; bCheck2 <= 2; bCheck2++)
-                                                                {
-                                                                    // if(bCheck2 == 1)
-                                                                    // {
-                                                                    //     // fBlock2 = FirstBlock[(NPC[B].Location.X / 32) - 1];
-                                                                    //     // lBlock2 = LastBlock[((NPC[B].Location.X + NPC[B].Location.Width) / 32.0) + 1];
-                                                                    //     blockTileGet(NPC[B].Location, fBlock2, lBlock2);
-                                                                    // }
-                                                                    // else
-                                                                    // {
-                                                                           // ds-sloth comment: this was a "bug",
-                                                                           // but it never affected the result so wasn't fixed
-                                                                           // should be numBlock - numTempBlock + 1,
-                                                                           // this will double-count numBlock - numTempBlock.
-                                                                           // not a problem because it is the last of the non-temp blocks
-                                                                           // and the first of the temp blocks in the original check,
-                                                                           // so order is the same if we exclusively count it is a non-temp block,
-                                                                           // which is what the new code does
-                                                                    //     fBlock2 = numBlock - numTempBlock;
-                                                                    //     lBlock2 = numBlock;
-                                                                    // }
-
-                                                                    auto collBlockSentinel2 = (bCheck2 == 1)
-                                                                        ? treeFLBlockQuery(NPC[B].Location, SORTMODE_COMPAT)
-                                                                        : treeTempBlockQuery(NPC[B].Location, SORTMODE_LOC);
-
-                                                                    for(BlockRef_t block2 : collBlockSentinel2)
-                                                                    {
-                                                                        int C = block2;
-
-                                                                        if(!BlockIsSizable[Block[C].Type] && !BlockOnlyHitspot1[Block[C].Type] && !Block[C].Hidden && BlockSlope[Block[C].Type] == 0)
-                                                                        {
-                                                                            if(CheckCollision(tempLocation, Block[C].Location))
-                                                                            {
-                                                                                if(int(NPC[A].Direction) == -1)
-                                                                                {
-                                                                                    NPC[B].Location.X = Block[C].Location.X + Block[C].Location.Width + 0.1;
-                                                                                    NPC[A].Location.X = NPC[B].Location.X + NPC[B].Location.Width + 0.1;
-                                                                                }
-                                                                                else
-                                                                                {
-                                                                                    NPC[B].Location.X = Block[C].Location.X - NPC[B].Location.Width - 0.1;
-                                                                                    NPC[A].Location.X = NPC[B].Location.X - NPC[A].Location.Width - 0.1;
-                                                                                }
-                                                                            }
-                                                                        }
-                                                                    }
-                                                                }
-
-                                                                treeNPCUpdate(B);
-                                                                if(NPC[B].tempBlock > 0)
-                                                                    treeNPCSplitTempBlock(B);
-                                                            }
-                                                            else if(NPC[A].Type == NPCID_TANK_TREADS)
-                                                                NPCHit(B, 8, A);
-                                                            else
-                                                            {
-                                                                if(!NPC[B]->IsABonus)
-                                                                {
-                                                                    if(NPC[A].Type == NPCID_CANNONENEMY && NPC[B].Type == NPCID_BULLET)
-                                                                        NPC[B].Projectile = true;
-                                                                    else
-                                                                    {
-                                                                        bool tempBool = false; // This whole cluster stops friendly projectiles form killing riddin shells
-
-                                                                        if(NPC[A]->IsAShell)
-                                                                        {
-                                                                            for(auto C = 1; C <= numPlayers; C++)
-                                                                            {
-                                                                                if(Player[C].StandingOnNPC == A && NPC[B].CantHurtPlayer == C)
-                                                                                {
-                                                                                    tempBool = true;
-                                                                                    break;
-                                                                                }
-                                                                            }
-                                                                        }
-
-                                                                        if(NPC[B]->IsAShell)
-                                                                        {
-                                                                            for(auto C = 1; C <= numPlayers; C++)
-                                                                            {
-                                                                                if(Player[C].StandingOnNPC == B && NPC[A].CantHurtPlayer == C)
-                                                                                {
-                                                                                    tempBool = true;
-                                                                                    break;
-                                                                                }
-                                                                            }
-                                                                        }
-
-                                                                        if(!(NPC[A].Type == NPCID_BULLET && NPC[A].Projectile))
-                                                                        {
-                                                                            if(NPC[B]->IsAShell && NPC[B].Projectile)
-                                                                            {
-                                                                                if(!tempBool)
-                                                                                    NPCHit(A, 3, B);
-                                                                            }
-                                                                            else
-                                                                            {
-                                                                                if(!tempBool)
-                                                                                    NPCHit(A, 4, B);
-                                                                            }
-                                                                        }
-
-                                                                        if(!tempBool) // end cluster
-                                                                            NPCHit(B, 3, A);
-
-                                                                        if(NPC[A].Type == NPCID_BULLET)
-                                                                        {
-                                                                            if(NPC[B].Type == NPCID_MINIBOSS)
-                                                                            {
-                                                                                NPC[A].Location.SpeedX = -NPC[A].Location.SpeedX;
-                                                                                NPCHit(A, 4, B);
-                                                                            }
-                                                                            else if(NPC[B].Type == NPCID_CANNONENEMY)
-                                                                            {
-                                                                                NPC[A].Location.SpeedX = -NPC[A].Location.SpeedX;
-                                                                                PlaySoundSpatial(SFX_BlockHit, NPC[A].Location);
-                                                                                NPCHit(A, 4, A);
-                                                                            }
-                                                                        }
-                                                                    }
-                                                                }
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                                else if(!(NPC[B].Type == NPCID_SPIT_BOSS_BALL && !NPC[B].Projectile))
-                                                {
-                                                    int HitSpot = FindCollision(NPC[A].Location, NPC[B].Location);
-                                                    if(NPCIsToad(NPC[A]) && NPC[A].Killed > 0)
-                                                        HitSpot = 0;
-                                                    if(NPCIsAParaTroopa(NPC[A]) && NPCIsAParaTroopa(NPC[B]))
-                                                    {
-                                                        if(NPC[A].Location.X + NPC[A].Location.Width / 2.0 > NPC[B].Location.X + NPC[B].Location.Width / 2.0)
-                                                            NPC[A].Location.SpeedX += 0.05;
-                                                        else
-                                                            NPC[A].Location.SpeedX -= 0.05;
-                                                        if(NPC[A].Location.Y + NPC[A].Location.Height / 2.0 > NPC[B].Location.Y + NPC[B].Location.Height / 2.0)
-                                                            NPC[A].Location.SpeedY += 0.05;
-                                                        else
-                                                            NPC[A].Location.SpeedY -= 0.05;
-                                                        HitSpot = 0;
-                                                    }
-
-                                                    if(!NPC[B].Projectile && !NPC[A]->NoClipping && !NPC[B]->NoClipping)
-                                                    {
-                                                        if(((NPC[A].Type == NPCID_EXT_TURTLE || NPC[A].Type == NPCID_BLU_HIT_TURTLE_S4) && NPC[B]->IsAShell) || ((NPC[B].Type == NPCID_EXT_TURTLE || NPC[B].Type == NPCID_BLU_HIT_TURTLE_S4) && NPC[A]->IsAShell)) // Nekkid koopa kicking a shell
-                                                        {
-                                                            if(NPC[A].Type == NPCID_EXT_TURTLE || NPC[A].Type == NPCID_BLU_HIT_TURTLE_S4)
-                                                            {
-                                                                if(NPC[A].Location.SpeedY == Physics.NPCGravity || NPC[A].Slope > 0)
-                                                                {
-                                                                    // If .Direction = 1 And .Location.X + .Location.Width < NPC(B).Location.X + 3 Or (.Direction = -1 And .Location.X > NPC(B).Location.X + NPC(B).Location.Width - 3) Then
-                                                                    if((NPC[A].Direction == 1  && NPC[A].Location.X + NPC[A].Location.Width < NPC[B].Location.X + 4) ||
-                                                                       (NPC[A].Direction == -1 && NPC[A].Location.X > NPC[B].Location.X + NPC[B].Location.Width - 4))
-                                                                    {
-                                                                        if(NPC[B].Location.SpeedX == 0.0 && NPC[B].Effect == NPCEFF_NORMAL)
-                                                                        {
-                                                                            NPC[A].Special = 10;
-                                                                            Player[numPlayers + 1].Direction = NPC[A].Direction;
-                                                                            NPC[A].Location.X += -NPC[A].Direction;
-                                                                            NPCHit(B, 1, numPlayers + 1);
-                                                                        }
-                                                                    }
-                                                                }
-                                                            }
-                                                        }
-                                                        else if((HitSpot == 2 || HitSpot == 4) && NPC[A].Type != NPCID_SAW && NPC[B].Type != NPCID_SAW)
-                                                        {
-                                                            NPC[A].onWall = true;
-                                                            if(NPC[A].Direction == NPC[B].Direction)
-                                                            {
-                                                                if(NPC[A].Location.SpeedX * NPC[A].Direction > NPC[B].Location.SpeedX * NPC[B].Direction)
-                                                                {
-                                                                    if(NPC[A].Type != NPCID_BULLET && NPC[A].Type != NPCID_PLR_FIREBALL && NPC[A].Type != NPCID_PLR_ICEBALL)
-                                                                        NPC[A].TurnAround = true;
-                                                                }
-                                                                else if(NPC[A].Location.SpeedX * NPC[A].Direction < NPC[B].Location.SpeedX * NPC[B].Direction)
-                                                                    NPC[B].TurnAround = true;
-                                                                else
-                                                                {
-                                                                    NPC[A].TurnAround = true;
-                                                                    NPC[B].TurnAround = true;
-                                                                }
-                                                            }
-                                                            else
-                                                            {
-                                                                if(NPC[A].Type != NPCID_BULLET && NPC[A].Type != NPCID_PLR_FIREBALL && NPC[A].Type != NPCID_PLR_ICEBALL)
-                                                                    NPC[A].TurnAround = true;
-                                                                NPC[B].TurnAround = true;
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            }
+                                            NPC[B].Location.X = Block[C].Location.X + Block[C].Location.Width + 0.1;
+                                            NPC[A].Location.X = NPC[B].Location.X + NPC[B].Location.Width + 0.1;
+                                        }
+                                        else
+                                        {
+                                            NPC[B].Location.X = Block[C].Location.X - NPC[B].Location.Width - 0.1;
+                                            NPC[A].Location.X = NPC[B].Location.X - NPC[A].Location.Width - 0.1;
                                         }
                                     }
                                 }
                             }
                         }
+
+                        treeNPCUpdate(B);
+                        if(NPC[B].tempBlock > 0)
+                            treeNPCSplitTempBlock(B);
+                    }
+                    else if(NPC[A].Type == NPCID_TANK_TREADS)
+                        NPCHit(B, 8, A);
+                    else
+                    {
+                        if(!NPC[B]->IsABonus)
+                        {
+                            if(NPC[A].Type == NPCID_CANNONENEMY && NPC[B].Type == NPCID_BULLET)
+                                NPC[B].Projectile = true;
+                            else
+                            {
+                                bool tempBool = false; // This whole cluster stops friendly projectiles form killing riddin shells
+
+                                if(NPC[A]->IsAShell)
+                                {
+                                    for(auto C = 1; C <= numPlayers; C++)
+                                    {
+                                        if(Player[C].StandingOnNPC == A && NPC[B].CantHurtPlayer == C)
+                                        {
+                                            tempBool = true;
+                                            break;
+                                        }
+                                    }
+                                }
+
+                                if(NPC[B]->IsAShell)
+                                {
+                                    for(auto C = 1; C <= numPlayers; C++)
+                                    {
+                                        if(Player[C].StandingOnNPC == B && NPC[A].CantHurtPlayer == C)
+                                        {
+                                            tempBool = true;
+                                            break;
+                                        }
+                                    }
+                                }
+
+                                if(!(NPC[A].Type == NPCID_BULLET && NPC[A].Projectile))
+                                {
+                                    if(NPC[B]->IsAShell && NPC[B].Projectile)
+                                    {
+                                        if(!tempBool)
+                                            NPCHit(A, 3, B);
+                                    }
+                                    else
+                                    {
+                                        if(!tempBool)
+                                            NPCHit(A, 4, B);
+                                    }
+                                }
+
+                                if(!tempBool) // end cluster
+                                    NPCHit(B, 3, A);
+
+                                if(NPC[A].Type == NPCID_BULLET)
+                                {
+                                    if(NPC[B].Type == NPCID_MINIBOSS)
+                                    {
+                                        NPC[A].Location.SpeedX = -NPC[A].Location.SpeedX;
+                                        NPCHit(A, 4, B);
+                                    }
+                                    else if(NPC[B].Type == NPCID_CANNONENEMY)
+                                    {
+                                        NPC[A].Location.SpeedX = -NPC[A].Location.SpeedX;
+                                        PlaySoundSpatial(SFX_BlockHit, NPC[A].Location);
+                                        NPCHit(A, 4, A);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        else if(!(NPC[B].Type == NPCID_SPIT_BOSS_BALL && !NPC[B].Projectile))
+        {
+            int HitSpot = FindCollision(NPC[A].Location, NPC[B].Location);
+            if(NPCIsToad(NPC[A]) && NPC[A].Killed > 0)
+                HitSpot = 0;
+            if(NPCIsAParaTroopa(NPC[A]) && NPCIsAParaTroopa(NPC[B]))
+            {
+                if(NPC[A].Location.X + NPC[A].Location.Width / 2.0 > NPC[B].Location.X + NPC[B].Location.Width / 2.0)
+                    NPC[A].Location.SpeedX += 0.05;
+                else
+                    NPC[A].Location.SpeedX -= 0.05;
+                if(NPC[A].Location.Y + NPC[A].Location.Height / 2.0 > NPC[B].Location.Y + NPC[B].Location.Height / 2.0)
+                    NPC[A].Location.SpeedY += 0.05;
+                else
+                    NPC[A].Location.SpeedY -= 0.05;
+                HitSpot = 0;
+            }
+
+            if(!NPC[B].Projectile && !NPC[A]->NoClipping && !NPC[B]->NoClipping)
+            {
+                if(((NPC[A].Type == NPCID_EXT_TURTLE || NPC[A].Type == NPCID_BLU_HIT_TURTLE_S4) && NPC[B]->IsAShell) || ((NPC[B].Type == NPCID_EXT_TURTLE || NPC[B].Type == NPCID_BLU_HIT_TURTLE_S4) && NPC[A]->IsAShell)) // Nekkid koopa kicking a shell
+                {
+                    if(NPC[A].Type == NPCID_EXT_TURTLE || NPC[A].Type == NPCID_BLU_HIT_TURTLE_S4)
+                    {
+                        if(NPC[A].Location.SpeedY == Physics.NPCGravity || NPC[A].Slope > 0)
+                        {
+                            // If .Direction = 1 And .Location.X + .Location.Width < NPC(B).Location.X + 3 Or (.Direction = -1 And .Location.X > NPC(B).Location.X + NPC(B).Location.Width - 3) Then
+                            if((NPC[A].Direction == 1  && NPC[A].Location.X + NPC[A].Location.Width < NPC[B].Location.X + 4) ||
+                               (NPC[A].Direction == -1 && NPC[A].Location.X > NPC[B].Location.X + NPC[B].Location.Width - 4))
+                            {
+                                if(NPC[B].Location.SpeedX == 0.0 && NPC[B].Effect == NPCEFF_NORMAL)
+                                {
+                                    NPC[A].Special = 10;
+                                    Player[numPlayers + 1].Direction = NPC[A].Direction;
+                                    NPC[A].Location.X += -NPC[A].Direction;
+                                    NPCHit(B, 1, numPlayers + 1);
+                                }
+                            }
+                        }
+                    }
+                }
+                else if((HitSpot == 2 || HitSpot == 4) && NPC[A].Type != NPCID_SAW && NPC[B].Type != NPCID_SAW)
+                {
+                    NPC[A].onWall = true;
+                    if(NPC[A].Direction == NPC[B].Direction)
+                    {
+                        if(NPC[A].Location.SpeedX * NPC[A].Direction > NPC[B].Location.SpeedX * NPC[B].Direction)
+                        {
+                            if(NPC[A].Type != NPCID_BULLET && NPC[A].Type != NPCID_PLR_FIREBALL && NPC[A].Type != NPCID_PLR_ICEBALL)
+                                NPC[A].TurnAround = true;
+                        }
+                        else if(NPC[A].Location.SpeedX * NPC[A].Direction < NPC[B].Location.SpeedX * NPC[B].Direction)
+                            NPC[B].TurnAround = true;
+                        else
+                        {
+                            NPC[A].TurnAround = true;
+                            NPC[B].TurnAround = true;
+                        }
+                    }
+                    else
+                    {
+                        if(NPC[A].Type != NPCID_BULLET && NPC[A].Type != NPCID_PLR_FIREBALL && NPC[A].Type != NPCID_PLR_ICEBALL)
+                            NPC[A].TurnAround = true;
+                        NPC[B].TurnAround = true;
                     }
                 }
             }
