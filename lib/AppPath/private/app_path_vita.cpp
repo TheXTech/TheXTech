@@ -24,7 +24,7 @@ static std::string s_userDirectory;
 
 void AppPathP::initDefaultPaths(const std::string & /*userDirName*/)
 {
-    s_userDirectory = "ux0:data/TheXTech/";
+    s_userDirectory = "ux0:data/" THEXTECH_DIRECTORY_PREFIX "/";
 }
 
 std::string AppPathP::appDirectory()
@@ -40,6 +40,11 @@ std::string AppPathP::userDirectory()
 std::string AppPathP::assetsRoot()
 {
     return std::string();
+}
+
+AssetsPathType AppPathP::assetsRootType()
+{
+    return AssetsPathType::Single;
 }
 
 std::string AppPathP::settingsRoot()

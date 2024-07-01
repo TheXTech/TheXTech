@@ -28,6 +28,17 @@
 #endif
 
 
+/*!
+ * \brief Set of possible asset pack search path types
+ */
+enum AssetsPathType
+{
+    Legacy,   // search the path directly for asset pack (as legacy), and check for additional packs in assets subdirectory
+    Single,   // single modern asset pack
+    Multiple, // directory containing multiple subdirectories with modern asset packs
+};
+
+
 class AppPathManager
 {
 public:
@@ -68,16 +79,6 @@ public:
      * \return root passed to addAssetsRoot()
      */
     static std::string userAddedAssetsRoot(); // Read-Only
-
-    /*!
-     * \brief Set of possible asset pack search path types
-     */
-    enum AssetsPathType
-    {
-        Legacy,   // search the path directly for asset pack (as legacy), and check for additional packs in assets subdirectory
-        Single,   // single modern asset pack
-        Multiple, // directory containing multiple subdirectories with modern asset packs
-    };
 
     /*!
      * \brief Get a list of folders that should be searched for asset packs (each folder directly, and also each subdirectory in folder + "/assets"). Does not change after initAppPath() is called.
