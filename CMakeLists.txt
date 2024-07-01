@@ -754,6 +754,7 @@ set(THEXTECH_SRC
     src/npc/npc_hit.cpp
     src/npc/npc_kill.cpp
     src/npc/npc_update.cpp
+    src/npc/npc_update/npc_movement_logic.cpp
     src/npc/npc_frames.cpp
     src/npc/npc_bonus.cpp
     src/npc/npc_queues.cpp
