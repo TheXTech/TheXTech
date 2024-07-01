@@ -54,8 +54,6 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
 
     Location_t floorLocation; // was previously called tempLocation3
 
-    int B = 0;
-
     // This was previously shared between players, but is safe unless Block[tempSlope2] satisfies certain properties before tempSlope2 gets set
     double tempSlope2X = 0; // The old X before player was moved
 
@@ -1001,6 +999,8 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
             Player[A].Location.SpeedX = 0;
     }
 
+    int ceilingBlock = 0; // was called B
+
     if(ceilingBlock2 != 0) // Hitting a block from below
     {
         float C = Block[ceilingBlock1].Location.X + Block[ceilingBlock1].Location.Width * 0.5;
@@ -1015,42 +1015,31 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
             D = -D;
 
         if(C < D)
-            B = ceilingBlock1;
+            ceilingBlock = ceilingBlock1;
         else
-            B = ceilingBlock2;
+            ceilingBlock = ceilingBlock2;
     }
     else if(ceilingBlock1 != 0)
     {
-        B = ceilingBlock1;
-        if(Block[B].Location.X + Block[B].Location.Width - Player[A].Location.X <= 4)
+        ceilingBlock = ceilingBlock1;
+        if(Block[ceilingBlock].Location.X + Block[ceilingBlock].Location.Width - Player[A].Location.X <= 4)
         {
-            Player[A].Location.X = Block[B].Location.X + Block[B].Location.Width + 0.1;
-            B = 0;
+            Player[A].Location.X = Block[ceilingBlock].Location.X + Block[ceilingBlock].Location.Width + 0.1;
+            ceilingBlock = 0;
         }
-        else if(Player[A].Location.X + Player[A].Location.Width - Block[B].Location.X <= 4)
+        else if(Player[A].Location.X + Player[A].Location.Width - Block[ceilingBlock].Location.X <= 4)
         {
-            Player[A].Location.X = Block[B].Location.X - Player[A].Location.Width - 0.1;
-            B = 0;
+            Player[A].Location.X = Block[ceilingBlock].Location.X - Player[ceilingBlock].Location.Width - 0.1;
+            ceilingBlock = 0;
         }
     }
-    else
-        B = 0;
 
-    if(B > 0)
+    if(ceilingBlock > 0)
     {
-        // Netplay code
-//                    if(nPlay.Online == true && A == nPlay.MySlot + 1) // online stuffs
-//                    {
-//                        curLoc = Player[A].Location;
-//                        Player[A].Location = oldLoc;
-//                        Netplay::sendData Netplay::PutPlayerLoc(nPlay.MySlot);
-//                        Player[A].Location = curLoc;
-//                    }
-
         PlaySoundSpatial(SFX_BlockHit, Player[A].Location);
         Player[A].Jump = 0;
-        Player[A].Location.Y = Block[B].Location.Y + Block[B].Location.Height + 0.01;
-        Player[A].Location.SpeedY = -0.01 + Block[B].Location.SpeedY;
+        Player[A].Location.Y = Block[ceilingBlock].Location.Y + Block[ceilingBlock].Location.Height + 0.01;
+        Player[A].Location.SpeedY = -0.01 + Block[ceilingBlock].Location.SpeedY;
 
         if(Player[A].Fairy)
             Player[A].Location.SpeedY = 2;
@@ -1065,15 +1054,15 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
             Player[A].Location.SpeedY = 2;
 
         if(Player[A].Mount != 2) // Tell the block it was hit
-            BlockHit(B, false, A);
+            BlockHit(ceilingBlock, false, A);
 
-        if(Block[B].Type == 55) // If it is a bouncy block the knock the player down
+        if(Block[ceilingBlock].Type == 55) // If it is a bouncy block the knock the player down
             Player[A].Location.SpeedY = 3;
 
         if(Player[A].State > 1 && Player[A].Character != 5) // If the player was big ask the block nicely to die
         {
-            if(Player[A].Mount != 2 && Block[B].Type != 293)
-                BlockHitHard(B);
+            if(Player[A].Mount != 2 && Block[ceilingBlock].Type != 293)
+                BlockHitHard(ceilingBlock);
         }
     }
 
