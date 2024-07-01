@@ -143,13 +143,34 @@ void NPCCollide(int A)
             continue;
         }
 
-        if(!(NPC[B].Type != NPCID_CANNONITEM && NPC[B].Type != NPCID_SWORDBEAM && NPC[B].Type != NPCID_TOOTHYPIPE && NPC[B].Type != NPCID_SPRING &&
-           NPC[B].Type != NPCID_HEAVY_THROWN && NPC[B].Type != NPCID_KEY && NPC[B].Type != NPCID_COIN_SWITCH && NPC[B].Type != NPCID_GRN_BOOT &&
-           NPC[B].Type != NPCID_VEHICLE && NPC[B].Type != NPCID_TOOTHY && NPC[B].Type != NPCID_CONVEYOR && NPC[B].Type != NPCID_METALBARREL &&
-           NPC[B].Type != NPCID_RED_BOOT && NPC[B].Type != NPCID_BLU_BOOT && !NPC[B].Generator &&
-           !((NPC[A].Type == NPCID_PLR_FIREBALL || NPC[A].Type == NPCID_PLR_ICEBALL) && NPC[B].Type == NPCID_FLIPPED_RAINBOW_SHELL) &&
-           NPC[B].Type != NPCID_TIMER_S2 && NPC[B].Type != NPCID_FLY_BLOCK && NPC[B].Type != NPCID_FLY_CANNON && NPC[B].Type != NPCID_DOOR_MAKER &&
-           NPC[B].Type != NPCID_MAGIC_DOOR && NPC[B].Type != NPCID_CHAR3_HEAVY && NPC[B].Type != NPCID_PLR_HEAVY && NPC[B].Type != NPCID_CHAR4_HEAVY))
+        // third exclusion condition
+        // if(!(NPC[B].Type != NPCID_CANNONITEM && NPC[B].Type != NPCID_SWORDBEAM && NPC[B].Type != NPCID_TOOTHYPIPE && NPC[B].Type != NPCID_SPRING &&
+        //    NPC[B].Type != NPCID_HEAVY_THROWN && NPC[B].Type != NPCID_KEY && NPC[B].Type != NPCID_COIN_SWITCH && NPC[B].Type != NPCID_GRN_BOOT &&
+        //    NPC[B].Type != NPCID_VEHICLE && NPC[B].Type != NPCID_TOOTHY && NPC[B].Type != NPCID_CONVEYOR && NPC[B].Type != NPCID_METALBARREL &&
+        //    NPC[B].Type != NPCID_RED_BOOT && NPC[B].Type != NPCID_BLU_BOOT && !NPC[B].Generator &&
+        //    !((NPC[A].Type == NPCID_PLR_FIREBALL || NPC[A].Type == NPCID_PLR_ICEBALL) && NPC[B].Type == NPCID_FLIPPED_RAINBOW_SHELL) &&
+        //    NPC[B].Type != NPCID_TIMER_S2 && NPC[B].Type != NPCID_FLY_BLOCK && NPC[B].Type != NPCID_FLY_CANNON && NPC[B].Type != NPCID_DOOR_MAKER &&
+        //    NPC[B].Type != NPCID_MAGIC_DOOR && NPC[B].Type != NPCID_CHAR3_HEAVY && NPC[B].Type != NPCID_PLR_HEAVY && NPC[B].Type != NPCID_CHAR4_HEAVY))
+        // {
+        //     continue;
+        // }
+
+        if(NPC[B].Type == NPCID_CANNONITEM || NPC[B].Type == NPCID_SWORDBEAM || NPC[B].Type == NPCID_TOOTHYPIPE || NPC[B].Type == NPCID_SPRING ||
+           NPC[B].Type == NPCID_HEAVY_THROWN || NPC[B].Type == NPCID_KEY || NPC[B].Type == NPCID_COIN_SWITCH || NPC[B].Type == NPCID_GRN_BOOT ||
+           NPC[B].Type == NPCID_VEHICLE || NPC[B].Type == NPCID_TOOTHY || NPC[B].Type == NPCID_CONVEYOR || NPC[B].Type == NPCID_METALBARREL ||
+           NPC[B].Type == NPCID_RED_BOOT || NPC[B].Type == NPCID_BLU_BOOT)
+        {
+            continue;
+        }
+
+        if(NPC[B].Generator)
+            continue;
+
+        if((NPC[A].Type == NPCID_PLR_FIREBALL || NPC[A].Type == NPCID_PLR_ICEBALL) && NPC[B].Type == NPCID_FLIPPED_RAINBOW_SHELL)
+            continue;
+
+        if(NPC[B].Type == NPCID_TIMER_S2 || NPC[B].Type == NPCID_FLY_BLOCK || NPC[B].Type == NPCID_FLY_CANNON || NPC[B].Type == NPCID_DOOR_MAKER ||
+           NPC[B].Type == NPCID_MAGIC_DOOR || NPC[B].Type == NPCID_CHAR3_HEAVY || NPC[B].Type == NPCID_PLR_HEAVY || NPC[B].Type == NPCID_CHAR4_HEAVY)
         {
             continue;
         }
