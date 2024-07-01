@@ -36,7 +36,7 @@
 
 #include "main/trees.h"
 
-void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, const bool movingBlock, const int tempHit3, const float oldSpeedY)
+void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, const bool movingBlock, const int floorBlock, const float oldSpeedY)
 {
     int floorNpc1 = 0;
     int floorNpc2 = 0;
@@ -873,9 +873,9 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                                             Player[A].RunCount = 0;
                                             tempHitSpeed = NPC[B].Location.SpeedX + NPC[B].BeltSpeed;
 
-                                            if(tempHit3 != 0)
+                                            if(floorBlock != 0)
                                             {
-                                                if(std::abs(Block[tempHit3].Location.X - NPC[B].Location.X) < 1)
+                                                if(std::abs(Block[floorBlock].Location.X - NPC[B].Location.X) < 1)
                                                 {
                                                     Player[A].Location.X = NPC[B].Location.X - Player[A].Location.Width - 1;
                                                     Player[A].Location.SpeedY = oldSpeedY;
@@ -917,9 +917,9 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                                             Player[A].RunCount = 0;
                                             tempHitSpeed = NPC[B].Location.SpeedX + NPC[B].BeltSpeed;
 
-                                            if(tempHit3 != 0)
+                                            if(floorBlock != 0)
                                             {
-                                                if(std::abs(Block[tempHit3].Location.X + Block[tempHit3].Location.Width - NPC[B].Location.X - NPC[B].Location.Width) < 1)
+                                                if(std::abs(Block[floorBlock].Location.X + Block[floorBlock].Location.Width - NPC[B].Location.X - NPC[B].Location.Width) < 1)
                                                 {
                                                     Player[A].Location.X = NPC[B].Location.X + NPC[B].Location.Width + 1;
                                                     Player[A].Location.SpeedY = oldSpeedY;

@@ -24,9 +24,9 @@
 #define PLAYER_UPDATE_PRIV_H
 
 // most of these routines were originally part of UpdatePlayer
-void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, const bool movingBlock, const int tempHit3, const float oldSpeedY);
+void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, const bool movingBlock, const int floorBlock, const float oldSpeedY);
 
-void PlayerBlockLogic(int A, int& tempHit3, bool& movingBlock, bool& DontResetGrabTime, float cursed_value_C);
+void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontResetGrabTime, float cursed_value_C);
 
 void PlayerVineLogic(int A);
 bool PlayerFairyOnVine(int A);

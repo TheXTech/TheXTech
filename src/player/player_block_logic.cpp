@@ -34,7 +34,7 @@
 
 #include "main/trees.h"
 
-void PlayerBlockLogic(int A, int& tempHit3, bool& movingBlock, bool& DontResetGrabTime, float cursed_value_C)
+void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontResetGrabTime, float cursed_value_C)
 {
     int oldSlope = Player[A].Slope;
     Player[A].Slope = 0;
@@ -52,7 +52,7 @@ void PlayerBlockLogic(int A, int& tempHit3, bool& movingBlock, bool& DontResetGr
     int ceilingBlock1 = 0;
     int ceilingBlock2 = 0;
 
-    Location_t tempLocation3;
+    Location_t floorLocation; // was previously called tempLocation3
 
     int B = 0;
 
@@ -287,24 +287,24 @@ void PlayerBlockLogic(int A, int& tempHit3, bool& movingBlock, bool& DontResetGr
                                         Slope = 1;
 
                                     // if we're already on top of another (higher or more leftwards, at level load time) block this frame, consider canceling it
-                                    if(tempHit3 > 0)
+                                    if(floorBlock > 0)
                                     {
                                         // the bug this is fixing is vanilla, but this case happens for a single frame every time a slope falls through ground since TheXTech 1.3.6,
                                         // and only in the rare case where a slope falls through ground *it was originally below* in vanilla
-                                        if(g_config.fix_player_downward_clip && !CompareWalkBlock(tempHit3, B, Player[A].Location))
+                                        if(g_config.fix_player_downward_clip && !CompareWalkBlock(floorBlock, B, Player[A].Location))
                                         {
                                             // keep the old block, other conditions are VERY likely to cancel it
                                         }
-                                        else if(!BlockIsSizable[Block[tempHit3].Type])
+                                        else if(!BlockIsSizable[Block[floorBlock].Type])
                                         {
-                                            if(Block[tempHit3].Location.Y != Block[B].Location.Y)
-                                                tempHit3 = 0;
+                                            if(Block[floorBlock].Location.Y != Block[B].Location.Y)
+                                                floorBlock = 0;
                                         }
                                         else
                                         {
                                             // NOTE: looks like a good place for a vb6-style fEqual
-                                            if(Block[tempHit3].Location.Y == Block[B].Location.Y + Block[B].Location.Height)
-                                                tempHit3 = 0;
+                                            if(Block[floorBlock].Location.Y == Block[B].Location.Y + Block[B].Location.Height)
+                                                floorBlock = 0;
                                         }
                                     }
 
@@ -520,35 +520,35 @@ void PlayerBlockLogic(int A, int& tempHit3, bool& movingBlock, bool& DontResetGr
                                     }
                                 }
 
-                                if(tempHit3 == 0) // For walking
+                                if(floorBlock == 0) // For walking
                                 {
-                                    tempHit3 = B;
-                                    tempLocation3 = Block[B].Location;
+                                    floorBlock = B;
+                                    floorLocation = Block[B].Location;
                                 }
                                 else // Find the best block to walk on if touching multiple blocks
                                 {
                                     if(g_config.fix_player_downward_clip)
                                     {
-                                        if(CompareWalkBlock(tempHit3, B, Player[A].Location))
+                                        if(CompareWalkBlock(floorBlock, B, Player[A].Location))
                                         {
-                                            tempHit3 = B;
-                                            tempLocation3 = Block[B].Location;
+                                            floorBlock = B;
+                                            floorLocation = Block[B].Location;
                                         }
                                     }
                                     else // Using old code
                                     {
-                                        if(Block[B].Location.SpeedY != 0 && Block[tempHit3].Location.SpeedY == 0)
+                                        if(Block[B].Location.SpeedY != 0 && Block[floorBlock].Location.SpeedY == 0)
                                         {
-                                            tempHit3 = B;
-                                            tempLocation3 = Block[B].Location;
+                                            floorBlock = B;
+                                            floorLocation = Block[B].Location;
                                         }
-                                        else if(Block[B].Location.SpeedY == 0 && Block[tempHit3].Location.SpeedY != 0)
+                                        else if(Block[B].Location.SpeedY == 0 && Block[floorBlock].Location.SpeedY != 0)
                                         {
                                         }
                                         else
                                         {
                                             cursed_value_C = Block[B].Location.X + Block[B].Location.Width * 0.5;
-                                            float D = Block[tempHit3].Location.X + Block[tempHit3].Location.Width * 0.5;
+                                            float D = Block[floorBlock].Location.X + Block[floorBlock].Location.Width * 0.5;
 
                                             cursed_value_C += -(Player[A].Location.X + Player[A].Location.Width * 0.5);
                                             D += -(Player[A].Location.X + Player[A].Location.Width * 0.5);
@@ -557,14 +557,14 @@ void PlayerBlockLogic(int A, int& tempHit3, bool& movingBlock, bool& DontResetGr
                                             if(D < 0)
                                                 D = -D;
                                             if(cursed_value_C < D)
-                                                tempHit3 = B;
+                                                floorBlock = B;
                                         }
 
                                         // if this block is moving up give it priority
-                                        if(Block[B].Location.SpeedY < 0 && Block[B].Location.Y < Block[tempHit3].Location.Y)
+                                        if(Block[B].Location.SpeedY < 0 && Block[B].Location.Y < Block[floorBlock].Location.Y)
                                         {
-                                            tempHit3 = B;
-                                            tempLocation3 = Block[B].Location;
+                                            floorBlock = B;
+                                            floorLocation = Block[B].Location;
                                         }
                                     }
                                 }
@@ -758,9 +758,8 @@ void PlayerBlockLogic(int A, int& tempHit3, bool& movingBlock, bool& DontResetGr
         }
     }
 
-    if(tempHit3 > 0) // For walking
+    if(floorBlock > 0) // For walking
     {
-
         if(Player[A].StandingOnNPC == -A) // fors standing on movable blocks
         {
             if(NPC[Player[A].StandingOnNPC].Special2 != 0)
@@ -772,20 +771,20 @@ void PlayerBlockLogic(int A, int& tempHit3, bool& movingBlock, bool& DontResetGr
         }
 
         // diggable dirt
-        if(Block[tempHit3].Type == 370 && Player[A].StandingOnNPC <= 0) // dig dirt
+        if(Block[floorBlock].Type == 370 && Player[A].StandingOnNPC <= 0) // dig dirt
         {
             DontResetGrabTime = true;
-            B = tempHit3;
+            // B = floorBlock;
             if(Player[A].TailCount == 0 && Player[A].Controls.Down && Player[A].Controls.Run && Player[A].Mount == 0 && !Player[A].Stoned && Player[A].HoldingNPC == 0 && (Player[A].GrabTime > 0 || Player[A].RunRelease))
             {
                 if((Player[A].GrabTime >= 12 && Player[A].Character < 3) || (Player[A].GrabTime >= 16 && Player[A].Character == 3) || (Player[A].GrabTime >= 8 && Player[A].Character == 4))
                 {
                     Player[A].Location.SpeedX = Player[A].GrabSpeed;
                     Player[A].GrabSpeed = 0;
-                    Block[B].Hidden = true;
-                    Block[B].Layer = LAYER_DESTROYED_BLOCKS;
-                    syncLayersTrees_Block(B);
-                    NewEffect(EFFID_SMOKE_S3, Block[B].Location);
+                    Block[floorBlock].Hidden = true;
+                    Block[floorBlock].Layer = LAYER_DESTROYED_BLOCKS;
+                    syncLayersTrees_Block(floorBlock);
+                    NewEffect(EFFID_SMOKE_S3, Block[floorBlock].Location);
                     Effect[numEffects].Location.SpeedY = -2;
                     Player[A].GrabTime = 0;
                 }
@@ -806,20 +805,9 @@ void PlayerBlockLogic(int A, int& tempHit3, bool& movingBlock, bool& DontResetGr
 
         if(tempHit2)
         {
-            if(WalkingCollision(Player[A].Location, Block[tempHit3].Location))
+            if(WalkingCollision(Player[A].Location, Block[floorBlock].Location))
             {
-//                            if(nPlay.Online == true && A == nPlay.MySlot + 1) // online stuffs
-//                            {
-//                                curLoc = Player[A].Location;
-//                                Player[A].Location = oldLoc;
-//                                if(Block[tempHit3].Type == 55 && FreezeNPCs == false)
-//                                    Netplay::sendData Netplay::PutPlayerLoc(nPlay.MySlot);
-//                                else if(Player[A].SpinJump == true && (Block[tempHit3].Type == 90 || Block[tempHit3].Type == 526) && Player[A].State > 1 && Block[tempHit3].Special == 0)
-//                                    Netplay::sendData Netplay::PutPlayerLoc(nPlay.MySlot) + "1l" + std::to_string(A) + LB;
-//                                Player[A].Location = curLoc;
-//                            }
-
-                Player[A].Location.Y = tempLocation3.Y - Player[A].Location.Height;
+                Player[A].Location.Y = floorLocation.Y - Player[A].Location.Height;
                 if(Player[A].GroundPound)
                 {
                     YoshiPound(A, Player[A].Mount, true);
@@ -829,25 +817,25 @@ void PlayerBlockLogic(int A, int& tempHit3, bool& movingBlock, bool& DontResetGr
                     YoshiPound(A, Player[A].Mount);
 
                 Player[A].Location.SpeedY = 0;
-                if(tempLocation3.SpeedX != 0.0 || tempLocation3.SpeedY != 0.0)
+                if(floorLocation.SpeedX != 0.0 || floorLocation.SpeedY != 0.0)
                 {
                     NPC[-A] = NPC_t();
-                    NPC[-A].Location = tempLocation3;
+                    NPC[-A].Location = floorLocation;
                     NPC[-A].Type = NPCID_METALBARREL;
                     NPC[-A].Active = true;
                     NPC[-A].TimeLeft = 100;
                     NPC[-A].Section = Player[A].Section;
-                    NPC[-A].Special = tempHit3;
+                    NPC[-A].Special = floorBlock;
                     Player[A].StandingOnNPC = -A;
                     movingBlock = true;
                     Player[A].Location.SpeedY = 12;
                 }
 
-                if(Block[tempHit3].Type == 55 && !FreezeNPCs) // Make the player jump if the block is bouncy
+                if(Block[floorBlock].Type == 55 && !FreezeNPCs) // Make the player jump if the block is bouncy
                 {
                     if(!Player[A].Slide)
                         Player[A].Multiplier = 0;
-                    BlockHit(tempHit3, true);
+                    BlockHit(floorBlock, true);
                     Player[A].Location.SpeedY = Physics.PlayerJumpVelocity;
                     PlaySoundSpatial(SFX_BlockHit, Player[A].Location);
                     if(Player[A].Controls.Jump || Player[A].Controls.AltJump)
@@ -861,14 +849,14 @@ void PlayerBlockLogic(int A, int& tempHit3, bool& movingBlock, bool& DontResetGr
                     }
                 }
 
-                if(Player[A].SpinJump && (Block[tempHit3].Type == 90 || Block[tempHit3].Type == 526) && Player[A].State > 1 && Block[tempHit3].Special == 0)
+                if(Player[A].SpinJump && (Block[floorBlock].Type == 90 || Block[floorBlock].Type == 526) && Player[A].State > 1 && Block[floorBlock].Special == 0)
                 {
                     Player[A].Location.SpeedY = Physics.PlayerJumpVelocity;
-                    Block[tempHit3].Kill = true;
+                    Block[floorBlock].Kill = true;
                     iBlocks += 1;
-                    iBlock[iBlocks] = tempHit3;
+                    iBlock[iBlocks] = floorBlock;
                     // HitSpot = 0; // this definition is never used
-                    tempHit3 = 0;
+                    floorBlock = 0;
                     Player[A].Jump = 7;
 
                     if(Player[A].Character == 2)
@@ -884,21 +872,10 @@ void PlayerBlockLogic(int A, int& tempHit3, bool& movingBlock, bool& DontResetGr
         }
         else
         {
-//                        if(nPlay.Online == true && A == nPlay.MySlot + 1) // online stuffs
-//                        {
-//                            curLoc = Player[A].Location;
-//                            Player[A].Location = oldLoc;
-//                            if(Block[tempHit3].Type == 55 && FreezeNPCs == false)
-//                                Netplay::sendData Netplay::PutPlayerLoc(nPlay.MySlot);
-//                            else if(Player[A].SpinJump == true && (Block[tempHit3].Type == 90 || Block[tempHit3].Type == 526) && Player[A].State > 1 && Block[tempHit3].Special == 0)
-//                                Netplay::sendData Netplay::PutPlayerLoc(nPlay.MySlot) + "1l" + std::to_string(A) + LB;
-//                            Player[A].Location = curLoc;
-//                        }
-
-            Player[A].Location.Y = tempLocation3.Y - Player[A].Location.Height;
+            Player[A].Location.Y = floorLocation.Y - Player[A].Location.Height;
             if(Player[A].StandingOnNPC != 0)
             {
-                if(NPC[Player[A].StandingOnNPC].Location.Y <= tempLocation3.Y && Player[A].StandingOnNPC != Player[A].HoldingNPC)
+                if(NPC[Player[A].StandingOnNPC].Location.Y <= floorLocation.Y && Player[A].StandingOnNPC != Player[A].HoldingNPC)
                     Player[A].Location.Y = NPC[Player[A].StandingOnNPC].Location.Y - Player[A].Location.Height;
             }
 
@@ -913,15 +890,15 @@ void PlayerBlockLogic(int A, int& tempHit3, bool& movingBlock, bool& DontResetGr
             if(Player[A].Slope == 0 || Player[A].Slide)
                 Player[A].Location.SpeedY = 0;
 
-            if(tempLocation3.SpeedX != 0.0 || tempLocation3.SpeedY != 0.0)
+            if(floorLocation.SpeedX != 0.0 || floorLocation.SpeedY != 0.0)
             {
                 NPC[-A] = NPC_t();
-                NPC[-A].Location = tempLocation3;
+                NPC[-A].Location = floorLocation;
                 NPC[-A].Type = NPCID_METALBARREL;
                 NPC[-A].Active = true;
                 NPC[-A].TimeLeft = 100;
                 NPC[-A].Section = Player[A].Section;
-                NPC[-A].Special = tempHit3;
+                NPC[-A].Special = floorBlock;
                 Player[A].StandingOnNPC = -A;
                 movingBlock = true;
                 Player[A].Location.SpeedY = 12;
@@ -948,9 +925,9 @@ void PlayerBlockLogic(int A, int& tempHit3, bool& movingBlock, bool& DontResetGr
                     Player[A].Location.SpeedY = 0;
             }
 
-            if(Block[tempHit3].Type == 55 && !FreezeNPCs) // Make the player jump if the block is bouncy
+            if(Block[floorBlock].Type == 55 && !FreezeNPCs) // Make the player jump if the block is bouncy
             {
-                BlockHit(tempHit3, true);
+                BlockHit(floorBlock, true);
 
                 if(!Player[A].Slide)
                     Player[A].Multiplier = 0;
@@ -971,13 +948,13 @@ void PlayerBlockLogic(int A, int& tempHit3, bool& movingBlock, bool& DontResetGr
                 }
             }
 
-            if(Player[A].SpinJump && (Block[tempHit3].Type == 90 || Block[tempHit3].Type == 526) && Player[A].State > 1 && Block[tempHit3].Special == 0)
+            if(Player[A].SpinJump && (Block[floorBlock].Type == 90 || Block[floorBlock].Type == 526) && Player[A].State > 1 && Block[floorBlock].Special == 0)
             {
                 Player[A].Location.SpeedY = Physics.PlayerJumpVelocity;
-                Block[tempHit3].Kill = true;
+                Block[floorBlock].Kill = true;
                 iBlocks += 1;
-                iBlock[iBlocks] = tempHit3;
-                tempHit3 = 0;
+                iBlock[iBlocks] = floorBlock;
+                floorBlock = 0;
                 Player[A].Jump = 7;
 
                 if(Player[A].Character == 2)
@@ -989,9 +966,6 @@ void PlayerBlockLogic(int A, int& tempHit3, bool& movingBlock, bool& DontResetGr
                     Player[A].Location.SpeedY = Physics.PlayerJumpVelocity * 0.5;
                 }
             }
-
-
-
         }
     }
 

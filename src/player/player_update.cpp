@@ -376,18 +376,18 @@ void UpdatePlayer()
                 float oldSpeedY = Player[A].Location.SpeedY; // holds the players previous Y speed
                 bool DontResetGrabTime = false; // helps with grabbing things from the top
                 bool movingBlock = false; // helps with collisions for moving blocks
-                int tempHit3 = 0;
+                int floorBlock = 0; // was previously called tempHit3
 
                 Player[A].Slippy = false;
 
-                PlayerBlockLogic(A, tempHit3, movingBlock, DontResetGrabTime, cursed_value_C);
+                PlayerBlockLogic(A, floorBlock, movingBlock, DontResetGrabTime, cursed_value_C);
 
                 // Vine collisions.
                 PlayerVineLogic(A);
 
                 // Check NPC collisions
                 int MessageNPC = 0;
-                PlayerNPCLogic(A, tempSpring, tempShell, MessageNPC, movingBlock, tempHit3, oldSpeedY);
+                PlayerNPCLogic(A, tempSpring, tempShell, MessageNPC, movingBlock, floorBlock, oldSpeedY);
 
                 // reduce player's multiplier
                 if((Player[A].Location.SpeedY == 0 || Player[A].StandingOnNPC != 0 || Player[A].Slope > 0) && !Player[A].Slide && !FreezeNPCs)
