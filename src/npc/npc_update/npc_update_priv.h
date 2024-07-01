@@ -26,4 +26,6 @@
 // most of these routines were originally part of UpdateNPCs
 void NPCMovementLogic(int A, float& speedVar);
 
+void NPCBlockLogic(int A, double& tempHit, int& tempHitBlock, float& tempSpeedA, const int numTempBlock, const float speedVar);
+
 #endif // NPC_UPDATE_PRIV_H
