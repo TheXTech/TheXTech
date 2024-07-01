@@ -115,10 +115,7 @@ void NPCCollide(int A)
 
     for(int B : treeNPCQuery(NPC[A].Location, SORTMODE_ID))
     {
-        if(!(B != A && NPC[B].Active))
-            continue;
-
-        if(!(!NPC[B]->IsACoin))
+        if(B == A || !NPC[B].Active || NPC[B]->IsACoin)
             continue;
 
         if(!CheckCollision(NPC[A].Location, NPC[B].Location))
@@ -127,18 +124,53 @@ void NPCCollide(int A)
         // if(!(B != A))
         //     continue;
 
-        if(!(!(NPC[B].Type == NPCID_MINIBOSS && NPC[B].Special == 4) && !(NPCIsToad(NPC[B])) &&
-           !(NPC[B].Type >= NPCID_PLATFORM_S3 && NPC[B].Type <= NPCID_PLATFORM_S1) && !(NPC[B].Type >= NPCID_CARRY_BLOCK_A && NPC[B].Type <= NPCID_CARRY_BLOCK_D) &&
-           NPC[B].Type != NPCID_LIFT_SAND && NPC[B].Type != NPCID_SICK_BOSS_BALL && !NPC[B]->IsAVine &&
-           NPC[B].Type != NPCID_PLR_ICEBALL && NPC[B].Type != NPCID_FIRE_CHAIN && NPC[B].Type != NPCID_CHAR3_HEAVY))
-        {
-            continue;
-        }
+        // first exclusion condition
+        // if(!(!(NPC[B].Type == NPCID_MINIBOSS && NPC[B].Special == 4) && !(NPCIsToad(NPC[B])) &&
+        //    !(NPC[B].Type >= NPCID_PLATFORM_S3 && NPC[B].Type <= NPCID_PLATFORM_S1) && !(NPC[B].Type >= NPCID_CARRY_BLOCK_A && NPC[B].Type <= NPCID_CARRY_BLOCK_D) &&
+        //    NPC[B].Type != NPCID_LIFT_SAND && NPC[B].Type != NPCID_SICK_BOSS_BALL && !NPC[B]->IsAVine &&
+        //    NPC[B].Type != NPCID_PLR_ICEBALL && NPC[B].Type != NPCID_FIRE_CHAIN && NPC[B].Type != NPCID_CHAR3_HEAVY))
+        // {
+        //     continue;
+        // }
 
+        if(NPC[B].Type == NPCID_MINIBOSS && NPC[B].Special == 4)
+            continue;
+
+        if(NPCIsToad(NPC[B]))
+            continue;
+
+        if(NPC[B].Type >= NPCID_PLATFORM_S3 && NPC[B].Type <= NPCID_PLATFORM_S1)
+            continue;
+
+        if(NPC[B].Type >= NPCID_CARRY_BLOCK_A && NPC[B].Type <= NPCID_CARRY_BLOCK_D)
+            continue;
+
+        if(NPC[B].Type == NPCID_LIFT_SAND || NPC[B].Type == NPCID_SICK_BOSS_BALL)
+            continue;
+
+        if(NPC[B]->IsAVine)
+            continue;
+
+        if(NPC[B].Type == NPCID_PLR_ICEBALL || NPC[B].Type == NPCID_FIRE_CHAIN || NPC[B].Type == NPCID_CHAR3_HEAVY)
+            continue;
+
+        // second exclusion condition
         // If Not (NPC(B).Type = 133) And NPC(B).HoldingPlayer = 0 And .Killed = 0 And NPC(B).JustActivated = 0 And NPC(B).Inert = False And NPC(B).Killed = 0 Then
-        if(!(NPC[B].Type != NPCID_SPIT_GUY_BALL && !(NPCIsVeggie(NPC[B]) && NPCIsVeggie(NPC[A])) &&
-           NPC[B].HoldingPlayer == 0 && NPC[A].Killed == 0 &&
-           NPC[B].JustActivated == 0 && !NPC[B].Inert && NPC[B].Killed == 0))
+        // if(!(NPC[B].Type != NPCID_SPIT_GUY_BALL && !(NPCIsVeggie(NPC[B]) && NPCIsVeggie(NPC[A])) &&
+        //    NPC[B].HoldingPlayer == 0 && NPC[A].Killed == 0 &&
+        //    NPC[B].JustActivated == 0 && !NPC[B].Inert && NPC[B].Killed == 0))
+        // {
+        //     continue;
+        // }
+
+        if(NPC[B].Type == NPCID_SPIT_GUY_BALL)
+            continue;
+
+        if(NPCIsVeggie(NPC[B]) && NPCIsVeggie(NPC[A]))
+            continue;
+
+        if(NPC[B].HoldingPlayer != 0 || NPC[A].Killed != 0 ||
+           NPC[B].JustActivated != 0 || NPC[B].Inert || NPC[B].Killed != 0)
         {
             continue;
         }
