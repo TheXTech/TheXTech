@@ -1582,15 +1582,8 @@ void UpdateNPCs()
                     if(NPC[A].Pinched.Moving > 0)
                         NPC[A].Pinched.Moving -= 1;
 
-                    float oldBeltSpeed = NPC[A].BeltSpeed;
-                    bool resetBeltSpeed = false;
-                    bool beltClear = false; // "stops belt movement when on a wall" (Redigit)
                     NPC[A].BeltSpeed = 0;
-                    float beltCount = 0;
-                    float addBelt = 0;
                     NPC[A].onWall = false;
-                    int oldSlope = NPC[A].Slope; // previous sloped block the npc was on
-                    bool SlopeTurn = false;
                     NPC[A].Slope = 0;
                     if(NPC[A].Location.X < -(FLBlocks - 1) * 32)
                         NPC[A].Location.X = -(FLBlocks - 1) * 32;
@@ -1607,9 +1600,19 @@ void UpdateNPCs()
                     {
                         double tempHit = 0; // height of block NPC is walking on
                         int tempHitBlock = 0; // index of block NPC is walking on
+                        float tempSpeedA = 0; // speed of ground the NPC is possibly standing on
+
+                        float oldBeltSpeed = NPC[A].BeltSpeed;
+                        bool resetBeltSpeed = false;
+                        bool beltClear = false; // "stops belt movement when on a wall" (Redigit)
+                        float beltCount = 0;
+                        float addBelt = 0;
+
+                        int oldSlope = NPC[A].Slope; // previous sloped block the npc was on
+                        bool SlopeTurn = false;
+
                         int tempBlockHit[3] = {0}; // keeps track of up to two blocks hit from below
                         int tempHitIsSlope = 0;
-                        float tempSpeedA = 0; // speed of ground the NPC is possibly standing on
 
                         if((!NPC[A]->NoClipping || NPC[A].Projectile) &&
                            !(NPC[A].Type == NPCID_SPIT_BOSS_BALL && NPC[A].Projectile) && NPC[A].Type != NPCID_TOOTHY &&
@@ -2868,25 +2871,6 @@ void UpdateNPCs()
                             }
                         }
 
-                        if(NPC[A]->IsAShell)
-                        {
-                            if(NPC[A].Special > 0)
-                            {
-                                NPC[A].Location.SpeedX = NPC[A].Location.SpeedX * 0.9;
-                                NPC[A].Frame = 0;
-                                NPC[A].FrameCount = 0;
-                                if(NPC[A].Location.SpeedX > -0.3 && NPC[A].Location.SpeedX < 0.3)
-                                {
-                                    NPC[A].Location.SpeedX = 0;
-                                    NPC[A].Special = 0;
-                                    NPC[A].Projectile = false;
-                                }
-                            }
-                        }
-
-                        if(NPC[A].Type == NPCID_TANK_TREADS && NPC[A].Location.SpeedX != 0)
-                            NPC[A].Location.SpeedX = 1 * NPC[A].DefaultDirection;
-
                         // beltspeed code
                         if(!resetBeltSpeed)
                         {
@@ -2966,12 +2950,31 @@ void UpdateNPCs()
                         if(beltClear)
                             NPC[A].BeltSpeed = 0;
 
-
-                        // possible usually-nulled function pointer for logic between block and NPC collisions
-
                         if(NPC[A].Type == NPCID_STONE_S3 || NPC[A].Type == NPCID_STONE_S4)
                             NPC[A].BeltSpeed = 0;
+
                         // End Block Collision
+                        // possible usually-nulled function pointer for logic between block and NPC collisions
+
+                        if(NPC[A]->IsAShell)
+                        {
+                            if(NPC[A].Special > 0)
+                            {
+                                NPC[A].Location.SpeedX = NPC[A].Location.SpeedX * 0.9;
+                                NPC[A].Frame = 0;
+                                NPC[A].FrameCount = 0;
+                                if(NPC[A].Location.SpeedX > -0.3 && NPC[A].Location.SpeedX < 0.3)
+                                {
+                                    NPC[A].Location.SpeedX = 0;
+                                    NPC[A].Special = 0;
+                                    NPC[A].Projectile = false;
+                                }
+                            }
+                        }
+
+                        if(NPC[A].Type == NPCID_TANK_TREADS && NPC[A].Location.SpeedX != 0)
+                            NPC[A].Location.SpeedX = 1 * NPC[A].DefaultDirection;
+
                         // If .Type = 12 Then .Projectile = True 'Stop the big fireballs from getting killed from tha lava
                         if(NPC[A].Type == NPCID_RAINBOW_SHELL)
                             NPC[A].Projectile = true;
