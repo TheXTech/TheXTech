@@ -202,9 +202,132 @@ void PlayerThrowBomb(int A)
     syncLayers_NPC(numNPCs);
 }
 
+bool PlayerChar4HeavyOut(const int A)
+{
+    if(Player[A].Character != 4)
+        return false;
+
+    for(int B : NPCQueues::Active.no_change)
+    {
+        if(NPC[B].Active)
+        {
+            if(NPC[B].Type == NPCID_CHAR4_HEAVY)
+            {
+                if(Maths::iRound(NPC[B].Special5) == A)
+                    return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+void PlayerThrowHeavy(const int A)
+{
+    auto &p = Player[A];
+
+    if(numNPCs >= maxNPCs - 100)
+        return;
+
+    p.FrameCount = 110;
+    p.FireBallCD = 25;
+
+    numNPCs++;
+    NPC[numNPCs] = NPC_t();
+    NPC[numNPCs].Type = NPCID_PLR_HEAVY;
+    if(ShadowMode)
+        NPC[numNPCs].Shadow = true;
+
+    if(p.Character == 3)
+    {
+        p.FireBallCD = 45;
+        NPC[numNPCs].Type = NPCID_CHAR3_HEAVY;
+
+        if(p.Controls.AltRun && p.Mount == 0)
+        {
+            NPC[numNPCs].HoldingPlayer = A;
+            p.HoldingNPC = numNPCs;
+            PlaySoundSpatial(SFX_Grab2, p.Location);
+        }
+        else
+            PlaySoundSpatial(SFX_Throw, p.Location);
+    }
+    else if(p.Character == 4)
+    {
+
+        p.FireBallCD = 0;
+        if(FlameThrower)
+            p.FireBallCD = 40;
+        NPC[numNPCs].Type = NPCID_CHAR4_HEAVY;
+        NPC[numNPCs].Special5 = A;
+        NPC[numNPCs].Special6 = p.Direction;
+        PlaySoundSpatial(SFX_Throw, p.Location);
+    }
+    else
+        PlaySoundSpatial(playerHammerSFX, p.Location);
+
+    NPC[numNPCs].Projectile = true;
+    NPC[numNPCs].Location.Height = NPC[numNPCs]->THeight;
+    NPC[numNPCs].Location.Width = NPC[numNPCs]->TWidth;
+    NPC[numNPCs].Location.X = p.Location.X + Physics.PlayerGrabSpotX[p.Character][p.State] * p.Direction;
+    NPC[numNPCs].Location.Y = p.Location.Y + Physics.PlayerGrabSpotY[p.Character][p.State];
+    NPC[numNPCs].Active = true;
+    NPC[numNPCs].TimeLeft = 100;
+    NPC[numNPCs].Location.SpeedY = 20;
+    NPC[numNPCs].CantHurt = 100;
+    NPC[numNPCs].CantHurtPlayer = A;
+
+    if(p.Controls.Up)
+    {
+        NPC[numNPCs].Location.SpeedX = 2 * p.Direction + p.Location.SpeedX * 0.9;
+
+        if(p.StandingOnNPC == 0)
+            NPC[numNPCs].Location.SpeedY = -8 + p.Location.SpeedY * 0.3;
+        else
+            NPC[numNPCs].Location.SpeedY = -8 + NPC[p.StandingOnNPC].Location.SpeedY * 0.3;
+
+        NPC[numNPCs].Location.Y -= 24;
+        NPC[numNPCs].Location.X += -6 * p.Direction;
+
+        if(p.Character == 3)
+        {
+            NPC[numNPCs].Location.SpeedY += 1;
+            NPC[numNPCs].Location.SpeedX = NPC[numNPCs].Location.SpeedX * 1.5;
+        }
+        else if(p.Character == 4)
+        {
+            NPC[numNPCs].Location.SpeedY = -8;
+            NPC[numNPCs].Location.SpeedX = 12 * p.Direction + p.Location.SpeedX;
+        }
+    }
+    else
+    {
+        NPC[numNPCs].Location.SpeedX = 4 * p.Direction + p.Location.SpeedX * 0.9;
+
+        if(p.StandingOnNPC == 0)
+            NPC[numNPCs].Location.SpeedY = -5 + p.Location.SpeedY * 0.3;
+        else
+            NPC[numNPCs].Location.SpeedY = -5 + NPC[p.StandingOnNPC].Location.SpeedY * 0.3;
+
+        if(p.Character == 3)
+            NPC[numNPCs].Location.SpeedY += 1;
+        else if(p.Character == 4)
+        {
+            NPC[numNPCs].Location.SpeedY = -5;
+            NPC[numNPCs].Location.SpeedX = 10 * p.Direction + p.Location.SpeedX;
+            NPC[numNPCs].Location.Y -= 12;
+        }
+    }
+
+    if(p.Character == 4)
+        NPC[numNPCs].Location.X = p.Location.X + p.Location.Width / 2.0 - NPC[numNPCs].Location.Width / 2.0;
+
+    syncLayers_NPC(numNPCs);
+    CheckSectionNPC(numNPCs);
+}
+
 void PowerUps(const int A)
 {
-    bool BoomOut = false;
     auto &p = Player[A];
     //int B = 0;
 
@@ -217,131 +340,17 @@ void PowerUps(const int A)
         return;
     }
 
+    // if(p.State == 6 && p.Character == 4 && p.Controls.Run && p.RunRelease)
+    //     BoomOut = PlayerChar4HeavyOut(A);
 
-    if(p.State == 6 && p.Character == 4 && p.Controls.Run && p.RunRelease)
-    {
-        for(int B : NPCQueues::Active.no_change)
-        {
-            if(NPC[B].Active)
-            {
-                if(NPC[B].Type == NPCID_CHAR4_HEAVY)
-                {
-                    if(Maths::iRound(NPC[B].Special5) == A)
-                    {
-                        BoomOut = true;
-                        break;
-                    }
-                }
-            }
-        }
-    }
-
-// Hammer Throw Code
+    // Hammer Throw Code
     if(!p.Slide && p.Vine == 0 && p.State == 6 && !p.Duck && p.Mount != 2 && p.Mount != 3 && p.HoldingNPC <= 0 && p.Character != 5)
     {
-        if(p.Controls.Run && !p.SpinJump && p.FireBallCD <= 0 && !BoomOut)
+        if(p.Controls.Run && !p.SpinJump && p.FireBallCD <= 0 /* && !BoomOut*/)
         {
-            if(p.RunRelease || FlameThrower)
-            {
-                if(numNPCs < maxNPCs - 100)
-                {
-                    p.FrameCount = 110;
-                    p.FireBallCD = 25;
-
-                    numNPCs++;
-                    NPC[numNPCs] = NPC_t();
-                    NPC[numNPCs].Type = NPCID_PLR_HEAVY;
-                    if(ShadowMode)
-                        NPC[numNPCs].Shadow = true;
-
-                    if(p.Character == 3)
-                    {
-                        p.FireBallCD = 45;
-                        NPC[numNPCs].Type = NPCID_CHAR3_HEAVY;
-
-                        if(p.Controls.AltRun && p.Mount == 0)
-                        {
-                            NPC[numNPCs].HoldingPlayer = A;
-                            p.HoldingNPC = numNPCs;
-                            PlaySoundSpatial(SFX_Grab2, p.Location);
-                        }
-                        else
-                            PlaySoundSpatial(SFX_Throw, p.Location);
-                    }
-                    else if(p.Character == 4)
-                    {
-
-                        p.FireBallCD = 0;
-                        if(FlameThrower)
-                            p.FireBallCD = 40;
-                        NPC[numNPCs].Type = NPCID_CHAR4_HEAVY;
-                        NPC[numNPCs].Special5 = A;
-                        NPC[numNPCs].Special6 = p.Direction;
-                        PlaySoundSpatial(SFX_Throw, p.Location);
-                    }
-                    else
-                        PlaySoundSpatial(playerHammerSFX, p.Location);
-
-                    NPC[numNPCs].Projectile = true;
-                    NPC[numNPCs].Location.Height = NPC[numNPCs]->THeight;
-                    NPC[numNPCs].Location.Width = NPC[numNPCs]->TWidth;
-                    NPC[numNPCs].Location.X = p.Location.X + Physics.PlayerGrabSpotX[p.Character][p.State] * p.Direction;
-                    NPC[numNPCs].Location.Y = p.Location.Y + Physics.PlayerGrabSpotY[p.Character][p.State];
-                    NPC[numNPCs].Active = true;
-                    NPC[numNPCs].TimeLeft = 100;
-                    NPC[numNPCs].Location.SpeedY = 20;
-                    NPC[numNPCs].CantHurt = 100;
-                    NPC[numNPCs].CantHurtPlayer = A;
-
-                    if(p.Controls.Up)
-                    {
-                        NPC[numNPCs].Location.SpeedX = 2 * p.Direction + p.Location.SpeedX * 0.9;
-
-                        if(p.StandingOnNPC == 0)
-                            NPC[numNPCs].Location.SpeedY = -8 + p.Location.SpeedY * 0.3;
-                        else
-                            NPC[numNPCs].Location.SpeedY = -8 + NPC[p.StandingOnNPC].Location.SpeedY * 0.3;
-
-                        NPC[numNPCs].Location.Y -= 24;
-                        NPC[numNPCs].Location.X += -6 * p.Direction;
-
-                        if(p.Character == 3)
-                        {
-                            NPC[numNPCs].Location.SpeedY += 1;
-                            NPC[numNPCs].Location.SpeedX = NPC[numNPCs].Location.SpeedX * 1.5;
-                        }
-                        else if(p.Character == 4)
-                        {
-                            NPC[numNPCs].Location.SpeedY = -8;
-                            NPC[numNPCs].Location.SpeedX = 12 * p.Direction + p.Location.SpeedX;
-                        }
-                    }
-                    else
-                    {
-                        NPC[numNPCs].Location.SpeedX = 4 * p.Direction + p.Location.SpeedX * 0.9;
-
-                        if(p.StandingOnNPC == 0)
-                            NPC[numNPCs].Location.SpeedY = -5 + p.Location.SpeedY * 0.3;
-                        else
-                            NPC[numNPCs].Location.SpeedY = -5 + NPC[p.StandingOnNPC].Location.SpeedY * 0.3;
-
-                        if(p.Character == 3)
-                            NPC[numNPCs].Location.SpeedY += 1;
-                        else if(p.Character == 4)
-                        {
-                            NPC[numNPCs].Location.SpeedY = -5;
-                            NPC[numNPCs].Location.SpeedX = 10 * p.Direction + p.Location.SpeedX;
-                            NPC[numNPCs].Location.Y -= 12;
-                        }
-                    }
-
-                    if(p.Character == 4)
-                        NPC[numNPCs].Location.X = p.Location.X + p.Location.Width / 2.0 - NPC[numNPCs].Location.Width / 2.0;
-
-                    syncLayers_NPC(numNPCs);
-                    CheckSectionNPC(numNPCs);
-                }
-            }
+            // if(p.RunRelease || FrameThrower)
+            if((!p.RunRelease && FlameThrower) || (p.RunRelease && !PlayerChar4HeavyOut(A)))
+                PlayerThrowHeavy(A);
         }
     }
 
