@@ -36,4 +36,6 @@ void NPCWalkingLogic(int A, const double tempHit, const int tempHitBlock, float 
 
 void NPCEffects(int A);
 
+void NPCSpecialMaybeHeld(int A);
+
 #endif // NPC_UPDATE_PRIV_H
