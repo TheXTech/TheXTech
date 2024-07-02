@@ -326,6 +326,124 @@ void PlayerThrowHeavy(const int A)
     CheckSectionNPC(numNPCs);
 }
 
+void PlayerThrowBall(const int A)
+{
+    Player_t& p = Player[A];
+
+    if(p.SpinJump)
+        p.SpinFireDir = p.Direction;
+
+    if(numNPCs >= maxNPCs - 100)
+        return;
+
+    if(!p.SpinJump)
+        p.FrameCount = 110;
+
+    numNPCs++;
+    NPC[numNPCs] = NPC_t();
+    NPC[numNPCs].Type = NPCID_PLR_FIREBALL;
+
+    if(p.State == 7)
+        NPC[numNPCs].Type = NPCID_PLR_ICEBALL;
+
+    if(ShadowMode)
+        NPC[numNPCs].Shadow = true;
+
+    NPC[numNPCs].Projectile = true;
+    NPC[numNPCs].Location.Height = NPC[numNPCs]->THeight;
+    NPC[numNPCs].Location.Width = NPC[numNPCs]->TWidth;
+    NPC[numNPCs].Location.X = p.Location.X + Physics.PlayerGrabSpotX[p.Character][p.State] * p.Direction + 4;
+    NPC[numNPCs].Location.Y = p.Location.Y + Physics.PlayerGrabSpotY[p.Character][p.State];
+    NPC[numNPCs].Active = true;
+    NPC[numNPCs].TimeLeft = 100;
+    NPC[numNPCs].Location.SpeedY = 20;
+    NPC[numNPCs].CantHurt = 100;
+    NPC[numNPCs].CantHurtPlayer = A;
+    NPC[numNPCs].Special = p.Character;
+
+    if(p.State == 7)
+        NPC[numNPCs].Special = 1;
+
+    if((p.Character == 3 || p.Character == 4) && p.Mount == 0 && p.Controls.AltRun) // peach holds fireballs
+    {
+        p.HoldingNPC = numNPCs;
+        NPC[numNPCs].HoldingPlayer = A;
+    }
+
+    if(Maths::iRound(NPC[numNPCs].Special) == 2)
+        NPC[numNPCs].Frame = 4;
+    if(Maths::iRound(NPC[numNPCs].Special) == 3)
+        NPC[numNPCs].Frame = 8;
+    if(Maths::iRound(NPC[numNPCs].Special) == 4)
+        NPC[numNPCs].Frame = 12;
+
+    syncLayers_NPC(numNPCs);
+    CheckSectionNPC(numNPCs);
+
+    p.FireBallCD = 30;
+    if(p.Character == 2)
+        p.FireBallCD = 35;
+    if(p.Character == 3)
+        p.FireBallCD = 40;
+    if(p.Character == 4)
+        p.FireBallCD = 25;
+
+    NPC[numNPCs].Location.SpeedX = 5 * p.Direction + (p.Location.SpeedX / 3.5);
+
+    if(p.State == 7)
+    {
+        NPC[numNPCs].Location.SpeedY = 5;
+
+        if(p.Controls.Up)
+        {
+            if(p.StandingOnNPC != 0)
+                NPC[numNPCs].Location.SpeedY = -8 + NPC[p.StandingOnNPC].Location.SpeedY * 0.1;
+            else
+                NPC[numNPCs].Location.SpeedY = -8 + p.Location.SpeedY * 0.1;
+
+            NPC[numNPCs].Location.SpeedX = NPC[numNPCs].Location.SpeedX * 0.9;
+        }
+
+        if(FlameThrower)
+        {
+            NPC[numNPCs].Location.SpeedX = NPC[numNPCs].Location.SpeedX * 1.5;
+            NPC[numNPCs].Location.SpeedY = NPC[numNPCs].Location.SpeedY * 1.5;
+        }
+
+        if(p.StandingOnNPC != 0)
+            NPC[numNPCs].Location.SpeedX = 5 * p.Direction + (p.Location.SpeedX / 3.5) + NPC[p.StandingOnNPC].Location.SpeedX / 3.5;
+
+        PlaySoundSpatial(SFX_Iceball, p.Location);
+        NPC[numNPCs].Location.SpeedX = NPC[numNPCs].Location.SpeedX * 0.8;
+    }
+    else
+    {
+        if(Maths::iRound(NPC[numNPCs].Special) == 2)
+            NPC[numNPCs].Location.SpeedX = NPC[numNPCs].Location.SpeedX * 0.85;
+
+        if(p.Controls.Up)
+        {
+            if(p.StandingOnNPC != 0)
+                NPC[numNPCs].Location.SpeedY = -6 + NPC[p.StandingOnNPC].Location.SpeedY * 0.1;
+            else
+                NPC[numNPCs].Location.SpeedY = -6 + p.Location.SpeedY * 0.1;
+
+            NPC[numNPCs].Location.SpeedX = NPC[numNPCs].Location.SpeedX * 0.9;
+        }
+
+        if(FlameThrower)
+        {
+            NPC[numNPCs].Location.SpeedX = NPC[numNPCs].Location.SpeedX * 1.5;
+            NPC[numNPCs].Location.SpeedY = NPC[numNPCs].Location.SpeedY * 1.5;
+        }
+
+        if(p.StandingOnNPC != 0)
+            NPC[numNPCs].Location.SpeedX = 5 * p.Direction + (p.Location.SpeedX / 3.5) + NPC[p.StandingOnNPC].Location.SpeedX / 3.5;
+
+        PlaySoundSpatial(SFX_Fireball, p.Location);
+    }
+}
+
 void PowerUps(const int A)
 {
     auto &p = Player[A];
@@ -355,132 +473,18 @@ void PowerUps(const int A)
     }
 
 
-
-
-// Fire Mario / Luigi code ---- FIRE FLOWER ACTION BALLS OF DOOM
+    // Fire Mario / Luigi code ---- FIRE FLOWER ACTION BALLS OF DOOM
     if(!p.Slide && p.Vine == 0 && (p.State == 3 || p.State == 7) && !p.Duck && p.Mount != 2 && p.Mount != 3 && p.HoldingNPC <= 0 && p.Character != 5)
     {
         if(((p.Controls.Run && !p.SpinJump) || (p.SpinJump && p.Direction != p.SpinFireDir)) && p.FireBallCD <= 0)
         {
             if((p.RunRelease || p.SpinJump) || (FlameThrower && p.HoldingNPC <= 0))
-            {
-                if(p.SpinJump)
-                    p.SpinFireDir = p.Direction;
-
-                if(numNPCs < maxNPCs - 100)
-                {
-                    if(!p.SpinJump)
-                        p.FrameCount = 110;
-
-                    numNPCs++;
-                    NPC[numNPCs] = NPC_t();
-                    NPC[numNPCs].Type = NPCID_PLR_FIREBALL;
-
-                    if(p.State == 7)
-                        NPC[numNPCs].Type = NPCID_PLR_ICEBALL;
-
-                    if(ShadowMode)
-                        NPC[numNPCs].Shadow = true;
-
-                    NPC[numNPCs].Projectile = true;
-                    NPC[numNPCs].Location.Height = NPC[numNPCs]->THeight;
-                    NPC[numNPCs].Location.Width = NPC[numNPCs]->TWidth;
-                    NPC[numNPCs].Location.X = p.Location.X + Physics.PlayerGrabSpotX[p.Character][p.State] * p.Direction + 4;
-                    NPC[numNPCs].Location.Y = p.Location.Y + Physics.PlayerGrabSpotY[p.Character][p.State];
-                    NPC[numNPCs].Active = true;
-                    NPC[numNPCs].TimeLeft = 100;
-                    NPC[numNPCs].Location.SpeedY = 20;
-                    NPC[numNPCs].CantHurt = 100;
-                    NPC[numNPCs].CantHurtPlayer = A;
-                    NPC[numNPCs].Special = p.Character;
-
-                    if(p.State == 7)
-                        NPC[numNPCs].Special = 1;
-
-                    if((p.Character == 3 || p.Character == 4) && p.Mount == 0 && p.Controls.AltRun) // peach holds fireballs
-                    {
-                        p.HoldingNPC = numNPCs;
-                        NPC[numNPCs].HoldingPlayer = A;
-                    }
-
-                    if(Maths::iRound(NPC[numNPCs].Special) == 2)
-                        NPC[numNPCs].Frame = 4;
-                    if(Maths::iRound(NPC[numNPCs].Special) == 3)
-                        NPC[numNPCs].Frame = 8;
-                    if(Maths::iRound(NPC[numNPCs].Special) == 4)
-                        NPC[numNPCs].Frame = 12;
-
-                    syncLayers_NPC(numNPCs);
-                    CheckSectionNPC(numNPCs);
-
-                    p.FireBallCD = 30;
-                    if(p.Character == 2)
-                        p.FireBallCD = 35;
-                    if(p.Character == 3)
-                        p.FireBallCD = 40;
-                    if(p.Character == 4)
-                        p.FireBallCD = 25;
-
-                    NPC[numNPCs].Location.SpeedX = 5 * p.Direction + (p.Location.SpeedX / 3.5);
-
-                    if(p.State == 7)
-                    {
-                        NPC[numNPCs].Location.SpeedY = 5;
-
-                        if(p.Controls.Up)
-                        {
-                            if(p.StandingOnNPC != 0)
-                                NPC[numNPCs].Location.SpeedY = -8 + NPC[p.StandingOnNPC].Location.SpeedY * 0.1;
-                            else
-                                NPC[numNPCs].Location.SpeedY = -8 + p.Location.SpeedY * 0.1;
-
-                            NPC[numNPCs].Location.SpeedX = NPC[numNPCs].Location.SpeedX * 0.9;
-                        }
-
-                        if(FlameThrower)
-                        {
-                            NPC[numNPCs].Location.SpeedX = NPC[numNPCs].Location.SpeedX * 1.5;
-                            NPC[numNPCs].Location.SpeedY = NPC[numNPCs].Location.SpeedY * 1.5;
-                        }
-
-                        if(p.StandingOnNPC != 0)
-                            NPC[numNPCs].Location.SpeedX = 5 * p.Direction + (p.Location.SpeedX / 3.5) + NPC[p.StandingOnNPC].Location.SpeedX / 3.5;
-
-                        PlaySoundSpatial(SFX_Iceball, p.Location);
-                        NPC[numNPCs].Location.SpeedX = NPC[numNPCs].Location.SpeedX * 0.8;
-                    }
-                    else
-                    {
-                        if(Maths::iRound(NPC[numNPCs].Special) == 2)
-                            NPC[numNPCs].Location.SpeedX = NPC[numNPCs].Location.SpeedX * 0.85;
-
-                        if(p.Controls.Up)
-                        {
-                            if(p.StandingOnNPC != 0)
-                                NPC[numNPCs].Location.SpeedY = -6 + NPC[p.StandingOnNPC].Location.SpeedY * 0.1;
-                            else
-                                NPC[numNPCs].Location.SpeedY = -6 + p.Location.SpeedY * 0.1;
-
-                            NPC[numNPCs].Location.SpeedX = NPC[numNPCs].Location.SpeedX * 0.9;
-                        }
-
-                        if(FlameThrower)
-                        {
-                            NPC[numNPCs].Location.SpeedX = NPC[numNPCs].Location.SpeedX * 1.5;
-                            NPC[numNPCs].Location.SpeedY = NPC[numNPCs].Location.SpeedY * 1.5;
-                        }
-
-                        if(p.StandingOnNPC != 0)
-                            NPC[numNPCs].Location.SpeedX = 5 * p.Direction + (p.Location.SpeedX / 3.5) + NPC[p.StandingOnNPC].Location.SpeedX / 3.5;
-
-                        PlaySoundSpatial(SFX_Fireball, p.Location);
-                    }
-                }
-            }
+                PlayerThrowBall(A);
         }
     }
 
-// RacoonMario
+
+    // RacoonMario
     if(!p.Slide && p.Vine == 0 && (p.State == 4 || p.State == 5) && !p.Duck && p.HoldingNPC == 0 && p.Mount != 2 && !p.Stoned && p.Effect == PLREFF_NORMAL && p.Character != 5)
     {
          if(p.Controls.Run || p.SpinJump)
@@ -514,12 +518,12 @@ void PowerUps(const int A)
     }
 
 
-// link stab
+    // link stab
     if(p.Character == 5 && p.Vine == 0 && p.Mount == 0 && !p.Stoned && p.FireBallCD == 0)
         PlayerChar5StabLogic(A);
 
 
-// cooldown timer
+    // cooldown timer
     p.FireBallCD2 -= 1;
     if(p.FireBallCD2 < 0)
         p.FireBallCD2 = 0;
