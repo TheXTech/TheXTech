@@ -171,6 +171,7 @@ void UpdatePlayer()
                 // Code used to move the player while sliding down a slope
                 if(Player[A].Slide)
                     PlayerSlideMovementX(A);
+                // TODO: mount-dependent logic
                 // if not sliding and in the clown car
                 else if(Player[A].Mount == 2)
                     PlayerVehicleDismountCheck(A);
@@ -180,6 +181,7 @@ void UpdatePlayer()
                 // if a fairy
                 else if(Player[A].Fairy)
                     PlayerFairyMovementX(A);
+                // TODO: state-dependent logic
                 // if the player is climbing a vine
                 else if(Player[A].Vine > 0)
                     PlayerVineMovement(A);
@@ -261,6 +263,7 @@ void UpdatePlayer()
 
                 if(Player[A].Fairy) // the player is a fairy
                     PlayerFairyMovementY(A);
+                // TODO: state-dependent logic
                 else if(Player[A].Wet > 0 && Player[A].Quicksand == 0) // the player is swimming
                     PlayerSwimMovementY(A);
                 else if(Player[A].Mount == 2)

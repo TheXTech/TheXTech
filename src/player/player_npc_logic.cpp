@@ -86,6 +86,7 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                             {
                                 if(BattleMode && NPC[B].CantHurtPlayer != A)
                                 {
+                                    // duck projectile-resistance in heavy suit
                                     if(Player[A].State == 6 && Player[A].Duck && Player[A].Character != 5)
                                         NPCHit(B, 3, B);
                                     else
@@ -325,7 +326,8 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                             }
                         }
 
-                        if((Player[A].State == 6 && Player[A].Duck && Player[A].Mount == 0 && Player[A].Character != 5) || (Player[A].Mount == 1 && Player[A].MountType == 2)) // Fireball immune for ducking in the hammer suit
+                        // ' Fireball immune for ducking in the hammer suit
+                        if((Player[A].State == 6 && Player[A].Duck && Player[A].Mount == 0 && Player[A].Character != 5) || (Player[A].Mount == 1 && Player[A].MountType == 2))
                         {
                             if(NPC[B].Type == NPCID_STATUE_FIRE || NPC[B].Type == NPCID_VILLAIN_FIRE || NPC[B].Type == NPCID_PLANT_FIRE || NPC[B].Type == NPCID_QUAD_BALL)
                             {
@@ -989,6 +991,7 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
 
     if(tempHit) // For multiple NPC hits
     {
+        // enable another double-jump when Char4 bounces on an NPC
         if(Player[A].Character == 4 && (Player[A].State == 4 || Player[A].State == 5) && !Player[A].SpinJump)
             Player[A].DoubleJump = true;
 

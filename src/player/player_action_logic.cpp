@@ -92,6 +92,8 @@ void PlayerPoundLogic(int A)
 
 void PlayerShootChar5Beam(int A)
 {
+    // TODO: State-dependent moment
+
     Player[A].FireBallCD2 = 40;
     if(Player[A].State == 6)
         Player[A].FireBallCD2 = 25;
@@ -328,6 +330,7 @@ void PlayerThrowHeavy(const int A)
 
 void PlayerThrowBall(const int A)
 {
+    // TODO: State-dependent moment
     Player_t& p = Player[A];
 
     if(p.SpinJump)
@@ -457,6 +460,8 @@ void PowerUps(const int A)
         p.TailCount = 0;
         return;
     }
+
+    // TODO: State-dependent moment, reorganize so that this is more clear
 
     // if(p.State == 6 && p.Character == 4 && p.Controls.Run && p.RunRelease)
     //     BoomOut = PlayerChar4HeavyOut(A);

@@ -458,6 +458,7 @@ void TouchBonus(int A, int B)
         if(NPC[B].Effect != NPCEFF_DROP_ITEM)
             s_PowerupScore(B);
     }
+    // TODO: not State-dependent moment, but combine some logic
     else if(NPC[B].Type == NPCID_STATUE_POWER) // Bonus is a Tanooki Suit
     {
         UpdatePlayerBonus(A, NPC[B].Type);

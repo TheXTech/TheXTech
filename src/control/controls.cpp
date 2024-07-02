@@ -899,6 +899,7 @@ bool Update(bool check_lost_devices)
             c.Right = false;
         }
 
+        // don't remap AltRun when player has Statue power
         if(!(p.State == 5 && p.Mount == 0) && c.AltRun)
             c.Run = true;
 

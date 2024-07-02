@@ -32,6 +32,7 @@
 // called after movement code and before block / NPC / player collisions
 void PlayerChar5Logic(int A)
 {
+    // TODO: State-dependent moment
     if(Player[A].State == 4 || Player[A].State == 5)
     {
         bool hasNoMonts = (g_config.fix_char5_vehicle_climb && Player[A].Mount <= 0) ||
@@ -118,6 +119,7 @@ void PlayerChar5Logic(int A)
             TailSwipe(A, true, true);
             PlaySoundSpatial(SFX_HeroStab, Player[A].Location);
 
+            // TODO: State-dependent moment
             if((Player[A].State == 3 || Player[A].State == 7 || Player[A].State == 6) && Player[A].FireBallCD2 == 0)
                 PlayerShootChar5Beam(A);
         }

@@ -872,6 +872,7 @@ void PlayerMovementY(int A)
             if(Player[A].Jump == 0 && ((Player[A].Controls.Jump && Player[A].FloatRelease) ||
               (Player[A].Controls.AltJump && Player[A].Location.SpeedY > 0)))
             {
+                // float time is longer during glide
                 if(Player[A].State == 4 || Player[A].State == 5)
                 {
                     Player[A].FloatTime = 100;
@@ -926,7 +927,7 @@ void PlayerMovementY(int A)
     }
 
 
-    // Racoon Mario
+    // glide ' Racoon Mario
     if((Player[A].State == 4 || Player[A].State == 5) || Player[A].YoshiBlue || (Player[A].Mount == 1 && Player[A].MountType == 3))
     {
         if((Player[A].Controls.Jump || Player[A].Controls.AltJump) &&

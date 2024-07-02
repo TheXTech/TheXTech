@@ -955,6 +955,7 @@ void PlayerHurt(const int A)
             }
             else
             {
+                // TODO: State-dependent moment
                 if(p.Character == 3 || p.Character == 4)
                 {
                     if(p.Hearts == 3 && (p.State == 2 || p.State == 4 || p.State == 5 || p.State == 6))
@@ -2072,6 +2073,7 @@ void PlayerFrame(Player_t &p)
                     p.Frame = 6;
             }
         }
+        // TODO: state-dependent moment
         else if(p.FrameCount >= 100 && p.FrameCount <= 118 && (p.State == 3 || p.State == 6 || p.State == 7)) // Fire Mario and Luigi
         {
             if(p.Duck)
@@ -2637,6 +2639,9 @@ void UpdatePlayerBonus(const int A, const NPCID B)
 {
     auto &p = Player[A];
 
+    // TODO: not State-dependent moment (necessarily), but needs adjustment to support new States / StateNPCs
+    // TODO: confirm when StateNPC is ever invalid
+
     // 1 player growing
     // 4 fire flower
     // 5 leaf
@@ -2836,6 +2841,7 @@ void TailSwipe(const int plr, bool boo, bool Stab, int StabDir)
                                         p.Jump = 10;
                                 }
                             }
+
                             if(block.Type == 370)
                             {
                                 PlaySoundSpatial(SFX_HeroGrass, block.Location);
@@ -2846,10 +2852,9 @@ void TailSwipe(const int plr, bool boo, bool Stab, int StabDir)
                                 Effect[numEffects].Location.SpeedY = -2;
                             }
 
+                            // allow Char5 to stab gray bricks when it has heavy power
                             if(block.Type == 457 && p.State == 6)
-                            {
                                 KillBlock(A);
-                            }
                         }
                     }
                 }
@@ -6077,6 +6082,7 @@ void PlayerEffects(const int A)
             // If numPlayers <= 2 Then DropBonus A
         }
     }
+    // TODO: not State-dependent moment, but combine some logic
     else if(p.Effect == PLREFF_FIRE_TO_BIG) // Player losing firepower
     {
         if(p.Duck)
@@ -7436,6 +7442,7 @@ void PlayerEffects(const int A)
             }
         }
     }
+    // TODO: not State-dependent moment, but combine some logic
     else if(p.Effect == PLREFF_TURN_FIRE) // Player got fire power
     {
         if(p.Duck && p.Character != 5)
@@ -7535,6 +7542,7 @@ void PlayerEffects(const int A)
             p.StandUp = true;
         }
     }
+    // TODO: not State-dependent moment, but combine some logic
     else if(p.Effect == PLREFF_TURN_LEAF) // Player got a leaf
     {
         p.Frame = 1;

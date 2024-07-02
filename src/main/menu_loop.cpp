@@ -107,7 +107,7 @@ static void updateIntroLevelActivity()
                 p.CanJump = true;
         }
 
-        if(p.HoldingNPC ==0)
+        if(p.HoldingNPC == 0)
         {
             if((p.State == 3 || p.State == 6 || p.State == 7) && iRand(100) >= 90)
             {
