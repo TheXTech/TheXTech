@@ -1529,25 +1529,25 @@ DECLREF_T(Block);
 //Public Player(0 To maxPlayers) As Player
 extern RangeArr<Player_t, 0, maxPlayers> Player;
 //Public MarioFrameX(0 To maxPlayerFrames) As Integer 'Player frame offset X
-extern RangeArrI<int, 0, maxPlayerFrames, 0> MarioFrameX;
+extern RangeArrI<vbint_t, 0, maxPlayerFrames, 0> MarioFrameX;
 //Public MarioFrameY(0 To maxPlayerFrames) As Integer 'Player frame offset Y
-extern RangeArrI<int, 0, maxPlayerFrames, 0> MarioFrameY;
+extern RangeArrI<vbint_t, 0, maxPlayerFrames, 0> MarioFrameY;
 //Public LuigiFrameX(0 To maxPlayerFrames) As Integer 'Player frame offset X
-extern RangeArrI<int, 0, maxPlayerFrames, 0> LuigiFrameX;
+extern RangeArrI<vbint_t, 0, maxPlayerFrames, 0> LuigiFrameX;
 //Public LuigiFrameY(0 To maxPlayerFrames) As Integer 'Player frame offset Y
-extern RangeArrI<int, 0, maxPlayerFrames, 0> LuigiFrameY;
+extern RangeArrI<vbint_t, 0, maxPlayerFrames, 0> LuigiFrameY;
 //Public PeachFrameX(0 To maxPlayerFrames) As Integer 'Player frame offset X
-extern RangeArrI<int, 0, maxPlayerFrames, 0> PeachFrameX;
+extern RangeArrI<vbint_t, 0, maxPlayerFrames, 0> PeachFrameX;
 //Public PeachFrameY(0 To maxPlayerFrames) As Integer 'Player frame offset Y
-extern RangeArrI<int, 0, maxPlayerFrames, 0> PeachFrameY;
+extern RangeArrI<vbint_t, 0, maxPlayerFrames, 0> PeachFrameY;
 //Public ToadFrameX(0 To maxPlayerFrames) As Integer 'Player frame offset X
-extern RangeArrI<int, 0, maxPlayerFrames, 0> ToadFrameX;
+extern RangeArrI<vbint_t, 0, maxPlayerFrames, 0> ToadFrameX;
 //Public ToadFrameY(0 To maxPlayerFrames) As Integer 'Player frame offset Y
-extern RangeArrI<int, 0, maxPlayerFrames, 0> ToadFrameY;
+extern RangeArrI<vbint_t, 0, maxPlayerFrames, 0> ToadFrameY;
 //Public LinkFrameX(0 To maxPlayerFrames) As Integer 'Player frame offset X
-extern RangeArrI<int, 0, maxPlayerFrames, 0> LinkFrameX;
+extern RangeArrI<vbint_t, 0, maxPlayerFrames, 0> LinkFrameX;
 //Public LinkFrameY(0 To maxPlayerFrames) As Integer 'Player frame offset Y
-extern RangeArrI<int, 0, maxPlayerFrames, 0> LinkFrameY;
+extern RangeArrI<vbint_t, 0, maxPlayerFrames, 0> LinkFrameY;
 //Public BackgroundFence(0 To maxBackgroundType) As Boolean
 extern RangeArrI<bool, 0, maxBackgroundType, false> BackgroundFence;
 

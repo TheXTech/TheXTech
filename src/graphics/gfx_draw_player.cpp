@@ -132,7 +132,7 @@ int pfrOffX(const StdPicture& tx, const Player_t& p)
     if((p.Character < 1) || (p.Character > 5))
         return 0;
 
-    using plr_frame_off_arr = RangeArrI<int, 0, maxPlayerFrames, 0>;
+    using plr_frame_off_arr = RangeArrI<vbint_t, 0, maxPlayerFrames, 0>;
     constexpr std::array<plr_frame_off_arr*, 5> char_offsetX = {&MarioFrameX, &LuigiFrameX, &PeachFrameX, &ToadFrameX, &LinkFrameX};
     int offX = (*char_offsetX[p.Character - 1])[(p.State * 100) + (p.Frame * p.Direction)];
 
@@ -147,7 +147,7 @@ int pfrOffY(const StdPicture& tx, const Player_t& p)
     if((p.Character < 1) || (p.Character > 5))
         return 0;
 
-    using plr_frame_off_arr = RangeArrI<int, 0, maxPlayerFrames, 0>;
+    using plr_frame_off_arr = RangeArrI<vbint_t, 0, maxPlayerFrames, 0>;
     constexpr std::array<plr_frame_off_arr*, 5> char_offsetY = {&MarioFrameY, &LuigiFrameY, &PeachFrameY, &ToadFrameY, &LinkFrameY};
     int offY = (*char_offsetY[p.Character - 1])[(p.State * 100) + (p.Frame * p.Direction)];
 
