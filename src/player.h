@@ -133,6 +133,9 @@ bool AllPlayersNormal();
 // NEW: ensures the players on a screen are nearby if the screen is shared
 void PlayersEnsureNearby(const Screen_t& screen);
 
+// NEW: checks for a keyhole at a location
+void KeyholeCheck(const int A, const Location_t& loc);
+
 // main Drop/Add functions
 void DropPlayer(const int A);
 void AddPlayer(int Character);

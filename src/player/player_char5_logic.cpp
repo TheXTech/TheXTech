@@ -93,30 +93,7 @@ void PlayerChar5Logic(int A)
     }
 
     if(Player[A].HasKey)
-    {
-        for(int B : treeBackgroundQuery(Player[A].Location, SORTMODE_NONE))
-        {
-            if(B > numBackground)
-                continue;
-
-            if(Background[B].Type == 35)
-            {
-                Location_t tempLocation = Background[B].Location;
-                tempLocation.Width = 16;
-                tempLocation.X += 8;
-                tempLocation.Height = 26;
-                tempLocation.Y += 2;
-                if(CheckCollision(Player[A].Location, tempLocation))
-                {
-                    PlaySound(SFX_Key);
-                    StopMusic();
-                    LevelMacro = LEVELMACRO_KEYHOLE_EXIT;
-                    LevelMacroWhich = B;
-                    break;
-                }
-            }
-        }
-    }
+        KeyholeCheck(A, Player[A].Location);
 
     if(Player[A].SwordPoke < 0)
     {

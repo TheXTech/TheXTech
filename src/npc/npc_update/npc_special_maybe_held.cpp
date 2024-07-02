@@ -28,6 +28,7 @@
 #include "eff_id.h"
 #include "config.h"
 #include "collision.h"
+#include "player.h"
 #include "layers.h"
 #include "blocks.h"
 #include "graphics.h"
@@ -869,31 +870,7 @@ void NPCSpecialMaybeHeld(int A)
     else if(NPC[A].Type == NPCID_KEY)
     {
         if(NPC[A].HoldingPlayer > 0)
-        {
-            for(int B : treeBackgroundQuery(NPC[A].Location, SORTMODE_NONE))
-            {
-                if(B > numBackground)
-                    continue;
-
-                if(Background[B].Type == 35)
-                {
-                    Location_t tempLocation = Background[B].Location;
-                    tempLocation.Width = 16;
-                    tempLocation.X += 8;
-                    tempLocation.Height = 26;
-                    tempLocation.Y += 2;
-
-                    if(CheckCollision(NPC[A].Location, tempLocation))
-                    {
-                        PlaySound(SFX_Key);
-                        StopMusic();
-                        LevelMacro = LEVELMACRO_KEYHOLE_EXIT;
-                        LevelMacroWhich = B;
-                        break;
-                    }
-                }
-            }
-        }
+            KeyholeCheck(NPC[A].HoldingPlayer, NPC[A].Location);
     }
     else if(NPCIsABot(NPC[A]))
     {

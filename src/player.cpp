@@ -809,7 +809,7 @@ void SetupPlayers()
 void PlayerHurt(const int A)
 {
     if(GodMode || GameOutro || BattleOutro > 0)
-            return;
+        return;
 
     auto &p = Player[A];
     Location_t tempLocation;
@@ -3842,31 +3842,7 @@ void YoshiEatCode(const int A)
         if(p.MountSpecial == 0)
         {
             if(NPC[p.YoshiNPC].Type == NPCID_KEY) // key check
-            {
-                for(int B : treeBackgroundQuery(p.Location, SORTMODE_ID))
-                {
-                    if(B > numBackground)
-                        break;
-
-                    if(Background[B].Type == 35)
-                    {
-                        tempLocation = Background[B].Location;
-                        tempLocation.Width = 16;
-                        tempLocation.X += 8;
-                        tempLocation.Height = 26;
-                        tempLocation.Y += 2;
-
-                        if(CheckCollision(p.Location, tempLocation))
-                        {
-                            PlaySound(SFX_Key);
-                            StopMusic();
-                            LevelMacro = LEVELMACRO_KEYHOLE_EXIT;
-                            LevelMacroWhich = B;
-                            break;
-                        }
-                    }
-                }
-            }
+                KeyholeCheck(A, p.Location);
             else if(NPC[p.YoshiNPC].Type == NPCID_SLIDE_BLOCK)
                 NPC[p.YoshiNPC].Special = 1;
 
@@ -8403,6 +8379,35 @@ void PlayersEnsureNearby(const Screen_t& screen)
         p.WarpShooted = false;
 
         DodgePlayers(plr_A);
+    }
+}
+
+void KeyholeCheck(const int A, const Location_t& loc)
+{
+    UNUSED(A);
+
+    for(int B : treeBackgroundQuery(loc, SORTMODE_NONE))
+    {
+        if(B > numBackground)
+            continue;
+
+        if(Background[B].Type == 35)
+        {
+            Location_t tempLocation = Background[B].Location;
+            tempLocation.Width = 16;
+            tempLocation.X += 8;
+            tempLocation.Height = 26;
+            tempLocation.Y += 2;
+
+            if(CheckCollision(loc, tempLocation))
+            {
+                PlaySound(SFX_Key);
+                StopMusic();
+                LevelMacro = LEVELMACRO_KEYHOLE_EXIT;
+                LevelMacroWhich = B;
+                break;
+            }
+        }
     }
 }
 
