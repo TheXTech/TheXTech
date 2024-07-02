@@ -558,8 +558,6 @@ void NPCCollideHeld(int A)
     // these types can't collide while held
     if(NPC[A].Type == NPCID_FLIPPED_RAINBOW_SHELL || NPC[A].Type == NPCID_CANNONITEM || NPC[A].Type == NPCID_SPRING || NPC[A].Type == NPCID_COIN_SWITCH ||
          NPC[A].Type == NPCID_TIME_SWITCH || NPC[A].Type == NPCID_TNT || NPC[A].Type == NPCID_BLU_BOOT || NPC[A].Type == NPCID_GRN_BOOT || NPC[A].Type == NPCID_RED_BOOT ||
-         // Duplicated segment [PVS Studio]
-         // NPC[A].Type == NPCID_BLU_BOOT ||
          NPC[A].Type == NPCID_TOOTHYPIPE || NPC[A].Type == NPCID_BOMB || (NPC[A].Type >= NPCID_CARRY_BLOCK_A && NPC[A].Type <= NPCID_CARRY_BLOCK_D) ||
          NPC[A].Type == NPCID_KEY || NPC[A].Type == NPCID_TIMER_S2 || NPC[A].Type == NPCID_FLY_BLOCK || NPC[A].Type == NPCID_FLY_CANNON || NPC[A].Type == NPCID_CHAR4_HEAVY)
     {
@@ -588,45 +586,58 @@ void NPCCollideHeld(int A)
         if(B == A || !NPC[B].Active)
             continue;
 
-        if(NPC[B].HoldingPlayer != 0 && !(BattleMode && NPC[B].HoldingPlayer != NPC[A].HoldingPlayer))
+        // don't kill dead or friendly NPC
+        if(NPC[B].Killed != 0 || NPC[B].Inert)
             continue;
 
+        // don't kill powerups
         if(NPC[B]->IsABonus)
             continue;
 
-        if((NPC[B].Type == NPCID_PLR_FIREBALL || NPC[B].Type == NPCID_PLR_ICEBALL) && !(BattleMode && NPC[B].CantHurtPlayer != NPC[A].HoldingPlayer))
+        // don't kill other players' NPCs except in Battle Mode
+        if(NPC[B].HoldingPlayer != 0 && (!BattleMode || NPC[B].HoldingPlayer == NPC[A].HoldingPlayer))
             continue;
 
+        // no friendly fire
+        if(NPC[A].CantHurtPlayer == NPC[B].CantHurtPlayer)
+            continue;
+
+        // don't kill NPC player is standing on
+        if(Player[NPC[A].HoldingPlayer].StandingOnNPC == B)
+            continue;
+
+        // these types can't be collision targets
         if(NPC[B].Type == NPCID_CANNONENEMY || NPC[B].Type == NPCID_CANNONITEM || NPC[B].Type == NPCID_SPRING || NPC[B].Type == NPCID_KEY ||
             NPC[B].Type == NPCID_COIN_SWITCH || NPC[B].Type == NPCID_TIME_SWITCH || NPC[B].Type == NPCID_TNT || NPC[B].Type == NPCID_RED_BOOT ||
-            NPC[B].Type == NPCID_GRN_BOOT)
+            NPC[B].Type == NPCID_GRN_BOOT || NPC[B].Type == NPCID_STONE_S3 || NPC[B].Type == NPCID_STONE_S4 || NPC[B].Type == NPCID_GHOST_S3 ||
+            NPC[B].Type == NPCID_SPIT_BOSS || NPC[B].Type == NPCID_ITEM_BURIED || NPC[B].Type == NPCID_LIFT_SAND || NPC[B].Type == NPCID_FLIPPED_RAINBOW_SHELL ||
+            NPC[B].Type == NPCID_EARTHQUAKE_BLOCK || NPC[B].Type == NPCID_ICE_CUBE || NPC[B].Type == NPCID_CHAR3_HEAVY)
         {
             continue;
         }
+        // slide block can't be collision target until activation
+        else if(NPC[B].Type == NPCID_SLIDE_BLOCK)
+        {
+            if(NPC[B].Special == 0.0)
+                continue;
+        }
+        else if(NPC[B].Type == NPCID_HEAVY_THROWN)
+        {
+            if(NPC[B].Projectile)
+                continue;
+        }
+        // probably redundant check (see above friendly fire note), but need to confirm when CantHurtPlayer and HoldingPlayer may be out of sync
+        else if(NPC[B].Type == NPCID_PLR_FIREBALL || NPC[B].Type == NPCID_PLR_ICEBALL)
+        {
+            if(!BattleMode || NPC[B].CantHurtPlayer == NPC[A].HoldingPlayer)
+                continue;
+        }
 
+#if 0
+        // impossible
         if(NPC[B].Type == NPCID_BLU_BOOT && NPC[A].Type == NPCID_BLU_BOOT)
             continue;
-
-        if(NPC[B].Type == NPCID_STONE_S3 || NPC[B].Type == NPCID_STONE_S4 || NPC[B].Type == NPCID_GHOST_S3 ||
-            NPC[B].Type == NPCID_SPIT_BOSS)
-        {
-            continue;
-        }
-
-        if(NPC[B].Type == NPCID_SLIDE_BLOCK && NPC[B].Special == 0.0)
-            continue;
-
-        if(NPC[B].Type == NPCID_ITEM_BURIED || NPC[B].Type == NPCID_LIFT_SAND || NPC[B].Type == NPCID_FLIPPED_RAINBOW_SHELL)
-            continue;
-
-        if(NPC[B].Type == NPCID_HEAVY_THROWN && NPC[B].Projectile)
-            continue;
-
-        if(NPC[B].Type == NPCID_EARTHQUAKE_BLOCK || NPC[B].Type == NPCID_ICE_CUBE || NPC[B].Type == NPCID_CHAR3_HEAVY)
-            continue;
-
-        if(NPC[A].CantHurtPlayer == NPC[B].CantHurtPlayer || NPC[B].Killed != 0 || (Player[NPC[A].HoldingPlayer].StandingOnNPC == B) || NPC[B].Inert)
-            continue;
+#endif
 
         if(!CheckCollision(NPC[A].Location, NPC[B].Location))
             continue;
