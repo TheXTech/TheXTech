@@ -30,6 +30,8 @@ void NPCBlockLogic(int A, double& tempHit, int& tempHitBlock, float& tempSpeedA,
 
 void NPCCollide(int A);
 
+void NPCCollideHeld(int A);
+
 void NPCWalkingLogic(int A, const double tempHit, const int tempHitBlock, float tempSpeedA);
 
 #endif // NPC_UPDATE_PRIV_H
