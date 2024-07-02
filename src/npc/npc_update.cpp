@@ -1559,7 +1559,6 @@ void UpdateNPCs()
                         PlaySoundSpatial(SFX_Saw, NPC[A].Location);
 
 
-
                     // NPC Movement Code
 
                     // Probably make a single function pointer for this whole block (until RESUME UNIFIED CODE),
@@ -1666,6 +1665,7 @@ void UpdateNPCs()
                                 {
                                     NPC[A].Special += 1;
                                     NPC[A].Location.SpeedY = 0;
+
                                     if(NPC[A].Slope > 0)
                                     {
                                         NPC[A].Location.SpeedY = NPC[A].Location.SpeedX * (Block[NPC[A].Slope].Location.Height / static_cast<double>(Block[NPC[A].Slope].Location.Width)) * BlockSlope[Block[NPC[A].Slope].Type];
@@ -1703,6 +1703,7 @@ void UpdateNPCs()
                                 {
                                     NPC[A].Special += 1;
                                     NPC[A].Location.SpeedY = 0;
+
                                     if(NPC[A].Slope > 0)
                                     {
                                         NPC[A].Location.SpeedY = NPC[A].Location.SpeedX * (Block[NPC[A].Slope].Location.Height / static_cast<double>(Block[NPC[A].Slope].Location.Width)) * BlockSlope[Block[NPC[A].Slope].Type];
@@ -1835,14 +1836,18 @@ void UpdateNPCs()
                             else if(NPC[A].Type == NPCID_JUMPER_S4) // ninja code
                             {
                                 bool tempTurn = true; // used for turning the npc around
+
                                 Location_t tempLocation = NPC[A].Location;
                                 tempLocation.SpeedX = 0;
                                 tempLocation.SpeedY = 0;
                                 tempLocation.Y = NPC[A].Location.Y + NPC[A].Location.Height - 8;
                                 tempLocation.Height = 16;
+
                                 if(NPC[A].Slope > 0)
                                     tempLocation.Height = 32;
+
                                 tempLocation.Width = 16;
+
                                 if(NPC[A].Location.SpeedX > 0)
                                     tempLocation.X = NPC[A].Location.X + NPC[A].Location.Width - 16;
                                 else
@@ -1999,6 +2004,7 @@ void UpdateNPCs()
 
                                 if(tempSpeedA != 0)
                                     NPC[A].Location.SpeedY = tempSpeedA;
+
                                 if(NPC[A].Type == NPCID_SAW)
                                     NPC[A].Special = NPC[A].Location.SpeedY;
 
@@ -2006,8 +2012,10 @@ void UpdateNPCs()
 
                             if(NPC[A].Slope == 0)
                                 NPC[A].Location.Y = tempHit;
+
                             tempHit = 0;
                             tempHitBlock = 0;
+
                             if(Block[tempHitBlock].tempBlockNpcType > 0 && NPC[Block[tempHitBlock].tempBlockNpcIdx].Slope > 0)
                             {
                                 // .Location.SpeedY = 0
@@ -2018,9 +2026,9 @@ void UpdateNPCs()
                     }
                 }
 
-                if(NPC[A].tempBlock > 0 && (NPC[A].Type < 60 || NPC[A].Type > 66) && NPC[A].Type != NPCID_CONVEYOR)
+                if(NPC[A].tempBlock > 0 && (NPC[A].Type < NPCID_YEL_PLATFORM || NPC[A].Type > NPCID_RED_PLATFORM) && NPC[A].Type != NPCID_CONVEYOR)
                 {
-                    if((NPC[A].Type < 78 || NPC[A].Type > 83) && NPC[A].Type != NPCID_SPRING)
+                    if((NPC[A].Type < NPCID_TANK_TREADS || NPC[A].Type > NPCID_SLANT_WOOD_M) && NPC[A].Type != NPCID_SPRING)
                     {
                         Block[NPC[A].tempBlock].Location = NPC[A].Location;
                         if(NPC[A].Type == NPCID_SPRING)
@@ -2122,6 +2130,7 @@ void UpdateNPCs()
                     NPC[A].Special += 1;
                     if(NPC[A].Special > 250)
                         NPC[A].Special2 = 1;
+
                     if(NPC[A].Special >= 350 || NPC[A].Special < 0)
                     {
                         Bomb(NPC[A].Location, 2);
@@ -2655,7 +2664,6 @@ void UpdateNPCs()
                         else
                             NPC[A].Special4 = 0;
                     }
-
                 }
                 else if(NPC[A].Type == NPCID_HEAVY_THROWER && NPC[A].HoldingPlayer > 0)
                 {
@@ -3072,12 +3080,8 @@ void UpdateNPCs()
 
 
                 NPCFrames(A);
-
-
-
-
-                // Effects
             }
+            // Effects
             else if(NPC[A].Effect == NPCEFF_EMERGE_UP) // Bonus coming out of a block effect
             {
                 if(NPC[A].Direction == 0.0f) // Move toward the closest player
@@ -3463,7 +3467,6 @@ void UpdateNPCs()
                 //     break;
             }
         }
-
     }
 
     numBlock -= numTempBlock; // clean up the temp npc blocks
