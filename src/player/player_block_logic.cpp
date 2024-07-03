@@ -1029,7 +1029,7 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
         }
         else if(Player[A].Location.X + Player[A].Location.Width - Block[ceilingBlock].Location.X <= 4)
         {
-            Player[A].Location.X = Block[ceilingBlock].Location.X - Player[ceilingBlock].Location.Width - 0.1;
+            Player[A].Location.X = Block[ceilingBlock].Location.X - Player[A].Location.Width - 0.1;
             ceilingBlock = 0;
         }
     }
