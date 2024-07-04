@@ -7442,7 +7442,64 @@ void PlayerEffects(const int A)
             }
         }
     }
-    // TODO: not State-dependent moment, but combine some logic
+    // logic combined across all "grow" powerup effects
+    else if(p.Effect == PLREFF_TURN_FIRE || p.Effect == PLREFF_TURN_ICE) // Player got fire power
+    {
+        int target_state = 3;
+
+        if(p.Effect == PLREFF_TURN_ICE)
+            target_state = 7;
+
+        if(p.Duck && p.Character != 5)
+        {
+            UnDuck(Player[A]);
+            p.Frame = 1;
+        }
+
+        p.Effect2 += 1;
+
+        if(fEqual(p.Effect2 / 5, std::floor(p.Effect2 / 5.0)))
+        {
+            if(p.State == 1 && p.Character != 5)
+            {
+                p.State = 2;
+
+                if(p.Mount == 0)
+                {
+                    p.Location.X += -Physics.PlayerWidth[p.Character][2] * 0.5 + Physics.PlayerWidth[p.Character][1] * 0.5;
+                    p.Location.Y += -Physics.PlayerHeight[p.Character][2] + Physics.PlayerHeight[p.Character][1];
+                    p.Location.Width = Physics.PlayerWidth[p.Character][p.State];
+                    p.Location.Height = Physics.PlayerHeight[p.Character][p.State];
+                }
+                else if(p.Mount == 3)
+                {
+                    YoshiHeight(A);
+                }
+                else if(p.Character == 2 && p.Mount != 2)
+                {
+                    p.Location.Y += -Physics.PlayerHeight[2][2] + Physics.PlayerHeight[1][2];
+                    p.Location.Height = Physics.PlayerHeight[p.Character][p.State];
+                }
+            }
+            else if(p.State != target_state)
+                p.State = target_state;
+            else
+                p.State = 2;
+        }
+
+        if(p.Effect2 >= 50)
+        {
+            if(p.State == 2)
+                p.State = target_state;
+
+            p.Immune += 50;
+            p.Immune2 = true;
+            p.Effect = PLREFF_NORMAL;
+            p.Effect2 = 0;
+            p.StandUp = true;
+        }
+    }
+#if 0
     else if(p.Effect == PLREFF_TURN_FIRE) // Player got fire power
     {
         if(p.Duck && p.Character != 5)
@@ -7542,6 +7599,7 @@ void PlayerEffects(const int A)
             p.StandUp = true;
         }
     }
+#endif
     // logic combined across all "transform" powerup effects
     else if(p.Effect == PLREFF_TURN_LEAF || p.Effect == PLREFF_TURN_STATUE || p.Effect == PLREFF_TURN_HEAVY)
     {
