@@ -783,6 +783,7 @@ int main(int argc, char**argv)
 #endif
 
     Controls::Quit();
+    QuitMixerX();
 
     g_frmMain.freeSystem();
 

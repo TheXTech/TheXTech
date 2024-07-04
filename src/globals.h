@@ -36,6 +36,7 @@
 #include "floats.h"
 #include "npc_id.h"
 #include "npc_effect.h"
+#include "player/player_effect.h"
 
 #include "global_constants.h"
 #include "global_strings.h"
@@ -673,7 +674,7 @@ struct Player_t
 //    CanAltJump As Boolean 'true if the player can alt jump
     bool CanAltJump = false;
 //    Effect As Integer 'for various effects like shrinking/growing/warping
-    int Effect = 0;
+    PlayerEffect Effect = PLREFF_NORMAL;
 //    Effect2 As Double 'counter for the effects
     double Effect2 = 0.0;
 //    Duck As Boolean 'true if ducking
@@ -944,6 +945,9 @@ struct LevelSaveInfo_t
     uint8_t medals_got = 0;
     uint8_t medals_best = 0;
 
+    // BITMASK
+    uint16_t exits_got = 0;
+
     inline bool inited() const
     {
         return max_medals != 255;
@@ -985,13 +989,13 @@ struct WorldLevel_t
 //    Start As Boolean 'true if the game starts here
     bool Start = false;
 
+//    Visible As Boolean 'true if it should be shown on the map
+    bool Visible = false;
+
 //    WarpX As Double 'for warping to another location on the world map
     double WarpX = 0.0;
 //    WarpY As Double
     double WarpY = 0.0;
-
-//    Visible As Boolean 'true if it should be shown on the map
-    bool Visible = false;
 
 //End Type
 
@@ -1525,25 +1529,25 @@ DECLREF_T(Block);
 //Public Player(0 To maxPlayers) As Player
 extern RangeArr<Player_t, 0, maxPlayers> Player;
 //Public MarioFrameX(0 To maxPlayerFrames) As Integer 'Player frame offset X
-extern RangeArrI<int, 0, maxPlayerFrames, 0> MarioFrameX;
+extern RangeArrI<vbint_t, 0, maxPlayerFrames, 0> MarioFrameX;
 //Public MarioFrameY(0 To maxPlayerFrames) As Integer 'Player frame offset Y
-extern RangeArrI<int, 0, maxPlayerFrames, 0> MarioFrameY;
+extern RangeArrI<vbint_t, 0, maxPlayerFrames, 0> MarioFrameY;
 //Public LuigiFrameX(0 To maxPlayerFrames) As Integer 'Player frame offset X
-extern RangeArrI<int, 0, maxPlayerFrames, 0> LuigiFrameX;
+extern RangeArrI<vbint_t, 0, maxPlayerFrames, 0> LuigiFrameX;
 //Public LuigiFrameY(0 To maxPlayerFrames) As Integer 'Player frame offset Y
-extern RangeArrI<int, 0, maxPlayerFrames, 0> LuigiFrameY;
+extern RangeArrI<vbint_t, 0, maxPlayerFrames, 0> LuigiFrameY;
 //Public PeachFrameX(0 To maxPlayerFrames) As Integer 'Player frame offset X
-extern RangeArrI<int, 0, maxPlayerFrames, 0> PeachFrameX;
+extern RangeArrI<vbint_t, 0, maxPlayerFrames, 0> PeachFrameX;
 //Public PeachFrameY(0 To maxPlayerFrames) As Integer 'Player frame offset Y
-extern RangeArrI<int, 0, maxPlayerFrames, 0> PeachFrameY;
+extern RangeArrI<vbint_t, 0, maxPlayerFrames, 0> PeachFrameY;
 //Public ToadFrameX(0 To maxPlayerFrames) As Integer 'Player frame offset X
-extern RangeArrI<int, 0, maxPlayerFrames, 0> ToadFrameX;
+extern RangeArrI<vbint_t, 0, maxPlayerFrames, 0> ToadFrameX;
 //Public ToadFrameY(0 To maxPlayerFrames) As Integer 'Player frame offset Y
-extern RangeArrI<int, 0, maxPlayerFrames, 0> ToadFrameY;
+extern RangeArrI<vbint_t, 0, maxPlayerFrames, 0> ToadFrameY;
 //Public LinkFrameX(0 To maxPlayerFrames) As Integer 'Player frame offset X
-extern RangeArrI<int, 0, maxPlayerFrames, 0> LinkFrameX;
+extern RangeArrI<vbint_t, 0, maxPlayerFrames, 0> LinkFrameX;
 //Public LinkFrameY(0 To maxPlayerFrames) As Integer 'Player frame offset Y
-extern RangeArrI<int, 0, maxPlayerFrames, 0> LinkFrameY;
+extern RangeArrI<vbint_t, 0, maxPlayerFrames, 0> LinkFrameY;
 //Public BackgroundFence(0 To maxBackgroundType) As Boolean
 extern RangeArrI<bool, 0, maxBackgroundType, false> BackgroundFence;
 

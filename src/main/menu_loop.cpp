@@ -107,7 +107,7 @@ static void updateIntroLevelActivity()
                 p.CanJump = true;
         }
 
-        if(p.HoldingNPC ==0)
+        if(p.HoldingNPC == 0)
         {
             if((p.State == 3 || p.State == 6 || p.State == 7) && iRand(100) >= 90)
             {
@@ -257,7 +257,7 @@ static void updateIntroLevelActivity()
             p.Bumped2 = 0;
             p.Direction = 1;
             p.Dismount = 0;
-            p.Effect = 0;
+            p.Effect = PLREFF_NORMAL;
             p.Effect2 = 0;
             p.FireBallCD = 0;
             p.ForceHold = 0;

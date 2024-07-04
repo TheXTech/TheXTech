@@ -1690,8 +1690,9 @@ void NPCHit(int A, int B, int C)
     {
         if(!(B == 1 || B == 2 || B == 6))
         {
-            if(B != 8 && B != 10)
+            if(B != 8 && B != 10 && !(B == 9 && g_config.fix_visual_bugs))
                 PlaySoundSpatial(SFX_ShellHit, NPC[A].Location);
+
             NPC[A].Killed = B;
         }
     }
@@ -2172,7 +2173,7 @@ void NPCHit(int A, int B, int C)
         }
         else if(B == 10 && NPC[A].Type != NPCID_POISON)
         {
-            if(C > 0 && NPC[A].Effect == 0)
+            if(C > 0 && NPC[A].Effect == NPCEFF_NORMAL)
                 TouchBonus(C, A);
         }
     }

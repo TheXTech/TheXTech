@@ -1,1 +1,225 @@
-{}
+{
+    "editor": {
+        "background2": {
+            "fam-set1": {
+                "bg2-51": "Deserto",
+                "bg2-9": "Notte 2",
+                "bg2-10": "Aria aperta",
+                "bg2-41": "Castello",
+                "bg2-50": "Funghi",
+                "bg2-7": "Sotterraneo",
+                "bg2-8": "Notte",
+                "header": "Set 1"
+            },
+            "fam-set3": {
+                "bg2-13": "Nuvole",
+                "bg2-36": "Nuvole 2",
+                "bg2-38": "Caverna",
+                "bg2-39": "Caverna 2",
+                "bg2-4": "Tubi",
+                "bg2-6": "Bonus",
+                "bg2-56": "Sott'acqua",
+                "bg2-1": "Blocchi",
+                "bg2-14": "Deserto",
+                "bg2-17": "Nave",
+                "bg2-2": "Colline",
+                "bg2-20": "Foresta",
+                "bg2-21": "Battaglia",
+                "bg2-22": "Cascata",
+                "bg2-23": "Carri armati",
+                "bg2-24": "Boss finale",
+                "bg2-27": "Castello",
+                "bg2-35": "Alberi innevati",
+                "bg2-37": "Colline innevate",
+                "bg2-15": "Cripta 2",
+                "bg2-3": "Cripta",
+                "header": "Set 3"
+            },
+            "auto": {
+                "bg2-0": "Nessuno"
+            },
+            "fam-misc": {
+                "bg2-16": "Cratere spaziale",
+                "bg2-40": "Miniera segreta",
+                "bg2-46": "Nave spaziale",
+                "bg2-45": "Palude spaziale",
+                "bg2-47": "Base spaziale",
+                "header": "Varie"
+            },
+            "fam-set4": {
+                "bg2-11": "Colline",
+                "bg2-12": "Alberi",
+                "bg2-18": "Villa",
+                "bg2-28": "Bonus",
+                "bg2-19": "Foresta",
+                "bg2-31": "Nuvole",
+                "bg2-29": "Notte",
+                "bg2-34": "Colline 3",
+                "bg2-30": "Caverna",
+                "bg2-32": "Colline 2",
+                "bg2-33": "Colline 4",
+                "bg2-42": "Castello",
+                "bg2-43": "Castello 2",
+                "bg2-55": "Sott'acqua",
+                "bg2-58": "Deserto (notte)",
+                "header": "Set 4"
+            },
+            "fam-set2": {
+                "bg2-25": "Sotterraneo",
+                "bg2-44": "Castello",
+                "bg2-48": "Nuvole",
+                "bg2-49": "Notte - Colline",
+                "bg2-5": "Alberi",
+                "bg2-52": "Notte - Deserto",
+                "bg2-53": "Scogliera",
+                "bg2-54": "Magazzino",
+                "bg2-57": "Cripta",
+                "header": "Set 2"
+            }
+        },
+        "bgo": {
+            "fam-key4": "Chiave",
+            "fam-hut1": "Capanna",
+            "fam-misc4": "Varie",
+            "fam-plants1": "Piante",
+            "fam-plants2": "Piante",
+            "fam-temple5": "Tempio",
+            "fam-plants3": "Piante",
+            "fam-plants4": "Piante",
+            "fam-structures3": "Strutture",
+            "fam-clouds1": "Nuvole",
+            "fam-doors2": "Porte",
+            "fam-doors4": "Porte",
+            "fam-exit3": "Uscita",
+            "fam-fences1": "Recinzioni",
+            "fam-fences4": "Recinzioni",
+            "fam-ghost4": "Fantasma",
+            "fam-tiles3": "Blocchi",
+            "fam-water1": "Acqua",
+            "fam-water2": "Acqua",
+            "fam-water3": "Acqua",
+            "fam-water4": "Acqua"
+        },
+        "block": {
+            "fam-special3": "Speciale",
+            "fam-misc1": "Varie",
+            "fam-misc4": "Varie",
+            "fam-pipes4": "Tubi",
+            "fam-special1": "Speciale",
+            "fam-pipes5-2": "Tubi",
+            "fam-special2": "Speciale",
+            "fam-special4": "Speciale",
+            "fam-underground1": "Sotterraneo",
+            "fam-underground2": "Sotterraneo",
+            "fam-wood2": "Legno",
+            "fam-water3": "Acqua",
+            "fam-bonus3": "Bonus",
+            "fam-bonus4": "Bonus",
+            "fam-bricks5": "Mattone",
+            "fam-castle2": "Castello",
+            "fam-castle4": "Castello",
+            "fam-cave3": "Caverna",
+            "fam-cave4": "Caverna",
+            "fam-clouds1": "Nuvole",
+            "fam-desert3": "Deserto",
+            "fam-grass3": "Erba",
+            "fam-grass4": "Erba",
+            "fam-house3": "Casa",
+            "fam-mansion4": "Villa",
+            "fam-metal5-3": "Varie",
+            "fam-dungeon1": "Cripta",
+            "fam-dungeon3": "Cripta",
+            "fam-char5": "Personaggio",
+            "fam-misc2": "Varie",
+            "fam-misc3": "Varie 3",
+            "fam-overworld1": "Aria aperta",
+            "fam-overworld2": "Aria aperta",
+            "fam-pipes1": "Tubi",
+            "fam-pipes3": "Tubi",
+            "fam-pipes5-3": "Tubi lunghi",
+            "fam-ruins5": "Rovine",
+            "fam-wood3": "Legno",
+            "fam-woods4": "Bosco"
+        },
+        "music": {
+            "fam-misc": {
+                "header": "Varie",
+                "music37": "Montagna ghiacciata",
+                "music18": "Spiaggia",
+                "music23": "Bosco eroico",
+                "music38": "Villaggio della giungla",
+                "music55": "Tema del titolo"
+            },
+            "fam-fight": {
+                "music52": "Sotterraneo",
+                "music39": "Tempio",
+                "music40": "Cavaliere"
+            },
+            "fam-rpg": {
+                "music34": "Città",
+                "header": "RPG",
+                "music16": "Foresta",
+                "music21": "Battaglia",
+                "music31": "Mare",
+                "music32": "Stagno",
+                "music33": "Nuvole"
+            },
+            "fam-set3": {
+                "music1": "Aria aperta",
+                "music3": "Cripta",
+                "music4": "Sotterraneo",
+                "header": "Set 3"
+            },
+            "fam-world": {
+                "music10": "Aria aperta",
+                "music41": "Cripta"
+            },
+            "fam-64": {
+                "music14": "Deserto",
+                "music26": "Castello",
+                "music27": "Tema principale",
+                "music35": "Neve",
+                "music36": "Boss",
+                "music49": "Acqua",
+                "music50": "Caverna"
+            },
+            "fam-set1": {
+                "music42": "Cripta",
+                "music9": "Aria aperta",
+                "music7": "Sotterraneo",
+                "header": "Set 1"
+            },
+            "fam-set2": {
+                "music5": "Aria aperta",
+                "music25": "Sotterraneo",
+                "header": "Set 2"
+            }
+        },
+        "worldMusic": {
+            "fam-set3": {
+                "header": "Set 3"
+            },
+            "fam-world": {
+                "wmusic13": "Cripta"
+            }
+        },
+        "npc": {
+            "fam-char3": "Personaggio",
+            "fam-char5": "Personaggio"
+        },
+        "exit-codes": {
+            "4": "Chiave"
+        }
+    },
+    "character": {
+        "name1": "Personaggio1",
+        "name2": "Personaggio2",
+        "name3": "Personaggio3",
+        "name4": "Personaggio4",
+        "name5": "Personaggio5"
+    },
+    "objects": {
+        "wordStarAccusativePlural": "stelle",
+        "wordStarAccusativeSingular": "stella"
+    }
+}

@@ -205,6 +205,8 @@ struct PGE_VideoRecording_VP8 : public PGE_VideoRecording
     PGE_VideoRecording_VP8();
     virtual ~PGE_VideoRecording_VP8();
 
+    void clean_up();
+
     // returns the best file extension for the recording type
     virtual const char* extension() const override;
 
@@ -869,6 +871,7 @@ static void close_stream(OutputStream* ost)
     sws_freeContext(ost->sws_ctx);
     ost->sws_ctx = NULL;
     swr_free(&ost->swr_ctx);
+    ost->st = nullptr;
 }
 
 
@@ -896,7 +899,10 @@ bool PGE_VideoRecording_VP8::initialize(const char* filename)
     /* Add the audio and video streams using the default format codecs
      * and initialize the codecs. */
     if(fmt->video_codec == AV_CODEC_ID_NONE || !init_stream(&video_st, oc, &video_codec, AV_CODEC_ID_VP8))
+    {
+        clean_up();
         return false;
+    }
 
     if(spec.audio_enabled && fmt->audio_codec != AV_CODEC_ID_NONE && set_src_sample_fmt())
     {
@@ -914,7 +920,10 @@ bool PGE_VideoRecording_VP8::initialize(const char* filename)
     if(video_st.st)
     {
         if(!open_video(this, video_codec, &video_st, opt))
+        {
+            clean_up();
             return false;
+        }
     }
 
     if(spec.audio_enabled && audio_st.st)
@@ -931,8 +940,8 @@ bool PGE_VideoRecording_VP8::initialize(const char* filename)
         ret = avio_open(&oc->pb, filename, AVIO_FLAG_WRITE);
         if(ret < 0)
         {
-            pLogWarning("PGEVideoRec: could not open destination [%s]: %s", filename,
-                        av_err2str(ret));
+            pLogWarning("PGEVideoRec: could not open destination [%s]: %s", filename, av_err2str(ret));
+            clean_up();
             return false;
         }
     }
@@ -942,8 +951,8 @@ bool PGE_VideoRecording_VP8::initialize(const char* filename)
 
     if(ret < 0)
     {
-        pLogWarning("PGEVideoRec: could not write headers: %s",
-                    av_err2str(ret));
+        pLogWarning("PGEVideoRec: could not write headers: %s", av_err2str(ret));
+        clean_up();
         return false;
     }
 
@@ -979,11 +988,11 @@ bool PGE_VideoRecording_VP8::encoding_thread()
     const AVOutputFormat* fmt = oc->oformat;
 
     if(!(fmt->flags & AVFMT_NOFILE))
-        /* Close the output file. */
-        avio_closep(&oc->pb);
+        avio_closep(&oc->pb); /* Close the output file. */
 
     /* free the stream */
     avformat_free_context(oc);
+    oc = nullptr;
 
 #if HAS_CHANNELLAYOUT
     av_channel_layout_uninit(&src_ch_layout);
@@ -992,7 +1001,8 @@ bool PGE_VideoRecording_VP8::encoding_thread()
     return true;
 }
 
-PGE_VideoRecording_VP8::PGE_VideoRecording_VP8()
+PGE_VideoRecording_VP8::PGE_VideoRecording_VP8() :
+    PGE_VideoRecording()
 {
     SDL_assert_release(!av_log_mutex); // only one PGE_VideoRecording_VP8 instance may exist at once
     av_log_mutex = SDL_CreateMutex();
@@ -1000,8 +1010,32 @@ PGE_VideoRecording_VP8::PGE_VideoRecording_VP8()
 
 PGE_VideoRecording_VP8::~PGE_VideoRecording_VP8()
 {
+    clean_up();
+
     SDL_DestroyMutex(av_log_mutex);
     av_log_mutex = nullptr;
+}
+
+void PGE_VideoRecording_VP8::clean_up()
+{
+    if(video_st.st)
+        close_stream(&video_st);
+
+    if(audio_st.st)
+        close_stream(&audio_st);
+
+    if(oc)
+    {
+        if(!(oc->oformat->flags & AVFMT_NOFILE))
+            avio_closep(&oc->pb); /* Close the output file. */
+
+        avformat_free_context(oc);
+        oc = nullptr;
+    }
+
+#if HAS_CHANNELLAYOUT
+    av_channel_layout_uninit(&src_ch_layout);
+#endif
 }
 
 std::unique_ptr<PGE_VideoRecording> PGE_new_recording_VP8(const PGE_VideoSpec& spec)

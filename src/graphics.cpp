@@ -50,7 +50,7 @@ void GetvScreen(vScreen_t& vscreen)
         pLoc.Height = 0;
 
     // this check is new because players can now respawn in 1P mode through DropAdd
-    double pLocY = (p.Effect == 6) ? p.Effect2 : pLoc.Y;
+    double pLocY = (p.Effect == PLREFF_RESPAWN) ? p.Effect2 : pLoc.Y;
 
     vscreen.X = -pLoc.X + (vscreen.Width * 0.5) - pLoc.Width / 2.0;
     vscreen.Y = -pLocY + (vscreen.Height * 0.5) - vScreenYOffset - pLoc.Height;
@@ -107,11 +107,11 @@ void GetvScreenAverage(vScreen_t& vscreen)
 
     for(A = 1; A <= numPlayers; A++)
     {
-        if(!Player[A].Dead && (Player[A].Effect != 6 || g_config.multiplayer_pause_controls))
+        if(!Player[A].Dead && (Player[A].Effect != PLREFF_RESPAWN || g_config.multiplayer_pause_controls))
         {
             vscreen.X += -Player[A].Location.X - Player[A].Location.Width / 2.0;
 
-            double pLocY = (Player[A].Effect == 6) ? Player[A].Effect2 : Player[A].Location.Y;
+            double pLocY = (Player[A].Effect == PLREFF_RESPAWN) ? Player[A].Effect2 : Player[A].Location.Y;
 
             if(Player[A].Mount == 2)
                 vscreen.Y += -pLocY;
@@ -253,7 +253,8 @@ void GetvScreenAverage3(vScreen_t& vscreen)
         double pl = plr.Location.X;
         double pr = pl + plr.Location.Width;
 
-        double pLocY = (plr.Effect == 6) ? plr.Effect2 : plr.Location.Y;
+        // DANGER: consider case where players are free-fall and a player respawns
+        double pLocY = (plr.Effect == PLREFF_RESPAWN) ? plr.Effect2 : plr.Location.Y;
 
         double by = pLocY + plr.Location.Height;
 
@@ -609,13 +610,15 @@ void GetvScreenCredits(vScreen_t& vscreen)
 
     for(A = 1; A <= numPlayers; A++)
     {
-        if((!Player[A].Dead || g_gameInfo.outroDeadMode) && Player[A].Effect != 6)
+        if((!Player[A].Dead || g_gameInfo.outroDeadMode) && Player[A].Effect != PLREFF_RESPAWN)
         {
             vscreen.X += -Player[A].Location.X - Player[A].Location.Width / 2.0;
+
             if(Player[A].Mount == 2)
                 vscreen.Y += -Player[A].Location.Y;
             else
                 vscreen.Y += -Player[A].Location.Y - Player[A].Location.Height;
+
             B++;
         }
     }

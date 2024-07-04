@@ -43,7 +43,6 @@ LevelSaveInfo_t InitLevelSaveInfo(const LevelData& loadedLevel);
  *
  * \return loaded save info
  */
-//!
 LevelSaveInfo_t InitLevelSaveInfo(const std::string& fullPath, LevelData& tempData);
 
 /**

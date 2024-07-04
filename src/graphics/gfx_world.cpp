@@ -175,7 +175,7 @@ void DrawPlayerWorld(Player_t& p, int X, int Y)
     p.Immune2 = false;
     p.Fairy = false;
     p.TimeToLive = 0;
-    p.Effect = 0;
+    p.Effect = PLREFF_NORMAL;
     p.MountSpecial = 0;
     p.HoldingNPC = 0;
     if(p.Duck)

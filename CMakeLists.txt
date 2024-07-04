@@ -751,12 +751,29 @@ set(THEXTECH_SRC
     src/npc/npc_hit.cpp
     src/npc/npc_kill.cpp
     src/npc/npc_update.cpp
+    src/npc/npc_update/npc_movement_logic.cpp
+    src/npc/npc_update/npc_block_logic.cpp
+    src/npc/npc_update/npc_collide.cpp
+    src/npc/npc_update/npc_walking_logic.cpp
+    src/npc/npc_update/npc_effects.cpp
+    src/npc/npc_update/npc_special_maybe_held.cpp
     src/npc/npc_frames.cpp
     src/npc/npc_bonus.cpp
     src/npc/npc_queues.cpp
     src/npc/section_overlap.cpp
     src/npc/npc_activation.cpp
     src/player/player_update.cpp
+    src/player/player_npc_logic.cpp
+    src/player/player_block_logic.cpp
+    src/player/player_vine_logic.cpp
+    src/player/player_screen_logic.cpp
+    src/player/player_fairy_logic.cpp
+    src/player/player_action_logic.cpp
+    src/player/player_movement_logic.cpp
+    src/player/player_pinched_logic.cpp
+    src/player/player_death_logic.cpp
+    src/player/player_vehicle_logic.cpp
+    src/player/player_char5_logic.cpp
     src/fontman/font_manager.cpp
     src/fontman/font_manager_private.cpp
     src/fontman/raster_font.cpp

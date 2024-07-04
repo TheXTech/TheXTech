@@ -106,6 +106,8 @@ void StealBonus();
 // Public Sub ClownCar()
 void ClownCar();
 
+void CleanupVehicleNPCs();
+
 // Private Sub WaterCheck(A As Integer)
 void WaterCheck(const int A); //PRIVATE
 // Private Sub Tanooki(A As Integer)
@@ -125,8 +127,14 @@ void LinkFrame(struct Player_t &p);
 // Private Sub PlayerEffects(A As Integer)
 void PlayerEffects(const int A);
 
+// NEW: checks if all players have normal state (if false, layer movement and events get disabled)
+bool AllPlayersNormal();
+
 // NEW: ensures the players on a screen are nearby if the screen is shared
 void PlayersEnsureNearby(const Screen_t& screen);
+
+// NEW: checks for a keyhole at a location
+void KeyholeCheck(const int A, const Location_t& loc);
 
 // main Drop/Add functions
 void DropPlayer(const int A);

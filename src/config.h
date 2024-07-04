@@ -810,8 +810,8 @@ public:
         "fix-char5-vehicle-climb", "Fix char 5 car fairy", nullptr};
     opt<bool> fix_vehicle_char_switch{this, defaults(true), {CompatClass::critical_update, false}, Scope::CreatorFile,
         "fix-vehicle-char-switch", "Don't switch character by car", nullptr};
-    opt<bool> fix_autoscroll_speed{this, defaults(true), {CompatClass::standard_update, false}, Scope::CreatorFile,
-        "fix-autoscroll-speed", "Autoscroll speed", nullptr};
+    opt<bool> fix_autoscroll_speed{this, defaults(false), {CompatClass::pure_preference, false}, Scope::CreatorFile,
+        "fix-autoscroll-speed", "[Deprecated] autoscroll speed", nullptr};
     opt<bool> fix_submerged_splash_effect{this, defaults(true), {CompatClass::standard_update, false}, Scope::CreatorFile,
         "fix-submerged-splash-effect", "Fix submerged splash effect", "Don't make a splash effect for items already underwater"};
     // 1.3.5.1

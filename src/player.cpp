@@ -28,6 +28,7 @@
 
 #include "globals.h"
 #include "player.h"
+#include "player/player_effect.h"
 #include "graphics.h"
 #include "collision.h"
 #include "npc.h"
@@ -474,7 +475,7 @@ void DodgePlayers(int plr_A)
             pLoc.X = old_X;
             pLoc.Y = old_Y;
 
-            Player[plr_A].Effect = 6;
+            Player[plr_A].Effect = PLREFF_RESPAWN;
             Player[plr_A].Effect2 = pLoc.Y;
             break;
         }
@@ -608,7 +609,7 @@ void SetupPlayers()
             Player[A].Location.Height = Physics.PlayerHeight[1][2];
 
         // moved from below to here
-        Player[A].Effect = 0;
+        Player[A].Effect = PLREFF_NORMAL;
         Player[A].Effect2 = 0;
 
         // modern multiplayer placement code
@@ -724,7 +725,7 @@ void SetupPlayers()
         Player[A].TimeToLive = 0;
         Player[A].Bumped = false;
         Player[A].Bumped2 = 0;
-        // Player[A].Effect = 0; // moved above, possibly set in start-pos code
+        // Player[A].Effect = PLREFF_NORMAL; // moved above, possibly set in start-pos code
         // Player[A].Effect2 = 0;
         Player[A].Immune = 0;
         Player[A].Immune2 = false;
@@ -807,7 +808,7 @@ void SetupPlayers()
 void PlayerHurt(const int A)
 {
     if(GodMode || GameOutro || BattleOutro > 0)
-            return;
+        return;
 
     auto &p = Player[A];
     Location_t tempLocation;
@@ -837,7 +838,7 @@ void PlayerHurt(const int A)
     {
         PlaySoundSpatial(SFX_HeroFairy, p.Location);
         p.Immune = 30;
-        p.Effect = 8;
+        p.Effect = PLREFF_WAITING;
         p.Effect2 = 4;
         p.Fairy = false;
         p.FairyTime = 0;
@@ -954,6 +955,7 @@ void PlayerHurt(const int A)
             }
             else
             {
+                // TODO: State-dependent moment
                 if(p.Character == 3 || p.Character == 4)
                 {
                     if(p.Hearts == 3 && (p.State == 2 || p.State == 4 || p.State == 5 || p.State == 6))
@@ -972,14 +974,14 @@ void PlayerHurt(const int A)
                             p.State = 1;
                         else if(p.State == 3 && p.Hearts == 2)
                         {
-                            p.Effect = 227;
+                            p.Effect = PLREFF_FIRE_TO_BIG;
                             p.Effect2 = 0;
                             PlaySoundSpatial(SFX_PlayerShrink, p.Location);
                             return;
                         }
                         else if(p.State == 7 && p.Hearts == 2)
                         {
-                            p.Effect = 228;
+                            p.Effect = PLREFF_ICE_TO_BIG;
                             p.Effect2 = 0;
                             PlaySoundSpatial(SFX_PlayerShrink, p.Location);
                             return;
@@ -1020,7 +1022,7 @@ void PlayerHurt(const int A)
                 {
                     PlaySoundSpatial(SFX_PlayerShrink, p.Location);
                     p.StateNPC = NPCID_NULL;
-                    p.Effect = 2;
+                    p.Effect = PLREFF_TURN_SMALL;
                 }
                 else
                 {
@@ -1153,7 +1155,7 @@ void PlayerDead(int A)
     p.Wet = 0;
     p.WetFrame = false;
     p.Quicksand = 0;
-    p.Effect = 0;
+    p.Effect = PLREFF_NORMAL;
     p.Effect2 = 0;
     p.Fairy = false;
 
@@ -1285,7 +1287,7 @@ void KillPlayer(const int A)
             p.Mount = 0;
             p.State = 2;
             p.Hearts = 2;
-            p.Effect = 0;
+            p.Effect = PLREFF_NORMAL;
 
             p.Location.Width = Physics.PlayerWidth[p.Character][p.State];
             p.Location.Height = Physics.PlayerHeight[p.Character][p.State];
@@ -1707,7 +1709,7 @@ void PlayerFrame(Player_t &p)
 //    auto &p = Player[A];
 
 // cause the flicker when he is immune
-    if(p.Effect != 9)
+    if(p.Effect != PLREFF_NO_COLLIDE)
     {
         if(p.Immune > 0)
         {
@@ -1828,7 +1830,7 @@ void PlayerFrame(Player_t &p)
     }
 
 // this finds the players direction
-    if(!LevelSelect && p.Effect != 3)
+    if(!LevelSelect && p.Effect != PLREFF_WARP_PIPE)
     {
         if(!(p.Mount == 3 && p.MountSpecial > 0))
         {
@@ -1951,7 +1953,7 @@ void PlayerFrame(Player_t &p)
                 {
                     if(p.Location.SpeedY == 0 || p.StandingOnNPC != 0 || p.Slope > 0 || (p.Location.SpeedY > 0 && p.Quicksand > 0))
                     {
-                        if(p.Location.SpeedX > 0 && (p.Controls.Left || (p.Direction == -1 && p.Bumped)) && p.Effect == 0 && p.Quicksand == 0)
+                        if(p.Location.SpeedX > 0 && (p.Controls.Left || (p.Direction == -1 && p.Bumped)) && p.Effect == PLREFF_NORMAL && p.Quicksand == 0)
                         {
                             if(!LevelSelect)
                             {
@@ -1970,7 +1972,7 @@ void PlayerFrame(Player_t &p)
                                 p.Frame = 4;
                             }
                         }
-                        else if(p.Location.SpeedX < 0 && (p.Controls.Right || (p.Direction == 1 && p.Bumped)) && p.Effect == 0 && p.Quicksand == 0)
+                        else if(p.Location.SpeedX < 0 && (p.Controls.Right || (p.Direction == 1 && p.Bumped)) && p.Effect == PLREFF_NORMAL && p.Quicksand == 0)
                         {
                             if(!LevelSelect)
                             {
@@ -2033,7 +2035,7 @@ void PlayerFrame(Player_t &p)
                 {
                     if(p.Mount != 2 &&
                        ((p.Controls.Left && p.Location.SpeedX > 0) || (p.Controls.Right && p.Location.SpeedX < 0)) &&
-                        p.Effect == 0 && !p.Duck)
+                        p.Effect == PLREFF_NORMAL && !p.Duck)
                     {
                         PlaySoundSpatial(SFX_Skid, p.Location);
                         if(p.SlideCounter <= 0)
@@ -2071,6 +2073,7 @@ void PlayerFrame(Player_t &p)
                     p.Frame = 6;
             }
         }
+        // TODO: state-dependent moment
         else if(p.FrameCount >= 100 && p.FrameCount <= 118 && (p.State == 3 || p.State == 6 || p.State == 7)) // Fire Mario and Luigi
         {
             if(p.Duck)
@@ -2121,7 +2124,7 @@ void PlayerFrame(Player_t &p)
         }
         else // Large Mario, Luigi, and Peach
         {
-            if(p.HoldingNPC == 0 || (p.Effect == 3 && p.Character >= 3))
+            if(p.HoldingNPC == 0 || (p.Effect == PLREFF_WARP_PIPE && p.Character >= 3))
             {
                 if(p.WetFrame && p.Location.SpeedY != 0 && p.Slope == 0 &&
                    p.StandingOnNPC == 0 && !p.Duck && p.Quicksand == 0)
@@ -2181,7 +2184,7 @@ void PlayerFrame(Player_t &p)
                     if(p.Location.SpeedY == 0 || p.StandingOnNPC != 0 || p.Slope > 0 || (p.Quicksand > 0 && p.Location.SpeedY > 0))
                     {
                         if(p.Location.SpeedX > 0 && (p.Controls.Left || (p.Direction == -1 && p.Bumped)) &&
-                           p.Effect == 0 && !p.Duck && p.Quicksand == 0)
+                           p.Effect == PLREFF_NORMAL && !p.Duck && p.Quicksand == 0)
                         {
                             if(!LevelSelect)
                             {
@@ -2200,7 +2203,7 @@ void PlayerFrame(Player_t &p)
                             }
                         }
                         else if(p.Location.SpeedX < 0 && (p.Controls.Right || (p.Direction == 1 && p.Bumped)) &&
-                                p.Effect == 0 && !p.Duck && p.Quicksand == 0)
+                                p.Effect == PLREFF_NORMAL && !p.Duck && p.Quicksand == 0)
                         {
                             if(!LevelSelect)
                             {
@@ -2332,7 +2335,7 @@ void PlayerFrame(Player_t &p)
                 {
                     if(p.Mount != 2 &&
                        ((p.Controls.Left && p.Location.SpeedX > 0) || (p.Controls.Right && p.Location.SpeedX < 0)) &&
-                       p.Effect == 0 && !p.Duck)
+                       p.Effect == PLREFF_NORMAL && !p.Duck)
                     {
                         PlaySoundSpatial(SFX_Skid, p.Location);
                         if(p.SlideCounter <= 0)
@@ -2421,7 +2424,7 @@ void PlayerFrame(Player_t &p)
             {
                 if(p.Location.SpeedX != 0.0)
                 {
-                    if(p.Effect == 0)
+                    if(p.Effect == PLREFF_NORMAL)
                         p.YoshiBFrameCount += 1 + (std::abs(p.Location.SpeedX * 0.7));
 
                     if((p.Direction == -1 && p.Location.SpeedX > 0) || (p.Direction == 1 && p.Location.SpeedX < 0))
@@ -2636,17 +2639,20 @@ void UpdatePlayerBonus(const int A, const NPCID B)
 {
     auto &p = Player[A];
 
+    // NOTE: I have traced all paths into this code, and it is unreachable if p.Effect != PLREFF_NORMAL
+    SDL_assert(p.Effect == PLREFF_NORMAL);
+
     // 1 player growing
     // 4 fire flower
     // 5 leaf
-    if(p.State != 1 || (p.Effect == 1 || p.Effect == 4 || p.Effect == 5))
+    if(p.State != 1 || (p.Effect == PLREFF_TURN_BIG || p.Effect == PLREFF_TURN_FIRE || p.Effect == PLREFF_TURN_LEAF))
     {
         if(B == NPCID_POWER_S3 || B == NPCID_POWER_S4 || B == NPCID_POWER_S1 || B == NPCID_POWER_S5)
         {
             if(p.HeldBonus == 0)
                 p.HeldBonus = B;
         }
-        else if((p.State == 2 || p.Effect == 1) && !(p.Effect == 4 || p.Effect == 5))
+        else if((p.State == 2 || p.Effect == PLREFF_TURN_BIG) && !(p.Effect == PLREFF_TURN_FIRE || p.Effect == PLREFF_TURN_LEAF))
         {
             if(p.HeldBonus == 0)
             {
@@ -2660,7 +2666,7 @@ void UpdatePlayerBonus(const int A, const NPCID B)
         }
         else
         {
-            if(p.State == 3 || p.Effect == 4)
+            if(p.State == 3 || p.Effect == PLREFF_TURN_FIRE)
             {
                 if(p.StateNPC == NPCID_FIRE_POWER_S4)
                     p.HeldBonus = NPCID_FIRE_POWER_S4;
@@ -2669,19 +2675,25 @@ void UpdatePlayerBonus(const int A, const NPCID B)
                 else
                     p.HeldBonus = NPCID_FIRE_POWER_S3;
             }
-            if(p.State == 4 || p.Effect == 5)
+
+            if(p.State == 4 || p.Effect == PLREFF_TURN_LEAF)
                 p.HeldBonus = NPCID_LEAF_POWER;
-            if(p.State == 5 || p.Effect == 11)
+
+            if(p.State == 5 || p.Effect == PLREFF_TURN_STATUE)
                 p.HeldBonus = NPCID_STATUE_POWER;
-            if(p.State == 6 || p.Effect == 12)
+
+            if(p.State == 6 || p.Effect == PLREFF_TURN_HEAVY)
                 p.HeldBonus = NPCID_HEAVY_POWER;
-            if(p.State == 7 || p.Effect == 41)
+
+            if(p.State == 7 || p.Effect == PLREFF_TURN_ICE)
             {
                 if(p.StateNPC == NPCID_ICE_POWER_S4)
                     p.HeldBonus = NPCID_ICE_POWER_S4;
                 else
                     p.HeldBonus = NPCID_ICE_POWER_S3;
             }
+
+            // TODO: State-dependent moment, extend for states > 7, using the 38A NPCIDs and then our own dedicated range. It's not safe to rely on StateNPC because it doesn't get saved.
         }
     }
 
@@ -2831,6 +2843,7 @@ void TailSwipe(const int plr, bool boo, bool Stab, int StabDir)
                                         p.Jump = 10;
                                 }
                             }
+
                             if(block.Type == 370)
                             {
                                 PlaySoundSpatial(SFX_HeroGrass, block.Location);
@@ -2841,10 +2854,9 @@ void TailSwipe(const int plr, bool boo, bool Stab, int StabDir)
                                 Effect[numEffects].Location.SpeedY = -2;
                             }
 
+                            // allow Char5 to stab gray bricks when it has heavy power
                             if(block.Type == 457 && p.State == 6)
-                            {
                                 KillBlock(A);
-                            }
                         }
                     }
                 }
@@ -2860,7 +2872,7 @@ void TailSwipe(const int plr, bool boo, bool Stab, int StabDir)
         if(A > numNPCsMax5)
             continue;
 
-        if(NPC[A].Active && NPC[A].Effect == 0 && !(NPCIsAnExit(NPC[A]) || (NPC[A]->IsACoin && !Stab)) &&
+        if(NPC[A].Active && NPC[A].Effect == NPCEFF_NORMAL && !(NPCIsAnExit(NPC[A]) || (NPC[A]->IsACoin && !Stab)) &&
             NPC[A].CantHurtPlayer != plr && !(p.StandingOnNPC == A && p.ShellSurf))
         {
             if(NPC[A].Type != NPCID_PLR_FIREBALL && NPC[A].Type != NPCID_PLR_ICEBALL && !(NPC[A].Type == NPCID_BULLET && NPC[A].Projectile) &&
@@ -2944,7 +2956,7 @@ void TailSwipe(const int plr, bool boo, bool Stab, int StabDir)
             {
                 stabLoc = Player[A].Location;
 
-                if(CheckCollision(tailLoc, stabLoc) && Player[A].Effect == 0 &&
+                if(CheckCollision(tailLoc, stabLoc) && Player[A].Effect == PLREFF_NORMAL &&
                     Player[A].Immune == 0 && !Player[A].Dead && Player[A].TimeToLive == 0)
                 {
                     if(Stab)
@@ -3007,7 +3019,7 @@ void YoshiEat(const int A)
     {
         auto &p2 = Player[B];
 
-        if(B != A && p2.Effect == 0 && !p2.Dead && p2.TimeToLive == 0 && p2.Mount == 0)
+        if(B != A && p2.Effect == PLREFF_NORMAL && !p2.Dead && p2.TimeToLive == 0 && p2.Mount == 0)
         {
             if(CheckCollision(p.YoshiTongue, p2.Location))
             {
@@ -3024,7 +3036,7 @@ void YoshiEat(const int A)
         if(((n->IsACoin && n.Special == 1) || !n->NoYoshi) &&
            n.Active && ((!n->IsACoin || n.Special == 1) || n.Type == 103) &&
            !NPCIsAnExit(n) && !n.Generator && !n.Inert && !NPCIsYoshi(n) &&
-            n.Effect != 5 && n.Immune == 0 && n.Type != NPCID_ITEM_BURIED &&
+            n.Effect != NPCEFF_PET_TONGUE && n.Immune == 0 && n.Type != NPCID_ITEM_BURIED &&
             !(n.Projectile && n.Type == NPCID_BULLET) && n.HoldingPlayer == 0)
         {
             tempLocation = n.Location;
@@ -3117,7 +3129,7 @@ void YoshiSpit(const int A)
     if(p.YoshiPlayer > 0)
     {
         Player[p.YoshiPlayer].Section = p.Section;
-        Player[p.YoshiPlayer].Effect = 0;
+        Player[p.YoshiPlayer].Effect = PLREFF_NORMAL;
         Player[p.YoshiPlayer].Effect2 = 0;
         Player[p.YoshiPlayer].Slide = true;
 
@@ -3296,7 +3308,7 @@ void YoshiPound(const int A, int mount, bool BreakBlocks)
 
         for(int B : NPCQueues::Active.may_erase)
         {
-            if(!NPC[B].Hidden && NPC[B].Active && NPC[B].Effect == 0)
+            if(!NPC[B].Hidden && NPC[B].Active && NPC[B].Effect == NPCEFF_NORMAL)
             {
                 tempLocation2 = NPC[B].Location;
                 tempLocation2.Y += tempLocation2.Height - 4;
@@ -3836,31 +3848,7 @@ void YoshiEatCode(const int A)
         if(p.MountSpecial == 0)
         {
             if(NPC[p.YoshiNPC].Type == NPCID_KEY) // key check
-            {
-                for(int B : treeBackgroundQuery(p.Location, SORTMODE_ID))
-                {
-                    if(B > numBackground)
-                        break;
-
-                    if(Background[B].Type == 35)
-                    {
-                        tempLocation = Background[B].Location;
-                        tempLocation.Width = 16;
-                        tempLocation.X += 8;
-                        tempLocation.Height = 26;
-                        tempLocation.Y += 2;
-
-                        if(CheckCollision(p.Location, tempLocation))
-                        {
-                            PlaySound(SFX_Key);
-                            StopMusic();
-                            LevelMacro = LEVELMACRO_KEYHOLE_EXIT;
-                            LevelMacroWhich = B;
-                            break;
-                        }
-                    }
-                }
-            }
+                KeyholeCheck(A, p.Location);
             else if(NPC[p.YoshiNPC].Type == NPCID_SLIDE_BLOCK)
                 NPC[p.YoshiNPC].Special = 1;
 
@@ -3986,7 +3974,7 @@ void YoshiEatCode(const int A)
 
             if(p.YoshiPlayer > 0)
             {
-                Player[p.YoshiPlayer].Effect = 9;
+                Player[p.YoshiPlayer].Effect = PLREFF_NO_COLLIDE;
                 Player[p.YoshiPlayer].Effect2 = A;
                 Player[p.YoshiPlayer].Location.X = p.YoshiTongue.X + p.YoshiTongue.Width / 2.0 - Player[p.YoshiPlayer].Location.Width / 2.0;
                 Player[p.YoshiPlayer].Location.Y = p.YoshiTongue.Y + p.YoshiTongue.Height / 2.0 - Player[p.YoshiPlayer].Location.Height / 2.0;
@@ -4130,7 +4118,7 @@ void YoshiEatCode(const int A)
         }
         else if(p.MountSpecial == 0 && p.YoshiPlayer > 0)
         {
-            Player[p.YoshiPlayer].Effect = 10;
+            Player[p.YoshiPlayer].Effect = PLREFF_PET_INSIDE;
             Player[p.YoshiPlayer].Effect2 = A;
             Player[p.YoshiPlayer].Location.X = p.Location.X + p.Location.Width / 2.0 - Player[p.YoshiPlayer].Location.Width / 2.0;
             Player[p.YoshiPlayer].Location.Y = p.Location.Y + p.Location.Height / 2.0 - Player[p.YoshiPlayer].Location.Height / 2.0;
@@ -4148,7 +4136,7 @@ void RespawnPlayer(int A, double Direction, double CenterX, double StopY, const 
     Player[A].Dead = false;
     Player[A].Location.SpeedX = 0;
     Player[A].Location.SpeedY = 0;
-    Player[A].Effect = 6;
+    Player[A].Effect = PLREFF_RESPAWN;
     // location where player stops flashing
     Player[A].Effect2 = StopY - Player[A].Location.Height;
     Player[A].Location.Y = -target_screen.Y - Player[A].Location.Height;
@@ -4161,7 +4149,7 @@ void RespawnPlayerTo(int A, int TargetPlayer)
 
     // don't lose a player when it targets a player who is already respawning
     double StopY;
-    if(Player[TargetPlayer].Effect == 6)
+    if(Player[TargetPlayer].Effect == PLREFF_RESPAWN)
         StopY = Player[TargetPlayer].Effect2 + Player[TargetPlayer].Location.Height;
     else if(Player[TargetPlayer].Mount == 2)
         StopY = Player[TargetPlayer].Location.Y;
@@ -4184,7 +4172,6 @@ void StealBonus()
     int B = 0;
     int C = 0;
     UNUSED(C);
-//    Location_t tempLocation;
 
     // dead players steal life
     if(BattleMode || GameMenu || GameOutro || g_ClonedPlayerMode)
@@ -4229,14 +4216,12 @@ void StealBonus()
 void ClownCar()
 {
     // for when the player is in the clown car
-    int A = 0;
-    int B = 0;
+    // int A = 0;
+    // int B = 0;
 //    int C = 0;
-    NPC_t blankNPC;
-    bool tempBool = false;
-    Location_t tempLocation;
+    // NPC_t blankNPC;
 
-    for(A = 1; A <= numPlayers; A++) // Code for running the Koopa Clown Car
+    for(int A = 1; A <= numPlayers; A++) // Code for running the Koopa Clown Car
     {
         // commenting out because:
         //   (1) misplaced; (2) doesn't work with abstract controls
@@ -4245,186 +4230,206 @@ void ClownCar()
         // if(numPlayers > 2 && GameMenu == false && LevelMacro == LEVELMACRO_OFF && nPlay.Online == false)
         //     Player[A].Controls = Player[1].Controls;
 
-        if(Player[A].Mount == 2 && Player[A].Dead == false && Player[A].TimeToLive == 0)
+        Player_t& p = Player[A];
+        Location_t& pLoc = p.Location;
+
+        // this code should only apply to living players on the vehicle mount
+        if(!(p.Mount == 2 && p.Dead == false && p.TimeToLive == 0))
+            continue;
+
+        // vehicle movement code
+        if(p.Effect == PLREFF_NORMAL)
         {
-            if(Player[A].Effect == 0)
+            if(p.Controls.Left)
             {
-                if(Player[A].Controls.Left)
-                {
-                    Player[A].Location.SpeedX -= 0.1;
-                    if(Player[A].Location.SpeedX > 0)
-                        Player[A].Location.SpeedX -= 0.15;
-                }
-                else if(Player[A].Controls.Right)
-                {
-                    Player[A].Location.SpeedX += 0.1;
-                    if(Player[A].Location.SpeedX < 0)
-                        Player[A].Location.SpeedX += 0.15;
-                }
+                pLoc.SpeedX -= 0.1;
+
+                if(pLoc.SpeedX > 0)
+                    pLoc.SpeedX -= 0.15;
+            }
+            else if(p.Controls.Right)
+            {
+                pLoc.SpeedX += 0.1;
+
+                if(pLoc.SpeedX < 0)
+                    pLoc.SpeedX += 0.15;
+            }
+            else
+            {
+                if(pLoc.SpeedX > 0.2)
+                    pLoc.SpeedX -= 0.05;
+                else if(pLoc.SpeedX < -0.2)
+                    pLoc.SpeedX += 0.05;
                 else
-                {
-                    if(Player[A].Location.SpeedX > 0.2)
-                        Player[A].Location.SpeedX -= 0.05;
-                    else if(Player[A].Location.SpeedX < -0.2)
-                        Player[A].Location.SpeedX += 0.05;
-                    else
-                        Player[A].Location.SpeedX = 0;
-                }
+                    pLoc.SpeedX = 0;
+            }
 
-                if(Player[A].Controls.Up)
-                {
-                    Player[A].Location.SpeedY -= 0.1;
-                    if(Player[A].Location.SpeedY > 0)
-                        Player[A].Location.SpeedY -= 0.2;
-                }
-                else if(Player[A].Controls.Down)
-                {
-                    Player[A].Location.SpeedY += 0.2;
-                    if(Player[A].Location.SpeedY < 0)
-                        Player[A].Location.SpeedY += 0.2;
-                }
+            if(p.Controls.Up)
+            {
+                pLoc.SpeedY -= 0.1;
+
+                if(pLoc.SpeedY > 0)
+                    pLoc.SpeedY -= 0.2;
+            }
+            else if(p.Controls.Down)
+            {
+                pLoc.SpeedY += 0.2;
+
+                if(pLoc.SpeedY < 0)
+                    pLoc.SpeedY += 0.2;
+            }
+            else
+            {
+                if(pLoc.SpeedY > 0.1)
+                    pLoc.SpeedY -= 0.1;
+                else if(pLoc.SpeedY < -0.1)
+                    pLoc.SpeedY += 0.1;
                 else
-                {
-                    if(Player[A].Location.SpeedY > 0.1)
-                        Player[A].Location.SpeedY -= 0.1;
-                    else if(Player[A].Location.SpeedY < -0.1)
-                        Player[A].Location.SpeedY += 0.1;
-                    else
-                        Player[A].Location.SpeedY = 0;
-                }
-
-                if(Player[A].Location.SpeedX > 4)
-                    Player[A].Location.SpeedX = 4;
-                else if(Player[A].Location.SpeedX < -4)
-                    Player[A].Location.SpeedX = -4;
-                if(Player[A].Location.SpeedY > 10)
-                    Player[A].Location.SpeedY = 10;
-                else if(Player[A].Location.SpeedY < -4)
-                    Player[A].Location.SpeedY = -4;
+                    pLoc.SpeedY = 0;
             }
 
-            numNPCs++;
-            NPC[numNPCs] = NPC_t();
-            NPC[numNPCs].playerTemp = true;
-            NPC[numNPCs].Type = NPCID_VEHICLE;
-            NPC[numNPCs].Variant = A; // newly-added to allow setting StandingOnVehiclePlr
-            NPC[numNPCs].Active = true;
-            NPC[numNPCs].TimeLeft = 100;
-            NPC[numNPCs].Location = Player[A].Location;
+            if(pLoc.SpeedX > 4)
+                pLoc.SpeedX = 4;
+            else if(pLoc.SpeedX < -4)
+                pLoc.SpeedX = -4;
+            if(pLoc.SpeedY > 10)
+                pLoc.SpeedY = 10;
+            else if(pLoc.SpeedY < -4)
+                pLoc.SpeedY = -4;
+        }
 
-            if(Player[A].Effect != 0)
+        // create playerTemp NPC for the Vehicle
+        numNPCs++;
+        NPC[numNPCs] = NPC_t();
+        NPC[numNPCs].playerTemp = true;
+        NPC[numNPCs].Type = NPCID_VEHICLE;
+        NPC[numNPCs].Variant = A; // newly-added to allow setting StandingOnVehiclePlr
+        NPC[numNPCs].Active = true;
+        NPC[numNPCs].TimeLeft = 100;
+        NPC[numNPCs].Location = pLoc;
+
+        if(p.Effect != PLREFF_NORMAL)
+        {
+            NPC[numNPCs].Location.SpeedX = 0;
+            NPC[numNPCs].Location.SpeedY = 0;
+        }
+
+        NPC[numNPCs].Location.Y += NPC[numNPCs].Location.SpeedY;
+        NPC[numNPCs].Location.X += NPC[numNPCs].Location.SpeedX;
+        NPC[numNPCs].Section = p.Section;
+        syncLayers_NPC(numNPCs);
+
+        // update other players' StandingOnNPC
+        for(int B = 1; B <= numPlayers; B++)
+        {
+            if(Player[B].StandingOnVehiclePlr && (g_ClonedPlayerMode || Player[B].StandingOnVehiclePlr == A))
             {
-                NPC[numNPCs].Location.SpeedX = 0;
-                NPC[numNPCs].Location.SpeedY = 0;
-            }
+                Player[B].StandingOnNPC = numNPCs;
+                Player[B].Location.X += double(p.mountBump);
 
-            NPC[numNPCs].Location.Y += NPC[numNPCs].Location.SpeedY;
-            NPC[numNPCs].Location.X += NPC[numNPCs].Location.SpeedX;
-            NPC[numNPCs].Section = Player[A].Section;
-            syncLayers_NPC(numNPCs);
-
-            for(B = 1; B <= numPlayers; B++)
-            {
-                if(Player[B].StandingOnVehiclePlr && (g_ClonedPlayerMode || Player[B].StandingOnVehiclePlr == A))
+                if(Player[B].Effect != PLREFF_NORMAL)
                 {
-                    Player[B].StandingOnNPC = numNPCs;
-                    Player[B].Location.X += double(Player[A].mountBump);
-                    if(Player[B].Effect != 0)
-                    {
-                        Player[B].Location.Y = Player[A].Location.Y - Player[B].Location.Height;
-                        Player[B].Location.X += Player[A].Location.SpeedX;
-                    }
+                    Player[B].Location.Y = pLoc.Y - Player[B].Location.Height;
+                    Player[B].Location.X += pLoc.SpeedX;
                 }
             }
+        }
 
-            for(int B : NPCQueues::Active.may_insert)
+        // handle NPCs on the vehicle
+        for(int B : NPCQueues::Active.may_insert)
+        {
+            // only want non-toothy NPCs on A's vehicle
+            if(!(NPC[B].vehiclePlr == A && NPC[B].Type != NPCID_TOOTHY))
+                continue;
+
+            if(p.Effect == PLREFF_NORMAL)
+                NPC[B].Location.X += pLoc.SpeedX + double(p.mountBump);
+
+            NPC[B].TimeLeft = 100;
+            NPC[B].Location.SpeedY = pLoc.SpeedY;
+            NPC[B].Location.SpeedX = 0;
+
+            if(p.Effect != PLREFF_NORMAL)
+                NPC[B].Location.SpeedY = 0;
+
+            NPC[B].Location.Y = pLoc.Y + NPC[B].Location.SpeedY + 0.1 - NPC[B].vehicleYOffset;
+            treeNPCUpdate(B);
+
+            // extend toothy pipe
+            if(p.Controls.Run && NPC[B].Type == NPCID_TOOTHYPIPE)
             {
-                if(NPC[B].vehiclePlr == A && NPC[B].Type != NPCID_TOOTHY)
+                // create toothy if it doesn't exist already
+                if(NPC[B].Special == 0.0)
                 {
-                    if(Player[A].Effect == 0)
-                        NPC[B].Location.X += Player[A].Location.SpeedX + double(Player[A].mountBump);
-                    NPC[B].TimeLeft = 100;
-                    NPC[B].Location.SpeedY = Player[A].Location.SpeedY;
-                    NPC[B].Location.SpeedX = 0;
-                    if(Player[A].Effect != 0)
-                        NPC[B].Location.SpeedY = 0;
-                    NPC[B].Location.Y = Player[A].Location.Y + NPC[B].Location.SpeedY + 0.1 - NPC[B].vehicleYOffset;
-                    treeNPCUpdate(B);
+                    NPC[B].Special = 1;
+                    numNPCs++;
+                    NPC[numNPCs] = NPC_t();
+                    NPC[B].Special2 = numNPCs;
 
-                    if(Player[A].Controls.Run)
+                    NPC[numNPCs].Active = true;
+                    NPC[numNPCs].Section = p.Section;
+                    NPC[numNPCs].TimeLeft = 100;
+                    NPC[numNPCs].Type = NPCID_TOOTHY;
+                    NPC[numNPCs].Location.Height = 32;
+                    NPC[numNPCs].Location.Width = 48;
+                    NPC[numNPCs].Special = A;
+                    NPC[numNPCs].Special2 = B;
+                    NPC[numNPCs].Direction = NPC[B].Direction;
+
+                    if(NPC[numNPCs].Direction == 1)
+                        NPC[numNPCs].Frame = 2;
+                    syncLayers_NPC(numNPCs);
+                }
+
+                // update toothy's position
+                for(int C : NPCQueues::Active.no_change)
+                {
+                    if(NPC[C].Type == NPCID_TOOTHY && Maths::iRound(NPC[C].Special) == A && Maths::iRound(NPC[C].Special2) == B)
                     {
-                        if(NPC[B].Type == NPCID_TOOTHYPIPE)
-                        {
-                            if(NPC[B].Special == 0.0)
-                            {
-                                NPC[B].Special = 1;
-                                numNPCs++;
-                                NPC[numNPCs] = NPC_t();
-                                NPC[B].Special2 = numNPCs;
-                                NPC[numNPCs].Active = true;
-                                NPC[numNPCs].Section = Player[A].Section;
-                                NPC[numNPCs].TimeLeft = 100;
-                                NPC[numNPCs].Type = NPCID_TOOTHY;
-                                NPC[numNPCs].Location.Height = 32;
-                                NPC[numNPCs].Location.Width = 48;
-                                NPC[numNPCs].Special = A;
-                                NPC[numNPCs].Special2 = B;
-                                NPC[numNPCs].Direction = NPC[B].Direction;
-                                if(NPC[numNPCs].Direction == 1)
-                                    NPC[numNPCs].Frame = 2;
-                                syncLayers_NPC(numNPCs);
-                            }
+                        NPC[C].vehiclePlr = A;
+                        NPC[C].Projectile = true;
+                        NPC[C].Direction = NPC[B].Direction;
 
-                            for(int C : NPCQueues::Active.no_change)
-                            {
-                                if(NPC[C].Type == NPCID_TOOTHY && Maths::iRound(NPC[C].Special) == A && Maths::iRound(NPC[C].Special2) == B)
-                                {
-                                    NPC[C].vehiclePlr = A;
-                                    NPC[C].Projectile = true;
-                                    NPC[C].Direction = NPC[B].Direction;
+                        if(NPC[C].Direction > 0)
+                            NPC[C].Location.X = NPC[B].Location.X + 32;
+                        else
+                            NPC[C].Location.X = NPC[B].Location.X - NPC[C].Location.Width;
 
-                                    if(NPC[C].Direction > 0)
-                                        NPC[C].Location.X = NPC[B].Location.X + 32;
-                                    else
-                                        NPC[C].Location.X = NPC[B].Location.X - NPC[C].Location.Width;
-
-                                    NPC[C].Location.Y = NPC[B].Location.Y;
-                                    NPC[C].TimeLeft = 100;
-                                    treeNPCUpdate(C);
-                                    break;
-                                }
-                            }
-                        }
+                        NPC[C].Location.Y = NPC[B].Location.Y;
+                        NPC[C].TimeLeft = 100;
+                        treeNPCUpdate(C);
+                        break;
                     }
-
-                    tempBool = false;
-                    tempLocation = NPC[B].Location;
-                    tempLocation.Y += tempLocation.Height + 0.1;
-                    tempLocation.X += 0.5;
-                    tempLocation.Width -= 1;
-                    tempLocation.Height = 1;
-
-                    for(int C : treeNPCQuery(tempLocation, SORTMODE_NONE))
-                    {
-                        if(B != C && (NPC[C].vehiclePlr == A || NPC[C].playerTemp))
-                        {
-                            if(CheckCollision(tempLocation, NPC[C].Location))
-                            {
-                                tempBool = true;
-                                break;
-                            }
-                        }
-                    }
-
-                    if(!tempBool)
-                    {
-                        NPC[B].vehiclePlr = 0;
-                        NPC[B].vehicleYOffset = 0;
-                    }
-                    else
-                        NPC[B].Location.SpeedX = 0;
                 }
             }
+
+            // check if NPC should stay on the vehicle
+            bool still_on_vehicle = false;
+            Location_t query_loc = NPC[B].Location;
+            query_loc.Y += query_loc.Height + 0.1;
+            query_loc.X += 0.5;
+            query_loc.Width -= 1;
+            query_loc.Height = 1;
+
+            for(int C : treeNPCQuery(query_loc, SORTMODE_NONE))
+            {
+                if(B != C && (NPC[C].vehiclePlr == A || NPC[C].playerTemp))
+                {
+                    if(CheckCollision(query_loc, NPC[C].Location))
+                    {
+                        still_on_vehicle = true;
+                        break;
+                    }
+                }
+            }
+
+            if(!still_on_vehicle)
+            {
+                NPC[B].vehiclePlr = 0;
+                NPC[B].vehicleYOffset = 0;
+            }
+            else
+                NPC[B].Location.SpeedX = 0;
         }
     }
 }
@@ -4432,7 +4437,6 @@ void ClownCar()
 void WaterCheck(const int A)
 {
     Location_t tempLocation;
-    // int B = 0;
     auto &p = Player[A];
 
     if(p.Wet > 0)
@@ -4558,441 +4562,6 @@ void WaterCheck(const int A)
     }
 }
 
-void Tanooki(const int A)
-{
-    auto &p = Player[A];
-
-    if(p.Fairy)
-           return;
-// tanooki
-    if(p.Stoned && p.Controls.Down && p.StandingOnNPC == 0)
-    {
-        p.Location.SpeedX = p.Location.SpeedX * 0.8;
-        if(p.Location.SpeedX >= -0.5 && p.Location.SpeedX <= 0.5)
-            p.Location.SpeedX = 0;
-        if(p.Location.SpeedY < 8)
-            p.Location.SpeedY += 0.25;
-    }
-
-    if(p.StonedCD == 0)
-    {
-        // If .Mount = 0 And .State = 5 And .Controls.Run = True And .Controls.Down = True Then
-        if(p.Mount == 0 && p.State == 5 && p.Controls.AltRun && p.Bombs == 0)
-        {
-            if(!p.Stoned)
-                p.Effect = 500;
-        }
-        else if(p.Stoned)
-            p.Effect = 500;
-    }
-    else
-        p.StonedCD -= 1;
-
-    if(p.Stoned)
-    {
-        p.StonedTime += 1;
-        if(p.StonedTime >= 240)
-        {
-            p.Effect = 500;
-            p.StonedCD = 60;
-        }
-        else if(p.StonedTime >= 180)
-        {
-            p.Immune += 1;
-            if(p.Immune % 3 == 0)
-            {
-                p.Immune2 = !p.Immune2;
-//                if(p.Immune2)
-//                    p.Immune2 = false;
-//                else
-//                    p.Immune2 = true;
-            }
-        }
-    }
-}
-
-void PowerUps(const int A)
-{
-    bool BoomOut = false;
-    auto &p = Player[A];
-    //int B = 0;
-
-    if(p.Fairy)
-    {
-        p.SwordPoke = 0;
-        p.FireBallCD = 0;
-        p.FireBallCD2 = 0;
-        p.TailCount = 0;
-        return;
-    }
-
-
-    if(p.State == 6 && p.Character == 4 && p.Controls.Run && p.RunRelease)
-    {
-        for(int B : NPCQueues::Active.no_change)
-        {
-            if(NPC[B].Active)
-            {
-                if(NPC[B].Type == NPCID_CHAR4_HEAVY)
-                {
-                    if(Maths::iRound(NPC[B].Special5) == A)
-                    {
-                        BoomOut = true;
-                        break;
-                    }
-                }
-            }
-        }
-    }
-
-// Hammer Throw Code
-        if(!p.Slide && p.Vine == 0 && p.State == 6 && !p.Duck && p.Mount != 2 && p.Mount != 3 && p.HoldingNPC <= 0 && p.Character != 5)
-        {
-            if(p.Controls.Run && !p.SpinJump && p.FireBallCD <= 0 && !BoomOut)
-            {
-                if(p.RunRelease || FlameThrower)
-                {
-                    if(numNPCs < maxNPCs - 100)
-                    {
-//                        if(nPlay.Online && A - 1 == nPlay.MySlot)
-//                            Netplay::sendData Netplay::PutPlayerControls(nPlay.MySlot) + "1f" + std::to_string(A) + "|" + p.FireBallCD - 1;
-                        p.FrameCount = 110;
-                        p.FireBallCD = 25;
-                        numNPCs++;
-                        NPC[numNPCs] = NPC_t();
-                        if(ShadowMode)
-                            NPC[numNPCs].Shadow = true;
-                        NPC[numNPCs].Type = NPCID_PLR_HEAVY;
-                        if(p.Character == 3)
-                        {
-                            p.FireBallCD = 45;
-                            NPC[numNPCs].Type = NPCID_CHAR3_HEAVY;
-                            if(p.Controls.AltRun && p.Mount == 0)
-                            {
-                                NPC[numNPCs].HoldingPlayer = A;
-                                p.HoldingNPC = numNPCs;
-                                PlaySoundSpatial(SFX_Grab2, p.Location);
-                            }
-                            else
-                                PlaySoundSpatial(SFX_Throw, p.Location);
-                        }
-                        else if(p.Character == 4)
-                        {
-
-                            p.FireBallCD = 0;
-                            if(FlameThrower)
-                                p.FireBallCD = 40;
-                            NPC[numNPCs].Type = NPCID_CHAR4_HEAVY;
-                            NPC[numNPCs].Special5 = A;
-                            NPC[numNPCs].Special6 = p.Direction;
-                            PlaySoundSpatial(SFX_Throw, p.Location);
-                        }
-                        else
-                            PlaySoundSpatial(playerHammerSFX, p.Location);
-
-                        NPC[numNPCs].Projectile = true;
-                        NPC[numNPCs].Location.Height = NPC[numNPCs]->THeight;
-                        NPC[numNPCs].Location.Width = NPC[numNPCs]->TWidth;
-                        NPC[numNPCs].Location.X = p.Location.X + Physics.PlayerGrabSpotX[p.Character][p.State] * p.Direction;
-                        NPC[numNPCs].Location.Y = p.Location.Y + Physics.PlayerGrabSpotY[p.Character][p.State];
-                        NPC[numNPCs].Active = true;
-                        NPC[numNPCs].TimeLeft = 100;
-                        NPC[numNPCs].Location.SpeedY = 20;
-                        NPC[numNPCs].CantHurt = 100;
-                        NPC[numNPCs].CantHurtPlayer = A;
-
-                        if(p.Controls.Up)
-                        {
-                            NPC[numNPCs].Location.SpeedX = 2 * p.Direction + p.Location.SpeedX * 0.9;
-                            if(p.StandingOnNPC == 0)
-                                NPC[numNPCs].Location.SpeedY = -8 + p.Location.SpeedY * 0.3;
-                            else
-                                NPC[numNPCs].Location.SpeedY = -8 + NPC[p.StandingOnNPC].Location.SpeedY * 0.3;
-                            NPC[numNPCs].Location.Y -= 24;
-                            NPC[numNPCs].Location.X += -6 * p.Direction;
-                            if(p.Character == 3)
-                            {
-                                NPC[numNPCs].Location.SpeedY += 1;
-                                NPC[numNPCs].Location.SpeedX = NPC[numNPCs].Location.SpeedX * 1.5;
-                            }
-                            else if(p.Character == 4)
-                            {
-                                NPC[numNPCs].Location.SpeedY = -8;
-                                NPC[numNPCs].Location.SpeedX = 12 * p.Direction + p.Location.SpeedX;
-                            }
-                        }
-                        else
-                        {
-                            NPC[numNPCs].Location.SpeedX = 4 * p.Direction + p.Location.SpeedX * 0.9;
-                            if(p.StandingOnNPC == 0)
-                                NPC[numNPCs].Location.SpeedY = -5 + p.Location.SpeedY * 0.3;
-                            else
-                                NPC[numNPCs].Location.SpeedY = -5 + NPC[p.StandingOnNPC].Location.SpeedY * 0.3;
-                            if(p.Character == 3)
-                                NPC[numNPCs].Location.SpeedY += 1;
-                            else if(p.Character == 4)
-                            {
-                                NPC[numNPCs].Location.SpeedY = -5;
-                                NPC[numNPCs].Location.SpeedX = 10 * p.Direction + p.Location.SpeedX;
-                                NPC[numNPCs].Location.Y -= 12;
-                            }
-                        }
-                        if(p.Character == 4)
-                            NPC[numNPCs].Location.X = p.Location.X + p.Location.Width / 2.0 - NPC[numNPCs].Location.Width / 2.0;
-                        syncLayers_NPC(numNPCs);
-                        CheckSectionNPC(numNPCs);
-                    }
-                }
-            }
-        }
-
-
-
-
-// Fire Mario / Luigi code ---- FIRE FLOWER ACTION BALLS OF DOOM
-        if(!p.Slide && p.Vine == 0 && (p.State == 3 || p.State == 7) && !p.Duck && p.Mount != 2 && p.Mount != 3 && p.HoldingNPC <= 0 && p.Character != 5)
-        {
-            if(((p.Controls.Run && !p.SpinJump) || (p.SpinJump && p.Direction != p.SpinFireDir)) && p.FireBallCD <= 0)
-            {
-                if((p.RunRelease || p.SpinJump) || (FlameThrower && p.HoldingNPC <= 0))
-                {
-                    if(p.SpinJump)
-                        p.SpinFireDir = p.Direction;
-
-                    if(numNPCs < maxNPCs - 100)
-                    {
-//                        if(nPlay.Online && A - 1 == nPlay.MySlot)
-//                            Netplay::sendData Netplay::PutPlayerControls(nPlay.MySlot) + "1f" + std::to_string(A) + "|" + p.FireBallCD - 1;
-                        if(!p.SpinJump)
-                            p.FrameCount = 110;
-
-                        numNPCs++;
-                        NPC[numNPCs] = NPC_t();
-                        if(ShadowMode)
-                            NPC[numNPCs].Shadow = true;
-                        NPC[numNPCs].Type = NPCID_PLR_FIREBALL;
-                        if(p.State == 7)
-                            NPC[numNPCs].Type = NPCID_PLR_ICEBALL;
-                        NPC[numNPCs].Projectile = true;
-                        NPC[numNPCs].Location.Height = NPC[numNPCs]->THeight;
-                        NPC[numNPCs].Location.Width = NPC[numNPCs]->TWidth;
-                        NPC[numNPCs].Location.X = p.Location.X + Physics.PlayerGrabSpotX[p.Character][p.State] * p.Direction + 4;
-                        NPC[numNPCs].Location.Y = p.Location.Y + Physics.PlayerGrabSpotY[p.Character][p.State];
-                        NPC[numNPCs].Active = true;
-                        NPC[numNPCs].TimeLeft = 100;
-                        NPC[numNPCs].Location.SpeedY = 20;
-                        NPC[numNPCs].CantHurt = 100;
-                        NPC[numNPCs].CantHurtPlayer = A;
-                        NPC[numNPCs].Special = p.Character;
-
-                        if(p.State == 7)
-                            NPC[numNPCs].Special = 1;
-
-                        if((p.Character == 3 || p.Character == 4) && p.Mount == 0 && p.Controls.AltRun) // peach holds fireballs
-                        {
-                            p.HoldingNPC = numNPCs;
-                            NPC[numNPCs].HoldingPlayer = A;
-                        }
-
-                        if(Maths::iRound(NPC[numNPCs].Special) == 2)
-                            NPC[numNPCs].Frame = 4;
-                        if(Maths::iRound(NPC[numNPCs].Special) == 3)
-                            NPC[numNPCs].Frame = 8;
-                        if(Maths::iRound(NPC[numNPCs].Special) == 4)
-                            NPC[numNPCs].Frame = 12;
-
-                        syncLayers_NPC(numNPCs);
-                        CheckSectionNPC(numNPCs);
-                        p.FireBallCD = 30;
-                        if(p.Character == 2)
-                            p.FireBallCD = 35;
-                        if(p.Character == 3)
-                            p.FireBallCD = 40;
-                        if(p.Character == 4)
-                            p.FireBallCD = 25;
-
-                        NPC[numNPCs].Location.SpeedX = 5 * p.Direction + (p.Location.SpeedX / 3.5);
-
-                        if(p.State == 7)
-                        {
-                            NPC[numNPCs].Location.SpeedY = 5;
-
-                            if(p.Controls.Up)
-                            {
-                                if(p.StandingOnNPC != 0)
-                                    NPC[numNPCs].Location.SpeedY = -8 + NPC[p.StandingOnNPC].Location.SpeedY * 0.1;
-                                else
-                                    NPC[numNPCs].Location.SpeedY = -8 + p.Location.SpeedY * 0.1;
-                                NPC[numNPCs].Location.SpeedX = NPC[numNPCs].Location.SpeedX * 0.9;
-                            }
-                            if(FlameThrower)
-                            {
-                                NPC[numNPCs].Location.SpeedX = NPC[numNPCs].Location.SpeedX * 1.5;
-                                NPC[numNPCs].Location.SpeedY = NPC[numNPCs].Location.SpeedY * 1.5;
-                            }
-                            if(p.StandingOnNPC != 0)
-                                NPC[numNPCs].Location.SpeedX = 5 * p.Direction + (p.Location.SpeedX / 3.5) + NPC[p.StandingOnNPC].Location.SpeedX / 3.5;
-                            PlaySoundSpatial(SFX_Iceball, p.Location);
-                            NPC[numNPCs].Location.SpeedX = NPC[numNPCs].Location.SpeedX * 0.8;
-                        }
-                        else
-                        {
-                            if(Maths::iRound(NPC[numNPCs].Special) == 2)
-                                NPC[numNPCs].Location.SpeedX = NPC[numNPCs].Location.SpeedX * 0.85;
-
-                            if(p.Controls.Up)
-                            {
-                                if(p.StandingOnNPC != 0)
-                                    NPC[numNPCs].Location.SpeedY = -6 + NPC[p.StandingOnNPC].Location.SpeedY * 0.1;
-                                else
-                                    NPC[numNPCs].Location.SpeedY = -6 + p.Location.SpeedY * 0.1;
-                                NPC[numNPCs].Location.SpeedX = NPC[numNPCs].Location.SpeedX * 0.9;
-                            }
-
-                            if(FlameThrower)
-                            {
-                                NPC[numNPCs].Location.SpeedX = NPC[numNPCs].Location.SpeedX * 1.5;
-                                NPC[numNPCs].Location.SpeedY = NPC[numNPCs].Location.SpeedY * 1.5;
-                            }
-
-                            if(p.StandingOnNPC != 0)
-                                NPC[numNPCs].Location.SpeedX = 5 * p.Direction + (p.Location.SpeedX / 3.5) + NPC[p.StandingOnNPC].Location.SpeedX / 3.5;
-                            PlaySoundSpatial(SFX_Fireball, p.Location);
-                        }
-                    }
-                }
-            }
-        }
-// RacoonMario
-        if(!p.Slide && p.Vine == 0 && (p.State == 4 || p.State == 5) && !p.Duck && p.HoldingNPC == 0 && p.Mount != 2 && !p.Stoned && p.Effect == 0 && p.Character != 5)
-        {
-             if(p.Controls.Run || p.SpinJump)
-             {
-                if(p.TailCount == 0 || p.TailCount >= 12)
-                {
-                    if(p.RunRelease || p.SpinJump)
-                    {
-                        p.TailCount = 1;
-                        if(!p.SpinJump)
-                            PlaySoundSpatial(SFX_Whip, p.Location);
-                    }
-                }
-             }
-        }
-
-        if(p.TailCount > 0)
-        {
-            p.TailCount += 1;
-            if(p.TailCount == 25)
-                p.TailCount = 0;
-
-            if(p.TailCount % 7 == 0 || (p.SpinJump && (p.TailCount % 2) == 0))
-                TailSwipe(A, true);
-            else
-                TailSwipe(A);
-
-            if(p.HoldingNPC > 0)
-                p.TailCount = 0;
-        }
-
-
-// link stab
-    if(p.Character == 5 && p.Vine == 0 && p.Mount == 0 && !p.Stoned && p.FireBallCD == 0)
-    {
-        if(p.Bombs > 0 && p.Controls.AltRun && p.RunRelease)
-        {
-            p.FireBallCD = 10;
-            p.Bombs -= 1;
-            numNPCs++;
-            NPC[numNPCs] = NPC_t();
-            NPC[numNPCs].Active = true;
-            NPC[numNPCs].TimeLeft = Physics.NPCTimeOffScreen;
-            NPC[numNPCs].Section = p.Section;
-            NPC[numNPCs].Type = NPCID_BOMB;
-            NPC[numNPCs].Location.Width = NPC[numNPCs]->TWidth;
-            NPC[numNPCs].Location.Height = NPC[numNPCs]->THeight;
-            NPC[numNPCs].CantHurtPlayer = A;
-            NPC[numNPCs].CantHurt = 1000;
-
-            if(p.Duck && (p.Location.SpeedY == 0 || p.Slope > 0 || p.StandingOnNPC != 0))
-            {
-                NPC[numNPCs].Location.X = p.Location.X + p.Location.Width / 2.0 - NPC[numNPCs].Location.Width / 2.0;
-                NPC[numNPCs].Location.Y = p.Location.Y + p.Location.Height - NPC[numNPCs].Location.Height;
-                NPC[numNPCs].Location.SpeedX = 0;
-                NPC[numNPCs].Location.SpeedY = 0;
-                PlaySoundSpatial(SFX_Grab, p.Location);
-            }
-            else
-            {
-                NPC[numNPCs].Location.X = p.Location.X + p.Location.Width / 2.0 - NPC[numNPCs].Location.Width / 2.0;
-                NPC[numNPCs].Location.Y = p.Location.Y;
-                NPC[numNPCs].Location.SpeedX = 5 * p.Direction;
-                NPC[numNPCs].Location.SpeedY = -6;
-                NPC[numNPCs].Projectile = true;
-                if(p.Location.SpeedY == 0 || p.Slope > 0 || p.StandingOnNPC != 0)
-                    p.SwordPoke = -10;
-                PlaySoundSpatial(SFX_Throw, p.Location);
-            }
-
-            syncLayers_NPC(numNPCs);
-        }
-        else if(p.FireBallCD == 0 && p.Controls.Run && p.RunRelease)
-        {
-            p.FireBallCD = 20;
-            if(p.Location.SpeedY != Physics.PlayerGravity && p.StandingOnNPC == 0 && p.Slope == 0) // Link ducks when jumping
-            {
-                if(p.Wet == 0 && !p.WetFrame)
-                {
-                    if(p.Controls.Down && !p.Duck && p.Mount == 0)
-                    {
-                        p.Duck = true;
-                        p.Location.Y += p.Location.Height;
-                        p.Location.Height = Physics.PlayerDuckHeight[p.Character][p.State];
-                        p.Location.Y += -p.Location.Height;
-                    }
-                    else if(!p.Controls.Down && p.Duck)
-                    {
-                        UnDuck(Player[A]);
-                    }
-                }
-            }
-            if(p.Duck)
-                p.SwordPoke = 1;
-            else
-                p.SwordPoke = -1;
-        }
-        else if(p.Controls.Up && p.Location.SpeedY < 0 && !p.Duck && p.SwordPoke == 0) // Link stabs up
-        {
-            if(!p.WetFrame && p.Frame == 10)
-            {
-                TailSwipe(A, true, true, 1);
-            }
-        }
-        else if(p.Controls.Down && (p.Location.SpeedY > 0 && p.StandingOnNPC == 0 && p.Slope == 0) && !p.Duck && p.SwordPoke == 0) // Link stabs down
-        {
-            if(!p.WetFrame && p.Frame == 9)
-            {
-                TailSwipe(A, true, true, 2);
-            }
-        }
-    }
-
-
-// cooldown timer
-    p.FireBallCD2 -= 1;
-    if(p.FireBallCD2 < 0)
-        p.FireBallCD2 = 0;
-
-    if(!(p.Character == 3 && NPC[p.HoldingNPC].Type == NPCID_PLR_FIREBALL))
-    {
-        p.FireBallCD -= 1;
-        if(FlameThrower)
-            p.FireBallCD -= 3;
-        if(p.FireBallCD < 0)
-            p.FireBallCD = 0;
-    }
-}
-
 static void s_TriggerDoorEffects(const Location_t& loc, bool do_big_door = true)
 {
     for(Background_t& bgo : treeBackgroundQuery(loc, SORTMODE_ID))
@@ -5087,7 +4656,7 @@ bool InOnscreenPet(int plr_A, const Screen_t& screen)
     const Player_t& p = Player[plr_A];
 
     // in the mouth of any player's Pet?
-    if(p.Effect == 10)
+    if(p.Effect == PLREFF_PET_INSIDE)
     {
         // check it really is a player on this screen
         for(int plr_i = 0; plr_i < screen.player_count; plr_i++)
@@ -5107,11 +4676,11 @@ void RemoveFromPet(int plr_A)
 {
     Player_t& p = Player[plr_A];
 
-    if(p.Effect == 10 && p.Effect2 > 0 && p.Effect2 <= numPlayers && Player[p.Effect2].YoshiPlayer == plr_A)
+    if(p.Effect == PLREFF_PET_INSIDE && p.Effect2 > 0 && p.Effect2 <= numPlayers && Player[p.Effect2].YoshiPlayer == plr_A)
         Player[p.Effect2].YoshiPlayer = 0;
 
     // set to no-collide mode with the other player (but this will be changed at the calling code)
-    p.Effect = 9;
+    p.Effect = PLREFF_NO_COLLIDE;
 }
 
 static inline bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool backward)
@@ -5296,7 +4865,7 @@ static inline bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool bac
                 {
                     GoToLevel = GetS(warp.level);
                     GoToLevelNoGameThing = warp.noEntranceScene;
-                    plr.Effect = 8;
+                    plr.Effect = PLREFF_WAITING;
                     plr.Effect2 = 2921;
                     plr.Warp = B;
                     plr.WarpBackward = backward;
@@ -5308,7 +4877,7 @@ static inline bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool bac
                 }
                 else if(warp.MapWarp)
                 {
-                    plr.Effect = 8;
+                    plr.Effect = PLREFF_WAITING;
                     plr.Effect2 = 2921;
                     plr.Warp = B;
                     plr.WarpBackward = backward;
@@ -5322,8 +4891,9 @@ static inline bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool bac
             plr.WarpCD = (warp.Effect == 3) ? 10 : 50;
 
             const Screen_t& screen = ScreenByPlayer(A);
+            int vscreen_A = vScreenIdxByPlayer(A);
             bool is_shared_screen = (screen.Type == 3);
-            bool do_tele = is_shared_screen && !vScreenCollision(vScreenIdxByPlayer(A), exit);
+            bool do_tele = is_shared_screen && !vScreenCollision(vscreen_A, exit);
 
             // teleport other players using the instant/portal warp in shared screen mode
             if(do_tele)
@@ -5343,8 +4913,8 @@ static inline bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool bac
                     {
                         RemoveFromPet(o_A);
 
-                        o_p.Location.X = exit.X + exit.Width / 2.0 - plr.Location.Width / 2.0;
-                        o_p.Location.Y = exit.Y + exit.Height - plr.Location.Height - 0.1;
+                        o_p.Location.X = exit.X + exit.Width / 2.0 - o_p.Location.Width / 2.0;
+                        o_p.Location.Y = exit.Y + exit.Height - o_p.Location.Height - 0.1;
                         CheckSection(o_A);
 
                         if(warp.Effect != 3) // Don't zero speed when passing a portal warp
@@ -5353,13 +4923,16 @@ static inline bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool bac
                             o_p.Location.SpeedY = 0;
                         }
 
+                        o_p.Vine = plr.Vine;
                         o_p.WarpCD = (warp.Effect == 3) ? 10 : 50;
 
                         // put other player in no-collide mode
-                        o_p.Effect = 9;
+                        o_p.Effect = PLREFF_NO_COLLIDE;
                         o_p.Effect2 = A;
                     }
                 }
+
+                GetvScreenAuto(vScreen[vscreen_A]);
             }
 
             return true; // break
@@ -5367,7 +4940,7 @@ static inline bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool bac
         else if(warp.Effect == 1) // Pipe
         {
             PlaySoundSpatial(SFX_Warp, plr.Location);
-            plr.Effect = 3;
+            plr.Effect = PLREFF_WARP_PIPE;
             if(g_config.fix_fairy_stuck_in_pipe)
                 plr.Effect2 = 0;
             plr.Warp = B;
@@ -5378,9 +4951,11 @@ static inline bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool bac
         else if(warp.Effect == 2) // Door
         {
             PlaySoundSpatial(SFX_Door, plr.Location);
-            plr.Effect = 7;
+            plr.Effect = PLREFF_WARP_DOOR;
+
             if(g_config.fix_fairy_stuck_in_pipe)
                 plr.Effect2 = 0;
+
             plr.Warp = B;
             plr.WarpBackward = backward;
 //                        if(nPlay.Online && A == nPlay.MySlot + 1)
@@ -5447,7 +5022,7 @@ void PlayerCollide(const int A)
         auto &p2 = Player[B];
 
         if(B != A && !p2.Dead && p2.TimeToLive == 0 &&
-           (p2.Effect == 0 || p2.Effect == 3) &&
+           (p2.Effect == PLREFF_NORMAL || p2.Effect == PLREFF_WARP_PIPE) &&
            !(p2.Mount == 2 || p1.Mount == 2) &&
            (!BattleMode || (p1.Immune == 0 && p2.Immune == 0)))
         {
@@ -6227,7 +5802,7 @@ void LinkFrame(Player_t &p)
         return;
     }
 
-    if(!LevelSelect && p.Effect == 0 && p.FireBallCD == 0)
+    if(!LevelSelect && p.Effect == PLREFF_NORMAL && p.FireBallCD == 0)
     {
         if(p.Controls.Left)
             p.Direction = -1;
@@ -6361,7 +5936,7 @@ void PlayerEffects(const int A)
     Location_t tempLocation;
     auto &p = Player[A];
 
-    if(p.Effect != 8 && p.Fairy)
+    if(p.Effect != PLREFF_WAITING && p.Fairy)
     {
         p.Fairy = false;
         SizeCheck(Player[A]);
@@ -6376,7 +5951,7 @@ void PlayerEffects(const int A)
     p.Pinched.reset_non_strict();
     p.SwordPoke = 0;
 
-    if(!p.YoshiBlue && p.Effect != 500)
+    if(!p.YoshiBlue && p.Effect != PLREFF_STONE)
     {
         p.CanFly = false;
         p.CanFly2 = false;
@@ -6388,7 +5963,7 @@ void PlayerEffects(const int A)
     constexpr int plr_warp_scroll_speed = 8; // 8px / frame
     constexpr int plr_warp_scroll_max_frames = 260; // 4 seconds
 
-    if(p.Effect == 1) // Player growing effect
+    if(p.Effect == PLREFF_TURN_BIG) // Player growing effect
     {
 
         p.Frame = 1;
@@ -6440,12 +6015,12 @@ void PlayerEffects(const int A)
         {
             p.Immune += 50;
             p.Immune2 = true;
-            p.Effect = 0;
+            p.Effect = PLREFF_NORMAL;
             p.Effect2 = 0;
             p.StandUp = true;
         }
     }
-    else if(p.Effect == 2) // Player shrinking effect
+    else if(p.Effect == PLREFF_TURN_SMALL) // Player shrinking effect
     {
         if(p.Duck)
         {
@@ -6504,12 +6079,52 @@ void PlayerEffects(const int A)
             }
             p.Immune = 150;
             p.Immune2 = true;
-            p.Effect = 0;
+            p.Effect = PLREFF_NORMAL;
             p.Effect2 = 0;
             // If numPlayers <= 2 Then DropBonus A
         }
     }
-    else if(p.Effect == 227) // Player losing firepower
+    // logic combined across all powerup-to-big effects
+    else if(p.Effect == PLREFF_FIRE_TO_BIG || p.Effect == PLREFF_ICE_TO_BIG)
+    {
+        int prev_state = 7;
+
+        if(p.Effect == PLREFF_FIRE_TO_BIG)
+            prev_state = 3;
+
+        if(p.Duck)
+        {
+            p.StandUp = true; // Fixes a block collision bug
+            p.Duck = false;
+            p.Location.Height = Physics.PlayerHeight[p.Character][p.State];
+            p.Location.Y += -Physics.PlayerHeight[p.Character][p.State] + Physics.PlayerDuckHeight[p.Character][p.State];
+        }
+
+        p.Frame = 1;
+        p.Effect2 += 1;
+
+        if(fEqual(p.Effect2 / 5, std::floor(p.Effect2 / 5)))
+        {
+            if(p.State == 2)
+                p.State = prev_state;
+            else
+                p.State = 2;
+        }
+
+        if(p.Effect2 >= 50)
+        {
+            if(p.State == prev_state)
+                p.State = 2;
+
+            p.Immune = 150;
+            p.Immune2 = true;
+            p.Effect = PLREFF_NORMAL;
+            p.Effect2 = 0;
+            // If numPlayers <= 2 Then DropBonus A
+        }
+    }
+#if 0
+    else if(p.Effect == PLREFF_FIRE_TO_BIG) // Player losing firepower
     {
         if(p.Duck)
         {
@@ -6533,12 +6148,12 @@ void PlayerEffects(const int A)
                 p.State = 2;
             p.Immune = 150;
             p.Immune2 = true;
-            p.Effect = 0;
+            p.Effect = PLREFF_NORMAL;
             p.Effect2 = 0;
             // If numPlayers <= 2 Then DropBonus A
         }
     }
-    else if(p.Effect == 228) // Player losing icepower
+    else if(p.Effect == PLREFF_ICE_TO_BIG) // Player losing icepower
     {
         if(p.Duck)
         {
@@ -6565,12 +6180,13 @@ void PlayerEffects(const int A)
                 p.State = 2;
             p.Immune = 150;
             p.Immune2 = true;
-            p.Effect = 0;
+            p.Effect = PLREFF_NORMAL;
             p.Effect2 = 0;
             // If numPlayers <= 2 Then DropBonus A
         }
     }
-    else if(p.Effect == 3) // Warp effect
+#endif
+    else if(p.Effect == PLREFF_WARP_PIPE) // Warp effect
     {
         p.SpinJump = false;
         p.TailCount = 0;
@@ -6748,7 +6364,7 @@ void PlayerEffects(const int A)
                         // in the mouth of an onscreen player's Pet?
                         bool in_onscreen_pet = !warp.NoYoshi && InOnscreenPet(o_A, screen);
 
-                        bool status_match = (o_p.Effect == 3 && o_p.Warp == p.Warp && o_p.WarpBackward == p.WarpBackward);
+                        bool status_match = (o_p.Effect == PLREFF_WARP_PIPE && o_p.Warp == p.Warp && o_p.WarpBackward == p.WarpBackward);
 
                         if(!o_p.Dead && o_p.TimeToLive == 0 && !in_onscreen_pet && !status_match)
                         {
@@ -6758,7 +6374,7 @@ void PlayerEffects(const int A)
 
                             o_p.Warp = p.Warp;
                             o_p.WarpBackward = p.WarpBackward;
-                            o_p.Effect = 3;
+                            o_p.Effect = PLREFF_WARP_PIPE;
                             // make other player behind so that this player will exit first
                             o_p.Effect2 = 0;
                             o_p.Location.X = warp_enter.X + warp_enter.Width / 2.0 - o_p.Location.Width / 2.0;
@@ -6955,14 +6571,14 @@ void PlayerEffects(const int A)
                         continue;
 
                     Player_t& o_p = Player[o_A];
-                    if(!o_p.Dead && o_p.TimeToLive == 0 && o_p.Effect == 3 && o_p.Effect2 == 0 && o_p.Warp == Player[A].Warp && o_p.WarpBackward == Player[A].WarpBackward)
+                    if(!o_p.Dead && o_p.TimeToLive == 0 && o_p.Effect == PLREFF_WARP_PIPE && o_p.Effect2 == 0 && o_p.Warp == Player[A].Warp && o_p.WarpBackward == Player[A].WarpBackward)
                     {
                         o_p.Location.X = p.Location.X + p.Location.Width / 2.0 - o_p.Location.Width / 2.0;
                         o_p.Location.Y = p.Location.Y + p.Location.Height - o_p.Location.Height;
 
                         CheckSection(o_A);
 
-                        o_p.Effect = 3;
+                        o_p.Effect = PLREFF_WARP_PIPE;
                         o_p.Effect2 = 1;
                     }
                 }
@@ -6981,14 +6597,14 @@ void PlayerEffects(const int A)
                         continue;
 
                     Player_t& o_p = Player[o_A];
-                    if(!o_p.Dead && o_p.TimeToLive == 0 && o_p.Effect == 3 && o_p.Warp == p.Warp && o_p.WarpBackward == p.WarpBackward && o_p.Effect2 > 1 && (o_p.Effect2 < 128 || o_p.Effect2 >= 2000))
+                    if(!o_p.Dead && o_p.TimeToLive == 0 && o_p.Effect == PLREFF_WARP_PIPE && o_p.Warp == p.Warp && o_p.WarpBackward == p.WarpBackward && o_p.Effect2 > 1 && (o_p.Effect2 < 128 || o_p.Effect2 >= 2000))
                         hit += 1;
                 }
 
                 // put in new pipe holding state
                 if(hit)
                 {
-                    p.Effect = 3;
+                    p.Effect = PLREFF_WARP_PIPE;
                     p.Effect2 = 2010 + 100 * hit;
                 }
             }
@@ -7007,7 +6623,7 @@ void PlayerEffects(const int A)
 
                         Player[B].Location.X = p.Location.X + p.Location.Width / 2.0 - Player[B].Location.Width / 2.0;
                         Player[B].Location.SpeedY = dRand() * 24 - 12;
-                        Player[B].Effect = 8;
+                        Player[B].Effect = PLREFF_WAITING;
                         Player[B].Effect2 = 0;
                         CheckSection(B);
 
@@ -7074,7 +6690,7 @@ void PlayerEffects(const int A)
             {
                 GoToLevel = GetS(warp.level);
                 GoToLevelNoGameThing = warp.noEntranceScene;
-                p.Effect = 8;
+                p.Effect = PLREFF_WAITING;
                 p.Effect2 = 2970;
                 ReturnWarp = p.Warp;
 
@@ -7085,7 +6701,7 @@ void PlayerEffects(const int A)
             }
             else if(warp.MapWarp)
             {
-                p.Effect = 8;
+                p.Effect = PLREFF_WAITING;
                 p.Effect2 = 2970;
             }
         }
@@ -7344,7 +6960,7 @@ void PlayerEffects(const int A)
                 }
             }
 
-            p.Effect = 0;
+            p.Effect = PLREFF_NORMAL;
             p.Effect2 = 0;
             p.WarpCD = 20;
             p.CanJump = false;
@@ -7395,7 +7011,7 @@ void PlayerEffects(const int A)
 
                         Player[B].Location.X = p.Location.X + p.Location.Width / 2.0 - Player[B].Location.Width / 2.0;
                         Player[B].Location.SpeedY = dRand() * 24 - 12;
-                        Player[B].Effect = 0;
+                        Player[B].Effect = PLREFF_NORMAL;
                         Player[B].Effect2 = 0;
                         CheckSection(B);
                     }
@@ -7403,7 +7019,7 @@ void PlayerEffects(const int A)
             }
         }
     }
-    else if(p.Effect == 7) // Door effect
+    else if(p.Effect == PLREFF_WARP_DOOR) // Door effect
     {
         bool backward = p.WarpBackward;
         auto &warp = Warp[p.Warp];
@@ -7505,7 +7121,7 @@ void PlayerEffects(const int A)
                 // in the mouth of an onscreen player's Pet?
                 bool in_onscreen_pet = !warp.NoYoshi && InOnscreenPet(o_A, screen);
 
-                bool status_match = (o_p.Effect == 7 && o_p.Warp == p.Warp && o_p.WarpBackward == p.WarpBackward);
+                bool status_match = (o_p.Effect == PLREFF_WARP_DOOR && o_p.Warp == p.Warp && o_p.WarpBackward == p.WarpBackward);
 
                 if(!o_p.Dead && o_p.TimeToLive == 0 && !in_onscreen_pet && !status_match)
                 {
@@ -7515,7 +7131,7 @@ void PlayerEffects(const int A)
 
                     o_p.Warp = p.Warp;
                     o_p.WarpBackward = p.WarpBackward;
-                    o_p.Effect = 7;
+                    o_p.Effect = PLREFF_WARP_DOOR;
                     // 1 frame behind so that this player will exit first
                     o_p.Effect2 = 14;
                     o_p.Location.X = warp_enter.X + warp_enter.Width / 2.0 - o_p.Location.Width / 2.0;
@@ -7584,14 +7200,14 @@ void PlayerEffects(const int A)
                         continue;
 
                     Player_t& o_p = Player[o_A];
-                    if(!o_p.Dead && o_p.TimeToLive == 0 && o_p.Effect == 7 && o_p.Warp == Player[A].Warp && o_p.WarpBackward == Player[A].WarpBackward)
+                    if(!o_p.Dead && o_p.TimeToLive == 0 && o_p.Effect == PLREFF_WARP_DOOR && o_p.Warp == Player[A].Warp && o_p.WarpBackward == Player[A].WarpBackward)
                     {
                         o_p.Location.X = warp_exit.X + warp_exit.Width / 2.0 - o_p.Location.Width / 2.0;
                         o_p.Location.Y = warp_exit.Y + warp_exit.Height - o_p.Location.Height;
 
                         CheckSection(o_A);
 
-                        o_p.Effect = 8;
+                        o_p.Effect = PLREFF_WAITING;
                         o_p.Effect2 = 131;
                         o_p.WarpCD = 40;
 
@@ -7618,7 +7234,7 @@ void PlayerEffects(const int A)
                 PlayerGrabCode(A);
             }
 
-            p.Effect = 0;
+            p.Effect = PLREFF_NORMAL;
             p.Effect2 = 0;
             p.WarpCD = 40;
 
@@ -7676,7 +7292,7 @@ void PlayerEffects(const int A)
             {
                 GoToLevel = GetS(warp.level);
                 GoToLevelNoGameThing = warp.noEntranceScene;
-                p.Effect = 8;
+                p.Effect = PLREFF_WAITING;
                 p.Effect2 = 3000;
                 ReturnWarp = p.Warp;
 
@@ -7687,7 +7303,7 @@ void PlayerEffects(const int A)
             }
             else if(warp.MapWarp)
             {
-                p.Effect = 8;
+                p.Effect = PLREFF_WAITING;
                 p.Effect2 = 2970;
             }
 
@@ -7725,7 +7341,7 @@ void PlayerEffects(const int A)
             }
         }
     }
-    else if(p.Effect == 8) // Holding Pattern
+    else if(p.Effect == PLREFF_WAITING) // Holding Pattern
     {
         // tracking a player that got an exit
         if(p.Effect2 < 0)
@@ -7736,12 +7352,13 @@ void PlayerEffects(const int A)
             if(Player[-p.Effect2].Dead)
                 p.Dead = true;
         }
+        // temporary immunity and invisibility
         else if(p.Effect2 <= 30)
         {
             p.Effect2 -= 1;
             if(p.Effect2 == 0.0)
             {
-                p.Effect = 0;
+                p.Effect = PLREFF_NORMAL;
                 p.Effect2 = 0;
             }
         }
@@ -7752,7 +7369,7 @@ void PlayerEffects(const int A)
             for(B = 1; B <= numPlayers; B++)
             {
                 // Was previously only B != A. New conditions only apply in >2P
-                bool check_coll = B != A && !Player[B].Dead && (Player[B].Effect != 8 || B < A);
+                bool check_coll = B != A && !Player[B].Dead && (Player[B].Effect != PLREFF_WAITING || B < A);
                 if(check_coll && CheckCollision(p.Location, Player[B].Location))
                     tempBool = true;
             }
@@ -7775,7 +7392,7 @@ void PlayerEffects(const int A)
             p.Effect2 -= 1;
             if(fEqual(p.Effect2, 100))
             {
-                p.Effect = 0;
+                p.Effect = PLREFF_NORMAL;
                 p.Effect2 = 0;
             }
         }
@@ -7786,7 +7403,7 @@ void PlayerEffects(const int A)
             if(fEqual(p.Effect2, 200))
             {
                 p.Effect2 = 100;
-                p.Effect = 3;
+                p.Effect = PLREFF_WARP_PIPE;
             }
         }
         else if(p.Effect2 <= 1000) // Start Wait for pipe
@@ -7794,19 +7411,19 @@ void PlayerEffects(const int A)
             p.Effect2 -= 1;
             if(fEqual(p.Effect2, 900))
             {
-                p.Effect = 3;
+                p.Effect = PLREFF_WARP_PIPE;
                 p.Effect2 = 100;
 
                 // 2P holding condition for start warp
                 if(A == 2 && (g_ClonedPlayerMode || numPlayers <= 2))
                 {
-                    p.Effect = 8;
+                    p.Effect = PLREFF_WAITING;
                     p.Effect2 = 300;
                 }
                 // modern >2P holding condition for warp
                 else if(A >= 2 && !g_ClonedPlayerMode)
                 {
-                    p.Effect = 3;
+                    p.Effect = PLREFF_WARP_PIPE;
                     p.Effect2 = 2010 + 100 * (A - 1);
                 }
             }
@@ -7820,12 +7437,12 @@ void PlayerEffects(const int A)
                 s_TriggerDoorEffects(static_cast<Location_t>(Warp[p.Warp].Exit), false);
 
                 SoundPause[46] = 0;
-                p.Effect = 8;
+                p.Effect = PLREFF_WAITING;
                 p.Effect2 = 30;
 
                 if(A >= 2 && !g_ClonedPlayerMode)
                 {
-                    p.Effect = 8;
+                    p.Effect = PLREFF_WAITING;
                     p.Effect2 = 131;
                 }
                 else
@@ -7867,7 +7484,65 @@ void PlayerEffects(const int A)
             }
         }
     }
-    else if(p.Effect == 4) // Player got fire power
+    // logic combined across all "grow" powerup effects
+    else if(p.Effect == PLREFF_TURN_FIRE || p.Effect == PLREFF_TURN_ICE) // Player got fire power
+    {
+        int target_state = 3;
+
+        if(p.Effect == PLREFF_TURN_ICE)
+            target_state = 7;
+
+        if(p.Duck && p.Character != 5)
+        {
+            UnDuck(Player[A]);
+            p.Frame = 1;
+        }
+
+        p.Effect2 += 1;
+
+        if(fEqual(p.Effect2 / 5, std::floor(p.Effect2 / 5.0)))
+        {
+            if(p.State == 1 && p.Character != 5)
+            {
+                p.State = 2;
+
+                if(p.Mount == 0)
+                {
+                    p.Location.X += -Physics.PlayerWidth[p.Character][2] * 0.5 + Physics.PlayerWidth[p.Character][1] * 0.5;
+                    p.Location.Y += -Physics.PlayerHeight[p.Character][2] + Physics.PlayerHeight[p.Character][1];
+                    p.Location.Width = Physics.PlayerWidth[p.Character][p.State];
+                    p.Location.Height = Physics.PlayerHeight[p.Character][p.State];
+                }
+                else if(p.Mount == 3)
+                {
+                    YoshiHeight(A);
+                }
+                else if(p.Character == 2 && p.Mount != 2)
+                {
+                    p.Location.Y += -Physics.PlayerHeight[2][2] + Physics.PlayerHeight[1][2];
+                    p.Location.Height = Physics.PlayerHeight[p.Character][p.State];
+                }
+            }
+            else if(p.State != target_state)
+                p.State = target_state;
+            else
+                p.State = 2;
+        }
+
+        if(p.Effect2 >= 50)
+        {
+            if(p.State == 2)
+                p.State = target_state;
+
+            p.Immune += 50;
+            p.Immune2 = true;
+            p.Effect = PLREFF_NORMAL;
+            p.Effect2 = 0;
+            p.StandUp = true;
+        }
+    }
+#if 0
+    else if(p.Effect == PLREFF_TURN_FIRE) // Player got fire power
     {
         if(p.Duck && p.Character != 5)
         {
@@ -7912,12 +7587,12 @@ void PlayerEffects(const int A)
                 p.State = 3;
             p.Immune += 50;
             p.Immune2 = true;
-            p.Effect = 0;
+            p.Effect = PLREFF_NORMAL;
             p.Effect2 = 0;
             p.StandUp = true;
         }
     }
-    else if(p.Effect == 41) // Player got ice power
+    else if(p.Effect == PLREFF_TURN_ICE) // Player got ice power
     {
         if(p.Duck && p.Character != 5)
         {
@@ -7961,12 +7636,66 @@ void PlayerEffects(const int A)
                 p.State = 7;
             p.Immune += 50;
             p.Immune2 = true;
-            p.Effect = 0;
+            p.Effect = PLREFF_NORMAL;
             p.Effect2 = 0;
             p.StandUp = true;
         }
     }
-    else if(p.Effect == 5) // Player got a leaf
+#endif
+    // logic combined across all "transform" powerup effects
+    else if(p.Effect == PLREFF_TURN_LEAF || p.Effect == PLREFF_TURN_STATUE || p.Effect == PLREFF_TURN_HEAVY)
+    {
+        int target_state = 4;
+
+        if(p.Effect != PLREFF_TURN_LEAF)
+        {
+            p.Immune2 = true;
+            target_state = 5 + (p.Effect - PLREFF_TURN_STATUE);
+        }
+
+        p.Frame = 1;
+
+        if(p.Effect2 == 0.0)
+        {
+            if(p.State == 1 && p.Mount == 0)
+            {
+                p.Location.X += -Physics.PlayerWidth[p.Character][2] * 0.5 + Physics.PlayerWidth[p.Character][1] * 0.5;
+                p.Location.Y += -Physics.PlayerHeight[p.Character][2] + Physics.PlayerHeight[p.Character][1];
+                p.State = target_state;
+                p.Location.Width = Physics.PlayerWidth[p.Character][p.State];
+                p.Location.Height = Physics.PlayerHeight[p.Character][p.State];
+            }
+            else if(p.Mount == 3)
+            {
+                YoshiHeight(A);
+            }
+            else if(p.Character == 2 && p.State == 1 && p.Mount == 1)
+            {
+                p.Location.Y += -Physics.PlayerHeight[2][2] + Physics.PlayerHeight[1][2];
+                p.Location.Height = Physics.PlayerHeight[p.Character][target_state];
+            }
+
+            p.State = target_state;
+            tempLocation.Width = 32;
+            tempLocation.Height = 32;
+            tempLocation.X = p.Location.X + p.Location.Width / 2.0 - tempLocation.Width / 2.0;
+            tempLocation.Y = p.Location.Y + p.Location.Height / 2.0 - tempLocation.Height / 2.0;
+            NewEffect(EFFID_SMOKE_S4, tempLocation, 1, 0, ShadowMode);
+        }
+
+        p.Effect2 += 1;
+
+        if(fEqual(p.Effect2, 14))
+        {
+            p.Immune += 50;
+            p.Immune2 = true;
+            p.Effect = PLREFF_NORMAL;
+            p.Effect2 = 0;
+            p.StandUp = true;
+        }
+    }
+#if 0
+    else if(p.Effect == PLREFF_TURN_LEAF) // Player got a leaf
     {
         p.Frame = 1;
 
@@ -7989,6 +7718,7 @@ void PlayerEffects(const int A)
                 p.Location.Y += -Physics.PlayerHeight[2][2] + Physics.PlayerHeight[1][2];
                 p.Location.Height = Physics.PlayerHeight[p.Character][4];
             }
+
             p.State = 4;
             tempLocation.Width = 32;
             tempLocation.Height = 32;
@@ -8003,15 +7733,16 @@ void PlayerEffects(const int A)
         {
             p.Immune += 50;
             p.Immune2 = true;
-            p.Effect = 0;
+            p.Effect = PLREFF_NORMAL;
             p.Effect2 = 0;
             p.StandUp = true;
         }
     }
-    else if(p.Effect == 11) // Player got a tanooki suit
+    else if(p.Effect == PLREFF_TURN_STATUE) // Player got a tanooki suit
     {
         p.Frame = 1;
         p.Immune2 = true;
+
         if(p.Effect2 == 0.0)
         {
             if(p.State == 1 && p.Mount == 0)
@@ -8029,8 +7760,9 @@ void PlayerEffects(const int A)
             else if(p.Character == 2 && p.State == 1 && p.Mount == 1)
             {
                 p.Location.Y += -Physics.PlayerHeight[2][2] + Physics.PlayerHeight[1][2];
-                p.Location.Height = Physics.PlayerHeight[p.Character][4];
+                p.Location.Height = Physics.PlayerHeight[p.Character][5]; // was 4 in SMBX 1.3, but the value was the same for all characters
             }
+
             p.State = 5;
             tempLocation.Width = 32;
             tempLocation.Height = 32;
@@ -8038,17 +7770,19 @@ void PlayerEffects(const int A)
             tempLocation.Y = p.Location.Y + p.Location.Height / 2.0 - tempLocation.Height / 2.0;
             NewEffect(EFFID_SMOKE_S4, tempLocation, 1, 0, ShadowMode);
         }
+
         p.Effect2 += 1;
+
         if(fEqual(p.Effect2, 14))
         {
             p.Immune += 50;
             p.Immune2 = true;
-            p.Effect = 0;
+            p.Effect = PLREFF_NORMAL;
             p.Effect2 = 0;
             p.StandUp = true;
         }
     }
-    else if(p.Effect == 12) // Player got a hammer suit
+    else if(p.Effect == PLREFF_TURN_HEAVY) // Player got a hammer suit
     {
         p.Frame = 1;
         p.Immune2 = true;
@@ -8059,7 +7793,7 @@ void PlayerEffects(const int A)
             {
                 p.Location.X += -Physics.PlayerWidth[p.Character][2] * 0.5 + Physics.PlayerWidth[p.Character][1] * 0.5;
                 p.Location.Y += -Physics.PlayerHeight[p.Character][2] + Physics.PlayerHeight[p.Character][1];
-                p.State = 5;
+                p.State = 6; // was 5 in SMBX 1.3, but this is fine because the dimensions are the same, and it gets set correctly below
                 p.Location.Width = Physics.PlayerWidth[p.Character][p.State];
                 p.Location.Height = Physics.PlayerHeight[p.Character][p.State];
             }
@@ -8087,12 +7821,13 @@ void PlayerEffects(const int A)
         {
             p.Immune += 50;
             p.Immune2 = true;
-            p.Effect = 0;
+            p.Effect = PLREFF_NORMAL;
             p.Effect2 = 0;
             p.StandUp = true;
         }
     }
-    else if(p.Effect == 500) // Change to / from tanooki
+#endif
+    else if(p.Effect == PLREFF_STONE) // Change to / from tanooki
     {
         for(B = 1; B <= 2; B++)
         {
@@ -8134,12 +7869,12 @@ void PlayerEffects(const int A)
         if(p.Effect2 >= 5)
         {
             p.Effect2 = 0;
-            p.Effect = 0;
+            p.Effect = PLREFF_NORMAL;
             p.Immune = 0;
             p.Immune2 = false;
         }
     }
-    else if(p.Effect == 9) // MultiMario
+    else if(p.Effect == PLREFF_NO_COLLIDE) // MultiMario
     {
         if(p.HoldingNPC > numNPCs) // Can't hold an NPC that is dead
             p.HoldingNPC = 0;
@@ -8178,13 +7913,13 @@ void PlayerEffects(const int A)
 
         for(B = 1; B <= numPlayers; B++)
         {
-            if(B != A && (Player[B].Effect == 0 || fEqual(B, p.Effect2)) && !Player[B].Dead && Player[B].TimeToLive == 0 && CheckCollision(p.Location, Player[B].Location))
+            if(B != A && (Player[B].Effect == PLREFF_NORMAL || fEqual(B, p.Effect2)) && !Player[B].Dead && Player[B].TimeToLive == 0 && CheckCollision(p.Location, Player[B].Location))
                 tempBool = false;
         }
 
         if(tempBool)
         {
-            p.Effect = 0;
+            p.Effect = PLREFF_NORMAL;
             p.Effect2 = 0;
             p.Immune = 0;
             p.Immune2 = false;
@@ -8194,7 +7929,7 @@ void PlayerEffects(const int A)
         {
             D = float(p.Effect2);
 
-            if(Player[D].Effect == 0)
+            if(Player[D].Effect == PLREFF_NORMAL)
                 p.Effect2 = 0;
 
             p.Immune2 = true;
@@ -8215,7 +7950,7 @@ void PlayerEffects(const int A)
         }
     }
 #endif
-    else if(p.Effect == 10) // Yoshi swallow
+    else if(p.Effect == PLREFF_PET_INSIDE) // Yoshi swallow
     {
         p.HoldingNPC = 0;
         p.StandingOnNPC = 0;
@@ -8225,11 +7960,11 @@ void PlayerEffects(const int A)
 
         if(Player[p.Effect2].YoshiPlayer != A)
         {
-            p.Effect = 0;
+            p.Effect = PLREFF_NORMAL;
             p.Effect2 = 0;
         }
     }
-    else if(p.Effect == 6) // player stole a heldbonus
+    else if(p.Effect == PLREFF_RESPAWN) // player stole a heldbonus
     {
         p.Immune += 1;
 
@@ -8251,12 +7986,12 @@ void PlayerEffects(const int A)
             for(B = 1; B <= numPlayers; B++)
             {
                 // !Player[B].Dead condition was added to prevent confusing Drop/Add cases where player gets locked in immune state
-                if(B != A && Player[B].Effect != 6 && ((!g_config.allow_drop_add && (numPlayers < 3 || g_ClonedPlayerMode)) || (!Player[B].Dead && Player[B].Effect != 10)) && CheckCollision(p.Location, Player[B].Location))
+                if(B != A && Player[B].Effect != PLREFF_RESPAWN && ((!g_config.allow_drop_add && (numPlayers < 3 || g_ClonedPlayerMode)) || (!Player[B].Dead && Player[B].Effect != PLREFF_PET_INSIDE)) && CheckCollision(p.Location, Player[B].Location))
                     tempBool = false;
             }
             if(tempBool)
             {
-                p.Effect = 0;
+                p.Effect = PLREFF_NORMAL;
                 p.Effect2 = 0;
                 p.Immune = 50;
                 p.Immune2 = false;
@@ -8269,7 +8004,7 @@ void PlayerEffects(const int A)
             {
                 if(Player[B].Mount == 2)
                 {
-                    p.Effect = 0;
+                    p.Effect = PLREFF_NORMAL;
                     p.Immune = 50;
                     p.Immune2 = false;
                     p.Location.Y = Player[B].Location.Y - p.Location.Height;
@@ -8279,15 +8014,26 @@ void PlayerEffects(const int A)
         }
     }
 
-    if(p.Mount == 3 && p.Effect != 9)
-    {
+    if(p.Mount == 3 && p.Effect != PLREFF_NO_COLLIDE)
         PlayerFrame(p);
-    }
+
 //    if(Player[A].Effect == 0)
 //    {
 //        if(nPlay.Online && A == nPlay.MySlot + 1)
 //            Netplay::sendData Netplay::PutPlayerControls(nPlay.MySlot) + "1c" + std::to_string(A) + "|" + Player[A].Effect + "|" + Player[A].Effect2 + LB + "1h" + std::to_string(A) + "|" + Player[A].State + LB;
 //    }
+}
+
+bool AllPlayersNormal()
+{
+    for(int B = 1; B <= numPlayers; B++)
+    {
+        // cross-ref modern item spawn code
+        if(!(Player[B].Effect == PLREFF_NORMAL || Player[B].Effect == PLREFF_WARP_PIPE || Player[B].Effect == PLREFF_NO_COLLIDE || Player[B].Effect == PLREFF_PET_INSIDE))
+            return false;
+    }
+
+    return true;
 }
 
 // NEW: ensures the players on a screen are nearby if the screen is shared
@@ -8338,7 +8084,7 @@ void PlayersEnsureNearby(const Screen_t& screen)
             cy += p_y;
             c_count += 1;
 
-            if(p.Effect == 3 || p.Effect == 7)
+            if(p.Effect == PLREFF_WARP_PIPE || p.Effect == PLREFF_WARP_DOOR)
                 exists_warping = true;
             else
                 exists_non_warping = true;
@@ -8372,7 +8118,7 @@ void PlayersEnsureNearby(const Screen_t& screen)
         const Location_t& pLoc = p.Location;
 
         // prefer non-warping player
-        if(exists_non_warping && (p.Effect == 3 || p.Effect == 7))
+        if(exists_non_warping && (p.Effect == PLREFF_WARP_PIPE || p.Effect == PLREFF_WARP_DOOR))
             continue;
 
         if(!p.Dead && p.TimeToLive == 0)
@@ -8420,7 +8166,7 @@ void PlayersEnsureNearby(const Screen_t& screen)
         if(p.Dead || p.TimeToLive != 0)
             continue;
 
-        p.Effect = 0;
+        p.Effect = PLREFF_NORMAL;
         p.Effect2 = 0;
         p.Warp = 0;
         p.WarpCD = 0;
@@ -8428,6 +8174,35 @@ void PlayersEnsureNearby(const Screen_t& screen)
         p.WarpShooted = false;
 
         DodgePlayers(plr_A);
+    }
+}
+
+void KeyholeCheck(const int A, const Location_t& loc)
+{
+    UNUSED(A);
+
+    for(int B : treeBackgroundQuery(loc, SORTMODE_NONE))
+    {
+        if(B > numBackground)
+            continue;
+
+        if(Background[B].Type == 35)
+        {
+            Location_t tempLocation = Background[B].Location;
+            tempLocation.Width = 16;
+            tempLocation.X += 8;
+            tempLocation.Height = 26;
+            tempLocation.Y += 2;
+
+            if(CheckCollision(loc, tempLocation))
+            {
+                PlaySound(SFX_Key);
+                StopMusic();
+                LevelMacro = LEVELMACRO_KEYHOLE_EXIT;
+                LevelMacroWhich = B;
+                break;
+            }
+        }
     }
 }
 
@@ -8597,7 +8372,7 @@ void SwapCharacter(int A, int Character, bool FromBlock)
     p.Immune = 50;
     if(FromBlock)
     {
-        p.Effect = 8;
+        p.Effect = PLREFF_WAITING;
         p.Effect2 = 14;
     }
     // NEW CODE that plays same role as old call to SetupPlayers() in the original world map char swap code
@@ -8626,7 +8401,7 @@ void SwapCharacter(int A, int Character, bool FromBlock)
     else
     {
         double saved_respawn_StopY = 0;
-        if(p.Effect == 6)
+        if(p.Effect == PLREFF_RESPAWN)
             saved_respawn_StopY = p.Effect2 + p.Location.Height;
 
         // make player bottom match old player bottom, to avoid floor glitches
@@ -8634,7 +8409,7 @@ void SwapCharacter(int A, int Character, bool FromBlock)
         SizeCheck(Player[A]);
 
         // if player effect is 6 (respawn downwards), update target similarly
-        if(p.Effect == 6)
+        if(p.Effect == PLREFF_RESPAWN)
             p.Effect2 = saved_respawn_StopY - p.Location.Height;
     }
 

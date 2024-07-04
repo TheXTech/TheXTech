@@ -192,6 +192,26 @@ void CurLevelMedals_t::commit()
     }
 }
 
+void CommitBeatCode(int beat_code)
+{
+    if(beat_code <= 0 || beat_code > 16)
+        return;
+
+    LevelSaveInfo_t* info = s_findSaveInfo();
+    if(!info)
+        return;
+
+    uint16_t bit = (1 << (beat_code - 1));
+    info->exits_got |= bit;
+
+    // copy this to any other world levels with the same filename
+    while(LevelSaveInfo_t* next = s_nextSaveInfo(info))
+    {
+        *next = *info;
+        info = next;
+    }
+}
+
 void OrderMedals()
 {
     using dist_and_hit_index = std::pair<uint16_t, int16_t>;

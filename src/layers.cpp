@@ -36,6 +36,7 @@
 #include "frame_timer.h"
 #include "main/speedrunner.h"
 #include "editor.h"
+#include "player.h"
 #include "blocks.h"
 #include "main/trees.h"
 #include "main/block_table.h"
@@ -881,7 +882,7 @@ void ProcEvent(eventindex_t index, int whichPlayer, bool NoEffect)
                                                             Player[C].Section = B;
                                                             Player[C].Location.X = Player[D].Location.X + Player[D].Location.Width / 2.0 - Player[C].Location.Width / 2.0;
                                                             Player[C].Location.Y = Player[D].Location.Y + Player[D].Location.Height - Player[C].Location.Height;
-                                                            Player[C].Effect = 9;
+                                                            Player[C].Effect = PLREFF_NO_COLLIDE;
                                                             Player[C].Effect2 = D;
                                                             break;
                                                         }
@@ -937,7 +938,7 @@ void ProcEvent(eventindex_t index, int whichPlayer, bool NoEffect)
                                 SoundPause[13] = 10;
 
                                 // need two cycles to fully update the dynamic screens in the new level
-                                SetupScreens(false);
+                                SetupScreens(screen, false);
                                 DynamicScreen(screen);
                                 CenterScreens(screen);
 
@@ -950,7 +951,7 @@ void ProcEvent(eventindex_t index, int whichPlayer, bool NoEffect)
                                     GetvScreenAverage(vScreen[Z1]);
 
                                 // set up the dynamic screens in the new level
-                                SetupScreens(false);
+                                SetupScreens(screen, false);
                                 DynamicScreen(screen);
 
                                 // set the positions (including screen positions) in the old level, but with the NEW dynamic splits
@@ -1038,7 +1039,7 @@ void ProcEvent(eventindex_t index, int whichPlayer, bool NoEffect)
                                 }
 
                                 // now, update the screen positions here before proceeding
-                                SetupScreens(false);
+                                SetupScreens(screen, false);
                                 CenterScreens(screen);
 
                                 for(int i = screen.active_begin(); i < screen.active_end(); i++)
@@ -1058,7 +1059,7 @@ void ProcEvent(eventindex_t index, int whichPlayer, bool NoEffect)
                                     double old_y = qScreenLoc[Z_i].Y;
 
                                     // (0) player should not have warped
-                                    if(plr.Effect == 9)
+                                    if(plr.Effect == PLREFF_NO_COLLIDE)
                                         use_new_resize = false;
 
                                     // (1) old bounds shouldn't be outside of the new level
@@ -1075,7 +1076,7 @@ void ProcEvent(eventindex_t index, int whichPlayer, bool NoEffect)
                                         use_new_resize = false;
 
                                     // (3) qScreen should not have occurred in old game
-                                    if(int(s.position.X) != EventSection_t::LESet_ResetDefault)
+                                    if(use_new_resize && int(s.position.X) != EventSection_t::LESet_ResetDefault)
                                     {
                                         double cx, cy, old_cx, old_cy;
 
@@ -1099,7 +1100,7 @@ void ProcEvent(eventindex_t index, int whichPlayer, bool NoEffect)
                                     else
                                     {
                                         // limit qScreen duration if player was warped
-                                        if(plr.Effect == 9)
+                                        if(plr.Effect == PLREFF_NO_COLLIDE)
                                         {
                                             Location_t old_section_loc = newLoc(tempLevel.X, tempLevel.Y, tempLevel.Width - tempLevel.X, tempLevel.Height - tempLevel.Y);
                                             Location_t qScreen_loc = newLoc(-qScreenLoc[Z_i].X, -qScreenLoc[Z_i].Y, qScreenLoc[Z_i].Width, qScreenLoc[Z_i].Height);
@@ -1422,19 +1423,14 @@ void UpdateEvents()
     // this is for events that have a delay to call other events
     // this sub also updates the screen position for autoscroll levels
     int A = 0;
-    int B = 0;
     if(FreezeNPCs)
         return;
 
     if(!GameMenu)
     {
-        // be sure to keep in sync with UpdateLayers code above.
         // possibly undesirable: doesn't advance event timer at all if any players are (for example) in doors or in holding pattern
-        for(B = 1; B <= numPlayers; B++)
-        {
-            if(!(Player[B].Effect == 0 || Player[B].Effect == 3 || Player[B].Effect == 9 || Player[B].Effect == 10))
-                return;
-        }
+        if(!AllPlayersNormal())
+            return;
     }
 
     if(newEventNum > 0)
@@ -1520,39 +1516,34 @@ void UpdateLayers()
 {
     // this is mainly for moving layers
     int A = 0;
-    int B = 0;
     // int C = 0;
 
     bool FreezeLayers = false;
 
     if(!GameMenu)
     {
-        // be sure to keep in sync with UpdateEvents code above.
         // possibly undesirable: doesn't advance layer movement at all if any players are (for example) in doors or in holding pattern
-        for(B = 1; B <= numPlayers; B++)
+        if(!AllPlayersNormal())
         {
-            if(!(Player[B].Effect == 0 || Player[B].Effect == 3 || Player[B].Effect == 9 || Player[B].Effect == 10))
-            {
-                // moved this code into the loop over layers instead of repeating it per player
-                // it has also been combined with the FreezeNPCs code since they did the same thing
-                // in the original game
+            // moved this code into the loop over layers instead of repeating it per player
+            // it has also been combined with the FreezeNPCs code since they did the same thing
+            // in the original game
 
-                // for(A = 0; A <= maxLayers; A++)
-                // {
-                //     if(Layer[A].Name != "" && (Layer[A].SpeedX != 0.f || Layer[A].SpeedY != 0.f) && Layer[A].EffectStop)
-                //     {
-                //         for(C = 1; C <= numBlock; C++)
-                //         {
-                //             if(Block[C].Layer == Layer[A].Name)
-                //             {
-                //                 Block[C].Location.SpeedX = 0;
-                //                 Block[C].Location.SpeedY = 0;
-                //             }
-                //         }
-                //     }
-                // }
-                FreezeLayers = true;
-            }
+            // for(A = 0; A <= maxLayers; A++)
+            // {
+            //     if(Layer[A].Name != "" && (Layer[A].SpeedX != 0.f || Layer[A].SpeedY != 0.f) && Layer[A].EffectStop)
+            //     {
+            //         for(C = 1; C <= numBlock; C++)
+            //         {
+            //             if(Block[C].Layer == Layer[A].Name)
+            //             {
+            //                 Block[C].Location.SpeedX = 0;
+            //                 Block[C].Location.SpeedY = 0;
+            //             }
+            //         }
+            //     }
+            // }
+            FreezeLayers = true;
         }
     }
 
@@ -1694,7 +1685,7 @@ void UpdateLayers()
                         NPC[B].DefaultLocation.X += double(Layer[A].SpeedX);
                         NPC[B].DefaultLocation.Y += double(Layer[A].SpeedY);
 
-                        if(!NPC[B].Active || NPC[B].Generator || NPC[B].Effect != 0 ||
+                        if(!NPC[B].Active || NPC[B].Generator || NPC[B].Effect != NPCEFF_NORMAL ||
                            NPC[B]->IsACoin || NPC[B].Type == NPCID_PLANT_S3 || NPC[B].Type == NPCID_STONE_S3 ||
                            NPC[B].Type == NPCID_BOTTOM_PLANT || NPC[B].Type == NPCID_SIDE_PLANT || NPC[B].Type == NPCID_FALL_BLOCK_RED ||
                            NPC[B].Type == NPCID_PLANT_S1 || NPC[B].Type == NPCID_BIG_PLANT || NPC[B]->IsAVine ||

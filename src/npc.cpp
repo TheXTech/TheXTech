@@ -341,7 +341,7 @@ void DropNPC(int A, int NPCType)
         }
         NPC[numNPCs].Location.SpeedX = 0;
         NPC[numNPCs].Location.SpeedY = 0;
-        NPC[numNPCs].Effect = 2;
+        NPC[numNPCs].Effect = NPCEFF_DROP_ITEM;
         NPC[numNPCs].Active = true;
         NPC[numNPCs].TimeLeft = 200;
         syncLayers_NPC(numNPCs);
@@ -2587,12 +2587,7 @@ void NPCSpecial(int A)
 
         if((npc.Direction == 1 && tempBool) || npc.Type == NPCID_SAW) // Player in same section, enabled, or, grinder
         {
-            bool pausePlatforms = false;
-            for(int B = 1; B <= numPlayers; B++)
-            {
-                if(!(Player[B].Effect == 0 || Player[B].Effect == 3 || Player[B].Effect == 9 || Player[B].Effect == 10))
-                    pausePlatforms = true;
-            }
+            bool pausePlatforms = !AllPlayersNormal();
 
             // this code ran unconditionally in SMBX 1.3
             if(!g_config.fix_platforms_acceleration || !pausePlatforms) // Keep zeroed speed when player required the pause of the move effect
@@ -2790,15 +2785,6 @@ void NPCSpecial(int A)
                 npc.Location.SpeedX = 0;
                 npc.Location.SpeedY = 0;
             }
-
-//            for(B = 1; B <= numPlayers; B++) // Move this code to up
-//            {
-//                if(!(Player[B].Effect == 0 || Player[B].Effect == 3 || Player[B].Effect == 9 || Player[B].Effect == 10))
-//                {
-//                    npc.Location.SpeedX = 0;
-//                    npc.Location.SpeedY = 0;
-//                }
-//            }
         }
         else
         {
@@ -3034,7 +3020,7 @@ void NPCSpecial(int A)
                                 Player[j].Location.X = p.Location.X + p.Location.Width / 2.0 - p.Location.Width / 2.0;
                                 Player[j].Location.SpeedX = 0;
                                 Player[j].Location.SpeedY = 0;
-                                Player[j].Effect = 8;
+                                Player[j].Effect = PLREFF_WAITING;
                                 Player[j].Effect2 = -i;
                             }
 
@@ -3228,7 +3214,7 @@ void SpecialNPC(int A)
         for(B = 1; B <= numPlayers; B++)
         {
             if(Player[B].Character == 5 && !Player[B].Dead && Player[B].TimeToLive == 0 &&
-               Player[B].Effect == 0 && Player[B].SwordPoke == 0 && !Player[B].Fairy &&
+               Player[B].Effect == PLREFF_NORMAL && Player[B].SwordPoke == 0 && !Player[B].Fairy &&
                !(NPC[A].Type == NPCID_PLR_FIREBALL && NPC[A].CantHurtPlayer == B) &&
                !(NPC[A].Type == NPCID_PLR_HEAVY && NPC[A].CantHurtPlayer == B))
             {

@@ -101,6 +101,11 @@ public:
  */
 void OrderMedals();
 
+/**
+ * \brief Save an obtained level beat code to the current level's LevelSaveInfo entries
+ */
+void CommitBeatCode(int beat_code);
+
 extern CurLevelMedals_t g_curLevelMedals;
 
 #endif // #ifndef LEVEL_MEDALS_H

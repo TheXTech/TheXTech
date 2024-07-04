@@ -1,2 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources></resources>
+<resources>
+    <string name="title_activity_game_settings">Impostazioni di gioco</string>
+    <string name="start_game_button">Inizia gioco</string>
+    <string name="settings_button">Impostazioni</string>
+</resources>

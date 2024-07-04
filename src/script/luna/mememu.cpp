@@ -1624,7 +1624,8 @@ public:
             }
         );
 
-        insert(0x00000122, &Player_t::Effect);
+        static_assert(sizeof(Player_t::Effect) == sizeof(vbint_t), "underlying type of Player_t::Effect must be vbint_t");
+        insert(0x00000122, reinterpret_cast<vbint_t Player_t::*>(&Player_t::Effect));
         insert(0x00000124, &Player_t::Effect2);
         // pound state handled below
         // insert(0x0000012c, &Player_t::DuckRelease);

@@ -320,7 +320,7 @@ void WorldLoop()
         Player[A].Bumped2 = 0;
         Player[A].CanFly = false;
         Player[A].CanFly2 = false;
-        Player[A].Effect = 0;
+        Player[A].Effect = PLREFF_NORMAL;
         Player[A].Effect2 = 0;
         Player[A].FlyCount = 0;
         Player[A].TailCount = 0;

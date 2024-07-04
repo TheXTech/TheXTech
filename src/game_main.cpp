@@ -1159,7 +1159,7 @@ int GameMain(const CmdLineSetup_t &setup)
                         PlayerFrame(p);
                         CheckSection(A);
                         SoundPause[17] = 0;
-                        p.Effect = 8;
+                        p.Effect = PLREFF_WAITING;
                         p.Effect2 = 950;
                     }
                     else if(warp.Effect == 2)
@@ -1170,7 +1170,7 @@ int GameMain(const CmdLineSetup_t &setup)
                         p.Location.Y = warp.Exit.Y + warp.Exit.Height - p.Location.Height;
 
                         CheckSection(A);
-                        p.Effect = 8;
+                        p.Effect = PLREFF_WAITING;
                         p.Effect2 = 2000;
                     }
                     else if(warp.Effect == 3) // Portal warp
@@ -1286,6 +1286,8 @@ int GameMain(const CmdLineSetup_t &setup)
             // store to level save info if level won
             if(LevelBeatCode > 0 || !GoToLevel.empty())
             {
+                CommitBeatCode(LevelBeatCode);
+
                 g_curLevelMedals.commit();
                 g_curLevelMedals.reset_checkpoint();
             }

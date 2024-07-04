@@ -74,6 +74,9 @@ void SetupGraphics();
 void SetupEditorGraphics();
 
 // Public Sub SetupScreens()
+// Sets the screen type and vScreen locations for a single screen
+void SetupScreens(Screen_t& screen, bool reset = true);
+
 // Sets the screen type and vScreen locations for all screens
 void SetupScreens(bool reset = true);
 
