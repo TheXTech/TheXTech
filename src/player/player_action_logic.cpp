@@ -464,49 +464,55 @@ void PowerUps(const int A)
         return;
     }
 
-    // TODO: State-dependent moment, reorganize so that this is more clear
-
+    // this condition was moved into PlayerThrowHeavy
     // if(p.State == 6 && p.Character == 4 && p.Controls.Run && p.RunRelease)
     //     BoomOut = PlayerChar4HeavyOut(A);
 
-    // Hammer Throw Code
-    if(!p.Slide && p.Vine == 0 && p.State == 6 && !p.Duck && p.Mount != 2 && p.Mount != 3 && p.HoldingNPC <= 0 && p.Character != 5 && p.FireBallCD <= 0)
+    // Run-triggered actions; many of the conditions were combined here, so please search for the distinctive comments to find the corresponding code in legacy source
+    if(!p.Slide && p.Vine == 0 && p.Character != 5 && !p.Duck && p.Mount <= 1 && p.HoldingNPC <= 0)
     {
-        if(p.Controls.Run && !p.SpinJump /* && p.FireBallCD <= 0 && !BoomOut*/)
+        // Hammer Throw Code
+        if(p.State == 6)
         {
-            if(p.RunRelease || p.SpinJump || FlameThrower)
-                PlayerThrowHeavy(A);
-        }
-    }
-
-
-    // Fire Mario / Luigi code ---- FIRE FLOWER ACTION BALLS OF DOOM
-    if(!p.Slide && p.Vine == 0 && (p.State == 3 || p.State == 7) && !p.Duck && p.Mount != 2 && p.Mount != 3 && p.HoldingNPC <= 0 && p.Character != 5 && p.FireBallCD <= 0)
-    {
-        if(((p.Controls.Run && !p.SpinJump) || (p.SpinJump && p.Direction != p.SpinFireDir)) /* && p.FireBallCD <= 0 */)
-        {
-            if((p.RunRelease || p.SpinJump) || (FlameThrower /* && p.HoldingNPC <= 0*/)) // HoldingNPC is checked above
-                PlayerThrowBall(A);
-        }
-    }
-
-
-    // RacoonMario
-    if(!p.Slide && p.Vine == 0 && (p.State == 4 || p.State == 5) && !p.Duck && p.HoldingNPC == 0 && p.Mount != 2 && !p.Stoned && p.Effect == PLREFF_NORMAL && p.Character != 5)
-    {
-         if(p.Controls.Run || p.SpinJump)
-         {
-            if(p.TailCount == 0 || p.TailCount >= 12)
+            if(p.FireBallCD <= 0)
             {
-                if(p.RunRelease || p.SpinJump)
+                if(p.Controls.Run && !p.SpinJump /* && !BoomOut*/)
                 {
-                    p.TailCount = 1;
-
-                    if(!p.SpinJump)
-                        PlaySoundSpatial(SFX_Whip, p.Location);
+                    if(p.RunRelease || p.SpinJump || FlameThrower)
+                        PlayerThrowHeavy(A);
                 }
             }
-         }
+        }
+        // Fire Mario / Luigi code ---- FIRE FLOWER ACTION BALLS OF DOOM
+        else if(p.State == 3 || p.State == 7)
+        {
+            if(p.FireBallCD <= 0)
+            {
+                if((p.Controls.Run && !p.SpinJump) || (p.SpinJump && p.Direction != p.SpinFireDir))
+                {
+                    if(p.RunRelease || p.SpinJump || FlameThrower)
+                        PlayerThrowBall(A);
+                }
+            }
+        }
+        // RacoonMario
+        else if(p.State == 4 || p.State == 5)
+        {
+            // NOTE: when PowerUps is called, HoldingNPC < 0 if and only if (Player[A].Mount != 0 || Player[A].Stoned || Player[A].Fairy), and Effect is always PLREFF_NORMAL
+            if(p.HoldingNPC == 0 /* && p.Mount != 2 && !p.Stoned && p.Effect == PLREFF_NORMAL */)
+            {
+                if((p.Controls.Run && p.RunRelease) || p.SpinJump)
+                {
+                    if(p.TailCount == 0 || p.TailCount >= 12)
+                    {
+                        p.TailCount = 1;
+
+                        if(!p.SpinJump)
+                            PlaySoundSpatial(SFX_Whip, p.Location);
+                    }
+                }
+            }
+        }
     }
 
     if(p.TailCount > 0)
