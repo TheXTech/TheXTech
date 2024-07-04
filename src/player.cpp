@@ -2639,9 +2639,6 @@ void UpdatePlayerBonus(const int A, const NPCID B)
 {
     auto &p = Player[A];
 
-    // TODO: not State-dependent moment (necessarily), but needs adjustment to support new States / StateNPCs
-    // TODO: confirm when StateNPC is ever invalid
-
     // NOTE: I have traced all paths into this code, and it is unreachable if p.Effect != PLREFF_NORMAL
     SDL_assert(p.Effect == PLREFF_NORMAL);
 
@@ -2695,6 +2692,8 @@ void UpdatePlayerBonus(const int A, const NPCID B)
                 else
                     p.HeldBonus = NPCID_ICE_POWER_S3;
             }
+
+            // TODO: State-dependent moment, extend for states > 7, using the 38A NPCIDs and then our own dedicated range. It's not safe to rely on StateNPC because it doesn't get saved.
         }
     }
 
