@@ -6082,7 +6082,46 @@ void PlayerEffects(const int A)
             // If numPlayers <= 2 Then DropBonus A
         }
     }
-    // TODO: not State-dependent moment, but combine some logic
+    // logic combined across all powerup-to-big effects
+    else if(p.Effect == PLREFF_FIRE_TO_BIG || p.Effect == PLREFF_ICE_TO_BIG)
+    {
+        int prev_state = 7;
+
+        if(p.Effect == PLREFF_FIRE_TO_BIG)
+            prev_state = 3;
+
+        if(p.Duck)
+        {
+            p.StandUp = true; // Fixes a block collision bug
+            p.Duck = false;
+            p.Location.Height = Physics.PlayerHeight[p.Character][p.State];
+            p.Location.Y += -Physics.PlayerHeight[p.Character][p.State] + Physics.PlayerDuckHeight[p.Character][p.State];
+        }
+
+        p.Frame = 1;
+        p.Effect2 += 1;
+
+        if(fEqual(p.Effect2 / 5, std::floor(p.Effect2 / 5)))
+        {
+            if(p.State == 2)
+                p.State = prev_state;
+            else
+                p.State = 2;
+        }
+
+        if(p.Effect2 >= 50)
+        {
+            if(p.State == prev_state)
+                p.State = 2;
+
+            p.Immune = 150;
+            p.Immune2 = true;
+            p.Effect = PLREFF_NORMAL;
+            p.Effect2 = 0;
+            // If numPlayers <= 2 Then DropBonus A
+        }
+    }
+#if 0
     else if(p.Effect == PLREFF_FIRE_TO_BIG) // Player losing firepower
     {
         if(p.Duck)
@@ -6144,6 +6183,7 @@ void PlayerEffects(const int A)
             // If numPlayers <= 2 Then DropBonus A
         }
     }
+#endif
     else if(p.Effect == PLREFF_WARP_PIPE) // Warp effect
     {
         p.SpinJump = false;
