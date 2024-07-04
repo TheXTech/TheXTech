@@ -228,6 +228,9 @@ void PlayerThrowHeavy(const int A)
 {
     auto &p = Player[A];
 
+    if(p.RunRelease && PlayerChar4HeavyOut(A))
+        return;
+
     if(numNPCs >= maxNPCs - 100)
         return;
 
@@ -467,23 +470,22 @@ void PowerUps(const int A)
     //     BoomOut = PlayerChar4HeavyOut(A);
 
     // Hammer Throw Code
-    if(!p.Slide && p.Vine == 0 && p.State == 6 && !p.Duck && p.Mount != 2 && p.Mount != 3 && p.HoldingNPC <= 0 && p.Character != 5)
+    if(!p.Slide && p.Vine == 0 && p.State == 6 && !p.Duck && p.Mount != 2 && p.Mount != 3 && p.HoldingNPC <= 0 && p.Character != 5 && p.FireBallCD <= 0)
     {
-        if(p.Controls.Run && !p.SpinJump && p.FireBallCD <= 0 /* && !BoomOut*/)
+        if(p.Controls.Run && !p.SpinJump /* && p.FireBallCD <= 0 && !BoomOut*/)
         {
-            // if(p.RunRelease || FrameThrower)
-            if((!p.RunRelease && FlameThrower) || (p.RunRelease && !PlayerChar4HeavyOut(A)))
+            if(p.RunRelease || p.SpinJump || FlameThrower)
                 PlayerThrowHeavy(A);
         }
     }
 
 
     // Fire Mario / Luigi code ---- FIRE FLOWER ACTION BALLS OF DOOM
-    if(!p.Slide && p.Vine == 0 && (p.State == 3 || p.State == 7) && !p.Duck && p.Mount != 2 && p.Mount != 3 && p.HoldingNPC <= 0 && p.Character != 5)
+    if(!p.Slide && p.Vine == 0 && (p.State == 3 || p.State == 7) && !p.Duck && p.Mount != 2 && p.Mount != 3 && p.HoldingNPC <= 0 && p.Character != 5 && p.FireBallCD <= 0)
     {
-        if(((p.Controls.Run && !p.SpinJump) || (p.SpinJump && p.Direction != p.SpinFireDir)) && p.FireBallCD <= 0)
+        if(((p.Controls.Run && !p.SpinJump) || (p.SpinJump && p.Direction != p.SpinFireDir)) /* && p.FireBallCD <= 0 */)
         {
-            if((p.RunRelease || p.SpinJump) || (FlameThrower && p.HoldingNPC <= 0))
+            if((p.RunRelease || p.SpinJump) || (FlameThrower /* && p.HoldingNPC <= 0*/)) // HoldingNPC is checked above
                 PlayerThrowBall(A);
         }
     }
