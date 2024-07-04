@@ -7566,6 +7566,7 @@ void PlayerEffects(const int A)
                 p.Location.Y += -Physics.PlayerHeight[2][2] + Physics.PlayerHeight[1][2];
                 p.Location.Height = Physics.PlayerHeight[p.Character][4];
             }
+
             p.State = 4;
             tempLocation.Width = 32;
             tempLocation.Height = 32;
@@ -7589,6 +7590,7 @@ void PlayerEffects(const int A)
     {
         p.Frame = 1;
         p.Immune2 = true;
+
         if(p.Effect2 == 0.0)
         {
             if(p.State == 1 && p.Mount == 0)
@@ -7606,8 +7608,9 @@ void PlayerEffects(const int A)
             else if(p.Character == 2 && p.State == 1 && p.Mount == 1)
             {
                 p.Location.Y += -Physics.PlayerHeight[2][2] + Physics.PlayerHeight[1][2];
-                p.Location.Height = Physics.PlayerHeight[p.Character][4];
+                p.Location.Height = Physics.PlayerHeight[p.Character][5]; // was 4 in SMBX 1.3, but the value was the same for all characters
             }
+
             p.State = 5;
             tempLocation.Width = 32;
             tempLocation.Height = 32;
@@ -7615,7 +7618,9 @@ void PlayerEffects(const int A)
             tempLocation.Y = p.Location.Y + p.Location.Height / 2.0 - tempLocation.Height / 2.0;
             NewEffect(EFFID_SMOKE_S4, tempLocation, 1, 0, ShadowMode);
         }
+
         p.Effect2 += 1;
+
         if(fEqual(p.Effect2, 14))
         {
             p.Immune += 50;
@@ -7636,7 +7641,7 @@ void PlayerEffects(const int A)
             {
                 p.Location.X += -Physics.PlayerWidth[p.Character][2] * 0.5 + Physics.PlayerWidth[p.Character][1] * 0.5;
                 p.Location.Y += -Physics.PlayerHeight[p.Character][2] + Physics.PlayerHeight[p.Character][1];
-                p.State = 5;
+                p.State = 6; // was 5 in SMBX 1.3, but this is fine because the dimensions are the same, and it gets set correctly below
                 p.Location.Width = Physics.PlayerWidth[p.Character][p.State];
                 p.Location.Height = Physics.PlayerHeight[p.Character][p.State];
             }
