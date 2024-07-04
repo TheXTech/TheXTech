@@ -7542,7 +7542,59 @@ void PlayerEffects(const int A)
             p.StandUp = true;
         }
     }
-    // TODO: not State-dependent moment, but combine some logic
+    // logic combined across all "transform" powerup effects
+    else if(p.Effect == PLREFF_TURN_LEAF || p.Effect == PLREFF_TURN_STATUE || p.Effect == PLREFF_TURN_HEAVY)
+    {
+        int target_state = 4;
+
+        if(p.Effect != PLREFF_TURN_LEAF)
+        {
+            p.Immune2 = true;
+            target_state = 5 + (p.Effect - PLREFF_TURN_STATUE);
+        }
+
+        p.Frame = 1;
+
+        if(p.Effect2 == 0.0)
+        {
+            if(p.State == 1 && p.Mount == 0)
+            {
+                p.Location.X += -Physics.PlayerWidth[p.Character][2] * 0.5 + Physics.PlayerWidth[p.Character][1] * 0.5;
+                p.Location.Y += -Physics.PlayerHeight[p.Character][2] + Physics.PlayerHeight[p.Character][1];
+                p.State = target_state;
+                p.Location.Width = Physics.PlayerWidth[p.Character][p.State];
+                p.Location.Height = Physics.PlayerHeight[p.Character][p.State];
+            }
+            else if(p.Mount == 3)
+            {
+                YoshiHeight(A);
+            }
+            else if(p.Character == 2 && p.State == 1 && p.Mount == 1)
+            {
+                p.Location.Y += -Physics.PlayerHeight[2][2] + Physics.PlayerHeight[1][2];
+                p.Location.Height = Physics.PlayerHeight[p.Character][target_state];
+            }
+
+            p.State = target_state;
+            tempLocation.Width = 32;
+            tempLocation.Height = 32;
+            tempLocation.X = p.Location.X + p.Location.Width / 2.0 - tempLocation.Width / 2.0;
+            tempLocation.Y = p.Location.Y + p.Location.Height / 2.0 - tempLocation.Height / 2.0;
+            NewEffect(EFFID_SMOKE_S4, tempLocation, 1, 0, ShadowMode);
+        }
+
+        p.Effect2 += 1;
+
+        if(fEqual(p.Effect2, 14))
+        {
+            p.Immune += 50;
+            p.Immune2 = true;
+            p.Effect = PLREFF_NORMAL;
+            p.Effect2 = 0;
+            p.StandUp = true;
+        }
+    }
+#if 0
     else if(p.Effect == PLREFF_TURN_LEAF) // Player got a leaf
     {
         p.Frame = 1;
@@ -7674,6 +7726,7 @@ void PlayerEffects(const int A)
             p.StandUp = true;
         }
     }
+#endif
     else if(p.Effect == PLREFF_STONE) // Change to / from tanooki
     {
         for(B = 1; B <= 2; B++)
