@@ -210,6 +210,8 @@ static void s_MovePlayersToExit(int got_exit_A)
 
 void TouchBonus(int A, int B)
 {
+    // NOTE: the only way to reach this code in SMBX 1.3 when Player[A].Effect is not PLREFF_NORMAL is if NPC[B]->IsACoin is true and NPC[B] is on Char4's boomerang
+
     // ban collecting dropped item during first stage of modern item drop process
     if(NPC[B].Effect == NPCEFF_DROP_ITEM && NPC[B].Effect3 != 0)
         return;

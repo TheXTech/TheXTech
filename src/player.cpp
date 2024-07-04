@@ -2642,6 +2642,9 @@ void UpdatePlayerBonus(const int A, const NPCID B)
     // TODO: not State-dependent moment (necessarily), but needs adjustment to support new States / StateNPCs
     // TODO: confirm when StateNPC is ever invalid
 
+    // NOTE: I have traced all paths into this code, and it is unreachable if p.Effect != PLREFF_NORMAL
+    SDL_assert(p.Effect == PLREFF_NORMAL);
+
     // 1 player growing
     // 4 fire flower
     // 5 leaf
