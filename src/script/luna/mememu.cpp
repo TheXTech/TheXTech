@@ -1554,7 +1554,7 @@ public:
         insert(0x0000003c, &Player_t::Slide);
         insert(0x0000003e, &Player_t::SlideKill);
         insert(0x00000040, &Player_t::Vine);
-        insert(0x00000042, &Player_t::NoShellKick);
+        // insert(0x00000042, &Player_t::NoShellKick);
         insert(0x00000044, &Player_t::ShellSurf);
         static_assert(sizeof(Player_t::StateNPC) == sizeof(vbint_t), "underlying type of Player_t::StateNPC must be vbint_t");
         insert(0x00000046, reinterpret_cast<vbint_t Player_t::*>(&Player_t::StateNPC));
@@ -1648,7 +1648,7 @@ public:
         // insert(0x0000014c, &Player_t::Pinched4);
         // insert(0x0000014e, &Player_t::NPCPinched);
 
-        insert(0x00000150, &Player_t::m2Speed);
+        // insert(0x00000150, &Player_t::m2Speed);
         insert(0x00000154, &Player_t::HoldingNPC);
         insert(0x00000156, &Player_t::CanGrabNPCs);
         static_assert(sizeof(Player_t::HeldBonus) == sizeof(vbint_t), "underlying type of Player_t::HeldBonus must be vbint_t");
@@ -1669,7 +1669,7 @@ public:
         insert(0x00000178, &Player_t::StandingOnVehiclePlr);
         insert(0x0000017a, &Player_t::UnStart);
         insert(0x0000017c, &Player_t::mountBump);
-        insert(0x00000180, &Player_t::SpeedFixY);
+        // insert(0x00000180, &Player_t::SpeedFixY);
     }
 
     double getValue(Player_t *obj, size_t address, FIELDTYPE ftype) override
