@@ -62,5 +62,6 @@ void PlayerVehicleDismountCheck(int A);
 
 void PlayerEffectWarpPipe(int A);
 void PlayerEffectWarpDoor(int A);
+void PlayerEffectWarpWait(int A);
 
 #endif // PLAYER_UPDATE_PRIV_H

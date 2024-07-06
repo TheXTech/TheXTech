@@ -69,10 +69,6 @@
 //// Private Sub PlayerEffects(A As Integer)
 //void PlayerEffects(const int A);
 
-void s_TriggerDoorEffects(const Location_t& loc, bool do_big_door = true);
-void s_WarpReleaseItems(const Warp_t& warp, int A, bool backward, bool release_at_warp = true);
-void s_WarpStealMount(int A);
-
 
 static void setupPlayerAtCheckpoints(NPC_t &npc, Checkpoint_t &cp)
 {
@@ -5796,127 +5792,8 @@ void PlayerEffects(const int A)
                 p.Effect2 = 0;
             }
         }
-        // door exit holding pattern (exit blocked)
-        else if(fEqual(p.Effect2, 131))
-        {
-            tempBool = false;
-            for(B = 1; B <= numPlayers; B++)
-            {
-                // Was previously only B != A. New conditions only apply in >2P
-                bool check_coll = B != A && !Player[B].Dead && (Player[B].Effect != PLREFF_WAITING || B < A);
-                if(check_coll && CheckCollision(p.Location, Player[B].Location))
-                    tempBool = true;
-            }
-
-            if(!tempBool)
-            {
-                p.Effect2 = 130;
-
-                const auto& warp_exit = p.WarpBackward ? Warp[p.Warp].Entrance : Warp[p.Warp].Exit;
-
-                s_TriggerDoorEffects(static_cast<Location_t>(warp_exit), false);
-
-                SoundPause[46] = 0;
-                PlaySoundSpatial(SFX_Door, p.Location);
-            }
-        }
-        // door exit wait
-        else if(p.Effect2 <= 130)
-        {
-            p.Effect2 -= 1;
-            if(fEqual(p.Effect2, 100))
-            {
-                p.Effect = PLREFF_NORMAL;
-                p.Effect2 = 0;
-            }
-        }
-        // 2P holding condition for start warp (pipe exit)
-        else if(p.Effect2 <= 300)
-        {
-            p.Effect2 -= 1;
-            if(fEqual(p.Effect2, 200))
-            {
-                p.Effect2 = 100;
-                p.Effect = PLREFF_WARP_PIPE;
-            }
-        }
-        else if(p.Effect2 <= 1000) // Start Wait for pipe
-        {
-            p.Effect2 -= 1;
-            if(fEqual(p.Effect2, 900))
-            {
-                p.Effect = PLREFF_WARP_PIPE;
-                p.Effect2 = 100;
-
-                // 2P holding condition for start warp
-                if(A == 2 && (g_ClonedPlayerMode || numPlayers <= 2))
-                {
-                    p.Effect = PLREFF_WAITING;
-                    p.Effect2 = 300;
-                }
-                // modern >2P holding condition for warp
-                else if(A >= 2 && !g_ClonedPlayerMode)
-                {
-                    p.Effect = PLREFF_WARP_PIPE;
-                    p.Effect2 = 2010 + 100 * (A - 1);
-                }
-            }
-        }
-        else if(p.Effect2 <= 2000) // Start Wait for door
-        {
-            p.Effect2 -= 1;
-
-            if(fEqual(p.Effect2, 1900))
-            {
-                s_TriggerDoorEffects(static_cast<Location_t>(Warp[p.Warp].Exit), false);
-
-                SoundPause[46] = 0;
-                p.Effect = PLREFF_WAITING;
-                p.Effect2 = 30;
-
-                if(A >= 2 && !g_ClonedPlayerMode)
-                {
-                    p.Effect = PLREFF_WAITING;
-                    p.Effect2 = 131;
-                }
-                else
-                    PlaySoundSpatial(SFX_Door, p.Location);
-            }
-        }
-        else if(p.Effect2 <= 3000) // warp wait
-        {
-            p.Effect2 -= 1;
-
-            auto &w = Warp[p.Warp];
-
-            if(g_config.EnableInterLevelFade && (w.MapWarp || w.level != STRINGINDEX_NONE) && Maths::iRound(p.Effect2) == 2955 && !g_levelScreenFader.isFadingIn())
-                g_levelScreenFader.setupFader(2, 0, 65, ScreenFader::S_FADE);
-
-            if(fEqual(p.Effect2, 2920))
-            {
-                if(w.MapWarp)
-                {
-                    LevelBeatCode = 6;
-
-                    if(!(w.MapX == -1 && w.MapY == -1))
-                    {
-                        WorldPlayer[1].Location.X = w.MapX;
-                        WorldPlayer[1].Location.Y = w.MapY;
-
-                        for(int l = 1; l <= numWorldLevels; ++l)
-                        {
-                            if(CheckCollision(WorldPlayer[1].Location, WorldLevel[l].Location))
-                            {
-                                WorldLevel[l].Active = true;
-                                curWorldLevel = l;
-                            }
-                        }
-                    }
-                }
-                EndLevel = true;
-                return;
-            }
-        }
+        else
+            PlayerEffectWarpWait(A);
     }
     // logic combined across all "grow" powerup effects
     else if(p.Effect == PLREFF_TURN_FIRE || p.Effect == PLREFF_TURN_ICE) // Player got fire power
