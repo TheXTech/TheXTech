@@ -61,5 +61,6 @@ void UpdatePlayerDead(int A);
 void PlayerVehicleDismountCheck(int A);
 
 void PlayerEffectWarpPipe(int A);
+void PlayerEffectWarpDoor(int A);
 
 #endif // PLAYER_UPDATE_PRIV_H
