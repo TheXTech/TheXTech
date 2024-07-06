@@ -5273,65 +5273,8 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
     if(LayerNPC > 0)
     {
         int B = NPC[LayerNPC].AttLayer;
-        // for(B = 1; B <= maxLayers; B++)
-        {
-            if(B != LAYER_NONE && B != LAYER_DEFAULT)
-            {
-                // if(Layer[B].Name == NPC[LayerNPC].AttLayer)
-                {
-                    if(NPC[LayerNPC].Location.X - lyrX == 0.0 && NPC[LayerNPC].Location.Y - lyrY == 0.0)
-                    {
-                        if(Layer[B].SpeedX != 0.0f || Layer[B].SpeedY != 0.0f)
-                        {
-                            Layer[B].EffectStop = true;
-                            Layer[B].SpeedX = 0;
-                            Layer[B].SpeedY = 0;
-
-                            for(int C : Layer[B].blocks)
-                            {
-                                // if(Block[C].Layer == Layer[B].Name)
-                                {
-                                    Block[C].Location.SpeedX = 0;
-                                    Block[C].Location.SpeedY = 0;
-                                }
-                            }
-
-                            if(g_config.fix_climb_bgo_layer_move)
-                            {
-                                for(int C : Layer[B].BGOs)
-                                {
-                                    if(BackgroundFence[Background[C].Type])
-                                    {
-                                        Background[C].Location.SpeedX = 0;
-                                        Background[C].Location.SpeedY = 0;
-                                    }
-                                }
-                            }
-
-                            for(int C : Layer[B].NPCs)
-                            {
-                                // if(NPC[C].Layer == Layer[B].Name)
-                                {
-                                    if(NPC[C]->IsAVine || NPC[C].Type == NPCID_ITEM_BURIED)
-                                    {
-                                        NPC[C].Location.SpeedX = 0;
-                                        NPC[C].Location.SpeedY = 0;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    else
-                    {
-                        Layer[B].EffectStop = false;
-                        Layer[B].SpeedX = NPC[LayerNPC].Location.X - lyrX;
-                        Layer[B].SpeedY = NPC[LayerNPC].Location.Y - lyrY;
-                    }
-                }
-            }
-            // else
-            //     break;
-        }
+        if(B != LAYER_NONE && B != LAYER_DEFAULT)
+            SetLayerSpeed(B, NPC[LayerNPC].Location.X - lyrX, NPC[LayerNPC].Location.Y - lyrY, false);
     }
 }
 
