@@ -426,8 +426,8 @@ void PlayerEffectWarpPipe(int A)
 
         // D_pLogDebug("Warping: %g (same section? %s!)", leftToGoal, SectionCollision(p.Section, warp_exit) ? "yes" : "no");
 
-        // trigger fader when there are 24 pixels left (for normal effects) or 0 pixels left (for none or scroll)
-        s_WarpFaderLogic(false, A, warp.transitEffect, warp_enter, Maths::iRound(leftToGoal) == 24, !is_level_quit && !same_section && Maths::iRound(leftToGoal) == 0);
+        // trigger fader when there are 16 pixels left (for normal effects) or 0 pixels left (for none or scroll)
+        s_WarpFaderLogic(false, A, warp.transitEffect, warp_enter, Maths::iRound(leftToGoal) == 16, !is_level_quit && !same_section && Maths::iRound(leftToGoal) == 0);
     }
     else if(fEqual(p.Effect2, 1))  // Exiting pipe (initialization)
     {
