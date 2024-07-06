@@ -884,6 +884,8 @@ public:
     opt<bool> dynamic_camera_logic{this, defaults(true), {CompatClass::standard_update, false}, Scope::CreatorFile,
         "dynamic-camera-logic", "Dynamic camera logic", "Allow a non-800x600 camera for most logic, and only use the event logic camera in rare cases",
         config_res_set};
+    opt<bool> fix_attlayer_reset{this, defaults(true), {CompatClass::standard_update, false}, Scope::CreatorFile,
+        "fix-attlayer-reset", "Fix AttLayer reset", "Resets an att. layer when its NPC dies", nullptr};
 
     // if we make the scope below be Scope::CreatorEpisode, episodes can force this in both modern / classic mode
     opt<bool> modern_lives_system{this, defaults(true), {CompatClass::critical_update, false}, Scope::None,

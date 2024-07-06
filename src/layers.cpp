@@ -360,6 +360,9 @@ void SetLayerSpeed(layerindex_t L, double SpeedX, double SpeedY, bool EffectStop
     if(L == LAYER_NONE)
         return;
 
+    if(g_config.fix_attlayer_reset)
+        Defective = false;
+
     // relatively simple code to set the layer's speed
     if(SpeedX != 0.0 || SpeedY != 0.0 || Defective)
     {
@@ -395,6 +398,12 @@ void SetLayerSpeed(layerindex_t L, double SpeedX, double SpeedY, bool EffectStop
         {
             NPC[C].Location.SpeedX = 0;
             NPC[C].Location.SpeedY = 0;
+        }
+
+        if(g_config.fix_attlayer_reset && !NPC[C].Active)
+        {
+            if(NPC[C].AttLayer != LAYER_NONE && NPC[C].AttLayer != LAYER_DEFAULT)
+                SetLayerSpeed(NPC[C].AttLayer, 0, 0);
         }
     }
 }
