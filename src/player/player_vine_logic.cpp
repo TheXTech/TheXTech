@@ -26,6 +26,7 @@
 #include "sound.h"
 #include "config.h"
 #include "npc_traits.h"
+#include "layers.h"
 
 #include "main/trees.h"
 
@@ -180,8 +181,10 @@ void PlayerVineMovement(int A)
 
     if(g_config.fix_climb_bgo_speed_adding && Player[A].VineBGO > 0)
     {
-        Player[A].Location.SpeedX += Background[Player[A].VineBGO].Location.SpeedX;
-        Player[A].Location.SpeedY += Background[Player[A].VineBGO].Location.SpeedY;
+        const Layer_t& layer = Layer[Background[Player[A].VineBGO].Layer];
+
+        Player[A].Location.SpeedX += layer.ApplySpeedX;
+        Player[A].Location.SpeedY += layer.ApplySpeedY;
     }
     else
     {

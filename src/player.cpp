@@ -1799,8 +1799,10 @@ void PlayerFrame(Player_t &p)
 
         if(g_config.fix_climb_bgo_speed_adding && p.VineBGO > 0)
         {
-            doesPlayerMoves = !fEqual(p.Location.SpeedX,  Background[p.VineBGO].Location.SpeedX) ||
-                               p.Location.SpeedY < Background[p.VineBGO].Location.SpeedY - 0.1;
+            const Layer_t& layer = Layer[Background[p.VineBGO].Layer];
+
+            doesPlayerMoves = !fEqual(p.Location.SpeedX,  (double)layer.ApplySpeedX) ||
+                               p.Location.SpeedY < layer.ApplySpeedY - 0.1;
         }
         else
         {
