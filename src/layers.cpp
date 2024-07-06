@@ -739,7 +739,7 @@ bool DeleteEvent(eventindex_t index)
 
 // Helper functions for ProcEvent
 
-void s_testPlayersInSection(const Screen_t& screen, int B, bool do_warp, int& onscreen_plr, int& warped_plr)
+static inline void s_testPlayersInSection(const Screen_t& screen, int B, bool do_warp, int& onscreen_plr, int& warped_plr)
 {
     // warp EVERYONE in cloned player mode, otherwise just warp players of this screen
     int i_start = g_ClonedPlayerMode ? 1 : 0;
@@ -809,6 +809,312 @@ void s_testPlayersInSection(const Screen_t& screen, int B, bool do_warp, int& on
     }
 }
 
+static inline void s_initModernQScreen(Screen_t& screen, const int B, const SpeedlessLocation_t& tempLevel, const SpeedlessLocation_t& newLevel, const int onscreen_plr, const int warped_plr, const bool is_reset, bool& set_qScreen, bool& set_qScreen_canonical)
+{
+    // check that the onscreen player is here
+    if(onscreen_plr == 0 && warped_plr == 0)
+    {
+        // no qScreen because there were no onscreen players, but do an update in case another Screen called qScreen
+        for(int i = screen.active_begin(); i < screen.active_end(); i++)
+        {
+            int Z_i = screen.vScreen_refs[i];
+            GetvScreenAuto(vScreen[Z_i]);
+            qScreenLoc[Z_i] = vScreen[Z_i];
+        }
+    }
+    // 2P dynamic screen handling
+    else if(screen.Type == ScreenTypes::Dynamic)
+    {
+        int Z1 = screen.vScreen_refs[0];
+        int Z2 = screen.vScreen_refs[1];
+
+        int p1 = screen.players[0];
+        int p2 = screen.players[1];
+
+        set_qScreen |= screen.Visible;
+        set_qScreen_canonical |= !screen.Visible && screen.is_canonical();
+
+        bool screen2_was_visible = vScreen[Z2].Visible;
+
+        double tX = 0.0;
+        double tY = 0.0;
+
+        if(warped_plr == p1 || warped_plr == p2)
+        {
+            int warped_Z = (warped_plr == p1) ? Z1 : Z2;
+            int onscreen_Z = (onscreen_plr == p1) ? Z1 : Z2;
+            tX = vScreen[warped_Z].X - vScreen[onscreen_Z].X;
+            tY = vScreen[warped_Z].Y - vScreen[onscreen_Z].Y;
+        }
+
+        SoundPause[13] = 10;
+
+        // need two cycles to fully update the dynamic screens in the new level
+        SetupScreens(screen, false);
+        DynamicScreen(screen);
+        CenterScreens(screen);
+
+        if(vScreen[Z2].Visible)
+        {
+            for(int Z = 1; Z <= 2; Z++)
+                GetvScreen(screen.vScreen(Z));
+        }
+        else
+            GetvScreenAverage(vScreen[Z1]);
+
+        // set up the dynamic screens in the new level
+        SetupScreens(screen, false);
+        DynamicScreen(screen);
+
+        // set the positions (including screen positions) in the old level, but with the NEW dynamic splits
+        level[B] = tempLevel;
+        CenterScreens(screen);
+
+        if(vScreen[Z2].Visible)
+        {
+            for(int Z = 1; Z <= 2; Z++)
+                GetvScreen(screen.vScreen(Z));
+        }
+        else
+        {
+            GetvScreenAverage(vScreen[Z1]);
+        }
+
+        // set the qScreen!
+        qScreenLoc[Z1] = vScreen[Z1];
+
+        // set the second qScreen if possible
+        if(vScreen[Z2].Visible)
+            qScreenLoc[Z2] = vScreen[Z2];
+
+        // special code to indicate the direction the other player was warped from
+        if((tX || tY) && (screen2_was_visible && !vScreen[Z2].Visible))
+        {
+            // total distance of warp
+            double dSquare = tX * tX + tY * tY;
+
+            // project onto the circle: proportion of distance from each axis
+            double xProp = tX * tX / dSquare;
+            double yProp = tY * tY / dSquare;
+
+            if(tX < 0)
+                xProp *= -1;
+
+            if(tY < 0)
+                yProp *= -1;
+
+            // maximum total shift of 1/4 of the vScreen's size; also limit by 200x150 (SMBX64 amount)
+            double maxShiftX = vScreen[Z1].Width / 4;
+            double maxShiftY = vScreen[Z1].Height / 4;
+
+            if(maxShiftX > 200)
+                maxShiftX = 200;
+
+            if(maxShiftY > 150)
+                maxShiftY = 150;
+
+            // apply the shift
+            qScreenLoc[Z1].X += maxShiftX * xProp;
+            qScreenLoc[Z1].Y += maxShiftY * yProp;
+
+            // restrict to old level bounds
+            if(-qScreenLoc[Z1].X < level[B].X)
+                qScreenLoc[Z1].X = -level[B].X;
+
+            if(-qScreenLoc[Z1].X + vScreen[Z1].Width > level[B].Width)
+                qScreenLoc[Z1].X = -(level[B].Width - vScreen[Z1].Width);
+
+            if(-qScreenLoc[Z1].Y < level[B].Y)
+                qScreenLoc[Z1].Y = -level[B].Y;
+
+            if(-qScreenLoc[Z1].Y + vScreen[Z1].Height > level[B].Height)
+                qScreenLoc[Z1].Y = -(level[B].Height - vScreen[Z1].Height);
+        }
+
+        // restore the new level
+        level[B] = newLevel;
+    }
+    // single-screen or forced split-screen code
+    else
+    {
+        // first, quickly store the old vScreens into qScreen
+        for(int i = screen.active_begin(); i < screen.active_end(); i++)
+        {
+            int Z_i = screen.vScreen_refs[i];
+
+            // update qScreenLoc only if qScreen was not already set (avoids jumps)
+            if(screen.Visible && !qScreen)
+                qScreenLoc[Z_i] = vScreen[Z_i];
+
+            if(!screen.Visible && screen.is_canonical() && !qScreen_canonical)
+                qScreenLoc[Z_i] = vScreen[Z_i];
+        }
+
+        // now, update the screen positions here before proceeding
+        SetupScreens(screen, false);
+        CenterScreens(screen);
+
+        for(int i = screen.active_begin(); i < screen.active_end(); i++)
+        {
+            int Z_i = screen.vScreen_refs[i];
+            Player_t& plr = Player[vScreen[Z_i].player];
+
+            // update vScreen position
+            GetvScreenAuto(vScreen[Z_i]);
+
+            // the next code is designed to avoid needing a qScreen if it wouldn't have occurred in the original game
+            bool use_new_resize = true;
+
+            double old_w = qScreenLoc[Z_i].Width;
+            double old_h = qScreenLoc[Z_i].Height;
+            double old_x = qScreenLoc[Z_i].X;
+            double old_y = qScreenLoc[Z_i].Y;
+
+            // (0) player should not have warped
+            if(plr.Effect == PLREFF_NO_COLLIDE)
+                use_new_resize = false;
+
+            // (1) old bounds shouldn't be outside of the new level
+            if(-old_x < level[B].X
+                || -old_x + old_w > level[B].Width
+                || -old_y < level[B].Y
+                || -old_y + old_h > level[B].Height)
+            {
+                use_new_resize = false;
+            }
+
+            // (2) new screen size should equal old (get new vScreen here)
+            if(vScreen[Z_i].Width != old_w || vScreen[Z_i].Height != old_h)
+                use_new_resize = false;
+
+            // (3) qScreen should not have occurred in old game
+            if(use_new_resize && !is_reset)
+            {
+                double cx, cy, old_cx, old_cy;
+
+                GetPlayerScreen(800, 600, plr, cx, cy);
+
+                level[B] = tempLevel;
+                GetPlayerScreen(800, 600, plr, old_cx, old_cy);
+                level[B] = newLevel;
+
+                if(std::abs(cx - old_cx) > 32 || std::abs(cy - old_cy) > 32)
+                    use_new_resize = false;
+            }
+
+            // do it!
+            if(use_new_resize)
+            {
+                qScreenLoc[Z_i] = vScreen[Z_i];
+                vScreen[Z_i].tempX = vScreen[Z_i].X - old_x;
+                vScreen[Z_i].TempY = vScreen[Z_i].Y - old_y;
+            }
+            else
+            {
+                // limit qScreen duration if player was warped
+                if(plr.Effect == PLREFF_NO_COLLIDE)
+                {
+                    Location_t old_section_loc = newLoc(tempLevel.X, tempLevel.Y, tempLevel.Width - tempLevel.X, tempLevel.Height - tempLevel.Y);
+                    Location_t qScreen_loc = newLoc(-qScreenLoc[Z_i].X, -qScreenLoc[Z_i].Y, qScreenLoc[Z_i].Width, qScreenLoc[Z_i].Height);
+
+                    // disable qScreen if cross-section
+                    if(!CheckCollision(old_section_loc, qScreen_loc))
+                    {
+                        qScreenLoc[Z_i] = vScreen[Z_i];
+                    }
+                    // otherwise, limit distance
+                    else
+                    {
+                        double distance = SDL_sqrt((vScreen[Z_i].X - qScreenLoc[Z_i].X) * (vScreen[Z_i].X - qScreenLoc[Z_i].X) + (vScreen[Z_i].Y - qScreenLoc[Z_i].Y) * (vScreen[Z_i].Y - qScreenLoc[Z_i].Y));
+
+                        if(distance > 400)
+                        {
+                            qScreenLoc[Z_i].X = (qScreenLoc[Z_i].X - vScreen[Z_i].X) * 400 / distance + vScreen[Z_i].X;
+                            qScreenLoc[Z_i].Y = (qScreenLoc[Z_i].Y - vScreen[Z_i].Y) * 400 / distance + vScreen[Z_i].Y;
+                        }
+                    }
+                }
+
+                set_qScreen |= screen.Visible;
+                set_qScreen_canonical |= !screen.Visible && screen.is_canonical();
+            }
+        }
+    }
+}
+
+static inline void s_initLegacyQScreen(Screen_t& screen, const int B, const SpeedlessLocation_t& tempLevel, const SpeedlessLocation_t& newLevel, const int onscreen_plr, const int warped_plr, const bool is_reset, bool& set_qScreen, bool& set_qScreen_canonical)
+{
+    int Z1 = screen.vScreen_refs[0];
+    int Z2 = screen.vScreen_refs[1];
+
+    int p1 = screen.players[0];
+    int p2 = screen.players[1];
+
+    if(screen.player_count == 2 && screen.DType != 5)
+    {
+        level[B] = tempLevel;
+
+        // faithful to original code which used vScreen[C], where C could be 0
+        vScreen_t screenLoc = vScreen[0];
+        if(p2 == onscreen_plr)
+            screenLoc = vScreen[Z2];
+        else if(p1 == onscreen_plr)
+            screenLoc = vScreen[Z1];
+
+        SoundPause[13] = 10;
+
+        DynamicScreen(screen);
+
+        // calculate the vScreen at non-splitscreen resolution (as the original game does)
+        GetvScreenAverage(vScreen[Z1]);
+        qScreenLoc[Z1] = vScreen[Z1];
+
+        // pan to indicate warped player, in the direction the screen was previously split
+        //   (used hardcoded 400 / 200 / 300 / 150 in VB6 code)
+        if(int(screenLoc.Width) == screen.W / 2)
+        {
+            if(qScreenLoc[Z1].X < screenLoc.X + screenLoc.Left)
+                qScreenLoc[Z1].X += screen.W / 4;
+            else
+                qScreenLoc[Z1].X -= screen.W / 4;
+        }
+
+        if(int(screenLoc.Height) == screen.H / 2)
+        {
+            if(qScreenLoc[Z1].Y < screenLoc.Y + screenLoc.Top)
+                qScreenLoc[Z1].Y += screen.H / 4;
+            else
+                qScreenLoc[Z1].Y -= screen.H / 4;
+        }
+
+        // used ScreenW / H and FrmMain.ScaleWidth / Height in VB6 code
+        double use_width  = SDL_min(static_cast<double>(screen.W), level[B].Width  - level[B].X);
+        double use_height = SDL_min(static_cast<double>(screen.H), level[B].Height - level[B].Y);
+
+        // restrict to old level bounds
+        if(-qScreenLoc[Z1].X < level[B].X)
+            qScreenLoc[Z1].X = -level[B].X;
+
+        if(-qScreenLoc[Z1].X + use_width /*FrmMain.ScaleWidth*/ > level[B].Width)
+            qScreenLoc[Z1].X = -(level[B].Width - use_width);
+
+        if(-qScreenLoc[Z1].Y < level[B].Y)
+            qScreenLoc[Z1].Y = -level[B].Y;
+
+        if(-qScreenLoc[Z1].Y + use_height /*FrmMain.ScaleHeight*/ > level[B].Height)
+            qScreenLoc[Z1].Y = -(level[B].Height - use_height);
+
+        // restore the new level
+        level[B] = newLevel;
+    }
+    else
+    {
+        qScreenLoc[Z1] = vScreen[Z1];
+    }
+
+    set_qScreen = true;
+    set_qScreen_canonical = true;
+}
 
 // Old functions:
 
@@ -906,311 +1212,10 @@ void ProcEvent(eventindex_t index, int whichPlayer, bool NoEffect)
 
                         // start the modern qScreen animation
                         if(!equalCase(evt.Name.c_str(), "Level - Start") && g_config.modern_section_change)
-                        {
-                            // check that the onscreen player is here
-                            if(onscreen_plr == 0 && warped_plr == 0)
-                            {
-                                // no qScreen because there were no onscreen players, but do an update in case another Screen called qScreen
-                                for(int i = screen.active_begin(); i < screen.active_end(); i++)
-                                {
-                                    int Z_i = screen.vScreen_refs[i];
-                                    GetvScreenAuto(vScreen[Z_i]);
-                                    qScreenLoc[Z_i] = vScreen[Z_i];
-                                }
-                            }
-                            // 2P dynamic screen handling
-                            else if(screen.Type == ScreenTypes::Dynamic)
-                            {
-                                int Z1 = screen.vScreen_refs[0];
-                                int Z2 = screen.vScreen_refs[1];
-
-                                int p1 = screen.players[0];
-                                int p2 = screen.players[1];
-
-                                set_qScreen |= screen.Visible;
-                                set_qScreen_canonical |= !screen.Visible && screen.is_canonical();
-
-                                bool screen2_was_visible = vScreen[Z2].Visible;
-
-                                double tX = 0.0;
-                                double tY = 0.0;
-
-                                if(warped_plr == p1 || warped_plr == p2)
-                                {
-                                    int warped_Z = (warped_plr == p1) ? Z1 : Z2;
-                                    int onscreen_Z = (onscreen_plr == p1) ? Z1 : Z2;
-                                    tX = vScreen[warped_Z].X - vScreen[onscreen_Z].X;
-                                    tY = vScreen[warped_Z].Y - vScreen[onscreen_Z].Y;
-                                }
-
-                                SoundPause[13] = 10;
-
-                                // need two cycles to fully update the dynamic screens in the new level
-                                SetupScreens(screen, false);
-                                DynamicScreen(screen);
-                                CenterScreens(screen);
-
-                                if(vScreen[Z2].Visible)
-                                {
-                                    for(int Z = 1; Z <= 2; Z++)
-                                        GetvScreen(screen.vScreen(Z));
-                                }
-                                else
-                                    GetvScreenAverage(vScreen[Z1]);
-
-                                // set up the dynamic screens in the new level
-                                SetupScreens(screen, false);
-                                DynamicScreen(screen);
-
-                                // set the positions (including screen positions) in the old level, but with the NEW dynamic splits
-                                level[B] = tempLevel;
-                                CenterScreens(screen);
-
-                                if(vScreen[Z2].Visible)
-                                {
-                                    for(int Z = 1; Z <= 2; Z++)
-                                        GetvScreen(screen.vScreen(Z));
-                                }
-                                else
-                                {
-                                    GetvScreenAverage(vScreen[Z1]);
-                                }
-
-                                // set the qScreen!
-                                qScreenLoc[Z1] = vScreen[Z1];
-
-                                // set the second qScreen if possible
-                                if(vScreen[Z2].Visible)
-                                    qScreenLoc[Z2] = vScreen[Z2];
-
-                                // special code to indicate the direction the other player was warped from
-                                if((tX || tY) && (screen2_was_visible && !vScreen[Z2].Visible))
-                                {
-                                    // total distance of warp
-                                    double dSquare = tX * tX + tY * tY;
-
-                                    // project onto the circle: proportion of distance from each axis
-                                    double xProp = tX * tX / dSquare;
-                                    double yProp = tY * tY / dSquare;
-
-                                    if(tX < 0)
-                                        xProp *= -1;
-
-                                    if(tY < 0)
-                                        yProp *= -1;
-
-                                    // maximum total shift of 1/4 of the vScreen's size; also limit by 200x150 (SMBX64 amount)
-                                    double maxShiftX = vScreen[Z1].Width / 4;
-                                    double maxShiftY = vScreen[Z1].Height / 4;
-
-                                    if(maxShiftX > 200)
-                                        maxShiftX = 200;
-
-                                    if(maxShiftY > 150)
-                                        maxShiftY = 150;
-
-                                    // apply the shift
-                                    qScreenLoc[Z1].X += maxShiftX * xProp;
-                                    qScreenLoc[Z1].Y += maxShiftY * yProp;
-
-                                    // restrict to old level bounds
-                                    if(-qScreenLoc[Z1].X < level[B].X)
-                                        qScreenLoc[Z1].X = -level[B].X;
-
-                                    if(-qScreenLoc[Z1].X + vScreen[Z1].Width > level[B].Width)
-                                        qScreenLoc[Z1].X = -(level[B].Width - vScreen[Z1].Width);
-
-                                    if(-qScreenLoc[Z1].Y < level[B].Y)
-                                        qScreenLoc[Z1].Y = -level[B].Y;
-
-                                    if(-qScreenLoc[Z1].Y + vScreen[Z1].Height > level[B].Height)
-                                        qScreenLoc[Z1].Y = -(level[B].Height - vScreen[Z1].Height);
-                                }
-
-                                // restore the new level
-                                level[B] = newLevel;
-                            }
-                            // single-screen or forced split-screen code
-                            else
-                            {
-                                // first, quickly store the old vScreens into qScreen
-                                for(int i = screen.active_begin(); i < screen.active_end(); i++)
-                                {
-                                    int Z_i = screen.vScreen_refs[i];
-
-                                    // update qScreenLoc only if qScreen was not already set (avoids jumps)
-                                    if(screen.Visible && !qScreen)
-                                        qScreenLoc[Z_i] = vScreen[Z_i];
-
-                                    if(!screen.Visible && screen.is_canonical() && !qScreen_canonical)
-                                        qScreenLoc[Z_i] = vScreen[Z_i];
-                                }
-
-                                // now, update the screen positions here before proceeding
-                                SetupScreens(screen, false);
-                                CenterScreens(screen);
-
-                                for(int i = screen.active_begin(); i < screen.active_end(); i++)
-                                {
-                                    int Z_i = screen.vScreen_refs[i];
-                                    Player_t& plr = Player[vScreen[Z_i].player];
-
-                                    // update vScreen position
-                                    GetvScreenAuto(vScreen[Z_i]);
-
-                                    // the next code is designed to avoid needing a qScreen if it wouldn't have occurred in the original game
-                                    bool use_new_resize = true;
-
-                                    double old_w = qScreenLoc[Z_i].Width;
-                                    double old_h = qScreenLoc[Z_i].Height;
-                                    double old_x = qScreenLoc[Z_i].X;
-                                    double old_y = qScreenLoc[Z_i].Y;
-
-                                    // (0) player should not have warped
-                                    if(plr.Effect == PLREFF_NO_COLLIDE)
-                                        use_new_resize = false;
-
-                                    // (1) old bounds shouldn't be outside of the new level
-                                    if(-old_x < level[B].X
-                                        || -old_x + old_w > level[B].Width
-                                        || -old_y < level[B].Y
-                                        || -old_y + old_h > level[B].Height)
-                                    {
-                                        use_new_resize = false;
-                                    }
-
-                                    // (2) new screen size should equal old (get new vScreen here)
-                                    if(vScreen[Z_i].Width != old_w || vScreen[Z_i].Height != old_h)
-                                        use_new_resize = false;
-
-                                    // (3) qScreen should not have occurred in old game
-                                    if(use_new_resize && int(s.position.X) != EventSection_t::LESet_ResetDefault)
-                                    {
-                                        double cx, cy, old_cx, old_cy;
-
-                                        GetPlayerScreen(800, 600, plr, cx, cy);
-
-                                        level[B] = tempLevel;
-                                        GetPlayerScreen(800, 600, plr, old_cx, old_cy);
-                                        level[B] = newLevel;
-
-                                        if(std::abs(cx - old_cx) > 32 || std::abs(cy - old_cy) > 32)
-                                            use_new_resize = false;
-                                    }
-
-                                    // do it!
-                                    if(use_new_resize)
-                                    {
-                                        qScreenLoc[Z_i] = vScreen[Z_i];
-                                        vScreen[Z_i].tempX = vScreen[Z_i].X - old_x;
-                                        vScreen[Z_i].TempY = vScreen[Z_i].Y - old_y;
-                                    }
-                                    else
-                                    {
-                                        // limit qScreen duration if player was warped
-                                        if(plr.Effect == PLREFF_NO_COLLIDE)
-                                        {
-                                            Location_t old_section_loc = newLoc(tempLevel.X, tempLevel.Y, tempLevel.Width - tempLevel.X, tempLevel.Height - tempLevel.Y);
-                                            Location_t qScreen_loc = newLoc(-qScreenLoc[Z_i].X, -qScreenLoc[Z_i].Y, qScreenLoc[Z_i].Width, qScreenLoc[Z_i].Height);
-
-                                            // disable qScreen if cross-section
-                                            if(!CheckCollision(old_section_loc, qScreen_loc))
-                                            {
-                                                qScreenLoc[Z_i] = vScreen[Z_i];
-                                            }
-                                            // otherwise, limit distance
-                                            else
-                                            {
-                                                double distance = SDL_sqrt((vScreen[Z_i].X - qScreenLoc[Z_i].X) * (vScreen[Z_i].X - qScreenLoc[Z_i].X) + (vScreen[Z_i].Y - qScreenLoc[Z_i].Y) * (vScreen[Z_i].Y - qScreenLoc[Z_i].Y));
-
-                                                if(distance > 400)
-                                                {
-                                                    qScreenLoc[Z_i].X = (qScreenLoc[Z_i].X - vScreen[Z_i].X) * 400 / distance + vScreen[Z_i].X;
-                                                    qScreenLoc[Z_i].Y = (qScreenLoc[Z_i].Y - vScreen[Z_i].Y) * 400 / distance + vScreen[Z_i].Y;
-                                                }
-                                            }
-                                        }
-
-                                        set_qScreen |= screen.Visible;
-                                        set_qScreen_canonical |= !screen.Visible && screen.is_canonical();
-                                    }
-                                }
-                            }
-                        }
+                            s_initModernQScreen(screen, B, tempLevel, newLevel, onscreen_plr, warped_plr, is_reset, set_qScreen, set_qScreen_canonical);
                         // legacy qScreen animation
                         else if(!equalCase(evt.Name.c_str(), "Level - Start"))
-                        {
-                            int Z1 = screen.vScreen_refs[0];
-                            int Z2 = screen.vScreen_refs[1];
-
-                            int p1 = screen.players[0];
-                            int p2 = screen.players[1];
-
-                            if(screen.player_count == 2 && screen.DType != 5)
-                            {
-                                level[B] = tempLevel;
-
-                                // faithful to original code which used vScreen[C], where C could be 0
-                                vScreen_t screenLoc = vScreen[0];
-                                if(p2 == onscreen_plr)
-                                    screenLoc = vScreen[Z2];
-                                else if(p1 == onscreen_plr)
-                                    screenLoc = vScreen[Z1];
-
-                                SoundPause[13] = 10;
-
-                                DynamicScreen(screen);
-
-                                // calculate the vScreen at non-splitscreen resolution (as the original game does)
-                                GetvScreenAverage(vScreen[Z1]);
-                                qScreenLoc[Z1] = vScreen[Z1];
-
-                                // pan to indicate warped player, in the direction the screen was previously split
-                                //   (used hardcoded 400 / 200 / 300 / 150 in VB6 code)
-                                if(int(screenLoc.Width) == screen.W / 2)
-                                {
-                                    if(qScreenLoc[Z1].X < screenLoc.X + screenLoc.Left)
-                                        qScreenLoc[Z1].X += screen.W / 4;
-                                    else
-                                        qScreenLoc[Z1].X -= screen.W / 4;
-                                }
-
-                                if(int(screenLoc.Height) == screen.H / 2)
-                                {
-                                    if(qScreenLoc[Z1].Y < screenLoc.Y + screenLoc.Top)
-                                        qScreenLoc[Z1].Y += screen.H / 4;
-                                    else
-                                        qScreenLoc[Z1].Y -= screen.H / 4;
-                                }
-
-                                // used ScreenW / H and FrmMain.ScaleWidth / Height in VB6 code
-                                double use_width  = SDL_min(static_cast<double>(screen.W), level[B].Width  - level[B].X);
-                                double use_height = SDL_min(static_cast<double>(screen.H), level[B].Height - level[B].Y);
-
-                                // restrict to old level bounds
-                                if(-qScreenLoc[Z1].X < level[B].X)
-                                    qScreenLoc[Z1].X = -level[B].X;
-
-                                if(-qScreenLoc[Z1].X + use_width /*FrmMain.ScaleWidth*/ > level[B].Width)
-                                    qScreenLoc[Z1].X = -(level[B].Width - use_width);
-
-                                if(-qScreenLoc[Z1].Y < level[B].Y)
-                                    qScreenLoc[Z1].Y = -level[B].Y;
-
-                                if(-qScreenLoc[Z1].Y + use_height /*FrmMain.ScaleHeight*/ > level[B].Height)
-                                    qScreenLoc[Z1].Y = -(level[B].Height - use_height);
-
-                                // restore the new level
-                                level[B] = s.position;
-                            }
-                            else
-                            {
-                                qScreenLoc[Z1] = vScreen[Z1];
-                            }
-
-                            set_qScreen = true;
-                            set_qScreen_canonical = true;
-                        }
+                            s_initLegacyQScreen(screen, B, tempLevel, newLevel, onscreen_plr, warped_plr, is_reset, set_qScreen, set_qScreen_canonical);
                     }
 
                     // enable qScreen (now after all logic to prevent messing up GetvScreen calls)
