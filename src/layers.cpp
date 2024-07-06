@@ -1634,6 +1634,9 @@ void UpdateLayers()
 
     for(A = 0; A <= numLayers; A++)
     {
+        Layer[A].ApplySpeedX = 0;
+        Layer[A].ApplySpeedY = 0;
+
         // only consider non-empty, moving layers
         if(Layer[A].Name.empty() || (Layer[A].SpeedX == 0.f && Layer[A].SpeedY == 0.f))
             continue;
@@ -1681,6 +1684,9 @@ void UpdateLayers()
             {
                 Layer[A].OffsetX += double(Layer[A].SpeedX);
                 Layer[A].OffsetY += double(Layer[A].SpeedY);
+
+                Layer[A].ApplySpeedX = Layer[A].SpeedX;
+                Layer[A].ApplySpeedY = Layer[A].SpeedY;
 
                 // no longer needed thanks to block quadtree, but used to reproduce some buggy behaviors
                 // move the sort invalidation out of the loop over blocks

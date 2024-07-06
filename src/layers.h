@@ -48,6 +48,11 @@ struct Layer_t
     float SpeedX = 0.0f;
 //    SpeedY As Single
     float SpeedY = 0.0f;
+
+// NEW: track the actual applied SpeedX and SpeedY during the last frame. Used for vines.
+    float ApplySpeedX = 0.0f;
+    float ApplySpeedY = 0.0f;
+
 //End Type
 // NEW: track the objects belonging to the layer
     std::set<int> blocks;
