@@ -389,8 +389,7 @@ void RenderSDL::setViewport(int x, int y, int w, int h)
     SDL_RenderSetViewport(m_gRenderer, &topLeftViewport);
 
 #ifdef __WIIU__
-    // FIXME: Temporary workaround for Wii U SDL2 bug that causes the wrong viewport area set.
-    // Also the SDL_RenderSetClipRect itself is buggy here as it violates SDL2's specification.
+    topLeftViewport = {0, 0, w, h};
     SDL_RenderSetClipRect(m_gRenderer, &topLeftViewport);
 #endif
 
