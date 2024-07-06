@@ -188,7 +188,7 @@ void PlayerVineMovement(int A)
     }
     else
     {
-        Player[A].Location.SpeedX += NPC[(int)Player[A].VineNPC].Location.SpeedX;
-        Player[A].Location.SpeedY += NPC[(int)Player[A].VineNPC].Location.SpeedY;
+        Player[A].Location.SpeedX += NPC[Player[A].VineNPC].Location.SpeedX;
+        Player[A].Location.SpeedY += NPC[Player[A].VineNPC].Location.SpeedY;
     }
 }
