@@ -1502,58 +1502,33 @@ static inline bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool bac
 
         if(warp.Locked)
         {
+            // if player has a key, consume it and allow unlocking the warp
             if(plr.HoldingNPC > 0 && NPC[plr.HoldingNPC].Type == NPCID_KEY)
             {
                 NPC[plr.HoldingNPC].Killed = 9;
                 NPCQueues::Killed.push_back(plr.HoldingNPC);
 
                 NewEffect(EFFID_SMOKE_S3, NPC[plr.HoldingNPC].Location);
-                warp.Locked = false;
-                int allBGOs = numBackground + numLocked;
-                for(int C = numBackground + 1; C <= allBGOs; C++)
-                {
-                    if(Background[C].Type == 98)
-                    {
-                        if(CheckCollision(entrance, Background[C].Location) ||
-                           (warp.twoWay && CheckCollision(exit, Background[C].Location)))
-                        {
-                            // this makes Background[C] disappear and never reappear
-                            Background[C].Layer = LAYER_NONE;
-                            Background[C].Hidden = true;
-                            syncLayers_BGO(C);
-                        }
-                    }
-                }
             }
             else if(plr.Mount == 3 && plr.YoshiNPC > 0 && NPC[plr.YoshiNPC].Type == NPCID_KEY)
             {
                 NPC[plr.YoshiNPC].Killed = 9;
                 NPCQueues::Killed.push_back(plr.YoshiNPC);
                 plr.YoshiNPC = 0;
-
-                warp.Locked = false;
-
-                int allBGOs = numBackground + numLocked;
-
-                for(int C = numBackground + 1; C <= allBGOs; C++)
-                {
-                    if(Background[C].Type == 98)
-                    {
-                        if(CheckCollision(entrance, Background[C].Location) ||
-                           (warp.twoWay && CheckCollision(exit, Background[C].Location)))
-                        {
-                            // this makes Background[C] disappear and never reappear
-                            Background[C].Layer = LAYER_NONE;
-                            Background[C].Hidden = true;
-                            syncLayers_BGO(C);
-                        }
-                    }
-                }
             }
             else if(plr.HasKey)
             {
                 plr.HasKey = false;
+            }
+            // otherwise, don't allow unlocking
+            else
+                canWarp = false;
+
+            // if player can still warp, unlock the warp
+            if(canWarp)
+            {
                 warp.Locked = false;
+
                 int allBGOs = numBackground + numLocked;
                 for(int C = numBackground + 1; C <= allBGOs; C++)
                 {
@@ -1570,8 +1545,6 @@ static inline bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool bac
                     }
                 }
             }
-            else
-                canWarp = false;
         }
     }
 
