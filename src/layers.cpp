@@ -398,7 +398,17 @@ void SetLayerSpeed(layerindex_t L, double SpeedX, double SpeedY, bool EffectStop
         }
     }
 
-    // @Wohlstand, should we add something here for the BGO fence fix?
+    if(g_config.fix_climb_bgo_layer_move)
+    {
+        for(int C : Layer[L].BGOs)
+        {
+            if(BackgroundFence[Background[C].Type])
+            {
+                Background[C].Location.SpeedX = 0;
+                Background[C].Location.SpeedY = 0;
+            }
+        }
+    }
 }
 
 
