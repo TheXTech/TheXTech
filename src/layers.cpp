@@ -1332,32 +1332,12 @@ void ProcEvent(eventindex_t index, int whichPlayer, bool NoEffect)
 
             if(evt.MoveLayer != LAYER_NONE)
             {
-
                 B = evt.MoveLayer;
 
-                Layer[B].EffectStop = true;
-                Layer[B].SpeedX = evt.SpeedX;
-                Layer[B].SpeedY = evt.SpeedY;
+                SetLayerSpeed(B, evt.SpeedX, evt.SpeedY, true);
 
                 if(Layer[B].SpeedX == 0.f && Layer[B].SpeedY == 0.f)
                 {
-                    // stop layer
-                    Layer[B].EffectStop = false;
-                    for(int C : Layer[B].blocks)
-                    {
-                        Block[C].Location.SpeedX = double(Layer[B].SpeedX);
-                        Block[C].Location.SpeedY = double(Layer[B].SpeedY);
-                    }
-
-                    for(int C : Layer[B].NPCs)
-                    {
-                        if(NPC[C]->IsAVine || NPC[C].Type == NPCID_ITEM_BURIED)
-                        {
-                            NPC[C].Location.SpeedX = 0;
-                            NPC[C].Location.SpeedY = 0;
-                        }
-                    }
-
                     // eventually, only re-join tables the first time the event has been triggered in a level
                     treeBlockJoinLayer(B);
                     treeBackgroundJoinLayer(B);
@@ -1776,15 +1756,13 @@ void UpdateLayers()
 
                             if(!NPC[B].Active)
                             {
+                                // note: this is the "defective" version of SetLayerSpeed, which (in classic mode) only sets the speed, and does nothing else
                                 if(NPC[B].AttLayer != LAYER_NONE && NPC[B].AttLayer != LAYER_DEFAULT)
-                                {
-                                    Layer[NPC[B].AttLayer].SpeedX = Layer[A].SpeedX;
-                                    Layer[NPC[B].AttLayer].SpeedY = Layer[A].SpeedY;
+                                    SetLayerSpeed(NPC[B].AttLayer, Layer[A].SpeedX, Layer[A].SpeedY, Layer[A].EffectStop, true);
 
-                                    // FIXME: this is the source of at least two bugs: (1) won't get reset later; (2) an undefined value of EffectStop will be used by NPC[B].AttLayer
-                                    // (1) should be fixed in SetLayerSpeed by checking for inactive NPCs with AttLayers and resetting their speeds
-                                    // (2) can be fixed here by setting Layer[NPC[B].AttLayer].EffectStop = Layer[A].EffectStop;
-                                }
+                                // NOTE: this was the source of at least two bugs: (1) won't get reset later; (2) an undefined value of EffectStop will be used by NPC[B].AttLayer
+                                // (1) should be fixed in SetLayerSpeed by checking for inactive NPCs with AttLayers and resetting their speeds
+                                // (2) is fixed in modern mode, where SetLayerSpeed correctly updates EffectStop to match Layer[A]'s
                             }
 
                             treeNPCUpdate(B);
