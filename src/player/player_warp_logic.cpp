@@ -20,6 +20,8 @@
 
 #include <fmt_format_ne.h>
 
+#include "sdl_proxy/sdl_stdinc.h"
+
 #include "globals.h"
 
 #include "player.h"
@@ -47,7 +49,7 @@
 static constexpr int plr_warp_scroll_speed = 8; // 8px / frame
 static constexpr int plr_warp_scroll_max_frames = 260; // 4 seconds
 
-void s_TriggerDoorEffects(const Location_t& loc, bool do_big_door = true)
+static void s_TriggerDoorEffects(const Location_t& loc, bool do_big_door = true)
 {
     for(Background_t& bgo : treeBackgroundQuery(loc, SORTMODE_ID))
     {
@@ -74,7 +76,7 @@ void s_TriggerDoorEffects(const Location_t& loc, bool do_big_door = true)
 // copied logic from checkWarp function
 // parameter release_at_warp determines whether NPC should be dropped at the warp entrance
 //   (set to false in new behavior where players are being teleported to warp)
-void s_WarpReleaseItems(const Warp_t& warp, int A, bool backward, bool release_at_warp = true)
+static void s_WarpReleaseItems(const Warp_t& warp, int A, bool backward, bool release_at_warp = true)
 {
     Player_t& plr = Player[A];
 
@@ -120,7 +122,7 @@ void s_WarpReleaseItems(const Warp_t& warp, int A, bool backward, bool release_a
 }
 
 // steal the mount from a player (because they just entered a no-mount warp)
-void s_WarpStealMount(int A)
+static void s_WarpStealMount(int A)
 {
     Player_t& p = Player[A];
     if(OwedMount[A] == 0 && p.Mount > 0 && p.Mount != 2)
@@ -157,6 +159,19 @@ static void s_CheckWarpLevelExit(Player_t& plr, const Warp_t& warp, int lvl_coun
     }
 }
 
+static void s_InitWarpScroll(Player_t& p, const Location_t& warp_enter, const Location_t& warp_exit, int min_frames = 0)
+{
+    int warp_dist = SDL_sqrt((warp_enter.X - warp_exit.X) * (warp_enter.X - warp_exit.X) + (warp_enter.Y - warp_exit.Y) * (warp_enter.Y - warp_exit.Y));
+
+    int scroll_frames = warp_dist / plr_warp_scroll_speed;
+    if(scroll_frames < min_frames)
+        scroll_frames = min_frames;
+    if(scroll_frames > plr_warp_scroll_max_frames)
+        scroll_frames = plr_warp_scroll_max_frames;
+
+    p.Effect2 = 128 + scroll_frames;
+}
+
 void PlayerEffectWarpPipe(int A)
 {
     Player_t& p = Player[A];
@@ -166,11 +181,11 @@ void PlayerEffectWarpPipe(int A)
     p.Location.SpeedY = 0;
 
     bool backward = p.WarpBackward;
-    auto &warp = Warp[p.Warp];
+    const auto &warp = Warp[p.Warp];
     Location_t warp_enter = static_cast<Location_t>(backward ? warp.Exit : warp.Entrance);
     Location_t warp_exit = static_cast<Location_t>(backward ? warp.Entrance : warp.Exit);
-    auto &warp_dir_enter = backward ? warp.Direction2 : warp.Direction;
-    auto &warp_dir_exit = backward ? warp.Direction : warp.Direction2;
+    const auto &warp_dir_enter = backward ? warp.Direction2 : warp.Direction;
+    const auto &warp_dir_exit = backward ? warp.Direction : warp.Direction2;
 
     bool same_section = SectionCollision(p.Section, warp_exit);
     bool do_scroll = (warp.transitEffect == LevelDoor::TRANSIT_SCROLL) && same_section;
@@ -196,10 +211,7 @@ void PlayerEffectWarpPipe(int A)
             if(p.Location.Y > warp_enter.Y + warp_enter.Height + 8)
             {
                 if(do_scroll)
-                {
-                    int warp_dist = SDL_sqrt((warp_enter.X - warp_exit.X) * (warp_enter.X - warp_exit.X) + (warp_enter.Y - warp_exit.Y) * (warp_enter.Y - warp_exit.Y));
-                    p.Effect2 = 128 + SDL_min(warp_dist / plr_warp_scroll_speed, plr_warp_scroll_max_frames);
-                }
+                    s_InitWarpScroll(p, warp_enter, warp_exit);
                 else
                     p.Effect2 = 1;
             }
@@ -224,10 +236,7 @@ void PlayerEffectWarpPipe(int A)
             if(p.Location.Y + p.Location.Height + 8 < warp_enter.Y)
             {
                 if(do_scroll)
-                {
-                    int warp_dist = SDL_sqrt((warp_enter.X - warp_exit.X) * (warp_enter.X - warp_exit.X) + (warp_enter.Y - warp_exit.Y) * (warp_enter.Y - warp_exit.Y));
-                    p.Effect2 = 128 + SDL_min(warp_dist / plr_warp_scroll_speed, plr_warp_scroll_max_frames);
-                }
+                    s_InitWarpScroll(p, warp_enter, warp_exit);
                 else
                     p.Effect2 = 1;
             }
@@ -258,10 +267,7 @@ void PlayerEffectWarpPipe(int A)
             if(p.Location.X + p.Location.Width + 8 < warp_enter.X)
             {
                 if(do_scroll)
-                {
-                    int warp_dist = SDL_sqrt((warp_enter.X - warp_exit.X) * (warp_enter.X - warp_exit.X) + (warp_enter.Y - warp_exit.Y) * (warp_enter.Y - warp_exit.Y));
-                    p.Effect2 = 128 + SDL_min(warp_dist / plr_warp_scroll_speed, plr_warp_scroll_max_frames);
-                }
+                    s_InitWarpScroll(p, warp_enter, warp_exit);
                 else
                     p.Effect2 = 1;
             }
@@ -981,9 +987,9 @@ void PlayerEffectWarpDoor(int A)
     Player_t& p = Player[A];
 
     bool backward = p.WarpBackward;
-    auto &warp = Warp[p.Warp];
-    Location_t warp_enter = static_cast<Location_t>(backward ? warp.Exit : warp.Entrance);
-    Location_t warp_exit = static_cast<Location_t>(backward ? warp.Entrance : warp.Exit);
+    const Warp_t &warp = Warp[p.Warp];
+    const Location_t warp_enter = static_cast<Location_t>(backward ? warp.Exit : warp.Entrance);
+    const Location_t warp_exit = static_cast<Location_t>(backward ? warp.Entrance : warp.Exit);
 
     bool same_section = SectionCollision(p.Section, warp_exit);
     bool do_scroll = (warp.transitEffect == LevelDoor::TRANSIT_SCROLL) && same_section;
@@ -1103,17 +1109,7 @@ void PlayerEffectWarpDoor(int A)
 
     // start the scroll effect
     if(do_scroll && fEqual(p.Effect2, 29))
-    {
-        int warp_dist = SDL_sqrt((warp_enter.X - warp_exit.X) * (warp_enter.X - warp_exit.X) + (warp_enter.Y - warp_exit.Y) * (warp_enter.Y - warp_exit.Y));
-
-        int scroll_frames = warp_dist / plr_warp_scroll_speed;
-        if(scroll_frames < 30)
-            scroll_frames = 30;
-        if(scroll_frames > plr_warp_scroll_max_frames)
-            scroll_frames = plr_warp_scroll_max_frames;
-
-        p.Effect2 = 128 + scroll_frames;
-    }
+        s_InitWarpScroll(p, warp_enter, warp_exit, 30);
     // process the scroll effect
     else if(p.Effect2 >= 128)
     {
@@ -1417,9 +1413,9 @@ static inline bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool bac
 
     bool onGround = !warp.stoodRequired || (plr.Pinched.Bottom1 == 2 || plr.Slope != 0 || plr.StandingOnNPC != 0);
 
-    auto &entrance      = backward ? warp.Exit        : warp.Entrance;
-    auto &exit          = backward ? warp.Entrance    : warp.Exit;
-    auto &direction     = backward ? warp.Direction2  : warp.Direction;
+    const auto &entrance      = backward ? warp.Exit        : warp.Entrance;
+    const auto &exit          = backward ? warp.Entrance    : warp.Exit;
+    const auto &direction     = backward ? warp.Direction2  : warp.Direction;
 
     if(!CheckCollision(plr.Location, entrance))
         return false; // continue
