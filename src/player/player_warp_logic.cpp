@@ -135,6 +135,28 @@ void s_WarpStealMount(int A)
     UpdateYoshiMusic();
 }
 
+static void s_CheckWarpLevelExit(Player_t& plr, const Warp_t& warp, int lvl_counter, int map_counter)
+{
+    if(warp.level != STRINGINDEX_NONE)
+    {
+        GoToLevel = GetS(warp.level);
+        GoToLevelNoGameThing = warp.noEntranceScene;
+        plr.Effect = PLREFF_WAITING;
+        plr.Effect2 = lvl_counter;
+        ReturnWarp = plr.Warp;
+
+        if(IsHubLevel)
+            ReturnWarpSaved = ReturnWarp;
+
+        StartWarp = warp.LevelWarp;
+    }
+    else if(warp.MapWarp)
+    {
+        plr.Effect = PLREFF_WAITING;
+        plr.Effect2 = map_counter;
+    }
+}
+
 void PlayerEffectWarpPipe(int A)
 {
     Player_t& p = Player[A];
@@ -637,24 +659,7 @@ void PlayerEffectWarpPipe(int A)
             }
         }
 
-        if(warp.level != STRINGINDEX_NONE)
-        {
-            GoToLevel = GetS(warp.level);
-            GoToLevelNoGameThing = warp.noEntranceScene;
-            p.Effect = PLREFF_WAITING;
-            p.Effect2 = 2970;
-            ReturnWarp = p.Warp;
-
-            if(IsHubLevel)
-                ReturnWarpSaved = ReturnWarp;
-
-            StartWarp = warp.LevelWarp;
-        }
-        else if(warp.MapWarp)
-        {
-            p.Effect = PLREFF_WAITING;
-            p.Effect2 = 2970;
-        }
+        s_CheckWarpLevelExit(p, warp, 2970, 2970);
     }
     else if(p.Effect2 >= 2000) // NEW >2P holding state for pipe exit
     {
@@ -1242,24 +1247,7 @@ void PlayerEffectWarpDoor(int A)
             }
         }
 
-        if(warp.level != STRINGINDEX_NONE)
-        {
-            GoToLevel = GetS(warp.level);
-            GoToLevelNoGameThing = warp.noEntranceScene;
-            p.Effect = PLREFF_WAITING;
-            p.Effect2 = 3000;
-            ReturnWarp = p.Warp;
-
-            if(IsHubLevel)
-                ReturnWarpSaved = ReturnWarp;
-
-            StartWarp = warp.LevelWarp;
-        }
-        else if(warp.MapWarp)
-        {
-            p.Effect = PLREFF_WAITING;
-            p.Effect2 = 2970;
-        }
+        s_CheckWarpLevelExit(p, warp, 3000, 2970);
 
         if(g_ClonedPlayerMode)
         {
@@ -1572,30 +1560,14 @@ static inline bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool bac
 
         if(warp.Effect == 0 || warp.Effect == 3) // Instant / Portal
         {
-            if(warp.Effect == 3)
+            if(warp.Effect == 3 && (warp.level != STRINGINDEX_NONE || warp.MapWarp))
             {
-                if(warp.level != STRINGINDEX_NONE)
-                {
-                    GoToLevel = GetS(warp.level);
-                    GoToLevelNoGameThing = warp.noEntranceScene;
-                    plr.Effect = PLREFF_WAITING;
-                    plr.Effect2 = 2921;
-                    plr.Warp = B;
-                    plr.WarpBackward = backward;
-                    ReturnWarp = B;
-                    if(IsHubLevel)
-                        ReturnWarpSaved = ReturnWarp;
-                    StartWarp = warp.LevelWarp;
-                    return true;
-                }
-                else if(warp.MapWarp)
-                {
-                    plr.Effect = PLREFF_WAITING;
-                    plr.Effect2 = 2921;
-                    plr.Warp = B;
-                    plr.WarpBackward = backward;
-                    return true;
-                }
+                plr.Warp = B;
+                plr.WarpBackward = backward;
+
+                s_CheckWarpLevelExit(plr, warp, 2921, 2921);
+
+                return true;
             }
 
             plr.Location.X = exit.X + exit.Width / 2.0 - plr.Location.Width / 2.0;
