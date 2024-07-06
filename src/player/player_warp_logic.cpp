@@ -343,7 +343,7 @@ void PlayerEffectWarpPipe(int A)
                     // in the mouth of an onscreen player's Pet?
                     bool in_onscreen_pet = !warp.NoYoshi && InOnscreenPet(o_A, screen);
 
-                    bool status_match = (o_p.Effect == PLREFF_WARP_PIPE && o_p.Warp == p.Warp && o_p.WarpBackward == p.WarpBackward);
+                    bool status_match = (o_p.Effect == p.Effect && o_p.Warp == p.Warp && o_p.WarpBackward == p.WarpBackward);
 
                     if(!o_p.Dead && o_p.TimeToLive == 0 && !in_onscreen_pet && !status_match)
                     {
@@ -353,7 +353,7 @@ void PlayerEffectWarpPipe(int A)
 
                         o_p.Warp = p.Warp;
                         o_p.WarpBackward = p.WarpBackward;
-                        o_p.Effect = PLREFF_WARP_PIPE;
+                        o_p.Effect = p.Effect;
                         // make other player behind so that this player will exit first
                         o_p.Effect2 = 0;
                         o_p.Location.X = warp_enter.X + warp_enter.Width / 2.0 - o_p.Location.Width / 2.0;
@@ -1086,7 +1086,7 @@ void PlayerEffectWarpDoor(int A)
             // in the mouth of an onscreen player's Pet?
             bool in_onscreen_pet = !warp.NoYoshi && InOnscreenPet(o_A, screen);
 
-            bool status_match = (o_p.Effect == PLREFF_WARP_DOOR && o_p.Warp == p.Warp && o_p.WarpBackward == p.WarpBackward);
+            bool status_match = (o_p.Effect == p.Effect && o_p.Warp == p.Warp && o_p.WarpBackward == p.WarpBackward);
 
             if(!o_p.Dead && o_p.TimeToLive == 0 && !in_onscreen_pet && !status_match)
             {
@@ -1096,7 +1096,7 @@ void PlayerEffectWarpDoor(int A)
 
                 o_p.Warp = p.Warp;
                 o_p.WarpBackward = p.WarpBackward;
-                o_p.Effect = PLREFF_WARP_DOOR;
+                o_p.Effect = p.Effect;
                 // 1 frame behind so that this player will exit first
                 o_p.Effect2 = 14;
                 o_p.Location.X = warp_enter.X + warp_enter.Width / 2.0 - o_p.Location.Width / 2.0;
