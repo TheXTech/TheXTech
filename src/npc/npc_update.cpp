@@ -1750,59 +1750,7 @@ void UpdateNPCs()
         }
 
         if(NPC[A].AttLayer != LAYER_NONE && NPC[A].AttLayer != LAYER_DEFAULT && NPC[A].HoldingPlayer == 0)
-        {
-            int B = NPC[A].AttLayer;
-            // for(int B = 1; B <= maxLayers; B++)
-            {
-                // if(Layer[B].Name != "")
-                {
-                    // if(Layer[B].Name == NPC[A].AttLayer)
-                    {
-                        if(NPC[A].Location.X - lyrX == 0.0 && NPC[A].Location.Y - lyrY == 0.0)
-                        {
-                            if(Layer[B].SpeedX != 0.0f || Layer[B].SpeedY != 0.0f)
-                            {
-                                Layer[B].EffectStop = true;
-                                Layer[B].SpeedX = 0;
-                                Layer[B].SpeedY = 0;
-
-                                for(int C : Layer[B].blocks)
-                                // for(int C = 1; C <= numBlock; C++)
-                                {
-                                    // if(Block[C].Layer == Layer[B].Name)
-                                    {
-                                        Block[C].Location.SpeedX = double(Layer[B].SpeedX);
-                                        Block[C].Location.SpeedY = double(Layer[B].SpeedY);
-                                    }
-                                }
-
-                                for(int C : Layer[B].NPCs)
-                                {
-                                    // if(NPC[C].Layer == Layer[B].Name)
-                                    {
-                                        if(NPC[C]->IsAVine || NPC[C].Type == NPCID_ITEM_BURIED)
-                                        {
-                                            NPC[C].Location.SpeedX = 0;
-                                            NPC[C].Location.SpeedY = 0;
-                                        }
-                                    }
-                                }
-
-                                // @Wohlstand, should we add something here for the BGO fence fix?
-                            }
-                        }
-                        else
-                        {
-                            Layer[B].EffectStop = false;
-                            Layer[B].SpeedX = float(NPC[A].Location.X - lyrX);
-                            Layer[B].SpeedY = float(NPC[A].Location.Y - lyrY);
-                        }
-                    }
-                }
-                // else
-                //     break;
-            }
-        }
+            SetLayerSpeed(NPC[A].AttLayer, NPC[A].Location.X - lyrX, NPC[A].Location.Y - lyrY, false);
     }
 
     numBlock -= numTempBlock; // clean up the temp npc blocks

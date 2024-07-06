@@ -215,6 +215,11 @@ bool RenameLayer(layerindex_t index, const std::string& NewName);
 // deletes a layer (and, optionally, everything in it)
 bool DeleteLayer(layerindex_t index, bool killall);
 
+// sets the speed of a layer
+// EffectStop controls whether the layer will stop when a player has abnormal status
+// Defective means that SMBX 1.3 was initially missing all code other than setting the speed
+void SetLayerSpeed(layerindex_t index, double SpeedX, double SpeedY, bool EffectStop = true, bool Defective = false);
+
 // Old functions:
 
 // Public Sub ShowLayer(LayerName As String, Optional NoEffect As Boolean = False) 'shows a layer

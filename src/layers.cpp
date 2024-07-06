@@ -355,6 +355,52 @@ bool DeleteLayer(layerindex_t L, bool killall)
     return true;
 }
 
+void SetLayerSpeed(layerindex_t L, double SpeedX, double SpeedY, bool EffectStop, bool Defective)
+{
+    if(L == LAYER_NONE)
+        return;
+
+    // relatively simple code to set the layer's speed
+    if(SpeedX != 0.0 || SpeedY != 0.0 || Defective)
+    {
+        Layer[L].SpeedX = SpeedX;
+        Layer[L].SpeedY = SpeedY;
+
+        if(!Defective)
+            Layer[L].EffectStop = EffectStop;
+
+        return;
+    }
+
+
+    // relatively more complex code to stop the layer -- first check that it's necessary
+    if(Layer[L].SpeedX == 0.0f && Layer[L].SpeedY == 0.0f)
+        return;
+
+
+    // EffectStop is set arbitrarily in the SMBX 1.3 code (and not used while speed is 0), but fortunately always to the opposite of what it is actually meant to be
+    Layer[L].EffectStop = !EffectStop;
+    Layer[L].SpeedX = 0;
+    Layer[L].SpeedY = 0;
+
+    for(int C : Layer[L].blocks)
+    {
+        Block[C].Location.SpeedX = 0;
+        Block[C].Location.SpeedY = 0;
+    }
+
+    for(int C : Layer[L].NPCs)
+    {
+        if(NPC[C]->IsAVine || NPC[C].Type == NPCID_ITEM_BURIED)
+        {
+            NPC[C].Location.SpeedX = 0;
+            NPC[C].Location.SpeedY = 0;
+        }
+    }
+
+    // @Wohlstand, should we add something here for the BGO fence fix?
+}
+
 
 // Old functions:
 
@@ -1759,6 +1805,10 @@ void UpdateLayers()
                                 {
                                     Layer[NPC[B].AttLayer].SpeedX = Layer[A].SpeedX;
                                     Layer[NPC[B].AttLayer].SpeedY = Layer[A].SpeedY;
+
+                                    // FIXME: this is the source of at least two bugs: (1) won't get reset later; (2) an undefined value of EffectStop will be used by NPC[B].AttLayer
+                                    // (1) should be fixed in SetLayerSpeed by checking for inactive NPCs with AttLayers and resetting their speeds
+                                    // (2) can be fixed here by setting Layer[NPC[B].AttLayer].EffectStop = Layer[A].EffectStop;
                                 }
                             }
 
