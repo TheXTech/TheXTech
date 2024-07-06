@@ -265,10 +265,6 @@ void UpdateGraphics2(bool skipRepaint)
 
     XRender::clearBuffer();
     XRender::resetViewport();
-#ifdef __WIIU__
-    // workaround for Wii U SDL2 bug that "locks in" the size of the viewport during the first draw of a frame
-    XRender::renderRect(0, 0, 1, 1, {0, 0, 0});
-#endif
     DrawBackdrop(Screens[0]);
 
 //    if(TakeScreen == true)
