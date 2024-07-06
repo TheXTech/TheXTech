@@ -37,11 +37,15 @@
 #include "layers.h"
 #include "config.h"
 
+#include "main/game_globals.h"
 #include "main/translate.h"
 #include "main/trees.h"
 #include "main/game_strings.h"
 #include "main/game_info.h"
 
+
+static constexpr int plr_warp_scroll_speed = 8; // 8px / frame
+static constexpr int plr_warp_scroll_max_frames = 260; // 4 seconds
 
 void s_TriggerDoorEffects(const Location_t& loc, bool do_big_door = true)
 {
@@ -129,6 +133,842 @@ void s_WarpStealMount(int A)
     p.MountOffsetY = 0;
     SizeCheck(Player[A]);
     UpdateYoshiMusic();
+}
+
+void PlayerEffectWarpPipe(int A)
+{
+    Player_t& p = Player[A];
+
+    p.SpinJump = false;
+    p.TailCount = 0;
+    p.Location.SpeedY = 0;
+
+    bool backward = p.WarpBackward;
+    auto &warp = Warp[p.Warp];
+    Location_t warp_enter = static_cast<Location_t>(backward ? warp.Exit : warp.Entrance);
+    Location_t warp_exit = static_cast<Location_t>(backward ? warp.Entrance : warp.Exit);
+    auto &warp_dir_enter = backward ? warp.Direction2 : warp.Direction;
+    auto &warp_dir_exit = backward ? warp.Direction : warp.Direction2;
+
+    bool same_section = SectionCollision(p.Section, warp_exit);
+    bool do_scroll = (warp.transitEffect == LevelDoor::TRANSIT_SCROLL) && same_section;
+    bool is_level_quit = warp.level != STRINGINDEX_NONE || warp.MapWarp;
+
+    // teleport other players into warp in shared screen mode
+    const Screen_t& screen = ScreenByPlayer(A);
+    bool is_shared_screen = (screen.Type == 3);
+
+    if(p.Effect2 == 0.0) // Entering pipe
+    {
+        double leftToGoal = 0.0;
+        double sign = +1.0;
+
+        if(warp_dir_enter == 3)
+        {
+            p.Location.Y += 1;
+            p.Location.X = warp_enter.X + warp_enter.Width / 2.0 - p.Location.Width / 2.0;
+
+            sign = (warp_enter.Y + warp_enter.Height) > p.Location.Y ? +1.0 : -1.0;
+            leftToGoal = SDL_fabs((warp_enter.Y + warp_enter.Height) - p.Location.Y) * sign;
+
+            if(p.Location.Y > warp_enter.Y + warp_enter.Height + 8)
+            {
+                if(do_scroll)
+                {
+                    int warp_dist = SDL_sqrt((warp_enter.X - warp_exit.X) * (warp_enter.X - warp_exit.X) + (warp_enter.Y - warp_exit.Y) * (warp_enter.Y - warp_exit.Y));
+                    p.Effect2 = 128 + SDL_min(warp_dist / plr_warp_scroll_speed, plr_warp_scroll_max_frames);
+                }
+                else
+                    p.Effect2 = 1;
+            }
+
+            if(p.Mount == 0)
+                p.Frame = 15;
+
+            if(p.HoldingNPC > 0)
+            {
+                NPC[p.HoldingNPC].Location.Y = p.Location.Y + Physics.PlayerGrabSpotY[p.Character][p.State] + 32 - NPC[p.HoldingNPC].Location.Height;
+                NPC[p.HoldingNPC].Location.X = p.Location.X + p.Location.Width / 2.0 - NPC[p.HoldingNPC].Location.Width / 2.0;
+            }
+        }
+        else if(warp_dir_enter == 1)
+        {
+            p.Location.Y -= 1;
+            p.Location.X = warp_enter.X + warp_enter.Width / 2.0 - p.Location.Width / 2.0;
+
+            sign = (p.Location.Y + p.Location.Height) > warp_enter.Y ? +1.0 : -1.0;
+            leftToGoal = SDL_fabs(warp_enter.Y - (p.Location.Y + p.Location.Height)) * sign;
+
+            if(p.Location.Y + p.Location.Height + 8 < warp_enter.Y)
+            {
+                if(do_scroll)
+                {
+                    int warp_dist = SDL_sqrt((warp_enter.X - warp_exit.X) * (warp_enter.X - warp_exit.X) + (warp_enter.Y - warp_exit.Y) * (warp_enter.Y - warp_exit.Y));
+                    p.Effect2 = 128 + SDL_min(warp_dist / plr_warp_scroll_speed, plr_warp_scroll_max_frames);
+                }
+                else
+                    p.Effect2 = 1;
+            }
+
+            if(p.HoldingNPC > 0)
+            {
+                NPC[p.HoldingNPC].Location.Y = p.Location.Y + Physics.PlayerGrabSpotY[p.Character][p.State] + 32 - NPC[p.HoldingNPC].Location.Height;
+                NPC[p.HoldingNPC].Location.X = p.Location.X + p.Location.Width / 2.0 - NPC[p.HoldingNPC].Location.Width / 2.0;
+            }
+            if(p.Mount == 0)
+                p.Frame = 15;
+        }
+        else if(warp_dir_enter == 2)
+        {
+            if(p.Mount == 3)
+            {
+                p.Duck = true;
+                p.Location.Height = 30;
+            }
+
+            p.Direction = -1; // makes (p.Direction > 0) always false
+            p.Location.Y = warp_enter.Y + warp_enter.Height - p.Location.Height - 2;
+            p.Location.X -= 0.5;
+
+            sign = (p.Location.X + p.Location.Width) > warp_enter.X ? +1.0 : -1.0;
+            leftToGoal = SDL_fabs((warp_enter.X - (p.Location.X + p.Location.Width)) * 2) * sign;
+
+            if(p.Location.X + p.Location.Width + 8 < warp_enter.X)
+            {
+                if(do_scroll)
+                {
+                    int warp_dist = SDL_sqrt((warp_enter.X - warp_exit.X) * (warp_enter.X - warp_exit.X) + (warp_enter.Y - warp_exit.Y) * (warp_enter.Y - warp_exit.Y));
+                    p.Effect2 = 128 + SDL_min(warp_dist / plr_warp_scroll_speed, plr_warp_scroll_max_frames);
+                }
+                else
+                    p.Effect2 = 1;
+            }
+
+            if(p.HoldingNPC > 0)
+            {
+                NPC[p.HoldingNPC].Location.Y = p.Location.Y + Physics.PlayerGrabSpotY[p.Character][p.State] + 32 - NPC[p.HoldingNPC].Location.Height;
+//                    if(p.Direction > 0) // Always false
+//                        NPC[p.HoldingNPC].Location.X = p.Location.X + Physics.PlayerGrabSpotX[p.Character][p.State];
+//                    else
+                NPC[p.HoldingNPC].Location.X = p.Location.X + p.Location.Width - Physics.PlayerGrabSpotX[p.Character][p.State] - NPC[p.HoldingNPC].Location.Width;
+            }
+            p.Location.SpeedX = -0.5;
+            PlayerFrame(p);
+            p.Location.SpeedX = 0;
+        }
+        else if(warp_dir_enter == 4)
+        {
+            if(p.Mount == 3)
+            {
+                p.Duck = true;
+                p.Location.Height = 30;
+            }
+            p.Direction = 1; // Makes (p.Direction > 0) always true
+            p.Location.Y = warp_enter.Y + warp_enter.Height - p.Location.Height - 2;
+            p.Location.X += 0.5;
+
+            sign = p.Location.X < (warp_enter.X + warp_enter.Width) ? +1.0 : -1.0;
+            leftToGoal = SDL_fabs(((warp_enter.X + warp_enter.Width) - p.Location.X) * 2) * sign;
+
+            if(p.Location.X > warp_enter.X + warp_enter.Width + 8)
+            {
+                if(do_scroll)
+                {
+                    int warp_dist = SDL_sqrt((warp_enter.X - warp_exit.X) * (warp_enter.X - warp_exit.X) + (warp_enter.Y - warp_exit.Y) * (warp_enter.Y - warp_exit.Y));
+                    p.Effect2 = 128 + SDL_min(warp_dist / plr_warp_scroll_speed, plr_warp_scroll_max_frames);
+                }
+                else
+                    p.Effect2 = 1;
+            }
+
+            if(p.HoldingNPC > 0)
+            {
+                NPC[p.HoldingNPC].Location.Y = p.Location.Y + Physics.PlayerGrabSpotY[p.Character][p.State] + 32 - NPC[p.HoldingNPC].Location.Height;
+//                    if(p.Direction > 0) // always true
+                NPC[p.HoldingNPC].Location.X = p.Location.X + Physics.PlayerGrabSpotX[p.Character][p.State];
+//                    else
+//                        NPC[p.HoldingNPC].Location.X = p.Location.X + p.Location.Width - Physics.PlayerGrabSpotX[p.Character][p.State] - NPC[p.HoldingNPC].Location.Width;
+            }
+            p.Location.SpeedX = 0.5;
+            PlayerFrame(p);
+            p.Location.SpeedX = 0;
+        }
+
+        if(p.HoldingNPC > 0 && p.HoldingNPC <= numNPCs)
+            treeNPCUpdate(p.HoldingNPC);
+
+        // teleport other players into the pipe warp
+        if(Maths::iRound(leftToGoal) == 8)
+        {
+            bool do_tele = is_shared_screen && !vScreenCollision(vScreenIdxByPlayer(A), warp_exit);
+
+            if(do_tele)
+            {
+                for(int plr_i = 0; plr_i < screen.player_count; plr_i++)
+                {
+                    int o_A = screen.players[plr_i];
+                    if(o_A == A)
+                        continue;
+
+                    Player_t& o_p = Player[o_A];
+
+                    // in the mouth of an onscreen player's Pet?
+                    bool in_onscreen_pet = !warp.NoYoshi && InOnscreenPet(o_A, screen);
+
+                    bool status_match = (o_p.Effect == PLREFF_WARP_PIPE && o_p.Warp == p.Warp && o_p.WarpBackward == p.WarpBackward);
+
+                    if(!o_p.Dead && o_p.TimeToLive == 0 && !in_onscreen_pet && !status_match)
+                    {
+                        RemoveFromPet(o_A);
+
+                        s_WarpReleaseItems(warp, o_A, p.WarpBackward, false);
+
+                        o_p.Warp = p.Warp;
+                        o_p.WarpBackward = p.WarpBackward;
+                        o_p.Effect = PLREFF_WARP_PIPE;
+                        // make other player behind so that this player will exit first
+                        o_p.Effect2 = 0;
+                        o_p.Location.X = warp_enter.X + warp_enter.Width / 2.0 - o_p.Location.Width / 2.0;
+                        o_p.Location.Y = warp_enter.Y + warp_enter.Height / 2.0 - o_p.Location.Height / 2.0;
+                        o_p.Location.SpeedX = 0.0;
+                        o_p.Location.SpeedY = 0.0;
+                    }
+                }
+            }
+        }
+
+        // D_pLogDebug("Warping: %g (same section? %s!)", leftToGoal, SectionCollision(p.Section, warp_exit) ? "yes" : "no");
+
+        // must limit to the number of actual vScreens to avoid RangeArr out-of-bounds access
+        int fader_index = vScreenIdxByPlayer(A);
+        SDL_assert_release(0 <= fader_index && fader_index <= c_vScreenCount);
+
+        auto& fader = g_levelVScreenFader[fader_index];
+
+        switch(warp.transitEffect)
+        {
+        default:
+            if(warp.transitEffect >= ScreenFader::S_CUSTOM)
+            {
+                if(Maths::iRound(leftToGoal) == 8 && !is_level_quit)
+                    fader.setupFader(3, 0, 65, warp.transitEffect,
+                                     true,
+                                     Maths::iRound(warp_enter.X + warp_enter.Width / 2),
+                                     Maths::iRound(warp_enter.Y + warp_enter.Height / 2),
+                                     fader_index);
+                break;
+            }
+        // fallthrough
+        case LevelDoor::TRANSIT_NONE:
+            if(Maths::iRound(leftToGoal) == 0 && !is_level_quit && !same_section)
+                fader.setupFader(g_config.EnableInterLevelFade ? 8 : 64, 0, 65, ScreenFader::S_FADE);
+            break;
+
+        case LevelDoor::TRANSIT_SCROLL:
+            // uses fade effect if not same section
+            if(Maths::iRound(leftToGoal) == 24 && !same_section)
+                fader.setupFader(3, 0, 65, ScreenFader::S_FADE);
+            break;
+
+        case LevelDoor::TRANSIT_FADE:
+            if(Maths::iRound(leftToGoal) == 24)
+                fader.setupFader(3, 0, 65, ScreenFader::S_FADE);
+            break;
+
+        case LevelDoor::TRANSIT_CIRCLE_FADE:
+            if(Maths::iRound(leftToGoal) == 24)
+                fader.setupFader(3, 0, 65, ScreenFader::S_CIRCLE,
+                                 true,
+                                 Maths::iRound(warp_enter.X + warp_enter.Width / 2),
+                                 Maths::iRound(warp_enter.Y + warp_enter.Height / 2),
+                                 fader_index);
+            break;
+
+        case LevelDoor::TRANSIT_FLIP_H:
+            if(Maths::iRound(leftToGoal) == 24)
+                fader.setupFader(3, 0, 65, ScreenFader::S_FLIP_H);
+            break;
+
+        case LevelDoor::TRANSIT_FLIP_V:
+            if(Maths::iRound(leftToGoal) == 24)
+                fader.setupFader(3, 0, 65, ScreenFader::S_FLIP_V);
+            break;
+        }
+    }
+    else if(fEqual(p.Effect2, 1))  // Exiting pipe (initialization)
+    {
+        if(warp.NoYoshi)
+        {
+            UnDuck(p);
+            s_WarpStealMount(A);
+        }
+
+        if(warp_dir_exit == 1)
+        {
+            p.Location.X = warp_exit.X + warp_exit.Width / 2.0 - p.Location.Width / 2.0;
+            p.Location.Y = warp_exit.Y - p.Location.Height - 8;
+
+            if(p.Mount == 0)
+                p.Frame = 15;
+
+            if(p.HoldingNPC > 0)
+            {
+                NPC[p.HoldingNPC].Location.Y = p.Location.Y + Physics.PlayerGrabSpotY[p.Character][p.State] + 32 - NPC[p.HoldingNPC].Location.Height;
+                NPC[p.HoldingNPC].Location.X = p.Location.X + p.Location.Width / 2.0 - NPC[p.HoldingNPC].Location.Width / 2.0;
+            }
+        }
+        else if(warp_dir_exit == 3)
+        {
+            p.Location.X = warp_exit.X + warp_exit.Width / 2.0 - p.Location.Width / 2.0;
+            p.Location.Y = warp_exit.Y + warp_exit.Height + 8;
+
+            if(p.Mount == 0)
+                p.Frame = 15;
+
+            if(p.HoldingNPC > 0)
+            {
+                NPC[p.HoldingNPC].Location.Y = p.Location.Y + Physics.PlayerGrabSpotY[p.Character][p.State] + 32 - NPC[p.HoldingNPC].Location.Height;
+                NPC[p.HoldingNPC].Location.X = p.Location.X + p.Location.Width / 2.0 - NPC[p.HoldingNPC].Location.Width / 2.0;
+            }
+        }
+        else if(warp_dir_exit == 2)
+        {
+            if(p.Mount == 3)
+            {
+                p.Duck = true;
+                p.Location.Height = 30;
+            }
+
+            p.Location.X = warp_exit.X - p.Location.Width - 8;
+            p.Location.Y = warp_exit.Y + warp_exit.Height - p.Location.Height - 2;
+
+            if(p.Mount == 0)
+                p.Frame = 1;
+
+            p.Direction = 1;
+
+            if(p.HoldingNPC > 0)
+            {
+                if(p.State == 1)
+                    p.Frame = 5;
+                else
+                    p.Frame = 8;
+
+                NPC[p.HoldingNPC].Location.Y = p.Location.Y + Physics.PlayerGrabSpotY[p.Character][p.State] + 32 - NPC[p.HoldingNPC].Location.Height;
+                p.Direction = -1; // Makes (p.Direction > 0) always false
+//                    if(p.Direction > 0) // always false
+//                        NPC[p.HoldingNPC].Location.X = p.Location.X + Physics.PlayerGrabSpotX[p.Character][p.State];
+//                    else
+                NPC[p.HoldingNPC].Location.X = p.Location.X + p.Location.Width - Physics.PlayerGrabSpotX[p.Character][p.State] - NPC[p.HoldingNPC].Location.Width;
+            }
+        }
+        else if(warp_dir_exit == 4)
+        {
+            if(p.Mount == 3)
+            {
+                p.Duck = true;
+                p.Location.Height = 30;
+            }
+
+            p.Location.X = warp_exit.X + warp_exit.Width + 8;
+            p.Location.Y = warp_exit.Y + warp_exit.Height - p.Location.Height - 2;
+
+            if(p.Mount == 0)
+                p.Frame = 1;
+
+            p.Direction = -1;
+            if(p.HoldingNPC > 0)
+            {
+                if(p.State == 1)
+                    p.Frame = 5;
+                else
+                    p.Frame = 8;
+
+                p.Direction = 1; // Makes always true
+                NPC[p.HoldingNPC].Location.Y = p.Location.Y + Physics.PlayerGrabSpotY[p.Character][p.State] + 32 - NPC[p.HoldingNPC].Location.Height;
+//                    if(p.Direction > 0) // always true
+                NPC[p.HoldingNPC].Location.X = p.Location.X + Physics.PlayerGrabSpotX[p.Character][p.State];
+//                    else
+//                        NPC[p.HoldingNPC].Location.X = p.Location.X + p.Location.Width - Physics.PlayerGrabSpotX[p.Character][p.State] - NPC[p.HoldingNPC].Location.Width;
+            }
+        }
+
+        if(p.HoldingNPC > 0 && p.HoldingNPC <= numNPCs)
+            treeNPCUpdate(p.HoldingNPC);
+
+        p.Effect2 = 100;
+        if(p.Duck)
+        {
+            if(warp_dir_exit == 1 || warp_dir_exit == 3)
+                UnDuck(Player[A]);
+        }
+
+        int last_section = p.Section;
+
+        CheckSection(A);
+
+        bool same_section = (last_section == p.Section);
+
+        if(p.HoldingNPC > 0)
+            CheckSectionNPC(p.HoldingNPC);
+
+        // set any other players warping to the same pipe to this state (needed to avoid splitting a shared screen)
+        if(is_shared_screen)
+        {
+            for(int plr_i = 0; plr_i < screen.player_count; plr_i++)
+            {
+                int o_A = screen.players[plr_i];
+                if(A == o_A)
+                    continue;
+
+                Player_t& o_p = Player[o_A];
+                if(!o_p.Dead && o_p.TimeToLive == 0 && o_p.Effect == PLREFF_WARP_PIPE && o_p.Effect2 == 0 && o_p.Warp == Player[A].Warp && o_p.WarpBackward == Player[A].WarpBackward)
+                {
+                    o_p.Location.X = p.Location.X + p.Location.Width / 2.0 - o_p.Location.Width / 2.0;
+                    o_p.Location.Y = p.Location.Y + p.Location.Height - o_p.Location.Height;
+
+                    CheckSection(o_A);
+
+                    o_p.Effect = PLREFF_WARP_PIPE;
+                    o_p.Effect2 = 1;
+                }
+            }
+        }
+
+        // delay based on number of players ahead of this one
+        if(is_shared_screen)
+        {
+            // number of players ahead of this one
+            int hit = 0;
+
+            for(int plr_i = 0; plr_i < screen.player_count; plr_i++)
+            {
+                int o_A = screen.players[plr_i];
+                if(o_A == A)
+                    continue;
+
+                Player_t& o_p = Player[o_A];
+                if(!o_p.Dead && o_p.TimeToLive == 0 && o_p.Effect == PLREFF_WARP_PIPE && o_p.Warp == p.Warp && o_p.WarpBackward == p.WarpBackward && o_p.Effect2 > 1 && (o_p.Effect2 < 128 || o_p.Effect2 >= 2000))
+                    hit += 1;
+            }
+
+            // put in new pipe holding state
+            if(hit)
+            {
+                p.Effect = PLREFF_WARP_PIPE;
+                p.Effect2 = 2010 + 100 * hit;
+            }
+        }
+
+        // many-player code
+        if(g_ClonedPlayerMode)
+        {
+            for(int B = 1; B <= numPlayers; B++)
+            {
+                if(B != A)
+                {
+                    if(warp_dir_exit != 3)
+                        Player[B].Location.Y = p.Location.Y + p.Location.Height - Player[B].Location.Height;
+                    else
+                        Player[B].Location.Y = p.Location.Y;
+
+                    Player[B].Location.X = p.Location.X + p.Location.Width / 2.0 - Player[B].Location.Width / 2.0;
+                    Player[B].Location.SpeedY = dRand() * 24 - 12;
+                    Player[B].Effect = PLREFF_WAITING;
+                    Player[B].Effect2 = 0;
+                    CheckSection(B);
+
+                    if(Player[B].HoldingNPC > 0)
+                        CheckSectionNPC(Player[B].HoldingNPC);
+                }
+            }
+        }
+
+        // reverse screen fade
+        int fader_index = vScreenIdxByPlayer(A);
+        SDL_assert_release(0 <= fader_index && fader_index <= c_vScreenCount);
+
+        auto& fader = g_levelVScreenFader[fader_index];
+
+        if(!is_level_quit && (fader.isVisible() || warp.transitEffect == LevelDoor::TRANSIT_SCROLL))
+        {
+            switch(warp.transitEffect)
+            {
+            default:
+                if(warp.transitEffect >= ScreenFader::S_CUSTOM)
+                {
+                    fader.setupFader(3, 65, 0, warp.transitEffect,
+                                     true,
+                                     Maths::iRound(warp_exit.X + warp_exit.Width / 2),
+                                     Maths::iRound(warp_exit.Y + warp_exit.Height / 2),
+                                     fader_index);
+                    break;
+                }
+            // fallthrough
+            case LevelDoor::TRANSIT_NONE:
+                fader.setupFader(g_config.EnableInterLevelFade ? 8 : 64, 65, 0, ScreenFader::S_FADE);
+                break;
+
+            case LevelDoor::TRANSIT_SCROLL:
+                // follows fade logic if cross section
+                if(!same_section && fader.isVisible())
+                    fader.setupFader(3, 65, 0, ScreenFader::S_FADE);
+                break;
+
+            case LevelDoor::TRANSIT_FADE:
+                fader.setupFader(3, 65, 0, ScreenFader::S_FADE);
+                break;
+
+            case LevelDoor::TRANSIT_CIRCLE_FADE:
+                fader.setupFader(2, 65, 0, ScreenFader::S_CIRCLE,
+                                 true,
+                                 Maths::iRound(warp_exit.X + warp_exit.Width / 2),
+                                 Maths::iRound(warp_exit.Y + warp_exit.Height /2),
+                                 fader_index);
+                break;
+
+            case LevelDoor::TRANSIT_FLIP_H:
+                fader.setupFader(3, 65, 0, ScreenFader::S_FLIP_H);
+                break;
+
+            case LevelDoor::TRANSIT_FLIP_V:
+                fader.setupFader(3, 65, 0, ScreenFader::S_FLIP_V);
+                break;
+            }
+        }
+
+        if(warp.level != STRINGINDEX_NONE)
+        {
+            GoToLevel = GetS(warp.level);
+            GoToLevelNoGameThing = warp.noEntranceScene;
+            p.Effect = PLREFF_WAITING;
+            p.Effect2 = 2970;
+            ReturnWarp = p.Warp;
+
+            if(IsHubLevel)
+                ReturnWarpSaved = ReturnWarp;
+
+            StartWarp = warp.LevelWarp;
+        }
+        else if(warp.MapWarp)
+        {
+            p.Effect = PLREFF_WAITING;
+            p.Effect2 = 2970;
+        }
+    }
+    else if(p.Effect2 >= 2000) // NEW >2P holding state for pipe exit
+    {
+        p.Effect2 -= 1;
+
+        if(p.Effect2 <= 2000)
+        {
+            p.Effect2 = 2;
+            if(backward || !warp.cannonExit)
+                PlaySoundSpatial(SFX_Warp, p.Location);
+        }
+    }
+    else if(p.Effect2 > 128) // Scrolling between pipes
+    {
+        double targetX = p.Location.X;
+        double targetY = p.Location.Y;
+
+        if(warp_dir_exit == 1)
+        {
+            targetX = warp_exit.X + warp_exit.Width / 2.0 - p.Location.Width / 2.0;
+            targetY = warp_exit.Y - p.Location.Height - 8;
+        }
+        else if(warp_dir_exit == 3)
+        {
+            targetX = warp_exit.X + warp_exit.Width / 2.0 - p.Location.Width / 2.0;
+            targetY = warp_exit.Y + warp_exit.Height + 8;
+        }
+        else if(warp_dir_exit == 2)
+        {
+            if(p.Mount == 3)
+                p.Location.Height = 30;
+
+            targetX = warp_exit.X - p.Location.Width - 8;
+            targetY = warp_exit.Y + warp_exit.Height - p.Location.Height - 2;
+        }
+        else if(warp_dir_exit == 4)
+        {
+            if(p.Mount == 3)
+                p.Location.Height = 30;
+
+            targetX = warp_exit.X + warp_exit.Width + 8;
+            targetY = warp_exit.Y + warp_exit.Height - p.Location.Height - 2;
+        }
+
+        int frames_left = p.Effect2 - 128;
+
+        p.Location.X += (targetX - p.Location.X) / frames_left;
+        p.Location.Y += (targetY - p.Location.Y) / frames_left;
+
+        p.Effect2 -= 1;
+
+        if(p.Effect2 <= 128)
+            p.Effect2 = 1;
+    }
+    else if(p.Effect2 >= 100) // Waiting until exit pipe
+    {
+        p.Effect2 += 1;
+
+        if(p.Effect2 >= 110)
+        {
+            p.Effect2 = 2;
+            if(backward || !warp.cannonExit)
+                PlaySoundSpatial(SFX_Warp, p.Location);
+        }
+    }
+    else if(fEqual(p.Effect2, 2)) // Proceeding the pipe exiting
+    {
+        if(!backward && warp.cannonExit)
+        {
+            switch(warp_dir_exit)
+            {
+            case LevelDoor::EXIT_DOWN:
+                p.Location.Y = warp_exit.Y;
+                break;
+            case LevelDoor::EXIT_UP:
+                p.Location.Y = (warp_exit.Y + warp_exit.Height) - p.Location.Height;
+                break;
+            case LevelDoor::EXIT_LEFT:
+                p.Location.X = (warp_exit.X + warp_exit.Width) - p.Location.Width;
+                p.Direction = -1;
+                break;
+            case LevelDoor::EXIT_RIGHT:
+                p.Location.X = warp_exit.X;
+                p.Direction = +1;
+                break;
+            }
+            p.Effect2 = 3;
+            if(p.HoldingNPC > 0)
+            {
+                if(p.ForceHold < 5) // Prevent NPC being stuck in the wall/ceiling
+                    p.ForceHold = 5;
+                PlayerGrabCode(A);
+            }
+        }
+        else if(warp_dir_exit == LevelDoor::EXIT_DOWN)
+        {
+            p.Location.Y += 1;
+
+            if(p.Location.Y >= warp_exit.Y)
+                p.Effect2 = 3;
+
+            if(p.HoldingNPC > 0)
+            {
+                NPC[p.HoldingNPC].Location.Y = p.Location.Y + Physics.PlayerGrabSpotY[p.Character][p.State] + 32 - NPC[p.HoldingNPC].Location.Height;
+                NPC[p.HoldingNPC].Location.X = p.Location.X + p.Location.Width / 2.0 - NPC[p.HoldingNPC].Location.Width / 2.0;
+            }
+
+            if(p.Mount == 0)
+                p.Frame = 15;
+        }
+        else if(warp_dir_exit == LevelDoor::EXIT_UP)
+        {
+            p.Location.Y -= 1;
+
+            if(p.Location.Y + p.Location.Height <= warp_exit.Y + warp_exit.Height)
+                p.Effect2 = 3;
+
+            if(p.HoldingNPC > 0)
+            {
+                NPC[p.HoldingNPC].Location.Y = p.Location.Y + Physics.PlayerGrabSpotY[p.Character][p.State] + 32 - NPC[p.HoldingNPC].Location.Height;
+                NPC[p.HoldingNPC].Location.X = p.Location.X + p.Location.Width / 2.0 - NPC[p.HoldingNPC].Location.Width / 2.0;
+            }
+
+            if(p.Mount == 0)
+                p.Frame = 15;
+
+            // make players less likely to collide chaotically out of UP exits
+            if(is_shared_screen || (numPlayers > 2 && !g_ClonedPlayerMode))
+                p.StandUp2 = true;
+        }
+        else if(warp_dir_exit == LevelDoor::EXIT_LEFT)
+        {
+            p.Location.X -= 0.5;
+            p.Direction = -1; // makes (p.Direction < 0) always true
+
+            if(p.Location.X + p.Location.Width <= warp_exit.X + warp_exit.Width)
+                p.Effect2 = 3;
+
+            if(p.HoldingNPC > 0)
+            {
+                if(p.Character >= 3) // peach/toad leaving a pipe
+                {
+                    p.Location.SpeedX = 1;
+                    PlayerFrame(p);
+                    NPC[p.HoldingNPC].Location.Y = p.Location.Y + Physics.PlayerGrabSpotY[p.Character][p.State] + 32 - NPC[p.HoldingNPC].Location.Height;
+
+//                        if(p.Direction < 0) // always true
+                    NPC[p.HoldingNPC].Location.X = p.Location.X + Physics.PlayerGrabSpotX[p.Character][p.State];
+//                        else
+//                            NPC[p.HoldingNPC].Location.X = p.Location.X + p.Location.Width - Physics.PlayerGrabSpotX[p.Character][p.State] - NPC[p.HoldingNPC].Location.Width;
+                }
+                else
+                {
+                    p.Direction = 1; // makes (p.Direction > 0) always true
+
+                    if(p.State == 1)
+                        p.Frame = 5;
+                    else
+                        p.Frame = 8;
+
+                    NPC[p.HoldingNPC].Location.Y = p.Location.Y + Physics.PlayerGrabSpotY[p.Character][p.State] + 32 - NPC[p.HoldingNPC].Location.Height;
+
+//                        if(p.Direction > 0) // always true
+                    NPC[p.HoldingNPC].Location.X = p.Location.X + Physics.PlayerGrabSpotX[p.Character][p.State];
+//                        else
+//                            NPC[p.HoldingNPC].Location.X = p.Location.X + p.Location.Width - Physics.PlayerGrabSpotX[p.Character][p.State] - NPC[p.HoldingNPC].Location.Width;
+                }
+            }
+            else
+            {
+                p.Location.SpeedX = -0.5;
+                PlayerFrame(p);
+                p.Location.SpeedX = 0;
+            }
+        }
+        else if(warp_dir_exit == LevelDoor::EXIT_RIGHT)
+        {
+            p.Location.X += 0.5;
+            p.Direction = 1; // makes (p.Direction < 0) always false
+
+            if(p.Location.X >= warp_exit.X)
+                p.Effect2 = 3;
+
+            if(p.HoldingNPC > 0)
+            {
+                if(p.Character >= 3) // peach/toad leaving a pipe
+                {
+                    p.Location.SpeedX = 1;
+                    PlayerFrame(p);
+                    NPC[p.HoldingNPC].Location.Y = p.Location.Y + Physics.PlayerGrabSpotY[p.Character][p.State] + 32 - NPC[p.HoldingNPC].Location.Height;
+
+//                        if(p.Direction < 0) // always false
+//                            NPC[p.HoldingNPC].Location.X = p.Location.X + Physics.PlayerGrabSpotX[p.Character][p.State];
+//                        else
+                    NPC[p.HoldingNPC].Location.X = p.Location.X + p.Location.Width - Physics.PlayerGrabSpotX[p.Character][p.State] - NPC[p.HoldingNPC].Location.Width;
+                }
+                else
+                {
+                    p.Direction = -1; // makes (p.Direction > 0) always false
+
+                    if(p.State == 1)
+                        p.Frame = 5;
+                    else
+                        p.Frame = 8;
+
+                    NPC[p.HoldingNPC].Location.Y = p.Location.Y + Physics.PlayerGrabSpotY[p.Character][p.State] + 32 - NPC[p.HoldingNPC].Location.Height;
+
+//                        if(p.Direction > 0) // always false
+//                            NPC[p.HoldingNPC].Location.X = p.Location.X + Physics.PlayerGrabSpotX[p.Character][p.State];
+//                        else
+                    NPC[p.HoldingNPC].Location.X = p.Location.X + p.Location.Width - Physics.PlayerGrabSpotX[p.Character][p.State] - NPC[p.HoldingNPC].Location.Width;
+                }
+            }
+            else
+            {
+                p.Location.SpeedX = -0.5;
+                PlayerFrame(p);
+                p.Location.SpeedX = 0;
+            }
+        }
+
+        if(p.HoldingNPC > 0 && p.HoldingNPC <= numNPCs)
+            treeNPCUpdate(p.HoldingNPC);
+    }
+    else if(fEqual(p.Effect2, 3)) // Finishing the pipe exiting / shooting
+    {
+        if(!backward && warp.cannonExit)
+        {
+            PlaySoundSpatial(SFX_Bullet, p.Location);
+            auto loc = warp_exit;
+            if(warp_dir_exit == LevelDoor::EXIT_LEFT || warp_dir_exit == LevelDoor::EXIT_RIGHT)
+                loc.Y += loc.Height - (p.Location.Height / 2) - (loc.Height / 2);
+            NewEffect(EFFID_STOMP_INIT, loc, p.Direction); // Cannon pipe shoot effect
+        }
+
+        if(p.HoldingNPC > 0)
+        {
+            if(warp_dir_exit == LevelDoor::EXIT_LEFT || warp_dir_exit == LevelDoor::EXIT_RIGHT)
+            {
+                if(warp_dir_exit == 2)
+                    p.Direction = 1;
+                else if(warp_dir_exit == 4)
+                    p.Direction = -1;
+
+                if(p.State == 1)
+                    p.Frame = 5;
+                else
+                    p.Frame = 8;
+
+                if(!p.Controls.Run)
+                    p.Controls.Run = true;
+
+                PlayerGrabCode(A);
+            }
+        }
+
+        p.Effect = PLREFF_NORMAL;
+        p.Effect2 = 0;
+        p.WarpCD = 20;
+        p.CanJump = false;
+        p.CanAltJump = false;
+        p.Bumped2 = 0;
+        if(!backward && warp.cannonExit)
+        {
+            switch(warp_dir_exit)
+            {
+            case LevelDoor::EXIT_DOWN:
+                p.Location.SpeedY = warp.cannonExitSpeed;
+                break;
+            case LevelDoor::EXIT_UP:
+                p.Location.SpeedY = -warp.cannonExitSpeed;
+                break;
+            case LevelDoor::EXIT_LEFT:
+                p.Location.SpeedX = -warp.cannonExitSpeed;
+                p.Direction = -1;
+                break;
+            case LevelDoor::EXIT_RIGHT:
+                p.Location.SpeedX = warp.cannonExitSpeed;
+                p.Direction = +1;
+                break;
+            }
+
+            if(warp_dir_exit == LevelDoor::EXIT_LEFT || warp_dir_exit == LevelDoor::EXIT_RIGHT)
+                p.WarpShooted = true;
+        }
+        else
+        {
+            p.Location.SpeedY = 0;
+            p.Location.SpeedX = 0;
+        }
+
+        if(p.HoldingNPC > 0)
+            NPC[p.HoldingNPC].Effect = NPCEFF_NORMAL;
+
+        if(g_ClonedPlayerMode)
+        {
+            for(int B = 1; B <= numPlayers; B++)
+            {
+                if(B != A)
+                {
+                    if(warp_dir_exit != 1)
+                        Player[B].Location.Y = p.Location.Y + p.Location.Height - Player[B].Location.Height;
+                    else
+                        Player[B].Location.Y = p.Location.Y;
+
+                    Player[B].Location.X = p.Location.X + p.Location.Width / 2.0 - Player[B].Location.Width / 2.0;
+                    Player[B].Location.SpeedY = dRand() * 24 - 12;
+                    Player[B].Effect = PLREFF_NORMAL;
+                    Player[B].Effect2 = 0;
+                    CheckSection(B);
+                }
+            }
+        }
+    }
 }
 
 static inline bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool backward)
