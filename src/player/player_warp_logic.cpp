@@ -378,7 +378,7 @@ void PlayerEffectWarpPipe(int A)
         default:
             if(warp.transitEffect >= ScreenFader::S_CUSTOM)
             {
-                if(Maths::iRound(leftToGoal) == 8 && !is_level_quit)
+                if(Maths::iRound(leftToGoal) == 24)
                     fader.setupFader(3, 0, 65, warp.transitEffect,
                                      true,
                                      Maths::iRound(warp_enter.X + warp_enter.Width / 2),
@@ -531,11 +531,7 @@ void PlayerEffectWarpPipe(int A)
                 UnDuck(Player[A]);
         }
 
-        int last_section = p.Section;
-
         CheckSection(A);
-
-        bool same_section = (last_section == p.Section);
 
         if(p.HoldingNPC > 0)
             CheckSectionNPC(p.HoldingNPC);
@@ -618,7 +614,7 @@ void PlayerEffectWarpPipe(int A)
 
         auto& fader = g_levelVScreenFader[fader_index];
 
-        if(!is_level_quit && (fader.isVisible() || warp.transitEffect == LevelDoor::TRANSIT_SCROLL))
+        if(!is_level_quit && fader.isVisible())
         {
             switch(warp.transitEffect)
             {
@@ -637,12 +633,8 @@ void PlayerEffectWarpPipe(int A)
                 fader.setupFader(g_config.EnableInterLevelFade ? 8 : 64, 65, 0, ScreenFader::S_FADE);
                 break;
 
+            // scroll logic follows fade logic if the screen fader is visible
             case LevelDoor::TRANSIT_SCROLL:
-                // follows fade logic if cross section
-                if(!same_section && fader.isVisible())
-                    fader.setupFader(3, 65, 0, ScreenFader::S_FADE);
-                break;
-
             case LevelDoor::TRANSIT_FADE:
                 fader.setupFader(3, 65, 0, ScreenFader::S_FADE);
                 break;
@@ -1023,7 +1015,7 @@ void PlayerEffectWarpDoor(int A)
         default:
             if(warp.transitEffect >= ScreenFader::S_CUSTOM)
             {
-                if(fEqual(p.Effect2, 5) && !is_level_quit)
+                if(fEqual(p.Effect2, 5))
                     fader.setupFader(3, 0, 65, warp.transitEffect,
                                      true,
                                      Maths::iRound(warp_enter.X + warp_enter.Width / 2),
@@ -1034,7 +1026,7 @@ void PlayerEffectWarpDoor(int A)
         // fallthrough
         case LevelDoor::TRANSIT_NONE:
             if(fEqual(p.Effect2, 20) && !is_level_quit && !same_section)
-                fader.setupFader(g_config.EnableInterLevelFade ? 9 : 64, 0, 65, ScreenFader::S_FADE);
+                fader.setupFader(g_config.EnableInterLevelFade ? 8 : 64, 0, 65, ScreenFader::S_FADE);
             break;
 
         case LevelDoor::TRANSIT_SCROLL:
@@ -1175,11 +1167,7 @@ void PlayerEffectWarpDoor(int A)
             }
         }
 
-        int last_section = p.Section;
-
         CheckSection(A);
-
-        bool same_section = (last_section == p.Section);
 
         if(p.HoldingNPC > 0)
         {
@@ -1196,7 +1184,7 @@ void PlayerEffectWarpDoor(int A)
         int fader_index = vScreenIdxByPlayer(A);
         auto& fader = g_levelVScreenFader[fader_index];
 
-        if(!is_level_quit && (fader.isVisible() || warp.transitEffect == LevelDoor::TRANSIT_SCROLL))
+        if(!is_level_quit && fader.isVisible())
         {
             switch(warp.transitEffect)
             {
@@ -1215,12 +1203,8 @@ void PlayerEffectWarpDoor(int A)
                 fader.setupFader(g_config.EnableInterLevelFade ? 8 : 64, 65, 0, ScreenFader::S_FADE);
                 break;
 
+            // scroll logic follows fade logic if the screen fader is visible
             case LevelDoor::TRANSIT_SCROLL:
-                // follows fade logic if cross section
-                if(!same_section && fader.isVisible())
-                    fader.setupFader(3, 65, 0, ScreenFader::S_FADE);
-                break;
-
             case LevelDoor::TRANSIT_FADE:
                 fader.setupFader(3, 65, 0, ScreenFader::S_FADE);
                 break;
