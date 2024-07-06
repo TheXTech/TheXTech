@@ -56,14 +56,14 @@ static void s_TriggerDoorEffects(const Location_t& loc, bool do_big_door = true)
         if(CheckCollision(loc, bgo.Location))
         {
             if(bgo.Type == 88)
-                NewEffect(EFFID_DOOR_S2_OPEN, bgo.Location);
+                NewEffect(EFFID_DOOR_S2_OPEN, static_cast<Location_t>(bgo.Location));
             else if(bgo.Type == 87)
-                NewEffect(EFFID_DOOR_DOUBLE_S3_OPEN, bgo.Location);
+                NewEffect(EFFID_DOOR_DOUBLE_S3_OPEN, static_cast<Location_t>(bgo.Location));
             else if(bgo.Type == 107)
-                NewEffect(EFFID_DOOR_SIDE_S3_OPEN, bgo.Location);
+                NewEffect(EFFID_DOOR_SIDE_S3_OPEN, static_cast<Location_t>(bgo.Location));
             else if(do_big_door && bgo.Type == 141)
             {
-                Location_t bLoc = bgo.Location;
+                Location_t bLoc = static_cast<Location_t>(bgo.Location);
                 bLoc.X += bLoc.Width / 2.0;
                 bLoc.Width = 104;
                 bLoc.X += -bLoc.Width / 2.0;

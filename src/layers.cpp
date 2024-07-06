@@ -397,18 +397,6 @@ void SetLayerSpeed(layerindex_t L, double SpeedX, double SpeedY, bool EffectStop
             NPC[C].Location.SpeedY = 0;
         }
     }
-
-    if(g_config.fix_climb_bgo_layer_move)
-    {
-        for(int C : Layer[L].BGOs)
-        {
-            if(BackgroundFence[Background[C].Type])
-            {
-                Background[C].Location.SpeedX = 0;
-                Background[C].Location.SpeedY = 0;
-            }
-        }
-    }
 }
 
 
@@ -531,7 +519,7 @@ void ShowLayer(layerindex_t L, bool NoEffect)
         {
             if(!NoEffect)
             {
-                tempLocation = Background[A].Location;
+                tempLocation = static_cast<Location_t>(Background[A].Location);
                 tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[10] / 2.0;
                 tempLocation.Y += tempLocation.Height / 2.0 - EffectHeight[10] / 2.0;
                 NewEffect(EFFID_SMOKE_S3, tempLocation);
@@ -624,7 +612,7 @@ void HideLayer(layerindex_t L, bool NoEffect)
         {
             if(!NoEffect)
             {
-                tempLocation = Background[A].Location;
+                tempLocation = static_cast<Location_t>(Background[A].Location);
                 tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[10] / 2.0;
                 tempLocation.Y += tempLocation.Height / 2.0 - EffectHeight[10] / 2.0;
                 NewEffect(EFFID_SMOKE_S3, tempLocation);
@@ -1361,18 +1349,6 @@ void ProcEvent(eventindex_t index, int whichPlayer, bool NoEffect)
                         Block[C].Location.SpeedY = double(Layer[B].SpeedY);
                     }
 
-                    if(g_config.fix_climb_bgo_layer_move)
-                    {
-                        for(int C : Layer[B].BGOs)
-                        {
-                            if(BackgroundFence[Background[C].Type])
-                            {
-                                Background[C].Location.SpeedX = double(Layer[B].SpeedX);
-                                Background[C].Location.SpeedY = double(Layer[B].SpeedY);
-                            }
-                        }
-                    }
-
                     for(int C : Layer[B].NPCs)
                     {
                         if(NPC[C]->IsAVine || NPC[C].Type == NPCID_ITEM_BURIED)
@@ -1654,18 +1630,6 @@ void UpdateLayers()
 
                 if(g_config.fix_climb_bgo_layer_move)
                 {
-                    for(int B : Layer[A].BGOs)
-                    {
-                        if(BackgroundFence[Background[B].Type])
-                        {
-                            Background[B].Location.SpeedX = 0;
-                            Background[B].Location.SpeedY = 0;
-                        }
-                    }
-                }
-
-                if(g_config.fix_climb_bgo_layer_move)
-                {
                     for(int B : Layer[A].NPCs)
                     {
                         if(NPC[B].Type == NPCID_ITEM_BURIED || NPC[B].Type == NPCID_HOMING_BALL_GEN || NPC[B]->IsAVine)
@@ -1739,11 +1703,6 @@ void UpdateLayers()
                     //{
                     Background[B].Location.X += double(Layer[A].SpeedX);
                     Background[B].Location.Y += double(Layer[A].SpeedY);
-                    if(g_config.fix_climb_bgo_layer_move && BackgroundFence[Background[B].Type])
-                    {
-                        Background[B].Location.SpeedX = double(Layer[A].SpeedX);
-                        Background[B].Location.SpeedY = double(Layer[A].SpeedY);
-                    }
 
                     if(inactive)
                         treeBackgroundUpdateLayer(A, B);

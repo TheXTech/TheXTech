@@ -780,7 +780,7 @@ struct Background_t
 //    EXTRA: sort priority for BGO (NOT a draw plane itself, a BGO-only format used for sorting and determining draw plane)
     uint8_t SortPriority = 0;
 //    Location As Location
-    Location_t Location;
+    SpeedlessLocation_t Location;
 
     //! SortPriority at which PLANE_LVL_BGO_NORM, PLANE_LVL_3D_MAIN, PLANE_LVL_BGO_FG, and PLANE_LVL_BGO_TOP start
     static constexpr uint8_t PRI_NORM_START = 0x30;
