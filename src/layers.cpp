@@ -737,6 +737,79 @@ bool DeleteEvent(eventindex_t index)
 }
 
 
+// Helper functions for ProcEvent
+
+void s_testPlayersInSection(const Screen_t& screen, int B, bool do_warp, int& onscreen_plr, int& warped_plr)
+{
+    // warp EVERYONE in cloned player mode, otherwise just warp players of this screen
+    int i_start = g_ClonedPlayerMode ? 1 : 0;
+    int i_end   = g_ClonedPlayerMode ? numPlayers + 1 : screen.player_count;
+    for(int i = i_start; i < i_end; i++)
+    {
+        int C = g_ClonedPlayerMode ? i : screen.players[i];
+
+        // If .Section = B Then
+        // Should set this only if the warp is successful!
+        if(do_warp && !g_config.modern_section_change)
+            Player[C].Section = B;
+
+        bool tempBool = false;
+        if(Player[C].Location.X + Player[C].Location.Width >= level[B].X)
+        {
+            if(Player[C].Location.X <= level[B].Width)
+            {
+                if(Player[C].Location.Y + Player[C].Location.Height >= level[B].Y)
+                {
+                    if(Player[C].Location.Y <= level[B].Height)
+                    {
+                        tempBool = true; // Check to see if player is still in section after resizing
+                        onscreen_plr = C;
+
+                        if(do_warp)
+                            Player[C].Section = B;
+                    }
+                }
+            }
+        }
+
+        // don't warp on reset
+        if(!do_warp)
+            continue;
+
+        if(!tempBool)
+        {
+            for(int D = 1; D <= numPlayers; D++)
+            {
+                if(D != C && Player[D].Section == B)
+                {
+                    if(Player[D].Location.X + Player[D].Location.Width >= level[B].X)
+                    {
+                        if(Player[D].Location.X <= level[B].Width)
+                        {
+                            if(Player[D].Location.Y + Player[D].Location.Height >= level[B].Y)
+                            {
+                                if(Player[D].Location.Y <= level[B].Height) // Move to another player who is still in the section
+                                {
+                                    warped_plr = C;
+
+                                    Player[C].Section = B;
+                                    Player[C].Location.X = Player[D].Location.X + Player[D].Location.Width / 2.0 - Player[C].Location.Width / 2.0;
+                                    Player[C].Location.Y = Player[D].Location.Y + Player[D].Location.Height - Player[C].Location.Height;
+                                    Player[C].Effect = PLREFF_NO_COLLIDE;
+                                    Player[C].Effect2 = D;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        // End If
+    }
+}
+
+
 // Old functions:
 
 void ProcEvent(eventindex_t index, int whichPlayer, bool NoEffect)
@@ -747,8 +820,8 @@ void ProcEvent(eventindex_t index, int whichPlayer, bool NoEffect)
     // this is for events that have just been triggered
     int B = 0;
     // int C = 0;
-    int D = 0;
-    bool tempBool = false;
+    // int D = 0;
+    // bool tempBool = false;
     SpeedlessLocation_t tempLevel;
     SpeedlessLocation_t newLevel;
 
@@ -827,74 +900,9 @@ void ProcEvent(eventindex_t index, int whichPlayer, bool NoEffect)
                         // which player on this screen was moved to the new section? (used for 2P dynamic)
                         int warped_plr = 0;
 
-                        // warp other players to resized section, if not a reset
-                        if(!evt.AutoStart && !equalCase(evt.Name.c_str(), "Level - Start"))
-                        {
-                            // warp EVERYONE in cloned player mode, otherwise just warp players of this screen
-                            int i_start = g_ClonedPlayerMode ? 1 : 0;
-                            int i_end   = g_ClonedPlayerMode ? numPlayers + 1 : screen.player_count;
-                            for(int i = i_start; i < i_end; i++)
-                            {
-                                int C = g_ClonedPlayerMode ? i : screen.players[i];
-
-                                // If .Section = B Then
-                                // Should set this only if the warp is successful!
-                                if(!g_config.modern_section_change)
-                                    Player[C].Section = B;
-
-                                tempBool = false;
-                                if(Player[C].Location.X + Player[C].Location.Width >= level[B].X)
-                                {
-                                    if(Player[C].Location.X <= level[B].Width)
-                                    {
-                                        if(Player[C].Location.Y + Player[C].Location.Height >= level[B].Y)
-                                        {
-                                            if(Player[C].Location.Y <= level[B].Height)
-                                            {
-                                                tempBool = true; // Check to see if player is still in section after resizing
-                                                onscreen_plr = C;
-                                                Player[C].Section = B;
-                                            }
-                                        }
-                                    }
-                                }
-
-                                // don't warp on reset
-                                if(is_reset)
-                                    continue;
-
-                                if(!tempBool)
-                                {
-                                    for(D = 1; D <= numPlayers; D++)
-                                    {
-                                        if(D != C && Player[D].Section == B)
-                                        {
-                                            if(Player[D].Location.X + Player[D].Location.Width >= level[B].X)
-                                            {
-                                                if(Player[D].Location.X <= level[B].Width)
-                                                {
-                                                    if(Player[D].Location.Y + Player[D].Location.Height >= level[B].Y)
-                                                    {
-                                                        if(Player[D].Location.Y <= level[B].Height) // Move to another player who is still in the section
-                                                        {
-                                                            warped_plr = C;
-
-                                                            Player[C].Section = B;
-                                                            Player[C].Location.X = Player[D].Location.X + Player[D].Location.Width / 2.0 - Player[C].Location.Width / 2.0;
-                                                            Player[C].Location.Y = Player[D].Location.Y + Player[D].Location.Height - Player[C].Location.Height;
-                                                            Player[C].Effect = PLREFF_NO_COLLIDE;
-                                                            Player[C].Effect2 = D;
-                                                            break;
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                                // End If
-                            }
-                        }
+                        // warp other players to resized section, if not a reset or level start
+                        bool do_warp = !is_reset && !evt.AutoStart && !equalCase(evt.Name.c_str(), "Level - Start");
+                        s_testPlayersInSection(screen, B, do_warp, onscreen_plr, warped_plr);
 
                         // start the modern qScreen animation
                         if(!equalCase(evt.Name.c_str(), "Level - Start") && g_config.modern_section_change)
@@ -1386,7 +1394,7 @@ void ProcEvent(eventindex_t index, int whichPlayer, bool NoEffect)
 
             ForcedControl = evt.Controls;
 
-            tempBool = false;
+            // tempBool = false;
             if(evt.TriggerEvent != EVENT_NONE)
             {
                 if(std::round(evt.TriggerDelay) == 0.0)
