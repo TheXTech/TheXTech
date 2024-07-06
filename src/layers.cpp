@@ -739,6 +739,7 @@ bool DeleteEvent(eventindex_t index)
 
 // Helper functions for ProcEvent
 
+// tests which players are in a resized section, and warps other onscreen players to the section if do_warp is enabled
 static inline void s_testPlayersInSection(const Screen_t& screen, int B, bool do_warp, int& onscreen_plr, int& warped_plr)
 {
     // warp EVERYONE in cloned player mode, otherwise just warp players of this screen
@@ -809,8 +810,11 @@ static inline void s_testPlayersInSection(const Screen_t& screen, int B, bool do
     }
 }
 
-static inline void s_initModernQScreen(Screen_t& screen, const int B, const SpeedlessLocation_t& tempLevel, const SpeedlessLocation_t& newLevel, const int onscreen_plr, const int warped_plr, const bool is_reset, bool& set_qScreen, bool& set_qScreen_canonical)
+// initializes modern qScreen for section B, and returns true if any of the screen's vScreens got qScreen enabled
+static inline bool s_initModernQScreen(Screen_t& screen, const int B, const SpeedlessLocation_t& tempLevel, const SpeedlessLocation_t& newLevel, const int onscreen_plr, const int warped_plr, const bool is_reset)
 {
+    bool set_qScreen = false;
+
     // check that the onscreen player is here
     if(onscreen_plr == 0 && warped_plr == 0)
     {
@@ -831,8 +835,7 @@ static inline void s_initModernQScreen(Screen_t& screen, const int B, const Spee
         int p1 = screen.players[0];
         int p2 = screen.players[1];
 
-        set_qScreen |= screen.Visible;
-        set_qScreen_canonical |= !screen.Visible && screen.is_canonical();
+        set_qScreen = true;
 
         bool screen2_was_visible = vScreen[Z2].Visible;
 
@@ -1035,14 +1038,16 @@ static inline void s_initModernQScreen(Screen_t& screen, const int B, const Spee
                     }
                 }
 
-                set_qScreen |= screen.Visible;
-                set_qScreen_canonical |= !screen.Visible && screen.is_canonical();
+                set_qScreen = true;
             }
         }
     }
+
+    return set_qScreen;
 }
 
-static inline void s_initLegacyQScreen(Screen_t& screen, const int B, const SpeedlessLocation_t& tempLevel, const SpeedlessLocation_t& newLevel, const int onscreen_plr, const int warped_plr, const bool is_reset, bool& set_qScreen, bool& set_qScreen_canonical)
+// initializes legacy qScreen for section B, and returns true in all cases
+static inline bool s_initLegacyQScreen(Screen_t& screen, const int B, const SpeedlessLocation_t& tempLevel, const SpeedlessLocation_t& newLevel, const int onscreen_plr)
 {
     int Z1 = screen.vScreen_refs[0];
     int Z2 = screen.vScreen_refs[1];
@@ -1112,8 +1117,7 @@ static inline void s_initLegacyQScreen(Screen_t& screen, const int B, const Spee
         qScreenLoc[Z1] = vScreen[Z1];
     }
 
-    set_qScreen = true;
-    set_qScreen_canonical = true;
+    return true;
 }
 
 // Old functions:
@@ -1210,12 +1214,20 @@ void ProcEvent(eventindex_t index, int whichPlayer, bool NoEffect)
                         bool do_warp = !is_reset && !evt.AutoStart && !equalCase(evt.Name.c_str(), "Level - Start");
                         s_testPlayersInSection(screen, B, do_warp, onscreen_plr, warped_plr);
 
+                        bool set_qScreen_i = false;
+
                         // start the modern qScreen animation
                         if(!equalCase(evt.Name.c_str(), "Level - Start") && g_config.modern_section_change)
-                            s_initModernQScreen(screen, B, tempLevel, newLevel, onscreen_plr, warped_plr, is_reset, set_qScreen, set_qScreen_canonical);
+                            set_qScreen_i = s_initModernQScreen(screen, B, tempLevel, newLevel, onscreen_plr, warped_plr, is_reset);
                         // legacy qScreen animation
                         else if(!equalCase(evt.Name.c_str(), "Level - Start"))
-                            s_initLegacyQScreen(screen, B, tempLevel, newLevel, onscreen_plr, warped_plr, is_reset, set_qScreen, set_qScreen_canonical);
+                            set_qScreen_i = s_initLegacyQScreen(screen, B, tempLevel, newLevel, onscreen_plr);
+
+                        if(set_qScreen_i)
+                        {
+                            set_qScreen |= screen.Visible;
+                            set_qScreen_canonical |= !screen.Visible && screen.is_canonical();
+                        }
                     }
 
                     // enable qScreen (now after all logic to prevent messing up GetvScreen calls)
