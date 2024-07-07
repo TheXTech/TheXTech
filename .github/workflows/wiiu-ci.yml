@@ -96,7 +96,7 @@ jobs:
     - name: Install modified SDL2
       run: |
         cd ..
-        git clone https://github.com/Wohlstand/SDL.git -b fix-wiiu-build-joystick --depth 1 SDL2
+        git clone https://github.com/Wohlstand/SDL.git -b wiiu-sdl2-2.28 --depth 1 SDL2
         cd SDL2
         mkdir build
         cd build
