@@ -1864,12 +1864,14 @@ void RenderGL::getScreenPixels(int x, int y, int w, int h, unsigned char *pixels
 
 void RenderGL::getScreenPixelsRGBA(int x, int y, int w, int h, unsigned char *pixels)
 {
+    bool direct_screenshot = (m_has_fbo && m_game_texture_fb && m_game_texture);
+
     int phys_x, phys_y, phys_w, phys_h;
 
 #ifdef RENDERGL_HAS_FBO
     GLint prev_fb = -1;
 
-    if(m_game_texture_fb && m_game_texture)
+    if(direct_screenshot)
     {
         phys_x = x * m_render_scale_factor;
         phys_y = y * m_render_scale_factor;
@@ -1890,8 +1892,8 @@ void RenderGL::getScreenPixelsRGBA(int x, int y, int w, int h, unsigned char *pi
         phys_h = h * m_phys_h / XRender::TargetH;
     }
 
-    // allocate buffer for screen-space pixels
-    uint8_t* phys_pixels = (uint8_t*)malloc(phys_w * phys_h * 4);
+    // allocate buffer for screen-space pixels (if rescaling is needed)
+    uint8_t* phys_pixels = (direct_screenshot) ? pixels : (uint8_t*)malloc(phys_w * phys_h * 4);
     if(!phys_pixels)
         return;
 
@@ -1903,6 +1905,10 @@ void RenderGL::getScreenPixelsRGBA(int x, int y, int w, int h, unsigned char *pi
     if(prev_fb != -1)
         glBindFramebuffer(GL_FRAMEBUFFER, prev_fb);
 #endif
+
+    // if rescaling is not needed, we're done!
+    if(direct_screenshot)
+        return;
 
     // rescale and move to target
     for(int r = 0; r < h; r++)
