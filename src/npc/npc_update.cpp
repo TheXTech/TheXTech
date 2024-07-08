@@ -1538,7 +1538,6 @@ void UpdateNPCs()
                     if(NPC[A].Pinched.Moving > 0)
                         NPC[A].Pinched.Moving -= 1;
 
-                    NPC[A].BeltSpeed = 0;
                     NPC[A].onWall = false;
                     NPC[A].Slope = 0;
                     if(NPC[A].Location.X < -(FLBlocks - 1) * 32)
@@ -1608,6 +1607,10 @@ void UpdateNPCs()
 
                         if(tempHit != 0) // Walking   // VERIFY ME
                             NPCWalkingLogic(A, tempHit, tempHitBlock, tempSpeedA);
+                    }
+                    else
+                    {
+                        NPC[A].BeltSpeed = 0;
                     }
                 }
 
