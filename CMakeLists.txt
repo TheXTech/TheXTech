@@ -184,6 +184,7 @@ option(ENABLE_OLD_CREDITS "Use original Redigit's credits without changes" OFF)
 option(ENABLE_LOGGING "Enable debug logging written into a file (may not work on some platfors)" ON)
 
 option(THEXTECH_ENABLE_LUA "Enable lua scripting support" OFF)
+option(THEXTECH_ENABLE_LUAU "Enable luau build testing" OFF)
 option(THEXTECH_ENABLE_LUNA_AUTOCODE "Enable LunaDLL Autocode scripting support" ON)
 
 option(THEXTECH_ENABLE_EDITOR "Enable runtime support for editor features" ON)
@@ -581,6 +582,22 @@ if(THEXTECH_BUILD_GL_DESKTOP_MODERN AND THEXTECH_USE_ANGLE_TRANSLATOR)
 
     target_link_libraries(A2XT_Int INTERFACE angle_shader_translator)
 endif()
+
+if(THEXTECH_ENABLE_LUAU)
+    message("== Building Luau... but it doesn't do anything! ==")
+    add_subdirectory(3rdparty/luau EXCLUDE_FROM_ALL)
+    if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+        target_compile_options(Luau.Compiler PRIVATE "-w")
+        target_compile_options(Luau.Ast PRIVATE "-w")
+        target_compile_options(Luau.VM PRIVATE "-w")
+    elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+        target_compile_options(Luau.Compiler PRIVATE /wd4100) # unreferenced formal parameter
+        target_compile_options(Luau.Ast PRIVATE /wd4100) # unreferenced formal parameter
+        target_compile_options(Luau.VM PRIVATE /wd4100) # unreferenced formal parameter
+    endif()
+    target_link_libraries(A2XT_Int INTERFACE Luau.Compiler Luau.VM)
+endif()
+
 
 target_link_libraries(A2XT_Int INTERFACE ${A2XT_LIBS})
 target_include_directories(A2XT_Int INTERFACE ${A2XT_INCS})

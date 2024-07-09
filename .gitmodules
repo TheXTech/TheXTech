@@ -52,3 +52,7 @@
 	path = 3rdparty/angle-shader-translator
 	url = https://github.com/TheXTech/angle-shader-translator-library.git
 	branch = dist-no-spirv
+[submodule "3rdparty/luau"]
+	path = 3rdparty/luau
+	url = https://github.com/TheXTech/luau.git
+	branch = master
