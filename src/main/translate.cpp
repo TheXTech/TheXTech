@@ -921,15 +921,15 @@ void XTechTranslate::updateLanguages(const std::string &outPath, bool noBlank)
 
         try
         {
-            std::string data;
+            Files::Data data = Files::load_file(fullFilePath.c_str());
 
-            if(!Files::dumpFile(fullFilePath, data))
+            if(!data.valid())
             {
                 std::printf("Warning: Failed to load the translation file %s: can't open file\n", fullFilePath.c_str());
                 continue;
             }
 
-            nlohmann::ordered_json langFile = nlohmann::ordered_json::parse(data);
+            nlohmann::ordered_json langFile = nlohmann::ordered_json::parse(data.begin(), data.end());
 
             for(const auto &k : trList)
             {
@@ -1017,25 +1017,21 @@ bool XTechTranslate::translateFile(const std::string& file, TrList& list, const 
 {
     try
     {
-        std::string data;
-        nlohmann::ordered_json langFile;
+        // Engine translations
+        Files::Data data = Files::load_file(file.c_str());
 
-        if(Files::fileExists(file))
+        if(!data.valid())
         {
-            // Engine translations
-            if(!Files::dumpFile(file, data))
-            {
-                pLogWarning("Failed to load the %s translation file %s: can't open file", trTypeName, file.c_str());
-                return false;
-            }
+            pLogWarning("Failed to load the %s translation file %s: can't open file", trTypeName, file.c_str());
+            return false;
+        }
 
-            langFile = nlohmann::ordered_json::parse(data);
+        nlohmann::ordered_json langFile = nlohmann::ordered_json::parse(data.begin(), data.end());
 
-            for(auto &k : list)
-            {
-                std::string &res = *k.second;
-                res = getJsonValue(langFile, k.first, *k.second);
-            }
+        for(auto &k : list)
+        {
+            std::string &res = *k.second;
+            res = getJsonValue(langFile, k.first, *k.second);
         }
     }
     catch(const std::exception &e)

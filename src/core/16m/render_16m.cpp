@@ -28,6 +28,7 @@
 #include <nds.h>
 
 #include <Logger/logger.h>
+#include <Utils/files.h>
 
 #include "globals.h"
 #include "config.h"
@@ -56,22 +57,28 @@ uint32_t s_loadedVRAM = 0;
 
 struct tex_load_data
 {
-    uint8_t* data = nullptr;
-    uint16_t palette[16];
+    Files::Data data;
     GL_TEXTURE_SIZE_ENUM w, h;
 
-    inline ~tex_load_data()
+    inline const uint16_t* palette() const
     {
-        if(data)
-            free(data);
+        if(!data.valid() || data.size() < 32)
+            return nullptr;
+
+        return reinterpret_cast<const uint16_t*>(data.begin());
+    }
+
+    inline const uint8_t* pixels() const
+    {
+        if(!data.valid() || data.size() < 32)
+            return nullptr;
+
+        return data.begin() + 32;
     }
 };
 
 static bool s_loadTextureToRAM(tex_load_data& tex, const std::string& path, int logical_w, int logical_h, int flags)
 {
-    if(tex.data != nullptr)
-        return false;
-
     logical_w >>= (1 + (flags & 15));
     logical_h >>= (1 + (flags & 15));
 
@@ -129,65 +136,15 @@ static bool s_loadTextureToRAM(tex_load_data& tex, const std::string& path, int 
     }
 
 
-    // could be allocating up to 64 KiB (excluded 128 KiB case)
-    uint8_t* pixels = (uint8_t*) malloc(data_size);
-    if(!pixels)
+    // load the file to RAM!
+    tex.data = Files::load_file(path.c_str());
+
+    // this can go wrong if the file doesn't exist or if the allocation fails
+    if(!tex.data.valid() || tex.data.size() != data_size + 32)
     {
-        pLogWarning("Failed to allocate %d bytes", data_size);
+        pLogWarning("Failed to load file %s (%d bytes, got %d)", path.c_str(), data_size + 32, (int)tex.data.size());
         return false;
     }
-
-
-    // open the file after checking the malloc (allocator cheaper than filesystem)
-    FILE* texfile = fopen(path.c_str(), "r");
-    if(!texfile)
-    {
-        pLogWarning("Failed to open file", data_size);
-        free(pixels);
-        return false;
-    }
-
-
-    // load palette
-    uint32_t to_read = 32;
-    uint8_t* target = (uint8_t*)(tex.palette);
-
-    while(to_read)
-    {
-        unsigned int bytes_read = fread(target, 1, to_read, texfile);
-        if(!bytes_read)
-        {
-            pLogWarning("Not enough palette data (needed %d more out of 32)", to_read);
-            free(pixels);
-            fclose(texfile);
-            return false;
-        }
-        to_read -= bytes_read;
-        target += bytes_read;
-    }
-
-
-    // load image data
-    to_read = data_size;
-    target = pixels;
-
-    while(to_read)
-    {
-        unsigned int bytes_read = fread(target, 1, to_read, texfile);
-        if(!bytes_read)
-        {
-            pLogWarning("Not enough texture data (needed %d more out of %d; logical w %d, h %d; texture w %d, h %d)", to_read, data_size, logical_w, logical_h, w_px, h_px);
-            free(pixels);
-            fclose(texfile);
-            return false;
-        }
-        to_read -= bytes_read;
-        target += bytes_read;
-    }
-
-    fclose(texfile);
-
-    tex.data = pixels;
 
     return true;
 }
@@ -228,20 +185,20 @@ static bool s_loadTexture(const std::string& path, int* tex_out, uint16_t* tex_w
         tex_params |= GL_TEXTURE_COLOR0_TRANSPARENT;
 
     glBindTexture(0, name);
-    if(!glTexImage2D(0, 0, GL_RGB16, tex.w, tex.h, 0, tex_params, tex.data))
+    if(!glTexImage2D(0, 0, GL_RGB16, tex.w, tex.h, 0, tex_params, tex.pixels()))
     {
         pLogWarning("Could not load texture (%u bytes) to VRAM (%u/524288 used). Requesting free texture memory.", data_size, s_loadedVRAM);
         minport_freeTextureMemory();
+
+        if(!glTexImage2D(0, 0, GL_RGB16, tex.w, tex.h, 0, tex_params, tex.pixels()))
+        {
+            pLogWarning("Still could not load texture (%u bytes) to VRAM (%u/524288 used).", data_size, s_loadedVRAM);
+            glDeleteTextures(1, &name);
+            return false;
+        }
     }
 
-    if(!glTexImage2D(0, 0, GL_RGB16, tex.w, tex.h, 0, tex_params, tex.data))
-    {
-        pLogWarning("Still could not load texture (%u bytes) to VRAM (%u/524288 used).", data_size, s_loadedVRAM);
-        glDeleteTextures(1, &name);
-        return false;
-    }
-
-    glColorTableEXT(0, 0, 16, 0, 0, tex.palette);
+    glColorTableEXT(0, 0, 16, 0, 0, tex.palette());
 
     *tex_out = name;
     *tex_w = w_px;

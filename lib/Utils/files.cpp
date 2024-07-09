@@ -23,6 +23,7 @@
  */
 
 #include "files.h"
+#include "Logger/logger.h"
 #include <stdio.h>
 #include <locale>
 
@@ -107,6 +108,43 @@ static char *fi_dirname(char *path)
     return path;
 }
 
+Files::Data::Data(Files::Data&& o)
+{
+    *this = std::move(o);
+}
+
+Files::Data::~Data()
+{
+    if(free_me)
+        free(const_cast<unsigned char*>(data));
+}
+
+const Files::Data& Files::Data::operator=(Files::Data&& o)
+{
+    if(free_me)
+        free(const_cast<unsigned char*>(data));
+
+    data = o.data;
+    length = o.length;
+    free_me = o.free_me;
+
+    o.data = nullptr;
+    o.length = -1;
+    o.free_me = false;
+
+    return *this;
+}
+
+void Files::Data::init_from_mem(const unsigned char* data, size_t size)
+{
+    if(free_me)
+        free(const_cast<unsigned char*>(data));
+
+    free_me = false;
+    data = data;
+    length = static_cast<long long int>(size);
+}
+
 FILE *Files::utf8_fopen(const char *filePath, const char *modes)
 {
 #ifndef _WIN32
@@ -122,6 +160,58 @@ FILE *Files::utf8_fopen(const char *filePath, const char *modes)
     wmode[wmode_len] = L'\0';
     return ::_wfopen(wfile, wmode);
 #endif
+}
+
+Files::Data Files::load_file(const char *filePath)
+{
+    Files::Data ret;
+
+    FILE *in = Files::utf8_fopen(filePath, "rb");
+    if(!in)
+        return ret;
+
+    std::fseek(in, 0, SEEK_END);
+    off_t size = std::ftell(in);
+    std::fseek(in, 0, SEEK_SET);
+
+    // allocate extra byte for null terminator, but don't count it towards size of contained item
+    unsigned char* target = (unsigned char*)malloc(size + 1);
+    off_t to_read = size;
+
+    if(!target)
+    {
+        fclose(in);
+        return ret;
+    }
+
+    ret.free_me = true;
+    ret.data = target;
+    ret.length = size;
+
+    while(to_read)
+    {
+        size_t bytes_read = fread(target, 1, to_read, in);
+        if(!bytes_read)
+        {
+            pLogCritical("I/O error when reading [%s]", filePath);
+            fclose(in);
+
+            // resets the return value and frees the malloc'd buffer
+            ret = Files::Data();
+
+            return ret;
+        }
+
+        to_read -= bytes_read;
+        target += bytes_read;
+    }
+
+    // set null terminator
+    *target = 0;
+
+    std::fclose(in);
+
+    return ret;
 }
 
 int Files::skipBom(FILE* file, const char** charset)
@@ -350,28 +440,4 @@ void Files::getGifMask(std::string& mask, const std::string& front)
         mask.push_back('m');
     else
         mask.insert(mask.begin() + dotPos, 'm');
-}
-
-bool Files::dumpFile(const std::string& inPath, std::string& outData)
-{
-    off_t end;
-    bool ret = true;
-    FILE *in = Files::utf8_fopen(inPath.c_str(), "rb");
-    if(!in)
-        return false;
-
-    outData.clear();
-
-    std::fseek(in, 0, SEEK_END);
-    end = std::ftell(in);
-    std::fseek(in, 0, SEEK_SET);
-
-    outData.resize(end);
-
-    if(std::fread((void*)outData.data(), 1, outData.size(), in) != outData.size())
-        ret = false;
-
-    std::fclose(in);
-
-    return ret;
 }

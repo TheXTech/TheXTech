@@ -48,9 +48,9 @@ public:
     ~LunaImage();
 
     LunaImage(const std::string &filename);
-    LunaImage(const LunaImage &o);
+    LunaImage(const LunaImage &o) = delete;
     LunaImage(LunaImage &&o);
-    LunaImage &operator=(const LunaImage &o);
+    LunaImage &operator=(const LunaImage &o) = delete;
     LunaImage &operator=(LunaImage &&o);
 
     void Init();

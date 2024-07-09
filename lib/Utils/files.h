@@ -27,9 +27,64 @@
 
 #include <string>
 
+struct SDL_RWops;
+
 namespace Files
 {
+    // Points to memory representing a loaded file. Does not need to own the memory.
+    struct Data
+    {
+private:
+        const unsigned char* data = nullptr;
+        long long int length = -1;
+        bool free_me = false;
+public:
+        Data() = default;
+        Data(const Data&) = delete;
+        Data(Data&&);
+        ~Data();
+
+        const Data& operator=(const Data&) = delete;
+        const Data& operator=(Data&&);
+
+        void init_from_mem(const unsigned char* data, size_t size);
+
+        inline bool valid() const
+        {
+            return length >= 0;
+        }
+
+        inline const unsigned char* begin() const
+        {
+            return data;
+        }
+
+        inline const unsigned char* end() const
+        {
+            return data + length;
+        }
+
+        inline const char* c_str() const
+        {
+            return reinterpret_cast<const char*>(data);
+        }
+
+        inline size_t size() const
+        {
+            return (length >= 0) ? (size_t)length : 0;
+        }
+
+        inline size_t empty() const
+        {
+            return length <= 0;
+        }
+
+        friend Data load_file(const char *filePath);
+    };
+
     FILE *utf8_fopen(const char *filePath, const char *modes);
+    Data load_file(const char *filePath);
+
     enum Charsets
     {
         CHARSET_UTF8 = 0,
@@ -38,8 +93,8 @@ namespace Files
         CHARSET_UTF32BE,
         CHARSET_UTF32LE
     };
-
     int skipBom(FILE *file, const char **charset = nullptr);
+
     bool fileExists(const std::string &path);
     bool deleteFile(const std::string &path);
     bool copyFile(const std::string &to, const std::string &from, bool override = false);
@@ -52,7 +107,6 @@ namespace Files
     bool hasSuffix(const std::string &path, const std::string &suffix);
     //Appends "m" into basename of the file name before last dot
     void getGifMask(std::string &mask, const std::string &front);
-    bool dumpFile(const std::string &inPath, std::string &outData);
 }
 
 #endif // FILES_H

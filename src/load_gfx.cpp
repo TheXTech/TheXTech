@@ -319,8 +319,8 @@ static void loadCGFX(const std::string &origPath,
         pLogDebug("Loaded custom GFX: %s", loadedPath.c_str());
         isCustom = true;
 
-        backup.texture_backup = static_cast<StdPicture_Sub&>(texture);
-        static_cast<StdPicture_Sub&>(texture) = newTexture;
+        backup.texture_backup = std::move(static_cast<StdPicture_Sub&>(texture));
+        static_cast<StdPicture_Sub&>(texture) = std::move(newTexture);
 
         if(width)
             *width = newTexture.w;
@@ -328,9 +328,9 @@ static void loadCGFX(const std::string &origPath,
             *height = newTexture.h;
 
         if(world)
-            g_defaultWorldGfxBackup.push_back(backup);
+            g_defaultWorldGfxBackup.push_back(std::move(backup));
         else
-            g_defaultLevelGfxBackup.push_back(backup);
+            g_defaultLevelGfxBackup.push_back(std::move(backup));
     }
 }
 
@@ -714,7 +714,7 @@ static void s_UnloadPreviewPlayers()
             *t.remote_isCustom = false;
         SDL_assert_release(t.remote_texture);
         XRender::unloadTexture(*t.remote_texture);
-        *static_cast<StdPicture_Sub*>(t.remote_texture) = t.texture_backup;
+        *static_cast<StdPicture_Sub*>(t.remote_texture) = std::move(t.texture_backup);
     }
 
     g_defaultLevelGfxBackup.resize(s_previewPlayersBegin);
@@ -737,7 +737,7 @@ static void restoreLevelBackupTextures()
             *t.remote_isCustom = false;
         SDL_assert_release(t.remote_texture);
         XRender::unloadTexture(*t.remote_texture);
-        *static_cast<StdPicture_Sub*>(t.remote_texture) = t.texture_backup;
+        *static_cast<StdPicture_Sub*>(t.remote_texture) = std::move(t.texture_backup);
     }
     g_defaultLevelGfxBackup.clear();
     s_previewPlayersBegin = 0;
@@ -758,7 +758,7 @@ static void restoreWorldBackupTextures()
             *t.remote_isCustom = false;
         SDL_assert_release(t.remote_texture);
         XRender::unloadTexture(*t.remote_texture);
-        *static_cast<StdPicture_Sub*>(t.remote_texture) = t.texture_backup;
+        *static_cast<StdPicture_Sub*>(t.remote_texture) = std::move(t.texture_backup);
     }
     g_defaultWorldGfxBackup.clear();
 }
