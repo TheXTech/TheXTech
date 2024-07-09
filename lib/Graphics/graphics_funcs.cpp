@@ -146,9 +146,9 @@ FIBITMAP *GraphicsHelps::loadImage(const std::string &file, bool convertTo32bit)
     return img;
 }
 
-FIBITMAP *GraphicsHelps::loadImage(std::vector<char> &raw, bool convertTo32bit)
+FIBITMAP *GraphicsHelps::loadImage(const Files::Data &raw, bool convertTo32bit)
 {
-    FIMEMORY *imgMEM = FreeImage_OpenMemory(reinterpret_cast<unsigned char *>(raw.data()),
+    FIMEMORY *imgMEM = FreeImage_OpenMemory(const_cast<unsigned char*>(raw.begin()),
                                             static_cast<unsigned int>(raw.size()));
     FREE_IMAGE_FORMAT formato = FreeImage_GetFileTypeFromMemory(imgMEM);
 
@@ -204,7 +204,7 @@ FIBITMAP *GraphicsHelps::loadMask(const std::string &file, bool maskIsPng, bool 
     return mask;
 }
 
-FIBITMAP *GraphicsHelps::loadMask(std::vector<char> &raw, bool maskIsPng, bool convertTo32bit)
+FIBITMAP *GraphicsHelps::loadMask(const Files::Data &raw, bool maskIsPng, bool convertTo32bit)
 {
     FIBITMAP *mask;
 
@@ -338,7 +338,7 @@ void GraphicsHelps::mergeWithMask(FIBITMAP *image,
     FreeImage_Unload(mask);
 }
 
-void GraphicsHelps::mergeWithMask(FIBITMAP *image, std::vector<char> &maskRaw, bool maskIsPng)
+void GraphicsHelps::mergeWithMask(FIBITMAP *image, const Files::Data &maskRaw, bool maskIsPng)
 {
     if(!image)
         return;

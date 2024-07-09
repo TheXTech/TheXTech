@@ -1053,14 +1053,14 @@ void RenderGL::compileShaders(StdPicture &target)
     {
         target.d.shader_program.reset(new GLProgramObject(
             s_es2_advanced_vert_src,
-            target.l.fragmentShaderSource.data()
+            target.l.fragmentShaderSource.c_str()
         ));
     }
     else
     {
         target.d.shader_program.reset(new GLProgramObject(
-            target.l.particleVertexShaderSource.data(),
-            target.l.fragmentShaderSource.empty() ? s_es2_standard_frag_src : target.l.fragmentShaderSource.data(),
+            target.l.particleVertexShaderSource.c_str(),
+            target.l.fragmentShaderSource.empty() ? s_es2_standard_frag_src : target.l.fragmentShaderSource.c_str(),
             true
         ));
 

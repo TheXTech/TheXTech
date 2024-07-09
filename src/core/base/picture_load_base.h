@@ -26,7 +26,7 @@
 #define PICTURE_LOAD_NORMAL
 
 #include <cstdint>
-#include <vector>
+#include <Utils/files.h>
 
 #ifdef THEXTECH_BUILD_GL_MODERN
 #include <string>
@@ -45,18 +45,18 @@ struct StdPictureLoad
     bool lazyLoaded = false;
 
     //! Original compressed data of the front image
-    std::vector<char> raw;
+    Files::Data raw;
     //! Original compressed data of the mask image (if presented)
-    std::vector<char> rawMask;
+    Files::Data rawMask;
     //! Was mask restored from the PNG at default graphics?
     bool isMaskPng = false;
 
 
 #ifdef THEXTECH_BUILD_GL_MODERN
     //! Original vertex shader source (if presented) -- CURRENTLY USED ONLY FOR PARTICLE SYSTEMS
-    std::vector<char> particleVertexShaderSource;
+    Files::Data particleVertexShaderSource;
     //! Original fragment shader source (if presented)
-    std::vector<char> fragmentShaderSource;
+    Files::Data fragmentShaderSource;
 
     //! Shader uniform variables registered, in order of registration
     std::vector<std::string> registeredUniforms;
