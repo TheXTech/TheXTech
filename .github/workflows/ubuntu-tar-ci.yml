@@ -215,18 +215,6 @@ jobs:
 #    - uses: nelonoel/branch-name@v1.0.1
     - uses: Wohlstand/branch-name@v1.0.1-wohl
 
-    - name: Check if a pull request
-      id: event-check
-      shell: bash
-      run: |
-        if [[ "${BRANCH_NAME}" == *"merge"* ]]; then
-          echo "--- This build is a pull-request ---"
-          echo "is_pull_request=true" >> $GITHUB_OUTPUT;
-        else
-          echo "--- This build is a normal branch build ---"
-          echo "is_pull_request=false" >> $GITHUB_OUTPUT;
-        fi
-
     - name: Pull submodules
       shell: bash
       run: |
@@ -306,32 +294,25 @@ jobs:
       # ======================================= Super Mario Bros. X - a fan-game =======================================
       # Was made in 2009 by Andrew Spinks "Redigit", and supported up to 2011 by it's original author.
       run: |
-        if [[ "${BRANCH_NAME}" == *"merge"* ]]; then
-            BRANCH_NAME_RES="pull-request"
-            echo "-- Pull-request detected!"
-        else
-            BRANCH_NAME_RES=${BRANCH_NAME}
-        fi
-
         bash .github/ci-helper/pack-game.sh \
             "${{ runner.os }}" \
             "thextech-adventures-of-demo" \
             "advdemo${{ matrix.config.executable_name_suffix }}" \
-            "thextech-adventures-of-demo-${{ matrix.config.package_filename_suffix }}-${BRANCH_NAME_RES}" \
+            "thextech-adventures-of-demo-${{ matrix.config.package_filename_suffix }}-${BRANCH_NAME}" \
             "aod"
 
         bash .github/ci-helper/pack-game.sh \
             "${{ runner.os }}" \
             "thextech-super-mario-bros-x" \
             "smbx${{ matrix.config.executable_name_suffix }}" \
-            "thextech-super-mario-bros-x-${{ matrix.config.package_filename_suffix }}-${BRANCH_NAME_RES}" \
+            "thextech-super-mario-bros-x-${{ matrix.config.package_filename_suffix }}-${BRANCH_NAME}" \
             "smbx13"
 
         bash .github/ci-helper/pack-game.sh \
             "${{ runner.os }}" \
             "thextech-bin" \
             "thextech${{ matrix.config.executable_name_suffix }}" \
-            "thextech-bin-${{ matrix.config.package_filename_suffix }}-${BRANCH_NAME_RES}" \
+            "thextech-bin-${{ matrix.config.package_filename_suffix }}-${BRANCH_NAME}" \
             "none"
 
     - name: Upload artifact
@@ -350,7 +331,7 @@ jobs:
         name: ${{ matrix.config.name }} ${{ matrix.config.build_type }}
 
     - name: Deploy to builds.wohlsoft.ru
-      if: success() && github.event_name != 'pull_request' && steps.event-check.outputs.is_pull_request == 'false' && steps.upload-check.outputs.available == 'true'
+      if: success() && github.event_name != 'pull_request' && steps.upload-check.outputs.available == 'true'
       continue-on-error: true
       shell: bash
       run: |

@@ -275,18 +275,6 @@ jobs:
 #    - uses: nelonoel/branch-name@v1.0.1
     - uses: Wohlstand/branch-name@v1.0.1-wohl
 
-    - name: Check if a pull request
-      id: event-check
-      shell: bash
-      run: |
-        if [[ "${BRANCH_NAME}" == *"merge"* ]]; then
-          echo "--- This build is a pull-request ---"
-          echo "is_pull_request=true" >> $GITHUB_OUTPUT;
-        else
-          echo "--- This build is a normal branch build ---"
-          echo "is_pull_request=false" >> $GITHUB_OUTPUT;
-        fi
-
     - name: Pull submodules
       shell: bash
       run: |
@@ -363,14 +351,7 @@ jobs:
           export PATH=${{ matrix.config.extra_path }}:${PATH}
         fi
         cd build
-        cpack  .
-        if [[ "${BRANCH_NAME}" == *"merge"* ]]; then
-            BRANCH_NAME_RES="pull-request"
-            echo "-- Pull-request detected!"
-        else
-            BRANCH_NAME_RES=${BRANCH_NAME}
-        fi
-        mv *.deb thextech-super-mario-bros-x-${{ matrix.config.package_filename_suffix }}-${BRANCH_NAME_RES}.deb
+        cpack  .        mv *.deb thextech-super-mario-bros-x-${{ matrix.config.package_filename_suffix }}-${BRANCH_NAME}.deb
         cd ..
 
     - name: Upload artifact
@@ -382,7 +363,7 @@ jobs:
         name: TheXTech ${{ matrix.config.name }} ${{ matrix.config.build_type }}
 
     - name: Deploy to builds.wohlsoft.ru
-      if: success() && github.event_name != 'pull_request' && steps.event-check.outputs.is_pull_request == 'false' && steps.upload-check.outputs.available == 'true'
+      if: success() && github.event_name != 'pull_request' && steps.upload-check.outputs.available == 'true'
       continue-on-error: true
       shell: bash
       run: |

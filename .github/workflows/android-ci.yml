@@ -29,18 +29,6 @@ jobs:
 #      - uses: nelonoel/branch-name@v1.0.1
       - uses: Wohlstand/branch-name@v1.0.1-wohl
 
-      - name: Check if a pull request
-        id: event-check
-        shell: bash
-        run: |
-          if [[ "${BRANCH_NAME}" == *"merge"* ]]; then
-            echo "--- This build is a pull-request ---"
-            echo "is_pull_request=true" >> $GITHUB_OUTPUT;
-          else
-            echo "--- This build is a normal branch build ---"
-            echo "is_pull_request=false" >> $GITHUB_OUTPUT;
-          fi
-
       - name: Pull submodules
         shell: bash
         run: |
@@ -131,33 +119,19 @@ jobs:
         if: ${{ steps.signing-check.outputs.available == 'true' }}
         shell: bash
         run: |
-          if [[ "${BRANCH_NAME}" == *"merge"* ]]; then
-              BRANCH_NAME_RES="pull-request"
-              echo "-- Pull-request detected!"
-          else
-              BRANCH_NAME_RES=${BRANCH_NAME}
-          fi
-
-          mv thextech/build/outputs/apk/apk/releaseci/thextech-apk-releaseci.apk thextech-android-${BRANCH_NAME_RES}.apk
+          mv thextech/build/outputs/apk/apk/releaseci/thextech-apk-releaseci.apk thextech-android-${BRANCH_NAME}.apk
 
       - name: Rename APK (unsigned)
         if: ${{ steps.signing-check.outputs.available != 'true' }}
         shell: bash
         run: |
-          if [[ "${BRANCH_NAME}" == *"merge"* ]]; then
-              BRANCH_NAME_RES="pull-request"
-              echo "-- Pull-request detected!"
-          else
-              BRANCH_NAME_RES=${BRANCH_NAME}
-          fi
-
-          mv thextech/build/outputs/apk/apk/release/thextech-apk-release-unsigned.apk thextech-android-${BRANCH_NAME_RES}-unsigned.apk
+          mv thextech/build/outputs/apk/apk/release/thextech-apk-release-unsigned.apk thextech-android-${BRANCH_NAME}-unsigned.apk
 
       - name: Upload APK
         if: success() && ${{ steps.signing-check.outputs.available == 'true' }}
         uses: actions/upload-artifact@v3
         with:
-          name: thextech-android-${BRANCH_NAME_RES}
+          name: thextech-android-${BRANCH_NAME}
           path: android-project/thextech-android-*.apk
 
       - name: Upload APK (unsigned)
@@ -165,26 +139,19 @@ jobs:
         uses: actions/upload-artifact@v3
         continue-on-error: true
         with:
-          name: thextech-android-${BRANCH_NAME_RES}-unsigned
+          name: thextech-android-${BRANCH_NAME}-unsigned
           path: android-project/thextech-android-*.apk
 
       - name: Deploy to builds.wohlsoft.ru
-        if: success() && github.event_name != 'pull_request' && steps.event-check.outputs.is_pull_request == 'false' && steps.upload-check.outputs.available == 'true'
+        if: success() && github.event_name != 'pull_request' && steps.upload-check.outputs.available == 'true'
         continue-on-error: true
         shell: bash
         run: |
-          if [[ "${BRANCH_NAME}" == *"merge"* ]]; then
-              BRANCH_NAME_RES="pull-request"
-              echo "-- Pull-request detected!"
-          else
-              BRANCH_NAME_RES=${BRANCH_NAME}
-          fi
-
           UPLOAD_LIST="set ssl:verify-certificate no;"
           if [[ "${{ steps.signing-check.outputs.available }}" == 'true' ]]; then
-              UPLOAD_LIST="${UPLOAD_LIST} put -O "www/android/" ./thextech-android-${BRANCH_NAME_RES}.apk;"
+              UPLOAD_LIST="${UPLOAD_LIST} put -O "www/android/" ./thextech-android-${BRANCH_NAME}.apk;"
           else
-              UPLOAD_LIST="${UPLOAD_LIST} put -O "www/android/" ./thextech-android-${BRANCH_NAME_RES}-unsigned.apk;"
+              UPLOAD_LIST="${UPLOAD_LIST} put -O "www/android/" ./thextech-android-${BRANCH_NAME}-unsigned.apk;"
           fi
           lftp -e "${UPLOAD_LIST} exit" -u ${{ secrets.builds_login }},${{ secrets.builds_password }} ${{ secrets.builds_host }}
 

@@ -68,18 +68,6 @@ jobs:
 #    - uses: nelonoel/branch-name@v1.0.1
     - uses: Wohlstand/branch-name@v1.0.1-wohl
 
-    - name: Check if a pull request
-      id: event-check
-      shell: bash
-      run: |
-        if [[ "${BRANCH_NAME}" == *"merge"* ]]; then
-          echo "--- This build is a pull-request ---"
-          echo "is_pull_request=true" >> $GITHUB_OUTPUT;
-        else
-          echo "--- This build is a normal branch build ---"
-          echo "is_pull_request=false" >> $GITHUB_OUTPUT;
-        fi
-
     - name: Pull submodules
       shell: bash
       run: |
@@ -205,30 +193,23 @@ jobs:
       if: success()
       shell: bash
       run: |
-        if [[ "${BRANCH_NAME}" == *"merge"* ]]; then
-            BRANCH_NAME_RES="pull-request"
-            echo "-- Pull-request detected!"
-        else
-            BRANCH_NAME_RES=${BRANCH_NAME}
-        fi
-
         bash .github/ci-helper/pack-game-macos.sh \
             aod \
             "assets/graphics/ui/icon/advdemo.icns" \
             "Adventures of Demo" \
-            "thextech-adventures-of-demo-macos-uni-${BRANCH_NAME_RES}.dmg"
+            "thextech-adventures-of-demo-macos-uni-${BRANCH_NAME}.dmg"
 
         bash .github/ci-helper/pack-game-macos.sh \
             smbx13 \
             "assets/graphics/ui/icon/smbx.icns" \
             "Super Mario Bros. X" \
-            "thextech-super-mario-bros-x-macos-uni-${BRANCH_NAME_RES}.dmg"
+            "thextech-super-mario-bros-x-macos-uni-${BRANCH_NAME}.dmg"
 
         bash .github/ci-helper/pack-game-macos.sh \
             none \
             "thextech.icns" \
             "TheXTech" \
-            "thextech-macos-uni-${BRANCH_NAME_RES}.zip"
+            "thextech-macos-uni-${BRANCH_NAME}.zip"
 
     - name: Upload DMG artifact
       if: success()
@@ -247,7 +228,7 @@ jobs:
         name: ${{ matrix.config.name }} ${{ matrix.config.build_type }} ZIP
 
     - name: Deploy to builds.wohlsoft.ru
-      if: success() && github.event_name != 'pull_request' && steps.event-check.outputs.is_pull_request == 'false' && steps.upload-check.outputs.available == 'true'
+      if: success() && github.event_name != 'pull_request' && steps.upload-check.outputs.available == 'true'
       continue-on-error: true
       shell: bash
       run: |
