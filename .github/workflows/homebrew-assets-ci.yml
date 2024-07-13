@@ -105,10 +105,8 @@ jobs:
     - uses: actions/checkout@v3
 
     - name: Download assets
-      uses: carlosperate/download-file-action@v2
-      with:
-        file-url: "${{ matrix.source.assets_url }}"
-        file-name: assets-source.7z
+      shell: bash
+      run: wget -d -nv -t 5 -O assets-source.7z "${{ matrix.config.assets_url }}"
 
     - name: Unpack assets
       shell: bash
