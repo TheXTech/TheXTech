@@ -3,6 +3,10 @@ name: Flatpak CI
 on:
   workflow_dispatch:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
     name: Flatpak for ${{ matrix.arch.name }}
@@ -42,12 +46,6 @@ jobs:
         else
           echo "available=false" >> $GITHUB_OUTPUT;
         fi
-
-    - uses: styfle/cancel-workflow-action@0.11.0
-      with:
-        workflow_id: flatpak.yml
-        all_but_latest: true
-        access_token: ${{ github.token }}
 
     - name: Install Ubuntu Dependencies
       shell: bash

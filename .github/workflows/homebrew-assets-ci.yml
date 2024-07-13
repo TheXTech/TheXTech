@@ -16,6 +16,10 @@ on:
       - utils/convertkit/assets-convert-homebrew.py
   workflow_dispatch:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
     name: ${{ matrix.source.name }} for ${{ matrix.target.name }}
@@ -73,12 +77,6 @@ jobs:
       run: |
         echo "filename=assets-${{ matrix.source.id }}-${{ matrix.target.id }}.zip" >> $GITHUB_OUTPUT;
         echo "The target will be named: [assets-${{ matrix.source.id }}-${{ matrix.target.id }}.${{ matrix.target.package_ext }}]"
-
-    - uses: styfle/cancel-workflow-action@0.11.0
-      with:
-        workflow_id: homebrew-assets-ci.yml
-        all_but_latest: true
-        access_token: ${{ github.token }}
 
     - name: Install Debian Dependencies
       shell: bash
