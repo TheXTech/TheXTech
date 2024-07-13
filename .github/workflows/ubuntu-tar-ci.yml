@@ -210,7 +210,7 @@ jobs:
         fi
         cmake --version
 
-    - uses: actions/checkout@v3
+    - uses: TheXTech/checkout@v0.1
 
     - uses: TheXTech/branch-name@v0.1
 

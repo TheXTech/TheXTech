@@ -63,7 +63,7 @@ jobs:
         printf "\n"
         wget -d ipinfo.io/ip -O/dev/null 2>&1 |grep ^User-Agent
 
-    - uses: actions/checkout@v3
+    - uses: TheXTech/checkout@v0.1
 
     - uses: TheXTech/branch-name@v0.1
 
