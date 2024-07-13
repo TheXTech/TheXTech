@@ -67,7 +67,7 @@ jobs:
     - uses: TheXTech/branch-name@v0.1
 
 
-    - uses: actions/checkout@v3
+    - uses: TheXTech/checkout@v0.1
 
     - name: Pull submodules
       shell: bash

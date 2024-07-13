@@ -269,7 +269,7 @@ jobs:
         fi
         cmake --version
 
-    - uses: actions/checkout@v3
+    - uses: TheXTech/checkout@v0.1
 
     - uses: TheXTech/branch-name@v0.1
 
@@ -281,16 +281,12 @@ jobs:
         git submodule update
 
     - name: Download SMBX assets
-      uses: carlosperate/download-file-action@v2
-      with:
-        file-url: "https://wohlsoft.ru/projects/TheXTech/_downloads/thextech-smbx13-assets-full.7z"
-        file-name: smbx13.7z
+      shell: bash
+      run: wget -d -nv -t 5 -O smbx13.7z "https://wohlsoft.ru/projects/TheXTech/_downloads/thextech-smbx13-assets-full.7z"
 
-#    - name: Download AoD assets
-#      uses: carlosperate/download-file-action@v2
-#      with:
-#        file-url: "https://wohlsoft.ru/projects/TheXTech/_downloads/thextech-adventure-of-demo-assets-full.7z"
-#        file-name: aod.7z
+    # - name: Download AoD assets
+    #   shell: bash
+    #   run: wget -d -nv -t 5 -O aod.7z "https://wohlsoft.ru/projects/TheXTech/_downloads/thextech-adventure-of-demo-assets-full.7z"
 
     - name: Unpack all assets
       shell: bash

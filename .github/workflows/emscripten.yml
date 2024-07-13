@@ -99,7 +99,7 @@ jobs:
         fi
         cmake --version
 
-    - uses: actions/checkout@v3
+    - uses: TheXTech/checkout@v0.1
 
     - uses: TheXTech/branch-name@v0.1
 
@@ -120,10 +120,8 @@ jobs:
         ./emsdk activate latest
 
     - name: Download assets
-      uses: carlosperate/download-file-action@v2
-      with:
-        file-url: "${{ matrix.config.assets_url }}"
-        file-name: assets.7z
+      shell: bash
+      run: wget -d -nv -t 5 -O assets.7z "${{ matrix.config.assets_url }}"
 
     - name: Unpack assets
       shell: bash
