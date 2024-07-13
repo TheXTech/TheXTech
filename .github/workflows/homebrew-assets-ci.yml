@@ -89,8 +89,7 @@ jobs:
                        zip                    \
                        lftp
 
-#    - uses: nelonoel/branch-name@v1.0.1
-    - uses: Wohlstand/branch-name@v1.0.1-wohl
+    - uses: TheXTech/branch-name@v0.1
 
     - name: Build and install spc2it Dependency
       shell: bash
