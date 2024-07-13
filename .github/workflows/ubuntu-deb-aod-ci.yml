@@ -11,6 +11,10 @@ on:
     branches:
       - main
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
     name: "${{ matrix.config.name }} | ${{ matrix.config.build_type }}"
@@ -256,12 +260,6 @@ jobs:
         else
           echo "available=false" >> $GITHUB_OUTPUT;
         fi
-
-    - uses: styfle/cancel-workflow-action@0.11.0
-      with:
-        workflow_id: ubuntu-deb-aod-ci.yml
-        all_but_latest: true
-        access_token: ${{ github.token }}
 
     - name: Install Dependencies
       shell: bash
