@@ -64,8 +64,8 @@ jobs:
         flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
         flatpak install -y flathub org.freedesktop.Platform/${{ matrix.arch.id }}/${{ matrix.arch.sdk_ver }} org.freedesktop.Sdk/${{ matrix.arch.id }}/${{ matrix.arch.sdk_ver }}
 
-#    - uses: nelonoel/branch-name@v1.0.1
-    - uses: Wohlstand/branch-name@v1.0.2-pr-test
+    - uses: TheXTech/branch-name@v0.1
+
 
     - uses: actions/checkout@v3
 
