@@ -102,7 +102,7 @@ jobs:
         ninja
         cp spc2it /usr/bin/spc2it
 
-    - uses: actions/checkout@v3
+    - uses: TheXTech/checkout@v0.1
 
     - name: Download assets
       shell: bash
