@@ -346,6 +346,7 @@ endif()
 
 option(PGEFL_QT_SUPPORT "Build PGE-FL with Qt support [Unneeded]" OFF)
 set(Moondust_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}) # Don't install PGE-FL libraries
+set(PGEFL_ENABLE_RWOPS ON)
 add_subdirectory(3rdparty/PGE_File_Formats)
 mark_as_advanced(WITH_UNIT_TESTS PGEFL_QT_SUPPORT)
 
@@ -438,6 +439,13 @@ set(A2XT_DEPS)
 
 add_library(A2XT_Int INTERFACE)
 
+if(THEXTECH_NO_SDL_BUILD)
+    add_subdirectory(lib/sdl_proxy_rwops)
+    get_target_property(SDL_PROXY_RWOPS_INCS sdl_proxy_rwops INTERFACE_INCLUDE_DIRECTORIES)
+    target_include_directories(pgefl PRIVATE ${SDL_PROXY_RWOPS_INCS})
+    target_link_libraries(A2XT_Int INTERFACE sdl_proxy_rwops)
+endif()
+
 if(THEXTECH_ENABLE_TTF_SUPPORT)
     list(APPEND A2XT_DEPS FREETYPE_Local)
     list(APPEND A2XT_LIBS PGE_FreeType)
@@ -469,6 +477,7 @@ if(USE_SYSTEM_LIBS)
 
     list(APPEND A2XT_LIBS ${FREEIMAGELITE_LIB} ${MIXERX_LIB} "${SDL2_LIBRARIES}")
     list(APPEND A2XT_INCS ${SDL2_INCLUDE_DIRS} ${MIXERX_HEAD_DIR} ${FREEIMAGELITE_HEAD_DIR})
+    target_include_directories(pgefl PRIVATE ${SDL2_INCLUDE_DIRS})
 elseif(NOT THEXTECH_NO_SDL_BUILD)
     include(cmake/library_FreeImage.cmake)
     list(APPEND A2XT_DEPS FreeImage_Local)
@@ -476,6 +485,7 @@ elseif(NOT THEXTECH_NO_SDL_BUILD)
 
     include(cmake/library_SDLMixerX.cmake)
     list(APPEND A2XT_INCS "${DEPENDENCIES_INSTALL_DIR}/include" ${SDL2_INCLUDE_DIRS})
+    target_include_directories(pgefl PRIVATE ${SDL2_INCLUDE_DIRS})
 
     if(NOT USE_SYSTEM_ZLIB) # Depend on ZLib at AudioCodecs
         if(TARGET FREETYPE_Local)
