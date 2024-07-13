@@ -67,18 +67,6 @@ jobs:
 #    - uses: nelonoel/branch-name@v1.0.1
     - uses: Wohlstand/branch-name@v1.0.2-pr-test
 
-    - name: Check if a pull request
-      id: event-check
-      shell: bash
-      run: |
-        if [[ "${BRANCH_NAME}" == *"merge"* ]]; then
-          echo "--- This build is a pull-request ---"
-          echo "is_pull_request=true" >> $GITHUB_OUTPUT;
-        else
-          echo "--- This build is a normal branch build ---"
-          echo "is_pull_request=false" >> $GITHUB_OUTPUT;
-        fi
-
     - uses: actions/checkout@v3
 
     - name: Pull submodules
@@ -92,16 +80,9 @@ jobs:
       id: make-yml
       shell: bash
       run: |
-        if [[ "${BRANCH_NAME}" == *"merge"* ]]; then
-            BRANCH_NAME_RES="pull-request"
-            echo "-- Pull-request detected!"
-        else
-            BRANCH_NAME_RES=${BRANCH_NAME}
-        fi
-
         export REPO_PATH="$(pwd)"
         export REPO_PATH_SED="$(pwd | sed 's_/_\\/_g')"
-        export BRANCH_NAME_SED="$(echo $BRANCH_NAME_RES | sed 's_/_\\/_g')"
+        export BRANCH_NAME_SED="$(echo $BRANCH_NAME | sed 's_/_\\/_g')"
         cd ..
         cat $REPO_PATH/resources/flatpak/build.yml \
           | sed "s/- type: git/- type: dir/" \
@@ -131,21 +112,14 @@ jobs:
         name: TheXTech (${{ matrix.arch.name }})
 
     - name: Deploy to builds.wohlsoft.ru
-      if: success() && github.event_name != 'pull_request' && steps.event-check.outputs.is_pull_request == 'false' && steps.upload-check.outputs.available == 'true'
+      if: success() && github.event_name != 'pull_request' && steps.upload-check.outputs.available == 'true'
       continue-on-error: true
       shell: bash
       run: |
-        if [[ "${BRANCH_NAME}" == *"merge"* ]]; then
-            BRANCH_NAME_RES="pull-request"
-            echo "-- Pull-request detected!"
-        else
-            BRANCH_NAME_RES=${BRANCH_NAME}
-        fi
-
         cd package
-        mv "thextech-${{ matrix.arch.name }}.flatpak" "thextech-${BRANCH_NAME_RES}-${{ matrix.arch.name }}.flatpak"
+        mv "thextech-${{ matrix.arch.name }}.flatpak" "thextech-${BRANCH_NAME}-${{ matrix.arch.name }}.flatpak"
 
         UPLOAD_LIST="set ssl:verify-certificate no;"
-        UPLOAD_LIST="${UPLOAD_LIST} put -O www/flatpak thextech-${BRANCH_NAME_RES}-${{ matrix.arch.name }}.flatpak;"
+        UPLOAD_LIST="${UPLOAD_LIST} put -O www/flatpak thextech-${BRANCH_NAME}-${{ matrix.arch.name }}.flatpak;"
 
         lftp -e "${UPLOAD_LIST} exit" -u ${{ secrets.builds_login }},${{ secrets.builds_password }} ${{ secrets.builds_host }}
