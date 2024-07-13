@@ -541,9 +541,9 @@ struct Player_t
 //    GrabSpeed As Single
     float GrabSpeed = 0.0f;
 //    VineNPC As Double 'the NPC that the player is climbing
-    double VineNPC = 0.0;
+    int VineNPC = 0;
 //  EXTRA:  Fence BGO
-    double VineBGO = 0.0;
+    int VineBGO = 0;
 //    Wet As Integer 'weather or not the player is under water
     int Wet = 0;
 //    WetFrame As Boolean 'true if the play should be swimming
@@ -559,7 +559,8 @@ struct Player_t
 //    Vine As Integer 'greater then 0 if the player is climbing
     int Vine = 0;
 //    NoShellKick As Integer 'dont kick a shell
-    int NoShellKick = 0;
+    // never set in SMBX 1.3, was originally used to improve shell-surf
+    // int NoShellKick = 0;
 //    ShellSurf As Boolean 'true if surfing a shell
     bool ShellSurf = false;
 //    StateNPC As Integer
@@ -715,7 +716,8 @@ struct Player_t
     PinchedInfo_t Pinched = PinchedInfo_t();
 
 //    m2Speed As Single
-    float m2Speed = 0.0f;
+    // unused since SMBX 1.3
+    // float m2Speed = 0.0f;
 //    HoldingNPC As Integer 'What NPC is being held
     int HoldingNPC = 0;
 //    CanGrabNPCs As Boolean 'If the player can grab NPCs
@@ -759,7 +761,8 @@ struct Player_t
 //    mountBump As Single 'Player hit something while in a mount
     float mountBump = 0.0f;
 //    SpeedFixY As Single
-    float SpeedFixY = 0.0f;
+    // unused since SMBX 1.3
+    // float SpeedFixY = 0.0f;
 //End Type
 
     Player_t() : GroundPound(false), GroundPound2(false), CanPound(false), AltRunRelease(false), DuckRelease(false) {}
@@ -777,7 +780,7 @@ struct Background_t
 //    EXTRA: sort priority for BGO (NOT a draw plane itself, a BGO-only format used for sorting and determining draw plane)
     uint8_t SortPriority = 0;
 //    Location As Location
-    Location_t Location;
+    SpeedlessLocation_t Location;
 
     //! SortPriority at which PLANE_LVL_BGO_NORM, PLANE_LVL_3D_MAIN, PLANE_LVL_BGO_FG, and PLANE_LVL_BGO_TOP start
     static constexpr uint8_t PRI_NORM_START = 0x30;

@@ -648,8 +648,11 @@ void PlayerMovementY(int A)
 
 
 
+#if 0
+    // never set since SMBX 1.3, see dead code below
     if(Player[A].NoShellKick > 0) // countdown for the next time the player kicks a turtle shell
         Player[A].NoShellKick--;
+#endif
 
     if(Player[A].ShellSurf)
     {

@@ -599,7 +599,7 @@ void UpdateEditor()
                     EditorCursor.Location.Y = Background[A].Location.Y;
                     SetCursor();
 
-                    Location_t loc = Background[A].Location;
+                    Location_t loc = static_cast<Location_t>(Background[A].Location);
                     int type = Background[A].Type;
 
                     Background[A] = Background[numBackground];
@@ -842,13 +842,13 @@ void UpdateEditor()
                 {
                     int A = EditorCursor.InteractIndex;
 
-                    Location_t loc = Background[A].Location;
+                    Location_t loc = static_cast<Location_t>(Background[A].Location);
                     int type = Background[A].Type;
 
                     auto &b = Background[A];
                     b.Location.X += b.Location.Width / 2.0 - EffectWidth[10] / 2;
                     b.Location.Y += b.Location.Height / 2.0 - EffectHeight[10] / 2;
-                    NewEffect(EFFID_SMOKE_S3, b.Location);
+                    NewEffect(EFFID_SMOKE_S3, static_cast<Location_t>(b.Location));
                     PlaySound(SFX_Smash);
 
                     Background[A] = Background[numBackground];
@@ -2209,7 +2209,8 @@ void SetCursor()
             EditorCursor.Background.Type = 1;
 
         EditorCursor.Background.Layer = EditorCursor.Layer;
-        EditorCursor.Background.Location = EditorCursor.Location;
+        EditorCursor.Background.Location.X = EditorCursor.Location.X;
+        EditorCursor.Background.Location.Y = EditorCursor.Location.Y;
         EditorCursor.Background.Location.Width = BackgroundWidth[EditorCursor.Background.Type];
         EditorCursor.Background.Location.Height = BackgroundHeight[EditorCursor.Background.Type];
         EditorCursor.Location.Width = EditorCursor.Background.Location.Width;

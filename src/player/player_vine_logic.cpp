@@ -26,6 +26,7 @@
 #include "sound.h"
 #include "config.h"
 #include "npc_traits.h"
+#include "layers.h"
 
 #include "main/trees.h"
 
@@ -44,7 +45,7 @@ void PlayerVineLogic(int A)
         {
             // if(CheckCollision(Player[A].Location, Background[B].Location))
             //{
-            Location_t tempLocation = Background[B].Location;
+            SpeedlessLocation_t tempLocation = Background[B].Location;
             tempLocation.Height -= 16;
             tempLocation.Width -= 20;
             tempLocation.X += 10;
@@ -180,12 +181,14 @@ void PlayerVineMovement(int A)
 
     if(g_config.fix_climb_bgo_speed_adding && Player[A].VineBGO > 0)
     {
-        Player[A].Location.SpeedX += Background[Player[A].VineBGO].Location.SpeedX;
-        Player[A].Location.SpeedY += Background[Player[A].VineBGO].Location.SpeedY;
+        const Layer_t& layer = Layer[Background[Player[A].VineBGO].Layer];
+
+        Player[A].Location.SpeedX += layer.ApplySpeedX;
+        Player[A].Location.SpeedY += layer.ApplySpeedY;
     }
     else
     {
-        Player[A].Location.SpeedX += NPC[(int)Player[A].VineNPC].Location.SpeedX;
-        Player[A].Location.SpeedY += NPC[(int)Player[A].VineNPC].Location.SpeedY;
+        Player[A].Location.SpeedX += NPC[Player[A].VineNPC].Location.SpeedX;
+        Player[A].Location.SpeedY += NPC[Player[A].VineNPC].Location.SpeedY;
     }
 }

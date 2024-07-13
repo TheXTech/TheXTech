@@ -11,6 +11,10 @@ on:
     branches:
       - main
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
     name: "${{ matrix.config.name }} | ${{ matrix.config.build_type }}"
@@ -61,12 +65,6 @@ jobs:
           echo "available=false" >> $GITHUB_OUTPUT;
         fi
 
-    - uses: styfle/cancel-workflow-action@0.11.0
-      with:
-        workflow_id: vita-ci.yml
-        all_but_latest: true
-        access_token: ${{ github.token }}
-
     - name: Install Dependencies
       shell: bash
       run: |
@@ -79,18 +77,6 @@ jobs:
 
 #    - uses: nelonoel/branch-name@v1.0.1
     - uses: Wohlstand/branch-name@v1.0.2-pr-test
-
-    - name: Check if a pull request
-      id: event-check
-      shell: bash
-      run: |
-        if [[ "${BRANCH_NAME}" == *"merge"* ]]; then
-          echo "--- This build is a pull-request ---"
-          echo "is_pull_request=true" >> $GITHUB_OUTPUT;
-        else
-          echo "--- This build is a normal branch build ---"
-          echo "is_pull_request=false" >> $GITHUB_OUTPUT;
-        fi
 
     - name: Pull submodules
       shell: bash
@@ -162,13 +148,6 @@ jobs:
       if: success()
       shell: bash
       run: |
-        if [[ "${BRANCH_NAME}" == *"merge"* ]]; then
-            BRANCH_NAME_RES="pull-request"
-            echo "-- Pull-request detected!"
-        else
-            BRANCH_NAME_RES=${BRANCH_NAME}
-        fi
-
         cd build
         mkdir package
         mkdir "package/${{ matrix.config.subdir_name }}"
@@ -179,7 +158,7 @@ jobs:
         cat ../docs/README_VITA.ESP.md ../README.ESP.md >> "package/${{ matrix.config.subdir_name }}/README.ESP.md"
         cp thextech.vpk "package/${{ matrix.config.subdir_name }}/"
         cd package
-        zip -9 -r "thextech-vita-${BRANCH_NAME_RES}.zip" "${{ matrix.config.subdir_name }}"
+        zip -9 -r "thextech-vita-${BRANCH_NAME}.zip" "${{ matrix.config.subdir_name }}"
         rm -Rf "${{ matrix.config.subdir_name }}"
         cd ../..
 
@@ -192,7 +171,7 @@ jobs:
         name: ${{ matrix.config.name }} ${{ matrix.config.build_type }}
 
     - name: Deploy to builds.wohlsoft.ru
-      if: success() && github.event_name != 'pull_request' && steps.event-check.outputs.is_pull_request == 'false' && steps.upload-check.outputs.available == 'true'
+      if: success() && github.event_name != 'pull_request' && steps.upload-check.outputs.available == 'true'
       continue-on-error: true
       shell: bash
       run: |

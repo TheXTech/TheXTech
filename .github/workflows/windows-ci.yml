@@ -10,6 +10,10 @@ on:
     branches:
       - main
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
     name: "${{ matrix.config.name }} | ${{ matrix.config.build_type }}"
@@ -82,12 +86,6 @@ jobs:
           echo "available=false" >> $GITHUB_OUTPUT;
         fi
 
-    - uses: styfle/cancel-workflow-action@0.11.0
-      with:
-        workflow_id: windows-ci.yml
-        all_but_latest: true
-        access_token: ${{ github.token }}
-
     - name: Install Dependencies
       shell: bash
       run: |
@@ -98,20 +96,8 @@ jobs:
 
     - uses: actions/checkout@v3
 
-#    - uses: nelonoel/branch-name@v1.0.1
-    - uses: Wohlstand/branch-name@v1.0.2-pr-test
+    - uses: TheXTech/branch-name@v0.1
 
-    - name: Check if a pull request
-      id: event-check
-      shell: bash
-      run: |
-        if [[ "${BRANCH_NAME}" == *"merge"* ]]; then
-          echo "--- This build is a pull-request ---"
-          echo "is_pull_request=true" >> $GITHUB_OUTPUT;
-        else
-          echo "--- This build is a normal branch build ---"
-          echo "is_pull_request=false" >> $GITHUB_OUTPUT;
-        fi
 
     - name: Pull submodules
       shell: bash
@@ -231,32 +217,25 @@ jobs:
       # ======================================= Super Mario Bros. X - a fan-game =======================================
       # Was made in 2009 by Andrew Spinks "Redigit", and supported up to 2011 by it's original author.
       run: |
-        if [[ "${BRANCH_NAME}" == *"merge"* ]]; then
-            BRANCH_NAME_RES="pull-request"
-            echo "-- Pull-request detected!"
-        else
-            BRANCH_NAME_RES=${BRANCH_NAME}
-        fi
-
         bash .github/ci-helper/pack-game.sh \
             "${{ runner.os }}" \
             "thextech-adventures-of-demo" \
             "advdemo${{ matrix.config.executable_name_suffix }}" \
-            "thextech-adventures-of-demo-${{ matrix.config.package_filename_suffix }}-${BRANCH_NAME_RES}" \
+            "thextech-adventures-of-demo-${{ matrix.config.package_filename_suffix }}-${BRANCH_NAME}" \
             "aod"
 
         bash .github/ci-helper/pack-game.sh \
             "${{ runner.os }}" \
             "thextech-super-mario-bros-x" \
             "smbx${{ matrix.config.executable_name_suffix }}" \
-            "thextech-super-mario-bros-x-${{ matrix.config.package_filename_suffix }}-${BRANCH_NAME_RES}" \
+            "thextech-super-mario-bros-x-${{ matrix.config.package_filename_suffix }}-${BRANCH_NAME}" \
             "smbx13"
 
         bash .github/ci-helper/pack-game.sh \
             "${{ runner.os }}" \
             "thextech-bin" \
             "thextech${{ matrix.config.executable_name_suffix }}" \
-            "thextech-bin-${{ matrix.config.package_filename_suffix }}-${BRANCH_NAME_RES}" \
+            "thextech-bin-${{ matrix.config.package_filename_suffix }}-${BRANCH_NAME}" \
             "none"
 
     - name: Upload artifact
@@ -276,7 +255,7 @@ jobs:
         name: ${{ matrix.config.name }} ${{ matrix.config.build_type }}
 
     - name: Deploy to builds.wohlsoft.ru
-      if: success() && github.event_name != 'pull_request' && steps.event-check.outputs.is_pull_request == 'false' && steps.upload-check.outputs.available == 'true'
+      if: success() && github.event_name != 'pull_request' && steps.upload-check.outputs.available == 'true'
       continue-on-error: true
       shell: bash
       run: |

@@ -17,6 +17,9 @@
  * or see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef GRAPHICS_FUNCS_H
+#define GRAPHICS_FUNCS_H
+
 #ifndef SDL_SDL_STDINC_H
 #   include "sdl_proxy/sdl_stdinc.h"
 #endif
@@ -25,9 +28,7 @@
 #include <vector>
 
 #include "size.h"
-
-#ifndef GRAPHICS_FUNCS_H
-#define GRAPHICS_FUNCS_H
+#include "Utils/files.h"
 
 struct PGE_Pix
 {
@@ -63,7 +64,7 @@ public:
      * \return FreeImage descriptor to loaded image
      */
     static FIBITMAP *loadImage(const std::string &file, bool convertTo32bit = true);
-    static FIBITMAP *loadImage(std::vector<char> &raw, bool convertTo32bit = true);
+    static FIBITMAP *loadImage(const Files::Data &raw, bool convertTo32bit = true);
 
     /*!
      * \brief Loads mask image from a disk
@@ -73,7 +74,7 @@ public:
      * \return FreeImage descriptor to loaded mask
      */
     static FIBITMAP *loadMask(const std::string &file, bool maskIsPng, bool convertTo32bit = true);
-    static FIBITMAP *loadMask(std::vector<char> &raw, bool maskIsPng, bool convertTo32bit = true);
+    static FIBITMAP *loadMask(const Files::Data &raw, bool maskIsPng, bool convertTo32bit = true);
 
     /*!
      * \brief Loads image from application resources
@@ -115,7 +116,7 @@ public:
     static void mergeWithMask(FIBITMAP *image,
                               const std::string &pathToMask,
                               const std::string &pathToMaskFallback = std::string());
-    static void mergeWithMask(FIBITMAP *image, std::vector<char> &maskRaw, bool maskIsPng = false);
+    static void mergeWithMask(FIBITMAP *image, const Files::Data &maskRaw, bool maskIsPng = false);
     static void mergeWithMask(FIBITMAP *image, FIBITMAP *mask);
 
     static void setBitBlitBG(uint8_t red, uint8_t green, uint8_t blue);

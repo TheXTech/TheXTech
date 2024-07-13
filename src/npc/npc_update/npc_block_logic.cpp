@@ -33,7 +33,6 @@
 
 void NPCBlockLogic(int A, double& tempHit, int& tempHitBlock, float& tempSpeedA, const int numTempBlock, const float speedVar)
 {
-    float oldBeltSpeed = NPC[A].BeltSpeed;
     bool resetBeltSpeed = false;
     bool beltClear = false; // "stops belt movement when on a wall" (Redigit)
     float beltCount = 0;
@@ -46,6 +45,9 @@ void NPCBlockLogic(int A, double& tempHit, int& tempHitBlock, float& tempSpeedA,
     int tempBlockHit1 = 0;
     int tempBlockHit2 = 0;
     int tempHitIsSlope = 0;
+
+    float oldBeltSpeed = NPC[A].BeltSpeed;
+    NPC[A].BeltSpeed = 0;
 
     if((!NPC[A]->NoClipping || NPC[A].Projectile) &&
        !(NPC[A].Type == NPCID_SPIT_BOSS_BALL && NPC[A].Projectile) && NPC[A].Type != NPCID_TOOTHY &&

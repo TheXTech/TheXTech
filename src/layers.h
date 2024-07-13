@@ -48,6 +48,11 @@ struct Layer_t
     float SpeedX = 0.0f;
 //    SpeedY As Single
     float SpeedY = 0.0f;
+
+// NEW: track the actual applied SpeedX and SpeedY during the last frame. Used for vines.
+    float ApplySpeedX = 0.0f;
+    float ApplySpeedY = 0.0f;
+
 //End Type
 // NEW: track the objects belonging to the layer
     std::set<int> blocks;
@@ -214,6 +219,11 @@ bool SwapLayers(layerindex_t index_1, layerindex_t index_2);
 bool RenameLayer(layerindex_t index, const std::string& NewName);
 // deletes a layer (and, optionally, everything in it)
 bool DeleteLayer(layerindex_t index, bool killall);
+
+// sets the speed of a layer
+// EffectStop controls whether the layer will stop when a player has abnormal status
+// Defective means that SMBX 1.3 was initially missing all code other than setting the speed
+void SetLayerSpeed(layerindex_t index, double SpeedX, double SpeedY, bool EffectStop = true, bool Defective = false);
 
 // Old functions:
 

@@ -574,95 +574,97 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                                     NPC[B].Type != NPCID_TOOTHYPIPE && NPC[B].Type != NPCID_TOOTHY &&
                                     (!Player[A].SlideKill || NPC[B]->WontHurt)) // NPCs that cannot be walked on
                             {
+#if 0
+                                // dead code since SMBX 1.3, because NoShellKick was never set
                                 if(NPC[B].CantHurtPlayer == A && Player[A].NoShellKick > 0)
                                 {
                                     // Do nothing!
                                 }
                                 else
+                                // (the remainder of this section was previously guarded by the above)
+#endif
+                                if(NPC[B]->IsABonus) // Bonus
+                                    TouchBonus(A, B);
+                                else if(NPC[B]->IsAShell && NPC[B].Location.SpeedX == 0 && Player[A].HoldingNPC == 0 && Player[A].Controls.Run)
                                 {
-                                    if(NPC[B]->IsABonus) // Bonus
-                                        TouchBonus(A, B);
-                                    else if(NPC[B]->IsAShell && NPC[B].Location.SpeedX == 0 && Player[A].HoldingNPC == 0 && Player[A].Controls.Run)
+                                    // grab turtle shells
+                                    //if(nPlay.Online == false || nPlay.MySlot + 1 == A)
                                     {
-                                        // grab turtle shells
-                                        //if(nPlay.Online == false || nPlay.MySlot + 1 == A)
-                                        {
-                                            if(Player[A].Character >= 3)
-                                                PlaySoundSpatial(SFX_Grab, Player[A].Location);
-                                            else
-                                                UnDuck(Player[A]);
+                                        if(Player[A].Character >= 3)
+                                            PlaySoundSpatial(SFX_Grab, Player[A].Location);
+                                        else
+                                            UnDuck(Player[A]);
 
-                                            Player[A].HoldingNPC = B;
-                                            NPC[B].HoldingPlayer = A;
-                                            NPC[B].CantHurt = Physics.NPCCanHurtWait;
-                                            NPC[B].CantHurtPlayer = A;
-                                        }
-
+                                        Player[A].HoldingNPC = B;
+                                        NPC[B].HoldingPlayer = A;
+                                        NPC[B].CantHurt = Physics.NPCCanHurtWait;
+                                        NPC[B].CantHurtPlayer = A;
                                     }
-                                    else if(NPC[B]->JumpHurt || (NPC[B]->IsFish && Player[A].WetFrame)) // NPCs that cause damage even when jumped on
-                                    {
-                                        if(!(NPC[B].Type == NPCID_PLANT_S3 && NPC[B].Special2 == 4) && !NPC[B]->WontHurt && NPC[B].CantHurtPlayer != A)
-                                        {
 
-                                            // the n00bcollision function reduces the size of the npc's hit box before it damages the player
-                                            if(n00bCollision(Player[A].Location, NPC[B].Location))
-                                                PlayerHurt(A);
-                                        }
+                                }
+                                else if(NPC[B]->JumpHurt || (NPC[B]->IsFish && Player[A].WetFrame)) // NPCs that cause damage even when jumped on
+                                {
+                                    if(!(NPC[B].Type == NPCID_PLANT_S3 && NPC[B].Special2 == 4) && !NPC[B]->WontHurt && NPC[B].CantHurtPlayer != A)
+                                    {
+
+                                        // the n00bcollision function reduces the size of the npc's hit box before it damages the player
+                                        if(n00bCollision(Player[A].Location, NPC[B].Location))
+                                            PlayerHurt(A);
                                     }
-                                    else if(NPC[B].Type == NPCID_MINIBOSS) // Special code for BOOM BOOM
+                                }
+                                else if(NPC[B].Type == NPCID_MINIBOSS) // Special code for BOOM BOOM
+                                {
+                                    if(NPC[B].Special == 0 || Player[A].Mount == 1 || Player[A].Mount == 3)
                                     {
-                                        if(NPC[B].Special == 0 || Player[A].Mount == 1 || Player[A].Mount == 3)
-                                        {
-                                            if(NPC[B].Special != 0)
-                                                PlaySoundSpatial(SFX_Stomp, Player[A].Location);
-                                            tempHit = true;
-                                            tempLocation.Y = NPC[B].Location.Y - Player[A].Location.Height;
-                                        }
-                                        else if(NPC[B].Special != 4)
-                                        {
-                                            if(n00bCollision(Player[A].Location, NPC[B].Location))
-                                                PlayerHurt(A);
-                                        }
-                                    }
-                                    else if((NPC[B].Type == NPCID_LIT_BOMB_S3) || NPC[B].Type == NPCID_HIT_CARRY_FODDER)
-                                        NPCHit(B, 1, A); // NPC 'B' was jumped on '1' by player 'A'
-                                    else if(NPC[B].Killed != 10 && !NPCIsBoot(NPC[B]) && !NPCIsYoshi(NPC[B]) && !(NPC[B]->IsAShell && NPC[B].CantHurtPlayer == A)) // Bounce off everything except Bonus and Piranha Plants
-                                    {
-                                        if(NPC[B].Type == NPCID_SPRING)
-                                            tempSpring = true;
-
-                                        if(NPC[B]->IsAShell && NPC[B].Location.SpeedX == 0 && NPC[B].Location.SpeedY == 0)
-                                            tempShell = true;
-
+                                        if(NPC[B].Special != 0)
+                                            PlaySoundSpatial(SFX_Stomp, Player[A].Location);
                                         tempHit = true;
                                         tempLocation.Y = NPC[B].Location.Y - Player[A].Location.Height;
-
-                                        if(NPC[B].Type == NPCID_COIN_SWITCH || NPC[B].Type == NPCID_TIME_SWITCH || NPC[B].Type == NPCID_TNT)
-                                        {
-                                            tempHit = false;
-                                            Player[A].Jump = false;
-                                            Player[A].Location.SpeedY = Physics.PlayerJumpVelocity;
-                                            Player[A].Location.SpeedY = -Physics.PlayerGravity;
-                                        }
                                     }
-
-                                    // If Not (.WetFrame = True And (NPC(B).Type = 229 Or NPC(B).Type = 230) Or NPCIsAVine(NPC(B).Type)) And .HoldingNPC <> B Then
-                                    if(
-                                        !(
-                                            (Player[A].WetFrame && (NPC[B].Type == NPCID_GRN_FISH_S3 || NPC[B].Type == NPCID_RED_FISH_S3)) ||
-                                            NPC[B]->IsAVine
-                                        ) && (Player[A].HoldingNPC != B)
-                                    )
+                                    else if(NPC[B].Special != 4)
                                     {
-                                        if(Player[A].Vine > 0)
-                                        {
-                                            Player[A].Vine = 0;
-                                            Player[A].Jump = 1;
-                                        }
-
-                                        if(!(NPC[B]->IsAShell && NPC[B].CantHurtPlayer == A))
-                                            NPCHit(B, 1, A); // NPC 'B' was jumped on '1' by player 'A'
+                                        if(n00bCollision(Player[A].Location, NPC[B].Location))
+                                            PlayerHurt(A);
                                     }
+                                }
+                                else if((NPC[B].Type == NPCID_LIT_BOMB_S3) || NPC[B].Type == NPCID_HIT_CARRY_FODDER)
+                                    NPCHit(B, 1, A); // NPC 'B' was jumped on '1' by player 'A'
+                                else if(NPC[B].Killed != 10 && !NPCIsBoot(NPC[B]) && !NPCIsYoshi(NPC[B]) && !(NPC[B]->IsAShell && NPC[B].CantHurtPlayer == A)) // Bounce off everything except Bonus and Piranha Plants
+                                {
+                                    if(NPC[B].Type == NPCID_SPRING)
+                                        tempSpring = true;
+
+                                    if(NPC[B]->IsAShell && NPC[B].Location.SpeedX == 0 && NPC[B].Location.SpeedY == 0)
+                                        tempShell = true;
+
+                                    tempHit = true;
+                                    tempLocation.Y = NPC[B].Location.Y - Player[A].Location.Height;
+
+                                    if(NPC[B].Type == NPCID_COIN_SWITCH || NPC[B].Type == NPCID_TIME_SWITCH || NPC[B].Type == NPCID_TNT)
+                                    {
+                                        tempHit = false;
+                                        Player[A].Jump = false;
+                                        Player[A].Location.SpeedY = Physics.PlayerJumpVelocity;
+                                        Player[A].Location.SpeedY = -Physics.PlayerGravity;
+                                    }
+                                }
+
+                                // If Not (.WetFrame = True And (NPC(B).Type = 229 Or NPC(B).Type = 230) Or NPCIsAVine(NPC(B).Type)) And .HoldingNPC <> B Then
+                                if(
+                                    !(
+                                        (Player[A].WetFrame && (NPC[B].Type == NPCID_GRN_FISH_S3 || NPC[B].Type == NPCID_RED_FISH_S3)) ||
+                                        NPC[B]->IsAVine
+                                    ) && (Player[A].HoldingNPC != B)
+                                )
+                                {
+                                    if(Player[A].Vine > 0)
+                                    {
+                                        Player[A].Vine = 0;
+                                        Player[A].Jump = 1;
+                                    }
+
+                                    if(!(NPC[B]->IsAShell && NPC[B].CantHurtPlayer == A))
+                                        NPCHit(B, 1, A); // NPC 'B' was jumped on '1' by player 'A'
                                 }
                             }
                         }

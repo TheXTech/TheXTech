@@ -1556,19 +1556,9 @@ void KillNPC(int A, int B)
         NPCQueues::RespawnDelay.insert(A);
     }
 
+    // note: this is the "defective" version of SetLayerSpeed, which (in classic mode) only sets the speed to 0, and does nothing else
     if(NPC[A].AttLayer != LAYER_NONE && NPC[A].AttLayer != LAYER_DEFAULT)
-    {
-        // for(C = 1; C <= maxLayers; C++)
-        {
-            // if(NPC[A].AttLayer == Layer[C].Name)
-            {
-                Layer[NPC[A].AttLayer].SpeedX = 0;
-                Layer[NPC[A].AttLayer].SpeedY = 0;
-
-                // @Wohlstand, do we want to add some code to keep the climbing on BGOs working?
-            }
-        }
-    }
+        SetLayerSpeed(NPC[A].AttLayer, 0, 0, false, true);
 
     if((!GameMenu && !BattleMode) || NPC[A].DefaultType == 0)
     {
@@ -1585,7 +1575,7 @@ void KillNPC(int A, int B)
 
             if(Player[B].YoshiNPC == numNPCs)
                 Player[B].YoshiNPC = A;
-            if(fEqual(Player[B].VineNPC, numNPCs))
+            if(Player[B].VineNPC == numNPCs)
                 Player[B].VineNPC = A;
         }
 

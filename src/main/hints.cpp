@@ -172,6 +172,9 @@ static uint8_t s_no_lives_old()
 
 static uint8_t s_rainbow_surf_applies()
 {
+    if(LevelSelect)
+        return false;
+
     for(NPCRef_t n : NPCQueues::Active.no_change)
     {
         if(n->Type == NPCID_FLIPPED_RAINBOW_SHELL)

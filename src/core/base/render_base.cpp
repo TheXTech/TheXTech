@@ -62,7 +62,7 @@ int XRender::TargetW = 800;
 int XRender::TargetH = 600;
 bool XRender::g_BitmaskTexturePresent = false;
 
-static const char blank_gif[] = "GIF89a\x01\x00\x01\x00\x80\x00\x00\xff\xff\xff\x00\x00\x00!\xf9\x04\x01\x00\x00\x00\x00,\x00\x00\x00\x00\x01\x00\x01\x00\x00\x02\2D\x01\x00;";
+static const unsigned char blank_gif[] = "GIF89a\x01\x00\x01\x00\x80\x00\x00\xff\xff\xff\x00\x00\x00!\xf9\x04\x01\x00\x00\x00\x00,\x00\x00\x00\x00\x01\x00\x01\x00\x00\x02\2D\x01\x00;";
 
 AbstractRender_t* g_render = nullptr;
 
@@ -261,17 +261,17 @@ void AbstractRender_t::lazyLoadPicture(StdPicture_Sub& target,
     target.w = tSize.w() * scaleFactor;
     target.h = tSize.h() * scaleFactor;
 
-    dumpFullFile(target.l.raw, path);
+    target.l.raw = Files::load_file(path.c_str());
 
     //Apply Alpha mask
     if(useMask && !maskPath.empty() && Files::fileExists(maskPath))
     {
-        dumpFullFile(target.l.rawMask, maskPath);
+        target.l.rawMask = Files::load_file(maskPath.c_str());
         target.l.isMaskPng = false; //-V1048
     }
     else if(useMask && !maskFallbackPath.empty())
     {
-        dumpFullFile(target.l.rawMask, maskFallbackPath);
+        target.l.rawMask = Files::load_file(maskFallbackPath.c_str());
         target.l.isMaskPng = true;
     }
 
@@ -283,10 +283,7 @@ void AbstractRender_t::lazyLoadPicture(StdPicture_Sub& target,
     if(Files::fileExists(path + ".frag"))
     {
         pLogDebug("Loading user shader [%s%s]...", path.c_str(), ".frag");
-        dumpFullFile(target.l.fragmentShaderSource, path + ".frag");
-
-        // must be null-terminated
-        target.l.fragmentShaderSource.push_back('\0');
+        target.l.fragmentShaderSource = Files::load_file((path + ".frag").c_str());
     }
 
     // load lighting info if it exists
@@ -392,13 +389,10 @@ void AbstractRender_t::LoadPictureShader(StdPicture& target, const std::string &
         target.l.lazyLoaded = true;
 
         // blank GIF of 1 pixel
-        target.l.raw.resize(sizeof(blank_gif) - 1);
-        SDL_memcpy(target.l.raw.data(), blank_gif, sizeof(blank_gif) - 1);
+        target.l.raw.init_from_mem(blank_gif, sizeof(blank_gif) - 1);
 
         pLogDebug("Loading user shader [%s]...", path.c_str());
-        dumpFullFile(target.l.fragmentShaderSource, path);
-        // must be null-terminated
-        target.l.fragmentShaderSource.push_back('\0');
+        target.l.fragmentShaderSource = Files::load_file(path.c_str());
 
         // eagerly compile it to minimize stutter
         g_render->compileShaders(target);
@@ -441,21 +435,16 @@ void AbstractRender_t::LoadPictureParticleSystem(StdPicture& target, const std::
             target.l.lazyLoaded = true;
 
             // blank GIF of 1 pixel
-            target.l.raw.resize(sizeof(blank_gif) - 1);
-            SDL_memcpy(target.l.raw.data(), blank_gif, sizeof(blank_gif) - 1);
+            target.l.raw.init_from_mem(blank_gif, sizeof(blank_gif) - 1);
         }
 
         pLogDebug("Loading particle system vertex shader [%s]...", vertexPath.c_str());
-        dumpFullFile(target.l.particleVertexShaderSource, vertexPath);
-        // must be null-terminated
-        target.l.particleVertexShaderSource.push_back('\0');
+        target.l.particleVertexShaderSource = Files::load_file(vertexPath.c_str());
 
         if(!fragPath.empty())
         {
             pLogDebug("Loading particle system fragment shader [%s]...", fragPath.c_str());
-            dumpFullFile(target.l.fragmentShaderSource, fragPath);
-            // must be null-terminated
-            target.l.fragmentShaderSource.push_back('\0');
+            target.l.fragmentShaderSource = Files::load_file(fragPath.c_str());
         }
 
         // eagerly compile it to minimize stutter

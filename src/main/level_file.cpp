@@ -1052,7 +1052,7 @@ void OpenLevelDataPost()
                 bgo = Background_t();
                 bgo.Layer = w.Layer;
                 bgo.Hidden = w.Hidden;
-                bgo.Location = static_cast<Location_t>(w.Entrance);
+                bgo.Location = w.Entrance;
                 bgo.Type = 98;
                 bgo.Location.Width = 16;
                 syncLayers_BGO(B);
@@ -1063,7 +1063,7 @@ void OpenLevelDataPost()
                     numLocked++;
                     auto &bgo2 = Background[B];
                     bgo2 = bgo;
-                    bgo2.Location = static_cast<Location_t>(w.Exit);
+                    bgo2.Location = w.Exit;
                     bgo2.Location.Width = 16;
                     syncLayers_BGO(B);
                 }
