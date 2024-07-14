@@ -106,7 +106,7 @@ jobs:
 
     - name: Download assets
       shell: bash
-      run: wget -d -nv -t 5 -O assets-source.7z "${{ matrix.config.assets_url }}"
+      run: wget -d -nv -t 5 -O assets-source.7z "${{ matrix.source.assets_url }}"
 
     - name: Unpack assets
       shell: bash
