@@ -108,7 +108,7 @@ jobs:
     - name: Download MinGW
       if: matrix.config.mingw_download
       shell: bash
-      run: wget -d -nv -t 5 -O mingw.7z "${{ matrix.config.mingw_download }}"
+      run: C:\\msys64\\usr\\bin\\wget.exe -d -nv -t 5 -O mingw.7z "${{ matrix.config.mingw_download }}"
 
     - name: Extract MinGW
       if: matrix.config.mingw_install_dir
@@ -119,7 +119,7 @@ jobs:
     - name: Download Ninja
       if: matrix.config.ninja_download
       shell: bash
-      run: wget -d -nv -t 5 -O ninja.zip "${{ matrix.config.ninja_download }}"
+      run: C:\\msys64\\usr\\bin\\wget.exe -d -nv -t 5 -O ninja.zip "${{ matrix.config.ninja_download }}"
 
     - name: Extract Ninja
       if: matrix.config.ninja_install_dir
@@ -130,7 +130,7 @@ jobs:
     - name: Download LFTP
       if: matrix.config.lftp_download
       shell: bash
-      run: wget -d -nv -t 5 -O lftp.7z "${{ matrix.config.lftp_download }}"
+      run: C:\\msys64\\usr\\bin\\wget.exe -d -nv -t 5 -O lftp.7z "${{ matrix.config.lftp_download }}"
 
     - name: Extract LFTP
       if: matrix.config.lftp_install_dir
@@ -140,11 +140,11 @@ jobs:
 
     - name: Download SMBX assets
       shell: bash
-      run: wget -d -nv -t 5 -O smbx13.7z "https://wohlsoft.ru/projects/TheXTech/_downloads/thextech-smbx13-assets-full.7z"
+      run: C:\\msys64\\usr\\bin\\wget.exe -d -nv -t 5 -O smbx13.7z "https://wohlsoft.ru/projects/TheXTech/_downloads/thextech-smbx13-assets-full.7z"
 
     - name: Download AoD assets
       shell: bash
-      run: wget -d -nv -t 5 -O aod.7z "https://wohlsoft.ru/projects/TheXTech/_downloads/thextech-adventure-of-demo-assets-full.7z"
+      run: C:\\msys64\\usr\\bin\\wget.exe -d -nv -t 5 -O aod.7z "https://wohlsoft.ru/projects/TheXTech/_downloads/thextech-adventure-of-demo-assets-full.7z"
 
     - name: Unpack all assets
       shell: bash
