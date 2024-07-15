@@ -19,7 +19,7 @@
 
 #include "image_size.h"
 
-#include "sdl_proxy/sdl_rwops.h"
+#include <SDL2/SDL_rwops.h>
 #include "sdl_proxy/sdl_stdinc.h"
 
 
