@@ -273,24 +273,6 @@ bool PGE_ImageInfo::getImageSize(const PGEString &imagePath, uint32_t *w, uint32
     return getImageSizeRW(image, w, h, errCode);
 }
 
-bool PGE_ImageInfo::getImageSizeFromMem(const char *mem, size_t size, uint32_t *w, uint32_t *h, int *errCode)
-{
-    if(errCode)
-        *errCode = ERR_OK;
-
-    SDL_RWops* image = SDL_RWFromConstMem(mem, int(size));
-
-    if(!image)
-    {
-        if(errCode)
-            *errCode = ERR_CANT_OPEN;
-
-        return false;
-    }
-
-    return getImageSizeRW(image, w, h, errCode);
-}
-
 
 PGEString PGE_ImageInfo::getMaskName(const PGEString &imageFileName)
 {
