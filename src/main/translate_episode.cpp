@@ -156,7 +156,7 @@ void TranslateEpisode::loadLevelTranslation(const std::string& key)
     TrLevelParser parser;
     parser.m_wantedKey = key;
 
-    FILE *f_in = Files::utf8_fopen(langFile.c_str(), "rb");
+    SDL_RWops *f_in = Files::open_file(langFile.c_str(), "rb");
     if(!f_in)
         return;
 
@@ -165,7 +165,7 @@ void TranslateEpisode::loadLevelTranslation(const std::string& key)
     else
         pLogDebug("JSON SaX returned FALSE");
 
-    std::fclose(f_in);
+    SDL_RWclose(f_in);
 }
 
 void TranslateEpisode::loadWorldTranslation(const std::string& key)
@@ -184,7 +184,7 @@ void TranslateEpisode::loadWorldTranslation(const std::string& key)
     TrWorldParser parser;
     parser.m_wantedKey = key;
 
-    FILE *f_in = Files::utf8_fopen(langFile.c_str(), "rb");
+    SDL_RWops *f_in = Files::open_file(langFile.c_str(), "rb");
     if(!f_in)
         return;
 
@@ -193,7 +193,7 @@ void TranslateEpisode::loadWorldTranslation(const std::string& key)
     else
         pLogDebug("JSON SaX returned FALSE");
 
-    std::fclose(f_in);
+    SDL_RWclose(f_in);
 }
 
 void TranslateEpisode::loadLunaScript(const std::string& key)
@@ -217,7 +217,7 @@ void TranslateEpisode::loadLunaScript(const std::string& key)
     parser.m_outputLines = &m_scriptLines;
     parser.m_outputTrIdLines = &m_scriptTrId;
 
-    FILE *f_in = Files::utf8_fopen(langFile.c_str(), "rb");
+    SDL_RWops *f_in = Files::open_file(langFile.c_str(), "rb");
     if(!f_in)
         return;
 
@@ -226,7 +226,7 @@ void TranslateEpisode::loadLunaScript(const std::string& key)
     else
         pLogDebug("JSON SaX returned FALSE");
 
-    std::fclose(f_in);
+    SDL_RWclose(f_in);
 }
 
 bool TranslateEpisode::tryTranslateTitle(const std::string& episodePath,
@@ -248,7 +248,7 @@ bool TranslateEpisode::tryTranslateTitle(const std::string& episodePath,
     parser.m_toWrite = &output;
     parser.m_wantedWorld = worldFile;
 
-    FILE *f_in = Files::utf8_fopen(langFile.c_str(), "rb");
+    SDL_RWops *f_in = Files::open_file(langFile.c_str(), "rb");
     if(!f_in)
         return false;
 
@@ -257,7 +257,7 @@ bool TranslateEpisode::tryTranslateTitle(const std::string& episodePath,
     else
         pLogDebug("JSON SaX returned FALSE");
 
-    std::fclose(f_in);
+    SDL_RWclose(f_in);
 
     return true;
 }
