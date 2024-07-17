@@ -575,11 +575,12 @@ void DeleteSave(int world, int save)
     // If legacy gamesave file exists, make the locker file to make illusion that old file got been removed
     if(Files::fileExists(legacySave))
     {
-        auto *f = Files::utf8_fopen(legacySaveLocker.c_str(), "wb");
+        auto *f = Files::open_file(legacySaveLocker.c_str(), "wb");
         if(f)
         {
-            std::fprintf(f, "If this file exists, the Vanilla \"save%d.sav\" inside the episode folder is ignored.", save);
-            std::fclose(f);
+            const char s[] = "If this file exists, the Vanilla \"save*.sav\" inside the episode folder is ignored.";
+            SDL_RWwrite(f, s, 1, sizeof(s) - 1);
+            SDL_RWclose(f);
         }
     }
 
