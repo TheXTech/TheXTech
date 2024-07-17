@@ -1,5 +1,6 @@
 #include "md5tools.hpp"
 #include "../Utils/files.h"
+#include <SDL2/SDL_rwops.h>
 
 
 std::string md5::string_to_hash(const std::string &input)
@@ -21,7 +22,7 @@ std::string md5::file_to_hash(const std::string &filePath)
 {
     char block[BLOCK_SIZE];
     std::string out;
-    FILE *f = Files::utf8_fopen(filePath.c_str(), "rb");
+    SDL_RWops *f = Files::open_file(filePath.c_str(), "rb");
     size_t got;
 
     if(!f)
@@ -31,7 +32,7 @@ std::string md5::file_to_hash(const std::string &filePath)
 
     do
     {
-        got = std::fread((void*)block, 1, 64, f);
+        got = SDL_RWread(f, (void*)block, 1, 64);
         h.process((const void*)block, (int)got);
     } while(got == 64);
 
@@ -39,7 +40,7 @@ std::string md5::file_to_hash(const std::string &filePath)
     out.resize(MD5_STRING_SIZE - 1);
     h.get_string(&out[0]);
 
-    std::fclose(f);
+    SDL_RWclose(f);
 
     return out;
 }
