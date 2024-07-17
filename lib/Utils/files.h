@@ -83,7 +83,10 @@ public:
     };
 
     FILE *utf8_fopen(const char *filePath, const char *modes);
+    SDL_RWops *open_file(const char *filePath, const char *modes);
     Data load_file(const char *filePath);
+
+    void flush_file(SDL_RWops *f);
 
     enum Charsets
     {
@@ -93,7 +96,7 @@ public:
         CHARSET_UTF32BE,
         CHARSET_UTF32LE
     };
-    int skipBom(FILE *file, const char **charset = nullptr);
+    int skipBom(SDL_RWops *file, const char **charset = nullptr);
 
     bool fileExists(const std::string &path);
     bool deleteFile(const std::string &path);

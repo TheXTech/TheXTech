@@ -108,7 +108,7 @@ bool AutocodeManager::LoadFiles()
 // READ FILE - Read the autocode file in the level folder
 bool AutocodeManager::ReadFile(const std::string &script_path, const std::string& tr_key)
 {
-    FILE *code_file = Files::utf8_fopen(script_path.c_str(), "rb");
+    SDL_RWops *code_file = Files::open_file(script_path.c_str(), "rb");
     if(!code_file)
         return false;
 
@@ -116,7 +116,7 @@ bool AutocodeManager::ReadFile(const std::string &script_path, const std::string
 
     m_Enabled = true;
     Parse(code_file, false, tr_key);
-    std::fclose(code_file);
+    SDL_RWclose(code_file);
     showErrors(script_path);
 
     return true;
@@ -125,7 +125,7 @@ bool AutocodeManager::ReadFile(const std::string &script_path, const std::string
 // READ WORLD - Read the world autocode file in the world folder
 bool AutocodeManager::ReadWorld(const std::string &script_path, const std::string& tr_key)
 {
-    FILE *code_file = Files::utf8_fopen(script_path.c_str(), "rb");
+    SDL_RWops *code_file = Files::open_file(script_path.c_str(), "rb");
     if(!code_file)
         return false;
 
@@ -133,7 +133,7 @@ bool AutocodeManager::ReadWorld(const std::string &script_path, const std::strin
 
     m_Enabled = true;
     Parse(code_file, false, tr_key);
-    std::fclose(code_file);
+    SDL_RWclose(code_file);
     showErrors(script_path);
 
     return true;
@@ -142,7 +142,7 @@ bool AutocodeManager::ReadWorld(const std::string &script_path, const std::strin
 // READ GLOBALS - Read the global code file
 bool AutocodeManager::ReadGlobals(const std::string &script_path)
 {
-    FILE *code_file = Files::utf8_fopen(script_path.c_str(), "rb");
+    SDL_RWops *code_file = Files::open_file(script_path.c_str(), "rb");
     if(!code_file)
         return false;
 
@@ -150,17 +150,71 @@ bool AutocodeManager::ReadGlobals(const std::string &script_path)
 
     m_Enabled = true;
     Parse(code_file, true);
-    std::fclose(code_file);
+    SDL_RWclose(code_file);
     m_GlobalEnabled = true;
     showErrors(script_path);
 
     return true;
 }
 
+template<int temp_buf_size>
+struct read_buf
+{
+    char temp_buf[temp_buf_size];
+    int temp_buf_cur = 0;
+    int temp_buf_end = 0;
+    bool eof = false;
+
+    bool fgets(char* out_buf, int out_buf_size, SDL_RWops *code_file)
+    {
+        char* out_buf_end = out_buf + out_buf_size;
+        if(out_buf >= out_buf_end)
+            return false;
+
+        while(true)
+        {
+            while(temp_buf_cur < temp_buf_end)
+            {
+                char c = temp_buf[temp_buf_cur++];
+
+                if(c == '\r')
+                    continue;
+
+                *(out_buf++) = c;
+                if(out_buf >= out_buf_end)
+                {
+                    out_buf[-1] = '\0';
+                    return true;
+                }
+
+                if(c == '\n')
+                {
+                    *(out_buf++) = '\0';
+                    return true;
+                }
+            }
+
+            temp_buf_cur = 0;
+            temp_buf_end = SDL_RWread(code_file, temp_buf, 1, sizeof(temp_buf));
+
+            if(temp_buf_end == 0)
+                eof = true;
+
+            if(eof)
+            {
+                *(out_buf++) = '\0';
+                return false;
+            }
+        }
+    }
+};
+
 // PARSE    - Parse the autocode file and populate manager with the contained code/settings
 //            Doesn't delete codes already in the lists
-void AutocodeManager::Parse(FILE *code_file, bool add_to_globals, const std::string& tr_key)
+void AutocodeManager::Parse(SDL_RWops *code_file, bool add_to_globals, const std::string& tr_key)
 {
+    read_buf<2048> readbuf;
+
     char wbuf[2000];
     char wmidbuf[2000];
     size_t wbuflen = 0;
@@ -192,7 +246,7 @@ void AutocodeManager::Parse(FILE *code_file, bool add_to_globals, const std::str
     TranslateEpisode tr;
     tr.loadLunaScript(tr_key);
 
-    std::fseek(code_file, 0, SEEK_SET);
+    SDL_RWseek(code_file, 0, RW_SEEK_SET);
 
     // Check and skip a BOM marker
     const char *charset;
@@ -203,7 +257,7 @@ void AutocodeManager::Parse(FILE *code_file, bool add_to_globals, const std::str
     }
 
     //char* dbg = "ParseDbgEOF";
-    while(!std::feof(code_file))
+    while(!readbuf.eof)
     {
         // Get a line and reset buffers
         SDL_memset(wbuf, 0, sizeof(wbuf));
@@ -222,7 +276,7 @@ void AutocodeManager::Parse(FILE *code_file, bool add_to_globals, const std::str
         bparam3 = 0;
         blength = 0;
 
-        if(!std::fgets(wbuf, 2000, code_file))
+        if(!readbuf.fgets(wbuf, 2000, code_file))
             break; // End of file has reached
         lineNum++;
 

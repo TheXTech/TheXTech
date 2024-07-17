@@ -26,7 +26,7 @@
 #include <map>
 #include <unordered_map>
 #include <list>
-#include <fstream>
+#include <SDL2/SDL_rwops.h>
 
 #include "autocode.h"
 
@@ -48,7 +48,7 @@ struct AutocodeManager
     bool ReadFile(const std::string &script_path, const std::string &tr_key); // Load level codes from dir_path
     bool ReadWorld(const std::string &script_path, const std::string &tr_key); // Load worldwide codes from dir_path
     bool ReadGlobals(const std::string &script_path); // Load global codes from dir_path
-    void Parse(FILE *open_file, bool add_to_globals, const std::string &tr_key = std::string());
+    void Parse(SDL_RWops *open_file, bool add_to_globals, const std::string &tr_key = std::string());
 
     static std::string resolveWorldFileCase(const std::string &in_name);
     static std::string resolveCustomFileCase(const std::string &in_name);
