@@ -29,20 +29,20 @@
 namespace LunaCounterUtil
 {
 
-inline size_t writeIntLE(FILE *openfile, int32_t inValue)
+inline size_t writeIntLE(SDL_RWops *openfile, int32_t inValue)
 {
     uint8_t out[4];
     out[0] = 0xFF & (static_cast<uint32_t>(inValue) >> 0);
     out[1] = 0xFF & (static_cast<uint32_t>(inValue) >> 8);
     out[2] = 0xFF & (static_cast<uint32_t>(inValue) >> 16);
     out[3] = 0xFF & (static_cast<uint32_t>(inValue) >> 24);
-    return std::fwrite(out, 1, 4, openfile);
+    return SDL_RWwrite(openfile, out, 1, 4);
 }
 
-inline size_t readIntLE(FILE *openfile, int32_t &outValue)
+inline size_t readIntLE(SDL_RWops *openfile, int32_t &outValue)
 {
     uint8_t in[4];
-    size_t ret = std::fread(in, 1, 4, openfile);
+    size_t ret = SDL_RWread(openfile, in, 1, 4);
 
     if(ret != 4)
         return ret;
@@ -56,20 +56,20 @@ inline size_t readIntLE(FILE *openfile, int32_t &outValue)
     return ret;
 }
 
-inline size_t writeUIntLE(FILE *openfile, uint32_t inValue)
+inline size_t writeUIntLE(SDL_RWops *openfile, uint32_t inValue)
 {
     uint8_t out[4];
     out[0] = 0xFF & (inValue >> 0);
     out[1] = 0xFF & (inValue >> 8);
     out[2] = 0xFF & (inValue >> 16);
     out[3] = 0xFF & (inValue >> 24);
-    return std::fwrite(out, 1, 4, openfile);
+    return SDL_RWwrite(openfile, out, 1, 4);
 }
 
-inline size_t readUIntLE(FILE *openfile, uint32_t &outValue)
+inline size_t readUIntLE(SDL_RWops *openfile, uint32_t &outValue)
 {
     uint8_t in[4];
-    size_t ret = std::fread(in, 1, 4, openfile);
+    size_t ret = SDL_RWread(openfile, in, 1, 4);
 
     if(ret != 4)
         return ret;

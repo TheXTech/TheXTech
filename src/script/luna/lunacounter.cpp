@@ -55,7 +55,7 @@ DeathCounter::DeathCounter() noexcept
 DeathCounter::~DeathCounter() noexcept
 {
     if(m_openFile)
-        std::fclose(m_openFile);
+        SDL_RWclose(m_openFile);
 }
 
 void DeathCounter::init()
@@ -102,7 +102,7 @@ void DeathCounter::quit()
 
     if(m_openFile)
     {
-        std::fclose(m_openFile);
+        SDL_RWclose(m_openFile);
         m_openFile = nullptr;
     }
 }
@@ -117,7 +117,7 @@ bool DeathCounter::TryLoadStats()
     // If file is not exist yet, try to create empty file
     if(!Files::fileExists(counterFile))
     {
-        FILE *statsfile = Files::utf8_fopen(counterFile.c_str(), "wb");
+        SDL_RWops *statsfile = Files::open_file(counterFile.c_str(), "wb");
         if(!statsfile)
         {
             mStatFileOK = false;
@@ -126,19 +126,18 @@ bool DeathCounter::TryLoadStats()
             return false;
         }
 
-        std::fwrite(&tempint, 1, sizeof(int), statsfile);
-        std::fflush(statsfile);
-        std::fclose(statsfile);
+        SDL_RWwrite(statsfile, &tempint, 1, sizeof(int));
+        SDL_RWclose(statsfile);
     }
 
     // close old open file if present
     if(m_openFile)
     {
-        std::fclose(m_openFile);
+        SDL_RWclose(m_openFile);
         m_openFile = nullptr;
     }
 
-    m_openFile = Files::utf8_fopen(counterFile.c_str(), "r+b");
+    m_openFile = Files::open_file(counterFile.c_str(), "r+b");
 
     // If create failed, disable death counter
     if(!m_openFile)
@@ -150,16 +149,14 @@ bool DeathCounter::TryLoadStats()
     }
 
     // If size less than 100, init new file
-    std::fseek(m_openFile, 0, SEEK_END);
-    int cursize = (int)std::ftell(m_openFile);
-    std::fseek(m_openFile, 0, SEEK_SET);
+    int cursize = (int)SDL_RWsize(m_openFile);
 
     if(cursize < 50)
     {
         InitStatsFile(m_openFile);
-        std::fflush(m_openFile);
+        Files::flush_file(m_openFile);
         mStatFileOK = true;
-        std::fseek(m_openFile, 0, SEEK_SET);
+        SDL_RWseek(m_openFile, 0, SEEK_SET);
     }
 
 //    if(statsfile.good() == false)
@@ -179,7 +176,7 @@ bool DeathCounter::TryLoadStats()
         mStatFileOK = false;
         mEnabled = false;
 
-        std::fclose(m_openFile);
+        SDL_RWclose(m_openFile);
         m_openFile = nullptr;
 
         return false;
@@ -234,26 +231,26 @@ void DeathCounter::AddDeath(const std::string &lvlname, int amount)
 }
 
 // INIT STATS FILE
-void DeathCounter::InitStatsFile(FILE *statsfile)
+void DeathCounter::InitStatsFile(SDL_RWops *statsfile)
 {
     WriteHeader(statsfile);
 }
 
 
 // WRITE HEADER - Write the death counter file header at beginning of file
-void DeathCounter::WriteHeader(FILE *statsfile)
+void DeathCounter::WriteHeader(SDL_RWops *statsfile)
 {
     // Write dll version
-    std::fseek(statsfile, 0, SEEK_SET);
+    SDL_RWseek(statsfile, 0, RW_SEEK_SET);
     LunaCounterUtil::writeIntLE(statsfile, LUNA_VERSION);
 
     // Init reserved
     uint8_t writebyte = 0;
-    off_t offset = std::ftell(statsfile);
+    off_t offset = SDL_RWtell(statsfile);
     while(offset < 100)
     {
-        std::fwrite(&writebyte, 1, sizeof(writebyte), statsfile);
-        offset = std::ftell(statsfile);
+        SDL_RWwrite(statsfile, &writebyte, 1, sizeof(writebyte));
+        offset = SDL_RWtell(statsfile);
     }
 
     // Write record count at 100 bytes (0 record count)
@@ -261,13 +258,13 @@ void DeathCounter::WriteHeader(FILE *statsfile)
 }
 
 // READ RECORDS - Add death records from file into death record list
-void DeathCounter::ReadRecords(FILE *statsfile)
+void DeathCounter::ReadRecords(SDL_RWops *statsfile)
 {
     int32_t tempint = 0;
     size_t got;
 
     // Read the record count at 100 bytes
-    std::fseek(statsfile, 100, SEEK_SET);
+    SDL_RWseek(statsfile, 100, RW_SEEK_SET);
     got = LunaCounterUtil::readIntLE(statsfile, tempint);
 
     if(got != sizeof(tempint))
@@ -289,10 +286,10 @@ void DeathCounter::ReadRecords(FILE *statsfile)
 
 
 // WRITE RECORDS - Writes death record count at pos 100 in the file followed by each record
-void DeathCounter::WriteRecords(FILE *statsfile)
+void DeathCounter::WriteRecords(SDL_RWops *statsfile)
 {
     int32_t reccount = (int32_t)mDeathRecords.size();
-    std::fseek(statsfile, 100, SEEK_SET);
+    SDL_RWseek(statsfile, 100, RW_SEEK_SET);
     LunaCounterUtil::writeIntLE(statsfile, reccount);
 
     // Write each record, if any exist
@@ -308,23 +305,23 @@ void DeathCounter::TrySave()
 {
     if(mStatFileOK && mEnabled && m_openFile)
     {
-        if(std::fseek(m_openFile, 0, SEEK_SET))
+        if(SDL_RWseek(m_openFile, 0, RW_SEEK_SET))
         {
             // attempt to reopen the file
-            std::fclose(m_openFile);
-            m_openFile = Files::utf8_fopen(counterFile.c_str(), "wb");
+            SDL_RWclose(m_openFile);
+            m_openFile = Files::open_file(counterFile.c_str(), "wb");
         }
 
         if(m_openFile)
         {
             Save(m_openFile);
-            std::fflush(m_openFile);
+            Files::flush_file(m_openFile);
         }
     }
 }
 
 // SAVE
-void DeathCounter::Save(FILE *statsfile)
+void DeathCounter::Save(SDL_RWops *statsfile)
 {
     if(mStatFileOK && mEnabled)
     {

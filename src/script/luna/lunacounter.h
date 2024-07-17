@@ -22,13 +22,14 @@
 #ifndef DEATHCOUNTER_H
 #define DEATHCOUNTER_H
 
-#include <cstdio>
 #include <string>
 #include <list>
 
 #include "lunacounter_record.h"
 
 #define DEATHCT_FNAME "demos.dmo"
+
+struct SDL_RWops;
 
 struct DeathCounter
 {
@@ -67,14 +68,14 @@ struct DeathCounter
     } m_print;
 
 private:
-    FILE* m_openFile = nullptr;
+    SDL_RWops* m_openFile = nullptr;
 
     friend struct DeathRecord;
-    static void InitStatsFile(FILE *openfile);
-    static void WriteHeader(FILE *openfile);
-    void WriteRecords(FILE *statsfile);
-    void ReadRecords(FILE *openfile);
-    void Save(FILE *openfile);
+    static void InitStatsFile(SDL_RWops *openfile);
+    static void WriteHeader(SDL_RWops *openfile);
+    void WriteRecords(SDL_RWops *statsfile);
+    void ReadRecords(SDL_RWops *openfile);
+    void Save(SDL_RWops *openfile);
 
     // Members
 public:

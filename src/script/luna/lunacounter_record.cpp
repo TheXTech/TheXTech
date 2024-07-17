@@ -25,7 +25,7 @@
 #include "sdl_proxy/sdl_stdinc.h"
 
 
-void DeathRecord::Save(FILE *openfile)
+void DeathRecord::Save(SDL_RWops *openfile)
 {
     // Write character count
     auto tempint = (uint32_t)m_levelName.size();
@@ -33,14 +33,14 @@ void DeathRecord::Save(FILE *openfile)
 
     // Write string data
     int16_t nullt = 0;
-    std::fwrite(m_levelName.data(), 1, tempint, openfile);
-    std::fwrite(&nullt, 1, sizeof(int16_t), openfile);
+    SDL_RWwrite(openfile, m_levelName.data(), 1, tempint);
+    SDL_RWwrite(openfile, &nullt, 1, sizeof(int16_t));
 
     // Write death count
     LunaCounterUtil::writeIntLE(openfile, m_deaths);
 }
 
-bool DeathRecord::Load(FILE *openfile)
+bool DeathRecord::Load(SDL_RWops *openfile)
 {
     size_t got;
     char buf[151];
@@ -64,7 +64,7 @@ bool DeathRecord::Load(FILE *openfile)
     }
 
     // Read string data
-    got = std::fread(buf, 1, length, openfile);
+    got = SDL_RWread(openfile, buf, 1, length);
     if(got != length)
     {
         pLogWarning("Demos counter Record: Failed to read the level name");
@@ -72,10 +72,10 @@ bool DeathRecord::Load(FILE *openfile)
     }
 
     if(skip > 0)
-        std::fseek(openfile, skip, SEEK_CUR);
+        SDL_RWseek(openfile, skip, RW_SEEK_CUR);
 
     m_levelName = std::string(buf);
-    std::fseek(openfile, 2, SEEK_CUR);
+    SDL_RWseek(openfile, 2, RW_SEEK_CUR);
 
     // Read death count
     got = LunaCounterUtil::readIntLE(openfile, m_deaths);
