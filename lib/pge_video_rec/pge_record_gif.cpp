@@ -30,7 +30,7 @@ struct PGE_VideoRecording_GIF : public PGE_VideoRecording
     PGE_VideoRecording_GIF() : PGE_VideoRecording() {}
     virtual ~PGE_VideoRecording_GIF() = default;
 
-    GIF_H::GifWriter  writer      = {nullptr, nullptr, true, false};
+    GIF_H::GifWriter  writer      = {nullptr, nullptr, true, false, {}};
     unsigned char padding[7] = {0, 0, 0, 0, 0, 0, 0};
 
     // returns the best file extension for the recording type
@@ -50,7 +50,7 @@ const char* PGE_VideoRecording_GIF::extension() const
 
 bool PGE_VideoRecording_GIF::initialize(const char* filename)
 {
-    FILE *gifFile = Files::utf8_fopen(filename, "wb");
+    SDL_RWops *gifFile = Files::open_file(filename, "wb");
 
     if(!gifFile)
         return false;
