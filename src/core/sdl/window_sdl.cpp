@@ -127,6 +127,8 @@ bool WindowSDL::initSDL(uint32_t windowInitFlags)
 
 #if defined(RENDER_FULLSCREEN_ALWAYS)
     windowInitFlags |= SDL_WINDOW_FULLSCREEN | SDL_WINDOW_SHOWN;
+#else
+    windowInitFlags |= SDL_WINDOW_HIDDEN;
 #endif
 
     // restore fullscreen state
@@ -147,7 +149,6 @@ bool WindowSDL::initSDL(uint32_t windowInitFlags)
                                 SDL_WINDOWPOS_CENTERED,
                                 initWindowW, initWindowH,
                                 SDL_WINDOW_RESIZABLE |
-                                SDL_WINDOW_HIDDEN |
                                 SDL_WINDOW_ALLOW_HIGHDPI |
                                 windowInitFlags);
 
