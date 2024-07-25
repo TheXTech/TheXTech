@@ -78,6 +78,9 @@
 #endif
 
 
+// warning for improper rects
+static const char* s_improper_rect_warning = "Attempted to set %s %d %s to %f, setting to 0";
+
 void addMissingLvlSuffix(std::string &fileName)
 {
     if(!fileName.empty() && !Files::hasSuffix(fileName, ".lvl") && !Files::hasSuffix(fileName, ".lvlx") && !Files::hasSuffix(fileName, "tst"))
@@ -215,9 +218,6 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
 
     if(FilePath == ".lvl" || FilePath == ".lvlx")
         return false;
-
-    // warning for improper rects
-    const char* improper_rect_warning = "Attempted to set %s %d %s to %f, setting to 0";
 
     g_curLevelMedals.prepare_lvl(lvl);
 
@@ -375,13 +375,13 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         // don't allow improper rects
         if(PlayerStart[A].Width < 0)
         {
-            pLogWarning(improper_rect_warning, "PlayerStart", A, "Width", PlayerStart[A].Width);
+            pLogWarning(s_improper_rect_warning, "PlayerStart", A, "Width", PlayerStart[A].Width);
             PlayerStart[A].Width = 0;
         }
 
         if(PlayerStart[A].Height < 0)
         {
-            pLogWarning(improper_rect_warning, "PlayerStart", A, "Height", PlayerStart[A].Height);
+            pLogWarning(s_improper_rect_warning, "PlayerStart", A, "Height", PlayerStart[A].Height);
             PlayerStart[A].Height = 0;
         }
 
@@ -568,13 +568,13 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         // don't allow improper rects
         if(block.Location.Width < 0)
         {
-            pLogWarning(improper_rect_warning, "Block", numBlock, "Width", block.Location.Width);
+            pLogWarning(s_improper_rect_warning, "Block", numBlock, "Width", block.Location.Width);
             block.Location.Width = 0;
         }
 
         if(block.Location.Height < 0)
         {
-            pLogWarning(improper_rect_warning, "Block", numBlock, "Height", block.Location.Height);
+            pLogWarning(s_improper_rect_warning, "Block", numBlock, "Height", block.Location.Height);
             block.Location.Height = 0;
         }
 
@@ -825,7 +825,6 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         syncLayers_NPC(numNPCs);
     }
 
-    std::string level_name;
 
     for(auto &w : lvl.doors)
     {
@@ -853,6 +852,7 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         // Work around filenames with no extension suffix and case missmatch
         if(!w.lname.empty())
         {
+            std::string level_name;
             validateLevelName(level_name, w.lname);
             SetS(warp.level, level_name);
         }
@@ -920,19 +920,20 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         // don't allow improper rects
         if(water.Location.Width < 0)
         {
-            pLogWarning(improper_rect_warning, "Water", numWater, "Width", water.Location.Width);
+            pLogWarning(s_improper_rect_warning, "Water", numWater, "Width", water.Location.Width);
             water.Location.Width = 0;
         }
 
         if(water.Location.Height < 0)
         {
-            pLogWarning(improper_rect_warning, "Water", numWater, "Height", water.Location.Height);
+            pLogWarning(s_improper_rect_warning, "Water", numWater, "Height", water.Location.Height);
             water.Location.Height = 0;
         }
 
         water.Buoy = w.buoy;
         water.Quicksand = w.env_type;
         water.Layer = FindLayer(w.layer);
+
         syncLayers_Water(numWater);
     }
 
