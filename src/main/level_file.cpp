@@ -455,11 +455,8 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
                 event.ToggleLayer.push_back(found);
         }
 
-        int maxSets = int(e.sets.size());
-        if(maxSets > numSections)
-            maxSets = numSections;
-
-        for(B = 0; B <= maxSections; B++)
+        // this was done in ClearLevel, but it may be necessary here to refresh matters if two events had the same name
+        for(int B = 0; B <= maxSections; B++)
         {
             auto &s = event.section[B];
             s.music_id = LevelEvent_Sets::LESet_Nothing;
@@ -471,10 +468,19 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
             s.position.Width = 0;
         }
 
-        for(B = 0; B < maxSets; B++)
+        // unpack section settings
+        for(auto &s : e.sets)
         {
-            auto &ss = event.section[B];
-            auto &s = e.sets[size_t(B)];
+            // this has a different meaning (padding) when we are not actually using callbacks
+            if(s.id == -1)
+                continue;
+            // invalid section ID
+            else if(s.id > maxSections || s.id < 0)
+                return false;
+
+            // relies on the fact that this is an ARRAY at TheXTech's side
+            auto &ss = event.section[s.id];
+
             ss.music_id = int(s.music_id);
             ss.background_id = int(s.background_id);
             if(!s.music_file.empty())
