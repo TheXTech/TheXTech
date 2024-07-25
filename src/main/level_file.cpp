@@ -155,11 +155,117 @@ bool OpenLevel(std::string FilePath)
     return true;
 }
 
+struct LevelLoad
+{
+    std::vector<std::string> current_layers;
+    std::vector<std::string> current_events;
+
+    std::vector<layerindex_t> final_layer_index;
+    std::vector<eventindex_t> final_event_index;
+
+    int numPlayerStart = 0;
+    int checkPointId = 0;
+
+    layerindex_t layers_finalized = 0;
+    eventindex_t events_finalized = 0;
+
+    void AddCurrentLayer(const std::string& layer_name)
+    {
+        current_layers.push_back(layer_name);
+        final_layer_index.push_back(LAYER_NONE);
+    }
+
+    layerindex_t FindLayer(const std::string& layer_name)
+    {
+        if(layer_name.empty())
+            return LAYER_NONE;
+
+        const char* s = layer_name.c_str();
+        if(s[0] == 'D' && s[1] == 'e' && s[2] == 'f' && s[3] == 'a' && s[4] == 'u' && s[5] == 'l' && s[6] == 't' && s[7] == '\0')
+            return LAYER_DEFAULT;
+
+        for(layerindex_t A = 0; A < current_layers.size(); A++)
+        {
+            if(SDL_strcasecmp(current_layers[A].c_str(), layer_name.c_str()) == 0)
+                return A;
+        }
+
+        if(current_layers.size() == LAYER_NONE)
+            return LAYER_NONE;
+
+        layerindex_t old_size = (layerindex_t)current_layers.size();
+        AddCurrentLayer(layer_name);
+
+        return old_size;
+    }
+
+    layerindex_t FinalizeLayer(layerindex_t current_index)
+    {
+        if(current_index == LAYER_NONE)
+            return LAYER_NONE;
+
+        if(final_layer_index[current_index] == LAYER_NONE)
+        {
+            if(layers_finalized == maxLayers)
+                return LAYER_NONE;
+
+            final_layer_index[current_index] = layers_finalized;
+            layers_finalized++;
+        }
+
+        return final_layer_index[current_index];
+    }
+
+    void AddCurrentEvent(const std::string& event_name)
+    {
+        current_events.push_back(event_name);
+        final_event_index.push_back(EVENT_NONE);
+    }
+
+    eventindex_t FindEvent(const std::string& event_name)
+    {
+        if(event_name.empty())
+            return EVENT_NONE;
+
+        for(eventindex_t A = 0; A < current_events.size(); A++)
+        {
+            if(SDL_strcasecmp(current_events[A].c_str(), event_name.c_str()) == 0)
+                return A;
+        }
+
+        if(current_events.size() == EVENT_NONE)
+            return EVENT_NONE;
+
+        eventindex_t old_size = (eventindex_t)current_events.size();
+        AddCurrentEvent(event_name);
+
+        return old_size;
+    }
+
+    eventindex_t FinalizeEvent(eventindex_t current_index)
+    {
+        if(current_index == EVENT_NONE)
+            return EVENT_NONE;
+
+        if(final_event_index[current_index] == EVENT_NONE)
+        {
+            if(events_finalized == maxEvents)
+                return EVENT_NONE;
+
+            final_event_index[current_index] = events_finalized;
+            events_finalized++;
+        }
+
+        return final_event_index[current_index];
+    }
+};
+
 bool OpenLevelData(LevelData &lvl, const std::string FilePath)
 {
+    LevelLoad load;
+
     int A = 0;
     int B = 0;
-    int checkPointId = 0;
 
     qScreen = false;
     qScreen_canonical = false;
@@ -175,8 +281,15 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
     numWarps = 0;
     numSections = 0;
 
-    numLayers = 0;
-    numEvents = 0;
+    // initialize basic layers and events left by ClearLevel()
+    // they'll get updated, but this is necessary to handle PGE-X files without them included
+    load.AddCurrentLayer("Default");
+
+    for(int l = 0; l < numLayers; l++)
+        load.FinalizeLayer(load.FindLayer(Layer[l].Name));
+
+    for(int e = 0; e < numEvents; e++)
+        load.FinalizeEvent(load.FindEvent(Events[e].Name));
 
     g_dirEpisode.setCurDir(lvl.meta.path);
     FileFormat = lvl.meta.RecentFormat;
@@ -202,19 +315,12 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
 
 
 // Load Custom Stuff
-//    if(DirMan::exists(FileNamePath + FileName))
-//        FindCustomNPCs(FileNamePath + FileName);
-//    else
     LoadCustomConfig();
     FindCustomPlayers();
     FindCustomNPCs();
     LoadCustomGFX();
     LoadCustomSound();
     FontManager::loadCustomFonts();
-
-//    if(DirMan::exists(FileNamePath + FileName)) // Useless now
-//        LoadCustomGFX2(FileNamePath + FileName);
-// Blah
 
     if(FilePath == ".lvl" || FilePath == ".lvlx")
         return false;
@@ -233,11 +339,9 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
 
     for(auto & s : lvl.sections)
     {
+        // load failure, invalid section ID
         if(s.id > maxSections || s.id < 0)
-        {
-            // load failure, invalid section ID
             return false;
-        }
 
         if(s.id + 1 > numSections)
             numSections = s.id + 1;
@@ -361,11 +465,11 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
 #endif
     }
 
-    int numPlayerStart = 0;
     for(auto &p : lvl.players)
     {
-        numPlayerStart++;
-        int A = numPlayerStart;
+        // TODO: should try to use the startpoint's ID field if possible
+        load.numPlayerStart++;
+        int A = load.numPlayerStart;
 
         PlayerStart[A].X = double(p.x);
         PlayerStart[A].Y = double(p.y);
@@ -393,13 +497,22 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
 
         PlayerStart[A].Direction = p.direction;
 
-        if(numPlayerStart == 2)
+        if(load.numPlayerStart == 2)
             break;
     }
 
-    A = 0;
     for(auto &l : lvl.layers)
     {
+        int A = load.FinalizeLayer(load.FindLayer(l.name));
+
+        // too many layers
+        if(A == LAYER_NONE)
+            return false;
+
+        // update layer count
+        if(A + 1 > numLayers)
+            numLayers = A + 1;
+
         auto &layer = Layer[A];
 
         layer = Layer_t();
@@ -407,22 +520,22 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         layer.Name = l.name;
         layer.Hidden = l.hidden;
         // hide layers after everything is done
-        A++;
-        numLayers++;
-        if(numLayers > maxLayers)
-        {
-            numLayers = maxLayers;
-            break;
-        }
     }
-
-    LAYER_USED_P_SWITCH = FindLayer(LAYER_USED_P_SWITCH_TITLE);
 
     // items in layers will be hidden after they are loaded
 
-    A = 0;
     for(auto &e : lvl.events)
     {
+        int A = load.FinalizeEvent(load.FindEvent(e.name));
+
+        // too many events
+        if(A == EVENT_NONE)
+            return false;
+
+        // update events count
+        if(A + 1 > numEvents)
+            numEvents = A + 1;
+
         auto &event = Events[A];
 
         event = Events_t();
@@ -436,21 +549,21 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         event.HideLayer.clear();
         for(std::string& l : e.layers_hide)
         {
-            layerindex_t found = FindLayer(l);
+            layerindex_t found = load.FindLayer(l);
             if(found != LAYER_NONE)
                 event.HideLayer.push_back(found);
         }
         event.ShowLayer.clear();
         for(std::string& l : e.layers_show)
         {
-            layerindex_t found = FindLayer(l);
+            layerindex_t found = load.FindLayer(l);
             if(found != LAYER_NONE)
                 event.ShowLayer.push_back(found);
         }
         event.ToggleLayer.clear();
         for(std::string& l : e.layers_toggle)
         {
-            layerindex_t found = FindLayer(l);
+            layerindex_t found = load.FindLayer(l);
             if(found != LAYER_NONE)
                 event.ToggleLayer.push_back(found);
         }
@@ -503,6 +616,8 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
             }
         }
 
+        event.TriggerEvent = load.FindEvent(e.trigger);
+
         event.TriggerDelay = e.trigger_timer;
 
         event.LayerSmoke = e.nosmoke;
@@ -519,32 +634,13 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         event.Controls.Up = e.ctrl_up;
 
         event.AutoStart = e.autostart;
-        event.MoveLayer = FindLayer(e.movelayer);
+        event.MoveLayer = load.FindLayer(e.movelayer);
         event.SpeedX = float(e.layer_speed_x);
         event.SpeedY = float(e.layer_speed_y);
 
         event.AutoX = float(e.move_camera_x);
         event.AutoY = float(e.move_camera_y);
         event.AutoSection = int(e.scroll_section);
-
-        A++;
-        numEvents++;
-        if(numEvents > maxEvents)
-        {
-            numEvents = maxEvents;
-            break;
-        }
-    }
-
-    // second pass needed for events that trigger other events
-    A = 0;
-    for(auto &e : lvl.events)
-    {
-        Events[A].TriggerEvent = FindEvent(e.trigger);
-
-        A++;
-        if(A > maxEvents)
-            break;
     }
 
     for(auto &b : lvl.blocks)
@@ -605,10 +701,10 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
 
         block.Invis = b.invisible;
         block.Slippy = b.slippery;
-        block.Layer = FindLayer(b.layer);
-        block.TriggerDeath = FindEvent(b.event_destroy);
-        block.TriggerHit = FindEvent(b.event_hit);
-        block.TriggerLast = FindEvent(b.event_emptylayer);
+        block.Layer = load.FindLayer(b.layer);
+        block.TriggerDeath = load.FindEvent(b.event_destroy);
+        block.TriggerHit = load.FindEvent(b.event_hit);
+        block.TriggerLast = load.FindEvent(b.event_emptylayer);
 
         if(IF_OUTRANGE(block.Type, 0, maxBlockType)) // Drop ID to 1 for blocks of out of range IDs
         {
@@ -640,7 +736,7 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
             bgo.Type = 1;
         }
 
-        bgo.Layer = FindLayer(b.layer);
+        bgo.Layer = load.FindLayer(b.layer);
         bgo.Location.Width = GFXBackgroundWidth[bgo.Type];
         bgo.Location.Height = BackgroundHeight[bgo.Type];
 
@@ -755,12 +851,12 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
 
         npc.Legacy = n.is_boss;
 
-        npc.Layer = FindLayer(n.layer);
-        npc.TriggerActivate = FindEvent(n.event_activate);
-        npc.TriggerDeath = FindEvent(n.event_die);
-        npc.TriggerTalk = FindEvent(n.event_talk);
-        npc.TriggerLast = FindEvent(n.event_emptylayer);
-        npc.AttLayer = FindLayer(n.attach_layer);
+        npc.Layer = load.FindLayer(n.layer);
+        npc.TriggerActivate = load.FindEvent(n.event_activate);
+        npc.TriggerDeath = load.FindEvent(n.event_die);
+        npc.TriggerTalk = load.FindEvent(n.event_talk);
+        npc.TriggerLast = load.FindEvent(n.event_emptylayer);
+        npc.AttLayer = load.FindLayer(n.attach_layer);
 
         npc.DefaultType = npc.Type;
         npc.Location.Width = npc->TWidth;
@@ -773,14 +869,12 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         npc.Active = true;
         npc.JustActivated = 1;
 
-        CheckSectionNPC(numNPCs);
-
         if(npc.Type == NPCID_CHECKPOINT) // Is a checkpoint
         {
-            checkPointId++;
+            load.checkPointId++;
             if(g_config.fix_vanilla_checkpoints)
             {
-                npc.Special = checkPointId;
+                npc.Special = load.checkPointId;
                 npc.DefaultSpecial = int(npc.Special);
             }
         }
@@ -821,8 +915,6 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
                     npc.Killed = 9;
             }
         }
-
-        syncLayers_NPC(numNPCs);
     }
 
 
@@ -865,7 +957,7 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         warp.MapY = int(w.world_y);
 
         warp.Stars = w.stars;
-        warp.Layer = FindLayer(w.layer);
+        warp.Layer = load.FindLayer(w.layer);
         warp.Hidden = w.unknown;
 
         warp.NoYoshi = w.novehicles;
@@ -877,7 +969,7 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
 
         warp.cannonExit = w.cannon_exit;
         warp.cannonExitSpeed = w.cannon_exit_speed;
-        warp.eventEnter = FindEvent(w.event_enter);
+        warp.eventEnter = load.FindEvent(w.event_enter);
         if(!w.stars_msg.empty())
             SetS(warp.StarsMsg, w.stars_msg);
         warp.noPrintStars = w.star_num_hide;
@@ -894,8 +986,6 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         // FIXME: allow warp object to specify a transit effect name as a string
         if(warp.transitEffect >= ScreenFader::S_CUSTOM)
             warp.transitEffect = ScreenFader::loadTransitEffect(std::to_string(warp.transitEffect));
-
-        syncLayers_Warp(numWarps);
     }
 
 
@@ -932,10 +1022,103 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
 
         water.Buoy = w.buoy;
         water.Quicksand = w.env_type;
-        water.Layer = FindLayer(w.layer);
-
-        syncLayers_Water(numWater);
+        water.Layer = load.FindLayer(w.layer);
     }
+
+    // Everything is loaded.
+    // Now we fix the layers and events that got temporary indexes.
+    for(int A = 1; A <= numBlock; A++)
+    {
+        if(Block[A].Layer != LAYER_NONE)
+            Block[A].Layer = load.final_layer_index[Block[A].Layer];
+
+        if(Block[A].TriggerDeath != EVENT_NONE)
+            Block[A].TriggerDeath = load.final_event_index[Block[A].TriggerDeath];
+
+        if(Block[A].TriggerHit != EVENT_NONE)
+            Block[A].TriggerHit = load.final_event_index[Block[A].TriggerHit];
+
+        if(Block[A].TriggerLast != EVENT_NONE)
+            Block[A].TriggerLast = load.final_event_index[Block[A].TriggerLast];
+    }
+
+    for(int A = 1; A <= numBackground; A++)
+    {
+        if(Background[A].Layer != LAYER_NONE)
+            Background[A].Layer = load.final_layer_index[Background[A].Layer];
+    }
+
+    for(int A = 1; A <= numNPCs; A++)
+    {
+        if(NPC[A].Layer != LAYER_NONE)
+            NPC[A].Layer = load.final_layer_index[NPC[A].Layer];
+
+        if(NPC[A].AttLayer != LAYER_NONE)
+            NPC[A].AttLayer = load.final_layer_index[NPC[A].AttLayer];
+
+        if(NPC[A].TriggerActivate != EVENT_NONE)
+            NPC[A].TriggerActivate = load.final_event_index[NPC[A].TriggerActivate];
+
+        if(NPC[A].TriggerDeath != EVENT_NONE)
+            NPC[A].TriggerDeath = load.final_event_index[NPC[A].TriggerDeath];
+
+        if(NPC[A].TriggerTalk != EVENT_NONE)
+            NPC[A].TriggerTalk = load.final_event_index[NPC[A].TriggerTalk];
+
+        if(NPC[A].TriggerLast != EVENT_NONE)
+            NPC[A].TriggerLast = load.final_event_index[NPC[A].TriggerLast];
+
+        CheckSectionNPC(A);
+        syncLayers_NPC(A);
+    }
+
+    for(int A = 1; A <= numWarps; A++)
+    {
+        if(Warp[A].Layer != LAYER_NONE)
+            Warp[A].Layer = load.final_layer_index[Warp[A].Layer];
+
+        if(Warp[A].eventEnter != EVENT_NONE)
+            Warp[A].eventEnter = load.final_event_index[Warp[A].eventEnter];
+
+        syncLayers_Warp(A);
+    }
+
+    for(int A = 1; A <= numWater; A++)
+    {
+        if(Water[A].Layer != LAYER_NONE)
+            Water[A].Layer = load.final_layer_index[Water[A].Layer];
+
+        syncLayers_Water(A);
+    }
+
+    for(int A = 0; A < numEvents; A++)
+    {
+        if(Events[A].MoveLayer != LAYER_NONE)
+            Events[A].MoveLayer = load.final_layer_index[Events[A].MoveLayer];
+
+        if(Events[A].TriggerEvent != EVENT_NONE)
+            Events[A].TriggerEvent = load.final_event_index[Events[A].TriggerEvent];
+
+        for(layerindex_t& l : Events[A].ShowLayer)
+        {
+            if(l != LAYER_NONE)
+                l = load.final_layer_index[l];
+        }
+
+        for(layerindex_t& l : Events[A].HideLayer)
+        {
+            if(l != LAYER_NONE)
+                l = load.final_layer_index[l];
+        }
+
+        for(layerindex_t& l : Events[A].ToggleLayer)
+        {
+            if(l != LAYER_NONE)
+                l = load.final_layer_index[l];
+        }
+    }
+
+    LAYER_USED_P_SWITCH = FindLayer(LAYER_USED_P_SWITCH_TITLE);
 
     return true;
 }
