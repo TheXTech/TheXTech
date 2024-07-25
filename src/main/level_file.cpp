@@ -196,22 +196,6 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         FullFileName = FileNamePath + FileName + ".lvlx";
     }
 
-    IsEpisodeIntro = (StartLevel == FileNameFull);
-
-    if(IsEpisodeIntro)
-    {
-        IsHubLevel = NoMap;
-        FileRecentSubHubLevel.clear();
-    }
-
-    if(!IsHubLevel)
-    {
-        IsHubLevel = std::find(SubHubLevels.begin(), SubHubLevels.end(), FileNameFull) != SubHubLevels.end();
-
-        if(IsHubLevel)
-            FileRecentSubHubLevel = FileNameFull;
-    }
-
     // Level-wide extra settings
     if(!lvl.custom_params.empty())
     {
@@ -967,6 +951,22 @@ void OpenLevelDataPost()
     if(!GameMenu && !LevelEditor)
         tr.loadLevelTranslation(FileNameFull);
 
+
+    IsEpisodeIntro = (StartLevel == FileNameFull);
+
+    if(IsEpisodeIntro)
+    {
+        IsHubLevel = NoMap;
+        FileRecentSubHubLevel.clear();
+    }
+
+    if(!IsHubLevel)
+    {
+        IsHubLevel = std::find(SubHubLevels.begin(), SubHubLevels.end(), FileNameFull) != SubHubLevels.end();
+
+        if(IsHubLevel)
+            FileRecentSubHubLevel = FileNameFull;
+    }
 
     // TODO: disable this if the file indicates that it is already sorted
     if(g_config.emulate_classic_block_order && FileFormat == FileFormats::LVL_PGEX)
