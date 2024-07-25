@@ -171,6 +171,16 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
     FreezeNPCs = false;
     CoinMode = false;
 
+    numBlock = 0;
+    numBackground = 0;
+    numLocked = 0;
+    numNPCs = 0;
+    numWarps = 0;
+    numSections = 0;
+
+    numLayers = 0;
+    numEvents = 0;
+
     g_dirEpisode.setCurDir(lvl.meta.path);
     FileFormat = lvl.meta.RecentFormat;
     FileName = g_dirEpisode.resolveDirCase(lvl.meta.filename);
@@ -196,20 +206,6 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         FullFileName = FileNamePath + FileName + ".lvlx";
     }
 
-    // Level-wide extra settings
-    if(!lvl.custom_params.empty())
-    {
-        // none supported yet
-    }
-
-    numBlock = 0;
-    numBackground = 0;
-    numLocked = 0;
-    numNPCs = 0;
-    numWarps = 0;
-
-    numLayers = 0;
-    numEvents = 0;
 
 // Load Custom Stuff
 //    if(DirMan::exists(FileNamePath + FileName))
@@ -240,7 +236,12 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
     maxStars = lvl.stars;
     LevelName = lvl.LevelName;
 
-    numSections = 0;
+    // Level-wide extra settings
+    if(!lvl.custom_params.empty())
+    {
+        // none supported yet
+    }
+
     B = 0;
     for(auto & s : lvl.sections)
     {
