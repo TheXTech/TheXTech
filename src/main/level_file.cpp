@@ -218,14 +218,6 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         // none supported yet
     }
 
-    // FIXME: disable this if the file indicates that it is already sorted
-    if(g_config.emulate_classic_block_order && FileFormat == FileFormats::LVL_PGEX)
-    {
-        FileFormats::smbx64LevelPrepare(lvl);
-        FileFormats::smbx64LevelSortBlocks(lvl);
-        FileFormats::smbx64LevelSortBGOs(lvl);
-    }
-
     numBlock = 0;
     numBackground = 0;
     numLocked = 0;
@@ -975,8 +967,31 @@ void OpenLevelDataPost()
     if(!GameMenu && !LevelEditor)
         tr.loadLevelTranslation(FileNameFull);
 
+
+    // TODO: disable this if the file indicates that it is already sorted
+    if(g_config.emulate_classic_block_order && FileFormat == FileFormats::LVL_PGEX)
+    {
+        qSortBlocksX(1, numBlock);
+
+        int col_start = 1;
+        int col_end = 2;
+        for(; col_end <= numBlock; col_end++)
+        {
+            if(Block[col_end].Location.X > Block[col_start].Location.X)
+            {
+                qSortBlocksY(col_start, col_end - 1);
+                col_start = col_end;
+            }
+        }
+
+        // col_end = numBlock + 1
+        qSortBlocksY(col_start, col_end - 1);
+        qSortBackgrounds(1, numBackground);
+    }
+    else
+        qSortBackgrounds(1, numBackground, false);
+
     // FindBlocks();
-    qSortBackgrounds(1, numBackground, false);
     UpdateBackgrounds();
     // FindSBlocks();
     syncLayersTrees_AllBlocks();
