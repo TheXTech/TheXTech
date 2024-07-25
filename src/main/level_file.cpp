@@ -154,15 +154,9 @@ bool OpenLevel(std::string FilePath)
 
 bool OpenLevelData(LevelData &lvl, const std::string FilePath)
 {
-//    std::string newInput;
-//    int FileRelease = 0;
     int A = 0;
     int B = 0;
     int checkPointId = 0;
-//    int C = 0;
-//    bool tempBool = false;
-//    int mSections = 0;
-//    Location_t tempLocation;
 
     qScreen = false;
     qScreen_canonical = false;
@@ -186,9 +180,6 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
     FileName = g_dirEpisode.resolveDirCase(lvl.meta.filename);
     FileNamePath = lvl.meta.path + "/";
     g_dirCustom.setCurDir(FileNamePath + FileName);
-
-    bool isSmbx64 = (lvl.meta.RecentFormat == LevelData::SMBX64);
-    // int  fVersion = lvl.meta.RecentFormatVersion;
 
     if(!FilePath.empty())
     {
@@ -222,8 +213,6 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
 //        LoadCustomGFX2(FileNamePath + FileName);
 // Blah
 
-    bool compatModern = (g_config.compatibility_mode == Config_t::COMPAT_OFF);
-
     if(FilePath == ".lvl" || FilePath == ".lvlx")
         return false;
 
@@ -242,9 +231,19 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         // none supported yet
     }
 
-    B = 0;
     for(auto & s : lvl.sections)
     {
+        if(s.id > maxSections || s.id < 0)
+        {
+            // load failure, invalid section ID
+            return false;
+        }
+
+        if(s.id + 1 > numSections)
+            numSections = s.id + 1;
+
+        int B = s.id;
+
         level[B].X = double(s.size_left);
         level[B].Y = double(s.size_top);
         level[B].Height = double(s.size_bottom);
@@ -360,24 +359,14 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
             }
         }
 #endif
-
-        B++;
-        if(B > maxSections)
-            break;
-        numSections++;
     }
 
-    for(A = 1; A <= 2; A++) // Fill with zeroes
-    {
-        PlayerStart[A].X = 0;
-        PlayerStart[A].Y = 0;
-        PlayerStart[A].Width = 0;
-        PlayerStart[A].Height = 0;
-    }
-
-    A = 1;
+    int numPlayerStart = 0;
     for(auto &p : lvl.players)
     {
+        numPlayerStart++;
+        int A = numPlayerStart;
+
         PlayerStart[A].X = double(p.x);
         PlayerStart[A].Y = double(p.y);
         PlayerStart[A].Width = double(p.w);
@@ -396,9 +385,15 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
             PlayerStart[A].Height = 0;
         }
 
+        // width and height are zero in LVLX
+        if(PlayerStart[A].Width == 0)
+            PlayerStart[A].Width = Physics.PlayerWidth[A][2];
+        if(PlayerStart[A].Height == 0)
+            PlayerStart[A].Height = Physics.PlayerHeight[A][2];
+
         PlayerStart[A].Direction = p.direction;
-        A++;
-        if(A > 2)
+
+        if(numPlayerStart == 2)
             break;
     }
 
@@ -716,20 +711,13 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
             variantHandled = true;
         }
 
-        // if(compatModern && isSmbx64)
-        // {
-        //     // legacy Smbx64 NPC behavior tracking moved to npc_special_data.h
-        //     npc.Variant = find_legacy_Variant(npc.Type, fVersion);
-        // }
-        // else
-
         // don't load anything for SMBX64 files
-        if(isSmbx64)
+        if(FileFormat == FileFormats::LVL_SMBX64)
         {
             npc.Variant = 0;
         }
         // only load Variant for NPCs that support it
-        else if(find_Variant_Data(npc.Type) /* && compatModern */)
+        else if(find_Variant_Data(npc.Type))
         {
             if((n.special_data < 0) || (n.special_data >= 256))
                 pLogWarning("Attempted to load npc Type %d with out-of-range variant index %f", npc.Type, n.special_data);
@@ -784,7 +772,7 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         if(npc.Type == NPCID_CHECKPOINT) // Is a checkpoint
         {
             checkPointId++;
-            if(compatModern)
+            if(g_config.fix_vanilla_checkpoints)
             {
                 npc.Special = checkPointId;
                 npc.DefaultSpecial = int(npc.Special);
