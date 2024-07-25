@@ -154,21 +154,20 @@ bool WindowSDL::initSDL(uint32_t windowInitFlags)
 
     if(m_window == nullptr)
     {
-        pLogCritical("Unable to create window!");
+        const char *error = SDL_GetError();
+        if(*error != '\0')
+            pLogFatal("Unable to create window: %s", error);
+        else
+            pLogFatal("Unable to create window!");
+
         SDL_ClearError();
         return false;
     }
-
-    if(isSdlError())
+    else if(isSdlError())
     {
         const char *error = SDL_GetError();
-        if(*error != '\0')
-            pLogCritical("Unable to create window: %s", error);
-        else
-            pLogCritical("Unable to create window!");
-
+        pLogCritical("SDL error on window creation: %s", error);
         SDL_ClearError();
-        return false;
     }
 
     SDL_SetWindowMinimumSize(m_window, 240, 160);
