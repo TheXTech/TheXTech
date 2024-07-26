@@ -108,7 +108,7 @@ void PlayerSharedScreenLogic(int A)
 
 
         // give wings to a player that falls offscreen but not off-section
-        if(p.Location.Y > -vscreen.Y + vscreen.Height + 64 && p.Location.Y <= level[p.Section].Height + 64 || (p.Controls.AltJump && p.Controls.AltRun))
+        if(p.Location.Y > -vscreen.Y + vscreen.Height + 64 && p.Location.Y <= level[p.Section].Height + 64)
         {
             p.Dead = true;
             p.Effect = PLREFF_COOP_WINGS;
