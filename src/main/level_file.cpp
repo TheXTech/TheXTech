@@ -159,6 +159,8 @@ struct LevelLoad
     std::vector<layerindex_t> final_layer_index;
     std::vector<eventindex_t> final_event_index;
 
+    SaveInfoInit si;
+
     int numPlayerStart = 0;
     int checkPointId = 0;
 
@@ -313,7 +315,7 @@ bool OpenLevelData(PGE_FileFormats_misc::TextInput& input, const std::string Fil
     FontManager::loadCustomFonts();
 
 
-    // load.si.begin(g_curLevelMedals.should_initialize());
+    load.si.begin(g_curLevelMedals.should_initialize());
 
     LevelData lvl;
     if(!FileFormats::OpenLevelFileT(input, lvl))
@@ -322,10 +324,9 @@ bool OpenLevelData(PGE_FileFormats_misc::TextInput& input, const std::string Fil
                     FilePath.c_str(),
                     lvl.meta.ERROR_info.c_str(),
                     lvl.meta.ERROR_linenum);
+        load.si.on_error();
         return false;
     }
-
-    g_curLevelMedals.prepare_lvl(lvl);
 
     if(!OpenLevel_Unpack(load, lvl))
         return false;
@@ -352,7 +353,7 @@ bool OpenLevel_Head(void* userdata, LevelData& lvl)
         // none supported yet
     }
 
-    // load.si.check_head(h);
+    load.si.check_head(lvl);
 
     return true;
 }
@@ -973,7 +974,7 @@ bool OpenLevel_NPC(void* userdata, LevelNPC& n)
     }
 
     // update the level's save info based on the NPC
-    // load.si.check_npc(n);
+    load.si.check_npc(n);
 
     return true;
 }
@@ -1401,7 +1402,10 @@ void OpenLevelDataPost()
     }
 
     if(!LevelEditor)
+    {
+        g_curLevelMedals.prepare_lvl();
         OrderMedals();
+    }
 
     // If too much locks
     SDL_assert_release(numBackground + numLocked <= (maxBackgrounds + maxWarps));

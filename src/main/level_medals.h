@@ -23,7 +23,10 @@
 #ifndef LEVEL_MEDALS_H
 #define LEVEL_MEDALS_H
 
+#include <string>
+
 struct LevelData;
+struct LevelSaveInfo_t;
 
 namespace PGE_FileFormats_misc
 {
@@ -38,14 +41,25 @@ private:
 
 protected:
     friend bool OpenLevelData(PGE_FileFormats_misc::TextInput &lvl, const std::string FilePath);
+    friend void OpenLevelDataPost();
 
     /**
-     * \brief loads maximums from the current level
-     * Must be called during OpenLevelData after FileNameFull is set and before the LevelData is unloaded
+     * \brief checks if the current level's save data must be initialized
+     * Must be called during OpenLevelData after FileNameFull is set
+     *
+     * The resulting pointer may be used by a SaveInfoInit object during level load,
+     * and remains valid until the next time LevelWarpSaveEntries is modified
+     * by this method or by FindStars()
      *
      * \param loadedLevel the loaded LevelData object, used to initialize level save info if needed
      */
-    void prepare_lvl(const LevelData& loadedLevel);
+    LevelSaveInfo_t* should_initialize() const;
+
+    /**
+     * \brief loads maximums from the current level
+     * Must be called after the level is fully loaded and the save data has been initialized
+     */
+    void prepare_lvl();
 
 public:
     //! INTEGER for number of medals available (can't exceed 8)

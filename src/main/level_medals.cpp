@@ -127,7 +127,7 @@ void CurLevelMedals_t::reset_lvl()
     prev = 0;
 }
 
-void CurLevelMedals_t::prepare_lvl(const LevelData& loadedLevel)
+LevelSaveInfo_t* CurLevelMedals_t::should_initialize() const
 {
     // find the level save info
     LevelSaveInfo_t* info = s_findSaveInfo();
@@ -135,25 +135,33 @@ void CurLevelMedals_t::prepare_lvl(const LevelData& loadedLevel)
     // if it can't be found in the world map / previously warped locations, initialize it and add to LevelWarpSaveEntries
     if(!info && LevelWarpSaveEntries.size() != 0xFFFF)
     {
-        LevelSaveInfo_t info_init = InitLevelSaveInfo(loadedLevel);
-
-        if(info_init.inited())
-        {
-            LevelWarpSaveEntries.push_back({FileNameFull, info_init});
-            info = &LevelWarpSaveEntries[LevelWarpSaveEntries.size() - 1].save_info;
-        }
+        LevelWarpSaveEntries.push_back({FileNameFull, LevelSaveInfo_t()});
+        info = &LevelWarpSaveEntries[LevelWarpSaveEntries.size() - 1].save_info;
     }
 
     // if allocation failed, just reset level info
     if(!info)
+        return nullptr;
+
+    // if allocated and inited, do nothing
+    if(info->inited())
+        return nullptr;
+
+    // we are ready!
+    return info;
+}
+
+void CurLevelMedals_t::prepare_lvl()
+{
+    // find the level save info
+    LevelSaveInfo_t* info = s_findSaveInfo();
+
+    // if save info isn't ready, just reset level info
+    if(!info || !info->inited())
     {
         reset_lvl();
         return;
     }
-
-    // if allocated but not inited yet (intro level?) do so now
-    if(!info->inited())
-        *info = InitLevelSaveInfo(loadedLevel);
 
     // load max / prev from the level info
     max = info->max_medals;
