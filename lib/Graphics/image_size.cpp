@@ -19,7 +19,7 @@
 
 #include "image_size.h"
 
-#include "sdl_proxy/sdl_rwops.h"
+#include <SDL2/SDL_rwops.h>
 #include "sdl_proxy/sdl_stdinc.h"
 
 
@@ -261,24 +261,6 @@ bool PGE_ImageInfo::getImageSize(const PGEString &imagePath, uint32_t *w, uint32
     }
 
     SDL_RWops* image = SDL_RWFromFile(imgPath.c_str(), "rb");
-
-    if(!image)
-    {
-        if(errCode)
-            *errCode = ERR_CANT_OPEN;
-
-        return false;
-    }
-
-    return getImageSizeRW(image, w, h, errCode);
-}
-
-bool PGE_ImageInfo::getImageSizeFromMem(const char *mem, size_t size, uint32_t *w, uint32_t *h, int *errCode)
-{
-    if(errCode)
-        *errCode = ERR_OK;
-
-    SDL_RWops* image = SDL_RWFromConstMem(mem, int(size));
 
     if(!image)
     {

@@ -85,8 +85,6 @@ EditorPipe::EditorPipe():
     m_levelAccepted(false)
 {
     m_acceptedRawData.clear();
-    FileFormats::CreateLevelData(m_acceptedLevel);
-    m_acceptedLevel.meta.ReadFileValid = false;
     pLogDebug("Construct interprocess pipe...");
     start();
 }
@@ -205,20 +203,8 @@ void EditorPipe::icomingData(const std::string &in)
     {
         pLogDebug("do Parse LVLX: PARSE_LVLX");
         m_doParseLevelData = true;
-        FileFormats::ReadExtendedLvlFileRaw(m_acceptedRawData, m_accepted_lvl_path, m_acceptedLevel);
-        IntProc::setState(fmt::format_ne("LVLX is valid: {0}", m_acceptedLevel.meta.ReadFileValid));
-        pLogDebug("Level data parsed, Valid: %d", m_acceptedLevel.meta.ReadFileValid);
-
-        if(!m_acceptedLevel.meta.ReadFileValid)
-        {
-            pLogDebug("Error reason:  %s", m_acceptedLevel.meta.ERROR_info.c_str());
-            pLogDebug("line number:   %d", m_acceptedLevel.meta.ERROR_linenum);
-            pLogDebug("line contents: %s", m_acceptedLevel.meta.ERROR_linedata.c_str());
-            D_pLogDebug("Invalid File data BEGIN >>>>>>>>>>>\n"
-                        "%s"
-                        "\n<<<<<<<<<<<<INVALID File data END",
-                        m_acceptedRawData.c_str());
-        }
+        m_acceptedLevel.open(&m_acceptedRawData, m_accepted_lvl_path);
+        IntProc::setState(fmt::format_ne("LVLX is valid: 1"));
 
         m_levelAccepted_lock.lock();
         m_levelAccepted = true;

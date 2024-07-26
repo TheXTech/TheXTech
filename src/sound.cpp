@@ -244,6 +244,7 @@ int CustomWorldMusicId()
 
 void InitMixerX()
 {
+#ifndef THEXTECH_NO_SDL_BUILD
     if(!g_config.audio_enable)
         return;
 
@@ -359,6 +360,7 @@ void InitMixerX()
 
         g_mixerLoaded = true;
     }
+#endif // #ifndef THEXTECH_NO_SDL_BUILD
 }
 
 void RestartMixerX()

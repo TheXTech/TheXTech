@@ -84,8 +84,15 @@ typedef struct SDL_RWops
     void* hidden;
 } SDL_RWops;
 
+SDL_RWops* SDL_AllocRW();
+void SDL_FreeRW(SDL_RWops * area);
+SDL_RWops* SDL_RWFromFile(const char* pathname, const char* mode);
+
 #ifdef __cplusplus
 } // extern "C"
 #endif
+
+/* C declarations or C++ inline definitions of standard RWops functions */
+#include "_priv_rwops_funcs.h"
 
 #endif /* #ifndef SDL_PROXY_RWOPS_H */

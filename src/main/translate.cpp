@@ -152,12 +152,14 @@ static std::string getJsonValue(nlohmann::ordered_json &j, const std::string &ke
 static bool saveFile(const std::string &inPath, const std::string &inData)
 {
     bool ret = true;
-    FILE *in = Files::utf8_fopen(inPath.c_str(), "w");
+    SDL_RWops *in = Files::open_file(inPath.c_str(), "w");
     if(!in)
         return false;
 
-    std::fprintf(in, "%s\n", inData.c_str());
-    std::fclose(in);
+    SDL_RWwrite(in, inData.c_str(), 1, inData.size());
+    SDL_RWwrite(in, "\n", 1, 1);
+
+    SDL_RWclose(in);
 
     return ret;
 }

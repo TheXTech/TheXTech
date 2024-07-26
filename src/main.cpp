@@ -612,8 +612,10 @@ int main(int argc, char**argv)
         else if(switchFrameSkip.isSet())
             g_config.enable_frameskip = true;
 
+#ifndef THEXTECH_NO_SDL_BUILD
         if(switchNoSound.isSet())
             g_config.audio_enable    = !switchNoSound.getValue();
+#endif
 
         if(switchVSync.isSet())
             g_config.render_vsync    = switchVSync.getValue();

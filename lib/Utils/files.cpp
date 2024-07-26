@@ -26,6 +26,7 @@
 #include "Logger/logger.h"
 #include <stdio.h>
 #include <locale>
+#include <SDL2/SDL_rwops.h>
 
 #ifdef _WIN32
 #include <windows.h>
@@ -40,9 +41,6 @@ static std::wstring Str2WStr(const std::string &path)
     return wpath;
 }
 #else
-#if defined(__ANDROID__)
-#   include <SDL2/SDL_rwops.h>
-#endif
 #include <unistd.h>
 #include <fcntl.h>         // open
 #include <string.h>
@@ -162,17 +160,20 @@ FILE *Files::utf8_fopen(const char *filePath, const char *modes)
 #endif
 }
 
+SDL_RWops *Files::open_file(const char *filePath, const char *modes)
+{
+    return SDL_RWFromFile(filePath, modes);
+}
+
 Files::Data Files::load_file(const char *filePath)
 {
     Files::Data ret;
 
-    FILE *in = Files::utf8_fopen(filePath, "rb");
+    SDL_RWops *in = Files::open_file(filePath, "rb");
     if(!in)
         return ret;
 
-    std::fseek(in, 0, SEEK_END);
-    off_t size = std::ftell(in);
-    std::fseek(in, 0, SEEK_SET);
+    off_t size = SDL_RWsize(in);
 
     // allocate extra byte for null terminator, but don't count it towards size of contained item
     unsigned char* target = (unsigned char*)malloc(size + 1);
@@ -180,7 +181,7 @@ Files::Data Files::load_file(const char *filePath)
 
     if(!target)
     {
-        fclose(in);
+        SDL_RWclose(in);
         return ret;
     }
 
@@ -190,11 +191,11 @@ Files::Data Files::load_file(const char *filePath)
 
     while(to_read)
     {
-        size_t bytes_read = fread(target, 1, to_read, in);
+        size_t bytes_read = SDL_RWread(in, target, 1, to_read);
         if(!bytes_read)
         {
             pLogCritical("I/O error when reading [%s]", filePath);
-            fclose(in);
+            SDL_RWclose(in);
 
             // resets the return value and frees the malloc'd buffer
             ret = Files::Data();
@@ -209,24 +210,35 @@ Files::Data Files::load_file(const char *filePath)
     // set null terminator
     *target = 0;
 
-    std::fclose(in);
+    SDL_RWclose(in);
 
     return ret;
 }
 
-int Files::skipBom(FILE* file, const char** charset)
+void Files::flush_file(SDL_RWops *f)
+{
+#ifdef THEXTECH_NO_SDL_BUILD
+    if(f->type == SDL_RWOPS_STDFILE)
+        ::fflush((FILE*)f->hidden);
+#elif defined(HAVE_STDIO_H)
+    if(f->type == SDL_RWOPS_STDFILE)
+        ::fflush(f->hidden.stdio.fp);
+#endif
+}
+
+int Files::skipBom(SDL_RWops* file, const char** charset)
 {
     char buf[4];
-    auto pos = ::ftell(file);
+    auto pos = SDL_RWtell(file);
 
     // Check for a BOM marker
-    if(::fread(buf, 1, 4, file) == 4)
+    if(SDL_RWread(file, buf, 1, 4) == 4)
     {
         if(::memcmp(buf, "\xEF\xBB\xBF", 3) == 0) // UTF-8 is only supported
         {
             if(charset)
                 *charset = "[UTF-8 BOM]";
-            ::fseek(file, pos + 3, SEEK_SET);
+            SDL_RWseek(file, pos + 3, RW_SEEK_SET);
             return CHARSET_UTF8;
         }
         // Unsupported charsets
@@ -234,28 +246,28 @@ int Files::skipBom(FILE* file, const char** charset)
         {
             if(charset)
                 *charset = "[UTF16-BE BOM]";
-            ::fseek(file, pos + 2, SEEK_SET);
+            SDL_RWseek(file, pos + 2, RW_SEEK_SET);
             return CHARSET_UTF16BE;
         }
         else if(::memcmp(buf, "\xFF\xFE", 2) == 0)
         {
             if(charset)
                 *charset = "[UTF16-LE BOM]";
-            ::fseek(file, pos + 2, SEEK_SET);
+            SDL_RWseek(file, pos + 2, RW_SEEK_SET);
             return CHARSET_UTF16LE;
         }
         else if(::memcmp(buf, "\x00\x00\xFE\xFF", 4) == 0)
         {
             if(charset)
                 *charset = "[UTF32-BE BOM]";
-            ::fseek(file, pos + 4, SEEK_SET);
+            SDL_RWseek(file, pos + 4, RW_SEEK_SET);
             return CHARSET_UTF32BE;
         }
         else if(::memcmp(buf, "\x00\x00\xFF\xFE", 4) == 0)
         {
             if(charset)
                 *charset = "[UTF32-LE BOM]";
-            ::fseek(file, pos + 4, SEEK_SET);
+            SDL_RWseek(file, pos + 4, RW_SEEK_SET);
             return CHARSET_UTF32LE;
         }
     }
@@ -264,7 +276,7 @@ int Files::skipBom(FILE* file, const char** charset)
         *charset = "[NO BOM]";
 
     // No BOM detected, seek to begining of the file
-    ::fseek(file, pos, SEEK_SET);
+    SDL_RWseek(file, pos, RW_SEEK_SET);
 
     return CHARSET_UTF8;
 }
@@ -275,23 +287,14 @@ bool Files::fileExists(const std::string &path)
     std::wstring wpath = Str2WStr(path);
     return PathFileExistsW(wpath.c_str()) == TRUE;
 
-#elif defined(__ANDROID__)
-    SDL_RWops *ops = SDL_RWFromFile(path.c_str(), "rb");
+#else
+    SDL_RWops *ops = Files::open_file(path.c_str(), "rb");
     if(ops)
     {
         SDL_RWclose(ops);
         return true;
     }
 
-    return false;
-
-#else
-    FILE *ops = fopen(path.c_str(), "rb");
-    if(ops)
-    {
-        fclose(ops);
-        return true;
-    }
     return false;
 #endif
 }

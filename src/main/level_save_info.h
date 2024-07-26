@@ -24,16 +24,34 @@
 #define LEVEL_SAVE_INFO_H
 
 #include <string>
+#include <bitset>
+
 #include <PGE_File_Formats/file_formats.h>
 
 #include "globals.h"
 
-/**
- * \brief initialize level save info from a loaded LevelData object
- * \param loadedLevel a loaded LevelData object for the level whose save info will be initialized
- * \return loaded save info
- */
-LevelSaveInfo_t InitLevelSaveInfo(const LevelData& loadedLevel);
+struct SaveInfoInit
+{
+    LevelSaveInfo_t* target = nullptr;
+    std::bitset<c_max_track_medals> used_indexes;
+
+    // resets target's fields to begin initialization
+    void begin(LevelSaveInfo_t* target);
+
+    // marks target as invalid on load error
+    void on_error();
+
+#ifdef PGEFL_CALLBACK_API
+    // updates star count from header
+    void check_head(const LevelHead& head);
+#else
+    // updates star count from header
+    void check_head(const LevelData& head);
+#endif
+
+    // updates medal count from NPC
+    void check_npc(const LevelNPC& head);
+};
 
 /**
  * \brief convenience function: initialize level save info from fullPath, loading the level into tempData

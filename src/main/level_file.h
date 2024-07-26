@@ -26,16 +26,12 @@
 #include <string>
 #include <PGE_File_Formats/lvl_filedata.h>
 
-struct Background_t;
-
-// extern void bgoApplyZMode(Background_t *bgo, int smbx64sp);
-
 extern void addMissingLvlSuffix(std::string &fileName);
 extern void validateLevelName(std::string &out, const std::string &raw);
 
 //! loads the level
 bool OpenLevel(std::string FilePath);
-bool OpenLevelData(LevelData &lvl, const std::string FilePath = std::string());
+bool OpenLevelData(PGE_FileFormats_misc::TextInput& input, const std::string FilePath = std::string());
 void OpenLevelDataPost();
 //! Reset everything to zero
 void ClearLevel();

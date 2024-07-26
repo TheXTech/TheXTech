@@ -163,6 +163,12 @@ if(NINTENDO_3DS)
     option(THEXTECH_CUSTOM_AUDIO_LIBRARY "Use the custom audio library instead of MixerX" OFF)
 endif()
 
+if(ANDROID OR VITA OR NINTENDO_3DS OR NINTENDO_WII OR NINTENDO_WIIU OR NINTENDO_SWITCH OR PGE_MIN_PORT OR THEXTECH_NO_SDL_BUILD)
+    set(THEXTECH_FORCE_FULLSCREEN ON)
+else()
+    option(THEXTECH_FORCE_FULLSCREEN "Force the game to only use fullscreen mode" OFF)
+endif()
+
 option(THEXTECH_BUILD_GL_DESKTOP_MODERN "On SDL builds, include the OpenGL 2.0+ Core/Compatibility renderer" ON)
 option(THEXTECH_BUILD_GL_ES_MODERN "On SDL builds, include the OpenGL ES 2.0+ renderer" ON)
 option(THEXTECH_BUILD_GL_DESKTOP_LEGACY "On SDL builds, include the OpenGL 1.1+ renderer" ON)
@@ -307,7 +313,6 @@ if(THEXTECH_CLI_BUILD OR PGE_MIN_PORT OR EMSCRIPTEN)
 endif()
 
 if(NINTENDO_DS)
-    set(THEXTECH_ENABLE_AUDIO_FX OFF CACHE BOOL "" FORCE)
     set(THEXTECH_NO_SDL_BUILD ON CACHE BOOL "" FORCE)
 endif()
 
@@ -337,6 +342,10 @@ if(NINTENDO_SWITCH)
     set(THEXTECH_BUILD_GL_ES_MODERN      OFF CACHE BOOL "" FORCE)
     set(THEXTECH_BUILD_GL_ES_LEGACY      OFF CACHE BOOL "" FORCE)
     set(THEXTECH_BUILD_GL_DESKTOP_LEGACY OFF CACHE BOOL "" FORCE)
+endif()
+
+if(THEXTECH_NO_SDL_BUILD)
+    set(THEXTECH_ENABLE_AUDIO_FX OFF CACHE BOOL "" FORCE)
 endif()
 
 # ============ Platform-conf ==end=========
@@ -1377,7 +1386,7 @@ if(ANDROID)
     )
 endif()
 
-if(ANDROID OR VITA OR NINTENDO_3DS OR NINTENDO_WII OR NINTENDO_WIIU OR NINTENDO_SWITCH OR PGE_MIN_PORT OR THEXTECH_NO_SDL_BUILD)
+if(THEXTECH_FORCE_FULLSCREEN)
     target_compile_definitions(thextech PRIVATE
         -DRENDER_FULLSCREEN_ALWAYS  # Game works always fullscreen
         -DNO_WINDOW_FOCUS_TRACKING  # Don't track for window focus

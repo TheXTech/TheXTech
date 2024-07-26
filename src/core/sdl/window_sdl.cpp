@@ -127,6 +127,8 @@ bool WindowSDL::initSDL(uint32_t windowInitFlags)
 
 #if defined(RENDER_FULLSCREEN_ALWAYS)
     windowInitFlags |= SDL_WINDOW_FULLSCREEN | SDL_WINDOW_SHOWN;
+#else
+    windowInitFlags |= SDL_WINDOW_HIDDEN;
 #endif
 
     // restore fullscreen state
@@ -147,27 +149,25 @@ bool WindowSDL::initSDL(uint32_t windowInitFlags)
                                 SDL_WINDOWPOS_CENTERED,
                                 initWindowW, initWindowH,
                                 SDL_WINDOW_RESIZABLE |
-                                SDL_WINDOW_HIDDEN |
                                 SDL_WINDOW_ALLOW_HIGHDPI |
                                 windowInitFlags);
 
     if(m_window == nullptr)
     {
-        pLogCritical("Unable to create window!");
+        const char *error = SDL_GetError();
+        if(*error != '\0')
+            pLogFatal("Unable to create window: %s", error);
+        else
+            pLogFatal("Unable to create window!");
+
         SDL_ClearError();
         return false;
     }
-
-    if(isSdlError())
+    else if(isSdlError())
     {
         const char *error = SDL_GetError();
-        if(*error != '\0')
-            pLogCritical("Unable to create window: %s", error);
-        else
-            pLogCritical("Unable to create window!");
-
+        pLogCritical("SDL error on window creation: %s", error);
         SDL_ClearError();
-        return false;
     }
 
     SDL_SetWindowMinimumSize(m_window, 240, 160);

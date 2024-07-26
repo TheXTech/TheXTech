@@ -2639,8 +2639,8 @@ void UpdatePlayerBonus(const int A, const NPCID B)
 {
     auto &p = Player[A];
 
-    // NOTE: I have traced all paths into this code, and it is unreachable if p.Effect != PLREFF_NORMAL
-    SDL_assert(p.Effect == PLREFF_NORMAL);
+    // INCORRECT NOTE: I have traced all paths into this code, and it is unreachable if p.Effect != PLREFF_NORMAL
+    // NOTE: this is not true if the player touches two bonuses in the same frame.
 
     // 1 player growing
     // 4 fire flower

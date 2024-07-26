@@ -2599,15 +2599,13 @@ void zTestLevel(bool magicHand, bool interProcess)
             PGE_Delay(2);
         }
 
-        LevelData& data = IntProc::editor->m_acceptedLevel;
-        if(!timeOut && !data.meta.ReadFileValid) //-V560
+        if(!timeOut && !OpenLevelData(IntProc::editor->m_acceptedLevel, IntProc::editor->m_accepted_lvl_path)) //-V560
         {
             pLogWarning("Bad file format!");
             GameIsActive = false;
             return;
         }
 
-        OpenLevelData(data, IntProc::editor->m_accepted_lvl_path);
         OpenLevelDataPost();
 
         pLogDebug("ICP: Done, starting a game....");

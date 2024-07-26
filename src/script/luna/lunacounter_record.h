@@ -25,11 +25,12 @@
 #include <cstdint>
 #include <cstdio>
 #include <string>
+#include <SDL2/SDL_rwops.h>
 
 struct DeathRecord
 {
-    void Save(FILE *openfile);
-    bool Load(FILE *openfile);
+    void Save(SDL_RWops *openfile);
+    bool Load(SDL_RWops *openfile);
 
     std::string m_levelName;
     int32_t m_deaths = 0;

@@ -35,7 +35,7 @@
 #   endif
 #endif
 
-#include "sdl_proxy/sdl_rwops.h"
+#include <SDL2/SDL_rwops.h>
 
 #include "config.h"
 #include "globals.h"

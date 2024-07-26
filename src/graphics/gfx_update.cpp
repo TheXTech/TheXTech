@@ -385,7 +385,7 @@ static inline void s_get_NPC_tint(int A, XTColor& cn)
     {
         if(!n.Active)
         {
-            if(!NPC_InactiveRender(n))
+            if(!NPC_InactiveRender(n) || g_CheatLogicScreen)
             {
                 cn = XTColorF(0.0f, 0.0f, 0.0f, 0.4f);
                 return;
@@ -1242,7 +1242,7 @@ void ModernNPCScreenLogic(Screen_t& screen, int vscreen_i, bool fill_draw_queue,
                 }
 
                 // if in "poof" mode, cancel render, but still set the intro frames as above so we can spawn the Smoke effect
-                if(NPC_InactiveSmoke(NPC[A]))
+                if(NPC_InactiveSmoke(NPC[A]) && !g_CheatLogicScreen)
                     render = false;
             }
         }

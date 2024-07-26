@@ -60,8 +60,6 @@ bool getImageSizeRW(SDL_RWops *image, uint32_t *w, uint32_t *h, int *errCode=nul
  */
 bool getImageSize(const PGEString &imagePath, uint32_t *w, uint32_t *h, int *errCode = nullptr);
 
-bool getImageSizeFromMem(const char *mem, size_t size, uint32_t *w, uint32_t *h, int *errCode = nullptr);
-
 /**
  * @brief Returns filename of masked image
  * @param [in] imageFileName foreground image file-name

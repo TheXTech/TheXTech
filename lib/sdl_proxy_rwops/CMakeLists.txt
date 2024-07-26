@@ -11,6 +11,8 @@ endif()
 project(sdl_proxy_rwops CXX)
 
 add_library(sdl_proxy_rwops STATIC EXCLUDE_FROM_ALL
-    sdl_proxy_rwops.c)
+    sdl_proxy_rwops.c
+    sdl_proxy_rwops_file.c
+)
 
-target_include_directories(sdl_proxy_rwops INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
+target_include_directories(sdl_proxy_rwops PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
