@@ -64,8 +64,18 @@ inline static bool s_Event_SoundOnly(const Events_t& evt, int test_section)
     return section_okay;
 }
 
+// from section of UpdateNPCs called "process chain activations"
+static bool s_NPC_CanActivate(const NPC_t& n)
+{
+    return n.Type != NPCID_CONVEYOR && n.Type != NPCID_FALL_BLOCK_RED &&
+        n.Type != NPCID_FALL_BLOCK_BROWN && !n->IsACoin;
+}
+
 static bool s_NPC_MustBeCanonical_internal(const NPC_t& n)
 {
+    if(!s_NPC_CanActivate(n))
+        return n.Generator;
+
     return n.Generator
         || n->UseDefaultCam
         || (n->IsFish && Maths::iRound(n.Special) == 2)
@@ -110,7 +120,7 @@ void NPC_ConstructCanonicalSet()
         }
     }
 
-    // perform chain activation
+    // find all NPCs that could cause the above NPCs to activate via chain activation
     for(size_t i = 0; i < to_check.size(); i++)
     {
         int16_t n = to_check[i];
@@ -125,6 +135,10 @@ void NPC_ConstructCanonicalSet()
         {
             if(B != n && CheckCollision(tempLocation, NPC[B].Location))
             {
+                // check that B is capable of chain-activation
+                if(!s_NPC_CanActivate(NPC[B]))
+                    continue;
+
                 if(!NPC[B]._priv_force_canonical)
                 {
                     NPC[B]._priv_force_canonical = true;
