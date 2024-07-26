@@ -146,7 +146,7 @@ std::vector<std::pair<std::string, AssetsPathType>> AppPathManager::assetsSearch
         out.push_back({m_customUserDirectory + "assets/", AssetsPathType::Multiple});
 
     if(!AppPathP::appDirectory().empty())
-        out.push_back({AppPathP::appDirectory() + "assets/", AssetsPathType::Multiple});
+        out.push_back({AppPathP::appDirectory(), AssetsPathType::Legacy});
 
     if(!m_isPortable)
     {
