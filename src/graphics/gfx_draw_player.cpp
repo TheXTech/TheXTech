@@ -169,9 +169,7 @@ void DrawPlayer(Player_t &p, const int Z, XTColor color)
     XTColor s = (ShadowMode ? XTColor(0, 0, 0) : color);
     //auto &p = Player[A];
 
-    bool player_door_scroll = (p.Effect == PLREFF_WARP_DOOR && p.Effect2 >= 128);
-
-    if(!p.Dead && !p.Immune2 && p.TimeToLive == 0 && !(p.Effect == PLREFF_WARP_PIPE || p.Effect == PLREFF_TURN_LEAF || p.Effect == PLREFF_WAITING || p.Effect == PLREFF_PET_INSIDE || player_door_scroll))
+    if(!p.Immune2) // other draw conditions moved to calling site in UpdateGraphics
     {
         if(vScreenCollision(Z, p.Location))
         {

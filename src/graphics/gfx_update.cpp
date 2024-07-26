@@ -2781,7 +2781,11 @@ void UpdateGraphicsScreen(Screen_t& screen)
         //'Players in front of blocks
         for(int A = numPlayers; A >= 1; A--)
         {
-            DrawPlayer(Player[A], Z);
+            Player_t& p = Player[A];
+            bool player_door_scroll = (p.Effect == PLREFF_WARP_DOOR && p.Effect2 >= 128);
+
+            if(!p.Dead && p.TimeToLive == 0 && !(p.Effect == PLREFF_WARP_PIPE || p.Effect == PLREFF_TURN_LEAF || p.Effect == PLREFF_WAITING || p.Effect == PLREFF_PET_INSIDE || player_door_scroll))
+                DrawPlayer(p, Z);
         }
         //'normal player end
 
