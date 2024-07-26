@@ -251,7 +251,7 @@ void PlayerEffectWarpPipe(int A)
     bool is_level_quit = warp.level != STRINGINDEX_NONE || warp.MapWarp;
 
     // teleport other players into warp in shared screen mode
-    const Screen_t& screen = ScreenByPlayer(A);
+    Screen_t& screen = ScreenByPlayer(A);
     bool is_shared_screen = (screen.Type == 3);
 
     if(p.Effect2 == 0.0) // Entering pipe
@@ -385,9 +385,10 @@ void PlayerEffectWarpPipe(int A)
             treeNPCUpdate(p.HoldingNPC);
 
         // teleport other players into the pipe warp
-        if(Maths::iRound(leftToGoal) == 8)
+        if(is_shared_screen && Maths::iRound(leftToGoal) == 8)
         {
-            bool do_tele = is_shared_screen && !vScreenCollision(vScreenIdxByPlayer(A), warp_exit);
+            int vscreen_A = vScreenIdxByPlayer(A);
+            bool do_tele = !vScreenCollision(vscreen_A, warp_exit);
 
             if(do_tele)
             {
@@ -421,6 +422,8 @@ void PlayerEffectWarpPipe(int A)
                         o_p.Location.SpeedY = 0.0;
                     }
                 }
+
+                SharedScreenAvoidJump(screen, 200);
             }
         }
 
@@ -563,6 +566,9 @@ void PlayerEffectWarpPipe(int A)
                     o_p.Effect2 = 1;
                 }
             }
+
+            // disable any tempX/TempY (no longer needed)
+            SharedScreenResetTemp(screen);
         }
 
         // delay based on number of players ahead of this one
@@ -967,40 +973,47 @@ void PlayerEffectWarpDoor(int A)
     s_WarpFaderLogic(false, A, warp.transitEffect, warp_enter, fEqual(p.Effect2, 5), !is_level_quit && !same_section && fEqual(p.Effect2, 20));
 
     // teleport other players into door in shared screen mode
-    const Screen_t& screen = ScreenByPlayer(A);
+    Screen_t& screen = ScreenByPlayer(A);
     bool is_shared_screen = (screen.Type == 3);
-    bool do_tele = is_shared_screen && !vScreenCollision(vScreenIdxByPlayer(A), warp_exit);
-    if(do_tele && fEqual(p.Effect2, 15))
+    if(is_shared_screen && fEqual(p.Effect2, 15))
     {
-        for(int plr_i = 0; plr_i < screen.player_count; plr_i++)
+        int vscreen_A = vScreenIdxByPlayer(A);
+        bool do_tele = is_shared_screen && !vScreenCollision(vscreen_A, warp_exit);
+
+        if(do_tele)
         {
-            int o_A = screen.players[plr_i];
-            if(o_A == A)
-                continue;
-
-            Player_t& o_p = Player[o_A];
-
-            // in the mouth of an onscreen player's Pet?
-            bool in_onscreen_pet = !warp.NoYoshi && InOnscreenPet(o_A, screen);
-
-            bool status_match = (o_p.Effect == p.Effect && o_p.Warp == p.Warp && o_p.WarpBackward == p.WarpBackward);
-
-            if(!o_p.Dead && o_p.TimeToLive == 0 && !in_onscreen_pet && !status_match)
+            for(int plr_i = 0; plr_i < screen.player_count; plr_i++)
             {
-                RemoveFromPet(o_A);
+                int o_A = screen.players[plr_i];
+                if(o_A == A)
+                    continue;
 
-                s_WarpReleaseItems(warp, o_A, p.WarpBackward, false);
+                Player_t& o_p = Player[o_A];
 
-                o_p.Warp = p.Warp;
-                o_p.WarpBackward = p.WarpBackward;
-                o_p.Effect = p.Effect;
-                // 1 frame behind so that this player will exit first
-                o_p.Effect2 = 14;
-                o_p.Location.X = warp_enter.X + warp_enter.Width / 2.0 - o_p.Location.Width / 2.0;
-                o_p.Location.Y = warp_enter.Y + warp_enter.Height - o_p.Location.Height;
-                o_p.Location.SpeedX = 0.0;
-                o_p.Location.SpeedY = 0.0;
+                // in the mouth of an onscreen player's Pet?
+                bool in_onscreen_pet = !warp.NoYoshi && InOnscreenPet(o_A, screen);
+
+                bool status_match = (o_p.Effect == p.Effect && o_p.Warp == p.Warp && o_p.WarpBackward == p.WarpBackward);
+
+                if(!o_p.Dead && o_p.TimeToLive == 0 && !in_onscreen_pet && !status_match)
+                {
+                    RemoveFromPet(o_A);
+
+                    s_WarpReleaseItems(warp, o_A, p.WarpBackward, false);
+
+                    o_p.Warp = p.Warp;
+                    o_p.WarpBackward = p.WarpBackward;
+                    o_p.Effect = p.Effect;
+                    // 1 frame behind so that this player will exit first
+                    o_p.Effect2 = 14;
+                    o_p.Location.X = warp_enter.X + warp_enter.Width / 2.0 - o_p.Location.Width / 2.0;
+                    o_p.Location.Y = warp_enter.Y + warp_enter.Height - o_p.Location.Height;
+                    o_p.Location.SpeedX = 0.0;
+                    o_p.Location.SpeedY = 0.0;
+                }
             }
+
+            SharedScreenAvoidJump(screen, 200);
         }
     }
 
@@ -1070,6 +1083,8 @@ void PlayerEffectWarpDoor(int A)
                     }
                 }
             }
+
+            SharedScreenResetTemp(screen);
         }
 
         CheckSection(A);

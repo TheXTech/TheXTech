@@ -62,6 +62,12 @@ void GetvScreenAverage3(vScreen_t& vscreen);
 // NEW: update a vScreen with the correct procedure based on its screen's Type and DType
 void GetvScreenAuto(vScreen_t& vscreen);
 
+//  Sets TempX and TempY to avoid a jump for a Screen's shared vScreen, and TempDelay as requested.
+void SharedScreenAvoidJump(Screen_t& screen, int TempDelay);
+
+//  Resets variables set by above
+void SharedScreenResetTemp(Screen_t& screen);
+
 // NEW: get the fixed-res vScreen position for a player, and write the top-left coordinate to (left, top)
 void GetPlayerScreen(double W, double H, const Player_t& p, double& left, double& top);
 

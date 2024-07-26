@@ -331,14 +331,47 @@ void GetvScreenAverage3(vScreen_t& vscreen)
     // allow some overscan (needed for 3DS)
     int allow_X = (g_config.allow_multires && vscreen.Width == XRender::TargetW && !Screens[vscreen.screen_ref].is_canonical()) ? XRender::TargetCameraOverscanX : 0;
 
-    if(-vscreen.X < section.X - allow_X)
-        vscreen.X = -(section.X - allow_X);
-    if(-vscreen.X + use_width > section.Width + allow_X)
-        vscreen.X = -(section.Width - use_width + allow_X);
-    if(-vscreen.Y < section.Y)
-        vscreen.Y = -section.Y;
-    if(-vscreen.Y + use_height > section.Height)
-        vscreen.Y = -(section.Height - use_height);
+    for(int i = 0; i < 2; i++)
+    {
+        if(-vscreen.X < section.X - allow_X)
+            vscreen.X = -(section.X - allow_X);
+        if(-vscreen.X + use_width > section.Width + allow_X)
+            vscreen.X = -(section.Width - use_width + allow_X);
+        if(-vscreen.Y < section.Y)
+            vscreen.Y = -section.Y;
+        if(-vscreen.Y + use_height > section.Height)
+            vscreen.Y = -(section.Height - use_height);
+
+        if(i == 1)
+            break;
+
+        if(vscreen.tempX == 0 && vscreen.TempY == 0 && vscreen.TempDelay == 0)
+            break;
+
+        // apply vScreen temp
+        vscreen.X += -vscreen.tempX;
+        vscreen.Y += -vscreen.TempY;
+
+        if(vscreen.TempDelay > 0)
+        {
+            vscreen.TempDelay--;
+            continue;
+        }
+
+        if(vscreen.tempX >= 2)
+            vscreen.tempX -= 2;
+        else if(vscreen.tempX <= -2)
+            vscreen.tempX += 2;
+        else
+            vscreen.tempX = 0;
+
+        if(vscreen.TempY >= 2)
+            vscreen.TempY -= 2;
+        else if(vscreen.TempY <= -2)
+            vscreen.TempY += 2;
+        else
+            vscreen.TempY = 0;
+    }
 }
 
 // NEW: update a vScreen with the correct procedure based on its screen's Type and DType
@@ -354,6 +387,48 @@ void GetvScreenAuto(vScreen_t& vscreen)
         GetvScreenCredits(vscreen);
     else
         GetvScreen(vscreen);
+}
+
+void SharedScreenAvoidJump(Screen_t& screen, int Delay)
+{
+    if(screen.Type != ScreenTypes::SharedScreen)
+        return;
+
+    auto& vscreen = screen.vScreen(1);
+
+    double curX = vscreen.X;
+    double curY = vscreen.Y;
+
+    vscreen.tempX = 0;
+    vscreen.TempY = 0;
+
+    GetvScreenAverage3(vscreen);
+
+    vscreen.tempX = vscreen.X - curX;
+    vscreen.TempY = vscreen.Y - curY;
+
+    vscreen.X = curX;
+    vscreen.Y = curY;
+
+    vscreen.TempDelay = Delay;
+
+    if(!screen.is_canonical())
+        SharedScreenAvoidJump(screen.canonical_screen(), Delay);
+}
+
+void SharedScreenResetTemp(Screen_t& screen)
+{
+    if(screen.Type != ScreenTypes::SharedScreen)
+        return;
+
+    auto& vscreen = screen.vScreen(1);
+
+    vscreen.tempX = 0;
+    vscreen.TempY = 0;
+    vscreen.TempDelay = 0;
+
+    if(!screen.is_canonical())
+        SharedScreenResetTemp(screen.canonical_screen());
 }
 
 // NEW: get the fixed-resolution vScreen position for a player, and write the top-left coordinate to (left, top)
