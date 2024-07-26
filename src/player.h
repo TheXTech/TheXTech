@@ -127,6 +127,8 @@ void LinkFrame(struct Player_t &p);
 // Private Sub PlayerEffects(A As Integer)
 void PlayerEffects(const int A);
 
+// NEW: checks if player has normal state
+bool PlayerNormal(const Player_t& p);
 // NEW: checks if all players have normal state (if false, layer movement and events get disabled)
 bool AllPlayersNormal();
 

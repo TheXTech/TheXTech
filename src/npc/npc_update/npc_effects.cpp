@@ -28,6 +28,7 @@
 #include "collision.h"
 #include "layers.h"
 #include "editor.h"
+#include "player.h"
 
 #include "main/trees.h"
 
@@ -184,8 +185,8 @@ static inline void NPCEffectLogic_DropItem(int A)
         double target_X = pLoc.X + pLoc.Width / 2 - nLoc.Width / 2;
         double target_Y = pLoc.Y + pLoc.Height - 192;
 
-        // anticipate player movement (cross-ref AllPlayersNormal())
-        if(p.Effect == PLREFF_NORMAL || p.Effect == PLREFF_WARP_PIPE || p.Effect == PLREFF_NO_COLLIDE || p.Effect == PLREFF_PET_INSIDE)
+        // anticipate player movement
+        if(PlayerNormal(p))
         {
             target_X += pLoc.SpeedX;
             target_Y += pLoc.SpeedY;

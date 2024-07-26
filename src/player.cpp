@@ -6280,12 +6280,16 @@ void PlayerEffects(const int A)
 //    }
 }
 
+bool PlayerNormal(const Player_t& p)
+{
+    return p.Effect == PLREFF_NORMAL || p.Effect == PLREFF_WARP_PIPE || p.Effect == PLREFF_NO_COLLIDE || p.Effect == PLREFF_PET_INSIDE;
+}
+
 bool AllPlayersNormal()
 {
     for(int B = 1; B <= numPlayers; B++)
     {
-        // cross-ref modern item spawn code
-        if(!(Player[B].Effect == PLREFF_NORMAL || Player[B].Effect == PLREFF_WARP_PIPE || Player[B].Effect == PLREFF_NO_COLLIDE || Player[B].Effect == PLREFF_PET_INSIDE))
+        if(!PlayerNormal(Player[B]))
             return false;
     }
 
