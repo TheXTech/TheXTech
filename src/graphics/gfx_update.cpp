@@ -3062,9 +3062,9 @@ void UpdateGraphicsScreen(Screen_t& screen)
 
         XRender::setDrawPlane(PLANE_LVL_META);
 
-        // Always draw for single-player
-        // And don't draw when many players at the same screen
-        if(screen.player_count == 1 || numScreens != 1)
+        // Always draw for single-player and forced shared screen
+        // And don't draw when many players at the same screen (might be leaving / joining the dynamic shared screen)
+        if(screen.player_count == 1 || numScreens != 1 || screen.Type == ScreenTypes::SharedScreen)
             g_levelVScreenFader[Z].draw(false);
 
         if((LevelEditor || MagicHand))
