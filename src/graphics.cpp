@@ -222,7 +222,6 @@ void GetvScreenAverage2(vScreen_t& vscreen)
 // Doubles the weight of the top player for the Y position
 void GetvScreenAverage3(vScreen_t& vscreen)
 {
-    bool horiz_bounds_inited = false;
     int plr_count = 0;
     double OldX = 0;
     double OldY = 0;
@@ -264,16 +263,12 @@ void GetvScreenAverage3(vScreen_t& vscreen)
             t = by;
         if(plr_count == 0 || b < by)
             b = by;
-
-        plr_count += 1;
-
-        // still set left and right bounds for respawning players
-        if(!horiz_bounds_inited || pl < l)
+        if(plr_count == 0 || pl < l)
             l = pl;
-        if(!horiz_bounds_inited || r < pr)
+        if(plr_count == 0 || r < pr)
             r = pr;
 
-        horiz_bounds_inited = true;
+        plr_count += 1;
     }
 
     if(plr_count == 0)
