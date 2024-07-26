@@ -327,9 +327,24 @@ bool OpenLevelData(PGE_FileFormats_misc::TextInput& input, const std::string Fil
 
     g_curLevelMedals.prepare_lvl(lvl);
 
+    if(!OpenLevel_Unpack(load, lvl))
+        return false;
+
+    OpenLevel_FixLayersEvents(load);
+
+    return true;
+}
+
+bool OpenLevel_Head(void* userdata, LevelData& lvl)
+{
+    LevelLoad& load = *static_cast<LevelLoad*>(userdata);
+    (void)load;
+
     // Level-wide settings
     maxStars = lvl.stars;
     LevelName = lvl.LevelName;
+
+    FileFormat = lvl.meta.RecentFormat;
 
     // Level-wide extra settings
     if(!lvl.custom_params.empty())
@@ -337,11 +352,18 @@ bool OpenLevelData(PGE_FileFormats_misc::TextInput& input, const std::string Fil
         // none supported yet
     }
 
-    for(auto & s : lvl.sections)
+    // load.si.check_head(h);
+
+    return true;
+}
+
+bool OpenLevel_Section(void*, LevelSection& s)
+{
+    // preserving indent
     {
         // load failure, invalid section ID
         if(s.id > maxSections || s.id < 0)
-            return false;
+            throw callback_error("Invalid section id");
 
         if(s.id + 1 > numSections)
             numSections = s.id + 1;
@@ -464,8 +486,14 @@ bool OpenLevelData(PGE_FileFormats_misc::TextInput& input, const std::string Fil
         }
 #endif
     }
+    return true;
+}
 
-    for(auto &p : lvl.players)
+
+bool OpenLevel_PlayerStart(void* userdata, PlayerPoint& p)
+{
+    LevelLoad& load = *static_cast<LevelLoad*>(userdata);
+
     {
         // TODO: should try to use the startpoint's ID field if possible
         load.numPlayerStart++;
@@ -498,16 +526,22 @@ bool OpenLevelData(PGE_FileFormats_misc::TextInput& input, const std::string Fil
         PlayerStart[A].Direction = p.direction;
 
         if(load.numPlayerStart == 2)
-            break;
+            return false;
     }
 
-    for(auto &l : lvl.layers)
+    return true;
+}
+
+bool OpenLevel_Layer(void* userdata, LevelLayer& l)
+{
+    LevelLoad& load = *static_cast<LevelLoad*>(userdata);
+
     {
         int A = load.FinalizeLayer(load.FindLayer(l.name));
 
         // too many layers
         if(A == LAYER_NONE)
-            return false;
+            throw callback_error("Too many layers");
 
         // update layer count
         if(A + 1 > numLayers)
@@ -522,15 +556,19 @@ bool OpenLevelData(PGE_FileFormats_misc::TextInput& input, const std::string Fil
         // hide layers after everything is done
     }
 
-    // items in layers will be hidden after they are loaded
+    return true;
+}
 
-    for(auto &e : lvl.events)
+bool OpenLevel_Event(void* userdata, LevelSMBX64Event& e)
+{
+    LevelLoad& load = *static_cast<LevelLoad*>(userdata);
+
     {
         int A = load.FinalizeEvent(load.FindEvent(e.name));
 
         // too many events
         if(A == EVENT_NONE)
-            return false;
+            throw callback_error("Too many events");
 
         // update events count
         if(A + 1 > numEvents)
@@ -568,7 +606,7 @@ bool OpenLevelData(PGE_FileFormats_misc::TextInput& input, const std::string Fil
                 event.ToggleLayer.push_back(found);
         }
 
-        // this was done in ClearLevel, but it may be necessary here to refresh matters if two events had the same name
+        // this was done in ClearLevel, but may be necessary here to refresh matters
         for(int B = 0; B <= maxSections; B++)
         {
             auto &s = event.section[B];
@@ -589,7 +627,7 @@ bool OpenLevelData(PGE_FileFormats_misc::TextInput& input, const std::string Fil
                 continue;
             // invalid section ID
             else if(s.id > maxSections || s.id < 0)
-                return false;
+                throw callback_error("Invalid section id");
 
             // relies on the fact that this is an ARRAY at TheXTech's side
             auto &ss = event.section[s.id];
@@ -643,13 +681,19 @@ bool OpenLevelData(PGE_FileFormats_misc::TextInput& input, const std::string Fil
         event.AutoSection = int(e.scroll_section);
     }
 
-    for(auto &b : lvl.blocks)
+    return true;
+}
+
+bool OpenLevel_Block(void* userdata, LevelBlock& b)
+{
+    LevelLoad& load = *static_cast<LevelLoad*>(userdata);
+
     {
         numBlock++;
         if(numBlock > maxBlocks)
         {
             numBlock = maxBlocks;
-            break;
+            return false;
         }
 
         auto &block = Block[numBlock];
@@ -713,13 +757,19 @@ bool OpenLevelData(PGE_FileFormats_misc::TextInput& input, const std::string Fil
         }
     }
 
-    for(auto &b : lvl.bgo)
+    return true;
+}
+
+bool OpenLevel_Background(void* userdata, LevelBGO& b)
+{
+    LevelLoad& load = *static_cast<LevelLoad*>(userdata);
+
     {
         numBackground++;
         if(numBackground > maxBackgrounds)
         {
             numBackground = maxBackgrounds;
-            break;
+            return false;
         }
 
         auto &bgo = Background[numBackground];
@@ -743,8 +793,13 @@ bool OpenLevelData(PGE_FileFormats_misc::TextInput& input, const std::string Fil
         bgo.SetSortPriority(b.z_mode, std::round(b.z_offset));
     }
 
+    return true;
+}
 
-    for(auto &n : lvl.npc)
+bool OpenLevel_NPC(void* userdata, LevelNPC& n)
+{
+    LevelLoad& load = *static_cast<LevelLoad*>(userdata);
+
     {
         bool variantHandled = false;
 
@@ -752,7 +807,7 @@ bool OpenLevelData(PGE_FileFormats_misc::TextInput& input, const std::string Fil
         if(numNPCs > maxNPCs)
         {
             numNPCs = maxNPCs;
-            break;
+            return false;
         }
 
         auto &npc = NPC[numNPCs];
@@ -917,14 +972,22 @@ bool OpenLevelData(PGE_FileFormats_misc::TextInput& input, const std::string Fil
         }
     }
 
+    // update the level's save info based on the NPC
+    // load.si.check_npc(n);
 
-    for(auto &w : lvl.doors)
+    return true;
+}
+
+bool OpenLevel_Warp(void* userdata, LevelDoor& w)
+{
+    LevelLoad& load = *static_cast<LevelLoad*>(userdata);
+
     {
         numWarps++;
         if(numWarps > maxWarps)
         {
             numWarps = maxWarps;
-            break;
+            return false;
         }
 
         auto &warp = Warp[numWarps];
@@ -988,14 +1051,19 @@ bool OpenLevelData(PGE_FileFormats_misc::TextInput& input, const std::string Fil
             warp.transitEffect = ScreenFader::loadTransitEffect(std::to_string(warp.transitEffect));
     }
 
+    return true;
+}
 
-    for(auto &w : lvl.physez)
+bool OpenLevel_Water(void* userdata, LevelPhysEnv& w)
+{
+    LevelLoad& load = *static_cast<LevelLoad*>(userdata);
+
     {
         numWater++;
         if(numWater > maxWater)
         {
             numWater = maxWater;
-            break;
+            return false;
         }
 
         auto &water = Water[numWater];
@@ -1025,6 +1093,11 @@ bool OpenLevelData(PGE_FileFormats_misc::TextInput& input, const std::string Fil
         water.Layer = load.FindLayer(w.layer);
     }
 
+    return true;
+}
+
+void OpenLevel_FixLayersEvents(const LevelLoad& load)
+{
     // Everything is loaded.
     // Now we fix the layers and events that got temporary indexes.
     for(int A = 1; A <= numBlock; A++)
@@ -1119,6 +1192,68 @@ bool OpenLevelData(PGE_FileFormats_misc::TextInput& input, const std::string Fil
     }
 
     LAYER_USED_P_SWITCH = FindLayer(LAYER_USED_P_SWITCH_TITLE);
+}
+
+bool OpenLevel_Unpack(LevelLoad& load, LevelData& lvl)
+{
+    try
+    {
+        OpenLevel_Head(&load, lvl);
+
+        for(auto &s : lvl.sections)
+        {
+            if(!OpenLevel_Section(&load, s))
+                break;
+        }
+        for(auto &p : lvl.players)
+        {
+            if(!OpenLevel_PlayerStart(&load, p))
+                break;
+        }
+        for(auto &b : lvl.blocks)
+        {
+            if(!OpenLevel_Block(&load, b))
+                break;
+        }
+        for(auto &b : lvl.bgo)
+        {
+            if(!OpenLevel_Background(&load, b))
+                break;
+        }
+        for(auto &n : lvl.npc)
+        {
+            if(!OpenLevel_NPC(&load, n))
+                break;
+        }
+        for(auto &w : lvl.doors)
+        {
+            if(!OpenLevel_Warp(&load, w))
+                break;
+        }
+        for(auto &w : lvl.physez)
+        {
+            if(!OpenLevel_Water(&load, w))
+                break;
+        }
+        for(auto &l : lvl.layers)
+        {
+            if(!OpenLevel_Layer(&load, l))
+                break;
+        }
+        for(auto &e : lvl.events)
+        {
+            if(!OpenLevel_Event(&load, e))
+                break;
+        }
+    }
+    catch(const callback_error& e)
+    {
+        pLogWarning("Error of level \"%s\" file loading: %s.",
+                    lvl.meta.filename.c_str(),
+                    e.what());
+
+        return false;
+    }
 
     return true;
 }
