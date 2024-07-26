@@ -94,7 +94,7 @@ extern std::set<NPCRef_t> RespawnDelay;
 
 inline bool check_active_type(NPCRef_t n)
 {
-    return n->Type == 57 || n->Type == 60 || n->Type == 62 || n->Type == 64 || n->Type == 66;
+    return n->Type == NPCID_CONVEYOR || n->Type == NPCID_YEL_PLATFORM || n->Type == NPCID_BLU_PLATFORM || n->Type == NPCID_GRN_PLATFORM || n->Type == NPCID_RED_PLATFORM;
 }
 
 inline bool check_active(NPCRef_t n)
