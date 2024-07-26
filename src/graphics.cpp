@@ -317,6 +317,10 @@ void GetvScreenAverage3(vScreen_t& vscreen)
         vscreen.Height = use_height;
     }
 
+    // if a NoTurnBack section, make sure that the limited width is tracked
+    if(g_config.allow_multires && NoTurnBack[section_idx])
+        use_width = SDL_min(use_width, static_cast<double>(screen.canonical_screen().W));
+
     use_width  = SDL_min(use_width,  section.Width  - section.X);
     use_height = SDL_min(use_height, section.Height - section.Y);
 
