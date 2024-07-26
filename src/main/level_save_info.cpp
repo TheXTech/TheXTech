@@ -190,7 +190,11 @@ void SaveInfoInit::on_error()
         *target = LevelSaveInfo_t();
 }
 
+#ifdef PGEFL_CALLBACK_API
+void SaveInfoInit::check_head(const LevelHead& head)
+#else
 void SaveInfoInit::check_head(const LevelData& head)
+#endif
 {
     if(!target)
         return;
@@ -241,6 +245,59 @@ void SaveInfoInit::check_npc(const LevelNPC& npc)
     }
 }
 
+#ifdef PGEFL_CALLBACK_API
+
+static void InitLevelSaveInfo_on_error(void* userdata, FileFormatsError& e)
+{
+    SaveInfoInit& si = *static_cast<SaveInfoInit*>(userdata);
+    si.on_error();
+
+    pLogWarning("During save info init: %s (line %d).",
+                e.ERROR_info.c_str(),
+                e.ERROR_linenum);
+}
+
+static bool InitLevelSaveInfo_load_head(void* userdata, LevelHead& head)
+{
+    SaveInfoInit& si = *static_cast<SaveInfoInit*>(userdata);
+    si.check_head(head);
+    return true;
+}
+
+static bool InitLevelSaveInfo_load_npc(void* userdata, LevelNPC& npc)
+{
+    SaveInfoInit& si = *static_cast<SaveInfoInit*>(userdata);
+    si.check_npc(npc);
+    return true;
+}
+
+LevelSaveInfo_t InitLevelSaveInfo(const std::string& fullPath, LevelData&)
+{
+    LevelSaveInfo_t ret;
+
+    SaveInfoInit si;
+    si.begin(&ret);
+
+    LevelLoadCallbacks cb;
+    cb.on_error = InitLevelSaveInfo_on_error;
+    cb.load_head = InitLevelSaveInfo_load_head;
+    cb.load_npc = InitLevelSaveInfo_load_npc;
+    cb.userdata = &si;
+
+    PGE_FileFormats_misc::TextFileInput in(fullPath);
+
+    if(FileFormats::OpenLevelFileT(in, cb))
+        pLogDebug("Initing level save data at [%s] with %d stars and %d medals", fullPath.c_str(), (int)ret.max_stars, (int)ret.max_medals);
+    else
+    {
+        si.on_error();
+        pLogWarning("During save info init: failed to load [%s]", fullPath.c_str());
+    }
+
+    return ret;
+}
+
+#else // #ifdef PGEFL_CALLBACK_API
 LevelSaveInfo_t InitLevelSaveInfo(const LevelData& loadedLevel)
 {
     LevelSaveInfo_t ret;
@@ -270,3 +327,4 @@ LevelSaveInfo_t InitLevelSaveInfo(const std::string& fullPath, LevelData& tempDa
 
     return ret;
 }
+#endif // #else // #ifdef PGEFL_CALLBACK_API

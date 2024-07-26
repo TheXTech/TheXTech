@@ -41,19 +41,17 @@ struct SaveInfoInit
     // marks target as invalid on load error
     void on_error();
 
+#ifdef PGEFL_CALLBACK_API
+    // updates star count from header
+    void check_head(const LevelHead& head);
+#else
     // updates star count from header
     void check_head(const LevelData& head);
+#endif
 
     // updates medal count from NPC
     void check_npc(const LevelNPC& head);
 };
-
-/**
- * \brief initialize level save info from a loaded LevelData object
- * \param loadedLevel a loaded LevelData object for the level whose save info will be initialized
- * \return loaded save info
- */
-LevelSaveInfo_t InitLevelSaveInfo(const LevelData& loadedLevel);
 
 /**
  * \brief convenience function: initialize level save info from fullPath, loading the level into tempData

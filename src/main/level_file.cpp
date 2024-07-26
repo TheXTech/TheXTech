@@ -258,7 +258,12 @@ struct LevelLoad
     }
 };
 
+#ifdef PGEFL_CALLBACK_API
+LevelLoadCallbacks OpenLevel_SetupCallbacks(LevelLoad& load);
+#else
 bool OpenLevel_Unpack(LevelLoad& load, LevelData& lvl);
+#endif
+
 void OpenLevel_FixLayersEvents(const LevelLoad& load);
 
 bool OpenLevelData(PGE_FileFormats_misc::TextInput& input, const std::string FilePath)
@@ -317,6 +322,15 @@ bool OpenLevelData(PGE_FileFormats_misc::TextInput& input, const std::string Fil
 
     load.si.begin(g_curLevelMedals.should_initialize());
 
+#ifdef PGEFL_CALLBACK_API
+    LevelLoadCallbacks callbacks = OpenLevel_SetupCallbacks(load);
+    if(!FileFormats::OpenLevelFileT(input, callbacks))
+    {
+        pLogDebug("Failed to load [%s]", FilePath.c_str());
+        load.si.on_error();
+        return false;
+    }
+#else
     LevelData lvl;
     if(!FileFormats::OpenLevelFileT(input, lvl))
     {
@@ -330,30 +344,47 @@ bool OpenLevelData(PGE_FileFormats_misc::TextInput& input, const std::string Fil
 
     if(!OpenLevel_Unpack(load, lvl))
         return false;
+#endif
 
     OpenLevel_FixLayersEvents(load);
 
     return true;
 }
 
-bool OpenLevel_Head(void* userdata, LevelData& lvl)
+#ifdef PGEFL_CALLBACK_API
+void OpenLevel_Error(void*, FileFormatsError& e)
+{
+    pLogWarning("Error of level file loading: %s (line %d).",
+                e.ERROR_info.c_str(),
+                e.ERROR_linenum);
+}
+#endif
+
+#ifdef PGEFL_CALLBACK_API
+bool OpenLevel_Head(void* userdata, LevelHead& head)
+#else
+bool OpenLevel_Head(void* userdata, LevelData& head)
+#endif
 {
     LevelLoad& load = *static_cast<LevelLoad*>(userdata);
-    (void)load;
 
     // Level-wide settings
-    maxStars = lvl.stars;
-    LevelName = lvl.LevelName;
+    maxStars = head.stars;
+    LevelName = head.LevelName;
 
-    FileFormat = lvl.meta.RecentFormat;
+#ifdef PGEFL_CALLBACK_API
+    FileFormat = head.RecentFormat;
+#else
+    FileFormat = head.meta.RecentFormat;
+#endif
 
     // Level-wide extra settings
-    if(!lvl.custom_params.empty())
+    if(!head.custom_params.empty())
     {
         // none supported yet
     }
 
-    load.si.check_head(lvl);
+    load.si.check_head(head);
 
     return true;
 }
@@ -1195,6 +1226,30 @@ void OpenLevel_FixLayersEvents(const LevelLoad& load)
     LAYER_USED_P_SWITCH = FindLayer(LAYER_USED_P_SWITCH_TITLE);
 }
 
+#ifdef PGEFL_CALLBACK_API
+
+LevelLoadCallbacks OpenLevel_SetupCallbacks(LevelLoad& load)
+{
+    LevelLoadCallbacks callbacks;
+
+    callbacks.on_error = OpenLevel_Error;
+    callbacks.load_head = OpenLevel_Head;
+    callbacks.load_section = OpenLevel_Section;
+    callbacks.load_startpoint = OpenLevel_PlayerStart;
+    callbacks.load_block = OpenLevel_Block;
+    callbacks.load_bgo = OpenLevel_Background;
+    callbacks.load_npc = OpenLevel_NPC;
+    callbacks.load_warp = OpenLevel_Warp;
+    callbacks.load_phys = OpenLevel_Water;
+    callbacks.load_layer = OpenLevel_Layer;
+    callbacks.load_event = OpenLevel_Event;
+
+    callbacks.userdata = &load;
+
+    return callbacks;
+}
+#else // #ifdef PGEFL_CALLBACK_API
+
 bool OpenLevel_Unpack(LevelLoad& load, LevelData& lvl)
 {
     try
@@ -1258,6 +1313,7 @@ bool OpenLevel_Unpack(LevelLoad& load, LevelData& lvl)
 
     return true;
 }
+#endif // #else // #ifdef PGEFL_CALLBACK_API
 
 void OpenLevelDataPost()
 {
