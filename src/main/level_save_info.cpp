@@ -31,6 +31,8 @@
 
 #include "globals.h"
 
+#include "level_save_info.h"
+
 static bool s_exportSingleSaveInfo(saveLevelInfo& s, const LevelSaveInfo_t& info)
 {
     if(!info.inited())
@@ -166,83 +168,105 @@ void ExportLevelSaveInfo(GamesaveData& s)
     }
 }
 
+// level save info initialization code
+void SaveInfoInit::begin(LevelSaveInfo_t* _target)
+{
+    target = _target;
+    if(!target)
+        return;
+
+    target->max_stars = 0;
+    target->max_medals = 0;
+    target->medals_got = 0;
+    target->medals_best = 0;
+
+    // keep track of the user-specified ones because two medals with the same user index are only counted once
+    used_indexes.reset();
+}
+
+void SaveInfoInit::on_error()
+{
+    if(target)
+        *target = LevelSaveInfo_t();
+}
+
+void SaveInfoInit::check_head(const LevelData& head)
+{
+    if(!target)
+        return;
+
+    target->max_stars = head.stars;
+}
+
+void SaveInfoInit::check_npc(const LevelNPC& npc)
+{
+    if(!target)
+        return;
+
+    bool is_container = (npc.id == NPCID_ITEM_BURIED || npc.id == NPCID_ITEM_POD ||
+                         npc.id == NPCID_ITEM_BUBBLE || npc.id == NPCID_ITEM_THROWER);
+
+    bool contains_medal = is_container && npc.contents == NPCID_MEDAL;
+
+    // allow medals only
+    if(npc.id != NPCID_MEDAL && !contains_medal)
+        return;
+
+    // don't count friendly medals (except, thrown medals can be collected)
+    if(npc.friendly && npc.id != NPCID_ITEM_THROWER)
+        return;
+
+    uint8_t Variant = static_cast<uint8_t>(npc.special_data);
+
+    // medal won't be counted (at all) if out-of-range
+    if(Variant > c_max_track_medals)
+        return;
+
+    // if no index, add to medal count
+    if(Variant == 0)
+    {
+        if(target->max_medals < c_max_track_medals)
+            target->max_medals++;
+
+        return;
+    }
+
+    // if index specified, check that the index hasn't already been used
+    if(!used_indexes[Variant - 1])
+    {
+        if(target->max_medals < c_max_track_medals)
+            target->max_medals++;
+
+        used_indexes[Variant - 1] = true;
+    }
+}
+
 LevelSaveInfo_t InitLevelSaveInfo(const LevelData& loadedLevel)
 {
     LevelSaveInfo_t ret;
 
-    // NOTE: could use code similar to below for stars, if not trusting the level header
-    ret.max_stars = loadedLevel.stars;
-    ret.max_medals = 0;
-    ret.medals_got = 0;
-    ret.medals_best = 0;
+    SaveInfoInit si;
+    si.begin(&ret);
 
-    // look for medals
-    uint8_t medal_count = 0;
+    si.check_head(loadedLevel);
 
-    // keep track of the user-specified ones because two medals with the same user index are only counted once
-    std::bitset<c_max_track_medals> used_indexes;
-
-    for(const auto &npc : loadedLevel.npc)
-    {
-        bool is_container = (npc.id == NPCID_ITEM_BURIED || npc.id == NPCID_ITEM_POD ||
-                             npc.id == NPCID_ITEM_BUBBLE || npc.id == NPCID_ITEM_THROWER);
-
-        bool contains_medal = is_container && npc.contents == NPCID_MEDAL;
-
-        // allow medals only
-        if(npc.id != NPCID_MEDAL && !contains_medal)
-            continue;
-
-        // don't count friendly medals (except, thrown medals can be collected)
-        if(npc.friendly && npc.id != NPCID_ITEM_THROWER)
-            continue;
-
-        uint8_t Variant = static_cast<uint8_t>(npc.special_data);
-
-        // medal won't be counted (at all) if out-of-range
-        if(Variant > c_max_track_medals)
-            continue;
-
-        // if no index, freely add to medal count (cap at 8 later)
-        if(Variant == 0)
-        {
-            medal_count++;
-            continue;
-        }
-
-        // if index specified, check that the index hasn't already been used
-        if(!used_indexes[Variant - 1])
-        {
-            medal_count++;
-            used_indexes[Variant - 1] = true;
-        }
-    }
-
-    // cap medal count at 8
-    if(medal_count > c_max_track_medals)
-        medal_count = c_max_track_medals;
-
-    ret.max_medals = medal_count;
+    for(const auto& n : loadedLevel.npc)
+        si.check_npc(n);
 
     return ret;
 }
 
 LevelSaveInfo_t InitLevelSaveInfo(const std::string& fullPath, LevelData& tempData)
 {
-    LevelSaveInfo_t ret;
+    if(!FileFormats::OpenLevelFile(fullPath, tempData))
+    {
+        pLogWarning("During save info init: failed to load [%s]", fullPath.c_str());
+        return LevelSaveInfo_t();
+    }
 
-    if(FileFormats::OpenLevelFile(fullPath, tempData))
-    {
-        ret = InitLevelSaveInfo(tempData);
-        pLogDebug("Initing level save data at [%s] with %d stars and %d medals", fullPath.c_str(), (int)ret.max_stars, (int)ret.max_medals);
-    }
-    else
-    {
-        pLogWarning("During save info init: error of level \"%s\" file loading: %s (line %d).",
-                    fullPath.c_str(),
-                    tempData.meta.ERROR_info.c_str(),
-                    tempData.meta.ERROR_linenum);
-    }
+    auto ret = InitLevelSaveInfo(tempData);
+
+    pLogDebug("Initing level save data at [%s] with %d stars and %d medals", fullPath.c_str(), (int)ret.max_stars, (int)ret.max_medals);
 
     return ret;
 }
