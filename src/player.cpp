@@ -4184,7 +4184,7 @@ void StealBonus()
 
     for(A = 1; A <= numPlayers; A++)
     {
-        if(Player[A].Dead)
+        if(Player[A].Dead && Player[A].Effect != PLREFF_COOP_WINGS)
         {
             // find other player
             if((g_config.modern_lives_system || Lives > 0) && LevelMacro == LEVELMACRO_OFF)

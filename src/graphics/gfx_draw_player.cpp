@@ -377,7 +377,7 @@ void DrawPlayer(Player_t &p, const int Z, XTColor color)
                                               32, 32, GFX.YoshiWings, 0, 0 + 32 * p.YoshiWingsFrame, s);
                     }
                 }
-                if(p.Mount == 1 && p.MountType == 3)
+                if((p.Mount == 1 && p.MountType == 3) || p.Effect == PLREFF_COOP_WINGS)
                 {
                     if(p.Direction == 1)
                     {

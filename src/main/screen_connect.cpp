@@ -608,7 +608,7 @@ static void Player_Remove(int p)
     // in drop-add, remove the Player officially in main game engine
     if(p + 1 <= numPlayers && s_context == Context::DropAdd)
     {
-        if(Player[p + 1].Dead || Player[p + 1].TimeToLive > 0)
+        if((Player[p + 1].Dead || Player[p + 1].TimeToLive > 0) && Player[p + 1].Effect != PLREFF_COOP_WINGS)
             s_char_info.dead_count++;
 
         DropPlayer(p + 1);

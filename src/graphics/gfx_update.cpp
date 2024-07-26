@@ -2973,7 +2973,9 @@ void UpdateGraphicsScreen(Screen_t& screen)
             // if(!GameMenu && !GameOutro)
             For(A, 1, numPlayers)
             {
-                if(Player[A].ShowWarp > 0)
+                if(Player[A].Effect == PLREFF_COOP_WINGS)
+                    DrawPlayer(Player[A], Z, XTColor(192, 192, 192, 192));
+                else if(Player[A].ShowWarp > 0)
                 {
                     const auto &w = Warp[Player[A].ShowWarp];
 
