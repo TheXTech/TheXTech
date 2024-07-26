@@ -518,15 +518,10 @@ void UpdateNPCs()
 
             if(sameSection)
             {
-                if(!NPC[A].Active)
-                    NPCQueues::Active.insert(A);
-
                 NPC[A].TimeLeft = 100;
                 NPC[A].Active = true;
                 NPC[A].JustActivated = 0;
             }
-            else if(!NPC[A].Active)
-                NPCQueues::Active.erase(A);
         }
         else if(NPC[A].Type == NPCID_YEL_PLATFORM || NPC[A].Type == NPCID_BLU_PLATFORM || NPC[A].Type == NPCID_GRN_PLATFORM || NPC[A].Type == NPCID_RED_PLATFORM)
         {
