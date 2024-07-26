@@ -2018,7 +2018,13 @@ int MouseLogic()
             MenuMouseRelease = true;
     }
 
-    return Mouse_Render(true, false);
+    int ret = Mouse_Render(true, false);
+
+    // and set it to false if needed
+    if(SharedCursor.Primary || SharedCursor.Secondary)
+        MenuMouseRelease = false;
+
+    return ret;
 }
 
 int PlayerBox::Logic()
