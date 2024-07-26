@@ -81,6 +81,13 @@
 // warning for improper rects
 static const char* s_improper_rect_warning = "Attempted to set %s %d %s to %f, setting to 0";
 
+// used to signal a total failure in a callback
+#ifdef PGEFL_CALLBACK_API
+using callback_error = PGE_FileFormats_misc::callback_error;
+#else
+using callback_error = std::runtime_error;
+#endif
+
 void addMissingLvlSuffix(std::string &fileName)
 {
     if(!fileName.empty() && !Files::hasSuffix(fileName, ".lvl") && !Files::hasSuffix(fileName, ".lvlx") && !Files::hasSuffix(fileName, "tst"))
@@ -127,28 +134,17 @@ void validateLevelName(std::string &out, const std::string &raw)
 bool OpenLevel(std::string FilePath)
 {
     addMissingLvlSuffix(FilePath);
-//    if(!Files::hasSuffix(FilePath, ".lvl") && !Files::hasSuffix(FilePath, ".lvlx"))
-//    {
-//        if(Files::fileExists(FilePath + ".lvlx"))
-//            FilePath += ".lvlx";
-//        else
-//            FilePath += ".lvl";
-//    }
 
+    PGE_FileFormats_misc::TextFileInput in(FilePath);
+
+    if(in.eof())
     {
-        LevelData lvl;
-        if(!FileFormats::OpenLevelFile(FilePath, lvl))
-        {
-            pLogWarning("Error of level \"%s\" file loading: %s (line %d).",
-                        FilePath.c_str(),
-                        lvl.meta.ERROR_info.c_str(),
-                        lvl.meta.ERROR_linenum);
-            return false;
-        }
-
-        if(!OpenLevelData(lvl, FilePath))
-            return false;
+        pLogWarning("File [%s] missing!", FilePath.c_str());
+        return false;
     }
+
+    if(!OpenLevelData(in, FilePath))
+        return false;
 
     OpenLevelDataPost();
 
@@ -260,12 +256,15 @@ struct LevelLoad
     }
 };
 
-bool OpenLevelData(LevelData &lvl, const std::string FilePath)
-{
-    LevelLoad load;
+bool OpenLevel_Unpack(LevelLoad& load, LevelData& lvl);
+void OpenLevel_FixLayersEvents(const LevelLoad& load);
 
-    int A = 0;
-    int B = 0;
+bool OpenLevelData(PGE_FileFormats_misc::TextInput& input, const std::string FilePath)
+{
+    if(FilePath == ".lvl" || FilePath == ".lvlx")
+        return false;
+
+    LevelLoad load;
 
     qScreen = false;
     qScreen_canonical = false;
@@ -291,27 +290,18 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
     for(int e = 0; e < numEvents; e++)
         load.FinalizeEvent(load.FindEvent(Events[e].Name));
 
-    g_dirEpisode.setCurDir(lvl.meta.path);
-    FileFormat = lvl.meta.RecentFormat;
-    FileName = g_dirEpisode.resolveDirCase(lvl.meta.filename);
-    FileNamePath = lvl.meta.path + "/";
+
+    // set the file path and load custom configuration
+    const std::string& path = (FilePath.empty()) ? input.getFilePath() : FilePath;
+
+    FileNamePath = Files::dirname(path) + "/";
+    g_dirEpisode.setCurDir(FileNamePath);
+
+    FileName = g_dirEpisode.resolveDirCase(Files::basenameNoSuffix(path));
     g_dirCustom.setCurDir(FileNamePath + FileName);
 
-    if(!FilePath.empty())
-    {
-        FileNameFull = Files::basename(FilePath);
-        FullFileName = FilePath;
-    }
-    else if(FileFormat == FileFormats::LVL_SMBX64 || FileFormat == FileFormats::LVL_SMBX38A)
-    {
-        FileNameFull = FileName + ".lvl";
-        FullFileName = FileNamePath + FileName + ".lvl";
-    }
-    else
-    {
-        FileNameFull = FileName + ".lvlx";
-        FullFileName = FileNamePath + FileName + ".lvlx";
-    }
+    FileNameFull = Files::basename(path);
+    FullFileName = path;
 
 
 // Load Custom Stuff
@@ -322,8 +312,18 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
     LoadCustomSound();
     FontManager::loadCustomFonts();
 
-    if(FilePath == ".lvl" || FilePath == ".lvlx")
+
+    // load.si.begin(g_curLevelMedals.should_initialize());
+
+    LevelData lvl;
+    if(!FileFormats::OpenLevelFileT(input, lvl))
+    {
+        pLogWarning("Error of level \"%s\" file loading: %s (line %d).",
+                    FilePath.c_str(),
+                    lvl.meta.ERROR_info.c_str(),
+                    lvl.meta.ERROR_linenum);
         return false;
+    }
 
     g_curLevelMedals.prepare_lvl(lvl);
 

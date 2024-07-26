@@ -25,6 +25,11 @@
 
 struct LevelData;
 
+namespace PGE_FileFormats_misc
+{
+    struct TextInput;
+}
+
 struct CurLevelMedals_t
 {
 private:
@@ -32,7 +37,7 @@ private:
     uint8_t m_checkpoint = 0;
 
 protected:
-    friend bool OpenLevelData(LevelData &lvl, const std::string FilePath);
+    friend bool OpenLevelData(PGE_FileFormats_misc::TextInput &lvl, const std::string FilePath);
 
     /**
      * \brief loads maximums from the current level

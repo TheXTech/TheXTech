@@ -30,12 +30,14 @@ public:
     void start();
     void stop();
 
+    using RawTextInput = PGE_FileFormats_misc::RawTextInput;
+
     // SEND_LVLX: /some/path/to/level file\n\n
     std::string     m_accepted_lvl_path; // Send to client the "READY\n\n" before accent raw data
     bool            m_doAcceptLevelData;
     std::string     m_acceptedRawData;  // accept any raw data before will be accepted '\n\n'
     bool            m_doParseLevelData;
-    LevelData       m_acceptedLevel;    // When accepted PARSE_LVLX\n\n, parse data and call signal
+    RawTextInput    m_acceptedLevel;    // When accepted PARSE_LVLX\n\n, parse data and call signal
 
     bool hasLevelData();
     bool levelReceivingInProcess();
