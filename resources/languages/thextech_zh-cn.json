@@ -326,7 +326,7 @@
             "phraseWaitingForInput": "等待玩家加入……",
             "reconnectTitle": "重新连接",
             "splitPressSelect_1": "按选择键",
-            "splitPressSelect_2": "进入按键配置",
+            "splitPressSelect_2": "进入按键设置",
             "wordDisconnect": "断开",
             "phraseTestProfile": "测试配置"
         },
@@ -400,7 +400,7 @@
             "controlsNewProfile": "<新建配置>",
             "controlsNotInUse": "（未使用）",
             "controlsReallyDeleteProfile": "是否删除配置？",
-            "controlsTitle": "按键配置",
+            "controlsTitle": "按键设置",
             "cursor": {
                 "down": "鼠标向下移动",
                 "left": "鼠标向左移动",
@@ -565,7 +565,7 @@
             "mainEditor": "编辑器",
             "mainExit": "退出",
             "mainMultiplayerGame": "双人游戏",
-            "mainOptions": "游戏选项",
+            "mainOptions": "游戏设置",
             "mainPlayEpisode": "开始游戏"
         },
         "options": {
@@ -593,7 +593,7 @@
                     "_name": "缓冲大小"
                 },
                 "_tooltip": "有关内部操作的技术性设置选项",
-                "advanced-video": "视频选项",
+                "advanced-video": "视频设置",
                 "audio-enable": "启用声音",
                 "audio-format": {
                     "_name": "音频格式",
@@ -644,11 +644,11 @@
                     "safe-tip": "仅点阵2x：如果图片为点阵2x，将缩小一半",
                     "_tooltip": "将图片缩小一半以释放内存"
                 },
-                "_header": "高级选项",
-                "advanced-audio": "音频选项"
+                "_header": "高级设置",
+                "advanced-audio": "音频设置"
             },
             "audio": {
-                "_header": "音频选项",
+                "_header": "音频设置",
                 "sfx-audio-fx": "回音效果",
                 "sfx-modern": "使用新增的声音",
                 "sfx-modern-tip": "使用TheXTech引擎新增的声音",
@@ -661,18 +661,18 @@
                 "sfx-spatial-audio": "三维音频"
             },
             "compatibility": {
-                "_header": "选项微调",
+                "_header": "地图微调设置",
                 "autocode": "LunaScript代码",
                 "reset-all": "重置全部",
                 "features": "新特性",
-                "_tooltip": "兼容模式或调试模式选项",
+                "_tooltip": "兼容模式或调试模式设置",
                 "bugfixes": "BUG修复"
             },
             "controls": {
-                "_header": "按键配置"
+                "_header": "按键设置"
             },
             "episode-options": {
-                "_header": "地图选项",
+                "_header": "地图设置",
                 "creator-compat": {
                     "_name": "创作者模式",
                     "_tooltip": "创作者相关的逻辑微调",
@@ -691,7 +691,7 @@
                 }
             },
             "main": {
-                "_header": "主选项",
+                "_header": "常规设置",
                 "background-work": "后台运行",
                 "background-work-tip": "窗口未激活时，可通过手柄游玩",
                 "four-screen-mode": {
@@ -715,7 +715,7 @@
                 "language": "语言"
             },
             "video": {
-                "_header": "视频选项",
+                "_header": "视频设置",
                 "battery-status": {
                     "fullscreen": "全屏时显示",
                     "fullscreen-tip": "全屏游戏时，显示电池电量",
@@ -764,7 +764,7 @@
                     "_name": "秒表计时器",
                     "animated": "动态特效"
                 },
-                "video-system": "系统选项",
+                "video-system": "系统设置",
                 "show-screen-shake": "画面震动",
                 "world-map-stars-show": "大地图上显示星星数量",
                 "world-map-stars-show-tip": "在关卡上方显示已收集星星数量",
