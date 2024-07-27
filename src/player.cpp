@@ -6297,7 +6297,7 @@ void PlayerEffects(const int A)
 
 bool PlayerNormal(const Player_t& p)
 {
-    return p.Effect == PLREFF_NORMAL || p.Effect == PLREFF_WARP_PIPE || p.Effect == PLREFF_NO_COLLIDE || p.Effect == PLREFF_PET_INSIDE;
+    return p.Effect == PLREFF_NORMAL || p.Effect == PLREFF_WARP_PIPE || p.Effect == PLREFF_NO_COLLIDE || p.Effect == PLREFF_PET_INSIDE || p.Effect == PLREFF_COOP_WINGS;
 }
 
 bool AllPlayersNormal()
