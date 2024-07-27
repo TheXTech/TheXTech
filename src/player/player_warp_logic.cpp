@@ -231,6 +231,44 @@ static void s_WarpFaderLogic(bool is_reverse, int A, int transitEffect, const Lo
     }
 }
 
+void s_delay_pipe_exit(int A)
+{
+    Player_t& p = Player[A];
+
+    const auto& warp = Warp[p.Warp];
+    const auto warp_dir_exit = (p.WarpBackward) ? warp.Direction : warp.Direction2;
+    bool warp_vertical = (warp_dir_exit == LevelDoor::EXIT_UP) || (warp_dir_exit == LevelDoor::EXIT_DOWN);
+
+    // number of players ahead of this one
+    int frames_before = 0;
+
+    for(int o_A = 1; o_A <= numPlayers; o_A++)
+    {
+        if(o_A == A)
+            continue;
+
+        Player_t& o_p = Player[o_A];
+        if(!o_p.Dead && o_p.TimeToLive == 0 && o_p.Effect == PLREFF_WARP_PIPE && o_p.Warp == p.Warp && o_p.WarpBackward == p.WarpBackward && o_p.Effect2 > 1 && (o_p.Effect2 < 128 || o_p.Effect2 >= 2000))
+        {
+            // wait for player to warp
+            if(warp_vertical)
+                frames_before += o_p.Location.Height;
+            else
+                frames_before += o_p.Location.Width;
+
+            // pause between players
+            frames_before += 70;
+        }
+    }
+
+    // put in new pipe holding state
+    if(frames_before)
+    {
+        p.Effect = PLREFF_WARP_PIPE;
+        p.Effect2 = 2010 + frames_before;
+    }
+}
+
 bool PlayerWaitingInWarp(const Player_t& p)
 {
     return (p.Effect == PLREFF_WARP_PIPE && p.Effect2 >= 2000)
@@ -579,28 +617,7 @@ void PlayerEffectWarpPipe(int A)
 
         // delay based on number of players ahead of this one
         if(is_shared_screen)
-        {
-            // number of players ahead of this one
-            int hit = 0;
-
-            for(int plr_i = 0; plr_i < screen.player_count; plr_i++)
-            {
-                int o_A = screen.players[plr_i];
-                if(o_A == A)
-                    continue;
-
-                Player_t& o_p = Player[o_A];
-                if(!o_p.Dead && o_p.TimeToLive == 0 && o_p.Effect == PLREFF_WARP_PIPE && o_p.Warp == p.Warp && o_p.WarpBackward == p.WarpBackward && o_p.Effect2 > 1 && (o_p.Effect2 < 128 || o_p.Effect2 >= 2000))
-                    hit += 1;
-            }
-
-            // put in new pipe holding state
-            if(hit)
-            {
-                p.Effect = PLREFF_WARP_PIPE;
-                p.Effect2 = 2010 + 100 * hit;
-            }
-        }
+            s_delay_pipe_exit(A);
 
         // many-player code
         if(g_ClonedPlayerMode)
@@ -1212,18 +1229,20 @@ void PlayerEffectWarpWait(int A)
             p.Effect = PLREFF_WARP_PIPE;
             p.Effect2 = 100;
 
-            // 2P holding condition for start warp
-            if(A == 2 && (g_ClonedPlayerMode || numPlayers <= 2))
+            const Screen_t& screen = ScreenByPlayer(A);
+
+            bool do_modern = !g_ClonedPlayerMode && (numPlayers > 2 || screen.Type == ScreenTypes::SharedScreen);
+            if(!do_modern)
             {
-                p.Effect = PLREFF_WAITING;
-                p.Effect2 = 300;
+                // 2P holding condition for start warp
+                if(A == screen.players[1])
+                {
+                    p.Effect = PLREFF_WAITING;
+                    p.Effect2 = 300;
+                }
             }
-            // modern >2P holding condition for warp
-            else if(A >= 2 && !g_ClonedPlayerMode)
-            {
-                p.Effect = PLREFF_WARP_PIPE;
-                p.Effect2 = 2010 + 100 * (A - 1);
-            }
+            else
+                s_delay_pipe_exit(A);
         }
     }
     else if(p.Effect2 <= 2000) // Start Wait for door

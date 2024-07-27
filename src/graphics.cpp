@@ -340,7 +340,7 @@ void GetvScreenAverage3(vScreen_t& vscreen)
         double mean_Y_not_warping = Y_not_warping / not_warping_count;
         // if the warping players are pulling the screen up by more than 100px, ignore them
         double allowed_height = 100;
-        if(mean_Y - mean_Y_not_warping > allowed_height)
+        if(mean_Y > mean_Y_not_warping + allowed_height)
             mean_Y = mean_Y_not_warping + allowed_height;
     }
 

@@ -5493,7 +5493,7 @@ void PlayerEffects(const int A)
     if(PlayerWaitingInWarp(p))
     {
         Screen_t& s = ScreenByPlayer(A);
-        if(s.Type == ScreenTypes::SharedScreen && (p.Location.Y + p.Location.Height < -vScreenByPlayer(A).Y) && CheckLiving())
+        if(s.Type == ScreenTypes::SharedScreen && (p.Location.Y + p.Location.Height < -vScreenByPlayer(A).Y) && CheckNearestLiving(A))
         {
             p.Dead = true;
             p.Effect = PLREFF_COOP_WINGS;
@@ -5506,7 +5506,6 @@ void PlayerEffects(const int A)
 
     if(p.Effect == PLREFF_TURN_BIG) // Player growing effect
     {
-
         p.Frame = 1;
         p.Effect2 += 1;
         if(p.Effect2 / 5 == static_cast<int>(floor(static_cast<double>(p.Effect2 / 5))))
