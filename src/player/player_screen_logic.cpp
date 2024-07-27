@@ -88,7 +88,6 @@ void PlayerSharedScreenLogic(int A)
             {
                 p.Dead = true;
                 p.Effect = PLREFF_COOP_WINGS;
-                SharedScreenAvoidJump(screen, 0);
             }
         }
         else if(p.Location.X + p.Location.Width >= -vscreen.X + vscreen.Width - 8 && check_right)
@@ -108,10 +107,16 @@ void PlayerSharedScreenLogic(int A)
 
 
         // give wings to a player that falls offscreen but not off-section
-        if(p.Location.Y > -vscreen.Y + vscreen.Height + 64 && p.Location.Y <= level[p.Section].Height + 64)
+        if(p.Location.Y > -vscreen.Y + vscreen.Height + 64 && p.Location.Y <= level[p.Section].Height)
         {
             p.Dead = true;
             p.Effect = PLREFF_COOP_WINGS;
+        }
+
+        if(p.Effect == PLREFF_COOP_WINGS)
+        {
+            p.Effect2 = 0;
+            SizeCheck(p);
             SharedScreenAvoidJump(screen, 0);
         }
     }
@@ -162,7 +167,11 @@ void PlayerEffectWings(int A)
         if(target_plr || offscreen)
         {
             double target_X = (target_plr) ? (Player[target_plr].Location.X + Player[target_plr].Location.Width / 2) : -vscreen.X + vscreen.Width / 2;
-            double target_Y = (target_plr) ? (Player[target_plr].Location.Y + Player[target_plr].Location.Height / 2) : -vscreen.Y + vscreen.Height / 2;
+            double target_Y = (target_plr) ? Player[target_plr].Location.Y - 8 : -vscreen.Y + vscreen.Height / 2;
+
+            int randomness = (target_plr) ? 8 : vscreen.Width / 10;
+            target_X += iRand(randomness * 2) - randomness;
+            target_Y += iRand(randomness * 2) - randomness;
 
             double center_X = p.Location.X + p.Location.Width / 2;
             double center_Y = p.Location.Y + p.Location.Height / 2;
@@ -227,60 +236,54 @@ void PlayerEffectWings(int A)
         p.Location.Y += p.Location.SpeedY;
 
         // tag other players
+        bool found_player = false;
         for(int B = 1; B <= numPlayers; B++)
         {
-            if(Player[B].Dead || Player[B].TimeToLive != 0)
+            if(Player[B].Dead || Player[B].TimeToLive != 0 || Player[B].Effect != PLREFF_NORMAL)
                 continue;
 
             if(!CheckCollision(Player[A].Location, Player[B].Location))
                 continue;
 
-            // want to end up in P2's current location, to avoid clipping blocks
-            double target_loc_cX = Player[B].Location.X + Player[B].Location.Width / 2;
-            double target_loc_bY = Player[B].Location.Y + Player[B].Location.Height;
-
-            p.Effect = PLREFF_NORMAL;
-            PlaySoundSpatial(SFX_Transform, p.Location);
-
-            PlayerCollide(A);
-
-            // if we're inside a block, force ourselves to use the other player's old location.
-            // do the Y coordinate first (more gentle), and disable collisions.
-            for(int attempt = 0; attempt < 2; attempt++)
-            {
-                bool had_collision = false;
-                for(BlockRef_t b_ref : treeBlockQuery(Player[A].Location, SORTMODE_NONE))
-                {
-                    const Block_t& b = b_ref;
-                    int B = (int)b_ref;
-
-                    if(b.Hidden || b.Invis || BlockIsSizable[b.Type] || BlockOnlyHitspot1[b.Type] || BlockNoClipping[b.Type])
-                        continue;
-
-                    if(BlockCheckPlayerFilter(B, A))
-                        continue;
-
-                    if(!CheckCollision(Player[A].Location, b.Location))
-                        continue;
-
-                    had_collision = true;
-
-                    if(attempt == 0)
-                        Player[A].Location.Y = target_loc_bY - Player[A].Location.Height;
-                    else
-                        Player[A].Location.X = target_loc_cX - Player[A].Location.Width / 2;
-
-                    Player[A].Effect = PLREFF_NO_COLLIDE;
-
-                    break;
-                }
-
-                if(!had_collision)
-                    break;
-            }
-
+            found_player = true;
             break;
         }
+
+        // just collided with player
+        if(found_player && !p.Effect2)
+        {
+            // if we're inside a block, then we can't respawn yet
+            bool hit_block = false;
+            for(BlockRef_t b_ref : treeBlockQuery(Player[A].Location, SORTMODE_NONE))
+            {
+                const Block_t& b = b_ref;
+                int B = (int)b_ref;
+
+                if(b.Hidden || b.Invis || BlockIsSizable[b.Type] || BlockOnlyHitspot1[b.Type] || BlockNoClipping[b.Type])
+                    continue;
+
+                if(BlockCheckPlayerFilter(B, A))
+                    continue;
+
+                if(!CheckCollision(Player[A].Location, b.Location))
+                    continue;
+
+                if(BlockSlope[B] || BlockSlope2[B])
+                    continue;
+
+                hit_block = true;
+                break;
+            }
+
+            if(!hit_block)
+            {
+                p.Effect = PLREFF_NORMAL;
+                PlayerCollide(A);
+                PlaySoundSpatial(SFX_Transform, p.Location);
+            }
+        }
+
+        p.Effect2 = found_player;
     }
     else
         p.Effect = PLREFF_NORMAL;
@@ -289,6 +292,7 @@ void PlayerEffectWings(int A)
     {
         p.Dead = false;
         p.CanJump = false;
+        p.Effect2 = 0;
         p.Immune = 50;
         p.Immune2 = false;
         CheckSection(A);
