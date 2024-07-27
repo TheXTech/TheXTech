@@ -6341,6 +6341,10 @@ void PlayersEnsureNearby(const Screen_t& screen)
         double p_x = pLoc.X + pLoc.Width / 2;
         double p_y = pLoc.Y + pLoc.Height / 2;
 
+        // dead players don't affect camera
+        if(p.Dead)
+            continue;
+
         if(plr_i == 0 || p_x < l)
             l = p_x;
 
@@ -6424,6 +6428,11 @@ void PlayersEnsureNearby(const Screen_t& screen)
             continue;
 
         Player_t& p = Player[plr_A];
+
+        // winged player will naturally return to screen
+        if(p.Effect == PLREFF_COOP_WINGS)
+            continue;
+
         Location_t& pLoc = p.Location;
 
         p.Section = pClosest.Section;
@@ -6431,6 +6440,8 @@ void PlayersEnsureNearby(const Screen_t& screen)
         pLoc.X = pClosestLoc.X + pClosestLoc.Width / 2 - pLoc.Width / 2;
         pLoc.Y = pClosestLoc.Y + pClosestLoc.Height - pLoc.Height;
     }
+
+    bool in_door_scroll = PlayerScrollingInWarp(pClosest);
 
     for(int plr_i = 0; plr_i < screen.player_count; plr_i++)
     {
@@ -6441,14 +6452,25 @@ void PlayersEnsureNearby(const Screen_t& screen)
         if(p.Dead || p.TimeToLive != 0)
             continue;
 
-        p.Effect = PLREFF_NORMAL;
-        p.Effect2 = 0;
-        p.Warp = 0;
-        p.WarpCD = 0;
-        p.WarpBackward = false;
-        p.WarpShooted = false;
+        if(in_door_scroll)
+        {
+            p.Effect = pClosest.Effect;
+            p.Effect2 = pClosest.Effect2;
+            p.Warp = pClosest.Warp;
+            p.WarpCD = pClosest.WarpCD;
+            p.WarpBackward = pClosest.WarpBackward;
+        }
+        else
+        {
+            p.Effect = PLREFF_NORMAL;
+            p.Effect2 = 0;
+            p.Warp = 0;
+            p.WarpCD = 0;
+            p.WarpBackward = false;
+            p.WarpShooted = false;
 
-        DodgePlayers(plr_A);
+            DodgePlayers(plr_A);
+        }
     }
 }
 

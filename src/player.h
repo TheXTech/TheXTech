@@ -119,6 +119,8 @@ void PowerUps(const int A); //PRIVATE
 void SuperWarp(const int A); //PRIVATE
 // NEW: reports whether a player is currently waiting to exit a warp (for shared screen)
 bool PlayerWaitingInWarp(const Player_t& p);
+// NEW: reports whether a player is currently scrolling between warps
+bool PlayerScrollingInWarp(const Player_t& p);
 // Private Sub PlayerCollide(A As Integer)
 void PlayerCollide(const int A); //PRIVATE
 

@@ -275,6 +275,12 @@ bool PlayerWaitingInWarp(const Player_t& p)
         || (p.Effect == PLREFF_WAITING && p.Effect2 > 30 && p.Effect2 <= 2000);
 }
 
+bool PlayerScrollingInWarp(const Player_t& p)
+{
+    return (p.Effect == PLREFF_WARP_PIPE || p.Effect == PLREFF_WARP_DOOR)
+        && (p.Effect2 >= 128 && p.Effect2 <= 128 + plr_warp_scroll_max_frames);
+}
+
 void PlayerEffectWarpPipe(int A)
 {
     Player_t& p = Player[A];
