@@ -5489,6 +5489,21 @@ void PlayerEffects(const int A)
 
     p.Immune2 = false;
 
+    // in shared screen mode, give wings to players who are above the screen waiting to exit a warp
+    if(PlayerWaitingInWarp(p))
+    {
+        Screen_t& s = ScreenByPlayer(A);
+        if(s.Type == ScreenTypes::SharedScreen && (p.Location.Y + p.Location.Height < -vScreenByPlayer(A).Y) && CheckLiving())
+        {
+            p.Dead = true;
+            p.Effect = PLREFF_COOP_WINGS;
+            p.Effect2 = 0;
+            SizeCheck(p);
+            SharedScreenAvoidJump(s, 0);
+            return;
+        }
+    }
+
     if(p.Effect == PLREFF_TURN_BIG) // Player growing effect
     {
 

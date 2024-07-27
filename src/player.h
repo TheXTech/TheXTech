@@ -23,6 +23,7 @@
 #define PLAYER_H
 
 struct Screen_t;
+struct Player_t;
 
 // NEW: moves a player to avoid collisions with other players, and sets to no-clipping if this is impossible
 void DodgePlayers(int plr_A);
@@ -116,6 +117,8 @@ void Tanooki(const int A); //PRIVATE
 void PowerUps(const int A); //PRIVATE
 // Private Sub SuperWarp(A As Integer)
 void SuperWarp(const int A); //PRIVATE
+// NEW: reports whether a player is currently waiting to exit a warp (for shared screen)
+bool PlayerWaitingInWarp(const Player_t& p);
 // Private Sub PlayerCollide(A As Integer)
 void PlayerCollide(const int A); //PRIVATE
 

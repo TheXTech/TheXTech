@@ -21,6 +21,7 @@
 #include "globals.h"
 #include "graphics.h"
 #include "collision.h"
+#include "player.h"
 #include "game_main.h"
 #include "sound.h"
 #include "change_res.h"
@@ -231,6 +232,8 @@ void GetvScreenAverage3(vScreen_t& vscreen)
 
     // calculate average Y position
     vscreen.Y = 0;
+    double Y_not_warping = 0;
+    int not_warping_count = 0;
 
     // find furthest left, right, top, and bottom players
     double l, r, t, b;
@@ -257,8 +260,6 @@ void GetvScreenAverage3(vScreen_t& vscreen)
 
         double by = pLocY + plr.Location.Height;
 
-        vscreen.Y -= by;
-
         if(plr_count == 0 || by < t)
             t = by;
         if(plr_count == 0 || b < by)
@@ -268,7 +269,14 @@ void GetvScreenAverage3(vScreen_t& vscreen)
         if(plr_count == 0 || r < pr)
             r = pr;
 
+        vscreen.Y -= by;
         plr_count += 1;
+
+        if(!PlayerWaitingInWarp(plr))
+        {
+            Y_not_warping -= by;
+            not_warping_count += 1;
+        }
     }
 
     if(plr_count == 0)
@@ -278,8 +286,9 @@ void GetvScreenAverage3(vScreen_t& vscreen)
         return;
     }
 
-    // double the contribution of the top player to the result
+    // 2x the contribution of the top player to the result
     vscreen.Y -= t;
+    plr_count += 1;
 
     const SpeedlessLocation_t& section = level[section_idx];
 
@@ -324,8 +333,19 @@ void GetvScreenAverage3(vScreen_t& vscreen)
     use_width  = SDL_min(use_width,  section.Width  - section.X);
     use_height = SDL_min(use_height, section.Height - section.Y);
 
+    // take the average, but if the players waiting to exit a warp are keeping the screen too high, don't let them control the screen
+    double mean_Y = vscreen.Y / plr_count;
+    if(not_warping_count != 0)
+    {
+        double mean_Y_not_warping = Y_not_warping / not_warping_count;
+        // if the warping players are pulling the screen up by more than 100px, ignore them
+        double allowed_height = 100;
+        if(mean_Y - mean_Y_not_warping > allowed_height)
+            mean_Y = mean_Y_not_warping + allowed_height;
+    }
+
     vscreen.X = -(l + r) / 2 + (use_width * 0.5);
-    vscreen.Y = vscreen.Y / (plr_count + 1) + (use_height * 0.5) - vScreenYOffset;
+    vscreen.Y = mean_Y + (use_height * 0.5) - vScreenYOffset;
 
     // allow some overscan (needed for 3DS)
     int allow_X = (g_config.allow_multires && vscreen.Width == XRender::TargetW && !Screens[vscreen.screen_ref].is_canonical()) ? XRender::TargetCameraOverscanX : 0;

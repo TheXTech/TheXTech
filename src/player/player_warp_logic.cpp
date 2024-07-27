@@ -231,6 +231,12 @@ static void s_WarpFaderLogic(bool is_reverse, int A, int transitEffect, const Lo
     }
 }
 
+bool PlayerWaitingInWarp(const Player_t& p)
+{
+    return (p.Effect == PLREFF_WARP_PIPE && p.Effect2 >= 2000)
+        || (p.Effect == PLREFF_WAITING && p.Effect2 > 30 && p.Effect2 <= 2000);
+}
+
 void PlayerEffectWarpPipe(int A)
 {
     Player_t& p = Player[A];
@@ -635,6 +641,8 @@ void PlayerEffectWarpPipe(int A)
             p.Effect2 = 2;
             if(backward || !warp.cannonExit)
                 PlaySoundSpatial(SFX_Warp, p.Location);
+
+            SharedScreenAvoidJump(screen, 0);
         }
     }
     else if(p.Effect2 > 128) // Scrolling between pipes
@@ -1178,6 +1186,9 @@ void PlayerEffectWarpWait(int A)
         {
             p.Effect = PLREFF_NORMAL;
             p.Effect2 = 0;
+
+            Screen_t& screen = ScreenByPlayer(A);
+            SharedScreenAvoidJump(screen, 0);
         }
     }
     // 2P holding condition for start warp (pipe exit)
@@ -1188,6 +1199,9 @@ void PlayerEffectWarpWait(int A)
         {
             p.Effect2 = 100;
             p.Effect = PLREFF_WARP_PIPE;
+
+            Screen_t& screen = ScreenByPlayer(A);
+            SharedScreenAvoidJump(screen, 0);
         }
     }
     else if(p.Effect2 <= 1000) // Start Wait for pipe
@@ -1233,7 +1247,7 @@ void PlayerEffectWarpWait(int A)
                 PlaySoundSpatial(SFX_Door, p.Location);
         }
     }
-    else if(p.Effect2 <= 3000) // warp wait
+    else if(p.Effect2 <= 3000) // exit warp wait
     {
         p.Effect2 -= 1;
 
