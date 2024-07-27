@@ -1056,7 +1056,10 @@ void PlayerEffectWarpDoor(int A)
 
     // start the scroll effect
     if(do_scroll && fEqual(p.Effect2, 29))
+    {
         s_InitWarpScroll(p, warp_enter, warp_exit, 30);
+        SoundPause[SFX_Door] = 60;
+    }
     // process the scroll effect
     else if(p.Effect2 >= 128)
     {
@@ -1072,7 +1075,10 @@ void PlayerEffectWarpDoor(int A)
         p.Location.Y += (targetY - p.Location.Y) / frames_left;
 
         if(frames_left == 30)
+        {
             s_TriggerDoorEffects(warp_exit);
+            PlaySoundSpatial(SFX_Door, warp_exit);
+        }
 
         p.Effect2 -= 1;
 
@@ -1203,7 +1209,7 @@ void PlayerEffectWarpWait(int A)
 
             s_TriggerDoorEffects(static_cast<Location_t>(warp_exit), false);
 
-            SoundPause[46] = 0;
+            SoundPause[SFX_Door] = 0;
             PlaySoundSpatial(SFX_Door, p.Location);
         }
     }
@@ -1271,7 +1277,7 @@ void PlayerEffectWarpWait(int A)
         {
             s_TriggerDoorEffects(static_cast<Location_t>(Warp[p.Warp].Exit), false);
 
-            SoundPause[46] = 0;
+            SoundPause[SFX_Door] = 0;
             p.Effect = PLREFF_WAITING;
             p.Effect2 = 30;
 
