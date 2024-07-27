@@ -74,7 +74,12 @@ void PlayerSharedScreenLogic(int A)
             if(p.Location.X <= -vscreen.X)
             {
                 p.Location.X = -vscreen.X;
-                p.Pinched.Left2 = 2;
+
+                // give wings to a player that would be killed by pinching
+                if(p.Pinched.Right4 && p.Pinched.Moving && !p.Pinched.Left2)
+                    p.Effect = PLREFF_COOP_WINGS;
+                else
+                    p.Pinched.Left2 = 2;
 
                 if(p.Location.SpeedX < 0)
                     p.Location.SpeedX = 0;
@@ -85,17 +90,19 @@ void PlayerSharedScreenLogic(int A)
 
             // give wings to a player that gets stuck to the left
             if(NoTurnBack[p.Section] && p.Pinched.Right4)
-            {
-                p.Dead = true;
                 p.Effect = PLREFF_COOP_WINGS;
-            }
         }
         else if(p.Location.X + p.Location.Width >= -vscreen.X + vscreen.Width - 8 && check_right)
         {
             if(p.Location.X + p.Location.Width >= -vscreen.X + vscreen.Width)
             {
                 p.Location.X = -vscreen.X + vscreen.Width - p.Location.Width;
-                p.Pinched.Right4 = 2;
+
+                // give wings to a player that would be killed by pinching
+                if(p.Pinched.Left2 && p.Pinched.Moving && !p.Pinched.Right4)
+                    p.Effect = PLREFF_COOP_WINGS;
+                else
+                    p.Pinched.Right4 = 2;
 
                 if(p.Location.SpeedX > 0)
                     p.Location.SpeedX = 0;
@@ -108,13 +115,11 @@ void PlayerSharedScreenLogic(int A)
 
         // give wings to a player that falls offscreen but not off-section
         if(p.Location.Y > -vscreen.Y + vscreen.Height + 64 && p.Location.Y <= level[p.Section].Height)
-        {
-            p.Dead = true;
             p.Effect = PLREFF_COOP_WINGS;
-        }
 
         if(p.Effect == PLREFF_COOP_WINGS)
         {
+            p.Dead = true;
             p.Effect2 = 0;
             SizeCheck(p);
             SharedScreenAvoidJump(screen, 0);
