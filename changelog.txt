@@ -50,6 +50,7 @@ Changelog for 1.3.7-dev
 -Update TheXTech's logic for climbing moving fences (@ds-sloth)
 -Fix vanilla peculiarity where the speed of blocks attached to an NPC would not be fully reset when the NPC dies, guarded by compat flag "fix-attlayer-reset" [Modern Mode] (@ds-sloth)
 -Fix TheXTech 1.3.6.1 peculiarity where a player could reach an inaccessible location by respawning while another player was scrolling (@ds-sloth)
+-Editor: fix TheXTech 1.3.6 bug where level test might incorrectly start following text input (@ds-sloth)
 
 Changelog for 1.3.6.6-dev
 -Fix vanilla bug where vehicle could be vulnerable if player entered it during AltJump (requires frame perfect down press), guarded by compat flag "fix-vehicle-altjump-bug" (@ds-sloth)
