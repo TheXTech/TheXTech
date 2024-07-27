@@ -1357,7 +1357,7 @@ int CheckNearestLiving(const int A)
         int o_A = screen.players[plr_i];
         const Player_t& o_p = Player[o_A];
 
-        if(o_A != A && !o_p.Dead && o_p.TimeToLive == 0)
+        if(o_A != A && !o_p.Dead && o_p.TimeToLive == 0 && o_A != p.YoshiPlayer)
         {
             double dist = (o_p.Location.X - p.Location.X) * (o_p.Location.X - p.Location.X) + (o_p.Location.Y - p.Location.Y) * (o_p.Location.Y - p.Location.Y);
 
@@ -1377,7 +1377,7 @@ int CheckNearestLiving(const int A)
     {
         const Player_t& o_p = Player[o_A];
 
-        if(o_A != A && !o_p.Dead && o_p.TimeToLive == 0)
+        if(o_A != A && !o_p.Dead && o_p.TimeToLive == 0 && o_A != p.YoshiPlayer)
         {
             double dist = (o_p.Location.X - p.Location.X) * (o_p.Location.X - p.Location.X) + (o_p.Location.Y - p.Location.Y) * (o_p.Location.Y - p.Location.Y);
 
