@@ -119,10 +119,11 @@ void PlayerSharedScreenLogic(int A)
 
         if(p.Effect == PLREFF_COOP_WINGS)
         {
+            SharedScreenAvoidJump_Pre(screen);
             p.Dead = true;
             p.Effect2 = 0;
             SizeCheck(p);
-            SharedScreenAvoidJump(screen, 0);
+            SharedScreenAvoidJump_Post(screen, 0);
         }
     }
 }
@@ -295,6 +296,8 @@ void PlayerEffectWings(int A)
 
     if(p.Effect != PLREFF_COOP_WINGS)
     {
+        SharedScreenAvoidJump_Pre(screen);
+
         p.Dead = false;
         p.CanJump = false;
         p.Effect2 = 0;
@@ -303,7 +306,7 @@ void PlayerEffectWings(int A)
         CheckSection(A);
         PlayerFrame(p);
 
-        SharedScreenAvoidJump(screen, 0);
+        SharedScreenAvoidJump_Post(screen, 0);
     }
 }
 

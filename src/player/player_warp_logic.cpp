@@ -436,6 +436,8 @@ void PlayerEffectWarpPipe(int A)
 
             if(do_tele)
             {
+                SharedScreenAvoidJump_Pre(screen);
+
                 for(int plr_i = 0; plr_i < screen.player_count; plr_i++)
                 {
                     int o_A = screen.players[plr_i];
@@ -465,9 +467,9 @@ void PlayerEffectWarpPipe(int A)
                         o_p.Location.SpeedX = 0.0;
                         o_p.Location.SpeedY = 0.0;
                     }
-                }
 
-                SharedScreenAvoidJump(screen, (do_scroll) ? 0 : 200);
+                    SharedScreenAvoidJump_Post(screen, (do_scroll) ? 0 : 200);
+                }
             }
         }
 
@@ -655,11 +657,13 @@ void PlayerEffectWarpPipe(int A)
 
         if(p.Effect2 <= 2000)
         {
+            SharedScreenAvoidJump_Pre(screen);
+
             p.Effect2 = 2;
             if(backward || !warp.cannonExit)
                 PlaySoundSpatial(SFX_Warp, p.Location);
 
-            SharedScreenAvoidJump(screen, 0);
+            SharedScreenAvoidJump_Post(screen, 0);
         }
     }
     else if(p.Effect2 > 128) // Scrolling between pipes
@@ -1007,6 +1011,8 @@ void PlayerEffectWarpDoor(int A)
 
         if(do_tele)
         {
+            SharedScreenAvoidJump_Pre(screen);
+
             for(int plr_i = 0; plr_i < screen.player_count; plr_i++)
             {
                 int o_A = screen.players[plr_i];
@@ -1038,7 +1044,7 @@ void PlayerEffectWarpDoor(int A)
                 }
             }
 
-            SharedScreenAvoidJump(screen, (do_scroll) ? 0 : 200);
+            SharedScreenAvoidJump_Post(screen, (do_scroll) ? 0 : 200);
         }
     }
 
@@ -1201,11 +1207,14 @@ void PlayerEffectWarpWait(int A)
         p.Effect2 -= 1;
         if(fEqual(p.Effect2, 100))
         {
+            Screen_t& screen = ScreenByPlayer(A);
+
+            SharedScreenAvoidJump_Pre(screen);
+
             p.Effect = PLREFF_NORMAL;
             p.Effect2 = 0;
 
-            Screen_t& screen = ScreenByPlayer(A);
-            SharedScreenAvoidJump(screen, 0);
+            SharedScreenAvoidJump_Post(screen, 0);
         }
     }
     // 2P holding condition for start warp (pipe exit)
@@ -1214,11 +1223,14 @@ void PlayerEffectWarpWait(int A)
         p.Effect2 -= 1;
         if(fEqual(p.Effect2, 200))
         {
+            Screen_t& screen = ScreenByPlayer(A);
+
+            SharedScreenAvoidJump_Pre(screen);
+
             p.Effect2 = 100;
             p.Effect = PLREFF_WARP_PIPE;
 
-            Screen_t& screen = ScreenByPlayer(A);
-            SharedScreenAvoidJump(screen, 0);
+            SharedScreenAvoidJump_Post(screen, 0);
         }
     }
     else if(p.Effect2 <= 1000) // Start Wait for pipe

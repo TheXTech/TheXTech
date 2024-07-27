@@ -408,7 +408,20 @@ void GetvScreenAuto(vScreen_t& vscreen)
         GetvScreen(vscreen);
 }
 
-void SharedScreenAvoidJump(Screen_t& screen, int Delay)
+void SharedScreenAvoidJump_Pre(Screen_t& screen)
+{
+    if(screen.Type != ScreenTypes::SharedScreen)
+        return;
+
+    auto& vscreen = screen.vScreen(1);
+
+    GetvScreenAverage3(vscreen);
+
+    if(!screen.is_canonical())
+        SharedScreenAvoidJump_Pre(screen.canonical_screen());
+}
+
+void SharedScreenAvoidJump_Post(Screen_t& screen, int Delay)
 {
     if(screen.Type != ScreenTypes::SharedScreen)
         return;
@@ -432,7 +445,7 @@ void SharedScreenAvoidJump(Screen_t& screen, int Delay)
     vscreen.TempDelay = Delay;
 
     if(!screen.is_canonical())
-        SharedScreenAvoidJump(screen.canonical_screen(), Delay);
+        SharedScreenAvoidJump_Post(screen.canonical_screen(), Delay);
 }
 
 void SharedScreenResetTemp(Screen_t& screen)

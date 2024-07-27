@@ -62,8 +62,11 @@ void GetvScreenAverage3(vScreen_t& vscreen);
 // NEW: update a vScreen with the correct procedure based on its screen's Type and DType
 void GetvScreenAuto(vScreen_t& vscreen);
 
+//  Prepares shared screen to avoid a jump
+void SharedScreenAvoidJump_Pre(Screen_t& screen);
+
 //  Sets TempX and TempY to avoid a jump for a Screen's shared vScreen, and TempDelay as requested.
-void SharedScreenAvoidJump(Screen_t& screen, int TempDelay);
+void SharedScreenAvoidJump_Post(Screen_t& screen, int TempDelay);
 
 //  Resets variables set by above
 void SharedScreenResetTemp(Screen_t& screen);

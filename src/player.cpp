@@ -5495,11 +5495,12 @@ void PlayerEffects(const int A)
         Screen_t& s = ScreenByPlayer(A);
         if(s.Type == ScreenTypes::SharedScreen && (p.Location.Y + p.Location.Height < -vScreenByPlayer(A).Y) && CheckNearestLiving(A))
         {
+            SharedScreenAvoidJump_Pre(s);
             p.Dead = true;
             p.Effect = PLREFF_COOP_WINGS;
             p.Effect2 = 0;
             SizeCheck(p);
-            SharedScreenAvoidJump(s, 0);
+            SharedScreenAvoidJump_Post(s, 0);
             return;
         }
     }
