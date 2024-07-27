@@ -4160,10 +4160,40 @@ void RespawnPlayerTo(int A, int TargetPlayer)
     //   so I will do it where it only affects the new code.
     // Player[A].Section = Player[TargetPlayer].Section;
 
-    // respawn at top of target player's vScreen in >2P mode, otherwise use vScreen 1 as SMBX64 does
-    const vScreen_t& target_screen = (numPlayers > 2) ? vScreenByPlayer(TargetPlayer) : vScreen[1];
+    // respawn at top of vScreen 1 in SMBX dynamic splitscreen, otherwise at top of target player's vScreen
+    const Screen_t& screen = ScreenByPlayer(A);
+    const vScreen_t& target_vscreen = (screen.Type == ScreenTypes::Dynamic) ? screen.vScreen(1) : vScreenByPlayer(TargetPlayer);
 
-    RespawnPlayer(A, Player[TargetPlayer].Direction, CenterX, StopY, target_screen);
+    RespawnPlayer(A, Player[TargetPlayer].Direction, CenterX, StopY, target_vscreen);
+
+    // if TargetPlayer is scrolling in warp, we can't spawn them directly.
+    if(PlayerScrollingInWarp(Player[TargetPlayer]))
+    {
+        // Give player A wings in shared screen
+        if(screen.Type == ScreenTypes::SharedScreen)
+        {
+            Player[A].Location.Y -= 100;
+            Player[A].Dead = true;
+            Player[A].Effect = PLREFF_COOP_WINGS;
+            Player[A].Effect2 = 0;
+        }
+        // respawn them to the target player's warp otherwise
+        else
+        {
+            const auto& warp = Warp[Player[TargetPlayer].Warp];
+            const auto& warp_exit = (Player[TargetPlayer].WarpBackward) ? warp.Entrance : warp.Exit;
+            const auto warp_exit_dir = (Player[TargetPlayer].WarpBackward) ? warp.Direction : warp.Direction2;
+
+            Player[A].Location.X = warp_exit.X + warp_exit.Width / 2 - Player[A].Location.Width / 2;
+
+            if(Player[TargetPlayer].Effect == PLREFF_WARP_PIPE && warp_exit_dir == 1)
+                Player[A].Effect2 = warp_exit.Y;
+            else
+                Player[A].Effect2 = warp_exit.Y + warp_exit.Height - Player[A].Location.Height;
+
+            Player[A].Location.Y = Player[A].Effect2 - target_vscreen.Height * 3 / 4;
+        }
+    }
 }
 
 void StealBonus()
