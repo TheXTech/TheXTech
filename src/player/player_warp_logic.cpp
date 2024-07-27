@@ -429,7 +429,7 @@ void PlayerEffectWarpPipe(int A)
                     }
                 }
 
-                SharedScreenAvoidJump(screen, 200);
+                SharedScreenAvoidJump(screen, (do_scroll) ? 0 : 200);
             }
         }
 
@@ -552,7 +552,7 @@ void PlayerEffectWarpPipe(int A)
             CheckSectionNPC(p.HoldingNPC);
 
         // set any other players warping to the same pipe to this state (needed to avoid splitting a shared screen)
-        if(is_shared_screen)
+        if(is_shared_screen && !do_scroll)
         {
             for(int plr_i = 0; plr_i < screen.player_count; plr_i++)
             {
@@ -1021,7 +1021,7 @@ void PlayerEffectWarpDoor(int A)
                 }
             }
 
-            SharedScreenAvoidJump(screen, 200);
+            SharedScreenAvoidJump(screen, (do_scroll) ? 0 : 200);
         }
     }
 
