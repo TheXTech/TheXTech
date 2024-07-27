@@ -6369,7 +6369,8 @@ void PlayersEnsureNearby(const Screen_t& screen)
         const Location_t& pLoc = p.Location;
 
         double p_x = pLoc.X + pLoc.Width / 2;
-        double p_y = pLoc.Y + pLoc.Height / 2;
+        double p_top = (p.Effect == PLREFF_RESPAWN) ? pLoc.Y : p.Effect2;
+        double p_y = p_top + pLoc.Height / 2;
 
         // dead players don't affect camera
         if(p.Dead)
@@ -6432,7 +6433,8 @@ void PlayersEnsureNearby(const Screen_t& screen)
 
         if(!p.Dead && p.TimeToLive == 0)
         {
-            double dist = (pLoc.X - cx) * (pLoc.X - cx) + (pLoc.Y - cy) * (pLoc.Y - cy);
+            double p_top = (p.Effect == PLREFF_RESPAWN) ? pLoc.Y : p.Effect2;
+            double dist = (pLoc.X - cx) * (pLoc.X - cx) + (p_top - cy) * (p_top - cy);
 
             if(closest == 0 || closest_dist > dist)
             {
@@ -6446,8 +6448,12 @@ void PlayersEnsureNearby(const Screen_t& screen)
     if(closest == 0)
         closest = screen.players[0];
 
-    const Player_t& pClosest = Player[closest];
+    Player_t& pClosest = Player[closest];
     const Location_t& pClosestLoc = pClosest.Location;
+
+    // if the winner is currently respawning, place them at their target loc
+    if(pClosest.Effect == PLREFF_RESPAWN)
+        pClosest.Location.Y = pClosest.Effect2;
 
     // move all players to winning player's location, and set effect if alive
     for(int plr_i = 0; plr_i < screen.player_count; plr_i++)
