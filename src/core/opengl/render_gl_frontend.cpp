@@ -313,6 +313,10 @@ bool RenderGL::initRender(SDL_Window *window)
         init_string += "depth buffer, ";
     if(m_client_side_arrays)
         init_string += "client-side arrays, ";
+    if(m_has_npot_textures)
+        init_string += "NPOT textures, ";
+    if(m_has_bgra_textures)
+        init_string += "BGRA format, ";
     if(m_use_shaders)
         init_string += "ES2 shaders, ";
     if(m_has_es3_shaders)
@@ -886,6 +890,11 @@ static int s_nextPowerOfTwo(int val)
     return power;
 }
 
+#ifndef GL_BGRA_EXT
+// from OpenGL 1.2 desktop spec and OES extension GL_EXT_texture_format_BGRA8888
+#define GL_BGRA_EXT 0x80E1
+#endif
+
 void RenderGL::loadTextureInternal(StdPicture &target, uint32_t width, uint32_t height, uint8_t *RGBApixels, uint32_t pitch, bool is_mask, uint32_t least_width, uint32_t least_height)
 {
     // clear pre-existing errors
@@ -896,13 +905,19 @@ void RenderGL::loadTextureInternal(StdPicture &target, uint32_t width, uint32_t 
     // SDL_Surface *surface;
     // SDL_Texture *texture = nullptr;
 
-    target.d.nOfColors = GL_RGBA;
-    target.d.format = GL_RGBA;
+    target.d.format = (m_has_bgra_textures) ? GL_BGRA_EXT : GL_RGBA;
+    target.d.nOfColors = target.d.format;
 
     GLuint tex_id;
 
-    int pad_w = s_nextPowerOfTwo(SDL_max(least_width, width));
-    int pad_h = s_nextPowerOfTwo(SDL_max(least_height, height));
+    uint32_t pad_w = SDL_max(least_width, width);
+    uint32_t pad_h = SDL_max(least_height, height);
+
+    if(!m_has_npot_textures)
+    {
+        pad_w = s_nextPowerOfTwo(pad_w);
+        pad_h = s_nextPowerOfTwo(pad_h);
+    }
 
     uint8_t* padded_pixels = nullptr;
     uint8_t* use_pixels = nullptr;
@@ -910,11 +925,11 @@ void RenderGL::loadTextureInternal(StdPicture &target, uint32_t width, uint32_t 
     pitch /= 4;
 
     // can't do because of pixel substitution
-    // if(pad_w == pitch && height == pad_h)
-    // {
-        // use_pixels = RGBApixels;
-    // }
-    // else
+    if(pad_w == pitch && height == pad_h && target.d.format == GL_BGRA_EXT)
+    {
+        use_pixels = RGBApixels;
+    }
+    else
     {
         padded_pixels = (uint8_t*) malloc(pad_w * pad_h * 4);
         if(!padded_pixels)
@@ -930,14 +945,27 @@ void RenderGL::loadTextureInternal(StdPicture &target, uint32_t width, uint32_t 
         else
             SDL_memset(padded_pixels, 0, pad_w * pad_h * 4);
 
-        for(uint32_t y = 0; y < height; y++)
+        if(target.d.format == GL_BGRA_EXT)
         {
-            for(uint32_t x = 0; x < width; x++)
+            uint32_t* padded_pixels_q = reinterpret_cast<uint32_t*>(padded_pixels);
+            uint32_t* input_pixels_q = reinterpret_cast<uint32_t*>(RGBApixels);
+            for(uint32_t y = 0; y < height; y++)
             {
-                padded_pixels[(y * pad_w + x) * 4 + 0] = RGBApixels[(y * pitch + x) * 4 + 2];
-                padded_pixels[(y * pad_w + x) * 4 + 1] = RGBApixels[(y * pitch + x) * 4 + 1];
-                padded_pixels[(y * pad_w + x) * 4 + 2] = RGBApixels[(y * pitch + x) * 4 + 0];
-                padded_pixels[(y * pad_w + x) * 4 + 3] = RGBApixels[(y * pitch + x) * 4 + 3];
+                for(uint32_t x = 0; x < width; x++)
+                    padded_pixels_q[(y * pad_w + x)] = input_pixels_q[(y * pitch + x)];
+            }
+        }
+        else
+        {
+            for(uint32_t y = 0; y < height; y++)
+            {
+                for(uint32_t x = 0; x < width; x++)
+                {
+                    padded_pixels[(y * pad_w + x) * 4 + 0] = RGBApixels[(y * pitch + x) * 4 + 2];
+                    padded_pixels[(y * pad_w + x) * 4 + 1] = RGBApixels[(y * pitch + x) * 4 + 1];
+                    padded_pixels[(y * pad_w + x) * 4 + 2] = RGBApixels[(y * pitch + x) * 4 + 0];
+                    padded_pixels[(y * pad_w + x) * 4 + 3] = RGBApixels[(y * pitch + x) * 4 + 3];
+                }
             }
         }
 
@@ -973,11 +1001,11 @@ void RenderGL::loadTextureInternal(StdPicture &target, uint32_t width, uint32_t 
 
     glTexImage2D(GL_TEXTURE_2D,
         0,
-        GL_RGBA,
+        target.d.format,
         pad_w,
         pad_h,
         0,
-        GL_RGBA,
+        target.d.format,
         GL_UNSIGNED_BYTE,
         use_pixels);
 

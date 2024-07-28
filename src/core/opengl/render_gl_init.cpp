@@ -255,6 +255,17 @@ bool RenderGL::initOpenGL()
     m_maxTextureWidth = maxTextureSize;
     m_maxTextureHeight = maxTextureSize;
 
+    if(m_gl_majver >= 2)
+        m_has_npot_textures = true;
+
+#ifndef __EMSCRIPTEN__
+    if(m_gl_profile != SDL_GL_CONTEXT_PROFILE_ES && m_gl_majver >= 1 && m_gl_minver >= 2)
+        m_has_bgra_textures = true;
+
+    if(m_gl_profile == SDL_GL_CONTEXT_PROFILE_ES && m_gl_majver >= 2 && SDL_GL_ExtensionSupported("GL_EXT_texture_format_BGRA8888"))
+        m_has_bgra_textures = true;
+#endif
+
 #ifdef RENDERGL_HAS_LOGICOP
     if(m_gl_profile != SDL_GL_CONTEXT_PROFILE_ES || m_gl_majver == 1)
         m_use_logicop = true;

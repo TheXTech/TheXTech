@@ -270,9 +270,8 @@ private:
     bool m_client_side_arrays = false;
 
     bool m_has_es3_shaders = false;
-    // unused for now
-    // bool m_has_npot_texture = false;
-    // bool m_has_bgra = false;
+    bool m_has_npot_textures = false;
+    bool m_has_bgra_textures = false;
 
 
     // preferences
