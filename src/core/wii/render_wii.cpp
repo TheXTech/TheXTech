@@ -1019,11 +1019,6 @@ inline bool GX_DrawImage_Custom(GXTexObj* img,
                                 unsigned int flip,
                                 XTColor color)
 {
-    uint8_t r = color.r;
-    uint8_t g = color.g;
-    uint8_t b = color.b;
-    uint8_t a = color.a;
-
     int16_t z = s_render_planes.next();
 
     GX_SetTevOp(GX_TEVSTAGE0, GX_MODULATE);
@@ -1031,6 +1026,11 @@ inline bool GX_DrawImage_Custom(GXTexObj* img,
 
     for(int i = 0; i < 2; i++)
     {
+        uint8_t r = color.r;
+        uint8_t g = color.g;
+        uint8_t b = color.b;
+        uint8_t a = color.a;
+
         uint16_t u1 = src_x;
         uint16_t u2 = src_x + src_w;
         uint16_t v1 = src_y;
@@ -1062,6 +1062,8 @@ inline bool GX_DrawImage_Custom(GXTexObj* img,
                 v2 = mask_h;
                 y2 = y + (v2 - v1) * h / src_h;
             }
+
+            r = 255; g = 255; b = 255; a = 255;
         }
         else if(mask)
         {
