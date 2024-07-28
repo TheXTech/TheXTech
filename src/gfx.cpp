@@ -28,6 +28,7 @@
 #include "graphics/gfx_frame.h"
 
 #include <IniProcessor/ini_processing.h>
+#include <Utils/files_ini.h>
 #include <fmt_format_ne.h>
 #include <Logger/logger.h>
 
@@ -85,8 +86,7 @@ void GFX_t::loadBorder(FrameBorder& border, const std::string& path)
     if(!border.tex.inited)
         return;
 
-    IniProcessing ini;
-    ini.open(path + ".ini");
+    IniProcessing ini = Files::load_ini(path + ".ini");
     loadFrameInfo(ini, border);
 
     // warn if invalid

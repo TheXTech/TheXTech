@@ -33,6 +33,7 @@
 #include <IniProcessor/ini_processing.h>
 #include <DirManager/dirman.h>
 #include <Utils/files.h>
+#include <Utils/files_ini.h>
 #include <Utils/dir_list_ci.h>
 #include <PGE_File_Formats/file_formats.h>
 #include <fmt_format_ne.h>
@@ -241,7 +242,7 @@ void LoadCustomPlayer(int character, int state, std::string cFileName)
 {
     pLogDebug("Loading %s...", cFileName.c_str());
 
-    IniProcessing hitBoxFile(cFileName);
+    IniProcessing hitBoxFile = Files::load_ini(cFileName);
     if(!hitBoxFile.isOpened())
     {
         pLogWarning("Can't open the player calibration file: %s", cFileName.c_str());

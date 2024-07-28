@@ -36,6 +36,7 @@
 #include <Logger/logger.h>
 #include <IniProcessor/ini_processing.h>
 #include <Utils/files.h>
+#include <Utils/files_ini.h>
 #include <Utils/strings.h>
 #include <unordered_map>
 #include <fmt_format_ne.h>
@@ -395,7 +396,7 @@ void PlayInitSound()
         return;
 
     // std::string doSound = AppPath + "sound/";
-    IniProcessing sounds(AppPath + "sounds.ini");
+    IniProcessing sounds = Files::load_ini(AppPath + "sounds.ini");
     unsigned int totalSounds;
     sounds.beginGroup("sound-main");
     sounds.read("total", totalSounds, 0);
@@ -421,7 +422,7 @@ void PlayInitSound()
 
 static void loadMusicIni(const std::string &path, bool isLoadingCustom)
 {
-    IniProcessing musicSetup(path);
+    IniProcessing musicSetup = Files::load_ini(path);
     if(!isLoadingCustom)
     {
         g_totalMusicLevel = 0;
@@ -518,7 +519,7 @@ void InitSound()
     loadMusicIni(musicIni, false);
 
     UpdateLoad();
-    IniProcessing sounds(sfxIni);
+    IniProcessing sounds = Files::load_ini(sfxIni);
     sounds.beginGroup("sound-main");
     sounds.read("total", g_totalSounds, 0);
     sounds.read("use-iceball-sfx", s_useIceBallSfx, false);

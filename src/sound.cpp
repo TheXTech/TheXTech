@@ -43,6 +43,7 @@
 #include <Logger/logger.h>
 #include <IniProcessor/ini_processing.h>
 #include <Utils/files.h>
+#include <Utils/files_ini.h>
 #include <Utils/strings.h>
 #include <unordered_map>
 #include <fmt_format_ne.h>
@@ -1021,7 +1022,7 @@ void PlayInitSound()
     SfxRoot = AppPath + "sound/";
 
     // std::string doSound = AppPath + "sound/";
-    IniProcessing sounds(AppPath + "sounds.ini");
+    IniProcessing sounds = Files::load_ini(AppPath + "sounds.ini");
     unsigned int totalSounds;
     sounds.beginGroup("sound-main");
     sounds.read("total", totalSounds, 0);
@@ -1050,7 +1051,7 @@ void PlayInitSound()
 
 static void loadMusicIni(SoundScope root, const std::string &path, bool isLoadingCustom)
 {
-    IniProcessing musicSetup(path);
+    IniProcessing musicSetup = Files::load_ini(path);
     if(!isLoadingCustom)
     {
         music.clear();
@@ -1154,7 +1155,7 @@ static void readFx(IniProcessing &sounds, SectionEffect_t &s)
 
 static void loadCustomSfxIni(SoundScope root, const std::string &path)
 {
-    IniProcessing sounds(path);
+    IniProcessing sounds = Files::load_ini(path);
     for(unsigned int i = 1; i <= g_totalSounds; ++i)
     {
         std::string alias = fmt::format_ne("sound{0}", i);
@@ -1268,7 +1269,7 @@ void InitSound()
     else
         IndicateProgress(start_time, 0.01, "");
 
-    IniProcessing sounds(sfxIni);
+    IniProcessing sounds = Files::load_ini(sfxIni);
     sounds.beginGroup("sound-main");
     sounds.read("total", g_totalSounds, 0);
     sounds.read("use-iceball-sfx", s_useIceBallSfx, false);

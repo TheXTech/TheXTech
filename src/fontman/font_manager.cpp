@@ -33,6 +33,7 @@
 #include <IniProcessor/ini_processing.h>
 #include <Logger/logger.h>
 #include <Utils/files.h>
+#include <Utils/files_ini.h>
 #include <DirManager/dirman.h>
 #include <IniProcessor/ini_processing.h>
 #include <fmt_format_ne.h>
@@ -287,7 +288,7 @@ static bool s_loadFontsFromDir(DirListCI &fonts_root,
         g_defaultRasterFont = &outRasterFonts.front();
 
     /***************Load TTF font support****************/
-    IniProcessing overrider(fonts_root.getCurDir() + sSubDir + "overrides.ini");
+    IniProcessing overrider = Files::load_ini(fonts_root.getCurDir() + sSubDir + "overrides.ini");
 
 #ifdef THEXTECH_ENABLE_TTF_SUPPORT
     if(overrider.beginGroup("ttf-fonts"))

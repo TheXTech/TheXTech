@@ -36,6 +36,7 @@
 #include <Utils/elapsed_timer.h>
 #include <DirManager/dirman.h>
 #include <Utils/files.h>
+#include <Utils/files_ini.h>
 #include <fmt_time_ne.h>
 #include <fmt_format_ne.h>
 
@@ -289,8 +290,7 @@ void AbstractRender_t::lazyLoadPicture(StdPicture_Sub& target,
     // load lighting info if it exists
     if(Files::fileExists(path + ".ini"))
     {
-        IniProcessing ini;
-        ini.open(path + ".ini");
+        IniProcessing ini = Files::load_ini(path + ".ini");
         std::string temp;
 
         for(const std::string& group : ini.childGroups())

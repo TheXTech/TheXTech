@@ -41,6 +41,7 @@
 
 #include <IniProcessor/ini_processing.h>
 #include <Utils/files.h>
+#include <Utils/files_ini.h>
 #include <Utils/dir_list_ci.h>
 #include <DirManager/dirman.h>
 #ifdef THEXTECH_INTERPROC_SUPPORTED
@@ -360,7 +361,7 @@ static void loadCBorder(const std::string &origPath,
         g_defaultBorderInfoBackup.push_back(bak);
 
         // load the frame border info
-        IniProcessing ini(res);
+        IniProcessing ini = Files::load_ini(res);
         loadFrameInfo(ini, border);
     }
 
