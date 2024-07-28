@@ -938,16 +938,16 @@ inline bool GX_DrawImage_Custom(GXTexObj* img,
                                 unsigned int flip,
                                 float _r, float _g, float _b, float _a)
 {
-    uint8_t r = _r * 255.0f + 0.5f;
-    uint8_t g = _g * 255.0f + 0.5f;
-    uint8_t b = _b * 255.0f + 0.5f;
-    uint8_t a = _a * 255.0f + 0.5f;
-
     GX_SetTevOp(GX_TEVSTAGE0, GX_MODULATE);
     GX_SetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
 
     for(int i = 0; i < 2; i++)
     {
+        uint8_t r = _r * 255.0f + 0.5f;
+        uint8_t g = _g * 255.0f + 0.5f;
+        uint8_t b = _b * 255.0f + 0.5f;
+        uint8_t a = _a * 255.0f + 0.5f;
+
         uint16_t u1 = src_x;
         uint16_t u2 = src_x + src_w;
         uint16_t v1 = src_y;
@@ -979,6 +979,8 @@ inline bool GX_DrawImage_Custom(GXTexObj* img,
                 v2 = mask_h;
                 y2 = y + (v2 - v1) * h / src_h;
             }
+
+            r = 255; g = 255; b = 255; a = 255;
         }
         else if(mask)
         {
