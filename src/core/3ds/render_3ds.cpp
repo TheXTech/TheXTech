@@ -1304,7 +1304,7 @@ void minport_RenderTexturePrivate(int16_t xDst, int16_t yDst, int16_t wDst, int1
                 C2D_Flush();
                 C3D_ColorLogicOp(GPU_LOGICOP_AND);
                 C2D_DrawImage_Custom(*to_mask_2, xDst, yDst, wDst, (1024 - ySrc) * hDst / hSrc,
-                                     xSrc, ySrc, wSrc, 1024 - ySrc, flip, color);
+                                     xSrc, ySrc, wSrc, 1024 - ySrc, flip, XTColor());
                 C2D_Flush();
                 C3D_ColorLogicOp(GPU_LOGICOP_OR);
             }
@@ -1340,7 +1340,7 @@ void minport_RenderTexturePrivate(int16_t xDst, int16_t yDst, int16_t wDst, int1
             C2D_Flush();
             C3D_ColorLogicOp(GPU_LOGICOP_AND);
             C2D_DrawImage_Custom(*to_mask, xDst, yDst, wDst, hDst,
-                                 xSrc, ySrc, wSrc, hSrc, flip, color);
+                                 xSrc, ySrc, wSrc, hSrc, flip, XTColor());
             C2D_Flush();
             C3D_ColorLogicOp(GPU_LOGICOP_OR);
         }
