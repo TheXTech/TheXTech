@@ -416,6 +416,7 @@ private:
 
     // OpenGL program objects
     GLProgramObject m_standard_program;
+    GLProgramObject m_no_tint_program;
     GLProgramObject m_bitmask_program;
     GLProgramObject m_output_program;
     GLProgramObject m_program_rect_filled;
@@ -451,6 +452,7 @@ private:
     static const char* const s_es3_advanced_vert_src;
 
     static const char* const s_es2_standard_frag_src;
+    static const char* const s_es2_no_tint_frag_src;
     static const char* const s_es2_bitmask_frag_src;
     static const char* const s_es3_bitmask_frag_src;
 

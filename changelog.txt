@@ -10,6 +10,7 @@ Changelog for 1.3.6.6-dev
 -Fixed Wii U bug where game quits into the black screen instead of the Wii U's main menu when game started from the Aroma (@Wohlstand)
 -Fix TheXTech 1.3.6.1 inaccuracy allowing the player to dismount a vehicle when blocked by an NPC (@ds-sloth)
 -Fix TheXTech 1.3.6.1 bug where conveyor belts would sometimes not activate correctly (@ds-sloth)
+-Fix TheXTech 1.3.6.1 OpenGL bug where the shadow effect interacted inaccurately with bitmasked textures (@ds-sloth)
 
 Changelog for 1.3.6.5
 -Fix TheXTech 1.3.6 bug where auto movement on the world map was not reset when switching episodes (@ds-sloth)
