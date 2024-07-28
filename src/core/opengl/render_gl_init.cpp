@@ -405,6 +405,11 @@ bool RenderGL::initShaders()
         );
     }
 
+    m_no_tint_program = GLProgramObject(
+        s_es2_standard_vert_src,
+        s_es2_no_tint_frag_src
+    );
+
     m_program_rect_filled = GLProgramObject(
         s_es2_standard_vert_src,
         s_es2_rect_filled_frag_src

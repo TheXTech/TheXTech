@@ -240,6 +240,13 @@ void RenderGL::prepareDrawMask()
     if(!m_use_logicop)
         return;
 
+    if(!m_use_shaders)
+    {
+#ifdef RENDERGL_HAS_FIXED_FUNCTION
+        glDisableClientState(GL_COLOR_ARRAY);
+#endif
+    }
+
 #ifdef RENDERGL_HAS_LOGICOP
     // bitwise and
     glEnable(GL_COLOR_LOGIC_OP);
@@ -251,6 +258,16 @@ void RenderGL::prepareDrawImage()
 {
     if(!m_use_logicop)
         return;
+
+    if(m_use_shaders)
+        m_standard_program.use_program();
+
+    if(!m_use_shaders)
+    {
+#ifdef RENDERGL_HAS_FIXED_FUNCTION
+        glEnableClientState(GL_COLOR_ARRAY);
+#endif
+    }
 
 #ifdef RENDERGL_HAS_LOGICOP
     // bitwise or
@@ -476,6 +493,9 @@ void RenderGL::executeOrderedDrawQueue(bool clear)
             glActiveTexture(TEXTURE_UNIT_IMAGE);
 #endif
         }
+        // use the no-tint program for the mask
+        else if(use_gl_logic_op)
+            program = &m_no_tint_program;
 
 
         // (2) setup the framebuffer read state as needed

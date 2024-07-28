@@ -166,7 +166,7 @@ void DrawPlayer(Player_t &p, const int Z, XTColor color)
 
     int B = 0;
     double C = 0;
-    XTColor s = (ShadowMode ? XTColor(0, 0, 0) : color);
+    XTColor s = (ShadowMode ? XTColor(0, 0, 0, color.a) : color);
     //auto &p = Player[A];
 
     if(!p.Immune2) // other draw conditions moved to calling site in UpdateGraphics
