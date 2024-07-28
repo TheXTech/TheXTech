@@ -232,6 +232,42 @@ void RenderGL::depthbufferCopy()
 #endif
 }
 
+void RenderGL::prepareDrawMask()
+{
+    if(!m_use_logicop)
+        return;
+
+#ifdef RENDERGL_HAS_LOGICOP
+    // bitwise and
+    glEnable(GL_COLOR_LOGIC_OP);
+    glLogicOp(GL_AND);
+#endif // #ifdef RENDERGL_HAS_LOGICOP
+}
+
+void RenderGL::prepareDrawImage()
+{
+    if(!m_use_logicop)
+        return;
+
+#ifdef RENDERGL_HAS_LOGICOP
+    // bitwise or
+    glDisable(GL_COLOR_LOGIC_OP);
+    glEnable(GL_COLOR_LOGIC_OP);
+    glLogicOp(GL_OR);
+#endif // #ifdef RENDERGL_HAS_LOGICOP
+}
+
+void RenderGL::leaveMaskContext()
+{
+    if(!m_use_logicop)
+        return;
+
+#ifdef RENDERGL_HAS_LOGICOP
+    // no bitwise op
+    glDisable(GL_COLOR_LOGIC_OP);
+#endif // #ifdef RENDERGL_HAS_LOGICOP
+}
+
 void RenderGL::fillVertexBuffer(const RenderGL::Vertex_t* vertex_attribs, int count)
 {
 #ifndef RENDERGL_HAS_VBO
