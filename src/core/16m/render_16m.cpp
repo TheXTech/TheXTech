@@ -137,7 +137,7 @@ static bool s_loadTextureToRAM(tex_load_data& tex, const std::string& path, int 
 
 
     // load the file to RAM!
-    tex.data = Files::load_file(path.c_str());
+    tex.data = Files::load_file(path);
 
     // this can go wrong if the file doesn't exist or if the allocation fails
     if(!tex.data.valid() || tex.data.size() != data_size + 32)

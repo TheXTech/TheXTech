@@ -261,17 +261,17 @@ void AbstractRender_t::lazyLoadPicture(StdPicture_Sub& target,
     target.w = tSize.w() * scaleFactor;
     target.h = tSize.h() * scaleFactor;
 
-    target.l.raw = Files::load_file(path.c_str());
+    target.l.raw = Files::load_file(path);
 
     //Apply Alpha mask
     if(useMask && !maskPath.empty() && Files::fileExists(maskPath))
     {
-        target.l.rawMask = Files::load_file(maskPath.c_str());
+        target.l.rawMask = Files::load_file(maskPath);
         target.l.isMaskPng = false; //-V1048
     }
     else if(useMask && !maskFallbackPath.empty())
     {
-        target.l.rawMask = Files::load_file(maskFallbackPath.c_str());
+        target.l.rawMask = Files::load_file(maskFallbackPath);
         target.l.isMaskPng = true;
     }
 
@@ -283,7 +283,7 @@ void AbstractRender_t::lazyLoadPicture(StdPicture_Sub& target,
     if(Files::fileExists(path + ".frag"))
     {
         pLogDebug("Loading user shader [%s%s]...", path.c_str(), ".frag");
-        target.l.fragmentShaderSource = Files::load_file((path + ".frag").c_str());
+        target.l.fragmentShaderSource = Files::load_file(path + ".frag");
     }
 
     // load lighting info if it exists
@@ -392,7 +392,7 @@ void AbstractRender_t::LoadPictureShader(StdPicture& target, const std::string &
         target.l.raw.init_from_mem(blank_gif, sizeof(blank_gif) - 1);
 
         pLogDebug("Loading user shader [%s]...", path.c_str());
-        target.l.fragmentShaderSource = Files::load_file(path.c_str());
+        target.l.fragmentShaderSource = Files::load_file(path);
 
         // eagerly compile it to minimize stutter
         g_render->compileShaders(target);
@@ -439,12 +439,12 @@ void AbstractRender_t::LoadPictureParticleSystem(StdPicture& target, const std::
         }
 
         pLogDebug("Loading particle system vertex shader [%s]...", vertexPath.c_str());
-        target.l.particleVertexShaderSource = Files::load_file(vertexPath.c_str());
+        target.l.particleVertexShaderSource = Files::load_file(vertexPath);
 
         if(!fragPath.empty())
         {
             pLogDebug("Loading particle system fragment shader [%s]...", fragPath.c_str());
-            target.l.fragmentShaderSource = Files::load_file(fragPath.c_str());
+            target.l.fragmentShaderSource = Files::load_file(fragPath);
         }
 
         // eagerly compile it to minimize stutter

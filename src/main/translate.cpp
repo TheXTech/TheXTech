@@ -923,7 +923,7 @@ void XTechTranslate::updateLanguages(const std::string &outPath, bool noBlank)
 
         try
         {
-            Files::Data data = Files::load_file(fullFilePath.c_str());
+            Files::Data data = Files::load_file(fullFilePath);
 
             if(!data.valid())
             {
@@ -1020,7 +1020,7 @@ bool XTechTranslate::translateFile(const std::string& file, TrList& list, const 
     try
     {
         // Engine translations
-        Files::Data data = Files::load_file(file.c_str());
+        Files::Data data = Files::load_file(file);
 
         if(!data.valid())
         {
