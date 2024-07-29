@@ -57,13 +57,15 @@ struct WorldLoad
     int FileRelease = 64;
 };
 
+bool OpenWorld_Unpack(WorldLoad& load, WorldData& wld);
+
+bool OpenWorld_Post(const WorldLoad& load);
+
 bool OpenWorld(std::string FilePath)
 {
     // USE PGE-FL here
     // std::string newInput = "";
     WorldLoad load;
-    int A = 0;
-    int B = 0;
     // long long zCounter = 0;
 
     ClearWorld();
@@ -106,15 +108,27 @@ bool OpenWorld(std::string FilePath)
     numWorldAreas = 0;
 
     // FileFormats::OpenWorldFile(FilePath, wld);
-    WorldData wld;
-    if(!FileFormats::OpenWorldFile(FilePath, wld))
     {
-        pLogWarning("Error of world \"%s\" file loading: %s (line %d).",
-                    FilePath.c_str(),
-                    wld.meta.ERROR_info.c_str(),
-                    wld.meta.ERROR_linenum);
-        return false;
+        WorldData wld;
+        if(!FileFormats::OpenWorldFile(FilePath, wld))
+        {
+            pLogWarning("Error of world \"%s\" file loading: %s (line %d).",
+                        FilePath.c_str(),
+                        wld.meta.ERROR_info.c_str(),
+                        wld.meta.ERROR_linenum);
+            return false;
+        }
+
+        if(!OpenWorld_Unpack(load, wld))
+            return false;
     }
+
+    return OpenWorld_Post(load);
+}
+
+bool OpenWorld_Head(void* userdata, WorldData& wld)
+{
+    WorldLoad& load = *static_cast<WorldLoad*>(userdata);
 
     FileFormat = wld.meta.RecentFormat;
     if(wld.meta.RecentFormat == LevelData::SMBX64)
@@ -176,7 +190,7 @@ bool OpenWorld(std::string FilePath)
     for(int i = 1; i <= maxWorldCredits; i++)
         WorldCredits[i].clear();
 
-    B = 0;
+    int B = 0;
     std::vector<std::string> authorsList;
     if(!wld.authors.empty())
     {
@@ -191,14 +205,17 @@ bool OpenWorld(std::string FilePath)
         }
     }
 
-    // zCounter = 0;
-    for(auto &t : wld.tiles)
+    return true;
+}
+
+bool OpenWorld_Tile(void*, WorldTerrainTile& t)
+{
     {
         numTiles++;
         if(numTiles > maxTiles)
         {
             numTiles = maxTiles;
-            break;
+            return false;
         }
 
         auto &terra = Tile[numTiles];
@@ -220,14 +237,17 @@ bool OpenWorld(std::string FilePath)
         }
     }
 
-    // zCounter = 0;
-    for(auto &s : wld.scenery)
+    return true;
+}
+
+bool OpenWorld_Scene(void*, WorldScenery& s)
+{
     {
         numScenes++;
         if(numScenes > maxScenes)
         {
             numScenes = maxScenes;
-            break;
+            return false;
         }
 
         auto &scene = Scene[numScenes];
@@ -250,14 +270,17 @@ bool OpenWorld(std::string FilePath)
         }
     }
 
-    // zCounter = 0;
-    for(auto &p : wld.paths)
+    return true;
+}
+
+bool OpenWorld_Path(void*, WorldPathTile& p)
+{
     {
         numWorldPaths++;
         if(numWorldPaths > maxWorldPaths)
         {
             numWorldPaths = maxWorldPaths;
-            break;
+            return false;
         }
 
         auto &pp = WorldPath[numWorldPaths];
@@ -282,14 +305,17 @@ bool OpenWorld(std::string FilePath)
         }
     }
 
-    // zCounter = 0;
-    for(auto &l : wld.levels)
+    return true;
+}
+
+bool OpenWorld_Level(void*, WorldLevelTile& l)
+{
     {
         numWorldLevels++;
         if(numWorldLevels > maxWorldLevels)
         {
             numWorldLevels = maxWorldLevels;
-            break;
+            return false;
         }
 
         auto &ll = WorldLevel[numWorldLevels];
@@ -329,14 +355,17 @@ bool OpenWorld(std::string FilePath)
         }
     }
 
-    // zCounter = 0;
-    for(auto &m : wld.music)
+    return true;
+}
+
+bool OpenWorld_Music(void*, WorldMusicBox& m)
+{
     {
         numWorldMusic++;
         if(numWorldMusic > maxWorldMusic)
         {
             numWorldMusic = maxWorldMusic;
-            break;
+            return false;
         }
 
         auto &box = WorldMusic[numWorldMusic];
@@ -363,16 +392,20 @@ bool OpenWorld(std::string FilePath)
         treeWorldMusicAdd(&box);
     }
 
-    for(auto &m : wld.arearects)
+    return true;
+}
+
+bool OpenWorld_AreaRect(void*, WorldAreaRect& m)
+{
     {
         if(!(m.flags & WorldAreaRect::SETUP_SET_VIEWPORT))
-            continue;
+            return true;
 
         numWorldAreas++;
         if(numWorldAreas > maxWorldAreas)
         {
             numWorldAreas = maxWorldAreas;
-            break;
+            return false;
         }
 
         auto &area = WorldArea[numWorldAreas];
@@ -385,6 +418,49 @@ bool OpenWorld(std::string FilePath)
         area.Location.Height = m.h;
     }
 
+    return true;
+}
+
+bool OpenWorld_Unpack(WorldLoad& load, WorldData& wld)
+{
+    OpenWorld_Head(&load, wld);
+
+    for(auto &t : wld.tiles)
+    {
+        if(!OpenWorld_Tile(&load, t))
+            break;
+    }
+    for(auto &s : wld.scenery)
+    {
+        if(!OpenWorld_Scene(&load, s))
+            break;
+    }
+    for(auto &p : wld.paths)
+    {
+        if(!OpenWorld_Path(&load, p))
+            break;
+    }
+    for(auto &l : wld.levels)
+    {
+        if(!OpenWorld_Level(&load, l))
+            break;
+    }
+    for(auto &m : wld.music)
+    {
+        if(!OpenWorld_Music(&load, m))
+            break;
+    }
+    for(auto &a : wld.arearects)
+    {
+        if(!OpenWorld_AreaRect(&load, a))
+            break;
+    }
+
+    return true;
+}
+
+bool OpenWorld_Post(const WorldLoad& load)
+{
     TranslateEpisode tr;
 
     if(!LevelEditor)
@@ -397,7 +473,7 @@ bool OpenWorld(std::string FilePath)
 
     if(!LevelEditor)
     {
-        for(A = 1; A <= numWorldLevels; A++)
+        for(int A = 1; A <= numWorldLevels; A++)
         {
             auto &ll = WorldLevel[A];
             if((FileRelease <= 20 && ll.Type == 1) || (FileRelease > 20 && ll.Start))
@@ -408,7 +484,7 @@ bool OpenWorld(std::string FilePath)
             }
         }
 
-        for(A = 1; A <= numWorldLevels; A++)
+        for(int A = 1; A <= numWorldLevels; A++)
         {
             auto &ll = WorldLevel[A];
             if((FileRelease <= 20 && ll.Type == 1) || (FileRelease > 20 && ll.Start))
@@ -420,7 +496,7 @@ bool OpenWorld(std::string FilePath)
     }
     else
     {
-        for(A = 1; A <= numWorldLevels; A++)
+        for(int A = 1; A <= numWorldLevels; A++)
         {
             auto &ll = WorldLevel[A];
             if(FileRelease <= 20 && ll.Type == 1)
@@ -430,29 +506,7 @@ bool OpenWorld(std::string FilePath)
         vScreen[1].X = (XRender::TargetW / 2) - (800 / 2);
         vScreen[1].Y = (XRender::TargetH / 2) - (600 / 2);
     }
-//    else
-//    {
-//        for(A = 1; A <= numCharacters; A++)
-//        {
-//            if(blockCharacter[A] == true)
-//                frmWorld::chkChar(A).Value = 1;
-//            else
-//                frmWorld::chkChar(A).Value = 0;
-//        }
-//        frmWorld.txtWorldName = WorldName;
-//        frmWorld.txtStartLevel = StartLevel;
-//        if(NoMap == true)
-//            frmWorld::chkNoMap.Value = 1;
-//        else
-//            frmWorld::chkNoMap.Value = 0;
-//        if(RestartLevel == true)
-//            frmWorld::chkRestartLevel.Value = 1;
-//        else
-//            frmWorld::chkRestartLevel.Value = 0;
-//        for(A = 1; A <= 5; A++)
-//            frmWorld::txtCredits(A).Text = WorldCredits[A];
-//        frmWorld.txtStars = MaxWorldStars;
-//    }
+
     SaveWorldStrings();
     resetFrameTimer();
 
