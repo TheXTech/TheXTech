@@ -339,7 +339,7 @@ Physics_t Physics;
 int MenuCursor = 0;
 int MenuMode = 0;
 bool MenuCursorCanMove = false;
-bool MenuCursorCanMove2 = false;
+bool MenuCursorCanMove_Back = false;
 bool NextFrame = false;
 int StopHit = 0;
 bool MouseRelease = false;

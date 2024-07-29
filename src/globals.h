@@ -1939,7 +1939,8 @@ extern int MenuMode;
 //Public MenuCursorCanMove As Boolean
 extern bool MenuCursorCanMove;
 //Public MenuCursorCanMove2 As Boolean 'Joystick
-extern bool MenuCursorCanMove2;
+// Now used to check if it's okay to go back (separately from the other actions)
+extern bool MenuCursorCanMove_Back;
 //Public NextFrame As Boolean
 extern bool NextFrame;
 //Public StopHit As Integer

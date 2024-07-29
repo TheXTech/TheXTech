@@ -329,6 +329,7 @@ void MessageScreen_Init()
     SoundPause[SFX_Message] = 0;
     PlaySound(SFX_Message);
     MenuCursorCanMove = false;
+    MenuCursorCanMove_Back = false;
     BuildUTF8CharMap(MessageText, MessageTextMap);
 }
 
@@ -359,6 +360,16 @@ bool MessageScreen_Logic(int plr)
         menuDoPress |= (c.Start || c.Jump);
         menuBackPress |= c.Run;
     }
+
+    if(!MenuCursorCanMove_Back)
+    {
+        if(!menuBackPress && MenuCursorCanMove)
+            MenuCursorCanMove_Back = true;
+
+        menuBackPress = false;
+    }
+    else if(menuBackPress)
+        MenuCursorCanMove_Back = false;
 
     if(!MenuCursorCanMove)
     {
