@@ -242,6 +242,7 @@ void Init(int plr, bool LegacyPause)
     PlaySound(SFX_Pause);
     MenuCursor = 0;
     MenuCursorCanMove = false;
+    MenuCursorCanMove_Back = false;
 
     if(LegacyPause)
         s_pause_type = PauseType::Legacy;
@@ -451,6 +452,16 @@ bool Logic(int plr)
         rightPressed |= c.Right;
     }
 
+    if(!MenuCursorCanMove_Back)
+    {
+        if(!menuBackPress && MenuCursorCanMove)
+            MenuCursorCanMove_Back = true;
+
+        menuBackPress = false;
+    }
+    else if(menuBackPress)
+        MenuCursorCanMove_Back = false;
+
     if(menuBackPress && menuDoPress)
         menuDoPress = false;
 
@@ -473,7 +484,6 @@ bool Logic(int plr)
             PlaySound(SFX_Slide);
 
         MenuCursor = max_item;
-        MenuCursorCanMove = false;
 
         if(s_cheat_menu_bits < 14)
             s_cheat_menu_bits = 0;
