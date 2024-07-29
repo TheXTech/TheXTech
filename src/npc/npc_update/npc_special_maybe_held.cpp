@@ -454,7 +454,7 @@ void NPCSpecialMaybeHeld(int A)
                         }
 
                         // expand down a section at the bottom of destroyed blocks
-                        for(int B = 0; B <= numSections; B++)
+                        for(int B = 0; B < numSections; B++)
                         {
                             auto &n = NPC[A];
                             auto &s = level[B];

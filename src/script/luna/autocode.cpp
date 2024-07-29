@@ -405,7 +405,7 @@ void Autocode::Do(bool init)
         case AT_SetMusic:
         {
             int sec = (int)Target - 1;
-            if(sec >= 0 && sec <= numSections)
+            if(sec >= 0 && sec < numSections)
             {
                 if(Param1 >= 0.0 && Param1 <= 24)
                     bgMusic[sec] = (int)Param1;
@@ -1020,14 +1020,16 @@ void Autocode::Do(bool init)
 
         case AT_PushScreenBoundary:
         {
-            if(Target > 0 && Target < numSections && Param1 >= 0 && Param1 < 5)
-                LevelF::PushSectionBoundary((int)Target - 1, (int)Param1, SDL_atof(GetS(MyString).c_str()));
+            int sec = (int)Target - 1;
+            if(sec >= 0 && sec < numSections && Param1 >= 0 && Param1 < 5)
+                LevelF::PushSectionBoundary(sec, (int)Param1, SDL_atof(GetS(MyString).c_str()));
             break;
         }
 
         case AT_SnapSectionBounds:
         {
-            if(Target > 0 && Target <= maxSections) // Make sure valid section
+            int sec = (int)Target - 1;
+            if(sec >= 0 && sec < numSections) // Make sure valid section
             {
                 //RECT current_bounds;
                 //int sec = ((int)Target) - 1;
@@ -1041,7 +1043,7 @@ void Autocode::Do(bool init)
                 //Level::SetSectionBounds(sec, x_stepped,  y_stepped, x_stepped + 800, y_stepped + 600);
 
                 //if(Length <= 1) { // When travel time is up, force screen into the right place
-                LevelF::SetSectionBounds((int)Target - 1, Param1, Param2, Param1 + 800, Param2 + 600);
+                LevelF::SetSectionBounds(sec, Param1, Param2, Param1 + 800, Param2 + 600);
                 //}
             }
             break;

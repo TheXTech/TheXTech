@@ -55,7 +55,7 @@ static void s_FindFirstOverlap(int S, int start)
 //! Find the first section that overlaps with each section
 void CalculateSectionOverlaps()
 {
-    for(int S = 0; S <= numSections; S++)
+    for(int S = 0; S < numSections; S++)
         s_FindFirstOverlap(S, 0);
 }
 
@@ -69,7 +69,7 @@ void UpdateSectionOverlaps(int S, bool shrink)
         s_FindFirstOverlap(S, g_SectionFirstOverlap[S]);
 
     // update all sections after S (for which S might be first overlap)
-    for(int O = S + 1; O <= numSections; O++)
+    for(int O = S + 1; O < numSections; O++)
     {
         // if S is the current overlap, check that it still applies
         if(g_SectionFirstOverlap[O] == S)

@@ -91,7 +91,7 @@ void CheckSectionNPC(int A)
         }
     }
 
-    for(int B = 0; B <= numSections; B++)
+    for(int B = 0; B < numSections; B++)
     {
         if(NPC[A].Location.X >= level[B].X)
         {
@@ -2759,7 +2759,7 @@ void NPCSpecial(int A)
                 {
                     bool below_all = true;
 
-                    for(int B = 0; B <= numSections; B++)
+                    for(int B = 0; B < numSections; B++)
                     {
                         if(NPC[A].Location.Y < level[B].Height)
                         {

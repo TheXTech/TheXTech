@@ -347,7 +347,7 @@ static void wetWater()
             Effect[B].Life = 0;
     }
 
-    for(int B = 0; B <= numSections; B++)
+    for(int B = 0; B < numSections; B++)
     {
         if(UnderWater[B])
         {

@@ -526,6 +526,9 @@ bool OpenLevel_PlayerStart(void* userdata, PlayerPoint& p)
 {
     LevelLoad& load = *static_cast<LevelLoad*>(userdata);
 
+    if(load.numPlayerStart == 2)
+        return false;
+
     {
         // TODO: should try to use the startpoint's ID field if possible
         load.numPlayerStart++;
@@ -1390,7 +1393,7 @@ void OpenLevelDataPost()
     {
         FindStars();
         LevelMacro = LEVELMACRO_OFF;
-        for(int A = 0; A <= numSections; A++) // Automatically correct 608 section height to 600
+        for(int A = 0; A < numSections; A++) // Automatically correct 608 section height to 600
         {
 //            if(int(level[A].Height - level[A].Y) == 608)
 //                level[A].Y += 8;

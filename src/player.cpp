@@ -249,7 +249,7 @@ void DodgePlayers(int plr_A)
 
     // check section of current position for later use
     int cur_section = -1;
-    for(int B = 0; B <= numSections; B++)
+    for(int B = 0; B < numSections; B++)
     {
         if(pLoc.X + pLoc.Width >= level[B].X
             && pLoc.X <= level[B].Width
@@ -1583,7 +1583,7 @@ void CheckSection(const int A)
 
     oldSection = p.Section;
 
-    for(B = 0; B <= numSections; B++)
+    for(B = 0; B < numSections; B++)
     {
         if(p.Location.X + p.Location.Width >= level[B].X)
         {
@@ -1636,7 +1636,7 @@ void CheckSection(const int A)
 
     if(!foundSection)
     {
-        for(B = 0; B <= numSections; B++)
+        for(B = 0; B < numSections; B++)
         {
             if(p.Location.X + p.Location.Width >= LevelREAL[B].X)
             {

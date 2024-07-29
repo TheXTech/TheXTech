@@ -1199,7 +1199,7 @@ void ProcEvent(eventindex_t index, int whichPlayer, bool NoEffect)
             if(g_config.speedrun_stop_timer_by == Config_t::SPEEDRUN_STOP_EVENT && equalCase(evt.Name.c_str(), g_config.speedrun_stop_timer_at))
                 speedRun_bossDeadEvent();
 
-            for(B = 0; B <= numSections; B++)
+            for(B = 0; B < numSections; B++)
             {
                 /* Music change */
                 auto &s = evt.section[B];
@@ -1411,7 +1411,7 @@ void ProcEvent(eventindex_t index, int whichPlayer, bool NoEffect)
 
             if(evt.EndGame == 1)
             {
-                for(B = 0; B <= numSections; B++)
+                for(B = 0; B < numSections; B++)
                     bgMusic[B] = 0;
                 StopMusic();
                 speedRun_bossDeadEvent();
@@ -1496,7 +1496,7 @@ void UpdateEvents()
         }
     }
 
-    for(A = 0; A <= numSections; A++)
+    for(A = 0; A < numSections; A++)
     {
         if(AutoX[A] != 0.0f || AutoY[A] != 0.0f)
         {
