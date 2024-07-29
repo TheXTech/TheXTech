@@ -409,18 +409,7 @@ bool InputMethodType::DeleteProfile(InputMethodProfile* profile, const std::vect
             continue;
 
         if(method->Profile == profile)
-        {
-            // try to assign an acceptable backup profile to all relevant methods
-            for(InputMethodProfile* backup : this->m_profiles)
-            {
-                if(backup != profile && this->SetProfile(method, player_no, backup, active_methods))
-                    break;
-            }
-
-            // if we couldn't find one, deleting the profile would leave the game inconsistent
-            if(method->Profile == profile)
-                return false;
-        }
+            return false;
 
         player_no ++;
     }
