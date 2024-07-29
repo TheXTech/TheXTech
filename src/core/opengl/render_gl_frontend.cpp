@@ -963,9 +963,11 @@ void RenderGL::loadTextureInternal(StdPicture &target, uint32_t width, uint32_t 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
+    auto internal_format = (m_gl_profile == SDL_GL_CONTEXT_PROFILE_ES) ? target.d.format : GL_RGBA;
+
     glTexImage2D(GL_TEXTURE_2D,
         0,
-        target.d.format,
+        internal_format,
         pad_w,
         pad_h,
         0,
