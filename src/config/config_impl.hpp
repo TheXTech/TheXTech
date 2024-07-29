@@ -637,12 +637,9 @@ bool ConfigRangeOption_t<true, value_t>::rotate_left()
     if(!base)
         return false;
 
-    if(m_value == base->m_range_info.min)
-        return false;
-
     m_value -= base->m_range_info.step;
     if(m_value < base->m_range_info.min)
-        m_value = base->m_range_info.min;
+        m_value = base->m_range_info.max;
 
     if(!is_set())
         m_set = ConfigSetLevel::set;
@@ -660,12 +657,9 @@ bool ConfigRangeOption_t<true, value_t>::rotate_right()
     if(!base)
         return false;
 
-    if(m_value == base->m_range_info.max)
-        return false;
-
     m_value += base->m_range_info.step;
     if(m_value > base->m_range_info.max)
-        m_value = base->m_range_info.max;
+        m_value = base->m_range_info.min;
 
     if(!is_set())
         m_set = ConfigSetLevel::set;
