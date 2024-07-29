@@ -341,11 +341,11 @@ bool DeleteLayer(layerindex_t L, bool killall)
             Events[A].MoveLayer = LAYER_NONE;
     }
 
-    for(int B = L; B <= numLayers - 1; B++)
+    for(int B = L; B < numLayers - 1; B++)
         SwapLayers(B, B+1);
 
-    Layer[numLayers] = Layer_t();
     numLayers --;
+    Layer[numLayers] = Layer_t();
 
     if(EditorCursor.Layer == L)
         EditorCursor.Layer = LAYER_DEFAULT;
@@ -1597,7 +1597,7 @@ void UpdateLayers()
     g_drawBlocks_invalidate_rate = 0;
     g_drawBGOs_invalidate_rate = 0;
 
-    for(A = 0; A <= numLayers; A++)
+    for(A = 0; A < numLayers; A++)
     {
         Layer[A].ApplySpeedX = 0;
         Layer[A].ApplySpeedY = 0;
@@ -1808,7 +1808,7 @@ void syncLayersTrees_Block(int block)
 {
     invalidateDrawBlocks();
 
-    for(int layer = 0; layer <= numLayers; layer++)
+    for(int layer = 0; layer < numLayers; layer++)
     {
         if(layer != Block[block].Layer)
         {
@@ -1853,7 +1853,7 @@ void syncLayers_AllNPCs()
 
 void syncLayers_NPC(int npc)
 {
-    for(int layer = 0; layer <= numLayers; layer++)
+    for(int layer = 0; layer < numLayers; layer++)
     {
         if(npc <= numNPCs && NPC[npc].Layer == layer)
             Layer[layer].NPCs.insert(npc);
@@ -1883,7 +1883,7 @@ void syncLayers_BGO(int bgo)
 {
     invalidateDrawBGOs();
 
-    for(int layer = 0; layer <= numLayers; layer++)
+    for(int layer = 0; layer < numLayers; layer++)
     {
         if(layer != Background[bgo].Layer)
         {
@@ -1909,7 +1909,7 @@ void syncLayers_BGO(int bgo)
 
 void syncLayers_Warp(int warp)
 {
-    for(int layer = 0; layer <= numLayers; layer++)
+    for(int layer = 0; layer < numLayers; layer++)
     {
         if(warp <= numWarps && Warp[warp].Layer == layer)
             Layer[layer].warps.insert(warp);
@@ -1920,7 +1920,7 @@ void syncLayers_Warp(int warp)
 
 void syncLayers_Water(int water)
 {
-    for(int layer = 0; layer <= numLayers; layer++)
+    for(int layer = 0; layer < numLayers; layer++)
     {
         if(layer != Water[water].Layer)
         {

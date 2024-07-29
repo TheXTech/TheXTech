@@ -291,10 +291,10 @@ bool OpenLevelData(PGE_FileFormats_misc::TextInput& input, const std::string Fil
     // they'll get updated, but this is necessary to handle PGE-X files without them included
     load.AddCurrentLayer("Default");
 
-    for(int l = 0; l < numLayers; l++)
+    for(int l = 0; l < 3; l++)
         load.FinalizeLayer(load.FindLayer(Layer[l].Name));
 
-    for(int e = 0; e < numEvents; e++)
+    for(int e = 0; e < 3; e++)
         load.FinalizeEvent(load.FindEvent(Events[e].Name));
 
 
