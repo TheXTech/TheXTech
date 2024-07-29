@@ -52,28 +52,21 @@
 #include "editor/editor_custom.h"
 #include "editor/editor_strings.h"
 
+struct WorldLoad
+{
+    int FileRelease = 64;
+};
+
 bool OpenWorld(std::string FilePath)
 {
     // USE PGE-FL here
     // std::string newInput = "";
-    int FileRelease = 64;
+    WorldLoad load;
     int A = 0;
     int B = 0;
     // long long zCounter = 0;
-    WorldData wld;
-    TranslateEpisode tr;
 
     ClearWorld();
-
-    // FileFormats::OpenWorldFile(FilePath, wld);
-    if(!FileFormats::OpenWorldFile(FilePath, wld))
-    {
-        pLogWarning("Error of world \"%s\" file loading: %s (line %d).",
-                    FilePath.c_str(),
-                    wld.meta.ERROR_info.c_str(),
-                    wld.meta.ERROR_linenum);
-        return false;
-    }
 
 //    for(A = FilePath.length(); A >= 1; A--)
 //    {
@@ -81,27 +74,15 @@ bool OpenWorld(std::string FilePath)
 //            break;
 //    }
 
-    g_dirEpisode.setCurDir(wld.meta.path);
-    FileFormat = wld.meta.RecentFormat;
-    FileName = g_dirEpisode.resolveDirCase(wld.meta.filename); //FilePath.substr(FilePath.length() - (FilePath.length() - A));
-    FileNamePath = wld.meta.path + "/"; //FilePath.substr(0, (A));
+    // set the file path and load custom configuration
+    FileNamePath = Files::dirname(FilePath) + "/";
+    g_dirEpisode.setCurDir(FileNamePath);
+
+    FileName = g_dirEpisode.resolveDirCase(Files::basenameNoSuffix(FilePath));
     g_dirCustom.setCurDir(FileNamePath + FileName);
 
-    if(!FilePath.empty())
-    {
-        FileNameFull = Files::basename(FilePath);
-        FullFileName = FilePath;
-    }
-    else if(FileFormat == FileFormats::WLD_SMBX64 || FileFormat == FileFormats::WLD_SMBX38A)
-    {
-        FileNameFull = FileName + ".wld";
-        FullFileName = FileNamePath + FileName + ".wld";
-    }
-    else
-    {
-        FileNameFull = FileName + ".wldx";
-        FullFileName = FileNamePath + FileName + ".wldx";
-    }
+    FileNameFull = Files::basename(FilePath);
+    FullFileName = FilePath;
 
     // Preserve these values for quick restoring when going to the world map
     FileNameFullWorld = FileNameFull;
@@ -110,9 +91,6 @@ bool OpenWorld(std::string FilePath)
     FileFormatWorld = FileFormat;
 
     FontManager::loadCustomFonts();
-
-    if(wld.meta.RecentFormat == LevelData::SMBX64)
-        FileRelease = int(wld.meta.RecentFormatVersion);
 
     LoadCustomConfig();
     FindCustomPlayers();
@@ -127,23 +105,34 @@ bool OpenWorld(std::string FilePath)
     numWorldMusic = 0;
     numWorldAreas = 0;
 
+    // FileFormats::OpenWorldFile(FilePath, wld);
+    WorldData wld;
+    if(!FileFormats::OpenWorldFile(FilePath, wld))
+    {
+        pLogWarning("Error of world \"%s\" file loading: %s (line %d).",
+                    FilePath.c_str(),
+                    wld.meta.ERROR_info.c_str(),
+                    wld.meta.ERROR_linenum);
+        return false;
+    }
+
+    FileFormat = wld.meta.RecentFormat;
+    if(wld.meta.RecentFormat == LevelData::SMBX64)
+        load.FileRelease = int(wld.meta.RecentFormatVersion);
+
     WorldName = wld.EpisodeTitle;
-    wld.charactersToS64();
-
-    blockCharacter[1] = wld.nocharacter1;
-    blockCharacter[2] = wld.nocharacter2;
-
-    // previously checked FileRelease here
-    // if(FileRelease >= 30 || !compatModern)
-    blockCharacter[3] = wld.nocharacter3;
-    blockCharacter[4] = wld.nocharacter4;
-    blockCharacter[5] = wld.nocharacter5;
 
     // cancel block if cheat is active
     if(g_forceCharacter && !LevelEditor && !WorldEditor)
     {
         for(int A = 1; A <= numCharacters; A++)
             blockCharacter[A] = false;
+    }
+    // load character block
+    else
+    {
+        for(size_t A = 1; A <= numCharacters && A - 1 < wld.nocharacter.size(); A++)
+            blockCharacter[A] = wld.nocharacter[A - 1];
     }
 
     StartLevel = wld.IntroLevel_file;
@@ -396,12 +385,15 @@ bool OpenWorld(std::string FilePath)
         area.Location.Height = m.h;
     }
 
+    TranslateEpisode tr;
+
     if(!LevelEditor)
         tr.loadWorldTranslation(FileNameFull);
 
     LoadCustomSound();
 
     // the version targeting below is from SMBX 1.3
+    const int FileRelease = load.FileRelease;
 
     if(!LevelEditor)
     {
