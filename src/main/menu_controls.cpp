@@ -18,6 +18,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <array>
+
 #include <fmt_format_ne.h>
 
 #include "sdl_proxy/sdl_stdinc.h"
@@ -31,6 +33,7 @@
 #include "../core/render.h"
 
 #include "graphics/gfx_frame.h"
+#include "graphics/gfx_marquee.h"
 
 #include "main/screen_textentry.h"
 
@@ -54,6 +57,9 @@ static bool s_canDelete = false;
 static bool s_deleteProfileSel = false;
 
 static Controls::ControlsClass s_profileTab = Controls::ControlsClass::None;
+
+static std::array<MarqueeState, maxLocalPlayers> s_controller_type_marquee;
+static std::array<MarqueeState, maxLocalPlayers> s_controller_profile_marquee;
 
 // only partially refactored from the mouse and standard menu logic functions
 //   (which currently duplicate part of their logic)
@@ -316,15 +322,11 @@ int menuControls_Mouse_Render(bool mouse, bool render)
     if(s_curType == -1)
     {
         if(render)
-        {
             SuperPrintScreenCenter(g_mainMenu.controlsTitle, 3, sY);
-        }
 
         // render the types at the top of the screen and the currently connected devices at the bottom
         if(render)
-        {
             SuperPrint(g_mainMenu.controlsDeviceTypes, 3, sX+16, sY+2*line);
-        }
 
         int scroll_start = 0;
         int scroll_end = n_types;
@@ -402,22 +404,33 @@ int menuControls_Mouse_Render(bool mouse, bool render)
         }
 
         // render the players
-        if(render && s_curType == -1)
+        if(render && s_curType == -1 && Controls::g_InputMethods.size() > 0)
         {
-            SuperPrint(g_mainMenu.controlsConnected, 3, sX+16, sY+(max_line-5)*line);
-            for(size_t p = 0; p < Controls::g_InputMethods.size(); p++)
+            SuperPrintScreenCenter(g_mainMenu.controlsConnected, 3, sY+(max_line-5)*line);
+
+            int p_width = (width - 8) / Controls::g_InputMethods.size();
+
+            for(size_t p = 0; p < Controls::g_InputMethods.size() && p < maxLocalPlayers; p++)
             {
                 if(!Controls::g_InputMethods[p])
                     continue;
 
-                int cX = sX + 100 + (200 * (int)p);
-                SuperPrintCenter(Controls::g_InputMethods[p]->Name, 5, cX, sY+(max_line-4)*line);
+                int lX = sX + 4 + (p_width * (int)p);
+                int cX = lX + p_width / 2;
 
-                // display the current profile
-                SuperPrintCenter(g_mainMenu.wordProfile + ":", 3, cX, sY+(max_line-3)*line);
+                MarqueeSpec print_spec = MarqueeSpec(p_width - 8, 10, 16, 32, 0);
+
+                s_controller_type_marquee[p].advance(print_spec);
+                SuperPrintMarquee(Controls::g_InputMethods[p]->Name, 5, lX, sY+(max_line-4)*line, print_spec, s_controller_type_marquee[p]);
+
+                RenderControls(p + 1, cX - 76 / 2, sY + (max_line - 3) * line - (line - 18) / 2 + 2, 76, 30, false, 255, true);
+
                 // should never be null
                 if(Controls::g_InputMethods[p]->Profile != nullptr)
-                    SuperPrintCenter(Controls::g_InputMethods[p]->Profile->Name, 5, cX, sY+(max_line-2)*line);
+                {
+                    s_controller_profile_marquee[p].advance(print_spec);
+                    SuperPrintMarquee(Controls::g_InputMethods[p]->Profile->Name, 5, lX, sY+(max_line-3)*line + 34, print_spec, s_controller_profile_marquee[p]);
+                }
             }
         }
     }
