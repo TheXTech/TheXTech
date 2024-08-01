@@ -25,6 +25,8 @@
 #include <Logger/logger.h>
 #include <fmt_format_ne.h>
 
+#include "Utils/files.h"
+
 #include "sdl_proxy/sdl_stdinc.h"
 
 #include "npc_id.h"
@@ -284,7 +286,7 @@ LevelSaveInfo_t InitLevelSaveInfo(const std::string& fullPath, LevelData&)
     cb.load_npc = InitLevelSaveInfo_load_npc;
     cb.userdata = &si;
 
-    PGE_FileFormats_misc::TextFileInput in(fullPath);
+    PGE_FileFormats_misc::RWopsTextInput in(Files::open_file(fullPath, "r"), fullPath);
 
     if(FileFormats::OpenLevelFileT(in, cb))
         pLogDebug("Initing level save data at [%s] with %d stars and %d medals", fullPath.c_str(), (int)ret.max_stars, (int)ret.max_medals);

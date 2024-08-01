@@ -414,7 +414,9 @@ static void s_LoadSingleWorld(const std::string& epDir, const std::string& fName
 {
     std::string wPath = epDir + fName;
 
-    if(FileFormats::OpenWorldFileHeader(wPath, head))
+    PGE_FileFormats_misc::RWopsTextInput in(Files::open_file(wPath, "r"), wPath);
+
+    if(FileFormats::OpenWorldFileHeaderT(in, head))
     {
         SelectWorld_t w;
         w.WorldName = head.EpisodeTitle;

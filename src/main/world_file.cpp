@@ -110,7 +110,9 @@ bool OpenWorld(std::string FilePath)
     // FileFormats::OpenWorldFile(FilePath, wld);
     {
         WorldData wld;
-        if(!FileFormats::OpenWorldFile(FilePath, wld))
+
+        PGE_FileFormats_misc::RWopsTextInput in(Files::open_file(FilePath, "r"), FilePath);
+        if(!FileFormats::OpenWorldFileT(in, wld))
         {
             pLogWarning("Error of world \"%s\" file loading: %s (line %d).",
                         FilePath.c_str(),

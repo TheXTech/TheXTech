@@ -135,7 +135,7 @@ bool OpenLevel(std::string FilePath)
 {
     addMissingLvlSuffix(FilePath);
 
-    PGE_FileFormats_misc::TextFileInput in(FilePath);
+    PGE_FileFormats_misc::RWopsTextInput in(Files::open_file(FilePath, "r"), FilePath);
 
     if(in.eof())
     {
