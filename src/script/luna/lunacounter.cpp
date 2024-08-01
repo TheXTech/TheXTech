@@ -117,7 +117,7 @@ bool DeathCounter::TryLoadStats()
     // If file is not exist yet, try to create empty file
     if(!Files::fileExists(counterFile))
     {
-        SDL_RWops *statsfile = Files::open_file(counterFile.c_str(), "wb");
+        SDL_RWops *statsfile = Files::open_file(counterFile, "wb");
         if(!statsfile)
         {
             mStatFileOK = false;
@@ -137,7 +137,7 @@ bool DeathCounter::TryLoadStats()
         m_openFile = nullptr;
     }
 
-    m_openFile = Files::open_file(counterFile.c_str(), "r+b");
+    m_openFile = Files::open_file(counterFile, "r+b");
 
     // If create failed, disable death counter
     if(!m_openFile)
@@ -309,7 +309,7 @@ void DeathCounter::TrySave()
         {
             // attempt to reopen the file
             SDL_RWclose(m_openFile);
-            m_openFile = Files::open_file(counterFile.c_str(), "wb");
+            m_openFile = Files::open_file(counterFile, "wb");
         }
 
         if(m_openFile)

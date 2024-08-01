@@ -165,7 +165,7 @@ void AbstractRender_t::dumpFullFile(std::vector<char> &dst, const std::string &p
     dst.clear();
     SDL_RWops *f;
 
-    f = Files::open_file(path.c_str(), "rb");
+    f = Files::open_file(path, "rb");
     if(!f)
         return;
 

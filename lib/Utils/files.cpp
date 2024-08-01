@@ -288,7 +288,7 @@ bool Files::fileExists(const std::string &path)
     return PathFileExistsW(wpath.c_str()) == TRUE;
 
 #else
-    SDL_RWops *ops = Files::open_file(path.c_str(), "rb");
+    SDL_RWops *ops = Files::open_file(path, "rb");
     if(ops)
     {
         SDL_RWclose(ops);

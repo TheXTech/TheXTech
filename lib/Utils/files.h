@@ -85,6 +85,11 @@ public:
     FILE *utf8_fopen(const char *filePath, const char *modes);
     SDL_RWops *open_file(const char *filePath, const char *modes);
     Data load_file(const char *filePath);
+
+    inline SDL_RWops *open_file(const std::string& filePath, const char *modes)
+    {
+        return open_file(filePath.c_str(), modes);
+    }
     inline Data load_file(const std::string& filePath)
     {
         return load_file(filePath.c_str());

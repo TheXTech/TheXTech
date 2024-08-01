@@ -152,7 +152,7 @@ static std::string getJsonValue(nlohmann::ordered_json &j, const std::string &ke
 static bool saveFile(const std::string &inPath, const std::string &inData)
 {
     bool ret = true;
-    SDL_RWops *in = Files::open_file(inPath.c_str(), "w");
+    SDL_RWops *in = Files::open_file(inPath, "w");
     if(!in)
         return false;
 
