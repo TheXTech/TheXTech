@@ -20,6 +20,7 @@
 
 #include <fmt_format_ne.h>
 #include <Utils/files.h>
+#include <Utils/files_ini.h>
 #include <IniProcessor/ini_processing.h>
 #include "game_info.h"
 #include "script/luna/luna.h"
@@ -125,7 +126,7 @@ void GameInfo::LoadGameInfo()
     std::string gameInfoPath = AppPath + "gameinfo.ini";
     if(Files::fileExists(gameInfoPath))
     {
-        IniProcessing config(gameInfoPath);
+        IniProcessing config = Files::load_ini(gameInfoPath);
 
         config.beginGroup("game");
         {

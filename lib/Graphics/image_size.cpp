@@ -260,7 +260,7 @@ bool PGE_ImageInfo::getImageSize(const PGEString &imagePath, uint32_t *w, uint32
         return false;
     }
 
-    SDL_RWops* image = SDL_RWFromFile(imgPath.c_str(), "rb");
+    SDL_RWops* image = Files::open_file(imgPath.c_str(), "rb");
 
     if(!image)
     {

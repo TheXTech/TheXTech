@@ -26,6 +26,7 @@
 #include <Logger/logger.h>
 #include <IniProcessor/ini_processing.h>
 #include <Utils/files.h>
+#include <Utils/files_ini.h>
 #include <DirManager/dirman.h>
 
 #ifdef THEXTECH_ENABLE_TTF_SUPPORT
@@ -65,7 +66,7 @@ void RasterFont::loadFont(const std::string &font_ini)
     }
 
     std::string root = DirMan(Files::dirname(font_ini)).absolutePath() + "/";
-    IniProcessing font(font_ini);
+    IniProcessing font = Files::load_ini(font_ini);
 
 // FIXME: Define it at CMake rather than here
 #if defined(__3DS__) || defined(__WII__) || defined(__16M__)
@@ -129,7 +130,7 @@ void RasterFont::loadFontMap(const std::string& fontmap_ini)
         return;
     }
 
-    IniProcessing font(fontmap_ini);
+    IniProcessing font = Files::load_ini(fontmap_ini);
     std::string texFile;
     uint32_t w = m_letterWidth, h = m_letterHeight;
     int texture_scale_factor;

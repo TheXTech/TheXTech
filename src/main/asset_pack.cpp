@@ -23,6 +23,7 @@
 #include <AppPath/app_path.h>
 
 #include <Utils/files.h>
+#include <Utils/files_ini.h>
 #include <DirManager/dirman.h>
 #include <Logger/logger.h>
 #include <IniProcessor/ini_processing.h>
@@ -119,7 +120,7 @@ static AssetPack_t s_scan_asset_pack(const std::string& path, bool skip_graphics
 
     if(Files::fileExists(gi_path))
     {
-        IniProcessing gameinfo(gi_path);
+        IniProcessing gameinfo = Files::load_ini(gi_path);
 
         gameinfo.beginGroup("game");
         gameinfo.read("id", ret.id, ret.id);
