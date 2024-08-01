@@ -529,7 +529,7 @@ static void AddSfx(SoundScope root,
 
                 if(!isSilent)
                 {
-                    m.music = Mix_LoadMUS((newPath).c_str());
+                    m.music = Mix_LoadMUS_RW(Files::open_file(newPath, "rb"), 1);
                     if(m.music)
                     {
                         // check, if short enough, load it as a chunk instead
@@ -544,7 +544,7 @@ static void AddSfx(SoundScope root,
                     }
 
                     if(!m.music)
-                        m.chunk = Mix_LoadWAV((newPath).c_str());
+                        m.chunk = Mix_LoadWAV_RW(Files::open_file(newPath, "rb"), 1);
                 }
 
                 if(m.chunk || m.music || isSilent)
@@ -590,7 +590,7 @@ static void AddSfx(SoundScope root,
             pLogDebug("Adding SFX [%s] '%s'", alias.c_str(), isSilent ? "<silence>" : m.path.c_str());
             if(!isSilent)
             {
-                m.music = Mix_LoadMUS((m.path).c_str());
+                m.music = Mix_LoadMUS_RW(Files::open_file(m.path, "rb"), 1);
                 if(m.music)
                 {
                     // check, if short enough, load it as a chunk instead
@@ -605,7 +605,7 @@ static void AddSfx(SoundScope root,
                 }
 
                 if(!m.music)
-                    m.chunk = Mix_LoadWAV((m.path).c_str());
+                    m.chunk = Mix_LoadWAV_RW(Files::open_file(m.path, "rb"), 1);
             }
 
             if(m.chunk || m.music || isSilent)
@@ -662,6 +662,7 @@ void SoundPauseEngine(int paused)
 }
 
 static void processPathArgs(std::string &path,
+                            std::string &args,
                             const std::string &episodeRoot,
                             const std::string &dataDirName,
                             int *yoshiModeTrack = nullptr)
@@ -687,7 +688,8 @@ static void processPathArgs(std::string &path,
     Strings::replaceInAll(p[1], "{e}", episodeRoot);
     Strings::replaceInAll(p[1], "{d}", episodeRoot + dataDirName);
     Strings::replaceInAll(p[1], "{r}", MusicRoot);
-    path = p[0] + "|" + p[1];
+    path = p[0];
+    args = p[1];
 }
 
 void PlayMusic(const std::string &Alias, int fadeInMs)
@@ -709,8 +711,9 @@ void PlayMusic(const std::string &Alias, int fadeInMs)
     {
         auto &m = mus->second;
         std::string p = m.path;
-        processPathArgs(p, FileNamePath + "/", FileName + "/");
-        g_curMusic = Mix_LoadMUS(p.c_str());
+        std::string args;
+        processPathArgs(p, args, FileNamePath + "/", FileName + "/");
+        g_curMusic = Mix_LoadMUS_RW_ARG(Files::open_file(p, "rb"), 1, args.c_str());
 
         if(!g_curMusic)
             pLogWarning("Music '%s' opening error: %s", m.path.c_str(), Mix_GetError());
@@ -863,8 +866,9 @@ void StartMusic(int A, int fadeInMs)
             if(g_curMusic)
                 Mix_FreeMusic(g_curMusic);
             std::string p = FileNamePath + "/" + curWorldMusicFile;
-            processPathArgs(p, FileNamePath + "/", FileName + "/");
-            g_curMusic = Mix_LoadMUS(p.c_str());
+            std::string args;
+            processPathArgs(p, args, FileNamePath + "/", FileName + "/");
+            g_curMusic = Mix_LoadMUS_RW_ARG(Files::open_file(p, "rb"), 1, args.c_str());
             s_musicHasYoshiMode = false;
             s_musicYoshiTrackNumber = -1;
             Mix_VolumeMusicStream(g_curMusic, 64 * g_config.audio_mus_volume / 100);
@@ -908,9 +912,10 @@ void StartMusic(int A, int fadeInMs)
             if(g_curMusic)
                 Mix_FreeMusic(g_curMusic);
             std::string p = FileNamePath + CustomMusic[A];
+            std::string args;
             s_musicYoshiTrackNumber = -1;
-            processPathArgs(p, FileNamePath, FileName + "/", &s_musicYoshiTrackNumber);
-            g_curMusic = Mix_LoadMUS(p.c_str());
+            processPathArgs(p, args, FileNamePath + "/", FileName + "/", &s_musicYoshiTrackNumber);
+            g_curMusic = Mix_LoadMUS_RW_ARG(Files::open_file(p, "rb"), 1, args.c_str());
             if(!g_curMusic)
                 pLogWarning("Failed to open the music [%s]: ", p.c_str(), Mix_GetError());
             else
@@ -1037,7 +1042,7 @@ void PlayInitSound()
 
         if(!p.empty())
         {
-            Mix_Music *loadsfx = Mix_LoadMUS((SfxRoot + p).c_str());
+            Mix_Music *loadsfx = Mix_LoadMUS_RW(Files::open_file(SfxRoot + p, "rb"), 1);
             if(loadsfx)
             {
                 if(Mix_PlayMusicStream(loadsfx, 0) < 0)
@@ -1614,7 +1619,7 @@ void PreloadExtSound(const std::string& path)
     auto f = extSfx.find(path);
     if(f == extSfx.end())
     {
-        auto *ch = Mix_LoadWAV(path.c_str());
+        auto *ch = Mix_LoadWAV_RW(Files::open_file(path, "rb"), 1);
         if(!ch)
         {
             pLogWarning("Can't load custom sound [%s]: %s", path.c_str(), Mix_GetError());
@@ -1650,7 +1655,7 @@ void PlayExtSound(const std::string &path, int loops, int volume)
     auto f = extSfx.find(path);
     if(f == extSfx.end())
     {
-        auto *ch = Mix_LoadWAV(path.c_str());
+        auto *ch = Mix_LoadWAV_RW(Files::open_file(path, "rb"), 1);
         if(!ch)
         {
             pLogWarning("Can't load custom sound: %s", Mix_GetError());
