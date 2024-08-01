@@ -219,7 +219,7 @@ void Files::flush_file(SDL_RWops *f)
 {
 #ifdef THEXTECH_NO_SDL_BUILD
     if(f->type == SDL_RWOPS_STDFILE)
-        ::fflush((FILE*)f->hidden);
+        ::fflush((FILE*)f->hidden.unknown.data1);
 #elif defined(HAVE_STDIO_H)
     if(f->type == SDL_RWOPS_STDFILE)
         ::fflush(f->hidden.stdio.fp);

@@ -22,12 +22,12 @@ RWOPS_BODY({
     return stream->seek(stream, offset, whence);
 })
 
-RWOPS_PREFIX int64_t SDL_RWread(SDL_RWops* stream, void* ptr, size_t size, size_t nmemb)
+RWOPS_PREFIX size_t SDL_RWread(SDL_RWops* stream, void* ptr, size_t size, size_t nmemb)
 RWOPS_BODY({
     return stream->read(stream, ptr, size, nmemb);
 })
 
-RWOPS_PREFIX int64_t SDL_RWwrite(SDL_RWops* stream, const void* ptr, size_t size, size_t nmemb)
+RWOPS_PREFIX size_t SDL_RWwrite(SDL_RWops* stream, const void* ptr, size_t size, size_t nmemb)
 RWOPS_BODY({
     return stream->write(stream, ptr, size, nmemb);
 })
