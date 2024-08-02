@@ -33,6 +33,8 @@
 
 #include "sound.h"
 
+#include <SDL2/SDL_rwops.h>
+
 #include <Logger/logger.h>
 #include <IniProcessor/ini_processing.h>
 #include <Utils/files.h>
@@ -42,6 +44,14 @@
 #include <fmt_format_ne.h>
 
 #include "pseudo_vb.h"
+
+static constexpr int s_max_effects = 1920;
+static constexpr int s_max_modules =  128;
+static int s_soundbank_effects = 0;
+static int s_soundbank_modules = 0;
+
+static mm_word s_soundbank_pointers[s_max_effects + s_max_modules] = {0};
+static SDL_RWops* s_soundbank_rwops = nullptr;
 
 // Public musicPlaying As Boolean
 bool musicPlaying = false;
@@ -82,6 +92,58 @@ static std::vector<int> s_levelMusicMods;
 static std::vector<int> s_specialMusicMods;
 static std::vector<int> s_sfxEffects;
 
+static uint8_t* s_maxmod_rwops_load(int id)
+{
+    if(!s_soundbank_rwops)
+        return nullptr;
+
+    SDL_RWseek(s_soundbank_rwops, 12 + id * 4, RW_SEEK_SET);
+
+    uint32_t off = 0;
+    SDL_RWread(s_soundbank_rwops, &off, sizeof(off), 1);
+    SDL_RWseek(s_soundbank_rwops, off, RW_SEEK_SET);
+
+    uint32_t size = 0;
+    SDL_RWread(s_soundbank_rwops, &size, sizeof(off), 1);
+    SDL_RWseek(s_soundbank_rwops, off, RW_SEEK_SET);
+    size += 8; // header
+
+    uint8_t* mem = (uint8_t*)malloc(size);
+    if(!mem)
+    {
+        pLogWarning("Sound: failed to allocate 0x%lx bytes to load #%d", size, id);
+        return nullptr;
+    }
+
+    if(SDL_RWread(s_soundbank_rwops, mem, 1, size) != size)
+    {
+        pLogWarning("Sound: failed to load #%d", id);
+        free(mem);
+        return nullptr;
+    }
+
+    return mem;
+}
+
+static mm_word s_maxmod_loader(mm_word msg, mm_word param)
+{
+    switch(msg)
+    {
+        case MMCB_SAMPREQUEST:
+            return reinterpret_cast<mm_word>(s_maxmod_rwops_load((int)param));
+        case MMCB_SONGREQUEST:
+            return reinterpret_cast<mm_word>(s_maxmod_rwops_load((int)param + s_soundbank_effects));
+        case MMCB_DELETESAMPLE:
+        case MMCB_DELETESONG:
+            free(reinterpret_cast<void*>(param));
+            break;
+        default:
+            break;
+    }
+    return 0;
+}
+
+
 int CustomWorldMusicId()
 {
     return g_customWldMusicId;
@@ -89,21 +151,64 @@ int CustomWorldMusicId()
 
 void InitMixerX()
 {
-    std::string SoundbankPath = AppPath + "soundbank.bin";
-
     if(g_mixerLoaded)
         return;
 
-    mmInitDefault(const_cast<char*>(SoundbankPath.c_str()));
+    mm_ds_system sys;
+    sys.mod_count    = s_max_modules;
+    sys.samp_count   = s_max_effects;
+    sys.mem_bank     = s_soundbank_pointers;
+    sys.fifo_channel = FIFO_MAXMOD;
+    mmInit(&sys);
+    mmSetCustomSoundBankHandler(s_maxmod_loader);
     g_mixerLoaded = true;
 }
 
+void LoadSoundBank()
+{
+    if(s_soundbank_rwops)
+        return;
+
+    std::string SoundbankPath = AppPath + "soundbank.bin";
+
+    s_soundbank_rwops = Files::open_file(SoundbankPath, "rb");
+
+    uint16_t nsamps, nmods;
+
+    if(!s_soundbank_rwops || SDL_RWread(s_soundbank_rwops, &nsamps, 2, 1) != 1 || SDL_RWread(s_soundbank_rwops, &nmods, 2, 1) != 1)
+    {
+        pLogWarning("Could not open soundbank [%s]", SoundbankPath.c_str());
+
+        if(s_soundbank_rwops)
+            SDL_RWclose(s_soundbank_rwops);
+
+        s_soundbank_rwops = nullptr;
+
+        return;
+    }
+
+    s_soundbank_modules = nmods;
+    s_soundbank_effects = nsamps;
+
+    pLogDebug("Opened soundbank [%s] with %d modules and %d samples", SoundbankPath.c_str(), s_soundbank_modules, s_soundbank_effects);
+}
+
 void QuitMixerX()
+{
+    // maxmod doesn't provide us any way to fully unload
+}
+
+void RestartMixerX()
+{
+}
+
+void UnloadSound()
 {
     if(!g_mixerLoaded)
         return;
 
     mmStop();
+    mmEffectCancelAll();
 
     if(s_curMusic != -1)
         mmUnload(s_curMusic);
@@ -116,18 +221,20 @@ void QuitMixerX()
         s_soundLoaded[i] = false;
     }
 
-    g_mixerLoaded = false;
-}
+    if(s_soundbank_rwops)
+    {
+        SDL_RWclose(s_soundbank_rwops);
+        s_soundbank_rwops = nullptr;
+    }
 
-void RestartMixerX()
-{
-    QuitMixerX();
-    InitMixerX();
-}
+    s_soundbank_effects = 0;
+    s_soundbank_modules = 0;
 
-void UnloadSound()
-{
-    RestartMixerX();
+    s_soundLoaded.clear();
+    s_worldMusicMods.clear();
+    s_levelMusicMods.clear();
+    s_specialMusicMods.clear();
+    s_sfxEffects.clear();
 }
 
 
@@ -233,8 +340,12 @@ static void s_playMusic(int mod, int fadeInMs)
     if(mod == -1)
         return;
 
-    mmLoad(mod);
     s_curMusic = mod;
+
+    if(!g_mixerLoaded)
+        return;
+
+    mmLoad(mod);
     s_MusicSetupFade(1024, fadeInMs);
     mmStart(mod, MM_PLAY_LOOP);
 }
@@ -371,7 +482,10 @@ void StopMusic()
 
     if(s_curMusic != -1)
     {
+        mmPause();
         mmStop();
+        // busy-wait on the main core
+        while(mmActive()) {}
         mmUnload(s_curMusic);
         s_curMusic = -1;
     }
@@ -393,6 +507,12 @@ void UpdateMusicVolume()
 void PlayInitSound()
 {
     if(!g_mixerLoaded)
+        return;
+
+    if(!s_soundbank_rwops)
+        LoadSoundBank();
+
+    if(!s_soundbank_rwops)
         return;
 
     // std::string doSound = AppPath + "sound/";
@@ -485,6 +605,12 @@ static void loadMusicIni(const std::string &path, bool isLoadingCustom)
 void InitSound()
 {
     if(!g_mixerLoaded)
+        return;
+
+    if(!s_soundbank_rwops)
+        LoadSoundBank();
+
+    if(!s_soundbank_rwops)
         return;
 
     std::string musicIni = AppPath + "music.ini";
