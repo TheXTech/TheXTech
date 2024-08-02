@@ -32,6 +32,7 @@
 
 struct Mix_Music;
 struct Mix_Chunk;
+struct SDL_RWops;
 
 #ifndef MIX_CHANNELS
 #define MIX_CHANNELS    8
@@ -106,6 +107,11 @@ extern void Mix_PauseAudio(int pause);
 
 extern Mix_Music* Mix_LoadMUS(const char* path);
 extern Mix_Chunk* Mix_LoadWAV(const char* path);
+
+extern Mix_Music* Mix_LoadMUS_RW(struct SDL_RWops*, int);
+extern Mix_Chunk* Mix_LoadWAV_RW(struct SDL_RWops*, int);
+
+extern Mix_Music* Mix_LoadMUS_RW_ARG(struct SDL_RWops*, int, const char*);
 
 extern double Mix_MusicDuration(Mix_Music* music);
 
