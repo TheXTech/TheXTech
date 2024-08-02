@@ -1017,6 +1017,21 @@ bool OpenLevel_Warp(void* userdata, LevelDoor& w)
 {
     LevelLoad& load = *static_cast<LevelLoad*>(userdata);
 
+    w.isSetIn = (!w.lvl_i);
+    w.isSetOut = (!w.lvl_o || (w.lvl_i));
+
+    if(!w.isSetIn && w.isSetOut)
+    {
+        w.ix = w.ox;
+        w.iy = w.oy;
+    }
+
+    if(!w.isSetOut && w.isSetIn)
+    {
+        w.ox = w.ix;
+        w.oy = w.iy;
+    }
+
     {
         numWarps++;
         if(numWarps > maxWarps)
