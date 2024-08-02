@@ -10,7 +10,6 @@
 
 static bool matchSuffixFilters(const std::string &name, const std::vector<std::string> &suffixFilters)
 {
-    bool found = false;
     std::locale loc;
 
     if(suffixFilters.empty())
@@ -21,18 +20,23 @@ static bool matchSuffixFilters(const std::string &name, const std::vector<std::s
         if(suffix.size() > name.size())
             continue;
 
-        std::string f;
-        f.reserve(name.size());
-        for(const char &c : name)
-            f.push_back(std::tolower(c, loc));
+        const char* name_compare = &name[name.size() - suffix.size()];
 
-        found |= (f.compare(f.size() - suffix.size(), suffix.size(), suffix) == 0);
+        bool match = true;
+        for(size_t i = 0; i < suffix.size(); ++i)
+        {
+            if(std::tolower(name_compare[i], loc) != suffix[i])
+            {
+                match = false;
+                break;
+            }
+        }
 
-        if(found)
+        if(match)
             return true;
     }
 
-    return found;
+    return false;
 }
 
 
