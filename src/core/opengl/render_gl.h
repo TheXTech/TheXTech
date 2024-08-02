@@ -160,9 +160,9 @@ private:
      */
     struct DrawContext_t
     {
-        GLProgramObject* program;
-        int uniform_step;
-        StdPicture* texture;
+        GLProgramObject* program = nullptr;
+        int uniform_step = 0;
+        StdPicture* texture = nullptr;
 
         constexpr DrawContext_t(std::nullptr_t)
             : program(nullptr), uniform_step(0), texture(nullptr) {}
