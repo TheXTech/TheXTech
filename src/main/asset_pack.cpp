@@ -32,6 +32,7 @@
 #include "core/render.h"
 #include "core/msgbox.h"
 
+#include "sound.h"
 #include "gfx.h"
 #include "load_gfx.h"
 #include "game_main.h"
@@ -413,6 +414,9 @@ bool ReloadAssetsFrom(const AssetPack_t& pack)
     UnloadWorldCustomGFX();
 
     GFX.unLoad();
+    StopAllSounds();
+    StopMusic();
+    UnloadSound();
 
     pLogDebug("Loading UI assets from [%s]", AppPath.c_str());
 
@@ -426,6 +430,7 @@ bool ReloadAssetsFrom(const AssetPack_t& pack)
         AppPath = OldAppPath;
         g_AssetPackID = OldAssetPackID;
         GFX.load();
+        InitSound(); // Setup sound effects
 
         // also, remove from list of valid asset packs
         for(auto it = s_asset_packs.begin(); it != s_asset_packs.end(); ++it)
