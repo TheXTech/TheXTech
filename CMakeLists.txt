@@ -634,6 +634,9 @@ endif()
 
 add_subdirectory(3rdparty/mbediso EXCLUDE_FROM_ALL)
 target_link_libraries(A2XT_Int INTERFACE mbediso)
+target_compile_definitions(A2XT_Int INTERFACE
+    -DPGE_USE_ARCHIVES  # DirMan should use the archives library
+)
 
 
 target_link_libraries(A2XT_Int INTERFACE ${A2XT_LIBS})
@@ -644,6 +647,9 @@ set(LIB_SRC
     lib/fader.cpp
     lib/Graphics/image_size.cpp
     lib/Graphics/size.cpp
+    lib/Archives/archives_rwops.cpp
+    lib/Archives/archives_mount.cpp
+    lib/Archives/archives_dir.cpp
     ${APPPATH_SRCS}
     ${DIRMANAGER_SRCS}
     ${FMT_SRCS}
@@ -1104,6 +1110,7 @@ file(GLOB THEXTECH_HEADS_SRC
     lib/Graphics/*.h
     lib/tclap/*.h
     lib/fmt/*.h
+    lib/Archives/*.h
     lib/json/*.hpp
     src/*.h
     src/*.hpp

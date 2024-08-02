@@ -24,6 +24,7 @@
 
 #include "files.h"
 #include "Logger/logger.h"
+#include "Archives/archives.h"
 #include <stdio.h>
 #include <locale>
 #include <SDL2/SDL_rwops.h>
@@ -176,6 +177,14 @@ FILE *Files::utf8_fopen(const char *filePath, const char *modes)
 
 SDL_RWops *Files::open_file(const char *filePath, const char *modes)
 {
+    if(Archives::is_prefix(filePath[0]))
+    {
+        if(modes[0] != 'r' || (modes[1] != 'b' && modes[1] != '\0'))
+            return nullptr;
+
+        return Archives::open_file(filePath);
+    }
+
     return SDL_RWFromFile(filePath, modes);
 }
 
@@ -435,6 +444,9 @@ bool Files::hasSuffix(const std::string &path, const std::string &suffix)
 
 bool Files::isAbsolute(const std::string& path)
 {
+    if(Archives::is_prefix(path.c_str()[0]))
+        return true;
+
     bool firstCharIsSlash = (path.size() > 0) ? path[0] == '/' : false;
 #ifdef _WIN32
     bool containsWinChars = (path.size() > 2) ? (path[1] == ':') && ((path[2] == '\\') || (path[2] == '/')) : false;
