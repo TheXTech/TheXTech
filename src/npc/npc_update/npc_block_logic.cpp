@@ -38,7 +38,6 @@ void NPCBlockLogic(int A, double& tempHit, int& tempHitBlock, float& tempSpeedA,
     float beltCount = 0;
     float addBelt = 0;
 
-    int oldSlope = NPC[A].Slope; // previous sloped block the npc was on
     bool SlopeTurn = false;
 
     // int tempBlockHit[3] = {0}; // keeps track of up to two blocks hit from below
@@ -46,7 +45,10 @@ void NPCBlockLogic(int A, double& tempHit, int& tempHitBlock, float& tempSpeedA,
     int tempBlockHit2 = 0;
     int tempHitIsSlope = 0;
 
+    int oldSlope = NPC[A].Slope; // previous sloped block the npc was on
     float oldBeltSpeed = NPC[A].BeltSpeed;
+
+    NPC[A].Slope = 0;
     NPC[A].BeltSpeed = 0;
 
     if((!NPC[A]->NoClipping || NPC[A].Projectile) &&
