@@ -401,7 +401,7 @@ static AssetPack_t s_find_pack_init(const std::string& full_id)
 
 bool ReloadAssetsFrom(const AssetPack_t& pack)
 {
-    pLogDebug("= Trying to load asset pack \"%s/\" from [%s]", pack.id.c_str(), pack.version.c_str(), pack.path.c_str());
+    pLogDebug("= Trying to load asset pack \"%s/%s\" from [%s]", pack.id.c_str(), pack.version.c_str(), pack.path.c_str());
 
     std::string OldAppPath = AppPath;
     std::string OldAssetPackID = g_AssetPackID;
