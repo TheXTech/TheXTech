@@ -29,6 +29,7 @@
 
 #include <Logger/logger.h>
 #include <Utils/files.h>
+#include <SDL2/SDL_rwops.h>
 
 #include "globals.h"
 #include "config.h"
@@ -527,12 +528,12 @@ void lazyLoadPicture(StdPicture_Sub& target, const std::string& path, int scaleF
 
     // We need to figure out the height and width!
     std::string sizePath = path + ".size";
-    FILE* fs = fopen(sizePath.c_str(), "r");
+    Files::Data fs = Files::load_file(sizePath);
 
-    if(fs != nullptr)
+    if(!fs.empty())
     {
         int w, h, flags;
-        if(fscanf(fs, "%d\n%d\n%d\n", &w, &h, &flags) != 3 || w < 0 || w > 8192 || h < 0 || h > 8192)
+        if(sscanf(fs.c_str(), "%d\n%d\n%d\n", &w, &h, &flags) != 3 || w < 0 || w > 8192 || h < 0 || h > 8192)
         {
             pLogWarning("Could not load image %s dimensions from size file", path.c_str());
             target.inited = false;
@@ -543,9 +544,6 @@ void lazyLoadPicture(StdPicture_Sub& target, const std::string& path, int scaleF
             target.h = h;
             target.l.flags = flags;
         }
-
-        if(fclose(fs))
-            pLogWarning("loadPicture: Couldn't close file.");
     }
     else
     {

@@ -38,6 +38,7 @@
 #include <Graphics/graphics_funcs.h>
 #include <Logger/logger.h>
 #include <Utils/files.h>
+#include <SDL2/SDL_rwops.h>
 
 #include "globals.h"
 #include "frame_timer.h"
@@ -731,20 +732,20 @@ void lazyLoadPicture(StdPicture_Sub& target, const std::string& path, int scaleF
 
     // We need to figure out the height and width!
     std::string sizePath = path + ".size";
-    FILE* fs = fopen(sizePath.c_str(), "r");
+    SDL_RWops* fs = Files::open_file(sizePath.c_str(), "rb");
 
     // NOT null-terminated: wwww\nhhhh\n
     char contents[10];
 
     if(fs != nullptr)
     {
-        fread(&contents[0], 1, 10, fs);
+        SDL_RWread(fs, &contents[0], 1, 10);
         contents[4] = '\0';
         contents[9] = '\0';
         target.w = atoi(&contents[0]);
         target.h = atoi(&contents[5]);
 
-        if(fclose(fs))
+        if(SDL_RWclose(fs))
             pLogWarning("lazyLoadPicture: Couldn't close file.");
     }
     // lazy load and unload to read dimensions if it doesn't exist.

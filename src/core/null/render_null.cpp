@@ -26,6 +26,8 @@
 #include <set>
 
 #include <Logger/logger.h>
+#include <Utils/files.h>
+#include <SDL2/SDL_rwops.h>
 
 #include "globals.h"
 #include "frame_timer.h"
@@ -129,19 +131,19 @@ void lazyLoadPicture(StdPicture_Sub& target, const std::string& path, int scaleF
 
     // We need to figure out the height and width!
     std::string sizePath = path + ".size";
-    FILE* fs = fopen(sizePath.c_str(), "r");
+    SDL_RWops* fs = Files::open_file(sizePath, "r");
 
     // NOT null-terminated: wwww\nhhhh\n
     char contents[10];
 
     if(fs != nullptr)
     {
-        fread(&contents[0], 1, 10, fs);
+        SDL_RWread(fs, &contents[0], 1, 10);
         contents[4] = '\0';
         contents[9] = '\0';
         target.w = atoi(&contents[0]);
         target.h = atoi(&contents[5]);
-        if(fclose(fs))
+        if(SDL_RWclose(fs))
             pLogWarning("loadPicture: Couldn't close file.");
     }
     else
@@ -161,7 +163,7 @@ void lazyLoadPicture(StdPicture_Sub& target, const std::string& path, int scaleF
         }
 #else
         // this will work if it's a PNG
-        FILE* fpng = fopen(path.c_str(), "rb");
+        SDL_RWops* fpng = Files::open_file(path, "rb");
         if(!fpng)
         {
             pLogWarning("loadPicture: Couldn't open size file.");
@@ -169,10 +171,10 @@ void lazyLoadPicture(StdPicture_Sub& target, const std::string& path, int scaleF
             return;
         }
 
-        fseek(fpng, 16, SEEK_SET);
+        SDL_RWseek(fpng, 16, RW_SEEK_SET);
 
         uint32_t w, h;
-        if(fread(&w, 4, 1, fpng) == 1 && fread(&h, 4, 1, fpng) == 1)
+        if(SDL_RWread(fpng, &w, 4, 1) == 1 && fread(fpng, &h, 4, 1) == 1)
         {
             w = SDL_SwapLE32(w);
             h = SDL_SwapLE32(h);
@@ -190,7 +192,7 @@ void lazyLoadPicture(StdPicture_Sub& target, const std::string& path, int scaleF
             target.inited = false;
         }
 
-        fclose(fpng);
+        SDL_RWclose(fpng);
 #endif
     }
 }
