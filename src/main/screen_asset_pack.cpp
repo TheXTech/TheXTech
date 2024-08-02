@@ -22,6 +22,7 @@
 #include <fmt_format_ne.h>
 #include <Integrator/integrator.h>
 
+#include "Archives/archives.h"
 #include "sdl_proxy/sdl_stdinc.h"
 
 #include "main/screen_asset_pack.h"
@@ -62,9 +63,22 @@ static bool s_ensure_idx_valid()
 
     s_cur_idx = 0;
 
+    std::string real_app_path;
+
+    // restore real path from loaded assets
+    if(AppPath[0] == ':' && AppPath[1] == 'a')
+    {
+        real_app_path.push_back('@');
+        real_app_path.append(Archives::assets_archive_path());
+        real_app_path.push_back(':');
+        real_app_path.append(AppPath.c_str() + 2, AppPath.size() - 2);
+    }
+    else
+        real_app_path = AppPath;
+
     for(const auto& pack : asset_packs)
     {
-        if(pack.path == AppPath && pack.full_id() == g_AssetPackID)
+        if(pack.path == real_app_path && pack.full_id() == g_AssetPackID)
         {
             if(s_target_idx == -1)
                 s_target_idx = s_cur_idx;

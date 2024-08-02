@@ -24,6 +24,7 @@
 
 #include <Utils/files.h>
 #include <Utils/files_ini.h>
+#include <Archives/archives.h>
 #include <DirManager/dirman.h>
 #include <Logger/logger.h>
 #include <IniProcessor/ini_processing.h>
@@ -31,6 +32,7 @@
 #include "main/asset_pack.h"
 #include "core/render.h"
 #include "core/msgbox.h"
+#include "fontman/font_manager.h"
 
 #include "sound.h"
 #include "gfx.h"
@@ -185,6 +187,7 @@ static void s_find_asset_packs()
 
     DirMan assets;
     std::vector<std::string> subdirList;
+    std::vector<std::string> archiveList;
     std::string subdir;
 
     bool found_debug_any = false;
@@ -233,10 +236,25 @@ static void s_find_asset_packs()
         {
             assets.setPath(root + "assets/");
             assets.getListOfFolders(subdirList);
+            assets.getListOfFiles(archiveList);
+
+            size_t num_dirs = subdirList.size();
+
+            for(std::string& a : archiveList)
+                subdirList.push_back(std::move(a));
+
+            size_t i = 0;
 
             for(const std::string& sub : subdirList)
             {
-                subdir = root + "assets/" + sub;
+                // archive
+                if(i >= num_dirs)
+                    subdir = "@" + root + "assets/" + sub + ":/";
+                // subdir
+                else
+                    subdir = root + "assets/" + sub;
+
+                i++;
 
                 D_pLogDebug("  Checking %s", subdir.c_str());
 
@@ -312,6 +330,7 @@ static AssetPack_t s_find_pack_init(const std::string& full_id)
 
     DirMan assets;
     std::vector<std::string> subdirList;
+    std::vector<std::string> archiveList;
     std::string subdir;
 
     AssetPack_t any_pack;
@@ -365,10 +384,25 @@ static AssetPack_t s_find_pack_init(const std::string& full_id)
         {
             assets.setPath(root + "assets/");
             assets.getListOfFolders(subdirList);
+            assets.getListOfFiles(archiveList);
+
+            size_t num_dirs = subdirList.size();
+
+            for(std::string& a : archiveList)
+                subdirList.push_back(std::move(a));
+
+            size_t i = 0;
 
             for(const std::string& sub : subdirList)
             {
-                subdir = root + "assets/" + sub;
+                // archive
+                if(i >= num_dirs)
+                    subdir = "@" + root + "assets/" + sub + ":/";
+                // subdir
+                else
+                    subdir = root + "assets/" + sub;
+
+                i++;
 
                 if(DirMan::exists(subdir + "/graphics/ui/"))
                 {
@@ -399,16 +433,42 @@ static AssetPack_t s_find_pack_init(const std::string& full_id)
 }
 
 
+static std::string s_prepare_assets_path(const std::string& path)
+{
+    std::string target_path = path;
+
+    // parse and mount assets if possible
+    if(target_path[0] == '@')
+    {
+        // mount target, then replace path
+        auto archive_end = target_path.begin();
+        while(archive_end != target_path.end() && *archive_end != ':')
+            ++archive_end;
+
+        if(archive_end != target_path.end())
+        {
+            *archive_end = '\0';
+
+            if(Archives::mount_assets(target_path.c_str() + 1))
+            {
+                target_path.erase(target_path.begin() + 2, archive_end + 1);
+                target_path[0] = ':';
+                target_path[1] = 'a';
+            }
+            else
+                *archive_end = ':';
+        }
+    }
+
+    return target_path;
+}
+
 bool ReloadAssetsFrom(const AssetPack_t& pack)
 {
     pLogDebug("= Trying to load asset pack \"%s/%s\" from [%s]", pack.id.c_str(), pack.version.c_str(), pack.path.c_str());
 
     std::string OldAppPath = AppPath;
     std::string OldAssetPackID = g_AssetPackID;
-
-    AppPathManager::setCurrentAssetPack(pack.id, pack.path);
-    AppPath = AppPathManager::assetsRoot();
-    g_AssetPackID = pack.full_id();
 
     UnloadCustomGFX();
     UnloadWorldCustomGFX();
@@ -417,6 +477,16 @@ bool ReloadAssetsFrom(const AssetPack_t& pack)
     StopAllSounds();
     StopMusic();
     UnloadSound();
+    FontManager::quit();
+
+    std::string old_assets_archive = Archives::assets_archive_path();
+    Archives::unmount_assets();
+
+    std::string target_path = s_prepare_assets_path(pack.path);
+
+    AppPathManager::setCurrentAssetPack(pack.id, target_path);
+    AppPath = AppPathManager::assetsRoot();
+    g_AssetPackID = pack.full_id();
 
     pLogDebug("Loading UI assets from [%s]", AppPath.c_str());
 
@@ -429,7 +499,13 @@ bool ReloadAssetsFrom(const AssetPack_t& pack)
         AppPathManager::setCurrentAssetPack(OldAssetPackID, OldAppPath);
         AppPath = OldAppPath;
         g_AssetPackID = OldAssetPackID;
+
+        Archives::unmount_assets();
+        if(!old_assets_archive.empty())
+            Archives::mount_assets(old_assets_archive.c_str());
+
         GFX.load();
+        FontManager::initFull();
         InitSound(); // Setup sound effects
 
         // also, remove from list of valid asset packs
@@ -514,7 +590,9 @@ bool InitUIAssetsFrom(const std::string& id, bool skip_gfx)
     if(pack.path.empty())
         pack.path = ".";
 
-    AppPathManager::setCurrentAssetPack(pack.id, pack.path);
+    std::string target_path = s_prepare_assets_path(pack.path);
+
+    AppPathManager::setCurrentAssetPack(pack.id, target_path);
     AppPath = AppPathManager::assetsRoot();
     g_AssetPackID = pack.full_id();
 

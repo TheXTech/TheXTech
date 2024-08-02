@@ -48,6 +48,7 @@
 
 #include <Utils/strings.h>
 #include <Utils/files.h>
+#include <Archives/archives.h>
 
 #ifdef THEXTECH_CRASHHANDLER_SUPPORTED
 #   include <CrashHandler/crash_handler.h>
@@ -788,6 +789,9 @@ int main(int argc, char**argv)
     QuitMixerX();
 
     g_frmMain.freeSystem();
+
+    Archives::unmount_assets();
+    Archives::unmount_episode();
 
 #ifdef __EMSCRIPTEN__
     AppPathManager::syncFs();
