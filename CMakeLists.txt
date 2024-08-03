@@ -453,6 +453,7 @@ if(THEXTECH_NO_SDL_BUILD)
     add_subdirectory(lib/sdl_proxy_rwops)
     get_target_property(SDL_PROXY_RWOPS_INCS sdl_proxy_rwops INTERFACE_INCLUDE_DIRECTORIES)
     target_include_directories(pgefl PRIVATE ${SDL_PROXY_RWOPS_INCS})
+    add_dependencies(pgefl sdl_proxy_rwops)
     target_link_libraries(A2XT_Int INTERFACE sdl_proxy_rwops)
 endif()
 
@@ -496,6 +497,9 @@ elseif(NOT THEXTECH_NO_SDL_BUILD)
     include(cmake/library_SDLMixerX.cmake)
     list(APPEND A2XT_INCS "${DEPENDENCIES_INSTALL_DIR}/include" ${SDL2_INCLUDE_DIRS})
     target_include_directories(pgefl PRIVATE ${SDL2_INCLUDE_DIRS})
+
+    # depend on RWops from AudioCodecs_Local SDL2 build
+    add_dependencies(pgefl AudioCodecs_Local)
 
     if(NOT USE_SYSTEM_ZLIB) # Depend on ZLib at AudioCodecs
         if(TARGET FREETYPE_Local)
