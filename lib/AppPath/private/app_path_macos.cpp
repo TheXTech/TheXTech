@@ -38,7 +38,6 @@ static std::string s_userDirectory;
 static std::string s_applicationPath;
 static std::string s_screenshotsPath;
 static std::string s_gifRecordPath;
-static std::string s_logsPath;
 //! The name of application bundle to be re-used as the user directory name
 static std::string s_bundleName;
 
@@ -91,9 +90,9 @@ void AppPathP::initDefaultPaths(const std::string &userDirName)
         }
 
         if(appSupport.empty())
-            appSupport = std::string("/Library/Application Support/PGE_Project/thextech/");
-        else
-            appSupport += userDirName;
+            appSupport = std::string("/Library/Application Support/");
+
+        appSupport += userDirName;
 
         if(!appSupport.empty() && appSupport.back() != '/')
             appSupport.push_back('/');
@@ -101,8 +100,9 @@ void AppPathP::initDefaultPaths(const std::string &userDirName)
         const char *homeDir = SDL_getenv("HOME");
         if(homeDir)
         {
-            s_userDirectory = std::string(homeDir) + "/TheXTech Games/" + s_bundleName;
-            s_userDirectory.append("/");
+            // modern user directory
+            s_userDirectory = std::string(homeDir) + userDirName;
+
             // Automatically create an infrastructure
             if(!DirMan::exists(s_userDirectory))
                 DirMan::mkAbsPath(s_userDirectory);
@@ -110,16 +110,11 @@ void AppPathP::initDefaultPaths(const std::string &userDirName)
                 DirMan::mkAbsPath(s_userDirectory + "worlds");
             if(!DirMan::exists(s_userDirectory + "battle"))
                 DirMan::mkAbsPath(s_userDirectory + "battle");
-
-            s_assetsRoot = std::string(homeDir) + "/TheXTech Games/Debug Assets/";
         }
         else
-        {
             s_userDirectory = appSupport;
-            s_assetsRoot.clear();
-        }
 
-        s_logsPath = s_userDirectory + "logs/";
+        s_assetsRoot.clear();
     }
 
     // Assets directory
@@ -168,6 +163,11 @@ std::string AppPathP::assetsRoot()
     return s_assetsRoot;
 }
 
+AssetsPathType AppPathP::assetsRootType()
+{
+    return AssetsPathType::Single;
+}
+
 std::string AppPathP::settingsRoot()
 {
     /*
@@ -200,7 +200,7 @@ std::string AppPathP::gifRecsRoot()
 
 std::string AppPathP::logsRoot()
 {
-    return s_logsPath;
+    return std::string();
 }
 
 bool AppPathP::portableAvailable()

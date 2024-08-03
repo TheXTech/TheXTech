@@ -29,9 +29,9 @@
 #include "app_path_private.h"
 
 //! The assets&user directory for standalone RPX when SD card is plugged
-constexpr const char* s_assetRootSD = "fs:/vol/external01/wiiu/thextech/";
+constexpr const char* s_assetRootSD = "fs:/vol/external01/wiiu/" THEXTECH_DIRECTORY_PREFIX "/";
 //! The assets&user directory for standalone RPX when USB stick is plugged
-constexpr const char* s_assetRootUSB = "usb:/wiiu/thextech/";
+constexpr const char* s_assetRootUSB = "usb:/wiiu/" THEXTECH_DIRECTORY_PREFIX "/";
 //! The assets directory for WUHB/installable package of the game
 constexpr const char* s_assetRootContent = "fs:/vol/content/";
 
@@ -42,24 +42,11 @@ constexpr const char* s_assetSaveRoot = "fs:/vol/save/common/";
 static std::string s_assetRoot;
 //! Writeable user directory for logs, screenshots, settings and extra user's episodes
 static std::string s_userDir;
-//! Directory to output log files
-static std::string s_logsDir;
-//! Directory to store taken screenshots
-static std::string s_screenshotsDir;
-//! Directory to store GIF recordings
-static std::string s_gifsDir;
-//! Settings directory
-static std::string s_settingsDir;
-//! Game saves storage directory
-static std::string s_gamesavesDir;
 
 
 void AppPathP::initDefaultPaths(const std::string &userDirName)
 {
     (void)userDirName;
-
-    uint16_t titleId = OSGetTitleID();
-    std::string titleIdString = fmt::sprintf("%016llX/", titleId);
 
     // When running game under WUHB package or as an installable game (/vol/content and /vol/save dirs do exist)
     // Also check that /vol/content/graphics/ exists (assets non-empty)
@@ -72,49 +59,23 @@ void AppPathP::initDefaultPaths(const std::string &userDirName)
         s_assetRoot = s_assetRootContent;
         // And consider /vol/save directory as default User Directory
         s_userDir = s_assetSaveRoot;
-        s_settingsDir.clear();
-        s_gamesavesDir.clear();
 
         // When USB stick is presented, store logs, screenshots and find user's episodes on it
         if(DirMan::exists("usb:/"))
-        {
-            // FIXME: Find a way to obtain executable/WUHB name, and put all the stuff into sub-directory
-            // That should avoid collisions between different game packages using the same engine.
-            s_userDir = "usb:/wiiu/thextech-user/" + titleIdString;
-            s_logsDir = s_userDir + "logs/";
-            s_screenshotsDir = s_userDir + "screenshots/";
-            s_gifsDir = s_userDir + "gif-recordings/";
-            // Keep storing of settings and gamesaves at /val/save virtual directory
-            s_settingsDir = std::string(s_assetSaveRoot) + "settings/";
-            s_gamesavesDir = std::string(s_assetSaveRoot) + "gamesaves/";
-        }
+            s_userDir = s_assetRootUSB;
         // When SD card is presented, store logs, screenshots and find user's episodes on it
         else if(DirMan::exists("fs:/vol/external01/"))
-        {
-            // FIXME: Find a way to obtain executable/WUHB name, and put all the stuff into sub-directory
-            // That should avoid collisions between different game packages using the same engine.
-            s_userDir = "fs:/vol/external01/wiiu/thextech-user/" + titleIdString;
-            s_logsDir = s_userDir + "logs/";
-            s_screenshotsDir = s_userDir + "screenshots/";
-            s_gifsDir = s_userDir + "gif-recordings/";
-            // Keep storing of settings and gamesaves at /val/save virtual directory
-            s_settingsDir = std::string(s_assetSaveRoot) + "settings/";
-            s_gamesavesDir = std::string(s_assetSaveRoot) + "gamesaves/";
-        }
+            s_userDir = s_assetRootSD;
     }
     else if(DirMan::exists(s_assetRootUSB))
     {
-        s_assetRoot = s_assetRootUSB;
+        s_assetRoot.clear();
         s_userDir = s_assetRootUSB;
-        s_settingsDir.clear();
-        s_gamesavesDir.clear();
     }
     else
     {
-        s_assetRoot = s_assetRootSD;
+        s_assetRoot.clear();
         s_userDir = s_assetRootSD;
-        s_settingsDir.clear();
-        s_gamesavesDir.clear();
     }
 }
 
@@ -133,6 +94,11 @@ std::string AppPathP::assetsRoot()
     return s_assetRoot;
 }
 
+AssetsPathType AppPathP::assetsRootType()
+{
+    return AssetsPathType::Single;
+}
+
 std::string AppPathP::settingsRoot()
 {
     /*
@@ -140,7 +106,7 @@ std::string AppPathP::settingsRoot()
      * directory out of user directory. Keep it empty if you want to keep the
      * default behaviour (i.e. settings saved at the user directory)
      */
-    return s_settingsDir;
+    return std::string();
 }
 
 std::string AppPathP::gamesavesRoot()
@@ -150,7 +116,7 @@ std::string AppPathP::gamesavesRoot()
      * directory out of user directory. Keep it empty if you want to keep the
      * default behaviour (i.e. gamesaves saved at the settings directory)
      */
-    return s_gamesavesDir;
+    return std::string();
 }
 
 std::string AppPathP::screenshotsRoot()
@@ -160,7 +126,7 @@ std::string AppPathP::screenshotsRoot()
      * directory out of user directory. Keep it empty if you want to keep the
      * default behaviour (i.e. screenshots saved at the user directory)
      */
-    return s_screenshotsDir;
+    return std::string();
 }
 
 std::string AppPathP::gifRecsRoot()
@@ -170,7 +136,7 @@ std::string AppPathP::gifRecsRoot()
      * directory out of user directory. Keep it empty if you want to keep the
      * default behaviour (i.e. GIF recordings saved at the user directory)
      */
-    return s_gifsDir;
+    return std::string();
 }
 
 std::string AppPathP::logsRoot()
@@ -180,7 +146,7 @@ std::string AppPathP::logsRoot()
      * directory out of user directory. Keep it empty if you want to keep the
      * default behaviour (i.e. logs saved at the user directory)
      */
-    return s_logsDir;
+    return std::string();
 }
 
 bool AppPathP::portableAvailable()
