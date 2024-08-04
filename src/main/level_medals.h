@@ -30,7 +30,7 @@ struct LevelSaveInfo_t;
 
 namespace PGE_FileFormats_misc
 {
-    struct TextInput;
+    class TextInput;
 }
 
 struct CurLevelMedals_t
