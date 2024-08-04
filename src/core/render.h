@@ -39,6 +39,11 @@
 #   define TAIL ;
 #endif
 
+namespace PGE_FileFormats_misc
+{
+    class TextInput;
+}
+
 struct UniformValue_t;
 
 
@@ -396,7 +401,7 @@ SDL_FORCE_INLINE void LoadPicture(StdPicture &target,
 
 
 #if defined(PGE_MIN_PORT) || defined(THEXTECH_CLI_BUILD)
-E_INLINE void lazyLoadPictureFromList(StdPicture_Sub& target, FILE* f, const std::string& dir);
+E_INLINE void lazyLoadPictureFromList(StdPicture_Sub& target, PGE_FileFormats_misc::TextInput& t, std::string& line_buf, const std::string& dir);
 #endif
 
 E_INLINE void setTransparentColor(StdPicture &target, uint32_t rgb) TAIL

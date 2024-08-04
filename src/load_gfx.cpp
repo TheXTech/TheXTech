@@ -52,6 +52,10 @@
 #include <emscripten.h>
 #endif
 
+#if defined(PGE_MIN_PORT) || defined(THEXTECH_CLI_BUILD)
+#   include <PGE_File_Formats/file_formats.h>
+#endif
+
 #include <set>
 
 bool gfxLoaderTestMode = false;
@@ -385,13 +389,13 @@ static void loadCBorder(const std::string &origPath,
  * \param world Is a world map
  * \param this_is_custom Is custom in the current load context
  */
-static void loadImageFromList(FILE* f, const std::string& dir,
+static void loadImageFromList(PGE_FileFormats_misc::TextInput& t, std::string& line_buf, const std::string& dir,
                     StdPicture &texture,
                     int *width, int *height, bool &is_custom_loc,
                     bool world = false, bool this_is_custom = false)
 {
     StdPicture_Sub newTexture;
-    XRender::lazyLoadPictureFromList(newTexture, f, dir);
+    XRender::lazyLoadPictureFromList(newTexture, t, line_buf, dir);
 
     if(!newTexture.inited)
         return;
@@ -433,10 +437,13 @@ bool LoadGFXFromList(std::string source_dir, bool custom, bool skip_world)
 {
     std::string path = source_dir + "graphics.list";
 
-    FILE* f = fopen(path.c_str(), "r");
+    SDL_RWops* f = Files::open_file(path, "rb");
 
     if(!f)
         return false;
+
+    PGE_FileFormats_misc::RWopsTextInput in(f, path);
+    std::string line_buf;
 
     char type_buf[12];
     int A;
@@ -448,29 +455,30 @@ bool LoadGFXFromList(std::string source_dir, bool custom, bool skip_world)
         // advance the file to the next entry
         if(failed)
         {
-            char out = '\n';
-
-            while(out == '\n')
+            do
             {
-                // pLogDebug("skipping failed lines at %d", ftell(f));
-                if(fscanf(f, "%*[^\n]%c", &out) != 1)
-                    break;
-            }
+                in.readLine(line_buf);
+            } while(!line_buf.empty());
 
-            if(fgetc(f) != '\n')
+            if(in.eof())
             {
                 pLogWarning("No more entries after failure");
                 break;
             }
         }
 
+        in.readLine(line_buf);
+        if(line_buf.empty() && !in.eof())
+            continue;
+
         failed = true;
 
         // read the entry!
         SDL_memset(type_buf, 0, sizeof(type_buf));
-        if(fscanf(f, "%11s %d", type_buf, &A) != 2 || fgetc(f) != '\n')
+        int pos;
+        if(sscanf(line_buf.c_str(), "%11s %d%n", type_buf, &A, &pos) != 2 || pos != (int)line_buf.size())
         {
-            if(feof(f))
+            if(in.eof())
                 break;
             else
             {
@@ -489,7 +497,7 @@ bool LoadGFXFromList(std::string source_dir, bool custom, bool skip_world)
                 continue;
             }
 
-            loadImageFromList(f, source_dir,
+            loadImageFromList(in, line_buf, source_dir,
                 GFXBackground2BMP[A], &GFXBackground2Width[A], &GFXBackground2Height[A], GFXBackground2Custom[A],
                 false, custom);
         }
@@ -501,7 +509,7 @@ bool LoadGFXFromList(std::string source_dir, bool custom, bool skip_world)
                 continue;
             }
 
-            loadImageFromList(f, source_dir,
+            loadImageFromList(in, line_buf, source_dir,
                 GFXBackgroundBMP[A], &GFXBackgroundWidth[A], &GFXBackgroundHeight[A], GFXBackgroundCustom[A],
                 false, custom);
 
@@ -519,7 +527,7 @@ bool LoadGFXFromList(std::string source_dir, bool custom, bool skip_world)
                 continue;
             }
 
-            loadImageFromList(f, source_dir,
+            loadImageFromList(in, line_buf, source_dir,
                 GFXBlockBMP[A], nullptr, nullptr, GFXBlockCustom[A],
                 false, custom);
         }
@@ -531,7 +539,7 @@ bool LoadGFXFromList(std::string source_dir, bool custom, bool skip_world)
                 continue;
             }
 
-            loadImageFromList(f, source_dir,
+            loadImageFromList(in, line_buf, source_dir,
                 GFXNPCBMP[A], nullptr, nullptr, GFXNPCCustom[A],
                 false, custom);
         }
@@ -543,7 +551,7 @@ bool LoadGFXFromList(std::string source_dir, bool custom, bool skip_world)
                 continue;
             }
 
-            loadImageFromList(f, source_dir,
+            loadImageFromList(in, line_buf, source_dir,
                 GFXEffectBMP[A], &GFXEffectWidth[A], &GFXEffectHeight[A], GFXEffectCustom[A],
                 false, custom);
         }
@@ -555,7 +563,7 @@ bool LoadGFXFromList(std::string source_dir, bool custom, bool skip_world)
                 continue;
             }
 
-            loadImageFromList(f, source_dir,
+            loadImageFromList(in, line_buf, source_dir,
                 GFXYoshiTBMP[A], nullptr, nullptr, GFXYoshiTCustom[A],
                 false, custom);
         }
@@ -567,7 +575,7 @@ bool LoadGFXFromList(std::string source_dir, bool custom, bool skip_world)
                 continue;
             }
 
-            loadImageFromList(f, source_dir,
+            loadImageFromList(in, line_buf, source_dir,
                 GFXYoshiBBMP[A], nullptr, nullptr, GFXYoshiBCustom[A],
                 false, custom);
         }
@@ -582,7 +590,7 @@ bool LoadGFXFromList(std::string source_dir, bool custom, bool skip_world)
                 continue;
             }
 
-            loadImageFromList(f, source_dir,
+            loadImageFromList(in, line_buf, source_dir,
                 GFXLevelBMP[A], &GFXLevelWidth[A], &GFXLevelHeight[A], GFXLevelCustom[A],
                 true, custom);
         }
@@ -597,7 +605,7 @@ bool LoadGFXFromList(std::string source_dir, bool custom, bool skip_world)
                 continue;
             }
 
-            loadImageFromList(f, source_dir,
+            loadImageFromList(in, line_buf, source_dir,
                 GFXTileBMP[A], &GFXTileWidth[A], &GFXTileHeight[A], GFXTileCustom[A],
                 true, custom);
         }
@@ -612,7 +620,7 @@ bool LoadGFXFromList(std::string source_dir, bool custom, bool skip_world)
                 continue;
             }
 
-            loadImageFromList(f, source_dir,
+            loadImageFromList(in, line_buf, source_dir,
                 GFXSceneBMP[A], &GFXSceneWidth[A], &GFXSceneHeight[A], GFXSceneCustom[A],
                 true, custom);
         }
@@ -627,7 +635,7 @@ bool LoadGFXFromList(std::string source_dir, bool custom, bool skip_world)
                 continue;
             }
 
-            loadImageFromList(f, source_dir,
+            loadImageFromList(in, line_buf, source_dir,
                 GFXPlayerBMP[A], &GFXPlayerWidth[A], &GFXPlayerHeight[A], GFXPlayerCustom[A],
                 true, custom);
         }
@@ -642,7 +650,7 @@ bool LoadGFXFromList(std::string source_dir, bool custom, bool skip_world)
                 continue;
             }
 
-            loadImageFromList(f, source_dir,
+            loadImageFromList(in, line_buf, source_dir,
                 GFXPathBMP[A], &GFXPathWidth[A], &GFXPathHeight[A], GFXPathCustom[A],
                 true, custom);
         }
@@ -672,15 +680,13 @@ bool LoadGFXFromList(std::string source_dir, bool custom, bool skip_world)
                 continue;
             }
 
-            loadImageFromList(f, source_dir,
+            loadImageFromList(in, line_buf, source_dir,
                 (*GFXCharacterBMP[c])[A], &(*GFXCharacterWidth[c])[A], &(*GFXCharacterHeight[c])[A], (*GFXCharacterCustom[c])[A],
                 false, custom);
         }
 
         failed = false;
     }
-
-    fclose(f);
 
     return true;
 }

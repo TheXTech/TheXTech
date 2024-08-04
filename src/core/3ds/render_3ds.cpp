@@ -38,6 +38,7 @@ extern void SetDefaultIO(FreeImageIO *io);
 #include <Logger/logger.h>
 #include <Utils/files.h>
 #include <SDL2/SDL_rwops.h>
+#include <PGE_File_Formats/file_formats.h>
 
 #include "sdl_proxy/sdl_stdinc.h"
 
@@ -868,37 +869,38 @@ void minport_ApplyViewport()
     }
 }
 
-void lazyLoadPictureFromList(StdPicture_Sub& target, FILE* f, const std::string& dir)
+void lazyLoadPictureFromList(StdPicture_Sub& target, PGE_FileFormats_misc::TextInput& t, std::string& line_buf, const std::string& dir)
 {
     if(!GameIsActive)
         return; // do nothing when game is closed
 
-    int length;
-
-    char filename[256];
-
-    if(fscanf(f, "%255[^\n]%n%*[^\n]\n", filename, &length) != 1)
+    t.readLine(line_buf);
+    if(line_buf.empty())
     {
         pLogWarning("Could not load image path from load list");
         return;
     }
 
-    if(length == 255)
-    {
-        pLogWarning("Image path %s was truncated in load list", filename);
-        return;
-    }
-
     target.inited = true;
     target.l.path = dir;
-    target.l.path += filename;
+    target.l.path += std::move(line_buf);
     target.l.lazyLoaded = true;
 
-    int w, h;
+    bool okay = false;
 
-    if((fscanf(f, "%d\n%d\n", &w, &h) != 2) || (w < 0) || (w > 8192) || (h < 0) || (h > 8192))
+    int w, h;
+    t.readLine(line_buf);
+    if(sscanf(line_buf.c_str(), "%d", &w) == 1)
     {
-        pLogWarning("Could not load image %s dimensions from load list", filename);
+        t.readLine(line_buf);
+
+        if(sscanf(line_buf.c_str(), "%d", &h) == 1)
+            okay = true;
+    }
+
+    if(!okay || w < 0 || w > 8192 || h < 0 || h > 8192)
+    {
+        pLogWarning("Could not load image %s dimensions from load list", target.l.path);
         target.inited = false;
         return;
     }
