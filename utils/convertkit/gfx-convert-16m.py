@@ -204,7 +204,7 @@ for dirpath, dirs, files in os.walk(outdir, topdown=True):
         l = open(os.path.join(dirpath, 'graphics.list'), 'w')
 
         for d in dirs:
-            if d == 'touchscreen' or d == 'ui':
+            if d == 'touchscreen' or d == 'ui' or d == 'fallback':
                 continue
 
             for f in os.listdir(os.path.join(dirpath, d)):
