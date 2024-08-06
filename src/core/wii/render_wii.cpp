@@ -162,17 +162,19 @@ static void* s_RawTo4x4RGBA(const uint8_t* src, uint32_t width, uint32_t height,
     return dst;
 }
 
-int robust_TPL_GetTexture(TPLFile* file, int i, GXTexObj* gxtex)
+Files::Data robust_Files_load_file(const std::string& path)
 {
-    int ret = TPL_GetTexture(file, i, gxtex);
+    Files::Data ret = Files::load_file(path);
 
-    if(ret == 0 || errno != ENOMEM)
+    if(ret.valid())
         return ret;
 
     pLogWarning("Failed to load due to lack of memory");
     minport_freeTextureMemory();
 
-    return TPL_GetTexture(file, i, gxtex);
+    ret = Files::load_file(path);
+
+    return ret;
 }
 
 FIBITMAP* robust_FILoad(const std::string& path, const std::string& maskPath, int* orig_w = nullptr, int* orig_h = nullptr)
@@ -299,10 +301,16 @@ void s_loadTexture(StdPicture& target, int i)
             target.h = tex_h * 2;
         }
 
-        if(robust_TPL_GetTexture(&target.d.texture_file[i], 0, &target.d.texture[i]) != 0)
+        if(TPL_GetTexture(&target.d.texture_file[i], 0, &target.d.texture[i]) != 0)
         {
             TPL_CloseTPLFile(&target.d.texture_file[i]);
             target.d.texture_file_init[i] = false;
+
+            if(target.d.backing_texture[i])
+            {
+                free(target.d.backing_texture[i]);
+                target.d.backing_texture[i] = nullptr;
+            }
         }
         else
         {
@@ -776,19 +784,6 @@ void lazyLoadPicture(StdPicture_Sub& target, const std::string& path, int scaleF
     }
 }
 
-int robust_OpenTPLFromFile(TPLFile* target, const char* path)
-{
-    int ret = TPL_OpenTPLFromFile(target, path);
-
-    if(ret == 1 || errno != ENOMEM)
-        return ret;
-
-    pLogWarning("Failed to load %s due to lack of memory", path);
-    minport_freeTextureMemory();
-
-    return TPL_OpenTPLFromFile(target, path);
-}
-
 void lazyLoad(StdPicture& target)
 {
     if(!target.inited || !target.l.lazyLoaded || target.d.hasTexture())
@@ -802,15 +797,16 @@ void lazyLoad(StdPicture& target)
 
     if(Files::hasSuffix(target.l.path, ".tpl"))
     {
-        if(robust_OpenTPLFromFile(&target.d.texture_file[0], target.l.path.c_str()) != 1)
+        Files::Data d = robust_Files_load_file(target.l.path);
+        if(!d.valid() || TPL_OpenTPLFromMemory(&target.d.texture_file[0], const_cast<uint8_t*>(d.begin()), d.size()) != 1)
         {
             pLogWarning("Permanently failed to load %s", target.l.path.c_str());
-            pLogWarning("Error: %d (%s)", errno, strerror(errno));
             target.inited = false;
             return;
         }
 
         target.d.texture_file_init[0] = true;
+        target.d.backing_texture[0] = d.disown();
         s_loadTexture(target, 0);
     }
     else
@@ -888,15 +884,16 @@ void lazyLoad(StdPicture& target)
     if(target.h > 2048 && target.d.texture_file_init[0])
     {
         suppPath = target.l.path + '1';
+        Files::Data d = robust_Files_load_file(suppPath);
 
-        if(robust_OpenTPLFromFile(&target.d.texture_file[1], suppPath.c_str()) != 1)
+        if(!d.valid() || TPL_OpenTPLFromMemory(&target.d.texture_file[1], const_cast<uint8_t*>(d.begin()), d.size()) != 1)
         {
             pLogWarning("Permanently failed to load %s", suppPath.c_str());
-            pLogWarning("Error: %d (%s)", errno, strerror(errno));
         }
         else
         {
             target.d.texture_file_init[1] = true;
+            target.d.backing_texture[1] = d.disown();
             s_loadTexture(target, 1);
         }
     }
@@ -904,8 +901,9 @@ void lazyLoad(StdPicture& target)
     if(target.h > 4096 && target.d.texture_file_init[0])
     {
         suppPath = target.l.path + '2';
+        Files::Data d = robust_Files_load_file(suppPath);
 
-        if(robust_OpenTPLFromFile(&target.d.texture_file[2], suppPath.c_str()) != 1)
+        if(!d.valid() || TPL_OpenTPLFromMemory(&target.d.texture_file[2], const_cast<uint8_t*>(d.begin()), d.size()) != 1)
         {
             pLogWarning("Permanently failed to load %s", suppPath.c_str());
             pLogWarning("Error: %d (%s)", errno, strerror(errno));
@@ -913,6 +911,7 @@ void lazyLoad(StdPicture& target)
         else
         {
             target.d.texture_file_init[2] = true;
+            target.d.backing_texture[2] = d.disown();
             s_loadTexture(target, 2);
         }
     }
