@@ -103,7 +103,9 @@ FIBITMAP *GraphicsHelps::loadImage(const std::string &file, bool convertTo32bit)
     loadingTime.start();
     fReadTime.start();
 #endif
-#if defined(THEXTECH_FILEMAPPER_SUPPORTED)
+
+    // disabled filemapper because it does not support archive contents
+#if 0 // #if defined(THEXTECH_FILEMAPPER_SUPPORTED)
     FileMapper fileMap;
 
     if(!fileMap.open_file(file))
@@ -125,20 +127,20 @@ FIBITMAP *GraphicsHelps::loadImage(const std::string &file, bool convertTo32bit)
 
 #else
     FreeImageIO io;
-    SetDefaultIO(&io);
-    FILE *handle = Files::utf8_fopen(file.c_str(), "rb");
+    SetRWopsIO(&io);
+    SDL_RWops *handle = Files::open_file(file, "rb");
 
     FREE_IMAGE_FORMAT formato = FreeImage_GetFileTypeFromHandle(&io, (fi_handle)handle);
 
     if(formato == FIF_UNKNOWN)
     {
-        fclose(handle);
+        SDL_RWclose(handle);
         return NULL;
     }
 
     FIBITMAP *img = FreeImage_LoadFromHandle(formato, &io, (fi_handle)handle);
 
-    fclose(handle);
+    SDL_RWclose(handle);
 
     if(!img)
         return NULL;
