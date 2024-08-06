@@ -355,7 +355,9 @@ void FindCustomNPCs(/*std::string cFilePath*/)
 void LoadCustomNPC(int A, std::string cFileName)
 {
     NPCConfigFile npc;
-    FileFormats::ReadNpcTXTFileF(std::move(cFileName), npc, true);
+    SDL_RWops* rwops = Files::open_file(cFileName, "r");
+    PGE_FileFormats_misc::RWopsTextInput in(rwops, std::move(cFileName));
+    FileFormats::ReadNpcTXTFile(in, npc, true);
 
     auto& traits = NPCTraits[A];
 
