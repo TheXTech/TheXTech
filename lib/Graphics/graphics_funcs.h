@@ -41,6 +41,8 @@ struct PGE_Pix
 typedef struct SDL_Window SDL_Window;
 typedef struct SDL_Surface SDL_Surface;
 
+struct FreeImageIO;
+
 /*!
  * \brief Helpful graphical functions which are doing various work: I/O, Front+Mask blending, etc.
  */
@@ -56,6 +58,11 @@ public:
      * \brief DeInitializes FreeImage
      */
     static void  closeFreeImage();
+
+    /*!
+     * \brief initializes a FreeImageIO with operations to load from an SDL_RWops object
+     */
+    static void SetRWopsIO(FreeImageIO *io);
 
     /*!
      * \brief Loads image from a disk

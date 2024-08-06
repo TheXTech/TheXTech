@@ -45,6 +45,35 @@
 #endif
 #include <FreeImageLite.h>
 
+static unsigned DLL_CALLCONV
+_RWopsReadProc(void *buffer, unsigned size, unsigned count, fi_handle handle) {
+    return (unsigned)SDL_RWread ((SDL_RWops *)handle, buffer, size, count);
+}
+
+static unsigned DLL_CALLCONV
+_RWopsWriteProc(void *buffer, unsigned size, unsigned count, fi_handle handle) {
+    return (unsigned)SDL_RWwrite((SDL_RWops *)handle, buffer, size, count);
+}
+
+static int DLL_CALLCONV
+_RWopsSeekProc(fi_handle handle, long offset, int origin) {
+    int use_origin = origin;
+
+    if(origin == SEEK_CUR)
+        use_origin = RW_SEEK_CUR;
+    else if(origin == SEEK_SET)
+        use_origin = RW_SEEK_SET;
+    else if(origin == SEEK_END)
+        use_origin = RW_SEEK_END;
+
+    return SDL_RWseek((SDL_RWops *)handle, offset, use_origin);
+}
+
+static long DLL_CALLCONV
+_RWopsTellProc(fi_handle handle) {
+    return SDL_RWseek((SDL_RWops *)handle, 0, RW_SEEK_CUR);
+}
+
 // strangely undocumented import necessary to use the FreeImage handle functions
 extern void SetDefaultIO(FreeImageIO *io);
 
@@ -56,6 +85,13 @@ void GraphicsHelps::initFreeImage()
 void GraphicsHelps::closeFreeImage()
 {
     FreeImage_DeInitialise();
+}
+
+void GraphicsHelps::SetRWopsIO(FreeImageIO *io) {
+    io->read_proc  = _RWopsReadProc;
+    io->seek_proc  = _RWopsSeekProc;
+    io->tell_proc  = _RWopsTellProc;
+    io->write_proc = _RWopsWriteProc;
 }
 
 FIBITMAP *GraphicsHelps::loadImage(const std::string &file, bool convertTo32bit)
