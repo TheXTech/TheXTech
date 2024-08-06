@@ -63,6 +63,13 @@ extern void SetDefaultIO(FreeImageIO *io);
 // used for crash prevention
 extern u32 gpuCmdBufOffset, gpuCmdBufSize;
 
+// FIXME: this might change in the future -- try to upstream a callback-based loader
+struct C2D_SpriteSheet_s
+{
+    Tex3DS_Texture t3x;
+    C3D_Tex tex;
+};
+
 namespace XRender
 {
 
@@ -985,16 +992,53 @@ void lazyLoadPicture(StdPicture_Sub& target, const std::string& path, int scaleF
     }
 }
 
+static ssize_t s_decompressCallback_rwops(void *userdata, void *buffer, size_t size)
+{
+    SDL_RWops* rwops = (SDL_RWops*)userdata;
+    if(!rwops)
+        return 0;
+
+    return SDL_RWread(rwops, buffer, 1, size);
+}
+
 static C2D_SpriteSheet s_tryHardToLoadC2D_SpriteSheet(const char* path)
 {
-    C2D_SpriteSheet sourceImage = C2D_SpriteSheetLoad(path);
+    SDL_RWops* rwops = Files::open_file(path, "rb");
+    if(!rwops)
+        return nullptr;
 
+    C2D_SpriteSheet sourceImage = (C2D_SpriteSheet)malloc(sizeof(struct C2D_SpriteSheet_s));
     if(!sourceImage)
+    {
+        SDL_RWclose(rwops);
+        return nullptr;
+    }
+
+    sourceImage->t3x = Tex3DS_TextureImportCallback(&sourceImage->tex, nullptr, false, s_decompressCallback_rwops, rwops);
+
+    if(!sourceImage->t3x)
     {
         if(linearSpaceFree() < 15000000)
             minport_freeTextureMemory();
 
-        sourceImage = C2D_SpriteSheetLoad(path);
+        SDL_RWseek(rwops, 0, RW_SEEK_SET);
+
+        sourceImage->t3x = Tex3DS_TextureImportCallback(&sourceImage->tex, nullptr, false, s_decompressCallback_rwops, rwops);
+    }
+
+    SDL_RWclose(rwops);
+
+    // copied from C2Di_PostLoadSheet
+    if(!sourceImage->t3x)
+    {
+        free(sourceImage);
+        sourceImage = nullptr;
+    }
+    else
+    {
+        // Configure transparent border around texture
+        sourceImage->tex.border = 0;
+        C3D_TexSetWrap(&sourceImage->tex, GPU_CLAMP_TO_BORDER, GPU_CLAMP_TO_BORDER);
     }
 
     return sourceImage;
