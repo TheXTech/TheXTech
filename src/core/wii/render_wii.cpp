@@ -180,13 +180,15 @@ FIBITMAP* robust_FILoad(const std::string& path, const std::string& maskPath, in
     if(path.empty())
         return nullptr;
 
-    // this is wasteful, but it lets us diagnose memory issue vs other issues
-    FREE_IMAGE_FORMAT formato = FreeImage_GetFileType(path.c_str(), 0);
+    SDL_RWops *handle = Files::open_file(path, "rb");
+
+    FreeImageIO io;
+    GraphicsHelps::SetRWopsIO(&io);
+    FREE_IMAGE_FORMAT formato = FreeImage_GetFileTypeFromHandle(&io, (fi_handle)handle);
+    SDL_RWclose(handle);
 
     if(formato == FIF_UNKNOWN)
-    {
         return nullptr;
-    }
 
     FIBITMAP* sourceImage = GraphicsHelps::loadImage(path);
 
