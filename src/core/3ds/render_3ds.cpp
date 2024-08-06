@@ -63,7 +63,7 @@ extern void SetDefaultIO(FreeImageIO *io);
 // used for crash prevention
 extern u32 gpuCmdBufOffset, gpuCmdBufSize;
 
-// u32 __ctru_linear_heap_size = (32 << 20); // 32MB
+u32 __ctru_linear_heap_size = (28 << 20); // 28MB
 
 // FIXME: this might change in the future -- try to upstream a callback-based loader
 struct C2D_SpriteSheet_s
