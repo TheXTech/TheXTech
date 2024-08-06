@@ -239,16 +239,16 @@ FIBITMAP* robust_FILoad(const std::string& path, int target_w)
         return nullptr;
     }
 
-    FILE *handle = Files::utf8_fopen(path.c_str(), "rb");
+    SDL_RWops *handle = Files::open_file(path, "rb");
 
     FreeImageIO io;
-    SetDefaultIO(&io);
+    GraphicsHelps::SetRWopsIO(&io);
     FREE_IMAGE_FORMAT formato = FreeImage_GetFileTypeFromHandle(&io, (fi_handle)handle);
 
     if(formato == FIF_UNKNOWN)
     {
         pLogWarning("FreeImageLite failed to load image due to unknown format");
-        fclose(handle);
+        SDL_RWclose(handle);
         return nullptr;
     }
 
@@ -261,14 +261,14 @@ FIBITMAP* robust_FILoad(const std::string& path, int target_w)
 
         if(!rawImage)
         {
-            fclose(handle);
+            SDL_RWclose(handle);
             return nullptr;
         }
 
         pLogDebug("Loaded successfully!");
     }
 
-    fclose(handle);
+    SDL_RWclose(handle);
 
     int32_t w = static_cast<int32_t>(FreeImage_GetWidth(rawImage));
     int32_t h = static_cast<int32_t>(FreeImage_GetHeight(rawImage));
