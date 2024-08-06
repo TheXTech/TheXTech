@@ -143,6 +143,20 @@ void Files::Data::init_from_mem(const unsigned char* data, size_t size)
     length = static_cast<long long int>(size);
 }
 
+void* Files::Data::disown()
+{
+    if(!free_me)
+        return nullptr;
+
+    void* ret = const_cast<uint8_t*>(data);
+
+    data = nullptr;
+    length = -1;
+    free_me = false;
+
+    return ret;
+}
+
 FILE *Files::utf8_fopen(const char *filePath, const char *modes)
 {
 #ifndef _WIN32

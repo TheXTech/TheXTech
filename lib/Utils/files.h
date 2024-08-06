@@ -49,6 +49,9 @@ public:
 
         void init_from_mem(const unsigned char* data, size_t size);
 
+        // if the buffer is malloc-allocated, disowns it and allows the client to take management of it
+        [[nodiscard]] void* disown();
+
         inline bool valid() const
         {
             return length >= 0;
