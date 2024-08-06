@@ -63,6 +63,8 @@ extern void SetDefaultIO(FreeImageIO *io);
 // used for crash prevention
 extern u32 gpuCmdBufOffset, gpuCmdBufSize;
 
+// u32 __ctru_linear_heap_size = (32 << 20); // 32MB
+
 // FIXME: this might change in the future -- try to upstream a callback-based loader
 struct C2D_SpriteSheet_s
 {
@@ -341,7 +343,7 @@ static C2D_Image s_RawToSwizzledRGBA(const uint8_t* src, uint32_t wsrc, uint32_t
 
     if(!C3D_TexInit(img.tex, wtex, htex, GPU_RGBA8))
     {
-        pLogDebug("Triggering free texture memory due to failed texture load (%u bytes free)", (unsigned)linearSpaceFree());
+        pLogDebug("Triggering free texture memory due to failed PNG/GIF load (%u bytes free)", (unsigned)linearSpaceFree());
         minport_freeTextureMemory();
 
         if(!C3D_TexInit(img.tex, wtex, htex, GPU_RGBA8))
@@ -524,6 +526,8 @@ bool init()
     s_render_inited = true;
 
     updateViewport();
+
+    pLogInfo("Initialized XRender with %u bytes free", (unsigned)linearSpaceFree());
 
     return true;
 }
@@ -990,6 +994,8 @@ void lazyLoadPicture(StdPicture_Sub& target, const std::string& path, int scaleF
             target.h = tSize.h() * scaleFactor;
         }
     }
+
+    // pLogDebug("Successfully loaded %s", target.l.path.c_str());
 }
 
 static ssize_t s_decompressCallback_rwops(void *userdata, void *buffer, size_t size)
@@ -1019,7 +1025,10 @@ static C2D_SpriteSheet s_tryHardToLoadC2D_SpriteSheet(const char* path)
     if(!sourceImage->t3x)
     {
         if(linearSpaceFree() < 15000000)
+        {
+            pLogDebug("Triggering free texture memory due to failed texture load (%u bytes free)", (unsigned)linearSpaceFree());
             minport_freeTextureMemory();
+        }
 
         SDL_RWseek(rwops, 0, RW_SEEK_SET);
 
