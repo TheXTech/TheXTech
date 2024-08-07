@@ -31,6 +31,7 @@
 #include <AppPath/app_path.h>
 #include <DirManager/dirman.h>
 #include <Utils/files.h>
+#include <Archives/archives.h>
 #include <PGE_File_Formats/file_formats.h>
 #include <Integrator/integrator.h>
 
@@ -414,6 +415,11 @@ void FindWorlds()
             DirMan episodes(worldsRoot.path);
             episodes.getListOfFolders(dirs);
             SDL_AtomicAdd(&loadingProgrssMax, (int)dirs.size());
+            if(!Archives::has_prefix(worldsRoot.path))
+            {
+                episodes.getListOfFiles(dirs);
+                SDL_AtomicAdd(&loadingProgrssMax, (int)dirs.size());
+            }
         }
     }
 #endif
@@ -443,6 +449,30 @@ void FindWorlds()
 #ifndef PGE_NO_THREADING
             SDL_AtomicAdd(&loadingProgrss, 1);
 #endif
+        }
+
+        if(!Archives::has_prefix(worldsRoot.path))
+        {
+            episodes.getListOfFiles(dirs);
+
+            for(const auto &dir : dirs)
+            {
+                std::string epDir = "@" + worldsRoot.path + dir + ":/";
+                DirMan episode(epDir);
+                episode.getListOfFiles(files, {".wld", ".wldx"});
+
+                for(std::string &fName : files)
+                    s_LoadSingleWorld(epDir, fName, head, tr, false);
+
+#ifdef THEXTECH_PRELOAD_LEVELS
+                if(LoadingInProcess)
+                    UpdateLoad();
+#endif
+
+#ifndef PGE_NO_THREADING
+                SDL_AtomicAdd(&loadingProgrss, 1);
+#endif
+            }
         }
     }
 

@@ -34,6 +34,7 @@
 
 #include <Logger/logger.h>
 #include <Utils/files.h>
+#include <Archives/archives.h>
 #include <AppPath/app_path.h>
 #include <Integrator/integrator.h>
 #include <PGE_File_Formats/file_formats.h>
@@ -204,6 +205,40 @@ static std::string findIntroLevel()
     pLogDebug("Selected intro level to start: %s", selected.c_str());
 
     return selected;
+}
+
+// mount an archive used in an episode (or level)'s path
+static std::string s_prepare_episode_path(const std::string& path)
+{
+    std::string target_path = path;
+
+    // parse and mount assets if possible
+    if(target_path[0] == '@')
+    {
+        // mount target, then replace path
+        auto archive_end = target_path.begin();
+        // don't check for path end until after the first slash
+        while(archive_end != target_path.end() && *archive_end != '/' && *archive_end != '\\')
+            ++archive_end;
+        while(archive_end != target_path.end() && *archive_end != ':')
+            ++archive_end;
+
+        if(archive_end != target_path.end())
+        {
+            *archive_end = '\0';
+
+            if(Archives::mount_episode(target_path.c_str() + 1))
+            {
+                target_path.erase(target_path.begin() + 2, archive_end + 1);
+                target_path[0] = ':';
+                target_path[1] = 'e';
+            }
+            else
+                *archive_end = ':';
+        }
+    }
+
+    return target_path;
 }
 
 // expand the section vertically if the top 8px of the level are empty
@@ -1132,6 +1167,8 @@ int GameMain(const CmdLineSetup_t &setup)
                     levelPath = SelectWorld[selWorld].WorldPath + GoToLevel;
                     GoToLevel.clear();
                 }
+
+                levelPath = s_prepare_episode_path(levelPath);
 
                 if(!OpenLevel(levelPath))
                 {
@@ -2327,6 +2364,8 @@ void StartEpisode()
 
     ClearGame();
     FontManager::clearAllCustomFonts();
+    UnloadCustomSound();
+    Archives::unmount_episode();
 
     std::string wPath = SelectWorld[selWorld].WorldPath + SelectWorld[selWorld].WorldFile;
 
@@ -2340,6 +2379,8 @@ void StartEpisode()
         g_recentWorld2p = wPath;
         SaveConfig();
     }
+
+    wPath = s_prepare_episode_path(wPath);
 
     OpenWorld(wPath);
 
@@ -2394,6 +2435,8 @@ void StartEpisode()
 
         std::string levelName = (FileRecentSubHubLevel.empty() ? StartLevel : FileRecentSubHubLevel);
         std::string levelPath = SelectWorld[selWorld].WorldPath + levelName;
+
+        levelPath = s_prepare_episode_path(levelPath);
 
         if(!OpenLevel(levelPath))
         {
