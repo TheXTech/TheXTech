@@ -372,15 +372,18 @@ void FindWorlds()
     SelectWorldEditable.push_back(SelectWorld_t()); // Dummy entry
 
 #ifndef PGE_NO_THREADING
-    SDL_AtomicSet(&loadingProgrss, 0);
-    SDL_AtomicSet(&loadingProgrssMax, 0);
-
-    for(const auto &worldsRoot : worldRoots)
+    if(SDL_AtomicGet(&loading))
     {
-        std::vector<std::string> dirs;
-        DirMan episodes(worldsRoot.path);
-        episodes.getListOfFolders(dirs);
-        SDL_AtomicAdd(&loadingProgrssMax, (int)dirs.size());
+        SDL_AtomicSet(&loadingProgrss, 0);
+        SDL_AtomicSet(&loadingProgrssMax, 0);
+
+        for(const auto &worldsRoot : worldRoots)
+        {
+            std::vector<std::string> dirs;
+            DirMan episodes(worldsRoot.path);
+            episodes.getListOfFolders(dirs);
+            SDL_AtomicAdd(&loadingProgrssMax, (int)dirs.size());
+        }
     }
 #endif
 
@@ -392,7 +395,7 @@ void FindWorlds()
         std::vector<std::string> files;
         episodes.getListOfFolders(dirs);
 
-        for(auto &dir : dirs)
+        for(const auto &dir : dirs)
         {
             std::string epDir = worldsRoot.path + dir + "/";
             DirMan episode(epDir);
@@ -543,15 +546,18 @@ void FindLevels()
     LevelData head;
 
 #ifndef PGE_NO_THREADING
-    SDL_AtomicSet(&loadingProgrss, 0);
-    SDL_AtomicSet(&loadingProgrssMax, 0);
-
-    for(const auto &battleRoot : battleRoots)
+    if(SDL_AtomicGet(&loading))
     {
-        std::vector<std::string> files;
-        DirMan battleLvls(battleRoot.path);
-        battleLvls.getListOfFiles(files, {".lvl", ".lvlx"});
-        SDL_AtomicAdd(&loadingProgrssMax, (int)files.size());
+        SDL_AtomicSet(&loadingProgrss, 0);
+        SDL_AtomicSet(&loadingProgrssMax, 0);
+
+        for(const auto &battleRoot : battleRoots)
+        {
+            std::vector<std::string> files;
+            DirMan battleLvls(battleRoot.path);
+            battleLvls.getListOfFiles(files, {".lvl", ".lvlx"});
+            SDL_AtomicAdd(&loadingProgrssMax, (int)files.size());
+        }
     }
 #endif
 
