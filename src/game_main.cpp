@@ -2108,6 +2108,8 @@ void StartEpisode()
     for(int i = (int)Controls::g_InputMethods.size() - 1; i >= numPlayers; i--)
         Controls::DeleteInputMethodSlot(i);
 
+    // (for now)
+    l_screen->player_count = numPlayers;
     ConnectScreen::SaveChars();
 
     numStars = 0;

@@ -90,30 +90,30 @@ public:
         for(int c = 0; c < numCharacters; c++)
             char_present[c] = false;
 
-        max_players = numPlayers;
+        max_players = l_screen->player_count;
         dead_count = 0;
     }
 
     void mark_present()
     {
-        for(int A = 1; A <= numPlayers; A++)
+        for(int p = 0; p < l_screen->player_count; p++)
         {
-            int c = Player[A].Character - 1;
+            int c = Player[l_screen->players[p]].Character - 1;
 
             if(0 <= c && c < numCharacters)
                 char_present[c] = true;
         }
 
-        if(max_players < numPlayers)
-            max_players = numPlayers;
+        if(max_players < l_screen->player_count)
+            max_players = l_screen->player_count;
     }
 
     // checks if the active players' characters have been changed by gameplay logic (not drop/add)
     bool chars_changed()
     {
-        for(int A = 1; A <= numPlayers; A++)
+        for(int p = 0; p < l_screen->player_count; p++)
         {
-            int c = Player[A].Character - 1;
+            int c = Player[l_screen->players[p]].Character - 1;
 
             if(0 <= c && c < numCharacters)
             {
@@ -285,14 +285,14 @@ static inline bool IsMenu()
 static inline bool ControlsMenu_ShowDrop(int p)
 {
     // don't allow dropping below required player count
-    if(s_context == Context::DropAdd && numPlayers <= s_minPlayers)
+    if(s_context == Context::DropAdd && l_screen->player_count <= s_minPlayers)
         return false;
 
     // never show drop icon at main menu
     if(s_context == Context::MainMenu)
         return false;
 
-    int plr_A = p + 1;
+    int plr_A = l_screen->players[p];
 
     // check that there is a different living player
     for(int B = 1; B <= numPlayers; B++)
@@ -422,7 +422,7 @@ void LegacyMenu_Start()
 void DropAdd_Start()
 {
     if(BattleMode)
-        s_minPlayers = numPlayers;
+        s_minPlayers = l_screen->player_count;
     else
         s_minPlayers = 1;
 
@@ -474,14 +474,17 @@ void PlayerBox::Init()
 {
     int p = CalcIndex();
 
-    if(p < (int)Controls::g_InputMethods.size() && Controls::g_InputMethods[p])
+    if(p < (int)Controls::g_InputMethods.size() && Controls::g_InputMethods[p]
+            && (s_context != Context::DropAdd || p < l_screen->player_count))
+    {
         m_state = PlayerState::SelectChar;
+    }
     else
         m_state = PlayerState::Disconnected;
 
-    if(s_context == Context::DropAdd)
+    if(s_context == Context::DropAdd && p < l_screen->player_count)
     {
-        l_screen->charSelect[p] = Player[p + 1].Character;
+        l_screen->charSelect[p] = Player[l_screen->players[p]].Character;
     }
     else
     {
@@ -604,12 +607,12 @@ static void Player_Remove(int p)
     s_players[maxLocalPlayers - 1] = PlayerBox();
 
     // in drop-add, remove the Player officially in main game engine
-    if(p + 1 <= numPlayers && s_context == Context::DropAdd)
+    if(p < l_screen->player_count && s_context == Context::DropAdd)
     {
-        if((Player[p + 1].Dead || Player[p + 1].TimeToLive > 0) && Player[p + 1].Effect != PLREFF_COOP_WINGS)
+        if((Player[l_screen->players[p]].Dead || Player[l_screen->players[p]].TimeToLive > 0) && Player[l_screen->players[p]].Effect != PLREFF_COOP_WINGS)
             s_char_info.dead_count++;
 
-        DropPlayer(p + 1);
+        DropPlayer(l_screen->players[p]);
     }
 }
 
@@ -656,19 +659,19 @@ void PlayerBox::UpdatePlayer()
     int p = CalcIndex();
 
     // if initialized, then update character
-    if(p + 1 <= numPlayers)
+    if(p < l_screen->player_count)
     {
-        if(l_screen->charSelect[p] != Player[p + 1].Character)
-            SwapCharacter(p + 1, l_screen->charSelect[p]);
+        if(l_screen->charSelect[p] != Player[l_screen->players[p]].Character)
+            SwapCharacter(l_screen->players[p], l_screen->charSelect[p]);
     }
     // otherwise, add new player!
     else
     {
         // swap p with the first non-existent player slot
-        Player_Swap(numPlayers, p);
+        Player_Swap(l_screen->player_count, p);
 
-        // AddPlayer increments numPlayers by 1
-        AddPlayer(l_screen->charSelect[numPlayers]);
+        // after AddPlayer, numPlayers is always the new player
+        AddPlayer(l_screen->charSelect[l_screen->player_count]);
 
         // add as dead if dead player was dropped in this level
         if(s_char_info.dead_count > 0)
@@ -885,6 +888,10 @@ bool PlayerBox::Do()
         {
             if(CheckDone())
             {
+                // clean up charSelect fields
+                for(int p = (int)Controls::g_InputMethods.size(); p < maxLocalPlayers; p++)
+                    l_screen->charSelect[p] = 0;
+
                 do_sentinel.active = true;
                 return true;
             }
@@ -1282,7 +1289,7 @@ bool PlayerBox::DrawChar(int x, int w, int y, int h, bool show_name)
     int p = CalcIndex();
 
     // player hasn't been added yet
-    bool inactive = m_state == PlayerState::Disconnected && (IsMenu() || p >= numPlayers);
+    bool inactive = m_state == PlayerState::Disconnected && (IsMenu() || p >= l_screen->player_count);
     bool show_inactive = inactive && p >= s_minPlayers;
 
     // alpha for most uses
@@ -1556,7 +1563,7 @@ int PlayerBox::Mouse_Render(bool render, int x, int y, int w, int h)
     int total_height = h - 12;
 
     // not-yet-added player
-    bool inactive = m_state == PlayerState::Disconnected && (s_context == Context::MainMenu || p >= numPlayers);
+    bool inactive = m_state == PlayerState::Disconnected && (s_context == Context::MainMenu || p >= l_screen->player_count);
     bool show_inactive = inactive && p >= s_minPlayers;
 
     if(inactive)
@@ -2087,7 +2094,7 @@ int PlayerBox::Logic()
         else if(s_context == Context::DropAdd)
         {
             // this is an Add situation
-            if(p >= numPlayers)
+            if(p >= l_screen->player_count)
             {
                 m_menu_item = 0;
                 l_screen->charSelect[p] = s_recent_char[p];
