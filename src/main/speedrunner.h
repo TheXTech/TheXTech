@@ -36,7 +36,7 @@ enum
 
 void speedRun_tick();
 
-void speedRun_syncControlKeys(int plr, const Controls_t &keys);
+void speedRun_syncControlKeys(int l_player_i, const Controls_t &keys);
 
 void speedRun_loadStats();
 void speedRun_saveStats();
@@ -49,8 +49,10 @@ void speedRun_triggerLeave();
 
 void speedRun_bossDeadEvent();
 
-void RenderPowerInfo(int player, int bx, int by, int bw, int bh, uint8_t alpha, const XPower::StatusInfo* status);
-void RenderControls(int player, int x, int y, int w, int h, bool missing, uint8_t alpha, bool connect_screen = false);
+void RenderPowerInfo(int l_player_i, int bx, int by, int bw, int bh, uint8_t alpha, const XPower::StatusInfo* status);
+
+// l_player_i is an index into the local screen's player array, not a global player index anymore.
+void RenderControls(int l_player_i, int x, int y, int w, int h, bool missing, uint8_t alpha, bool connect_screen = false);
 void RenderControls(const Controls_t& controls, int x, int y, int w, int h, bool missing, uint8_t alpha);
 
 enum
@@ -60,7 +62,8 @@ enum
     SPEEDRUN_ALIGN_RIGHT,
 };
 
-void speedRun_renderControls(int player, int screenZ = -1, int align = SPEEDRUN_ALIGN_AUTO);
+// player is an index into the local screen's player array, not a global player index
+void speedRun_renderControls(int l_player_i, int screenZ = -1, int align = SPEEDRUN_ALIGN_AUTO);
 void speedRun_renderTimer();
 
 #endif // SPEEDRUNNER_H

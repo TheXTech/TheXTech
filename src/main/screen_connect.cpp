@@ -1810,7 +1810,7 @@ int PlayerBox::Mouse_Render(bool render, int x, int y, int w, int h)
             if(inactive)
                 speedRun_syncControlKeys(p, Controls_t());
 
-            RenderControls(p + 1, controls_x, controls_y, 76, 30, !input_method, 255, true);
+            RenderControls(p, controls_x, controls_y, 76, 30, !input_method, 255, true);
         }
     }
 

@@ -1224,17 +1224,17 @@ void RumbleAllPlayers(int ms, float strength)
 }
 
 
-StatusInfo GetStatus(int player)
+StatusInfo GetStatus(int l_player_i)
 {
     // return something blank if player doesn't exist
-    if(player < 1 || player >= (int)g_InputMethods.size() + 1 || g_InputMethods[player - 1] == nullptr)
+    if(l_player_i < 0 || l_player_i >= (int)g_InputMethods.size() || g_InputMethods[l_player_i] == nullptr)
         return StatusInfo();
 
-    // return something blank if player doesn't want to show status
-    if(!g_InputMethods[player - 1]->Profile || !g_InputMethods[player - 1]->Profile->m_showPowerStatus)
+    // return something blank if l_player_i doesn't want to show status
+    if(!g_InputMethods[l_player_i]->Profile || !g_InputMethods[l_player_i]->Profile->m_showPowerStatus)
         return StatusInfo();
 
-    return g_InputMethods[player - 1]->GetStatus();
+    return g_InputMethods[l_player_i]->GetStatus();
 }
 
 

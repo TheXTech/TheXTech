@@ -684,8 +684,8 @@ void UpdateGraphics2(bool skipRepaint)
 
         XRender::resetViewport();
 
-        for(int plr_i = 0; plr_i < Screens[0].player_count; plr_i++)
-            speedRun_renderControls(Screens[0].players[plr_i], -1, SPEEDRUN_ALIGN_AUTO);
+        for(int plr_i = 0; plr_i < l_screen->player_count; plr_i++)
+            speedRun_renderControls(plr_i, -1, SPEEDRUN_ALIGN_AUTO);
     }
 
     // draw on-screen menus and meta-information

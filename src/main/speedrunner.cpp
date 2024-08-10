@@ -106,7 +106,7 @@ void speedRun_renderTimer()
     s_gamePlayTimer.render();
 }
 
-static void GetControllerColor(int player, XTColor& color, bool* drawLabel = nullptr)
+static void GetControllerColor(int l_player_i, XTColor& color, bool* drawLabel = nullptr)
 {
     color = XTColorF(0.4f, 0.4f, 0.4f);
     if(drawLabel)
@@ -115,7 +115,12 @@ static void GetControllerColor(int player, XTColor& color, bool* drawLabel = nul
     if(GameMenu)
         return;
 
-    if(player < 1 || player > maxLocalPlayers)
+    if(l_player_i < 0 || l_player_i >= l_screen->player_count)
+        return;
+
+    int player = l_screen->players[l_player_i];
+
+    if(player < 1 || player > numPlayers)
         return;
 
     if(numPlayers > 1 && !g_ClonedPlayerMode)
@@ -148,7 +153,7 @@ static void GetControllerColor(int player, XTColor& color, bool* drawLabel = nul
 
 void RenderControls_priv(int player, const Controls_t* controls, int x, int y, int w, int h, bool missing, uint8_t alpha, bool connect_screen)
 {
-    if(!controls && (player < 1 || player > maxLocalPlayers))
+    if(!controls && (player < 0 || player >= maxLocalPlayers))
         return;
 
     uint8_t alphaBtn = missing ? alpha / 2 : alpha;
@@ -159,7 +164,7 @@ void RenderControls_priv(int player, const Controls_t* controls, int x, int y, i
 
     if(!connect_screen)
         GetControllerColor(player, color, &drawLabel);
-    else if(player == 0)
+    else if(player == -1)
         color = XTColorF(0.4f, 0.4f, 0.4f);
 
     XRender::renderRect(x, y, w, h, {0, 0, 0, alpha}, true);//Edge
@@ -173,7 +178,7 @@ void RenderControls_priv(int player, const Controls_t* controls, int x, int y, i
         alphaText *= coord;
     }
 
-    const Controls_t& c = (controls) ? *controls : s_displayControls[player - 1];
+    const Controls_t& c = (controls) ? *controls : s_displayControls[player];
 
     XRender::renderRect(x + 10, y + 12, 6, 6, {32, 32, 32, alphaBtn}, true);//Cender of D-Pad
 
@@ -199,7 +204,7 @@ void RenderControls_priv(int player, const Controls_t* controls, int x, int y, i
     if(!connect_screen && (drawLabel || missing))
     {
         const char* label_fmt = (missing ? "P{0}?" : "P{0}");
-        SuperPrintCenter(fmt::format_ne(label_fmt, player), 3, x + w / 2, y + 2, XTAlpha(alphaText));
+        SuperPrintCenter(fmt::format_ne(label_fmt, player + 1), 3, x + w / 2, y + 2, XTAlpha(alphaText));
     }
     else if(missing)
     {
@@ -214,7 +219,7 @@ void RenderControls(int player, int x, int y, int w, int h, bool missing, uint8_
 
 void RenderControls(const Controls_t& controls, int x, int y, int w, int h, bool missing, uint8_t alpha)
 {
-    return RenderControls_priv(0, &controls, x, y, w, h, missing, alpha, true);
+    return RenderControls_priv(-1, &controls, x, y, w, h, missing, alpha, true);
 }
 
 
@@ -244,7 +249,7 @@ void RenderPowerInfo(int player, int bx, int by, int bw, int bh, uint8_t alpha, 
 
     if(status)
         status_info = *status;
-    else if(player >= 1 && player <= maxLocalPlayers)
+    else if(player >= 0 && player < maxLocalPlayers)
         status_info = Controls::GetStatus(player);
     else
         status_info = XPower::devicePowerStatus();
@@ -342,14 +347,15 @@ void speedRun_renderControls(int player, int screenZ, int align)
     if(GameMenu && (!g_config.show_controllers || MenuMode == MENU_CHARACTER_SELECT_NEW || MenuMode == MENU_CHARACTER_SELECT_NEW_BM))
         return;
 
-    if(player < 1 || player > maxLocalPlayers)
+    // player is an index into the local screen's player array, not a global player index
+    if(player < 0 || player >= maxLocalPlayers)
         return;
 
     if(SingleCoop)
-        player = 1;
+        player = 0;
 
-    const bool player_missing = (player - 1 >= (int)Controls::g_InputMethods.size() || !Controls::g_InputMethods[player - 1]);
-    const bool player_newly_connected = !player_missing && QuickReconnectScreen::g_active && QuickReconnectScreen::g_toast_duration[player - 1];
+    const bool player_missing = (player >= (int)Controls::g_InputMethods.size() || !Controls::g_InputMethods[player]);
+    const bool player_newly_connected = !player_missing && QuickReconnectScreen::g_active && QuickReconnectScreen::g_toast_duration[player];
     XPower::StatusInfo status_info = Controls::GetStatus(player);
 
     // Controller
@@ -387,15 +393,10 @@ void speedRun_renderControls(int player, int screenZ, int align)
     }
     else
     {
-        const Screen_t& plr_screen = ScreenByPlayer(player);
+        const Screen_t& plr_screen = *l_screen;
         num_players = plr_screen.player_count;
 
-        int plr_i = 0;
-        for(; plr_i < plr_screen.player_count; plr_i++)
-        {
-            if(plr_screen.players[plr_i] == player)
-                break;
-        }
+        int plr_i = player;
 
         if(GameMenu)
         {
@@ -462,12 +463,12 @@ void speedRun_renderControls(int player, int screenZ, int align)
 
     if(player_newly_connected)
     {
-        const Controls::InputMethod* input_method = Controls::g_InputMethods[player - 1];
+        const Controls::InputMethod* input_method = Controls::g_InputMethods[player];
 
         const std::string& profile_name = (input_method->Profile ? input_method->Profile->Name : "");
 
         uint8_t alpha = 255;
-        int toast_duration = QuickReconnectScreen::g_toast_duration[player - 1];
+        int toast_duration = QuickReconnectScreen::g_toast_duration[player];
         int time_from_edge = SDL_min(toast_duration, QuickReconnectScreen::MAX_TOAST_DURATION - toast_duration);
 
         if(time_from_edge < 33)

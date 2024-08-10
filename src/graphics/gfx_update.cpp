@@ -3080,12 +3080,12 @@ void UpdateGraphicsScreen(Screen_t& screen)
 
         if(screen.Type == 5 && numScreens == 1)
         {
-            speedRun_renderControls(screen.players[0], Z, SPEEDRUN_ALIGN_LEFT);
-            speedRun_renderControls(screen.players[1], Z, SPEEDRUN_ALIGN_RIGHT);
+            speedRun_renderControls(0, Z, SPEEDRUN_ALIGN_LEFT);
+            speedRun_renderControls(1, Z, SPEEDRUN_ALIGN_RIGHT);
         }
         else if(numScreens >= 2)
         {
-            speedRun_renderControls(plr_Z, Z, SPEEDRUN_ALIGN_AUTO);
+            speedRun_renderControls(vscreen_i, Z, SPEEDRUN_ALIGN_AUTO);
         }
 
         // indicate any small-screen camera features
@@ -3132,7 +3132,7 @@ void UpdateGraphicsScreen(Screen_t& screen)
     if(show_controls_one_vscreen || show_controls_no_vscreen)
     {
         for(int plr_i = 0; plr_i < screen.player_count; plr_i++)
-            speedRun_renderControls(screen.players[plr_i], -1, SPEEDRUN_ALIGN_AUTO);
+            speedRun_renderControls(plr_i, -1, SPEEDRUN_ALIGN_AUTO);
     }
 }
 
