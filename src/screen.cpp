@@ -32,6 +32,8 @@ Screen_t* l_screen = &Screens[0];
 RangeArr<qScreen_t, 0, c_vScreenCount> qScreenLoc;
 RangeArr<vScreen_t, 0, c_vScreenCount> vScreen;
 
+static std::array<uint8_t, maxNetplayPlayers + 1> s_screenIdxByPlayer;
+
 
 int vScreen_t::TargetX() const
 {
@@ -146,10 +148,6 @@ int Screen_t::TargetY() const
 
 void InitScreens()
 {
-    // assign players to main screen
-    for(int p = 0; p < maxLocalPlayers; p++)
-        Screens[0].players[p] = p + 1;
-
     // assign vScreens to screens
     for(int s = 0; s < c_screenCount; s++)
     {
@@ -160,8 +158,31 @@ void InitScreens()
         }
     }
 
-    Screens[0].set_canonical_screen(1);
-    Screens[1].Visible = false;
+    // set canonical screens
+    for(int s = 0; s < maxNetplayClients; s++)
+    {
+        Screens[s].set_canonical_screen(maxNetplayClients + s);
+        Screens[maxNetplayClients + s].Visible = false;
+    }
+
+    // reset screens' players
+    for(int s = 0; s < maxNetplayClients; s++)
+    {
+        Screens[s].players = {};
+        Screens[s].player_count = 0;
+    }
+
+    UpdateScreenPlayers();
+}
+
+void UpdateScreenPlayers()
+{
+    // update canonical screens
+    for(int s = 0; s < maxNetplayClients; s++)
+    {
+        Screens[s].canonical_screen().players = Screens[s].players;
+        Screens[s].canonical_screen().player_count = Screens[s].player_count;
+    }
 
     // assign players to vScreens
     for(int s = 0; s < c_screenCount; s++)
@@ -172,21 +193,66 @@ void InitScreens()
         }
     }
 
-    // set multiplayer prefs
-    for(int s = 0; s < c_screenCount; s++)
+    // update player screen indexes
+    s_screenIdxByPlayer = {};
+    for(int s = 0; s < maxNetplayClients; s++)
     {
-        // TODO: only do this for the locally-owned screen(s)
-        Screens[s].two_screen_pref = g_config.two_screen_mode;
-        Screens[s].four_screen_pref = g_config.four_screen_mode;
+        for(int p = 0; p < Screens[s].player_count; p++)
+        {
+            if(Screens[s].players[p] <= maxNetplayPlayers)
+                s_screenIdxByPlayer[Screens[s].players[p]] = s;
+        }
+    }
+}
+
+void Screens_AssignPlayer(int player, Screen_t& screen)
+{
+    if(screen.player_count >= maxLocalPlayers)
+        return;
+
+    screen.players[screen.player_count] = player;
+    screen.player_count++;
+
+    UpdateScreenPlayers();
+}
+
+void Screens_DropPlayer(int player)
+{
+    // drop player itself
+    for(int s = 0; s < maxNetplayClients; s++)
+    {
+        for(int i = 0; i < Screens[s].player_count; i++)
+        {
+            if(Screens[s].players[i] == player)
+            {
+                // shift other players left
+                for(int j = i; j + 1 < Screens[s].player_count; j++)
+                    Screens[s].players[j] = Screens[s].players[j + 1];
+
+                // reduce player count
+                Screens[s].player_count--;
+            }
+        }
+    }
+
+    // shift all player indices down
+    for(int s = 0; s < maxNetplayClients; s++)
+    {
+        for(int i = 0; i < Screens[s].player_count; i++)
+        {
+            if(Screens[s].players[i] > player)
+                Screens[s].players[i]--;
+        }
     }
 }
 
 // finds the visible Screen that contains a specific player
 int ScreenIdxByPlayer(int player)
 {
-    // FIXME: update this for netplay
-    (void)player;
-    return 0;
+    if(player > maxNetplayPlayers)
+        return 0;
+
+    return s_screenIdxByPlayer[player];
 }
 
 // finds the canonical Screen that contains a specific player
@@ -227,10 +293,16 @@ int vScreenIdxByPlayer_canonical(int player)
 
     Screen_t& screen = ScreenByPlayer_canonical(player);
 
-    bool is_splitscreen = (screen.Type == 1 || screen.Type == 4 || (screen.Type == 5 && screen.vScreen(2).Visible) || screen.Type == 6);
+    bool is_splitscreen = (screen.Type == 1 || screen.Type == 4 || (screen.Type == 5 && screen.vScreen(2).Visible) || screen.Type == 6 || screen.Type == ScreenTypes::Quad);
 
-    if(is_splitscreen && player == screen.players[1])
-        return screen.vScreen_refs[1];
+    if(is_splitscreen)
+    {
+        for(int i = 0; i < screen.player_count; i++)
+        {
+            if(player == screen.players[i])
+                return screen.vScreen_refs[i];
+        }
+    }
 
     return screen.vScreen_refs[0];
 }

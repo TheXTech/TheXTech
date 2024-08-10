@@ -33,11 +33,8 @@
 
 void SetScreenType(Screen_t& screen)
 {
-    // TODO: move this logic elsewhere once multiple screens are supported
-    if(g_ClonedPlayerMode)
-        screen.player_count = 1;
-    else
-        screen.player_count = SDL_min(numPlayers, maxLocalPlayers);
+    if(!screen.is_active())
+        return;
 
     // moved this code from game_main.cpp, but it occured elsewhere also
     //   it was always called before setup screens, now it is a part of setup screens.
@@ -81,6 +78,9 @@ void SetScreenType(Screen_t& screen)
 // Sets up the split lines
 void SetupScreens(Screen_t& screen, bool reset)
 {
+    if(!screen.is_active())
+        return;
+
     SetScreenType(screen);
 
     vScreen_t& vscreen1 = screen.vScreen(1);
@@ -196,6 +196,9 @@ void SetupScreens(bool reset)
 
 void DynamicScreen(Screen_t& screen, bool mute)
 {
+    if(!screen.is_active())
+        return;
+
     int A = 0;
 
     vScreen_t& vscreen1 = screen.vScreen(1);
@@ -468,6 +471,9 @@ void DynamicScreens()
 // NEW: limit vScreens to playable section area and center them on the real screen
 void CenterScreens(Screen_t& screen)
 {
+    if(!screen.is_active())
+        return;
+
     // approximate positions of player screens
     double cX1, cY1, cX2, cY2;
     GetPlayerScreen(screen.canonical_screen().W, screen.canonical_screen().H, Player[screen.players[0]], cX1, cY1);

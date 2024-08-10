@@ -6557,12 +6557,14 @@ void PlayerGone(const int A)
     }
 }
 
-void AddPlayer(int Character)
+void AddPlayer(int Character, Screen_t& screen)
 {
     numPlayers++;
 
+    // add player to screen
+    Screens_AssignPlayer(numPlayers, screen);
+
     Player_t& p = Player[numPlayers];
-    const Screen_t& screen = ScreenByPlayer(numPlayers);
 
     p = Player_t();
     p.Character = Character;
@@ -6676,6 +6678,9 @@ void DropPlayer(const int A)
     }
 
     numPlayers --;
+
+    // remove player from screens
+    Screens_DropPlayer(A);
 
     // the rest only matters during level play
     if(LevelSelect)

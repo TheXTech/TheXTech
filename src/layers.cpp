@@ -470,6 +470,9 @@ void ShowLayer(layerindex_t L, bool NoEffect)
                 {
                     const Screen_t& screen = Screens[screen_i];
 
+                    if(!screen.is_active())
+                        continue;
+
                     if(!screen.is_canonical())
                         continue;
 
@@ -1257,6 +1260,9 @@ void ProcEvent(eventindex_t index, int whichPlayer, bool NoEffect)
                     for(int screen_i = 0; screen_i < c_screenCount; screen_i++)
                     {
                         Screen_t& screen = Screens[screen_i];
+
+                        if(!screen.is_active())
+                            continue;
 
                         // which player on this screen is already in the new section? (used for 2P dynamic)
                         int onscreen_plr = 0;

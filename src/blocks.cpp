@@ -1844,6 +1844,9 @@ void PowBlock()
     {
         Screen_t& screen = Screens[screen_i];
 
+        if(!screen.is_active())
+            continue;
+
         // use modern screen iteration bounds
         if(g_config.allow_multires)
         {

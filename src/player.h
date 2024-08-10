@@ -145,7 +145,7 @@ void KeyholeCheck(const int A, const Location_t& loc);
 
 // main Drop/Add functions
 void DropPlayer(const int A);
-void AddPlayer(int Character);
+void AddPlayer(int Character, Screen_t& screen);
 
 // NEW but, when Die is false and FromBlock is true, identical to hitting character block.
 void SwapCharacter(int A, int Character, bool FromBlock = false);

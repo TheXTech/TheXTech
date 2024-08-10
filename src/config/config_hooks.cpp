@@ -94,16 +94,14 @@ void config_mountdrums_set()
 
 void config_screenmode_set()
 {
-    // TODO: only update the locally-controlled screens for NetPlay
+    l_screen->two_screen_pref = g_config.two_screen_mode;
+    l_screen->four_screen_pref = g_config.four_screen_mode;
 
-    Screens[0].two_screen_pref = g_config.two_screen_mode;
-    Screens[0].four_screen_pref = g_config.four_screen_mode;
-
-    Screens[0].canonical_screen().two_screen_pref = g_config.two_screen_mode;
-    Screens[0].canonical_screen().four_screen_pref = g_config.four_screen_mode;
+    l_screen->canonical_screen().two_screen_pref = g_config.two_screen_mode;
+    l_screen->canonical_screen().four_screen_pref = g_config.four_screen_mode;
 
     SetupScreens();
-    PlayersEnsureNearby(Screens[0]);
+    PlayersEnsureNearby(*l_screen);
 }
 
 void config_audiofx_set()

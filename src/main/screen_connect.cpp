@@ -671,7 +671,7 @@ void PlayerBox::UpdatePlayer()
         Player_Swap(l_screen->player_count, p);
 
         // after AddPlayer, numPlayers is always the new player
-        AddPlayer(l_screen->charSelect[l_screen->player_count]);
+        AddPlayer(l_screen->charSelect[l_screen->player_count], *l_screen);
 
         // add as dead if dead player was dropped in this level
         if(s_char_info.dead_count > 0)

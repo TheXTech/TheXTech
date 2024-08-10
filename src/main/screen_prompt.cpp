@@ -176,9 +176,9 @@ bool Logic()
 
     bool menuDoPress = SharedControls.MenuDo || SharedControls.Pause;
 
-    for(int i = 0; i < maxLocalPlayers; i++)
+    for(int i = 0; i < l_screen->player_count; i++)
     {
-        Controls_t &c = Player[i + 1].Controls;
+        Controls_t &c = Player[l_screen->players[i]].Controls;
 
         menuDoPress |= c.Start || c.Jump;
 
