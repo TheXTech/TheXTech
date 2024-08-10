@@ -5,8 +5,6 @@
 // for maxLocalPlayers
 #include "../global_constants.h"
 
-extern int g_charSelect[maxLocalPlayers];
-
 namespace ConnectScreen
 {
 

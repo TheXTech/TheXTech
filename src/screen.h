@@ -159,6 +159,9 @@ public:
     //! which players belong to the screen (no player may belong to multiple visible screens).
     localarr_t players;
 
+    //! which characters have been requested
+    localarr_t charSelect;
+
     //! how many active players in this screen (excluding cloned-player mode)
     int player_count = 0;
 

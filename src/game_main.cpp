@@ -502,12 +502,12 @@ int GameMain(const CmdLineSetup_t &setup)
                 for(int i = 0; i < numPlayers; i++)
                 {
                     if(testPlayer[i + 1].Character != 0)
-                        g_charSelect[i] = testPlayer[i + 1].Character;
+                        l_screen->charSelect[i] = testPlayer[i + 1].Character;
                     else
-                        g_charSelect[i] = i + 1;
+                        l_screen->charSelect[i] = i + 1;
 
                     // replace blocked characters
-                    if(blockCharacter[g_charSelect[i]])
+                    if(blockCharacter[l_screen->charSelect[i]])
                     {
                         for(int new_char = 1; new_char <= numCharacters; new_char++)
                         {
@@ -519,14 +519,14 @@ int GameMain(const CmdLineSetup_t &setup)
                             int j = 0;
                             for(; j < i; j++)
                             {
-                                if(g_charSelect[j] == new_char)
+                                if(l_screen->charSelect[j] == new_char)
                                     break;
                             }
 
                             // if loop ended naturally, character is unused
                             if(j == i)
                             {
-                                g_charSelect[i] = new_char;
+                                l_screen->charSelect[i] = new_char;
                                 break;
                             }
                         }
@@ -2101,8 +2101,8 @@ void StartEpisode()
 
     for(int i = 0; i < numPlayers; i++)
     {
-        if(g_charSelect[i] != 0)
-            Player[i + 1].Character = g_charSelect[i];
+        if(l_screen->charSelect[i] != 0)
+            Player[i + 1].Character = l_screen->charSelect[i];
     }
 
     for(int i = (int)Controls::g_InputMethods.size() - 1; i >= numPlayers; i--)
@@ -2243,8 +2243,8 @@ void StartBattleMode()
 
     for(int i = 0; i < numPlayers; i++)
     {
-        if(g_charSelect[i] != 0)
-            Player[i + 1].Character = g_charSelect[i];
+        if(l_screen->charSelect[i] != 0)
+            Player[i + 1].Character = l_screen->charSelect[i];
     }
 
     for(int i = (int)Controls::g_InputMethods.size() - 1; i >= numPlayers; i--)
