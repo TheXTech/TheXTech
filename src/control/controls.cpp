@@ -790,15 +790,15 @@ bool Update(bool check_lost_devices)
 
     Controls_t blankControls = Controls_t();
 
-    for(size_t i = 0; i < maxLocalPlayers; i++)
+    for(int i = 0; i < l_screen->player_count; i++)
     {
-        Controls_t& controls = Player[(long)i + 1].Controls;
+        Controls_t& controls = Player[l_screen->players[i]].Controls;
         CursorControls_t& cursor = SharedCursor;
         EditorControls_t& editor = ::EditorControls;
 
         controls = blankControls;
 
-        if(i >= g_InputMethods.size())
+        if(i >= (int)g_InputMethods.size())
             continue;
 
         InputMethod* method = g_InputMethods[i];
@@ -809,7 +809,7 @@ bool Update(bool check_lost_devices)
             continue;
         }
 
-        if(!method->Update((int)i + 1, controls, cursor, editor, g_hotkeysPressed) && check_lost_devices)
+        if(!method->Update(l_screen->players[i], controls, cursor, editor, g_hotkeysPressed) && check_lost_devices)
         {
             okay = false;
             DeleteInputMethod(method);
@@ -847,8 +847,8 @@ bool Update(bool check_lost_devices)
     // sync controls
     Record::Sync();
 
-    for(int i = 0; i < numPlayers && i < maxLocalPlayers; i++)
-        speedRun_syncControlKeys(i, Player[i + 1].Controls);
+    for(int i = 0; i < l_screen->player_count; i++)
+        speedRun_syncControlKeys(i, Player[l_screen->players[i]].Controls);
 
     // resolve invalid states and override players without controls
     For(B, 1, numPlayers)
@@ -919,11 +919,11 @@ bool Update(bool check_lost_devices)
     }
 
     // indicate if some control slots are missing
-    if(((int)g_InputMethods.size() < numPlayers) && !g_ClonedPlayerMode
+    if(((int)g_InputMethods.size() < l_screen->player_count)
        && !SingleCoop && !GameMenu && !Record::replay_file && check_lost_devices)
     {
         // fill with nullptrs
-        while((int)g_InputMethods.size() < numPlayers)
+        while((int)g_InputMethods.size() < l_screen->player_count)
             g_InputMethods.push_back(nullptr);
 
         okay = false;
