@@ -12,6 +12,7 @@ Changelog for 1.3.6.6-dev
 -Fix TheXTech 1.3.6.1 bug where conveyor belts would sometimes not activate correctly (@ds-sloth)
 -Fix TheXTech 1.3.6.1 OpenGL bug where the shadow effect interacted inaccurately with bitmasked textures (@ds-sloth)
 -Fix TheXTech 1.3.6 bug where it was impossible to unpause while holding an item (@ds-sloth, thanks to SimplyMav for the report)
+-Fix TheXTech 1.3.6.1 bug where GIF masks for sizable block 261 were not loaded (@ds-sloth)
 
 Changelog for 1.3.6.5
 -Fix TheXTech 1.3.6 bug where auto movement on the world map was not reset when switching episodes (@ds-sloth)
