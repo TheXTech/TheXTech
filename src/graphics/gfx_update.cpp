@@ -1833,10 +1833,8 @@ void UpdateGraphicsScreen(Screen_t& screen)
 
         // Get a reference to our NPC draw queue.
         // Make sure we are in range.
-        // If we later add more than two screens,
-        // need to change how many NPC draw queues we have.
-        SDL_assert_release((Z - 1 >= 0) && ((Z - 1) < (int)(sizeof(NPC_Draw_Queue) / sizeof(NPC_Draw_Queue_t))));
-        NPC_Draw_Queue_t& NPC_Draw_Queue_p = NPC_Draw_Queue[Z-1];
+        SDL_assert_release((vscreen_i >= 0) && (vscreen_i < (int)(sizeof(NPC_Draw_Queue) / sizeof(NPC_Draw_Queue_t))));
+        NPC_Draw_Queue_t& NPC_Draw_Queue_p = NPC_Draw_Queue[vscreen_i];
 
         // always needed now due to cases where vScreen is smaller than physical screen
         XRender::setViewport(vScreen[Z].TargetX(), vScreen[Z].TargetY(), vScreen[Z].Width, vScreen[Z].Height);
