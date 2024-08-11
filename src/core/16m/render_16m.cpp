@@ -780,6 +780,8 @@ void lazyLoad(StdPicture &target)
     if(!target.inited || !target.l.lazyLoaded || target.d.hasTexture())
         return;
 
+    auto st = SDL_GetMicroTicks();
+
     target.d.attempted_load = true;
     s_texture_bank.insert(&target);
 
@@ -790,6 +792,10 @@ void lazyLoad(StdPicture &target)
         pLogWarning("Permanently failed to load %s", target.l.path.c_str());
         return;
     }
+
+    auto done = SDL_GetMicroTicks();
+
+    pLogDebug("Loaded %s in %lld us", target.l.path.c_str(), (long long)done - (long long)st);
 
     return;
 }

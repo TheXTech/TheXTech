@@ -38,6 +38,7 @@
 #include <Graphics/graphics_funcs.h>
 #include <Logger/logger.h>
 #include <Utils/files.h>
+#include <sdl_proxy/sdl_timer.h>
 #include <SDL2/SDL_rwops.h>
 #include <PGE_File_Formats/file_formats.h>
 
@@ -793,6 +794,8 @@ void lazyLoad(StdPicture& target)
 
     pLogDebug("Loading %s", target.l.path.c_str());
 
+    auto st = SDL_GetMicroTicks();
+
     std::string suppPath;
 
     target.inited = true;
@@ -914,9 +917,11 @@ void lazyLoad(StdPicture& target)
         }
     }
 
-    pLogDebug("Done!");
-
     s_num_textures_loaded++;
+
+    auto done = SDL_GetMicroTicks();
+
+    pLogDebug("Loaded %s in %lld us", target.l.path.c_str(), (long long)done - (long long)st);
 }
 
 void lazyPreLoad(StdPicture& target)
