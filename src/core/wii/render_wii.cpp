@@ -183,6 +183,8 @@ FIBITMAP* robust_FILoad(const std::string& path, const std::string& maskPath, in
         return nullptr;
 
     SDL_RWops *handle = Files::open_file(path, "rb");
+    if(!handle)
+        return nullptr;
 
     FreeImageIO io;
     GraphicsHelps::SetRWopsIO(&io);
