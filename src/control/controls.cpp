@@ -1188,19 +1188,31 @@ void Rumble(int player, int ms, float strength)
     if(GameMenu || GameOutro)
         return;
 
-    if(player < 1 || player > (int)g_InputMethods.size())
+    const Screen_t& screen = ScreenByPlayer(player);
+
+    if(&screen != l_screen)
         return;
 
-    if(!g_InputMethods[player - 1])
+    int l_player_i = 0;
+    while(player != screen.players[l_player_i] && l_player_i < screen.player_count)
+        l_player_i++;
+
+    if(l_player_i == screen.player_count)
         return;
 
-    if(!g_InputMethods[player - 1]->Profile)
+    if(l_player_i > (int)g_InputMethods.size())
         return;
 
-    if(!g_InputMethods[player - 1]->Profile->m_rumbleEnabled)
+    if(!g_InputMethods[l_player_i])
         return;
 
-    g_InputMethods[player - 1]->Rumble(ms, strength);
+    if(!g_InputMethods[l_player_i]->Profile)
+        return;
+
+    if(!g_InputMethods[l_player_i]->Profile->m_rumbleEnabled)
+        return;
+
+    g_InputMethods[l_player_i]->Rumble(ms, strength);
 }
 
 void RumbleAllPlayers(int ms, float strength)
