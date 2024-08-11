@@ -38,6 +38,7 @@
 #include <PGE_File_Formats/file_formats.h>
 
 #include "sdl_proxy/sdl_stdinc.h"
+#include "sdl_proxy/sdl_timer.h"
 
 #include "globals.h"
 #include "config.h"
@@ -1059,6 +1060,8 @@ void lazyLoad(StdPicture& target)
     if(!target.inited || !target.l.lazyLoaded || target.d.hasTexture() || (target.d.last_draw_frame && g_current_frame - target.d.last_draw_frame < g_load_failure_retry_frames))
         return;
 
+    auto st = SDL_GetMicroTicks();
+
     if(!Files::hasSuffix(target.l.path, ".t3x"))
     {
         FIBITMAP* FI_tex = robust_FILoad(target.l.path, target.w);
@@ -1186,6 +1189,10 @@ void lazyLoad(StdPicture& target)
     // 3 is the first mask texture
     if(target.d.texture[3])
         s_num_bitmasks_loaded++;
+
+    auto done = SDL_GetMicroTicks();
+
+    pLogDebug("Loaded %s in %lld us", target.l.path.c_str(), (long long)done - (long long)st);
 
     if(linearSpaceFree() < 4194304)
     {
