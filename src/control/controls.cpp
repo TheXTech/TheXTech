@@ -28,6 +28,7 @@
 #include "../controls.h"
 #include "../main/record.h"
 #include "../main/speedrunner.h"
+#include "message.h"
 
 #include "core/render.h"
 #include "core/window.h"
@@ -82,6 +83,8 @@ static PauseCode s_requestedPause = PauseCode::None;
 HotkeysPressed_t g_hotkeysPressed;
 static HotkeysPressed_t s_hotkeysPressedOld;
 bool g_disallowHotkeys = false;
+
+std::array<Controls_t, maxLocalPlayers> g_RawControls;
 
 std::array<std::string, PlayerControls::Buttons::MAX> PlayerControls::g_button_name_UI;
 std::array<std::string, CursorControls::Buttons::MAX> CursorControls::g_button_name_UI;
@@ -759,6 +762,8 @@ bool ProcessEvent(const SDL_Event* ev)
     return false;
 }
 
+static Controls_t s_last_controls[maxNetplayPlayers + 1];
+
 // 1. Calls the UpdateControlsPre hooks of loaded InputMethodTypes
 //    a. Syncs hardware state as needed
 // 2. Updates Player and Editor controls by calling currently bound InputMethods
@@ -792,34 +797,48 @@ bool Update(bool check_lost_devices)
 
     for(int i = 0; i < l_screen->player_count; i++)
     {
-        Controls_t& controls = Player[l_screen->players[i]].Controls;
+        Controls_t newControls = blankControls;
+
         CursorControls_t& cursor = SharedCursor;
         EditorControls_t& editor = ::EditorControls;
 
-        controls = blankControls;
-
-        if(i >= (int)g_InputMethods.size())
-            continue;
-
-        InputMethod* method = g_InputMethods[i];
-
-        if(!method)
+        if(i < (int)g_InputMethods.size() && g_InputMethods[i])
         {
-            // okay = false;
-            continue;
+            InputMethod* method = g_InputMethods[i];
+
+            if(!method->Update(l_screen->players[i], newControls, cursor, editor, g_hotkeysPressed) && check_lost_devices)
+            {
+                okay = false;
+                DeleteInputMethod(method);
+                // the method pointer is no longer valid
+            }
         }
 
-        if(!method->Update(l_screen->players[i], controls, cursor, editor, g_hotkeysPressed) && check_lost_devices)
-        {
-            okay = false;
-            DeleteInputMethod(method);
-            // the method pointer is no longer valid
-            continue;
-        }
+        // push messages corresponding to controls press / release
+        XMessage::PushControls(i, newControls);
     }
 
     for(InputMethodType* type : g_InputMethodTypes)
         type->UpdateControlsPost();
+
+    // sync any messages
+    XMessage::Tick();
+
+    // update player controls based on message queue
+    XMessage::Message m;
+    while((m = XMessage::PopMessage()))
+    {
+        if(m.type == XMessage::Type::press || m.type == XMessage::Type::release)
+        {
+            if(m.screen >= maxNetplayClients || m.player >= maxLocalPlayers || m.message >= PlayerControls::n_buttons)
+                continue;
+
+            PlayerControls::GetButton(s_last_controls[Screens[m.screen].players[m.player]], m.message) = (m.type == XMessage::Type::press);
+        }
+    }
+
+    for(int A = 1; A <= numPlayers && A <= maxNetplayPlayers; A++)
+        Player[A].Controls = s_last_controls[A];
 
     // check for legacy pause key
     if(g_hotkeysPressed[Hotkeys::Buttons::LegacyPause] != -1)

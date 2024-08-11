@@ -165,6 +165,12 @@ inline bool &GetButton(Controls_t &c, size_t i)
         return c.Start;
     }
 }
+
+inline bool GetButton(const Controls_t &c, size_t i)
+{
+    return GetButton(const_cast<Controls_t&>(c), i);
+}
+
 } // namespace (Controls::)PlayerControls
 
 // utility functions to access information from the CursorControls_t struct
@@ -813,6 +819,9 @@ extern std::vector<InputMethodType *> g_InputMethodTypes;
 extern bool g_renderTouchscreen;
 extern HotkeysPressed_t g_hotkeysPressed;
 extern bool g_disallowHotkeys;
+
+// raw controls values for the current locally-connected players, with no processing. may be publicly accessed only for menu logic
+extern std::array<Controls_t, maxLocalPlayers> g_RawControls;
 
 } // namespace Controls
 

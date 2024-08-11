@@ -794,6 +794,7 @@ set(THEXTECH_SRC
     src/sorting.cpp
     src/screen.cpp
     src/screen_fader.cpp
+    src/message.cpp
     src/std_picture.cpp
     src/npc/npc_hit.cpp
     src/npc/npc_kill.cpp
