@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.5)
 
 if(POLICY CMP0069) # Allow CMAKE_INTERPROCEDURAL_OPTIMIZATION (lto) to be set
     cmake_policy(SET CMP0069 NEW)
+    set(CMAKE_POLICY_DEFAULT_CMP0069 NEW)
 endif()
 
 project(TheXTech LANGUAGES C CXX)
