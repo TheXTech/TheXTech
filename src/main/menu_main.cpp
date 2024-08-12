@@ -569,7 +569,9 @@ void FindLevels()
         for(std::string &fName : files)
         {
             std::string wPath = battleRoot.path + fName;
-            if(FileFormats::OpenLevelFileHeader(wPath, head))
+
+            PGE_FileFormats_misc::RWopsTextInput in(Files::open_file(wPath, "r"), wPath);
+            if(FileFormats::OpenLevelFileHeaderT(in, head))
             {
                 SelectWorld_t w;
                 w.WorldPath = battleRoot.path;
