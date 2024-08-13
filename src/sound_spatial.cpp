@@ -52,6 +52,11 @@ void Sound_ResolveSpatialMod(uint8_t& left, uint8_t& right, int l, int t, int r,
         int64_t x_num = vscreen.Width * vscreen.Width;
         int64_t y_num = vscreen.Height * vscreen.Height;
 
+        if(x_num <= 0)
+            x_num = 1;
+        if(y_num <= 0)
+            y_num = 1;
+
         int64_t l_div = l_dist * l_dist;
         int64_t r_div = r_dist * r_dist;
         int64_t y_div = y_dist * y_dist;
