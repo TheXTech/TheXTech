@@ -1831,11 +1831,17 @@ void EditorScreen::UpdateSectionsScreen(CallMode mode)
         SuperPrintR(mode, g_mainMenu.caseNone, 3, 54, 60);
 
     SuperPrintR(mode, g_editorStrings.levelStartPos, 3, 10, 90);
-    if(UpdateButton(mode, 240, 80 + 4, GFXBlock[622], EditorCursor.SubMode == 4, 0, 0, 32, 32))
+    if(UpdateButton(mode, 240, 80 + 4, GFXBlock[622], (EditorCursor.Mode == OptCursor_t::LVL_PLAYERSTART && EditorCursor.SubMode == 4), 0, 0, 32, 32))
+    {
+        EditorCursor.Mode = OptCursor_t::LVL_PLAYERSTART;
         EditorCursor.SubMode = 4;
+    }
 
-    if(UpdateButton(mode, 280, 80 + 4, GFXBlock[623], EditorCursor.SubMode == 5, 0, 0, 32, 32))
+    if(UpdateButton(mode, 280, 80 + 4, GFXBlock[623], (EditorCursor.Mode == OptCursor_t::LVL_PLAYERSTART && EditorCursor.SubMode == 5), 0, 0, 32, 32))
+    {
+        EditorCursor.Mode = OptCursor_t::LVL_PLAYERSTART;
         EditorCursor.SubMode = 5;
+    }
 
     // section settings
     SuperPrintCenterR(mode, fmt::format_ne(g_editorStrings.phraseSectionIndex, curSection + 1), 3, 320, 166);
@@ -2307,6 +2313,8 @@ void EditorScreen::UpdateSelectListScreen(CallMode mode)
     {
         if(m_special_page == SPECIAL_PAGE_EVENT_SOUND || m_special_page == SPECIAL_PAGE_EVENT_MUSIC || m_special_page == SPECIAL_PAGE_EVENT_BACKGROUND)
             m_special_page = SPECIAL_PAGE_EVENT_SETTINGS;
+        else if(m_special_page == SPECIAL_PAGE_SECTION_MUSIC || m_special_page == SPECIAL_PAGE_SECTION_BACKGROUND)
+            m_special_page = SPECIAL_PAGE_SECTION_SETTINGS;
         else
             m_special_page = SPECIAL_PAGE_NONE;
     }
@@ -5083,9 +5091,12 @@ void EditorScreen::UpdateSelectorBar(CallMode mode, bool select_bar_only)
         || m_special_page == SPECIAL_PAGE_EVENT_CONTROLS || m_special_page == SPECIAL_PAGE_EVENT_SOUND);
     bool in_file = (m_special_page == SPECIAL_PAGE_FILE || m_special_page == SPECIAL_PAGE_FILE_CONFIRM
         || m_special_page == SPECIAL_PAGE_FILE_CONVERT);
+    bool in_section_settings = (m_special_page == SPECIAL_PAGE_SECTION_SETTINGS
+        || m_special_page == SPECIAL_PAGE_SECTION_MUSIC
+        || m_special_page == SPECIAL_PAGE_SECTION_BACKGROUND);
     bool in_world_settings = (m_special_page == SPECIAL_PAGE_WORLD_SETTINGS);
     bool in_leveltest_settings = (m_special_page == SPECIAL_PAGE_EDITOR_SETTINGS || m_special_page == SPECIAL_PAGE_LEVELTEST_HELDNPC || m_special_page == SPECIAL_PAGE_MAGICBLOCK);
-    bool in_excl_special = in_layers || in_events || in_world_settings || in_leveltest_settings || in_file;
+    bool in_excl_special = in_layers || in_events || in_section_settings || in_world_settings || in_leveltest_settings || in_file;
     bool exit_special = false;
 
     bool currently_in;
@@ -5182,14 +5193,15 @@ void EditorScreen::UpdateSelectorBar(CallMode mode, bool select_bar_only)
         }
 
         // level settings
-        currently_in = !in_excl_special && EditorCursor.Mode == OptCursor_t::LVL_SETTINGS;
+        currently_in = (in_section_settings || EditorCursor.Mode == OptCursor_t::LVL_PLAYERSTART);
         if(!MagicHand && UpdateButton(mode, sx+9*40+4, 4, GFXBlock[60], currently_in, 0, 0, 32, 32, g_editorStrings.tooltipSettings.c_str()))
         {
             if(currently_in || !editorScreen.active)
                 swap_screens();
-            EditorCursor.Mode = OptCursor_t::LVL_SETTINGS;
-            if(in_excl_special)
-                exit_special = true;
+            EditorCursor.Mode = OptCursor_t::LVL_SELECT;
+            m_last_mode = OptCursor_t::LVL_SELECT;
+            if(!currently_in)
+                m_special_page = SPECIAL_PAGE_SECTION_SETTINGS;
         }
 
         // layers
@@ -5484,7 +5496,7 @@ void EditorScreen::UpdateEditorScreen(CallMode mode, bool second_screen)
         UpdateWaterScreen(mode);
     else if(EditorCursor.Mode == OptCursor_t::LVL_WARPS)
         UpdateWarpScreen(mode);
-    else if(EditorCursor.Mode == OptCursor_t::LVL_SETTINGS)
+    else if(EditorCursor.Mode == OptCursor_t::LVL_PLAYERSTART || m_special_page == SPECIAL_PAGE_SECTION_SETTINGS)
         UpdateSectionsScreen(mode);
     else if(EditorCursor.Mode == OptCursor_t::WLD_TILES)
         UpdateTileScreen(mode);
