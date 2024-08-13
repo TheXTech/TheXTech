@@ -1401,6 +1401,9 @@ void OpenLevelDataPost()
 
     if(LevelEditor)
     {
+        if(numSections < 21)
+            numSections = 21;
+
         ResetSectionScrolls();
         SetSection(curSection);
     }
