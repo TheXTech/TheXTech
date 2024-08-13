@@ -2445,6 +2445,12 @@ void zTestLevel(bool magicHand, bool interProcess)
         SavedChar[A].Character = A;
     }
 
+    if(numPlayers == 0)
+        numPlayers = editorScreen.num_test_players;
+
+    if(BattleMode && numPlayers < 2)
+        numPlayers = 2;
+
     for(A = 1; A <= numNPCs; A++)
     {
         auto &n = NPC[A];
@@ -2473,18 +2479,13 @@ void zTestLevel(bool magicHand, bool interProcess)
     Lives = 3;
     g_100s = 3;
 
-    if(numPlayers == 0)
-        numPlayers = editorScreen.num_test_players;
-
-    if(BattleMode && numPlayers < 2)
-        numPlayers = 2;
-
     if(Checkpoint.empty()) // Don't reset players when resume at the checkpoint
     {
         if(g_ClonedPlayerMode)
         {
             for(A = 1; A <= numPlayers; A++)
             {
+                Player[A] = Player_t();
                 Player[A].Hearts = 0;
                 Player[A].State = testPlayer[1].State;
                 Player[A].HeldBonus = NPCID_NULL;
@@ -2501,6 +2502,7 @@ void zTestLevel(bool magicHand, bool interProcess)
         {
             for(A = numPlayers; A >= 1; A--)
             {
+                Player[A] = Player_t();
                 Player[A].State = testPlayer[A].State;
                 Player[A].HeldBonus = NPCID_NULL;
                 Player[A].Dead = false;
@@ -2515,6 +2517,15 @@ void zTestLevel(bool magicHand, bool interProcess)
         }
 
         StartWarp = testStartWarp;
+    }
+
+    // assign players to screens
+    InitScreens();
+    for(A = 1; A <= numPlayers; A++)
+    {
+        Screens_AssignPlayer(A, *l_screen);
+        if(g_ClonedPlayerMode)
+            break;
     }
 
     LevelEditor = false;
