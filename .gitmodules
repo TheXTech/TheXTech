@@ -56,3 +56,6 @@
 	path = 3rdparty/luau
 	url = https://github.com/TheXTech/luau.git
 	branch = master
+[submodule "mbediso"]
+	path = 3rdparty/mbediso
+	url = https://github.com/ds-sloth/mbediso/
