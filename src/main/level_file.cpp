@@ -1503,6 +1503,8 @@ void ClearLevel()
     RestoreWorldStrings();
     LevelName.clear();
     IsHubLevel = false;
+    // default file format if level header is missing
+    FileFormat = FileFormats::LVL_PGEX;
     // removed because the same logic is called inside of LoadCustomConfig()
     // ResetCustomConfig();
     SetupPhysics();
