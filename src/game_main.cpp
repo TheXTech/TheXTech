@@ -585,6 +585,11 @@ int GameMain(const CmdLineSetup_t &setup)
             // ScreenType = 0; // set in SetupScreens()
             XEvents::doEvents();
             SetupEditorGraphics(); //Set up the editor graphics
+            InitScreens();
+
+            for(int i = 0; i < maxLocalPlayers; i++)
+                Screens_AssignPlayer(i + 1, *l_screen);
+
             SetupScreens();
             MagicHand = false;
             MouseRelease = false;
