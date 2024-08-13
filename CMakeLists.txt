@@ -607,6 +607,9 @@ if(THEXTECH_ENABLE_LUAU)
     target_link_libraries(A2XT_Int INTERFACE Luau.Compiler Luau.VM)
 endif()
 
+add_subdirectory(3rdparty/mbediso EXCLUDE_FROM_ALL)
+target_link_libraries(A2XT_Int INTERFACE mbediso)
+
 
 target_link_libraries(A2XT_Int INTERFACE ${A2XT_LIBS})
 target_include_directories(A2XT_Int INTERFACE ${A2XT_INCS})
