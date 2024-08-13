@@ -632,6 +632,9 @@ if(NINTENDO_DS AND CALICO_ROOT)
     target_link_libraries(A2XT_Int INTERFACE xtbootstrap)
 endif()
 
+add_subdirectory(3rdparty/mbediso EXCLUDE_FROM_ALL)
+target_link_libraries(A2XT_Int INTERFACE mbediso)
+
 
 target_link_libraries(A2XT_Int INTERFACE ${A2XT_LIBS})
 target_include_directories(A2XT_Int INTERFACE ${A2XT_INCS})
