@@ -154,6 +154,31 @@ int pfrOffY(const StdPicture& tx, const Player_t& p)
     return offY;
 }
 
+using plr_pic_arr = RangeArr<StdPicture, 1, 10>;
+static constexpr std::array<plr_pic_arr*, 5> s_char_tex = {&GFXMario, &GFXLuigi, &GFXPeach, &GFXToad, &GFXLink};
+
+void DrawPlayerRaw(int X, int Y, int Character, int State, int Frame, int Direction)
+{
+    Player_t p;
+    p.Character = Character;
+    p.State = State;
+    p.Frame = Frame;
+    p.Direction = Direction;
+
+    StdPicture& tx = (*s_char_tex[p.Character - 1])[p.State];
+
+    int offX = pfrOffX(tx, p);
+    int offY = pfrOffY(tx, p);
+
+    XRender::renderTexture(X + offX,
+                Y + offY,
+                pfrW(tx, p),
+                pfrH(tx, p),
+                tx,
+                pfrX(tx, p),
+                pfrY(tx, p));
+}
+
 void DrawPlayer(const int A, const int Z, XTColor color)
 {
     DrawPlayer(Player[A], Z, color);
@@ -243,10 +268,7 @@ void DrawPlayer(Player_t &p, const int Z, XTColor color)
             }
             else if(p.Character >= 1 && p.Character <= 5) // draw player
             {
-                using plr_pic_arr = RangeArr<StdPicture, 1, 10>;
-                constexpr std::array<plr_pic_arr*, 5> char_tex = {&GFXMario, &GFXLuigi, &GFXPeach, &GFXToad, &GFXLink};
-
-                StdPicture& tx = (*char_tex[p.Character - 1])[p.State];
+                StdPicture& tx = (*s_char_tex[p.Character - 1])[p.State];
                 int offX = pfrOffX(tx, p);
                 int offY = pfrOffY(tx, p);
 

@@ -238,6 +238,8 @@ int pfrOffY(const StdPicture& tx, const Player_t& p);
  * \param noSetup Avoid player settings re-setup
  */
 void GameThing(int waitms = 0, int fadeSpeed = 0);
+// Draw a player frame onscreen
+void DrawPlayerRaw(int X, int Y, int Character, int State, int Frame, int Direction);
 // Public Sub DrawPlayer(A As Integer, Z As Integer)
 void DrawPlayer(const int A, const int Z, XTColor color = XTColor());
 void DrawPlayer(Player_t &p, const int Z, XTColor color = XTColor());
