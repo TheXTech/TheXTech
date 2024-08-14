@@ -428,7 +428,7 @@ void DrawEditorLevel(int Z)
             }
         }
 
-        else if(e.Mode == OptCursor_t::LVL_SETTINGS) // Player start points
+        else if(e.Mode == OptCursor_t::LVL_PLAYERSTART) // Player start points
         {
             if(e.SubMode == 4 || e.SubMode == 5)
             {

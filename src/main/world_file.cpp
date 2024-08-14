@@ -571,6 +571,8 @@ void ClearWorld(bool quick)
     StartLevel.clear();
     BeatTheGame = false;
     numWorldCredits = 0;
+    // default file format if world header is missing
+    FileFormat = FileFormats::LVL_PGEX;
 
     for(int i = 1; i <= maxWorldCredits; i++)
         WorldCredits[i].clear();

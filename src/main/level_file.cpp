@@ -1401,6 +1401,9 @@ void OpenLevelDataPost()
 
     if(LevelEditor)
     {
+        if(numSections < 21)
+            numSections = 21;
+
         ResetSectionScrolls();
         SetSection(curSection);
     }
@@ -1503,6 +1506,8 @@ void ClearLevel()
     RestoreWorldStrings();
     LevelName.clear();
     IsHubLevel = false;
+    // default file format if level header is missing
+    FileFormat = FileFormats::LVL_PGEX;
     // removed because the same logic is called inside of LoadCustomConfig()
     // ResetCustomConfig();
     SetupPhysics();
