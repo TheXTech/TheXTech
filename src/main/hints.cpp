@@ -38,6 +38,7 @@
 #include "std_picture.h"
 #include "screen.h"
 #include "globals.h"
+#include "player.h"
 #include "npc_id.h"
 #include "npc_traits.h"
 #include "npc/npc_queues.h"
@@ -113,6 +114,14 @@ static void s_draw_rainbow_surf(int x, int y)
     XRender::renderTexture(x + 96 / 2 - tex.w / 2, y + 96 - 34 - 4 - frame_h, tex.w, frame_h, tex, 0, frame_h * frame_idx);
 }
 
+static void s_draw_char5_bombs(int x, int y)
+{
+    DrawPlayerRaw(x + 10, y + 96 - 56, 5, 2, 8, 1);
+
+    StdPicture& tex = GFXNPC[NPCID_BOMB];
+    XRender::renderTexture(x + 96 + 4 - NPCTraits[NPCID_BOMB].WidthGFX, y + 96 - 8 - NPCTraits[NPCID_BOMB].HeightGFX, NPCTraits[NPCID_BOMB].WidthGFX, NPCTraits[NPCID_BOMB].HeightGFX, tex, 0, 0);
+}
+
 static bool s_purple_pet_present()
 {
     for(int A = 1; A <= numPlayers; A++)
@@ -184,12 +193,46 @@ static uint8_t s_rainbow_surf_applies()
     return 0;
 }
 
+static uint8_t s_char5_bombs_applies()
+{
+    if(LevelSelect)
+        return 0;
+
+    bool has_char5 = false;
+
+    for(int A = 1; A <= numPlayers; A++)
+    {
+        if(Player[A].Character == 5)
+        {
+            if(Player[A].Bombs > 0)
+                return 102;
+            else
+            {
+                has_char5 = true;
+                break;
+            }
+        }
+    }
+
+    if(!has_char5)
+        return 0;
+
+    for(NPCRef_t n : NPCQueues::Active.no_change)
+    {
+        if(n->Type == NPCID_BOMB && n->TimeLeft > 2)
+            return 102;
+    }
+
+    return 0;
+}
+
 static const Hint s_hints[] = {
     {"Press to pound downwards!", "pound-key", s_altrun_pound_applies, s_draw_purple_pet_altrun},
     {"Press to pound downwards!", "pound-key", s_down_pound_applies,   s_draw_purple_pet_down},
     {"If you fail, your score will reset.",   "no-lives-new", s_no_lives_new, s_draw_no_lives},
     {"If you fail, the game will end.", "no-lives-old", s_no_lives_old, s_draw_no_lives},
     {"Grab, run, hold down, and let go to surf.", "rainbow-surf", s_rainbow_surf_applies, s_draw_rainbow_surf},
+    {"Press Run to collect and Alt Run to throw.", "char5-bombs", s_char5_bombs_applies, s_draw_char5_bombs},
 };
 
 static constexpr size_t s_hint_count = sizeof(s_hints) / sizeof(Hint);
