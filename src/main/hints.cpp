@@ -122,6 +122,18 @@ static void s_draw_char5_bombs(int x, int y)
     XRender::renderTexture(x + 96 + 4 - NPCTraits[NPCID_BOMB].WidthGFX, y + 96 - 8 - NPCTraits[NPCID_BOMB].HeightGFX, NPCTraits[NPCID_BOMB].WidthGFX, NPCTraits[NPCID_BOMB].HeightGFX, tex, 0, 0);
 }
 
+static void s_draw_red_duck(int x, int y)
+{
+    StdPicture& plant = GFXNPC[NPCID_FIRE_PLANT];
+    XRender::renderTexture(x + 96 - 4 - 32, y + 96 - 8 - NPCTraits[NPCID_FIRE_PLANT].THeight, 32, NPCTraits[NPCID_FIRE_PLANT].THeight, plant, 0, 0);
+
+    StdPicture& fire = GFXNPC[NPCID_PLANT_FIRE];
+    XRender::renderTexture(x + 96 - 56, y + 96 - 56, 32, NPCTraits[NPCID_PLANT_FIRE].THeight, fire, 0, 0);
+
+    StdPicture& boot = GFXNPC[NPCID_RED_BOOT];
+    XRender::renderTexture(x + 8, y + 96 - 8 - 32, 32, 32, boot, 0, 64);
+}
+
 static bool s_purple_pet_present()
 {
     for(int A = 1; A <= numPlayers; A++)
@@ -226,6 +238,20 @@ static uint8_t s_char5_bombs_applies()
     return 0;
 }
 
+static uint8_t s_red_duck_applies()
+{
+    if(LevelSelect)
+        return 0;
+
+    for(int A = 1; A <= numPlayers; A++)
+    {
+        if(Player[A].Mount == 1 && Player[A].MountType == 2)
+            return 104;
+    }
+
+    return 0;
+}
+
 static const Hint s_hints[] = {
     {"Press to pound downwards!", "pound-key", s_altrun_pound_applies, s_draw_purple_pet_altrun},
     {"Press to pound downwards!", "pound-key", s_down_pound_applies,   s_draw_purple_pet_down},
@@ -233,6 +259,7 @@ static const Hint s_hints[] = {
     {"If you fail, the game will end.", "no-lives-old", s_no_lives_old, s_draw_no_lives},
     {"Grab, run, hold down, and let go to surf.", "rainbow-surf", s_rainbow_surf_applies, s_draw_rainbow_surf},
     {"Press Run to collect and Alt Run to throw.", "char5-bombs", s_char5_bombs_applies, s_draw_char5_bombs},
+    {"Duck to block most - but not all - flames!", "red-duck", s_red_duck_applies, s_draw_red_duck},
 };
 
 static constexpr size_t s_hint_count = sizeof(s_hints) / sizeof(Hint);
