@@ -173,11 +173,11 @@ static uint8_t s_no_lives_old()
 static uint8_t s_rainbow_surf_applies()
 {
     if(LevelSelect)
-        return false;
+        return 0;
 
     for(NPCRef_t n : NPCQueues::Active.no_change)
     {
-        if(n->Type == NPCID_FLIPPED_RAINBOW_SHELL)
+        if(n->Type == NPCID_FLIPPED_RAINBOW_SHELL && n->TimeLeft > 2)
             return 107;
     }
 
