@@ -958,7 +958,12 @@ void TouchScreenController::scanTouchDevices()
             auto &d = m_devices[i];
             d.id = SDL_GetTouchDevice(i);
 
-#if !defined(VITA) // || SDL_VERSION_ATLEAST(2, 30, 4) // FIXME: Enable this tweak after SDL2 side will be fixed
+// A reminder to don't forget change the condition after SDL2 gets updated
+#if SDL_VERSION_ATLEAST(2, 30, 7)
+#   error PLEASE CHANGE THE CONDITION FOR SDL2 VERSION TO THE VERSION 2.30.8!
+#endif
+
+#if !defined(VITA) || SDL_VERSION_ATLEAST(2, 30, 6) // FIXME: Enable this tweak after SDL2 side will be fixed
             if(!d.id) // Invalid touch device, will be dropped from the list
             {
                 d.id = -1;
