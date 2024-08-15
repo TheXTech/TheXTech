@@ -87,7 +87,13 @@ body:
     id: cpu
     attributes:
       label: Processor architecture
-      description: Which architecture your processor where you ran the game have?<br/>**Note:** Some platforms do use one single architecture only, for example:<br/>- 3DS and Vita do use ARM32/ARMv7<br/>- Wii and Wii U do use the PPC32<br> - Switch uses ARM64/AARCH64.
+      description: |
+        Which architecture your processor where you ran the game have?
+
+        **Note:** Some platforms do have one single architecture only, for example:<
+        * **3DS** and **Vita** has the ARM32/ARMv7.
+        * **Wii** and **Wii U** has the PPC32.
+        * **Switch** has the ARM64/AARCH64.
       options:
         - [Not specified / I don't know]
         - x86_64 / x64 (64-bit x86)
