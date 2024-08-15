@@ -18,7 +18,7 @@ body:
       label: A type of bug
       description: |
         How you would classify this bug by yourself?
-        * **Natibe bug** - The own bug of TheXTech itself that was never happen in the original SMBX.
+        * **Native bug** - The own bug of TheXTech itself that was never happen in the original SMBX.
         * **Vanilla bug** - The bug of original SMBX that got being inherited by TheXTech during its initial creation.
         * **Compatibility bug** - The deviation of behaviour from the original even with the strict compatibility mode (run the game with `--compat-level smbx13` command-line argument).
 
@@ -87,7 +87,7 @@ body:
     id: cpu
     attributes:
       label: Processor architecture
-      description: Which architecture your processor where you ran the game have?
+      description: Which architecture your processor where you ran the game have?<br/>**Note:** Some platforms do use one single architecture only, for example:<br/>- 3DS and Vita do use ARM32/ARMv7<br/>- Wii and Wii U do use the PPC32<br> - Switch uses ARM64/AARCH64.
       options:
         - [Not specified / I don't know]
         - x86_64 / x64 (64-bit x86)
