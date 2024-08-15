@@ -90,7 +90,7 @@ body:
       description: |
         Which architecture your processor where you ran the game have?
 
-        **Note:** Some platforms do have one single architecture only, for example:<
+        **Note:** Some platforms do have one single architecture only, for example:
         * **3DS** and **Vita** has the ARM32/ARMv7.
         * **Wii** and **Wii U** has the PPC32.
         * **Switch** has the ARM64/AARCH64.
