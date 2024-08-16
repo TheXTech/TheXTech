@@ -77,7 +77,7 @@ struct NPC_Variant_Data_t
         for(i = 1; strings[i] != nullptr; i++)
         {
             if(version < active_below[i]
-                && active_below[i] < active_below[earliest_behavior])
+                && (version >= active_below[earliest_behavior] || active_below[i] < active_below[earliest_behavior]))
             {
                 earliest_behavior = i;
             }
