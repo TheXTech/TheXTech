@@ -939,7 +939,7 @@ bool Update(bool check_lost_devices)
 
     // indicate if some control slots are missing
     if(((int)g_InputMethods.size() < l_screen->player_count)
-       && !SingleCoop && !GameMenu && !Record::replay_file && check_lost_devices)
+       && !SingleCoop && !GameMenu && !LevelEditor && !Record::replay_file && check_lost_devices)
     {
         // fill with nullptrs
         while((int)g_InputMethods.size() < l_screen->player_count)
