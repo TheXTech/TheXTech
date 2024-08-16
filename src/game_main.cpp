@@ -568,6 +568,9 @@ int GameMain(const CmdLineSetup_t &setup)
 
         if(ScreenAssetPack::g_LoopActive)
         {
+            // make sure that controllers can connect properly
+            numPlayers = maxLocalPlayers;
+
             // Run the frame-loop
             runFrameLoop(&ScreenAssetPack::Loop,
                          nullptr,

@@ -629,6 +629,8 @@ void initAll()
     NPC.fill(NPC_t());
 
     InitScreens();
+    for(int i = 0; i < maxLocalPlayers; i++)
+        Screens_AssignPlayer(i + 1, *l_screen);
 }
 
 
