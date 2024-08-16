@@ -255,6 +255,8 @@ void InitMixerX()
     MusicRoot = AppPath + "music/";
     SfxRoot = AppPath + "sound/";
 
+    Mix_SetRWFromFile(Files::open_file);
+
     SDL_AtomicSet(&extSfxBusy, 0);
 
     if(g_mixerLoaded)
