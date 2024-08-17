@@ -3169,6 +3169,8 @@ void MouseMove(float X, float Y, bool /*nCur*/)
     X -= vScreen[A].TargetX();
     Y -= vScreen[A].TargetY();
 
+    X -= XRender::TargetOverscanX;
+
     // translate into layer coordinates to snap to layer's grid
     if(MagicHand && EditorCursor.Layer != LAYER_NONE)
     {
