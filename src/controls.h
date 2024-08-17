@@ -820,6 +820,7 @@ extern bool g_renderTouchscreen;
 extern HotkeysPressed_t g_hotkeysPressed;
 extern bool g_disallowHotkeys;
 
+// FIXME: this should become read-only and be renamed LocalControls, and there should be a separate NetControls (indexed by player) that occurs post XMessage, used by the speedrun controls display.
 // raw controls values for the current locally-connected players, with no processing. may be publicly accessed only for menu logic
 extern std::array<Controls_t, maxLocalPlayers> g_RawControls;
 
