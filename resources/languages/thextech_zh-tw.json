@@ -20,8 +20,8 @@
         },
         "events": {
             "bounds": {
-                "changeAllSectionBoundsToCurrent": "改變所有場景範圍到當前設置嗎？",
-                "changeSectionBoundsToCurrent": "改變場景{0}的範圍到當前設置嗎？",
+                "changeAllSectionBoundsToCurrent": "改變所有場景範圍到當前設定嗎？",
+                "changeSectionBoundsToCurrent": "改變場景{0}的範圍到當前設定嗎？",
                 "shouldEvent": "要使事件{0}"
             },
             "controlsForEventN": "強制按下玩家按鍵：{0}",
@@ -198,7 +198,7 @@
             "noTurnBack": "單向卷軸",
             "offscreenExit": "場景邊緣出口",
             "scroll": "強制卷軸",
-            "setBounds": "設置範圍",
+            "setBounds": "設定範圍",
             "underwater": "水下",
             "vertWrap": "縱向循環"
         },
@@ -233,7 +233,7 @@
             "paths": "路線",
             "scenes": "風景",
             "select": "選擇",
-            "settings": "設置",
+            "settings": "設定",
             "show": "顯示",
             "tiles": "地形",
             "warps": "傳送點",
@@ -319,14 +319,14 @@
             "phraseForceResume": "強制恢復遊戲",
             "phraseHoldStart": "按住開始鍵",
             "phrasePressAButton": "按下一個按鍵",
-            "phraseSetControls": "設置按鍵",
+            "phraseSetControls": "設定按鍵",
             "phraseStartToForceRes": "按開始鍵強制恢復遊戲",
             "phraseStartToResume": "按開始鍵恢復遊戲",
             "phraseTestControls": "測試按鍵",
             "phraseWaitingForInput": "等待玩家加入……",
             "reconnectTitle": "重新連接",
             "splitPressSelect_1": "按選擇鍵",
-            "splitPressSelect_2": "進入按鍵配置",
+            "splitPressSelect_2": "進入按鍵選項設定",
             "wordDisconnect": "斷開",
             "phraseTestProfile": "測試配置"
         },
@@ -350,7 +350,7 @@
             "returnToEditor": "返回編輯器",
             "saveAndContinue": "保存並繼續",
             "saveAndQuit": "保存並退出",
-            "playerSetup": "玩家設置"
+            "playerSetup": "玩家設定"
         },
         "format": {
             "minutesSeconds": "{0}分{1}秒"
@@ -361,7 +361,11 @@
         "hint": {
             "no-lives-old": "如果生命值為0，遊戲將會結束。",
             "no-lives-new": "如果生命值為0，積分將會清零。",
-            "pound-key": "按下該按鍵進行震地！"
+            "pound-key": "按下高亮的按鍵，進行震地！",
+            "char5-bombs": "按下“奔跑”鍵可收集炸彈，按下“第二奔跑”鍵可投擲炸彈。",
+            "red-duck": "當玩家躲避在紅鞋子內，將可以抵擋大多數火焰！",
+            "gray-bricks": "神秘力量可以破壞部分磚塊。",
+            "rainbow-surf": "在拿起彩虹龜殼的時候，按下“下”鍵，開始衝浪吧！"
         }
     },
     "languageName": "繁體中文",
@@ -435,7 +439,7 @@
                 "batteryStatus": "電池狀態",
                 "groundPoundButton": "震地按鍵",
                 "maxPlayers": "玩家上限",
-                "rumble": "Rumble 控制器",
+                "rumble": "Rumble控制器",
                 "textEntryStyle": "文字輸入使用設備"
             },
             "phraseNewProfOldJoy": "新建老式手柄配置",
@@ -538,7 +542,7 @@
         },
         "editor": {
             "errorMissingResources": "抱歉，需要檔案：{0}，才能進入編輯器。",
-            "errorResolution": "抱歉，在當前設置的分辨率下，無法進入編輯器。",
+            "errorResolution": "抱歉，在當前設定的分辨率下，無法進入編輯器。",
             "newWorld": "<新地圖>",
             "promptNewWorldName": "新地圖名稱",
             "battles": "<對戰關卡>"
@@ -564,7 +568,7 @@
             "mainEditor": "編輯器",
             "mainExit": "退出",
             "mainMultiplayerGame": "雙人遊戲",
-            "mainOptions": "設置",
+            "mainOptions": "遊戲選項",
             "mainPlayEpisode": "開始遊戲"
         },
         "options": {
@@ -580,7 +584,215 @@
             },
             "render": "圖形渲染類型: {0}",
             "renderX": "圖形渲染類型: {0} (X)",
-            "renderAuto": "圖形渲染類型：自動選擇 ({0})"
+            "renderAuto": "圖形渲染類型: 自動選擇 ({0})",
+            "advanced": {
+                "scale-down-textures": {
+                    "all-tip": "縮小全部圖片：載入卡頓的機率比“僅點陣2x”低",
+                    "none-tip": "不縮小任何圖片：載入卡頓的機率更低",
+                    "_tooltip": "將圖片縮小一半以釋放內存",
+                    "none": "無",
+                    "_name": "縮小圖片",
+                    "safe": "僅點陣2x",
+                    "safe-tip": "僅點陣2x：如果圖片為點陣2x，將縮小一半",
+                    "all": "全部"
+                },
+                "audio-enable": "啟用聲音",
+                "render": {
+                    "sdl-tip": "使用SDL2，基礎跨平臺渲染器。",
+                    "_name": "圖形渲染類型",
+                    "hw": "自動選擇",
+                    "sw": "軟件渲染器",
+                    "opengl": "OpenGL 3+",
+                    "opengl11": "OpenGL 1.1",
+                    "opengl-tip": "使用新版電腦渲染器，用於最精確的SMBX64模擬，並支持增強視覺效果。",
+                    "opengl11-tip": "使用舊版電腦渲染器，僅用於最精確的SMBX64模擬，不支持增強視覺效果。",
+                    "opengles": "OpenGL ES 2+",
+                    "opengles11": "OpenGL ES 1.1+",
+                    "opengles-tip": "使用新版手機渲染器，用於高精確度的SMBX64模擬，並支持增強視覺效果。",
+                    "opengles11-tip": "使用舊版手機渲染器，僅用於最精確的SMBX64模擬，不支援增強視覺效果。",
+                    "sdl": "SDL2"
+                },
+                "_header": "高階設定",
+                "_tooltip": "有關內部操作的技術性設定選項",
+                "advanced-audio": "音頻選項",
+                "advanced-video": "視頻選項",
+                "log-level": {
+                    "debug": "調試",
+                    "fatal": "異常中止",
+                    "none": "關閉",
+                    "_name": "日誌記錄等級",
+                    "critical": "緊急狀態",
+                    "info": "信息",
+                    "warning": "警告"
+                },
+                "record-gameplay-data": "生成録像",
+                "audio-channels": {
+                    "mono": "單聲道",
+                    "stereo": "立體聲",
+                    "_name": "輸出聲道"
+                },
+                "audio-buffer-size": {
+                    "_name": "緩衝大小",
+                    "_tooltip": "降低未預期的噪音，增加延遲"
+                },
+                "audio-format": {
+                    "_name": "音頻格式",
+                    "_tooltip": "音效卡驅動音頻格式"
+                },
+                "audio-sample-rate": {
+                    "11025": "11025赫茲",
+                    "16000": "16000赫茲",
+                    "22050": "22050赫茲",
+                    "32000": "32000赫茲",
+                    "44100": "44100赫茲",
+                    "48000": "48000赫茲",
+                    "_name": "取樣率"
+                },
+                "choose-assets-on-launch": "啟動程序時，彈出選擇組件介面"
+            },
+            "audio": {
+                "audio-sfx-volume": "聲音音量",
+                "sfx-modern": "播放新增的聲音",
+                "sfx-audio-fx": "迴音效果",
+                "sfx-modern-tip": "播放TheXTech引擎新增的聲音",
+                "sfx-pet-beat": "坐騎節奏",
+                "sfx-spatial-audio": "三維音頻",
+                "sfx-spatial-audio-tip": "減少畫面外環境的音量",
+                "audio-prefs": "偏好設定",
+                "audio-music-volume": "音樂音量",
+                "sfx-pet-beat-tip": "騎上坐騎時，播放特殊節奏",
+                "_header": "音頻選項"
+            },
+            "compatibility": {
+                "features": "新特性",
+                "_header": "地圖微調選項",
+                "_tooltip": "兼容模式或調試模式選項",
+                "bugfixes": "BUG修復",
+                "autocode": "LunaScript代碼",
+                "reset-all": "重置全部"
+            },
+            "episode-options": {
+                "creator-compat": {
+                    "enable": "開啓",
+                    "disable": "關閉",
+                    "_tooltip": "創作者相關的邏輯微調",
+                    "_name": "創作者模式",
+                    "file-only": "僅檔案"
+                },
+                "_header": "地圖選項",
+                "playstyle": {
+                    "_name": "遊戲模式",
+                    "classic": "經典模式",
+                    "classic-tip": "開啟部分遊戲更新",
+                    "modern": "現代模式",
+                    "modern-tip": "開啟全部遊戲更新",
+                    "vanilla-tip": "關閉全部遊戲更新",
+                    "vanilla": "懷舊模式"
+                }
+            },
+            "main": {
+                "two-screen-mode": {
+                    "topbottom": "上下分屏",
+                    "_name": "雙人遊戲畫面模式",
+                    "shared": "同屏",
+                    "smbx": "SMBX",
+                    "split": "左右分屏"
+                },
+                "unlimited-framerate": "禁用鎖幀",
+                "_header": "常規選項",
+                "background-work": "後臺執行",
+                "background-work-tip": "窗口未激活時，可通過手柄遊玩",
+                "four-screen-mode": {
+                    "_name": "四人遊戲畫面模式",
+                    "shared": "同屏",
+                    "split": "分屏"
+                },
+                "frame-skip": "跳幀",
+                "multiplayer": "多人遊戲",
+                "timing": "幀數控制",
+                "discord-rpc": "在Discord中顯示",
+                "language": "語言",
+                "vsync": "垂直同步"
+            },
+            "video": {
+                "battery-status": {
+                    "fullscreen-tip": "全屏遊戲時，顯示電池電量",
+                    "_name": "電池狀態",
+                    "on": "顯示",
+                    "fullscreen": "全屏時顯示",
+                    "low": "僅在低電量時顯示",
+                    "low-tip": "在電池電量低時，顯示電池電量",
+                    "off": "隱藏"
+                },
+                "info-meta": "畫面中元數據信息",
+                "show-episode-title": {
+                    "bottom": "底部",
+                    "off": "隱藏",
+                    "top": "頂部",
+                    "bottom-tip": "在秒錶計時器的上方顯示當前地圖",
+                    "top-tip": "在遊戲畫面大小較大時，在狀態列上方顯示當前地圖",
+                    "_name": "顯示當前地圖"
+                },
+                "show-fails-counter": "顯示失敗次數",
+                "show-playtime-counter": {
+                    "_name": "秒錶計時器",
+                    "off-tip": "僅在速通時顯示秒錶計時器",
+                    "animated": "動態特效",
+                    "_tooltip": "顯示當前地圖和當前關卡的遊玩時間",
+                    "transparent": "開啟（透明）",
+                    "opaque": "開啟（不透明）",
+                    "off": "關閉",
+                    "animated-tip": "過關時，為秒錶計時器新增彩虹特效"
+                },
+                "world-map-stars-show": "大地圖上顯示星星數量",
+                "video-system": "系統選項",
+                "show-screen-shake": "畫面震動",
+                "show-medals-counter": "顯示獎牌數量",
+                "3d-compat-mode": "三維兼容模式",
+                "3d-compat-mode-tip": "在同一個三維平面下繪製所有物件",
+                "world-map-stars-show-tip": "在關卡上方顯示已收集星星數量",
+                "show-fps": "顯示幀數",
+                "show-medals-counter-tip": "當玩家在關卡入口處時，在狀態列上顯示獎牌數量",
+                "show-fails-counter-tip": "顯示當前關卡和當前地圖的失敗次數",
+                "effects": "畫面效果",
+                "enable-inter-level-fade-effect": "過渡效果",
+                "fullscreen": "全屏模式",
+                "display-controllers": "顯示按鍵",
+                "internal-res": {
+                    "nds": "512x384（DS）",
+                    "hd": "1280x720（高清）",
+                    "gba": "480x320（GBA）",
+                    "dynamic": "自適應",
+                    "hello": "768x432（HELLO引擎）",
+                    "3ds": "800x480 (3DS)",
+                    "_name": "畫面大小",
+                    "_tooltip": "設定遊戲畫面大小",
+                    "smbx-wide": "SMBX（寬屏）",
+                    "snes": "512x448（SFC）",
+                    "vga": "640x480（VGA）",
+                    "smbx": "800x600（SMBX）"
+                },
+                "_header": "視頻選項",
+                "info-game": "畫面中游戲信息",
+                "info-run": "畫面中執行時信息",
+                "scale-mode": {
+                    "0_5x": "0.5倍",
+                    "1x": "1倍",
+                    "2x": "2倍",
+                    "_name": "圖像縮放",
+                    "integer": "整數",
+                    "linear": "雙綫性",
+                    "nearest": "最近鄰居",
+                    "full": "完全縮放",
+                    "center": "中心"
+                }
+            },
+            "view-credits": {
+                "_header": "查看製作團隊"
+            },
+            "controls": {
+                "_header": "按鍵選項"
+            }
         },
         "wordBack": "返回",
         "wordHide": "隱藏",

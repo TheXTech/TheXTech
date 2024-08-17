@@ -326,7 +326,7 @@
             "phraseWaitingForInput": "等待玩家加入……",
             "reconnectTitle": "重新连接",
             "splitPressSelect_1": "按选择键",
-            "splitPressSelect_2": "进入按键设置",
+            "splitPressSelect_2": "进入按键选项设置",
             "wordDisconnect": "断开",
             "phraseTestProfile": "测试配置"
         },
@@ -353,18 +353,18 @@
             "returnToEditor": "返回编辑器",
             "saveAndContinue": "保存并继续",
             "saveAndQuit": "保存并退出",
-            "playerSetup": "玩家设置"
+            "playerSetup": "玩家选项"
         },
         "message": {
             "scanningLevels": "扫描关卡中……"
         },
         "hint": {
-            "pound-key": "按下该按键进行震地！",
+            "pound-key": "按下高亮的按键，进行震地！",
             "no-lives-old": "如果生命值为0，游戏将会结束。",
             "no-lives-new": "如果生命值为0，得分将会清零。",
             "rainbow-surf": "在拿起彩虹龟壳的时候，按下“下”键，开始冲浪吧！",
             "char5-bombs": "按下“奔跑”键可收集炸弹，按下“第二奔跑”键可投掷炸弹。",
-            "red-duck": "当玩家躲避在红鞋子内，将可以抵挡大部分的火焰！",
+            "red-duck": "当玩家躲避在红鞋子内，将可以抵挡大多数火焰！",
             "gray-bricks": "神秘力量可以破坏部分砖块。"
         }
     },
@@ -403,7 +403,7 @@
             "controlsNewProfile": "<新建配置>",
             "controlsNotInUse": "（未使用）",
             "controlsReallyDeleteProfile": "是否删除配置？",
-            "controlsTitle": "按键设置",
+            "controlsTitle": "按键选项",
             "cursor": {
                 "down": "鼠标向下移动",
                 "left": "鼠标向左移动",
@@ -568,8 +568,8 @@
             "mainEditor": "编辑器",
             "mainExit": "退出",
             "mainMultiplayerGame": "双人游戏",
-            "mainOptions": "游戏设置",
-            "mainPlayEpisode": "开始游戏"
+            "mainOptions": "游戏选项",
+            "mainPlayEpisode": "选择地图进行游戏"
         },
         "options": {
             "optionsModeFullScreen": "全屏模式",
@@ -596,7 +596,7 @@
                     "_name": "缓冲大小"
                 },
                 "_tooltip": "有关内部操作的技术性设置选项",
-                "advanced-video": "视频设置",
+                "advanced-video": "视频选项",
                 "audio-enable": "启用声音",
                 "audio-format": {
                     "_name": "音频格式",
@@ -626,16 +626,16 @@
                     "_name": "图形渲染类型",
                     "hw": "自动选择",
                     "opengl": "OpenGL 3+",
-                    "opengl-tip": "新版电脑渲染器，用于最精确的SMBX64模拟，且支持视觉效果增强。",
-                    "opengl11-tip": "旧版电脑渲染器，仅用于最精确的SMBX64模拟，无视觉效果增强。",
-                    "opengles-tip": "新版手机渲染器，用于高精确度的SMBX64模拟，且支持视觉效果增强。",
-                    "opengles11-tip": "旧版手机渲染器，仅用于最精确的SMBX64模拟，无视觉效果增强。",
+                    "opengl-tip": "使用新版电脑渲染器，用于最精确的SMBX64模拟，并支持增强视觉效果。",
+                    "opengl11-tip": "使用旧版电脑渲染器，仅用于最精确的SMBX64模拟，不支持增强视觉效果。",
+                    "opengles-tip": "使用新版手机渲染器，用于高精确度的SMBX64模拟，并支持增强视觉效果。",
+                    "opengles11-tip": "使用旧版手机渲染器，仅用于最精确的SMBX64模拟，不支持增强视觉效果。",
                     "sdl": "SDL2",
                     "sw": "软件渲染器",
                     "opengl11": "OpenGL 1.1",
                     "opengles": "OpenGL ES 2+",
                     "opengles11": "OpenGL ES 1.1+",
-                    "sdl-tip": "基础的跨平台渲染器。"
+                    "sdl-tip": "使用SDL2，基础跨平台渲染器。"
                 },
                 "scale-down-textures": {
                     "_name": "缩小图片",
@@ -647,40 +647,40 @@
                     "safe-tip": "仅点阵2x：如果图片为点阵2x，将缩小一半",
                     "_tooltip": "将图片缩小一半以释放内存"
                 },
-                "_header": "高级设置",
-                "advanced-audio": "音频设置"
+                "_header": "高级选项",
+                "advanced-audio": "音频选项"
             },
             "audio": {
-                "_header": "音频设置",
+                "_header": "音频选项",
                 "sfx-audio-fx": "回音效果",
-                "sfx-modern": "使用新增的声音",
-                "sfx-modern-tip": "使用TheXTech引擎新增的声音",
+                "sfx-modern": "播放新增的声音",
+                "sfx-modern-tip": "播放TheXTech引擎新增的声音",
                 "sfx-pet-beat": "坐骑节奏",
                 "sfx-pet-beat-tip": "骑上坐骑时，播放特殊节奏",
-                "sfx-spatial-audio-tip": "减少当前画面外环境的音量",
+                "sfx-spatial-audio-tip": "减少画面外环境的音量",
                 "audio-prefs": "偏好设置",
                 "audio-music-volume": "音乐音量",
                 "audio-sfx-volume": "声音音量",
                 "sfx-spatial-audio": "三维音频"
             },
             "compatibility": {
-                "_header": "地图微调设置",
+                "_header": "地图微调选项",
                 "autocode": "LunaScript代码",
                 "reset-all": "重置全部",
                 "features": "新特性",
-                "_tooltip": "兼容模式或调试模式设置",
+                "_tooltip": "兼容模式或调试模式选项",
                 "bugfixes": "BUG修复"
             },
             "controls": {
-                "_header": "按键设置"
+                "_header": "按键选项"
             },
             "episode-options": {
-                "_header": "地图设置",
+                "_header": "地图选项",
                 "creator-compat": {
                     "_name": "创作者模式",
                     "_tooltip": "创作者相关的逻辑微调",
-                    "disable": "禁用",
-                    "enable": "启用",
+                    "disable": "关闭",
+                    "enable": "开启",
                     "file-only": "仅文件"
                 },
                 "playstyle": {
@@ -688,26 +688,26 @@
                     "classic": "经典模式",
                     "modern": "现代模式",
                     "vanilla": "怀旧模式",
-                    "classic-tip": "启用部分游戏更新",
-                    "modern-tip": "启用全部游戏更新",
-                    "vanilla-tip": "禁用全部游戏更新"
+                    "classic-tip": "开启部分游戏更新",
+                    "modern-tip": "开启全部游戏更新",
+                    "vanilla-tip": "关闭全部游戏更新"
                 }
             },
             "main": {
-                "_header": "常规设置",
+                "_header": "常规选项",
                 "background-work": "后台运行",
                 "background-work-tip": "窗口未激活时，可通过手柄游玩",
                 "four-screen-mode": {
                     "shared": "同屏",
                     "split": "分屏",
-                    "_name": "四人游戏画面方式"
+                    "_name": "四人游戏画面模式"
                 },
                 "frame-skip": "跳帧",
                 "discord-rpc": "在Discord中显示",
                 "multiplayer": "多人游戏",
                 "timing": "帧数控制",
                 "two-screen-mode": {
-                    "_name": "双人游戏画面方式",
+                    "_name": "双人游戏画面模式",
                     "shared": "同屏",
                     "smbx": "SMBX",
                     "topbottom": "上下分屏",
@@ -718,7 +718,7 @@
                 "language": "语言"
             },
             "video": {
-                "_header": "视频设置",
+                "_header": "视频选项",
                 "battery-status": {
                     "fullscreen": "全屏时显示",
                     "fullscreen-tip": "全屏游戏时，显示电池电量",
@@ -761,13 +761,13 @@
                     "_tooltip": "显示当前地图和当前关卡的游玩时间",
                     "animated-tip": "过关时，为秒表计时器添加彩虹特效",
                     "off": "关闭",
-                    "off-tip": "只在速通时显示秒表计时器",
+                    "off-tip": "仅在速通时显示秒表计时器",
                     "opaque": "开启（不透明）",
                     "transparent": "开启（透明）",
                     "_name": "秒表计时器",
                     "animated": "动态特效"
                 },
-                "video-system": "系统设置",
+                "video-system": "系统选项",
                 "show-screen-shake": "画面震动",
                 "world-map-stars-show": "大地图上显示星星数量",
                 "world-map-stars-show-tip": "在关卡上方显示已收集星星数量",
@@ -780,7 +780,7 @@
                     "_name": "图像缩放",
                     "1x": "1倍",
                     "nearest": "最近邻居",
-                    "full": "完整缩放",
+                    "full": "完全缩放",
                     "linear": "双线性"
                 },
                 "3d-compat-mode": "三维兼容模式",
