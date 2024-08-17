@@ -272,36 +272,34 @@ void DrawEditorLevel(int Z)
     }
 
 #ifdef __3DS__
-    XRender::setTargetLayer(0);
+    XRender::setTargetLayer(2);
 #endif
+
     // render section boundary
     if(LevelEditor)
     {
-        if((CommonFrame % 46) > 30 || (CommonFrame % 46) == 0)
+        if(vScreen[Z].X + level[S].X > 0)
         {
-            if(vScreen[Z].X + level[S].X > 0)
-            {
-                XRender::renderRect(0, 0,
-                                   vScreen[Z].X + level[S].X, XRender::TargetH, {0, 0, 0}, true);
-            }
+            XRender::renderRect(0, 0,
+                               vScreen[Z].X + level[S].X, XRender::TargetH, {63, 63, 63, 192}, true);
+        }
 
-            if(XRender::TargetW > level[S].Width + vScreen[Z].X)
-            {
-                XRender::renderRect(level[S].Width + vScreen[Z].X, 0,
-                                   XRender::TargetW - (level[S].Width + vScreen[Z].X), XRender::TargetH, {0, 0, 0}, true);
-            }
+        if(XRender::TargetW > level[S].Width + vScreen[Z].X)
+        {
+            XRender::renderRect(level[S].Width + vScreen[Z].X, 0,
+                               XRender::TargetW - (level[S].Width + vScreen[Z].X), XRender::TargetH, {63, 63, 63, 192}, true);
+        }
 
-            if(vScreen[Z].Y + level[S].Y > 0)
-            {
-                XRender::renderRect(0, 0,
-                                   XRender::TargetW, vScreen[Z].Y + level[S].Y, {0, 0, 0}, true);
-            }
+        if(vScreen[Z].Y + level[S].Y > 0)
+        {
+            XRender::renderRect(vScreen[Z].X + level[S].X, 0,
+                               level[S].Width - level[S].X, vScreen[Z].Y + level[S].Y, {63, 63, 63, 192}, true);
+        }
 
-            if(XRender::TargetH > level[S].Height + vScreen[Z].Y)
-            {
-                XRender::renderRect(0, level[S].Height + vScreen[Z].Y,
-                                   XRender::TargetW, XRender::TargetH - (level[S].Height + vScreen[Z].Y), {0, 0, 0}, true);
-            }
+        if(XRender::TargetH > level[S].Height + vScreen[Z].Y)
+        {
+            XRender::renderRect(vScreen[Z].X + level[S].X, level[S].Height + vScreen[Z].Y,
+                               level[S].Width - level[S].X, XRender::TargetH - (level[S].Height + vScreen[Z].Y), {63, 63, 63, 192}, true);
         }
     }
 

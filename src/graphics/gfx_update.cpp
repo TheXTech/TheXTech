@@ -1859,25 +1859,25 @@ void UpdateGraphicsScreen(Screen_t& screen)
             if(camX + level[S].X > 0)
             {
                 XRender::renderRect(0, 0,
-                                    camX + level[S].X, screen.H, XTColorF(0.2f, 0.2f, 0.2f), true);
+                                    camX + level[S].X - XRender::TargetOverscanX, screen.H, {63, 63, 63}, true);
             }
 
             if(screen.W > level[S].Width + camX)
             {
-                XRender::renderRect(level[S].Width + camX, 0,
-                                    screen.W - (level[S].Width + camX), screen.H, XTColorF(0.2f, 0.2f, 0.2f), true);
+                XRender::renderRect(level[S].Width + camX + XRender::TargetOverscanX, 0,
+                                    screen.W - (level[S].Width + camX), screen.H, {63, 63, 63}, true);
             }
 
             if(camY + level[S].Y > 0)
             {
                 XRender::renderRect(0, 0,
-                                    screen.W, camY + level[S].Y, XTColorF(0.2f, 0.2f, 0.2f), true);
+                                    screen.W, camY + level[S].Y, {63, 63, 63}, true);
             }
 
             if(screen.H > level[S].Height + camY)
             {
                 XRender::renderRect(0, level[S].Height + camY,
-                                    screen.W, screen.H - (level[S].Height + camY), XTColorF(0.2f, 0.2f, 0.2f), true);
+                                    screen.W, screen.H - (level[S].Height + camY), {63, 63, 63}, true);
             }
         }
 
