@@ -553,9 +553,10 @@ bool OpenLevel_PlayerStart(void* userdata, PlayerPoint& p)
         }
 
         // width and height are zero in LVLX
-        if(PlayerStart[A].Width == 0)
+        // (note: PGE-FL sometimes defaults these to SMBX values in PGE-X, but that logic is removed in MDX so the PGEX check here will no longer be necessary)
+        if(PlayerStart[A].Width == 0 || FileFormat == FileFormats::LVL_PGEX)
             PlayerStart[A].Width = Physics.PlayerWidth[A][2];
-        if(PlayerStart[A].Height == 0)
+        if(PlayerStart[A].Height == 0 || FileFormat == FileFormats::LVL_PGEX)
             PlayerStart[A].Height = Physics.PlayerHeight[A][2];
 
         PlayerStart[A].Direction = p.direction;
