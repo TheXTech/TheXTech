@@ -162,7 +162,6 @@ struct LevelLoad
     SaveInfoInit si;
 
     int numPlayerStart = 0;
-    int checkPointId = 0;
 
     layerindex_t layers_finalized = 0;
     eventindex_t events_finalized = 0;
@@ -959,53 +958,6 @@ bool OpenLevel_NPC(void* userdata, LevelNPC& n)
         npc.TimeLeft = 1;
         npc.Active = true;
         npc.JustActivated = 1;
-
-        if(npc.Type == NPCID_CHECKPOINT) // Is a checkpoint
-        {
-            load.checkPointId++;
-            if(g_config.fix_vanilla_checkpoints)
-            {
-                npc.Special = load.checkPointId;
-                npc.DefaultSpecial = int(npc.Special);
-            }
-        }
-        else if(npc.Type == NPCID_STAR_EXIT || npc.Type == NPCID_STAR_COLLECT) // Is a star
-        {
-            bool starFound = false;
-            for(const auto& star : Star)
-            {
-                bool bySection = npc.Variant == 0 && (star.Section == npc.Section || star.Section == -1);
-                bool byId = npc.Variant > 0 && -(star.Section + 100) == (int)npc.Variant;
-                if(star.level == FileNameFull && (bySection || byId))
-                    starFound = true;
-            }
-
-            if(starFound)
-            {
-                npc.Special = 1;
-                npc.DefaultSpecial = 1;
-                if(npc.Type == NPCID_STAR_COLLECT)
-                    npc.Killed = 9;
-            }
-        }
-        else if((npc.Type == NPCID_ITEM_BURIED || npc.Type == NPCID_ITEM_POD ||
-                  npc.Type == NPCID_ITEM_BUBBLE || npc.Type == NPCID_ITEM_THROWER) &&
-                (n.contents == NPCID_STAR_EXIT || n.contents == NPCID_STAR_COLLECT)) // Is a container that has a star inside
-        {
-            bool starFound = false;
-            for(const auto& star : Star)
-            {
-                bool byId = npc.Variant > 0 && -(star.Section + 100) == (int)npc.Variant;
-                if(star.level == FileNameFull && byId)
-                    starFound = true;
-            }
-
-            if(starFound)
-            {
-                if(n.contents == NPCID_STAR_COLLECT)
-                    npc.Killed = 9;
-            }
-        }
     }
 
     // update the level's save info based on the NPC
@@ -1151,6 +1103,7 @@ void OpenLevel_FixLayersEvents(const LevelLoad& load)
 {
     // Everything is loaded.
     // Now we fix the layers and events that got temporary indexes.
+    // We also do some NPC logic that depends on the section boundaries.
     for(int A = 1; A <= numBlock; A++)
     {
         if(Block[A].Layer != LAYER_NONE)
@@ -1171,6 +1124,10 @@ void OpenLevel_FixLayersEvents(const LevelLoad& load)
         if(Background[A].Layer != LAYER_NONE)
             Background[A].Layer = load.final_layer_index[Background[A].Layer];
     }
+
+    // Prepare for NPC logic
+    CalculateSectionOverlaps();
+    int checkPointId = 0;
 
     for(int A = 1; A <= numNPCs; A++)
     {
@@ -1194,6 +1151,57 @@ void OpenLevel_FixLayersEvents(const LevelLoad& load)
 
         CheckSectionNPC(A);
         syncLayers_NPC(A);
+
+
+        // Extra NPC load logic
+        NPC_t& npc = NPC[A];
+
+        if(npc.Type == NPCID_CHECKPOINT) // Is a checkpoint
+        {
+            checkPointId++;
+            if(g_config.fix_vanilla_checkpoints)
+            {
+                npc.Special = checkPointId;
+                npc.DefaultSpecial = int(npc.Special);
+            }
+        }
+        else if(npc.Type == NPCID_STAR_EXIT || npc.Type == NPCID_STAR_COLLECT) // Is a star
+        {
+            bool starFound = false;
+            for(const auto& star : Star)
+            {
+                bool bySection = npc.Variant == 0 && (star.Section == npc.Section || star.Section == -1);
+                bool byId = npc.Variant > 0 && -(star.Section + 100) == (int)npc.Variant;
+                if(star.level == FileNameFull && (bySection || byId))
+                    starFound = true;
+            }
+
+            if(starFound)
+            {
+                npc.Special = 1;
+                npc.DefaultSpecial = 1;
+                if(npc.Type == NPCID_STAR_COLLECT)
+                    npc.Killed = 9;
+            }
+        }
+        else if((npc.Type == NPCID_ITEM_BURIED || npc.Type == NPCID_ITEM_POD ||
+                  npc.Type == NPCID_ITEM_BUBBLE || npc.Type == NPCID_ITEM_THROWER) &&
+                (NPCID(npc.Special) == NPCID_STAR_EXIT || NPCID(npc.Special) == NPCID_STAR_COLLECT)) // Is a container that has a star inside
+        {
+            bool starFound = false;
+            for(const auto& star : Star)
+            {
+                bool byId = npc.Variant > 0 && -(star.Section + 100) == (int)npc.Variant;
+                if(star.level == FileNameFull && byId)
+                    starFound = true;
+            }
+
+            if(starFound)
+            {
+                if(NPCID(npc.Special) == NPCID_STAR_COLLECT)
+                    npc.Killed = 9;
+            }
+        }
     }
 
     for(int A = 1; A <= numWarps; A++)
@@ -1387,7 +1395,6 @@ void OpenLevelDataPost()
     syncLayersTrees_AllBlocks();
     syncLayers_AllBGOs();
 
-    CalculateSectionOverlaps();
     NPC_ConstructCanonicalSet();
 
     // moved the old event/layer loading code to the top
