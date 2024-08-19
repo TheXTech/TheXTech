@@ -6386,7 +6386,7 @@ void PlayersEnsureNearby(const Screen_t& screen)
         const Location_t& pLoc = p.Location;
 
         double p_x = pLoc.X + pLoc.Width / 2;
-        double p_top = (p.Effect == PLREFF_RESPAWN) ? pLoc.Y : p.Effect2;
+        double p_top = (p.Effect == PLREFF_RESPAWN) ? p.Effect2 : pLoc.Y;
         double p_y = p_top + pLoc.Height / 2;
 
         // dead players don't affect camera
@@ -6450,7 +6450,7 @@ void PlayersEnsureNearby(const Screen_t& screen)
 
         if(!p.Dead && p.TimeToLive == 0)
         {
-            double p_top = (p.Effect == PLREFF_RESPAWN) ? pLoc.Y : p.Effect2;
+            double p_top = (p.Effect == PLREFF_RESPAWN) ? p.Effect2 : pLoc.Y;
             double dist = (pLoc.X - cx) * (pLoc.X - cx) + (p_top - cy) * (p_top - cy);
 
             if(closest == 0 || closest_dist > dist)
