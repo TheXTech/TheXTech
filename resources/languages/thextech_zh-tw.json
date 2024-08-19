@@ -665,8 +665,8 @@
             },
             "compatibility": {
                 "features": "新特性",
-                "_header": "地圖微調選項",
-                "_tooltip": "兼容模式或調試模式選項",
+                "_header": "遊戲微調選項",
+                "_tooltip": "兼容模式或調試模式選項，僅對當前遊戲生效",
                 "bugfixes": "BUG修復",
                 "autocode": "LunaScript代碼",
                 "reset-all": "重置全部"

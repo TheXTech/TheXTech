@@ -664,11 +664,11 @@
                 "sfx-spatial-audio": "三维音频"
             },
             "compatibility": {
-                "_header": "地图微调选项",
+                "_header": "游戏微调选项",
                 "autocode": "LunaScript代码",
                 "reset-all": "重置全部",
                 "features": "新特性",
-                "_tooltip": "兼容模式或调试模式选项",
+                "_tooltip": "兼容模式或调试模式选项，仅对当前游戏生效",
                 "bugfixes": "BUG修复"
             },
             "controls": {
