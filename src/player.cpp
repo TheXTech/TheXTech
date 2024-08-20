@@ -3784,7 +3784,7 @@ void SizeCheck(Player_t &p)
 void YoshiEatCode(const int A)
 {
     int B = 0;
-    Location_t tempLocation;
+    // Location_t tempLocation;
     auto &p = Player[A];
 
     if(p.Mount == 3 && !p.Fairy)
