@@ -29,15 +29,21 @@
 
 struct SDL_RWops;
 
+#if defined(__GNUC__) && !defined(__llvm__) && !defined(__INTEL_COMPILER)
+#   define FILES_NODISCARD_ATTR [[nodiscard]]
+#else
+#   define FILES_NODISCARD_ATTR // Nothing!
+#endif
+
 namespace Files
 {
     // Points to memory representing a loaded file. Does not need to own the memory.
     struct Data
     {
 private:
-        const unsigned char* data = nullptr;
-        long long int length = -1;
-        bool free_me = false;
+        const unsigned char* m_data = nullptr;
+        long long int m_length = -1;
+        bool m_free_me = false;
 public:
         Data() = default;
         Data(const Data&) = delete;
@@ -50,36 +56,36 @@ public:
         void init_from_mem(const unsigned char* data, size_t size);
 
         // if the buffer is malloc-allocated, disowns it and allows the client to take management of it
-        [[nodiscard]] void* disown();
+        FILES_NODISCARD_ATTR void* disown();
 
         inline bool valid() const
         {
-            return length >= 0;
+            return m_length >= 0;
         }
 
         inline const unsigned char* begin() const
         {
-            return data;
+            return m_data;
         }
 
         inline const unsigned char* end() const
         {
-            return data + length;
+            return m_data + m_length;
         }
 
         inline const char* c_str() const
         {
-            return reinterpret_cast<const char*>(data);
+            return reinterpret_cast<const char*>(m_data);
         }
 
         inline size_t size() const
         {
-            return (length >= 0) ? (size_t)length : 0;
+            return (m_length >= 0) ? (size_t)m_length : 0;
         }
 
         inline size_t empty() const
         {
-            return length <= 0;
+            return m_length <= 0;
         }
 
         friend Data load_file(const char *filePath);
