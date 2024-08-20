@@ -315,9 +315,10 @@ void DodgePlayers(int plr_A)
 
         // (c) X logic: move player backwards, and check it hasn't moved off section / off screen
         constexpr int plr_spacing = 40;
-        pLoc.X -= (plr_spacing - plr_spacing * 2 * forwards_direction) * Player[plr_A].Direction;
+        const int X_move = (plr_spacing - plr_spacing * 2 * forwards_direction) * Player[plr_A].Direction;
+        pLoc.X -= X_move;
 
-        // check for failures of being outside of section X bounds
+        // check for failures of being outside of section X bounds (partially offscreen)
         if(!failed && cur_section != -1 && (pLoc.X < level[cur_section].X || pLoc.X + pLoc.Width > level[cur_section].Width))
             failed = true;
 
@@ -330,11 +331,23 @@ void DodgePlayers(int plr_A)
         constexpr int max_height_add = 160;
         double top_bound = pLoc.Y - max_height_add;
         bool check_floor = true;
+
+        // perform floor check (move player upwards until they are above blocks)
         while(!failed && check_floor)
         {
             check_floor = false;
 
-            for(BlockRef_t b_ref : treeBlockQuery(pLoc, SORTMODE_NONE))
+            // check the whole range from player's old position to player's new position (prevents crossing walls)
+            double left_X = pLoc.X;
+            double right_X = pLoc.X + pLoc.Width;
+            if(X_move < 0)
+                right_X -= X_move;
+            else
+                left_X -= X_move;
+
+            const Location_t floor_check_range = newLoc(left_X, pLoc.Y + pLoc.Height, right_X - left_X, pLoc.Height);
+
+            for(BlockRef_t b_ref : treeBlockQuery(floor_check_range, SORTMODE_NONE))
             {
                 const Block_t& b = b_ref;
                 int B = (int)b_ref;
@@ -345,7 +358,7 @@ void DodgePlayers(int plr_A)
                 if(BlockCheckPlayerFilter(B, plr_A))
                     continue;
 
-                if(CheckCollision(pLoc, b.Location))
+                if(CheckCollision(floor_check_range, b.Location))
                 {
                     double new_Y = blockGetTopYTouching(b, pLoc);
 
@@ -364,7 +377,7 @@ void DodgePlayers(int plr_A)
                 failed = true;
         }
 
-        // perform downwards floor check (cliff check) if the original position had a floor
+        // perform cliff check (move player downwards until they are on blocks) if the original position had a floor
         if(!failed && orig_has_floor && pLoc.Y >= old_Y)
         {
             bool found_floor = false;
@@ -403,6 +416,10 @@ void DodgePlayers(int plr_A)
             else
                 failed = true;
         }
+
+        // check for failures of being outside of section Y bounds (totally offscreen)
+        if(!failed && cur_section != -1 && (pLoc.Y + pLoc.Height < level[cur_section].Y || pLoc.Y > level[cur_section].Height))
+            failed = true;
 
         // check being too far from original position (Shared Screen mode)
         if(!failed && plr_screen.Type == ScreenTypes::SharedScreen && std::abs(pLoc.Y - orig_Y) > plr_screen.H * 0.75)
@@ -6369,7 +6386,7 @@ void PlayersEnsureNearby(const Screen_t& screen)
         const Location_t& pLoc = p.Location;
 
         double p_x = pLoc.X + pLoc.Width / 2;
-        double p_top = (p.Effect == PLREFF_RESPAWN) ? pLoc.Y : p.Effect2;
+        double p_top = (p.Effect == PLREFF_RESPAWN) ? p.Effect2 : pLoc.Y;
         double p_y = p_top + pLoc.Height / 2;
 
         // dead players don't affect camera
@@ -6433,7 +6450,7 @@ void PlayersEnsureNearby(const Screen_t& screen)
 
         if(!p.Dead && p.TimeToLive == 0)
         {
-            double p_top = (p.Effect == PLREFF_RESPAWN) ? pLoc.Y : p.Effect2;
+            double p_top = (p.Effect == PLREFF_RESPAWN) ? p.Effect2 : pLoc.Y;
             double dist = (pLoc.X - cx) * (pLoc.X - cx) + (p_top - cy) * (p_top - cy);
 
             if(closest == 0 || closest_dist > dist)

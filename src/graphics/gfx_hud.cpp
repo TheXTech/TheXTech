@@ -523,5 +523,5 @@ void DrawDeviceBattery()
     int bx = XRender::TargetW - XRender::TargetOverscanX - (bw + 8);
     int by = 24;
 
-    RenderPowerInfo(0, bx, by, bw, bh, 255, &status_info);
+    RenderPowerInfo(-1, bx, by, bw, bh, 255, &status_info);
 }
