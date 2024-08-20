@@ -90,7 +90,7 @@ public:
     void on_any_death();
 
     /**
-     * \brief loads currently got medals from checkpoint, resets this-life medals
+     * \brief loads currently got medals from checkpoint (if appropriate), resets this-life medals
      */
     void on_all_dead();
 
@@ -100,9 +100,14 @@ public:
     void on_checkpoint();
 
     /**
-     * \brief resets all player gotten medals for fresh level
+     * \brief resets saved medals in checkpoint
      */
     void reset_checkpoint();
+
+    /**
+     * \brief restores saved medals from checkpoint
+     */
+    void resume_from_checkpoint();
 
     /**
      * \brief resets level attributes (keeps checkpoint)

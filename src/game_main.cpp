@@ -799,7 +799,6 @@ int GameMain(const CmdLineSetup_t &setup)
             pLogDebug("Clear check-points at Game Menu start");
             Checkpoint.clear();
             CheckpointsList.clear();
-            g_curLevelMedals.reset_lvl();
             g_curLevelMedals.reset_checkpoint();
             WorldPlayer[1].Frame = 0;
             cheats_clearBuffer();
@@ -1305,11 +1304,9 @@ int GameMain(const CmdLineSetup_t &setup)
             if(LevelBeatCode > 0 || !GoToLevel.empty())
             {
                 CommitBeatCode(LevelBeatCode);
-
                 g_curLevelMedals.commit();
-                g_curLevelMedals.reset_checkpoint();
             }
-            // otherwise, restore the medals from checkpoint
+            // otherwise, reset the medal count
             else
                 g_curLevelMedals.on_all_dead();
 

@@ -118,7 +118,7 @@ static void setupCheckpoints()
 {
     if(Checkpoint != FullFileName || Checkpoint.empty())
     {
-        if(StartLevel != FileNameFull && !LevelSelect)
+        if(!IsHubLevel && !LevelSelect)
         {
             pLogDebug("Clear check-points at SetupPlayers()");
             Checkpoint.clear();
@@ -127,6 +127,9 @@ static void setupCheckpoints()
         }
         return;
     }
+
+    // restore medals from checkpoint
+    g_curLevelMedals.resume_from_checkpoint();
 
     pLogDebug("Trying to restore %zu checkpoints...", CheckpointsList.size());
     if(!g_config.fix_vanilla_checkpoints && CheckpointsList.empty())
@@ -545,7 +548,6 @@ void SetupPlayers()
         pLogDebug("Clear check-points at Battle Mode begining");
         Checkpoint.clear();
         CheckpointsList.clear();
-        g_curLevelMedals.reset_lvl();
         g_curLevelMedals.reset_checkpoint();
     }
     else

@@ -51,6 +51,7 @@
 #include "screen_quickreconnect.h"
 #include "screen_textentry.h"
 #include "screen_prompt.h"
+#include "main/level_medals.h"
 #include "script/luna/luna.h"
 
 #include "../pseudo_vb.h"
@@ -183,6 +184,7 @@ void GameLoop()
                 pLogDebug("Clear check-points at GameLoop()");
                 Checkpoint.clear();
                 CheckpointsList.clear();
+                g_curLevelMedals.reset_checkpoint();
             }
 
             // Quit to world map when finishing the sub-hub
