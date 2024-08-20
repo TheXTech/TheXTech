@@ -98,6 +98,10 @@ android {
     //       See details: https://github.com/android/ndk/wiki/Changelog-r24
     ndkVersion "23.2.8568313"
 
+    buildFeatures {
+        buildConfig true
+    }
+
     defaultConfig {
         if (buildAsApplication) {
             applicationId "ru.wohlsoft.thextech"
