@@ -97,26 +97,24 @@ void CurLevelMedals_t::on_all_dead()
     life = 0;
 
     if(Checkpoint == FullFileName)
-        got = m_checkpoint;
+        got = checkpoint;
     else
         got = 0;
 }
 
 void CurLevelMedals_t::on_checkpoint()
 {
-    m_checkpoint = got;
+    checkpoint = got;
 }
 
 void CurLevelMedals_t::reset_checkpoint()
 {
-    got = 0;
-    life = 0;
-    m_checkpoint = 0;
+    checkpoint = 0;
 }
 
 void CurLevelMedals_t::resume_from_checkpoint()
 {
-    got = m_checkpoint;
+    got = checkpoint;
 }
 
 void CurLevelMedals_t::reset_lvl()
@@ -151,6 +149,10 @@ LevelSaveInfo_t* CurLevelMedals_t::should_initialize() const
 
 void CurLevelMedals_t::prepare_lvl()
 {
+    // reset got / life
+    got = 0;
+    life = 0;
+
     // find the level save info
     LevelSaveInfo_t* info = s_findSaveInfo();
 

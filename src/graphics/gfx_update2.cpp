@@ -578,7 +578,7 @@ void UpdateGraphics2(bool skipRepaint)
 
             if(l.save_info.inited() && l.save_info.max_medals > 0 && true)
             {
-                uint8_t ckpt = (Checkpoint == FileNamePathWorld + l.FileName) ? g_curLevelMedals.got : 0;
+                uint8_t ckpt = (Checkpoint == FileNamePathWorld + l.FileName) ? g_curLevelMedals.checkpoint : 0;
 
                 DrawMedals(p_center_x, info_y, true, l.save_info.max_medals, 0, ckpt, l.save_info.medals_got, l.save_info.medals_best);
             }
