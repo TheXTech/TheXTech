@@ -1424,6 +1424,7 @@ static const std::unordered_map<int, int> s_soundFallback =
     {SFX_HeroIce, SFX_HeroFire},
     {SFX_HeroFireRod, SFX_HeroFire},
     {SFX_FlameThrower, SFX_HeroFire},
+    {SFX_PlayerHeavy, SFX_Fireball},
 };
 
 static int getFallbackSfx(int A)
@@ -1470,7 +1471,7 @@ void PlaySoundSpatial(int A, int l, int t, int r, int b, int loops, int volume)
     if(GameMenu || GameOutro) // || A == 26 || A == 27 || A == 29)
         return;
 
-    if(A > (int)g_totalSounds) // Play fallback sound for the missing SFX
+    if(A > (int)g_totalSounds || !g_config.sfx_modern) // Play fallback sound for the missing SFX
         A = getFallbackSfx(A);
     else if(!s_useIceBallSfx && A == SFX_Iceball)
         A = SFX_Fireball; // Fell back into fireball when iceball sound isn't preferred
