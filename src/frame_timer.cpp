@@ -144,10 +144,19 @@ void PerformanceStats_t::print_filenames(int x, int y)
 
     SuperPrint(fmt::sprintf_ne("FILE: %s", FileNameFull.empty() ? "<none>" : FileNameFull.c_str()),
                3, x + 4, YLINE, XTColorF(1.f, 0.5f, 1.f));
+
+#ifdef __16M__
+    auto m = mallinfo();
+    SuperPrint(fmt::sprintf_ne("USED: %dkb", m.uordblks/1024),
+               3, x + 4, YLINE, XTColorF(1.f, 0.5f, 1.f));
+    SuperPrint(fmt::sprintf_ne("ARENA: %dkb", m.arena/1024),
+               3, x + 4, YLINE, XTColorF(1.f, 0.5f, 1.f));
+#else
     SuperPrint(fmt::sprintf_ne("MUSK: %s", currentMusic.empty() ? "<none>" : currentMusic.c_str()),
                3, x + 4, YLINE, XTColorF(1.f, 0.5f, 1.f));
     SuperPrint(fmt::sprintf_ne("MUSF: %s", currentMusicFile.empty() ? "<none>" : currentMusicFile.c_str()),
                3, x + 4, YLINE, XTColorF(1.f, 0.5f, 1.f));
+#endif
 
     if(GameMenu)
     {
