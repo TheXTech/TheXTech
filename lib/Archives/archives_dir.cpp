@@ -23,6 +23,8 @@
 #include <cstring>
 #include <cstddef>
 
+#include "sdl_proxy/sdl_assert.h"
+
 #include "archives.h"
 #include "archives_priv.h"
 
@@ -77,11 +79,14 @@ DirIterator::~DirIterator()
 {
     if(dir)
         mbediso_closedir(dir);
-    if(fs_to_free)
-        mbediso_closefs(fs_to_free);
+    if(has_temp_ref)
+    {
+        SDL_assert_release(temp_refs > 0);
+        temp_refs--;
+    }
 
     dir = nullptr;
-    fs_to_free = nullptr;
+    has_temp_ref = false;
 }
 
 DirEntry& DirIterator::DirIter::operator*()
@@ -128,20 +133,21 @@ DirIterator list_dir(const char* name)
         memcpy(archive_path, archive_path_start, archive_path_size);
         archive_path[archive_path_size] = '\0';
 
-        mbediso_fs* tempfs = mbediso_openfs_file(archive_path, false);
+        bool mounted = mount_temp(archive_path);
         free(archive_path);
 
-        if(!tempfs)
+        if(!mounted || !temp_mount)
             return ret;
 
         const char* dir_path_begin = archive_path_end + 1;
 
-        d = mbediso_opendir(tempfs, dir_path_begin);
+        d = mbediso_opendir(temp_mount, dir_path_begin);
 
         if(d)
-            ret.fs_to_free = tempfs;
-        else
-            mbediso_closefs(tempfs);
+        {
+            temp_refs++;
+            ret.has_temp_ref = true;
+        }
     }
     else if(name[0] == ':' && (name[1] == 'a' || name[1] == 'e'))
     {
@@ -182,17 +188,15 @@ PathType exists(const char* name)
         memcpy(archive_path, archive_path_start, archive_path_size);
         archive_path[archive_path_size] = '\0';
 
-        mbediso_fs* tempfs = mbediso_openfs_file(archive_path, false);
+        bool mounted = mount_temp(archive_path);
         free(archive_path);
 
-        if(!tempfs)
+        if(!mounted || !temp_mount)
             return PATH_NONE;
 
         const char* dir_path_begin = archive_path_end + 1;
 
-        found = mbediso_exists(tempfs, dir_path_begin);
-
-        mbediso_closefs(tempfs);
+        found = mbediso_exists(temp_mount, dir_path_begin);
     }
     else if(name[0] == ':' && (name[1] == 'a' || name[1] == 'e'))
     {

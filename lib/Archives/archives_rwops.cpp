@@ -22,6 +22,7 @@
 #include <cstring>
 
 #include <SDL2/SDL_rwops.h>
+#include "sdl_proxy/sdl_assert.h"
 
 #include "mbediso.h"
 
@@ -78,17 +79,13 @@ static int s_file_close_normal(SDL_RWops* stream)
     return 0;
 }
 
-static int s_file_close_freefs(SDL_RWops* stream)
+static int s_file_close_decref(SDL_RWops* stream)
 {
-    if(!stream || !stream->hidden.unknown.data1)
+    if(s_file_close_normal(stream))
         return -1;
 
-    mbediso_file* f = static_cast<mbediso_file*>(stream->hidden.unknown.data1);
-
-    mbediso_fs* fs = mbediso_file_fs(f);
-
-    mbediso_fclose(f);
-    mbediso_closefs(fs);
+    SDL_assert_release(temp_refs > 0);
+    temp_refs--;
 
     return 0;
 }
@@ -98,7 +95,7 @@ SDL_RWops* open_file(const char* name)
     if(!is_prefix(name[0]))
         return nullptr;
 
-    mbediso_fs* tempfs = nullptr;
+    bool has_temp_ref = false;
     mbediso_file* f = nullptr;
 
     if(name[0] == '@')
@@ -120,15 +117,16 @@ SDL_RWops* open_file(const char* name)
         memcpy(archive_path, archive_path_start, archive_path_size);
         archive_path[archive_path_size] = '\0';
 
-        tempfs = mbediso_openfs_file(archive_path, false);
+        bool mounted = mount_temp(archive_path);
         free(archive_path);
 
-        if(!tempfs)
+        if(!mounted || !temp_mount)
             return nullptr;
 
         const char* file_path_begin = archive_path_end + 1;
 
-        f = mbediso_fopen(tempfs, file_path_begin);
+        f = mbediso_fopen(temp_mount, file_path_begin);
+        has_temp_ref = true;
     }
     else if(name[0] == ':' && (name[1] == 'a' || name[1] == 'e'))
     {
@@ -139,17 +137,13 @@ SDL_RWops* open_file(const char* name)
     }
 
     if(!f)
-    {
-        mbediso_closefs(tempfs);
         return nullptr;
-    }
 
     SDL_RWops* ret = SDL_AllocRW();
 
     if(!ret)
     {
         mbediso_fclose(f);
-        mbediso_closefs(tempfs);
         return nullptr;
     }
 
@@ -157,7 +151,10 @@ SDL_RWops* open_file(const char* name)
     ret->seek = s_file_seek;
     ret->read = s_file_read;
     ret->write = s_file_write;
-    ret->close = (tempfs) ? s_file_close_freefs : s_file_close_normal;
+    ret->close = (has_temp_ref) ? s_file_close_decref : s_file_close_normal;
+
+    if(has_temp_ref)
+        temp_refs++;
 
     ret->type = SDL_RWOPS_UNKNOWN;
     ret->hidden.unknown.data1 = f;
