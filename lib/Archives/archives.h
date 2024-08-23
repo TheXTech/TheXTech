@@ -49,7 +49,7 @@ struct DirEntry
 struct DirIterator
 {
     mbediso_dir* dir = nullptr;
-    mbediso_fs* fs_to_free = nullptr;
+    bool has_temp_ref = false;
     bool expired = false;
 
     struct DirIter
@@ -84,6 +84,8 @@ const std::string& assets_archive_path();
 
 bool mount_episode(const char* archive_path);
 void unmount_episode();
+
+void unmount_temp();
 
 SDL_RWops* open_file(const char* name);
 DirIterator list_dir(const char* name);

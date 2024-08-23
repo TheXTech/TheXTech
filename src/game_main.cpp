@@ -1484,6 +1484,7 @@ int GameMain(const CmdLineSetup_t &setup)
             } // TestLevel
         }
 
+        Archives::unmount_temp();
     }
 
     Integrator::quitIntegrations();
