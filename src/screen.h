@@ -84,10 +84,10 @@ struct vScreen_t : public qScreen_t
     int TargetY() const;
 
     //! x-offset to add for render calls (based on X, but may be rounded)
-    double CameraAddX() const;
+    int CameraAddX() const;
 
     //! Y-offset to add for render calls (based on Y, but may be rounded)
-    double CameraAddY() const;
+    int CameraAddY() const;
 };
 
 constexpr int maxNetplayClients = 8;

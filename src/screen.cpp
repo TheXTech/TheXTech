@@ -45,22 +45,14 @@ int vScreen_t::TargetY() const
     return Screens[screen_ref].TargetY() + ScreenTop;
 }
 
-double vScreen_t::CameraAddX() const
+int vScreen_t::CameraAddX() const
 {
-#if 0
-    return SDL_round(X / 2) * 2;
-#else
-    return X;
-#endif
+    return std::floor(X + 0.5);
 }
 
-double vScreen_t::CameraAddY() const
+int vScreen_t::CameraAddY() const
 {
-#if 0
-    return SDL_round(Y / 2) * 2;
-#else
-    return Y;
-#endif
+    return std::floor(Y + 0.5);
 }
 
 Screen_t& Screen_t::canonical_screen()
