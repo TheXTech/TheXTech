@@ -328,8 +328,8 @@ void UpdateGraphics2(bool skipRepaint)
 
     XRender::setViewport(vScreen[Z].TargetX() - XRender::TargetOverscanX, vScreen[Z].TargetY(), vScreen[Z].Width + 2 * XRender::TargetOverscanX, vScreen[Z].Height);
 
-    double camX = vScreen[Z].CameraAddX() + XRender::TargetOverscanX;
-    double camY = vScreen[Z].CameraAddY();
+    int camX = vScreen[Z].CameraAddX() + XRender::TargetOverscanX;
+    int camY = vScreen[Z].CameraAddY();
 
     double sLeft = -vScreen[1].X - 2 * XRender::TargetOverscanX;
     double sTop = -vScreen[1].Y;
@@ -356,7 +356,7 @@ void UpdateGraphics2(bool skipRepaint)
             {
                 g_stats.renderedTiles++;
 //                XRender::renderTexture(camX + Tile[A].Location.X, camY + Tile[A].Location.Y, Tile[A].Location.Width, Tile[A].Location.Height, GFXTile[Tile[A].Type], 0, TileHeight[Tile[A].Type] * TileFrame[Tile[A].Type]);
-                XRender::renderTexture(camX + tile.Location.X,
+                XRender::renderTextureBasic(camX + tile.Location.X,
                                       camY + tile.Location.Y,
                                       tile.Location.Width,
                                       tile.Location.Height,
@@ -378,7 +378,7 @@ void UpdateGraphics2(bool skipRepaint)
                 g_stats.renderedScenes++;
 //                XRender::renderTexture(camX + scene.Location.X, camY + scene.Location.Y, scene.Location.Width, scene.Location.Height, GFXSceneMask[scene.Type], 0, SceneHeight[scene.Type] * SceneFrame[scene.Type]);
 //                XRender::renderTexture(camX + scene.Location.X, camY + scene.Location.Y, scene.Location.Width, scene.Location.Height, GFXScene[scene.Type], 0, SceneHeight[scene.Type] * SceneFrame[scene.Type]);
-                XRender::renderTexture(camX + scene.Location.X,
+                XRender::renderTextureBasic(camX + scene.Location.X,
                                       camY + scene.Location.Y,
                                       scene.Location.Width, scene.Location.Height,
                                       GFXSceneBMP[scene.Type], 0, SceneHeight[scene.Type] * SceneFrame[scene.Type]);
@@ -399,7 +399,7 @@ void UpdateGraphics2(bool skipRepaint)
                 g_stats.renderedPaths++;
 //                XRender::renderTexture(camX + path.Location.X, camY + path.Location.Y, path.Location.Width, path.Location.Height, GFXPathMask[path.Type], 0, 0);
 //                XRender::renderTexture(camX + path.Location.X, camY + path.Location.Y, path.Location.Width, path.Location.Height, GFXPath[path.Type], 0, 0);
-                XRender::renderTexture(camX + path.Location.X,
+                XRender::renderTextureBasic(camX + path.Location.X,
                                       camY + path.Location.Y,
                                       path.Location.Width, path.Location.Height,
                                       GFXPathBMP[path.Type], 0, 0);
@@ -428,7 +428,7 @@ void UpdateGraphics2(bool skipRepaint)
 
                 if(lvlP.Path)
                 {
-                    XRender::renderTexture(camX + lvlP.Location.X,
+                    XRender::renderTextureBasic(camX + lvlP.Location.X,
                                           camY + lvlP.Location.Y,
                                           lvlP.Location.Width,
                                           lvlP.Location.Height,
@@ -437,7 +437,7 @@ void UpdateGraphics2(bool skipRepaint)
 
                 if(lvlP.Path2)
                 {
-                    XRender::renderTexture(camX + lvlP.Location.X - 16,
+                    XRender::renderTextureBasic(camX + lvlP.Location.X - 16,
                                           camY + 8 + lvlP.Location.Y,
                                           64, 32,
                                           GFXLevelBMP[29], 0, 0);
