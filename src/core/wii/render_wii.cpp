@@ -1115,6 +1115,96 @@ inline bool GX_DrawImage_Custom(GXTexObj* img,
     return true;
 }
 
+inline bool GX_DrawImage_Custom_Basic(GXTexObj* img,
+                                GXTexObj* mask,
+                                int16_t x, int16_t y, uint16_t w, uint16_t h,
+                                uint16_t src_x, uint16_t src_y,
+                                XTColor color)
+{
+    int16_t z = s_render_planes.next();
+
+    GX_SetTevOp(GX_TEVSTAGE0, GX_MODULATE);
+    GX_SetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
+
+    for(int i = 0; i < 2; i++)
+    {
+        uint8_t r = color.r;
+        uint8_t g = color.g;
+        uint8_t b = color.b;
+        uint8_t a = color.a;
+
+        uint16_t u1 = src_x;
+        uint16_t u2 = src_x + w;
+        uint16_t v1 = src_y;
+        uint16_t v2 = src_y + h;
+
+        int16_t x1 = x;
+        int16_t x2 = x + w;
+        int16_t y1 = y;
+        int16_t y2 = y + h;
+
+        if(mask && i == 0)
+        {
+            GX_SetBlendMode(GX_BM_LOGIC, GX_BL_ONE, GX_BL_ONE, GX_LO_AND);
+            GX_LoadTexObj(mask, GX_TEXMAP0);
+            uint16_t mask_w = GX_GetTexObjWidth(mask);
+            uint16_t mask_h = GX_GetTexObjHeight(mask);
+
+            if(u1 > mask_w || v1 > mask_h)
+                continue;
+
+            if(u2 > mask_w)
+            {
+                u2 = mask_w;
+                x2 = x + mask_w;
+            }
+
+            if(v2 > mask_h)
+            {
+                v2 = mask_h;
+                y2 = y + mask_h;
+            }
+
+            r = 255; g = 255; b = 255; a = 255;
+        }
+        else if(mask)
+        {
+            GX_SetBlendMode(GX_BM_LOGIC, GX_BL_ONE, GX_BL_ONE, GX_LO_OR);
+            GX_LoadTexObj(img, GX_TEXMAP0);
+        }
+        else
+        {
+            GX_LoadTexObj(img, GX_TEXMAP0);
+        }
+
+        GX_Begin(GX_QUADS, GX_VTXFMT0, 4);
+        GX_Position3s16(x1, y1, z);
+        GX_Color4u8(r, g, b, a);
+        GX_TexCoord2u16(u1, v1);
+
+        GX_Position3s16(x2, y1, z);
+        GX_Color4u8(r, g, b, a);
+        GX_TexCoord2u16(u2, v1);
+
+        GX_Position3s16(x2, y2, z);
+        GX_Color4u8(r, g, b, a);
+        GX_TexCoord2u16(u2, v2);
+
+        GX_Position3s16(x1, y2, z);
+        GX_Color4u8(r, g, b, a);
+        GX_TexCoord2u16(u1, v2);
+        GX_End();
+
+        if(!mask)
+            break;
+    }
+
+    if(mask)
+        GX_SetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_SET);
+
+    return true;
+}
+
 inline bool GX_DrawImage_Custom_Rotated(GXTexObj* img,
                                         GXTexObj* mask,
                                         float x, float y, float w, float h,
@@ -1350,6 +1440,162 @@ void minport_RenderTexturePrivate(int16_t xDst, int16_t yDst, int16_t wDst, int1
     else
         GX_DrawImage_Custom(to_draw, to_mask, xDst, yDst, wDst, hDst,
                             xSrc, ySrc, wSrc, hSrc, flip, color);
+}
+
+void minport_RenderTexturePrivate_Basic(int16_t xDst, int16_t yDst, int16_t wDst, int16_t hDst,
+                                  StdPicture& tx,
+                                  int16_t xSrc, int16_t ySrc,
+                                  XTColor color)
+{
+    if(!tx.inited)
+        return;
+
+    if(!tx.d.hasTexture() && tx.l.lazyLoaded)
+        lazyLoad(tx);
+
+    if(!tx.d.hasTexture())
+        return;
+
+    GXTexObj* to_draw = nullptr;
+    GXTexObj* to_draw_2 = nullptr;
+
+    GXTexObj* to_mask = nullptr;
+    GXTexObj* to_mask_2 = nullptr;
+
+    if(tx.d.multi_horizontal && xSrc + wDst > 1024)
+    {
+        if(wDst > 1024)
+        {
+            // reduce it to be on viewport
+            if(xDst < 0)
+            {
+                xSrc -= xDst;
+                wDst += xDst;
+                xDst = 0;
+            }
+
+            if(wDst > 1024)
+                wDst = 1024;
+        }
+
+        if(xSrc + wDst > 2048)
+        {
+            if(tx.d.texture_init[2])
+            {
+                to_draw = &tx.d.texture[2];
+
+                if(tx.d.texture_init[5])
+                    to_mask = &tx.d.texture[5];
+            }
+
+            if(xSrc < 2048 && tx.d.texture_init[1])
+            {
+                to_draw_2 = &tx.d.texture[1];
+
+                if(tx.d.texture_init[4])
+                    to_mask_2 = &tx.d.texture[4];
+            }
+
+            xSrc -= 1024;
+        }
+        else
+        {
+            if(tx.d.texture_init[1])
+            {
+                to_draw = &tx.d.texture[1];
+
+                if(tx.d.texture_init[4])
+                    to_mask = &tx.d.texture[4];
+            }
+
+            if(xSrc < 1024)
+            {
+                to_draw_2 = &tx.d.texture[0];
+
+                if(tx.d.texture_init[3])
+                    to_mask_2 = &tx.d.texture[3];
+            }
+        }
+
+        // draw the left pic
+        if(to_draw_2 != nullptr)
+        {
+            GX_DrawImage_Custom_Basic(to_draw_2, to_mask_2, xDst, yDst, 1024 - xSrc, hDst,
+                                xSrc, ySrc, color);
+
+            xDst += 1024 - xSrc;
+            wDst -= (1024 - xSrc);
+            xSrc = 0;
+        }
+        else
+            xSrc -= 1024;
+    }
+    else if(!tx.d.multi_horizontal && ySrc + hDst > 1024)
+    {
+        if(ySrc + hDst > 2048)
+        {
+            if(tx.d.texture_init[2])
+            {
+                to_draw = &tx.d.texture[2];
+
+                if(tx.d.texture_init[5])
+                    to_mask = &tx.d.texture[5];
+            }
+
+            if(ySrc < 2048 && tx.d.texture_init[1])
+            {
+                to_draw_2 = &tx.d.texture[1];
+
+                if(tx.d.texture_init[4])
+                    to_mask_2 = &tx.d.texture[4];
+            }
+
+            ySrc -= 1024;
+        }
+        else
+        {
+            if(tx.d.texture_init[1])
+            {
+                to_draw = &tx.d.texture[1];
+
+                if(tx.d.texture_init[4])
+                    to_mask = &tx.d.texture[4];
+            }
+
+            if(ySrc < 1024)
+            {
+                to_draw_2 = &tx.d.texture[0];
+
+                if(tx.d.texture_init[3])
+                    to_mask_2 = &tx.d.texture[3];
+            }
+        }
+
+        // draw the top pic
+        if(to_draw_2 != nullptr)
+        {
+            GX_DrawImage_Custom_Basic(to_draw_2, to_mask_2, xDst, yDst, wDst, 1024 - ySrc,
+                                xSrc, ySrc, color);
+
+            yDst += (1024 - ySrc);
+            hDst -= (1024 - ySrc);
+            ySrc = 0;
+        }
+        else
+            ySrc -= 1024;
+    }
+    else
+    {
+        to_draw = &tx.d.texture[0];
+
+        if(tx.d.texture_init[3])
+            to_mask = &tx.d.texture[3];
+    }
+
+    if(to_draw == nullptr) return;
+
+    GX_DrawImage_Custom_Basic(to_draw, to_mask, xDst, yDst, wDst, hDst,
+                        xSrc, ySrc, color);
 }
 
 } // namespace XRender

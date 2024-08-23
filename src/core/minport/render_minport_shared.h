@@ -129,6 +129,11 @@ void minport_RenderTexturePrivate(int16_t xDst, int16_t yDst, int16_t wDst, int1
                              float rotateAngle, FPoint_t *center, unsigned int flip,
                              XTColor color);
 
+void minport_RenderTexturePrivate_Basic(int16_t xDst, int16_t yDst, int16_t wDst, int16_t hDst,
+                             StdPicture &tx,
+                             int16_t xSrc, int16_t ySrc,
+                             XTColor color);
+
 } // namespace XRender;
 
 #endif // #ifndef RENDER_MINPORT_SHARED_H

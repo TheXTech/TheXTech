@@ -329,6 +329,51 @@ inline bool GL_DrawImage_Custom(int name, int flags,
     return true;
 }
 
+inline bool GL_DrawImage_Custom_Basic(int name, int flags,
+    int16_t x, int16_t y, uint16_t w, uint16_t h,
+    uint16_t src_x, uint16_t src_y,
+    XTColor color)
+{
+    uint16_t u1 = src_x >> (flags & 15);
+    uint16_t u2 = (src_x + w) >> (flags & 15);
+    uint16_t v1 = src_y >> (flags & 15);
+    uint16_t v2 = (src_y + h) >> (flags & 15);
+
+    uint8_t r = color.r;
+    uint8_t g = color.g;
+    uint8_t b = color.b;
+    uint8_t a = color.a;
+
+    glBindTexture(0, name);
+    if((a >> 3) < 31)
+        glPolyFmt(/*POLY_ID(s_poly_id++) | */ POLY_ALPHA((a >> 3) + 1) | POLY_CULL_NONE | POLY_FOG_Q);
+
+    glBegin(GL_QUADS);
+
+    glColor3b(r, g, b);
+
+    s_gxTexcoord2i(u1, v1);
+    s_gxVertex3i(x, y, s_render_planes.next());
+    for(int i = 0; i < 7; ++i)
+        s_render_planes.next(); // actually advance 8 slots rather than 1, to handle some imprecision of the DSi depth buffer (unknown cause)
+
+    s_gxTexcoord2i(u1, v2);
+    s_gxVertex2i(x, y + h);
+
+    s_gxTexcoord2i(u2, v2);
+    s_gxVertex2i(x + w, y + h);
+
+    s_gxTexcoord2i(u2, v1);
+    s_gxVertex2i(x + w, y);
+
+    glEnd();
+
+    if((a >> 3) < 31)
+        glPolyFmt(POLY_ALPHA(31) | POLY_CULL_NONE | POLY_FOG_Q);
+
+    return true;
+}
+
 bool init()
 {
     lcdMainOnBottom();
@@ -787,6 +832,62 @@ void minport_RenderTexturePrivate(int16_t xDst, int16_t yDst, int16_t wDst, int1
     // finalize rotation HERE
     if(rotateAngle)
         glPopMatrix(1);
+}
+
+void minport_RenderTexturePrivate_Basic(int16_t xDst, int16_t yDst, int16_t wDst, int16_t hDst,
+                             StdPicture &tx,
+                             int16_t xSrc, int16_t ySrc,
+                             XTColor color)
+{
+    if(!tx.inited)
+        return;
+
+    if(tx.l.lazyLoaded && !tx.d.hasTexture() && !tx.d.reallyHasTexture())
+        lazyLoad(tx);
+
+    if(!tx.d.reallyHasTexture())
+        return;
+
+    int to_draw = 0;
+    int to_draw_2 = 0;
+
+    if(ySrc + hDst > 1024)
+    {
+        if(ySrc + hDst > 2048)
+        {
+            if(tx.d.texture[2])
+                to_draw = tx.d.texture[2];
+            if(ySrc < 2048 && tx.d.texture[1])
+                to_draw_2 = tx.d.texture[1];
+            ySrc -= 1024;
+        }
+        else
+        {
+            if(tx.d.texture[1])
+                to_draw = tx.d.texture[1];
+            if(ySrc < 1024)
+                to_draw_2 = tx.d.texture[0];
+        }
+
+        // draw the top pic
+        if(to_draw_2)
+        {
+            GL_DrawImage_Custom_Basic(to_draw_2, tx.l.flags, xDst, yDst, wDst, 1024 - ySrc, xSrc, ySrc, color);
+            yDst += (1024 - ySrc);
+            hDst -= (1024 - ySrc);
+            ySrc = 0;
+        }
+        else
+            ySrc -= 1024;
+    }
+    else
+    {
+        to_draw = tx.d.texture[0];
+    }
+
+    if(!to_draw) return;
+
+    GL_DrawImage_Custom_Basic(to_draw, tx.l.flags, xDst, yDst, wDst, hDst, xSrc, ySrc, color);
 }
 
 }; // namespace XRender

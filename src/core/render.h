@@ -638,6 +638,25 @@ E_INLINE void renderTextureScale(double xDst, double yDst, double wDst, double h
 }
 #endif
 
+E_INLINE void renderTextureBasic(int xDst, int yDst, int wDst, int hDst,
+                           StdPicture &tx,
+                           int xSrc, int ySrc,
+                           XTColor color = XTColor()) TAIL
+#ifndef RENDER_CUSTOM
+{
+    // (this will use the double signature on desktop renderers)
+    g_render->renderTexture(xDst, yDst, wDst, hDst,
+                            tx,
+                            xSrc, ySrc,
+                            color);
+}
+#endif
+
+void renderTextureBasic(double xDst, double yDst, double wDst, double hDst,
+                       StdPicture &tx,
+                       double xSrc, double ySrc,
+                       XTColor color = XTColor()) = delete;
+
 E_INLINE void renderTexture(double xDst, double yDst, double wDst, double hDst,
                            StdPicture &tx,
                            int xSrc, int ySrc,
@@ -674,6 +693,18 @@ E_INLINE void renderTexture(float xDst, float yDst, StdPicture &tx,
                             color);
 }
 #endif
+
+E_INLINE void renderTextureBasic(int xDst, int yDst, StdPicture &tx,
+                           XTColor color = XTColor()) TAIL
+#ifndef RENDER_CUSTOM
+{
+    // (this will use the float signature on desktop renderers)
+    g_render->renderTexture(xDst, yDst, tx, color);
+}
+#endif
+
+void renderTextureBasic(float xDst, float yDst, StdPicture &tx,
+                           XTColor color = XTColor()) = delete;
 
 /*!
  * \brief Draws the particle system at a particular camera offset

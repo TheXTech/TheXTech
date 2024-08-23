@@ -30,9 +30,6 @@
 
 #include <FreeImageLite.h>
 
-// strangely undocumented import necessary to use the FreeImage handle functions
-extern void SetDefaultIO(FreeImageIO *io);
-
 #include <Graphics/graphics_funcs.h>
 
 #include <Logger/logger.h>
@@ -1416,6 +1413,133 @@ void minport_RenderTexturePrivate(int16_t xDst, int16_t yDst, int16_t wDst, int1
     // Finalize rotation HERE
     if(rotateAngle)
         C2D_ViewRestore(&prev_view);
+}
+
+void minport_RenderTexturePrivate_Basic(int16_t xDst, int16_t yDst, int16_t wDst, int16_t hDst,
+                                  StdPicture& tx,
+                                  int16_t xSrc, int16_t ySrc,
+                                  XTColor color)
+{
+    if(!tx.inited)
+        return;
+
+    if(!tx.d.hasTexture() && tx.l.lazyLoaded)
+        lazyLoad(tx);
+
+    if(!tx.d.hasTexture())
+        return;
+
+    // don't exceed 90%, ever
+    if(gpuCmdBufSize > 0 && gpuCmdBufOffset * 10 > gpuCmdBufSize * 9)
+        return;
+
+    // texture boundaries
+    // this never happens unless there was an invalid input
+    // if((xSrc < 0.0f) || (ySrc < 0.0f)) return;
+
+    C2D_Image* to_draw = nullptr;
+    C2D_Image* to_draw_2 = nullptr;
+
+    C2D_Image* to_mask = nullptr;
+    C2D_Image* to_mask_2 = nullptr;
+
+    // Don't go more than size of texture
+    // Failure conditions should only happen if texture is smaller than expected
+
+    if(ySrc + hDst > 1024)
+    {
+        if(ySrc + hDst > 2048)
+        {
+            if(tx.d.texture[2])
+            {
+                to_draw = &tx.d.image[2];
+                if(tx.d.texture[5])
+                    to_mask = &tx.d.image[5];
+            }
+
+            if(ySrc < 2048 && tx.d.texture[1])
+            {
+                to_draw_2 = &tx.d.image[1];
+                if(tx.d.texture[4])
+                    to_mask_2 = &tx.d.image[4];
+            }
+
+            ySrc -= 1024;
+        }
+        else
+        {
+            if(tx.d.texture[1])
+            {
+                to_draw = &tx.d.image[1];
+                if(tx.d.texture[4])
+                    to_mask = &tx.d.image[4];
+            }
+
+            if(ySrc < 1024)
+            {
+                to_draw_2 = &tx.d.image[0];
+                if(tx.d.texture[3])
+                    to_mask_2 = &tx.d.image[3];
+            }
+        }
+
+        // draw the top pic
+        if(to_draw_2 != nullptr)
+        {
+            if(to_mask_2)
+            {
+                C2D_Flush();
+                C3D_ColorLogicOp(GPU_LOGICOP_AND);
+                C2D_DrawImage_Custom_Basic(*to_mask_2, xDst, yDst, wDst, 1024 - ySrc,
+                                     xSrc, ySrc, XTColor());
+                C2D_Flush();
+                C3D_ColorLogicOp(GPU_LOGICOP_OR);
+            }
+
+            C2D_DrawImage_Custom_Basic(*to_draw_2, xDst, yDst, wDst, 1024 - ySrc,
+                                 xSrc, ySrc, color);
+
+            if(to_mask_2)
+            {
+                C2D_Flush();
+                s_resetBlend();
+            }
+
+            yDst += 1024 - ySrc;
+            hDst -= 1024 - ySrc;
+            ySrc = 0;
+        }
+        else
+            ySrc -= 1024;
+    }
+    else
+    {
+        to_draw = &tx.d.image[0];
+        if(tx.d.texture[3])
+            to_mask = &tx.d.image[3];
+    }
+
+    if(to_draw != nullptr)
+    {
+        if(to_mask)
+        {
+            C2D_Flush();
+            C3D_ColorLogicOp(GPU_LOGICOP_AND);
+            C2D_DrawImage_Custom_Basic(*to_mask, xDst, yDst, wDst, hDst,
+                                 xSrc, ySrc, XTColor());
+            C2D_Flush();
+            C3D_ColorLogicOp(GPU_LOGICOP_OR);
+        }
+
+        C2D_DrawImage_Custom_Basic(*to_draw, xDst, yDst, wDst, hDst,
+                             xSrc, ySrc, color);
+
+        if(to_mask)
+        {
+            C2D_Flush();
+            s_resetBlend();
+        }
+    }
 }
 
 } // namespace XRender
