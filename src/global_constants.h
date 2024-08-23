@@ -94,11 +94,7 @@ const int FLBlocks = 8000;
 //Public Const vScreenYOffset As Integer = 0     'Players Y on the screen
 const int vScreenYOffset = 0;
 //Public Const maxBlocks As Integer = 20000  'Max # of blocks
-#ifdef __16M__
-const int maxBlocks = 10000;
-#else
 const int maxBlocks = 20000;
-#endif
 //Public Const maxPlayers As Integer = 200  'Holds the max number of players
 // Must not exceed 255 (largest uint8_t)
 #ifdef __16M__
@@ -110,17 +106,9 @@ const int maxPlayers = 200;
 //Public Const maxEffects As Integer = 1000    'Max # of effects
 const int maxEffects = 1000;
 //Public Const maxNPCs As Integer = 5000    'Max # of NPCs
-#ifdef __16M__
-const int maxNPCs = 3000;
-#else
 const int maxNPCs = 5000;
-#endif
 //Public Const maxBackgrounds As Integer = 8000    'Max # of background objects
-#ifdef __16M__
-const int maxBackgrounds = 4000;
-#else
 const int maxBackgrounds = 8000;
-#endif
 //Public Const maxPlayerFrames As Integer = 750 'Maximum number of player frames
 const int maxPlayerFrames = 750;
 //Public Const maxBlockType As Integer = 700 'Maximum number of block types
@@ -172,11 +160,7 @@ const int maxLevelType = 100;
 //Public Const maxPathType As Integer = 100
 const int maxPathType = 100;
 //Public Const maxTiles As Integer = 20000
-#ifdef __16M__
-const int maxTiles = 8000;
-#else
 const int maxTiles = 20000;
-#endif
 //Public Const maxScenes As Integer = 5000
 const int maxScenes = 5000;
 
