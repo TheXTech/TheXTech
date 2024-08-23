@@ -404,7 +404,7 @@ PGE_Size RasterFont::printText(const char* text, size_t text_size,
 
             if(letter_alpha != 0)
             {
-                XRender::renderTexture(x + static_cast<int32_t>(offsetX - rch.padding_left + m_glyphOffsetX),
+                XRender::renderTextureBasic(x + static_cast<int32_t>(offsetX - rch.padding_left + m_glyphOffsetX),
                                        y + static_cast<int32_t>(offsetY + m_glyphOffsetY),
                                        w, h,
                                        *rch.tx,
