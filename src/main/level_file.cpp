@@ -1150,7 +1150,6 @@ void OpenLevel_FixLayersEvents(const LevelLoad& load)
             NPC[A].TriggerLast = load.final_event_index[NPC[A].TriggerLast];
 
         CheckSectionNPC(A);
-        syncLayers_NPC(A);
 
 
         // Extra NPC load logic
@@ -1202,6 +1201,8 @@ void OpenLevel_FixLayersEvents(const LevelLoad& load)
                     npc.Killed = 9;
             }
         }
+
+        syncLayers_NPC(A);
     }
 
     for(int A = 1; A <= numWarps; A++)
