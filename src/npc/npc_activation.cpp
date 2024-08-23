@@ -131,12 +131,14 @@ void NPC_ConstructCanonicalSet()
         tempLocation.Width += 64;
         tempLocation.Height += 64;
 
+        bool n_is_generator = NPC[n].Generator;
+
         for(int16_t B : treeNPCQuery(tempLocation, SORTMODE_NONE))
         {
             if(B != n && CheckCollision(tempLocation, NPC[B].Location))
             {
-                // check that B is capable of chain-activation
-                if(!s_NPC_CanActivate(NPC[B]))
+                // check that B is capable of chain-activation (or that n is a generator, in which case B would block it)
+                if(!n_is_generator && !s_NPC_CanActivate(NPC[B]))
                     continue;
 
                 if(!NPC[B]._priv_force_canonical)
