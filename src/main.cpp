@@ -792,6 +792,7 @@ int main(int argc, char**argv)
 
     Archives::unmount_assets();
     Archives::unmount_episode();
+    Archives::unmount_temp();
 
 #ifdef __EMSCRIPTEN__
     AppPathManager::syncFs();

@@ -29,6 +29,10 @@ namespace Archives
 
 extern mbediso_fs* assets_mount;
 extern mbediso_fs* episode_mount;
+extern mbediso_fs* temp_mount;
+extern int temp_refs;
+
+bool mount_temp(const char* archive_path);
 
 } // namespace Archives
 

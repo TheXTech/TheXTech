@@ -20,6 +20,7 @@
 
 
 #include <string>
+#include <Logger/logger.h>
 
 #include "archives.h"
 #include "archives_priv.h"
@@ -31,8 +32,12 @@ namespace Archives
 
 mbediso_fs* assets_mount = nullptr;
 mbediso_fs* episode_mount = nullptr;
+mbediso_fs* temp_mount = nullptr;
 static std::string s_assets_archive_path;
 static std::string s_episode_archive_path;
+static std::string s_temp_archive_path;
+
+int temp_refs;
 
 static void s_unmount(mbediso_fs*& target, std::string& loaded_path)
 {
@@ -51,7 +56,21 @@ static bool s_mount(mbediso_fs*& target, std::string& loaded_path, const char* a
         return true;
 
     s_unmount(target, loaded_path);
-    target = mbediso_openfs_file(archive_path, true);
+
+    if(s_temp_archive_path == archive_path && temp_refs == 0 && temp_mount != nullptr && mbediso_scanfs(temp_mount) == 0)
+    {
+        pLogDebug("Upgrading temporary mount to real mount");
+
+        target = temp_mount;
+        temp_mount = nullptr;
+
+        loaded_path = std::move(s_temp_archive_path);
+        s_temp_archive_path.clear();
+
+        return true;
+    }
+
+    target = mbediso_openfs_file(archive_path, target != temp_mount);
 
     if(target)
         loaded_path = archive_path;
@@ -82,6 +101,31 @@ bool mount_episode(const char* archive_path)
 void unmount_episode()
 {
     return s_unmount(episode_mount, s_episode_archive_path);
+}
+
+bool mount_temp(const char* archive_path)
+{
+    if(s_temp_archive_path == archive_path)
+        return true;
+
+    if(temp_refs > 0)
+    {
+        pLogCritical("Can't mount new archive [%s]; items still open from prev archive [%s]", archive_path, s_temp_archive_path.c_str());
+        return false;
+    }
+
+    return s_mount(temp_mount, s_temp_archive_path, archive_path);
+}
+
+void unmount_temp()
+{
+    if(temp_refs > 0)
+    {
+        pLogCritical("Can't unmount temp archive [%s;] items still open.", s_temp_archive_path.c_str());
+        return;
+    }
+
+    return s_unmount(temp_mount, s_temp_archive_path);
 }
 
 } // namespace Archives
