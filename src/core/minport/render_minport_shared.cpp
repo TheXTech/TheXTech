@@ -348,7 +348,19 @@ void minport_freeTextureMemory()
         }
     }
 
+#ifdef __16M__
     pLogDebug("Unloaded %d stale textures at free texture memory request", num_unloaded);
+#else
+    if(g_config.log_level != PGE_LogLevel::Debug)
+        return;
+
+    int num_loaded = 0;
+
+    for(StdPicture* p = g_render_chain_tail; p != nullptr; p = p->d.next_texture)
+        num_loaded++;
+
+    pLogDebug("Unloaded %d stale textures at free texture memory request (%d still loaded)", num_unloaded, num_loaded);
+#endif
 }
 
 #ifdef __16M__
