@@ -50,3 +50,11 @@ uint64_t SDL_GetMicroTicks()
 
     return (uint64_t)curTime_ticks * 1000000 / (BUS_CLOCK>>10);
 }
+
+void SDL_Delay(int ms)
+{
+    uint64_t want = SDL_GetMicroTicks() + ms * 1000;
+
+    while(SDL_GetMicroTicks() < want)
+        swiDelay(0x126f); // ~120us
+}

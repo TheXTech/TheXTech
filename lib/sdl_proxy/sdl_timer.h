@@ -39,10 +39,6 @@ inline uint64_t SDL_GetTicks64()
 
 #include <cstdint>
 
-//#ifdef __WII__
-//#define SDL_GetTicks SDL_GetTicks_Wii_
-//#endif
-
 #ifndef SDL_timer_h_
 extern uint32_t SDL_GetTicks();
 
@@ -52,10 +48,7 @@ inline uint64_t SDL_GetTicks64()
 }
 #endif
 
-inline void SDL_Delay(int x)
-{
-    (void)(x);
-}
+void SDL_Delay(int ms);
 
 #endif
 
