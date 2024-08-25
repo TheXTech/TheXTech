@@ -1006,11 +1006,16 @@ static ssize_t s_decompressCallback_rwops(void *userdata, void *buffer, size_t s
     return SDL_RWread(rwops, buffer, 1, size);
 }
 
-static C2D_SpriteSheet s_tryHardToLoadC2D_SpriteSheet(const char* path)
+static C2D_SpriteSheet s_tryHardToLoadC2D_SpriteSheet(const char* path, bool& file_missing)
 {
     SDL_RWops* rwops = Files::open_file(path, "rb");
     if(!rwops)
+    {
+        file_missing = true;
         return nullptr;
+    }
+
+    file_missing = false;
 
     C2D_SpriteSheet sourceImage = (C2D_SpriteSheet)malloc(sizeof(struct C2D_SpriteSheet_s));
     if(!sourceImage)
@@ -1054,7 +1059,7 @@ static C2D_SpriteSheet s_tryHardToLoadC2D_SpriteSheet(const char* path)
 
 void lazyLoad(StdPicture& target)
 {
-    if(!target.inited || !target.l.lazyLoaded || target.d.hasTexture())
+    if(!target.inited || !target.l.lazyLoaded || target.d.hasTexture() || (target.d.last_draw_frame && g_current_frame - target.d.last_draw_frame < g_load_failure_retry_frames))
         return;
 
     if(!Files::hasSuffix(target.l.path, ".t3x"))
@@ -1121,9 +1126,9 @@ void lazyLoad(StdPicture& target)
 
         if(!target.d.hasTexture())
         {
-            pLogWarning("Permanently failed to load %s during texture load (upload to GPU failed), %lu free", target.l.path.c_str(), linearSpaceFree());
+            pLogWarning("Failed to load %s during texture load (upload to GPU failed), %lu free", target.l.path.c_str(), linearSpaceFree());
             pLogWarning("Error: %d (%s)", errno, strerror(errno));
-            target.inited = false;
+            target.d.last_draw_frame = g_current_frame;
             return;
         }
     }
@@ -1131,14 +1136,22 @@ void lazyLoad(StdPicture& target)
     {
         C2D_SpriteSheet sourceImage;
         std::string suppPath;
+        bool file_missing = false;
 
-        sourceImage = s_tryHardToLoadC2D_SpriteSheet(target.l.path.c_str()); // some other source image
+        sourceImage = s_tryHardToLoadC2D_SpriteSheet(target.l.path.c_str(), file_missing); // some other source image
 
         if(!sourceImage)
         {
-            pLogWarning("Permanently failed to load %s, %lu free", target.l.path.c_str(), linearSpaceFree());
-            pLogWarning("Error: %d (%s)", errno, strerror(errno));
-            target.inited = false;
+            pLogWarning("Failed to load %s, %lu free", target.l.path.c_str(), linearSpaceFree());
+
+            if(file_missing)
+                pLogWarning("File missing");
+
+            if(file_missing)
+                target.inited = false;
+            else
+                target.d.last_draw_frame = g_current_frame;
+
             return;
         }
 
@@ -1147,12 +1160,13 @@ void lazyLoad(StdPicture& target)
         if(target.h > 2048)
         {
             suppPath = target.l.path + '1';
-            sourceImage = s_tryHardToLoadC2D_SpriteSheet(suppPath.c_str());
+            sourceImage = s_tryHardToLoadC2D_SpriteSheet(suppPath.c_str(), file_missing);
 
             if(!sourceImage)
             {
                 pLogWarning("Permanently failed to load %s, %lu free", suppPath.c_str(), linearSpaceFree());
-                pLogWarning("Error: %d (%s)", errno, strerror(errno));
+                if(file_missing)
+                    pLogWarning("File missing");
             }
             else
                 s_loadTexture2(target, sourceImage);
@@ -1161,12 +1175,13 @@ void lazyLoad(StdPicture& target)
         if(target.h > 4096)
         {
             suppPath = target.l.path + '2';
-            sourceImage = s_tryHardToLoadC2D_SpriteSheet(suppPath.c_str());
+            sourceImage = s_tryHardToLoadC2D_SpriteSheet(suppPath.c_str(), file_missing);
 
             if(!sourceImage)
             {
                 pLogWarning("Permanently failed to load %s, %lu free", suppPath.c_str(), linearSpaceFree());
-                pLogWarning("Error: %d (%s)", errno, strerror(errno));
+                if(file_missing)
+                    pLogWarning("File missing");
             }
             else
                 s_loadTexture3(target, sourceImage);
@@ -1229,6 +1244,9 @@ void unloadTexture(StdPicture& tx)
         tx.d.image[i] = C2D_Image();
         tx.d.texture[i] = nullptr;
     }
+
+    // reset load timer
+    tx.d.last_draw_frame = 0;
 
     if(!tx.l.canLoad())
         static_cast<StdPicture_Sub&>(tx) = StdPicture_Sub();

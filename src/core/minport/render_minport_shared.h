@@ -55,6 +55,9 @@ constexpr uint32_t g_never_unload_before = 2;
 // always unload a texture that was rendered more than this many frames ago
 constexpr uint32_t g_always_unload_after = 18000;
 
+// retry a failed load after this many frames
+constexpr uint32_t g_load_failure_retry_frames = 500;
+
 // do not need to be implemented per-platform
 
 #if 0
