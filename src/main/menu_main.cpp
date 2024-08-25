@@ -1020,23 +1020,26 @@ bool mainMenuUpdate()
             }
 
 
-            int quitKeyPos = 2;
+            if(MenuMode == MENU_MAIN)
+            {
+                int quitKeyPos = 2;
 
-            if(s_show_separate_2P())
-                quitKeyPos++;
+                if(s_show_separate_2P())
+                    quitKeyPos++;
 
-            if(!g_gameInfo.disableBattleMode)
-                quitKeyPos++;
+                if(!g_gameInfo.disableBattleMode)
+                    quitKeyPos++;
 
-            if(g_config.enable_editor)
-                quitKeyPos++;
+                if(g_config.enable_editor)
+                    quitKeyPos++;
 
 
-            if(MenuCursor > quitKeyPos)
-                MenuCursor = 0;
+                if(MenuCursor > quitKeyPos)
+                    MenuCursor = 0;
 
-            if(MenuCursor < 0)
-                MenuCursor = quitKeyPos;
+                if(MenuCursor < 0)
+                    MenuCursor = quitKeyPos;
+            }
         } // Main Menu
 
         // Character Select
