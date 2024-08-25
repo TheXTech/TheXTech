@@ -52,7 +52,8 @@
 namespace XRender
 {
 
-bool g_in_frame;
+bool g_in_frame = false;
+uint64_t s_last_frame_start = 0;
 
 std::set<StdPicture*> s_texture_bank;
 uint32_t s_loadedVRAM = 0;
@@ -426,6 +427,12 @@ void quit()
 {
 }
 
+bool ready_for_frame()
+{
+    // in unlimited framerate or frameskip modes, only start at most 60 frames per second (because the game will get limited to 60 frames per second in the hardware anyway)
+    return (!g_config.unlimited_framerate && !g_config.enable_frameskip) || (SDL_GetMicroTicks() - s_last_frame_start) > 16722;
+}
+
 void setTargetTexture()
 {
     if(g_in_frame)
@@ -434,6 +441,7 @@ void setTargetTexture()
         return;
     }
 
+    s_last_frame_start = SDL_GetMicroTicks();
     g_in_frame = true;
 
     minport_initFrame();
@@ -471,10 +479,16 @@ void repaint()
         return;
     }
 
+    g_microStats.start_sleep();
+
     glFlush(0);
 
     if(g_config.render_vsync)
         swiWaitForVBlank();
+
+    // Note that when vsync is disabled, the glFlush call will actually cause the geometry engine to wait for vblank on the next issued command. We can't track that timing easily.
+
+    g_microStats.start_task(MicroStats::Graphics);
 
     g_in_frame = false;
 }

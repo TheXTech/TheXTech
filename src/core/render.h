@@ -68,10 +68,13 @@ extern int TargetW;
 extern int TargetH;
 
 #ifndef RENDER_CUSTOM
-
 // reset bitmask warning flag for SDL platforms
 extern bool g_BitmaskTexturePresent;
+#endif
 
+#ifdef __16M__
+// signals that the GPU is ready for new commands (will not block at frame end)
+bool ready_for_frame();
 #endif
 
 

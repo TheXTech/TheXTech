@@ -104,6 +104,15 @@ void UpdateGraphics2(bool skipRepaint)
     if(g_config.enable_frameskip && frameSkipNeeded())
         return;
 
+#ifdef __16M__
+    if(!XRender::ready_for_frame())
+    {
+        if(g_config.unlimited_framerate)
+            frameNextInc();
+        return;
+    }
+#endif
+
     XRender::setTargetTexture();
 
     frameNextInc();
