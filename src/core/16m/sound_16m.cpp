@@ -24,6 +24,7 @@
 
 #include "sdl_proxy/sdl_stdinc.h"
 
+#include "pseudo_vb.h"
 #include "globals.h"
 #include "global_dirs.h"
 #include "frame_timer.h"
@@ -43,7 +44,7 @@
 #include <unordered_map>
 #include <fmt_format_ne.h>
 
-#include "pseudo_vb.h"
+#include "core/16m/sound_stream_16m.h"
 
 static constexpr int s_max_effects = 1920;
 static constexpr int s_max_modules =  128;
@@ -85,6 +86,7 @@ static bool s_useIceBallSfx = false;
 static bool s_useNewIceSfx = false;
 
 static int s_curMusic = -1;
+static uint16_t s_customSection = 0;
 // static int s_curJingle = -1;
 static std::vector<bool> s_soundLoaded;
 static std::vector<int> s_worldMusicMods;
@@ -210,8 +212,11 @@ void UnloadSound()
     mmStop();
     mmEffectCancelAll();
 
-    if(s_curMusic != -1)
+    if(s_curMusic > -1)
         mmUnload(s_curMusic);
+    else if(s_curMusic < -1)
+        Sound_StreamStop();
+
     s_curMusic = -1;
 
     for(unsigned int i = 0; i < g_totalSounds; i++)
@@ -337,6 +342,9 @@ static void s_MusicUpdateFade()
 static void s_playMusic(int mod, int fadeInMs)
 {
     StopMusic();
+    if(mod == -2 && s_customSection > maxSections)
+        return;
+
     if(mod == -1)
         return;
 
@@ -345,9 +353,31 @@ static void s_playMusic(int mod, int fadeInMs)
     if(!g_mixerLoaded)
         return;
 
-    mmLoad(mod);
-    s_MusicSetupFade(1024, fadeInMs);
-    mmStart(mod, MM_PLAY_LOOP);
+    if(mod > -1)
+    {
+        mmLoad(mod);
+        s_MusicSetupFade(1024, fadeInMs);
+        mmStart(mod, MM_PLAY_LOOP);
+    }
+    else if(mod == -2 || mod == -3)
+    {
+        std::string p = ((mod == -3) ? (curWorldMusicFile) : CustomMusic[s_customSection]);
+
+        // remove pipe and add qoa
+        for(size_t i = 0; i < p.size(); i++)
+        {
+            if(p[i] == '|')
+            {
+                p.resize(i);
+                break;
+            }
+        }
+        p += ".qoa";
+
+        p = g_dirEpisode.resolveFileCaseExistsAbs(p);
+
+        Sound_StreamStart(Files::open_file(p, "rb"));
+    }
 }
 
 void setMusicStartDelay()
@@ -425,16 +455,14 @@ void StartMusic(int A, int fadeInMs)
         StopMusic();
         curWorldMusic = A;
         musicName = fmt::format_ne("wmusic{0}", A);
+
+        int index = -1;
         if(curWorldMusic == g_customWldMusicId)
-        {
-        }
-        else
-        {
-            int index = -1;
-            if(A >= 1 && A - 1 < (int)s_worldMusicMods.size())
-                index = s_worldMusicMods[A - 1];
-            s_playMusic(index, fadeInMs);
-        }
+            index = -3;
+        else if(A >= 1 && A - 1 < (int)s_worldMusicMods.size())
+            index = s_worldMusicMods[A - 1];
+
+        s_playMusic(index, fadeInMs);
     }
     else if(A == -1) // P switch music
     {
@@ -463,8 +491,14 @@ void StartMusic(int A, int fadeInMs)
         std::string mus = fmt::format_ne("music{0}", curMusic);
 
         int index = -1;
-        if(curMusic >= 1 && curMusic - 1 < (int)s_levelMusicMods.size())
+        if(curMusic == g_customLvlMusicId)
+        {
+            s_customSection = A;
+            index = -2;
+        }
+        else if(curMusic >= 1 && curMusic - 1 < (int)s_levelMusicMods.size())
             index = s_levelMusicMods[curMusic - 1];
+
         s_playMusic(index, fadeInMs);
 
         musicName = std::move(mus);
@@ -480,15 +514,18 @@ void StopMusic()
 
     pLogDebug("Stopping music");
 
-    if(s_curMusic != -1)
+    if(s_curMusic > -1)
     {
         mmPause();
         mmStop();
         // busy-wait on the main core
         while(mmActive()) {}
         mmUnload(s_curMusic);
-        s_curMusic = -1;
     }
+    else if(s_curMusic < -1)
+        Sound_StreamStop();
+
+    s_curMusic = -1;
     musicPlaying = false;
     g_stats.currentMusic.clear();
 }
@@ -798,11 +835,14 @@ void UpdateSound()
 {
     if(!g_mixerLoaded)
         return;
+
     For(A, 1, numSounds)
     {
         if(SoundPause[A] > 0)
             SoundPause[A] -= 1;
     }
+
+    Sound_StreamUpdate();
 
     s_MusicUpdateFade();
 }
