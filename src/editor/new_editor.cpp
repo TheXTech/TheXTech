@@ -2587,6 +2587,8 @@ void EditorScreen::UpdateSelectListScreen(CallMode mode)
                 {
                     if(m_special_page == SPECIAL_PAGE_EVENT_SOUND || m_special_page == SPECIAL_PAGE_EVENT_MUSIC || m_special_page == SPECIAL_PAGE_EVENT_BACKGROUND)
                         m_special_page = SPECIAL_PAGE_EVENT_SETTINGS;
+                    else if(m_special_page == SPECIAL_PAGE_SECTION_MUSIC || m_special_page == SPECIAL_PAGE_SECTION_BACKGROUND)
+                        m_special_page = SPECIAL_PAGE_SECTION_SETTINGS;
                     else
                         m_special_page = SPECIAL_PAGE_NONE;
                 }
