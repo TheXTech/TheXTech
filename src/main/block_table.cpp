@@ -136,6 +136,10 @@ struct TableInterface
 
         rect_external loc = _loc;
 
+        // workaround to handle common block push behavior of NPCs -- if NPCs eventually use updatable queries, this can be removed (along with logic below)
+        if(loc.r - loc.l < 32)
+            loc.r = loc.l + 32;
+
         // NOTE: there are extremely rare cases when these margins are not sufficient for full compatibility
         //   (such as, when an item is trapped inside a wall during !BlocksSorted)
         // This should be fixed for players now.
