@@ -2446,8 +2446,6 @@ void UpdateGraphicsScreen(Screen_t& screen)
                 if(sY > vScreen[Z].Height)
                     continue;
 
-
-
                 if(sX + BlockWidth[block.Type] >= 0 && sY + BlockHeight[block.Type] >= 0 /*&& !block.Hidden*/)
                 {
                     g_stats.renderedBlocks++;
@@ -2472,14 +2470,23 @@ void UpdateGraphicsScreen(Screen_t& screen)
                Effect[A].Type == EFFID_SPINBLOCK || Effect[A].Type == EFFID_BIG_DOOR_OPEN || Effect[A].Type == EFFID_LAVA_MONSTER_LOOK ||
                Effect[A].Type == EFFID_WATER_SPLASH || Effect[A].Type == EFFID_TIME_SWITCH_PRESS || Effect[A].Type == EFFID_TNT_PRESS)
             {
-                g_stats.renderedEffects++;
-                if(vScreenCollision(Z, Effect[A].Location))
+                int sX = (camX + s_round2int(Effect[A].Location.X));
+                if(sX > vScreen[Z].Width)
+                    continue;
+
+                int sY = camY + s_round2int(Effect[A].Location.Y);
+                if(sY > vScreen[Z].Height)
+                    continue;
+
+                int w = s_round2int(Effect[A].Location.Width);
+                int h = s_round2int(Effect[A].Location.Height);
+
+                if(sX + w >= 0 && sY + h >= 0)
                 {
+                    g_stats.renderedEffects++;
+
                     XTColor cn = Effect[A].Shadow ? XTColor(0, 0, 0) : XTColor();
-                    XRender::renderTexture(camX + Effect[A].Location.X,
-                                           camY + Effect[A].Location.Y,
-                                           Effect[A].Location.Width,
-                                           Effect[A].Location.Height,
+                    XRender::renderTextureBasic(sX, sY, w, h,
                                            GFXEffect[Effect[A].Type], 0,
                                            Effect[A].Frame * EffectHeight[Effect[A].Type], cn);
                 }
@@ -2928,16 +2935,24 @@ void UpdateGraphicsScreen(Screen_t& screen)
                e.Type != EFFID_PLR_FIREBALL_TRAIL && e.Type != EFFID_COIN_SWITCH_PRESS && e.Type != EFFID_SPINBLOCK && e.Type != EFFID_BIG_DOOR_OPEN &&
                e.Type != EFFID_LAVA_MONSTER_LOOK && e.Type != EFFID_WATER_SPLASH && e.Type != EFFID_TIME_SWITCH_PRESS && e.Type != EFFID_TNT_PRESS)
             {
-                if(vScreenCollision(Z, e.Location))
+                int sX = (camX + s_round2int(Effect[A].Location.X));
+                if(sX > vScreen[Z].Width)
+                    continue;
+
+                int sY = camY + s_round2int(Effect[A].Location.Y);
+                if(sY > vScreen[Z].Height)
+                    continue;
+
+                int w = s_round2int(Effect[A].Location.Width);
+                int h = s_round2int(Effect[A].Location.Height);
+
+                if(sX + w >= 0 && sY + h >= 0)
                 {
                     g_stats.renderedEffects++;
 
                     XTColor cn = e.Shadow ? XTColor(0, 0, 0) : XTColor();
-                    XRender::renderTexture(vb6Round(camX + e.Location.X),
-                                           vb6Round(camY + e.Location.Y),
-                                           vb6Round(e.Location.Width),
-                                           vb6Round(e.Location.Height),
-                                           GFXEffectBMP[e.Type], 0, e.Frame * EffectHeight[e.Type], cn);
+                    XRender::renderTextureBasic(sX, sY, w, h,
+                        GFXEffectBMP[e.Type], 0, e.Frame * EffectHeight[e.Type], cn);
                 }
             }
         }
