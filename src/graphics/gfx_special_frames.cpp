@@ -56,10 +56,14 @@ void SpecialFrames()
             SpecialFrame[3] = 0;
     }
 
-    SpecialFrameCount[4]++;
-    if(SpecialFrameCount[4] >= 2.475F)
+    // SpecialFrameCount[4]++;
+    // if(SpecialFrameCount[4] >= 2.475F)
+
+    SpecialFrameCount[4] += 1000;
+    if(SpecialFrameCount[4] >= 2475)
     {
-        SpecialFrameCount[4] = (float)(SpecialFrameCount[4] - 2.475);
+        // SpecialFrameCount[4] = SpecialFrameCount[4] - 2.475F;
+        SpecialFrameCount[4] -= 2475;
 
         SpecialFrame[4]++;
         if(SpecialFrame[4] >= 4)

@@ -240,8 +240,8 @@ RangeArrI<int, 0, maxBlockType, 0> EffectHeight;
 EffectDefaults_t EffectDefaults;
 RangeArrI<int, 1, maxSceneType, 0> SceneWidth;
 RangeArrI<int, 1, maxSceneType, 0> SceneHeight;
-RangeArrI<int, 0, 100, 0> SpecialFrame;
-RangeArr<float, 0, 100> SpecialFrameCount;
+RangeArrI<vbint_t, 0, 9, 0> SpecialFrame;
+RangeArr<vbint_t, 0, 9> SpecialFrameCount;
 RangeArrI<bool, 1, maxBackgroundType, false> BackgroundHasNoMask;
 RangeArrI<bool, 0, maxBackgroundType, false> Foreground;
 RangeArrI<int, 1, maxBackgroundType, 0> BackgroundWidth;
@@ -621,7 +621,7 @@ void initAll()
     bgMusicREAL.fill(0);
     Background2REAL.fill(0);
     Background2.fill(0);
-    SpecialFrameCount.fill(0.f);
+    SpecialFrameCount.fill(0);
     // NPCSpeedvar.fill(0.f);
 
     Block.fill(Block_t());

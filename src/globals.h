@@ -1743,9 +1743,9 @@ extern RangeArrI<int, 1, maxSceneType, 0> SceneFrame;
 //Public SceneFrame2(1 To maxSceneType) As Integer 'Counter to update the scene frames
 extern RangeArrI<int, 1, maxSceneType, 0> SceneFrame2;
 //Public SpecialFrame(100) As Integer 'misc frames for things like coins and the kurbi shoe
-extern RangeArrI<int, 0, 100, 0> SpecialFrame;
+extern RangeArrI<vbint_t, 0, 9, 0> SpecialFrame;
 //Public SpecialFrameCount(100) As Single
-extern RangeArr<float, 0, 100> SpecialFrameCount;
+extern RangeArr<vbint_t, 0, 9> SpecialFrameCount;
 //Public TileWidth(1 To maxTileType) As Integer
 extern RangeArrI<int, 1, maxTileType, 0> TileWidth;
 //Public TileHeight(1 To maxTileType) As Integer
