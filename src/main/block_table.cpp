@@ -52,7 +52,7 @@ struct TableInterface
         num_active_tables = 0;
     }
 
-    const std::set<int>& layer_items(int layer);
+    const std::vector<vbint_t>& layer_items(int layer);
 
     // checks if a layer is currently split from the main table
     bool active(int layer)
@@ -237,7 +237,7 @@ bool s_temp_blocks_enabled = false;
 /* ================= Level blocks ================= */
 
 template<>
-const std::set<int>& TableInterface<BlockRef_t>::layer_items(int layer)
+const std::vector<vbint_t>& TableInterface<BlockRef_t>::layer_items(int layer)
 {
     return Layer[layer].blocks;
 }
@@ -531,7 +531,7 @@ TreeResult_Sentinel<BlockRef_t> treeBlockQuery(const Location_t &_loc,
 /* ================= Level Backgrounds ================= */
 
 template<>
-const std::set<int>& TableInterface<BackgroundRef_t>::layer_items(int layer)
+const std::vector<vbint_t>& TableInterface<BackgroundRef_t>::layer_items(int layer)
 {
     return Layer[layer].BGOs;
 }
@@ -704,7 +704,7 @@ TreeResult_Sentinel<NPCRef_t> treeNPCQuery(double Left, double Top, double Right
 /* ================= Level PEZs ================= */
 
 template<>
-const std::set<int>& TableInterface<WaterRef_t>::layer_items(int layer)
+const std::vector<vbint_t>& TableInterface<WaterRef_t>::layer_items(int layer)
 {
     return Layer[layer].waters;
 }

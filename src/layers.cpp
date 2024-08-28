@@ -71,6 +71,30 @@ static SDL_INLINE bool equalCase(const char *x, const char *y)
     return (SDL_strcasecmp(x, y) == 0);
 }
 
+static void sorted_insert(std::vector<vbint_t>& vec, vbint_t val)
+{
+    auto it = std::lower_bound(vec.begin(), vec.end(), val);
+    bool val_exists = (it != vec.end() && *it == val);
+
+    // don't duplicate value
+    if(val_exists)
+        return;
+
+    vec.insert(it, val);
+}
+
+static void sorted_erase(std::vector<vbint_t>& vec, vbint_t val)
+{
+    auto it = std::lower_bound(vec.begin(), vec.end(), val);
+    bool val_exists = (it != vec.end() && *it == val);
+
+    // don't remove nonexistent value
+    if(!val_exists)
+        return;
+
+    vec.erase(it);
+}
+
 
 
 // utilities for layerindex_t and eventindex_t
@@ -1818,7 +1842,7 @@ void syncLayersTrees_Block(int block)
     {
         if(layer != Block[block].Layer)
         {
-            Layer[layer].blocks.erase(block);
+            sorted_erase(Layer[layer].blocks, block);
             treeBlockRemoveLayer(layer, block);
         }
     }
@@ -1828,14 +1852,14 @@ void syncLayersTrees_Block(int block)
     {
         treeBlockUpdateLayer(layer, block);
         if(layer != LAYER_NONE)
-            Layer[layer].blocks.insert(block);
+            sorted_insert(Layer[layer].blocks, block);
     }
     else
     {
         treeBlockRemoveLayer(layer, block);
         if(layer != LAYER_NONE)
         {
-            Layer[layer].blocks.erase(block);
+            sorted_erase(Layer[layer].blocks, block);
         }
     }
 }
@@ -1894,7 +1918,7 @@ void syncLayers_BGO(int bgo)
         if(layer != Background[bgo].Layer)
         {
             treeBackgroundRemoveLayer(layer, bgo);
-            Layer[layer].BGOs.erase(bgo);
+            sorted_erase(Layer[layer].BGOs, bgo);
         }
     }
 
@@ -1903,13 +1927,13 @@ void syncLayers_BGO(int bgo)
     {
         treeBackgroundUpdateLayer(layer, bgo);
         if(layer != LAYER_NONE)
-            Layer[layer].BGOs.insert(bgo);
+            sorted_insert(Layer[layer].BGOs, bgo);
     }
     else
     {
         treeBackgroundRemoveLayer(layer, bgo);
         if(layer != LAYER_NONE)
-            Layer[layer].BGOs.erase(bgo);
+            sorted_erase(Layer[layer].BGOs, bgo);
     }
 }
 
@@ -1918,9 +1942,9 @@ void syncLayers_Warp(int warp)
     for(int layer = 0; layer < numLayers; layer++)
     {
         if(warp <= numWarps && Warp[warp].Layer == layer)
-            Layer[layer].warps.insert(warp);
+            sorted_insert(Layer[layer].warps, warp);
         else
-            Layer[layer].warps.erase(warp);
+            sorted_erase(Layer[layer].warps, warp);
     }
 }
 
@@ -1931,7 +1955,7 @@ void syncLayers_Water(int water)
         if(layer != Water[water].Layer)
         {
             treeWaterRemoveLayer(layer, water);
-            Layer[layer].waters.erase(water);
+            sorted_erase(Layer[layer].waters, water);
         }
     }
 
@@ -1940,12 +1964,12 @@ void syncLayers_Water(int water)
     {
         treeWaterUpdateLayer(layer, water);
         if(layer != LAYER_NONE)
-            Layer[layer].waters.insert(water);
+            sorted_insert(Layer[layer].waters, water);
     }
     else
     {
         treeWaterRemoveLayer(layer, water);
         if(layer != LAYER_NONE)
-            Layer[layer].waters.erase(water);
+            sorted_erase(Layer[layer].waters, water);
     }
 }

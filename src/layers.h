@@ -55,11 +55,11 @@ struct Layer_t
 
 //End Type
 // NEW: track the objects belonging to the layer
-    std::set<int> blocks;
-    std::set<int> BGOs;
+    std::vector<vbint_t> blocks;
+    std::vector<vbint_t> BGOs;
     std::set<int> NPCs;
-    std::set<int> warps;
-    std::set<int> waters;
+    std::vector<vbint_t> warps;
+    std::vector<vbint_t> waters;
 // NEW: track the layer offset so we don't need to update the block/BGO trees
     double OffsetX = 0.0;
     double OffsetY = 0.0;
