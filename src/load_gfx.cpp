@@ -84,12 +84,12 @@ static const Sint64 c_gfxLoaderShowInterval = 500;
 
 struct GFXBackup_t
 {
-    int *remote_width = nullptr;
-    int *remote_height = nullptr;
+    vbint_t *remote_width = nullptr;
+    vbint_t *remote_height = nullptr;
     bool *remote_isCustom = nullptr;
     StdPicture *remote_texture = nullptr;
-    int width = 0;
-    int height = 0;
+    vbint_t width = 0;
+    vbint_t height = 0;
     StdPicture_Sub texture_backup;
 };
 
@@ -240,7 +240,7 @@ SDL_FORCE_INLINE bool s_resolveFile(const char **extList,
  */
 static void loadCGFX(const std::string &origPath,
                      const std::string &fName,
-                     int *width, int *height, bool& isCustom, StdPicture &texture,
+                     vbint_t *width, vbint_t *height, bool& isCustom, StdPicture &texture,
                      bool world = false,
                      bool skipMask = false)
 {
@@ -391,7 +391,7 @@ static void loadCBorder(const std::string &origPath,
  */
 static void loadImageFromList(PGE_FileFormats_misc::TextInput& t, std::string& line_buf, const std::string& dir,
                     StdPicture &texture,
-                    int *width, int *height, bool &is_custom_loc,
+                    vbint_t *width, vbint_t *height, bool &is_custom_loc,
                     bool world = false, bool this_is_custom = false)
 {
     StdPicture_Sub newTexture;

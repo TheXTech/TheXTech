@@ -1364,9 +1364,9 @@ struct SelectWorld_t
 };
 
 //Public OwedMount(0 To maxPlayers) As Integer 'when a yoshi/boot is taken from the player this returns after going back to the world map
-extern RangeArrI<int, 0, maxPlayers, 0> OwedMount;
+extern RangeArrI<vbint_t, 0, maxPlayers, 0> OwedMount;
 //Public OwedMountType(0 To maxPlayers) As Integer
-extern RangeArrI<int, 0, maxPlayers, 0> OwedMountType;
+extern RangeArrI<vbint_t, 0, maxPlayers, 0> OwedMountType;
 //EXTRA: set this flag once modern autoscroll used, otherwise, legacy will be used
 extern bool AutoUseModern;
 //Public AutoX(0 To maxSections) As Single 'for autoscroll
@@ -1657,9 +1657,9 @@ enum
     SLOPE_CEILING_RIGHT = +1,
 };
 //Public BlockSlope(0 To maxBlockType) As Integer 'block is sloped on top. -1 of block has an upward slope, 1 for downward
-extern RangeArrI<int, 0, maxBlockType, 0> BlockSlope;
+extern RangeArrI<vbint_t, 0, maxBlockType, 0> BlockSlope;
 //Public BlockSlope2(0 To maxBlockType) As Integer 'block is sloped on the bottom.
-extern RangeArrI<int, 0, maxBlockType, 0> BlockSlope2;
+extern RangeArrI<vbint_t, 0, maxBlockType, 0> BlockSlope2;
 
 // moved into vScreen
 
@@ -1685,52 +1685,52 @@ extern bool qScreen_canonical;
 // extern RangeArr<vScreen_t, 0, 2> qScreenLoc;
 
 //Public BlockWidth(0 To maxBlockType) As Integer 'Block type width
-extern RangeArrI<int, 0, maxBlockType, 0> BlockWidth;
+extern RangeArrI<vbint_t, 0, maxBlockType, 0> BlockWidth;
 //Public BlockHeight(0 To maxBlockType) As Integer 'Block type height
-extern RangeArrI<int, 0, maxBlockType, 0> BlockHeight;
+extern RangeArrI<vbint_t, 0, maxBlockType, 0> BlockHeight;
 //Public BonusWidth(1 To 100) As Integer 'Bonus type width
-extern RangeArrI<int, 0, maxBlockType, 0> BonusWidth;
+// extern RangeArrI<vbint_t, 0, maxBlockType, 0> BonusWidth;
 //Public BonusHeight(1 To 100) As Integer 'Bonus type height
-extern RangeArrI<int, 0, maxBlockType, 0> BonusHeight;
+// extern RangeArrI<vbint_t, 0, maxBlockType, 0> BonusHeight;
 //Public EffectWidth(1 To maxEffectType) As Integer 'Effect width
-extern RangeArrI<int, 0, maxBlockType, 0> EffectWidth;
+extern RangeArrI<vbint_t, 0, maxEffectType, 0> EffectWidth;
 //Public EffectHeight(1 To maxEffectType) As Integer 'Effect height
-extern RangeArrI<int, 0, maxBlockType, 0> EffectHeight;
+extern RangeArrI<vbint_t, 0, maxEffectType, 0> EffectHeight;
 
 //Public Type EffectDefaults
 struct EffectDefaults_t
 {
 //    EffectWidth(1 To maxEffectType) As Integer
-    RangeArrI<int, 1, maxEffectType, 0> EffectWidth;
+    RangeArrI<vbint_t, 1, maxEffectType, 0> EffectWidth;
 //    EffectHeight(1 To maxEffectType) As Integer
-    RangeArrI<int, 1, maxEffectType, 0> EffectHeight;
+    RangeArrI<vbint_t, 1, maxEffectType, 0> EffectHeight;
 //EXTRA: count of frames (compute from the GFX height)
-    RangeArrI<int, 1, maxEffectType, 0> EffectFrames;
+    RangeArrI<vbint_t, 1, maxEffectType, 0> EffectFrames;
 //End Type
 };
 
 //Public EffectDefaults As EffectDefaults
 extern EffectDefaults_t EffectDefaults;
 //Public SceneWidth(1 To 100) As Integer 'Scene width
-extern RangeArrI<int, 1, maxSceneType, 0> SceneWidth;
+extern RangeArrI<vbint_t, 1, maxSceneType, 0> SceneWidth;
 //Public SceneHeight(1 To 100) As Integer 'Scene height
-extern RangeArrI<int, 1, maxSceneType, 0> SceneHeight;
+extern RangeArrI<vbint_t, 1, maxSceneType, 0> SceneHeight;
 //Public BackgroundHasNoMask(1 To maxBackgroundType) As Boolean
 extern RangeArrI<bool, 1, maxBackgroundType, false> BackgroundHasNoMask;
 //Public Foreground(0 To maxBackgroundType) As Boolean 'flags the background object to be drawn in front of everything else
 extern RangeArrI<bool, 0, maxBackgroundType, false> Foreground;
 //Public BackgroundWidth(1 To maxBackgroundType) As Integer
-extern RangeArrI<int, 1, maxBackgroundType, 0> BackgroundWidth;
+extern RangeArrI<vbint_t, 1, maxBackgroundType, 0> BackgroundWidth;
 //Public BackgroundHeight(1 To maxBackgroundType) As Integer
-extern RangeArrI<int, 1, maxBackgroundType, 0> BackgroundHeight;
+extern RangeArrI<vbint_t, 1, maxBackgroundType, 0> BackgroundHeight;
 //Public BackgroundFrame(1 To maxBackgroundType) As Integer
-extern RangeArrI<int, 1, maxBackgroundType, 0> BackgroundFrame;
+extern RangeArrI<vbint_t, 1, maxBackgroundType, 0> BackgroundFrame;
 //Public BackgroundFrameCount(1 To maxBackgroundType) As Integer
-extern RangeArrI<int, 1, maxBackgroundType, 0> BackgroundFrameCount;
+extern RangeArrI<vbint_t, 1, maxBackgroundType, 0> BackgroundFrameCount;
 //Public BlockFrame(1 To maxBlockType) As Integer 'What frame the block is on
-extern RangeArrI<int, 1, maxBlockType, 0> BlockFrame;
+extern RangeArrI<vbint_t, 1, maxBlockType, 0> BlockFrame;
 //Public BlockFrame2(1 To maxBlockType) As Integer 'Counter to update the blocks frame
-extern RangeArrI<int, 1, maxBlockType, 0> BlockFrame2;
+extern RangeArrI<vbint_t, 1, maxBlockType, 0> BlockFrame2;
 
 // deprecated
 //Public sBlockArray(1 To 1000) As Integer 'sizable block array
@@ -1739,25 +1739,25 @@ extern RangeArrI<int, 1, maxBlockType, 0> BlockFrame2;
 // extern int sBlockNum;
 
 //Public SceneFrame(1 To maxSceneType) As Integer 'What frame the scene is on
-extern RangeArrI<int, 1, maxSceneType, 0> SceneFrame;
+extern RangeArrI<vbint_t, 1, maxSceneType, 0> SceneFrame;
 //Public SceneFrame2(1 To maxSceneType) As Integer 'Counter to update the scene frames
-extern RangeArrI<int, 1, maxSceneType, 0> SceneFrame2;
+extern RangeArrI<vbint_t, 1, maxSceneType, 0> SceneFrame2;
 //Public SpecialFrame(100) As Integer 'misc frames for things like coins and the kurbi shoe
 extern RangeArrI<vbint_t, 0, 9, 0> SpecialFrame;
 //Public SpecialFrameCount(100) As Single
 extern RangeArr<vbint_t, 0, 9> SpecialFrameCount;
 //Public TileWidth(1 To maxTileType) As Integer
-extern RangeArrI<int, 1, maxTileType, 0> TileWidth;
+extern RangeArrI<vbint_t, 1, maxTileType, 0> TileWidth;
 //Public TileHeight(1 To maxTileType) As Integer
-extern RangeArrI<int, 1, maxTileType, 0> TileHeight;
+extern RangeArrI<vbint_t, 1, maxTileType, 0> TileHeight;
 //Public TileFrame(1 To maxTileType) As Integer
-extern RangeArrI<int, 1, maxTileType, 0> TileFrame;
+extern RangeArrI<vbint_t, 1, maxTileType, 0> TileFrame;
 //Public TileFrame2(1 To maxTileType) As Integer
-extern RangeArrI<int, 1, maxTileType, 0> TileFrame2;
+extern RangeArrI<vbint_t, 1, maxTileType, 0> TileFrame2;
 //Public LevelFrame(1 To 100) As Integer 'What frame the scene is on
-extern RangeArrI<int, 1, 100, 0> LevelFrame;
+extern RangeArrI<vbint_t, 1, 100, 0> LevelFrame;
 //Public LevelFrame2(1 To 100) As Integer 'Counter to update the scene frames
-extern RangeArrI<int, 1, 100, 0> LevelFrame2;
+extern RangeArrI<vbint_t, 1, 100, 0> LevelFrame2;
 //Public BlockHasNoMask(1 To maxBlockType) As Boolean
 extern RangeArrI<bool, 1, maxBlockType, false> BlockHasNoMask;
 //Public LevelHasNoMask(1 To 100) As Boolean
@@ -1775,9 +1775,9 @@ extern RangeArrI<bool, 0, maxBlockType, false> BlockPSwitch;
 //Public BlockNoClipping(0 To maxBlockType) As Boolean 'player/npcs can walk throught the block
 extern RangeArrI<bool, 0, maxBlockType, false> BlockNoClipping;
 //Public CoinFrame(1 To 10) As Integer 'What frame the coin is on
-extern RangeArrI<int, 1, 10, 0> CoinFrame;
+extern RangeArrI<vbint_t, 1, 10, 0> CoinFrame;
 //Public CoinFrame2(1 To 10) As Integer 'Counter to update the coin frames
-extern RangeArrI<int, 1, 10, 0> CoinFrame2;
+extern RangeArrI<vbint_t, 1, 10, 0> CoinFrame2;
 //Public EditorCursor As EditorCursor
 extern EditorCursor_t EditorCursor;
 //Public EditorControls As EditorControls
@@ -1792,9 +1792,9 @@ extern EditorControls_t EditorControls;
 // extern RangeArr<CursorControls_t, 1, maxLocalPlayers> PlayerCursor;
 
 //Public Sound(1 To numSounds) As Integer
-extern RangeArrI<int, 1, numSounds, 0> Sound;
+// extern RangeArrI<int, 1, numSounds, 0> Sound;
 //Public SoundPause(1 To numSounds) As Integer
-extern RangeArrI<int, 1, numSounds, 0> SoundPause;
+extern RangeArrI<vbint_t, 1, numSounds, 0> SoundPause;
 //EXTRA: Immediately quit level because of a fatal error
 extern bool ErrorQuit;
 //Public EndLevel As Boolean 'End the level and move to the next
@@ -2194,9 +2194,9 @@ extern RangeArrI<bool, 1, numBackground2, false> GFXBackground2Custom;
 //Public GFXBackground2BMP(1 To numBackground2) As StdPicture
 extern RangeArr<StdPicture, 1, numBackground2> GFXBackground2BMP;
 //Public GFXBackground2Height(1 To numBackground2) As Integer
-extern RangeArrI<int, 1, numBackground2, 0> GFXBackground2Height;
+extern RangeArrI<vbint_t, 1, numBackground2, 0> GFXBackground2Height;
 //Public GFXBackground2Width(1 To numBackground2) As Integer
-extern RangeArrI<int, 1, numBackground2, 0> GFXBackground2Width;
+extern RangeArrI<vbint_t, 1, numBackground2, 0> GFXBackground2Width;
 //Public GFXNPCCustom(1 To maxNPCType) As Boolean
 extern RangeArrI<bool, 1, maxNPCType, false> GFXNPCCustom;
 //Public GFXNPC(1 To maxNPCType) As Long
@@ -2227,9 +2227,9 @@ extern RangeArr<StdPicture, 1, maxEffectType> GFXEffectBMP;
 //Public GFXEffectMaskBMP(1 To maxEffectType) As StdPicture
 //extern RangeArr<StdPicture, 1, maxEffectType> GFXEffectMaskBMP;
 //Public GFXEffectHeight(1 To maxEffectType) As Integer
-extern RangeArrI<int, 1, maxEffectType, 0> GFXEffectHeight;
+extern RangeArrI<vbint_t, 1, maxEffectType, 0> GFXEffectHeight;
 //Public GFXEffectWidth(1 To maxEffectType) As Integer
-extern RangeArrI<int, 1, maxEffectType, 0> GFXEffectWidth;
+extern RangeArrI<vbint_t, 1, maxEffectType, 0> GFXEffectWidth;
 //Public GFXBackgroundCustom(1 To maxBackgroundType) As Boolean
 extern RangeArrI<bool, 1, maxBackgroundType, false> GFXBackgroundCustom;
 //Public GFXBackground(1 To maxBackgroundType) As Long
@@ -2242,14 +2242,14 @@ extern RangeArr<StdPicture, 1, maxBackgroundType> GFXBackgroundBMP;
 //Public GFXBackgroundMaskBMP(1 To maxBackgroundType) As StdPicture
 //extern RangeArr<StdPicture, 1, maxBackgroundType> GFXBackgroundMaskBMP;
 //Public GFXBackgroundHeight(1 To maxBackgroundType) As Integer
-extern RangeArrI<int, 1, maxBackgroundType, 0> GFXBackgroundHeight;
+extern RangeArrI<vbint_t, 1, maxBackgroundType, 0> GFXBackgroundHeight;
 //Public GFXBackgroundWidth(1 To maxBackgroundType) As Integer
-extern RangeArrI<int, 1, maxBackgroundType, 0> GFXBackgroundWidth;
+extern RangeArrI<vbint_t, 1, maxBackgroundType, 0> GFXBackgroundWidth;
 
 extern const char *GFXPlayerNames[numCharacters];
 extern RangeArr<StdPicture, 1, 10> *GFXCharacterBMP[numCharacters];
-extern RangeArrI<int, 1, 10, 0> *GFXCharacterWidth[numCharacters];
-extern RangeArrI<int, 1, 10, 0> *GFXCharacterHeight[numCharacters];
+extern RangeArrI<vbint_t, 1, 10, 0> *GFXCharacterWidth[numCharacters];
+extern RangeArrI<vbint_t, 1, 10, 0> *GFXCharacterHeight[numCharacters];
 extern RangeArrI<bool, 1, 10, false> *GFXCharacterCustom[numCharacters];
 
 //Public GFXMarioCustom(1 To 10) As Boolean
@@ -2264,9 +2264,9 @@ extern RangeArr<StdPicture, 1, 10> GFXMarioBMP;
 //Public GFXMarioMaskBMP(1 To 10) As StdPicture
 //extern RangeArr<StdPicture, 1, 10> GFXMarioMaskBMP;
 //Public GFXMarioHeight(1 To 10) As Integer
-extern RangeArrI<int, 1, 10, 0> GFXMarioHeight;
+extern RangeArrI<vbint_t, 1, 10, 0> GFXMarioHeight;
 //Public GFXMarioWidth(1 To 10) As Integer
-extern RangeArrI<int, 1, 10, 0> GFXMarioWidth;
+extern RangeArrI<vbint_t, 1, 10, 0> GFXMarioWidth;
 //Public GFXLuigiCustom(1 To 10) As Boolean
 extern RangeArrI<bool, 1, 10, false> GFXLuigiCustom;
 //Public GFXLuigi(1 To 10) As Long
@@ -2279,9 +2279,9 @@ extern RangeArr<StdPicture, 1, 10> GFXLuigiBMP;
 //Public GFXLuigiMaskBMP(1 To 10) As StdPicture
 //extern RangeArr<StdPicture, 1, 10> GFXLuigiMaskBMP;
 //Public GFXLuigiHeight(1 To 10) As Integer
-extern RangeArrI<int, 1, 10, 0> GFXLuigiHeight;
+extern RangeArrI<vbint_t, 1, 10, 0> GFXLuigiHeight;
 //Public GFXLuigiWidth(1 To 10) As Integer
-extern RangeArrI<int, 1, 10, 0> GFXLuigiWidth;
+extern RangeArrI<vbint_t, 1, 10, 0> GFXLuigiWidth;
 //Public GFXPeachCustom(1 To 10) As Boolean
 extern RangeArrI<bool, 1, 10, false> GFXPeachCustom;
 //Public GFXPeach(1 To 10) As Long
@@ -2294,9 +2294,9 @@ extern RangeArr<StdPicture, 1, 10> GFXPeachBMP;
 //Public GFXPeachMaskBMP(1 To 10) As StdPicture
 //extern RangeArr<StdPicture, 1, 10> GFXPeachMaskBMP;
 //Public GFXPeachHeight(1 To 10) As Integer
-extern RangeArrI<int, 1, 10, 0> GFXPeachHeight;
+extern RangeArrI<vbint_t, 1, 10, 0> GFXPeachHeight;
 //Public GFXPeachWidth(1 To 10) As Integer
-extern RangeArrI<int, 1, 10, 0> GFXPeachWidth;
+extern RangeArrI<vbint_t, 1, 10, 0> GFXPeachWidth;
 //Public GFXToadCustom(1 To 10) As Boolean
 extern RangeArrI<bool, 1, 10, false> GFXToadCustom;
 //Public GFXToad(1 To 10) As Long
@@ -2309,9 +2309,9 @@ extern RangeArr<StdPicture, 1, 10> GFXToadBMP;
 //Public GFXToadMaskBMP(1 To 10) As StdPicture
 //extern RangeArr<StdPicture, 1, 10> GFXToadMaskBMP;
 //Public GFXToadHeight(1 To 10) As Integer
-extern RangeArrI<int, 1, 10, 0> GFXToadHeight;
+extern RangeArrI<vbint_t, 1, 10, 0> GFXToadHeight;
 //Public GFXToadWidth(1 To 10) As Integer
-extern RangeArrI<int, 1, 10, 0> GFXToadWidth;
+extern RangeArrI<vbint_t, 1, 10, 0> GFXToadWidth;
 
 //Public GFXLinkCustom(1 To 10) As Boolean
 extern RangeArrI<bool, 1, 10, false> GFXLinkCustom;
@@ -2325,9 +2325,9 @@ extern RangeArr<StdPicture, 1, 10> GFXLinkBMP;
 //Public GFXLinkMaskBMP(1 To 10) As StdPicture
 //extern RangeArr<StdPicture, 1, 10> GFXLinkMaskBMP;
 //Public GFXLinkHeight(1 To 10) As Integer
-extern RangeArrI<int, 1, 10, 0> GFXLinkHeight;
+extern RangeArrI<vbint_t, 1, 10, 0> GFXLinkHeight;
 //Public GFXLinkWidth(1 To 10) As Integer
-extern RangeArrI<int, 1, 10, 0> GFXLinkWidth;
+extern RangeArrI<vbint_t, 1, 10, 0> GFXLinkWidth;
 //Public GFXYoshiBCustom(1 To 10) As Boolean
 extern RangeArrI<bool, 1, maxYoshiGfx, false> GFXYoshiBCustom;
 //Public GFXYoshiB(1 To 10) As Long
@@ -2359,9 +2359,9 @@ extern RangeArrI<bool, 1, maxTileType, false> GFXTileCustom;
 //Public GFXTileBMP(1 To maxTileType) As StdPicture
 extern RangeArr<StdPicture, 1, maxTileType> GFXTileBMP;
 //Public GFXTileHeight(1 To maxTileType) As Integer
-extern RangeArrI<int, 1, maxTileType, 0> GFXTileHeight;
+extern RangeArrI<vbint_t, 1, maxTileType, 0> GFXTileHeight;
 //Public GFXTileWidth(1 To maxTileType) As Integer
-extern RangeArrI<int, 1, maxTileType, 0> GFXTileWidth;
+extern RangeArrI<vbint_t, 1, maxTileType, 0> GFXTileWidth;
 //Public GFXLevelCustom(0 To maxLevelType) As Long
 extern RangeArrI<bool, 0, maxLevelType, false> GFXLevelCustom;
 //Public GFXLevel(0 To maxLevelType) As Long
@@ -2374,9 +2374,9 @@ extern RangeArr<StdPicture, 0, maxLevelType> GFXLevelBMP;
 //Public GFXLevelMaskBMP(0 To maxLevelType) As StdPicture
 //extern RangeArr<StdPicture, 0, maxLevelType> GFXLevelMaskBMP;
 //Public GFXLevelHeight(0 To maxLevelType) As Integer
-extern RangeArrI<int, 0, maxLevelType, 0> GFXLevelHeight;
+extern RangeArrI<vbint_t, 0, maxLevelType, 0> GFXLevelHeight;
 //Public GFXLevelWidth(0 To maxLevelType) As Integer
-extern RangeArrI<int, 0, maxLevelType, 0> GFXLevelWidth;
+extern RangeArrI<vbint_t, 0, maxLevelType, 0> GFXLevelWidth;
 //Public GFXLevelBig(0 To maxLevelType) As Boolean
 extern RangeArrI<bool, 0, maxLevelType, false> GFXLevelBig;
 //Public GFXSceneCustom(1 To maxSceneType) As Long
@@ -2391,9 +2391,9 @@ extern RangeArr<StdPicture, 1, maxSceneType> GFXSceneBMP;
 //Public GFXSceneMaskBMP(1 To maxSceneType) As StdPicture
 //extern RangeArr<StdPicture, 1, maxSceneType> GFXSceneMaskBMP;
 //Public GFXSceneHeight(1 To maxSceneType) As Integer
-extern RangeArrI<int, 1, maxSceneType, 0> GFXSceneHeight;
+extern RangeArrI<vbint_t, 1, maxSceneType, 0> GFXSceneHeight;
 //Public GFXSceneWidth(1 To maxSceneType) As Integer
-extern RangeArrI<int, 1, maxSceneType, 0> GFXSceneWidth;
+extern RangeArrI<vbint_t, 1, maxSceneType, 0> GFXSceneWidth;
 //Public GFXPathCustom(1 To maxPathType) As Long
 extern RangeArrI<bool, 1, maxPathType, false> GFXPathCustom;
 //Public GFXPath(1 To maxPathType) As Long
@@ -2406,9 +2406,9 @@ extern RangeArr<StdPicture, 1, maxPathType> GFXPathBMP;
 //Public GFXPathMaskBMP(1 To maxPathType) As StdPicture
 //extern RangeArr<StdPicture, 1, maxPathType> GFXPathMaskBMP;
 //Public GFXPathHeight(1 To maxPathType) As Integer
-extern RangeArrI<int, 1, maxPathType, 0> GFXPathHeight;
+extern RangeArrI<vbint_t, 1, maxPathType, 0> GFXPathHeight;
 //Public GFXPathWidth(1 To maxPathType) As Integer
-extern RangeArrI<int, 1, maxPathType, 0> GFXPathWidth;
+extern RangeArrI<vbint_t, 1, maxPathType, 0> GFXPathWidth;
 
 //Public GFXPlayerCustom(1 To numCharacters) As Long
 extern RangeArrI<bool, 1, numCharacters, false> GFXPlayerCustom;
@@ -2422,9 +2422,9 @@ extern RangeArr<StdPicture, 1, numCharacters> GFXPlayerBMP;
 //Public GFXPlayerMaskBMP(1 To numCharacters) As StdPicture
 //extern RangeArr<StdPicture, 1, numCharacters> GFXPlayerMaskBMP;
 //Public GFXPlayerHeight(1 To numCharacters) As Integer
-extern RangeArrI<int, 1, numCharacters, 0> GFXPlayerHeight;
+extern RangeArrI<vbint_t, 1, numCharacters, 0> GFXPlayerHeight;
 //Public GFXPlayerWidth(1 To numCharacters) As Integer
-extern RangeArrI<int, 1, numCharacters, 0> GFXPlayerWidth;
+extern RangeArrI<vbint_t, 1, numCharacters, 0> GFXPlayerWidth;
 
 //Public PlayerCharacter As Integer
 extern int PlayerCharacter;
