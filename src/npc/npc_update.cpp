@@ -563,7 +563,10 @@ void UpdateNPCs()
 
                 for(int B : treeNPCQuery(tempLocation, SORTMODE_ID))
                 {
-                    if(!NPC[B].Active && B != A && NPC[B].Reset[1] && NPC[B].Reset[2])
+                    // In SMBX 1.3, Deactivate was called every frame for every Hidden NPC (in this loop over A). That set Reset to false. Now we need to emulate it.
+                    bool reset_should_be_false = (B < A && NPC[B].Hidden);
+
+                    if(!NPC[B].Active && B != A && !reset_should_be_false && NPC[B].Reset[1] && NPC[B].Reset[2])
                     {
                         if(CheckCollision(tempLocation, NPC[B].Location))
                         {
@@ -614,9 +617,13 @@ void UpdateNPCs()
 
                         for(int B : treeNPCQuery(tempLocation, SORTMODE_ID))
                         {
+                            // In SMBX 1.3, Deactivate was called every frame for every Hidden NPC (in this loop over A). That set Reset to false. Now we need to emulate it.
+                            bool reset_should_be_false = (B < A && NPC[B].Hidden);
+
                             if(!NPC[B].Active &&
-                              (!NPC[B].Hidden || !g_compatibility.fix_npc_activation_event_loop_bug) &&
-                               B != A && NPC[B].Reset[1] && NPC[B].Reset[2])
+                                !reset_should_be_false &&
+                                (!NPC[B].Hidden || !g_compatibility.fix_npc_activation_event_loop_bug) &&
+                                B != A && NPC[B].Reset[1] && NPC[B].Reset[2])
                             {
                                 if(CheckCollision(tempLocation, NPC[B].Location))
                                 {
