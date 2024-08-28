@@ -382,7 +382,7 @@ void UpdatableQuery<BlockRef_t>::update(const Location_t& loc, const UpdatableQu
 
     if(sort_mode_use == SORTMODE_COMPAT)
     {
-        if(g_config.emulate_classic_block_order)
+        if(block_query_mode == QUERY_FLBLOCK && g_config.emulate_classic_block_order)
             sort_mode_use = SORTMODE_ID;
         else
             sort_mode_use = SORTMODE_LOC;
