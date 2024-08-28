@@ -34,6 +34,9 @@
 
 #include "main/trees.h"
 
+// should be tuned based on profiling of Effect-heavy cases (consider Col.'s Cathedral in SRW2)
+static constexpr int s_kill_stack_size = 16;
+
 // Updates the effects
 void UpdateEffects()
 {
@@ -49,10 +52,21 @@ void UpdateEffects()
     if(FreezeNPCs)
         return;
 
+    vbint_t killed_effects[s_kill_stack_size];
+    int num_killed = 0;
+
     For(A, 1, numEffects)
     {
         auto &e = Effect[A];
         e.Life -= 1;
+
+        if(e.Life <= 0)
+        {
+            if(num_killed < s_kill_stack_size)
+                killed_effects[num_killed] = A;
+
+            num_killed++;
+        }
 
         if(e.Life == 0)
         {
@@ -819,10 +833,18 @@ void UpdateEffects()
             e.Location.SpeedY = e.Location.SpeedY * 0.97;
     } //for
 
-    for(int A = numEffects; A >= 1; --A)
+    if(num_killed > s_kill_stack_size)
     {
-        if(Effect[A].Life <= 0)
-            KillEffect(A);
+        for(int A = numEffects; A >= 1; --A)
+        {
+            if(Effect[A].Life <= 0)
+                KillEffect(A);
+        }
+    }
+    else
+    {
+        for(int A = num_killed - 1; A >= 0; --A)
+            KillEffect(killed_effects[A]);
     }
 }
 
