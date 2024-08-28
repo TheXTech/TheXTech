@@ -107,8 +107,8 @@ static bool s_ResetCheckpoints()
 #ifdef THEXTECH_INTERPROC_SUPPORTED
     IntProc::sendStarsNumber(numStars);
 #endif
-    numSavedEvents = 0;
-    BlockSwitch.fill(false);
+    // numSavedEvents = 0;
+    // BlockSwitch.fill(false);
     PlaySound(SFX_Bullet);
     return true;
 }

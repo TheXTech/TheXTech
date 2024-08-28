@@ -108,13 +108,13 @@ extern double vb6Round(double x, int decimals);
 
 //'Saved Events
 //Public numSavedEvents As Integer
-extern int numSavedEvents;
+// extern int numSavedEvents;
 //Public SavedEvents(1 To MaxSavedEvents) As String
-extern RangeArr<std::string, 1, MaxSavedEvents> SavedEvents;
+// extern RangeArr<std::string, 1, MaxSavedEvents> SavedEvents;
 //Public BlockSwitch(1 To 4) As Boolean
-extern RangeArrI<bool, 1, 4, false> BlockSwitch;
+// extern RangeArrI<bool, 1, 4, false> BlockSwitch;
 //'Public PowerUpUnlock(2 To 7) As Boolean
-extern RangeArrI<bool, 2, 7, false> PowerUpUnlock;
+// extern RangeArrI<bool, 2, 7, false> PowerUpUnlock;
 
 //Public Const SWP_SHOWWINDOW = &H40
 //const int SWP_SHOWWINDOW = 0x40;

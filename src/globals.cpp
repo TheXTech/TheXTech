@@ -38,10 +38,10 @@
 bool GameIsActive = false;
 std::string AppPath;
 
-int numSavedEvents = 0;
-RangeArr<std::string, 1, MaxSavedEvents> SavedEvents;
-RangeArrI<bool, 1, 4, false> BlockSwitch;
-RangeArrI<bool, 2, 7, false> PowerUpUnlock;
+// int numSavedEvents = 0;
+// RangeArr<std::string, 1, MaxSavedEvents> SavedEvents;
+// RangeArrI<bool, 1, 4, false> BlockSwitch;
+// RangeArrI<bool, 2, 7, false> PowerUpUnlock;
 long myBackBuffer = 0;
 long myBufferBMP = 0;
 int AllCharBlock = 0;
@@ -597,9 +597,9 @@ bool g_isHBLauncher = false;
 
 void initAll()
 {
-    SavedEvents.fill(std::string());
-    BlockSwitch.fill(false);
-    PowerUpUnlock.fill(false);
+    // SavedEvents.fill(std::string());
+    // BlockSwitch.fill(false);
+    // PowerUpUnlock.fill(false);
     vScreen.fill(vScreen_t());
     qScreenLoc.fill(vScreen_t());
     PlayerStart.fill(Location_t());

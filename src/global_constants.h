@@ -60,7 +60,7 @@ constexpr stringindex_t STRINGINDEX_NONE = static_cast<stringindex_t>(-1);
 const int MaxLevelStrings = 65535;
 
 //Public Const MaxSavedEvents As Integer = 200
-const int MaxSavedEvents = 200;
+// const int MaxSavedEvents = 200;
 
 //const int maxSelectWorlds = 100;
 
