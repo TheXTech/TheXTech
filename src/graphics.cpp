@@ -609,7 +609,7 @@ void PlayerWarpGFX(int A, Location_t &tempLocation, float &X2, float &Y2)
     tempLocation.Width -= double(X2);
 }
 
-void NPCWarpGFX(int A, Location_t &tempLocation, float &X2, float &Y2)
+void NPCWarpGFX(int A, IntegerLocation_t &tempLocation, int &X2, int &Y2)
 {
     auto &player = Player[A];
     bool backward = player.WarpBackward;
@@ -636,16 +636,16 @@ void NPCWarpGFX(int A, Location_t &tempLocation, float &X2, float &Y2)
         {
             if(warp_enter.Y > tempLocation.Y)
             {
-                Y2 = float(warp_enter.Y - tempLocation.Y);
+                Y2 = warp_enter.Y - tempLocation.Y;
                 tempLocation.Y = warp_enter.Y;
-                tempLocation.Height += -double(Y2);
+                tempLocation.Height += -Y2;
             }
         }
         else if(warp_dir_enter == 4) // Moving right
             tempLocation.Width = (warp_enter.X + warp_enter.Width) - (tempLocation.X);
         else if(warp_dir_enter == 2) // Moving left
         {
-            X2 = float(warp_enter.X - tempLocation.X);
+            X2 = warp_enter.X - tempLocation.X;
             if(X2 < 0)
                 X2 = 0;
             else
@@ -663,16 +663,16 @@ void NPCWarpGFX(int A, Location_t &tempLocation, float &X2, float &Y2)
         {
             if(warp_exit.Y > tempLocation.Y)
             {
-                Y2 = float(warp_exit.Y - tempLocation.Y);
+                Y2 = warp_exit.Y - tempLocation.Y;
                 tempLocation.Y = warp_exit.Y;
-                tempLocation.Height += -double(Y2);
+                tempLocation.Height += -Y2;
             }
         }
         else if(warp_dir_exit == 4) // Moving left
             tempLocation.Width = (warp_exit.X + warp_exit.Width) - (tempLocation.X);
         else if(warp_dir_exit == 2) // Moving right
         {
-            X2 = float(warp_exit.X - tempLocation.X);
+            X2 = warp_exit.X - tempLocation.X;
             if(X2 < 0)
                 X2 = 0;
             else

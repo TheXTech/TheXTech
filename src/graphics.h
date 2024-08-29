@@ -158,7 +158,7 @@ void DrawBackground(int S, int Z);
 // Public Sub PlayerWarpGFX(A As Integer, tempLocation As Location, X2 As Single, Y2 As Single)
 void PlayerWarpGFX(int A, Location_t &tempLocation, float &X2, float &Y2);
 // Public Sub NPCWarpGFX(A As Integer, tempLocation As Location, X2 As Single, Y2 As Single)
-void NPCWarpGFX(int A, Location_t &tempLocation, float &X2, float &Y2);
+void NPCWarpGFX(int A, IntegerLocation_t &tempLocation, int &X2, int &Y2);
 // Public Sub ChangeScreen() 'change from fullscreen to windowed mode
 // change from fullscreen to windowed mode
 void ChangeScreen();
