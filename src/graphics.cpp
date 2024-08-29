@@ -836,15 +836,28 @@ void ScreenShot()
     TakeScreen = false;
 }
 
+static inline int s_round2int(double d)
+{
+    return std::floor(d + 0.5);
+}
+
 void DrawFrozenNPC(int Z, int A)
 {
-    double camX = vScreen[Z].CameraAddX();
-    double camY = vScreen[Z].CameraAddY();
+    int camX = vScreen[Z].CameraAddX();
+    int camY = vScreen[Z].CameraAddY();
 
     auto &n = NPC[A];
-    if((vScreenCollision(Z, n.Location) ||
-        vScreenCollision(Z, newLoc(n.Location.X - (n->WidthGFX - n.Location.Width) / 2,
-                            n.Location.Y, CDbl(n->WidthGFX), CDbl(n->THeight)))) && !n.Hidden)
+
+    int sX = camX + s_round2int(NPC[A].Location.X);
+    int sY = camY + s_round2int(NPC[A].Location.Y);
+    int w = s_round2int(NPC[A].Location.Width);
+    int h = s_round2int(NPC[A].Location.Height);
+
+    // collision already checked elsewhere
+    // if((vScreenCollision(Z, n.Location) ||
+    //     vScreenCollision(Z, newLoc(n.Location.X - (n->WidthGFX - n.Location.Width) / 2,
+    //                         n.Location.Y, CDbl(n->WidthGFX), CDbl(n->THeight)))) && !n.Hidden)
+    if(true)
     {
 // draw npc
         XTColor c = n.Shadow ? XTColor(0, 0, 0) : XTColor();
@@ -856,29 +869,30 @@ void DrawFrozenNPC(int Z, int A)
         // Draw frozen NPC body in only condition the content value is valid
         if(content > 0 && content <= maxNPCType)
         {
-             XRender::renderTexture(float(camX + n.Location.X + 2),
-                                    float(camY + n.Location.Y + 2),
-                                    float(n.Location.Width - 4),
-                                    float(n.Location.Height - 4),
+             XRender::renderTextureBasic(sX + 2,
+                                    sY + 2,
+                                    w - 4,
+                                    h - 4,
                                     GFXNPCBMP[content],
-                                    2, 2 + contentFrame * NPCHeight(content), c);
+                                    2, 2 + contentFrame * NPCHeight(content),
+                                    c);
         }
 
         // draw ice
-         XRender::renderTexture(float(camX + n.Location.X + n->FrameOffsetX),
-                                float(camY + n.Location.Y + n->FrameOffsetY),
-                                float(n.Location.Width - 6), float(n.Location.Height - 6),
+         XRender::renderTextureBasic(sX + n->FrameOffsetX,
+                                sY + n->FrameOffsetY,
+                                w - 6, h - 6,
                                 GFXNPCBMP[n.Type], 0, 0, c);
-         XRender::renderTexture(float(camX + n.Location.X + n->FrameOffsetX + n.Location.Width - 6),
-                                float(camY + n.Location.Y + n->FrameOffsetY),
-                                6, float(n.Location.Height - 6),
+         XRender::renderTextureBasic(sX + n->FrameOffsetX + w - 6,
+                                sY + n->FrameOffsetY,
+                                6, h - 6,
                                 GFXNPCBMP[n.Type], 128 - 6, 0, c);
-         XRender::renderTexture(float(camX + n.Location.X + n->FrameOffsetX),
-                                float(camY + n.Location.Y + n->FrameOffsetY + n.Location.Height - 6),
-                                float(n.Location.Width - 6), 6,
+         XRender::renderTextureBasic(sX + n->FrameOffsetX,
+                                sY + n->FrameOffsetY + h - 6,
+                                w - 6, 6,
                                 GFXNPCBMP[n.Type], 0, 128 - 6, c);
-         XRender::renderTexture(float(camX + n.Location.X + n->FrameOffsetX + n.Location.Width - 6),
-                                float(camY + n.Location.Y + n->FrameOffsetY + n.Location.Height - 6),
+         XRender::renderTextureBasic(sX + n->FrameOffsetX + w - 6,
+                                sY + n->FrameOffsetY + h - 6,
                                 6, 6, GFXNPCBMP[n.Type],
                                 128 - 6, 128 - 6, c);
     }
