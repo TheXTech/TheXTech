@@ -180,6 +180,15 @@ static inline int s_round2int(double d)
     return std::floor(d + 0.5);
 }
 
+static inline int s_round2int_plr(double d)
+{
+#ifdef PGE_MIN_PORT
+    return (int)(std::floor(d / 2 + 0.5)) * 2;
+#else
+    return std::floor(d + 0.5);
+#endif
+}
+
 void doShakeScreen(int force, int type)
 {
     s_shakeScreen.setup(force, force, type, 0, 1.0);
@@ -2238,13 +2247,13 @@ void UpdateGraphicsScreen(Screen_t& screen)
                             {
                                 drawLoc.Height = hNpc->HeightGFX;
                                 drawLoc.Width = hNpc->WidthGFX;
-                                drawLoc.Y = s_round2int(hNpc.Location.Y) + s_round2int(hNpc.Location.Height) - hNpc->HeightGFX;
-                                drawLoc.X = s_round2int(hNpc.Location.X) + s_round2int(hNpc.Location.Width) / 2 - hNpc->WidthGFX / 2;
+                                drawLoc.Y = s_round2int_plr(hNpc.Location.Y) + s_round2int(hNpc.Location.Height) - hNpc->HeightGFX;
+                                drawLoc.X = s_round2int_plr(hNpc.Location.X) + s_round2int(hNpc.Location.Width) / 2 - hNpc->WidthGFX / 2;
                             }
                             else
                             {
-                                drawLoc.X = s_round2int(hNpc.Location.X);
-                                drawLoc.Y = s_round2int(hNpc.Location.Y);
+                                drawLoc.X = s_round2int_plr(hNpc.Location.X);
+                                drawLoc.Y = s_round2int_plr(hNpc.Location.Y);
                                 drawLoc.Height = hNpc->THeight;
                                 drawLoc.Width = hNpc->TWidth;
                             }
@@ -2805,10 +2814,32 @@ void UpdateGraphicsScreen(Screen_t& screen)
             }
             else if(!NPCIsYoshi(NPC[A]) && NPC[A].Type > 0)
             {
+                int sX = camX + s_round2int_plr(NPC[A].Location.X);
+                int sY = camY + s_round2int_plr(NPC[A].Location.Y);
+                int w = s_round2int(NPC[A].Location.Width);
+                int h = s_round2int(NPC[A].Location.Height);
+
                 if(NPC[A]->WidthGFX == 0)
-                    RenderTexturePlayer(Z, camX + NPC[A].Location.X + NPC[A]->FrameOffsetX, camY + NPC[A].Location.Y + NPC[A]->FrameOffsetY, NPC[A].Location.Width, NPC[A].Location.Height, GFXNPC[NPC[A].Type], 0, NPC[A].Frame * NPC[A].Location.Height, cn);
+                {
+                    RenderTexturePlayer(Z, sX + NPC[A]->FrameOffsetX,
+                        sY + NPC[A]->FrameOffsetY,
+                        w,
+                        h,
+                        GFXNPC[NPC[A].Type],
+                        0, NPC[A].Frame * h,
+                        cn);
+                }
                 else
-                    RenderTexturePlayer(Z, camX + NPC[A].Location.X + (NPC[A]->FrameOffsetX * -NPC[A].Direction) - NPC[A]->WidthGFX / 2.0 + NPC[A].Location.Width / 2.0, camY + NPC[A].Location.Y + NPC[A]->FrameOffsetY - NPC[A]->HeightGFX + NPC[A].Location.Height, NPC[A]->WidthGFX, NPC[A]->HeightGFX, GFXNPC[NPC[A].Type], 0, NPC[A].Frame * NPC[A]->HeightGFX, cn);
+                {
+                    RenderTexturePlayer(Z,
+                        sX + (NPC[A]->FrameOffsetX * -NPC[A].Direction) - NPC[A]->WidthGFX / 2 + w / 2,
+                        sY + NPC[A]->FrameOffsetY - NPC[A]->HeightGFX + h,
+                        NPC[A]->WidthGFX,
+                        NPC[A]->HeightGFX,
+                        GFXNPC[NPC[A].Type],
+                        0, NPC[A].Frame * NPC[A]->HeightGFX,
+                        cn);
+                }
             }
         }
 
@@ -3045,8 +3076,8 @@ void UpdateGraphicsScreen(Screen_t& screen)
                 {
                     const auto &w = Warp[Player[A].ShowWarp];
 
-                    int p_center_x = camX + s_round2int(Player[A].Location.X) + s_round2int(Player[A].Location.Width) / 2;
-                    int info_y = s_round2int(Player[A].Location.Y) + s_round2int(Player[A].Location.Height) - 96 + camY;
+                    int p_center_x = camX + s_round2int_plr(Player[A].Location.X) + s_round2int(Player[A].Location.Width) / 2;
+                    int info_y = s_round2int_plr(Player[A].Location.Y) + s_round2int(Player[A].Location.Height) - 96 + camY;
 
                     if(!w.noPrintStars && w.save_info().inited() && w.save_info().max_stars > 0)
                     {

@@ -63,7 +63,7 @@ void RenderKeyhole(int Z)
         keyhole.Hidden = true;
 }
 
-void RenderTexturePlayerScale(int Z, double dst_x, double dst_y, double dst_w, double dst_h,
+void RenderTexturePlayerScale(int Z, int dst_x, int dst_y, int dst_w, int dst_h,
                          StdPicture& tex,
                          int src_x, int src_y, int src_w, int src_h,
                          XTColor color)
@@ -71,7 +71,7 @@ void RenderTexturePlayerScale(int Z, double dst_x, double dst_y, double dst_w, d
     if(LevelMacro != LEVELMACRO_KEYHOLE_EXIT || LevelMacroWhich == 0)
     {
         if(src_w == -1 || src_h == -1)
-            return XRender::renderTexture(dst_x, dst_y, dst_w, dst_h, tex, src_x, src_y, color);
+            return XRender::renderTextureBasic(dst_x, dst_y, dst_w, dst_h, tex, src_x, src_y, color);
         else
             return XRender::renderTextureScaleEx(dst_x, dst_y, dst_w, dst_h, tex, src_x, src_y, src_w, src_h, 0, nullptr, X_FLIP_NONE, color);
     }
@@ -106,7 +106,7 @@ void RenderTexturePlayerScale(int Z, double dst_x, double dst_y, double dst_w, d
                 color);
 }
 
-void RenderTexturePlayer(int Z, double dst_x, double dst_y, double dst_w, double dst_h,
+void RenderTexturePlayer(int Z, int dst_x, int dst_y, int dst_w, int dst_h,
                          StdPicture& tex,
                          int src_x, int src_y, XTColor color)
 {

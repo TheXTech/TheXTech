@@ -47,12 +47,20 @@ int vScreen_t::TargetY() const
 
 int vScreen_t::CameraAddX() const
 {
+#ifdef PGE_MIN_PORT
+    return (int)(std::floor(X / 2 + 0.5)) * 2;
+#else
     return std::floor(X + 0.5);
+#endif
 }
 
 int vScreen_t::CameraAddY() const
 {
+#ifdef PGE_MIN_PORT
+    return (int)(std::floor(Y / 2 + 0.5)) * 2;
+#else
     return std::floor(Y + 0.5);
+#endif
 }
 
 Screen_t& Screen_t::canonical_screen()

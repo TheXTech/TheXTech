@@ -26,12 +26,17 @@
 
 void RenderKeyhole(int Z);
 
-void RenderTexturePlayer(int Z, double dst_x, double dst_y, double dst_w, double dst_h,
+void RenderTexturePlayer(int Z, int dst_x, int dst_y, int dst_w, int dst_h,
                          StdPicture& tex,
                          int src_x = 0, int src_y = 0,
                          XTColor color = XTColor());
 
-void RenderTexturePlayerScale(int Z, double dst_x, double dst_y, double dst_w, double dst_h,
+void RenderTexturePlayer(int Z, double dst_x, double dst_y, double dst_w, double dst_h,
+                         StdPicture& tex,
+                         double src_x = 0, double src_y = 0,
+                         XTColor color = XTColor()) = delete;
+
+void RenderTexturePlayerScale(int Z, int dst_x, int dst_y, int dst_w, int dst_h,
                          StdPicture& tex,
                          int src_x, int src_y, int src_w, int src_h,
                          XTColor color = XTColor());
