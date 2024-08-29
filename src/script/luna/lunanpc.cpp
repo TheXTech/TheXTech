@@ -119,7 +119,10 @@ void NpcF::AllFace(int identity, int section, double x)
         if(anyID || thisnpc->Type == identity)
         {
             if(anySec || thisnpc->Section == section)
-                thisnpc->Special6 = (x < thisnpc->Location.X) ? -1.0 : 1.0;
+            {
+                // thisnpc->Special6 = (x < thisnpc->Location.X) ? -1.0 : 1.0;
+                thisnpc->Direction = (x < thisnpc->Location.X) ? -1 : 1;
+            }
         }
     }
 }
