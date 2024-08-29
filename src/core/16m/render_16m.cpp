@@ -32,6 +32,8 @@
 #include <SDL2/SDL_rwops.h>
 #include <PGE_File_Formats/file_formats.h>
 
+#include "sdl_proxy/sdl_timer.h"
+
 #include "globals.h"
 #include "config.h"
 #include "frame_timer.h"
