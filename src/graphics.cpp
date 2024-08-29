@@ -526,15 +526,50 @@ void SetupEditorGraphics()
 //    GFX.BackgroundColor(2).Height = frmLevelWindow.vScreen(1).Height
 }
 
-void PlayerWarpGFX(int A, Location_t &tempLocation, float &X2, float &Y2)
+static inline int s_round2int(double d)
+{
+    return std::floor(d + 0.5);
+}
+
+static inline int s_round2int_plr(double d)
+{
+#ifdef PGE_MIN_PORT
+    return (int)(std::floor(d / 2 + 0.5)) * 2;
+#else
+    return std::floor(d + 0.5);
+#endif
+}
+
+static inline IntegerLocation_t s_round2int(const SpeedlessLocation_t& d)
+{
+    IntegerLocation_t ret;
+
+    ret.X = s_round2int(d.X); ret.Y = s_round2int(d.Y); ret.Width = s_round2int(d.Width); ret.Height = s_round2int(d.Height);
+
+    return ret;
+}
+
+static inline IntegerLocation_t s_round2int_plr(const SpeedlessLocation_t& d)
+{
+    IntegerLocation_t ret;
+
+    ret.X = s_round2int_plr(d.X); ret.Y = s_round2int_plr(d.Y); ret.Width = s_round2int_plr(d.Width); ret.Height = s_round2int_plr(d.Height);
+
+    return ret;
+}
+
+void PlayerWarpGFX(int A, IntegerLocation_t &tempLocation, int &X2, int &Y2)
 {
     auto &player = Player[A];
     bool backward = player.WarpBackward;
     auto &warp = Warp[player.Warp];
-    auto &warp_enter = backward ? warp.Exit : warp.Entrance;
-    auto &warp_exit = backward ? warp.Entrance : warp.Exit;
+    const SpeedlessLocation_t &_warp_enter = backward ? warp.Exit : warp.Entrance;
+    const SpeedlessLocation_t &_warp_exit = backward ? warp.Entrance : warp.Exit;
     auto &warp_dir_enter = backward ? warp.Direction2 : warp.Direction;
     auto &warp_dir_exit = backward ? warp.Direction : warp.Direction2;
+
+    IntegerLocation_t warp_enter = s_round2int_plr(_warp_enter);
+    IntegerLocation_t warp_exit = s_round2int_plr(_warp_exit);
 
     // .Effect = 3      -- Warp Pipe
     // .Effect2 = 0     -- Entering
@@ -553,7 +588,7 @@ void PlayerWarpGFX(int A, Location_t &tempLocation, float &X2, float &Y2)
         {
             if(warp_enter.Y > tempLocation.Y)
             {
-                Y2 = float(warp_enter.Y - tempLocation.Y);
+                Y2 = warp_enter.Y - tempLocation.Y;
                 tempLocation.Y = warp_enter.Y;
                 tempLocation.Height += -Y2;
             }
@@ -562,7 +597,7 @@ void PlayerWarpGFX(int A, Location_t &tempLocation, float &X2, float &Y2)
             tempLocation.Width = (warp_enter.X + warp_enter.Width) - (tempLocation.X);
         else if(warp_dir_enter == 2) // Moving left
         {
-            X2 = float(warp_enter.X - tempLocation.X);
+            X2 = warp_enter.X - tempLocation.X;
             if(X2 < 0)
                 X2 = 0;
             else
@@ -580,16 +615,16 @@ void PlayerWarpGFX(int A, Location_t &tempLocation, float &X2, float &Y2)
         {
             if(warp_exit.Y > tempLocation.Y)
             {
-                Y2 = float(warp_exit.Y - tempLocation.Y);
+                Y2 = warp_exit.Y - tempLocation.Y;
                 tempLocation.Y = warp_exit.Y;
-                tempLocation.Height += -double(Y2);
+                tempLocation.Height += -Y2;
             }
         }
         else if(warp_dir_exit == 4) // Moving left
             tempLocation.Width = (warp_exit.X + warp_exit.Width) - (tempLocation.X);
         else if(warp_dir_exit == 2) // Moving right
         {
-            X2 = float(warp_exit.X - tempLocation.X);
+            X2 = warp_exit.X - tempLocation.X;
             if(X2 < 0)
                 X2 = 0;
             else
@@ -606,7 +641,7 @@ void PlayerWarpGFX(int A, Location_t &tempLocation, float &X2, float &Y2)
         tempLocation.Width = 0;
     }
 
-    tempLocation.Width -= double(X2);
+    tempLocation.Width -= X2;
 }
 
 void NPCWarpGFX(int A, IntegerLocation_t &tempLocation, int &X2, int &Y2)
@@ -614,10 +649,13 @@ void NPCWarpGFX(int A, IntegerLocation_t &tempLocation, int &X2, int &Y2)
     auto &player = Player[A];
     bool backward = player.WarpBackward;
     auto &warp = Warp[player.Warp];
-    auto &warp_enter = backward ? warp.Exit : warp.Entrance;
-    auto &warp_exit = backward ? warp.Entrance : warp.Exit;
+    const SpeedlessLocation_t &_warp_enter = backward ? warp.Exit : warp.Entrance;
+    const SpeedlessLocation_t &_warp_exit = backward ? warp.Entrance : warp.Exit;
     auto &warp_dir_enter = backward ? warp.Direction2 : warp.Direction;
     auto &warp_dir_exit = backward ? warp.Direction : warp.Direction2;
+
+    IntegerLocation_t warp_enter = s_round2int_plr(_warp_enter);
+    IntegerLocation_t warp_exit = s_round2int_plr(_warp_exit);
 
     // player(a).effect = 3      -- Warp Pipe
     // player(a).effect2 = 0     -- Entering
@@ -834,20 +872,6 @@ void ScreenShot()
     PlaySoundMenu(SFX_GotItem);
 #endif
     TakeScreen = false;
-}
-
-static inline int s_round2int(double d)
-{
-    return std::floor(d + 0.5);
-}
-
-static inline int s_round2int_plr(double d)
-{
-#ifdef PGE_MIN_PORT
-    return (int)(std::floor(d / 2 + 0.5)) * 2;
-#else
-    return std::floor(d + 0.5);
-#endif
 }
 
 void DrawFrozenNPC(int Z, int A)

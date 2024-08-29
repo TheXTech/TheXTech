@@ -1817,7 +1817,6 @@ void UpdateGraphicsDraw(bool skipRepaint)
 void UpdateGraphicsScreen(Screen_t& screen)
 {
     XTColor plr_shade = ShadowMode ? XTColor(0, 0, 0) : XTColor();
-    Location_t tempLocation;
 
     int numScreens = screen.active_end();
 
@@ -1969,9 +1968,6 @@ void UpdateGraphicsScreen(Screen_t& screen)
                 }
             }
         }
-
-        tempLocation.Width = 32;
-        tempLocation.Height = 32;
 
         XRender::setDrawPlane(PLANE_LVL_SBLOCK);
 
@@ -2218,9 +2214,6 @@ void UpdateGraphicsScreen(Screen_t& screen)
             {
                 const Player_t& p = Player[A];
 
-                float Y2 = 0;
-                float X2 = 0;
-
                 // previously, the NPC draw logic was duplicated for two cases. now it is de-duplicated, using a loop here.
                 bool draw_held_npc = (p.HoldingNPC > 0);
                 int draw_count = (draw_held_npc) ? 2 : 1;
@@ -2284,45 +2277,59 @@ void UpdateGraphicsScreen(Screen_t& screen)
                         if((p.Character < 1) || (p.Character > 5))
                             continue;
 
+                        int pX = s_round2int_plr(p.Location.X);
+                        int pY = s_round2int_plr(p.Location.Y);
+                        int pW = s_round2int_plr(p.Location.Width);
+                        int pH = s_round2int_plr(p.Location.Height);
+
                         // warp NPCs (deduplicated and moved above)
 
                         // mounts
                         if(p.Mount == 3)
                         {
                             int B = p.MountType;
+
                             // Yoshi's Body
-                            tempLocation = roundLoc(p.Location, 2.0);
-                            tempLocation.Height = 32;
-                            tempLocation.Width = 32;
-                            tempLocation.X += p.YoshiBX;
-                            tempLocation.Y += p.YoshiBY;
-                            Y2 = 0;
-                            X2 = 0;
-                            PlayerWarpGFX(A, tempLocation, X2, Y2);
-                            XRender::renderTexture(camX + tempLocation.X,
-                                                  camY + tempLocation.Y,
-                                                  tempLocation.Width,
-                                                  tempLocation.Height,
+                            IntegerLocation_t drawLoc;
+
+                            drawLoc.X = pX + p.YoshiBX;
+                            drawLoc.Y = pY + p.YoshiBY;
+                            drawLoc.Width = 32;
+                            drawLoc.Height = 32;
+
+                            int src_x = 0;
+                            int src_y = 0;
+
+                            PlayerWarpGFX(A, drawLoc, src_x, src_y);
+
+                            XRender::renderTextureBasic(camX + drawLoc.X,
+                                                  camY + drawLoc.Y,
+                                                  drawLoc.Width,
+                                                  drawLoc.Height,
                                                   GFXYoshiB[B],
-                                                  X2,
-                                                  Y2 + 32 * p.YoshiBFrame,
+                                                  src_x,
+                                                  src_y + 32 * p.YoshiBFrame,
                                                   plr_shade);
+
                             // Yoshi's Head
-                            tempLocation = roundLoc(p.Location, 2.0);
-                            tempLocation.Height = 32;
-                            tempLocation.Width = 32;
-                            tempLocation.X += p.YoshiTX;
-                            tempLocation.Y += p.YoshiTY;
-                            Y2 = 0;
-                            X2 = 0;
-                            PlayerWarpGFX(A, tempLocation, X2, Y2);
-                            XRender::renderTexture(camX + tempLocation.X,
-                                                  camY + tempLocation.Y,
-                                                  tempLocation.Width,
-                                                  tempLocation.Height,
+                            drawLoc.X = pX + p.YoshiTX;
+                            drawLoc.Y = pY + p.YoshiTY;
+                            drawLoc.Width = 32;
+                            drawLoc.Height = 32;
+
+                            src_x = 0;
+                            src_y = 0;
+
+                            PlayerWarpGFX(A, drawLoc, src_x, src_y);
+
+                            XRender::renderTexture(camX + drawLoc.X,
+                                                  camY + drawLoc.Y,
+                                                  drawLoc.Width,
+                                                  drawLoc.Height,
                                                   GFXYoshiT[B],
-                                                  X2,
-                                                  Y2 + 32 * p.YoshiTFrame);
+                                                  src_x,
+                                                  src_y + 32 * p.YoshiTFrame,
+                                                  plr_shade);
                         }
 
                         // DONE: Convert this mess of duplicated code into united with usage of references, pointers, and ternary expressions
@@ -2351,58 +2358,66 @@ void UpdateGraphicsScreen(Screen_t& screen)
                                 : (p.State == 1)
                                   ?  6
                                   : -4;
-                            tempLocation = roundLoc(p.Location, 2.0);
-                            tempLocation.Height = p.Location.Height - offY + small_h_corr;
-                            tempLocation.Width = w;
-                            tempLocation.X += offX;
-                            tempLocation.Y += offY + toad_oy_corr;
-                            Y2 = 0;
-                            X2 = 0;
-                            PlayerWarpGFX(A, tempLocation, X2, Y2);
-                            XRender::renderTexture(camX + tempLocation.X,
-                                                  camY + tempLocation.Y,
-                                                  tempLocation.Width,
-                                                  tempLocation.Height,
+
+                            IntegerLocation_t drawLoc;
+
+                            drawLoc.X = pX + offX;
+                            drawLoc.Y = pY + offY + toad_oy_corr;
+                            drawLoc.Width = w;
+                            drawLoc.Height = pH - offY + small_h_corr;
+
+                            int src_x = 0;
+                            int src_y = 0;
+
+                            PlayerWarpGFX(A, drawLoc, src_x, src_y);
+                            XRender::renderTexture(camX + drawLoc.X,
+                                                  camY + drawLoc.Y,
+                                                  drawLoc.Width,
+                                                  drawLoc.Height,
                                                   tx,
-                                                  pfrX(tx, p) + X2,
-                                                  pfrY(tx, p) + Y2,
+                                                  pfrX(tx, p) + src_x,
+                                                  pfrY(tx, p) + src_y,
                                                   plr_shade);
 
                             // boot GFX
-                            tempLocation = roundLoc(p.Location, 2.0);
-                            tempLocation.Height = 32;
-                            tempLocation.Width = 32;
-                            tempLocation.X += p.Location.Width / 2.0 - 16;
-                            tempLocation.Y += p.Location.Height - 30;
-                            Y2 = 0;
-                            X2 = 0;
-                            PlayerWarpGFX(A, tempLocation, X2, Y2);
-                            XRender::renderTexture(camX + tempLocation.X,
-                                                  camY + tempLocation.Y,
-                                                  tempLocation.Width,
-                                                  tempLocation.Height,
+                            drawLoc.X = pX + pW / 2 - 16;
+                            drawLoc.Y = pY + pH - 30;
+                            drawLoc.Width = 32;
+                            drawLoc.Height = 32;
+
+                            src_x = 0;
+                            src_y = 0;
+
+                            PlayerWarpGFX(A, drawLoc, src_x, src_y);
+                            XRender::renderTexture(camX + drawLoc.X,
+                                                  camY + drawLoc.Y,
+                                                  drawLoc.Width,
+                                                  drawLoc.Height,
                                                   GFX.Boot[p.MountType],
-                                                  X2,
-                                                  Y2 + 32 * p.MountFrame,
+                                                  src_x,
+                                                  src_y + 32 * p.MountFrame,
                                                   plr_shade);
                         }
                         else
                         {
-                            tempLocation = roundLoc(p.Location, 2.0);
-                            tempLocation.Height = h;
-                            tempLocation.Width = w;
-                            tempLocation.X += offX;
-                            tempLocation.Y += offY + p.MountOffsetY;
-                            Y2 = 0;
-                            X2 = 0;
-                            PlayerWarpGFX(A, tempLocation, X2, Y2);
-                            XRender::renderTexture(camX + tempLocation.X,
-                                                  camY + tempLocation.Y,
-                                                  tempLocation.Width,
-                                                  tempLocation.Height,
+                            IntegerLocation_t drawLoc;
+
+                            drawLoc.X = pX + offX;
+                            drawLoc.Y = pY + offY + p.MountOffsetY;
+                            drawLoc.Width = w;
+                            drawLoc.Height = h;
+
+                            int src_x = 0;
+                            int src_y = 0;
+
+                            PlayerWarpGFX(A, drawLoc, src_x, src_y);
+                            XRender::renderTexture(camX + drawLoc.X,
+                                                  camY + drawLoc.Y,
+                                                  drawLoc.Width,
+                                                  drawLoc.Height,
                                                   tx,
-                                                  pfrX(tx, p) + X2,
-                                                  pfrY(tx, p) + Y2,
+                                                  pfrX(tx, p) + src_x,
+                                                  pfrY(tx, p) + src_y,
                                                   plr_shade);
                         }
                     }
