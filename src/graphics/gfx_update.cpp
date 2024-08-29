@@ -3045,14 +3045,14 @@ void UpdateGraphicsScreen(Screen_t& screen)
                 {
                     const auto &w = Warp[Player[A].ShowWarp];
 
-                    int p_center_x = camX + Player[A].Location.X + (Player[A].Location.Width / 2);
-                    int info_y = Player[A].Location.Y + Player[A].Location.Height - 96 + camY;
+                    int p_center_x = camX + s_round2int(Player[A].Location.X) + s_round2int(Player[A].Location.Width) / 2;
+                    int info_y = s_round2int(Player[A].Location.Y) + s_round2int(Player[A].Location.Height) - 96 + camY;
 
                     if(!w.noPrintStars && w.save_info().inited() && w.save_info().max_stars > 0 && Player[A].Mount != 2)
                     {
                         std::string tempString = fmt::format_ne("{0}/{1}", w.curStars, w.save_info().max_stars);
-                        XRender::renderTexture(p_center_x - tempString.length() * 9 - 20, info_y,     GFX.Interface[5]);
-                        XRender::renderTexture(p_center_x - tempString.length() * 9,      info_y + 1, GFX.Interface[1]);
+                        XRender::renderTextureBasic(p_center_x - tempString.length() * 9 - 20, info_y,     GFX.Interface[5]);
+                        XRender::renderTextureBasic(p_center_x - tempString.length() * 9,      info_y + 1, GFX.Interface[1]);
                         SuperPrint(tempString, 3,
                                    p_center_x - tempString.length() * 9 + 18,
                                    info_y);
