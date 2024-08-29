@@ -5019,14 +5019,18 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
         NPC[p.HoldingNPC].CantHurtPlayer = A;
         if(NPCIsVeggie(NPC[p.HoldingNPC]))
             NPC[p.HoldingNPC].CantHurt = 1000;
+
         if(p.Controls.Run || p.ForceHold > 0)
         {
+            // fix a graphical bug where the NPC would stutter in the player's hands
+            double use_w = (g_config.fix_visual_bugs) ? std::round(NPC[p.HoldingNPC].Location.Width) : NPC[p.HoldingNPC].Location.Width;
 
         // hold above head
             if(p.Character == 3 || p.Character == 4 || (p.Duck))
             {
                 NPC[p.HoldingNPC].Bouce = true;
-                NPC[p.HoldingNPC].Location.X = p.Location.X + p.Location.Width / 2.0 - NPC[p.HoldingNPC].Location.Width / 2.0;
+                NPC[p.HoldingNPC].Location.X = p.Location.X + p.Location.Width / 2.0 - use_w / 2.0;
+
                 if(p.Character == 3) // princess peach
                 {
                     if(p.State == 1)
@@ -5042,7 +5046,7 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
                     {
                         if(NPC[p.HoldingNPC].Type == NPCID_PLR_FIREBALL || NPC[p.HoldingNPC].Type == NPCID_PLR_ICEBALL)
                         {
-                            NPC[p.HoldingNPC].Location.X = p.Location.X + p.Location.Width / 2.0 - NPC[p.HoldingNPC].Location.Width / 2.0 + dRand() * 4 - 2;
+                            NPC[p.HoldingNPC].Location.X = p.Location.X + p.Location.Width / 2.0 - use_w / 2.0 + dRand() * 4 - 2;
                             NPC[p.HoldingNPC].Location.Y = p.Location.Y - NPC[p.HoldingNPC].Location.Height - 4 + dRand() * 4 - 2;
                         }
                         else
@@ -5055,7 +5059,8 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
                 if(p.Direction > 0)
                     NPC[p.HoldingNPC].Location.X = p.Location.X + Physics.PlayerGrabSpotX[p.Character][p.State];
                 else
-                    NPC[p.HoldingNPC].Location.X = p.Location.X + p.Location.Width - Physics.PlayerGrabSpotX[p.Character][p.State] - NPC[p.HoldingNPC].Location.Width;
+                    NPC[p.HoldingNPC].Location.X = p.Location.X + p.Location.Width - Physics.PlayerGrabSpotX[p.Character][p.State] - use_w;
+
                 NPC[p.HoldingNPC].Location.Y = p.Location.Y + Physics.PlayerGrabSpotY[p.Character][p.State] + 32 - NPC[p.HoldingNPC].Location.Height;
             }
 
