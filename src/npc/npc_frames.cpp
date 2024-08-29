@@ -1341,7 +1341,9 @@ void NPCFrames(int A)
         NPC[A].FrameCount += 1;
         if(NPC[A].FrameCount >= 20)
             NPC[A].FrameCount = 0;
-        NPC[A].Frame = static_cast<int>(floor(static_cast<double>(NPC[A].FrameCount / 5)));
+        // NPC[A].Frame = static_cast<int>(floor(static_cast<double>(NPC[A].FrameCount / 5)));
+        // integer division now
+        NPC[A].Frame = NPC[A].FrameCount / 5;
         if(NPC[A].Direction == 1)
             NPC[A].Frame += 4;
         // statue fireball
@@ -1351,7 +1353,9 @@ void NPCFrames(int A)
         NPC[A].FrameCount += 1;
         if(NPC[A].FrameCount >= 8)
             NPC[A].FrameCount = 0;
-        NPC[A].Frame = static_cast<int>(floor(static_cast<double>(NPC[A].FrameCount / 2)));
+        // NPC[A].Frame = static_cast<int>(floor(static_cast<double>(NPC[A].FrameCount / 2)));
+        // integer division now
+        NPC[A].Frame = NPC[A].FrameCount / 2;
         if(NPC[A].Direction == 1)
             NPC[A].Frame += 4;
         // winged koopa

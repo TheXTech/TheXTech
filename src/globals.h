@@ -405,10 +405,11 @@ struct NPC_t
     float RealSpeedX = 0.0f;
 //    BeltSpeed As Single 'The speed of the object this NPC is standing on
     float BeltSpeed = 0.0f;
-//    FrameCount As Single 'The counter for incrementing the frames
-    float FrameCount = 0.0f;
 //    oldAddBelt As Single
     float oldAddBelt = 0.0f;
+//    FrameCount As Single 'The counter for incrementing the frames
+    // was previously a float but this didn't accomplish anything
+    vbint_t FrameCount = 0;
 //    Damage As Single
     // never set to a non-integer value, likely used a float for saturation arithemtic
     vbint_t Damage = 0;
