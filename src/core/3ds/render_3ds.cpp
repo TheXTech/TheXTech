@@ -167,6 +167,8 @@ static void s_createSceneTargets()
             }
         }
 
+        C3D_TexSetFilter(&s_layer_texs[i], GPU_LINEAR, GPU_LINEAR);
+
         s_layer_targets[i] = C3D_RenderTargetCreateFromTex(&s_layer_texs[i], GPU_TEXFACE_2D, 0, GPU_RB_DEPTH16);
         s_layer_subtexs[i] = {(uint16_t)s_tex_w, (uint16_t)s_tex_h, 0.0, 1.0, (float)((double)s_tex_w / (double)mem_w), 1.0f - (float)((double)s_tex_h / (double)mem_h)};
         s_layer_ims[i].tex = &s_layer_texs[i];
@@ -821,16 +823,6 @@ void minport_ApplyPhysCoords()
         s_createSceneTargets();
 
     g_screen_swapped = should_swap_screen();
-
-    GPU_TEXTURE_FILTER_PARAM filter = GPU_LINEAR;
-
-    for(int layer = 0; layer < 4; layer++)
-    {
-        C3D_TexSetFilter(&s_layer_texs[layer], filter, filter);
-
-        if(s_single_layer_mode)
-            break;
-    }
 }
 
 void minport_ApplyViewport()
