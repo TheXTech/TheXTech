@@ -60,14 +60,7 @@ void UpdateEffects()
         auto &e = Effect[A];
         e.Life -= 1;
 
-        if(e.Life <= 0)
-        {
-            if(num_killed < s_kill_stack_size)
-                killed_effects[num_killed] = A;
-
-            num_killed++;
-        }
-
+        // moved code for Life == 0 for EFFID_MINIBOSS_DIE below
 
         e.Location.X += e.Location.SpeedX;
         e.Location.Y += e.Location.SpeedY;
@@ -612,13 +605,13 @@ void UpdateEffects()
         else if(e.Type == EFFID_BOMB_S3_EXPLODE || e.Type == EFFID_CHAR3_HEAVY_EXPLODE) // SMB3 Bomb Part 2
         {
             e.FrameCount += 1;
-                if(e.FrameCount >= 4)
-                {
-                    e.FrameCount = 0;
-                    e.Frame += 1;
-                    if(e.Frame >= 4)
-                        e.Frame = 0;
-                }
+            if(e.FrameCount >= 4)
+            {
+                e.FrameCount = 0;
+                e.Frame += 1;
+                if(e.Frame >= 4)
+                    e.Frame = 0;
+            }
 
             if(e.Type == EFFID_CHAR3_HEAVY_EXPLODE && iRand(10) >= 8)
             {
@@ -630,16 +623,16 @@ void UpdateEffects()
         else if(e.Type == EFFID_EARTHQUAKE_BLOCK_HIT) // POW Block
         {
             e.FrameCount += 1;
-                if(e.FrameCount >= 4)
+            if(e.FrameCount >= 4)
+            {
+                e.FrameCount = 0;
+                e.Frame += 1;
+                if(e.Frame >= 4)
                 {
-                    e.FrameCount = 0;
-                    e.Frame += 1;
-                    if(e.Frame >= 4)
-                    {
-                        e.Life = 0;
-                        e.Frame = 3;
-                    }
+                    e.Life = 0;
+                    e.Frame = 3;
                 }
+            }
         }
         else if(e.Type == EFFID_DOOR_S2_OPEN || e.Type == EFFID_DOOR_DOUBLE_S3_OPEN || e.Type == EFFID_DOOR_SIDE_S3_OPEN || e.Type == EFFID_BIG_DOOR_OPEN) // door
         {
@@ -836,6 +829,15 @@ void UpdateEffects()
         }
         else if(e.Type == EFFID_SCORE)
             e.Location.SpeedY = e.Location.SpeedY * 0.97;
+
+        // check for killed (lets us only do a single loop over effects)
+        if(e.Life <= 0)
+        {
+            if(num_killed < s_kill_stack_size)
+                killed_effects[num_killed] = A;
+
+            num_killed++;
+        }
     } //for
 
     if(num_killed > s_kill_stack_size)
