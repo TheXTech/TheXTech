@@ -690,7 +690,7 @@ void PlayerMovementY(int A)
 
         if(NPC[Player[A].StandingOnNPC].Wet == 2)
         {
-            if(NPC[Player[A].StandingOnNPC].Type == 195)
+            if(NPC[Player[A].StandingOnNPC].Type == NPCID_FLIPPED_RAINBOW_SHELL)
                 NPC[Player[A].StandingOnNPC].Special4 = 1;
             NPC[Player[A].StandingOnNPC].Location.SpeedY += -Physics.NPCGravity * 1.5;
         }
@@ -841,7 +841,7 @@ void PlayerMovementY(int A)
 
             if(Player[A].HoldingNPC > 0)
             {
-                if(NPC[Player[A].HoldingNPC].Type == 278 || NPC[Player[A].HoldingNPC].Type == 279)
+                if(NPC[Player[A].HoldingNPC].Type == NPCID_FLY_BLOCK || NPC[Player[A].HoldingNPC].Type == NPCID_FLY_CANNON)
                 {
                     if(Player[A].Controls.Jump || Player[A].Controls.AltJump)
                     {

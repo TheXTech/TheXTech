@@ -1496,8 +1496,9 @@ void NPCFrames(int A)
         if(NPC[A].Special == 0)
         {
             NPC[A].FrameCount += 1;
-            if(NPC[A].Type == NPCID_HIT_CARRY_FODDER && NPC[A].Special > 360)
-                NPC[A].FrameCount += 1;
+            // was not commented in VB6, but it's obviously impossible
+            // if(NPC[A].Type == NPCID_HIT_CARRY_FODDER && NPC[A].Special > 360)
+            //     NPC[A].FrameCount += 1;
             if(NPC[A].Direction == -1 && NPC[A].Frame >= 2)
                 NPC[A].Frame = 0;
             else if(NPC[A].Direction == 1 && NPC[A].Frame < 2)

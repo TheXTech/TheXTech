@@ -365,6 +365,8 @@ void NPCBlockLogic(int A, double& tempHit, int& tempHitBlock, float& tempSpeedA,
 
                                     if(BlockSlope2[Block[B].Type] != 0 && HitSpot > 0 && ((NPC[A].Location.Y > Block[B].Location.Y) || ((NPC[A].Type == NPCID_WALL_BUG || NPC[A].Type == NPCID_WALL_SPARK || NPC[A].Type == NPCID_WALL_TURTLE) && NPC[A].Special == 3)))
                                     {
+                                        // the modifications to Special and Special2 here are invalid and could affect any NPC
+
                                         if(HitSpot == 5)
                                         {
                                             if(NPC[A].Special == 2 && NPC[A].Special2 == 1)
@@ -725,6 +727,7 @@ void NPCBlockLogic(int A, double& tempHit, int& tempHitBlock, float& tempSpeedA,
                                         NPCHit(A, 4, A);
 
                                     // If a Pokey head stands on a top of another Pokey segment
+                                    // FIXME: need a compat guard for below condition
                                     if(HitSpot == 1 && NPC[A].Type == NPCID_STACKER && Block[B].tempBlockNpcType == NPCID_STACKER
                                         && NPC[Block[B].tempBlockNpcIdx].Type == NPCID_STACKER) // Make sure Pokey didn't transformed into ice cube or anything also
                                     {

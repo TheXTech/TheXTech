@@ -428,7 +428,7 @@ void SkullRide(int A, bool reEnable)
     for(int B = 1; B <= numNPCs; B++) // Recursively activate all neihbour skull-ride segments
     {
         auto &npc = NPC[B];
-        if(npc.Type == 190)
+        if(npc.Type == NPCID_RAFT)
         {
             if(npc.Active)
             {
@@ -488,7 +488,7 @@ void SkullRide(int A, bool reEnable)
             NPC_t& npc = static_cast<NPCRef_t>(vec[unchecked]);
 
             // conditions from inside of loop in original SkullRide
-            if(npc.Type == 190 && npc.Active && npc.Special == spec && CheckCollision(loc, npc.Location))
+            if(npc.Type == NPCID_RAFT && npc.Active && npc.Special == spec && CheckCollision(loc, npc.Location))
             {
                 // set active flag
                 npc.Special = 1;
@@ -562,7 +562,7 @@ void SkullRideDone(int A, const Location_t &alignAt)
     for(int B = 1; B <= numNPCs; B++) // Recursively DE-activate all neighbour skull-ride segments
     {
         auto &npc = NPC[B];
-        if(npc.Type == 190)
+        if(npc.Type == NPCID_RAFT)
         {
             if(npc.Active)
             {
@@ -619,7 +619,7 @@ void SkullRideDone(int A, const Location_t &alignAt)
             NPC_t& npc = static_cast<NPCRef_t>(vec[unchecked]);
 
             // conditions from inside of loop in original SkullRideDone
-            if(npc.Type == 190 && npc.Active && npc.Special == 1 && CheckCollision(loc, npc.Location))
+            if(npc.Type == NPCID_RAFT && npc.Active && npc.Special == 1 && CheckCollision(loc, npc.Location))
             {
                 npc.Special = 2;
                 npc.Location.SpeedX = 0.0;
@@ -997,7 +997,7 @@ void NPCSpecial(int A)
             }
 
             npc.TurnAround = false;
-            if(npc.Type == 134)
+            if(npc.Type == NPCID_BOMB)
                 npc.Projectile = true;
         }
 
@@ -1227,18 +1227,18 @@ void NPCSpecial(int A)
         }
         else if(npc.Special == 1)
         {
-            if(npc.Type == 281 && fEqual((float)npc.Location.SpeedY, Physics.NPCGravity))
+            if(npc.Type == NPCID_FIRE_BOSS_SHELL && fEqual((float)npc.Location.SpeedY, Physics.NPCGravity))
                 npc.Location.SpeedX += 0.1 * npc.Direction;
             else
                 npc.Location.SpeedX += 0.2 * npc.Direction;
-            if(npc.Type == 281 && npc.Damage >= 5)
+            if(npc.Type == NPCID_FIRE_BOSS_SHELL && npc.Damage >= 5)
             {
                 if(npc.Location.SpeedX > 5.5)
                     npc.Location.SpeedX = 5.5;
                 else if(npc.Location.SpeedX < -5.5)
                     npc.Location.SpeedX = -5.5;
             }
-            else if(npc.Type == 281 && npc.Damage >= 10)
+            else if(npc.Type == NPCID_FIRE_BOSS_SHELL && npc.Damage >= 10)
             {
                 if(npc.Location.SpeedX > 6)
                     npc.Location.SpeedX = 6;
@@ -1253,7 +1253,7 @@ void NPCSpecial(int A)
                     npc.Location.SpeedX = -5;
             }
 
-            if(npc.Type == 281 && fEqual((float)npc.Location.SpeedY, Physics.NPCGravity))
+            if(npc.Type == NPCID_FIRE_BOSS_SHELL && fEqual((float)npc.Location.SpeedY, Physics.NPCGravity))
             {
                 npc.Special3 += 1;
                 if((npc.Location.SpeedX < -2 && npc.Direction < 0) || (npc.Location.SpeedX > 2 && npc.Direction > 0))
@@ -1277,7 +1277,7 @@ void NPCSpecial(int A)
         else if(npc.Special == 2)
         {
             npc.Location.SpeedY = -5 - dRand() * 3;
-            if(npc.Type == 281)
+            if(npc.Type == NPCID_FIRE_BOSS_SHELL)
                 npc.Location.SpeedY -= 2;
             npc.Special = 3;
         }
@@ -1289,7 +1289,7 @@ void NPCSpecial(int A)
                 npc.Location.SpeedX += 0.2;
             npc.Special2 += 1;
 
-            if(npc.Type == 281)
+            if(npc.Type == NPCID_FIRE_BOSS_SHELL)
             {
                 npc.Special2 = 20;
                 PlaySoundSpatial(SFX_Spring, npc.Location);

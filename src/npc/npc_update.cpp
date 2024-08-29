@@ -1356,8 +1356,9 @@ void UpdateNPCs()
                         NPC[A].TimeLeft = 100;
                         NPC[A].BeltSpeed = 0;
 
-                        if(NPC[A].Type == (NPC[A]->IsFish && NPC[A].Special == 2))
-                            NPC[A].Special5 = 0;
+                        // dead code, impossible condition in SMBX 1.3 source (IsFish did not apply for NPC Type 1)
+                        // if(NPC[A].Type == (NPC[A]->IsFish && NPC[A].Special == 2))
+                        //     NPC[A].Special5 = 0;
 
                         NPC[A].Direction = Player[NPC[A].HoldingPlayer].Direction; // Face the player
                         NPC[A].Location.SpeedY = Player[NPC[A].HoldingPlayer].Location.SpeedY;
