@@ -43,6 +43,8 @@
 
 #include "draw_planes.h"
 
+#include "videoGL_alloc_palette.hpp"
+
 #ifdef DEBUG_PLANES
 #    define POLY_FOG_Q POLY_FOG
 #else
@@ -62,6 +64,8 @@ struct tex_load_data
 {
     Files::Data data;
     GL_TEXTURE_SIZE_ENUM w, h;
+    int name;
+    int params;
 
     inline const uint16_t* palette() const
     {
@@ -79,6 +83,8 @@ struct tex_load_data
         return data.begin() + 32;
     }
 };
+
+static std::vector<tex_load_data> s_texture_load_queue;
 
 static bool s_loadTextureToRAM(tex_load_data& tex, const std::string& path, int logical_w, int logical_h, int flags)
 {
@@ -165,9 +171,7 @@ static bool s_loadTexture(const std::string& path, int* tex_out, uint16_t* tex_w
     if(logical_h > 2048)
         logical_h = 2048;
 
-    int name;
-
-    if(!glGenTextures(1, &name))
+    if(!glGenTextures(1, &tex.name))
     {
         pLogWarning("Could not generate texture");
         return false;
@@ -175,7 +179,7 @@ static bool s_loadTexture(const std::string& path, int* tex_out, uint16_t* tex_w
 
     if(!s_loadTextureToRAM(tex, path, logical_w, logical_h, flags))
     {
-        glDeleteTextures(1, &name);
+        glDeleteTextures(1, &tex.name);
         return false;
     }
 
@@ -183,31 +187,35 @@ static bool s_loadTexture(const std::string& path, int* tex_out, uint16_t* tex_w
     uint16_t h_px = 1 << (3 + tex.h);
     uint32_t data_size = w_px * h_px / 2;
 
-    int tex_params = TEXGEN_OFF;
+    tex.params = TEXGEN_OFF;
     if((flags & 16) == 0)
-        tex_params |= GL_TEXTURE_COLOR0_TRANSPARENT;
+        tex.params |= GL_TEXTURE_COLOR0_TRANSPARENT;
 
-    glBindTexture(0, name);
-    if(!glTexImage2D(0, 0, GL_RGB16, tex.w, tex.h, 0, tex_params, tex.pixels()))
+    glBindTexture(0, tex.name);
+
+    // allocate, but do not load to VRAM yet
+    if(!glTexImage2D(0, 0, GL_RGB16, tex.w, tex.h, 0, tex.params, nullptr))
     {
         pLogWarning("Could not load texture (%u bytes) to VRAM (%u/524288 used). Requesting free texture memory.", data_size, s_loadedVRAM);
         minport_freeTextureMemory();
 
-        if(!glTexImage2D(0, 0, GL_RGB16, tex.w, tex.h, 0, tex_params, tex.pixels()))
+        if(!glTexImage2D(0, 0, GL_RGB16, tex.w, tex.h, 0, tex.params, nullptr))
         {
             pLogWarning("Still could not load texture (%u bytes) to VRAM (%u/524288 used).", data_size, s_loadedVRAM);
-            glDeleteTextures(1, &name);
+            glDeleteTextures(1, &tex.name);
             return false;
         }
     }
 
-    glColorTableEXT(0, 0, 16, 0, 0, tex.palette());
+    glColorTableEXT_alloc_only(0, 0, 16, 0, 0);
 
-    *tex_out = name;
+    *tex_out = tex.name;
     *tex_w = w_px;
     *tex_h = h_px;
 
     s_loadedVRAM += data_size;
+
+    s_texture_load_queue.push_back(std::move(tex));
 
     // pLogDebug("Loaded tex from %s!", path.c_str());
 
@@ -483,8 +491,20 @@ void repaint()
 
     glFlush(0);
 
-    if(g_config.render_vsync)
+    if(g_config.render_vsync || !s_texture_load_queue.empty())
         swiWaitForVBlank();
+
+    if(!s_texture_load_queue.empty())
+    {
+        for(const auto& tex : s_texture_load_queue)
+        {
+            glBindTexture(0, tex.name);
+            glColorSubTableEXT(0, 0, 16, 0, 0, tex.palette());
+            glTexImage2D(0, 0, GL_RGB16, tex.w, tex.h, 0, tex.params, tex.pixels());
+        }
+
+        s_texture_load_queue.clear();
+    }
 
     // Note that when vsync is disabled, the glFlush call will actually cause the geometry engine to wait for vblank on the next issued command. We can't track that timing easily.
 
@@ -717,6 +737,7 @@ void clearAllTextures()
     }
 
     s_texture_bank.clear();
+    s_texture_load_queue.clear();
 
     if(s_loadedVRAM != 0)
         pLogWarning("VRAM use not 0 after clear (%u instead). At risk of use-after-free.", s_loadedVRAM);
