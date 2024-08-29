@@ -733,6 +733,7 @@ void clearAllTextures()
             + tx->d.tex_w[1] * tx->d.tex_h[1]
             + tx->d.tex_w[2] * tx->d.tex_h[2]) / 2;
 
+        minport_unlinkTexture(tx);
         tx->d.destroy();
     }
 
