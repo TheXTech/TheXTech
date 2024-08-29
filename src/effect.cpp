@@ -68,30 +68,6 @@ void UpdateEffects()
             num_killed++;
         }
 
-        if(e.Life == 0)
-        {
-            if(e.Type == EFFID_MINIBOSS_DIE)
-            {
-                if(e.NewNpc > 0)
-                {
-                    numNPCs++;
-                    auto &nn = NPC[numNPCs];
-                    nn = NPC_t();
-                    nn.Type = NPCID(e.NewNpc);
-                    nn.Location.Height = nn->THeight;
-                    nn.Location.Width = nn->TWidth;
-                    nn.Location.X = e.Location.X + e.Location.Width / 2.0 - NPC[numNPCs].Location.Width / 2.0;
-                    nn.Location.Y = e.Location.Y - 1;
-                    nn.Location.SpeedY = -6;
-                    nn.Active = true;
-                    nn.TimeLeft = 100;
-                    nn.Frame = 0;
-                    syncLayers_NPC(numNPCs);
-                    CheckSectionNPC(numNPCs);
-                    PlaySoundSpatial(SFX_BossBeat, e.Location);
-                }
-            }
-        }
 
         e.Location.X += e.Location.SpeedX;
         e.Location.Y += e.Location.SpeedY;
@@ -579,6 +555,35 @@ void UpdateEffects()
         }
         else if(e.Type == EFFID_MINIBOSS_DIE) // Dead Big Koopa
         {
+            // moved from top
+            if(e.Life == 0)
+            {
+                if(e.NewNpc > 0)
+                {
+                    numNPCs++;
+                    auto &nn = NPC[numNPCs];
+                    nn = NPC_t();
+                    nn.Type = NPCID(e.NewNpc);
+
+                    nn.Location.Height = nn->THeight;
+                    nn.Location.Width = nn->TWidth;
+                    nn.Location.X = e.Location.X + e.Location.Width / 2.0 - NPC[numNPCs].Location.Width / 2.0;
+                    nn.Location.Y = e.Location.Y - 1;
+                    nn.Location.SpeedY = -6;
+
+                    // this would fix the fact that the code was moved from before the effect's speed was applied, but SpeedX / SpeedY is always 0 for EFFID_MINIBOSS_DIE
+                    // nn.Location.X -= e.Location.SpeedX;
+                    // nn.Location.Y -= e.Location.SpeedY;
+
+                    nn.Active = true;
+                    nn.TimeLeft = 100;
+                    nn.Frame = 0;
+                    syncLayers_NPC(numNPCs);
+                    CheckSectionNPC(numNPCs);
+                    PlaySoundSpatial(SFX_BossBeat, e.Location);
+                }
+            }
+
             e.Location.SpeedX = 0;
             e.Location.SpeedY = 0;
             e.FrameCount += 1;
