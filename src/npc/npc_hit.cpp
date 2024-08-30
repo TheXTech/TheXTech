@@ -1783,7 +1783,8 @@ void NPCHit(int A, int B, int C)
                 else
                     PlaySoundSpatial(SFX_SpitBossHit, NPC[A].Location);
                 NPC[A].Special = 4;
-                NPC[A].Special2 = 0;
+                // (was previously Special2)
+                NPC[A].SpecialY = 0;
                 NPC[A].Location.SpeedX = 0;
                 NPC[A].Location.SpeedY = 0;
             }

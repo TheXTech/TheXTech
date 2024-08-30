@@ -370,7 +370,7 @@ void NPCBlockLogic(int A, double& tempHit, int& tempHitBlock, float& tempSpeedA,
                                         double NPC_A_Special = NPC[A].Special;
                                         double NPC_A_Special2 = NPC[A].Special2;
 
-                                        if(NPC[A].Type == NPCID_VILLAIN_S3)
+                                        if(NPC[A].Type == NPCID_VILLAIN_S3 || NPC[A].Type == NPCID_MINIBOSS)
                                             NPC_A_Special2 = NPC[A].SpecialY;
 
                                         if(HitSpot == 5)
@@ -460,16 +460,12 @@ void NPCBlockLogic(int A, double& tempHit, int& tempHitBlock, float& tempSpeedA,
                                         }
 
                                         // could make compat flag here and refuse to clobber these values for cases other than wall climbers
-                                        if(NPC[A].Type == NPCID_VILLAIN_S3)
-                                        {
-                                            NPC[A].Special = NPC_A_Special;
+                                        if(NPC[A].Type == NPCID_VILLAIN_S3 || NPC[A].Type == NPCID_MINIBOSS)
                                             NPC[A].SpecialY = NPC_A_Special2;
-                                        }
                                         else
-                                        {
-                                            NPC[A].Special = NPC_A_Special;
                                             NPC[A].Special2 = NPC_A_Special2;
-                                        }
+
+                                        NPC[A].Special = NPC_A_Special;
                                     }
 
 

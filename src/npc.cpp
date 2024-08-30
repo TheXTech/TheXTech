@@ -4302,6 +4302,8 @@ void SpecialNPC(int A)
     }
     else if(NPC[A].Type == NPCID_MINIBOSS)
     {
+        // Special is the current state
+        // SpecialY is the main counter (was previously Special2)
         if(NPC[A].Legacy)
         {
             if(NPC[A].TimeLeft > 1)
@@ -4321,20 +4323,20 @@ void SpecialNPC(int A)
                 NPC[A].Location.Height = 54;
             }
 
-            NPC[A].Special2 += dRand() * 2;
-            if(NPC[A].Special2 >= 250 + iRand(250))
+            NPC[A].SpecialY += dRand() * 2;
+            if(NPC[A].SpecialY >= 250 + iRand(250))
             {
                 NPC[A].Special = 2;
-                NPC[A].Special2 = 0;
+                NPC[A].SpecialY = 0;
             }
         }
         else if(NPC[A].Special == 2)
         {
-            NPC[A].Special2 += 1;
-            if(NPC[A].Special2 >= 10)
+            NPC[A].SpecialY += 1;
+            if(NPC[A].SpecialY >= 10)
             {
                 NPC[A].Special = 1;
-                NPC[A].Special2 = 0;
+                NPC[A].SpecialY = 0;
             }
         }
         else if(NPC[A].Special == 1)
@@ -4345,20 +4347,20 @@ void SpecialNPC(int A)
                 NPC[A].Location.Height = 40;
             }
 
-            NPC[A].Special2 += dRand() * 2;
-            if(NPC[A].Special2 >= 100 + iRand(100))
+            NPC[A].SpecialY += dRand() * 2;
+            if(NPC[A].SpecialY >= 100 + iRand(100))
             {
                 NPC[A].Special = 3;
-                NPC[A].Special2 = 0;
+                NPC[A].SpecialY = 0;
             }
         }
         else if(NPC[A].Special == 3)
         {
-            NPC[A].Special2 += 1;
-            if(NPC[A].Special2 >= 10)
+            NPC[A].SpecialY += 1;
+            if(NPC[A].SpecialY >= 10)
             {
                 NPC[A].Special = 0;
-                NPC[A].Special2 = 0;
+                NPC[A].SpecialY = 0;
             }
         }
         else if(NPC[A].Special == 4)
@@ -4369,11 +4371,11 @@ void SpecialNPC(int A)
                 NPC[A].Location.Height = 34;
             }
 
-            NPC[A].Special2 += 1;
-            if(NPC[A].Special2 >= 100)
+            NPC[A].SpecialY += 1;
+            if(NPC[A].SpecialY >= 100)
             {
                 NPC[A].Special = 1;
-                NPC[A].Special2 = 0;
+                NPC[A].SpecialY = 0;
             }
         }
         // deferring tree update to end of the NPC physics update
