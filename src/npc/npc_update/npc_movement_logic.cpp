@@ -406,6 +406,7 @@ void NPCMovementLogic(int A, float& speedVar)
 
             if((NPC[A]->IsFish && NPC[A].Special != 1) && !NPC[A].Projectile)
             {
+                // NOTE: SpeedX was previously stored in Special3. That value was only read here (fish with Special == 1 use Special3 in a different way).
                 if(NPC[A].Wet == 0)
                 {
                     if(NPC[A].Special5 >= 0)
@@ -414,15 +415,15 @@ void NPCMovementLogic(int A, float& speedVar)
                 else
                 {
                     NPC[A].Special2 = 6;
-                    NPC[A].Special3 = NPC[A].Location.SpeedX;
+                    NPC[A].SpecialX = NPC[A].Location.SpeedX;
                 }
 
                 if(NPC[A].Special2 <= 0)
                 {
-                    NPC[A].Special3 = NPC[A].Special3 * 0.99;
-                    if(NPC[A].Special3 > -0.1 && NPC[A].Special3 < 0.1)
-                        NPC[A].Special3 = 0;
-                    NPC[A].Location.SpeedX = NPC[A].Special3;
+                    NPC[A].SpecialX = NPC[A].SpecialX * 0.99;
+                    if(NPC[A].SpecialX > -0.1 && NPC[A].SpecialX < 0.1)
+                        NPC[A].SpecialX = 0;
+                    NPC[A].Location.SpeedX = NPC[A].SpecialX;
                 }
             }
 
