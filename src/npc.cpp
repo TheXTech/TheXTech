@@ -652,8 +652,8 @@ void SkullRideDone(int A, const Location_t &alignAt)
 void NPCSpecial(int A)
 {
     double C = 0;
-    double D = 0;
-    double E = 0;
+    // double D = 0;
+    // double E = 0;
     // double F = 0;
     // int64_t fBlock = 0;
     // int64_t lBlock = 0;
@@ -1448,9 +1448,9 @@ void NPCSpecial(int A)
 
                 NPC[numNPCs].Location.Y = npc.Location.Y + 47;
                 NPC[numNPCs].Location.SpeedX = 3 * NPC[numNPCs].Direction;
-                C = (NPC[numNPCs].Location.X + NPC[numNPCs].Location.Width / 2.0) - npc.SpecialX;
-                D = (NPC[numNPCs].Location.Y + NPC[numNPCs].Location.Height / 2.0) - npc.SpecialY;
-                NPC[numNPCs].Location.SpeedY = D / C * NPC[numNPCs].Location.SpeedX;
+                double dist_x = (NPC[numNPCs].Location.X + NPC[numNPCs].Location.Width / 2.0) - npc.SpecialX;
+                double dist_y = (NPC[numNPCs].Location.Y + NPC[numNPCs].Location.Height / 2.0) - npc.SpecialY;
+                NPC[numNPCs].Location.SpeedY = dist_y / dist_x * NPC[numNPCs].Location.SpeedX;
 
                 if(NPC[numNPCs].Location.SpeedY > 3)
                     NPC[numNPCs].Location.SpeedY = 3;
@@ -1622,10 +1622,10 @@ void NPCSpecial(int A)
 
                 NPC[numNPCs].Location.SpeedX = 4 * NPC[numNPCs].Direction;
 
-                C = (NPC[numNPCs].Location.X + NPC[numNPCs].Location.Width / 2.0) - (Player[npc.Special5].Location.X + Player[npc.Special5].Location.Width / 2.0);
-                D = (NPC[numNPCs].Location.Y + NPC[numNPCs].Location.Height / 2.0) - (Player[npc.Special5].Location.Y + Player[npc.Special5].Location.Height / 2.0);
+                double dist_x = (NPC[numNPCs].Location.X + NPC[numNPCs].Location.Width / 2.0) - (Player[npc.Special5].Location.X + Player[npc.Special5].Location.Width / 2.0);
+                double dist_y = (NPC[numNPCs].Location.Y + NPC[numNPCs].Location.Height / 2.0) - (Player[npc.Special5].Location.Y + Player[npc.Special5].Location.Height / 2.0);
 
-                NPC[numNPCs].Location.SpeedY = D / C * NPC[numNPCs].Location.SpeedX;
+                NPC[numNPCs].Location.SpeedY = dist_y / dist_x * NPC[numNPCs].Location.SpeedX;
                 if(NPC[numNPCs].Location.SpeedY > 2)
                     NPC[numNPCs].Location.SpeedY = 2;
                 else if(NPC[numNPCs].Location.SpeedY < -2)
@@ -2058,15 +2058,13 @@ void NPCSpecial(int A)
     {
         if(npc.Special == 0)
         {
-            double C = 0;
-            double D = 0.0;
-            double E;
             npc.Special2 += 1;
 
             if(npc.Special2 > 80 + iRand(20))
             {
                 npc.Special = 1;
                 C = 0;
+                int ip = 0;
                 for(int i = 1; i <= numPlayers; i++)
                 {
                     if(!Player[i].Dead && Player[i].Section == npc.Section)
@@ -2074,18 +2072,18 @@ void NPCSpecial(int A)
                         if(C == 0 || std::abs(npc.Location.X + npc.Location.Width / 2.0 - (Player[i].Location.X + Player[i].Location.Width / 2.0)) < C)
                         {
                             C = std::abs(npc.Location.X + npc.Location.Width / 2.0 - (Player[i].Location.X + Player[i].Location.Width / 2.0));
-                            D = i;
+                            ip = i;
                         }
                     }
                 }
-                int ip = D;
-                C = (npc.Location.X + npc.Location.Width / 2.0) - (Player[ip].Location.X + Player[ip].Location.Width / 2.0);
-                D = (npc.Location.Y + npc.Location.Height / 2.0) - (Player[ip].Location.Y + Player[ip].Location.Height / 2.0);
-                E = std::sqrt(std::pow(C, 2) + std::pow(D, 2));
-                C = -C / E;
-                D = -D / E;
-                npc.Location.SpeedX = C * 3;
-                npc.Location.SpeedY = D * 3;
+
+                double dist_x = (npc.Location.X + npc.Location.Width / 2.0) - (Player[ip].Location.X + Player[ip].Location.Width / 2.0);
+                double dist_y = (npc.Location.Y + npc.Location.Height / 2.0) - (Player[ip].Location.Y + Player[ip].Location.Height / 2.0);
+                double dist = std::sqrt(std::pow(dist_x, 2) + std::pow(dist_y, 2));
+                dist_x = -dist_x / dist;
+                dist_y = -dist_y / dist;
+                npc.Location.SpeedX = dist_x * 3;
+                npc.Location.SpeedY = dist_y * 3;
             }
         }
 
@@ -2626,8 +2624,8 @@ void NPCSpecial(int A)
             }
 
             C = 2; // The Speed
-            D = 0;
-            E = 0;
+            double speed_y = 0; // D = 0;
+            double speed_x = 0; // E = 0;
             vbint_t bgo_type = 0; // F = 0;
             // tempNPC = npc;
             Location_t oldLoc = npc.Location;
@@ -2650,8 +2648,8 @@ void NPCSpecial(int A)
                                 if(Background[i].Type == npc.Special5 || Background[i].Type == 70 || Background[i].Type == 100)
                                 {
                                     bgo_type = 0;
-                                    E = 0;
-                                    D = 0;
+                                    speed_x = 0;
+                                    speed_y = 0;
                                     // npc = tempNPC;
                                     npc.Location = oldLoc;
                                 }
@@ -2668,9 +2666,9 @@ void NPCSpecial(int A)
                                         npc.Location.SpeedY = C;
                                     npc.Location.SpeedX = 0;
                                     if(centered)
-                                        E = -(npc.Location.X + (npc.Location.Width / 2)) + (Background[i].Location.X + (Background[i].Location.Width / 2));
+                                        speed_x = -(npc.Location.X + (npc.Location.Width / 2)) + (Background[i].Location.X + (Background[i].Location.Width / 2));
                                     else
-                                        E = -npc.Location.X + Background[i].Location.X - 32;
+                                        speed_x = -npc.Location.X + Background[i].Location.X - 32;
                                 }
                                 // Horizontal rail
                                 else if(Background[i].Type == 71)
@@ -2681,9 +2679,9 @@ void NPCSpecial(int A)
                                         npc.Location.SpeedX = -C;
                                     npc.Location.SpeedY = 0;
                                     if(centered)
-                                        D = -(npc.Location.Y + (npc.Location.Height / 2)) + (Background[i].Location.Y + (Background[i].Location.Height / 2));
+                                        speed_y = -(npc.Location.Y + (npc.Location.Height / 2)) + (Background[i].Location.Y + (Background[i].Location.Height / 2));
                                     else
-                                        D = -npc.Location.Y + Background[i].Location.Y;
+                                        speed_y = -npc.Location.Y + Background[i].Location.Y;
                                 }
                                 // Diagonal rail left-bottom, right-top
                                 else if(Background[i].Type == 73)
@@ -2737,8 +2735,8 @@ void NPCSpecial(int A)
             }
             else
             {
-                npc.Location.SpeedX += E;
-                npc.Location.SpeedY += D;
+                npc.Location.SpeedX += speed_x;
+                npc.Location.SpeedY += speed_y;
             }
 
             // this code ran unconditionally in SMBX 1.3
@@ -2828,6 +2826,7 @@ void NPCSpecial(int A)
     else if(npc.Type == NPCID_VILLAIN_S1) // King Koopa
     {
         C = 0;
+        int target_plr = 0; // was D
         for(int i = 1; i <= numPlayers; i++)
         {
             auto &p = Player[i];
@@ -2836,17 +2835,17 @@ void NPCSpecial(int A)
                 if(C == 0.0 || std::abs(npc.Location.X + npc.Location.Width / 2.0 - (p.Location.X + p.Location.Width / 2.0)) < C)
                 {
                     C = std::abs(npc.Location.X + npc.Location.Width / 2.0 - (p.Location.X + p.Location.Width / 2.0));
-                    D = i;
+                    target_plr = i;
                 }
             }
         }
 
-        if(Player[D].Location.X + Player[D].Location.Width / 2.0 > npc.Location.X + 16)
+        if(Player[target_plr].Location.X + Player[target_plr].Location.Width / 2.0 > npc.Location.X + 16)
             npc.Direction = 1;
         else
             npc.Direction = -1;
 
-        npc.Special5 = D;
+        npc.Special5 = target_plr;
 
         if(iRand(300) >= 297 && npc.Special == 0.0)
             npc.Special = 1;
@@ -2912,13 +2911,15 @@ void NPCSpecial(int A)
                         NPC[numNPCs].Location.X = npc.Location.X + 54;
                     NPC[numNPCs].Location.Y = npc.Location.Y + 19;
                     NPC[numNPCs].Location.SpeedX = 4 * NPC[numNPCs].Direction;
-                    C = (NPC[numNPCs].Location.X + NPC[numNPCs].Location.Width / 2.0) - (Player[npc.Special5].Location.X + Player[npc.Special5].Location.Width / 2.0);
-                    D = (NPC[numNPCs].Location.Y + NPC[numNPCs].Location.Height / 2.0) - (Player[npc.Special5].Location.Y + Player[npc.Special5].Location.Height / 2.0);
-                    NPC[numNPCs].Location.SpeedY = D / C * NPC[numNPCs].Location.SpeedX;
+
+                    double dist_x = (NPC[numNPCs].Location.X + NPC[numNPCs].Location.Width / 2.0) - (Player[npc.Special5].Location.X + Player[npc.Special5].Location.Width / 2.0);
+                    double dist_y = (NPC[numNPCs].Location.Y + NPC[numNPCs].Location.Height / 2.0) - (Player[npc.Special5].Location.Y + Player[npc.Special5].Location.Height / 2.0);
+                    NPC[numNPCs].Location.SpeedY = dist_y / dist_x * NPC[numNPCs].Location.SpeedX;
                     if(NPC[numNPCs].Location.SpeedY > 1)
                         NPC[numNPCs].Location.SpeedY = 1;
                     else if(NPC[numNPCs].Location.SpeedY < -1)
                         NPC[numNPCs].Location.SpeedY = -1;
+
                     PlaySoundSpatial(SFX_BigFireball, npc.Location);
 
                     syncLayers_NPC(numNPCs);
