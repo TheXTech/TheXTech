@@ -265,7 +265,7 @@ void PlayerThrowHeavy(const int A)
             p.FireBallCD = 40;
         NPC[numNPCs].Type = NPCID_CHAR4_HEAVY;
         NPC[numNPCs].Special5 = A;
-        NPC[numNPCs].Special6 = p.Direction;
+        NPC[numNPCs].Special4 = p.Direction; // Special6 in SMBX 1.3
         PlaySoundSpatial(SFX_Throw, p.Location);
     }
     else

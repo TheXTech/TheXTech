@@ -3329,6 +3329,9 @@ void SpecialNPC(int A)
     }
     if(NPC[A].Type == NPCID_CHAR4_HEAVY) // Toad Boomerang
     {
+        // Special5 is player that threw NPC
+        // Special4 is the direction that the player was facing when throwing (Special6 in SMBX 1.3)
+
         double npcHCenter = NPC[A].Location.X + NPC[A].Location.Width / 2.0;
         double npcVCenter = NPC[A].Location.Y + NPC[A].Location.Height / 2.0;
         double playerHCenter = Player[NPC[A].Special5].Location.X + Player[NPC[A].Special5].Location.Width / 2.0;
@@ -3364,13 +3367,13 @@ void SpecialNPC(int A)
         if(NPC[A].Location.Y + NPC[A].Location.Height / 2.0 > playerVCenter)
         {
             NPC[A].Location.SpeedY -= 0.2;
-            if(NPC[A].Location.SpeedY > 0 && NPC[A].Direction != NPC[A].Special6)
+            if(NPC[A].Location.SpeedY > 0 && NPC[A].Direction != NPC[A].Special4)
                 NPC[A].Location.SpeedY += -std::abs(NPC[A].Location.SpeedY) * 0.04;
         }
         else if(NPC[A].Location.Y + NPC[A].Location.Height / 2.0 < playerVCenter)
         {
             NPC[A].Location.SpeedY += 0.2;
-            if(NPC[A].Location.SpeedY < 0 && NPC[A].Direction != NPC[A].Special6)
+            if(NPC[A].Location.SpeedY < 0 && NPC[A].Direction != NPC[A].Special4)
                 NPC[A].Location.SpeedY += std::abs(NPC[A].Location.SpeedY) * 0.04;
         }
         NPC[A].Location.SpeedY += (playerVCenter - NPC[A].Location.Y + NPC[A].Location.Height / 2.0) * 0.004;
@@ -3398,8 +3401,8 @@ void SpecialNPC(int A)
             }
         }
 
-        bool atCenter = (npcHCenter > playerHCenter && NPC[A].Special6 == 1) ||
-                        (npcHCenter < playerHCenter && NPC[A].Special6 == -1);
+        bool atCenter = (npcHCenter > playerHCenter && NPC[A].Special4 == 1) ||
+                        (npcHCenter < playerHCenter && NPC[A].Special4 == -1);
         if(!atCenter)
         {
             NPC[A].Special2 = 1;
@@ -3455,7 +3458,6 @@ void SpecialNPC(int A)
                     NPC[A].Location.SpeedY += 0.1;
             }
         }
-
     }
     else if(NPC[A].Type == NPCID_ITEM_POD) // yoshi egg
     {

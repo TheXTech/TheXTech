@@ -5311,7 +5311,7 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
             if(NPC[p.HoldingNPC].Type == NPCID_CHAR4_HEAVY)
             {
                 NPC[p.HoldingNPC].Special5 = A;
-                NPC[p.HoldingNPC].Special6 = p.Direction;
+                NPC[p.HoldingNPC].Special4 = p.Direction; // Special6 in SMBX 1.3
                 NPC[p.HoldingNPC].Location.SpeedY = -8;
                 NPC[p.HoldingNPC].Location.SpeedX = 12 * p.Direction + p.Location.SpeedX;
                 NPC[p.HoldingNPC].Projectile = true;
