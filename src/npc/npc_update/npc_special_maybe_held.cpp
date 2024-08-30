@@ -105,7 +105,7 @@ void NPCSpecialMaybeHeld(int A)
         // special5 - the player
         // special4 - what bowser is doing
         // special3 - counter for what bowser is doing
-        // special2 - counter for what bowser needs to do
+        // specialY - counter for what bowser needs to do (was Special2)
         if(NPC[A].Legacy)
         {
             if(NPC[A].TimeLeft > 1)
@@ -169,17 +169,17 @@ void NPCSpecialMaybeHeld(int A)
             }
         }
 
-        NPC[A].Special2 += dRand();
+        NPC[A].SpecialY += dRand();
 
         if(NPC[A].Special4 == 0 && tempBool)
         {
-            if(NPC[A].Special2 >= 200 + dRand() * 400 - dRand() * 200) // hop on player
+            if(NPC[A].SpecialY >= 200 + dRand() * 400 - dRand() * 200) // hop on player
             {
-                if(NPC[A].Special2 >= 200 + dRand() * 600)
-                    NPC[A].Special2 = 0;
+                if(NPC[A].SpecialY >= 200 + dRand() * 600)
+                    NPC[A].SpecialY = 0;
                 NPC[A].Special4 = 3;
             }
-            else if((NPC[A].Special2 >= 80 && NPC[A].Special2 <= 130) || (NPC[A].Special2 >= 160 + dRand() * 300 && NPC[A].Special2 <= 180 + dRand() * 800)) // shoot fireball
+            else if((NPC[A].SpecialY >= 80 && NPC[A].SpecialY <= 130) || (NPC[A].SpecialY >= 160 + dRand() * 300 && NPC[A].SpecialY <= 180 + dRand() * 800)) // shoot fireball
                 NPC[A].Special4 = 4;
         }
 
@@ -465,7 +465,7 @@ void NPCSpecialMaybeHeld(int A)
                                n.Location.Y + n.Location.Height + 48 <= s.Height &&
                                B != n.Section)
                             {
-                                n.Special2 = 0;
+                                n.SpecialY = 0;
                                 n.Special3 = 0;
                                 n.Special4 = 2;
 
