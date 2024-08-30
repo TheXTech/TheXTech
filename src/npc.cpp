@@ -1124,6 +1124,8 @@ void NPCSpecial(int A)
     }
     else if(npc.Type == NPCID_BAT) // bat thing
     {
+        // Special is an activation flag
+        // SpecialY (previously Special2) is the target Y coordinate
         if(npc.Special == 0)
         {
             if(!g_config.fix_bat_start_while_inactive || npc.Active)
@@ -1151,12 +1153,12 @@ void NPCSpecial(int A)
                             if(p.Location.Y > npc.Location.Y)
                             {
                                 npc.Location.SpeedY = 2.5;
-                                npc.Special2 = p.Location.Y - 130;
+                                npc.SpecialY = p.Location.Y - 130;
                             }
                             else
                             {
                                 npc.Location.SpeedY = -2.5;
-                                npc.Special2 = p.Location.Y + 130;
+                                npc.SpecialY = p.Location.Y + 130;
                             }
 
                             if(npc.Active)
@@ -1169,7 +1171,7 @@ void NPCSpecial(int A)
         else
         {
             npc.Location.SpeedX = (3 - std::abs(npc.Location.SpeedY)) * npc.Direction;
-            if((npc.Location.SpeedY > 0 && npc.Location.Y > npc.Special2) || (npc.Location.SpeedY < 0 && npc.Location.Y < npc.Special2))
+            if((npc.Location.SpeedY > 0 && npc.Location.Y > npc.SpecialY) || (npc.Location.SpeedY < 0 && npc.Location.Y < npc.SpecialY))
             {
                 npc.Location.SpeedY = npc.Location.SpeedY * 0.98;
                 if(npc.Location.SpeedY > -0.1 && npc.Location.SpeedY < 0.1)
