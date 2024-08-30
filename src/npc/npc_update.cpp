@@ -1102,8 +1102,9 @@ void UpdateNPCs()
                                         NPC[A].Location.SpeedY = -2;
                                 }
 
+                                // assigned to Special in SMBX 1.3
                                 if(NPC[A].Type == NPCID_PLATFORM_S3)
-                                    NPC[A].Special = NPC[A].Location.SpeedY;
+                                    NPC[A].SpecialY = NPC[A].Location.SpeedY;
                             }
 
                             if(Water[B].Quicksand)

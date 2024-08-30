@@ -370,11 +370,14 @@ void NPCBlockLogic(int A, double& tempHit, int& tempHitBlock, float& tempSpeedA,
                                         double NPC_A_Special = NPC[A].Special;
                                         double NPC_A_Special2 = NPC[A].Special2;
 
+                                        char Special_from = 0;
                                         char Special2_from = 0;
 
                                         if(NPC[A].Type == NPCID_YEL_PLATFORM || NPC[A].Type == NPCID_BLU_PLATFORM || NPC[A].Type == NPCID_GRN_PLATFORM || NPC[A].Type == NPCID_RED_PLATFORM || NPC[A].Type == NPCID_PLATFORM_S3 || NPC[A].Type == NPCID_SAW)
                                         {
+                                            Special_from = 'Y';
                                             Special2_from = 'X';
+                                            NPC_A_Special = NPC[A].SpecialY;
                                             NPC_A_Special2 = NPC[A].SpecialX;
                                         }
                                         else if(NPC[A].Type == NPCID_VILLAIN_S3 || NPC[A].Type == NPCID_MINIBOSS || NPC[A].Type == NPCID_GOALTAPE || NPC[A].Type == NPCID_BAT)
@@ -477,7 +480,12 @@ void NPCBlockLogic(int A, double& tempHit, int& tempHitBlock, float& tempSpeedA,
                                         else
                                             NPC[A].Special2 = (vbint_t)NPC_A_Special2;
 
-                                        NPC[A].Special = NPC_A_Special;
+                                        if(Special_from == 'X')
+                                            NPC[A].SpecialX = NPC_A_Special;
+                                        else if(Special_from == 'Y')
+                                            NPC[A].SpecialY = NPC_A_Special;
+                                        else
+                                            NPC[A].Special = NPC_A_Special;
                                     }
 
 

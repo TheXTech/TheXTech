@@ -2580,7 +2580,7 @@ void NPCSpecial(int A)
             npc.Type == NPCID_RED_PLATFORM || npc.Type == NPCID_PLATFORM_S3 || npc.Type == NPCID_SAW)
     {
         // SpecialX (prev Special2) stores the previous X speed (ignoring platform pause)
-        // Special stores the previous Y speed (ignoring platform pause)
+        // SpecialY (prev Special) stores the previous Y speed (ignoring platform pause)
 
         straightLine = false; // SET BUT NOT USED
         UNUSED(straightLine);
@@ -2612,7 +2612,7 @@ void NPCSpecial(int A)
             // this code ran unconditionally in SMBX 1.3
             if(!g_config.fix_platforms_acceleration || !pausePlatforms) // Keep zeroed speed when player required the pause of the move effect
             {
-                npc.Location.SpeedY = npc.Special;
+                npc.Location.SpeedY = npc.SpecialY;
                 npc.Location.SpeedX = npc.SpecialX;
             }
 
@@ -2760,18 +2760,18 @@ void NPCSpecial(int A)
             }
 
             // this code ran unconditionally in SMBX 1.3
-            // it does not run in modern mode so that the Special / SpecialX keep the speed from before the pause
+            // it does not run in modern mode so that the SpecialY / SpecialX keep the speed from before the pause
             if(!g_config.fix_platforms_acceleration || !pausePlatforms)
             {
-                npc.Special = npc.Location.SpeedY;
+                npc.SpecialY = npc.Location.SpeedY;
                 npc.SpecialX = npc.Location.SpeedX;
             }
 
             // NEW: add a terminal velocity for the platforms in modern mode
-            if(npc.Special > 16)
+            if(npc.SpecialY > 16)
             {
                 if(g_config.fix_platforms_acceleration)
-                    npc.Special = 16;
+                    npc.SpecialY = 16;
 
                 // in either mode, try to "cancel" the NPC once it has fallen below everything
                 // fixes some serious memory exhaustion bugs
