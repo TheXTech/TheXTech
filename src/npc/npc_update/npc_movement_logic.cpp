@@ -477,7 +477,7 @@ void NPCMovementLogic(int A, float& speedVar)
 
         else if((NPC[A]->IsFish && NPC[A].Special == 2) && !NPC[A].Projectile)
         {
-            if(Maths::iRound(NPC[A].Special5) == 1)
+            if(NPC[A].Special5 == 1)
             {
                 if(NPC[A].Location.Y > NPC[A].DefaultLocation.Y)
                     NPC[A].Location.SpeedY = -4 - (NPC[A].Location.Y - NPC[A].DefaultLocation.Y) * 0.02;

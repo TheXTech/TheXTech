@@ -215,7 +215,7 @@ bool PlayerChar4HeavyOut(const int A)
         {
             if(NPC[B].Type == NPCID_CHAR4_HEAVY)
             {
-                if(Maths::iRound(NPC[B].Special5) == A)
+                if(NPC[B].Special5 == A)
                     return true;
             }
         }

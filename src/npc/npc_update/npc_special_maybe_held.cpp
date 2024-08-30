@@ -129,7 +129,7 @@ void NPCSpecialMaybeHeld(int A)
                 NPC[A].Frame = 5;
         }
 
-        if(NPC[A].Special5 == 0.0) // find player
+        if(NPC[A].Special5 == 0) // find player
         {
             bool tempBool = false;
             for(int B = 1; B <= numPlayers; B++)
@@ -157,7 +157,7 @@ void NPCSpecialMaybeHeld(int A)
         bool tempBool = false;
         if(NPC[A].Special5 > 0)
         {
-            if(Player[long(NPC[A].Special5)].Location.X + Player[long(NPC[A].Special5)].Location.Width / 2.0 < NPC[A].Location.X + NPC[A].Location.Width / 2.0)
+            if(Player[NPC[A].Special5].Location.X + Player[NPC[A].Special5].Location.Width / 2.0 < NPC[A].Location.X + NPC[A].Location.Width / 2.0)
             {
                 if(NPC[A].Direction < 0)
                     tempBool = true;
@@ -338,7 +338,7 @@ void NPCSpecialMaybeHeld(int A)
             else if(fiEqual(NPC[A].Special3, 5))
             {
                 auto &sx = NPC[A].Location.SpeedX;
-                auto &pl = Player[int(NPC[A].Special5)].Location;
+                auto &pl = Player[NPC[A].Special5].Location;
                 NPC[A].Special3 += 1;
                 NPC[A].Location.SpeedY = -12;
                 NPC[A].BeltSpeed = 0;
@@ -557,8 +557,8 @@ void NPCSpecialMaybeHeld(int A)
                         NPC[numNPCs].Location.X = NPC[A].Location.X + 54;
                     NPC[numNPCs].Location.Y = NPC[A].Location.Y + 19;
                     NPC[numNPCs].Location.SpeedX = 4 * double(NPC[numNPCs].Direction);
-                    double C = (NPC[numNPCs].Location.X + NPC[numNPCs].Location.Width / 2.0) - (Player[int(NPC[A].Special5)].Location.X + Player[int(NPC[A].Special5)].Location.Width / 2.0);
-                    double D = (NPC[numNPCs].Location.Y + NPC[numNPCs].Location.Height / 2.0) - (Player[int(NPC[A].Special5)].Location.Y + Player[int(NPC[A].Special5)].Location.Height / 2.0);
+                    double C = (NPC[numNPCs].Location.X + NPC[numNPCs].Location.Width / 2.0) - (Player[NPC[A].Special5].Location.X + Player[NPC[A].Special5].Location.Width / 2.0);
+                    double D = (NPC[numNPCs].Location.Y + NPC[numNPCs].Location.Height / 2.0) - (Player[NPC[A].Special5].Location.Y + Player[NPC[A].Special5].Location.Height / 2.0);
                     NPC[numNPCs].Location.SpeedY = D / C * NPC[numNPCs].Location.SpeedX;
                     if(NPC[numNPCs].Location.SpeedY > 1)
                         NPC[numNPCs].Location.SpeedY = 1;
