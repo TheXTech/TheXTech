@@ -154,6 +154,8 @@ void Deactivate(int A)
             NPC[A].Special4 = 0;
             NPC[A].Special5 = 0;
             NPC[A].Special6 = 0;
+            NPC[A].SpecialX = 0.0;
+            NPC[A].SpecialY = 0.0;
             NPC[A].Damage = 0;
             NPC[A].HoldingPlayer = 0;
 

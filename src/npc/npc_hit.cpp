@@ -280,6 +280,8 @@ void NPCHit(int A, int B, int C)
             NPC[A].Special4 = 0;
             NPC[A].Special5 = 0;
             NPC[A].Special6 = 0;
+            NPC[A].SpecialX = 0.0;
+            NPC[A].SpecialY = 0.0;
         }
         else if(B == 3 || B == 5)
         {
@@ -467,6 +469,8 @@ void NPCHit(int A, int B, int C)
             NPC[A].Special4 = 0;
             NPC[A].Special5 = 0;
             NPC[A].Special6 = 0;
+            NPC[A].SpecialX = 0.0;
+            NPC[A].SpecialY = 0.0;
             NPC[A].Location.X += NPC[A].Location.Width / 2.0;
             NPC[A].Location.Y += NPC[A].Location.Height;
             if(NPC[A].Type == NPCID_MAGIC_BOSS)

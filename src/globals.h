@@ -294,6 +294,10 @@ struct NPC_t
 //    Location As Location 'collsion detection information
     Location_t Location;
 
+// NEW: position variables (or double counters) used by AI
+    double SpecialX = 0.0;
+    double SpecialY = 0.0;
+
 //'Secial - misc variables used for NPC AI
 //    Special As Double
     double Special = 0.0;
