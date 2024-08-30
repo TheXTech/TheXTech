@@ -314,9 +314,9 @@ void NPCCollide(int A)
                     // allow turtle (B) to kick shell (A) if it is facing the shell
                     if(NPC[A]->IsAShell &&
                             (NPC[B].Type == NPCID_EXT_TURTLE || NPC[B].Type == NPCID_BLU_HIT_TURTLE_S4) &&
-                            (int(NPC[A].Direction) != int(NPC[B].Direction) || NPC[A].Special > 0) && !NPC[B].Projectile)
+                            (NPC[A].Direction != NPC[B].Direction || NPC[A].Special > 0) && !NPC[B].Projectile)
                     {
-                        if(int(NPC[A].Direction) == -1)
+                        if(NPC[A].Direction == -1)
                         {
                             NPC[B].Frame = 3;
                             if(NPC[B].Type == NPCID_BLU_HIT_TURTLE_S4)
@@ -618,7 +618,7 @@ void NPCCollideHeld(int A)
         // slide block can't be collision target until activation
         else if(NPC[B].Type == NPCID_SLIDE_BLOCK)
         {
-            if(NPC[B].Special == 0.0)
+            if(NPC[B].Special == 0)
                 continue;
         }
         else if(NPC[B].Type == NPCID_HEAVY_THROWN)

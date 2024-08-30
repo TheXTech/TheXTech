@@ -146,7 +146,7 @@ static void setupCheckpoints()
             if(NPC[A].Type != NPCID_CHECKPOINT)
                 continue;
 
-            if(g_config.fix_vanilla_checkpoints && cp.id != Maths::iRound(NPC[A].Special))
+            if(g_config.fix_vanilla_checkpoints && cp.id != NPC[A].Special)
                 continue;
 
             NPC[A].Killed = 9;
@@ -4408,7 +4408,7 @@ void ClownCar()
             if(p.Controls.Run && NPC[B].Type == NPCID_TOOTHYPIPE)
             {
                 // create toothy if it doesn't exist already
-                if(NPC[B].Special == 0.0)
+                if(NPC[B].Special == 0)
                 {
                     NPC[B].Special = 1;
                     numNPCs++;
@@ -4433,7 +4433,7 @@ void ClownCar()
                 // update toothy's position
                 for(int C : NPCQueues::Active.no_change)
                 {
-                    if(NPC[C].Type == NPCID_TOOTHY && Maths::iRound(NPC[C].Special) == A && NPC[C].Special2 == B)
+                    if(NPC[C].Type == NPCID_TOOTHY && NPC[C].Special == A && NPC[C].Special2 == B)
                     {
                         NPC[C].vehiclePlr = A;
                         NPC[C].Projectile = true;
@@ -5066,7 +5066,7 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
 
             if(NPC[p.HoldingNPC].Type == NPCID_TOOTHYPIPE && !FreezeNPCs)
             {
-                if(NPC[p.HoldingNPC].Special == 0.0)
+                if(NPC[p.HoldingNPC].Special == 0)
                 {
                     NPC[p.HoldingNPC].Special = 1;
                     NPC[p.HoldingNPC].Special2 = numNPCs + 1;

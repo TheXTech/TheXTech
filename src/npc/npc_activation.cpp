@@ -78,7 +78,7 @@ static bool s_NPC_MustBeCanonical_internal(const NPC_t& n)
 
     return n.Generator
         || n->UseDefaultCam
-        || (n->IsFish && Maths::iRound(n.Special) == 2)
+        || (n->IsFish && n.Special == 2)
         || n.AttLayer != LAYER_NONE
         || (n.TriggerActivate != EVENT_NONE && !s_Event_SoundOnly(Events[n.TriggerActivate], n.Section));
 }
@@ -90,7 +90,7 @@ bool NPC_MustBeCanonical(NPCRef_t n)
 
 bool NPC_InactiveIgnore(const NPC_t& n)
 {
-    return (n->IsFish && Maths::iRound(n.Special) == 2)
+    return (n->IsFish && n.Special == 2)
         || n->InactiveRender == NPCTraits_t::SKIP;
 }
 

@@ -221,7 +221,7 @@ void SaveLevel(const std::string& FilePath, int format, int version)   // saves 
         if(n.Type == NPCID_ITEM_BURIED || n.Type == NPCID_ITEM_POD ||
            n.Type == NPCID_ITEM_BUBBLE || n.Type == NPCID_ITEM_THROWER)
         {
-            npc.contents = long(n.Special);
+            npc.contents = n.Special;
             npc.special_data = n.Variant;
         }
 

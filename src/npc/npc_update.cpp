@@ -844,7 +844,7 @@ void UpdateNPCs()
             continue;
 
         // check for inactive NPCs that are falling off
-        if(NPC[A].JustActivated == 0 && !(NPC[A]->IsFish && Maths::iRound(NPC[A].Special) == 2) && NPC[A].Type != NPCID_LAVABUBBLE)
+        if(NPC[A].JustActivated == 0 && !(NPC[A]->IsFish && NPC[A].Special == 2) && NPC[A].Type != NPCID_LAVABUBBLE)
         {
             if(!GameMenu && NPC[A].Location.Y > level[NPC[A].Section].Height + 16)
             {
@@ -955,7 +955,7 @@ void UpdateNPCs()
                         NPC[A].Active = false;
                         NPC[A].TimeLeft = 0;
                     }
-                    else if(NPC[A]->IsFish && Maths::iRound(NPC[A].Special) == 2)
+                    else if(NPC[A]->IsFish && NPC[A].Special == 2)
                     {
                         NPC[A].Location.Y = level[Player[NPC[A].JustActivated].Section].Height - 0.1;
                         NPC[A].Location.SpeedX = (1 + (NPC[A].Location.Y - NPC[A].DefaultLocationY) * 0.005) * NPC[A].Direction;
@@ -989,7 +989,7 @@ void UpdateNPCs()
         // check for active NPCs that are falling off
         else if(NPC[A].Location.Y > level[NPC[A].Section].Height && NPC[A].Location.Y > level[NPC[A].Section].Height + 16)
         {
-            if(!GameMenu && !(NPC[A]->IsFish && Maths::iRound(NPC[A].Special) == 2) && NPC[A].Type != NPCID_LAVABUBBLE)
+            if(!GameMenu && !(NPC[A]->IsFish && NPC[A].Special == 2) && NPC[A].Type != NPCID_LAVABUBBLE)
                 NPCHit(A, 9);
         }
 
@@ -1229,7 +1229,7 @@ void UpdateNPCs()
             if((NPC[A].Type == NPCID_VILLAIN_S3 || NPC[A].Type == NPCID_FIRE_DISK || NPC[A].Type == NPCID_FIRE_CHAIN) && NPC[A].TimeLeft > 1)
                 NPC[A].TimeLeft = 100;
 
-            if(!(NPC[A].Type == NPCID_PLR_FIREBALL || (NPC[A]->IsFish && fiEqual(NPC[A].Special, 2)) ||
+            if(!(NPC[A].Type == NPCID_PLR_FIREBALL || (NPC[A]->IsFish && NPC[A].Special == 2) ||
                  NPC[A].Type == NPCID_TOOTHY || NPC[A].Type == NPCID_VEHICLE || NPC[A].Type == NPCID_YEL_PLATFORM || NPC[A].Type == NPCID_BLU_PLATFORM ||
                  NPC[A].Type == NPCID_GRN_PLATFORM || NPC[A].Type == NPCID_RED_PLATFORM || NPC[A].Type == NPCID_VILLAIN_S3 || NPCIsYoshi(NPC[A])) &&
                  NPC[A].HoldingPlayer == 0)
@@ -1290,7 +1290,7 @@ void UpdateNPCs()
 
                         if(NPC[A].Type == NPCID_ITEM_BURIED)
                         {
-                            if(NPC[A].Special == 0.0)
+                            if(NPC[A].Special == 0)
                                 NPC[A].Special = NPCID_VEGGIE_RANDOM;
 
                             if(NPC[A].Generator)

@@ -727,7 +727,7 @@ void NPCSpecial(int A)
 #endif
         // ============================================================
 
-        if(!tempBool || npc.Special == 1.0)
+        if(!tempBool || npc.Special == 1)
         {
             numNPCs++;
             NPC[numNPCs] = NPC_t();
@@ -753,7 +753,7 @@ void NPCSpecial(int A)
             syncLayers_NPC(numNPCs);
         }
 
-        if(npc.Special == 1.0)
+        if(npc.Special == 1)
         {
             npc.Killed = 9;
             NPCQueues::Killed.push_back(A);
@@ -857,7 +857,7 @@ void NPCSpecial(int A)
 
             tempLocation = npc.Location;
 
-            if(int(npc.Special) == -1)
+            if(npc.Special == -1)
                 tempLocation.Y -= 1;
             else
                 tempLocation.Y += tempLocation.Height + 1;
@@ -926,7 +926,7 @@ void NPCSpecial(int A)
 
     else if(npc.Type == NPCID_SPIKY_BALL_S4) // falling spiney
     {
-        if(npc.Special != 0.0)
+        if(npc.Special != 0)
         {
             npc.Type = NPCID_SPIKY_S4;
             npc.Special = 0;
@@ -953,7 +953,7 @@ void NPCSpecial(int A)
     }
     else if(npc.Type == NPCID_ITEM_BUBBLE) // bubble
     {
-        if(fiEqual(npc.Special, NPCID_RANDOM_POWER))
+        if(npc.Special == NPCID_RANDOM_POWER)
         {
             npc.Special = RandomBonus();
             npc.DefaultSpecial = npc.Special;
@@ -1021,7 +1021,7 @@ void NPCSpecial(int A)
     }
     else if(npc.Type == NPCID_QUAD_SPITTER) // fire plant thing
     {
-        if(npc.Special == 0.0)
+        if(npc.Special == 0)
         {
             npc.Special2 += 1;
             if(npc.Special2 >= 170)
@@ -1030,7 +1030,7 @@ void NPCSpecial(int A)
                 npc.Special = 1;
             }
         }
-        else if(fiEqual(npc.Special, 1))
+        else if(npc.Special == 1)
         {
             npc.Special2 += 1;
             if(npc.Special2 >= 70)
@@ -1827,7 +1827,7 @@ void NPCSpecial(int A)
         else if(fEqual((float)npc.Location.SpeedY, Physics.NPCGravity))
             npc.Special = 0;
 
-        if(!npc.Stuck && npc.Special == 0.0)
+        if(!npc.Stuck && npc.Special == 0)
         {
             if(npc.Special2 == 0)
             {
@@ -2052,7 +2052,7 @@ void NPCSpecial(int A)
     {
         if(npc.Special >= 1)
         {
-            double B = 1 - (npc.Special / 45);
+            double B = 1 - (npc.Special / 45.0);
             double C = B * 0.5;
             B *= 15;
             C *= 15;
@@ -2136,7 +2136,7 @@ void NPCSpecial(int A)
         tempBool = false;
         tempBool2 = false;
 
-        if(npc.Special == 0.0)
+        if(npc.Special == 0)
         {
             if(npc.Direction == 0)
             {
@@ -2485,7 +2485,7 @@ void NPCSpecial(int A)
     {
         npc.Direction = npc.DefaultDirection;
 
-        if(npc.Immune > 0 && !fEqual(npc.Special, 3))
+        if(npc.Immune > 0 && npc.Special != 3)
             npc.Special = 2;
 
         if(npc.Damage >= 30)
@@ -2868,7 +2868,7 @@ void NPCSpecial(int A)
 
         npc.Special5 = target_plr;
 
-        if(iRand(300) >= 297 && npc.Special == 0.0)
+        if(iRand(300) >= 297 && npc.Special == 0)
             npc.Special = 1;
 
         npc.Special4 += 1;
@@ -3064,7 +3064,7 @@ void NPCSpecial(int A)
     }
     else if(npc.Type == NPCID_CHECKER_PLATFORM)
     {
-        if(fiEqual(npc.Special, 1))
+        if(npc.Special == 1)
         {
             npc.Location.SpeedY += Physics.NPCGravity / 4;
             npc.Special = 0;
@@ -3077,7 +3077,7 @@ void NPCSpecial(int A)
 
     else if(npc.Type == NPCID_LAVA_MONSTER)
     {
-        if(Maths::iRound(npc.Special) == 0.0)
+        if(npc.Special == 0)
         {
             tempLocation = npc.Location;
             tempLocation.Height = 400;
@@ -3100,7 +3100,7 @@ void NPCSpecial(int A)
                 }
             }
         }
-        else if(Maths::iRound(npc.Special) == 1)
+        else if(npc.Special == 1)
         {
             npc.Special2 += 1;
             if(npc.Special2 == 90)
@@ -3499,7 +3499,7 @@ void SpecialNPC(int A)
             if(NPC[A].Special == 0)
             {
                 C = 0;
-                D = 1;
+                int target_plr = 1;
                 for(B = 1; B <= numPlayers; B++)
                 {
                     if(!Player[B].Dead && Player[B].Section == NPC[A].Section)
@@ -3508,11 +3508,11 @@ void SpecialNPC(int A)
                         if(C == 0 || dist < C)
                         {
                             C = dist;
-                            D = (float)B;
+                            target_plr = B;
                         }
                     }
                 }
-                NPC[A].Special = D;
+                NPC[A].Special = target_plr;
             }
 
             if(NPC[A].Special2 == 0 || NPC[A].Special4 == 1)
@@ -3694,7 +3694,7 @@ void SpecialNPC(int A)
                     NPC[A].Special2 = 3;
                     NPC[A].Special = 0;
                 }
-                else if(fiEqual(NPC[A].Special, 50))
+                else if(NPC[A].Special == 50)
                 {
                     numNPCs++;
                     NPC[numNPCs] = NPC_t();
@@ -4246,7 +4246,7 @@ void SpecialNPC(int A)
 
             if(NPC[A].Location.Y < NPC[A].DefaultLocationY - 10)
             {
-                if(int(NPC[A].Special) % 5 == 0) {
+                if(NPC[A].Special % 5 == 0) {
                     NewEffect(EFFID_BIG_FIREBALL_TAIL, NPC[A].Location);
                 }
             }
@@ -4261,7 +4261,7 @@ void SpecialNPC(int A)
         {
             NPC[A].Special += 1;
 
-            if(fiEqual(NPC[A].Special, 61))
+            if(NPC[A].Special == 61)
             {
                 tempLocation = NPC[A].Location;
                 tempLocation.Y += 2;
@@ -5728,7 +5728,7 @@ void CharStuff(int WhatNPC, bool CheckEggs)
         {
             if(NPC[A].Type == NPCID_ITEM_POD && NPC[A].Special > 0 /* && CheckEggs*/) // Check Eggs
             {
-                if(NPCIsYoshi((int)NPC[A].Special)) // Yoshi into mushroom (Egg)
+                if(NPCIsYoshi(NPC[A].Special)) // Yoshi into mushroom (Egg)
                 {
                     // NPC(A).Special = 249
                     NPC[A].Special = NPCID_GRN_BOOT; // Yoshi into boot
@@ -5787,7 +5787,7 @@ void CharStuff(int WhatNPC, bool CheckEggs)
         {
             if(NPC[A].Type == NPCID_ITEM_POD && NPC[A].Special > 0 /* && CheckEggs*/) // Check Eggs
             {
-                if(NPCIsYoshi((int)NPC[A].Special) || NPCIsBoot((int)NPC[A].Special)) // Yoshi / boot into mushroom (Egg)
+                if(NPCIsYoshi(NPC[A].Special) || NPCIsBoot(NPC[A].Special)) // Yoshi / boot into mushroom (Egg)
                     NPC[A].Special = NPCID_POWER_S5;
                 if(NPC[A].Special == NPCID_POWER_S3 || NPC[A].Special == NPCID_POWER_S1 || NPC[A].Special == NPCID_POWER_S4) // mushrooms into hearts (eggs)
                     NPC[A].Special = NPCID_POWER_S5;

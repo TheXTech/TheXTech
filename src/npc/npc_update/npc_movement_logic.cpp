@@ -358,7 +358,7 @@ void NPCMovementLogic(int A, float& speedVar)
     // yoshi
     if(NPCIsYoshi(NPC[A]))
     {
-        if(NPC[A].Special == 0.0)
+        if(NPC[A].Special == 0)
         {
             if(NPC[A].Location.SpeedY == 0.0 || NPC[A].Slope > 0)
             {

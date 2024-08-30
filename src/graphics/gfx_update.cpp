@@ -311,7 +311,7 @@ public:
                     NPC[A].Type == NPCID_PLANT_S3 || NPC[A].Type == NPCID_PLANT_S1 || NPC[A].Type == NPCID_BIG_PLANT ||
                     NPC[A].Type == NPCID_LONG_PLANT_UP || NPC[A].Type == NPCID_LONG_PLANT_DOWN || NPC[A].Type == NPCID_BOTTOM_PLANT ||
                     NPC[A].Type == NPCID_SIDE_PLANT || NPC[A].Effect == NPCEFF_EMERGE_UP || NPC[A].Effect == NPCEFF_EMERGE_DOWN ||
-                    NPC[A].Effect == NPCEFF_WARP || (NPC[A].Type == NPCID_SLIDE_BLOCK && NPC[A].Special == 0.0))
+                    NPC[A].Effect == NPCEFF_WARP || (NPC[A].Type == NPCID_SLIDE_BLOCK && NPC[A].Special == 0))
                 && NPC[A].vehiclePlr == 0))
         {
             if(BG_n == sizeof(BG) / sizeof(uint16_t))
@@ -853,7 +853,7 @@ void ClassicNPCScreenLogic(int Z, int numScreens, bool fill_draw_queue, NPC_Draw
              NPC[A].Type == NPCID_PLANT_S3 || NPC[A].Type == NPCID_PLANT_S1 || NPC[A].Type == NPCID_BIG_PLANT ||
              NPC[A].Type == NPCID_LONG_PLANT_UP || NPC[A].Type == NPCID_LONG_PLANT_DOWN || NPC[A].Type == NPCID_BOTTOM_PLANT ||
              NPC[A].Type == NPCID_SIDE_PLANT || NPC[A].Effect == NPCEFF_EMERGE_UP || NPC[A].Effect == NPCEFF_EMERGE_DOWN ||
-             NPC[A].Effect == NPCEFF_WARP || (NPC[A].Type == NPCID_SLIDE_BLOCK && NPC[A].Special == 0.0)) &&
+             NPC[A].Effect == NPCEFF_WARP || (NPC[A].Type == NPCID_SLIDE_BLOCK && NPC[A].Special == 0)) &&
              (NPC[A].vehiclePlr == 0 && (!NPC[A].Generator || LevelEditor))) ||
              NPC[A].Type == NPCID_SAW || NPC[A].Type == NPCID_JUMP_PLANT)
         {
@@ -2586,7 +2586,7 @@ void UpdateGraphicsScreen(Screen_t& screen)
                         int contents_sX = sX + w / 2 - contents_w / 2;
                         int contents_sY = sY + h / 2 - contents_h / 2;
 
-                        int B = EditorNPCFrame((NPCID)SDL_floor(NPC[A].Special), NPC[A].Direction);
+                        int B = EditorNPCFrame((NPCID)(NPC[A].Special), NPC[A].Direction);
 
                         XRender::renderTextureBasic(contents_sX + NPC[A]->FrameOffsetX, contents_sY, contents_w, contents_h,
                             GFXNPC[NPC[A].Special],
@@ -2638,7 +2638,7 @@ void UpdateGraphicsScreen(Screen_t& screen)
                 YoshiBFrame = 6;
                 YoshiTFrame = 0;
 
-                if(NPC[A].Special == 0.0)
+                if(NPC[A].Special == 0)
                 {
                     if(!FreezeNPCs)
                         NPC[A].FrameCount += 1;

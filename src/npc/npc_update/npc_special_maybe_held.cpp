@@ -884,7 +884,7 @@ void NPCSpecialMaybeHeld(int A)
         }
         else
         {
-            if(NPC[A].Special == 0.0)
+            if(NPC[A].Special == 0)
             {
                 double C = 0;
                 int D = 1;
@@ -910,9 +910,11 @@ void NPCSpecialMaybeHeld(int A)
             if(NPC[A].Location.SpeedY == 0.0 || NPC[A].Slope > 0)
             {
                 NPC[A].Location.SpeedX = 0;
-                if(fiEqual(NPC[A].Special, 0))
+
+                if(NPC[A].Special == 0)
                     NPC[A].Special = iRand(3) + 1;
-                if(fiEqual(NPC[A].Special, 1))
+
+                if(NPC[A].Special == 1)
                 {
                     NPC[A].FrameCount += 1;
                     NPC[A].Special2 += 1;

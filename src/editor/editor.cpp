@@ -1320,7 +1320,7 @@ void UpdateEditor()
                             n.DefaultDirection = n.Direction;
                             n.DefaultLocationX = n.Location.X;
                             n.DefaultLocationY = n.Location.Y;
-                            n.DefaultSpecial = int(n.Special);
+                            n.DefaultSpecial = n.Special;
                             CheckSectionNPC(numNPCs);
                         }
                         syncLayers_NPC(numNPCs);
@@ -1764,8 +1764,8 @@ void UpdateInterprocess()
 
             if(EditorCursor.NPC.Type == NPCID_ITEM_BURIED || EditorCursor.NPC.Type == NPCID_ITEM_POD || EditorCursor.NPC.Type == NPCID_ITEM_THROWER || EditorCursor.NPC.Type == NPCID_ITEM_BUBBLE)
             {
-                EditorCursor.NPC.Special = n.contents;
-                EditorCursor.NPC.DefaultSpecial = int(EditorCursor.NPC.Special);
+                EditorCursor.NPC.Special = (vbint_t)n.contents;
+                EditorCursor.NPC.DefaultSpecial = EditorCursor.NPC.Special;
             }
             if(EditorCursor.NPC.Type == 288 || EditorCursor.NPC.Type == 289 || (EditorCursor.NPC.Type == 91 && int(EditorCursor.NPC.Special) == 288))
             {
@@ -1775,20 +1775,20 @@ void UpdateInterprocess()
 
             if(NPCIsAParaTroopa(EditorCursor.NPC))
             {
-                EditorCursor.NPC.Special = n.special_data;
-                EditorCursor.NPC.DefaultSpecial = int(EditorCursor.NPC.Special);
+                EditorCursor.NPC.Special = (vbint_t)n.special_data;
+                EditorCursor.NPC.DefaultSpecial = EditorCursor.NPC.Special;
             }
 
             if(EditorCursor.NPC->IsFish)
             {
-                EditorCursor.NPC.Special = n.special_data;
-                EditorCursor.NPC.DefaultSpecial = int(EditorCursor.NPC.Special);
+                EditorCursor.NPC.Special = (vbint_t)n.special_data;
+                EditorCursor.NPC.DefaultSpecial = EditorCursor.NPC.Special;
             }
 
             if(EditorCursor.NPC.Type == 260)
             {
-                EditorCursor.NPC.Special = n.special_data;
-                EditorCursor.NPC.DefaultSpecial = int(EditorCursor.NPC.Special);
+                EditorCursor.NPC.Special = (vbint_t)n.special_data;
+                EditorCursor.NPC.DefaultSpecial = EditorCursor.NPC.Special;
             }
 
             if(EditorCursor.NPC.Type == 86)

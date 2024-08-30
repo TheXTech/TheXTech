@@ -754,8 +754,8 @@ void UpdateEffects()
 
                         if(NPCTraits[e.NewNpc].IsFish || NPCIsAParaTroopa(e.NewNpc) || e.NewNpc == NPCID_FIRE_CHAIN)
                         {
-                            nn.Special = static_cast<double>(e.NewNpcSpecial);
-                            nn.DefaultSpecial = static_cast<int>(e.NewNpcSpecial);
+                            nn.Special = e.NewNpcSpecial;
+                            nn.DefaultSpecial = e.NewNpcSpecial;
                         }
 
                         if(e.NewNpc == NPCID_STAR_EXIT || e.NewNpc == NPCID_STAR_COLLECT || e.NewNpc == NPCID_MEDAL)

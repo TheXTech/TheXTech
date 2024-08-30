@@ -866,8 +866,8 @@ bool OpenLevel_NPC(void* userdata, LevelNPC& n)
         if(npc.Type == NPCID_ITEM_BURIED || npc.Type == NPCID_ITEM_POD ||
            npc.Type == NPCID_ITEM_BUBBLE || npc.Type == NPCID_ITEM_THROWER)
         {
-            npc.Special = n.contents;
-            npc.DefaultSpecial = int(npc.Special);
+            npc.Special = (vbint_t)n.contents;
+            npc.DefaultSpecial = npc.Special;
             npc.Variant = n.special_data;
             variantHandled = true;
         }
@@ -881,20 +881,20 @@ bool OpenLevel_NPC(void* userdata, LevelNPC& n)
 
         if(NPCIsAParaTroopa(npc))
         {
-            npc.Special = n.special_data;
-            npc.DefaultSpecial = int(npc.Special);
+            npc.Special = (vbint_t)n.special_data;
+            npc.DefaultSpecial = npc.Special;
         }
 
         if(npc->IsFish)
         {
-            npc.Special = n.special_data;
-            npc.DefaultSpecial = int(npc.Special);
+            npc.Special = (vbint_t)n.special_data;
+            npc.DefaultSpecial = npc.Special;
         }
 
         if(npc.Type == NPCID_FIRE_CHAIN)
         {
-            npc.Special = n.special_data;
-            npc.DefaultSpecial = int(npc.Special);
+            npc.Special = (vbint_t)n.special_data;
+            npc.DefaultSpecial = npc.Special;
         }
 
         if(npc.Type == NPCID_STAR_EXIT || npc.Type == NPCID_STAR_COLLECT || npc.Type == NPCID_MEDAL)

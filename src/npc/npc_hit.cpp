@@ -461,7 +461,7 @@ void NPCHit(int A, int B, int C)
             NPC[A].Killed = B;
         if(NPC[A].Damage >= 15)
             NPC[A].Killed = B;
-        else if(fiEqual(NPC[A].Special, 5) && !(NPC[A].Type == NPCID_MAGIC_BOSS_SHELL || NPC[A].Type == NPCID_FIRE_BOSS_SHELL))
+        else if(NPC[A].Special == 5 && !(NPC[A].Type == NPCID_MAGIC_BOSS_SHELL || NPC[A].Type == NPCID_FIRE_BOSS_SHELL))
         {
             NPC[A].Special = 0;
             NPC[A].Special2 = 0;
@@ -1732,7 +1732,7 @@ void NPCHit(int A, int B, int C)
                 if(NPC[C].Type != NPCID_PLR_HEAVY)
                 {
                     // if(B != 6) // Always true
-                    if(fEqual(NPC[A].Special, 5) && HasSound(SFX_HeroFireRod))
+                    if(NPC[A].Special == 5 && HasSound(SFX_HeroFireRod))
                         PlaySoundSpatial(SFX_HeroFire, NPC[A].Location);
                     else
                         PlaySoundSpatial(SFX_BlockHit, NPC[A].Location);
@@ -1743,7 +1743,7 @@ void NPCHit(int A, int B, int C)
             {
                 if(B != 6)
                 {
-                    if(fEqual(NPC[A].Special, 5) && HasSound(SFX_HeroFireRod))
+                    if(NPC[A].Special == 5 && HasSound(SFX_HeroFireRod))
                         PlaySoundSpatial(SFX_HeroFire, NPC[A].Location);
                     else
                         PlaySoundSpatial(SFX_BlockHit, NPC[A].Location);
@@ -1775,7 +1775,7 @@ void NPCHit(int A, int B, int C)
     {
         if(NPC[A].Special != 4)
         {
-            if((B == 1 || B == 10) && NPC[A].Special == 0.0)
+            if((B == 1 || B == 10) && NPC[A].Special == 0)
             {
                 NPC[A].Damage += 3;
                 if(B == 1)
@@ -2189,7 +2189,7 @@ void NPCHit(int A, int B, int C)
     bool tempBool = false;
     if(NPC[A].Killed == 3)
     {
-        if(NPC[C].Type == NPCID_PLR_FIREBALL && NPC[C].Special == 5.0 && NPC[A].Type != NPCID_PLR_FIREBALL)
+        if(NPC[C].Type == NPCID_PLR_FIREBALL && NPC[C].Special == 5 && NPC[A].Type != NPCID_PLR_FIREBALL)
         {
             NPC[A].Direction = NPC[C].Direction;
             NPC[A].Killed = 10;

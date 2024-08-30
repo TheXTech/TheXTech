@@ -300,7 +300,7 @@ struct NPC_t
 
 //'Secial - misc variables used for NPC AI
 //    Special As Double
-    double Special = 0.0;
+    vbint_t Special = 0;
 //    Special2 As Double
     vbint_t Special2 = 0;
 //    Special3 As Double

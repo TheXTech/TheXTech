@@ -213,7 +213,7 @@ void UpdatePlayer()
                 if(Player[A].StandingOnNPC != 0 && /*!NPC[Player[A].StandingOnNPC].Pinched && */ !FreezeNPCs)
                 {
                     if(Player[A].StandingOnNPC < 0)
-                        NPC[Player[A].StandingOnNPC].Location = Block[(int)NPC[Player[A].StandingOnNPC].Special].Location;
+                        NPC[Player[A].StandingOnNPC].Location = Block[NPC[Player[A].StandingOnNPC].Special].Location;
 
                     Player[A].Location.SpeedX += NPC[Player[A].StandingOnNPC].Location.SpeedX + NPC[Player[A].StandingOnNPC].BeltSpeed;
                 }

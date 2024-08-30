@@ -376,11 +376,11 @@ void PlayerThrowBall(const int A)
         NPC[numNPCs].HoldingPlayer = A;
     }
 
-    if(Maths::iRound(NPC[numNPCs].Special) == 2)
+    if(NPC[numNPCs].Special == 2)
         NPC[numNPCs].Frame = 4;
-    if(Maths::iRound(NPC[numNPCs].Special) == 3)
+    if(NPC[numNPCs].Special == 3)
         NPC[numNPCs].Frame = 8;
-    if(Maths::iRound(NPC[numNPCs].Special) == 4)
+    if(NPC[numNPCs].Special == 4)
         NPC[numNPCs].Frame = 12;
 
     syncLayers_NPC(numNPCs);
@@ -424,7 +424,7 @@ void PlayerThrowBall(const int A)
     }
     else
     {
-        if(Maths::iRound(NPC[numNPCs].Special) == 2)
+        if(NPC[numNPCs].Special == 2)
             NPC[numNPCs].Location.SpeedX = NPC[numNPCs].Location.SpeedX * 0.85;
 
         if(p.Controls.Up)

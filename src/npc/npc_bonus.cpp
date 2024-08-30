@@ -349,7 +349,7 @@ void TouchBonus(int A, int B)
 
         Checkpoint = FullFileName;
         Checkpoint_t cp;
-        cp.id = Maths::iRound(NPC[B].Special);
+        cp.id = NPC[B].Special;
         CheckpointsList.push_back(cp);
         g_curLevelMedals.on_checkpoint();
         pLogDebug("Added checkpoint ID %d", cp.id);

@@ -213,13 +213,13 @@ void NPCBlockLogic(int A, double& tempHit, int& tempHitBlock, float& tempSpeedA,
 
                                     if(NPC[A].Type == NPCID_PLR_FIREBALL || NPC[A].Type == NPCID_PLR_ICEBALL)
                                     {
-                                        if(Block[B].Type == 626 && fiEqual(NPC[A].Special, 1))
+                                        if(Block[B].Type == 626 && NPC[A].Special == 1)
                                             HitSpot = 0;
-                                        if(Block[B].Type == 627 && fiEqual(NPC[A].Special, 2))
+                                        if(Block[B].Type == 627 && NPC[A].Special == 2)
                                             HitSpot = 0;
-                                        if(Block[B].Type == 628 && fiEqual(NPC[A].Special, 3))
+                                        if(Block[B].Type == 628 && NPC[A].Special == 3)
                                             HitSpot = 0;
-                                        if(Block[B].Type == 629 && fiEqual(NPC[A].Special, 4))
+                                        if(Block[B].Type == 629 && NPC[A].Special == 4)
                                             HitSpot = 0;
                                     }
 
@@ -490,7 +490,7 @@ void NPCBlockLogic(int A, double& tempHit, int& tempHitBlock, float& tempSpeedA,
                                         else if(Special_from == 'Y')
                                             NPC[A].SpecialY = NPC_A_Special;
                                         else
-                                            NPC[A].Special = NPC_A_Special;
+                                            NPC[A].Special = (vbint_t)NPC_A_Special;
                                     }
 
 
