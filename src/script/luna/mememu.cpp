@@ -2054,7 +2054,7 @@ public:
         insert(0x00000100, &NPC_t::Special3);
         insert(0x00000108, &NPC_t::Special4);
         insert(0x00000110, &NPC_t::Special5);
-        insert(0x00000118, &NPC_t::Special6);
+        // insert(0x00000118, &NPC_t::Special6); // removed!
         insert(0x00000120, // TurnAround
             [](const NPC_t& n, FIELDTYPE ftype)->double
             {

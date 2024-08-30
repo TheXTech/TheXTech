@@ -279,7 +279,7 @@ void NPCHit(int A, int B, int C)
             NPC[A].Special3 = 0;
             NPC[A].Special4 = 0;
             NPC[A].Special5 = 0;
-            NPC[A].Special6 = 0;
+            // NPC[A].Special6 = 0;
             NPC[A].SpecialX = 0.0;
             NPC[A].SpecialY = 0.0;
         }
@@ -468,7 +468,7 @@ void NPCHit(int A, int B, int C)
             NPC[A].Special3 = 0;
             NPC[A].Special4 = 0;
             NPC[A].Special5 = 0;
-            NPC[A].Special6 = 0;
+            // NPC[A].Special6 = 0;
             NPC[A].SpecialX = 0.0;
             NPC[A].SpecialY = 0.0;
             NPC[A].Location.X += NPC[A].Location.Width / 2.0;

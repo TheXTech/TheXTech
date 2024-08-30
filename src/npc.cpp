@@ -167,7 +167,7 @@ void Deactivate(int A)
             NPC[A].Special3 = 0;
             NPC[A].Special4 = 0;
             NPC[A].Special5 = 0;
-            NPC[A].Special6 = 0;
+            // NPC[A].Special6 = 0;
             NPC[A].SpecialX = 0.0;
             NPC[A].SpecialY = 0.0;
             NPC[A].Damage = 0;
@@ -1332,7 +1332,7 @@ void NPCSpecial(int A)
                 npc.Special3 = 0;
                 npc.Special4 = 0;
                 npc.Special5 = 0;
-                npc.Special6 = 0;
+                // npc.Special6 = 0;
                 npc.Location.X += npc.Location.Width / 2.0;
                 npc.Location.Y += npc.Location.Height;
                 npc.Type = NPCID(npc.Type - 1);
@@ -1494,7 +1494,7 @@ void NPCSpecial(int A)
                 npc.Special = 0;
                 npc.Special4 = 0;
                 npc.Special5 = 0;
-                npc.Special6 = 0;
+                // npc.Special6 = 0;
                 npc.SpecialX = 0.0;
                 npc.SpecialY = 0.0;
             }
@@ -1599,7 +1599,7 @@ void NPCSpecial(int A)
                 npc.Special3 = 0;
                 npc.Special4 = 0;
                 npc.Special5 = 0;
-                npc.Special6 = 0;
+                // npc.Special6 = 0;
                 npc.SpecialX = 0;
                 npc.Location.X += npc.Location.Width / 2.0;
                 npc.Location.Y += npc.Location.Height;
