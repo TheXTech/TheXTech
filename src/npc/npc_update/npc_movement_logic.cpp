@@ -670,10 +670,10 @@ void NPCMovementLogic(int A, float& speedVar)
 
         // the following is all new code!
 
-        if((NPC[A].Special == 2 || NPC[A].Special == 3) && (NPC[A].Special3 != 0))
+        if((NPC[A].Special == 2 || NPC[A].Special == 3) && (NPC[A].SpecialX != 0))
         {
-            NPC[A].Location.X = NPC[A].Special3; // Finish alignment
-            NPC[A].Special3 = 0;
+            NPC[A].Location.X = NPC[A].SpecialX; // Finish alignment
+            NPC[A].SpecialX = 0;
         }
 
         if(NPC[A].Special == 3) // Watch for wall collisions. If one got dissappear (hidden layer, toggled switch), resume a ride

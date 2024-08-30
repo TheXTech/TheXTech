@@ -555,7 +555,7 @@ static void s_alignRuftCell(NPC_t &me, const Location_t &alignAt)
         me.Location.X = p;
     }
 
-    me.Special3 = me.Location.X;
+    me.SpecialX = me.Location.X;
     treeNPCUpdate(&me);
     if(me.tempBlock != 0)
         treeNPCSplitTempBlock(&me);
