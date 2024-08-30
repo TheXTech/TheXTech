@@ -3165,7 +3165,7 @@ void UpdateGraphicsScreen(Screen_t& screen)
                 int A = NPC_Draw_Queue_p.Dropped[i];
 
                 // pulse alpha during modern item drop
-                XTColor cn = (NPC[A].Effect3 != 0) ? (NPC[A].Special6 <= 45 ? XTAlpha(128 + 2 * (45 - (int)NPC[A].Special6) + (int)(32 * cos(NPC[A].Special6 / 4))) : XTAlpha(128)) : XTColor();
+                XTColor cn = (NPC[A].Effect3 != 0) ? (NPC[A].Special6 <= 45 ? XTAlpha(128 + 2 * (45 - NPC[A].Special6) + (int)(32 * cosf((float)NPC[A].Special6 / 4))) : XTAlpha(128)) : XTColor();
 
                 if(NPC[A]->WidthGFX == 0)
                 {

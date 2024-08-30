@@ -2223,7 +2223,7 @@ void SetCursor()
         EditorCursor.NPC.Special3 = 0.0;
         EditorCursor.NPC.Special4 = 0.0;
         EditorCursor.NPC.Special5 = 0.0;
-        EditorCursor.NPC.Special6 = 0.0;
+        EditorCursor.NPC.Special6 = 0;
         EditorCursor.NPC.SpecialX = 0.0;
         EditorCursor.NPC.SpecialY = 0.0;
         EditorCursor.NPC.Layer = EditorCursor.Layer;

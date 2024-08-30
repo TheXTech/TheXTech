@@ -224,7 +224,7 @@ static inline void NPCEffectLogic_DropItem(int A)
 
         // timer logic
         if(NPC[A].Special6 <= 45)
-            NPC[A].Special6 -= 1.0;
+            NPC[A].Special6 -= 1;
         else if(nLoc.X == target_X && nLoc.Y == target_Y)
             NPC[A].Special6 = 45;
 

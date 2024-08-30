@@ -3364,8 +3364,8 @@ void SpecialNPC(int A)
             }
         }
 
-        bool atCenter = (npcHCenter > playerHCenter && fiEqual(NPC[A].Special6, 1)) ||
-                        (npcHCenter < playerHCenter && fiEqual(NPC[A].Special6, -1));
+        bool atCenter = (npcHCenter > playerHCenter && NPC[A].Special6 == 1) ||
+                        (npcHCenter < playerHCenter && NPC[A].Special6 == -1);
         if(!atCenter)
         {
             NPC[A].Special2 = 1;

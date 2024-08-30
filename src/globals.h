@@ -310,7 +310,7 @@ struct NPC_t
 //    Special5 As Double
     double Special5 = 0.0;
 //    Special6 As Double
-    double Special6 = 0.0;
+    vbint_t Special6 = 0;
 
     // Information about the NPC's current unusual state (reordered for alignment purposes)
 //    Effect2 As Double
