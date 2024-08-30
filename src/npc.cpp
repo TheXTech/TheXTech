@@ -5405,7 +5405,8 @@ void SpecialNPC(int A)
 
         if(C > 0)
         {
-            if(NPC[A].Special6 == 0)
+            // this direction indicator used Special6 in SMBX 1.3, and now uses SpecialX (as a simple boolean flag)
+            if(NPC[A].SpecialX == 0)
             {
                 NPC[A].Location.SpeedX -= 0.2;
                 D = (float)SDL_fabs(NPC[A].Location.X + NPC[A].Location.Width / 2.0 - Player[C].Location.X + Player[C].Location.Width / 2.0) / 100;
@@ -5413,7 +5414,7 @@ void SpecialNPC(int A)
                 if(NPC[A].Location.SpeedX < -5 - D)
                     NPC[A].Location.SpeedX += 0.2;
                 if(NPC[A].Location.X + NPC[A].Location.Width / 2.0 < Player[C].Location.X + Player[C].Location.Width / 2.0 - 50 + (Player[C].Location.SpeedX * 15))
-                    NPC[A].Special6 = 1;
+                    NPC[A].SpecialX = 1;
             }
             else
             {
@@ -5423,7 +5424,7 @@ void SpecialNPC(int A)
                 if(NPC[A].Location.SpeedX > 5 + D)
                     NPC[A].Location.SpeedX -= 0.2;
                 if(NPC[A].Location.X + NPC[A].Location.Width / 2.0 > Player[C].Location.X + Player[C].Location.Width / 2.0 + 50 + (Player[C].Location.SpeedX * 15))
-                    NPC[A].Special6 = 0;
+                    NPC[A].SpecialX = 0;
             }
 
             // C is the targeted player
