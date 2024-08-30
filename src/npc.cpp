@@ -654,7 +654,7 @@ void NPCSpecial(int A)
     double C = 0;
     double D = 0;
     double E = 0;
-    double F = 0;
+    // double F = 0;
     // int64_t fBlock = 0;
     // int64_t lBlock = 0;
     bool straightLine = false; // SET BUT NOT USED
@@ -2114,10 +2114,8 @@ void NPCSpecial(int A)
     }
     else if(npc.Type == NPCID_WALL_SPARK || npc.Type == NPCID_WALL_BUG || npc.Type == NPCID_WALL_TURTLE) // sparky
     {
-        if(npc.Type == NPCID_WALL_SPARK)
-            F = 2;
-        else
-            F = 1;
+        // was F
+        int speed_mult = (npc.Type == NPCID_WALL_SPARK) ? 2 : 1;
 
         tempBool = false;
         tempBool2 = false;
@@ -2162,8 +2160,8 @@ void NPCSpecial(int A)
 
         if(npc.Special == 1)
         {
-            npc.Location.SpeedY = F * std::abs(npc.Special2);
-            npc.Location.SpeedX = F * npc.Special2;
+            npc.Location.SpeedY = speed_mult * std::abs(npc.Special2);
+            npc.Location.SpeedX = speed_mult * npc.Special2;
             tempBool = false;
             tempLocation.Width = 2;
             tempLocation.Height = 2;
@@ -2247,7 +2245,7 @@ void NPCSpecial(int A)
         }
         else if(npc.Special == 2)
         {
-            npc.Location.SpeedY = F * npc.Special2;
+            npc.Location.SpeedY = speed_mult * npc.Special2;
             npc.Location.SpeedX = std::abs(npc.Special2);
             tempBool = false;
             tempLocation.Width = 2;
@@ -2321,7 +2319,7 @@ void NPCSpecial(int A)
         else if(npc.Special == 3)
         {
             npc.Location.SpeedY = -std::abs(npc.Special2);
-            npc.Location.SpeedX = F * npc.Special2;
+            npc.Location.SpeedX = speed_mult * npc.Special2;
             tempBool = false;
             tempLocation.Width = 2;
             tempLocation.Height = 2;
@@ -2371,7 +2369,7 @@ void NPCSpecial(int A)
                         {
                             tempBool2 = true;
                             if(BlockSlope2[Block[i].Type] != 0)
-                                npc.Location.SpeedY = npc.Location.SpeedY * F;
+                                npc.Location.SpeedY = npc.Location.SpeedY * speed_mult;
                         }
                     }
                 }
@@ -2393,7 +2391,7 @@ void NPCSpecial(int A)
         }
         else if(npc.Special == 4)
         {
-            npc.Location.SpeedY = F * npc.Special2;
+            npc.Location.SpeedY = speed_mult * npc.Special2;
             npc.Location.SpeedX = -std::abs(npc.Special2);
             tempBool = false;
             tempLocation.Width = 2;
@@ -2630,7 +2628,7 @@ void NPCSpecial(int A)
             C = 2; // The Speed
             D = 0;
             E = 0;
-            F = 0;
+            vbint_t bgo_type = 0; // F = 0;
             // tempNPC = npc;
             Location_t oldLoc = npc.Location;
 
@@ -2647,11 +2645,11 @@ void NPCSpecial(int A)
                     {
                         if(CheckCollision(tempLocation, Background[i].Location))
                         {
-                            if(F > 0)
+                            if(bgo_type > 0)
                             {
                                 if(Background[i].Type == npc.Special5 || Background[i].Type == 70 || Background[i].Type == 100)
                                 {
-                                    F = 0;
+                                    bgo_type = 0;
                                     E = 0;
                                     D = 0;
                                     // npc = tempNPC;
@@ -2659,7 +2657,7 @@ void NPCSpecial(int A)
                                 }
                             }
 
-                            if(F == 0)
+                            if(bgo_type == 0)
                             {
                                 // Vertical rail
                                 if(Background[i].Type == 72)
@@ -2721,14 +2719,14 @@ void NPCSpecial(int A)
                                 }
 
                                 tempBool = true;
-                                F = Background[i].Type;
+                                bgo_type = Background[i].Type;
                             }
                         }
                     }//Not hidden
                 } // any important BGO?
             } // for BGOs
 
-            npc.Special5 = F;
+            npc.Special5 = bgo_type;
 
             if(!tempBool)
             {
