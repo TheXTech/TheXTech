@@ -201,7 +201,7 @@ void NPCBlockLogic(int A, double& tempHit, int& tempHitBlock, float& tempSpeedA,
                                         }
                                         else if(HitSpot == 3)
                                         {
-                                            if(fiEqual(NPC[A].Special4, 3))
+                                            if(NPC[A].Special4 == 3)
                                             {
                                                 NPC[A].Frame = 10;
                                                 NPC[A].Special3 = 21;

@@ -824,7 +824,7 @@ void NPCSpecial(int A)
     }
     else if(npc.Type == NPCID_CHAR3_HEAVY) // heart bomb
     {
-        if(npc.Special4 != 0.0)
+        if(npc.Special4 != 0)
         {
             npc.Killed = 9;
             NPCQueues::Killed.push_back(A);
@@ -2872,7 +2872,7 @@ void NPCSpecial(int A)
 
         if(npc.Special4 <= 80 + iRand(40))
         {
-            if((iRand(100) >= 40) && int(npc.Special4) % 16 == 0)
+            if((iRand(100) >= 40) && npc.Special4 % 16 == 0)
             {
                 PlaySoundSpatial(SFX_HeavyToss, npc.Location);
                 numNPCs++;
