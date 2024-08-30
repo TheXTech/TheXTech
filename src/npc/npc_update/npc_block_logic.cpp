@@ -380,6 +380,11 @@ void NPCBlockLogic(int A, double& tempHit, int& tempHitBlock, float& tempSpeedA,
                                             NPC_A_Special = NPC[A].SpecialY;
                                             NPC_A_Special2 = NPC[A].SpecialX;
                                         }
+                                        else if(NPC[A].Type == NPCID_HOMING_BALL_GEN)
+                                        {
+                                            Special_from = 'Y';
+                                            NPC_A_Special = NPC[A].SpecialY;
+                                        }
                                         else if(NPC[A].Type == NPCID_VILLAIN_S3 || NPC[A].Type == NPCID_MINIBOSS || NPC[A].Type == NPCID_GOALTAPE || NPC[A].Type == NPCID_BAT)
                                         {
                                             Special2_from = 'Y';

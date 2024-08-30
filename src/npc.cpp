@@ -2107,10 +2107,11 @@ void NPCSpecial(int A)
     }
     else if(npc.Type == NPCID_HOMING_BALL_GEN) // Metroid O shooter thing
     {
-        npc.Special += 1 + dRand();
-        if(npc.Special >= 200 + dRand() * 200)
+        // was Special in SMBX 1.3
+        npc.SpecialY += 1 + dRand();
+        if(npc.SpecialY >= 200 + dRand() * 200)
         {
-            npc.Special = 0;
+            npc.SpecialY = 0;
             numNPCs++;
             NPC[numNPCs] = NPC_t();
             NPC[numNPCs].Inert = npc.Inert;
