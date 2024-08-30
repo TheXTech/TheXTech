@@ -367,19 +367,21 @@ void NPCBlockLogic(int A, double& tempHit, int& tempHitBlock, float& tempSpeedA,
                                     if(BlockSlope2[Block[B].Type] != 0 && HitSpot > 0 && ((NPC[A].Location.Y > Block[B].Location.Y) || ((NPC[A].Type == NPCID_WALL_BUG || NPC[A].Type == NPCID_WALL_SPARK || NPC[A].Type == NPCID_WALL_TURTLE) && NPC[A].Special == 3)))
                                     {
                                         // the modifications to Special and Special2 here are invalid and could affect any NPC
+                                        double NPC_A_Special = NPC[A].Special;
+                                        double NPC_A_Special2 = NPC[A].Special2;
 
                                         if(HitSpot == 5)
                                         {
-                                            if(NPC[A].Special == 2 && NPC[A].Special2 == 1)
+                                            if(NPC_A_Special == 2 && NPC_A_Special2 == 1)
                                             {
-                                                NPC[A].Special2 = 1;
-                                                NPC[A].Special = 3;
+                                                NPC_A_Special2 = 1;
+                                                NPC_A_Special = 3;
                                             }
 
-                                            if(NPC[A].Special == 4 && NPC[A].Special2 == 1)
+                                            if(NPC_A_Special == 4 && NPC_A_Special2 == 1)
                                             {
-                                                NPC[A].Special2 = -1;
-                                                NPC[A].Special = 3;
+                                                NPC_A_Special2 = -1;
+                                                NPC_A_Special = 3;
                                             }
                                         }
 
@@ -389,6 +391,7 @@ void NPCBlockLogic(int A, double& tempHit, int& tempHitBlock, float& tempSpeedA,
                                             PlrMid = NPC[A].Location.X + NPC[A].Location.Width;
                                         else
                                             PlrMid = NPC[A].Location.X;
+
                                         double Slope = (PlrMid - Block[B].Location.X) / Block[B].Location.Width;
                                         if(BlockSlope2[Block[B].Type] > 0)
                                             Slope = 1 - Slope;
@@ -410,14 +413,13 @@ void NPCBlockLogic(int A, double& tempHit, int& tempHitBlock, float& tempSpeedA,
 
                                             if(fEqual(NPC[A].Location.SpeedY, double(Physics.NPCGravity)) || NPC[A].Slope > 0 || oldSlope > 0)
                                             {
-                                                if((NPC[A].Special == 2 || NPC[A].Special == 4) && NPC[A].Special2 == -1)
+                                                if((NPC_A_Special == 2 || NPC_A_Special == 4) && NPC_A_Special2 == -1)
                                                 {
-                                                    if(NPC[A].Special == 4)
-                                                        NPC[A].Special2 = 1;
-                                                    if(NPC[A].Special == 2)
-                                                        NPC[A].Special2 = -1;
-                                                    NPC[A].Special = 3;
-
+                                                    if(NPC_A_Special == 4)
+                                                        NPC_A_Special2 = 1;
+                                                    if(NPC_A_Special == 2)
+                                                        NPC_A_Special2 = -1;
+                                                    NPC_A_Special = 3;
                                                 }
 
                                                 PlrMid = NPC[A].Location.Y;
@@ -453,6 +455,10 @@ void NPCBlockLogic(int A, double& tempHit, int& tempHitBlock, float& tempSpeedA,
                                                     NPC[A].Location.SpeedY += 2;
                                             }
                                         }
+
+                                        // could make compat flag here and refuse to clobber these values for cases other than wall climbers
+                                        NPC[A].Special = NPC_A_Special;
+                                        NPC[A].Special2 = NPC_A_Special2;
                                     }
 
 
