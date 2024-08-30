@@ -25,6 +25,8 @@
 #include "effect.h"
 #include "eff_id.h"
 
+#include "npc/npc_cockpit_bits.h"
+
 void PlayerMovementX(int A, float& cursed_value_C)
 {
     // Modify player's speed if he is running up/down hill
@@ -435,21 +437,17 @@ void PlayerCockpitMovementX(int A)
     Player[A].Driving = false;
     if(Player[A].StandingOnNPC > 0)
     {
-        NPC[Player[A].StandingOnNPC].Special4 = 1;
+        NPC[Player[A].StandingOnNPC].Special4 = NPC_COCKPIT_DRIVING;
 
         if(Player[A].Controls.Left)
-            NPC[Player[A].StandingOnNPC].Special5 = -1;
+            NPC[Player[A].StandingOnNPC].Special4 |= NPC_COCKPIT_LEFT;
         else if(Player[A].Controls.Right)
-            NPC[Player[A].StandingOnNPC].Special5 = 1;
-        else
-            NPC[Player[A].StandingOnNPC].Special5 = 0;
+            NPC[Player[A].StandingOnNPC].Special4 |= NPC_COCKPIT_RIGHT;
 
         if(Player[A].Controls.Up)
-            NPC[Player[A].StandingOnNPC].Special6 = -1;
+            NPC[Player[A].StandingOnNPC].Special4 |= NPC_COCKPIT_UP;
         else if(Player[A].Controls.Down)
-            NPC[Player[A].StandingOnNPC].Special6 = 1;
-        else
-            NPC[Player[A].StandingOnNPC].Special6 = 0;
+            NPC[Player[A].StandingOnNPC].Special4 |= NPC_COCKPIT_DOWN;
     }
 
     Player[A].Location.SpeedX = 0;

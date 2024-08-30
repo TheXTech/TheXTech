@@ -42,6 +42,7 @@
 
 #include "npc/npc_queues.h"
 #include "npc/section_overlap.h"
+#include "npc/npc_cockpit_bits.h"
 
 #include <Utils/maths.h>
 
@@ -763,21 +764,26 @@ void NPCSpecial(int A)
     }
     else if(npc.Type == NPCID_COCKPIT)
     {
-        if(npc.Special4 > 0)
-            npc.Special4 = 0;
-        else
-        {
-            npc.Special5 = 0;
-            npc.Special6 = 0;
-        }
+        // Previously, used Special4 (1 if being driven), Special5 (-1 for left, 1 for right), and Special6 (-1 for up, 1 for down)
+        // Now, uses a bitfield in Special4
 
-        if(npc.Special5 > 0)
+        // if(npc.Special4 > 0)
+        //     npc.Special4 = 0;
+        // else
+        // {
+        //     npc.Special5 = 0;
+        //     npc.Special6 = 0;
+        // }
+
+        // if(npc.Special5 > 0)
+        if(npc.Special4 & NPC_COCKPIT_RIGHT)
         {
             if(npc.Location.SpeedX < 0)
                 npc.Location.SpeedX = npc.Location.SpeedX * 0.95;
             npc.Location.SpeedX += 0.1;
         }
-        else if(npc.Special5 < 0)
+        // else if(npc.Special5 < 0)
+        else if(npc.Special4 & NPC_COCKPIT_LEFT)
         {
             if(npc.Location.SpeedX > 0)
                 npc.Location.SpeedX = npc.Location.SpeedX * 0.95;
@@ -790,13 +796,15 @@ void NPCSpecial(int A)
                 npc.Location.SpeedX = 0;
         }
 
-        if(npc.Special6 > 0)
+        // if(npc.Special6 > 0)
+        if(npc.Special4 & NPC_COCKPIT_DOWN)
         {
             if(npc.Location.SpeedY < 0)
                 npc.Location.SpeedY = npc.Location.SpeedY * 0.95;
             npc.Location.SpeedY += 0.1;
         }
-        else if(npc.Special6 < 0)
+        // else if(npc.Special6 < 0)
+        else if(npc.Special4 & NPC_COCKPIT_UP)
         {
             if(npc.Location.SpeedY > 0)
                 npc.Location.SpeedY = npc.Location.SpeedY * 0.95;
@@ -808,6 +816,9 @@ void NPCSpecial(int A)
             if(npc.Location.SpeedY > -0.1 && npc.Location.SpeedY < 0.1)
                 npc.Location.SpeedY = 0;
         }
+
+        // reset after reading
+        npc.Special4 = 0;
 
         if(npc.Location.SpeedY > 4)
             npc.Location.SpeedY = 4;
