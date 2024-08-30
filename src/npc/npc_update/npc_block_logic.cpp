@@ -370,8 +370,18 @@ void NPCBlockLogic(int A, double& tempHit, int& tempHitBlock, float& tempSpeedA,
                                         double NPC_A_Special = NPC[A].Special;
                                         double NPC_A_Special2 = NPC[A].Special2;
 
-                                        if(NPC[A].Type == NPCID_VILLAIN_S3 || NPC[A].Type == NPCID_MINIBOSS || NPC[A].Type == NPCID_GOALTAPE || NPC[A].Type == NPCID_BAT)
+                                        char Special2_from = 0;
+
+                                        if(NPC[A].Type == NPCID_YEL_PLATFORM || NPC[A].Type == NPCID_BLU_PLATFORM || NPC[A].Type == NPCID_GRN_PLATFORM || NPC[A].Type == NPCID_RED_PLATFORM || NPC[A].Type == NPCID_PLATFORM_S3 || NPC[A].Type == NPCID_SAW)
+                                        {
+                                            Special2_from = 'X';
+                                            NPC_A_Special2 = NPC[A].SpecialX;
+                                        }
+                                        else if(NPC[A].Type == NPCID_VILLAIN_S3 || NPC[A].Type == NPCID_MINIBOSS || NPC[A].Type == NPCID_GOALTAPE || NPC[A].Type == NPCID_BAT)
+                                        {
+                                            Special2_from = 'Y';
                                             NPC_A_Special2 = NPC[A].SpecialY;
+                                        }
 
                                         if(HitSpot == 5)
                                         {
@@ -460,7 +470,9 @@ void NPCBlockLogic(int A, double& tempHit, int& tempHitBlock, float& tempSpeedA,
                                         }
 
                                         // could make compat flag here and refuse to clobber these values for cases other than wall climbers
-                                        if(NPC[A].Type == NPCID_VILLAIN_S3 || NPC[A].Type == NPCID_MINIBOSS || NPC[A].Type == NPCID_GOALTAPE || NPC[A].Type == NPCID_BAT)
+                                        if(Special2_from == 'X')
+                                            NPC[A].SpecialX = NPC_A_Special2;
+                                        else if(Special2_from == 'Y')
                                             NPC[A].SpecialY = NPC_A_Special2;
                                         else
                                             NPC[A].Special2 = NPC_A_Special2;

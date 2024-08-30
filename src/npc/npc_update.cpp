@@ -1501,8 +1501,9 @@ void UpdateNPCs()
                             NewEffect(EFFID_STOMP_INIT, tempLocation);
                         }
 
+                        // was Special2
                         if(NPC[A].Type == NPCID_SAW)
-                            NPC[A].Special2 = -NPC[A].Special2;
+                            NPC[A].SpecialX = -NPC[A].SpecialX;
 
                         if(!NPC[A]->IsAShell && NPC[A].Type != NPCID_PLR_FIREBALL && NPC[A].Type != NPCID_TANK_TREADS &&
                            NPC[A].Type != NPCID_BULLET && NPC[A].Type != NPCID_VILLAIN_S3 && !NPCIsABot(NPC[A]) &&

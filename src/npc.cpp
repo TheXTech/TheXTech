@@ -2579,6 +2579,9 @@ void NPCSpecial(int A)
     else if(npc.Type == NPCID_YEL_PLATFORM || npc.Type == NPCID_BLU_PLATFORM || npc.Type == NPCID_GRN_PLATFORM ||
             npc.Type == NPCID_RED_PLATFORM || npc.Type == NPCID_PLATFORM_S3 || npc.Type == NPCID_SAW)
     {
+        // SpecialX (prev Special2) stores the previous X speed (ignoring platform pause)
+        // Special stores the previous Y speed (ignoring platform pause)
+
         straightLine = false; // SET BUT NOT USED
         UNUSED(straightLine);
         tempBool = false;
@@ -2610,7 +2613,7 @@ void NPCSpecial(int A)
             if(!g_config.fix_platforms_acceleration || !pausePlatforms) // Keep zeroed speed when player required the pause of the move effect
             {
                 npc.Location.SpeedY = npc.Special;
-                npc.Location.SpeedX = npc.Special2;
+                npc.Location.SpeedX = npc.SpecialX;
             }
 
             tempBool = false;
@@ -2757,11 +2760,11 @@ void NPCSpecial(int A)
             }
 
             // this code ran unconditionally in SMBX 1.3
-            // it does not run in modern mode so that the Special / Special2 keep the speed from before the pause
+            // it does not run in modern mode so that the Special / SpecialX keep the speed from before the pause
             if(!g_config.fix_platforms_acceleration || !pausePlatforms)
             {
                 npc.Special = npc.Location.SpeedY;
-                npc.Special2 = npc.Location.SpeedX;
+                npc.SpecialX = npc.Location.SpeedX;
             }
 
             // NEW: add a terminal velocity for the platforms in modern mode
@@ -2836,7 +2839,7 @@ void NPCSpecial(int A)
             if(npc.Location.SpeedX == 0 && fEqual((float)npc.Location.SpeedY, Physics.NPCGravity))
             {
                 npc.Location.SpeedX = C * npc.Direction;
-                npc.Special2 = npc.Location.SpeedX;
+                npc.SpecialX = npc.Location.SpeedX;
             }
         }
     }
