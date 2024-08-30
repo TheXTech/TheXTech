@@ -2241,7 +2241,7 @@ void NPCSpecial(int A)
                     {
                         if(npc.Special3 > 0)
                         {
-                            npc.Location.X = Block[(int)npc.Special3].Location.X + Block[(int)npc.Special3].Location.Width + 2;
+                            npc.Location.X = Block[npc.Special3].Location.X + Block[npc.Special3].Location.Width + 2;
                             npc.Location.Y += 2;
                         }
                         npc.Special = 4;
@@ -2524,7 +2524,7 @@ void NPCSpecial(int A)
                 PlaySoundSpatial(SFX_SickBossSpit, npc.Location);
 
             npc.Special3 += 1;
-            if((int(npc.Special3) % 10) == 0)
+            if((npc.Special3 % 10) == 0)
             {
                 numNPCs++;
                 NPC[numNPCs] = NPC_t();
@@ -2540,7 +2540,7 @@ void NPCSpecial(int A)
                 NPC[numNPCs].Location.SpeedY = -7;
                 NPC[numNPCs].Location.SpeedX = 7 * NPC[numNPCs].Direction;
                 NPC[numNPCs].Location.SpeedY += dRand() * 6 - 3;
-                NPC[numNPCs].Location.SpeedX = NPC[numNPCs].Location.SpeedX * (1 - (npc.Special3 / 140));
+                NPC[numNPCs].Location.SpeedX = NPC[numNPCs].Location.SpeedX * (1 - (npc.Special3 / 140.0));
 
                 syncLayers_NPC(numNPCs);
             }

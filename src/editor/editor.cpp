@@ -2222,7 +2222,7 @@ void SetCursor()
             if(t != 288 && t != 289 && t != 91 && t != 260)
                 EditorCursor.NPC.Special2 = 0.0;
         }
-        EditorCursor.NPC.Special3 = 0.0;
+        EditorCursor.NPC.Special3 = 0;
         EditorCursor.NPC.Special4 = 0;
         EditorCursor.NPC.Special5 = 0;
         EditorCursor.NPC.Special6 = 0;

@@ -295,7 +295,7 @@ void NPCSpecialMaybeHeld(int A)
                     else
                         NPC[A].Frame = 6;
                 }
-                else if(fiEqual(NPC[A].Special3, 5))
+                else if(NPC[A].Special3 == 5)
                 {
                     NPC[A].Special3 += 1;
                     NPC[A].Location.SpeedY = -3;
@@ -324,7 +324,7 @@ void NPCSpecialMaybeHeld(int A)
                 if(NPC[A].Special > 1)
                     NPC[A].Special -= 1;
                 NPC[A].Special3 += 1;
-                if(fiEqual(NPC[A].Special3, -1))
+                if(NPC[A].Special3 == -1)
                     NPC[A].Special3 = 6;
             }
             else if(NPC[A].Special3 < 5)
@@ -335,7 +335,7 @@ void NPCSpecialMaybeHeld(int A)
                 else
                     NPC[A].Frame = 6;
             }
-            else if(fiEqual(NPC[A].Special3, 5))
+            else if(NPC[A].Special3 == 5)
             {
                 auto &sx = NPC[A].Location.SpeedX;
                 auto &pl = Player[NPC[A].Special5].Location;
@@ -360,7 +360,7 @@ void NPCSpecialMaybeHeld(int A)
                 else
                     NPC[A].Frame = 5;
             }
-            else if(fiEqual(NPC[A].Special3, 6))
+            else if(NPC[A].Special3 == 6)
             {
                 if(NPC[A].Location.SpeedY > 0)
                 {
@@ -391,7 +391,7 @@ void NPCSpecialMaybeHeld(int A)
                 NPC[A].Location.SpeedY = 2;
                 NPC[A].Special3 += 1;
             }
-            else if(fiEqual(NPC[A].Special3, 21))
+            else if(NPC[A].Special3 == 21)
             {
                 if(NPC[A].Location.SpeedY != 0.0)
                     NPC[A].Location.SpeedY = 10;
@@ -538,7 +538,8 @@ void NPCSpecialMaybeHeld(int A)
                     NPC[A].Frame = 2;
                 else
                     NPC[A].Frame = 7;
-                if(fiEqual(NPC[A].Special3, 29))
+
+                if(NPC[A].Special3 == 29)
                 {
                     numNPCs++;
                     NPC[numNPCs] = NPC_t();

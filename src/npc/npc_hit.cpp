@@ -1654,7 +1654,7 @@ void NPCHit(int A, int B, int C)
     {
         if(!(B == 1 || B == 2 || B == 6))
         {
-            if(NPC[A].Special3 == 0.0)
+            if(NPC[A].Special3 == 0)
             {
                 if(B == 3)
                 {
