@@ -212,27 +212,26 @@ static inline void NPCEffectLogic_DropItem(int A)
             move_Y *= (8.0 * 1.4142135623730951) / dist;
         }
 
-        if(std::abs(delta_Y) < std::abs(move_Y) || NPC[A].Special6 <= 45)
+        if(std::abs(delta_Y) < std::abs(move_Y) || NPC[A].Special5 <= 45)
             nLoc.Y = target_Y;
         else
             nLoc.Y += move_Y;
 
-        if(std::abs(delta_X) < std::abs(move_X) || NPC[A].Special6 <= 45)
+        if(std::abs(delta_X) < std::abs(move_X) || NPC[A].Special5 <= 45)
             nLoc.X = target_X;
         else
             nLoc.X += move_X;
 
         // timer logic
-        if(NPC[A].Special6 <= 45)
-            NPC[A].Special6 -= 1;
+        if(NPC[A].Special5 <= 45)
+            NPC[A].Special5 -= 1;
         else if(nLoc.X == target_X && nLoc.Y == target_Y)
-            NPC[A].Special6 = 45;
+            NPC[A].Special5 = 45;
 
         // enter SMBX mode on timer expiration
-        if(NPC[A].Special6 <= 0)
+        if(NPC[A].Special5 <= 0)
         {
             NPC[A].Effect3 = 0;
-            NPC[A].Special6 = 0;
             NPC[A].Special5 = 0;
         }
     }

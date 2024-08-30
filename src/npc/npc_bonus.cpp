@@ -152,7 +152,7 @@ void DropBonus(int A)
     // enable modern NPC spawn code
     if(g_config.modern_item_drop && !ForcedControls)
     {
-        NPC[numNPCs].Special6 = 120;
+        NPC[numNPCs].Special5 = 120;
         NPC[numNPCs].Effect3 = A;
         NPC[numNPCs].Effect2 = 1;
     }
