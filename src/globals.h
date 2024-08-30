@@ -472,6 +472,8 @@ struct NPC_t
     bool DefaultStuck : 1;
     // EXTRA (private to npc_activation.cpp): stores whether the NPC needs to use an event logic screen for activation
     bool _priv_force_canonical : 1;
+    // EXTRA: used only for vines spawned by vine head
+    bool DefaultLocationHeight_Force32 : 1;
 
 //'the default values are used when De-Activating an NPC when it goes on screen
 //    DefaultDirection As Single
@@ -484,7 +486,8 @@ struct NPC_t
 //    DefaultSpecial2 As Integer
     vbint_t DefaultSpecial2 = 0;
 //    DefaultLocation As Location
-    SpeedlessLocation_t DefaultLocation;
+    double DefaultLocationX = 0;
+    double DefaultLocationY = 0;
 
     // obsolete and removed fields
 //    PinchCount As Integer 'obsolete
@@ -500,11 +503,14 @@ struct NPC_t
 
 //End Type
 
+    // reset location to default
+    void ResetLocation();
     const NPCTraits_t* operator->() const;
 
     NPC_t() : TurnAround(false), onWall(false), TurnBackWipe(false), GeneratorActive(false),
         playerTemp(false), Legacy(false), Chat(false), NoLavaSplash(false),
-        Bouce(false), DefaultStuck(false), _priv_force_canonical(false) {}
+        Bouce(false), DefaultStuck(false), _priv_force_canonical(false),
+        DefaultLocationHeight_Force32(false) {}
 
 };
 

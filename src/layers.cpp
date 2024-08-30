@@ -1747,8 +1747,8 @@ void UpdateLayers()
                 {
                     // if(NPC[B].Layer == Layer[A].Name)
                     {
-                        NPC[B].DefaultLocation.X += double(Layer[A].SpeedX);
-                        NPC[B].DefaultLocation.Y += double(Layer[A].SpeedY);
+                        NPC[B].DefaultLocationX += double(Layer[A].SpeedX);
+                        NPC[B].DefaultLocationY += double(Layer[A].SpeedY);
 
                         if(!NPC[B].Active || NPC[B].Generator || NPC[B].Effect != NPCEFF_NORMAL ||
                            NPC[B]->IsACoin || NPC[B].Type == NPCID_PLANT_S3 || NPC[B].Type == NPCID_STONE_S3 ||
@@ -1771,13 +1771,13 @@ void UpdateLayers()
 
                             if(!NPC[B].Active)
                             {
-                                NPC[B].Location.X = NPC[B].DefaultLocation.X;
-                                NPC[B].Location.Y = NPC[B].DefaultLocation.Y;
+                                NPC[B].Location.X = NPC[B].DefaultLocationX;
+                                NPC[B].Location.Y = NPC[B].DefaultLocationY;
                                 if(NPC[B].Type == NPCID_PLANT_S3 || NPC[B].Type == NPCID_BIG_PLANT || NPC[B].Type == NPCID_PLANT_S1 ||
                                    NPC[B].Type == NPCID_LONG_PLANT_UP || NPC[B].Type == NPCID_FIRE_PLANT)
-                                    NPC[B].Location.Y += NPC[B].DefaultLocation.Height;
+                                    NPC[B].Location.Y += NPC[B]->THeight;
                                 else if(NPC[B].Type == NPCID_SIDE_PLANT && NPC[B].Direction == -1)
-                                    NPC[B].Location.X += NPC[B].DefaultLocation.Width;
+                                    NPC[B].Location.X += NPC[B]->TWidth;
                             }
                             else
                             {

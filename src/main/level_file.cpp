@@ -951,7 +951,8 @@ bool OpenLevel_NPC(void* userdata, LevelNPC& n)
         npc.DefaultType = npc.Type;
         npc.Location.Width = npc->TWidth;
         npc.Location.Height = npc->THeight;
-        npc.DefaultLocation = static_cast<SpeedlessLocation_t>(npc.Location);
+        npc.DefaultLocationX = npc.Location.X;
+        npc.DefaultLocationY = npc.Location.Y;
         npc.DefaultDirection = npc.Direction;
 
         // allow every NPC to be active for one frame to initialize its internal state

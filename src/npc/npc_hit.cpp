@@ -1961,7 +1961,7 @@ void NPCHit(int A, int B, int C)
                     if(!NPC[A].NoLavaSplash)
                         NewEffect(EFFID_LAVA_SPLASH, NPC[A].Location);
                     PlaySoundSpatial(SFX_Lava, NPC[A].Location);
-                    NPC[A].Location = static_cast<Location_t>(NPC[A].DefaultLocation);
+                    NPC[A].ResetLocation();
 
                     if(NPC[A].Active)
                     {
@@ -2084,7 +2084,7 @@ void NPCHit(int A, int B, int C)
             NewEffect(EFFID_SMOKE_S3, NPC[A].Location);
             NewEffect(EFFID_LAVA_SPLASH, NPC[A].Location);
             PlaySoundSpatial(SFX_Lava, NPC[A].Location);
-            NPC[A].Location = static_cast<Location_t>(NPC[A].DefaultLocation);
+            NPC[A].ResetLocation();
             NPCQueues::Unchecked.push_back(A);
         }
     }

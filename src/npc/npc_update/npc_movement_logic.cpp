@@ -479,14 +479,14 @@ void NPCMovementLogic(int A, float& speedVar)
         {
             if(NPC[A].Special5 == 1)
             {
-                if(NPC[A].Location.Y > NPC[A].DefaultLocation.Y)
-                    NPC[A].Location.SpeedY = -4 - (NPC[A].Location.Y - NPC[A].DefaultLocation.Y) * 0.02;
+                if(NPC[A].Location.Y > NPC[A].DefaultLocationY)
+                    NPC[A].Location.SpeedY = -4 - (NPC[A].Location.Y - NPC[A].DefaultLocationY) * 0.02;
                 else
                     NPC[A].Special5 = 0;
             }
             else
             {
-                // If .Location.SpeedY < 2 + (.Location.Y - .DefaultLocation.Y) * 0.02 Then
+                // If .Location.SpeedY < 2 + (.Location.Y - .DefaultLocationY) * 0.02 Then
                 NPC[A].Location.SpeedY += Physics.NPCGravity * 0.4;
                 // End If
             }
@@ -517,7 +517,7 @@ void NPCMovementLogic(int A, float& speedVar)
                     NPC[A].Location.SpeedY += -Physics.NPCGravity * 0.5;
                 else if(NPC[A].Wet == 2 && NPC[A]->IsFish && NPC[A].Special != 2 && !NPC[A].Projectile) // Fish cheep
                 {
-                    if((NPC[A].Location.X < NPC[A].DefaultLocation.X - 100 && NPC[A].Direction == -1) || (NPC[A].Location.X > NPC[A].DefaultLocation.X + 100 && NPC[A].Direction == 1))
+                    if((NPC[A].Location.X < NPC[A].DefaultLocationX - 100 && NPC[A].Direction == -1) || (NPC[A].Location.X > NPC[A].DefaultLocationX + 100 && NPC[A].Direction == 1))
                     {
                         if(NPC[A].Special == 3)
                             NPC[A].TurnAround = true;
@@ -537,9 +537,9 @@ void NPCMovementLogic(int A, float& speedVar)
                             NPC[A].Location.SpeedY = 2;
                         if(NPC[A].Location.SpeedY < -2)
                             NPC[A].Location.SpeedY = -2;
-                        if(NPC[A].Location.Y > NPC[A].DefaultLocation.Y + 25)
+                        if(NPC[A].Location.Y > NPC[A].DefaultLocationY + 25)
                             NPC[A].Special4 = 1;
-                        else if(NPC[A].Location.Y < NPC[A].DefaultLocation.Y - 25)
+                        else if(NPC[A].Location.Y < NPC[A].DefaultLocationY - 25)
                             NPC[A].Special4 = 0;
                         if(NPC[A].Special4 == 0)
                             NPC[A].Location.SpeedY += 0.05;
@@ -766,7 +766,7 @@ void NPCMovementLogic(int A, float& speedVar)
     }
     else
     {
-        if(!(NPC[A].Location.X == NPC[A].DefaultLocation.X && NPC[A].Location.Y == NPC[A].DefaultLocation.Y) || NPC[A].Type == NPCID_FIRE_POWER_S3)
+        if(!(NPC[A].Location.X == NPC[A].DefaultLocationX && NPC[A].Location.Y == NPC[A].DefaultLocationY) || NPC[A].Type == NPCID_FIRE_POWER_S3)
         {
             NPC[A].Location.SpeedX = NPC[A].Location.SpeedX * 0.99;
             NPC[A].Location.X += NPC[A].Location.SpeedX;

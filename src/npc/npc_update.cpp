@@ -926,7 +926,7 @@ void UpdateNPCs()
                 }
                 else if(NPC[A].Type == NPCID_LAVA_MONSTER) // blaarg
                 {
-                    NPC[A].Location.Y = NPC[A].DefaultLocation.Y + NPC[A].Location.Height + 36;
+                    NPC[A].Location.Y = NPC[A].DefaultLocationY + NPC[A].Location.Height + 36;
                     treeNPCUpdate(A);
                     if(NPC[A].tempBlock > 0)
                         treeNPCSplitTempBlock(A);
@@ -957,7 +957,7 @@ void UpdateNPCs()
                     else if(NPC[A]->IsFish && Maths::iRound(NPC[A].Special) == 2)
                     {
                         NPC[A].Location.Y = level[Player[NPC[A].JustActivated].Section].Height - 0.1;
-                        NPC[A].Location.SpeedX = (1 + (NPC[A].Location.Y - NPC[A].DefaultLocation.Y) * 0.005) * NPC[A].Direction;
+                        NPC[A].Location.SpeedX = (1 + (NPC[A].Location.Y - NPC[A].DefaultLocationY) * 0.005) * NPC[A].Direction;
                         NPC[A].Special5 = 1;
                         treeNPCUpdate(A);
                         if(NPC[A].tempBlock > 0)
@@ -1552,8 +1552,8 @@ void UpdateNPCs()
                     if(!(NPC[A]->IsACoin && NPC[A].Special == 0) && !(NPC[A].Type == NPCID_SLIDE_BLOCK && NPC[A].Special == 0) &&
                        NPC[A].Type != NPCID_CONVEYOR && NPC[A].Type != NPCID_STATUE_FIRE && NPC[A].Type != NPCID_ITEM_BURIED && NPC[A].Type != NPCID_STAR_EXIT &&
                        NPC[A].Type != NPCID_STAR_COLLECT && !(NPC[A].Type >= NPCID_PLATFORM_S3 && NPC[A].Type <= NPCID_PLATFORM_S1) &&
-                       !(NPCIsAnExit(NPC[A]) && ((NPC[A].DefaultLocation.X == NPC[A].Location.X &&
-                       NPC[A].DefaultLocation.Y == NPC[A].Location.Y) || NPC[A].Inert)) &&
+                       !(NPCIsAnExit(NPC[A]) && ((NPC[A].DefaultLocationX == NPC[A].Location.X &&
+                       NPC[A].DefaultLocationY == NPC[A].Location.Y) || NPC[A].Inert)) &&
                        NPC[A].Type != NPCID_LIFT_SAND && NPC[A].Type != NPCID_CHECKPOINT && NPC[A].Type != NPCID_SICK_BOSS_BALL &&
                        !(NPC[A].Type == NPCID_PLANT_FIRE || NPC[A].Type == NPCID_LOCK_DOOR || NPC[A].Type == NPCID_FIRE_DISK || NPC[A].Type == NPCID_FIRE_CHAIN))
                     {

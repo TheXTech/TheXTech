@@ -244,7 +244,8 @@ void NPCBlockLogic(int A, double& tempHit, int& tempHitBlock, float& tempSpeedA,
                                                 NPC[numNPCs].Location.X = Block[B].Location.X + 2;
                                                 NPC[numNPCs].Active = true;
                                                 NPC[numNPCs].DefaultType = NPC[numNPCs].Type;
-                                                NPC[numNPCs].DefaultLocation = static_cast<SpeedlessLocation_t>(NPC[numNPCs].Location);
+                                                NPC[numNPCs].DefaultLocationX = NPC[numNPCs].Location.X;
+                                                NPC[numNPCs].DefaultLocationY = NPC[numNPCs].Location.Y;
                                                 NPC[numNPCs].TimeLeft = 100;
                                                 syncLayers_NPC(numNPCs);
                                                 CheckSectionNPC(numNPCs);
