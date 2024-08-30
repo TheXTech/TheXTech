@@ -88,10 +88,12 @@ void DrawEditorLevel(int Z)
                             tempLocation.Width = NPCWidthGFX(C);
                         }
 
+                        vbint_t tempDirection = -1;
+
                         XRender::renderTexture(vScreen[Z].X + tempLocation.X + NPCFrameOffsetX(C),
                             vScreen[Z].Y + tempLocation.Y + NPCFrameOffsetY(C),
                             tempLocation.Width, tempLocation.Height,
-                            GFXNPC[C], 0, EditorNPCFrame(C, -1) * tempLocation.Height);
+                            GFXNPC[C], 0, EditorNPCFrame(C, tempDirection) * tempLocation.Height);
                     }
                 }
 
@@ -131,11 +133,15 @@ void DrawEditorLevel(int Z)
                             tempLocation.Y = NPC[A].Location.Y + NPC[A].Location.Height - tempLocation.Height;
                         else
                             tempLocation.Y = NPC[A].Location.Y;
+
                         tempLocation.X = NPC[A].Location.X + NPC[A].Location.Width / 2 - tempLocation.Width / 2;
+
+                        vbint_t tempDirection = -1;
+
                         XRender::renderTexture(vScreen[Z].X + tempLocation.X + NPCFrameOffsetX(C),
                             vScreen[Z].Y + tempLocation.Y + NPCFrameOffsetY(C),
                             tempLocation.Width, tempLocation.Height,
-                            GFXNPC[C], 0, EditorNPCFrame(C, -1) * tempLocation.Height);
+                            GFXNPC[C], 0, EditorNPCFrame(C, tempDirection) * tempLocation.Height);
                     }
                 }
 
@@ -409,10 +415,12 @@ void DrawEditorLevel(int Z)
                         tempLocation.Width = NPCWidthGFX(C);
                     }
 
+                    vbint_t tempDirection = -1;
+
                     XRender::renderTexture(vScreen[Z].X + tempLocation.X + NPCFrameOffsetX(C),
                         vScreen[Z].Y + tempLocation.Y + NPCFrameOffsetY(C),
                         tempLocation.Width, tempLocation.Height,
-                        GFXNPC[C], 0, EditorNPCFrame(C, -1) * tempLocation.Height);
+                        GFXNPC[C], 0, EditorNPCFrame(C, tempDirection) * tempLocation.Height);
                 }
             }
 
@@ -572,10 +580,12 @@ void DrawEditorLevel(int Z)
 
                     tempLocation.X = n.Location.X + n.Location.Width / 2 - tempLocation.Width / 2;
 
+                    vbint_t tempDirection = -1;
+
                     XRender::renderTexture(vScreen[Z].X + tempLocation.X + NPCFrameOffsetX(C),
                         vScreen[Z].Y + tempLocation.Y + NPCFrameOffsetY(C),
                         tempLocation.Width, tempLocation.Height,
-                        GFXNPC[C], 0, EditorNPCFrame(C, -1) * tempLocation.Height);
+                        GFXNPC[C], 0, EditorNPCFrame(C, tempDirection) * tempLocation.Height);
                 }
             }
 

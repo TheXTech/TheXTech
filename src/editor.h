@@ -82,8 +82,8 @@ extern void UpdateEditor();
 extern void UpdateInterprocess();
 #endif
 
-extern int EditorNPCFrame(const NPCID A, int C, int N = 0);
-extern int EditorNPCFrame(const NPCID A, float& C, int N = 0);
+// extern int EditorNPCFrame(const NPCID A, vbint_t C, int N = 0);
+extern int EditorNPCFrame(const NPCID A, vbint_t& C, int N = 0);
 
 extern void GetEditorControls();
 

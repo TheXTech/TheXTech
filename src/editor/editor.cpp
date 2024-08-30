@@ -1847,13 +1847,12 @@ void UpdateInterprocess()
 }
 #endif // THEXTECH_INTERPROC_SUPPORTED
 
-int EditorNPCFrame(const NPCID A, int C, int N)
-{
-    float C_ = C;
-    return EditorNPCFrame(A, C_, N);
-}
+// int EditorNPCFrame(const NPCID A, vbint_t C, int N)
+// {
+//     return EditorNPCFrame(A, C, N);
+// }
 
-int EditorNPCFrame(const NPCID A, float& C, int N)
+int EditorNPCFrame(const NPCID A, vbint_t& C, int N)
 {
     int ret = 0;
 // find the default left/right frames for NPCs
@@ -1863,12 +1862,12 @@ int EditorNPCFrame(const NPCID A, float& C, int N)
     int B = 0;
     int D = 0;
     int E = 0;
-    B = (int)C;
-    while(int(B) == 0)
+    B = C;
+    while(B == 0)
         B = iRand(3) - 1;
 
     if(!LevelEditor)
-        C = (float)B;
+        C = B;
     if(A == 241)
         ret = 4;
     if(A == 195)
