@@ -2095,7 +2095,8 @@ void NPCFrames(int A)
     }
     else if(NPC[A].Type == NPCID_HEAVY_THROWER) // SMB Hammer Bro
     {
-        if(NPC[A].Special3 >= 0)
+        // the throw counter was previously Special3, and it has been moved to SpecialX
+        if(NPC[A].SpecialX >= 0)
         {
             if((NPC[A].Location.SpeedY < 1 && NPC[A].Location.SpeedY >= 0) || NPC[A].Slope > 0 || NPC[A].HoldingPlayer > 0)
             {

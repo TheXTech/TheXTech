@@ -581,13 +581,14 @@ void NPCSpecialMaybeHeld(int A)
     }
     else if(NPC[A].Type == NPCID_HEAVY_THROWER && NPC[A].HoldingPlayer > 0)
     {
+        // the throw counter was previously Special3, but it uses a double in the non-held logic, so it has been moved to SpecialX
         if(Player[NPC[A].HoldingPlayer].Effect == PLREFF_NORMAL)
-            NPC[A].Special3 += 1;
+            NPC[A].SpecialX += 1;
 
-        if(NPC[A].Special3 >= 20)
+        if(NPC[A].SpecialX >= 20)
         {
             PlaySoundSpatial(SFX_HeavyToss, NPC[A].Location);
-            NPC[A].Special3 = 0; // -15
+            NPC[A].SpecialX = 0; // -15
             numNPCs++;
             NPC[numNPCs] = NPC_t();
             NPC[numNPCs].Location.Height = 32;

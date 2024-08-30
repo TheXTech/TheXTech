@@ -4680,8 +4680,9 @@ void SpecialNPC(int A)
             }
         }
 
-        NPC[A].Special3 += dRand() * 2;
-        if(NPC[A].Special3 >= 50 + dRand() * 1000)
+        // the throw counter was previously Special3
+        NPC[A].SpecialX += dRand() * 2;
+        if(NPC[A].SpecialX >= 50 + dRand() * 1000)
         {
             if(NPC[A].Location.SpeedY == Physics.NPCGravity)
             {
@@ -4691,7 +4692,7 @@ void SpecialNPC(int A)
             }
 
             PlaySoundSpatial(SFX_HeavyToss, NPC[A].Location);
-            NPC[A].Special3 = -15;
+            NPC[A].SpecialX = -15;
             numNPCs++;
             NPC[numNPCs] = NPC_t();
             NPC[numNPCs].Inert = NPC[A].Inert;
