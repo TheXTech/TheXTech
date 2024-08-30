@@ -314,7 +314,11 @@ struct NPC_t
 
     // Information about the NPC's current unusual state (reordered for alignment purposes)
 //    Effect2 As Double
-    double Effect2 = 0.0; // When Effect 4, Used to store a destination position, must be in double!
+    // double Effect2 = 0.0; // When Effect 4, Used to store a destination position, must be in double!
+
+    // when Effect == NPCEFF_WARP, this was previously used to hold a destination position.
+    // now the destination position is stored in SpecialX/Y, and this is an integer.
+    vbint_t Effect2 = 0;
 //    Effect As Integer 'For starting / stopping effects
     NPCEffect Effect = NPCEFF_NORMAL;
 //    Effect3 As Integer

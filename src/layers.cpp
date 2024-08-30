@@ -1787,10 +1787,12 @@ void UpdateLayers()
 
                             if(NPC[B].Effect == NPCEFF_WARP)
                             {
+                                // specialY/X store the NPC's destination position
+                                // this previously changed Effect2
                                 if(NPC[B].Effect3 == 1 || NPC[B].Effect3 == 3)
-                                    NPC[B].Effect2 += double(Layer[A].SpeedY);
+                                    NPC[B].SpecialY += double(Layer[A].SpeedY);
                                 else
-                                    NPC[B].Effect2 += double(Layer[A].SpeedX);
+                                    NPC[B].SpecialX += double(Layer[A].SpeedX);
                             }
 
                             if(!NPC[B].Active)

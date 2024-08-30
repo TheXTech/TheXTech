@@ -411,8 +411,10 @@ void UpdateNPCs()
 
                             if(NPC[A].GeneratorEffect == 1) // Warp NPC
                             {
+                                // NOTE: this code previously used Effect2 to store the destination position, and now it uses SpecialX/Y
                                 NPC[numNPCs].Layer = NPC[A].Layer;
                                 NPC[numNPCs].Effect3 = NPC[A].GeneratorDirection;
+                                NPC[numNPCs].Effect2 = 0;
                                 NPC[numNPCs].Effect = NPCEFF_WARP;
                                 NPC[numNPCs].Location.SpeedX = 0;
                                 NPC[numNPCs].TimeLeft = 100;
@@ -421,12 +423,12 @@ void UpdateNPCs()
                                     if(NPC[A]->HeightGFX > NPC[A].Location.Height)
                                     {
                                         NPC[numNPCs].Location.Y = NPC[A].Location.Y + NPC[A]->HeightGFX;
-                                        NPC[numNPCs].Effect2 = NPC[numNPCs].Location.Y - (NPC[A]->HeightGFX - NPC[A].Location.Height);
+                                        NPC[numNPCs].SpecialY = NPC[numNPCs].Location.Y - (NPC[A]->HeightGFX - NPC[A].Location.Height);
                                     }
                                     else
                                     {
                                         NPC[numNPCs].Location.Y = NPC[A].Location.Y + NPC[A].Location.Height;
-                                        NPC[numNPCs].Effect2 = NPC[numNPCs].Location.Y;
+                                        NPC[numNPCs].SpecialY = NPC[numNPCs].Location.Y;
                                     }
                                 }
                                 else if(NPC[A].GeneratorDirection == 3)
@@ -434,25 +436,25 @@ void UpdateNPCs()
                                     if(NPC[A]->HeightGFX > NPC[A].Location.Height)
                                     {
                                         NPC[numNPCs].Location.Y = NPC[A].Location.Y - NPC[A].Location.Height;
-                                        NPC[numNPCs].Effect2 = NPC[numNPCs].Location.Y + NPC[A].Location.Height + (NPC[A]->HeightGFX - NPC[A].Location.Height);
+                                        NPC[numNPCs].SpecialY = NPC[numNPCs].Location.Y + NPC[A].Location.Height + (NPC[A]->HeightGFX - NPC[A].Location.Height);
                                     }
                                     else
                                     {
                                         NPC[numNPCs].Location.Y = NPC[A].Location.Y - NPC[A].Location.Height;
-                                        NPC[numNPCs].Effect2 = NPC[numNPCs].Location.Y + NPC[A].Location.Height;
+                                        NPC[numNPCs].SpecialY = NPC[numNPCs].Location.Y + NPC[A].Location.Height;
                                     }
                                 }
                                 else if(NPC[A].GeneratorDirection == 2)
                                 {
                                     NPC[numNPCs].Location.Y -= 4;
                                     NPC[numNPCs].Location.X = NPC[A].Location.X + NPC[A].Location.Width;
-                                    NPC[numNPCs].Effect2 = NPC[numNPCs].Location.X;
+                                    NPC[numNPCs].SpecialX = NPC[numNPCs].Location.X;
                                 }
                                 else if(NPC[A].GeneratorDirection == 4)
                                 {
                                     NPC[numNPCs].Location.Y -= 4;
                                     NPC[numNPCs].Location.X = NPC[A].Location.X - NPC[A].Location.Width;
-                                    NPC[numNPCs].Effect2 = NPC[numNPCs].Location.X + NPC[A].Location.Width;
+                                    NPC[numNPCs].SpecialX = NPC[numNPCs].Location.X + NPC[A].Location.Width;
                                 }
                             }
                             else if(NPC[A].GeneratorEffect == 2) // projectile

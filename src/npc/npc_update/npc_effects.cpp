@@ -102,7 +102,7 @@ static inline void NPCEffectLogic_EmergeDown(int A)
     NPC[A].Effect2 += 1;
     NPC[A].Location.Y += 1;
 
-    if(fEqual(NPC[A].Effect2, 32.0))
+    if(NPC[A].Effect2 == 32)
     {
         NPC[A].Effect = NPCEFF_NORMAL;
         NPC[A].Effect2 = 0;
@@ -248,16 +248,17 @@ static inline void NPCEffectLogic_DropItem(int A)
 
 static inline void NPCEffectLogic_Warp(int A)
 {
+    // NOTE: this code previously used Effect2 to store destination position, and now it uses SpecialX/Y
     if(NPC[A].Effect3 == 1)
     {
         NPC[A].Location.Y -= 1;
         if(NPC[A].Type == NPCID_PLATFORM_S1)
             NPC[A].Location.Y -= 1;
 
-        if(NPC[A].Location.Y + NPC[A].Location.Height <= NPC[A].Effect2)
+        if(NPC[A].Location.Y + NPC[A].Location.Height <= NPC[A].SpecialY)
         {
             NPC[A].Effect = NPCEFF_NORMAL;
-            NPC[A].Effect2 = 0;
+            NPC[A].SpecialY = 0;
             NPC[A].Effect3 = 0;
         }
     }
@@ -268,10 +269,10 @@ static inline void NPCEffectLogic_Warp(int A)
         if(NPC[A].Type == NPCID_PLATFORM_S1)
             NPC[A].Location.Y += 1;
 
-        if(NPC[A].Location.Y >= NPC[A].Effect2)
+        if(NPC[A].Location.Y >= NPC[A].SpecialY)
         {
             NPC[A].Effect = NPCEFF_NORMAL;
-            NPC[A].Effect2 = 0;
+            NPC[A].SpecialY = 0;
             NPC[A].Effect3 = 0;
         }
     }
@@ -284,10 +285,10 @@ static inline void NPCEffectLogic_Warp(int A)
         else
             NPC[A].Location.X -= double(Physics.NPCWalkingSpeed);
 
-        if(NPC[A].Location.X + NPC[A].Location.Width <= NPC[A].Effect2)
+        if(NPC[A].Location.X + NPC[A].Location.Width <= NPC[A].SpecialX)
         {
             NPC[A].Effect = NPCEFF_NORMAL;
-            NPC[A].Effect2 = 0;
+            NPC[A].SpecialX = 0;
             NPC[A].Effect3 = 0;
         }
     }
@@ -300,10 +301,10 @@ static inline void NPCEffectLogic_Warp(int A)
         else
             NPC[A].Location.X += double(Physics.NPCWalkingSpeed);
 
-        if(NPC[A].Location.X >= NPC[A].Effect2)
+        if(NPC[A].Location.X >= NPC[A].SpecialX)
         {
             NPC[A].Effect = NPCEFF_NORMAL;
-            NPC[A].Effect2 = 0;
+            NPC[A].SpecialX = 0;
             NPC[A].Effect3 = 0;
         }
     }

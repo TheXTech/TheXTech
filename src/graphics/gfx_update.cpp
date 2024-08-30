@@ -254,7 +254,7 @@ public:
 
         if(NPC[A].Effect == NPCEFF_DROP_ITEM)
         {
-            if(std::fmod(NPC[A].Effect2, 3) == 0.0)
+            if(NPC[A].Effect2 % 3 == 0)
                 return;
             if(Dropped_n == sizeof(Dropped) / sizeof(uint16_t))
                 return;
@@ -945,7 +945,7 @@ void ClassicNPCScreenLogic(int Z, int numScreens, bool fill_draw_queue, NPC_Draw
 
         if(NPC[A].Effect == NPCEFF_DROP_ITEM)
         {
-            if(std::fmod(NPC[A].Effect2, 3) != 0.0)
+            if(NPC[A].Effect2 % 3 != 0)
             {
                 can_check = true;
                 reset_all = false;
