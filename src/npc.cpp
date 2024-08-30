@@ -2972,6 +2972,9 @@ void NPCSpecial(int A)
     }
     else if(npc.Type == NPCID_GOALTAPE) // SMW Exit
     {
+        // Special is whether the tape is going up or down
+        // SpecialY is the Y coordinate of the ground below the tape (was previously Special2)
+
         if(npc.Special == 0)
             npc.Location.SpeedY = 2;
         else
@@ -2980,7 +2983,7 @@ void NPCSpecial(int A)
         if(npc.Location.Y <= npc.DefaultLocationY)
             npc.Special = 0;
 
-        if(npc.Special2 == 0)
+        if(npc.SpecialY == 0)
         {
             tempLocation = npc.Location;
             tempLocation.Height = 8000;
@@ -2999,7 +3002,7 @@ void NPCSpecial(int A)
                 }
             }
             if(C > 0)
-                npc.Special2 = Block[C].Location.Y + 4;
+                npc.SpecialY = Block[C].Location.Y + 4;
         }
 
         for(int i = 1; i <= numPlayers; i++)
@@ -3007,7 +3010,7 @@ void NPCSpecial(int A)
             auto &p = Player[i];
             if(p.Section == npc.Section)
             {
-                if(p.Location.Y + npc.Location.Height <= npc.Special2)
+                if(p.Location.Y + npc.Location.Height <= npc.SpecialY)
                 {
                     if(p.Location.X + p.Location.Width >= npc.Location.X + npc.Location.Width - 8)
                     {
@@ -3015,7 +3018,7 @@ void NPCSpecial(int A)
                         {
                             if(CheckCollision(p.Location, npc.Location))
                             {
-                                MoreScore(vb6Round((1 - (npc.Location.Y - npc.DefaultLocationY) / (npc.Special2 - npc.DefaultLocationY)) * 10) + 1, npc.Location);
+                                MoreScore(vb6Round((1 - (npc.Location.Y - npc.DefaultLocationY) / (npc.SpecialY - npc.DefaultLocationY)) * 10) + 1, npc.Location);
                                 npc.Killed = 9;
                                 NPCQueues::Killed.push_back(A);
                                 PlaySoundSpatial(SFX_Stone, npc.Location);

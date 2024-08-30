@@ -915,7 +915,8 @@ void UpdateNPCs()
 
                     if(C > 0)
                     {
-                        NPC[A].Special2 = Block[C].Location.Y + 4;
+                        // save location of ground below goal tape (was previously Special2)
+                        NPC[A].SpecialY = Block[C].Location.Y + 4;
                         NPC[A].Location.Y = Block[C].Location.Y - NPC[A].Location.Height;
                         NPC[A].Special = 1;
 
