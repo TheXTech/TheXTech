@@ -302,7 +302,7 @@ struct NPC_t
 //    Special As Double
     double Special = 0.0;
 //    Special2 As Double
-    double Special2 = 0.0;
+    vbint_t Special2 = 0;
 //    Special3 As Double
     vbint_t Special3 = 0;
 //    Special4 As Double

@@ -898,14 +898,14 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
         if(EditorCursor.NPC.Type == NPCID_MAGIC_DOOR || EditorCursor.NPC.Type == NPCID_DOOR_MAKER
             || (EditorCursor.NPC.Type == NPCID_ITEM_BURIED && EditorCursor.NPC.Special == NPCID_DOOR_MAKER))
         {
-            std::string&& dest_section = fmt::format_ne(g_editorStrings.phraseSectionIndex, (int)(EditorCursor.NPC.Special2) + 1);
+            std::string&& dest_section = fmt::format_ne(g_editorStrings.phraseSectionIndex, EditorCursor.NPC.Special2 + 1);
             SuperPrintR(mode, dest_section, 3, e_ScreenW - 200, 220);
 
             if(EditorCursor.NPC.Special2 > 0 && UpdateButton(mode, e_ScreenW - 160 + 4, 240 + 4, GFX.EIcons, false, 0, 32*Icon::left, 32, 32))
-                EditorCursor.NPC.Special2 --;
+                EditorCursor.NPC.Special2--;
 
             if(EditorCursor.NPC.Special2 < 20 && UpdateButton(mode, e_ScreenW - 120 + 4, 240 + 4, GFX.EIcons, false, 0, 32*Icon::right, 32, 32))
-                EditorCursor.NPC.Special2 ++;
+                EditorCursor.NPC.Special2++;
         }
 
         // multistars

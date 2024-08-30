@@ -473,7 +473,7 @@ void UpdateEditor()
                             n.contents = (long)EditorCursor.NPC.Special;
 
                         if(n.id == 288 || n.id == 289 || (n.id == 91 && int(EditorCursor.NPC.Special) == 288))
-                            n.special_data = (long)EditorCursor.NPC.Special2;
+                            n.special_data = EditorCursor.NPC.Special2;
 
                         if(NPCIsAParaTroopa(n.id) || NPCTraits[n.id].IsFish || n.id == 260)
                             n.special_data = (long)EditorCursor.NPC.Special;
@@ -1769,8 +1769,8 @@ void UpdateInterprocess()
             }
             if(EditorCursor.NPC.Type == 288 || EditorCursor.NPC.Type == 289 || (EditorCursor.NPC.Type == 91 && int(EditorCursor.NPC.Special) == 288))
             {
-                EditorCursor.NPC.Special2 = n.special_data;
-                EditorCursor.NPC.DefaultSpecial2 = int(EditorCursor.NPC.Special2);
+                EditorCursor.NPC.Special2 = (vbint_t)n.special_data;
+                EditorCursor.NPC.DefaultSpecial2 = EditorCursor.NPC.Special2;
             }
 
             if(NPCIsAParaTroopa(EditorCursor.NPC))
@@ -2220,7 +2220,7 @@ void SetCursor()
             if(t != 91 && t != 96 && t != 283 && t != 284 && !NPCTraits[t].IsFish && !NPCIsAParaTroopa(t) && t != NPCID_FIRE_CHAIN)
                 EditorCursor.NPC.Special = 0;
             if(t != 288 && t != 289 && t != 91 && t != 260)
-                EditorCursor.NPC.Special2 = 0.0;
+                EditorCursor.NPC.Special2 = 0;
         }
         EditorCursor.NPC.Special3 = 0;
         EditorCursor.NPC.Special4 = 0;

@@ -1605,9 +1605,9 @@ void KillNPC(int A, int B)
             }
         }
         else if(NPC[A].Type == NPCID_TOOTHYPIPE && NPC[A].Special2 > 0)
-            NPC[(int)NPC[A].Special2].Special2 = A;
+            NPC[NPC[A].Special2].Special2 = A;
         else if(NPC[A].Type == NPCID_TOOTHY && NPC[A].Special2 > 0)
-            NPC[(int)NPC[A].Special2].Special2 = A;
+            NPC[NPC[A].Special2].Special2 = A;
     }
     else
     {

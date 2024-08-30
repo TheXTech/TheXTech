@@ -475,7 +475,7 @@ void NPCBlockLogic(int A, double& tempHit, int& tempHitBlock, float& tempSpeedA,
                                         else if(Special2_from == 'Y')
                                             NPC[A].SpecialY = NPC_A_Special2;
                                         else
-                                            NPC[A].Special2 = NPC_A_Special2;
+                                            NPC[A].Special2 = (vbint_t)NPC_A_Special2;
 
                                         NPC[A].Special = NPC_A_Special;
                                     }

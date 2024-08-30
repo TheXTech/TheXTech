@@ -936,7 +936,7 @@ void NPCHit(int A, int B, int C)
             else if(NPC[A].Type == NPCID_BULLY)
             {
                 PlaySoundSpatial(SFX_Stomp, NPC[A].Location);
-                if(NPC[A].Special2 == 0.0)
+                if(NPC[A].Special2 == 0)
                 {
                     NPC[A].Special2 = 1;
                     NPC[A].Location.SpeedX = 4 * Player[C].Direction;

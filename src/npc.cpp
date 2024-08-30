@@ -960,7 +960,7 @@ void NPCSpecial(int A)
         }
 
         npc.Location.SpeedX = 0.75 * npc.DefaultDirection;
-        if(npc.Special2 == 0.0)
+        if(npc.Special2 == 0)
             npc.Special2 = -1;
 
         npc.Location.SpeedY += 0.05 * npc.Special2;
@@ -1041,7 +1041,7 @@ void NPCSpecial(int A)
         }
         else if(npc.Special == 2)
         {
-            if(npc.Special2 == 0.0) // spit fireballs
+            if(npc.Special2 == 0) // spit fireballs
             {
                 for(int i = 1; i <= 4; i++)
                 {
@@ -1829,7 +1829,7 @@ void NPCSpecial(int A)
 
         if(!npc.Stuck && npc.Special == 0.0)
         {
-            if(npc.Special2 == 0.0)
+            if(npc.Special2 == 0)
             {
                 if(npc.Location.X < npc.DefaultLocationX - 128 && npc.Direction == -1)
                     npc.Special2 = 60;
@@ -1848,7 +1848,7 @@ void NPCSpecial(int A)
                 if(fEqual((float)npc.Location.SpeedY, Physics.NPCGravity))
                     npc.Location.SpeedX = 0;
 
-                if(npc.Special2 == 0.0)
+                if(npc.Special2 == 0)
                 {
                     if(npc.Location.X < npc.DefaultLocationX)
                         npc.Direction = 1;
@@ -3685,7 +3685,7 @@ void SpecialNPC(int A)
                     NPC[A].Special = 0;
                 }
             }
-            else if(fiEqual(NPC[A].Special2, 2))
+            else if(NPC[A].Special2 == 2)
             {
                 NPC[A].Special += 1;
                 if(NPC[A].Special >= 100)
@@ -3738,14 +3738,14 @@ void SpecialNPC(int A)
                     syncLayers_NPC(numNPCs);
                 }
             }
-            else if(fiEqual(NPC[A].Special2, 3))
+            else if(NPC[A].Special2 == 3)
             {
                 NPC[A].Special += 1;
                 NPC[A].Location.Y += 1.5;
                 if(NPC[A].Special >= NPC[A]->THeight * 0.65 + 1)
                     NPC[A].Special2 = 4;
             }
-            else if(fiEqual(NPC[A].Special2, 4))
+            else if(NPC[A].Special2 == 4)
             {
                 NPC[A].Special += 1;
                 if(NPC[A].Special >= 150)
@@ -4228,7 +4228,7 @@ void SpecialNPC(int A)
         NPC[A].Projectile = true;
 
         // If .Location.X <> .DefaultLocationX Then .Killed = 2
-        if(NPC[A].Special2 == 0.0)
+        if(NPC[A].Special2 == 0)
         {
             NPC[A].Location.Y = NPC[A].DefaultLocationY + NPC[A].Location.Height + 1.5;
             NPC[A].Special2 = 1;
@@ -4238,7 +4238,7 @@ void SpecialNPC(int A)
             tempLocation.Y -= 32;
             NewEffect(EFFID_LAVA_SPLASH, tempLocation);
         }
-        else if(fiEqual(NPC[A].Special2, 1))
+        else if(NPC[A].Special2 == 1)
         {
             NPC[A].Special += 1;
             NPC[A].Location.SpeedY = -6;
@@ -4256,7 +4256,7 @@ void SpecialNPC(int A)
                 NPC[A].Special = 0;
             }
         }
-        else if(fiEqual(NPC[A].Special2, 2))
+        else if(NPC[A].Special2 == 2)
         {
             NPC[A].Special += 1;
 

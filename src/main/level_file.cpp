@@ -875,8 +875,8 @@ bool OpenLevel_NPC(void* userdata, LevelNPC& n)
         if(npc.Type == NPCID_DOOR_MAKER || npc.Type == NPCID_MAGIC_DOOR ||
           (npc.Type == NPCID_ITEM_BURIED && n.contents == NPCID_DOOR_MAKER))
         {
-            npc.Special2 = n.special_data;
-            npc.DefaultSpecial2 = int(npc.Special2);
+            npc.Special2 = (vbint_t)n.special_data;
+            npc.DefaultSpecial2 = npc.Special2;
         }
 
         if(NPCIsAParaTroopa(npc))

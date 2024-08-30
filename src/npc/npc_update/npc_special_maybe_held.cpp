@@ -778,22 +778,22 @@ void NPCSpecialMaybeHeld(int A)
                     B = 1;
             }
         }
-        else if(NPC[(int)NPC[A].Special2].Projectile && NPC[(int)NPC[A].Special2].Active)
+        else if(NPC[NPC[A].Special2].Projectile && NPC[NPC[A].Special2].Active)
         {
             B = 1;
             NPC[A].Projectile = true;
-            NPC[A].Direction = NPC[(int)NPC[A].Special2].Direction;
+            NPC[A].Direction = NPC[NPC[A].Special2].Direction;
             if(NPC[A].Direction > 0)
-                NPC[A].Location.X = NPC[(int)NPC[A].Special2].Location.X + 32;
+                NPC[A].Location.X = NPC[NPC[A].Special2].Location.X + 32;
             else
-                NPC[A].Location.X = NPC[(int)NPC[A].Special2].Location.X - NPC[A].Location.Width;
-            NPC[A].Location.Y = NPC[(int)NPC[A].Special2].Location.Y;
+                NPC[A].Location.X = NPC[NPC[A].Special2].Location.X - NPC[A].Location.Width;
+            NPC[A].Location.Y = NPC[NPC[A].Special2].Location.Y;
         }
 
         if(Player[NPC[A].vehiclePlr].Controls.Run)
             B = 1;
 
-        if(NPC[A].Special2 > 0 && NPC[(int)NPC[A].Special2].Special2 != A)
+        if(NPC[A].Special2 > 0 && NPC[NPC[A].Special2].Special2 != A)
             B = 0;
 
         if(NPC[A].Special > 0)
@@ -814,7 +814,7 @@ void NPCSpecialMaybeHeld(int A)
             NPC[A].Special = 0;
 
         if(NPC[A].HoldingPlayer > 0 && NPC[A].Special2 > 0)
-            NPC[(int)NPC[A].Special2].Direction = NPC[A].Direction;
+            NPC[NPC[A].Special2].Direction = NPC[A].Direction;
 
         if(Player[NPC[A].HoldingPlayer].Effect != PLREFF_NORMAL)
             NPC[A].Special = 0;
@@ -851,19 +851,19 @@ void NPCSpecialMaybeHeld(int A)
         }
 #endif
 
-        if(NPC[(int)NPC[A].Special2].Type == NPCID_TOOTHY && fEqual(NPC[(int)NPC[A].Special2].Special2, A))
+        if(NPC[NPC[A].Special2].Type == NPCID_TOOTHY && NPC[NPC[A].Special2].Special2 == A)
         {
-            NPC[(int)NPC[A].Special2].Projectile = true;
-            NPC[(int)NPC[A].Special2].Direction = NPC[A].Direction;
+            NPC[NPC[A].Special2].Projectile = true;
+            NPC[NPC[A].Special2].Direction = NPC[A].Direction;
             if(NPC[A].Direction > 0)
-                NPC[(int)NPC[A].Special2].Location.X = NPC[A].Location.X + 32;
+                NPC[NPC[A].Special2].Location.X = NPC[A].Location.X + 32;
             else
-                NPC[(int)NPC[A].Special2].Location.X = NPC[A].Location.X - NPC[(int)NPC[A].Special2].Location.Width;
-            NPC[(int)NPC[A].Special2].Location.Y = NPC[A].Location.Y;
+                NPC[NPC[A].Special2].Location.X = NPC[A].Location.X - NPC[NPC[A].Special2].Location.Width;
+            NPC[NPC[A].Special2].Location.Y = NPC[A].Location.Y;
 
-            treeNPCUpdate((int)NPC[A].Special2);
-            if(NPC[(int)NPC[A].Special2].tempBlock != 0)
-                treeNPCSplitTempBlock((int)NPC[A].Special2);
+            treeNPCUpdate(NPC[A].Special2);
+            if(NPC[NPC[A].Special2].tempBlock != 0)
+                treeNPCSplitTempBlock(NPC[A].Special2);
         }
 
         if(NPC[A].vehiclePlr > 0 && !Player[NPC[A].vehiclePlr].Controls.Run)

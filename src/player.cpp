@@ -4433,7 +4433,7 @@ void ClownCar()
                 // update toothy's position
                 for(int C : NPCQueues::Active.no_change)
                 {
-                    if(NPC[C].Type == NPCID_TOOTHY && Maths::iRound(NPC[C].Special) == A && Maths::iRound(NPC[C].Special2) == B)
+                    if(NPC[C].Type == NPCID_TOOTHY && Maths::iRound(NPC[C].Special) == A && NPC[C].Special2 == B)
                     {
                         NPC[C].vehiclePlr = A;
                         NPC[C].Projectile = true;

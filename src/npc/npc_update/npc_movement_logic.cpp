@@ -235,7 +235,7 @@ void NPCMovementLogic(int A, float& speedVar)
     // bully
     else if(NPC[A].Type == NPCID_BULLY)
     {
-        if(!NPC[A].Projectile && NPC[A].Special2 == 0.0)
+        if(!NPC[A].Projectile && NPC[A].Special2 == 0)
         {
             double C = 0;
             for(int B = 1; B <= numPlayers; B++)

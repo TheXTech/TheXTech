@@ -901,7 +901,7 @@ void DrawFrozenNPC(int Z, int A)
 // draw npc
         XTColor c = n.Shadow ? XTColor(0, 0, 0) : XTColor();
         int content = int(n.Special);
-        int contentFrame = int(n.Special2);
+        int contentFrame = n.Special2;
 
         // SDL_assert_release(content >= 0 && content <= maxNPCType);
 
