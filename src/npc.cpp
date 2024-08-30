@@ -1512,11 +1512,13 @@ void NPCSpecial(int A)
         // special4 is attack timer
         // special3 is attack count
 
+        // SpecialX (Special6 in SMBX 1.3) appears to be an additional attack timer
+
         if(npc.Inert)
         {
             npc.Special4 = 0;
             npc.Special3 = 0;
-            npc.Special6 = 0;
+            npc.SpecialX = 0;
         }
 
         if(npc.Special5 == 0) // Target a Random Player
@@ -1545,7 +1547,7 @@ void NPCSpecial(int A)
 
         if(npc.Special == 0)
         {
-            if((npc.Damage < 5 && npc.Special6 > 60) || (npc.Damage < 10 && npc.Special6 > 80) || npc.Inert)
+            if((npc.Damage < 5 && npc.SpecialX > 60) || (npc.Damage < 10 && npc.SpecialX > 80) || npc.Inert)
             {
                 if(npc.Special2 == -1)
                     npc.Location.SpeedX = -1.5;
@@ -1567,9 +1569,9 @@ void NPCSpecial(int A)
 
             // attack timer
             if(fEqual((float)npc.Location.SpeedY, Physics.NPCGravity))
-                npc.Special6 += 1;
+                npc.SpecialX += 1;
 
-            if(npc.Special6 == 20 || npc.Special6 == 40 || npc.Special6 == 60 || (npc.Damage >= 5 && npc.Special6 == 80) || (npc.Damage >= 10 && npc.Special6 == 100))
+            if(npc.SpecialX == 20 || npc.SpecialX == 40 || npc.SpecialX == 60 || (npc.Damage >= 5 && npc.SpecialX == 80) || (npc.Damage >= 10 && npc.SpecialX == 100))
             {
                 npc.Special = 1;
                 npc.Special5 = 0;
@@ -1577,12 +1579,12 @@ void NPCSpecial(int A)
                 npc.Special4 = 0;
             }
 
-            if(npc.Damage >= 10 && npc.Special == 0 && npc.Special6 >= 100)
-                npc.Special6 = 200;
+            if(npc.Damage >= 10 && npc.Special == 0 && npc.SpecialX >= 100)
+                npc.SpecialX = 200;
 
-            if(npc.Special6 >= 160 && fEqual((float)npc.Location.SpeedY, Physics.NPCGravity))
+            if(npc.SpecialX >= 160 && fEqual((float)npc.Location.SpeedY, Physics.NPCGravity))
             {
-                npc.Special6 = 0;
+                npc.SpecialX = 0;
                 npc.Special = 3;
                 PlaySoundSpatial(SFX_Spring, npc.Location);
                 npc.Location.SpeedY = -7 - dRand() * 2;
@@ -1598,6 +1600,7 @@ void NPCSpecial(int A)
                 npc.Special4 = 0;
                 npc.Special5 = 0;
                 npc.Special6 = 0;
+                npc.SpecialX = 0;
                 npc.Location.X += npc.Location.Width / 2.0;
                 npc.Location.Y += npc.Location.Height;
                 npc.Type = NPCID_FIRE_BOSS_SHELL;
@@ -1676,9 +1679,6 @@ void NPCSpecial(int A)
                 npc.Special4 = 0;
             }
         }
-
-
-
     }
     else if(npc.Type == NPCID_SWORDBEAM) // link sword beam
     {
