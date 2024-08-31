@@ -132,6 +132,7 @@ static void compatInit(Compatibility_t &c)
     // 1.3.6.6
     c.fix_vehicle_altjump_bug = true;
     c.fix_vehicle_altjump_lock = true;
+    c.fix_player_stuck_on_dirt = true;
     // 1.3.7
 
 
@@ -200,6 +201,7 @@ static void compatInit(Compatibility_t &c)
         // 1.3.6.6
         c.fix_vehicle_altjump_bug = false;
         c.fix_vehicle_altjump_lock = false;
+        c.fix_player_stuck_on_dirt = false;
     }
 
     c.speedrun_stop_timer_by = Compatibility_t::SPEEDRUN_STOP_NONE;
@@ -448,6 +450,7 @@ static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
         // 1.3.6.6
         compat.read("fix-vehicle-altjump-bug", c.fix_vehicle_altjump_bug, c.fix_vehicle_altjump_bug);
         compat.read("fix-vehicle-altjump-lock", c.fix_vehicle_altjump_lock, c.fix_vehicle_altjump_lock);
+        compat.read("fix-player-stuck-on-dirt", c.fix_player_stuck_on_dirt, c.fix_player_stuck_on_dirt);
         // 1.3.7 (but these will be changed in the Compat update)
     }
     // 1.3.4

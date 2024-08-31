@@ -102,6 +102,7 @@ struct Compatibility_t
     // 1.3.6.6
     bool fix_vehicle_altjump_bug; // don't become vulnerable on sides after altjump into car
     bool fix_vehicle_altjump_lock; // don't get stuck in car entered while holding AltJump
+    bool fix_player_stuck_on_dirt; // player can be stuck when hit by an NPC while digging dirt (#125)
     // 1.3.7
 
     // SpeedRun section

@@ -2900,6 +2900,8 @@ void UpdatePlayer()
                                 Player[A].GrabTime += 1;
                             }
                         }
+                        else if(g_compatibility.fix_player_stuck_on_dirt)
+                            DontResetGrabTime = false;
                     }
 
                     if(tempHit2)
