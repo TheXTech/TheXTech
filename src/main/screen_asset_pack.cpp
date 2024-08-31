@@ -189,7 +189,7 @@ void DrawBackground(double fade)
     XRender::setTargetLayer(3);
 
     // fade the existing display
-    if(!g_LoopActive)
+    if(!g_LoopActive && XRender::TargetH <= 480)
         XRender::targetFade(static_cast<uint8_t>(255 * (1.0f - fade)));
 #endif
 
