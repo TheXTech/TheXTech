@@ -600,7 +600,7 @@ void setTargetLayer(int layer)
         C2D_SceneBegin(s_layer_targets[layer]);
         s_cur_target = s_layer_targets[layer];
     }
-    else
+    else if(s_cur_target != s_layer_targets[0])
     {
         C2D_SceneBegin(s_layer_targets[0]);
         s_cur_target = s_layer_targets[0];
