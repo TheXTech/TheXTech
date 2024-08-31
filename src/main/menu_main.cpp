@@ -74,6 +74,7 @@
 
 #include "editor.h"
 #include "frm_main.h"
+#include "load_gfx.h"
 
 #include "screen_textentry.h"
 #include "main/asset_pack.h"
@@ -404,6 +405,11 @@ void FindWorlds()
             for(std::string &fName : files)
                 s_LoadSingleWorld(epDir, fName, head, tr, worldsRoot.editable);
 
+#ifdef THEXTECH_PRELOAD_LEVELS
+            if(LoadingInProcess)
+                UpdateLoad();
+#endif
+
 #ifndef PGE_NO_THREADING
             SDL_AtomicAdd(&loadingProgrss, 1);
 #endif
@@ -581,6 +587,11 @@ void FindLevels()
                     w.WorldName = fName;
                 w.editable = battleRoot.editable;
                 SelectBattle.push_back(w);
+
+#ifdef THEXTECH_PRELOAD_LEVELS
+                if(LoadingInProcess)
+                    UpdateLoad();
+#endif
             }
 #ifndef PGE_NO_THREADING
             SDL_AtomicAdd(&loadingProgrss, 1);
