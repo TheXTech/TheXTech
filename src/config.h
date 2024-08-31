@@ -873,6 +873,9 @@ public:
         "fix-vehicle-altjump-bug", "Fix vehicle AltJump bug", "Don't become vulnerable after AltJump into car"};
     opt<bool> fix_vehicle_altjump_lock{this, defaults(true), {CompatClass::critical_update, false}, Scope::CreatorFile,
         "fix-vehicle-altjump-lock", "Fix vehicle AltJump lock", "Don't get stuck in car entered while holding AltJump"};
+    // player can be stuck when hit by an NPC while digging dirt (#125)
+    opt<bool> fix_player_stuck_on_dirt{this, defaults(true), {CompatClass::critical_update, false}, Scope::CreatorFile,
+        "fix-player-stuck-on-dirt", "Fix player stuck on dirt", "Don't get stuck when digging dirt"};
 
     // 1.3.7
     opt<bool> fix_npc_camera_logic{this, defaults(true), {CompatClass::critical_update, false}, Scope::CreatorFile,

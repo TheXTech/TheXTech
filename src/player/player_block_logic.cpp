@@ -799,6 +799,8 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
                     Player[A].GrabTime += 1;
                 }
             }
+            else if(g_config.fix_player_stuck_on_dirt)
+                DontResetGrabTime = false;
         }
 
         if(tempHit2)

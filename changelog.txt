@@ -69,6 +69,7 @@ Changelog for 1.3.6.6-dev
 -Fix TheXTech 1.3.6.1 bug where SMBX level version autodetection did not work for platforms (note that this logic will be fully removed in 1.3.7) (@ds-sloth)
 -Fix TheXTech 1.3.6.1 bug where NPCs on hidden layers were incorrectly allowed to chain-activate. (The bug affected the outro scene of Dynamite Grotto in SRW2.) (@ds-sloth)
 -Add workaround for TheXTech 1.3.6.1 Modern Mode inaccuracy where NPC clipping did not match SMBX 1.3. (This bug affected the same scene.) (@ds-sloth)
+-Fix vanilla bug where player can get softlocked if hit by a grabbable NPC while digging dirt, guarded by compat flag "fix-player-stuck-on-dirt" (Classic Mode) (@ds-sloth)
 
 Changelog for 1.3.6.5
 -Fix TheXTech 1.3.6 bug where auto movement on the world map was not reset when switching episodes (@ds-sloth)
