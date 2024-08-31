@@ -2344,7 +2344,7 @@ void UpdateGraphicsScreen(Screen_t& screen)
 
                             PlayerWarpGFX(A, drawLoc, src_x, src_y);
 
-                            XRender::renderTexture(camX + drawLoc.X,
+                            XRender::renderTextureBasic(camX + drawLoc.X,
                                                   camY + drawLoc.Y,
                                                   drawLoc.Width,
                                                   drawLoc.Height,
@@ -2392,7 +2392,7 @@ void UpdateGraphicsScreen(Screen_t& screen)
                             int src_y = 0;
 
                             PlayerWarpGFX(A, drawLoc, src_x, src_y);
-                            XRender::renderTexture(camX + drawLoc.X,
+                            XRender::renderTextureBasic(camX + drawLoc.X,
                                                   camY + drawLoc.Y,
                                                   drawLoc.Width,
                                                   drawLoc.Height,
@@ -2411,7 +2411,7 @@ void UpdateGraphicsScreen(Screen_t& screen)
                             src_y = 0;
 
                             PlayerWarpGFX(A, drawLoc, src_x, src_y);
-                            XRender::renderTexture(camX + drawLoc.X,
+                            XRender::renderTextureBasic(camX + drawLoc.X,
                                                   camY + drawLoc.Y,
                                                   drawLoc.Width,
                                                   drawLoc.Height,
@@ -2433,7 +2433,7 @@ void UpdateGraphicsScreen(Screen_t& screen)
                             int src_y = 0;
 
                             PlayerWarpGFX(A, drawLoc, src_x, src_y);
-                            XRender::renderTexture(camX + drawLoc.X,
+                            XRender::renderTextureBasic(camX + drawLoc.X,
                                                   camY + drawLoc.Y,
                                                   drawLoc.Width,
                                                   drawLoc.Height,
@@ -2815,18 +2815,23 @@ void UpdateGraphicsScreen(Screen_t& screen)
                     break;
                 }
 
-                XRender::renderTexture(
-                        camX + SDL_floor(Player[A].Location.X) + pfrOffX(tx, p) - Physics.PlayerWidth[Player[A].Character][Player[A].State] / 2 + 64,
-                        camY + Player[A].Location.Y + pfrOffY(tx, p) + Player[A].MountOffsetY - Y,
+                int sX = camX + s_round2int_plr(Player[A].Location.X);
+                int sY = camY + s_round2int_plr(Player[A].Location.Y);
+                int pW = s_round2int(Player[A].Location.Width);
+                int pH = s_round2int(Player[A].Location.Height);
+
+                XRender::renderTextureBasic(
+                        sX + pfrOffX(tx, p) - Physics.PlayerWidth[Player[A].Character][Player[A].State] / 2 + 64,
+                        sY + pfrOffY(tx, p) + Player[A].MountOffsetY - Y,
                         pfrW(tx, p), // was 99, not 100, but not a big deal
-                        Player[A].Location.Height - 20 - Player[A].MountOffsetY,
+                        pH - 20 - Player[A].MountOffsetY,
                         tx,
                         pfrX(tx, p),
                         pfrY(tx, p),
                         plr_shade);
-                XRender::renderTexture(
-                        camX + SDL_floor(Player[A].Location.X) + Player[A].Location.Width / 2.0 - 64,
-                        camY + Player[A].Location.Y + Player[A].Location.Height - 128,
+                XRender::renderTextureBasic(
+                        sX + pW / 2 - 64,
+                        sY + pH - 128,
                         128,
                         128,
                         GFX.Mount[Player[A].Mount],
@@ -3352,7 +3357,7 @@ void UpdateGraphicsMeta()
     if(GamePaused == PauseCode::DropAdd)
     {
         ConnectScreen::Render();
-        XRender::renderTexture(int(SharedCursor.X), int(SharedCursor.Y), GFX.ECursor[2]);
+        XRender::renderTextureBasic(int(SharedCursor.X), int(SharedCursor.Y), GFX.ECursor[2]);
     }
 
     if(GamePaused == PauseCode::Options)
@@ -3362,7 +3367,7 @@ void UpdateGraphicsMeta()
 #endif
 
         OptionsScreen::Render();
-        XRender::renderTexture(int(SharedCursor.X), int(SharedCursor.Y), GFX.ECursor[2]);
+        XRender::renderTextureBasic(int(SharedCursor.X), int(SharedCursor.Y), GFX.ECursor[2]);
     }
 
     if(GamePaused == PauseCode::TextEntry)
