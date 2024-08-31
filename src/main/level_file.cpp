@@ -1233,22 +1233,26 @@ void OpenLevel_FixLayersEvents(const LevelLoad& load)
         if(Events[A].TriggerEvent != EVENT_NONE)
             Events[A].TriggerEvent = load.final_event_index[Events[A].TriggerEvent];
 
-        for(layerindex_t& l : Events[A].ShowLayer)
+        // fix all layer indices
+        for(int i = 0; i < 3; i++)
         {
-            if(l != LAYER_NONE)
-                l = load.final_layer_index[l];
-        }
+            auto& arr = (i == 0) ? Events[A].ShowLayer
+                : (i == 1) ? Events[A].HideLayer
+                : Events[A].ToggleLayer;
 
-        for(layerindex_t& l : Events[A].HideLayer)
-        {
-            if(l != LAYER_NONE)
-                l = load.final_layer_index[l];
-        }
+            auto out_it = arr.begin();
+            for(auto in_it = out_it; in_it != arr.end(); ++in_it)
+            {
+                layerindex_t l = *in_it;
 
-        for(layerindex_t& l : Events[A].ToggleLayer)
-        {
-            if(l != LAYER_NONE)
-                l = load.final_layer_index[l];
+                if(l != LAYER_NONE)
+                    l = load.final_layer_index[l];
+
+                if(l != LAYER_NONE)
+                    *(out_it++) = l;
+            }
+
+            arr.resize(out_it - arr.begin());
         }
     }
 
