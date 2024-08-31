@@ -612,11 +612,15 @@ int GameMain(const CmdLineSetup_t &setup)
             MenuMode = MENU_INTRO;
             LevelEditor = false;
             WorldEditor = false;
-            XRender::clearBuffer();
-            XRender::repaint();
+
+            if(GameIsActive)
+            {
+                XRender::clearBuffer();
+                XRender::repaint();
 #ifdef THEXTECH_PRELOAD_LEVELS
-            FindWorlds();
+                FindWorlds();
 #endif
+            }
         }
 
         // TheXTech Credits

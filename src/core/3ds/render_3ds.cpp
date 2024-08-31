@@ -535,6 +535,11 @@ bool init()
 
 void quit()
 {
+    if(!s_render_inited || !GameIsActive)
+        return;
+
+    s_render_inited = false;
+
     s_clearAllTextures();
     s_destroySceneTargets();
 
@@ -654,7 +659,7 @@ void setDrawPlane(uint8_t plane)
 
 void repaint()
 {
-    if(!g_in_frame)
+    if(!g_in_frame || !GameIsActive)
         return;
 
     constexpr int shift = MAX_3D_OFFSET / 2;

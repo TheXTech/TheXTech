@@ -1306,6 +1306,9 @@ void InitSound()
         else
             UpdateLoad();
 #endif
+
+        if(!GameIsActive)
+            return;
     }
 
     if(LoadingInProcess)
@@ -1313,7 +1316,7 @@ void InitSound()
 
     Mix_ReserveChannels(g_reservedChannels);
 
-    if(g_errorsSfx > 0)
+    if(g_errorsSfx > 0 && GameIsActive)
     {
         XMsgBox::simpleMsgBox(XMsgBox::MESSAGEBOX_ERROR,
                               "Sounds loading error",

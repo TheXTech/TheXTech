@@ -51,7 +51,10 @@ void quit() {}
 
 int simpleMsgBox(uint32_t flags, const std::string &title, const std::string &message)
 {
-    errorConf* conf = new errorConf;
+    if(!GameIsActive)
+        return -1;
+
+    errorConf* conf = new(std::nothrow) errorConf;
     if(!conf)
         return -2;
 
