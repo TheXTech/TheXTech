@@ -1937,8 +1937,8 @@ void UpdateGraphicsScreen(Screen_t& screen)
                 if(vScreenCollision(Z, Background[A].Location) && !Background[A].Hidden)
                 {
                     g_stats.renderedBGOs++;
-                    XRender::renderTexture(camX + Background[A].Location.X,
-                                          camY + Background[A].Location.Y,
+                    XRender::renderTextureBasic(camX + s_round2int(Background[A].Location.X),
+                                          camY + s_round2int(Background[A].Location.Y),
                                           GFXBackgroundWidth[Background[A].Type],
                                           BackgroundHeight[Background[A].Type],
                                           GFXBackgroundBMP[Background[A].Type], 0,
@@ -1955,16 +1955,27 @@ void UpdateGraphicsScreen(Screen_t& screen)
                 int A = screenBackgrounds[nextBackground];
                 g_stats.checkedBGOs++;
 
-                if(vScreenCollision(Z, Background[A].Location) && !Background[A].Hidden)
+                if(Background[A].Hidden)
+                    continue;
+
+                int sX = camX + s_round2int(Background[A].Location.X);
+                if(sX > vScreen[Z].Width)
+                    continue;
+
+                int sY = camY + s_round2int(Background[A].Location.Y);
+                if(sY > vScreen[Z].Height)
+                    continue;
+
+                if(sX + GFXBackgroundWidth[Background[A].Type] >= 0 && sY + BackgroundHeight[Background[A].Type] >= 0 /*&& !Background[A].Hidden*/)
                 {
                     g_stats.renderedBGOs++;
-                    XRender::renderTexture(camX + Background[A].Location.X,
-                                          camY + Background[A].Location.Y,
+                    XRender::renderTextureBasic(sX,
+                                          sY,
                                           GFXBackgroundWidth[Background[A].Type],
                                           BackgroundHeight[Background[A].Type],
-                                          GFXBackgroundBMP[Background[A].Type], 0,
-                                          BackgroundHeight[Background[A].Type] *
-                                          BackgroundFrame[Background[A].Type]);
+                                          GFXBackgroundBMP[Background[A].Type],
+                                          0,
+                                          BackgroundHeight[Background[A].Type] * BackgroundFrame[Background[A].Type]);
                 }
             }
         }
@@ -2070,8 +2081,8 @@ void UpdateGraphicsScreen(Screen_t& screen)
                 if(vScreenCollision(Z, Background[A].Location) && !Background[A].Hidden)
                 {
                     g_stats.renderedBGOs++;
-                    XRender::renderTexture(camX + Background[A].Location.X,
-                                          camY + Background[A].Location.Y,
+                    XRender::renderTextureBasic(camX + s_round2int(Background[A].Location.X),
+                                          camY + s_round2int(Background[A].Location.Y),
                                           GFXBackgroundWidth[Background[A].Type],
                                           BackgroundHeight[Background[A].Type],
                                           GFXBackgroundBMP[Background[A].Type], 0,
@@ -2116,12 +2127,23 @@ void UpdateGraphicsScreen(Screen_t& screen)
             int A = screenBackgrounds[oBackground];
 
             g_stats.checkedBGOs++;
-            if(vScreenCollision(Z, Background[A].Location) &&
-                (Background[A].Type == 98 || Background[A].Type == 160) && !Background[A].Hidden)
+
+            if(Background[A].Hidden || !(Background[A].Type == 98 || Background[A].Type == 160))
+                continue;
+
+            int sX = camX + s_round2int(Background[A].Location.X);
+            if(sX > vScreen[Z].Width)
+                continue;
+
+            int sY = camY + s_round2int(Background[A].Location.Y);
+            if(sY > vScreen[Z].Height)
+                continue;
+
+            if(sX + BackgroundWidth[Background[A].Type] >= 0 && sY + BackgroundHeight[Background[A].Type] >= 0)
             {
                 g_stats.renderedBGOs++;
-                XRender::renderTextureBasic(camX + s_round2int(Background[A].Location.X),
-                                      camY + s_round2int(Background[A].Location.Y),
+                XRender::renderTextureBasic(sX,
+                                      sY,
                                       BackgroundWidth[Background[A].Type], BackgroundHeight[Background[A].Type],
                                       GFXBackgroundBMP[Background[A].Type],
                                       0, BackgroundHeight[Background[A].Type] * BackgroundFrame[Background[A].Type]);
@@ -2889,8 +2911,8 @@ void UpdateGraphicsScreen(Screen_t& screen)
                 if(vScreenCollision(Z, Background[A].Location) && !Background[A].Hidden)
                 {
                     g_stats.renderedBGOs++;
-                    XRender::renderTexture(camX + Background[A].Location.X,
-                                          camY + Background[A].Location.Y,
+                    XRender::renderTextureBasic(camX + s_round2int(Background[A].Location.X),
+                                          camY + s_round2int(Background[A].Location.Y),
                                           GFXBackgroundWidth[Background[A].Type],
                                           BackgroundHeight[Background[A].Type],
                                           GFXBackgroundBMP[Background[A].Type], 0,
