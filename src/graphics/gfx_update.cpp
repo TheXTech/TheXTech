@@ -2466,13 +2466,16 @@ void UpdateGraphicsScreen(Screen_t& screen)
                 if(sY > vScreen[Z].Height)
                     continue;
 
-                if(sX + BlockWidth[block.Type] >= 0 && sY + BlockHeight[block.Type] >= 0 /*&& !block.Hidden*/)
+                int bw = s_round2int(block.Location.Width);
+                int bh = s_round2int(block.Location.Height);
+
+                if(sX + bw >= 0 && sY + bh >= 0 /*&& !block.Hidden*/)
                 {
                     g_stats.renderedBlocks++;
                     XRender::renderTextureBasic(sX,
                                           sY + block.ShakeOffset,
-                                          BlockWidth[block.Type],
-                                          BlockHeight[block.Type],
+                                          bw,
+                                          bh,
                                           GFXBlock[block.Type],
                                           0,
                                           BlockFrame[block.Type] * 32);
@@ -2989,30 +2992,30 @@ void UpdateGraphicsScreen(Screen_t& screen)
             // screenLavaBlocks only contains deadly blocks
             // if(!BlockKills[block.Type]) continue;
 
-            if(vScreenCollision(Z, block.Location) /*&& !block.Hidden*/)
+            // if(vScreenCollision(Z, block.Location) /*&& !block.Hidden*/)
+
+            // Don't show a visual difference of hit-resized block in a comparison to original state
+            int sX = (block.getShrinkResized()) ? (camX + s_round2int(block.Location.X - 0.05)) : (camX + s_round2int(block.Location.X));
+            if(sX > vScreen[Z].Width)
+                continue;
+
+            int sY = camY + s_round2int(block.Location.Y);
+            if(sY > vScreen[Z].Height)
+                continue;
+
+            int bw = s_round2int(block.Location.Width);
+            int bh = s_round2int(block.Location.Height);
+
+            if(sX + bw >= 0 && sY + bh >= 0 /*&& !block.Hidden*/)
             {
                 g_stats.renderedBlocks++;
-                // Don't show a visual difference of hit-resized block in a comparison to original state
-                if(block.getShrinkResized())
-                {
-                    XRender::renderTextureBasic(camX + s_round2int(block.Location.X - 0.05),
-                                          camY + s_round2int(block.Location.Y) + block.ShakeOffset,
-                                          32,
-                                          BlockHeight[block.Type],
-                                          GFXBlock[block.Type],
-                                          0,
-                                          BlockFrame[block.Type] * 32);
-                }
-                else
-                {
-                    XRender::renderTextureBasic(camX + s_round2int(block.Location.X),
-                                          camY + s_round2int(block.Location.Y) + block.ShakeOffset,
-                                          BlockWidth[block.Type],
-                                          BlockHeight[block.Type],
-                                          GFXBlock[block.Type],
-                                          0,
-                                          BlockFrame[block.Type] * 32);
-                }
+                XRender::renderTextureBasic(sX,
+                                      sY + block.ShakeOffset,
+                                      bw,
+                                      bh,
+                                      GFXBlock[block.Type],
+                                      0,
+                                      BlockFrame[block.Type] * 32);
             }
         }
 
