@@ -700,6 +700,12 @@ public:
     // Returns true if Rumble is ever supported
     virtual bool RumbleSupported() = 0;
 
+    // Returns true if Power Status is ever supported
+    virtual bool PowerStatusSupported()
+    {
+        return false;
+    }
+
     // Hooks that are called before and after Player controls are updated
     // Update any information that the InputMethods will reference
     virtual void UpdateControlsPre() = 0;

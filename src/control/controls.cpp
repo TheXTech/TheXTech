@@ -187,7 +187,9 @@ void InputMethodProfile::SaveConfig_All(IniProcessing* ctl)
     if(this->Type->RumbleSupported())
         ctl->setValue("enable-rumble", this->m_rumbleEnabled);
 
-    ctl->setValue("show-power-status", this->m_showPowerStatus);
+    if(this->Type->PowerStatusSupported())
+        ctl->setValue("show-power-status", this->m_showPowerStatus);
+
     this->SaveConfig(ctl);
 }
 
@@ -196,7 +198,9 @@ void InputMethodProfile::LoadConfig_All(IniProcessing* ctl)
     if(this->Type->RumbleSupported())
         ctl->read("enable-rumble", this->m_rumbleEnabled, this->m_rumbleEnabled);
 
-    ctl->read("show-power-status", this->m_showPowerStatus, this->m_showPowerStatus);
+    if(this->Type->PowerStatusSupported())
+        ctl->read("show-power-status", this->m_showPowerStatus, this->m_showPowerStatus);
+
     this->LoadConfig(ctl);
 }
 
@@ -208,8 +212,12 @@ size_t InputMethodProfile::GetOptionCount()
     if(!this->Type->RumbleSupported())
         shared_options_count -= 1;
 
+    if(!this->Type->PowerStatusSupported())
+        shared_options_count -= 1;
+
     return shared_options_count + this->GetOptionCount_Custom();
 }
+
 // Methods to manage per-profile options
 // It is guaranteed that none of these will be called if
 // GetOptionCount() returns 0.
@@ -217,6 +225,9 @@ size_t InputMethodProfile::GetOptionCount()
 const char* InputMethodProfile::GetOptionName(size_t i)
 {
     if(!this->Type->RumbleSupported() && (int)i >= CommonOptions::rumble)
+        i += 1;
+
+    if(!this->Type->PowerStatusSupported() && (int)i >= CommonOptions::show_power_status)
         i += 1;
 
     if(i >= CommonOptions::COUNT)
@@ -235,6 +246,9 @@ const char* InputMethodProfile::GetOptionName(size_t i)
 const char* InputMethodProfile::GetOptionValue(size_t i)
 {
     if(!this->Type->RumbleSupported() && (int)i >= CommonOptions::rumble)
+        i += 1;
+
+    if(!this->Type->PowerStatusSupported() && (int)i >= CommonOptions::show_power_status)
         i += 1;
 
     if(i >= CommonOptions::COUNT)
@@ -261,6 +275,9 @@ const char* InputMethodProfile::GetOptionValue(size_t i)
 bool InputMethodProfile::OptionChange(size_t i)
 {
     if(!this->Type->RumbleSupported() && (int)i >= CommonOptions::rumble)
+        i += 1;
+
+    if(!this->Type->PowerStatusSupported() && (int)i >= CommonOptions::show_power_status)
         i += 1;
 
     if(i >= CommonOptions::COUNT)
@@ -296,7 +313,10 @@ bool InputMethodProfile::OptionRotateLeft(size_t i)
 {
     int i_proc = (int)i;
 
-    if(!this->Type->RumbleSupported() && (int)i >= CommonOptions::rumble)
+    if(!this->Type->RumbleSupported() && (int)i_proc >= CommonOptions::rumble)
+        i_proc += 1;
+
+    if(!this->Type->PowerStatusSupported() && (int)i_proc >= CommonOptions::show_power_status)
         i_proc += 1;
 
     if(i_proc >= CommonOptions::COUNT)
@@ -309,7 +329,10 @@ bool InputMethodProfile::OptionRotateRight(size_t i)
 {
     int i_proc = (int)i;
 
-    if(!this->Type->RumbleSupported() && (int)i >= CommonOptions::rumble)
+    if(!this->Type->RumbleSupported() && (int)i_proc >= CommonOptions::rumble)
+        i_proc += 1;
+
+    if(!this->Type->PowerStatusSupported() && (int)i_proc >= CommonOptions::show_power_status)
         i_proc += 1;
 
     if(i_proc >= CommonOptions::COUNT)

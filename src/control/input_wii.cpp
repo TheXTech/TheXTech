@@ -1196,6 +1196,11 @@ bool InputMethodType_Wii::RumbleSupported()
     return true;
 }
 
+bool InputMethodType_Wii::PowerStatusSupported()
+{
+    return true;
+}
+
 void InputMethodType_Wii::UpdateControlsPre()
 {
     WPAD_ScanPads();
