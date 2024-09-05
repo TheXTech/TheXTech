@@ -18,7 +18,21 @@ if not outdir.endswith('/'): outdir += '/'
 
 os.makedirs(os.path.join(outdir, 'graphics', 'fallback'), exist_ok=True)
 
+def has_dot(p):
+    if not p:
+        return False
+
+    p, t = os.path.split(p)
+
+    if t.startswith('.'):
+        return True
+
+    return has_dot(p)
+
 for dirpath, _, files in os.walk(datadir, topdown=True):
+    if has_dot(dirpath[len(datadir):]):
+        continue
+
     outpath = os.path.join(outdir, dirpath[len(datadir):])
     os.makedirs(outpath, exist_ok=True)
 
@@ -194,7 +208,7 @@ for dirpath, dirs, files in os.walk(outdir, topdown=True):
                 if len(basename.split('-')) != 2:
                     continue
 
-                basename = basename.replace('-', ' ')
+                basename = basename.replace('-', ' ').lower()
 
                 if not basename[:basename.find(' ')] in ('background', 'background2', 'block', 'effect', 'level',
                         'link', 'luigi', 'mario', 'npc', 'path',
@@ -229,7 +243,7 @@ for dirpath, dirs, files in os.walk(outdir, topdown=True):
         if len(basename.split('-')) != 2:
             continue
 
-        basename = basename.replace('-', ' ')
+        basename = basename.replace('-', ' ').lower()
 
         if not basename[:basename.find(' ')] in ('background', 'background2', 'block', 'effect', 'level',
                 'link', 'luigi', 'mario', 'npc', 'path',

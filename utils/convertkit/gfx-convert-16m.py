@@ -244,7 +244,7 @@ for dirpath, dirs, files in os.walk(outdir, topdown=True):
                 if len(basename.split('-')) != 2:
                     continue
 
-                basename = basename.replace('-', ' ')
+                basename = basename.replace('-', ' ').lower()
 
                 if not basename[:basename.find(' ')] in ('background', 'background2', 'block', 'effect', 'level',
                         'link', 'luigi', 'mario', 'npc', 'path',
@@ -279,7 +279,7 @@ for dirpath, dirs, files in os.walk(outdir, topdown=True):
         if len(basename.split('-')) != 2:
             continue
 
-        basename = basename.replace('-', ' ')
+        basename = basename.replace('-', ' ').lower()
 
         if not basename[:basename.find(' ')] in ('background', 'background2', 'block', 'effect', 'level',
                 'link', 'luigi', 'mario', 'npc', 'path',
