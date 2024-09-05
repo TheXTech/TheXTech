@@ -554,6 +554,12 @@ bool LoadGFXFromList(std::string source_dir, bool custom, bool skip_world)
             loadImageFromList(in, line_buf, source_dir,
                 GFXEffectBMP[A], &GFXEffectWidth[A], &GFXEffectHeight[A], GFXEffectCustom[A],
                 false, custom);
+
+            if(GFXEffectCustom[A])
+            {
+                EffectWidth[A] = GFXEffectWidth[A];
+                EffectHeight[A] = GFXEffectHeight[A] / EffectDefaults.EffectFrames[A];
+            }
         }
         else if(type_buf[0] == 'y' && type_buf[5] == 't')
         {
