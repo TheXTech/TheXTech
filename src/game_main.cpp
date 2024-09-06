@@ -399,7 +399,7 @@ int GameMain(const CmdLineSetup_t &setup)
     bool cmdline_content = (!setup.testLevel.empty() || !setup.testReplay.empty() || setup.interprocess);
 
     // special case: go straight to asset pack menu
-    if(g_config.pick_assets_on_start && !cmdline_content && GetAssetPacks().size() > 1)
+    if(g_config.pick_assets_on_start && !cmdline_content && setup.assetPack.empty() && GetAssetPacks().size() > 1)
     {
         FontManager::initFull();
         Controls::LoadTouchScreenGFX();
