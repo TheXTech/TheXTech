@@ -64,7 +64,8 @@ struct vScreen_t : public qScreen_t
     uint8_t player = 0;
 };
 
-constexpr int c_screenCount = 1;
+#define THEXTECH_NUM_SCREENS 1
+constexpr int c_screenCount = THEXTECH_NUM_SCREENS;
 constexpr int c_vScreenCount = c_screenCount * maxLocalPlayers;
 
 //Public vScreen(0 To 2) As vScreen 'Sets up the players screens

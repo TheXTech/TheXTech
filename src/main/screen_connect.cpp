@@ -830,7 +830,7 @@ void Player_Down(int p)
     }
 }
 
-bool Player_MouseItem(int p, int i)
+static bool Player_MouseItem(const int p, int i)
 {
     if(s_menuItem[p] != i)
     {
@@ -847,7 +847,7 @@ bool Player_MouseItem(int p, int i)
     return false;
 }
 
-bool Player_MenuItem_Mouse_Render(int p, int i, const std::string& label, int X, int Y, bool mouse, bool render)
+static bool Player_MenuItem_Mouse_Render(const int p, int i, const std::string& label, int X, int Y, bool mouse, bool render)
 {
     if(mouse)
     {
@@ -865,7 +865,7 @@ bool Player_MenuItem_Mouse_Render(int p, int i, const std::string& label, int X,
     return false;
 }
 
-inline void Render_PCursor(int x, int y, int p, float r, float g, float b)
+static inline void Render_PCursor(int x, int y, int p, float r, float g, float b)
 {
     if(GFX.PCursor.inited)
         XRender::renderTexture(x, y, GFX.PCursor, r, g, b);
@@ -878,7 +878,7 @@ inline void Render_PCursor(int x, int y, int p, float r, float g, float b)
 }
 
 // render the character select screen
-void Chars_Mouse_Render(int x, int w, int y, int h, bool mouse, bool render)
+static void Chars_Mouse_Render(int x, int w, int y, int h, bool mouse, bool render)
 {
     int menu_w = 200;
     if(menu_w > w)
@@ -992,7 +992,7 @@ void Chars_Mouse_Render(int x, int w, int y, int h, bool mouse, bool render)
 }
 
 // each player gets a precious 5 lines to display and handle as much unique info as possible
-bool Player_Mouse_Render(int p, int pX, int cX, int pY, int line, bool mouse, bool render)
+static bool Player_Mouse_Render(const int p, int pX, int cX, int pY, int line, bool mouse, bool render)
 {
     bool ret = false;
 
@@ -1000,6 +1000,13 @@ bool Player_Mouse_Render(int p, int pX, int cX, int pY, int line, bool mouse, bo
     float r = (p == 0 ? 1.f : 0.f);
     float g = (p == 1 ? 1.f : 0.f);
     float b = (p > 1 ? 1.f : 0.f);
+
+    if(p < 0 || p >= maxLocalPlayers)
+    {
+        // `p` should not be bigger than `maxLocalPlaeyrs`, otherwise the out of range at `s_playerState`
+        SDL_assert(p >=0 && p < maxLocalPlayers);
+        return false;
+    }
 
     // note that all cursor rendering is done using MCursor[1] (the scroll-up indicator), rotated,
     //   because the standard cursor icons are already tinted.
