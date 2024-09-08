@@ -101,13 +101,16 @@ void Screen_t::set_canonical_screen(uint8_t index)
 
     if(m_CanonicalScreen != 0)
     {
-        if(this >= &Screens[0] && this <= &Screens[c_screenCount - 1])
-            canonical_screen().m_VisibleScreen = this - &Screens[0];
-        else
-            canonical_screen().m_VisibleScreen = 0;
+        Screen_t *mainScreen = &Screens[0];
+        Screen_t &canScreen = canonical_screen();
 
-        canonical_screen().m_CanonicalScreen = 0;
-        canonical_screen().players = players;
+        if(this >= mainScreen && this <= &Screens[c_screenCount - 1])
+            canScreen.m_VisibleScreen = static_cast<uint8_t>(this - mainScreen);
+        else
+            canScreen.m_VisibleScreen = 0;
+
+        canScreen.m_CanonicalScreen = 0;
+        canScreen.players = players;
     }
 }
 

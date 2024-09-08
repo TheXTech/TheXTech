@@ -1468,6 +1468,13 @@ int PlayerBox::Mouse_Render_1P(bool render)
     int p = CalcIndex();
     bool mouse = !render;
 
+    if(p < 0 || p >= maxLocalPlayers)
+    {
+        // `p` should not be bigger than `maxLocalPlaeyrs`, otherwise the out of range at `s_playerState`
+        SDL_assert(p >=0 && p < maxLocalPlayers);
+        return false;
+    }
+
     if(mouse && !render && !SharedCursor.Move && !SharedCursor.Primary && !SharedCursor.Secondary && !SharedCursor.ScrollUp && !SharedCursor.ScrollDown)
         return 0;
 
