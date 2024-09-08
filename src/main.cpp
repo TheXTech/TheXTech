@@ -715,6 +715,9 @@ int main(int argc, char**argv)
 
     OpenConfig_preSetup();
 
+    setup.noSound = g_audioSetup.disableSound;
+    setup.renderType = g_videoSettings.renderMode;
+    setup.vSync = g_videoSettings.vSync;
     setup.verboseLogging = true;
     setup.frameSkip = false;
     setup.testShowFPS = true;
