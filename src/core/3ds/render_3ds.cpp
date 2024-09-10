@@ -1080,13 +1080,9 @@ void lazyLoad(StdPicture& target)
         }
         else if(!target.l.mask_path.empty())
         {
-            FIBITMAP* FI_mask_rgba = robust_FILoad(target.l.mask_path, target.w);
+            FIBITMAP* FI_mask = robust_FILoad(target.l.mask_path, target.w);
 
-            if(FI_mask_rgba)
-            {
-                GraphicsHelps::getMaskFromRGBA(FI_mask_rgba, FI_mask);
-                GraphicsHelps::closeImage(FI_mask_rgba);
-            }
+            GraphicsHelps::RGBAToMask(FI_mask);
 
             // marginally faster, but inaccurate
             force_merge = true;

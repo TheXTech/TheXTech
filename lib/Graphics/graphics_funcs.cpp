@@ -233,11 +233,7 @@ FIBITMAP *GraphicsHelps::loadMask(const std::string &file, bool maskIsPng, bool 
 
     // this is the main reason that we have a separate call: extract a bitmask from a PNG RGBA image
     if(maskIsPng)
-    {
-        FIBITMAP *front = FreeImage_Copy(mask, 0, 0, int(FreeImage_GetWidth(mask)), int(FreeImage_GetHeight(mask)));
-        getMaskFromRGBA(front, mask);
-        closeImage(front);
-    }
+        RGBAToMask(mask);
 
     return mask;
 }
@@ -255,11 +251,7 @@ FIBITMAP *GraphicsHelps::loadMask(const Files::Data &raw, bool maskIsPng, bool c
 
     // this is the main reason that we have a separate call: extract a bitmask from a PNG RGBA image
     if(maskIsPng)
-    {
-        FIBITMAP *front = FreeImage_Copy(mask, 0, 0, int(FreeImage_GetWidth(mask)), int(FreeImage_GetHeight(mask)));
-        getMaskFromRGBA(front, mask);
-        closeImage(front);
-    }
+        RGBAToMask(mask);
 
     return mask;
 }
@@ -302,39 +294,29 @@ void GraphicsHelps::closeImage(FIBITMAP *img)
     FreeImage_Unload(img);
 }
 
-void GraphicsHelps::getMaskFromRGBA(FIBITMAP *&image, FIBITMAP *&mask)
+void GraphicsHelps::RGBAToMask(FIBITMAP *mask)
 {
-    unsigned int img_w   = FreeImage_GetWidth(image);
-    unsigned int img_h   = FreeImage_GetHeight(image);
-
-    mask = FreeImage_AllocateT(FIT_BITMAP,
-                               int(img_w), int(img_h),
-                               int(FreeImage_GetBPP(image)),
-                               FreeImage_GetRedMask(image),
-                               FreeImage_GetGreenMask(image),
-                               FreeImage_GetBlueMask(image));
-
     if(!mask)
-    {
-        pLogCritical("Out of memory when extracting mask!");
         return;
-    }
 
-    RGBQUAD Fpix;
-    RGBQUAD Npix = {0x0, 0x0, 0x0, 0xFF};
+    // convert alpha channel to luminance
+    unsigned int img_w  = FreeImage_GetWidth(mask);
+    unsigned int img_h  = FreeImage_GetHeight(mask);
+
+    uint8_t *pixel_data = reinterpret_cast<uint8_t*>(FreeImage_GetBits(mask));
+    auto dest_px_stride = static_cast<uint32_t>(FreeImage_GetPitch(mask));
 
     for(unsigned int y = 0; (y < img_h); y++)
     {
         for(unsigned int x = 0; (x < img_w); x++)
         {
-            FreeImage_GetPixelColor(image, x, y, &Fpix);
+            uint8_t* pixel = &pixel_data[dest_px_stride * y + 4 * x];
 
-            uint8_t grey = (255 - Fpix.rgbReserved);
-            Npix.rgbRed  = grey;
-            Npix.rgbGreen = grey;
-            Npix.rgbBlue = grey;
-            Npix.rgbReserved = 0xFF;
-            FreeImage_SetPixelColor(mask,  x, y, &Npix);
+            uint8_t grey = 0xFF - pixel[3];
+            pixel[0] = grey;
+            pixel[1] = grey;
+            pixel[2] = grey;
+            pixel[3] = 0xFF;
         }
     }
 }
@@ -362,10 +344,8 @@ void GraphicsHelps::mergeWithMask(FIBITMAP *image,
     FIBITMAP *mask = pathToMask.empty() ? nullptr : loadImage(pathToMask, true);
     if(!mask && !pathToMaskFallback.empty())
     {
-        FIBITMAP *front = loadImage(pathToMaskFallback, true);
-        if(front)
-            getMaskFromRGBA(front, mask);
-        closeImage(front);
+        mask = loadImage(pathToMaskFallback, true);
+        RGBAToMask(mask);
     }
 
     if(!mask)
@@ -390,12 +370,7 @@ void GraphicsHelps::mergeWithMask(FIBITMAP *image, const Files::Data &maskRaw, b
         return;//Nothing to do
 
     if(maskIsPng)
-    {
-        FIBITMAP *newMask = nullptr;
-        getMaskFromRGBA(mask, newMask);
-        closeImage(mask);
-        mask = newMask;
-    }
+        RGBAToMask(mask);
 
     mergeWithMask(image, mask);
 

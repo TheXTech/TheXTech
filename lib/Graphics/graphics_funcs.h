@@ -104,11 +104,10 @@ public:
     static void closeImage(FIBITMAP *img);
 
     /**
-     * @brief Generate mask from off RGBA source
-     * @param image [in] Source Image
-     * @param mask [out] Target image to write a mask
+     * @brief Generate mask from an RGBA source
+     * @param mask [inout] Mask initially in RGBA format
      */
-    static void getMaskFromRGBA(FIBITMAP*&image, FIBITMAP *&mask);
+    static void RGBAToMask(FIBITMAP* mask);
 
     /*!
      * \brief Merges mask and foreground image with bit blitting algorithm
