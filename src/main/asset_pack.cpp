@@ -442,6 +442,9 @@ static std::string s_prepare_assets_path(const std::string& path)
     {
         // mount target, then replace path
         auto archive_end = target_path.begin();
+        // don't check for path end until after the first slash
+        while(archive_end != target_path.end() && *archive_end != '/' && *archive_end != '\\')
+            ++archive_end;
         while(archive_end != target_path.end() && *archive_end != ':')
             ++archive_end;
 
