@@ -144,6 +144,8 @@ bool WindowSDL::initSDL(uint32_t windowInitFlags)
     if(!g_gameInfo.title.empty())
         window_name = g_gameInfo.titleWindow();
 
+    D_pLogDebug("SDL2: Extra WindowFlags: %u", windowInitFlags);
+
     m_window = SDL_CreateWindow(window_name.c_str(),
                                 SDL_WINDOWPOS_CENTERED,
                                 SDL_WINDOWPOS_CENTERED,
