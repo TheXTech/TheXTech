@@ -102,10 +102,11 @@ SDL_RWops* open_file(const char* name)
     {
         const char* archive_path_start = name + 1;
         const char* archive_path_end = archive_path_start;
-        while(*archive_path_end != '\0')
-            archive_path_end++;
-        while(*archive_path_end != ':' && archive_path_end != archive_path_start)
-            archive_path_end--;
+        // don't check for path end until after the first slash
+        while(*archive_path_end != '\0' && *archive_path_end != '/' && *archive_path_end != '\\')
+            ++archive_path_end;
+        while(*archive_path_end != '\0' && *archive_path_end != ':')
+            ++archive_path_end;
 
         if(archive_path_end == archive_path_start || *archive_path_end == '\0')
             return nullptr;
