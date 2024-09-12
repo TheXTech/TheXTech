@@ -140,6 +140,8 @@ bool WindowSDL::initSDL(uint32_t windowInitFlags)
     windowInitFlags &= ~SDL_WINDOW_FULLSCREEN;
 #endif
 
+    D_pLogDebug("SDL2: Extra WindowFlags: %u", windowInitFlags);
+
     m_window = SDL_CreateWindow(m_windowTitle.c_str(),
                                 SDL_WINDOWPOS_CENTERED,
                                 SDL_WINDOWPOS_CENTERED,
