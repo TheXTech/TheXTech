@@ -1002,12 +1002,8 @@ void TouchScreenController::scanTouchDevices()
             auto &d = m_devices[i];
             d.id = SDL_GetTouchDevice(i);
 
-// A reminder to don't forget change the condition after SDL2 gets updated
-#if SDL_VERSION_ATLEAST(2, 30, 7)
-#   error PLEASE CHANGE THE CONDITION FOR SDL2 VERSION TO THE VERSION 2.30.8!
-#endif
-
-#if !defined(VITA) || SDL_VERSION_ATLEAST(2, 30, 6) // FIXME: Enable this tweak after SDL2 side will be fixed
+// At the SDL2 older than 2.30.8 is a bug that valid touch device was treated as invalid on Vita. This problem had been resolved since 2.30.8.
+#if !defined(VITA) || SDL_VERSION_ATLEAST(2, 30, 8)
             if(!d.id) // Invalid touch device, will be dropped from the list
             {
                 d.id = -1;
