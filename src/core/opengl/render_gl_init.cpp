@@ -162,7 +162,11 @@ bool RenderGL::initOpenGL(const CmdLineSetup_t &setup)
 #endif
 
 #ifdef THEXTECH_BUILD_GL_DESKTOP_LEGACY
+#   ifdef __APPLE__
+    try_init_gl(m_gContext, m_window, 0, 1, 1, RENDER_ACCELERATED_OPENGL_LEGACY);
+#   else
     try_init_gl(m_gContext, m_window, SDL_GL_CONTEXT_PROFILE_COMPATIBILITY, 1, 1, RENDER_ACCELERATED_OPENGL_LEGACY);
+#   endif
 #endif
 
 #ifdef THEXTECH_BUILD_GL_ES_LEGACY
