@@ -874,7 +874,7 @@ void RenderGL::loadTextureInternal(StdPicture &target, uint32_t width, uint32_t 
     const GLenum cpu_format = GL_RGBA;
 #else
     target.d.format = (m_has_bgra_textures) ? GL_BGRA_EXT : GL_RGBA;
-    const GLenum cpu_format = GL_BRGA_EXT;
+    const GLenum cpu_format = GL_BGRA_EXT;
 #endif
 
     target.d.nOfColors = target.d.format;
