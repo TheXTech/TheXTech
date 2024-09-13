@@ -96,6 +96,8 @@ private:
             return "Core";
         case SDL_GL_CONTEXT_PROFILE_ES:
             return "ES";
+        case 0:
+            return "<Auto>";
         default:
             return "";
         }

@@ -869,7 +869,14 @@ void RenderGL::loadTextureInternal(StdPicture &target, uint32_t width, uint32_t 
     // SDL_Surface *surface;
     // SDL_Texture *texture = nullptr;
 
+#ifdef THEXTECH_BIG_ENDIAN
+    target.d.format = GL_RGBA;
+    const GLenum cpu_format = GL_RGBA;
+#else
     target.d.format = (m_has_bgra_textures) ? GL_BGRA_EXT : GL_RGBA;
+    const GLenum cpu_format = GL_BRGA_EXT;
+#endif
+
     target.d.nOfColors = target.d.format;
 
     GLuint tex_id;
@@ -889,7 +896,7 @@ void RenderGL::loadTextureInternal(StdPicture &target, uint32_t width, uint32_t 
     pitch /= 4;
 
     // can't do because of pixel substitution
-    if(pad_w == pitch && height == pad_h && target.d.format == GL_BGRA_EXT)
+    if(pad_w == pitch && height == pad_h && target.d.format == cpu_format)
     {
         use_pixels = RGBApixels;
     }
@@ -909,7 +916,7 @@ void RenderGL::loadTextureInternal(StdPicture &target, uint32_t width, uint32_t 
         else
             SDL_memset(padded_pixels, 0, pad_w * pad_h * 4);
 
-        if(target.d.format == GL_BGRA_EXT)
+        if(target.d.format == cpu_format)
         {
             uint32_t* padded_pixels_q = reinterpret_cast<uint32_t*>(padded_pixels);
             uint32_t* input_pixels_q = reinterpret_cast<uint32_t*>(RGBApixels);
