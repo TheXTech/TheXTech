@@ -421,7 +421,7 @@ static inline void s_get_NPC_tint(int A, XTColor& cn)
         }
     }
 
-    cn = n.Shadow ? XTColor(0, 0, 0) : XTColor();
+    cn = n.Shadow ? XTColor(64, 64, 64) : XTColor();
 }
 
 // draws a warning icon for offscreen active NPC A on vScreen Z
@@ -1816,7 +1816,7 @@ void UpdateGraphicsDraw(bool skipRepaint)
 
 void UpdateGraphicsScreen(Screen_t& screen)
 {
-    XTColor plr_shade = ShadowMode ? XTColor(0, 0, 0) : XTColor();
+    XTColor plr_shade = ShadowMode ? XTColor(64, 64, 64) : XTColor();
 
     int numScreens = screen.active_end();
 
@@ -2508,7 +2508,7 @@ void UpdateGraphicsScreen(Screen_t& screen)
                 {
                     g_stats.renderedEffects++;
 
-                    XTColor cn = Effect[A].Shadow ? XTColor(0, 0, 0) : XTColor();
+                    XTColor cn = Effect[A].Shadow ? XTColor(64, 64, 64) : XTColor();
                     XRender::renderTextureBasic(sX, sY, w, h,
                                            GFXEffect[Effect[A].Type], 0,
                                            Effect[A].Frame * EffectHeight[Effect[A].Type], cn);
@@ -2851,7 +2851,7 @@ void UpdateGraphicsScreen(Screen_t& screen)
         for(size_t i = 0; i < NPC_Draw_Queue_p.Held_n; i++)
         {
             int A = NPC_Draw_Queue_p.Held[i];
-            XTColor cn = NPC[A].Shadow ? XTColor(0, 0, 0) : XTColor();
+            XTColor cn = NPC[A].Shadow ? XTColor(64, 64, 64) : XTColor();
 
             if(NPC[A].Type == NPCID_ICE_CUBE)
             {
@@ -3045,7 +3045,7 @@ void UpdateGraphicsScreen(Screen_t& screen)
                 {
                     g_stats.renderedEffects++;
 
-                    XTColor cn = e.Shadow ? XTColor(0, 0, 0) : XTColor();
+                    XTColor cn = e.Shadow ? XTColor(64, 64, 64) : XTColor();
                     XRender::renderTextureBasic(sX, sY, w, h,
                         GFXEffectBMP[e.Type], 0, e.Frame * EffectHeight[e.Type], cn);
                 }

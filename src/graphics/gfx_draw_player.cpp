@@ -205,7 +205,7 @@ void DrawPlayer(Player_t &p, const int Z, XTColor color)
 
     int B = 0;
     // double C = 0;
-    XTColor s = (ShadowMode ? XTColor(0, 0, 0, color.a) : color);
+    XTColor s = (ShadowMode ? XTColor(64, 64, 64, color.a) : color);
     //auto &p = Player[A];
 
     int sX = camX + s_round2int_plr(p.Location.X);
