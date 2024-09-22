@@ -25,14 +25,8 @@ namespace detail
 
 static constexpr size_t s_rwops_input_adapter_buffer_size = 2048;
 
-/*!
-Input adapter for SDL_RWops file access. Uses a 2KB cache.
-*/
-class rwops_input_adapter
+namespace rwops
 {
-public:
-    using char_type = uint8_t;
-
     // Primary template of char_traits calls std char_traits
     template<typename T>
     struct char_traits : std::char_traits<T>
@@ -61,6 +55,15 @@ public:
             return static_cast<int_type>(EOF);
         }
     };
+}
+
+/*!
+Input adapter for SDL_RWops file access. Uses a 2KB cache.
+*/
+class rwops_input_adapter
+{
+public:
+    using char_type = uint8_t;
 
     explicit rwops_input_adapter(SDL_RWops* rwops) noexcept
         : m_rwops(rwops) {}
@@ -72,7 +75,7 @@ public:
     rwops_input_adapter& operator=(rwops_input_adapter&&) = delete;
     ~rwops_input_adapter() = default;
 
-    char_traits<uint8_t>::int_type get_character() noexcept
+    rwops::char_traits<uint8_t>::int_type get_character() noexcept
     {
         if(m_temp_buf_cur >= m_temp_buf_end)
         {
@@ -80,7 +83,7 @@ public:
             m_temp_buf_end = SDL_RWread(m_rwops, &m_temp_buf[0], 1, sizeof(m_temp_buf));
 
             if(m_temp_buf_end == 0)
-                char_traits<uint8_t>::eof();
+                rwops::char_traits<uint8_t>::eof();
         }
 
         return m_temp_buf[m_temp_buf_cur++];
