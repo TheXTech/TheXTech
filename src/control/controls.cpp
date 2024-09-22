@@ -416,6 +416,7 @@ bool InputMethodType::DeleteProfile(InputMethodProfile* profile, const std::vect
         }
 
         player_no ++;
+        UNUSED(player_no);
     }
 
     for(int i = 0; i < maxLocalPlayers; i++)
