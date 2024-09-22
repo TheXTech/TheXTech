@@ -1,3 +1,28 @@
+#ifndef PRIV_RVOPS_PATCH
+#define PRIV_RVOPS_PATCH
+
+#   ifndef JSON_NO_IO
+#include <string>
+#include <SDL2/SDL_rwops.h>
+
+#ifdef NLOHMANN_JSON_NAMESPACE_BEGIN
+#   error Include this file BEFORE the <json/json.hpp>!
+#endif
+
+#define NLOHMANN_JSON_NAMESPACE_NO_VERSION 1 // Disable versioning
+
+namespace nlohmann
+{
+#if NLOHMANN_JSON_NAMESPACE_NO_VERSION
+inline namespace json_abi
+#else
+inline namespace json_abi_v3_11_2
+#endif
+{
+namespace detail
+{
+
+
 static constexpr size_t s_rwops_input_adapter_buffer_size = 2048;
 
 /*!
@@ -5,7 +30,7 @@ Input adapter for SDL_RWops file access. Uses a 2KB cache.
 */
 class rwops_input_adapter
 {
-  public:
+public:
     using char_type = uint8_t;
 
     explicit rwops_input_adapter(SDL_RWops* rwops) noexcept
@@ -32,7 +57,7 @@ class rwops_input_adapter
         return m_temp_buf[m_temp_buf_cur++];
     }
 
-  private:
+private:
     /// the rwops stream to read from
     SDL_RWops* m_rwops;
 
@@ -45,3 +70,12 @@ inline rwops_input_adapter input_adapter(SDL_RWops* rwops)
 {
     return rwops_input_adapter(rwops);
 }
+
+
+
+} // namespace detail
+} // inline namespace json_abi
+} // namespace nlohmann
+
+#   endif // #ifndef JSON_NO_IO
+#endif // PRIV_RVOPS_PATCH

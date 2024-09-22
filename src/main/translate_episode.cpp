@@ -18,6 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <json/json_rwops_input.hpp>
 #include <json/json.hpp>
 #include <Logger/logger.h>
 #include <Utils/files.h>

@@ -23,6 +23,7 @@
 #include <AppPath/app_path.h>
 #include <Utils/files.h>
 #include <Utils/strings.h>
+#include <json/json_rwops_input.hpp>
 #include <json/json.hpp>
 #include <fmt_format_ne.h>
 

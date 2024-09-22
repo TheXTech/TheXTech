@@ -21,6 +21,7 @@
 #include "sdl_proxy/sdl_stdinc.h"
 #include "sdl_proxy/sdl_timer.h"
 
+#include <json/json_rwops_input.hpp>
 #include <json/json.hpp>
 
 #include "core/render.h"
