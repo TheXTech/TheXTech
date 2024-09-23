@@ -65,8 +65,8 @@ uint32_t s_loadedVRAM = 0;
 struct tex_load_data
 {
     Files::Data data;
-    GL_TEXTURE_SIZE_ENUM w, h;
-    int name;
+    GL_TEXTURE_SIZE_ENUM w, last_h;
+    int name[3] = {};
     int params;
 
     inline const uint16_t* palette() const
@@ -77,73 +77,94 @@ struct tex_load_data
         return reinterpret_cast<const uint16_t*>(data.begin());
     }
 
-    inline const uint8_t* pixels() const
+    inline GL_TEXTURE_SIZE_ENUM h(int i) const
     {
-        if(!data.valid() || data.size() < 32)
+        bool is_last = (i == 2) || (name[i + 1] == 0);
+
+        return (is_last) ? last_h : TEXTURE_SIZE_1024;
+    }
+
+    inline const uint8_t* pixels(int i) const
+    {
+        if(!data.valid())
             return nullptr;
 
-        return data.begin() + 32;
+        unsigned w_px = 1 << (3 + w);
+        unsigned pixel_data_offset = 32 + i * w_px * 1024 / 2;
+
+        if(data.size() < pixel_data_offset)
+            return nullptr;
+
+        return data.begin() + pixel_data_offset;
     }
 };
 
 static std::vector<tex_load_data> s_texture_load_queue;
 
-static bool s_loadTextureToRAM(tex_load_data& tex, const std::string& path, int logical_w, int logical_h, int flags)
+static int s_loadTextureToRAM(tex_load_data& tex, const std::string& path, int logical_w, int logical_h, int flags)
 {
-    logical_w >>= (1 + (flags & 15));
-    logical_h >>= (1 + (flags & 15));
+    int texture_w = logical_w >> (1 + (flags & 15));
+    int texture_h = logical_h >> (1 + (flags & 15));
 
-    if(logical_w > 1024)
-        return false;
-    else if(logical_w > 512)
+    int complete_texture_count = (texture_h - 1) / 1024;
+    int last_texture_h = ((texture_h - 1) % 1024) + 1;
+
+    // only load 3 textures at most
+    if(texture_h > 3072)
+    {
+        complete_texture_count = 2;
+        last_texture_h = 1024;
+    }
+
+    if(texture_w > 1024)
+        return 0;
+    else if(texture_w > 512)
         tex.w = TEXTURE_SIZE_1024;
-    else if(logical_w > 256)
+    else if(texture_w > 256)
         tex.w = TEXTURE_SIZE_512;
-    else if(logical_w > 128)
+    else if(texture_w > 128)
         tex.w = TEXTURE_SIZE_256;
-    else if(logical_w > 64)
+    else if(texture_w > 64)
         tex.w = TEXTURE_SIZE_128;
-    else if(logical_w > 32)
+    else if(texture_w > 32)
         tex.w = TEXTURE_SIZE_64;
-    else if(logical_w > 16)
+    else if(texture_w > 16)
         tex.w = TEXTURE_SIZE_32;
-    else if(logical_w > 8)
+    else if(texture_w > 8)
         tex.w = TEXTURE_SIZE_16;
     else
         tex.w = TEXTURE_SIZE_8;
 
-    if(logical_h > 1024)
-        return false;
-    else if(logical_h > 512)
-        tex.h = TEXTURE_SIZE_1024;
-    else if(logical_h > 256)
-        tex.h = TEXTURE_SIZE_512;
-    else if(logical_h > 128)
-        tex.h = TEXTURE_SIZE_256;
-    else if(logical_h > 64)
-        tex.h = TEXTURE_SIZE_128;
-    else if(logical_h > 32)
-        tex.h = TEXTURE_SIZE_64;
-    else if(logical_h > 16)
-        tex.h = TEXTURE_SIZE_32;
-    else if(logical_h > 8)
-        tex.h = TEXTURE_SIZE_16;
+    if(last_texture_h > 1024)
+        return 0;
+    else if(last_texture_h > 512)
+        tex.last_h = TEXTURE_SIZE_1024;
+    else if(last_texture_h > 256)
+        tex.last_h = TEXTURE_SIZE_512;
+    else if(last_texture_h > 128)
+        tex.last_h = TEXTURE_SIZE_256;
+    else if(last_texture_h > 64)
+        tex.last_h = TEXTURE_SIZE_128;
+    else if(last_texture_h > 32)
+        tex.last_h = TEXTURE_SIZE_64;
+    else if(last_texture_h > 16)
+        tex.last_h = TEXTURE_SIZE_32;
+    else if(last_texture_h > 8)
+        tex.last_h = TEXTURE_SIZE_16;
     else
-        tex.h = TEXTURE_SIZE_8;
-
+        tex.last_h = TEXTURE_SIZE_8;
 
     // calculate number of bytes desired
     // TEXTURE_SIZE_8 is an int with value 0
     uint16_t w_px = 1 << (3 + tex.w);
-    uint16_t h_px = 1 << (3 + tex.h);
+    uint16_t h_px = (1 << (3 + tex.last_h)) + (1024 * complete_texture_count);
     uint32_t data_size = w_px * h_px / 2;
 
-
     // don't even try to load a texture that would require >=25% of VRAM
-    if(data_size > 65536)
+    if(data_size > 131072)
     {
         pLogWarning("Refused to allocate %d bytes", data_size);
-        return false;
+        return 0;
     }
 
 
@@ -154,15 +175,15 @@ static bool s_loadTextureToRAM(tex_load_data& tex, const std::string& path, int 
     if(!tex.data.valid() || tex.data.size() != data_size + 32)
     {
         pLogWarning("Failed to load file %s (%d bytes, got %d)", path.c_str(), data_size + 32, (int)tex.data.size());
-        return false;
+        return 0;
     }
 
-    return true;
+    return complete_texture_count + 1;
 }
 
-static bool s_loadTexture(const std::string& path, int* tex_out, uint16_t* tex_w, uint16_t* tex_h, int logical_w, int logical_h, int flags)
+static int s_loadTexture(const std::string& path, int* tex_out, int* data_size, int logical_w, int logical_h, int flags)
 {
-    if(!tex_out || !tex_w || !tex_h)
+    if(!tex_out || !data_size)
     {
         pLogWarning("Got a null pointer to s_loadTexture");
         return false;
@@ -170,58 +191,76 @@ static bool s_loadTexture(const std::string& path, int* tex_out, uint16_t* tex_w
 
     tex_load_data tex;
 
-    if(logical_h > 2048)
-        logical_h = 2048;
+    int tex_count = s_loadTextureToRAM(tex, path, logical_w, logical_h, flags);
 
-    if(!glGenTextures(1, &tex.name))
-    {
-        pLogWarning("Could not generate texture");
+    if(tex_count == 0)
         return false;
-    }
 
-    if(!s_loadTextureToRAM(tex, path, logical_w, logical_h, flags))
+    int loaded = 0;
+    uint32_t loaded_data_size = 0;
+
+    for(int i = 0; i < tex_count; i++)
     {
-        glDeleteTextures(1, &tex.name);
-        return false;
-    }
-
-    uint16_t w_px = 1 << (3 + tex.w);
-    uint16_t h_px = 1 << (3 + tex.h);
-    uint32_t data_size = w_px * h_px / 2;
-
-    tex.params = TEXGEN_OFF;
-    if((flags & 16) == 0)
-        tex.params |= GL_TEXTURE_COLOR0_TRANSPARENT;
-
-    glBindTexture(0, tex.name);
-
-    // allocate, but do not load to VRAM yet
-    if(!glTexImage2D(0, 0, GL_RGB16, tex.w, tex.h, 0, tex.params, nullptr))
-    {
-        pLogWarning("Could not load texture (%u bytes) to VRAM (%u/524288 used). Requesting free texture memory.", data_size, s_loadedVRAM);
-        minport_freeTextureMemory();
-
-        if(!glTexImage2D(0, 0, GL_RGB16, tex.w, tex.h, 0, tex.params, nullptr))
+        if(!glGenTextures(1, &tex.name[i]))
         {
-            pLogWarning("Still could not load texture (%u bytes) to VRAM (%u/524288 used).", data_size, s_loadedVRAM);
-            glDeleteTextures(1, &tex.name);
-            return false;
+            pLogWarning("Could not generate texture");
+            break;
         }
+
+        uint16_t h_enum = (i == tex_count - 1) ? tex.last_h : TEXTURE_SIZE_1024;
+
+        uint16_t w_px = 1 << (3 + tex.w);
+        uint16_t h_px = 1 << (3 + h_enum);
+        uint32_t part_data_size = w_px * h_px / 2;
+
+        tex.params = TEXGEN_OFF;
+        if((flags & 16) == 0)
+            tex.params |= GL_TEXTURE_COLOR0_TRANSPARENT;
+
+        glBindTexture(0, tex.name[i]);
+
+        // allocate, but do not load to VRAM yet
+        if(!glTexImage2D(0, 0, GL_RGB16, tex.w, h_enum, 0, tex.params, nullptr))
+        {
+            pLogWarning("Could not load texture (%u bytes) to VRAM (%u/524288 used). Requesting free texture memory.", part_data_size, s_loadedVRAM);
+            minport_freeTextureMemory();
+
+            if(!glTexImage2D(0, 0, GL_RGB16, tex.w, h_enum, 0, tex.params, nullptr))
+            {
+                pLogWarning("Still could not load texture (%u bytes) to VRAM (%u/524288 used).", part_data_size, s_loadedVRAM);
+                glDeleteTextures(1, &tex.name[i]);
+                break;
+            }
+        }
+
+        glColorTableEXT_alloc_only(0, 0, 16, 0, 0);
+
+        tex_out[i] = tex.name[i];
+
+        loaded++;
+        loaded_data_size += part_data_size;
     }
 
-    glColorTableEXT_alloc_only(0, 0, 16, 0, 0);
+    if(loaded != tex_count)
+    {
+        for(int i = 0; i < loaded; i++)
+        {
+            glDeleteTextures(1, &tex.name[i]);
+            tex.name[i] = 0;
+            tex_out[i] = 0;
+        }
 
-    *tex_out = tex.name;
-    *tex_w = w_px;
-    *tex_h = h_px;
+        return 0;
+    }
 
-    s_loadedVRAM += data_size;
+    s_loadedVRAM += loaded_data_size;
+    *data_size = loaded_data_size;
 
     s_texture_load_queue.push_back(std::move(tex));
 
     // pLogDebug("Loaded tex from %s!", path.c_str());
 
-    return true;
+    return loaded;
 }
 
 static RenderPlanes_t s_render_planes;
@@ -500,9 +539,15 @@ void repaint()
     {
         for(const auto& tex : s_texture_load_queue)
         {
-            glBindTexture(0, tex.name);
-            glColorSubTableEXT(0, 0, 16, 0, 0, tex.palette());
-            glTexImage2D(0, 0, GL_RGB16, tex.w, tex.h, 0, tex.params, tex.pixels());
+            for(int i = 0; i < 2; i++)
+            {
+                if(!tex.name[i])
+                    break;
+
+                glBindTexture(0, tex.name[i]);
+                glColorSubTableEXT(0, 0, 16, 0, 0, tex.palette());
+                glTexImage2D(0, 0, GL_RGB16, tex.w, tex.h(i), 0, tex.params, tex.pixels(i));
+            }
         }
 
         s_texture_load_queue.clear();
@@ -694,29 +739,10 @@ void lazyLoad(StdPicture &target)
 
     std::string suppPath;
 
-    if(!s_loadTexture(target.l.path, &target.d.texture[0], &target.d.tex_w[0], &target.d.tex_h[0], target.w, target.h, target.l.flags))
+    if(!s_loadTexture(target.l.path, target.d.texture, &target.d.data_size, target.w, target.h, target.l.flags))
     {
         pLogWarning("Permanently failed to load %s", target.l.path.c_str());
         return;
-    }
-
-    if(target.h > 2048)
-    {
-        suppPath = target.l.path + '1';
-        if(!s_loadTexture(suppPath, &target.d.texture[1], &target.d.tex_w[1], &target.d.tex_h[1], target.w, target.h - 2048, target.l.flags))
-        {
-            pLogWarning("Permanently failed to load %s", suppPath.c_str());
-            return;
-        }
-    }
-    if(target.h > 4096)
-    {
-        suppPath = target.l.path + '2';
-        if(!s_loadTexture(suppPath, &target.d.texture[2], &target.d.tex_w[2], &target.d.tex_h[2], target.w, target.h - 4096, target.l.flags))
-        {
-            pLogWarning("Permanently failed to load %s", suppPath.c_str());
-            return;
-        }
     }
 
     return;
@@ -731,9 +757,7 @@ void clearAllTextures()
 {
     for(StdPicture* tx : s_texture_bank)
     {
-        s_loadedVRAM -= (tx->d.tex_w[0] * tx->d.tex_h[0]
-            + tx->d.tex_w[1] * tx->d.tex_h[1]
-            + tx->d.tex_w[2] * tx->d.tex_h[2]) / 2;
+        s_loadedVRAM -= tx->d.data_size;
 
         minport_unlinkTexture(tx);
         tx->d.destroy();
@@ -762,12 +786,8 @@ void unloadTexture(StdPicture &tx)
 
     if(tx.d.reallyHasTexture())
     {
-        D_pLogDebug("Freeing %d bytes from %s", (tx.d.tex_w[0] * tx.d.tex_h[0]
-            + tx.d.tex_w[1] * tx.d.tex_h[1]
-            + tx.d.tex_w[2] * tx.d.tex_h[2]) / 2, tx.l.path.c_str());
-        s_loadedVRAM -= (tx.d.tex_w[0] * tx.d.tex_h[0]
-            + tx.d.tex_w[1] * tx.d.tex_h[1]
-            + tx.d.tex_w[2] * tx.d.tex_h[2]) / 2;
+        D_pLogDebug("Freeing %d bytes from %s", tx.d.data_size);
+        s_loadedVRAM -= tx.d.data_size;
     }
 
     tx.d.destroy();
@@ -827,35 +847,39 @@ void minport_RenderTexturePrivate(int16_t xDst, int16_t yDst, int16_t wDst, int1
     int to_draw = 0;
     int to_draw_2 = 0;
 
-    if(ySrc + hSrc > 1024)
+    int tex_part_height = 1024 << (tx.l.flags & 15);
+
+    if(ySrc + hSrc > tex_part_height)
     {
-        if(ySrc + hSrc > 2048)
+        if(ySrc + hSrc > tex_part_height * 2)
         {
             if(tx.d.texture[2])
                 to_draw = tx.d.texture[2];
-            if(ySrc < 2048 && tx.d.texture[1])
+            if(ySrc < tex_part_height * 2 && tx.d.texture[1])
                 to_draw_2 = tx.d.texture[1];
-            ySrc -= 1024;
+
+            ySrc -= tex_part_height;
         }
         else
         {
             if(tx.d.texture[1])
                 to_draw = tx.d.texture[1];
-            if(ySrc < 1024)
+            if(ySrc < tex_part_height)
                 to_draw_2 = tx.d.texture[0];
         }
+
         // draw the top pic
         if(to_draw_2)
         {
-            GL_DrawImage_Custom(to_draw_2, tx.l.flags, xDst, yDst, wDst, (1024 - ySrc) * hDst / hSrc,
-                                xSrc, ySrc, wSrc, 1024 - ySrc, flip, color);
-            yDst += (1024 - ySrc) * hDst / hSrc;
-            hDst -= (1024 - ySrc) * hDst / hSrc;
-            hSrc -= (1024 - ySrc);
+            GL_DrawImage_Custom(to_draw_2, tx.l.flags, xDst, yDst, wDst, (tex_part_height - ySrc) * hDst / hSrc,
+                                xSrc, ySrc, wSrc, tex_part_height - ySrc, flip, color);
+            yDst += (tex_part_height - ySrc) * hDst / hSrc;
+            hDst -= (tex_part_height - ySrc) * hDst / hSrc;
+            hSrc -= (tex_part_height - ySrc);
             ySrc = 0;
         }
         else
-            ySrc -= 1024;
+            ySrc -= tex_part_height;
     }
     else
     {
@@ -886,42 +910,16 @@ void minport_RenderTexturePrivate_Basic(int16_t xDst, int16_t yDst, int16_t wDst
     if(!tx.d.reallyHasTexture())
         return;
 
-    int to_draw = 0;
-    int to_draw_2 = 0;
-
-    if(ySrc + hDst > 1024)
+    if(tx.d.texture[1])
     {
-        if(ySrc + hDst > 2048)
-        {
-            if(tx.d.texture[2])
-                to_draw = tx.d.texture[2];
-            if(ySrc < 2048 && tx.d.texture[1])
-                to_draw_2 = tx.d.texture[1];
-            ySrc -= 1024;
-        }
-        else
-        {
-            if(tx.d.texture[1])
-                to_draw = tx.d.texture[1];
-            if(ySrc < 1024)
-                to_draw_2 = tx.d.texture[0];
-        }
+        return minport_RenderTexturePrivate(xDst, yDst, wDst, hDst,
+                             tx,
+                             xSrc, ySrc, wDst, hDst,
+                             0, nullptr, 0,
+                             color);
+    }
 
-        // draw the top pic
-        if(to_draw_2)
-        {
-            GL_DrawImage_Custom_Basic(to_draw_2, tx.l.flags, xDst, yDst, wDst, 1024 - ySrc, xSrc, ySrc, color);
-            yDst += (1024 - ySrc);
-            hDst -= (1024 - ySrc);
-            ySrc = 0;
-        }
-        else
-            ySrc -= 1024;
-    }
-    else
-    {
-        to_draw = tx.d.texture[0];
-    }
+    int to_draw = tx.d.texture[0];
 
     if(!to_draw) return;
 
