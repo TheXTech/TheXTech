@@ -48,7 +48,7 @@ static inline int s_round2int_plr(double d)
 //! Get left pixel at the player sprite
 int pfrX(const StdPicture& tx, const Player_t& p)
 {
-#if !defined(THEXTECH_WIP_FEATURES) && !defined(__16M__)
+#if !defined(THEXTECH_WIP_FEATURES) && !defined(PGE_MIN_PORT)
     UNUSED(tx);
     return ((p.Frame * p.Direction + 49) / 10) * 100;
 
@@ -58,7 +58,7 @@ int pfrX(const StdPicture& tx, const Player_t& p)
     // will use internal flags (tx.flags & PLAYER_MODERN and tx.flags & PLAYER_CUSTOM) in future
     // if tx.flags & PLAYER_CUSTOM, then will use heap-allocated polymorphic CustomData_t* tx.custom_data,
     // which will include all frame bounding boxes and offsets
-    if(tx.w == 1000)
+    if(tx.h != 512)
         return ((p.Frame * p.Direction + 49) / 10) * 100;
     else
     {
@@ -68,13 +68,15 @@ int pfrX(const StdPicture& tx, const Player_t& p)
 
         int fr = (p.Frame <= 32) ? p.Frame : p.Frame - 7;
 
+        bool is_center_frame = (fr == 0);
+
         if(p.Character == 5)
             fr -= 1;
 
         int col = fr / n_rows;
 
         // load left-facing frame (bottom) - right to left (in order to mirror top half)
-        if(fr != 0 && p.Direction < 0)
+        if(!is_center_frame && p.Direction < 0)
             return col_w * (n_cols - col - 1);
         // load right-facing frame (top) - left to right
         else
@@ -86,13 +88,13 @@ int pfrX(const StdPicture& tx, const Player_t& p)
 //! Get top pixel at the player sprite
 int pfrY(const StdPicture& tx, const Player_t& p)
 {
-#if !defined(THEXTECH_WIP_FEATURES) && !defined(__16M__)
+#if !defined(THEXTECH_WIP_FEATURES) && !defined(PGE_MIN_PORT)
     UNUSED(tx);
     return ((p.Frame * p.Direction + 49) % 10) * 100;
 
 #else
     // FIXME: Replace this heuristic logic with a proper texture flags mechanism
-    if(tx.w == 1000)
+    if(tx.h != 512)
         return ((p.Frame * p.Direction + 49) % 10) * 100;
     else
     {
@@ -101,13 +103,15 @@ int pfrY(const StdPicture& tx, const Player_t& p)
 
         int fr = (p.Frame <= 32) ? p.Frame : p.Frame - 7;
 
+        bool is_center_frame = (fr == 0);
+
         if(p.Character == 5)
             fr -= 1;
 
         int row = fr % n_rows;
 
         // load left-facing frame (bottom)
-        if(fr != 0 && p.Direction < 0)
+        if(!is_center_frame && p.Direction < 0)
             return row_h * (n_rows + row);
         // load right-facing frame (top)
         else
@@ -119,7 +123,7 @@ int pfrY(const StdPicture& tx, const Player_t& p)
 //! Get width at the player sprite
 int pfrW(const StdPicture& tx, const Player_t& p)
 {
-    if(tx.w == 1000)
+    if(tx.h != 512)
         return 100;
     else if(p.Character == 5)
         return 64;
@@ -132,7 +136,7 @@ int pfrH(const StdPicture& tx, const Player_t& p)
 {
     UNUSED(p);
 
-    if(tx.w == 1000)
+    if(tx.h != 512)
         return 100;
     else
         return 64;
