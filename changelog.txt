@@ -54,7 +54,7 @@ Changelog for 1.3.7-dev
 -Fix vanilla peculiarity where some held NPCs would appear to move on the player's hands / feet, guarded by compat flag "fix-visual-bugs" [Modern Mode] (@ds-sloth)
 -Change cheat "shadowstar" to use a 75% black tint (instead of 100% as in SMBX 1.3) for visibility against dark level backgrounds (@0lhi, @ds-sloth)
 
-Changelog for 1.3.6.6-dev
+Changelog for 1.3.6.6
 -Fix vanilla bug where vehicle could be vulnerable if player entered it during AltJump (requires frame perfect down press), guarded by compat flag "fix-vehicle-altjump-bug" (@ds-sloth)
 -Fix vanilla bug where vehicle could not be exited if player entered it while holding AltJump key, guarded by compat flag "fix-vehicle-altjump-lock" (@ds-sloth)
 -Fixed the problem when a touch screen is not detected on some Android devices (@Wohlstand)
