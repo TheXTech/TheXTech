@@ -260,7 +260,7 @@ float shadow(const in vec2 target_pos, const in float target_plane, const in vec
 
     // don't cast shadows when going backwards from the source to the background
     float       long_term_plane  = source_plane;                // plane determining how shadows are cast, decreases from the source to the background
-    const int   long_term_steps  = int(8.0 * shadowResolution); // number of steps required to decrease the long term plane (8px)
+    const int   long_term_steps  = int(10.0 * shadowResolution); // number of steps required to decrease the long term plane (8px)
     int         last_switch_step = 0;                           // number of steps since last switch (used to decide when to update long_term_plane)
 
     // target shouldn't cast shadows on itself (fade these in)
@@ -290,7 +290,7 @@ float shadow(const in vec2 target_pos, const in float target_plane, const in vec
             if(plane_at == target_plane && i - last_target_step < self_shadow_fade)
             {
                 // restore if it's only been a single step
-                if(i - last_target_step < 2)
+                if(i - last_target_step < 6)
                 {
                     accum_conditional = last_accum_conditional;
                     mult_conditional = last_mult_conditional;
@@ -316,8 +316,8 @@ float shadow(const in vec2 target_pos, const in float target_plane, const in vec
             last_plane = plane_at;
         }
 
-        // no shadows from objects at lower planes (or effects)
-        if(plane_at <= long_term_plane || plane_at > 16.0)
+        // no shadows from objects at background planes when the light source is a higher planes (and no shadows from effects)
+        if(plane_at == long_term_plane || plane_at > 16.0 || plane_at < long_term_plane && plane_at < 7.0)
             accum += accum_rate;
         // BGOs only partially cast shadows on foreground
         else if(plane_at < 6.0 && target_plane >= 6.0)
@@ -425,7 +425,7 @@ float shadow2(const in uint light_type, const in vec2 target_pos, const in float
 
 void main()
 {
-    o_FragColor.rgb = vec3(0.0, 0.0, 0.0);
+    vec3 total_color = vec3(0.0, 0.0, 0.0);
 
     if(u_system_type == SYSTEM_TYPE_DISABLED)
         return;
@@ -460,7 +460,7 @@ void main()
         float rate = calculate_light_falloff(u_lights[i], light_type, v_fbcoord, source_pos);
         rate *= fade_light(u_lights[i], light_type, source_pos);
 
-        if(rate > best_rate) // if(rate > 0.0) if calculating average rate
+        if(rate > 0.0)
         {
             if(u_system_type == SYSTEM_TYPE_SHADOW_RAYS)
                 rate *= shadow(v_fbcoord, pixel_plane, source_pos, source_plane);
@@ -563,12 +563,13 @@ void main()
         {
             if(source_count > 0.0)
             {
-                // float average_rate = total_rate / source_count;
+                float average_rate = total_rate / source_count;
                 // float use_rate = (best_rate * 1.5 + average_rate) / 2.5;
+                // float use_rate = pow(average_rate, 0.5);
 
-                float use_rate = best_rate;
+                float use_rate = (light_type == LIGHT_TYPE_BOX) ? best_rate : total_rate;
 
-                o_FragColor.rgb += use_rate * light_color(u_lights[i].color);
+                total_color += use_rate * light_color(u_lights[i].color);
                 best_rate = 0.0;
                 total_rate = 0.0;
                 source_count = 0.0;
@@ -576,7 +577,9 @@ void main()
         }
     }
 
-    o_FragColor.rgb += light_color(u_ambient_color);
+    total_color += light_color(u_ambient_color);
+    vec3 falloff = tanh(total_color);
+    o_FragColor.rgb = min(falloff * 1.5, total_color);
     o_FragColor.a = 1.0;
 }
 )RAW";
