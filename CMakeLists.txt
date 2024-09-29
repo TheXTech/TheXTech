@@ -216,7 +216,6 @@ if(APPLE)
     set(THEXTECH_BUNDLE_NAME "TheXTech" CACHE STRING "Name of bundle folder")
     set(THEXTECH_ICON_NAME "thextech.icns" CACHE STRING "Name of bundle icon file")
     set(THEXTECH_CUSTOM_ICON_PATH "" CACHE STRING "Name of icon file to pack into the bundle")
-    set(THEXTECH_CUSTOM_USERDATA_DIR_NAME "" CACHE STRING "A custom name for user data in a home directory, by default the name is 'TheXTech Episodes'.")
     if(NOT THEXTECH_CUSTOM_ICON_PATH STREQUAL "")
         message("Use custom macOS icon: ${THEXTECH_CUSTOM_ICON_PATH}")
         list(APPEND LIB_SRC_EXTRA
@@ -1200,10 +1199,6 @@ if(APPLE)
 
     if(THEXTECH_PRELOAD_ENVIRONMENT_MANUALLY)
         target_compile_definitions(thextech PRIVATE -DUSE_BUNDLED_ASSETS)
-    endif()
-
-    if(THEXTECH_CUSTOM_USERDATA_DIR_NAME AND NOT THEXTECH_CUSTOM_USERDATA_DIR_NAME STREQUAL "")
-        target_compile_definitions(thextech PRIVATE -DUSERDATA_ROOT_NAME="${THEXTECH_CUSTOM_USERDATA_DIR_NAME}")
     endif()
 
     if(XTECH_MACOSX_TIGER) # Use X11 mode on Mac OS X Tiger

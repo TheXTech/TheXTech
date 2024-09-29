@@ -29,10 +29,6 @@
 #include "app_path_private.h"
 
 
-#ifndef USERDATA_ROOT_NAME
-#    define USERDATA_ROOT_NAME "TheXTech"
-#endif
-
 static std::string s_assetsRoot;
 static std::string s_userDirectory;
 static std::string s_applicationPath;
@@ -54,7 +50,7 @@ void AppPathP::initDefaultPaths(const std::string &userDirName)
         CFStringGetCString(filePathRef, temporaryCString, PATH_MAX, kCFStringEncodingUTF8);
         s_applicationPath = PGE_URLDEC(std::string(temporaryCString));
         {
-            s_bundleName = USERDATA_ROOT_NAME;
+            s_bundleName.clear();
 
             auto i = s_applicationPath.find_last_of(".app");
 
@@ -78,6 +74,24 @@ void AppPathP::initDefaultPaths(const std::string &userDirName)
         CFRelease(appUrlRef);
     }
 
+    // Assets directory
+    s_assetsRoot.clear();
+
+#if defined(USE_BUNDLED_ASSETS) // When its release game with assets shipped with a game
+    {
+        CFURLRef appUrlRef;
+        appUrlRef = CFBundleCopyResourceURL(CFBundleGetMainBundle(), CFSTR("assets"), NULL, NULL);
+        CFStringRef filePathRef = CFURLGetString(appUrlRef);
+        char temporaryCString[PATH_MAX];
+        bzero(temporaryCString, PATH_MAX);
+        CFStringGetCString(filePathRef, temporaryCString, PATH_MAX, kCFStringEncodingUTF8);
+        std::string path = PGE_URLDEC(std::string(temporaryCString));
+        if(path.compare(0, 7, "file://") == 0)
+            path.erase(0, 7);
+        s_assetsRoot = path;
+    }
+#endif
+
     // Initialize the user directory
     {
         std::string appSupport;
@@ -100,38 +114,26 @@ void AppPathP::initDefaultPaths(const std::string &userDirName)
         const char *homeDir = SDL_getenv("HOME");
         if(homeDir)
         {
-            // modern user directory
-            s_userDirectory = std::string(homeDir) + userDirName;
+            // Classic TheXTech distribution: per-bundle directories
+            if(!s_assetsRoot.empty() && !s_bundleName.empty())
+            {
+                // legacy per-bundle user directory
+                s_userDirectory = std::string(homeDir) + "/TheXTech Games/" + s_bundleName;
+            }
+            // Shared userdata directory
+            else
+            {
+                s_userDirectory = std::string(homeDir) + userDirName;
 
-            // Automatically create an infrastructure
-            if(!DirMan::exists(s_userDirectory))
-                DirMan::mkAbsPath(s_userDirectory);
-            if(!DirMan::exists(s_userDirectory + "worlds"))
-                DirMan::mkAbsPath(s_userDirectory + "worlds");
-            if(!DirMan::exists(s_userDirectory + "battle"))
-                DirMan::mkAbsPath(s_userDirectory + "battle");
+                // fallback to legacy directory if there is no custom directory set
+                std::string legacyUserDirectory = std::string(homeDir) + "/TheXTech Games/Debug Assets";
+                if(userDirName == "TheXTech" && !DirMan::exists(s_userDirectory) && DirMan::exists(legacyUserDirectory))
+                    s_userDirectory = legacyUserDirectory;
+            }
         }
         else
             s_userDirectory = appSupport;
-
-        s_assetsRoot.clear();
     }
-
-    // Assets directory
-#if defined(USE_BUNDLED_ASSETS) // When its release game with assets shipped with a game
-    {
-        CFURLRef appUrlRef;
-        appUrlRef = CFBundleCopyResourceURL(CFBundleGetMainBundle(), CFSTR("assets"), NULL, NULL);
-        CFStringRef filePathRef = CFURLGetString(appUrlRef);
-        char temporaryCString[PATH_MAX];
-        bzero(temporaryCString, PATH_MAX);
-        CFStringGetCString(filePathRef, temporaryCString, PATH_MAX, kCFStringEncodingUTF8);
-        std::string path = PGE_URLDEC(std::string(temporaryCString));
-        if(path.compare(0, 7, "file://") == 0)
-            path.erase(0, 7);
-        s_assetsRoot = path;
-    }
-#endif
 
     // Screenshots directory
     {
@@ -165,7 +167,7 @@ std::string AppPathP::assetsRoot()
 
 AssetsPathType AppPathP::assetsRootType()
 {
-    return AssetsPathType::Single;
+    return AssetsPathType::Legacy;
 }
 
 std::string AppPathP::settingsRoot()
