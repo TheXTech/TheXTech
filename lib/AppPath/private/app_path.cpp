@@ -143,7 +143,7 @@ std::vector<std::pair<std::string, AssetsPathType>> AppPathManager::assetsSearch
         out.push_back({m_customAssetsRoot, AssetsPathType::Single});
 
     if(!m_customUserDirectory.empty())
-        out.push_back({m_customUserDirectory + "assets/", AssetsPathType::Multiple});
+        out.push_back({m_customUserDirectory, AssetsPathType::Legacy});
 
     if(!AppPathP::appDirectory().empty())
         out.push_back({AppPathP::appDirectory(), AssetsPathType::Legacy});
@@ -151,7 +151,7 @@ std::vector<std::pair<std::string, AssetsPathType>> AppPathManager::assetsSearch
     if(!m_isPortable)
     {
         if(m_customUserDirectory.empty())
-            out.push_back({m_userPath + "assets/", AssetsPathType::Multiple});
+            out.push_back({m_userPath, AssetsPathType::Legacy});
 
         if(!AppPathP::assetsRoot().empty())
             out.push_back({AppPathP::assetsRoot(), AppPathP::assetsRootType()});
