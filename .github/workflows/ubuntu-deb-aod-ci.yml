@@ -32,9 +32,8 @@ jobs:
             extra_options: "-DPGE_SHARED_SDLMIXER=OFF -DUSE_SYSTEM_SDL2=OFF -DUSE_FREEIMAGE_SYSTEM_LIBS=ON \
             -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=MinSizeRel \
             -DTHEXTECH_BUILD_GL_ES_LEGACY=OFF \
-            -DTHEXTECH_FIXED_ASSETS_PATH=/usr/share/games/aod \
+            -DTHEXTECH_FIXED_ASSETS_PATH=/usr/share/games/TheXTech/aod \
             -DTHEXTECH_SOURCE_ASSETS_PATH=\"${GITHUB_WORKSPACE}/aod\" \
-            -DTHEXTECH_USER_DIR_NAME=\".thextech-aod\" \
             -DDESKTOP_NAME=\"Adventures of Demo\" \
             -DDESKTOP_GENERIC_NAME=\"Adventures of Demo\" \
             -DDESKTOP_COMMENT=\"An unofficial A2XT spin-off game\" \
@@ -80,9 +79,8 @@ jobs:
             extra_options: "-DPGE_SHARED_SDLMIXER=OFF -DUSE_SYSTEM_SDL2=OFF -DUSE_FREEIMAGE_SYSTEM_LIBS=ON \
             -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=MinSizeRel \
             -DTHEXTECH_BUILD_GL_ES_LEGACY=OFF \
-            -DTHEXTECH_FIXED_ASSETS_PATH=/usr/share/games/aod \
+            -DTHEXTECH_FIXED_ASSETS_PATH=/usr/share/games/TheXTech/aod \
             -DTHEXTECH_SOURCE_ASSETS_PATH=\"${GITHUB_WORKSPACE}/aod\" \
-            -DTHEXTECH_USER_DIR_NAME=\".thextech-aod\" \
             -DDESKTOP_NAME=\"Adventures of Demo\" \
             -DDESKTOP_GENERIC_NAME=\"Adventures of Demo\" \
             -DDESKTOP_COMMENT=\"An unofficial A2XT spin-off game\" \
@@ -130,9 +128,8 @@ jobs:
             extra_options: "-DPGE_SHARED_SDLMIXER=OFF -DUSE_SYSTEM_SDL2=ON -DUSE_FREEIMAGE_SYSTEM_LIBS=ON \
             -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=MinSizeRel \
             -DTHEXTECH_BUILD_GL_ES_LEGACY=OFF \
-            -DTHEXTECH_FIXED_ASSETS_PATH=/usr/share/games/aod \
+            -DTHEXTECH_FIXED_ASSETS_PATH=/usr/share/games/TheXTech/aod \
             -DTHEXTECH_SOURCE_ASSETS_PATH=\"${GITHUB_WORKSPACE}/aod\" \
-            -DTHEXTECH_USER_DIR_NAME=\".thextech-aod\" \
             -DDESKTOP_NAME=\"Adventures of Demo\" \
             -DDESKTOP_GENERIC_NAME=\"Adventures of Demo\" \
             -DDESKTOP_COMMENT=\"An unofficial A2XT spin-off game\" \
@@ -177,9 +174,8 @@ jobs:
 
             extra_options: "-DPGE_SHARED_SDLMIXER=OFF -DUSE_SYSTEM_SDL2=ON -DUSE_FREEIMAGE_SYSTEM_LIBS=ON \
             -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=MinSizeRel \
-            -DTHEXTECH_FIXED_ASSETS_PATH=/usr/share/games/aod \
+            -DTHEXTECH_FIXED_ASSETS_PATH=/usr/share/games/TheXTech/aod \
             -DTHEXTECH_SOURCE_ASSETS_PATH=\"${GITHUB_WORKSPACE}/aod\" \
-            -DTHEXTECH_USER_DIR_NAME=\".thextech-aod\" \
             -DDESKTOP_NAME=\"Adventures of Demo\" \
             -DDESKTOP_GENERIC_NAME=\"Adventures of Demo\" \
             -DDESKTOP_COMMENT=\"An unofficial A2XT spin-off game\" \
@@ -215,9 +211,8 @@ jobs:
 
             extra_options: "-DPGE_SHARED_SDLMIXER=OFF -DUSE_SYSTEM_SDL2=ON -DUSE_FREEIMAGE_SYSTEM_LIBS=ON \
             -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=MinSizeRel \
-            -DTHEXTECH_FIXED_ASSETS_PATH=/usr/share/games/aod \
+            -DTHEXTECH_FIXED_ASSETS_PATH=/usr/share/games/TheXTech/aod \
             -DTHEXTECH_SOURCE_ASSETS_PATH=\"${GITHUB_WORKSPACE}/aod\" \
-            -DTHEXTECH_USER_DIR_NAME=\".thextech-aod\" \
             -DDESKTOP_NAME=\"Adventures of Demo\" \
             -DDESKTOP_GENERIC_NAME=\"Adventures of Demo\" \
             -DDESKTOP_COMMENT=\"An unofficial A2XT spin-off game\" \

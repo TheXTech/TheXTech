@@ -34,8 +34,13 @@ static std::string s_gameInstallDirectory;
 
 static std::string s_applicationPath;
 
-//! The root for installed data (note: asset packs are placed at /usr/share/games/thextech/assets/...)
-static const char* s_gamesSysDir = "/usr/share/games/" THEXTECH_DIRECTORY_PREFIX "/assets/";
+//! The root for installed data (note: asset packs are placed at /usr/share/games/TheXTech/<pack-name> by default)
+#ifdef __HAIKU__
+    // FIXME: check that this Haiku-specific logic is correct
+    static const char* s_gamesSysDir = "/boot/system/data/" THEXTECH_DIRECTORY_PREFIX "/";
+#else
+    static const char* s_gamesSysDir = "/usr/share/games/" THEXTECH_DIRECTORY_PREFIX "/";
+#endif
 
 static std::string s_getEnvNotNull(const char *env)
 {
@@ -80,9 +85,15 @@ void AppPathP::initDefaultPaths(const std::string &userDirName)
 
     userDir += "/";
 
-    // use modern user directory
+    // use modern user directory by default
     s_userDirectory = userDir + userDirName;
 
+    // fallback to legacy directory if there is no custom directory set
+    std::string legacyUserDirectory = homePath + ".PGE_Project/thextech";
+    if(userDirName == "TheXTech" && !DirMan::exists(s_userDirectory) && DirMan::exists(legacyUserDirectory))
+        s_userDirectory = legacyUserDirectory;
+
+    // find the application's own path
     char *appPath = SDL_GetBasePath();
     if(!appPath)
     {
