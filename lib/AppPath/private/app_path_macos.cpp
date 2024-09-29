@@ -114,21 +114,22 @@ void AppPathP::initDefaultPaths(const std::string &userDirName)
         const char *homeDir = SDL_getenv("HOME");
         if(homeDir)
         {
-            // Classic TheXTech distribution: per-bundle directories
+            // Current TheXTech distribution: per-bundle directories
             if(!s_assetsRoot.empty() && !s_bundleName.empty())
-            {
-                // legacy per-bundle user directory
                 s_userDirectory = std::string(homeDir) + "/TheXTech Games/" + s_bundleName;
-            }
             // Shared userdata directory
             else
             {
                 s_userDirectory = std::string(homeDir) + userDirName;
 
                 // fallback to legacy directory if there is no custom directory set
-                std::string legacyUserDirectory = std::string(homeDir) + "/TheXTech Games/Debug Assets";
+                std::string legacyUserDirectory = std::string(homeDir) + "/TheXTech Games/" + s_bundleName;
+                std::string legacyAssetsDirectory = std::string(homeDir) + "/TheXTech Games/Debug Assets";
                 if(userDirName == "TheXTech" && !DirMan::exists(s_userDirectory) && DirMan::exists(legacyUserDirectory))
+                {
                     s_userDirectory = legacyUserDirectory;
+                    s_assetsRoot = legacyAssetsDirectory;
+                }
             }
         }
         else
