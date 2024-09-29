@@ -56,7 +56,7 @@ void AppPathP::initDefaultPaths(const std::string &userDirName)
 {
     wchar_t pathBuffer[MAX_PATH] = L"";
 
-    std::string roamingPath;
+    std::string roamingPath, homePath;
 
     if(FAILED(SHGetFolderPathW(NULL, CSIDL_APPDATA, NULL, 0, pathBuffer)))
     {
@@ -86,12 +86,19 @@ void AppPathP::initDefaultPaths(const std::string &userDirName)
     // User directory
     DWORD path_len = GetEnvironmentVariableW(L"UserProfile", pathBuffer, MAX_PATH);
     SDL_assert_release(path_len);
-    s_toUtf8(s_userDirectory, pathBuffer, path_len);
+    s_toUtf8(homePath, pathBuffer, path_len);
 
-    if(s_userDirectory.empty() && roamingPath.empty())
+    if(homePath.empty() && roamingPath.empty())
         s_userDirectory = s_applicationPath;
     else
+    {
         s_userDirectory = roamingPath + "/" + userDirName;
+
+        // fallback to legacy directory if there is no custom directory set
+        std::string legacyUserDirectory = homePath + "/.PGE_Project/thextech";
+        if(userDirName == "TheXTech" && !DirMan::exists(s_userDirectory) && DirMan::exists(legacyUserDirectory))
+            s_userDirectory = legacyUserDirectory;
+    }
 }
 
 std::string AppPathP::appDirectory()
