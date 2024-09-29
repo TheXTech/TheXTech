@@ -113,34 +113,48 @@ Files::Data::Data(Files::Data&& o)
 
 Files::Data::~Data()
 {
-    if(free_me)
-        free(const_cast<unsigned char*>(data));
+    if(m_free_me)
+        free(const_cast<unsigned char*>(m_data));
 }
 
 const Files::Data& Files::Data::operator=(Files::Data&& o)
 {
-    if(free_me)
-        free(const_cast<unsigned char*>(data));
+    if(m_free_me)
+        free(const_cast<unsigned char*>(m_data));
 
-    data = o.data;
-    length = o.length;
-    free_me = o.free_me;
+    m_data = o.m_data;
+    m_length = o.m_length;
+    m_free_me = o.m_free_me;
 
-    o.data = nullptr;
-    o.length = -1;
-    o.free_me = false;
+    o.m_data = nullptr;
+    o.m_length = -1;
+    o.m_free_me = false;
 
     return *this;
 }
 
 void Files::Data::init_from_mem(const unsigned char* data, size_t size)
 {
-    if(free_me)
+    if(m_free_me)
         free(const_cast<unsigned char*>(data));
 
-    free_me = false;
-    data = data;
-    length = static_cast<long long int>(size);
+    m_free_me = false;
+    m_data = data;
+    m_length = static_cast<long long int>(size);
+}
+
+void* Files::Data::disown()
+{
+    if(!m_free_me)
+        return nullptr;
+
+    void* ret = const_cast<uint8_t*>(m_data);
+
+    m_data = nullptr;
+    m_length = -1;
+    m_free_me = false;
+
+    return ret;
 }
 
 FILE *Files::utf8_fopen(const char *filePath, const char *modes)
@@ -185,9 +199,9 @@ Files::Data Files::load_file(const char *filePath)
         return ret;
     }
 
-    ret.free_me = true;
-    ret.data = target;
-    ret.length = size;
+    ret.m_free_me = true;
+    ret.m_data = target;
+    ret.m_length = size;
 
     while(to_read)
     {
@@ -219,7 +233,7 @@ void Files::flush_file(SDL_RWops *f)
 {
 #ifdef THEXTECH_NO_SDL_BUILD
     if(f->type == SDL_RWOPS_STDFILE)
-        ::fflush((FILE*)f->hidden);
+        ::fflush((FILE*)f->hidden.unknown.data1);
 #elif defined(HAVE_STDIO_H)
     if(f->type == SDL_RWOPS_STDFILE)
         ::fflush(f->hidden.stdio.fp);
@@ -288,7 +302,7 @@ bool Files::fileExists(const std::string &path)
     return PathFileExistsW(wpath.c_str()) == TRUE;
 
 #else
-    SDL_RWops *ops = Files::open_file(path.c_str(), "rb");
+    SDL_RWops *ops = Files::open_file(path, "rb");
     if(ops)
     {
         SDL_RWclose(ops);

@@ -2421,7 +2421,7 @@ void SetupVars()
     BlockHasNoMask[256] = true;
     BlockHasNoMask[257] = true;
     BlockHasNoMask[258] = true;
-    BlockHasNoMask[261] = true;
+    // BlockHasNoMask[261] = true; // invalid, Block 261 is sizable and this flag is never read for sizable blocks in SMBX 1.3
     BlockHasNoMask[262] = true;
     BlockHasNoMask[264] = true;
     BlockHasNoMask[263] = true;

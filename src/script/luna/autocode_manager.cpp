@@ -108,7 +108,7 @@ bool AutocodeManager::LoadFiles()
 // READ FILE - Read the autocode file in the level folder
 bool AutocodeManager::ReadFile(const std::string &script_path, const std::string& tr_key)
 {
-    SDL_RWops *code_file = Files::open_file(script_path.c_str(), "rb");
+    SDL_RWops *code_file = Files::open_file(script_path, "rb");
     if(!code_file)
         return false;
 
@@ -125,7 +125,7 @@ bool AutocodeManager::ReadFile(const std::string &script_path, const std::string
 // READ WORLD - Read the world autocode file in the world folder
 bool AutocodeManager::ReadWorld(const std::string &script_path, const std::string& tr_key)
 {
-    SDL_RWops *code_file = Files::open_file(script_path.c_str(), "rb");
+    SDL_RWops *code_file = Files::open_file(script_path, "rb");
     if(!code_file)
         return false;
 
@@ -142,7 +142,7 @@ bool AutocodeManager::ReadWorld(const std::string &script_path, const std::strin
 // READ GLOBALS - Read the global code file
 bool AutocodeManager::ReadGlobals(const std::string &script_path)
 {
-    SDL_RWops *code_file = Files::open_file(script_path.c_str(), "rb");
+    SDL_RWops *code_file = Files::open_file(script_path, "rb");
     if(!code_file)
         return false;
 

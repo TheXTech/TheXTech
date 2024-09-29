@@ -71,6 +71,30 @@ static SDL_INLINE bool equalCase(const char *x, const char *y)
     return (SDL_strcasecmp(x, y) == 0);
 }
 
+static void sorted_insert(std::vector<vbint_t>& vec, vbint_t val)
+{
+    auto it = std::lower_bound(vec.begin(), vec.end(), val);
+    bool val_exists = (it != vec.end() && *it == val);
+
+    // don't duplicate value
+    if(val_exists)
+        return;
+
+    vec.insert(it, val);
+}
+
+static void sorted_erase(std::vector<vbint_t>& vec, vbint_t val)
+{
+    auto it = std::lower_bound(vec.begin(), vec.end(), val);
+    bool val_exists = (it != vec.end() && *it == val);
+
+    // don't remove nonexistent value
+    if(!val_exists)
+        return;
+
+    vec.erase(it);
+}
+
 
 
 // utilities for layerindex_t and eventindex_t
@@ -341,11 +365,11 @@ bool DeleteLayer(layerindex_t L, bool killall)
             Events[A].MoveLayer = LAYER_NONE;
     }
 
-    for(int B = L; B <= numLayers - 1; B++)
+    for(int B = L; B < numLayers - 1; B++)
         SwapLayers(B, B+1);
 
-    Layer[numLayers] = Layer_t();
     numLayers --;
+    Layer[numLayers] = Layer_t();
 
     if(EditorCursor.Layer == L)
         EditorCursor.Layer = LAYER_DEFAULT;
@@ -469,6 +493,9 @@ void ShowLayer(layerindex_t L, bool NoEffect)
                 for(int screen_i = 0; !hit && screen_i < c_screenCount; screen_i++)
                 {
                     const Screen_t& screen = Screens[screen_i];
+
+                    if(!screen.is_active())
+                        continue;
 
                     if(!screen.is_canonical())
                         continue;
@@ -1199,7 +1226,7 @@ void ProcEvent(eventindex_t index, int whichPlayer, bool NoEffect)
             if(g_config.speedrun_stop_timer_by == Config_t::SPEEDRUN_STOP_EVENT && equalCase(evt.Name.c_str(), g_config.speedrun_stop_timer_at))
                 speedRun_bossDeadEvent();
 
-            for(B = 0; B <= numSections; B++)
+            for(B = 0; B < numSections; B++)
             {
                 /* Music change */
                 auto &s = evt.section[B];
@@ -1257,6 +1284,9 @@ void ProcEvent(eventindex_t index, int whichPlayer, bool NoEffect)
                     for(int screen_i = 0; screen_i < c_screenCount; screen_i++)
                     {
                         Screen_t& screen = Screens[screen_i];
+
+                        if(!screen.is_active())
+                            continue;
 
                         // which player on this screen is already in the new section? (used for 2P dynamic)
                         int onscreen_plr = 0;
@@ -1411,7 +1441,7 @@ void ProcEvent(eventindex_t index, int whichPlayer, bool NoEffect)
 
             if(evt.EndGame == 1)
             {
-                for(B = 0; B <= numSections; B++)
+                for(B = 0; B < numSections; B++)
                     bgMusic[B] = 0;
                 StopMusic();
                 speedRun_bossDeadEvent();
@@ -1496,7 +1526,7 @@ void UpdateEvents()
         }
     }
 
-    for(A = 0; A <= numSections; A++)
+    for(A = 0; A < numSections; A++)
     {
         if(AutoX[A] != 0.0f || AutoY[A] != 0.0f)
         {
@@ -1597,7 +1627,7 @@ void UpdateLayers()
     g_drawBlocks_invalidate_rate = 0;
     g_drawBGOs_invalidate_rate = 0;
 
-    for(A = 0; A <= numLayers; A++)
+    for(A = 0; A < numLayers; A++)
     {
         Layer[A].ApplySpeedX = 0;
         Layer[A].ApplySpeedY = 0;
@@ -1717,8 +1747,8 @@ void UpdateLayers()
                 {
                     // if(NPC[B].Layer == Layer[A].Name)
                     {
-                        NPC[B].DefaultLocation.X += double(Layer[A].SpeedX);
-                        NPC[B].DefaultLocation.Y += double(Layer[A].SpeedY);
+                        NPC[B].DefaultLocationX += double(Layer[A].SpeedX);
+                        NPC[B].DefaultLocationY += double(Layer[A].SpeedY);
 
                         if(!NPC[B].Active || NPC[B].Generator || NPC[B].Effect != NPCEFF_NORMAL ||
                            NPC[B]->IsACoin || NPC[B].Type == NPCID_PLANT_S3 || NPC[B].Type == NPCID_STONE_S3 ||
@@ -1741,13 +1771,13 @@ void UpdateLayers()
 
                             if(!NPC[B].Active)
                             {
-                                NPC[B].Location.X = NPC[B].DefaultLocation.X;
-                                NPC[B].Location.Y = NPC[B].DefaultLocation.Y;
+                                NPC[B].Location.X = NPC[B].DefaultLocationX;
+                                NPC[B].Location.Y = NPC[B].DefaultLocationY;
                                 if(NPC[B].Type == NPCID_PLANT_S3 || NPC[B].Type == NPCID_BIG_PLANT || NPC[B].Type == NPCID_PLANT_S1 ||
                                    NPC[B].Type == NPCID_LONG_PLANT_UP || NPC[B].Type == NPCID_FIRE_PLANT)
-                                    NPC[B].Location.Y += NPC[B].DefaultLocation.Height;
+                                    NPC[B].Location.Y += NPC[B]->THeight;
                                 else if(NPC[B].Type == NPCID_SIDE_PLANT && NPC[B].Direction == -1)
-                                    NPC[B].Location.X += NPC[B].DefaultLocation.Width;
+                                    NPC[B].Location.X += NPC[B]->TWidth;
                             }
                             else
                             {
@@ -1757,10 +1787,12 @@ void UpdateLayers()
 
                             if(NPC[B].Effect == NPCEFF_WARP)
                             {
+                                // specialY/X store the NPC's destination position
+                                // this previously changed Effect2
                                 if(NPC[B].Effect3 == 1 || NPC[B].Effect3 == 3)
-                                    NPC[B].Effect2 += double(Layer[A].SpeedY);
+                                    NPC[B].SpecialY += double(Layer[A].SpeedY);
                                 else
-                                    NPC[B].Effect2 += double(Layer[A].SpeedX);
+                                    NPC[B].SpecialX += double(Layer[A].SpeedX);
                             }
 
                             if(!NPC[B].Active)
@@ -1808,11 +1840,11 @@ void syncLayersTrees_Block(int block)
 {
     invalidateDrawBlocks();
 
-    for(int layer = 0; layer <= numLayers; layer++)
+    for(int layer = 0; layer < numLayers; layer++)
     {
         if(layer != Block[block].Layer)
         {
-            Layer[layer].blocks.erase(block);
+            sorted_erase(Layer[layer].blocks, block);
             treeBlockRemoveLayer(layer, block);
         }
     }
@@ -1822,14 +1854,14 @@ void syncLayersTrees_Block(int block)
     {
         treeBlockUpdateLayer(layer, block);
         if(layer != LAYER_NONE)
-            Layer[layer].blocks.insert(block);
+            sorted_insert(Layer[layer].blocks, block);
     }
     else
     {
         treeBlockRemoveLayer(layer, block);
         if(layer != LAYER_NONE)
         {
-            Layer[layer].blocks.erase(block);
+            sorted_erase(Layer[layer].blocks, block);
         }
     }
 }
@@ -1853,7 +1885,7 @@ void syncLayers_AllNPCs()
 
 void syncLayers_NPC(int npc)
 {
-    for(int layer = 0; layer <= numLayers; layer++)
+    for(int layer = 0; layer < numLayers; layer++)
     {
         if(npc <= numNPCs && NPC[npc].Layer == layer)
             Layer[layer].NPCs.insert(npc);
@@ -1883,12 +1915,12 @@ void syncLayers_BGO(int bgo)
 {
     invalidateDrawBGOs();
 
-    for(int layer = 0; layer <= numLayers; layer++)
+    for(int layer = 0; layer < numLayers; layer++)
     {
         if(layer != Background[bgo].Layer)
         {
             treeBackgroundRemoveLayer(layer, bgo);
-            Layer[layer].BGOs.erase(bgo);
+            sorted_erase(Layer[layer].BGOs, bgo);
         }
     }
 
@@ -1897,35 +1929,35 @@ void syncLayers_BGO(int bgo)
     {
         treeBackgroundUpdateLayer(layer, bgo);
         if(layer != LAYER_NONE)
-            Layer[layer].BGOs.insert(bgo);
+            sorted_insert(Layer[layer].BGOs, bgo);
     }
     else
     {
         treeBackgroundRemoveLayer(layer, bgo);
         if(layer != LAYER_NONE)
-            Layer[layer].BGOs.erase(bgo);
+            sorted_erase(Layer[layer].BGOs, bgo);
     }
 }
 
 void syncLayers_Warp(int warp)
 {
-    for(int layer = 0; layer <= numLayers; layer++)
+    for(int layer = 0; layer < numLayers; layer++)
     {
         if(warp <= numWarps && Warp[warp].Layer == layer)
-            Layer[layer].warps.insert(warp);
+            sorted_insert(Layer[layer].warps, warp);
         else
-            Layer[layer].warps.erase(warp);
+            sorted_erase(Layer[layer].warps, warp);
     }
 }
 
 void syncLayers_Water(int water)
 {
-    for(int layer = 0; layer <= numLayers; layer++)
+    for(int layer = 0; layer < numLayers; layer++)
     {
         if(layer != Water[water].Layer)
         {
             treeWaterRemoveLayer(layer, water);
-            Layer[layer].waters.erase(water);
+            sorted_erase(Layer[layer].waters, water);
         }
     }
 
@@ -1934,12 +1966,12 @@ void syncLayers_Water(int water)
     {
         treeWaterUpdateLayer(layer, water);
         if(layer != LAYER_NONE)
-            Layer[layer].waters.insert(water);
+            sorted_insert(Layer[layer].waters, water);
     }
     else
     {
         treeWaterRemoveLayer(layer, water);
         if(layer != LAYER_NONE)
-            Layer[layer].waters.erase(water);
+            sorted_erase(Layer[layer].waters, water);
     }
 }

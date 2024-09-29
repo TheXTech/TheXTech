@@ -60,7 +60,7 @@ typedef struct SDL_RWops
      *
      *  \return the number of objects read, or 0 at error or end of file.
      */
-    int64_t (* read) (struct SDL_RWops * context, void *ptr,
+    size_t (* read) (struct SDL_RWops * context, void *ptr,
                              size_t size, size_t maxnum);
 
     /**
@@ -69,7 +69,7 @@ typedef struct SDL_RWops
      *
      *  \return the number of objects written, or 0 at error or end of file.
      */
-    int64_t (* write) (struct SDL_RWops * context, const void *ptr,
+    size_t (* write) (struct SDL_RWops * context, const void *ptr,
                               size_t size, size_t num);
 
     /**
@@ -81,7 +81,13 @@ typedef struct SDL_RWops
 
     int type;
 
-    void* hidden;
+    union
+    {
+      struct
+      {
+          void *data1;
+      } unknown;
+    } hidden;
 } SDL_RWops;
 
 SDL_RWops* SDL_AllocRW();

@@ -45,6 +45,35 @@
 #endif
 #include <FreeImageLite.h>
 
+static unsigned DLL_CALLCONV
+_RWopsReadProc(void *buffer, unsigned size, unsigned count, fi_handle handle) {
+    return (unsigned)SDL_RWread ((SDL_RWops *)handle, buffer, size, count);
+}
+
+static unsigned DLL_CALLCONV
+_RWopsWriteProc(void *buffer, unsigned size, unsigned count, fi_handle handle) {
+    return (unsigned)SDL_RWwrite((SDL_RWops *)handle, buffer, size, count);
+}
+
+static int DLL_CALLCONV
+_RWopsSeekProc(fi_handle handle, long offset, int origin) {
+    int use_origin = origin;
+
+    if(origin == SEEK_CUR)
+        use_origin = RW_SEEK_CUR;
+    else if(origin == SEEK_SET)
+        use_origin = RW_SEEK_SET;
+    else if(origin == SEEK_END)
+        use_origin = RW_SEEK_END;
+
+    return SDL_RWseek((SDL_RWops *)handle, offset, use_origin);
+}
+
+static long DLL_CALLCONV
+_RWopsTellProc(fi_handle handle) {
+    return SDL_RWseek((SDL_RWops *)handle, 0, RW_SEEK_CUR);
+}
+
 // strangely undocumented import necessary to use the FreeImage handle functions
 extern void SetDefaultIO(FreeImageIO *io);
 
@@ -58,6 +87,13 @@ void GraphicsHelps::closeFreeImage()
     FreeImage_DeInitialise();
 }
 
+void GraphicsHelps::SetRWopsIO(FreeImageIO *io) {
+    io->read_proc  = _RWopsReadProc;
+    io->seek_proc  = _RWopsSeekProc;
+    io->tell_proc  = _RWopsTellProc;
+    io->write_proc = _RWopsWriteProc;
+}
+
 FIBITMAP *GraphicsHelps::loadImage(const std::string &file, bool convertTo32bit)
 {
 #ifdef DEBUG_BUILD
@@ -67,7 +103,9 @@ FIBITMAP *GraphicsHelps::loadImage(const std::string &file, bool convertTo32bit)
     loadingTime.start();
     fReadTime.start();
 #endif
-#if defined(THEXTECH_FILEMAPPER_SUPPORTED)
+
+    // disabled filemapper because it does not support archive contents
+#if 0 // #if defined(THEXTECH_FILEMAPPER_SUPPORTED)
     FileMapper fileMap;
 
     if(!fileMap.open_file(file))
@@ -89,20 +127,20 @@ FIBITMAP *GraphicsHelps::loadImage(const std::string &file, bool convertTo32bit)
 
 #else
     FreeImageIO io;
-    SetDefaultIO(&io);
-    FILE *handle = Files::utf8_fopen(file.c_str(), "rb");
+    SetRWopsIO(&io);
+    SDL_RWops *handle = Files::open_file(file, "rb");
 
     FREE_IMAGE_FORMAT formato = FreeImage_GetFileTypeFromHandle(&io, (fi_handle)handle);
 
     if(formato == FIF_UNKNOWN)
     {
-        fclose(handle);
+        SDL_RWclose(handle);
         return NULL;
     }
 
     FIBITMAP *img = FreeImage_LoadFromHandle(formato, &io, (fi_handle)handle);
 
-    fclose(handle);
+    SDL_RWclose(handle);
 
     if(!img)
         return NULL;
@@ -195,11 +233,7 @@ FIBITMAP *GraphicsHelps::loadMask(const std::string &file, bool maskIsPng, bool 
 
     // this is the main reason that we have a separate call: extract a bitmask from a PNG RGBA image
     if(maskIsPng)
-    {
-        FIBITMAP *front = FreeImage_Copy(mask, 0, 0, int(FreeImage_GetWidth(mask)), int(FreeImage_GetHeight(mask)));
-        getMaskFromRGBA(front, mask);
-        closeImage(front);
-    }
+        RGBAToMask(mask);
 
     return mask;
 }
@@ -217,11 +251,7 @@ FIBITMAP *GraphicsHelps::loadMask(const Files::Data &raw, bool maskIsPng, bool c
 
     // this is the main reason that we have a separate call: extract a bitmask from a PNG RGBA image
     if(maskIsPng)
-    {
-        FIBITMAP *front = FreeImage_Copy(mask, 0, 0, int(FreeImage_GetWidth(mask)), int(FreeImage_GetHeight(mask)));
-        getMaskFromRGBA(front, mask);
-        closeImage(front);
-    }
+        RGBAToMask(mask);
 
     return mask;
 }
@@ -264,39 +294,29 @@ void GraphicsHelps::closeImage(FIBITMAP *img)
     FreeImage_Unload(img);
 }
 
-void GraphicsHelps::getMaskFromRGBA(FIBITMAP *&image, FIBITMAP *&mask)
+void GraphicsHelps::RGBAToMask(FIBITMAP *mask)
 {
-    unsigned int img_w   = FreeImage_GetWidth(image);
-    unsigned int img_h   = FreeImage_GetHeight(image);
-
-    mask = FreeImage_AllocateT(FIT_BITMAP,
-                               int(img_w), int(img_h),
-                               int(FreeImage_GetBPP(image)),
-                               FreeImage_GetRedMask(image),
-                               FreeImage_GetGreenMask(image),
-                               FreeImage_GetBlueMask(image));
-
     if(!mask)
-    {
-        pLogCritical("Out of memory when extracting mask!");
         return;
-    }
 
-    RGBQUAD Fpix;
-    RGBQUAD Npix = {0x0, 0x0, 0x0, 0xFF};
+    // convert alpha channel to luminance
+    unsigned int img_w  = FreeImage_GetWidth(mask);
+    unsigned int img_h  = FreeImage_GetHeight(mask);
+
+    uint8_t *pixel_data = reinterpret_cast<uint8_t*>(FreeImage_GetBits(mask));
+    auto dest_px_stride = static_cast<uint32_t>(FreeImage_GetPitch(mask));
 
     for(unsigned int y = 0; (y < img_h); y++)
     {
         for(unsigned int x = 0; (x < img_w); x++)
         {
-            FreeImage_GetPixelColor(image, x, y, &Fpix);
+            uint8_t* pixel = &pixel_data[dest_px_stride * y + 4 * x];
 
-            uint8_t grey = (255 - Fpix.rgbReserved);
-            Npix.rgbRed  = grey;
-            Npix.rgbGreen = grey;
-            Npix.rgbBlue = grey;
-            Npix.rgbReserved = 0xFF;
-            FreeImage_SetPixelColor(mask,  x, y, &Npix);
+            uint8_t grey = 0xFF - pixel[3];
+            pixel[0] = grey;
+            pixel[1] = grey;
+            pixel[2] = grey;
+            pixel[3] = 0xFF;
         }
     }
 }
@@ -324,10 +344,8 @@ void GraphicsHelps::mergeWithMask(FIBITMAP *image,
     FIBITMAP *mask = pathToMask.empty() ? nullptr : loadImage(pathToMask, true);
     if(!mask && !pathToMaskFallback.empty())
     {
-        FIBITMAP *front = loadImage(pathToMaskFallback, true);
-        if(front)
-            getMaskFromRGBA(front, mask);
-        closeImage(front);
+        mask = loadImage(pathToMaskFallback, true);
+        RGBAToMask(mask);
     }
 
     if(!mask)
@@ -352,12 +370,7 @@ void GraphicsHelps::mergeWithMask(FIBITMAP *image, const Files::Data &maskRaw, b
         return;//Nothing to do
 
     if(maskIsPng)
-    {
-        FIBITMAP *newMask = nullptr;
-        getMaskFromRGBA(mask, newMask);
-        closeImage(mask);
-        mask = newMask;
-    }
+        RGBAToMask(mask);
 
     mergeWithMask(image, mask);
 

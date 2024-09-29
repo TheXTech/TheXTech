@@ -22,26 +22,39 @@
 
 #include <nds.h>
 
-uint32_t curTime = 0u;
+uint32_t curTime_ticks = 0u;
 bool inited = false;
 
-void s_timerCallBack()
+void s_updateTimer()
 {
-    curTime++;
+    if(!inited)
+    {
+        timerStart(1, ClockDivider_1024, 0, nullptr);
+        timerStart(2, (ClockDivider)TIMER_CASCADE, 0, nullptr);
+        inited = true;
+    }
+
+    curTime_ticks = TIMER_DATA(1) + (TIMER_DATA(2) << 16);
 }
 
 uint32_t SDL_GetTicks()
 {
-    if(!inited)
-    {
-        timerStart(2, ClockDivider_1024, TIMER_FREQ_1024(1000), s_timerCallBack);
-        inited = true;
-    }
+    s_updateTimer();
 
-    return curTime;
+    return (uint64_t)curTime_ticks * 1000 / (BUS_CLOCK>>10);
 }
 
 uint64_t SDL_GetMicroTicks()
 {
-    return curTime * 1000;
+    s_updateTimer();
+
+    return (uint64_t)curTime_ticks * 1000000 / (BUS_CLOCK>>10);
+}
+
+void SDL_Delay(int ms)
+{
+    uint64_t want = SDL_GetMicroTicks() + ms * 1000;
+
+    while(SDL_GetMicroTicks() < want)
+        swiDelay(0x126f); // ~120us
 }

@@ -38,6 +38,8 @@
 #include <Graphics/graphics_funcs.h>
 #include <Logger/logger.h>
 #include <Utils/files.h>
+#include <SDL2/SDL_rwops.h>
+#include <PGE_File_Formats/file_formats.h>
 
 #include "globals.h"
 #include "frame_timer.h"
@@ -160,17 +162,19 @@ static void* s_RawTo4x4RGBA(const uint8_t* src, uint32_t width, uint32_t height,
     return dst;
 }
 
-int robust_TPL_GetTexture(TPLFile* file, int i, GXTexObj* gxtex)
+Files::Data robust_Files_load_file(const std::string& path)
 {
-    int ret = TPL_GetTexture(file, i, gxtex);
+    Files::Data ret = Files::load_file(path);
 
-    if(ret == 0 || errno != ENOMEM)
+    if(ret.valid())
         return ret;
 
     pLogWarning("Failed to load due to lack of memory");
     minport_freeTextureMemory();
 
-    return TPL_GetTexture(file, i, gxtex);
+    ret = Files::load_file(path);
+
+    return ret;
 }
 
 FIBITMAP* robust_FILoad(const std::string& path, const std::string& maskPath, int* orig_w = nullptr, int* orig_h = nullptr)
@@ -178,13 +182,17 @@ FIBITMAP* robust_FILoad(const std::string& path, const std::string& maskPath, in
     if(path.empty())
         return nullptr;
 
-    // this is wasteful, but it lets us diagnose memory issue vs other issues
-    FREE_IMAGE_FORMAT formato = FreeImage_GetFileType(path.c_str(), 0);
+    SDL_RWops *handle = Files::open_file(path, "rb");
+    if(!handle)
+        return nullptr;
+
+    FreeImageIO io;
+    GraphicsHelps::SetRWopsIO(&io);
+    FREE_IMAGE_FORMAT formato = FreeImage_GetFileTypeFromHandle(&io, (fi_handle)handle);
+    SDL_RWclose(handle);
 
     if(formato == FIF_UNKNOWN)
-    {
         return nullptr;
-    }
 
     FIBITMAP* sourceImage = GraphicsHelps::loadImage(path);
 
@@ -295,10 +303,16 @@ void s_loadTexture(StdPicture& target, int i)
             target.h = tex_h * 2;
         }
 
-        if(robust_TPL_GetTexture(&target.d.texture_file[i], 0, &target.d.texture[i]) != 0)
+        if(TPL_GetTexture(&target.d.texture_file[i], 0, &target.d.texture[i]) != 0)
         {
             TPL_CloseTPLFile(&target.d.texture_file[i]);
             target.d.texture_file_init[i] = false;
+
+            if(target.d.backing_texture[i])
+            {
+                free(target.d.backing_texture[i]);
+                target.d.backing_texture[i] = nullptr;
+            }
         }
         else
         {
@@ -666,37 +680,38 @@ void minport_ApplyViewport()
     // GX_SetScissorBoxOffset(-ox, -oy);
 }
 
-void lazyLoadPictureFromList(StdPicture_Sub& target, FILE* f, const std::string& dir)
+void lazyLoadPictureFromList(StdPicture_Sub& target, PGE_FileFormats_misc::TextInput& t, std::string& line_buf, const std::string& dir)
 {
     if(!GameIsActive)
         return; // do nothing when game is closed
 
-    int length;
-
-    char filename[256];
-
-    if(fscanf(f, "%255[^\n]%n%*[^\n]\n", filename, &length) != 1)
+    t.readLine(line_buf);
+    if(line_buf.empty())
     {
         pLogWarning("Could not load image path from load list");
         return;
     }
 
-    if(length == 255)
-    {
-        pLogWarning("Image path %s was truncated in load list", filename);
-        return;
-    }
-
     target.inited = true;
     target.l.path = dir;
-    target.l.path += filename;
+    target.l.path += std::move(line_buf);
     target.l.lazyLoaded = true;
 
-    int w, h;
+    bool okay = false;
 
-    if(fscanf(f, "%d\n%d\n", &w, &h) != 2 || w < 0 || w > 8192 || h < 0 || h > 8192)
+    int w, h;
+    t.readLine(line_buf);
+    if(sscanf(line_buf.c_str(), "%d", &w) == 1)
     {
-        pLogWarning("Could not load image %s dimensions from load list", filename);
+        t.readLine(line_buf);
+
+        if(sscanf(line_buf.c_str(), "%d", &h) == 1)
+            okay = true;
+    }
+
+    if(!okay || w < 0 || w > 8192 || h < 0 || h > 8192)
+    {
+        pLogWarning("Could not load image %s dimensions from load list", target.l.path);
         target.inited = false;
         return;
     }
@@ -731,20 +746,20 @@ void lazyLoadPicture(StdPicture_Sub& target, const std::string& path, int scaleF
 
     // We need to figure out the height and width!
     std::string sizePath = path + ".size";
-    FILE* fs = fopen(sizePath.c_str(), "r");
+    SDL_RWops* fs = Files::open_file(sizePath.c_str(), "rb");
 
     // NOT null-terminated: wwww\nhhhh\n
     char contents[10];
 
     if(fs != nullptr)
     {
-        fread(&contents[0], 1, 10, fs);
+        SDL_RWread(fs, &contents[0], 1, 10);
         contents[4] = '\0';
         contents[9] = '\0';
         target.w = atoi(&contents[0]);
         target.h = atoi(&contents[5]);
 
-        if(fclose(fs))
+        if(SDL_RWclose(fs))
             pLogWarning("lazyLoadPicture: Couldn't close file.");
     }
     // lazy load and unload to read dimensions if it doesn't exist.
@@ -771,19 +786,6 @@ void lazyLoadPicture(StdPicture_Sub& target, const std::string& path, int scaleF
     }
 }
 
-int robust_OpenTPLFromFile(TPLFile* target, const char* path)
-{
-    int ret = TPL_OpenTPLFromFile(target, path);
-
-    if(ret == 1 || errno != ENOMEM)
-        return ret;
-
-    pLogWarning("Failed to load %s due to lack of memory", path);
-    minport_freeTextureMemory();
-
-    return TPL_OpenTPLFromFile(target, path);
-}
-
 void lazyLoad(StdPicture& target)
 {
     if(!target.inited || !target.l.lazyLoaded || target.d.hasTexture())
@@ -797,15 +799,16 @@ void lazyLoad(StdPicture& target)
 
     if(Files::hasSuffix(target.l.path, ".tpl"))
     {
-        if(robust_OpenTPLFromFile(&target.d.texture_file[0], target.l.path.c_str()) != 1)
+        Files::Data d = robust_Files_load_file(target.l.path);
+        if(!d.valid() || TPL_OpenTPLFromMemory(&target.d.texture_file[0], const_cast<uint8_t*>(d.begin()), d.size()) != 1)
         {
             pLogWarning("Permanently failed to load %s", target.l.path.c_str());
-            pLogWarning("Error: %d (%s)", errno, strerror(errno));
             target.inited = false;
             return;
         }
 
         target.d.texture_file_init[0] = true;
+        target.d.backing_texture[0] = d.disown();
         s_loadTexture(target, 0);
     }
     else
@@ -829,13 +832,9 @@ void lazyLoad(StdPicture& target)
         }
         else if(!target.l.mask_path.empty())
         {
-            FIBITMAP* FI_mask_rgba = robust_FILoad(target.l.mask_path, "");
+            FIBITMAP* FI_mask = robust_FILoad(target.l.mask_path, "");
 
-            if(FI_mask_rgba)
-            {
-                GraphicsHelps::getMaskFromRGBA(FI_mask_rgba, FI_mask);
-                GraphicsHelps::closeImage(FI_mask_rgba);
-            }
+            GraphicsHelps::RGBAToMask(FI_mask);
 
             // marginally faster, but inaccurate
             force_merge = true;
@@ -883,15 +882,16 @@ void lazyLoad(StdPicture& target)
     if(target.h > 2048 && target.d.texture_file_init[0])
     {
         suppPath = target.l.path + '1';
+        Files::Data d = robust_Files_load_file(suppPath);
 
-        if(robust_OpenTPLFromFile(&target.d.texture_file[1], suppPath.c_str()) != 1)
+        if(!d.valid() || TPL_OpenTPLFromMemory(&target.d.texture_file[1], const_cast<uint8_t*>(d.begin()), d.size()) != 1)
         {
             pLogWarning("Permanently failed to load %s", suppPath.c_str());
-            pLogWarning("Error: %d (%s)", errno, strerror(errno));
         }
         else
         {
             target.d.texture_file_init[1] = true;
+            target.d.backing_texture[1] = d.disown();
             s_loadTexture(target, 1);
         }
     }
@@ -899,8 +899,9 @@ void lazyLoad(StdPicture& target)
     if(target.h > 4096 && target.d.texture_file_init[0])
     {
         suppPath = target.l.path + '2';
+        Files::Data d = robust_Files_load_file(suppPath);
 
-        if(robust_OpenTPLFromFile(&target.d.texture_file[2], suppPath.c_str()) != 1)
+        if(!d.valid() || TPL_OpenTPLFromMemory(&target.d.texture_file[2], const_cast<uint8_t*>(d.begin()), d.size()) != 1)
         {
             pLogWarning("Permanently failed to load %s", suppPath.c_str());
             pLogWarning("Error: %d (%s)", errno, strerror(errno));
@@ -908,6 +909,7 @@ void lazyLoad(StdPicture& target)
         else
         {
             target.d.texture_file_init[2] = true;
+            target.d.backing_texture[2] = d.disown();
             s_loadTexture(target, 2);
         }
     }
@@ -1019,11 +1021,6 @@ inline bool GX_DrawImage_Custom(GXTexObj* img,
                                 unsigned int flip,
                                 XTColor color)
 {
-    uint8_t r = color.r;
-    uint8_t g = color.g;
-    uint8_t b = color.b;
-    uint8_t a = color.a;
-
     int16_t z = s_render_planes.next();
 
     GX_SetTevOp(GX_TEVSTAGE0, GX_MODULATE);
@@ -1031,6 +1028,11 @@ inline bool GX_DrawImage_Custom(GXTexObj* img,
 
     for(int i = 0; i < 2; i++)
     {
+        uint8_t r = color.r;
+        uint8_t g = color.g;
+        uint8_t b = color.b;
+        uint8_t a = color.a;
+
         uint16_t u1 = src_x;
         uint16_t u2 = src_x + src_w;
         uint16_t v1 = src_y;
@@ -1062,6 +1064,8 @@ inline bool GX_DrawImage_Custom(GXTexObj* img,
                 v2 = mask_h;
                 y2 = y + (v2 - v1) * h / src_h;
             }
+
+            r = 255; g = 255; b = 255; a = 255;
         }
         else if(mask)
         {
@@ -1078,6 +1082,96 @@ inline bool GX_DrawImage_Custom(GXTexObj* img,
 
         if(flip & X_FLIP_VERTICAL)
             std::swap(v1, v2);
+
+        GX_Begin(GX_QUADS, GX_VTXFMT0, 4);
+        GX_Position3s16(x1, y1, z);
+        GX_Color4u8(r, g, b, a);
+        GX_TexCoord2u16(u1, v1);
+
+        GX_Position3s16(x2, y1, z);
+        GX_Color4u8(r, g, b, a);
+        GX_TexCoord2u16(u2, v1);
+
+        GX_Position3s16(x2, y2, z);
+        GX_Color4u8(r, g, b, a);
+        GX_TexCoord2u16(u2, v2);
+
+        GX_Position3s16(x1, y2, z);
+        GX_Color4u8(r, g, b, a);
+        GX_TexCoord2u16(u1, v2);
+        GX_End();
+
+        if(!mask)
+            break;
+    }
+
+    if(mask)
+        GX_SetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_SET);
+
+    return true;
+}
+
+inline bool GX_DrawImage_Custom_Basic(GXTexObj* img,
+                                GXTexObj* mask,
+                                int16_t x, int16_t y, uint16_t w, uint16_t h,
+                                uint16_t src_x, uint16_t src_y,
+                                XTColor color)
+{
+    int16_t z = s_render_planes.next();
+
+    GX_SetTevOp(GX_TEVSTAGE0, GX_MODULATE);
+    GX_SetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
+
+    for(int i = 0; i < 2; i++)
+    {
+        uint8_t r = color.r;
+        uint8_t g = color.g;
+        uint8_t b = color.b;
+        uint8_t a = color.a;
+
+        uint16_t u1 = src_x;
+        uint16_t u2 = src_x + w;
+        uint16_t v1 = src_y;
+        uint16_t v2 = src_y + h;
+
+        int16_t x1 = x;
+        int16_t x2 = x + w;
+        int16_t y1 = y;
+        int16_t y2 = y + h;
+
+        if(mask && i == 0)
+        {
+            GX_SetBlendMode(GX_BM_LOGIC, GX_BL_ONE, GX_BL_ONE, GX_LO_AND);
+            GX_LoadTexObj(mask, GX_TEXMAP0);
+            uint16_t mask_w = GX_GetTexObjWidth(mask);
+            uint16_t mask_h = GX_GetTexObjHeight(mask);
+
+            if(u1 > mask_w || v1 > mask_h)
+                continue;
+
+            if(u2 > mask_w)
+            {
+                u2 = mask_w;
+                x2 = x + mask_w;
+            }
+
+            if(v2 > mask_h)
+            {
+                v2 = mask_h;
+                y2 = y + mask_h;
+            }
+
+            r = 255; g = 255; b = 255; a = 255;
+        }
+        else if(mask)
+        {
+            GX_SetBlendMode(GX_BM_LOGIC, GX_BL_ONE, GX_BL_ONE, GX_LO_OR);
+            GX_LoadTexObj(img, GX_TEXMAP0);
+        }
+        else
+        {
+            GX_LoadTexObj(img, GX_TEXMAP0);
+        }
 
         GX_Begin(GX_QUADS, GX_VTXFMT0, 4);
         GX_Position3s16(x1, y1, z);
@@ -1342,6 +1436,162 @@ void minport_RenderTexturePrivate(int16_t xDst, int16_t yDst, int16_t wDst, int1
     else
         GX_DrawImage_Custom(to_draw, to_mask, xDst, yDst, wDst, hDst,
                             xSrc, ySrc, wSrc, hSrc, flip, color);
+}
+
+void minport_RenderTexturePrivate_Basic(int16_t xDst, int16_t yDst, int16_t wDst, int16_t hDst,
+                                  StdPicture& tx,
+                                  int16_t xSrc, int16_t ySrc,
+                                  XTColor color)
+{
+    if(!tx.inited)
+        return;
+
+    if(!tx.d.hasTexture() && tx.l.lazyLoaded)
+        lazyLoad(tx);
+
+    if(!tx.d.hasTexture())
+        return;
+
+    GXTexObj* to_draw = nullptr;
+    GXTexObj* to_draw_2 = nullptr;
+
+    GXTexObj* to_mask = nullptr;
+    GXTexObj* to_mask_2 = nullptr;
+
+    if(tx.d.multi_horizontal && xSrc + wDst > 1024)
+    {
+        if(wDst > 1024)
+        {
+            // reduce it to be on viewport
+            if(xDst < 0)
+            {
+                xSrc -= xDst;
+                wDst += xDst;
+                xDst = 0;
+            }
+
+            if(wDst > 1024)
+                wDst = 1024;
+        }
+
+        if(xSrc + wDst > 2048)
+        {
+            if(tx.d.texture_init[2])
+            {
+                to_draw = &tx.d.texture[2];
+
+                if(tx.d.texture_init[5])
+                    to_mask = &tx.d.texture[5];
+            }
+
+            if(xSrc < 2048 && tx.d.texture_init[1])
+            {
+                to_draw_2 = &tx.d.texture[1];
+
+                if(tx.d.texture_init[4])
+                    to_mask_2 = &tx.d.texture[4];
+            }
+
+            xSrc -= 1024;
+        }
+        else
+        {
+            if(tx.d.texture_init[1])
+            {
+                to_draw = &tx.d.texture[1];
+
+                if(tx.d.texture_init[4])
+                    to_mask = &tx.d.texture[4];
+            }
+
+            if(xSrc < 1024)
+            {
+                to_draw_2 = &tx.d.texture[0];
+
+                if(tx.d.texture_init[3])
+                    to_mask_2 = &tx.d.texture[3];
+            }
+        }
+
+        // draw the left pic
+        if(to_draw_2 != nullptr)
+        {
+            GX_DrawImage_Custom_Basic(to_draw_2, to_mask_2, xDst, yDst, 1024 - xSrc, hDst,
+                                xSrc, ySrc, color);
+
+            xDst += 1024 - xSrc;
+            wDst -= (1024 - xSrc);
+            xSrc = 0;
+        }
+        else
+            xSrc -= 1024;
+    }
+    else if(!tx.d.multi_horizontal && ySrc + hDst > 1024)
+    {
+        if(ySrc + hDst > 2048)
+        {
+            if(tx.d.texture_init[2])
+            {
+                to_draw = &tx.d.texture[2];
+
+                if(tx.d.texture_init[5])
+                    to_mask = &tx.d.texture[5];
+            }
+
+            if(ySrc < 2048 && tx.d.texture_init[1])
+            {
+                to_draw_2 = &tx.d.texture[1];
+
+                if(tx.d.texture_init[4])
+                    to_mask_2 = &tx.d.texture[4];
+            }
+
+            ySrc -= 1024;
+        }
+        else
+        {
+            if(tx.d.texture_init[1])
+            {
+                to_draw = &tx.d.texture[1];
+
+                if(tx.d.texture_init[4])
+                    to_mask = &tx.d.texture[4];
+            }
+
+            if(ySrc < 1024)
+            {
+                to_draw_2 = &tx.d.texture[0];
+
+                if(tx.d.texture_init[3])
+                    to_mask_2 = &tx.d.texture[3];
+            }
+        }
+
+        // draw the top pic
+        if(to_draw_2 != nullptr)
+        {
+            GX_DrawImage_Custom_Basic(to_draw_2, to_mask_2, xDst, yDst, wDst, 1024 - ySrc,
+                                xSrc, ySrc, color);
+
+            yDst += (1024 - ySrc);
+            hDst -= (1024 - ySrc);
+            ySrc = 0;
+        }
+        else
+            ySrc -= 1024;
+    }
+    else
+    {
+        to_draw = &tx.d.texture[0];
+
+        if(tx.d.texture_init[3])
+            to_mask = &tx.d.texture[3];
+    }
+
+    if(to_draw == nullptr) return;
+
+    GX_DrawImage_Custom_Basic(to_draw, to_mask, xDst, yDst, wDst, hDst,
+                        xSrc, ySrc, color);
 }
 
 } // namespace XRender

@@ -43,6 +43,7 @@ struct StdPictureData
     StdPicture* next_texture = nullptr;
 
     //! The last frame that the texture was rendered (not accessed if not in the render chain)
+    // (in unloaded textures, used for frame of load failure due to texture memory pressure)
     uint32_t last_draw_frame = 0;
 
     //! Loaded texture data

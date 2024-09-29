@@ -127,8 +127,8 @@ inline void s_reset_friends()
 
     if(any_compat_set)
     {
-        PlaySoundMenu(SFX_LavaMonster);
         UpdateConfig();
+        PlaySoundMenu(SFX_LavaMonster);
     }
     else
         PlaySoundMenu(SFX_BlockHit);
@@ -393,8 +393,8 @@ void Do()
         {
             s_set_dirty();
             s_change_item();
-            PlaySoundMenu(SFX_Do);
             UpdateConfig();
+            PlaySoundMenu(SFX_Do);
         }
         else
         {
@@ -414,8 +414,8 @@ void RotateLeft()
     {
         s_set_dirty();
         s_change_item();
-        PlaySoundMenu(SFX_Do);
         UpdateConfig();
+        PlaySoundMenu(SFX_Do);
     }
     else
     {
@@ -434,8 +434,8 @@ void RotateRight()
     {
         s_set_dirty();
         s_change_item();
-        PlaySoundMenu(SFX_Do);
         UpdateConfig();
+        PlaySoundMenu(SFX_Do);
     }
     else
     {
@@ -455,8 +455,8 @@ void Delete()
         s_set_dirty();
         s_change_item();
         opt->unset();
-        PlaySoundMenu(SFX_PlayerShrink);
         UpdateConfig();
+        PlaySoundMenu(SFX_PlayerShrink);
     }
     else
     {

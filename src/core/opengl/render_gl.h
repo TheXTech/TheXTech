@@ -96,6 +96,8 @@ private:
             return "Core";
         case SDL_GL_CONTEXT_PROFILE_ES:
             return "ES";
+        case 0:
+            return "<Auto>";
         default:
             return "";
         }
@@ -160,9 +162,9 @@ private:
      */
     struct DrawContext_t
     {
-        GLProgramObject* program;
-        int uniform_step;
-        StdPicture* texture;
+        GLProgramObject* program = nullptr;
+        int uniform_step = 0;
+        StdPicture* texture = nullptr;
 
         constexpr DrawContext_t(std::nullptr_t)
             : program(nullptr), uniform_step(0), texture(nullptr) {}
@@ -270,9 +272,8 @@ private:
     bool m_client_side_arrays = false;
 
     bool m_has_es3_shaders = false;
-    // unused for now
-    // bool m_has_npot_texture = false;
-    // bool m_has_bgra = false;
+    bool m_has_npot_textures = false;
+    bool m_has_bgra_textures = false;
 
 
     // preferences
@@ -355,6 +356,7 @@ private:
 
     // OpenGL program objects
     GLProgramObject m_standard_program;
+    GLProgramObject m_no_tint_program;
     GLProgramObject m_bitmask_program;
     GLProgramObject m_output_program;
     GLProgramObject m_program_rect_filled;
@@ -402,6 +404,7 @@ private:
     static const char* const s_es3_advanced_vert_src;
 
     static const char* const s_es2_standard_frag_src;
+    static const char* const s_es2_no_tint_frag_src;
     static const char* const s_es2_bitmask_frag_src;
     static const char* const s_es3_bitmask_frag_src;
 

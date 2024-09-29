@@ -30,13 +30,12 @@
 
 #include <FreeImageLite.h>
 
-// strangely undocumented import necessary to use the FreeImage handle functions
-extern void SetDefaultIO(FreeImageIO *io);
-
 #include <Graphics/graphics_funcs.h>
 
 #include <Logger/logger.h>
 #include <Utils/files.h>
+#include <SDL2/SDL_rwops.h>
+#include <PGE_File_Formats/file_formats.h>
 
 #include "sdl_proxy/sdl_stdinc.h"
 
@@ -60,6 +59,15 @@ extern void SetDefaultIO(FreeImageIO *io);
 
 // used for crash prevention
 extern u32 gpuCmdBufOffset, gpuCmdBufSize;
+
+u32 __ctru_linear_heap_size = (28 << 20); // 28MB
+
+// FIXME: this might change in the future -- try to upstream a callback-based loader
+struct C2D_SpriteSheet_s
+{
+    Tex3DS_Texture t3x;
+    C3D_Tex tex;
+};
 
 namespace XRender
 {
@@ -159,6 +167,8 @@ static void s_createSceneTargets()
             }
         }
 
+        C3D_TexSetFilter(&s_layer_texs[i], GPU_LINEAR, GPU_LINEAR);
+
         s_layer_targets[i] = C3D_RenderTargetCreateFromTex(&s_layer_texs[i], GPU_TEXFACE_2D, 0, GPU_RB_DEPTH16);
         s_layer_subtexs[i] = {(uint16_t)s_tex_w, (uint16_t)s_tex_h, 0.0, 1.0, (float)((double)s_tex_w / (double)mem_w), 1.0f - (float)((double)s_tex_h / (double)mem_h)};
         s_layer_ims[i].tex = &s_layer_texs[i];
@@ -230,16 +240,18 @@ FIBITMAP* robust_FILoad(const std::string& path, int target_w)
         return nullptr;
     }
 
-    FILE *handle = Files::utf8_fopen(path.c_str(), "rb");
+    SDL_RWops *handle = Files::open_file(path, "rb");
+    if(!handle)
+        return nullptr;
 
     FreeImageIO io;
-    SetDefaultIO(&io);
+    GraphicsHelps::SetRWopsIO(&io);
     FREE_IMAGE_FORMAT formato = FreeImage_GetFileTypeFromHandle(&io, (fi_handle)handle);
 
     if(formato == FIF_UNKNOWN)
     {
         pLogWarning("FreeImageLite failed to load image due to unknown format");
-        fclose(handle);
+        SDL_RWclose(handle);
         return nullptr;
     }
 
@@ -252,14 +264,14 @@ FIBITMAP* robust_FILoad(const std::string& path, int target_w)
 
         if(!rawImage)
         {
-            fclose(handle);
+            SDL_RWclose(handle);
             return nullptr;
         }
 
         pLogDebug("Loaded successfully!");
     }
 
-    fclose(handle);
+    SDL_RWclose(handle);
 
     int32_t w = static_cast<int32_t>(FreeImage_GetWidth(rawImage));
     int32_t h = static_cast<int32_t>(FreeImage_GetHeight(rawImage));
@@ -332,7 +344,7 @@ static C2D_Image s_RawToSwizzledRGBA(const uint8_t* src, uint32_t wsrc, uint32_t
 
     if(!C3D_TexInit(img.tex, wtex, htex, GPU_RGBA8))
     {
-        pLogDebug("Triggering free texture memory due to failed texture load (%u bytes free)", (unsigned)linearSpaceFree());
+        pLogDebug("Triggering free texture memory due to failed PNG/GIF load (%u bytes free)", (unsigned)linearSpaceFree());
         minport_freeTextureMemory();
 
         if(!C3D_TexInit(img.tex, wtex, htex, GPU_RGBA8))
@@ -516,11 +528,18 @@ bool init()
 
     updateViewport();
 
+    pLogInfo("Initialized XRender with %u bytes free", (unsigned)linearSpaceFree());
+
     return true;
 }
 
 void quit()
 {
+    if(!s_render_inited || !GameIsActive)
+        return;
+
+    s_render_inited = false;
+
     s_clearAllTextures();
     s_destroySceneTargets();
 
@@ -586,7 +605,7 @@ void setTargetLayer(int layer)
         C2D_SceneBegin(s_layer_targets[layer]);
         s_cur_target = s_layer_targets[layer];
     }
-    else
+    else if(s_cur_target != s_layer_targets[0])
     {
         C2D_SceneBegin(s_layer_targets[0]);
         s_cur_target = s_layer_targets[0];
@@ -640,7 +659,7 @@ void setDrawPlane(uint8_t plane)
 
 void repaint()
 {
-    if(!g_in_frame)
+    if(!g_in_frame || !GameIsActive)
         return;
 
     constexpr int shift = MAX_3D_OFFSET / 2;
@@ -809,16 +828,6 @@ void minport_ApplyPhysCoords()
         s_createSceneTargets();
 
     g_screen_swapped = should_swap_screen();
-
-    GPU_TEXTURE_FILTER_PARAM filter = GPU_LINEAR;
-
-    for(int layer = 0; layer < 4; layer++)
-    {
-        C3D_TexSetFilter(&s_layer_texs[layer], filter, filter);
-
-        if(s_single_layer_mode)
-            break;
-    }
 }
 
 void minport_ApplyViewport()
@@ -867,37 +876,38 @@ void minport_ApplyViewport()
     }
 }
 
-void lazyLoadPictureFromList(StdPicture_Sub& target, FILE* f, const std::string& dir)
+void lazyLoadPictureFromList(StdPicture_Sub& target, PGE_FileFormats_misc::TextInput& t, std::string& line_buf, const std::string& dir)
 {
     if(!GameIsActive)
         return; // do nothing when game is closed
 
-    int length;
-
-    char filename[256];
-
-    if(fscanf(f, "%255[^\n]%n%*[^\n]\n", filename, &length) != 1)
+    t.readLine(line_buf);
+    if(line_buf.empty())
     {
         pLogWarning("Could not load image path from load list");
         return;
     }
 
-    if(length == 255)
-    {
-        pLogWarning("Image path %s was truncated in load list", filename);
-        return;
-    }
-
     target.inited = true;
     target.l.path = dir;
-    target.l.path += filename;
+    target.l.path += std::move(line_buf);
     target.l.lazyLoaded = true;
 
-    int w, h;
+    bool okay = false;
 
-    if((fscanf(f, "%d\n%d\n", &w, &h) != 2) || (w < 0) || (w > 8192) || (h < 0) || (h > 8192))
+    int w, h;
+    t.readLine(line_buf);
+    if(sscanf(line_buf.c_str(), "%d", &w) == 1)
     {
-        pLogWarning("Could not load image %s dimensions from load list", filename);
+        t.readLine(line_buf);
+
+        if(sscanf(line_buf.c_str(), "%d", &h) == 1)
+            okay = true;
+    }
+
+    if(!okay || w < 0 || w > 8192 || h < 0 || h > 8192)
+    {
+        pLogWarning("Could not load image %s dimensions from load list", target.l.path);
         target.inited = false;
         return;
     }
@@ -935,20 +945,20 @@ void lazyLoadPicture(StdPicture_Sub& target, const std::string& path, int scaleF
     {
         // We need to figure out the height and width!
         std::string sizePath = path + ".size";
-        FILE* fs = fopen(sizePath.c_str(), "r");
+        SDL_RWops* fs = Files::open_file(sizePath.c_str(), "rb");
 
         // NOT null-terminated: wwww\nhhhh\n
         char contents[10];
 
         if(fs != nullptr)
         {
-            fread(&contents[0], 1, 10, fs);
+            SDL_RWread(fs, &contents[0], 1, 10);
             contents[4] = '\0';
             contents[9] = '\0';
             target.w = atoi(&contents[0]);
             target.h = atoi(&contents[5]);
 
-            if(fclose(fs))
+            if(SDL_RWclose(fs))
                 pLogWarning("lazyLoadPicture: Couldn't close file.");
         }
         else
@@ -980,18 +990,65 @@ void lazyLoadPicture(StdPicture_Sub& target, const std::string& path, int scaleF
             target.h = tSize.h() * scaleFactor;
         }
     }
+
+    // pLogDebug("Successfully loaded %s", target.l.path.c_str());
 }
 
-static C2D_SpriteSheet s_tryHardToLoadC2D_SpriteSheet(const char* path)
+static ssize_t s_decompressCallback_rwops(void *userdata, void *buffer, size_t size)
 {
-    C2D_SpriteSheet sourceImage = C2D_SpriteSheetLoad(path);
+    SDL_RWops* rwops = (SDL_RWops*)userdata;
+    if(!rwops)
+        return 0;
 
+    return SDL_RWread(rwops, buffer, 1, size);
+}
+
+static C2D_SpriteSheet s_tryHardToLoadC2D_SpriteSheet(const char* path, bool& file_missing)
+{
+    SDL_RWops* rwops = Files::open_file(path, "rb");
+    if(!rwops)
+    {
+        file_missing = true;
+        return nullptr;
+    }
+
+    file_missing = false;
+
+    C2D_SpriteSheet sourceImage = (C2D_SpriteSheet)malloc(sizeof(struct C2D_SpriteSheet_s));
     if(!sourceImage)
     {
-        if(linearSpaceFree() < 15000000)
-            minport_freeTextureMemory();
+        SDL_RWclose(rwops);
+        return nullptr;
+    }
 
-        sourceImage = C2D_SpriteSheetLoad(path);
+    sourceImage->t3x = Tex3DS_TextureImportCallback(&sourceImage->tex, nullptr, false, s_decompressCallback_rwops, rwops);
+
+    if(!sourceImage->t3x)
+    {
+        if(linearSpaceFree() < 15000000)
+        {
+            pLogDebug("Triggering free texture memory due to failed texture load (%u bytes free)", (unsigned)linearSpaceFree());
+            minport_freeTextureMemory();
+        }
+
+        SDL_RWseek(rwops, 0, RW_SEEK_SET);
+
+        sourceImage->t3x = Tex3DS_TextureImportCallback(&sourceImage->tex, nullptr, false, s_decompressCallback_rwops, rwops);
+    }
+
+    SDL_RWclose(rwops);
+
+    // copied from C2Di_PostLoadSheet
+    if(!sourceImage->t3x)
+    {
+        free(sourceImage);
+        sourceImage = nullptr;
+    }
+    else
+    {
+        // Configure transparent border around texture
+        sourceImage->tex.border = 0;
+        C3D_TexSetWrap(&sourceImage->tex, GPU_CLAMP_TO_BORDER, GPU_CLAMP_TO_BORDER);
     }
 
     return sourceImage;
@@ -999,7 +1056,7 @@ static C2D_SpriteSheet s_tryHardToLoadC2D_SpriteSheet(const char* path)
 
 void lazyLoad(StdPicture& target)
 {
-    if(!target.inited || !target.l.lazyLoaded || target.d.hasTexture())
+    if(!target.inited || !target.l.lazyLoaded || target.d.hasTexture() || (target.d.last_draw_frame && g_current_frame - target.d.last_draw_frame < g_load_failure_retry_frames))
         return;
 
     if(!Files::hasSuffix(target.l.path, ".t3x"))
@@ -1023,13 +1080,9 @@ void lazyLoad(StdPicture& target)
         }
         else if(!target.l.mask_path.empty())
         {
-            FIBITMAP* FI_mask_rgba = robust_FILoad(target.l.mask_path, target.w);
+            FIBITMAP* FI_mask = robust_FILoad(target.l.mask_path, target.w);
 
-            if(FI_mask_rgba)
-            {
-                GraphicsHelps::getMaskFromRGBA(FI_mask_rgba, FI_mask);
-                GraphicsHelps::closeImage(FI_mask_rgba);
-            }
+            GraphicsHelps::RGBAToMask(FI_mask);
 
             // marginally faster, but inaccurate
             force_merge = true;
@@ -1066,9 +1119,9 @@ void lazyLoad(StdPicture& target)
 
         if(!target.d.hasTexture())
         {
-            pLogWarning("Permanently failed to load %s during texture load (upload to GPU failed), %lu free", target.l.path.c_str(), linearSpaceFree());
+            pLogWarning("Failed to load %s during texture load (upload to GPU failed), %lu free", target.l.path.c_str(), linearSpaceFree());
             pLogWarning("Error: %d (%s)", errno, strerror(errno));
-            target.inited = false;
+            target.d.last_draw_frame = g_current_frame;
             return;
         }
     }
@@ -1076,14 +1129,22 @@ void lazyLoad(StdPicture& target)
     {
         C2D_SpriteSheet sourceImage;
         std::string suppPath;
+        bool file_missing = false;
 
-        sourceImage = s_tryHardToLoadC2D_SpriteSheet(target.l.path.c_str()); // some other source image
+        sourceImage = s_tryHardToLoadC2D_SpriteSheet(target.l.path.c_str(), file_missing); // some other source image
 
         if(!sourceImage)
         {
-            pLogWarning("Permanently failed to load %s, %lu free", target.l.path.c_str(), linearSpaceFree());
-            pLogWarning("Error: %d (%s)", errno, strerror(errno));
-            target.inited = false;
+            pLogWarning("Failed to load %s, %lu free", target.l.path.c_str(), linearSpaceFree());
+
+            if(file_missing)
+                pLogWarning("File missing");
+
+            if(file_missing)
+                target.inited = false;
+            else
+                target.d.last_draw_frame = g_current_frame;
+
             return;
         }
 
@@ -1092,12 +1153,13 @@ void lazyLoad(StdPicture& target)
         if(target.h > 2048)
         {
             suppPath = target.l.path + '1';
-            sourceImage = s_tryHardToLoadC2D_SpriteSheet(suppPath.c_str());
+            sourceImage = s_tryHardToLoadC2D_SpriteSheet(suppPath.c_str(), file_missing);
 
             if(!sourceImage)
             {
                 pLogWarning("Permanently failed to load %s, %lu free", suppPath.c_str(), linearSpaceFree());
-                pLogWarning("Error: %d (%s)", errno, strerror(errno));
+                if(file_missing)
+                    pLogWarning("File missing");
             }
             else
                 s_loadTexture2(target, sourceImage);
@@ -1106,12 +1168,13 @@ void lazyLoad(StdPicture& target)
         if(target.h > 4096)
         {
             suppPath = target.l.path + '2';
-            sourceImage = s_tryHardToLoadC2D_SpriteSheet(suppPath.c_str());
+            sourceImage = s_tryHardToLoadC2D_SpriteSheet(suppPath.c_str(), file_missing);
 
             if(!sourceImage)
             {
                 pLogWarning("Permanently failed to load %s, %lu free", suppPath.c_str(), linearSpaceFree());
-                pLogWarning("Error: %d (%s)", errno, strerror(errno));
+                if(file_missing)
+                    pLogWarning("File missing");
             }
             else
                 s_loadTexture3(target, sourceImage);
@@ -1174,6 +1237,9 @@ void unloadTexture(StdPicture& tx)
         tx.d.image[i] = C2D_Image();
         tx.d.texture[i] = nullptr;
     }
+
+    // reset load timer
+    tx.d.last_draw_frame = 0;
 
     if(!tx.l.canLoad())
         static_cast<StdPicture_Sub&>(tx) = StdPicture_Sub();
@@ -1304,7 +1370,7 @@ void minport_RenderTexturePrivate(int16_t xDst, int16_t yDst, int16_t wDst, int1
                 C2D_Flush();
                 C3D_ColorLogicOp(GPU_LOGICOP_AND);
                 C2D_DrawImage_Custom(*to_mask_2, xDst, yDst, wDst, (1024 - ySrc) * hDst / hSrc,
-                                     xSrc, ySrc, wSrc, 1024 - ySrc, flip, color);
+                                     xSrc, ySrc, wSrc, 1024 - ySrc, flip, XTColor());
                 C2D_Flush();
                 C3D_ColorLogicOp(GPU_LOGICOP_OR);
             }
@@ -1340,7 +1406,7 @@ void minport_RenderTexturePrivate(int16_t xDst, int16_t yDst, int16_t wDst, int1
             C2D_Flush();
             C3D_ColorLogicOp(GPU_LOGICOP_AND);
             C2D_DrawImage_Custom(*to_mask, xDst, yDst, wDst, hDst,
-                                 xSrc, ySrc, wSrc, hSrc, flip, color);
+                                 xSrc, ySrc, wSrc, hSrc, flip, XTColor());
             C2D_Flush();
             C3D_ColorLogicOp(GPU_LOGICOP_OR);
         }
@@ -1358,6 +1424,133 @@ void minport_RenderTexturePrivate(int16_t xDst, int16_t yDst, int16_t wDst, int1
     // Finalize rotation HERE
     if(rotateAngle)
         C2D_ViewRestore(&prev_view);
+}
+
+void minport_RenderTexturePrivate_Basic(int16_t xDst, int16_t yDst, int16_t wDst, int16_t hDst,
+                                  StdPicture& tx,
+                                  int16_t xSrc, int16_t ySrc,
+                                  XTColor color)
+{
+    if(!tx.inited)
+        return;
+
+    if(!tx.d.hasTexture() && tx.l.lazyLoaded)
+        lazyLoad(tx);
+
+    if(!tx.d.hasTexture())
+        return;
+
+    // don't exceed 90%, ever
+    if(gpuCmdBufSize > 0 && gpuCmdBufOffset * 10 > gpuCmdBufSize * 9)
+        return;
+
+    // texture boundaries
+    // this never happens unless there was an invalid input
+    // if((xSrc < 0.0f) || (ySrc < 0.0f)) return;
+
+    C2D_Image* to_draw = nullptr;
+    C2D_Image* to_draw_2 = nullptr;
+
+    C2D_Image* to_mask = nullptr;
+    C2D_Image* to_mask_2 = nullptr;
+
+    // Don't go more than size of texture
+    // Failure conditions should only happen if texture is smaller than expected
+
+    if(ySrc + hDst > 1024)
+    {
+        if(ySrc + hDst > 2048)
+        {
+            if(tx.d.texture[2])
+            {
+                to_draw = &tx.d.image[2];
+                if(tx.d.texture[5])
+                    to_mask = &tx.d.image[5];
+            }
+
+            if(ySrc < 2048 && tx.d.texture[1])
+            {
+                to_draw_2 = &tx.d.image[1];
+                if(tx.d.texture[4])
+                    to_mask_2 = &tx.d.image[4];
+            }
+
+            ySrc -= 1024;
+        }
+        else
+        {
+            if(tx.d.texture[1])
+            {
+                to_draw = &tx.d.image[1];
+                if(tx.d.texture[4])
+                    to_mask = &tx.d.image[4];
+            }
+
+            if(ySrc < 1024)
+            {
+                to_draw_2 = &tx.d.image[0];
+                if(tx.d.texture[3])
+                    to_mask_2 = &tx.d.image[3];
+            }
+        }
+
+        // draw the top pic
+        if(to_draw_2 != nullptr)
+        {
+            if(to_mask_2)
+            {
+                C2D_Flush();
+                C3D_ColorLogicOp(GPU_LOGICOP_AND);
+                C2D_DrawImage_Custom_Basic(*to_mask_2, xDst, yDst, wDst, 1024 - ySrc,
+                                     xSrc, ySrc, XTColor());
+                C2D_Flush();
+                C3D_ColorLogicOp(GPU_LOGICOP_OR);
+            }
+
+            C2D_DrawImage_Custom_Basic(*to_draw_2, xDst, yDst, wDst, 1024 - ySrc,
+                                 xSrc, ySrc, color);
+
+            if(to_mask_2)
+            {
+                C2D_Flush();
+                s_resetBlend();
+            }
+
+            yDst += 1024 - ySrc;
+            hDst -= 1024 - ySrc;
+            ySrc = 0;
+        }
+        else
+            ySrc -= 1024;
+    }
+    else
+    {
+        to_draw = &tx.d.image[0];
+        if(tx.d.texture[3])
+            to_mask = &tx.d.image[3];
+    }
+
+    if(to_draw != nullptr)
+    {
+        if(to_mask)
+        {
+            C2D_Flush();
+            C3D_ColorLogicOp(GPU_LOGICOP_AND);
+            C2D_DrawImage_Custom_Basic(*to_mask, xDst, yDst, wDst, hDst,
+                                 xSrc, ySrc, XTColor());
+            C2D_Flush();
+            C3D_ColorLogicOp(GPU_LOGICOP_OR);
+        }
+
+        C2D_DrawImage_Custom_Basic(*to_draw, xDst, yDst, wDst, hDst,
+                             xSrc, ySrc, color);
+
+        if(to_mask)
+        {
+            C2D_Flush();
+            s_resetBlend();
+        }
+    }
 }
 
 } // namespace XRender

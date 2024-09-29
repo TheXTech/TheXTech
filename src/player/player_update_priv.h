@@ -34,6 +34,7 @@ void PlayerVineMovement(int A);
 
 void PlayerSharedScreenLogic(int A);
 void PlayerLevelBoundsLogic(int A);
+void PlayerEffectWings(int A);
 
 void PlayerFairyTimerUpdate(int A);
 void PlayerFairyMovementX(int A);

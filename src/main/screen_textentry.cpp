@@ -699,9 +699,9 @@ bool Logic()
     bool doPressed = SharedControls.MenuDo;
     bool backPressed = SharedControls.MenuBack;
 
-    for(int i = 0; i < maxLocalPlayers; i++)
+    for(int i = 0; i < l_screen->player_count; i++)
     {
-        Controls_t &c = Player[i + 1].Controls;
+        Controls_t &c = Controls::g_RawControls[i];
 
         startPressed |= c.Start;
         doPressed |= c.Jump || c.AltJump;

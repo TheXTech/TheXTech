@@ -23,7 +23,7 @@
 
 Layer_t *LayerF::Get(int layerIdx)
 {
-    if(layerIdx < 0 || layerIdx > numLayers)
+    if(layerIdx < 0 || layerIdx >= numLayers)
         return nullptr;
     return &Layer[layerIdx];
 }

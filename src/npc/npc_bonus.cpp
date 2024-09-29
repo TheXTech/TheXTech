@@ -152,7 +152,7 @@ void DropBonus(int A)
     // enable modern NPC spawn code
     if(g_config.modern_item_drop && !ForcedControls)
     {
-        NPC[numNPCs].Special6 = 120.0;
+        NPC[numNPCs].Special5 = 120;
         NPC[numNPCs].Effect3 = A;
         NPC[numNPCs].Effect2 = 1;
     }
@@ -349,7 +349,7 @@ void TouchBonus(int A, int B)
 
         Checkpoint = FullFileName;
         Checkpoint_t cp;
-        cp.id = Maths::iRound(NPC[B].Special);
+        cp.id = NPC[B].Special;
         CheckpointsList.push_back(cp);
         g_curLevelMedals.on_checkpoint();
         pLogDebug("Added checkpoint ID %d", cp.id);

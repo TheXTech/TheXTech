@@ -347,7 +347,7 @@ static void wetWater()
             Effect[B].Life = 0;
     }
 
-    for(int B = 0; B <= numSections; B++)
+    for(int B = 0; B < numSections; B++)
     {
         if(UnderWater[B])
         {
@@ -855,13 +855,32 @@ static void becomeAsLuigi()
     UpdateYoshiMusic();
 }
 
+static int findLivingForCheat()
+{
+    if(!g_ClonedPlayerMode && numPlayers != l_screen->player_count)
+    {
+        PlaySound(SFX_BlockHit);
+        return false;
+    }
+
+    return CheckLiving();
+}
+
+static void setScreenPlayers(int count)
+{
+    l_screen->player_count = count;
+    l_screen->players = {1, 2, 3, 4};
+    UpdateScreenPlayers();
+}
+
 static void superbDemo200()
 {
-    int B = CheckLiving();
+    int B = findLivingForCheat();
     if(B > 0)
     {
         numPlayers = 200;
         g_ClonedPlayerMode = true;
+        setScreenPlayers(1);
 
         SetupScreens();
 
@@ -884,11 +903,12 @@ static void superbDemo200()
 
 static void superbDemo128()
 {
-    int B = CheckLiving();
+    int B = findLivingForCheat();
     if(B > 0)
     {
         numPlayers = 128;
         g_ClonedPlayerMode = true;
+        setScreenPlayers(1);
 
         SetupScreens();
 
@@ -911,11 +931,12 @@ static void superbDemo128()
 
 static void superbDemo64()
 {
-    int B = CheckLiving();
+    int B = findLivingForCheat();
     if(B > 0)
     {
         numPlayers = 64;
         g_ClonedPlayerMode = true;
+        setScreenPlayers(1);
 
         SetupScreens();
 
@@ -938,11 +959,12 @@ static void superbDemo64()
 
 static void superbDemo32()
 {
-    int B = CheckLiving();
+    int B = findLivingForCheat();
     if(B > 0)
     {
         numPlayers = 32;
         g_ClonedPlayerMode = true;
+        setScreenPlayers(1);
 
         SetupScreens();
 
@@ -966,11 +988,12 @@ static void superbDemo32()
 
 static void superbDemo16()
 {
-    int B = CheckLiving();
+    int B = findLivingForCheat();
     if(B > 0)
     {
         numPlayers = 16;
         g_ClonedPlayerMode = true;
+        setScreenPlayers(1);
 
         SetupScreens();
 
@@ -994,11 +1017,12 @@ static void superbDemo16()
 
 static void superbDemo8()
 {
-    int B = CheckLiving();
+    int B = findLivingForCheat();
     if(B > 0)
     {
         numPlayers = 8;
         g_ClonedPlayerMode = true;
+        setScreenPlayers(1);
 
         SetupScreens();
 
@@ -1022,11 +1046,12 @@ static void superbDemo8()
 
 static void superbDemo4()
 {
-    int B = CheckLiving();
+    int B = findLivingForCheat();
     if(B > 0)
     {
         numPlayers = 4;
         g_ClonedPlayerMode = true;
+        setScreenPlayers(1);
 
         SetupScreens();
 
@@ -1050,13 +1075,15 @@ static void superbDemo4()
 
 static void superbDemo2()
 {
-    int B = CheckLiving();
+    int B = findLivingForCheat();
 
     if(B > 0)
     {
         g_ClonedPlayerMode = false;
         numPlayers = 2;
         SingleCoop = 1;
+        setScreenPlayers(2);
+
         SetupScreens();
         if(Player[B].Effect == PLREFF_NO_COLLIDE)
             Player[B].Effect = PLREFF_NORMAL;
@@ -1104,7 +1131,7 @@ static void superbDemo2()
 
 static void onePlayer()
 {
-    int B = CheckLiving();
+    int B = findLivingForCheat();
 
     if(B > 0)
     {
@@ -1130,6 +1157,8 @@ static void onePlayer()
         numPlayers = 1;
         SingleCoop = 1;
         g_ClonedPlayerMode = false;
+
+        setScreenPlayers(1);
         SetupScreens();
         if(Player[B].Effect == PLREFF_NO_COLLIDE)
             Player[B].Effect = PLREFF_NORMAL;
@@ -1155,7 +1184,7 @@ static void onePlayer()
 
 static void twoPlayer()
 {
-    int B = CheckLiving();
+    int B = findLivingForCheat();
     if(B > 0)
     {
         numPlayers = 2;
@@ -1174,6 +1203,7 @@ static void twoPlayer()
 
         SingleCoop = 0;
         g_ClonedPlayerMode = false;
+        setScreenPlayers(2);
         SetupScreens();
 
         if(Player[B].Effect == PLREFF_NO_COLLIDE)
@@ -1206,7 +1236,7 @@ static void twoPlayer()
 
 static void fourPlayer()
 {
-    int B = CheckLiving();
+    int B = findLivingForCheat();
     if(B > 0)
     {
         numPlayers = 4;
@@ -1225,6 +1255,7 @@ static void fourPlayer()
 
         SingleCoop = 0;
         g_ClonedPlayerMode = false;
+        setScreenPlayers(4);
 
         if(Player[B].Effect == PLREFF_NO_COLLIDE)
             Player[B].Effect = PLREFF_NORMAL;

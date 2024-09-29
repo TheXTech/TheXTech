@@ -165,6 +165,12 @@ inline bool &GetButton(Controls_t &c, size_t i)
         return c.Start;
     }
 }
+
+inline bool GetButton(const Controls_t &c, size_t i)
+{
+    return GetButton(const_cast<Controls_t&>(c), i);
+}
+
 } // namespace (Controls::)PlayerControls
 
 // utility functions to access information from the CursorControls_t struct
@@ -694,6 +700,12 @@ public:
     // Returns true if Rumble is ever supported
     virtual bool RumbleSupported() = 0;
 
+    // Returns true if Power Status is ever supported
+    virtual bool PowerStatusSupported()
+    {
+        return false;
+    }
+
     // Hooks that are called before and after Player controls are updated
     // Update any information that the InputMethods will reference
     virtual void UpdateControlsPre() = 0;
@@ -793,11 +805,12 @@ bool SetInputMethodProfile(int slot, InputMethodProfile *profile);
 bool SetInputMethodProfile(InputMethod *method, InputMethodProfile *profile);
 void ClearInputMethods();
 
-// player is 1-indexed here :(
+// player is 1-indexed as an actual player here
 void Rumble(int player, int ms, float strength);
 void RumbleAllPlayers(int ms, float strength);
 
-StatusInfo GetStatus(int player);
+// player is 0-indexed as an input method here
+StatusInfo GetStatus(int l_player_i);
 
 void RenderTouchControls();
 void UpdateTouchScreenSize();
@@ -812,6 +825,10 @@ extern std::vector<InputMethodType *> g_InputMethodTypes;
 extern bool g_renderTouchscreen;
 extern HotkeysPressed_t g_hotkeysPressed;
 extern bool g_disallowHotkeys;
+
+// FIXME: this should become read-only and be renamed LocalControls, and there should be a separate NetControls (indexed by player) that occurs post XMessage, used by the speedrun controls display.
+// raw controls values for the current locally-connected players, with no processing. may be publicly accessed only for menu logic
+extern std::array<Controls_t, maxLocalPlayers> g_RawControls;
 
 } // namespace Controls
 

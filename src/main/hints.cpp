@@ -33,11 +33,13 @@
 #include "main/hints.h"
 #include "main/speedrunner.h"
 #include "main/translate.h"
+#include "main/trees.h"
 #include "game_main.h"
 
 #include "std_picture.h"
 #include "screen.h"
 #include "globals.h"
+#include "player.h"
 #include "npc_id.h"
 #include "npc_traits.h"
 #include "npc/npc_queues.h"
@@ -108,9 +110,41 @@ static void s_draw_rainbow_surf(int x, int y)
     RenderControls(c, x + 96 / 2 - 76 / 2, y + 96 - 34, 76, 30, false, 255);
 
     StdPicture& tex = GFXNPC[NPCID_FLIPPED_RAINBOW_SHELL];
-    int frame_h = NPCTraits[NPCID_FLIPPED_RAINBOW_SHELL].THeight;
-    int frame_idx = 1 + 4 * ((CommonFrame % 16) / 4);
+    int frame_h = NPCTraits[NPCID_FLIPPED_RAINBOW_SHELL].HeightGFX;
+    int frame_idx = ((CommonFrame % 64) / 4);
     XRender::renderTexture(x + 96 / 2 - tex.w / 2, y + 96 - 34 - 4 - frame_h, tex.w, frame_h, tex, 0, frame_h * frame_idx);
+}
+
+static void s_draw_char5_bombs(int x, int y)
+{
+    DrawPlayerRaw(x + 10, y + 96 - 56, 5, 2, 8, 1);
+
+    StdPicture& tex = GFXNPC[NPCID_BOMB];
+    XRender::renderTexture(x + 96 + 4 - NPCTraits[NPCID_BOMB].WidthGFX, y + 96 - 8 - NPCTraits[NPCID_BOMB].HeightGFX, NPCTraits[NPCID_BOMB].WidthGFX, NPCTraits[NPCID_BOMB].HeightGFX, tex, 0, 0);
+}
+
+static void s_draw_red_duck(int x, int y)
+{
+    StdPicture& plant = GFXNPC[NPCID_FIRE_PLANT];
+    XRender::renderTexture(x + 96 - 4 - 32, y + 96 - 8 - NPCTraits[NPCID_FIRE_PLANT].THeight, 32, NPCTraits[NPCID_FIRE_PLANT].THeight, plant, 0, 0);
+
+    StdPicture& fire = GFXNPC[NPCID_PLANT_FIRE];
+    XRender::renderTexture(x + 96 - 56, y + 96 - 56, 32, NPCTraits[NPCID_PLANT_FIRE].THeight, fire, 0, 0);
+
+    StdPicture& boot = GFXNPC[NPCID_RED_BOOT];
+    XRender::renderTexture(x + 8, y + 96 - 8 - 32, 32, 32, boot, 0, 64);
+}
+
+static void s_draw_gray_bricks(int x, int y)
+{
+    StdPicture& brick = GFXBlock[457];
+    XRender::renderTexture(x + 24 + 4, y + 96 - 8 - 32, 32, 32, brick, 0, 0);
+
+    StdPicture& st = GFXNPC[NPCID_STATUE_POWER];
+    XRender::renderTexture(x + 4, y + 4, 32, 32, st, 0, 0);
+
+    StdPicture& heavy = GFXNPC[NPCID_HEAVY_POWER];
+    XRender::renderTexture(x + 96 - 4 - 32, y + 96 - 16 - 64, 32, 32, heavy, 0, 0);
 }
 
 static bool s_purple_pet_present()
@@ -173,15 +207,92 @@ static uint8_t s_no_lives_old()
 static uint8_t s_rainbow_surf_applies()
 {
     if(LevelSelect)
-        return false;
+        return 0;
 
     for(NPCRef_t n : NPCQueues::Active.no_change)
     {
-        if(n->Type == NPCID_FLIPPED_RAINBOW_SHELL)
+        if(n->Type == NPCID_FLIPPED_RAINBOW_SHELL && n->TimeLeft > 2)
             return 107;
     }
 
     return 0;
+}
+
+static uint8_t s_char5_bombs_applies()
+{
+    if(LevelSelect)
+        return 0;
+
+    bool has_char5 = false;
+
+    for(int A = 1; A <= numPlayers; A++)
+    {
+        if(Player[A].Character == 5)
+        {
+            if(Player[A].Bombs > 0)
+                return 102;
+            else
+            {
+                has_char5 = true;
+                break;
+            }
+        }
+    }
+
+    if(!has_char5)
+        return 0;
+
+    for(NPCRef_t n : NPCQueues::Active.no_change)
+    {
+        if(n->Type == NPCID_BOMB && n->TimeLeft > 2)
+            return 102;
+    }
+
+    return 0;
+}
+
+static uint8_t s_red_duck_applies()
+{
+    if(LevelSelect)
+        return 0;
+
+    for(int A = 1; A <= numPlayers; A++)
+    {
+        if(Player[A].Mount == 1 && Player[A].MountType == 2)
+            return 104;
+    }
+
+    return 0;
+}
+
+static uint8_t s_gray_bricks_applies()
+{
+    if(LevelSelect)
+        return 0;
+
+    int found = 0;
+    for(int A = 1; A <= numPlayers; A++)
+    {
+        if(Player[A].State == 5 || Player[A].State == 6)
+        {
+            found = A;
+            break;
+        }
+    }
+
+    if(!found)
+        return 0;
+
+#ifndef LOW_MEM
+    const vScreen_t& vscreen = vScreenByPlayer(found);
+    for(const Block_t& b : treeBlockQuery(newLoc(-vscreen.X, -vscreen.Y, vscreen.Width, vscreen.Height), SORTMODE_NONE))
+    {
+        if(b.Type == 457 && !b.Hidden && !b.Invis)
+            return 106;
+    }
+#endif
+
+    return 30;
 }
 
 static const Hint s_hints[] = {
@@ -190,6 +301,9 @@ static const Hint s_hints[] = {
     {"If you fail, your score will reset.",   "no-lives-new", s_no_lives_new, s_draw_no_lives},
     {"If you fail, the game will end.", "no-lives-old", s_no_lives_old, s_draw_no_lives},
     {"Grab, run, hold down, and let go to surf.", "rainbow-surf", s_rainbow_surf_applies, s_draw_rainbow_surf},
+    {"Press Run to collect and Alt Run to throw.", "char5-bombs", s_char5_bombs_applies, s_draw_char5_bombs},
+    {"Duck to block most - but not all - flames!", "red-duck", s_red_duck_applies, s_draw_red_duck},
+    {"Some blocks are vulnerable to special powers.", "gray-bricks", s_gray_bricks_applies, s_draw_gray_bricks},
 };
 
 static constexpr size_t s_hint_count = sizeof(s_hints) / sizeof(Hint);

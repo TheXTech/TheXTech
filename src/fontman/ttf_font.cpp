@@ -17,6 +17,9 @@
  * or see <http://www.gnu.org/licenses/>.
  */
 
+#include <SDL2/SDL_rwops.h>
+#include <Utils/files.h>
+
 #include "ttf_font.h"
 #include "sdl_proxy/sdl_stdinc.h"
 #include "sdl_proxy/sdl_assert.h"
@@ -53,6 +56,63 @@ static std::mutex                   g_loadedFaces_mutex;
 #   define TTF_MUTEX_LOCK()         (void)0
 #   define TTF_MUTEX_UNLOCK()       (void)0
 #endif
+
+static unsigned long s_FT_rwops_io_func(FT_Stream stream, unsigned long offset, unsigned char* buffer, unsigned long count)
+{
+    if(!stream)
+        return !count;
+
+    SDL_RWops* rwops = (SDL_RWops*)stream->descriptor.pointer;
+
+    if(!rwops || SDL_RWseek(rwops, offset, RW_SEEK_SET) < 0)
+        return !count;
+
+    if(!count)
+        return 0;
+
+    if(!buffer)
+        return 0;
+
+    return SDL_RWread(rwops, buffer, 1, count);
+}
+
+static void s_FT_rwops_close_func(FT_Stream stream)
+{
+    if(!stream)
+        return;
+
+    SDL_RWops* rwops = (SDL_RWops*)stream->descriptor.pointer;
+
+    if(!rwops)
+        return;
+
+    SDL_RWclose(rwops);
+
+    delete stream;
+}
+
+static FT_Stream s_FT_make_stream(const std::string& path)
+{
+    SDL_RWops* rwops = Files::open_file(path, "rb");
+
+    if(!rwops)
+        return nullptr;
+
+    FT_Stream stream = new(std::nothrow) FT_StreamRec;
+    if(!stream)
+    {
+        SDL_RWclose(rwops);
+        return nullptr;
+    }
+
+    stream->base = nullptr;
+    stream->descriptor.pointer = (void*)rwops;
+    stream->size = SDL_RWsize(rwops);
+    stream->read = s_FT_rwops_io_func;
+    stream->close = s_FT_rwops_close_func;
+
+    return stream;
+}
 
 
 bool initializeFreeType()
@@ -107,8 +167,16 @@ TtfFont::~TtfFont()
 bool TtfFont::loadFont(const std::string &path)
 {
     SDL_assert_release(g_ft);
-    FT_Error error = FT_New_Face(g_ft, path.c_str(), 0, &m_face);
-    if(error)
+
+    FT_Open_Args args;
+    args.flags = FT_OPEN_STREAM;
+    args.stream = s_FT_make_stream(path);
+
+    FT_Error error = FT_Err_Cannot_Open_Resource;
+    if(args.stream)
+        error = FT_Open_Face(g_ft, &args, 0, &m_face);
+
+    if(!args.stream || error)
     {
         pLogWarning("Failed to load the font: %s", FT_Error_String(error));
         return false;

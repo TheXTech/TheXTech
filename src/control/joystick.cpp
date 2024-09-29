@@ -1517,6 +1517,11 @@ bool InputMethodType_Joystick::RumbleSupported()
     return true;
 }
 
+bool InputMethodType_Joystick::PowerStatusSupported()
+{
+    return true;
+}
+
 void InputMethodType_Joystick::UpdateControlsPre() {}
 void InputMethodType_Joystick::UpdateControlsPost() {}
 

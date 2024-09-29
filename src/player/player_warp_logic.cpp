@@ -231,6 +231,56 @@ static void s_WarpFaderLogic(bool is_reverse, int A, int transitEffect, const Lo
     }
 }
 
+void s_delay_pipe_exit(int A)
+{
+    Player_t& p = Player[A];
+
+    const auto& warp = Warp[p.Warp];
+    const auto warp_dir_exit = (p.WarpBackward) ? warp.Direction : warp.Direction2;
+    bool warp_vertical = (warp_dir_exit == LevelDoor::EXIT_UP) || (warp_dir_exit == LevelDoor::EXIT_DOWN);
+
+    // number of players ahead of this one
+    int frames_before = 0;
+
+    for(int o_A = 1; o_A <= numPlayers; o_A++)
+    {
+        if(o_A == A)
+            continue;
+
+        Player_t& o_p = Player[o_A];
+        if(!o_p.Dead && o_p.TimeToLive == 0 && o_p.Effect == PLREFF_WARP_PIPE && o_p.Warp == p.Warp && o_p.WarpBackward == p.WarpBackward && o_p.Effect2 > 1 && (o_p.Effect2 < 128 || o_p.Effect2 >= 2000))
+        {
+            // wait for player to warp
+            if(warp_vertical)
+                frames_before += o_p.Location.Height;
+            else
+                frames_before += o_p.Location.Width;
+
+            // pause between players
+            frames_before += 70;
+        }
+    }
+
+    // put in new pipe holding state
+    if(frames_before)
+    {
+        p.Effect = PLREFF_WARP_PIPE;
+        p.Effect2 = 2010 + frames_before;
+    }
+}
+
+bool PlayerWaitingInWarp(const Player_t& p)
+{
+    return (p.Effect == PLREFF_WARP_PIPE && p.Effect2 >= 2000)
+        || (p.Effect == PLREFF_WAITING && p.Effect2 > 30 && p.Effect2 <= 2000);
+}
+
+bool PlayerScrollingInWarp(const Player_t& p)
+{
+    return (p.Effect == PLREFF_WARP_PIPE || p.Effect == PLREFF_WARP_DOOR)
+        && (p.Effect2 >= 128 && p.Effect2 <= 128 + plr_warp_scroll_max_frames);
+}
+
 void PlayerEffectWarpPipe(int A)
 {
     Player_t& p = Player[A];
@@ -251,7 +301,7 @@ void PlayerEffectWarpPipe(int A)
     bool is_level_quit = warp.level != STRINGINDEX_NONE || warp.MapWarp;
 
     // teleport other players into warp in shared screen mode
-    const Screen_t& screen = ScreenByPlayer(A);
+    Screen_t& screen = ScreenByPlayer(A);
     bool is_shared_screen = (screen.Type == 3);
 
     if(p.Effect2 == 0.0) // Entering pipe
@@ -385,12 +435,15 @@ void PlayerEffectWarpPipe(int A)
             treeNPCUpdate(p.HoldingNPC);
 
         // teleport other players into the pipe warp
-        if(Maths::iRound(leftToGoal) == 8)
+        if(is_shared_screen && Maths::iRound(leftToGoal) == 8)
         {
-            bool do_tele = is_shared_screen && !vScreenCollision(vScreenIdxByPlayer(A), warp_exit);
+            int vscreen_A = vScreenIdxByPlayer(A);
+            bool do_tele = !vScreenCollision(vscreen_A, warp_exit);
 
             if(do_tele)
             {
+                SharedScreenAvoidJump_Pre(screen);
+
                 for(int plr_i = 0; plr_i < screen.player_count; plr_i++)
                 {
                     int o_A = screen.players[plr_i];
@@ -420,6 +473,8 @@ void PlayerEffectWarpPipe(int A)
                         o_p.Location.SpeedX = 0.0;
                         o_p.Location.SpeedY = 0.0;
                     }
+
+                    SharedScreenAvoidJump_Post(screen, (do_scroll) ? 0 : 200);
                 }
             }
         }
@@ -543,7 +598,7 @@ void PlayerEffectWarpPipe(int A)
             CheckSectionNPC(p.HoldingNPC);
 
         // set any other players warping to the same pipe to this state (needed to avoid splitting a shared screen)
-        if(is_shared_screen)
+        if(is_shared_screen && !do_scroll)
         {
             for(int plr_i = 0; plr_i < screen.player_count; plr_i++)
             {
@@ -563,32 +618,14 @@ void PlayerEffectWarpPipe(int A)
                     o_p.Effect2 = 1;
                 }
             }
+
+            // disable any tempX/TempY (no longer needed)
+            SharedScreenResetTemp(screen);
         }
 
         // delay based on number of players ahead of this one
         if(is_shared_screen)
-        {
-            // number of players ahead of this one
-            int hit = 0;
-
-            for(int plr_i = 0; plr_i < screen.player_count; plr_i++)
-            {
-                int o_A = screen.players[plr_i];
-                if(o_A == A)
-                    continue;
-
-                Player_t& o_p = Player[o_A];
-                if(!o_p.Dead && o_p.TimeToLive == 0 && o_p.Effect == PLREFF_WARP_PIPE && o_p.Warp == p.Warp && o_p.WarpBackward == p.WarpBackward && o_p.Effect2 > 1 && (o_p.Effect2 < 128 || o_p.Effect2 >= 2000))
-                    hit += 1;
-            }
-
-            // put in new pipe holding state
-            if(hit)
-            {
-                p.Effect = PLREFF_WARP_PIPE;
-                p.Effect2 = 2010 + 100 * hit;
-            }
-        }
+            s_delay_pipe_exit(A);
 
         // many-player code
         if(g_ClonedPlayerMode)
@@ -626,9 +663,13 @@ void PlayerEffectWarpPipe(int A)
 
         if(p.Effect2 <= 2000)
         {
+            SharedScreenAvoidJump_Pre(screen);
+
             p.Effect2 = 2;
             if(backward || !warp.cannonExit)
                 PlaySoundSpatial(SFX_Warp, p.Location);
+
+            SharedScreenAvoidJump_Post(screen, 0);
         }
     }
     else if(p.Effect2 > 128) // Scrolling between pipes
@@ -967,46 +1008,58 @@ void PlayerEffectWarpDoor(int A)
     s_WarpFaderLogic(false, A, warp.transitEffect, warp_enter, fEqual(p.Effect2, 5), !is_level_quit && !same_section && fEqual(p.Effect2, 20));
 
     // teleport other players into door in shared screen mode
-    const Screen_t& screen = ScreenByPlayer(A);
+    Screen_t& screen = ScreenByPlayer(A);
     bool is_shared_screen = (screen.Type == 3);
-    bool do_tele = is_shared_screen && !vScreenCollision(vScreenIdxByPlayer(A), warp_exit);
-    if(do_tele && fEqual(p.Effect2, 15))
+    if(is_shared_screen && fEqual(p.Effect2, 15))
     {
-        for(int plr_i = 0; plr_i < screen.player_count; plr_i++)
+        int vscreen_A = vScreenIdxByPlayer(A);
+        bool do_tele = is_shared_screen && !vScreenCollision(vscreen_A, warp_exit);
+
+        if(do_tele)
         {
-            int o_A = screen.players[plr_i];
-            if(o_A == A)
-                continue;
+            SharedScreenAvoidJump_Pre(screen);
 
-            Player_t& o_p = Player[o_A];
-
-            // in the mouth of an onscreen player's Pet?
-            bool in_onscreen_pet = !warp.NoYoshi && InOnscreenPet(o_A, screen);
-
-            bool status_match = (o_p.Effect == p.Effect && o_p.Warp == p.Warp && o_p.WarpBackward == p.WarpBackward);
-
-            if(!o_p.Dead && o_p.TimeToLive == 0 && !in_onscreen_pet && !status_match)
+            for(int plr_i = 0; plr_i < screen.player_count; plr_i++)
             {
-                RemoveFromPet(o_A);
+                int o_A = screen.players[plr_i];
+                if(o_A == A)
+                    continue;
 
-                s_WarpReleaseItems(warp, o_A, p.WarpBackward, false);
+                Player_t& o_p = Player[o_A];
 
-                o_p.Warp = p.Warp;
-                o_p.WarpBackward = p.WarpBackward;
-                o_p.Effect = p.Effect;
-                // 1 frame behind so that this player will exit first
-                o_p.Effect2 = 14;
-                o_p.Location.X = warp_enter.X + warp_enter.Width / 2.0 - o_p.Location.Width / 2.0;
-                o_p.Location.Y = warp_enter.Y + warp_enter.Height - o_p.Location.Height;
-                o_p.Location.SpeedX = 0.0;
-                o_p.Location.SpeedY = 0.0;
+                // in the mouth of an onscreen player's Pet?
+                bool in_onscreen_pet = !warp.NoYoshi && InOnscreenPet(o_A, screen);
+
+                bool status_match = (o_p.Effect == p.Effect && o_p.Warp == p.Warp && o_p.WarpBackward == p.WarpBackward);
+
+                if(!o_p.Dead && o_p.TimeToLive == 0 && !in_onscreen_pet && !status_match)
+                {
+                    RemoveFromPet(o_A);
+
+                    s_WarpReleaseItems(warp, o_A, p.WarpBackward, false);
+
+                    o_p.Warp = p.Warp;
+                    o_p.WarpBackward = p.WarpBackward;
+                    o_p.Effect = p.Effect;
+                    // 1 frame behind so that this player will exit first
+                    o_p.Effect2 = 14;
+                    o_p.Location.X = warp_enter.X + warp_enter.Width / 2.0 - o_p.Location.Width / 2.0;
+                    o_p.Location.Y = warp_enter.Y + warp_enter.Height - o_p.Location.Height;
+                    o_p.Location.SpeedX = 0.0;
+                    o_p.Location.SpeedY = 0.0;
+                }
             }
+
+            SharedScreenAvoidJump_Post(screen, (do_scroll) ? 0 : 200);
         }
     }
 
     // start the scroll effect
     if(do_scroll && fEqual(p.Effect2, 29))
+    {
         s_InitWarpScroll(p, warp_enter, warp_exit, 30);
+        SoundPause[SFX_Door] = 60;
+    }
     // process the scroll effect
     else if(p.Effect2 >= 128)
     {
@@ -1022,7 +1075,10 @@ void PlayerEffectWarpDoor(int A)
         p.Location.Y += (targetY - p.Location.Y) / frames_left;
 
         if(frames_left == 30)
+        {
             s_TriggerDoorEffects(warp_exit);
+            PlaySoundSpatial(SFX_Door, warp_exit);
+        }
 
         p.Effect2 -= 1;
 
@@ -1070,6 +1126,8 @@ void PlayerEffectWarpDoor(int A)
                     }
                 }
             }
+
+            SharedScreenResetTemp(screen);
         }
 
         CheckSection(A);
@@ -1151,7 +1209,7 @@ void PlayerEffectWarpWait(int A)
 
             s_TriggerDoorEffects(static_cast<Location_t>(warp_exit), false);
 
-            SoundPause[46] = 0;
+            SoundPause[SFX_Door] = 0;
             PlaySoundSpatial(SFX_Door, p.Location);
         }
     }
@@ -1161,8 +1219,14 @@ void PlayerEffectWarpWait(int A)
         p.Effect2 -= 1;
         if(fEqual(p.Effect2, 100))
         {
+            Screen_t& screen = ScreenByPlayer(A);
+
+            SharedScreenAvoidJump_Pre(screen);
+
             p.Effect = PLREFF_NORMAL;
             p.Effect2 = 0;
+
+            SharedScreenAvoidJump_Post(screen, 0);
         }
     }
     // 2P holding condition for start warp (pipe exit)
@@ -1171,8 +1235,14 @@ void PlayerEffectWarpWait(int A)
         p.Effect2 -= 1;
         if(fEqual(p.Effect2, 200))
         {
+            Screen_t& screen = ScreenByPlayer(A);
+
+            SharedScreenAvoidJump_Pre(screen);
+
             p.Effect2 = 100;
             p.Effect = PLREFF_WARP_PIPE;
+
+            SharedScreenAvoidJump_Post(screen, 0);
         }
     }
     else if(p.Effect2 <= 1000) // Start Wait for pipe
@@ -1183,18 +1253,20 @@ void PlayerEffectWarpWait(int A)
             p.Effect = PLREFF_WARP_PIPE;
             p.Effect2 = 100;
 
-            // 2P holding condition for start warp
-            if(A == 2 && (g_ClonedPlayerMode || numPlayers <= 2))
+            const Screen_t& screen = ScreenByPlayer(A);
+
+            bool do_modern = !g_ClonedPlayerMode && (numPlayers > 2 || screen.Type == ScreenTypes::SharedScreen);
+            if(!do_modern)
             {
-                p.Effect = PLREFF_WAITING;
-                p.Effect2 = 300;
+                // 2P holding condition for start warp
+                if(A == screen.players[1])
+                {
+                    p.Effect = PLREFF_WAITING;
+                    p.Effect2 = 300;
+                }
             }
-            // modern >2P holding condition for warp
-            else if(A >= 2 && !g_ClonedPlayerMode)
-            {
-                p.Effect = PLREFF_WARP_PIPE;
-                p.Effect2 = 2010 + 100 * (A - 1);
-            }
+            else
+                s_delay_pipe_exit(A);
         }
     }
     else if(p.Effect2 <= 2000) // Start Wait for door
@@ -1205,7 +1277,7 @@ void PlayerEffectWarpWait(int A)
         {
             s_TriggerDoorEffects(static_cast<Location_t>(Warp[p.Warp].Exit), false);
 
-            SoundPause[46] = 0;
+            SoundPause[SFX_Door] = 0;
             p.Effect = PLREFF_WAITING;
             p.Effect2 = 30;
 
@@ -1218,7 +1290,7 @@ void PlayerEffectWarpWait(int A)
                 PlaySoundSpatial(SFX_Door, p.Location);
         }
     }
-    else if(p.Effect2 <= 3000) // warp wait
+    else if(p.Effect2 <= 3000) // exit warp wait
     {
         p.Effect2 -= 1;
 

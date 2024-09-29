@@ -53,7 +53,8 @@ namespace OptCursor_t
         LVL_BLOCKS = 1,
         LVL_BGOS = 3,
         LVL_NPCS = 4,
-        LVL_SETTINGS = 2,
+        LVL_SECTION = 2,
+        LVL_PLAYERSTART = 18,
         LVL_WARPS = 5,
         LVL_WATER = 15,
         LVL_EVENTS = 17,
@@ -81,8 +82,8 @@ extern void UpdateEditor();
 extern void UpdateInterprocess();
 #endif
 
-extern int EditorNPCFrame(const NPCID A, int C, int N = 0);
-extern int EditorNPCFrame(const NPCID A, float& C, int N = 0);
+// extern int EditorNPCFrame(const NPCID A, vbint_t C, int N = 0);
+extern int EditorNPCFrame(const NPCID A, vbint_t& C, int N = 0);
 
 extern void GetEditorControls();
 

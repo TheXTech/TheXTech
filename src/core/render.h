@@ -39,6 +39,11 @@
 #   define TAIL ;
 #endif
 
+namespace PGE_FileFormats_misc
+{
+    class TextInput;
+}
+
 struct UniformValue_t;
 
 
@@ -63,10 +68,13 @@ extern int TargetW;
 extern int TargetH;
 
 #ifndef RENDER_CUSTOM
-
 // reset bitmask warning flag for SDL platforms
 extern bool g_BitmaskTexturePresent;
+#endif
 
+#ifdef __16M__
+// signals that the GPU is ready for new commands (will not block at frame end)
+bool ready_for_frame();
 #endif
 
 
@@ -396,7 +404,7 @@ SDL_FORCE_INLINE void LoadPicture(StdPicture &target,
 
 
 #if defined(PGE_MIN_PORT) || defined(THEXTECH_CLI_BUILD)
-E_INLINE void lazyLoadPictureFromList(StdPicture_Sub& target, FILE* f, const std::string& dir);
+E_INLINE void lazyLoadPictureFromList(StdPicture_Sub& target, PGE_FileFormats_misc::TextInput& t, std::string& line_buf, const std::string& dir);
 #endif
 
 E_INLINE void setTransparentColor(StdPicture &target, uint32_t rgb) TAIL
@@ -633,6 +641,25 @@ E_INLINE void renderTextureScale(double xDst, double yDst, double wDst, double h
 }
 #endif
 
+E_INLINE void renderTextureBasic(int xDst, int yDst, int wDst, int hDst,
+                           StdPicture &tx,
+                           int xSrc, int ySrc,
+                           XTColor color = XTColor()) TAIL
+#ifndef RENDER_CUSTOM
+{
+    // (this will use the double signature on desktop renderers)
+    g_render->renderTexture(xDst, yDst, wDst, hDst,
+                            tx,
+                            xSrc, ySrc,
+                            color);
+}
+#endif
+
+void renderTextureBasic(double xDst, double yDst, double wDst, double hDst,
+                       StdPicture &tx,
+                       double xSrc, double ySrc,
+                       XTColor color = XTColor()) = delete;
+
 E_INLINE void renderTexture(double xDst, double yDst, double wDst, double hDst,
                            StdPicture &tx,
                            int xSrc, int ySrc,
@@ -669,6 +696,18 @@ E_INLINE void renderTexture(float xDst, float yDst, StdPicture &tx,
                             color);
 }
 #endif
+
+E_INLINE void renderTextureBasic(int xDst, int yDst, StdPicture &tx,
+                           XTColor color = XTColor()) TAIL
+#ifndef RENDER_CUSTOM
+{
+    // (this will use the float signature on desktop renderers)
+    g_render->renderTexture(xDst, yDst, tx, color);
+}
+#endif
+
+void renderTextureBasic(float xDst, float yDst, StdPicture &tx,
+                           XTColor color = XTColor()) = delete;
 
 /*!
  * \brief Draws the particle system at a particular camera offset

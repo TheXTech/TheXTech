@@ -186,7 +186,7 @@ void FillGraph(Graph& graph)
         bool contains_door = is_container && (n.Special == NPCID_DOOR_MAKER || n.Special == NPCID_MAGIC_DOOR);
         bool is_door = (n.Type == NPCID_DOOR_MAKER || n.Type == NPCID_MAGIC_DOOR);
 
-        bool has_target_section = n.Special2 > 0;
+        bool has_target_section = n.Special2 >= 0;
 
         // allow doors only
         if(!is_door && !contains_door)

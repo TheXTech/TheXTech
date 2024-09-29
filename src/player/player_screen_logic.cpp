@@ -18,17 +18,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "sdl_proxy/sdl_stdinc.h"
+
 #include "globals.h"
 #include "player.h"
 #include "graphics.h"
 #include "screen.h"
+#include "blocks.h"
+#include "collision.h"
 #include "config.h"
 
+#include "main/trees.h"
 #include "main/game_globals.h"
 
 void PlayerSharedScreenLogic(int A)
 {
-    const Screen_t& screen = ScreenByPlayer(A);
+    Screen_t& screen = ScreenByPlayer(A);
 
     // if(!LevelWrap[Player[A].Section] && LevelMacro == LEVELMACRO_OFF)
     // This section is fully new logic
@@ -38,7 +43,6 @@ void PlayerSharedScreenLogic(int A)
         const SpeedlessLocation_t& section = level[p.Section];
 
         const vScreen_t& vscreen = vScreenByPlayer(A);
-
 
         // section for shared screen push
         bool check_left = true;
@@ -70,7 +74,12 @@ void PlayerSharedScreenLogic(int A)
             if(p.Location.X <= -vscreen.X)
             {
                 p.Location.X = -vscreen.X;
-                p.Pinched.Left2 = 2;
+
+                // give wings to a player that would be killed by pinching
+                if(p.Pinched.Right4 && p.Pinched.Moving && !p.Pinched.Left2)
+                    p.Effect = PLREFF_COOP_WINGS;
+                else
+                    p.Pinched.Left2 = 2;
 
                 if(p.Location.SpeedX < 0)
                     p.Location.SpeedX = 0;
@@ -78,13 +87,22 @@ void PlayerSharedScreenLogic(int A)
 
             if(p.Location.SpeedX >= 0 && p.Location.SpeedX < 1)
                 p.Location.SpeedX = 1;
+
+            // give wings to a player that gets stuck to the left
+            if(NoTurnBack[p.Section] && p.Pinched.Right4)
+                p.Effect = PLREFF_COOP_WINGS;
         }
         else if(p.Location.X + p.Location.Width >= -vscreen.X + vscreen.Width - 8 && check_right)
         {
             if(p.Location.X + p.Location.Width >= -vscreen.X + vscreen.Width)
             {
                 p.Location.X = -vscreen.X + vscreen.Width - p.Location.Width;
-                p.Pinched.Right4 = 2;
+
+                // give wings to a player that would be killed by pinching
+                if(p.Pinched.Left2 && p.Pinched.Moving && !p.Pinched.Right4)
+                    p.Effect = PLREFF_COOP_WINGS;
+                else
+                    p.Pinched.Right4 = 2;
 
                 if(p.Location.SpeedX > 0)
                     p.Location.SpeedX = 0;
@@ -95,9 +113,200 @@ void PlayerSharedScreenLogic(int A)
         }
 
 
-        // kill a player that falls offscreen
-        if(p.Location.Y > -vscreen.Y + vscreen.Height + 64)
-            PlayerDead(A);
+        // give wings to a player that falls offscreen but not off-section
+        if(p.Location.Y > -vscreen.Y + vscreen.Height + 64 && p.Location.Y <= level[p.Section].Height)
+            p.Effect = PLREFF_COOP_WINGS;
+
+        if(p.Effect == PLREFF_COOP_WINGS)
+        {
+            SharedScreenAvoidJump_Pre(screen);
+            p.Dead = true;
+            p.Effect2 = 0;
+            SizeCheck(p);
+            SharedScreenAvoidJump_Post(screen, 0);
+        }
+    }
+}
+
+void PlayerEffectWings(int A)
+{
+    Screen_t& screen = ScreenByPlayer(A);
+    Player_t& p = Player[A];
+
+    int vscreen_i = vScreenIdxByPlayer(A);
+    const vScreen_t& vscreen = vScreen[vscreen_i];
+
+    p.Fairy = false;
+
+    if(screen.Type == ScreenTypes::SharedScreen)
+    {
+        bool button_pressed = p.Controls.Jump && p.CanJump;
+        if(p.Controls.Jump)
+            p.CanJump = false;
+
+        int WingsFrame = 0;
+
+        // check if the player should be moving towards another player or towards the screen
+        int target_plr = CheckNearestLiving(A);
+        if(target_plr)
+            p.Section = Player[target_plr].Section;
+
+        if(!button_pressed)
+            target_plr = 0;
+
+        bool offscreen = !vScreenCollision(vscreen_i, p.Location);
+
+        // force to be close to the screen
+        if(offscreen)
+        {
+            if(p.Location.X + p.Location.Width < -vscreen.X - 100)
+                p.Location.X = -vscreen.X - 100 - p.Location.Width;
+            if(p.Location.X > -vscreen.X + vscreen.Width + 100)
+                p.Location.X = -vscreen.X + vscreen.Width + 100;
+            if(p.Location.Y + p.Location.Height < -vscreen.Y - 100)
+                p.Location.Y = -vscreen.Y - 100 - p.Location.Height;
+            if(p.Location.Y > -vscreen.Y + vscreen.Height + 100)
+                p.Location.Y = -vscreen.Y + vscreen.Height + 100;
+        }
+
+        // move towards screen center or living player
+        if(target_plr || offscreen)
+        {
+            double target_X = (target_plr) ? (Player[target_plr].Location.X + Player[target_plr].Location.Width / 2) : -vscreen.X + vscreen.Width / 2;
+            double target_Y = (target_plr) ? Player[target_plr].Location.Y - 8 : -vscreen.Y + vscreen.Height / 2;
+
+            int randomness = (target_plr) ? 8 : vscreen.Width / 10;
+            target_X += iRand(randomness * 2) - randomness;
+            target_Y += iRand(randomness * 2) - randomness;
+
+            double center_X = p.Location.X + p.Location.Width / 2;
+            double center_Y = p.Location.Y + p.Location.Height / 2;
+
+            double target_SpeedX = (target_X - center_X);
+            double target_SpeedY = (target_Y - center_Y);
+
+            double target_speed = SDL_sqrt(target_SpeedX * target_SpeedX + target_SpeedY * target_SpeedY);
+
+            if(target_speed != 0.0)
+            {
+                target_SpeedX *= 8.0 / target_speed;
+                target_SpeedY *= 8.0 / target_speed;
+            }
+
+            p.Location.SpeedX = p.Location.SpeedX * 0.5 + target_SpeedX * 0.5;
+            p.Location.SpeedY = p.Location.SpeedY * 0.5 + target_SpeedY * 0.5;
+
+            if(SoundPause[SFX_Swim] == 0)
+            {
+                PlaySoundSpatial(SFX_Swim, p.Location);
+                SoundPause[SFX_Swim] = 15;
+            }
+        }
+        // deceleration
+        else
+        {
+            double sq_speed = p.Location.SpeedX * p.Location.SpeedX + p.Location.SpeedY * p.Location.SpeedY;
+            double decelerate_rate = (sq_speed > 4.0) ? 0.95 : (sq_speed > 1.0) ? 0.99 : 0.999;
+
+            if(sq_speed <= 4.0)
+            {
+                WingsFrame = 1;
+
+                if(!p.Controls.Jump)
+                    p.CanJump = true;
+            }
+
+            p.Location.SpeedX *= decelerate_rate;
+            p.Location.SpeedY *= decelerate_rate;
+        }
+
+        // update frame
+        p.SpinJump = false;
+        p.WetFrame = false;
+        if(p.Location.SpeedY == 0)
+            p.Location.SpeedY = 0.00001;
+        PlayerFrame(p);
+        if(p.Location.SpeedX >= 0)
+        {
+            p.Direction = 1;
+            p.YoshiWingsFrame = WingsFrame + 2;
+        }
+        else
+        {
+            p.Direction = -1;
+            p.YoshiWingsFrame = WingsFrame;
+        }
+
+        // apply movement
+        p.Location.X += p.Location.SpeedX;
+        p.Location.Y += p.Location.SpeedY;
+
+        // tag other players
+        bool found_player = false;
+        for(int B = 1; B <= numPlayers; B++)
+        {
+            if(Player[B].Dead || Player[B].TimeToLive != 0 || Player[B].Effect != PLREFF_NORMAL)
+                continue;
+
+            if(!CheckCollision(Player[A].Location, Player[B].Location))
+                continue;
+
+            found_player = true;
+            break;
+        }
+
+        // just collided with player
+        if(found_player && !p.Effect2)
+        {
+            // if we're inside a block, then we can't respawn yet
+            bool hit_block = false;
+            for(BlockRef_t b_ref : treeBlockQuery(Player[A].Location, SORTMODE_NONE))
+            {
+                const Block_t& b = b_ref;
+                int B = (int)b_ref;
+
+                if(b.Hidden || b.Invis || BlockIsSizable[b.Type] || BlockOnlyHitspot1[b.Type] || BlockNoClipping[b.Type])
+                    continue;
+
+                if(BlockCheckPlayerFilter(B, A))
+                    continue;
+
+                if(!CheckCollision(Player[A].Location, b.Location))
+                    continue;
+
+                if(BlockSlope[B] || BlockSlope2[B])
+                    continue;
+
+                hit_block = true;
+                break;
+            }
+
+            if(!hit_block)
+            {
+                p.Effect = PLREFF_NORMAL;
+                PlayerCollide(A);
+                PlaySoundSpatial(SFX_Transform, p.Location);
+            }
+        }
+
+        p.Effect2 = found_player;
+    }
+    else
+        p.Effect = PLREFF_NORMAL;
+
+    if(p.Effect != PLREFF_COOP_WINGS)
+    {
+        SharedScreenAvoidJump_Pre(screen);
+
+        p.Dead = false;
+        p.CanJump = false;
+        p.Effect2 = 0;
+        p.Immune = 50;
+        p.Immune2 = false;
+        CheckSection(A);
+        PlayerFrame(p);
+
+        SharedScreenAvoidJump_Post(screen, 0);
     }
 }
 

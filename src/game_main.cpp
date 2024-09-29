@@ -399,7 +399,7 @@ int GameMain(const CmdLineSetup_t &setup)
     bool cmdline_content = (!setup.testLevel.empty() || !setup.testReplay.empty() || setup.interprocess);
 
     // special case: go straight to asset pack menu
-    if(g_config.pick_assets_on_start && !cmdline_content && GetAssetPacks().size() > 1)
+    if(g_config.pick_assets_on_start && !cmdline_content && setup.assetPack.empty() && GetAssetPacks().size() > 1)
     {
         FontManager::initFull();
         Controls::LoadTouchScreenGFX();
@@ -502,12 +502,12 @@ int GameMain(const CmdLineSetup_t &setup)
                 for(int i = 0; i < numPlayers; i++)
                 {
                     if(testPlayer[i + 1].Character != 0)
-                        g_charSelect[i] = testPlayer[i + 1].Character;
+                        l_screen->charSelect[i] = testPlayer[i + 1].Character;
                     else
-                        g_charSelect[i] = i + 1;
+                        l_screen->charSelect[i] = i + 1;
 
                     // replace blocked characters
-                    if(blockCharacter[g_charSelect[i]])
+                    if(blockCharacter[l_screen->charSelect[i]])
                     {
                         for(int new_char = 1; new_char <= numCharacters; new_char++)
                         {
@@ -519,14 +519,14 @@ int GameMain(const CmdLineSetup_t &setup)
                             int j = 0;
                             for(; j < i; j++)
                             {
-                                if(g_charSelect[j] == new_char)
+                                if(l_screen->charSelect[j] == new_char)
                                     break;
                             }
 
                             // if loop ended naturally, character is unused
                             if(j == i)
                             {
-                                g_charSelect[i] = new_char;
+                                l_screen->charSelect[i] = new_char;
                                 break;
                             }
                         }
@@ -568,6 +568,9 @@ int GameMain(const CmdLineSetup_t &setup)
 
         if(ScreenAssetPack::g_LoopActive)
         {
+            // make sure that controllers can connect properly
+            numPlayers = maxLocalPlayers;
+
             // Run the frame-loop
             runFrameLoop(&ScreenAssetPack::Loop,
                          nullptr,
@@ -585,6 +588,11 @@ int GameMain(const CmdLineSetup_t &setup)
             // ScreenType = 0; // set in SetupScreens()
             XEvents::doEvents();
             SetupEditorGraphics(); //Set up the editor graphics
+            InitScreens();
+
+            for(int i = 0; i < maxLocalPlayers; i++)
+                Screens_AssignPlayer(i + 1, *l_screen);
+
             SetupScreens();
             MagicHand = false;
             MouseRelease = false;
@@ -604,11 +612,15 @@ int GameMain(const CmdLineSetup_t &setup)
             MenuMode = MENU_INTRO;
             LevelEditor = false;
             WorldEditor = false;
-            XRender::clearBuffer();
-            XRender::repaint();
+
+            if(GameIsActive)
+            {
+                XRender::clearBuffer();
+                XRender::repaint();
 #ifdef THEXTECH_PRELOAD_LEVELS
-            FindWorlds();
+                FindWorlds();
 #endif
+            }
         }
 
         // TheXTech Credits
@@ -791,7 +803,6 @@ int GameMain(const CmdLineSetup_t &setup)
             pLogDebug("Clear check-points at Game Menu start");
             Checkpoint.clear();
             CheckpointsList.clear();
-            g_curLevelMedals.reset_lvl();
             g_curLevelMedals.reset_checkpoint();
             WorldPlayer[1].Frame = 0;
             cheats_clearBuffer();
@@ -819,17 +830,27 @@ int GameMain(const CmdLineSetup_t &setup)
             g_CheatEditYourFriends = false;
             XRender::unloadGifTextures();
 
-            // reinitialize the screens (resets multiplayer preferences)
+            // reset l_screen to index 0
+            Screens[0] = *l_screen;
+            l_screen = &Screens[0];
+
+            // reset non-local screens' charSelect
+            for(int s = 1; s < maxNetplayClients; s++)
+                Screens[s].charSelect = {};
+
+            // reinitialize the screens (resets multiplayer preferences and restores state disrupted by reassigning Screens[0])
             InitScreens();
+
+            for(int i = 0; i < maxLocalPlayers; i++)
+                Screens_AssignPlayer(i + 1, *l_screen);
+
             SetupScreens();
 
             BattleOutro = 0;
             BattleIntro = 0;
 
             for(int A = 1; A <= maxPlayers; ++A)
-            {
                 Player[A] = blankPlayer;
-            }
 
             numPlayers = g_gameInfo.introMaxPlayersCount;
 #ifdef __16M__
@@ -1287,11 +1308,9 @@ int GameMain(const CmdLineSetup_t &setup)
             if(LevelBeatCode > 0 || !GoToLevel.empty())
             {
                 CommitBeatCode(LevelBeatCode);
-
                 g_curLevelMedals.commit();
-                g_curLevelMedals.reset_checkpoint();
             }
-            // otherwise, restore the medals from checkpoint
+            // otherwise, reset the medal count
             else
                 g_curLevelMedals.on_all_dead();
 
@@ -2070,6 +2089,43 @@ void SizableBlocks()
     BlockIsSizable[445] = true;
 }
 
+static void s_InitPlayersFromCharSelect()
+{
+    // load players from the screens
+    numPlayers = 0;
+    InitScreens();
+
+    for(int s = 0; s < maxNetplayClients; s++)
+    {
+        Screen_t& screen = Screens[s];
+
+        for(int i = 0; i < maxLocalPlayers; i++)
+        {
+            if(screen.charSelect[i] != 0)
+            {
+                numPlayers++;
+                Screens_AssignPlayer(numPlayers, screen);
+
+                Player_t& p = Player[numPlayers];
+                p.State = 1;
+                p.Mount = 0;
+                p.Character = screen.charSelect[i];
+                p.HeldBonus = NPCID(0);
+                p.CanFly = false;
+                p.CanFly2 = false;
+                p.TailCount = 0;
+                p.YoshiBlue = false;
+                p.YoshiRed = false;
+                p.YoshiYellow = false;
+                p.Hearts = 0;
+            }
+        }
+    }
+
+    for(int i = (int)Controls::g_InputMethods.size() - 1; i >= l_screen->player_count; i--)
+        Controls::DeleteInputMethodSlot(i);
+}
+
 void StartEpisode()
 {
     For(A, 1, numCharacters)
@@ -2079,34 +2135,8 @@ void StartEpisode()
         SavedChar[A].State = 1;
     }
 
-    for(int i = 1; i <= maxLocalPlayers; i++)
-    {
-        Player[i].State = 1;
-        Player[i].Mount = 0;
-        // reassigned below unless something is wrong
-        Player[i].Character = (i - 1) % 5 + 1;
-        Player[i].HeldBonus = NPCID(0);
-        Player[i].CanFly = false;
-        Player[i].CanFly2 = false;
-        Player[i].TailCount = 0;
-        Player[i].YoshiBlue = false;
-        Player[i].YoshiRed = false;
-        Player[i].YoshiYellow = false;
-        Player[i].Hearts = 0;
-    }
-
-    numPlayers = (int)Controls::g_InputMethods.size();
-    if(numPlayers > maxLocalPlayers)
-        numPlayers = maxLocalPlayers;
-
-    for(int i = 0; i < numPlayers; i++)
-    {
-        if(g_charSelect[i] != 0)
-            Player[i + 1].Character = g_charSelect[i];
-    }
-
-    for(int i = (int)Controls::g_InputMethods.size() - 1; i >= numPlayers; i--)
-        Controls::DeleteInputMethodSlot(i);
+    // load players from the screens
+    s_InitPlayersFromCharSelect();
 
     ConnectScreen::SaveChars();
 
@@ -2221,34 +2251,13 @@ void StartBattleMode()
         SavedChar[A].State = 1;
     }
 
-    for(int i = 1; i <= maxLocalPlayers; i++)
+    s_InitPlayersFromCharSelect();
+
+    for(int i = 1; i <= numPlayers; i++)
     {
         Player[i].State = 2;
-        Player[i].Mount = 0;
-        // reassigned below unless something is wrong
-        Player[i].Character = (i - 1) % 5 + 1;
-        Player[i].HeldBonus = NPCID(0);
-        Player[i].CanFly = false;
-        Player[i].CanFly2 = false;
-        Player[i].TailCount = 0;
-        Player[i].YoshiBlue = false;
-        Player[i].YoshiRed = false;
-        Player[i].YoshiYellow = false;
         Player[i].Hearts = 2;
     }
-
-    numPlayers = (int)Controls::g_InputMethods.size();
-    if(numPlayers > maxLocalPlayers)
-        numPlayers = maxLocalPlayers;
-
-    for(int i = 0; i < numPlayers; i++)
-    {
-        if(g_charSelect[i] != 0)
-            Player[i + 1].Character = g_charSelect[i];
-    }
-
-    for(int i = (int)Controls::g_InputMethods.size() - 1; i >= numPlayers; i--)
-        Controls::DeleteInputMethodSlot(i);
 
     numStars = 0;
     Coins = 0;

@@ -84,13 +84,15 @@ struct vScreen_t : public qScreen_t
     int TargetY() const;
 
     //! x-offset to add for render calls (based on X, but may be rounded)
-    double CameraAddX() const;
+    int CameraAddX() const;
 
     //! Y-offset to add for render calls (based on Y, but may be rounded)
-    double CameraAddY() const;
+    int CameraAddY() const;
 };
 
-constexpr int c_screenCount = 2;
+constexpr int maxNetplayClients = 8;
+constexpr int maxNetplayPlayers = maxNetplayClients * maxLocalPlayers;
+constexpr int c_screenCount = 2 * maxNetplayClients;
 constexpr int c_vScreenCount = c_screenCount * maxLocalPlayers;
 
 //Public vScreen(0 To 2) As vScreen 'Sets up the players screens
@@ -159,6 +161,9 @@ public:
     //! which players belong to the screen (no player may belong to multiple visible screens).
     localarr_t players;
 
+    //! which characters have been requested
+    localarr_t charSelect;
+
     //! how many active players in this screen (excluding cloned-player mode)
     int player_count = 0;
 
@@ -180,6 +185,11 @@ public:
     //! the currently requested multiplayer modes for the screen
     int two_screen_pref = MultiplayerPrefs::Dynamic;
     int four_screen_pref = MultiplayerPrefs::Shared;
+
+    inline bool is_active() const
+    {
+        return player_count != 0;
+    }
 
     inline bool is_canonical() const
     {
@@ -217,6 +227,15 @@ public:
 extern RangeArr<Screen_t, 0, c_screenCount - 1> Screens;
 
 void InitScreens();
+
+// ensure that the vScreen players and canonical screen players are consistent with the primary screens' players
+void UpdateScreenPlayers();
+
+// assigns a player to a screen
+void Screens_AssignPlayer(int player, Screen_t& screen);
+
+// drop a player from the screens system, lowering the indices of all higher players (but does no other player drop logic)
+void Screens_DropPlayer(int player);
 
 // finds the visible Screen that contains a specific player
 int ScreenIdxByPlayer(int player);

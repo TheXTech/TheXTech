@@ -20,6 +20,7 @@
 
 #include <Logger/logger.h>
 #include <IniProcessor/ini_processing.h>
+#include <Utils/files_ini.h>
 
 #include <fmt_format_ne.h>
 
@@ -964,9 +965,7 @@ void Load(XTechTranslate* translate)
 
     pLogDebug("Loading editor.ini...");
 
-    IniProcessing editor(AppPath + "editor.ini");
-    // IniProcessing sound(AppPath + "sounds.ini");
-    // IniProcessing music(AppPath + "music.ini");
+    IniProcessing editor = Files::load_ini(AppPath + "editor.ini");
 
     std::vector<int> temp_ints;
     std::vector<int> temp_layout_pod_indices;

@@ -24,6 +24,7 @@
 
 #include "sdl_proxy/sdl_stdinc.h"
 
+#include "pseudo_vb.h"
 #include "globals.h"
 #include "global_dirs.h"
 #include "frame_timer.h"
@@ -33,14 +34,25 @@
 
 #include "sound.h"
 
+#include <SDL2/SDL_rwops.h>
+
 #include <Logger/logger.h>
 #include <IniProcessor/ini_processing.h>
 #include <Utils/files.h>
+#include <Utils/files_ini.h>
 #include <Utils/strings.h>
 #include <unordered_map>
 #include <fmt_format_ne.h>
 
-#include "pseudo_vb.h"
+#include "core/16m/sound_stream_16m.h"
+
+static constexpr int s_max_effects = 1920;
+static constexpr int s_max_modules =  128;
+static int s_soundbank_effects = 0;
+static int s_soundbank_modules = 0;
+
+static mm_word s_soundbank_pointers[s_max_effects + s_max_modules] = {0};
+static SDL_RWops* s_soundbank_rwops = nullptr;
 
 // Public musicPlaying As Boolean
 bool musicPlaying = false;
@@ -74,12 +86,65 @@ static bool s_useIceBallSfx = false;
 static bool s_useNewIceSfx = false;
 
 static int s_curMusic = -1;
+static uint16_t s_customSection = 0;
 // static int s_curJingle = -1;
 static std::vector<bool> s_soundLoaded;
 static std::vector<int> s_worldMusicMods;
 static std::vector<int> s_levelMusicMods;
 static std::vector<int> s_specialMusicMods;
 static std::vector<int> s_sfxEffects;
+
+static uint8_t* s_maxmod_rwops_load(int id)
+{
+    if(!s_soundbank_rwops)
+        return nullptr;
+
+    SDL_RWseek(s_soundbank_rwops, 12 + id * 4, RW_SEEK_SET);
+
+    uint32_t off = 0;
+    SDL_RWread(s_soundbank_rwops, &off, sizeof(off), 1);
+    SDL_RWseek(s_soundbank_rwops, off, RW_SEEK_SET);
+
+    uint32_t size = 0;
+    SDL_RWread(s_soundbank_rwops, &size, sizeof(off), 1);
+    SDL_RWseek(s_soundbank_rwops, off, RW_SEEK_SET);
+    size += 8; // header
+
+    uint8_t* mem = (uint8_t*)malloc(size);
+    if(!mem)
+    {
+        pLogWarning("Sound: failed to allocate 0x%lx bytes to load #%d", size, id);
+        return nullptr;
+    }
+
+    if(SDL_RWread(s_soundbank_rwops, mem, 1, size) != size)
+    {
+        pLogWarning("Sound: failed to load #%d", id);
+        free(mem);
+        return nullptr;
+    }
+
+    return mem;
+}
+
+static mm_word s_maxmod_loader(mm_word msg, mm_word param)
+{
+    switch(msg)
+    {
+        case MMCB_SAMPREQUEST:
+            return reinterpret_cast<mm_word>(s_maxmod_rwops_load((int)param));
+        case MMCB_SONGREQUEST:
+            return reinterpret_cast<mm_word>(s_maxmod_rwops_load((int)param + s_soundbank_effects));
+        case MMCB_DELETESAMPLE:
+        case MMCB_DELETESONG:
+            free(reinterpret_cast<void*>(param));
+            break;
+        default:
+            break;
+    }
+    return 0;
+}
+
 
 int CustomWorldMusicId()
 {
@@ -88,24 +153,70 @@ int CustomWorldMusicId()
 
 void InitMixerX()
 {
-    std::string SoundbankPath = AppPath + "soundbank.bin";
-
     if(g_mixerLoaded)
         return;
 
-    mmInitDefault(const_cast<char*>(SoundbankPath.c_str()));
+    mm_ds_system sys;
+    sys.mod_count    = s_max_modules;
+    sys.samp_count   = s_max_effects;
+    sys.mem_bank     = s_soundbank_pointers;
+    sys.fifo_channel = FIFO_MAXMOD;
+    mmInit(&sys);
+    mmSetCustomSoundBankHandler(s_maxmod_loader);
     g_mixerLoaded = true;
 }
 
+void LoadSoundBank()
+{
+    if(s_soundbank_rwops)
+        return;
+
+    std::string SoundbankPath = AppPath + "soundbank.bin";
+
+    s_soundbank_rwops = Files::open_file(SoundbankPath, "rb");
+
+    uint16_t nsamps, nmods;
+
+    if(!s_soundbank_rwops || SDL_RWread(s_soundbank_rwops, &nsamps, 2, 1) != 1 || SDL_RWread(s_soundbank_rwops, &nmods, 2, 1) != 1)
+    {
+        pLogWarning("Could not open soundbank [%s]", SoundbankPath.c_str());
+
+        if(s_soundbank_rwops)
+            SDL_RWclose(s_soundbank_rwops);
+
+        s_soundbank_rwops = nullptr;
+
+        return;
+    }
+
+    s_soundbank_modules = nmods;
+    s_soundbank_effects = nsamps;
+
+    pLogDebug("Opened soundbank [%s] with %d modules and %d samples", SoundbankPath.c_str(), s_soundbank_modules, s_soundbank_effects);
+}
+
 void QuitMixerX()
+{
+    // maxmod doesn't provide us any way to fully unload
+}
+
+void RestartMixerX()
+{
+}
+
+void UnloadSound()
 {
     if(!g_mixerLoaded)
         return;
 
     mmStop();
+    mmEffectCancelAll();
 
-    if(s_curMusic != -1)
+    if(s_curMusic > -1)
         mmUnload(s_curMusic);
+    else if(s_curMusic < -1)
+        Sound_StreamStop();
+
     s_curMusic = -1;
 
     for(unsigned int i = 0; i < g_totalSounds; i++)
@@ -115,18 +226,20 @@ void QuitMixerX()
         s_soundLoaded[i] = false;
     }
 
-    g_mixerLoaded = false;
-}
+    if(s_soundbank_rwops)
+    {
+        SDL_RWclose(s_soundbank_rwops);
+        s_soundbank_rwops = nullptr;
+    }
 
-void RestartMixerX()
-{
-    QuitMixerX();
-    InitMixerX();
-}
+    s_soundbank_effects = 0;
+    s_soundbank_modules = 0;
 
-void UnloadSound()
-{
-    RestartMixerX();
+    s_soundLoaded.clear();
+    s_worldMusicMods.clear();
+    s_levelMusicMods.clear();
+    s_specialMusicMods.clear();
+    s_sfxEffects.clear();
 }
 
 
@@ -229,13 +342,42 @@ static void s_MusicUpdateFade()
 static void s_playMusic(int mod, int fadeInMs)
 {
     StopMusic();
+    if(mod == -2 && s_customSection > maxSections)
+        return;
+
     if(mod == -1)
         return;
 
-    mmLoad(mod);
     s_curMusic = mod;
-    s_MusicSetupFade(1024, fadeInMs);
-    mmStart(mod, MM_PLAY_LOOP);
+
+    if(!g_mixerLoaded)
+        return;
+
+    if(mod > -1)
+    {
+        mmLoad(mod);
+        s_MusicSetupFade(1024, fadeInMs);
+        mmStart(mod, MM_PLAY_LOOP);
+    }
+    else if(mod == -2 || mod == -3)
+    {
+        std::string p = ((mod == -3) ? (curWorldMusicFile) : CustomMusic[s_customSection]);
+
+        // remove pipe and add qoa
+        for(size_t i = 0; i < p.size(); i++)
+        {
+            if(p[i] == '|')
+            {
+                p.resize(i);
+                break;
+            }
+        }
+        p += ".qoa";
+
+        p = g_dirEpisode.resolveFileCaseExistsAbs(p);
+
+        Sound_StreamStart(Files::open_file(p, "rb"));
+    }
 }
 
 void setMusicStartDelay()
@@ -313,16 +455,14 @@ void StartMusic(int A, int fadeInMs)
         StopMusic();
         curWorldMusic = A;
         musicName = fmt::format_ne("wmusic{0}", A);
+
+        int index = -1;
         if(curWorldMusic == g_customWldMusicId)
-        {
-        }
-        else
-        {
-            int index = -1;
-            if(A >= 1 && A - 1 < (int)s_worldMusicMods.size())
-                index = s_worldMusicMods[A - 1];
-            s_playMusic(index, fadeInMs);
-        }
+            index = -3;
+        else if(A >= 1 && A - 1 < (int)s_worldMusicMods.size())
+            index = s_worldMusicMods[A - 1];
+
+        s_playMusic(index, fadeInMs);
     }
     else if(A == -1) // P switch music
     {
@@ -351,8 +491,14 @@ void StartMusic(int A, int fadeInMs)
         std::string mus = fmt::format_ne("music{0}", curMusic);
 
         int index = -1;
-        if(curMusic >= 1 && curMusic - 1 < (int)s_levelMusicMods.size())
+        if(curMusic == g_customLvlMusicId)
+        {
+            s_customSection = A;
+            index = -2;
+        }
+        else if(curMusic >= 1 && curMusic - 1 < (int)s_levelMusicMods.size())
             index = s_levelMusicMods[curMusic - 1];
+
         s_playMusic(index, fadeInMs);
 
         musicName = std::move(mus);
@@ -368,12 +514,18 @@ void StopMusic()
 
     pLogDebug("Stopping music");
 
-    if(s_curMusic != -1)
+    if(s_curMusic > -1)
     {
+        mmPause();
         mmStop();
+        // busy-wait on the main core
+        while(mmActive()) {}
         mmUnload(s_curMusic);
-        s_curMusic = -1;
     }
+    else if(s_curMusic < -1)
+        Sound_StreamStop();
+
+    s_curMusic = -1;
     musicPlaying = false;
     g_stats.currentMusic.clear();
 }
@@ -394,8 +546,14 @@ void PlayInitSound()
     if(!g_mixerLoaded)
         return;
 
+    if(!s_soundbank_rwops)
+        LoadSoundBank();
+
+    if(!s_soundbank_rwops)
+        return;
+
     // std::string doSound = AppPath + "sound/";
-    IniProcessing sounds(AppPath + "sounds.ini");
+    IniProcessing sounds = Files::load_ini(AppPath + "sounds.ini");
     unsigned int totalSounds;
     sounds.beginGroup("sound-main");
     sounds.read("total", totalSounds, 0);
@@ -421,7 +579,7 @@ void PlayInitSound()
 
 static void loadMusicIni(const std::string &path, bool isLoadingCustom)
 {
-    IniProcessing musicSetup(path);
+    IniProcessing musicSetup = Files::load_ini(path);
     if(!isLoadingCustom)
     {
         g_totalMusicLevel = 0;
@@ -486,6 +644,12 @@ void InitSound()
     if(!g_mixerLoaded)
         return;
 
+    if(!s_soundbank_rwops)
+        LoadSoundBank();
+
+    if(!s_soundbank_rwops)
+        return;
+
     std::string musicIni = AppPath + "music.ini";
     std::string sfxIni = AppPath + "sounds.ini";
 
@@ -518,7 +682,7 @@ void InitSound()
     loadMusicIni(musicIni, false);
 
     UpdateLoad();
-    IniProcessing sounds(sfxIni);
+    IniProcessing sounds = Files::load_ini(sfxIni);
     sounds.beginGroup("sound-main");
     sounds.read("total", g_totalSounds, 0);
     sounds.read("use-iceball-sfx", s_useIceBallSfx, false);
@@ -671,11 +835,14 @@ void UpdateSound()
 {
     if(!g_mixerLoaded)
         return;
+
     For(A, 1, numSounds)
     {
         if(SoundPause[A] > 0)
             SoundPause[A] -= 1;
     }
+
+    Sound_StreamUpdate();
 
     s_MusicUpdateFade();
 }

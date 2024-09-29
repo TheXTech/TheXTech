@@ -103,6 +103,7 @@ public:
 
     bool TestProfileType(InputMethodProfile *profile);
     bool RumbleSupported();
+    bool PowerStatusSupported() override;
 
     void UpdateControlsPre();
     void UpdateControlsPost();

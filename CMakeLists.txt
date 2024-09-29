@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.5)
 
 if(POLICY CMP0069) # Allow CMAKE_INTERPROCEDURAL_OPTIMIZATION (lto) to be set
     cmake_policy(SET CMP0069 NEW)
+    set(CMAKE_POLICY_DEFAULT_CMP0069 NEW)
 endif()
 
 project(TheXTech LANGUAGES C CXX)
@@ -184,6 +185,7 @@ option(ENABLE_OLD_CREDITS "Use original Redigit's credits without changes" OFF)
 option(ENABLE_LOGGING "Enable debug logging written into a file (may not work on some platfors)" ON)
 
 option(THEXTECH_ENABLE_LUA "Enable lua scripting support" OFF)
+option(THEXTECH_ENABLE_LUAU "Enable luau build testing" OFF)
 option(THEXTECH_ENABLE_LUNA_AUTOCODE "Enable LunaDLL Autocode scripting support" ON)
 
 option(THEXTECH_ENABLE_EDITOR "Enable runtime support for editor features" ON)
@@ -449,6 +451,7 @@ if(THEXTECH_NO_SDL_BUILD)
     add_subdirectory(lib/sdl_proxy_rwops)
     get_target_property(SDL_PROXY_RWOPS_INCS sdl_proxy_rwops INTERFACE_INCLUDE_DIRECTORIES)
     target_include_directories(pgefl PRIVATE ${SDL_PROXY_RWOPS_INCS})
+    add_dependencies(pgefl sdl_proxy_rwops)
     target_link_libraries(A2XT_Int INTERFACE sdl_proxy_rwops)
 endif()
 
@@ -493,6 +496,9 @@ elseif(NOT THEXTECH_NO_SDL_BUILD)
     list(APPEND A2XT_INCS "${DEPENDENCIES_INSTALL_DIR}/include" ${SDL2_INCLUDE_DIRS})
     target_include_directories(pgefl PRIVATE ${SDL2_INCLUDE_DIRS})
 
+    # depend on RWops from AudioCodecs_Local SDL2 build
+    add_dependencies(pgefl AudioCodecs_Local)
+
     if(NOT USE_SYSTEM_ZLIB) # Depend on ZLib at AudioCodecs
         if(TARGET FREETYPE_Local)
             add_dependencies(FREETYPE_Local AudioCodecs_Local)
@@ -533,9 +539,13 @@ elseif(NOT THEXTECH_NO_SDL_BUILD)
 
     if(PGE_SHARED_SDLMIXER)
         if(NOT WIN32 AND NOT EMSCRIPTEN AND NOT APPLE AND NOT ANDROID AND NOT NINTENDO_SWITCH)
-            find_library(_LIB_GL GL)
-            if(_LIB_GL)
-                list(APPEND A2XT_LIBS ${_LIB_GL})
+            if(THEXTECH_BUILD_GL_ES_MODERN AND NOT THEXTECH_BUILD_GL_DESKTOP_MODERN AND NOT THEXTECH_BUILD_GL_DESKTOP_LEGACY AND NOT THEXTECH_BUILD_GL_ES_LEGACY)
+                list(APPEND A2XT_LIBS GLESv2)
+            else()
+                find_library(_LIB_GL GL)
+                if(_LIB_GL)
+                    list(APPEND A2XT_LIBS ${_LIB_GL})
+                endif()
             endif()
         else()
             list(APPEND A2XT_LIBS shell32)
@@ -578,6 +588,22 @@ if(THEXTECH_BUILD_GL_DESKTOP_MODERN AND THEXTECH_USE_ANGLE_TRANSLATOR)
 
     target_link_libraries(A2XT_Int INTERFACE angle_shader_translator)
 endif()
+
+if(THEXTECH_ENABLE_LUAU)
+    message("== Building Luau... but it doesn't do anything! ==")
+    add_subdirectory(3rdparty/luau EXCLUDE_FROM_ALL)
+    if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+        target_compile_options(Luau.Compiler PRIVATE "-w")
+        target_compile_options(Luau.Ast PRIVATE "-w")
+        target_compile_options(Luau.VM PRIVATE "-w")
+    elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+        target_compile_options(Luau.Compiler PRIVATE /wd4100) # unreferenced formal parameter
+        target_compile_options(Luau.Ast PRIVATE /wd4100) # unreferenced formal parameter
+        target_compile_options(Luau.VM PRIVATE /wd4100) # unreferenced formal parameter
+    endif()
+    target_link_libraries(A2XT_Int INTERFACE Luau.Compiler Luau.VM)
+endif()
+
 
 target_link_libraries(A2XT_Int INTERFACE ${A2XT_LIBS})
 target_include_directories(A2XT_Int INTERFACE ${A2XT_INCS})
@@ -766,6 +792,7 @@ set(THEXTECH_SRC
     src/sorting.cpp
     src/screen.cpp
     src/screen_fader.cpp
+    src/message.cpp
     src/std_picture.cpp
     src/npc/npc_hit.cpp
     src/npc/npc_kill.cpp
@@ -912,6 +939,7 @@ elseif(NINTENDO_DS)
         src/core/16m/window_16m.cpp
         src/core/null/events_null.cpp
         src/core/16m/sound_16m.cpp
+        src/core/16m/sound_stream_16m.cpp
         src/core/power/power_16m.cpp
     )
 elseif(THEXTECH_NO_SDL_BUILD)

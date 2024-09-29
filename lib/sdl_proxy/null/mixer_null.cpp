@@ -28,6 +28,7 @@
 
 #include <cstring>
 #include <cstdlib>
+#include <SDL2/SDL_rwops.h>
 
 #include "../mixer.h"
 #include "globals.h"
@@ -145,6 +146,30 @@ Mix_Music* Mix_LoadMUS(const char* path)
 {
     UNUSED(path);
     return nullptr; // Always fail
+}
+
+Mix_Music* Mix_LoadMUS_RW(struct SDL_RWops* rwops, int free_me)
+{
+    if(free_me)
+        SDL_RWclose(rwops);
+
+    return nullptr;
+}
+
+Mix_Chunk* Mix_LoadWAV_RW(struct SDL_RWops* rwops, int free_me)
+{
+    if(free_me)
+        SDL_RWclose(rwops);
+
+    return nullptr;
+}
+
+Mix_Music* Mix_LoadMUS_RW_ARG(struct SDL_RWops* rwops, int free_me, const char*)
+{
+    if(free_me)
+        SDL_RWclose(rwops);
+
+    return nullptr;
 }
 
 int Mix_VolumeMusicStream(Mix_Music* music, int volume)

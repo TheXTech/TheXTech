@@ -43,6 +43,7 @@
 #include <Logger/logger.h>
 #include <IniProcessor/ini_processing.h>
 #include <Utils/files.h>
+#include <Utils/files_ini.h>
 #include <Utils/strings.h>
 #include <unordered_map>
 #include <fmt_format_ne.h>
@@ -253,6 +254,8 @@ void InitMixerX()
 
     MusicRoot = AppPath + "music/";
     SfxRoot = AppPath + "sound/";
+
+    Mix_SetRWFromFile(Files::open_file);
 
     SDL_AtomicSet(&extSfxBusy, 0);
 
@@ -1021,7 +1024,7 @@ void PlayInitSound()
     SfxRoot = AppPath + "sound/";
 
     // std::string doSound = AppPath + "sound/";
-    IniProcessing sounds(AppPath + "sounds.ini");
+    IniProcessing sounds = Files::load_ini(AppPath + "sounds.ini");
     unsigned int totalSounds;
     sounds.beginGroup("sound-main");
     sounds.read("total", totalSounds, 0);
@@ -1050,7 +1053,7 @@ void PlayInitSound()
 
 static void loadMusicIni(SoundScope root, const std::string &path, bool isLoadingCustom)
 {
-    IniProcessing musicSetup(path);
+    IniProcessing musicSetup = Files::load_ini(path);
     if(!isLoadingCustom)
     {
         music.clear();
@@ -1154,7 +1157,7 @@ static void readFx(IniProcessing &sounds, SectionEffect_t &s)
 
 static void loadCustomSfxIni(SoundScope root, const std::string &path)
 {
-    IniProcessing sounds(path);
+    IniProcessing sounds = Files::load_ini(path);
     for(unsigned int i = 1; i <= g_totalSounds; ++i)
     {
         std::string alias = fmt::format_ne("sound{0}", i);
@@ -1268,7 +1271,7 @@ void InitSound()
     else
         IndicateProgress(start_time, 0.01, "");
 
-    IniProcessing sounds(sfxIni);
+    IniProcessing sounds = Files::load_ini(sfxIni);
     sounds.beginGroup("sound-main");
     sounds.read("total", g_totalSounds, 0);
     sounds.read("use-iceball-sfx", s_useIceBallSfx, false);
@@ -1303,6 +1306,9 @@ void InitSound()
         else
             UpdateLoad();
 #endif
+
+        if(!GameIsActive)
+            return;
     }
 
     if(LoadingInProcess)
@@ -1310,11 +1316,12 @@ void InitSound()
 
     Mix_ReserveChannels(g_reservedChannels);
 
-    if(g_errorsSfx > 0)
+    if(g_errorsSfx > 0 && GameIsActive)
     {
         XMsgBox::simpleMsgBox(XMsgBox::MESSAGEBOX_ERROR,
                               "Sounds loading error",
                               fmt::format_ne("Failed to load some SFX assets. Loo a log file to get more details:\n{0}", getLogFilePath()));
+        g_errorsSfx = 0;
     }
 
     // Print the stats of loaded sound files
@@ -1420,6 +1427,7 @@ static const std::unordered_map<int, int> s_soundFallback =
     {SFX_HeroIce, SFX_HeroFire},
     {SFX_HeroFireRod, SFX_HeroFire},
     {SFX_FlameThrower, SFX_HeroFire},
+    {SFX_PlayerHeavy, SFX_Fireball},
 };
 
 static int getFallbackSfx(int A)
@@ -1466,7 +1474,7 @@ void PlaySoundSpatial(int A, int l, int t, int r, int b, int loops, int volume)
     if(GameMenu || GameOutro) // || A == 26 || A == 27 || A == 29)
         return;
 
-    if(A > (int)g_totalSounds) // Play fallback sound for the missing SFX
+    if(A > (int)g_totalSounds || !g_config.sfx_modern) // Play fallback sound for the missing SFX
         A = getFallbackSfx(A);
     else if(!s_useIceBallSfx && A == SFX_Iceball)
         A = SFX_Fireball; // Fell back into fireball when iceball sound isn't preferred

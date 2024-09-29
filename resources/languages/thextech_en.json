@@ -344,7 +344,10 @@
             "pound-key": "Press to pound downwards!",
             "no-lives-new": "If you fail, your score will reset.",
             "no-lives-old": "If you fail, the game will end.",
-            "rainbow-surf": "Grab, run, hold down, and let go to surf."
+            "rainbow-surf": "Grab, run, hold down, and let go to surf.",
+            "char5-bombs": "Press Run to collect and Alt Run to throw.",
+            "red-duck": "Duck to block most - but not all - flames!",
+            "gray-bricks": "Some blocks are vulnerable to special powers."
         },
         "message": {
             "scanningLevels": "Scanning levels..."

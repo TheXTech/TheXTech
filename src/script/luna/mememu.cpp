@@ -2008,6 +2008,8 @@ public:
         );
         // insert(0x00000078, &NPC_t::Location); // between 0x78 and 0xA8
         // insert(0x000000a8, &NPC_t::DefaultLocation); // between 0xA8 and 0xD8
+        insert(0x000000a8, &NPC_t::DefaultLocationX); // 0xA8
+        insert(0x000000b0, &NPC_t::DefaultLocationY); // 0xB0
         insert(0x000000d8, // DefaultDirection
             [](const NPC_t& n, FIELDTYPE ftype)->double
             {
@@ -2052,7 +2054,7 @@ public:
         insert(0x00000100, &NPC_t::Special3);
         insert(0x00000108, &NPC_t::Special4);
         insert(0x00000110, &NPC_t::Special5);
-        insert(0x00000118, &NPC_t::Special6);
+        // insert(0x00000118, &NPC_t::Special6); // removed!
         insert(0x00000120, // TurnAround
             [](const NPC_t& n, FIELDTYPE ftype)->double
             {
@@ -2170,10 +2172,8 @@ public:
     {
         if(address >= 0x78 && address < 0xA8) // Location
             return s_locMem.getValue(&obj->Location, address - 0x78, ftype);
-        else if(address >= 0xC8 && address < 0xD8) // invalid part of DefaultLocation
+        else if(address >= 0xB8 && address < 0xD8) // invalid part of DefaultLocation
             pLogWarning("MemEmu: Attempt to read NPC address 0x%x (removed part of DefaultLocation)", address);
-        else if(address >= 0xA8 && address < 0xC8) // DefaultLocation
-            return s_spLocMem.getValue(&obj->DefaultLocation, address - 0xA8, ftype);
         else if(address == 0x126)
             return obj->Reset[1] ? 0xFFFF : 0;
         else if(address == 0x128)
@@ -2210,14 +2210,9 @@ public:
             treeNPCUpdate(obj);
             return;
         }
-        else if(address >= 0xC8 && address < 0xD8) // DefaultLocation, invalid part
+        else if(address >= 0xB8 && address < 0xD8) // DefaultLocation, invalid part
         {
             pLogWarning("MemEmu: Attempt to set NPC address 0x%x (removed part of DefaultLocation)", address);
-            return;
-        }
-        else if(address >= 0xA8 && address < 0xC8) // DefaultLocation
-        {
-            s_spLocMem.setValue(&obj->DefaultLocation, address - 0xA8, value, ftype);
             return;
         }
         else if(address == 0x126)

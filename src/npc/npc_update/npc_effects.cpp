@@ -28,6 +28,7 @@
 #include "collision.h"
 #include "layers.h"
 #include "editor.h"
+#include "player.h"
 
 #include "main/trees.h"
 
@@ -101,7 +102,7 @@ static inline void NPCEffectLogic_EmergeDown(int A)
     NPC[A].Effect2 += 1;
     NPC[A].Location.Y += 1;
 
-    if(fEqual(NPC[A].Effect2, 32.0))
+    if(NPC[A].Effect2 == 32)
     {
         NPC[A].Effect = NPCEFF_NORMAL;
         NPC[A].Effect2 = 0;
@@ -184,8 +185,8 @@ static inline void NPCEffectLogic_DropItem(int A)
         double target_X = pLoc.X + pLoc.Width / 2 - nLoc.Width / 2;
         double target_Y = pLoc.Y + pLoc.Height - 192;
 
-        // anticipate player movement (cross-ref AllPlayersNormal())
-        if(p.Effect == PLREFF_NORMAL || p.Effect == PLREFF_WARP_PIPE || p.Effect == PLREFF_NO_COLLIDE || p.Effect == PLREFF_PET_INSIDE)
+        // anticipate player movement
+        if(PlayerNormal(p))
         {
             target_X += pLoc.SpeedX;
             target_Y += pLoc.SpeedY;
@@ -211,27 +212,26 @@ static inline void NPCEffectLogic_DropItem(int A)
             move_Y *= (8.0 * 1.4142135623730951) / dist;
         }
 
-        if(std::abs(delta_Y) < std::abs(move_Y) || NPC[A].Special6 <= 45)
+        if(std::abs(delta_Y) < std::abs(move_Y) || NPC[A].Special5 <= 45)
             nLoc.Y = target_Y;
         else
             nLoc.Y += move_Y;
 
-        if(std::abs(delta_X) < std::abs(move_X) || NPC[A].Special6 <= 45)
+        if(std::abs(delta_X) < std::abs(move_X) || NPC[A].Special5 <= 45)
             nLoc.X = target_X;
         else
             nLoc.X += move_X;
 
         // timer logic
-        if(NPC[A].Special6 <= 45)
-            NPC[A].Special6 -= 1.0;
+        if(NPC[A].Special5 <= 45)
+            NPC[A].Special5 -= 1;
         else if(nLoc.X == target_X && nLoc.Y == target_Y)
-            NPC[A].Special6 = 45;
+            NPC[A].Special5 = 45;
 
         // enter SMBX mode on timer expiration
-        if(NPC[A].Special6 <= 0)
+        if(NPC[A].Special5 <= 0)
         {
             NPC[A].Effect3 = 0;
-            NPC[A].Special6 = 0;
             NPC[A].Special5 = 0;
         }
     }
@@ -247,16 +247,17 @@ static inline void NPCEffectLogic_DropItem(int A)
 
 static inline void NPCEffectLogic_Warp(int A)
 {
+    // NOTE: this code previously used Effect2 to store destination position, and now it uses SpecialX/Y
     if(NPC[A].Effect3 == 1)
     {
         NPC[A].Location.Y -= 1;
         if(NPC[A].Type == NPCID_PLATFORM_S1)
             NPC[A].Location.Y -= 1;
 
-        if(NPC[A].Location.Y + NPC[A].Location.Height <= NPC[A].Effect2)
+        if(NPC[A].Location.Y + NPC[A].Location.Height <= NPC[A].SpecialY)
         {
             NPC[A].Effect = NPCEFF_NORMAL;
-            NPC[A].Effect2 = 0;
+            NPC[A].SpecialY = 0;
             NPC[A].Effect3 = 0;
         }
     }
@@ -267,10 +268,10 @@ static inline void NPCEffectLogic_Warp(int A)
         if(NPC[A].Type == NPCID_PLATFORM_S1)
             NPC[A].Location.Y += 1;
 
-        if(NPC[A].Location.Y >= NPC[A].Effect2)
+        if(NPC[A].Location.Y >= NPC[A].SpecialY)
         {
             NPC[A].Effect = NPCEFF_NORMAL;
-            NPC[A].Effect2 = 0;
+            NPC[A].SpecialY = 0;
             NPC[A].Effect3 = 0;
         }
     }
@@ -283,10 +284,10 @@ static inline void NPCEffectLogic_Warp(int A)
         else
             NPC[A].Location.X -= double(Physics.NPCWalkingSpeed);
 
-        if(NPC[A].Location.X + NPC[A].Location.Width <= NPC[A].Effect2)
+        if(NPC[A].Location.X + NPC[A].Location.Width <= NPC[A].SpecialX)
         {
             NPC[A].Effect = NPCEFF_NORMAL;
-            NPC[A].Effect2 = 0;
+            NPC[A].SpecialX = 0;
             NPC[A].Effect3 = 0;
         }
     }
@@ -299,10 +300,10 @@ static inline void NPCEffectLogic_Warp(int A)
         else
             NPC[A].Location.X += double(Physics.NPCWalkingSpeed);
 
-        if(NPC[A].Location.X >= NPC[A].Effect2)
+        if(NPC[A].Location.X >= NPC[A].SpecialX)
         {
             NPC[A].Effect = NPCEFF_NORMAL;
-            NPC[A].Effect2 = 0;
+            NPC[A].SpecialX = 0;
             NPC[A].Effect3 = 0;
         }
     }

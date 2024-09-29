@@ -105,7 +105,7 @@ void NPCSpecialMaybeHeld(int A)
         // special5 - the player
         // special4 - what bowser is doing
         // special3 - counter for what bowser is doing
-        // special2 - counter for what bowser needs to do
+        // specialY - counter for what bowser needs to do (was Special2)
         if(NPC[A].Legacy)
         {
             if(NPC[A].TimeLeft > 1)
@@ -120,7 +120,7 @@ void NPCSpecialMaybeHeld(int A)
             }
         }
 
-        if(NPC[A].Special4 == 0.0)
+        if(NPC[A].Special4 == 0)
         {
             NPC[A].Special3 = 0; // reset counter when done
             if(NPC[A].Direction < 0)
@@ -129,7 +129,7 @@ void NPCSpecialMaybeHeld(int A)
                 NPC[A].Frame = 5;
         }
 
-        if(NPC[A].Special5 == 0.0) // find player
+        if(NPC[A].Special5 == 0) // find player
         {
             bool tempBool = false;
             for(int B = 1; B <= numPlayers; B++)
@@ -157,7 +157,7 @@ void NPCSpecialMaybeHeld(int A)
         bool tempBool = false;
         if(NPC[A].Special5 > 0)
         {
-            if(Player[long(NPC[A].Special5)].Location.X + Player[long(NPC[A].Special5)].Location.Width / 2.0 < NPC[A].Location.X + NPC[A].Location.Width / 2.0)
+            if(Player[NPC[A].Special5].Location.X + Player[NPC[A].Special5].Location.Width / 2.0 < NPC[A].Location.X + NPC[A].Location.Width / 2.0)
             {
                 if(NPC[A].Direction < 0)
                     tempBool = true;
@@ -169,27 +169,27 @@ void NPCSpecialMaybeHeld(int A)
             }
         }
 
-        NPC[A].Special2 += dRand();
+        NPC[A].SpecialY += dRand();
 
-        if(fiEqual(NPC[A].Special4, 0) && tempBool)
+        if(NPC[A].Special4 == 0 && tempBool)
         {
-            if(NPC[A].Special2 >= 200 + dRand() * 400 - dRand() * 200) // hop on player
+            if(NPC[A].SpecialY >= 200 + dRand() * 400 - dRand() * 200) // hop on player
             {
-                if(NPC[A].Special2 >= 200 + dRand() * 600)
-                    NPC[A].Special2 = 0;
+                if(NPC[A].SpecialY >= 200 + dRand() * 600)
+                    NPC[A].SpecialY = 0;
                 NPC[A].Special4 = 3;
             }
-            else if((NPC[A].Special2 >= 80 && NPC[A].Special2 <= 130) || (NPC[A].Special2 >= 160 + dRand() * 300 && NPC[A].Special2 <= 180 + dRand() * 800)) // shoot fireball
+            else if((NPC[A].SpecialY >= 80 && NPC[A].SpecialY <= 130) || (NPC[A].SpecialY >= 160 + dRand() * 300 && NPC[A].SpecialY <= 180 + dRand() * 800)) // shoot fireball
                 NPC[A].Special4 = 4;
         }
 
         if(NPC[A].Inert)
         {
-            if(fiEqual(NPC[A].Special4, 4) || fiEqual(NPC[A].Special4, 3))
+            if(NPC[A].Special4 == 4 || NPC[A].Special4 == 3)
                 NPC[A].Special4 = 0;
         }
 
-        if(fiEqual(NPC[A].Special4, 0)) // when not doing anything turn to player
+        if(NPC[A].Special4 == 0) // when not doing anything turn to player
         {
             if(!tempBool)
             {
@@ -200,7 +200,7 @@ void NPCSpecialMaybeHeld(int A)
             }
         }
 
-        if(NPC[A].Special4 == 0.0) // hop
+        if(NPC[A].Special4 == 0) // hop
             NPC[A].Special4 = 2;
 
         if(NPC[A].HoldingPlayer > 0)
@@ -211,7 +211,7 @@ void NPCSpecialMaybeHeld(int A)
                 NPC[A].Frame = 5;
             NPC[A].Special4 = 9000;
         }
-        else if(fiEqual(NPC[A].Special4, 9000))
+        else if(NPC[A].Special4 == 9000)
         {
             NPC[A].Special5 = NPC[A].CantHurtPlayer;
             NPC[A].Special4 = 0;
@@ -219,7 +219,7 @@ void NPCSpecialMaybeHeld(int A)
             NPC[A].Location.SpeedY = 0;
         }
 
-        if(fiEqual(NPC[A].Special4, -1)) // turn left
+        if(NPC[A].Special4 == -1) // turn left
         {
             NPC[A].Special3 -= 1;
             if(NPC[A].Special3 > -5)
@@ -238,7 +238,7 @@ void NPCSpecialMaybeHeld(int A)
                 NPC[A].Direction = -1;
             }
         }
-        else if(fiEqual(NPC[A].Special4, 1)) // turn right
+        else if(NPC[A].Special4 == 1) // turn right
         {
             NPC[A].Special3 += 1;
             if(NPC[A].Special3 < 5)
@@ -257,7 +257,7 @@ void NPCSpecialMaybeHeld(int A)
                 NPC[A].Direction = 1;
             }
         }
-        else if(fiEqual(NPC[A].Special4, -10)) // look left
+        else if(NPC[A].Special4 == -10) // look left
         {
             NPC[A].Special3 -= 1;
             if(NPC[A].Special3 > -5)
@@ -270,7 +270,7 @@ void NPCSpecialMaybeHeld(int A)
                 NPC[A].Direction = -1;
             }
         }
-        else if(fiEqual(NPC[A].Special4, 10)) // look right
+        else if(NPC[A].Special4 == 10) // look right
         {
             NPC[A].Special3 += 1;
             if(NPC[A].Special3 < 5)
@@ -283,7 +283,7 @@ void NPCSpecialMaybeHeld(int A)
                 NPC[A].Direction = 1;
             }
         }
-        else if(fiEqual(NPC[A].Special4, 2)) // hops
+        else if(NPC[A].Special4 == 2) // hops
         {
             if(NPC[A].Location.SpeedY == 0.0 || NPC[A].Slope > 0)
             {
@@ -295,7 +295,7 @@ void NPCSpecialMaybeHeld(int A)
                     else
                         NPC[A].Frame = 6;
                 }
-                else if(fiEqual(NPC[A].Special3, 5))
+                else if(NPC[A].Special3 == 5)
                 {
                     NPC[A].Special3 += 1;
                     NPC[A].Location.SpeedY = -3;
@@ -317,14 +317,14 @@ void NPCSpecialMaybeHeld(int A)
                     NPC[A].Special4 = 0;
             }
         }
-        else if(fiEqual(NPC[A].Special4, 3)) // jump on player
+        else if(NPC[A].Special4 == 3) // jump on player
         {
             if(NPC[A].Special3 < -1)
             {
                 if(NPC[A].Special > 1)
                     NPC[A].Special -= 1;
                 NPC[A].Special3 += 1;
-                if(fiEqual(NPC[A].Special3, -1))
+                if(NPC[A].Special3 == -1)
                     NPC[A].Special3 = 6;
             }
             else if(NPC[A].Special3 < 5)
@@ -335,10 +335,10 @@ void NPCSpecialMaybeHeld(int A)
                 else
                     NPC[A].Frame = 6;
             }
-            else if(fiEqual(NPC[A].Special3, 5))
+            else if(NPC[A].Special3 == 5)
             {
                 auto &sx = NPC[A].Location.SpeedX;
-                auto &pl = Player[int(NPC[A].Special5)].Location;
+                auto &pl = Player[NPC[A].Special5].Location;
                 NPC[A].Special3 += 1;
                 NPC[A].Location.SpeedY = -12;
                 NPC[A].BeltSpeed = 0;
@@ -360,7 +360,7 @@ void NPCSpecialMaybeHeld(int A)
                 else
                     NPC[A].Frame = 5;
             }
-            else if(fiEqual(NPC[A].Special3, 6))
+            else if(NPC[A].Special3 == 6)
             {
                 if(NPC[A].Location.SpeedY > 0)
                 {
@@ -391,7 +391,7 @@ void NPCSpecialMaybeHeld(int A)
                 NPC[A].Location.SpeedY = 2;
                 NPC[A].Special3 += 1;
             }
-            else if(fiEqual(NPC[A].Special3, 21))
+            else if(NPC[A].Special3 == 21)
             {
                 if(NPC[A].Location.SpeedY != 0.0)
                     NPC[A].Location.SpeedY = 10;
@@ -454,7 +454,7 @@ void NPCSpecialMaybeHeld(int A)
                         }
 
                         // expand down a section at the bottom of destroyed blocks
-                        for(int B = 0; B <= numSections; B++)
+                        for(int B = 0; B < numSections; B++)
                         {
                             auto &n = NPC[A];
                             auto &s = level[B];
@@ -465,7 +465,7 @@ void NPCSpecialMaybeHeld(int A)
                                n.Location.Y + n.Location.Height + 48 <= s.Height &&
                                B != n.Section)
                             {
-                                n.Special2 = 0;
+                                n.SpecialY = 0;
                                 n.Special3 = 0;
                                 n.Special4 = 2;
 
@@ -522,7 +522,7 @@ void NPCSpecialMaybeHeld(int A)
                 }
             }
         }
-        else if(fiEqual(NPC[A].Special4, 4)) // shoot a fireball
+        else if(NPC[A].Special4 == 4) // shoot a fireball
         {
             NPC[A].Special3 += 1;
             if(NPC[A].Special3 < 15)
@@ -538,7 +538,8 @@ void NPCSpecialMaybeHeld(int A)
                     NPC[A].Frame = 2;
                 else
                     NPC[A].Frame = 7;
-                if(fiEqual(NPC[A].Special3, 29))
+
+                if(NPC[A].Special3 == 29)
                 {
                     numNPCs++;
                     NPC[numNPCs] = NPC_t();
@@ -557,8 +558,8 @@ void NPCSpecialMaybeHeld(int A)
                         NPC[numNPCs].Location.X = NPC[A].Location.X + 54;
                     NPC[numNPCs].Location.Y = NPC[A].Location.Y + 19;
                     NPC[numNPCs].Location.SpeedX = 4 * double(NPC[numNPCs].Direction);
-                    double C = (NPC[numNPCs].Location.X + NPC[numNPCs].Location.Width / 2.0) - (Player[int(NPC[A].Special5)].Location.X + Player[int(NPC[A].Special5)].Location.Width / 2.0);
-                    double D = (NPC[numNPCs].Location.Y + NPC[numNPCs].Location.Height / 2.0) - (Player[int(NPC[A].Special5)].Location.Y + Player[int(NPC[A].Special5)].Location.Height / 2.0);
+                    double C = (NPC[numNPCs].Location.X + NPC[numNPCs].Location.Width / 2.0) - (Player[NPC[A].Special5].Location.X + Player[NPC[A].Special5].Location.Width / 2.0);
+                    double D = (NPC[numNPCs].Location.Y + NPC[numNPCs].Location.Height / 2.0) - (Player[NPC[A].Special5].Location.Y + Player[NPC[A].Special5].Location.Height / 2.0);
                     NPC[numNPCs].Location.SpeedY = D / C * NPC[numNPCs].Location.SpeedX;
                     if(NPC[numNPCs].Location.SpeedY > 1)
                         NPC[numNPCs].Location.SpeedY = 1;
@@ -581,13 +582,14 @@ void NPCSpecialMaybeHeld(int A)
     }
     else if(NPC[A].Type == NPCID_HEAVY_THROWER && NPC[A].HoldingPlayer > 0)
     {
+        // the throw counter was previously Special3, but it uses a double in the non-held logic, so it has been moved to SpecialX
         if(Player[NPC[A].HoldingPlayer].Effect == PLREFF_NORMAL)
-            NPC[A].Special3 += 1;
+            NPC[A].SpecialX += 1;
 
-        if(NPC[A].Special3 >= 20)
+        if(NPC[A].SpecialX >= 20)
         {
             PlaySoundSpatial(SFX_HeavyToss, NPC[A].Location);
-            NPC[A].Special3 = 0; // -15
+            NPC[A].SpecialX = 0; // -15
             numNPCs++;
             NPC[numNPCs] = NPC_t();
             NPC[numNPCs].Location.Height = 32;
@@ -776,22 +778,22 @@ void NPCSpecialMaybeHeld(int A)
                     B = 1;
             }
         }
-        else if(NPC[(int)NPC[A].Special2].Projectile && NPC[(int)NPC[A].Special2].Active)
+        else if(NPC[NPC[A].Special2].Projectile && NPC[NPC[A].Special2].Active)
         {
             B = 1;
             NPC[A].Projectile = true;
-            NPC[A].Direction = NPC[(int)NPC[A].Special2].Direction;
+            NPC[A].Direction = NPC[NPC[A].Special2].Direction;
             if(NPC[A].Direction > 0)
-                NPC[A].Location.X = NPC[(int)NPC[A].Special2].Location.X + 32;
+                NPC[A].Location.X = NPC[NPC[A].Special2].Location.X + 32;
             else
-                NPC[A].Location.X = NPC[(int)NPC[A].Special2].Location.X - NPC[A].Location.Width;
-            NPC[A].Location.Y = NPC[(int)NPC[A].Special2].Location.Y;
+                NPC[A].Location.X = NPC[NPC[A].Special2].Location.X - NPC[A].Location.Width;
+            NPC[A].Location.Y = NPC[NPC[A].Special2].Location.Y;
         }
 
         if(Player[NPC[A].vehiclePlr].Controls.Run)
             B = 1;
 
-        if(NPC[A].Special2 > 0 && NPC[(int)NPC[A].Special2].Special2 != A)
+        if(NPC[A].Special2 > 0 && NPC[NPC[A].Special2].Special2 != A)
             B = 0;
 
         if(NPC[A].Special > 0)
@@ -812,7 +814,7 @@ void NPCSpecialMaybeHeld(int A)
             NPC[A].Special = 0;
 
         if(NPC[A].HoldingPlayer > 0 && NPC[A].Special2 > 0)
-            NPC[(int)NPC[A].Special2].Direction = NPC[A].Direction;
+            NPC[NPC[A].Special2].Direction = NPC[A].Direction;
 
         if(Player[NPC[A].HoldingPlayer].Effect != PLREFF_NORMAL)
             NPC[A].Special = 0;
@@ -849,19 +851,19 @@ void NPCSpecialMaybeHeld(int A)
         }
 #endif
 
-        if(NPC[(int)NPC[A].Special2].Type == NPCID_TOOTHY && fEqual(NPC[(int)NPC[A].Special2].Special2, A))
+        if(NPC[NPC[A].Special2].Type == NPCID_TOOTHY && NPC[NPC[A].Special2].Special2 == A)
         {
-            NPC[(int)NPC[A].Special2].Projectile = true;
-            NPC[(int)NPC[A].Special2].Direction = NPC[A].Direction;
+            NPC[NPC[A].Special2].Projectile = true;
+            NPC[NPC[A].Special2].Direction = NPC[A].Direction;
             if(NPC[A].Direction > 0)
-                NPC[(int)NPC[A].Special2].Location.X = NPC[A].Location.X + 32;
+                NPC[NPC[A].Special2].Location.X = NPC[A].Location.X + 32;
             else
-                NPC[(int)NPC[A].Special2].Location.X = NPC[A].Location.X - NPC[(int)NPC[A].Special2].Location.Width;
-            NPC[(int)NPC[A].Special2].Location.Y = NPC[A].Location.Y;
+                NPC[NPC[A].Special2].Location.X = NPC[A].Location.X - NPC[NPC[A].Special2].Location.Width;
+            NPC[NPC[A].Special2].Location.Y = NPC[A].Location.Y;
 
-            treeNPCUpdate((int)NPC[A].Special2);
-            if(NPC[(int)NPC[A].Special2].tempBlock != 0)
-                treeNPCSplitTempBlock((int)NPC[A].Special2);
+            treeNPCUpdate(NPC[A].Special2);
+            if(NPC[NPC[A].Special2].tempBlock != 0)
+                treeNPCSplitTempBlock(NPC[A].Special2);
         }
 
         if(NPC[A].vehiclePlr > 0 && !Player[NPC[A].vehiclePlr].Controls.Run)
@@ -882,7 +884,7 @@ void NPCSpecialMaybeHeld(int A)
         }
         else
         {
-            if(NPC[A].Special == 0.0)
+            if(NPC[A].Special == 0)
             {
                 double C = 0;
                 int D = 1;
@@ -908,9 +910,11 @@ void NPCSpecialMaybeHeld(int A)
             if(NPC[A].Location.SpeedY == 0.0 || NPC[A].Slope > 0)
             {
                 NPC[A].Location.SpeedX = 0;
-                if(fiEqual(NPC[A].Special, 0))
+
+                if(NPC[A].Special == 0)
                     NPC[A].Special = iRand(3) + 1;
-                if(fiEqual(NPC[A].Special, 1))
+
+                if(NPC[A].Special == 1)
                 {
                     NPC[A].FrameCount += 1;
                     NPC[A].Special2 += 1;

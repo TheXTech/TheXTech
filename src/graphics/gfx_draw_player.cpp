@@ -31,10 +31,24 @@
 
 #include "graphics/gfx_keyhole.h"
 
+static inline int s_round2int(double d)
+{
+    return std::floor(d + 0.5);
+}
+
+static inline int s_round2int_plr(double d)
+{
+#ifdef PGE_MIN_PORT
+    return (int)(std::floor(d / 2 + 0.5)) * 2;
+#else
+    return std::floor(d + 0.5);
+#endif
+}
+
 //! Get left pixel at the player sprite
 int pfrX(const StdPicture& tx, const Player_t& p)
 {
-#if !defined(THEXTECH_WIP_FEATURES) && !defined(__16M__)
+#if !defined(THEXTECH_WIP_FEATURES) && !defined(PGE_MIN_PORT)
     UNUSED(tx);
     return ((p.Frame * p.Direction + 49) / 10) * 100;
 
@@ -44,7 +58,7 @@ int pfrX(const StdPicture& tx, const Player_t& p)
     // will use internal flags (tx.flags & PLAYER_MODERN and tx.flags & PLAYER_CUSTOM) in future
     // if tx.flags & PLAYER_CUSTOM, then will use heap-allocated polymorphic CustomData_t* tx.custom_data,
     // which will include all frame bounding boxes and offsets
-    if(tx.w == 1000)
+    if(tx.h != 512)
         return ((p.Frame * p.Direction + 49) / 10) * 100;
     else
     {
@@ -54,13 +68,15 @@ int pfrX(const StdPicture& tx, const Player_t& p)
 
         int fr = (p.Frame <= 32) ? p.Frame : p.Frame - 7;
 
+        bool is_center_frame = (fr == 0);
+
         if(p.Character == 5)
             fr -= 1;
 
         int col = fr / n_rows;
 
         // load left-facing frame (bottom) - right to left (in order to mirror top half)
-        if(fr != 0 && p.Direction < 0)
+        if(!is_center_frame && p.Direction < 0)
             return col_w * (n_cols - col - 1);
         // load right-facing frame (top) - left to right
         else
@@ -72,13 +88,13 @@ int pfrX(const StdPicture& tx, const Player_t& p)
 //! Get top pixel at the player sprite
 int pfrY(const StdPicture& tx, const Player_t& p)
 {
-#if !defined(THEXTECH_WIP_FEATURES) && !defined(__16M__)
+#if !defined(THEXTECH_WIP_FEATURES) && !defined(PGE_MIN_PORT)
     UNUSED(tx);
     return ((p.Frame * p.Direction + 49) % 10) * 100;
 
 #else
     // FIXME: Replace this heuristic logic with a proper texture flags mechanism
-    if(tx.w == 1000)
+    if(tx.h != 512)
         return ((p.Frame * p.Direction + 49) % 10) * 100;
     else
     {
@@ -87,13 +103,15 @@ int pfrY(const StdPicture& tx, const Player_t& p)
 
         int fr = (p.Frame <= 32) ? p.Frame : p.Frame - 7;
 
+        bool is_center_frame = (fr == 0);
+
         if(p.Character == 5)
             fr -= 1;
 
         int row = fr % n_rows;
 
         // load left-facing frame (bottom)
-        if(fr != 0 && p.Direction < 0)
+        if(!is_center_frame && p.Direction < 0)
             return row_h * (n_rows + row);
         // load right-facing frame (top)
         else
@@ -105,7 +123,7 @@ int pfrY(const StdPicture& tx, const Player_t& p)
 //! Get width at the player sprite
 int pfrW(const StdPicture& tx, const Player_t& p)
 {
-    if(tx.w == 1000)
+    if(tx.h != 512)
         return 100;
     else if(p.Character == 5)
         return 64;
@@ -118,7 +136,7 @@ int pfrH(const StdPicture& tx, const Player_t& p)
 {
     UNUSED(p);
 
-    if(tx.w == 1000)
+    if(tx.h != 512)
         return 100;
     else
         return 64;
@@ -154,6 +172,31 @@ int pfrOffY(const StdPicture& tx, const Player_t& p)
     return offY;
 }
 
+using plr_pic_arr = RangeArr<StdPicture, 1, 10>;
+static constexpr std::array<plr_pic_arr*, 5> s_char_tex = {&GFXMario, &GFXLuigi, &GFXPeach, &GFXToad, &GFXLink};
+
+void DrawPlayerRaw(int X, int Y, int Character, int State, int Frame, int Direction)
+{
+    Player_t p;
+    p.Character = Character;
+    p.State = State;
+    p.Frame = Frame;
+    p.Direction = Direction;
+
+    StdPicture& tx = (*s_char_tex[p.Character - 1])[p.State];
+
+    int offX = pfrOffX(tx, p);
+    int offY = pfrOffY(tx, p);
+
+    XRender::renderTextureBasic(X + offX,
+                Y + offY,
+                pfrW(tx, p),
+                pfrH(tx, p),
+                tx,
+                pfrX(tx, p),
+                pfrY(tx, p));
+}
+
 void DrawPlayer(const int A, const int Z, XTColor color)
 {
     DrawPlayer(Player[A], Z, color);
@@ -161,17 +204,20 @@ void DrawPlayer(const int A, const int Z, XTColor color)
 
 void DrawPlayer(Player_t &p, const int Z, XTColor color)
 {
-    double camX = vScreen[Z].CameraAddX();
-    double camY = vScreen[Z].CameraAddY();
+    int camX = vScreen[Z].CameraAddX();
+    int camY = vScreen[Z].CameraAddY();
 
     int B = 0;
-    double C = 0;
-    XTColor s = (ShadowMode ? XTColor(0, 0, 0) : color);
+    // double C = 0;
+    XTColor s = (ShadowMode ? XTColor(64, 64, 64, color.a) : color);
     //auto &p = Player[A];
 
-    bool player_door_scroll = (p.Effect == PLREFF_WARP_DOOR && p.Effect2 >= 128);
+    int sX = camX + s_round2int_plr(p.Location.X);
+    int sY = camY + s_round2int_plr(p.Location.Y);
+    int w = s_round2int(p.Location.Width);
+    int h = s_round2int(p.Location.Height);
 
-    if(!p.Dead && !p.Immune2 && p.TimeToLive == 0 && !(p.Effect == PLREFF_WARP_PIPE || p.Effect == PLREFF_TURN_LEAF || p.Effect == PLREFF_WAITING || p.Effect == PLREFF_PET_INSIDE || player_door_scroll))
+    if(!p.Immune2) // other draw conditions moved to calling site in UpdateGraphics
     {
         if(vScreenCollision(Z, p.Location))
         {
@@ -181,13 +227,12 @@ void DrawPlayer(Player_t &p, const int Z, XTColor color)
                 // Yoshi's Tongue
                 if(p.MountSpecial > 0)
                 {
-
-                    C = 0;
+                    int C = 0;
                     if(p.Direction == -1)
                         C = p.YoshiTongueLength;
 
-                    RenderTexturePlayer(Z, camX + double(p.YoshiTongueX) - C - 1,
-                                          camY + p.YoshiTongue.Y,
+                    RenderTexturePlayer(Z, camX + s_round2int_plr(p.YoshiTongueX) - C - 1,
+                                          camY + s_round2int_plr(p.YoshiTongue.Y),
                                           p.YoshiTongueLength + 2,
                                           16,
                                           GFX.Tongue[2],
@@ -198,8 +243,8 @@ void DrawPlayer(Player_t &p, const int Z, XTColor color)
                     if(p.Direction == 1)
                         C = 0;
 
-                    RenderTexturePlayer(Z, camX + p.YoshiTongue.X,
-                                          camY + p.YoshiTongue.Y,
+                    RenderTexturePlayer(Z, camX + s_round2int_plr(p.YoshiTongue.X),
+                                          camY + s_round2int_plr(p.YoshiTongue.Y),
                                           16, 16,
                                           GFX.Tongue[1],
                                           0,
@@ -208,14 +253,14 @@ void DrawPlayer(Player_t &p, const int Z, XTColor color)
                 }
 
                 // Yoshi's Body
-                RenderTexturePlayer(Z, camX + p.Location.X + p.YoshiBX,
-                                      camY + p.Location.Y + p.YoshiBY,
+                RenderTexturePlayer(Z, sX + p.YoshiBX,
+                                      sY + p.YoshiBY,
                                       32, 32,
                                       GFXYoshiB[B], 0, 32 * p.YoshiBFrame, s);
 
                 // Yoshi's Head
-                RenderTexturePlayer(Z, camX + p.Location.X + p.YoshiTX,
-                                      camY + p.Location.Y + p.YoshiTY,
+                RenderTexturePlayer(Z, sX + p.YoshiTX,
+                                      sY + p.YoshiTY,
                                       32, 32,
                                       GFXYoshiT[B], 0, 32 * p.YoshiTFrame, s);
             }
@@ -226,10 +271,10 @@ void DrawPlayer(Player_t &p, const int Z, XTColor color)
 
                 //if(!p.Immune2) // Always true because of covered condition above
                 {
-                    RenderTexturePlayer(Z, camX + p.Location.X - 5,
-                                          camY + p.Location.Y - 2,
+                    RenderTexturePlayer(Z, sX - 5,
+                                          sY - 2,
                                           32, 32,
-                                          GFXNPC[254],
+                                          GFXNPC[NPCID_FLY_POWER],
                                           0,
                                           (SpecialFrame[9] + (p.Direction > 0 ? 1 : 3)) * 32,
                                           s);
@@ -245,18 +290,15 @@ void DrawPlayer(Player_t &p, const int Z, XTColor color)
             }
             else if(p.Character >= 1 && p.Character <= 5) // draw player
             {
-                using plr_pic_arr = RangeArr<StdPicture, 1, 10>;
-                constexpr std::array<plr_pic_arr*, 5> char_tex = {&GFXMario, &GFXLuigi, &GFXPeach, &GFXToad, &GFXLink};
-
-                StdPicture& tx = (*char_tex[p.Character - 1])[p.State];
+                StdPicture& tx = (*s_char_tex[p.Character - 1])[p.State];
                 int offX = pfrOffX(tx, p);
                 int offY = pfrOffY(tx, p);
 
                 if(p.Mount == 0)
                 {
                     RenderTexturePlayer(Z,
-                                camX + p.Location.X + offX,
-                                camY + p.Location.Y + offY,
+                                sX + offX,
+                                sY + offY,
                                 pfrW(tx, p),
                                 pfrH(tx, p),
                                 tx,
@@ -279,18 +321,18 @@ void DrawPlayer(Player_t &p, const int Z, XTColor color)
                             : 0;
 
                         RenderTexturePlayer(Z,
-                                    camX + p.Location.X + offX,
-                                    small_toad_oy_corr + camY + p.Location.Y + offY,
+                                    sX + offX,
+                                    small_toad_oy_corr + sY + offY,
                                     pfrW(tx, p),
-                                    p.Location.Height - 26 /*- p.MountOffsetY*/ - offY + peach_h_corr,
+                                    h - 26 /*- p.MountOffsetY*/ - offY + peach_h_corr,
                                     tx,
                                     pfrX(tx, p),
                                     pfrY(tx, p),
                                     s);
                     }
 
-                    RenderTexturePlayer(Z, camX + p.Location.X + p.Location.Width / 2.0 - 16,
-                                          camY + p.Location.Y + p.Location.Height - 30,
+                    RenderTexturePlayer(Z, sX + w / 2 - 16,
+                                          sY + h - 30,
                                           32, 32,
                                           GFX.Boot[p.MountType],
                                           0,
@@ -299,8 +341,8 @@ void DrawPlayer(Player_t &p, const int Z, XTColor color)
                 }
                 else if(p.Mount == 3)
                 {
-                    RenderTexturePlayer(Z, camX + p.Location.X + offX,
-                                          camY + p.Location.Y + offY + p.MountOffsetY,
+                    RenderTexturePlayer(Z, sX + offX,
+                                          sY + offY + p.MountOffsetY,
                                           pfrW(tx, p),
                                           pfrH(tx, p),
                                           tx,
@@ -331,22 +373,27 @@ void DrawPlayer(Player_t &p, const int Z, XTColor color)
                      !Player[NPC[p.HoldingNPC].HoldingPlayer].Dead
                     )
                     {
+                        int npc_sX = camX + s_round2int_plr(NPC[p.HoldingNPC].Location.X);
+                        int npc_sY = camY + s_round2int_plr(NPC[p.HoldingNPC].Location.Y);
+                        int npc_w = s_round2int(NPC[p.HoldingNPC].Location.Width);
+                        int npc_h = s_round2int(NPC[p.HoldingNPC].Location.Height);
+
                         if(!NPCIsYoshi(NPC[p.HoldingNPC]) && NPC[p.HoldingNPC].Type > 0)
                         {
                             if(NPC[p.HoldingNPC]->WidthGFX == 0)
                             {
-                                RenderTexturePlayer(Z, camX + NPC[p.HoldingNPC].Location.X + NPC[p.HoldingNPC]->FrameOffsetX,
-                                                      camY + NPC[p.HoldingNPC].Location.Y + NPC[p.HoldingNPC]->FrameOffsetY,
-                                                      NPC[p.HoldingNPC].Location.Width,
-                                                      NPC[p.HoldingNPC].Location.Height,
+                                RenderTexturePlayer(Z, npc_sX + NPC[p.HoldingNPC]->FrameOffsetX,
+                                                      npc_sY + NPC[p.HoldingNPC]->FrameOffsetY,
+                                                      npc_w,
+                                                      npc_h,
                                                       GFXNPC[NPC[p.HoldingNPC].Type],
                                                       0,
-                                                      NPC[p.HoldingNPC].Frame * NPC[p.HoldingNPC].Location.Height);
+                                                      NPC[p.HoldingNPC].Frame * npc_h);
                             }
                             else
                             {
-                                RenderTexturePlayer(Z, camX + NPC[p.HoldingNPC].Location.X + (NPC[p.HoldingNPC]->FrameOffsetX * -NPC[p.HoldingNPC].Direction) - NPC[p.HoldingNPC]->WidthGFX / 2.0 + NPC[p.HoldingNPC].Location.Width / 2.0,
-                                                      camY + NPC[p.HoldingNPC].Location.Y + NPC[p.HoldingNPC]->FrameOffsetY - NPC[p.HoldingNPC]->HeightGFX + NPC[p.HoldingNPC].Location.Height,
+                                RenderTexturePlayer(Z, npc_sX + (NPC[p.HoldingNPC]->FrameOffsetX * -NPC[p.HoldingNPC].Direction) - NPC[p.HoldingNPC]->WidthGFX / 2 + npc_w / 2,
+                                                      npc_sY + NPC[p.HoldingNPC]->FrameOffsetY - NPC[p.HoldingNPC]->HeightGFX + npc_h,
                                                       NPC[p.HoldingNPC]->WidthGFX,
                                                       NPC[p.HoldingNPC]->HeightGFX,
                                                       GFXNPC[NPC[p.HoldingNPC].Type],
@@ -368,29 +415,29 @@ void DrawPlayer(Player_t &p, const int Z, XTColor color)
                 {
                     if(p.Direction == 1)
                     {
-                        RenderTexturePlayer(Z, camX + p.Location.X + p.YoshiBX - 12,
-                                              camY + p.Location.Y + p.YoshiBY - 16,
+                        RenderTexturePlayer(Z, sX + p.YoshiBX - 12,
+                                              sY + p.YoshiBY - 16,
                                               32, 32, GFX.YoshiWings, 0, 0 + 32 * p.YoshiWingsFrame, s);
                     }
                     else
                     {
-                        RenderTexturePlayer(Z, camX + p.Location.X + p.YoshiBX + 12,
-                                              camY + p.Location.Y + p.YoshiBY - 16,
+                        RenderTexturePlayer(Z, sX + p.YoshiBX + 12,
+                                              sY + p.YoshiBY - 16,
                                               32, 32, GFX.YoshiWings, 0, 0 + 32 * p.YoshiWingsFrame, s);
                     }
                 }
-                if(p.Mount == 1 && p.MountType == 3)
+                if((p.Mount == 1 && p.MountType == 3) || p.Effect == PLREFF_COOP_WINGS)
                 {
                     if(p.Direction == 1)
                     {
-                        RenderTexturePlayer(Z, camX + p.Location.X - 24,
-                                              camY + p.Location.Y + p.Location.Height - 40,
+                        RenderTexturePlayer(Z, sX - 24,
+                                              sY + h - 40,
                                               32, 32, GFX.YoshiWings, 0, 0 + 32 * p.YoshiWingsFrame, s);
                     }
                     else
                     {
-                        RenderTexturePlayer(Z, camX + p.Location.X + 16,
-                                              camY + p.Location.Y + p.Location.Height - 40,
+                        RenderTexturePlayer(Z, sX + 16,
+                                              sY + h - 40,
                                               32, 32, GFX.YoshiWings, 0, 0 + 32 * p.YoshiWingsFrame, s);
                     }
                 }

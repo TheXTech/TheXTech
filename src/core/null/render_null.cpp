@@ -26,6 +26,9 @@
 #include <set>
 
 #include <Logger/logger.h>
+#include <Utils/files.h>
+#include <SDL2/SDL_rwops.h>
+#include <PGE_File_Formats/file_formats.h>
 
 #include "globals.h"
 #include "frame_timer.h"
@@ -129,19 +132,19 @@ void lazyLoadPicture(StdPicture_Sub& target, const std::string& path, int scaleF
 
     // We need to figure out the height and width!
     std::string sizePath = path + ".size";
-    FILE* fs = fopen(sizePath.c_str(), "r");
+    SDL_RWops* fs = Files::open_file(sizePath, "r");
 
     // NOT null-terminated: wwww\nhhhh\n
     char contents[10];
 
     if(fs != nullptr)
     {
-        fread(&contents[0], 1, 10, fs);
+        SDL_RWread(fs, &contents[0], 1, 10);
         contents[4] = '\0';
         contents[9] = '\0';
         target.w = atoi(&contents[0]);
         target.h = atoi(&contents[5]);
-        if(fclose(fs))
+        if(SDL_RWclose(fs))
             pLogWarning("loadPicture: Couldn't close file.");
     }
     else
@@ -161,7 +164,7 @@ void lazyLoadPicture(StdPicture_Sub& target, const std::string& path, int scaleF
         }
 #else
         // this will work if it's a PNG
-        FILE* fpng = fopen(path.c_str(), "rb");
+        SDL_RWops* fpng = Files::open_file(path, "rb");
         if(!fpng)
         {
             pLogWarning("loadPicture: Couldn't open size file.");
@@ -169,10 +172,10 @@ void lazyLoadPicture(StdPicture_Sub& target, const std::string& path, int scaleF
             return;
         }
 
-        fseek(fpng, 16, SEEK_SET);
+        SDL_RWseek(fpng, 16, RW_SEEK_SET);
 
         uint32_t w, h;
-        if(fread(&w, 4, 1, fpng) == 1 && fread(&h, 4, 1, fpng) == 1)
+        if(SDL_RWread(fpng, &w, 4, 1) == 1 && fread(fpng, &h, 4, 1) == 1)
         {
             w = SDL_SwapLE32(w);
             h = SDL_SwapLE32(h);
@@ -190,40 +193,48 @@ void lazyLoadPicture(StdPicture_Sub& target, const std::string& path, int scaleF
             target.inited = false;
         }
 
-        fclose(fpng);
+        SDL_RWclose(fpng);
 #endif
     }
 }
 
-void lazyLoadPictureFromList(StdPicture_Sub& target, FILE* f, const std::string& dir)
+void lazyLoadPictureFromList(StdPicture_Sub& target, PGE_FileFormats_misc::TextInput& t, std::string& line_buf, const std::string& dir)
 {
     if(!GameIsActive)
         return; // do nothing when game is closed
 
-    int length;
-
-    char filename[256];
-    if(fscanf(f, "%255[^\n]%n%*[^\n]\n", filename, &length) != 1)
+    t.readLine(line_buf);
+    if(line_buf.empty())
     {
         pLogWarning("Could not load image path from load list");
         return;
     }
 
-    if(length == 255)
-    {
-        pLogWarning("Image path %s was truncated in load list", filename);
-        return;
-    }
-
     target.inited = true;
     target.l.path = dir;
-    target.l.path += filename;
+    target.l.path += std::move(line_buf);
     target.l.lazyLoaded = true;
 
-    int w, h, flags;
-    if((fscanf(f, "%d\n%d\n%d\n", &w, &h, &flags) < 2) || (w < 0) || (w > 8192) || (h < 0) || (h > 8192))
+    bool okay = false;
+
+    int w, h;
+    t.readLine(line_buf);
+    if(sscanf(line_buf.c_str(), "%d", &w) == 1)
     {
-        pLogWarning("Could not load image %s dimensions from load list", filename);
+        t.readLine(line_buf);
+
+        if(sscanf(line_buf.c_str(), "%d", &h) == 1)
+        {
+            // t.readLine(line_buf);
+
+            // if(sscanf(line_buf.c_str(), "%d", &flags) == 1)
+                okay = true;
+        }
+    }
+
+    if(!okay || w < 0 || w > 8192 || h < 0 || h > 8192)
+    {
+        pLogWarning("Could not load image %s dimensions from load list", target.l.path);
         target.inited = false;
         return;
     }
@@ -232,6 +243,8 @@ void lazyLoadPictureFromList(StdPicture_Sub& target, FILE* f, const std::string&
 
     target.w = w;
     target.h = h;
+
+    return;
 }
 
 void lazyLoad(StdPicture &target)
@@ -336,6 +349,13 @@ inline void i_renderTexturePrivate(float, float, float, float,
 {
 }
 
+inline void i_renderTexturePrivate_Basic(int16_t, int16_t, int16_t, int16_t,
+                             StdPicture &,
+                             int16_t, int16_t,
+                             XTColor)
+{
+}
+
 // public draw methods
 
 void renderTextureScale(double xDst, double yDst, double wDst, double hDst,
@@ -369,6 +389,22 @@ void renderTexture(double xDst, double yDst, double wDst, double hDst,
         color);
 }
 
+void renderTextureBasic(int xDst, int yDst, int wDst, int hDst,
+                            StdPicture &tx,
+                            int xSrc, int ySrc,
+                            XTColor color)
+{
+    auto div_x = FLOORDIV2(xDst), div_y = FLOORDIV2(yDst);
+    auto div_w = FLOORDIV2(xDst + wDst) - div_x;
+    auto div_h = FLOORDIV2(yDst + hDst) - div_y;
+
+    i_renderTexturePrivate_Basic(
+        div_x, div_y, div_w, div_h,
+        tx,
+        FLOORDIV2(xSrc), FLOORDIV2(ySrc),
+        color);
+}
+
 void renderTexture(float xDst, float yDst, StdPicture &tx,
                    XTColor color)
 {
@@ -382,15 +418,14 @@ void renderTexture(float xDst, float yDst, StdPicture &tx,
         color);
 }
 
-void renderTexture(int xDst, int yDst, StdPicture &tx, XTColor color)
+void renderTextureBasic(int xDst, int yDst, StdPicture &tx, XTColor color)
 {
     int w = tx.w / 2;
     int h = tx.h / 2;
-    i_renderTexturePrivate(
+    i_renderTexturePrivate_Basic(
         ROUNDDIV2(xDst), ROUNDDIV2(yDst), w, h,
         tx,
-        0.0f, 0.0f, w, h,
-        0.0f, nullptr, X_FLIP_NONE,
+        0.0f, 0.0f,
         color);
 }
 

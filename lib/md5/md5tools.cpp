@@ -22,7 +22,7 @@ std::string md5::file_to_hash(const std::string &filePath)
 {
     char block[BLOCK_SIZE];
     std::string out;
-    SDL_RWops *f = Files::open_file(filePath.c_str(), "rb");
+    SDL_RWops *f = Files::open_file(filePath, "rb");
     size_t got;
 
     if(!f)

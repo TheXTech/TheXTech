@@ -74,6 +74,7 @@
 
 #include "editor.h"
 #include "frm_main.h"
+#include "load_gfx.h"
 
 #include "screen_textentry.h"
 #include "main/asset_pack.h"
@@ -372,15 +373,18 @@ void FindWorlds()
     SelectWorldEditable.push_back(SelectWorld_t()); // Dummy entry
 
 #ifndef PGE_NO_THREADING
-    SDL_AtomicSet(&loadingProgrss, 0);
-    SDL_AtomicSet(&loadingProgrssMax, 0);
-
-    for(const auto &worldsRoot : worldRoots)
+    if(SDL_AtomicGet(&loading))
     {
-        std::vector<std::string> dirs;
-        DirMan episodes(worldsRoot.path);
-        episodes.getListOfFolders(dirs);
-        SDL_AtomicAdd(&loadingProgrssMax, (int)dirs.size());
+        SDL_AtomicSet(&loadingProgrss, 0);
+        SDL_AtomicSet(&loadingProgrssMax, 0);
+
+        for(const auto &worldsRoot : worldRoots)
+        {
+            std::vector<std::string> dirs;
+            DirMan episodes(worldsRoot.path);
+            episodes.getListOfFolders(dirs);
+            SDL_AtomicAdd(&loadingProgrssMax, (int)dirs.size());
+        }
     }
 #endif
 
@@ -392,7 +396,7 @@ void FindWorlds()
         std::vector<std::string> files;
         episodes.getListOfFolders(dirs);
 
-        for(auto &dir : dirs)
+        for(const auto &dir : dirs)
         {
             std::string epDir = worldsRoot.path + dir + "/";
             DirMan episode(epDir);
@@ -400,6 +404,11 @@ void FindWorlds()
 
             for(std::string &fName : files)
                 s_LoadSingleWorld(epDir, fName, head, tr, worldsRoot.editable);
+
+#ifdef THEXTECH_PRELOAD_LEVELS
+            if(LoadingInProcess)
+                UpdateLoad();
+#endif
 
 #ifndef PGE_NO_THREADING
             SDL_AtomicAdd(&loadingProgrss, 1);
@@ -414,7 +423,9 @@ static void s_LoadSingleWorld(const std::string& epDir, const std::string& fName
 {
     std::string wPath = epDir + fName;
 
-    if(FileFormats::OpenWorldFileHeader(wPath, head))
+    PGE_FileFormats_misc::RWopsTextInput in(Files::open_file(wPath, "r"), wPath);
+
+    if(FileFormats::OpenWorldFileHeaderT(in, head))
     {
         SelectWorld_t w;
         w.WorldName = head.EpisodeTitle;
@@ -541,15 +552,18 @@ void FindLevels()
     LevelData head;
 
 #ifndef PGE_NO_THREADING
-    SDL_AtomicSet(&loadingProgrss, 0);
-    SDL_AtomicSet(&loadingProgrssMax, 0);
-
-    for(const auto &battleRoot : battleRoots)
+    if(SDL_AtomicGet(&loading))
     {
-        std::vector<std::string> files;
-        DirMan battleLvls(battleRoot.path);
-        battleLvls.getListOfFiles(files, {".lvl", ".lvlx"});
-        SDL_AtomicAdd(&loadingProgrssMax, (int)files.size());
+        SDL_AtomicSet(&loadingProgrss, 0);
+        SDL_AtomicSet(&loadingProgrssMax, 0);
+
+        for(const auto &battleRoot : battleRoots)
+        {
+            std::vector<std::string> files;
+            DirMan battleLvls(battleRoot.path);
+            battleLvls.getListOfFiles(files, {".lvl", ".lvlx"});
+            SDL_AtomicAdd(&loadingProgrssMax, (int)files.size());
+        }
     }
 #endif
 
@@ -561,7 +575,9 @@ void FindLevels()
         for(std::string &fName : files)
         {
             std::string wPath = battleRoot.path + fName;
-            if(FileFormats::OpenLevelFileHeader(wPath, head))
+
+            PGE_FileFormats_misc::RWopsTextInput in(Files::open_file(wPath, "r"), wPath);
+            if(FileFormats::OpenLevelFileHeaderT(in, head))
             {
                 SelectWorld_t w;
                 w.WorldPath = battleRoot.path;
@@ -571,6 +587,11 @@ void FindLevels()
                     w.WorldName = fName;
                 w.editable = battleRoot.editable;
                 SelectBattle.push_back(w);
+
+#ifdef THEXTECH_PRELOAD_LEVELS
+                if(LoadingInProcess)
+                    UpdateLoad();
+#endif
             }
 #ifndef PGE_NO_THREADING
             SDL_AtomicAdd(&loadingProgrss, 1);
@@ -1010,23 +1031,26 @@ bool mainMenuUpdate()
             }
 
 
-            int quitKeyPos = 2;
+            if(MenuMode == MENU_MAIN)
+            {
+                int quitKeyPos = 2;
 
-            if(s_show_separate_2P())
-                quitKeyPos++;
+                if(s_show_separate_2P())
+                    quitKeyPos++;
 
-            if(!g_gameInfo.disableBattleMode)
-                quitKeyPos++;
+                if(!g_gameInfo.disableBattleMode)
+                    quitKeyPos++;
 
-            if(g_config.enable_editor)
-                quitKeyPos++;
+                if(g_config.enable_editor)
+                    quitKeyPos++;
 
 
-            if(MenuCursor > quitKeyPos)
-                MenuCursor = 0;
+                if(MenuCursor > quitKeyPos)
+                    MenuCursor = 0;
 
-            if(MenuCursor < 0)
-                MenuCursor = quitKeyPos;
+                if(MenuCursor < 0)
+                    MenuCursor = quitKeyPos;
+            }
         } // Main Menu
 
         // Character Select

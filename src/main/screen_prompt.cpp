@@ -154,10 +154,8 @@ void Render()
     else
         XRender::renderTextureFL(menu_left_X - 20, menu_top_Y + (s_cur_item * 36), GFX.MCursor[1].w, GFX.MCursor[1].h, GFX.MCursor[1], 0, 0, 90.0, nullptr, X_FLIP_NONE);
 
-    speedRun_renderControls(1, -1);
-
-    if(numPlayers > 1)
-        speedRun_renderControls(2, -1);
+    for(int plr_i = 0; plr_i < l_screen->player_count; plr_i++)
+        speedRun_renderControls(plr_i, -1);
 
     // draw screen fader and repaint
 
@@ -178,9 +176,9 @@ bool Logic()
 
     bool menuDoPress = SharedControls.MenuDo || SharedControls.Pause;
 
-    for(int i = 0; i < maxLocalPlayers; i++)
+    for(int i = 0; i < l_screen->player_count; i++)
     {
-        Controls_t &c = Player[i + 1].Controls;
+        Controls_t &c = Player[l_screen->players[i]].Controls;
 
         menuDoPress |= c.Start || c.Jump;
 

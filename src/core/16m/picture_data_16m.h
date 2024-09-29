@@ -40,8 +40,7 @@ struct StdPictureData
     bool attempted_load = false;
 
     int texture[3] = {0, 0, 0};
-    uint16_t tex_w[3] = {0, 0, 0};
-    uint16_t tex_h[3] = {0, 0, 0};
+    int data_size = 0;
 
     //! The previous texture in the render chain (nullptr if this is the tail or unloaded)
     StdPicture* last_texture = nullptr;
@@ -67,11 +66,9 @@ struct StdPictureData
         glDeleteTextures(3, texture);
 
         for(int i = 0; i < 3; i++)
-        {
             texture[i] = 0;
-            tex_w[i] = 0;
-            tex_h[i] = 0;
-        }
+
+        data_size = 0;
 
         attempted_load = false;
     }

@@ -51,6 +51,7 @@
 #include "screen_quickreconnect.h"
 #include "screen_textentry.h"
 #include "screen_prompt.h"
+#include "main/level_medals.h"
 #include "script/luna/luna.h"
 
 #include "../pseudo_vb.h"
@@ -183,6 +184,7 @@ void GameLoop()
                 pLogDebug("Clear check-points at GameLoop()");
                 Checkpoint.clear();
                 CheckpointsList.clear();
+                g_curLevelMedals.reset_checkpoint();
             }
 
             // Quit to world map when finishing the sub-hub
@@ -328,6 +330,7 @@ void MessageScreen_Init()
     SoundPause[SFX_Message] = 0;
     PlaySound(SFX_Message);
     MenuCursorCanMove = false;
+    MenuCursorCanMove_Back = false;
     BuildUTF8CharMap(MessageText, MessageTextMap);
 }
 
@@ -358,6 +361,16 @@ bool MessageScreen_Logic(int plr)
         menuDoPress |= (c.Start || c.Jump);
         menuBackPress |= c.Run;
     }
+
+    if(!MenuCursorCanMove_Back)
+    {
+        if(!menuBackPress && MenuCursorCanMove)
+            MenuCursorCanMove_Back = true;
+
+        menuBackPress = false;
+    }
+    else if(menuBackPress)
+        MenuCursorCanMove_Back = false;
 
     if(!MenuCursorCanMove)
     {

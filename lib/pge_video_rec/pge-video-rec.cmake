@@ -42,10 +42,30 @@ if(PGE_ENABLE_VIDEO_REC)
         find_path(SWRESAMPLE_INCLUDE_DIR libswresample/swresample.h PATH_SUFFIXES ffmpeg)
         find_library(SWRESAMPLE_LIBRARY swresample)
 
-        if(AVCODEC_INCLUDE_DIR AND AVCODEC_LIBRARY AND AVFORMAT_INCLUDE_DIR AND AVFORMAT_LIBRARY AND SWSCALE_INCLUDE_DIR AND SWSCALE_LIBRARY AND SWRESAMPLE_INCLUDE_DIR AND SWRESAMPLE_LIBRARY)
+        if(AVCODEC_INCLUDE_DIR AND AVCODEC_LIBRARY AND
+           AVFORMAT_INCLUDE_DIR AND AVFORMAT_LIBRARY AND
+           SWSCALE_INCLUDE_DIR AND SWSCALE_LIBRARY AND
+           SWRESAMPLE_INCLUDE_DIR AND SWRESAMPLE_LIBRARY)
             set(PGE_VIDEO_REC_WEBM_SUPPORTED ON)
-            set(VIDEO_REC_INCS ${AVCODEC_INCLUDE_DIR} ${AVFORMAT_INCLUDE_DIR} ${AVUTIL_INCLUDE_DIR} ${SWSCALE_INCLUDE_DIR} ${SWRESAMPLE_INCLUDE_DIR})
-            set(VIDEO_REC_LIBS ${AVCODEC_LIBRARY} ${AVFORMAT_LIBRARY} ${AVUTIL_LIBRARY} ${SWSCALE_LIBRARY} ${SWRESAMPLE_LIBRARY})
+            set(VIDEO_REC_INCS
+                ${AVCODEC_INCLUDE_DIR}
+                ${AVFORMAT_INCLUDE_DIR}
+                ${AVUTIL_INCLUDE_DIR}
+                ${SWSCALE_INCLUDE_DIR}
+                ${SWRESAMPLE_INCLUDE_DIR}
+            )
+            set(VIDEO_REC_LIBS
+                ${SWSCALE_LIBRARY}
+                ${SWRESAMPLE_LIBRARY}
+                ${AVFORMAT_LIBRARY}
+                ${AVCODEC_LIBRARY}
+                ${AVUTIL_LIBRARY}
+            )
+
+            if(VITA)
+                find_library(FFMPEG_LAME_LIBRARY REQUIRED mp3lame)
+                list(APPEND VIDEO_REC_LIBS ${FFMPEG_LAME_LIBRARY})
+            endif()
         endif()
     endif()
 
@@ -58,4 +78,3 @@ if(PGE_ENABLE_VIDEO_REC)
         message("== PGE video record will be built without WEBM support")
     endif()
 endif()
-

@@ -107,7 +107,7 @@ void RenderGL::try_init_gl(SDL_GLContext& context, SDL_Window* window, GLint pro
     if(context)
         g_config.render_mode.obtained = mode;
     else
-        pLogInfo("Render GL: context creation failed.");
+        pLogInfo("Render GL: context creation failed: %s", SDL_GetError());
 }
 
 bool RenderGL::initOpenGL()
@@ -168,7 +168,11 @@ bool RenderGL::initOpenGL()
 #endif
 
 #ifdef THEXTECH_BUILD_GL_DESKTOP_LEGACY
+#   ifdef __APPLE__
+    try_init_gl(m_gContext, m_window, 0, 1, 1, Config_t::RENDER_ACCELERATED_OPENGL_LEGACY);
+#   else
     try_init_gl(m_gContext, m_window, SDL_GL_CONTEXT_PROFILE_COMPATIBILITY, 1, 1, Config_t::RENDER_ACCELERATED_OPENGL_LEGACY);
+#   endif
 #endif
 
 #ifdef THEXTECH_BUILD_GL_ES_LEGACY
@@ -254,6 +258,17 @@ bool RenderGL::initOpenGL()
 
     m_maxTextureWidth = maxTextureSize;
     m_maxTextureHeight = maxTextureSize;
+
+    if(m_gl_majver >= 2)
+        m_has_npot_textures = true;
+
+#if !defined(__EMSCRIPTEN__)
+    if(m_gl_profile != SDL_GL_CONTEXT_PROFILE_ES && m_gl_majver >= 1 && m_gl_minver >= 2)
+        m_has_bgra_textures = true;
+
+    if(m_gl_profile == SDL_GL_CONTEXT_PROFILE_ES && m_gl_majver >= 2 && SDL_GL_ExtensionSupported("GL_EXT_texture_format_BGRA8888"))
+        m_has_bgra_textures = true;
+#endif
 
 #ifdef RENDERGL_HAS_LOGICOP
     if(m_gl_profile != SDL_GL_CONTEXT_PROFILE_ES || m_gl_majver == 1)
@@ -393,6 +408,11 @@ bool RenderGL::initShaders()
             logic_contents.empty() ? s_es2_bitmask_frag_src : logic_contents.data()
         );
     }
+
+    m_no_tint_program = GLProgramObject(
+        s_es2_standard_vert_src,
+        s_es2_no_tint_frag_src
+    );
 
     m_program_rect_filled = GLProgramObject(
         s_es2_standard_vert_src,

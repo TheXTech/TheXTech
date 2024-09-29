@@ -639,7 +639,7 @@ static void write_NPCs()
         fprintf(record_file, "Active %d\r\n", n.Active);
         fprintf(record_file, "Dir %lf\r\n", (double)n.Direction);
         fprintf(record_file, "XYWH %lf %lf %lf %lf\r\n", n.Location.X, n.Location.Y, n.Location.Width, n.Location.Height);
-        fprintf(record_file, "S %lf %lf %lf %lf %lf %lf %lf\r\n", n.Special, n.Special2, n.Special3, n.Special4, n.Special5, n.Special6, (double)n.Variant);
+        fprintf(record_file, "S %lf %lf %lf %lf %lf %lf %lf\r\n", (double)n.Special, (double)n.Special2, (double)n.Special3, (double)n.Special4, (double)n.Special5, (double)n.SpecialX, (double)n.SpecialY);
     }
 }
 
@@ -738,7 +738,7 @@ static void read_NPCs()
             }
 
             double sOld[] = {S1, S2, S3, S4, S5, S6, S7};
-            double sNew[] = {n.Special, n.Special2, n.Special3, n.Special4, n.Special5, n.Special6, (double)n.Variant};
+            double sNew[] = {(double)n.Special, (double)n.Special2, (double)n.Special3, (double)n.Special4, (double)n.Special5, (double)n.SpecialX, (double)n.SpecialY};
 
             for(int s = 0; s < 7; ++s)
             {

@@ -153,7 +153,7 @@ void XLanguage::findLanguages()
     for(auto it = langs_begin; it != langs_end; ++it)
     {
         // check filesize > 8 bytes
-        auto f = SDL_RWFromFile((langs.absolutePath() + "/" + *it).c_str(), "rb");
+        auto f = Files::open_file(langs.absolutePath() + "/" + *it, "rb");
 
         // file doesn't exist / has problem opening
         if(!f)

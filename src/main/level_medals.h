@@ -30,15 +30,11 @@ struct LevelSaveInfo_t;
 
 namespace PGE_FileFormats_misc
 {
-    struct TextInput;
+    class TextInput;
 }
 
 struct CurLevelMedals_t
 {
-private:
-    //! bitfield of medals acquired at most recent checkpoint
-    uint8_t m_checkpoint = 0;
-
 protected:
     friend bool OpenLevelData(PGE_FileFormats_misc::TextInput &lvl, const std::string FilePath);
     friend void OpenLevelDataPost();
@@ -56,7 +52,7 @@ protected:
     LevelSaveInfo_t* should_initialize() const;
 
     /**
-     * \brief loads maximums from the current level
+     * \brief loads maximums from the current level and resets gotten counts
      * Must be called after the level is fully loaded and the save data has been initialized
      */
     void prepare_lvl();
@@ -71,6 +67,8 @@ public:
     uint8_t got = 0;
     //! bitfield of medals acquired since most recent lost life (on win, compared with and possibly replaces "best" in save data)
     uint8_t life = 0;
+    //! bitfield of medals acquired at most recent checkpoint
+    uint8_t checkpoint = 0;
 
     /**
      * \brief sets specific coin as obtained
@@ -90,7 +88,7 @@ public:
     void on_any_death();
 
     /**
-     * \brief loads currently got medals from checkpoint, resets this-life medals
+     * \brief loads currently got medals from checkpoint (if appropriate), resets this-life medals
      */
     void on_all_dead();
 
@@ -100,12 +98,17 @@ public:
     void on_checkpoint();
 
     /**
-     * \brief resets all player gotten medals for fresh level
+     * \brief resets saved medals in checkpoint
      */
     void reset_checkpoint();
 
     /**
-     * \brief resets level attributes (keeps checkpoint)
+     * \brief restores saved medals from checkpoint
+     */
+    void resume_from_checkpoint();
+
+    /**
+     * \brief resets level attributes (keeps checkpoint and gotten counts)
      */
     void reset_lvl();
 

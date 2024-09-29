@@ -55,6 +55,9 @@ constexpr uint32_t g_never_unload_before = 2;
 // always unload a texture that was rendered more than this many frames ago
 constexpr uint32_t g_always_unload_after = 18000;
 
+// retry a failed load after this many frames
+constexpr uint32_t g_load_failure_retry_frames = 500;
+
 // do not need to be implemented per-platform
 
 #if 0
@@ -127,6 +130,11 @@ void minport_RenderTexturePrivate(int16_t xDst, int16_t yDst, int16_t wDst, int1
                              StdPicture &tx,
                              int16_t xSrc, int16_t ySrc, int16_t wSrc, int16_t hSrc,
                              float rotateAngle, FPoint_t *center, unsigned int flip,
+                             XTColor color);
+
+void minport_RenderTexturePrivate_Basic(int16_t xDst, int16_t yDst, int16_t wDst, int16_t hDst,
+                             StdPicture &tx,
+                             int16_t xSrc, int16_t ySrc,
                              XTColor color);
 
 } // namespace XRender;

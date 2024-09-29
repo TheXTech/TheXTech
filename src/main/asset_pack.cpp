@@ -23,6 +23,7 @@
 #include <AppPath/app_path.h>
 
 #include <Utils/files.h>
+#include <Utils/files_ini.h>
 #include <DirManager/dirman.h>
 #include <Logger/logger.h>
 #include <IniProcessor/ini_processing.h>
@@ -31,6 +32,7 @@
 #include "core/render.h"
 #include "core/msgbox.h"
 
+#include "sound.h"
 #include "gfx.h"
 #include "load_gfx.h"
 #include "game_main.h"
@@ -119,7 +121,7 @@ static AssetPack_t s_scan_asset_pack(const std::string& path, bool skip_graphics
 
     if(Files::fileExists(gi_path))
     {
-        IniProcessing gameinfo(gi_path);
+        IniProcessing gameinfo = Files::load_ini(gi_path);
 
         gameinfo.beginGroup("game");
         gameinfo.read("id", ret.id, ret.id);
@@ -405,7 +407,7 @@ static AssetPack_t s_find_pack_init(const std::string& full_id)
 
 bool ReloadAssetsFrom(const AssetPack_t& pack)
 {
-    pLogDebug("= Trying to load asset pack \"%s/\" from [%s]", pack.id.c_str(), pack.version.c_str(), pack.path.c_str());
+    pLogDebug("= Trying to load asset pack \"%s/%s\" from [%s]", pack.id.c_str(), pack.version.c_str(), pack.path.c_str());
 
     std::string OldAppPath = AppPath;
     std::string OldAssetPackID = g_AssetPackID;
@@ -418,6 +420,9 @@ bool ReloadAssetsFrom(const AssetPack_t& pack)
     UnloadWorldCustomGFX();
 
     GFX.unLoad();
+    StopAllSounds();
+    StopMusic();
+    UnloadSound();
 
     pLogDebug("Loading UI assets from [%s]", AppPath.c_str());
 
@@ -431,6 +436,7 @@ bool ReloadAssetsFrom(const AssetPack_t& pack)
         AppPath = OldAppPath;
         g_AssetPackID = OldAssetPackID;
         GFX.load();
+        InitSound(); // Setup sound effects
 
         // also, remove from list of valid asset packs
         for(auto it = s_asset_packs.begin(); it != s_asset_packs.end(); ++it)

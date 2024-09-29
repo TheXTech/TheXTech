@@ -23,6 +23,7 @@
 #define PLAYER_H
 
 struct Screen_t;
+struct Player_t;
 
 // NEW: moves a player to avoid collisions with other players, and sets to no-clipping if this is impossible
 void DodgePlayers(int plr_A);
@@ -116,6 +117,10 @@ void Tanooki(const int A); //PRIVATE
 void PowerUps(const int A); //PRIVATE
 // Private Sub SuperWarp(A As Integer)
 void SuperWarp(const int A); //PRIVATE
+// NEW: reports whether a player is currently waiting to exit a warp (for shared screen)
+bool PlayerWaitingInWarp(const Player_t& p);
+// NEW: reports whether a player is currently scrolling between warps
+bool PlayerScrollingInWarp(const Player_t& p);
 // Private Sub PlayerCollide(A As Integer)
 void PlayerCollide(const int A); //PRIVATE
 
@@ -127,6 +132,8 @@ void LinkFrame(struct Player_t &p);
 // Private Sub PlayerEffects(A As Integer)
 void PlayerEffects(const int A);
 
+// NEW: checks if player has normal state
+bool PlayerNormal(const Player_t& p);
 // NEW: checks if all players have normal state (if false, layer movement and events get disabled)
 bool AllPlayersNormal();
 
@@ -138,7 +145,7 @@ void KeyholeCheck(const int A, const Location_t& loc);
 
 // main Drop/Add functions
 void DropPlayer(const int A);
-void AddPlayer(int Character);
+void AddPlayer(int Character, Screen_t& screen);
 
 // NEW but, when Die is false and FromBlock is true, identical to hitting character block.
 void SwapCharacter(int A, int Character, bool FromBlock = false);

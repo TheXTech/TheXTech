@@ -21,6 +21,7 @@
 #include "globals.h"
 #include "graphics.h"
 #include "collision.h"
+#include "player.h"
 #include "game_main.h"
 #include "sound.h"
 #include "change_res.h"
@@ -222,7 +223,6 @@ void GetvScreenAverage2(vScreen_t& vscreen)
 // Doubles the weight of the top player for the Y position
 void GetvScreenAverage3(vScreen_t& vscreen)
 {
-    bool horiz_bounds_inited = false;
     int plr_count = 0;
     double OldX = 0;
     double OldY = 0;
@@ -232,6 +232,8 @@ void GetvScreenAverage3(vScreen_t& vscreen)
 
     // calculate average Y position
     vscreen.Y = 0;
+    double Y_not_warping = 0;
+    int not_warping_count = 0;
 
     // find furthest left, right, top, and bottom players
     double l, r, t, b;
@@ -258,22 +260,23 @@ void GetvScreenAverage3(vScreen_t& vscreen)
 
         double by = pLocY + plr.Location.Height;
 
-        vscreen.Y -= by;
-
         if(plr_count == 0 || by < t)
             t = by;
         if(plr_count == 0 || b < by)
             b = by;
-
-        plr_count += 1;
-
-        // still set left and right bounds for respawning players
-        if(!horiz_bounds_inited || pl < l)
+        if(plr_count == 0 || pl < l)
             l = pl;
-        if(!horiz_bounds_inited || r < pr)
+        if(plr_count == 0 || r < pr)
             r = pr;
 
-        horiz_bounds_inited = true;
+        vscreen.Y -= by;
+        plr_count += 1;
+
+        if(!PlayerWaitingInWarp(plr))
+        {
+            Y_not_warping -= by;
+            not_warping_count += 1;
+        }
     }
 
     if(plr_count == 0)
@@ -283,8 +286,9 @@ void GetvScreenAverage3(vScreen_t& vscreen)
         return;
     }
 
-    // double the contribution of the top player to the result
+    // 2x the contribution of the top player to the result
     vscreen.Y -= t;
+    plr_count += 1;
 
     const SpeedlessLocation_t& section = level[section_idx];
 
@@ -322,23 +326,71 @@ void GetvScreenAverage3(vScreen_t& vscreen)
         vscreen.Height = use_height;
     }
 
+    // if a NoTurnBack section, make sure that the limited width is tracked
+    if(g_config.allow_multires && NoTurnBack[section_idx])
+        use_width = SDL_min(use_width, static_cast<double>(screen.canonical_screen().W));
+
     use_width  = SDL_min(use_width,  section.Width  - section.X);
     use_height = SDL_min(use_height, section.Height - section.Y);
 
+    // take the average, but if the players waiting to exit a warp are keeping the screen too high, don't let them control the screen
+    double mean_Y = vscreen.Y / plr_count;
+    if(not_warping_count != 0)
+    {
+        double mean_Y_not_warping = Y_not_warping / not_warping_count;
+        // if the warping players are pulling the screen up by more than 100px, ignore them
+        double allowed_height = 100;
+        if(mean_Y > mean_Y_not_warping + allowed_height)
+            mean_Y = mean_Y_not_warping + allowed_height;
+    }
+
     vscreen.X = -(l + r) / 2 + (use_width * 0.5);
-    vscreen.Y = vscreen.Y / (plr_count + 1) + (use_height * 0.5) - vScreenYOffset;
+    vscreen.Y = mean_Y + (use_height * 0.5) - vScreenYOffset;
 
     // allow some overscan (needed for 3DS)
     int allow_X = (g_config.allow_multires && vscreen.Width == XRender::TargetW && !Screens[vscreen.screen_ref].is_canonical()) ? XRender::TargetCameraOverscanX : 0;
 
-    if(-vscreen.X < section.X - allow_X)
-        vscreen.X = -(section.X - allow_X);
-    if(-vscreen.X + use_width > section.Width + allow_X)
-        vscreen.X = -(section.Width - use_width + allow_X);
-    if(-vscreen.Y < section.Y)
-        vscreen.Y = -section.Y;
-    if(-vscreen.Y + use_height > section.Height)
-        vscreen.Y = -(section.Height - use_height);
+    for(int i = 0; i < 2; i++)
+    {
+        if(-vscreen.X < section.X - allow_X)
+            vscreen.X = -(section.X - allow_X);
+        if(-vscreen.X + use_width > section.Width + allow_X)
+            vscreen.X = -(section.Width - use_width + allow_X);
+        if(-vscreen.Y < section.Y)
+            vscreen.Y = -section.Y;
+        if(-vscreen.Y + use_height > section.Height)
+            vscreen.Y = -(section.Height - use_height);
+
+        if(i == 1)
+            break;
+
+        if(vscreen.tempX == 0 && vscreen.TempY == 0 && vscreen.TempDelay == 0)
+            break;
+
+        // apply vScreen temp
+        vscreen.X += -vscreen.tempX;
+        vscreen.Y += -vscreen.TempY;
+
+        if(vscreen.TempDelay > 0)
+        {
+            vscreen.TempDelay--;
+            continue;
+        }
+
+        if(vscreen.tempX >= 2)
+            vscreen.tempX -= 2;
+        else if(vscreen.tempX <= -2)
+            vscreen.tempX += 2;
+        else
+            vscreen.tempX = 0;
+
+        if(vscreen.TempY >= 2)
+            vscreen.TempY -= 2;
+        else if(vscreen.TempY <= -2)
+            vscreen.TempY += 2;
+        else
+            vscreen.TempY = 0;
+    }
 }
 
 // NEW: update a vScreen with the correct procedure based on its screen's Type and DType
@@ -354,6 +406,61 @@ void GetvScreenAuto(vScreen_t& vscreen)
         GetvScreenCredits(vscreen);
     else
         GetvScreen(vscreen);
+}
+
+void SharedScreenAvoidJump_Pre(Screen_t& screen)
+{
+    if(screen.Type != ScreenTypes::SharedScreen)
+        return;
+
+    auto& vscreen = screen.vScreen(1);
+
+    GetvScreenAverage3(vscreen);
+
+    if(!screen.is_canonical())
+        SharedScreenAvoidJump_Pre(screen.canonical_screen());
+}
+
+void SharedScreenAvoidJump_Post(Screen_t& screen, int Delay)
+{
+    if(screen.Type != ScreenTypes::SharedScreen)
+        return;
+
+    auto& vscreen = screen.vScreen(1);
+
+    double curX = vscreen.X;
+    double curY = vscreen.Y;
+
+    vscreen.tempX = 0;
+    vscreen.TempY = 0;
+
+    GetvScreenAverage3(vscreen);
+
+    vscreen.tempX = vscreen.X - curX;
+    vscreen.TempY = vscreen.Y - curY;
+
+    vscreen.X = curX;
+    vscreen.Y = curY;
+
+    vscreen.TempDelay = Delay;
+
+    if(!screen.is_canonical())
+        SharedScreenAvoidJump_Post(screen.canonical_screen(), Delay);
+}
+
+void SharedScreenResetTemp(Screen_t& screen)
+{
+    if(screen.Type != ScreenTypes::SharedScreen)
+        return;
+
+    auto& vscreen = screen.vScreen(1);
+
+    vscreen.tempX = 0;
+    vscreen.TempY = 0;
+    vscreen.TempDelay = 0;
+
+    if(!screen.is_canonical())
+        SharedScreenResetTemp(screen.canonical_screen());
 }
 
 // NEW: get the fixed-resolution vScreen position for a player, and write the top-left coordinate to (left, top)
@@ -419,15 +526,50 @@ void SetupEditorGraphics()
 //    GFX.BackgroundColor(2).Height = frmLevelWindow.vScreen(1).Height
 }
 
-void PlayerWarpGFX(int A, Location_t &tempLocation, float &X2, float &Y2)
+static inline int s_round2int(double d)
+{
+    return std::floor(d + 0.5);
+}
+
+static inline int s_round2int_plr(double d)
+{
+#ifdef PGE_MIN_PORT
+    return (int)(std::floor(d / 2 + 0.5)) * 2;
+#else
+    return std::floor(d + 0.5);
+#endif
+}
+
+static inline IntegerLocation_t s_round2int(const SpeedlessLocation_t& d)
+{
+    IntegerLocation_t ret;
+
+    ret.X = s_round2int(d.X); ret.Y = s_round2int(d.Y); ret.Width = s_round2int(d.Width); ret.Height = s_round2int(d.Height);
+
+    return ret;
+}
+
+static inline IntegerLocation_t s_round2int_plr(const SpeedlessLocation_t& d)
+{
+    IntegerLocation_t ret;
+
+    ret.X = s_round2int_plr(d.X); ret.Y = s_round2int_plr(d.Y); ret.Width = s_round2int_plr(d.Width); ret.Height = s_round2int_plr(d.Height);
+
+    return ret;
+}
+
+void PlayerWarpGFX(int A, IntegerLocation_t &tempLocation, int &X2, int &Y2)
 {
     auto &player = Player[A];
     bool backward = player.WarpBackward;
     auto &warp = Warp[player.Warp];
-    auto &warp_enter = backward ? warp.Exit : warp.Entrance;
-    auto &warp_exit = backward ? warp.Entrance : warp.Exit;
+    const SpeedlessLocation_t &_warp_enter = backward ? warp.Exit : warp.Entrance;
+    const SpeedlessLocation_t &_warp_exit = backward ? warp.Entrance : warp.Exit;
     auto &warp_dir_enter = backward ? warp.Direction2 : warp.Direction;
     auto &warp_dir_exit = backward ? warp.Direction : warp.Direction2;
+
+    IntegerLocation_t warp_enter = s_round2int_plr(_warp_enter);
+    IntegerLocation_t warp_exit = s_round2int_plr(_warp_exit);
 
     // .Effect = 3      -- Warp Pipe
     // .Effect2 = 0     -- Entering
@@ -446,7 +588,7 @@ void PlayerWarpGFX(int A, Location_t &tempLocation, float &X2, float &Y2)
         {
             if(warp_enter.Y > tempLocation.Y)
             {
-                Y2 = float(warp_enter.Y - tempLocation.Y);
+                Y2 = warp_enter.Y - tempLocation.Y;
                 tempLocation.Y = warp_enter.Y;
                 tempLocation.Height += -Y2;
             }
@@ -455,7 +597,7 @@ void PlayerWarpGFX(int A, Location_t &tempLocation, float &X2, float &Y2)
             tempLocation.Width = (warp_enter.X + warp_enter.Width) - (tempLocation.X);
         else if(warp_dir_enter == 2) // Moving left
         {
-            X2 = float(warp_enter.X - tempLocation.X);
+            X2 = warp_enter.X - tempLocation.X;
             if(X2 < 0)
                 X2 = 0;
             else
@@ -473,16 +615,16 @@ void PlayerWarpGFX(int A, Location_t &tempLocation, float &X2, float &Y2)
         {
             if(warp_exit.Y > tempLocation.Y)
             {
-                Y2 = float(warp_exit.Y - tempLocation.Y);
+                Y2 = warp_exit.Y - tempLocation.Y;
                 tempLocation.Y = warp_exit.Y;
-                tempLocation.Height += -double(Y2);
+                tempLocation.Height += -Y2;
             }
         }
         else if(warp_dir_exit == 4) // Moving left
             tempLocation.Width = (warp_exit.X + warp_exit.Width) - (tempLocation.X);
         else if(warp_dir_exit == 2) // Moving right
         {
-            X2 = float(warp_exit.X - tempLocation.X);
+            X2 = warp_exit.X - tempLocation.X;
             if(X2 < 0)
                 X2 = 0;
             else
@@ -499,18 +641,21 @@ void PlayerWarpGFX(int A, Location_t &tempLocation, float &X2, float &Y2)
         tempLocation.Width = 0;
     }
 
-    tempLocation.Width -= double(X2);
+    tempLocation.Width -= X2;
 }
 
-void NPCWarpGFX(int A, Location_t &tempLocation, float &X2, float &Y2)
+void NPCWarpGFX(int A, IntegerLocation_t &tempLocation, int &X2, int &Y2)
 {
     auto &player = Player[A];
     bool backward = player.WarpBackward;
     auto &warp = Warp[player.Warp];
-    auto &warp_enter = backward ? warp.Exit : warp.Entrance;
-    auto &warp_exit = backward ? warp.Entrance : warp.Exit;
+    const SpeedlessLocation_t &_warp_enter = backward ? warp.Exit : warp.Entrance;
+    const SpeedlessLocation_t &_warp_exit = backward ? warp.Entrance : warp.Exit;
     auto &warp_dir_enter = backward ? warp.Direction2 : warp.Direction;
     auto &warp_dir_exit = backward ? warp.Direction : warp.Direction2;
+
+    IntegerLocation_t warp_enter = s_round2int_plr(_warp_enter);
+    IntegerLocation_t warp_exit = s_round2int_plr(_warp_exit);
 
     // player(a).effect = 3      -- Warp Pipe
     // player(a).effect2 = 0     -- Entering
@@ -529,16 +674,16 @@ void NPCWarpGFX(int A, Location_t &tempLocation, float &X2, float &Y2)
         {
             if(warp_enter.Y > tempLocation.Y)
             {
-                Y2 = float(warp_enter.Y - tempLocation.Y);
+                Y2 = warp_enter.Y - tempLocation.Y;
                 tempLocation.Y = warp_enter.Y;
-                tempLocation.Height += -double(Y2);
+                tempLocation.Height += -Y2;
             }
         }
         else if(warp_dir_enter == 4) // Moving right
             tempLocation.Width = (warp_enter.X + warp_enter.Width) - (tempLocation.X);
         else if(warp_dir_enter == 2) // Moving left
         {
-            X2 = float(warp_enter.X - tempLocation.X);
+            X2 = warp_enter.X - tempLocation.X;
             if(X2 < 0)
                 X2 = 0;
             else
@@ -556,16 +701,16 @@ void NPCWarpGFX(int A, Location_t &tempLocation, float &X2, float &Y2)
         {
             if(warp_exit.Y > tempLocation.Y)
             {
-                Y2 = float(warp_exit.Y - tempLocation.Y);
+                Y2 = warp_exit.Y - tempLocation.Y;
                 tempLocation.Y = warp_exit.Y;
-                tempLocation.Height += -double(Y2);
+                tempLocation.Height += -Y2;
             }
         }
         else if(warp_dir_exit == 4) // Moving left
             tempLocation.Width = (warp_exit.X + warp_exit.Width) - (tempLocation.X);
         else if(warp_dir_exit == 2) // Moving right
         {
-            X2 = float(warp_exit.X - tempLocation.X);
+            X2 = warp_exit.X - tempLocation.X;
             if(X2 < 0)
                 X2 = 0;
             else
@@ -731,47 +876,62 @@ void ScreenShot()
 
 void DrawFrozenNPC(int Z, int A)
 {
-    double camX = vScreen[Z].CameraAddX();
-    double camY = vScreen[Z].CameraAddY();
+    int camX = vScreen[Z].CameraAddX();
+    int camY = vScreen[Z].CameraAddY();
 
     auto &n = NPC[A];
-    if((vScreenCollision(Z, n.Location) ||
-        vScreenCollision(Z, newLoc(n.Location.X - (n->WidthGFX - n.Location.Width) / 2,
-                            n.Location.Y, CDbl(n->WidthGFX), CDbl(n->THeight)))) && !n.Hidden)
+
+    int sX = camX + s_round2int(NPC[A].Location.X);
+    int sY = camY + s_round2int(NPC[A].Location.Y);
+    int w = s_round2int(NPC[A].Location.Width);
+    int h = s_round2int(NPC[A].Location.Height);
+
+    if(NPC[A].HoldingPlayer != 0)
+    {
+        sX = camX + s_round2int_plr(NPC[A].Location.X);
+        sY = camY + s_round2int_plr(NPC[A].Location.Y);
+    }
+
+    // collision already checked elsewhere
+    // if((vScreenCollision(Z, n.Location) ||
+    //     vScreenCollision(Z, newLoc(n.Location.X - (n->WidthGFX - n.Location.Width) / 2,
+    //                         n.Location.Y, CDbl(n->WidthGFX), CDbl(n->THeight)))) && !n.Hidden)
+    if(true)
     {
 // draw npc
         XTColor c = n.Shadow ? XTColor(0, 0, 0) : XTColor();
-        int content = int(n.Special);
-        int contentFrame = int(n.Special2);
+        int content = n.Special;
+        int contentFrame = n.Special2;
 
         // SDL_assert_release(content >= 0 && content <= maxNPCType);
 
         // Draw frozen NPC body in only condition the content value is valid
         if(content > 0 && content <= maxNPCType)
         {
-             XRender::renderTexture(float(camX + n.Location.X + 2),
-                                    float(camY + n.Location.Y + 2),
-                                    float(n.Location.Width - 4),
-                                    float(n.Location.Height - 4),
+             XRender::renderTextureBasic(sX + 2,
+                                    sY + 2,
+                                    w - 4,
+                                    h - 4,
                                     GFXNPCBMP[content],
-                                    2, 2 + contentFrame * NPCHeight(content), c);
+                                    2, 2 + contentFrame * NPCHeight(content),
+                                    c);
         }
 
         // draw ice
-         XRender::renderTexture(float(camX + n.Location.X + n->FrameOffsetX),
-                                float(camY + n.Location.Y + n->FrameOffsetY),
-                                float(n.Location.Width - 6), float(n.Location.Height - 6),
+         XRender::renderTextureBasic(sX + n->FrameOffsetX,
+                                sY + n->FrameOffsetY,
+                                w - 6, h - 6,
                                 GFXNPCBMP[n.Type], 0, 0, c);
-         XRender::renderTexture(float(camX + n.Location.X + n->FrameOffsetX + n.Location.Width - 6),
-                                float(camY + n.Location.Y + n->FrameOffsetY),
-                                6, float(n.Location.Height - 6),
+         XRender::renderTextureBasic(sX + n->FrameOffsetX + w - 6,
+                                sY + n->FrameOffsetY,
+                                6, h - 6,
                                 GFXNPCBMP[n.Type], 128 - 6, 0, c);
-         XRender::renderTexture(float(camX + n.Location.X + n->FrameOffsetX),
-                                float(camY + n.Location.Y + n->FrameOffsetY + n.Location.Height - 6),
-                                float(n.Location.Width - 6), 6,
+         XRender::renderTextureBasic(sX + n->FrameOffsetX,
+                                sY + n->FrameOffsetY + h - 6,
+                                w - 6, 6,
                                 GFXNPCBMP[n.Type], 0, 128 - 6, c);
-         XRender::renderTexture(float(camX + n.Location.X + n->FrameOffsetX + n.Location.Width - 6),
-                                float(camY + n.Location.Y + n->FrameOffsetY + n.Location.Height - 6),
+         XRender::renderTextureBasic(sX + n->FrameOffsetX + w - 6,
+                                sY + n->FrameOffsetY + h - 6,
                                 6, 6, GFXNPCBMP[n.Type],
                                 128 - 6, 128 - 6, c);
     }

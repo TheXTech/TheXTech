@@ -84,7 +84,7 @@ if(USE_SYSTEM_SDL2)
     endif()
 else()
     set(USE_LOCAL_SDL2 ${PGE_USE_LOCAL_SDL2})
-    set(SDL2_INCLUDE_DIRS ${DEPENDENCIES_INSTALL_DIR}/include/SDL2)
+    set(SDL2_INCLUDE_DIRS "${DEPENDENCIES_INSTALL_DIR}/include/" "${DEPENDENCIES_INSTALL_DIR}/include/SDL2")
 endif()
 
 set(MixerX_SysLibs)

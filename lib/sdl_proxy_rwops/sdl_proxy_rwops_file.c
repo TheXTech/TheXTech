@@ -47,15 +47,15 @@ static inline FILE *utf8_fopen(const char *filePath, const char *modes)
 
 static int64_t s_file_size(SDL_RWops* stream)
 {
-    if(!stream || !stream->hidden)
+    if(!stream || !stream->hidden.unknown.data1)
         return -1;
 
-    long curpos = ftell(stream->hidden);
+    long curpos = ftell(stream->hidden.unknown.data1);
 
-    fseek(stream->hidden, 0, SEEK_END);
-    int64_t filesize = (int64_t)(ftell(stream->hidden));
+    fseek(stream->hidden.unknown.data1, 0, SEEK_END);
+    int64_t filesize = (int64_t)(ftell(stream->hidden.unknown.data1));
 
-    fseek(stream->hidden, curpos, SEEK_SET);
+    fseek(stream->hidden.unknown.data1, curpos, SEEK_SET);
 
     return filesize;
 }
@@ -66,25 +66,25 @@ static int64_t s_file_seek(SDL_RWops* stream, int64_t offset, int whence)
     {
         // skip the seek
     }
-    else if(fseek(stream->hidden, offset, whence))
+    else if(fseek(stream->hidden.unknown.data1, offset, whence))
         return -1;
 
-    return ftell(stream->hidden);
+    return ftell(stream->hidden.unknown.data1);
 }
 
-static int64_t s_file_read(SDL_RWops* stream, void* ptr, size_t size, size_t nmemb)
+static size_t s_file_read(SDL_RWops* stream, void* ptr, size_t size, size_t nmemb)
 {
-    return fread(ptr, size, nmemb, stream->hidden);
+    return fread(ptr, size, nmemb, stream->hidden.unknown.data1);
 }
 
-static int64_t s_file_write(SDL_RWops* stream, const void* ptr, size_t size, size_t nmemb)
+static size_t s_file_write(SDL_RWops* stream, const void* ptr, size_t size, size_t nmemb)
 {
-    return fwrite(ptr, size, nmemb, stream->hidden);
+    return fwrite(ptr, size, nmemb, stream->hidden.unknown.data1);
 }
 
 static int s_file_close(SDL_RWops* stream)
 {
-    return fclose(stream->hidden);
+    return fclose(stream->hidden.unknown.data1);
 }
 
 SDL_RWops* SDL_RWFromFile(const char* pathname, const char* mode)
@@ -108,7 +108,7 @@ SDL_RWops* SDL_RWFromFile(const char* pathname, const char* mode)
     ret->close = s_file_close;
 
     ret->type = SDL_RWOPS_STDFILE;
-    ret->hidden = f;
+    ret->hidden.unknown.data1 = f;
 
     return ret;
 }

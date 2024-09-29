@@ -252,20 +252,12 @@ bool PGE_ImageInfo::getImageSize(const PGEString &imagePath, uint32_t *w, uint32
 
     std::string imgPath = PGEStringToStd(imagePath);
 
-    if(!Files::fileExists(imgPath))
-    {
-        if(errCode)
-            *errCode = ERR_NOT_EXISTS;
-
-        return false;
-    }
-
-    SDL_RWops* image = SDL_RWFromFile(imgPath.c_str(), "rb");
+    SDL_RWops* image = Files::open_file(imgPath, "rb");
 
     if(!image)
     {
         if(errCode)
-            *errCode = ERR_CANT_OPEN;
+            *errCode = ERR_NOT_EXISTS;
 
         return false;
     }

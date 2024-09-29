@@ -33,11 +33,8 @@
 
 void SetScreenType(Screen_t& screen)
 {
-    // TODO: move this logic elsewhere once multiple screens are supported
-    if(g_ClonedPlayerMode)
-        screen.player_count = 1;
-    else
-        screen.player_count = SDL_min(numPlayers, maxLocalPlayers);
+    if(!screen.is_active())
+        return;
 
     // moved this code from game_main.cpp, but it occured elsewhere also
     //   it was always called before setup screens, now it is a part of setup screens.
@@ -81,6 +78,9 @@ void SetScreenType(Screen_t& screen)
 // Sets up the split lines
 void SetupScreens(Screen_t& screen, bool reset)
 {
+    if(!screen.is_active())
+        return;
+
     SetScreenType(screen);
 
     vScreen_t& vscreen1 = screen.vScreen(1);
@@ -196,6 +196,9 @@ void SetupScreens(bool reset)
 
 void DynamicScreen(Screen_t& screen, bool mute)
 {
+    if(!screen.is_active())
+        return;
+
     int A = 0;
 
     vScreen_t& vscreen1 = screen.vScreen(1);
@@ -468,6 +471,9 @@ void DynamicScreens()
 // NEW: limit vScreens to playable section area and center them on the real screen
 void CenterScreens(Screen_t& screen)
 {
+    if(!screen.is_active())
+        return;
+
     // approximate positions of player screens
     double cX1, cY1, cX2, cY2;
     GetPlayerScreen(screen.canonical_screen().W, screen.canonical_screen().H, Player[screen.players[0]], cX1, cY1);
@@ -495,8 +501,13 @@ void CenterScreens(Screen_t& screen)
         double MaxWidth = section.Width - section.X;
         double MaxHeight = section.Height - section.Y;
 
-        // on 3DS allow a slight amount of expansion for 3D overdraw
-        int allow_X = (g_config.allow_multires && vscreen.Width == XRender::TargetW && !screen.is_canonical()) ? XRender::TargetOverscanX : 0;
+        // on 3DS allow a slight amount of expansion for 3D overdraw, if the vscreen covers (and will cover) the entire screen
+        int allow_X = (g_config.allow_multires && vscreen.Width == XRender::TargetW && !screen.is_canonical()) ? XRender::TargetCameraOverscanX : 0;
+
+        // don't do overscan if the section will be smaller than the screen after overscan (add 1 for floating precision margin)
+        if(MaxWidth + XRender::TargetCameraOverscanX * 2 + 1 < vscreen.Width)
+            allow_X = 0;
+
         MaxWidth += allow_X * 2;
 
         double MinWidth = 0;

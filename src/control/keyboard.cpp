@@ -915,7 +915,10 @@ void InputMethodType_Keyboard::UpdateControlsPost()
     }
 
     if(this->m_directText && GamePaused == PauseCode::TextEntry)
+    {
+        this->m_canPoll = false;
         return;
+    }
 
     bool altPressed = this->m_keyboardState[SDL_SCANCODE_LALT] ||
                       this->m_keyboardState[SDL_SCANCODE_RALT];

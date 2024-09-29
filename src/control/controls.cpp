@@ -28,6 +28,7 @@
 #include "../controls.h"
 #include "../main/record.h"
 #include "../main/speedrunner.h"
+#include "message.h"
 
 #include "core/render.h"
 #include "core/window.h"
@@ -82,6 +83,8 @@ static PauseCode s_requestedPause = PauseCode::None;
 HotkeysPressed_t g_hotkeysPressed;
 static HotkeysPressed_t s_hotkeysPressedOld;
 bool g_disallowHotkeys = false;
+
+std::array<Controls_t, maxLocalPlayers> g_RawControls;
 
 std::array<std::string, PlayerControls::Buttons::MAX> PlayerControls::g_button_name_UI;
 std::array<std::string, CursorControls::Buttons::MAX> CursorControls::g_button_name_UI;
@@ -184,7 +187,9 @@ void InputMethodProfile::SaveConfig_All(IniProcessing* ctl)
     if(this->Type->RumbleSupported())
         ctl->setValue("enable-rumble", this->m_rumbleEnabled);
 
-    ctl->setValue("show-power-status", this->m_showPowerStatus);
+    if(this->Type->PowerStatusSupported())
+        ctl->setValue("show-power-status", this->m_showPowerStatus);
+
     this->SaveConfig(ctl);
 }
 
@@ -193,7 +198,9 @@ void InputMethodProfile::LoadConfig_All(IniProcessing* ctl)
     if(this->Type->RumbleSupported())
         ctl->read("enable-rumble", this->m_rumbleEnabled, this->m_rumbleEnabled);
 
-    ctl->read("show-power-status", this->m_showPowerStatus, this->m_showPowerStatus);
+    if(this->Type->PowerStatusSupported())
+        ctl->read("show-power-status", this->m_showPowerStatus, this->m_showPowerStatus);
+
     this->LoadConfig(ctl);
 }
 
@@ -205,8 +212,12 @@ size_t InputMethodProfile::GetOptionCount()
     if(!this->Type->RumbleSupported())
         shared_options_count -= 1;
 
+    if(!this->Type->PowerStatusSupported())
+        shared_options_count -= 1;
+
     return shared_options_count + this->GetOptionCount_Custom();
 }
+
 // Methods to manage per-profile options
 // It is guaranteed that none of these will be called if
 // GetOptionCount() returns 0.
@@ -214,6 +225,9 @@ size_t InputMethodProfile::GetOptionCount()
 const char* InputMethodProfile::GetOptionName(size_t i)
 {
     if(!this->Type->RumbleSupported() && (int)i >= CommonOptions::rumble)
+        i += 1;
+
+    if(!this->Type->PowerStatusSupported() && (int)i >= CommonOptions::show_power_status)
         i += 1;
 
     if(i >= CommonOptions::COUNT)
@@ -232,6 +246,9 @@ const char* InputMethodProfile::GetOptionName(size_t i)
 const char* InputMethodProfile::GetOptionValue(size_t i)
 {
     if(!this->Type->RumbleSupported() && (int)i >= CommonOptions::rumble)
+        i += 1;
+
+    if(!this->Type->PowerStatusSupported() && (int)i >= CommonOptions::show_power_status)
         i += 1;
 
     if(i >= CommonOptions::COUNT)
@@ -258,6 +275,9 @@ const char* InputMethodProfile::GetOptionValue(size_t i)
 bool InputMethodProfile::OptionChange(size_t i)
 {
     if(!this->Type->RumbleSupported() && (int)i >= CommonOptions::rumble)
+        i += 1;
+
+    if(!this->Type->PowerStatusSupported() && (int)i >= CommonOptions::show_power_status)
         i += 1;
 
     if(i >= CommonOptions::COUNT)
@@ -293,7 +313,10 @@ bool InputMethodProfile::OptionRotateLeft(size_t i)
 {
     int i_proc = (int)i;
 
-    if(!this->Type->RumbleSupported() && (int)i >= CommonOptions::rumble)
+    if(!this->Type->RumbleSupported() && (int)i_proc >= CommonOptions::rumble)
+        i_proc += 1;
+
+    if(!this->Type->PowerStatusSupported() && (int)i_proc >= CommonOptions::show_power_status)
         i_proc += 1;
 
     if(i_proc >= CommonOptions::COUNT)
@@ -306,7 +329,10 @@ bool InputMethodProfile::OptionRotateRight(size_t i)
 {
     int i_proc = (int)i;
 
-    if(!this->Type->RumbleSupported() && (int)i >= CommonOptions::rumble)
+    if(!this->Type->RumbleSupported() && (int)i_proc >= CommonOptions::rumble)
+        i_proc += 1;
+
+    if(!this->Type->PowerStatusSupported() && (int)i_proc >= CommonOptions::show_power_status)
         i_proc += 1;
 
     if(i_proc >= CommonOptions::COUNT)
@@ -409,20 +435,10 @@ bool InputMethodType::DeleteProfile(InputMethodProfile* profile, const std::vect
             continue;
 
         if(method->Profile == profile)
-        {
-            // try to assign an acceptable backup profile to all relevant methods
-            for(InputMethodProfile* backup : this->m_profiles)
-            {
-                if(backup != profile && this->SetProfile(method, player_no, backup, active_methods))
-                    break;
-            }
-
-            // if we couldn't find one, deleting the profile would leave the game inconsistent
-            if(method->Profile == profile)
-                return false;
-        }
+            return false;
 
         player_no ++;
+        UNUSED(player_no);
     }
 
     for(int i = 0; i < maxLocalPlayers; i++)
@@ -770,6 +786,8 @@ bool ProcessEvent(const SDL_Event* ev)
     return false;
 }
 
+static Controls_t s_last_controls[maxNetplayPlayers + 1];
+
 // 1. Calls the UpdateControlsPre hooks of loaded InputMethodTypes
 //    a. Syncs hardware state as needed
 // 2. Updates Player and Editor controls by calling currently bound InputMethods
@@ -801,36 +819,50 @@ bool Update(bool check_lost_devices)
 
     Controls_t blankControls = Controls_t();
 
-    for(size_t i = 0; i < maxLocalPlayers; i++)
+    for(int i = 0; i < l_screen->player_count; i++)
     {
-        Controls_t& controls = Player[(long)i + 1].Controls;
+        Controls_t newControls = blankControls;
+
         CursorControls_t& cursor = SharedCursor;
         EditorControls_t& editor = ::EditorControls;
 
-        controls = blankControls;
-
-        if(i >= g_InputMethods.size())
-            continue;
-
-        InputMethod* method = g_InputMethods[i];
-
-        if(!method)
+        if(i < (int)g_InputMethods.size() && g_InputMethods[i])
         {
-            // okay = false;
-            continue;
+            InputMethod* method = g_InputMethods[i];
+
+            if(!method->Update(l_screen->players[i], newControls, cursor, editor, g_hotkeysPressed) && check_lost_devices)
+            {
+                okay = false;
+                DeleteInputMethod(method);
+                // the method pointer is no longer valid
+            }
         }
 
-        if(!method->Update((int)i + 1, controls, cursor, editor, g_hotkeysPressed) && check_lost_devices)
-        {
-            okay = false;
-            DeleteInputMethod(method);
-            // the method pointer is no longer valid
-            continue;
-        }
+        // push messages corresponding to controls press / release
+        XMessage::PushControls(i, newControls);
     }
 
     for(InputMethodType* type : g_InputMethodTypes)
         type->UpdateControlsPost();
+
+    // sync any messages
+    XMessage::Tick();
+
+    // update player controls based on message queue
+    XMessage::Message m;
+    while((m = XMessage::PopMessage()))
+    {
+        if(m.type == XMessage::Type::press || m.type == XMessage::Type::release)
+        {
+            if(m.screen >= maxNetplayClients || m.player >= maxLocalPlayers || m.message >= PlayerControls::n_buttons)
+                continue;
+
+            PlayerControls::GetButton(s_last_controls[Screens[m.screen].players[m.player]], m.message) = (m.type == XMessage::Type::press);
+        }
+    }
+
+    for(int A = 1; A <= numPlayers && A <= maxNetplayPlayers; A++)
+        Player[A].Controls = s_last_controls[A];
 
     // check for legacy pause key
     if(g_hotkeysPressed[Hotkeys::Buttons::LegacyPause] != -1)
@@ -858,8 +890,8 @@ bool Update(bool check_lost_devices)
     // sync controls
     Record::Sync();
 
-    for(int i = 0; i < numPlayers && i < maxLocalPlayers; i++)
-        speedRun_syncControlKeys(i, Player[i + 1].Controls);
+    for(int i = 0; i < l_screen->player_count; i++)
+        speedRun_syncControlKeys(i, Player[l_screen->players[i]].Controls);
 
     // resolve invalid states and override players without controls
     For(B, 1, numPlayers)
@@ -930,11 +962,11 @@ bool Update(bool check_lost_devices)
     }
 
     // indicate if some control slots are missing
-    if(((int)g_InputMethods.size() < numPlayers) && !g_ClonedPlayerMode
-       && !SingleCoop && !GameMenu && !Record::replay_file && check_lost_devices)
+    if(((int)g_InputMethods.size() < l_screen->player_count)
+       && !SingleCoop && !GameMenu && !LevelEditor && !Record::replay_file && check_lost_devices)
     {
         // fill with nullptrs
-        while((int)g_InputMethods.size() < numPlayers)
+        while((int)g_InputMethods.size() < l_screen->player_count)
             g_InputMethods.push_back(nullptr);
 
         okay = false;
@@ -1199,19 +1231,31 @@ void Rumble(int player, int ms, float strength)
     if(GameMenu || GameOutro)
         return;
 
-    if(player < 1 || player > (int)g_InputMethods.size())
+    const Screen_t& screen = ScreenByPlayer(player);
+
+    if(&screen != l_screen)
         return;
 
-    if(!g_InputMethods[player - 1])
+    int l_player_i = 0;
+    while(player != screen.players[l_player_i] && l_player_i < screen.player_count)
+        l_player_i++;
+
+    if(l_player_i == screen.player_count)
         return;
 
-    if(!g_InputMethods[player - 1]->Profile)
+    if(l_player_i > (int)g_InputMethods.size())
         return;
 
-    if(!g_InputMethods[player - 1]->Profile->m_rumbleEnabled)
+    if(!g_InputMethods[l_player_i])
         return;
 
-    g_InputMethods[player - 1]->Rumble(ms, strength);
+    if(!g_InputMethods[l_player_i]->Profile)
+        return;
+
+    if(!g_InputMethods[l_player_i]->Profile->m_rumbleEnabled)
+        return;
+
+    g_InputMethods[l_player_i]->Rumble(ms, strength);
 }
 
 void RumbleAllPlayers(int ms, float strength)
@@ -1235,17 +1279,17 @@ void RumbleAllPlayers(int ms, float strength)
 }
 
 
-StatusInfo GetStatus(int player)
+StatusInfo GetStatus(int l_player_i)
 {
     // return something blank if player doesn't exist
-    if(player < 1 || player >= (int)g_InputMethods.size() + 1 || g_InputMethods[player - 1] == nullptr)
+    if(l_player_i < 0 || l_player_i >= (int)g_InputMethods.size() || g_InputMethods[l_player_i] == nullptr)
         return StatusInfo();
 
-    // return something blank if player doesn't want to show status
-    if(!g_InputMethods[player - 1]->Profile || !g_InputMethods[player - 1]->Profile->m_showPowerStatus)
+    // return something blank if l_player_i doesn't want to show status
+    if(!g_InputMethods[l_player_i]->Profile || !g_InputMethods[l_player_i]->Profile->m_showPowerStatus)
         return StatusInfo();
 
-    return g_InputMethods[player - 1]->GetStatus();
+    return g_InputMethods[l_player_i]->GetStatus();
 }
 
 

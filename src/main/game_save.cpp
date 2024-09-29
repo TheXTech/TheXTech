@@ -575,7 +575,7 @@ void DeleteSave(int world, int save)
     // If legacy gamesave file exists, make the locker file to make illusion that old file got been removed
     if(Files::fileExists(legacySave))
     {
-        auto *f = Files::open_file(legacySaveLocker.c_str(), "wb");
+        auto *f = Files::open_file(legacySaveLocker, "wb");
         if(f)
         {
             const char s[] = "If this file exists, the Vanilla \"save*.sav\" inside the episode folder is ignored.";

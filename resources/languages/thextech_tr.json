@@ -34,10 +34,10 @@
                 "activate": "NPC ekrana girer",
                 "death": "NPC ölür",
                 "destroy": "blok yok edildi",
-                "enter": "",
+                "enter": "ışınlanma girildi",
                 "hit": "Bloğa vurulduğunda",
-                "layerClear": "obje katma- nındaki her şey temizlendiğinde",
-                "phraseTriggersAfterTemplate": "",
+                "layerClear": "obje katmanındaki her şey temizlenir",
+                "phraseTriggersAfterTemplate": "{2} yaşandıktan ms sonra {0} aktifleştirir {1}'i",
                 "phraseTriggersWhenTemplate": "{0}: {1} etkinleştir",
                 "talk": "NPC ile konuşulduğunda"
             },
@@ -45,147 +45,151 @@
             "headerTriggerEvent": "Etkinleştir:",
             "itemNewEvent": "<Yeni Olay>",
             "label": {
-                "activate": "Konuştu- ğunda",
-                "death": "Öldü- ğünde",
-                "destroy": "",
+                "activate": "Aktifleştiğinde",
+                "death": "Öldüğünde",
+                "destroy": "Yok Et",
                 "enter": "",
-                "hit": "",
-                "layerClear": "Katman Temiz",
+                "hit": "Vuruldu",
+                "layerClear": "Katmanı Temiz",
                 "next": "",
                 "talk": "Konuştuğunda"
             },
             "layers": {
                 "headerHide": "Sakla:",
-                "headerMove": "",
-                "headerShow": "",
+                "headerMove": "Hareket Ettir:",
+                "headerShow": "Göster:",
                 "headerToggle": ""
             },
             "letter": {
-                "activate": "",
-                "death": "",
-                "destroy": "",
+                "activate": "A:",
+                "death": "Ö:",
+                "destroy": "Y:",
                 "enter": "",
-                "hit": "",
-                "layerClear": "",
-                "talk": ""
+                "hit": "V:",
+                "layerClear": "Ka:",
+                "talk": "Ko:"
             },
-            "promptEventName": "",
-            "promptEventText": "",
+            "promptEventName": "Olay adı",
+            "promptEventText": "Olay metni",
             "props": {
-                "autostart": "",
-                "controls": "",
+                "autostart": "OtoBaşla",
+                "controls": "Kontroller",
                 "endGame": "",
-                "sound": ""
+                "sound": "Ses",
+                "layerSmoke": "Duman"
             },
             "sections": {
-                "actionKeep": "",
-                "actionReset": "",
-                "actionSet": "",
-                "phraseAllSections": "",
-                "propBackground": "",
-                "propBounds": "",
-                "propMusic": ""
+                "actionKeep": "Tut",
+                "actionReset": "Sıfırla",
+                "actionSet": "Ayarla",
+                "phraseAllSections": "Bütün Kısımlar",
+                "propBackground": "AP",
+                "propBounds": "Sınırlar",
+                "propMusic": "Müzik"
             },
-            "settingsForEvent": ""
+            "settingsForEvent": "{0} olayının ayarları"
         },
         "file": {
-            "actionClearLevel": "",
-            "actionClearWorld": "",
-            "actionExit": "",
-            "actionOpen": "",
-            "actionRevert": "",
-            "commandNew": "",
-            "commandOpen": "",
-            "commandSave": "",
-            "commandSaveAs": "",
-            "confirmConfirmAction": "",
-            "confirmConvertFormatTo": "",
-            "confirmSaveBeforeAction": "",
+            "actionClearLevel": "Seviyeyi Temizle",
+            "actionClearWorld": "Dünyayı Temizle",
+            "actionExit": "Çıkış",
+            "actionOpen": "Aç",
+            "actionRevert": "Geri Al",
+            "commandNew": "Yeni",
+            "commandOpen": "Aç...",
+            "commandSave": "Kaydet",
+            "commandSaveAs": "Farklı Kaydet...",
+            "confirmConfirmAction": "{0} yapmak istediğine emin misin?",
+            "confirmConvertFormatTo": "{0} formatına dönüştürülsün mü?",
+            "confirmSaveBeforeAction": "{0} yapmadan kaydet?",
             "formatLegacy": "",
-            "formatModern": "",
-            "labelCurrentFile": "",
-            "labelFormat": "",
-            "optionActionWithoutSave": "",
-            "optionCancelAction": "",
+            "formatModern": "Modern",
+            "labelCurrentFile": "Şu anki dosya:",
+            "labelFormat": "Biçim:",
+            "optionActionWithoutSave": "Kaydetmeden {0}",
+            "optionCancelAction": "İptal: {0} yapma",
             "optionCancelConversion": "",
             "optionProceedWithConversion": "",
-            "optionYesSaveThenAction": "",
-            "sectionLevel": "",
-            "sectionWorld": ""
+            "optionYesSaveThenAction": "Evet: kaydet ve {0}",
+            "sectionLevel": "Seviye",
+            "sectionWorld": "Dünya",
+            "convert": {
+                "descNew": "Dosya uzantısı değişecek ama eski dosya SİLİNMEYECEK.\n\nLütfen kaydettikten sonra kaybolmuş özelliklere bakın."
+            }
         },
         "layers": {
             "abbrevAttLayer": "",
-            "default": "",
+            "default": "Varsayılan",
             "deletion": {
-                "cancel": "",
-                "confirmDelete": "",
-                "confirmPreserve": "",
-                "header": "",
-                "preserveLayerContents": ""
+                "cancel": "İptal: katmanı silme",
+                "confirmDelete": "Hayır: *BÜTÜN İÇERİĞİ SİL*",
+                "confirmPreserve": "Evet: varsayılan katmana taşı",
+                "header": "{0} katmanı siliniyor",
+                "preserveLayerContents": "Katman içeriği korunsun mu?"
             },
             "desc": {
-                "att": ""
+                "att": "NPC hareket ettiği zaman bağlı olduğu katman onu takip eder"
             },
-            "header": "",
-            "itemNewLayer": "",
-            "label": "",
-            "labelAttached": "",
-            "labelAttachedLayer": "",
-            "labelMoveLayer": "",
-            "promptLayerName": ""
+            "header": "Katmanlar:",
+            "itemNewLayer": "<Yeni Katman>",
+            "label": "Katman:",
+            "labelAttached": "Bağlı Olduğu:",
+            "labelAttachedLayer": "Bağlı Olduğu Katman:",
+            "labelMoveLayer": "Katmanı Hareket Ettir:",
+            "promptLayerName": "Katman adı"
         },
-        "letterCoordX": "",
-        "letterCoordY": "",
-        "letterDown": "",
-        "letterLeft": "",
-        "letterRight": "",
-        "letterUp": "",
+        "letterCoordX": "X",
+        "letterCoordY": "Y",
+        "letterDown": "A",
+        "letterLeft": "So",
+        "letterRight": "Sa",
+        "letterUp": "Y",
         "level": {
-            "alwaysVis": "",
-            "bigBG": "",
-            "gameStart": "",
-            "levelName": "",
-            "pathBG": "",
-            "pathUnlocks": "",
-            "startPos": ""
+            "alwaysVis": "Hep Görün",
+            "bigBG": "Büyük AP",
+            "gameStart": "Oyun Başlar",
+            "levelName": "Seviye İsmi",
+            "pathBG": "Yol AP",
+            "pathUnlocks": "Yol Anahtarları",
+            "startPos": "Başlangıç Pozisyonu"
         },
-        "mapPos": "",
+        "mapPos": "Harita Pozisyonu",
         "npc": {
-            "abbrevGen": "",
+            "abbrevGen": "Üret",
             "ai": {
-                "LR": "",
-                "UD": "",
-                "aiIs": "",
-                "headerCustomAi": "",
-                "jump": "",
-                "leap": "",
-                "swim": "",
-                "target": "",
-                "use1_0Ai": ""
+                "LR": "SağSol",
+                "UD": "YukAş",
+                "aiIs": "AI: {0}",
+                "headerCustomAi": "Custom AI:",
+                "jump": "Atla",
+                "leap": "Sıçra",
+                "swim": "Yüz",
+                "target": "Hedef",
+                "use1_0Ai": "1.0 AI Kullan"
             },
             "gen": {
-                "direction": "",
+                "direction": "Yönü",
                 "effectIs": "",
                 "effectShoot": "",
                 "effectWarp": "",
                 "header": ""
             },
-            "inContainer": "",
-            "inertNice": "",
+            "inContainer": "İçi",
+            "inertNice": "Dost",
             "props": {
                 "active": "",
                 "attachSurface": "",
-                "facing": ""
+                "facing": "Yönü"
             },
-            "stuckStop": "",
-            "tooltipExpandSection": ""
+            "stuckStop": "Dur",
+            "tooltipExpandSection": "Kısmı Genişlet"
         },
-        "pageBlankOfBlank": "",
-        "phraseAreYouSure": "",
-        "phraseCountMore": "",
-        "phraseDelayIsMs": "",
+        "pageBlankOfBlank": "Sayfa {0} de {1}",
+        "phraseAreYouSure": "Emin misin?",
+        "phraseCountMore": "{0} Daha",
+        "phraseDelayIsMs": "{0} ms Ertele",
         "phraseRadiusIndex": "",
-        "phraseSectionIndex": "",
+        "phraseSectionIndex": "Kısım {0}",
         "phraseTextOf": "",
         "phraseWarpIndex": "",
         "section": {
@@ -220,7 +224,7 @@
             "erase": "",
             "eraseAll": "",
             "events": "",
-            "file": "",
+            "file": "Dosya",
             "layers": "",
             "levels": "",
             "music": "",
@@ -299,7 +303,8 @@
             "phraseCreditIndex": "",
             "retryOnFail": "",
             "totalStars": ""
-        }
+        },
+        "labelSortLayer": "Katmanları Sırala:"
     },
     "game": {
         "connect": {
@@ -318,7 +323,8 @@
             "reconnectTitle": "",
             "splitPressSelect_1": "",
             "splitPressSelect_2": "",
-            "wordDisconnect": ""
+            "wordDisconnect": "",
+            "phraseTestProfile": "Test Profili"
         },
         "controls": {
             "phrasePlayerConnected": "",
@@ -502,7 +508,7 @@
                     "buttonA": "",
                     "buttonB": "",
                     "buttonHome": "",
-                    "buttonMinus": "",
+                    "buttonMinus": "-",
                     "buttonPlus": "",
                     "caseIR": "",
                     "dPad": "",
@@ -544,31 +550,39 @@
         "options": {
             "optionsModeFullScreen": "",
             "optionsModeWindowed": "",
-            "optionsViewCredits": ""
+            "optionsViewCredits": "",
+            "advanced": {
+                "advanced-video": "Video",
+                "advanced-audio": "Ses",
+                "audio-format": {
+                    "_name": "Ses formatı"
+                }
+            }
         },
         "wordBack": "",
         "wordHide": "",
         "wordNo": "",
-        "wordOff": "",
-        "wordOn": "",
-        "wordPlayer": "",
-        "wordProfile": "",
-        "wordResume": "",
-        "wordShow": "",
-        "wordWaiting": "",
-        "wordYes": ""
+        "wordOff": "Kapalı",
+        "wordOn": "Açık",
+        "wordPlayer": "Oyuncu",
+        "wordProfile": "Profil",
+        "wordResume": "Devam Et",
+        "wordShow": "Göster",
+        "wordWaiting": "Bekleniyor",
+        "wordYes": "Evet"
     },
     "outro": {
-        "cppPortDevelopers": "",
+        "cppPortDevelopers": "C++ portunun geliştiricileri:",
         "customSprites": "",
         "engineCredits": "",
         "gameCredits": "",
-        "levelDesign": "",
-        "nameAndrewSpinks": "",
-        "nameVitalyNovichkov": "",
-        "originalBy": "",
-        "psVitaPortBy": "",
-        "specialThanks": ""
+        "levelDesign": "Seviye Tasarımı:",
+        "nameAndrewSpinks": "Andrew Spinks",
+        "nameVitalyNovichkov": "Vitaly Novichkov",
+        "originalBy": "Orijinal VB6 kodu:",
+        "psVitaPortBy": "PS Vita Portu:",
+        "specialThanks": "Özel Teşekkürler:",
+        "qualityControl": "Kalite Kontrol:"
     },
     "pluralRules": ""
 }

@@ -146,14 +146,9 @@ public:
     opt<bool> unlimited_framerate{this, defaults(false), {}, Scope::Config,
         "unlimited-framerate", "Unlimited framerate", nullptr};
 
-#ifdef __WIIU__
-    // Wii U SDL2 has a bug that requires vSync to always be enabled
-    static constexpr bool render_vsync = true;
-#else
     opt<bool> render_vsync{this, defaults(false), {}, Scope::Config,
         "vsync", "V-Sync", nullptr,
         config_res_set};
-#endif
 
     /* ---- Main - Multiplayer ----*/
     subsection main_multiplayer{this, "multiplayer", "Multiplayer"};
@@ -873,6 +868,9 @@ public:
         "fix-vehicle-altjump-bug", "Fix vehicle AltJump bug", "Don't become vulnerable after AltJump into car"};
     opt<bool> fix_vehicle_altjump_lock{this, defaults(true), {CompatClass::critical_update, false}, Scope::CreatorFile,
         "fix-vehicle-altjump-lock", "Fix vehicle AltJump lock", "Don't get stuck in car entered while holding AltJump"};
+    // player can be stuck when hit by an NPC while digging dirt (#125)
+    opt<bool> fix_player_stuck_on_dirt{this, defaults(true), {CompatClass::critical_update, false}, Scope::CreatorFile,
+        "fix-player-stuck-on-dirt", "Fix player stuck on dirt", "Don't get stuck when digging dirt"};
 
     // 1.3.7
     opt<bool> fix_npc_camera_logic{this, defaults(true), {CompatClass::critical_update, false}, Scope::CreatorFile,

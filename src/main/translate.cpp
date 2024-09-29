@@ -23,6 +23,7 @@
 #include <AppPath/app_path.h>
 #include <Utils/files.h>
 #include <Utils/strings.h>
+#include <json/json_rwops_input.hpp>
 #include <json/json.hpp>
 #include <fmt_format_ne.h>
 
@@ -152,7 +153,7 @@ static std::string getJsonValue(nlohmann::ordered_json &j, const std::string &ke
 static bool saveFile(const std::string &inPath, const std::string &inData)
 {
     bool ret = true;
-    SDL_RWops *in = Files::open_file(inPath.c_str(), "w");
+    SDL_RWops *in = Files::open_file(inPath, "w");
     if(!in)
         return false;
 
@@ -923,7 +924,7 @@ void XTechTranslate::updateLanguages(const std::string &outPath, bool noBlank)
 
         try
         {
-            Files::Data data = Files::load_file(fullFilePath.c_str());
+            Files::Data data = Files::load_file(fullFilePath);
 
             if(!data.valid())
             {
@@ -1020,7 +1021,7 @@ bool XTechTranslate::translateFile(const std::string& file, TrList& list, const 
     try
     {
         // Engine translations
-        Files::Data data = Files::load_file(file.c_str());
+        Files::Data data = Files::load_file(file);
 
         if(!data.valid())
         {

@@ -20,6 +20,7 @@
 
 #include <PGE_File_Formats/file_formats.h>
 #include <IniProcessor/ini_processing.h>
+#include <Utils/files_ini.h>
 #include <fmt_format_ne.h>
 
 #include "config.h"
@@ -255,18 +256,16 @@ void LoadCustomConfig()
     // Level-wide custom creator setup
     customCompat = g_dirCustom.resolveFileCaseExistsAbs("compat.ini");
 
-    IniProcessing ini;
-
     if(!episodeCompat.empty())
     {
-        ini.open(episodeCompat);
+        IniProcessing ini = Files::load_ini(episodeCompat);
         g_config_episode_creator.LoadLegacyCompat(&ini, ConfigSetLevel::ep_compat);
         g_config_episode_creator.UpdateFromIni(&ini, ConfigSetLevel::ep_compat);
     }
 
     if(!customCompat.empty())
     {
-        ini.open(customCompat);
+        IniProcessing ini = Files::load_ini(episodeCompat);
         g_config_file_creator.LoadLegacyCompat(&ini, ConfigSetLevel::file_compat);
         g_config_file_creator.UpdateFromIni(&ini, ConfigSetLevel::file_compat);
     }

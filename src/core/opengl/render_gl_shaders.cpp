@@ -108,6 +108,20 @@ void main()
 }
 )RAW";
 
+const char* const RenderGL::s_es2_no_tint_frag_src =
+R"RAW(#version 100
+precision mediump float;
+varying   vec2      v_texcoord;
+uniform   sampler2D u_texture;
+const     float     c_alpha_test_thresh = (8.0 / 255.0);
+void main()
+{
+  vec4 l_color = texture2D(u_texture, v_texcoord);
+  if(l_color.a < c_alpha_test_thresh) discard;
+  gl_FragColor = l_color;
+}
+)RAW";
+
 const char* const RenderGL::s_es2_bitmask_frag_src =
 R"RAW(#version 100
 
@@ -218,7 +232,7 @@ void main()
   if(l_image.r == 0.0 && l_image.g == 0.0 && l_image.b == 0.0 && l_mask.r == 1.0 && l_mask.g == 1.0 && l_mask.b == 1.0)
     discard;
 
-  // l_image *= v_tint.rgb;
+  l_image *= v_tint.rgb;
 
   vec2 src = v_fbcoord.xy;
   // src.y += sin(v_fbcoord.x * 6.0 + l_mask.r + l_mask.g + l_mask.b) * (l_image.r + l_image.g + l_image.b + 3.0 - l_mask.r - l_mask.g - l_mask.b) / 9.0;
@@ -226,7 +240,8 @@ void main()
   vec3 l_bg = texture2D(u_framebuffer, src).rgb;
 
   gl_FragColor.rgb = bitwise_ops(l_bg, l_mask, l_image);
-  gl_FragColor.a = 1.0;
+  // gl_FragColor.a = v_tint.a;
+  gl_FragColor.a = 1.0; // less appealing, but matches glLogicOp behavior
 }
 )RAW";
 
@@ -262,14 +277,15 @@ void main()
   if(l_image.r == 0.0 && l_image.g == 0.0 && l_image.b == 0.0 && l_mask.r == 1.0 && l_mask.g == 1.0 && l_mask.b == 1.0)
     discard;
 
-  // l_image *= v_tint.rgb;
+  l_image *= v_tint.rgb;
 
   vec2 src = v_fbcoord.xy;
 
   vec3 l_bg = texture(u_framebuffer, src).rgb;
 
   FragColor.rgb = bitwise_ops(l_bg, l_mask, l_image);
-  FragColor.a = 1.0;
+  // FragColor.a = v_tint.a;
+  FragColor.a = 1.0; // less appealing, but matches glLogicOp behavior
 }
 )RAW";
 

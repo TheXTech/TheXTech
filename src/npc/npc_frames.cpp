@@ -1341,7 +1341,9 @@ void NPCFrames(int A)
         NPC[A].FrameCount += 1;
         if(NPC[A].FrameCount >= 20)
             NPC[A].FrameCount = 0;
-        NPC[A].Frame = static_cast<int>(floor(static_cast<double>(NPC[A].FrameCount / 5)));
+        // NPC[A].Frame = static_cast<int>(floor(static_cast<double>(NPC[A].FrameCount / 5)));
+        // integer division now
+        NPC[A].Frame = NPC[A].FrameCount / 5;
         if(NPC[A].Direction == 1)
             NPC[A].Frame += 4;
         // statue fireball
@@ -1351,7 +1353,9 @@ void NPCFrames(int A)
         NPC[A].FrameCount += 1;
         if(NPC[A].FrameCount >= 8)
             NPC[A].FrameCount = 0;
-        NPC[A].Frame = static_cast<int>(floor(static_cast<double>(NPC[A].FrameCount / 2)));
+        // NPC[A].Frame = static_cast<int>(floor(static_cast<double>(NPC[A].FrameCount / 2)));
+        // integer division now
+        NPC[A].Frame = NPC[A].FrameCount / 2;
         if(NPC[A].Direction == 1)
             NPC[A].Frame += 4;
         // winged koopa
@@ -1496,8 +1500,9 @@ void NPCFrames(int A)
         if(NPC[A].Special == 0)
         {
             NPC[A].FrameCount += 1;
-            if(NPC[A].Type == NPCID_HIT_CARRY_FODDER && NPC[A].Special > 360)
-                NPC[A].FrameCount += 1;
+            // was not commented in VB6, but it's obviously impossible
+            // if(NPC[A].Type == NPCID_HIT_CARRY_FODDER && NPC[A].Special > 360)
+            //     NPC[A].FrameCount += 1;
             if(NPC[A].Direction == -1 && NPC[A].Frame >= 2)
                 NPC[A].Frame = 0;
             else if(NPC[A].Direction == 1 && NPC[A].Frame < 2)
@@ -2090,7 +2095,8 @@ void NPCFrames(int A)
     }
     else if(NPC[A].Type == NPCID_HEAVY_THROWER) // SMB Hammer Bro
     {
-        if(NPC[A].Special3 >= 0)
+        // the throw counter was previously Special3, and it has been moved to SpecialX
+        if(NPC[A].SpecialX >= 0)
         {
             if((NPC[A].Location.SpeedY < 1 && NPC[A].Location.SpeedY >= 0) || NPC[A].Slope > 0 || NPC[A].HoldingPlayer > 0)
             {

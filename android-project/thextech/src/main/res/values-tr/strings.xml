@@ -5,7 +5,7 @@
     <string name="launcher_gameSelect_clearList">Listeyi temizle</string>
     <string name="launcher_gameselect_toast_selected">Oyunu değiştir: %s</string>
     <string name="setup_display_cat">Görüntü</string>
-    <string name="launcher_gameselect_toast_listclean">Temizlenmiş oyunlar listesi.</string>
+    <string name="launcher_gameselect_toast_listclean">Oyun listesi temizlenmiştir.</string>
     <string name="touchscreen_vibration_test_label">Geri dönüşü test et</string>
     <string name="launcher_gameselect_clearlist_title">Oyun listesini temizle</string>
     <string name="cheat_dialog_title">Komut yaz:</string>
@@ -22,7 +22,7 @@
     <string name="settings_button">Ayarlar</string>
     <string name="game_logo_label">Oyun logosu</string>
     <string name="setup_general_cat">Genel</string>
-    <string name="setup_show_framerate">Kare sayısı değerini göster</string>
+    <string name="setup_show_framerate">Kare hızı değerini göster</string>
     <string name="setup_feedback_enable_vibration">Titreşimi aç</string>
     <string name="setup_feedback_vibration_strength">Titreşim gücü</string>
     <string name="launcher_gameselect_clearlist_question">Oyun listesini temizlemek istediğinize emin misiniz\?</string>
@@ -31,12 +31,13 @@
     <string name="setup_touchscreen_alwaysshow">Dokunmatik ekran kontrollerini başlangıçta göster</string>
     <string name="setup_touchscreen_controller_enable">Dokunmatik ekran kontrollerini kullan</string>
     <string name="setup_touchscreen_mode">Kontrolcü modu</string>
-    <string name="setup_max_framerate_mode">Maksimum kare sayısı modu</string>
-    <string name="managePermExplainText">Bu oyun kullanıcı tarafından cihazın hafızasına konulmuş dosyalar (seviyeler, bölümler, grafikle, müzikler, ayarlar, vb. gibi) kullanır. Bu olay kullanıcıların içerikleri değiştirmelerine ve geliştirmelerini sağlar (masaüstü versiyonundaki gibi). Maalesef ki Android11+ bazı dosyaların tek tek okunmasındansa genel dosyanın okunmasına izin vermiyor. Bu oyunu çalıştırmak için oyunun, bütün dosyalara bakmasına izin vermeniz gerekmektedir.</string>
+    <string name="setup_max_framerate_mode">Maksimum kare hızı modu</string>
+    <string name="managePermExplainText">Bu oyun kullanıcı tarafından cihazın hafızasına konulmuş dosyaları (seviyeler, bölümler, grafikle, müzikler, ayarlar, vb. gibi) kullanır. Bu olay kullanıcıların içerikleri değiştirmelerine ve geliştirmelerini sağlar (masaüstü versiyonundaki gibi). Maalesef ki Android11+ bazı dosyaların tek tek okunmasına izin vermiyor. Bu oyunu çalıştırmak için oyunun, bütün dosyalara bakmasına izin vermeniz gerekmektedir.</string>
     <string name="setup_assets_path_label">Kaynak yolunu değiştir</string>
     <string name="setup_feedback_vibration_length">Titreşim uzunluğu</string>
     <string name="setup_show_battery_status_label">Cihazın batarya durumu</string>
     <string name="setup_show_controller_state_label">Bir oyun kontrolcüsü durumu göster</string>
     <string name="cheat_dialog_ok">Çalıştır</string>
     <string name="setup_renderer_label">Render sistemi</string>
+    <string name="launcher_openfile_indirectly">Açılan dosyalar için dizindeki kaynaklara ulaşılamadı. Bu nedenle oyun var olan kaynaklarla açılacaktır. Fazladan kaynaklar (custom grafikler, müzikler, ayarlar, scriptler vb.) yüklenememektedir. Oyunu başlatmak istediğinize emin misiniz?</string>
 </resources>

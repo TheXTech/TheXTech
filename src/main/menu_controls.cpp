@@ -18,6 +18,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <array>
+
 #include <fmt_format_ne.h>
 
 #include "sdl_proxy/sdl_stdinc.h"
@@ -31,6 +33,7 @@
 #include "../core/render.h"
 
 #include "graphics/gfx_frame.h"
+#include "graphics/gfx_marquee.h"
 
 #include "main/screen_textentry.h"
 
@@ -43,10 +46,6 @@ bool g_pollingInput = false;
 static int s_curType = -1;
 static int s_curProfile = -1;
 
-static int s_changingProfilePlayer = -1;
-static Controls::InputMethodProfile* s_lastProfile = nullptr;
-static int s_profileChangeTimer = 0;
-
 static bool s_secondaryInput = false;
 
 static bool s_canDelete = false;
@@ -54,6 +53,9 @@ static bool s_canDelete = false;
 static bool s_deleteProfileSel = false;
 
 static Controls::ControlsClass s_profileTab = Controls::ControlsClass::None;
+
+static std::array<MarqueeState, maxLocalPlayers> s_controller_type_marquee;
+static std::array<MarqueeState, maxLocalPlayers> s_controller_profile_marquee;
 
 // only partially refactored from the mouse and standard menu logic functions
 //   (which currently duplicate part of their logic)
@@ -72,39 +74,7 @@ int menuControls_Do()
         Controls::InputMethodType* type = Controls::g_InputMethodTypes[s_curType];
         Controls::InputMethodProfile* profile = type->GetProfiles()[s_curProfile];
 
-        if(MenuCursor == 0) // Activate Profile
-        {
-            MenuCursorCanMove = false;
-            // Figure out who pressed this
-            int i;
-            for(i = 0; i < maxLocalPlayers; i++)
-            {
-                if(Player[i + 1].Controls.Start || Player[i + 1].Controls.Jump)
-                    break;
-            }
-            if(i == maxLocalPlayers || !Controls::g_InputMethods[i])
-            {
-                PlaySoundMenu(SFX_BlockHit);
-                return 0;
-            }
-
-            // save the profile before attempting to set it
-            s_lastProfile = Controls::g_InputMethods[i]->Profile;
-
-            // attempt to set the profile, if it fails, remove record
-            if(s_lastProfile == profile || !Controls::SetInputMethodProfile(i, profile))
-            {
-                s_lastProfile = nullptr;
-                PlaySoundMenu(SFX_BlockHit);
-                return 0;
-            }
-
-            PlaySoundMenu(SFX_PSwitch);
-            s_changingProfilePlayer = i;
-            s_profileChangeTimer = 66*3;
-            return 0;
-        }
-        else if(MenuCursor == 1) // Rename Profile
+        if(MenuCursor == 0) // Rename Profile
         {
             PlaySoundMenu(SFX_Do);
             MenuCursorCanMove = false;
@@ -112,7 +82,7 @@ int menuControls_Do()
             MenuCursorCanMove = false;
             return 0;
         }
-        else if(MenuCursor == 2) // Delete Profile
+        else if(MenuCursor == 1) // Delete Profile
         {
             PlaySoundMenu(SFX_PlayerDied2);
             s_deleteProfileSel = true;
@@ -123,13 +93,13 @@ int menuControls_Do()
         else // submenu
         {
             PlaySoundMenu(SFX_Do);
-            if(MenuCursor == 3)
+            if(MenuCursor == 2)
                 s_profileTab = Controls::ControlsClass::Player;
-            else if(MenuCursor == 4)
+            else if(MenuCursor == 3)
                 s_profileTab = Controls::ControlsClass::Cursor;
-            else if(MenuCursor == 5)
+            else if(MenuCursor == 4)
                 s_profileTab = Controls::ControlsClass::Editor;
-            else if(MenuCursor == 6)
+            else if(MenuCursor == 5)
                 s_profileTab = Controls::ControlsClass::Hotkey;
             MenuCursor = 0;
             MenuCursorCanMove = false;
@@ -231,7 +201,7 @@ int menuControls_Mouse_Render(bool mouse, bool render)
                 {
                     PlaySoundMenu(SFX_Slide);
                     s_deleteProfileSel = false;
-                    MenuCursor = 2; // Delete Profile
+                    MenuCursor = 1; // Delete Profile
                     MenuMouseRelease = false;
                 }
             }
@@ -268,63 +238,15 @@ int menuControls_Mouse_Render(bool mouse, bool render)
         return 0;
     }
 
-    // render the players
-    if(render && s_changingProfilePlayer != -1)
-    {
-        // just render the players, and center onscreen, if changing profile
-        int top_line = max_line / 2 - 3;
-        if(top_line < 0)
-            top_line = 0;
-
-        SuperPrintScreenCenter(g_gameStrings.connectTestProfile, 3, sY+(top_line)*line);
-
-        size_t p = s_changingProfilePlayer;
-        if(!Controls::g_InputMethods[p])
-            return 0;
-        SuperPrintScreenCenter(Controls::g_InputMethods[p]->Name, 3, sY+(top_line+1)*line);
-
-        // display the current profile
-        SuperPrintScreenCenter(g_mainMenu.wordProfile + ":", 3, sY+(top_line+2)*line);
-        // should never be null
-        if(Controls::g_InputMethods[p]->Profile != nullptr)
-            SuperPrintScreenCenter(Controls::g_InputMethods[p]->Profile->Name, 3, sY+(top_line+3)*line);
-
-        // display the test controls and profile reversion countdown (add more details)
-        RenderControls((int)p + 1, (XRender::TargetW / 2) - 38, sY + (top_line + 4) * line, 76, 30, false, 1.0f);
-        SuperPrintScreenCenter(g_gameStrings.connectHoldStart, 3, sY + (top_line + 6) * line);
-        int n_stars;
-        int n_empty;
-        if(s_profileChangeTimer < 66*3)
-        {
-            n_stars = (s_profileChangeTimer + 65) / 66;
-            n_empty = 6 - n_stars;
-        }
-        else
-        {
-            n_stars = 3 + (s_profileChangeTimer - 66*3)/22;
-            n_empty = 6 - n_stars;
-        }
-        const std::string squeeze = std::string(n_empty, '-') + std::string(n_stars*2, '*') + std::string(n_empty, '-');
-        SuperPrintScreenCenter(squeeze, 3, sY+(top_line+7)*line);
-    }
-
-    // for both mouse and render
-    if(s_changingProfilePlayer != -1)
-        return 0;
-
     // rendering / mouse for the main controls screen
     if(s_curType == -1)
     {
         if(render)
-        {
             SuperPrintScreenCenter(g_mainMenu.controlsTitle, 3, sY);
-        }
 
         // render the types at the top of the screen and the currently connected devices at the bottom
         if(render)
-        {
             SuperPrint(g_mainMenu.controlsDeviceTypes, 3, sX+16, sY+2*line);
-        }
 
         int scroll_start = 0;
         int scroll_end = n_types;
@@ -402,22 +324,33 @@ int menuControls_Mouse_Render(bool mouse, bool render)
         }
 
         // render the players
-        if(render && s_curType == -1)
+        if(render && s_curType == -1 && Controls::g_InputMethods.size() > 0)
         {
-            SuperPrint(g_mainMenu.controlsConnected, 3, sX+16, sY+(max_line-5)*line);
-            for(size_t p = 0; p < Controls::g_InputMethods.size(); p++)
+            SuperPrintScreenCenter(g_mainMenu.controlsConnected, 3, sY+(max_line-5)*line);
+
+            int p_width = (width - 8) / Controls::g_InputMethods.size();
+
+            for(size_t p = 0; p < Controls::g_InputMethods.size() && p < maxLocalPlayers; p++)
             {
                 if(!Controls::g_InputMethods[p])
                     continue;
 
-                int cX = sX + 100 + (200 * (int)p);
-                SuperPrintCenter(Controls::g_InputMethods[p]->Name, 5, cX, sY+(max_line-4)*line);
+                int lX = sX + 4 + (p_width * (int)p);
+                int cX = lX + p_width / 2;
 
-                // display the current profile
-                SuperPrintCenter(g_mainMenu.wordProfile + ":", 3, cX, sY+(max_line-3)*line);
+                MarqueeSpec print_spec = MarqueeSpec(p_width - 8, 10, 16, 32, 0);
+
+                s_controller_type_marquee[p].advance(print_spec);
+                SuperPrintMarquee(Controls::g_InputMethods[p]->Name, 5, lX, sY+(max_line-4)*line, print_spec, s_controller_type_marquee[p]);
+
+                RenderControls(p + 1, cX - 76 / 2, sY + (max_line - 3) * line - (line - 18) / 2 + 2, 76, 30, false, 255, true);
+
                 // should never be null
                 if(Controls::g_InputMethods[p]->Profile != nullptr)
-                    SuperPrintCenter(Controls::g_InputMethods[p]->Profile->Name, 5, cX, sY+(max_line-2)*line);
+                {
+                    s_controller_profile_marquee[p].advance(print_spec);
+                    SuperPrintMarquee(Controls::g_InputMethods[p]->Profile->Name, 5, lX, sY+(max_line-3)*line + 34, print_spec, s_controller_profile_marquee[p]);
+                }
             }
         }
     }
@@ -704,7 +637,7 @@ int menuControls_Mouse_Render(bool mouse, bool render)
 
         Controls::InputMethodProfile* profile = type->GetProfiles()[s_curProfile];
         const int n_options = (int)profile->GetOptionCount();
-        const int n_stock = 7;
+        const int n_stock = 6;
 
         if(render)
         {
@@ -787,30 +720,28 @@ int menuControls_Mouse_Render(bool mouse, bool render)
         for(int i = 0; i < n_stock; i++)
         {
             const char* name;
-            if(i == 0) // Activate profile
-                name = g_mainMenu.controlsActivateProfile.c_str();
-            else if(i == 1) // Rename profile
+            if(i == 0) // Rename profile
                 name = g_mainMenu.controlsRenameProfile.c_str();
-            else if(i == 2) // Delete profile
+            else if(i == 1) // Delete profile
                 name = g_mainMenu.controlsDeleteProfile.c_str();
-            else if(i == 3) // Player
+            else if(i == 2) // Player
                 name = g_mainMenu.controlsPlayerControls.c_str();
-            else if(i == 4) // Cursor
+            else if(i == 3) // Cursor
                 name = g_mainMenu.controlsCursorControls.c_str();
-            else if(i == 5) // Editor
+            else if(i == 4) // Editor
                 name = g_mainMenu.controlsEditorControls.c_str();
-            else if(i == 6) // Hotkeys
+            else if(i == 5) // Hotkeys
                 name = g_mainMenu.controlsHotkeys.c_str();
             else
                 name = "";
 
             int s; // shift
-            if(i >= 3)
+            if(i >= 2)
                 s = 2;
             else
                 s = 1;
 
-            if(render && i == 3 && i+s-2 >= scroll_start && i+s-2 < scroll_end)
+            if(render && i == 2 && i+s-2 >= scroll_start && i+s-2 < scroll_end)
                 SuperPrint(g_mainMenu.controlsTitle, 3, sX+16, start_y+(i+s - 1 - scroll_start)*line);
 
             if(i+s-1 < scroll_start || i+s-1 >= scroll_end)
@@ -1176,8 +1107,8 @@ int menuControls_MouseLogic()
 
 int menuControls_Logic()
 {
-    // allow input methods to join so long as not currently switching a method
-    if(s_changingProfilePlayer == -1 && !g_pollingInput && GameMenu)
+    // allow input methods to join so long as not currently changing a profile
+    if(!g_pollingInput && GameMenu)
         Controls::PollInputMethod();
 
     const int n_types = (int)Controls::g_InputMethodTypes.size();
@@ -1249,49 +1180,6 @@ int menuControls_Logic()
         return 0;
     }
 
-    // stop the profile change process if the player is no longer there
-    if(s_changingProfilePlayer != -1 &&
-        (s_changingProfilePlayer >= (int)Controls::g_InputMethods.size()
-            || !Controls::g_InputMethods[s_changingProfilePlayer]))
-    {
-        s_changingProfilePlayer = -1;
-        s_lastProfile = nullptr;
-    }
-
-    // do the countdown of the profile change process
-    if(s_changingProfilePlayer != -1)
-    {
-        const Controls_t& c = Player[s_changingProfilePlayer+1].Controls;
-
-        // count down if no buttons pressed, 3 seconds if any buttons pressed
-        if(!c.Run && !c.Jump && !c.AltRun && !c.AltJump && !c.Start && !c.Drop && !c.Down && !c.Up && !c.Left && !c.Right)
-        {
-            s_profileChangeTimer --;
-        }
-        else if(s_profileChangeTimer < 66*3)
-            s_profileChangeTimer = 66*3;
-        // if start button pressed, count up!
-        if(c.Start)
-            s_profileChangeTimer ++;
-
-        if(s_profileChangeTimer < 0)
-        {
-            PlaySoundMenu(SFX_PSwitch);
-            Controls::SetInputMethodProfile(Controls::g_InputMethods[s_changingProfilePlayer], s_lastProfile);
-            s_lastProfile = nullptr;
-            s_changingProfilePlayer = -1;
-        }
-        if(s_profileChangeTimer > 66*4)
-        {
-            PlaySoundMenu(SFX_Pet);
-            s_lastProfile = nullptr;
-            s_changingProfilePlayer = -1;
-        }
-
-        MenuCursorCanMove = false;
-        return 0;
-    }
-
     bool upPressed = SharedControls.MenuUp;
     bool downPressed = SharedControls.MenuDown;
     bool leftPressed = SharedControls.MenuLeft;
@@ -1308,9 +1196,6 @@ int menuControls_Logic()
 
     for(int i = 0; i < maxLocalPlayers; i++)
     {
-        if(s_changingProfilePlayer == i)
-            continue;
-
         Controls_t &c = Player[i + 1].Controls;
 
         menuDoPress |= c.Start || c.Jump;
@@ -1328,17 +1213,11 @@ int menuControls_Logic()
         menuDoPress = false;
 
     if(delPressed && s_canDelete)
-    {
         s_canDelete = false;
-    }
     else if(delPressed)
-    {
         delPressed = false;
-    }
     else
-    {
         s_canDelete = true;
-    }
 
     // logic for the profile deletion screen
     if(s_deleteProfileSel)
@@ -1372,12 +1251,12 @@ int menuControls_Logic()
         {
             PlaySoundMenu(SFX_Slide);
             s_deleteProfileSel = false;
-            MenuCursor = 2; // Delete Profile
+            MenuCursor = 1; // Delete Profile
             MenuCursorCanMove = false;
         }
         else if(menuDoPress && MenuCursor == 1)
         {
-            if(profile != s_lastProfile && type->DeleteProfile(profile, Controls::g_InputMethods))
+            if(type->DeleteProfile(profile, Controls::g_InputMethods))
             {
                 PlaySoundMenu(SFX_VillainKilled);
                 s_deleteProfileSel = false;
@@ -1535,7 +1414,7 @@ int menuControls_Logic()
         }
 
         Controls::InputMethodProfile* profile = type->GetProfiles()[s_curProfile];
-        const int n_stock = 7;
+        const int n_stock = 6;
         const int n_options = (int)profile->GetOptionCount();
 
         // first come the stock options, then the profile options.
@@ -1659,13 +1538,13 @@ int menuControls_Logic()
             PlaySoundMenu(SFX_Slide);
 
             if(s_profileTab == Controls::ControlsClass::Player)
-                MenuCursor = 3;
+                MenuCursor = 2;
             else if(s_profileTab == Controls::ControlsClass::Cursor)
-                MenuCursor = 4;
+                MenuCursor = 3;
             else if(s_profileTab == Controls::ControlsClass::Editor)
-                MenuCursor = 5;
+                MenuCursor = 4;
             else if(s_profileTab == Controls::ControlsClass::Hotkey)
-                MenuCursor = 6;
+                MenuCursor = 5;
 
             s_profileTab = Controls::ControlsClass::None;
             s_secondaryInput = false;

@@ -64,7 +64,7 @@ int ComputeLevelSection(int x, int y)
 
     int ret = -1;
 
-    for(int i = 0; i <= numSections; ++i)
+    for(int i = 0; i < numSections; ++i)
     {
         if(SectionCollision(i, l))
         {

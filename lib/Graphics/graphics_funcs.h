@@ -41,6 +41,8 @@ struct PGE_Pix
 typedef struct SDL_Window SDL_Window;
 typedef struct SDL_Surface SDL_Surface;
 
+struct FreeImageIO;
+
 /*!
  * \brief Helpful graphical functions which are doing various work: I/O, Front+Mask blending, etc.
  */
@@ -56,6 +58,11 @@ public:
      * \brief DeInitializes FreeImage
      */
     static void  closeFreeImage();
+
+    /*!
+     * \brief initializes a FreeImageIO with operations to load from an SDL_RWops object
+     */
+    static void SetRWopsIO(FreeImageIO *io);
 
     /*!
      * \brief Loads image from a disk
@@ -97,11 +104,10 @@ public:
     static void closeImage(FIBITMAP *img);
 
     /**
-     * @brief Generate mask from off RGBA source
-     * @param image [in] Source Image
-     * @param mask [out] Target image to write a mask
+     * @brief Generate mask from an RGBA source
+     * @param mask [inout] Mask initially in RGBA format
      */
-    static void getMaskFromRGBA(FIBITMAP*&image, FIBITMAP *&mask);
+    static void RGBAToMask(FIBITMAP* mask);
 
     /*!
      * \brief Merges mask and foreground image with bit blitting algorithm

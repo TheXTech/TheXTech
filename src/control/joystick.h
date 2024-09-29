@@ -185,6 +185,7 @@ public:
 
     bool TestProfileType(InputMethodProfile *profile) override;
     bool RumbleSupported() override;
+    bool PowerStatusSupported() override;
 
     void UpdateControlsPre() override;
     void UpdateControlsPost() override;

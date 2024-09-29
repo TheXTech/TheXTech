@@ -383,9 +383,9 @@ void NPCWalkingLogic(int A, const double tempHit, const int tempHitBlock, float 
         if(tempSpeedA != 0)
             NPC[A].Location.SpeedY = tempSpeedA;
 
+        // assigned to Special in SMBX 1.3
         if(NPC[A].Type == NPCID_SAW)
-            NPC[A].Special = NPC[A].Location.SpeedY;
-
+            NPC[A].SpecialY = NPC[A].Location.SpeedY;
     }
 
     if(NPC[A].Slope == 0)

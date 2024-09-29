@@ -21,6 +21,7 @@
 #include "sdl_proxy/sdl_stdinc.h"
 #include "sdl_proxy/sdl_timer.h"
 
+#include <json/json_rwops_input.hpp>
 #include <json/json.hpp>
 #include <algorithm>
 
@@ -135,7 +136,7 @@ bool OpenLevel(std::string FilePath)
 {
     addMissingLvlSuffix(FilePath);
 
-    PGE_FileFormats_misc::TextFileInput in(FilePath);
+    PGE_FileFormats_misc::RWopsTextInput in(Files::open_file(FilePath, "r"), FilePath);
 
     if(in.eof())
     {
@@ -162,7 +163,6 @@ struct LevelLoad
     SaveInfoInit si;
 
     int numPlayerStart = 0;
-    int checkPointId = 0;
 
     layerindex_t layers_finalized = 0;
     eventindex_t events_finalized = 0;
@@ -291,10 +291,10 @@ bool OpenLevelData(PGE_FileFormats_misc::TextInput& input, const std::string Fil
     // they'll get updated, but this is necessary to handle PGE-X files without them included
     load.AddCurrentLayer("Default");
 
-    for(int l = 0; l < numLayers; l++)
+    for(int l = 0; l < 3; l++)
         load.FinalizeLayer(load.FindLayer(Layer[l].Name));
 
-    for(int e = 0; e < numEvents; e++)
+    for(int e = 0; e < 3; e++)
         load.FinalizeEvent(load.FindEvent(Events[e].Name));
 
 
@@ -526,6 +526,9 @@ bool OpenLevel_PlayerStart(void* userdata, PlayerPoint& p)
 {
     LevelLoad& load = *static_cast<LevelLoad*>(userdata);
 
+    if(load.numPlayerStart == 2)
+        return false;
+
     {
         // TODO: should try to use the startpoint's ID field if possible
         load.numPlayerStart++;
@@ -550,9 +553,10 @@ bool OpenLevel_PlayerStart(void* userdata, PlayerPoint& p)
         }
 
         // width and height are zero in LVLX
-        if(PlayerStart[A].Width == 0)
+        // (note: PGE-FL sometimes defaults these to SMBX values in PGE-X, but that logic is removed in MDX so the PGEX check here will no longer be necessary)
+        if(PlayerStart[A].Width == 0 || FileFormat == FileFormats::LVL_PGEX)
             PlayerStart[A].Width = Physics.PlayerWidth[A][2];
-        if(PlayerStart[A].Height == 0)
+        if(PlayerStart[A].Height == 0 || FileFormat == FileFormats::LVL_PGEX)
             PlayerStart[A].Height = Physics.PlayerHeight[A][2];
 
         PlayerStart[A].Direction = p.direction;
@@ -863,8 +867,8 @@ bool OpenLevel_NPC(void* userdata, LevelNPC& n)
         if(npc.Type == NPCID_ITEM_BURIED || npc.Type == NPCID_ITEM_POD ||
            npc.Type == NPCID_ITEM_BUBBLE || npc.Type == NPCID_ITEM_THROWER)
         {
-            npc.Special = n.contents;
-            npc.DefaultSpecial = int(npc.Special);
+            npc.Special = (vbint_t)n.contents;
+            npc.DefaultSpecial = npc.Special;
             npc.Variant = n.special_data;
             variantHandled = true;
         }
@@ -872,26 +876,26 @@ bool OpenLevel_NPC(void* userdata, LevelNPC& n)
         if(npc.Type == NPCID_DOOR_MAKER || npc.Type == NPCID_MAGIC_DOOR ||
           (npc.Type == NPCID_ITEM_BURIED && n.contents == NPCID_DOOR_MAKER))
         {
-            npc.Special2 = n.special_data;
-            npc.DefaultSpecial2 = int(npc.Special2);
+            npc.Special2 = (vbint_t)n.special_data;
+            npc.DefaultSpecial2 = npc.Special2;
         }
 
         if(NPCIsAParaTroopa(npc))
         {
-            npc.Special = n.special_data;
-            npc.DefaultSpecial = int(npc.Special);
+            npc.Special = (vbint_t)n.special_data;
+            npc.DefaultSpecial = npc.Special;
         }
 
         if(npc->IsFish)
         {
-            npc.Special = n.special_data;
-            npc.DefaultSpecial = int(npc.Special);
+            npc.Special = (vbint_t)n.special_data;
+            npc.DefaultSpecial = npc.Special;
         }
 
         if(npc.Type == NPCID_FIRE_CHAIN)
         {
-            npc.Special = n.special_data;
-            npc.DefaultSpecial = int(npc.Special);
+            npc.Special = (vbint_t)n.special_data;
+            npc.DefaultSpecial = npc.Special;
         }
 
         if(npc.Type == NPCID_STAR_EXIT || npc.Type == NPCID_STAR_COLLECT || npc.Type == NPCID_MEDAL)
@@ -948,60 +952,14 @@ bool OpenLevel_NPC(void* userdata, LevelNPC& n)
         npc.DefaultType = npc.Type;
         npc.Location.Width = npc->TWidth;
         npc.Location.Height = npc->THeight;
-        npc.DefaultLocation = static_cast<SpeedlessLocation_t>(npc.Location);
+        npc.DefaultLocationX = npc.Location.X;
+        npc.DefaultLocationY = npc.Location.Y;
         npc.DefaultDirection = npc.Direction;
 
         // allow every NPC to be active for one frame to initialize its internal state
         npc.TimeLeft = 1;
         npc.Active = true;
         npc.JustActivated = 1;
-
-        if(npc.Type == NPCID_CHECKPOINT) // Is a checkpoint
-        {
-            load.checkPointId++;
-            if(g_config.fix_vanilla_checkpoints)
-            {
-                npc.Special = load.checkPointId;
-                npc.DefaultSpecial = int(npc.Special);
-            }
-        }
-        else if(npc.Type == NPCID_STAR_EXIT || npc.Type == NPCID_STAR_COLLECT) // Is a star
-        {
-            bool starFound = false;
-            for(const auto& star : Star)
-            {
-                bool bySection = npc.Variant == 0 && (star.Section == npc.Section || star.Section == -1);
-                bool byId = npc.Variant > 0 && -(star.Section + 100) == (int)npc.Variant;
-                if(star.level == FileNameFull && (bySection || byId))
-                    starFound = true;
-            }
-
-            if(starFound)
-            {
-                npc.Special = 1;
-                npc.DefaultSpecial = 1;
-                if(npc.Type == NPCID_STAR_COLLECT)
-                    npc.Killed = 9;
-            }
-        }
-        else if((npc.Type == NPCID_ITEM_BURIED || npc.Type == NPCID_ITEM_POD ||
-                  npc.Type == NPCID_ITEM_BUBBLE || npc.Type == NPCID_ITEM_THROWER) &&
-                (n.contents == NPCID_STAR_EXIT || n.contents == NPCID_STAR_COLLECT)) // Is a container that has a star inside
-        {
-            bool starFound = false;
-            for(const auto& star : Star)
-            {
-                bool byId = npc.Variant > 0 && -(star.Section + 100) == (int)npc.Variant;
-                if(star.level == FileNameFull && byId)
-                    starFound = true;
-            }
-
-            if(starFound)
-            {
-                if(n.contents == NPCID_STAR_COLLECT)
-                    npc.Killed = 9;
-            }
-        }
     }
 
     // update the level's save info based on the NPC
@@ -1013,6 +971,21 @@ bool OpenLevel_NPC(void* userdata, LevelNPC& n)
 bool OpenLevel_Warp(void* userdata, LevelDoor& w)
 {
     LevelLoad& load = *static_cast<LevelLoad*>(userdata);
+
+    w.isSetIn = (!w.lvl_i);
+    w.isSetOut = (!w.lvl_o || (w.lvl_i));
+
+    if(!w.isSetIn && w.isSetOut)
+    {
+        w.ix = w.ox;
+        w.iy = w.oy;
+    }
+
+    if(!w.isSetOut && w.isSetIn)
+    {
+        w.ox = w.ix;
+        w.oy = w.iy;
+    }
 
     {
         numWarps++;
@@ -1132,6 +1105,7 @@ void OpenLevel_FixLayersEvents(const LevelLoad& load)
 {
     // Everything is loaded.
     // Now we fix the layers and events that got temporary indexes.
+    // We also do some NPC logic that depends on the section boundaries.
     for(int A = 1; A <= numBlock; A++)
     {
         if(Block[A].Layer != LAYER_NONE)
@@ -1152,6 +1126,10 @@ void OpenLevel_FixLayersEvents(const LevelLoad& load)
         if(Background[A].Layer != LAYER_NONE)
             Background[A].Layer = load.final_layer_index[Background[A].Layer];
     }
+
+    // Prepare for NPC logic
+    CalculateSectionOverlaps();
+    int checkPointId = 0;
 
     for(int A = 1; A <= numNPCs; A++)
     {
@@ -1174,6 +1152,58 @@ void OpenLevel_FixLayersEvents(const LevelLoad& load)
             NPC[A].TriggerLast = load.final_event_index[NPC[A].TriggerLast];
 
         CheckSectionNPC(A);
+
+
+        // Extra NPC load logic
+        NPC_t& npc = NPC[A];
+
+        if(npc.Type == NPCID_CHECKPOINT) // Is a checkpoint
+        {
+            checkPointId++;
+            if(g_config.fix_vanilla_checkpoints)
+            {
+                npc.Special = checkPointId;
+                npc.DefaultSpecial = int(npc.Special);
+            }
+        }
+        else if(npc.Type == NPCID_STAR_EXIT || npc.Type == NPCID_STAR_COLLECT) // Is a star
+        {
+            bool starFound = false;
+            for(const auto& star : Star)
+            {
+                bool bySection = npc.Variant == 0 && (star.Section == npc.Section || star.Section == -1);
+                bool byId = npc.Variant > 0 && -(star.Section + 100) == (int)npc.Variant;
+                if(star.level == FileNameFull && (bySection || byId))
+                    starFound = true;
+            }
+
+            if(starFound)
+            {
+                npc.Special = 1;
+                npc.DefaultSpecial = 1;
+                if(npc.Type == NPCID_STAR_COLLECT)
+                    npc.Killed = 9;
+            }
+        }
+        else if((npc.Type == NPCID_ITEM_BURIED || npc.Type == NPCID_ITEM_POD ||
+                  npc.Type == NPCID_ITEM_BUBBLE || npc.Type == NPCID_ITEM_THROWER) &&
+                (NPCID(npc.Special) == NPCID_STAR_EXIT || NPCID(npc.Special) == NPCID_STAR_COLLECT)) // Is a container that has a star inside
+        {
+            bool starFound = false;
+            for(const auto& star : Star)
+            {
+                bool byId = npc.Variant > 0 && -(star.Section + 100) == (int)npc.Variant;
+                if(star.level == FileNameFull && byId)
+                    starFound = true;
+            }
+
+            if(starFound)
+            {
+                if(NPCID(npc.Special) == NPCID_STAR_COLLECT)
+                    npc.Killed = 9;
+            }
+        }
+
         syncLayers_NPC(A);
     }
 
@@ -1204,22 +1234,26 @@ void OpenLevel_FixLayersEvents(const LevelLoad& load)
         if(Events[A].TriggerEvent != EVENT_NONE)
             Events[A].TriggerEvent = load.final_event_index[Events[A].TriggerEvent];
 
-        for(layerindex_t& l : Events[A].ShowLayer)
+        // fix all layer indices
+        for(int i = 0; i < 3; i++)
         {
-            if(l != LAYER_NONE)
-                l = load.final_layer_index[l];
-        }
+            auto& arr = (i == 0) ? Events[A].ShowLayer
+                : (i == 1) ? Events[A].HideLayer
+                : Events[A].ToggleLayer;
 
-        for(layerindex_t& l : Events[A].HideLayer)
-        {
-            if(l != LAYER_NONE)
-                l = load.final_layer_index[l];
-        }
+            auto out_it = arr.begin();
+            for(auto in_it = out_it; in_it != arr.end(); ++in_it)
+            {
+                layerindex_t l = *in_it;
 
-        for(layerindex_t& l : Events[A].ToggleLayer)
-        {
-            if(l != LAYER_NONE)
-                l = load.final_layer_index[l];
+                if(l != LAYER_NONE)
+                    l = load.final_layer_index[l];
+
+                if(l != LAYER_NONE)
+                    *(out_it++) = l;
+            }
+
+            arr.resize(out_it - arr.begin());
         }
     }
 
@@ -1368,7 +1402,6 @@ void OpenLevelDataPost()
     syncLayersTrees_AllBlocks();
     syncLayers_AllBGOs();
 
-    CalculateSectionOverlaps();
     NPC_ConstructCanonicalSet();
 
     // moved the old event/layer loading code to the top
@@ -1383,6 +1416,9 @@ void OpenLevelDataPost()
 
     if(LevelEditor)
     {
+        if(numSections < 21)
+            numSections = 21;
+
         ResetSectionScrolls();
         SetSection(curSection);
     }
@@ -1390,7 +1426,7 @@ void OpenLevelDataPost()
     {
         FindStars();
         LevelMacro = LEVELMACRO_OFF;
-        for(int A = 0; A <= numSections; A++) // Automatically correct 608 section height to 600
+        for(int A = 0; A < numSections; A++) // Automatically correct 608 section height to 600
         {
 //            if(int(level[A].Height - level[A].Y) == 608)
 //                level[A].Y += 8;
@@ -1485,6 +1521,8 @@ void ClearLevel()
     RestoreWorldStrings();
     LevelName.clear();
     IsHubLevel = false;
+    // default file format if level header is missing
+    FileFormat = FileFormats::LVL_PGEX;
     // removed because the same logic is called inside of LoadCustomConfig()
     // ResetCustomConfig();
     SetupPhysics();

@@ -118,7 +118,7 @@ static void setupCheckpoints()
 {
     if(Checkpoint != FullFileName || Checkpoint.empty())
     {
-        if(StartLevel != FileNameFull && !LevelSelect)
+        if(!IsHubLevel && !LevelSelect)
         {
             pLogDebug("Clear check-points at SetupPlayers()");
             Checkpoint.clear();
@@ -127,6 +127,9 @@ static void setupCheckpoints()
         }
         return;
     }
+
+    // restore medals from checkpoint
+    g_curLevelMedals.resume_from_checkpoint();
 
     pLogDebug("Trying to restore %zu checkpoints...", CheckpointsList.size());
     if(!g_config.fix_vanilla_checkpoints && CheckpointsList.empty())
@@ -143,7 +146,7 @@ static void setupCheckpoints()
             if(NPC[A].Type != NPCID_CHECKPOINT)
                 continue;
 
-            if(g_config.fix_vanilla_checkpoints && cp.id != Maths::iRound(NPC[A].Special))
+            if(g_config.fix_vanilla_checkpoints && cp.id != NPC[A].Special)
                 continue;
 
             NPC[A].Killed = 9;
@@ -249,7 +252,7 @@ void DodgePlayers(int plr_A)
 
     // check section of current position for later use
     int cur_section = -1;
-    for(int B = 0; B <= numSections; B++)
+    for(int B = 0; B < numSections; B++)
     {
         if(pLoc.X + pLoc.Width >= level[B].X
             && pLoc.X <= level[B].Width
@@ -315,9 +318,10 @@ void DodgePlayers(int plr_A)
 
         // (c) X logic: move player backwards, and check it hasn't moved off section / off screen
         constexpr int plr_spacing = 40;
-        pLoc.X -= (plr_spacing - plr_spacing * 2 * forwards_direction) * Player[plr_A].Direction;
+        const int X_move = (plr_spacing - plr_spacing * 2 * forwards_direction) * Player[plr_A].Direction;
+        pLoc.X -= X_move;
 
-        // check for failures of being outside of section X bounds
+        // check for failures of being outside of section X bounds (partially offscreen)
         if(!failed && cur_section != -1 && (pLoc.X < level[cur_section].X || pLoc.X + pLoc.Width > level[cur_section].Width))
             failed = true;
 
@@ -330,11 +334,23 @@ void DodgePlayers(int plr_A)
         constexpr int max_height_add = 160;
         double top_bound = pLoc.Y - max_height_add;
         bool check_floor = true;
+
+        // perform floor check (move player upwards until they are above blocks)
         while(!failed && check_floor)
         {
             check_floor = false;
 
-            for(BlockRef_t b_ref : treeBlockQuery(pLoc, SORTMODE_NONE))
+            // check the whole range from player's old position to player's new position (prevents crossing walls)
+            double left_X = pLoc.X;
+            double right_X = pLoc.X + pLoc.Width;
+            if(X_move < 0)
+                right_X -= X_move;
+            else
+                left_X -= X_move;
+
+            const Location_t floor_check_range = newLoc(left_X, pLoc.Y + pLoc.Height, right_X - left_X, pLoc.Height);
+
+            for(BlockRef_t b_ref : treeBlockQuery(floor_check_range, SORTMODE_NONE))
             {
                 const Block_t& b = b_ref;
                 int B = (int)b_ref;
@@ -345,7 +361,7 @@ void DodgePlayers(int plr_A)
                 if(BlockCheckPlayerFilter(B, plr_A))
                     continue;
 
-                if(CheckCollision(pLoc, b.Location))
+                if(CheckCollision(floor_check_range, b.Location))
                 {
                     double new_Y = blockGetTopYTouching(b, pLoc);
 
@@ -364,7 +380,7 @@ void DodgePlayers(int plr_A)
                 failed = true;
         }
 
-        // perform downwards floor check (cliff check) if the original position had a floor
+        // perform cliff check (move player downwards until they are on blocks) if the original position had a floor
         if(!failed && orig_has_floor && pLoc.Y >= old_Y)
         {
             bool found_floor = false;
@@ -403,6 +419,10 @@ void DodgePlayers(int plr_A)
             else
                 failed = true;
         }
+
+        // check for failures of being outside of section Y bounds (totally offscreen)
+        if(!failed && cur_section != -1 && (pLoc.Y + pLoc.Height < level[cur_section].Y || pLoc.Y > level[cur_section].Height))
+            failed = true;
 
         // check being too far from original position (Shared Screen mode)
         if(!failed && plr_screen.Type == ScreenTypes::SharedScreen && std::abs(pLoc.Y - orig_Y) > plr_screen.H * 0.75)
@@ -528,7 +548,6 @@ void SetupPlayers()
         pLogDebug("Clear check-points at Battle Mode begining");
         Checkpoint.clear();
         CheckpointsList.clear();
-        g_curLevelMedals.reset_lvl();
         g_curLevelMedals.reset_checkpoint();
     }
     else
@@ -1357,7 +1376,7 @@ int CheckNearestLiving(const int A)
         int o_A = screen.players[plr_i];
         const Player_t& o_p = Player[o_A];
 
-        if(o_A != A && !o_p.Dead && o_p.TimeToLive == 0)
+        if(o_A != A && !o_p.Dead && o_p.TimeToLive == 0 && o_A != p.YoshiPlayer)
         {
             double dist = (o_p.Location.X - p.Location.X) * (o_p.Location.X - p.Location.X) + (o_p.Location.Y - p.Location.Y) * (o_p.Location.Y - p.Location.Y);
 
@@ -1377,7 +1396,7 @@ int CheckNearestLiving(const int A)
     {
         const Player_t& o_p = Player[o_A];
 
-        if(o_A != A && !o_p.Dead && o_p.TimeToLive == 0)
+        if(o_A != A && !o_p.Dead && o_p.TimeToLive == 0 && o_A != p.YoshiPlayer)
         {
             double dist = (o_p.Location.X - p.Location.X) * (o_p.Location.X - p.Location.X) + (o_p.Location.Y - p.Location.Y) * (o_p.Location.Y - p.Location.Y);
 
@@ -1583,7 +1602,7 @@ void CheckSection(const int A)
 
     oldSection = p.Section;
 
-    for(B = 0; B <= numSections; B++)
+    for(B = 0; B < numSections; B++)
     {
         if(p.Location.X + p.Location.Width >= level[B].X)
         {
@@ -1636,7 +1655,7 @@ void CheckSection(const int A)
 
     if(!foundSection)
     {
-        for(B = 0; B <= numSections; B++)
+        for(B = 0; B < numSections; B++)
         {
             if(p.Location.X + p.Location.Width >= LevelREAL[B].X)
             {
@@ -3784,7 +3803,7 @@ void SizeCheck(Player_t &p)
 void YoshiEatCode(const int A)
 {
     int B = 0;
-    Location_t tempLocation;
+    // Location_t tempLocation;
     auto &p = Player[A];
 
     if(p.Mount == 3 && !p.Fairy)
@@ -4160,10 +4179,40 @@ void RespawnPlayerTo(int A, int TargetPlayer)
     //   so I will do it where it only affects the new code.
     // Player[A].Section = Player[TargetPlayer].Section;
 
-    // respawn at top of target player's vScreen in >2P mode, otherwise use vScreen 1 as SMBX64 does
-    const vScreen_t& target_screen = (numPlayers > 2) ? vScreenByPlayer(TargetPlayer) : vScreen[1];
+    // respawn at top of vScreen 1 in SMBX dynamic splitscreen, otherwise at top of target player's vScreen
+    const Screen_t& screen = ScreenByPlayer(A);
+    const vScreen_t& target_vscreen = (screen.Type == ScreenTypes::Dynamic) ? screen.vScreen(1) : vScreenByPlayer(TargetPlayer);
 
-    RespawnPlayer(A, Player[TargetPlayer].Direction, CenterX, StopY, target_screen);
+    RespawnPlayer(A, Player[TargetPlayer].Direction, CenterX, StopY, target_vscreen);
+
+    // if TargetPlayer is scrolling in warp, we can't spawn them directly.
+    if(PlayerScrollingInWarp(Player[TargetPlayer]))
+    {
+        // Give player A wings in shared screen
+        if(screen.Type == ScreenTypes::SharedScreen)
+        {
+            Player[A].Location.Y -= 100;
+            Player[A].Dead = true;
+            Player[A].Effect = PLREFF_COOP_WINGS;
+            Player[A].Effect2 = 0;
+        }
+        // respawn them to the target player's warp otherwise
+        else
+        {
+            const auto& warp = Warp[Player[TargetPlayer].Warp];
+            const auto& warp_exit = (Player[TargetPlayer].WarpBackward) ? warp.Entrance : warp.Exit;
+            const auto warp_exit_dir = (Player[TargetPlayer].WarpBackward) ? warp.Direction : warp.Direction2;
+
+            Player[A].Location.X = warp_exit.X + warp_exit.Width / 2 - Player[A].Location.Width / 2;
+
+            if(Player[TargetPlayer].Effect == PLREFF_WARP_PIPE && warp_exit_dir == 1)
+                Player[A].Effect2 = warp_exit.Y;
+            else
+                Player[A].Effect2 = warp_exit.Y + warp_exit.Height - Player[A].Location.Height;
+
+            Player[A].Location.Y = Player[A].Effect2 - target_vscreen.Height * 3 / 4;
+        }
+    }
 }
 
 void StealBonus()
@@ -4184,7 +4233,7 @@ void StealBonus()
 
     for(A = 1; A <= numPlayers; A++)
     {
-        if(Player[A].Dead)
+        if(Player[A].Dead && Player[A].Effect != PLREFF_COOP_WINGS)
         {
             // find other player
             if((g_config.modern_lives_system || Lives > 0) && LevelMacro == LEVELMACRO_OFF)
@@ -4359,7 +4408,7 @@ void ClownCar()
             if(p.Controls.Run && NPC[B].Type == NPCID_TOOTHYPIPE)
             {
                 // create toothy if it doesn't exist already
-                if(NPC[B].Special == 0.0)
+                if(NPC[B].Special == 0)
                 {
                     NPC[B].Special = 1;
                     numNPCs++;
@@ -4384,7 +4433,7 @@ void ClownCar()
                 // update toothy's position
                 for(int C : NPCQueues::Active.no_change)
                 {
-                    if(NPC[C].Type == NPCID_TOOTHY && Maths::iRound(NPC[C].Special) == A && Maths::iRound(NPC[C].Special2) == B)
+                    if(NPC[C].Type == NPCID_TOOTHY && NPC[C].Special == A && NPC[C].Special2 == B)
                     {
                         NPC[C].vehiclePlr = A;
                         NPC[C].Projectile = true;
@@ -4970,14 +5019,18 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
         NPC[p.HoldingNPC].CantHurtPlayer = A;
         if(NPCIsVeggie(NPC[p.HoldingNPC]))
             NPC[p.HoldingNPC].CantHurt = 1000;
+
         if(p.Controls.Run || p.ForceHold > 0)
         {
+            // fix a graphical bug where the NPC would stutter in the player's hands
+            double use_w = (g_config.fix_visual_bugs) ? std::round(NPC[p.HoldingNPC].Location.Width) : NPC[p.HoldingNPC].Location.Width;
 
         // hold above head
             if(p.Character == 3 || p.Character == 4 || (p.Duck))
             {
                 NPC[p.HoldingNPC].Bouce = true;
-                NPC[p.HoldingNPC].Location.X = p.Location.X + p.Location.Width / 2.0 - NPC[p.HoldingNPC].Location.Width / 2.0;
+                NPC[p.HoldingNPC].Location.X = p.Location.X + p.Location.Width / 2.0 - use_w / 2.0;
+
                 if(p.Character == 3) // princess peach
                 {
                     if(p.State == 1)
@@ -4993,7 +5046,7 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
                     {
                         if(NPC[p.HoldingNPC].Type == NPCID_PLR_FIREBALL || NPC[p.HoldingNPC].Type == NPCID_PLR_ICEBALL)
                         {
-                            NPC[p.HoldingNPC].Location.X = p.Location.X + p.Location.Width / 2.0 - NPC[p.HoldingNPC].Location.Width / 2.0 + dRand() * 4 - 2;
+                            NPC[p.HoldingNPC].Location.X = p.Location.X + p.Location.Width / 2.0 - use_w / 2.0 + dRand() * 4 - 2;
                             NPC[p.HoldingNPC].Location.Y = p.Location.Y - NPC[p.HoldingNPC].Location.Height - 4 + dRand() * 4 - 2;
                         }
                         else
@@ -5006,13 +5059,14 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
                 if(p.Direction > 0)
                     NPC[p.HoldingNPC].Location.X = p.Location.X + Physics.PlayerGrabSpotX[p.Character][p.State];
                 else
-                    NPC[p.HoldingNPC].Location.X = p.Location.X + p.Location.Width - Physics.PlayerGrabSpotX[p.Character][p.State] - NPC[p.HoldingNPC].Location.Width;
+                    NPC[p.HoldingNPC].Location.X = p.Location.X + p.Location.Width - Physics.PlayerGrabSpotX[p.Character][p.State] - use_w;
+
                 NPC[p.HoldingNPC].Location.Y = p.Location.Y + Physics.PlayerGrabSpotY[p.Character][p.State] + 32 - NPC[p.HoldingNPC].Location.Height;
             }
 
             if(NPC[p.HoldingNPC].Type == NPCID_TOOTHYPIPE && !FreezeNPCs)
             {
-                if(NPC[p.HoldingNPC].Special == 0.0)
+                if(NPC[p.HoldingNPC].Special == 0)
                 {
                     NPC[p.HoldingNPC].Special = 1;
                     NPC[p.HoldingNPC].Special2 = numNPCs + 1;
@@ -5257,7 +5311,7 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
             if(NPC[p.HoldingNPC].Type == NPCID_CHAR4_HEAVY)
             {
                 NPC[p.HoldingNPC].Special5 = A;
-                NPC[p.HoldingNPC].Special6 = p.Direction;
+                NPC[p.HoldingNPC].Special4 = p.Direction; // Special6 in SMBX 1.3
                 NPC[p.HoldingNPC].Location.SpeedY = -8;
                 NPC[p.HoldingNPC].Location.SpeedX = 12 * p.Direction + p.Location.SpeedX;
                 NPC[p.HoldingNPC].Projectile = true;
@@ -5489,9 +5543,24 @@ void PlayerEffects(const int A)
 
     p.Immune2 = false;
 
+    // in shared screen mode, give wings to players who are above the screen waiting to exit a warp
+    if(PlayerWaitingInWarp(p))
+    {
+        Screen_t& s = ScreenByPlayer(A);
+        if(s.Type == ScreenTypes::SharedScreen && (p.Location.Y + p.Location.Height < -vScreenByPlayer(A).Y) && CheckNearestLiving(A))
+        {
+            SharedScreenAvoidJump_Pre(s);
+            p.Dead = true;
+            p.Effect = PLREFF_COOP_WINGS;
+            p.Effect2 = 0;
+            SizeCheck(p);
+            SharedScreenAvoidJump_Post(s, 0);
+            return;
+        }
+    }
+
     if(p.Effect == PLREFF_TURN_BIG) // Player growing effect
     {
-
         p.Frame = 1;
         p.Effect2 += 1;
         if(p.Effect2 / 5 == static_cast<int>(floor(static_cast<double>(p.Effect2 / 5))))
@@ -6280,12 +6349,16 @@ void PlayerEffects(const int A)
 //    }
 }
 
+bool PlayerNormal(const Player_t& p)
+{
+    return p.Effect == PLREFF_NORMAL || p.Effect == PLREFF_WARP_PIPE || p.Effect == PLREFF_NO_COLLIDE || p.Effect == PLREFF_PET_INSIDE || p.Effect == PLREFF_COOP_WINGS;
+}
+
 bool AllPlayersNormal()
 {
     for(int B = 1; B <= numPlayers; B++)
     {
-        // cross-ref modern item spawn code
-        if(!(Player[B].Effect == PLREFF_NORMAL || Player[B].Effect == PLREFF_WARP_PIPE || Player[B].Effect == PLREFF_NO_COLLIDE || Player[B].Effect == PLREFF_PET_INSIDE))
+        if(!PlayerNormal(Player[B]))
             return false;
     }
 
@@ -6320,7 +6393,12 @@ void PlayersEnsureNearby(const Screen_t& screen)
         const Location_t& pLoc = p.Location;
 
         double p_x = pLoc.X + pLoc.Width / 2;
-        double p_y = pLoc.Y + pLoc.Height / 2;
+        double p_top = (p.Effect == PLREFF_RESPAWN) ? p.Effect2 : pLoc.Y;
+        double p_y = p_top + pLoc.Height / 2;
+
+        // dead players don't affect camera
+        if(p.Dead)
+            continue;
 
         if(plr_i == 0 || p_x < l)
             l = p_x;
@@ -6379,7 +6457,8 @@ void PlayersEnsureNearby(const Screen_t& screen)
 
         if(!p.Dead && p.TimeToLive == 0)
         {
-            double dist = (pLoc.X - cx) * (pLoc.X - cx) + (pLoc.Y - cy) * (pLoc.Y - cy);
+            double p_top = (p.Effect == PLREFF_RESPAWN) ? p.Effect2 : pLoc.Y;
+            double dist = (pLoc.X - cx) * (pLoc.X - cx) + (p_top - cy) * (p_top - cy);
 
             if(closest == 0 || closest_dist > dist)
             {
@@ -6393,8 +6472,12 @@ void PlayersEnsureNearby(const Screen_t& screen)
     if(closest == 0)
         closest = screen.players[0];
 
-    const Player_t& pClosest = Player[closest];
+    Player_t& pClosest = Player[closest];
     const Location_t& pClosestLoc = pClosest.Location;
+
+    // if the winner is currently respawning, place them at their target loc
+    if(pClosest.Effect == PLREFF_RESPAWN)
+        pClosest.Location.Y = pClosest.Effect2;
 
     // move all players to winning player's location, and set effect if alive
     for(int plr_i = 0; plr_i < screen.player_count; plr_i++)
@@ -6405,6 +6488,11 @@ void PlayersEnsureNearby(const Screen_t& screen)
             continue;
 
         Player_t& p = Player[plr_A];
+
+        // winged player will naturally return to screen
+        if(p.Effect == PLREFF_COOP_WINGS)
+            continue;
+
         Location_t& pLoc = p.Location;
 
         p.Section = pClosest.Section;
@@ -6412,6 +6500,8 @@ void PlayersEnsureNearby(const Screen_t& screen)
         pLoc.X = pClosestLoc.X + pClosestLoc.Width / 2 - pLoc.Width / 2;
         pLoc.Y = pClosestLoc.Y + pClosestLoc.Height - pLoc.Height;
     }
+
+    bool in_door_scroll = PlayerScrollingInWarp(pClosest);
 
     for(int plr_i = 0; plr_i < screen.player_count; plr_i++)
     {
@@ -6422,14 +6512,25 @@ void PlayersEnsureNearby(const Screen_t& screen)
         if(p.Dead || p.TimeToLive != 0)
             continue;
 
-        p.Effect = PLREFF_NORMAL;
-        p.Effect2 = 0;
-        p.Warp = 0;
-        p.WarpCD = 0;
-        p.WarpBackward = false;
-        p.WarpShooted = false;
+        if(in_door_scroll)
+        {
+            p.Effect = pClosest.Effect;
+            p.Effect2 = pClosest.Effect2;
+            p.Warp = pClosest.Warp;
+            p.WarpCD = pClosest.WarpCD;
+            p.WarpBackward = pClosest.WarpBackward;
+        }
+        else
+        {
+            p.Effect = PLREFF_NORMAL;
+            p.Effect2 = 0;
+            p.Warp = 0;
+            p.WarpCD = 0;
+            p.WarpBackward = false;
+            p.WarpShooted = false;
 
-        DodgePlayers(plr_A);
+            DodgePlayers(plr_A);
+        }
     }
 }
 
@@ -6480,12 +6581,14 @@ void PlayerGone(const int A)
     }
 }
 
-void AddPlayer(int Character)
+void AddPlayer(int Character, Screen_t& screen)
 {
     numPlayers++;
 
+    // add player to screen
+    Screens_AssignPlayer(numPlayers, screen);
+
     Player_t& p = Player[numPlayers];
-    const Screen_t& screen = ScreenByPlayer(numPlayers);
 
     p = Player_t();
     p.Character = Character;
@@ -6599,6 +6702,9 @@ void DropPlayer(const int A)
     }
 
     numPlayers --;
+
+    // remove player from screens
+    Screens_DropPlayer(A);
 
     // the rest only matters during level play
     if(LevelSelect)

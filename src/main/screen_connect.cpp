@@ -23,8 +23,6 @@
 #include "main/game_strings.h"
 #include "main/speedrunner.h"
 
-int g_charSelect[maxLocalPlayers] = {0};
-
 namespace ConnectScreen
 {
 
@@ -92,30 +90,30 @@ public:
         for(int c = 0; c < numCharacters; c++)
             char_present[c] = false;
 
-        max_players = numPlayers;
+        max_players = l_screen->player_count;
         dead_count = 0;
     }
 
     void mark_present()
     {
-        for(int A = 1; A <= numPlayers; A++)
+        for(int p = 0; p < l_screen->player_count; p++)
         {
-            int c = Player[A].Character - 1;
+            int c = Player[l_screen->players[p]].Character - 1;
 
             if(0 <= c && c < numCharacters)
                 char_present[c] = true;
         }
 
-        if(max_players < numPlayers)
-            max_players = numPlayers;
+        if(max_players < l_screen->player_count)
+            max_players = l_screen->player_count;
     }
 
     // checks if the active players' characters have been changed by gameplay logic (not drop/add)
     bool chars_changed()
     {
-        for(int A = 1; A <= numPlayers; A++)
+        for(int p = 0; p < l_screen->player_count; p++)
         {
-            int c = Player[A].Character - 1;
+            int c = Player[l_screen->players[p]].Character - 1;
 
             if(0 <= c && c < numCharacters)
             {
@@ -178,7 +176,7 @@ private:
     // adds player if not present, and updates player's character
     void UpdatePlayer();
 
-    // makes sure that g_charSelect[p] is valid
+    // makes sure that l_screen->charSelect[p] is valid
     void ValidateChar(bool ghost_mode = false);
 
     // does logic for an item the mouse is currently over
@@ -246,7 +244,7 @@ static void s_logRecentChars()
     for(int i = 0; i < maxLocalPlayers; i++)
     {
         if(s_players[i].m_state != PlayerState::Disconnected)
-            s_recent_char[i] = g_charSelect[i];
+            s_recent_char[i] = l_screen->charSelect[i];
     }
 
     // if controls dirty, save them
@@ -287,14 +285,14 @@ static inline bool IsMenu()
 static inline bool ControlsMenu_ShowDrop(int p)
 {
     // don't allow dropping below required player count
-    if(s_context == Context::DropAdd && numPlayers <= s_minPlayers)
+    if(s_context == Context::DropAdd && l_screen->player_count <= s_minPlayers)
         return false;
 
     // never show drop icon at main menu
     if(s_context == Context::MainMenu)
         return false;
 
-    int plr_A = p + 1;
+    int plr_A = l_screen->players[p];
 
     // check that there is a different living player
     for(int B = 1; B <= numPlayers; B++)
@@ -367,7 +365,7 @@ void MainMenu_Start(int minPlayers)
         Controls::ClearInputMethods();
 
     for(int i = 0; i < maxLocalPlayers; i++)
-        g_charSelect[i] = 0;
+        l_screen->charSelect[i] = 0;
 
     s_InitBlockCharacter();
 
@@ -396,7 +394,7 @@ void LegacyMenu_Start()
         Controls::ClearInputMethods();
 
     for(int i = 0; i < maxLocalPlayers; i++)
-        g_charSelect[i] = 0;
+        l_screen->charSelect[i] = 0;
 
     s_InitBlockCharacter();
 
@@ -424,7 +422,7 @@ void LegacyMenu_Start()
 void DropAdd_Start()
 {
     if(BattleMode)
-        s_minPlayers = numPlayers;
+        s_minPlayers = l_screen->player_count;
     else
         s_minPlayers = 1;
 
@@ -476,18 +474,21 @@ void PlayerBox::Init()
 {
     int p = CalcIndex();
 
-    if(p < (int)Controls::g_InputMethods.size() && Controls::g_InputMethods[p])
+    if(p < (int)Controls::g_InputMethods.size() && Controls::g_InputMethods[p]
+            && (s_context != Context::DropAdd || p < l_screen->player_count))
+    {
         m_state = PlayerState::SelectChar;
+    }
     else
         m_state = PlayerState::Disconnected;
 
-    if(s_context == Context::DropAdd)
+    if(s_context == Context::DropAdd && p < l_screen->player_count)
     {
-        g_charSelect[p] = Player[p + 1].Character;
+        l_screen->charSelect[p] = Player[l_screen->players[p]].Character;
     }
     else
     {
-        g_charSelect[p] = s_recent_char[p];
+        l_screen->charSelect[p] = s_recent_char[p];
         ValidateChar(true);
     }
 }
@@ -516,7 +517,7 @@ bool PlayerBox::CharAvailable(int c, bool ghost_mode)
         if(i == p)
             continue;
 
-        if(g_charSelect[i] == c)
+        if(l_screen->charSelect[i] == c)
             return false;
     }
 
@@ -591,7 +592,7 @@ static void Player_Remove(int p)
 {
     // if it was a novel add, mark their character as allowed
     if(s_players[p].m_current_add == 2)
-        s_char_info.mark_char_present(g_charSelect[p]);
+        s_char_info.mark_char_present(l_screen->charSelect[p]);
 
     Controls::DeleteInputMethodSlot(p);
 
@@ -600,18 +601,18 @@ static void Player_Remove(int p)
     {
         s_players[p2] = s_players[p2 + 1];
         s_players[p2].m_input_ready = false;
-        g_charSelect[p2] = g_charSelect[p2 + 1];
+        l_screen->charSelect[p2] = l_screen->charSelect[p2 + 1];
     }
 
     s_players[maxLocalPlayers - 1] = PlayerBox();
 
     // in drop-add, remove the Player officially in main game engine
-    if(p + 1 <= numPlayers && s_context == Context::DropAdd)
+    if(p < l_screen->player_count && s_context == Context::DropAdd)
     {
-        if(Player[p + 1].Dead || Player[p + 1].TimeToLive > 0)
+        if((Player[l_screen->players[p]].Dead || Player[l_screen->players[p]].TimeToLive > 0) && Player[l_screen->players[p]].Effect != PLREFF_COOP_WINGS)
             s_char_info.dead_count++;
 
-        DropPlayer(p + 1);
+        DropPlayer(l_screen->players[p]);
     }
 }
 
@@ -625,7 +626,7 @@ static void Player_Swap(int p1, int p2)
 
     std::swap(s_players[p1], s_players[p2]);
 
-    std::swap(g_charSelect[p1], g_charSelect[p2]);
+    std::swap(l_screen->charSelect[p1], l_screen->charSelect[p2]);
 
     s_players[p1].m_input_ready = false;
     s_players[p2].m_input_ready = false;
@@ -658,19 +659,19 @@ void PlayerBox::UpdatePlayer()
     int p = CalcIndex();
 
     // if initialized, then update character
-    if(p + 1 <= numPlayers)
+    if(p < l_screen->player_count)
     {
-        if(g_charSelect[p] != Player[p + 1].Character)
-            SwapCharacter(p + 1, g_charSelect[p]);
+        if(l_screen->charSelect[p] != Player[l_screen->players[p]].Character)
+            SwapCharacter(l_screen->players[p], l_screen->charSelect[p]);
     }
     // otherwise, add new player!
     else
     {
         // swap p with the first non-existent player slot
-        Player_Swap(numPlayers, p);
+        Player_Swap(l_screen->player_count, p);
 
-        // AddPlayer increments numPlayers by 1
-        AddPlayer(g_charSelect[numPlayers]);
+        // after AddPlayer, numPlayers is always the new player
+        AddPlayer(l_screen->charSelect[l_screen->player_count], *l_screen);
 
         // add as dead if dead player was dropped in this level
         if(s_char_info.dead_count > 0)
@@ -703,7 +704,7 @@ void PlayerBox::ValidateChar(bool ghost_mode)
 {
     int p = CalcIndex();
 
-    int& sel = g_charSelect[p];
+    uint8_t& sel = l_screen->charSelect[p];
 
     // ensure that character selection is still valid
 
@@ -887,6 +888,10 @@ bool PlayerBox::Do()
         {
             if(CheckDone())
             {
+                // clean up charSelect fields
+                for(int p = (int)Controls::g_InputMethods.size(); p < maxLocalPlayers; p++)
+                    l_screen->charSelect[p] = 0;
+
                 do_sentinel.active = true;
                 return true;
             }
@@ -946,7 +951,7 @@ bool PlayerBox::CanChangeChar()
     // see if any other character is totally free for self
     for(int ch = 1; ch <= numCharacters; ch++)
     {
-        if(ch == g_charSelect[p])
+        if(ch == l_screen->charSelect[p])
             continue;
 
         if(CharAvailable(ch))
@@ -954,16 +959,16 @@ bool PlayerBox::CanChangeChar()
     }
 
     // if own character is okay, then it'll be kept. return false here.
-    if(CharAvailable(g_charSelect[p]))
+    if(CharAvailable(l_screen->charSelect[p]))
         return false;
 
     // if even own character not totally free, see if any character is allowed by the s_char_info state
     for(int ch = 1; ch <= numCharacters; ch++)
     {
-        if(ch == g_charSelect[p])
+        if(ch == l_screen->charSelect[p])
             continue;
 
-        if(s_char_info.accept(g_charSelect[p], p, m_current_add))
+        if(s_char_info.accept(l_screen->charSelect[p], p, m_current_add))
             return true;
     }
 
@@ -979,17 +984,17 @@ void PlayerBox::PrevChar()
     // }
 
     int p = CalcIndex();
-    int old_ch = g_charSelect[p];
+    int old_ch = l_screen->charSelect[p];
 
     int i = 0;
     for(i = 0; i < numCharacters; i++)
     {
-        g_charSelect[p] --;
+        l_screen->charSelect[p] --;
 
-        if(g_charSelect[p] < 1)
-            g_charSelect[p] = numCharacters;
+        if(l_screen->charSelect[p] < 1)
+            l_screen->charSelect[p] = numCharacters;
 
-        if(CharAvailable(g_charSelect[p]))
+        if(CharAvailable(l_screen->charSelect[p]))
             break;
     }
 
@@ -998,18 +1003,18 @@ void PlayerBox::PrevChar()
     {
         for(i = 0; i < numCharacters; i++)
         {
-            g_charSelect[p] --;
+            l_screen->charSelect[p] --;
 
-            if(g_charSelect[p] < 1)
-                g_charSelect[p] = numCharacters;
+            if(l_screen->charSelect[p] < 1)
+                l_screen->charSelect[p] = numCharacters;
 
-            if(s_char_info.accept(g_charSelect[p], p, m_current_add))
+            if(s_char_info.accept(l_screen->charSelect[p], p, m_current_add))
                 break;
         }
     }
 
     // eventually changed character, update the player
-    if(g_charSelect[p] != old_ch)
+    if(l_screen->charSelect[p] != old_ch)
     {
         PlaySoundMenu(SFX_Slide);
         UpdatePlayer();
@@ -1027,17 +1032,17 @@ void PlayerBox::NextChar()
     // }
 
     int p = CalcIndex();
-    int old_ch = g_charSelect[p];
+    int old_ch = l_screen->charSelect[p];
 
     int i;
     for(i = 0; i < numCharacters; i++)
     {
-        g_charSelect[p] ++;
+        l_screen->charSelect[p] ++;
 
-        if(g_charSelect[p] > numCharacters)
-            g_charSelect[p] = 1;
+        if(l_screen->charSelect[p] > numCharacters)
+            l_screen->charSelect[p] = 1;
 
-        if(CharAvailable(g_charSelect[p]))
+        if(CharAvailable(l_screen->charSelect[p]))
             break;
     }
 
@@ -1046,18 +1051,18 @@ void PlayerBox::NextChar()
     {
         for(i = 0; i < numCharacters; i++)
         {
-            g_charSelect[p] ++;
+            l_screen->charSelect[p] ++;
 
-            if(g_charSelect[p] > numCharacters)
-                g_charSelect[p] = 1;
+            if(l_screen->charSelect[p] > numCharacters)
+                l_screen->charSelect[p] = 1;
 
-            if(s_char_info.accept(g_charSelect[p], p, m_current_add))
+            if(s_char_info.accept(l_screen->charSelect[p], p, m_current_add))
                 break;
         }
     }
 
     // eventually changed character, update the player
-    if(g_charSelect[p] != old_ch)
+    if(l_screen->charSelect[p] != old_ch)
     {
         PlaySoundMenu(SFX_Slide);
         UpdatePlayer();
@@ -1194,12 +1199,17 @@ bool PlayerBox::MouseItem(int i)
         PlaySoundMenu(SFX_Slide);
     }
 
-    int& sel = m_state == PlayerState::SelectChar ? g_charSelect[0] : m_menu_item;
+    int sel = (m_state == PlayerState::SelectChar) ? l_screen->charSelect[0] : m_menu_item;
 
     if(sel != i)
     {
         PlaySoundMenu(SFX_Slide);
-        sel = i;
+
+        if(m_state == PlayerState::SelectChar)
+            l_screen->charSelect[0] = i;
+        else
+            m_menu_item = i;
+
         m_marquee_state.reset_width();
     }
 
@@ -1279,14 +1289,14 @@ bool PlayerBox::DrawChar(int x, int w, int y, int h, bool show_name)
     int p = CalcIndex();
 
     // player hasn't been added yet
-    bool inactive = m_state == PlayerState::Disconnected && (IsMenu() || p >= numPlayers);
+    bool inactive = m_state == PlayerState::Disconnected && (IsMenu() || p >= l_screen->player_count);
     bool show_inactive = inactive && p >= s_minPlayers;
 
     // alpha for most uses
     uint8_t alpha = (show_inactive) ? 127 : 255;
 
     // verify that character is valid
-    int ch = g_charSelect[p];
+    int ch = l_screen->charSelect[p];
     if(ch < 1 || ch > numCharacters)
         return false;
 
@@ -1444,7 +1454,7 @@ bool PlayerBox::DrawChar(int x, int w, int y, int h, bool show_name)
 #if 0
     // finish with character name
     if(show_name)
-        SuperPrintCenter(g_gameInfo.characterName[g_charSelect[p]], 3, x + w / 2, y + h + 12, XTAlpha(alpha));
+        SuperPrintCenter(g_gameInfo.characterName[l_screen->charSelect[p]], 3, x + w / 2, y + h + 12, XTAlpha(alpha));
 #else
     UNUSED(show_name);
 #endif
@@ -1457,6 +1467,13 @@ int PlayerBox::Mouse_Render_1P(bool render)
 {
     int p = CalcIndex();
     bool mouse = !render;
+
+    if(p < 0 || p >= maxLocalPlayers)
+    {
+        // `p` should not be bigger than `maxLocalPlaeyrs`, otherwise the out of range at `s_playerState`
+        SDL_assert(p >=0 && p < maxLocalPlayers);
+        return false;
+    }
 
     if(mouse && !render && !SharedCursor.Move && !SharedCursor.Primary && !SharedCursor.Secondary && !SharedCursor.ScrollUp && !SharedCursor.ScrollDown)
         return 0;
@@ -1481,7 +1498,7 @@ int PlayerBox::Mouse_Render_1P(bool render)
             if(MenuItem_Mouse_Render(i, fmt::format_ne(g_mainMenu.selectCharacter, g_gameInfo.characterName[i]), MenuX, y_pos, mouse, render))
                 return 1;
 
-            if(render && g_charSelect[p] == i)
+            if(render && l_screen->charSelect[p] == i)
                 XRender::renderTexture(MenuX - 20, y_pos, GFX.MCursor[0]);
 
             y_pos += 30;
@@ -1515,8 +1532,8 @@ int PlayerBox::Mouse_Render_1P(bool render)
     }
 
     // do char transform thing!
-    if(render && g_charSelect[p] >= 1 && g_charSelect[p] <= numCharacters)
-        DoTransform(p, g_charSelect[p]);
+    if(render && l_screen->charSelect[p] >= 1 && l_screen->charSelect[p] <= numCharacters)
+        DoTransform(p, l_screen->charSelect[p]);
 
     return 0;
 }
@@ -1553,18 +1570,18 @@ int PlayerBox::Mouse_Render(bool render, int x, int y, int w, int h)
     int total_height = h - 12;
 
     // not-yet-added player
-    bool inactive = m_state == PlayerState::Disconnected && (s_context == Context::MainMenu || p >= numPlayers);
+    bool inactive = m_state == PlayerState::Disconnected && (s_context == Context::MainMenu || p >= l_screen->player_count);
     bool show_inactive = inactive && p >= s_minPlayers;
 
     if(inactive)
     {
         if(show_inactive)
-            g_charSelect[p] = s_recent_char[p];
+            l_screen->charSelect[p] = s_recent_char[p];
         ValidateChar(true);
     }
 
     // check currently selected character
-    int ch = g_charSelect[p];
+    int ch = l_screen->charSelect[p];
 
     // verify that character is valid
     if(ch < 1 || ch > numCharacters)
@@ -1807,7 +1824,7 @@ int PlayerBox::Mouse_Render(bool render, int x, int y, int w, int h)
             if(inactive)
                 speedRun_syncControlKeys(p, Controls_t());
 
-            RenderControls(p + 1, controls_x, controls_y, 76, 30, !input_method, 255, true);
+            RenderControls(p, controls_x, controls_y, 76, 30, !input_method, 255, true);
         }
     }
 
@@ -2018,7 +2035,13 @@ int MouseLogic()
             MenuMouseRelease = true;
     }
 
-    return Mouse_Render(true, false);
+    int ret = Mouse_Render(true, false);
+
+    // and set it to false if needed
+    if(SharedCursor.Primary || SharedCursor.Secondary)
+        MenuMouseRelease = false;
+
+    return ret;
 }
 
 int PlayerBox::Logic()
@@ -2070,7 +2093,7 @@ int PlayerBox::Logic()
 
                 m_menu_item = 0;
                 if(p >= s_minPlayers)
-                    g_charSelect[p] = s_recent_char[p];
+                    l_screen->charSelect[p] = s_recent_char[p];
                 m_state = PlayerState::SelectChar;
                 ValidateChar();
             }
@@ -2078,10 +2101,10 @@ int PlayerBox::Logic()
         else if(s_context == Context::DropAdd)
         {
             // this is an Add situation
-            if(p >= numPlayers)
+            if(p >= l_screen->player_count)
             {
                 m_menu_item = 0;
-                g_charSelect[p] = s_recent_char[p];
+                l_screen->charSelect[p] = s_recent_char[p];
                 m_state = PlayerState::SelectChar;
 
                 // check whether a novel add

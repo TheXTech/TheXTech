@@ -42,6 +42,7 @@ void DrawInterface(int Z, int numScreens)
 
     const Screen_t& screen = Screens[vScreen[Z].screen_ref];
 
+    // note: to_string doesn't belong in per-frame code, replace with faster implementation soon
     std::string scoreStr = std::to_string(Score);
     std::string coinsStr = std::to_string(Coins);
     std::string numStarsStr = std::to_string(numStars);
@@ -89,9 +90,9 @@ void DrawInterface(int Z, int numScreens)
 
             int heart_offset = (plr_count > 2) ? 24 : 32;
 
-            XRender::renderTexture(plr_center - heart_1_gfx.w / 2 - heart_offset, ScreenTop + 16, heart_1_gfx);
-            XRender::renderTexture(plr_center - heart_2_gfx.w / 2               , ScreenTop + 16, heart_2_gfx);
-            XRender::renderTexture(plr_center - heart_3_gfx.w / 2 + heart_offset, ScreenTop + 16, heart_3_gfx);
+            XRender::renderTextureBasic(plr_center - heart_1_gfx.w / 2 - heart_offset, ScreenTop + 16, heart_1_gfx);
+            XRender::renderTextureBasic(plr_center - heart_2_gfx.w / 2               , ScreenTop + 16, heart_2_gfx);
+            XRender::renderTextureBasic(plr_center - heart_3_gfx.w / 2 + heart_offset, ScreenTop + 16, heart_3_gfx);
         }
         // show held bonus (item box)
         else
@@ -105,11 +106,11 @@ void DrawInterface(int Z, int numScreens)
             if(!is_multiplayer || use_container > 2)
                 use_container = 0;
 
-            XRender::renderTexture(plr_center - GFX.Container[1].w / 2, ScreenTop + 16, GFX.Container[use_container]);
+            XRender::renderTextureBasic(plr_center - GFX.Container[1].w / 2, ScreenTop + 16, GFX.Container[use_container]);
 
             if(plr.HeldBonus > 0)
             {
-                XRender::renderTexture(plr_center - GFX.Container[1].w / 2 + 12,
+                XRender::renderTextureBasic(plr_center - GFX.Container[1].w / 2 + 12,
                                         ScreenTop + 16 + 12,
                                         NPCWidth(plr.HeldBonus), NPCHeight(plr.HeldBonus),
                                         GFXNPC[plr.HeldBonus], 0, 0);
@@ -122,9 +123,9 @@ void DrawInterface(int Z, int numScreens)
             // offset for bomb text, just for compatibility
             int off = (plr_count == 2) ? -1 : 0;
 
-            XRender::renderTexture(20 + plr_center - 28 - 34 + off, ScreenTop + 52,
+            XRender::renderTextureBasic(20 + plr_center - 28 - 34 + off, ScreenTop + 52,
                 GFX.Interface[8]);
-            XRender::renderTexture(20 + plr_center - 28 - 10 + off, ScreenTop + 53,
+            XRender::renderTextureBasic(20 + plr_center - 28 - 10 + off, ScreenTop + 53,
                 GFX.Interface[1]);
             SuperPrint(std::to_string(plr.Bombs), 1,
                        float(20 + plr_center - 28 + 12 + off),
@@ -149,13 +150,13 @@ void DrawInterface(int Z, int numScreens)
 
         // Indicate key
         if(someone_has_key)
-            XRender::renderTexture(coins_x - 24, ScreenTop + 16 + 10, GFX.Interface[0]);
+            XRender::renderTextureBasic(coins_x - 24, ScreenTop + 16 + 10, GFX.Interface[0]);
 
         // Print coins on the screen
         auto& coin_icon = (Player[first_plr_idx].Character == 5) ? GFX.Interface[6] : GFX.Interface[2];
-        XRender::renderTexture(coins_x, ScreenTop + 16 + 10, coin_icon);
+        XRender::renderTextureBasic(coins_x, ScreenTop + 16 + 10, coin_icon);
 
-        XRender::renderTexture(coins_x + coin_icon.w + 8, ScreenTop + 16 + 11, GFX.Interface[1]);
+        XRender::renderTextureBasic(coins_x + coin_icon.w + 8, ScreenTop + 16 + 11, GFX.Interface[1]);
 
         // note: the 36px at end gives 8px of padding between "x" icon and text when there are 2 digits
         int coins_score_text_right = (coins_x + coin_icon.w + 8 + GFX.Interface[1].w + 8 + 36);
@@ -180,8 +181,8 @@ void DrawInterface(int Z, int numScreens)
         // Print stars on the screen
         if(numStars > 0)
         {
-            XRender::renderTexture(lives_stars_x - GFX.Interface[5].w, ScreenTop + 16 + 30, GFX.Interface[5]);
-            XRender::renderTexture(lives_stars_x + 8, ScreenTop + 16 + 31, GFX.Interface[1]);
+            XRender::renderTextureBasic(lives_stars_x - GFX.Interface[5].w, ScreenTop + 16 + 30, GFX.Interface[5]);
+            XRender::renderTextureBasic(lives_stars_x + 8, ScreenTop + 16 + 31, GFX.Interface[1]);
 
             SuperPrint(numStarsStr, 1,
                        lives_stars_text_left,
@@ -193,16 +194,16 @@ void DrawInterface(int Z, int numScreens)
     {
         // plr 1 lives
         int plr1_lives_x = left_margin - 60; // excludes life icon width
-        XRender::renderTexture(plr1_lives_x - GFX.Interface[3].w, ScreenTop + 16 + 10, GFX.Interface[3]);
-        XRender::renderTexture(plr1_lives_x + 8, ScreenTop + 16 + 11, GFX.Interface[1]);
+        XRender::renderTextureBasic(plr1_lives_x - GFX.Interface[3].w, ScreenTop + 16 + 10, GFX.Interface[3]);
+        XRender::renderTextureBasic(plr1_lives_x + 8, ScreenTop + 16 + 11, GFX.Interface[1]);
         SuperPrint(std::to_string(BattleLives[screen.players[0]]), 1,
                    plr1_lives_x + 8 + GFX.Interface[1].w + 8,
                    ScreenTop + 16 + 11);
 
         // plr 2 lives
         int plr2_lives_x = right_margin + 30; // excludes life icon width
-        XRender::renderTexture(plr2_lives_x - GFX.Interface[7].w, ScreenTop + 16 + 10, GFX.Interface[7]);
-        XRender::renderTexture(plr2_lives_x + 8, ScreenTop + 16 + 11, GFX.Interface[1]);
+        XRender::renderTextureBasic(plr2_lives_x - GFX.Interface[7].w, ScreenTop + 16 + 10, GFX.Interface[7]);
+        XRender::renderTextureBasic(plr2_lives_x + 8, ScreenTop + 16 + 11, GFX.Interface[1]);
         SuperPrint(std::to_string(BattleLives[screen.players[1]]), 1,
                    float(plr2_lives_x + 8 + GFX.Interface[1].w + 8),
                    ScreenTop + 16 + 11);
@@ -214,11 +215,11 @@ void DrawInterface(int Z, int numScreens)
         int lives_x = left_margin - 60; // excludes life icon width
         auto& oneup_twoup = (first_plr_idx == 2 && numPlayers == 2) ? GFX.Interface[7] : GFX.Interface[3];
 
-        XRender::renderTexture(lives_x - oneup_twoup.w,
+        XRender::renderTextureBasic(lives_x - oneup_twoup.w,
                               ScreenTop + 16 + 10,
                               oneup_twoup);
 
-        XRender::renderTexture(lives_x + 8,
+        XRender::renderTextureBasic(lives_x + 8,
             ScreenTop + 16 + 11,
             GFX.Interface[1]);
 
@@ -227,7 +228,7 @@ void DrawInterface(int Z, int numScreens)
                    ScreenTop + 16 + 11);
     }
 
-    if(!IsHubLevel && !BattleMode)
+    if(!BattleMode)
     {
         // draw medals at top-right side of HUD
         int medals_x = SDL_min(static_cast<int>(vScreen[Z].Width) - 16, CenterX + 400 - 16);
@@ -257,17 +258,17 @@ void DrawInterface(int Z, int numScreens)
 
                 if(nextPlr > 1)
                 {
-                    XRender::renderTexture(l, nextY - GFX.BMVs.h / 2, GFX.BMVs);
+                    XRender::renderTextureBasic(l, nextY - GFX.BMVs.h / 2, GFX.BMVs);
                     l += GFX.BMVs.w + 16;
                 }
 
-                XRender::renderTexture(l, nextY - P1_charname.h / 2, P1_charname);
+                XRender::renderTextureBasic(l, nextY - P1_charname.h / 2, P1_charname);
                 l += P1_charname.w + 16;
 
-                XRender::renderTexture(l, nextY - GFX.BMVs.h / 2, GFX.BMVs);
+                XRender::renderTextureBasic(l, nextY - GFX.BMVs.h / 2, GFX.BMVs);
                 l += GFX.BMVs.w + 16;
 
-                XRender::renderTexture(l, nextY - P2_charname.h / 2, P2_charname);
+                XRender::renderTextureBasic(l, nextY - P2_charname.h / 2, P2_charname);
 
                 nextY += 48;
                 nextPlr += 2;
@@ -281,8 +282,8 @@ void DrawInterface(int Z, int numScreens)
                 int w = last_charname.w + GFX.BMVs.w + 16;
                 int l = vScreen[Z].Width / 2 - w / 2;
 
-                XRender::renderTexture(l, nextY - GFX.BMVs.h / 2, GFX.BMVs);
-                XRender::renderTexture(l + GFX.BMVs.w + 16, nextY - last_charname.h / 2, last_charname);
+                XRender::renderTextureBasic(l, nextY - GFX.BMVs.h / 2, GFX.BMVs);
+                XRender::renderTextureBasic(l + GFX.BMVs.w + 16, nextY - last_charname.h / 2, last_charname);
             }
         }
     }
@@ -291,8 +292,8 @@ void DrawInterface(int Z, int numScreens)
     {
         auto& win_charname = GFX.CharacterName[Player[BattleWinner].Character];
 
-        XRender::renderTexture(10 + vScreen[Z].Width / 2.0, -96 + vScreen[Z].Height / 2.0 - GFX.BMWin.h / 2, GFX.BMWin);
-        XRender::renderTexture(-10 + vScreen[Z].Width / 2.0 - win_charname.w, -96 + vScreen[Z].Height / 2.0 - win_charname.h / 2, win_charname);
+        XRender::renderTexture(10 + vScreen[Z].Width / 2, -96 + vScreen[Z].Height / 2 - GFX.BMWin.h / 2, GFX.BMWin);
+        XRender::renderTexture(-10 + vScreen[Z].Width / 2 - win_charname.w, -96 + vScreen[Z].Height / 2 - win_charname.h / 2, win_charname);
     }
 }
 
@@ -308,12 +309,12 @@ void DrawLives(int X, int Y, int lives, int hunds)
         count = (debt) ? -hunds : hunds;
 
         if(GFX.Balance.inited)
-            XRender::renderTexture(X - GFX.Balance.w / 2, Y, GFX.Balance.w / 2, GFX.Balance.h, GFX.Balance, debt * GFX.Balance.w / 2, 0);
+            XRender::renderTextureBasic(X - GFX.Balance.w / 2, Y, GFX.Balance.w / 2, GFX.Balance.h, GFX.Balance, debt * GFX.Balance.w / 2, 0);
         else
         {
-            XRender::renderTexture(X - GFX.Interface[2].w,      Y, GFX.Interface[2], XTColor(0x7F, 0x7F * !debt, 0x7F * !debt));
-            XRender::renderTexture(X - GFX.Interface[2].w - 8,  Y, GFX.Interface[2], XTColor(0xBF, 0xBF * !debt, 0xBF * !debt));
-            XRender::renderTexture(X - GFX.Interface[2].w - 16, Y, GFX.Interface[2], XTColor(0xFF, 0xFF * !debt, 0xFF * !debt));
+            XRender::renderTextureBasic(X - GFX.Interface[2].w,      Y, GFX.Interface[2], XTColor(0x7F, 0x7F * !debt, 0x7F * !debt));
+            XRender::renderTextureBasic(X - GFX.Interface[2].w - 8,  Y, GFX.Interface[2], XTColor(0xBF, 0xBF * !debt, 0xBF * !debt));
+            XRender::renderTextureBasic(X - GFX.Interface[2].w - 16, Y, GFX.Interface[2], XTColor(0xFF, 0xFF * !debt, 0xFF * !debt));
         }
 
         if(count >= 100)
@@ -328,11 +329,11 @@ void DrawLives(int X, int Y, int lives, int hunds)
     else
     {
         count = lives;
-        XRender::renderTexture(X - GFX.Interface[3].w, Y, GFX.Interface[3]);
+        XRender::renderTextureBasic(X - GFX.Interface[3].w, Y, GFX.Interface[3]);
     }
 
     if(show_times)
-        XRender::renderTexture(X + 8, Y + 1, GFX.Interface[1]);
+        XRender::renderTextureBasic(X + 8, Y + 1, GFX.Interface[1]);
 
     SuperPrint(std::to_string(count), 1,
                text_X,
@@ -349,16 +350,16 @@ static inline void s_DrawMedal(int i, int x, int y, int coin_width, int coin_hei
 {
     if(GFX.Medals.inited)
     {
-        XRender::renderTexture(x, y, coin_width, coin_height, GFX.Medals, coin_width * (int)level, 0);
+        XRender::renderTextureBasic(x, y, coin_width, coin_height, GFX.Medals, coin_width * (int)level, 0);
     }
     else
     {
         if(level == MedalDrawLevel::Shiny || level == MedalDrawLevel::Got)
-            XRender::renderTexture(x, y, GFX.Interface[2]);
+            XRender::renderTextureBasic(x, y, GFX.Interface[2]);
         else if(level == MedalDrawLevel::Prev)
-            XRender::renderTexture(x, y, GFX.Interface[2], XTColorF(0.5f, 0.5f, 0.5f));
+            XRender::renderTextureBasic(x, y, GFX.Interface[2], XTColorF(0.5f, 0.5f, 0.5f));
         else
-            XRender::renderTexture(x, y, GFX.Interface[2], XTColorF(0.5f, 0.5f, 0.5f, 0.5f));
+            XRender::renderTextureBasic(x, y, GFX.Interface[2], XTColorF(0.5f, 0.5f, 0.5f, 0.5f));
     }
 
     // render sparkles for shiny
@@ -384,7 +385,7 @@ static inline void s_DrawMedal(int i, int x, int y, int coin_width, int coin_hei
             sparkle_X &= ~1;
             sparkle_Y &= ~1;
 
-            XRender::renderTexture(x + sparkle_X, y + sparkle_Y, EffectWidth[78], EffectHeight[78], GFXEffect[78], 0, EffectHeight[78] * sparkle_frame, XTAlphaF(0.8f));
+            XRender::renderTextureBasic(x + sparkle_X, y + sparkle_Y, EffectWidth[78], EffectHeight[78], GFXEffect[78], 0, EffectHeight[78] * sparkle_frame, XTAlphaF(0.8f));
         }
     }
 }
@@ -493,7 +494,7 @@ void DrawMedals(int X, int Y, bool warp, uint8_t max, uint8_t prev, uint8_t ckpt
     // draw scene
     s_DrawMedal(0, X, Y, coin_width, coin_height, show_shiny ? MedalDrawLevel::Shiny : MedalDrawLevel::Got);
     X += coin_width + 8;
-    XRender::renderTexture(X, Y, GFX.Interface[1]);
+    XRender::renderTextureBasic(X, Y, GFX.Interface[1]);
     X += GFX.Interface[1].w + 4;
     SuperPrint(label, 3, X, Y);
 }
@@ -523,5 +524,5 @@ void DrawDeviceBattery()
     int bx = XRender::TargetW - XRender::TargetOverscanX - (bw + 8);
     int by = 24;
 
-    RenderPowerInfo(0, bx, by, bw, bh, 255, &status_info);
+    RenderPowerInfo(-1, bx, by, bw, bh, 255, &status_info);
 }

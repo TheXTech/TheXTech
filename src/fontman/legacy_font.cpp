@@ -309,7 +309,7 @@ PGE_Size LegacyFont::printText(const char* text, size_t text_size, int32_t x, in
 
             if(letter_alpha != 0)
             {
-                XRender::renderTexture(x + static_cast<int32_t>(offsetX),
+                XRender::renderTextureBasic(x + static_cast<int32_t>(offsetX),
                                        y + static_cast<int32_t>(offsetY),
                                        rch.tW, rch.tH,
                                        *m_textures[rch.texId],

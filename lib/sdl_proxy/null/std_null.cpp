@@ -31,3 +31,8 @@ uint64_t SDL_GetMicroTicks()
 {
     return curTime * 1000;
 }
+
+void SDL_Delay(int ms)
+{
+   (void)ms;
+}

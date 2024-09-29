@@ -411,8 +411,10 @@ void UpdateNPCs()
 
                             if(NPC[A].GeneratorEffect == 1) // Warp NPC
                             {
+                                // NOTE: this code previously used Effect2 to store the destination position, and now it uses SpecialX/Y
                                 NPC[numNPCs].Layer = NPC[A].Layer;
                                 NPC[numNPCs].Effect3 = NPC[A].GeneratorDirection;
+                                NPC[numNPCs].Effect2 = 0;
                                 NPC[numNPCs].Effect = NPCEFF_WARP;
                                 NPC[numNPCs].Location.SpeedX = 0;
                                 NPC[numNPCs].TimeLeft = 100;
@@ -421,12 +423,12 @@ void UpdateNPCs()
                                     if(NPC[A]->HeightGFX > NPC[A].Location.Height)
                                     {
                                         NPC[numNPCs].Location.Y = NPC[A].Location.Y + NPC[A]->HeightGFX;
-                                        NPC[numNPCs].Effect2 = NPC[numNPCs].Location.Y - (NPC[A]->HeightGFX - NPC[A].Location.Height);
+                                        NPC[numNPCs].SpecialY = NPC[numNPCs].Location.Y - (NPC[A]->HeightGFX - NPC[A].Location.Height);
                                     }
                                     else
                                     {
                                         NPC[numNPCs].Location.Y = NPC[A].Location.Y + NPC[A].Location.Height;
-                                        NPC[numNPCs].Effect2 = NPC[numNPCs].Location.Y;
+                                        NPC[numNPCs].SpecialY = NPC[numNPCs].Location.Y;
                                     }
                                 }
                                 else if(NPC[A].GeneratorDirection == 3)
@@ -434,25 +436,25 @@ void UpdateNPCs()
                                     if(NPC[A]->HeightGFX > NPC[A].Location.Height)
                                     {
                                         NPC[numNPCs].Location.Y = NPC[A].Location.Y - NPC[A].Location.Height;
-                                        NPC[numNPCs].Effect2 = NPC[numNPCs].Location.Y + NPC[A].Location.Height + (NPC[A]->HeightGFX - NPC[A].Location.Height);
+                                        NPC[numNPCs].SpecialY = NPC[numNPCs].Location.Y + NPC[A].Location.Height + (NPC[A]->HeightGFX - NPC[A].Location.Height);
                                     }
                                     else
                                     {
                                         NPC[numNPCs].Location.Y = NPC[A].Location.Y - NPC[A].Location.Height;
-                                        NPC[numNPCs].Effect2 = NPC[numNPCs].Location.Y + NPC[A].Location.Height;
+                                        NPC[numNPCs].SpecialY = NPC[numNPCs].Location.Y + NPC[A].Location.Height;
                                     }
                                 }
                                 else if(NPC[A].GeneratorDirection == 2)
                                 {
                                     NPC[numNPCs].Location.Y -= 4;
                                     NPC[numNPCs].Location.X = NPC[A].Location.X + NPC[A].Location.Width;
-                                    NPC[numNPCs].Effect2 = NPC[numNPCs].Location.X;
+                                    NPC[numNPCs].SpecialX = NPC[numNPCs].Location.X;
                                 }
                                 else if(NPC[A].GeneratorDirection == 4)
                                 {
                                     NPC[numNPCs].Location.Y -= 4;
                                     NPC[numNPCs].Location.X = NPC[A].Location.X - NPC[A].Location.Width;
-                                    NPC[numNPCs].Effect2 = NPC[numNPCs].Location.X + NPC[A].Location.Width;
+                                    NPC[numNPCs].SpecialX = NPC[numNPCs].Location.X + NPC[A].Location.Width;
                                 }
                             }
                             else if(NPC[A].GeneratorEffect == 2) // projectile
@@ -532,15 +534,10 @@ void UpdateNPCs()
 
             if(sameSection)
             {
-                if(!NPC[A].Active)
-                    NPCQueues::Active.insert(A);
-
                 NPC[A].TimeLeft = 100;
                 NPC[A].Active = true;
                 NPC[A].JustActivated = 0;
             }
-            else if(!NPC[A].Active)
-                NPCQueues::Active.erase(A);
         }
         else if(NPC[A].Type == NPCID_YEL_PLATFORM || NPC[A].Type == NPCID_BLU_PLATFORM || NPC[A].Type == NPCID_GRN_PLATFORM || NPC[A].Type == NPCID_RED_PLATFORM)
         {
@@ -582,7 +579,10 @@ void UpdateNPCs()
 
                 for(int B : treeNPCQuery(tempLocation, SORTMODE_ID))
                 {
-                    if(!NPC[B].Active && B != A && NPC[B].Reset[1] && NPC[B].Reset[2])
+                    // In SMBX 1.3, Deactivate was called every frame for every Hidden NPC (in this loop over A). That set Reset to false. Now we need to emulate it.
+                    bool reset_should_be_false = (B < A && NPC[B].Hidden);
+
+                    if(!NPC[B].Active && B != A && !reset_should_be_false && NPC[B].Reset[1] && NPC[B].Reset[2])
                     {
                         if(CheckCollision(tempLocation, NPC[B].Location))
                         {
@@ -634,9 +634,13 @@ void UpdateNPCs()
 
                         for(int B : treeNPCQuery(tempLocation2, SORTMODE_ID))
                         {
+                            // In SMBX 1.3, Deactivate was called every frame for every Hidden NPC (in this loop over A). That set Reset to false. Now we need to emulate it.
+                            bool reset_should_be_false = (B < A && NPC[B].Hidden);
+
                             if(!NPC[B].Active &&
-                              (!NPC[B].Hidden || !g_config.fix_npc_activation_event_loop_bug) &&
-                               B != A && NPC[B].Reset[1] && NPC[B].Reset[2])
+                                !reset_should_be_false &&
+                                (!NPC[B].Hidden || !g_config.fix_npc_activation_event_loop_bug) &&
+                                B != A && NPC[B].Reset[1] && NPC[B].Reset[2])
                             {
                                 if(CheckCollision(tempLocation2, NPC[B].Location))
                                 {
@@ -840,7 +844,7 @@ void UpdateNPCs()
             continue;
 
         // check for inactive NPCs that are falling off
-        if(NPC[A].JustActivated == 0 && !(NPC[A]->IsFish && Maths::iRound(NPC[A].Special) == 2) && NPC[A].Type != NPCID_LAVABUBBLE)
+        if(NPC[A].JustActivated == 0 && !(NPC[A]->IsFish && NPC[A].Special == 2) && NPC[A].Type != NPCID_LAVABUBBLE)
         {
             if(!GameMenu && NPC[A].Location.Y > level[NPC[A].Section].Height + 16)
             {
@@ -911,7 +915,8 @@ void UpdateNPCs()
 
                     if(C > 0)
                     {
-                        NPC[A].Special2 = Block[C].Location.Y + 4;
+                        // save location of ground below goal tape (was previously Special2)
+                        NPC[A].SpecialY = Block[C].Location.Y + 4;
                         NPC[A].Location.Y = Block[C].Location.Y - NPC[A].Location.Height;
                         NPC[A].Special = 1;
 
@@ -922,7 +927,7 @@ void UpdateNPCs()
                 }
                 else if(NPC[A].Type == NPCID_LAVA_MONSTER) // blaarg
                 {
-                    NPC[A].Location.Y = NPC[A].DefaultLocation.Y + NPC[A].Location.Height + 36;
+                    NPC[A].Location.Y = NPC[A].DefaultLocationY + NPC[A].Location.Height + 36;
                     treeNPCUpdate(A);
                     if(NPC[A].tempBlock > 0)
                         treeNPCSplitTempBlock(A);
@@ -950,10 +955,10 @@ void UpdateNPCs()
                         NPC[A].Active = false;
                         NPC[A].TimeLeft = 0;
                     }
-                    else if(NPC[A]->IsFish && Maths::iRound(NPC[A].Special) == 2)
+                    else if(NPC[A]->IsFish && NPC[A].Special == 2)
                     {
                         NPC[A].Location.Y = level[Player[NPC[A].JustActivated].Section].Height - 0.1;
-                        NPC[A].Location.SpeedX = (1 + (NPC[A].Location.Y - NPC[A].DefaultLocation.Y) * 0.005) * NPC[A].Direction;
+                        NPC[A].Location.SpeedX = (1 + (NPC[A].Location.Y - NPC[A].DefaultLocationY) * 0.005) * NPC[A].Direction;
                         NPC[A].Special5 = 1;
                         treeNPCUpdate(A);
                         if(NPC[A].tempBlock > 0)
@@ -984,7 +989,7 @@ void UpdateNPCs()
         // check for active NPCs that are falling off
         else if(NPC[A].Location.Y > level[NPC[A].Section].Height && NPC[A].Location.Y > level[NPC[A].Section].Height + 16)
         {
-            if(!GameMenu && !(NPC[A]->IsFish && Maths::iRound(NPC[A].Special) == 2) && NPC[A].Type != NPCID_LAVABUBBLE)
+            if(!GameMenu && !(NPC[A]->IsFish && NPC[A].Special == 2) && NPC[A].Type != NPCID_LAVABUBBLE)
                 NPCHit(A, 9);
         }
 
@@ -1097,8 +1102,9 @@ void UpdateNPCs()
                                         NPC[A].Location.SpeedY = -2;
                                 }
 
+                                // assigned to Special in SMBX 1.3
                                 if(NPC[A].Type == NPCID_PLATFORM_S3)
-                                    NPC[A].Special = NPC[A].Location.SpeedY;
+                                    NPC[A].SpecialY = NPC[A].Location.SpeedY;
                             }
 
                             if(Water[B].Quicksand)
@@ -1223,7 +1229,7 @@ void UpdateNPCs()
             if((NPC[A].Type == NPCID_VILLAIN_S3 || NPC[A].Type == NPCID_FIRE_DISK || NPC[A].Type == NPCID_FIRE_CHAIN) && NPC[A].TimeLeft > 1)
                 NPC[A].TimeLeft = 100;
 
-            if(!(NPC[A].Type == NPCID_PLR_FIREBALL || (NPC[A]->IsFish && fiEqual(NPC[A].Special, 2)) ||
+            if(!(NPC[A].Type == NPCID_PLR_FIREBALL || (NPC[A]->IsFish && NPC[A].Special == 2) ||
                  NPC[A].Type == NPCID_TOOTHY || NPC[A].Type == NPCID_VEHICLE || NPC[A].Type == NPCID_YEL_PLATFORM || NPC[A].Type == NPCID_BLU_PLATFORM ||
                  NPC[A].Type == NPCID_GRN_PLATFORM || NPC[A].Type == NPCID_RED_PLATFORM || NPC[A].Type == NPCID_VILLAIN_S3 || NPCIsYoshi(NPC[A])) &&
                  NPC[A].HoldingPlayer == 0)
@@ -1284,7 +1290,7 @@ void UpdateNPCs()
 
                         if(NPC[A].Type == NPCID_ITEM_BURIED)
                         {
-                            if(NPC[A].Special == 0.0)
+                            if(NPC[A].Special == 0)
                                 NPC[A].Special = NPCID_VEGGIE_RANDOM;
 
                             if(NPC[A].Generator)
@@ -1354,8 +1360,9 @@ void UpdateNPCs()
                         NPC[A].TimeLeft = 100;
                         NPC[A].BeltSpeed = 0;
 
-                        if(NPC[A].Type == (NPC[A]->IsFish && NPC[A].Special == 2))
-                            NPC[A].Special5 = 0;
+                        // dead code, impossible condition in SMBX 1.3 source (IsFish did not apply for NPC Type 1)
+                        // if(NPC[A].Type == (NPC[A]->IsFish && NPC[A].Special == 2))
+                        //     NPC[A].Special5 = 0;
 
                         NPC[A].Direction = Player[NPC[A].HoldingPlayer].Direction; // Face the player
                         NPC[A].Location.SpeedY = Player[NPC[A].HoldingPlayer].Location.SpeedY;
@@ -1495,8 +1502,9 @@ void UpdateNPCs()
                             NewEffect(EFFID_STOMP_INIT, tempLocation);
                         }
 
+                        // was Special2
                         if(NPC[A].Type == NPCID_SAW)
-                            NPC[A].Special2 = -NPC[A].Special2;
+                            NPC[A].SpecialX = -NPC[A].SpecialX;
 
                         if(!NPC[A]->IsAShell && NPC[A].Type != NPCID_PLR_FIREBALL && NPC[A].Type != NPCID_TANK_TREADS &&
                            NPC[A].Type != NPCID_BULLET && NPC[A].Type != NPCID_VILLAIN_S3 && !NPCIsABot(NPC[A]) &&
@@ -1539,7 +1547,6 @@ void UpdateNPCs()
                         NPC[A].Pinched.Moving -= 1;
 
                     NPC[A].onWall = false;
-                    NPC[A].Slope = 0;
                     if(NPC[A].Location.X < -(FLBlocks - 1) * 32)
                         NPC[A].Location.X = -(FLBlocks - 1) * 32;
                     if(NPC[A].Location.X + NPC[A].Location.Width > (FLBlocks + 1) * 32)
@@ -1548,8 +1555,8 @@ void UpdateNPCs()
                     if(!(NPC[A]->IsACoin && NPC[A].Special == 0) && !(NPC[A].Type == NPCID_SLIDE_BLOCK && NPC[A].Special == 0) &&
                        NPC[A].Type != NPCID_CONVEYOR && NPC[A].Type != NPCID_STATUE_FIRE && NPC[A].Type != NPCID_ITEM_BURIED && NPC[A].Type != NPCID_STAR_EXIT &&
                        NPC[A].Type != NPCID_STAR_COLLECT && !(NPC[A].Type >= NPCID_PLATFORM_S3 && NPC[A].Type <= NPCID_PLATFORM_S1) &&
-                       !(NPCIsAnExit(NPC[A]) && ((NPC[A].DefaultLocation.X == NPC[A].Location.X &&
-                       NPC[A].DefaultLocation.Y == NPC[A].Location.Y) || NPC[A].Inert)) &&
+                       !(NPCIsAnExit(NPC[A]) && ((NPC[A].DefaultLocationX == NPC[A].Location.X &&
+                       NPC[A].DefaultLocationY == NPC[A].Location.Y) || NPC[A].Inert)) &&
                        NPC[A].Type != NPCID_LIFT_SAND && NPC[A].Type != NPCID_CHECKPOINT && NPC[A].Type != NPCID_SICK_BOSS_BALL &&
                        !(NPC[A].Type == NPCID_PLANT_FIRE || NPC[A].Type == NPCID_LOCK_DOOR || NPC[A].Type == NPCID_FIRE_DISK || NPC[A].Type == NPCID_FIRE_CHAIN))
                     {
@@ -1611,6 +1618,7 @@ void UpdateNPCs()
                     else
                     {
                         NPC[A].BeltSpeed = 0;
+                        NPC[A].Slope = 0;
                     }
                 }
 

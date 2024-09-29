@@ -8,6 +8,8 @@ import math
 import shutil
 import configparser
 
+import audio_convert_16m
+
 from convert_plr import *
 
 PREVIEW = False
@@ -20,9 +22,28 @@ outdir = sys.argv[2]
 if not datadir.endswith('/'): datadir += '/'
 if not outdir.endswith('/'): outdir += '/'
 
+def has_dot(p):
+    if not p:
+        return False
+
+    p, t = os.path.split(p)
+
+    if t.startswith('.'):
+        return True
+
+    return has_dot(p)
+
 for dirpath, _, files in os.walk(datadir, topdown=True):
     if dirpath.endswith('fallback'):
         continue
+
+    if has_dot(dirpath[len(datadir):]):
+        continue
+
+    if dirpath[len(datadir):] == 'music' or dirpath[len(datadir):] == 'sound':
+        continue
+
+    print(dirpath)
 
     if dirpath.endswith('fonts'):
         print('found fonts dir', dirpath)
@@ -49,12 +70,15 @@ for dirpath, _, files in os.walk(datadir, topdown=True):
     outpath = outdir+dirpath[len(datadir):]
     os.makedirs(outpath, exist_ok=True)
     for fn in files:
+        if fn.startswith('.'):
+            continue
+
         rfn = os.path.join(dirpath, fn)
         if not os.path.isfile(rfn): continue
         destfn = os.path.join(outpath, fn)
         bmpfn = os.path.join(outpath, fn[:-3]+'bmp')
         dsgfn = os.path.join(outpath, fn[:-3]+'dsg')
-        if not REDO and (os.path.isfile(destfn) or os.path.isfile(destfn+'.wav') or ((fn.endswith('.gif') or fn.endswith('.png')) and os.path.isfile(dsgfn))): continue
+        if not REDO and (os.path.isfile(destfn) or os.path.isfile(destfn+'.wav' or os.path.isfile(destfn+'.qoa')) or ((fn.endswith('.gif') or fn.endswith('.png')) and os.path.isfile(dsgfn))): continue
         print(rfn)
 
         is_1x = is_fonts_dir and fn in texture_1x
@@ -113,7 +137,7 @@ for dirpath, _, files in os.walk(datadir, topdown=True):
                 while os.path.isfile(bmpfn[:-4]+f'-{i}.bmp'):
                     os.remove(bmpfn[:-4]+f'-{i}.bmp')
                     i += 1
-        elif fn.endswith('.db'):
+        elif fn.endswith('.db') or fn.endswith('.xcf') or fn.endswith('.odt') or fn.endswith('.pdf'):
             continue
         elif fn.endswith('.ogg') and '/sound/' in rfn:
             # os.system(f'ffmpeg -i "{rfn}" "{destfn}.wav"')
@@ -127,9 +151,12 @@ for dirpath, _, files in os.walk(datadir, topdown=True):
             # shutil.copy(rfn, destfn)
             # os.system(f'sed \'s/\\.ogg"/\\.ogg.wav"/\' -i "{destfn}"')
             continue
-        elif fn.endswith('.mp3'):
-            # os.system(f'ffmpeg -i "{rfn}" -aq 1 "{destfn}.ogg"')
-            # shutil.move(destfn+'.ogg', destfn)
+        elif fn.lower().endswith('.mp3') or fn.lower().endswith('.ogg'):
+            wavfn = destfn + ".wav"
+            qoafn = destfn + ".qoa"
+            os.system(f'ffmpeg -i "{rfn}" -acodec pcm_s16le -ar 24000 -ac 1 "{wavfn}"')
+            os.system(f'qoaconv "{wavfn}" "{qoafn}"')
+            os.remove(wavfn)
             continue
         else:
             shutil.copy(rfn, destfn)
@@ -204,7 +231,7 @@ for dirpath, dirs, files in os.walk(outdir, topdown=True):
         l = open(os.path.join(dirpath, 'graphics.list'), 'w')
 
         for d in dirs:
-            if d == 'touchscreen' or d == 'ui':
+            if d == 'touchscreen' or d == 'ui' or d == 'fallback':
                 continue
 
             for f in os.listdir(os.path.join(dirpath, d)):
@@ -217,7 +244,7 @@ for dirpath, dirs, files in os.walk(outdir, topdown=True):
                 if len(basename.split('-')) != 2:
                     continue
 
-                basename = basename.replace('-', ' ')
+                basename = basename.replace('-', ' ').lower()
 
                 if not basename[:basename.find(' ')] in ('background', 'background2', 'block', 'effect', 'level',
                         'link', 'luigi', 'mario', 'npc', 'path',
@@ -252,7 +279,7 @@ for dirpath, dirs, files in os.walk(outdir, topdown=True):
         if len(basename.split('-')) != 2:
             continue
 
-        basename = basename.replace('-', ' ')
+        basename = basename.replace('-', ' ').lower()
 
         if not basename[:basename.find(' ')] in ('background', 'background2', 'block', 'effect', 'level',
                 'link', 'luigi', 'mario', 'npc', 'path',
@@ -270,3 +297,13 @@ for dirpath, dirs, files in os.walk(outdir, topdown=True):
 
     if opened:
         l.close()
+
+# construct soundbank
+if REDO or not os.path.isfile(os.path.join(outdir, 'soundbank.bin')):
+    audio_convert_16m.convert_audio(datadir, outdir)
+
+if os.path.isdir(os.path.join(outdir, 'music')):
+    shutil.rmtree(os.path.join(outdir, 'music'))
+
+if os.path.isdir(os.path.join(outdir, 'sound')):
+    shutil.rmtree(os.path.join(outdir, 'sound'))

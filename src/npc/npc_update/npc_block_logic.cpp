@@ -38,7 +38,6 @@ void NPCBlockLogic(int A, double& tempHit, int& tempHitBlock, float& tempSpeedA,
     float beltCount = 0;
     float addBelt = 0;
 
-    int oldSlope = NPC[A].Slope; // previous sloped block the npc was on
     bool SlopeTurn = false;
 
     // int tempBlockHit[3] = {0}; // keeps track of up to two blocks hit from below
@@ -46,7 +45,10 @@ void NPCBlockLogic(int A, double& tempHit, int& tempHitBlock, float& tempSpeedA,
     int tempBlockHit2 = 0;
     int tempHitIsSlope = 0;
 
+    int oldSlope = NPC[A].Slope; // previous sloped block the npc was on
     float oldBeltSpeed = NPC[A].BeltSpeed;
+
+    NPC[A].Slope = 0;
     NPC[A].BeltSpeed = 0;
 
     if((!NPC[A]->NoClipping || NPC[A].Projectile) &&
@@ -199,7 +201,7 @@ void NPCBlockLogic(int A, double& tempHit, int& tempHitBlock, float& tempSpeedA,
                                         }
                                         else if(HitSpot == 3)
                                         {
-                                            if(fiEqual(NPC[A].Special4, 3))
+                                            if(NPC[A].Special4 == 3)
                                             {
                                                 NPC[A].Frame = 10;
                                                 NPC[A].Special3 = 21;
@@ -211,13 +213,13 @@ void NPCBlockLogic(int A, double& tempHit, int& tempHitBlock, float& tempSpeedA,
 
                                     if(NPC[A].Type == NPCID_PLR_FIREBALL || NPC[A].Type == NPCID_PLR_ICEBALL)
                                     {
-                                        if(Block[B].Type == 626 && fiEqual(NPC[A].Special, 1))
+                                        if(Block[B].Type == 626 && NPC[A].Special == 1)
                                             HitSpot = 0;
-                                        if(Block[B].Type == 627 && fiEqual(NPC[A].Special, 2))
+                                        if(Block[B].Type == 627 && NPC[A].Special == 2)
                                             HitSpot = 0;
-                                        if(Block[B].Type == 628 && fiEqual(NPC[A].Special, 3))
+                                        if(Block[B].Type == 628 && NPC[A].Special == 3)
                                             HitSpot = 0;
-                                        if(Block[B].Type == 629 && fiEqual(NPC[A].Special, 4))
+                                        if(Block[B].Type == 629 && NPC[A].Special == 4)
                                             HitSpot = 0;
                                     }
 
@@ -242,7 +244,8 @@ void NPCBlockLogic(int A, double& tempHit, int& tempHitBlock, float& tempSpeedA,
                                                 NPC[numNPCs].Location.X = Block[B].Location.X + 2;
                                                 NPC[numNPCs].Active = true;
                                                 NPC[numNPCs].DefaultType = NPC[numNPCs].Type;
-                                                NPC[numNPCs].DefaultLocation = static_cast<SpeedlessLocation_t>(NPC[numNPCs].Location);
+                                                NPC[numNPCs].DefaultLocationX = NPC[numNPCs].Location.X;
+                                                NPC[numNPCs].DefaultLocationY = NPC[numNPCs].Location.Y;
                                                 NPC[numNPCs].TimeLeft = 100;
                                                 syncLayers_NPC(numNPCs);
                                                 CheckSectionNPC(numNPCs);
@@ -363,18 +366,43 @@ void NPCBlockLogic(int A, double& tempHit, int& tempHitBlock, float& tempSpeedA,
 
                                     if(BlockSlope2[Block[B].Type] != 0 && HitSpot > 0 && ((NPC[A].Location.Y > Block[B].Location.Y) || ((NPC[A].Type == NPCID_WALL_BUG || NPC[A].Type == NPCID_WALL_SPARK || NPC[A].Type == NPCID_WALL_TURTLE) && NPC[A].Special == 3)))
                                     {
+                                        // the modifications to Special and Special2 here are invalid and could affect any NPC
+                                        double NPC_A_Special = NPC[A].Special;
+                                        double NPC_A_Special2 = NPC[A].Special2;
+
+                                        char Special_from = 0;
+                                        char Special2_from = 0;
+
+                                        if(NPC[A].Type == NPCID_YEL_PLATFORM || NPC[A].Type == NPCID_BLU_PLATFORM || NPC[A].Type == NPCID_GRN_PLATFORM || NPC[A].Type == NPCID_RED_PLATFORM || NPC[A].Type == NPCID_PLATFORM_S3 || NPC[A].Type == NPCID_SAW)
+                                        {
+                                            Special_from = 'Y';
+                                            Special2_from = 'X';
+                                            NPC_A_Special = NPC[A].SpecialY;
+                                            NPC_A_Special2 = NPC[A].SpecialX;
+                                        }
+                                        else if(NPC[A].Type == NPCID_HOMING_BALL_GEN)
+                                        {
+                                            Special_from = 'Y';
+                                            NPC_A_Special = NPC[A].SpecialY;
+                                        }
+                                        else if(NPC[A].Type == NPCID_VILLAIN_S3 || NPC[A].Type == NPCID_MINIBOSS || NPC[A].Type == NPCID_GOALTAPE || NPC[A].Type == NPCID_BAT)
+                                        {
+                                            Special2_from = 'Y';
+                                            NPC_A_Special2 = NPC[A].SpecialY;
+                                        }
+
                                         if(HitSpot == 5)
                                         {
-                                            if(NPC[A].Special == 2 && NPC[A].Special2 == 1)
+                                            if(NPC_A_Special == 2 && NPC_A_Special2 == 1)
                                             {
-                                                NPC[A].Special2 = 1;
-                                                NPC[A].Special = 3;
+                                                NPC_A_Special2 = 1;
+                                                NPC_A_Special = 3;
                                             }
 
-                                            if(NPC[A].Special == 4 && NPC[A].Special2 == 1)
+                                            if(NPC_A_Special == 4 && NPC_A_Special2 == 1)
                                             {
-                                                NPC[A].Special2 = -1;
-                                                NPC[A].Special = 3;
+                                                NPC_A_Special2 = -1;
+                                                NPC_A_Special = 3;
                                             }
                                         }
 
@@ -384,6 +412,7 @@ void NPCBlockLogic(int A, double& tempHit, int& tempHitBlock, float& tempSpeedA,
                                             PlrMid = NPC[A].Location.X + NPC[A].Location.Width;
                                         else
                                             PlrMid = NPC[A].Location.X;
+
                                         double Slope = (PlrMid - Block[B].Location.X) / Block[B].Location.Width;
                                         if(BlockSlope2[Block[B].Type] > 0)
                                             Slope = 1 - Slope;
@@ -405,14 +434,13 @@ void NPCBlockLogic(int A, double& tempHit, int& tempHitBlock, float& tempSpeedA,
 
                                             if(fEqual(NPC[A].Location.SpeedY, double(Physics.NPCGravity)) || NPC[A].Slope > 0 || oldSlope > 0)
                                             {
-                                                if((NPC[A].Special == 2 || NPC[A].Special == 4) && NPC[A].Special2 == -1)
+                                                if((NPC_A_Special == 2 || NPC_A_Special == 4) && NPC_A_Special2 == -1)
                                                 {
-                                                    if(NPC[A].Special == 4)
-                                                        NPC[A].Special2 = 1;
-                                                    if(NPC[A].Special == 2)
-                                                        NPC[A].Special2 = -1;
-                                                    NPC[A].Special = 3;
-
+                                                    if(NPC_A_Special == 4)
+                                                        NPC_A_Special2 = 1;
+                                                    if(NPC_A_Special == 2)
+                                                        NPC_A_Special2 = -1;
+                                                    NPC_A_Special = 3;
                                                 }
 
                                                 PlrMid = NPC[A].Location.Y;
@@ -448,6 +476,21 @@ void NPCBlockLogic(int A, double& tempHit, int& tempHitBlock, float& tempSpeedA,
                                                     NPC[A].Location.SpeedY += 2;
                                             }
                                         }
+
+                                        // could make compat flag here and refuse to clobber these values for cases other than wall climbers
+                                        if(Special2_from == 'X')
+                                            NPC[A].SpecialX = NPC_A_Special2;
+                                        else if(Special2_from == 'Y')
+                                            NPC[A].SpecialY = NPC_A_Special2;
+                                        else
+                                            NPC[A].Special2 = (vbint_t)NPC_A_Special2;
+
+                                        if(Special_from == 'X')
+                                            NPC[A].SpecialX = NPC_A_Special;
+                                        else if(Special_from == 'Y')
+                                            NPC[A].SpecialY = NPC_A_Special;
+                                        else
+                                            NPC[A].Special = (vbint_t)NPC_A_Special;
                                     }
 
 
@@ -723,6 +766,7 @@ void NPCBlockLogic(int A, double& tempHit, int& tempHitBlock, float& tempSpeedA,
                                         NPCHit(A, 4, A);
 
                                     // If a Pokey head stands on a top of another Pokey segment
+                                    // FIXME: need a compat guard for below condition
                                     if(HitSpot == 1 && NPC[A].Type == NPCID_STACKER && Block[B].tempBlockNpcType == NPCID_STACKER
                                         && NPC[Block[B].tempBlockNpcIdx].Type == NPCID_STACKER) // Make sure Pokey didn't transformed into ice cube or anything also
                                     {

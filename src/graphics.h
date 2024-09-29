@@ -62,6 +62,15 @@ void GetvScreenAverage3(vScreen_t& vscreen);
 // NEW: update a vScreen with the correct procedure based on its screen's Type and DType
 void GetvScreenAuto(vScreen_t& vscreen);
 
+//  Prepares shared screen to avoid a jump
+void SharedScreenAvoidJump_Pre(Screen_t& screen);
+
+//  Sets TempX and TempY to avoid a jump for a Screen's shared vScreen, and TempDelay as requested.
+void SharedScreenAvoidJump_Post(Screen_t& screen, int TempDelay);
+
+//  Resets variables set by above
+void SharedScreenResetTemp(Screen_t& screen);
+
 // NEW: get the fixed-res vScreen position for a player, and write the top-left coordinate to (left, top)
 void GetPlayerScreen(double W, double H, const Player_t& p, double& left, double& top);
 
@@ -147,9 +156,9 @@ void DrawMessage(const UTF8CharMap_t& SuperTextMap);
 // draws the background to the screen
 void DrawBackground(int S, int Z);
 // Public Sub PlayerWarpGFX(A As Integer, tempLocation As Location, X2 As Single, Y2 As Single)
-void PlayerWarpGFX(int A, Location_t &tempLocation, float &X2, float &Y2);
+void PlayerWarpGFX(int A, IntegerLocation_t &tempLocation, int &X2, int &Y2);
 // Public Sub NPCWarpGFX(A As Integer, tempLocation As Location, X2 As Single, Y2 As Single)
-void NPCWarpGFX(int A, Location_t &tempLocation, float &X2, float &Y2);
+void NPCWarpGFX(int A, IntegerLocation_t &tempLocation, int &X2, int &Y2);
 // Public Sub ChangeScreen() 'change from fullscreen to windowed mode
 // change from fullscreen to windowed mode
 void ChangeScreen();
@@ -229,6 +238,8 @@ int pfrOffY(const StdPicture& tx, const Player_t& p);
  * \param noSetup Avoid player settings re-setup
  */
 void GameThing(int waitms = 0, int fadeSpeed = 0);
+// Draw a player frame onscreen
+void DrawPlayerRaw(int X, int Y, int Character, int State, int Frame, int Direction);
 // Public Sub DrawPlayer(A As Integer, Z As Integer)
 void DrawPlayer(const int A, const int Z, XTColor color = XTColor());
 void DrawPlayer(Player_t &p, const int Z, XTColor color = XTColor());

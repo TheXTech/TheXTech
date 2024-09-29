@@ -86,8 +86,9 @@ void UpdatePlayer()
         else if(Player[A].HoldingNPC == -1)
             Player[A].HoldingNPC = 0;
 
-        if(Player[A].Controls.Drop && Player[A].DropRelease) // this is for the single player coop cheat code
+        if(Player[A].Controls.Drop && Player[A].DropRelease && Player[A].Effect != PLREFF_COOP_WINGS)
         {
+            // this is for the single player coop cheat code
             if(SingleCoop > 0 && Player[A].Controls.Down)
                 SwapCoop();
             else
@@ -100,9 +101,11 @@ void UpdatePlayer()
         // Handle the death effecs
         if(Player[A].TimeToLive > 0)
             UpdatePlayerTimeToLive(A);
+        else if(Player[A].Effect == PLREFF_COOP_WINGS)
+            PlayerEffectWings(A);
         else if(Player[A].Dead)
             UpdatePlayerDead(A);
-        else if(!Player[A].Dead)
+        else
         {
             if(Player[A].SlideCounter > 0) // for making the slide Effect
                 Player[A].SlideCounter -= 1;
@@ -210,7 +213,7 @@ void UpdatePlayer()
                 if(Player[A].StandingOnNPC != 0 && /*!NPC[Player[A].StandingOnNPC].Pinched && */ !FreezeNPCs)
                 {
                     if(Player[A].StandingOnNPC < 0)
-                        NPC[Player[A].StandingOnNPC].Location = Block[(int)NPC[Player[A].StandingOnNPC].Special].Location;
+                        NPC[Player[A].StandingOnNPC].Location = Block[NPC[Player[A].StandingOnNPC].Special].Location;
 
                     Player[A].Location.SpeedX += NPC[Player[A].StandingOnNPC].Location.SpeedX + NPC[Player[A].StandingOnNPC].BeltSpeed;
                 }
