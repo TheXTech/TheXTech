@@ -54,6 +54,7 @@ void MsgBoxWiiU::run()
         if(nn::erreula::IsDecideSelectButtonError())
         {
             nn::erreula::DisappearErrorViewer();
+            XRender::repaint();
             break;
         }
 
