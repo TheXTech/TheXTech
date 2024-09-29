@@ -982,6 +982,16 @@ else()
         src/core/power/power_sdl.cpp
     )
 
+    if(NINTENDO_WIIU)
+        list(APPEND THEXTECH_SRC
+            src/core/wiiu/msgbox_wiiu.cpp
+        )
+    else()
+        list(APPEND THEXTECH_SRC
+            src/core/sdl/msgbox_sdl.cpp
+        )
+    endif()
+
     if(THEXTECH_BUILD_GL_DESKTOP_MODERN OR THEXTECH_BUILD_GL_DESKTOP_LEGACY OR THEXTECH_BUILD_GL_ES_MODERN OR THEXTECH_BUILD_GL_ES_LEGACY)
         list(APPEND THEXTECH_SRC
             src/core/opengl/gl_program_object.cpp
@@ -1072,9 +1082,18 @@ file(GLOB THEXTECH_HEADS_SRC
     src/script/luna/level/*.h
     src/control/*.h
     src/core/*.h
+    src/core/16m/*.h
+    src/core/3ds/*.h
     src/core/base/*.h
-    src/core/sdl/*.h
     src/core/language/*.h
+    src/core/minport/*.h
+    src/core/null/*.h
+    src/core/opengl/*.h
+    src/core/power/*.h
+    src/core/sdl/*.h
+    src/core/vita/*.h
+    src/core/wii/*.h
+    src/core/wiiu/*.h
     src/editor/*.h
     src/main/*.h
     src/main/translate/*.h
