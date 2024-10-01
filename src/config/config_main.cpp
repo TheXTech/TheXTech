@@ -265,7 +265,7 @@ void LoadCustomConfig()
 
     if(!customCompat.empty())
     {
-        IniProcessing ini = Files::load_ini(episodeCompat);
+        IniProcessing ini = Files::load_ini(customCompat);
         g_config_file_creator.LoadLegacyCompat(&ini, ConfigSetLevel::file_compat);
         g_config_file_creator.UpdateFromIni(&ini, ConfigSetLevel::file_compat);
     }
