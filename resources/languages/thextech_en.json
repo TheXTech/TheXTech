@@ -648,7 +648,8 @@
                     "none-tip": "Least loading stutter",
                     "safe": "Safe",
                     "safe-tip": "Checks if images are in 2x format"
-                }
+                },
+                "webm-recording": "WEBM recording"
             },
             "audio": {
                 "_header": "Audio",
@@ -792,6 +793,15 @@
             },
             "view-credits": {
                 "_header": "View Credits"
+            },
+            "speedrun": {
+                "mode": {
+                    "0": "0",
+                    "1": "1",
+                    "2": "2",
+                    "3": "3",
+                    "_name": "Speedrun mode"
+                }
             }
         },
         "wordBack": "Back",
