@@ -789,7 +789,7 @@ public:
     opt<bool> fix_climb_bgo_speed_adding{this, defaults(true), {CompatClass::standard_update, false}, Scope::CreatorFile,
         "fix-climb-bgo-speed-adding", "Climb BGO speed adding", nullptr};
     opt<bool> fix_climb_bgo_layer_move{this, defaults(true), {CompatClass::standard_update, false}, Scope::CreatorFile,
-        "enable-climb-bgo-layer-move", "Climb moving BGOs", nullptr};
+        "enable-climb-bgo-layer-move", "Move with climbable BGOs", "Player will move together with the climbable BGO on the moving layer as on vines"};
     opt<bool> fix_skull_raft{this, defaults(true), {CompatClass::standard_update, false}, Scope::CreatorFile,
         "fix-skull-raft", "Skull raft", nullptr};
     opt<bool> fix_char3_escape_shell_surf{this, defaults(true), {CompatClass::critical_update, false}, Scope::CreatorFile,
