@@ -98,7 +98,7 @@ void NpcF::AllSetHits(int identity, int section, float hits)
 
     for(int i = 1; i <= numNPCs; i++)
     {
-        thisnpc = Get(i);
+        thisnpc = &NPC[i];
         if(anyID || thisnpc->Type == identity)
         {
             if(anySec || thisnpc->Section == section)
@@ -115,7 +115,7 @@ void NpcF::AllFace(int identity, int section, double x)
 
     for(int i = 1; i <= numNPCs; i++)
     {
-        thisnpc = Get(i);
+        thisnpc = &NPC[i];
         if(anyID || thisnpc->Type == identity)
         {
             if(anySec || thisnpc->Section == section)
