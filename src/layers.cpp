@@ -1647,7 +1647,7 @@ void UpdateLayers()
                     Block[B].Location.SpeedY = 0;
                 }
 
-                if(g_config.fix_climb_bgo_layer_move)
+                if(g_config.enable_climb_bgo_layer_move)
                 {
                     for(int B : Layer[A].NPCs)
                     {
