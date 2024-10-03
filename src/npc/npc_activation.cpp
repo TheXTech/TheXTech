@@ -80,6 +80,7 @@ static bool s_NPC_MustBeCanonical_internal(const NPC_t& n)
         || n->UseDefaultCam
         || (n->IsFish && n.Special == 2)
         || n.AttLayer != LAYER_NONE
+        || (n.Legacy && (n.Type == NPCID_MINIBOSS || n.Type == NPCID_SPIT_BOSS || n.Type == NPCID_VILLAIN_S3))
         || (n.TriggerActivate != EVENT_NONE && !s_Event_SoundOnly(Events[n.TriggerActivate], n.Section));
 }
 
