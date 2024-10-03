@@ -133,7 +133,8 @@ void GameplayTimer::reset()
 {
     m_invalidContinue = false;
     m_cyclesInt = false;
-    m_cyclesFin = false;
+    m_cyclesAtWin = 0;
+    m_cyclesAtWinDisplay = 0;
     m_cyclesCurrent = 0;
     m_cyclesTotal = 0;
     m_levelBlinkActive = false;
@@ -165,9 +166,16 @@ void GameplayTimer::load()
 
     o.beginGroup("timers");
     o.read("int", m_cyclesInt, false);
-    o.read("fin", m_cyclesFin, false);
     o.read("total", m_cyclesTotal, 0);
+
+    // no longer permanently stop the timer following credits roll, but do store the cycles at first win for future display
+    bool legacy_fin = false;
+    o.read("fin", legacy_fin, false);
+    int64_t cyclesAtWin_default = (legacy_fin) ? m_cyclesTotal : 0;
+
+    o.read("win", m_cyclesAtWin, cyclesAtWin_default);
     m_cyclesCurrent = 0; // Reset the counter
+    m_cyclesAtWinDisplay = 0;
     o.endGroup();
 
     if(!m_cyclesInt)
@@ -188,8 +196,8 @@ void GameplayTimer::save()
 
     o.beginGroup("timers");
     o.setValue("int", m_cyclesInt);
-    o.setValue("fin", m_cyclesFin);
     o.setValue("total", m_cyclesTotal);
+    o.setValue("win", m_cyclesAtWin);
     o.endGroup();
 
     o.writeIniFile();
@@ -203,7 +211,8 @@ void GameplayTimer::tick()
         m_cyclesInt = true;
         m_cyclesCurrent = 0;
         m_cyclesTotal = 0;
-        m_cyclesFin = 0;
+        m_cyclesAtWin = 0;
+        m_cyclesAtWinDisplay = 0;
         m_levelBlinkActive = false;
         m_worldBlinkActive = false;
         m_blinkingFactor = 0.0f;
@@ -217,8 +226,7 @@ void GameplayTimer::tick()
     else if(!in_leveltest_restart_screen && g_config.show_playtime_counter == Config_t::PLAYTIME_COUNTER_ANIMATED)
         m_levelBlinkActive = true;
 
-    if(!m_cyclesFin)
-        m_cyclesTotal += 1;
+    m_cyclesTotal += 1;
 
     if(m_levelBlinkActive)
         updateColorSpin(5.0f);
@@ -233,7 +241,11 @@ void GameplayTimer::tick()
 
 void GameplayTimer::onBossDead()
 {
-    m_cyclesFin = true;
+    m_cyclesAtWinDisplay = m_cyclesTotal;
+
+    if(m_cyclesAtWin == 0)
+        m_cyclesAtWin = m_cyclesTotal;
+
     if(g_config.show_playtime_counter == Config_t::PLAYTIME_COUNTER_ANIMATED)
         m_worldBlinkActive = true;
 }
@@ -257,5 +269,11 @@ void GameplayTimer::render()
     if(m_invalidContinue)
         SuperPrintScreenCenter(g_mainMenu.caseNone,         3, y - 18, XTColorF(0.5f, 0.5f, 0.5f, a));
     else if(!TestLevel)
-        SuperPrintScreenCenter(formatTime(m_cyclesTotal),   3, y - 18, XTColorF(wc, 1.0f, wc, a));
+    {
+        int64_t use_total = m_cyclesTotal;
+        if(m_cyclesAtWinDisplay)
+            use_total = m_cyclesAtWinDisplay;
+
+        SuperPrintScreenCenter(formatTime(use_total),       3, y - 18, XTColorF(wc, 1.0f, wc, a));
+    }
 }
