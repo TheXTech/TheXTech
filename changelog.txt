@@ -56,6 +56,7 @@ Changelog for 1.3.7-dev
 -Added support for error boxes at the Wii U to explicitly show reasons of errors to users (@Wohlstand)
 -Fixed crash on attempt to execute the "SetHits" and "AllFace" LunaScript commands (@Wohlstand)
 -Speedrun timer no longer permanently stops following initial game win, allowing speedruns of postgame content (@ds-sloth)
+-Fix TheXTech 1.3.5.1 bug where the lower half of a player's sprite could be shown behind a shoe / sack (@ds-sloth)
 
 Changelog for 1.3.6.6
 -Fix vanilla bug where vehicle could be vulnerable if player entered it during AltJump (requires frame perfect down press), guarded by compat flag "fix-vehicle-altjump-bug" (@ds-sloth)

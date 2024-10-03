@@ -2368,8 +2368,8 @@ void UpdateGraphicsScreen(Screen_t& screen)
 
                         if(p.Mount == 1)
                         {
-                            int small_h_corr
-                                = (p.State != 0)
+                            int big_h_corr
+                                = (p.State == 1)
                                 ? 0
                                 : (p.Character == 4)
                                   ? -26
@@ -2386,7 +2386,7 @@ void UpdateGraphicsScreen(Screen_t& screen)
                             drawLoc.X = pX + offX;
                             drawLoc.Y = pY + offY + toad_oy_corr;
                             drawLoc.Width = w;
-                            drawLoc.Height = pH - offY + small_h_corr;
+                            drawLoc.Height = pH - offY + big_h_corr;
 
                             int src_x = 0;
                             int src_y = 0;
