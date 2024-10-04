@@ -648,7 +648,8 @@
                     "_tooltip": "将图片缩小一半以释放内存"
                 },
                 "_header": "高级选项",
-                "advanced-audio": "音频选项"
+                "advanced-audio": "音频选项",
+                "webm-recording": "录制WEBM视频"
             },
             "audio": {
                 "_header": "音频选项",
@@ -792,6 +793,15 @@
             },
             "view-credits": {
                 "_header": "查看制作团队"
+            },
+            "speedrun": {
+                "mode": {
+                    "_name": "秒表计时模式",
+                    "0": "0（默认）",
+                    "1": "1（现代）",
+                    "3": "3（怀旧）",
+                    "2": "2（经典）"
+                }
             }
         },
         "wordBack": "返回",
