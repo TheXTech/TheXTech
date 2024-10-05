@@ -29,16 +29,11 @@
 #include "app_path_private.h"
 
 
-#ifndef USERDATA_ROOT_NAME
-#    define USERDATA_ROOT_NAME "TheXTech"
-#endif
-
 static std::string s_assetsRoot;
 static std::string s_userDirectory;
 static std::string s_applicationPath;
 static std::string s_screenshotsPath;
 static std::string s_gifRecordPath;
-static std::string s_logsPath;
 //! The name of application bundle to be re-used as the user directory name
 static std::string s_bundleName;
 
@@ -55,7 +50,7 @@ void AppPathP::initDefaultPaths(const std::string &userDirName)
         CFStringGetCString(filePathRef, temporaryCString, PATH_MAX, kCFStringEncodingUTF8);
         s_applicationPath = PGE_URLDEC(std::string(temporaryCString));
         {
-            s_bundleName = USERDATA_ROOT_NAME;
+            s_bundleName.clear();
 
             auto i = s_applicationPath.find_last_of(".app");
 
@@ -79,50 +74,9 @@ void AppPathP::initDefaultPaths(const std::string &userDirName)
         CFRelease(appUrlRef);
     }
 
-    // Initialize the user directory
-    {
-        std::string appSupport;
-
-        char *base_path = getAppSupportDir();
-        if(base_path)
-        {
-            appSupport.append(base_path);
-            SDL_free(base_path);
-        }
-
-        if(appSupport.empty())
-            appSupport = std::string("/Library/Application Support/PGE_Project/thextech/");
-        else
-            appSupport += userDirName;
-
-        if(!appSupport.empty() && appSupport.back() != '/')
-            appSupport.push_back('/');
-
-        const char *homeDir = SDL_getenv("HOME");
-        if(homeDir)
-        {
-            s_userDirectory = std::string(homeDir) + "/TheXTech Games/" + s_bundleName;
-            s_userDirectory.append("/");
-            // Automatically create an infrastructure
-            if(!DirMan::exists(s_userDirectory))
-                DirMan::mkAbsPath(s_userDirectory);
-            if(!DirMan::exists(s_userDirectory + "worlds"))
-                DirMan::mkAbsPath(s_userDirectory + "worlds");
-            if(!DirMan::exists(s_userDirectory + "battle"))
-                DirMan::mkAbsPath(s_userDirectory + "battle");
-
-            s_assetsRoot = std::string(homeDir) + "/TheXTech Games/Debug Assets/";
-        }
-        else
-        {
-            s_userDirectory = appSupport;
-            s_assetsRoot.clear();
-        }
-
-        s_logsPath = s_userDirectory + "logs/";
-    }
-
     // Assets directory
+    s_assetsRoot.clear();
+
 #if defined(USE_BUNDLED_ASSETS) // When its release game with assets shipped with a game
     {
         CFURLRef appUrlRef;
@@ -137,6 +91,50 @@ void AppPathP::initDefaultPaths(const std::string &userDirName)
         s_assetsRoot = path;
     }
 #endif
+
+    // Initialize the user directory
+    {
+        std::string appSupport;
+
+        char *base_path = getAppSupportDir();
+        if(base_path)
+        {
+            appSupport.append(base_path);
+            SDL_free(base_path);
+        }
+
+        if(appSupport.empty())
+            appSupport = std::string("/Library/Application Support/");
+
+        appSupport += userDirName;
+
+        if(!appSupport.empty() && appSupport.back() != '/')
+            appSupport.push_back('/');
+
+        const char *homeDir = SDL_getenv("HOME");
+        if(homeDir)
+        {
+            // Current TheXTech distribution: per-bundle directories
+            if(!s_assetsRoot.empty() && !s_bundleName.empty())
+                s_userDirectory = std::string(homeDir) + "/TheXTech Games/" + s_bundleName;
+            // Shared userdata directory
+            else
+            {
+                s_userDirectory = std::string(homeDir) + userDirName;
+
+                // fallback to legacy directory if there is no custom directory set
+                std::string legacyUserDirectory = std::string(homeDir) + "/TheXTech Games/" + s_bundleName;
+                std::string legacyAssetsDirectory = std::string(homeDir) + "/TheXTech Games/Debug Assets";
+                if(userDirName == "TheXTech" && !DirMan::exists(s_userDirectory) && DirMan::exists(legacyUserDirectory))
+                {
+                    s_userDirectory = legacyUserDirectory;
+                    s_assetsRoot = legacyAssetsDirectory;
+                }
+            }
+        }
+        else
+            s_userDirectory = appSupport;
+    }
 
     // Screenshots directory
     {
@@ -166,6 +164,11 @@ std::string AppPathP::userDirectory()
 std::string AppPathP::assetsRoot()
 {
     return s_assetsRoot;
+}
+
+AssetsPathType AppPathP::assetsRootType()
+{
+    return AssetsPathType::Legacy;
 }
 
 std::string AppPathP::settingsRoot()
@@ -200,7 +203,7 @@ std::string AppPathP::gifRecsRoot()
 
 std::string AppPathP::logsRoot()
 {
-    return s_logsPath;
+    return std::string();
 }
 
 bool AppPathP::portableAvailable()

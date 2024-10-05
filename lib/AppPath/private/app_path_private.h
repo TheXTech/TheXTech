@@ -23,6 +23,8 @@
 
 #include <string>
 
+#include "AppPath/app_path.h"
+
 namespace AppPathP
 {
 //! If this flag set to TRUE, the legacy debug assets root will be completely ignored
@@ -50,6 +52,15 @@ extern std::string userDirectory();
  * \return Path to the assets root directory, or an empty string if none is present
  */
 extern std::string assetsRoot();
+
+/*!
+ * \brief Returns the type of the assets root directory
+ *
+ * - Legacy should point to a single asset pack and will result in non-nested user directories
+ * - Single should point to a single modern asset pack and will result in nested user directories
+ * - Multiple should point to a directory containing multiple modern asset packs and will result in nested user directories
+ */
+extern AssetsPathType assetsRootType();
 
 /*!
  * \brief Get the default path to the writable settings directory (if empty, store at the usre directory)
