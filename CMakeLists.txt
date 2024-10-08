@@ -211,6 +211,7 @@ set(THEXTECH_CREDITS_TITLE "" CACHE STRING "Custom game title, shown at the outr
 
 set(THEXTECH_PACKAGE_NAME "thextech" CACHE STRING "Name of package archive file")
 set(THEXTECH_EXECUTABLE_NAME "thextech" CACHE STRING "Name of executable file")
+set(THEXTECH_INSTALLER_PACKAGE_NAME "${THEXTECH_EXECUTABLE_NAME}" CACHE STRING "The package name for the package manager")
 
 if(APPLE)
     set(THEXTECH_PRELOAD_ENVIRONMENT "" CACHE STRING "Path to resources root to pack")
