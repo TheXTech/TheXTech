@@ -290,6 +290,17 @@ void GetvScreenAverage3(vScreen_t& vscreen)
     vscreen.Y -= t;
     plr_count += 1;
 
+    // take the average, but if the players waiting to exit a warp are keeping the screen too high, don't let them control the screen
+    double mean_Y = vscreen.Y / plr_count;
+    if(not_warping_count != 0)
+    {
+        double mean_Y_not_warping = Y_not_warping / not_warping_count;
+        // if the warping players are pulling the screen up by more than 100px, ignore them
+        double allowed_height = 100;
+        if(mean_Y > mean_Y_not_warping + allowed_height)
+            mean_Y = mean_Y_not_warping + allowed_height;
+    }
+
     const SpeedlessLocation_t& section = level[section_idx];
 
     double use_width  = screen.W;
@@ -303,6 +314,12 @@ void GetvScreenAverage3(vScreen_t& vscreen)
         double want_r = r + screen.W / 4;
         double want_t = t - screen.H / 4;
         double want_b = b + screen.H / 4;
+
+        if(want_t > -mean_Y - screen.H / 2)
+            want_t = -mean_Y - screen.H / 2;
+
+        if(want_b < -mean_Y + screen.H / 2)
+            want_b = -mean_Y + screen.H / 2;
 
         if(want_l < section.X)
             want_l = section.X;
@@ -320,10 +337,14 @@ void GetvScreenAverage3(vScreen_t& vscreen)
             use_height = want_b - want_t;
 
         use_width  = SDL_min(use_width,  static_cast<double>(screen.visible_screen().W));
-        use_height = SDL_min(use_height, static_cast<double>(screen.visible_screen().H));
+        // don't limit by visible screen: needed to handle unusual shared screen cases found by Sapphire Bullet Bill
+        // use_height = SDL_min(use_height, static_cast<double>(screen.visible_screen().H));
 
         vscreen.Width = use_width;
         vscreen.Height = use_height;
+
+        if(use_height > screen.H)
+            mean_Y = -(want_t + want_b) / 2;
     }
 
     // if a NoTurnBack section, make sure that the limited width is tracked
@@ -332,17 +353,6 @@ void GetvScreenAverage3(vScreen_t& vscreen)
 
     use_width  = SDL_min(use_width,  section.Width  - section.X);
     use_height = SDL_min(use_height, section.Height - section.Y);
-
-    // take the average, but if the players waiting to exit a warp are keeping the screen too high, don't let them control the screen
-    double mean_Y = vscreen.Y / plr_count;
-    if(not_warping_count != 0)
-    {
-        double mean_Y_not_warping = Y_not_warping / not_warping_count;
-        // if the warping players are pulling the screen up by more than 100px, ignore them
-        double allowed_height = 100;
-        if(mean_Y > mean_Y_not_warping + allowed_height)
-            mean_Y = mean_Y_not_warping + allowed_height;
-    }
 
     vscreen.X = -(l + r) / 2 + (use_width * 0.5);
     vscreen.Y = mean_Y + (use_height * 0.5) - vScreenYOffset;
