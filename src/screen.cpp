@@ -111,6 +111,8 @@ void Screen_t::set_canonical_screen(uint8_t index)
 
         canScreen.m_CanonicalScreen = 0;
         canScreen.players = players;
+        canScreen.two_screen_pref = two_screen_pref;
+        canScreen.four_screen_pref = four_screen_pref;
     }
 }
 
