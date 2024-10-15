@@ -541,6 +541,20 @@ public:
         "scale-down-textures", "Scale down images", "Store images as 1x to save memory"};
 #endif
 
+#ifndef PGE_MIN_PORT
+    opt_enum<std::pair<int, int>> internal_res_4p{this,
+        {
+            {{0, 0}, "default", "Default"},
+            {{1920, 1080}, "fhd", "1920x1080 (FHD)"},
+            {{1600, 1200}, "qsmbx", "1600x1200 (QSMBX)"},
+            {{2560, 1440}, "qhd", "2560x1440 (QHD)"},
+        },
+        defaults(std::pair<int, int>({0, 0})), {}, Scope::Config,
+        "internal-res-4p", "4P split screen size", nullptr,
+        config_res_set
+    };
+#endif
+
 #ifndef THEXTECH_NO_SDL_BUILD
     /* ---- Advanced - Audio ----*/
     subsection advanced_audio{this, "advanced-audio", "Audio"};

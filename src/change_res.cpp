@@ -78,6 +78,15 @@ void UpdateInternalRes()
     int req_w = g_config.internal_res.m_value.first;
     int req_h = g_config.internal_res.m_value.second;
 
+#ifndef PGE_MIN_PORT
+    if(l_screen->Type == ScreenTypes::Quad && g_config.internal_res_4p.m_value.first != 0)
+    {
+        req_w = g_config.internal_res_4p.m_value.first;
+        req_h = g_config.internal_res_4p.m_value.second;
+        ignore_compat = true;
+    }
+#endif
+
     // use the correct canonical screen's resolution here
     int canon_w = l_screen->canonical_screen().W;
     int canon_h = l_screen->canonical_screen().H;
