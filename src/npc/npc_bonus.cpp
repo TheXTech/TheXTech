@@ -222,8 +222,8 @@ void TouchBonus(int A, int B)
         return;
 
     int sfx_extra_item     = (Player[A].Character == 5) ? SFX_HeroHeart : SFX_GotItem;
-    int sfx_grow_item      = (Player[A].Character == 5) ? SFX_HeroHeart : SFX_PlayerGrow;
-    int sfx_transform_item = (Player[A].Character == 5) ? SFX_HeroHeart : SFX_Transform;
+    int sfx_grow_item      = (Player[A].Character == 5) ? SFX_HeroItem  : SFX_PlayerGrow;
+    int sfx_transform_item = (Player[A].Character == 5) ? SFX_HeroItem  : SFX_Transform;
 
     // moved up here so that the hearts logic works
     NPCID civilian_type = NPCID(0);
