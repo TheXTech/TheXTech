@@ -78,9 +78,9 @@ void UpdateInternalRes()
     int req_w = g_config.internal_res.m_value.first;
     int req_h = g_config.internal_res.m_value.second;
 
-    // TODO: use the correct canonical screen's resolution here
-    int canon_w = 800;
-    int canon_h = 600;
+    // use the correct canonical screen's resolution here
+    int canon_w = l_screen->canonical_screen().W;
+    int canon_h = l_screen->canonical_screen().H;
 
     if(!g_config.allow_multires && !ignore_compat)
     {
