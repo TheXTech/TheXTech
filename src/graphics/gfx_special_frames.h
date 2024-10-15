@@ -22,14 +22,28 @@
 #ifndef GFX_SPECIAL_FRAMES_H
 #define GFX_SPECIAL_FRAMES_H
 
-// Private Sub SpecialFrames() 'update frames for special things such as coins and kuribo's shoe
-extern void SpecialFrames();//PRIVATE
-// update frames for special things such as coins and kuribo's shoe
+#include "globals.h"
 
-// NEW: update level frames that keep going during
+// Private Sub SpecialFrames() 'update frames for special things such as coins and kuribo's shoe
+// update frames for special things such as coins and kuribo's shoe (pauses during FreezeNPCs)
+extern void SpecialFrames();//PRIVATE
+
+// updates CommonFrame and CommonFrame_Unpaused
+inline void CommonFrames()
+{
+    CommonFrame++;
+
+    if(LevelSelect || !FreezeNPCs)
+        CommonFrame_NotFrozen++;
+}
+
+// NEW: update level frames that keep going during FreezeNPCs and pause
 void LevelFramesAlways();
 
-// NEW: update level frames that stop during FreezeNPCs
+// NEW: update level frames that stop during FreezeNPCs (but continue during pause)
 void LevelFramesNotFrozen();
+
+// NEW: update world frames
+void WorldFrames();
 
 #endif // #ifndef GFX_SPECIAL_FRAMES_H

@@ -513,7 +513,7 @@ void RenderGL::repaint()
     if(m_current_frame % 512 == 0)
         cleanupDrawQueues();
 
-    m_shader_clock = (GLfloat)((m_current_frame) % (65 * 60)) / 65.0f;
+    m_shader_clock = (GLfloat)((CommonFrame_NotFrozen) % (65 * 60)) / 65.0f;
 
 #if 0
     GLuint err;

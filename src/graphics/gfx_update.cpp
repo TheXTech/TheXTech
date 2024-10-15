@@ -1700,36 +1700,10 @@ void UpdateGraphicsLogic(bool Do_FrameSkip)
         SpecialFrames();
     }
 
+    CommonFrames();
+
     LevelFramesAlways();
     ProcessIntroNPCFrames();
-
-    // Update Coin Frames
-    CoinFrame2[1] += 1;
-    if(CoinFrame2[1] >= 6)
-    {
-        CoinFrame2[1] = 0;
-        CoinFrame[1] += 1;
-        if(CoinFrame[1] >= 4)
-            CoinFrame[1] = 0;
-    }
-
-    CoinFrame2[2] += 1;
-    if(CoinFrame2[2] >= 6)
-    {
-        CoinFrame2[2] = 0;
-        CoinFrame[2] += 1;
-        if(CoinFrame[2] >= 7)
-            CoinFrame[2] = 0;
-    }
-
-    CoinFrame2[3] += 1;
-    if(CoinFrame2[3] >= 7)
-    {
-        CoinFrame2[3] = 0;
-        CoinFrame[3] += 1;
-        if(CoinFrame[3] >= 4)
-            CoinFrame[3] = 0;
-    }
 
     // clear the last-frame reset state of NPCs
     if(g_config.fix_npc_camera_logic)

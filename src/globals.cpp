@@ -47,6 +47,7 @@ long myBufferBMP = 0;
 int AllCharBlock = 0;
 bool StartMenu = false;
 uint32_t CommonFrame = 0;
+uint32_t CommonFrame_NotFrozen = 0;
 bool ScrollRelease = false;
 bool TakeScreen = false;
 bool ShowOnScreenHUD = true;

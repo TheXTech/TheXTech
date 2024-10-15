@@ -147,6 +147,8 @@ extern bool StartMenu;
 //Public BlockFlash As Integer
 // Note: was previously BlockFlash, manually looped by local code to 0-90. Now incremented every frame, should be used with modulus operator.
 extern uint32_t CommonFrame;
+// This one only increments when FreezeNPCs is not true. Used by shaders.
+extern uint32_t CommonFrame_NotFrozen;
 
 //Public ScrollRelease As Boolean
 extern bool ScrollRelease;
