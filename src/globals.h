@@ -1375,6 +1375,7 @@ struct SelectWorld_t
     bool editable = false;
     bool highlight = false;
     bool disabled = false;
+    bool probably_incompatible = false;
 //End Type
 };
 

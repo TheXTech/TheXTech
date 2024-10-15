@@ -195,6 +195,8 @@ XTechTranslate::XTechTranslate()
         {"menu.game.gameNoBattleLevels",   &g_mainMenu.gameNoBattleLevels},
         {"menu.game.gameBattleRandom",     &g_mainMenu.gameBattleRandom},
 
+        {"menu.game.warnEpCompat",         &g_mainMenu.warnEpCompat},
+
         {"menu.game.gameSlotContinue",     &g_mainMenu.gameSlotContinue},
         {"menu.game.gameSlotNew",          &g_mainMenu.gameSlotNew},
 

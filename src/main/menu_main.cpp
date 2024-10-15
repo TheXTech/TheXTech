@@ -152,6 +152,8 @@ void initMainMenu()
     g_mainMenu.gameNoBattleLevels = "<No battle levels>";
     g_mainMenu.gameBattleRandom = "Random Level";
 
+    g_mainMenu.warnEpCompat = "Warning: this episode was made for a different version of SMBX and may not work properly.";
+
     g_mainMenu.gameSlotContinue = "SLOT {0} ... {1}%";
     g_mainMenu.gameSlotNew = "SLOT {0} ... NEW GAME";
     g_mainMenu.gameCopySave = "Copy save";
@@ -435,7 +437,14 @@ static void s_LoadSingleWorld(const std::string& epDir, const std::string& fName
         if(w.WorldName.empty())
             w.WorldName = fName;
 
-        w.bugfixes_on_by_default = (head.meta.RecentFormat != LevelData::SMBX64);
+        bool is_wldx = (head.meta.RecentFormat == WorldData::PGEX);
+        bool is_wld38a = (head.meta.RecentFormat == WorldData::SMBX38A);
+        if(is_wldx && head.meta.configPackId == "SMBX2")
+            w.probably_incompatible = true;
+        else if(is_wld38a)
+            w.probably_incompatible = true;
+        else
+            w.bugfixes_on_by_default = true;
 
         w.blockChar[1] = head.nocharacter1;
         w.blockChar[2] = head.nocharacter2;
@@ -1718,11 +1727,20 @@ bool mainMenuUpdate()
                     }
                     else if(MenuCursor >= 0 && MenuCursor <= c_menuItemSavesEndList) // Select the save slot, but still need to select players
                     {
+                        selSave = MenuCursor + 1;
+
+                        // warn the user of incompatibility if present
+                        if(SaveSlotInfo[selSave].Progress < 0 && SelectWorld[selWorld].probably_incompatible)
+                        {
+                            PlaySoundMenu(SFX_Message);
+
+                            MessageText = g_mainMenu.warnEpCompat;
+                            PauseGame(PauseCode::Message);
+                        }
+
                         PlaySoundMenu(SFX_Do);
 
                         LoadCustomPlayerPreviews(SelectWorld[selWorld].WorldPath.c_str());
-
-                        selSave = MenuCursor + 1;
 
                         if(MenuMode == MENU_SELECT_SLOT_2P)
                             ConnectScreen::MainMenu_Start(2);
@@ -2782,6 +2800,9 @@ void mainMenuDraw()
 
             if(w.disabled)
                 color = {127, 127, 127};
+
+            if(w.probably_incompatible)
+                color = {255, 127, 127};
 
             B = A - minShow + 1;
 

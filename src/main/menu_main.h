@@ -127,6 +127,8 @@ struct MainMenuContent
     std::string gameNoBattleLevels;
     std::string gameBattleRandom;
 
+    std::string warnEpCompat;
+
     std::string gameSlotContinue;
     std::string gameSlotNew;
 
