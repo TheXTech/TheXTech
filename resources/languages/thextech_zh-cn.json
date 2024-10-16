@@ -559,7 +559,8 @@
             "gameSourceSlot": "选择源存档",
             "gameTargetSlot": "选择目标存档",
             "phraseScore": "得分：{0}",
-            "phraseTime": "时间：{0}"
+            "phraseTime": "时间：{0}",
+            "warnEpCompat": "警告：该地图使用其他SMBX版本制作，在该引擎下可能无法正常运作。"
         },
         "loading": "加载中...",
         "main": {
