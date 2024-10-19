@@ -152,7 +152,7 @@ void initMainMenu()
     g_mainMenu.gameNoBattleLevels = "<No battle levels>";
     g_mainMenu.gameBattleRandom = "Random Level";
 
-    g_mainMenu.warnEpCompat = "Warning: this episode was made for a different version of SMBX and may not work properly.";
+    g_mainMenu.warnEpCompat = "Warning: this episode was made for a different branch of SMBX and may not work properly.";
 
     g_mainMenu.gameSlotContinue = "SLOT {0} ... {1}%";
     g_mainMenu.gameSlotNew = "SLOT {0} ... NEW GAME";
