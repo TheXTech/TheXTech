@@ -357,6 +357,12 @@ bool Logic()
         // if not still on the same asset pack, reload assets!!
         if(cur_idx != s_cur_idx || !g_AssetsLoaded)
         {
+            if(!g_AssetsLoaded)
+            {
+                XRender::clearBuffer();
+                XRender::repaint();
+            }
+
             s_cur_idx = cur_idx;
             CommonFrame = 0; // don't show indicators
             if(!ReloadAssetsFrom(GetAssetPacks()[cur_idx]))
