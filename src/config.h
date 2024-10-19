@@ -443,7 +443,7 @@ public:
 
     // static constexpr bool record_gameplay_data = false;
 
-    opt<bool> pick_assets_on_start{this, defaults(false), {}, Scope::Config,
+    opt<bool> pick_assets_on_start{this, defaults(true), {}, Scope::Config,
         "choose-assets-on-launch", "Choose assets on launch", nullptr};
 
     opt<bool> record_gameplay_data{this, defaults(false), {}, Scope::Config,
