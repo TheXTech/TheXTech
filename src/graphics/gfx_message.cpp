@@ -35,20 +35,14 @@ void DrawMessage(const std::string& SuperText)
 // based on Wohlstand's improved algorithm, but screen-size aware
 void DrawMessage(const UTF8CharMap_t &SuperTextMap)
 {
-#ifdef BUILT_IN_TEXTBOX
-    const int TextBoxW = 500;
-    const bool UseGFX = false;
-#else
     int TextBoxW = GFX.TextBox.w;
     bool UseGFX = true;
 
-    if(XRender::TargetW < GFX.TextBox.w)
+    if(!GFX.TextBox.inited || XRender::TargetW < GFX.TextBox.w)
     {
         TextBoxW = XRender::TargetW - 50;
         UseGFX = false;
     }
-
-#endif
 
     // possibly, load these data from the fonts engine
     const int charWidth = 18;
