@@ -829,6 +829,7 @@ set(THEXTECH_SRC
     src/fontman/font_manager_private.cpp
     src/fontman/raster_font.cpp
     src/fontman/legacy_font.cpp
+    src/fontman/hardcoded_font.cpp
     src/fontman/utf8_helpers.cpp
 )
 
