@@ -17,6 +17,8 @@
  * or see <http://www.gnu.org/licenses/>.
  */
 
+#include <vector>
+
 #include "fontman/hardcoded_font.h"
 
 #include "core/render.h"
