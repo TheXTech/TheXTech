@@ -343,8 +343,15 @@ int GameMain(const CmdLineSetup_t &setup)
     gfxLoaderTestMode = setup.testLevelMode;
 
     // find asset pack and load required UI graphics
-    if(!InitUIAssetsFrom(setup.assetPack))
-        return 1;
+    bool init_failure = !InitUIAssetsFrom(setup.assetPack);
+
+    if(init_failure)
+    {
+        if(!setup.assetPack.empty())
+            return 1;
+
+        FontManager::initFallback();
+    }
 
 //    If LevelEditor = False Then
 //        frmMain.Show // Show window a bit later
@@ -361,7 +368,8 @@ int GameMain(const CmdLineSetup_t &setup)
     XEvents::doEvents();
 
 #ifdef __EMSCRIPTEN__ // Workaround for a recent Chrome's policy to avoid sudden sound without user's interaction
-    FontManager::initFull();
+    if(!init_failure)
+        FontManager::initFull();
 
     XWindow::show(); // Don't show window until playing an initial sound
 
@@ -385,7 +393,7 @@ int GameMain(const CmdLineSetup_t &setup)
 #endif
     XWindow::show(); // Don't show window until playing an initial sound
 
-    if(!setup.testLevelMode)
+    if(!setup.testLevelMode && !init_failure)
         PlayInitSound();
 
 #ifdef THEXTECH_INTERPROC_SUPPORTED
@@ -407,7 +415,7 @@ int GameMain(const CmdLineSetup_t &setup)
         ScreenAssetPack::g_LoopActive = true;
     }
     // normal case: load everything and go to menu
-    else
+    else if(!init_failure)
         MainLoadAll();
 
     LevelSelect = true; // world map is to be shown
@@ -423,7 +431,30 @@ int GameMain(const CmdLineSetup_t &setup)
     if(!g_config.background_work && !XWindow::hasWindowInputFocus())
         SoundPauseEngine(1);
 
-    if(cmdline_content) // Start level testing immediately!
+    if(init_failure)
+    {
+        GameMenu = false;
+        LevelSelect = false;
+        gSMBXHUDSettings.skip = true;
+        numPlayers = 1;
+        InitScreens();
+        Screens_AssignPlayer(1, *l_screen);
+        QuickReconnectScreen::g_active = true;
+        MessageText = "Fatal: no assets!\nExtract an asset pack to:\n";
+        for(auto& i : AppPathManager::assetsSearchPath())
+        {
+            MessageText += "\n";
+            MessageText += i.first;
+
+            if(i.second == AppPathManager::Legacy)
+                MessageText += "assets/<pack-id>/";
+            else if(i.second == AppPathManager::Multiple)
+                MessageText += "<pack-id>/";
+        }
+        PauseGame(PauseCode::Message);
+        GameIsActive = false;
+    }
+    else if(cmdline_content) // Start level testing immediately!
     {
         bool is_world = (Files::hasSuffix(setup.testLevel, ".wld") || Files::hasSuffix(setup.testLevel, ".wldx"));
 
@@ -552,7 +583,7 @@ int GameMain(const CmdLineSetup_t &setup)
         }
     }
 
-    do
+    while(GameIsActive)
     {
         if(GameMenu || MagicHand || LevelEditor || ScreenAssetPack::g_LoopActive)
         {
@@ -1419,7 +1450,7 @@ int GameMain(const CmdLineSetup_t &setup)
             } // TestLevel
         }
 
-    } while(GameIsActive);
+    }
 
     Integrator::quitIntegrations();
 

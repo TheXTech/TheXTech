@@ -51,6 +51,8 @@ void         utf8_pop_back(std::string &str);
 void         utf8_erase_at(std::string &str, size_t begin);
 void         utf8_erase_before(std::string &str, size_t end);
 
+//! Fallback initialization of font rendering including only the fallback font
+void initFallback();
 //! Full initialization of font renderith include external fonts
 void initFull();
 //! De-Initialize font manager and clear memory
