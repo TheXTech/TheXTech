@@ -177,11 +177,11 @@ bool GFX_t::load()
 
     if(m_loadErrors > 0)
     {
-        std::string msg = fmt::format_ne("Failed to load UI image assets from {0}. Look a log file to get more details:\n{1}"
-                                         "\n\n"
-                                         "It's possible that you didn't install the game assets package, or you had installed it at the incorrect directory.",
-                                         AppPath, getLogFilePath());
-        XMsgBox::simpleMsgBox(XMsgBox::MESSAGEBOX_ERROR, "UI image assets loading error", msg);
+        // std::string msg = fmt::format_ne("Failed to load UI image assets from {0}. Look a log file to get more details:\n{1}"
+        //                                  "\n\n"
+        //                                  "It's possible that you didn't install the game assets package, or you had installed it at the incorrect directory.",
+        //                                  AppPath, getLogFilePath());
+        // XMsgBox::simpleMsgBox(XMsgBox::MESSAGEBOX_ERROR, "UI image assets loading error", msg);
         m_loadErrors = 0;
         return false;
     }
