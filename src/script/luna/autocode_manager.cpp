@@ -735,6 +735,13 @@ void AutocodeManager::addError(int lineNumber, const std::string &line, const st
         err.line.pop_back();
     }
 
+    // Cut the line to 80 symbols
+    if(err.line.size() > 80)
+    {
+        err.line.erase(80);
+        err.line += "...";
+    }
+
     pLogWarning("Autocode: Script parse error: [%s] at %d: %s",
                 err.message.c_str(), err.lineNumber, err.line.c_str());
 
