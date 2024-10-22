@@ -440,7 +440,7 @@ int GameMain(const CmdLineSetup_t &setup)
         InitScreens();
         Screens_AssignPlayer(1, *l_screen);
         QuickReconnectScreen::g_active = true;
-        MessageText = "Fatal: no assets!\nExtract an asset pack to:\n";
+        MessageText = "Fatal: no assets!\nExtract a game/asset pack to:\n";
         for(auto& i : AppPathManager::assetsSearchPath())
         {
             MessageText += "\n";
