@@ -126,6 +126,9 @@ void Hotkeys::Activate(size_t i, int player)
     }
 #endif
 
+    case Buttons::VanillaCam:
+        return;
+
     case Buttons::DebugInfo:
         g_stats.next_page();
         return;
