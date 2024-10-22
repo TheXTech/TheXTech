@@ -1472,7 +1472,7 @@ void EditorLoop()
     UpdateEffects();
     if(WorldEditor)
         UpdateGraphics2();
-    else
+    else if(LevelEditor)
         UpdateGraphics();
 
     updateScreenFaders();
