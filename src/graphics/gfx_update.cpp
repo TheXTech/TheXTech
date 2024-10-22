@@ -1344,7 +1344,7 @@ void ModernNPCScreenLogic(Screen_t& screen, int vscreen_i, bool fill_draw_queue,
                     NPCFrames(A);
             }
         }
-        else if(fill_draw_queue && g_config.small_screen_camera_features && NPC[A].Active && cannot_reset && NPC[A].JustActivated == 0 && !NPC[A].Inert && NPC[A].Type != NPCID_CONVEYOR)
+        else if(fill_draw_queue && g_config.small_screen_cam && NPC[A].Active && cannot_reset && NPC[A].JustActivated == 0 && !NPC[A].Inert && NPC[A].Type != NPCID_CONVEYOR)
         {
             if(NPC[A].Location.SpeedX != 0 || NPC[A].Location.SpeedY != 0
                 || (!NPC[A]->WontHurt && !NPC[A]->IsACoin && !NPC[A]->IsABonus))
@@ -3228,7 +3228,7 @@ void UpdateGraphicsScreen(Screen_t& screen)
         }
 
         // indicate any small-screen camera features
-        if(g_config.small_screen_camera_features && screen.H < 600
+        if(g_config.small_screen_cam && screen.H < 600
             && screen.Type != 2 && screen.Type != 3 && screen.Type != 7 && (screen.Type != 5 || screen.vScreen(2).Visible))
         {
             DrawSmallScreenCam(vScreen[Z]);

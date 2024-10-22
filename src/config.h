@@ -693,10 +693,6 @@ public:
     // /* ---- Prefs - Effects ----*/
     // subsection effects{this, "effects", "Visual Effects"};
 
-    // opt<bool> small_screen_camera_features{this, defaults(true), {VER_THEXTECH137}, Scope::Config,
-    //     "small-screen-camera-features", "Small screen camera features", "Camera optimizations that improve the experience at low resolutions"};
-    static constexpr bool small_screen_camera_features = true;
-
 
 
     /* ---- Compatibility ----*/
@@ -757,8 +753,10 @@ public:
     opt<bool> world_map_fast_move{this, defaults(true), {CompatClass::standard_update, false}, Scope::Creator,
         "world-map-fast-move", "Automatic movement", "Moves automatically between forks on the path"};
 
-    opt<bool> modern_item_drop{this, defaults(true), {CompatClass::standard_update, false}, Scope::Creator,
-        "modern-item-drop", "Modern item drop", "Experimental implementation of modern item drop"};
+    // opt<bool> modern_item_drop{this, defaults(true), {CompatClass::standard_update, false}, Scope::Creator,
+    //     "modern-item-drop", "Modern item drop", "Experimental implementation of modern item drop"};
+    opt<bool> small_screen_cam{this, defaults(true), {CompatClass::standard_update, false}, Scope::None,
+        "small-screen-cam", "Small screen camera", "Camera panning and control"};
 
     opt<bool> disable_spin_jump{this, defaults(false), {CompatClass::critical_update, false}, Scope::Creator,
         "disable-spin-jump", "Disable spin jump", "The alt jump key should trigger an ordinary jump instead of a spin jump"};

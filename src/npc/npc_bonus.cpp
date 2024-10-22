@@ -150,7 +150,9 @@ void DropBonus(int A)
     CheckSectionNPC(numNPCs);
 
     // enable modern NPC spawn code
-    if(g_config.modern_item_drop && !ForcedControls)
+    bool small_screen_cam = (g_config.small_screen_cam && screen.W < screen.canonical_screen().W);
+    bool always_shared = (is_shared && screen.Type == ScreenTypes::SharedScreen);
+    if(!ForcedControls && (always_shared || small_screen_cam))
     {
         NPC[numNPCs].Special5 = 120;
         NPC[numNPCs].Effect3 = A;
