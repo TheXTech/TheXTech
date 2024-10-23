@@ -235,6 +235,12 @@ void UpdateInternalRes()
         }
     }
 
+    if(LevelEditor || MagicHand)
+    {
+        XRender::TargetW = SDL_max(XRender::TargetW, 640);
+        XRender::TargetH = SDL_max(XRender::TargetH, 480);
+    }
+
 #ifdef __3DS__
     if(g_config.allow_multires || ignore_compat)
         XRender::TargetW += XRender::MAX_3D_OFFSET * 2;

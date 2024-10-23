@@ -41,6 +41,7 @@
 #include "effect.h"
 #include "layers.h"
 #include "game_main.h"
+#include "change_res.h"
 #include "main/level_file.h"
 #include "main/cheat_code.h"
 #include "main/trees.h"
@@ -2522,6 +2523,11 @@ void zTestLevel(bool magicHand, bool interProcess)
         StartWarp = testStartWarp;
     }
 
+    LevelEditor = false;
+    TestLevel = true;
+
+    UpdateInternalRes();
+
     // assign players to screens
     InitScreens();
     for(A = 1; A <= numPlayers; A++)
@@ -2531,8 +2537,6 @@ void zTestLevel(bool magicHand, bool interProcess)
             break;
     }
 
-    LevelEditor = false;
-    TestLevel = true;
     SetupPlayers();
     MagicHand = magicHand;
     FontManager::clearAllCustomFonts();

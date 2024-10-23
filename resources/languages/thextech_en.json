@@ -542,7 +542,6 @@
         },
         "editor": {
             "errorMissingResources": "Sorry! You are missing {0}, required for the in-game editor.",
-            "errorResolution": "Sorry! The in-game editor is not supported at your current resolution.",
             "battles": "<Battle Levels>",
             "newWorld": "<New World>",
             "promptNewWorldName": "New world name"

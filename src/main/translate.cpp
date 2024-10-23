@@ -187,7 +187,7 @@ XTechTranslate::XTechTranslate()
 
         {"menu.editor.battles",            &g_mainMenu.editorBattles},
         {"menu.editor.newWorld",           &g_mainMenu.editorNewWorld},
-        {"menu.editor.errorResolution",    &g_mainMenu.editorErrorResolution},
+        // {"menu.editor.errorResolution",    &g_mainMenu.editorErrorResolution},
         {"menu.editor.errorMissingResources", &g_mainMenu.editorErrorMissingResources},
         {"menu.editor.promptNewWorldName", &g_mainMenu.editorPromptNewWorldName},
 

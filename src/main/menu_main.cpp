@@ -144,7 +144,7 @@ void initMainMenu()
 
     g_mainMenu.editorBattles = "<Battle Levels>";
     g_mainMenu.editorNewWorld = "<New World>";
-    g_mainMenu.editorErrorResolution = "Sorry! The in-game editor is not supported at your current resolution.";
+    // g_mainMenu.editorErrorResolution = "Sorry! The in-game editor is not supported at your current resolution.";
     g_mainMenu.editorErrorMissingResources = "Sorry! You are missing {0}, required for the in-game editor.";
     g_mainMenu.editorPromptNewWorldName = "New world name";
 
@@ -974,13 +974,16 @@ bool mainMenuUpdate()
                 }
                 else if(g_config.enable_editor && MenuCursor == i++)
                 {
+#if 0
                     if(XRender::TargetW < 640 || XRender::TargetH < 480)
                     {
                         PlaySoundMenu(SFX_BlockHit);
                         MessageText = g_mainMenu.editorErrorResolution;
                         PauseGame(PauseCode::Message);
                     }
-                    else if(!GFX.EIcons.inited)
+                    else
+#endif
+                    if(!GFX.EIcons.inited)
                     {
                         PlaySoundMenu(SFX_BlockHit);
                         MessageText = fmt::format_ne(g_mainMenu.editorErrorMissingResources, "EditorIcons.png");

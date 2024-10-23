@@ -119,7 +119,7 @@ struct MainMenuContent
 
     std::string editorBattles;
     std::string editorNewWorld;
-    std::string editorErrorResolution;
+    // std::string editorErrorResolution;
     std::string editorErrorMissingResources;
     std::string editorPromptNewWorldName;
 
