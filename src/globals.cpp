@@ -80,7 +80,7 @@ std::string g_recentWorld1p;
 std::string g_recentWorld2p;
 std::string g_recentWorldEditor;
 //bool ShowFPS = false;
-double PrintFPS = 0.0;
+int PrintFPS = 0;
 bool g_VanillaCam = false;
 // moved to "screen.cpp"
 // RangeArr<vScreen_t, 0, 2> vScreen;

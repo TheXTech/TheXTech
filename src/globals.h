@@ -1338,7 +1338,7 @@ extern std::string g_recentWorldEditor;
 //Public ShowFPS As Boolean
 // extern bool ShowFPS;
 //Public PrintFPS As Double
-extern double PrintFPS;
+extern int PrintFPS;
 extern bool g_VanillaCam;
 
 // moved to "screen.h"
