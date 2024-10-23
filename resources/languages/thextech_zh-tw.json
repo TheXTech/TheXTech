@@ -542,7 +542,6 @@
         },
         "editor": {
             "errorMissingResources": "抱歉，需要檔案：{0}，才能進入編輯器。",
-            "errorResolution": "抱歉，在當前設定的分辨率下，無法進入編輯器。",
             "newWorld": "<新地圖>",
             "promptNewWorldName": "新地圖名稱",
             "battles": "<對戰關卡>"

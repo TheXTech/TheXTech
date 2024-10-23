@@ -535,7 +535,6 @@
         "editor": {
             "battles": "<전투 레벨>",
             "errorMissingResources": "죄송합니다! 게임 내 편집기에 필요한 {0}이 누락되었습니다.",
-            "errorResolution": "죄송합니다! 현재 해상도에서는 게임 내 편집기가 지원하지 않습니다.",
             "newWorld": "<새로운 세계>",
             "promptNewWorldName": "새로운 세계 이름"
         }
