@@ -619,6 +619,10 @@ int GameMain(const CmdLineSetup_t &setup)
             // ScreenType = 0; // set in SetupScreens()
             XEvents::doEvents();
             SetupEditorGraphics(); //Set up the editor graphics
+
+            g_VanillaCam = false;
+            UpdateInternalRes();
+
             InitScreens();
 
             for(int i = 0; i < maxLocalPlayers; i++)
@@ -859,7 +863,10 @@ int GameMain(const CmdLineSetup_t &setup)
             g_ClonedPlayerMode = false;
             g_CheatLogicScreen = false;
             g_CheatEditYourFriends = false;
+            g_VanillaCam = false;
             XRender::unloadGifTextures();
+
+            UpdateInternalRes();
 
             // reset l_screen to index 0
             Screens[0] = *l_screen;

@@ -73,7 +73,7 @@ void ChangeRes(int, int, int, int)
 
 void UpdateInternalRes()
 {
-    bool ignore_compat = GameMenu && (g_config.speedrun_mode.m_set < ConfigSetLevel::cmdline);
+    bool ignore_compat = LevelEditor || (GameMenu && g_config.speedrun_mode.m_set < ConfigSetLevel::cmdline);
 
     int req_w = g_config.internal_res.m_value.first;
     int req_h = g_config.internal_res.m_value.second;
@@ -257,7 +257,7 @@ void UpdateInternalRes()
         l_screen->H = canon_h;
     }
 
-    if(g_VanillaCam)
+    if(!GameMenu && !GameOutro && !LevelEditor && !BattleMode && g_VanillaCam)
     {
         XRender::TargetW = SDL_max(XRender::TargetW, canon_w);
         XRender::TargetH = SDL_max(XRender::TargetH, canon_h);
