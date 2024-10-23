@@ -128,9 +128,17 @@ void Hotkeys::Activate(size_t i, int player)
 #endif
 
     case Buttons::VanillaCam:
-        g_VanillaCam = !g_VanillaCam;
-        PlaySoundMenu(SFX_PSwitch);
-        UpdateInternalRes();
+        if(g_VanillaCam || l_screen->W != l_screen->canonical_screen().W || l_screen->H != l_screen->canonical_screen().H)
+        {
+            g_VanillaCam = !g_VanillaCam;
+            PlaySoundMenu(SFX_Camera);
+            UpdateInternalRes();
+        }
+        else
+        {
+            PlaySoundMenu(SFX_BlockHit);
+        }
+
         return;
 
     case Buttons::DebugInfo:
