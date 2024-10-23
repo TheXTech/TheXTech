@@ -495,7 +495,7 @@ void NPCSpecialMaybeHeld(int A)
                                 }
                             }
                         } // for
-                        SoundPause[2] = 12;
+                        SoundPause[SFX_Stomp] = 12;
                     }
                 }
             }

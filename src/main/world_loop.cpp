@@ -440,7 +440,7 @@ void WorldLoop()
             {
                 WorldPlayer[1].Move3 = false;
                 PlaySound(SFX_BlockHit);
-                SoundPause[3] = 2;
+                SoundPause[SFX_BlockHit] = 2;
             }
         }
         else if(Player[1].Controls.Left)
@@ -478,7 +478,7 @@ void WorldLoop()
             {
                 WorldPlayer[1].Move3 = false;
                 PlaySound(SFX_BlockHit);
-                SoundPause[3] = 2;
+                SoundPause[SFX_BlockHit] = 2;
             }
         }
         else if(Player[1].Controls.Down)
@@ -516,7 +516,7 @@ void WorldLoop()
             {
                 WorldPlayer[1].Move3 = false;
                 PlaySound(SFX_BlockHit);
-                SoundPause[3] = 2;
+                SoundPause[SFX_BlockHit] = 2;
             }
         }
         else if(Player[1].Controls.Right)
@@ -554,7 +554,7 @@ void WorldLoop()
             {
                 WorldPlayer[1].Move3 = false;
                 PlaySound(SFX_BlockHit);
-                SoundPause[3] = 2;
+                SoundPause[SFX_BlockHit] = 2;
             }
         }
         else if(Player[1].Controls.Jump && Player[1].UnStart)
@@ -614,7 +614,7 @@ void WorldLoop()
                                 worldWaitForFade();
                             }
 
-                            SoundPause[26] = 200;
+                            SoundPause[SFX_Slide] = 200;
                             curWorldLevel = t;
                             LevelSelect = false;
 

@@ -1502,7 +1502,7 @@ void OpenLevelDataPost()
     // If too much locks
     SDL_assert_release(numBackground + numLocked <= (maxBackgrounds + maxWarps));
 
-    SoundPause[13] = 100;
+    SoundPause[SFX_Camera] = 100;
     resetFrameTimer();
 }
 

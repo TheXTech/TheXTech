@@ -774,7 +774,7 @@ void PlaySound(int A, int loops, int volume)
         A = SFX_ShellHit; // Restore the old behavior
 
     if(g_ClonedPlayerMode)
-        SoundPause[10] = 1;
+        SoundPause[SFX_Skid] = 1;
 
     UNUSED(volume);
     PlaySoundMenu(A, loops);

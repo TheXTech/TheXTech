@@ -1031,7 +1031,7 @@ int GameMain(const CmdLineSetup_t &setup)
 
 //                if(!GoToLevelNoGameThing)
 //                    PlaySound(SFX_LevelSelect);
-                SoundPause[26] = 2000;
+                SoundPause[SFX_Slide] = 2000;
 
                 LevelSelect = false;
 
@@ -1210,7 +1210,7 @@ int GameMain(const CmdLineSetup_t &setup)
 
                         PlayerFrame(p);
                         CheckSection(A);
-                        SoundPause[17] = 0;
+                        SoundPause[SFX_Warp] = 0;
                         p.Effect = PLREFF_WAITING;
                         p.Effect2 = 950;
                     }
@@ -2249,7 +2249,7 @@ void StartEpisode()
     {
         // TODO: why did Wohlstand disable this?
         PlaySoundMenu(SFX_LevelSelect);
-        SoundPause[26] = 200;
+        SoundPause[SFX_Slide] = 200;
         LevelSelect = false;
 
         ResetSoundFX();

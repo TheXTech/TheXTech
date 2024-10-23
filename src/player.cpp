@@ -3272,7 +3272,7 @@ void YoshiSpit(const int A)
             {
                 if(NPC[p.YoshiNPC]->IsAShell)
                 {
-                    SoundPause[9] = 2;
+                    SoundPause[SFX_ShellHit] = 2;
                     // NPCHit .YoshiNPC, 1, A
                     NPC[p.YoshiNPC].Location.SpeedX = Physics.NPCShellSpeed * p.Direction;
                 }

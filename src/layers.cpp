@@ -930,7 +930,7 @@ static inline bool s_initModernQScreen(Screen_t& screen, const int B, const Spee
             tY = vScreen[warped_Z].Y - vScreen[onscreen_Z].Y;
         }
 
-        SoundPause[13] = 10;
+        SoundPause[SFX_Camera] = 10;
 
         // need two cycles to fully update the dynamic screens in the new level
         SetupScreens(screen, false);
@@ -1146,7 +1146,7 @@ static inline bool s_initLegacyQScreen(Screen_t& screen, const int B, const Spee
         else if(p1 == onscreen_plr)
             screenLoc = vScreen[Z1];
 
-        SoundPause[13] = 10;
+        SoundPause[SFX_Camera] = 10;
 
         DynamicScreen(screen);
 
