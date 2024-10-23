@@ -1339,6 +1339,7 @@ extern std::string g_recentWorldEditor;
 // extern bool ShowFPS;
 //Public PrintFPS As Double
 extern double PrintFPS;
+extern bool g_VanillaCam;
 
 // moved to "screen.h"
 //Public vScreen(0 To 2) As vScreen 'Sets up the players screens

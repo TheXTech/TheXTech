@@ -29,6 +29,7 @@
 #include "../main/record.h"
 #include "../main/speedrunner.h"
 #include "message.h"
+#include "change_res.h"
 
 #include "core/render.h"
 #include "core/window.h"
@@ -127,6 +128,9 @@ void Hotkeys::Activate(size_t i, int player)
 #endif
 
     case Buttons::VanillaCam:
+        g_VanillaCam = !g_VanillaCam;
+        PlaySoundMenu(SFX_PSwitch);
+        UpdateInternalRes();
         return;
 
     case Buttons::DebugInfo:

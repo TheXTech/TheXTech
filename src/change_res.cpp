@@ -257,6 +257,14 @@ void UpdateInternalRes()
         l_screen->H = canon_h;
     }
 
+    if(g_VanillaCam)
+    {
+        XRender::TargetW = SDL_max(XRender::TargetW, canon_w);
+        XRender::TargetH = SDL_max(XRender::TargetH, canon_h);
+        l_screen->W = canon_w;
+        l_screen->H = canon_h;
+    }
+
     if(XRender::is_nullptr() || !GameIsActive)
         return;
 
