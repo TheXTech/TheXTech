@@ -1173,6 +1173,9 @@ int GameMain(const CmdLineSetup_t &setup)
                     else
                         p.Warp = ReturnWarp;
 
+                    if(p.Warp > maxWarps)
+                        break;
+
                     p.WarpBackward = false;
                     auto &warp = Warp[p.Warp];
 
@@ -1258,24 +1261,31 @@ int GameMain(const CmdLineSetup_t &setup)
             // ---------------------------------------
             bool hasPlayerPoint = false;
             bool hasStartWarp = (Player[1].Warp > 0);
+            bool hasCrashStartWarp = (Player[1].Warp > maxWarps);
             bool hasValidStartWarp = (Player[1].Warp > 0 && Player[1].Warp <= numWarps);
             bool startError = false;
 
             for(int i = 1; i <= numPlayers && i <= 2; ++i)
                 hasPlayerPoint |= !PlayerStart[i].isNull();
 
-            if(hasStartWarp && !hasValidStartWarp)
+            if(hasCrashStartWarp)
             {
+                // this case would have crashed SMBX 1.3.
                 MessageText = fmt::format_ne(g_gameStrings.errorInvalidEnterWarp,
                                              FullFileName,
                                              Player[1].Warp,
                                              numWarps);
                 startError = true;
+                Player[1].Warp = 0;
             }
-            else if(!hasPlayerPoint && !hasStartWarp)
+            else if(!hasPlayerPoint && !hasValidStartWarp)
             {
                 MessageText = fmt::format_ne(g_gameStrings.errorNoStartPoint, FullFileName);
                 startError = true;
+            }
+            else if(hasStartWarp && !hasValidStartWarp)
+            {
+                pLogWarning("Level start: warp %d requested, but only %d warps present.", Player[1].Warp, numWarps);
             }
 
             if(startError) // Quit the level because of error
