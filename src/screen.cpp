@@ -126,6 +126,9 @@ int Screen_t::active_begin() const
 
 int Screen_t::active_end() const
 {
+    if(!is_active())
+        return 0;
+
     if(Type == ScreenTypes::SingleCoop && SingleCoop == 2)
         return 2;
 
