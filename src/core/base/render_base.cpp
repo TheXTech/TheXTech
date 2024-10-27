@@ -498,7 +498,7 @@ void AbstractRender_t::loadTexture(StdPicture &target, uint32_t width, uint32_t 
         target.d.invalidateDepthTest();
     }
 
-    loadTextureInternal(target, width, height, RGBApixels, pitch);
+    loadTextureInternal(target, width, height, RGBApixels, pitch, 0, 0);
 }
 
 void AbstractRender_t::lazyLoad(StdPicture &target)
@@ -656,24 +656,27 @@ void AbstractRender_t::lazyLoad(StdPicture &target)
     if(!g_render->depthTestSupported() || maskImage || !GraphicsHelps::validateForDepthTest(sourceImage, StdPictureGetOrigPath(target)))
         target.d.invalidateDepthTest();
 
-    uint8_t *textura = reinterpret_cast<uint8_t *>(FreeImage_GetBits(sourceImage));
-
-    g_render->loadTextureInternal(target, w, h, textura, pitch);
-
-    GraphicsHelps::closeImage(sourceImage);
+    uint32_t w_mask = 0;
+    uint32_t h_mask = 0;
 
     if(maskImage)
     {
-        uint32_t w_mask = static_cast<uint32_t>(FreeImage_GetWidth(maskImage));
-        uint32_t h_mask = static_cast<uint32_t>(FreeImage_GetHeight(maskImage));
+        w_mask = static_cast<uint32_t>(FreeImage_GetWidth(maskImage));
+        h_mask = static_cast<uint32_t>(FreeImage_GetHeight(maskImage));
         uint32_t pitch_mask = static_cast<uint32_t>(FreeImage_GetPitch(maskImage));
 
-        textura = reinterpret_cast<uint8_t *>(FreeImage_GetBits(maskImage));
+        uint8_t* textura = reinterpret_cast<uint8_t *>(FreeImage_GetBits(maskImage));
 
         g_render->loadTextureMask(target, w_mask, h_mask, textura, pitch_mask, w, h);
 
         GraphicsHelps::closeImage(maskImage);
     }
+
+    uint8_t *textura = reinterpret_cast<uint8_t *>(FreeImage_GetBits(sourceImage));
+
+    g_render->loadTextureInternal(target, w, h, textura, pitch, w_mask, h_mask);
+
+    GraphicsHelps::closeImage(sourceImage);
 
 #ifdef THEXTECH_BUILD_GL_MODERN
     if(g_render->userShadersSupported() && (!target.l.particleVertexShaderSource.empty() || !target.l.fragmentShaderSource.empty()))
@@ -979,9 +982,9 @@ void AbstractRender_t::toggleGifRecorder()
 #ifdef PGE_VIDEO_REC_WEBM_SUPPORTED
         if(g_config.webm_recording)
         {
-        spec.frame_rate = 120;
-        spec.video_quality = 10;
-        spec.audio_enabled = g_config.audio_enable;
+            spec.frame_rate = 120;
+            spec.video_quality = 10;
+            spec.audio_enabled = g_config.audio_enable;
             spec.audio_sample_rate = g_config.audio_sample_rate.obtained;
             spec.audio_channel_count = g_config.audio_channels.obtained;
             spec.audio_sample_format = g_config.audio_format.obtained;

@@ -221,7 +221,9 @@ protected:
                              uint32_t width,
                              uint32_t height,
                              uint8_t *RGBApixels,
-                             uint32_t pitch) = 0;
+                             uint32_t pitch,
+                             uint32_t mask_width,
+                             uint32_t mask_height) = 0;
 
     virtual void loadTextureMask(StdPicture &target,
                              uint32_t mask_width,

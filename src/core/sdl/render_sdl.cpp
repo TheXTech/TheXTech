@@ -448,8 +448,11 @@ void RenderSDL::setDrawPlane(uint8_t plane)
     m_recent_draw_plane = plane;
 }
 
-void RenderSDL::loadTextureInternal(StdPicture &target, uint32_t width, uint32_t height, uint8_t *RGBApixels, uint32_t pitch)
+void RenderSDL::loadTextureInternal(StdPicture &target, uint32_t width, uint32_t height, uint8_t *RGBApixels, uint32_t pitch, uint32_t mask_width, uint32_t mask_height)
 {
+    UNUSED(mask_width);
+    UNUSED(mask_height);
+
     SDL_Surface *surface;
     SDL_Texture *texture = nullptr;
 
