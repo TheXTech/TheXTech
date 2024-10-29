@@ -144,6 +144,7 @@ void Deactivate(int A)
             NPC[A].Quicksand = 0;
             NPC[A].NoLavaSplash = false;
             NPC[A].Active = false;
+            NPC[A].Type = NPC[A].DefaultType;
             NPC[A].ResetLocation();
             NPC[A].Direction = NPC[A].DefaultDirection;
             NPC[A].Stuck = NPC[A].DefaultStuck;
@@ -152,7 +153,6 @@ void Deactivate(int A)
             NPC[A].Effect = NPCEFF_NORMAL;
             NPC[A].Effect2 = 0;
             NPC[A].Effect3 = 0;
-            NPC[A].Type = NPC[A].DefaultType;
             NPC[A].BeltSpeed = 0;
             NPC[A].vehiclePlr = 0;
             NPC[A].vehicleYOffset = 0;
