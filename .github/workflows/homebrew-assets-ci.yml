@@ -81,7 +81,7 @@ jobs:
       shell: bash
       run: |
         apt update
-        apt install -y gcc cmake  \
+        apt install -y build-essential cmake  \
                        imagemagick ffmpeg     \
                        python3                \
                        p7zip-full             \
