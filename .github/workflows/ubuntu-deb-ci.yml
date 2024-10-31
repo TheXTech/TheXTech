@@ -239,7 +239,7 @@ jobs:
             libxxf86vm-dev libxinerama-dev libxkbcommon-dev libfontconfig1-dev libasound2-dev \
             libpulse-dev libdbus-1-dev udev mtdev-tools webp libudev-dev libglm-dev \
             libwayland-dev libegl1-mesa-dev mesa-common-dev libgl1-mesa-dev libglu1-mesa-dev \
-            libgles2-mesa libgles2-mesa-dev libgles-dev libproxy-dev libsdl2-dev \
+            libgles2 libgles-dev libproxy-dev libsdl2-dev \
             libpng-dev libjpeg-dev hashdeep dpkg debconf lintian",
 
             executable_name: "thextech",
