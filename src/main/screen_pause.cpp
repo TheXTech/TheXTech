@@ -583,11 +583,11 @@ bool Logic(int plr)
                     }
                 }
 
-                if(AllCharBlock == 0 && numPlayers <= maxLocalPlayers)
-                {
-                    PlaySound(SFX_Slide);
-                    Player[A].RunRelease = false;
+                Player[A].RunRelease = false;
+                auto snd = SFX_BlockHit;
 
+                if(AllCharBlock == 0 && numPlayers <= maxLocalPlayers && Player[A].Effect == PLREFF_NORMAL)
+                {
                     // replaced old character swap code with this new code,
                     // supporting arbitrary multiplayer and in-level swap.
                     int target = Player[A].Character;
@@ -638,12 +638,15 @@ bool Logic(int plr)
                     // if a suitable target found, swap character
                     if(target != Player[A].Character)
                     {
+                        snd = SFX_Slide;
                         SwapCharacter(A, target);
 
                         if(LevelSelect)
                             SetupPlayers();
                     }
                 }
+
+                PlaySound(snd);
             }
         }
     }

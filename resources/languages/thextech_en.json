@@ -542,7 +542,6 @@
         },
         "editor": {
             "errorMissingResources": "Sorry! You are missing {0}, required for the in-game editor.",
-            "errorResolution": "Sorry! The in-game editor is not supported at your current resolution.",
             "battles": "<Battle Levels>",
             "newWorld": "<New World>",
             "promptNewWorldName": "New world name"
@@ -554,6 +553,7 @@
             "gameEraseSlot": "Select the slot to erase",
             "gameNoBattleLevels": "<No battle levels>",
             "gameNoEpisodesToPlay": "<No episodes to play>",
+            "warnEpCompat": "Warning: this episode was made for a different branch of SMBX and may not work properly.",
             "gameSlotContinue": "SLOT {0} ... {1}%",
             "gameSlotNew": "SLOT {0} ... NEW GAME",
             "gameSourceSlot": "Select the source slot",
@@ -648,7 +648,8 @@
                     "none-tip": "Least loading stutter",
                     "safe": "Safe",
                     "safe-tip": "Checks if images are in 2x format"
-                }
+                },
+                "webm-recording": "WEBM recording"
             },
             "audio": {
                 "_header": "Audio",
@@ -792,6 +793,15 @@
             },
             "view-credits": {
                 "_header": "View Credits"
+            },
+            "speedrun": {
+                "mode": {
+                    "0": "0",
+                    "1": "1",
+                    "2": "2",
+                    "3": "3",
+                    "_name": "Speedrun mode"
+                }
             }
         },
         "wordBack": "Back",

@@ -542,7 +542,6 @@
         },
         "editor": {
             "errorMissingResources": "抱歉，需要檔案：{0}，才能進入編輯器。",
-            "errorResolution": "抱歉，在當前設定的分辨率下，無法進入編輯器。",
             "newWorld": "<新地圖>",
             "promptNewWorldName": "新地圖名稱",
             "battles": "<對戰關卡>"
@@ -559,7 +558,8 @@
             "gameSourceSlot": "選擇源存檔",
             "gameTargetSlot": "選擇目標存檔",
             "phraseScore": "積分：{0}",
-            "phraseTime": "時間：{0}"
+            "phraseTime": "時間：{0}",
+            "warnEpCompat": "警告：該地圖使用其他分支的SMBX引擎製作，在該引擎下可能無法正常運作。"
         },
         "loading": "加載中...",
         "main": {
@@ -614,8 +614,8 @@
                 },
                 "_header": "高階設定",
                 "_tooltip": "有關內部操作的技術性設定選項",
-                "advanced-audio": "音頻選項",
-                "advanced-video": "視頻選項",
+                "advanced-audio": "音訊選項",
+                "advanced-video": "視訊選項",
                 "log-level": {
                     "debug": "調試",
                     "fatal": "異常中止",
@@ -636,8 +636,8 @@
                     "_tooltip": "降低未預期的噪音，增加延遲"
                 },
                 "audio-format": {
-                    "_name": "音頻格式",
-                    "_tooltip": "音效卡驅動音頻格式"
+                    "_name": "音訊格式",
+                    "_tooltip": "音效卡驅動音訊格式"
                 },
                 "audio-sample-rate": {
                     "11025": "11025赫茲",
@@ -648,7 +648,8 @@
                     "48000": "48000赫茲",
                     "_name": "取樣率"
                 },
-                "choose-assets-on-launch": "啟動程序時，彈出選擇組件介面"
+                "choose-assets-on-launch": "啟動程序時，彈出選擇組件介面",
+                "webm-recording": "録製WEBM視訊"
             },
             "audio": {
                 "audio-sfx-volume": "聲音音量",
@@ -656,12 +657,12 @@
                 "sfx-audio-fx": "迴音效果",
                 "sfx-modern-tip": "播放TheXTech引擎新增的聲音",
                 "sfx-pet-beat": "坐騎節奏",
-                "sfx-spatial-audio": "三維音頻",
+                "sfx-spatial-audio": "三維音訊",
                 "sfx-spatial-audio-tip": "減少畫面外環境的音量",
                 "audio-prefs": "偏好設定",
                 "audio-music-volume": "音樂音量",
                 "sfx-pet-beat-tip": "騎上坐騎時，播放特殊節奏",
-                "_header": "音頻選項"
+                "_header": "音訊選項"
             },
             "compatibility": {
                 "features": "新特性",
@@ -772,7 +773,7 @@
                     "vga": "640x480（VGA）",
                     "smbx": "800x600（SMBX）"
                 },
-                "_header": "視頻選項",
+                "_header": "視訊選項",
                 "info-game": "畫面中游戲信息",
                 "info-run": "畫面中執行時信息",
                 "scale-mode": {
@@ -792,6 +793,15 @@
             },
             "controls": {
                 "_header": "按鍵選項"
+            },
+            "speedrun": {
+                "mode": {
+                    "0": "0（默認）",
+                    "1": "1（現代）",
+                    "2": "2（經典）",
+                    "3": "3（懷舊）",
+                    "_name": "秒錶計時模式"
+                }
             }
         },
         "wordBack": "返回",

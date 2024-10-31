@@ -210,8 +210,9 @@ void RefreshVisibleItems()
             if(g_options.m_options[i] == &g_options.view_credits && !GameMenu)
                 continue;
 
-            if(g_options.m_options[i] == &g_options.advanced && !GameMenu)
-                continue;
+            // previously banned access to advanced menu during gameplay
+            // if(g_options.m_options[i] == &g_options.advanced && !GameMenu)
+            //     continue;
 
             if(g_options.m_options[i] == &g_options.episode_options && (GameMenu || BattleMode))
                 continue;

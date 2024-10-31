@@ -144,13 +144,15 @@ void initMainMenu()
 
     g_mainMenu.editorBattles = "<Battle Levels>";
     g_mainMenu.editorNewWorld = "<New World>";
-    g_mainMenu.editorErrorResolution = "Sorry! The in-game editor is not supported at your current resolution.";
+    // g_mainMenu.editorErrorResolution = "Sorry! The in-game editor is not supported at your current resolution.";
     g_mainMenu.editorErrorMissingResources = "Sorry! You are missing {0}, required for the in-game editor.";
     g_mainMenu.editorPromptNewWorldName = "New world name";
 
     g_mainMenu.gameNoEpisodesToPlay = "<No episodes to play>";
     g_mainMenu.gameNoBattleLevels = "<No battle levels>";
     g_mainMenu.gameBattleRandom = "Random Level";
+
+    g_mainMenu.warnEpCompat = "Warning: this episode was made for a different branch of SMBX and may not work properly.";
 
     g_mainMenu.gameSlotContinue = "SLOT {0} ... {1}%";
     g_mainMenu.gameSlotNew = "SLOT {0} ... NEW GAME";
@@ -435,7 +437,14 @@ static void s_LoadSingleWorld(const std::string& epDir, const std::string& fName
         if(w.WorldName.empty())
             w.WorldName = fName;
 
-        w.bugfixes_on_by_default = (head.meta.RecentFormat != LevelData::SMBX64);
+        bool is_wldx = (head.meta.RecentFormat == WorldData::PGEX);
+        bool is_wld38a = (head.meta.RecentFormat == WorldData::SMBX38A);
+        if(is_wldx && head.meta.configPackId == "SMBX2")
+            w.probably_incompatible = true;
+        else if(is_wld38a)
+            w.probably_incompatible = true;
+        else
+            w.bugfixes_on_by_default = true;
 
         w.blockChar[1] = head.nocharacter1;
         w.blockChar[2] = head.nocharacter2;
@@ -965,13 +974,16 @@ bool mainMenuUpdate()
                 }
                 else if(g_config.enable_editor && MenuCursor == i++)
                 {
+#if 0
                     if(XRender::TargetW < 640 || XRender::TargetH < 480)
                     {
                         PlaySoundMenu(SFX_BlockHit);
                         MessageText = g_mainMenu.editorErrorResolution;
                         PauseGame(PauseCode::Message);
                     }
-                    else if(!GFX.EIcons.inited)
+                    else
+#endif
+                    if(!GFX.EIcons.inited)
                     {
                         PlaySoundMenu(SFX_BlockHit);
                         MessageText = fmt::format_ne(g_mainMenu.editorErrorMissingResources, "EditorIcons.png");
@@ -1718,11 +1730,20 @@ bool mainMenuUpdate()
                     }
                     else if(MenuCursor >= 0 && MenuCursor <= c_menuItemSavesEndList) // Select the save slot, but still need to select players
                     {
+                        selSave = MenuCursor + 1;
+
+                        // warn the user of incompatibility if present
+                        if(SaveSlotInfo[selSave].Progress < 0 && SelectWorld[selWorld].probably_incompatible)
+                        {
+                            PlaySoundMenu(SFX_Message);
+
+                            MessageText = g_mainMenu.warnEpCompat;
+                            PauseGame(PauseCode::Message);
+                        }
+
                         PlaySoundMenu(SFX_Do);
 
                         LoadCustomPlayerPreviews(SelectWorld[selWorld].WorldPath.c_str());
-
-                        selSave = MenuCursor + 1;
 
                         if(MenuMode == MENU_SELECT_SLOT_2P)
                             ConnectScreen::MainMenu_Start(2);
@@ -2782,6 +2803,9 @@ void mainMenuDraw()
 
             if(w.disabled)
                 color = {127, 127, 127};
+
+            if(w.probably_incompatible)
+                color = {255, 127, 127};
 
             B = A - minShow + 1;
 

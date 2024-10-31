@@ -542,7 +542,6 @@
         },
         "editor": {
             "errorMissingResources": "抱歉，需要文件：{0}，才能进入编辑器。",
-            "errorResolution": "抱歉，在当前设置的分辨率下，无法进入编辑器。",
             "newWorld": "<创建新地图>",
             "promptNewWorldName": "新地图名称",
             "battles": "<创建对战模式关卡>"
@@ -559,7 +558,8 @@
             "gameSourceSlot": "选择源存档",
             "gameTargetSlot": "选择目标存档",
             "phraseScore": "得分：{0}",
-            "phraseTime": "时间：{0}"
+            "phraseTime": "时间：{0}",
+            "warnEpCompat": "警告：该地图使用其他分支的SMBX引擎制作，在该引擎下可能无法正常运作。"
         },
         "loading": "加载中...",
         "main": {
@@ -648,7 +648,8 @@
                     "_tooltip": "将图片缩小一半以释放内存"
                 },
                 "_header": "高级选项",
-                "advanced-audio": "音频选项"
+                "advanced-audio": "音频选项",
+                "webm-recording": "录制WEBM视频"
             },
             "audio": {
                 "_header": "音频选项",
@@ -792,6 +793,15 @@
             },
             "view-credits": {
                 "_header": "查看制作团队"
+            },
+            "speedrun": {
+                "mode": {
+                    "_name": "秒表计时模式",
+                    "0": "0（默认）",
+                    "1": "1（现代）",
+                    "3": "3（怀旧）",
+                    "2": "2（经典）"
+                }
             }
         },
         "wordBack": "返回",

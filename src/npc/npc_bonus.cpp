@@ -150,7 +150,9 @@ void DropBonus(int A)
     CheckSectionNPC(numNPCs);
 
     // enable modern NPC spawn code
-    if(g_config.modern_item_drop && !ForcedControls)
+    bool small_screen_cam = (g_config.small_screen_cam && screen.W < screen.canonical_screen().W);
+    bool always_shared = (is_shared && screen.Type == ScreenTypes::SharedScreen);
+    if(!ForcedControls && (always_shared || small_screen_cam))
     {
         NPC[numNPCs].Special5 = 120;
         NPC[numNPCs].Effect3 = A;
@@ -222,8 +224,8 @@ void TouchBonus(int A, int B)
         return;
 
     int sfx_extra_item     = (Player[A].Character == 5) ? SFX_HeroHeart : SFX_GotItem;
-    int sfx_grow_item      = (Player[A].Character == 5) ? SFX_HeroHeart : SFX_PlayerGrow;
-    int sfx_transform_item = (Player[A].Character == 5) ? SFX_HeroHeart : SFX_Transform;
+    int sfx_grow_item      = (Player[A].Character == 5) ? SFX_HeroItem  : SFX_PlayerGrow;
+    int sfx_transform_item = (Player[A].Character == 5) ? SFX_HeroItem  : SFX_Transform;
 
     // moved up here so that the hearts logic works
     NPCID civilian_type = NPCID(0);

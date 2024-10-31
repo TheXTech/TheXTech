@@ -187,13 +187,15 @@ XTechTranslate::XTechTranslate()
 
         {"menu.editor.battles",            &g_mainMenu.editorBattles},
         {"menu.editor.newWorld",           &g_mainMenu.editorNewWorld},
-        {"menu.editor.errorResolution",    &g_mainMenu.editorErrorResolution},
+        // {"menu.editor.errorResolution",    &g_mainMenu.editorErrorResolution},
         {"menu.editor.errorMissingResources", &g_mainMenu.editorErrorMissingResources},
         {"menu.editor.promptNewWorldName", &g_mainMenu.editorPromptNewWorldName},
 
         {"menu.game.gameNoEpisodesToPlay", &g_mainMenu.gameNoEpisodesToPlay},
         {"menu.game.gameNoBattleLevels",   &g_mainMenu.gameNoBattleLevels},
         {"menu.game.gameBattleRandom",     &g_mainMenu.gameBattleRandom},
+
+        {"menu.game.warnEpCompat",         &g_mainMenu.warnEpCompat},
 
         {"menu.game.gameSlotContinue",     &g_mainMenu.gameSlotContinue},
         {"menu.game.gameSlotNew",          &g_mainMenu.gameSlotNew},
@@ -295,6 +297,7 @@ XTechTranslate::XTechTranslate()
         {"menu.controls.hotkeys.recordGif",   &Controls::Hotkeys::g_button_name_UI[Controls::Hotkeys::RecordGif]},
 #endif
         {"menu.controls.hotkeys.debugInfo",   &Controls::Hotkeys::g_button_name_UI[Controls::Hotkeys::DebugInfo]},
+        {"menu.controls.hotkeys.vanillaCam",  &Controls::Hotkeys::g_button_name_UI[Controls::Hotkeys::VanillaCam]},
         {"menu.controls.hotkeys.enterCheats", &Controls::Hotkeys::g_button_name_UI[Controls::Hotkeys::EnterCheats]},
         {"menu.controls.hotkeys.toggleHUD",   &Controls::Hotkeys::g_button_name_UI[Controls::Hotkeys::ToggleHUD]},
         {"menu.controls.hotkeys.legacyPause", &Controls::Hotkeys::g_button_name_UI[Controls::Hotkeys::LegacyPause]},

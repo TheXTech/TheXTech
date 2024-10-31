@@ -1344,7 +1344,7 @@ void ModernNPCScreenLogic(Screen_t& screen, int vscreen_i, bool fill_draw_queue,
                     NPCFrames(A);
             }
         }
-        else if(fill_draw_queue && g_config.small_screen_camera_features && NPC[A].Active && cannot_reset && NPC[A].JustActivated == 0 && !NPC[A].Inert && NPC[A].Type != NPCID_CONVEYOR)
+        else if(fill_draw_queue && g_config.small_screen_cam && NPC[A].Active && cannot_reset && NPC[A].JustActivated == 0 && !NPC[A].Inert && NPC[A].Type != NPCID_CONVEYOR)
         {
             if(NPC[A].Location.SpeedX != 0 || NPC[A].Location.SpeedY != 0
                 || (!NPC[A]->WontHurt && !NPC[A]->IsACoin && !NPC[A]->IsABonus))
@@ -1700,36 +1700,10 @@ void UpdateGraphicsLogic(bool Do_FrameSkip)
         SpecialFrames();
     }
 
+    CommonFrames();
+
     LevelFramesAlways();
     ProcessIntroNPCFrames();
-
-    // Update Coin Frames
-    CoinFrame2[1] += 1;
-    if(CoinFrame2[1] >= 6)
-    {
-        CoinFrame2[1] = 0;
-        CoinFrame[1] += 1;
-        if(CoinFrame[1] >= 4)
-            CoinFrame[1] = 0;
-    }
-
-    CoinFrame2[2] += 1;
-    if(CoinFrame2[2] >= 6)
-    {
-        CoinFrame2[2] = 0;
-        CoinFrame[2] += 1;
-        if(CoinFrame[2] >= 7)
-            CoinFrame[2] = 0;
-    }
-
-    CoinFrame2[3] += 1;
-    if(CoinFrame2[3] >= 7)
-    {
-        CoinFrame2[3] = 0;
-        CoinFrame[3] += 1;
-        if(CoinFrame[3] >= 4)
-            CoinFrame[3] = 0;
-    }
 
     // clear the last-frame reset state of NPCs
     if(g_config.fix_npc_camera_logic)
@@ -2368,8 +2342,8 @@ void UpdateGraphicsScreen(Screen_t& screen)
 
                         if(p.Mount == 1)
                         {
-                            int small_h_corr
-                                = (p.State != 0)
+                            int big_h_corr
+                                = (p.State == 1)
                                 ? 0
                                 : (p.Character == 4)
                                   ? -26
@@ -2386,7 +2360,7 @@ void UpdateGraphicsScreen(Screen_t& screen)
                             drawLoc.X = pX + offX;
                             drawLoc.Y = pY + offY + toad_oy_corr;
                             drawLoc.Width = w;
-                            drawLoc.Height = pH - offY + small_h_corr;
+                            drawLoc.Height = pH - offY + big_h_corr;
 
                             int src_x = 0;
                             int src_y = 0;
@@ -3195,7 +3169,7 @@ void UpdateGraphicsScreen(Screen_t& screen)
                 int A = NPC_Draw_Queue_p.Dropped[i];
 
                 // pulse alpha during modern item drop
-                XTColor cn = (NPC[A].Effect3 != 0) ? (NPC[A].Special5 <= 45 ? XTAlpha(128 + 2 * (45 - NPC[A].Special5) + (int)(32 * cosf((float)NPC[A].Special5 / 4))) : XTAlpha(128)) : XTColor();
+                XTColor cn = (NPC[A].Effect3 != 0) ? (NPC[A].Special5 <= 66 ? XTAlpha(128 + (66 - NPC[A].Special5) + (int)(32 * cosf((float)NPC[A].Special5 / 4))) : XTAlpha(128)) : XTColor();
 
                 if(NPC[A]->WidthGFX == 0)
                 {
@@ -3211,6 +3185,14 @@ void UpdateGraphicsScreen(Screen_t& screen)
                         camY + s_round2int(NPC[A].Location.Y + NPC[A].Location.Height) + NPC[A]->FrameOffsetY - NPC[A]->HeightGFX,
                         NPC[A]->WidthGFX, NPC[A]->HeightGFX,
                         GFXNPC[NPC[A].Type], 0, NPC[A].Frame * NPC[A]->HeightGFX, cn);
+                }
+
+                if(NPC[A].Effect3 != 0 && NPC[A].Special5 <= 66)
+                {
+                    int i = (NPC[A].Special5 - 1) / 22 + 1;
+                    XRender::renderTextureBasic(camX + s_round2int(NPC[A].Location.X + NPC[A].Location.Width / 2) - GFX.Font1[i].w / 2,
+                        camY + s_round2int(NPC[A].Location.Y + NPC[A].Location.Height / 2) - GFX.Font1[i].h / 2,
+                        GFX.Font1[i]);
                 }
             }
         }
@@ -3246,7 +3228,7 @@ void UpdateGraphicsScreen(Screen_t& screen)
         }
 
         // indicate any small-screen camera features
-        if(g_config.small_screen_camera_features && screen.H < 600
+        if(g_config.small_screen_cam && screen.H < 600
             && screen.Type != 2 && screen.Type != 3 && screen.Type != 7 && (screen.Type != 5 || screen.vScreen(2).Visible))
         {
             DrawSmallScreenCam(vScreen[Z]);
@@ -3318,7 +3300,7 @@ void UpdateGraphicsMeta()
     speedRun_renderTimer();
 
     if(PrintFPS > 0 && g_config.show_fps)
-        SuperPrint(fmt::format_ne("{0}", int(PrintFPS)), 1, XRender::TargetOverscanX + 8, 8, {0, 255, 0});
+        SuperPrint(std::to_string(PrintFPS), 1, XRender::TargetOverscanX + 8, 8, {0, 255, 0});
 
     g_stats.print();
 

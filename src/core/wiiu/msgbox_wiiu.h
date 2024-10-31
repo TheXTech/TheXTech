@@ -19,31 +19,36 @@
  */
 
 #pragma once
-#ifndef GFX_SPECIAL_FRAMES_H
-#define GFX_SPECIAL_FRAMES_H
+#ifndef MSGBOXWIIU_H
+#define MSGBOXWIIU_H
 
-#include "globals.h"
+#include "../base/msgbox_base.h"
 
-// Private Sub SpecialFrames() 'update frames for special things such as coins and kuribo's shoe
-// update frames for special things such as coins and kuribo's shoe (pauses during FreezeNPCs)
-extern void SpecialFrames();//PRIVATE
-
-// updates CommonFrame and CommonFrame_Unpaused
-inline void CommonFrames()
+class MsgBoxWiiU final : public AbstractMsgBox_t
 {
-    CommonFrame++;
+    void run();
 
-    if(LevelSelect || !FreezeNPCs)
-        CommonFrame_NotFrozen++;
-}
+public:
+    MsgBoxWiiU();
+    ~MsgBoxWiiU();
 
-// NEW: update level frames that keep going during FreezeNPCs and pause
-void LevelFramesAlways();
+    void close();
 
-// NEW: update level frames that stop during FreezeNPCs (but continue during pause)
-void LevelFramesNotFrozen();
+    /*!
+     * \brief Show the simple message box
+     * \param flags Message box flags
+     * \param title Title of the message box
+     * \param message Message text
+     * \return 0 on success or a negative error code on failure
+     */
+    int simpleMsgBox(uint32_t flags, const std::string &title, const std::string &message) override;
 
-// NEW: update world frames
-void WorldFrames();
+    /*!
+     * \brief Show the error message box
+     * \param title Title of the message box
+     * \param message Text of the emssage box
+     */
+    void errorMsgBox(const std::string &title, const std::string &message) override;
+};
 
-#endif // #ifndef GFX_SPECIAL_FRAMES_H
+#endif //MSGBOXWIIU_H

@@ -490,7 +490,7 @@ void UpdateNPCs()
                                 else
                                 {
                                     NPC[numNPCs].Location.SpeedX = Physics.NPCShellSpeed;
-                                    SoundPause[3] = 1;
+                                    SoundPause[SFX_BlockHit] = 1;
                                     NewEffect(EFFID_SMOKE_S3, newLoc(NPC[A].Location.X - 16, NPC[A].Location.Y, 32, 32));
                                 }
                             }

@@ -168,7 +168,7 @@ bool PlayerF::IsHoldingSpriteType(Player_t *player, int NPC_ID)
 {
     if(player->HoldingNPC != 0)
     {
-        NPC_t *npc = NpcF::Get(player->HoldingNPC);
+        NPC_t *npc = &NPC[player->HoldingNPC];
         if(npc->Type == NPC_ID)
             return true;
     }

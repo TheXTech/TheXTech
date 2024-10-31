@@ -147,6 +147,8 @@ extern bool StartMenu;
 //Public BlockFlash As Integer
 // Note: was previously BlockFlash, manually looped by local code to 0-90. Now incremented every frame, should be used with modulus operator.
 extern uint32_t CommonFrame;
+// This one only increments when FreezeNPCs is not true. Used by shaders.
+extern uint32_t CommonFrame_NotFrozen;
 
 //Public ScrollRelease As Boolean
 extern bool ScrollRelease;
@@ -1336,7 +1338,8 @@ extern std::string g_recentWorldEditor;
 //Public ShowFPS As Boolean
 // extern bool ShowFPS;
 //Public PrintFPS As Double
-extern double PrintFPS;
+extern int PrintFPS;
+extern bool g_VanillaCam;
 
 // moved to "screen.h"
 //Public vScreen(0 To 2) As vScreen 'Sets up the players screens
@@ -1375,6 +1378,7 @@ struct SelectWorld_t
     bool editable = false;
     bool highlight = false;
     bool disabled = false;
+    bool probably_incompatible = false;
 //End Type
 };
 

@@ -24,8 +24,6 @@
 /*Private*/
 void SpecialFrames()
 {
-    CommonFrame++;
-
     SpecialFrameCount[1]++;
     if(SpecialFrameCount[1] >= 6)
     {
@@ -277,5 +275,134 @@ void LevelFramesAlways()
         BackgroundFrame[188] = BackgroundFrame[187];
         BackgroundFrame[189] = BackgroundFrame[187];
         BackgroundFrame[190] = BackgroundFrame[187];
+    }
+
+    // Update Coin Frames
+    CoinFrame2[1] += 1;
+    if(CoinFrame2[1] >= 6)
+    {
+        CoinFrame2[1] = 0;
+        CoinFrame[1] += 1;
+        if(CoinFrame[1] >= 4)
+            CoinFrame[1] = 0;
+    }
+
+    CoinFrame2[2] += 1;
+    if(CoinFrame2[2] >= 6)
+    {
+        CoinFrame2[2] = 0;
+        CoinFrame[2] += 1;
+        if(CoinFrame[2] >= 7)
+            CoinFrame[2] = 0;
+    }
+
+    CoinFrame2[3] += 1;
+    if(CoinFrame2[3] >= 7)
+    {
+        CoinFrame2[3] = 0;
+        CoinFrame[3] += 1;
+        if(CoinFrame[3] >= 4)
+            CoinFrame[3] = 0;
+    }
+}
+
+void WorldFrames()
+{
+    SceneFrame2[1] += 1;
+    if(SceneFrame2[1] >= 12)
+    {
+        SceneFrame2[1] = 0;
+        SceneFrame[1] += 1;
+        if(SceneFrame[1] >= 4)
+            SceneFrame[1] = 0;
+        SceneFrame[4] = SceneFrame[1];
+        SceneFrame[5] = SceneFrame[1];
+        SceneFrame[6] = SceneFrame[1];
+        SceneFrame[9] = SceneFrame[1];
+        SceneFrame[10] = SceneFrame[1];
+        SceneFrame[12] = SceneFrame[1];
+        SceneFrame[51] = SceneFrame[1];
+        SceneFrame[52] = SceneFrame[1];
+        SceneFrame[53] = SceneFrame[1];
+        SceneFrame[54] = SceneFrame[1];
+        SceneFrame[55] = SceneFrame[1];
+    }
+    SceneFrame2[27] += 1;
+    if(SceneFrame2[27] >= 8)
+    {
+        SceneFrame2[27] = 0;
+        SceneFrame[27] += 1;
+        if(SceneFrame[27] >= 12)
+            SceneFrame[27] = 0;
+        SceneFrame[28] = SceneFrame[27];
+        SceneFrame[29] = SceneFrame[27];
+        SceneFrame[30] = SceneFrame[27];
+    }
+    SceneFrame2[33] += 1;
+    if(SceneFrame2[33] >= 4)
+    {
+        SceneFrame2[33] = 0;
+        SceneFrame[33] = SceneFrame[27] + 1;
+        if(SceneFrame[33] >= 14)
+            SceneFrame[33] = 0;
+        SceneFrame[34] = SceneFrame[33];
+    }
+    SceneFrame2[62] += 1;
+    if(SceneFrame2[62] >= 8)
+    {
+        SceneFrame2[62] = 0;
+        SceneFrame[62] += 1;
+        if(SceneFrame[62] >= 8)
+            SceneFrame[62] = 0;
+        SceneFrame[63] = SceneFrame[62];
+    }
+    LevelFrame2[2] += 1;
+    if(LevelFrame2[2] >= 6)
+    {
+        LevelFrame2[2] = 0;
+        LevelFrame[2] += 1;
+        if(LevelFrame[2] >= 6)
+            LevelFrame[2] = 0;
+        LevelFrame[9] = LevelFrame[2];
+        LevelFrame[13] = LevelFrame[2];
+        LevelFrame[14] = LevelFrame[2];
+        LevelFrame[15] = LevelFrame[2];
+        LevelFrame[31] = LevelFrame[2];
+        LevelFrame[32] = LevelFrame[2];
+    }
+    LevelFrame2[8] += 1;
+    if(LevelFrame2[8] >= 12)
+    {
+        LevelFrame2[8] = 0;
+        LevelFrame[8] += 1;
+        if(LevelFrame[8] >= 4)
+            LevelFrame[8] = 0;
+    }
+    LevelFrame2[12] += 1;
+    if(LevelFrame2[12] >= 8)
+    {
+        LevelFrame2[12] = 0;
+        LevelFrame[12] += 1;
+        if(LevelFrame[12] >= 2)
+            LevelFrame[12] = 0;
+    }
+    LevelFrame2[25] += 1;
+    if(LevelFrame2[25] >= 8)
+    {
+        LevelFrame2[25] = 0;
+        LevelFrame[25] += 1;
+        if(LevelFrame[25] >= 4)
+            LevelFrame[25] = 0;
+        LevelFrame[26] = LevelFrame[25];
+    }
+    TileFrame2[14] += 1;
+    if(TileFrame2[14] >= 14)
+    {
+        TileFrame2[14] = 0;
+        TileFrame[14] += 1;
+        if(TileFrame[14] >= 4)
+            TileFrame[14] = 0;
+        TileFrame[27] = TileFrame[14];
+        TileFrame[241] = TileFrame[14];
     }
 }

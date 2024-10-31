@@ -303,7 +303,11 @@ void s_loadTexture(StdPicture& target, int i)
             target.h = tex_h * 2;
         }
 
-        if(TPL_GetTexture(&target.d.texture_file[i], 0, &target.d.texture[i]) != 0)
+        if(TPL_GetTextureCI(&target.d.texture_file[i], 0, &target.d.texture[i], &target.d.palette[i], GX_TLUT0) == 0)
+            target.d.texture_init[i] = 2;
+        else if(TPL_GetTexture(&target.d.texture_file[i], 0, &target.d.texture[i]) == 0)
+            target.d.texture_init[i] = true;
+        else
         {
             TPL_CloseTPLFile(&target.d.texture_file[i]);
             target.d.texture_file_init[i] = false;
@@ -313,13 +317,12 @@ void s_loadTexture(StdPicture& target, int i)
                 free(target.d.backing_texture[i]);
                 target.d.backing_texture[i] = nullptr;
             }
+
+            return;
         }
-        else
-        {
-            GX_InitTexObjFilterMode(&target.d.texture[i], GX_NEAR, GX_NEAR);
-            GX_InitTexObjWrapMode(&target.d.texture[i], GX_CLAMP, GX_CLAMP);
-            target.d.texture_init[i] = true;
-        }
+
+        GX_InitTexObjFilterMode(&target.d.texture[i], GX_NEAR, GX_NEAR);
+        GX_InitTexObjWrapMode(&target.d.texture[i], GX_CLAMP, GX_CLAMP);
     }
 }
 
@@ -1016,6 +1019,7 @@ void minport_RenderBoxUnfilled(int x1, int y1, int x2, int y2, XTColor color)
 
 inline bool GX_DrawImage_Custom(GXTexObj* img,
                                 GXTexObj* mask,
+                                GXTlutObj* palette,
                                 int16_t x, int16_t y, uint16_t w, uint16_t h,
                                 uint16_t src_x, uint16_t src_y, uint16_t src_w, uint16_t src_h,
                                 unsigned int flip,
@@ -1074,6 +1078,9 @@ inline bool GX_DrawImage_Custom(GXTexObj* img,
         }
         else
         {
+            if(palette)
+                GX_LoadTlut(palette, GX_TLUT0);
+
             GX_LoadTexObj(img, GX_TEXMAP0);
         }
 
@@ -1113,6 +1120,7 @@ inline bool GX_DrawImage_Custom(GXTexObj* img,
 
 inline bool GX_DrawImage_Custom_Basic(GXTexObj* img,
                                 GXTexObj* mask,
+                                GXTlutObj* palette,
                                 int16_t x, int16_t y, uint16_t w, uint16_t h,
                                 uint16_t src_x, uint16_t src_y,
                                 XTColor color)
@@ -1170,6 +1178,9 @@ inline bool GX_DrawImage_Custom_Basic(GXTexObj* img,
         }
         else
         {
+            if(palette)
+                GX_LoadTlut(palette, GX_TLUT0);
+
             GX_LoadTexObj(img, GX_TEXMAP0);
         }
 
@@ -1203,6 +1214,7 @@ inline bool GX_DrawImage_Custom_Basic(GXTexObj* img,
 
 inline bool GX_DrawImage_Custom_Rotated(GXTexObj* img,
                                         GXTexObj* mask,
+                                        GXTlutObj* palette,
                                         float x, float y, float w, float h,
                                         float src_x, float src_y, float src_w, float src_h,
                                         unsigned int flip, FPoint_t* center, float angle,
@@ -1236,6 +1248,7 @@ inline bool GX_DrawImage_Custom_Rotated(GXTexObj* img,
 
     GX_DrawImage_Custom(img,
                         mask,
+                        palette,
                         -cx, -cy, w, h,
                         src_x, src_y, src_w, src_h,
                         flip,
@@ -1278,6 +1291,9 @@ void minport_RenderTexturePrivate(int16_t xDst, int16_t yDst, int16_t wDst, int1
     GXTexObj* to_mask = nullptr;
     GXTexObj* to_mask_2 = nullptr;
 
+    GXTlutObj* to_palette = nullptr;
+    GXTlutObj* to_palette_2 = nullptr;
+
     if(tx.d.multi_horizontal && xSrc + wSrc > 1024)
     {
         if(wSrc > 1024)
@@ -1304,6 +1320,9 @@ void minport_RenderTexturePrivate(int16_t xDst, int16_t yDst, int16_t wDst, int1
             {
                 to_draw = &tx.d.texture[2];
 
+                if(tx.d.texture_init[2] == 2)
+                    to_palette = &tx.d.palette[2];
+
                 if(tx.d.texture_init[5])
                     to_mask = &tx.d.texture[5];
             }
@@ -1311,6 +1330,9 @@ void minport_RenderTexturePrivate(int16_t xDst, int16_t yDst, int16_t wDst, int1
             if(xSrc < 2048 && tx.d.texture_init[1])
             {
                 to_draw_2 = &tx.d.texture[1];
+
+                if(tx.d.texture_init[1] == 2)
+                    to_palette_2 = &tx.d.palette[1];
 
                 if(tx.d.texture_init[4])
                     to_mask_2 = &tx.d.texture[4];
@@ -1324,6 +1346,9 @@ void minport_RenderTexturePrivate(int16_t xDst, int16_t yDst, int16_t wDst, int1
             {
                 to_draw = &tx.d.texture[1];
 
+                if(tx.d.texture_init[1] == 2)
+                    to_palette = &tx.d.palette[1];
+
                 if(tx.d.texture_init[4])
                     to_mask = &tx.d.texture[4];
             }
@@ -1331,6 +1356,9 @@ void minport_RenderTexturePrivate(int16_t xDst, int16_t yDst, int16_t wDst, int1
             if(xSrc < 1024)
             {
                 to_draw_2 = &tx.d.texture[0];
+
+                if(tx.d.texture_init[0] == 2)
+                    to_palette_2 = &tx.d.palette[0];
 
                 if(tx.d.texture_init[3])
                     to_mask_2 = &tx.d.texture[3];
@@ -1343,11 +1371,11 @@ void minport_RenderTexturePrivate(int16_t xDst, int16_t yDst, int16_t wDst, int1
             if(rotateAngle != 0.0)
             {
                 // TODO: use correct center to support big textures being rotated
-                GX_DrawImage_Custom_Rotated(to_draw_2, to_mask_2, xDst, yDst, (1024 - xSrc) * wDst / wSrc, hDst,
+                GX_DrawImage_Custom_Rotated(to_draw_2, to_mask_2, to_palette_2, xDst, yDst, (1024 - xSrc) * wDst / wSrc, hDst,
                                             xSrc, ySrc, 1024 - xSrc, hSrc, flip, center, rotateAngle, color);
             }
             else
-                GX_DrawImage_Custom(to_draw_2, to_mask_2, xDst, yDst, (1024 - xSrc) * wDst / wSrc, hDst,
+                GX_DrawImage_Custom(to_draw_2, to_mask_2, to_palette_2, xDst, yDst, (1024 - xSrc) * wDst / wSrc, hDst,
                                     xSrc, ySrc, 1024 - xSrc, hSrc, flip, color);
 
             xDst += (1024 - xSrc) * wDst / wSrc;
@@ -1366,6 +1394,9 @@ void minport_RenderTexturePrivate(int16_t xDst, int16_t yDst, int16_t wDst, int1
             {
                 to_draw = &tx.d.texture[2];
 
+                if(tx.d.texture_init[2] == 2)
+                    to_palette = &tx.d.palette[2];
+
                 if(tx.d.texture_init[5])
                     to_mask = &tx.d.texture[5];
             }
@@ -1373,6 +1404,9 @@ void minport_RenderTexturePrivate(int16_t xDst, int16_t yDst, int16_t wDst, int1
             if(ySrc < 2048 && tx.d.texture_init[1])
             {
                 to_draw_2 = &tx.d.texture[1];
+
+                if(tx.d.texture_init[1] == 2)
+                    to_palette_2 = &tx.d.palette[1];
 
                 if(tx.d.texture_init[4])
                     to_mask_2 = &tx.d.texture[4];
@@ -1386,6 +1420,9 @@ void minport_RenderTexturePrivate(int16_t xDst, int16_t yDst, int16_t wDst, int1
             {
                 to_draw = &tx.d.texture[1];
 
+                if(tx.d.texture_init[1] == 2)
+                    to_palette = &tx.d.palette[1];
+
                 if(tx.d.texture_init[4])
                     to_mask = &tx.d.texture[4];
             }
@@ -1393,6 +1430,9 @@ void minport_RenderTexturePrivate(int16_t xDst, int16_t yDst, int16_t wDst, int1
             if(ySrc < 1024)
             {
                 to_draw_2 = &tx.d.texture[0];
+
+                if(tx.d.texture_init[0] == 2)
+                    to_palette_2 = &tx.d.palette[0];
 
                 if(tx.d.texture_init[3])
                     to_mask_2 = &tx.d.texture[3];
@@ -1405,11 +1445,11 @@ void minport_RenderTexturePrivate(int16_t xDst, int16_t yDst, int16_t wDst, int1
             if(rotateAngle != 0.0)
             {
                 // TODO: use correct center to support big textures being rotated
-                GX_DrawImage_Custom_Rotated(to_draw_2, to_mask_2, xDst, yDst, wDst, (1024 - ySrc) * hDst / hSrc,
+                GX_DrawImage_Custom_Rotated(to_draw_2, to_mask_2, to_palette_2, xDst, yDst, wDst, (1024 - ySrc) * hDst / hSrc,
                                             xSrc, ySrc, wSrc, 1024 - ySrc, flip, center, rotateAngle, color);
             }
             else
-                GX_DrawImage_Custom(to_draw_2, to_mask_2, xDst, yDst, wDst, (1024 - ySrc) * hDst / hSrc,
+                GX_DrawImage_Custom(to_draw_2, to_mask_2, to_palette_2, xDst, yDst, wDst, (1024 - ySrc) * hDst / hSrc,
                                     xSrc, ySrc, wSrc, 1024 - ySrc, flip, color);
 
             yDst += (1024 - ySrc) * hDst / hSrc;
@@ -1424,6 +1464,9 @@ void minport_RenderTexturePrivate(int16_t xDst, int16_t yDst, int16_t wDst, int1
     {
         to_draw = &tx.d.texture[0];
 
+        if(tx.d.texture_init[0] == 2)
+            to_palette = &tx.d.palette[0];
+
         if(tx.d.texture_init[3])
             to_mask = &tx.d.texture[3];
     }
@@ -1431,10 +1474,10 @@ void minport_RenderTexturePrivate(int16_t xDst, int16_t yDst, int16_t wDst, int1
     if(to_draw == nullptr) return;
 
     if(rotateAngle != 0.0)
-        GX_DrawImage_Custom_Rotated(to_draw, to_mask, xDst, yDst, wDst, hDst,
+        GX_DrawImage_Custom_Rotated(to_draw, to_mask, to_palette, xDst, yDst, wDst, hDst,
                                     xSrc, ySrc, wSrc, hSrc, flip, center, rotateAngle, color);
     else
-        GX_DrawImage_Custom(to_draw, to_mask, xDst, yDst, wDst, hDst,
+        GX_DrawImage_Custom(to_draw, to_mask, to_palette, xDst, yDst, wDst, hDst,
                             xSrc, ySrc, wSrc, hSrc, flip, color);
 }
 
@@ -1458,6 +1501,9 @@ void minport_RenderTexturePrivate_Basic(int16_t xDst, int16_t yDst, int16_t wDst
     GXTexObj* to_mask = nullptr;
     GXTexObj* to_mask_2 = nullptr;
 
+    GXTlutObj* to_palette = nullptr;
+    GXTlutObj* to_palette_2 = nullptr;
+
     if(tx.d.multi_horizontal && xSrc + wDst > 1024)
     {
         if(wDst > 1024)
@@ -1480,6 +1526,9 @@ void minport_RenderTexturePrivate_Basic(int16_t xDst, int16_t yDst, int16_t wDst
             {
                 to_draw = &tx.d.texture[2];
 
+                if(tx.d.texture_init[2] == 2)
+                    to_palette = &tx.d.palette[2];
+
                 if(tx.d.texture_init[5])
                     to_mask = &tx.d.texture[5];
             }
@@ -1487,6 +1536,9 @@ void minport_RenderTexturePrivate_Basic(int16_t xDst, int16_t yDst, int16_t wDst
             if(xSrc < 2048 && tx.d.texture_init[1])
             {
                 to_draw_2 = &tx.d.texture[1];
+
+                if(tx.d.texture_init[1] == 2)
+                    to_palette_2 = &tx.d.palette[1];
 
                 if(tx.d.texture_init[4])
                     to_mask_2 = &tx.d.texture[4];
@@ -1500,6 +1552,9 @@ void minport_RenderTexturePrivate_Basic(int16_t xDst, int16_t yDst, int16_t wDst
             {
                 to_draw = &tx.d.texture[1];
 
+                if(tx.d.texture_init[1] == 2)
+                    to_palette = &tx.d.palette[1];
+
                 if(tx.d.texture_init[4])
                     to_mask = &tx.d.texture[4];
             }
@@ -1507,6 +1562,9 @@ void minport_RenderTexturePrivate_Basic(int16_t xDst, int16_t yDst, int16_t wDst
             if(xSrc < 1024)
             {
                 to_draw_2 = &tx.d.texture[0];
+
+                if(tx.d.texture_init[0] == 2)
+                    to_palette_2 = &tx.d.palette[0];
 
                 if(tx.d.texture_init[3])
                     to_mask_2 = &tx.d.texture[3];
@@ -1516,7 +1574,7 @@ void minport_RenderTexturePrivate_Basic(int16_t xDst, int16_t yDst, int16_t wDst
         // draw the left pic
         if(to_draw_2 != nullptr)
         {
-            GX_DrawImage_Custom_Basic(to_draw_2, to_mask_2, xDst, yDst, 1024 - xSrc, hDst,
+            GX_DrawImage_Custom_Basic(to_draw_2, to_mask_2, to_palette_2, xDst, yDst, 1024 - xSrc, hDst,
                                 xSrc, ySrc, color);
 
             xDst += 1024 - xSrc;
@@ -1534,6 +1592,9 @@ void minport_RenderTexturePrivate_Basic(int16_t xDst, int16_t yDst, int16_t wDst
             {
                 to_draw = &tx.d.texture[2];
 
+                if(tx.d.texture_init[2] == 2)
+                    to_palette = &tx.d.palette[2];
+
                 if(tx.d.texture_init[5])
                     to_mask = &tx.d.texture[5];
             }
@@ -1541,6 +1602,9 @@ void minport_RenderTexturePrivate_Basic(int16_t xDst, int16_t yDst, int16_t wDst
             if(ySrc < 2048 && tx.d.texture_init[1])
             {
                 to_draw_2 = &tx.d.texture[1];
+
+                if(tx.d.texture_init[1] == 2)
+                    to_palette_2 = &tx.d.palette[1];
 
                 if(tx.d.texture_init[4])
                     to_mask_2 = &tx.d.texture[4];
@@ -1554,6 +1618,9 @@ void minport_RenderTexturePrivate_Basic(int16_t xDst, int16_t yDst, int16_t wDst
             {
                 to_draw = &tx.d.texture[1];
 
+                if(tx.d.texture_init[1] == 2)
+                    to_palette = &tx.d.palette[1];
+
                 if(tx.d.texture_init[4])
                     to_mask = &tx.d.texture[4];
             }
@@ -1561,6 +1628,9 @@ void minport_RenderTexturePrivate_Basic(int16_t xDst, int16_t yDst, int16_t wDst
             if(ySrc < 1024)
             {
                 to_draw_2 = &tx.d.texture[0];
+
+                if(tx.d.texture_init[0] == 2)
+                    to_palette_2 = &tx.d.palette[0];
 
                 if(tx.d.texture_init[3])
                     to_mask_2 = &tx.d.texture[3];
@@ -1570,7 +1640,7 @@ void minport_RenderTexturePrivate_Basic(int16_t xDst, int16_t yDst, int16_t wDst
         // draw the top pic
         if(to_draw_2 != nullptr)
         {
-            GX_DrawImage_Custom_Basic(to_draw_2, to_mask_2, xDst, yDst, wDst, 1024 - ySrc,
+            GX_DrawImage_Custom_Basic(to_draw_2, to_mask_2, to_palette_2, xDst, yDst, wDst, 1024 - ySrc,
                                 xSrc, ySrc, color);
 
             yDst += (1024 - ySrc);
@@ -1584,13 +1654,16 @@ void minport_RenderTexturePrivate_Basic(int16_t xDst, int16_t yDst, int16_t wDst
     {
         to_draw = &tx.d.texture[0];
 
+        if(tx.d.texture_init[0] == 2)
+            to_palette = &tx.d.palette[0];
+
         if(tx.d.texture_init[3])
             to_mask = &tx.d.texture[3];
     }
 
     if(to_draw == nullptr) return;
 
-    GX_DrawImage_Custom_Basic(to_draw, to_mask, xDst, yDst, wDst, hDst,
+    GX_DrawImage_Custom_Basic(to_draw, to_mask, to_palette, xDst, yDst, wDst, hDst,
                         xSrc, ySrc, color);
 }
 

@@ -55,11 +55,12 @@ struct StdPictureData
     // possible backing data
     bool texture_file_init[3] = {false, false, false};
     TPLFile texture_file[3];
+    GXTlutObj palette[3];
 
     void* backing_texture[6] = {nullptr, nullptr, nullptr, nullptr, nullptr, nullptr};
 
     // 3 slots per texture, 3 masks also
-    bool texture_init[6] = {false, false, false, false, false, false};
+    uint8_t texture_init[6] = {false, false, false, false, false, false};
 
     GXTexObj texture[6];
 

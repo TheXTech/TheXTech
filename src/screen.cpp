@@ -111,6 +111,8 @@ void Screen_t::set_canonical_screen(uint8_t index)
 
         canScreen.m_CanonicalScreen = 0;
         canScreen.players = players;
+        canScreen.two_screen_pref = two_screen_pref;
+        canScreen.four_screen_pref = four_screen_pref;
     }
 }
 
@@ -124,6 +126,9 @@ int Screen_t::active_begin() const
 
 int Screen_t::active_end() const
 {
+    if(!is_active())
+        return 0;
+
     if(Type == ScreenTypes::SingleCoop && SingleCoop == 2)
         return 2;
 

@@ -182,9 +182,11 @@ void PlayerVineMovement(int A)
     if(g_config.fix_climb_bgo_speed_adding && Player[A].VineBGO > 0)
     {
         const Layer_t& layer = Layer[Background[Player[A].VineBGO].Layer];
-
-        Player[A].Location.SpeedX += layer.ApplySpeedX;
-        Player[A].Location.SpeedY += layer.ApplySpeedY;
+        if(g_config.enable_climb_bgo_layer_move)
+        {
+            Player[A].Location.SpeedX += layer.ApplySpeedX;
+            Player[A].Location.SpeedY += layer.ApplySpeedY;
+        }
     }
     else
     {

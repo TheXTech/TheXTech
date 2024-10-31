@@ -49,9 +49,15 @@
 typedef WindowSDL WindowUsed;
 #   define USE_CORE_WINDOW_SDL
 
-#   include "core/sdl/msgbox_sdl.h"
+#   ifdef __WIIU__
+#       include "core/wiiu/msgbox_wiiu.h"
+typedef MsgBoxWiiU MsgBoxUsed;
+#       define SDL_CORE_MSGBOX_WIIU
+#   else
+#       include "core/sdl/msgbox_sdl.h"
 typedef MsgBoxSDL MsgBoxUsed;
-#   define USE_CORE_MSGBOX_SDL
+#       define SDL_CORE_MSGBOX_SDL
+#   endif
 
 #   include "core/sdl/events_sdl.h"
 typedef EventsSDL EventsUsed;
@@ -157,8 +163,10 @@ bool FrmMain::initSystem(const CmdLineSetup_t &setup)
 #ifdef MSGBOX_CUSTOM
     D_pLogDebugNA("FrmMain: Loading XMsgBox...");
     res &= XMsgBox::init();
-#elif defined(USE_CORE_WINDOW_SDL) && defined(USE_CORE_MSGBOX_SDL)
+#elif defined(USE_CORE_WINDOW_SDL) && defined(SDL_CORE_MSGBOX_SDL)
     msgbox->init(window->getWindow());
+#elif defined(SDL_CORE_MSGBOX_WIIU)
+    // Nothing to do for Wii U
 #else
 #   error "FIXME: Implement supported message boxes initialization here"
 #endif

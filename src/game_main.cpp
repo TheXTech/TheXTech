@@ -343,8 +343,15 @@ int GameMain(const CmdLineSetup_t &setup)
     gfxLoaderTestMode = setup.testLevelMode;
 
     // find asset pack and load required UI graphics
-    if(!InitUIAssetsFrom(setup.assetPack))
-        return 1;
+    bool init_failure = !InitUIAssetsFrom(setup.assetPack);
+
+    if(init_failure)
+    {
+        if(!setup.assetPack.empty())
+            return 1;
+
+        FontManager::initFallback();
+    }
 
 //    If LevelEditor = False Then
 //        frmMain.Show // Show window a bit later
@@ -361,7 +368,8 @@ int GameMain(const CmdLineSetup_t &setup)
     XEvents::doEvents();
 
 #ifdef __EMSCRIPTEN__ // Workaround for a recent Chrome's policy to avoid sudden sound without user's interaction
-    FontManager::initFull();
+    if(!init_failure)
+        FontManager::initFull();
 
     XWindow::show(); // Don't show window until playing an initial sound
 
@@ -385,7 +393,7 @@ int GameMain(const CmdLineSetup_t &setup)
 #endif
     XWindow::show(); // Don't show window until playing an initial sound
 
-    if(!setup.testLevelMode)
+    if(!setup.testLevelMode && !init_failure)
         PlayInitSound();
 
 #ifdef THEXTECH_INTERPROC_SUPPORTED
@@ -407,7 +415,7 @@ int GameMain(const CmdLineSetup_t &setup)
         ScreenAssetPack::g_LoopActive = true;
     }
     // normal case: load everything and go to menu
-    else
+    else if(!init_failure)
         MainLoadAll();
 
     LevelSelect = true; // world map is to be shown
@@ -423,7 +431,30 @@ int GameMain(const CmdLineSetup_t &setup)
     if(!g_config.background_work && !XWindow::hasWindowInputFocus())
         SoundPauseEngine(1);
 
-    if(cmdline_content) // Start level testing immediately!
+    if(init_failure)
+    {
+        GameMenu = false;
+        LevelSelect = false;
+        gSMBXHUDSettings.skip = true;
+        numPlayers = 1;
+        InitScreens();
+        Screens_AssignPlayer(1, *l_screen);
+        QuickReconnectScreen::g_active = true;
+        MessageText = "Fatal: no assets!\nExtract a game/asset pack to:\n";
+        for(auto& i : AppPathManager::assetsSearchPath())
+        {
+            MessageText += "\n";
+            MessageText += i.first;
+
+            if(i.second == AppPathManager::Legacy)
+                MessageText += "assets/<pack-id>/";
+            else if(i.second == AppPathManager::Multiple)
+                MessageText += "<pack-id>/";
+        }
+        PauseGame(PauseCode::Message);
+        GameIsActive = false;
+    }
+    else if(cmdline_content) // Start level testing immediately!
     {
         bool is_world = (Files::hasSuffix(setup.testLevel, ".wld") || Files::hasSuffix(setup.testLevel, ".wldx"));
 
@@ -552,7 +583,7 @@ int GameMain(const CmdLineSetup_t &setup)
         }
     }
 
-    do
+    while(GameIsActive)
     {
         if(GameMenu || MagicHand || LevelEditor || ScreenAssetPack::g_LoopActive)
         {
@@ -588,6 +619,10 @@ int GameMain(const CmdLineSetup_t &setup)
             // ScreenType = 0; // set in SetupScreens()
             XEvents::doEvents();
             SetupEditorGraphics(); //Set up the editor graphics
+
+            g_VanillaCam = false;
+            UpdateInternalRes();
+
             InitScreens();
 
             for(int i = 0; i < maxLocalPlayers; i++)
@@ -828,7 +863,10 @@ int GameMain(const CmdLineSetup_t &setup)
             g_ClonedPlayerMode = false;
             g_CheatLogicScreen = false;
             g_CheatEditYourFriends = false;
+            g_VanillaCam = false;
             XRender::unloadGifTextures();
+
+            UpdateInternalRes();
 
             // reset l_screen to index 0
             Screens[0] = *l_screen;
@@ -1000,7 +1038,7 @@ int GameMain(const CmdLineSetup_t &setup)
 
 //                if(!GoToLevelNoGameThing)
 //                    PlaySound(SFX_LevelSelect);
-                SoundPause[26] = 2000;
+                SoundPause[SFX_Slide] = 2000;
 
                 LevelSelect = false;
 
@@ -1135,6 +1173,9 @@ int GameMain(const CmdLineSetup_t &setup)
                     else
                         p.Warp = ReturnWarp;
 
+                    if(p.Warp > maxWarps)
+                        break;
+
                     p.WarpBackward = false;
                     auto &warp = Warp[p.Warp];
 
@@ -1179,7 +1220,7 @@ int GameMain(const CmdLineSetup_t &setup)
 
                         PlayerFrame(p);
                         CheckSection(A);
-                        SoundPause[17] = 0;
+                        SoundPause[SFX_Warp] = 0;
                         p.Effect = PLREFF_WAITING;
                         p.Effect2 = 950;
                     }
@@ -1220,24 +1261,31 @@ int GameMain(const CmdLineSetup_t &setup)
             // ---------------------------------------
             bool hasPlayerPoint = false;
             bool hasStartWarp = (Player[1].Warp > 0);
+            bool hasCrashStartWarp = (Player[1].Warp > maxWarps);
             bool hasValidStartWarp = (Player[1].Warp > 0 && Player[1].Warp <= numWarps);
             bool startError = false;
 
             for(int i = 1; i <= numPlayers && i <= 2; ++i)
                 hasPlayerPoint |= !PlayerStart[i].isNull();
 
-            if(hasStartWarp && !hasValidStartWarp)
+            if(hasCrashStartWarp)
             {
+                // this case would have crashed SMBX 1.3.
                 MessageText = fmt::format_ne(g_gameStrings.errorInvalidEnterWarp,
                                              FullFileName,
                                              Player[1].Warp,
                                              numWarps);
                 startError = true;
+                Player[1].Warp = 0;
             }
-            else if(!hasPlayerPoint && !hasStartWarp)
+            else if(!hasPlayerPoint && !hasValidStartWarp)
             {
                 MessageText = fmt::format_ne(g_gameStrings.errorNoStartPoint, FullFileName);
                 startError = true;
+            }
+            else if(hasStartWarp && !hasValidStartWarp)
+            {
+                pLogWarning("Level start: warp %d requested, but only %d warps present.", Player[1].Warp, numWarps);
             }
 
             if(startError) // Quit the level because of error
@@ -1419,7 +1467,7 @@ int GameMain(const CmdLineSetup_t &setup)
             } // TestLevel
         }
 
-    } while(GameIsActive);
+    }
 
     Integrator::quitIntegrations();
 
@@ -1441,7 +1489,7 @@ void EditorLoop()
     UpdateEffects();
     if(WorldEditor)
         UpdateGraphics2();
-    else
+    else if(LevelEditor)
         UpdateGraphics();
 
     updateScreenFaders();
@@ -2218,7 +2266,7 @@ void StartEpisode()
     {
         // TODO: why did Wohlstand disable this?
         PlaySoundMenu(SFX_LevelSelect);
-        SoundPause[26] = 200;
+        SoundPause[SFX_Slide] = 200;
         LevelSelect = false;
 
         ResetSoundFX();

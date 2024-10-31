@@ -320,6 +320,8 @@ InputMethodProfile_3DS::InputMethodProfile_3DS()
     this->m_editor_keys[EditorControls::Buttons::NextSection] = KEYID_DRIGHT;
     this->m_editor_keys[EditorControls::Buttons::SwitchScreens] = KEYID_SELECT;
     this->m_editor_keys[EditorControls::Buttons::TestPlay] = KEYID_START;
+
+    this->m_hotkeys[Hotkeys::Buttons::VanillaCam] = KEYID_L;
 }
 
 bool InputMethodProfile_3DS::PollPrimaryButton(ControlsClass c, size_t i)

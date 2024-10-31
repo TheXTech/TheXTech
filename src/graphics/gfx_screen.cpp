@@ -36,6 +36,8 @@ void SetScreenType(Screen_t& screen)
     if(!screen.is_active())
         return;
 
+    auto old_type = screen.Type;
+
     // moved this code from game_main.cpp, but it occured elsewhere also
     //   it was always called before setup screens, now it is a part of setup screens.
     //   better to have it in one place so it can be updated
@@ -73,6 +75,13 @@ void SetScreenType(Screen_t& screen)
         screen.Type = ScreenTypes::Credits;
     if(LevelEditor)
         screen.Type = ScreenTypes::SinglePlayer;
+
+#ifndef PGE_MIN_PORT
+    if(&screen == l_screen && (old_type == ScreenTypes::Quad) != (screen.Type == ScreenTypes::Quad))
+        UpdateInternalRes();
+#else
+    (void)old_type;
+#endif
 }
 
 // Sets up the split lines

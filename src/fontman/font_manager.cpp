@@ -418,6 +418,33 @@ static void s_initFontsFallback()
 }
 
 
+void FontManager::initFallback()
+{
+    if(g_fontManagerIsInit)
+        return;
+
+#ifdef THEXTECH_ENABLE_TTF_SUPPORT
+    g_defaultTtfFont = nullptr;
+#endif
+
+    g_double_pixled = false; //ConfigManager::setup_fonts.double_pixled;
+
+    for(int i = 0; i < c_smbxFontsMapMax; ++i)
+    {
+        s_smbxFontsMap[i] = -1;
+        s_smbxFontsSizesMap[i] = -1;
+    }
+
+    s_initFontsFallback();
+
+    // use fallback font for everything
+    for(int i = 0; i < c_smbxFontsMapMax; ++i)
+    {
+        s_smbxFontsMap[i] = s_smbxFontsMap[4];
+        s_smbxFontsSizesMap[i] = s_smbxFontsSizesMap[4];
+    }
+}
+
 void FontManager::initFull()
 {
 #ifdef THEXTECH_ENABLE_TTF_SUPPORT

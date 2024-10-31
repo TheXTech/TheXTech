@@ -29,6 +29,7 @@
 #include "../main/record.h"
 #include "../main/speedrunner.h"
 #include "message.h"
+#include "change_res.h"
 
 #include "core/render.h"
 #include "core/window.h"
@@ -125,6 +126,21 @@ void Hotkeys::Activate(size_t i, int player)
         return;
     }
 #endif
+
+    case Buttons::VanillaCam:
+        if(!GameMenu && !GameOutro && !LevelEditor && !BattleMode && (g_VanillaCam || l_screen->W != l_screen->canonical_screen().W || l_screen->H != l_screen->canonical_screen().H))
+        {
+            g_VanillaCam = !g_VanillaCam;
+            SoundPause[SFX_Camera] = 0;
+            PlaySoundMenu(SFX_Camera);
+            UpdateInternalRes();
+        }
+        else
+        {
+            PlaySoundMenu(SFX_BlockHit);
+        }
+
+        return;
 
     case Buttons::DebugInfo:
         g_stats.next_page();

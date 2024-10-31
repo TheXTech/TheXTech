@@ -363,8 +363,13 @@ void SetupCredits()
     AddCredit("Savby"); // For important design work on the character select screen (ConnectScreen)
     AddCredit("Otabo"); /* For the "Sarasaland Adventure" projects (both 1 and 2) that was being widely used in
                            tests and debugs: and also, they introduced the SMBX to me (Vitaliy), in 2013
-                           and inspired me to all my future projects (Moondust Project and TheXTech).
-                        */  // --- P.S. Put all next lines under THIS comment line. ---
+                           and inspired me to all my future projects (Moondust Project and TheXTech). */
+    AddCredit("Krissy Silvermoon"); // For testing and design feedback since 2021 until at least 2024
+    AddCredit("Bubble"); // For bugtesting in 2021-2022
+    AddCredit("Trickii"); // For extensive bugtesting in 2024
+    AddCredit("AntonioGZZ96"); // For careful bugtesting in 2024
+    AddCredit("ddrsoul"); // For sharing the engine with the PortMaster community
+    // --- P.S. Put all next lines above THIS comment line. ---
 #endif
     AddCredit("");
     AddCredit("4matsy");

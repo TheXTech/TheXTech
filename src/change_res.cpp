@@ -73,14 +73,23 @@ void ChangeRes(int, int, int, int)
 
 void UpdateInternalRes()
 {
-    bool ignore_compat = GameMenu && (g_config.speedrun_mode.m_set < ConfigSetLevel::cmdline);
+    bool ignore_compat = LevelEditor || (GameMenu && g_config.speedrun_mode.m_set < ConfigSetLevel::cmdline);
 
     int req_w = g_config.internal_res.m_value.first;
     int req_h = g_config.internal_res.m_value.second;
 
-    // TODO: use the correct canonical screen's resolution here
-    int canon_w = 800;
-    int canon_h = 600;
+#ifndef PGE_MIN_PORT
+    if(l_screen->Type == ScreenTypes::Quad && g_config.internal_res_4p.m_value.first != 0)
+    {
+        req_w = g_config.internal_res_4p.m_value.first;
+        req_h = g_config.internal_res_4p.m_value.second;
+        ignore_compat = true;
+    }
+#endif
+
+    // use the correct canonical screen's resolution here
+    int canon_w = l_screen->canonical_screen().W;
+    int canon_h = l_screen->canonical_screen().H;
 
     if(!g_config.allow_multires && !ignore_compat)
     {
@@ -226,6 +235,12 @@ void UpdateInternalRes()
         }
     }
 
+    if(LevelEditor || MagicHand)
+    {
+        XRender::TargetW = SDL_max(XRender::TargetW, 640);
+        XRender::TargetH = SDL_max(XRender::TargetH, 480);
+    }
+
 #ifdef __3DS__
     if(g_config.allow_multires || ignore_compat)
         XRender::TargetW += XRender::MAX_3D_OFFSET * 2;
@@ -244,6 +259,14 @@ void UpdateInternalRes()
     }
     else
     {
+        l_screen->W = canon_w;
+        l_screen->H = canon_h;
+    }
+
+    if(!GameMenu && !GameOutro && !LevelEditor && !BattleMode && g_VanillaCam)
+    {
+        XRender::TargetW = SDL_max(XRender::TargetW, canon_w);
+        XRender::TargetH = SDL_max(XRender::TargetH, canon_h);
         l_screen->W = canon_w;
         l_screen->H = canon_h;
     }

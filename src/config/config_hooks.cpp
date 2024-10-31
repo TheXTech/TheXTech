@@ -51,6 +51,7 @@ extern bool g_configInTransaction;
 
 void config_res_set()
 {
+    g_VanillaCam = false;
     if(GameIsActive && (GameMenu || GamePaused == PauseCode::Options || g_config.internal_res.m_set == ConfigSetLevel::cheat))
         UpdateWindowRes();
     UpdateInternalRes();

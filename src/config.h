@@ -443,7 +443,7 @@ public:
 
     // static constexpr bool record_gameplay_data = false;
 
-    opt<bool> pick_assets_on_start{this, defaults(false), {}, Scope::Config,
+    opt<bool> pick_assets_on_start{this, defaults(true), {}, Scope::Config,
         "choose-assets-on-launch", "Choose assets on launch", nullptr};
 
     opt<bool> record_gameplay_data{this, defaults(false), {}, Scope::Config,
@@ -539,6 +539,20 @@ public:
         },
         defaults(SCALE_DOWN_SAFE), {}, Scope::Config,
         "scale-down-textures", "Scale down images", "Store images as 1x to save memory"};
+#endif
+
+#ifndef PGE_MIN_PORT
+    opt_enum<std::pair<int, int>> internal_res_4p{this,
+        {
+            {{0, 0}, "default", "Default"},
+            {{1920, 1080}, "fhd", "1920x1080 (FHD)"},
+            {{1600, 1200}, "qsmbx", "1600x1200 (QSMBX)"},
+            {{2560, 1440}, "qhd", "2560x1440 (QHD)"},
+        },
+        defaults(std::pair<int, int>({0, 0})), {}, Scope::Config,
+        "internal-res-4p", "4P split screen size", nullptr,
+        config_res_set
+    };
 #endif
 
 #ifndef THEXTECH_NO_SDL_BUILD
@@ -679,10 +693,6 @@ public:
     // /* ---- Prefs - Effects ----*/
     // subsection effects{this, "effects", "Visual Effects"};
 
-    // opt<bool> small_screen_camera_features{this, defaults(true), {VER_THEXTECH137}, Scope::Config,
-    //     "small-screen-camera-features", "Small screen camera features", "Camera optimizations that improve the experience at low resolutions"};
-    static constexpr bool small_screen_camera_features = true;
-
 
 
     /* ---- Compatibility ----*/
@@ -743,8 +753,10 @@ public:
     opt<bool> world_map_fast_move{this, defaults(true), {CompatClass::standard_update, false}, Scope::Creator,
         "world-map-fast-move", "Automatic movement", "Moves automatically between forks on the path"};
 
-    opt<bool> modern_item_drop{this, defaults(true), {CompatClass::standard_update, false}, Scope::Creator,
-        "modern-item-drop", "Modern item drop", "Experimental implementation of modern item drop"};
+    // opt<bool> modern_item_drop{this, defaults(true), {CompatClass::standard_update, false}, Scope::Creator,
+    //     "modern-item-drop", "Modern item drop", "Experimental implementation of modern item drop"};
+    opt<bool> small_screen_cam{this, defaults(true), {CompatClass::standard_update, false}, Scope::None,
+        "small-screen-cam", "Small screen camera", "Camera panning and control"};
 
     opt<bool> disable_spin_jump{this, defaults(false), {CompatClass::critical_update, false}, Scope::Creator,
         "disable-spin-jump", "Disable spin jump", "The alt jump key should trigger an ordinary jump instead of a spin jump"};
@@ -788,8 +800,8 @@ public:
         "fix-climb-invisible-fences", "Don't climb hidden fences", nullptr};
     opt<bool> fix_climb_bgo_speed_adding{this, defaults(true), {CompatClass::standard_update, false}, Scope::CreatorFile,
         "fix-climb-bgo-speed-adding", "Climb BGO speed adding", nullptr};
-    opt<bool> fix_climb_bgo_layer_move{this, defaults(true), {CompatClass::standard_update, false}, Scope::CreatorFile,
-        "enable-climb-bgo-layer-move", "Climb moving BGOs", nullptr};
+    opt<bool> enable_climb_bgo_layer_move{this, defaults(true), {CompatClass::standard_update, false}, Scope::CreatorFile,
+        "enable-climb-bgo-layer-move", "Move with climbable BGOs", "Player will move together with the climbable BGO on the moving layer as on vines"};
     opt<bool> fix_skull_raft{this, defaults(true), {CompatClass::standard_update, false}, Scope::CreatorFile,
         "fix-skull-raft", "Skull raft", nullptr};
     opt<bool> fix_char3_escape_shell_surf{this, defaults(true), {CompatClass::critical_update, false}, Scope::CreatorFile,

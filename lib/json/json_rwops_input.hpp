@@ -83,7 +83,7 @@ public:
             m_temp_buf_end = SDL_RWread(m_rwops, &m_temp_buf[0], 1, sizeof(m_temp_buf));
 
             if(m_temp_buf_end == 0)
-                rwops::char_traits<uint8_t>::eof();
+                return rwops::char_traits<uint8_t>::eof();
         }
 
         return m_temp_buf[m_temp_buf_cur++];

@@ -311,7 +311,6 @@
             "gameCopySave": "Copiar guardar"
         },
         "editor": {
-            "errorResolution": "Lo sentimos. El editor del juego no es compatible con tu resolución actual.",
             "newWorld": "<Nuevo Mundo>",
             "errorMissingResources": "Lo sentimos. Te falta {0}, necesario para el editor del juego.",
             "promptNewWorldName": "Nuevo nombre del mundo",

@@ -55,6 +55,12 @@ public:
 
         void init_from_mem(const unsigned char* data, size_t size);
 
+        inline void take_ownership_of_mem(const unsigned char* data, size_t size)
+        {
+            init_from_mem(data, size);
+            m_free_me = true;
+        }
+
         // if the buffer is malloc-allocated, disowns it and allows the client to take management of it
         FILES_NODISCARD_ATTR void* disown();
 

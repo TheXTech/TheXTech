@@ -513,7 +513,7 @@ void RenderGL::repaint()
     if(m_current_frame % 512 == 0)
         cleanupDrawQueues();
 
-    m_shader_clock = (GLfloat)((m_current_frame) % (65 * 60)) / 65.0f;
+    m_shader_clock = (GLfloat)((CommonFrame_NotFrozen) % (65 * 60)) / 65.0f;
 
 #if 0
     GLuint err;
@@ -1032,9 +1032,9 @@ void RenderGL::loadTextureInternal(StdPicture &target, uint32_t width, uint32_t 
 #endif
 }
 
-void RenderGL::loadTextureInternal(StdPicture &target, uint32_t width, uint32_t height, uint8_t *RGBApixels, uint32_t pitch)
+void RenderGL::loadTextureInternal(StdPicture &target, uint32_t width, uint32_t height, uint8_t *RGBApixels, uint32_t pitch, uint32_t mask_width, uint32_t mask_height)
 {
-    loadTextureInternal(target, width, height, RGBApixels, pitch, false, width, height);
+    loadTextureInternal(target, width, height, RGBApixels, pitch, false, mask_width, mask_height);
 }
 
 void RenderGL::loadTextureMask(StdPicture &target, uint32_t mask_width, uint32_t mask_height, uint8_t *RGBApixels, uint32_t pitch, uint32_t image_width, uint32_t image_height)

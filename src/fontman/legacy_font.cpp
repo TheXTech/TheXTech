@@ -20,6 +20,8 @@
 #include <algorithm>
 #include "sdl_proxy/sdl_stdinc.h"
 
+#include "hardcoded_font.h"
+
 #include "legacy_font.h"
 #include "gfx.h"
 #include "std_picture.h"
@@ -257,6 +259,10 @@ PGE_Size LegacyFont::printText(const char* text, size_t text_size, int32_t x, in
 {
     if(m_charMap.empty() || !text || text_size == 0)
         return PGE_Size(0, 0);
+
+    // load fallback texture if needed
+    if(m_textures[0] == &GFX.Font2[3] && !m_textures[0]->d.hasTexture())
+        LoadHardcodedFont(*m_textures[0]);
 
     int32_t  offsetX = (crop_info) ? -crop_info->offset : 0;
     uint32_t offsetY = 0;

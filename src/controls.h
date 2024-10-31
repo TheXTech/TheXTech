@@ -405,6 +405,7 @@ enum Buttons : size_t
 #ifdef PGE_ENABLE_VIDEO_REC
     RecordGif,
 #endif
+    VanillaCam,
     DebugInfo, EnterCheats,
     ToggleHUD, LegacyPause,
 #ifdef DEBUG_BUILD
@@ -431,6 +432,8 @@ inline const char *GetButtonName_INI(size_t i)
     case Buttons::RecordGif:
         return "record-gif";
 #endif
+    case Buttons::VanillaCam:
+        return "vanilla-cam";
     case Buttons::DebugInfo:
         return "debug-info";
     case Buttons::EnterCheats:
@@ -466,6 +469,8 @@ inline const char *GetButtonName_UI_Init(size_t i)
 #endif
     case Buttons::DebugInfo:
         return "Debug Info";
+    case Buttons::VanillaCam:
+        return "Vanilla Cam";
     case Buttons::EnterCheats:
         return "Enter Code";
     case Buttons::ToggleHUD:

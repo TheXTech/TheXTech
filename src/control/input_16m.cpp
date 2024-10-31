@@ -300,6 +300,8 @@ InputMethodProfile_16M::InputMethodProfile_16M()
     this->m_editor_keys[EditorControls::Buttons::NextSection] = KEYID_R;
     this->m_editor_keys[EditorControls::Buttons::SwitchScreens] = KEYID_SELECT;
     this->m_editor_keys[EditorControls::Buttons::TestPlay] = KEYID_START;
+
+    this->m_hotkeys[Hotkeys::Buttons::VanillaCam] = KEYID_L;
 }
 
 bool InputMethodProfile_16M::PollPrimaryButton(ControlsClass c, size_t i)

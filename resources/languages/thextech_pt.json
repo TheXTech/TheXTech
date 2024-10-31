@@ -532,7 +532,6 @@
         "editor": {
             "promptNewWorldName": "Nome do novo mundo",
             "errorMissingResources": "Desculpe! {0} falta, é necessário para o editor no jogo.",
-            "errorResolution": "Desculpe! O editor no jogo não é suportado na resolução atual.",
             "battles": "<Níveis de Batalha>",
             "newWorld": "<Novo Mundo>"
         },

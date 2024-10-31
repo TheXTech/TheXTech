@@ -38,6 +38,8 @@
 #include "config.h"
 #include "frame_timer.h"
 
+#include "fontman/hardcoded_font.h"
+
 #include "core/render.h"
 #include "core/minport/render_minport_shared.h"
 
@@ -100,6 +102,39 @@ struct tex_load_data
 };
 
 static std::vector<tex_load_data> s_texture_load_queue;
+
+static inline uint8_t s_fb_lookup(uint8_t p)
+{
+    return ((p & 3) == 3) ? 0x11 :
+        (p & 2) ? 0x01 :
+        (p & 1) ? 0x10 :
+        0x00;
+}
+
+inline uint8_t* s_load_hardcoded_font()
+{
+    uint8_t* ret = (uint8_t*)calloc(32 + 1024 * 4, 1);
+
+    if(!ret)
+        return nullptr;
+
+    ret[2] = 255;
+    ret[3] = 255;
+
+    auto i = c_hardcoded_font_bytes.cbegin();
+    uint8_t* o = ret + 32;
+
+    while(i != c_hardcoded_font_bytes.cend())
+    {
+        uint8_t row = *(i++);
+        *(o++) = s_fb_lookup(row >> 6);
+        *(o++) = s_fb_lookup(row >> 4);
+        *(o++) = s_fb_lookup(row >> 2);
+        *(o++) = s_fb_lookup(row >> 0);
+    }
+
+    return ret;
+}
 
 static int s_loadTextureToRAM(tex_load_data& tex, const std::string& path, int logical_w, int logical_h, int flags)
 {
@@ -168,8 +203,19 @@ static int s_loadTextureToRAM(tex_load_data& tex, const std::string& path, int l
     }
 
 
+    // check for hardcoded font
+    const char* path_str = path.c_str();
+
+    if(path_str[0] == '!' && path_str[1] == 'F' && path_str[2] == '\0')
+    {
+        uint8_t* data = s_load_hardcoded_font();
+
+        if(data)
+            tex.data.take_ownership_of_mem(data, 32 + 1024 * 4);
+    }
     // load the file to RAM!
-    tex.data = Files::load_file(path);
+    else
+        tex.data = Files::load_file(path);
 
     // this can go wrong if the file doesn't exist or if the allocation fails
     if(!tex.data.valid() || tex.data.size() != data_size + 32)

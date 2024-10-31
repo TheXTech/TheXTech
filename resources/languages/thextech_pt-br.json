@@ -561,8 +561,7 @@
             "errorMissingResources": "Desculpe! {0} esta faltando, é necessário para o editor no jogo.",
             "battles": "<Níveis de Batalha>",
             "newWorld": "<Novo Mundo>",
-            "promptNewWorldName": "Nome do novo mundo",
-            "errorResolution": "Desculpe! O editor no jogo não é suportado na resolução atual."
+            "promptNewWorldName": "Nome do novo mundo"
         },
         "wordBack": "Voltar",
         "wordWaiting": "Esperando",

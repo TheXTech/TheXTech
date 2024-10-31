@@ -56,7 +56,7 @@ void ProcessSmallScreenCam(vScreen_t& vscreen)
             rate = 1.0;
     }
 
-    if(g_config.small_screen_camera_features && screen.W < c_screen.W && !NoTurnBack[p.Section])
+    if(g_config.small_screen_cam && screen.W < c_screen.W && !NoTurnBack[p.Section])
     {
         int16_t max_offsetX = 360;
         if(max_offsetX > vscreen.Width - p.Location.Width * 4)
@@ -99,7 +99,7 @@ void ProcessSmallScreenCam(vScreen_t& vscreen)
         vscreen.X -= rate * vscreen.small_screen_features.offset_x / 2;
     }
 
-    if(g_config.small_screen_camera_features && screen.H < c_screen.H)
+    if(g_config.small_screen_cam && screen.H < c_screen.H)
     {
         int16_t max_offsetY = 200;
         if(max_offsetY > (c_screen.H - screen.H) + 50)

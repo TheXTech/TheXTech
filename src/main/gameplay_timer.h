@@ -28,7 +28,9 @@ class GameplayTimer
 {
     bool    m_invalidContinue = false;
     bool    m_cyclesInt = false;
-    bool    m_cyclesFin = false;
+    // bool    m_cyclesFin = false;
+    int64_t m_cyclesAtWin = 0;
+    int64_t m_cyclesAtWinDisplay = 0;
     int64_t m_cyclesCurrent = 0;
     int64_t m_cyclesTotal = 0;
 

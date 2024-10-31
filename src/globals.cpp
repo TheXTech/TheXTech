@@ -47,6 +47,7 @@ long myBufferBMP = 0;
 int AllCharBlock = 0;
 bool StartMenu = false;
 uint32_t CommonFrame = 0;
+uint32_t CommonFrame_NotFrozen = 0;
 bool ScrollRelease = false;
 bool TakeScreen = false;
 bool ShowOnScreenHUD = true;
@@ -79,7 +80,8 @@ std::string g_recentWorld1p;
 std::string g_recentWorld2p;
 std::string g_recentWorldEditor;
 //bool ShowFPS = false;
-double PrintFPS = 0.0;
+int PrintFPS = 0;
+bool g_VanillaCam = false;
 // moved to "screen.cpp"
 // RangeArr<vScreen_t, 0, 2> vScreen;
 // int ScreenType = 0;

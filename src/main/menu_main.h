@@ -119,13 +119,15 @@ struct MainMenuContent
 
     std::string editorBattles;
     std::string editorNewWorld;
-    std::string editorErrorResolution;
+    // std::string editorErrorResolution;
     std::string editorErrorMissingResources;
     std::string editorPromptNewWorldName;
 
     std::string gameNoEpisodesToPlay;
     std::string gameNoBattleLevels;
     std::string gameBattleRandom;
+
+    std::string warnEpCompat;
 
     std::string gameSlotContinue;
     std::string gameSlotNew;
