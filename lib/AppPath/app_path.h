@@ -31,7 +31,7 @@
 /*!
  * \brief Set of possible asset pack search path types
  */
-enum AssetsPathType
+enum class AssetsPathType
 {
     Legacy,   // search the path directly for asset pack (as legacy), and check for additional packs in assets subdirectory
     Single,   // single modern asset pack
