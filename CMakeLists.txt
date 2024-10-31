@@ -226,13 +226,6 @@ if(APPLE)
 endif()
 
 if(NOT APPLE AND NOT ANDROID AND NOT EMSCRIPTEN)
-    set(DEFAULT_THEXTECH_SOURCE_ASSETS_PATH "${CMAKE_CURRENT_SOURCE_DIR}/assets") # For source packages creation with vendored assets
-    if(NOT EXISTS "${DEFAULT_THEXTECH_SOURCE_ASSETS_PATH}")
-        unset(DEFAULT_THEXTECH_SOURCE_ASSETS_PATH)
-    endif()
-
-    set(THEXTECH_FIXED_ASSETS_PATH "${DEFAULT_THEXTECH_FIXED_ASSETS_PATH}" CACHE STRING "Deprecated: path to install assets, platform-dependent. (The '/usr/share/games/TheXTech/assets/<game-name>/' suggested on Ubuntu). Unused by default.")
-    set(THEXTECH_SOURCE_ASSETS_PATH "${DEFAULT_THEXTECH_SOURCE_ASSETS_PATH}" CACHE STRING "Path to resources root used with the package to create")
     set(THEXTECH_UNIX_INSTALL TRUE)
 endif()
 
@@ -1656,11 +1649,7 @@ else()
             endif()
 
             # application icons
-            if(THEXTECH_SOURCE_ASSETS_PATH AND NOT THEXTECH_SOURCE_ASSETS_PATH STREQUAL "")
-                set(THEXTECH_ICON_PATH "${THEXTECH_SOURCE_ASSETS_PATH}/graphics/ui/icon/")
-            else()
-                set(THEXTECH_ICON_PATH "${CMAKE_CURRENT_SOURCE_DIR}/resources/icon/")
-            endif()
+            set(THEXTECH_ICON_PATH "${CMAKE_CURRENT_SOURCE_DIR}/resources/icon/")
 
             install(FILES "${THEXTECH_ICON_PATH}/thextech_16.png"
                     DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/icons/hicolor/16x16/apps/" RENAME "${THEXTECH_EXECUTABLE_NAME}.png")
@@ -1674,20 +1663,6 @@ else()
                     DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/icons/hicolor/256x256/apps/" RENAME "${THEXTECH_EXECUTABLE_NAME}.png")
             install(FILES "${THEXTECH_ICON_PATH}/thextech_512.png" OPTIONAL
                     DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/icons/hicolor/512x512/apps/" RENAME "${THEXTECH_EXECUTABLE_NAME}.png")
-        endif()
-
-        # package all assets
-        if(THEXTECH_FIXED_ASSETS_PATH AND NOT THEXTECH_FIXED_ASSETS_PATH STREQUAL "" AND
-           THEXTECH_SOURCE_ASSETS_PATH AND NOT THEXTECH_SOURCE_ASSETS_PATH STREQUAL "")
-
-            file(GLOB THEXTECH_ASSETS_FILES_ROOT_LIST LIST_DIRECTORIES false  "${THEXTECH_SOURCE_ASSETS_PATH}/*")
-            install(FILES ${THEXTECH_ASSETS_FILES_ROOT_LIST} DESTINATION "${THEXTECH_FIXED_ASSETS_PATH}")
-
-            install(DIRECTORY "${THEXTECH_SOURCE_ASSETS_PATH}/battle" DESTINATION "${THEXTECH_FIXED_ASSETS_PATH}")
-            install(DIRECTORY "${THEXTECH_SOURCE_ASSETS_PATH}/graphics" DESTINATION "${THEXTECH_FIXED_ASSETS_PATH}")
-            install(DIRECTORY "${THEXTECH_SOURCE_ASSETS_PATH}/music" DESTINATION "${THEXTECH_FIXED_ASSETS_PATH}")
-            install(DIRECTORY "${THEXTECH_SOURCE_ASSETS_PATH}/sound" DESTINATION "${THEXTECH_FIXED_ASSETS_PATH}")
-            install(DIRECTORY "${THEXTECH_SOURCE_ASSETS_PATH}/worlds" DESTINATION "${THEXTECH_FIXED_ASSETS_PATH}")
         endif()
 
         # install readmes
