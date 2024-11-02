@@ -793,7 +793,7 @@ int menuControls_Mouse_Render(bool mouse, bool render)
                 if(render)
                 {
                     if(o_base + 2*i >= scroll_start && o_base + 2*i < scroll_end && name)
-                        SuperPrint(name, 5, sX+24, start_y + (o_base + 2*i - scroll_start)*line);
+                        SuperPrint(name, 5, sX+24, start_y + (o_base + 2*i - scroll_start)*line, {160, 160, 255});
                     if(o_base + 2*i + 1 >= scroll_start && o_base + 2*i + 1 < scroll_end)
                     {
                         if(value)
@@ -993,15 +993,18 @@ int menuControls_Mouse_Render(bool mouse, bool render)
         for(int i = 0; i < n_buttons; i++)
         {
             int label_row, value_row, label_x, left_value_x, right_value_x;
+            XTColor label_color;
 
             if(double_line)
             {
+                label_color = {160, 160, 255};
+
                 label_row = b_base + (2 * i) - scroll_start;
                 value_row = label_row + 1;
 
-                label_x = sX + 32 + ((width - 32) / 4);
-                left_value_x = sX + 32;
-                right_value_x = sX + 32 + ((width - 32) / 2);
+                label_x = sX + 24;
+                left_value_x = sX + 48;
+                right_value_x = sX + 48 + ((width - 48) / 2);
             }
             else
             {
@@ -1025,7 +1028,7 @@ int menuControls_Mouse_Render(bool mouse, bool render)
                 else if(s_profileTab == Controls::ControlsClass::Hotkey)
                     name = Controls::Hotkeys::GetButtonName_UI(i);
 
-                SuperPrint(name, 5, label_x, start_y + label_row * line);
+                SuperPrint(name, 5, label_x, start_y + label_row * line, label_color);
 
                 if(MenuCursor == i && !s_secondaryInput && g_pollingInput)
                     SuperPrint("...", 3, left_value_x, start_y + value_row * line);
