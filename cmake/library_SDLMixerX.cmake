@@ -127,7 +127,12 @@ if(NINTENDO_3DS)
 endif()
 
 if(NOT WIN32 AND NOT EMSCRIPTEN AND NOT APPLE AND NOT ANDROID AND NOT NINTENDO_SWITCH AND NOT NINTENDO_WIIU)
-    find_library(_LIB_GL GL)
+    if(THEXTECH_BUILD_GL_ES_MODERN AND NOT THEXTECH_BUILD_GL_DESKTOP_MODERN AND NOT THEXTECH_BUILD_GL_DESKTOP_LEGACY)
+        find_library(_LIB_GL GLESv2)
+    else()
+        find_library(_LIB_GL GL)
+    endif()
+
     if(_LIB_GL)
         list(APPEND MixerX_SysLibs ${_LIB_GL})
     endif()
