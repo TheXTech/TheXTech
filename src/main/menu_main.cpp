@@ -103,6 +103,8 @@ static constexpr int c_menuItemSavesCopy = maxSaveSlots;
 static constexpr int c_menuItemSavesDelete = maxSaveSlots + 1;
 static constexpr int c_menuSavesOffsetY = (maxSaveSlots - 3) * 30;
 
+static uint8_t s_episode_playstyle = 0;
+static uint8_t s_episode_speedrun_mode = 0;
 static bool s_editor_target_thextech = true;
 
 int NumSelectWorld = 0;
@@ -254,6 +256,24 @@ static bool s_prefer_modern_char_sel()
 static bool s_show_separate_2P()
 {
     return !s_prefer_modern_char_sel() && !g_gameInfo.disableTwoPlayer;
+}
+
+static void s_change_save_item()
+{
+    int save_configs = SaveSlotInfo[MenuCursor + 1].ConfigDefaults;
+
+    if(save_configs > 0)
+    {
+        s_episode_playstyle = save_configs - 1;
+        s_episode_speedrun_mode = 0;
+    }
+    else if(save_configs < 0)
+        s_episode_speedrun_mode = -save_configs;
+    else
+    {
+        s_episode_playstyle = SelectWorld[selWorld].bugfixes_on_by_default ? Config_t::MODE_MODERN : Config_t::MODE_CLASSIC;
+        s_episode_speedrun_mode = g_config.speedrun_mode.m_value;
+    }
 }
 
 void GetMenuPos(int* MenuX, int* MenuY)
@@ -789,13 +809,7 @@ bool mainMenuUpdate()
 #endif
 
                 if(MenuMode >= MENU_SELECT_SLOT_BASE && MenuMode < MENU_SELECT_SLOT_END)
-                {
-                    ConfigChangeSentinel sent(ConfigSetLevel::ep_config);
-
-                    g_config.playstyle = SelectWorld[selWorld].bugfixes_on_by_default ? Config_t::MODE_MODERN : Config_t::MODE_CLASSIC;
-                    if(g_config.speedrun_mode.m_set != ConfigSetLevel::cmdline)
-                        g_config.speedrun_mode = 0;
-                }
+                    s_change_save_item();
 
                 PlaySoundMenu(SFX_Slide);
             }
@@ -1097,6 +1111,12 @@ bool mainMenuUpdate()
             {
                 if(MenuMode == MENU_CHARACTER_SELECT_NEW)
                 {
+                    // writing to m_value to avoid extra UpdateConfig hook
+                    g_config.playstyle.m_value = s_episode_playstyle;
+
+                    if(g_config.speedrun_mode.m_set != ConfigSetLevel::cmdline)
+                        g_config.speedrun_mode.m_value = s_episode_speedrun_mode;
+
                     MenuCursor = 0;
                     StartEpisode();
                     return true;
@@ -1517,22 +1537,7 @@ bool mainMenuUpdate()
                         MenuMode *= MENU_SELECT_SLOT_BASE;
                         MenuCursor = 0;
 
-                        {
-                            ConfigChangeSentinel sent(ConfigSetLevel::ep_config);
-
-                            int save_configs = SaveSlotInfo[MenuCursor + 1].ConfigDefaults;
-
-                            if(save_configs > 0)
-                                g_config.playstyle = save_configs - 1;
-                            else if(save_configs < 0 && g_config.speedrun_mode.m_set != ConfigSetLevel::cmdline)
-                                g_config.speedrun_mode = -save_configs;
-                            else
-                            {
-                                g_config.playstyle = SelectWorld[selWorld].bugfixes_on_by_default ? Config_t::MODE_MODERN : Config_t::MODE_CLASSIC;
-                                if(g_config.speedrun_mode.m_set != ConfigSetLevel::cmdline)
-                                    g_config.speedrun_mode = 0;
-                            }
-                        }
+                        s_change_save_item();
                     }
 
                     MenuCursorCanMove = false;
@@ -1613,31 +1618,25 @@ bool mainMenuUpdate()
         // Save Select
         else if(MenuMode == MENU_SELECT_SLOT_1P || MenuMode == MENU_SELECT_SLOT_2P)
         {
-            ConfigChangeSentinel sent(ConfigSetLevel::ep_config);
-
             if(SharedCursor.Move)
             {
                 int old_item = MenuCursor;
                 s_handleMouseMove(c_menuItemSavesDelete, MenuX, MenuY, 300, 30);
 
                 if(MenuCursor != old_item)
-                {
-                    g_config.playstyle = SelectWorld[selWorld].bugfixes_on_by_default ? Config_t::MODE_MODERN : Config_t::MODE_CLASSIC;
-                    if(g_config.speedrun_mode.m_set != ConfigSetLevel::cmdline)
-                        g_config.speedrun_mode = 0;
-                }
+                    s_change_save_item();
             }
 
             // new mode selection logic
             if(MenuCursor >= 0 && MenuCursor < maxSaveSlots && SaveSlotInfo[MenuCursor + 1].ConfigDefaults == 0)
             {
                 // switch mode
-                if(MenuCursorCanMove && altPressed && g_config.speedrun_mode.m_value == 0)
+                if(MenuCursorCanMove && altPressed && s_episode_speedrun_mode == 0)
                 {
-                    if(g_config.playstyle == Config_t::MODE_MODERN)
-                        g_config.playstyle = Config_t::MODE_CLASSIC;
+                    if(s_episode_playstyle == Config_t::MODE_MODERN)
+                        s_episode_playstyle = Config_t::MODE_CLASSIC;
                     else
-                        g_config.playstyle = Config_t::MODE_MODERN;
+                        s_episode_playstyle = Config_t::MODE_MODERN;
 
                     PlaySoundMenu(SFX_PSwitch);
                     MenuCursorCanMove = false;
@@ -1653,10 +1652,10 @@ bool mainMenuUpdate()
                 {
                     int target_bugfixes = (SelectWorld[selWorld].bugfixes_on_by_default) ? Config_t::MODE_MODERN : Config_t::MODE_CLASSIC;
 
-                    if(g_config.playstyle == Config_t::MODE_VANILLA)
-                        g_config.playstyle = target_bugfixes;
+                    if(s_episode_playstyle == Config_t::MODE_VANILLA)
+                        s_episode_playstyle = target_bugfixes;
                     else
-                        g_config.playstyle = Config_t::MODE_VANILLA;
+                        s_episode_playstyle = Config_t::MODE_VANILLA;
 
                     PlaySoundMenu(SFX_PSwitch);
                     MenuCursorCanMove = false;
@@ -1667,10 +1666,10 @@ bool mainMenuUpdate()
                     PlaySoundMenu(SFX_PlayerGrow);
                     selSave = MenuCursor + 1;
 
-                    if(g_config.speedrun_mode.m_value == 0)
-                        MenuCursor = g_config.playstyle;
+                    if(s_episode_speedrun_mode == 0)
+                        MenuCursor = s_episode_playstyle;
                     else
-                        MenuCursor = g_config.speedrun_mode + 2;
+                        MenuCursor = s_episode_speedrun_mode + 2;
 
                     MenuMode += MENU_SELECT_SLOT_ADVMODE_ADD;
                     MenuCursorCanMove = false;
@@ -1682,9 +1681,12 @@ bool mainMenuUpdate()
                 int save_configs = SaveSlotInfo[MenuCursor + 1].ConfigDefaults;
 
                 if(save_configs > 0)
-                    g_config.playstyle = save_configs - 1;
-                else if(save_configs < 0 && g_config.speedrun_mode.m_set != ConfigSetLevel::cmdline)
-                    g_config.speedrun_mode = -save_configs;
+                {
+                    s_episode_playstyle = save_configs - 1;
+                    s_episode_speedrun_mode = 0;
+                }
+                else if(save_configs < 0)
+                    s_episode_speedrun_mode = -save_configs;
             }
 
             if(MenuCursorCanMove || MenuMouseClick)
@@ -1692,10 +1694,6 @@ bool mainMenuUpdate()
                 if(menuBackPress)
                 {
 //'save select back
-                    g_config.playstyle = Config_t::MODE_MODERN;
-                    if(g_config.speedrun_mode.m_set != ConfigSetLevel::cmdline)
-                        g_config.speedrun_mode = 0;
-
                     MenuMode /= MENU_SELECT_SLOT_BASE;
 
                     // Restore menu state
@@ -1721,6 +1719,7 @@ bool mainMenuUpdate()
                         MenuMode += MENU_SELECT_SLOT_DELETE_ADD;
                         MenuCursorCanMove = false;
                     }
+                    // block invalid speedrun continuation
                     else if(MenuCursor >= 0 && MenuCursor <= c_menuItemSavesEndList
                         && g_config.speedrun_mode != 0 && g_config.speedrun_mode != -SaveSlotInfo[MenuCursor + 1].ConfigDefaults
                         && (SaveSlotInfo[MenuCursor + 1].ConfigDefaults != 0 || SaveSlotInfo[MenuCursor + 1].Progress >= 0))
@@ -1887,22 +1886,13 @@ bool mainMenuUpdate()
                 }
                 else if(menuDoPress || MenuMouseClick)
                 {
-                    ConfigChangeSentinel sent(ConfigSetLevel::ep_config);
-
                     if(MenuCursor < 3)
                     {
-                        g_config.playstyle = MenuCursor;
-
-                        if(g_config.speedrun_mode.m_set != ConfigSetLevel::cmdline)
-                            g_config.speedrun_mode = 0;
+                        s_episode_playstyle = MenuCursor;
+                        s_episode_speedrun_mode = 0;
                     }
                     else
-                    {
-                        g_config.playstyle = Config_t::MODE_MODERN;
-
-                        if(g_config.speedrun_mode.m_set != ConfigSetLevel::cmdline)
-                            g_config.speedrun_mode = MenuCursor - 2;
-                    }
+                        s_episode_speedrun_mode = MenuCursor - 2;
 
                     PlaySoundMenu(SFX_Do);
                     MenuMode -= MENU_SELECT_SLOT_ADVMODE_ADD;
@@ -2376,7 +2366,9 @@ static void s_drawGameSaves(int MenuX, int MenuY)
         int save_configs = info.ConfigDefaults;
         if(save_configs == 0 && A == MenuCursor + 1 && (MenuMode == MENU_SELECT_SLOT_1P || MenuMode == MENU_SELECT_SLOT_2P))
         {
-            save_configs = g_config.playstyle + 1;
+            save_configs = s_episode_playstyle + 1;
+            if(s_episode_speedrun_mode != 0)
+                save_configs = -s_episode_speedrun_mode;
             if(g_config.speedrun_mode != 0)
                 save_configs = -g_config.speedrun_mode;
         }
@@ -2439,7 +2431,7 @@ static void s_drawGameSaves(int MenuX, int MenuY)
     int infobox_y = MenuY + 145 + c_menuSavesOffsetY;
 
     // forbid incompatible speedrun
-    if(g_config.speedrun_mode != 0 && g_config.speedrun_mode.m_set >= ConfigSetLevel::cmdline && g_config.speedrun_mode != -info.ConfigDefaults
+    if(g_config.speedrun_mode != 0 && g_config.speedrun_mode != -info.ConfigDefaults
         && (info.ConfigDefaults != 0 || info.Progress >= 0))
     {
         XRender::renderRect(XRender::TargetW / 2 - 240, infobox_y, 480, 68, XTColorF(0, 0, 0, 1.0f));
@@ -2454,15 +2446,18 @@ static void s_drawGameSaves(int MenuX, int MenuY)
 
         XTColor color;
 
-        if(g_config.playstyle == Config_t::MODE_MODERN)
+        if(s_episode_playstyle == Config_t::MODE_MODERN)
             color = XTColorF(0.5f, 0.8f, 1.0f);
-        else if(g_config.playstyle == Config_t::MODE_CLASSIC)
+        else if(s_episode_playstyle == Config_t::MODE_CLASSIC)
             color = XTColorF(1.0f, 0.5f, 0.5f);
         else
             color = XTColorF(0.8f, 0.5f, 0.2f);
 
-        if(g_config.speedrun_mode != 0)
-            SuperPrintScreenCenter("SPEEDRUN MODE " + std::to_string(g_config.speedrun_mode), 3, infobox_y + 4, color);
+        if(s_episode_speedrun_mode != 0)
+        {
+            SuperPrintScreenCenter("SPEEDRUN MODE " + std::to_string(s_episode_speedrun_mode), 3, infobox_y + 4, color);
+            s_episode_playstyle = s_episode_speedrun_mode - 1;
+        }
         else
         {
             // int target_bugfixes = (SelectWorld[selWorld].bugfixes_on_by_default) ? Config_t::MODE_MODERN : Config_t::MODE_CLASSIC;
@@ -2471,9 +2466,9 @@ static void s_drawGameSaves(int MenuX, int MenuY)
             playstyle_string += g_options.playstyle.m_display_name;
             playstyle_string += ": ";
 
-            if(g_config.playstyle == Config_t::MODE_MODERN)
+            if(s_episode_playstyle == Config_t::MODE_MODERN)
                 playstyle_string += g_options.playstyle.m_enum_values[0].m_display_name;
-            else if(g_config.playstyle == Config_t::MODE_CLASSIC)
+            else if(s_episode_playstyle == Config_t::MODE_CLASSIC)
                 playstyle_string += g_options.playstyle.m_enum_values[1].m_display_name;
             else
                 playstyle_string += g_options.playstyle.m_enum_values[2].m_display_name;
@@ -2487,9 +2482,9 @@ static void s_drawGameSaves(int MenuX, int MenuY)
         }
 
         const std::string& playstyle_description
-            = (g_config.playstyle == Config_t::MODE_MODERN) ?
+            = (s_episode_playstyle == Config_t::MODE_MODERN) ?
                 g_options.playstyle.m_enum_values[0].m_display_tooltip
-            : (g_config.playstyle == Config_t::MODE_CLASSIC) ?
+            : (s_episode_playstyle == Config_t::MODE_CLASSIC) ?
                 g_options.playstyle.m_enum_values[1].m_display_tooltip
             :
                 g_options.playstyle.m_enum_values[2].m_display_tooltip;

@@ -798,11 +798,14 @@ int GameMain(const CmdLineSetup_t &setup)
         else if(GameMenu)
         {
             {
-                ConfigChangeSentinel sent(ConfigSetLevel::ep_config);
+                g_config.playstyle.m_value = Config_t::MODE_MODERN;
+                g_config.playstyle.m_set = ConfigSetLevel::ep_config;
 
-                g_config.playstyle = Config_t::MODE_MODERN;
                 if(g_config.speedrun_mode.m_set != ConfigSetLevel::cmdline)
-                    g_config.speedrun_mode = 0;
+                {
+                    g_config.speedrun_mode.m_value = 0;
+                    g_config.playstyle.m_set = ConfigSetLevel::ep_config;
+                }
             }
 
             Integrator::clearEpisodeName();
