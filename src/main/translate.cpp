@@ -314,6 +314,7 @@ XTechTranslate::XTechTranslate()
 
 #if defined(CONTROLS_JOYSTICK_STRINGS)
         {"menu.controls.phraseNewProfOldJoy",&g_controlsStrings.phraseNewProfOldJoy},
+        {"menu.controls.joystickSimpleEditor",&g_controlsStrings.joystickSimpleEditor},
         {"menu.controls.types.oldJoystick", &g_controlsStrings.nameOldJoy},
 #endif
 

@@ -72,6 +72,7 @@ struct ControlsStrings_t
 #if defined(CONTROLS_JOYSTICK_STRINGS)
     std::string nameOldJoy = "Old Joy";
     std::string phraseNewProfOldJoy = "New Profile for Old Joystick";
+    std::string joystickSimpleEditor = "Simple Editor Controls";
 #endif
 
 #ifdef CONTROLS_TOUCHSCREEN_STRINGS

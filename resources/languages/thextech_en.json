@@ -442,6 +442,7 @@
                 "rumble": "Rumble",
                 "textEntryStyle": "Text Entry Style"
             },
+            "joystickSimpleEditor": "Simple Editor Controls",
             "phraseNewProfOldJoy": "New Profile for Old Joystick",
             "profile": {
                 "activateProfile": "Activate profile",
