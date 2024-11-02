@@ -1601,10 +1601,19 @@ void UpdateLoadREAL()
         XRender::setTargetTexture();
         XRender::clearBuffer();
 
+        bool assets_reload = (ScreenAssetPack::g_LoopActive && g_AssetsLoaded);
+
         int sh_w = XRender::TargetW / 2;
         int gh_w = GFX.MenuGFX[4].w / 2;
         int sh_h = XRender::TargetH / 2;
         int gh_h = GFX.MenuGFX[4].h / 2;
+
+        // use default coordinates during reload
+        if(assets_reload)
+        {
+            gh_w = 400;
+            gh_h = 300;
+        }
 
         int Left    = sh_w - gh_w;
         int Top     = sh_h - gh_h;
@@ -1626,7 +1635,7 @@ void UpdateLoadREAL()
         Left += XRender::TargetOverscanX;
         Right -= XRender::TargetOverscanX;
 
-        if(ScreenAssetPack::g_LoopActive && g_AssetsLoaded)
+        if(assets_reload)
         {
             ScreenAssetPack::DrawBackground(1.0);
             DrawDeviceBattery();

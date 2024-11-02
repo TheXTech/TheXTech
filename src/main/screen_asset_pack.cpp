@@ -292,7 +292,18 @@ void Render(bool now_loading = false)
     DrawDeviceBattery();
 
     if(now_loading)
-        XRender::renderTexture(XRender::TargetW - 168, XRender::TargetH - 24, GFX.Loader);
+    {
+        int R = XRender::TargetW / 2 + 400;
+        int B = XRender::TargetH / 2 + 300;
+
+        if(R > XRender::TargetW)
+            R = XRender::TargetW;
+
+        if(B > XRender::TargetH)
+            B = XRender::TargetH;
+
+        XRender::renderTexture(R - 168, B - 24, GFX.Loader);
+    }
 
     XRender::repaint();
 
