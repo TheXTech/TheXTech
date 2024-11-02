@@ -276,6 +276,25 @@ static void s_change_save_item()
     }
 }
 
+static void s_draw_infobox_switch_arrows(int infobox_x, int infobox_y)
+{
+    // XRender::renderRect(infobox_x, infobox_y, 480, 68, {0, 0, 0, 192});
+
+    if(CommonFrame % 90 < 45)
+        return;
+
+    if(GFX.CharSelIcons.inited)
+    {
+        XRender::renderTextureFL(infobox_x + 8, infobox_y + 34 - 24 / 2, 24, 24, GFX.CharSelIcons, 72, 0, 0.0, nullptr, X_FLIP_HORIZONTAL);
+        XRender::renderTexture(infobox_x + 480 - 8 - 24, infobox_y + 34 - 24 / 2, 24, 24, GFX.CharSelIcons, 72, 0);
+    }
+    else
+    {
+        XRender::renderTextureFL(infobox_x + 8, infobox_y + 34 - GFX.MCursor[1].w / 2, GFX.MCursor[1].w, GFX.MCursor[1].h, GFX.MCursor[1], 0, 0, -90.0);
+        XRender::renderTextureFL(infobox_x + 480 - 8 - GFX.MCursor[1].h, infobox_y + 34 - GFX.MCursor[2].w / 2, GFX.MCursor[2].w, GFX.MCursor[2].h, GFX.MCursor[2], 0, 0, -90.0);
+    }
+}
+
 void GetMenuPos(int* MenuX, int* MenuY)
 {
     if(MenuX)
@@ -1383,11 +1402,12 @@ bool mainMenuUpdate()
                     PlaySoundMenu(SFX_Slide);
                     MenuCursorCanMove = false;
                 }
-                else if(altPressed && MenuMode == MENU_EDITOR && MenuCursor + 1 >= NumSelectWorldEditable - 1)
+                else if((leftPressed || rightPressed) && MenuMode == MENU_EDITOR && MenuCursor + 1 >= NumSelectWorldEditable - 1)
                 {
                     s_editor_target_thextech = !s_editor_target_thextech;
-                    PlaySoundMenu(SFX_PSwitch);
+                    PlaySoundMenu(SFX_Climbing);
                     MenuCursorCanMove = false;
+                    ScrollDelay = -1;
                 }
                 else if(menuDoPress || MenuMouseClick)
                 {
@@ -1631,14 +1651,14 @@ bool mainMenuUpdate()
             if(MenuCursor >= 0 && MenuCursor < maxSaveSlots && SaveSlotInfo[MenuCursor + 1].ConfigDefaults == 0)
             {
                 // switch mode
-                if(MenuCursorCanMove && altPressed && s_episode_speedrun_mode == 0)
+                if(MenuCursorCanMove && (leftPressed || rightPressed) && s_episode_speedrun_mode == 0)
                 {
                     if(s_episode_playstyle == Config_t::MODE_MODERN)
                         s_episode_playstyle = Config_t::MODE_CLASSIC;
                     else
                         s_episode_playstyle = Config_t::MODE_MODERN;
 
-                    PlaySoundMenu(SFX_PSwitch);
+                    PlaySoundMenu(SFX_Climbing);
                     MenuCursorCanMove = false;
                 }
 
@@ -1657,7 +1677,7 @@ bool mainMenuUpdate()
                     else
                         s_episode_playstyle = Config_t::MODE_VANILLA;
 
-                    PlaySoundMenu(SFX_PSwitch);
+                    PlaySoundMenu(SFX_Climbing);
                     MenuCursorCanMove = false;
                 }
                 // go to speedrun menu otherwise
@@ -2455,7 +2475,7 @@ static void s_drawGameSaves(int MenuX, int MenuY)
 
         if(s_episode_speedrun_mode != 0)
         {
-            SuperPrintScreenCenter("SPEEDRUN MODE " + std::to_string(s_episode_speedrun_mode), 3, infobox_y + 4, color);
+            SuperPrintScreenCenter("SPEEDRUN MODE " + std::to_string(s_episode_speedrun_mode), 3, infobox_y + 14, color);
             s_episode_playstyle = s_episode_speedrun_mode - 1;
         }
         else
@@ -2476,9 +2496,10 @@ static void s_drawGameSaves(int MenuX, int MenuY)
             // if(target_bugfixes == g_config.playstyle)
             //     playstyle_string += " (Recommended)";
 
-            SuperPrintScreenCenter(playstyle_string, 3, infobox_y + 4, color);
+            SuperPrintScreenCenter(playstyle_string, 3, infobox_y + 14, color);
 
-            SuperPrintScreenCenter("ALT JUMP TO SWITCH", 3, infobox_y + 44, XTColorF(0.8f, 0.8f, 0.8f, 0.8f));
+            // switch arrows
+            s_draw_infobox_switch_arrows(infobox_x, infobox_y);
         }
 
         const std::string& playstyle_description
@@ -2489,7 +2510,7 @@ static void s_drawGameSaves(int MenuX, int MenuY)
             :
                 g_options.playstyle.m_enum_values[2].m_display_tooltip;
 
-        SuperPrintScreenCenter(playstyle_description, 5, infobox_y + 24, color);
+        SuperPrintScreenCenter(playstyle_description, 5, infobox_y + 34, color);
     }
     // display fun save slot info
     else if(info.Progress >= 0)
@@ -2840,14 +2861,14 @@ void mainMenuDraw()
             else
                 color = XTColorF(1.0f, 0.5f, 0.5f);
 
-            SuperPrintScreenCenter("MAKE FOR:", 3, infobox_y + 4, color);
+            SuperPrintScreenCenter("MAKE FOR:", 3, infobox_y + 14, color);
 
             if(s_editor_target_thextech)
-                SuperPrintScreenCenter("TheXTech", 3, infobox_y + 24, color);
+                SuperPrintScreenCenter("TheXTech", 3, infobox_y + 34, color);
             else
-                SuperPrintScreenCenter("SMBX 1.3", 3, infobox_y + 24, color);
+                SuperPrintScreenCenter("SMBX 1.3", 3, infobox_y + 34, color);
 
-            SuperPrintScreenCenter("ALT JUMP TO SWITCH", 3, infobox_y + 44, XTColorF(0.8f, 0.8f, 0.8f, 0.8f));
+            s_draw_infobox_switch_arrows(infobox_x, infobox_y);
         }
 
         // render the scroll indicators
