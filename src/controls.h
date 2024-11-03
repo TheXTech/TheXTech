@@ -809,6 +809,7 @@ void DeleteInputMethodSlot(int slot);
 bool SetInputMethodProfile(int slot, InputMethodProfile *profile);
 bool SetInputMethodProfile(InputMethod *method, InputMethodProfile *profile);
 void ClearInputMethods();
+void RemoveNullInputMethods();
 
 // player is 1-indexed as an actual player here
 void Rumble(int player, int ms, float strength);

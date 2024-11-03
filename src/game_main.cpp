@@ -869,6 +869,9 @@ int GameMain(const CmdLineSetup_t &setup)
             g_VanillaCam = false;
             XRender::unloadGifTextures();
 
+            Controls::RemoveNullInputMethods();
+            QuickReconnectScreen::Deactivate();
+
             UpdateInternalRes();
 
             // reset l_screen to index 0
