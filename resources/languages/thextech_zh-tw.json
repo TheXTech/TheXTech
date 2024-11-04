@@ -538,7 +538,8 @@
                 }
             },
             "wordButtons": "按鍵",
-            "wordProfiles": "配置"
+            "wordProfiles": "配置",
+            "joystickSimpleEditor": "簡單編輯器控制模式"
         },
         "editor": {
             "errorMissingResources": "抱歉，需要檔案：{0}，才能進入編輯器。",
