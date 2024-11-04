@@ -746,6 +746,11 @@ void SetupPlayers()
         // Player[A].Effect2 = 0;
         Player[A].Immune = 0;
         Player[A].Immune2 = false;
+
+        // new code to prevent char5 from attacking at spawn (thanks to Sapphire Bullet Bill for the suggestion)
+        if(!LevelEditor && BattleMode && numPlayers > 2)
+            Player[A].Immune = 90;
+
         Player[A].Jump = 0;
         Player[A].Frame = 1;
         Player[A].FrameCount = 0;
