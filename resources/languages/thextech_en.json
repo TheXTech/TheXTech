@@ -544,6 +544,7 @@
         "editor": {
             "errorMissingResources": "Sorry! You are missing {0}, required for the in-game editor.",
             "battles": "<Battle Levels>",
+            "makeFor": "Make for:",
             "newWorld": "<New World>",
             "promptNewWorldName": "New world name"
         },

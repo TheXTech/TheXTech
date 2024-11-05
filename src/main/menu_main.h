@@ -119,6 +119,7 @@ struct MainMenuContent
 
     std::string editorBattles;
     std::string editorNewWorld;
+    std::string editorMakeFor;
     std::string editorErrorMissingResources;
     std::string editorPromptNewWorldName;
 

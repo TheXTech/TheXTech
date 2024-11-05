@@ -146,6 +146,7 @@ void initMainMenu()
 
     g_mainMenu.editorBattles = "<Battle Levels>";
     g_mainMenu.editorNewWorld = "<New World>";
+    g_mainMenu.editorMakeFor = "Make for:";
     g_mainMenu.editorErrorMissingResources = "Sorry! You are missing {0}, required for the in-game editor.";
     g_mainMenu.editorPromptNewWorldName = "New world name";
 
@@ -2850,7 +2851,7 @@ void mainMenuDraw()
             else
                 color = XTColorF(1.0f, 0.5f, 0.5f);
 
-            SuperPrintScreenCenter("MAKE FOR:", 3, infobox_y + 14, color);
+            SuperPrintScreenCenter(g_mainMenu.editorMakeFor, 3, infobox_y + 14, color);
 
             if(s_editor_target_thextech)
                 SuperPrintScreenCenter("TheXTech", 3, infobox_y + 34, color);
