@@ -146,7 +146,6 @@ void initMainMenu()
 
     g_mainMenu.editorBattles = "<Battle Levels>";
     g_mainMenu.editorNewWorld = "<New World>";
-    // g_mainMenu.editorErrorResolution = "Sorry! The in-game editor is not supported at your current resolution.";
     g_mainMenu.editorErrorMissingResources = "Sorry! You are missing {0}, required for the in-game editor.";
     g_mainMenu.editorPromptNewWorldName = "New world name";
 
@@ -169,17 +168,7 @@ void initMainMenu()
 
     g_mainMenu.errorBattleNoLevels = "Can't start battle because of no levels available";
 
-    g_mainMenu.optionsModeFullScreen = "Fullscreen mode";
-    g_mainMenu.optionsModeWindowed = "Windowed mode";
-    g_mainMenu.optionsViewCredits = "View credits";
     g_mainMenu.optionsRestartEngine = "Restart engine for changes to take effect.";
-    g_mainMenu.optionsRender = "Render: {0}";
-    g_mainMenu.optionsRenderAuto = "Render: Auto ({0})";
-    g_mainMenu.optionsRenderX = "Render: {0} (X)";
-    g_mainMenu.optionsScaleMode = "Scale";
-    g_mainMenu.optionsScaleInteger = "Integer";
-    g_mainMenu.optionsScaleNearest = "Nearest";
-    g_mainMenu.optionsScaleLinear = "Linear";
 
     g_mainMenu.connectCharSelTitle = "Character Select";
     g_mainMenu.connectStartGame = "Start Game";
@@ -226,8 +215,8 @@ void initMainMenu()
     g_mainMenu.wordLanguage = "Language";
     g_mainMenu.abbrevMilliseconds = "MS";
 
-    g_mainMenu.promptDeprecatedSetting = "This file uses a deprecated compatibility flag that will be removed in version 1.3.7.\n\nOld flag: \"{0}\"\nNew flag: \"{1}\"\n\n\nReplace it with the updated flag for version 1.3.6 and newer?";
-    g_mainMenu.promptDeprecatedSettingUnwritable = "An unwritable file ({0}) uses a deprecated compatibility flag that will be removed in version 1.3.7.\n\nSection: [{1}]\nOld flag: \"{2}\"\nNew flag: \"{3}\"\n\n\nPlease update it manually and copy to your device.";
+    // g_mainMenu.promptDeprecatedSetting = "This file uses a deprecated compatibility flag that will be removed in version 1.3.7.\n\nOld flag: \"{0}\"\nNew flag: \"{1}\"\n\n\nReplace it with the updated flag for version 1.3.6 and newer?";
+    // g_mainMenu.promptDeprecatedSettingUnwritable = "An unwritable file ({0}) uses a deprecated compatibility flag that will be removed in version 1.3.7.\n\nSection: [{1}]\nOld flag: \"{2}\"\nNew flag: \"{3}\"\n\n\nPlease update it manually and copy to your device.";
 }
 
 
