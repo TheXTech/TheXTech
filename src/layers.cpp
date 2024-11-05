@@ -615,10 +615,8 @@ void HideLayer(layerindex_t L, bool NoEffect)
 
         NPC[A].Hidden = true;
 
-        if(!NPC[A].Generator)
-        {
+        if(!LevelEditor && !NPC[A].Generator)
             Deactivate(A);
-        }
     }
 
     if(!Layer[L].blocks.empty())
