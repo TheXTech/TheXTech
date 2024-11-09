@@ -545,7 +545,8 @@
             "errorMissingResources": "抱歉，需要文件：{0}，才能进入编辑器。",
             "newWorld": "<创建新地图>",
             "promptNewWorldName": "新地图名称",
-            "battles": "<创建对战模式关卡>"
+            "battles": "<创建对战模式关卡>",
+            "makeFor": "目标引擎："
         },
         "game": {
             "gameBattleRandom": "随机关卡",
