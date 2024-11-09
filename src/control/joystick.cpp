@@ -35,6 +35,7 @@
 #include "../controls.h"
 #include "joystick.h"
 
+#include "main/menu_main.h"
 #include "control/controls_strings.h"
 
 namespace Controls
@@ -148,7 +149,7 @@ static void s_updateCtrlKey(SDL_GameController* c, bool& key, const KM_Key& mkey
     key |= key_new;
 }
 
-static void s_updateJoystickAnalogue(SDL_Joystick* j, double& amount, const KM_Key& mkey)
+static void s_updateJoystickAnalogue(SDL_Joystick* j, double& amount, const KM_Key& mkey, double digital_amount = 1.0)
 {
     Sint32 val = 0, dx = 0, dy = 0;
     Sint16 val_initial = 0;
@@ -222,13 +223,13 @@ static void s_updateJoystickAnalogue(SDL_Joystick* j, double& amount, const KM_K
         val = (Sint32)SDL_JoystickGetHat(j, mkey.id);
 
         if((val & mkey.val))
-            amount_new = 1.0;
+            amount_new = digital_amount;
 
         break;
 
     case KM_Key::JoyButton:
         if((Sint32)SDL_JoystickGetButton(j, mkey.id))
-            amount_new = 1.0;
+            amount_new = digital_amount;
 
         break;
 
@@ -241,7 +242,7 @@ static void s_updateJoystickAnalogue(SDL_Joystick* j, double& amount, const KM_K
         amount = amount_new;
 }
 
-static void s_updateCtrlAnalogue(SDL_GameController* c, double& amount, const KM_Key& mkey)
+static void s_updateCtrlAnalogue(SDL_GameController* c, double& amount, const KM_Key& mkey, double digital_amount = 1.0)
 {
     double amount_new = 0.;
 
@@ -266,7 +267,7 @@ static void s_updateCtrlAnalogue(SDL_GameController* c, double& amount, const KM
 
     case KM_Key::CtrlButton:
         if(SDL_GameControllerGetButton(c, (SDL_GameControllerButton)mkey.id) != 0)
-            amount_new = 1.0;
+            amount_new = digital_amount;
 
         break;
 
@@ -450,6 +451,9 @@ bool InputMethod_Joystick::Update(int player, Controls_t& c, CursorControls_t& m
             keys2 = p->m_editor_keys2;
             key_start = 4;
             key_max = EditorControls::n_buttons;
+
+            if(p->m_simple_editor && LevelEditor)
+                continue;
         }
         else
         {
@@ -500,29 +504,61 @@ bool InputMethod_Joystick::Update(int player, Controls_t& c, CursorControls_t& m
         }
     }
 
-    double cursor[4];
+    // simple editor controls
+    if(p->m_simple_editor && LevelEditor)
+    {
+        CursorControls::GetButton(m, CursorControls::Buttons::Primary) = PlayerControls::GetButton(c, PlayerControls::Buttons::Jump);
+        CursorControls::GetButton(m, CursorControls::Buttons::Secondary) = false;
+        CursorControls::GetButton(m, CursorControls::Buttons::Tertiary) = false;
+
+        EditorControls::GetButton(e, EditorControls::FastScroll) = false;
+        EditorControls::GetButton(e, EditorControls::PrevSection) = false;
+        EditorControls::GetButton(e, EditorControls::NextSection) = false;
+
+        EditorControls::GetButton(e, EditorControls::ModeSelect) |= PlayerControls::GetButton(c, PlayerControls::Buttons::Run);
+        EditorControls::GetButton(e, EditorControls::ModeErase) |= PlayerControls::GetButton(c, PlayerControls::Buttons::AltJump);
+        EditorControls::GetButton(e, EditorControls::SwitchScreens) |= PlayerControls::GetButton(c, PlayerControls::Buttons::Drop);
+        EditorControls::GetButton(e, EditorControls::TestPlay) |= PlayerControls::GetButton(c, PlayerControls::Buttons::Start);
+    }
+
+    // analogue controls
+    double cursor[4] = {0, 0, 0, 0};
     double scroll[4] = {0, 0, 0, 0};
 
     if(p->m_controllerProfile && this->m_devices->ctrl)
     {
         for(int i = 0; i < 4; i++)
         {
-            cursor[i] = 0.0;
-            s_updateCtrlAnalogue(this->m_devices->ctrl, cursor[i], p->m_cursor_keys[i]);
-            s_updateCtrlAnalogue(this->m_devices->ctrl, cursor[i], p->m_cursor_keys2[i]);
-            s_updateCtrlAnalogue(this->m_devices->ctrl, scroll[i], p->m_editor_keys[i]);
-            s_updateCtrlAnalogue(this->m_devices->ctrl, scroll[i], p->m_editor_keys2[i]);
+            if(p->m_simple_editor && LevelEditor)
+            {
+                s_updateCtrlAnalogue(this->m_devices->ctrl, cursor[i], p->m_keys[i], 0.5);
+                s_updateCtrlAnalogue(this->m_devices->ctrl, cursor[i], p->m_keys2[i], 0.5);
+            }
+            else
+            {
+                s_updateCtrlAnalogue(this->m_devices->ctrl, cursor[i], p->m_cursor_keys[i]);
+                s_updateCtrlAnalogue(this->m_devices->ctrl, cursor[i], p->m_cursor_keys2[i]);
+                s_updateCtrlAnalogue(this->m_devices->ctrl, scroll[i], p->m_editor_keys[i]);
+                s_updateCtrlAnalogue(this->m_devices->ctrl, scroll[i], p->m_editor_keys2[i]);
+            }
         }
     }
     else
     {
         for(int i = 0; i < 4; i++)
         {
-            cursor[i] = 0.0;
-            s_updateJoystickAnalogue(this->m_devices->joy, cursor[i], p->m_cursor_keys[i]);
-            s_updateJoystickAnalogue(this->m_devices->joy, cursor[i], p->m_cursor_keys2[i]);
-            s_updateJoystickAnalogue(this->m_devices->joy, scroll[i], p->m_editor_keys[i]);
-            s_updateJoystickAnalogue(this->m_devices->joy, scroll[i], p->m_editor_keys2[i]);
+            if(p->m_simple_editor && LevelEditor)
+            {
+                s_updateJoystickAnalogue(this->m_devices->joy, cursor[i], p->m_keys[i], 0.5);
+                s_updateJoystickAnalogue(this->m_devices->joy, cursor[i], p->m_keys2[i], 0.5);
+            }
+            else
+            {
+                s_updateJoystickAnalogue(this->m_devices->joy, cursor[i], p->m_cursor_keys[i]);
+                s_updateJoystickAnalogue(this->m_devices->joy, cursor[i], p->m_cursor_keys2[i]);
+                s_updateJoystickAnalogue(this->m_devices->joy, scroll[i], p->m_editor_keys[i]);
+                s_updateJoystickAnalogue(this->m_devices->joy, scroll[i], p->m_editor_keys2[i]);
+            }
         }
     }
 
@@ -886,7 +922,10 @@ bool InputMethodProfile_Joystick::PollPrimaryButton(ControlsClass c, size_t i)
     InputMethodType_Joystick* t = dynamic_cast<InputMethodType_Joystick*>(this->Type);
 
     if(!t)
-        return false;
+        return true;
+
+    if(this->m_simple_editor && c == ControlsClass::Editor)
+        return true;
 
     KM_Key key = this->m_controllerProfile ?
                  t->PollControllerKeyAll() :
@@ -978,7 +1017,10 @@ bool InputMethodProfile_Joystick::PollSecondaryButton(ControlsClass c, size_t i)
     InputMethodType_Joystick* t = dynamic_cast<InputMethodType_Joystick*>(this->Type);
 
     if(!t)
-        return false;
+        return true;
+
+    if(this->m_simple_editor && c == ControlsClass::Editor)
+        return true;
 
     KM_Key key;
 
@@ -1108,6 +1150,9 @@ bool InputMethodProfile_Joystick::DeletePrimaryButton(ControlsClass c, size_t i)
     }
     else if(c == ControlsClass::Editor)
     {
+        if(this->m_simple_editor)
+            return false;
+
         keys = this->m_editor_keys;
         keys2 = this->m_editor_keys2;
     }
@@ -1151,7 +1196,12 @@ bool InputMethodProfile_Joystick::DeleteSecondaryButton(ControlsClass c, size_t 
     else if(c == ControlsClass::Cursor)
         keys2 = this->m_cursor_keys2;
     else if(c == ControlsClass::Editor)
+    {
+        if(this->m_simple_editor)
+            return false;
+
         keys2 = this->m_editor_keys2;
+    }
     else if(c == ControlsClass::Hotkey)
         keys2 = this->m_hotkeys2;
     else
@@ -1246,12 +1296,27 @@ const char* InputMethodProfile_Joystick::NamePrimaryButton(ControlsClass c, size
         keys = this->m_keys;
     else if(c == ControlsClass::Cursor)
         keys = this->m_cursor_keys;
+    else if(c == ControlsClass::Editor && this->m_simple_editor)
+    {
+        keys = this->m_keys;
+
+        if(i == EditorControls::Buttons::ModeSelect)
+            i = PlayerControls::Buttons::Run;
+        else if(i == EditorControls::Buttons::ModeErase)
+            i = PlayerControls::Buttons::AltJump;
+        else if(i == EditorControls::Buttons::SwitchScreens)
+            i = PlayerControls::Buttons::Drop;
+        else if(i == EditorControls::Buttons::TestPlay)
+            i = PlayerControls::Buttons::Start;
+        else
+            return g_mainMenu.caseNone.c_str();
+    }
     else if(c == ControlsClass::Editor)
         keys = this->m_editor_keys;
     else if(c == ControlsClass::Hotkey)
         keys = this->m_hotkeys;
     else
-        return nullptr;
+        return "";
 
     return s_nameButton(keys[i]);
 }
@@ -1264,12 +1329,27 @@ const char* InputMethodProfile_Joystick::NameSecondaryButton(ControlsClass c, si
         keys2 = this->m_keys2;
     else if(c == ControlsClass::Cursor)
         keys2 = this->m_cursor_keys2;
+    else if(c == ControlsClass::Editor && this->m_simple_editor)
+    {
+        keys2 = this->m_keys2;
+
+        if(i == EditorControls::Buttons::ModeSelect)
+            i = PlayerControls::Buttons::Run;
+        else if(i == EditorControls::Buttons::ModeErase)
+            i = PlayerControls::Buttons::AltJump;
+        else if(i == EditorControls::Buttons::SwitchScreens)
+            i = PlayerControls::Buttons::Drop;
+        else if(i == EditorControls::Buttons::TestPlay)
+            i = PlayerControls::Buttons::Start;
+        else
+            return "";
+    }
     else if(c == ControlsClass::Editor)
         keys2 = this->m_editor_keys2;
     else if(c == ControlsClass::Hotkey)
         keys2 = this->m_hotkeys2;
     else
-        return nullptr;
+        return "";
 
     return s_nameButton(keys2[i]);
 }
@@ -1339,6 +1419,7 @@ void InputMethodProfile_Joystick::SaveConfig(IniProcessing* ctl)
     }
 
     ctl->setValue("old-joystick", !this->m_controllerProfile);
+    ctl->setValue("simple-editor", this->m_simple_editor);
 }
 
 void InputMethodProfile_Joystick::LoadConfig(IniProcessing* ctl)
@@ -1408,6 +1489,8 @@ void InputMethodProfile_Joystick::LoadConfig(IniProcessing* ctl)
     bool legacyProfile;
     ctl->read("old-joystick", legacyProfile, false);
     this->m_controllerProfile = !legacyProfile;
+
+    ctl->read("simple-editor", this->m_simple_editor, true);
 }
 
 void InputMethodProfile_Joystick::SaveConfig_Legacy(IniProcessing* ctl)
@@ -1460,6 +1543,48 @@ void InputMethodProfile_Joystick::LoadConfig_Legacy(IniProcessing* ctl)
     }
 
     this->m_legacyProfile = true;
+    this->m_simple_editor = true;
+}
+
+size_t InputMethodProfile_Joystick::GetOptionCount_Custom()
+{
+    return 1;
+}
+
+const char *InputMethodProfile_Joystick::GetOptionName_Custom(size_t i)
+{
+    UNUSED(i);
+
+    return g_controlsStrings.joystickSimpleEditor.c_str();
+}
+
+const char *InputMethodProfile_Joystick::GetOptionValue_Custom(size_t i)
+{
+    UNUSED(i);
+
+    if(this->m_simple_editor)
+        return g_mainMenu.wordOn.c_str();
+    else
+        return g_mainMenu.wordOff.c_str();
+}
+
+bool InputMethodProfile_Joystick::OptionChange_Custom(size_t i)
+{
+    return this->OptionRotateRight_Custom(i);
+}
+
+bool InputMethodProfile_Joystick::OptionRotateLeft_Custom(size_t i)
+{
+    return this->OptionRotateRight_Custom(i);
+}
+
+bool InputMethodProfile_Joystick::OptionRotateRight_Custom(size_t i)
+{
+    UNUSED(i);
+
+    this->m_simple_editor = !this->m_simple_editor;
+
+    return true;
 }
 
 /*====================================================*\

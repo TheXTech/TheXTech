@@ -1240,6 +1240,18 @@ void ClearInputMethods()
     g_InputMethods.clear();
 }
 
+void RemoveNullInputMethods()
+{
+    // remove any null input methods
+    for(size_t i = 0; i < Controls::g_InputMethods.size(); )
+    {
+        if(Controls::g_InputMethods[i])
+            i++;
+        else
+            Controls::DeleteInputMethodSlot(i);
+    }
+}
+
 
 // player is 1-indexed :(
 void Rumble(int player, int ms, float strength)

@@ -112,6 +112,9 @@ public:
     bool m_controllerProfile = false;
     bool m_legacyProfile = false;
 
+    // current settings
+    bool m_simple_editor = true;
+
     // primary keys (also controller keys in legacy mode)
     KM_Key m_keys[PlayerControls::n_buttons];
     // secondary keys (also joystick keys in legacy mode)
@@ -157,6 +160,25 @@ public:
     // one can assume that the IniProcessing* is already in the correct group
     void SaveConfig(IniProcessing *ctl);
     void LoadConfig(IniProcessing *ctl);
+
+public:
+    // How many per-type special options are there?
+    size_t GetOptionCount_Custom();
+    // Methods to manage per-profile options
+    // It is guaranteed that none of these will be called if
+    // GetOptionCount_Custom() returns 0.
+    // get a char* describing the option
+    const char *GetOptionName_Custom(size_t i);
+    // get a char* describing the current option value
+    // must be allocated in static or instance memory
+    // WILL NOT be freed
+    const char *GetOptionValue_Custom(size_t i);
+    // called when A is pressed; allowed to interrupt main game loop
+    bool OptionChange_Custom(size_t i);
+    // called when left is pressed
+    bool OptionRotateLeft_Custom(size_t i);
+    // called when right is pressed
+    bool OptionRotateRight_Custom(size_t i);
 };
 
 class InputMethodType_Joystick : public InputMethodType

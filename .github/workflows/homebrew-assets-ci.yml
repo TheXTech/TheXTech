@@ -81,7 +81,7 @@ jobs:
       shell: bash
       run: |
         apt update
-        apt install -y gcc meson ninja-build  \
+        apt install -y build-essential cmake  \
                        imagemagick ffmpeg     \
                        python3                \
                        p7zip-full             \
@@ -97,9 +97,10 @@ jobs:
       run: |
         git clone https://github.com/ds-sloth/spc2it ../spc2it
         cd ../spc2it
-        meson build
+        mkdir build
         cd build
-        ninja
+        cmake ..
+        make
         cp spc2it /usr/bin/spc2it
 
     - uses: TheXTech/checkout@v0.1

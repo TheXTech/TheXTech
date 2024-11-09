@@ -187,7 +187,7 @@ XTechTranslate::XTechTranslate()
 
         {"menu.editor.battles",            &g_mainMenu.editorBattles},
         {"menu.editor.newWorld",           &g_mainMenu.editorNewWorld},
-        // {"menu.editor.errorResolution",    &g_mainMenu.editorErrorResolution},
+        {"menu.editor.makeFor",            &g_mainMenu.editorMakeFor},
         {"menu.editor.errorMissingResources", &g_mainMenu.editorErrorMissingResources},
         {"menu.editor.promptNewWorldName", &g_mainMenu.editorPromptNewWorldName},
 
@@ -212,17 +212,7 @@ XTechTranslate::XTechTranslate()
 
         {"menu.battle.errorNoLevels",      &g_mainMenu.errorBattleNoLevels},
 
-        {"menu.options.optionsModeFullScreen",   &g_mainMenu.optionsModeFullScreen},
-        {"menu.options.optionsModeWindowed",     &g_mainMenu.optionsModeWindowed},
-        {"menu.options.optionsViewCredits",      &g_mainMenu.optionsViewCredits},
         {"menu.options.restartEngine",           &g_mainMenu.optionsRestartEngine},
-        {"menu.options.render",                  &g_mainMenu.optionsRender},
-        {"menu.options.renderAuto",              &g_mainMenu.optionsRenderAuto},
-        {"menu.options.renderX",                 &g_mainMenu.optionsRenderX},
-        {"menu.options.scale.label",             &g_mainMenu.optionsScaleMode},
-        {"menu.options.scale.integer",           &g_mainMenu.optionsScaleInteger},
-        {"menu.options.scale.nearest",           &g_mainMenu.optionsScaleNearest},
-        {"menu.options.scale.linear",            &g_mainMenu.optionsScaleLinear},
 
         {"menu.character.charSelTitle",    &g_mainMenu.connectCharSelTitle},
         {"menu.character.startGame",       &g_mainMenu.connectStartGame},
@@ -253,7 +243,6 @@ XTechTranslate::XTechTranslate()
 
         {"menu.controls.options.rumble",            &g_mainMenu.controlsOptionRumble},
         {"menu.controls.options.batteryStatus",     &g_mainMenu.controlsOptionBatteryStatus},
-        // {"menu.controls.options.groundPoundButton", &g_mainMenu.controlsOptionGroundPoundButton},
         {"menu.controls.options.maxPlayers",        &g_controlsStrings.sharedOptionMaxPlayers},
 
         {"menu.controls.buttons.up",      &Controls::PlayerControls::g_button_name_UI[Controls::PlayerControls::Up]},
@@ -314,6 +303,7 @@ XTechTranslate::XTechTranslate()
 
 #if defined(CONTROLS_JOYSTICK_STRINGS)
         {"menu.controls.phraseNewProfOldJoy",&g_controlsStrings.phraseNewProfOldJoy},
+        {"menu.controls.joystickSimpleEditor",&g_controlsStrings.joystickSimpleEditor},
         {"menu.controls.types.oldJoystick", &g_controlsStrings.nameOldJoy},
 #endif
 

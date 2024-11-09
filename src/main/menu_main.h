@@ -119,7 +119,7 @@ struct MainMenuContent
 
     std::string editorBattles;
     std::string editorNewWorld;
-    // std::string editorErrorResolution;
+    std::string editorMakeFor;
     std::string editorErrorMissingResources;
     std::string editorPromptNewWorldName;
 
@@ -146,17 +146,7 @@ struct MainMenuContent
     std::string errorBattleNoLevels;
 
     // Options
-    std::string optionsModeFullScreen;
-    std::string optionsModeWindowed;
-    std::string optionsViewCredits;
     std::string optionsRestartEngine;
-    std::string optionsRender;
-    std::string optionsRenderAuto;
-    std::string optionsRenderX;
-    std::string optionsScaleMode;
-    std::string optionsScaleInteger;
-    std::string optionsScaleNearest;
-    std::string optionsScaleLinear;
 
     // ConnectScreen
     std::string connectCharSelTitle;
@@ -180,7 +170,6 @@ struct MainMenuContent
     std::string controlsHotkeys;
 
     std::string controlsOptionRumble;
-    // std::string controlsOptionGroundPoundButton;
     std::string controlsOptionBatteryStatus;
 
     std::string wordProfiles;
@@ -204,10 +193,6 @@ struct MainMenuContent
     std::string wordWaiting;
     std::string wordLanguage;
     std::string abbrevMilliseconds;
-
-    // Compat menu
-    std::string promptDeprecatedSetting;
-    std::string promptDeprecatedSettingUnwritable;
 };
 
 extern MainMenuContent g_mainMenu;

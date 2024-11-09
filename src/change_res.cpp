@@ -73,7 +73,8 @@ void ChangeRes(int, int, int, int)
 
 void UpdateInternalRes()
 {
-    bool ignore_compat = LevelEditor || (GameMenu && g_config.speedrun_mode.m_set < ConfigSetLevel::cmdline);
+    // bool ignore_compat = LevelEditor || (GameMenu && g_config.speedrun_mode.m_set < ConfigSetLevel::cmdline);
+    bool ignore_compat = LevelEditor;
 
     int req_w = g_config.internal_res.m_value.first;
     int req_h = g_config.internal_res.m_value.second;
