@@ -498,6 +498,7 @@ if(THEXTECH_ENABLE_LUA)
 endif()
 
 include(cmake/library_glew.cmake)
+include(cmake/library_syslibs.cmake)
 
 if(USE_SYSTEM_LIBS)
     find_package(SDL2 REQUIRED)
@@ -512,19 +513,9 @@ if(USE_SYSTEM_LIBS)
         set(SDL2_LIBRARIES mingw32 SDL2main SDL2)
     endif()
 
-    list(APPEND A2XT_LIBS ${FREEIMAGELITE_LIB} ${MIXERX_LIB} "${SDL2_LIBRARIES}")
+    list(APPEND A2XT_LIBS ${FREEIMAGELITE_LIB} ${MIXERX_LIB} "${SDL2_LIBRARIES}" ${THEXTECH_SYSLIBS})
     list(APPEND A2XT_INCS ${SDL2_INCLUDE_DIRS} ${MIXERX_HEAD_DIR} ${FREEIMAGELITE_HEAD_DIR})
     target_include_directories(pgefl PRIVATE ${SDL2_INCLUDE_DIRS})
-
-    if(THEXTECH_BUILD_GL_ES_MODERN AND NOT THEXTECH_BUILD_GL_DESKTOP_MODERN AND NOT THEXTECH_BUILD_GL_DESKTOP_LEGACY)
-        find_library(_LIB_GL GLESv2)
-    else()
-        message("-- Finding Desktop OpenGL...")
-    endif()
-
-    if(_LIB_GL)
-        list(APPEND A2XT_LIBS ${_LIB_GL})
-    endif()
 elseif(NOT THEXTECH_NO_SDL_BUILD)
     include(cmake/library_FreeImage.cmake)
     list(APPEND A2XT_DEPS FreeImage_Local)
