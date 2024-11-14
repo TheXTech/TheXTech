@@ -545,7 +545,8 @@
             "errorMissingResources": "抱歉，需要檔案：{0}，才能進入編輯器。",
             "newWorld": "<新地圖>",
             "promptNewWorldName": "新地圖名稱",
-            "battles": "<對戰關卡>"
+            "battles": "<對戰關卡>",
+            "makeFor": "目標引擎："
         },
         "game": {
             "gameBattleRandom": "隨機關卡",
