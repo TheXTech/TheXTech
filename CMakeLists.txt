@@ -170,9 +170,16 @@ else()
     option(THEXTECH_FORCE_FULLSCREEN "Force the game to only use fullscreen mode" OFF)
 endif()
 
-option(THEXTECH_BUILD_GL_DESKTOP_MODERN "On SDL builds, include the OpenGL 2.0+ Core/Compatibility renderer" ON)
+if("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux" AND "${TARGET_PROCESSOR}" MATCHES "arm.*")
+    message("-- Desktop OpenGL build will be disabled on unsupported platform (${CMAKE_SYSTEM_NAME} on ${TARGET_PROCESSOR})")
+    set(THEXTECH_BUILD_GL_DESKTOP_DEFAULT OFF)
+else()
+    set(THEXTECH_BUILD_GL_DESKTOP_DEFAULT ON)
+endif()
+
+option(THEXTECH_BUILD_GL_DESKTOP_MODERN "On SDL builds, include the OpenGL 2.0+ Core/Compatibility renderer" ${THEXTECH_BUILD_GL_DESKTOP_DEFAULT})
 option(THEXTECH_BUILD_GL_ES_MODERN "On SDL builds, include the OpenGL ES 2.0+ renderer" ON)
-option(THEXTECH_BUILD_GL_DESKTOP_LEGACY "On SDL builds, include the OpenGL 1.1+ renderer" ON)
+option(THEXTECH_BUILD_GL_DESKTOP_LEGACY "On SDL builds, include the OpenGL 1.1+ renderer" ${THEXTECH_BUILD_GL_DESKTOP_DEFAULT})
 option(THEXTECH_BUILD_GL_ES_LEGACY "On SDL builds, include the OpenGL ES 1.1 renderer" OFF)
 
 option(THEXTECH_USE_ANGLE_TRANSLATOR "On modern OpenGL builds, include the ANGLE shader translator to improve shader support in OpenGL 3.0+ Core/Compatibility profiles" ${THEXTECH_USE_ANGLE_TRANSLATOR_DEFAULT})
