@@ -10,7 +10,7 @@ function checkState()
     else
         printf "\n=== AN ERROR OCCURRED! ===\n\n"
         cd ${bak}
-        return 1
+        exit 1
     fi
 }
 
