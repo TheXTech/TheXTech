@@ -89,7 +89,7 @@ void AppPathP::initDefaultPaths(const std::string &userDirName)
     s_userDirectory = userDir + userDirName;
 
     // fallback to legacy directory if there is no custom directory set
-    std::string legacyUserDirectory = homePath + ".PGE_Project/thextech";
+    std::string legacyUserDirectory = homePath + "/.PGE_Project/thextech";
     if(userDirName == "TheXTech" && !DirMan::exists(s_userDirectory) && DirMan::exists(legacyUserDirectory))
         s_userDirectory = legacyUserDirectory;
 
