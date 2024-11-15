@@ -446,9 +446,9 @@ int GameMain(const CmdLineSetup_t &setup)
             MessageText += "\n";
             MessageText += i.first;
 
-            if(i.second == AppPathManager::Legacy)
+            if(i.second == AssetsPathType::Legacy)
                 MessageText += "assets/<pack-id>/";
-            else if(i.second == AppPathManager::Multiple)
+            else if(i.second == AssetsPathType::Multiple)
                 MessageText += "<pack-id>/";
         }
         PauseGame(PauseCode::Message);

@@ -26,7 +26,7 @@
 #include "../app_path.h"
 #include "app_path_private.h"
 
-constexpr const char* s_assetRoot = "/thextech/";
+constexpr const char* s_assetRoot = "/" THEXTECH_DIRECTORY_PREFIX "/";
 
 void AppPathP::initDefaultPaths(const std::string &userDirName)
 {
@@ -48,6 +48,11 @@ std::string AppPathP::userDirectory()
 std::string AppPathP::assetsRoot()
 {
     return std::string();
+}
+
+AssetsPathType AppPathP::assetsRootType()
+{
+    return AssetsPathType::Single;
 }
 
 std::string AppPathP::settingsRoot()

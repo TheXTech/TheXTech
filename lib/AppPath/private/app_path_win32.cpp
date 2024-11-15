@@ -30,12 +30,8 @@
 
 #include "app_path_private.h"
 
-static std::string s_assetsRoot;
 static std::string s_userDirectory;
-static std::string s_logsDirectory;
 static std::string s_applicationPath;
-//! The legacy debug root
-static const char* s_legacyDebugDir = "/.PGE_Project/thextech/";
 
 static void s_toUtf8(std::string &ret, wchar_t *str, DWORD len)
 {
@@ -58,13 +54,9 @@ static void s_toUtf8(std::string &ret, wchar_t *str, DWORD len)
 
 void AppPathP::initDefaultPaths(const std::string &userDirName)
 {
-    // FIXME: Implement new default directories format later
-    (void)userDirName;
     wchar_t pathBuffer[MAX_PATH] = L"";
 
-#if defined(THEXTECH_NEW_USER_PATHS)
-    std::string localPath;
-    std::string roamingPath;
+    std::string roamingPath, homePath;
 
     if(FAILED(SHGetFolderPathW(NULL, CSIDL_APPDATA, NULL, 0, pathBuffer)))
     {
@@ -75,17 +67,6 @@ void AppPathP::initDefaultPaths(const std::string &userDirName)
     }
     else
         s_toUtf8(roamingPath, pathBuffer, (DWORD)SDL_wcslen(pathBuffer));
-
-    if(FAILED(SHGetFolderPathW(NULL, CSIDL_LOCAL_APPDATA, NULL, 0, pathBuffer)))
-    {
-#   ifndef DISABLE_LOGGING
-        std::fprintf(stderr, "== Failed to retrieve the common AppData\n");
-        std::fflush(stderr);
-#   endif
-    }
-    else
-        s_toUtf8(localPath, pathBuffer, (DWORD)SDL_wcslen(pathBuffer));
-#endif // THEXTECH_NEW_USER_PATHS
 
     // Application path
     char *path = SDL_GetBasePath();
@@ -105,32 +86,19 @@ void AppPathP::initDefaultPaths(const std::string &userDirName)
     // User directory
     DWORD path_len = GetEnvironmentVariableW(L"UserProfile", pathBuffer, MAX_PATH);
     SDL_assert_release(path_len);
-    s_toUtf8(s_userDirectory, pathBuffer, path_len);
+    s_toUtf8(homePath, pathBuffer, path_len);
 
-#if defined(THEXTECH_NEW_USER_PATHS)
-    if(s_userDirectory.empty() && localPath.empty() && roamingPath.empty())
-        s_userDirectory = "./";
+    if(homePath.empty() && roamingPath.empty())
+        s_userDirectory = s_applicationPath;
     else
     {
-        // Priority the legacy path for compatibility
-        if(!ignoreLegacyDebugDir && DirMan::exists(s_userDirectory + s_legacyDebugDir))
-        {
-            s_userDirectory += s_legacyDebugDir;
-            s_assetsRoot.clear();
-            s_logsDirectory.clear();
-        }
-        else
-        {
-            s_userDirectory = roamingPath + userDirName + "UserData/";
-            s_assetsRoot = roamingPath + userDirName + "DebugAssets/";
-            s_logsDirectory = localPath + userDirName + "logs/";
-        }
+        s_userDirectory = roamingPath + "/" + userDirName;
+
+        // fallback to legacy directory if there is no custom directory set
+        std::string legacyUserDirectory = homePath + "/.PGE_Project/thextech";
+        if(userDirName == "TheXTech" && !DirMan::exists(s_userDirectory) && DirMan::exists(legacyUserDirectory))
+            s_userDirectory = legacyUserDirectory;
     }
-#else
-    s_userDirectory += s_legacyDebugDir;
-    s_assetsRoot.clear();
-    s_logsDirectory.clear();
-#endif
 }
 
 std::string AppPathP::appDirectory()
@@ -145,7 +113,12 @@ std::string AppPathP::userDirectory()
 
 std::string AppPathP::assetsRoot()
 {
-    return s_assetsRoot;
+    return std::string();
+}
+
+AssetsPathType AppPathP::assetsRootType()
+{
+    return AssetsPathType::Single;
 }
 
 std::string AppPathP::settingsRoot()
@@ -195,7 +168,7 @@ std::string AppPathP::logsRoot()
      * directory out of user directory. Keep it empty if you want to keep the
      * default behaviour (i.e. logs saved at the user directory)
      */
-    return s_logsDirectory;
+    return std::string();
 }
 
 bool AppPathP::portableAvailable()
