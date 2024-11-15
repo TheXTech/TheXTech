@@ -69,6 +69,9 @@ int16_t testStartWarp = 0;
 // moved into game_loop.cpp
 // PauseCode GamePaused = PauseCode::None;
 
+std::string MessageTitle;
+MessageType g_MessageType = MESSAGE_TYPE_NORMAL;
+
 std::string MessageText;
 UTF8CharMap_t MessageTextMap;
 

@@ -38,7 +38,7 @@ void DrawMessage(const UTF8CharMap_t &SuperTextMap)
     int TextBoxW = GFX.TextBox.w;
     bool UseGFX = true;
 
-    if(!GFX.TextBox.inited || XRender::TargetW < GFX.TextBox.w)
+    if(!GFX.TextBox.inited || XRender::TargetW < GFX.TextBox.w || (g_MessageType >= MESSAGE_TYPE_SYS_INFO))
     {
         TextBoxW = XRender::TargetW - 50;
         UseGFX = false;
@@ -92,6 +92,48 @@ void DrawMessage(const UTF8CharMap_t &SuperTextMap)
     // Draw the background now we know how many lines there are. 10px of padding above and below.
     int totalHeight = numLines * lineHeight + 20;
 
+    int titleWidth = 0;
+    XTColor messageColour = {8, 96, 168};
+    XTColor titleColour = {255, 255, 255};
+
+    switch(g_MessageType)
+    {
+    case MESSAGE_TYPE_SYS_INFO:
+        messageColour = {0x1D, 0x08, 0x5E};
+        titleColour = {0xf5, 0xff, 0x1a};
+        break;
+    case MESSAGE_TYPE_SYS_WARNING:
+        messageColour = {0xBF, 0x63, 0x24};
+        titleColour = {0xf5, 0xff, 0x1a};
+        break;
+    case MESSAGE_TYPE_SYS_ERROR:
+        messageColour = {0x61, 0x00, 0x0F};
+        titleColour = {0xf5, 0xff, 0x1a};
+        break;
+    default:
+        messageColour = {8, 96, 168};
+        break;
+    }
+
+    if(g_MessageType >= MESSAGE_TYPE_SYS_INFO && !MessageTitle.empty())
+    {
+        titleWidth = SuperTextPixLen(MessageTitle, 4);
+
+        int titleBoxWidth = TextBoxW > titleWidth + 12 ? TextBoxW : titleWidth + 12;
+        int titleBoxHeight = lineHeight + 20;
+        int titleBoxX = (XRender::TargetW / 2) - (titleBoxWidth / 2);
+        int titleBoxY = BoxY_Start - 40;
+
+        XRender::renderRect(titleBoxX, titleBoxY,
+                            titleBoxWidth, titleBoxHeight, {0, 0, 0});
+        XRender::renderRect(titleBoxX + 2, titleBoxY + 2,
+                            titleBoxWidth - 4, titleBoxHeight - 4, {255, 255, 255});
+        XRender::renderRect(titleBoxX + 4, titleBoxY + 4,
+                            titleBoxWidth - 8, titleBoxHeight - 8, messageColour);
+
+        SuperPrintScreenCenter(MessageTitle, 4, titleBoxY + 10, titleColour);
+    }
+
     if(!UseGFX)
     {
         XRender::renderRect(XRender::TargetW / 2 - TextBoxW / 2,
@@ -102,7 +144,7 @@ void DrawMessage(const UTF8CharMap_t &SuperTextMap)
                             TextBoxW - 4, totalHeight - 4, {255, 255, 255});
         XRender::renderRect(XRender::TargetW / 2 - TextBoxW / 2 + 4,
                             BoxY_Start + 4,
-                            TextBoxW - 8, totalHeight - 8, {8, 96, 168});
+                            TextBoxW - 8, totalHeight - 8, messageColour);
     }
 
 #ifndef BUILT_IN_TEXTBOX

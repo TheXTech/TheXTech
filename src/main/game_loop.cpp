@@ -382,8 +382,10 @@ bool MessageScreen_Logic(int plr)
 
     if(MenuCursorCanMove && (menuDoPress || menuBackPress))
     {
+        MessageTitle.clear();
         MessageText.clear();
         MessageTextMap.clear();
+        g_MessageType = MESSAGE_TYPE_NORMAL;
         return true;
     }
 

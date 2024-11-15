@@ -1312,8 +1312,23 @@ extern int16_t testStartWarp;
 //Public GamePaused As Boolean 'true if the game is paused
 // extern PauseCode GamePaused;
 
+extern std::string MessageTitle;
+enum MessageType
+{
+    // Has no title
+    MESSAGE_TYPE_NORMAL = 0,
+    // Has title, normal colour
+    MESSAGE_TYPE_SYS_INFO,
+    // Has title, yellow colour
+    MESSAGE_TYPE_SYS_WARNING,
+    // Has title, red colour
+    MESSAGE_TYPE_SYS_ERROR,
+};
+extern MessageType g_MessageType;
+
 //Public MessageText As String 'when talking to an npc
 extern std::string MessageText;
+
 /*!
  * \brief UTF8CharMap_t The array of character pointers to track a begining of every UTF8 character in the string
  */

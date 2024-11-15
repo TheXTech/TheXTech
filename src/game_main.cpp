@@ -441,6 +441,11 @@ int GameMain(const CmdLineSetup_t &setup)
         Screens_AssignPlayer(1, *l_screen);
         QuickReconnectScreen::g_active = true;
         MessageText = "Fatal: no assets!\nExtract a game/asset pack to:\n";
+
+        g_MessageType = MESSAGE_TYPE_SYS_ERROR;
+        MessageTitle = "Fatal: assets not found";
+        MessageText = "Please extract a game/asset pack to:\n";
+
         for(auto& i : AppPathManager::assetsSearchPath())
         {
             MessageText += "\n";
@@ -451,6 +456,7 @@ int GameMain(const CmdLineSetup_t &setup)
             else if(i.second == AssetsPathType::Multiple)
                 MessageText += "<pack-id>/";
         }
+
         PauseGame(PauseCode::Message);
         GameIsActive = false;
     }
