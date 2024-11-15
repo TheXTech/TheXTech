@@ -521,6 +521,7 @@ int GameMain(const CmdLineSetup_t &setup)
                 LevelSelect = false;
                 TestLevel = true;
                 EndLevel = false;
+                g_MessageType = MESSAGE_TYPE_SYS_WARNING;
                 MessageText = fmt::format_ne(g_gameStrings.errorOpenFileFailed, setup.testLevel);
                 PauseGame(PauseCode::Message);
                 ErrorQuit = true;
@@ -1083,6 +1084,7 @@ int GameMain(const CmdLineSetup_t &setup)
 
                 if(!OpenLevel(levelPath))
                 {
+                    g_MessageType = MESSAGE_TYPE_SYS_WARNING;
                     MessageText = fmt::format_ne(g_gameStrings.errorOpenFileFailed, levelPath);
                     PauseGame(PauseCode::Message);
                     ErrorQuit = true;
@@ -1311,6 +1313,7 @@ int GameMain(const CmdLineSetup_t &setup)
                 for(int A = 1; A <= numPlayers; A++)
                     Player[A].Dead = true;
 
+                g_MessageType = MESSAGE_TYPE_SYS_WARNING;
                 PauseGame(PauseCode::Message);
 
                 if(g_config.modern_lives_system)
@@ -2322,6 +2325,7 @@ void StartEpisode()
 
         if(!OpenLevel(levelPath))
         {
+            g_MessageType = MESSAGE_TYPE_SYS_WARNING;
             MessageText = fmt::format_ne(g_gameStrings.errorOpenFileFailed, levelName);
             PauseGame(PauseCode::Message);
             ErrorQuit = true;
@@ -2376,6 +2380,7 @@ void StartBattleMode()
 
     if(NumSelectBattle <= 1)
     {
+        g_MessageType = MESSAGE_TYPE_SYS_WARNING;
         MessageText = g_mainMenu.errorBattleNoLevels;
         PauseGame(PauseCode::Message);
         ErrorQuit = true;
@@ -2389,6 +2394,7 @@ void StartBattleMode()
     std::string levelPath = SelectBattle[selWorld].WorldPath + SelectBattle[selWorld].WorldFile;
     if(!OpenLevel(levelPath))
     {
+        g_MessageType = MESSAGE_TYPE_SYS_WARNING;
         MessageText = fmt::format_ne(g_gameStrings.errorOpenFileFailed, SelectBattle[selWorld].WorldFile);
         PauseGame(PauseCode::Message);
         ErrorQuit = true;

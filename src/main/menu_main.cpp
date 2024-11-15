@@ -1008,12 +1008,14 @@ bool mainMenuUpdate()
                     if(!GFX.EIcons.inited)
                     {
                         PlaySoundMenu(SFX_BlockHit);
+                        g_MessageType = MESSAGE_TYPE_SYS_WARNING;
                         MessageText = fmt::format_ne(g_mainMenu.editorErrorMissingResources, "EditorIcons.png");
                         PauseGame(PauseCode::Message);
                     }
                     else if(!EditorCustom::loaded)
                     {
                         PlaySoundMenu(SFX_BlockHit);
+                        g_MessageType = MESSAGE_TYPE_SYS_WARNING;
                         MessageText = fmt::format_ne(g_mainMenu.editorErrorMissingResources, "editor.ini");
                         PauseGame(PauseCode::Message);
                     }
@@ -1730,6 +1732,7 @@ bool mainMenuUpdate()
                         {
                             PlaySoundMenu(SFX_Message);
 
+                            g_MessageType = MESSAGE_TYPE_SYS_INFO;
                             MessageText = g_mainMenu.warnEpCompat;
                             PauseGame(PauseCode::Message);
                         }

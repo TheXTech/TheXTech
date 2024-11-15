@@ -67,6 +67,7 @@ void config_rendermode_set()
 
     if(!res)
     {
+        g_MessageType = MESSAGE_TYPE_SYS_INFO;
         MessageText = g_mainMenu.optionsRestartEngine;
         PauseGame(PauseCode::Message);
     }
