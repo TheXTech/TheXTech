@@ -255,6 +255,10 @@ void AppPathManager::initSettingsPath()
     if(!DirMan::exists(gameSaveRootDir()))
         DirMan::mkAbsPath(gameSaveRootDir());
 
+    // Create the user assets directory, as a hint for the user
+    if(!DirMan::exists(m_userPath + "assets/"))
+        DirMan::mkAbsPath(m_userPath + "assets/");
+
     // And create empty worlds and battle directories too, make a hint for user
     if(!DirMan::exists(userWorldsRootDir()))
         DirMan::mkAbsPath(userWorldsRootDir());
