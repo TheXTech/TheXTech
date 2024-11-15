@@ -108,7 +108,8 @@ void EventsSDL::processEvent()
         break;
 #ifdef USE_RENDER_BLOCKING
     case SDL_RENDER_DEVICE_RESET:
-        D_pLogDebugNA("Android: Render Device Reset");
+        pLogInfo("Android: Render Device Reset");
+        g_frmMain.restartRenderer();
         break;
     case SDL_APP_WILLENTERBACKGROUND:
         XRender::setBlockRender(true);
