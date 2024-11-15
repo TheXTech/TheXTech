@@ -23,6 +23,10 @@
 #include <SDL2/SDL_thread.h>
 #endif
 
+#ifdef __WIIU__
+#include <sysapp/launch.h>
+#endif
+
 #include <Logger/logger.h>
 #include <Utils/files.h>
 #include <AppPath/app_path.h>
@@ -440,7 +444,6 @@ int GameMain(const CmdLineSetup_t &setup)
         InitScreens();
         Screens_AssignPlayer(1, *l_screen);
         QuickReconnectScreen::g_active = true;
-        MessageText = "Fatal: no assets!\nExtract a game/asset pack to:\n";
 
         g_MessageType = MESSAGE_TYPE_SYS_ERROR;
         MessageTitle = "Fatal: assets not found";
@@ -458,7 +461,8 @@ int GameMain(const CmdLineSetup_t &setup)
         }
 
         PauseGame(PauseCode::Message);
-        GameIsActive = false;
+        GracefulQuit();
+        return 0;
     }
     else if(cmdline_content) // Start level testing immediately!
     {
@@ -797,7 +801,8 @@ int GameMain(const CmdLineSetup_t &setup)
         // quickly exit if returned to menu from world test
         else if(setup.testLevelMode && GameMenu)
         {
-            GameIsActive = false;
+            GracefulQuit();
+            return 0;
         }
 
         // The Game Menu
@@ -1439,7 +1444,8 @@ int GameMain(const CmdLineSetup_t &setup)
                 // from command line, close (if player has requested to stop testing)
                 else if(setup.testLevelMode)
                 {
-                    GameIsActive = false;
+                    GracefulQuit();
+                    return 0;
                 }
 
                 LevelBeatCode = 0;
@@ -1534,6 +1540,32 @@ void KillIt()
     XWindow::showCursor(1);
 }
 
+void GracefulQuit(bool wait)
+{
+    XRender::setTargetTexture();
+    XRender::clearBuffer();
+    StopMusic();
+    XRender::repaint();
+    XEvents::doEvents();
+
+#ifdef __WIIU__
+    if(GameIsActive && !g_isHBLauncher)
+    {
+        SYSLaunchMenu(); // Trigger the SDL_QUIT and the leading quit into Wii U main menu
+
+        while(GameIsActive) // Wait until quit event will happen
+        {
+            XEvents::doEvents();
+            PGE_Delay(1);
+        }
+    }
+#endif
+
+    if(!wait)
+        PGE_Delay(500);
+
+    KillIt();
+}
 
 void NextLevel()
 {

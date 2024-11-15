@@ -57,6 +57,7 @@ void MenuLoop();
 void EditorLoop();
 //! Cleans up the buffer before ending the program
 void KillIt();
+void GracefulQuit(bool wait = false);
 
 // OpenLevel() and ClearLevel() moved into main/level_file.h
 

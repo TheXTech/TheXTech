@@ -25,10 +25,6 @@
 #include <SDL2/SDL_thread.h>
 #endif
 
-#ifdef __WIIU__
-#include <sysapp/launch.h>
-#endif
-
 #include <fmt_format_ne.h>
 #include <array>
 
@@ -1047,22 +1043,7 @@ bool mainMenuUpdate()
                 else if(MenuCursor == i++)
                 {
                     PlaySoundMenu(SFX_Do);
-                    XRender::setTargetTexture();
-                    XRender::clearBuffer();
-                    StopMusic();
-                    XRender::repaint();
-                    XEvents::doEvents();
-
-#ifdef __WIIU__
-                    if(GameIsActive && !g_isHBLauncher)
-                        SYSLaunchMenu(); // Trigger the SDL_QUIT and the leading quit into Wii U main menu
-                    XEvents::doEvents();
-#endif
-
-                    if(!g_config.unlimited_framerate)
-                        PGE_Delay(500);
-
-                    KillIt();
+                    GracefulQuit(true);
                     return true;
                 }
 
