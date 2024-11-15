@@ -328,7 +328,17 @@ void GameLoop()
 void MessageScreen_Init()
 {
     SoundPause[SFX_Message] = 0;
-    PlaySound(SFX_Message);
+
+    switch(g_MessageType)
+    {
+    case MESSAGE_TYPE_SYS_ERROR:
+        PlaySound(SFX_SMGlass);
+        break;
+    default:
+        PlaySound(SFX_Message);
+        break;
+    }
+
     MenuCursorCanMove = false;
     MenuCursorCanMove_Back = false;
     BuildUTF8CharMap(MessageText, MessageTextMap);

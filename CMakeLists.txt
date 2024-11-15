@@ -731,6 +731,7 @@ set(THEXTECH_SRC
     src/npc.cpp
     src/sound.cpp
     src/sound_spatial.cpp
+    src/sound/sound_msgsnd.cpp
     src/frame_timer.cpp
     src/global_dirs.cpp
     src/global_strings.cpp
@@ -1116,6 +1117,7 @@ file(GLOB THEXTECH_HEADS_SRC
     src/main/*.hpp
     src/npc/*.h
     src/npc/*.hpp
+    src/sound/*.h
     src/sound/fx/*.h
     src/sound/fx/*.hpp
     src/fontman/*.h

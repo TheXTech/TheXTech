@@ -40,6 +40,8 @@
 #include "sound/fx/spc_echo.h"
 #endif
 
+#include "sound/sound_msgsnd.h"
+
 #include <Logger/logger.h>
 #include <IniProcessor/ini_processing.h>
 #include <Utils/files.h>
@@ -1442,6 +1444,12 @@ void PlaySound(int A, int loops, int volume)
 {
     if(!g_mixerLoaded)
         return;
+
+    if(g_totalSounds == 0)
+    {
+        playFallbackSfx(A, loops, volume);
+        return;
+    }
 
     if(GameMenu || GameOutro) // || A == 26 || A == 27 || A == 29)
         return;
