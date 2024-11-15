@@ -250,6 +250,9 @@ static bool s_show_separate_2P()
 
 static void s_change_save_item()
 {
+    if(MenuCursor < 0 || MenuCursor >= maxSaveSlots)
+        return;
+
     int save_configs = SaveSlotInfo[MenuCursor + 1].ConfigDefaults;
 
     if(save_configs > 0)
