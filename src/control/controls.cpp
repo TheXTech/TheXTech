@@ -877,7 +877,13 @@ bool Update(bool check_lost_devices)
         }
     }
 
-    for(int A = 1; A <= numPlayers && A <= maxNetplayPlayers; A++)
+    int numPlayers_p = numPlayers;
+
+    // fix a bug affecting main menu dead mode
+    if(GameMenu || GameOutro)
+        numPlayers_p = maxLocalPlayers;
+
+    for(int A = 1; A <= numPlayers_p && A <= maxNetplayPlayers; A++)
         Player[A].Controls = s_last_controls[A];
 
     // check for legacy pause key
