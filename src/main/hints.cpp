@@ -123,7 +123,7 @@ static void s_draw_char5_bombs(int x, int y)
     XRender::renderTexture(x + 96 + 4 - NPCTraits[NPCID_BOMB].WidthGFX, y + 96 - 8 - NPCTraits[NPCID_BOMB].HeightGFX, NPCTraits[NPCID_BOMB].WidthGFX, NPCTraits[NPCID_BOMB].HeightGFX, tex, 0, 0);
 }
 
-static void s_draw_red_duck(int x, int y)
+static void s_draw_shoe_block(int x, int y)
 {
     StdPicture& plant = GFXNPC[NPCID_FIRE_PLANT];
     XRender::renderTexture(x + 96 - 4 - 32, y + 96 - 8 - NPCTraits[NPCID_FIRE_PLANT].THeight, 32, NPCTraits[NPCID_FIRE_PLANT].THeight, plant, 0, 0);
@@ -131,8 +131,21 @@ static void s_draw_red_duck(int x, int y)
     StdPicture& fire = GFXNPC[NPCID_PLANT_FIRE];
     XRender::renderTexture(x + 96 - 56, y + 96 - 56, 32, NPCTraits[NPCID_PLANT_FIRE].THeight, fire, 0, 0);
 
+    DrawPlayerRaw(x + 8 + 4, y + 96 - 8 - 32 - 22, 3, 1, 1, 1);
+
     StdPicture& boot = GFXNPC[NPCID_RED_BOOT];
     XRender::renderTexture(x + 8, y + 96 - 8 - 32, 32, 32, boot, 0, 64);
+}
+
+static void s_draw_heavy_duck(int x, int y)
+{
+    StdPicture& plant = GFXNPC[NPCID_FIRE_PLANT];
+    XRender::renderTexture(x + 96 - 4 - 32, y + 96 - 8 - NPCTraits[NPCID_FIRE_PLANT].THeight, 32, NPCTraits[NPCID_FIRE_PLANT].THeight, plant, 0, 0);
+
+    StdPicture& fire = GFXNPC[NPCID_PLANT_FIRE];
+    XRender::renderTexture(x + 96 - 56, y + 96 - 56, 32, NPCTraits[NPCID_PLANT_FIRE].THeight, fire, 0, 0);
+
+    DrawPlayerRaw(x + 8, y + 96 - 56, 1, 6, 7, 1);
 }
 
 static void s_draw_gray_bricks(int x, int y)
@@ -251,7 +264,7 @@ static uint8_t s_char5_bombs_applies()
     return 0;
 }
 
-static uint8_t s_red_duck_applies()
+static uint8_t s_shoe_block_applies()
 {
     if(LevelSelect)
         return 0;
@@ -260,6 +273,20 @@ static uint8_t s_red_duck_applies()
     {
         if(Player[A].Mount == 1 && Player[A].MountType == 2)
             return 104;
+    }
+
+    return 0;
+}
+
+static uint8_t s_heavy_duck_applies()
+{
+    if(LevelSelect)
+        return 0;
+
+    for(int A = 1; A <= numPlayers; A++)
+    {
+        if(Player[A].State == 6)
+            return 101;
     }
 
     return 0;
@@ -302,7 +329,8 @@ static const Hint s_hints[] = {
     {"If you fail, the game will end.", "no-lives-old", s_no_lives_old, s_draw_no_lives},
     {"Grab, run, hold down, and let go to surf.", "rainbow-surf", s_rainbow_surf_applies, s_draw_rainbow_surf},
     {"Press Run to collect and Alt Run to throw.", "char5-bombs", s_char5_bombs_applies, s_draw_char5_bombs},
-    {"Duck to block most - but not all - flames!", "red-duck", s_red_duck_applies, s_draw_red_duck},
+    {"Duck to block most - but not all - flames!", "heavy-duck", s_heavy_duck_applies, s_draw_heavy_duck},
+    {"Wearing this blocks most - but not all - flames!", "shoe-block", s_shoe_block_applies, s_draw_shoe_block},
     {"Some blocks are vulnerable to special powers.", "gray-bricks", s_gray_bricks_applies, s_draw_gray_bricks},
 };
 
