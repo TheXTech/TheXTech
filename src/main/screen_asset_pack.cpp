@@ -375,6 +375,7 @@ bool Logic()
 
             if(!g_AssetsLoaded)
             {
+                XRender::setTargetTexture();
                 XRender::clearBuffer();
                 XRender::repaint();
             }
