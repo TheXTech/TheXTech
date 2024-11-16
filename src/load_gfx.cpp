@@ -1566,9 +1566,11 @@ void UpdateLoadREAL()
     }
 #endif // THEXTECH_INTERPROC_SUPPORTED
 
+    bool assets_reload = (ScreenAssetPack::g_LoopActive && g_AssetsLoaded);
+
     static uint8_t alphaFader = 255;
 
-    if(ScreenAssetPack::g_LoopActive)
+    if(assets_reload)
         alphaFader = 0;
 
     if(LoadCoinsT <= SDL_GetTicks())
@@ -1600,8 +1602,6 @@ void UpdateLoadREAL()
     {
         XRender::setTargetTexture();
         XRender::clearBuffer();
-
-        bool assets_reload = (ScreenAssetPack::g_LoopActive && g_AssetsLoaded);
 
         int sh_w = XRender::TargetW / 2;
         int gh_w = GFX.MenuGFX[4].w / 2;
