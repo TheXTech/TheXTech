@@ -30,6 +30,10 @@ struct GameContent
     std::string controlsPhrasePlayerDisconnected;
     std::string controlsPhrasePlayerConnected;
 
+    std::string msgBoxTitleInfo;
+    std::string msgBoxTitleWarning;
+    std::string msgBoxTitleError;
+
     std::string errorOpenFileFailed;
     std::string errorInvalidEnterWarp;
     std::string errorNoStartPoint;

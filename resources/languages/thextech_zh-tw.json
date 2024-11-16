@@ -335,9 +335,9 @@
             "phrasePlayerDisconnected": "玩家{0}未連接任何設備"
         },
         "error": {
-            "errorInvalidEnterWarp": "========= 發生錯誤! =========\n\n作爲關卡起點的傳送點{1}號不存在，因此無法進入關卡。\n傳送點總數：{2}\n\n檔案：{0}",
-            "errorNoStartPoint": "========= 發生錯誤! =========\n\n未放置玩家起點或傳送點入口，因此無法進入關卡。\n\n檔案：{0}",
-            "openFileFailed": "錯誤：無法打開檔案\"{0}\"：檔案不存在或已損壞。",
+            "errorInvalidEnterWarp": "作爲關卡起點的傳送點{1}號不存在，因此無法進入關卡。\n傳送點總數：{2}\n\n檔案：{0}",
+            "errorNoStartPoint": "未放置玩家起點或傳送點入口，因此無法進入關卡。\n\n檔案：{0}",
+            "openFileFailed": "無法打開檔案\"{0}\"：檔案不存在或已損壞。",
             "warpNeedStarCount": "你需要{0}{2}{1}才能進入此傳送點。"
         },
         "pause": {
@@ -351,6 +351,9 @@
             "saveAndContinue": "保存並繼續",
             "saveAndQuit": "保存並退出",
             "playerSetup": "玩家設定"
+        },
+        "msgbox": {
+            "sysInfoError": "發生錯誤!"
         },
         "format": {
             "minutesSeconds": "{0}分{1}秒"

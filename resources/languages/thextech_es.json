@@ -468,10 +468,10 @@
             "reconnectTitle": "Reconectar"
         },
         "error": {
-            "errorInvalidEnterWarp": "========= ERROR! =========\n\nImposible comenzar el nivel debido a que un pasaje de entrada inválido {1} fue especificado.\nTotal Pasajes de Entrada: {2}\n\nArchivo: {0}",
-            "openFileFailed": "ERROR: Imposible abrir \"{0}\": El archivo está corrupto o no existe.",
+            "errorInvalidEnterWarp": "Imposible comenzar el nivel debido a que un pasaje de entrada inválido {1} fue especificado.\nTotal Pasajes de Entrada: {2}\n\nArchivo: {0}",
+            "openFileFailed": "Imposible abrir \"{0}\": El archivo está corrupto o no existe.",
             "warpNeedStarCount": "Necesitas {0} {1} para entrar.",
-            "errorNoStartPoint": "========= ERROR! =========\n\nImposible empezar nivel debido a que no hay puntos de comienzo colocados ni pasajes de entrada especificados.\n\nArchivo: {0}"
+            "errorNoStartPoint": "Imposible empezar nivel debido a que no hay puntos de comienzo colocados ni pasajes de entrada especificados.\n\nArchivo: {0}"
         },
         "pause": {
             "restartLevel": "Reiniciar Nivel",

@@ -335,9 +335,9 @@
             "phrasePlayerDisconnected": "玩家{0}未连接任何设备"
         },
         "error": {
-            "errorInvalidEnterWarp": "========= 发生错误! =========\n\n作为关卡起点的传送点{1}号不存在，因此无法进入关卡。\n传送点总数：{2}\n\n文件：{0}",
-            "errorNoStartPoint": "========= 发生错误! =========\n\n未放置玩家起点或传送点入口，因此无法进入关卡。\n\n文件：{0}",
-            "openFileFailed": "错误：无法打开文件\"{0}\"：文件不存在或已损坏。",
+            "errorInvalidEnterWarp": "作为关卡起点的传送点{1}号不存在，因此无法进入关卡。\n传送点总数：{2}\n\n文件：{0}",
+            "errorNoStartPoint": "未放置玩家起点或传送点入口，因此无法进入关卡。\n\n文件：{0}",
+            "openFileFailed": "无法打开文件\"{0}\"：文件不存在或已损坏。",
             "warpNeedStarCount": "你需要{0}{2}{1}才能进入此传送点。"
         },
         "format": {
@@ -354,6 +354,9 @@
             "saveAndContinue": "保存并继续",
             "saveAndQuit": "保存并退出",
             "playerSetup": "玩家选项"
+        },
+        "msgbox": {
+            "sysInfoError": "发生错误!"
         },
         "message": {
             "scanningLevels": "扫描关卡中……"

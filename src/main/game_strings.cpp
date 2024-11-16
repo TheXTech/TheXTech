@@ -27,19 +27,19 @@ void initGameStrings()
     g_gameStrings.controlsPhrasePlayerDisconnected = "P{0} disconnected";
     g_gameStrings.controlsPhrasePlayerConnected = "P{0} connected {1}, Profile: {2}";
 
-    g_gameStrings.errorOpenFileFailed = "ERROR: Can't open \"{0}\": file doesn't exist or corrupted.";
-    g_gameStrings.errorInvalidEnterWarp = "========= ERROR! =========\n"
-                                          "\n"
-                                          "Can't start the level "
+    g_gameStrings.msgBoxTitleInfo = "Info";
+    g_gameStrings.msgBoxTitleWarning = "Warning!";
+    g_gameStrings.msgBoxTitleError = "Error!";
+
+    g_gameStrings.errorOpenFileFailed = "Can't open \"{0}\": file doesn't exist or corrupted.";
+    g_gameStrings.errorInvalidEnterWarp = "Can't start the level "
                                           "because of an invalid "
                                           "entrance warp {1} was "
                                           "specified.\n"
                                           "Total warp entries: {2}\n"
                                           "\n"
                                           "File: {0}";
-    g_gameStrings.errorNoStartPoint = "========= ERROR! =========\n"
-                                      "\n"
-                                      "Can't start the level "
+    g_gameStrings.errorNoStartPoint = "Can't start the level "
                                       "because of no available "
                                       "start points placed or "
                                       "entrance warp specified.\n"

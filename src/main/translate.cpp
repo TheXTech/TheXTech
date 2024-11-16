@@ -425,6 +425,10 @@ XTechTranslate::XTechTranslate()
         {"game.controls.phrasePlayerDisconnected",  &g_gameStrings.controlsPhrasePlayerDisconnected},
         {"game.controls.phrasePlayerConnected",     &g_gameStrings.controlsPhrasePlayerConnected},
 
+        {"game.msgbox.sysInfoTitle",                &g_gameStrings.msgBoxTitleInfo},
+        {"game.msgbox.sysInfoWarning",              &g_gameStrings.msgBoxTitleWarning},
+        {"game.msgbox.sysInfoError",                &g_gameStrings.msgBoxTitleError},
+
         {"game.error.openFileFailed",               &g_gameStrings.errorOpenFileFailed},
         {"game.error.errorInvalidEnterWarp",        &g_gameStrings.errorInvalidEnterWarp},
         {"game.error.errorNoStartPoint",            &g_gameStrings.errorNoStartPoint},

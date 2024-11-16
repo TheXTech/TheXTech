@@ -53,6 +53,7 @@
 #include "screen_prompt.h"
 #include "main/level_medals.h"
 #include "script/luna/luna.h"
+#include "game_strings.h"
 
 #include "../pseudo_vb.h"
 
@@ -337,6 +338,24 @@ void MessageScreen_Init()
         SoundPause[SFX_Message] = 0;
         PlaySound(SFX_Message);
         break;
+    }
+
+    if(g_MessageType >= MESSAGE_TYPE_SYS_INFO && MessageTitle.empty())
+    {
+        switch(g_MessageType)
+        {
+        case MESSAGE_TYPE_SYS_INFO:
+            MessageTitle = g_gameStrings.msgBoxTitleInfo;
+            break;
+        case MESSAGE_TYPE_SYS_WARNING:
+            MessageTitle = g_gameStrings.msgBoxTitleWarning;
+            break;
+        case MESSAGE_TYPE_SYS_ERROR:
+            MessageTitle = g_gameStrings.msgBoxTitleError;
+            break;
+        default:
+            break;
+        }
     }
 
     MenuCursorCanMove = false;

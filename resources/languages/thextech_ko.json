@@ -576,9 +576,9 @@
         },
         "error": {
             "warpNeedStarCount": "입력하려면 {0} {1}이(가) 필요합니다.",
-            "errorInvalidEnterWarp": "========= 오류입니다! =========\n\n잘못된 입구 워프 {1}이(가) 지정되었기 때문에 레벨을 시작할 수 없습니다.\n총 워프 항목: {2}\n\n파일: {0}",
-            "openFileFailed": "오류: \"{0}\"을(를) 열 수 없습니다. 파일이 존재하지 않거나 손상되었습니다.",
-            "errorNoStartPoint": "========= 오류입니다! =========\n\n사용 가능한 시작점이 배치되지 않았거나 입구 워프가 지정되어 있지 않아 레벨을 시작할 수 없습니다.\n\n파일: {0}"
+            "errorInvalidEnterWarp": "잘못된 입구 워프 {1}이(가) 지정되었기 때문에 레벨을 시작할 수 없습니다.\n총 워프 항목: {2}\n\n파일: {0}",
+            "openFileFailed": "\"{0}\"을(를) 열 수 없습니다. 파일이 존재하지 않거나 손상되었습니다.",
+            "errorNoStartPoint": "사용 가능한 시작점이 배치되지 않았거나 입구 워프가 지정되어 있지 않아 레벨을 시작할 수 없습니다.\n\n파일: {0}"
         },
         "pause": {
             "continue": "계속하기",
@@ -591,6 +591,9 @@
             "returnToEditor": "편집기로 돌아가기",
             "saveAndContinue": "저장하고 계속하기",
             "playerSetup": "플레이어 설정"
+        },
+        "msgbox": {
+            "sysInfoError": "오류입니다!"
         },
         "message": {
             "scanningLevels": "레벨 스캔 중..."
