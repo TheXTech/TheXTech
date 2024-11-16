@@ -327,14 +327,14 @@ void GameLoop()
 
 void MessageScreen_Init()
 {
-    SoundPause[SFX_Message] = 0;
-
     switch(g_MessageType)
     {
     case MESSAGE_TYPE_SYS_ERROR:
+        SoundPause[SFX_SMGlass] = 0;
         PlaySound(SFX_SMGlass);
         break;
     default:
+        SoundPause[SFX_Message] = 0;
         PlaySound(SFX_Message);
         break;
     }
