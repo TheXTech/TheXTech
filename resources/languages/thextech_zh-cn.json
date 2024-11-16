@@ -356,7 +356,9 @@
             "playerSetup": "玩家选项"
         },
         "msgbox": {
-            "sysInfoError": "发生错误!"
+            "sysInfoError": "发生错误!",
+            "sysInfoTitle": "信息",
+            "sysInfoWarning": "警告！"
         },
         "message": {
             "scanningLevels": "扫描关卡中……"
@@ -367,7 +369,9 @@
             "no-lives-new": "如果生命值为0，得分将会清零。",
             "rainbow-surf": "在拿起彩虹龟壳的时候，按下“下”键，开始冲浪吧！",
             "char5-bombs": "按下“奔跑”键可收集炸弹，按下“第二奔跑”键可投掷炸弹。",
-            "gray-bricks": "神秘力量可以破坏部分砖块。"
+            "gray-bricks": "神秘力量可以破坏部分砖块。",
+            "heavy-duck": "玩家下蹲时，可以抵挡大多数火焰！",
+            "shoe-block": "穿上该装备时，可以抵挡大多数火焰！"
         }
     },
     "languageName": "简体中文",
@@ -435,7 +439,8 @@
                 "legacyPause": "旧版暂停菜单",
                 "recordGif": "GIF 动画录制",
                 "screenshot": "截图",
-                "toggleHUD": "状态栏切换"
+                "toggleHUD": "状态栏切换",
+                "vanillaCam": "原始镜像"
             },
             "options": {
                 "batteryStatus": "电池状态",
@@ -653,7 +658,14 @@
                 },
                 "_header": "高级选项",
                 "advanced-audio": "音频选项",
-                "webm-recording": "录制WEBM视频"
+                "webm-recording": "录制WEBM视频",
+                "internal-res-4p": {
+                    "_name": "四人分屏画面大小",
+                    "qhd": "2560x1440（QHD）",
+                    "qsmbx": "1600x1200（QSMBX）",
+                    "default": "默认",
+                    "fhd": "1920x1080（FHD）"
+                }
             },
             "audio": {
                 "_header": "音频选项",
