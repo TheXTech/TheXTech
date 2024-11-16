@@ -68,13 +68,20 @@ set(VITA_ADDTL_LIBS
     SceVshBridge_stub
 )
 
+if(THEXTECH_BUILD_GL_ES_MODERN)
+    list(APPEND VITA_ADDTL_LIBS
+        SceIme_stub
+        libIMGEGL_stub
+        libgpu_es4_ext_stub
+        libGLESv2_stub
+    )
+endif()
+
 # VITA_CMAKE_FLAGS is used in conjunction with ExternalProject_Add
 set(VITA_CMAKE_FLAGS
     # General/TheXTech
     "-DVITA=1"
     "-DENABLE_FPIC=0"
-    "-DUSE_SYSTEM_SDL2_DEFAULT=ON"
-    "-DUSE_SYSTEM_SDL2=ON"
     "-DUSE_STATIC_LIBC=OFF"
 
     # Free Image
@@ -85,8 +92,6 @@ set(VITA_CMAKE_FLAGS
 
     # Audio Mixer
     "-DPGE_SHARED_SDLMIXER=OFF"
-    "-DPGE_USE_LOCAL_SDL2=OFF"
-    "-DUSE_SYSTEM_SDL2=ON"
     "-DUSE_GME=ON"
     "-DUSE_MIDI=ON"
     "-DADLMIDI_LIBRARY="

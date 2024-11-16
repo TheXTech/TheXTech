@@ -23,7 +23,7 @@ endif()
 
 option(MIXERX_ENABLE_WAVPACK "Enable the WavPack codec support [Support is experimental, doesn't builds on some platforms]" OFF)
 
-if(NOT VITA AND NOT NINTENDO_WII AND NOT NINTENDO_WIIU AND NOT XTECH_MACOSX_TIGER)
+if(NOT NINTENDO_WII AND NOT NINTENDO_WIIU AND NOT XTECH_MACOSX_TIGER)
     option(PGE_USE_LOCAL_SDL2 "Do use the locally-built SDL2 library from the AudioCodecs set. Otherwise, download and build the development top main version." ON)
 else()
     option(PGE_USE_LOCAL_SDL2 "Do use the locally-built SDL2 library from the AudioCodecs set. Otherwise, download and build the development top main version." OFF)
@@ -151,9 +151,14 @@ if(VITA)
         "-DBUILD_OPUS=ON"
     )
 
+    if(THEXTECH_BUILD_GL_ES_MODERN)
+        list(APPEND VITA_AUDIOCODECS_CMAKE_FLAGS
+            "-DVITA_SDL2_PVR=ON"
+        )
+    endif()
+
     set(VITA_MIXERX_CMAKE_FLAGS
         "-DUSE_OGG_VORBIS_TREMOR=OFF"
-        "-DUSE_SYSTEM_SDL2=ON"
         "-DUSE_SYSTEM_AUDIO_LIBRARIES_DEFAULT=ON"
         "-DSDL_MIXER_X_SHARED=OFF"
         "-DFLAC_LIBRARIES=FLAC"
