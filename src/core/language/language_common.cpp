@@ -212,8 +212,13 @@ void XLanguage::resolveLanguage(const std::string& requestedLanguage)
         }
 
         if(detectSetup())
+        {
+            SDL_free(loc);
             return; // Found!
+        }
     }
+
+    SDL_free(loc);
 #endif
 
     // Detect using system specific ways
