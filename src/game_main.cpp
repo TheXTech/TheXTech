@@ -1287,7 +1287,7 @@ int GameMain(const CmdLineSetup_t &setup)
             for(int i = 1; i <= numPlayers && i <= 2; ++i)
                 hasPlayerPoint |= !PlayerStart[i].isNull();
 
-            if(hasCrashStartWarp)
+            if(hasCrashStartWarp || (TestLevel && hasStartWarp && !hasValidStartWarp))
             {
                 g_MessageType = MESSAGE_TYPE_SYS_ERROR;
                 // this case would have crashed SMBX 1.3.
