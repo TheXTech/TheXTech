@@ -53,6 +53,10 @@ void EventsSDL::doEvents()
     while(SDL_PollEvent(&m_event))
     {
         processEvent();
+#ifdef __WIIU__
+        if(m_event.type == SDL_QUIT) // Don't process any events after quit
+            break;
+#endif
     }
 }
 

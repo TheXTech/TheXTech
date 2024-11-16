@@ -1546,9 +1546,23 @@ void KillIt()
 
 void GracefulQuit(bool wait)
 {
-    XRender::setTargetTexture();
-    XRender::clearBuffer();
+#ifdef __WIIU__
+    if(!GameIsActive)
+        return; // Don't call this twice
+#endif
+
     StopMusic();
+
+    if(wait)
+    {
+        g_levelScreenFader.setupFader(2, 0, 65, ScreenFader::S_FADE);
+        levelWaitForFade();
+    }
+
+    StopAllSounds();
+
+    XRender::setTargetScreen();
+    XRender::clearBuffer();
     XRender::repaint();
     XEvents::doEvents();
 
@@ -1560,13 +1574,12 @@ void GracefulQuit(bool wait)
         while(GameIsActive) // Wait until quit event will happen
         {
             XEvents::doEvents();
-            PGE_Delay(1);
+            PGE_Delay(10);
         }
+
+        PGE_Delay(100);
     }
 #endif
-
-    if(!wait)
-        PGE_Delay(500);
 
     KillIt();
 }
