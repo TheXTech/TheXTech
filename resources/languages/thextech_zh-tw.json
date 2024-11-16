@@ -119,11 +119,11 @@
         },
         "layers": {
             "abbrevAttLayer": "跟隨：",
-            "default": "默認",
+            "default": "缺省",
             "deletion": {
                 "cancel": "取消：返回上一級菜單",
                 "confirmDelete": "否：*刪除全部對象*",
-                "confirmPreserve": "是：移動到默認圖層",
+                "confirmPreserve": "是：移動到缺省圖層",
                 "header": "刪除{0}圖層",
                 "preserveLayerContents": "是否保留圖層對象？"
             },
@@ -353,7 +353,9 @@
             "playerSetup": "玩家設定"
         },
         "msgbox": {
-            "sysInfoError": "發生錯誤!"
+            "sysInfoError": "發生錯誤!",
+            "sysInfoWarning": "警告！",
+            "sysInfoTitle": "信息"
         },
         "format": {
             "minutesSeconds": "{0}分{1}秒"
@@ -367,7 +369,9 @@
             "pound-key": "按下高亮的按鍵，進行震地！",
             "char5-bombs": "按下“奔跑”鍵可收集炸彈，按下“第二奔跑”鍵可投擲炸彈。",
             "gray-bricks": "神秘力量可以破壞部分磚塊。",
-            "rainbow-surf": "在拿起彩虹龜殼的時候，按下“下”鍵，開始衝浪吧！"
+            "rainbow-surf": "在拿起彩虹龜殼的時候，按下“下”鍵，開始衝浪吧！",
+            "shoe-block": "穿上該裝備時，可以抵擋大多數火焰！",
+            "heavy-duck": "玩家下蹲時，可以抵擋大多數火焰！"
         }
     },
     "languageName": "繁體中文",
@@ -435,7 +439,8 @@
                 "legacyPause": "舊版暫停菜單",
                 "recordGif": "GIF 動畫錄製",
                 "screenshot": "截圖",
-                "toggleHUD": "狀態欄切換"
+                "toggleHUD": "狀態欄切換",
+                "vanillaCam": "原始畫面大小"
             },
             "options": {
                 "batteryStatus": "電池狀態",
@@ -653,7 +658,14 @@
                     "_name": "取樣率"
                 },
                 "choose-assets-on-launch": "啟動程序時，彈出選擇組件介面",
-                "webm-recording": "録製WEBM視訊"
+                "webm-recording": "録製WEBM視訊",
+                "internal-res-4p": {
+                    "fhd": "1920x1080（FHD）",
+                    "qhd": "2560x1440（QHD）",
+                    "qsmbx": "1600x1200（QSMBX）",
+                    "_name": "四人分屏模式畫面大小",
+                    "default": "缺省"
+                }
             },
             "audio": {
                 "audio-sfx-volume": "聲音音量",

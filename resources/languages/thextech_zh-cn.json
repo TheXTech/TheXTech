@@ -440,7 +440,7 @@
                 "recordGif": "GIF 动画录制",
                 "screenshot": "截图",
                 "toggleHUD": "状态栏切换",
-                "vanillaCam": "原始镜像"
+                "vanillaCam": "原始画面大小"
             },
             "options": {
                 "batteryStatus": "电池状态",
@@ -660,7 +660,7 @@
                 "advanced-audio": "音频选项",
                 "webm-recording": "录制WEBM视频",
                 "internal-res-4p": {
-                    "_name": "四人分屏画面大小",
+                    "_name": "四人分屏模式画面大小",
                     "qhd": "2560x1440（QHD）",
                     "qsmbx": "1600x1200（QSMBX）",
                     "default": "默认",
