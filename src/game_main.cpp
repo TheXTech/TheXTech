@@ -1555,13 +1555,21 @@ void GracefulQuit(bool wait)
 
     if(wait)
     {
-        g_levelScreenFader.setupFader(2, 0, 65, ScreenFader::S_FADE);
-        levelWaitForFade();
+        const Uint64 waitDst = SDL_GetTicks64() + 500;
+
+        do
+        {
+            XRender::setTargetTexture();
+            XRender::clearBuffer();
+            XRender::repaint();
+            XEvents::doEvents();
+            PGE_Delay(16);
+        } while(SDL_GetTicks64() < waitDst);
     }
 
     StopAllSounds();
 
-    XRender::setTargetScreen();
+    XRender::setTargetTexture();
     XRender::clearBuffer();
     XRender::repaint();
     XEvents::doEvents();
