@@ -562,7 +562,7 @@
             "gameEraseSlot": "Select the slot to erase",
             "gameNoBattleLevels": "<No battle levels>",
             "gameNoEpisodesToPlay": "<No episodes to play>",
-            "warnEpCompat": "Warning: this episode was made for a different branch of SMBX and may not work properly.",
+            "warnEpCompat": "This episode was made for a different branch of SMBX and may not work properly.",
             "gameSlotContinue": "SLOT {0} ... {1}%",
             "gameSlotNew": "SLOT {0} ... NEW GAME",
             "gameSourceSlot": "Select the source slot",
