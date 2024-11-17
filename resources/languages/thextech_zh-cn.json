@@ -356,7 +356,7 @@
             "playerSetup": "玩家选项"
         },
         "msgbox": {
-            "sysInfoError": "发生错误!",
+            "sysInfoError": "错误！",
             "sysInfoTitle": "信息",
             "sysInfoWarning": "警告！"
         },
@@ -371,7 +371,7 @@
             "char5-bombs": "按下“奔跑”键可收集炸弹，按下“第二奔跑”键可投掷炸弹。",
             "gray-bricks": "神秘力量可以破坏部分砖块。",
             "heavy-duck": "玩家下蹲时，可以抵挡大多数火焰！",
-            "shoe-block": "穿上该装备时，可以抵挡大多数火焰！"
+            "shoe-block": "穿上鞋子时，可以抵挡大多数火焰！"
         }
     },
     "languageName": "简体中文",
