@@ -318,7 +318,8 @@ jobs:
           export PATH=${{ matrix.config.extra_path }}:${PATH}
         fi
         cd build
-        cpack  .        mv *.deb thextech-adventures-of-demo-${{ matrix.config.package_filename_suffix }}-${BRANCH_NAME}.deb
+        cpack .
+        mv *.deb thextech-bin-${{ matrix.config.package_filename_suffix }}-${BRANCH_NAME}.deb
         cd ..
 
     - name: Upload artifact
