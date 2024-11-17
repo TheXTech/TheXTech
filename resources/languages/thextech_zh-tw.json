@@ -353,7 +353,7 @@
             "playerSetup": "玩家設定"
         },
         "msgbox": {
-            "sysInfoError": "發生錯誤!",
+            "sysInfoError": "錯誤！",
             "sysInfoWarning": "警告！",
             "sysInfoTitle": "信息"
         },
@@ -370,7 +370,7 @@
             "char5-bombs": "按下“奔跑”鍵可收集炸彈，按下“第二奔跑”鍵可投擲炸彈。",
             "gray-bricks": "神秘力量可以破壞部分磚塊。",
             "rainbow-surf": "在拿起彩虹龜殼的時候，按下“下”鍵，開始衝浪吧！",
-            "shoe-block": "穿上該裝備時，可以抵擋大多數火焰！",
+            "shoe-block": "穿上鞋子時，可以抵擋大多數火焰！",
             "heavy-duck": "玩家下蹲時，可以抵擋大多數火焰！"
         }
     },
