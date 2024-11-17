@@ -1216,278 +1216,239 @@ void ProcEvent(eventindex_t index, int whichPlayer, bool NoEffect)
     // Ignore vanilla autoscroll if newer way has been used
     bool autoScrollerChanged = false;
 
+    auto &evt = Events[index];
+
+    recentlyTriggeredEvents.insert(index);
+
+    if(g_config.speedrun_stop_timer_by == Config_t::SPEEDRUN_STOP_EVENT && equalCase(evt.Name.c_str(), g_config.speedrun_stop_timer_at))
+        speedRun_bossDeadEvent();
+
+    for(B = 0; B < numSections; B++)
     {
-        auto &evt = Events[index];
+        /* Music change */
+        auto &s = evt.section[B];
+
+        bool musicChanged = false;
+        if(s.music_id == EventSection_t::LESet_ResetDefault)
         {
-            recentlyTriggeredEvents.insert(index);
+            bgMusic[B] = bgMusicREAL[B];
+            musicChanged = true;
+        }
+        else if(s.music_id != EventSection_t::LESet_Nothing)
+        {
+            bgMusic[B] = s.music_id;
+            musicChanged = true;
+        }
 
-            if(g_config.speedrun_stop_timer_by == Config_t::SPEEDRUN_STOP_EVENT && equalCase(evt.Name.c_str(), g_config.speedrun_stop_timer_at))
-                speedRun_bossDeadEvent();
+        if(musicChanged && (B == Player[1].Section || (numPlayers == 2 && B == Player[2].Section)))
+            StartMusic(B);
 
-            for(B = 0; B < numSections; B++)
+        /* Background change */
+        if(s.background_id == EventSection_t::LESet_ResetDefault)
+            Background2[B] = Background2REAL[B];
+        else if(s.background_id != EventSection_t::LESet_Nothing)
+            Background2[B] = s.background_id;
+
+        /* Per-Section autoscroll setup */
+        if(s.autoscroll)
+        {
+            if(!AutoUseModern) // First attemt to use modern autoscrolling will block futher use of the legacy autoscrolling
+                AutoUseModern = true;
+            autoScrollerChanged = true;
+            AutoX[B] = s.autoscroll_x;
+            AutoY[B] = s.autoscroll_y;
+        }
+
+        bool is_reset = int(s.position.X) == EventSection_t::LESet_ResetDefault;
+
+        /* Resize the section boundaries */
+        if(is_reset && !g_config.modern_section_change)
+        {
+            level[B] = LevelREAL[B];
+            UpdateSectionOverlaps(B);
+        }
+        else if(int(s.position.X) != EventSection_t::LESet_Nothing)
+        {
+            tempLevel = level[B];
+            newLevel = (is_reset) ? LevelREAL[B] : s.position;
+            level[B] = newLevel;
+            UpdateSectionOverlaps(B);
+
+            // track these across all screens
+            bool set_qScreen = false;
+            bool set_qScreen_canonical = false;
+
+            for(int screen_i = 0; screen_i < c_screenCount; screen_i++)
             {
-                /* Music change */
-                auto &s = evt.section[B];
+                Screen_t& screen = Screens[screen_i];
 
-                bool musicChanged = false;
-                if(s.music_id == EventSection_t::LESet_ResetDefault)
+                if(!screen.is_active())
+                    continue;
+
+                // which player on this screen is already in the new section? (used for 2P dynamic)
+                int onscreen_plr = 0;
+                // which player on this screen was moved to the new section? (used for 2P dynamic)
+                int warped_plr = 0;
+
+                // warp other players to resized section, if not a reset or level start
+                bool do_warp = !is_reset && !evt.AutoStart && !equalCase(evt.Name.c_str(), "Level - Start");
+                s_testPlayersInSection(screen, B, do_warp, onscreen_plr, warped_plr);
+
+                bool set_qScreen_i = false;
+
+                // start the modern qScreen animation
+                if(!equalCase(evt.Name.c_str(), "Level - Start") && g_config.modern_section_change)
+                    set_qScreen_i = s_initModernQScreen(screen, B, tempLevel, newLevel, onscreen_plr, warped_plr, is_reset);
+                // legacy qScreen animation
+                else if(!equalCase(evt.Name.c_str(), "Level - Start"))
+                    set_qScreen_i = s_initLegacyQScreen(screen, B, tempLevel, newLevel, onscreen_plr);
+
+                if(set_qScreen_i)
                 {
-                    bgMusic[B] = bgMusicREAL[B];
-                    musicChanged = true;
-                }
-                else if(s.music_id != EventSection_t::LESet_Nothing)
-                {
-                    bgMusic[B] = s.music_id;
-                    musicChanged = true;
-                }
-
-                if(musicChanged && (B == Player[1].Section || (numPlayers == 2 && B == Player[2].Section)))
-                    StartMusic(B);
-
-                /* Background change */
-                if(s.background_id == EventSection_t::LESet_ResetDefault)
-                    Background2[B] = Background2REAL[B];
-                else if(s.background_id != EventSection_t::LESet_Nothing)
-                    Background2[B] = s.background_id;
-
-                /* Per-Section autoscroll setup */
-                if(s.autoscroll)
-                {
-                    if(!AutoUseModern) // First attemt to use modern autoscrolling will block futher use of the legacy autoscrolling
-                        AutoUseModern = true;
-                    autoScrollerChanged = true;
-                    AutoX[B] = s.autoscroll_x;
-                    AutoY[B] = s.autoscroll_y;
-                }
-
-                bool is_reset = int(s.position.X) == EventSection_t::LESet_ResetDefault;
-
-                /* Resize the section boundaries */
-                if(is_reset && !g_config.modern_section_change)
-                {
-                    level[B] = LevelREAL[B];
-                    UpdateSectionOverlaps(B);
-                }
-                else if(int(s.position.X) != EventSection_t::LESet_Nothing)
-                {
-                    tempLevel = level[B];
-                    newLevel = (is_reset) ? LevelREAL[B] : s.position;
-                    level[B] = newLevel;
-                    UpdateSectionOverlaps(B);
-
-                    // track these across all screens
-                    bool set_qScreen = false;
-                    bool set_qScreen_canonical = false;
-
-                    for(int screen_i = 0; screen_i < c_screenCount; screen_i++)
-                    {
-                        Screen_t& screen = Screens[screen_i];
-
-                        if(!screen.is_active())
-                            continue;
-
-                        // which player on this screen is already in the new section? (used for 2P dynamic)
-                        int onscreen_plr = 0;
-                        // which player on this screen was moved to the new section? (used for 2P dynamic)
-                        int warped_plr = 0;
-
-                        // warp other players to resized section, if not a reset or level start
-                        bool do_warp = !is_reset && !evt.AutoStart && !equalCase(evt.Name.c_str(), "Level - Start");
-                        s_testPlayersInSection(screen, B, do_warp, onscreen_plr, warped_plr);
-
-                        bool set_qScreen_i = false;
-
-                        // start the modern qScreen animation
-                        if(!equalCase(evt.Name.c_str(), "Level - Start") && g_config.modern_section_change)
-                            set_qScreen_i = s_initModernQScreen(screen, B, tempLevel, newLevel, onscreen_plr, warped_plr, is_reset);
-                        // legacy qScreen animation
-                        else if(!equalCase(evt.Name.c_str(), "Level - Start"))
-                            set_qScreen_i = s_initLegacyQScreen(screen, B, tempLevel, newLevel, onscreen_plr);
-
-                        if(set_qScreen_i)
-                        {
-                            set_qScreen |= screen.Visible;
-                            set_qScreen_canonical |= !screen.Visible && screen.is_canonical();
-                        }
-                    }
-
-                    // enable qScreen (now after all logic to prevent messing up GetvScreen calls)
-                    qScreen |= set_qScreen;
-                    qScreen_canonical |= set_qScreen_canonical;
-
-                    resetFrameTimer();
+                    set_qScreen |= screen.Visible;
+                    set_qScreen_canonical |= !screen.Visible && screen.is_canonical();
                 }
             }
 
-            for(auto &l : evt.HideLayer)
-                HideLayer(l, NoEffect ? true : evt.LayerSmoke);
+            // enable qScreen (now after all logic to prevent messing up GetvScreen calls)
+            qScreen |= set_qScreen;
+            qScreen_canonical |= set_qScreen_canonical;
 
-            for(auto &l : evt.ShowLayer)
-                ShowLayer(l, NoEffect ? true : evt.LayerSmoke);
+            resetFrameTimer();
+        }
+    }
 
-            for(auto &l : evt.ToggleLayer)
+    for(auto &l : evt.HideLayer)
+        HideLayer(l, NoEffect ? true : evt.LayerSmoke);
+
+    for(auto &l : evt.ShowLayer)
+        ShowLayer(l, NoEffect ? true : evt.LayerSmoke);
+
+    for(auto &l : evt.ToggleLayer)
+    {
+        if(Layer[l].Hidden)
+            ShowLayer(l, evt.LayerSmoke);
+        else
+            HideLayer(l, evt.LayerSmoke);
+    }
+
+    if(evt.MoveLayer != LAYER_NONE)
+    {
+        B = evt.MoveLayer;
+
+        SetLayerSpeed(B, evt.SpeedX, evt.SpeedY, true);
+
+        if(Layer[B].SpeedX == 0.f && Layer[B].SpeedY == 0.f)
+        {
+            // eventually, only re-join tables the first time the event has been triggered in a level
+            treeBlockJoinLayer(B);
+            treeBackgroundJoinLayer(B);
+            treeWaterJoinLayer(B);
+        }
+        else
+        {
+            // these thresholds can be tweaked, but they balance the expense of querying more tables with the expense of updating locations in the main table
+            if(Layer[B].blocks.size() > 2)
+                treeBlockSplitLayer(B);
+
+            if(Layer[B].BGOs.size() > 2)
+                treeBackgroundSplitLayer(B);
+
+            if(Layer[B].waters.size() > 2)
+                treeWaterSplitLayer(B);
+        }
+    }
+
+    if(!AutoUseModern) // Use legacy auto-scrolling when modern autoscrolling was never used here
+    {
+        if(g_config.fix_autoscroll_speed)
+        {
+            if(!autoScrollerChanged)
             {
-                if(Layer[l].Hidden)
-                    ShowLayer(l, evt.LayerSmoke);
-                else
-                    HideLayer(l, evt.LayerSmoke);
-            }
-
-#if 0 // Obsolete, replaced with a code above
-            for(B = 0; B <= 20; B++)
-            {
-                if(NoEffect == true)
+                // Do set the autoscrool when non-zero values only, don't zero by other autoruns
+                if((evt.AutoX != 0.0 || evt.AutoY != 0.0) && IF_INRANGE(evt.AutoSection, 0, maxSections))
                 {
-                    HideLayer(evt.HideLayer[B], NoEffect);
-                    ShowLayer(evt.ShowLayer[B], NoEffect);
-                }
-                else
-                {
-                    HideLayer(evt.HideLayer[B], evt.LayerSmoke);
-                    ShowLayer(evt.ShowLayer[B], evt.LayerSmoke);
-                }
-
-                if(!(evt.ToggleLayer[B] == ""))
-                {
-                    for(C = 0; C <= maxLayers; C++)
-                    {
-                        if(Layer[C].Name == evt.ToggleLayer[B])
-                        {
-                            if(Layer[C].Hidden)
-                            {
-                                ShowLayer(Layer[C].Name, evt.LayerSmoke);
-                            }
-                            else
-                            {
-                                HideLayer(Layer[C].Name, evt.LayerSmoke);
-                            }
-                        }
-                    }
-                }
-            }
-#endif
-
-            if(evt.MoveLayer != LAYER_NONE)
-            {
-                B = evt.MoveLayer;
-
-                SetLayerSpeed(B, evt.SpeedX, evt.SpeedY, true);
-
-                if(Layer[B].SpeedX == 0.f && Layer[B].SpeedY == 0.f)
-                {
-                    // eventually, only re-join tables the first time the event has been triggered in a level
-                    treeBlockJoinLayer(B);
-                    treeBackgroundJoinLayer(B);
-                    treeWaterJoinLayer(B);
-                }
-                else
-                {
-                    // these thresholds can be tweaked, but they balance the expense of querying more tables with the expense of updating locations in the main table
-                    if(Layer[B].blocks.size() > 2)
-                        treeBlockSplitLayer(B);
-
-                    if(Layer[B].BGOs.size() > 2)
-                        treeBackgroundSplitLayer(B);
-
-                    if(Layer[B].waters.size() > 2)
-                        treeWaterSplitLayer(B);
+                    AutoX[evt.AutoSection] = evt.AutoX;
+                    AutoY[evt.AutoSection] = evt.AutoY;
                 }
             }
+        }
+        else if(IF_INRANGE(evt.AutoSection, 0, SDL_min(maxSections, maxEvents)))
+        {
+            // Buggy behavior, see https://github.com/Wohlstand/TheXTech/issues/44
+            AutoX[evt.AutoSection] = Events[evt.AutoSection].AutoX;
+            AutoY[evt.AutoSection] = Events[evt.AutoSection].AutoY;
+        }
+    }
 
-            if(!AutoUseModern) // Use legacy auto-scrolling when modern autoscrolling was never used here
-            {
-                if(g_config.fix_autoscroll_speed)
-                {
-                    if(!autoScrollerChanged)
-                    {
-                        // Do set the autoscrool when non-zero values only, don't zero by other autoruns
-                        if((evt.AutoX != 0.0 || evt.AutoY != 0.0) && IF_INRANGE(evt.AutoSection, 0, maxSections))
-                        {
-                            AutoX[evt.AutoSection] = evt.AutoX;
-                            AutoY[evt.AutoSection] = evt.AutoY;
-                        }
-                    }
-                }
-                else if(IF_INRANGE(evt.AutoSection, 0, SDL_min(maxSections, maxEvents)))
-                {
-                    // Buggy behavior, see https://github.com/Wohlstand/TheXTech/issues/44
-                    AutoX[evt.AutoSection] = Events[evt.AutoSection].AutoX;
-                    AutoY[evt.AutoSection] = Events[evt.AutoSection].AutoY;
-                }
-            }
+    if(evt.Text != STRINGINDEX_NONE)
+    {
+        MessageText = GetS(evt.Text);
 
-            if(evt.Text != STRINGINDEX_NONE)
-            {
-                MessageText = GetS(evt.Text);
+        bool player_valid = whichPlayer >= 1 && whichPlayer <= numPlayers;
+        int base_player = (numPlayers > 1) ? -1 : 1;
+        preProcessMessage(MessageText, player_valid ? whichPlayer : base_player);
 
-                bool player_valid = whichPlayer >= 1 && whichPlayer <= numPlayers;
-                int base_player = (numPlayers > 1) ? -1 : 1;
-                preProcessMessage(MessageText, player_valid ? whichPlayer : base_player);
+        bool use_player_pause = (player_valid && g_config.multiplayer_pause_controls);
+        PauseGame(PauseCode::Message, use_player_pause ? whichPlayer : 0);
+    }
 
-                bool use_player_pause = (player_valid && g_config.multiplayer_pause_controls);
-                PauseGame(PauseCode::Message, use_player_pause ? whichPlayer : 0);
+    if(evt.Sound > 0)
+    {
+        if(SoundPause[evt.Sound] > 4)
+            SoundPause[evt.Sound] = 0;
+        PlaySound(evt.Sound);
+    }
 
-                MessageText = "";
-            }
+    if(evt.EndGame == 1)
+    {
+        for(B = 0; B < numSections; B++)
+            bgMusic[B] = 0;
+        StopMusic();
+        speedRun_bossDeadEvent();
+        LevelMacroCounter = 0;
+        LevelMacro = LEVELMACRO_GAME_COMPLETE_EXIT;
+    }
 
-            if(evt.Sound > 0)
-            {
-                if(SoundPause[evt.Sound] > 4)
-                    SoundPause[evt.Sound] = 0;
-                PlaySound(evt.Sound);
-            }
+    ForcedControls = (evt.Controls.AltJump ||
+                      evt.Controls.AltRun ||
+                      evt.Controls.Down ||
+                      evt.Controls.Drop ||
+                      evt.Controls.Jump ||
+                      evt.Controls.Left ||
+                      evt.Controls.Right ||
+                      evt.Controls.Run ||
+                      evt.Controls.Start ||
+                      evt.Controls.Up);
 
-            if(evt.EndGame == 1)
-            {
-                for(B = 0; B < numSections; B++)
-                    bgMusic[B] = 0;
-                StopMusic();
-                speedRun_bossDeadEvent();
-                LevelMacroCounter = 0;
-                LevelMacro = LEVELMACRO_GAME_COMPLETE_EXIT;
-            }
+    ForcedControl = evt.Controls;
 
-            ForcedControls = (evt.Controls.AltJump ||
-                              evt.Controls.AltRun ||
-                              evt.Controls.Down ||
-                              evt.Controls.Drop ||
-                              evt.Controls.Jump ||
-                              evt.Controls.Left ||
-                              evt.Controls.Right ||
-                              evt.Controls.Run ||
-                              evt.Controls.Start ||
-                              evt.Controls.Up);
+    // tempBool = false;
+    if(evt.TriggerEvent != EVENT_NONE)
+    {
+        if(std::round(evt.TriggerDelay) == 0.0)
+        {
+            // for(B = 0; B <= maxEvents; B++)
+            // {
+            //     if(Events[B].Name == evt.TriggerEvent)
+            //     {
+            //         if(Events[B].TriggerEvent == evt.Name)
+            //             tempBool = true;
+            //         break;
+            //     }
+            // }
 
-            ForcedControl = evt.Controls;
-
-            // tempBool = false;
-            if(evt.TriggerEvent != EVENT_NONE)
-            {
-                if(std::round(evt.TriggerDelay) == 0.0)
-                {
-                    // for(B = 0; B <= maxEvents; B++)
-                    // {
-                    //     if(Events[B].Name == evt.TriggerEvent)
-                    //     {
-                    //         if(Events[B].TriggerEvent == evt.Name)
-                    //             tempBool = true;
-                    //         break;
-                    //     }
-                    // }
-
-                    // here tempBool prevented any order-2 circles from occurring
-                    // if(!tempBool)
-                    if(Events[evt.TriggerEvent].TriggerEvent != index)
-                        ProcEvent(evt.TriggerEvent, whichPlayer);
-                }
-                else
-                {
-                    newEventNum++;
-                    NewEvent[newEventNum] = evt.TriggerEvent;
-                    newEventDelay[newEventNum] = vb6Round(evt.TriggerDelay * 6.5);
-                    newEventPlayer[newEventNum] = static_cast<uint8_t>(whichPlayer);
-                }
-            }
+            // here tempBool prevented any order-2 circles from occurring
+            // if(!tempBool)
+            if(Events[evt.TriggerEvent].TriggerEvent != index)
+                ProcEvent(evt.TriggerEvent, whichPlayer);
+        }
+        else
+        {
+            newEventNum++;
+            NewEvent[newEventNum] = evt.TriggerEvent;
+            newEventDelay[newEventNum] = vb6Round(evt.TriggerDelay * 6.5);
+            newEventPlayer[newEventNum] = static_cast<uint8_t>(whichPlayer);
         }
     }
 }
