@@ -27,6 +27,10 @@
 #include <sysapp/launch.h>
 #endif
 
+#if defined(THEXTECH_ASSERTS_INGAME_MESSAGE) && !defined(THEXTECH_NO_SDL_BUILD)
+#   include <CrashHandler/crash_handler.h>
+#endif
+
 #include <Logger/logger.h>
 #include <Utils/files.h>
 #include <AppPath/app_path.h>
@@ -301,6 +305,32 @@ void MainLoadAll()
 }
 
 
+#if defined(THEXTECH_ASSERTS_INGAME_MESSAGE) && !defined(THEXTECH_NO_SDL_BUILD)
+static SDL_AssertState ingame_assert_sdl_handler(const SDL_AssertData *data, void *)
+{
+    CrashHandler::logAssertInfo(data);
+    g_MessageType = MESSAGE_TYPE_SYS_FATAL_ASSERT;
+    MessageTitle = "Fatal error!";
+    MessageText =  fmt::sprintf_ne("Assertion condition has failed:\n"
+                                   "\n"
+                                   "File: %s(%d)\n"
+                                   "Function: %s\n"
+                                   "Condition: %s\n"
+                                   "\n"
+                                   "Game will be closed.\n\n"
+                                   "See log for details:\n"
+                                   "%s",
+                                   data->filename, data->linenum,
+                                   data->function,
+                                   data->condition,
+                                   getLogFilePath().c_str());
+    PauseGame(PauseCode::Message);
+
+    return SDL_ASSERTION_ABORT;
+}
+#endif
+
+
 int GameMain(const CmdLineSetup_t &setup)
 {
     Player_t blankPlayer;
@@ -403,6 +433,10 @@ int GameMain(const CmdLineSetup_t &setup)
     gfxLoaderThreadingMode = true;
 #endif
     XWindow::show(); // Don't show window until playing an initial sound
+
+#if defined(THEXTECH_ASSERTS_INGAME_MESSAGE) && !defined(THEXTECH_NO_SDL_BUILD)
+    SDL_SetAssertionHandler(&ingame_assert_sdl_handler, NULL);
+#endif
 
     if(!setup.testLevelMode && !init_failure)
         PlayInitSound();

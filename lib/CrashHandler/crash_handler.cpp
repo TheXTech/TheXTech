@@ -402,14 +402,20 @@ int ppc_backtrace(void **buffer, int size)
     int depth;
     uint32_t stackptr = 0, lr, *addr;
 
+    pLogDebug("Stack trace: PPC: Get link register...");
+
     // get link register
     asm volatile ("mflr %0" : "=r"(lr));
 
     // link register is assigned to depth[0]
     buffer[0] = (void *) (lr - 4);
 
+    pLogDebug("Stack trace: PPC: Get link stack pointer...");
+
     // get stackpointer
     asm volatile("stw %%sp, 0(%0)" : : "b" ((uint32_t)&stackptr));
+
+    pLogDebug("Stack trace: PPC: Assign...");
 
     // assign stack ptr to address
     addr = reinterpret_cast<uint32_t *>(stackptr);
@@ -426,6 +432,8 @@ int ppc_backtrace(void **buffer, int size)
 
     }
 
+    D_pLogDebugNA("Stack trace: PPC: Loop...");
+
     for(depth = 1; (depth < size && *addr); ++depth)
     {
         uint32_t * next = (uint32_t *) *addr;
@@ -433,34 +441,40 @@ int ppc_backtrace(void **buffer, int size)
         addr = next;
     }
 
+    D_pLogDebugNA("Stack trace: PPC: Return...");
+
     return depth;
 }
 #endif
 
 static std::string getStacktrace()
 {
-    D_pLogDebugNA("Initializing std::string...");
+    D_pLogDebugNA("Stack trace: Initializing std::string...");
     std::string bkTrace;
+    D_pLogDebugNA("Stack trace: String done...");
 
 #if defined(_WIN32)
     GetStackWalk(bkTrace);
 
 #elif defined(USE_PPC_BACKTRACE)
+
+    D_pLogDebugNA("Stack trace: Static arrays...");
     void  *array[400];
     char stack_entry[25];
     int size;
+    D_pLogDebugNA("Stack trace: Done...");
 
-    D_pLogDebugNA("Requesting backtrace...");
+    D_pLogDebugNA("Stack trace: Requesting backtrace...");
     size = ppc_backtrace(array, 400);
 
-    D_pLogDebugNA("Filling std::string...");
+    D_pLogDebugNA("Stack trace: Filling std::string...");
     for(int j = 0; j < size; j++)
     {
         SDL_snprintf(stack_entry, 25, "- 0x%08x\n", (uint32_t)array[j]);
         bkTrace.append(stack_entry);
     }
 
-    D_pLogDebugNA("DONE!");
+    D_pLogDebugNA("Stack trace: DONE!");
 
 #elif Backtrace_FOUND
     void  *array[400];
@@ -810,6 +824,15 @@ static void handle_signal(int signal, siginfo_t *siginfo, void * /*context*/)
 #ifndef THEXTECH_NO_SDL_BUILD
 static SDL_AssertState custom_sdl_handler(const SDL_AssertData *data, void *userdata)
 {
+    CrashHandler::logAssertInfo(data);
+    return SDL_GetDefaultAssertionHandler()(data, userdata);
+}
+#endif
+
+void CrashHandler::logAssertInfo(const void* data_p)
+{
+    const SDL_AssertData *data = reinterpret_cast<const SDL_AssertData*>(data_p);
+
     std::string stack = getStacktrace();
     pLogFatal("<Assertion condition has failed>:\n"
               "---------------------------------------------------------\n"
@@ -824,9 +847,9 @@ static SDL_AssertState custom_sdl_handler(const SDL_AssertData *data, void *user
               stack.c_str(),
               g_messageToUser);
 
-    return SDL_GetDefaultAssertionHandler()(data, userdata);
+    // Finalize logger
+    CloseLog();
 }
-#endif
 
 #if defined(HAS_SIG_INFO)
 static struct sigaction act;
@@ -888,4 +911,5 @@ void CrashHandler::initSigs()
 #   endif
 #endif // HAS_SIG_INFO
 }
+
 /* Signals End */

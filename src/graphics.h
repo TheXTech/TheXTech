@@ -142,6 +142,11 @@ void DrawMessage(const std::string& SuperText);
  */
 void DrawMessage(const UTF8CharMap_t& SuperTextMap);
 
+/*!
+ * \brief This is a very special function that runs only last state of the texture
+ */
+void UpdateGraphicsFatalAssert();
+
 // Public Sub SetRes()
 // void SetRes(); //deprecated
 // Public Function CheckKey(newStrizzle As String) As String

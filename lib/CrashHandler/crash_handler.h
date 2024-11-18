@@ -27,6 +27,7 @@ public:
     static void crashByUnhandledException();
     static void crashByFlood();
     static void initSigs();
+    static void logAssertInfo(const void *data);
 };
 
 #endif // CRASHHANDLER_H

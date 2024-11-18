@@ -23,6 +23,12 @@
 #include <Integrator/integrator.h>
 #include <pge_delay.h>
 
+#if defined(THEXTECH_ASSERTS_INGAME_MESSAGE) && !defined(THEXTECH_NO_SDL_BUILD)
+#   ifdef __WIIU__
+#       include <sysapp/launch.h>
+#   endif
+#   include "frm_main.h"
+#endif
 #include "../globals.h"
 #include "../config.h"
 #include "../frame_timer.h"
@@ -333,7 +339,12 @@ void MessageScreen_Init()
     {
     case MESSAGE_TYPE_SYS_ERROR:
         SoundPause[SFX_SMGlass] = 0;
-        PlaySound(SFX_SMGlass);
+        PlaySoundMenu(SFX_SMGlass);
+        break;
+    case MESSAGE_TYPE_SYS_FATAL_ASSERT:
+        StopMusic();
+        SoundPause[SFX_SMGlass] = 0;
+        PlayErrorSound(SFX_SMGlass);
         break;
     default:
         SoundPause[SFX_Message] = 0;
@@ -352,6 +363,7 @@ void MessageScreen_Init()
             MessageTitle = g_gameStrings.msgBoxTitleWarning;
             break;
         case MESSAGE_TYPE_SYS_ERROR:
+        case MESSAGE_TYPE_SYS_FATAL_ASSERT:
             MessageTitle = g_gameStrings.msgBoxTitleError;
             break;
         default:
@@ -415,7 +427,8 @@ bool MessageScreen_Logic(int plr)
         MessageTitle.clear();
         MessageText.clear();
         MessageTextMap.clear();
-        g_MessageType = MESSAGE_TYPE_NORMAL;
+        if(g_MessageType != MESSAGE_TYPE_SYS_FATAL_ASSERT)
+            g_MessageType = MESSAGE_TYPE_NORMAL;
         return true;
     }
 
@@ -475,9 +488,12 @@ int PauseGame(PauseCode code, int plr)
 
             g_microStats.start_task(MicroStats::Graphics);
 
-            speedRun_tick();
+            if(g_MessageType != MESSAGE_TYPE_SYS_FATAL_ASSERT)
+                speedRun_tick();
 
-            if(code == PauseCode::Prompt)
+            if(g_MessageType == MESSAGE_TYPE_SYS_FATAL_ASSERT)
+                UpdateGraphicsFatalAssert();
+            else if(code == PauseCode::Prompt)
                 PromptScreen::Render();
             else if((LevelSelect && !GameMenu) || WorldEditor)
                 UpdateGraphics2();
@@ -564,6 +580,28 @@ int PauseGame(PauseCode code, int plr)
     } while(true);
 
     GamePaused = old_code;
+
+#if defined(THEXTECH_ASSERTS_INGAME_MESSAGE) && !defined(THEXTECH_NO_SDL_BUILD)
+    // When it's a fatal error, just quit everything immediately
+    if(g_MessageType == MESSAGE_TYPE_SYS_FATAL_ASSERT)
+    {
+        GracefulQuit(false);
+
+#ifdef __WIIU__
+        if(g_isHBLauncher)
+            SYSRelaunchTitle(0, NULL);
+#endif
+
+        Controls::Quit();
+        QuitMixerX();
+        g_frmMain.freeSystem();
+#   ifdef __WIIU__
+        exit(0);
+#   else
+        abort();
+#   endif
+    }
+#endif
 
     // prevent unexpected button presses
     for(int i = 1; i <= numPlayers; i++)

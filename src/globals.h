@@ -1323,6 +1323,8 @@ enum MessageType
     MESSAGE_TYPE_SYS_WARNING,
     // Has title, red colour
     MESSAGE_TYPE_SYS_ERROR,
+    // Has title, red colour, game will quit after closing this
+    MESSAGE_TYPE_SYS_FATAL_ASSERT,
 };
 extern MessageType g_MessageType;
 
