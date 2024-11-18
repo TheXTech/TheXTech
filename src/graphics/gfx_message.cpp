@@ -256,8 +256,6 @@ void UpdateGraphicsFatalAssert()
 {
     cycleNextInc();
 
-    static int cycles = 0;
-
     if(g_config.enable_frameskip && !TakeScreen && frameSkipNeeded())
         return;
 
@@ -272,11 +270,6 @@ void UpdateGraphicsFatalAssert()
         DrawMessage(MessageText);
     else
         DrawMessage(MessageTextMap);
-
-    SuperPrintScreenCenter(std::to_string(cycles++), 1, 8, {0, 0, 255});
-
-    if(cycles > 650)
-        cycles = 0;
 
     XRender::repaint();
 }
