@@ -469,7 +469,7 @@ struct PauseLoopState
 
 static PauseLoopState s_pauseLoopState;
 
-int PauseGame(PauseCode code, int plr)
+void PauseGame(PauseCode code, int plr)
 {
 //    double fpsTime = 0;
 //    int fpsCount = 0;
@@ -519,9 +519,6 @@ int PauseGame(PauseCode code, int plr)
     SyncSysCursorDisplay();
 
     // resetFrameTimer();
-
-    // some pause games may return a status code
-    int result = 0;
 
     do
     {
@@ -609,8 +606,7 @@ int PauseGame(PauseCode code, int plr)
             }
             else if(GamePaused == PauseCode::DropAdd)
             {
-                result = ConnectScreen::Logic();
-                if(result)
+                if(ConnectScreen::Logic())
                     break;
             }
             else if(GamePaused == PauseCode::Options)
@@ -662,6 +658,4 @@ int PauseGame(PauseCode code, int plr)
     SyncSysCursorDisplay();
 
     // resetFrameTimer();
-
-    return result;
 }

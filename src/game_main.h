@@ -96,7 +96,7 @@ void ClearGame(bool punnish = false);
 void DeleteSave(int world, int save);
 void CopySave(int world, int src, int dst);
 
-int PauseGame(PauseCode code, int plr = 0);
+void PauseGame(PauseCode code, int plr = 0);
 
 // reload recent episodes from config (used when asset pack changes)
 void ConfigReloadRecentEpisodes();
