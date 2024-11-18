@@ -1448,7 +1448,7 @@ void PlaySound(int A, int loops, int volume)
     if(!g_mixerLoaded)
         return;
 
-    if(g_totalSounds == 0)
+    if(g_totalSounds == 0 || A > (int)g_totalSounds)
     {
         playFallbackSfx(A, loops, volume);
         return;
@@ -1520,7 +1520,7 @@ void PlaySoundMenu(int A, int loops)
     if(SoundPause[A] > 0) // if the sound wasn't just played
         return;
 
-    if(g_totalSounds == 0)
+    if(g_totalSounds == 0 || A > (int)g_totalSounds)
     {
         playFallbackSfx(A, loops, 128);
         return;
