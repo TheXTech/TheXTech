@@ -458,21 +458,52 @@ bool MessageScreen_Logic(int plr)
     return false;
 }
 
+static constexpr int s_max_pause_stack_depth = 4;
+
+struct PauseLoopState
+{
+    int pause_player = 0;
+    PauseCode pause_stack[s_max_pause_stack_depth];
+    int pause_stack_depth = 0;
+};
+
+static PauseLoopState s_pauseLoopState;
+
 int PauseGame(PauseCode code, int plr)
 {
 //    double fpsTime = 0;
 //    int fpsCount = 0;
 
-    if(!GameMenu && !LevelEditor)
+    // initialize pause from main game
+    if(GamePaused == PauseCode::None)
     {
-        for(int A = numPlayers; A >= 1; A--)
-            SavedChar[Player[A].Character] = Player[A];
+        s_pauseLoopState = PauseLoopState();
+        s_pauseLoopState.pause_player = plr;
+
+        if(!GameMenu && !LevelEditor)
+        {
+            for(int A = numPlayers; A >= 1; A--)
+                SavedChar[Player[A].Character] = Player[A];
+        }
+
+        if(PSwitchTime > 0)
+            PauseMusic();
+    }
+    // push pause code stack
+    else if(s_pauseLoopState.pause_stack_depth < s_max_pause_stack_depth)
+    {
+        s_pauseLoopState.pause_stack[s_pauseLoopState.pause_stack_depth] = GamePaused;
+        s_pauseLoopState.pause_stack_depth++;
     }
 
+    // set pause code
+    GamePaused = code;
+
+    // init correct pause screen type
     if(code == PauseCode::Message)
         MessageScreen_Init();
     else if(code == PauseCode::PauseScreen)
-        PauseScreen::Init(plr, SharedControls.LegacyPause);
+        PauseScreen::Init(s_pauseLoopState.pause_player, SharedControls.LegacyPause);
     else if(code == PauseCode::DropAdd)
         ConnectScreen::DropAdd_Start();
     else if(code == PauseCode::Prompt)
@@ -484,13 +515,8 @@ int PauseGame(PauseCode code, int plr)
         // assume TextEntryScreen has already been inited through its Run function.
     }
 
-    PauseCode old_code = GamePaused;
-    GamePaused = code;
-
+    // sync system cursor
     SyncSysCursorDisplay();
-
-    if(PSwitchTime > 0)
-        PauseMusic();
 
     // resetFrameTimer();
 
@@ -522,7 +548,7 @@ int PauseGame(PauseCode code, int plr)
 
             if(is_fatal_message)
                 UpdateGraphicsFatalAssert();
-            else if(code == PauseCode::Prompt)
+            else if(GamePaused == PauseCode::Prompt)
                 PromptScreen::Render();
             else if((LevelSelect && !GameMenu) || WorldEditor)
                 UpdateGraphics2();
@@ -552,8 +578,8 @@ int PauseGame(PauseCode code, int plr)
                 updateScreenFaders();
 
             // reset the active player if it is no longer present
-            if(plr > numPlayers)
-                plr = 0;
+            if(s_pauseLoopState.pause_player > numPlayers)
+                s_pauseLoopState.pause_player = 0;
 
             g_microStats.start_task(MicroStats::Script);
 
@@ -568,12 +594,12 @@ int PauseGame(PauseCode code, int plr)
             }
             else if(GamePaused == PauseCode::PauseScreen)
             {
-                if(PauseScreen::Logic(plr))
+                if(PauseScreen::Logic(s_pauseLoopState.pause_player))
                     break;
             }
             else if(GamePaused == PauseCode::Message)
             {
-                if(MessageScreen_Logic(plr))
+                if(MessageScreen_Logic(s_pauseLoopState.pause_player))
                     break;
             }
             else if(GamePaused == PauseCode::Prompt)
@@ -608,7 +634,20 @@ int PauseGame(PauseCode code, int plr)
             break;
     } while(true);
 
-    GamePaused = old_code;
+    // pop pause stack
+    if(s_pauseLoopState.pause_stack_depth > 0)
+    {
+        s_pauseLoopState.pause_stack_depth--;
+        GamePaused = s_pauseLoopState.pause_stack[s_pauseLoopState.pause_stack_depth];
+    }
+    // resume main game
+    else
+    {
+        GamePaused = PauseCode::None;
+
+        if(PSwitchTime > 0)
+            ResumeMusic();
+    }
 
     // prevent unexpected button presses
     for(int i = 1; i <= numPlayers; i++)
@@ -619,10 +658,8 @@ int PauseGame(PauseCode code, int plr)
 
     MenuCursorCanMove = false;
 
+    // sync system cursor
     SyncSysCursorDisplay();
-
-    if(PSwitchTime > 0 && GamePaused == PauseCode::None)
-        ResumeMusic();
 
     // resetFrameTimer();
 
