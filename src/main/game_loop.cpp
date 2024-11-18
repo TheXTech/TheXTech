@@ -583,7 +583,7 @@ int PauseGame(PauseCode code, int plr)
 
     XWindow::showCursor(prev_cursor);
 
-    if(PSwitchTime > 0)
+    if(PSwitchTime > 0 && GamePaused == PauseCode::None)
         ResumeMusic();
 
     // resetFrameTimer();
