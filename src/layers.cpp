@@ -1200,10 +1200,10 @@ static inline bool s_initLegacyQScreen(Screen_t& screen, const int B, const Spee
 
 // Old functions:
 
-void ProcEvent(eventindex_t index, int whichPlayer, bool NoEffect)
+eventindex_t s_ProcEvent_resumable(eventindex_t index, int whichPlayer, bool is_resume, bool NoEffect)
 {
     if(index == EVENT_NONE || LevelEditor)
-        return;
+        return EVENT_NONE;
 
     // this is for events that have just been triggered
     int B = 0;
@@ -1217,6 +1217,9 @@ void ProcEvent(eventindex_t index, int whichPlayer, bool NoEffect)
     bool autoScrollerChanged = false;
 
     auto &evt = Events[index];
+
+    if(is_resume)
+        goto event_resume;
 
     recentlyTriggeredEvents.insert(index);
 
@@ -1389,9 +1392,11 @@ void ProcEvent(eventindex_t index, int whichPlayer, bool NoEffect)
         int base_player = (numPlayers > 1) ? -1 : 1;
         preProcessMessage(MessageText, player_valid ? whichPlayer : base_player);
 
-        bool use_player_pause = (player_valid && g_config.multiplayer_pause_controls);
-        PauseGame(PauseCode::Message, use_player_pause ? whichPlayer : 0);
+        // request resuming at the current index
+        return index;
     }
+
+event_resume:
 
     if(evt.Sound > 0)
     {
@@ -1441,7 +1446,11 @@ void ProcEvent(eventindex_t index, int whichPlayer, bool NoEffect)
             // here tempBool prevented any order-2 circles from occurring
             // if(!tempBool)
             if(Events[evt.TriggerEvent].TriggerEvent != index)
-                ProcEvent(evt.TriggerEvent, whichPlayer);
+            {
+                // this should receive tail-call optimization
+                // possibly request resuming at the child index (or its child, etc)
+                return s_ProcEvent_resumable(evt.TriggerEvent, whichPlayer, false, NoEffect);
+            }
         }
         else
         {
@@ -1450,6 +1459,22 @@ void ProcEvent(eventindex_t index, int whichPlayer, bool NoEffect)
             newEventDelay[newEventNum] = vb6Round(evt.TriggerDelay * 6.5);
             newEventPlayer[newEventNum] = static_cast<uint8_t>(whichPlayer);
         }
+    }
+
+    return EVENT_NONE;
+}
+
+void ProcEvent(eventindex_t index, int whichPlayer, bool NoEffect)
+{
+    eventindex_t resume_event = s_ProcEvent_resumable(index, whichPlayer, false, NoEffect);
+
+    while(resume_event != EVENT_NONE)
+    {
+        bool player_valid = whichPlayer >= 1 && whichPlayer <= numPlayers;
+        bool use_player_pause = (player_valid && g_config.multiplayer_pause_controls);
+        PauseGame(PauseCode::Message, use_player_pause ? whichPlayer : 0);
+
+        resume_event = s_ProcEvent_resumable(resume_event, whichPlayer, true, NoEffect);
     }
 }
 
