@@ -1448,7 +1448,7 @@ void PlaySound(int A, int loops, int volume)
     if(!g_mixerLoaded)
         return;
 
-    if(g_totalSounds == 0 || A > (int)g_totalSounds)
+    if(g_totalSounds == 0)
     {
         playFallbackSfx(A, loops, volume);
         return;
