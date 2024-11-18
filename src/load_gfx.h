@@ -56,7 +56,7 @@ void UnloadWorldCustomGFX();
 
 void LoaderInit();
 void LoaderFinish();
-void LoaderUpdateDebugString(const std::string &strig);
+void LoaderUpdateDebugString(const std::string &strig, bool forceUpdate = false);
 
 // Public Sub UpdateLoad()
 void UpdateLoadREAL();

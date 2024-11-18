@@ -142,6 +142,9 @@ static int loadingThread(void *waiter_ptr)
 
     InitSound(); // Setup sound effects
 
+    LoaderUpdateDebugString("Finishing...", true);
+    UpdateLoad();
+
 #ifndef PGE_NO_THREADING
     if(waiter)
         SDL_AtomicSet(waiter, 0);
@@ -277,10 +280,14 @@ void MainLoadAll()
 
             SDL_WaitThread(loadThread, &threadReturnValue);
             pLogDebug("Loading thread was exited with %d code.", threadReturnValue);
+
+            // Draw last frame
+            UpdateLoadREAL();
         }
     }
 #else
     loadingThread(nullptr);
+    UpdateLoad();
 #endif
 
     Integrator::setGameName(g_gameInfo.title, g_gameInfo.statusIconName);

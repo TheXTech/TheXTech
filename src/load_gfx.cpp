@@ -64,6 +64,7 @@ bool gfxLoaderThreadingMode = false;
 static SDL_mutex *gfxLoaderDebugMutex = nullptr;
 #endif
 static std::string gfxLoaderDebugString;
+static bool        gfxLoaderDebugStringUpdated = false;
 static Sint64 gfxLoaderDebugStart = -1;
 static const Sint64 c_gfxLoaderShowInterval = 500;
 
@@ -1518,6 +1519,7 @@ void LoaderInit()
 {
     gfxLoaderDebugStart = SDL_GetTicks();
     gfxLoaderDebugString.clear();
+    gfxLoaderDebugStringUpdated = true;
 #ifndef PGE_NO_THREADING
     if(gfxLoaderDebugMutex)
         gfxLoaderDebugMutex = SDL_CreateMutex();
@@ -1528,6 +1530,7 @@ void LoaderFinish()
 {
     gfxLoaderDebugStart = -1;
     gfxLoaderDebugString.clear();
+    gfxLoaderDebugStringUpdated = true;
 #ifndef PGE_NO_THREADING
     if(gfxLoaderDebugMutex)
         SDL_DestroyMutex(gfxLoaderDebugMutex);
@@ -1535,7 +1538,7 @@ void LoaderFinish()
 #endif
 }
 
-void LoaderUpdateDebugString(const std::string &strig)
+void LoaderUpdateDebugString(const std::string &strig, bool forceUpdate)
 {
     if(gfxLoaderDebugStart == -1)
         return;
@@ -1544,6 +1547,8 @@ void LoaderUpdateDebugString(const std::string &strig)
     SDL_LockMutex(gfxLoaderDebugMutex);
 #endif
     gfxLoaderDebugString = "Load: " + strig;
+    if(forceUpdate)
+        gfxLoaderDebugStringUpdated = true;
 #ifndef PGE_NO_THREADING
     SDL_UnlockMutex(gfxLoaderDebugMutex);
 #endif
@@ -1572,6 +1577,12 @@ void UpdateLoadREAL()
 
     if(assets_reload)
         alphaFader = 0;
+
+    if(gfxLoaderDebugStringUpdated)
+    {
+        gfxLoaderDebugStringUpdated = false;
+        draw = true;
+    }
 
     if(LoadCoinsT <= SDL_GetTicks())
     {
