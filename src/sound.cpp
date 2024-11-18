@@ -1531,10 +1531,12 @@ void PlaySoundMenu(int A, int loops)
     s_resetSoundDelay(A);
 }
 
+#if defined(THEXTECH_ASSERTS_INGAME_MESSAGE) && !defined(THEXTECH_NO_SDL_BUILD)
 void PlayErrorSound(int A, int loops)
 {
     playFallbackSfx(A, loops, 128);
 }
+#endif
 
 // stops all sound from being played for 10 cycles
 void BlockSound()
