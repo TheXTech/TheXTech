@@ -25,12 +25,41 @@
 #include "graphics.h"
 #include "sound.h"
 #include "game_main.h"
+#include "main/screen_asset_pack.h"
 #include "core/render.h"
 #include "core/window.h"
 #include "core/render.h"
 #ifdef __EMSCRIPTEN__
 #include "core/events.h"
 #endif
+
+void SyncSysCursorDisplay()
+{
+    bool hide_cursor = false;
+
+    // hide cursor in fullscreen
+    if(XWindow::isFullScreen())
+        hide_cursor = true;
+
+    // hide cursor in game states that have own cursor
+    if(GameMenu || MagicHand || LevelEditor || ScreenAssetPack::g_LoopActive)
+        hide_cursor = true;
+
+    // hide cursor in pause states that have own cursor
+    if(GamePaused == PauseCode::Options || GamePaused == PauseCode::DropAdd || GamePaused == PauseCode::TextEntry)
+        hide_cursor = true;
+
+    if(hide_cursor)
+    {
+        XWindow::setCursor(CURSOR_NONE);
+        XWindow::showCursor(0);
+    }
+    else
+    {
+        XWindow::setCursor(CURSOR_DEFAULT);
+        XWindow::showCursor(1);
+    }
+}
 
 void SetOrigRes()
 {
@@ -52,8 +81,7 @@ void SetOrigRes()
     if(LoadingInProcess)
         UpdateLoad();
 
-    if(!GameMenu && !MagicHand && !LevelEditor)
-        XWindow::showCursor(1);
+    SyncSysCursorDisplay();
 }
 
 void ChangeRes(int, int, int, int)
@@ -63,7 +91,7 @@ void ChangeRes(int, int, int, int)
     if(LoadingInProcess)
         UpdateLoad();
 
-    XWindow::showCursor(0);
+    SyncSysCursorDisplay();
 }
 
 //void SaveIt(int ScX, int ScY, int ScC, int ScF, std::string ScreenChanged)

@@ -752,12 +752,6 @@ bool mainMenuUpdate()
         s_startAssetPackTimer = 0;
 
     {
-        if(XWindow::getCursor() != CURSOR_NONE)
-        {
-            XWindow::setCursor(CURSOR_NONE);
-            XWindow::showCursor(0);
-        }
-
         {
             bool k = false;
             k |= menuBackPress;

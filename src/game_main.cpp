@@ -596,17 +596,7 @@ int GameMain(const CmdLineSetup_t &setup)
 
     while(GameIsActive)
     {
-        if(GameMenu || MagicHand || LevelEditor || ScreenAssetPack::g_LoopActive)
-        {
-            XWindow::setCursor(CURSOR_NONE);
-            XWindow::showCursor(0);
-        }
-        else if(!g_config.fullscreen)
-        {
-            XWindow::setCursor(CURSOR_DEFAULT);
-            XWindow::showCursor(1);
-        }
-
+        SyncSysCursorDisplay();
 
         if(ScreenAssetPack::g_LoopActive)
         {
@@ -2012,8 +2002,7 @@ void CheckActive()
     {
         XEvents::waitEvents();
 //        If LevelEditor = True Or MagicHand = True Then frmLevelWindow.vScreen(1).MousePointer = 0
-        if(LevelEditor || MagicHand)
-            XWindow::showCursor(0);
+        SyncSysCursorDisplay();
 
         resetFrameTimer();
 

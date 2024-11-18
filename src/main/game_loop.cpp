@@ -45,6 +45,7 @@
 #include "speedrunner.h"
 #include "main/record.h"
 #include "menu_main.h"
+#include "change_res.h"
 #include "screen_pause.h"
 #include "screen_connect.h"
 #include "screen_options.h"
@@ -426,8 +427,6 @@ int PauseGame(PauseCode code, int plr)
 //    double fpsTime = 0;
 //    int fpsCount = 0;
 
-    int prev_cursor = XWindow::showCursor(-1);
-
     if(!GameMenu && !LevelEditor)
     {
         for(int A = numPlayers; A >= 1; A--)
@@ -439,19 +438,11 @@ int PauseGame(PauseCode code, int plr)
     else if(code == PauseCode::PauseScreen)
         PauseScreen::Init(plr, SharedControls.LegacyPause);
     else if(code == PauseCode::DropAdd)
-    {
         ConnectScreen::DropAdd_Start();
-        XWindow::showCursor(0);
-    }
     else if(code == PauseCode::Prompt)
-    {
         PromptScreen::Init();
-    }
     else if(code == PauseCode::Options)
-    {
         OptionsScreen::Init();
-        XWindow::showCursor(0);
-    }
     else if(code == PauseCode::TextEntry)
     {
         // assume TextEntryScreen has already been inited through its Run function.
@@ -459,6 +450,8 @@ int PauseGame(PauseCode code, int plr)
 
     PauseCode old_code = GamePaused;
     GamePaused = code;
+
+    SyncSysCursorDisplay();
 
     if(PSwitchTime > 0)
         PauseMusic();
@@ -581,7 +574,7 @@ int PauseGame(PauseCode code, int plr)
 
     MenuCursorCanMove = false;
 
-    XWindow::showCursor(prev_cursor);
+    SyncSysCursorDisplay();
 
     if(PSwitchTime > 0 && GamePaused == PauseCode::None)
         ResumeMusic();

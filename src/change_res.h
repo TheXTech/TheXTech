@@ -22,6 +22,9 @@
 #ifndef CHANGE_RES_H
 #define CHANGE_RES_H
 
+// New: sync whether the window's cursor should be shown
+void SyncSysCursorDisplay();
+
 //void GetCurrentRes(); // Useless
 void SetOrigRes();
 void ChangeRes(int ScreenX, int ScreenY, int ScreenColor, int ScreenFreq);
