@@ -235,7 +235,12 @@ void Sound_ResolveSpatialMod(uint8_t& left, uint8_t& right, int l, int t, int r,
 // Check does sound is defined at sounds.ini
 bool HasSound(int A);
 void PlaySoundMenu(int A, int loops = 0);
+
+#if defined(THEXTECH_ASSERTS_INGAME_MESSAGE) && !defined(THEXTECH_NO_SDL_BUILD)
+// always uses fallback sound
 void PlayErrorSound(int A, int loops = 0);
+#endif
+
 // Public Sub BlockSound() 'stops all sound from being played for 10 cycles
 // stops all sound from being played for 10 cycles
 void BlockSound();

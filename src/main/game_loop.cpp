@@ -341,11 +341,13 @@ void MessageScreen_Init()
         SoundPause[SFX_SMGlass] = 0;
         PlaySoundMenu(SFX_SMGlass);
         break;
+#ifdef THEXTECH_ASSERTS_INGAME_MESSAGE
     case MESSAGE_TYPE_SYS_FATAL_ASSERT:
         StopMusic();
         SoundPause[SFX_SMGlass] = 0;
         PlayErrorSound(SFX_SMGlass);
         break;
+#endif
     default:
         SoundPause[SFX_Message] = 0;
         PlaySound(SFX_Message);
@@ -424,11 +426,32 @@ bool MessageScreen_Logic(int plr)
 
     if(MenuCursorCanMove && (menuDoPress || menuBackPress))
     {
+#if defined(THEXTECH_ASSERTS_INGAME_MESSAGE) && !defined(THEXTECH_NO_SDL_BUILD)
+        // When it's a fatal error, just quit everything immediately
+        if(g_MessageType == MESSAGE_TYPE_SYS_FATAL_ASSERT)
+        {
+            GracefulQuit(false);
+
+#ifdef __WIIU__
+            if(g_isHBLauncher)
+                SYSRelaunchTitle(0, NULL);
+#endif
+
+            Controls::Quit();
+            QuitMixerX();
+            g_frmMain.freeSystem();
+#   ifdef __WIIU__
+            exit(0);
+#   else
+            abort();
+#   endif
+        }
+#endif
+
         MessageTitle.clear();
         MessageText.clear();
         MessageTextMap.clear();
-        if(g_MessageType != MESSAGE_TYPE_SYS_FATAL_ASSERT)
-            g_MessageType = MESSAGE_TYPE_NORMAL;
+        g_MessageType = MESSAGE_TYPE_NORMAL;
         return true;
     }
 
@@ -488,10 +511,16 @@ int PauseGame(PauseCode code, int plr)
 
             g_microStats.start_task(MicroStats::Graphics);
 
-            if(g_MessageType != MESSAGE_TYPE_SYS_FATAL_ASSERT)
+#if defined(THEXTECH_ASSERTS_INGAME_MESSAGE) && !defined(THEXTECH_NO_SDL_BUILD)
+            const bool is_fatal_message = (g_MessageType == MESSAGE_TYPE_SYS_FATAL_ASSERT);
+#else
+            constexpr bool is_fatal_message = false;
+#endif
+
+            if(!is_fatal_message)
                 speedRun_tick();
 
-            if(g_MessageType == MESSAGE_TYPE_SYS_FATAL_ASSERT)
+            if(is_fatal_message)
                 UpdateGraphicsFatalAssert();
             else if(code == PauseCode::Prompt)
                 PromptScreen::Render();
@@ -580,28 +609,6 @@ int PauseGame(PauseCode code, int plr)
     } while(true);
 
     GamePaused = old_code;
-
-#if defined(THEXTECH_ASSERTS_INGAME_MESSAGE) && !defined(THEXTECH_NO_SDL_BUILD)
-    // When it's a fatal error, just quit everything immediately
-    if(g_MessageType == MESSAGE_TYPE_SYS_FATAL_ASSERT)
-    {
-        GracefulQuit(false);
-
-#ifdef __WIIU__
-        if(g_isHBLauncher)
-            SYSRelaunchTitle(0, NULL);
-#endif
-
-        Controls::Quit();
-        QuitMixerX();
-        g_frmMain.freeSystem();
-#   ifdef __WIIU__
-        exit(0);
-#   else
-        abort();
-#   endif
-    }
-#endif
 
     // prevent unexpected button presses
     for(int i = 1; i <= numPlayers; i++)
