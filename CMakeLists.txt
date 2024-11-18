@@ -951,7 +951,7 @@ elseif(NINTENDO_WII)
     )
 elseif(NINTENDO_DS)
     add_definitions(-DWINDOW_CUSTOM -DMSGBOX_CUSTOM -DEVENTS_CUSTOM -DRENDER_CUSTOM -DTHEXTECH_NO_SDL_CORE)
-    list(REMOVE_ITEM THEXTECH_SRC src/sound.cpp)
+    list(REMOVE_ITEM THEXTECH_SRC src/sound.cpp src/sound/sound_msgsnd.cpp)
 
     list(APPEND THEXTECH_SRC
         src/control/input_16m.cpp
