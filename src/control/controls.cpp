@@ -1271,13 +1271,13 @@ void Rumble(int player, int ms, float strength)
         return;
 
     int l_player_i = 0;
-    while(player != screen.players[l_player_i] && l_player_i < screen.player_count)
+    while(l_player_i < screen.player_count && player != screen.players[l_player_i])
         l_player_i++;
 
     if(l_player_i == screen.player_count)
         return;
 
-    if(l_player_i > (int)g_InputMethods.size())
+    if(l_player_i >= (int)g_InputMethods.size())
         return;
 
     if(!g_InputMethods[l_player_i])

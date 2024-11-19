@@ -210,6 +210,20 @@ static void s_MovePlayersToExit(int got_exit_A)
     }
 }
 
+void CollectMedal(const NPC_t& medal)
+{
+    PlaySoundSpatial(SFX_MedalGet, medal.Location);
+
+    auto& medal_score = NPCTraits[medal.Type].Score;
+    MoreScore(medal_score, medal.Location);
+
+    medal_score += 1;
+    if(medal_score > 14)
+        medal_score = 14;
+
+    g_curLevelMedals.get(medal.Variant - 1);
+}
+
 void TouchBonus(int A, int B)
 {
     // INCORRECT NOTE: the only way to reach this code in SMBX 1.3 when Player[A].Effect is not PLREFF_NORMAL is if NPC[B]->IsACoin is true and NPC[B] is on Char4's boomerang
@@ -592,16 +606,7 @@ void TouchBonus(int A, int B)
             Got100Coins();
 
         if(NPC[B].Type == NPCID_MEDAL)
-        {
-            PlaySoundSpatial(SFX_MedalGet, NPC[B].Location);
-            auto& medal_score = NPCTraits[NPC[B].Type].Score;
-            MoreScore(medal_score, NPC[B].Location);
-            medal_score += 1;
-            if(medal_score > 14)
-                medal_score = 14;
-
-            g_curLevelMedals.get(NPC[B].Variant - 1);
-        }
+            CollectMedal(NPC[B]);
         else
             MoreScore(1, NPC[B].Location);
 
