@@ -574,8 +574,8 @@ void LLVM_ATTRIBUTE_NORETURN CrashHandler::crashByUnhandledException()
     g_msgBoxHook(
         //% "Unhandled exception!"
         "Unhandled exception!",
-        //% "Engine has crashed because accepted unhandled exception!"
-        "Engine has crashed because accepted unhandled exception!\n\n"
+        //% "The engine has crashed because of an unhandled exception!"
+        "The engine has crashed because of an unhandled exception!\n\n"
         "--Exception message:----\n" +
         exc_line + "\n"
         "------------------------"
