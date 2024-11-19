@@ -130,13 +130,19 @@ static bool s_DropAddScreen()
 }
 
 
+static void s_OptionsScreen_Resume();
+
 static bool s_OptionsScreen()
 {
     PlaySound(SFX_Do);
 
-    PauseGame(PauseCode::Options, 0);
-    MenuCursorCanMove = false;
+    PauseInit(PauseCode::Options, 0, s_OptionsScreen_Resume);
 
+    return false;
+}
+
+static void s_OptionsScreen_Resume()
+{
     // re-initialize / re-translate pause menu
     SoundPause[SFX_Pause] = 1;
     Init(s_pause_plr, s_pause_type == PauseType::Legacy);
@@ -150,8 +156,6 @@ static bool s_OptionsScreen()
             break;
         }
     }
-
-    return false;
 }
 
 static bool s_CheatScreen()
