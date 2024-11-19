@@ -572,9 +572,7 @@ void LLVM_ATTRIBUTE_NORETURN CrashHandler::crashByUnhandledException()
               STACK_FORMAT, exc.c_str(),
               stack.c_str(), g_messageToUser);
     g_msgBoxHook(
-        //% "Unhandled exception!"
         "Unhandled exception!",
-        //% "The engine has crashed because of an unhandled exception!"
         "The engine has crashed because of an unhandled exception!\n\n"
         "--Exception message:----\n" +
         exc_line + "\n"
@@ -590,9 +588,7 @@ void LLVM_ATTRIBUTE_NORETURN CrashHandler::crashByFlood()
               STACK_FORMAT,
               stack.c_str(), g_messageToUser);
     g_msgBoxHook(
-        //% "Out of memory!"
         "Out of memory!",
-        //% "Engine has crashed because out of memory! Try to close other applications and restart game."
         "Engine has crashed because out of memory! Try to close other applications and restart game.");
     abortEngine(-2);
 }
@@ -678,9 +674,7 @@ static void handle_signal(int signal, siginfo_t *siginfo, void * /*context*/)
         }
 
         g_msgBoxHook(
-            //% "Physical memory address error!"
             "Physical memory address error!",
-            //% "Engine has crashed because a physical memory address error"
             "Engine has crashed because a physical memory address error");
         abortEngine(signal);
     }
@@ -697,9 +691,7 @@ static void handle_signal(int signal, siginfo_t *siginfo, void * /*context*/)
                   STACK_FORMAT,
                   stack.c_str(), g_messageToUser);
         g_msgBoxHook(
-            //% "Wrong CPU Instruction!"
             "Wrong CPU Instruction!",
-            //% "Engine has crashed because a wrong CPU instruction"
             "Engine has crashed because a wrong CPU instruction");
         abortEngine(signal);
     }
@@ -754,9 +746,7 @@ static void handle_signal(int signal, siginfo_t *siginfo, void * /*context*/)
         }
 
         g_msgBoxHook(
-            //% "Wrong arithmetical operation"
             "Wrong arithmetical operation",
-            //% "Engine has crashed because of a wrong arithmetical operation!"
             "Engine has crashed because of a wrong arithmetical operation!");
         abortEngine(signal);
     }
@@ -768,9 +758,7 @@ static void handle_signal(int signal, siginfo_t *siginfo, void * /*context*/)
                   STACK_FORMAT,
                   stack.c_str(), g_messageToUser);
         g_msgBoxHook(
-            //% "Aborted"
             "Aborted",
-            //% "Engine has been aborted because critical error was occouped."
             "Engine has been aborted because critical error was occouped.");
         abortEngine(signal);
     }
@@ -815,11 +803,7 @@ static void handle_signal(int signal, siginfo_t *siginfo, void * /*context*/)
         }
 
         g_msgBoxHook(
-            //% "Segmentation fault"
             "Segmentation fault",
-            /*% "Engine has crashed because of a Segmentation fault.\n"
-                "Run debugging with a built in debug mode application\n"
-                "and retry your recent actions to get more detailed information." */
             "Engine has crashed because of a Segmentation fault.\n"
             "Run debugging with a built in debug mode application\n"
             "and retry your recent actions to get more detailed information.");
@@ -830,9 +814,7 @@ static void handle_signal(int signal, siginfo_t *siginfo, void * /*context*/)
     {
         pLogFatal("<Interrupted!>");
         g_msgBoxHook(
-            //% "Interrupt"
             "Interrupt",
-            //% "Engine has been interrupted"
             "Engine has been interrupted");
         abortEngine(signal);
     }
