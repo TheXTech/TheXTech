@@ -463,9 +463,9 @@ static constexpr int s_max_pause_stack_depth = 4;
 struct PauseLoopState
 {
     int pause_player = 0;
-    PauseCode pause_stack[s_max_pause_stack_depth];
+    PauseCode pause_stack[s_max_pause_stack_depth + 1];
     typedef void (*callback_t)();
-    callback_t pause_stack_callback[s_max_pause_stack_depth];
+    callback_t pause_stack_callback[s_max_pause_stack_depth + 1];
     int pause_stack_depth = 0;
 };
 
@@ -490,7 +490,7 @@ void PauseInit(PauseCode code, int plr, void (*callback)())
             PauseMusic();
     }
     // push pause code stack
-    else if(s_pauseLoopState.pause_stack_depth + 1 < s_max_pause_stack_depth)
+    else if(s_pauseLoopState.pause_stack_depth < s_max_pause_stack_depth)
         s_pauseLoopState.pause_stack_depth++;
 
     // set pause code
@@ -523,11 +523,13 @@ void PauseInit(PauseCode code, int plr, void (*callback)())
 }
 
 // finishes the current pause and pops it from the pause stack
-static void s_PauseFinish();
+static void s_PauseFinish(int stack_level);
 
 // a main loop for cases where the game is paused
 void PauseLoop()
 {
+    int cur_stack_level = s_pauseLoopState.pause_stack_depth;
+
     g_microStats.start_task(MicroStats::Graphics);
 
 #if defined(THEXTECH_ASSERTS_INGAME_MESSAGE) && !defined(THEXTECH_NO_SDL_BUILD)
@@ -621,14 +623,28 @@ void PauseLoop()
     g_microStats.end_frame();
 
     if(pause_done)
-        s_PauseFinish();
+        s_PauseFinish(cur_stack_level);
 }
 
-static void s_PauseFinish()
+static void s_PauseFinish(int stack_level)
 {
     // perform callback
-    if(s_pauseLoopState.pause_stack_callback[s_pauseLoopState.pause_stack_depth])
-        s_pauseLoopState.pause_stack_callback[s_pauseLoopState.pause_stack_depth]();
+    if(s_pauseLoopState.pause_stack_callback[stack_level])
+        s_pauseLoopState.pause_stack_callback[stack_level]();
+
+    // special case: remove dropped frame from middle of pause stack
+    if(s_pauseLoopState.pause_stack_depth > stack_level)
+    {
+        for(int i = stack_level; i < s_pauseLoopState.pause_stack_depth; i++)
+        {
+            s_pauseLoopState.pause_stack[i] = s_pauseLoopState.pause_stack[i + 1];
+            s_pauseLoopState.pause_stack_callback[i] = s_pauseLoopState.pause_stack_callback[i + 1];
+        }
+
+        s_pauseLoopState.pause_stack_depth--;
+
+        return;
+    }
 
     // pop pause stack
     if(s_pauseLoopState.pause_stack_depth > 0)
