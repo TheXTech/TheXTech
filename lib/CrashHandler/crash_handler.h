@@ -20,10 +20,14 @@
 #ifndef CRASHHANDLER_H
 #define CRASHHANDLER_H
 
+#include <string>
+
 class CrashHandler
 {
 public:
     CrashHandler() = default;
+    typedef void (*MsgBoxHook_t)(const std::string &title, const std::string &message);
+    static void setCrashMsgBoxHook(MsgBoxHook_t hook);
     static void crashByUnhandledException();
     static void crashByFlood();
     static void initSigs();

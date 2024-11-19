@@ -532,6 +532,13 @@ static LLVM_ATTRIBUTE_NORETURN void abortEngine(int signal)
     exit(signal);
 }
 
+static CrashHandler::MsgBoxHook_t g_msgBoxHook = &XMsgBox::errorMsgBox;
+
+void CrashHandler::setCrashMsgBoxHook(MsgBoxHook_t hook)
+{
+    g_msgBoxHook = hook;
+}
+
 void LLVM_ATTRIBUTE_NORETURN CrashHandler::crashByUnhandledException()
 {
     std::string stack = getStacktrace();
@@ -555,7 +562,7 @@ void LLVM_ATTRIBUTE_NORETURN CrashHandler::crashByUnhandledException()
     pLogFatal("<Unhandled exception! %s>\n"
               STACK_FORMAT, exc.c_str(),
               stack.c_str(), g_messageToUser);
-    XMsgBox::errorMsgBox(
+    g_msgBoxHook(
         //% "Unhandled exception!"
         "Unhandled exception!",
         //% "Engine has crashed because accepted unhandled exception!"
@@ -569,7 +576,7 @@ void LLVM_ATTRIBUTE_NORETURN CrashHandler::crashByFlood()
     pLogFatal("<Out of memory!>\n"
               STACK_FORMAT,
               stack.c_str(), g_messageToUser);
-    XMsgBox::errorMsgBox(
+    g_msgBoxHook(
         //% "Out of memory!"
         "Out of memory!",
         //% "Engine has crashed because out of memory! Try to close other applications and restart game."
@@ -607,7 +614,7 @@ static void handle_signal(int signal, siginfo_t *siginfo, void * /*context*/)
     case SIGALRM:
     {
         pLogFatal("<alarm() time out!>");
-        XMsgBox::errorMsgBox(
+        g_msgBoxHook(
             //% "Time out!"
             "Time out!",
             //% "Engine has abourted because alarm() time out!"
@@ -656,7 +663,7 @@ static void handle_signal(int signal, siginfo_t *siginfo, void * /*context*/)
                       stack.c_str(), g_messageToUser);
         }
 
-        XMsgBox::errorMsgBox(
+        g_msgBoxHook(
             //% "Physical memory address error!"
             "Physical memory address error!",
             //% "Engine has crashed because a physical memory address error"
@@ -675,7 +682,7 @@ static void handle_signal(int signal, siginfo_t *siginfo, void * /*context*/)
         pLogFatal("<Wrong CPU Instruction>\n"
                   STACK_FORMAT,
                   stack.c_str(), g_messageToUser);
-        XMsgBox::errorMsgBox(
+        g_msgBoxHook(
             //% "Wrong CPU Instruction!"
             "Wrong CPU Instruction!",
             //% "Engine has crashed because a wrong CPU instruction"
@@ -732,7 +739,7 @@ static void handle_signal(int signal, siginfo_t *siginfo, void * /*context*/)
                       stack.c_str(), g_messageToUser);
         }
 
-        XMsgBox::errorMsgBox(
+        g_msgBoxHook(
             //% "Wrong arithmetical operation"
             "Wrong arithmetical operation",
             //% "Engine has crashed because of a wrong arithmetical operation!"
@@ -746,7 +753,7 @@ static void handle_signal(int signal, siginfo_t *siginfo, void * /*context*/)
         pLogFatal("<Aborted!>\n"
                   STACK_FORMAT,
                   stack.c_str(), g_messageToUser);
-        XMsgBox::errorMsgBox(
+        g_msgBoxHook(
             //% "Aborted"
             "Aborted",
             //% "Engine has been aborted because critical error was occouped."
@@ -793,7 +800,7 @@ static void handle_signal(int signal, siginfo_t *siginfo, void * /*context*/)
                       stack.c_str(), g_messageToUser);
         }
 
-        XMsgBox::errorMsgBox(
+        g_msgBoxHook(
             //% "Segmentation fault"
             "Segmentation fault",
             /*% "Engine has crashed because of a Segmentation fault.\n"
@@ -808,7 +815,7 @@ static void handle_signal(int signal, siginfo_t *siginfo, void * /*context*/)
     case SIGINT:
     {
         pLogFatal("<Interrupted!>");
-        XMsgBox::errorMsgBox(
+        g_msgBoxHook(
             //% "Interrupt"
             "Interrupt",
             //% "Engine has been interrupted"
