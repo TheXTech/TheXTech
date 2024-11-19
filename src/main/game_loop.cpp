@@ -469,11 +469,9 @@ struct PauseLoopState
 
 static PauseLoopState s_pauseLoopState;
 
-void PauseGame(PauseCode code, int plr)
+// initializes a certain pause screen (but does not reset the game loop)
+void PauseInit(PauseCode code, int plr)
 {
-//    double fpsTime = 0;
-//    int fpsCount = 0;
-
     // initialize pause from main game
     if(GamePaused == PauseCode::None)
     {
@@ -490,14 +488,14 @@ void PauseGame(PauseCode code, int plr)
             PauseMusic();
     }
     // push pause code stack
-    else if(s_pauseLoopState.pause_stack_depth < s_max_pause_stack_depth)
-    {
-        s_pauseLoopState.pause_stack[s_pauseLoopState.pause_stack_depth] = GamePaused;
+    else if(s_pauseLoopState.pause_stack_depth + 1 < s_max_pause_stack_depth)
         s_pauseLoopState.pause_stack_depth++;
-    }
 
     // set pause code
     GamePaused = code;
+
+    // store pause code for this pause
+    s_pauseLoopState.pause_stack[s_pauseLoopState.pause_stack_depth] = GamePaused;
 
     // init correct pause screen type
     if(code == PauseCode::Message)
@@ -519,117 +517,112 @@ void PauseGame(PauseCode code, int plr)
     SyncSysCursorDisplay();
 
     // resetFrameTimer();
+}
 
-    do
-    {
-        if(canProceedFrame())
-        {
-            computeFrameTime1();
-            computeFrameTime2();
+// finishes the current pause and pops it from the pause stack
+static void s_PauseFinish();
 
-            g_microStats.start_task(MicroStats::Controls);
-
-            XEvents::doEvents();
-            CheckActive();
-
-            g_microStats.start_task(MicroStats::Graphics);
+// a main loop for cases where the game is paused
+void PauseLoop()
+{
+    g_microStats.start_task(MicroStats::Graphics);
 
 #if defined(THEXTECH_ASSERTS_INGAME_MESSAGE) && !defined(THEXTECH_NO_SDL_BUILD)
-            const bool is_fatal_message = (g_MessageType == MESSAGE_TYPE_SYS_FATAL_ASSERT);
+    const bool is_fatal_message = (g_MessageType == MESSAGE_TYPE_SYS_FATAL_ASSERT);
 #else
-            constexpr bool is_fatal_message = false;
+    constexpr bool is_fatal_message = false;
 #endif
 
-            if(!is_fatal_message)
-                speedRun_tick();
+    if(!is_fatal_message)
+        speedRun_tick();
 
-            if(is_fatal_message)
-                UpdateGraphicsFatalAssert();
-            else if(GamePaused == PauseCode::Prompt)
-                PromptScreen::Render();
-            else if((LevelSelect && !GameMenu) || WorldEditor)
-                UpdateGraphics2();
-            else
-                UpdateGraphics();
+    if(is_fatal_message)
+        UpdateGraphicsFatalAssert();
+    else if(GamePaused == PauseCode::Prompt)
+        PromptScreen::Render();
+    else if((LevelSelect && !GameMenu) || WorldEditor)
+        UpdateGraphics2();
+    else
+        UpdateGraphics();
 
-            g_microStats.start_task(MicroStats::Controls);
+    g_microStats.start_task(MicroStats::Controls);
 
-            if(!Controls::Update())
-                QuickReconnectScreen::g_active = true;
+    if(!Controls::Update())
+        QuickReconnectScreen::g_active = true;
 
-            if(QuickReconnectScreen::g_active)
-                QuickReconnectScreen::Logic();
+    if(QuickReconnectScreen::g_active)
+        QuickReconnectScreen::Logic();
 
-            g_microStats.start_task(MicroStats::Sound);
+    g_microStats.start_task(MicroStats::Sound);
 
-            UpdateSound();
-            BlockFrames();
+    UpdateSound();
+    BlockFrames();
 
-            g_microStats.start_task(MicroStats::Effects);
+    g_microStats.start_task(MicroStats::Effects);
 
-            UpdateEffects();
+    UpdateEffects();
 
-            if(LevelSelect)
-                g_worldScreenFader.update();
-            else
-                updateScreenFaders();
+    if(LevelSelect)
+        g_worldScreenFader.update();
+    else
+        updateScreenFaders();
 
-            // reset the active player if it is no longer present
-            if(s_pauseLoopState.pause_player > numPlayers)
-                s_pauseLoopState.pause_player = 0;
+    // reset the active player if it is no longer present
+    if(s_pauseLoopState.pause_player > numPlayers)
+        s_pauseLoopState.pause_player = 0;
 
-            g_microStats.start_task(MicroStats::Script);
+    g_microStats.start_task(MicroStats::Script);
 
-            // run the appropriate pause logic
-            if(qScreen)
-            {
-                // prevent any logic or unpause from taking place
+    bool pause_done = false;
 
-                // qScreen takes place in WorldLoop, not world graphics
-                if(LevelSelect)
-                    qScreen = Update_qScreen(1);
-            }
-            else if(GamePaused == PauseCode::PauseScreen)
-            {
-                if(PauseScreen::Logic(s_pauseLoopState.pause_player))
-                    break;
-            }
-            else if(GamePaused == PauseCode::Message)
-            {
-                if(MessageScreen_Logic(s_pauseLoopState.pause_player))
-                    break;
-            }
-            else if(GamePaused == PauseCode::Prompt)
-            {
-                if(PromptScreen::Logic())
-                    break;
-            }
-            else if(GamePaused == PauseCode::DropAdd)
-            {
-                if(ConnectScreen::Logic())
-                    break;
-            }
-            else if(GamePaused == PauseCode::Options)
-            {
-                if(OptionsScreen::Logic())
-                    break;
-            }
-            else if(GamePaused == PauseCode::TextEntry)
-            {
-                if(TextEntryScreen::Logic())
-                    break;
-            }
+    // run the appropriate pause logic
+    if(qScreen)
+    {
+        // prevent any logic or unpause from taking place
 
-            g_microStats.end_frame();
-        }
+        // qScreen takes place in WorldLoop, not world graphics
+        if(LevelSelect)
+            qScreen = Update_qScreen(1);
+    }
+    else if(GamePaused == PauseCode::PauseScreen)
+    {
+        if(PauseScreen::Logic(s_pauseLoopState.pause_player))
+            pause_done = true;
+    }
+    else if(GamePaused == PauseCode::Message)
+    {
+        if(MessageScreen_Logic(s_pauseLoopState.pause_player))
+            pause_done = true;
+    }
+    else if(GamePaused == PauseCode::Prompt)
+    {
+        if(PromptScreen::Logic())
+            pause_done = true;
+    }
+    else if(GamePaused == PauseCode::DropAdd)
+    {
+        if(ConnectScreen::Logic())
+            pause_done = true;
+    }
+    else if(GamePaused == PauseCode::Options)
+    {
+        if(OptionsScreen::Logic())
+            pause_done = true;
+    }
+    else if(GamePaused == PauseCode::TextEntry)
+    {
+        if(TextEntryScreen::Logic())
+            pause_done = true;
+    }
 
-        if(!g_config.unlimited_framerate)
-            PGE_Delay(1);
+    g_microStats.end_frame();
 
-        if(!GameIsActive)
-            break;
-    } while(true);
+    if(pause_done)
+        s_PauseFinish();
+}
 
+static void s_PauseFinish()
+{
     // pop pause stack
     if(s_pauseLoopState.pause_stack_depth > 0)
     {
@@ -658,4 +651,36 @@ void PauseGame(PauseCode code, int plr)
     SyncSysCursorDisplay();
 
     // resetFrameTimer();
+}
+
+void PauseGame(PauseCode code, int plr)
+{
+//    double fpsTime = 0;
+//    int fpsCount = 0;
+
+    PauseInit(code, plr);
+
+    int cur_pause_stack_depth = s_pauseLoopState.pause_stack_depth;
+
+    do
+    {
+        if(canProceedFrame())
+        {
+            computeFrameTime1();
+            computeFrameTime2();
+
+            g_microStats.start_task(MicroStats::Controls);
+
+            XEvents::doEvents();
+            CheckActive();
+
+            PauseLoop();
+        }
+
+        if(!g_config.unlimited_framerate)
+            PGE_Delay(1);
+
+        if(!GameIsActive)
+            break;
+    } while(GamePaused != PauseCode::None && s_pauseLoopState.pause_stack_depth >= cur_pause_stack_depth);
 }
