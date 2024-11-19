@@ -625,9 +625,7 @@ static void handle_signal(int signal, siginfo_t *siginfo, void * /*context*/)
     {
         pLogFatal("<alarm() time out!>");
         g_msgBoxHook(
-            //% "Time out!"
             "Time out!",
-            //% "Engine has abourted because alarm() time out!"
             "Engine has abourted because alarm() time out!");
         abortEngine(signal);
     }
