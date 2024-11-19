@@ -464,13 +464,15 @@ struct PauseLoopState
 {
     int pause_player = 0;
     PauseCode pause_stack[s_max_pause_stack_depth];
+    typedef void (*callback_t)();
+    callback_t pause_stack_callback[s_max_pause_stack_depth];
     int pause_stack_depth = 0;
 };
 
 static PauseLoopState s_pauseLoopState;
 
 // initializes a certain pause screen (but does not reset the game loop)
-void PauseInit(PauseCode code, int plr)
+void PauseInit(PauseCode code, int plr, void (*callback)())
 {
     // initialize pause from main game
     if(GamePaused == PauseCode::None)
@@ -494,8 +496,9 @@ void PauseInit(PauseCode code, int plr)
     // set pause code
     GamePaused = code;
 
-    // store pause code for this pause
+    // store pause code and pause callback for this pause
     s_pauseLoopState.pause_stack[s_pauseLoopState.pause_stack_depth] = GamePaused;
+    s_pauseLoopState.pause_stack_callback[s_pauseLoopState.pause_stack_depth] = callback;
 
     // init correct pause screen type
     if(code == PauseCode::Message)
@@ -623,6 +626,10 @@ void PauseLoop()
 
 static void s_PauseFinish()
 {
+    // perform callback
+    if(s_pauseLoopState.pause_stack_callback[s_pauseLoopState.pause_stack_depth])
+        s_pauseLoopState.pause_stack_callback[s_pauseLoopState.pause_stack_depth]();
+
     // pop pause stack
     if(s_pauseLoopState.pause_stack_depth > 0)
     {
