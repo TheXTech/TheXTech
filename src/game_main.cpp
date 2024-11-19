@@ -29,6 +29,7 @@
 
 #if defined(THEXTECH_ASSERTS_INGAME_MESSAGE) && !defined(THEXTECH_NO_SDL_BUILD)
 #   include <CrashHandler/crash_handler.h>
+#   include <signal.h>
 #endif
 
 #include <Logger/logger.h>
@@ -334,6 +335,7 @@ static void ingame_crash_msg_handler(const std::string &title, const std::string
     CloseLog(); // Before this, last log message was written, so, no more logs will be printed
     g_MessageType = MESSAGE_TYPE_SYS_FATAL_ASSERT;
     MessageTitle = "Fatal error!";
+    signal(SIGABRT, SIG_DFL);
     MessageText =  fmt::sprintf_ne("%s\n"
                                   "\n"
                                   "%s\n"

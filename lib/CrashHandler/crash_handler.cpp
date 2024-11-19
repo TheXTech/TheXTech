@@ -24,11 +24,14 @@
 #   include "sdl_proxy/sdl_assert.h"
 #endif
 
-#ifndef THEXTECH_NO_SDL_BUILD
-#include <SDL2/SDL_version.h>
+#if !defined(__16M__) && !defined(__WII__) && !defined(__3DS__)
+#   define PGE_ENABLE_SIGNAL_HOOKS
+#endif
 
+#ifndef THEXTECH_NO_SDL_BUILD
+#   include <SDL2/SDL_version.h>
 #   if !defined(THEXTECH_CLI_BUILD) && !defined(CUSTOM_AUDIO)
-#   include <SDL2/SDL_mixer_ext.h>
+#       include <SDL2/SDL_mixer_ext.h>
 #   endif
 #endif
 
@@ -39,7 +42,7 @@
 #include <lib/CrashHandler/backtrace.h>
 
 #if defined(DEBUG_BUILD) && (Backtrace_FOUND || defined(_WIN32))
-#define PGE_ENGINE_DEBUG
+#   define PGE_ENGINE_DEBUG
 #endif
 
 #ifdef PGE_ENGINE_DEBUG
@@ -66,6 +69,7 @@
 
 // Exclude platforms that don't have SIG_INFO support
 #if    !defined(_WIN32) \
+    && !defined(__16M__) \
     && !defined(__3DS__) \
     && !defined(__WII__) \
     && !defined(__WIIU__) \
@@ -76,6 +80,7 @@
 
 // Exclude personal data removal from platforms where API doesn't allows to recognise the user and/or home directory
 #if    !defined(VITA) \
+    && !defined(__16M__) \
     && !defined(__3DS__) \
     && !defined(__WII__) \
     && !defined(__WIIU__)  \
@@ -523,13 +528,14 @@ static std::string getStacktrace()
 #   define LLVM_ATTRIBUTE_NORETURN
 #endif
 
-static LLVM_ATTRIBUTE_NORETURN void abortEngine(int signal)
+static LLVM_ATTRIBUTE_NORETURN void abortEngine(int sig)
 {
     CloseLog();
+    signal(SIGABRT, SIG_DFL);
 #ifndef THEXTECH_NO_SDL_BUILD
     SDL_Quit();
 #endif
-    exit(signal);
+    exit(sig);
 }
 
 static CrashHandler::MsgBoxHook_t g_msgBoxHook = &XMsgBox::errorMsgBox;
@@ -584,6 +590,7 @@ void LLVM_ATTRIBUTE_NORETURN CrashHandler::crashByFlood()
     abortEngine(-2);
 }
 
+#if defined(PGE_ENABLE_SIGNAL_HOOKS)
 #if defined(_WIN32) // Unsupported signals by Windows
 struct siginfo_t;
 #endif
@@ -827,6 +834,7 @@ static void handle_signal(int signal, siginfo_t *siginfo, void * /*context*/)
         return;
     }
 }
+#endif // defined(PGE_ENABLE_SIGNAL_HOOKS)
 
 #ifndef THEXTECH_NO_SDL_BUILD
 static SDL_AssertState custom_sdl_handler(const SDL_AssertData *data, void *userdata)
@@ -860,7 +868,7 @@ void CrashHandler::logAssertInfo(const void* data_p)
 
 #if defined(HAS_SIG_INFO)
 static struct sigaction act;
-#else
+#elif defined(PGE_ENABLE_SIGNAL_HOOKS)
 #   if _WIN32
 struct siginfo_t;
 #   endif
@@ -885,7 +893,7 @@ void CrashHandler::initSigs()
 
     std::set_new_handler(&crashByFlood);
     std::set_terminate(&crashByUnhandledException);
-#if defined(HAS_SIG_INFO) // Unsupported signals by Windows
+#if defined(HAS_SIG_INFO) && defined(PGE_ENABLE_SIGNAL_HOOKS) // Unsupported signals by Windows
     memset(&act, 0, sizeof(struct sigaction));
     sigemptyset(&act.sa_mask);
     act.sa_sigaction = handle_signal;
@@ -903,7 +911,7 @@ void CrashHandler::initSigs()
     sigaction(SIGSEGV, &act, nullptr);
     sigaction(SIGINT,  &act, nullptr);
     sigaction(SIGABRT, &act, nullptr);
-#else // HAS_SIG_INFO
+#elif defined(PGE_ENABLE_SIGNAL_HOOKS) // HAS_SIG_INFO
     signal(SIGILL,  &handle_signalWIN32);
     signal(SIGFPE,  &handle_signalWIN32);
     signal(SIGSEGV, &handle_signalWIN32);
