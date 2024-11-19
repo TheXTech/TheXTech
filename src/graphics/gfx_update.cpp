@@ -204,6 +204,40 @@ void doShakeScreenClear()
     s_shakeScreen.clear();
 }
 
+// some "special" logic for pet mounts, used to be in the draw code
+static void PetFrameLogic(NPC_t& n)
+{
+    if(n.Special == 0)
+    {
+        if(!FreezeNPCs)
+            n.FrameCount += 1;
+
+        if(n.FrameCount >= 70)
+        {
+            if(!FreezeNPCs)
+                n.FrameCount = 0;
+        }
+    }
+    else
+    {
+        if(!FreezeNPCs)
+            n.FrameCount += 1;
+
+        if(n.FrameCount > 8)
+            n.FrameCount = 0;
+
+        if(!FreezeNPCs)
+            n.Special2 += 1;
+
+        if(n.Special2 > 30)
+        {
+            if(!FreezeNPCs)
+                n.Special2 = 0;
+        }
+    }
+
+}
+
 
 // this organizes all of the NPC draw conditions into one queue
 class NPC_Draw_Queue_t
@@ -324,9 +358,14 @@ public:
         {
             if(Normal_n == sizeof(Normal) / sizeof(uint16_t))
                 return;
+
             Normal[Normal_n] = A;
             Normal_n += 1;
             g_stats.renderedNPCs += 1;
+
+            // some "special" logic that has been moved into the logic portion
+            if(NPCIsYoshi(NPC[A].Type))
+                PetFrameLogic(NPC[A]);
         }
     }
 
@@ -2650,28 +2689,21 @@ void UpdateGraphicsScreen(Screen_t& screen)
                 YoshiBFrame = 6;
                 YoshiTFrame = 0;
 
+                // there was "special" logic affecting FrameCount and Special2, moved to logic side
                 if(NPC[A].Special == 0)
                 {
-                    if(!FreezeNPCs)
-                        NPC[A].FrameCount += 1;
-
                     if(NPC[A].FrameCount >= 70)
                     {
-                        if(!FreezeNPCs)
-                            NPC[A].FrameCount = 0;
+                        // there was a logic assignment here
                     }
                     else if(NPC[A].FrameCount >= 50)
                         YoshiTFrame = 3;
                 }
                 else
                 {
-                    if(!FreezeNPCs)
-                        NPC[A].FrameCount += 1;
-
                     if(NPC[A].FrameCount > 8)
                     {
                         YoshiBFrame = 0;
-                        NPC[A].FrameCount = 0;
                     }
                     else if(NPC[A].FrameCount > 6)
                     {
@@ -2697,18 +2729,10 @@ void UpdateGraphicsScreen(Screen_t& screen)
                     else
                         YoshiBFrame = 0;
 
-                    if(!FreezeNPCs)
-                        NPC[A].Special2 += 1;
-
                     if(NPC[A].Special2 > 30)
-                    {
                         YoshiTFrame = 0;
-                        if(!FreezeNPCs)
-                            NPC[A].Special2 = 0;
-                    }
                     else if(NPC[A].Special2 > 10)
                         YoshiTFrame = 2;
-
                 }
 
                 if(YoshiBFrame == 6)
@@ -2727,6 +2751,7 @@ void UpdateGraphicsScreen(Screen_t& screen)
                     YoshiBX = -YoshiBX;
                     YoshiTX = -YoshiTX;
                 }
+
                 // YoshiBX += 4
                 // YoshiTX += 4
                 g_stats.renderedNPCs++;
