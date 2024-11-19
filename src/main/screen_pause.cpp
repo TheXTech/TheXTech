@@ -124,9 +124,8 @@ static bool s_DropAddScreen()
 
     PlaySound(SFX_Do);
 
-    PauseGame(PauseCode::DropAdd, 0);
+    PauseInit(PauseCode::DropAdd, 0);
 
-    MenuCursorCanMove = false;
     return false;
 }
 
