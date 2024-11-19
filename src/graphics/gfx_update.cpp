@@ -1684,6 +1684,18 @@ void UpdateGraphicsLogic(bool Do_FrameSkip)
                 }
             }
 
+            // some "special" logic for warping Char 5 (moved from draw code)
+            for(int A = 1; A <= numPlayers; A++)
+            {
+                Player_t& p = Player[A];
+
+                if(p.Character == 5 && p.Effect == PLREFF_WARP_PIPE && !p.Dead && !p.Immune2 && p.TimeToLive == 0 && p.Frame > 5)
+                {
+                    if(vScreenCollision(Z, p.Location))
+                        p.Frame = 1;
+                }
+            }
+
             // moved from render code because it affects the game's random state
             // TODO: have a separate shakeScreen state per screen
             s_shakeScreen.update();
@@ -2267,8 +2279,9 @@ void UpdateGraphicsScreen(Screen_t& screen)
                     }
                     else if(vScreenCollision(Z, Player[A].Location))
                     {
-                        if(Player[A].Character == 5 && Player[A].Frame > 5)
-                            Player[A].Frame = 1;
+                        // this "special" code has been moved up into the logic section
+                        // if(Player[A].Character == 5 && Player[A].Frame > 5)
+                        //     Player[A].Frame = 1;
 
                         if((p.Character < 1) || (p.Character > 5))
                             continue;
