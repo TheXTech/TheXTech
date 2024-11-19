@@ -137,6 +137,12 @@ void CheckActive();//in game_main.cpp
 
 void GameLoop()
 {
+    if(GamePaused != PauseCode::None)
+    {
+        PauseLoop();
+        return;
+    }
+
     g_microStats.start_task(MicroStats::Script);
     lunaLoop();
 
@@ -275,7 +281,7 @@ void GameLoop()
         {
             // this is always able to pause the game even when CaptainN is enabled.
             if(SharedControls.Pause)
-                PauseGame(PauseCode::PauseScreen, 0);
+                PauseInit(PauseCode::PauseScreen, 0);
             // don't let double-pause or double-toggle happen
             else
             {
@@ -319,9 +325,7 @@ void GameLoop()
                     }
                     // normally pause the game
                     else
-                    {
-                        PauseGame(PauseCode::PauseScreen, 0);
-                    }
+                        PauseInit(PauseCode::PauseScreen, 0);
 
                     // don't let double-pause or double-toggle happen
                     break;
