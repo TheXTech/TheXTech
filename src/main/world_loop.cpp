@@ -65,6 +65,7 @@ void worldWaitForFade(int waitTicks)
         if(canProceedFrame())
         {
             computeFrameTime1();
+            // FIXME: strip logic out of UpdateGraphics2
             UpdateGraphics2();
             UpdateSound();
             XEvents::doEvents();
@@ -218,10 +219,20 @@ static inline double getWorldPlayerCenterY()
 void WorldLoop()
 {
     bool musicReset = false;
-    Location_t tempLocation;
-    int A = 0;
-    int B = 0;
-    bool allowFastMove = g_config.world_map_fast_move;
+
+    if(GamePaused != PauseCode::None)
+    {
+        PauseLoop();
+
+        if(GamePaused != PauseCode::None)
+            return;
+        else
+            goto resume_from_pause;
+    }
+
+    // Location_t tempLocation;
+    // int A = 0;
+    // int B = 0;
 
     if(SingleCoop > 0)
         SingleCoop = 1;
@@ -244,7 +255,7 @@ void WorldLoop()
     if(numPlayers > maxLocalPlayers)
         numPlayers = maxLocalPlayers;
 
-    for(B = 1; B <= numPlayers; B++)
+    for(int B = 1; B <= numPlayers; B++)
     {
         if(Player[B].Mount == 2)
             Player[B].Mount = 0;
@@ -276,7 +287,7 @@ void WorldLoop()
             s_worldUpdateMusic(WorldPlayer[1].Location);
             worldResetSection();
 
-            for(A = 1; A <= 4; A++)
+            for(int A = 1; A <= 4; A++)
             {
                 if(WorldLevel[curWorldLevel].LevelExit[A] == LevelBeatCode || WorldLevel[curWorldLevel].LevelExit[A] == -1)
                 {
@@ -314,7 +325,7 @@ void WorldLoop()
     else
         LevelBeatCode = 0;
 
-    for(A = 1; A <= numPlayers; A++)
+    for(int A = 1; A <= numPlayers; A++)
     {
         Player[A].Bumped = false;
         Player[A].Bumped2 = 0;
@@ -373,11 +384,33 @@ void WorldLoop()
 
     if(WorldPlayer[1].Move == 0)
     {
-        tempLocation = WorldPlayer[1].Location;
+        if(SharedControls.Pause)
+        {
+            PauseInit(PauseCode::PauseScreen, 0);
+            return;
+        }
+
+        for(int i = 1; i <= numPlayers; i++)
+        {
+            if(Player[i].Controls.Start && Player[i].UnStart)
+            {
+                PauseInit(PauseCode::PauseScreen, 0);
+                return;
+            }
+
+            // only allow P1 to pause if multiplayer pause controls disabled
+            if(!g_config.multiplayer_pause_controls)
+                break;
+        }
+
+resume_from_pause:
+
+        Location_t tempLocation = WorldPlayer[1].Location;
         tempLocation.Width -= 8;
         tempLocation.Height -= 8;
         tempLocation.X += 4;
         tempLocation.Y += 4;
+
         WorldPlayer[1].LevelIndex = 0;
 
         //for(A = 1; A <= numWorldLevels; A++)
@@ -389,19 +422,6 @@ void WorldLoop()
                 WorldPlayer[1].LevelIndex = t;
                 break;
             }
-        }
-
-        if(SharedControls.Pause)
-        {
-            PauseGame(PauseCode::PauseScreen, 0);
-        }
-        for(int i = 1; i <= numPlayers; i++)
-        {
-            if(Player[i].Controls.Start && Player[i].UnStart)
-                PauseGame(PauseCode::PauseScreen, 0);
-            // only allow P1 to pause if multiplayer pause controls disabled
-            if(!g_config.multiplayer_pause_controls)
-                break;
         }
 
         if(Player[1].Controls.Up)
@@ -703,7 +723,7 @@ void WorldLoop()
 
         if(WorldPlayer[1].Move3 && WorldPlayer[1].Move == 0)
         {
-            if(allowFastMove)
+            if(g_config.world_map_fast_move)
                 PlayerPath(WorldPlayer[1]);
 
             if(WorldPlayer[1].Move == 0)
@@ -747,7 +767,7 @@ void WorldLoop()
         WorldPlayer[1].Move2 += 2;
         WorldPlayer[1].Location.Y -= 2;
 
-        if(WalkAnywhere || allowFastMove)
+        if(WalkAnywhere || g_config.world_map_fast_move)
         {
             WorldPlayer[1].Move2 += 2;
             WorldPlayer[1].Location.Y -= 2;
@@ -766,7 +786,7 @@ void WorldLoop()
         WorldPlayer[1].Move2 += 2;
         WorldPlayer[1].Location.X -= 2;
 
-        if(WalkAnywhere || allowFastMove)
+        if(WalkAnywhere || g_config.world_map_fast_move)
         {
             WorldPlayer[1].Move2 += 2;
             WorldPlayer[1].Location.X -= 2;
@@ -785,7 +805,7 @@ void WorldLoop()
         WorldPlayer[1].Move2 += 2;
         WorldPlayer[1].Location.Y += 2;
 
-        if(WalkAnywhere || allowFastMove)
+        if(WalkAnywhere || g_config.world_map_fast_move)
         {
             WorldPlayer[1].Move2 += 2;
             WorldPlayer[1].Location.Y += 2;
@@ -804,7 +824,7 @@ void WorldLoop()
         WorldPlayer[1].Move2 += 2;
         WorldPlayer[1].Location.X += 2;
 
-        if(WalkAnywhere || allowFastMove)
+        if(WalkAnywhere || g_config.world_map_fast_move)
         {
             WorldPlayer[1].Move2 += 2;
             WorldPlayer[1].Location.X += 2;
