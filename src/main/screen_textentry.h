@@ -27,6 +27,12 @@
 namespace TextEntryScreen
 {
 
+extern std::string Text;
+
+// Initialize TextEntryScreen. [Temporarily returns whether a PauseGame(PauseCode::None) should be triggered.]
+bool Init(const std::string& Prompt, void (*callback)(), const std::string Value = std::string());
+
+// Initialize and run TextEntryScreen, waiting for the pause loop to complete, and returning the entered text. Deprecated.
 const std::string& Run(const std::string& Prompt, const std::string Value = std::string());
 
 void Render();

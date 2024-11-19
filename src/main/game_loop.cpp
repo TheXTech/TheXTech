@@ -665,7 +665,9 @@ void PauseGame(PauseCode code, int plr)
 //    double fpsTime = 0;
 //    int fpsCount = 0;
 
-    PauseInit(code, plr);
+    // allow waiting for the current pause frame to terminate by triggering PauseGame with PauseCode::None
+    if(code != PauseCode::None)
+        PauseInit(code, plr);
 
     int cur_pause_stack_depth = s_pauseLoopState.pause_stack_depth;
 

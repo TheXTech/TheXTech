@@ -608,13 +608,17 @@ bool KeyboardMouseRender(bool mouse, bool render)
     return false;
 }
 
-const std::string& Run(const std::string& Prompt, const std::string Value)
+bool Init(const std::string& Prompt, void (*callback)(), const std::string Value)
 {
 #ifdef __ANDROID__
     if(g_config.use_native_osk)
     {
         s_textEntry_callDialog();
-        return Text;
+
+        if(callback)
+            callback();
+
+        return false;
     }
 #endif
 
@@ -622,7 +626,11 @@ const std::string& Run(const std::string& Prompt, const std::string Value)
     if(g_config.use_native_osk)
     {
         Text = s_GetTextInput(Prompt, Value);
-        return Text;
+
+        if(callback)
+            callback();
+
+        return false;
     }
 #endif
 
@@ -641,7 +649,29 @@ const std::string& Run(const std::string& Prompt, const std::string Value)
     s_render_sel = false;
     s_timer = -1;
     s_committed = false;
-    PauseGame(PauseCode::TextEntry, 0);
+    PauseInit(PauseCode::TextEntry, 0, callback);
+
+    return true;
+}
+
+const std::string& Run(const std::string& Prompt, const std::string Value)
+{
+    bool using_pause_loop = Init(Prompt, nullptr, Value);
+
+    // wait for pause loop to finish
+    if(using_pause_loop)
+        PauseGame(PauseCode::None);
+
+    return Text;
+}
+
+void Render()
+{
+    KeyboardMouseRender(false, true);
+}
+
+static void s_finalize()
+{
     MenuCursorCanMove = false;
     MenuMouseRelease = false;
     MouseRelease = false;
@@ -653,13 +683,6 @@ const std::string& Run(const std::string& Prompt, const std::string Value)
         Player[i].CanJump = false;
         Player[i].CanAltJump = false;
     }
-
-    return Text;
-}
-
-void Render()
-{
-    KeyboardMouseRender(false, true);
 }
 
 bool Logic()
@@ -683,10 +706,7 @@ bool Logic()
 
     if(KeyboardMouseRender(true, false))
     {
-        MenuCursorCanMove = false;
-        MenuMouseRelease = false;
-        MouseRelease = false;
-        ScrollRelease = false;
+        s_finalize();
         return true;
     }
 
@@ -732,8 +752,7 @@ bool Logic()
 
         if((doPressed && DoAction()) || startPressed)
         {
-            MenuCursorCanMove = false;
-            MenuMouseRelease = false;
+            s_finalize();
             return true;
         }
     }
@@ -755,6 +774,9 @@ bool Logic()
 
     if(MenuCursorCanMove)
         s_timer = 10;
+
+    if(s_committed)
+        s_finalize();
 
     return s_committed;
 }
