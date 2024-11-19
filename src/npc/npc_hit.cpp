@@ -2094,6 +2094,7 @@ void NPCHit(int A, int B, int C)
     {
         if(LevelEditor)
             PlaySoundSpatial(SFX_ShellHit, NPC[A].Location);
+
         if(B == 2)
         {
             if(NPC[A].Type == NPCID_GEM_1 || NPC[A].Type == NPCID_GEM_5 || NPC[A].Type == NPCID_GEM_20)
@@ -2107,6 +2108,11 @@ void NPCHit(int A, int B, int C)
                 PlaySoundSpatial(SFX_Coin, NPC[A].Location);
                 NewEffect(EFFID_COIN_COLLECT, NPC[A].Location);
                 MoreScore(1, NPC[A].Location);
+            }
+            else if(g_config.fix_medal_kill && NPC[A].Type == NPCID_MEDAL)
+            {
+                NewEffect(EFFID_COIN_COLLECT, NPC[A].Location);
+                CollectMedal(NPC[A]);
             }
             else
             {

@@ -38,6 +38,8 @@ void DropBonus(int A);
 // EXTRA: After adding one new star, hide all over-star BGOs
 void CheckAfterStarTake(bool many = false);
 
+// EXTRA: all the logic for collecting a medal NPC
+void CollectMedal(const NPC_t& medal);
 // Public Sub TouchBonus(A As Integer, B As Integer) 'Code for dealing with bonus and player
 // Code for dealing with bonus and player
 void TouchBonus(int A, int B);
