@@ -158,12 +158,18 @@ static void s_OptionsScreen_Resume()
     }
 }
 
+static void s_CheatScreen_callback()
+{
+    cheats_setBuffer(TextEntryScreen::Text);
+
+    // uncomment this if you want to return to the pause menu
+    // PauseInit(PauseCode::PauseScreen);
+}
+
 static bool s_CheatScreen()
 {
-    cheats_setBuffer(TextEntryScreen::Run(g_gameStrings.pauseItemEnterCode));
-    // uncomment this if you want to return to the pause menu
-    // MenuCursorCanMove = false;
-    // return false;
+    TextEntryScreen::Init(g_gameStrings.pauseItemEnterCode, s_CheatScreen_callback);
+
     return true;
 }
 
