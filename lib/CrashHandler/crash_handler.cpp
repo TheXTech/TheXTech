@@ -549,6 +549,7 @@ void LLVM_ATTRIBUTE_NORETURN CrashHandler::crashByUnhandledException()
 {
     std::string stack = getStacktrace();
     std::string exc;
+    std::string exc_line;
 
     try
     {
@@ -556,12 +557,14 @@ void LLVM_ATTRIBUTE_NORETURN CrashHandler::crashByUnhandledException()
     }
     catch(const std::exception &e)
     {
+        exc_line = e.what();
         exc.append(" caught an unhandled exception. [");
-        exc.append(e.what());
+        exc.append(exc_line);
         exc.append("]");
     }
     catch(...)
     {
+        exc_line = "<unknown>";
         exc.append(" caught unhandled exception. (unknown) ");
     }
 
@@ -572,7 +575,11 @@ void LLVM_ATTRIBUTE_NORETURN CrashHandler::crashByUnhandledException()
         //% "Unhandled exception!"
         "Unhandled exception!",
         //% "Engine has crashed because accepted unhandled exception!"
-        "Engine has crashed because accepted unhandled exception!");
+        "Engine has crashed because accepted unhandled exception!\n\n"
+        "--Exception message:----\n" +
+        exc_line + "\n"
+        "------------------------"
+    );
     abortEngine(-1);
 }
 

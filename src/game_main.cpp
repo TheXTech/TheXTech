@@ -338,7 +338,7 @@ static void ingame_crash_msg_handler(const std::string &title, const std::string
     signal(SIGABRT, SIG_DFL);
     MessageText =  fmt::sprintf_ne("%s\n"
                                   "\n"
-                                  "%s\n"
+                                  "%s\n\n"
                                   "Game will be closed.\n\n"
                                   "See log for details:\n"
                                   "%s",
