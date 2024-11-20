@@ -426,7 +426,9 @@ if(THEXTECH_ENABLE_LUA)
     include(cmake/library_luabind.cmake)
 endif()
 
-include(cmake/library_discord_rpc.cmake)
+if(NOT THEXTECH_CLI_BUILD AND NOT THEXTECH_NO_SDL_BUILD)
+    include(cmake/library_discord_rpc.cmake)
+endif()
 
 if(EMSCRIPTEN)
     message("Is EMSCRIPTEN!")
