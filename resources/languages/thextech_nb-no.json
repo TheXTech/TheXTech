@@ -252,7 +252,8 @@
             "gameTargetSlot": "",
             "gameBattleRandom": "",
             "gameNoBattleLevels": "",
-            "gameSourceSlot": ""
+            "gameSourceSlot": "",
+            "warnEpCompat": ""
         },
         "loading": "",
         "wordPlayer": "",

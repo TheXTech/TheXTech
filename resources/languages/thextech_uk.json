@@ -436,7 +436,8 @@
             "gameCopySave": "",
             "gameEraseSave": "",
             "phraseScore": "",
-            "gameTargetSlot": ""
+            "gameTargetSlot": "",
+            "warnEpCompat": ""
         },
         "main": {
             "mainEditor": "",

@@ -414,7 +414,8 @@
             "gameSlotNew": "",
             "gameSlotContinue": "",
             "gameSourceSlot": "",
-            "gameBattleRandom": ""
+            "gameBattleRandom": "",
+            "warnEpCompat": ""
         },
         "wordProfile": "",
         "abbrevMilliseconds": "",

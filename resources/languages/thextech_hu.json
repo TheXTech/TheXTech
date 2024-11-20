@@ -12,7 +12,8 @@
             "gameEraseSlot": "",
             "gameEraseSave": "",
             "phraseScore": "",
-            "gameNoBattleLevels": ""
+            "gameNoBattleLevels": "",
+            "warnEpCompat": ""
         },
         "options": {
             "renderX": "",

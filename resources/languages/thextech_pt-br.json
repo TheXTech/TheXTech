@@ -549,7 +549,8 @@
             "gameTargetSlot": "Agora, o Jogo de destino",
             "phraseScore": "Pontos: {0}",
             "phraseTime": "Tempo: {0}",
-            "gameSlotContinue": "JOGO {0} ... {1}%"
+            "gameSlotContinue": "JOGO {0} ... {1}%",
+            "warnEpCompat": ""
         },
         "main": {
             "mainPlayEpisode": "Jogar Episódio",

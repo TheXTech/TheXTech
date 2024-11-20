@@ -736,7 +736,8 @@
             "gameSlotNew": "",
             "gameTargetSlot": "",
             "phraseScore": "",
-            "gameCopySave": ""
+            "gameCopySave": "",
+            "warnEpCompat": ""
         },
         "caseNone": "",
         "editor": {

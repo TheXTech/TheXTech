@@ -323,7 +323,8 @@
             "gameNoEpisodesToPlay": "<Sin episodios que reproducir>",
             "phraseTime": "Tiempo: {0}",
             "gameEraseSlot": "Seleccione la ranura que desea borrar",
-            "gameCopySave": "Copiar guardar"
+            "gameCopySave": "Copiar guardar",
+            "warnEpCompat": ""
         },
         "editor": {
             "newWorld": "<Nuevo Mundo>",

@@ -440,7 +440,8 @@
             "gameNoEpisodesToPlay": "",
             "gameEraseSave": "",
             "gameNoBattleLevels": "",
-            "gameTargetSlot": ""
+            "gameTargetSlot": "",
+            "warnEpCompat": ""
         },
         "wordPlayer": "",
         "wordProfile": "",

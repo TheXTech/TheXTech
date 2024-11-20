@@ -793,7 +793,8 @@
             "gameEraseSlot": "",
             "phraseScore": "",
             "gameSlotContinue": "",
-            "gameEraseSave": ""
+            "gameEraseSave": "",
+            "warnEpCompat": ""
         },
         "editor": {
             "battles": "",

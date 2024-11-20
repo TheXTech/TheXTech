@@ -566,7 +566,8 @@
             "gameBattleRandom": "Nível Aleatório",
             "gameCopySave": "Copiar Jogo",
             "gameEraseSave": "Apagar Jogo",
-            "gameSourceSlot": "Selecione o Jogo de origem"
+            "gameSourceSlot": "Selecione o Jogo de origem",
+            "warnEpCompat": ""
         },
         "loading": "A carregar...",
         "main": {

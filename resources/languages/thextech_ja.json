@@ -421,7 +421,8 @@
             "gameEraseSave": "",
             "gameEraseSlot": "",
             "phraseTime": "",
-            "gameNoBattleLevels": ""
+            "gameNoBattleLevels": "",
+            "warnEpCompat": ""
         },
         "main": {
             "mainMultiplayerGame": "",

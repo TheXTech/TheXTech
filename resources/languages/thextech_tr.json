@@ -567,7 +567,8 @@
             "gameSourceSlot": "",
             "gameTargetSlot": "",
             "phraseScore": "",
-            "phraseTime": ""
+            "phraseTime": "",
+            "warnEpCompat": ""
         },
         "loading": "",
         "main": {

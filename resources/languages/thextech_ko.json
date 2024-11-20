@@ -323,7 +323,8 @@
             "phraseTime": "시간: {0}",
             "gameEraseSlot": "삭제할 슬롯 선택",
             "gameBattleRandom": "랜덤 레벨",
-            "gameCopySave": "저장 복사"
+            "gameCopySave": "저장 복사",
+            "warnEpCompat": ""
         },
         "wordHide": "숨김",
         "options": {
