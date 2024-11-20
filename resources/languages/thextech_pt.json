@@ -194,7 +194,8 @@
             "scroll": "Deslizar",
             "horizWrap": "Ligar Esq-Dir",
             "setBounds": "Def. Bordas",
-            "underwater": "Subaquático"
+            "underwater": "Subaquático",
+            "vertWrap": ""
         },
         "select": {
             "sectionBlankPropBlank": "Secção {0}{1}",
@@ -356,6 +357,21 @@
             "errorNoStartPoint": "========= ERRO! ==========\n\nNão foi possível iniciar o nível por este nível não conter ponto de inicio ou entradas de teleporte especificadas.\n\nFicheiro: {0}",
             "openFileFailed": "ERRO: \"{0}\" nao foi aberto: Ficheiro inexistente ou corrompido.",
             "warpNeedStarCount": "Precisa de\n{0} {1} para entrar."
+        },
+        "hint": {
+            "no-lives-new": "",
+            "no-lives-old": "",
+            "gray-bricks": "",
+            "char5-bombs": "",
+            "rainbow-surf": "",
+            "pound-key": "",
+            "shoe-block": "",
+            "heavy-duck": ""
+        },
+        "msgbox": {
+            "sysInfoTitle": "",
+            "sysInfoWarning": "",
+            "sysInfoError": ""
         }
     },
     "menu": {
@@ -402,7 +418,8 @@
                 "screenshot": "Capt. Ecrã",
                 "toggleHUD": "Interface",
                 "debugInfo": "Depurar",
-                "legacyPause": "Pausa Alt"
+                "legacyPause": "Pausa Alt",
+                "vanillaCam": ""
             },
             "options": {
                 "batteryStatus": "Estado da Pilha",
@@ -527,13 +544,15 @@
             "controlsNotInUse": "(Não Usado)",
             "controlsReallyDeleteProfile": "Apagar perfil?",
             "controlsTitle": "Controles",
-            "wordButtons": "Botões"
+            "wordButtons": "Botões",
+            "joystickSimpleEditor": ""
         },
         "editor": {
             "promptNewWorldName": "Nome do novo mundo",
             "errorMissingResources": "Desculpe! {0} falta, é necessário para o editor no jogo.",
             "battles": "<Níveis de Batalha>",
-            "newWorld": "<Novo Mundo>"
+            "newWorld": "<Novo Mundo>",
+            "makeFor": ""
         },
         "game": {
             "gameEraseSlot": "Selecione um Jogo para apagar",
@@ -572,6 +591,231 @@
                 "label": "Escala",
                 "linear": "Linear",
                 "nearest": "Aproximado"
+            },
+            "advanced": {
+                "render": {
+                    "opengl-tip": "",
+                    "opengl11-tip": "",
+                    "opengles": "",
+                    "opengl11": "",
+                    "opengles11-tip": "",
+                    "hw": "",
+                    "_name": "",
+                    "opengl": "",
+                    "opengles-tip": "",
+                    "sdl": "",
+                    "opengles11": "",
+                    "sdl-tip": "",
+                    "sw": ""
+                },
+                "audio-channels": {
+                    "mono": "",
+                    "_name": "",
+                    "stereo": ""
+                },
+                "audio-buffer-size": {
+                    "_tooltip": "",
+                    "_name": ""
+                },
+                "audio-sample-rate": {
+                    "16000": "",
+                    "22050": "",
+                    "_name": "",
+                    "11025": "",
+                    "32000": "",
+                    "44100": "",
+                    "48000": ""
+                },
+                "choose-assets-on-launch": "",
+                "audio-format": {
+                    "_tooltip": "",
+                    "_name": ""
+                },
+                "log-level": {
+                    "critical": "",
+                    "_name": "",
+                    "debug": "",
+                    "info": "",
+                    "none": "",
+                    "fatal": "",
+                    "warning": ""
+                },
+                "webm-recording": "",
+                "internal-res-4p": {
+                    "qsmbx": "",
+                    "default": "",
+                    "qhd": "",
+                    "_name": "",
+                    "fhd": ""
+                },
+                "advanced-audio": "",
+                "_tooltip": "",
+                "advanced-video": "",
+                "_header": "",
+                "record-gameplay-data": "",
+                "scale-down-textures": {
+                    "_tooltip": "",
+                    "_name": "",
+                    "all-tip": "",
+                    "all": "",
+                    "none": "",
+                    "none-tip": "",
+                    "safe-tip": "",
+                    "safe": ""
+                },
+                "audio-enable": ""
+            },
+            "main": {
+                "two-screen-mode": {
+                    "topbottom": "",
+                    "shared": "",
+                    "split": "",
+                    "smbx": "",
+                    "_name": ""
+                },
+                "language": "",
+                "discord-rpc": "",
+                "timing": "",
+                "multiplayer": "",
+                "unlimited-framerate": "",
+                "background-work-tip": "",
+                "background-work": "",
+                "_header": "",
+                "frame-skip": "",
+                "four-screen-mode": {
+                    "split": "",
+                    "shared": "",
+                    "_name": ""
+                },
+                "vsync": ""
+            },
+            "audio": {
+                "sfx-pet-beat-tip": "",
+                "sfx-pet-beat": "",
+                "sfx-modern-tip": "",
+                "_header": "",
+                "sfx-modern": "",
+                "audio-music-volume": "",
+                "sfx-audio-fx": "",
+                "audio-sfx-volume": "",
+                "audio-prefs": "",
+                "sfx-spatial-audio": "",
+                "sfx-spatial-audio-tip": ""
+            },
+            "speedrun": {
+                "mode": {
+                    "0": "",
+                    "2": "",
+                    "1": "",
+                    "3": "",
+                    "_name": ""
+                }
+            },
+            "view-credits": {
+                "_header": ""
+            },
+            "video": {
+                "world-map-stars-show-tip": "",
+                "battery-status": {
+                    "off": "",
+                    "on": "",
+                    "_name": "",
+                    "low-tip": "",
+                    "low": "",
+                    "fullscreen-tip": "",
+                    "fullscreen": ""
+                },
+                "internal-res": {
+                    "hd": "",
+                    "hello": "",
+                    "gba": "",
+                    "dynamic": "",
+                    "_tooltip": "",
+                    "_name": "",
+                    "3ds": "",
+                    "vga": "",
+                    "nds": "",
+                    "smbx": "",
+                    "snes": "",
+                    "smbx-wide": ""
+                },
+                "_header": "",
+                "fullscreen": "",
+                "enable-inter-level-fade-effect": "",
+                "info-game": "",
+                "scale-mode": {
+                    "1x": "",
+                    "2x": "",
+                    "integer": "",
+                    "_name": "",
+                    "0_5x": "",
+                    "center": "",
+                    "linear": "",
+                    "nearest": "",
+                    "full": ""
+                },
+                "show-episode-title": {
+                    "bottom-tip": "",
+                    "_name": "",
+                    "off": "",
+                    "bottom": "",
+                    "top-tip": "",
+                    "top": ""
+                },
+                "3d-compat-mode": "",
+                "show-playtime-counter": {
+                    "_name": "",
+                    "transparent": "",
+                    "animated": "",
+                    "_tooltip": "",
+                    "opaque": "",
+                    "animated-tip": "",
+                    "off": "",
+                    "off-tip": ""
+                },
+                "show-medals-counter-tip": "",
+                "show-screen-shake": "",
+                "video-system": "",
+                "world-map-stars-show": "",
+                "info-run": "",
+                "info-meta": "",
+                "display-controllers": "",
+                "effects": "",
+                "3d-compat-mode-tip": "",
+                "show-fails-counter": "",
+                "show-medals-counter": "",
+                "show-fails-counter-tip": "",
+                "show-fps": ""
+            },
+            "controls": {
+                "_header": ""
+            },
+            "episode-options": {
+                "_header": "",
+                "creator-compat": {
+                    "_tooltip": "",
+                    "_name": "",
+                    "disable": "",
+                    "enable": "",
+                    "file-only": ""
+                },
+                "playstyle": {
+                    "_name": "",
+                    "classic-tip": "",
+                    "classic": "",
+                    "modern": "",
+                    "modern-tip": "",
+                    "vanilla-tip": "",
+                    "vanilla": ""
+                }
+            },
+            "compatibility": {
+                "_header": "",
+                "features": "",
+                "bugfixes": "",
+                "reset-all": "",
+                "autocode": "",
+                "_tooltip": ""
             }
         },
         "wordBack": "Voltar",

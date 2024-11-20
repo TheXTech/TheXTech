@@ -1,1 +1,849 @@
-{}
+{
+    "menu": {
+        "options": {
+            "scale": {
+                "nearest": "",
+                "integer": "",
+                "label": "",
+                "linear": ""
+            },
+            "audio": {
+                "sfx-pet-beat": "",
+                "audio-prefs": "",
+                "sfx-pet-beat-tip": "",
+                "_header": "",
+                "audio-music-volume": "",
+                "sfx-modern-tip": "",
+                "audio-sfx-volume": "",
+                "sfx-audio-fx": "",
+                "sfx-modern": "",
+                "sfx-spatial-audio-tip": "",
+                "sfx-spatial-audio": ""
+            },
+            "video": {
+                "battery-status": {
+                    "fullscreen-tip": "",
+                    "fullscreen": "",
+                    "on": "",
+                    "off": "",
+                    "_name": "",
+                    "low": "",
+                    "low-tip": ""
+                },
+                "3d-compat-mode-tip": "",
+                "enable-inter-level-fade-effect": "",
+                "show-medals-counter-tip": "",
+                "scale-mode": {
+                    "full": "",
+                    "center": "",
+                    "1x": "",
+                    "2x": "",
+                    "integer": "",
+                    "0_5x": "",
+                    "_name": "",
+                    "nearest": "",
+                    "linear": ""
+                },
+                "show-playtime-counter": {
+                    "off-tip": "",
+                    "_name": "",
+                    "off": "",
+                    "animated": "",
+                    "animated-tip": "",
+                    "transparent": "",
+                    "opaque": "",
+                    "_tooltip": ""
+                },
+                "_header": "",
+                "info-game": "",
+                "fullscreen": "",
+                "info-meta": "",
+                "internal-res": {
+                    "dynamic": "",
+                    "3ds": "",
+                    "_name": "",
+                    "hd": "",
+                    "smbx": "",
+                    "nds": "",
+                    "smbx-wide": "",
+                    "hello": "",
+                    "vga": "",
+                    "snes": "",
+                    "gba": "",
+                    "_tooltip": ""
+                },
+                "show-fails-counter": "",
+                "show-fails-counter-tip": "",
+                "world-map-stars-show": "",
+                "show-screen-shake": "",
+                "show-fps": "",
+                "world-map-stars-show-tip": "",
+                "show-medals-counter": "",
+                "info-run": "",
+                "display-controllers": "",
+                "effects": "",
+                "show-episode-title": {
+                    "_name": "",
+                    "bottom": "",
+                    "bottom-tip": "",
+                    "off": "",
+                    "top-tip": "",
+                    "top": ""
+                },
+                "video-system": "",
+                "3d-compat-mode": ""
+            },
+            "advanced": {
+                "advanced-audio": "",
+                "webm-recording": "",
+                "render": {
+                    "opengles11": "",
+                    "sdl": "",
+                    "opengles11-tip": "",
+                    "sw": "",
+                    "hw": "",
+                    "_name": "",
+                    "opengl": "",
+                    "opengl11": "",
+                    "opengl-tip": "",
+                    "sdl-tip": "",
+                    "opengl11-tip": "",
+                    "opengles": "",
+                    "opengles-tip": ""
+                },
+                "log-level": {
+                    "none": "",
+                    "info": "",
+                    "critical": "",
+                    "fatal": "",
+                    "debug": "",
+                    "_name": "",
+                    "warning": ""
+                },
+                "_header": "",
+                "audio-format": {
+                    "_tooltip": "",
+                    "_name": ""
+                },
+                "audio-sample-rate": {
+                    "16000": "",
+                    "11025": "",
+                    "_name": "",
+                    "48000": "",
+                    "44100": "",
+                    "22050": "",
+                    "32000": ""
+                },
+                "choose-assets-on-launch": "",
+                "advanced-video": "",
+                "_tooltip": "",
+                "audio-buffer-size": {
+                    "_tooltip": "",
+                    "_name": ""
+                },
+                "scale-down-textures": {
+                    "_name": "",
+                    "_tooltip": "",
+                    "all": "",
+                    "all-tip": "",
+                    "none-tip": "",
+                    "safe": "",
+                    "safe-tip": "",
+                    "none": ""
+                },
+                "record-gameplay-data": "",
+                "internal-res-4p": {
+                    "default": "",
+                    "fhd": "",
+                    "_name": "",
+                    "qsmbx": "",
+                    "qhd": ""
+                },
+                "audio-channels": {
+                    "mono": "",
+                    "_name": "",
+                    "stereo": ""
+                },
+                "audio-enable": ""
+            },
+            "main": {
+                "two-screen-mode": {
+                    "smbx": "",
+                    "_name": "",
+                    "shared": "",
+                    "topbottom": "",
+                    "split": ""
+                },
+                "frame-skip": "",
+                "_header": "",
+                "four-screen-mode": {
+                    "shared": "",
+                    "_name": "",
+                    "split": ""
+                },
+                "timing": "",
+                "unlimited-framerate": "",
+                "background-work-tip": "",
+                "background-work": "",
+                "language": "",
+                "multiplayer": "",
+                "discord-rpc": "",
+                "vsync": ""
+            },
+            "episode-options": {
+                "playstyle": {
+                    "modern-tip": "",
+                    "vanilla": "",
+                    "vanilla-tip": "",
+                    "modern": "",
+                    "_name": "",
+                    "classic-tip": "",
+                    "classic": ""
+                },
+                "creator-compat": {
+                    "file-only": "",
+                    "_name": "",
+                    "disable": "",
+                    "_tooltip": "",
+                    "enable": ""
+                },
+                "_header": ""
+            },
+            "renderX": "",
+            "speedrun": {
+                "mode": {
+                    "0": "",
+                    "2": "",
+                    "1": "",
+                    "3": "",
+                    "_name": ""
+                }
+            },
+            "optionsModeFullScreen": "",
+            "renderAuto": "",
+            "restartEngine": "",
+            "view-credits": {
+                "_header": ""
+            },
+            "optionsViewCredits": "",
+            "optionsModeWindowed": "",
+            "controls": {
+                "_header": ""
+            },
+            "compatibility": {
+                "autocode": "",
+                "_tooltip": "",
+                "bugfixes": "",
+                "_header": "",
+                "features": "",
+                "reset-all": ""
+            },
+            "render": ""
+        },
+        "game": {
+            "gameSlotNew": "",
+            "gameEraseSlot": "",
+            "gameNoEpisodesToPlay": "",
+            "gameSlotContinue": "",
+            "phraseScore": "",
+            "gameCopySave": "",
+            "phraseTime": "",
+            "gameEraseSave": "",
+            "gameTargetSlot": "",
+            "gameBattleRandom": "",
+            "gameNoBattleLevels": "",
+            "gameSourceSlot": ""
+        },
+        "loading": "",
+        "wordPlayer": "",
+        "controls": {
+            "editor": {
+                "scrollLeft": "",
+                "scrollDown": "",
+                "scrollRight": "",
+                "nextSection": "",
+                "testPlay": "",
+                "fastScroll": "",
+                "modeErase": "",
+                "prevSection": "",
+                "switchScreens": "",
+                "modeSelect": "",
+                "scrollUp": ""
+            },
+            "tDS": {
+                "casePen": "",
+                "buttonStart": "",
+                "tStick": "",
+                "dPad": "",
+                "buttonA": "",
+                "buttonY": "",
+                "buttonB": "",
+                "buttonR": "",
+                "buttonSelect": "",
+                "buttonL": "",
+                "buttonZR": "",
+                "buttonX": "",
+                "buttonZL": "",
+                "cStick": ""
+            },
+            "touchscreen": {
+                "option": {
+                    "feedbackStrength": "",
+                    "scaleButtons": "",
+                    "showCodeButton": "",
+                    "feedbackLength": "",
+                    "holdRun": "",
+                    "interfaceStyle": "",
+                    "scaleFactor": "",
+                    "sStartSpacing": "",
+                    "resetLayout": "",
+                    "scaleDPad": "",
+                    "layoutStyle": ""
+                },
+                "style": {
+                    "actions": "",
+                    "XODA": "",
+                    "ABXY": ""
+                },
+                "layout": {
+                    "tight": "",
+                    "phabletOld": "",
+                    "longOld": "",
+                    "phoneOld": "",
+                    "tinyOld": "",
+                    "tabletOld": "",
+                    "standard": ""
+                }
+            },
+            "types": {
+                "keyboard": "",
+                "gamepad": "",
+                "oldJoystick": "",
+                "touchscreen": ""
+            },
+            "controlsNotInUse": "",
+            "wii": {
+                "classic": {
+                    "buttonY": "",
+                    "buttonZL": "",
+                    "lStick": "",
+                    "rStick": "",
+                    "buttonX": "",
+                    "buttonZR": "",
+                    "buttonLT": "",
+                    "buttonRT": ""
+                },
+                "phraseNewClassic": "",
+                "wiimote": {
+                    "buttonA": "",
+                    "button2": "",
+                    "button1": "",
+                    "dPad": "",
+                    "buttonB": "",
+                    "buttonHome": "",
+                    "buttonMinus": "",
+                    "buttonPlus": "",
+                    "shake": "",
+                    "caseIR": ""
+                },
+                "typeNunchuck": "",
+                "nunchuck": {
+                    "buttonC": "",
+                    "buttonZ": "",
+                    "prefixN": ""
+                },
+                "phraseNewNunchuck": "",
+                "typeClassic": "",
+                "typeWiimote": ""
+            },
+            "wordProfiles": "",
+            "buttons": {
+                "jump": "",
+                "altJump": "",
+                "right": "",
+                "altRun": "",
+                "drop": "",
+                "up": "",
+                "down": "",
+                "left": "",
+                "run": "",
+                "start": ""
+            },
+            "cursor": {
+                "down": "",
+                "tertiary": "",
+                "left": "",
+                "right": "",
+                "up": "",
+                "secondary": "",
+                "primary": ""
+            },
+            "profile": {
+                "cursorControls": "",
+                "activateProfile": "",
+                "deleteProfile": "",
+                "renameProfile": "",
+                "playerControls": "",
+                "editorControls": "",
+                "hotkeys": ""
+            },
+            "hotkeys": {
+                "legacyPause": "",
+                "recordGif": "",
+                "toggleHUD": "",
+                "screenshot": "",
+                "vanillaCam": "",
+                "fullscreen": "",
+                "enterCheats": "",
+                "debugInfo": ""
+            },
+            "joystickSimpleEditor": "",
+            "controlsDeviceTypes": "",
+            "controlsConnected": "",
+            "controlsDeleteKey": "",
+            "options": {
+                "groundPoundButton": "",
+                "batteryStatus": "",
+                "textEntryStyle": "",
+                "maxPlayers": "",
+                "rumble": ""
+            },
+            "phraseNewProfOldJoy": "",
+            "wordButtons": "",
+            "controlsInUse": "",
+            "caseInvalid": "",
+            "caseMouse": "",
+            "caseTouch": "",
+            "controlsNewProfile": "",
+            "controlsReallyDeleteProfile": "",
+            "controlsTitle": ""
+        },
+        "main": {
+            "mainExit": "",
+            "mainBattleGame": "",
+            "main1PlayerGame": "",
+            "mainMultiplayerGame": "",
+            "mainOptions": "",
+            "mainEditor": "",
+            "mainPlayEpisode": ""
+        },
+        "wordResume": "",
+        "editor": {
+            "makeFor": "",
+            "errorMissingResources": "",
+            "newWorld": "",
+            "battles": "",
+            "promptNewWorldName": ""
+        },
+        "wordLanguage": "",
+        "battle": {
+            "errorNoLevels": ""
+        },
+        "wordProfile": "",
+        "wordOff": "",
+        "wordNo": "",
+        "wordHide": "",
+        "wordWaiting": "",
+        "wordShow": "",
+        "wordOn": "",
+        "wordYes": "",
+        "character": {
+            "startGame": "",
+            "charSelTitle": "",
+            "selectCharacter": ""
+        },
+        "caseNone": "",
+        "abbrevMilliseconds": "",
+        "wordBack": ""
+    },
+    "outro": {
+        "qualityControl": "",
+        "nameVitalyNovichkov": "",
+        "levelDesign": "",
+        "originalBy": "",
+        "cppPortDevelopers": "",
+        "engineCredits": "",
+        "specialThanks": "",
+        "nameAndrewSpinks": "",
+        "psVitaPortBy": "",
+        "gameCredits": "",
+        "customSprites": ""
+    },
+    "editor": {
+        "file": {
+            "convert": {
+                "descNew": ""
+            },
+            "optionCancelConversion": "",
+            "actionRevert": "",
+            "commandNew": "",
+            "optionCancelAction": "",
+            "optionYesSaveThenAction": "",
+            "sectionLevel": "",
+            "confirmConfirmAction": "",
+            "formatLegacy": "",
+            "labelCurrentFile": "",
+            "labelFormat": "",
+            "formatModern": "",
+            "optionProceedWithConversion": "",
+            "sectionWorld": "",
+            "optionActionWithoutSave": "",
+            "actionExit": "",
+            "actionClearWorld": "",
+            "confirmSaveBeforeAction": "",
+            "actionClearLevel": "",
+            "confirmConvertFormatTo": "",
+            "commandSave": "",
+            "commandOpen": "",
+            "commandSaveAs": "",
+            "actionOpen": ""
+        },
+        "phraseAreYouSure": "",
+        "npc": {
+            "ai": {
+                "target": "",
+                "LR": "",
+                "swim": "",
+                "use1_0Ai": "",
+                "jump": "",
+                "aiIs": "",
+                "headerCustomAi": "",
+                "leap": "",
+                "UD": ""
+            },
+            "inertNice": "",
+            "gen": {
+                "header": "",
+                "effectWarp": "",
+                "effectIs": "",
+                "effectShoot": "",
+                "direction": ""
+            },
+            "inContainer": "",
+            "props": {
+                "attachSurface": "",
+                "active": "",
+                "facing": ""
+            },
+            "stuckStop": "",
+            "tooltipExpandSection": "",
+            "abbrevGen": ""
+        },
+        "pageBlankOfBlank": "",
+        "section": {
+            "noTurnBack": "",
+            "horizWrap": "",
+            "setBounds": "",
+            "vertWrap": "",
+            "underwater": "",
+            "scroll": "",
+            "offscreenExit": ""
+        },
+        "phraseWarpIndex": "",
+        "toggleMagicBlock": "",
+        "tooltip": {
+            "area": "",
+            "file": "",
+            "erase": "",
+            "blocks": "",
+            "eraseAll": "",
+            "scenes": "",
+            "events": "",
+            "paths": "",
+            "select": "",
+            "settings": "",
+            "warps": "",
+            "water": "",
+            "music": "",
+            "levels": "",
+            "layers": "",
+            "show": "",
+            "tiles": "",
+            "BGOs": "",
+            "NPCs": ""
+        },
+        "warp": {
+            "allow": "",
+            "transit": {
+                "name1": "",
+                "name5": "",
+                "name3": "",
+                "name2": "",
+                "name4": "",
+                "name0": ""
+            },
+            "dir": "",
+            "cannonExit": "",
+            "effect": "",
+            "lvlWarp": "",
+            "showStarCount": "",
+            "speed": "",
+            "starLockMessage": "",
+            "style": {
+                "pipe": "",
+                "door": "",
+                "blipInstant": "",
+                "portal": "",
+                "style": ""
+            },
+            "target": "",
+            "toMap": "",
+            "twoWay": "",
+            "to": "",
+            "title": "",
+            "needStarCount": "",
+            "needFloor": "",
+            "out": "",
+            "needKey": "",
+            "showStartScene": "",
+            "item": "",
+            "ride": "",
+            "placing": "",
+            "in": ""
+        },
+        "world": {
+            "totalStars": "",
+            "name": "",
+            "retryOnFail": "",
+            "phraseCreditIndex": "",
+            "hubWorld": "",
+            "introLevel": "",
+            "allowChars": ""
+        },
+        "select": {
+            "pathBlankUnlock": "",
+            "allSectPropBlankForEventN": "",
+            "sectionBlankPropBlank": "",
+            "soundForEventN": "",
+            "warpTransitEffect": "",
+            "sectBlankPropBlankForEventN": "",
+            "worldMusic": ""
+        },
+        "water": {
+            "title": ""
+        },
+        "wordCoins": "",
+        "wordEvent": {
+            "genitive": "",
+            "nominative": "",
+            "typeLabel": ""
+        },
+        "wordEnabled": "",
+        "wordNPC": {
+            "genitive": "",
+            "nominative": ""
+        },
+        "events": {
+            "controlsForEventN": "",
+            "deletion": {
+                "deletingEvent": "",
+                "cancel": "",
+                "confirm": ""
+            },
+            "header": "",
+            "label": {
+                "activate": "",
+                "destroy": "",
+                "enter": "",
+                "talk": "",
+                "next": "",
+                "hit": "",
+                "layerClear": "",
+                "death": ""
+            },
+            "layers": {
+                "headerMove": "",
+                "headerHide": "",
+                "headerToggle": "",
+                "headerShow": ""
+            },
+            "sections": {
+                "actionKeep": "",
+                "actionReset": "",
+                "propMusic": "",
+                "actionSet": "",
+                "phraseAllSections": "",
+                "propBackground": "",
+                "propBounds": ""
+            },
+            "settingsForEvent": "",
+            "desc": {
+                "phraseTriggersAfterTemplate": "",
+                "enter": "",
+                "talk": "",
+                "layerClear": "",
+                "activate": "",
+                "hit": "",
+                "death": "",
+                "destroy": "",
+                "phraseTriggersWhenTemplate": ""
+            },
+            "letter": {
+                "activate": "",
+                "hit": "",
+                "death": "",
+                "destroy": "",
+                "enter": "",
+                "layerClear": "",
+                "talk": ""
+            },
+            "props": {
+                "autostart": "",
+                "controls": "",
+                "endGame": "",
+                "sound": "",
+                "layerSmoke": ""
+            },
+            "promptEventText": "",
+            "bounds": {
+                "shouldEvent": "",
+                "changeSectionBoundsToCurrent": "",
+                "changeAllSectionBoundsToCurrent": ""
+            },
+            "headerTriggerEvent": "",
+            "itemNewEvent": "",
+            "promptEventName": ""
+        },
+        "block": {
+            "canBreak": "",
+            "inside": "",
+            "pickContents": "",
+            "canBreakTooltip": "",
+            "letterWidth": "",
+            "slick": "",
+            "letterHeight": "",
+            "invis": ""
+        },
+        "browser": {
+            "openFile": "",
+            "saveFile": "",
+            "askOverwriteFile": "",
+            "newFile": "",
+            "itemNewFile": "",
+            "itemNewFolder": ""
+        },
+        "layers": {
+            "deletion": {
+                "preserveLayerContents": "",
+                "cancel": "",
+                "confirmPreserve": "",
+                "header": "",
+                "confirmDelete": ""
+            },
+            "default": "",
+            "label": "",
+            "itemNewLayer": "",
+            "header": "",
+            "desc": {
+                "att": ""
+            },
+            "labelAttached": "",
+            "promptLayerName": "",
+            "labelMoveLayer": "",
+            "labelAttachedLayer": "",
+            "abbrevAttLayer": ""
+        },
+        "letterCoordY": "",
+        "phraseDelayIsMs": "",
+        "phraseTextOf": "",
+        "testPlay": {
+            "pet": "",
+            "boot": "",
+            "char": "",
+            "power": "",
+            "magicHand": ""
+        },
+        "wordHeight": "",
+        "level": {
+            "levelName": "",
+            "pathUnlocks": "",
+            "startPos": "",
+            "alwaysVis": "",
+            "bigBG": "",
+            "pathBG": "",
+            "gameStart": ""
+        },
+        "labelSortLayer": "",
+        "letterDown": "",
+        "letterCoordX": "",
+        "letterUp": "",
+        "letterRight": "",
+        "letterLeft": "",
+        "mapPos": "",
+        "phraseGenericIndex": "",
+        "phraseSectionIndex": "",
+        "phraseRadiusIndex": "",
+        "phraseCountMore": "",
+        "wordInstant": "",
+        "wordMode": "",
+        "wordText": "",
+        "wordWidth": "",
+        "labelSortOffset": ""
+    },
+    "game": {
+        "controls": {
+            "phrasePlayerDisconnected": "",
+            "phrasePlayerConnected": ""
+        },
+        "connect": {
+            "splitPressSelect_1": "",
+            "reconnectTitle": "",
+            "dropAddTitle": "",
+            "wordDisconnect": "",
+            "phraseDropPX": "",
+            "phraseForceResume": "",
+            "phraseStartToResume": "",
+            "phraseTestControls": "",
+            "phraseTestProfile": "",
+            "phraseDropMe": "",
+            "splitPressSelect_2": "",
+            "phraseWaitingForInput": "",
+            "phraseStartToForceRes": "",
+            "phraseSetControls": "",
+            "phrasePressAButton": "",
+            "phraseChangeChar": "",
+            "phraseHoldStart": ""
+        },
+        "error": {
+            "warpNeedStarCount": "",
+            "openFileFailed": "",
+            "errorNoStartPoint": "",
+            "errorInvalidEnterWarp": ""
+        },
+        "hint": {
+            "pound-key": "",
+            "no-lives-new": "",
+            "no-lives-old": "",
+            "char5-bombs": "",
+            "gray-bricks": "",
+            "rainbow-surf": "",
+            "heavy-duck": "",
+            "shoe-block": ""
+        },
+        "message": {
+            "scanningLevels": ""
+        },
+        "pause": {
+            "quitTesting": "",
+            "continue": "",
+            "resetCheckpoints": "",
+            "quit": "",
+            "restartLevel": "",
+            "saveAndContinue": "",
+            "enterCode": "",
+            "saveAndQuit": "",
+            "returnToEditor": "",
+            "playerSetup": ""
+        },
+        "format": {
+            "minutesSeconds": ""
+        },
+        "msgbox": {
+            "sysInfoTitle": "",
+            "sysInfoWarning": "",
+            "sysInfoError": ""
+        }
+    },
+    "pluralRules": "",
+    "languageName": ""
+}

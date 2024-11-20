@@ -339,7 +339,232 @@
             "optionsModeWindowed": "창 모드",
             "optionsModeFullScreen": "전체화면 모드",
             "optionsViewCredits": "크레딧 보기",
-            "renderAuto": "렌더링: 자동 ({0})"
+            "renderAuto": "렌더링: 자동 ({0})",
+            "advanced": {
+                "render": {
+                    "opengl11-tip": "",
+                    "sw": "",
+                    "opengles11-tip": "",
+                    "opengl-tip": "",
+                    "sdl": "",
+                    "_name": "",
+                    "opengl": "",
+                    "hw": "",
+                    "sdl-tip": "",
+                    "opengl11": "",
+                    "opengles": "",
+                    "opengles11": "",
+                    "opengles-tip": ""
+                },
+                "scale-down-textures": {
+                    "_name": "",
+                    "all": "",
+                    "safe": "",
+                    "all-tip": "",
+                    "none-tip": "",
+                    "none": "",
+                    "safe-tip": "",
+                    "_tooltip": ""
+                },
+                "advanced-audio": "",
+                "webm-recording": "",
+                "_header": "",
+                "_tooltip": "",
+                "audio-channels": {
+                    "mono": "",
+                    "stereo": "",
+                    "_name": ""
+                },
+                "audio-format": {
+                    "_name": "",
+                    "_tooltip": ""
+                },
+                "audio-enable": "",
+                "audio-sample-rate": {
+                    "11025": "",
+                    "48000": "",
+                    "_name": "",
+                    "32000": "",
+                    "16000": "",
+                    "22050": "",
+                    "44100": ""
+                },
+                "log-level": {
+                    "debug": "",
+                    "_name": "",
+                    "fatal": "",
+                    "critical": "",
+                    "info": "",
+                    "warning": "",
+                    "none": ""
+                },
+                "audio-buffer-size": {
+                    "_tooltip": "",
+                    "_name": ""
+                },
+                "record-gameplay-data": "",
+                "internal-res-4p": {
+                    "fhd": "",
+                    "qsmbx": "",
+                    "qhd": "",
+                    "default": "",
+                    "_name": ""
+                },
+                "choose-assets-on-launch": "",
+                "advanced-video": ""
+            },
+            "main": {
+                "unlimited-framerate": "",
+                "timing": "",
+                "four-screen-mode": {
+                    "_name": "",
+                    "split": "",
+                    "shared": ""
+                },
+                "multiplayer": "",
+                "language": "",
+                "vsync": "",
+                "two-screen-mode": {
+                    "shared": "",
+                    "split": "",
+                    "smbx": "",
+                    "topbottom": "",
+                    "_name": ""
+                },
+                "background-work-tip": "",
+                "background-work": "",
+                "_header": "",
+                "discord-rpc": "",
+                "frame-skip": ""
+            },
+            "video": {
+                "battery-status": {
+                    "low": "",
+                    "_name": "",
+                    "off": "",
+                    "on": "",
+                    "fullscreen": "",
+                    "fullscreen-tip": "",
+                    "low-tip": ""
+                },
+                "enable-inter-level-fade-effect": "",
+                "show-episode-title": {
+                    "_name": "",
+                    "bottom-tip": "",
+                    "top": "",
+                    "off": "",
+                    "bottom": "",
+                    "top-tip": ""
+                },
+                "internal-res": {
+                    "gba": "",
+                    "vga": "",
+                    "_name": "",
+                    "3ds": "",
+                    "_tooltip": "",
+                    "nds": "",
+                    "dynamic": "",
+                    "smbx": "",
+                    "hello": "",
+                    "hd": "",
+                    "snes": "",
+                    "smbx-wide": ""
+                },
+                "scale-mode": {
+                    "integer": "",
+                    "center": "",
+                    "_name": "",
+                    "nearest": "",
+                    "1x": "",
+                    "0_5x": "",
+                    "full": "",
+                    "linear": "",
+                    "2x": ""
+                },
+                "_header": "",
+                "display-controllers": "",
+                "info-run": "",
+                "info-meta": "",
+                "effects": "",
+                "fullscreen": "",
+                "show-fails-counter": "",
+                "3d-compat-mode-tip": "",
+                "show-fails-counter-tip": "",
+                "3d-compat-mode": "",
+                "show-fps": "",
+                "show-playtime-counter": {
+                    "animated-tip": "",
+                    "_name": "",
+                    "_tooltip": "",
+                    "off": "",
+                    "animated": "",
+                    "off-tip": "",
+                    "transparent": "",
+                    "opaque": ""
+                },
+                "show-medals-counter-tip": "",
+                "show-medals-counter": "",
+                "video-system": "",
+                "show-screen-shake": "",
+                "world-map-stars-show": "",
+                "world-map-stars-show-tip": "",
+                "info-game": ""
+            },
+            "controls": {
+                "_header": ""
+            },
+            "episode-options": {
+                "_header": "",
+                "creator-compat": {
+                    "_name": "",
+                    "file-only": "",
+                    "enable": "",
+                    "disable": "",
+                    "_tooltip": ""
+                },
+                "playstyle": {
+                    "modern-tip": "",
+                    "modern": "",
+                    "classic": "",
+                    "classic-tip": "",
+                    "vanilla": "",
+                    "vanilla-tip": "",
+                    "_name": ""
+                }
+            },
+            "speedrun": {
+                "mode": {
+                    "_name": "",
+                    "3": "",
+                    "2": "",
+                    "1": "",
+                    "0": ""
+                }
+            },
+            "audio": {
+                "_header": "",
+                "audio-sfx-volume": "",
+                "audio-prefs": "",
+                "sfx-pet-beat": "",
+                "sfx-spatial-audio": "",
+                "sfx-pet-beat-tip": "",
+                "audio-music-volume": "",
+                "sfx-modern": "",
+                "sfx-modern-tip": "",
+                "sfx-spatial-audio-tip": "",
+                "sfx-audio-fx": ""
+            },
+            "compatibility": {
+                "_header": "",
+                "features": "",
+                "bugfixes": "",
+                "_tooltip": "",
+                "autocode": "",
+                "reset-all": ""
+            },
+            "view-credits": {
+                "_header": ""
+            }
         },
         "wordWaiting": "대기 중",
         "main": {
@@ -404,7 +629,8 @@
                 "legacyPause": "이전 일시 중지",
                 "recordGif": "GIF 녹화",
                 "screenshot": "스크린샷",
-                "toggleHUD": "상태 표시줄 토글"
+                "toggleHUD": "상태 표시줄 토글",
+                "vanillaCam": ""
             },
             "tDS": {
                 "buttonA": "A",
@@ -509,7 +735,8 @@
                 "groundPoundButton": "그라운드 파운드 버튼"
             },
             "wordButtons": "버튼",
-            "wordProfiles": "프로파일"
+            "wordProfiles": "프로파일",
+            "joystickSimpleEditor": ""
         },
         "wordLanguage": "언어",
         "wordPlayer": "플레이어",
@@ -536,7 +763,8 @@
             "battles": "<전투 레벨>",
             "errorMissingResources": "죄송합니다! 게임 내 편집기에 필요한 {0}이 누락되었습니다.",
             "newWorld": "<새로운 세계>",
-            "promptNewWorldName": "새로운 세계 이름"
+            "promptNewWorldName": "새로운 세계 이름",
+            "makeFor": ""
         }
     },
     "outro": {
@@ -593,7 +821,9 @@
             "playerSetup": "플레이어 설정"
         },
         "msgbox": {
-            "sysInfoError": "오류입니다!"
+            "sysInfoError": "오류입니다!",
+            "sysInfoTitle": "",
+            "sysInfoWarning": ""
         },
         "message": {
             "scanningLevels": "레벨 스캔 중..."
@@ -610,7 +840,10 @@
             "no-lives-old": "실패하면 게임이 끝납니다.",
             "pound-key": "아래로 두드리려면 누르세요!",
             "rainbow-surf": "잡고, 달리고, 누르고, 놓아서 서핑하세요.",
-            "char5-bombs": "모으려면 Run을 누르고, 던지려면 Alt Run을 누르세요."
+            "char5-bombs": "모으려면 Run을 누르고, 던지려면 Alt Run을 누르세요.",
+            "gray-bricks": "",
+            "heavy-duck": "",
+            "shoe-block": ""
         }
     }
 }

@@ -198,7 +198,8 @@
             "offscreenExit": "",
             "scroll": "",
             "setBounds": "",
-            "underwater": ""
+            "underwater": "",
+            "vertWrap": ""
         },
         "select": {
             "allSectPropBlankForEventN": "",
@@ -235,7 +236,8 @@
             "show": "",
             "tiles": "",
             "warps": "",
-            "water": ""
+            "water": "",
+            "area": ""
         },
         "warp": {
             "allow": "",
@@ -304,7 +306,9 @@
             "retryOnFail": "",
             "totalStars": ""
         },
-        "labelSortLayer": "Katmanları Sırala:"
+        "labelSortLayer": "Katmanları Sırala:",
+        "labelSortOffset": "",
+        "phraseGenericIndex": ""
     },
     "game": {
         "connect": {
@@ -332,7 +336,9 @@
         },
         "error": {
             "openFileFailed": "",
-            "warpNeedStarCount": ""
+            "warpNeedStarCount": "",
+            "errorInvalidEnterWarp": "",
+            "errorNoStartPoint": ""
         },
         "pause": {
             "continue": "",
@@ -343,7 +349,29 @@
             "restartLevel": "",
             "returnToEditor": "",
             "saveAndContinue": "",
-            "saveAndQuit": ""
+            "saveAndQuit": "",
+            "playerSetup": ""
+        },
+        "hint": {
+            "char5-bombs": "",
+            "gray-bricks": "",
+            "rainbow-surf": "",
+            "shoe-block": "",
+            "pound-key": "",
+            "heavy-duck": "",
+            "no-lives-old": "",
+            "no-lives-new": ""
+        },
+        "message": {
+            "scanningLevels": ""
+        },
+        "format": {
+            "minutesSeconds": ""
+        },
+        "msgbox": {
+            "sysInfoWarning": "",
+            "sysInfoError": "",
+            "sysInfoTitle": ""
         }
     },
     "languageName": "Türkçe",
@@ -411,7 +439,8 @@
                 "legacyPause": "",
                 "recordGif": "",
                 "screenshot": "",
-                "toggleHUD": ""
+                "toggleHUD": "",
+                "vanillaCam": ""
             },
             "options": {
                 "batteryStatus": "",
@@ -516,12 +545,15 @@
                 }
             },
             "wordButtons": "",
-            "wordProfiles": ""
+            "wordProfiles": "",
+            "joystickSimpleEditor": ""
         },
         "editor": {
             "errorMissingResources": "",
             "newWorld": "",
-            "promptNewWorldName": ""
+            "promptNewWorldName": "",
+            "battles": "",
+            "makeFor": ""
         },
         "game": {
             "gameBattleRandom": "",
@@ -544,7 +576,8 @@
             "mainEditor": "",
             "mainExit": "",
             "mainMultiplayerGame": "",
-            "mainOptions": ""
+            "mainOptions": "",
+            "mainPlayEpisode": ""
         },
         "options": {
             "optionsModeFullScreen": "",
@@ -554,9 +587,237 @@
                 "advanced-video": "Video",
                 "advanced-audio": "Ses",
                 "audio-format": {
-                    "_name": "Ses formatı"
+                    "_name": "Ses formatı",
+                    "_tooltip": ""
+                },
+                "render": {
+                    "opengl": "",
+                    "opengl-tip": "",
+                    "opengl11-tip": "",
+                    "opengl11": "",
+                    "opengles11": "",
+                    "sw": "",
+                    "sdl-tip": "",
+                    "opengles11-tip": "",
+                    "sdl": "",
+                    "opengles-tip": "",
+                    "hw": "",
+                    "_name": "",
+                    "opengles": ""
+                },
+                "log-level": {
+                    "debug": "",
+                    "fatal": "",
+                    "_name": "",
+                    "critical": "",
+                    "warning": "",
+                    "info": "",
+                    "none": ""
+                },
+                "audio-sample-rate": {
+                    "_name": "",
+                    "48000": "",
+                    "11025": "",
+                    "22050": "",
+                    "16000": "",
+                    "32000": "",
+                    "44100": ""
+                },
+                "scale-down-textures": {
+                    "_name": "",
+                    "all": "",
+                    "_tooltip": "",
+                    "none-tip": "",
+                    "safe-tip": "",
+                    "safe": "",
+                    "all-tip": "",
+                    "none": ""
+                },
+                "webm-recording": "",
+                "internal-res-4p": {
+                    "qhd": "",
+                    "_name": "",
+                    "fhd": "",
+                    "default": "",
+                    "qsmbx": ""
+                },
+                "_header": "",
+                "_tooltip": "",
+                "audio-buffer-size": {
+                    "_name": "",
+                    "_tooltip": ""
+                },
+                "audio-channels": {
+                    "mono": "",
+                    "_name": "",
+                    "stereo": ""
+                },
+                "choose-assets-on-launch": "",
+                "audio-enable": "",
+                "record-gameplay-data": ""
+            },
+            "episode-options": {
+                "creator-compat": {
+                    "_tooltip": "",
+                    "disable": "",
+                    "_name": "",
+                    "enable": "",
+                    "file-only": ""
+                },
+                "_header": "",
+                "playstyle": {
+                    "modern-tip": "",
+                    "classic": "",
+                    "classic-tip": "",
+                    "vanilla": "",
+                    "modern": "",
+                    "vanilla-tip": "",
+                    "_name": ""
                 }
-            }
+            },
+            "main": {
+                "background-work": "",
+                "four-screen-mode": {
+                    "shared": "",
+                    "_name": "",
+                    "split": ""
+                },
+                "frame-skip": "",
+                "vsync": "",
+                "two-screen-mode": {
+                    "topbottom": "",
+                    "split": "",
+                    "shared": "",
+                    "_name": "",
+                    "smbx": ""
+                },
+                "background-work-tip": "",
+                "timing": "",
+                "multiplayer": "",
+                "language": "",
+                "_header": "",
+                "unlimited-framerate": "",
+                "discord-rpc": ""
+            },
+            "video": {
+                "internal-res": {
+                    "hd": "",
+                    "hello": "",
+                    "smbx": "",
+                    "dynamic": "",
+                    "_tooltip": "",
+                    "_name": "",
+                    "gba": "",
+                    "snes": "",
+                    "vga": "",
+                    "smbx-wide": "",
+                    "3ds": "",
+                    "nds": ""
+                },
+                "effects": "",
+                "scale-mode": {
+                    "_name": "",
+                    "center": "",
+                    "2x": "",
+                    "1x": "",
+                    "0_5x": "",
+                    "nearest": "",
+                    "full": "",
+                    "linear": "",
+                    "integer": ""
+                },
+                "info-meta": "",
+                "show-episode-title": {
+                    "_name": "",
+                    "bottom": "",
+                    "top": "",
+                    "off": "",
+                    "top-tip": "",
+                    "bottom-tip": ""
+                },
+                "show-playtime-counter": {
+                    "opaque": "",
+                    "animated-tip": "",
+                    "off": "",
+                    "off-tip": "",
+                    "_tooltip": "",
+                    "_name": "",
+                    "transparent": "",
+                    "animated": ""
+                },
+                "_header": "",
+                "world-map-stars-show-tip": "",
+                "3d-compat-mode-tip": "",
+                "battery-status": {
+                    "_name": "",
+                    "low-tip": "",
+                    "low": "",
+                    "fullscreen-tip": "",
+                    "fullscreen": "",
+                    "off": "",
+                    "on": ""
+                },
+                "info-run": "",
+                "display-controllers": "",
+                "enable-inter-level-fade-effect": "",
+                "fullscreen": "",
+                "info-game": "",
+                "3d-compat-mode": "",
+                "show-screen-shake": "",
+                "world-map-stars-show": "",
+                "video-system": "",
+                "show-medals-counter-tip": "",
+                "show-fps": "",
+                "show-fails-counter-tip": "",
+                "show-medals-counter": "",
+                "show-fails-counter": ""
+            },
+            "speedrun": {
+                "mode": {
+                    "3": "",
+                    "_name": "",
+                    "0": "",
+                    "2": "",
+                    "1": ""
+                }
+            },
+            "scale": {
+                "label": "",
+                "integer": "",
+                "linear": "",
+                "nearest": ""
+            },
+            "audio": {
+                "sfx-modern-tip": "",
+                "audio-sfx-volume": "",
+                "sfx-modern": "",
+                "audio-prefs": "",
+                "sfx-spatial-audio-tip": "",
+                "sfx-audio-fx": "",
+                "sfx-spatial-audio": "",
+                "sfx-pet-beat": "",
+                "sfx-pet-beat-tip": "",
+                "_header": "",
+                "audio-music-volume": ""
+            },
+            "controls": {
+                "_header": ""
+            },
+            "compatibility": {
+                "bugfixes": "",
+                "_header": "",
+                "reset-all": "",
+                "features": "",
+                "autocode": "",
+                "_tooltip": ""
+            },
+            "view-credits": {
+                "_header": ""
+            },
+            "restartEngine": "",
+            "render": "",
+            "renderAuto": "",
+            "renderX": ""
         },
         "wordBack": "",
         "wordHide": "",
@@ -568,7 +829,8 @@
         "wordResume": "Devam Et",
         "wordShow": "Göster",
         "wordWaiting": "Bekleniyor",
-        "wordYes": "Evet"
+        "wordYes": "Evet",
+        "wordLanguage": ""
     },
     "outro": {
         "cppPortDevelopers": "C++ portunun geliştiricileri:",
