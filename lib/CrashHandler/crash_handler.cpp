@@ -24,7 +24,7 @@
 #   include "sdl_proxy/sdl_assert.h"
 #endif
 
-#if !defined(__16M__) && !defined(__WII__) && !defined(__3DS__)
+#if !defined(__16M__) && !defined(__WII__) && !defined(__3DS__) && !defined(VITA)
 #   define PGE_ENABLE_SIGNAL_HOOKS
 #endif
 
