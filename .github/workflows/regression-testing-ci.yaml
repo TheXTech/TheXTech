@@ -76,37 +76,37 @@ jobs:
         git submodule init
         git submodule update
 
-    - name: Download SMBX assets
-      shell: bash
-      run: wget -d -nv -t 5 -O smbx13.7z "https://wohlsoft.ru/projects/TheXTech/_downloads/thextech-smbx13-assets-full.7z"
-
-    - name: Download AoD assets
-      shell: bash
-      run: wget -d -nv -t 5 -O aod.7z "https://wohlsoft.ru/projects/TheXTech/_downloads/thextech-adventure-of-demo-assets-full.7z"
-
-    - name: Unpack all assets
-      shell: bash
-      run: |
-        mkdir -p smbx13
-        cd smbx13
-        7z x ../smbx13.7z
-        cd ..
-        rm smbx13.7z
-        mkdir -p aod
-        cd aod
-        7z x ../aod.7z
-        cd ..
-        rm aod.7z
-
-    - name: Apply update to translations
-      shell: bash
-      run: |
-        ASSETS_ROOT1="$PWD/smbx13"
-        ASSETS_ROOT2="$PWD/aod"
-        cd .github/ci-helper
-        bash translate_update.sh "${ASSETS_ROOT1}"
-        bash translate_update.sh "${ASSETS_ROOT2}"
-        cd ../..
+#    - name: Download SMBX assets
+#      shell: bash
+#      run: wget -d -nv -t 5 -O smbx13.7z "https://wohlsoft.ru/projects/TheXTech/_downloads/thextech-smbx13-assets-full.7z"
+#
+#    - name: Download AoD assets
+#      shell: bash
+#      run: wget -d -nv -t 5 -O aod.7z "https://wohlsoft.ru/projects/TheXTech/_downloads/thextech-adventure-of-demo-assets-full.7z"
+#
+#    - name: Unpack all assets
+#      shell: bash
+#      run: |
+#        mkdir -p smbx13
+#        cd smbx13
+#        7z x ../smbx13.7z
+#        cd ..
+#        rm smbx13.7z
+#        mkdir -p aod
+#        cd aod
+#        7z x ../aod.7z
+#        cd ..
+#        rm aod.7z
+#
+#    - name: Apply update to translations
+#      shell: bash
+#      run: |
+#        ASSETS_ROOT1="$PWD/smbx13"
+#        ASSETS_ROOT2="$PWD/aod"
+#        cd .github/ci-helper
+#        bash translate_update.sh "${ASSETS_ROOT1}"
+#        bash translate_update.sh "${ASSETS_ROOT2}"
+#        cd ../..
 
     - name: Configure
       shell: bash
