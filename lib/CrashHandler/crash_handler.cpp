@@ -829,7 +829,6 @@ static SDL_AssertState custom_sdl_handler(const SDL_AssertData *data, void *user
     CrashHandler::logAssertInfo(data);
     return SDL_GetDefaultAssertionHandler()(data, userdata);
 }
-#endif
 
 void CrashHandler::logAssertInfo(const void* data_p)
 {
@@ -852,6 +851,7 @@ void CrashHandler::logAssertInfo(const void* data_p)
     // Finalize logger
     CloseLog();
 }
+#endif // #ifndef THEXTECH_NO_SDL_BUILD
 
 #if defined(HAS_SIG_INFO)
 static struct sigaction act;
