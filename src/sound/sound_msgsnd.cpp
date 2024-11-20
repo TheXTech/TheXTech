@@ -94,6 +94,7 @@ static unsigned char s_sndMsg[] =
     0x00
 };
 
+#ifndef CUSTOM_AUDIO
 void playFallbackSfx(int sfxId, int loops, int volume)
 {
     SDL_RWops *sfx = nullptr;
@@ -122,3 +123,6 @@ void playFallbackSfx(int sfxId, int loops, int volume)
         Mix_SetFreeOnStop(sfxF, 1);
     }
 }
+#else
+void playFallbackSfx(int, int, int) {}
+#endif
