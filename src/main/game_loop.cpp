@@ -23,6 +23,12 @@
 #include <Integrator/integrator.h>
 #include <pge_delay.h>
 
+#if defined(THEXTECH_ASSERTS_INGAME_MESSAGE) && !defined(THEXTECH_NO_SDL_BUILD)
+#   ifdef __WIIU__
+#       include <sysapp/launch.h>
+#   endif
+#   include "frm_main.h"
+#endif
 #include "../globals.h"
 #include "../config.h"
 #include "../frame_timer.h"
@@ -333,8 +339,15 @@ void MessageScreen_Init()
     {
     case MESSAGE_TYPE_SYS_ERROR:
         SoundPause[SFX_SMGlass] = 0;
-        PlaySound(SFX_SMGlass);
+        PlaySoundMenu(SFX_SMGlass);
         break;
+#ifdef THEXTECH_ASSERTS_INGAME_MESSAGE
+    case MESSAGE_TYPE_SYS_FATAL_ASSERT:
+        StopMusic();
+        SoundPause[SFX_SMGlass] = 0;
+        PlayErrorSound(SFX_SMGlass);
+        break;
+#endif
     default:
         SoundPause[SFX_Message] = 0;
         PlaySound(SFX_Message);
@@ -352,6 +365,7 @@ void MessageScreen_Init()
             MessageTitle = g_gameStrings.msgBoxTitleWarning;
             break;
         case MESSAGE_TYPE_SYS_ERROR:
+        case MESSAGE_TYPE_SYS_FATAL_ASSERT:
             MessageTitle = g_gameStrings.msgBoxTitleError;
             break;
         default:
@@ -412,6 +426,28 @@ bool MessageScreen_Logic(int plr)
 
     if(MenuCursorCanMove && (menuDoPress || menuBackPress))
     {
+#if defined(THEXTECH_ASSERTS_INGAME_MESSAGE) && !defined(THEXTECH_NO_SDL_BUILD)
+        // When it's a fatal error, just quit everything immediately
+        if(g_MessageType == MESSAGE_TYPE_SYS_FATAL_ASSERT)
+        {
+            GracefulQuit(false);
+
+#ifdef __WIIU__
+            if(g_isHBLauncher)
+                SYSRelaunchTitle(0, NULL);
+#endif
+
+            Controls::Quit();
+            QuitMixerX();
+            g_frmMain.freeSystem();
+#   if defined(__WII__) || defined(__WIIU__)
+            exit(0);
+#   else
+            abort();
+#   endif
+        }
+#endif
+
         MessageTitle.clear();
         MessageText.clear();
         MessageTextMap.clear();
@@ -475,9 +511,18 @@ int PauseGame(PauseCode code, int plr)
 
             g_microStats.start_task(MicroStats::Graphics);
 
-            speedRun_tick();
+#if defined(THEXTECH_ASSERTS_INGAME_MESSAGE) && !defined(THEXTECH_NO_SDL_BUILD)
+            const bool is_fatal_message = (g_MessageType == MESSAGE_TYPE_SYS_FATAL_ASSERT);
+#else
+            constexpr bool is_fatal_message = false;
+#endif
 
-            if(code == PauseCode::Prompt)
+            if(!is_fatal_message)
+                speedRun_tick();
+
+            if(is_fatal_message)
+                UpdateGraphicsFatalAssert();
+            else if(code == PauseCode::Prompt)
                 PromptScreen::Render();
             else if((LevelSelect && !GameMenu) || WorldEditor)
                 UpdateGraphics2();

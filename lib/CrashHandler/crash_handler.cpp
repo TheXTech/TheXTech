@@ -24,11 +24,14 @@
 #   include "sdl_proxy/sdl_assert.h"
 #endif
 
-#ifndef THEXTECH_NO_SDL_BUILD
-#include <SDL2/SDL_version.h>
+#if !defined(__16M__) && !defined(__WII__) && !defined(__3DS__) && !defined(__SWITCH__) && !defined(VITA)
+#   define PGE_ENABLE_SIGNAL_HOOKS
+#endif
 
+#ifndef THEXTECH_NO_SDL_BUILD
+#   include <SDL2/SDL_version.h>
 #   if !defined(THEXTECH_CLI_BUILD) && !defined(CUSTOM_AUDIO)
-#   include <SDL2/SDL_mixer_ext.h>
+#       include <SDL2/SDL_mixer_ext.h>
 #   endif
 #endif
 
@@ -39,7 +42,7 @@
 #include <lib/CrashHandler/backtrace.h>
 
 #if defined(DEBUG_BUILD) && (Backtrace_FOUND || defined(_WIN32))
-#define PGE_ENGINE_DEBUG
+#   define PGE_ENGINE_DEBUG
 #endif
 
 #ifdef PGE_ENGINE_DEBUG
@@ -66,6 +69,7 @@
 
 // Exclude platforms that don't have SIG_INFO support
 #if    !defined(_WIN32) \
+    && !defined(__16M__) \
     && !defined(__3DS__) \
     && !defined(__WII__) \
     && !defined(__WIIU__) \
@@ -76,6 +80,7 @@
 
 // Exclude personal data removal from platforms where API doesn't allows to recognise the user and/or home directory
 #if    !defined(VITA) \
+    && !defined(__16M__) \
     && !defined(__3DS__) \
     && !defined(__WII__) \
     && !defined(__WIIU__)  \
@@ -402,14 +407,20 @@ int ppc_backtrace(void **buffer, int size)
     int depth;
     uint32_t stackptr = 0, lr, *addr;
 
+    pLogDebug("Stack trace: PPC: Get link register...");
+
     // get link register
     asm volatile ("mflr %0" : "=r"(lr));
 
     // link register is assigned to depth[0]
     buffer[0] = (void *) (lr - 4);
 
+    pLogDebug("Stack trace: PPC: Get link stack pointer...");
+
     // get stackpointer
     asm volatile("stw %%sp, 0(%0)" : : "b" ((uint32_t)&stackptr));
+
+    pLogDebug("Stack trace: PPC: Assign...");
 
     // assign stack ptr to address
     addr = reinterpret_cast<uint32_t *>(stackptr);
@@ -426,6 +437,8 @@ int ppc_backtrace(void **buffer, int size)
 
     }
 
+    D_pLogDebugNA("Stack trace: PPC: Loop...");
+
     for(depth = 1; (depth < size && *addr); ++depth)
     {
         uint32_t * next = (uint32_t *) *addr;
@@ -433,34 +446,40 @@ int ppc_backtrace(void **buffer, int size)
         addr = next;
     }
 
+    D_pLogDebugNA("Stack trace: PPC: Return...");
+
     return depth;
 }
 #endif
 
 static std::string getStacktrace()
 {
-    D_pLogDebugNA("Initializing std::string...");
+    D_pLogDebugNA("Stack trace: Initializing std::string...");
     std::string bkTrace;
+    D_pLogDebugNA("Stack trace: String done...");
 
 #if defined(_WIN32)
     GetStackWalk(bkTrace);
 
 #elif defined(USE_PPC_BACKTRACE)
+
+    D_pLogDebugNA("Stack trace: Static arrays...");
     void  *array[400];
     char stack_entry[25];
     int size;
+    D_pLogDebugNA("Stack trace: Done...");
 
-    D_pLogDebugNA("Requesting backtrace...");
+    D_pLogDebugNA("Stack trace: Requesting backtrace...");
     size = ppc_backtrace(array, 400);
 
-    D_pLogDebugNA("Filling std::string...");
+    D_pLogDebugNA("Stack trace: Filling std::string...");
     for(int j = 0; j < size; j++)
     {
         SDL_snprintf(stack_entry, 25, "- 0x%08x\n", (uint32_t)array[j]);
         bkTrace.append(stack_entry);
     }
 
-    D_pLogDebugNA("DONE!");
+    D_pLogDebugNA("Stack trace: DONE!");
 
 #elif Backtrace_FOUND
     void  *array[400];
@@ -509,19 +528,28 @@ static std::string getStacktrace()
 #   define LLVM_ATTRIBUTE_NORETURN
 #endif
 
-static LLVM_ATTRIBUTE_NORETURN void abortEngine(int signal)
+static LLVM_ATTRIBUTE_NORETURN void abortEngine(int sig)
 {
     CloseLog();
+    signal(SIGABRT, SIG_DFL);
 #ifndef THEXTECH_NO_SDL_BUILD
     SDL_Quit();
 #endif
-    exit(signal);
+    exit(sig);
+}
+
+static CrashHandler::MsgBoxHook_t g_msgBoxHook = &XMsgBox::errorMsgBox;
+
+void CrashHandler::setCrashMsgBoxHook(MsgBoxHook_t hook)
+{
+    g_msgBoxHook = hook;
 }
 
 void LLVM_ATTRIBUTE_NORETURN CrashHandler::crashByUnhandledException()
 {
     std::string stack = getStacktrace();
     std::string exc;
+    std::string exc_line;
 
     try
     {
@@ -529,23 +557,27 @@ void LLVM_ATTRIBUTE_NORETURN CrashHandler::crashByUnhandledException()
     }
     catch(const std::exception &e)
     {
+        exc_line = e.what();
         exc.append(" caught an unhandled exception. [");
-        exc.append(e.what());
+        exc.append(exc_line);
         exc.append("]");
     }
     catch(...)
     {
+        exc_line = "<unknown>";
         exc.append(" caught unhandled exception. (unknown) ");
     }
 
     pLogFatal("<Unhandled exception! %s>\n"
               STACK_FORMAT, exc.c_str(),
               stack.c_str(), g_messageToUser);
-    XMsgBox::errorMsgBox(
-        //% "Unhandled exception!"
+    g_msgBoxHook(
         "Unhandled exception!",
-        //% "Engine has crashed because accepted unhandled exception!"
-        "Engine has crashed because accepted unhandled exception!");
+        "The engine has crashed because of an unhandled exception!\n\n"
+        "--Exception message:----\n" +
+        exc_line + "\n"
+        "------------------------"
+    );
     abortEngine(-1);
 }
 
@@ -555,14 +587,13 @@ void LLVM_ATTRIBUTE_NORETURN CrashHandler::crashByFlood()
     pLogFatal("<Out of memory!>\n"
               STACK_FORMAT,
               stack.c_str(), g_messageToUser);
-    XMsgBox::errorMsgBox(
-        //% "Out of memory!"
+    g_msgBoxHook(
         "Out of memory!",
-        //% "Engine has crashed because out of memory! Try to close other applications and restart game."
         "Engine has crashed because out of memory! Try to close other applications and restart game.");
     abortEngine(-2);
 }
 
+#if defined(PGE_ENABLE_SIGNAL_HOOKS)
 #if defined(_WIN32) // Unsupported signals by Windows
 struct siginfo_t;
 #endif
@@ -593,10 +624,8 @@ static void handle_signal(int signal, siginfo_t *siginfo, void * /*context*/)
     case SIGALRM:
     {
         pLogFatal("<alarm() time out!>");
-        XMsgBox::errorMsgBox(
-            //% "Time out!"
+        g_msgBoxHook(
             "Time out!",
-            //% "Engine has abourted because alarm() time out!"
             "Engine has abourted because alarm() time out!");
         abortEngine(signal);
     }
@@ -642,10 +671,8 @@ static void handle_signal(int signal, siginfo_t *siginfo, void * /*context*/)
                       stack.c_str(), g_messageToUser);
         }
 
-        XMsgBox::errorMsgBox(
-            //% "Physical memory address error!"
+        g_msgBoxHook(
             "Physical memory address error!",
-            //% "Engine has crashed because a physical memory address error"
             "Engine has crashed because a physical memory address error");
         abortEngine(signal);
     }
@@ -661,10 +688,8 @@ static void handle_signal(int signal, siginfo_t *siginfo, void * /*context*/)
         pLogFatal("<Wrong CPU Instruction>\n"
                   STACK_FORMAT,
                   stack.c_str(), g_messageToUser);
-        XMsgBox::errorMsgBox(
-            //% "Wrong CPU Instruction!"
+        g_msgBoxHook(
             "Wrong CPU Instruction!",
-            //% "Engine has crashed because a wrong CPU instruction"
             "Engine has crashed because a wrong CPU instruction");
         abortEngine(signal);
     }
@@ -718,10 +743,8 @@ static void handle_signal(int signal, siginfo_t *siginfo, void * /*context*/)
                       stack.c_str(), g_messageToUser);
         }
 
-        XMsgBox::errorMsgBox(
-            //% "Wrong arithmetical operation"
+        g_msgBoxHook(
             "Wrong arithmetical operation",
-            //% "Engine has crashed because of a wrong arithmetical operation!"
             "Engine has crashed because of a wrong arithmetical operation!");
         abortEngine(signal);
     }
@@ -732,10 +755,8 @@ static void handle_signal(int signal, siginfo_t *siginfo, void * /*context*/)
         pLogFatal("<Aborted!>\n"
                   STACK_FORMAT,
                   stack.c_str(), g_messageToUser);
-        XMsgBox::errorMsgBox(
-            //% "Aborted"
+        g_msgBoxHook(
             "Aborted",
-            //% "Engine has been aborted because critical error was occouped."
             "Engine has been aborted because critical error was occouped.");
         abortEngine(signal);
     }
@@ -779,12 +800,8 @@ static void handle_signal(int signal, siginfo_t *siginfo, void * /*context*/)
                       stack.c_str(), g_messageToUser);
         }
 
-        XMsgBox::errorMsgBox(
-            //% "Segmentation fault"
+        g_msgBoxHook(
             "Segmentation fault",
-            /*% "Engine has crashed because of a Segmentation fault.\n"
-                "Run debugging with a built in debug mode application\n"
-                "and retry your recent actions to get more detailed information." */
             "Engine has crashed because of a Segmentation fault.\n"
             "Run debugging with a built in debug mode application\n"
             "and retry your recent actions to get more detailed information.");
@@ -794,10 +811,8 @@ static void handle_signal(int signal, siginfo_t *siginfo, void * /*context*/)
     case SIGINT:
     {
         pLogFatal("<Interrupted!>");
-        XMsgBox::errorMsgBox(
-            //% "Interrupt"
+        g_msgBoxHook(
             "Interrupt",
-            //% "Engine has been interrupted"
             "Engine has been interrupted");
         abortEngine(signal);
     }
@@ -806,10 +821,20 @@ static void handle_signal(int signal, siginfo_t *siginfo, void * /*context*/)
         return;
     }
 }
+#endif // defined(PGE_ENABLE_SIGNAL_HOOKS)
 
 #ifndef THEXTECH_NO_SDL_BUILD
 static SDL_AssertState custom_sdl_handler(const SDL_AssertData *data, void *userdata)
 {
+    CrashHandler::logAssertInfo(data);
+    return SDL_GetDefaultAssertionHandler()(data, userdata);
+}
+#endif
+
+void CrashHandler::logAssertInfo(const void* data_p)
+{
+    const SDL_AssertData *data = reinterpret_cast<const SDL_AssertData*>(data_p);
+
     std::string stack = getStacktrace();
     pLogFatal("<Assertion condition has failed>:\n"
               "---------------------------------------------------------\n"
@@ -824,13 +849,13 @@ static SDL_AssertState custom_sdl_handler(const SDL_AssertData *data, void *user
               stack.c_str(),
               g_messageToUser);
 
-    return SDL_GetDefaultAssertionHandler()(data, userdata);
+    // Finalize logger
+    CloseLog();
 }
-#endif
 
 #if defined(HAS_SIG_INFO)
 static struct sigaction act;
-#else
+#elif defined(PGE_ENABLE_SIGNAL_HOOKS)
 #   if _WIN32
 struct siginfo_t;
 #   endif
@@ -855,7 +880,7 @@ void CrashHandler::initSigs()
 
     std::set_new_handler(&crashByFlood);
     std::set_terminate(&crashByUnhandledException);
-#if defined(HAS_SIG_INFO) // Unsupported signals by Windows
+#if defined(HAS_SIG_INFO) && defined(PGE_ENABLE_SIGNAL_HOOKS) // Unsupported signals by Windows
     memset(&act, 0, sizeof(struct sigaction));
     sigemptyset(&act.sa_mask);
     act.sa_sigaction = handle_signal;
@@ -873,7 +898,7 @@ void CrashHandler::initSigs()
     sigaction(SIGSEGV, &act, nullptr);
     sigaction(SIGINT,  &act, nullptr);
     sigaction(SIGABRT, &act, nullptr);
-#else // HAS_SIG_INFO
+#elif defined(PGE_ENABLE_SIGNAL_HOOKS) // HAS_SIG_INFO
     signal(SIGILL,  &handle_signalWIN32);
     signal(SIGFPE,  &handle_signalWIN32);
     signal(SIGSEGV, &handle_signalWIN32);
@@ -888,4 +913,5 @@ void CrashHandler::initSigs()
 #   endif
 #endif // HAS_SIG_INFO
 }
+
 /* Signals End */

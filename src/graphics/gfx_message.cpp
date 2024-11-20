@@ -4,6 +4,9 @@
 #include "../graphics.h"
 #include "core/render.h"
 #include "../gfx.h"
+#include "../draw_planes.h"
+#include "../frame_timer.h"
+#include "../config.h"
 
 #include "fontman/font_manager_private.h"
 #include "fontman/font_manager.h"
@@ -107,6 +110,7 @@ void DrawMessage(const UTF8CharMap_t &SuperTextMap)
         titleColour = {0xf5, 0xff, 0x1a};
         break;
     case MESSAGE_TYPE_SYS_ERROR:
+    case MESSAGE_TYPE_SYS_FATAL_ASSERT:
         messageColour = {0x61, 0x00, 0x0F};
         titleColour = {0xf5, 0xff, 0x1a};
         break;
@@ -246,4 +250,26 @@ void DrawMessage(const UTF8CharMap_t &SuperTextMap)
         BoxY += lineHeight;
         firstLine = false;
     }
+}
+
+void UpdateGraphicsFatalAssert()
+{
+    cycleNextInc();
+
+    if(g_config.enable_frameskip && !TakeScreen && frameSkipNeeded())
+        return;
+
+    XRender::setTargetTexture();
+    XRender::resetViewport();
+    XRender::setDrawPlane(PLANE_LVL_META);
+
+    if(PrintFPS > 0 && g_config.show_fps)
+        SuperPrint(std::to_string(PrintFPS), 1, XRender::TargetOverscanX + 8, 8, {0, 255, 0});
+
+    if(MessageTextMap.empty())
+        DrawMessage(MessageText);
+    else
+        DrawMessage(MessageTextMap);
+
+    XRender::repaint();
 }

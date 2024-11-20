@@ -1314,7 +1314,10 @@ void InitSound()
     }
 
     if(LoadingInProcess)
+    {
+        LoaderUpdateDebugString("All sounds loaded");
         UpdateLoad();
+    }
 
     Mix_ReserveChannels(g_reservedChannels);
 
@@ -1514,13 +1517,26 @@ bool HasSound(int A)
 
 void PlaySoundMenu(int A, int loops)
 {
-    if(SoundPause[A] == 0) // if the sound wasn't just played
+    if(SoundPause[A] > 0) // if the sound wasn't just played
+        return;
+
+    if(g_totalSounds == 0 || A > (int)g_totalSounds)
     {
-        std::string alias = fmt::format_ne("sound{0}", A);
-        PlaySfx(alias, loops);
-        s_resetSoundDelay(A);
+        playFallbackSfx(A, loops, 128);
+        return;
     }
+
+    std::string alias = fmt::format_ne("sound{0}", A);
+    PlaySfx(alias, loops);
+    s_resetSoundDelay(A);
 }
+
+#if defined(THEXTECH_ASSERTS_INGAME_MESSAGE) && !defined(THEXTECH_NO_SDL_BUILD)
+void PlayErrorSound(int A, int loops)
+{
+    playFallbackSfx(A, loops, 128);
+}
+#endif
 
 // stops all sound from being played for 10 cycles
 void BlockSound()
