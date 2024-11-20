@@ -1,0 +1,200 @@
+name: Regression Test CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: "${{ matrix.config.name }} | ${{ matrix.config.build_type }}"
+    runs-on: ${{ matrix.config.os }}
+    container: ${{ matrix.config.container }}
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+        - {
+            name: "Ubuntu 24.04 x86_64 (no-SDL)",
+            os: ubuntu-24.04,
+
+            extra_options: "-DTHEXTECH_EXECUTABLE_NAME=thextech \
+            -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=ON \
+            -DUSE_STATIC_LIBC=ON \
+            -DUSE_SYSTEM_LIBS=OFF \
+            -DTHEXTECH_CLI_BUILD=ON \
+            -DTHEXTECH_NO_SDL_BUILD=ON",
+
+            deps_cmdline: "sudo apt-get update -qq \
+            && sudo apt-get install -qq cmake ninja-build lftp \
+            build-essential",
+
+            executable_name: "thextech",
+            generator: "Ninja",
+            build_type: "MinSizeRel",
+            executable_name_suffix: "",
+            package_filename_suffix: "ubuntu-24-04-amd64",
+            upload_directory: ""
+          }
+
+    steps:
+    - name: Check for the upload support
+      id: upload-check
+      shell: bash
+      run: |
+        if [[ "${{ secrets.builds_login }}" != '' && \
+              "${{ secrets.builds_password }}" != '' && \
+              "${{ secrets.builds_host }}" != '' ]]; then
+          echo "available=true" >> $GITHUB_OUTPUT;
+        else
+          echo "available=false" >> $GITHUB_OUTPUT;
+        fi
+
+    - name: Install Dependencies
+      shell: bash
+      run: |
+        if [[ ! -z "${{ matrix.config.deps_cmdline }}" ]]; then
+          eval ${{ matrix.config.deps_cmdline }}
+        fi
+        cmake --version
+
+    - uses: TheXTech/checkout@v0.1
+
+    - uses: TheXTech/branch-name@v0.1
+
+
+    - name: Pull submodules
+      shell: bash
+      run: |
+        git submodule init
+        git submodule update
+
+    - name: Download SMBX assets
+      shell: bash
+      run: wget -d -nv -t 5 -O smbx13.7z "https://wohlsoft.ru/projects/TheXTech/_downloads/thextech-smbx13-assets-full.7z"
+
+    - name: Download AoD assets
+      shell: bash
+      run: wget -d -nv -t 5 -O aod.7z "https://wohlsoft.ru/projects/TheXTech/_downloads/thextech-adventure-of-demo-assets-full.7z"
+
+    - name: Unpack all assets
+      shell: bash
+      run: |
+        mkdir -p smbx13
+        cd smbx13
+        7z x ../smbx13.7z
+        cd ..
+        rm smbx13.7z
+        mkdir -p aod
+        cd aod
+        7z x ../aod.7z
+        cd ..
+        rm aod.7z
+
+    - name: Apply update to translations
+      shell: bash
+      run: |
+        ASSETS_ROOT1="$PWD/smbx13"
+        ASSETS_ROOT2="$PWD/aod"
+        cd .github/ci-helper
+        bash translate_update.sh "${ASSETS_ROOT1}"
+        bash translate_update.sh "${ASSETS_ROOT2}"
+        cd ../..
+
+    - name: Configure
+      shell: bash
+      run: |
+        if [[ ! -z "${{ matrix.config.extra_path }}" ]]; then
+          export PATH=${{ matrix.config.extra_path }}:${PATH}
+          echo "PATH environment: ${PATH}"
+        fi
+        if [[ "${{ secrets.DISCORD_APP_ID }}" != '' ]]; then
+          LOCAL_EXTRA_SETUP="-DTHEXTECH_ENABLE_DISCORD_RPC=ON -DTHEXTECH_DISCORD_APPID=\"${{ secrets.DISCORD_APP_ID }}\""
+        fi
+        cmake -B build -G "${{ matrix.config.generator }}" -DCMAKE_BUILD_TYPE=${{ matrix.config.build_type }} ${{ matrix.config.extra_options }} ${LOCAL_EXTRA_SETUP} .
+
+    - name: Build
+      shell: bash
+      run: |
+        if [[ ! -z "${{ matrix.config.extra_path }}" ]]; then
+          export PATH=${{ matrix.config.extra_path }}:${PATH}
+        fi
+        export MAKEFLAGS=--keep-going
+        cmake --build build --config ${{ matrix.config.build_type }} --parallel 3
+
+    - name: List dependent libraries
+      if: success() && runner.os == 'Linux'
+      shell: bash
+      run: |
+        file build/output/bin/thextech
+        ldd build/output/bin/thextech
+
+    - name: Check codesize and RAM usage
+      if: success() && runner.os == 'Linux'
+      shell: bash
+      run: |
+        size build/output/bin/thextech
+
+    # TODO: some performance and regression testing on a suite. Wait for wip-archives merge so that it is easy to use a test-suite.
+
+    # - name: Create Package
+    #   if: success()
+    #   id: create_package
+    #   shell: bash
+    #   run: |
+    #     bash .github/ci-helper/pack-game.sh \
+    #         "${{ runner.os }}" \
+    #         "thextech-bin" \
+    #         "thextech${{ matrix.config.executable_name_suffix }}" \
+    #         "thextech-bin-${{ matrix.config.package_filename_suffix }}-${BRANCH_NAME}" \
+    #         "none"
+
+    # - name: Upload artifact
+    #   if: success() && runner.os == 'Linux' && config.upload_directory != ''
+    #   uses: actions/upload-artifact@v3
+    #   continue-on-error: true
+    #   with:
+    #     path: build/package/*.tar.gz
+    #     name: TheXTech ${{ matrix.config.name }} ${{ matrix.config.build_type }}
+
+    # - name: Upload artifact
+    #   if: success() && runner.os == 'Windows'
+    #   uses: actions/upload-artifact@v3
+    #   continue-on-error: true
+    #   with:
+    #     path: build/package/*.7z
+    #     name: ${{ matrix.config.name }} ${{ matrix.config.build_type }}
+
+    # - name: Deploy to builds.wohlsoft.ru
+    #   if: steps.create_package.outcome == 'success' && github.event_name != 'pull_request' && steps.upload-check.outputs.available == 'true' && config.upload_directory != ''
+    #   continue-on-error: true
+    #   shell: bash
+    #   run: |
+    #     if [[ ! -z "${{ matrix.config.extra_path }}" ]]; then
+    #       export PATH=${{ matrix.config.extra_path }}:${PATH}
+    #     fi
+    #     UPLOAD_LIST="set ssl:verify-certificate no;"
+    #     if [[ "${{ runner.os }}" == 'Windows' ]]; then
+    #         for q in ./build/package/*.7z; do
+    #             UPLOAD_LIST="${UPLOAD_LIST} put -O ${{ matrix.config.upload_directory }} $q;"
+    #         done
+    #     elif [[ "${{ runner.os }}" == 'Linux' ]]; then
+    #         for q in ./build/package/*.tar.gz; do
+    #             UPLOAD_LIST="${UPLOAD_LIST} put -O ${{ matrix.config.upload_directory }} $q;"
+    #         done
+    #     fi
+    #     lftp -e "${UPLOAD_LIST} exit" -u ${{ secrets.builds_login }},${{ secrets.builds_password }} ${{ secrets.builds_host }}
+
+    - name: List Build Directory
+      if: always()
+      shell: bash
+      run: |
+        git status
+        ls -lR build
