@@ -440,7 +440,7 @@ bool MessageScreen_Logic(int plr)
             Controls::Quit();
             QuitMixerX();
             g_frmMain.freeSystem();
-#   ifdef __WIIU__
+#   if defined(__WII__) || defined(__WIIU__)
             exit(0);
 #   else
             abort();
