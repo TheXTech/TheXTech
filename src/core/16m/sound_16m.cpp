@@ -227,7 +227,7 @@ void UnloadSound()
     for(unsigned int i = 0; i < g_totalSounds; i++)
     {
         if(s_soundLoaded[i])
-            mmUnloadEffect(i);
+            mmUnloadEffect(s_sfxEffects[i]);
         s_soundLoaded[i] = false;
     }
 
@@ -576,7 +576,7 @@ void PlayInitSound()
         if(effect != -1)
         {
             mmLoadEffect(effect);
-            s_soundLoaded[SFX_Do] = true;
+            s_soundLoaded[SFX_Do - 1] = true;
             mmEffect(effect);
         }
     }
@@ -817,9 +817,9 @@ void PlaySoundMenu(int A, int loops)
         if(index == -1)
             return;
 
-        if(!s_soundLoaded[A])
+        if(!s_soundLoaded[A - 1])
             mmLoadEffect(index);
-        s_soundLoaded[A] = true;
+        s_soundLoaded[A - 1] = true;
         mm_sfxhand handle = mmEffect(index);
         UNUSED(handle);
         UNUSED(loops);
