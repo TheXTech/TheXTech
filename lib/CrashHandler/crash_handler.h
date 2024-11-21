@@ -31,7 +31,9 @@ public:
     static void crashByUnhandledException();
     static void crashByFlood();
     static void initSigs();
+#ifndef THEXTECH_NO_SDL_BUILD
     static void logAssertInfo(const void *data);
+#endif
 };
 
 #endif // CRASHHANDLER_H
