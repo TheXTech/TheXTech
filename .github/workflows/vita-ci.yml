@@ -34,7 +34,7 @@ jobs:
             -DVITA_TITLEID=\"THEXTECH0\" \
             -DVITA_VERSION=\"01.05\"",
 
-            deps_cmdline: "echo \"Vita SDK is already pre-installed\"",
+            deps_cmdline: "echo 'Vita SDK is already pre-installed'",
 
             generator: "Unix Makefiles",
             build_type: "MinSizeRel",

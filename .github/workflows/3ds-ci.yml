@@ -32,7 +32,7 @@ jobs:
 
             extra_options: "-DCMAKE_TOOLCHAIN_FILE=$DEVKITPRO/cmake/3DS.cmake -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=ON",
 
-            deps_cmdline: "echo \"DevkitPro SDK is already pre-installed\"",
+            deps_cmdline: "echo 'DevkitPro SDK is already pre-installed'",
 
             generator: "Ninja",
             build_type: "Release",

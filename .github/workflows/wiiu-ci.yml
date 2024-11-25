@@ -35,7 +35,7 @@ jobs:
             -DCMAKE_PREFIX_PATH=/opt/devkitpro/portlibs/wiiu-local \
             -DCMAKE_INSTALL_PREFIX=$DEVKITPRO/portlibs/wiiu",
 
-            deps_cmdline: "echo \"DevkitPro SDK is already pre-installed\"",
+            deps_cmdline: "echo 'DevkitPro SDK is already pre-installed'",
 
             generator: "Ninja",
             build_type: "MinSizeRel",
