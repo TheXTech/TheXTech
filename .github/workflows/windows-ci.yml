@@ -229,16 +229,8 @@ jobs:
             "none"
 
     - name: Upload artifact
-      if: success() && runner.os == 'Linux'
-      uses: actions/upload-artifact@v3
-      continue-on-error: true
-      with:
-        path: build/package/*.tar.gz
-        name: TheXTech ${{ matrix.config.name }} ${{ matrix.config.build_type }}
-
-    - name: Upload artifact
-      if: success() && runner.os == 'Windows'
-      uses: actions/upload-artifact@v3
+      if: success()
+      uses: actions/upload-artifact@v4
       continue-on-error: true
       with:
         path: build/package/*.7z

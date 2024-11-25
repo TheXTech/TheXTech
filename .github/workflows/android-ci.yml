@@ -134,7 +134,7 @@ jobs:
 
       - name: Upload APK (unsigned)
         if: success() && ${{ steps.signing-check.outputs.available != 'true' }}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         continue-on-error: true
         with:
           name: thextech-android-${BRANCH_NAME}-unsigned
