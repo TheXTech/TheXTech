@@ -32,8 +32,8 @@ jobs:
 
             extra_options: "-DTHEXTECH_EXECUTABLE_NAME=thextech \
             -DCMAKE_TOOLCHAIN_FILE=$DEVKITPRO/cmake/Switch.cmake \
-            -DCMAKE_PREFIX_PATH=/opt/devkitpro/portlibs/switch-local \
             -DCMAKE_INSTALL_PREFIX=$DEVKITPRO/portlibs/switch",
+            # -DCMAKE_PREFIX_PATH=/opt/devkitpro/portlibs/switch-local
 
             deps_cmdline: "echo 'DevkitPro SDK is already pre-installed'",
 
@@ -97,16 +97,16 @@ jobs:
 #        sudo dkp-pacman --noconfirm -Syu
 #        sudo dkp-pacman --noconfirm -Sy switch-dev switch-libpng switch-libjpeg-turbo switch-zlib switch-tools switch-cmake switch-mesa switch-libdrm_nouveau switch-glm switch-glad
 
-    - name: Install modified SDL2
-      run: |
-        cd ..
-        git clone https://github.com/Wohlstand/SDL.git -b switch-sdl2-2.0.14-dev --depth 1 SDL2
-        cd SDL2
-        mkdir build
-        cd build
-        cmake -G Ninja -DCMAKE_TOOLCHAIN_FILE=$DEVKITPRO/cmake/Switch.cmake -DCMAKE_PREFIX_PATH=/opt/devkitpro/portlibs/switch-local -DCMAKE_PREFIX_PATH=/opt/devkitpro/portlibs/switch-local ..
-        cmake --build . --target all -j4
-        sudo cmake --build . --target install
+#    - name: Install modified SDL2
+#      run: |
+#        cd ..
+#        git clone https://github.com/Wohlstand/SDL.git -b switch-sdl2-2.0.14-dev --depth 1 SDL2
+#        cd SDL2
+#        mkdir build
+#        cd build
+#        cmake -G Ninja -DCMAKE_TOOLCHAIN_FILE=$DEVKITPRO/cmake/Switch.cmake -DCMAKE_PREFIX_PATH=/opt/devkitpro/portlibs/switch-local -DCMAKE_PREFIX_PATH=/opt/devkitpro/portlibs/switch-local ..
+#        cmake --build . --target all -j4
+#        sudo cmake --build . --target install
 
     - name: Configure
       shell: bash
