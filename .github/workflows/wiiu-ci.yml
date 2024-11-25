@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - wip-ports
+      - versus-ci-homebrew
   pull_request:
     branches:
       - main
@@ -18,7 +19,7 @@ jobs:
   build:
     name: "${{ matrix.config.name }} | ${{ matrix.config.build_type }}"
     runs-on: ubuntu-latest
-    container: devkitpro/devkitppc
+    container: ghcr.io/thextech/wohlnet-ci-ubuntu2404-dkp-vita:latest
     env:
         DEVKITPRO: /opt/devkitpro
         DEVKITPPC: /opt/devkitpro/devkitPPC
@@ -34,10 +35,7 @@ jobs:
             -DCMAKE_PREFIX_PATH=/opt/devkitpro/portlibs/wiiu-local \
             -DCMAKE_INSTALL_PREFIX=$DEVKITPRO/portlibs/wiiu",
 
-            deps_cmdline: "sudo apt-get update -qq \
-            && sudo apt-get install -qq cmake ninja-build make lftp git-core python zip \
-            && git config --global --add safe.directory '*'
-            && (sudo dkp-pacman -Rc --noconfirm wiiu-sdl2 || true)",
+            deps_cmdline: "echo 'DevkitPro SDK is already pre-installed'",
 
             generator: "Ninja",
             build_type: "MinSizeRel",
@@ -127,7 +125,7 @@ jobs:
 
     - name: Upload artifact
       if: success()
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       continue-on-error: true
       with:
         path: build/package/*.zip

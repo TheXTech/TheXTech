@@ -5,8 +5,7 @@ on:
     branches:
       - main
       - devel
-      - wip-vita-support
-      - wip-vita-master
+      - versus-ci-homebrew
   pull_request:
     branches:
       - main
@@ -19,7 +18,7 @@ jobs:
   build:
     name: "${{ matrix.config.name }} | ${{ matrix.config.build_type }}"
     runs-on: ubuntu-latest
-    container: gnuton/vitasdk-docker
+    container: ghcr.io/thextech/wohlnet-ci-ubuntu2404-dkp-vita:latest
     env:
         VITASDK: /usr/local/vitasdk
     strategy:
@@ -35,14 +34,7 @@ jobs:
             -DVITA_TITLEID=\"THEXTECH0\" \
             -DVITA_VERSION=\"01.05\"",
 
-            deps_cmdline: "sudo apt-get update -qq \
-            && sudo apt-get update --fix-missing -qq \
-            && sudo apt-get install -y software-properties-common \
-            && sudo add-apt-repository -y \"ppa:git-core/ppa\" \
-            && sudo apt-get update --fix-missing -qq \
-            && sudo apt-get install -f -qq \
-            && sudo apt-get install -qq cmake ninja-build cmake ninja-build lftp git-core git python3 zip xz-utils p7zip-full \
-            && git config --global --add safe.directory '*'",
+            deps_cmdline: "echo 'Vita SDK is already pre-installed'",
 
             generator: "Unix Makefiles",
             build_type: "MinSizeRel",
@@ -164,7 +156,7 @@ jobs:
 
     - name: Upload artifact
       if: success()
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       continue-on-error: true
       with:
         path: build/package/*.zip
