@@ -22,6 +22,8 @@
 
 #include <nds.h>
 
+#ifndef __CALICO__
+
 uint32_t curTime_ticks = 0u;
 bool inited = false;
 
@@ -58,3 +60,24 @@ void SDL_Delay(int ms)
     while(SDL_GetMicroTicks() < want)
         swiDelay(0x126f); // ~120us
 }
+
+#endif
+
+#ifdef __CALICO__
+
+uint32_t SDL_GetTicks()
+{
+    return (uint64_t)tickGetCount() * 1000 / TICK_FREQ;
+}
+
+uint64_t SDL_GetMicroTicks()
+{
+    return (uint64_t)tickGetCount() * 1000000 / TICK_FREQ;
+}
+
+void SDL_Delay(int ms)
+{
+    threadSleep(ms * 1000);
+}
+
+#endif

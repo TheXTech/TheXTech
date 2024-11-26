@@ -626,6 +626,12 @@ if(THEXTECH_ENABLE_LUAU)
     target_link_libraries(A2XT_Int INTERFACE Luau.Compiler Luau.VM)
 endif()
 
+if(NINTENDO_DS AND CALICO_ROOT)
+    add_library(xtbootstrap src/core/16m/boot_16m.c)
+    set_property(TARGET xtbootstrap PROPERTY INTERPROCEDURAL_OPTIMIZATION FALSE)
+    target_link_libraries(A2XT_Int INTERFACE xtbootstrap)
+endif()
+
 
 target_link_libraries(A2XT_Int INTERFACE ${A2XT_LIBS})
 target_include_directories(A2XT_Int INTERFACE ${A2XT_INCS})
@@ -961,7 +967,7 @@ elseif(NINTENDO_DS)
         src/core/16m/render_16m.cpp
         src/core/16m/msgbox_16m.cpp
         src/core/16m/window_16m.cpp
-        src/core/null/events_null.cpp
+        src/core/16m/events_16m.cpp
         src/core/16m/sound_16m.cpp
         src/core/16m/sound_stream_16m.cpp
         src/core/power/power_16m.cpp
@@ -1303,12 +1309,17 @@ elseif(NINTENDO_WII)
 elseif(NINTENDO_WIIU)
     target_compile_definitions(thextech PRIVATE -DPGE_SDL_MUTEX)
 elseif(NINTENDO_DS)
-    target_link_libraries(thextech PRIVATE filesystem)
     target_link_libraries(thextech PRIVATE fat)
     target_link_libraries(thextech PRIVATE mm9)
-    target_link_libraries(thextech PRIVATE nds9)
     target_compile_definitions(thextech PRIVATE -DPGE_NO_THREADING -DLOW_MEM -DTHEXTECH_PRELOAD_LEVELS -D__16M__)
-    set(CMAKE_EXE_LINKER_FLAGS "-L${NDS_ROOT}/lib -specs=dsi_arm9.specs")
+
+    if(CALICO_ROOT)
+        target_compile_definitions(thextech PRIVATE -D__CALICO__)
+    elseif(BLOCKSDS)
+        target_compile_definitions(thextech PRIVATE -D__BLOCKS__)
+    endif()
+
+    set(CMAKE_EXE_LINKER_FLAGS "-L${CALICO_ROOT}/lib -L${NDS_ROOT}/lib -specs=${CALICO_ROOT}/share/ds9.specs -T ${CMAKE_CURRENT_SOURCE_DIR}/cmake/overlays-16m.ld")
 elseif(PGE_MIN_PORT)
     target_compile_definitions(thextech PRIVATE -DLOW_MEM)
 endif()

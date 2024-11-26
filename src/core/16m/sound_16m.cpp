@@ -160,7 +160,12 @@ void InitMixerX()
     sys.mod_count    = s_max_modules;
     sys.samp_count   = s_max_effects;
     sys.mem_bank     = s_soundbank_pointers;
+#ifndef __CALICO__
     sys.fifo_channel = FIFO_MAXMOD;
+#else
+    sys.fifo_channel = 0;
+#endif
+
     mmInit(&sys);
     mmSetCustomSoundBankHandler(s_maxmod_loader);
     g_mixerLoaded = true;

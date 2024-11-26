@@ -65,6 +65,10 @@
 #include <nds.h>
 #endif
 
+#ifdef __CALICO__
+#define main _entry_point
+#endif
+
 #ifdef __WII__
 #include <gccore.h>
 #endif

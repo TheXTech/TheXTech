@@ -321,7 +321,7 @@ static inline void s_gxTexcoord2i(t16 u, t16 v)
 static inline void s_gxVertex3i(v16 x, v16 y, v16 z)
 {
     GFX_VERTEX16 = (y << 16) | (x & 0xFFFF);
-    GFX_VERTEX16 = ((uint32)(uint16)z);
+    GFX_VERTEX16 = ((u32)(u16)z);
 }
 
 static inline void s_gxVertex2i(v16 x, v16 y)

@@ -2,13 +2,13 @@ extern "C"
 {
 void removePaletteFromTexture( gl_texture_data *tex );
 
-uint8*
-vramBlock_examineSpecial( s_vramBlock *mb, uint8 *addr, uint32 size, uint8 align );
+u8*
+vramBlock_examineSpecial( s_vramBlock *mb, u8 *addr, u32 size, u8 align );
 
-uint16* vramGetBank(uint16 *addr);
+u16* vramGetBank(u16 *addr);
 
-uint32
-vramBlock_allocateSpecial( s_vramBlock *mb, uint8 *addr, uint32 size );
+u32
+vramBlock_allocateSpecial( s_vramBlock *mb, u8 *addr, u32 size );
 };
 
 //---------------------------------------------------------------------------------
@@ -16,7 +16,7 @@ vramBlock_allocateSpecial( s_vramBlock *mb, uint8 *addr, uint32 size );
 //  format palette into palette memory,
 //  and sets it to the currently bound texture
 //---------------------------------------------------------------------------------
-void glColorTableEXT_alloc_only( int, int, uint16 width, int, int ) {
+void glColorTableEXT_alloc_only( int, int, u16 width, int, int ) {
 //---------------------------------------------------------------------------------
     if( glGlob->activeTexture ) {
         gl_texture_data *texture = (gl_texture_data*)DynamicArrayGet( &glGlob->texturePtrs, glGlob->activeTexture );
@@ -29,16 +29,16 @@ void glColorTableEXT_alloc_only( int, int, uint16 width, int, int ) {
             return;
 
         // Allocate new palette block based on the texture's format
-        uint32 colFormat = (( texture->texFormat >> 26 ) & 0x7 );
+        u32 colFormat = (( texture->texFormat >> 26 ) & 0x7 );
 
-        uint32 colFormatVal = (( colFormat == GL_RGB4 || ( colFormat == GL_NOTEXTURE && width <= 4 )) ? 3 : 4 );
-        uint8* checkAddr = vramBlock_examineSpecial( glGlob->vramBlocks[ 1 ], (uint8*)VRAM_E, width << 1, colFormatVal );
+        u32 colFormatVal = (( colFormat == GL_RGB4 || ( colFormat == GL_NOTEXTURE && width <= 4 )) ? 3 : 4 );
+        u8* checkAddr = vramBlock_examineSpecial( glGlob->vramBlocks[ 1 ], (u8*)VRAM_E, width << 1, colFormatVal );
 
         if( checkAddr ) {
             // Calculate the address, logical and actual, of where the palette will go
-            uint16* baseBank = vramGetBank( (uint16*)checkAddr );
-            uint32 addr = ( (uint32)checkAddr - (uint32)baseBank );
-            uint8 offset = 0;
+            u16* baseBank = vramGetBank( (u16*)checkAddr );
+            u32 addr = ( (u32)checkAddr - (u32)baseBank );
+            u8 offset = 0;
 
             if( baseBank == VRAM_F )
                 offset = ( VRAM_F_CR >> 3 ) & 3;
@@ -62,9 +62,9 @@ void glColorTableEXT_alloc_only( int, int, uint16 width, int, int ) {
             palette->palSize = width << 1;
 
             // copy straight to VRAM, and assign a palette name
-            // uint32 tempVRAM = VRAM_EFG_CR;
-            // uint16 *startBank = vramGetBank( (uint16*)palette->vramAddr );
-            // uint16 *endBank = vramGetBank( (uint16*)((char*)palette->vramAddr + ( width << 1 ) - 1));
+            // u32 tempVRAM = VRAM_EFG_CR;
+            // u16 *startBank = vramGetBank( (u16*)palette->vramAddr );
+            // u16 *endBank = vramGetBank( (u16*)((char*)palette->vramAddr + ( width << 1 ) - 1));
             // do {
             //     if( startBank == VRAM_E ) {
             //         vramSetBankE( VRAM_E_LCD );
@@ -82,7 +82,7 @@ void glColorTableEXT_alloc_only( int, int, uint16 width, int, int ) {
             // vramRestoreBanks_EFG( tempVRAM );
 
             if( glGlob->deallocPalSize )
-                texture->palIndex = (uint32)DynamicArrayGet( &glGlob->deallocPal, glGlob->deallocPalSize-- );
+                texture->palIndex = (u32)DynamicArrayGet( &glGlob->deallocPal, glGlob->deallocPalSize-- );
             else
                 texture->palIndex = glGlob->palCount++;
             DynamicArraySet( &glGlob->palettePtrs, texture->palIndex, (void*)palette );
