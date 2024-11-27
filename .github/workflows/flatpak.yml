@@ -73,8 +73,7 @@ jobs:
       shell: bash
       run: |
         git config --global --add safe.directory '*'
-        git submodule init
-        git submodule update
+        git submodule update --init --recursive
 
     - name: Create flatpak manifest YML
       id: make-yml
