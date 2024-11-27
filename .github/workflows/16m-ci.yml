@@ -1,13 +1,13 @@
 name: No-SDL CI
 
 on:
-#  push:
-#    branches:
-#      - main
-#      - versus-ci-homebrew
-#  pull_request:
-#    branches:
-#      - main
+  push:
+    branches:
+      - main
+      - versus-ci-homebrew
+  pull_request:
+    branches:
+      - main
   workflow_dispatch:
 
 concurrency:

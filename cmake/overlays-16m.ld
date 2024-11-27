@@ -47,7 +47,7 @@ SECTIONS {
     __ovlarea_main_end = MAX(__ovlarea_main_end, .);
 
 }
-INSERT AFTER .main.bss;
+INSERT AFTER .twl.bss;
 
 SECTIONS {
 
