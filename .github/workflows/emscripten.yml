@@ -108,8 +108,7 @@ jobs:
       shell: bash
       run: |
         # Pull submodules
-        git submodule init
-        git submodule update
+        git submodule update --init --recursive
 
     - name: Install emscripten
       run: |
