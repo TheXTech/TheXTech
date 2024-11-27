@@ -34,7 +34,7 @@ jobs:
             deps_cmdline: "echo 'DevkitPro SDK is already pre-installed'",
 
             generator: "Ninja",
-            build_type: "Release",
+            build_type: "RelWithDebInfo",
             executable_name: "thextech",
             subdir_name: "thextech-16m",
             upload_directory: "www/16m/"
