@@ -21,6 +21,7 @@
 #include <nds.h>
 #include <fat.h>
 #include <stdio.h>
+#include <calico.h>
 #include <calico/nds/env.h>
 
 extern int _entry_point(int argc, char** argv);
@@ -29,6 +30,16 @@ extern void* __main_bss_end;
 extern void* __heap_start_ntr;
 extern void* __heap_start_twl;
 extern void *fake_heap_start, *fake_heap_end;
+
+static Thread s_main_thread;
+alignas(8) static uint8_t s_main_thread_stack[96 * 1024];
+static int s_argc;
+static char** s_argv;
+
+static int s_run()
+{
+    return _entry_point(s_argc, s_argv);
+}
 
 int main(int argc, char** argv)
 {
@@ -49,7 +60,14 @@ int main(int argc, char** argv)
         goto fail_exit;
     }
 
-    int ret = _entry_point(argc, argv);
+    s_argc = argc;
+    s_argv = argv;
+
+    threadPrepare(&s_main_thread, s_run, NULL, &s_main_thread_stack[sizeof(s_main_thread_stack)], MAIN_THREAD_PRIO);
+    threadAttachLocalStorage(&s_main_thread, NULL);
+    threadStart(&s_main_thread);
+
+    int ret = threadJoin(&s_main_thread);
 
     ovlDeactivate(0);
 
