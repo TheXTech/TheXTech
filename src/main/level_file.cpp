@@ -426,7 +426,8 @@ bool OpenLevel_Section(void*, LevelSection& s)
         if(LevelEditor && !s.custom_params.empty())
             SetS(SectionJSONInfo[B], s.custom_params);
 
-#if defined(THEXTECH_BUILD_GL_MODERN)
+        // section effects still not finalized for 1.3.7 release
+#if 0 // #if defined(THEXTECH_BUILD_GL_MODERN)
         if(!s.custom_params.empty())
         {
             try

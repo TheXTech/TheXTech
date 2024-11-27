@@ -1094,7 +1094,9 @@ bool RenderGL::depthTestSupported()
 
 bool RenderGL::userShadersSupported()
 {
-    return m_use_shaders && m_buffer_texture[BUFFER_FB_READ] && m_buffer_texture[BUFFER_INT_PASS_1];
+    // shader format still not finalized for 1.3.7 release
+    return false;
+    // return m_use_shaders && m_buffer_texture[BUFFER_FB_READ] && m_buffer_texture[BUFFER_INT_PASS_1];
 }
 
 void RenderGL::unloadTexture(StdPicture &tx)
