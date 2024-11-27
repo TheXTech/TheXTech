@@ -638,6 +638,11 @@ target_compile_definitions(A2XT_Int INTERFACE
     -DPGE_USE_ARCHIVES  # DirMan should use the archives library
 )
 
+if(ANDROID)
+    set_target_properties(lz4 PROPERTIES POSITION_INDEPENDENT_CODE ON)
+    set_target_properties(mbediso PROPERTIES POSITION_INDEPENDENT_CODE ON)
+endif()
+
 
 target_link_libraries(A2XT_Int INTERFACE ${A2XT_LIBS})
 target_include_directories(A2XT_Int INTERFACE ${A2XT_INCS})
