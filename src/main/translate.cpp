@@ -322,7 +322,7 @@ XTechTranslate::XTechTranslate()
     m_engineMap.insert({"menu.controls.touchscreen.option.feedbackStrength", &g_controlsStrings.touchscreenOptionFeedbackStrength});
     m_engineMap.insert({"menu.controls.touchscreen.option.feedbackLength", &g_controlsStrings.touchscreenOptionFeedbackLength});
     m_engineMap.insert({"menu.controls.touchscreen.option.holdRun",        &g_controlsStrings.touchscreenOptionHoldRun});
-    m_engineMap.insert({"menu.controls.touchscreen.option.showCodeButton", &g_controlsStrings.touchscreenOptionShowCodeButton},
+    m_engineMap.insert({"menu.controls.touchscreen.option.showCodeButton", &g_controlsStrings.touchscreenOptionShowCodeButton});
 
 
     m_engineMap.insert({"menu.controls.touchscreen.layout.tight",          &g_controlsStrings.touchscreenLayoutTight});
