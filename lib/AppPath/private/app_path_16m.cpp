@@ -42,11 +42,7 @@ std::string AppPathP::appDirectory()
 
 std::string AppPathP::userDirectory()
 {
-#ifdef __BLOCKS__
     return "sd:/" THEXTECH_DIRECTORY_PREFIX "/";
-#else
-    return "/" THEXTECH_DIRECTORY_PREFIX "/";
-#endif
 }
 
 std::string AppPathP::assetsRoot()
