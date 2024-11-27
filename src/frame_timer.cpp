@@ -18,6 +18,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifdef __16M__
+#include <malloc.h>
+#endif
+
 #include "sdl_proxy/sdl_stdinc.h"
 #include "sdl_proxy/sdl_timer.h"
 

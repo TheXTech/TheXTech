@@ -233,9 +233,15 @@ int main(int argc, char**argv)
     vramSetBankH(VRAM_H_SUB_BG);
     vramSetBankI(VRAM_I_SUB_BG_0x06208000);
 
-    PrintConsole* defaultConsole = consoleGetDefault();
-
+#ifdef __BLOCKS__
+    const int DEFAULT_CONSOLE_MAP_BASE = 22;
+    const int DEFAULT_CONSOLE_GFX_BASE = 3;
+    const int DEFAULT_CONSOLE_BG_LAYER = 0;
+    consoleInit(nullptr, DEFAULT_CONSOLE_BG_LAYER, BgType_Text4bpp, BgSize_T_256x256, DEFAULT_CONSOLE_MAP_BASE, DEFAULT_CONSOLE_GFX_BASE, false, true);
+#else
+    const PrintConsole* defaultConsole = consoleGetDefault();
     consoleInit(nullptr, defaultConsole->bgLayer, BgType_Text4bpp, BgSize_T_256x256, defaultConsole->mapBase, defaultConsole->gfxBase, false, true);
+#endif
 
     printf("Hello, 16MB world!\n");
 #endif
