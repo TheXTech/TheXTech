@@ -170,622 +170,622 @@ static bool saveFile(const std::string &inPath, const std::string &inData)
 XTechTranslate::XTechTranslate()
 {
     // List of all translatable strings of the engine
-    m_engineMap =
-    {
-        {"menu.main.mainPlayEpisode",        &g_mainMenu.mainPlayEpisode},
-        {"menu.main.main1PlayerGame",      &g_mainMenu.main1PlayerGame},
-        {"menu.main.mainMultiplayerGame",  &g_mainMenu.mainMultiplayerGame},
-        {"menu.main.mainBattleGame",       &g_mainMenu.mainBattleGame},
-        {"menu.main.mainEditor",           &g_mainMenu.mainEditor},
-        {"menu.main.mainOptions",          &g_mainMenu.mainOptions},
-        {"menu.main.mainExit",             &g_mainMenu.mainExit},
+    m_engineMap.clear();
 
-        {"menu.loading",                   &g_mainMenu.loading},
+    m_engineMap.insert({"menu.main.mainPlayEpisode",        &g_mainMenu.mainPlayEpisode});
+    m_engineMap.insert({"menu.main.main1PlayerGame",      &g_mainMenu.main1PlayerGame});
+    m_engineMap.insert({"menu.main.mainMultiplayerGame",  &g_mainMenu.mainMultiplayerGame});
+    m_engineMap.insert({"menu.main.mainBattleGame",       &g_mainMenu.mainBattleGame});
+    m_engineMap.insert({"menu.main.mainEditor",           &g_mainMenu.mainEditor});
+    m_engineMap.insert({"menu.main.mainOptions",          &g_mainMenu.mainOptions});
+    m_engineMap.insert({"menu.main.mainExit",             &g_mainMenu.mainExit});
 
-        {"languageName",                   &g_mainMenu.languageName},
-        {"pluralRules",                    &g_mainMenu.pluralRules},
+    m_engineMap.insert({"menu.loading",                   &g_mainMenu.loading});
 
-        {"menu.editor.battles",            &g_mainMenu.editorBattles},
-        {"menu.editor.newWorld",           &g_mainMenu.editorNewWorld},
-        {"menu.editor.makeFor",            &g_mainMenu.editorMakeFor},
-        {"menu.editor.errorMissingResources", &g_mainMenu.editorErrorMissingResources},
-        {"menu.editor.promptNewWorldName", &g_mainMenu.editorPromptNewWorldName},
+    m_engineMap.insert({"languageName",                   &g_mainMenu.languageName});
+    m_engineMap.insert({"pluralRules",                    &g_mainMenu.pluralRules});
 
-        {"menu.game.gameNoEpisodesToPlay", &g_mainMenu.gameNoEpisodesToPlay},
-        {"menu.game.gameNoBattleLevels",   &g_mainMenu.gameNoBattleLevels},
-        {"menu.game.gameBattleRandom",     &g_mainMenu.gameBattleRandom},
+    m_engineMap.insert({"menu.editor.battles",            &g_mainMenu.editorBattles});
+    m_engineMap.insert({"menu.editor.newWorld",           &g_mainMenu.editorNewWorld});
+    m_engineMap.insert({"menu.editor.makeFor",            &g_mainMenu.editorMakeFor});
+    m_engineMap.insert({"menu.editor.errorMissingResources", &g_mainMenu.editorErrorMissingResources});
+    m_engineMap.insert({"menu.editor.promptNewWorldName", &g_mainMenu.editorPromptNewWorldName});
 
-        {"menu.game.warnEpCompat",         &g_mainMenu.warnEpCompat},
+    m_engineMap.insert({"menu.game.gameNoEpisodesToPlay", &g_mainMenu.gameNoEpisodesToPlay});
+    m_engineMap.insert({"menu.game.gameNoBattleLevels",   &g_mainMenu.gameNoBattleLevels});
+    m_engineMap.insert({"menu.game.gameBattleRandom",     &g_mainMenu.gameBattleRandom});
 
-        {"menu.game.gameSlotContinue",     &g_mainMenu.gameSlotContinue},
-        {"menu.game.gameSlotNew",          &g_mainMenu.gameSlotNew},
+    m_engineMap.insert({"menu.game.warnEpCompat",         &g_mainMenu.warnEpCompat});
 
-        {"menu.game.gameCopySave",         &g_mainMenu.gameCopySave},
-        {"menu.game.gameEraseSave",        &g_mainMenu.gameEraseSave},
+    m_engineMap.insert({"menu.game.gameSlotContinue",     &g_mainMenu.gameSlotContinue});
+    m_engineMap.insert({"menu.game.gameSlotNew",          &g_mainMenu.gameSlotNew});
 
-        {"menu.game.gameSourceSlot",       &g_mainMenu.gameSourceSlot},
-        {"menu.game.gameTargetSlot",       &g_mainMenu.gameTargetSlot},
-        {"menu.game.gameEraseSlot",        &g_mainMenu.gameEraseSlot},
+    m_engineMap.insert({"menu.game.gameCopySave",         &g_mainMenu.gameCopySave});
+    m_engineMap.insert({"menu.game.gameEraseSave",        &g_mainMenu.gameEraseSave});
 
-        {"menu.game.phraseScore",          &g_mainMenu.phraseScore},
-        {"menu.game.phraseTime",           &g_mainMenu.phraseTime},
+    m_engineMap.insert({"menu.game.gameSourceSlot",       &g_mainMenu.gameSourceSlot});
+    m_engineMap.insert({"menu.game.gameTargetSlot",       &g_mainMenu.gameTargetSlot});
+    m_engineMap.insert({"menu.game.gameEraseSlot",        &g_mainMenu.gameEraseSlot});
 
-        {"menu.battle.errorNoLevels",      &g_mainMenu.errorBattleNoLevels},
+    m_engineMap.insert({"menu.game.phraseScore",          &g_mainMenu.phraseScore});
+    m_engineMap.insert({"menu.game.phraseTime",           &g_mainMenu.phraseTime});
 
-        {"menu.options.restartEngine",           &g_mainMenu.optionsRestartEngine},
+    m_engineMap.insert({"menu.battle.errorNoLevels",      &g_mainMenu.errorBattleNoLevels});
 
-        {"menu.character.charSelTitle",    &g_mainMenu.connectCharSelTitle},
-        {"menu.character.startGame",       &g_mainMenu.connectStartGame},
-        {"menu.character.selectCharacter", &g_mainMenu.selectCharacter},
+    m_engineMap.insert({"menu.options.restartEngine",           &g_mainMenu.optionsRestartEngine});
+
+    m_engineMap.insert({"menu.character.charSelTitle",    &g_mainMenu.connectCharSelTitle});
+    m_engineMap.insert({"menu.character.startGame",       &g_mainMenu.connectStartGame});
+    m_engineMap.insert({"menu.character.selectCharacter", &g_mainMenu.selectCharacter});
 
 
-        {"menu.controls.controlsTitle",     &g_mainMenu.controlsTitle},
-        {"menu.controls.controlsConnected", &g_mainMenu.controlsConnected},
-        {"menu.controls.controlsDeleteKey", &g_mainMenu.controlsDeleteKey},
-        {"menu.controls.controlsDeviceTypes", &g_mainMenu.controlsDeviceTypes},
-        {"menu.controls.controlsInUse", &g_mainMenu.controlsInUse},
-        {"menu.controls.controlsNotInUse", &g_mainMenu.controlsNotInUse},
+    m_engineMap.insert({"menu.controls.controlsTitle",     &g_mainMenu.controlsTitle});
+    m_engineMap.insert({"menu.controls.controlsConnected", &g_mainMenu.controlsConnected});
+    m_engineMap.insert({"menu.controls.controlsDeleteKey", &g_mainMenu.controlsDeleteKey});
+    m_engineMap.insert({"menu.controls.controlsDeviceTypes", &g_mainMenu.controlsDeviceTypes});
+    m_engineMap.insert({"menu.controls.controlsInUse", &g_mainMenu.controlsInUse});
+    m_engineMap.insert({"menu.controls.controlsNotInUse", &g_mainMenu.controlsNotInUse});
 
-        {"menu.controls.wordProfiles", &g_mainMenu.wordProfiles},
-        {"menu.controls.wordButtons", &g_mainMenu.wordButtons},
+    m_engineMap.insert({"menu.controls.wordProfiles", &g_mainMenu.wordProfiles});
+    m_engineMap.insert({"menu.controls.wordButtons", &g_mainMenu.wordButtons});
 
-        {"menu.controls.controlsReallyDeleteProfile", &g_mainMenu.controlsReallyDeleteProfile},
-        {"menu.controls.controlsNewProfile", &g_mainMenu.controlsNewProfile},
-        {"menu.controls.caseInvalid",        &g_controlsStrings.sharedCaseInvalid},
+    m_engineMap.insert({"menu.controls.controlsReallyDeleteProfile", &g_mainMenu.controlsReallyDeleteProfile});
+    m_engineMap.insert({"menu.controls.controlsNewProfile", &g_mainMenu.controlsNewProfile});
+    m_engineMap.insert({"menu.controls.caseInvalid",        &g_controlsStrings.sharedCaseInvalid});
 
-        {"menu.controls.profile.activateProfile", &g_mainMenu.controlsActivateProfile},
-        {"menu.controls.profile.renameProfile",   &g_mainMenu.controlsRenameProfile},
-        {"menu.controls.profile.deleteProfile",   &g_mainMenu.controlsDeleteProfile},
-        {"menu.controls.profile.playerControls",  &g_mainMenu.controlsPlayerControls},
-        {"menu.controls.profile.cursorControls",  &g_mainMenu.controlsCursorControls},
-        {"menu.controls.profile.editorControls",  &g_mainMenu.controlsEditorControls},
-        {"menu.controls.profile.hotkeys",         &g_mainMenu.controlsHotkeys},
+    m_engineMap.insert({"menu.controls.profile.activateProfile", &g_mainMenu.controlsActivateProfile});
+    m_engineMap.insert({"menu.controls.profile.renameProfile",   &g_mainMenu.controlsRenameProfile});
+    m_engineMap.insert({"menu.controls.profile.deleteProfile",   &g_mainMenu.controlsDeleteProfile});
+    m_engineMap.insert({"menu.controls.profile.playerControls",  &g_mainMenu.controlsPlayerControls});
+    m_engineMap.insert({"menu.controls.profile.cursorControls",  &g_mainMenu.controlsCursorControls});
+    m_engineMap.insert({"menu.controls.profile.editorControls",  &g_mainMenu.controlsEditorControls});
+    m_engineMap.insert({"menu.controls.profile.hotkeys",         &g_mainMenu.controlsHotkeys});
 
-        {"menu.controls.options.rumble",            &g_mainMenu.controlsOptionRumble},
-        {"menu.controls.options.batteryStatus",     &g_mainMenu.controlsOptionBatteryStatus},
-        {"menu.controls.options.maxPlayers",        &g_controlsStrings.sharedOptionMaxPlayers},
+    m_engineMap.insert({"menu.controls.options.rumble",            &g_mainMenu.controlsOptionRumble});
+    m_engineMap.insert({"menu.controls.options.batteryStatus",     &g_mainMenu.controlsOptionBatteryStatus});
+    m_engineMap.insert({"menu.controls.options.maxPlayers",        &g_controlsStrings.sharedOptionMaxPlayers});
 
-        {"menu.controls.buttons.up",      &Controls::PlayerControls::g_button_name_UI[Controls::PlayerControls::Up]},
-        {"menu.controls.buttons.down",    &Controls::PlayerControls::g_button_name_UI[Controls::PlayerControls::Down]},
-        {"menu.controls.buttons.left",    &Controls::PlayerControls::g_button_name_UI[Controls::PlayerControls::Left]},
-        {"menu.controls.buttons.right",   &Controls::PlayerControls::g_button_name_UI[Controls::PlayerControls::Right]},
-        {"menu.controls.buttons.jump",    &Controls::PlayerControls::g_button_name_UI[Controls::PlayerControls::Jump]},
-        {"menu.controls.buttons.run",     &Controls::PlayerControls::g_button_name_UI[Controls::PlayerControls::Run]},
-        {"menu.controls.buttons.altJump", &Controls::PlayerControls::g_button_name_UI[Controls::PlayerControls::AltJump]},
-        {"menu.controls.buttons.altRun",  &Controls::PlayerControls::g_button_name_UI[Controls::PlayerControls::AltRun]},
-        {"menu.controls.buttons.start",   &Controls::PlayerControls::g_button_name_UI[Controls::PlayerControls::Start]},
-        {"menu.controls.buttons.drop",    &Controls::PlayerControls::g_button_name_UI[Controls::PlayerControls::Drop]},
+    m_engineMap.insert({"menu.controls.buttons.up",      &Controls::PlayerControls::g_button_name_UI[Controls::PlayerControls::Up]});
+    m_engineMap.insert({"menu.controls.buttons.down",    &Controls::PlayerControls::g_button_name_UI[Controls::PlayerControls::Down]});
+    m_engineMap.insert({"menu.controls.buttons.left",    &Controls::PlayerControls::g_button_name_UI[Controls::PlayerControls::Left]});
+    m_engineMap.insert({"menu.controls.buttons.right",   &Controls::PlayerControls::g_button_name_UI[Controls::PlayerControls::Right]});
+    m_engineMap.insert({"menu.controls.buttons.jump",    &Controls::PlayerControls::g_button_name_UI[Controls::PlayerControls::Jump]});
+    m_engineMap.insert({"menu.controls.buttons.run",     &Controls::PlayerControls::g_button_name_UI[Controls::PlayerControls::Run]});
+    m_engineMap.insert({"menu.controls.buttons.altJump", &Controls::PlayerControls::g_button_name_UI[Controls::PlayerControls::AltJump]});
+    m_engineMap.insert({"menu.controls.buttons.altRun",  &Controls::PlayerControls::g_button_name_UI[Controls::PlayerControls::AltRun]});
+    m_engineMap.insert({"menu.controls.buttons.start",   &Controls::PlayerControls::g_button_name_UI[Controls::PlayerControls::Start]});
+    m_engineMap.insert({"menu.controls.buttons.drop",    &Controls::PlayerControls::g_button_name_UI[Controls::PlayerControls::Drop]});
 
-        {"menu.controls.cursor.up",        &Controls::CursorControls::g_button_name_UI[Controls::CursorControls::CursorUp]},
-        {"menu.controls.cursor.down",      &Controls::CursorControls::g_button_name_UI[Controls::CursorControls::CursorDown]},
-        {"menu.controls.cursor.left",      &Controls::CursorControls::g_button_name_UI[Controls::CursorControls::CursorLeft]},
-        {"menu.controls.cursor.right",     &Controls::CursorControls::g_button_name_UI[Controls::CursorControls::CursorRight]},
-        {"menu.controls.cursor.primary",   &Controls::CursorControls::g_button_name_UI[Controls::CursorControls::Primary]},
-        {"menu.controls.cursor.secondary", &Controls::CursorControls::g_button_name_UI[Controls::CursorControls::Secondary]},
-        {"menu.controls.cursor.tertiary",  &Controls::CursorControls::g_button_name_UI[Controls::CursorControls::Tertiary]},
+    m_engineMap.insert({"menu.controls.cursor.up",        &Controls::CursorControls::g_button_name_UI[Controls::CursorControls::CursorUp]});
+    m_engineMap.insert({"menu.controls.cursor.down",      &Controls::CursorControls::g_button_name_UI[Controls::CursorControls::CursorDown]});
+    m_engineMap.insert({"menu.controls.cursor.left",      &Controls::CursorControls::g_button_name_UI[Controls::CursorControls::CursorLeft]});
+    m_engineMap.insert({"menu.controls.cursor.right",     &Controls::CursorControls::g_button_name_UI[Controls::CursorControls::CursorRight]});
+    m_engineMap.insert({"menu.controls.cursor.primary",   &Controls::CursorControls::g_button_name_UI[Controls::CursorControls::Primary]});
+    m_engineMap.insert({"menu.controls.cursor.secondary", &Controls::CursorControls::g_button_name_UI[Controls::CursorControls::Secondary]});
+    m_engineMap.insert({"menu.controls.cursor.tertiary",  &Controls::CursorControls::g_button_name_UI[Controls::CursorControls::Tertiary]});
 
-        {"menu.controls.editor.scrollUp",      &Controls::EditorControls::g_button_name_UI[Controls::EditorControls::ScrollUp]},
-        {"menu.controls.editor.scrollDown",    &Controls::EditorControls::g_button_name_UI[Controls::EditorControls::ScrollDown]},
-        {"menu.controls.editor.scrollLeft",    &Controls::EditorControls::g_button_name_UI[Controls::EditorControls::ScrollLeft]},
-        {"menu.controls.editor.scrollRight",   &Controls::EditorControls::g_button_name_UI[Controls::EditorControls::ScrollRight]},
-        {"menu.controls.editor.fastScroll",    &Controls::EditorControls::g_button_name_UI[Controls::EditorControls::FastScroll]},
-        {"menu.controls.editor.modeSelect",    &Controls::EditorControls::g_button_name_UI[Controls::EditorControls::ModeSelect]},
-        {"menu.controls.editor.modeErase",     &Controls::EditorControls::g_button_name_UI[Controls::EditorControls::ModeErase]},
-        {"menu.controls.editor.prevSection",   &Controls::EditorControls::g_button_name_UI[Controls::EditorControls::PrevSection]},
-        {"menu.controls.editor.nextSection",   &Controls::EditorControls::g_button_name_UI[Controls::EditorControls::NextSection]},
-        {"menu.controls.editor.switchScreens", &Controls::EditorControls::g_button_name_UI[Controls::EditorControls::SwitchScreens]},
-        {"menu.controls.editor.testPlay",      &Controls::EditorControls::g_button_name_UI[Controls::EditorControls::TestPlay]},
+    m_engineMap.insert({"menu.controls.editor.scrollUp",      &Controls::EditorControls::g_button_name_UI[Controls::EditorControls::ScrollUp]});
+    m_engineMap.insert({"menu.controls.editor.scrollDown",    &Controls::EditorControls::g_button_name_UI[Controls::EditorControls::ScrollDown]});
+    m_engineMap.insert({"menu.controls.editor.scrollLeft",    &Controls::EditorControls::g_button_name_UI[Controls::EditorControls::ScrollLeft]});
+    m_engineMap.insert({"menu.controls.editor.scrollRight",   &Controls::EditorControls::g_button_name_UI[Controls::EditorControls::ScrollRight]});
+    m_engineMap.insert({"menu.controls.editor.fastScroll",    &Controls::EditorControls::g_button_name_UI[Controls::EditorControls::FastScroll]});
+    m_engineMap.insert({"menu.controls.editor.modeSelect",    &Controls::EditorControls::g_button_name_UI[Controls::EditorControls::ModeSelect]});
+    m_engineMap.insert({"menu.controls.editor.modeErase",     &Controls::EditorControls::g_button_name_UI[Controls::EditorControls::ModeErase]});
+    m_engineMap.insert({"menu.controls.editor.prevSection",   &Controls::EditorControls::g_button_name_UI[Controls::EditorControls::PrevSection]});
+    m_engineMap.insert({"menu.controls.editor.nextSection",   &Controls::EditorControls::g_button_name_UI[Controls::EditorControls::NextSection]});
+    m_engineMap.insert({"menu.controls.editor.switchScreens", &Controls::EditorControls::g_button_name_UI[Controls::EditorControls::SwitchScreens]});
+    m_engineMap.insert({"menu.controls.editor.testPlay",      &Controls::EditorControls::g_button_name_UI[Controls::EditorControls::TestPlay]});
 
 #ifndef RENDER_FULLSCREEN_ALWAYS
-        {"menu.controls.hotkeys.fullscreen",  &Controls::Hotkeys::g_button_name_UI[Controls::Hotkeys::Fullscreen]},
+    m_engineMap.insert({"menu.controls.hotkeys.fullscreen",  &Controls::Hotkeys::g_button_name_UI[Controls::Hotkeys::Fullscreen]});
 #endif
 #ifdef USE_SCREENSHOTS_AND_RECS
-        {"menu.controls.hotkeys.screenshot",  &Controls::Hotkeys::g_button_name_UI[Controls::Hotkeys::Screenshot]},
+    m_engineMap.insert({"menu.controls.hotkeys.screenshot",  &Controls::Hotkeys::g_button_name_UI[Controls::Hotkeys::Screenshot]});
 #endif
 #ifdef PGE_ENABLE_VIDEO_REC
-        {"menu.controls.hotkeys.recordGif",   &Controls::Hotkeys::g_button_name_UI[Controls::Hotkeys::RecordGif]},
+    m_engineMap.insert({"menu.controls.hotkeys.recordGif",   &Controls::Hotkeys::g_button_name_UI[Controls::Hotkeys::RecordGif]});
 #endif
-        {"menu.controls.hotkeys.debugInfo",   &Controls::Hotkeys::g_button_name_UI[Controls::Hotkeys::DebugInfo]},
-        {"menu.controls.hotkeys.vanillaCam",  &Controls::Hotkeys::g_button_name_UI[Controls::Hotkeys::VanillaCam]},
-        {"menu.controls.hotkeys.enterCheats", &Controls::Hotkeys::g_button_name_UI[Controls::Hotkeys::EnterCheats]},
-        {"menu.controls.hotkeys.toggleHUD",   &Controls::Hotkeys::g_button_name_UI[Controls::Hotkeys::ToggleHUD]},
-        {"menu.controls.hotkeys.legacyPause", &Controls::Hotkeys::g_button_name_UI[Controls::Hotkeys::LegacyPause]},
+    m_engineMap.insert({"menu.controls.hotkeys.debugInfo",   &Controls::Hotkeys::g_button_name_UI[Controls::Hotkeys::DebugInfo]});
+    m_engineMap.insert({"menu.controls.hotkeys.vanillaCam",  &Controls::Hotkeys::g_button_name_UI[Controls::Hotkeys::VanillaCam]});
+    m_engineMap.insert({"menu.controls.hotkeys.enterCheats", &Controls::Hotkeys::g_button_name_UI[Controls::Hotkeys::EnterCheats]});
+    m_engineMap.insert({"menu.controls.hotkeys.toggleHUD",   &Controls::Hotkeys::g_button_name_UI[Controls::Hotkeys::ToggleHUD]});
+    m_engineMap.insert({"menu.controls.hotkeys.legacyPause", &Controls::Hotkeys::g_button_name_UI[Controls::Hotkeys::LegacyPause]});
 
 #ifdef CONTROLS_KEYBOARD_STRINGS
-        {"menu.controls.types.keyboard",    &g_controlsStrings.nameKeyboard},
-        {"menu.controls.options.textEntryStyle",    &g_controlsStrings.keyboardOptionTextEntryStyle},
-        {"menu.controls.caseMouse",         &g_controlsStrings.caseMouse},
+    m_engineMap.insert({"menu.controls.types.keyboard",    &g_controlsStrings.nameKeyboard});
+    m_engineMap.insert({"menu.controls.options.textEntryStyle",    &g_controlsStrings.keyboardOptionTextEntryStyle});
+    m_engineMap.insert({"menu.controls.caseMouse",         &g_controlsStrings.caseMouse});
 #endif
 
 #if defined(CONTROLS_KEYBOARD_STRINGS) || defined(CONTROLS_JOYSTICK_STRINGS)
-        {"menu.controls.types.gamepad",     &g_controlsStrings.nameGamepad},
+    m_engineMap.insert({"menu.controls.types.gamepad",     &g_controlsStrings.nameGamepad});
 #endif
 
 #if defined(CONTROLS_JOYSTICK_STRINGS)
-        {"menu.controls.phraseNewProfOldJoy",&g_controlsStrings.phraseNewProfOldJoy},
-        {"menu.controls.joystickSimpleEditor",&g_controlsStrings.joystickSimpleEditor},
-        {"menu.controls.types.oldJoystick", &g_controlsStrings.nameOldJoy},
+    m_engineMap.insert({"menu.controls.phraseNewProfOldJoy",&g_controlsStrings.phraseNewProfOldJoy});
+    m_engineMap.insert({"menu.controls.joystickSimpleEditor",&g_controlsStrings.joystickSimpleEditor});
+    m_engineMap.insert({"menu.controls.types.oldJoystick", &g_controlsStrings.nameOldJoy});
 #endif
 
 #if defined(CONTROLS_TOUCHSCREEN_STRINGS)
-        {"menu.controls.types.touchscreen", &g_controlsStrings.nameTouchscreen},
+    m_engineMap.insert({"menu.controls.types.touchscreen", &g_controlsStrings.nameTouchscreen});
 
-        {"menu.controls.caseTouch",         &g_controlsStrings.caseTouch},
+    m_engineMap.insert({"menu.controls.caseTouch",         &g_controlsStrings.caseTouch});
 
-        {"menu.controls.touchscreen.option.layoutStyle",    &g_controlsStrings.touchscreenOptionLayoutStyle},
-        {"menu.controls.touchscreen.option.scaleFactor",    &g_controlsStrings.touchscreenOptionScaleFactor},
-        {"menu.controls.touchscreen.option.scaleDPad",      &g_controlsStrings.touchscreenOptionScaleDPad},
-        {"menu.controls.touchscreen.option.scaleButtons",   &g_controlsStrings.touchscreenOptionScaleButtons},
-        {"menu.controls.touchscreen.option.sStartSpacing",  &g_controlsStrings.touchscreenOptionSStartSpacing},
-        {"menu.controls.touchscreen.option.resetLayout",    &g_controlsStrings.touchscreenOptionResetLayout},
-        {"menu.controls.touchscreen.option.interfaceStyle", &g_controlsStrings.touchscreenOptionInterfaceStyle},
-        {"menu.controls.touchscreen.option.feedbackStrength", &g_controlsStrings.touchscreenOptionFeedbackStrength},
-        {"menu.controls.touchscreen.option.feedbackLength", &g_controlsStrings.touchscreenOptionFeedbackLength},
-        {"menu.controls.touchscreen.option.holdRun",        &g_controlsStrings.touchscreenOptionHoldRun},
-        {"menu.controls.touchscreen.option.showCodeButton", &g_controlsStrings.touchscreenOptionShowCodeButton},
+    m_engineMap.insert({"menu.controls.touchscreen.option.layoutStyle",    &g_controlsStrings.touchscreenOptionLayoutStyle});
+    m_engineMap.insert({"menu.controls.touchscreen.option.scaleFactor",    &g_controlsStrings.touchscreenOptionScaleFactor});
+    m_engineMap.insert({"menu.controls.touchscreen.option.scaleDPad",      &g_controlsStrings.touchscreenOptionScaleDPad});
+    m_engineMap.insert({"menu.controls.touchscreen.option.scaleButtons",   &g_controlsStrings.touchscreenOptionScaleButtons});
+    m_engineMap.insert({"menu.controls.touchscreen.option.sStartSpacing",  &g_controlsStrings.touchscreenOptionSStartSpacing});
+    m_engineMap.insert({"menu.controls.touchscreen.option.resetLayout",    &g_controlsStrings.touchscreenOptionResetLayout});
+    m_engineMap.insert({"menu.controls.touchscreen.option.interfaceStyle", &g_controlsStrings.touchscreenOptionInterfaceStyle});
+    m_engineMap.insert({"menu.controls.touchscreen.option.feedbackStrength", &g_controlsStrings.touchscreenOptionFeedbackStrength});
+    m_engineMap.insert({"menu.controls.touchscreen.option.feedbackLength", &g_controlsStrings.touchscreenOptionFeedbackLength});
+    m_engineMap.insert({"menu.controls.touchscreen.option.holdRun",        &g_controlsStrings.touchscreenOptionHoldRun});
+    m_engineMap.insert({"menu.controls.touchscreen.option.showCodeButton", &g_controlsStrings.touchscreenOptionShowCodeButton},
 
 
-        {"menu.controls.touchscreen.layout.tight",          &g_controlsStrings.touchscreenLayoutTight},
-        {"menu.controls.touchscreen.layout.tinyOld",        &g_controlsStrings.touchscreenLayoutTinyOld},
-        {"menu.controls.touchscreen.layout.phoneOld",       &g_controlsStrings.touchscreenLayoutPhoneOld},
-        {"menu.controls.touchscreen.layout.longOld",        &g_controlsStrings.touchscreenLayoutLongOld},
-        {"menu.controls.touchscreen.layout.phabletOld",     &g_controlsStrings.touchscreenLayoutPhabletOld},
-        {"menu.controls.touchscreen.layout.tabletOld",      &g_controlsStrings.touchscreenLayoutTabletOld},
-        {"menu.controls.touchscreen.layout.standard",       &g_controlsStrings.touchscreenLayoutStandard},
+    m_engineMap.insert({"menu.controls.touchscreen.layout.tight",          &g_controlsStrings.touchscreenLayoutTight});
+    m_engineMap.insert({"menu.controls.touchscreen.layout.tinyOld",        &g_controlsStrings.touchscreenLayoutTinyOld});
+    m_engineMap.insert({"menu.controls.touchscreen.layout.phoneOld",       &g_controlsStrings.touchscreenLayoutPhoneOld});
+    m_engineMap.insert({"menu.controls.touchscreen.layout.longOld",        &g_controlsStrings.touchscreenLayoutLongOld});
+    m_engineMap.insert({"menu.controls.touchscreen.layout.phabletOld",     &g_controlsStrings.touchscreenLayoutPhabletOld});
+    m_engineMap.insert({"menu.controls.touchscreen.layout.tabletOld",      &g_controlsStrings.touchscreenLayoutTabletOld});
+    m_engineMap.insert({"menu.controls.touchscreen.layout.standard",       &g_controlsStrings.touchscreenLayoutStandard});
 
-        {"menu.controls.touchscreen.style.actions",         &g_controlsStrings.touchscreenStyleActions},
-        {"menu.controls.touchscreen.style.ABXY",            &g_controlsStrings.touchscreenStyleABXY},
-        {"menu.controls.touchscreen.style.XODA",            &g_controlsStrings.touchscreenStyleXODA},
+    m_engineMap.insert({"menu.controls.touchscreen.style.actions",         &g_controlsStrings.touchscreenStyleActions});
+    m_engineMap.insert({"menu.controls.touchscreen.style.ABXY",            &g_controlsStrings.touchscreenStyleABXY});
+    m_engineMap.insert({"menu.controls.touchscreen.style.XODA",            &g_controlsStrings.touchscreenStyleXODA});
 #endif // #if defined(CONTROLS_TOUCHSCREEN_STRINGS)
 
 #if defined(CONTROLS_16M_STRINGS)
-        {"menu.controls.tDS.buttonA",      &g_controlsStrings.tdsButtonA},
-        {"menu.controls.tDS.buttonB",      &g_controlsStrings.tdsButtonB},
-        {"menu.controls.tDS.buttonX",      &g_controlsStrings.tdsButtonX},
-        {"menu.controls.tDS.buttonY",      &g_controlsStrings.tdsButtonY},
-        {"menu.controls.tDS.buttonL",      &g_controlsStrings.tdsButtonL},
-        {"menu.controls.tDS.buttonR",      &g_controlsStrings.tdsButtonR},
-        {"menu.controls.tDS.buttonSelect", &g_controlsStrings.tdsButtonSelect},
-        {"menu.controls.tDS.buttonStart",  &g_controlsStrings.tdsButtonStart},
+    m_engineMap.insert({"menu.controls.tDS.buttonA",      &g_controlsStrings.tdsButtonA});
+    m_engineMap.insert({"menu.controls.tDS.buttonB",      &g_controlsStrings.tdsButtonB});
+    m_engineMap.insert({"menu.controls.tDS.buttonX",      &g_controlsStrings.tdsButtonX});
+    m_engineMap.insert({"menu.controls.tDS.buttonY",      &g_controlsStrings.tdsButtonY});
+    m_engineMap.insert({"menu.controls.tDS.buttonL",      &g_controlsStrings.tdsButtonL});
+    m_engineMap.insert({"menu.controls.tDS.buttonR",      &g_controlsStrings.tdsButtonR});
+    m_engineMap.insert({"menu.controls.tDS.buttonSelect", &g_controlsStrings.tdsButtonSelect});
+    m_engineMap.insert({"menu.controls.tDS.buttonStart",  &g_controlsStrings.tdsButtonStart});
 
-        {"menu.controls.tDS.casePen",      &g_controlsStrings.tdsCasePen},
+    m_engineMap.insert({"menu.controls.tDS.casePen",      &g_controlsStrings.tdsCasePen});
 #endif // #ifdef CONTROLS_16M_STRINGS
 
 #if defined(CONTROLS_3DS_STRINGS)
-        {"menu.controls.tDS.buttonZL",     &g_controlsStrings.tdsButtonZL},
-        {"menu.controls.tDS.buttonZR",     &g_controlsStrings.tdsButtonZR},
-        {"menu.controls.tDS.dPad",         &g_controlsStrings.tdsDpad},
-        {"menu.controls.tDS.tStick",       &g_controlsStrings.tdsTstick},
-        {"menu.controls.tDS.cStick",       &g_controlsStrings.tdsCstick},
+    m_engineMap.insert({"menu.controls.tDS.buttonZL",     &g_controlsStrings.tdsButtonZL});
+    m_engineMap.insert({"menu.controls.tDS.buttonZR",     &g_controlsStrings.tdsButtonZR});
+    m_engineMap.insert({"menu.controls.tDS.dPad",         &g_controlsStrings.tdsDpad});
+    m_engineMap.insert({"menu.controls.tDS.tStick",       &g_controlsStrings.tdsTstick});
+    m_engineMap.insert({"menu.controls.tDS.cStick",       &g_controlsStrings.tdsCstick});
 #endif // #ifdef CONTROLS_3DS_STRINGS
 
 #if defined(CONTROLS_WII_STRINGS)
-        {"menu.controls.wii.typeWiimote",         &g_controlsStrings.wiiTypeWiimote},
-        {"menu.controls.wii.typeNunchuck",        &g_controlsStrings.wiiTypeNunchuck},
-        {"menu.controls.wii.typeClassic",         &g_controlsStrings.wiiTypeClassic},
-        {"menu.controls.wii.phraseNewNunchuck",   &g_controlsStrings.wiiPhraseNewNunchuck},
-        {"menu.controls.wii.phraseNewClassic",    &g_controlsStrings.wiiPhraseNewClassic},
+    m_engineMap.insert({"menu.controls.wii.typeWiimote",         &g_controlsStrings.wiiTypeWiimote});
+    m_engineMap.insert({"menu.controls.wii.typeNunchuck",        &g_controlsStrings.wiiTypeNunchuck});
+    m_engineMap.insert({"menu.controls.wii.typeClassic",         &g_controlsStrings.wiiTypeClassic});
+    m_engineMap.insert({"menu.controls.wii.phraseNewNunchuck",   &g_controlsStrings.wiiPhraseNewNunchuck});
+    m_engineMap.insert({"menu.controls.wii.phraseNewClassic",    &g_controlsStrings.wiiPhraseNewClassic});
 
-        {"menu.controls.wii.wiimote.dPad",        &g_controlsStrings.wiiDpad},
-        {"menu.controls.wii.wiimote.buttonA",     &g_controlsStrings.wiiButtonA},
-        {"menu.controls.wii.wiimote.buttonB",     &g_controlsStrings.wiiButtonB},
-        {"menu.controls.wii.wiimote.buttonMinus", &g_controlsStrings.wiiButtonMinus},
-        {"menu.controls.wii.wiimote.buttonPlus",  &g_controlsStrings.wiiButtonPlus},
-        {"menu.controls.wii.wiimote.buttonHome",  &g_controlsStrings.wiiButtonHome},
-        {"menu.controls.wii.wiimote.button2",     &g_controlsStrings.wiiButton2},
-        {"menu.controls.wii.wiimote.button1",     &g_controlsStrings.wiiButton1},
-        {"menu.controls.wii.wiimote.shake",       &g_controlsStrings.wiiShake},
-        {"menu.controls.wii.wiimote.caseIR",      &g_controlsStrings.wiiCaseIR},
+    m_engineMap.insert({"menu.controls.wii.wiimote.dPad",        &g_controlsStrings.wiiDpad});
+    m_engineMap.insert({"menu.controls.wii.wiimote.buttonA",     &g_controlsStrings.wiiButtonA});
+    m_engineMap.insert({"menu.controls.wii.wiimote.buttonB",     &g_controlsStrings.wiiButtonB});
+    m_engineMap.insert({"menu.controls.wii.wiimote.buttonMinus", &g_controlsStrings.wiiButtonMinus});
+    m_engineMap.insert({"menu.controls.wii.wiimote.buttonPlus",  &g_controlsStrings.wiiButtonPlus});
+    m_engineMap.insert({"menu.controls.wii.wiimote.buttonHome",  &g_controlsStrings.wiiButtonHome});
+    m_engineMap.insert({"menu.controls.wii.wiimote.button2",     &g_controlsStrings.wiiButton2});
+    m_engineMap.insert({"menu.controls.wii.wiimote.button1",     &g_controlsStrings.wiiButton1});
+    m_engineMap.insert({"menu.controls.wii.wiimote.shake",       &g_controlsStrings.wiiShake});
+    m_engineMap.insert({"menu.controls.wii.wiimote.caseIR",      &g_controlsStrings.wiiCaseIR});
 
-        {"menu.controls.wii.nunchuck.prefixN",    &g_controlsStrings.wiiPrefixNunchuck},
-        {"menu.controls.wii.nunchuck.buttonZ",    &g_controlsStrings.wiiButtonZ},
-        {"menu.controls.wii.nunchuck.buttonC",    &g_controlsStrings.wiiButtonC},
+    m_engineMap.insert({"menu.controls.wii.nunchuck.prefixN",    &g_controlsStrings.wiiPrefixNunchuck});
+    m_engineMap.insert({"menu.controls.wii.nunchuck.buttonZ",    &g_controlsStrings.wiiButtonZ});
+    m_engineMap.insert({"menu.controls.wii.nunchuck.buttonC",    &g_controlsStrings.wiiButtonC});
 
-        {"menu.controls.wii.classic.lStick",      &g_controlsStrings.wiiLStick},
-        {"menu.controls.wii.classic.rStick",      &g_controlsStrings.wiiRStick},
-        {"menu.controls.wii.classic.buttonZL",    &g_controlsStrings.wiiButtonZL},
-        {"menu.controls.wii.classic.buttonZR",    &g_controlsStrings.wiiButtonZR},
-        {"menu.controls.wii.classic.buttonLT",    &g_controlsStrings.wiiButtonLT},
-        {"menu.controls.wii.classic.buttonRT",    &g_controlsStrings.wiiButtonRT},
-        {"menu.controls.wii.classic.buttonX",     &g_controlsStrings.wiiButtonX},
-        {"menu.controls.wii.classic.buttonY",     &g_controlsStrings.wiiButtonY},
+    m_engineMap.insert({"menu.controls.wii.classic.lStick",      &g_controlsStrings.wiiLStick});
+    m_engineMap.insert({"menu.controls.wii.classic.rStick",      &g_controlsStrings.wiiRStick});
+    m_engineMap.insert({"menu.controls.wii.classic.buttonZL",    &g_controlsStrings.wiiButtonZL});
+    m_engineMap.insert({"menu.controls.wii.classic.buttonZR",    &g_controlsStrings.wiiButtonZR});
+    m_engineMap.insert({"menu.controls.wii.classic.buttonLT",    &g_controlsStrings.wiiButtonLT});
+    m_engineMap.insert({"menu.controls.wii.classic.buttonRT",    &g_controlsStrings.wiiButtonRT});
+    m_engineMap.insert({"menu.controls.wii.classic.buttonX",     &g_controlsStrings.wiiButtonX});
+    m_engineMap.insert({"menu.controls.wii.classic.buttonY",     &g_controlsStrings.wiiButtonY});
 
 #endif // #ifdef CONTROLS_WII_STRINGS
 
-        {"menu.wordNo",         &g_mainMenu.wordNo},
-        {"menu.wordYes",        &g_mainMenu.wordYes},
-        {"menu.caseNone",       &g_mainMenu.caseNone},
-        {"menu.wordOn",         &g_mainMenu.wordOn},
-        {"menu.wordOff",        &g_mainMenu.wordOff},
-        {"menu.wordShow",       &g_mainMenu.wordShow},
-        {"menu.wordHide",       &g_mainMenu.wordHide},
-        {"menu.wordPlayer",     &g_mainMenu.wordPlayer},
-        {"menu.wordProfile",    &g_mainMenu.wordProfile},
-        {"menu.wordBack",       &g_mainMenu.wordBack},
-        {"menu.wordResume",     &g_mainMenu.wordResume},
-        {"menu.wordWaiting",    &g_mainMenu.wordWaiting},
-        {"menu.wordLanguage",    &g_mainMenu.wordLanguage},
+    m_engineMap.insert({"menu.wordNo",         &g_mainMenu.wordNo});
+    m_engineMap.insert({"menu.wordYes",        &g_mainMenu.wordYes});
+    m_engineMap.insert({"menu.caseNone",       &g_mainMenu.caseNone});
+    m_engineMap.insert({"menu.wordOn",         &g_mainMenu.wordOn});
+    m_engineMap.insert({"menu.wordOff",        &g_mainMenu.wordOff});
+    m_engineMap.insert({"menu.wordShow",       &g_mainMenu.wordShow});
+    m_engineMap.insert({"menu.wordHide",       &g_mainMenu.wordHide});
+    m_engineMap.insert({"menu.wordPlayer",     &g_mainMenu.wordPlayer});
+    m_engineMap.insert({"menu.wordProfile",    &g_mainMenu.wordProfile});
+    m_engineMap.insert({"menu.wordBack",       &g_mainMenu.wordBack});
+    m_engineMap.insert({"menu.wordResume",     &g_mainMenu.wordResume});
+    m_engineMap.insert({"menu.wordWaiting",    &g_mainMenu.wordWaiting});
+    m_engineMap.insert({"menu.wordLanguage",    &g_mainMenu.wordLanguage});
 
-        {"menu.abbrevMilliseconds", &g_mainMenu.abbrevMilliseconds},
-
-
-        {"outro.gameCredits",           &g_outroScreen.gameCredits},
-        {"outro.engineCredits",         &g_outroScreen.engineCredits},
-        {"outro.originalBy",            &g_outroScreen.originalBy},
-        {"outro.nameAndrewSpinks",      &g_outroScreen.nameAndrewSpinks},
-        {"outro.cppPortDevelopers",     &g_outroScreen.cppPortDevelopers},
-        {"outro.nameVitalyNovichkov",   &g_outroScreen.nameVitalyNovichkov},
-        {"outro.qualityControl",        &g_outroScreen.qualityControl},
-        {"outro.psVitaPortBy",          &g_outroScreen.psVitaPortBy},
-        {"outro.levelDesign",           &g_outroScreen.levelDesign},
-        {"outro.customSprites",         &g_outroScreen.customSprites},
-        {"outro.specialThanks",         &g_outroScreen.specialThanks},
+    m_engineMap.insert({"menu.abbrevMilliseconds", &g_mainMenu.abbrevMilliseconds});
 
 
-        {"game.controls.phrasePlayerDisconnected",  &g_gameStrings.controlsPhrasePlayerDisconnected},
-        {"game.controls.phrasePlayerConnected",     &g_gameStrings.controlsPhrasePlayerConnected},
+    m_engineMap.insert({"outro.gameCredits",           &g_outroScreen.gameCredits});
+    m_engineMap.insert({"outro.engineCredits",         &g_outroScreen.engineCredits});
+    m_engineMap.insert({"outro.originalBy",            &g_outroScreen.originalBy});
+    m_engineMap.insert({"outro.nameAndrewSpinks",      &g_outroScreen.nameAndrewSpinks});
+    m_engineMap.insert({"outro.cppPortDevelopers",     &g_outroScreen.cppPortDevelopers});
+    m_engineMap.insert({"outro.nameVitalyNovichkov",   &g_outroScreen.nameVitalyNovichkov});
+    m_engineMap.insert({"outro.qualityControl",        &g_outroScreen.qualityControl});
+    m_engineMap.insert({"outro.psVitaPortBy",          &g_outroScreen.psVitaPortBy});
+    m_engineMap.insert({"outro.levelDesign",           &g_outroScreen.levelDesign});
+    m_engineMap.insert({"outro.customSprites",         &g_outroScreen.customSprites});
+    m_engineMap.insert({"outro.specialThanks",         &g_outroScreen.specialThanks});
 
-        {"game.msgbox.sysInfoTitle",                &g_gameStrings.msgBoxTitleInfo},
-        {"game.msgbox.sysInfoWarning",              &g_gameStrings.msgBoxTitleWarning},
-        {"game.msgbox.sysInfoError",                &g_gameStrings.msgBoxTitleError},
 
-        {"game.error.openFileFailed",               &g_gameStrings.errorOpenFileFailed},
-        {"game.error.errorInvalidEnterWarp",        &g_gameStrings.errorInvalidEnterWarp},
-        {"game.error.errorNoStartPoint",            &g_gameStrings.errorNoStartPoint},
+    m_engineMap.insert({"game.controls.phrasePlayerDisconnected",  &g_gameStrings.controlsPhrasePlayerDisconnected});
+    m_engineMap.insert({"game.controls.phrasePlayerConnected",     &g_gameStrings.controlsPhrasePlayerConnected});
 
-        {"game.error.warpNeedStarCount",            &g_gameStrings.warpNeedStarCount},
+    m_engineMap.insert({"game.msgbox.sysInfoTitle",                &g_gameStrings.msgBoxTitleInfo});
+    m_engineMap.insert({"game.msgbox.sysInfoWarning",              &g_gameStrings.msgBoxTitleWarning});
+    m_engineMap.insert({"game.msgbox.sysInfoError",                &g_gameStrings.msgBoxTitleError});
 
-        {"game.message.scanningLevels",             &g_gameStrings.messageScanningLevels},
-        {"game.format.minutesSeconds",              &g_gameStrings.formatMinutesSeconds},
+    m_engineMap.insert({"game.error.openFileFailed",               &g_gameStrings.errorOpenFileFailed});
+    m_engineMap.insert({"game.error.errorInvalidEnterWarp",        &g_gameStrings.errorInvalidEnterWarp});
+    m_engineMap.insert({"game.error.errorNoStartPoint",            &g_gameStrings.errorNoStartPoint});
 
-        {"game.pause.continue",             &g_gameStrings.pauseItemContinue},
-        {"game.pause.restartLevel",         &g_gameStrings.pauseItemRestartLevel},
-        {"game.pause.resetCheckpoints",     &g_gameStrings.pauseItemResetCheckpoints},
-        {"game.pause.quitTesting",          &g_gameStrings.pauseItemQuitTesting},
-        {"game.pause.returnToEditor",       &g_gameStrings.pauseItemReturnToEditor},
-        {"game.pause.playerSetup",          &g_gameStrings.pauseItemPlayerSetup},
-        {"game.pause.enterCode",            &g_gameStrings.pauseItemEnterCode},
-        {"game.pause.saveAndContinue",      &g_gameStrings.pauseItemSaveAndContinue},
-        {"game.pause.saveAndQuit",          &g_gameStrings.pauseItemSaveAndQuit},
-        {"game.pause.quit",                 &g_gameStrings.pauseItemQuit},
+    m_engineMap.insert({"game.error.warpNeedStarCount",            &g_gameStrings.warpNeedStarCount});
 
-        {"game.connect.reconnectTitle",            &g_gameStrings.connectReconnectTitle},
+    m_engineMap.insert({"game.message.scanningLevels",             &g_gameStrings.messageScanningLevels});
+    m_engineMap.insert({"game.format.minutesSeconds",              &g_gameStrings.formatMinutesSeconds});
 
-        {"game.connect.phrasePressAButton",        &g_gameStrings.connectPressAButton},
+    m_engineMap.insert({"game.pause.continue",             &g_gameStrings.pauseItemContinue});
+    m_engineMap.insert({"game.pause.restartLevel",         &g_gameStrings.pauseItemRestartLevel});
+    m_engineMap.insert({"game.pause.resetCheckpoints",     &g_gameStrings.pauseItemResetCheckpoints});
+    m_engineMap.insert({"game.pause.quitTesting",          &g_gameStrings.pauseItemQuitTesting});
+    m_engineMap.insert({"game.pause.returnToEditor",       &g_gameStrings.pauseItemReturnToEditor});
+    m_engineMap.insert({"game.pause.playerSetup",          &g_gameStrings.pauseItemPlayerSetup});
+    m_engineMap.insert({"game.pause.enterCode",            &g_gameStrings.pauseItemEnterCode});
+    m_engineMap.insert({"game.pause.saveAndContinue",      &g_gameStrings.pauseItemSaveAndContinue});
+    m_engineMap.insert({"game.pause.saveAndQuit",          &g_gameStrings.pauseItemSaveAndQuit});
+    m_engineMap.insert({"game.pause.quit",                 &g_gameStrings.pauseItemQuit});
 
-        {"game.connect.phraseTestProfile",        &g_gameStrings.connectTestProfile},
-        {"game.connect.phraseHoldStart",           &g_gameStrings.connectHoldStart},
-        {"game.connect.wordDisconnect",            &g_gameStrings.connectDisconnect},
+    m_engineMap.insert({"game.connect.reconnectTitle",            &g_gameStrings.connectReconnectTitle});
 
-        {"game.connect.phraseForceResume",         &g_gameStrings.connectForceResume},
-        {"game.connect.phraseDropPX",              &g_gameStrings.connectDropPX},
+    m_engineMap.insert({"game.connect.phrasePressAButton",        &g_gameStrings.connectPressAButton});
 
-        {"game.connect.phraseWaitingForInput",     &g_gameStrings.connectWaitingForInputDevice},
-        {"game.connect.splitPressSelect_1",        &g_gameStrings.connectPressSelectForControlsOptions_P1},
-        {"game.connect.splitPressSelect_2",        &g_gameStrings.connectPressSelectForControlsOptions_P2},
+    m_engineMap.insert({"game.connect.phraseTestProfile",        &g_gameStrings.connectTestProfile});
+    m_engineMap.insert({"game.connect.phraseHoldStart",           &g_gameStrings.connectHoldStart});
+    m_engineMap.insert({"game.connect.wordDisconnect",            &g_gameStrings.connectDisconnect});
 
-        {"game.connect.phraseChangeChar",          &g_gameStrings.connectChangeChar},
-        {"game.connect.phraseSetControls",         &g_gameStrings.connectSetControls},
-        {"game.connect.phraseDropMe",              &g_gameStrings.connectDropMe},
+    m_engineMap.insert({"game.connect.phraseForceResume",         &g_gameStrings.connectForceResume});
+    m_engineMap.insert({"game.connect.phraseDropPX",              &g_gameStrings.connectDropPX});
 
-        {"game.connect.phraseStartToResume",       &g_gameStrings.connectPressStartToResume},
-        {"game.connect.phraseStartToForceRes",     &g_gameStrings.connectPressStartToForceResume},
+    m_engineMap.insert({"game.connect.phraseWaitingForInput",     &g_gameStrings.connectWaitingForInputDevice});
+    m_engineMap.insert({"game.connect.splitPressSelect_1",        &g_gameStrings.connectPressSelectForControlsOptions_P1});
+    m_engineMap.insert({"game.connect.splitPressSelect_2",        &g_gameStrings.connectPressSelectForControlsOptions_P2});
+
+    m_engineMap.insert({"game.connect.phraseChangeChar",          &g_gameStrings.connectChangeChar});
+    m_engineMap.insert({"game.connect.phraseSetControls",         &g_gameStrings.connectSetControls});
+    m_engineMap.insert({"game.connect.phraseDropMe",              &g_gameStrings.connectDropMe});
+
+    m_engineMap.insert({"game.connect.phraseStartToResume",       &g_gameStrings.connectPressStartToResume});
+    m_engineMap.insert({"game.connect.phraseStartToForceRes",     &g_gameStrings.connectPressStartToForceResume});
 
 #ifdef THEXTECH_ENABLE_EDITOR
-        {"editor.block.pickContents",       &g_editorStrings.pickBlockContents},
+    m_engineMap.insert({"editor.block.pickContents",       &g_editorStrings.pickBlockContents});
 
-        {"editor.block.letterWidth",        &g_editorStrings.blockLetterWidth},
-        {"editor.block.letterHeight",       &g_editorStrings.blockLetterHeight},
-        {"editor.block.canBreak",           &g_editorStrings.blockCanBreak},
-        {"editor.block.canBreakTooltip",    &g_editorStrings.blockTooltipCanBreak},
-        {"editor.block.slick",              &g_editorStrings.blockSlick},
-        {"editor.block.invis",              &g_editorStrings.blockInvis},
-        {"editor.block.inside",             &g_editorStrings.blockInside},
+    m_engineMap.insert({"editor.block.letterWidth",        &g_editorStrings.blockLetterWidth});
+    m_engineMap.insert({"editor.block.letterHeight",       &g_editorStrings.blockLetterHeight});
+    m_engineMap.insert({"editor.block.canBreak",           &g_editorStrings.blockCanBreak});
+    m_engineMap.insert({"editor.block.canBreakTooltip",    &g_editorStrings.blockTooltipCanBreak});
+    m_engineMap.insert({"editor.block.slick",              &g_editorStrings.blockSlick});
+    m_engineMap.insert({"editor.block.invis",              &g_editorStrings.blockInvis});
+    m_engineMap.insert({"editor.block.inside",             &g_editorStrings.blockInside});
 
-        {"editor.warp.title",               &g_editorStrings.warpTitle},
-        {"editor.warp.placing",             &g_editorStrings.warpPlacing},
-        {"editor.warp.in",                  &g_editorStrings.warpIn},
-        {"editor.warp.out",                 &g_editorStrings.warpOut},
-        {"editor.warp.dir",                 &g_editorStrings.warpDir},
-        {"editor.warp.twoWay",              &g_editorStrings.warpTwoWay},
-        {"editor.warp.style.style",         &g_editorStrings.warpStyle},
-        {"editor.warp.style.pipe",          &g_editorStrings.warpStylePipe},
-        {"editor.warp.style.door",          &g_editorStrings.warpStyleDoor},
-        {"editor.warp.style.blipInstant",   &g_editorStrings.warpStyleBlipInstant},
-        {"editor.warp.style.portal",        &g_editorStrings.warpStylePortal},
-        {"editor.warp.effect",              &g_editorStrings.warpEffect},
-        {"editor.warp.allow",               &g_editorStrings.warpAllow},
-        {"editor.warp.item",                &g_editorStrings.warpItem},
-        {"editor.warp.ride",                &g_editorStrings.warpRide},
-        {"editor.warp.cannonExit",          &g_editorStrings.warpCannonExit},
-        {"editor.warp.speed",               &g_editorStrings.warpSpeed},
-        {"editor.warp.needStarCount",       &g_editorStrings.warpNeedStarCount},
-        {"editor.warp.needKey",             &g_editorStrings.warpNeedKey},
-        {"editor.warp.needFloor",           &g_editorStrings.warpNeedFloor},
-        {"editor.warp.starLockMessage",     &g_editorStrings.warpStarLockMessage},
-        {"editor.warp.toMap",               &g_editorStrings.warpToMap},
-        {"editor.warp.lvlWarp",             &g_editorStrings.warpLvlWarp},
-        {"editor.warp.target",              &g_editorStrings.warpTarget},
-        {"editor.warp.to",                  &g_editorStrings.warpTo},
-        {"editor.warp.showStartScene",      &g_editorStrings.warpShowStartScene},
-        {"editor.warp.showStarCount",       &g_editorStrings.warpShowStarCount},
+    m_engineMap.insert({"editor.warp.title",               &g_editorStrings.warpTitle});
+    m_engineMap.insert({"editor.warp.placing",             &g_editorStrings.warpPlacing});
+    m_engineMap.insert({"editor.warp.in",                  &g_editorStrings.warpIn});
+    m_engineMap.insert({"editor.warp.out",                 &g_editorStrings.warpOut});
+    m_engineMap.insert({"editor.warp.dir",                 &g_editorStrings.warpDir});
+    m_engineMap.insert({"editor.warp.twoWay",              &g_editorStrings.warpTwoWay});
+    m_engineMap.insert({"editor.warp.style.style",         &g_editorStrings.warpStyle});
+    m_engineMap.insert({"editor.warp.style.pipe",          &g_editorStrings.warpStylePipe});
+    m_engineMap.insert({"editor.warp.style.door",          &g_editorStrings.warpStyleDoor});
+    m_engineMap.insert({"editor.warp.style.blipInstant",   &g_editorStrings.warpStyleBlipInstant});
+    m_engineMap.insert({"editor.warp.style.portal",        &g_editorStrings.warpStylePortal});
+    m_engineMap.insert({"editor.warp.effect",              &g_editorStrings.warpEffect});
+    m_engineMap.insert({"editor.warp.allow",               &g_editorStrings.warpAllow});
+    m_engineMap.insert({"editor.warp.item",                &g_editorStrings.warpItem});
+    m_engineMap.insert({"editor.warp.ride",                &g_editorStrings.warpRide});
+    m_engineMap.insert({"editor.warp.cannonExit",          &g_editorStrings.warpCannonExit});
+    m_engineMap.insert({"editor.warp.speed",               &g_editorStrings.warpSpeed});
+    m_engineMap.insert({"editor.warp.needStarCount",       &g_editorStrings.warpNeedStarCount});
+    m_engineMap.insert({"editor.warp.needKey",             &g_editorStrings.warpNeedKey});
+    m_engineMap.insert({"editor.warp.needFloor",           &g_editorStrings.warpNeedFloor});
+    m_engineMap.insert({"editor.warp.starLockMessage",     &g_editorStrings.warpStarLockMessage});
+    m_engineMap.insert({"editor.warp.toMap",               &g_editorStrings.warpToMap});
+    m_engineMap.insert({"editor.warp.lvlWarp",             &g_editorStrings.warpLvlWarp});
+    m_engineMap.insert({"editor.warp.target",              &g_editorStrings.warpTarget});
+    m_engineMap.insert({"editor.warp.to",                  &g_editorStrings.warpTo});
+    m_engineMap.insert({"editor.warp.showStartScene",      &g_editorStrings.warpShowStartScene});
+    m_engineMap.insert({"editor.warp.showStarCount",       &g_editorStrings.warpShowStarCount});
 
-        {"editor.water.title",              &g_editorStrings.waterTitle},
+    m_engineMap.insert({"editor.water.title",              &g_editorStrings.waterTitle});
 
-        {"editor.npc.inContainer",          &g_editorStrings.npcInContainer},
-        {"editor.npc.inertNice",            &g_editorStrings.npcInertNice},
-        {"editor.npc.stuckStop",            &g_editorStrings.npcStuckStop},
-        {"editor.npc.props.active",         &g_editorStrings.npcPropertyActive},
-        {"editor.npc.props.attachSurface",  &g_editorStrings.npcPropertyAttachSurface},
-        {"editor.npc.props.facing",         &g_editorStrings.npcPropertyFacing},
-        {"editor.npc.abbrevGen",            &g_editorStrings.npcAbbrevGen},
+    m_engineMap.insert({"editor.npc.inContainer",          &g_editorStrings.npcInContainer});
+    m_engineMap.insert({"editor.npc.inertNice",            &g_editorStrings.npcInertNice});
+    m_engineMap.insert({"editor.npc.stuckStop",            &g_editorStrings.npcStuckStop});
+    m_engineMap.insert({"editor.npc.props.active",         &g_editorStrings.npcPropertyActive});
+    m_engineMap.insert({"editor.npc.props.attachSurface",  &g_editorStrings.npcPropertyAttachSurface});
+    m_engineMap.insert({"editor.npc.props.facing",         &g_editorStrings.npcPropertyFacing});
+    m_engineMap.insert({"editor.npc.abbrevGen",            &g_editorStrings.npcAbbrevGen});
 
-        {"editor.npc.ai.aiIs",              &g_editorStrings.npcAiIs},
-        {"editor.npc.ai.target",            &g_editorStrings.npcAiTarget},
-        {"editor.npc.ai.jump",              &g_editorStrings.npcAiJump},
-        {"editor.npc.ai.leap",              &g_editorStrings.npcAiLeap},
-        {"editor.npc.ai.swim",              &g_editorStrings.npcAiSwim},
-        {"editor.npc.ai.LR",                &g_editorStrings.npcAiLR},
-        {"editor.npc.ai.UD",                &g_editorStrings.npcAiUD},
+    m_engineMap.insert({"editor.npc.ai.aiIs",              &g_editorStrings.npcAiIs});
+    m_engineMap.insert({"editor.npc.ai.target",            &g_editorStrings.npcAiTarget});
+    m_engineMap.insert({"editor.npc.ai.jump",              &g_editorStrings.npcAiJump});
+    m_engineMap.insert({"editor.npc.ai.leap",              &g_editorStrings.npcAiLeap});
+    m_engineMap.insert({"editor.npc.ai.swim",              &g_editorStrings.npcAiSwim});
+    m_engineMap.insert({"editor.npc.ai.LR",                &g_editorStrings.npcAiLR});
+    m_engineMap.insert({"editor.npc.ai.UD",                &g_editorStrings.npcAiUD});
 
-        {"editor.npc.ai.headerCustomAi",    &g_editorStrings.npcCustomAi},
+    m_engineMap.insert({"editor.npc.ai.headerCustomAi",    &g_editorStrings.npcCustomAi});
 
-        {"editor.npc.ai.use1_0Ai",          &g_editorStrings.npcUse1_0Ai},
-        {"editor.npc.tooltipExpandSection", &g_editorStrings.npcTooltipExpandSection},
+    m_engineMap.insert({"editor.npc.ai.use1_0Ai",          &g_editorStrings.npcUse1_0Ai});
+    m_engineMap.insert({"editor.npc.tooltipExpandSection", &g_editorStrings.npcTooltipExpandSection});
 
-        {"editor.npc.gen.header",           &g_editorStrings.npcGenHeader},
-        {"editor.npc.gen.direction",        &g_editorStrings.npcGenDirection},
-        {"editor.npc.gen.effectIs",         &g_editorStrings.npcGenEffectIs},
-        {"editor.npc.gen.effectWarp",       &g_editorStrings.npcGenEffectWarp},
-        {"editor.npc.gen.effectShoot",      &g_editorStrings.npcGenEffectShoot},
+    m_engineMap.insert({"editor.npc.gen.header",           &g_editorStrings.npcGenHeader});
+    m_engineMap.insert({"editor.npc.gen.direction",        &g_editorStrings.npcGenDirection});
+    m_engineMap.insert({"editor.npc.gen.effectIs",         &g_editorStrings.npcGenEffectIs});
+    m_engineMap.insert({"editor.npc.gen.effectWarp",       &g_editorStrings.npcGenEffectWarp});
+    m_engineMap.insert({"editor.npc.gen.effectShoot",      &g_editorStrings.npcGenEffectShoot});
 
-        {"editor.wordNPC.nominative",       &g_editorStrings.wordNPC},
-        {"editor.wordNPC.genitive",         &g_editorStrings.wordNPCGenitive},
+    m_engineMap.insert({"editor.wordNPC.nominative",       &g_editorStrings.wordNPC});
+    m_engineMap.insert({"editor.wordNPC.genitive",         &g_editorStrings.wordNPCGenitive});
 
-        {"editor.wordEvent.nominative",     &g_editorStrings.wordEvent},
-        {"editor.wordEvent.genitive",       &g_editorStrings.wordEventGenitive},
-        {"editor.wordEvent.typeLabel",      &g_editorStrings.phraseTypeLabelEvent},
+    m_engineMap.insert({"editor.wordEvent.nominative",     &g_editorStrings.wordEvent});
+    m_engineMap.insert({"editor.wordEvent.genitive",       &g_editorStrings.wordEventGenitive});
+    m_engineMap.insert({"editor.wordEvent.typeLabel",      &g_editorStrings.phraseTypeLabelEvent});
 
-        {"editor.wordCoins",                &g_editorStrings.wordCoins},
+    m_engineMap.insert({"editor.wordCoins",                &g_editorStrings.wordCoins});
 
-        {"editor.wordEnabled",              &g_editorStrings.wordEnabled},
-        {"editor.wordText",                 &g_editorStrings.wordText},
-        {"editor.wordInstant",              &g_editorStrings.wordInstant},
-        {"editor.wordMode",                 &g_editorStrings.wordMode},
-        {"editor.wordHeight",               &g_editorStrings.wordHeight},
-        {"editor.wordWidth",                &g_editorStrings.wordWidth},
+    m_engineMap.insert({"editor.wordEnabled",              &g_editorStrings.wordEnabled});
+    m_engineMap.insert({"editor.wordText",                 &g_editorStrings.wordText});
+    m_engineMap.insert({"editor.wordInstant",              &g_editorStrings.wordInstant});
+    m_engineMap.insert({"editor.wordMode",                 &g_editorStrings.wordMode});
+    m_engineMap.insert({"editor.wordHeight",               &g_editorStrings.wordHeight});
+    m_engineMap.insert({"editor.wordWidth",                &g_editorStrings.wordWidth});
 
-        {"editor.labelSortLayer",           &g_editorStrings.labelSortLayer},
-        {"editor.labelSortOffset",          &g_editorStrings.labelSortOffset},
+    m_engineMap.insert({"editor.labelSortLayer",           &g_editorStrings.labelSortLayer});
+    m_engineMap.insert({"editor.labelSortOffset",          &g_editorStrings.labelSortOffset});
 
-        {"editor.phraseTextOf",             &g_editorStrings.phraseTextOf},
-        {"editor.phraseSectionIndex",       &g_editorStrings.phraseSectionIndex},
-        {"editor.phraseRadiusIndex",        &g_editorStrings.phraseRadiusIndex},
-        {"editor.phraseWarpIndex",          &g_editorStrings.phraseWarpIndex},
-        {"editor.phraseGenericIndex",       &g_editorStrings.phraseGenericIndex},
-        {"editor.phraseDelayIsMs",          &g_editorStrings.phraseDelayIsMs},
-        {"editor.phraseCountMore",          &g_editorStrings.phraseCountMore},
-        {"editor.mapPos",                   &g_editorStrings.mapPos},
-        {"editor.phraseAreYouSure",         &g_editorStrings.phraseAreYouSure},
-        {"editor.pageBlankOfBlank",         &g_editorStrings.pageBlankOfBlank},
+    m_engineMap.insert({"editor.phraseTextOf",             &g_editorStrings.phraseTextOf});
+    m_engineMap.insert({"editor.phraseSectionIndex",       &g_editorStrings.phraseSectionIndex});
+    m_engineMap.insert({"editor.phraseRadiusIndex",        &g_editorStrings.phraseRadiusIndex});
+    m_engineMap.insert({"editor.phraseWarpIndex",          &g_editorStrings.phraseWarpIndex});
+    m_engineMap.insert({"editor.phraseGenericIndex",       &g_editorStrings.phraseGenericIndex});
+    m_engineMap.insert({"editor.phraseDelayIsMs",          &g_editorStrings.phraseDelayIsMs});
+    m_engineMap.insert({"editor.phraseCountMore",          &g_editorStrings.phraseCountMore});
+    m_engineMap.insert({"editor.mapPos",                   &g_editorStrings.mapPos});
+    m_engineMap.insert({"editor.phraseAreYouSure",         &g_editorStrings.phraseAreYouSure});
+    m_engineMap.insert({"editor.pageBlankOfBlank",         &g_editorStrings.pageBlankOfBlank});
 
-        {"editor.letterUp",                 &g_editorStrings.letterUp},
-        {"editor.letterDown",               &g_editorStrings.letterDown},
-        {"editor.letterLeft",               &g_editorStrings.letterLeft},
-        {"editor.letterRight",              &g_editorStrings.letterRight},
-        {"editor.letterCoordX",             &g_editorStrings.letterCoordX},
-        {"editor.letterCoordY",             &g_editorStrings.letterCoordY},
+    m_engineMap.insert({"editor.letterUp",                 &g_editorStrings.letterUp});
+    m_engineMap.insert({"editor.letterDown",               &g_editorStrings.letterDown});
+    m_engineMap.insert({"editor.letterLeft",               &g_editorStrings.letterLeft});
+    m_engineMap.insert({"editor.letterRight",              &g_editorStrings.letterRight});
+    m_engineMap.insert({"editor.letterCoordX",             &g_editorStrings.letterCoordX});
+    m_engineMap.insert({"editor.letterCoordY",             &g_editorStrings.letterCoordY});
 
-        {"editor.toggleMagicBlock",         &g_editorStrings.toggleMagicBlock},
+    m_engineMap.insert({"editor.toggleMagicBlock",         &g_editorStrings.toggleMagicBlock});
 
-        {"editor.testPlay.magicHand",       &g_editorStrings.testMagicHand},
-        {"editor.testPlay.char",            &g_editorStrings.testChar},
-        {"editor.testPlay.power",           &g_editorStrings.testPower},
-        {"editor.testPlay.boot",            &g_editorStrings.testBoot},
-        {"editor.testPlay.pet",             &g_editorStrings.testPet},
+    m_engineMap.insert({"editor.testPlay.magicHand",       &g_editorStrings.testMagicHand});
+    m_engineMap.insert({"editor.testPlay.char",            &g_editorStrings.testChar});
+    m_engineMap.insert({"editor.testPlay.power",           &g_editorStrings.testPower});
+    m_engineMap.insert({"editor.testPlay.boot",            &g_editorStrings.testBoot});
+    m_engineMap.insert({"editor.testPlay.pet",             &g_editorStrings.testPet});
 
-        {"editor.events.header",            &g_editorStrings.eventsHeader},
+    m_engineMap.insert({"editor.events.header",            &g_editorStrings.eventsHeader});
 
-        {"editor.events.letter.activate",    &g_editorStrings.eventsLetterActivate},
-        {"editor.events.letter.death",       &g_editorStrings.eventsLetterDeath},
-        {"editor.events.letter.talk",        &g_editorStrings.eventsLetterTalk},
-        {"editor.events.letter.layerClear",  &g_editorStrings.eventsLetterLayerClear},
-        {"editor.events.letter.hit",         &g_editorStrings.eventsLetterHit},
-        {"editor.events.letter.destroy",     &g_editorStrings.eventsLetterDestroy},
-        {"editor.events.letter.enter",       &g_editorStrings.eventsLetterEnter},
+    m_engineMap.insert({"editor.events.letter.activate",    &g_editorStrings.eventsLetterActivate});
+    m_engineMap.insert({"editor.events.letter.death",       &g_editorStrings.eventsLetterDeath});
+    m_engineMap.insert({"editor.events.letter.talk",        &g_editorStrings.eventsLetterTalk});
+    m_engineMap.insert({"editor.events.letter.layerClear",  &g_editorStrings.eventsLetterLayerClear});
+    m_engineMap.insert({"editor.events.letter.hit",         &g_editorStrings.eventsLetterHit});
+    m_engineMap.insert({"editor.events.letter.destroy",     &g_editorStrings.eventsLetterDestroy});
+    m_engineMap.insert({"editor.events.letter.enter",       &g_editorStrings.eventsLetterEnter});
 
-        {"editor.events.label.next",        &g_editorStrings.eventsLabelNext},
-        {"editor.events.label.activate",    &g_editorStrings.eventsLabelActivate},
-        {"editor.events.label.death",       &g_editorStrings.eventsLabelDeath},
-        {"editor.events.label.talk",        &g_editorStrings.eventsLabelTalk},
-        {"editor.events.label.layerClear",  &g_editorStrings.eventsLabelLayerClear},
-        {"editor.events.label.hit",         &g_editorStrings.eventsLabelHit},
-        {"editor.events.label.destroy",     &g_editorStrings.eventsLabelDestroy},
-        {"editor.events.label.enter",       &g_editorStrings.eventsLabelEnter},
+    m_engineMap.insert({"editor.events.label.next",        &g_editorStrings.eventsLabelNext});
+    m_engineMap.insert({"editor.events.label.activate",    &g_editorStrings.eventsLabelActivate});
+    m_engineMap.insert({"editor.events.label.death",       &g_editorStrings.eventsLabelDeath});
+    m_engineMap.insert({"editor.events.label.talk",        &g_editorStrings.eventsLabelTalk});
+    m_engineMap.insert({"editor.events.label.layerClear",  &g_editorStrings.eventsLabelLayerClear});
+    m_engineMap.insert({"editor.events.label.hit",         &g_editorStrings.eventsLabelHit});
+    m_engineMap.insert({"editor.events.label.destroy",     &g_editorStrings.eventsLabelDestroy});
+    m_engineMap.insert({"editor.events.label.enter",       &g_editorStrings.eventsLabelEnter});
 
-        {"editor.events.desc.activate",     &g_editorStrings.eventsDescActivate},
-        {"editor.events.desc.death",        &g_editorStrings.eventsDescDeath},
-        {"editor.events.desc.talk",         &g_editorStrings.eventsDescTalk},
-        {"editor.events.desc.layerClear",   &g_editorStrings.eventsDescLayerClear},
-        {"editor.events.desc.hit",          &g_editorStrings.eventsDescHit},
-        {"editor.events.desc.destroy",      &g_editorStrings.eventsDescDestroy},
-        {"editor.events.desc.enter",        &g_editorStrings.eventsDescEnter},
+    m_engineMap.insert({"editor.events.desc.activate",     &g_editorStrings.eventsDescActivate});
+    m_engineMap.insert({"editor.events.desc.death",        &g_editorStrings.eventsDescDeath});
+    m_engineMap.insert({"editor.events.desc.talk",         &g_editorStrings.eventsDescTalk});
+    m_engineMap.insert({"editor.events.desc.layerClear",   &g_editorStrings.eventsDescLayerClear});
+    m_engineMap.insert({"editor.events.desc.hit",          &g_editorStrings.eventsDescHit});
+    m_engineMap.insert({"editor.events.desc.destroy",      &g_editorStrings.eventsDescDestroy});
+    m_engineMap.insert({"editor.events.desc.enter",        &g_editorStrings.eventsDescEnter});
 
-        {"editor.events.desc.phraseTriggersWhenTemplate",   &g_editorStrings.eventsDescPhraseTriggersWhenTemplate},
-        {"editor.events.desc.phraseTriggersAfterTemplate",   &g_editorStrings.eventsDescPhraseTriggersAfterTemplate},
+    m_engineMap.insert({"editor.events.desc.phraseTriggersWhenTemplate",   &g_editorStrings.eventsDescPhraseTriggersWhenTemplate});
+    m_engineMap.insert({"editor.events.desc.phraseTriggersAfterTemplate",   &g_editorStrings.eventsDescPhraseTriggersAfterTemplate});
 
-        {"editor.events.deletion.deletingEvent",    &g_editorStrings.eventsDeletingEvent},
-        {"editor.events.deletion.confirm",          &g_editorStrings.eventsDeletionConfirm},
-        {"editor.events.deletion.cancel",           &g_editorStrings.eventsDeletionCancel},
+    m_engineMap.insert({"editor.events.deletion.deletingEvent",    &g_editorStrings.eventsDeletingEvent});
+    m_engineMap.insert({"editor.events.deletion.confirm",          &g_editorStrings.eventsDeletionConfirm});
+    m_engineMap.insert({"editor.events.deletion.cancel",           &g_editorStrings.eventsDeletionCancel});
 
-        {"editor.events.promptEventText",  &g_editorStrings.eventsPromptEventText},
-        {"editor.events.promptEventName",  &g_editorStrings.eventsPromptEventName},
-        {"editor.events.itemNewEvent",     &g_editorStrings.eventsItemNewEvent},
+    m_engineMap.insert({"editor.events.promptEventText",  &g_editorStrings.eventsPromptEventText});
+    m_engineMap.insert({"editor.events.promptEventName",  &g_editorStrings.eventsPromptEventName});
+    m_engineMap.insert({"editor.events.itemNewEvent",     &g_editorStrings.eventsItemNewEvent});
 
-        {"editor.events.controlsForEventN",      &g_editorStrings.eventsControlsForEvent},
-        {"editor.events.settingsForEvent",       &g_editorStrings.eventsSettingsForEvent},
+    m_engineMap.insert({"editor.events.controlsForEventN",      &g_editorStrings.eventsControlsForEvent});
+    m_engineMap.insert({"editor.events.settingsForEvent",       &g_editorStrings.eventsSettingsForEvent});
 
-        {"editor.events.layers.headerShow",      &g_editorStrings.eventsHeaderShow},
-        {"editor.events.layers.headerHide",      &g_editorStrings.eventsHeaderHide},
-        {"editor.events.layers.headerToggle",    &g_editorStrings.eventsHeaderToggle},
-        {"editor.events.layers.headerMove",      &g_editorStrings.eventsHeaderMove},
+    m_engineMap.insert({"editor.events.layers.headerShow",      &g_editorStrings.eventsHeaderShow});
+    m_engineMap.insert({"editor.events.layers.headerHide",      &g_editorStrings.eventsHeaderHide});
+    m_engineMap.insert({"editor.events.layers.headerToggle",    &g_editorStrings.eventsHeaderToggle});
+    m_engineMap.insert({"editor.events.layers.headerMove",      &g_editorStrings.eventsHeaderMove});
 
-        {"editor.events.sections.actionKeep",    &g_editorStrings.eventsActionKeep},
-        {"editor.events.sections.actionReset",   &g_editorStrings.eventsActionReset},
-        {"editor.events.sections.actionSet",     &g_editorStrings.eventsActionSet},
+    m_engineMap.insert({"editor.events.sections.actionKeep",    &g_editorStrings.eventsActionKeep});
+    m_engineMap.insert({"editor.events.sections.actionReset",   &g_editorStrings.eventsActionReset});
+    m_engineMap.insert({"editor.events.sections.actionSet",     &g_editorStrings.eventsActionSet});
 
-        {"editor.events.sections.propMusic",     &g_editorStrings.eventsCaseMusic},
-        {"editor.events.sections.propBackground", &g_editorStrings.eventsCaseBackground},
-        {"editor.events.sections.propBounds",    &g_editorStrings.eventsCaseBounds},
+    m_engineMap.insert({"editor.events.sections.propMusic",     &g_editorStrings.eventsCaseMusic});
+    m_engineMap.insert({"editor.events.sections.propBackground", &g_editorStrings.eventsCaseBackground});
+    m_engineMap.insert({"editor.events.sections.propBounds",    &g_editorStrings.eventsCaseBounds});
 
-        {"editor.events.sections.phraseAllSections",     &g_editorStrings.eventsPhraseAllSections},
+    m_engineMap.insert({"editor.events.sections.phraseAllSections",     &g_editorStrings.eventsPhraseAllSections});
 
-        {"editor.events.props.autostart",     &g_editorStrings.eventsPropAutostart},
-        {"editor.events.props.sound",         &g_editorStrings.eventsPropSound},
-        {"editor.events.props.endGame",       &g_editorStrings.eventsPropEndGame},
-        {"editor.events.props.controls",      &g_editorStrings.eventsPropControls},
-        {"editor.events.props.layerSmoke",    &g_editorStrings.eventsPropLayerSmoke},
+    m_engineMap.insert({"editor.events.props.autostart",     &g_editorStrings.eventsPropAutostart});
+    m_engineMap.insert({"editor.events.props.sound",         &g_editorStrings.eventsPropSound});
+    m_engineMap.insert({"editor.events.props.endGame",       &g_editorStrings.eventsPropEndGame});
+    m_engineMap.insert({"editor.events.props.controls",      &g_editorStrings.eventsPropControls});
+    m_engineMap.insert({"editor.events.props.layerSmoke",    &g_editorStrings.eventsPropLayerSmoke});
 
-        {"editor.events.headerTriggerEvent",  &g_editorStrings.eventsHeaderTriggerEvent},
+    m_engineMap.insert({"editor.events.headerTriggerEvent",  &g_editorStrings.eventsHeaderTriggerEvent});
 
-        {"editor.level.levelName",            &g_editorStrings.levelName},
-        {"editor.level.startPos",             &g_editorStrings.levelStartPos},
-        {"editor.level.pathBG",               &g_editorStrings.levelPathBG},
-        {"editor.level.bigBG",                &g_editorStrings.levelBigBG},
-        {"editor.level.gameStart",            &g_editorStrings.levelGameStart},
-        {"editor.level.alwaysVis",            &g_editorStrings.levelAlwaysVis},
-        {"editor.level.pathUnlocks",          &g_editorStrings.levelPathUnlocks},
+    m_engineMap.insert({"editor.level.levelName",            &g_editorStrings.levelName});
+    m_engineMap.insert({"editor.level.startPos",             &g_editorStrings.levelStartPos});
+    m_engineMap.insert({"editor.level.pathBG",               &g_editorStrings.levelPathBG});
+    m_engineMap.insert({"editor.level.bigBG",                &g_editorStrings.levelBigBG});
+    m_engineMap.insert({"editor.level.gameStart",            &g_editorStrings.levelGameStart});
+    m_engineMap.insert({"editor.level.alwaysVis",            &g_editorStrings.levelAlwaysVis});
+    m_engineMap.insert({"editor.level.pathUnlocks",          &g_editorStrings.levelPathUnlocks});
 
-        {"editor.section.scroll",             &g_editorStrings.sectionScroll},
-        {"editor.section.horizWrap",          &g_editorStrings.sectionHorizWrap},
-        {"editor.section.vertWrap",           &g_editorStrings.sectionVertWrap},
-        {"editor.section.underwater",         &g_editorStrings.sectionUnderwater},
-        {"editor.section.noTurnBack",         &g_editorStrings.sectionNoTurnBack},
-        {"editor.section.offscreenExit",      &g_editorStrings.sectionOffscreenExit},
+    m_engineMap.insert({"editor.section.scroll",             &g_editorStrings.sectionScroll});
+    m_engineMap.insert({"editor.section.horizWrap",          &g_editorStrings.sectionHorizWrap});
+    m_engineMap.insert({"editor.section.vertWrap",           &g_editorStrings.sectionVertWrap});
+    m_engineMap.insert({"editor.section.underwater",         &g_editorStrings.sectionUnderwater});
+    m_engineMap.insert({"editor.section.noTurnBack",         &g_editorStrings.sectionNoTurnBack});
+    m_engineMap.insert({"editor.section.offscreenExit",      &g_editorStrings.sectionOffscreenExit});
 
-        {"editor.world.name",                 &g_editorStrings.worldName},
-        {"editor.world.introLevel",           &g_editorStrings.worldIntroLevel},
-        {"editor.world.hubWorld",             &g_editorStrings.worldHubWorld},
-        {"editor.world.retryOnFail",          &g_editorStrings.worldRetryOnFail},
-        {"editor.world.totalStars",           &g_editorStrings.worldTotalStars},
-        {"editor.world.allowChars",           &g_editorStrings.worldAllowChars},
-        {"editor.world.phraseCreditIndex",    &g_editorStrings.worldCreditIndex},
+    m_engineMap.insert({"editor.world.name",                 &g_editorStrings.worldName});
+    m_engineMap.insert({"editor.world.introLevel",           &g_editorStrings.worldIntroLevel});
+    m_engineMap.insert({"editor.world.hubWorld",             &g_editorStrings.worldHubWorld});
+    m_engineMap.insert({"editor.world.retryOnFail",          &g_editorStrings.worldRetryOnFail});
+    m_engineMap.insert({"editor.world.totalStars",           &g_editorStrings.worldTotalStars});
+    m_engineMap.insert({"editor.world.allowChars",           &g_editorStrings.worldAllowChars});
+    m_engineMap.insert({"editor.world.phraseCreditIndex",    &g_editorStrings.worldCreditIndex});
 
-        {"editor.select.soundForEventN",              &g_editorStrings.selectSoundForEvent},
-        {"editor.select.sectBlankPropBlankForEventN", &g_editorStrings.selectSectBlankPropBlankForEvent},
-        {"editor.select.allSectPropBlankForEventN",   &g_editorStrings.selectAllSectPropBlankForEvent},
-        {"editor.select.sectionBlankPropBlank",     &g_editorStrings.selectSectionBlankPropBlank},
-        {"editor.select.pathBlankUnlock",           &g_editorStrings.selectPathBlankUnlock},
-        {"editor.select.warpTransitEffect",         &g_editorStrings.selectWarpTransitionEffect},
-        {"editor.select.worldMusic",                &g_editorStrings.selectWorldMusic},
+    m_engineMap.insert({"editor.select.soundForEventN",              &g_editorStrings.selectSoundForEvent});
+    m_engineMap.insert({"editor.select.sectBlankPropBlankForEventN", &g_editorStrings.selectSectBlankPropBlankForEvent});
+    m_engineMap.insert({"editor.select.allSectPropBlankForEventN",   &g_editorStrings.selectAllSectPropBlankForEvent});
+    m_engineMap.insert({"editor.select.sectionBlankPropBlank",     &g_editorStrings.selectSectionBlankPropBlank});
+    m_engineMap.insert({"editor.select.pathBlankUnlock",           &g_editorStrings.selectPathBlankUnlock});
+    m_engineMap.insert({"editor.select.warpTransitEffect",         &g_editorStrings.selectWarpTransitionEffect});
+    m_engineMap.insert({"editor.select.worldMusic",                &g_editorStrings.selectWorldMusic});
 
-        {"editor.layers.header",              &g_editorStrings.layersHeader},
+    m_engineMap.insert({"editor.layers.header",              &g_editorStrings.layersHeader});
 
-        {"editor.layers.label",               &g_editorStrings.labelLayer},
-        {"editor.layers.labelAttached",       &g_editorStrings.layersLabelAttached},
-        {"editor.layers.abbrevAttLayer",      &g_editorStrings.layersAbbrevAttLayer},
-        {"editor.layers.default",             &g_editorStrings.layersLayerDefault},
+    m_engineMap.insert({"editor.layers.label",               &g_editorStrings.labelLayer});
+    m_engineMap.insert({"editor.layers.labelAttached",       &g_editorStrings.layersLabelAttached});
+    m_engineMap.insert({"editor.layers.abbrevAttLayer",      &g_editorStrings.layersAbbrevAttLayer});
+    m_engineMap.insert({"editor.layers.default",             &g_editorStrings.layersLayerDefault});
 
-        {"editor.layers.labelAttachedLayer",  &g_editorStrings.layersLabelAttachedLayer},
-        {"editor.layers.labelMoveLayer",      &g_editorStrings.layersLabelMoveLayer},
+    m_engineMap.insert({"editor.layers.labelAttachedLayer",  &g_editorStrings.layersLabelAttachedLayer});
+    m_engineMap.insert({"editor.layers.labelMoveLayer",      &g_editorStrings.layersLabelMoveLayer});
 
-        {"editor.layers.deletion.header",                   &g_editorStrings.layersDeletionHeader},
-        {"editor.layers.deletion.preserveLayerContents",    &g_editorStrings.layersDeletionPreserveLayerContents},
-        {"editor.layers.deletion.confirmPreserve",          &g_editorStrings.layersDeletionConfirmPreserve},
-        {"editor.layers.deletion.confirmDelete",            &g_editorStrings.layersDeletionConfirmDelete},
-        {"editor.layers.deletion.cancel",                   &g_editorStrings.layersDeletionCancel},
+    m_engineMap.insert({"editor.layers.deletion.header",                   &g_editorStrings.layersDeletionHeader});
+    m_engineMap.insert({"editor.layers.deletion.preserveLayerContents",    &g_editorStrings.layersDeletionPreserveLayerContents});
+    m_engineMap.insert({"editor.layers.deletion.confirmPreserve",          &g_editorStrings.layersDeletionConfirmPreserve});
+    m_engineMap.insert({"editor.layers.deletion.confirmDelete",            &g_editorStrings.layersDeletionConfirmDelete});
+    m_engineMap.insert({"editor.layers.deletion.cancel",                   &g_editorStrings.layersDeletionCancel});
 
-        {"editor.layers.desc.att", &g_editorStrings.layersDescAtt},
+    m_engineMap.insert({"editor.layers.desc.att", &g_editorStrings.layersDescAtt});
 
-        {"editor.layers.promptLayerName", &g_editorStrings.layersPromptLayerName},
-        {"editor.layers.itemNewLayer",    &g_editorStrings.layersItemNewLayer},
+    m_engineMap.insert({"editor.layers.promptLayerName", &g_editorStrings.layersPromptLayerName});
+    m_engineMap.insert({"editor.layers.itemNewLayer",    &g_editorStrings.layersItemNewLayer});
 
-        {"editor.file.actionClearLevel",            &g_editorStrings.fileActionClearLevel},
-        {"editor.file.actionClearWorld",            &g_editorStrings.fileActionClearWorld},
-        {"editor.file.actionOpen",                  &g_editorStrings.fileActionOpen},
-        {"editor.file.actionRevert",                &g_editorStrings.fileActionRevert},
-        {"editor.file.actionExit",                  &g_editorStrings.fileActionExit},
-        {"editor.file.confirmSaveBeforeAction",     &g_editorStrings.fileConfirmationSaveBeforeAction},
-        {"editor.file.confirmConfirmAction",        &g_editorStrings.fileConfirmationConfirmAction},
-        {"editor.file.confirmConvertFormatTo",      &g_editorStrings.fileConfirmationConvertFormatTo},
-        {"editor.file.optionYesSaveThenAction",     &g_editorStrings.fileOptionYesSaveThenAction},
-        {"editor.file.optionActionWithoutSave",     &g_editorStrings.fileOptionActionWithoutSave},
-        {"editor.file.optionCancelAction",          &g_editorStrings.fileOptionCancelAction},
-        {"editor.file.optionProceedWithConversion", &g_editorStrings.fileOptionProceedWithConversion},
-        {"editor.file.optionCancelConversion",      &g_editorStrings.fileOptionCancelConversion},
+    m_engineMap.insert({"editor.file.actionClearLevel",            &g_editorStrings.fileActionClearLevel});
+    m_engineMap.insert({"editor.file.actionClearWorld",            &g_editorStrings.fileActionClearWorld});
+    m_engineMap.insert({"editor.file.actionOpen",                  &g_editorStrings.fileActionOpen});
+    m_engineMap.insert({"editor.file.actionRevert",                &g_editorStrings.fileActionRevert});
+    m_engineMap.insert({"editor.file.actionExit",                  &g_editorStrings.fileActionExit});
+    m_engineMap.insert({"editor.file.confirmSaveBeforeAction",     &g_editorStrings.fileConfirmationSaveBeforeAction});
+    m_engineMap.insert({"editor.file.confirmConfirmAction",        &g_editorStrings.fileConfirmationConfirmAction});
+    m_engineMap.insert({"editor.file.confirmConvertFormatTo",      &g_editorStrings.fileConfirmationConvertFormatTo});
+    m_engineMap.insert({"editor.file.optionYesSaveThenAction",     &g_editorStrings.fileOptionYesSaveThenAction});
+    m_engineMap.insert({"editor.file.optionActionWithoutSave",     &g_editorStrings.fileOptionActionWithoutSave});
+    m_engineMap.insert({"editor.file.optionCancelAction",          &g_editorStrings.fileOptionCancelAction});
+    m_engineMap.insert({"editor.file.optionProceedWithConversion", &g_editorStrings.fileOptionProceedWithConversion});
+    m_engineMap.insert({"editor.file.optionCancelConversion",      &g_editorStrings.fileOptionCancelConversion});
 
-        {"editor.file.labelCurrentFile",    &g_editorStrings.fileLabelCurrentFile},
-        {"editor.file.labelFormat",         &g_editorStrings.fileLabelFormat},
+    m_engineMap.insert({"editor.file.labelCurrentFile",    &g_editorStrings.fileLabelCurrentFile});
+    m_engineMap.insert({"editor.file.labelFormat",         &g_editorStrings.fileLabelFormat});
 
-        {"editor.file.formatModern",        &g_editorStrings.fileFormatModern},
-        {"editor.file.formatLegacy",        &g_editorStrings.fileFormatLegacy},
+    m_engineMap.insert({"editor.file.formatModern",        &g_editorStrings.fileFormatModern});
+    m_engineMap.insert({"editor.file.formatLegacy",        &g_editorStrings.fileFormatLegacy});
 
-        {"editor.file.sectionLevel",        &g_editorStrings.fileSectionLevel},
-        {"editor.file.sectionWorld",        &g_editorStrings.fileSectionWorld},
-        {"editor.file.commandNew",          &g_editorStrings.fileCommandNew},
-        {"editor.file.commandOpen",         &g_editorStrings.fileCommandOpen},
-        {"editor.file.commandSave",         &g_editorStrings.fileCommandSave},
-        {"editor.file.commandSaveAs",       &g_editorStrings.fileCommandSaveAs},
+    m_engineMap.insert({"editor.file.sectionLevel",        &g_editorStrings.fileSectionLevel});
+    m_engineMap.insert({"editor.file.sectionWorld",        &g_editorStrings.fileSectionWorld});
+    m_engineMap.insert({"editor.file.commandNew",          &g_editorStrings.fileCommandNew});
+    m_engineMap.insert({"editor.file.commandOpen",         &g_editorStrings.fileCommandOpen});
+    m_engineMap.insert({"editor.file.commandSave",         &g_editorStrings.fileCommandSave});
+    m_engineMap.insert({"editor.file.commandSaveAs",       &g_editorStrings.fileCommandSaveAs});
 
-        {"editor.file.convert.descNew",             &g_editorStrings.fileConvertDesc},
+    m_engineMap.insert({"editor.file.convert.descNew",             &g_editorStrings.fileConvertDesc});
 
 #if 0
-        {"editor.file.convert._38aUnsupported",     &g_editorStrings.fileConvert38aUnsupported},
-        {"editor.file.convert.formatUnknown",       &g_editorStrings.fileConvertFormatUnknown},
+    m_engineMap.insert({"editor.file.convert._38aUnsupported",     &g_editorStrings.fileConvert38aUnsupported});
+    m_engineMap.insert({"editor.file.convert.formatUnknown",       &g_editorStrings.fileConvertFormatUnknown});
 
-        {"editor.file.convert.featureWarpTransit",      &g_editorStrings.fileConvertFeatureWarpTransit},
-        {"editor.file.convert.featureWarpNeedsStand",   &g_editorStrings.fileConvertFeatureWarpNeedsStand},
-        {"editor.file.convert.featureWarpCannonExit",   &g_editorStrings.fileConvertFeatureWarpCannonExit},
-        {"editor.file.convert.featureWarpEnterEvent",   &g_editorStrings.fileConvertFeatureWarpEnterEvent},
-        {"editor.file.convert.featureWarpCustomStarsMsg", &g_editorStrings.fileConvertFeatureWarpCustomStarsMsg},
-        {"editor.file.convert.featureWarpNoPrintStars", &g_editorStrings.fileConvertFeatureWarpNoPrintStars},
-        {"editor.file.convert.featureWarpNoStartScene", &g_editorStrings.fileConvertFeatureWarpNoStartScene},
-        {"editor.file.convert.featureWarpPortal",       &g_editorStrings.fileConvertFeatureWarpPortal},
+    m_engineMap.insert({"editor.file.convert.featureWarpTransit",      &g_editorStrings.fileConvertFeatureWarpTransit});
+    m_engineMap.insert({"editor.file.convert.featureWarpNeedsStand",   &g_editorStrings.fileConvertFeatureWarpNeedsStand});
+    m_engineMap.insert({"editor.file.convert.featureWarpCannonExit",   &g_editorStrings.fileConvertFeatureWarpCannonExit});
+    m_engineMap.insert({"editor.file.convert.featureWarpEnterEvent",   &g_editorStrings.fileConvertFeatureWarpEnterEvent});
+    m_engineMap.insert({"editor.file.convert.featureWarpCustomStarsMsg", &g_editorStrings.fileConvertFeatureWarpCustomStarsMsg});
+    m_engineMap.insert({"editor.file.convert.featureWarpNoPrintStars", &g_editorStrings.fileConvertFeatureWarpNoPrintStars});
+    m_engineMap.insert({"editor.file.convert.featureWarpNoStartScene", &g_editorStrings.fileConvertFeatureWarpNoStartScene});
+    m_engineMap.insert({"editor.file.convert.featureWarpPortal",       &g_editorStrings.fileConvertFeatureWarpPortal});
 
-        {"editor.file.convert.featureEventCustomMusic", &g_editorStrings.fileConvertFeatureEventCustomMusic},
-        {"editor.file.convert.featureEventAutoscroll",  &g_editorStrings.fileConvertFeatureEventAutoscroll},
+    m_engineMap.insert({"editor.file.convert.featureEventCustomMusic", &g_editorStrings.fileConvertFeatureEventCustomMusic});
+    m_engineMap.insert({"editor.file.convert.featureEventAutoscroll",  &g_editorStrings.fileConvertFeatureEventAutoscroll});
 
-        {"editor.file.convert.featureNPCVariant",       &g_editorStrings.fileConvertFeatureNPCVariant},
-        {"editor.file.convert.featureBlockForceSmashable", &g_editorStrings.fileConvertFeatureBlockForceSmashable},
-        {"editor.file.convert.featureBgoOrder",         &g_editorStrings.fileConvertFeatureBgoOrder},
+    m_engineMap.insert({"editor.file.convert.featureNPCVariant",       &g_editorStrings.fileConvertFeatureNPCVariant});
+    m_engineMap.insert({"editor.file.convert.featureBlockForceSmashable", &g_editorStrings.fileConvertFeatureBlockForceSmashable});
+    m_engineMap.insert({"editor.file.convert.featureBgoOrder",         &g_editorStrings.fileConvertFeatureBgoOrder});
 
-        {"editor.file.convert.featureCustomWorldMusic", &g_editorStrings.fileConvertFeatureCustomWorldMusic},
-        {"editor.file.convert.featureWorldStarDisplay", &g_editorStrings.fileConvertFeatureWorldStarDisplay},
-        {"editor.file.convert.featureLevelStarDisplay", &g_editorStrings.fileConvertFeatureLevelStarDisplay},
-        {"editor.file.convert.featureWorldMapSections", &g_editorStrings.fileConvertFeatureWorldMapSections},
+    m_engineMap.insert({"editor.file.convert.featureCustomWorldMusic", &g_editorStrings.fileConvertFeatureCustomWorldMusic});
+    m_engineMap.insert({"editor.file.convert.featureWorldStarDisplay", &g_editorStrings.fileConvertFeatureWorldStarDisplay});
+    m_engineMap.insert({"editor.file.convert.featureLevelStarDisplay", &g_editorStrings.fileConvertFeatureLevelStarDisplay});
+    m_engineMap.insert({"editor.file.convert.featureWorldMapSections", &g_editorStrings.fileConvertFeatureWorldMapSections});
 #endif
 
-        {"editor.browser.newFile",          &g_editorStrings.browserNewFile},
-        {"editor.browser.saveFile",         &g_editorStrings.browserSaveFile},
-        {"editor.browser.openFile",         &g_editorStrings.browserOpenFile},
+    m_engineMap.insert({"editor.browser.newFile",          &g_editorStrings.browserNewFile});
+    m_engineMap.insert({"editor.browser.saveFile",         &g_editorStrings.browserSaveFile});
+    m_engineMap.insert({"editor.browser.openFile",         &g_editorStrings.browserOpenFile});
 
-        {"editor.browser.itemNewFile",      &g_editorStrings.browserItemNewFile},
-        {"editor.browser.itemNewFolder",    &g_editorStrings.browserItemNewFolder},
+    m_engineMap.insert({"editor.browser.itemNewFile",      &g_editorStrings.browserItemNewFile});
+    m_engineMap.insert({"editor.browser.itemNewFolder",    &g_editorStrings.browserItemNewFolder});
 
-        {"editor.browser.askOverwriteFile", &g_editorStrings.browserAskOverwriteFile},
+    m_engineMap.insert({"editor.browser.askOverwriteFile", &g_editorStrings.browserAskOverwriteFile});
 
-        {"editor.tooltip.select",   &g_editorStrings.tooltipSelect},
-        {"editor.tooltip.erase",    &g_editorStrings.tooltipErase},
-        {"editor.tooltip.eraseAll", &g_editorStrings.tooltipEraseAll},
-        {"editor.tooltip.blocks",   &g_editorStrings.tooltipBlocks},
-        {"editor.tooltip.BGOs",     &g_editorStrings.tooltipBGOs},
-        {"editor.tooltip.NPCs",     &g_editorStrings.tooltipNPCs},
-        {"editor.tooltip.warps",    &g_editorStrings.tooltipWarps},
-        {"editor.tooltip.water",    &g_editorStrings.tooltipWater},
-        {"editor.tooltip.settings", &g_editorStrings.tooltipSettings},
-        {"editor.tooltip.layers",   &g_editorStrings.tooltipLayers},
-        {"editor.tooltip.events",   &g_editorStrings.tooltipEvents},
-        {"editor.tooltip.tiles",    &g_editorStrings.tooltipTiles},
-        {"editor.tooltip.scenes",   &g_editorStrings.tooltipScenes},
-        {"editor.tooltip.levels",   &g_editorStrings.tooltipLevels},
-        {"editor.tooltip.paths",    &g_editorStrings.tooltipPaths},
-        {"editor.tooltip.music",    &g_editorStrings.tooltipMusic},
-        {"editor.tooltip.area",     &g_editorStrings.tooltipArea},
-        {"editor.tooltip.file",     &g_editorStrings.tooltipFile},
-        {"editor.tooltip.show",     &g_editorStrings.tooltipShow},
+    m_engineMap.insert({"editor.tooltip.select",   &g_editorStrings.tooltipSelect});
+    m_engineMap.insert({"editor.tooltip.erase",    &g_editorStrings.tooltipErase});
+    m_engineMap.insert({"editor.tooltip.eraseAll", &g_editorStrings.tooltipEraseAll});
+    m_engineMap.insert({"editor.tooltip.blocks",   &g_editorStrings.tooltipBlocks});
+    m_engineMap.insert({"editor.tooltip.BGOs",     &g_editorStrings.tooltipBGOs});
+    m_engineMap.insert({"editor.tooltip.NPCs",     &g_editorStrings.tooltipNPCs});
+    m_engineMap.insert({"editor.tooltip.warps",    &g_editorStrings.tooltipWarps});
+    m_engineMap.insert({"editor.tooltip.water",    &g_editorStrings.tooltipWater});
+    m_engineMap.insert({"editor.tooltip.settings", &g_editorStrings.tooltipSettings});
+    m_engineMap.insert({"editor.tooltip.layers",   &g_editorStrings.tooltipLayers});
+    m_engineMap.insert({"editor.tooltip.events",   &g_editorStrings.tooltipEvents});
+    m_engineMap.insert({"editor.tooltip.tiles",    &g_editorStrings.tooltipTiles});
+    m_engineMap.insert({"editor.tooltip.scenes",   &g_editorStrings.tooltipScenes});
+    m_engineMap.insert({"editor.tooltip.levels",   &g_editorStrings.tooltipLevels});
+    m_engineMap.insert({"editor.tooltip.paths",    &g_editorStrings.tooltipPaths});
+    m_engineMap.insert({"editor.tooltip.music",    &g_editorStrings.tooltipMusic});
+    m_engineMap.insert({"editor.tooltip.area",     &g_editorStrings.tooltipArea});
+    m_engineMap.insert({"editor.tooltip.file",     &g_editorStrings.tooltipFile});
+    m_engineMap.insert({"editor.tooltip.show",     &g_editorStrings.tooltipShow});
 
 #endif // THEXTECH_ENABLE_EDITOR
-    };
+    // };
 
 #ifdef THEXTECH_ENABLE_EDITOR
     for(int i = 0; i < 6; ++i)
