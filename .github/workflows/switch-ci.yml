@@ -4,8 +4,7 @@ on:
   push:
     branches:
       - main
-      - devel
-      - wip-switch-port
+      - stable*
       - versus-ci-homebrew
   pull_request:
     branches:

@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - main
-      - devel
+      - stable*
       - versus-ci-macos
   pull_request:
     branches:

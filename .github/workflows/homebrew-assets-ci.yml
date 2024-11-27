@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - stable*
     paths:
       - .github/workflows/homebrew-assets-ci.yml
       - utils/convertkit/assets-convert-homebrew.py

@@ -4,12 +4,11 @@ on:
   push:
     branches:
       - main
-      - wip-ports
+      - stable*
       - versus-ci-homebrew
   pull_request:
     branches:
       - main
-      - wip-ports
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}

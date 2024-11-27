@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - main
-      - devel
+      - stable*
       - versus-ci-homebrew
   pull_request:
     branches:
