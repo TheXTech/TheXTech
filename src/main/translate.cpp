@@ -214,8 +214,6 @@ XTechTranslate::XTechTranslate()
 
     m_engineMap.insert({"menu.options.restartEngine",           &g_mainMenu.optionsRestartEngine});
 
-    m_engineMap.insert({"menu.character.charSelTitle",    &g_mainMenu.connectCharSelTitle});
-    m_engineMap.insert({"menu.character.startGame",       &g_mainMenu.connectStartGame});
     m_engineMap.insert({"menu.character.selectCharacter", &g_mainMenu.selectCharacter});
 
 
@@ -233,7 +231,6 @@ XTechTranslate::XTechTranslate()
     m_engineMap.insert({"menu.controls.controlsNewProfile", &g_mainMenu.controlsNewProfile});
     m_engineMap.insert({"menu.controls.caseInvalid",        &g_controlsStrings.sharedCaseInvalid});
 
-    m_engineMap.insert({"menu.controls.profile.activateProfile", &g_mainMenu.controlsActivateProfile});
     m_engineMap.insert({"menu.controls.profile.renameProfile",   &g_mainMenu.controlsRenameProfile});
     m_engineMap.insert({"menu.controls.profile.deleteProfile",   &g_mainMenu.controlsDeleteProfile});
     m_engineMap.insert({"menu.controls.profile.playerControls",  &g_mainMenu.controlsPlayerControls});
@@ -404,7 +401,6 @@ XTechTranslate::XTechTranslate()
     m_engineMap.insert({"menu.wordBack",       &g_mainMenu.wordBack});
     m_engineMap.insert({"menu.wordResume",     &g_mainMenu.wordResume});
     m_engineMap.insert({"menu.wordWaiting",    &g_mainMenu.wordWaiting});
-    m_engineMap.insert({"menu.wordLanguage",    &g_mainMenu.wordLanguage});
 
     m_engineMap.insert({"menu.abbrevMilliseconds", &g_mainMenu.abbrevMilliseconds});
 
@@ -421,9 +417,6 @@ XTechTranslate::XTechTranslate()
     m_engineMap.insert({"outro.customSprites",         &g_outroScreen.customSprites});
     m_engineMap.insert({"outro.specialThanks",         &g_outroScreen.specialThanks});
 
-
-    m_engineMap.insert({"game.controls.phrasePlayerDisconnected",  &g_gameStrings.controlsPhrasePlayerDisconnected});
-    m_engineMap.insert({"game.controls.phrasePlayerConnected",     &g_gameStrings.controlsPhrasePlayerConnected});
 
     m_engineMap.insert({"game.msgbox.sysInfoTitle",                &g_gameStrings.msgBoxTitleInfo});
     m_engineMap.insert({"game.msgbox.sysInfoWarning",              &g_gameStrings.msgBoxTitleWarning});
@@ -464,12 +457,7 @@ XTechTranslate::XTechTranslate()
     m_engineMap.insert({"game.connect.splitPressSelect_1",        &g_gameStrings.connectPressSelectForControlsOptions_P1});
     m_engineMap.insert({"game.connect.splitPressSelect_2",        &g_gameStrings.connectPressSelectForControlsOptions_P2});
 
-    m_engineMap.insert({"game.connect.phraseChangeChar",          &g_gameStrings.connectChangeChar});
-    m_engineMap.insert({"game.connect.phraseSetControls",         &g_gameStrings.connectSetControls});
     m_engineMap.insert({"game.connect.phraseDropMe",              &g_gameStrings.connectDropMe});
-
-    m_engineMap.insert({"game.connect.phraseStartToResume",       &g_gameStrings.connectPressStartToResume});
-    m_engineMap.insert({"game.connect.phraseStartToForceRes",     &g_gameStrings.connectPressStartToForceResume});
 
 #ifdef THEXTECH_ENABLE_EDITOR
     m_engineMap.insert({"editor.block.pickContents",       &g_editorStrings.pickBlockContents});

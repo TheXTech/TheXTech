@@ -24,9 +24,6 @@ GameContent g_gameStrings;
 
 void initGameStrings()
 {
-    g_gameStrings.controlsPhrasePlayerDisconnected = "P{0} disconnected";
-    g_gameStrings.controlsPhrasePlayerConnected = "P{0} connected {1}, Profile: {2}";
-
     g_gameStrings.msgBoxTitleInfo = "Info";
     g_gameStrings.msgBoxTitleWarning = "Warning!";
     g_gameStrings.msgBoxTitleError = "Error!";
@@ -69,8 +66,6 @@ void initGameStrings()
     g_gameStrings.connectDisconnect = "Disconnect";
     g_gameStrings.connectHoldStart = "Hold Start";
 
-    g_gameStrings.connectSetControls = "Set Controls";
-    g_gameStrings.connectChangeChar = "Change Char";
     g_gameStrings.connectDropMe = "Drop Me";
 
     g_gameStrings.connectDropPX = "Drop P{0}";
@@ -79,8 +74,5 @@ void initGameStrings()
     g_gameStrings.connectWaitingForInputDevice = "Waiting for input device...";
     g_gameStrings.connectPressSelectForControlsOptions_P1 = "Press Select for";
     g_gameStrings.connectPressSelectForControlsOptions_P2 = "Controls Options";
-
-    g_gameStrings.connectPressStartToResume = "Press Start to Resume";
-    g_gameStrings.connectPressStartToForceResume = "Press Start to Force Resume";
 
 }
