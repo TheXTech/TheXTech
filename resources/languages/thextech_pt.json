@@ -348,10 +348,6 @@
         "format": {
             "minutesSeconds": "{0}m{1}s"
         },
-        "controls": {
-            "phrasePlayerConnected": "J{0} conectado {1}, Perfil: {2}",
-            "phrasePlayerDisconnected": "J{0} desconectado"
-        },
         "error": {
             "errorInvalidEnterWarp": "========= ERRO! ==========\n\nNão foi possível iniciar o nível devido a um teleporte de entrada invalido em {1}.\nTotal de entradas no teleporte: {2}\n\nFicheiro: {0}",
             "errorNoStartPoint": "========= ERRO! ==========\n\nNão foi possível iniciar o nível por este nível não conter ponto de inicio ou entradas de teleporte especificadas.\n\nFicheiro: {0}",
@@ -381,9 +377,7 @@
         },
         "caseNone": "<Nenhum>",
         "character": {
-            "charSelTitle": "Seleção de Personagem",
-            "selectCharacter": "Jogo do {0}",
-            "startGame": "Iniciar Jogo"
+            "selectCharacter": "Jogo do {0}"
         },
         "controls": {
             "buttons": {
@@ -430,7 +424,6 @@
             },
             "profile": {
                 "editorControls": "Controles do editor",
-                "activateProfile": "Ativar Perfil",
                 "cursorControls": "Controles do cursor",
                 "deleteProfile": "Apagar Perfil",
                 "hotkeys": "Atalhos",
@@ -580,19 +573,7 @@
             "mainPlayEpisode": "Jogar Episódio"
         },
         "options": {
-            "optionsViewCredits": "Ver créditos",
-            "render": "Render.: {0}",
-            "optionsModeFullScreen": "Modo Ecrã Inteiro",
-            "optionsModeWindowed": "Modo Janela",
-            "renderAuto": "Render.: Automático ({0})",
             "restartEngine": "Reinicie a Engine para aplicar as mudanças.",
-            "renderX": "Render.: {0} (X)",
-            "scale": {
-                "integer": "Inteiros",
-                "label": "Escala",
-                "linear": "Linear",
-                "nearest": "Aproximado"
-            },
             "advanced": {
                 "render": {
                     "opengl-tip": "",
@@ -821,7 +802,6 @@
         },
         "wordBack": "Voltar",
         "wordHide": "Esconder",
-        "wordLanguage": "Idioma",
         "wordOff": "Desl.",
         "wordWaiting": "À espera",
         "wordOn": "Ligado",

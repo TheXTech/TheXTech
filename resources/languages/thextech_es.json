@@ -335,18 +335,7 @@
         },
         "wordHide": "Ocultar",
         "options": {
-            "scale": {
-                "label": "Escala",
-                "linear": "Lineal",
-                "integer": "Entero",
-                "nearest": "Más cerca"
-            },
             "restartEngine": "Reinicie el motor para que los cambios surtan efecto.",
-            "renderX": "Renderizar: {0} (X)",
-            "render": "Renderizar: {0}",
-            "optionsModeWindowed": "Modo ventana",
-            "optionsModeFullScreen": "Modo de pantalla completa",
-            "optionsViewCredits": "Ver créditos",
             "advanced": {
                 "render": {
                     "opengl": "",
@@ -548,7 +537,6 @@
             "controls": {
                 "_header": ""
             },
-            "renderAuto": "",
             "main": {
                 "four-screen-mode": {
                     "_name": "",
@@ -706,7 +694,6 @@
                 "legacyPause": ""
             },
             "profile": {
-                "activateProfile": "Activar perfil",
                 "deleteProfile": "Eliminar perfil",
                 "cursorControls": "",
                 "playerControls": "",
@@ -746,7 +733,6 @@
             "caseMouse": "",
             "phraseNewProfOldJoy": ""
         },
-        "wordLanguage": "Idioma",
         "wordPlayer": "Jugador",
         "wordBack": "Volver",
         "wordOn": "Encendido",
@@ -757,9 +743,7 @@
         "wordYes": "Si",
         "wordOff": "Apagado",
         "character": {
-            "selectCharacter": "Juego de {0}",
-            "charSelTitle": "Selección de Personaje",
-            "startGame": "Comenzar Juego"
+            "selectCharacter": "Juego de {0}"
         },
         "battle": {
             "errorNoLevels": "Imposible comenzar batalla debido a que no hay niveles disponibles"
@@ -819,10 +803,6 @@
             "quitTesting": "Dejar de Probar",
             "enterCode": "Introducir Código",
             "playerSetup": ""
-        },
-        "controls": {
-            "phrasePlayerDisconnected": "P{0} desconectado",
-            "phrasePlayerConnected": ""
         },
         "message": {
             "scanningLevels": "Escaneando niveles..."

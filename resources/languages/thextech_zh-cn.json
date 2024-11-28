@@ -330,10 +330,6 @@
             "wordDisconnect": "断开",
             "phraseTestProfile": "测试配置"
         },
-        "controls": {
-            "phrasePlayerConnected": "玩家{0}已连接{1}， 配置： {2}",
-            "phrasePlayerDisconnected": "玩家{0}未连接任何设备"
-        },
         "error": {
             "errorInvalidEnterWarp": "作为关卡起点的传送点{1}号不存在，因此无法进入关卡。\n传送点总数：{2}\n\n文件：{0}",
             "errorNoStartPoint": "未放置玩家起点或传送点入口，因此无法进入关卡。\n\n文件：{0}",
@@ -382,9 +378,7 @@
         },
         "caseNone": "<无>",
         "character": {
-            "charSelTitle": "选择角色",
-            "selectCharacter": "{0}游戏",
-            "startGame": "开始游戏"
+            "selectCharacter": "{0}游戏"
         },
         "controls": {
             "buttons": {
@@ -451,7 +445,6 @@
             },
             "phraseNewProfOldJoy": "新建老式手柄配置",
             "profile": {
-                "activateProfile": "启用配置",
                 "cursorControls": "鼠标控制",
                 "deleteProfile": "删除配置",
                 "editorControls": "编辑器控制",
@@ -581,19 +574,7 @@
             "mainPlayEpisode": "选择地图进行游戏"
         },
         "options": {
-            "optionsModeFullScreen": "全屏模式",
-            "optionsModeWindowed": "窗口模式",
-            "optionsViewCredits": "查看制作团队",
             "restartEngine": "重启引擎后生效",
-            "scale": {
-                "integer": "整数",
-                "label": "图像缩放",
-                "linear": "双线性",
-                "nearest": "最近邻居"
-            },
-            "render": "图形渲染类型: {0}",
-            "renderX": "图形渲染类型: {0} (X)",
-            "renderAuto": "图形渲染类型: 自动选择 ({0})",
             "advanced": {
                 "audio-channels": {
                     "stereo": "立体声",
@@ -822,7 +803,6 @@
         },
         "wordBack": "返回",
         "wordHide": "隐藏",
-        "wordLanguage": "语言",
         "wordNo": "否",
         "wordOff": "关闭",
         "wordOn": "开启",

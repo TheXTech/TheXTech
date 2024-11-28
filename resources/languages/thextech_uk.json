@@ -205,17 +205,9 @@
                 "show-screen-shake": "",
                 "info-meta": ""
             },
-            "optionsViewCredits": "",
             "controls": {
                 "_header": ""
             },
-            "scale": {
-                "label": "",
-                "nearest": "",
-                "linear": "",
-                "integer": ""
-            },
-            "optionsModeWindowed": "",
             "restartEngine": "",
             "episode-options": {
                 "creator-compat": {
@@ -245,13 +237,9 @@
                     "3": ""
                 }
             },
-            "renderAuto": "",
-            "render": "",
-            "renderX": "",
             "view-credits": {
                 "_header": ""
-            },
-            "optionsModeFullScreen": ""
+            }
         },
         "wordBack": "",
         "wordNo": "",
@@ -376,7 +364,6 @@
             "profile": {
                 "deleteProfile": "",
                 "cursorControls": "",
-                "activateProfile": "",
                 "hotkeys": "",
                 "editorControls": "",
                 "playerControls": "",
@@ -449,9 +436,7 @@
             "mainPlayEpisode": ""
         },
         "character": {
-            "charSelTitle": "",
-            "selectCharacter": "",
-            "startGame": ""
+            "selectCharacter": ""
         },
         "battle": {
             "errorNoLevels": ""
@@ -465,7 +450,6 @@
         "wordOn": "",
         "wordOff": "",
         "wordPlayer": "",
-        "wordLanguage": "",
         "wordHide": "",
         "abbrevMilliseconds": "",
         "caseNone": ""
@@ -809,10 +793,6 @@
             "errorInvalidEnterWarp": "",
             "warpNeedStarCount": "",
             "errorNoStartPoint": ""
-        },
-        "controls": {
-            "phrasePlayerDisconnected": "",
-            "phrasePlayerConnected": ""
         },
         "hint": {
             "no-lives-old": "",

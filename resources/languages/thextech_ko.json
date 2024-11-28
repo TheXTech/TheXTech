@@ -328,19 +328,7 @@
         },
         "wordHide": "숨김",
         "options": {
-            "scale": {
-                "label": "스케일",
-                "linear": "이중선형",
-                "integer": "정수",
-                "nearest": "가장 가까운"
-            },
             "restartEngine": "변경 사항을 적용하려면 엔진을 다시 시작하세요.",
-            "renderX": "렌더: {0} (X)",
-            "render": "렌더: {0}",
-            "optionsModeWindowed": "창 모드",
-            "optionsModeFullScreen": "전체화면 모드",
-            "optionsViewCredits": "크레딧 보기",
-            "renderAuto": "렌더링: 자동 ({0})",
             "advanced": {
                 "render": {
                     "opengl11-tip": "",
@@ -651,7 +639,6 @@
             },
             "phraseNewProfOldJoy": "이전 조이스틱의 새 프로파일",
             "profile": {
-                "activateProfile": "프로파일 활성화",
                 "playerControls": "플레이어 컨트롤",
                 "renameProfile": "프로파일 이름바꾸기",
                 "editorControls": "편집기 컨트롤",
@@ -739,7 +726,6 @@
             "wordProfiles": "프로파일",
             "joystickSimpleEditor": ""
         },
-        "wordLanguage": "언어",
         "wordPlayer": "플레이어",
         "wordBack": "뒤로가기",
         "wordOn": "켬",
@@ -756,9 +742,7 @@
         },
         "caseNone": "<없음>",
         "character": {
-            "charSelTitle": "캐릭터 선택",
-            "selectCharacter": "{0} 게임",
-            "startGame": "게임 시작"
+            "selectCharacter": "{0} 게임"
         },
         "editor": {
             "battles": "<전투 레벨>",
@@ -831,10 +815,6 @@
         },
         "format": {
             "minutesSeconds": "{0}분{1}초"
-        },
-        "controls": {
-            "phrasePlayerConnected": "플레이어 {0}가 {1}에 연결됨, 프로파일: {2}",
-            "phrasePlayerDisconnected": "플레이어 {0} 연결 끊김"
         },
         "hint": {
             "no-lives-new": "실패하면 점수가 재설정됩니다.",

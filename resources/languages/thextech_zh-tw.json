@@ -330,10 +330,6 @@
             "wordDisconnect": "斷開",
             "phraseTestProfile": "測試配置"
         },
-        "controls": {
-            "phrasePlayerConnected": "玩家{0}已連接{1}， 配置： {2}",
-            "phrasePlayerDisconnected": "玩家{0}未連接任何設備"
-        },
         "error": {
             "errorInvalidEnterWarp": "作爲關卡起點的傳送點{1}號不存在，因此無法進入關卡。\n傳送點總數：{2}\n\n檔案：{0}",
             "errorNoStartPoint": "未放置玩家起點或傳送點入口，因此無法進入關卡。\n\n檔案：{0}",
@@ -382,9 +378,7 @@
         },
         "caseNone": "<無>",
         "character": {
-            "charSelTitle": "選擇角色",
-            "selectCharacter": "{0}遊戲",
-            "startGame": "開始遊戲"
+            "selectCharacter": "{0}遊戲"
         },
         "controls": {
             "buttons": {
@@ -451,7 +445,6 @@
             },
             "phraseNewProfOldJoy": "新建老式手柄配置",
             "profile": {
-                "activateProfile": "啓用配置",
                 "cursorControls": "鼠標控制",
                 "deleteProfile": "刪除配置",
                 "editorControls": "編輯器控制",
@@ -581,19 +574,7 @@
             "mainPlayEpisode": "開始遊戲"
         },
         "options": {
-            "optionsModeFullScreen": "全屏模式",
-            "optionsModeWindowed": "窗口模式",
-            "optionsViewCredits": "查看製作團隊",
             "restartEngine": "重啓引擎后生效",
-            "scale": {
-                "integer": "整數",
-                "label": "圖像縮放",
-                "linear": "雙綫性",
-                "nearest": "最近鄰居"
-            },
-            "render": "圖形渲染類型: {0}",
-            "renderX": "圖形渲染類型: {0} (X)",
-            "renderAuto": "圖形渲染類型: 自動選擇 ({0})",
             "advanced": {
                 "scale-down-textures": {
                     "all-tip": "縮小全部圖片：載入卡頓的機率比“僅點陣2x”低",
@@ -822,7 +803,6 @@
         },
         "wordBack": "返回",
         "wordHide": "隱藏",
-        "wordLanguage": "語言",
         "wordNo": "否",
         "wordOff": "關閉",
         "wordOn": "開啓",

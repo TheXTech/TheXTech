@@ -173,16 +173,6 @@
                 },
                 "_header": ""
             },
-            "scale": {
-                "integer": "",
-                "nearest": "",
-                "label": "",
-                "linear": ""
-            },
-            "optionsViewCredits": "",
-            "renderX": "",
-            "renderAuto": "",
-            "render": "",
             "main": {
                 "background-work": "",
                 "background-work-tip": "",
@@ -230,8 +220,6 @@
                 "sfx-modern-tip": "",
                 "sfx-audio-fx": ""
             },
-            "optionsModeFullScreen": "",
-            "optionsModeWindowed": "",
             "compatibility": {
                 "reset-all": "",
                 "autocode": "",
@@ -270,7 +258,6 @@
                 "deleteProfile": "",
                 "cursorControls": "",
                 "hotkeys": "",
-                "activateProfile": "",
                 "renameProfile": "",
                 "editorControls": ""
             },
@@ -414,8 +401,6 @@
         },
         "abbrevMilliseconds": "",
         "character": {
-            "charSelTitle": "",
-            "startGame": "",
             "selectCharacter": ""
         },
         "caseNone": "",
@@ -446,7 +431,6 @@
         "wordPlayer": "",
         "wordProfile": "",
         "loading": "",
-        "wordLanguage": "",
         "wordOn": "",
         "wordOff": "",
         "wordNo": "",
@@ -787,10 +771,6 @@
             "phraseChangeChar": "",
             "phraseForceResume": "",
             "splitPressSelect_1": ""
-        },
-        "controls": {
-            "phrasePlayerConnected": "",
-            "phrasePlayerDisconnected": ""
         },
         "format": {
             "minutesSeconds": ""

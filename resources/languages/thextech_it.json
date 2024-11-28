@@ -312,7 +312,6 @@
     },
     "menu": {
         "options": {
-            "optionsModeFullScreen": "",
             "advanced": {
                 "audio-format": {
                     "_name": "",
@@ -386,7 +385,6 @@
                 "choose-assets-on-launch": "",
                 "webm-recording": ""
             },
-            "optionsViewCredits": "",
             "audio": {
                 "sfx-audio-fx": "",
                 "sfx-modern": "",
@@ -492,13 +490,6 @@
                 "show-fps": "",
                 "3d-compat-mode": ""
             },
-            "optionsModeWindowed": "",
-            "scale": {
-                "label": "",
-                "integer": "",
-                "linear": "",
-                "nearest": ""
-            },
             "main": {
                 "four-screen-mode": {
                     "_name": "",
@@ -526,8 +517,6 @@
             "view-credits": {
                 "_header": ""
             },
-            "renderX": "",
-            "renderAuto": "",
             "restartEngine": "",
             "speedrun": {
                 "mode": {
@@ -548,8 +537,7 @@
             },
             "controls": {
                 "_header": ""
-            },
-            "render": ""
+            }
         },
         "main": {
             "mainMultiplayerGame": "",
@@ -630,7 +618,6 @@
             "caseMouse": "",
             "profile": {
                 "cursorControls": "",
-                "activateProfile": "",
                 "editorControls": "",
                 "playerControls": "",
                 "hotkeys": "",
@@ -751,9 +738,7 @@
         "wordOn": "",
         "wordNo": "",
         "character": {
-            "selectCharacter": "",
-            "charSelTitle": "",
-            "startGame": ""
+            "selectCharacter": ""
         },
         "battle": {
             "errorNoLevels": ""
@@ -765,8 +750,7 @@
         "wordResume": "",
         "wordShow": "",
         "wordBack": "",
-        "wordHide": "",
-        "wordLanguage": ""
+        "wordHide": ""
     },
     "game": {
         "connect": {
@@ -821,10 +805,6 @@
         },
         "format": {
             "minutesSeconds": ""
-        },
-        "controls": {
-            "phrasePlayerDisconnected": "",
-            "phrasePlayerConnected": ""
         },
         "msgbox": {
             "sysInfoError": "",
