@@ -62,6 +62,10 @@ public:
             Creator = CreatorEpisode | CreatorFile,
             // Creator = CreatorGlobal | CreatorLocal,
 
+            TranslateOnly = 1 << 5,
+
+            MakeTranslation = UserVisible | TranslateOnly,
+
             // Episode = UserEpisode | CreatorEpisode,
             // File = UserFile | CreatorFile,
             // Local = Episode | File,
