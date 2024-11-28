@@ -27,9 +27,6 @@
 
 struct GameContent
 {
-    std::string controlsPhrasePlayerDisconnected;
-    std::string controlsPhrasePlayerConnected;
-
     std::string msgBoxTitleInfo;
     std::string msgBoxTitleWarning;
     std::string msgBoxTitleError;
@@ -64,8 +61,6 @@ struct GameContent
     std::string connectHoldStart;
     std::string connectDisconnect;
 
-    std::string connectChangeChar;
-    std::string connectSetControls;
     std::string connectDropMe;
 
     std::string connectForceResume;
@@ -74,9 +69,6 @@ struct GameContent
     std::string connectWaitingForInputDevice;
     std::string connectPressSelectForControlsOptions_P1;
     std::string connectPressSelectForControlsOptions_P2;
-
-    std::string connectPressStartToResume;
-    std::string connectPressStartToForceResume;
 };
 
 extern GameContent g_gameStrings;

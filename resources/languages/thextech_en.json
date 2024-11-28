@@ -330,10 +330,6 @@
             "splitPressSelect_2": "Controls Options",
             "wordDisconnect": "Disconnect"
         },
-        "controls": {
-            "phrasePlayerConnected": "P{0} connected {1}, Profile: {2}",
-            "phrasePlayerDisconnected": "P{0} disconnected"
-        },
         "error": {
             "errorInvalidEnterWarp": "Can't start the level because of an invalid entrance warp {1} was specified.\nTotal warp entries: {2}\n\nFile: {0}",
             "errorNoStartPoint": "Can't start the level because of no available start points placed or entrance warp specified.\n\nFile: {0}",
@@ -382,9 +378,7 @@
         },
         "caseNone": "<None>",
         "character": {
-            "charSelTitle": "Character Select",
-            "selectCharacter": "{0} game",
-            "startGame": "Start Game"
+            "selectCharacter": "{0} game"
         },
         "controls": {
             "buttons": {
@@ -452,7 +446,6 @@
             "joystickSimpleEditor": "Simple Editor Controls",
             "phraseNewProfOldJoy": "New Profile for Old Joystick",
             "profile": {
-                "activateProfile": "Activate profile",
                 "cursorControls": "Cursor controls",
                 "deleteProfile": "Delete profile",
                 "editorControls": "Editor controls",
@@ -581,19 +574,7 @@
             "mainPlayEpisode": "Play Episode"
         },
         "options": {
-            "optionsModeFullScreen": "Fullscreen mode",
-            "optionsModeWindowed": "Windowed mode",
-            "optionsViewCredits": "View credits",
-            "render": "Render: {0}",
-            "renderAuto": "Render: Auto ({0})",
-            "renderX": "Render: {0} (X)",
             "restartEngine": "Restart engine for changes to take effect.",
-            "scale": {
-                "integer": "Integer",
-                "label": "Scale",
-                "linear": "Linear",
-                "nearest": "Nearest"
-            },
             "advanced": {
                 "_header": "Advanced",
                 "_tooltip": "Technical options for internal operations",
@@ -822,7 +803,6 @@
         },
         "wordBack": "Back",
         "wordHide": "Hide",
-        "wordLanguage": "Language",
         "wordNo": "No",
         "wordOff": "Off",
         "wordOn": "On",

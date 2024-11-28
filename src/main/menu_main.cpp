@@ -168,9 +168,6 @@ void initMainMenu()
 
     g_mainMenu.optionsRestartEngine = "Restart engine for changes to take effect.";
 
-    g_mainMenu.connectCharSelTitle = "Character Select";
-    g_mainMenu.connectStartGame = "Start Game";
-
     g_mainMenu.wordPlayer = "Player";
     g_mainMenu.wordProfile = "Profile";
     g_mainMenu.wordBack = "Back";
@@ -210,7 +207,6 @@ void initMainMenu()
     g_mainMenu.wordOff  = "Off";
     g_mainMenu.wordShow = "Show";
     g_mainMenu.wordHide = "Hide";
-    g_mainMenu.wordLanguage = "Language";
     g_mainMenu.abbrevMilliseconds = "MS";
 
     // g_mainMenu.promptDeprecatedSetting = "This file uses a deprecated compatibility flag that will be removed in version 1.3.7.\n\nOld flag: \"{0}\"\nNew flag: \"{1}\"\n\n\nReplace it with the updated flag for version 1.3.6 and newer?";

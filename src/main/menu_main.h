@@ -149,8 +149,6 @@ struct MainMenuContent
     std::string optionsRestartEngine;
 
     // ConnectScreen
-    std::string connectCharSelTitle;
-    std::string connectStartGame;
     std::string selectCharacter;
 
     // Controls menus
@@ -191,7 +189,6 @@ struct MainMenuContent
     std::string wordBack;
     std::string wordResume;
     std::string wordWaiting;
-    std::string wordLanguage;
     std::string abbrevMilliseconds;
 };
 
