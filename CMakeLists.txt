@@ -632,6 +632,9 @@ if(NINTENDO_DS AND CALICO_ROOT)
     target_link_libraries(A2XT_Int INTERFACE xtbootstrap)
 endif()
 
+if(ANDROID)
+    set(LZ4_POSITION_INDEPENDENT_LIB ON)
+endif()
 add_subdirectory(3rdparty/mbediso EXCLUDE_FROM_ALL)
 target_link_libraries(A2XT_Int INTERFACE mbediso)
 target_compile_definitions(A2XT_Int INTERFACE
