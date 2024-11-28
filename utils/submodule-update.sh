@@ -15,6 +15,20 @@ elif [[ "$reponame" == "harfbuzz" || "$reponame" == "thextech-discord-rpc" ]]; t
     echo "Branch main"
     git checkout main
     git pull origin main
+# ========================================================
+# TEMPORARY, REMOVE THIS ONCE THIS GETS MERGED INTO MASTER
+elif [[ "$reponame" == "PGE_File_Formats" ]]; then
+    echo "Branch wip-mdx"
+    git checkout wip-mdx
+    git pull origin wip-mdx
+# ========================================================
+elif [[ "$reponame" == "mbediso" ]]; then
+    echo "Branch main"
+    git checkout main
+    git pull origin main
+    # Sync submodules
+    git submodule init
+    git submodule update
 else
     echo "Branch master"
     git checkout master
