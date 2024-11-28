@@ -330,10 +330,6 @@
             "wordDisconnect": "Отключить",
             "phraseTestProfile": "Тест профиля"
         },
-        "controls": {
-            "phrasePlayerConnected": "И{0} подключил(а) {1}, Профиль: {2}",
-            "phrasePlayerDisconnected": "И{0} отключился(лась)"
-        },
         "error": {
             "errorInvalidEnterWarp": "Невозможно запустить уровень, потому что указан некорректный входной проход {1}.\nВсего проходов: {2}\n\nФайл: {0}",
             "errorNoStartPoint": "Невозможно запустить уровень из-за отсутствия начальных точек, либо не указан входной проход.\n\nФайл: {0}",
@@ -382,9 +378,7 @@
         },
         "caseNone": "<Нет>",
         "character": {
-            "charSelTitle": "Выбор персонажа",
-            "selectCharacter": "Играть, как {0}",
-            "startGame": "Начать игру"
+            "selectCharacter": "Играть, как {0}"
         },
         "controls": {
             "buttons": {
@@ -451,7 +445,6 @@
             },
             "phraseNewProfOldJoy": "Новый профиль для ст.джойстика",
             "profile": {
-                "activateProfile": "Активировать профиль",
                 "cursorControls": "Указатель",
                 "deleteProfile": "Удалить профиль",
                 "editorControls": "Редактор",
@@ -581,19 +574,7 @@
             "mainPlayEpisode": "Сыграть в эпизод"
         },
         "options": {
-            "optionsModeFullScreen": "На весь экран",
-            "optionsModeWindowed": "Оконный режим",
-            "optionsViewCredits": "Титры",
             "restartEngine": "Перезагрузите игру, чтобы применить изменения.",
-            "scale": {
-                "integer": "Целочисленный",
-                "label": "Масштаб",
-                "linear": "Линейный",
-                "nearest": "Ближ. сосед"
-            },
-            "renderX": "Графика: {0} (X)",
-            "render": "Графика: {0}",
-            "renderAuto": "Графика: Авто ({0})",
             "advanced": {
                 "audio-buffer-size": {
                     "_tooltip": "Увеличьте, чтобы уменьшить обрывы, но при этом звук будет сильнее отставать",
@@ -822,7 +803,6 @@
         },
         "wordBack": "Назад",
         "wordHide": "Скрыть",
-        "wordLanguage": "Язык",
         "wordNo": "Нет",
         "wordOff": "Выкл.",
         "wordOn": "Вкл.",

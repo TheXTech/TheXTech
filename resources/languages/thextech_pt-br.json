@@ -330,10 +330,6 @@
             "splitPressSelect_1": "Pressione Select para",
             "wordDisconnect": "Desconectar"
         },
-        "controls": {
-            "phrasePlayerDisconnected": "J{0} desconectado",
-            "phrasePlayerConnected": "J{0} conectado {1}, Perfil: {2}"
-        },
         "error": {
             "errorInvalidEnterWarp": "========= ERRO! ==========\n\nNão foi possível iniciar o nível devido a um teleporte de entrada invalido em {1}.\nTotal de entradas no teleporte: {2}\n\nArquivo: {0}",
             "errorNoStartPoint": "========= ERRO! ==========\n\nNão foi possível iniciar o nível por este nível não conter ponto de inicio ou entradas de teleporte especificadas.\n\nArquivo: {0}",
@@ -519,7 +515,6 @@
             },
             "profile": {
                 "hotkeys": "Atalhos",
-                "activateProfile": "Ativar Perfil",
                 "cursorControls": "Controles do cursor",
                 "deleteProfile": "Apagar Perfil",
                 "editorControls": "Controles do editor",
@@ -562,19 +557,7 @@
             "mainMultiplayerGame": "Dois Jogadores"
         },
         "options": {
-            "optionsModeFullScreen": "Modo Tela Cheia",
-            "scale": {
-                "nearest": "Aproximado",
-                "integer": "Inteiros",
-                "linear": "Linear",
-                "label": "Escala"
-            },
             "restartEngine": "Reinicie a Engine para aplicar as mudanças.",
-            "render": "Render.: {0}",
-            "renderAuto": "Render.: Automático ({0})",
-            "renderX": "Render.: {0} (X)",
-            "optionsModeWindowed": "Modo Janela",
-            "optionsViewCredits": "Ver créditos",
             "advanced": {
                 "audio-enable": "",
                 "audio-format": {
@@ -817,12 +800,9 @@
         },
         "caseNone": "<Nenhum>",
         "character": {
-            "selectCharacter": "Jogo do {0}",
-            "startGame": "Iniciar Jogo",
-            "charSelTitle": "Seleção de Personagem"
+            "selectCharacter": "Jogo do {0}"
         },
         "wordHide": "Esconder",
-        "wordLanguage": "Idioma",
         "wordNo": "Não",
         "wordOff": "Desl.",
         "wordOn": "Ligado",

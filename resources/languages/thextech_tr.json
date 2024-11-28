@@ -330,10 +330,6 @@
             "wordDisconnect": "",
             "phraseTestProfile": "Test Profili"
         },
-        "controls": {
-            "phrasePlayerConnected": "",
-            "phrasePlayerDisconnected": ""
-        },
         "error": {
             "openFileFailed": "",
             "warpNeedStarCount": "",
@@ -382,9 +378,7 @@
         },
         "caseNone": "",
         "character": {
-            "charSelTitle": "",
-            "selectCharacter": "",
-            "startGame": ""
+            "selectCharacter": ""
         },
         "controls": {
             "buttons": {
@@ -451,7 +445,6 @@
             },
             "phraseNewProfOldJoy": "",
             "profile": {
-                "activateProfile": "",
                 "cursorControls": "",
                 "deleteProfile": "",
                 "editorControls": "",
@@ -581,9 +574,6 @@
             "mainPlayEpisode": ""
         },
         "options": {
-            "optionsModeFullScreen": "",
-            "optionsModeWindowed": "",
-            "optionsViewCredits": "",
             "advanced": {
                 "advanced-video": "Video",
                 "advanced-audio": "Ses",
@@ -782,12 +772,6 @@
                     "1": ""
                 }
             },
-            "scale": {
-                "label": "",
-                "integer": "",
-                "linear": "",
-                "nearest": ""
-            },
             "audio": {
                 "sfx-modern-tip": "",
                 "audio-sfx-volume": "",
@@ -815,10 +799,7 @@
             "view-credits": {
                 "_header": ""
             },
-            "restartEngine": "",
-            "render": "",
-            "renderAuto": "",
-            "renderX": ""
+            "restartEngine": ""
         },
         "wordBack": "",
         "wordHide": "",
@@ -830,8 +811,7 @@
         "wordResume": "Devam Et",
         "wordShow": "Göster",
         "wordWaiting": "Bekleniyor",
-        "wordYes": "Evet",
-        "wordLanguage": ""
+        "wordYes": "Evet"
     },
     "outro": {
         "cppPortDevelopers": "C++ portunun geliştiricileri:",

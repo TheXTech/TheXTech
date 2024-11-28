@@ -1,12 +1,6 @@
 {
     "menu": {
         "options": {
-            "scale": {
-                "nearest": "",
-                "integer": "",
-                "label": "",
-                "linear": ""
-            },
             "audio": {
                 "sfx-pet-beat": "",
                 "audio-prefs": "",
@@ -209,7 +203,6 @@
                 },
                 "_header": ""
             },
-            "renderX": "",
             "speedrun": {
                 "mode": {
                     "0": "",
@@ -219,14 +212,10 @@
                     "_name": ""
                 }
             },
-            "optionsModeFullScreen": "",
-            "renderAuto": "",
             "restartEngine": "",
             "view-credits": {
                 "_header": ""
             },
-            "optionsViewCredits": "",
-            "optionsModeWindowed": "",
             "controls": {
                 "_header": ""
             },
@@ -237,8 +226,7 @@
                 "_header": "",
                 "features": "",
                 "reset-all": ""
-            },
-            "render": ""
+            }
         },
         "game": {
             "gameSlotNew": "",
@@ -381,7 +369,6 @@
             },
             "profile": {
                 "cursorControls": "",
-                "activateProfile": "",
                 "deleteProfile": "",
                 "renameProfile": "",
                 "playerControls": "",
@@ -436,7 +423,6 @@
             "battles": "",
             "promptNewWorldName": ""
         },
-        "wordLanguage": "",
         "battle": {
             "errorNoLevels": ""
         },
@@ -449,8 +435,6 @@
         "wordOn": "",
         "wordYes": "",
         "character": {
-            "startGame": "",
-            "charSelTitle": "",
             "selectCharacter": ""
         },
         "caseNone": "",
@@ -782,10 +766,6 @@
         "labelSortOffset": ""
     },
     "game": {
-        "controls": {
-            "phrasePlayerDisconnected": "",
-            "phrasePlayerConnected": ""
-        },
         "connect": {
             "splitPressSelect_1": "",
             "reconnectTitle": "",

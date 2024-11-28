@@ -352,10 +352,6 @@
         "format": {
             "minutesSeconds": ""
         },
-        "controls": {
-            "phrasePlayerDisconnected": "",
-            "phrasePlayerConnected": ""
-        },
         "pause": {
             "enterCode": "",
             "continue": "",
@@ -444,7 +440,6 @@
                 "deleteProfile": "",
                 "editorControls": "",
                 "hotkeys": "",
-                "activateProfile": "",
                 "cursorControls": "",
                 "renameProfile": ""
             },
@@ -541,14 +536,6 @@
             "controlsDeviceTypes": ""
         },
         "options": {
-            "renderAuto": "",
-            "render": "",
-            "scale": {
-                "nearest": "",
-                "label": "",
-                "linear": "",
-                "integer": ""
-            },
             "advanced": {
                 "render": {
                     "_name": "",
@@ -665,7 +652,6 @@
                 "unlimited-framerate": "",
                 "vsync": ""
             },
-            "renderX": "",
             "restartEngine": "",
             "audio": {
                 "sfx-spatial-audio-tip": "",
@@ -753,8 +739,6 @@
                 "video-system": "",
                 "world-map-stars-show-tip": ""
             },
-            "optionsModeFullScreen": "",
-            "optionsViewCredits": "",
             "compatibility": {
                 "features": "",
                 "_tooltip": "",
@@ -763,7 +747,6 @@
                 "autocode": "",
                 "bugfixes": ""
             },
-            "optionsModeWindowed": "",
             "speedrun": {
                 "mode": {
                     "3": "",
@@ -815,9 +798,7 @@
         },
         "abbrevMilliseconds": "",
         "character": {
-            "selectCharacter": "",
-            "startGame": "",
-            "charSelTitle": ""
+            "selectCharacter": ""
         },
         "loading": "",
         "wordHide": "",
@@ -826,7 +807,6 @@
         "wordBack": "",
         "wordOff": "",
         "wordResume": "",
-        "wordLanguage": "",
         "wordProfile": "",
         "wordPlayer": "",
         "wordWaiting": "",

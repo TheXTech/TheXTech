@@ -74,12 +74,6 @@
                 },
                 "webm-recording": ""
             },
-            "scale": {
-                "linear": "",
-                "integer": "",
-                "label": "",
-                "nearest": ""
-            },
             "restartEngine": "",
             "episode-options": {
                 "creator-compat": {
@@ -220,10 +214,6 @@
             "controls": {
                 "_header": ""
             },
-            "optionsModeFullScreen": "",
-            "optionsViewCredits": "",
-            "render": "",
-            "renderX": "",
             "audio": {
                 "audio-music-volume": "",
                 "_header": "",
@@ -236,13 +226,9 @@
                 "sfx-pet-beat": "",
                 "audio-sfx-volume": "",
                 "sfx-pet-beat-tip": ""
-            },
-            "optionsModeWindowed": "",
-            "renderAuto": ""
+            }
         },
         "character": {
-            "startGame": "",
-            "charSelTitle": "",
             "selectCharacter": ""
         },
         "controls": {
@@ -378,7 +364,6 @@
                 "playerControls": "",
                 "editorControls": "",
                 "cursorControls": "",
-                "activateProfile": "",
                 "deleteProfile": ""
             },
             "options": {
@@ -407,7 +392,6 @@
             "caseMouse": "",
             "wordProfiles": ""
         },
-        "wordLanguage": "",
         "caseNone": "",
         "game": {
             "gameNoEpisodesToPlay": "",
@@ -787,10 +771,6 @@
             "splitPressSelect_1": "",
             "wordDisconnect": "",
             "phraseTestControls": ""
-        },
-        "controls": {
-            "phrasePlayerConnected": "",
-            "phrasePlayerDisconnected": ""
         },
         "format": {
             "minutesSeconds": ""

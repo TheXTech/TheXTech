@@ -74,7 +74,6 @@
                 "_tooltip": "",
                 "audio-enable": ""
             },
-            "optionsModeWindowed": "",
             "episode-options": {
                 "creator-compat": {
                     "disable": "",
@@ -176,14 +175,7 @@
                 "video-system": "",
                 "world-map-stars-show": ""
             },
-            "renderX": "",
             "restartEngine": "",
-            "scale": {
-                "linear": "",
-                "label": "",
-                "integer": "",
-                "nearest": ""
-            },
             "compatibility": {
                 "features": "",
                 "bugfixes": "",
@@ -216,8 +208,6 @@
                 "language": "",
                 "vsync": ""
             },
-            "render": "",
-            "optionsViewCredits": "",
             "audio": {
                 "_header": "",
                 "audio-music-volume": "",
@@ -234,8 +224,6 @@
             "controls": {
                 "_header": ""
             },
-            "optionsModeFullScreen": "",
-            "renderAuto": "",
             "view-credits": {
                 "_header": ""
             }
@@ -334,8 +322,7 @@
                 "deleteProfile": "",
                 "renameProfile": "",
                 "hotkeys": "",
-                "editorControls": "",
-                "activateProfile": ""
+                "editorControls": ""
             },
             "tDS": {
                 "buttonX": "",
@@ -426,9 +413,7 @@
         },
         "caseNone": "",
         "character": {
-            "selectCharacter": "",
-            "startGame": "",
-            "charSelTitle": ""
+            "selectCharacter": ""
         },
         "main": {
             "mainExit": "",
@@ -450,7 +435,6 @@
         "wordOff": "",
         "wordPlayer": "",
         "wordBack": "",
-        "wordLanguage": "",
         "wordOn": "",
         "wordShow": "",
         "wordResume": "",
@@ -826,10 +810,6 @@
             "sysInfoWarning": "",
             "sysInfoTitle": "",
             "sysInfoError": ""
-        },
-        "controls": {
-            "phrasePlayerDisconnected": "",
-            "phrasePlayerConnected": ""
         }
     },
     "outro": {

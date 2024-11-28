@@ -16,7 +16,6 @@
             "warnEpCompat": ""
         },
         "options": {
-            "renderX": "",
             "advanced": {
                 "scale-down-textures": {
                     "_tooltip": "",
@@ -112,14 +111,6 @@
                 "audio-sfx-volume": "",
                 "audio-prefs": ""
             },
-            "scale": {
-                "integer": "",
-                "nearest": "",
-                "label": "",
-                "linear": ""
-            },
-            "render": "",
-            "renderAuto": "",
             "compatibility": {
                 "_header": "",
                 "_tooltip": "",
@@ -248,9 +239,6 @@
                 "_header": ""
             },
             "restartEngine": "",
-            "optionsModeFullScreen": "",
-            "optionsViewCredits": "",
-            "optionsModeWindowed": "",
             "controls": {
                 "_header": ""
             }
@@ -288,7 +276,6 @@
             },
             "profile": {
                 "renameProfile": "",
-                "activateProfile": "",
                 "playerControls": "",
                 "deleteProfile": "",
                 "cursorControls": "",
@@ -425,9 +412,7 @@
             "makeFor": ""
         },
         "character": {
-            "selectCharacter": "",
-            "startGame": "",
-            "charSelTitle": ""
+            "selectCharacter": ""
         },
         "main": {
             "mainBattleGame": "",
@@ -448,7 +433,6 @@
         },
         "caseNone": "",
         "abbrevMilliseconds": "",
-        "wordLanguage": "",
         "wordOn": "",
         "wordPlayer": "",
         "wordNo": "",
@@ -787,10 +771,6 @@
             "phraseWaitingForInput": "",
             "wordDisconnect": "",
             "phraseTestControls": ""
-        },
-        "controls": {
-            "phrasePlayerDisconnected": "",
-            "phrasePlayerConnected": ""
         },
         "error": {
             "errorInvalidEnterWarp": "",
