@@ -639,6 +639,7 @@
                     "safe": "Safe",
                     "safe-tip": "Checks if images are in 2x format"
                 },
+                "use-native-osk": "Native OSK",
                 "webm-recording": "WEBM recording",
                 "internal-res-4p": {
                     "_name": "4P split screen size",
