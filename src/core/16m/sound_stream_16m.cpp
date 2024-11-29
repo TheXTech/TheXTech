@@ -42,13 +42,20 @@ struct Sound_Stream
 
 static Sound_Stream s_stream;
 
+void Sound_StreamLoadData();;
+
 
 mm_word s_fill_stream(mm_word length, mm_addr dest, mm_stream_formats /*format*/)
 {
-    if(!s_stream.encoded_bytes)
+    if(length < QOA_FRAME_LEN)
         return 0;
 
-    if(length < QOA_FRAME_LEN)
+#ifdef __CALICO__
+    if(!s_stream.encoded_bytes)
+        Sound_StreamLoadData();
+#endif
+
+    if(!s_stream.encoded_bytes)
         return 0;
 
     unsigned int samples_decoded;
@@ -106,15 +113,22 @@ void Sound_StreamStart(SDL_RWops* rwops)
     if(s_stream.desc.channels == 1)
         stream.format = MM_STREAM_16BIT_MONO;
 
+#ifdef __CALICO__
+    stream.timer = 0;
+    stream.manual = 0;
+#else
     stream.timer = MM_TIMER3;
     stream.manual = 1;
+#endif
 
     // open the stream
     mmStreamOpen(&stream);
 
+#ifndef __CALICO__
     // start playing
     Sound_StreamUpdate();
     Sound_StreamUpdate();
+#endif
 }
 
 void Sound_StreamUpdate()
@@ -125,39 +139,57 @@ void Sound_StreamUpdate()
     if(s_stream.encoded_bytes)
         mmStreamUpdate();
     else
+        Sound_StreamLoadData();
+}
+
+void Sound_StreamLoadData()
+{
+    if(!s_stream.rwops)
+        return;
+
+    size_t frame_size = s_qoa_frame_size;
+    if(s_stream.desc.channels == 1)
+        frame_size = QOA_FRAME_SIZE(1, QOA_SLICES_PER_FRAME);
+
+    s_stream.encoded_bytes = SDL_RWread(s_stream.rwops, s_stream.encoded_frame, 1, frame_size);
+
+    while(s_stream.encoded_bytes != frame_size)
     {
-        size_t frame_size = s_qoa_frame_size;
-        if(s_stream.desc.channels == 1)
-            frame_size = QOA_FRAME_SIZE(1, QOA_SLICES_PER_FRAME);
+        int new_bytes = SDL_RWread(s_stream.rwops, s_stream.encoded_frame + s_stream.encoded_bytes, 1, frame_size - s_stream.encoded_bytes);
 
-        s_stream.encoded_bytes = SDL_RWread(s_stream.rwops, s_stream.encoded_frame, 1, frame_size);
+        if(new_bytes == 0)
+            break;
+        else
+            printf("Stream: read %d bytes first and %d bytes second.", (int)s_stream.encoded_bytes, new_bytes);
 
-        if(s_stream.encoded_bytes != frame_size)
+        s_stream.encoded_bytes += new_bytes;
+    }
+
+    if(s_stream.encoded_bytes != frame_size)
+    {
+        // return to stream start
+        SDL_RWseek(s_stream.rwops, s_stream.first_frame_filepos, RW_SEEK_SET);
+
+        // try to read again if there wasn't anything left
+        if(s_stream.encoded_bytes == 0)
+            s_stream.encoded_bytes = SDL_RWread(s_stream.rwops, s_stream.encoded_frame, 1, frame_size);
+
+        // if still nothing, then panic and close the file
+        if(s_stream.encoded_bytes == 0)
         {
-            // return to stream start
-            SDL_RWseek(s_stream.rwops, s_stream.first_frame_filepos, RW_SEEK_SET);
-
-            // try to read again if there wasn't anything left
-            if(s_stream.encoded_bytes == 0)
-                s_stream.encoded_bytes = SDL_RWread(s_stream.rwops, s_stream.encoded_frame, 1, frame_size);
-
-            // if still nothing, then panic and close the file
-            if(s_stream.encoded_bytes == 0)
-            {
-                SDL_RWclose(s_stream.rwops);
-                s_stream.rwops = nullptr;
-            }
+            SDL_RWclose(s_stream.rwops);
+            s_stream.rwops = nullptr;
         }
     }
 }
 
 void Sound_StreamStop()
 {
+    mmStreamClose();
+
     if(s_stream.rwops)
     {
         SDL_RWclose(s_stream.rwops);
         s_stream.rwops = nullptr;
     }
-
-    mmStreamClose();
 }
