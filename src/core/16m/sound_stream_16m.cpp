@@ -29,13 +29,13 @@
 #include "core/16m/qoa.h"
 
 
-static constexpr size_t s_qoa_frame_size = QOA_FRAME_SIZE(2, QOA_SLICES_PER_FRAME);
+static constexpr size_t s_max_qoa_frame_size = QOA_FRAME_SIZE(2, QOA_SLICES_PER_FRAME);
 
 struct Sound_Stream
 {
     SDL_RWops* rwops = nullptr;
     qoa_desc desc;
-    uint8_t encoded_frame[s_qoa_frame_size];
+    uint8_t encoded_frame[s_max_qoa_frame_size];
     unsigned int encoded_bytes = 0;
     int first_frame_filepos = 0;
 };
@@ -136,10 +136,12 @@ void Sound_StreamUpdate()
     if(!s_stream.rwops)
         return;
 
+#ifndef __CALICO__
     if(s_stream.encoded_bytes)
         mmStreamUpdate();
     else
         Sound_StreamLoadData();
+#endif
 }
 
 void Sound_StreamLoadData()
@@ -147,13 +149,13 @@ void Sound_StreamLoadData()
     if(!s_stream.rwops)
         return;
 
-    size_t frame_size = s_qoa_frame_size;
+    size_t frame_size = s_max_qoa_frame_size;
     if(s_stream.desc.channels == 1)
         frame_size = QOA_FRAME_SIZE(1, QOA_SLICES_PER_FRAME);
 
     s_stream.encoded_bytes = SDL_RWread(s_stream.rwops, s_stream.encoded_frame, 1, frame_size);
 
-    while(s_stream.encoded_bytes != frame_size)
+    while(s_stream.encoded_bytes != 0 && s_stream.encoded_bytes != frame_size)
     {
         int new_bytes = SDL_RWread(s_stream.rwops, s_stream.encoded_frame + s_stream.encoded_bytes, 1, frame_size - s_stream.encoded_bytes);
 
