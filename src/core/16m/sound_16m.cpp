@@ -85,6 +85,8 @@ static bool s_useIceBallSfx = false;
 //! Enable using of the new ice SFX: NPC freeze and breaking of the frozen NPC
 static bool s_useNewIceSfx = false;
 
+static int s_loaderEffect = -1;
+
 static int s_curMusic = -1;
 static uint16_t s_customSection = 0;
 // static int s_curJingle = -1;
@@ -557,14 +559,18 @@ void PlayInitSound()
     if(!s_soundbank_rwops)
         return;
 
+    if(s_loaderEffect != -1)
+    {
+        mmUnloadEffect(s_loaderEffect);
+        s_loaderEffect = -1;
+    }
+
     // std::string doSound = AppPath + "sound/";
     IniProcessing sounds = Files::load_ini(AppPath + "sounds.ini");
     unsigned int totalSounds;
     sounds.beginGroup("sound-main");
     sounds.read("total", totalSounds, 0);
     sounds.endGroup();
-
-    s_soundLoaded.resize(totalSounds);
 
     if(totalSounds >= SFX_Do)
     {
@@ -576,8 +582,8 @@ void PlayInitSound()
         if(effect != -1)
         {
             mmLoadEffect(effect);
-            s_soundLoaded[SFX_Do - 1] = true;
             mmEffect(effect);
+            s_loaderEffect = effect;
         }
     }
 }
@@ -649,6 +655,12 @@ void InitSound()
     if(!g_mixerLoaded)
         return;
 
+    if(s_loaderEffect != -1)
+    {
+        mmUnloadEffect(s_loaderEffect);
+        s_loaderEffect = -1;
+    }
+
     if(!s_soundbank_rwops)
         LoadSoundBank();
 
@@ -700,6 +712,7 @@ void InitSound()
 
     int real_effects = 0;
     s_sfxEffects.reserve(g_totalSounds);
+    s_sfxEffects.resize(0);
     s_soundLoaded.resize(g_totalSounds);
     int effect;
     UpdateLoad();
