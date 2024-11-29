@@ -190,11 +190,12 @@ void XLanguage::resolveLanguage(const std::string& requestedLanguage)
 #ifndef THEXTECH_DISABLE_SDL_LOCALE
     pLogDebug("Checking SDL localization...");
 
-    SDL_Locale *loc = SDL_GetPreferredLocales();
+    SDL_Locale *loc_head = SDL_GetPreferredLocales();
+
     CurrentLanguage.clear();
     CurrentLangDialect.clear();
 
-    for(; loc; ++loc)
+    for(SDL_Locale *loc = loc_head; loc; ++loc)
     {
         if(!loc->language && !loc->country)
             break; // Empty entry
@@ -213,12 +214,13 @@ void XLanguage::resolveLanguage(const std::string& requestedLanguage)
 
         if(detectSetup())
         {
-            SDL_free(loc);
+            SDL_free(loc_head);
             return; // Found!
         }
     }
 
-    SDL_free(loc);
+    if(loc_head)
+        SDL_free(loc_head);
 #endif
 
     // Detect using system specific ways
