@@ -700,6 +700,13 @@ void lazyLoadPictureFromList(StdPicture_Sub& target, PGE_FileFormats_misc::TextI
     target.l.path += std::move(line_buf);
     target.l.lazyLoaded = true;
 
+    if(target.l.path.size() >= 4 && SDL_strncasecmp(target.l.path.c_str() + target.l.path.size() - 4, ".gif", 4) == 0)
+    {
+        target.l.mask_path = target.l.path;
+        target.l.mask_path.resize(target.l.mask_path.size() - 4);
+        target.l.mask_path += "m.gif";
+    }
+
     bool okay = false;
 
     int w, h;
