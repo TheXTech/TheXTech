@@ -646,7 +646,8 @@
                     "qsmbx": "1600x1200（QSMBX）",
                     "_name": "四人分屏模式畫面大小",
                     "default": "缺省"
-                }
+                },
+                "use-native-osk": "啓用內置虛擬鍵盤"
             },
             "audio": {
                 "audio-sfx-volume": "聲音音量",
