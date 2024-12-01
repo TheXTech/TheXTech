@@ -891,7 +891,15 @@ void lazyLoad(StdPicture& target)
         return;
     }
 
-    if(target.h > 2048 && target.d.texture_file_init[0])
+    int expanded_dim = target.h;
+
+    if(target.w > 2048 && target.h <= 2048)
+    {
+        expanded_dim = target.w;
+        target.d.multi_horizontal = true;
+    }
+
+    if(expanded_dim > 2048 && target.d.texture_file_init[0])
     {
         suppPath = target.l.path + '1';
         Files::Data d = robust_Files_load_file(suppPath);
@@ -908,7 +916,7 @@ void lazyLoad(StdPicture& target)
         }
     }
 
-    if(target.h > 4096 && target.d.texture_file_init[0])
+    if(expanded_dim > 4096 && target.d.texture_file_init[0])
     {
         suppPath = target.l.path + '2';
         Files::Data d = robust_Files_load_file(suppPath);
