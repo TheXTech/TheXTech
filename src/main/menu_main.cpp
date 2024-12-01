@@ -1987,12 +1987,13 @@ void drawGameVersion(bool disable_git, bool git_only)
     constexpr bool is_release = !in_string(V_LATEST_STABLE, '-');
     constexpr bool is_main = str_prefix(V_BUILD_BRANCH, "main");
     constexpr bool is_stable = str_prefix(V_BUILD_BRANCH, "stable");
+    constexpr bool is_head = str_prefix(V_BUILD_BRANCH, "HEAD");
     constexpr bool is_wip = str_prefix(V_BUILD_BRANCH, "wip-");
 
     constexpr bool is_dirty = in_string(V_BUILD_VER, '-');
 
-    constexpr bool show_branch = (!is_main && !(is_release && is_stable));
-    constexpr bool show_commit = (!is_release || (!is_main && !is_stable));
+    constexpr bool show_branch = (!is_main && !(is_release && is_stable) && !is_head);
+    constexpr bool show_commit = (!is_release || (!is_main && !is_stable && !is_head));
 
     // show version
     if(!git_only)
