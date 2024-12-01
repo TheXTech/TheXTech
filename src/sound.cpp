@@ -105,7 +105,7 @@ const AudioDefaults_t g_audioDefaults =
 #endif
 
 static Mix_Music *g_curMusic = nullptr;
-static bool g_mixerLoaded = false;
+bool g_mixerLoaded = false;
 
 //! most recent argument to StartMusic. Could be a world map music ID or a section index.
 static constexpr int s_null_music = -5;
