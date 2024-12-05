@@ -68,6 +68,7 @@ struct tex_load_data
 {
     Files::Data data;
     GL_TEXTURE_SIZE_ENUM w, last_h;
+    GL_TEXTURE_TYPE_ENUM type;
     int name[3] = {};
     int params;
 
@@ -92,7 +93,8 @@ struct tex_load_data
             return nullptr;
 
         unsigned w_px = 1 << (3 + w);
-        unsigned pixel_data_offset = 32 + i * w_px * 1024 / 2;
+        unsigned pixels_per_byte = (type == GL_RGB32_A3) ? 1 : 2;
+        unsigned pixel_data_offset = 32 + i * w_px * 1024 / pixels_per_byte;
 
         if(data.size() < pixel_data_offset)
             return nullptr;
@@ -195,6 +197,9 @@ static int s_loadTextureToRAM(tex_load_data& tex, const std::string& path, int l
     uint16_t h_px = (1 << (3 + tex.last_h)) + (1024 * complete_texture_count);
     uint32_t data_size = w_px * h_px / 2;
 
+    if(flags & 32)
+        data_size *= 2;
+
     // don't even try to load a texture that would require >=25% of VRAM
     if(data_size > 131072)
     {
@@ -263,15 +268,19 @@ static int s_loadTexture(const std::string& path, int* tex_out, int* data_size, 
         if((flags & 16) == 0)
             tex.params |= GL_TEXTURE_COLOR0_TRANSPARENT;
 
+        tex.type = GL_RGB16;
+        if(flags & 32)
+            tex.type = GL_RGB32_A3;
+
         glBindTexture(0, tex.name[i]);
 
         // allocate, but do not load to VRAM yet
-        if(!glTexImage2D(0, 0, GL_RGB16, tex.w, h_enum, 0, tex.params, nullptr))
+        if(!glTexImage2D(0, 0, tex.type, tex.w, h_enum, 0, tex.params, nullptr))
         {
             pLogWarning("Could not load texture (%u bytes) to VRAM (%u/524288 used). Requesting free texture memory.", part_data_size, s_loadedVRAM);
             minport_freeTextureMemory();
 
-            if(!glTexImage2D(0, 0, GL_RGB16, tex.w, h_enum, 0, tex.params, nullptr))
+            if(!glTexImage2D(0, 0, tex.type, tex.w, h_enum, 0, tex.params, nullptr))
             {
                 pLogWarning("Still could not load texture (%u bytes) to VRAM (%u/524288 used).", part_data_size, s_loadedVRAM);
                 glDeleteTextures(1, &tex.name[i]);
@@ -592,7 +601,7 @@ void repaint()
 
                 glBindTexture(0, tex.name[i]);
                 glColorSubTableEXT(0, 0, 16, 0, 0, tex.palette());
-                glTexImage2D(0, 0, GL_RGB16, tex.w, tex.h(i), 0, tex.params, tex.pixels(i));
+                glTexImage2D(0, 0, tex.type, tex.w, tex.h(i), 0, tex.params, tex.pixels(i));
             }
         }
 
