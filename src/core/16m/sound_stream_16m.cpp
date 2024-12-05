@@ -172,8 +172,14 @@ void Sound_StreamLoadData()
         // return to stream start
         SDL_RWseek(s_stream.rwops, s_stream.first_frame_filepos, RW_SEEK_SET);
 
-        // try to read again if there wasn't anything left
-        if(s_stream.encoded_bytes == 0)
+        // try to read again if there wasn't anything left (or always on Calico, which requires precise frames)
+#ifdef __CALICO__
+        const bool read_again = true;
+#else
+        const bool read_again = (s_stream.encoded_bytes == 0);
+#endif
+
+        if(read_again)
             s_stream.encoded_bytes = SDL_RWread(s_stream.rwops, s_stream.encoded_frame, 1, frame_size);
 
         // if still nothing, then panic and close the file
