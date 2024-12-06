@@ -125,9 +125,29 @@ static void initPlayers(Player_t tempPlayer[maxLocalPlayers])
 
     if(numPlayers == 1 || g_ClonedPlayerMode)
     {
+        tempPlayer[0].Direction = 1;
+    }
+    else if(numPlayers == 2)
+    {
+        tempPlayer[0].Direction = -1;
+        tempPlayer[1].Direction = 1;
+    }
+    else
+    {
+        for(int i = 0; i < numPlayers && i < maxLocalPlayers; i++)
+            tempPlayer[i].Direction = 1;
+    }
+
+    for(int i = 0; i < numPlayers && i < maxLocalPlayers; i++)
+        PlayerFrame(tempPlayer[i]);
+}
+
+static void placePlayers(Player_t tempPlayer[maxLocalPlayers])
+{
+    if(numPlayers == 1 || g_ClonedPlayerMode)
+    {
         tempPlayer[0].Location.X = XRender::TargetW / 2.0 - tempPlayer[0].Location.Width / 2.0;
         tempPlayer[0].Location.Y = XRender::TargetH / 2.0 - tempPlayer[0].Location.Height + 24;
-        tempPlayer[0].Direction = 1;
     }
     else if(numPlayers == 2)
     {
@@ -137,26 +157,24 @@ static void initPlayers(Player_t tempPlayer[maxLocalPlayers])
 
         tempPlayer[1].Location.X = XRender::TargetW / 2.0 - tempPlayer[1].Location.Width / 2.0 + 32;
         tempPlayer[1].Location.Y = XRender::TargetH / 2.0 - tempPlayer[1].Location.Height + 24;
-        tempPlayer[1].Direction = 1;
     }
     else
     {
         int start_x = XRender::TargetW / 2.0 - (numPlayers - 1) * 32;
+
         for(int i = 0; i < numPlayers && i < maxLocalPlayers; i++)
         {
             tempPlayer[i].Location.X = start_x + 64 * i - tempPlayer[i].Location.Width / 2.0;
             tempPlayer[i].Location.Y = XRender::TargetH / 2.0 - tempPlayer[i].Location.Height + 24;
-            tempPlayer[i].Direction = 1;
         }
     }
-
-    for(int i = 0; i < numPlayers && i < maxLocalPlayers; i++)
-        PlayerFrame(tempPlayer[i]);
 }
 
 
 static void drawEnterScreen(Player_t tempPlayer[maxLocalPlayers])
 {
+    placePlayers(tempPlayer);
+
     for(int A = 0; A < numPlayers && A < maxLocalPlayers; ++A)
     {
         DrawPlayer(tempPlayer[A], 0);
