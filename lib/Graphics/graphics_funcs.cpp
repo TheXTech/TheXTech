@@ -411,20 +411,17 @@ void GraphicsHelps::mergeWithMask(FIBITMAP *image, FIBITMAP *mask)
             Npix.rgbBlue = ((SPixP[FI_RGBA_BLUE] & s_bitblitBG.rgbBlue) | FPixP[FI_RGBA_BLUE]);
             Npix.rgbGreen = ((SPixP[FI_RGBA_GREEN] & s_bitblitBG.rgbGreen) | FPixP[FI_RGBA_GREEN]);
             Npix.rgbRed = ((SPixP[FI_RGBA_RED] & s_bitblitBG.rgbRed) | FPixP[FI_RGBA_RED]);
-            newAlpha = 255 - ((static_cast<unsigned short>(SPixP[FI_RGBA_RED]) +
-                               static_cast<unsigned short>(SPixP[FI_RGBA_GREEN]) +
-                               static_cast<unsigned short>(SPixP[FI_RGBA_BLUE])) / 3);
 
-            if((SPixP[FI_RGBA_RED] > 240u) //is almost White
-               && (SPixP[FI_RGBA_GREEN] > 240u)
-               && (SPixP[FI_RGBA_BLUE] > 240u))
+            // these terms (mask pixel and not front pixel, bitwise) represent the values that could be seen in SMBX 1.3
+            newAlpha = 255 - ((static_cast<unsigned short>(SPixP[FI_RGBA_RED] & ~FPixP[FI_RGBA_RED]) +
+                               static_cast<unsigned short>(SPixP[FI_RGBA_GREEN] & ~FPixP[FI_RGBA_GREEN]) +
+                               static_cast<unsigned short>(SPixP[FI_RGBA_BLUE] & ~FPixP[FI_RGBA_BLUE])) / 3);
+
+            if(newAlpha < 16)
                 newAlpha = 0;
 
-            newAlpha += ((static_cast<unsigned short>(FPixP[FI_RGBA_RED]) +
-                          static_cast<unsigned short>(FPixP[FI_RGBA_GREEN]) +
-                          static_cast<unsigned short>(FPixP[FI_RGBA_BLUE])) / 3);
-
-            if(newAlpha > 255) newAlpha = 255;
+            if(newAlpha > 240)
+                newAlpha = 255;
 
             FPixP[FI_RGBA_BLUE]  = Npix.rgbBlue;
             FPixP[FI_RGBA_GREEN] = Npix.rgbGreen;
@@ -745,6 +742,11 @@ bool GraphicsHelps::validateBitmaskRequired(FIBITMAP *image, FIBITMAP *mask, con
     BYTE *line1 = fimg_bits;
     BYTE *line2 = bimg_bits;
 
+    int blend_bits = 0;
+
+    BYTE fp_default[4] = {0, 0, 0, 0};
+    BYTE bp_default[4] = {255, 255, 255, 255};
+
     for(uint32_t y = 0; y < fh || y < bh; ++y)
     {
         for(uint32_t x = 0; x < fw || x < bw; ++x)
@@ -755,36 +757,42 @@ bool GraphicsHelps::validateBitmaskRequired(FIBITMAP *image, FIBITMAP *mask, con
             BYTE *fp = line1 + (y * fpitch) + (x * 4);
             BYTE *bp = line2 + (y * bpitch) + (x * 4);
 
+            if(!fp_present)
+                fp = fp_default;
+
+            if(!bp_present)
+                bp = bp_default;
+
             // accept vanilla GIFs that target 16-bit color depth
             // note that missing back pixels are white and absent front pixels are black
-            bool bp_is_white = !bp_present || (bp[0] >= 0xf8 && bp[1] >= 0xf8 && bp[2] >= 0xf8);
-            bool fp_is_white =  fp_present && (fp[0] >= 0xf8 && fp[1] >= 0xf8 && fp[2] >= 0xf8);
-            bool bp_is_black =  bp_present && (bp[0] <  0x08 && bp[1] <  0x08 && bp[2] <  0x08);
-            bool fp_is_black = !fp_present || (fp[0] <  0x08 && fp[1] <  0x08 && fp[2] <  0x08);
-
-            // mask pixel is black: buffer replaced with front pixel
-            if(bp_is_black)
-                continue;
-
-            // front pixel is white: buffer replaced with front pixel
-            if(fp_is_white)
-                continue;
+            bool bp_is_white = bp[0] >= 0xf0 && bp[1] >= 0xf0 && bp[2] >= 0xf0;
+            bool fp_is_black = fp[0] <  0x10 && fp[1] <  0x10 && fp[2] <  0x10;
 
             // back pixel is white and front pixel is black: buffer preserved
             if(bp_is_white && fp_is_black)
                 continue;
 
-            // pixel is matching with the front (i.e. is not an example of the lazily-made sprite)
-            if(bp_present && fp_present && SDL_memcmp(bp, fp, 3) == 0)
+            // front contains back: buffer replaced with front pixel
+            // (this subsumes mask pixel black, front pixel white, and matching cases)
+            if((bp[0] & ~fp[0] & 0xf8) == 0 && (bp[1] & ~fp[1] & 0xf8) == 0 && (bp[2] & ~fp[2] & 0xf8) == 0)
                 continue;
 
-            D_pLogDebug("Texture REQUIRES the bitmask render (%s)", origPath.c_str());
-            return true;
+            blend_bits += (bp[0] & ~fp[0]) / 0x08;
+            blend_bits += (bp[1] & ~fp[1]) / 0x08;
+            blend_bits += (bp[2] & ~fp[2]) / 0x08;
         }
     }
 
-    D_pLogDebug("Texture doesn't require bitmask render (%s)", origPath.c_str());
-    return false;
+    if(blend_bits >= 10000)
+    {
+        D_pLogDebug("Texture REQUIRES the bitmask render (%s)", origPath.c_str());
+        return true;
+    }
+    else
+    {
+        D_pLogDebug("Texture doesn't require bitmask render (%s)", origPath.c_str());
+        return false;
+    }
 }
 
 bool GraphicsHelps::validateForDepthTest(FIBITMAP *image, const std::string &origPath)
