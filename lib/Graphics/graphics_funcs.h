@@ -203,6 +203,13 @@ public:
     static FIBITMAP *fastScaleDownAnd32Bit(FIBITMAP *image, bool do_scale_down = true);
 
     /*!
+     * \brief Quickly convert the image from 1-color or 256-color to 16-bit RGB565 (3DS-exclusive). Also does a vertical flip.
+     * \param image           Image to convert
+     * \return FreeImage descriptor to converted image
+     */
+    static FIBITMAP *fastConvertToRGB565AndFlip(FIBITMAP *image, bool /*unused*/);
+
+    /*!
      * \brief Set the icon for the SDL Window
      * \param window Target window instance
      * \param img Icon image to set

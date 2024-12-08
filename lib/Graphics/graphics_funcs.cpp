@@ -954,6 +954,83 @@ FIBITMAP *GraphicsHelps::fastScaleDownAnd32Bit(FIBITMAP *image, bool do_scale_do
     return dest;
 }
 
+static uint16_t s_RGB24_to_RGB565(uint32_t RGB24)
+{
+    uint16_t r = ((uint8_t*)(&RGB24))[2];
+    uint16_t g = ((uint8_t*)(&RGB24))[1];
+    uint16_t b = ((uint8_t*)(&RGB24))[0];
+
+    return ((r >> 3) << FI16_565_RED_SHIFT) | ((g >> 2) << FI16_565_GREEN_SHIFT) | ((b >> 3) << FI16_565_BLUE_SHIFT);
+}
+
+FIBITMAP *GraphicsHelps::fastConvertToRGB565AndFlip(FIBITMAP *image, bool /*unused*/)
+{
+    // one kilobytes of stack isn't affordable? make this static, then.
+
+    // palette for full bytes
+    std::array<uint16_t, 256> palette;
+
+
+    if(!image)
+        return nullptr;
+
+    if(FreeImage_GetBPP(image) != 1 && FreeImage_GetBPP(image) != 8)
+        return nullptr;
+
+
+    auto src_w = static_cast<uint32_t>(FreeImage_GetWidth(image));
+    auto src_h = static_cast<uint32_t>(FreeImage_GetHeight(image));
+    const uint8_t *src_pixels  = reinterpret_cast<uint8_t*>(FreeImage_GetBits(image));
+    const uint32_t *src_palette = reinterpret_cast<uint32_t*>(FreeImage_GetPalette(image));
+    auto src_stride = static_cast<uint32_t>(FreeImage_GetPitch(image));
+
+    FIBITMAP *dest = FreeImage_Allocate(src_w, src_h, 16, FI16_565_RED_MASK, FI16_565_GREEN_MASK, FI16_565_BLUE_MASK);
+
+    if(!dest)
+        return nullptr;
+
+    uint16_t *dest_pixels  = reinterpret_cast<uint16_t*>(FreeImage_GetBits(dest));
+    auto dest_px_stride = static_cast<uint32_t>(FreeImage_GetPitch(dest)) / 2;
+
+    // special logic for 1 BPP
+    if(FreeImage_GetBPP(image) == 1)
+    {
+        // fill first two entries
+        for(int i = 0; i < 2; i++)
+            palette[i] = s_RGB24_to_RGB565(src_palette[i]);
+
+        // perform lookups
+        for(uint32_t y = 0; y < src_h; y++)
+        {
+            int src_y = src_h - (y + 1);
+            for(uint32_t x = 0; x < src_w; x++)
+            {
+                uint8_t which_bit = 128 >> (x % 8);
+                bool lit = src_pixels[src_y * src_stride + x / 8] & which_bit;
+                dest_pixels[y * dest_px_stride + x] = palette[lit];
+            }
+        }
+
+        return dest;
+    }
+
+    // fill 8-bit palette
+    for(int i = 0; i < 256; i++)
+        palette[i] = s_RGB24_to_RGB565(src_palette[i]);
+
+    // perform lookups
+    for(uint32_t y = 0; y < src_h; y++)
+    {
+        int src_y = src_h - (y + 1);
+        for(uint32_t x = 0; x < src_w; x++)
+        {
+            dest_pixels[y * dest_px_stride + x] = palette[src_pixels[src_y * src_stride + x]];
+        }
+    }
+
+    return dest;
+}
+
 bool GraphicsHelps::setWindowIcon(SDL_Window *window, FIBITMAP *img, int iconSize)
 {
 #if defined(_WIN32) && !defined(THEXTECH_WINRT)
