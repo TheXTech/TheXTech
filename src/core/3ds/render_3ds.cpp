@@ -240,38 +240,38 @@ FIBITMAP* robust_FILoad(const std::string& path, int target_w, bool force_565)
         return nullptr;
     }
 
-    SDL_RWops *handle = Files::open_file(path, "rb");
-    if(!handle)
+    Files::Data data = Files::load_file(path);
+    if(data.empty())
         return nullptr;
 
-    FreeImageIO io;
-    GraphicsHelps::SetRWopsIO(&io);
-    FREE_IMAGE_FORMAT formato = FreeImage_GetFileTypeFromHandle(&io, (fi_handle)handle);
+    FIMEMORY* imgMEM = FreeImage_OpenMemory(const_cast<unsigned char*>(data.begin()),
+                                            static_cast<unsigned int>(data.size()));
+    FREE_IMAGE_FORMAT formato = FreeImage_GetFileTypeFromMemory(imgMEM);
 
     if(formato == FIF_UNKNOWN)
     {
         pLogWarning("FreeImageLite failed to load image due to unknown format");
-        SDL_RWclose(handle);
+        FreeImage_CloseMemory(imgMEM);
         return nullptr;
     }
 
-    FIBITMAP *rawImage = FreeImage_LoadFromHandle(formato, &io, (fi_handle)handle);
+    FIBITMAP* rawImage = FreeImage_LoadFromMemory(formato, imgMEM, 0);
     if(!rawImage)
     {
         pLogWarning("FreeImageLite failed to load image due to lack of memory, trying to free some memory");
         minport_freeTextureMemory();
-        rawImage = FreeImage_LoadFromHandle(formato, &io, (fi_handle)handle);
+        rawImage = FreeImage_LoadFromMemory(formato, imgMEM, 0);
 
         if(!rawImage)
         {
-            SDL_RWclose(handle);
+            FreeImage_CloseMemory(imgMEM);
             return nullptr;
         }
 
         pLogDebug("Loaded successfully!");
     }
 
-    SDL_RWclose(handle);
+    FreeImage_CloseMemory(imgMEM);
 
     int32_t w = static_cast<int32_t>(FreeImage_GetWidth(rawImage));
     int32_t h = static_cast<int32_t>(FreeImage_GetHeight(rawImage));
