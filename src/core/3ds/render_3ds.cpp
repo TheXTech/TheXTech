@@ -948,38 +948,40 @@ void lazyLoadPicture(StdPicture_Sub& target, const std::string& path, int scaleF
 
     target.l.lazyLoaded = true;
 
+    // We need to figure out the height and width! First try to load a size file
+    std::string sizePath = path + ".size";
+    SDL_RWops* fs = Files::open_file(sizePath.c_str(), "rb");
+
+    // NOT null-terminated: wwww\nhhhh\n
+    char contents[10];
+
+    if(fs != nullptr)
+    {
+        int got = SDL_RWread(fs, &contents[0], 1, 10);
+        contents[4] = '\0';
+        contents[9] = '\0';
+        target.w = atoi(&contents[0]);
+        target.h = atoi(&contents[5]);
+
+        SDL_RWclose(fs);
+
+        // we're good if we could load this
+        if(got == 10 && target.w > 0 && target.h > 0)
+            return;
+    }
+
+    // no fallback for t3x
     if(Files::hasSuffix(target.l.path, ".t3x"))
     {
-        // We need to figure out the height and width!
-        std::string sizePath = path + ".size";
-        SDL_RWops* fs = Files::open_file(sizePath.c_str(), "rb");
-
-        // NOT null-terminated: wwww\nhhhh\n
-        char contents[10];
-
-        if(fs != nullptr)
-        {
-            SDL_RWread(fs, &contents[0], 1, 10);
-            contents[4] = '\0';
-            contents[9] = '\0';
-            target.w = atoi(&contents[0]);
-            target.h = atoi(&contents[5]);
-
-            if(SDL_RWclose(fs))
-                pLogWarning("lazyLoadPicture: Couldn't close file.");
-        }
-        else
-        {
-            pLogWarning("lazyLoadPicture: Couldn't open size file. Giving up.");
-            target.inited = false;
-            return;
-        }
+        pLogWarning("lazyLoadPicture: Couldn't open size file. Giving up.");
+        target.inited = false;
+        return;
     }
-    else
-    {
-        PGE_Size tSize;
 
-        if(!GraphicsHelps::getImageMetrics(path, &tSize))
+    // fallback for desktop formats
+    PGE_Size tSize;
+
+    if(!GraphicsHelps::getImageMetrics(path, &tSize))
         {
             pLogWarning("Error loading of image file:\n"
                         "%s\n"
@@ -993,9 +995,8 @@ void lazyLoadPicture(StdPicture_Sub& target, const std::string& path, int scaleF
         }
         else
         {
-            target.w = tSize.w() * scaleFactor;
-            target.h = tSize.h() * scaleFactor;
-        }
+        target.w = tSize.w() * scaleFactor;
+        target.h = tSize.h() * scaleFactor;
     }
 
     // pLogDebug("Successfully loaded %s", target.l.path.c_str());
