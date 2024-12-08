@@ -1020,19 +1020,10 @@ void lazyLoadPicture(StdPicture_Sub& target, const std::string& path, int scaleF
     // pLogDebug("Successfully loaded %s", target.l.path.c_str());
 }
 
-static ssize_t s_decompressCallback_rwops(void *userdata, void *buffer, size_t size)
-{
-    SDL_RWops* rwops = (SDL_RWops*)userdata;
-    if(!rwops)
-        return 0;
-
-    return SDL_RWread(rwops, buffer, 1, size);
-}
-
 static C2D_SpriteSheet s_tryHardToLoadC2D_SpriteSheet(const char* path, bool& file_missing)
 {
-    SDL_RWops* rwops = Files::open_file(path, "rb");
-    if(!rwops)
+    Files::Data data = Files::load_file(path);
+    if(!data.valid())
     {
         file_missing = true;
         return nullptr;
@@ -1042,12 +1033,9 @@ static C2D_SpriteSheet s_tryHardToLoadC2D_SpriteSheet(const char* path, bool& fi
 
     C2D_SpriteSheet sourceImage = (C2D_SpriteSheet)malloc(sizeof(struct C2D_SpriteSheet_s));
     if(!sourceImage)
-    {
-        SDL_RWclose(rwops);
         return nullptr;
-    }
 
-    sourceImage->t3x = Tex3DS_TextureImportCallback(&sourceImage->tex, nullptr, false, s_decompressCallback_rwops, rwops);
+    sourceImage->t3x = Tex3DS_TextureImport(data.begin(), data.size(), &sourceImage->tex, nullptr, false);
 
     if(!sourceImage->t3x)
     {
@@ -1057,12 +1045,8 @@ static C2D_SpriteSheet s_tryHardToLoadC2D_SpriteSheet(const char* path, bool& fi
             minport_freeTextureMemory();
         }
 
-        SDL_RWseek(rwops, 0, RW_SEEK_SET);
-
-        sourceImage->t3x = Tex3DS_TextureImportCallback(&sourceImage->tex, nullptr, false, s_decompressCallback_rwops, rwops);
+        sourceImage->t3x = Tex3DS_TextureImport(data.begin(), data.size(), &sourceImage->tex, nullptr, false);
     }
-
-    SDL_RWclose(rwops);
 
     // copied from C2Di_PostLoadSheet
     if(!sourceImage->t3x)
