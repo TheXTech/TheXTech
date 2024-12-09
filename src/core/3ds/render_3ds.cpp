@@ -34,7 +34,6 @@
 
 #include <Logger/logger.h>
 #include <Utils/files.h>
-#include <Archives/archives.h>
 #include <SDL2/SDL_rwops.h>
 #include <PGE_File_Formats/file_formats.h>
 
@@ -1072,7 +1071,7 @@ void lazyLoad(StdPicture& target)
     if(!Files::hasSuffix(target.l.path, ".t3x"))
     {
         // optimization: use a smaller pixel format
-        bool force_565 = Archives::has_prefix(target.l.mask_path) && Files::hasSuffix(target.l.mask_path, "m.gif") && !target.l.colorKey;
+        bool force_565 = Files::hasSuffix(target.l.mask_path, "m.gif") && !target.l.colorKey;
 
         if(g_ForceBitmaskMerge)
             force_565 = false;
