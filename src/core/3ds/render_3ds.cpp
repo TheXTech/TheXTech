@@ -1078,7 +1078,7 @@ void lazyLoad(StdPicture& target)
 
         FIBITMAP* FI_tex = robust_FILoad(target.l.path, target.w, force_565);
 
-        if(FreeImage_GetBPP(FI_tex) != 16)
+        if(force_565 && FreeImage_GetBPP(FI_tex) != 16)
         {
             pLogDebug("Couldn't use RGB565 mode for image %s", target.l.path.c_str());
             force_565 = false;
