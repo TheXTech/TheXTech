@@ -646,7 +646,8 @@
                     "qsmbx": "1600x1200（QSMBX）",
                     "default": "默认",
                     "fhd": "1920x1080（FHD）"
-                }
+                },
+                "use-native-osk": "启用内置虚拟键盘"
             },
             "audio": {
                 "_header": "音频选项",

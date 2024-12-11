@@ -232,7 +232,7 @@ void s_clearAllTextures()
     }
 }
 
-FIBITMAP* robust_FILoad(const std::string& path, int target_w)
+FIBITMAP* robust_FILoad(const std::string& path, int target_w, bool force_565)
 {
     if(path.empty())
     {
@@ -240,41 +240,45 @@ FIBITMAP* robust_FILoad(const std::string& path, int target_w)
         return nullptr;
     }
 
-    SDL_RWops *handle = Files::open_file(path, "rb");
-    if(!handle)
+    Files::Data data = Files::load_file(path);
+    if(data.empty())
         return nullptr;
 
-    FreeImageIO io;
-    GraphicsHelps::SetRWopsIO(&io);
-    FREE_IMAGE_FORMAT formato = FreeImage_GetFileTypeFromHandle(&io, (fi_handle)handle);
+    FIMEMORY* imgMEM = FreeImage_OpenMemory(const_cast<unsigned char*>(data.begin()),
+                                            static_cast<unsigned int>(data.size()));
+    FREE_IMAGE_FORMAT formato = FreeImage_GetFileTypeFromMemory(imgMEM);
 
     if(formato == FIF_UNKNOWN)
     {
         pLogWarning("FreeImageLite failed to load image due to unknown format");
-        SDL_RWclose(handle);
+        FreeImage_CloseMemory(imgMEM);
         return nullptr;
     }
 
-    FIBITMAP *rawImage = FreeImage_LoadFromHandle(formato, &io, (fi_handle)handle);
+    FIBITMAP* rawImage = FreeImage_LoadFromMemory(formato, imgMEM, 0);
     if(!rawImage)
     {
         pLogWarning("FreeImageLite failed to load image due to lack of memory, trying to free some memory");
         minport_freeTextureMemory();
-        rawImage = FreeImage_LoadFromHandle(formato, &io, (fi_handle)handle);
+        rawImage = FreeImage_LoadFromMemory(formato, imgMEM, 0);
 
         if(!rawImage)
         {
-            SDL_RWclose(handle);
+            FreeImage_CloseMemory(imgMEM);
             return nullptr;
         }
 
         pLogDebug("Loaded successfully!");
     }
 
-    SDL_RWclose(handle);
+    FreeImage_CloseMemory(imgMEM);
 
     int32_t w = static_cast<int32_t>(FreeImage_GetWidth(rawImage));
     int32_t h = static_cast<int32_t>(FreeImage_GetHeight(rawImage));
+
+    // don't force 565 if need to downscale
+    if(w >= target_w)
+        force_565 = false;
 
     pLogDebug("loading %s, freeimage reports %dx%d (%d-bit), pitch %u", path.c_str(), w, h, (int)FreeImage_GetBPP(rawImage), FreeImage_GetPitch(rawImage));
 
@@ -287,19 +291,21 @@ FIBITMAP* robust_FILoad(const std::string& path, int target_w)
         return nullptr;
     }
 
-    if(w < target_w && FreeImage_GetBPP(rawImage) == 32)
+    if(w < target_w && FreeImage_GetBPP(rawImage) == 32 && !force_565)
     {
         // don't rescale, just flip
         FreeImage_FlipVertical(rawImage);
         return rawImage;
     }
 
-    FIBITMAP *sourceImage = GraphicsHelps::fastScaleDownAnd32Bit(rawImage, w >= target_w);
+    const auto prepare_func = (force_565) ? GraphicsHelps::fastConvertToRGB565AndFlip : GraphicsHelps::fastScaleDownAnd32Bit;
+
+    FIBITMAP *sourceImage = prepare_func(rawImage, w >= target_w);
     if(!sourceImage)
     {
         pLogWarning("Failed to convert image due to lack of memory, trying to free some memory");
         minport_freeTextureMemory();
-        sourceImage = GraphicsHelps::fastScaleDownAnd32Bit(rawImage, w >= target_w);
+        sourceImage = prepare_func(rawImage, w >= target_w);
 
         if(!sourceImage)
         {
@@ -312,7 +318,8 @@ FIBITMAP* robust_FILoad(const std::string& path, int target_w)
 
     FreeImage_Unload(rawImage);
 
-    FreeImage_FlipVertical(sourceImage);
+    if(!force_565)
+        FreeImage_FlipVertical(sourceImage);
 
     return sourceImage;
 }
@@ -325,7 +332,7 @@ static int s_nextPowerOfTwo(int val)
     return power;
 }
 
-static C2D_Image s_RawToSwizzledRGBA(const uint8_t* src, uint32_t wsrc, uint32_t hsrc, uint32_t pitch, bool mask, bool downscale = true)
+static C2D_Image s_RawToSwizzledRGBA(const uint8_t* src, uint32_t wsrc, uint32_t hsrc, uint32_t pitch, bool mask, bool is_565, bool downscale)
 {
     // calculate destination dimensions, including downscaling and required padding
     int sf = (downscale ? 2 : 1);
@@ -342,12 +349,15 @@ static C2D_Image s_RawToSwizzledRGBA(const uint8_t* src, uint32_t wsrc, uint32_t
 
     pLogDebug("This part is w %d h %d p %d -> %d %d %f %f %f %f", (int)wsrc, (int)hsrc, (int)pitch, (int)wtex, (int)htex, img.subtex->left, img.subtex->top, img.subtex->right, img.subtex->bottom);
 
-    if(!C3D_TexInit(img.tex, wtex, htex, GPU_RGBA8))
+    auto want_format = (is_565) ? GPU_RGB565 : GPU_RGBA8;
+    int pitch_px = (is_565) ? pitch / 2 : pitch / 4;
+
+    if(!C3D_TexInit(img.tex, wtex, htex, want_format))
     {
         pLogDebug("Triggering free texture memory due to failed PNG/GIF load (%u bytes free)", (unsigned)linearSpaceFree());
         minport_freeTextureMemory();
 
-        if(!C3D_TexInit(img.tex, wtex, htex, GPU_RGBA8))
+        if(!C3D_TexInit(img.tex, wtex, htex, want_format))
         {
             delete img.tex;
             delete img.subtex;
@@ -359,7 +369,7 @@ static C2D_Image s_RawToSwizzledRGBA(const uint8_t* src, uint32_t wsrc, uint32_t
 
     C3D_TexSetFilter(img.tex, GPU_NEAREST, GPU_NEAREST);
     C3D_TexSetWrap(img.tex, GPU_CLAMP_TO_BORDER, GPU_CLAMP_TO_BORDER);
-    img.tex->border = mask ? 0xFFFFFFFF : 0x00FFFFFF;
+    img.tex->border = mask ? 0xFFFFFFFF : 0x00000000;
 
     for(u32 y = 0; y < hdst; y++)
     {
@@ -367,14 +377,21 @@ static C2D_Image s_RawToSwizzledRGBA(const uint8_t* src, uint32_t wsrc, uint32_t
         {
             const u32 dst_pixel = ((((y >> 3) * (wtex >> 3) + (x >> 3)) << 6) +
                                 ((x & 1) | ((y & 1) << 1) | ((x & 2) << 1) | ((y & 2) << 2) |
-                                ((x & 4) << 2) | ((y & 4) << 3))) * 4;
+                                ((x & 4) << 2) | ((y & 4) << 3)));
 
-            const u32 src_pixel = (y * sf * pitch) + (x * sf * 4);
+            const u32 src_pixel = (y * sf * pitch_px) + (x * sf);
 
-            ((uint8_t*)img.tex->data)[dst_pixel + 0] = src[src_pixel + 3];
-            ((uint8_t*)img.tex->data)[dst_pixel + 1] = src[src_pixel + 0];
-            ((uint8_t*)img.tex->data)[dst_pixel + 2] = src[src_pixel + 1];
-            ((uint8_t*)img.tex->data)[dst_pixel + 3] = src[src_pixel + 2];
+            if(is_565)
+            {
+                ((uint16_t*)img.tex->data)[dst_pixel] = ((uint16_t*)src)[src_pixel];
+            }
+            else
+            {
+                ((uint8_t*)img.tex->data)[dst_pixel * 4 + 0] = src[src_pixel * 4 + 3];
+                ((uint8_t*)img.tex->data)[dst_pixel * 4 + 1] = src[src_pixel * 4 + 0];
+                ((uint8_t*)img.tex->data)[dst_pixel * 4 + 2] = src[src_pixel * 4 + 1];
+                ((uint8_t*)img.tex->data)[dst_pixel * 4 + 3] = src[src_pixel * 4 + 2];
+            }
         }
     }
 
@@ -387,12 +404,12 @@ static C2D_Image s_RawToSwizzledRGBA(const uint8_t* src, uint32_t wsrc, uint32_t
             {
                 const u32 dst_pixel = ((((y >> 3) * (wtex >> 3) + (x >> 3)) << 6) +
                                     ((x & 1) | ((y & 1) << 1) | ((x & 2) << 1) | ((y & 2) << 2) |
-                                    ((x & 4) << 2) | ((y & 4) << 3))) * 4;
+                                    ((x & 4) << 2) | ((y & 4) << 3)));
 
-                ((uint8_t*)img.tex->data)[dst_pixel + 0] = 255;
-                ((uint8_t*)img.tex->data)[dst_pixel + 1] = 255;
-                ((uint8_t*)img.tex->data)[dst_pixel + 2] = 255;
-                ((uint8_t*)img.tex->data)[dst_pixel + 3] = 255;
+                if(is_565)
+                    ((uint16_t*)img.tex->data)[dst_pixel] = 0xFFFF;
+                else
+                    ((uint32_t*)img.tex->data)[dst_pixel] = 0xFFFFFFFF;
             }
         }
     }
@@ -400,7 +417,7 @@ static C2D_Image s_RawToSwizzledRGBA(const uint8_t* src, uint32_t wsrc, uint32_t
     return img;
 }
 
-void s_loadTexture(StdPicture& target, void* data, int width, int height, int pitch, bool mask)
+void s_loadTexture(StdPicture& target, void* data, int width, int height, int pitch, bool mask, bool is_565)
 {
     // downscale if logical width matches the actual width of the texture, otherwise don't
     bool downscale = (width >= target.w);
@@ -439,7 +456,7 @@ void s_loadTexture(StdPicture& target, void* data, int width, int height, int pi
 
         if(w_i > 0 && h_i > 0)
         {
-            target.d.image[i + 3 * mask] = s_RawToSwizzledRGBA((uint8_t*)data + (start_y * width + start_x) * 4, w_i, h_i, pitch, mask, downscale);
+            target.d.image[i + 3 * mask] = s_RawToSwizzledRGBA((uint8_t*)data + (start_y * width + start_x) * 4, w_i, h_i, pitch, mask, is_565, downscale);
 
             if(target.d.image[i + 3 * mask].tex)
             {
@@ -893,6 +910,13 @@ void lazyLoadPictureFromList(StdPicture_Sub& target, PGE_FileFormats_misc::TextI
     target.l.path += std::move(line_buf);
     target.l.lazyLoaded = true;
 
+    if(target.l.path.size() >= 4 && SDL_strncasecmp(target.l.path.c_str() + target.l.path.size() - 4, ".gif", 4) == 0)
+    {
+        target.l.mask_path = target.l.path;
+        target.l.mask_path.resize(target.l.mask_path.size() - 4);
+        target.l.mask_path += "m.gif";
+    }
+
     bool okay = false;
 
     int w, h;
@@ -941,72 +965,64 @@ void lazyLoadPicture(StdPicture_Sub& target, const std::string& path, int scaleF
 
     target.l.lazyLoaded = true;
 
+    // We need to figure out the height and width! First try to load a size file
+    std::string sizePath = path + ".size";
+    SDL_RWops* fs = Files::open_file(sizePath.c_str(), "rb");
+
+    // NOT null-terminated: wwww\nhhhh\n
+    char contents[10];
+
+    if(fs != nullptr)
+    {
+        int got = SDL_RWread(fs, &contents[0], 1, 10);
+        contents[4] = '\0';
+        contents[9] = '\0';
+        target.w = atoi(&contents[0]);
+        target.h = atoi(&contents[5]);
+
+        SDL_RWclose(fs);
+
+        // we're good if we could load this
+        if(got == 10 && target.w > 0 && target.h > 0)
+            return;
+    }
+
+    // no fallback for t3x
     if(Files::hasSuffix(target.l.path, ".t3x"))
     {
-        // We need to figure out the height and width!
-        std::string sizePath = path + ".size";
-        SDL_RWops* fs = Files::open_file(sizePath.c_str(), "rb");
+        pLogWarning("lazyLoadPicture: Couldn't open size file. Giving up.");
+        target.inited = false;
+        return;
+    }
 
-        // NOT null-terminated: wwww\nhhhh\n
-        char contents[10];
+    // fallback for desktop formats
+    PGE_Size tSize;
 
-        if(fs != nullptr)
-        {
-            SDL_RWread(fs, &contents[0], 1, 10);
-            contents[4] = '\0';
-            contents[9] = '\0';
-            target.w = atoi(&contents[0]);
-            target.h = atoi(&contents[5]);
+    if(!GraphicsHelps::getImageMetrics(path, &tSize))
+    {
+        pLogWarning("Error loading of image file:\n"
+                    "%s\n"
+                    "Reason: %s.",
+                    path.c_str(),
+                    (Files::fileExists(path) ? "wrong image format" : "file not exist"));
 
-            if(SDL_RWclose(fs))
-                pLogWarning("lazyLoadPicture: Couldn't close file.");
-        }
-        else
-        {
-            pLogWarning("lazyLoadPicture: Couldn't open size file. Giving up.");
-            target.inited = false;
-            return;
-        }
+        target.inited = false;
+        target.l.path.clear();
+        target.l.mask_path.clear();
     }
     else
     {
-        PGE_Size tSize;
-
-        if(!GraphicsHelps::getImageMetrics(path, &tSize))
-        {
-            pLogWarning("Error loading of image file:\n"
-                        "%s\n"
-                        "Reason: %s.",
-                        path.c_str(),
-                        (Files::fileExists(path) ? "wrong image format" : "file not exist"));
-
-            target.inited = false;
-            target.l.path.clear();
-            target.l.mask_path.clear();
-        }
-        else
-        {
-            target.w = tSize.w() * scaleFactor;
-            target.h = tSize.h() * scaleFactor;
-        }
+        target.w = tSize.w() * scaleFactor;
+        target.h = tSize.h() * scaleFactor;
     }
 
     // pLogDebug("Successfully loaded %s", target.l.path.c_str());
 }
 
-static ssize_t s_decompressCallback_rwops(void *userdata, void *buffer, size_t size)
-{
-    SDL_RWops* rwops = (SDL_RWops*)userdata;
-    if(!rwops)
-        return 0;
-
-    return SDL_RWread(rwops, buffer, 1, size);
-}
-
 static C2D_SpriteSheet s_tryHardToLoadC2D_SpriteSheet(const char* path, bool& file_missing)
 {
-    SDL_RWops* rwops = Files::open_file(path, "rb");
-    if(!rwops)
+    Files::Data data = Files::load_file(path);
+    if(!data.valid())
     {
         file_missing = true;
         return nullptr;
@@ -1016,12 +1032,9 @@ static C2D_SpriteSheet s_tryHardToLoadC2D_SpriteSheet(const char* path, bool& fi
 
     C2D_SpriteSheet sourceImage = (C2D_SpriteSheet)malloc(sizeof(struct C2D_SpriteSheet_s));
     if(!sourceImage)
-    {
-        SDL_RWclose(rwops);
         return nullptr;
-    }
 
-    sourceImage->t3x = Tex3DS_TextureImportCallback(&sourceImage->tex, nullptr, false, s_decompressCallback_rwops, rwops);
+    sourceImage->t3x = Tex3DS_TextureImport(data.begin(), data.size(), &sourceImage->tex, nullptr, false);
 
     if(!sourceImage->t3x)
     {
@@ -1031,12 +1044,8 @@ static C2D_SpriteSheet s_tryHardToLoadC2D_SpriteSheet(const char* path, bool& fi
             minport_freeTextureMemory();
         }
 
-        SDL_RWseek(rwops, 0, RW_SEEK_SET);
-
-        sourceImage->t3x = Tex3DS_TextureImportCallback(&sourceImage->tex, nullptr, false, s_decompressCallback_rwops, rwops);
+        sourceImage->t3x = Tex3DS_TextureImport(data.begin(), data.size(), &sourceImage->tex, nullptr, false);
     }
-
-    SDL_RWclose(rwops);
 
     // copied from C2Di_PostLoadSheet
     if(!sourceImage->t3x)
@@ -1061,7 +1070,19 @@ void lazyLoad(StdPicture& target)
 
     if(!Files::hasSuffix(target.l.path, ".t3x"))
     {
-        FIBITMAP* FI_tex = robust_FILoad(target.l.path, target.w);
+        // optimization: use a smaller pixel format
+        bool force_565 = Files::hasSuffix(target.l.mask_path, "m.gif") && !target.l.colorKey;
+
+        if(g_ForceBitmaskMerge)
+            force_565 = false;
+
+        FIBITMAP* FI_tex = robust_FILoad(target.l.path, target.w, force_565);
+
+        if(force_565 && FreeImage_GetBPP(FI_tex) != 16)
+        {
+            pLogDebug("Couldn't use RGB565 mode for image %s", target.l.path.c_str());
+            force_565 = false;
+        }
 
         if(!FI_tex)
         {
@@ -1076,11 +1097,11 @@ void lazyLoad(StdPicture& target)
 
         if(Files::hasSuffix(target.l.mask_path, "m.gif"))
         {
-            FI_mask = robust_FILoad(target.l.mask_path, target.w);
+            FI_mask = robust_FILoad(target.l.mask_path, target.w, force_565);
         }
         else if(!target.l.mask_path.empty())
         {
-            FIBITMAP* FI_mask = robust_FILoad(target.l.mask_path, target.w);
+            FIBITMAP* FI_mask = robust_FILoad(target.l.mask_path, target.w, force_565);
 
             GraphicsHelps::RGBAToMask(FI_mask);
 
@@ -1088,7 +1109,7 @@ void lazyLoad(StdPicture& target)
             force_merge = true;
         }
 
-        if(FI_mask && (force_merge || g_ForceBitmaskMerge || !GraphicsHelps::validateBitmaskRequired(FI_tex, FI_mask, target.l.path)))
+        if(FI_mask && !force_565 && (force_merge || g_ForceBitmaskMerge || !GraphicsHelps::validateBitmaskRequired(FI_tex, FI_mask, target.l.path)))
         {
             GraphicsHelps::mergeWithMask(FI_tex, FI_mask);
             GraphicsHelps::closeImage(FI_mask);
@@ -1108,12 +1129,12 @@ void lazyLoad(StdPicture& target)
             GraphicsHelps::replaceColor(FI_tex, colSrc, colDst);
         }
 
-        s_loadTexture(target, FreeImage_GetBits(FI_tex), FreeImage_GetWidth(FI_tex), FreeImage_GetHeight(FI_tex), FreeImage_GetPitch(FI_tex), false);
+        s_loadTexture(target, FreeImage_GetBits(FI_tex), FreeImage_GetWidth(FI_tex), FreeImage_GetHeight(FI_tex), FreeImage_GetPitch(FI_tex), false, force_565);
         FreeImage_Unload(FI_tex);
 
         if(FI_mask)
         {
-            s_loadTexture(target, FreeImage_GetBits(FI_mask), FreeImage_GetWidth(FI_mask), FreeImage_GetHeight(FI_mask), FreeImage_GetPitch(FI_mask), true);
+            s_loadTexture(target, FreeImage_GetBits(FI_mask), FreeImage_GetWidth(FI_mask), FreeImage_GetHeight(FI_mask), FreeImage_GetPitch(FI_mask), true, force_565);
             FreeImage_Unload(FI_mask);
         }
 
@@ -1201,7 +1222,7 @@ void lazyPreLoad(StdPicture& target)
 
 void loadTexture(StdPicture& target, uint32_t width, uint32_t height, uint8_t *RGBApixels, uint32_t pitch)
 {
-    s_loadTexture(target, RGBApixels, width, height, pitch, false);
+    s_loadTexture(target, RGBApixels, width, height, pitch, false, false);
     target.inited = true;
     target.l.lazyLoaded = false;
 }

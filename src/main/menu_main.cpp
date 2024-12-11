@@ -31,6 +31,7 @@
 #include <AppPath/app_path.h>
 #include <DirManager/dirman.h>
 #include <Utils/files.h>
+#include <Utils/files_ini.h>
 #include <Archives/archives.h>
 #include <PGE_File_Formats/file_formats.h>
 #include <Integrator/integrator.h>
@@ -368,6 +369,7 @@ struct WorldRoot_t
 
 // helper functions used by FindWorlds() and LoadSingleWorld()
 static void s_LoadSingleWorld(const std::string& epDir, const std::string& fName, WorldData& head, TranslateEpisode& tr, bool editable);
+static void s_LoadWorldArchive(const std::string& archive);
 static void s_FinishFindWorlds();
 
 void FindWorlds()
@@ -453,12 +455,7 @@ void FindWorlds()
 
             for(const auto &dir : dirs)
             {
-                std::string epDir = "@" + worldsRoot.path + dir + ":/";
-                DirMan episode(epDir);
-                episode.getListOfFiles(files, {".wld", ".wldx"});
-
-                for(std::string &fName : files)
-                    s_LoadSingleWorld(epDir, fName, head, tr, false);
+                s_LoadWorldArchive(worldsRoot.path + dir);
 
 #ifdef THEXTECH_PRELOAD_LEVELS
                 if(LoadingInProcess)
@@ -515,6 +512,107 @@ static void s_LoadSingleWorld(const std::string& epDir, const std::string& fName
         if(editable)
             SelectWorldEditable.push_back(w);
     }
+}
+
+static void s_LoadWorldArchive(const std::string& archive)
+{
+    SelectWorld_t w;
+    w.WorldPath = "@";
+    w.WorldPath += archive;
+    w.WorldPath += ":/";
+
+    IniProcessing ini = Files::load_ini(w.WorldPath + "_meta.ini");
+
+    ini.beginGroup("content");
+
+    // confirm filename exists
+    ini.read("filename", w.WorldFile, w.WorldFile);
+    if(w.WorldFile.empty())
+    {
+        pLogInfo("Episode [%s] not loaded; could not parse _meta.ini", archive.c_str());
+        return;
+    }
+
+    // confirm engine support
+    std::string engine;
+    ini.read("engine", engine, engine);
+    if(engine != "TheXTech")
+    {
+        pLogInfo("Episode [%s] not loaded; for incompatible engine [%s]", archive.c_str(), engine.c_str());
+        return;
+    }
+
+    // confirm platform support
+    std::string platform;
+    ini.read("platform", platform, platform);
+
+    bool platform_okay = false;
+
+#ifndef __16M__
+    if(platform == "main")
+        platform_okay = true;
+#endif
+
+#ifdef __3DS__
+    if(platform == "3ds")
+        platform_okay = true;
+#endif
+
+#ifdef __WII__
+    if(platform == "wii")
+        platform_okay = true;
+#endif
+
+#ifdef __16M__
+    if(platform == "dsi")
+        platform_okay = true;
+#endif
+
+    if(!platform_okay)
+    {
+        pLogInfo("Episode [%s] not loaded; for incompatible platform [%s]", archive.c_str(), platform.c_str());
+        return;
+    }
+
+    ini.endGroup();
+
+    // load properties
+    ini.beginGroup("properties");
+
+    // playstyle classic
+    bool is_classic;
+    ini.read("is-classic", is_classic, false);
+    w.bugfixes_on_by_default = !is_classic;
+
+    // character block
+    std::string char_block;
+    ini.read("char-block", char_block, char_block);
+    char_block.resize(numCharacters, '0');
+
+    for(int i = 1; i <= numCharacters; i++)
+        w.blockChar[i] = (char_block[i - 1] == '1');
+
+    // title
+    ini.read("title", w.WorldName, w.WorldName);
+
+    std::string title_key = "title-";
+    title_key += CurrentLanguage;
+    ini.read(title_key.c_str(), w.WorldName, w.WorldName);
+
+    title_key += '-';
+    title_key += CurrentLangDialect;
+    ini.read(title_key.c_str(), w.WorldName, w.WorldName);
+
+    if(w.WorldName.empty())
+        w.WorldName = w.WorldFile;
+
+    ini.endGroup();
+
+    // last details
+    w.editable = false;
+
+    // store it!
+    SelectWorld.push_back(w);
 }
 
 static void s_FinishFindWorlds()
@@ -1987,12 +2085,13 @@ void drawGameVersion(bool disable_git, bool git_only)
     constexpr bool is_release = !in_string(V_LATEST_STABLE, '-');
     constexpr bool is_main = str_prefix(V_BUILD_BRANCH, "main");
     constexpr bool is_stable = str_prefix(V_BUILD_BRANCH, "stable");
+    constexpr bool is_head = str_prefix(V_BUILD_BRANCH, "HEAD");
     constexpr bool is_wip = str_prefix(V_BUILD_BRANCH, "wip-");
 
     constexpr bool is_dirty = in_string(V_BUILD_VER, '-');
 
-    constexpr bool show_branch = (!is_main && !(is_release && is_stable));
-    constexpr bool show_commit = (!is_release || (!is_main && !is_stable));
+    constexpr bool show_branch = (!is_main && !(is_release && is_stable) && !is_head);
+    constexpr bool show_commit = (!is_release || (!is_main && !is_stable && !is_head));
 
     // show version
     if(!git_only)

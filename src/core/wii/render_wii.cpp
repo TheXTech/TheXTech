@@ -78,7 +78,7 @@ int g_rmode_h = 480;
  * Convert a raw BMP (ARGB) to 4x4RGBA.
  * @author DragonMinded, modifications by ds-sloth
 */
-static void* s_RawTo4x4RGBA(const uint8_t* src, uint32_t width, uint32_t height, uint32_t pitch, uint32_t* wdst_out, uint32_t* hdst_out, bool downscale = true)
+static void* s_RawTo4x4RGBA(const uint8_t* src, uint32_t width, uint32_t height, uint32_t pitch, uint32_t* wdst_out, uint32_t* hdst_out, bool mask, bool downscale)
 {
     // calculate destination dimensions, including downscaling and required padding
     int sf = (downscale ? 2 : 1);
@@ -107,6 +107,8 @@ static void* s_RawTo4x4RGBA(const uint8_t* src, uint32_t width, uint32_t height,
 
     u8* p = (u8*)dst;
 
+    u8 PAD = (mask) ? 255 : 0;
+
     for(u32 block = 0; block < hdst; block += 4)
     {
         for(u32 i = 0; i < wdst; i += 4)
@@ -117,10 +119,10 @@ static void* s_RawTo4x4RGBA(const uint8_t* src, uint32_t width, uint32_t height,
                 for(u8 argb = 0; argb < 4; ++argb)
                 {
                     // new: padding
-                    if((i + argb) * sf > width || (block + c) * sf > height)
+                    if((i + argb) * sf >= width || (block + c) * sf >= height)
                     {
-                        *p++ = 0;
-                        *p++ = 255;
+                        *p++ = PAD;
+                        *p++ = PAD;
                         continue;
                     }
 
@@ -137,10 +139,10 @@ static void* s_RawTo4x4RGBA(const uint8_t* src, uint32_t width, uint32_t height,
                 for(u8 argb = 0; argb < 4; ++argb)
                 {
                     // new: padding
-                    if((i + argb) * sf > width || (block + c) * sf > height)
+                    if((i + argb) * sf >= width || (block + c) * sf >= height)
                     {
-                        *p++ = 255;
-                        *p++ = 255;
+                        *p++ = PAD;
+                        *p++ = PAD;
                         continue;
                     }
 
@@ -271,7 +273,7 @@ void s_loadTexture(StdPicture& target, void* data, int width, int height, int pi
         if(w_i > 0 && h_i > 0)
         {
             uint32_t wdst = 0, hdst = 0;
-            target.d.backing_texture[i + 3 * mask] = s_RawTo4x4RGBA((uint8_t*)data + start_y * pitch + start_x * 4, w_i, h_i, pitch, &wdst, &hdst, downscale);
+            target.d.backing_texture[i + 3 * mask] = s_RawTo4x4RGBA((uint8_t*)data + start_y * pitch + start_x * 4, w_i, h_i, pitch, &wdst, &hdst, mask, downscale);
 
             if(target.d.backing_texture[i + 3 * mask])
             {
@@ -700,6 +702,13 @@ void lazyLoadPictureFromList(StdPicture_Sub& target, PGE_FileFormats_misc::TextI
     target.l.path += std::move(line_buf);
     target.l.lazyLoaded = true;
 
+    if(target.l.path.size() >= 4 && SDL_strncasecmp(target.l.path.c_str() + target.l.path.size() - 4, ".gif", 4) == 0)
+    {
+        target.l.mask_path = target.l.path;
+        target.l.mask_path.resize(target.l.mask_path.size() - 4);
+        target.l.mask_path += "m.gif";
+    }
+
     bool okay = false;
 
     int w, h;
@@ -882,7 +891,15 @@ void lazyLoad(StdPicture& target)
         return;
     }
 
-    if(target.h > 2048 && target.d.texture_file_init[0])
+    int expanded_dim = target.h;
+
+    if(target.w > 2048 && target.h <= 2048)
+    {
+        expanded_dim = target.w;
+        target.d.multi_horizontal = true;
+    }
+
+    if(expanded_dim > 2048 && target.d.texture_file_init[0])
     {
         suppPath = target.l.path + '1';
         Files::Data d = robust_Files_load_file(suppPath);
@@ -899,7 +916,7 @@ void lazyLoad(StdPicture& target)
         }
     }
 
-    if(target.h > 4096 && target.d.texture_file_init[0])
+    if(expanded_dim > 4096 && target.d.texture_file_init[0])
     {
         suppPath = target.l.path + '2';
         Files::Data d = robust_Files_load_file(suppPath);

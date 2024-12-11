@@ -411,20 +411,17 @@ void GraphicsHelps::mergeWithMask(FIBITMAP *image, FIBITMAP *mask)
             Npix.rgbBlue = ((SPixP[FI_RGBA_BLUE] & s_bitblitBG.rgbBlue) | FPixP[FI_RGBA_BLUE]);
             Npix.rgbGreen = ((SPixP[FI_RGBA_GREEN] & s_bitblitBG.rgbGreen) | FPixP[FI_RGBA_GREEN]);
             Npix.rgbRed = ((SPixP[FI_RGBA_RED] & s_bitblitBG.rgbRed) | FPixP[FI_RGBA_RED]);
-            newAlpha = 255 - ((static_cast<unsigned short>(SPixP[FI_RGBA_RED]) +
-                               static_cast<unsigned short>(SPixP[FI_RGBA_GREEN]) +
-                               static_cast<unsigned short>(SPixP[FI_RGBA_BLUE])) / 3);
 
-            if((SPixP[FI_RGBA_RED] > 240u) //is almost White
-               && (SPixP[FI_RGBA_GREEN] > 240u)
-               && (SPixP[FI_RGBA_BLUE] > 240u))
+            // these terms (mask pixel and not front pixel, bitwise) represent the values that could be seen in SMBX 1.3
+            newAlpha = 255 - ((static_cast<unsigned short>(SPixP[FI_RGBA_RED] & ~FPixP[FI_RGBA_RED]) +
+                               static_cast<unsigned short>(SPixP[FI_RGBA_GREEN] & ~FPixP[FI_RGBA_GREEN]) +
+                               static_cast<unsigned short>(SPixP[FI_RGBA_BLUE] & ~FPixP[FI_RGBA_BLUE])) / 3);
+
+            if(newAlpha < 16)
                 newAlpha = 0;
 
-            newAlpha += ((static_cast<unsigned short>(FPixP[FI_RGBA_RED]) +
-                          static_cast<unsigned short>(FPixP[FI_RGBA_GREEN]) +
-                          static_cast<unsigned short>(FPixP[FI_RGBA_BLUE])) / 3);
-
-            if(newAlpha > 255) newAlpha = 255;
+            if(newAlpha > 240)
+                newAlpha = 255;
 
             FPixP[FI_RGBA_BLUE]  = Npix.rgbBlue;
             FPixP[FI_RGBA_GREEN] = Npix.rgbGreen;
@@ -745,6 +742,11 @@ bool GraphicsHelps::validateBitmaskRequired(FIBITMAP *image, FIBITMAP *mask, con
     BYTE *line1 = fimg_bits;
     BYTE *line2 = bimg_bits;
 
+    int blend_bits = 0;
+
+    BYTE fp_default[4] = {0, 0, 0, 0};
+    BYTE bp_default[4] = {255, 255, 255, 255};
+
     for(uint32_t y = 0; y < fh || y < bh; ++y)
     {
         for(uint32_t x = 0; x < fw || x < bw; ++x)
@@ -755,36 +757,42 @@ bool GraphicsHelps::validateBitmaskRequired(FIBITMAP *image, FIBITMAP *mask, con
             BYTE *fp = line1 + (y * fpitch) + (x * 4);
             BYTE *bp = line2 + (y * bpitch) + (x * 4);
 
+            if(!fp_present)
+                fp = fp_default;
+
+            if(!bp_present)
+                bp = bp_default;
+
             // accept vanilla GIFs that target 16-bit color depth
             // note that missing back pixels are white and absent front pixels are black
-            bool bp_is_white = !bp_present || (bp[0] >= 0xf8 && bp[1] >= 0xf8 && bp[2] >= 0xf8);
-            bool fp_is_white =  fp_present && (fp[0] >= 0xf8 && fp[1] >= 0xf8 && fp[2] >= 0xf8);
-            bool bp_is_black =  bp_present && (bp[0] <  0x08 && bp[1] <  0x08 && bp[2] <  0x08);
-            bool fp_is_black = !fp_present || (fp[0] <  0x08 && fp[1] <  0x08 && fp[2] <  0x08);
-
-            // mask pixel is black: buffer replaced with front pixel
-            if(bp_is_black)
-                continue;
-
-            // front pixel is white: buffer replaced with front pixel
-            if(fp_is_white)
-                continue;
+            bool bp_is_white = bp[0] >= 0xf0 && bp[1] >= 0xf0 && bp[2] >= 0xf0;
+            bool fp_is_black = fp[0] <  0x10 && fp[1] <  0x10 && fp[2] <  0x10;
 
             // back pixel is white and front pixel is black: buffer preserved
             if(bp_is_white && fp_is_black)
                 continue;
 
-            // pixel is matching with the front (i.e. is not an example of the lazily-made sprite)
-            if(bp_present && fp_present && SDL_memcmp(bp, fp, 3) == 0)
+            // front contains back: buffer replaced with front pixel
+            // (this subsumes mask pixel black, front pixel white, and matching cases)
+            if((bp[0] & ~fp[0] & 0xf8) == 0 && (bp[1] & ~fp[1] & 0xf8) == 0 && (bp[2] & ~fp[2] & 0xf8) == 0)
                 continue;
 
-            D_pLogDebug("Texture REQUIRES the bitmask render (%s)", origPath.c_str());
-            return true;
+            blend_bits += (bp[0] & ~fp[0]) / 0x08;
+            blend_bits += (bp[1] & ~fp[1]) / 0x08;
+            blend_bits += (bp[2] & ~fp[2]) / 0x08;
         }
     }
 
-    D_pLogDebug("Texture doesn't require bitmask render (%s)", origPath.c_str());
-    return false;
+    if(blend_bits >= 10000)
+    {
+        D_pLogDebug("Texture REQUIRES the bitmask render (%s)", origPath.c_str());
+        return true;
+    }
+    else
+    {
+        D_pLogDebug("Texture doesn't require bitmask render (%s)", origPath.c_str());
+        return false;
+    }
 }
 
 bool GraphicsHelps::validateForDepthTest(FIBITMAP *image, const std::string &origPath)
@@ -940,6 +948,83 @@ FIBITMAP *GraphicsHelps::fastScaleDownAnd32Bit(FIBITMAP *image, bool do_scale_do
         for(uint32_t x = 0; x < src_w / 2; x++)
         {
             dest_pixels[y * dest_px_stride + x] = palette[src_pixels[y * src_stride + x * src_pixel_stride]];
+        }
+    }
+
+    return dest;
+}
+
+static uint16_t s_RGB24_to_RGB565(uint32_t RGB24)
+{
+    uint16_t r = ((uint8_t*)(&RGB24))[2];
+    uint16_t g = ((uint8_t*)(&RGB24))[1];
+    uint16_t b = ((uint8_t*)(&RGB24))[0];
+
+    return ((r >> 3) << FI16_565_RED_SHIFT) | ((g >> 2) << FI16_565_GREEN_SHIFT) | ((b >> 3) << FI16_565_BLUE_SHIFT);
+}
+
+FIBITMAP *GraphicsHelps::fastConvertToRGB565AndFlip(FIBITMAP *image, bool /*unused*/)
+{
+    // one kilobytes of stack isn't affordable? make this static, then.
+
+    // palette for full bytes
+    std::array<uint16_t, 256> palette;
+
+
+    if(!image)
+        return nullptr;
+
+    if(FreeImage_GetBPP(image) != 1 && FreeImage_GetBPP(image) != 8)
+        return nullptr;
+
+
+    auto src_w = static_cast<uint32_t>(FreeImage_GetWidth(image));
+    auto src_h = static_cast<uint32_t>(FreeImage_GetHeight(image));
+    const uint8_t *src_pixels  = reinterpret_cast<uint8_t*>(FreeImage_GetBits(image));
+    const uint32_t *src_palette = reinterpret_cast<uint32_t*>(FreeImage_GetPalette(image));
+    auto src_stride = static_cast<uint32_t>(FreeImage_GetPitch(image));
+
+    FIBITMAP *dest = FreeImage_Allocate(src_w, src_h, 16, FI16_565_RED_MASK, FI16_565_GREEN_MASK, FI16_565_BLUE_MASK);
+
+    if(!dest)
+        return nullptr;
+
+    uint16_t *dest_pixels  = reinterpret_cast<uint16_t*>(FreeImage_GetBits(dest));
+    auto dest_px_stride = static_cast<uint32_t>(FreeImage_GetPitch(dest)) / 2;
+
+    // special logic for 1 BPP
+    if(FreeImage_GetBPP(image) == 1)
+    {
+        // fill first two entries
+        for(int i = 0; i < 2; i++)
+            palette[i] = s_RGB24_to_RGB565(src_palette[i]);
+
+        // perform lookups
+        for(uint32_t y = 0; y < src_h; y++)
+        {
+            int src_y = src_h - (y + 1);
+            for(uint32_t x = 0; x < src_w; x++)
+            {
+                uint8_t which_bit = 128 >> (x % 8);
+                bool lit = src_pixels[src_y * src_stride + x / 8] & which_bit;
+                dest_pixels[y * dest_px_stride + x] = palette[lit];
+            }
+        }
+
+        return dest;
+    }
+
+    // fill 8-bit palette
+    for(int i = 0; i < 256; i++)
+        palette[i] = s_RGB24_to_RGB565(src_palette[i]);
+
+    // perform lookups
+    for(uint32_t y = 0; y < src_h; y++)
+    {
+        int src_y = src_h - (y + 1);
+        for(uint32_t x = 0; x < src_w; x++)
+        {
+            dest_pixels[y * dest_px_stride + x] = palette[src_pixels[src_y * src_stride + x]];
         }
     }
 

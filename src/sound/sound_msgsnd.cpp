@@ -23,6 +23,8 @@
 #include "../sound.h"
 #include "sound_msgsnd.h"
 
+extern bool g_mixerLoaded;
+
 static unsigned char s_sndGlas[] =
 {
     0x4d, 0x54, 0x68, 0x64, 0x00, 0x00, 0x00, 0x06, 0x00, 0x01, 0x00, 0x05,
@@ -97,6 +99,9 @@ static unsigned char s_sndMsg[] =
 #ifndef CUSTOM_AUDIO
 void playFallbackSfx(int sfxId, int loops, int volume)
 {
+    if(!g_mixerLoaded)
+        return;
+
     SDL_RWops *sfx = nullptr;
 
     switch(sfxId)

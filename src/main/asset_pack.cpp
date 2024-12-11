@@ -119,24 +119,88 @@ static AssetPack_t s_scan_asset_pack(const std::string& path, bool skip_graphics
     ret.gfx->bg_frames = 1;
     ret.gfx->bg_frame_ticks = 125;
 
+    std::string meta_path = ret.path + "_meta.ini";
     std::string gi_path = ret.path + "gameinfo.ini";
 
-    if(Files::fileExists(gi_path))
+    IniProcessing ini;
+    int ini_exists = 0;
+
+    if(Archives::has_prefix(path) && Files::fileExists(meta_path))
     {
-        IniProcessing gameinfo = Files::load_ini(gi_path);
+        Files::Data data = Files::load_file(meta_path);
+        ini.openMem(data.c_str(), data.size());
+        ini_exists = 1;
 
-        gameinfo.beginGroup("game");
-        gameinfo.read("id", ret.id, ret.id);
-        gameinfo.read("version", ret.version, ret.version);
-        gameinfo.read("show-id", ret.show_id, ret.show_id);
-        gameinfo.endGroup();
+        ini.beginGroup("content");
 
-        gameinfo.beginGroup("android");
-        gameinfo.read("logo", logo_image_path, logo_image_path_default);
-        gameinfo.read("background", bg_image_path, bg_image_path_default);
-        gameinfo.read("background-frames", ret.gfx->bg_frames, ret.gfx->bg_frames);
-        gameinfo.read("background-delay", ret.gfx->bg_frame_ticks, ret.gfx->bg_frame_ticks);
-        gameinfo.endGroup();
+        // confirm engine support
+        std::string engine;
+        ini.read("engine", engine, engine);
+        if(engine != "TheXTech")
+        {
+            pLogInfo("Asset pack [%s] not loaded; for incompatible engine [%s]", path.c_str(), engine.c_str());
+            return ret;
+        }
+
+        // confirm platform support
+        std::string platform;
+        ini.read("platform", platform, platform);
+
+        bool platform_okay = false;
+
+#ifndef __16M__
+        if(platform == "main")
+            platform_okay = true;
+#endif
+
+#ifdef __3DS__
+        if(platform == "3ds")
+            platform_okay = true;
+#endif
+
+#ifdef __WII__
+        if(platform == "wii")
+            platform_okay = true;
+#endif
+
+#ifdef __16M__
+        if(platform == "dsi")
+            platform_okay = true;
+#endif
+
+        if(!platform_okay)
+        {
+            pLogInfo("Asset pack [%s] not loaded; for incompatible platform [%s]", path.c_str(), platform.c_str());
+            return ret;
+        }
+
+        ini.read("pack-id", ret.id, ret.id);
+    }
+    else if(Files::fileExists(gi_path))
+    {
+        Files::Data data = Files::load_file(gi_path);
+        ini.openMem(data.c_str(), data.size());
+        ini_exists = -1;
+
+        ini.beginGroup("game");
+        ini.read("id", ret.id, ret.id);
+    }
+
+    if(ini_exists)
+    {
+        // finish reading main group
+        ini.read("version", ret.version, ret.version);
+        ini.read("show-id", ret.show_id, ret.show_id);
+        ini.endGroup();
+
+        // read graphics group (properties for _meta.ini, android for gameinfo.ini)
+        ini.beginGroup((ini_exists > 0) ? "properties" : "android");
+        ini.read("show-id", ret.show_id, ret.show_id);
+        ini.read("logo", logo_image_path, logo_image_path_default);
+        ini.read("background", bg_image_path, bg_image_path_default);
+        ini.read("background-frames", ret.gfx->bg_frames, ret.gfx->bg_frames);
+        ini.read("background-delay", ret.gfx->bg_frame_ticks, ret.gfx->bg_frame_ticks);
+        ini.endGroup();
     }
 
     if(logo_image_path != logo_image_path_default)
@@ -250,28 +314,35 @@ static void s_find_asset_packs()
 
             for(const std::string& sub : subdirList)
             {
+                i++;
+
                 // archive
-                if(i >= num_dirs)
+                if(i > num_dirs)
+                {
                     subdir = "@" + root + sub + ":/";
+
+                    if(!Files::fileExists(subdir + "_meta.ini"))
+                        continue;
+                }
                 // subdir
                 else
+                {
                     subdir = root + sub;
 
-                i++;
+                    if(!DirMan::exists(subdir + "/graphics/ui/"))
+                        continue;
+                }
 
                 D_pLogDebug("  Checking %s", subdir.c_str());
 
-                if(DirMan::exists(subdir + "/graphics/ui/"))
-                {
-                    AssetPack_t pack = s_scan_asset_pack(subdir);
+                AssetPack_t pack = s_scan_asset_pack(subdir);
 
-                    if(!pack.gfx || !pack.gfx->logo.inited)
-                        pLogWarning("Could not load UI assets from possible asset pack [%s], ignoring", pack.path.c_str());
-                    else if(pack.id.empty())
-                        pLogWarning("Could not read ID of possible asset pack [%s], ignoring", pack.path.c_str());
-                    else
-                        s_asset_packs.push_back(std::move(pack));
-                }
+                if(!pack.gfx || !pack.gfx->logo.inited)
+                    pLogWarning("Could not load UI assets from possible asset pack [%s], ignoring", pack.path.c_str());
+                else if(pack.id.empty())
+                    pLogWarning("Could not read ID of possible asset pack [%s], ignoring", pack.path.c_str());
+                else
+                    s_asset_packs.push_back(std::move(pack));
             }
         }
     }
@@ -401,28 +472,35 @@ static AssetPack_t s_find_pack_init(const std::string& full_id)
 
             for(const std::string& sub : subdirList)
             {
-                // archive
-                if(i >= num_dirs)
-                    subdir = "@" + root + sub + ":/";
-                // subdir
-                else
-                    subdir = root + sub;
-
                 i++;
 
-                if(DirMan::exists(subdir + "/graphics/ui/"))
+                // archive
+                if(i > num_dirs)
                 {
-                    AssetPack_t pack = s_scan_asset_pack(subdir, true);
+                    subdir = "@" + root + sub + ":/";
 
-                    if(pack.id.empty())
-                        pLogWarning("Could not read ID of possible asset pack [%s], ignoring", pack.path.c_str());
-                    else if(pack.id == id && pack.version == version)
-                        return pack;
-                    else if(pack.id == id && id_match.path.empty())
-                        id_match = std::move(pack);
-                    else if(any_pack.path.empty())
-                        any_pack = std::move(pack);
+                    if(!Files::fileExists(subdir + "_meta.ini"))
+                        continue;
                 }
+                // subdir
+                else
+                {
+                    subdir = root + sub;
+
+                    if(!DirMan::exists(subdir + "/graphics/ui/"))
+                        continue;
+                }
+
+                AssetPack_t pack = s_scan_asset_pack(subdir, true);
+
+                if(pack.id.empty())
+                    pLogWarning("Could not read ID of possible asset pack [%s], ignoring", pack.path.c_str());
+                else if(pack.id == id && pack.version == version)
+                    return pack;
+                else if(pack.id == id && id_match.path.empty())
+                    id_match = std::move(pack);
+                else if(any_pack.path.empty())
+                    any_pack = std::move(pack);
             }
         }
     }

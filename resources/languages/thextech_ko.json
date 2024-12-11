@@ -336,9 +336,9 @@
                     "opengles11-tip": "",
                     "opengl-tip": "",
                     "sdl": "",
-                    "_name": "",
+                    "_name": "렌더 모드",
                     "opengl": "",
-                    "hw": "",
+                    "hw": "자동",
                     "sdl-tip": "",
                     "opengl11": "",
                     "opengles": "",
@@ -411,7 +411,7 @@
                     "shared": ""
                 },
                 "multiplayer": "",
-                "language": "",
+                "language": "언어",
                 "vsync": "",
                 "two-screen-mode": {
                     "shared": "",
@@ -432,7 +432,7 @@
                     "_name": "",
                     "off": "",
                     "on": "",
-                    "fullscreen": "",
+                    "fullscreen": "전체화면",
                     "fullscreen-tip": "",
                     "low-tip": ""
                 },
@@ -460,14 +460,14 @@
                     "smbx-wide": ""
                 },
                 "scale-mode": {
-                    "integer": "",
+                    "integer": "정수",
                     "center": "",
-                    "_name": "",
-                    "nearest": "",
+                    "_name": "스케일",
+                    "nearest": "가장 가까운",
                     "1x": "",
                     "0_5x": "",
                     "full": "",
-                    "linear": "",
+                    "linear": "이중선형",
                     "2x": ""
                 },
                 "_header": "",
@@ -475,7 +475,7 @@
                 "info-run": "",
                 "info-meta": "",
                 "effects": "",
-                "fullscreen": "",
+                "fullscreen": "전체화면",
                 "show-fails-counter": "",
                 "3d-compat-mode-tip": "",
                 "show-fails-counter-tip": "",
@@ -552,7 +552,7 @@
                 "reset-all": ""
             },
             "view-credits": {
-                "_header": ""
+                "_header": "크레딧 보기"
             }
         },
         "wordWaiting": "대기 중",
