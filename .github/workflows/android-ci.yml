@@ -126,7 +126,7 @@ jobs:
 
       - name: Upload APK
         if: success() && ${{ steps.signing-check.outputs.available == 'true' }}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: thextech-android-${BRANCH_NAME}
           path: android-project/thextech-android-*.apk
