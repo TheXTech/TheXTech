@@ -1,0 +1,52 @@
+name: Languages sync CI
+
+on:
+  push:
+    branches:
+      - main
+      - versus-ci-langsync
+    paths:
+      - .github/workflows/sync-langs.yml
+      - .github/ci-helper/translate_sync_assets.sh
+      - .github/ci-helper/translate_update.sh
+      - .github/ci-helper/translate_patcher.py
+      - resources/languages/**.json
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Syncing lagnuages
+    runs-on: ubuntu-latest
+    container: ghcr.io/thextech/wohlnet-ci-ubuntu2404:latest
+    strategy:
+      fail-fast: true
+    steps:
+    - uses: TheXTech/branch-name@v0.1
+
+    - uses: TheXTech/checkout@v0.1
+
+    - name: Adding Gitea SSH key
+      shell: bash
+      env:
+        SSH_KEY: ${{secrets.GITEA_SYNCBOT_SSH_KEY}}
+      run: |
+        mkdir ~/.ssh
+        chmod 700 ~/.ssh
+        eval `ssh-agent -s`
+        ssh-add - <<< "${SSH_KEY}"
+        ls -la ~/.ssh/
+        ssh -o StrictHostKeyChecking=no -T git@gitea.wohlsoft.ru
+        echo "SSH_AUTH_SOCK=${SSH_AUTH_SOCK}" >> $GITHUB_ENV
+        git config --global user.email "ci@example.ru"
+        git config --global user.name "Language Sync Bot"
+
+    - name: Apply update to all the translations
+      shell: bash
+      env:
+        GIT_AUTHOR: ${{secrets.GITEA_SYNCBOT_AUTHOR}}
+      run: |
+        bash .github/ci-helper/translate_sync_assets.sh
