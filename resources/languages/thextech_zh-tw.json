@@ -207,7 +207,7 @@
             "pathBlankUnlock": "路線向{0}開啓條件",
             "sectBlankPropBlankForEventN": "更改場景{0}的{1}於{2}事件",
             "sectionBlankPropBlank": "場景{0}{1}",
-            "soundForEventN": "播放聲音{0}",
+            "soundForEventN": "執行{0}事件時播放聲音",
             "warpTransitEffect": "過渡效果",
             "worldMusic": "大地圖音樂"
         },
