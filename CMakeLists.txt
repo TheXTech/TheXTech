@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.5...3.10)
 
 if(POLICY CMP0069) # Allow CMAKE_INTERPROCEDURAL_OPTIMIZATION (lto) to be set
     cmake_policy(SET CMP0069 NEW)
@@ -1671,8 +1671,103 @@ elseif(EMSCRIPTEN)
                 "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/thextech_256.png")
 
     configure_file(${CMAKE_SOURCE_DIR}/resources/emscripten/manifest.json.in ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/manifest.json)
-
     configure_file(${CMAKE_SOURCE_DIR}/resources/emscripten/sw.js.in ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/sw.js)
+
+elseif(HAIKU)
+    string(TIMESTAMP XTECH_HAIKU_COPYRIGHT_YEAR "%Y")
+    message("-- Haiku package version: ${THEXTECH_HAIKU_VERSION_STRING} (Yer ${XTECH_HAIKU_COPYRIGHT_YEAR})")
+    set(DESKTOP_NAME "TheXTech" CACHE STRING "Name for the application icon")
+    set(XTECH_HAIKU_SHORT_DESC "TheXTech is an open-source continuation of the SMBX 1.3 platformer game engine. Its highest priority is full compatibility with the SMBX 1.3 content standard, but it also adds a number of enhancements and bugfixes." CACHE STRING "Description for the installable Haiku package.")
+    configure_file("${CMAKE_SOURCE_DIR}/resources/haiku/PackageInfo.in" "${CMAKE_BINARY_DIR}/package/.PackageInfo")
+
+    set_target_properties(thextech PROPERTIES LINK_FLAGS "-Wl,-rpath,'$ORIGIN/../lib'")
+
+    add_custom_command(
+        TARGET thextech POST_BUILD
+        COMMAND rc
+                -o "${CMAKE_BINARY_DIR}/icon.rsrc"
+                "${CMAKE_SOURCE_DIR}/resources/haiku/icon.rdef"
+                COMMENT "Preparing icon file...")
+
+    add_custom_command(
+        TARGET thextech POST_BUILD
+        COMMAND resattr
+                -o "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${THEXTECH_EXECUTABLE_NAME}"
+                "${CMAKE_BINARY_DIR}/icon.rsrc"
+        COMMENT "Assigning icon to ${THEXTECH_EXECUTABLE_NAME}...")
+
+    if(NOT EXISTS "${CMAKE_BINARY_DIR}/package/apps/${THEXTECH_DIRECTORY_PREFIX}")
+        file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/package/apps/${THEXTECH_DIRECTORY_PREFIX}/bin")
+        file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/package/apps/${THEXTECH_DIRECTORY_PREFIX}/lib")
+        file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/package/apps/${THEXTECH_DIRECTORY_PREFIX}/doc")
+    endif()
+
+    if(NOT EXISTS "${CMAKE_BINARY_DIR}/package/data/deskbar/menu/Applications")
+        file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/package/data/deskbar/menu/Applications")
+    endif()
+
+    add_custom_target(make_hkpg
+        DEPENDS "${CMAKE_BINARY_DIR}/package/apps/${THEXTECH_DIRECTORY_PREFIX}/bin/${THEXTECH_EXECUTABLE_NAME}"
+        COMMENT "Creating HPKG package..."
+    )
+
+    add_custom_command(
+        OUTPUT "${CMAKE_BINARY_DIR}/package/apps/${THEXTECH_DIRECTORY_PREFIX}/bin/${THEXTECH_EXECUTABLE_NAME}"
+        DEPENDS "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${THEXTECH_EXECUTABLE_NAME}"
+        COMMAND
+            ${CMAKE_COMMAND} -E copy
+            "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${THEXTECH_EXECUTABLE_NAME}"
+            "${CMAKE_BINARY_DIR}/package/apps/${THEXTECH_DIRECTORY_PREFIX}/bin/${THEXTECH_EXECUTABLE_NAME}"
+    )
+
+    add_custom_command(
+        TARGET make_hkpg PRE_BUILD
+        COMMAND
+            ${CMAKE_COMMAND} -E copy
+            "${CMAKE_SOURCE_DIR}/changelog.txt"
+            "${CMAKE_BINARY_DIR}/package/apps/${THEXTECH_DIRECTORY_PREFIX}/doc/changelog.txt"
+    )
+
+    add_custom_command(
+        TARGET make_hkpg PRE_BUILD
+        COMMAND
+            ${CMAKE_COMMAND} -E copy
+            "${CMAKE_SOURCE_DIR}/README.md"
+            "${CMAKE_BINARY_DIR}/package/apps/${THEXTECH_DIRECTORY_PREFIX}/doc/ReadMe.txt"
+    )
+
+    add_custom_command(
+        TARGET make_hkpg PRE_BUILD
+        COMMAND
+            ${CMAKE_COMMAND} -E copy
+            "${CMAKE_SOURCE_DIR}/LICENSE"
+            "${CMAKE_BINARY_DIR}/package/apps/${THEXTECH_DIRECTORY_PREFIX}/doc/License.TheXTech.txt"
+    )
+
+    add_custom_command(
+        TARGET make_hkpg PRE_BUILD
+        COMMAND resattr
+                -o "${CMAKE_BINARY_DIR}/package/apps/${THEXTECH_DIRECTORY_PREFIX}/bin/${THEXTECH_EXECUTABLE_NAME}"
+                "${CMAKE_BINARY_DIR}/icon.rsrc"
+        COMMENT "Assigning icon to ${THEXTECH_EXECUTABLE_NAME}...")
+
+    add_custom_command(
+        TARGET make_hkpg PRE_BUILD
+        COMMAND cp -a "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/*.so*" "${CMAKE_BINARY_DIR}/package/apps/TheXTech/lib/"
+    )
+
+    add_custom_command(
+        TARGET make_hkpg PRE_BUILD
+        COMMAND ${CMAKE_COMMAND} -E create_symlink
+                "../../../../apps/TheXTech/bin/${THEXTECH_EXECUTABLE_NAME}"
+                "${CMAKE_BINARY_DIR}/package/data/deskbar/menu/Applications/${DESKTOP_NAME}"
+    )
+
+    add_custom_command(
+        TARGET make_hkpg POST_BUILD
+        COMMAND package create -C "${CMAKE_BINARY_DIR}/package/"
+                "${CMAKE_BINARY_DIR}/${THEXTECH_INSTALLER_PACKAGE_NAME}_bin-${THEXTECH_HAIKU_VERSION_STRING}-${TARGET_PROCESSOR}.hpkg"
+    )
 
 else()
     install(TARGETS thextech
