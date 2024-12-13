@@ -1,0 +1,30 @@
+name                  thextech_bin
+version               @THEXTECH_HAIKU_VERSION_STRING@
+architecture          @TARGET_PROCESSOR@
+summary               "TheXTech runtime package"
+description           "@XTECH_HAIKU_SHORT_DESC@"
+packager              "Vitaliy Novichkov <admin@wohlnet.ru>"
+vendor                "TheXTech Developers Team"
+licenses {
+    "GNU GPL v3"
+}
+copyrights {
+    "Copyright (C) 2020-@XTECH_HAIKU_COPYRIGHT_YEAR@ by Vitaliy Novichkov <admin@wohlnet.ru>"
+}
+provides {
+    thextech_bin = @THEXTECH_HAIKU_VERSION_STRING@
+}
+requires {
+    haiku >= r1~beta5_hrev57937-129
+    libsdl2 >= 2.30.10-1
+}
+urls {
+# TheXTech Project page
+    "https://wohlsoft.ru/projects/TheXTech/"
+# Source code repository
+    "https://github.com/TheXTech/TheXTech"
+}
+source-urls {
+# Source code repository
+    "https://github.com/TheXTech/TheXTech"
+}

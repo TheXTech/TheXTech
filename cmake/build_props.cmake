@@ -38,6 +38,11 @@ if(POLICY CMP0114)
     cmake_policy(SET CMP0114 NEW)
 endif()
 
+# Report about improperly use of PRE_BUILD, PRE_LINK, and POST_BUILD keywords
+if(POLICY CMP0175)
+    cmake_policy(SET CMP0175 NEW)
+endif()
+
 # ========================= Macros and Functions ==============================
 
 include(CheckCCompilerFlag)
