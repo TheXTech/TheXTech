@@ -359,6 +359,8 @@ void OpenLevel_Error(void*, FileFormatsError& e)
     pLogWarning("Error of level file loading: %s (line %d).",
                 e.ERROR_info.c_str(),
                 e.ERROR_linenum);
+
+    MessageText = std::move(e.ERROR_info);
 }
 #endif
 

@@ -2627,9 +2627,7 @@ void zTestLevel(bool magicHand, bool interProcess)
     {
         if(!OpenLevel(FullFileName))
         {
-            g_MessageType = MESSAGE_TYPE_SYS_WARNING;
-            MessageText = fmt::format_ne(g_gameStrings.errorOpenFileFailed, FullFileName);
-            PauseGame(PauseCode::Message);
+            ReportLoadFailure(FullFileName);
             ErrorQuit = true;
         }
     }

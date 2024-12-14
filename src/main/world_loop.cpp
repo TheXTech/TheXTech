@@ -625,9 +625,7 @@ void WorldLoop()
                             if(!OpenLevel(levelPath))
                             {
                                 delayedMusicStart(); // Allow music being started
-                                g_MessageType = MESSAGE_TYPE_SYS_WARNING;
-                                MessageText = fmt::format_ne(g_gameStrings.errorOpenFileFailed, lvl.FileName);
-                                PauseGame(PauseCode::Message);
+                                ReportLoadFailure(lvl.FileName);
                                 ErrorQuit = true;
                             }
 
