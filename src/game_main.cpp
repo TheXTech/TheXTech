@@ -266,6 +266,27 @@ static void s_ExpandSectionForMenu()
         menu_section.Y = menu_section.Height - 2160;
 }
 
+void ReportLoadFailure(const std::string& filename)
+{
+    g_MessageType = MESSAGE_TYPE_SYS_WARNING;
+
+    // temporarily store error code from load process in MessageTitle string
+    std::swap(MessageText, MessageTitle);
+
+    MessageText = fmt::format_ne(g_gameStrings.errorOpenFileFailed, filename);
+
+    // add error code from load process
+    if(!MessageTitle.empty())
+    {
+        MessageText += '\n';
+        MessageText += '\n';
+        MessageText += MessageTitle;
+        MessageTitle.clear();
+    }
+
+    PauseGame(PauseCode::Message);
+}
+
 void MainLoadAll()
 {
     LoadingInProcess = true;
@@ -617,9 +638,8 @@ int GameMain(const CmdLineSetup_t &setup)
                 LevelSelect = false;
                 TestLevel = true;
                 EndLevel = false;
-                g_MessageType = MESSAGE_TYPE_SYS_ERROR;
-                MessageText = fmt::format_ne(g_gameStrings.errorOpenFileFailed, setup.testLevel);
-                PauseGame(PauseCode::Message);
+
+                ReportLoadFailure(setup.testLevel);
                 ErrorQuit = true;
             }
             else
@@ -1172,9 +1192,7 @@ int GameMain(const CmdLineSetup_t &setup)
 
                 if(!OpenLevel(levelPath))
                 {
-                    g_MessageType = MESSAGE_TYPE_SYS_ERROR;
-                    MessageText = fmt::format_ne(g_gameStrings.errorOpenFileFailed, levelPath);
-                    PauseGame(PauseCode::Message);
+                    ReportLoadFailure(levelPath);
                     ErrorQuit = true;
                 }
 
@@ -2441,9 +2459,7 @@ void StartEpisode()
 
         if(!OpenLevel(levelPath))
         {
-            g_MessageType = MESSAGE_TYPE_SYS_ERROR;
-            MessageText = fmt::format_ne(g_gameStrings.errorOpenFileFailed, levelName);
-            PauseGame(PauseCode::Message);
+            ReportLoadFailure(levelName);
             ErrorQuit = true;
         }
 
@@ -2510,9 +2526,7 @@ void StartBattleMode()
     std::string levelPath = SelectBattle[selWorld].WorldPath + SelectBattle[selWorld].WorldFile;
     if(!OpenLevel(levelPath))
     {
-        g_MessageType = MESSAGE_TYPE_SYS_ERROR;
-        MessageText = fmt::format_ne(g_gameStrings.errorOpenFileFailed, SelectBattle[selWorld].WorldFile);
-        PauseGame(PauseCode::Message);
+        ReportLoadFailure(SelectBattle[selWorld].WorldFile);
         ErrorQuit = true;
     }
     SetupPlayers();
