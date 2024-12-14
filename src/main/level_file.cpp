@@ -204,7 +204,8 @@ struct LevelLoad
 
         if(final_layer_index[current_index] == LAYER_NONE)
         {
-            if(layers_finalized == maxLayers)
+            // note: both 0 and maxLayers are valid layer indexes
+            if(layers_finalized > maxLayers)
                 return LAYER_NONE;
 
             final_layer_index[current_index] = layers_finalized;
@@ -247,7 +248,8 @@ struct LevelLoad
 
         if(final_event_index[current_index] == EVENT_NONE)
         {
-            if(events_finalized == maxEvents)
+            // note: both 0 and maxEvents are valid event indexes
+            if(events_finalized > maxEvents)
                 return EVENT_NONE;
 
             final_event_index[current_index] = events_finalized;
