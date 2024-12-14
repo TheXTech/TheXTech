@@ -15,6 +15,7 @@ Changelog for 1.3.7-dev
 -3DS: speed up graphics loading code (@ds-sloth)
 -3DS/Wii: fix TheXTech 1.3.7-beta bug where levels with 101 layers/events could not load (@ds-sloth)
 -Update level loading error screen to be more informative (@ds-sloth)
+-Hints: fix the graphical display of the surfing hint (@ds-sloth)
 
 Changelog for 1.3.7-beta
 -Add ability to trigger event layer smoke in the in-game editor (@ds-sloth)
