@@ -110,8 +110,12 @@ static void s_draw_rainbow_surf(int x, int y)
     RenderControls(c, x + 96 / 2 - 76 / 2, y + 96 - 34, 76, 30, false, 255);
 
     StdPicture& tex = GFXNPC[NPCID_FLIPPED_RAINBOW_SHELL];
+
     int frame_h = NPCTraits[NPCID_FLIPPED_RAINBOW_SHELL].HeightGFX;
+    if(frame_h == 0)
+        frame_h = NPCTraits[NPCID_FLIPPED_RAINBOW_SHELL].THeight;
     int frame_idx = ((CommonFrame % 64) / 4);
+
     XRender::renderTexture(x + 96 / 2 - tex.w / 2, y + 96 - 34 - 4 - frame_h, tex.w, frame_h, tex, 0, frame_h * frame_idx);
 }
 
