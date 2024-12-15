@@ -13,6 +13,7 @@ Changelog for 1.3.7-dev
 -Refine the placement of HUD items at low resolutions (@ds-sloth)
 -Don't allow pressing the vanilla cam hotkey during a camera pan event (@ds-sloth)
 -3DS: add advanced option "Inaccurate GIFs" to allow playing in 3D on levels with GIFs (@ds-sloth)
+-Fix TheXTech 1.3.7-beta bug where battle levels could be created even if the asset pack disables battle mode (@ds-sloth, thanks to @LoveBodhi for the report)
 
 Changelog for 1.3.7-beta
 -Add ability to trigger event layer smoke in the in-game editor (@ds-sloth)
