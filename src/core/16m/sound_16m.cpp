@@ -94,6 +94,9 @@ static std::vector<bool> s_soundLoaded;
 static std::vector<int> s_worldMusicMods;
 static std::vector<int> s_levelMusicMods;
 static std::vector<int> s_specialMusicMods;
+static std::vector<char*> s_worldMusicQoas;
+static std::vector<char*> s_levelMusicQoas;
+static std::vector<char*> s_specialMusicQoas;
 static std::vector<int> s_sfxEffects;
 
 static uint8_t* s_maxmod_rwops_load(int id)
@@ -211,6 +214,21 @@ void RestartMixerX()
 {
 }
 
+static void s_clearQoaLists()
+{
+    for(char* c : s_worldMusicQoas)
+        free(c);
+    s_worldMusicQoas.clear();
+
+    for(char* c : s_levelMusicQoas)
+        free(c);
+    s_levelMusicQoas.clear();
+
+    for(char* c : s_specialMusicQoas)
+        free(c);
+    s_specialMusicQoas.clear();
+}
+
 void UnloadSound()
 {
     if(!g_mixerLoaded)
@@ -219,12 +237,7 @@ void UnloadSound()
     mmStop();
     mmEffectCancelAll();
 
-    if(s_curMusic > -1)
-        mmUnload(s_curMusic);
-    else if(s_curMusic < -1)
-        Sound_StreamStop();
-
-    s_curMusic = -1;
+    StopMusic();
 
     for(unsigned int i = 0; i < g_totalSounds; i++)
     {
@@ -241,6 +254,8 @@ void UnloadSound()
 
     s_soundbank_effects = 0;
     s_soundbank_modules = 0;
+
+    s_clearQoaLists();
 
     s_soundLoaded.clear();
     s_worldMusicMods.clear();
@@ -346,21 +361,30 @@ static void s_MusicUpdateFade()
         StopMusic();
 }
 
-static void s_playMusic(int mod, int fadeInMs)
+static void s_playMusic(int mod, const char* qoa, int fadeInMs)
 {
     StopMusic();
     if(mod == -2 && s_customSection > maxSections)
         return;
 
-    if(mod == -1)
+    if(mod == -1 && qoa == nullptr)
         return;
 
     s_curMusic = mod;
 
+    if(qoa)
+        s_curMusic = -4;
+
     if(!g_mixerLoaded)
         return;
 
-    if(mod > -1)
+    if(qoa)
+    {
+        std::string music_path = AppPath + "music/" + qoa;
+        pLogDebug("Trying to play %s from %s...", qoa, music_path.c_str());
+        Sound_StreamStart(Files::open_file(music_path, "rb"));
+    }
+    else if(mod > -1)
     {
         mmLoad(mod);
         s_MusicSetupFade(1024, fadeInMs);
@@ -429,9 +453,13 @@ void PlayMusic(const std::string &Alias, int fadeInMs)
     {
         pLogDebug("Starting special music [3]");
         int index = -1;
+        const char* qoa = nullptr;
         if(2 < s_specialMusicMods.size())
+        {
             index = s_specialMusicMods[2];
-        s_playMusic(index, fadeInMs);
+            qoa = s_specialMusicQoas[2];
+        }
+        s_playMusic(index, qoa, fadeInMs);
         musicName = "tmusic";
     }
 }
@@ -464,12 +492,16 @@ void StartMusic(int A, int fadeInMs)
         musicName = fmt::format_ne("wmusic{0}", A);
 
         int index = -1;
+        const char* qoa = nullptr;
         if(curWorldMusic == g_customWldMusicId)
             index = -3;
         else if(A >= 1 && A - 1 < (int)s_worldMusicMods.size())
+        {
             index = s_worldMusicMods[A - 1];
+            qoa = s_worldMusicQoas[A - 1];
+        }
 
-        s_playMusic(index, fadeInMs);
+        s_playMusic(index, qoa, fadeInMs);
     }
     else if(A == -1) // P switch music
     {
@@ -477,16 +509,24 @@ void StartMusic(int A, int fadeInMs)
         if(FreezeNPCs) {
             pLogDebug("Starting special music [2]");
             int index = -1;
+            const char* qoa = nullptr;
             if(1 < s_specialMusicMods.size())
+            {
                 index = s_specialMusicMods[1];
-            s_playMusic(index, fadeInMs);
+                qoa = s_specialMusicQoas[1];
+            }
+            s_playMusic(index, qoa, fadeInMs);
             musicName = "stmusic";
         } else {
             pLogDebug("Starting special music [1]");
             int index = -1;
+            const char* qoa = nullptr;
             if(0 < s_specialMusicMods.size())
+            {
                 index = s_specialMusicMods[0];
-            s_playMusic(index, fadeInMs);
+                qoa = s_specialMusicQoas[0];
+            }
+            s_playMusic(index, qoa, fadeInMs);
             musicName = "smusic";
         }
         curMusic = -1;
@@ -498,15 +538,19 @@ void StartMusic(int A, int fadeInMs)
         std::string mus = fmt::format_ne("music{0}", curMusic);
 
         int index = -1;
+        const char* qoa = nullptr;
         if(curMusic == g_customLvlMusicId)
         {
             s_customSection = A;
             index = -2;
         }
         else if(curMusic >= 1 && curMusic - 1 < (int)s_levelMusicMods.size())
+        {
             index = s_levelMusicMods[curMusic - 1];
+            qoa = s_levelMusicQoas[curMusic - 1];
+        }
 
-        s_playMusic(index, fadeInMs);
+        s_playMusic(index, qoa, fadeInMs);
 
         musicName = std::move(mus);
     }
@@ -615,14 +659,27 @@ static void loadMusicIni(const std::string &path, bool isLoadingCustom)
     s_specialMusicMods.clear();
     s_specialMusicMods.reserve(g_totalMusicSpecial);
 
+    s_clearQoaLists();
+    s_levelMusicQoas.reserve(g_totalMusicLevel);
+    s_worldMusicQoas.reserve(g_totalMusicWorld);
+    s_specialMusicQoas.reserve(g_totalMusicSpecial);
+
+    std::string group;
+    std::string got_qoa;
     for(unsigned int i = 1; i <= g_totalMusicLevel; ++i)
     {
-        std::string group = fmt::format_ne("level-music-{0}", i);
+        group = fmt::format_ne("level-music-{0}", i);
         musicSetup.beginGroup(group);
         musicSetup.read("resolved-mod", mod, -1);
+        musicSetup.read("file-qoa", got_qoa, "");
         musicSetup.endGroup();
 
         s_levelMusicMods.push_back(mod);
+
+        char* qoa = nullptr;
+        if(!got_qoa.empty())
+            qoa = strdup(got_qoa.c_str());
+        s_levelMusicQoas.push_back(qoa);
     }
 
     if(!isLoadingCustom)
@@ -632,9 +689,15 @@ static void loadMusicIni(const std::string &path, bool isLoadingCustom)
         std::string group = fmt::format_ne("world-music-{0}", i);
         musicSetup.beginGroup(group);
         musicSetup.read("resolved-mod", mod, -1);
+        musicSetup.read("file-qoa", got_qoa, "");
         musicSetup.endGroup();
 
         s_worldMusicMods.push_back(mod);
+
+        char* qoa = nullptr;
+        if(!got_qoa.empty())
+            qoa = strdup(got_qoa.c_str());
+        s_worldMusicQoas.push_back(qoa);
     }
 
     if(!isLoadingCustom)
@@ -644,9 +707,15 @@ static void loadMusicIni(const std::string &path, bool isLoadingCustom)
         std::string group = fmt::format_ne("special-music-{0}", i);
         musicSetup.beginGroup(group);
         musicSetup.read("resolved-mod", mod, -1);
+        musicSetup.read("file-qoa", got_qoa, "");
         musicSetup.endGroup();
 
         s_specialMusicMods.push_back(mod);
+
+        char* qoa = nullptr;
+        if(!got_qoa.empty())
+            qoa = strdup(got_qoa.c_str());
+        s_specialMusicQoas.push_back(qoa);
     }
 }
 
