@@ -647,7 +647,9 @@
                     "_name": "四人分屏模式畫面大小",
                     "default": "缺省"
                 },
-                "use-native-osk": "啓用內置虛擬鍵盤"
+                "use-native-osk": "啓用內置虛擬鍵盤",
+                "inaccurate-gifs": "錯誤GIF圖片渲染",
+                "inaccurate-gifs-tip": "當GIF圖片檔案存在時，啟用3D效果"
             },
             "audio": {
                 "audio-sfx-volume": "聲音音量",

@@ -647,7 +647,9 @@
                     "default": "默认",
                     "fhd": "1920x1080（FHD）"
                 },
-                "use-native-osk": "启用内置虚拟键盘"
+                "use-native-osk": "启用内置虚拟键盘",
+                "inaccurate-gifs-tip": "当GIF图片文件存在时，启用3D效果",
+                "inaccurate-gifs": "错误GIF图片渲染"
             },
             "audio": {
                 "_header": "音频选项",
