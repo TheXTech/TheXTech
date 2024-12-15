@@ -22,6 +22,10 @@
 #include <SDL2/SDL_rwops.h>
 #include <maxmod9.h>
 
+#ifdef __CALICO__
+#include <calico.h>
+#endif
+
 #include "core/16m/sound_stream_16m.h"
 
 #define QOA_IMPLEMENTATION
@@ -116,6 +120,7 @@ void Sound_StreamStart(SDL_RWops* rwops)
 #ifdef __CALICO__
     stream.timer = 0;
     stream.manual = 0;
+    stream.minus_thread_prio = -(MAIN_THREAD_PRIO - 1); // priority 1 higher than main thread
 #else
     stream.timer = MM_TIMER3;
     stream.manual = 1;
