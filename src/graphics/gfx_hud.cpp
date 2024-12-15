@@ -231,8 +231,14 @@ void DrawInterface(int Z, int numScreens)
     if(!BattleMode)
     {
         // draw medals at top-right side of HUD
-        int medals_x = SDL_min(static_cast<int>(vScreen[Z].Width) - 16, CenterX + 400 - 16);
-        int medals_y = ScreenTop + 16;
+        int medals_x = SDL_min(static_cast<int>(vScreen[Z].Width), CenterX + 320) - 16;
+        int medals_y = ScreenTop + 32;
+
+        if(vScreen[Z].Width > 440 && vScreen[Z].Width < 640)
+            medals_x -= 48;
+
+        if(vScreen[Z].Width < 640 || plr_count > 2)
+            medals_y = ScreenTop + 4;
 
         DrawMedals(medals_x, medals_y, false, g_curLevelMedals.max, g_curLevelMedals.prev, 0, g_curLevelMedals.got, g_curLevelMedals.life);
     }
@@ -522,7 +528,7 @@ void DrawDeviceBattery()
     int bw = 40;
     int bh = 22;
     int bx = XRender::TargetW - XRender::TargetOverscanX - (bw + 8);
-    int by = 24;
+    int by = (GameMenu) ? 24 : 8;
 
     RenderPowerInfo(-1, bx, by, bw, bh, 255, &status_info);
 }

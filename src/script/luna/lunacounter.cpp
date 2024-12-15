@@ -396,6 +396,10 @@ void DeathCounter::Draw(int screenZ)
     {
         int total_W = m_print.titlePixLen + 16 + m_print.counterPixLen;
         int title_X = vscreen.Width / 2 - total_W / 2;
+
+        if(vscreen.Width < 640)
+            title_X -= 64;
+
         int counter_X = title_X + m_print.titlePixLen + 16;
 
         // make even
