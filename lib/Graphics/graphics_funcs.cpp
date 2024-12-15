@@ -984,9 +984,15 @@ FIBITMAP *GraphicsHelps::fastScaleDownAnd32Bit(FIBITMAP *image, bool do_scale_do
 
 static uint16_t s_RGB24_to_RGB565(uint32_t RGB24)
 {
+#ifdef __WII__
+    uint16_t r = ((uint8_t*)(&RGB24))[0];
+    uint16_t g = ((uint8_t*)(&RGB24))[1];
+    uint16_t b = ((uint8_t*)(&RGB24))[2];
+#else
     uint16_t r = ((uint8_t*)(&RGB24))[2];
     uint16_t g = ((uint8_t*)(&RGB24))[1];
     uint16_t b = ((uint8_t*)(&RGB24))[0];
+#endif
 
     return ((r >> 3) << FI16_565_RED_SHIFT) | ((g >> 2) << FI16_565_GREEN_SHIFT) | ((b >> 3) << FI16_565_BLUE_SHIFT);
 }
