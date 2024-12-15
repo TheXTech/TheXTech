@@ -319,7 +319,7 @@ static int s_loadTexture(const std::string& path, int* tex_out, int* data_size, 
 }
 
 static RenderPlanes_t s_render_planes;
-static uint8_t s_poly_id;
+// static uint8_t s_poly_id;
 
 // sourced from gl2d
 static inline void s_gxTexcoord2i(t16 u, t16 v)
@@ -345,7 +345,7 @@ void minport_RenderBoxFilled( int x1, int y1, int x2, int y2, XTColor color)
 
     glBindTexture(0, 0);
     if((color.a >> 3) < 31)
-        glPolyFmt(POLY_ID(s_poly_id++) | POLY_ALPHA((color.a >> 3) + 1) | POLY_CULL_NONE | POLY_FOG_Q);
+        glPolyFmt(POLY_ID(s_render_planes.m_current_plane / 8) | POLY_ALPHA((color.a >> 3) + 1) | POLY_CULL_NONE | POLY_FOG_Q);
     glColor3b(color.r, color.g, color.b);
 
     glBegin( GL_QUADS );
@@ -406,7 +406,7 @@ inline bool GL_DrawImage_Custom(int name, int flags,
 
     glBindTexture(0, name);
     if((a >> 3) < 31)
-        glPolyFmt(/*POLY_ID(s_poly_id++) | */ POLY_ALPHA((a >> 3) + 1) | POLY_CULL_NONE | POLY_FOG_Q);
+        glPolyFmt(/*POLY_ID(s_poly_id++) | */ POLY_ID(s_render_planes.m_current_plane / 8) | POLY_ALPHA((a >> 3) + 1) | POLY_CULL_NONE | POLY_FOG_Q);
 
     glBegin(GL_QUADS);
 
@@ -451,7 +451,7 @@ inline bool GL_DrawImage_Custom_Basic(int name, int flags,
 
     glBindTexture(0, name);
     if((a >> 3) < 31)
-        glPolyFmt(/*POLY_ID(s_poly_id++) | */ POLY_ALPHA((a >> 3) + 1) | POLY_CULL_NONE | POLY_FOG_Q);
+        glPolyFmt(/*POLY_ID(s_poly_id++) | */ POLY_ID(s_render_planes.m_current_plane / 8) | POLY_ALPHA((a >> 3) + 1) | POLY_CULL_NONE | POLY_FOG_Q);
 
     glBegin(GL_QUADS);
 
@@ -551,7 +551,7 @@ void setTargetTexture()
     minport_initFrame();
 
     s_render_planes.reset();
-    s_poly_id = 0;
+    // s_poly_id = 0;
     glClearColor(0, 0, 0, 31);
 
     minport_ApplyViewport();
