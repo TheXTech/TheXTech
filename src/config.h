@@ -490,6 +490,12 @@ public:
     /* ---- Advanced - Video ----*/
     subsection advanced_video{this, "advanced-video", "Video"};
 
+#ifdef __3DS__
+    opt<bool> inaccurate_gifs{this, defaults(false), {}, Scope::Config,
+        "inaccurate-gifs", "Inaccurate GIFs", "Allows 3D effect when GIFs are present",
+        config_3ds_inaccurate_gifs_set};
+#endif
+
 #ifndef RENDER_CUSTOM
     enum RenderMode_t
     {

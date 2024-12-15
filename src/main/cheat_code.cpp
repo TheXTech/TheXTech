@@ -1903,8 +1903,14 @@ static void speedDemon()
 static void gifs2png()
 {
     PlaySound(SFX_Transform);
+
+#ifdef __3DS__
+    ConfigChangeSentinel sent(ConfigSetLevel::cheat);
+    g_config.inaccurate_gifs = !g_config.inaccurate_gifs;
+#else
     g_ForceBitmaskMerge = !g_ForceBitmaskMerge;
     XRender::unloadGifTextures();
+#endif
 }
 
 static void logicScreen()
