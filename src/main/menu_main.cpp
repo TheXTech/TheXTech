@@ -641,9 +641,12 @@ static void s_FinishFindWorlds()
 
     NumSelectWorld = (int)(SelectWorld.size() - 1);
 
-    SelectWorld_t battles = SelectWorld_t();
-    battles.WorldName = g_mainMenu.editorBattles;
-    SelectWorldEditable.push_back(battles);
+    if(!g_gameInfo.disableBattleMode)
+    {
+        SelectWorld_t battles = SelectWorld_t();
+        battles.WorldName = g_mainMenu.editorBattles;
+        SelectWorldEditable.push_back(battles);
+    }
 
     SelectWorld_t createWorld = SelectWorld_t();
     createWorld.WorldName = g_mainMenu.editorNewWorld;
@@ -1473,6 +1476,8 @@ bool mainMenuUpdate()
 
             if(MenuCursorCanMove || MenuMouseClick)
             {
+                int first_new_content = (g_gameInfo.disableBattleMode) ? NumSelectWorldEditable : NumSelectWorldEditable - 1;
+
                 if(menuBackPress)
                 {
                     MenuCursor = MenuMode - 1;
@@ -1496,7 +1501,7 @@ bool mainMenuUpdate()
                     PlaySoundMenu(SFX_Slide);
                     MenuCursorCanMove = false;
                 }
-                else if((leftPressed || rightPressed) && MenuMode == MENU_EDITOR && MenuCursor + 1 >= NumSelectWorldEditable - 1)
+                else if((leftPressed || rightPressed) && MenuMode == MENU_EDITOR && MenuCursor + 1 >= first_new_content)
                 {
                     s_editor_target_thextech = !s_editor_target_thextech;
                     PlaySoundMenu(SFX_Climbing);
@@ -1566,7 +1571,7 @@ bool mainMenuUpdate()
 #endif
                             }
                         }
-                        else if(selWorld == NumSelectWorldEditable - 1)
+                        else if(!g_gameInfo.disableBattleMode && selWorld == NumSelectWorldEditable - 1)
                         {
                             ClearWorld(true);
                             GameMenu = false;
@@ -2632,7 +2637,8 @@ void mainMenuDraw()
         }
 
         // preview type of content being created
-        if(MenuMode == MENU_EDITOR && MenuCursor + 1 >= NumSelectWorldEditable - 1)
+        int first_new_content = (g_gameInfo.disableBattleMode) ? NumSelectWorldEditable : NumSelectWorldEditable - 1;
+        if(MenuMode == MENU_EDITOR && MenuCursor + 1 >= first_new_content)
         {
             B = MenuCursor + 1 - minShow + 1;
 
