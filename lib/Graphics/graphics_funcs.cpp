@@ -647,7 +647,7 @@ FIBITMAP *GraphicsHelps::fastConvertTo32Bit(FIBITMAP *image)
     if(!image)
         return nullptr;
 
-    if(FreeImage_GetBPP(image) != 4 && FreeImage_GetBPP(image) != 8)
+    if(FreeImage_GetBPP(image) != 1 && FreeImage_GetBPP(image) != 4 && FreeImage_GetBPP(image) != 8)
         return nullptr;
 
     auto src_w = static_cast<uint32_t>(FreeImage_GetWidth(image));
@@ -664,6 +664,34 @@ FIBITMAP *GraphicsHelps::fastConvertTo32Bit(FIBITMAP *image)
 
     uint32_t *dest_pixels  = reinterpret_cast<uint32_t*>(FreeImage_GetBits(dest));
     auto dest_pitch_px = static_cast<uint32_t>(FreeImage_GetPitch(dest)) / 4;
+
+    // special logic for 1 BPP
+    if(FreeImage_GetBPP(image) == 1)
+    {
+        // fill first two entries
+        for(int i = 0; i < 2; i++)
+        {
+            palette_high[i] = src_palette[i];
+
+            if(src_trans)
+                ((uint8_t*)&palette_high[i])[3] = src_trans[i];
+            else
+                ((uint8_t*)&palette_high[i])[3] = 255;
+        }
+
+        // perform lookups
+        for(uint32_t y = 0; y < src_h; y++)
+        {
+            for(uint32_t x = 0; x < src_w; x++)
+            {
+                uint8_t which_bit = 128 >> (x % 8);
+                bool lit = src_pixels[y * src_pitch + x / 8] & which_bit;
+                dest_pixels[y * dest_pitch_px + x] = palette_high[lit];
+            }
+        }
+
+        return dest;
+    }
 
     if(FreeImage_GetBPP(image) == 8)
     {
