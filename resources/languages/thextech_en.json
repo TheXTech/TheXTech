@@ -640,6 +640,8 @@
                     "safe-tip": "Checks if images are in 2x format"
                 },
                 "use-native-osk": "Native OSK",
+                "inaccurate-gifs": "Inaccurate GIFs",
+                "inaccurate-gifs-tip": "Allows 3D effect when GIFs are present",
                 "webm-recording": "WEBM recording",
                 "internal-res-4p": {
                     "_name": "4P split screen size",

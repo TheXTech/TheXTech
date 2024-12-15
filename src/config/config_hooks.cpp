@@ -45,6 +45,11 @@
 #include <Graphics/graphics_funcs.h>
 #endif
 
+#ifdef __3DS__
+#include "core/render.h"
+#include "main/cheat_code.h"
+#endif
+
 
 // config_main.cpp
 extern bool g_configInTransaction;
@@ -156,6 +161,17 @@ void config_integrations_set()
     Integrator::quitIntegrations();
     Integrator::initIntegrations();
 }
+
+#ifdef __3DS__
+void config_3ds_inaccurate_gifs_set()
+{
+    if(g_ForceBitmaskMerge == g_config.inaccurate_gifs)
+        return;
+
+    g_ForceBitmaskMerge = g_config.inaccurate_gifs;
+    XRender::unloadGifTextures();
+}
+#endif
 
 void config_compat_changed()
 {

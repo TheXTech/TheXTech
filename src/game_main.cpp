@@ -981,6 +981,9 @@ int GameMain(const CmdLineSetup_t &setup)
             FlyForever = false;
             BeatTheGame = false;
             g_ForceBitmaskMerge = false;
+#ifdef __3DS__
+            g_ForceBitmaskMerge = g_config.inaccurate_gifs;
+#endif
             g_ClonedPlayerMode = false;
             g_CheatLogicScreen = false;
             g_CheatEditYourFriends = false;

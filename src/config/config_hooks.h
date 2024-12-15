@@ -34,6 +34,7 @@ void config_audio_set();
 void config_music_volume_set();
 void config_log_level_set();
 void config_integrations_set();
+void config_3ds_inaccurate_gifs_set();
 void config_compat_changed();
 
 #endif
