@@ -188,6 +188,18 @@ void DrawInterface(int Z, int numScreens)
                        lives_stars_text_left,
                        ScreenTop + 16 + 31);
         }
+
+        // draw medals at top-right side of HUD
+        int medals_x = SDL_min(static_cast<int>(vScreen[Z].Width), CenterX + 320) - 16;
+        int medals_y = ScreenTop + 32;
+
+        if(vScreen[Z].Width > 440 && vScreen[Z].Width < 640)
+            medals_x = coins_score_text_right;
+
+        if(vScreen[Z].Width < 640 || plr_count > 2)
+            medals_y = ScreenTop + 4;
+
+        DrawMedals(medals_x, medals_y, false, g_curLevelMedals.max, g_curLevelMedals.prev, 0, g_curLevelMedals.got, g_curLevelMedals.life);
     }
     // draw both battle mode lives
     else if(shared_screen)
@@ -226,21 +238,6 @@ void DrawInterface(int Z, int numScreens)
         SuperPrint(std::to_string(BattleLives[first_plr_idx]), 1,
                    lives_x + 8 + GFX.Interface[1].w + 8,
                    ScreenTop + 16 + 11);
-    }
-
-    if(!BattleMode)
-    {
-        // draw medals at top-right side of HUD
-        int medals_x = SDL_min(static_cast<int>(vScreen[Z].Width), CenterX + 320) - 16;
-        int medals_y = ScreenTop + 32;
-
-        if(vScreen[Z].Width > 440 && vScreen[Z].Width < 640)
-            medals_x -= 48;
-
-        if(vScreen[Z].Width < 640 || plr_count > 2)
-            medals_y = ScreenTop + 4;
-
-        DrawMedals(medals_x, medals_y, false, g_curLevelMedals.max, g_curLevelMedals.prev, 0, g_curLevelMedals.got, g_curLevelMedals.life);
     }
 
     if(BattleIntro > 0)
