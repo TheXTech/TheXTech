@@ -164,6 +164,76 @@ static void* s_RawTo4x4RGBA(const uint8_t* src, uint32_t width, uint32_t height,
     return dst;
 }
 
+/**
+ * Convert a raw BMP (RGB565) to 4x4 RGB565.
+ * @author DragonMinded, modifications by ds-sloth
+*/
+static void* s_RawTo4x4_16bit(const uint8_t* src, uint32_t width, uint32_t height, uint32_t pitch, uint32_t* wdst_out, uint32_t* hdst_out, bool mask, bool downscale)
+{
+    // calculate destination dimensions, including downscaling and required padding
+    int sf = (downscale ? 2 : 1);
+    uint32_t wdst = (width + sf - 1) / sf;
+    uint32_t hdst = (height + sf - 1) / sf;
+
+    if(wdst & 3)
+    {
+        wdst += 4;
+        wdst &= ~3;
+    }
+
+    if(hdst & 3)
+    {
+        hdst += 4;
+        hdst &= ~3;
+    }
+
+    void* dst = memalign(32, wdst * hdst * 2);
+
+    if(!dst)
+    {
+        pLogCritical("Memory allocation failed when converting texture to Wii hardware format");
+        return dst;
+    }
+
+    u16* p = (u16*)dst;
+
+    u16 PAD = (mask) ? 0xFFFF : 0;
+
+    const uint16_t* src_px = reinterpret_cast<const uint16_t*>(src);
+    int pitch_px = pitch / 2;
+
+    for(u32 block = 0; block < hdst; block += 4)
+    {
+        for(u32 i = 0; i < wdst; i += 4)
+        {
+            // whole rgb565 pixel
+            for(u8 c = 0; c < 4; ++c)
+            {
+                for(u8 argb = 0; argb < 4; ++argb)
+                {
+                    // new: padding
+                    if((i + argb) * sf >= width || (block + c) * sf >= height)
+                    {
+                        *p++ = PAD;
+                        continue;
+                    }
+
+                    // New: Alpha pixels
+                    *p++ = src_px[(((i + argb) * sf) + ((block + c) * sf * pitch_px))];
+                }
+            }
+        }
+    }
+
+    if(dst && wdst_out)
+        *wdst_out = wdst;
+
+    if(dst && hdst_out)
+        *hdst_out = hdst;
+
+    return dst;
+}
+
 Files::Data robust_Files_load_file(const std::string& path)
 {
     Files::Data ret = Files::load_file(path);
@@ -179,64 +249,94 @@ Files::Data robust_Files_load_file(const std::string& path)
     return ret;
 }
 
-FIBITMAP* robust_FILoad(const std::string& path, const std::string& maskPath, int* orig_w = nullptr, int* orig_h = nullptr)
+FIBITMAP* robust_FILoad(const std::string& path, int target_w, bool prefer_rgb565)
 {
     if(path.empty())
         return nullptr;
 
-    SDL_RWops *handle = Files::open_file(path, "rb");
-    if(!handle)
+    Files::Data data = Files::load_file(path);
+    if(data.empty())
         return nullptr;
 
-    FreeImageIO io;
-    GraphicsHelps::SetRWopsIO(&io);
-    FREE_IMAGE_FORMAT formato = FreeImage_GetFileTypeFromHandle(&io, (fi_handle)handle);
-    SDL_RWclose(handle);
+    FIMEMORY* imgMEM = FreeImage_OpenMemory(const_cast<unsigned char*>(data.begin()),
+                                            static_cast<unsigned int>(data.size()));
+    FREE_IMAGE_FORMAT formato = FreeImage_GetFileTypeFromMemory(imgMEM);
 
     if(formato == FIF_UNKNOWN)
+    {
+        FreeImage_CloseMemory(imgMEM);
         return nullptr;
+    }
 
-    FIBITMAP* sourceImage = GraphicsHelps::loadImage(path);
-
-    if(!sourceImage)
+    FIBITMAP* rawImage = FreeImage_LoadFromMemory(formato, imgMEM, 0);
+    if(!rawImage)
     {
         pLogWarning("FreeImageLite failed to load image due to lack of memory, trying to free some memory");
         minport_freeTextureMemory();
-        sourceImage = GraphicsHelps::loadImage(path);
+        rawImage = FreeImage_LoadFromMemory(formato, imgMEM, 0);
 
-        if(!sourceImage)
+        if(!rawImage)
+        {
+            FreeImage_CloseMemory(imgMEM);
             return nullptr;
+        }
+
+        pLogDebug("Loaded successfully!");
     }
 
-    if(!maskPath.empty())
-        GraphicsHelps::mergeWithMask(sourceImage, "", maskPath);
+    FreeImage_CloseMemory(imgMEM);
 
-    uint32_t w = static_cast<uint32_t>(FreeImage_GetWidth(sourceImage));
-    uint32_t h = static_cast<uint32_t>(FreeImage_GetHeight(sourceImage));
+    int32_t w = static_cast<int32_t>(FreeImage_GetWidth(rawImage));
+    int32_t h = static_cast<int32_t>(FreeImage_GetHeight(rawImage));
 
-    pLogDebug("loading %s, freeimage reports %u %u %u", path.c_str(), w, h, FreeImage_GetPitch(sourceImage));
-
-    if(orig_w)
-        *orig_w = w;
-
-    if(orig_h)
-        *orig_h = h;
+    pLogDebug("loading %s, freeimage reports %u %u %u", path.c_str(), w, h, FreeImage_GetPitch(rawImage));
 
     if((w == 0) || (h == 0))
     {
-        GraphicsHelps::closeImage(sourceImage);
+        GraphicsHelps::closeImage(rawImage);
         pLogWarning("Error loading of image file:\n"
                     "Reason: %s."
                     "Zero image size!");
         return nullptr;
     }
 
-    FreeImage_FlipVertical(sourceImage);
+    if(w >= target_w)
+        prefer_rgb565 = false;
+
+    if(w < target_w && FreeImage_GetBPP(rawImage) == 32 && !prefer_rgb565)
+    {
+        // don't rescale, just flip
+        FreeImage_FlipVertical(rawImage);
+        return rawImage;
+    }
+
+    const auto prepare_func = (prefer_rgb565) ? GraphicsHelps::fastConvertToRGB565AndFlip : GraphicsHelps::fastScaleDownAnd32Bit;
+
+    FIBITMAP *sourceImage = prepare_func(rawImage, w >= target_w);
+    if(!sourceImage)
+    {
+        pLogWarning("Failed to convert image due to lack of memory, trying to free some memory");
+        minport_freeTextureMemory();
+        sourceImage = prepare_func(rawImage, w >= target_w);
+
+        if(!sourceImage)
+        {
+            FreeImage_Unload(rawImage);
+            return nullptr;
+        }
+
+        pLogDebug("Converted successfully!");
+    }
+
+    FreeImage_Unload(rawImage);
+
+    if(!prefer_rgb565)
+        FreeImage_FlipVertical(sourceImage);
 
     return sourceImage;
 }
 
-void s_loadTexture(StdPicture& target, void* data, int width, int height, int pitch, bool mask)
+void s_loadTexture(StdPicture& target, void* data, int width, int height, int pitch, int bpp, bool mask)
 {
     // downscale if logical width matches the actual width of the texture, otherwise don't
     bool downscale = (width >= target.w);
@@ -273,13 +373,19 @@ void s_loadTexture(StdPicture& target, void* data, int width, int height, int pi
         if(w_i > 0 && h_i > 0)
         {
             uint32_t wdst = 0, hdst = 0;
-            target.d.backing_texture[i + 3 * mask] = s_RawTo4x4RGBA((uint8_t*)data + start_y * pitch + start_x * 4, w_i, h_i, pitch, &wdst, &hdst, mask, downscale);
+
+            if(bpp == 32)
+                target.d.backing_texture[i + 3 * mask] = s_RawTo4x4RGBA((uint8_t*)data + start_y * pitch + start_x * 4, w_i, h_i, pitch, &wdst, &hdst, mask, downscale);
+            else
+                target.d.backing_texture[i + 3 * mask] = s_RawTo4x4_16bit((uint8_t*)data + start_y * pitch + start_x * 2, w_i, h_i, pitch, &wdst, &hdst, mask, downscale);
 
             if(target.d.backing_texture[i + 3 * mask])
             {
-                DCFlushRange(target.d.backing_texture[i + 3 * mask], wdst * hdst * 4);
+                auto texformat = (bpp == 32) ? GX_TF_RGBA8 : GX_TF_RGB565;
+
+                DCFlushRange(target.d.backing_texture[i + 3 * mask], wdst * hdst * (bpp / 8));
                 GX_InitTexObj(&target.d.texture[i + 3 * mask], target.d.backing_texture[i + 3 * mask],
-                              wdst, hdst, GX_TF_RGBA8, GX_CLAMP, GX_CLAMP, GX_FALSE);
+                              wdst, hdst, texformat, GX_CLAMP, GX_CLAMP, GX_FALSE);
                 GX_InitTexObjFilterMode(&target.d.texture[i + 3 * mask], GX_NEAR, GX_NEAR);
 
                 // printf("We initialized with %u %u\n", wdst, hdst);
@@ -825,7 +931,12 @@ void lazyLoad(StdPicture& target)
     }
     else
     {
-        FIBITMAP* FI_tex = robust_FILoad(target.l.path, "");
+        bool mask_is_gif = Files::hasSuffix(target.l.mask_path, "m.gif");
+        bool prefer_rgb565 = mask_is_gif && !g_ForceBitmaskMerge && !target.l.colorKey;
+
+        FIBITMAP* FI_tex = robust_FILoad(target.l.path, target.w, prefer_rgb565);
+        if(FreeImage_GetBPP(FI_tex) == 32)
+            prefer_rgb565 = false;
 
         if(!FI_tex)
         {
@@ -838,13 +949,13 @@ void lazyLoad(StdPicture& target)
         FIBITMAP* FI_mask = nullptr;
         bool force_merge = false;
 
-        if(Files::hasSuffix(target.l.mask_path, "m.gif"))
+        if(mask_is_gif)
         {
-            FI_mask = robust_FILoad(target.l.mask_path, "");
+            FI_mask = robust_FILoad(target.l.mask_path, target.w, prefer_rgb565);
         }
         else if(!target.l.mask_path.empty())
         {
-            FIBITMAP* FI_mask = robust_FILoad(target.l.mask_path, "");
+            FIBITMAP* FI_mask = robust_FILoad(target.l.mask_path, target.w, false);
 
             GraphicsHelps::RGBAToMask(FI_mask);
 
@@ -852,7 +963,7 @@ void lazyLoad(StdPicture& target)
             force_merge = true;
         }
 
-        if(FI_mask && (force_merge || g_ForceBitmaskMerge || !GraphicsHelps::validateBitmaskRequired(FI_tex, FI_mask, target.l.path)))
+        if(FI_mask && !prefer_rgb565 && (force_merge || g_ForceBitmaskMerge || !GraphicsHelps::validateBitmaskRequired(FI_tex, FI_mask, target.l.path)))
         {
             GraphicsHelps::mergeWithMask(FI_tex, FI_mask);
             GraphicsHelps::closeImage(FI_mask);
@@ -872,12 +983,12 @@ void lazyLoad(StdPicture& target)
             GraphicsHelps::replaceColor(FI_tex, colSrc, colDst);
         }
 
-        s_loadTexture(target, FreeImage_GetBits(FI_tex), FreeImage_GetWidth(FI_tex), FreeImage_GetHeight(FI_tex), FreeImage_GetPitch(FI_tex), false);
+        s_loadTexture(target, FreeImage_GetBits(FI_tex), FreeImage_GetWidth(FI_tex), FreeImage_GetHeight(FI_tex), FreeImage_GetPitch(FI_tex), FreeImage_GetBPP(FI_tex), false);
         FreeImage_Unload(FI_tex);
 
         if(FI_mask)
         {
-            s_loadTexture(target, FreeImage_GetBits(FI_mask), FreeImage_GetWidth(FI_mask), FreeImage_GetHeight(FI_mask), FreeImage_GetPitch(FI_mask), true);
+            s_loadTexture(target, FreeImage_GetBits(FI_mask), FreeImage_GetWidth(FI_mask), FreeImage_GetHeight(FI_mask), FreeImage_GetPitch(FI_mask), FreeImage_GetBPP(FI_tex), true);
             FreeImage_Unload(FI_mask);
         }
     }
@@ -946,7 +1057,7 @@ void lazyPreLoad(StdPicture& target)
 
 void loadTexture(StdPicture &target, uint32_t width, uint32_t height, uint8_t *RGBApixels, uint32_t pitch)
 {
-    s_loadTexture(target, RGBApixels, width, height, pitch, false);
+    s_loadTexture(target, RGBApixels, width, height, pitch, 32, false);
     target.inited = true;
     target.l.lazyLoaded = false;
 }
