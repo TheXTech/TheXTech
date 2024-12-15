@@ -128,7 +128,7 @@ void Hotkeys::Activate(size_t i, int player)
 #endif
 
     case Buttons::VanillaCam:
-        if(!GameMenu && !GameOutro && !LevelEditor && !BattleMode && (g_VanillaCam || l_screen->W != l_screen->canonical_screen().W || l_screen->H != l_screen->canonical_screen().H))
+        if(!GameMenu && !GameOutro && !LevelEditor && !BattleMode && !qScreen && (g_VanillaCam || l_screen->W != l_screen->canonical_screen().W || l_screen->H != l_screen->canonical_screen().H))
         {
             g_VanillaCam = !g_VanillaCam;
             SoundPause[SFX_Camera] = 0;
