@@ -29,6 +29,11 @@
 #   endif
 #   include "frm_main.h"
 #endif
+
+#ifdef __BLOCKS__
+#include "core/16m/sound_stream_16m.h"
+#endif
+
 #include "../globals.h"
 #include "../config.h"
 #include "../frame_timer.h"
@@ -229,6 +234,11 @@ void GameLoop()
             speedRun_tick();
         UpdateGraphics();
         updateScreenFaders();
+
+#ifdef __BLOCKS__
+        // make sure that streamed audio is still updated on non-threading 16M build
+        Sound_StreamUpdate();
+#endif
     }
     else if(BattleIntro > 0)
     {
