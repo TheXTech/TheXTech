@@ -119,6 +119,7 @@ bool OpenWorld(std::string FilePath)
                         FilePath.c_str(),
                         wld.meta.ERROR_info.c_str(),
                         wld.meta.ERROR_linenum);
+            MessageText = std::move(wld.meta.ERROR_info);
             return false;
         }
 
