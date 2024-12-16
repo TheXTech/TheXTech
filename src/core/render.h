@@ -389,7 +389,9 @@ SDL_FORCE_INLINE void LoadPicture(StdPicture &target,
                                   const std::string &maskFallbackPath = std::string())
 {
     lazyLoadPicture(target, path, scaleFactor, maskPath, maskFallbackPath);
+#ifndef PGE_MIN_PORT
     lazyLoad(target);
+#endif
 }
 
 // load a picture whose logical size is the same as its texture size (the texture normally would have 2x2 pixels)
@@ -399,7 +401,9 @@ SDL_FORCE_INLINE void LoadPicture(StdPicture &target,
                                   const std::string &maskFallbackPath = std::string())
 {
     lazyLoadPicture(target, path, 1, maskPath, maskFallbackPath);
+#ifndef PGE_MIN_PORT
     lazyLoad(target);
+#endif
 }
 
 
