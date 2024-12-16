@@ -141,6 +141,7 @@ bool OpenLevel(std::string FilePath)
     if(in.eof())
     {
         pLogWarning("File [%s] missing!", FilePath.c_str());
+        MessageText = "File does not exist";
         return false;
     }
 
@@ -1286,6 +1287,7 @@ LevelLoadCallbacks OpenLevel_SetupCallbacks(LevelLoad& load)
 
     return callbacks;
 }
+
 #else // #ifdef PGEFL_CALLBACK_API
 
 bool OpenLevel_Unpack(LevelLoad& load, LevelData& lvl)
