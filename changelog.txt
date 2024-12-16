@@ -3,6 +3,7 @@ TheXTech Changelog.
 Changelog for 1.3.8-dev
 -Unstable changes will go here for testing during the 1.3.7.x release lifespan...
 -Update LVLX/WLDX/SAVX loader to use new MDX file parser (@ds-sloth)
+-3DS/Wii: disable partial support for loading SMBX-38A content (@ds-sloth)
 -Technical update: reduce mainloop nesting to improve engine flexibility (@ds-sloth)
 -Add experimental support for loading game/episode content from single-file archives (@ds-sloth)
 

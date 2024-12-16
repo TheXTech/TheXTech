@@ -374,6 +374,11 @@ endif()
 option(PGEFL_QT_SUPPORT "Build PGE-FL with Qt support [Unneeded]" OFF)
 set(Moondust_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}) # Don't install PGE-FL libraries
 set(PGEFL_ENABLE_RWOPS ON)
+
+if(PGE_MIN_PORT)
+    set(PGEFL_DISABLE_SMBX38A ON)
+endif()
+
 add_subdirectory(3rdparty/PGE_File_Formats)
 mark_as_advanced(WITH_UNIT_TESTS PGEFL_QT_SUPPORT)
 
