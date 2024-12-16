@@ -1078,6 +1078,16 @@ int GameMain(const CmdLineSetup_t &setup)
         // World Map
         else if(LevelSelect)
         {
+            // only set if loading the WORLD fails
+            if(ErrorQuit)
+            {
+                ErrorQuit = false;
+                GameMenu = true;
+                MenuMode = MENU_INTRO;
+                MenuCursor = 0;
+                continue;
+            }
+
             cheats_clearBuffer();
 
             For(A, 1, numPlayers)
@@ -2362,7 +2372,15 @@ void StartEpisode()
         SaveConfig();
     }
 
-    OpenWorld(wPath);
+    if(!OpenWorld(wPath))
+    {
+        ClearLevel();
+        LevelSelect = false;
+        ReportLoadFailure(wPath);
+        LevelSelect = true;
+        ErrorQuit = true;
+        return;
+    }
 
     if(selSave && SaveSlotInfo[selSave].Progress >= 0)
     {
@@ -2419,10 +2437,14 @@ void StartEpisode()
         if(!OpenLevel(levelPath))
         {
             ReportLoadFailure(levelName);
-            ErrorQuit = true;
-        }
+            LevelSelect = true;
 
-        GameThing(1000, 3);
+            // return to menu if the hub of a hub world is broken
+            if(NoMap)
+                ErrorQuit = true;
+        }
+        else
+            GameThing(1000, 3);
     }
 }
 
