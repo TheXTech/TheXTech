@@ -32,6 +32,7 @@
 
 #include "config.h"
 #include "main/level_medals.h"
+#include "main/screen_asset_pack.h"
 
 void DrawInterface(int Z, int numScreens)
 {
@@ -525,7 +526,7 @@ void DrawDeviceBattery()
     int bw = 40;
     int bh = 22;
     int bx = XRender::TargetW - XRender::TargetOverscanX - (bw + 8);
-    int by = (GameMenu) ? 24 : 8;
+    int by = (GameMenu || ScreenAssetPack::g_LoopActive) ? 24 : 8;
 
     RenderPowerInfo(-1, bx, by, bw, bh, 255, &status_info);
 }
