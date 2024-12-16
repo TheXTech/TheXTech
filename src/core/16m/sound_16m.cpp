@@ -583,7 +583,10 @@ void StopMusic()
 
 void FadeOutMusic(int ms)
 {
-    s_MusicSetupFade(0, ms);
+    if(s_curMusic < -1)
+        StopMusic();
+    else
+        s_MusicSetupFade(0, ms);
 }
 
 
