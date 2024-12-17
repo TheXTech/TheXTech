@@ -1443,12 +1443,17 @@ void ProcEvent(eventindex_t index, int whichPlayer, bool NoEffect)
             if(Events[evt.TriggerEvent].TriggerEvent != index)
                 ProcEvent(evt.TriggerEvent, whichPlayer);
         }
-        else
+        else if(newEventNum < maxEvents)
         {
             newEventNum++;
             NewEvent[newEventNum] = evt.TriggerEvent;
             newEventDelay[newEventNum] = vb6Round(evt.TriggerDelay * 6.5);
             newEventPlayer[newEventNum] = static_cast<uint8_t>(whichPlayer);
+        }
+        else
+        {
+            // SMBX64 would have crashed here... eventually we should do a message box and crash to menu in vanilla mode.
+            // probably best to make a single function handling this.
         }
     }
 }
