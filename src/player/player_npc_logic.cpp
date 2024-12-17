@@ -1034,7 +1034,7 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
         Player[A].Location.Y = tempLocation.Y;
 
         if(tempShell)
-            NewEffect(EFFID_STOMP_INIT, newLoc(Player[A].Location.X + Player[A].Location.Width / 2.0 - EffectWidth[132] / 2.0, Player[A].Location.Y + Player[A].Location.Height - EffectHeight[132] / 2.0));
+            NewEffect(EFFID_STOMP_INIT, newLoc(Player[A].Location.X + Player[A].Location.Width / 2.0 - EffectWidth[EFFID_STOMP_INIT] / 2.0, Player[A].Location.Y + Player[A].Location.Height - EffectHeight[EFFID_STOMP_INIT] / 2.0));
         else if(!tempSpring)
             NewEffect(EFFID_WHACK, newLoc(Player[A].Location.X + Player[A].Location.Width / 2.0 - 16, Player[A].Location.Y + Player[A].Location.Height - 16));
         else
