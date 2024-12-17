@@ -1329,18 +1329,21 @@ void PlayerEffectWarpWait(int A)
 
 static inline bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool backward)
 {
-    bool canWarp = false;
-
     bool onGround = !warp.stoodRequired || (plr.Pinched.Bottom1 == 2 || plr.Slope != 0 || plr.StandingOnNPC != 0);
 
     const auto &entrance      = backward ? warp.Exit        : warp.Entrance;
     const auto &exit          = backward ? warp.Entrance    : warp.Exit;
     const auto &direction     = backward ? warp.Direction2  : warp.Direction;
 
+    if(warp.LevelEnt)
+        return false;
+
     if(!CheckCollision(plr.Location, entrance))
         return false; // continue
 
     plr.ShowWarp = B;
+
+    bool canWarp = false;
 
     if(warp.Effect == 3) // Portal
         canWarp = true;
@@ -1368,10 +1371,10 @@ static inline bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool bac
     else if(warp.Effect == 0) // Instant
         canWarp = true;
 
-    if(warp.LevelEnt)
-        canWarp = false;
+    if(!canWarp)
+        return false;
 
-    if(warp.Stars > numStars && canWarp)
+    if(warp.Stars > numStars)
     {
         bool do_swap_frame = (g_config.fix_visual_bugs && warp.Effect == 1 && direction == 3 && plr.Duck && plr.SwordPoke == 0);
         int old_plr_frame = plr.Frame;
@@ -1399,181 +1402,174 @@ static inline bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool bac
         return true;
     }
 
-    if(canWarp)
+    plr.Slide = false;
+
+    if(warp.Effect != 3)
+        plr.Stoned = false;
+
+    if(warp.Locked)
     {
-        plr.Slide = false;
-
-        if(warp.Effect != 3)
-            plr.Stoned = false;
-
-        if(warp.Locked)
+        // if player has a key, consume it and allow unlocking the warp
+        if(plr.HoldingNPC > 0 && NPC[plr.HoldingNPC].Type == NPCID_KEY)
         {
-            // if player has a key, consume it and allow unlocking the warp
-            if(plr.HoldingNPC > 0 && NPC[plr.HoldingNPC].Type == NPCID_KEY)
-            {
-                NPC[plr.HoldingNPC].Killed = 9;
-                NPCQueues::Killed.push_back(plr.HoldingNPC);
+            NPC[plr.HoldingNPC].Killed = 9;
+            NPCQueues::Killed.push_back(plr.HoldingNPC);
 
-                NewEffect(EFFID_SMOKE_S3, NPC[plr.HoldingNPC].Location);
-            }
-            else if(plr.Mount == 3 && plr.YoshiNPC > 0 && NPC[plr.YoshiNPC].Type == NPCID_KEY)
-            {
-                NPC[plr.YoshiNPC].Killed = 9;
-                NPCQueues::Killed.push_back(plr.YoshiNPC);
-                plr.YoshiNPC = 0;
-            }
-            else if(plr.HasKey)
-            {
-                plr.HasKey = false;
-            }
-            // otherwise, don't allow unlocking
-            else
-                canWarp = false;
+            NewEffect(EFFID_SMOKE_S3, NPC[plr.HoldingNPC].Location);
+        }
+        else if(plr.Mount == 3 && plr.YoshiNPC > 0 && NPC[plr.YoshiNPC].Type == NPCID_KEY)
+        {
+            NPC[plr.YoshiNPC].Killed = 9;
+            NPCQueues::Killed.push_back(plr.YoshiNPC);
+            plr.YoshiNPC = 0;
+        }
+        else if(plr.HasKey)
+        {
+            plr.HasKey = false;
+        }
+        // otherwise, don't allow unlocking
+        else
+            return false;
 
-            // if player can still warp, unlock the warp
-            if(canWarp)
-            {
-                warp.Locked = false;
+        // if player can still warp, unlock the warp
+        warp.Locked = false;
 
-                int allBGOs = numBackground + numLocked;
-                for(int C = numBackground + 1; C <= allBGOs; C++)
+        // remove warp lock icon
+        int allBGOs = numBackground + numLocked;
+        for(int C = numBackground + 1; C <= allBGOs; C++)
+        {
+            if(Background[C].Type == 98)
+            {
+                if(CheckCollision(entrance, Background[C].Location) ||
+                   (warp.twoWay && CheckCollision(exit, Background[C].Location)))
                 {
-                    if(Background[C].Type == 98)
-                    {
-                        if(CheckCollision(entrance, Background[C].Location) ||
-                           (warp.twoWay && CheckCollision(exit, Background[C].Location)))
-                        {
-                            // this makes Background[C] disappear and never reappear
-                            Background[C].Layer = LAYER_NONE;
-                            Background[C].Hidden = true;
-                            syncLayers_BGO(C);
-                        }
-                    }
+                    // this makes Background[C] disappear and never reappear
+                    Background[C].Layer = LAYER_NONE;
+                    Background[C].Hidden = true;
+                    syncLayers_BGO(C);
                 }
             }
         }
     }
 
-    if(canWarp)
+    // execute the warp!
+    UnDuck(Player[A]);
+    plr.YoshiTongueLength = 0;
+    plr.MountSpecial = 0;
+    plr.FrameCount = 0;
+    plr.TailCount = 0;
+    plr.CanFly = false;
+    plr.CanFly2 = false;
+    plr.RunCount = 0;
+
+    s_WarpReleaseItems(warp, A, backward);
+
+    if(warp.Effect != 3) // Don't zero speed when passing a portal warp
     {
-        UnDuck(Player[A]);
-        plr.YoshiTongueLength = 0;
-        plr.MountSpecial = 0;
-        plr.FrameCount = 0;
-        plr.TailCount = 0;
-        plr.CanFly = false;
-        plr.CanFly2 = false;
-        plr.RunCount = 0;
+        plr.Location.SpeedX = 0;
+        plr.Location.SpeedY = 0;
+    }
 
-        s_WarpReleaseItems(warp, A, backward);
+    if(warp.eventEnter != EVENT_NONE)
+        ProcEvent(warp.eventEnter, A);
 
-        if(warp.Effect != 3) // Don't zero speed when passing a portal warp
+    if(warp.Effect == 0 || warp.Effect == 3) // Instant / Portal
+    {
+        if(warp.Effect == 3 && (warp.level != STRINGINDEX_NONE || warp.MapWarp))
         {
-            plr.Location.SpeedX = 0;
-            plr.Location.SpeedY = 0;
+            plr.Warp = B;
+            plr.WarpBackward = backward;
+
+            s_CheckWarpLevelExit(plr, warp, 2921, 2921);
+
+            return true;
         }
 
-        if(warp.eventEnter != EVENT_NONE)
-            ProcEvent(warp.eventEnter, A);
+        plr.Location.X = exit.X + exit.Width / 2.0 - plr.Location.Width / 2.0;
+        plr.Location.Y = exit.Y + exit.Height - plr.Location.Height - 0.1;
+        CheckSection(A);
+        plr.WarpCD = (warp.Effect == 3) ? 10 : 50;
 
-        if(warp.Effect == 0 || warp.Effect == 3) // Instant / Portal
+        const Screen_t& screen = ScreenByPlayer(A);
+        int vscreen_A = vScreenIdxByPlayer(A);
+        bool is_shared_screen = (screen.Type == 3);
+        bool do_tele = is_shared_screen && !vScreenCollision(vscreen_A, exit);
+
+        // teleport other players using the instant/portal warp in shared screen mode
+        if(do_tele)
         {
-            if(warp.Effect == 3 && (warp.level != STRINGINDEX_NONE || warp.MapWarp))
+            for(int plr_i = 0; plr_i < screen.player_count; plr_i++)
             {
-                plr.Warp = B;
-                plr.WarpBackward = backward;
+                int o_A = screen.players[plr_i];
+                if(o_A == A)
+                    continue;
 
-                s_CheckWarpLevelExit(plr, warp, 2921, 2921);
+                Player_t& o_p = Player[o_A];
 
-                return true;
-            }
+                // in the mouth of an onscreen player's Pet?
+                bool in_onscreen_pet = !warp.NoYoshi && InOnscreenPet(o_A, screen);
 
-            plr.Location.X = exit.X + exit.Width / 2.0 - plr.Location.Width / 2.0;
-            plr.Location.Y = exit.Y + exit.Height - plr.Location.Height - 0.1;
-            CheckSection(A);
-            plr.WarpCD = (warp.Effect == 3) ? 10 : 50;
-
-            const Screen_t& screen = ScreenByPlayer(A);
-            int vscreen_A = vScreenIdxByPlayer(A);
-            bool is_shared_screen = (screen.Type == 3);
-            bool do_tele = is_shared_screen && !vScreenCollision(vscreen_A, exit);
-
-            // teleport other players using the instant/portal warp in shared screen mode
-            if(do_tele)
-            {
-                for(int plr_i = 0; plr_i < screen.player_count; plr_i++)
+                if(!o_p.Dead && o_p.TimeToLive == 0 && !in_onscreen_pet)
                 {
-                    int o_A = screen.players[plr_i];
-                    if(o_A == A)
-                        continue;
+                    RemoveFromPet(o_A);
 
-                    Player_t& o_p = Player[o_A];
+                    o_p.Location.X = exit.X + exit.Width / 2.0 - o_p.Location.Width / 2.0;
+                    o_p.Location.Y = exit.Y + exit.Height - o_p.Location.Height - 0.1;
+                    CheckSection(o_A);
 
-                    // in the mouth of an onscreen player's Pet?
-                    bool in_onscreen_pet = !warp.NoYoshi && InOnscreenPet(o_A, screen);
-
-                    if(!o_p.Dead && o_p.TimeToLive == 0 && !in_onscreen_pet)
+                    if(warp.Effect != 3) // Don't zero speed when passing a portal warp
                     {
-                        RemoveFromPet(o_A);
-
-                        o_p.Location.X = exit.X + exit.Width / 2.0 - o_p.Location.Width / 2.0;
-                        o_p.Location.Y = exit.Y + exit.Height - o_p.Location.Height - 0.1;
-                        CheckSection(o_A);
-
-                        if(warp.Effect != 3) // Don't zero speed when passing a portal warp
-                        {
-                            o_p.Location.SpeedX = 0;
-                            o_p.Location.SpeedY = 0;
-                        }
-
-                        o_p.Vine = plr.Vine;
-                        o_p.WarpCD = (warp.Effect == 3) ? 10 : 50;
-
-                        // put other player in no-collide mode
-                        o_p.Effect = PLREFF_NO_COLLIDE;
-                        o_p.Effect2 = A;
+                        o_p.Location.SpeedX = 0;
+                        o_p.Location.SpeedY = 0;
                     }
-                }
 
-                GetvScreenAuto(vScreen[vscreen_A]);
+                    o_p.Vine = plr.Vine;
+                    o_p.WarpCD = (warp.Effect == 3) ? 10 : 50;
+
+                    // put other player in no-collide mode
+                    o_p.Effect = PLREFF_NO_COLLIDE;
+                    o_p.Effect2 = A;
+                }
             }
 
-            return true; // break
+            GetvScreenAuto(vScreen[vscreen_A]);
         }
-        else if(warp.Effect == 1) // Pipe
-        {
-            PlaySoundSpatial(SFX_Warp, plr.Location);
-            plr.Effect = PLREFF_WARP_PIPE;
-            if(g_config.fix_fairy_stuck_in_pipe)
-                plr.Effect2 = 0;
-            plr.Warp = B;
-            plr.WarpBackward = backward;
+
+        return true; // break
+    }
+    else if(warp.Effect == 1) // Pipe
+    {
+        PlaySoundSpatial(SFX_Warp, plr.Location);
+        plr.Effect = PLREFF_WARP_PIPE;
+        if(g_config.fix_fairy_stuck_in_pipe)
+            plr.Effect2 = 0;
+        plr.Warp = B;
+        plr.WarpBackward = backward;
 //                        if(nPlay.Online && A == nPlay.MySlot + 1)
 //                            Netplay::sendData Netplay::PutPlayerLoc(nPlay.MySlot) + "1j" + std::to_string(A) + "|" + plr.Warp + LB;
-        }
-        else if(warp.Effect == 2) // Door
-        {
-            PlaySoundSpatial(SFX_Door, plr.Location);
-            plr.Effect = PLREFF_WARP_DOOR;
+    }
+    else if(warp.Effect == 2) // Door
+    {
+        PlaySoundSpatial(SFX_Door, plr.Location);
+        plr.Effect = PLREFF_WARP_DOOR;
 
-            if(g_config.fix_fairy_stuck_in_pipe)
-                plr.Effect2 = 0;
+        if(g_config.fix_fairy_stuck_in_pipe)
+            plr.Effect2 = 0;
 
-            plr.Warp = B;
-            plr.WarpBackward = backward;
+        plr.Warp = B;
+        plr.WarpBackward = backward;
 //                        if(nPlay.Online && A == nPlay.MySlot + 1)
 //                            Netplay::sendData Netplay::PutPlayerLoc(nPlay.MySlot) + "1j" + std::to_string(A) + "|" + plr.Warp + LB;
-            plr.Location.X = entrance.X + entrance.Width / 2.0 - plr.Location.Width / 2.0;
-            plr.Location.Y = entrance.Y + entrance.Height - plr.Location.Height;
+        plr.Location.X = entrance.X + entrance.Width / 2.0 - plr.Location.Width / 2.0;
+        plr.Location.Y = entrance.Y + entrance.Height - plr.Location.Height;
 
-            bool same_section = SectionCollision(plr.Section, static_cast<Location_t>(exit));
-            bool do_scroll = (warp.transitEffect == LevelDoor::TRANSIT_SCROLL) && same_section;
+        bool same_section = SectionCollision(plr.Section, static_cast<Location_t>(exit));
+        bool do_scroll = (warp.transitEffect == LevelDoor::TRANSIT_SCROLL) && same_section;
 
-            s_TriggerDoorEffects(static_cast<Location_t>(entrance));
+        s_TriggerDoorEffects(static_cast<Location_t>(entrance));
 
-            if(!do_scroll)
-                s_TriggerDoorEffects(static_cast<Location_t>(exit));
-        }
+        if(!do_scroll)
+            s_TriggerDoorEffects(static_cast<Location_t>(exit));
     }
 
     return false; // continue
