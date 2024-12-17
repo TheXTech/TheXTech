@@ -16,6 +16,7 @@ Changelog for 1.3.7-dev
 -3DS: add advanced option "Inaccurate GIFs" to allow playing in 3D on levels with GIFs (@ds-sloth)
 -Fix TheXTech 1.3.7-beta bug where battle levels could be created even if the asset pack disables battle mode (@ds-sloth, thanks to @LoveBodhi for the report)
 -Fix TheXTech 1.3.6.1 bug where player-dependent event text could be inaccurate if Autocode cancelled a different event (@ds-sloth)
+-TheXTech-exclusive events are now processed at the end of the frame they are triggered in (@ds-sloth)
 
 Changelog for 1.3.7-beta
 -Add ability to trigger event layer smoke in the in-game editor (@ds-sloth)
