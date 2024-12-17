@@ -58,6 +58,8 @@ bool UpdatePlayer()
         goto resume_MessageNPC;
     case GameLoopInterrupt::UpdatePlayer_TriggerTalk:
         goto resume_TriggerTalk;
+    case GameLoopInterrupt::UpdatePlayer_SuperWarp:
+        goto resume_SuperWarp;
     default:
         break;
     }
@@ -488,7 +490,29 @@ resume_TriggerTalk:
                 if(!GodMode)
                     PlayerPinchedDeathCheck(A);
 
+                if(false)
+                {
+resume_SuperWarp:
+                    A = g_gameLoopInterrupt.A;
+
+                    // restore some locals from this procedure
+                    DontResetGrabTime = g_gameLoopInterrupt.bool1;
+                    tempSpring = g_gameLoopInterrupt.bool2;
+                    tempShell = g_gameLoopInterrupt.bool3;
+
+                    // SuperWarp will resume at the correct index based on g_gameLoopInterrupt.B, and then clear g_gameLoopInterrupt.site
+                }
+
                 SuperWarp(A); // this sub checks warps
+
+                if(g_gameLoopInterrupt.site != GameLoopInterrupt::None)
+                {
+                    // save some locals from this procedure
+                    g_gameLoopInterrupt.bool1 = DontResetGrabTime;
+                    g_gameLoopInterrupt.bool2 = tempSpring;
+                    g_gameLoopInterrupt.bool3 = tempShell;
+                    return true;
+                }
 
                 // shell surf
                 if(Player[A].ShellSurf && Player[A].StandingOnNPC != 0)

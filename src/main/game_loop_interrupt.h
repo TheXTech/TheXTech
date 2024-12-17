@@ -29,12 +29,13 @@ struct GameLoopInterrupt
         None = 0,
         UpdatePlayer_MessageNPC,
         UpdatePlayer_TriggerTalk,
+        UpdatePlayer_SuperWarp,
     };
 
     // variables to help with resume
     Site site = None;
-    int A, B;
-    bool bool1, bool2, bool3;
+    int A, B, C;
+    bool bool1, bool2, bool3, bool4;
 };
 
 extern GameLoopInterrupt g_gameLoopInterrupt;

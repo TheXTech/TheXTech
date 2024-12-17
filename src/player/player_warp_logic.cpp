@@ -44,6 +44,7 @@
 #include "main/trees.h"
 #include "main/game_strings.h"
 #include "main/game_info.h"
+#include "main/game_loop_interrupt.h"
 
 
 static constexpr int plr_warp_scroll_speed = 8; // 8px / frame
@@ -1372,9 +1373,10 @@ static inline bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool bac
 
     if(warp.Stars > numStars && canWarp)
     {
-        int prevFrame = plr.Frame;
+        bool do_swap_frame = (g_config.fix_visual_bugs && warp.Effect == 1 && direction == 3 && plr.Duck && plr.SwordPoke == 0);
+        int old_plr_frame = plr.Frame;
 
-        if(g_config.fix_visual_bugs && warp.Effect == 1 && direction == 3 && plr.Duck && plr.SwordPoke == 0)
+        if(do_swap_frame)
         {
             // Show the duck frame only when attempting to go down
             plr.Frame = (plr.Character == 5) ? 5 : 7;
@@ -1385,15 +1387,16 @@ static inline bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool bac
         else
             MessageText = GetS(warp.StarsMsg);
 
-        PauseGame(PauseCode::Message, A);
-        MessageText.clear();
-        MessageTextMap.clear();
+        // store all warp-local vars
+        PauseInit(PauseCode::Message, A);
+        g_gameLoopInterrupt.site = GameLoopInterrupt::UpdatePlayer_SuperWarp;
+        g_gameLoopInterrupt.A = A;
+        g_gameLoopInterrupt.B = B;
+        g_gameLoopInterrupt.C = old_plr_frame;
+        g_gameLoopInterrupt.bool4 = do_swap_frame;
 
-        // Restore previous frame
-        if(g_config.fix_visual_bugs && warp.Effect == 1 && direction == 3)
-            plr.Frame = prevFrame;
-
-        canWarp = false;
+        // return true to break out of the loop
+        return true;
     }
 
     if(canWarp)
@@ -1579,10 +1582,28 @@ static inline bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool bac
 void SuperWarp(const int A)
 {
     auto &plr = Player[A];
+    int B = 1;
+
+    if(g_gameLoopInterrupt.site != GameLoopInterrupt::None)
+    {
+        // clear message text
+        MessageText.clear();
+        MessageTextMap.clear();
+
+        // Restore previous frame if needed
+        if(g_gameLoopInterrupt.bool4)
+            plr.Frame = g_gameLoopInterrupt.C;
+
+        // check the warp after the one that triggered the message
+        B = g_gameLoopInterrupt.B + 1;
+
+        // reset the g_gameLoopInterrupt state
+        g_gameLoopInterrupt.site = GameLoopInterrupt::None;
+    }
 
     if(plr.WarpCD <= 0 && plr.Mount != 2 /* && !plr.GroundPound && !plr.GroundPound2 */)
     {
-        for(int B = 1; B <= numWarps; B++)
+        for(; B <= numWarps; B++)
         {
             auto &warp = Warp[B];
 
