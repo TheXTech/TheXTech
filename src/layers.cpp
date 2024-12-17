@@ -1554,6 +1554,7 @@ void CancelNewEvent(eventindex_t index)
         {
             newEventDelay[A] = newEventDelay[newEventNum];
             NewEvent[A] = NewEvent[newEventNum];
+            newEventPlayer[A] = newEventPlayer[newEventNum];
             newEventNum--;
             --A;
         }
