@@ -54,7 +54,7 @@ int numEvents = 0;
 RangeArr<Events_t, 0, maxEvents> Events;
 
 RangeArrI<eventindex_t, 1, maxEvents, EVENT_NONE> NewEvent;
-RangeArrI<int, 1, maxEvents, 0> newEventDelay;
+RangeArrI<vbint_t, 1, maxEvents, 0> newEventDelay;
 RangeArrI<uint8_t, 1, maxEvents, 0> newEventPlayer;
 int newEventNum = 0;
 
@@ -1481,6 +1481,17 @@ void ProcEvent(eventindex_t index, int whichPlayer, bool NoEffect)
         PauseGame(PauseCode::None, 0);
         resume_event = ProcEvent_Safe(true, resume_event, whichPlayer, NoEffect);
     }
+}
+
+void TriggerEvent(eventindex_t index, int whichPlayer)
+{
+    if(newEventNum >= maxEvents)
+        return;
+
+    newEventNum++;
+    NewEvent[newEventNum] = index;
+    newEventDelay[newEventNum] = 0;
+    newEventPlayer[newEventNum] = static_cast<uint8_t>(whichPlayer);
 }
 
 void UpdateEvents()

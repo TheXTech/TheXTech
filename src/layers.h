@@ -171,7 +171,7 @@ extern RangeArr<Events_t, 0, maxEvents> Events;
 //Public NewEvent(1 To 100) As String
 extern RangeArrI<eventindex_t, 1, maxEvents, EVENT_NONE> NewEvent;
 //Public newEventDelay(1 To 100) As Integer
-extern RangeArrI<int, 1, maxEvents, 0> newEventDelay;
+extern RangeArrI<vbint_t, 1, maxEvents, 0> newEventDelay;
 //! NEW: which player originally triggered each queued event
 extern RangeArrI<uint8_t, 1, maxEvents, 0> newEventPlayer;
 //Public newEventNum As Integer
@@ -266,10 +266,15 @@ void ClearTriggeredEvents();
 void ProcEvent(eventindex_t, bool) = delete; // old signature
 // NEW: added WhichPlayer, 0 by default, to indicate which player triggered the event
 void ProcEvent(eventindex_t index, int WhichPlayer, bool NoEffect = false);
+
 // If this returns an eventindex other than EVENT_NONE, then a pause has been initiated for a message
 // As soon as the pause ends, the call must be re-made with the same arguments, but with resume set to true and index set to the returned eventindex
 // The caller must also support an interrupt and restore routine.
 eventindex_t ProcEvent_Safe(bool resume, eventindex_t index, int WhichPlayer, bool NoEffect = false);
+
+// NEW: safe call that adds event to the end of the events queue for the current frame
+void TriggerEvent(eventindex_t index, int WhichPlayer);
+
 // Public Sub UpdateEvents()
 void UpdateEvents();
 
