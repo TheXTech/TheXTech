@@ -33,7 +33,8 @@ void DodgePlayers(int plr_A);
 void SetupPlayers();
 // Public Sub UpdatePlayer() 'This is the main sub for the players
 // This is the main sub for the players
-void UpdatePlayer();
+// Returns true if the game has been paused
+bool UpdatePlayer();
 // Public Sub PlayerHurt(A As Integer) 'Player got hurt
 // Player got hurt
 void PlayerHurt(const int A);

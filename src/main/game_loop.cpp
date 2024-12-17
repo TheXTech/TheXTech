@@ -64,6 +64,7 @@
 #include "screen_textentry.h"
 #include "screen_prompt.h"
 #include "main/level_medals.h"
+#include "main/game_loop_interrupt.h"
 #include "script/luna/luna.h"
 #include "game_strings.h"
 
@@ -140,11 +141,26 @@ void editorWaitForFade()
 
 void CheckActive();//in game_main.cpp
 
+GameLoopInterrupt g_gameLoopInterrupt;
+
 void GameLoop()
 {
     if(GamePaused != PauseCode::None)
     {
         PauseLoop();
+
+        // resume code (if needed)
+        if(GamePaused == PauseCode::None)
+        {
+            switch(g_gameLoopInterrupt.site)
+            {
+            case GameLoopInterrupt::UpdatePlayer_MessageNPC:
+                goto resume_UpdatePlayer;
+            default:
+                break;
+            }
+        }
+
         return;
     }
 
@@ -272,8 +288,12 @@ void GameLoop()
         UpdateBlocks();
         g_microStats.start_task(MicroStats::Effects);
         UpdateEffects();
+
+resume_UpdatePlayer:
         g_microStats.start_task(MicroStats::Player);
-        UpdatePlayer();
+        if(UpdatePlayer())
+            return;
+
         speedRun_tick();
         // UpdateGraphics() now calls start_task internally
         if(LivingPlayers() || BattleMode)

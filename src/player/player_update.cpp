@@ -47,26 +47,42 @@
 #include "eff_id.h"
 
 #include "npc/npc_queues.h"
+#include "main/game_loop_interrupt.h"
 
 
-void UpdatePlayer()
+bool UpdatePlayer()
 {
-    bool tempSpring = false;
-    bool tempShell = false;
+    switch(g_gameLoopInterrupt.site)
+    {
+    case GameLoopInterrupt::UpdatePlayer_MessageNPC:
+        goto resume_MessageNPC;
+    default:
+        break;
+    }
+
+    // these variables persist over the interrupt/resume routine
+    int A;
+    bool tempSpring;
+    bool tempShell;
+    tempSpring = false; // this one is probably safe to not share between players. it is reset between players unless tempShell is also hit
+    tempShell = false; // this one marks whether a player has collided with a shell in the current frame and modifies the effects created when any player hits the top of NPC
 
     StealBonus(); // allows a dead player to come back to life by using a 1-up
     ClownCar(); // updates players in the clown car
 
 
     // A is the current player, numPlayers is the last player. this loop updates all the players
-    for(int tmpNumPlayers = numPlayers, A = 1; A <= tmpNumPlayers; A++)
+    for(A = 1; A <= numPlayers; A++)
     {
         // reset variables
         Player[A].ShowWarp = 0;
         Player[A].mountBump = 0;
 
         // this was shared over players in SMBX 1.3 -- if the line marked "MOST CURSED LINE" in player_block_logic.cpp becomes a source of incompatibility, we will need to restore that logic
-        float cursed_value_C = 0;
+        // this will include modifying the GameLoopInterrupt struct to include it
+        // for now, this variable does not persist over the interrupt/resume routine
+        float cursed_value_C;
+        cursed_value_C = 0;
 
         if(Player[A].GrabTime > 0) // if grabbing something, take control away from the player
         {
@@ -166,7 +182,9 @@ void UpdatePlayer()
                         Player[A].Slippy = true;
                 }
 
-                double SlippySpeedX = Player[A].Location.SpeedX;
+                // this variable does not persist over the interrupt/resume routine
+                double SlippySpeedX;
+                SlippySpeedX = Player[A].Location.SpeedX;
 
 
                 // Player's X movement. ---------------------------
@@ -378,22 +396,29 @@ void UpdatePlayer()
                 // decrement pinched timers
                 PlayerPinchedTimerUpdate(A);
 
-                // Block collisions.
-                float oldSpeedY = Player[A].Location.SpeedY; // holds the players previous Y speed
-                bool DontResetGrabTime = false; // helps with grabbing things from the top
-                bool movingBlock = false; // helps with collisions for moving blocks
-                int floorBlock = 0; // was previously called tempHit3
+                // these variables persist over the interrupt/resume routine
+                int MessageNPC;
+                bool DontResetGrabTime;
+                MessageNPC = 0;
+                DontResetGrabTime = false; // helps with grabbing things from the top
 
-                Player[A].Slippy = false;
+                // scoping variables shared between block logic and NPC logic
+                {
+                    float oldSpeedY = Player[A].Location.SpeedY; // holds the players previous Y speed
+                    bool movingBlock = false; // helps with collisions for moving blocks
+                    int floorBlock = 0; // was previously called tempHit3
 
-                PlayerBlockLogic(A, floorBlock, movingBlock, DontResetGrabTime, cursed_value_C);
+                    Player[A].Slippy = false;
 
-                // Vine collisions.
-                PlayerVineLogic(A);
+                    // Block collisions.
+                    PlayerBlockLogic(A, floorBlock, movingBlock, DontResetGrabTime, cursed_value_C);
 
-                // Check NPC collisions
-                int MessageNPC = 0;
-                PlayerNPCLogic(A, tempSpring, tempShell, MessageNPC, movingBlock, floorBlock, oldSpeedY);
+                    // Vine collisions.
+                    PlayerVineLogic(A);
+
+                    // Check NPC collisions
+                    PlayerNPCLogic(A, tempSpring, tempShell, MessageNPC, movingBlock, floorBlock, oldSpeedY);
+                }
 
                 // reduce player's multiplier
                 if((Player[A].Location.SpeedY == 0 || Player[A].StandingOnNPC != 0 || Player[A].Slope > 0) && !Player[A].Slide && !FreezeNPCs)
@@ -410,7 +435,23 @@ void UpdatePlayer()
                 {
                     MessageText = GetS(NPC[MessageNPC].Text);
                     preProcessMessage(MessageText, A);
-                    PauseGame(PauseCode::Message, A);
+                    PauseInit(PauseCode::Message, A);
+                    g_gameLoopInterrupt.site = GameLoopInterrupt::UpdatePlayer_MessageNPC;
+                    g_gameLoopInterrupt.A = A;
+                    g_gameLoopInterrupt.B = MessageNPC;
+                    g_gameLoopInterrupt.bool1 = DontResetGrabTime;
+                    g_gameLoopInterrupt.bool2 = tempSpring;
+                    g_gameLoopInterrupt.bool3 = tempShell;
+                    return true;
+
+resume_MessageNPC:
+                    A = g_gameLoopInterrupt.A;
+                    MessageNPC = g_gameLoopInterrupt.B;
+                    DontResetGrabTime = g_gameLoopInterrupt.bool1;
+                    tempSpring = g_gameLoopInterrupt.bool2;
+                    tempShell = g_gameLoopInterrupt.bool3;
+                    g_gameLoopInterrupt.site = GameLoopInterrupt::None;
+
                     MessageText.clear();
                     MessageTextMap.clear();
 
@@ -470,6 +511,8 @@ void UpdatePlayer()
     }
 
     CleanupVehicleNPCs();
+
+    return false;
 }
 
 void CleanupVehicleNPCs()
