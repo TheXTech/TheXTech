@@ -266,6 +266,10 @@ void ClearTriggeredEvents();
 void ProcEvent(eventindex_t, bool) = delete; // old signature
 // NEW: added WhichPlayer, 0 by default, to indicate which player triggered the event
 void ProcEvent(eventindex_t index, int WhichPlayer, bool NoEffect = false);
+// If this returns an eventindex other than EVENT_NONE, then a pause has been initiated for a message
+// As soon as the pause ends, the call must be re-made with the same arguments, but with resume set to true and index set to the returned eventindex
+// The caller must also support an interrupt and restore routine.
+eventindex_t ProcEvent_Safe(bool resume, eventindex_t index, int WhichPlayer, bool NoEffect = false);
 // Public Sub UpdateEvents()
 void UpdateEvents();
 

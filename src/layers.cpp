@@ -1200,7 +1200,7 @@ static inline bool s_initLegacyQScreen(Screen_t& screen, const int B, const Spee
 
 // Old functions:
 
-eventindex_t s_ProcEvent_resumable(eventindex_t index, int whichPlayer, bool is_resume, bool NoEffect)
+eventindex_t ProcEvent_Safe(bool is_resume, eventindex_t index, int whichPlayer, bool NoEffect)
 {
     if(index == EVENT_NONE || LevelEditor)
         return EVENT_NONE;
@@ -1392,6 +1392,9 @@ eventindex_t s_ProcEvent_resumable(eventindex_t index, int whichPlayer, bool is_
         int base_player = (numPlayers > 1) ? -1 : 1;
         preProcessMessage(MessageText, player_valid ? whichPlayer : base_player);
 
+        bool use_player_pause = (player_valid && g_config.multiplayer_pause_controls);
+        PauseInit(PauseCode::Message, use_player_pause ? whichPlayer : 0);
+
         // request resuming at the current index
         return index;
     }
@@ -1449,7 +1452,7 @@ event_resume:
             {
                 // this should receive tail-call optimization
                 // possibly request resuming at the child index (or its child, etc)
-                return s_ProcEvent_resumable(evt.TriggerEvent, whichPlayer, false, NoEffect);
+                return ProcEvent_Safe(false, evt.TriggerEvent, whichPlayer, NoEffect);
             }
         }
         else
@@ -1466,15 +1469,12 @@ event_resume:
 
 void ProcEvent(eventindex_t index, int whichPlayer, bool NoEffect)
 {
-    eventindex_t resume_event = s_ProcEvent_resumable(index, whichPlayer, false, NoEffect);
+    eventindex_t resume_event = ProcEvent_Safe(false, index, whichPlayer, NoEffect);
 
     while(resume_event != EVENT_NONE)
     {
-        bool player_valid = whichPlayer >= 1 && whichPlayer <= numPlayers;
-        bool use_player_pause = (player_valid && g_config.multiplayer_pause_controls);
-        PauseGame(PauseCode::Message, use_player_pause ? whichPlayer : 0);
-
-        resume_event = s_ProcEvent_resumable(resume_event, whichPlayer, true, NoEffect);
+        PauseGame(PauseCode::None, 0);
+        resume_event = ProcEvent_Safe(true, resume_event, whichPlayer, NoEffect);
     }
 }
 
