@@ -1081,7 +1081,7 @@ void Autocode::Do(bool init)
 
         case AT_TriggerSMBXEvent:
         {
-            ProcEvent(FindEvent(GetS(MyString)), (int)Param1);
+            TriggerEvent(FindEvent(GetS(MyString)), (int)Param1);
             break;
         }
 
