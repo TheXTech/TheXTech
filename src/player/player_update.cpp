@@ -56,6 +56,8 @@ bool UpdatePlayer()
     {
     case GameLoopInterrupt::UpdatePlayer_MessageNPC:
         goto resume_MessageNPC;
+    case GameLoopInterrupt::UpdatePlayer_TriggerTalk:
+        goto resume_TriggerTalk;
     default:
         break;
     }
@@ -436,6 +438,8 @@ bool UpdatePlayer()
                     MessageText = GetS(NPC[MessageNPC].Text);
                     preProcessMessage(MessageText, A);
                     PauseInit(PauseCode::Message, A);
+
+                    // store entire routine state into g_gameLoopInterrupt
                     g_gameLoopInterrupt.site = GameLoopInterrupt::UpdatePlayer_MessageNPC;
                     g_gameLoopInterrupt.A = A;
                     g_gameLoopInterrupt.B = MessageNPC;
@@ -445,18 +449,35 @@ bool UpdatePlayer()
                     return true;
 
 resume_MessageNPC:
+                    // restore only the essentials for now, we may need to pause/resume again
                     A = g_gameLoopInterrupt.A;
                     MessageNPC = g_gameLoopInterrupt.B;
-                    DontResetGrabTime = g_gameLoopInterrupt.bool1;
-                    tempSpring = g_gameLoopInterrupt.bool2;
-                    tempShell = g_gameLoopInterrupt.bool3;
-                    g_gameLoopInterrupt.site = GameLoopInterrupt::None;
 
                     MessageText.clear();
                     MessageTextMap.clear();
 
                     if(NPC[MessageNPC].TriggerTalk != EVENT_NONE)
-                        ProcEvent(NPC[MessageNPC].TriggerTalk, A);
+                    {
+                        eventindex_t resume_index;
+                        resume_index = ProcEvent_Safe(false, NPC[MessageNPC].TriggerTalk, A);
+                        while(resume_index != EVENT_NONE)
+                        {
+                            g_gameLoopInterrupt.B = resume_index;
+                            g_gameLoopInterrupt.site = GameLoopInterrupt::UpdatePlayer_TriggerTalk;
+                            return true;
+
+resume_TriggerTalk:
+                            A = g_gameLoopInterrupt.A;
+                            resume_index = g_gameLoopInterrupt.B;
+                            resume_index = ProcEvent_Safe(true, resume_index, A);
+                        }
+                    }
+
+                    // finish restoring state from g_gameLoopInterrupt
+                    DontResetGrabTime = g_gameLoopInterrupt.bool1;
+                    tempSpring = g_gameLoopInterrupt.bool2;
+                    tempShell = g_gameLoopInterrupt.bool3;
+                    g_gameLoopInterrupt.site = GameLoopInterrupt::None;
 
                     MessageNPC = 0;
                 }

@@ -28,6 +28,7 @@ struct GameLoopInterrupt
     {
         None = 0,
         UpdatePlayer_MessageNPC,
+        UpdatePlayer_TriggerTalk,
     };
 
     // variables to help with resume

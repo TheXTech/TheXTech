@@ -155,6 +155,7 @@ void GameLoop()
             switch(g_gameLoopInterrupt.site)
             {
             case GameLoopInterrupt::UpdatePlayer_MessageNPC:
+            case GameLoopInterrupt::UpdatePlayer_TriggerTalk:
                 goto resume_UpdatePlayer;
             default:
                 break;
