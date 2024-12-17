@@ -30,7 +30,7 @@
 #   include "frm_main.h"
 #endif
 
-#ifdef __BLOCKS__
+#if defined(__16M__) && !defined(__CALICO__)
 #include "core/16m/sound_stream_16m.h"
 #endif
 
@@ -229,7 +229,7 @@ void GameLoop()
         UpdateGraphics();
         updateScreenFaders();
 
-#ifdef __BLOCKS__
+#if defined(__16M__) && !defined(__CALICO__)
         // make sure that streamed audio is still updated on non-threading 16M build
         Sound_StreamUpdate();
 #endif
