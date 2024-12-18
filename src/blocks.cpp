@@ -1538,37 +1538,15 @@ void PSwitch(bool enabled)
             }
         }
 
-        // this has been made more complicated because the Blocks are no longer sorted like they were previously
+        // From release v1.3.6.1 to release v1.3.7, this section had a much more complex routine
+        // because I was trying to emulate sorting here without the blocks actually being sorted.
+        // However, the blocks ARE sorted in compat mode since v1.3.6.1, so the code was actually
+        // overcomplicated. -- ds-sloth
 
-        // use one of the pre-allocated result vectors
-        TreeResult_Sentinel<BlockRef_t> sent;
-        std::vector<BaseRef_t>& PSwitchBlocks = *sent.i_vec;
-
-        // fill it with the PSwitch-affected blocks
+        // make the NPCs and kill the blocks
         for(A = numBlock; A >= 1; A--)
         {
             if(BlockPSwitch[Block[A].Type] && Block[A].Special == 0 && Block[A].coinSwitchNpcType == 0 && !Block[A].Hidden)
-            {
-                PSwitchBlocks.push_back(A);
-            }
-        }
-
-        // sort them in reverse location order
-        if(g_config.emulate_classic_block_order)
-        {
-            std::sort(PSwitchBlocks.begin(), PSwitchBlocks.end(),
-                [](BaseRef_t a, BaseRef_t b) {
-                    return (((BlockRef_t)a)->Location.X > ((BlockRef_t)b)->Location.X
-                        || (((BlockRef_t)a)->Location.X == ((BlockRef_t)b)->Location.X
-                            && ((BlockRef_t)a)->Location.Y > ((BlockRef_t)b)->Location.Y));
-                });
-        }
-
-        // make the NPCs
-        size_t numConverted = 0;
-        for(; numConverted < PSwitchBlocks.size(); numConverted++)
-        {
-            A = PSwitchBlocks[numConverted];
             {
                 if(numNPCs < maxNPCs)
                 {
@@ -1614,35 +1592,16 @@ void PSwitch(bool enabled)
 
                     syncLayers_NPC(numNPCs);
                     CheckSectionNPC(numNPCs);
-                }
-                else
-                    break;
-            }
-        }
 
-        // remove blocks that didn't get converted from the list
-        PSwitchBlocks.resize(numConverted);
-
-        // return them to reverse index order
-        if(g_config.emulate_classic_block_order)
-        {
-            std::sort(PSwitchBlocks.begin(), PSwitchBlocks.end(),
-                [](BaseRef_t a, BaseRef_t b) {
-                    return a > b;
-                });
-        }
-
-        // kill the blocks
-        for(int A : PSwitchBlocks)
-        {
-            {
-                {
                     Block[A] = Block[numBlock];
                     Block[numBlock] = blankBlock;
                     numBlock--;
+
                     syncLayersTrees_Block(A);
                     syncLayersTrees_Block(numBlock + 1);
                 }
+                else
+                    break;
             }
         }
 
@@ -1690,37 +1649,12 @@ void PSwitch(bool enabled)
         }
 
 
-        // this has been made more complicated because the Blocks are no longer sorted like they were previously
+        // See comment in the previous section. There was a much more complicated routine here for some versions. -- ds-sloth
 
-        // use one of the pre-allocated result vectors
-        TreeResult_Sentinel<BlockRef_t> sent;
-        std::vector<BaseRef_t>& PSwitchBlocks = *sent.i_vec;
-
-        // fill it with the PSwitch-affected blocks
+        // restore the NPCs
         for(A = numBlock; A >= 1; A--)
         {
             if(Block[A].coinSwitchNpcType > 0 && !Block[A].Hidden)
-            {
-                PSwitchBlocks.push_back(A);
-            }
-        }
-
-        // sort them in reverse location order
-        if(g_config.emulate_classic_block_order)
-        {
-            std::sort(PSwitchBlocks.begin(), PSwitchBlocks.end(),
-                [](BaseRef_t a, BaseRef_t b) {
-                    return (((BlockRef_t)a)->Location.X > ((BlockRef_t)b)->Location.X
-                        || (((BlockRef_t)a)->Location.X == ((BlockRef_t)b)->Location.X
-                            && ((BlockRef_t)a)->Location.Y > ((BlockRef_t)b)->Location.Y));
-                });
-        }
-
-        // restore the NPCs
-        size_t numConverted = 0;
-        for(; numConverted < PSwitchBlocks.size(); numConverted++)
-        {
-            A = PSwitchBlocks[numConverted];
             {
                 if(numNPCs < maxNPCs)
                 {
@@ -1755,28 +1689,15 @@ void PSwitch(bool enabled)
                     syncLayers_NPC(numNPCs);
                     CheckSectionNPC(numNPCs);
                     nn.Killed = 0;
-                }
-                else
-                    break;
-            }
-        }
 
-        // remove blocks that didn't get converted from the list
-        PSwitchBlocks.resize(numConverted);
-
-        // shouldn't actually return them to reverse index order: KillBlock might internally call events, so it should be called in reverse location order
-
-        // kill the blocks
-        for(int A : PSwitchBlocks)
-        {
-            {
-                {
                     KillBlock(A, false);
                     Block[A].Layer = LAYER_USED_P_SWITCH;
                     syncLayersTrees_Block(A);
                     // this is as close to a permanent death as blocks get in the game,
                     // because this layer usually doesn't exist
                 }
+                else
+                    break;
             }
         }
 
