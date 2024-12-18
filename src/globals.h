@@ -874,7 +874,8 @@ struct Block_t
     uint8_t ShakeCounter = 0;
     int8_t ShakeOffset = 0;
 //    Kill As Boolean 'if true the game will destroy the block
-    bool Kill = false;
+    // NEW: can be set to 9 in which case the game will ACTUALLY destroy it
+    uint8_t Kill = false;
 //    Invis As Boolean 'for invisible blocks
     bool Invis = false;
 //    Hidden As Boolean

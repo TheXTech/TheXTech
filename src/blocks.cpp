@@ -851,6 +851,16 @@ void BlockHitHard(int A)
     }
 }
 
+void SafelyKillBlock(int A)
+{
+    if(Block[A].Hidden)
+        return;
+
+    Block[A].Kill = 9;
+    iBlocks++;
+    iBlock[iBlocks] = A;
+}
+
 void KillBlock(int A, bool Splode)
 {
     Block_t blankBlock;
@@ -1417,9 +1427,12 @@ void UpdateBlocks()
 
         if(ib.Kill) // See if block should be broke
         {
+            bool just_kill_it = (ib.Kill == 9);
             ib.Kill = false;
 
-            if(ib.Special == 0)
+            if(just_kill_it)
+                KillBlock(iBlock[A]); // KILL the block
+            else if(ib.Special == 0)
             {
                 if(ib.Type == 4 || ib.Type == 60 ||
                    ib.Type == 90 || ib.Type == 188 ||

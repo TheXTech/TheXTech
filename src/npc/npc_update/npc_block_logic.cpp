@@ -124,7 +124,7 @@ void NPCBlockLogic(int A, double& tempHit, int& tempHitBlock, float& tempSpeedA,
                                     if(NPC[A].Type == NPCID_PLR_HEAVY || NPC[A].Type == NPCID_SWORDBEAM || NPC[A].Type == NPCID_CHAR4_HEAVY)
                                     {
                                         if(Block[B].Type == 457)
-                                            KillBlock(B);
+                                            SafelyKillBlock(B);
 
                                         HitSpot = 0;
                                     }

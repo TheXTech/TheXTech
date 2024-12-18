@@ -35,7 +35,9 @@ void BlockShakeUpPow(int A);
 void BlockShakeDown(int A);
 
 void BlockHitHard(int A);
-//! Destroy a block
+//! Safely destroy a block
+void SafelyKillBlock(int A);
+//! Unsafely destroy a block (this procedure will become private)
 void KillBlock(int A, bool Splode = true);
 // update the frames for animated blocks
 void BlockFrames();

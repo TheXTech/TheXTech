@@ -418,7 +418,7 @@ void NPCSpecialMaybeHeld(int A)
                     {
                         int B = block;
                         if(Block[B].Type == 186 && CheckCollision(tempLocation, Block[B].Location) && !Block[B].Hidden)
-                            KillBlock(B);
+                            SafelyKillBlock(B);
                     }
 
                     if(!legacy && g_config.extra_screen_shake)

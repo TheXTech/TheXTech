@@ -180,7 +180,7 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
                             if(Block[B].Type == 457 && Player[A].Stoned)
                             {
                                 HitSpot = 0;
-                                KillBlock(B);
+                                SafelyKillBlock(B);
                             }
 
                             // shadowmode is a cheat that allows the player to walk through walls

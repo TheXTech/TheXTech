@@ -2880,7 +2880,7 @@ void TailSwipe(const int plr, bool boo, bool Stab, int StabDir)
 
                             // allow Char5 to stab gray bricks when it has heavy power
                             if(block.Type == 457 && p.State == 6)
-                                KillBlock(A);
+                                SafelyKillBlock(A);
                         }
                     }
                 }
