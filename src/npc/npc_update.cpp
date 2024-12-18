@@ -571,59 +571,14 @@ void UpdateNPCs()
                 if(NPC[A].TriggerActivate != EVENT_NONE)
                     ProcEvent(NPC[A].TriggerActivate, activ_player);
 
-                Location_t tempLocation = NPC[A].Location;
-                tempLocation.Y -= 32;
-                tempLocation.X -= 32;
-                tempLocation.Width += 64;
-                tempLocation.Height += 64;
+                newAct[numAct] = A;
+                numAct++;
 
-                for(int B : treeNPCQuery(tempLocation, SORTMODE_ID))
-                {
-                    // In SMBX 1.3, Deactivate was called every frame for every Hidden NPC (in this loop over A). That set Reset to false. Now we need to emulate it.
-                    bool reset_should_be_false = (B < A && NPC[B].Hidden);
-
-                    if(!NPC[B].Active && B != A && !reset_should_be_false && NPC[B].Reset[1] && NPC[B].Reset[2])
-                    {
-                        if(CheckCollision(tempLocation, NPC[B].Location))
-                        {
-                            SDL_assert_release(numAct < maxNPCs);
-                            newAct[numAct] = B;
-                            numAct++;
-
-                            NPC[B].Active = true;
-                            NPC[B].TimeLeft = NPC[A].TimeLeft;
-                            NPC[B].Section = NPC[A].Section;
-
-                            if(g_config.fix_npc_camera_logic)
-                                NPC[B].JustActivated = NPC[A].JustActivated;
-                            else
-                                NPC[B].JustActivated = 1;
-
-                            if(B < A)
-                            {
-                                if(NPC[B].TriggerActivate != EVENT_NONE)
-                                    ProcEvent(NPC[B].TriggerActivate, activ_player);
-                            }
-
-                            NPCQueues::Active.insert(B);
-                        }
-                    }
-                    else if(B != A && NPC[B].Active && NPC[B].TimeLeft < NPC[A].TimeLeft - 1)
-                    {
-                        if(CheckCollision(tempLocation, NPC[B].Location))
-                            NPC[B].TimeLeft = NPC[A].TimeLeft - 1;
-                    }
-                }
-
-                // int C = 0;
-
-                // while(numAct > C)
-                // {
-                //     C++;
+                // chain activation
                 for(int C = 0; C < numAct; C++)
                 {
                     if(NPC[newAct[C]].Type != NPCID_CONVEYOR && NPC[newAct[C]].Type != NPCID_FALL_BLOCK_RED &&
-                       NPC[newAct[C]].Type != NPCID_FALL_BLOCK_BROWN && NPC[newAct[C]].Type != NPCID_SPIKY_THROWER &&
+                       NPC[newAct[C]].Type != NPCID_FALL_BLOCK_BROWN && (C == 0 || NPC[newAct[C]].Type != NPCID_SPIKY_THROWER) &&
                        !NPC[newAct[C]]->IsACoin)
                     {
                         Location_t tempLocation2 = NPC[newAct[C]].Location;
@@ -637,10 +592,10 @@ void UpdateNPCs()
                             // In SMBX 1.3, Deactivate was called every frame for every Hidden NPC (in this loop over A). That set Reset to false. Now we need to emulate it.
                             bool reset_should_be_false = (B < A && NPC[B].Hidden);
 
-                            if(!NPC[B].Active &&
-                                !reset_should_be_false &&
-                                (!NPC[B].Hidden || !g_config.fix_npc_activation_event_loop_bug) &&
-                                B != A && NPC[B].Reset[1] && NPC[B].Reset[2])
+                            if(!NPC[B].Active && B != A
+                                && !reset_should_be_false
+                                && (C == 0 || !NPC[B].Hidden || !g_config.fix_npc_activation_event_loop_bug)
+                                && NPC[B].Reset[1] && NPC[B].Reset[2])
                             {
                                 if(CheckCollision(tempLocation2, NPC[B].Location))
                                 {
@@ -665,6 +620,11 @@ void UpdateNPCs()
 
                                     NPCQueues::Active.insert(B);
                                 }
+                            }
+                            else if(C == 0 && B != A && NPC[B].Active && NPC[B].TimeLeft < NPC[A].TimeLeft - 1)
+                            {
+                                if(CheckCollision(tempLocation2, NPC[B].Location))
+                                    NPC[B].TimeLeft = NPC[A].TimeLeft - 1;
                             }
                         }
                     }
