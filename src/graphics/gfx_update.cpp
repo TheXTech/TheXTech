@@ -997,10 +997,16 @@ void ClassicNPCScreenLogic(int Z, int numScreens, bool fill_draw_queue, NPC_Draw
 
         if((vScreenCollision(Z, NPC[A].Location) || (has_ALoc && vScreenCollision(Z, npcALoc))) && !NPC[A].Hidden)
         {
-            if(kill_zero && NPC[A].Type == 0)
+            if(kill_zero && NPC[A].Type == 0) // what is this? almost certainly some sort of debugging on Redigit's side
             {
                 NPC[A].Killed = 9;
-                KillNPC(A, 9);
+
+                // KillNPC was called directly in SMBX 1.3. Skipping it is a logic change
+                // but I think the situation didn't come up in properly formed content anyway.
+                // KillNPC(A, 9);
+
+                NPCQueues::Killed.push_back(A);
+                continue;
             }
             else if(NPC[A].Active && fill_draw_queue)
             {
@@ -1307,12 +1313,16 @@ void ModernNPCScreenLogic(Screen_t& screen, int vscreen_i, bool fill_draw_queue,
         // activate the NPC if allowed
         if(can_activate)
         {
-            if(NPC[A].Type == 0) // what is this?
+            if(NPC[A].Type == 0) // what is this? almost certainly some sort of debugging on Redigit's side
             {
                 NPC[A].Killed = 9;
-                KillNPC(A, 9);
+
+                // KillNPC was called directly in SMBX 1.3. Skipping it is a logic change
+                // but I think the situation didn't come up in properly formed content anyway.
+                // KillNPC(A, 9);
 
                 NPCQueues::Killed.push_back(A);
+                continue;
             }
             else if(!NPC[A].Active && NPC[A].Effect != NPCEFF_DROP_ITEM
                 && (NPC[A].Reset[2] || NPC[A].Type == NPCID_CONVEYOR))
