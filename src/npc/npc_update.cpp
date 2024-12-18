@@ -587,6 +587,9 @@ void UpdateNPCs()
                         tempLocation2.Width += 64;
                         tempLocation2.Height += 64;
 
+                        // start of NPCs to check for events
+                        int activated_by_C_begin = numAct;
+
                         for(int B : treeNPCQuery(tempLocation2, SORTMODE_ID))
                         {
                             // In SMBX 1.3, Deactivate was called every frame for every Hidden NPC (in this loop over A). That set Reset to false. Now we need to emulate it.
@@ -612,19 +615,30 @@ void UpdateNPCs()
                                     else
                                         NPC[B].JustActivated = 1;
 
-                                    if(B < A)
-                                    {
-                                        if(NPC[B].TriggerActivate != EVENT_NONE)
-                                            ProcEvent(NPC[B].TriggerActivate, activ_player);
-                                    }
-
                                     NPCQueues::Active.insert(B);
+
+                                    // event for B was previously triggered here
+                                    // this should not be a logic change from SMBX 1.3:
+                                    // - ShowLayer turns Hidden NPCs (which can't be activated) into already-active NPCs
+                                    // - HideLayer calls Deactivate on NPCs, so their Reset flags will be false
                                 }
                             }
                             else if(C == 0 && B != A && NPC[B].Active && NPC[B].TimeLeft < NPC[A].TimeLeft - 1)
                             {
                                 if(CheckCollision(tempLocation2, NPC[B].Location))
                                     NPC[B].TimeLeft = NPC[A].TimeLeft - 1;
+                            }
+                        }
+
+                        // trigger events for all NPCs activated by C (outside of the query loop above)
+                        for(int i = activated_by_C_begin; i < numAct; i++)
+                        {
+                            int B = newAct[i];
+
+                            if(B < A)
+                            {
+                                if(NPC[B].TriggerActivate != EVENT_NONE)
+                                    ProcEvent(NPC[B].TriggerActivate, activ_player);
                             }
                         }
                     }
