@@ -156,6 +156,7 @@ void GameLoop()
             {
             case GameLoopInterrupt::UpdatePlayer_MessageNPC:
             case GameLoopInterrupt::UpdatePlayer_TriggerTalk:
+            case GameLoopInterrupt::UpdatePlayer_SuperWarp:
                 goto resume_UpdatePlayer;
             default:
                 break;
