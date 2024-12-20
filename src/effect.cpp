@@ -593,7 +593,7 @@ void UpdateEffects()
         {
             if(e.FrameCount == 0)
             {
-                NewEffect(EFFID_BOMB_S3_EXPLODE, e.Location, static_cast<float>(e.Frame));
+                NewEffect(EFFID_BOMB_S3_EXPLODE, e.Location, e.Frame);
                 e.Frame += 1;
                 if(e.Frame >= 4)
                     e.Frame = 0;
@@ -733,7 +733,7 @@ void UpdateEffects()
                 if(!LevelEditor && e.NewNpc != 96)
                 {
                     if(NPCIsYoshi(e.NewNpc))
-                        NewEffect(EFFID_PET_BIRTH, e.Location, 1, static_cast<float>(e.NewNpc));
+                        NewEffect(EFFID_PET_BIRTH, e.Location, 1, e.NewNpc);
                     else if(e.NewNpc > 0)
                     {
                         numNPCs++;
@@ -855,7 +855,7 @@ void UpdateEffects()
     }
 }
 
-void NewEffect(int A, const Location_t &Location, float Direction, int NewNpc, bool Shadow, uint8_t newNpcSpecial)
+void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, bool Shadow, uint8_t newNpcSpecial)
 {
 // this sub creates effects
 // please reference the /graphics/effect folder to see what the effects are
@@ -1193,7 +1193,7 @@ void NewEffect(int A, const Location_t &Location, float Direction, int NewNpc, b
         ne.Location.Y = Location.Y;
         ne.Location.SpeedY = -12;
         ne.Location.SpeedX = Location.SpeedX;
-        ne.Frame = vb6Round(Direction);
+        ne.Frame = Direction;
         ne.Life = 120;
         ne.Type = A;
     }
@@ -1429,7 +1429,7 @@ void NewEffect(int A, const Location_t &Location, float Direction, int NewNpc, b
                 }
                 ne.Location.SpeedX = ne.Location.SpeedX * 1.5;
                 ne.Location.SpeedY = ne.Location.SpeedY * 1.5;
-                ne.Frame = vb6Round(Direction);
+                ne.Frame = Direction;
                 ne.Type = A;
             }
         }

@@ -337,7 +337,7 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                                 NPCQueues::Killed.push_back(B);
                                 for(int C = 1; C <= 10; ++C)
                                 {
-                                    NewEffect(EFFID_PLR_FIREBALL_TRAIL, NPC[B].Location, static_cast<float>(NPC[B].Special));
+                                    NewEffect(EFFID_PLR_FIREBALL_TRAIL, NPC[B].Location, NPC[B].Special);
                                     Effect[numEffects].Location.SpeedX = dRand() * 3 - 1.5 + NPC[B].Location.SpeedX * 0.1;
                                     Effect[numEffects].Location.SpeedY = dRand() * 3 - 1.5 - NPC[B].Location.SpeedY * 0.1;
                                     if(Effect[numEffects].Frame == 0)

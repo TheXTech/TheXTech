@@ -1034,7 +1034,7 @@ resume_TriggerLast:
             else
             {
                 PlaySoundSpatial(SFX_ShellHit, NPC[A].Location); // Shell hit sound
-                NewEffect(EFFID_WALL_TURTLE_DIE, NPC[A].Location, static_cast<double>(NPC[A].Frame));
+                NewEffect(EFFID_WALL_TURTLE_DIE, NPC[A].Location, NPC[A].Frame);
             }
         }
         else if(NPC[A].Type == NPCID_GRN_SHELL_S1 || NPC[A].Type == NPCID_GRN_TURTLE_S1 || NPC[A].Type == NPCID_GRN_FLY_TURTLE_S1) // smb1 Green Koopa
@@ -1342,9 +1342,10 @@ resume_TriggerLast:
                 for(C = 1; C <= 10; C++)
                 {
                     if(NPC[A].Type == NPCID_PLR_ICEBALL)
-                        NewEffect(EFFID_PLR_ICEBALL_TRAIL, NPC[A].Location, static_cast<float>(NPC[A].Special), 0, NPC[A].Shadow);
+                        NewEffect(EFFID_PLR_ICEBALL_TRAIL, NPC[A].Location, NPC[A].Special, 0, NPC[A].Shadow);
                     else
-                        NewEffect(EFFID_PLR_FIREBALL_TRAIL, NPC[A].Location, static_cast<float>(NPC[A].Special), 0, NPC[A].Shadow);
+                        NewEffect(EFFID_PLR_FIREBALL_TRAIL, NPC[A].Location, NPC[A].Special, 0, NPC[A].Shadow);
+
                     Effect[numEffects].Location.SpeedX = dRand() * 3 - 1.5 + NPC[A].Location.SpeedX * 0.1;
                     Effect[numEffects].Location.SpeedY = dRand() * 3 - 1.5 - NPC[A].Location.SpeedY * 0.1;
                 }
