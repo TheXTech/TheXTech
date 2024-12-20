@@ -159,6 +159,8 @@ void GameLoop()
             case GameLoopInterrupt::UpdatePlayer_SuperWarp:
                 goto resume_UpdatePlayer;
             case GameLoopInterrupt::UpdateNPCs_Activation_Generator:
+            case GameLoopInterrupt::UpdateNPCs_Activation_Self:
+            case GameLoopInterrupt::UpdateNPCs_Activation_Chain:
                 goto resume_UpdateNPCs;
             default:
                 break;

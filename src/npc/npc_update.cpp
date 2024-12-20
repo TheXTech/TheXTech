@@ -173,6 +173,8 @@ bool UpdateNPCs()
     switch(g_gameLoopInterrupt.site)
     {
     case GameLoopInterrupt::UpdateNPCs_Activation_Generator:
+    case GameLoopInterrupt::UpdateNPCs_Activation_Self:
+    case GameLoopInterrupt::UpdateNPCs_Activation_Chain:
         goto resume_Activation;
     default:
         break;
@@ -343,6 +345,10 @@ resume_Activation:
             {
             case GameLoopInterrupt::UpdateNPCs_Activation_Generator:
                 goto resume_Activation_Generator;
+            case GameLoopInterrupt::UpdateNPCs_Activation_Self:
+                goto resume_Activation_Self;
+            case GameLoopInterrupt::UpdateNPCs_Activation_Chain:
+                goto resume_Activation_Chain;
             default:
                 break;
             }
@@ -611,90 +617,146 @@ resume_Activation_Generator:
         if(NPC[A].JustActivated != 0)
         {
             static std::array<int, maxNPCs> newAct;
-            int numAct = 0;
+            int numAct;
+            numAct = 0;
 
             if(NPC[A].Active && NPC[A].TimeLeft > 1 &&
                NPC[A].Type != NPCID_CONVEYOR && NPC[A].Type != NPCID_FALL_BLOCK_RED &&
                NPC[A].Type != NPCID_FALL_BLOCK_BROWN && !NPC[A]->IsACoin) // And .Type <> NPCID_SPIKY_THROWER
             {
                 // if activated by a shared screen, don't make the event player-specific
-                const vScreen_t& activ_vscreen = vScreen[NPC[A].JustActivated];
-                const Screen_t& activ_screen = Screens[activ_vscreen.screen_ref];
-                bool shared_screen = (activ_screen.player_count > 1) && (activ_screen.active_end() - activ_screen.active_begin() == 1);
+                int activ_player;
+                {
+                    const vScreen_t& activ_vscreen = vScreen[NPC[A].JustActivated];
+                    const Screen_t& activ_screen = Screens[activ_vscreen.screen_ref];
+                    bool shared_screen = (activ_screen.player_count > 1) && (activ_screen.active_end() - activ_screen.active_begin() == 1);
 
-                int activ_player = (shared_screen) ? 0 : activ_vscreen.player;
+                    activ_player = (shared_screen) ? 0 : activ_vscreen.player;
+                }
 
                 if(NPC[A].TriggerActivate != EVENT_NONE)
-                    ProcEvent(NPC[A].TriggerActivate, activ_player);
+                {
+                    eventindex_t resume_index;
+                    resume_index = ProcEvent_Safe(false, NPC[A].TriggerActivate, activ_player);
+                    while(resume_index != EVENT_NONE)
+                    {
+                        g_gameLoopInterrupt.C = resume_index;
+                        g_gameLoopInterrupt.D = activ_player;
+                        g_gameLoopInterrupt.site = GameLoopInterrupt::UpdateNPCs_Activation_Self;
+                        goto interrupt_Activation;
+
+resume_Activation_Self:
+                        resume_index = g_gameLoopInterrupt.C;
+                        activ_player = g_gameLoopInterrupt.D;
+                        numAct = 0;
+                        g_gameLoopInterrupt.site = GameLoopInterrupt::None;
+
+                        resume_index = ProcEvent_Safe(true, resume_index, activ_player);
+                    }
+                }
 
                 newAct[numAct] = A;
                 numAct++;
 
                 // chain activation
-                for(int C = 0; C < numAct; C++)
+                int C;
+                for(C = 0; C < numAct; C++)
                 {
                     if(NPC[newAct[C]].Type != NPCID_CONVEYOR && NPC[newAct[C]].Type != NPCID_FALL_BLOCK_RED &&
                        NPC[newAct[C]].Type != NPCID_FALL_BLOCK_BROWN && (C == 0 || NPC[newAct[C]].Type != NPCID_SPIKY_THROWER) &&
                        !NPC[newAct[C]]->IsACoin)
                     {
-                        Location_t tempLocation2 = NPC[newAct[C]].Location;
-                        tempLocation2.Y -= 32;
-                        tempLocation2.X -= 32;
-                        tempLocation2.Width += 64;
-                        tempLocation2.Height += 64;
+                        // start of NPCs to check for events (not preserved by resume)
+                        int activated_by_C_begin;
+                        activated_by_C_begin = numAct;
 
-                        // start of NPCs to check for events
-                        int activated_by_C_begin = numAct;
-
-                        for(int B : treeNPCQuery(tempLocation2, SORTMODE_ID))
                         {
-                            // In SMBX 1.3, Deactivate was called every frame for every Hidden NPC (in this loop over A). That set Reset to false. Now we need to emulate it.
-                            bool reset_should_be_false = (B < A && NPC[B].Hidden);
+                            Location_t tempLocation2 = NPC[newAct[C]].Location;
+                            tempLocation2.Y -= 32;
+                            tempLocation2.X -= 32;
+                            tempLocation2.Width += 64;
+                            tempLocation2.Height += 64;
 
-                            if(!NPC[B].Active && B != A
-                                && !reset_should_be_false
-                                && (C == 0 || !NPC[B].Hidden || !g_config.fix_npc_activation_event_loop_bug)
-                                && NPC[B].Reset[1] && NPC[B].Reset[2])
+                            for(int B : treeNPCQuery(tempLocation2, SORTMODE_ID))
                             {
-                                if(CheckCollision(tempLocation2, NPC[B].Location))
+                                // In SMBX 1.3, Deactivate was called every frame for every Hidden NPC (in this loop over A). That set Reset to false. Now we need to emulate it.
+                                bool reset_should_be_false = (B < A && NPC[B].Hidden);
+
+                                if(!NPC[B].Active && B != A
+                                    && !reset_should_be_false
+                                    && (C == 0 || !NPC[B].Hidden || !g_config.fix_npc_activation_event_loop_bug)
+                                    && NPC[B].Reset[1] && NPC[B].Reset[2])
                                 {
-                                    SDL_assert_release(numAct < maxNPCs);
-                                    newAct[numAct] = B;
-                                    numAct++;
+                                    if(CheckCollision(tempLocation2, NPC[B].Location))
+                                    {
+                                        SDL_assert_release(numAct < maxNPCs);
+                                        newAct[numAct] = B;
+                                        numAct++;
 
-                                    NPC[B].Active = true;
-                                    NPC[B].TimeLeft = NPC[newAct[C]].TimeLeft;
-                                    NPC[B].Section = NPC[newAct[C]].Section;
+                                        NPC[B].Active = true;
+                                        NPC[B].TimeLeft = NPC[newAct[C]].TimeLeft;
+                                        NPC[B].Section = NPC[newAct[C]].Section;
 
-                                    if(g_config.fix_npc_camera_logic)
-                                        NPC[B].JustActivated = NPC[A].JustActivated;
-                                    else
-                                        NPC[B].JustActivated = 1;
+                                        if(g_config.fix_npc_camera_logic)
+                                            NPC[B].JustActivated = NPC[A].JustActivated;
+                                        else
+                                            NPC[B].JustActivated = 1;
 
-                                    NPCQueues::Active.insert(B);
+                                        NPCQueues::Active.insert(B);
 
-                                    // event for B was previously triggered here
-                                    // this should not be a logic change from SMBX 1.3:
-                                    // - ShowLayer turns Hidden NPCs (which can't be activated) into already-active NPCs
-                                    // - HideLayer calls Deactivate on NPCs, so their Reset flags will be false
+                                        // event for B was previously triggered here
+                                        // this should not be a logic change from SMBX 1.3:
+                                        // - ShowLayer turns Hidden NPCs (which can't be activated) into already-active NPCs
+                                        // - HideLayer calls Deactivate on NPCs, so their Reset flags will be false
+                                    }
                                 }
-                            }
-                            else if(C == 0 && B != A && NPC[B].Active && NPC[B].TimeLeft < NPC[A].TimeLeft - 1)
-                            {
-                                if(CheckCollision(tempLocation2, NPC[B].Location))
-                                    NPC[B].TimeLeft = NPC[A].TimeLeft - 1;
+                                else if(C == 0 && B != A && NPC[B].Active && NPC[B].TimeLeft < NPC[A].TimeLeft - 1)
+                                {
+                                    if(CheckCollision(tempLocation2, NPC[B].Location))
+                                        NPC[B].TimeLeft = NPC[A].TimeLeft - 1;
+                                }
                             }
                         }
 
                         // trigger events for all NPCs activated by C (outside of the query loop above)
-                        for(int i = activated_by_C_begin; i < numAct; i++)
+
+                        // restored by resume
+                        int i;
+                        for(i = activated_by_C_begin; i < numAct; i++)
                         {
-                            int B = newAct[i];
+                            // not used by resume
+                            int B;
+                            B = newAct[i];
 
                             if(B < A)
                             {
                                 if(NPC[B].TriggerActivate != EVENT_NONE)
-                                    ProcEvent(NPC[B].TriggerActivate, activ_player);
+                                {
+                                    eventindex_t resume_index;
+                                    resume_index = ProcEvent_Safe(false, NPC[B].TriggerActivate, activ_player);
+                                    while(resume_index != EVENT_NONE)
+                                    {
+                                        g_gameLoopInterrupt.C = resume_index;
+                                        g_gameLoopInterrupt.D = activ_player;
+                                        g_gameLoopInterrupt.E = numAct;
+                                        g_gameLoopInterrupt.F = C;
+                                        g_gameLoopInterrupt.G = i;
+
+                                        g_gameLoopInterrupt.site = GameLoopInterrupt::UpdateNPCs_Activation_Chain;
+                                        goto interrupt_Activation;
+
+resume_Activation_Chain:
+                                        resume_index = g_gameLoopInterrupt.C;
+                                        activ_player = g_gameLoopInterrupt.D;
+                                        numAct = g_gameLoopInterrupt.E;
+                                        C = g_gameLoopInterrupt.F;
+                                        i = g_gameLoopInterrupt.G;
+
+                                        g_gameLoopInterrupt.site = GameLoopInterrupt::None;
+
+                                        resume_index = ProcEvent_Safe(true, resume_index, activ_player);
+                                    }
+                                }
                             }
                         }
                     }
