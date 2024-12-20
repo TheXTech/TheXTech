@@ -1229,7 +1229,6 @@ void BlockFrames()
 
 void UpdateBlocks()
 {
-    int A = 0;
     int B = 0;
     if(FreezeNPCs)
         return;
@@ -1238,7 +1237,7 @@ void UpdateBlocks()
 
     if(BattleMode)
     {
-        for(A = 1; A <= numBlock; A++)
+        for(int A = 1; A <= numBlock; A++)
         {
             auto &b = Block[A];
             // respawn
@@ -1295,7 +1294,8 @@ void UpdateBlocks()
         }
     }
 
-    for(auto A = 1; A <= iBlocks; A++)
+    int A;
+    for(A = 1; A <= iBlocks; A++)
     {
         auto &ib = Block[iBlock[A]];
         // Update the shake effect
@@ -1428,18 +1428,17 @@ void UpdateBlocks()
         if(ib.Kill) // See if block should be broke
         {
             bool just_kill_it = (ib.Kill == 9);
+            bool is_breakable_type = (ib.Type == 4 || ib.Type == 60 ||
+               ib.Type == 90 || ib.Type == 188 ||
+               ib.Type == 226 || ib.Type == 293 ||
+               ib.Type == 526); // Check to see if it is breakable
+            bool is_empty = (ib.Special == 0);
+            bool is_breakable = (is_breakable_type && is_empty);
+
             ib.Kill = false;
 
-            if(just_kill_it)
-                KillBlock(iBlock[A]); // KILL the block
-            else if(ib.Special == 0)
-            {
-                if(ib.Type == 4 || ib.Type == 60 ||
-                   ib.Type == 90 || ib.Type == 188 ||
-                   ib.Type == 226 || ib.Type == 293 ||
-                   ib.Type == 526) // Check to see if it is breakable
-                    KillBlock(iBlock[A]); // Destroy the block
-            }
+            if(is_breakable || just_kill_it)
+                KillBlock(iBlock[A]); // Destroy the block
         }
     }
 
