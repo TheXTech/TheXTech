@@ -1610,6 +1610,13 @@ void PSwitch(bool enabled)
                     Block[numBlock] = blankBlock;
                     numBlock--;
 
+                    // make sure that iBlock isn't forgotten (this is done for all blocks below if the compat flag is set)
+                    if(!g_config.emulate_classic_block_order)
+                    {
+                        iBlocks++;
+                        iBlock[iBlocks] = A;
+                    }
+
                     syncLayersTrees_Block(A);
                     syncLayersTrees_Block(numBlock + 1);
                 }
@@ -1757,11 +1764,12 @@ void PSwitch(bool enabled)
         syncLayersTrees_AllBlocks();
 
         BlocksSorted = true;
-    }
 
-    iBlocks = numBlock;
-    for(A = 1; A <= numBlock; A++)
-        iBlock[A] = A;
+        // make sure that iBlock references weren't broken if blocks got sorted
+        iBlocks = numBlock;
+        for(A = 1; A <= numBlock; A++)
+            iBlock[A] = A;
+    }
 
     resetFrameTimer();
 }
