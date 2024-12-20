@@ -49,10 +49,10 @@ void KillNPC(int A, int B)
     // B = 8      Stomped by boot
     // B = 9      Time to DIE
     // B = 10     Zelda Stab
-    bool DontSpawnExit = false;
-    bool DontResetMusic = false;
-    bool tempBool = false;
-    NPC_t blankNPC;
+    // bool DontSpawnExit = false;
+    // bool DontResetMusic = false;
+    // bool tempBool = false;
+    // NPC_t blankNPC;
     int C = 0;
     Location_t tempLocation;
 
@@ -94,7 +94,7 @@ void KillNPC(int A, int B)
 
     if(NPC[A].Type == NPCID_YELSWITCH_FODDER || NPC[A].Type == NPCID_BLUSWITCH_FODDER || NPC[A].Type == NPCID_GRNSWITCH_FODDER || NPC[A].Type == NPCID_REDSWITCH_FODDER || NPC[A].DefaultType == 59 || NPC[A].DefaultType == 61 || NPC[A].DefaultType == 63 || NPC[A].DefaultType == 65)
     {
-        tempBool = false;
+        bool tempBool = false;
 
         for(C = 1; C <= numNPCs; C++)
         {
@@ -184,25 +184,29 @@ void KillNPC(int A, int B)
 
     if(NPC[A].TriggerLast != EVENT_NONE)
     {
-        tempBool = false;
+        bool last_in_layer;
 
-        int lr = NPC[A].Layer;
-        if(lr != LAYER_NONE)
         {
-            for(int other_npc : Layer[lr].NPCs)
-            {
-                if(other_npc != A && !NPC[other_npc].Generator)
-                {
-                    tempBool = true;
-                    break;
-                }
-            }
+            last_in_layer = true;
 
-            if(!Layer[lr].blocks.empty())
-                tempBool = true;
+            int lr = NPC[A].Layer;
+            if(lr != LAYER_NONE)
+            {
+                for(int other_npc : Layer[lr].NPCs)
+                {
+                    if(other_npc != A && !NPC[other_npc].Generator)
+                    {
+                        last_in_layer = false;
+                        break;
+                    }
+                }
+
+                if(!Layer[lr].blocks.empty())
+                    last_in_layer = false;
+            }
         }
 
-        if(!tempBool)
+        if(last_in_layer)
             ProcEvent(NPC[A].TriggerLast, 0);
     }
 
@@ -727,7 +731,7 @@ void KillNPC(int A, int B)
 
             if(NPC[A].Legacy)
             {
-                tempBool = false;
+                bool tempBool = false;
                 for(B = 1; B <= numNPCs; B++)
                 {
                     if(B != A && NPC[B].Type == NPCID_VILLAIN_S3)
@@ -1086,6 +1090,8 @@ void KillNPC(int A, int B)
             PlaySoundSpatial(SFX_SpitBossHit, NPC[A].Location);
             if(NPC[A].Legacy && !LevelEditor)
             {
+                bool DontSpawnExit = false;
+
                 for(C = 1; C <= numNPCs; C++)
                 {
                     if(NPC[C].Type == NPCID_SPIT_BOSS && C != A)
@@ -1114,6 +1120,8 @@ void KillNPC(int A, int B)
                 }
                 else
                 {
+                    bool DontResetMusic = false;
+
                     for(int nc : NPCQueues::Active.no_change)
                     {
                         if(NPC[nc].Type == NPCID_SPIT_BOSS && NPC[nc].Active && nc != A)
@@ -1312,6 +1320,8 @@ void KillNPC(int A, int B)
             NPC[A].Location.Height = NPC[A]->THeight;
             if(NPC[A].Legacy)
             {
+                bool DontSpawnExit = false;
+
                 for(B = 1; B <= numNPCs; B++)
                 {
                     if(NPC[B].Type == NPCID_MINIBOSS && NPC[B].Killed == 0 && B != A)
@@ -1328,6 +1338,8 @@ void KillNPC(int A, int B)
                     NewEffect(EFFID_MINIBOSS_DIE, NPC[A].Location, 1, 16);
                 else
                 {
+                    bool DontResetMusic = false;
+
                     NewEffect(EFFID_MINIBOSS_DIE, NPC[A].Location);
 
                     for(int nc : NPCQueues::Active.no_change)
@@ -1581,7 +1593,7 @@ void KillNPC(int A, int B)
 
         SDL_assert_release(A > 0);
         NPC[A] = NPC[numNPCs];
-        NPC[numNPCs] = blankNPC;
+        NPC[numNPCs] = NPC_t();
         numNPCs--;
         syncLayers_NPC(A);
         syncLayers_NPC(numNPCs + 1);
