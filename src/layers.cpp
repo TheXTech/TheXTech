@@ -1526,7 +1526,7 @@ void UpdateEvents()
                 NewEvent[A] = NewEvent[newEventNum];
                 newEventNum--;
 
-                if(g_config.fix_event_substitution_bug)
+                if(g_config.fix_event_swap_bug)
                 {
                     // if A was not replaced by a new event, then we should check the event A was replaced by
                     if(newEventNum < newEventNum_old && newEventDelay[A] <= 0)
