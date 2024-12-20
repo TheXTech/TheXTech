@@ -276,7 +276,7 @@ eventindex_t ProcEvent_Safe(bool resume, eventindex_t index, int WhichPlayer, bo
 void TriggerEvent(eventindex_t index, int WhichPlayer);
 
 // Public Sub UpdateEvents()
-void UpdateEvents();
+bool UpdateEvents();
 
 
 // functions to synchronize the layers of objects

@@ -164,6 +164,8 @@ void GameLoop()
             case GameLoopInterrupt::UpdateNPCs_FreezeNPCs_KillNPC:
             case GameLoopInterrupt::UpdateNPCs_Normal_KillNPC:
                 goto resume_UpdateNPCs;
+            case GameLoopInterrupt::UpdateEvents:
+                goto resume_UpdateEvents;
             default:
                 break;
             }
@@ -310,8 +312,11 @@ resume_UpdatePlayer:
             UpdateGraphics();
         g_microStats.start_task(MicroStats::Sound);
         UpdateSound();
+
+resume_UpdateEvents:
         g_microStats.start_task(MicroStats::Events);
-        UpdateEvents();
+        if(UpdateEvents())
+            return;
 //        If MagicHand = True Then UpdateEditor
 
         updateScreenFaders();

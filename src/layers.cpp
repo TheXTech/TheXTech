@@ -46,6 +46,7 @@
 #include "npc/npc_queues.h"
 #include "npc/section_overlap.h"
 #include "graphics/gfx_update.h"
+#include "main/game_loop_interrupt.h"
 
 int numLayers = 0;
 RangeArr<Layer_t, 0, maxLayers> Layer;
@@ -1494,19 +1495,28 @@ void TriggerEvent(eventindex_t index, int whichPlayer)
     newEventPlayer[newEventNum] = static_cast<uint8_t>(whichPlayer);
 }
 
-void UpdateEvents()
+bool UpdateEvents()
 {
     // this is for events that have a delay to call other events
     // this sub also updates the screen position for autoscroll levels
     int A = 0;
+
+    switch(g_gameLoopInterrupt.site)
+    {
+    case GameLoopInterrupt::UpdateEvents:
+        goto resume;
+    default:
+        break;
+    }
+
     if(FreezeNPCs)
-        return;
+        return false;
 
     if(!GameMenu)
     {
         // possibly undesirable: doesn't advance event timer at all if any players are (for example) in doors or in holding pattern
         if(!AllPlayersNormal())
-            return;
+            return false;
     }
 
     if(newEventNum > 0)
@@ -1520,7 +1530,25 @@ void UpdateEvents()
                 newEventDelay[A]--;
             else
             {
-                ProcEvent(NewEvent[A], newEventPlayer[A]);
+                eventindex_t resume_index;
+                resume_index = ProcEvent_Safe(false, NewEvent[A], newEventPlayer[A]);
+                while(resume_index != EVENT_NONE)
+                {
+                    g_gameLoopInterrupt.A = A;
+                    g_gameLoopInterrupt.B = newEventNum_old;
+                    g_gameLoopInterrupt.C = resume_index;
+                    g_gameLoopInterrupt.site = GameLoopInterrupt::UpdateEvents;
+                    return true;
+
+resume:
+                    A = g_gameLoopInterrupt.A;
+                    newEventNum_old = g_gameLoopInterrupt.B;
+                    resume_index = g_gameLoopInterrupt.C;
+                    g_gameLoopInterrupt.site = GameLoopInterrupt::None;
+
+                    resume_index = ProcEvent_Safe(true, resume_index, newEventPlayer[A]);
+                }
+
                 newEventDelay[A] = newEventDelay[newEventNum];
                 newEventPlayer[A] = newEventPlayer[newEventNum];
                 NewEvent[A] = NewEvent[newEventNum];
@@ -1570,6 +1598,8 @@ void UpdateEvents()
             UpdateSectionOverlaps(A);
         }
     }
+
+    return false;
 }
 
 void CancelNewEvent(eventindex_t index)
