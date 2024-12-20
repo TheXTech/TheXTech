@@ -1695,7 +1695,7 @@ void NPCFrames(int A)
                         }
                     }
                     else
-                        NewEffect(EFFID_PLR_FIREBALL_TRAIL, NPC[A].Location, static_cast<float>(NPC[A].Special), 0, NPC[A].Shadow);
+                        NewEffect(EFFID_PLR_FIREBALL_TRAIL, NPC[A].Location, NPC[A].Special, 0, NPC[A].Shadow);
                 }
             }
             else
@@ -1734,7 +1734,7 @@ void NPCFrames(int A)
                     }
                 }
                 else
-                    NewEffect(EFFID_PLR_FIREBALL_TRAIL, NPC[A].Location, static_cast<float>(NPC[A].Special), 0, NPC[A].Shadow);
+                    NewEffect(EFFID_PLR_FIREBALL_TRAIL, NPC[A].Location, NPC[A].Special, 0, NPC[A].Shadow);
             }
         }
         NPC[A].FrameCount += 1;
