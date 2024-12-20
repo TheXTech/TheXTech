@@ -1511,7 +1511,10 @@ void UpdateEvents()
 
     if(newEventNum > 0)
     {
-        for(A = 1; A <= newEventNum; A++)
+        int newEventNum_old;
+        newEventNum_old = newEventNum;
+
+        for(A = 1; A <= newEventNum_old; A++)
         {
             if(newEventDelay[A] > 0)
                 newEventDelay[A]--;
@@ -1522,6 +1525,16 @@ void UpdateEvents()
                 newEventPlayer[A] = newEventPlayer[newEventNum];
                 NewEvent[A] = NewEvent[newEventNum];
                 newEventNum--;
+
+                if(g_config.fix_event_substitution_bug)
+                {
+                    // if A was not replaced by a new event, then we should check the event A was replaced by
+                    if(newEventNum < newEventNum_old && newEventDelay[A] <= 0)
+                    {
+                        A--;
+                        newEventNum_old--;
+                    }
+                }
             }
         }
     }

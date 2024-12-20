@@ -908,6 +908,8 @@ public:
         "fix-attlayer-reset", "Fix AttLayer reset", "Resets an att. layer when its NPC dies"};
     opt<bool> fix_medal_kill{this, defaults(true), {CompatClass::standard_update, false}, Scope::CreatorFile,
         "fix-medal-kill", "Fix medal kill", "Count a medal as collected when player kills it"};
+    opt<bool> fix_event_swap_bug{this, defaults(true), {CompatClass::critical_update, false}, Scope::CreatorFile,
+        "fix-event-swap-bug", "Fix event swap bug", "Don't overwrite pending events when multiple events triggered in a frame"};
 
     // if we make the scope below be Scope::CreatorEpisode, episodes can force this in both modern / classic mode
     opt<bool> modern_lives_system{this, defaults(true), {CompatClass::critical_update, false}, Scope::None,
