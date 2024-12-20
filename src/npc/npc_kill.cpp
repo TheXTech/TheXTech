@@ -37,7 +37,9 @@
 
 #include "npc/npc_queues.h"
 
-void KillNPC(int A, int B)
+#include "main/game_loop_interrupt.h"
+
+bool KillNPC(int A, int B)
 {
     // ------+  KILL CODES  +-------
     // B = 1      Jumped on by a player (or kicked)
@@ -55,6 +57,18 @@ void KillNPC(int A, int B)
     // NPC_t blankNPC;
     int C = 0;
     Location_t tempLocation;
+
+    switch(g_gameLoopInterrupt.site)
+    {
+    case GameLoopInterrupt::UpdateNPCs_FreezeNPCs_KillNPC:
+    case GameLoopInterrupt::UpdateNPCs_Normal_KillNPC:
+        if(g_gameLoopInterrupt.bool1)
+            goto resume_TriggerLast;
+        else
+            goto resume_TriggerDeath;
+    default:
+        break;
+    }
 
     // don't need to worry about updating NPC A's tree because that will certainly happen in either the syncLayersNPC or the Deactivate call at the end of the procedure
 
@@ -179,7 +193,20 @@ void KillNPC(int A, int B)
 
     if(NPC[A].TriggerDeath != EVENT_NONE && !LevelEditor)
     {
-        ProcEvent(NPC[A].TriggerDeath, 0);
+        eventindex_t resume_index;
+        resume_index = ProcEvent_Safe(false, NPC[A].TriggerDeath, 0);
+        while(resume_index != EVENT_NONE)
+        {
+            g_gameLoopInterrupt.C = resume_index;
+            g_gameLoopInterrupt.bool1 = false; // marks as TriggerDeath
+            return true;
+
+resume_TriggerDeath:
+            resume_index = g_gameLoopInterrupt.C;
+            g_gameLoopInterrupt.site = GameLoopInterrupt::None;
+
+            resume_index = ProcEvent_Safe(true, resume_index, 0);
+        }
     }
 
     if(NPC[A].TriggerLast != EVENT_NONE)
@@ -207,7 +234,22 @@ void KillNPC(int A, int B)
         }
 
         if(last_in_layer)
-            ProcEvent(NPC[A].TriggerLast, 0);
+        {
+            eventindex_t resume_index;
+            resume_index = ProcEvent_Safe(false, NPC[A].TriggerLast, 0);
+            while(resume_index != EVENT_NONE)
+            {
+                g_gameLoopInterrupt.C = resume_index;
+                g_gameLoopInterrupt.bool1 = true; // marks as TriggerLast
+                return true;
+
+resume_TriggerLast:
+                resume_index = g_gameLoopInterrupt.C;
+                g_gameLoopInterrupt.site = GameLoopInterrupt::None;
+
+                resume_index = ProcEvent_Safe(true, resume_index, 0);
+            }
+        }
     }
 
     if(NPC[A].HoldingPlayer > 0)
@@ -1625,4 +1667,6 @@ void KillNPC(int A, int B)
     {
         Deactivate(A);
     }
+
+    return false;
 }

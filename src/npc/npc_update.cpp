@@ -176,6 +176,10 @@ bool UpdateNPCs()
     case GameLoopInterrupt::UpdateNPCs_Activation_Self:
     case GameLoopInterrupt::UpdateNPCs_Activation_Chain:
         goto resume_Activation;
+    case GameLoopInterrupt::UpdateNPCs_FreezeNPCs_KillNPC:
+        goto resume_FreezeNPCs_KillNPC;
+    case GameLoopInterrupt::UpdateNPCs_Normal_KillNPC:
+        goto resume_Normal_KillNPC;
     default:
         break;
     }
@@ -219,7 +223,8 @@ bool UpdateNPCs()
     if(FreezeNPCs) // When time is paused
     {
         StopHit = 0;
-        for(int A = numNPCs; A >= 1; A--) // check to see if NPCs should be killed
+        int A;
+        for(A = numNPCs; A >= 1; A--) // check to see if NPCs should be killed
         {
             if(NPCIsBoot(NPC[A]) || NPCIsYoshi(NPC[A]))
             {
@@ -262,7 +267,21 @@ bool UpdateNPCs()
                     else
                         NPC[A].Location.SpeedX += 0.5;
                 }
-                KillNPC(A, NPC[A].Killed);
+
+                int KillCode;
+                KillCode = NPC[A].Killed;
+
+                while(KillNPC(A, KillCode))
+                {
+                    g_gameLoopInterrupt.site = GameLoopInterrupt::UpdateNPCs_FreezeNPCs_KillNPC;
+                    g_gameLoopInterrupt.A = A;
+                    g_gameLoopInterrupt.B = KillCode;
+                    return true;
+
+resume_FreezeNPCs_KillNPC:
+                    A = g_gameLoopInterrupt.A;
+                    KillCode = g_gameLoopInterrupt.B;
+                }
             }
         }
 
@@ -1876,13 +1895,20 @@ interrupt_Activation:
         return a > b;
     });
 
-    int last_NPC = maxNPCs + 1;
-    size_t KilledQueue_check = NPCQueues::Killed.size();
-    size_t KilledQueue_known = NPCQueues::Killed.size();
+    // all of these are preserved by the interrupt / resume routine
+    int last_NPC;
+    size_t KilledQueue_check;
+    size_t KilledQueue_known;
+    size_t i;
+    last_NPC = maxNPCs + 1;
+    KilledQueue_check = NPCQueues::Killed.size();
+    KilledQueue_known = NPCQueues::Killed.size();
 
-    for(size_t i = 0; i < KilledQueue_check; i++) // KILL THE NPCS <><><><><><><><><><><><><><><><><><><><><><><><><><><><><><
+    for(i = 0; i < KilledQueue_check; i++) // KILL THE NPCS <><><><><><><><><><><><><><><><><><><><><><><><><><><><><><
     {
-        int A = NPCQueues::Killed[i];
+        // preserved by the interrupt / resume routine
+        int A;
+        A = NPCQueues::Killed[i];
 
         // in rare cases, the game may accidentally kill an NPC outside of the NPC array (storage glitch example)
         if(A > numNPCs)
@@ -1905,7 +1931,30 @@ interrupt_Activation:
                     NPC[A].Location.SpeedX += 0.5;
             }
 
-            KillNPC(A, NPC[A].Killed);
+            // preserved by the interrupt / resume routine
+            int KillCode;
+            KillCode = NPC[A].Killed;
+
+            while(KillNPC(A, NPC[A].Killed))
+            {
+                g_gameLoopInterrupt.site = GameLoopInterrupt::UpdateNPCs_Normal_KillNPC;
+                g_gameLoopInterrupt.A = i; // NOT A
+                g_gameLoopInterrupt.B = KillCode;
+                // C is reserved as the event index
+                g_gameLoopInterrupt.D = last_NPC;
+                g_gameLoopInterrupt.E = KilledQueue_check;
+                g_gameLoopInterrupt.F = KilledQueue_known;
+                return true;
+
+resume_Normal_KillNPC:
+                i = g_gameLoopInterrupt.A;
+                A = NPCQueues::Killed[i];
+                KillCode = g_gameLoopInterrupt.B;
+
+                last_NPC = g_gameLoopInterrupt.D;
+                KilledQueue_check = g_gameLoopInterrupt.E;
+                KilledQueue_known = g_gameLoopInterrupt.F;
+            }
 
             // KillNPC sometimes adds duplicate / unnecessary members to NPCQueues::Killed
             bool real_new_killed = false;

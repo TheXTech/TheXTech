@@ -48,7 +48,8 @@ void TouchBonus(int A, int B);
 void NPCHit(int A, int B, int C = 0);
 // Public Sub KillNPC(A As Integer, B As Integer) 'Handles NPC deaths and death effects
 // Handles NPC deaths and death effects
-void KillNPC(int A, int B);
+// Returns true if this should be resumed later
+bool KillNPC(int A, int B);
 // Public Sub CheckSectionNPC(A As Integer) 'find out what section the NPC is in
 // find out what section the NPC is in
 void CheckSectionNPC(int A);
