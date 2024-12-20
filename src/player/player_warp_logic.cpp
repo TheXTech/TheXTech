@@ -1396,7 +1396,7 @@ static inline bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool bac
         if(g_config.fix_visual_bugs && warp.Effect == 1 && direction == 3)
             plr.Frame = prevFrame;
 
-        canWarp = false;
+        return false;
     }
 
     plr.Slide = false;
