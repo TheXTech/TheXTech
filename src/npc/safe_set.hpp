@@ -63,6 +63,8 @@ public:
             {
                 if(m_parent && prev_invalid > 0)
                     m_parent->invalid = true;
+
+                m_parent = nullptr;
             }
 
             inline bool operator!=(const iterator& o)
@@ -127,6 +129,11 @@ public:
     {
         invalid = true;
         m_set.erase(t);
+    }
+
+    inline void invalidate()
+    {
+        invalid = true;
     }
 };
 

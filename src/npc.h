@@ -29,8 +29,8 @@ enum NPCID : vbint_t;
 struct NPC_t;
 struct Player_t;
 
-// Public Sub UpdateNPCs()
-void UpdateNPCs();
+// Returns true if the game has been paused
+bool UpdateNPCs();
 // Public Sub DropBonus(A As Integer) 'Drops a bonus item that was held by the player
 // Drops a bonus item that was held by the player
 void DropBonus(int A);

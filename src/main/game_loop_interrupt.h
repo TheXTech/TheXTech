@@ -30,11 +30,12 @@ struct GameLoopInterrupt
         UpdatePlayer_MessageNPC,
         UpdatePlayer_TriggerTalk,
         UpdatePlayer_SuperWarp,
+        UpdateNPCs_Activation_Generator,
     };
 
     // variables to help with resume
     Site site = None;
-    int A, B, C;
+    int A, B, C, D, E;
     bool bool1, bool2, bool3, bool4;
 };
 

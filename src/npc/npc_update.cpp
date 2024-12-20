@@ -42,6 +42,8 @@
 #include "../eff_id.h"
 #include "../layers.h"
 
+#include "main/game_loop_interrupt.h"
+
 #include "game_main.h"
 #include "npc_traits.h"
 
@@ -102,7 +104,7 @@ void CheckNPCWidth(NPC_t& n)
     }
 }
 
-void UpdateNPCs()
+bool UpdateNPCs()
 {
     // this is 1 of the 2 clusterfuck subs in the code, be weary
 
@@ -165,6 +167,16 @@ void UpdateNPCs()
 
     double lyrX = 0; // for attaching to layers
     double lyrY = 0; // for attaching to layers
+
+    auto activation_it = NPCQueues::Active.may_insert_erase.begin();
+
+    switch(g_gameLoopInterrupt.site)
+    {
+    case GameLoopInterrupt::UpdateNPCs_Activation_Generator:
+        goto resume_Activation;
+    default:
+        break;
+    }
 
     // newAct.fill(0);
 
@@ -255,7 +267,7 @@ void UpdateNPCs()
         NPCQueues::Killed.clear();
 
         CharStuff();
-        return;
+        return false;
     }
 
 
@@ -307,11 +319,35 @@ void UpdateNPCs()
     for(int A : NPCQueues::Unchecked)
         CheckNPCWidth(NPC[A]);
 
-    int numNPCsMax = numNPCs;
+    // gets restored by resumption here
+    int numNPCsMax;
+    numNPCsMax = numNPCs;
 
     // need this complex loop syntax because Active can be modified within it
-    for(int A : NPCQueues::Active.may_erase)
+    for(; activation_it != NPCQueues::Active.may_insert_erase.end(); ++activation_it)
     {
+        int A;
+        if(true)
+        {
+            A = *activation_it;
+        }
+        else
+        {
+resume_Activation:
+            A = g_gameLoopInterrupt.A;
+            numNPCsMax = g_gameLoopInterrupt.B;
+            activation_it.last_val = A;
+            NPCQueues::Active.invalidate();
+
+            switch(g_gameLoopInterrupt.site)
+            {
+            case GameLoopInterrupt::UpdateNPCs_Activation_Generator:
+                goto resume_Activation_Generator;
+            default:
+                break;
+            }
+        }
+
         if(A > numNPCsMax)
             break;
 
@@ -349,7 +385,9 @@ void UpdateNPCs()
                     NPC[A].GeneratorActive = false;
                     if(NPC[A].GeneratorTime * 10 >= NPC[A].GeneratorTimeMax * 65)
                     {
-                        bool tempBool = false;
+                        // this is not touched after the resumption below
+                        bool tempBool;
+                        tempBool = false;
 
                         if(numNPCs == maxNPCs - 100)
                             tempBool = true;
@@ -507,10 +545,28 @@ void UpdateNPCs()
                             NPC[numNPCs].TriggerLast = NPC[A].TriggerLast;
                             NPC[numNPCs].TriggerTalk = NPC[A].TriggerTalk;
                             CheckSectionNPC(numNPCs);
+
                             if(NPC[numNPCs].TriggerActivate != EVENT_NONE)
-                                ProcEvent(NPC[numNPCs].TriggerActivate, 0);
+                            {
+                                eventindex_t resume_index;
+                                resume_index = ProcEvent_Safe(false, NPC[numNPCs].TriggerActivate, 0);
+                                while(resume_index != EVENT_NONE)
+                                {
+                                    g_gameLoopInterrupt.C = resume_index;
+                                    g_gameLoopInterrupt.site = GameLoopInterrupt::UpdateNPCs_Activation_Generator;
+                                    goto interrupt_Activation;
+
+resume_Activation_Generator:
+                                    resume_index = g_gameLoopInterrupt.C;
+                                    g_gameLoopInterrupt.site = GameLoopInterrupt::None;
+
+                                    resume_index = ProcEvent_Safe(true, resume_index, 0);
+                                }
+                            }
+
                             if(NPC[numNPCs].Type == NPCID_RANDOM_POWER)
                                 NPC[numNPCs].Type = RandomBonus();
+
                             syncLayers_NPC(numNPCs);
                             CheckNPCWidth(NPC[numNPCs]);
                         }
@@ -764,6 +820,14 @@ void UpdateNPCs()
                     NPC[A].tempBlock = numBlock;
                 }
             }
+        }
+
+        if(false)
+        {
+interrupt_Activation:
+            g_gameLoopInterrupt.A = A;
+            g_gameLoopInterrupt.B = numNPCsMax;
+            return true;
         }
     }
 
@@ -1869,4 +1933,6 @@ void UpdateNPCs()
     //        }
     //    }
     CharStuff();
+
+    return false;
 }

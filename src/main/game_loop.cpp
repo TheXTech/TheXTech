@@ -158,6 +158,8 @@ void GameLoop()
             case GameLoopInterrupt::UpdatePlayer_TriggerTalk:
             case GameLoopInterrupt::UpdatePlayer_SuperWarp:
                 goto resume_UpdatePlayer;
+            case GameLoopInterrupt::UpdateNPCs_Activation_Generator:
+                goto resume_UpdateNPCs;
             default:
                 break;
             }
@@ -280,8 +282,10 @@ void GameLoop()
         ClearTriggeredEvents();
         UpdateLayers(); // layers before/after npcs
 
+resume_UpdateNPCs:
         g_microStats.start_task(MicroStats::NPCs);
-        UpdateNPCs();
+        if(UpdateNPCs())
+            return;
 
         if(LevelMacro == LEVELMACRO_KEYHOLE_EXIT)
             return; // stop on key exit
