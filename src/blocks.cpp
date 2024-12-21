@@ -44,6 +44,7 @@
 #include "graphics/gfx_update.h"
 #include "npc/npc_queues.h"
 #include "main/trees.h"
+#include "main/game_loop_interrupt.h"
 
 
 void BlockHit(int A, bool HitDown, int whatPlayer)
@@ -861,15 +862,26 @@ void SafelyKillBlock(int A)
     iBlock[iBlocks] = A;
 }
 
-void KillBlock(int A, bool Splode)
+bool KillBlock(int A, bool Splode)
 {
     Block_t blankBlock;
     bool tempBool = false;
 
     Block_t& b = Block[A];
 
+    switch(g_gameLoopInterrupt.site)
+    {
+    case GameLoopInterrupt::UpdateBlocks_KillBlock:
+        if(g_gameLoopInterrupt.bool1)
+            goto resume_TriggerLast;
+        else
+            goto resume_TriggerDeath;
+    default:
+        break;
+    }
+
     if(Block[A].Hidden)
-        return;
+        return false;
 
     if(BattleMode && Block[A].RespawnDelay == 0)
         Block[A].RespawnDelay = 1;
@@ -909,23 +921,37 @@ void KillBlock(int A, bool Splode)
             syncLayersTrees_Block(numBlock + 1);
         }
 
-        return;
+        return false;
     }
 
     Score += 50;
 
     if(Block[A].TriggerDeath != EVENT_NONE)
     {
-        ProcEvent(Block[A].TriggerDeath, 0);
+        eventindex_t resume_index;
+        resume_index = ProcEvent_Safe(false, Block[A].TriggerDeath, 0);
+        while(resume_index != EVENT_NONE)
+        {
+            g_gameLoopInterrupt.C = resume_index;
+            g_gameLoopInterrupt.bool1 = false; // marks as TriggerDeath
+            return true;
+
+resume_TriggerDeath:
+            resume_index = g_gameLoopInterrupt.C;
+            g_gameLoopInterrupt.site = GameLoopInterrupt::None;
+
+            resume_index = ProcEvent_Safe(true, resume_index, 0);
+        }
     }
 
     if(Block[A].TriggerLast != EVENT_NONE)
     {
         tempBool = false;
 
-        int C = Block[A].Layer;
-        if(C != LAYER_NONE)
+        if(Block[A].Layer != LAYER_NONE)
         {
+            int C = Block[A].Layer;
+
             for(int npc : Layer[C].NPCs)
             {
                 if(!NPC[npc].Generator)
@@ -950,7 +976,20 @@ void KillBlock(int A, bool Splode)
 
         if(!tempBool)
         {
-            ProcEvent(Block[A].TriggerLast, 0);
+            eventindex_t resume_index;
+            resume_index = ProcEvent_Safe(false, Block[A].TriggerLast, 0);
+            while(resume_index != EVENT_NONE)
+            {
+                g_gameLoopInterrupt.C = resume_index;
+                g_gameLoopInterrupt.bool1 = true; // marks as TriggerLast
+                return true;
+
+resume_TriggerLast:
+                resume_index = g_gameLoopInterrupt.C;
+                g_gameLoopInterrupt.site = GameLoopInterrupt::None;
+
+                resume_index = ProcEvent_Safe(true, resume_index, 0);
+            }
         }
     }
 
@@ -958,6 +997,8 @@ void KillBlock(int A, bool Splode)
     Block[A].Layer = LAYER_DESTROYED_BLOCKS;
     Block[A].Kill = false;
     syncLayersTrees_Block(A);
+
+    return false;
 }
 
 void BlockFrames()
@@ -1226,11 +1267,19 @@ void BlockFrames()
     }
 }
 
-void UpdateBlocks()
+bool UpdateBlocks()
 {
     int B = 0;
     if(FreezeNPCs)
-        return;
+        return false;
+
+    switch(g_gameLoopInterrupt.site)
+    {
+    case GameLoopInterrupt::UpdateBlocks_KillBlock:
+        goto resume_iBlocks;
+    default:
+        break;
+    }
 
     BlockFrames();
 
@@ -1296,7 +1345,29 @@ void UpdateBlocks()
     int A;
     for(A = 1; A <= iBlocks; A++)
     {
+        bool is_resume;
+        if(false)
+        {
+resume_iBlocks:
+            A = g_gameLoopInterrupt.A;
+            is_resume = true;
+        }
+        else
+            is_resume = false;
+
         auto &ib = Block[iBlock[A]];
+
+        if(is_resume)
+        {
+            switch(g_gameLoopInterrupt.site)
+            {
+            case GameLoopInterrupt::UpdateBlocks_KillBlock:
+                goto resume_KillBlock;
+            default:
+                break;
+            }
+        }
+
         // Update the shake effect
         if(ib.Hidden)
         {
@@ -1426,18 +1497,34 @@ void UpdateBlocks()
 
         if(ib.Kill) // See if block should be broke
         {
-            bool just_kill_it = (ib.Kill == 9);
-            bool is_breakable_type = (ib.Type == 4 || ib.Type == 60 ||
-               ib.Type == 90 || ib.Type == 188 ||
-               ib.Type == 226 || ib.Type == 293 ||
-               ib.Type == 526); // Check to see if it is breakable
-            bool is_empty = (ib.Special == 0);
-            bool is_breakable = (is_breakable_type && is_empty);
+            bool just_kill_it, is_breakable;
+            {
+                just_kill_it = (ib.Kill == 9);
+                bool is_breakable_type = (ib.Type == 4 || ib.Type == 60 ||
+                   ib.Type == 90 || ib.Type == 188 ||
+                   ib.Type == 226 || ib.Type == 293 ||
+                   ib.Type == 526); // Check to see if it is breakable
+                bool is_empty = (ib.Special == 0);
+                is_breakable = (is_breakable_type && is_empty);
+            }
 
             ib.Kill = false;
 
             if(is_breakable || just_kill_it)
-                KillBlock(iBlock[A]); // Destroy the block
+            {
+                if(false)
+                {
+resume_KillBlock:
+                    (void)nullptr;
+                }
+
+                if(KillBlock(iBlock[A])) // Destroy the block
+                {
+                    g_gameLoopInterrupt.A = A;
+                    g_gameLoopInterrupt.site = GameLoopInterrupt::UpdateBlocks_KillBlock;
+                    return true;
+                }
+            }
         }
     }
 
@@ -1480,6 +1567,8 @@ void UpdateBlocks()
             StartMusic(Player[PSwitchPlayer].Section);
         }
     }
+
+    return false;
 }
 
 void PSwitch(bool enabled)

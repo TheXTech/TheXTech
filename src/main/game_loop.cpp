@@ -166,6 +166,8 @@ void GameLoop()
                 goto resume_UpdateNPCs;
             case GameLoopInterrupt::UpdateEvents:
                 goto resume_UpdateEvents;
+            case GameLoopInterrupt::UpdateBlocks_KillBlock:
+                goto resume_UpdateBlocks;
             default:
                 break;
             }
@@ -296,8 +298,11 @@ resume_UpdateNPCs:
         if(LevelMacro == LEVELMACRO_KEYHOLE_EXIT)
             return; // stop on key exit
 
+resume_UpdateBlocks:
         g_microStats.start_task(MicroStats::Blocks);
-        UpdateBlocks();
+        if(UpdateBlocks())
+            return;
+
         g_microStats.start_task(MicroStats::Effects);
         UpdateEffects();
 

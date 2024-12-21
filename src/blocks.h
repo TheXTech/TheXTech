@@ -37,12 +37,12 @@ void BlockShakeDown(int A);
 void BlockHitHard(int A);
 //! Safely destroy a block
 void SafelyKillBlock(int A);
-//! Unsafely destroy a block (this procedure will become private)
-void KillBlock(int A, bool Splode = true);
+//! Unsafely destroy a block; returns true if this procedure should be resumed. (this procedure will become private)
+bool KillBlock(int A, bool Splode = true);
 // update the frames for animated blocks
 void BlockFrames();
-//! Update the blocks
-void UpdateBlocks();
+//! Update the blocks; returns true if this procedure should be resumed.
+bool UpdateBlocks();
 
 //! turns all the blocks to coins and vice versa
 void PSwitch(bool enabled);

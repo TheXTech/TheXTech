@@ -36,6 +36,7 @@ struct GameLoopInterrupt
         UpdateNPCs_FreezeNPCs_KillNPC,
         UpdateNPCs_Normal_KillNPC,
         UpdateEvents,
+        UpdateBlocks_KillBlock,
     };
 
     // variables to help with resume
