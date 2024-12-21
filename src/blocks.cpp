@@ -908,57 +908,56 @@ void KillBlock(int A, bool Splode)
             syncLayersTrees_Block(A);
             syncLayersTrees_Block(numBlock + 1);
         }
+
+        return;
     }
-    else
+
+    Score += 50;
+
+    if(Block[A].TriggerDeath != EVENT_NONE)
     {
-        Score += 50;
+        ProcEvent(Block[A].TriggerDeath, 0);
+    }
 
-        if(Block[A].TriggerDeath != EVENT_NONE)
+    if(Block[A].TriggerLast != EVENT_NONE)
+    {
+        tempBool = false;
+
+        int C = Block[A].Layer;
+        if(C != LAYER_NONE)
         {
-            ProcEvent(Block[A].TriggerDeath, 0);
-        }
-
-        if(Block[A].TriggerLast != EVENT_NONE)
-        {
-            tempBool = false;
-
-            int C = Block[A].Layer;
-            if(C != LAYER_NONE)
+            for(int npc : Layer[C].NPCs)
             {
-                for(int npc : Layer[C].NPCs)
+                if(!NPC[npc].Generator)
                 {
-                    if(!NPC[npc].Generator)
-                    {
-                        tempBool = true;
-                        break;
-                    }
-                }
-
-                if(!tempBool)
-                {
-                    for(int other_block : Layer[C].blocks)
-                    {
-                        if(other_block != A)
-                        {
-                            tempBool = true;
-                            break;
-                        }
-                    }
+                    tempBool = true;
+                    break;
                 }
             }
 
             if(!tempBool)
             {
-                ProcEvent(Block[A].TriggerLast, 0);
+                for(int other_block : Layer[C].blocks)
+                {
+                    if(other_block != A)
+                    {
+                        tempBool = true;
+                        break;
+                    }
+                }
             }
         }
 
-        Block[A].Hidden = true;
-        Block[A].Layer = LAYER_DESTROYED_BLOCKS;
-        Block[A].Kill = false;
-        syncLayersTrees_Block(A);
+        if(!tempBool)
+        {
+            ProcEvent(Block[A].TriggerLast, 0);
+        }
     }
 
+    Block[A].Hidden = true;
+    Block[A].Layer = LAYER_DESTROYED_BLOCKS;
+    Block[A].Kill = false;
+    syncLayersTrees_Block(A);
 }
 
 void BlockFrames()
