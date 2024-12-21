@@ -99,12 +99,23 @@ void GameInfo::InitGameInfo()
 #   endif
 #endif
 
+    activity_settings_in_compat = false;
+
+    ResetIntroActivitySettings();
+    ResetOutroActivitySettings();
+}
+
+void GameInfo::ResetIntroActivitySettings()
+{
     introEnableActivity = true;
     introMaxPlayersCount = 6;
     introCharacters = {1, 2, 3, 4, 5};
     introCharacterCurrent = 0;
     introDeadMode = false;
+}
 
+void GameInfo::ResetOutroActivitySettings()
+{
     outroEnableActivity = true;
     outroMaxPlayersCount = 5;
     outroCharacters = {1, 2, 3, 4, 5};
@@ -169,32 +180,11 @@ void GameInfo::LoadGameInfo()
         config.endGroup();
 
         config.beginGroup("intro");
-        {
-            config.read("enable-activity", introEnableActivity, true);
-            config.read("max-players-count", introMaxPlayersCount, 6);
-            config.read("characters", introCharacters, {1, 2, 3, 4, 5});
-            introDeadMode = !introEnableActivity || introMaxPlayersCount < 1;
-        }
+        LoadIntroActivitySettings(config);
         config.endGroup();
 
         config.beginGroup("outro");
-        {
-            config.read("enable-activity", outroEnableActivity, true);
-            config.read("max-players-count", outroMaxPlayersCount, 5);
-            config.read("characters", outroCharacters, {1, 2, 3, 4, 5});
-            config.read("states", outroStates, {4, 7, 5, 3, 6});
-            config.read("mounts", outroMounts, {0, 3, 0, 1, 0});
-            config.read("auto-jump", outroAutoJump, true);
-            IniProcessing::StrEnumMap dirs
-            {
-                {"left", -1},
-                {"idle", 0},
-                {"right", +1}
-            };
-            config.readEnum("walk-direction", outroWalkDirection, -1, dirs);
-            config.read("initial-directions", outroInitialDirections, {0, 0, 0, 0, 0});
-            outroDeadMode = !outroEnableActivity || outroMaxPlayersCount < 1;
-        }
+        LoadOutroActivitySettings(config);
         config.endGroup();
 
         config.beginGroup("credits");
@@ -224,6 +214,33 @@ void GameInfo::LoadGameInfo()
         readCheats(config, cheatsLevelAliases, "cheats-level-aliases");
         readCheats(config, cheatsLevelRenames, "cheats-level-renames");
     }
+}
+
+void GameInfo::LoadIntroActivitySettings(IniProcessing& config)
+{
+    config.read("enable-activity", introEnableActivity, true);
+    config.read("max-players-count", introMaxPlayersCount, 6);
+    config.read("characters", introCharacters, {1, 2, 3, 4, 5});
+    introDeadMode = !introEnableActivity || introMaxPlayersCount < 1;
+}
+
+void GameInfo::LoadOutroActivitySettings(IniProcessing& config)
+{
+    config.read("enable-activity", outroEnableActivity, true);
+    config.read("max-players-count", outroMaxPlayersCount, 5);
+    config.read("characters", outroCharacters, {1, 2, 3, 4, 5});
+    config.read("states", outroStates, {4, 7, 5, 3, 6});
+    config.read("mounts", outroMounts, {0, 3, 0, 1, 0});
+    config.read("auto-jump", outroAutoJump, true);
+    IniProcessing::StrEnumMap dirs
+    {
+        {"left", -1},
+        {"idle", 0},
+        {"right", +1}
+    };
+    config.readEnum("walk-direction", outroWalkDirection, -1, dirs);
+    config.read("initial-directions", outroInitialDirections, {0, 0, 0, 0, 0});
+    outroDeadMode = !outroEnableActivity || outroMaxPlayersCount < 1;
 }
 
 int GameInfo::introCharacterNext()

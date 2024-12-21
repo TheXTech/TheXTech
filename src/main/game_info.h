@@ -27,10 +27,18 @@
 #include "global_constants.h"
 #include "range_arr.hpp"
 
+struct IniProcessing;
+
 struct GameInfo
 {
     void InitGameInfo();
     void LoadGameInfo();
+
+    void LoadIntroActivitySettings(IniProcessing& ini);
+    void LoadOutroActivitySettings(IniProcessing& ini);
+
+    void ResetIntroActivitySettings();
+    void ResetOutroActivitySettings();
 
     std::string title;
     // std::string titleCredits;
@@ -50,6 +58,8 @@ struct GameInfo
     int creditsFont = 4;
     std::string creditsHomePage;
     std::vector<std::string> creditsGame;
+
+    bool activity_settings_in_compat = false;
 
     bool introEnableActivity = true;
     int  introMaxPlayersCount = 6;

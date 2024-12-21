@@ -758,13 +758,6 @@ int GameMain(const CmdLineSetup_t &setup)
             for(int A = 1; A <= maxPlayers; A++)
                 Player[A] = blankPlayer;
 
-            numPlayers = g_gameInfo.outroMaxPlayersCount;
-#ifdef __16M__
-            if(numPlayers > 3)
-                numPlayers = 3;
-#endif
-            if(g_gameInfo.outroDeadMode)
-                numPlayers = 1; // Deadman mode
             GameMenu = false;
             StopMusic();
 
@@ -772,6 +765,14 @@ int GameMain(const CmdLineSetup_t &setup)
             if(!Files::fileExists(outroPath))
                 outroPath = AppPath + "outro.lvl";
             OpenLevel(outroPath);
+
+            numPlayers = g_gameInfo.outroMaxPlayersCount;
+#ifdef __16M__
+            if(numPlayers > 3)
+                numPlayers = 3;
+#endif
+            if(g_gameInfo.outroDeadMode)
+                numPlayers = 1; // Deadman mode
 
             SetupScreens();
             ClearBuffer = true;
@@ -982,14 +983,6 @@ int GameMain(const CmdLineSetup_t &setup)
             for(int A = 1; A <= maxPlayers; ++A)
                 Player[A] = blankPlayer;
 
-            numPlayers = g_gameInfo.introMaxPlayersCount;
-#ifdef __16M__
-            if(numPlayers > 3)
-                numPlayers = 3;
-#endif
-            if(g_gameInfo.introDeadMode)
-                numPlayers = 1;// one deadman should be
-
             auto introPath = findIntroLevel();
             if(introPath.empty())
             {
@@ -1007,6 +1000,14 @@ int GameMain(const CmdLineSetup_t &setup)
             Screens[0].vScreen(1).X = -level[0].X;
             Screens[0].canonical_screen().vScreen(1).X = -level[0].X;
             s_ExpandSectionForMenu();
+
+            numPlayers = g_gameInfo.introMaxPlayersCount;
+#ifdef __16M__
+            if(numPlayers > 3)
+                numPlayers = 3;
+#endif
+            if(g_gameInfo.introDeadMode)
+                numPlayers = 1;// one deadman should be
 
             if(g_config.EnableInterLevelFade)
                 g_levelScreenFader.setupFader(3, 65, 0, ScreenFader::S_FADE);
