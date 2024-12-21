@@ -791,6 +791,16 @@ bool OpenLevel_Block(void* userdata, LevelBlock& b)
         block.TriggerHit = load.FindEvent(b.event_hit);
         block.TriggerLast = load.FindEvent(b.event_emptylayer);
 
+        if((block.Type == 186 || block.Type == 457) && (block.TriggerDeath != EVENT_NONE || block.TriggerLast != EVENT_NONE))
+        {
+            const char* error_string = "Block 186 or 457 has a destroy event. TheXTech does not match SMBX 1.3 logic in this case. This content cannot be played in Vanilla mode.";
+
+            pLogWarning(error_string);
+
+            if(g_config.playstyle == Config_t::MODE_VANILLA)
+                throw callback_error(error_string);
+        }
+
         if(IF_OUTRANGE(block.Type, 0, maxBlockType)) // Drop ID to 1 for blocks of out of range IDs
         {
             pLogWarning("Block-%d ID is out of range (max types %d), reset to Block-1", block.Type, maxBlockType);

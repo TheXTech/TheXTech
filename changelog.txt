@@ -6,7 +6,7 @@ Changelog for 1.3.8-dev
 -3DS/Wii: disable partial support for loading SMBX-38A content (@ds-sloth)
 -Technical update: reduce mainloop nesting to improve engine flexibility (@ds-sloth)
 -Add experimental support for loading game/episode content from single-file archives (@ds-sloth)
--Important notice: gray and red bricks are now killed at the end of the frame they are destroyed (like other blocks). This is an intentional change to the vanilla game workflow that is required for us to support NetPlay. (@ds-sloth)
+-Important notice: gray and red bricks are now killed at the end of the frame they are destroyed (like other blocks). This is an intentional change to the game workflow that is required for us to support NetPlay. Content where these blocks have destroy / last events can no longer be loaded in Vanilla Mode. (@ds-sloth)
 
 Changelog for 1.3.7-dev
 -Fix vanilla peculiarity where medals were sometimes not collected when killed, guarded by "fix-medal-kill" [Modern Mode] (@ds-sloth, thanks to @Superbloxen for the report)
