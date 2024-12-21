@@ -367,6 +367,9 @@ endif()
 
 if(THEXTECH_NO_SDL_BUILD)
     set(THEXTECH_ENABLE_AUDIO_FX OFF CACHE BOOL "" FORCE)
+    set(MBEDISO_THREADS "NONE")
+else()
+    set(MBEDISO_THREADS "SDL2")
 endif()
 
 # ============ Platform-conf ==end=========
