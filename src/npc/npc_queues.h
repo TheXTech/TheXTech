@@ -62,6 +62,7 @@
 #include <vector>
 #include <set>
 #include "npc/safe_set.hpp"
+#include "npc_traits.h"
 
 #include "globals.h"
 
@@ -97,9 +98,14 @@ inline bool check_active_type(NPCRef_t n)
     return n->Type == NPCID_CONVEYOR || n->Type == NPCID_YEL_PLATFORM || n->Type == NPCID_BLU_PLATFORM || n->Type == NPCID_GRN_PLATFORM || n->Type == NPCID_RED_PLATFORM;
 }
 
+inline bool check_exclude_vine(NPCRef_t n)
+{
+    return (*n)->IsAVine && !((*n)->IsABlock || (*n)->IsAHit1Block || (*n)->CanWalkOn);
+}
+
 inline bool check_active(NPCRef_t n)
 {
-    return n->Active || n->Generator || n->JustActivated || check_active_type(n) || (n->AttLayer != LAYER_NONE && n->AttLayer != LAYER_DEFAULT);
+    return (n->Active && !check_exclude_vine(n)) || n->Generator || n->JustActivated || check_active_type(n) || (n->AttLayer != LAYER_NONE && n->AttLayer != LAYER_DEFAULT);
 }
 
 void clear();

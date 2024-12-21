@@ -985,6 +985,10 @@ void UpdateNPCs()
 
             if(NPC[A].Type == NPCID_CANNONITEM)
                 NPC[A].Projectile = false;
+
+            // this allows us to exclude Vines from the set of active NPCs (without checking their status every frame if they do need to be active)
+            if(NPC[A]->IsAVine)
+                NPCQueues::update(NPC[A]);
         }
         // check for active NPCs that are falling off
         else if(NPC[A].Location.Y > level[NPC[A].Section].Height && NPC[A].Location.Y > level[NPC[A].Section].Height + 16)
@@ -1003,10 +1007,12 @@ void UpdateNPCs()
         {
             // .Location.SpeedX = 0
             // .Location.SpeedY = 0
-            if(NPC[A].Type == NPCID_GRN_VINE_S3 || NPC[A].Type == NPCID_RED_VINE_S3)
-                NPC[A].Frame = BlockFrame[5];
-            else if(NPC[A].Type >= NPCID_GRN_VINE_S2 && NPC[A].Type <= NPCID_BLU_VINE_BASE_S2)
-                NPC[A].Frame = SpecialFrame[7];
+
+            // moved into UpdateGraphicsLogic, now only applies to visible vines
+            // if(NPC[A].Type == NPCID_GRN_VINE_S3 || NPC[A].Type == NPCID_RED_VINE_S3)
+            //     NPC[A].Frame = BlockFrame[5];
+            // else if(NPC[A].Type >= NPCID_GRN_VINE_S2 && NPC[A].Type <= NPCID_BLU_VINE_BASE_S2)
+            //     NPC[A].Frame = SpecialFrame[7];
         }
 /////////////// BEGIN ACTIVE CODE /////////////////////////////////////////////////////////////
         else if(NPC[A].Active && NPC[A].Killed == 0 && !NPC[A].Generator)
