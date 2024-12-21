@@ -19,6 +19,7 @@ Changelog for 1.3.7-dev
 -TheXTech-exclusive events are now processed at the end of the frame they are triggered in (@ds-sloth)
 -Fix TheXTech 1.3.1 inaccuracy where a vanilla bug failed to replicate. This bug caused a pending event to be overwritten when two events triggered in a single frame. The bugfix now has compat flag "fix-event-swap-bug" (@ds-sloth)
 -Improve the performance of levels with many climbable NPCs (@ds-sloth)
+-Move the `[intro]` and `[outro]` sections of `gameinfo.ini` to `[activity-setup]` in the `compat.ini` file for the intro/outro levels, for per-level configuration of these settings. Setting the fields via `gameinfo.ini` is deprecated and will be removed during the v1.3.7.x series. (@ds-sloth, @Wohlstand)
 
 Changelog for 1.3.7-beta
 -Add ability to trigger event layer smoke in the in-game editor (@ds-sloth)
