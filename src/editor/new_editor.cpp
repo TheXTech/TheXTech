@@ -3320,8 +3320,17 @@ void EditorScreen::UpdateBlockScreen(CallMode mode)
     // Events
     SuperPrintRightR(mode, g_editorStrings.eventsHeader, 3, e_ScreenW - 40, 334);
     SuperPrintR(mode, g_editorStrings.eventsLetterHit + GetE(EditorCursor.Block.TriggerHit), 3, e_ScreenW - 160, 360);
-    SuperPrintR(mode, g_editorStrings.eventsLetterDestroy + GetE(EditorCursor.Block.TriggerDeath), 3, e_ScreenW - 160, 380);
-    SuperPrintR(mode, g_editorStrings.eventsLetterLayerClear + GetE(EditorCursor.Block.TriggerLast), 3, e_ScreenW - 160, 400);
+
+    if(EditorCursor.Block.Type != 186 && EditorCursor.Block.Type != 457)
+    {
+        SuperPrintR(mode, g_editorStrings.eventsLetterDestroy + GetE(EditorCursor.Block.TriggerDeath), 3, e_ScreenW - 160, 380);
+        SuperPrintR(mode, g_editorStrings.eventsLetterLayerClear + GetE(EditorCursor.Block.TriggerLast), 3, e_ScreenW - 160, 400);
+    }
+    else
+    {
+        EditorCursor.Block.TriggerDeath = EVENT_NONE;
+        EditorCursor.Block.TriggerLast = EVENT_NONE;
+    }
 
     if(UpdateButton(mode, e_ScreenW - 40 + 4, 320 + 4, GFX.EIcons, false, 0, 32*Icon::subscreen, 32, 32))
         m_special_page = SPECIAL_PAGE_OBJ_TRIGGERS;
