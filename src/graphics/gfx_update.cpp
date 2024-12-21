@@ -353,6 +353,15 @@ public:
             BG[BG_n] = A;
             BG_n += 1;
             g_stats.renderedNPCs += 1;
+
+            // vine frames (moved from UpdateNPCs)
+            if(NPC[A]->IsAVine)
+            {
+                if(NPC[A].Type == NPCID_GRN_VINE_S3 || NPC[A].Type == NPCID_RED_VINE_S3)
+                    NPC[A].Frame = BlockFrame[5];
+                else if(NPC[A].Type >= NPCID_GRN_VINE_S2 && NPC[A].Type <= NPCID_BLU_VINE_BASE_S2)
+                    NPC[A].Frame = SpecialFrame[7];
+            }
         }
         else if(NPC[A].Effect == NPCEFF_NORMAL && NPC[A].HoldingPlayer == 0)
         {

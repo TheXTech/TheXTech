@@ -2091,9 +2091,9 @@ public:
             {
                 memToValue(n.Active, in, ftype);
 
-                if(n.Active)
+                if(NPCQueues::check_active(n))
                     NPCQueues::Active.insert(n);
-                else if(!NPCQueues::check_active(n))
+                else
                 {
                     NPCQueues::Active.erase(n);
                     NPCQueues::Unchecked.push_back(n);
