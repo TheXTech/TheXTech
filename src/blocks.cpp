@@ -1267,6 +1267,8 @@ void BlockFrames()
     }
 }
 
+bool PSwitch(bool enabled);
+
 bool UpdateBlocks()
 {
     int B = 0;
@@ -1278,6 +1280,10 @@ bool UpdateBlocks()
     case GameLoopInterrupt::UpdateBlocks_KillBlock:
     case GameLoopInterrupt::UpdateBlocks_TriggerHit:
         goto resume_iBlocks;
+    case GameLoopInterrupt::UpdateBlocks_SwitchOn:
+        goto resume_SwitchOn;
+    case GameLoopInterrupt::UpdateBlocks_SwitchOff:
+        goto resume_SwitchOff;
     default:
         break;
     }
@@ -1571,7 +1577,9 @@ resume_KillBlock:
             else
                 PlaySound(SFX_PSwitch);
 
-            PSwitch(true);
+resume_SwitchOn:
+            if(PSwitch(true))
+                return true;
         }
 
         PSwitchTime--;
@@ -1581,7 +1589,10 @@ resume_KillBlock:
 
         if(PSwitchTime <= 1)
         {
-            PSwitch(false);
+resume_SwitchOff:
+            if(PSwitch(false))
+                return true;
+
             StopMusic();
             StartMusic(Player[PSwitchPlayer].Section);
         }
@@ -1590,11 +1601,21 @@ resume_KillBlock:
     return false;
 }
 
-void PSwitch(bool enabled)
+bool PSwitch(bool enabled)
 {
     int A = 0;
     // int B = 0;
     Block_t blankBlock;
+    eventindex_t resume_index = EVENT_NONE;
+
+    switch(g_gameLoopInterrupt.site)
+    {
+    case GameLoopInterrupt::UpdateBlocks_SwitchOn:
+    case GameLoopInterrupt::UpdateBlocks_SwitchOff:
+        goto resume_ProcEvent;
+    default:
+        break;
+    }
 
     if(enabled)
     {
@@ -1731,7 +1752,7 @@ void PSwitch(bool enabled)
             }
         }
 
-        ProcEvent(EVENT_PSWITCH_START, 0, true);
+        resume_index = ProcEvent_Safe(false, EVENT_PSWITCH_START, 0, true);
     }
     else
     {
@@ -1827,7 +1848,20 @@ void PSwitch(bool enabled)
             }
         }
 
-        ProcEvent(EVENT_PSWITCH_END, 0, true);
+        resume_index = ProcEvent_Safe(false, EVENT_PSWITCH_END, 0, true);
+    }
+
+    while(resume_index != EVENT_NONE)
+    {
+        g_gameLoopInterrupt.C = resume_index;
+        g_gameLoopInterrupt.site = (enabled) ? GameLoopInterrupt::UpdateBlocks_SwitchOn : GameLoopInterrupt::UpdateBlocks_SwitchOff;
+        return true;
+
+resume_ProcEvent:
+        resume_index = g_gameLoopInterrupt.C;
+        g_gameLoopInterrupt.site = GameLoopInterrupt::None;
+
+        resume_index = ProcEvent_Safe(true, resume_index, 0, true);
     }
 
     // qSortBlocksX(1, numBlock);
@@ -1878,6 +1912,8 @@ void PSwitch(bool enabled)
     }
 
     resetFrameTimer();
+
+    return false;
 }
 
 void PowBlock()

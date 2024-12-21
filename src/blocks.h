@@ -44,8 +44,8 @@ void BlockFrames();
 //! Update the blocks; returns true if this procedure should be resumed.
 bool UpdateBlocks();
 
-//! turns all the blocks to coins and vice versa
-void PSwitch(bool enabled);
+//! turns all the blocks to coins and vice versa (now private)
+// bool PSwitch(bool enabled);
 //! drops coins and shakes all blocks on screen when player throws a POW block
 void PowBlock();
 
