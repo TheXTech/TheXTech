@@ -170,6 +170,7 @@ void GameLoop()
             case GameLoopInterrupt::UpdateBlocks_TriggerHit:
             case GameLoopInterrupt::UpdateBlocks_SwitchOn:
             case GameLoopInterrupt::UpdateBlocks_SwitchOff:
+            case GameLoopInterrupt::UpdateBlocks_SwitchOff_KillBlock:
                 goto resume_UpdateBlocks;
             default:
                 break;

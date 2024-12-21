@@ -40,6 +40,7 @@ struct GameLoopInterrupt
         UpdateBlocks_TriggerHit,
         UpdateBlocks_SwitchOn,
         UpdateBlocks_SwitchOff,
+        UpdateBlocks_SwitchOff_KillBlock,
     };
 
     // variables to help with resume

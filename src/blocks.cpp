@@ -872,6 +872,7 @@ bool KillBlock(int A, bool Splode)
     switch(g_gameLoopInterrupt.site)
     {
     case GameLoopInterrupt::UpdateBlocks_KillBlock:
+    case GameLoopInterrupt::UpdateBlocks_SwitchOff_KillBlock:
         if(g_gameLoopInterrupt.bool1)
             goto resume_TriggerLast;
         else
@@ -1283,6 +1284,7 @@ bool UpdateBlocks()
     case GameLoopInterrupt::UpdateBlocks_SwitchOn:
         goto resume_SwitchOn;
     case GameLoopInterrupt::UpdateBlocks_SwitchOff:
+    case GameLoopInterrupt::UpdateBlocks_SwitchOff_KillBlock:
         goto resume_SwitchOff;
     default:
         break;
@@ -1613,6 +1615,8 @@ bool PSwitch(bool enabled)
     case GameLoopInterrupt::UpdateBlocks_SwitchOn:
     case GameLoopInterrupt::UpdateBlocks_SwitchOff:
         goto resume_ProcEvent;
+    case GameLoopInterrupt::UpdateBlocks_SwitchOff_KillBlock:
+        goto resume_KillBlock;
     default:
         break;
     }
@@ -1803,7 +1807,10 @@ bool PSwitch(bool enabled)
         {
             if(Block[A].coinSwitchNpcType > 0 && !Block[A].Hidden)
             {
-                if(numNPCs < maxNPCs)
+                if(numNPCs >= maxNPCs)
+                    break;
+
+                // scoping nn
                 {
                     numNPCs++;
                     auto &nn = NPC[numNPCs];
@@ -1836,15 +1843,25 @@ bool PSwitch(bool enabled)
                     syncLayers_NPC(numNPCs);
                     CheckSectionNPC(numNPCs);
                     nn.Killed = 0;
-
-                    KillBlock(A, false);
-                    Block[A].Layer = LAYER_USED_P_SWITCH;
-                    syncLayersTrees_Block(A);
-                    // this is as close to a permanent death as blocks get in the game,
-                    // because this layer usually doesn't exist
                 }
-                else
-                    break;
+
+                if(false)
+                {
+resume_KillBlock:
+                    A = g_gameLoopInterrupt.A;
+                }
+
+                if(KillBlock(A, false))
+                {
+                    g_gameLoopInterrupt.A = A;
+                    g_gameLoopInterrupt.site = GameLoopInterrupt::UpdateBlocks_SwitchOff_KillBlock;
+                    return true;
+                }
+
+                Block[A].Layer = LAYER_USED_P_SWITCH;
+                syncLayersTrees_Block(A);
+                // this is as close to a permanent death as blocks get in the game,
+                // because this layer usually doesn't exist
             }
         }
 
