@@ -1276,6 +1276,7 @@ bool UpdateBlocks()
     switch(g_gameLoopInterrupt.site)
     {
     case GameLoopInterrupt::UpdateBlocks_KillBlock:
+    case GameLoopInterrupt::UpdateBlocks_TriggerHit:
         goto resume_iBlocks;
     default:
         break;
@@ -1363,6 +1364,8 @@ resume_iBlocks:
             {
             case GameLoopInterrupt::UpdateBlocks_KillBlock:
                 goto resume_KillBlock;
+            case GameLoopInterrupt::UpdateBlocks_TriggerHit:
+                goto resume_TriggerHit;
             default:
                 break;
             }
@@ -1406,7 +1409,23 @@ resume_iBlocks:
                 || ib.ShakeCounter == SHAKE_DOWNUP12_MID)
             {
                 if(ib.TriggerHit != EVENT_NONE)
-                    ProcEvent(ib.TriggerHit, 0);
+                {
+                    eventindex_t resume_index;
+                    resume_index = ProcEvent_Safe(false, ib.TriggerHit, 0);
+                    while(resume_index != EVENT_NONE)
+                    {
+                        g_gameLoopInterrupt.C = resume_index;
+                        g_gameLoopInterrupt.A = A;
+                        g_gameLoopInterrupt.site = GameLoopInterrupt::UpdateBlocks_TriggerHit;
+                        return true;
+
+resume_TriggerHit:
+                        resume_index = g_gameLoopInterrupt.C;
+                        g_gameLoopInterrupt.site = GameLoopInterrupt::None;
+
+                        resume_index = ProcEvent_Safe(true, resume_index, 0);
+                    }
+                }
 
                 // on/off block
                 if(ib.Type == 282)
