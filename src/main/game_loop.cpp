@@ -172,12 +172,47 @@ void GameLoop()
             case GameLoopInterrupt::UpdateBlocks_SwitchOff:
             case GameLoopInterrupt::UpdateBlocks_SwitchOff_KillBlock:
                 goto resume_UpdateBlocks;
+            case GameLoopInterrupt::IntroEvents:
+                goto resume_IntroEvents;
             default:
                 break;
             }
         }
 
         return;
+    }
+
+    if(g_gameLoopInterrupt.process_intro_events)
+    {
+        int A;
+        for(A = 0; A <= maxEvents; ++A)
+        {
+            // excluded in SMBX 1.3
+            if(A == 1)
+                continue;
+
+            if(A == EVENT_LEVEL_START || Events[A].AutoStart)
+            {
+                eventindex_t resume_index;
+                resume_index = ProcEvent_Safe(false, A, 0, true);
+                while(resume_index != EVENT_NONE)
+                {
+                    g_gameLoopInterrupt.A = A;
+                    g_gameLoopInterrupt.C = resume_index;
+                    g_gameLoopInterrupt.site = GameLoopInterrupt::IntroEvents;
+                    return;
+
+resume_IntroEvents:
+                    A = g_gameLoopInterrupt.A;
+                    resume_index = g_gameLoopInterrupt.C;
+                    g_gameLoopInterrupt.site = GameLoopInterrupt::None;
+
+                    resume_index = ProcEvent_Safe(true, resume_index, 0, true);
+                }
+            }
+        }
+
+        g_gameLoopInterrupt.process_intro_events = false;
     }
 
     g_microStats.start_task(MicroStats::Script);

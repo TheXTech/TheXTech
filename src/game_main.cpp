@@ -98,6 +98,7 @@
 #include "main/screen_connect.h"
 #include "main/screen_quickreconnect.h"
 #include "main/screen_asset_pack.h"
+#include "main/game_loop_interrupt.h"
 
 #include "main/level_medals.h"
 
@@ -1472,12 +1473,8 @@ int GameMain(const CmdLineSetup_t &setup)
 
                 delayedMusicStart(); // Allow music being started
 
-                ProcEvent(EVENT_LEVEL_START, 0, true);
-                for(int A = 2; A <= maxEvents; ++A)
-                {
-                    if(Events[A].AutoStart)
-                        ProcEvent(A, 0, true);
-                }
+                // intro events previously processed directly here
+                g_gameLoopInterrupt.process_intro_events = true;
 
                 // MAIN GAME LOOP
                 runFrameLoop(nullptr, &GameLoop,

@@ -27,6 +27,7 @@ struct GameLoopInterrupt
     enum Site
     {
         None = 0,
+        IntroEvents,
         UpdatePlayer_MessageNPC,
         UpdatePlayer_TriggerTalk,
         UpdatePlayer_SuperWarp,
@@ -47,6 +48,7 @@ struct GameLoopInterrupt
     Site site = None;
     int A, B, C, D, E, F, G;
     bool bool1, bool2, bool3, bool4;
+    bool process_intro_events = false;
 };
 
 extern GameLoopInterrupt g_gameLoopInterrupt;
