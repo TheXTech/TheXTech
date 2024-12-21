@@ -268,6 +268,32 @@ void LoadCustomConfig()
         IniProcessing ini = Files::load_ini(customCompat);
         g_config_file_creator.LoadLegacyCompat(&ini, ConfigSetLevel::file_compat);
         g_config_file_creator.UpdateFromIni(&ini, ConfigSetLevel::file_compat);
+
+        // pass activity-setup keys to GameInfo
+        if(ini.contains("activity-setup") || g_gameInfo.activity_settings_in_compat)
+        {
+            ini.beginGroup("activity-setup");
+
+            bool activity_settings_in_compat = true;
+
+            if(GameOutro)
+                g_gameInfo.LoadOutroActivitySettings(ini);
+            else if(GameMenu)
+                g_gameInfo.LoadIntroActivitySettings(ini);
+            else
+                activity_settings_in_compat = false;
+
+            g_gameInfo.activity_settings_in_compat |= activity_settings_in_compat;
+
+            ini.endGroup();
+        }
+    }
+    else if(g_gameInfo.activity_settings_in_compat)
+    {
+        if(GameOutro)
+            g_gameInfo.ResetOutroActivitySettings();
+        else if(GameMenu)
+            g_gameInfo.ResetIntroActivitySettings();
     }
 
     UpdateConfig();
