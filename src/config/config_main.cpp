@@ -241,6 +241,28 @@ void Options_t::make_translation(XTechTranslate& translate)
     }
 }
 
+static void s_GameInfoActivitySetup(IniProcessing& ini)
+{
+    if(ini.contains("activity-setup") && (GameOutro || GameMenu))
+    {
+        if(!g_gameInfo.activity_settings_in_compat)
+        {
+            g_gameInfo.ResetIntroActivitySettings();
+            g_gameInfo.ResetOutroActivitySettings();
+            g_gameInfo.activity_settings_in_compat = true;
+        }
+
+        ini.beginGroup("activity-setup");
+
+        if(GameOutro)
+            g_gameInfo.LoadOutroActivitySettings(ini);
+        else if(GameMenu)
+            g_gameInfo.LoadIntroActivitySettings(ini);
+
+        ini.endGroup();
+    }
+}
+
 void LoadCustomConfig()
 {
     std::string episodeCompat, customCompat, episodeConfig, customConfig, userEpConfig;
@@ -256,11 +278,20 @@ void LoadCustomConfig()
     // Level-wide custom creator setup
     customCompat = g_dirCustom.resolveFileCaseExistsAbs("compat.ini");
 
+    if(g_gameInfo.activity_settings_in_compat)
+    {
+        g_gameInfo.ResetIntroActivitySettings();
+        g_gameInfo.ResetOutroActivitySettings();
+    }
+
     if(!episodeCompat.empty())
     {
         IniProcessing ini = Files::load_ini(episodeCompat);
         g_config_episode_creator.LoadLegacyCompat(&ini, ConfigSetLevel::ep_compat);
         g_config_episode_creator.UpdateFromIni(&ini, ConfigSetLevel::ep_compat);
+
+        // pass activity-setup keys to GameInfo
+        s_GameInfoActivitySetup(ini);
     }
 
     if(!customCompat.empty())
@@ -270,23 +301,7 @@ void LoadCustomConfig()
         g_config_file_creator.UpdateFromIni(&ini, ConfigSetLevel::file_compat);
 
         // pass activity-setup keys to GameInfo
-        if(ini.contains("activity-setup") || g_gameInfo.activity_settings_in_compat)
-        {
-            ini.beginGroup("activity-setup");
-
-            bool activity_settings_in_compat = true;
-
-            if(GameOutro)
-                g_gameInfo.LoadOutroActivitySettings(ini);
-            else if(GameMenu)
-                g_gameInfo.LoadIntroActivitySettings(ini);
-            else
-                activity_settings_in_compat = false;
-
-            g_gameInfo.activity_settings_in_compat |= activity_settings_in_compat;
-
-            ini.endGroup();
-        }
+        s_GameInfoActivitySetup(ini);
     }
     else if(g_gameInfo.activity_settings_in_compat)
     {
