@@ -218,28 +218,28 @@ void GameInfo::LoadGameInfo()
 
 void GameInfo::LoadIntroActivitySettings(IniProcessing& config)
 {
-    config.read("enable-activity", introEnableActivity, true);
-    config.read("max-players-count", introMaxPlayersCount, 6);
-    config.read("characters", introCharacters, {1, 2, 3, 4, 5});
+    config.read("enable-activity", introEnableActivity, introEnableActivity);
+    config.read("max-players-count", introMaxPlayersCount, introMaxPlayersCount);
+    config.read("characters", introCharacters, introCharacters);
     introDeadMode = !introEnableActivity || introMaxPlayersCount < 1;
 }
 
 void GameInfo::LoadOutroActivitySettings(IniProcessing& config)
 {
-    config.read("enable-activity", outroEnableActivity, true);
-    config.read("max-players-count", outroMaxPlayersCount, 5);
-    config.read("characters", outroCharacters, {1, 2, 3, 4, 5});
-    config.read("states", outroStates, {4, 7, 5, 3, 6});
-    config.read("mounts", outroMounts, {0, 3, 0, 1, 0});
-    config.read("auto-jump", outroAutoJump, true);
+    config.read("enable-activity", outroEnableActivity, outroEnableActivity);
+    config.read("max-players-count", outroMaxPlayersCount, outroMaxPlayersCount);
+    config.read("characters", outroCharacters, outroCharacters);
+    config.read("states", outroStates, outroStates);
+    config.read("mounts", outroMounts, outroMounts);
+    config.read("auto-jump", outroAutoJump, outroAutoJump);
     IniProcessing::StrEnumMap dirs
     {
         {"left", -1},
         {"idle", 0},
         {"right", +1}
     };
-    config.readEnum("walk-direction", outroWalkDirection, -1, dirs);
-    config.read("initial-directions", outroInitialDirections, {0, 0, 0, 0, 0});
+    config.readEnum("walk-direction", outroWalkDirection, outroWalkDirection, dirs);
+    config.read("initial-directions", outroInitialDirections, outroInitialDirections);
     outroDeadMode = !outroEnableActivity || outroMaxPlayersCount < 1;
 }
 
