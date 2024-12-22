@@ -303,13 +303,6 @@ void LoadCustomConfig()
         // pass activity-setup keys to GameInfo
         s_GameInfoActivitySetup(ini);
     }
-    else if(g_gameInfo.activity_settings_in_compat)
-    {
-        if(GameOutro)
-            g_gameInfo.ResetOutroActivitySettings();
-        else if(GameMenu)
-            g_gameInfo.ResetIntroActivitySettings();
-    }
 
     UpdateConfig();
 }
