@@ -99,6 +99,9 @@ void GameInfo::InitGameInfo()
 #   endif
 #endif
 
+    disableTwoPlayer = false;
+    disableBattleMode = false;
+
     activity_settings_in_compat = false;
 
     ResetIntroActivitySettings();
@@ -126,8 +129,6 @@ void GameInfo::ResetOutroActivitySettings()
     outroWalkDirection = -1;
     outroAutoJump = true;
     outroDeadMode = false;
-    disableTwoPlayer = false;
-    disableBattleMode = false;
 }
 
 void GameInfo::LoadGameInfo()
