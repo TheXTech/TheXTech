@@ -292,7 +292,7 @@ void SetupCredits()
 #endif
     AddCredit("");
     AddCredit(g_outroScreen.nameAndrewSpinks);
-    AddCredit("'Redigit'");
+    AddCredit("'Redigit'"); // Author of original VB6 Engine (2009-2011)
     AddCredit("");
     AddCredit("");
 #ifndef ENABLE_OLD_CREDITS
@@ -306,7 +306,7 @@ void SetupCredits()
     AddCredit("");
     AddCredit(g_outroScreen.qualityControl);
     AddCredit("");
-    AddCredit("0lhi"); // Significant contribution to TheXTech development, testing, improvement process
+    AddCredit("0lhi"); // Significant contribution to TheXTech development, testing, improvement process (2021-2024)
     AddCredit("");
     AddCredit("");
 #endif
@@ -357,7 +357,7 @@ void SetupCredits()
     AddCredit("Yingchun Soul"); // Idea for individual iceball shooting SFX and contribution with the "frozen NPC breaking" SFX
     AddCredit("MrDoubleA"); // Contribution with the "NPC got frozen" SFX
     AddCredit("Slash-18"); // Contribution with the better iceball shooting SFX
-    AddCredit("Eclipsed"); // For the help to verify and polish the speed-run mode
+    AddCredit("Eclipsed"); // For the help to verify and polish the speed-run mode (2021)
     AddCredit("RunninPigeon"); // For Nintendo Switch alpha testing on hardware (Formerly "ThatRoadRunnerfan727 (Matthew)")
     AddCredit("RMN Community"); // For Quality Episodes that allowed us to refine the Engine
     AddCredit("Savby"); // For important design work on the character select screen (ConnectScreen)
