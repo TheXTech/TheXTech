@@ -1650,6 +1650,16 @@ void CheckSection(const int A)
                                     }
                                 }
                             }
+
+#ifdef PGE_MIN_PORT
+                            // unload old background when changing sections (this helps prevent texture memory exhaustion)
+                            if(numPlayers == 1 && oldSection >= 0 && Background2[oldSection] != Background2[p.Section])
+                            {
+                                // (note: GFXBackground2 doesn't always line up exactly with Background2, but this solution still helps)
+                                XRender::unloadTexture(GFXBackground2[oldSection]);
+                            }
+#endif
+
                             break;
                         }
                     }
