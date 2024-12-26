@@ -1229,9 +1229,13 @@ bool mainMenuUpdate()
                 {
                     // writing to m_value to avoid extra UpdateConfig hook
                     g_config.playstyle.m_value = s_episode_playstyle;
+                    g_config.playstyle.m_set = ConfigSetLevel::ep_config;
 
                     if(g_config.speedrun_mode.m_set != ConfigSetLevel::cmdline)
+                    {
                         g_config.speedrun_mode.m_value = s_episode_speedrun_mode;
+                        g_config.speedrun_mode.m_set = ConfigSetLevel::ep_config;
+                    }
 
                     MenuCursor = 0;
                     StartEpisode();
