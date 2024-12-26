@@ -88,14 +88,14 @@ void DrawTopAnchoredBackground(int S, int Z, int A, int offset = 32, int expecte
     }
 }
 
-void DrawCenterAnchoredBackground(int S, int Z, int A, int expected_height = 0, int tile_bottom = 0, int tile_top = 0, bool flip_tile = false, double h_parallax = 0.5, bool anim = false)
+void DrawCenterAnchoredBackground(int S, int Z, int A, int expected_height = 0, int tile_bottom = 0, int tile_top = 0, bool flip_tile = false, int h_num = 1, int h_den = 2, bool anim = false)
 {
     const Screen_t& screen = Screens[vScreen[Z].screen_ref];
-    double camX = vScreen[Z].CameraAddX();
-    double camY = vScreen[Z].CameraAddY();
+    int camX = vScreen[Z].CameraAddX();
+    int camY = vScreen[Z].CameraAddY();
 
-    double Eff_ScreenH = vScreen[Z].Height;
-    double Eff_Top = 0;
+    int Eff_ScreenH = vScreen[Z].Height;
+    int Eff_Top = 0;
     if(screen.Type == ScreenTypes::Dynamic)
     {
         Eff_Top = vScreen[Z].Top;
@@ -116,21 +116,21 @@ void DrawCenterAnchoredBackground(int S, int Z, int A, int expected_height = 0, 
             no_tiling = true;
     }
 
-    double frameH = GFXBackground2Height[A];
+    int frameH = GFXBackground2Height[A];
     // HACK: align non-rounded pictures (there was Redigit's original with the 3455 pixels height,
     // but it must be 3456. There are lot of custom resources that using the 3455 height by mistake)
     // in the original image, the fourth frame is missing its top line.
     if(A == 42 && GFXBackground2Height[A] == expected_height - 1 && anim)
     {
-        frameH = expected_height / 4.0;
+        frameH = expected_height / 4;
     }
     else if(anim)
     {
-        frameH = GFXBackground2Height[A] / 4.0;
+        frameH = GFXBackground2Height[A] / 4;
     }
 
-    double CanvasH = frameH;
-    double CanvasOffset = 0;
+    int CanvasH = frameH;
+    int CanvasOffset = 0;
 
     // ensure that the canvas covers above and below the screen
     if(Eff_ScreenH > CanvasH)
@@ -141,14 +141,22 @@ void DrawCenterAnchoredBackground(int S, int Z, int A, int expected_height = 0, 
 
     Location_t tempLocation;
 
-    int horiz_reps = (level[S].Width - level[S].X + screen.W / h_parallax) / GFXBackground2Width[A] * h_parallax + 1;
+    int levelX = SDL_round(level[S].X);
 
-    for(int B = 0; B <= horiz_reps; B++)
+    int camX_levelX = camX + levelX;
+    int Left = vScreen[Z].Left;
+
+    int offsetX = (camX_levelX * (h_den - h_num) - Left * h_num) / h_den;
+
+    for(; offsetX < vScreen[Z].Width; offsetX += GFXBackground2Width[A])
     {
+        if(offsetX + GFXBackground2Width[A] <= 0)
+            continue;
+
         tempLocation.Width = GFXBackground2Width[A];
         tempLocation.Height = frameH;
 
-        tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (camX + vScreen[Z].Left + level[S].X) * h_parallax);
+        tempLocation.X = offsetX;
         if(level[S].Height - level[S].Y > CanvasH)
         {
             // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - (600 - vScreen(Z).Top)) * (GFXBackground2Height(A) / 4 - (600 - vScreen(Z).Top))
@@ -166,22 +174,20 @@ void DrawCenterAnchoredBackground(int S, int Z, int A, int expected_height = 0, 
 
         double bottom_Y = tempLocation.Y + frameH;
         unsigned int flip = X_FLIP_NONE;
-        while(tempLocation.X + tempLocation.Width > -camX
-            && tempLocation.X < -camX + vScreen[Z].Width
-            && tempLocation.Y + tempLocation.Height > -camY)
+        while(tempLocation.Y + tempLocation.Height > -camY)
         {
             // HACK: place the fourth frame in the correct location if we are missing a single line
             if(A == 42 && GFXBackground2Height[A] == expected_height - 1 && anim && SpecialFrame[3] == 3)
             {
                 // duplicate the line
-                XRender::renderTextureScaleEx(camX + tempLocation.X, camY + tempLocation.Y,
+                XRender::renderTextureScaleEx(tempLocation.X, camY + tempLocation.Y,
                     GFXBackground2Width[A], 1,
                     GFXBackground2[A],
                     0, frameH * SpecialFrame[3],
                     GFXBackground2Width[A], 1,
                     0., nullptr, flip);
                 // draw the frame
-                XRender::renderTextureScaleEx(camX + tempLocation.X, camY + tempLocation.Y + 1,
+                XRender::renderTextureScaleEx(tempLocation.X, camY + tempLocation.Y + 1,
                     GFXBackground2Width[A], tempLocation.Height - 1,
                     GFXBackground2[A],
                     0, frameH * SpecialFrame[3],
@@ -190,7 +196,7 @@ void DrawCenterAnchoredBackground(int S, int Z, int A, int expected_height = 0, 
             }
             else if(anim)
             {
-                XRender::renderTextureScaleEx(camX + tempLocation.X, camY + tempLocation.Y,
+                XRender::renderTextureScaleEx(tempLocation.X, camY + tempLocation.Y,
                     GFXBackground2Width[A], tempLocation.Height,
                     GFXBackground2[A],
                     0, frameH * SpecialFrame[3],
@@ -199,7 +205,7 @@ void DrawCenterAnchoredBackground(int S, int Z, int A, int expected_height = 0, 
             }
             else
             {
-                XRender::renderTextureScaleEx(camX + tempLocation.X, camY + tempLocation.Y,
+                XRender::renderTextureScaleEx(tempLocation.X, camY + tempLocation.Y,
                     GFXBackground2Width[A], tempLocation.Height,
                     GFXBackground2[A],
                     0, 0,
@@ -230,14 +236,12 @@ void DrawCenterAnchoredBackground(int S, int Z, int A, int expected_height = 0, 
         if(flip_tile)
             flip = X_FLIP_VERTICAL;
 
-        while(tempLocation.X + tempLocation.Width > -camX
-            && tempLocation.X < -camX + vScreen[Z].Width
-            && tempLocation.Y < -camY + vScreen[Z].Height)
+        while(tempLocation.Y < -camY + vScreen[Z].Height)
         {
             // HACK: use the smaller frame size if we are missing a single line
             if(A == 42 && GFXBackground2Height[A] == expected_height - 1 && anim && SpecialFrame[3] == 3)
             {
-                XRender::renderTextureScaleEx(camX + tempLocation.X, camY + tempLocation.Y,
+                XRender::renderTextureScaleEx(tempLocation.X, camY + tempLocation.Y,
                     GFXBackground2Width[A], tempLocation.Height,
                     GFXBackground2[A],
                     0, frameH * SpecialFrame[3] + (frameH - 1) - tempLocation.Height,
@@ -246,7 +250,7 @@ void DrawCenterAnchoredBackground(int S, int Z, int A, int expected_height = 0, 
             }
             else if(anim)
             {
-                XRender::renderTextureScaleEx(camX + tempLocation.X, camY + tempLocation.Y,
+                XRender::renderTextureScaleEx(tempLocation.X, camY + tempLocation.Y,
                     GFXBackground2Width[A], tempLocation.Height,
                     GFXBackground2[A],
                     0, frameH * SpecialFrame[3] + frameH - tempLocation.Height,
@@ -255,7 +259,7 @@ void DrawCenterAnchoredBackground(int S, int Z, int A, int expected_height = 0, 
             }
             else
             {
-                XRender::renderTextureScaleEx(camX + tempLocation.X, camY + tempLocation.Y,
+                XRender::renderTextureScaleEx(tempLocation.X, camY + tempLocation.Y,
                     GFXBackground2Width[A], tempLocation.Height,
                     GFXBackground2[A],
                     0, frameH - tempLocation.Height,
@@ -382,7 +386,7 @@ void DrawBackground(int S, int Z)
 
     if(Background2[S] == 13)
     {
-        DrawCenterAnchoredBackground(S, Z, A, 0, 0, 0, false, 0.75);
+        DrawCenterAnchoredBackground(S, Z, A, 0, 0, 0, false, 3, 4);
     }
 
     A = 1; // Blocks
@@ -471,7 +475,7 @@ void DrawBackground(int S, int Z)
     A = 9; // Night
     if(Background2[S] == 8 || Background2[S] == 9)
     {
-        DrawCenterAnchoredBackground(S, Z, A, -1, 0, 0, false, 0.75);
+        DrawCenterAnchoredBackground(S, Z, A, -1, 0, 0, false, 3, 4);
     }
 
     A = 10; // Night 2
@@ -527,7 +531,7 @@ void DrawBackground(int S, int Z)
     A = 18; // SMW ghost house
     if(Background2[S] == 18)
     {
-        DrawCenterAnchoredBackground(S, Z, A, 0, 0, 0, false, 0.5, true);
+        DrawCenterAnchoredBackground(S, Z, A, 0, 0, 0, false, 1, 2, true);
     }
 
     A = 19; // smw forest
@@ -628,13 +632,13 @@ void DrawBackground(int S, int Z)
     A = 29; // SMW Night
     if(Background2[S] == 29)
     {
-        DrawCenterAnchoredBackground(S, Z, A, -1, 0, 0, false, 0.5, true);
+        DrawCenterAnchoredBackground(S, Z, A, -1, 0, 0, false, 1, 2, true);
     }
 
     A = 30; // SMW Cave
     if(Background2[S] == 30)
     {
-        DrawCenterAnchoredBackground(S, Z, A, 3456, 0, 0, true, 0.5, true);
+        DrawCenterAnchoredBackground(S, Z, A, 3456, 0, 0, true, 1, 2, true);
     }
 
     A = 31; // SMW Hills 2
@@ -669,7 +673,7 @@ void DrawBackground(int S, int Z)
 
     if(Background2[S] == 36)
     {
-        DrawCenterAnchoredBackground(S, Z, A, 0, 0, 0, false, 0.75);
+        DrawCenterAnchoredBackground(S, Z, A, 0, 0, 0, false, 3, 4);
     }
 
     A = 35; // SMB 3 Snow Trees
@@ -904,7 +908,7 @@ void DrawBackground(int S, int Z)
     if(Background2[S] == 42)
     {
         // safe to tile top 546px and bottom 160px of vanilla asset
-        DrawCenterAnchoredBackground(S, Z, A, 3456, 160, 546, false, 0.5, true);
+        DrawCenterAnchoredBackground(S, Z, A, 3456, 160, 546, false, 1, 2, true);
     }
     A = 43; // SMW Castle 2
     if(Background2[S] == 43)
@@ -1392,7 +1396,7 @@ void DrawBackground(int S, int Z)
     A = 55; // SMW Water
     if(Background2[S] == 55)
     {
-        DrawCenterAnchoredBackground(S, Z, A, 0, 0, 0, false, 0.5, true);
+        DrawCenterAnchoredBackground(S, Z, A, 0, 0, 0, false, 1, 2, true);
     }
 
     A = 56; // SMB3 Water
@@ -1505,7 +1509,7 @@ void DrawBackground(int S, int Z)
     if(Background2[S] == 58)
     {
         // can loop top 600px and bottom 128px of vanilla asset
-        DrawCenterAnchoredBackground(S, Z, A, 3584, 128, 600, false, 0.5, true);
+        DrawCenterAnchoredBackground(S, Z, A, 3584, 128, 600, false, 1, 2, true);
     }
 
     level[S] = tempLevel;
