@@ -20,6 +20,18 @@
 
 #include "sdl_proxy/sdl_stdinc.h"
 
+#ifndef THEXTECH_NO_SDL_BUILD
+#include "SDL2/SDL_version.h"
+
+// define SDL_round
+#   if !SDL_VERSION_ATLEAST(2, 0, 16)
+static int SDL_round(double val)
+{
+    return (val > 0) ? val + 0.5 : val - 0.5;
+}
+#   endif
+#endif
+
 #include "../globals.h"
 #include "../graphics.h"
 #include "../collision.h"
