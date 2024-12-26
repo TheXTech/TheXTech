@@ -499,7 +499,7 @@ bool LoadGFXFromList(std::string source_dir, bool custom, bool skip_world)
             }
 
             loadImageFromList(in, line_buf, source_dir,
-                GFXBackground2BMP[A], &GFXBackground2Width[A], &GFXBackground2Height[A], GFXBackground2Custom[A],
+                GFXBackground2BMP[A], nullptr, nullptr, GFXBackground2Custom[A],
                 false, custom);
         }
         else if(type_buf[9] == 'd')
@@ -855,17 +855,9 @@ void LoadGFX()
         s_find_image(p, CurDir, fmt::format_ne("background2-{0}", A));
 
         if(!p.empty())
-        {
             XRender::lazyLoadPicture(GFXBackground2BMP[A], p);
-            GFXBackground2Width[A] = GFXBackground2BMP[A].w;
-            GFXBackground2Height[A] = GFXBackground2BMP[A].h;
-        }
         else
-        {
-            GFXBackground2Width[A] = 0;
-            GFXBackground2Height[A] = 0;
             break;
-        }
 
         if(A % 10 == 0)
             UpdateLoad();
@@ -1403,7 +1395,7 @@ void LoadCustomGFX(bool include_world, const char* preview_players_from)
     {
         loadCGFX(GfxRoot + fmt::format_ne("background2/background2-{0}.png", A),
                  fmt::format_ne("background2-{0}", A),
-                 &GFXBackground2Width[A], &GFXBackground2Height[A], GFXBackground2Custom[A], GFXBackground2BMP[A],
+                 nullptr, nullptr, GFXBackground2Custom[A], GFXBackground2BMP[A],
                  false, true);
     }
 

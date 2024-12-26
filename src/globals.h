@@ -2231,9 +2231,9 @@ extern RangeArrI<bool, 1, numBackground2, false> GFXBackground2Custom;
 //Public GFXBackground2BMP(1 To numBackground2) As StdPicture
 extern RangeArr<StdPicture, 1, numBackground2> GFXBackground2BMP;
 //Public GFXBackground2Height(1 To numBackground2) As Integer
-extern RangeArrI<vbint_t, 1, numBackground2, 0> GFXBackground2Height;
+// extern RangeArrI<vbint_t, 1, numBackground2, 0> GFXBackground2Height;
 //Public GFXBackground2Width(1 To numBackground2) As Integer
-extern RangeArrI<vbint_t, 1, numBackground2, 0> GFXBackground2Width;
+// extern RangeArrI<vbint_t, 1, numBackground2, 0> GFXBackground2Width;
 //Public GFXNPCCustom(1 To maxNPCType) As Boolean
 extern RangeArrI<bool, 1, maxNPCType, false> GFXNPCCustom;
 //Public GFXNPC(1 To maxNPCType) As Long
