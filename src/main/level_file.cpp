@@ -1053,6 +1053,7 @@ bool OpenLevel_Warp(void* userdata, LevelDoor& w)
         warp.cannonExit = w.cannon_exit;
         warp.cannonExitSpeed = w.cannon_exit_speed;
         warp.eventEnter = load.FindEvent(w.event_enter);
+        warp.eventExit = load.FindEvent(w.event_exit);
         if(!w.stars_msg.empty())
             SetS(warp.StarsMsg, w.stars_msg);
         warp.noPrintStars = w.star_num_hide;
@@ -1229,6 +1230,9 @@ void OpenLevel_FixLayersEvents(const LevelLoad& load)
 
         if(Warp[A].eventEnter != EVENT_NONE)
             Warp[A].eventEnter = load.final_event_index[Warp[A].eventEnter];
+
+        if(Warp[A].eventExit != EVENT_NONE)
+            Warp[A].eventExit = load.final_event_index[Warp[A].eventExit];
 
         syncLayers_Warp(A);
     }
