@@ -314,6 +314,7 @@ void SaveLevel(const std::string& FilePath, int format, int version)   // saves 
         warp.cannon_exit = w.cannonExit;
         warp.cannon_exit_speed = w.cannonExitSpeed;
         warp.event_enter = GetE(w.eventEnter);
+        warp.event_exit = GetE(w.eventExit);
         warp.stars_msg = GetS(w.StarsMsg);
         warp.star_num_hide = w.noPrintStars;
         warp.hide_entering_scene = w.noEntranceScene;

@@ -922,6 +922,7 @@ void PlayerEffectWarpPipe(int A)
         p.CanJump = false;
         p.CanAltJump = false;
         p.Bumped2 = 0;
+
         if(!backward && warp.cannonExit)
         {
             switch(warp_dir_exit)
@@ -973,6 +974,9 @@ void PlayerEffectWarpPipe(int A)
                 }
             }
         }
+
+        if(warp.eventExit != EVENT_NONE)
+            TriggerEvent(warp.eventExit, A);
     }
 }
 
@@ -1147,6 +1151,9 @@ void PlayerEffectWarpDoor(int A)
         // reverse warp fader
         if(!is_level_quit)
             s_WarpFaderLogic(true, A, warp.transitEffect, warp_exit, true, true);
+
+        if(warp.eventExit != EVENT_NONE)
+            TriggerEvent(warp.eventExit, A);
 
         s_CheckWarpLevelExit(p, warp, 3000, 2970);
 
@@ -1477,6 +1484,9 @@ static inline bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool bac
             plr.Warp = B;
             plr.WarpBackward = backward;
 
+            if(warp.eventExit != EVENT_NONE)
+                TriggerEvent(warp.eventExit, A);
+
             s_CheckWarpLevelExit(plr, warp, 2921, 2921);
 
             return true;
@@ -1531,6 +1541,9 @@ static inline bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool bac
 
             GetvScreenAuto(vScreen[vscreen_A]);
         }
+
+        if(warp.eventExit != EVENT_NONE)
+            TriggerEvent(warp.eventExit, A);
 
         return true; // break
     }

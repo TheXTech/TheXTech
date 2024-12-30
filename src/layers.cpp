@@ -741,6 +741,11 @@ bool SwapEvents(eventindex_t index_1, eventindex_t index_2)
             Warp[A].eventEnter = index_2;
         else if(Warp[A].eventEnter == index_2)
             Warp[A].eventEnter = index_1;
+
+        if(Warp[A].eventExit == index_1)
+            Warp[A].eventExit= index_2;
+        else if(Warp[A].eventExit == index_2)
+            Warp[A].eventExit = index_1;
     }
 
     for(A = 0; A < numEvents; A++)
@@ -775,10 +780,13 @@ bool DeleteEvent(eventindex_t index)
     {
         if(NPC[A].TriggerTalk == index)
             NPC[A].TriggerTalk = EVENT_NONE;
+
         if(NPC[A].TriggerDeath == index)
             NPC[A].TriggerDeath = EVENT_NONE;
+
         if(NPC[A].TriggerLast == index)
             NPC[A].TriggerLast = EVENT_NONE;
+
         if(NPC[A].TriggerActivate == index)
             NPC[A].TriggerActivate = EVENT_NONE;
     }
@@ -787,8 +795,10 @@ bool DeleteEvent(eventindex_t index)
     {
         if(Block[A].TriggerHit == index)
             Block[A].TriggerHit = EVENT_NONE;
+
         if(Block[A].TriggerDeath == index)
             Block[A].TriggerDeath = EVENT_NONE;
+
         if(Block[A].TriggerLast == index)
             Block[A].TriggerLast = EVENT_NONE;
     }
@@ -797,6 +807,9 @@ bool DeleteEvent(eventindex_t index)
     {
         if(Warp[A].eventEnter == index)
             Warp[A].eventEnter = EVENT_NONE;
+
+        if(Warp[A].eventExit == index)
+            Warp[A].eventExit = EVENT_NONE;
     }
 
     for(A = 0; A < numEvents; A++)
