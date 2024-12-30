@@ -21,7 +21,9 @@
 #include <fmt_format_ne.h>
 #include <Utils/files.h>
 #include <Utils/files_ini.h>
+#include <Archives/archives.h>
 #include <IniProcessor/ini_processing.h>
+
 #include "game_info.h"
 #include "script/luna/luna.h"
 
@@ -180,13 +182,16 @@ void GameInfo::LoadGameInfo()
         }
         config.endGroup();
 
-        config.beginGroup("intro");
-        LoadIntroActivitySettings(config);
-        config.endGroup();
+        if(!Archives::has_prefix(AppPath))
+        {
+            config.beginGroup("intro");
+            LoadIntroActivitySettings(config);
+            config.endGroup();
 
-        config.beginGroup("outro");
-        LoadOutroActivitySettings(config);
-        config.endGroup();
+            config.beginGroup("outro");
+            LoadOutroActivitySettings(config);
+            config.endGroup();
+        }
 
         config.beginGroup("credits");
         {

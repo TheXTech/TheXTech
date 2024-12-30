@@ -791,6 +791,9 @@ int GameMain(const CmdLineSetup_t &setup)
             FlyForever = false;
             GoToLevelNoGameThing = false;
 
+            g_VanillaCam = false;
+            UpdateInternalRes();
+
             for(int A = 1; A <= maxPlayers; A++)
                 Player[A] = blankPlayer;
 
