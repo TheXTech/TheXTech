@@ -1478,7 +1478,7 @@ void TriggerEvent(eventindex_t index, int whichPlayer)
 
     newEventNum++;
     NewEvent[newEventNum] = index;
-    newEventDelay[newEventNum] = 0;
+    newEventDelay[newEventNum] = -1;
     newEventPlayer[newEventNum] = static_cast<uint8_t>(whichPlayer);
 }
 
@@ -1486,15 +1486,16 @@ void UpdateEvents()
 {
     // this is for events that have a delay to call other events
     // this sub also updates the screen position for autoscroll levels
-    int A = 0;
+    bool events_active = true;
+
     if(FreezeNPCs)
-        return;
+        events_active = false;
 
     if(!GameMenu)
     {
         // possibly undesirable: doesn't advance event timer at all if any players are (for example) in doors or in holding pattern
         if(!AllPlayersNormal())
-            return;
+            events_active = false;
     }
 
     if(newEventNum > 0)
@@ -1502,11 +1503,13 @@ void UpdateEvents()
         int newEventNum_old;
         newEventNum_old = newEventNum;
 
-        for(A = 1; A <= newEventNum_old; A++)
+        for(int A = 1; A <= newEventNum_old; A++)
         {
-            if(newEventDelay[A] > 0)
+            // count down the event if the events are active
+            if(newEventDelay[A] > 0 && events_active)
                 newEventDelay[A]--;
-            else
+            // trigger event if it's ready, or if the event was directly Triggered
+            else if(events_active || newEventDelay[A] < 0)
             {
                 ProcEvent(NewEvent[A], newEventPlayer[A]);
                 newEventDelay[A] = newEventDelay[newEventNum];
@@ -1527,7 +1530,10 @@ void UpdateEvents()
         }
     }
 
-    for(A = 0; A < numSections; A++)
+    if(!events_active)
+        return;
+
+    for(int A = 0; A < numSections; A++)
     {
         if(AutoX[A] != 0.0f || AutoY[A] != 0.0f)
         {
