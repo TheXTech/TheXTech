@@ -415,7 +415,7 @@ void PlayerLevelWrapLogic(int A)
             {
                 RemoveFromPet(o_A);
                 o_p.Effect = PLREFF_RESPAWN;
-                o_p.Effect2 = o_p.Location.Y;
+                o_p.RespawnY = o_p.Location.Y;
             }
         }
 

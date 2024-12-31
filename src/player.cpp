@@ -494,7 +494,7 @@ void DodgePlayers(int plr_A)
             pLoc.Y = old_Y;
 
             Player[plr_A].Effect = PLREFF_RESPAWN;
-            Player[plr_A].Effect2 = pLoc.Y;
+            Player[plr_A].RespawnY = pLoc.Y;
             break;
         }
     }
@@ -628,6 +628,7 @@ void SetupPlayers()
         // moved from below to here
         Player[A].Effect = PLREFF_NORMAL;
         Player[A].Effect2 = 0;
+        Player[A].RespawnY = 0;
 
         // modern multiplayer placement code
         if(g_config.multiplayer_pause_controls)
@@ -4172,7 +4173,7 @@ void RespawnPlayer(int A, double Direction, double CenterX, double StopY, const 
     Player[A].Location.SpeedY = 0;
     Player[A].Effect = PLREFF_RESPAWN;
     // location where player stops flashing
-    Player[A].Effect2 = StopY - Player[A].Location.Height;
+    Player[A].RespawnY = StopY - Player[A].Location.Height;
     Player[A].Location.Y = -target_screen.Y - Player[A].Location.Height;
     Player[A].Location.X = CenterX - Player[A].Location.Width / 2.0;
 }
@@ -4184,7 +4185,7 @@ void RespawnPlayerTo(int A, int TargetPlayer)
     // don't lose a player when it targets a player who is already respawning
     double StopY;
     if(Player[TargetPlayer].Effect == PLREFF_RESPAWN)
-        StopY = Player[TargetPlayer].Effect2 + Player[TargetPlayer].Location.Height;
+        StopY = Player[TargetPlayer].RespawnY + Player[TargetPlayer].Location.Height;
     else if(Player[TargetPlayer].Mount == 2)
         StopY = Player[TargetPlayer].Location.Y;
     else
@@ -4210,6 +4211,7 @@ void RespawnPlayerTo(int A, int TargetPlayer)
             Player[A].Dead = true;
             Player[A].Effect = PLREFF_COOP_WINGS;
             Player[A].Effect2 = 0;
+            Player[A].RespawnY = 0;
         }
         // respawn them to the target player's warp otherwise
         else
@@ -4221,11 +4223,11 @@ void RespawnPlayerTo(int A, int TargetPlayer)
             Player[A].Location.X = warp_exit.X + warp_exit.Width / 2 - Player[A].Location.Width / 2;
 
             if(Player[TargetPlayer].Effect == PLREFF_WARP_PIPE && warp_exit_dir == 1)
-                Player[A].Effect2 = warp_exit.Y;
+                Player[A].RespawnY = warp_exit.Y;
             else
-                Player[A].Effect2 = warp_exit.Y + warp_exit.Height - Player[A].Location.Height;
+                Player[A].RespawnY = warp_exit.Y + warp_exit.Height - Player[A].Location.Height;
 
-            Player[A].Location.Y = Player[A].Effect2 - target_vscreen.Height * 3 / 4;
+            Player[A].Location.Y = Player[A].RespawnY - target_vscreen.Height * 3 / 4;
         }
     }
 }
@@ -6025,7 +6027,7 @@ void PlayerEffects(const int A)
 
         p.Effect2 += 1;
 
-        if(fEqual(p.Effect2, 14))
+        if(p.Effect2 == 14)
         {
             p.Immune += 50;
             p.Immune2 = true;
@@ -6253,7 +6255,7 @@ void PlayerEffects(const int A)
 
         for(B = 1; B <= numPlayers; B++)
         {
-            if(B != A && (Player[B].Effect == PLREFF_NORMAL || fEqual(B, p.Effect2)) && !Player[B].Dead && Player[B].TimeToLive == 0 && CheckCollision(p.Location, Player[B].Location))
+            if(B != A && (Player[B].Effect == PLREFF_NORMAL || B == p.Effect2) && !Player[B].Dead && Player[B].TimeToLive == 0 && CheckCollision(p.Location, Player[B].Location))
                 tempBool = false;
         }
 
@@ -6319,9 +6321,9 @@ void PlayerEffects(const int A)
 
         p.Location.Y += 2.2;
 
-        if(p.Location.Y >= p.Effect2)
+        if(p.Location.Y >= p.RespawnY)
         {
-            p.Location.Y = p.Effect2;
+            p.Location.Y = p.RespawnY;
             tempBool = true;
             for(B = 1; B <= numPlayers; B++)
             {
@@ -6332,7 +6334,7 @@ void PlayerEffects(const int A)
             if(tempBool)
             {
                 p.Effect = PLREFF_NORMAL;
-                p.Effect2 = 0;
+                p.RespawnY = 0;
                 p.Immune = 50;
                 p.Immune2 = false;
                 p.Location.SpeedY = 0.01;
@@ -6408,7 +6410,7 @@ void PlayersEnsureNearby(const Screen_t& screen)
         const Location_t& pLoc = p.Location;
 
         double p_x = pLoc.X + pLoc.Width / 2;
-        double p_top = (p.Effect == PLREFF_RESPAWN) ? p.Effect2 : pLoc.Y;
+        double p_top = (p.Effect == PLREFF_RESPAWN) ? p.RespawnY : pLoc.Y;
         double p_y = p_top + pLoc.Height / 2;
 
         // dead players don't affect camera
@@ -6472,7 +6474,7 @@ void PlayersEnsureNearby(const Screen_t& screen)
 
         if(!p.Dead && p.TimeToLive == 0)
         {
-            double p_top = (p.Effect == PLREFF_RESPAWN) ? p.Effect2 : pLoc.Y;
+            double p_top = (p.Effect == PLREFF_RESPAWN) ? p.RespawnY : pLoc.Y;
             double dist = (pLoc.X - cx) * (pLoc.X - cx) + (p_top - cy) * (p_top - cy);
 
             if(closest == 0 || closest_dist > dist)
@@ -6492,7 +6494,7 @@ void PlayersEnsureNearby(const Screen_t& screen)
 
     // if the winner is currently respawning, place them at their target loc
     if(pClosest.Effect == PLREFF_RESPAWN)
-        pClosest.Location.Y = pClosest.Effect2;
+        pClosest.Location.Y = pClosest.RespawnY;
 
     // move all players to winning player's location, and set effect if alive
     for(int plr_i = 0; plr_i < screen.player_count; plr_i++)
@@ -6526,6 +6528,8 @@ void PlayersEnsureNearby(const Screen_t& screen)
 
         if(p.Dead || p.TimeToLive != 0)
             continue;
+
+        p.RespawnY = 0;
 
         if(in_door_scroll)
         {
@@ -6779,7 +6783,7 @@ void SwapCharacter(int A, int Character, bool FromBlock)
     {
         double saved_respawn_StopY = 0;
         if(p.Effect == PLREFF_RESPAWN)
-            saved_respawn_StopY = p.Effect2 + p.Location.Height;
+            saved_respawn_StopY = p.RespawnY + p.Location.Height;
 
         // make player bottom match old player bottom, to avoid floor glitches
         UnDuck(Player[A]);
@@ -6787,7 +6791,7 @@ void SwapCharacter(int A, int Character, bool FromBlock)
 
         // if player effect is 6 (respawn downwards), update target similarly
         if(p.Effect == PLREFF_RESPAWN)
-            p.Effect2 = saved_respawn_StopY - p.Location.Height;
+            p.RespawnY = saved_respawn_StopY - p.Location.Height;
     }
 
     if(!LevelSelect)

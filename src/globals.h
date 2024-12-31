@@ -693,8 +693,10 @@ struct Player_t
     bool CanAltJump = false;
 //    Effect As Integer 'for various effects like shrinking/growing/warping
     PlayerEffect Effect = PLREFF_NORMAL;
-//    Effect2 As Double 'counter for the effects
-    double Effect2 = 0.0;
+//    Effect2 As Double 'counter for the effects (was double)
+    vbint_t Effect2 = 0;
+//    NEW: this previously used the same storage as Effect2
+    double RespawnY = 0.0;
 //    Duck As Boolean 'true if ducking
     bool Duck = false;
 //    DropRelease As Boolean

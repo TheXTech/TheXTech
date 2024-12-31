@@ -51,7 +51,7 @@ void GetvScreen(vScreen_t& vscreen)
         pLoc.Height = 0;
 
     // this check is new because players can now respawn in 1P mode through DropAdd
-    double pLocY = (p.Effect == PLREFF_RESPAWN) ? p.Effect2 : pLoc.Y;
+    double pLocY = (p.Effect == PLREFF_RESPAWN) ? p.RespawnY : pLoc.Y;
 
     vscreen.X = -pLoc.X + (vscreen.Width * 0.5) - pLoc.Width / 2.0;
     vscreen.Y = -pLocY + (vscreen.Height * 0.5) - vScreenYOffset - pLoc.Height;
@@ -112,7 +112,7 @@ void GetvScreenAverage(vScreen_t& vscreen)
         {
             vscreen.X += -Player[A].Location.X - Player[A].Location.Width / 2.0;
 
-            double pLocY = (Player[A].Effect == PLREFF_RESPAWN) ? Player[A].Effect2 : Player[A].Location.Y;
+            double pLocY = (Player[A].Effect == PLREFF_RESPAWN) ? Player[A].RespawnY : Player[A].Location.Y;
 
             if(Player[A].Mount == 2)
                 vscreen.Y += -pLocY;
@@ -256,7 +256,7 @@ void GetvScreenAverage3(vScreen_t& vscreen)
         double pr = pl + plr.Location.Width;
 
         // DANGER: consider case where players are free-fall and a player respawns
-        double pLocY = (plr.Effect == PLREFF_RESPAWN) ? plr.Effect2 : plr.Location.Y;
+        double pLocY = (plr.Effect == PLREFF_RESPAWN) ? plr.RespawnY : plr.Location.Y;
 
         double by = pLocY + plr.Location.Height;
 
@@ -587,7 +587,7 @@ void PlayerWarpGFX(int A, IntegerLocation_t &tempLocation, int &X2, int &Y2)
     // .Effect2 => 100  -- Delay at next spot
     // .Effect2 = 2     -- Exiting
     // .Effect2 = 3     -- Done
-    if(player.Effect2 == 0.0)
+    if(player.Effect2 == 0)
     {
         if(warp_dir_enter == 3) // Moving down
         {
@@ -614,7 +614,7 @@ void PlayerWarpGFX(int A, IntegerLocation_t &tempLocation, int &X2, int &Y2)
                 tempLocation.X = warp_enter.X;
         }
     }
-    else if(Maths::iRound(player.Effect2) == 2)
+    else if(player.Effect2 == 2)
     {
         if(warp_dir_exit == 3) // Moving up
         {
@@ -642,7 +642,7 @@ void PlayerWarpGFX(int A, IntegerLocation_t &tempLocation, int &X2, int &Y2)
         }
     }
 
-    if(Maths::iRound(player.Effect2) == 1 || player.Effect2 >= 100)
+    if(player.Effect2 == 1 || player.Effect2 >= 100)
         tempLocation.Height = 0;
 
     if(tempLocation.Height < 0)
@@ -673,7 +673,7 @@ void NPCWarpGFX(int A, IntegerLocation_t &tempLocation, int &X2, int &Y2)
     // player(a).effect2 => 100  -- Delay at next spot
     // player(a).effect2 = 2     -- Exiting
     // player(a).effect2 = 3     -- Done
-    if(player.Effect2 == 0.0)
+    if(player.Effect2 == 0)
     {
         if(warp_dir_enter == 3) // Moving down
         {
@@ -700,7 +700,7 @@ void NPCWarpGFX(int A, IntegerLocation_t &tempLocation, int &X2, int &Y2)
                 tempLocation.X = warp_enter.X;
         }
     }
-    else if(Maths::iRound(player.Effect2) == 2)
+    else if(player.Effect2 == 2)
     {
         if(warp_dir_exit == 3) // Moving up
         {
@@ -728,7 +728,7 @@ void NPCWarpGFX(int A, IntegerLocation_t &tempLocation, int &X2, int &Y2)
         }
     }
 
-    if(Maths::iRound(player.Effect2) == 1 || player.Effect2 >= 100)
+    if(player.Effect2 == 1 || player.Effect2 >= 100)
         tempLocation.Height = 0;
 
     if(tempLocation.Height < 0)

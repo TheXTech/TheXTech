@@ -485,7 +485,7 @@ void PlayerEffectWarpPipe(int A)
         // trigger fader when there are 16 pixels left (for normal effects) or 0 pixels left (for none or scroll)
         s_WarpFaderLogic(false, A, warp.transitEffect, warp_enter, Maths::iRound(leftToGoal) == 16, !is_level_quit && !same_section && Maths::iRound(leftToGoal) == 0);
     }
-    else if(fEqual(p.Effect2, 1))  // Exiting pipe (initialization)
+    else if(p.Effect2 == 1)  // Exiting pipe (initialization)
     {
         if(warp.NoYoshi)
         {
@@ -726,7 +726,7 @@ void PlayerEffectWarpPipe(int A)
                 PlaySoundSpatial(SFX_Warp, p.Location);
         }
     }
-    else if(fEqual(p.Effect2, 2)) // Proceeding the pipe exiting
+    else if(p.Effect2 == 2) // Proceeding the pipe exiting
     {
         if(!backward && warp.cannonExit)
         {
@@ -885,7 +885,7 @@ void PlayerEffectWarpPipe(int A)
         if(p.HoldingNPC > 0 && p.HoldingNPC <= numNPCs)
             treeNPCUpdate(p.HoldingNPC);
     }
-    else if(fEqual(p.Effect2, 3)) // Finishing the pipe exiting / shooting
+    else if(p.Effect2 == 3) // Finishing the pipe exiting / shooting
     {
         if(!backward && warp.cannonExit)
         {
@@ -1010,12 +1010,12 @@ void PlayerEffectWarpDoor(int A)
         p.Frame = 1;
 
     // trigger warp fader when p.Effect2 is 5 (for normal animations) or 20 (for none/scroll animations)
-    s_WarpFaderLogic(false, A, warp.transitEffect, warp_enter, fEqual(p.Effect2, 5), !is_level_quit && !same_section && fEqual(p.Effect2, 20));
+    s_WarpFaderLogic(false, A, warp.transitEffect, warp_enter, p.Effect2 == 5, !is_level_quit && !same_section && (p.Effect2 == 20));
 
     // teleport other players into door in shared screen mode
     Screen_t& screen = ScreenByPlayer(A);
     bool is_shared_screen = (screen.Type == 3);
-    if(is_shared_screen && fEqual(p.Effect2, 15))
+    if(is_shared_screen && (p.Effect2 == 15))
     {
         int vscreen_A = vScreenIdxByPlayer(A);
         bool do_tele = is_shared_screen && !vScreenCollision(vscreen_A, warp_exit);
@@ -1060,7 +1060,7 @@ void PlayerEffectWarpDoor(int A)
     }
 
     // start the scroll effect
-    if(do_scroll && fEqual(p.Effect2, 29))
+    if(do_scroll && p.Effect2 == 29)
     {
         s_InitWarpScroll(p, warp_enter, warp_exit, 30);
         SoundPause[SFX_Door] = 60;
@@ -1200,7 +1200,7 @@ void PlayerEffectWarpWait(int A)
     Player_t& p = Player[A];
 
     // door exit holding pattern (exit blocked)
-    if(fEqual(p.Effect2, 131))
+    if(p.Effect2 == 131)
     {
         bool tempBool = false;
         for(int B = 1; B <= numPlayers; B++)
@@ -1227,7 +1227,7 @@ void PlayerEffectWarpWait(int A)
     else if(p.Effect2 <= 130)
     {
         p.Effect2 -= 1;
-        if(fEqual(p.Effect2, 100))
+        if(p.Effect2 == 100)
         {
             Screen_t& screen = ScreenByPlayer(A);
 
@@ -1243,7 +1243,7 @@ void PlayerEffectWarpWait(int A)
     else if(p.Effect2 <= 300)
     {
         p.Effect2 -= 1;
-        if(fEqual(p.Effect2, 200))
+        if(p.Effect2 == 200)
         {
             Screen_t& screen = ScreenByPlayer(A);
 
@@ -1258,7 +1258,7 @@ void PlayerEffectWarpWait(int A)
     else if(p.Effect2 <= 1000) // Start Wait for pipe
     {
         p.Effect2 -= 1;
-        if(fEqual(p.Effect2, 900))
+        if(p.Effect2 == 900)
         {
             p.Effect = PLREFF_WARP_PIPE;
             p.Effect2 = 100;
@@ -1283,7 +1283,7 @@ void PlayerEffectWarpWait(int A)
     {
         p.Effect2 -= 1;
 
-        if(fEqual(p.Effect2, 1900))
+        if(p.Effect2 == 1900)
         {
             s_TriggerDoorEffects(static_cast<Location_t>(Warp[p.Warp].Exit), false);
 
@@ -1302,7 +1302,7 @@ void PlayerEffectWarpWait(int A)
                 PlaySoundSpatial(SFX_Door, p.Location);
         }
         // new code to replicate SMBX 1.3 logic setting Effect2 to 30
-        else if(fEqual(p.Effect2, 1870))
+        else if(p.Effect2 == 1870)
         {
             // Trigger an exit event at door warp that was used to enter the level
             if(Warp[p.Warp].eventExit != EVENT_NONE)
@@ -1318,10 +1318,10 @@ void PlayerEffectWarpWait(int A)
 
         auto &w = Warp[p.Warp];
 
-        if(g_config.EnableInterLevelFade && (w.MapWarp || w.level != STRINGINDEX_NONE) && Maths::iRound(p.Effect2) == 2955 && !g_levelScreenFader.isFadingIn())
+        if(g_config.EnableInterLevelFade && (w.MapWarp || w.level != STRINGINDEX_NONE) && (p.Effect2 == 2955) && !g_levelScreenFader.isFadingIn())
             g_levelScreenFader.setupFader(2, 0, 65, ScreenFader::S_FADE);
 
-        if(fEqual(p.Effect2, 2920))
+        if(p.Effect2 == 2920)
         {
             if(w.MapWarp)
             {
