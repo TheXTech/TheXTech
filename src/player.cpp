@@ -3971,19 +3971,19 @@ void YoshiEatCode(const int A)
 
             p.YoshiTongue.Height = 12;
             p.YoshiTongue.Width = 16;
-            p.YoshiTongueX = p.Location.X + p.Location.Width / 2.0;
+            float TongueX = p.Location.X + p.Location.Width / 2.0;
 
             if(p.Controls.Up || (p.StandingOnNPC == 0 && p.Slope == 0 && p.Location.SpeedY != 0 && !p.Controls.Down))
             {
-                p.YoshiTongueX += p.Direction * (22);
+                TongueX += p.Direction * (22);
                 p.YoshiTongue.Y = p.Location.Y + 8 + (p.Location.Height - 54);
-                p.YoshiTongue.X = p.YoshiTongueX + p.YoshiTongueLength * p.Direction;
+                p.YoshiTongue.X = TongueX + p.YoshiTongueLength * p.Direction;
             }
             else
             {
-                p.YoshiTongueX += p.Direction * (34);
+                TongueX += p.Direction * (34);
                 p.YoshiTongue.Y = p.Location.Y + 30 + (p.Location.Height - 54);
-                p.YoshiTongue.X = p.YoshiTongueX + p.YoshiTongueLength * p.Direction;
+                p.YoshiTongue.X = TongueX + p.YoshiTongueLength * p.Direction;
             }
 
             if(p.Direction == -1)

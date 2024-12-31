@@ -228,10 +228,12 @@ void DrawPlayer(Player_t &p, const int Z, XTColor color)
                 if(p.MountSpecial > 0)
                 {
                     int C = 0;
-                    if(p.Direction == -1)
+                    if(p.Direction == 1)
                         C = p.YoshiTongueLength;
+                    else
+                        C = -16;
 
-                    RenderTexturePlayer(Z, camX + s_round2int_plr(p.YoshiTongueX) - C - 1,
+                    RenderTexturePlayer(Z, camX + s_round2int_plr(p.YoshiTongue.X) - C - 1,
                                           camY + s_round2int_plr(p.YoshiTongue.Y),
                                           p.YoshiTongueLength + 2,
                                           16,

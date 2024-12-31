@@ -1587,7 +1587,7 @@ public:
         insert(0x0000007a, &Player_t::YoshiBFrame);
         insert(0x0000007c, &Player_t::YoshiBFrameCount);
         //Location_t YoshiTongue; (Between 0x80 and 0xB0)
-        insert(0x000000b0, &Player_t::YoshiTongueX);
+        // insert(0x000000b0, &Player_t::YoshiTongueX);
         insert(0x000000b4, &Player_t::YoshiTongueLength);
         insert(0x000000b6, &Player_t::YoshiTonugeBool);
         insert(0x000000b8, &Player_t::YoshiNPC);

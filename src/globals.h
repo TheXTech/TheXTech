@@ -648,7 +648,7 @@ struct Player_t
 //    YoshiTongue As Location
     Location_t YoshiTongue;
 //    YoshiTongueX As Single
-    float YoshiTongueX = 0.0f;
+    // float YoshiTongueX = 0.0f;
 //    YoshiTongueLength As Integer 'length of yoshi's tongue
     vbint_t YoshiTongueLength = 0;
 //    YoshiTonugeBool As Boolean
