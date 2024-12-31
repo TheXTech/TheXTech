@@ -1659,7 +1659,7 @@ public:
         insert(0x00000160, &Player_t::FireBallCD);
         insert(0x00000162, &Player_t::FireBallCD2);
         insert(0x00000164, &Player_t::TailCount);
-        insert(0x00000168, &Player_t::RunCount);
+        // insert(0x00000168, &Player_t::RunCount);
         insert(0x0000016c, &Player_t::CanFly);
         insert(0x0000016e, &Player_t::CanFly2);
         insert(0x00000170, &Player_t::FlyCount);

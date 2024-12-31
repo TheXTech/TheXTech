@@ -760,7 +760,9 @@ struct Player_t
 //    TailCount As Integer 'Used for the tail swipe
     vbint_t TailCount = 0;
 //    RunCount As Single 'To find how long the player has ran for
-    float RunCount = 0.0f;
+    // was previously incremented 1.0 per running frame and decremented 0.3 per slow frame
+    // now is incremented 10 per running frame and decremented 3 per slow frame
+    vbint_t RunCount = 0;
 //    CanFly As Boolean 'If the player can fly
     bool CanFly = false;
 //    CanFly2 As Boolean

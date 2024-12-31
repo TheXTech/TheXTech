@@ -329,48 +329,47 @@ void PlayerMovementX(int A, float& cursed_value_C)
     // Racoon/Tanooki Mario.  this handles the ability to fly after running
     if((Player[A].State == 4 || Player[A].State == 5) && Player[A].Wet == 0)
     {
+        // note: RunCount was previously a float, so its values have been multiplied by 10 everywhere
+        bool is_running = (std::abs(Player[A].Location.SpeedX) >= double(Physics.PlayerRunSpeed) ||
+            (Player[A].Character == 3 && std::abs(Player[A].Location.SpeedX) >= 5.58 - 0.001)); // Rounding error of SpeedX makes an evil here
+
         if( (Player[A].Location.SpeedY == 0.0 ||
              Player[A].CanFly2 ||
              Player[A].StandingOnNPC != 0 ||
              Player[A].Slope > 0) &&
-            (std::abs(Player[A].Location.SpeedX) >= double(Physics.PlayerRunSpeed) ||
-            (Player[A].Character == 3 && std::abs(Player[A].Location.SpeedX) >= 5.58 - 0.001))) // Rounding error of SpeedX makes an evil here
+            is_running)
         {
-            Player[A].RunCount += 1;
+            Player[A].RunCount += 10;
         }
-        else
+        else if(!is_running)
         {
-            if(!(std::abs(Player[A].Location.SpeedX) >= double(Physics.PlayerRunSpeed) ||
-                 (Player[A].Character == 3 && std::abs(Player[A].Location.SpeedX) >= 5.58 - 0.001)) )
-            {
-                Player[A].RunCount -= 0.3f;
-            }
+            Player[A].RunCount -= 3;
         }
 
-        if(Player[A].RunCount >= 35 && Player[A].Character == 1)
+        if(Player[A].RunCount >= 350 && Player[A].Character == 1)
         {
             Player[A].CanFly = true;
-            Player[A].RunCount = 35;
+            Player[A].RunCount = 350;
         }
-        else if(Player[A].RunCount >= 40 && Player[A].Character == 2)
+        else if(Player[A].RunCount >= 400 && Player[A].Character == 2)
         {
             Player[A].CanFly = true;
-            Player[A].RunCount = 40;
+            Player[A].RunCount = 400;
         }
-        else if(Player[A].RunCount >= 80 && Player[A].Character == 3)
+        else if(Player[A].RunCount >= 800 && Player[A].Character == 3)
         {
             Player[A].CanFly = true;
-            Player[A].RunCount = 80;
+            Player[A].RunCount = 800;
         }
-        else if(Player[A].RunCount >= 60 && Player[A].Character == 4)
+        else if(Player[A].RunCount >= 600 && Player[A].Character == 4)
         {
             Player[A].CanFly = true;
-            Player[A].RunCount = 60;
+            Player[A].RunCount = 600;
         }
-        else if(Player[A].RunCount >= 10 && Player[A].Character == 5) // link flying
+        else if(Player[A].RunCount >= 100 && Player[A].Character == 5) // link flying
         {
             Player[A].CanFly = true;
-            Player[A].RunCount = 10;
+            Player[A].RunCount = 100;
         }
         else
         {
@@ -569,7 +568,7 @@ void PlayerMovementY(int A)
                     else if(Player[A].Character == 3) // special handling for peach
                     {
                         Player[A].FlyCount = 0;
-                        Player[A].RunCount = 80;
+                        Player[A].RunCount = 800; // multiplied by 10 vs VB6 code, since it's an int now
                         Player[A].CanFly2 = false;
                         Player[A].Jump = 70;
                         Player[A].CanFloat = true;

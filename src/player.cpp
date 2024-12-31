@@ -3877,7 +3877,7 @@ void YoshiEatCode(const int A)
         if(p.YoshiBlue)
         {
             p.CanFly = true;
-            p.RunCount = 1000;
+            p.RunCount = 10000; // multiplied by 10 vs VB6 code, since it's an int now
         }
 
         if(p.MountSpecial == 0)
