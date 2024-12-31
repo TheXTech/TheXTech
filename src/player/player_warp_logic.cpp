@@ -1288,8 +1288,10 @@ void PlayerEffectWarpWait(int A)
             s_TriggerDoorEffects(static_cast<Location_t>(Warp[p.Warp].Exit), false);
 
             SoundPause[SFX_Door] = 0;
-            p.Effect = PLREFF_WAITING;
-            p.Effect2 = 30;
+
+            // SMBX 1.3 logic for P1, see below
+            // p.Effect = PLREFF_WAITING;
+            // p.Effect2 = 30;
 
             if(A >= 2 && !g_ClonedPlayerMode)
             {
@@ -1298,6 +1300,16 @@ void PlayerEffectWarpWait(int A)
             }
             else
                 PlaySoundSpatial(SFX_Door, p.Location);
+        }
+        // new code to replicate SMBX 1.3 logic setting Effect2 to 30
+        else if(fEqual(p.Effect2, 1870))
+        {
+            // Trigger an exit event at door warp that was used to enter the level
+            if(Warp[p.Warp].eventExit != EVENT_NONE)
+                TriggerEvent(Warp[p.Warp].eventExit, A);
+
+            p.Effect = PLREFF_NORMAL;
+            p.Effect2 = 0;
         }
     }
     else if(p.Effect2 <= 3000) // exit warp wait

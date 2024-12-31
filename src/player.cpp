@@ -5815,14 +5815,10 @@ void PlayerEffects(const int A)
         else if(p.Effect2 <= 30)
         {
             p.Effect2 -= 1;
-            if(p.Effect2 == 0.0)
+            if(p.Effect2 == 0)
             {
                 p.Effect = PLREFF_NORMAL;
                 p.Effect2 = 0;
-
-                // Trigger an exit event at door warp that was been used to enter the level
-                if(p.Warp > 0 && Warp[p.Warp].Effect == 2 && Warp[p.Warp].eventExit != EVENT_NONE)
-                    TriggerEvent(Warp[p.Warp].eventExit, A);
             }
         }
         else
