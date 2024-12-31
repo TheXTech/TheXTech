@@ -28,11 +28,7 @@ jobs:
         - {
             name: "Vita build",
 
-            extra_options: "-DTHEXTECH_EXECUTABLE_NAME=thextech \
-            -DCMAKE_TOOLCHAIN_FILE=/usr/local/vitasdk/share/vita.toolchain.cmake \
-            -DVITA_APP_NAME=\"TheXTech Vita\" \
-            -DVITA_TITLEID=\"THEXTECH0\" \
-            -DVITA_VERSION=\"01.05\"",
+            extra_options: "-DCMAKE_TOOLCHAIN_FILE=$VITASDK/share/vita.toolchain.cmake",
 
             deps_cmdline: "echo 'Vita SDK is already pre-installed'",
 

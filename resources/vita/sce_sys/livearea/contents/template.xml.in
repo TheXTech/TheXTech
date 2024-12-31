@@ -12,7 +12,15 @@
 	<frame id="frame1">
 		<liveitem>
 			<text>
-				<str size="20" color="#ffffff" shadow="on">Ported by Axiom</str>
+				<str size="20" color="#ffffff" shadow="on">@XTECH_VITA_AUTHORS@</str>
+			</text>
+		</liveitem>
+	</frame>
+
+	<frame id="frame2">
+		<liveitem>
+			<text>
+				<str size="20" color="#ffffff" shadow="on">@XTECH_VITA_SHORT_DESC@</str>
 			</text>
 		</liveitem>
 	</frame>
