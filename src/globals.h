@@ -706,7 +706,7 @@ struct Player_t
 //    Bumped As Boolean 'true if hit by another player
     bool Bumped = false;
 //    Bumped2 As Single
-    float Bumped2 = 0.0f;
+    vbint_t Bumped2 = 0;
 //    Dead As Boolean 'true if dead
     bool Dead = false;
 //    TimeToLive As Integer 'for returning to the other play after dying
