@@ -1149,12 +1149,14 @@ void PlayerEffectWarpDoor(int A)
         p.Effect2 = 0;
         p.WarpCD = 40;
 
-        // reverse warp fader
         if(!is_level_quit)
+        {
+            // reverse warp fader
             s_WarpFaderLogic(true, A, warp.transitEffect, warp_exit, true, true);
 
-        if(warp.eventExit != EVENT_NONE)
-            TriggerEvent(warp.eventExit, A);
+            if(warp.eventExit != EVENT_NONE)
+                TriggerEvent(warp.eventExit, A);
+        }
 
         s_CheckWarpLevelExit(p, warp, 3000, 2970);
 
@@ -1486,10 +1488,6 @@ static inline bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool bac
         {
             plr.Warp = B;
             plr.WarpBackward = backward;
-
-            if(warp.eventExit != EVENT_NONE)
-                TriggerEvent(warp.eventExit, A);
-
             s_CheckWarpLevelExit(plr, warp, 2921, 2921);
 
             return true;
