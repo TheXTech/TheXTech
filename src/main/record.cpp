@@ -79,6 +79,12 @@
 #   define PRId64   __PRI64_PREFIX "d"
 #endif
 
+#ifdef LOW_MEM
+#   define PRIvb PRId16
+#else
+#   define PRIvb "d"
+#endif
+
 static std::string makeRecordPrefix()
 {
     auto now = std::chrono::system_clock::now();
@@ -179,7 +185,7 @@ static void write_header()
                 "Mount %d\r\n"
                 "MountType %d\r\n"
                 "HeldBonus %d\r\n",
-                Player[A].Character, Player[A].State, Player[A].Mount, Player[A].MountType, Player[A].HeldBonus);
+                (int)Player[A].Character, (int)Player[A].State, (int)Player[A].Mount, (int)Player[A].MountType, (int)Player[A].HeldBonus);
     }
 }
 
@@ -300,24 +306,24 @@ static void read_header()
 
     for(int A = 1; A <= numPlayers; A++)
     {
-        int HeldBonus = NPCID(0);
+        vbint_t HeldBonus = NPCID(0);
 
         if(recordVersion < 3)
             fscanf(replay_file,
                    "Player\r\n"
-                   "Char %d\r\n"
-                   "State %d\r\n"
-                   "MountType %d\r\n"
-                   "HeldBonus %d\r\n",
+                   "Char %" PRIvb "\r\n"
+                   "State %" PRIvb "\r\n"
+                   "MountType %" PRIvb "\r\n"
+                   "HeldBonus %" PRIvb "\r\n",
                 &Player[A].Character, &Player[A].State, &Player[A].MountType, &HeldBonus);
         else
             fscanf(replay_file,
                    "Player\r\n"
-                   "Char %d\r\n"
-                   "State %d\r\n"
-                   "Mount %d\r\n"
-                   "MountType %d\r\n"
-                   "HeldBonus %d\r\n",
+                   "Char %" PRIvb "\r\n"
+                   "State %" PRIvb "\r\n"
+                   "Mount %" PRIvb "\r\n"
+                   "MountType %" PRIvb "\r\n"
+                   "HeldBonus %" PRIvb "\r\n",
                 &Player[A].Character, &Player[A].State, &Player[A].Mount, &Player[A].MountType, &HeldBonus);
 
         Player[A].HeldBonus = NPCID(HeldBonus);

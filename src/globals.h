@@ -526,55 +526,55 @@ struct Player_t
 //    Driving As Boolean
     bool Driving = false;
 //    Quicksand As Integer
-    int Quicksand = 0;
+    vbint_t Quicksand = 0;
 //    Bombs As Integer
-    int Bombs = 0;
+    vbint_t Bombs = 0;
 //    Slippy As Boolean
     bool Slippy = false;
 //    Fairy As Boolean
     bool Fairy = false;
 //    FairyCD As Integer
-    int FairyCD = 0;
+    vbint_t FairyCD = 0;
 //    FairyTime As Integer
-    int FairyTime = 0;
+    vbint_t FairyTime = 0;
 //    HasKey As Boolean
     bool HasKey = false;
 //    SwordPoke As Integer
-    int SwordPoke = 0;
+    vbint_t SwordPoke = 0;
 //    Hearts As Integer
-    int Hearts = 0;
+    vbint_t Hearts = 0;
 //    CanFloat As Boolean
     bool CanFloat = false;
 //    FloatRelease As Boolean
     bool FloatRelease = false;
 //    FloatTime As Integer
-    int FloatTime = 0;
+    vbint_t FloatTime = 0;
 //    FloatSpeed As Single
     float FloatSpeed = 0.0f;
 //    FloatDir As Integer
-    int FloatDir = 0;
+    vbint_t FloatDir = 0;
 //    GrabTime As Integer 'how long the player has been trying to grab an npc from above
-    int GrabTime = 0;
+    vbint_t GrabTime = 0;
 //    GrabSpeed As Single
     float GrabSpeed = 0.0f;
 //    VineNPC As Double 'the NPC that the player is climbing
-    int VineNPC = 0;
+    vbint_t VineNPC = 0;
 //  EXTRA:  Fence BGO
-    int VineBGO = 0;
+    vbint_t VineBGO = 0;
 //    Wet As Integer 'weather or not the player is under water
-    int Wet = 0;
+    vbint_t Wet = 0;
 //    WetFrame As Boolean 'true if the play should be swimming
     bool WetFrame = false;
 //    SwimCount As Integer 'cool down between swim strokes
-    int SwimCount = 0;
+    vbint_t SwimCount = 0;
 //    NoGravity As Integer
-    int NoGravity = 0;
+    vbint_t NoGravity = 0;
 //    Slide As Boolean 'true if the player is sliding
     bool Slide = false;
 //    SlideKill As Boolean 'true if the player is sliding fast enough to kill an NPC
     bool SlideKill = false;
 //    Vine As Integer 'greater then 0 if the player is climbing
-    int Vine = 0;
+    vbint_t Vine = 0;
 //    NoShellKick As Integer 'dont kick a shell
     // never set in SMBX 1.3, was originally used to improve shell-surf
     // int NoShellKick = 0;
@@ -583,27 +583,27 @@ struct Player_t
 //    StateNPC As Integer
     NPCID StateNPC = NPCID(0);
 //    Slope As Integer 'the block that the player is standing on when on a slope
-    int Slope = 0;
+    vbint_t Slope = 0;
 //    Stoned As Boolean 'true of a statue form (tanooki suit)
     bool Stoned = false;
 //    StonedCD As Integer 'delay before going back in to stone form
-    int StonedCD = 0;
+    vbint_t StonedCD = 0;
 //    StonedTime As Integer 'how long the player can remain as a statue
-    int StonedTime = 0;
+    vbint_t StonedTime = 0;
 //    SpinJump As Boolean 'true if spin jumping
     bool SpinJump = false;
 //    SpinFrame As Integer 'frame for spinning
-    int SpinFrame = 0;
+    vbint_t SpinFrame = 0;
 //    SpinFireDir As Integer 'for shooting fireballs while spin jumping
-    int SpinFireDir = 0;
+    vbint_t SpinFireDir = 0;
 //    Multiplier As Integer 'for score increase for multiple hops
     vbint_t Multiplier = 0;
 //    SlideCounter As Integer 'for creating the dust effect when sliding
-    int SlideCounter = 0;
+    vbint_t SlideCounter = 0;
 //    ShowWarp As Integer
-    int ShowWarp = 0;
+    vbint_t ShowWarp = 0;
 //    ForceHold As Integer  'force the player to hold an item for a specific amount of time
-    int ForceHold = 0;
+    vbint_t ForceHold = 0;
 
     // pound state converted to bitfield
 //    GroundPound As Boolean 'for purple yoshi pound
@@ -625,68 +625,68 @@ struct Player_t
 //    YoshiRed As Boolean
     bool YoshiRed = false;
 //    YoshiWingsFrame As Integer
-    int YoshiWingsFrame = 0;
+    vbint_t YoshiWingsFrame = 0;
 //    YoshiWingsFrameCount As Integer
-    int YoshiWingsFrameCount = 0;
+    vbint_t YoshiWingsFrameCount = 0;
 //'yoshi graphic display
 //    YoshiTX As Integer
-    int YoshiTX = 0;
+    vbint_t YoshiTX = 0;
 //    YoshiTY As Integer
-    int YoshiTY = 0;
+    vbint_t YoshiTY = 0;
 //    YoshiTFrame As Integer
-    int YoshiTFrame = 0;
+    vbint_t YoshiTFrame = 0;
 //    YoshiTFrameCount As Integer
-    int YoshiTFrameCount = 0;
+    vbint_t YoshiTFrameCount = 0;
 //    YoshiBX As Integer
-    int YoshiBX = 0;
+    vbint_t YoshiBX = 0;
 //    YoshiBY As Integer
-    int YoshiBY = 0;
+    vbint_t YoshiBY = 0;
 //    YoshiBFrame As Integer
-    int YoshiBFrame = 0;
+    vbint_t YoshiBFrame = 0;
 //    YoshiBFrameCount As Integer
-    int YoshiBFrameCount = 0;
+    vbint_t YoshiBFrameCount = 0;
 //    YoshiTongue As Location
     Location_t YoshiTongue;
 //    YoshiTongueX As Single
     float YoshiTongueX = 0.0f;
 //    YoshiTongueLength As Integer 'length of yoshi's tongue
-    int YoshiTongueLength = 0;
+    vbint_t YoshiTongueLength = 0;
 //    YoshiTonugeBool As Boolean
     bool YoshiTonugeBool = false;
 //    YoshiNPC As Integer 'the NPC that is in yoshi's mouth
-    int YoshiNPC = 0;
+    vbint_t YoshiNPC = 0;
 //    YoshiPlayer As Integer 'the player that is in yoshi's mouth
-    int YoshiPlayer = 0;
+    vbint_t YoshiPlayer = 0;
 //    Dismount As Integer 'delay before you can remount
-    int Dismount = 0;
+    vbint_t Dismount = 0;
 //    NoPlayerCol As Integer
-    int NoPlayerCol = 0;
+    vbint_t NoPlayerCol = 0;
 //    Location As Location 'collision detection info
     Location_t Location;
 //    Character As Integer 'luigi or mario
-    int Character = 0;
+    vbint_t Character = 0;
 //    Controls As Controls 'players controls
     Controls_t Controls;
 //    Direction As Integer 'the way the player is facing
-    int Direction = 0;
+    vbint_t Direction = 0;
 //    Mount As Integer '1 for boot, 2 for clown car, 3 for yoshi
-    int Mount = 0;
+    vbint_t Mount = 0;
 //    MountType As Integer 'for different types of mounts. blue yoshi, red yoshi, etc
-    int MountType = 0;
+    vbint_t MountType = 0;
 //    MountSpecial As Integer
-    int MountSpecial = 0;
+    vbint_t MountSpecial = 0;
 //    MountOffsetY As Integer
-    int MountOffsetY = 0;
+    vbint_t MountOffsetY = 0;
 //    MountFrame As Integer 'GFX frame for the player's mount
-    int MountFrame = 0;
+    vbint_t MountFrame = 0;
 //    State As Integer '1 for small mario, 2 for super, 3 for fire, 4 for racoon, 5 for tanooki, 6 for hammer
-    int State = 0;
+    vbint_t State = 0;
 //    Frame As Integer
-    int Frame = 0;
+    vbint_t Frame = 0;
 //    FrameCount As Single
-    int FrameCount = 0;
+    vbint_t FrameCount = 0;
 //    Jump As Integer 'how long the player can jump for
-    int Jump = 0;
+    vbint_t Jump = 0;
 //    CanJump As Boolean 'true if the player can jump
     bool CanJump = false;
 //    CanAltJump As Boolean 'true if the player can alt jump
@@ -712,9 +712,9 @@ struct Player_t
 //    Dead As Boolean 'true if dead
     bool Dead = false;
 //    TimeToLive As Integer 'for returning to the other play after dying
-    int TimeToLive = 0;
+    vbint_t TimeToLive = 0;
 //    Immune As Integer 'greater then 0 if immune, this is a counter
-    int Immune = 0;
+    vbint_t Immune = 0;
 //    Immune2 As Boolean 'makes the player blink
     bool Immune2 = false;
 //    ForceHitSpot3 As Boolean 'force hitspot 3 for collision detection
@@ -738,27 +738,27 @@ struct Player_t
     // unused since SMBX 1.3
     // float m2Speed = 0.0f;
 //    HoldingNPC As Integer 'What NPC is being held
-    int HoldingNPC = 0;
+    vbint_t HoldingNPC = 0;
 //    CanGrabNPCs As Boolean 'If the player can grab NPCs
     bool CanGrabNPCs = false;
 //    HeldBonus As Integer 'the NPC that is in the player's container
     NPCID HeldBonus = NPCID(0);
 //    Section As Integer 'What section of the level the player is in
-    int Section = 0;
+    vbint_t Section = 0;
 //    WarpCD As Integer 'delay before allowing the player to warp again
-    int WarpCD = 0;
+    vbint_t WarpCD = 0;
 //    Warp As Integer 'the warp the player is using
-    int Warp = 0;
+    vbint_t Warp = 0;
 // EXTRA: Is the backward warp mode
-    int WarpBackward = false;
+    bool WarpBackward = false;
 // EXTRA: True if shooted from the cannon
-    int WarpShooted = false;
+    bool WarpShooted = false;
 //    FireBallCD As Integer 'How long the player has to wait before he can shoot again
-    int FireBallCD = 0;
+    vbint_t FireBallCD = 0;
 //    FireBallCD2 As Integer 'How long the player has to wait before he can shoot again
-    int FireBallCD2 = 0;
+    vbint_t FireBallCD2 = 0;
 //    TailCount As Integer 'Used for the tail swipe
-    int TailCount = 0;
+    vbint_t TailCount = 0;
 //    RunCount As Single 'To find how long the player has ran for
     float RunCount = 0.0f;
 //    CanFly As Boolean 'If the player can fly
@@ -766,15 +766,15 @@ struct Player_t
 //    CanFly2 As Boolean
     bool CanFly2 = false;
 //    FlyCount As Integer 'length of time the player can fly
-    int FlyCount = 0;
+    vbint_t FlyCount = 0;
 //    RunRelease As Boolean 'The player let go of run and pressed again
     bool RunRelease = false;
 //    JumpRelease As Boolean 'The player let go of run and pressed again
     bool JumpRelease = false;
 //    StandingOnNPC As Integer 'The NPC the player is standing on
-    int StandingOnNPC = 0;
+    vbint_t StandingOnNPC = 0;
 //    StandingOnTempNPC As Integer 'The NPC the player is standing on
-    int StandingOnVehiclePlr = 0;
+    vbint_t StandingOnVehiclePlr = 0;
 //    UnStart As Boolean 'Player let go of the start button
     bool UnStart = false;
 //    mountBump As Single 'Player hit something while in a mount
