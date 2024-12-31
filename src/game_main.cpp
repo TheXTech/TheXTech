@@ -1346,6 +1346,9 @@ int GameMain(const CmdLineSetup_t &setup)
                         p.Location.Y = warp.Exit.Y + warp.Exit.Height - p.Location.Height;
                         CheckSection(A);
                         p.WarpCD = 50;
+
+                        if(warp.eventExit != EVENT_NONE)
+                            TriggerEvent(warp.eventExit, A);
                     }
                 }
 
