@@ -660,7 +660,7 @@ struct Player_t
 //    Dismount As Integer 'delay before you can remount
     vbint_t Dismount = 0;
 //    NoPlayerCol As Integer
-    vbint_t NoPlayerCol = 0;
+    // vbint_t NoPlayerCol = 0;
 //    Location As Location 'collision detection info
     Location_t Location;
 //    Character As Integer 'luigi or mario

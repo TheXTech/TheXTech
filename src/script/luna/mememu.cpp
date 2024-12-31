@@ -1593,7 +1593,7 @@ public:
         insert(0x000000b8, &Player_t::YoshiNPC);
         insert(0x000000ba, &Player_t::YoshiPlayer);
         insert(0x000000bc, &Player_t::Dismount);
-        insert(0x000000be, &Player_t::NoPlayerCol);
+        // insert(0x000000be, &Player_t::NoPlayerCol);
         //Location_t Location; (Between 0xC0 and 0xF0)
         insert(0x000000f0, &Player_t::Character);
         //Controls_t Controls; (Between 0xF2 and 0x105)
