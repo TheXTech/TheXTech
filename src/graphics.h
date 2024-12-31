@@ -184,8 +184,9 @@ void DrawInterface(int Z, int numScreens);
  * \param Y      top Y coordinate
  * \param lives  lives count to draw
  * \param hunds  100s count to draw
+ * \param force_lives force draw of the lives count
  */
-void DrawLives(int X, int Y, int lives, int hunds);
+void DrawLives(int X, int Y, int lives, int hunds, bool force_lives = false);
 
 /*!
  * \brief NEW: draws a set of medals onscreen

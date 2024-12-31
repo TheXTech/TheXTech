@@ -253,7 +253,10 @@ static void s_change_save_item()
         s_episode_speedrun_mode = 0;
     }
     else if(save_configs < 0)
+    {
         s_episode_speedrun_mode = -save_configs;
+        s_episode_playstyle = s_episode_speedrun_mode - 1;
+    }
     else
     {
         s_episode_playstyle = SelectWorld[selWorld].bugfixes_on_by_default ? Config_t::MODE_MODERN : Config_t::MODE_CLASSIC;
@@ -1681,7 +1684,10 @@ bool mainMenuUpdate()
                     s_episode_speedrun_mode = 0;
                 }
                 else if(save_configs < 0)
+                {
                     s_episode_speedrun_mode = -save_configs;
+                    s_episode_playstyle = s_episode_speedrun_mode - 1;
+                }
             }
 
             if(MenuCursorCanMove || MenuMouseClick)
@@ -1888,7 +1894,10 @@ bool mainMenuUpdate()
                         s_episode_speedrun_mode = 0;
                     }
                     else
+                    {
                         s_episode_speedrun_mode = MenuCursor - 2;
+                        s_episode_playstyle = s_episode_speedrun_mode - 1;
+                    }
 
                     PlaySoundMenu(SFX_Do);
                     MenuMode -= MENU_SELECT_SLOT_ADVMODE_ADD;
@@ -2160,7 +2169,6 @@ static void s_drawGameSaves(int MenuX, int MenuY)
         if(s_episode_speedrun_mode != 0)
         {
             SuperPrintScreenCenter("SPEEDRUN MODE " + std::to_string(s_episode_speedrun_mode), 3, infobox_y + 14, color);
-            s_episode_playstyle = s_episode_speedrun_mode - 1;
         }
         else
         {
@@ -2234,7 +2242,7 @@ static void s_drawGameSaves(int MenuX, int MenuY)
         int row_lc = (hasFails) ? row_1 : row_c;
 
         // Print lives on the screen (from gfx_update2.cpp)
-        DrawLives(infobox_x + 272 + 32, row_lc, info.Lives, info.Hundreds);
+        DrawLives(infobox_x + 272 + 32, row_lc, info.Lives, info.Hundreds, s_episode_playstyle == Config_t::MODE_VANILLA);
 
         // Print coins on the screen (from gfx_update2.cpp)
         int coins_x = infobox_x + 480 - 10 - 36 - 62;

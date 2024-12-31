@@ -301,13 +301,13 @@ void DrawInterface(int Z, int numScreens)
     }
 }
 
-void DrawLives(int X, int Y, int lives, int hunds)
+void DrawLives(int X, int Y, int lives, int hunds, bool force_lives)
 {
     bool show_times = true;
     int count = 0;
     int text_X = X + 8 + GFX.Interface[1].w + 8;
 
-    if(g_config.modern_lives_system)
+    if(g_config.modern_lives_system && !force_lives)
     {
         bool debt = (hunds < 0);
         count = (debt) ? -hunds : hunds;
