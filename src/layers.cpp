@@ -1504,7 +1504,7 @@ void TriggerEvent(eventindex_t index, int whichPlayer)
 
     newEventNum++;
     NewEvent[newEventNum] = index;
-    newEventDelay[newEventNum] = 0;
+    newEventDelay[newEventNum] = -1;
     newEventPlayer[newEventNum] = static_cast<uint8_t>(whichPlayer);
 }
 
@@ -1512,7 +1512,7 @@ bool UpdateEvents()
 {
     // this is for events that have a delay to call other events
     // this sub also updates the screen position for autoscroll levels
-    int A = 0;
+    bool events_active = true;
 
     switch(g_gameLoopInterrupt.site)
     {
@@ -1523,13 +1523,13 @@ bool UpdateEvents()
     }
 
     if(FreezeNPCs)
-        return false;
+        events_active = false;
 
     if(!GameMenu)
     {
         // possibly undesirable: doesn't advance event timer at all if any players are (for example) in doors or in holding pattern
         if(!AllPlayersNormal())
-            return false;
+            events_active = false;
     }
 
     if(newEventNum > 0)
@@ -1537,11 +1537,14 @@ bool UpdateEvents()
         int newEventNum_old;
         newEventNum_old = newEventNum;
 
+        int A;
         for(A = 1; A <= newEventNum_old; A++)
         {
-            if(newEventDelay[A] > 0)
+            // count down the event if the events are active
+            if(newEventDelay[A] > 0 && events_active)
                 newEventDelay[A]--;
-            else
+            // trigger event if it's ready, or if the event was directly Triggered
+            else if(events_active || newEventDelay[A] < 0)
             {
                 eventindex_t resume_index;
                 resume_index = ProcEvent_Safe(false, NewEvent[A], newEventPlayer[A]);
@@ -1550,6 +1553,8 @@ bool UpdateEvents()
                     g_gameLoopInterrupt.A = A;
                     g_gameLoopInterrupt.B = newEventNum_old;
                     g_gameLoopInterrupt.C = resume_index;
+                    g_gameLoopInterrupt.bool1 = events_active;
+
                     g_gameLoopInterrupt.site = GameLoopInterrupt::UpdateEvents;
                     return true;
 
@@ -1557,6 +1562,8 @@ resume:
                     A = g_gameLoopInterrupt.A;
                     newEventNum_old = g_gameLoopInterrupt.B;
                     resume_index = g_gameLoopInterrupt.C;
+                    events_active = g_gameLoopInterrupt.bool1;
+
                     g_gameLoopInterrupt.site = GameLoopInterrupt::None;
 
                     resume_index = ProcEvent_Safe(true, resume_index, newEventPlayer[A]);
@@ -1580,7 +1587,10 @@ resume:
         }
     }
 
-    for(A = 0; A < numSections; A++)
+    if(!events_active)
+        return false;
+
+    for(int A = 0; A < numSections; A++)
     {
         if(AutoX[A] != 0.0f || AutoY[A] != 0.0f)
         {
