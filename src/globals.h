@@ -646,7 +646,7 @@ struct Player_t
 //    YoshiBFrameCount As Integer
     vbint_t YoshiBFrameCount = 0;
 //    YoshiTongue As Location
-    Location_t YoshiTongue;
+    SpeedlessLocation_t YoshiTongue;
 //    YoshiTongueX As Single
     // float YoshiTongueX = 0.0f;
 //    YoshiTongueLength As Integer 'length of yoshi's tongue

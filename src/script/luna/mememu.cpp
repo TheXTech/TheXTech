@@ -1675,7 +1675,7 @@ public:
     double getValue(Player_t *obj, size_t address, FIELDTYPE ftype) override
     {
         if(address >= 0x80 && address < 0xB0) // YoshiTongue
-            return s_locMem.getValue(&obj->YoshiTongue, address - 0x80, ftype);
+            return s_spLocMem.getValue(&obj->YoshiTongue, address - 0x80, ftype);
         else if(address >= 0xC0 && address < 0xF0) // Location
             return s_locMem.getValue(&obj->Location, address - 0xC0, ftype);
         else if(address >= 0xF2 && address < 0x106) // Controls
@@ -1723,7 +1723,7 @@ public:
     {
         if(address >= 0x80 && address < 0xB0) // YoshiTongue
         {
-            s_locMem.setValue(&obj->YoshiTongue, address - 0x80, value, ftype);
+            s_spLocMem.setValue(&obj->YoshiTongue, address - 0x80, value, ftype);
             return;
         }
         else if(address >= 0xC0 && address < 0xF0) // Location

@@ -3065,7 +3065,7 @@ void YoshiEat(const int A)
         }
     }
 
-    for(int B : treeNPCQuery(p.YoshiTongue, SORTMODE_ID))
+    for(int B : treeNPCQuery(static_cast<Location_t>(p.YoshiTongue), SORTMODE_ID))
     {
         auto &n = NPC[B];
         if(((n->IsACoin && n.Special == 1) || !n->NoYoshi) &&
