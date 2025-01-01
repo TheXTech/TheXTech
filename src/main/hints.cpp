@@ -89,9 +89,21 @@ static void s_draw_purple_pet_altrun(int x, int y)
     s_draw_purple_pet(c, x, y);
 }
 
-static void s_draw_no_lives(int x, int y)
+static void s_draw_no_lives_new(int x, int y)
 {
     DrawLives(x + 40, y + 48 - 8, Lives, g_100s);
+}
+
+static void s_draw_no_lives_old(int x, int y)
+{
+    StdPicture &tex = GFXNPC[NPCID_POISON];
+
+    int frame_h = NPCTraits[NPCID_POISON].HeightGFX;
+    if(frame_h == 0)
+        frame_h = NPCTraits[NPCID_POISON].THeight;
+
+    XRender::renderTextureBasic(x + 48 - tex.w / 2, y + 48 - frame_h / 2,
+        tex.w, frame_h, tex, 0, 0);
 }
 
 static void s_draw_rainbow_surf(int x, int y)
@@ -197,20 +209,18 @@ static uint8_t s_down_pound_applies()
     return 108;
 }
 
-static uint8_t s_no_lives_new()
+static uint8_t s_no_lives_new_applies()
 {
     if(!g_config.modern_lives_system)
         return 0;
 
     if(g_100s == 0)
         return 100;
-    else if(g_100s < 0)
-        return 8;
 
     return 0;
 }
 
-static uint8_t s_no_lives_old()
+static uint8_t s_no_lives_old_applies()
 {
     if(g_config.modern_lives_system)
         return 0;
@@ -327,15 +337,15 @@ static uint8_t s_gray_bricks_applies()
 }
 
 static const Hint s_hints[] = {
-    {"Press to pound downwards!", "pound-key", s_altrun_pound_applies, s_draw_purple_pet_altrun},
-    {"Press to pound downwards!", "pound-key", s_down_pound_applies,   s_draw_purple_pet_down},
-    {"If you fail, your score will reset.",   "no-lives-new", s_no_lives_new, s_draw_no_lives},
-    {"If you fail, the game will end.", "no-lives-old", s_no_lives_old, s_draw_no_lives},
-    {"Grab, run, hold down, and let go to surf.", "rainbow-surf", s_rainbow_surf_applies, s_draw_rainbow_surf},
-    {"Press Run to collect and Alt Run to throw.", "char5-bombs", s_char5_bombs_applies, s_draw_char5_bombs},
-    {"Duck to block most - but not all - flames!", "heavy-duck", s_heavy_duck_applies, s_draw_heavy_duck},
-    {"Wearing this blocks most - but not all - flames!", "shoe-block", s_shoe_block_applies, s_draw_shoe_block},
-    {"Some blocks are vulnerable to special powers.", "gray-bricks", s_gray_bricks_applies, s_draw_gray_bricks},
+    {"Press to pound downwards!",                               "pound-key",    s_altrun_pound_applies, s_draw_purple_pet_altrun},
+    {"Press to pound downwards!",                               "pound-key",    s_down_pound_applies,   s_draw_purple_pet_down},
+    {"No coins left? Take a loan! Just watch your score...",    "no-lives-new", s_no_lives_new_applies, s_draw_no_lives_new},
+    {"Be careful - Game Over is imminent!",                     "no-lives-old", s_no_lives_old_applies, s_draw_no_lives_old},
+    {"Grab, run, hold down, and let go to surf.",               "rainbow-surf", s_rainbow_surf_applies, s_draw_rainbow_surf},
+    {"Press Run to collect and Alt Run to throw.",              "char5-bombs",  s_char5_bombs_applies,  s_draw_char5_bombs},
+    {"Duck to block most - but not all - flames!",              "heavy-duck",   s_heavy_duck_applies,   s_draw_heavy_duck},
+    {"Wearing this blocks most - but not all - flames!",        "shoe-block",   s_shoe_block_applies,   s_draw_shoe_block},
+    {"Some blocks are vulnerable to special powers.",           "gray-bricks",  s_gray_bricks_applies,  s_draw_gray_bricks},
 };
 
 static constexpr size_t s_hint_count = sizeof(s_hints) / sizeof(Hint);
