@@ -345,8 +345,8 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                                     else
                                         Effect[numEffects].Frame = 5 + iRand(3);
                                 }
-                                NPC[B].Location.X += NPC[B].Location.Width / 2.0 - EffectWidth[10] / 2.0;
-                                NPC[B].Location.Y += NPC[B].Location.Height / 2.0 - EffectHeight[10] / 2.0;
+                                NPC[B].Location.X += NPC[B].Location.Width / 2.0 - EffectWidth[EFFID_SMOKE_S3] / 2.0;
+                                NPC[B].Location.Y += NPC[B].Location.Height / 2.0 - EffectHeight[EFFID_SMOKE_S3] / 2.0;
                                 NewEffect(EFFID_SMOKE_S3, NPC[B].Location);
 
                                 treeNPCUpdate(B);
@@ -415,7 +415,7 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                                     {
                                         Player[A].VineNPC = B;
                                         if(g_config.fix_climb_bgo_speed_adding)
-                                            Player[A].VineBGO = 0.0;
+                                            Player[A].VineBGO = 0;
                                     }
                                 }
                             }
