@@ -340,8 +340,8 @@ void GetvScreenAverage3(vScreen_t& vscreen)
         // don't limit by visible screen: needed to handle unusual shared screen cases found by Sapphire Bullet Bill
         // use_height = SDL_min(use_height, static_cast<double>(screen.visible_screen().H));
 
-        vscreen.Width = use_width;
-        vscreen.Height = use_height;
+        vscreen.Width = (int)use_width;
+        vscreen.Height = (int)use_height;
 
         if(use_height > screen.H)
             mean_Y = -(want_t + want_b) / 2;
@@ -787,8 +787,8 @@ void GetvScreenCredits(vScreen_t& vscreen)
     const SpeedlessLocation_t& section = level[Player[1].Section];
 
     // remember that the screen will be limited to the section's size in all cases
-    double use_width  = SDL_min(vscreen.Width,  section.Width  - section.X);
-    double use_height = SDL_min(vscreen.Height, section.Height - section.Y);
+    double use_width  = SDL_min((double)vscreen.Width,  section.Width  - section.X);
+    double use_height = SDL_min((double)vscreen.Height, section.Height - section.Y);
 
     vscreen.X = (vscreen.X / B) + (use_width * 0.5);
     vscreen.Y = (vscreen.Y / B) + (use_height * 0.5) - vScreenYOffset;

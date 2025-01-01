@@ -36,18 +36,18 @@ struct qScreen_t
     double Y = 0.0;
 
 //    Left As Double
-    double Left = 0.0;
+    int Left = 0;
 //    Top As Double
-    double Top = 0.0;
+    int Top = 0;
 //    Width As Double
-    double Width = 0.0;
+    int Width = 0;
 //    Height As Double
-    double Height = 0.0;
+    int Height = 0;
 //End Type
 
 //    NEW: location on screen when vScreens are smaller due to level size
-    double ScreenTop = 0.0;
-    double ScreenLeft = 0.0;
+    int ScreenTop = 0;
+    int ScreenLeft = 0;
 };
 
 struct vScreen_t : public qScreen_t

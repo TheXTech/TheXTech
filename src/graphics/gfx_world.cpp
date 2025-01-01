@@ -35,7 +35,7 @@ static bool s_border_valid()
     return GFX.WorldMapFrame_Border.tex.inited && (!GFX.isCustom(73) || GFX.isCustom(74));
 }
 
-static void s_getMargins(const Screen_t& screen, double& margin, double& marginTop, double& marginBottom)
+static void s_getMargins(const Screen_t& screen, int& margin, int& marginTop, int& marginBottom)
 {
     margin = 66;
     marginTop = 130;
@@ -82,7 +82,7 @@ void GetvScreenWorld(vScreen_t& vscreen)
     const WorldPlayer_t& wp = WorldPlayer[vscreen.player];
     const Location_t& wpLoc = wp.Location;
 
-    double margin, marginTop, marginBottom;
+    int margin, marginTop, marginBottom;
     s_getMargins(screen, margin, marginTop, marginBottom);
 
     vscreen.Top = marginTop;
@@ -124,17 +124,17 @@ void GetvScreenWorld(vScreen_t& vscreen)
 
     // default bounds are the canonical vScreen
     const Screen_t& c_screen = screen.canonical_screen();
-    double c_margin, c_marginTop, c_marginBottom;
+    int c_margin, c_marginTop, c_marginBottom;
     s_getMargins(c_screen, c_margin, c_marginTop, c_marginBottom);
 
     double c_width = c_screen.W - c_margin * 2;
     double c_height = c_screen.H - c_marginTop - c_marginBottom;
 
-    const Location_t defaultBounds = newLoc(fX - c_width / 2, fY - c_height / 2, c_width, c_height);
+    const IntegerLocation_t defaultBounds = IntegerLocation_t{Maths::iRound(fX - c_width / 2), Maths::iRound(fY - c_height / 2), (int)c_width, (int)c_height};
 
     // get the bounds from the player's section if possible, otherwise the defaults
-    const Location_t& bounds = (wp.Section != 0)
-        ? static_cast<Location_t>(WorldArea[wp.Section].Location)
+    const IntegerLocation_t& bounds = (wp.Section != 0)
+        ? WorldArea[wp.Section].Location
         : defaultBounds;
 
     if(bounds.Width < vscreen.Width)
