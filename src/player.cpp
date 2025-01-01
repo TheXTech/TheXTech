@@ -5580,7 +5580,7 @@ void PlayerEffects(const int A)
     {
         p.Frame = 1;
         p.Effect2 += 1;
-        if(p.Effect2 / 5 == static_cast<int>(floor(static_cast<double>(p.Effect2 / 5))))
+        if(p.Effect2 % 5 == 0)
         {
             if(p.State == 1)
             {
@@ -5643,7 +5643,7 @@ void PlayerEffects(const int A)
         }
         p.Frame = 1;
         p.Effect2 += 1;
-        if(p.Effect2 / 5 == static_cast<int>(floor(static_cast<double>(p.Effect2 / 5))))
+        if(p.Effect2 % 5 == 0)
         {
             if(p.State == 1)
             {
@@ -5715,7 +5715,7 @@ void PlayerEffects(const int A)
         p.Frame = 1;
         p.Effect2 += 1;
 
-        if(fEqual(p.Effect2 / 5, std::floor(p.Effect2 / 5)))
+        if(p.Effect2 % 5 == 0)
         {
             if(p.State == 2)
                 p.State = prev_state;
@@ -5747,7 +5747,7 @@ void PlayerEffects(const int A)
         }
         p.Frame = 1;
         p.Effect2 += 1;
-        if(p.Effect2 / 5 == static_cast<int>(floor(static_cast<double>(p.Effect2 / 5))))
+        if(p.Effect2 % 5 == 0)
         {
             if(p.State == 2)
                 p.State = 3;
@@ -5778,7 +5778,7 @@ void PlayerEffects(const int A)
         p.Frame = 1;
         p.Effect2 += 1;
 
-        if(fEqual(p.Effect2 / 5, std::floor(p.Effect2 / 5)))
+        if(p.Effect2 % 5 == 0)
         {
             if(p.State == 2)
                 p.State = 7;
@@ -5842,7 +5842,7 @@ void PlayerEffects(const int A)
 
         p.Effect2 += 1;
 
-        if(fEqual(p.Effect2 / 5, std::floor(p.Effect2 / 5.0)))
+        if(p.Effect2 % 5 == 0)
         {
             if(p.State == 1 && p.Character != 5)
             {
@@ -5894,7 +5894,7 @@ void PlayerEffects(const int A)
 
         p.Effect2 += 1;
 
-        if(fEqual(p.Effect2 / 5, std::floor(p.Effect2 / 5.0)))
+        if(p.Effect2 % 5 == 0)
         {
             if(p.State == 1 && p.Character != 5)
             {
@@ -5944,7 +5944,7 @@ void PlayerEffects(const int A)
 
         p.Effect2 += 1;
 
-        if(fEqual(p.Effect2 / 5, std::floor(p.Effect2 / 5.0)))
+        if(p.Effect2 % 5 == 0)
         {
             if(p.State == 1 && p.Character != 5)
             {
