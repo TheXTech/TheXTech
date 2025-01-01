@@ -1003,7 +1003,8 @@ void TouchScreenController::scanTouchDevices()
             d.id = SDL_GetTouchDevice(i);
 
 // At the SDL2 older than 2.30.8 is a bug that valid touch device was treated as invalid on Vita. This problem had been resolved since 2.30.8.
-#if !defined(VITA) || SDL_VERSION_ATLEAST(2, 30, 8)
+// A similar problem appears at the 3DS on SDL2 before the 2.30.11
+#if (!defined(VITA) || SDL_VERSION_ATLEAST(2, 30, 8)) && (!defined(__3DS__) || SDL_VERSION_ATLEAST(2, 30, 11))
             if(!d.id) // Invalid touch device, will be dropped from the list
             {
                 d.id = -1;
