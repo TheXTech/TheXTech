@@ -46,7 +46,8 @@
 #include "config.h"
 #include "controls.h"
 #include "graphics.h"
-#include "../gfx.h"
+#include "gfx.h"
+#include "eff_id.h"
 
 
 namespace XHints
@@ -92,14 +93,12 @@ static void s_draw_purple_pet_altrun(int x, int y)
 
 static void s_draw_no_lives_new(int x, int y)
 {
-    StdPicture &tex = GFXEffect[3];
+    StdPicture &tex = GFXEffect[EFFID_CHAR1_DIE];
 
-    XRender::renderTextureBasic(x + 48 - tex.w / 2, y + 24,
-        tex.w, 32, tex, 0, 0);
+    XRender::renderTextureBasic(x + 48 - tex.w / 2, y + 54 - tex.h, tex);
 
     if(GFX.Balance.inited)
-            XRender::renderTextureBasic(x + 48 - GFX.Balance.w / 2, y + 64,
-                GFX.Balance.w, GFX.Balance.h, GFX.Balance, 0, 0);
+        XRender::renderTextureBasic(x + 48 - GFX.Balance.w / 2, y + 64, GFX.Balance);
 }
 
 static void s_draw_no_lives_old(int x, int y)
