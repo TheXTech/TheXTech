@@ -276,7 +276,7 @@ static void s_draw_infobox_switch_arrows(int infobox_x, int infobox_y)
     if(GFX.CharSelIcons.inited)
     {
         XRender::renderTextureFL(infobox_x + 8, infobox_y + 34 - 24 / 2, 24, 24, GFX.CharSelIcons, 72, 0, 0.0, nullptr, X_FLIP_HORIZONTAL);
-        XRender::renderTexture(infobox_x + 480 - 8 - 24, infobox_y + 34 - 24 / 2, 24, 24, GFX.CharSelIcons, 72, 0);
+        XRender::renderTextureBasic(infobox_x + 480 - 8 - 24, infobox_y + 34 - 24 / 2, 24, 24, GFX.CharSelIcons, 72, 0);
     }
     else
     {
@@ -2182,14 +2182,10 @@ static void s_drawGameSaves(int MenuX, int MenuY)
             if(info.Stars > 0)
             {
                 len += 4;
-                XRender::renderTexture(MenuX + len, posY + 1,
-                                      GFX.Interface[5].w, GFX.Interface[5].h,
-                                      GFX.Interface[5], 0, 0);
+                XRender::renderTextureBasic(MenuX + len, posY + 1, GFX.Interface[5]);
 
                 len += GFX.Interface[5].w + 4;
-                XRender::renderTexture(MenuX + len, posY + 2,
-                                      GFX.Interface[1].w, GFX.Interface[1].h,
-                                      GFX.Interface[1], 0, 0);
+                XRender::renderTextureBasic(MenuX + len, posY + 2, GFX.Interface[1]);
 
                 len += GFX.Interface[1].w + 4;
                 SuperPrint(fmt::format_ne("{0}", info.Stars), 3, MenuX + len, posY);
@@ -2243,7 +2239,7 @@ static void s_drawGameSaves(int MenuX, int MenuY)
             {
                 XRender::renderTextureScaleEx(mode_icon_X, mode_icon_Y, 24, 24, GFXNPC[NPCID_TIMER_S2], 0, 0, 32, 32, rot, nullptr, X_FLIP_NONE, XTAlphaF(op));
                 if(save_configs > -10)
-                    XRender::renderTexture(mode_icon_X + 12, mode_icon_Y + 12, GFX.Font1[-save_configs]);
+                    XRender::renderTextureBasic(mode_icon_X + 12, mode_icon_Y + 12, GFX.Font1[-save_configs]);
             }
             else
             {
@@ -2374,8 +2370,8 @@ static void s_drawGameSaves(int MenuX, int MenuY)
 
         // Print coins on the screen (from gfx_update2.cpp)
         int coins_x = infobox_x + 480 - 10 - 36 - 62;
-        XRender::renderTexture(coins_x + 16, row_lc, GFX.Interface[2]);
-        XRender::renderTexture(coins_x + 40, row_lc + 2, GFX.Interface[1]);
+        XRender::renderTextureBasic(coins_x + 16, row_lc, GFX.Interface[2]);
+        XRender::renderTextureBasic(coins_x + 40, row_lc + 2, GFX.Interface[1]);
         SuperPrintRightAlign(t = std::to_string(info.Coins), 1, coins_x + 62 + 36, row_lc + 2);
 
         // Fails Counter
@@ -2402,7 +2398,7 @@ void mainMenuDraw()
 
     // URL
     if(XRender::TargetH >= SmallScreenH)
-        XRender::renderTexture(XRender::TargetW / 2 - GFX.MenuGFX[3].w / 2, XRender::TargetH - 24, GFX.MenuGFX[3]);
+        XRender::renderTextureBasic(XRender::TargetW / 2 - GFX.MenuGFX[3].w / 2, XRender::TargetH - 24, GFX.MenuGFX[3]);
 
     bool at_main_title = (MenuMode == MENU_MAIN || MenuMode == MENU_INTRO);
     bool draw_in_asset_pack = at_main_title && s_startAssetPackTimer >= 2;
@@ -2417,7 +2413,7 @@ void mainMenuDraw()
         int curtain_horiz_reps = XRender::TargetW / curtain_draw_w + 2;
 
         for(int i = 0; i < curtain_horiz_reps; i++)
-            XRender::renderTexture(curtain_draw_w * i, 0, curtain_draw_w, GFX.MenuGFX[1].h, GFX.MenuGFX[1], 0, 0);
+            XRender::renderTextureBasic(curtain_draw_w * i, 0, curtain_draw_w, GFX.MenuGFX[1].h, GFX.MenuGFX[1], 0, 0);
 
 #ifdef __3DS__
         if(at_main_title)
@@ -2446,7 +2442,7 @@ void mainMenuDraw()
             else if(XRender::TargetH <= 600)
                 logo_y = 40;
 
-            XRender::renderTexture(XRender::TargetW / 2 - GFX.MenuGFX[2].w / 2, logo_y, GFX.MenuGFX[2], logo_tint);
+            XRender::renderTextureBasic(XRender::TargetW / 2 - GFX.MenuGFX[2].w / 2, logo_y, GFX.MenuGFX[2], logo_tint);
         }
         else if(LogoMode == 2)
         {
@@ -2498,7 +2494,7 @@ void mainMenuDraw()
             SuperPrint(g_mainMenu.mainEditor, 3, MenuX, MenuY+30*(i++));
         SuperPrint(g_mainMenu.mainOptions, 3, MenuX, MenuY+30*(i++));
         SuperPrint(g_mainMenu.mainExit, 3, MenuX, MenuY+30*(i++));
-        XRender::renderTexture(MenuX - 20, MenuY + (MenuCursor * 30), 16, 16, GFX.MCursor[0], 0, 0);
+        XRender::renderTextureBasic(MenuX - 20, MenuY + (MenuCursor * 30), GFX.MCursor[0]);
     }
 
     // Character select
@@ -2583,12 +2579,12 @@ void mainMenuDraw()
 
         if(MenuMode == MENU_CHARACTER_SELECT_2P_S2 || MenuMode == MENU_CHARACTER_SELECT_BM_S2)
         {
-            XRender::renderTexture(MenuX - 20, B + MenuY + (MenuCursor * 30), GFX.MCursor[3]);
-            XRender::renderTexture(MenuX - 20, B + MenuY + ((PlayerCharacter - 1) * 30), GFX.MCursor[0]);
+            XRender::renderTextureBasic(MenuX - 20, B + MenuY + (MenuCursor * 30), GFX.MCursor[3]);
+            XRender::renderTextureBasic(MenuX - 20, B + MenuY + ((PlayerCharacter - 1) * 30), GFX.MCursor[0]);
         }
         else
         {
-            XRender::renderTexture(MenuX - 20, B + MenuY + (MenuCursor * 30), GFX.MCursor[0]);
+            XRender::renderTextureBasic(MenuX - 20, B + MenuY + (MenuCursor * 30), GFX.MCursor[0]);
         }
     }
 #endif
@@ -2694,15 +2690,15 @@ void mainMenuDraw()
 
         // render the scroll indicators
         if(minShow > 1)
-            XRender::renderTexture(XRender::TargetW/2 - 8, MenuY - 20, GFX.MCursor[1]);
+            XRender::renderTextureBasic(XRender::TargetW/2 - 8, MenuY - 20, GFX.MCursor[1]);
 
         if(maxShow < original_maxShow)
-            XRender::renderTexture(XRender::TargetW/2 - 8, MenuY + 140, GFX.MCursor[2]);
+            XRender::renderTextureBasic(XRender::TargetW/2 - 8, MenuY + 140, GFX.MCursor[2]);
 
         B = MenuCursor - minShow + 1;
 
         if(B >= 0 && B < 5)
-            XRender::renderTexture(MenuX - 20, MenuY + (B * 30), GFX.MCursor[0].w, GFX.MCursor[0].h, GFX.MCursor[0], 0, 0);
+            XRender::renderTextureBasic(MenuX - 20, MenuY + (B * 30), GFX.MCursor[0]);
     }
 
     else if(MenuMode == MENU_SELECT_SLOT_1P || MenuMode == MENU_SELECT_SLOT_2P) // Save Select
@@ -2710,7 +2706,7 @@ void mainMenuDraw()
         s_drawGameTypeTitle(MenuX, MenuY - 70);
         SuperPrint(SelectWorld[selWorld].WorldName, 3, MenuX, MenuY - 40, XTColorF(0.6f, 1.f, 1.f));
         s_drawGameSaves(MenuX, MenuY);
-        XRender::renderTexture(MenuX - 20, MenuY + (MenuCursor * 30), GFX.MCursor[0]);
+        XRender::renderTextureBasic(MenuX - 20, MenuY + (MenuCursor * 30), GFX.MCursor[0]);
     }
 
     else if(MenuMode == MENU_SELECT_SLOT_1P_COPY_S1 || MenuMode == MENU_SELECT_SLOT_2P_COPY_S1 ||
@@ -2727,11 +2723,11 @@ void mainMenuDraw()
 
         if(MenuMode == MENU_SELECT_SLOT_1P_COPY_S2 || MenuMode == MENU_SELECT_SLOT_2P_COPY_S2)
         {
-            XRender::renderTexture(MenuX - 20, MenuY + ((menuCopySaveSrc - 1) * 30), GFX.MCursor[0]);
-            XRender::renderTexture(MenuX - 20, MenuY + (MenuCursor * 30), GFX.MCursor[3]);
+            XRender::renderTextureBasic(MenuX - 20, MenuY + ((menuCopySaveSrc - 1) * 30), GFX.MCursor[0]);
+            XRender::renderTextureBasic(MenuX - 20, MenuY + (MenuCursor * 30), GFX.MCursor[3]);
         }
         else
-            XRender::renderTexture(MenuX - 20, MenuY + (MenuCursor * 30), GFX.MCursor[0]);
+            XRender::renderTextureBasic(MenuX - 20, MenuY + (MenuCursor * 30), GFX.MCursor[0]);
     }
 
     else if(MenuMode == MENU_SELECT_SLOT_1P_DELETE || MenuMode == MENU_SELECT_SLOT_2P_DELETE) // Delete save
@@ -2742,7 +2738,7 @@ void mainMenuDraw()
 
         SuperPrint(g_mainMenu.gameEraseSlot, 3, MenuX, MenuY + c_menuSavesFooterHint, XTColorF(1.0f, 0.7f, 0.7f));
 
-        XRender::renderTexture(MenuX - 20, MenuY + (MenuCursor * 30), GFX.MCursor[0]);
+        XRender::renderTextureBasic(MenuX - 20, MenuY + (MenuCursor * 30), GFX.MCursor[0]);
     }
 
     else if(MenuMode == MENU_SELECT_SLOT_1P_ADVMODE || MenuMode == MENU_SELECT_SLOT_2P_ADVMODE) // Advanced mode select
@@ -2759,7 +2755,7 @@ void mainMenuDraw()
         SuperPrint("Speedrun Mode 2", 3, MenuX, MenuY + (A++ * 30), XTColorF(1.0f, 0.7f, 0.7f));
         SuperPrint("Speedrun Mode 3", 3, MenuX, MenuY + (A++ * 30), XTColorF(0.8f, 0.5f, 0.2f));
 
-        XRender::renderTexture(MenuX - 20, MenuY + (MenuCursor * 30), GFX.MCursor[0]);
+        XRender::renderTextureBasic(MenuX - 20, MenuY + (MenuCursor * 30), GFX.MCursor[0]);
     }
 
     // Player controls setup
@@ -2787,5 +2783,5 @@ void mainMenuDraw()
     }
 
     // Mouse cursor
-    XRender::renderTexture(int(SharedCursor.X), int(SharedCursor.Y), GFX.ECursor[2]);
+    XRender::renderTextureBasic(int(SharedCursor.X), int(SharedCursor.Y), GFX.ECursor[2]);
 }

@@ -484,8 +484,8 @@ void UpdateGraphics2(bool skipRepaint)
                 int totalLen = len + GFX.Interface[1].w + GFX.Interface[5].w + 8 + 4;
                 int x = p_center_x - (totalLen / 2);
 
-                XRender::renderTexture(x, info_y, GFX.Interface[5]);
-                XRender::renderTexture(x + GFX.Interface[5].w + 8, info_y, GFX.Interface[1]);
+                XRender::renderTextureBasic(x, info_y, GFX.Interface[5]);
+                XRender::renderTextureBasic(x + GFX.Interface[5].w + 8, info_y, GFX.Interface[1]);
                 SuperPrint(label, 3, x + GFX.Interface[1].w + GFX.Interface[5].w + 8 + 4, info_y);
                 info_y -= 20;
             }
@@ -534,15 +534,15 @@ void UpdateGraphics2(bool skipRepaint)
         // Print coins on the screen
         auto& coin_icon = (Player[1].Character == 5) ? GFX.Interface[6] : GFX.Interface[2];
 
-        XRender::renderTexture(pX + 16, vScreen[Z].ScreenTop - 42, coin_icon);
-        XRender::renderTexture(pX + 40, vScreen[Z].ScreenTop - 40, GFX.Interface[1]);
+        XRender::renderTextureBasic(pX + 16, vScreen[Z].ScreenTop - 42, coin_icon);
+        XRender::renderTextureBasic(pX + 40, vScreen[Z].ScreenTop - 40, GFX.Interface[1]);
         SuperPrint(std::to_string(Coins), 1, pX + 62, vScreen[Z].ScreenTop - 40);
 
         // Print stars on the screen
         if(numStars > 0)
         {
-            XRender::renderTexture(pX + 16, vScreen[Z].ScreenTop - 64, GFX.Interface[5]);
-            XRender::renderTexture(pX + 40, vScreen[Z].ScreenTop - 62, GFX.Interface[1]);
+            XRender::renderTextureBasic(pX + 16, vScreen[Z].ScreenTop - 64, GFX.Interface[5]);
+            XRender::renderTextureBasic(pX + 40, vScreen[Z].ScreenTop - 62, GFX.Interface[1]);
             SuperPrint(std::to_string(numStars), 1, pX + 62, vScreen[Z].ScreenTop - 62);
         }
 

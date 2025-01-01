@@ -523,7 +523,7 @@ bool Back()
 
 static inline void Render_Cursor(int x, int y, int p)
 {
-    XRender::renderTexture(x, y, GFX.MCursor[0]);
+    XRender::renderTextureBasic(x, y, GFX.MCursor[0]);
 
     UNUSED(p);
 }
@@ -723,10 +723,10 @@ bool Mouse_Render(bool mouse, bool render)
 
     // render the scroll indicators
     if(cur_scroll > 0)
-        XRender::renderTexture(sX + width / 2 - GFX.MCursor[1].w / 2, sY + first_display_row * line - GFX.MCursor[1].h, GFX.MCursor[1]);
+        XRender::renderTextureBasic(sX + width / 2 - GFX.MCursor[1].w / 2, sY + first_display_row * line - GFX.MCursor[1].h, GFX.MCursor[1]);
 
     if(cur_scroll + display_rows < num_items)
-        XRender::renderTexture(sX + width / 2 - GFX.MCursor[2].w / 2, sY + (first_display_row + display_rows) * line - line + 18, GFX.MCursor[2]);
+        XRender::renderTextureBasic(sX + width / 2 - GFX.MCursor[2].w / 2, sY + (first_display_row + display_rows) * line - line + 18, GFX.MCursor[2]);
 
     MarqueeSpec name_marquee_spec = MarqueeSpec(0, 10, 64, 32, -1);
     MarqueeSpec value_marquee_spec = MarqueeSpec(value_width, 10, 64, 32, 1);

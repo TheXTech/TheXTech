@@ -74,7 +74,7 @@ void DrawTextureTiled(int dst_x, int dst_y, int dst_w, int dst_h, StdPicture& tx
             if(y + render_h > dst_y + dst_h)
                 render_h = dst_y + dst_h - y;
 
-            XRender::renderTexture(x, y, render_w, render_h, tx, src_x + c_off_x, src_y + c_off_y, color);
+            XRender::renderTextureBasic(x, y, render_w, render_h, tx, src_x + c_off_x, src_y + c_off_y, color);
 
             y += src_h - c_off_y;
             c_off_y = 0;
@@ -86,7 +86,7 @@ void DrawTextureTiled(int dst_x, int dst_y, int dst_w, int dst_h, StdPicture& tx
 }
 
 // renders a new-style frame with the included external and internal locations
-void RenderFrameBorder(const Location_t& external, const Location_t& internal,
+void RenderFrameBorder(const IntegerLocation_t& external, const IntegerLocation_t& internal,
 	StdPicture& tile, FrameBorder* border)
 {
 	// first, verify to what extent the external and internal parts are the same
@@ -154,14 +154,14 @@ void RenderFrameBorder(const Location_t& external, const Location_t& internal,
 	// top external-left external
 	if(have_l && have_t && i.le && i.te)
 	{
-		XRender::renderTexture(internal.X - i.le, internal.Y - i.te, i.le, i.te,
+		XRender::renderTextureBasic(internal.X - i.le, internal.Y - i.te, i.le, i.te,
 		    i.tex,
 		    0, 0);
 	}
 	// top external-left internal
 	if(have_l && have_t && i.li && i.te)
 	{
-		XRender::renderTexture(internal.X, internal.Y - i.te, i.li, i.te,
+		XRender::renderTextureBasic(internal.X, internal.Y - i.te, i.li, i.te,
 		    i.tex,
 		    i.le, 0);
 	}
@@ -177,21 +177,21 @@ void RenderFrameBorder(const Location_t& external, const Location_t& internal,
 	// top external-right internal
 	if(have_t && have_r && i.ri && i.te)
 	{
-		XRender::renderTexture(internal.X + internal.Width - i.ri, internal.Y - i.te, i.ri, i.te,
+		XRender::renderTextureBasic(internal.X + internal.Width - i.ri, internal.Y - i.te, i.ri, i.te,
 		    i.tex,
 		    i.tex.w - i.ri - i.re, 0);
 	}
 	// top external-right external
 	if(have_t && have_r && i.re && i.te)
 	{
-		XRender::renderTexture(internal.X + internal.Width, internal.Y - i.te, i.re, i.te,
+		XRender::renderTextureBasic(internal.X + internal.Width, internal.Y - i.te, i.re, i.te,
 		    i.tex,
 		    i.tex.w - i.re, 0);
 	}
 	// top internal-left external
 	if(have_t && have_l && i.le && i.ti)
 	{
-		XRender::renderTexture(internal.X - i.le, internal.Y, i.le, i.ti,
+		XRender::renderTextureBasic(internal.X - i.le, internal.Y, i.le, i.ti,
 		    i.tex,
 		    0, i.te);
 	}
@@ -208,21 +208,21 @@ void RenderFrameBorder(const Location_t& external, const Location_t& internal,
 	// bottom internal-left external
 	if(have_b && have_l && i.le && i.bi)
 	{
-		XRender::renderTexture(internal.X - i.le, internal.Y + internal.Height - i.bi, i.le, i.bi,
+		XRender::renderTextureBasic(internal.X - i.le, internal.Y + internal.Height - i.bi, i.le, i.bi,
 		    i.tex,
 		    0, i.tex.h - i.bi - i.be);
 	}
 	// bottom external-left external
 	if(have_b && have_l && i.le && i.be)
 	{
-		XRender::renderTexture(internal.X - i.le, internal.Y + internal.Height, i.le, i.be,
+		XRender::renderTextureBasic(internal.X - i.le, internal.Y + internal.Height, i.le, i.be,
 		    i.tex,
 		    0, i.tex.h - i.be);
 	}
 	// bottom external-left internal
 	if(have_b && have_l && i.li && i.be)
 	{
-		XRender::renderTexture(internal.X, internal.Y + internal.Height, i.li, i.be,
+		XRender::renderTextureBasic(internal.X, internal.Y + internal.Height, i.li, i.be,
 		    i.tex,
 		    i.le, i.tex.h - i.be);
 	}
@@ -237,21 +237,21 @@ void RenderFrameBorder(const Location_t& external, const Location_t& internal,
 	// bottom external-right internal
 	if(have_b && have_r && i.ri && i.be)
 	{
-		XRender::renderTexture(internal.X + internal.Width - i.ri, internal.Y + internal.Height, i.ri, i.be,
+		XRender::renderTextureBasic(internal.X + internal.Width - i.ri, internal.Y + internal.Height, i.ri, i.be,
 		    i.tex,
 		    i.tex.w - i.ri - i.re, i.tex.h - i.be);
 	}
 	// bottom external-right external
 	if(have_b && have_r && i.re && i.be)
 	{
-		XRender::renderTexture(internal.X + internal.Width, internal.Y + internal.Height, i.re, i.be,
+		XRender::renderTextureBasic(internal.X + internal.Width, internal.Y + internal.Height, i.re, i.be,
 		    i.tex,
 		    i.tex.w - i.re, i.tex.h - i.be);
 	}
 	// top internal-right external
 	if(have_t && have_r && i.re && i.ti)
 	{
-		XRender::renderTexture(internal.X + internal.Width, internal.Y, i.re, i.ti,
+		XRender::renderTextureBasic(internal.X + internal.Width, internal.Y, i.re, i.ti,
 		    i.tex,
 		    i.tex.w - i.re, i.te);
 	}
@@ -267,7 +267,7 @@ void RenderFrameBorder(const Location_t& external, const Location_t& internal,
 	// bottom internal-right external
 	if(have_b && have_r && i.bi && i.re)
 	{
-		XRender::renderTexture(internal.X + internal.Width, internal.Y + internal.Height - i.bi, i.re, i.bi,
+		XRender::renderTextureBasic(internal.X + internal.Width, internal.Y + internal.Height - i.bi, i.re, i.bi,
 		    i.tex,
 		    i.tex.w - i.re, i.tex.h - i.bi - i.be);
 	}
@@ -275,7 +275,7 @@ void RenderFrameBorder(const Location_t& external, const Location_t& internal,
 
 // renders a new-style frame as a fill at the included internal location
 // the frame fills the internal rect
-void RenderFrameFill(const Location_t& internal, FrameBorder& frame, XTColor color)
+void RenderFrameFill(const IntegerLocation_t& internal, FrameBorder& frame, XTColor color)
 {
 	FrameBorder& i = frame;
 
@@ -288,7 +288,7 @@ void RenderFrameFill(const Location_t& internal, FrameBorder& frame, XTColor col
 	// top internal-left internal
 	if(i.li && i.ti)
 	{
-		XRender::renderTexture(internal.X, internal.Y, i.li, i.ti,
+		XRender::renderTextureBasic(internal.X, internal.Y, i.li, i.ti,
 		    i.tex,
 		    i.le, i.te,
 		    color);
@@ -307,7 +307,7 @@ void RenderFrameFill(const Location_t& internal, FrameBorder& frame, XTColor col
 	// top internal-right internal
 	if(i.ri && i.ti)
 	{
-		XRender::renderTexture(internal.X + internal.Width - i.ri, internal.Y, i.ri, i.ti,
+		XRender::renderTextureBasic(internal.X + internal.Width - i.ri, internal.Y, i.ri, i.ti,
 		    i.tex,
 		    i.tex.w - i.ri - i.re, i.te,
 		    color);
@@ -326,7 +326,7 @@ void RenderFrameFill(const Location_t& internal, FrameBorder& frame, XTColor col
 	// bottom internal-left internal
 	if(i.li && i.bi)
 	{
-		XRender::renderTexture(internal.X, internal.Y + internal.Height - i.bi, i.li, i.bi,
+		XRender::renderTextureBasic(internal.X, internal.Y + internal.Height - i.bi, i.li, i.bi,
 		    i.tex,
 		    i.le,
 		    i.tex.h - i.bi - i.be,
@@ -344,7 +344,7 @@ void RenderFrameFill(const Location_t& internal, FrameBorder& frame, XTColor col
 	// bottom internal-right internal
 	if(i.ri && i.bi)
 	{
-		XRender::renderTexture(internal.X + internal.Width - i.ri, internal.Y + internal.Height - i.bi, i.ri, i.bi,
+		XRender::renderTextureBasic(internal.X + internal.Width - i.ri, internal.Y + internal.Height - i.bi, i.ri, i.bi,
 		    i.tex,
 		    i.tex.w - i.ri - i.re, i.tex.h - i.bi - i.be,
 		    color);

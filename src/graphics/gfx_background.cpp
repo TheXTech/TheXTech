@@ -57,14 +57,14 @@ void DrawBackgroundColor(int A, int Z, bool lower = false)
 void DrawTopAnchoredBackground(int S, int Z, int A, int offset = 32, int expected_height = 0, int tile_bottom = 0, double h_parallax = 0.5)
 {
     DrawBackgroundColor(A, Z, true);
-    double camX = vScreen[Z].CameraAddX();
-    double camY = vScreen[Z].CameraAddY();
+    int camX = vScreen[Z].CameraAddX();
+    int camY = vScreen[Z].CameraAddY();
 
     const Screen_t& screen = Screens[vScreen[Z].screen_ref];
 
     int horiz_reps = (level[S].Width - level[S].X + screen.W / h_parallax) / GFXBackground2[A].w * h_parallax + 1;
 
-    Location_t tempLocation;
+    IntegerLocation_t tempLocation;
 
     for(int B = 0; B <= horiz_reps; B++)
     {
@@ -81,7 +81,7 @@ void DrawTopAnchoredBackground(int S, int Z, int A, int offset = 32, int expecte
                 && tempLocation.X < -camX + vScreen[Z].Width
                 && tempLocation.Y < -camY + vScreen[Z].Height)
         {
-            XRender::renderTexture(camX + tempLocation.X, camY + tempLocation.Y,
+            XRender::renderTextureBasic(camX + tempLocation.X, camY + tempLocation.Y,
                 GFXBackground2[A].w, tempLocation.Height, GFXBackground2[A], 0, GFXBackground2[A].h - tempLocation.Height);
 
             if(g_config.disable_background2_tiling)

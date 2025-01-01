@@ -209,7 +209,7 @@ void DrawWorldMapFrame(const vScreen_t& vscreen)
 
     if(worldHasFrameAssets())
     {
-        RenderFrameBorder(newLoc(0, 0, screen.W, screen.H), newLoc(vscreen.ScreenLeft, vscreen.ScreenTop, vscreen.Width, vscreen.Height),
+        RenderFrameBorder({0, 0, screen.W, screen.H}, {(int)vscreen.ScreenLeft, (int)vscreen.ScreenTop, (int)vscreen.Width, (int)vscreen.Height},
             GFX.WorldMapFrame_Tile, s_border_valid() ? &GFX.WorldMapFrame_Border : nullptr);
     }
     else
@@ -217,8 +217,13 @@ void DrawWorldMapFrame(const vScreen_t& vscreen)
         // render a legacy background, in MANY careful segments...
         constexpr bool do_stretch = true;
 
+        int ScreenLeft = vscreen.ScreenLeft;
+        int ScreenTop = vscreen.ScreenTop;
+        int ScreenWidth = vscreen.Width;
+        int ScreenHeight = vscreen.Height;
+
         // top-left
-        XRender::renderTexture(vscreen.ScreenLeft - 66, vscreen.ScreenTop - 130, 66, 130, GFX.Interface[4], 0, 0);
+        XRender::renderTextureBasic(ScreenLeft - 66, ScreenTop - 130, 66, 130, GFX.Interface[4], 0, 0);
 
         // top
         int orig_width = GFX.Interface[4].w - 66 - 66;
@@ -229,15 +234,17 @@ void DrawWorldMapFrame(const vScreen_t& vscreen)
                 GFX.Interface[4], 66, 0, orig_width, 130);
         }
         else
-            for(int offset = 0; offset < vscreen.Width; offset += orig_width)
         {
-            XRender::renderTexture(vscreen.ScreenLeft + offset, vscreen.ScreenTop - 130,
-                SDL_min((int)vscreen.Width - offset, orig_width), 130,
-                GFX.Interface[4], 66, 0);
+            for(int offset = 0; offset < ScreenWidth; offset += orig_width)
+            {
+                XRender::renderTextureBasic(ScreenLeft + offset, ScreenTop - 130,
+                    SDL_min(ScreenWidth - offset, orig_width), 130,
+                    GFX.Interface[4], 66, 0);
+            }
         }
 
         // top-right
-        XRender::renderTexture(vscreen.ScreenLeft + vscreen.Width, vscreen.ScreenTop - 130, 66, 130 + 20, GFX.Interface[4], GFX.Interface[4].w - 66, 0);
+        XRender::renderTextureBasic(ScreenLeft + ScreenWidth, ScreenTop - 130, 66, 130 + 20, GFX.Interface[4], GFX.Interface[4].w - 66, 0);
 
         // left
         int orig_height = GFX.Interface[4].h - 130 - 66;
@@ -248,11 +255,13 @@ void DrawWorldMapFrame(const vScreen_t& vscreen)
                 GFX.Interface[4], 0, 130, 66, orig_height);
         }
         else
-            for(int offset = 0; offset < vscreen.Height; offset += orig_height)
         {
-            XRender::renderTexture(vscreen.ScreenLeft - 66, vscreen.ScreenTop + offset,
-                66, SDL_min((int)vscreen.Height - offset, orig_height),
-                GFX.Interface[4], 0, 130);
+            for(int offset = 0; offset < ScreenHeight; offset += orig_height)
+            {
+                XRender::renderTextureBasic(ScreenLeft - 66, ScreenTop + offset,
+                    66, SDL_min(ScreenHeight - offset, orig_height),
+                    GFX.Interface[4], 0, 130);
+            }
         }
 
         // right
@@ -264,15 +273,17 @@ void DrawWorldMapFrame(const vScreen_t& vscreen)
                 GFX.Interface[4], GFX.Interface[4].w - 66, 130 + 20, 66, orig_height);
         }
         else
-            for(int offset = 20; offset < vscreen.Height; offset += orig_height)
         {
-            XRender::renderTexture(vscreen.ScreenLeft + vscreen.Width, vscreen.ScreenTop + offset,
-                66, SDL_min((int)vscreen.Height - offset, orig_height),
-                GFX.Interface[4], GFX.Interface[4].w - 66, 130 + 20);
+            for(int offset = 20; offset < ScreenHeight; offset += orig_height)
+            {
+                XRender::renderTextureBasic(ScreenLeft + ScreenWidth, ScreenTop + offset,
+                    66, SDL_min((int)ScreenHeight - offset, orig_height),
+                    GFX.Interface[4], GFX.Interface[4].w - 66, 130 + 20);
+            }
         }
 
         // bottom-left
-        XRender::renderTexture(vscreen.ScreenLeft - 66, vscreen.ScreenTop + vscreen.Height, 66 + 34, 66, GFX.Interface[4], 0, GFX.Interface[4].h - 66);
+        XRender::renderTextureBasic(ScreenLeft - 66, ScreenTop + ScreenHeight, 66 + 34, 66, GFX.Interface[4], 0, GFX.Interface[4].h - 66);
 
         // bottom
         orig_width = GFX.Interface[4].w - (66 + 34) - 66;
@@ -283,14 +294,16 @@ void DrawWorldMapFrame(const vScreen_t& vscreen)
                 GFX.Interface[4], 100, GFX.Interface[4].h - 66, orig_width, 66);
         }
         else
-            for(int offset = 34; offset < vscreen.Width; offset += orig_width)
         {
-            XRender::renderTexture(vscreen.ScreenLeft + offset, vscreen.ScreenTop + vscreen.Height,
-                SDL_min((int)vscreen.Width - offset, orig_width), 66,
-                GFX.Interface[4], 100, GFX.Interface[4].h - 66);
+            for(int offset = 34; offset < ScreenWidth; offset += orig_width)
+            {
+                XRender::renderTextureBasic(ScreenLeft + offset, ScreenTop + ScreenHeight,
+                    SDL_min(ScreenWidth - offset, orig_width), 66,
+                    GFX.Interface[4], 100, GFX.Interface[4].h - 66);
+            }
         }
 
         // bottom-right
-        XRender::renderTexture(vscreen.ScreenLeft + vscreen.Width, vscreen.ScreenTop + vscreen.Height, 66, 66, GFX.Interface[4], GFX.Interface[4].w - 66, GFX.Interface[4].h - 66);
+        XRender::renderTextureBasic(ScreenLeft + ScreenWidth, ScreenTop + ScreenHeight, 66, 66, GFX.Interface[4], GFX.Interface[4].w - 66, GFX.Interface[4].h - 66);
     }
 }

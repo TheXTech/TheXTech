@@ -1645,7 +1645,7 @@ void UpdateLoadREAL()
         }
         else if(!gfxLoaderTestMode)
         {
-            XRender::renderTexture(sh_w - gh_w, sh_h - gh_h, GFX.MenuGFX[4]);
+            XRender::renderTextureBasic(sh_w - gh_w, sh_h - gh_h, GFX.MenuGFX[4]);
         }
         else
         {
@@ -1655,8 +1655,8 @@ void UpdateLoadREAL()
                 SuperPrint("Loading data...", 3, Left + 10, Top + 10);
         }
 
-        XRender::renderTexture(Right - 168, Bottom - 24, GFX.Loader);
-        XRender::renderTexture(Right - 40, Bottom - 40, GFX.LoadCoin.w, GFX.LoadCoin.h / 4, GFX.LoadCoin, 0, 32 * LoadCoins);
+        XRender::renderTextureBasic(Right - 168, Bottom - 24, GFX.Loader);
+        XRender::renderTextureBasic(Right - 40, Bottom - 40, GFX.LoadCoin.w, GFX.LoadCoin.h / 4, GFX.LoadCoin, 0, 32 * LoadCoins);
 
         if(gfxLoaderThreadingMode && alphaFader > 0)
             XRender::renderRect(0, 0, XRender::TargetW, XRender::TargetH, {0, 0, 0, alphaFader});

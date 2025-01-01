@@ -296,8 +296,8 @@ void DrawInterface(int Z, int numScreens)
     {
         auto& win_charname = GFX.CharacterName[Player[BattleWinner].Character];
 
-        XRender::renderTexture(10 + vScreen[Z].Width / 2, -96 + vScreen[Z].Height / 2 - GFX.BMWin.h / 2, GFX.BMWin);
-        XRender::renderTexture(-10 + vScreen[Z].Width / 2 - win_charname.w, -96 + vScreen[Z].Height / 2 - win_charname.h / 2, win_charname);
+        XRender::renderTextureBasic(10 + (int)vScreen[Z].Width / 2, -96 + (int)vScreen[Z].Height / 2 - GFX.BMWin.h / 2, GFX.BMWin);
+        XRender::renderTextureBasic(-10 + (int)vScreen[Z].Width / 2 - win_charname.w, -96 + (int)vScreen[Z].Height / 2 - win_charname.h / 2, win_charname);
     }
 }
 

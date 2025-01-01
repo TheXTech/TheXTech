@@ -152,12 +152,12 @@ void DrawBackground(double fade)
     if(s_AnimatingBack)
     {
         for(int i = 0; i < curtain_horiz_reps; i++)
-            XRender::renderTexture(curtain_draw_w * i, -GFX.MenuGFX[1].h * fade, curtain_draw_w, GFX.MenuGFX[1].h, GFX.MenuGFX[1], 0, 0);
+            XRender::renderTextureBasic(curtain_draw_w * i, -(int)(GFX.MenuGFX[1].h * fade), curtain_draw_w, GFX.MenuGFX[1].h, GFX.MenuGFX[1], 0, 0);
     }
 
     // draw background logo
     if(s_AnimatingBack || pack.logo_override)
-        XRender::renderTexture(XRender::TargetW / 2 - GFX.MenuGFX[2].w / 2, menu_logo_y, GFX.MenuGFX[2]);
+        XRender::renderTextureBasic(XRender::TargetW / 2 - GFX.MenuGFX[2].w / 2, menu_logo_y, GFX.MenuGFX[2]);
 
     AssetPack_t::Gfx& gfx = *pack.gfx;
 
@@ -172,7 +172,7 @@ void DrawBackground(double fade)
     if(!g_LoopActive && !s_AnimatingBack)
     {
         for(int i = 0; i < curtain_horiz_reps; i++)
-            XRender::renderTexture(curtain_draw_w * i, -GFX.MenuGFX[1].h * fade, curtain_draw_w, GFX.MenuGFX[1].h, GFX.MenuGFX[1], 0, 0);
+            XRender::renderTextureBasic(curtain_draw_w * i, -(int)(GFX.MenuGFX[1].h * fade), curtain_draw_w, GFX.MenuGFX[1].h, GFX.MenuGFX[1], 0, 0);
     }
 
     // show previous / next packs
@@ -214,14 +214,20 @@ void DrawBackground(double fade)
     {
         float cX = 100 + logo_shift * s_switch_coord / 2.0f;
         XTColor pack_color = (s_switch_coord == 0.0f) ? color * XTAlpha(127) : color_no_switch * XTAlphaF(0.25f + 0.25f * (s_switch_coord + 1.0f));
-        XRender::renderTexture(cX + prev_pack.gfx->logo.w * (s_switch_coord / 4.0f - 1.0f), XRender::TargetH / 2 - prev_pack.gfx->logo.h / 2, prev_pack.gfx->logo, pack_color);
+        XRender::renderTextureBasic((int)(cX + prev_pack.gfx->logo.w * (s_switch_coord / 4.0f - 1.0f)),
+            XRender::TargetH / 2 - prev_pack.gfx->logo.h / 2,
+            prev_pack.gfx->logo,
+            pack_color);
     }
 
     if(next_pack.gfx && next_pack.gfx->logo.inited)
     {
         float cX = (XRender::TargetW - 100) + logo_shift * s_switch_coord / 2.0f;
         XTColor pack_color = (s_switch_coord == 0.0f) ? color * XTAlpha(127) : color_no_switch * XTAlphaF(0.25f + 0.25f * (1.0f - s_switch_coord));
-        XRender::renderTexture(cX + prev_pack.gfx->logo.w * (s_switch_coord / 4.0f), XRender::TargetH / 2 - next_pack.gfx->logo.h / 2, next_pack.gfx->logo, pack_color);
+        XRender::renderTextureBasic((int)(cX + prev_pack.gfx->logo.w * (s_switch_coord / 4.0f)),
+            XRender::TargetH / 2 - next_pack.gfx->logo.h / 2,
+            next_pack.gfx->logo,
+            pack_color);
     }
 
     // draw current logo in all cases (needed for cases where title card is not in GFX.MenuGFX[2])
@@ -234,7 +240,7 @@ void DrawBackground(double fade)
     {
         float cX = (XRender::TargetW / 2) + logo_shift * s_switch_coord / 2.0f;
         XTColor main_color = color_no_switch * XTAlphaF(0.75f + 0.25f * (1.0f - SDL_fabs(s_switch_coord)));
-        XRender::renderTexture(cX + gfx.logo.w * (s_switch_coord / 4.0f - 0.5f), XRender::TargetH / 2 - gfx.logo.h / 2, gfx.logo, main_color);
+        XRender::renderTextureBasic((int)(cX + gfx.logo.w * (s_switch_coord / 4.0f - 0.5f)), XRender::TargetH / 2 - gfx.logo.h / 2, gfx.logo, main_color);
     }
     else
     {
@@ -243,7 +249,9 @@ void DrawBackground(double fade)
         int center_Y = XRender::TargetH / 2 - gfx.logo.h / 2;
         int place_Y = (center_Y * fade) + (menu_logo_y * (1.0 - fade));
 
-        XRender::renderTexture(cX + gfx.logo.w * (s_switch_coord * fade / 4.0f - 0.5f), place_Y, gfx.logo);
+        XRender::renderTextureBasic((int)(cX + gfx.logo.w * (s_switch_coord * fade / 4.0f - 0.5f)),
+            place_Y,
+            gfx.logo);
     }
 
     // show version if appropriate
@@ -264,7 +272,7 @@ void DrawBackground(double fade)
         if(GFX.CharSelIcons.inited)
         {
             XRender::renderTextureFL(XRender::TargetW / 2 - offset, XRender::TargetH / 2 - 24 / 2, 24, 24, GFX.CharSelIcons, 72, 0, 0.0, nullptr, X_FLIP_HORIZONTAL);
-            XRender::renderTexture(XRender::TargetW / 2 + offset - 24, XRender::TargetH / 2, 24, 24, GFX.CharSelIcons, 72, 0);
+            XRender::renderTextureBasic(XRender::TargetW / 2 + offset - 24, XRender::TargetH / 2, 24, 24, GFX.CharSelIcons, 72, 0);
         }
         else
         {
@@ -301,7 +309,7 @@ void Render(bool now_loading = false)
     DrawBackground(1.0);
 
     // Mouse cursor
-    XRender::renderTexture(int(SharedCursor.X), int(SharedCursor.Y), GFX.ECursor[2]);
+    XRender::renderTextureBasic(int(SharedCursor.X), int(SharedCursor.Y), GFX.ECursor[2]);
 
     DrawDeviceBattery();
 
@@ -316,7 +324,7 @@ void Render(bool now_loading = false)
         if(B > XRender::TargetH)
             B = XRender::TargetH;
 
-        XRender::renderTexture(R - 168, B - 24, GFX.Loader);
+        XRender::renderTextureBasic(R - 168, B - 24, GFX.Loader);
     }
 
     XRender::repaint();

@@ -258,7 +258,7 @@ static void s_logRecentChars()
 static inline void Render_PCursor(int x, int y)
 {
     if(GFX.PCursor.inited)
-        XRender::renderTexture(x, y, GFX.PCursor);
+        XRender::renderTextureBasic(x, y, GFX.PCursor);
     else
         XRender::renderTextureFL(x, y, GFX.MCursor[1].w, GFX.MCursor[1].h, GFX.MCursor[1], 0, 0, 90.0, nullptr, X_FLIP_NONE);
 }
@@ -268,7 +268,7 @@ static inline void Render_PCursorDownwards(int x, int y, XTColor color = XTColor
     if(GFX.PCursor.inited)
         XRender::renderTextureFL(x - GFX.PCursor.h / 2, y - GFX.PCursor.w, GFX.PCursor.w, GFX.PCursor.h, GFX.PCursor, 0, 0, 90.0, nullptr, X_FLIP_NONE, color);
     else
-        XRender::renderTexture(x - GFX.MCursor[2].w / 2, y - GFX.MCursor[2].h, GFX.MCursor[2], color);
+        XRender::renderTextureBasic(x - GFX.MCursor[2].w / 2, y - GFX.MCursor[2].h, GFX.MCursor[2], color);
 }
 
 static inline bool Is1P()
@@ -1242,17 +1242,17 @@ bool PlayerBox::MenuItem_Mouse_Render(int i, const std::string& label, int X, in
             {
                 if(label[0] == 'X')
                 {
-                    XRender::renderTexture(X, Y, 24, 24, GFX.CharSelIcons, 0, 0);
+                    XRender::renderTextureBasic(X, Y, 24, 24, GFX.CharSelIcons, 0, 0);
                     return false;
                 }
                 else if(label[0] == 'O')
                 {
-                    XRender::renderTexture(X, Y, 24, 24, GFX.CharSelIcons, 24, 0);
+                    XRender::renderTextureBasic(X, Y, 24, 24, GFX.CharSelIcons, 24, 0);
                     return false;
                 }
                 else if(label[0] == '?')
                 {
-                    XRender::renderTexture(X, Y, 24, 24, GFX.CharSelIcons, 48, 0);
+                    XRender::renderTextureBasic(X, Y, 24, 24, GFX.CharSelIcons, 48, 0);
                     return false;
                 }
             }
@@ -1306,7 +1306,7 @@ bool PlayerBox::DrawChar(int x, int w, int y, int h, bool show_name)
 
     // draw frame
     if(GFX.CharSelFrame.tex.inited)
-        RenderFrameFill(newLoc(x, y, w, h), GFX.CharSelFrame, XTAlpha(alpha));
+        RenderFrameFill(IntegerLocation_t{x, y, w, h}, GFX.CharSelFrame, XTAlpha(alpha));
     else
     {
         uint8_t alpha_border = (show_inactive) ?  64 : 255;
@@ -1337,7 +1337,7 @@ bool PlayerBox::DrawChar(int x, int w, int y, int h, bool show_name)
         else if(GFX.CharSelIcons.inited)
         {
             XRender::renderTextureFL(x - 24 - 4, y + h / 2 - 24 / 2, 24, 24, GFX.CharSelIcons, 72, 0, 0.0, nullptr, X_FLIP_HORIZONTAL, arrow_color);
-            XRender::renderTexture(x + w + 4, y + h / 2 - 24 / 2, 24, 24, GFX.CharSelIcons, 72, 0, arrow_color);
+            XRender::renderTextureBasic(x + w + 4, y + h / 2 - 24 / 2, 24, 24, GFX.CharSelIcons, 72, 0, arrow_color);
         }
         else
         {
@@ -1499,7 +1499,7 @@ int PlayerBox::Mouse_Render_1P(bool render)
                 return 1;
 
             if(render && l_screen->charSelect[p] == i)
-                XRender::renderTexture(MenuX - 20, y_pos, GFX.MCursor[0]);
+                XRender::renderTextureBasic(MenuX - 20, y_pos, GFX.MCursor[0]);
 
             y_pos += 30;
         }
@@ -1757,10 +1757,10 @@ int PlayerBox::Mouse_Render(bool render, int x, int y, int w, int h)
         if(render)
         {
             if(scroll_start > 0)
-                XRender::renderTexture(cx - GFX.MCursor[1].w / 2, start_y - GFX.MCursor[1].h, GFX.MCursor[1]);
+                XRender::renderTextureBasic(cx - GFX.MCursor[1].w / 2, start_y - GFX.MCursor[1].h, GFX.MCursor[1]);
 
             if(scroll_end < total_lines)
-                XRender::renderTexture(cx - GFX.MCursor[2].w / 2, start_y + (avail_lines)*line - line + 18, GFX.MCursor[2]);
+                XRender::renderTextureBasic(cx - GFX.MCursor[2].w / 2, start_y + (avail_lines)*line - line + 18, GFX.MCursor[2]);
         }
 
         // show the menu cursor for the player

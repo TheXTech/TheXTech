@@ -72,5 +72,5 @@ void RenderBitmapOp::Draw(Renderer *renderer)
     if((width <= 0) || (height <= 0))
         return;
 
-    XRender::renderTexture(x, y, width, height, direct_img->m_image, sx, sy, XTAlphaF(opacity));
+    XRender::renderTextureBasic(x, y, width, height, direct_img->m_image, sx, sy, XTAlphaF(opacity));
 }

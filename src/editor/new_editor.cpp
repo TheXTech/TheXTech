@@ -5389,9 +5389,9 @@ void EditorScreen::UpdateSelectorBar(CallMode mode, bool select_bar_only)
 
 #ifdef __3DS__
         if(select_bar_only)
-            XRender::renderTexture(X, Y, GFX.ECursor[2]);
+            XRender::renderTextureBasic(X, Y, GFX.ECursor[2]);
 #else
-        XRender::renderTexture(X, Y, GFX.ECursor[2]);
+        XRender::renderTextureBasic(X, Y, GFX.ECursor[2]);
 #endif
 
         if(e_tooltip)
@@ -5523,7 +5523,7 @@ void EditorScreen::UpdateEditorScreen(CallMode mode, bool second_screen)
     if(mode == CallMode::Render && e_CursorX >= 0 && GamePaused == PauseCode::None)
     {
 #ifndef __3DS__
-        XRender::renderTexture(e_CursorX, e_CursorY, GFX.ECursor[2]);
+        XRender::renderTextureBasic(e_CursorX, e_CursorY, GFX.ECursor[2]);
 #endif
         if(e_tooltip)
         {

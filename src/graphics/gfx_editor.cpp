@@ -635,50 +635,50 @@ void DrawEditorLevel(int Z)
                 int frame = (CommonFrame % 46) / 20;
                 if(frame > 2)
                     frame = 2;
-                XRender::renderTexture(curX - 8, curY, 32, 32, GFXNPC[NPCID_AXE], 0, 32 * frame);
+                XRender::renderTextureBasic(curX - 8, curY, 32, 32, GFXNPC[NPCID_AXE], 0, 32 * frame);
             }
             else
-                XRender::renderTexture(curX - 2, curY, GFX.ECursor[3]);
+                XRender::renderTextureBasic(curX - 2, curY, GFX.ECursor[3]);
         }
 
         // left-right resize
         else if(EditorCursor.InteractFlags > 1 && !(EditorCursor.InteractFlags & 2) && !(EditorCursor.InteractFlags & 4))
         {
-            XRender::renderTexture(curX - 16, curY - 16, 32, 32, GFX.EIcons, 0, 32 * Icon::lr);
+            XRender::renderTextureBasic(curX - 16, curY - 16, 32, 32, GFX.EIcons, 0, 32 * Icon::lr);
         }
 
         // up-down resize
         else if(EditorCursor.InteractFlags > 1 && !(EditorCursor.InteractFlags & 8) && !(EditorCursor.InteractFlags & 16))
         {
-            XRender::renderTexture(curX - 16, curY - 16, 32, 32, GFX.EIcons, 0, 32 * Icon::ud);
+            XRender::renderTextureBasic(curX - 16, curY - 16, 32, 32, GFX.EIcons, 0, 32 * Icon::ud);
         }
 
         // resize
         else if(EditorCursor.InteractFlags > 1)
         {
-            XRender::renderTexture(curX - 16, curY - 16, 32, 32, GFX.EIcons, 0, 32 * Icon::target);
+            XRender::renderTextureBasic(curX - 16, curY - 16, 32, 32, GFX.EIcons, 0, 32 * Icon::target);
         }
 
         else if(EditorCursor.Mode == 13 || EditorCursor.Mode == 14) // Selector
         {
             if(MagicBlock::enabled)
-                XRender::renderTexture(curX, curY, GFX.ECursor[2], XTColorF(0.7f, 1.0f, 0.7f, 1.0f));
+                XRender::renderTextureBasic(curX, curY, GFX.ECursor[2], XTColorF(0.7f, 1.0f, 0.7f, 1.0f));
             else
-                XRender::renderTexture(curX, curY, GFX.ECursor[2]);
+                XRender::renderTextureBasic(curX, curY, GFX.ECursor[2]);
 
         }
 
         // Section Resize
         else if(EditorCursor.Mode == 2 && EditorCursor.SubMode < 4)
         {
-            XRender::renderTexture(curX, curY, GFX.ECursor[1]);
+            XRender::renderTextureBasic(curX, curY, GFX.ECursor[1]);
         }
         else
         {
             if(MagicBlock::enabled)
-                XRender::renderTexture(curX, curY, GFX.ECursor[2], XTColorF(0.7f, 1.0f, 0.7f, 1.0f));
+                XRender::renderTextureBasic(curX, curY, GFX.ECursor[2], XTColorF(0.7f, 1.0f, 0.7f, 1.0f));
             else
-                XRender::renderTexture(curX, curY, GFX.ECursor[2]);
+                XRender::renderTextureBasic(curX, curY, GFX.ECursor[2]);
 
             if(e.Layer != LAYER_NONE && e.Layer != LAYER_DEFAULT)
             {
@@ -813,8 +813,8 @@ void DrawEditorWorld()
             XTColorF(1.0f, 0.8f, 0.2f), false);
     }
 
-    double X = EditorCursor.X - vScreen[Z].TargetX();
-    double Y = EditorCursor.Y - vScreen[Z].TargetY();
+    int X = (int)EditorCursor.X - vScreen[Z].TargetX();
+    int Y = (int)EditorCursor.Y - vScreen[Z].TargetY();
 
 #if 0
     if(g_config.editor_edge_scroll && !editorScreen.active && !MagicHand)
@@ -843,33 +843,31 @@ void DrawEditorWorld()
             int frame = (CommonFrame % 46) / 20;
             if(frame > 2)
                 frame = 2;
-            XRender::renderTexture(X - 8, Y, 32, 32, GFXNPC[NPCID_AXE], 0, 32 * frame);
+            XRender::renderTextureBasic(X - 8, Y, 32, 32, GFXNPC[NPCID_AXE], 0, 32 * frame);
         }
         else
-            XRender::renderTexture(X - 2, Y, GFX.ECursor[3]);
+            XRender::renderTextureBasic(X - 2, Y, GFX.ECursor[3]);
     }
     // left-right resize
     else if(EditorCursor.InteractFlags > 1 && !(EditorCursor.InteractFlags & 2) && !(EditorCursor.InteractFlags & 4))
     {
-        XRender::renderTexture(X - 16, Y - 16, 32, 32, GFX.EIcons, 0, 32 * Icon::lr);
+        XRender::renderTextureBasic(X - 16, Y - 16, 32, 32, GFX.EIcons, 0, 32 * Icon::lr);
     }
 
     // up-down resize
     else if(EditorCursor.InteractFlags > 1 && !(EditorCursor.InteractFlags & 8) && !(EditorCursor.InteractFlags & 16))
     {
-        XRender::renderTexture(X - 16, Y - 16, 32, 32, GFX.EIcons, 0, 32 * Icon::ud);
+        XRender::renderTextureBasic(X - 16, Y - 16, 32, 32, GFX.EIcons, 0, 32 * Icon::ud);
     }
 
     // resize
     else if(EditorCursor.InteractFlags > 1)
     {
-        XRender::renderTexture(X - 16, Y - 16, 32, 32, GFX.EIcons, 0, 32 * Icon::target);
+        XRender::renderTextureBasic(X - 16, Y - 16, 32, 32, GFX.EIcons, 0, 32 * Icon::target);
     }
     else
     {
-        XRender::renderTexture(X, Y,
-            32, 32,
-            GFX.ECursor[2], 0, 0);
+        XRender::renderTextureBasic(X, Y, GFX.ECursor[2]);
 
         // show coordinates of nearby level for help making warps
         for(WorldLevel_t* t : treeWorldLevelQuery(newLoc(EditorCursor.Location.X, EditorCursor.Location.Y, 1, 1), SORTMODE_NONE))

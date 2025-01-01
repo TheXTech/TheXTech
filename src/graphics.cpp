@@ -986,12 +986,12 @@ void DrawBackdrop(const Screen_t& screen)
     if(GFX.Backdrop.inited)
     {
         bool border_valid = GFX.Backdrop_Border.tex.inited && (!GFX.isCustom(71) || GFX.isCustom(72));
+        IntegerLocation_t full{0, 0, XRender::TargetW, XRender::TargetH};
 
         // special case for world map
         if(LevelSelect && !GameMenu && !GameOutro && !LevelEditor)
         {
-            Location_t full = newLoc(0, 0, XRender::TargetW, XRender::TargetH);
-            Location_t inner = newLoc(screen.TargetX(), screen.TargetY(), screen.W, screen.H);
+            IntegerLocation_t inner{screen.TargetX(), screen.TargetY(), screen.W, screen.H};
 
             // if world map frame assets missing, use the 800x600 area isntead
             if(!worldHasFrameAssets())
@@ -1002,8 +1002,7 @@ void DrawBackdrop(const Screen_t& screen)
                 inner.Height = 600;
             }
 
-            RenderFrameBorder(full, inner,
-                GFX.Backdrop, border_valid ? &GFX.Backdrop_Border : nullptr);
+            RenderFrameBorder(full, inner, GFX.Backdrop, border_valid ? &GFX.Backdrop_Border : nullptr);
 
             return;
         }
@@ -1011,8 +1010,8 @@ void DrawBackdrop(const Screen_t& screen)
         for(int i = screen.active_begin(); i < screen.active_end(); i++)
         {
             const auto& s = screen.vScreen(i + 1);
+            IntegerLocation_t inner{s.TargetX(), s.TargetY(), (int)s.Width, (int)s.Height};
 
-            Location_t full = newLoc(0, 0, XRender::TargetW, XRender::TargetH);
             // horizontal
             if(screen.Type == 4 || (screen.Type == 5 && (screen.DType == 1 || screen.DType == 2)))
             {
@@ -1030,8 +1029,7 @@ void DrawBackdrop(const Screen_t& screen)
                     full.Y = XRender::TargetH / 2;
             }
 
-            RenderFrameBorder(full, newLoc(s.TargetX(), s.TargetY(), s.Width, s.Height),
-                GFX.Backdrop, border_valid ? &GFX.Backdrop_Border : nullptr);
+            RenderFrameBorder(full, inner, GFX.Backdrop, border_valid ? &GFX.Backdrop_Border : nullptr);
         }
     }
 }

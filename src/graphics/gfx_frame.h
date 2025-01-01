@@ -52,12 +52,12 @@ void DrawTextureTiled(int dst_x, int dst_y, int dst_w, int dst_h, StdPicture& tx
 // renders a new-style frame as a border with the included external and internal locations
 // the frame fills the space between external and internal
 // border is nullable
-void RenderFrameBorder(const Location_t& external, const Location_t& internal,
+void RenderFrameBorder(const IntegerLocation_t& external, const IntegerLocation_t& internal,
 	StdPicture& tile, FrameBorder* border);
 
 // renders a new-style frame as a fill at the included internal location
 // the frame fills the internal rect
-void RenderFrameFill(const Location_t& internal, FrameBorder& frame, XTColor color = XTColor());
+void RenderFrameFill(const IntegerLocation_t& internal, FrameBorder& frame, XTColor color = XTColor());
 
 // renders a simple colored frame, optimized for an opaque frame
 void DrawSimpleFrameOpaque(int x, int y, int w, int h, XTColor border_1, XTColor border_2, XTColor fill);

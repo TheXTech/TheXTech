@@ -232,18 +232,18 @@ void DrawSmallScreenCam(vScreen_t& vscreen)
         color = XTColorF(1.0f, 0.2f, 0.2f, 1.0f);
 
         if(vscreen.small_screen_features.offset_y_hold > 0)
-            XRender::renderTexture(CamX + 4, CamY - 18, GFX.MCursor[1], XTAlphaF(rate));
+            XRender::renderTextureBasic(CamX + 4, CamY - 18, GFX.MCursor[1], XTAlphaF(rate));
         else
-            XRender::renderTexture(CamX + 4, CamY + 18, GFX.MCursor[2], XTAlphaF(rate));
+            XRender::renderTextureBasic(CamX + 4, CamY + 18, GFX.MCursor[2], XTAlphaF(rate));
     }
     else if(vscreen.small_screen_features.offset_y < -max_offsetY * 4 / 5 || vscreen.small_screen_features.offset_y > max_offsetY * 4 / 5)
     {
         color = XTColorF(0.5f, 1.0f, 0.5f, 0.7f);
 
         if(vscreen.small_screen_features.offset_y > 0)
-            XRender::renderTexture(CamX + 4, CamY - 18, GFX.MCursor[1], XTAlphaF(0.7f * rate));
+            XRender::renderTextureBasic(CamX + 4, CamY - 18, GFX.MCursor[1], XTAlphaF(0.7f * rate));
         else
-            XRender::renderTexture(CamX + 4, CamY + 18, GFX.MCursor[2], XTAlphaF(0.7f * rate));
+            XRender::renderTextureBasic(CamX + 4, CamY + 18, GFX.MCursor[2], XTAlphaF(0.7f * rate));
     }
     else if(vscreen.small_screen_features.offset_y <= -48 || vscreen.small_screen_features.offset_y >= 48)
     {
@@ -257,7 +257,7 @@ void DrawSmallScreenCam(vScreen_t& vscreen)
     color.a *= rate;
 
     if(GFX.Camera.inited)
-        XRender::renderTexture(CamX, CamY, GFX.Camera, color);
+        XRender::renderTextureBasic(CamX, CamY, GFX.Camera, color);
     else
         XRender::renderRect(CamX, CamY, 24, 16, color);
 }

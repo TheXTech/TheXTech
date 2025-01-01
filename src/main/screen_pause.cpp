@@ -401,16 +401,16 @@ void Render()
         if(GFX.PCursor.inited)
         {
             if(s_pause_plr == 2 && s_pause_type != PauseType::Legacy)
-                XRender::renderTexture(menu_left_X - 20, menu_top_Y + (MenuCursor * 36), GFX.PCursor, {0, 255, 0});
+                XRender::renderTextureBasic(menu_left_X - 20, menu_top_Y + (MenuCursor * 36), GFX.PCursor, {0, 255, 0});
             else if(s_pause_plr != 1 && s_pause_type != PauseType::Legacy)
-                XRender::renderTexture(menu_left_X - 20, menu_top_Y + (MenuCursor * 36), GFX.PCursor);
+                XRender::renderTextureBasic(menu_left_X - 20, menu_top_Y + (MenuCursor * 36), GFX.PCursor);
             else
-                XRender::renderTexture(menu_left_X - 20, menu_top_Y + (MenuCursor * 36), GFX.PCursor, {255, 0, 0});
+                XRender::renderTextureBasic(menu_left_X - 20, menu_top_Y + (MenuCursor * 36), GFX.PCursor, {255, 0, 0});
         }
         else if(s_pause_plr == 2 && s_pause_type != PauseType::Legacy)
-            XRender::renderTexture(menu_left_X - 20, menu_top_Y + (MenuCursor * 36), 16, 16, GFX.MCursor[3], 0, 0);
+            XRender::renderTextureBasic(menu_left_X - 20, menu_top_Y + (MenuCursor * 36), 16, 16, GFX.MCursor[3], 0, 0);
         else
-            XRender::renderTexture(menu_left_X - 20, menu_top_Y + (MenuCursor * 36), 16, 16, GFX.MCursor[0], 0, 0);
+            XRender::renderTextureBasic(menu_left_X - 20, menu_top_Y + (MenuCursor * 36), 16, 16, GFX.MCursor[0], 0, 0);
     }
 
     if(XRender::TargetH > XRender::TargetH / 2 + menu_box_height / 2 + 16 + 96 + 8)

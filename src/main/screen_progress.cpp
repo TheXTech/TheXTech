@@ -96,7 +96,7 @@ void IndicateProgress(uint32_t start_time, double progress, const std::string& m
                time_y,
                {255, 255, 255, 127});
 
-    XRender::renderTexture(XRender::TargetW / 2 - GFX.LoadCoin.w / 2, time_y + 40, GFX.LoadCoin.w, GFX.LoadCoin.h / 4, GFX.LoadCoin, 0, 32 * LoadCoins);
+    XRender::renderTextureBasic(XRender::TargetW / 2 - GFX.LoadCoin.w / 2, time_y + 40, GFX.LoadCoin.w, GFX.LoadCoin.h / 4, GFX.LoadCoin, 0, 32 * LoadCoins);
 
     XRender::repaint();
     XRender::setTargetScreen();

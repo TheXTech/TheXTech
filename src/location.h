@@ -100,6 +100,9 @@ struct IntegerLocation_t
     int32_t Height = 0;
     int32_t Width = 0;
 
+    inline IntegerLocation_t() = default;
+    inline IntegerLocation_t(int32_t X, int32_t Y, int32_t Width, int32_t Height) : X(X), Y(Y), Height(Height), Width(Width) {}
+
     inline explicit operator Location_t() const
     {
         Location_t ret;

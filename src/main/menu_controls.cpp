@@ -178,10 +178,10 @@ int menuControls_Mouse_Render(bool mouse, bool render)
         {
             SuperPrint(g_mainMenu.wordNo, 3, sX+width/4, sY+line*3);
             if(MenuCursor == 0)
-                XRender::renderTexture(sX+width/4-24, sY+line*3, GFX.MCursor[0]);
+                XRender::renderTextureBasic(sX+width/4-24, sY+line*3, GFX.MCursor[0]);
             SuperPrint(g_mainMenu.wordYes, 3, sX+width/4, sY+line*4);
             if(MenuCursor == 1)
-                XRender::renderTexture(sX+width/4-24, sY+line*4, GFX.MCursor[0]);
+                XRender::renderTextureBasic(sX+width/4-24, sY+line*4, GFX.MCursor[0]);
         }
 
         if(mouse)
@@ -272,10 +272,10 @@ int menuControls_Mouse_Render(bool mouse, bool render)
         if(render)
         {
             if(scroll_start > 0)
-                XRender::renderTexture(sX + width / 2 - GFX.MCursor[1].w / 2, sY + 3*line - GFX.MCursor[1].h, GFX.MCursor[1]);
+                XRender::renderTextureBasic(sX + width / 2 - GFX.MCursor[1].w / 2, sY + 3*line - GFX.MCursor[1].h, GFX.MCursor[1]);
 
             if(scroll_end < n_types)
-                XRender::renderTexture(sX + width / 2 - GFX.MCursor[2].w / 2, sY + (3+scroll_end-scroll_start)*line - line + 18, GFX.MCursor[2]);
+                XRender::renderTextureBasic(sX + width / 2 - GFX.MCursor[2].w / 2, sY + (3+scroll_end-scroll_start)*line - line + 18, GFX.MCursor[2]);
         }
 
         // render the menu items
@@ -301,7 +301,7 @@ int menuControls_Mouse_Render(bool mouse, bool render)
                 else
                     SuperPrint(Controls::g_InputMethodTypes[scroll_start + i]->LocalName(), 5, sX+48, sY+(3+i)*line);
                 if(MenuCursor == scroll_start + i)
-                    XRender::renderTexture(sX + 24, sY+(3+i)*line, GFX.MCursor[0]);
+                    XRender::renderTextureBasic(sX + 24, sY+(3+i)*line, GFX.MCursor[0]);
             }
             int item_width = (int)Controls::g_InputMethodTypes[scroll_start + i]->LocalName().size() * 18;
             if(mouse && SharedCursor.X >= sX+48 && SharedCursor.X <= sX+48 + item_width
@@ -446,10 +446,10 @@ int menuControls_Mouse_Render(bool mouse, bool render)
         if(render)
         {
             if(scroll_start > 0)
-                XRender::renderTexture(sX + width / 2 - GFX.MCursor[1].w / 2, start_y - GFX.MCursor[1].h, GFX.MCursor[1]);
+                XRender::renderTextureBasic(sX + width / 2 - GFX.MCursor[1].w / 2, start_y - GFX.MCursor[1].h, GFX.MCursor[1]);
 
             if(scroll_end < total_lines)
-                XRender::renderTexture(sX + width / 2 - GFX.MCursor[2].w / 2, start_y + (avail_lines)*line - line + 18, GFX.MCursor[2]);
+                XRender::renderTextureBasic(sX + width / 2 - GFX.MCursor[2].w / 2, start_y + (avail_lines)*line - line + 18, GFX.MCursor[2]);
         }
 
         if(render && 0 >= scroll_start && 0 < scroll_end)
@@ -481,7 +481,7 @@ int menuControls_Mouse_Render(bool mouse, bool render)
                     else
                         SuperPrint(profiles[i]->Name, 5, sX+48, start_y + (i + 1-scroll_start)*line);
                     if(MenuCursor == i)
-                        XRender::renderTexture(sX + 24, start_y + (i + 1-scroll_start)*line, GFX.MCursor[0]);
+                        XRender::renderTextureBasic(sX + 24, start_y + (i + 1-scroll_start)*line, GFX.MCursor[0]);
                 }
                 if(mouse)
                 {
@@ -543,7 +543,7 @@ int menuControls_Mouse_Render(bool mouse, bool render)
                         if(value)
                             SuperPrint(value, 3, sX+48, start_y + (o_base + 2*i + 1 - scroll_start)*line);
                         if(MenuCursor - n_profiles - 1 == i)
-                            XRender::renderTexture(sX + 24, start_y + (o_base + 2*i + 1 - scroll_start)*line, GFX.MCursor[0]);
+                            XRender::renderTextureBasic(sX + 24, start_y + (o_base + 2*i + 1 - scroll_start)*line, GFX.MCursor[0]);
                     }
                 }
                 if(mouse && value)
@@ -581,7 +581,7 @@ int menuControls_Mouse_Render(bool mouse, bool render)
                         if(value)
                             SuperPrintRightAlign(value, 3, sX+width-32, start_y + (o_base + i - scroll_start)*line);
                         if(MenuCursor - n_profiles - 1 == i)
-                            XRender::renderTexture(sX + 24, start_y + (o_base + i - scroll_start)*line, GFX.MCursor[0]);
+                            XRender::renderTextureBasic(sX + 24, start_y + (o_base + i - scroll_start)*line, GFX.MCursor[0]);
                     }
                 }
                 if(mouse)
@@ -711,10 +711,10 @@ int menuControls_Mouse_Render(bool mouse, bool render)
         if(render)
         {
             if(scroll_start > 0)
-                XRender::renderTexture(sX + width / 2 - GFX.MCursor[1].w / 2, start_y - GFX.MCursor[1].h, GFX.MCursor[1]);
+                XRender::renderTextureBasic(sX + width / 2 - GFX.MCursor[1].w / 2, start_y - GFX.MCursor[1].h, GFX.MCursor[1]);
 
             if(scroll_end < total_lines)
-                XRender::renderTexture(sX + width / 2 - GFX.MCursor[2].w / 2, start_y + (avail_lines)*line - line + 18, GFX.MCursor[2]);
+                XRender::renderTextureBasic(sX + width / 2 - GFX.MCursor[2].w / 2, start_y + (avail_lines)*line - line + 18, GFX.MCursor[2]);
         }
 
         for(int i = 0; i < n_stock; i++)
@@ -751,7 +751,7 @@ int menuControls_Mouse_Render(bool mouse, bool render)
             {
                 SuperPrint(name, 5, sX+48, start_y+(i+s - scroll_start)*line);
                 if(MenuCursor == i)
-                    XRender::renderTexture(sX + 24, start_y + (i+s - scroll_start)*line, GFX.MCursor[0]);
+                    XRender::renderTextureBasic(sX + 24, start_y + (i+s - scroll_start)*line, GFX.MCursor[0]);
             }
             if(mouse)
             {
@@ -799,7 +799,7 @@ int menuControls_Mouse_Render(bool mouse, bool render)
                         if(value)
                             SuperPrint(value, 3, sX+48, start_y + (o_base + 2*i + 1 - scroll_start)*line);
                         if(MenuCursor - n_stock == i)
-                            XRender::renderTexture(sX + 24, start_y + (o_base + 2*i + 1 - scroll_start)*line, GFX.MCursor[0]);
+                            XRender::renderTextureBasic(sX + 24, start_y + (o_base + 2*i + 1 - scroll_start)*line, GFX.MCursor[0]);
                     }
                 }
 
@@ -838,7 +838,7 @@ int menuControls_Mouse_Render(bool mouse, bool render)
                         if(value)
                             SuperPrintRightAlign(value, 3, sX+width-32, start_y + (o_base + i - scroll_start)*line);
                         if(MenuCursor - n_stock == i)
-                            XRender::renderTexture(sX + 24, start_y + (o_base + i - scroll_start)*line, GFX.MCursor[0]);
+                            XRender::renderTextureBasic(sX + 24, start_y + (o_base + i - scroll_start)*line, GFX.MCursor[0]);
                     }
                 }
 
@@ -977,10 +977,10 @@ int menuControls_Mouse_Render(bool mouse, bool render)
         if(render)
         {
             if(scroll_start > 0)
-                XRender::renderTexture(sX + width / 2 - GFX.MCursor[1].w / 2, start_y - GFX.MCursor[1].h, GFX.MCursor[1]);
+                XRender::renderTextureBasic(sX + width / 2 - GFX.MCursor[1].w / 2, start_y - GFX.MCursor[1].h, GFX.MCursor[1]);
 
             if(scroll_end < total_lines)
-                XRender::renderTexture(sX + width / 2 - GFX.MCursor[2].w / 2, start_y + (avail_lines)*line - line + 18, GFX.MCursor[2]);
+                XRender::renderTextureBasic(sX + width / 2 - GFX.MCursor[2].w / 2, start_y + (avail_lines)*line - line + 18, GFX.MCursor[2]);
         }
 
         // render the word "BUTTONS"
@@ -1043,9 +1043,9 @@ int menuControls_Mouse_Render(bool mouse, bool render)
                 if(MenuCursor == i)
                 {
                     if(!s_secondaryInput)
-                        XRender::renderTexture(left_value_x - 24, start_y + value_row * line, GFX.MCursor[0]);
+                        XRender::renderTextureBasic(left_value_x - 24, start_y + value_row * line, GFX.MCursor[0]);
                     else
-                        XRender::renderTexture(right_value_x - 24, start_y + value_row * line, GFX.MCursor[0]);
+                        XRender::renderTextureBasic(right_value_x - 24, start_y + value_row * line, GFX.MCursor[0]);
                 }
             }
 

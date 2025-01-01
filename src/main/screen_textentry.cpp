@@ -603,7 +603,7 @@ bool KeyboardMouseRender(bool mouse, bool render)
     }
 
     if(render && !Controls::g_renderTouchscreen)
-        XRender::renderTexture(SharedCursor.X, SharedCursor.Y, GFX.ECursor[2]);
+        XRender::renderTextureBasic((int)SharedCursor.X, (int)SharedCursor.Y, GFX.ECursor[2]);
 
     return false;
 }

@@ -150,7 +150,7 @@ void Render()
         SuperPrint(s_options[i], 3, menu_left_X, menu_top_Y + (i * 36));
 
     if(GFX.PCursor.inited)
-        XRender::renderTexture(menu_left_X - 20, menu_top_Y + (s_cur_item * 36), GFX.PCursor);
+        XRender::renderTextureBasic(menu_left_X - 20, menu_top_Y + (s_cur_item * 36), GFX.PCursor);
     else
         XRender::renderTextureFL(menu_left_X - 20, menu_top_Y + (s_cur_item * 36), GFX.MCursor[1].w, GFX.MCursor[1].h, GFX.MCursor[1], 0, 0, 90.0, nullptr, X_FLIP_NONE);
 
