@@ -401,7 +401,7 @@ void SetLayerSpeed(layerindex_t L, double SpeedX, double SpeedY, bool EffectStop
     }
 
 
-    // relatively more complex code to stop the layer -- first check that it's necessary
+    // relatively more complex code to stop the layer -- first check that it's necessary (note: this check prevents an infinite recursion)
     if(Layer[L].SpeedX == 0.0f && Layer[L].SpeedY == 0.0f)
         return;
 
@@ -427,6 +427,7 @@ void SetLayerSpeed(layerindex_t L, double SpeedX, double SpeedY, bool EffectStop
 
         if(g_config.fix_attlayer_reset && !NPC[C].Active)
         {
+            // this does not cause an infinite recursion due to the early return code above
             if(NPC[C].AttLayer != LAYER_NONE && NPC[C].AttLayer != LAYER_DEFAULT)
                 SetLayerSpeed(NPC[C].AttLayer, 0, 0);
         }
