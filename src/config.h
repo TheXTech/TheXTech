@@ -733,8 +733,6 @@ public:
     /* ---- Compatibility - Features ----*/
     subsection compat_features{this, "features", "Features"};
 
-    opt<bool> prefer_modern_pause{this, defaults(true), {CompatClass::critical_update, false}, Scope::None,
-        "prefer-modern-pause", "Modern pause screen", "Display the expanded pause menu by default (if off, expand pause menu using Alt Pause)"};
     opt<bool> allow_drop_add{this, defaults(true), {CompatClass::critical_update, false}, Scope::None,
         "allow-drop-add", "Allow drop/add", "Allow players to be dropped/added from the pause menu item during gameplay"};
     opt<bool> multiplayer_pause_controls{this, defaults(true), {CompatClass::critical_update, false}, Scope::None,
@@ -804,8 +802,8 @@ public:
         "fix-npc247-collapse", "NPC 247 collapse", "Prevents the stacked spiky plants from collapsing incorrectly"};
     opt<bool> fix_platforms_acceleration{this, defaults(true), {CompatClass::critical_update, false}, Scope::CreatorFile,
         "fix-platform-acceleration", "Platform acceleration", nullptr};
-    opt<bool> fix_npc55_kick_ice_blocks{this, defaults(true), {CompatClass::standard_update, false}, Scope::CreatorFile,
-        "fix-npc55-kick-ice-blocks", "NPC55 kick ice blocks", "The beached turtle should not sadly kick ice blocks"};
+    opt<bool> fix_npc55_kick_ice_blocks{this, defaults(false), {CompatClass::standard_update, false}, Scope::CreatorFile,
+        "fix-npc55-kick-ice-blocks", "NPC55 kick ice blocks", "NPC55 should kick ice blocks like NPC119"};
     opt<bool> fix_climb_invisible_fences{this, defaults(true), {CompatClass::standard_update, false}, Scope::CreatorFile,
         "fix-climb-invisible-fences", "Don't climb hidden fences", nullptr};
     opt<bool> fix_climb_bgo_speed_adding{this, defaults(true), {CompatClass::standard_update, false}, Scope::CreatorFile,
