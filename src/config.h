@@ -750,7 +750,7 @@ public:
     opt<bool> modern_section_change{this, defaults(true), {CompatClass::critical_update, false}, Scope::CreatorFile,
         "modern-section-change", "Modern section change", "Animate sections resizing when they shrink or during 2-player mode"};
 
-    opt<bool> extra_screen_shake{this, defaults(true), {CompatClass::standard_update, false}, Scope::Creator,
+    opt<bool> extra_screen_shake{this, defaults(true), {CompatClass::critical_update, false}, Scope::Creator,
         "extra-screen-shake", "Extra screen shake", "Shake screen for large enemy and player ground pounds"};
 
     opt<bool> enable_playtime_tracking{this, defaults(true), {CompatClass::pure_preference, false}, Scope::CreatorFile,
