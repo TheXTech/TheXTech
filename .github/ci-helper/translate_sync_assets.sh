@@ -12,10 +12,11 @@ function update_repo()
     branch=$2
 
     if [[ "$branch" != "" ]]; then
-        branch_command=-b $branch
+        branch_command="-b $branch"
+        branch_display="[Branch $branch] "
     fi
 
-    echo "--------------- $q ---------------"
+    echo "--------------- $q $branch_display---------------"
     cd "${GIT_ROOT}"
     git clone "$q" --depth 1 $branch_command repo
 
@@ -34,6 +35,7 @@ function update_repo()
     cd ..
     rm -Rf repo
 }
+
 
 # FIXME: Replace this hardcoded list with a server-side one to don't re-commit this list
 # every time
