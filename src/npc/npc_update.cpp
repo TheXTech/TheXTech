@@ -861,27 +861,30 @@ resume_Activation_Chain:
                 }
             }
 
-            if(NPC[A]->IsABlock || NPC[A]->IsAHit1Block || (NPC[A]->CanWalkOn && !(NPC[A]->IsFish && NPC[A].Special == 2)))
+            else if(NPC[A]->IsABlock || NPC[A]->IsAHit1Block || (NPC[A]->CanWalkOn && !(NPC[A]->IsFish && NPC[A].Special == 2)))
             {
                 if(
                     (
                         !NPC[A].Projectile && NPC[A].HoldingPlayer == 0 &&
-                        NPC[A].Effect == NPCEFF_NORMAL && !(NPC[A].Type == NPCID_SLIDE_BLOCK && NPC[A].Special == 1) &&
+                        NPC[A].Effect == NPCEFF_NORMAL && /* !(NPC[A].Type == NPCID_SLIDE_BLOCK && NPC[A].Special == 1) && */
                        !((NPC[A].Type == NPCID_FALL_BLOCK_RED || NPC[A].Type == NPCID_FALL_BLOCK_BROWN) && NPC[A].Special == 1)
                     ) || NPC[A].Type == NPCID_METALBARREL || NPC[A].Type == NPCID_HPIPE_SHORT || NPC[A].Type == NPCID_HPIPE_LONG ||
                     NPC[A].Type == NPCID_VPIPE_SHORT || NPC[A].Type == NPCID_VPIPE_LONG
                 )
                 {
                     numBlock++;
+
                     Block[numBlock] = blankBlock;
                     Block[numBlock].Type = 0;
                     Block[numBlock].Location = NPC[A].Location;
-                    Block[numBlock].Location.Y = static_cast<int>(floor(static_cast<double>(Block[numBlock].Location.Y + 0.02)));
+                    Block[numBlock].Location.Y = floor(Block[numBlock].Location.Y + 0.02);
                     Block[numBlock].tempBlockVehiclePlr = NPC[A].vehiclePlr;
                     Block[numBlock].tempBlockVehicleYOffset = NPC[A].vehicleYOffset;
                     Block[numBlock].tempBlockNpcIdx = A;
+
                     if(NPC[A].Type == NPCID_VEHICLE)
                         Block[numBlock].Type = 25;
+
                     if(NPC[A]->IsAHit1Block || (NPC[A]->CanWalkOn && !NPC[A]->IsABlock))
                         Block[numBlock].Type = 26;
 
@@ -894,6 +897,7 @@ resume_Activation_Chain:
                         Block[numBlock].Location.Y -= 16;
                         Block[numBlock].Location.Height += 16;
                     }
+
                     Block[numBlock].Location.SpeedX += NPC[A].BeltSpeed;
                     Block[numBlock].tempBlockNpcType = NPC[A].Type;
                     // not syncing the block layer here because we'll sync all of them together later
