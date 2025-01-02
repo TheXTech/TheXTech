@@ -5,18 +5,6 @@ if(POLICY CMP0077)
     cmake_policy(SET CMP0077 NEW)
 endif()
 
-if(NOT VITA_APP_NAME)
-    set(VITA_APP_NAME "TheXTech PS Vita")
-endif()
-
-if(NOT VITA_TITLEID)
-    set(VITA_TITLEID "THEXTECH0")
-endif()
-
-if(NOT VITA_VERSION)
-    set(VITA_VERSION "01.00")
-endif()
-
 if(NOT VITA_MKSFOEX_FLAGS)
     set(VITA_MKSFOEX_FLAGS "-d ATTRIBUTE2=12") # ATTRIBUTE2=12 specifies we need more RAM.  
 endif()
