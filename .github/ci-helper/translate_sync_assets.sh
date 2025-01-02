@@ -16,7 +16,9 @@ function update_repo()
         branch_display="[Branch $branch] "
     fi
 
-    echo "--------------- $q $branch_display---------------"
+    echo "============================================================="
+    echo "================ $q $branch_display================"
+    echo "============================================================="
     cd "${GIT_ROOT}"
     git clone "$q" --depth 1 $branch_command repo
 
@@ -34,6 +36,7 @@ function update_repo()
     fi
     cd ..
     rm -Rf repo
+    printf "=============================================================\n\n\n"
 }
 
 
