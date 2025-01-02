@@ -8,11 +8,11 @@ mkdir -p build-git
 
 function update_repo()
 {
-    $q=$1
-    $branch=$2
+    q=$1
+    branch=$2
 
     if [[ "$branch" != "" ]]; then
-        $branch_command=-b $branch
+        branch_command=-b $branch
     fi
 
     echo "--------------- $q ---------------"
