@@ -34,6 +34,7 @@ Changelog for 1.3.7-dev
 -Fix TheXTech 1.3.7-beta bug where the modern lives count was shown at the title screen for vanilla gamesaves (@ds-sloth, thanks to @0lhi for the report)
 -Fix TheXTech 1.3.7-beta bug where "4shared" and "4split" could give Chars 3 and 4 pet mounts (@ds-sloth, thanks to @0lhi for the report)
 -Fix TheXTech 1.3.7-beta defect where it was not clear whether vanilla cam was activated at high resolutions (@ds-sloth, thanks to @0lhi for the report)
+-Fix TheXTech 1.3.7-beta inaccuracy in which an NPC that moves into a section during gameplay might fail to spawn (this affected the final boss of Valtteri's Island - Revisited) (@ds-sloth)
 
 Changelog for 1.3.7-beta
 -Add ability to trigger event layer smoke in the in-game editor (@ds-sloth)
