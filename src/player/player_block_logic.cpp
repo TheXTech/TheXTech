@@ -94,7 +94,8 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
                             // 2 is from the right
                             // 3 is from the bottom
                             // 4 is from the left
-                            int HitSpot = FindRunningCollision(Player[A].Location, Block[B].Location); // this finds what part of the block the player collided
+                            double block_belt_speed = 0.0;
+                            int HitSpot = FindRunningCollision(Player[A].Location, Block[B].Location, block_belt_speed); // this finds what part of the block the player collided
 
                             if(BlockNoClipping[Block[B].Type]) // blocks that the player can't touch are forced to hitspot 0 (which means no collision)
                                 HitSpot = 0;
@@ -478,7 +479,7 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
                                 auto pLoc = Player[A].Location;
                                 pLoc.SpeedX += NPC[oldStandingOnNpc].Location.SpeedX;
                                 pLoc.SpeedY += NPC[oldStandingOnNpc].Location.SpeedY;
-                                HitSpot = FindRunningCollision(pLoc, Block[B].Location);
+                                HitSpot = FindRunningCollision(pLoc, Block[B].Location, block_belt_speed);
                                 D_pLogDebug("Conveyor: Recomputed collision with block %d", B);
                             }
 

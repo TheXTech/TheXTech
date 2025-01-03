@@ -102,7 +102,8 @@ bool WalkingCollision2(const Location_t &Loc1, const Location_t &Loc2);
 bool WalkingCollision3(const Location_t &Loc1, const Location_t &Loc2, float BeltSpeed);
 // Public Function FindRunningCollision(Loc1 As Location, Loc2 As Location) As Integer 'Helps the player to walk over 1 unit cracks
 // Helps the player to walk over 1 unit cracks
-int FindRunningCollision(const Location_t &Loc1, const Location_t &Loc2);
+// NEW: BeltSpeedX accounts for the speed of a conveyor belt when testing side collisions
+int FindRunningCollision(const Location_t &Loc1, const Location_t &Loc2, double BeltSpeedX);
 // Public Function ShouldTurnAround(Loc1 As Location, Loc2 As Location, Direction As Single) As Boolean  'Determines if an NPC should turnaround
 // Determines if an NPC should turnaround
 bool ShouldTurnAround(const Location_t &Loc1, const Location_t &Loc2, float Direction);

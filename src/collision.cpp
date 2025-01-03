@@ -515,7 +515,7 @@ bool WalkingCollision3(const Location_t &Loc1, const Location_t &Loc2, float Bel
 }
 
 // Helps the player to walk over 1 unit cracks
-int FindRunningCollision(const Location_t &Loc1, const Location_t &Loc2)
+int FindRunningCollision(const Location_t &Loc1, const Location_t &Loc2, double BeltSpeedX)
 {
     int tempFindRunningCollision = COLLISION_NONE;
 
@@ -523,11 +523,11 @@ int FindRunningCollision(const Location_t &Loc1, const Location_t &Loc2)
     {
         tempFindRunningCollision = COLLISION_TOP;
     }
-    else if(Loc1.X - Loc1.SpeedX >= Loc2.X + Loc2.Width - Loc2.SpeedX)
+    else if(Loc1.X - Loc1.SpeedX >= Loc2.X + Loc2.Width - (Loc2.SpeedX - BeltSpeedX))
     {
         tempFindRunningCollision = COLLISION_RIGHT;
     }
-    else if(Loc1.X + Loc1.Width - Loc1.SpeedX <= Loc2.X - Loc2.SpeedX)
+    else if(Loc1.X + Loc1.Width - Loc1.SpeedX <= Loc2.X - (Loc2.SpeedX - BeltSpeedX))
     {
         tempFindRunningCollision = COLLISION_LEFT;
     }
