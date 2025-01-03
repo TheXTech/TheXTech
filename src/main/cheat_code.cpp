@@ -1270,6 +1270,13 @@ static void fourPlayer()
             }
 
             Player[C].Character = C;
+
+            if(Player[C].Character > 2 && Player[C].Mount == 3)
+            {
+                Player[C].Mount = 1;
+                Player[C].MountType = 1;
+            }
+
             if(Player[C].Mount <= 1)
             {
                 Player[C].Location.Y += Player[C].Location.Height;
