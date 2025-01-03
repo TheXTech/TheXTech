@@ -357,6 +357,7 @@ void SetupCredits()
     AddCredit("Yingchun Soul"); // Idea for individual iceball shooting SFX and contribution with the "frozen NPC breaking" SFX
     AddCredit("MrDoubleA"); // Contribution with the "NPC got frozen" SFX
     AddCredit("Slash-18"); // Contribution with the better iceball shooting SFX
+    AddCredit("sl4cer");   // For reporting several issues while livestreaming (2021) (also known as draena)
     AddCredit("Eclipsed"); // For the help to verify and polish the speed-run mode (2021)
     AddCredit("RunninPigeon"); // For Nintendo Switch alpha testing on hardware (Formerly "ThatRoadRunnerfan727 (Matthew)")
     AddCredit("RMN Community"); // For Quality Episodes that allowed us to refine the Engine
