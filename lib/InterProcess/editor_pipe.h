@@ -34,9 +34,10 @@ public:
 
     // SEND_LVLX: /some/path/to/level file\n\n
     std::string     m_accepted_lvl_path; // Send to client the "READY\n\n" before accent raw data
-    bool            m_doAcceptLevelData;
+    bool            m_doAcceptLevelData = false;
+    bool            m_doAcceptLevelDataParts = false;
     std::string     m_acceptedRawData;  // accept any raw data before will be accepted '\n\n'
-    bool            m_doParseLevelData;
+    bool            m_doParseLevelData = false;
     RawTextInput    m_acceptedLevel;    // When accepted PARSE_LVLX\n\n, parse data and call signal
 
     bool hasLevelData();

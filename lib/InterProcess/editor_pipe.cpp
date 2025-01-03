@@ -182,10 +182,16 @@ void EditorPipe::icomingData(const std::string &in)
     if(m_doAcceptLevelData)
     {
         m_acceptedRawData.append(in);
+
+        if(m_doAcceptLevelDataParts)
+            sendMessage("LVLX_NEXT\n\n");
+
         pLogDebug("Append LVLX data...");
     }
-    else if(in.compare(0, 11, "SEND_LVLX: ") == 0)
+    else if(in.compare(0, 11, "SEND_LVLX: ") == 0 || in.compare(0, 17, "SEND_LVLX_PARTS: ") == 0)
     {
+        m_doAcceptLevelDataParts = (in.compare(0, 17, "SEND_LVLX_PARTS: ") == 0);
+        size_t offset = m_doAcceptLevelDataParts ? 17 : 11;
         //Delete old cached stuff
         m_acceptedRawData.clear();
         D_pLogDebug("IN: >> %s",
@@ -193,16 +199,17 @@ void EditorPipe::icomingData(const std::string &in)
                      in.substr(0, 30).c_str() :
                      in.c_str())
                    );
-        m_accepted_lvl_path   = std::string(in.c_str() + 11, (in.size() - 11));//skip "SEND_LVLX: "
+        m_accepted_lvl_path   = std::string(in.c_str() + offset, (in.size() - offset));//skip "SEND_LVLX: "
         Strings::doTrim(m_accepted_lvl_path);
         m_doAcceptLevelData  = true;
         IntProc::setState("Accepted SEND_LVLX");
-        sendMessage("READY\n\n");
+        sendMessage(m_doAcceptLevelDataParts ? "READY_PARTS\n\n" : "READY\n\n");
     }
     else if(in.compare(0, 10, "PARSE_LVLX") == 0)
     {
         pLogDebug("do Parse LVLX: PARSE_LVLX");
         m_doParseLevelData = true;
+        m_doAcceptLevelDataParts = false;
         m_acceptedLevel.open(&m_acceptedRawData, m_accepted_lvl_path);
         IntProc::setState(fmt::format_ne("LVLX is valid: 1"));
 
