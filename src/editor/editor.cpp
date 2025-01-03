@@ -2583,7 +2583,7 @@ void zTestLevel(bool magicHand, bool interProcess)
         IntProc::setState("Waiting for input data...");
         while(!IntProc::hasLevelData())
         {
-            UpdateLoad();
+            UpdateLoadREAL();
 
             //Abort loading process and exit from game if window was closed
             if(!GameIsActive)
@@ -2602,25 +2602,32 @@ void zTestLevel(bool magicHand, bool interProcess)
                 pLogWarning("ICP: Wait timeout");
                 timeOut = true;
                 IntProc::setState("ERROR: Wait time out.");
-                UpdateLoad();
+                UpdateLoadREAL();
                 PGE_Delay(1000);
                 GameIsActive = false;
                 return;
             }
+
             PGE_Delay(2);
         }
+
+        UpdateLoadREAL();
 
         if(!timeOut && !OpenLevelData(IntProc::editor->m_acceptedLevel, IntProc::editor->m_accepted_lvl_path)) //-V560
         {
             pLogWarning("Bad file format!");
+            pLogDebug("ERROR: Bad data format");
+            UpdateLoadREAL();
+            PGE_Delay(1000);
             GameIsActive = false;
             return;
         }
 
-        OpenLevelDataPost();
-
         pLogDebug("ICP: Done, starting a game....");
         IntProc::setState("Done. Starting game...");
+        UpdateLoadREAL();
+
+        OpenLevelDataPost();
     }
     else
 #endif // THEXTECH_INTERPROC_SUPPORTED
