@@ -16,14 +16,15 @@ function update_tr_file()
     q="$1"
     if [[ ! -f "${LANGS_PATCH}/$q" ]]; then
         # If no patch file exists, just copy
-        printf "-- copy: %s\n" $q
+        printf "==== COPY: %s ====\n" $q
         cp -v "${LANGS_IN}/$q" "${LANGS_OUT}/$q"
     else
         # Otherwise, apply the patch
-        printf "-- patch: %s\n" $q
+        printf "==== PATCH: %s ====\n" $q
         echo python3 "${OLD_DIR}/translate_patcher.py" "${LANGS_IN}/$q" "${LANGS_PATCH}/$q" "${LANGS_OUT}/$q"
         python3 "${OLD_DIR}/translate_patcher.py" "${LANGS_IN}/$q" "${LANGS_PATCH}/$q" "${LANGS_OUT}/$q"
     fi
+    printf "\n"
 }
 
 echo "---------------------------------------------"
