@@ -3,22 +3,39 @@
 OLD_DIR=~+
 
 ASSETS_ROOT=$1
-REPO_ROOT="$PWD/../../resources/languages"
 
-LANGS_IN=$1/languages/patches
+LANGS_IN="$PWD/../../resources/languages"
+LANGS_PATCH=$1/languages/patches
 LANGS_OUT=$1/languages
 
-cd "${LANGS_IN}"
+# Update only existing files at the target (Don't copy new files, they should be placed manually to add them for the autosync)
+cd "${LANGS_OUT}"
+
+function update_tr_file()
+{
+    q="$1"
+    if [[ ! -f "${LANGS_PATCH}/$q" ]]; then
+        # If no patch file exists, just copy
+        printf "-- copy: %s\n" $q
+        cp -v "${LANGS_IN}/$q" "${LANGS_OUT}/$q"
+    else
+        # Otherwise, apply the patch
+        printf "-- patch: %s\n" $q
+        echo python3 "${OLD_DIR}/translate_patcher.py" "${LANGS_IN}/$q" "${LANGS_PATCH}/$q" "${LANGS_OUT}/$q"
+        python3 "${OLD_DIR}/translate_patcher.py" "${LANGS_IN}/$q" "${LANGS_PATCH}/$q" "${LANGS_OUT}/$q"
+    fi
+}
+
+echo "---------------------------------------------"
+
+for q in thextech_*.json; do
+    update_tr_file "$q"
+done
 
 for q in assets_*.json; do
-    printf "\n\n---------------------------------------------\nFile: %s\n" $q
-    echo "===== copy  ====="
-    GENERIC_TR=thextech_${q:7:-5}.json
-    cp -v "${REPO_ROOT}/${GENERIC_TR}" "${LANGS_OUT}/${GENERIC_TR}"
-    echo "===== patch ====="
-    echo python3 "${OLD_DIR}/translate_patcher.py" "${REPO_ROOT}/$q" "${LANGS_IN}/$q" "${LANGS_OUT}/$q"
-    python3 "${OLD_DIR}/translate_patcher.py" "${REPO_ROOT}/$q" "${LANGS_IN}/$q" "${LANGS_OUT}/$q"
-    echo "---------------------------------------------"
+    update_tr_file "$q"
 done
+
+echo "---------------------------------------------"
 
 cd "$OLD_DIR"
