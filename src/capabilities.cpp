@@ -92,6 +92,7 @@ const char *const g_capabilities =
             "\"test-level-ipc\","
             "\"test-world-file\","
             "\"vsync-flag\","
+            "\"ipc-lvlx-multipart\","
             "\"--END--\""
         "]"
     "}";
