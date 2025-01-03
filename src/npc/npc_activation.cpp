@@ -114,7 +114,7 @@ void NPC_ConstructCanonicalSet()
 
     for(int16_t n = 1; n <= numNPCs; n++)
     {
-        if(s_NPC_MustBeCanonical_internal(NPC[n]))
+        if(s_NPC_MustBeCanonical_internal(NPC[n]) || NPC[n]._priv_force_canonical)
         {
             NPC[n]._priv_force_canonical = true;
             to_check.push_back(n);

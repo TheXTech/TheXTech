@@ -1158,7 +1158,18 @@ void OpenLevel_FixLayersEvents(const LevelLoad& load)
         if(NPC[A].TriggerLast != EVENT_NONE)
             NPC[A].TriggerLast = load.final_event_index[NPC[A].TriggerLast];
 
+        // section check logic is stubbed in the game menu, so don't use a strict check
+        if(!GameMenu)
+            NPC[A].Section = maxSections + 1;
+
         CheckSectionNPC(A);
+
+        // if not fully in any section, use canonical camera for this (fixes final boss of Valtteri's Island - Revisited)
+        if(NPC[A].Section == maxSections + 1)
+        {
+            NPC[A].Section = 0;
+            NPC[A]._priv_force_canonical = true;
+        }
 
 
         // Extra NPC load logic

@@ -91,7 +91,7 @@ void CheckSectionNPC(int A)
     // disabled in 1.3.6.1 because of bugs when overlapping sections change
     // Previously, it optimized for section 0. Now, it optimizes for NPC's current section.
     int B = NPC[A].Section;
-    if(g_SectionFirstOverlap[B] == B && NPC[A].Location.X >= level[B].X)
+    if(B <= maxSections && g_SectionFirstOverlap[B] == B && NPC[A].Location.X >= level[B].X)
     {
         if(NPC[A].Location.X + NPC[A].Location.Width <= level[B].Width)
         {
