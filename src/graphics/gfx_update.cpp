@@ -2523,7 +2523,10 @@ void UpdateGraphicsScreen(Screen_t& screen)
                                           bh,
                                           GFXBlock[block.Type],
                                           0,
-                                          BlockFrame[block.Type] * 32);
+                                          BlockFrame[block.Type] * bh);
+                    // BlockFrame * bh was previously BlockFrame * 32
+                    // This change is needed for converted conveyor blocks
+                    // It may be reverted in the future
                 }
             }
         }
