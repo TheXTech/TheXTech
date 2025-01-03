@@ -410,6 +410,8 @@ void SetLayerSpeed(layerindex_t L, double SpeedX, double SpeedY, bool EffectStop
     Layer[L].EffectStop = !EffectStop;
     Layer[L].SpeedX = 0;
     Layer[L].SpeedY = 0;
+    Layer[L].ApplySpeedX = 0;
+    Layer[L].ApplySpeedY = 0;
 
     for(int C : Layer[L].blocks)
     {
