@@ -28,6 +28,16 @@ enum BLKID
     BLKID_SPIN_BLOCK = 90,
     BLKID_RED_BRICK = 186,
     BLKID_GRY_BRICK = 457,
+
+    // these can be expanded into user-modifiable ranges in the future.
+    // currently the "CONV" blocks can't be placed or modified in any way by the user
+    BLKID_CONVEYOR_L_START = 701,
+    BLKID_CONVEYOR_L_CONV = 701,
+    BLKID_CONVEYOR_L_END = 701,
+
+    BLKID_CONVEYOR_R_START = 702,
+    BLKID_CONVEYOR_R_CONV = 702,
+    BLKID_CONVEYOR_R_END = 702,
 };
 
 

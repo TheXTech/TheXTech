@@ -43,6 +43,7 @@
 #include "../graphics.h"
 #include "../editor.h"
 #include "../npc_id.h"
+#include "blk_id.h"
 #include "level_file.h"
 #include "main/level_save_info.h"
 #include "main/level_medals.h"
@@ -164,6 +165,7 @@ struct LevelLoad
     SaveInfoInit si;
 
     int numPlayerStart = 0;
+    bool use_new_conveyors = false;
 
     layerindex_t layers_finalized = 0;
     eventindex_t events_finalized = 0;
@@ -324,6 +326,25 @@ bool OpenLevelData(PGE_FileFormats_misc::TextInput& input, const std::string Fil
 
 
     load.si.begin(g_curLevelMedals.should_initialize());
+
+    // turn NPC conveyor belts into new conveyor belts in modern mode
+    if(g_config.new_conveyor_belts && !LevelEditor)
+    {
+        const NPCTraits_t& t = NPCTraits[NPCID_CONVEYOR];
+
+        // check all of these conditions first
+        if(t.FrameOffsetX == 0 && t.FrameOffsetY == 0
+            && (t.WidthGFX == 0 || t.WidthGFX == t.TWidth)
+            && (t.HeightGFX == 0 || t.HeightGFX == t.THeight)
+            && t.IsABlock && t.CanWalkOn && t.MovesPlayer && !t.JumpHurt
+            && t.WontHurt && t.NoYoshi && t.Speedvar == 1)
+        {
+            load.use_new_conveyors = true;
+        }
+
+        // (note: it might be possible to handle the case where MovesPlayer and IsABlock are both false but CanWalkOn and IsAHit1Block are true)
+        // (note: it might be possible to handle the case where SpeedVar is not 1 -- still risky if SpeedVar is greater than 10)
+    }
 
 #ifdef PGEFL_CALLBACK_API
     LevelLoadCallbacks callbacks = OpenLevel_SetupCallbacks(load);
@@ -801,7 +822,7 @@ bool OpenLevel_Block(void* userdata, LevelBlock& b)
                 throw callback_error(error_string);
         }
 
-        if(IF_OUTRANGE(block.Type, 0, maxBlockType)) // Drop ID to 1 for blocks of out of range IDs
+        if(IF_OUTRANGE(block.Type, 0, maxBlockType) || block.Type == BLKID_CONVEYOR_L_CONV || block.Type == BLKID_CONVEYOR_R_CONV) // Drop ID to 1 for blocks of out of range IDs
         {
             pLogWarning("Block-%d ID is out of range (max types %d), reset to Block-1", block.Type, maxBlockType);
             block.Type = 1;
@@ -850,6 +871,27 @@ bool OpenLevel_Background(void* userdata, LevelBGO& b)
 bool OpenLevel_NPC(void* userdata, LevelNPC& n)
 {
     LevelLoad& load = *static_cast<LevelLoad*>(userdata);
+
+    if(n.id == NPCID_CONVEYOR && !n.friendly && load.use_new_conveyors && numBlock < maxBlocks)
+    {
+        numBlock++;
+
+        auto &block = Block[numBlock];
+
+        block = Block_t();
+
+        block.Location.X = double(n.x);
+        block.Location.Y = double(n.y);
+        block.Location.Height = double(NPCTraits[NPCID_CONVEYOR].THeight);
+        block.Location.Width = double(NPCTraits[NPCID_CONVEYOR].TWidth);
+
+        block.Type = (n.direct > 0) ? BLKID_CONVEYOR_R_CONV : BLKID_CONVEYOR_L_CONV;
+        block.Location.SpeedX = (n.direct > 0) ? 0.8 : -0.8;
+        block.DefaultType = block.Type;
+        block.Layer = load.FindLayer(n.layer);
+
+        return true;
+    }
 
     {
         bool variantHandled = false;

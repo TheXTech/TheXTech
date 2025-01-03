@@ -20,6 +20,56 @@
 
 #include "../globals.h"
 #include "../graphics.h"
+#include "blk_id.h"
+#include "game_main.h"
+#include "npc_traits.h"
+
+static void s_ConveyorBlockConvertedFrames()
+{
+    // check whether converted conveyors should use custom frames
+    const auto& t = NPCTraits[NPCID_CONVEYOR];
+
+    // non-preferred case, custom frames
+    for(int dir_right = 0; dir_right < 2; dir_right++)
+    {
+        int id = (dir_right) ? BLKID_CONVEYOR_R_CONV : BLKID_CONVEYOR_L_CONV;
+        auto& Frame = BlockFrame[id];
+        auto& FrameCount = BlockFrame2[id];
+
+        FrameCount += 1;
+
+        if(FrameCount > t.FrameSpeed)
+        {
+            if(t.FrameStyle == 0)
+                Frame += (dir_right) ? 1 : -1;
+            else
+                Frame += 1;
+
+            FrameCount = 0;
+        }
+
+        if(t.FrameStyle == 0)
+        {
+            if(Frame >= t.TFrames)
+                Frame = 0;
+            else if(Frame < 0)
+                Frame = t.TFrames - 1;
+        }
+        else if(t.FrameStyle == 1 || t.FrameStyle == 2)
+        {
+            if(!dir_right)
+            {
+                if(Frame < 0 || Frame >= t.TFrames)
+                    Frame = 0;
+            }
+            else
+            {
+                if(Frame < t.TFrames || Frame >= t.TFrames * 2)
+                    Frame = t.TFrames;
+            }
+        }
+    }
+}
 
 /*Private*/
 void SpecialFrames()
@@ -57,6 +107,8 @@ void SpecialFrames()
     // SpecialFrameCount[4]++;
     // if(SpecialFrameCount[4] >= 2.475F)
 
+    bool conveyer_block_difficult_frames = (NPCTraits[NPCID_CONVEYOR].TFrames > 0);
+
     SpecialFrameCount[4] += 1000;
     if(SpecialFrameCount[4] >= 2475)
     {
@@ -66,7 +118,31 @@ void SpecialFrames()
         SpecialFrame[4]++;
         if(SpecialFrame[4] >= 4)
             SpecialFrame[4] = 0;
+
+        // Apply NPC conveyor belt frame to block conveyor belts as well
+        if(!FreezeNPCs && !LevelSelect && GamePaused == PauseCode::None)
+        {
+            for(int i = BLKID_CONVEYOR_L_START; i <= BLKID_CONVEYOR_L_END; i++)
+            {
+                if(i == BLKID_CONVEYOR_L_CONV && conveyer_block_difficult_frames)
+                    continue;
+
+                BlockFrame[i] = SpecialFrame[4];
+            }
+
+            for(int i = BLKID_CONVEYOR_R_START; i <= BLKID_CONVEYOR_R_END; i++)
+            {
+                if(i == BLKID_CONVEYOR_R_CONV && conveyer_block_difficult_frames)
+                    continue;
+
+                BlockFrame[i] = 3 - SpecialFrame[4];
+            }
+        }
     }
+
+    // do conveyor block converted frames if needed
+    if(conveyer_block_difficult_frames)
+        s_ConveyorBlockConvertedFrames();
 
     SpecialFrameCount[5]++;
     if(SpecialFrameCount[5] < 20)

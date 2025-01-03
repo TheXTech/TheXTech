@@ -27,6 +27,8 @@
 #include "custom.h"
 #include "config.h"
 #include "npc_traits.h"
+#include "npc_id.h"
+#include "blk_id.h"
 
 #include <utility>
 
@@ -196,6 +198,11 @@ void LoadNPCDefaults()
     int A = 0;
     for(A = 1; A <= maxNPCType; A++)
         NPCTraits[A] = s_NPCDefaults.NPCTraits[A];
+
+    BlockWidth[BLKID_CONVEYOR_L_CONV] = 32;
+    BlockWidth[BLKID_CONVEYOR_R_CONV] = 32;
+    BlockHeight[BLKID_CONVEYOR_L_CONV] = 32;
+    BlockHeight[BLKID_CONVEYOR_R_CONV] = 32;
 
     loadNpcSetupFixes();
 }
@@ -415,6 +422,15 @@ void LoadCustomNPC(int A, std::string cFileName)
         traits.FrameStyle = int(npc.framestyle);
     if(npc.en_usedefaultcam)
         traits.UseDefaultCam = npc.usedefaultcam;
+
+    if(A == NPCID_CONVEYOR)
+    {
+        BlockWidth[BLKID_CONVEYOR_L_CONV] = traits.TWidth;
+        BlockWidth[BLKID_CONVEYOR_R_CONV] = traits.TWidth;
+
+        BlockHeight[BLKID_CONVEYOR_L_CONV] = traits.THeight;
+        BlockHeight[BLKID_CONVEYOR_R_CONV] = traits.THeight;
+    }
 }
 
 void LoadCustomPlayerPreviews(const char* preview_players_from)

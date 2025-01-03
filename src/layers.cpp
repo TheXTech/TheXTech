@@ -28,6 +28,7 @@
 #include "npc.h"
 #include "npc_id.h"
 #include "eff_id.h"
+#include "blk_id.h"
 #include "npc_traits.h"
 #include "sound.h"
 #include "graphics.h"
@@ -417,6 +418,11 @@ void SetLayerSpeed(layerindex_t L, double SpeedX, double SpeedY, bool EffectStop
     {
         Block[C].Location.SpeedX = 0;
         Block[C].Location.SpeedY = 0;
+
+        if(Block[C].Type >= BLKID_CONVEYOR_L_START && Block[C].Type <= BLKID_CONVEYOR_L_END)
+            Block[C].Location.SpeedX = -0.8;
+        else if(Block[C].Type >= BLKID_CONVEYOR_R_START && Block[C].Type <= BLKID_CONVEYOR_R_END)
+            Block[C].Location.SpeedX = 0.8;
     }
 
     for(int C : Layer[L].NPCs)
@@ -1715,6 +1721,11 @@ void UpdateLayers()
                 {
                     Block[B].Location.SpeedX = 0;
                     Block[B].Location.SpeedY = 0;
+
+                    if(Block[B].Type >= BLKID_CONVEYOR_L_START && Block[B].Type <= BLKID_CONVEYOR_L_END)
+                        Block[B].Location.SpeedX = -0.8;
+                    else if(Block[B].Type >= BLKID_CONVEYOR_R_START && Block[B].Type <= BLKID_CONVEYOR_R_END)
+                        Block[B].Location.SpeedX = 0.8;
                 }
 
                 if(g_config.enable_climb_bgo_layer_move)
@@ -1776,6 +1787,11 @@ void UpdateLayers()
                     Block[B].Location.Y += double(Layer[A].SpeedY);
                     Block[B].Location.SpeedX = double(Layer[A].SpeedX);
                     Block[B].Location.SpeedY = double(Layer[A].SpeedY);
+
+                    if(Block[B].Type >= BLKID_CONVEYOR_L_START && Block[B].Type <= BLKID_CONVEYOR_L_END)
+                        Block[B].Location.SpeedX += -0.8;
+                    else if(Block[B].Type >= BLKID_CONVEYOR_R_START && Block[B].Type <= BLKID_CONVEYOR_R_END)
+                        Block[B].Location.SpeedX += 0.8;
 
                     if(inactive)
                         treeBlockUpdateLayer(A, B);

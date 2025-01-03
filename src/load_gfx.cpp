@@ -30,6 +30,8 @@
 #include "globals.h"
 #include "global_dirs.h"
 
+#include "blk_id.h"
+
 #include "gfx.h"
 #include "load_gfx.h"
 #include "graphics.h" // SuperPrint
@@ -522,7 +524,7 @@ bool LoadGFXFromList(std::string source_dir, bool custom, bool skip_world)
         }
         else if(type_buf[0] == 'b')
         {
-            if(A > maxBlockType)
+            if(A > maxBlockType || A == BLKID_CONVEYOR_L_CONV || A == BLKID_CONVEYOR_R_CONV)
             {
                 pLogWarning("Received load request for invalid block %s %d", type_buf, A);
                 continue;
@@ -543,6 +545,26 @@ bool LoadGFXFromList(std::string source_dir, bool custom, bool skip_world)
             loadImageFromList(in, line_buf, source_dir,
                 GFXNPCBMP[A], nullptr, nullptr, GFXNPCCustom[A],
                 false, custom);
+
+            // load converted conveyer block graphics from conveyer NPC graphics
+            if(A == NPCID_CONVEYOR)
+            {
+                if(custom)
+                {
+                    for(int i = BLKID_CONVEYOR_L_CONV; i <= BLKID_CONVEYOR_R_CONV; i += BLKID_CONVEYOR_R_CONV - BLKID_CONVEYOR_L_CONV)
+                    {
+                        GFXBackup_t backup;
+                        backup.remote_isCustom = &GFXBlockCustom[i];
+                        backup.remote_texture = &GFXBlockBMP[i];
+                        XRender::unloadTexture(GFXBlockBMP[i]);
+                        backup.texture_backup = static_cast<StdPicture_Sub&>(GFXBlockBMP[i]);
+                        g_defaultLevelGfxBackup.push_back(backup);
+                    }
+                }
+
+                (StdPicture_Sub&)GFXBlockBMP[BLKID_CONVEYOR_L_CONV] = (const StdPicture_Sub&)GFXNPCBMP[NPCID_CONVEYOR];
+                (StdPicture_Sub&)GFXBlockBMP[BLKID_CONVEYOR_R_CONV] = (const StdPicture_Sub&)GFXNPCBMP[NPCID_CONVEYOR];
+            }
         }
         else if(type_buf[0] == 'e')
         {
@@ -833,6 +855,9 @@ void LoadGFX()
     CurDir.setCurDir(getGfxDir() + "block/");
     for(int A = 1; A <= maxBlockType; ++A)
     {
+        if(A == BLKID_CONVEYOR_L_CONV || A == BLKID_CONVEYOR_R_CONV)
+            continue;
+
         LoaderUpdateDebugString(fmt::format_ne("Block {0}", A));
         s_find_image(p, CurDir, fmt::format_ne("block-{0}", A));
 
@@ -875,6 +900,14 @@ void LoadGFX()
         if(!p.empty())
         {
             XRender::lazyLoadPicture(GFXNPCBMP[A], p);
+
+            // load converted conveyer block graphics from conveyer NPC graphics
+            if(A == NPCID_CONVEYOR)
+            {
+                XRender::lazyLoadPicture(GFXBlockBMP[BLKID_CONVEYOR_L_CONV], p);
+                XRender::lazyLoadPicture(GFXBlockBMP[BLKID_CONVEYOR_R_CONV], p);
+            }
+
             // GFXNPCWidth(A) = GFXNPCBMP[A].w;
             // GFXNPCHeight(A) = GFXNPCBMP[A].h;
             if(A % 20 == 0)
@@ -1385,6 +1418,9 @@ void LoadCustomGFX(bool include_world, const char* preview_players_from)
 
     for(int A = 1; A <= maxBlockType; ++A)
     {
+        if(A == BLKID_CONVEYOR_L_CONV || A == BLKID_CONVEYOR_R_CONV)
+            continue;
+
         loadCGFX(GfxRoot + fmt::format_ne("block/block-{0}.png", A),
                  fmt::format_ne("block-{0}", A),
                  nullptr, nullptr, GFXBlockCustom[A], GFXBlockBMP[A],
@@ -1401,9 +1437,24 @@ void LoadCustomGFX(bool include_world, const char* preview_players_from)
 
     for(int A = 1; A <= maxNPCType; ++A)
     {
-        loadCGFX(GfxRoot + fmt::format_ne("npc/npc-{0}.png", A),
-                 fmt::format_ne("npc-{0}", A),
+        std::string npc_path = GfxRoot + fmt::format_ne("npc/npc-{0}.png", A);
+        std::string npc_fn = fmt::format_ne("npc-{0}", A);
+
+        loadCGFX(npc_path,
+                 npc_fn,
                  nullptr, nullptr, GFXNPCCustom[A], GFXNPCBMP[A]);
+
+        // load converted conveyer block graphics from conveyer NPC graphics
+        if(A == NPCID_CONVEYOR)
+        {
+            loadCGFX(npc_path,
+                     npc_fn,
+                     nullptr, nullptr, GFXBlockCustom[BLKID_CONVEYOR_L_CONV], GFXBlockBMP[BLKID_CONVEYOR_L_CONV]);
+
+            loadCGFX(npc_path,
+                     npc_fn,
+                     nullptr, nullptr, GFXBlockCustom[BLKID_CONVEYOR_R_CONV], GFXBlockBMP[BLKID_CONVEYOR_R_CONV]);
+        }
     }
 
     for(int A = 1; A <= maxEffectType; ++A)

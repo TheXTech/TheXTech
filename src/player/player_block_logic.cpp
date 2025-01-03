@@ -30,6 +30,7 @@
 #include "eff_id.h"
 #include "collision.h"
 #include "eff_id.h"
+#include "blk_id.h"
 #include "config.h"
 
 #include "main/trees.h"
@@ -95,6 +96,11 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
                             // 3 is from the bottom
                             // 4 is from the left
                             double block_belt_speed = 0.0;
+                            if(Block[B].Type >= BLKID_CONVEYOR_L_START && Block[B].Type <= BLKID_CONVEYOR_L_END)
+                                block_belt_speed = -0.8;
+                            else if(Block[B].Type >= BLKID_CONVEYOR_R_START && Block[B].Type <= BLKID_CONVEYOR_R_END)
+                                block_belt_speed = 0.8;
+
                             int HitSpot = FindRunningCollision(Player[A].Location, Block[B].Location, block_belt_speed); // this finds what part of the block the player collided
 
                             if(BlockNoClipping[Block[B].Type]) // blocks that the player can't touch are forced to hitspot 0 (which means no collision)

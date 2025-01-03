@@ -28,6 +28,7 @@
 #include "layers.h"
 #include "effect.h"
 #include "eff_id.h"
+#include "blk_id.h"
 
 #include "main/trees.h"
 
@@ -106,8 +107,10 @@ void NPCBlockLogic(int A, double& tempHit, int& tempHitBlock, float& tempSpeedA,
                                     // traits of the block's NPC (if it is actually an NPC)
                                     const NPCTraits_t& blk_npc_tr = NPCTraits[Block[B].tempBlockNpcType];
 
+                                    bool block_is_not_conveyor = (Block[B].tempBlockNpcType != NPCID_CONVEYOR) && !(Block[B].Type >= BLKID_CONVEYOR_L_START && Block[B].Type <= BLKID_CONVEYOR_R_END);
+
                                     int HitSpot;
-                                    if(Block[B].tempBlockNpcType != NPCID_CONVEYOR && (blk_npc_tr.IsABlock || blk_npc_tr.IsAHit1Block || blk_npc_tr.CanWalkOn))
+                                    if(block_is_not_conveyor && (blk_npc_tr.IsABlock || blk_npc_tr.IsAHit1Block || blk_npc_tr.CanWalkOn))
                                         HitSpot = NPCFindCollision(NPC[A].Location, Block[B].Location);
                                     else
                                         HitSpot = FindCollisionBelt(NPC[A].Location, Block[B].Location, oldBeltSpeed);
@@ -1132,7 +1135,7 @@ void NPCBlockLogic(int A, double& tempHit, int& tempHitBlock, float& tempSpeedA,
                                                 NPCQueues::Killed.push_back(A);
                                             }
                                         }
-                                        else if(NPC[A].Type != NPCID_SPIKY_BALL_S3 && !(NPC[A]->IsABlock && Block[B].tempBlockNpcType > 0) && Block[B].tempBlockNpcType != NPCID_CONVEYOR)
+                                        else if(NPC[A].Type != NPCID_SPIKY_BALL_S3 && !(NPC[A]->IsABlock && Block[B].tempBlockNpcType > 0) && block_is_not_conveyor)
                                         {
                                             addBelt = NPC[A].Location.X;
 

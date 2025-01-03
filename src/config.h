@@ -913,6 +913,10 @@ public:
     opt<bool> modern_lives_system{this, defaults(true), {CompatClass::critical_update, false}, Scope::None,
         "modern-lives-system", "Modern lives system", "Allow negative lives instead of returning to the main menu"};
 
+    // 1.3.8
+    opt<bool> new_conveyor_belts{this, defaults(true), {CompatClass::standard_update, false}, Scope::Creator,
+        "new-conveyor-belts", "New conveyor belts", "Update belts to faster and more stable logic"};
+
     /* ---- Compatibility - Speedrun ----*/
 
     section speedrun{this, Scope::CreatorEpisode, "speedrun", "Speedrun"};

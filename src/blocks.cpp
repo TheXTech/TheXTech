@@ -33,6 +33,7 @@
 #include "npc.h"
 #include "npc_id.h"
 #include "eff_id.h"
+#include "blk_id.h"
 #include "npc_traits.h"
 #include "player.h"
 #include "sorting.h"
@@ -183,6 +184,20 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
     {
         PlaySoundSpatial(SFX_PSwitch, b.Location);
         BeltDirection = -BeltDirection; // for the blet direction changing block
+
+        for(auto B = 1; B <= numBlock; B++)
+        {
+            if(Block[B].Type >= BLKID_CONVEYOR_L_START && Block[B].Type <= BLKID_CONVEYOR_L_END)
+            {
+                Block[B].Type += BLKID_CONVEYOR_R_START - BLKID_CONVEYOR_L_START;
+                Block[B].Location.SpeedX = Layer[Block[B].Layer].ApplySpeedX + 0.8;
+            }
+            else if(Block[B].Type >= BLKID_CONVEYOR_R_START && Block[B].Type <= BLKID_CONVEYOR_R_END)
+            {
+                Block[B].Type -= BLKID_CONVEYOR_R_START - BLKID_CONVEYOR_L_START;
+                Block[B].Location.SpeedX = Layer[Block[B].Layer].ApplySpeedX - 0.8;
+            }
+        }
     }
 
 
