@@ -232,7 +232,7 @@ static const int TinyScreenW = 600;
 
 static bool s_prefer_modern_char_sel()
 {
-    return (g_config.compatibility_mode == Config_t::COMPAT_OFF || g_config.compatibility_mode == Config_t::COMPAT_MODERN);
+    return (g_config.compatibility_mode != Config_t::COMPAT_SMBX13) && (s_episode_playstyle != Config_t::MODE_VANILLA);
 }
 
 static bool s_show_separate_2P()
