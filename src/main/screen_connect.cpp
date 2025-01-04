@@ -364,6 +364,19 @@ void MainMenu_Start(int minPlayers)
     // clear input methods if invalid
     if((int)Controls::g_InputMethods.size() > BoxCount(true))
         Controls::ClearInputMethods();
+    // confirm that input methods are associated with players
+    else if(Controls::g_InputMethods.size() > 1)
+    {
+        for(size_t i = 0; i < Controls::g_InputMethods.size(); )
+        {
+            if(Controls::g_InputMethods[i] && Controls::g_InputMethods[i]->used_for_player)
+                i++;
+            else
+                Controls::DeleteInputMethodSlot(i);
+        }
+    }
+    else if(Controls::g_InputMethods.size() > 0 && Controls::g_InputMethods[0])
+        Controls::g_InputMethods[0]->used_for_player = true;
 
     for(int i = 0; i < maxLocalPlayers; i++)
         l_screen->charSelect[i] = 0;
@@ -393,6 +406,8 @@ void LegacyMenu_Start()
     // clear input methods if invalid
     if((int)Controls::g_InputMethods.size() > BoxCount(true))
         Controls::ClearInputMethods();
+    else if(Controls::g_InputMethods.size() > 0 && Controls::g_InputMethods[0])
+        Controls::g_InputMethods[0]->used_for_player = true;
 
     for(int i = 0; i < maxLocalPlayers; i++)
         l_screen->charSelect[i] = 0;
@@ -2427,7 +2442,11 @@ int Logic()
     }
 
     if(!block_poll)
-        Controls::PollInputMethod();
+    {
+        auto found = Controls::PollInputMethod();
+        if(found)
+            found->used_for_player = true;
+    }
 
     return 0;
 }

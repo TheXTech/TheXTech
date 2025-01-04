@@ -517,6 +517,9 @@ public:
     //     but the game may later change it depending on user interaction.
     InputMethodProfile *Profile = nullptr;
 
+    // true if it's been explicitly used by any player since being added
+    bool used_for_player = false;
+
     virtual ~InputMethod();
 
     // Update function that sets player controls, cursor controls, and editor controls,
