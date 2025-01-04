@@ -1,1 +1,89 @@
-{}
+{
+    "editor": {
+        "background2": {
+            "fam-set3": {
+                "bg2-35": "Arbres Enneigés",
+                "bg2-36": "Nuages 2",
+                "bg2-39": "Grotte 2",
+                "bg2-37": "Collines Enneigées",
+                "bg2-4": "Tuyaux",
+                "bg2-6": "Bonus",
+                "bg2-56": "Sous-marin",
+                "header": "Set 3",
+                "bg2-1": "Blocs",
+                "bg2-13": "Nuages",
+                "bg2-14": "Désert",
+                "bg2-15": "Donjon 2",
+                "bg2-17": "Vaisseau",
+                "bg2-22": "Chute d'eau",
+                "bg2-23": "Tanks",
+                "bg2-2": "Collines",
+                "bg2-20": "Forêt",
+                "bg2-21": "Bataille",
+                "bg2-24": "Boss Final",
+                "bg2-26": "Marchand de Champis",
+                "bg2-27": "Château",
+                "bg2-3": "Donjon",
+                "bg2-38": "Grotte"
+            },
+            "fam-set4": {
+                "bg2-55": "Sous-marin",
+                "bg2-42": "Château",
+                "bg2-11": "Collines",
+                "bg2-12": "Arbres",
+                "bg2-30": "Grotte",
+                "bg2-29": "Nuit",
+                "bg2-58": "Nuit Déserte",
+                "bg2-32": "Collines 2",
+                "bg2-33": "Collines 4",
+                "bg2-34": "Collines 3",
+                "bg2-43": "Château 2",
+                "header": "Set 4",
+                "bg2-18": "Manoir",
+                "bg2-19": "Forêt",
+                "bg2-28": "Bonus",
+                "bg2-31": "Nuages"
+            },
+            "fam-misc": {
+                "bg2-16": "Cratère Spacial",
+                "bg2-40": "Mine Secrète",
+                "bg2-45": "Marais Spacial",
+                "bg2-46": "Vaisseau Spatial",
+                "bg2-47": "Base Spaciale",
+                "header": "Autre"
+            },
+            "fam-set1": {
+                "bg2-10": "Plein Air",
+                "bg2-41": "Château",
+                "bg2-50": "Champignons",
+                "bg2-51": "Désert",
+                "bg2-7": "Souterrain",
+                "bg2-8": "Nuit",
+                "bg2-9": "Nuit 2",
+                "header": "Set 1"
+            },
+            "fam-set2": {
+                "bg2-25": "Souterrain",
+                "bg2-44": "Château",
+                "bg2-48": "Nuages",
+                "bg2-49": "Nuit - Collines",
+                "bg2-5": "Arbres",
+                "bg2-52": "Nuit - Désert",
+                "bg2-53": "Falaise",
+                "bg2-54": "Entrepôt",
+                "bg2-57": "Donjon",
+                "header": "Set 2"
+            },
+            "auto": {
+                "bg2-0": "Aucun"
+            }
+        }
+    },
+    "character": {
+        "name1": "Pers1",
+        "name2": "Pers2",
+        "name3": "Pers3",
+        "name4": "Pers4",
+        "name5": "Pers5"
+    }
+}
