@@ -150,6 +150,11 @@ void EditorPipe::sendPlayerSettings(int playerId, int character, int state, int 
     sendMessage(fmt::format_ne("CMD:PLAYER_SETUP_UPDATE {0} {1} {2} {3} {4}", playerId, character, state, vehicleID, vehicleState));
 }
 
+void EditorPipe::sendPlayerSettings2(int playerId, int health, int reservedItem)
+{
+    sendMessage(fmt::format_ne("CMD:PLAYER_SETUP_UPDATE2 {0} {1} {2}", playerId, health, reservedItem));
+}
+
 void EditorPipe::shut()
 {
     sendMessage("CMD:ENGINE_CLOSED");

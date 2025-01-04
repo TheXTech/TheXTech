@@ -21,6 +21,7 @@ public:
     void sendTakenNPC(const LevelNPC &npc);
     void sendCloseProperties();
     void sendPlayerSettings(int playerId, int character, int state, int vehicleID, int vehicleState);
+    void sendPlayerSettings2(int playerId, int health, int reservedItem);
     void shut();
 
     bool        m_isWorking;

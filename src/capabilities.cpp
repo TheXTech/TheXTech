@@ -93,6 +93,8 @@ const char *const g_capabilities =
             "\"test-world-file\","
             "\"vsync-flag\","
             "\"ipc-lvlx-multipart\","
+            "\"ipc-player-health\","
+            "\"ipc-player-item\","
             "\"--END--\""
         "]"
     "}";
