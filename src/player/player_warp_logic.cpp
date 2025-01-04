@@ -138,6 +138,19 @@ static void s_WarpStealMount(int A)
     UpdateYoshiMusic();
 }
 
+// fix the location of any players in pets, for after a player gets teleported
+static void s_FixPlayersInPets(const Screen_t& screen)
+{
+    for(int plr_i = 0; plr_i < screen.player_count; plr_i++)
+    {
+        int o_A = screen.players[plr_i];
+
+        const Player_t& o_p = Player[o_A];
+        if(o_p.Effect == PLREFF_PET_INSIDE)
+            PlayerEffects(o_A);
+    }
+}
+
 static void s_CheckWarpLevelExit(Player_t& plr, const Warp_t& warp, int lvl_counter, int map_counter)
 {
     if(warp.level != STRINGINDEX_NONE)
@@ -478,9 +491,9 @@ void PlayerEffectWarpPipe(int A)
                         o_p.Location.SpeedX = 0.0;
                         o_p.Location.SpeedY = 0.0;
                     }
-
-                    SharedScreenAvoidJump_Post(screen, (do_scroll) ? 0 : 200);
                 }
+
+                SharedScreenAvoidJump_Post(screen, (do_scroll) ? 0 : 200);
             }
         }
 
@@ -623,6 +636,9 @@ void PlayerEffectWarpPipe(int A)
                     o_p.Effect2 = 1;
                 }
             }
+
+            // update position of any players in pets
+            s_FixPlayersInPets(screen);
 
             // disable any tempX/TempY (no longer needed)
             SharedScreenResetTemp(screen);
@@ -1140,6 +1156,9 @@ void PlayerEffectWarpDoor(int A)
                 }
             }
 
+            // update position of any players in pets
+            s_FixPlayersInPets(screen);
+
             SharedScreenResetTemp(screen);
         }
 
@@ -1563,6 +1582,9 @@ static inline bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool bac
                     o_p.Effect2 = A;
                 }
             }
+
+            // update position of any players in pets
+            s_FixPlayersInPets(screen);
 
             GetvScreenAuto(vScreen[vscreen_A]);
         }
