@@ -344,8 +344,8 @@ static uint8_t s_gray_bricks_applies()
 }
 
 static const Hint s_hints[] = {
-    {"Press to pound downwards!",                               "pound-key",    s_altrun_pound_applies, s_draw_purple_pet_altrun},
-    {"Press to pound downwards!",                               "pound-key",    s_down_pound_applies,   s_draw_purple_pet_down},
+    {"Press Alt Run to pound downwards!",                       "pound-altrun", s_altrun_pound_applies, s_draw_purple_pet_altrun},
+    {"Press Down to pound downwards!",                          "pound-down",   s_down_pound_applies,   s_draw_purple_pet_down},
     {"No coins left? Take a loan! Just watch your score...",    "no-lives-new", s_no_lives_new_applies, s_draw_no_lives_new},
     {"Be careful - Game Over is imminent!",                     "no-lives-old", s_no_lives_old_applies, s_draw_no_lives_old},
     {"Grab, run, hold down, and let go to surf.",               "rainbow-surf", s_rainbow_surf_applies, s_draw_rainbow_surf},
