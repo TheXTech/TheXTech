@@ -31,6 +31,7 @@ Changelog for 1.3.7-dev
 -Ensure that the player setup menu always remembers the most recently selected characters (@ds-sloth, thanks to @0lhi for the suggestion)
 -Fix TheXTech 1.3.7-beta bug where the logical screen could desync after dropping a player (@ds-sloth)
 -Fixed the random crash and memory damaging during the load process (@Wohlstand)
+-Add ability to change last warp resume setting on hub worlds. This allows playing episodes incompatible with this behavior in Modern Mode. (@ds-sloth, thanks to @0lhi for the suggestion)
 
 Changelog for 1.3.7-beta
 -Add ability to trigger event layer smoke in the in-game editor (@ds-sloth)

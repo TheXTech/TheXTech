@@ -693,7 +693,9 @@
                     "modern-tip": "All updates",
                     "vanilla": "Vanilla",
                     "vanilla-tip": "No updates"
-                }
+                },
+                "hub-resume": "Save warp in hub",
+                "hub-resume-tip": "Resume play at the last warp you entered"
             },
             "main": {
                 "_header": "Main",
