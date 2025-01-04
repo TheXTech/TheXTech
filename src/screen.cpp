@@ -252,6 +252,8 @@ void Screens_DropPlayer(int player)
                 Screens[s].players[i]--;
         }
     }
+
+    UpdateScreenPlayers();
 }
 
 // finds the visible Screen that contains a specific player
