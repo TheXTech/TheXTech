@@ -198,3 +198,9 @@ std::string Strings::replaceAll(std::string src, const std::string &from, const 
     replaceInAll(src, from, to);
     return src;
 }
+
+void Strings::dealloc(std::string& out)
+{
+    std::string deleter; // Deallocate the string
+    std::swap(out, deleter);
+}

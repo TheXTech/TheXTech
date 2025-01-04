@@ -53,5 +53,11 @@ namespace Strings
     void removeInAll(std::string &src, const std::string &substr);
     std::string replaceAll(std::string src, const std::string &from, const std::string &to);
     std::string removeAll(std::string src, const std::string &substr);
+
+    /**
+     * @brief Clears the std::string with the deallocation of the heap
+     * @param out The string to deallocate
+     */
+    void dealloc(std::string &out);
 }
 #endif // STRINGS_H
