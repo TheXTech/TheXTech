@@ -45,6 +45,7 @@
 #include <Utils/files.h>
 #include <Utils/files_ini.h>
 #include <Utils/dir_list_ci.h>
+#include <Utils/strings.h>
 #include <DirManager/dirman.h>
 #ifdef THEXTECH_INTERPROC_SUPPORTED
 #   include <InterProcess/intproc.h>
@@ -1561,7 +1562,7 @@ void UnloadWorldCustomGFX()
 void LoaderInit()
 {
     gfxLoaderDebugStart = SDL_GetTicks();
-    gfxLoaderDebugString.clear();
+    Strings::dealloc(gfxLoaderDebugString);
     gfxLoaderDebugStringUpdated = true;
     gfxLoaderDebugString.reserve(1024);
 
@@ -1574,10 +1575,8 @@ void LoaderInit()
 void LoaderFinish()
 {
     gfxLoaderDebugStart = -1;
-    gfxLoaderDebugString.clear();
+    Strings::dealloc(gfxLoaderDebugString);
     gfxLoaderDebugStringUpdated = true;
-    std::string deleter; // Deallocate the string
-    std::swap(gfxLoaderDebugString, deleter);
 
 #ifndef PGE_NO_THREADING
     if(gfxLoaderDebugMutex)
