@@ -574,10 +574,10 @@ void InputMethodType::LoadConfig(IniProcessing* ctl)
     int n_existing = (int)this->m_profiles.size(); // should usually be zero
 
     ctl->beginGroup(this->Name);
-    ctl->read("n-profiles", n_profiles, 0);
+    ctl->read("n-profiles", n_profiles, 2);
     ctl->endGroup();
 
-    for(int i = 0; i < n_profiles || i < 2; i++)
+    for(int i = 0; i < n_profiles; i++)
     {
         std::string group_name = this->Name + "-" + std::to_string(i + n_existing + 1);
 
