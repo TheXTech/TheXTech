@@ -453,6 +453,10 @@ void PlayerEffectWarpPipe(int A)
 
                     Player_t& o_p = Player[o_A];
 
+                    // revive someone in wings and bring to warp
+                    if(o_p.Effect == PLREFF_COOP_WINGS)
+                        o_p.Dead = false;
+
                     // in the mouth of an onscreen player's Pet?
                     bool in_onscreen_pet = !warp.NoYoshi && InOnscreenPet(o_A, screen);
 
@@ -1032,6 +1036,10 @@ void PlayerEffectWarpDoor(int A)
 
                 Player_t& o_p = Player[o_A];
 
+                // revive someone in wings and bring to warp
+                if(o_p.Effect == PLREFF_COOP_WINGS)
+                    o_p.Dead = false;
+
                 // in the mouth of an onscreen player's Pet?
                 bool in_onscreen_pet = !warp.NoYoshi && InOnscreenPet(o_A, screen);
 
@@ -1525,6 +1533,10 @@ static inline bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool bac
                     continue;
 
                 Player_t& o_p = Player[o_A];
+
+                // revive someone in wings and bring to warp
+                if(o_p.Effect == PLREFF_COOP_WINGS)
+                    o_p.Dead = false;
 
                 // in the mouth of an onscreen player's Pet?
                 bool in_onscreen_pet = !warp.NoYoshi && InOnscreenPet(o_A, screen);
