@@ -5562,15 +5562,20 @@ void PlayerEffects(const int A)
     if(PlayerWaitingInWarp(p))
     {
         Screen_t& s = ScreenByPlayer(A);
-        if(s.Type == ScreenTypes::SharedScreen && (p.Location.Y + p.Location.Height < -vScreenByPlayer(A).Y) && CheckNearestLiving(A))
+        if(s.Type == ScreenTypes::SharedScreen && (p.Location.Y + p.Location.Height < -vScreenByPlayer(A).Y))
         {
-            SharedScreenAvoidJump_Pre(s);
-            p.Dead = true;
-            p.Effect = PLREFF_COOP_WINGS;
-            p.Effect2 = 0;
-            SizeCheck(p);
-            SharedScreenAvoidJump_Post(s, 0);
-            return;
+            int O = CheckNearestLiving(A);
+
+            if(O && p.Location.Y < Player[O].Location.Y - 300)
+            {
+                SharedScreenAvoidJump_Pre(s);
+                p.Dead = true;
+                p.Effect = PLREFF_COOP_WINGS;
+                p.Effect2 = 0;
+                SizeCheck(p);
+                SharedScreenAvoidJump_Post(s, 0);
+                return;
+            }
         }
     }
 
