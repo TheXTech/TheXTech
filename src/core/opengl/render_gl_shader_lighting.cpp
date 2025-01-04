@@ -438,7 +438,7 @@ void main()
     float pixel_depth = min(min(min(pixel_depth_TL, pixel_depth_TR), pixel_depth_BL), pixel_depth_BR);
     float pixel_plane = floor(pixel_depth * 32.0);
 
-    uint light_type;
+    uint light_type = LIGHT_TYPE_POINT;
     float best_rate = 0.0;
     float total_rate = 0.0;
     float source_count = 0.0;
