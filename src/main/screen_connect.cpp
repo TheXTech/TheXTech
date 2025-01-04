@@ -45,6 +45,7 @@ enum class Context
 };
 
 static Context s_context;
+static std::array<uint8_t, maxLocalPlayers> s_recent_char{};
 
 struct CharInfo
 {
@@ -98,6 +99,7 @@ public:
     {
         for(int p = 0; p < l_screen->player_count; p++)
         {
+            s_recent_char[p] = Player[l_screen->players[p]].Character;
             int c = Player[l_screen->players[p]].Character - 1;
 
             if(0 <= c && c < numCharacters)
@@ -231,7 +233,6 @@ static bool s_controls_dirty = false;
 static int s_minPlayers = 1;
 
 static std::array<PlayerBox, maxLocalPlayers> s_players;
-static std::array<uint8_t, maxLocalPlayers> s_recent_char{};
 
 static CharInfo s_char_info;
 
