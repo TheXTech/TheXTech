@@ -1739,6 +1739,7 @@ void UpdateMacro()
         {
             auto &p = Player[i + 1];
             IntProc::sendPlayerSettings(i, p.Character, p.State, p.Mount, p.MountType);
+            IntProc::sendPlayerSettings2(i, p.Hearts, p.HeldBonus);
         }
     }
 #endif

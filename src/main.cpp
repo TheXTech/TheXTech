@@ -168,6 +168,7 @@ static void strToPlayerSetup(int player, const std::string &setupString)
     std::vector<std::string> keys;
 
     auto &p = testPlayer[player];
+    bool hasHealth = false;
 
     Strings::split(keys, setupString, ";");
     for(auto &k : keys)
@@ -182,17 +183,40 @@ static void strToPlayerSetup(int player, const std::string &setupString)
             p.Mount = int(SDL_strtol(k.substr(1).c_str(), nullptr, 10));
         else if(k[0] == 't') // Mount types
             p.MountType = int(SDL_strtol(k.substr(1).c_str(), nullptr, 10));
+        else if(k[0] == 'h') // Health level
+        {
+            p.Hearts = int(SDL_strtol(k.substr(1).c_str(), nullptr, 10));
+            hasHealth = true;
+        }
+        else if(k[0] == 'r') // Reserved NPC-ID
+            p.HeldBonus = NPCID(SDL_strtol(k.substr(1).c_str(), nullptr, 10));
     }
 
     if(p.Character < 1)
         p.Character = 1;
-    if(p.Character > 5)
+    else if(p.Character > 5)
         p.Character = 5;
 
     if(p.State < 1)
         p.State = 1;
-    if(p.State > 7)
+    else if(p.State > 7)
         p.State = 7;
+
+    if(p.HeldBonus >= maxNPCType)
+        p.HeldBonus = NPCID_NULL;
+
+    if(hasHealth)
+    {
+        if(p.Hearts <= 1 && p.State == 2)
+            p.Hearts = 2;
+
+        if(p.Hearts > 3)
+            p.Hearts = 3;
+    }
+    else if(p.Character >= 3 && p.State > 2)
+        p.Hearts = 3; // Ensure the health is 3 when any state is bigger than 2 is assigned
+    else
+        p.Hearts = 0;
 
 
     switch(p.Mount)
@@ -366,11 +390,11 @@ int main(int argc, char**argv)
                                                       "player1",
                                                       "Setup of playable character for player 1:\n"
                                                       "  Semicolon separated key-argument values:\n"
-                                                      "  c - character, s - state, m - mount, t - mount type.\n\n"
+                                                      "  c - character, s - state, m - mount, t - mount type, h - health, r - reserved NPC-ID.\n\n"
                                                       "Example:\n"
-                                                      "  c1;s2;m3;t0 - Character as 1, State as 2, Mount as 3, M.Type as 0",
+                                                      "  c1;s2;m3;t0;r10;h2 - Character as 1, State as 2, Mount as 3, M.Type as 0",
                                                       false, "",
-                                                      "c1;s2;m0;t0",
+                                                      "c1;s2;m0;t0;r10;h2",
                                                       cmd);
 
         TCLAP::ValueArg<std::string> playerCharacter2("2",
@@ -379,9 +403,9 @@ int main(int argc, char**argv)
                                                       "  Semicolon separated key-argument values:\n"
                                                       "  c - character, s - state, m - mount, t - mount type.\n\n"
                                                       "Example:\n"
-                                                      "  c1;s2;m3;t0 - Character as 1, State as 2, Mount as 3, M.Type as 0",
+                                                      "  c1;s2;m3;t0;r10;h2 - Character as 1, State as 2, Mount as 3, M.Type as 0",
                                                       false, "",
-                                                      "c1;s2;m0;t0",
+                                                      "c1;s2;m0;t0;r10;h2",
                                                       cmd);
 
         TCLAP::SwitchArg switchTestGodMode("g", "god-mode", "Enable god mode in level testing", false);

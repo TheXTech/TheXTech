@@ -2491,9 +2491,9 @@ void zTestLevel(bool magicHand, bool interProcess)
             for(A = 1; A <= numPlayers; A++)
             {
                 Player[A] = Player_t();
-                Player[A].Hearts = 0;
+                Player[A].Hearts = testPlayer[1].Hearts;
                 Player[A].State = testPlayer[1].State;
-                Player[A].HeldBonus = NPCID_NULL;
+                Player[A].HeldBonus = testPlayer[1].HeldBonus;
                 Player[A].Dead = false;
                 Player[A].Mount = testPlayer[1].Mount;
                 Player[A].MountType = testPlayer[1].MountType;
@@ -2508,8 +2508,9 @@ void zTestLevel(bool magicHand, bool interProcess)
             for(A = numPlayers; A >= 1; A--)
             {
                 Player[A] = Player_t();
+                Player[A].Hearts = testPlayer[A].Hearts;
                 Player[A].State = testPlayer[A].State;
-                Player[A].HeldBonus = NPCID_NULL;
+                Player[A].HeldBonus = testPlayer[A].HeldBonus;
                 Player[A].Dead = false;
                 Player[A].Mount = testPlayer[A].Mount;
                 Player[A].MountType = testPlayer[A].MountType;
