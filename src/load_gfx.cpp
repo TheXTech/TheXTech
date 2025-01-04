@@ -1520,8 +1520,10 @@ void LoaderInit()
     gfxLoaderDebugStart = SDL_GetTicks();
     gfxLoaderDebugString.clear();
     gfxLoaderDebugStringUpdated = true;
+    gfxLoaderDebugString.reserve(1024);
+
 #ifndef PGE_NO_THREADING
-    if(gfxLoaderDebugMutex)
+    if(!gfxLoaderDebugMutex)
         gfxLoaderDebugMutex = SDL_CreateMutex();
 #endif
 }
@@ -1531,6 +1533,9 @@ void LoaderFinish()
     gfxLoaderDebugStart = -1;
     gfxLoaderDebugString.clear();
     gfxLoaderDebugStringUpdated = true;
+    std::string deleter; // Deallocate the string
+    std::swap(gfxLoaderDebugString, deleter);
+
 #ifndef PGE_NO_THREADING
     if(gfxLoaderDebugMutex)
         SDL_DestroyMutex(gfxLoaderDebugMutex);

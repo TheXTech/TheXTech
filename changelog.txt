@@ -30,6 +30,7 @@ Changelog for 1.3.7-dev
 -Fix TheXTech 1.3.7-beta bug where an assertion failure could be triggered when a player went offscreen in shared screen multiplayer (@ds-sloth)
 -Ensure that the player setup menu always remembers the most recently selected characters (@ds-sloth, thanks to @0lhi for the suggestion)
 -Fix TheXTech 1.3.7-beta bug where the logical screen could desync after dropping a player (@ds-sloth)
+-Fixed the random crash and memory damaging during the load process (@Wohlstand)
 
 Changelog for 1.3.7-beta
 -Add ability to trigger event layer smoke in the in-game editor (@ds-sloth)
