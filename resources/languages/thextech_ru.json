@@ -456,16 +456,16 @@
                 "buttonB": "B",
                 "buttonL": "L",
                 "buttonR": "R",
-                "buttonSelect": "Выбор",
+                "buttonSelect": "SELECT",
                 "buttonStart": "Старт",
                 "buttonX": "X",
                 "buttonY": "Y",
                 "buttonZL": "ZL",
                 "buttonZR": "ZR",
-                "cStick": "Рычажок",
+                "cStick": "C-Stick",
                 "casePen": "(Перо)",
                 "dPad": "Крест.",
-                "tStick": "Выступ"
+                "tStick": "Джойстик"
             },
             "touchscreen": {
                 "layout": {
