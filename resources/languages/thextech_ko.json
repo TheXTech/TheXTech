@@ -819,7 +819,6 @@
         "hint": {
             "no-lives-new": "실패하면 점수가 재설정됩니다.",
             "no-lives-old": "실패하면 게임이 끝납니다.",
-            "pound-key": "아래로 두드리려면 누르세요!",
             "rainbow-surf": "잡고, 달리고, 누르고, 놓아서 서핑하세요.",
             "char5-bombs": "모으려면 Run을 누르고, 던지려면 Alt Run을 누르세요.",
             "gray-bricks": "",
