@@ -59,5 +59,7 @@ namespace Strings
      * @param out The string to deallocate
      */
     void dealloc(std::string &out);
+
+    void dealloc(std::vector<std::string> &out);
 }
 #endif // STRINGS_H

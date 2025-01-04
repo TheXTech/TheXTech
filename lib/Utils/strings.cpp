@@ -204,3 +204,9 @@ void Strings::dealloc(std::string& out)
     std::string deleter; // Deallocate the string
     std::swap(out, deleter);
 }
+
+void Strings::dealloc(std::vector<std::string>& out)
+{
+    std::vector<std::string> deleter; // Deallocate the string
+    std::swap(out, deleter);
+}

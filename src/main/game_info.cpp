@@ -21,6 +21,7 @@
 #include <fmt_format_ne.h>
 #include <Utils/files.h>
 #include <Utils/files_ini.h>
+#include <Utils/strings.h>
 #include <IniProcessor/ini_processing.h>
 #include "game_info.h"
 #include "script/luna/luna.h"
@@ -195,15 +196,61 @@ void GameInfo::LoadGameInfo()
 
             int cr;
             std::string value;
-            creditsGame.clear();
+            Strings::dealloc(creditsGame);
 
-            for(cr = 1; ; cr++)
+            std::string credits_file;
+            config.read("game-credits-file", credits_file, "");
+
+            if(!credits_file.empty())
             {
-                std::string key = fmt::format_ne("game-credit-{0}", cr);
-                if(!config.hasKey(key))
-                    break;
-                config.read(key.c_str(), value, value);
-                creditsGame.push_back(value);
+                auto data = Files::load_file(AppPath + credits_file);
+                if(!data.empty())
+                {
+                    const uint8_t *str = data.begin();
+                    const uint8_t *it;
+
+                    for(it = data.begin(); it != data.end(); ++it)
+                    {
+                        char s = static_cast<char>(*it);
+                        if(s == '\n')
+                        {
+                            if(it - str > 1)
+                                value.assign(reinterpret_cast<const char*>(str), (it - str) - 1);
+                            else
+                                value.clear();
+
+                            if(!value.empty() && value.back() == '\r')
+                                value.pop_back();
+
+                            creditsGame.push_back(value);
+                            str = it;
+                        }
+                    }
+
+                    if(it - str > 1)
+                        value.assign(reinterpret_cast<const char*>(str), (it - str) - 1);
+                    else
+                        value.clear();
+
+                    if(!value.empty() && value.back() == '\r')
+                        value.pop_back();
+
+                    if(value.empty())
+                        creditsGame.push_back(value);
+                }
+            }
+
+            if(creditsGame.empty)
+            {
+                // Old format
+                for(cr = 1; ; cr++)
+                {
+                    std::string key = fmt::format_ne("game-credit-{0}", cr);
+                    if(!config.hasKey(key))
+                        break;
+                    config.read(key.c_str(), value, value);
+                    creditsGame.push_back(value);
+                }
             }
         }
         config.endGroup();
