@@ -240,7 +240,7 @@ void GameInfo::LoadGameInfo()
                 }
             }
 
-            if(creditsGame.empty)
+            if(creditsGame.empty())
             {
                 // Old format
                 for(cr = 1; ; cr++)
