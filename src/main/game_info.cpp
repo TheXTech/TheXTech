@@ -24,6 +24,7 @@
 #include <Utils/strings.h>
 #include <Archives/archives.h>
 #include <IniProcessor/ini_processing.h>
+#include <PGE_File_Formats/pge_file_lib_globs.h>
 
 #include "game_info.h"
 #include "script/luna/luna.h"
@@ -211,37 +212,17 @@ void GameInfo::LoadGameInfo()
                 auto data = Files::load_file(AppPath + credits_file);
                 if(!data.empty())
                 {
-                    const uint8_t *str = data.begin();
-                    const uint8_t *it;
+                    std::string data_s(data.c_str());
+                    PGE_FileFormats_misc::RawTextInput input;
 
-                    for(it = data.begin(); it != data.end(); ++it)
+                    if(input.open(&data_s))
                     {
-                        char s = static_cast<char>(*it);
-                        if(s == '\n')
+                        while(!input.eof())
                         {
-                            if(it - str > 1)
-                                value.assign(reinterpret_cast<const char*>(str), (it - str) - 1);
-                            else
-                                value.clear();
-
-                            if(!value.empty() && value.back() == '\r')
-                                value.pop_back();
-
-                            creditsGame.push_back(value);
-                            str = it;
+                            input.readLine(value);
+                            creditsGame.push_back(Strings::trim(value));
                         }
                     }
-
-                    if(it - str > 1)
-                        value.assign(reinterpret_cast<const char*>(str), (it - str) - 1);
-                    else
-                        value.clear();
-
-                    if(!value.empty() && value.back() == '\r')
-                        value.pop_back();
-
-                    if(value.empty())
-                        creditsGame.push_back(value);
                 }
             }
 
