@@ -40,8 +40,9 @@
 
 #include "../game_main.h"
 #include "menu_main.h"
-#include "screen_pause.h"
-#include "screen_textentry.h"
+#include "main/screen_pause.h"
+#include "main/screen_textentry.h"
+#include "main/screen_connect.h"
 #include "speedrunner.h"
 #include "cheat_code.h"
 
@@ -211,6 +212,8 @@ static bool s_Quit()
         SaveGame(); // "Save & Quit"
     else
         speedRun_saveStats();
+
+    ConnectScreen::SaveChars();
 
     s_cheat_menu_bits = 0;
     GameMenu = true;
