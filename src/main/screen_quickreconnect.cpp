@@ -77,7 +77,9 @@ void Logic()
 
     if(has_missing && GamePaused != PauseCode::DropAdd)
     {
-        Controls::PollInputMethod();
+        auto found = Controls::PollInputMethod();
+        if(found)
+            found->used_for_player = true;
 
         // add toasts for new players
         for(int i = 0; i < maxLocalPlayers; i++)
