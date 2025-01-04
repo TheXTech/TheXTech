@@ -1206,7 +1206,7 @@ void PlayerEffectWarpWait(int A)
         for(int B = 1; B <= numPlayers; B++)
         {
             // Was previously only B != A. New conditions only apply in >2P
-            bool check_coll = B != A && !Player[B].Dead && (Player[B].Effect != PLREFF_WAITING || B < A);
+            bool check_coll = B != A && !Player[B].Dead && (Player[B].Effect != PLREFF_WAITING || B < A) && (Player[B].Effect != PLREFF_PET_INSIDE);
             if(check_coll && CheckCollision(p.Location, Player[B].Location))
                 tempBool = true;
         }
