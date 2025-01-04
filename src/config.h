@@ -700,6 +700,9 @@ public:
         defaults(CREATORCOMPAT_ENABLE), {CompatClass::critical_update, CREATORCOMPAT_DISABLE}, Scope::EpisodeOptions,
         "creator-compat", "Creator compat", "Logic tweaks by content creator"};
 
+    opt<bool> enable_last_warp_hub_resume{this, defaults(true), {CompatClass::standard_update, false}, Scope::CreatorEpisode | Scope::EpisodeOptions,
+        "hub-resume", "Save warp in hub", "Resume play at the last warp you entered"};
+
     // /* ---- Prefs - Effects ----*/
     // subsection effects{this, "effects", "Visual Effects"};
 
@@ -743,8 +746,6 @@ public:
 
     opt<bool> fix_vanilla_checkpoints{this, defaults(true), {CompatClass::standard_update, false}, Scope::CreatorFile,
         "fix-vanilla-checkpoints", "Fix vanilla checkpoints", "Resume from the most recently touched checkpoint after death"};
-    opt<bool> enable_last_warp_hub_resume{this, defaults(true), {CompatClass::standard_update, false}, Scope::CreatorEpisode,
-        "enable-last-warp-hub-resume", "Save warp in hub", "In a hub world, resume play at the last warp you entered the hub level from"};
     opt<bool> disable_background2_tiling{this, defaults(false), {CompatClass::standard_update, true}, Scope::Creator,
         "disable-background2-tiling", "Disable BG tiling", "Disable tiling of the level background texture if it causes visual disturbances"};
     opt<bool> modern_section_change{this, defaults(true), {CompatClass::critical_update, false}, Scope::CreatorFile,

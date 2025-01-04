@@ -236,6 +236,9 @@ void RefreshVisibleItems()
 
         for(size_t i = section_index + 1; i < next_section_index; i++)
         {
+            if(g_options.m_options[i] == &g_options.enable_last_warp_hub_resume && !NoMap)
+                continue;
+
             if(g_CheatEditYourFriends || g_options.m_options[i]->m_scope & current_scope)
             {
                 bool this_is_subsection = g_options.m_options[i] != &g_options.reset_all && dynamic_cast<ConfigSubSection_t<false>*>(g_options.m_options[i]);
@@ -269,7 +272,7 @@ inline BaseConfigOption_t<true>* PrepareAction(bool to_delete = false)
         return nullptr;
 
     // is it one of the other unique episode config options?
-    bool is_ep_config = (g_config.m_options[i] == &g_config.creator_compat) || (g_config.m_options[i] == &g_config.playstyle);
+    bool is_ep_config = (g_config.m_options[i] == &g_config.creator_compat) || (g_config.m_options[i] == &g_config.playstyle) || (g_config.m_options[i] == &g_config.enable_last_warp_hub_resume);
 
     // check some info about the option
     ConfigSetLevel prev_level = g_config.m_options[i]->m_set;

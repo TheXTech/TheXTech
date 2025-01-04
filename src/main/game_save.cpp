@@ -382,6 +382,9 @@ void LoadGame()
         return;
     }
 
+    // load settings from save file here
+    g_config.LoadEpisodeConfig(sav.userData);
+
     Lives = float(sav.lives);
     g_100s = (sav.hundreds == 0) ? sav.lives : ((sav.hundreds > 0) ? sav.hundreds - 1 : sav.hundreds);
     Coins = int(sav.coins);
@@ -487,9 +490,6 @@ void LoadGame()
 
     gSavedVarBank.TryLoadWorldVars();
 #endif
-
-    // load settings from save file here
-    g_config.LoadEpisodeConfig(sav.userData);
 
     ImportLevelSaveInfo(sav);
 }

@@ -113,6 +113,9 @@ void Config_t::SaveEpisodeConfig(saveUserData& userdata)
     int creator_compat_value = (creator_compat.m_set == ConfigSetLevel::ep_config) ? creator_compat : s_backup_creator_compat;
     ep_config.data.emplace_back(saveUserData::DataEntry{"creator-compat", (creator_compat_value == CREATORCOMPAT_DISABLE) ? "disable" : ((creator_compat_value == CREATORCOMPAT_FILEONLY) ? "file-only" : "enable")});
 
+    if(enable_last_warp_hub_resume.m_set == ConfigSetLevel::ep_config)
+        ep_config.data.emplace_back(saveUserData::DataEntry{"hub-resume", (enable_last_warp_hub_resume.m_value) ? "on" : "off"});
+
     userdata.store.push_back(ep_config);
 }
 
@@ -137,18 +140,6 @@ void Config_t::LoadEpisodeConfig(const saveUserData& userdata)
                     speedrun_mode.m_set = ConfigSetLevel::ep_config;
                 }
             }
-            // TODO: remove this legacy clause
-            else if(entry.key == "enable-bugfixes")
-            {
-                if(entry.value == "none")
-                    playstyle.m_value = MODE_VANILLA;
-                else if(entry.value == "critical")
-                    playstyle.m_value = MODE_CLASSIC;
-                else
-                    playstyle.m_value = MODE_MODERN;
-
-                playstyle.m_set = ConfigSetLevel::ep_config;
-            }
             else if(entry.key == "playstyle")
             {
                 if(entry.value == "vanilla")
@@ -170,6 +161,15 @@ void Config_t::LoadEpisodeConfig(const saveUserData& userdata)
                     creator_compat.m_value = CREATORCOMPAT_ENABLE;
 
                 creator_compat.m_set = ConfigSetLevel::ep_config;
+            }
+            else if(entry.key == "hub-resume")
+            {
+                if(entry.value == "off")
+                    enable_last_warp_hub_resume.m_value = false;
+                else
+                    enable_last_warp_hub_resume.m_value = true;
+
+                enable_last_warp_hub_resume.m_set = ConfigSetLevel::ep_config;
             }
         }
 
