@@ -274,7 +274,7 @@ void PlayerEffectWings(int A)
                 if(!CheckCollision(Player[A].Location, b.Location))
                     continue;
 
-                if(BlockSlope[B] || BlockSlope2[B])
+                if(BlockSlope[b.Type] || BlockSlope2[b.Type])
                     continue;
 
                 hit_block = true;
