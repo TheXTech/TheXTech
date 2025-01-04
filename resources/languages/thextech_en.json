@@ -337,7 +337,8 @@
             "warpNeedStarCount": "You need {0} {1} to enter."
         },
         "hint": {
-            "pound-key": "Press to pound downwards!",
+            "pound-altrun": "Press Alt Run to pound downwards!",
+            "pound-down": "Press Down to pound downwards!",
             "no-lives-new": "No coins left? Take a loan! Just watch your score...",
             "no-lives-old": "Be careful - Game Over is imminent!",
             "rainbow-surf": "Grab, run, hold down, and let go to surf.",
