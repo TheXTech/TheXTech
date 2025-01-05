@@ -2036,6 +2036,7 @@ void SetupVars()
     NPCTraits[NPCID_LAVA_MONSTER].UseDefaultCam = true;
     NPCTraits[NPCID_SPIKY_THROWER].UseDefaultCam = true;
     NPCTraits[NPCID_ITEM_THROWER].UseDefaultCam = true;
+    NPCTraits[NPCID_SAW].UseDefaultCam = true;
 
     // Default NPCs that render differently when inactive
     for(int A = 1; A <= maxNPCType; A++)
@@ -2068,6 +2069,7 @@ void SetupVars()
     NPCTraits[NPCID_FLY_CANNON].InactiveRender = NPCTraits_t::SHOW_ALWAYS;
     NPCTraits[NPCID_MAGIC_DOOR].InactiveRender = NPCTraits_t::SHOW_ALWAYS;
     NPCTraits[NPCID_DOOR_MAKER].InactiveRender = NPCTraits_t::SHOW_ALWAYS;
+    NPCTraits[NPCID_SAW].InactiveRender = NPCTraits_t::SHOW_ALWAYS;
 
     NPCTraits[NPCID_LAVABUBBLE].InactiveRender = NPCTraits_t::SKIP;
     NPCTraits[NPCID_PLANT_S3].InactiveRender = NPCTraits_t::SKIP;
