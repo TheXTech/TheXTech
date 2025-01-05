@@ -234,12 +234,12 @@ static const int TinyScreenW = 600;
 
 static bool s_prefer_modern_char_sel()
 {
-    return (g_config.compatibility_mode != Config_t::COMPAT_SMBX13) && (s_episode_playstyle != Config_t::MODE_VANILLA);
+    return (g_config.compatibility_mode != Config_t::COMPAT_SMBX13) && (s_episode_speedrun_mode != 3);
 }
 
 static bool s_show_separate_2P()
 {
-    return !s_prefer_modern_char_sel() && !g_gameInfo.disableTwoPlayer;
+    return g_config.compatibility_mode == Config_t::COMPAT_SMBX13 && !g_gameInfo.disableTwoPlayer;
 }
 
 static void s_change_save_item()
@@ -2151,9 +2151,7 @@ static void s_drawGameTypeTitle(int x, int y)
     else
     {
         // show "Play Episode" when at the save slot selecting and adjusting settings (not when the game was started in compat / speedrun mode)
-        bool changing_settings = (MenuMode >= MENU_SELECT_SLOT_BASE && MenuMode < MENU_SELECT_SLOT_END && g_config.speedrun_mode.m_set != ConfigSetLevel::cmdline && g_config.compatibility_mode.m_set != ConfigSetLevel::cmdline);
-
-        if(!s_show_separate_2P() || changing_settings)
+        if(!s_show_separate_2P())
             SuperPrint(g_mainMenu.mainPlayEpisode, 3, x, y, XTColorF(1.0f, 0.3f, 0.3f));
         else if(menuPlayersNum == 1)
             SuperPrint(g_mainMenu.main1PlayerGame, 3, x, y, XTColorF(1.0f, 0.3f, 0.3f));
