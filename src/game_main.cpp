@@ -175,7 +175,41 @@ static std::string getIntrFile()
 
 static std::string findIntroLevel()
 {
-    std::string introPath;
+    // Custom intro of recently played episode
+    if(!g_recentWorldIntro.empty())
+    {
+        // Check, is this a directory rather than a file
+        if(DirMan::exists(g_recentWorldIntro))
+        {
+            if(g_recentWorldIntro.back() != '/')
+                g_recentWorldIntro.push_back('/');
+
+            DirMan customSet(g_recentWorldIntro);
+            std::vector<std::string> intros;
+
+            if(!customSet.getListOfFiles(intros, {".lvl", "lvlx"}))
+                g_recentWorldIntro.clear(); // No suitable files here
+            else
+            {
+                std::sort(intros.begin(), intros.end());
+                for(auto &i : intros)
+                {
+                    i.insert(0, g_recentWorldIntro);
+                    pLogDebug("Found custom introset intro level: %s", i.c_str());
+                }
+
+                const std::string &selected = intros[iRand2T(intros.size())];
+                pLogDebug("Selected intro level to start: %s", selected.c_str());
+                return selected;
+            }
+        }
+        else if(Files::fileExists(g_recentWorldIntro))
+            return g_recentWorldIntro;
+        else
+            g_recentWorldIntro.clear(); // Continue normal intro
+    }
+
+    // std::string introPath;
     std::string introSetDir = AppPath + "introset/";
 
     if(!DirMan::exists(introSetDir))
@@ -764,9 +798,18 @@ int GameMain(const CmdLineSetup_t &setup)
             GameMenu = false;
             StopMusic();
 
-            auto outroPath = AppPath + "outro.lvlx";
-            if(!Files::fileExists(outroPath))
-                outroPath = AppPath + "outro.lvl";
+            std::string outroPath;
+
+            if(!g_recentWorldOutro.empty() && Files::fileExists(g_recentWorldOutro))
+                outroPath = g_recentWorldOutro;
+            else
+            {
+                outroPath = AppPath + "outro.lvlx";
+
+                if(!Files::fileExists(outroPath))
+                    outroPath = AppPath + "outro.lvl";
+            }
+
             OpenLevel(outroPath);
 
             numPlayers = g_gameInfo.outroMaxPlayersCount;
@@ -872,6 +915,9 @@ int GameMain(const CmdLineSetup_t &setup)
                         {
                             SetupScreens();
                         });
+
+            // Clear custom outro if that was presented
+            g_recentWorldOutro.clear();
         }
 
         // quickly exit if returned to menu from world test
@@ -2368,20 +2414,24 @@ void StartEpisode()
     FontManager::clearAllCustomFonts();
 
     std::string wPath = SelectWorld[selWorld].WorldPath + SelectWorld[selWorld].WorldFile;
+    std::string recentWorldIntroPrev = g_recentWorldIntro;
+    bool doSaveConfig = false;
 
     if((numPlayers == 1 || g_config.compatibility_mode != Config_t::COMPAT_SMBX13) && g_recentWorld1p != wPath)
     {
         g_recentWorld1p = wPath;
-        SaveConfig();
+        doSaveConfig = true;
     }
     else if((numPlayers >= 2 && g_config.compatibility_mode == Config_t::COMPAT_SMBX13) && g_recentWorld2p != wPath)
     {
         g_recentWorld2p = wPath;
-        SaveConfig();
+        doSaveConfig = true;
     }
 
     if(!OpenWorld(wPath))
     {
+        if(doSaveConfig)
+            SaveConfig();
         ClearLevel();
         LevelSelect = false;
         ReportLoadFailure(wPath);
@@ -2389,6 +2439,12 @@ void StartEpisode()
         ErrorQuit = true;
         return;
     }
+
+    if(recentWorldIntroPrev != g_recentWorldIntro)
+        doSaveConfig = true;
+
+    if(doSaveConfig)
+        SaveConfig();
 
     if(selSave && SaveSlotInfo[selSave].Progress >= 0)
     {

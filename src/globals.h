@@ -1352,6 +1352,11 @@ extern std::string g_recentAssetPack;
 extern std::string g_recentWorld1p;
 extern std::string g_recentWorld2p;
 extern std::string g_recentWorldEditor;
+
+// Absolute path to the level file or directory that contains them. Will be saved at gamesave
+extern std::string g_recentWorldIntro;
+// Absolute path to the outro level file. Will NOT be saved at gamesave, and will reset on world clear.
+extern std::string g_recentWorldOutro;
 // replaced with g_config.show_fps
 //Public ShowFPS As Boolean
 // extern bool ShowFPS;

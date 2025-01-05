@@ -169,6 +169,9 @@ bool OpenWorld_Head(void* userdata, WorldData& wld)
     WldxCustomParams.clear();
     SubHubLevels.clear();
 
+    Strings::dealloc(g_recentWorldIntro);
+    Strings::dealloc(g_recentWorldOutro);
+
     if(!wld.custom_params.empty())
     {
         WldxCustomParams = wld.custom_params;
@@ -181,6 +184,27 @@ bool OpenWorld_Head(void* userdata, WorldData& wld)
             {
                 for(const nlohmann::json& sub_hub : world_data["sub_hubs_list"])
                     SubHubLevels.push_back(sub_hub.get<std::string>());
+            }
+
+            if(world_data.contains("custom_intro"))
+            {
+                auto p = world_data["custom_intro"];
+                if(p.contains("intro_path"))
+                {
+                    std::string pp = p.value("intro_path", std::string());
+                    if(!pp.empty())
+                        g_recentWorldIntro = FileNamePath + pp;
+                }
+            }
+
+            if(world_data.contains("custom_outro"))
+            {
+                auto p = world_data["custom_outro"];
+                if(p.contains("outro_path"))
+                {
+                    std::string pp = p.value("outro_path", std::string());
+                    g_recentWorldOutro = FileNamePath + pp;
+                }
             }
         }
         catch(const std::exception &e)
