@@ -321,8 +321,12 @@ static inline int BoxCount(bool strict = false)
     if(s_context == Context::MainMenu && n < 2)
         n = 2;
 
-    // disable entering >2P in vanilla mode
+    // disable entering >2P in vanilla mode (in-game)
     if(n > 2 && !g_config.multiplayer_pause_controls)
+        n = 2;
+
+    // disable entering >2P in vanilla mode (main menu)
+    if(n > 2 && s_context == Context::MainMenu && mainMenuPlaystyle() == Config_t::MODE_VANILLA)
         n = 2;
 
     // disable entering >1P from legacy menu

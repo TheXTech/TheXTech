@@ -242,6 +242,12 @@ static bool s_show_separate_2P()
     return g_config.compatibility_mode == Config_t::COMPAT_SMBX13 && !g_gameInfo.disableTwoPlayer;
 }
 
+// export it, let's hope for some nice LTO here
+int mainMenuPlaystyle()
+{
+    return s_episode_playstyle;
+}
+
 static void s_change_save_item()
 {
     if(MenuCursor < 0 || MenuCursor >= maxSaveSlots)
