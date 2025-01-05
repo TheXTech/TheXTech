@@ -951,9 +951,6 @@ int GameMain(const CmdLineSetup_t &setup)
                         {
                             SetupScreens();
                         });
-
-            // Clear custom outro if that was presented
-            g_recentWorldOutro.clear();
         }
 
         // quickly exit if returned to menu from world test

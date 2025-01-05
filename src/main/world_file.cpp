@@ -663,6 +663,8 @@ void ClearWorld(bool quick)
     StartLevel.clear();
     BeatTheGame = false;
     numWorldCredits = 0;
+    // Clear custom outro if that was presented
+    g_recentWorldOutro.clear();
     // default file format if world header is missing
     FileFormat = FileFormats::LVL_PGEX;
 
