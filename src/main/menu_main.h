@@ -199,6 +199,8 @@ extern void initMainMenu();
 extern bool mainMenuUpdate();
 extern void mainMenuDraw();
 
+extern int mainMenuPlaystyle();
+
 void GetMenuPos(int* MenuX, int* MenuY);
 
 #endif // MENU_MAIN_H
