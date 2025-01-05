@@ -31,7 +31,7 @@ extern struct PGE_LogSetup
     //! The logging level
     PGE_LogLevel::Level level = PGE_LogLevel::Debug;
     //! Maximum number of log files in the directory
-    int maxFilesCount = 0;
+    int maxFilesCount = 10;
     //! Default logs directory
     std::string logPathDefault;
     //! Fallback log directory when default log directory is inaccessible
