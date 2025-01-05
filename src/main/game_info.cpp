@@ -200,7 +200,6 @@ void GameInfo::LoadGameInfo()
             config.read("font", creditsFont, 5);
             config.read("homepage", creditsHomePage, creditsHomePage);
 
-            int cr;
             std::string value;
             Strings::dealloc(creditsGame);
 
@@ -209,27 +208,19 @@ void GameInfo::LoadGameInfo()
 
             if(!credits_file.empty())
             {
-                auto data = Files::load_file(AppPath + credits_file);
-                if(!data.empty())
+                PGE_FileFormats_misc::RWopsTextInput input(Files::open_file(AppPath + credits_file, "r"));
+                while(!input.eof())
                 {
-                    std::string data_s(data.c_str());
-                    PGE_FileFormats_misc::RawTextInput input;
-
-                    if(input.open(&data_s))
-                    {
-                        while(!input.eof())
-                        {
-                            input.readLine(value);
-                            creditsGame.push_back(Strings::trim(value));
-                        }
-                    }
+                    input.readLine(value);
+                    if(!value.empty() || !input.eof())
+                        creditsGame.push_back(value);
                 }
             }
 
             if(creditsGame.empty())
             {
                 // Old format
-                for(cr = 1; ; cr++)
+                for(int cr = 1; ; cr++)
                 {
                     std::string key = fmt::format_ne("game-credit-{0}", cr);
                     if(!config.hasKey(key))
