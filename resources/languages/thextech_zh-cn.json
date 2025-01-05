@@ -693,7 +693,9 @@
                     "classic-tip": "开启部分游戏更新",
                     "modern-tip": "开启全部游戏更新",
                     "vanilla-tip": "关闭全部游戏更新"
-                }
+                },
+                "hub-resume": "中心关卡：传送点记忆",
+                "hub-resume-tip": "从上次进入的传送点继续游戏"
             },
             "main": {
                 "_header": "常规选项",
