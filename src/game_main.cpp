@@ -2406,12 +2406,12 @@ void StartEpisode()
 
     std::string wPath = SelectWorld[selWorld].WorldPath + SelectWorld[selWorld].WorldFile;
 
-    if(numPlayers == 1 && g_recentWorld1p != wPath)
+    if((numPlayers == 1 || g_config.compatibility_mode != Config_t::COMPAT_SMBX13) && g_recentWorld1p != wPath)
     {
         g_recentWorld1p = wPath;
         SaveConfig();
     }
-    else if(numPlayers >= 2 && g_recentWorld2p != wPath)
+    else if((numPlayers >= 2 && g_config.compatibility_mode == Config_t::COMPAT_SMBX13) && g_recentWorld2p != wPath)
     {
         g_recentWorld2p = wPath;
         SaveConfig();
