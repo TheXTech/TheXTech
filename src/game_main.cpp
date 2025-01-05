@@ -34,6 +34,7 @@
 
 #include <Logger/logger.h>
 #include <Utils/files.h>
+#include <Utils/strings.h>
 #include <AppPath/app_path.h>
 #include <Integrator/integrator.h>
 #include <PGE_File_Formats/file_formats.h>
@@ -160,13 +161,7 @@ static int loadingThread(void *waiter_ptr)
 
 static std::string getIntrFile()
 {
-    std::string introPath = g_recentWorldIntro;
-
-    if(introPath.empty() || !Files::fileExists(introPath))
-    {
-        g_recentWorldIntro.clear();
-        introPath = AppPath + "intro.lvlx";
-    }
+    auto introPath = AppPath + "intro.lvlx";
 
     if(!Files::fileExists(introPath))
         introPath = AppPath + "intro.lvl";
@@ -179,52 +174,69 @@ static std::string getIntrFile()
     return introPath;
 }
 
-static std::string findIntroLevel()
+/**
+ * @brief Choice randomly one of level from the directory
+ * @param out The selection path (absolute path)
+ * @param dir Directory with levels, must end with /
+ * @param rootIntro The fallback absolute path to level if introset not exists or empty
+ * @return true if choice was done, otherwise, nothing
+ */
+static bool choiceFromIntroset(std::string &out, const std::string &dir, const std::string &rootIntro = std::string())
 {
-    std::string introSetDir = AppPath + "introset/";
-    bool introSetCustom = false;
-
-    if(!g_recentWorldIntro.empty() && DirMan::exists(g_recentWorldIntro))
-    {
-        if(g_recentWorldIntro.back() != '/')
-            g_recentWorldIntro.push_back('/');
-
-        introSetCustom = true;
-        introSetDir = g_recentWorldIntro;
-    }
-
-    if(!DirMan::exists(introSetDir))
-        return getIntrFile();
-
-    DirMan introSet(introSetDir);
+    DirMan introSet(dir);
     std::vector<std::string> intros;
 
-    if(!introSet.getListOfFiles(intros, {".lvl", "lvlx"}) || intros.empty())
-        return getIntrFile();
+    if(!introSet.exists() || !introSet.getListOfFiles(intros, {".lvl", "lvlx"}) || intros.empty())
+    {
+        if(rootIntro.empty())
+            return false;
+        else
+        {
+            out = rootIntro;
+            return true;
+        }
+    }
 
     std::sort(intros.begin(), intros.end());
 
     for(auto &i : intros)
     {
-        i.insert(0, introSetDir);
+        i.insert(0, dir);
         pLogDebug("Found introset intro level: %s", i.c_str());
     }
 
-    if(!introSetCustom || intros.empty())
+    // The final choice
+    out = intros[iRand2T(intros.size())];
+
+    return true;
+}
+
+static std::string findIntroLevel()
+{
+    std::string choice;
+
+    // Try to find custom intros
+    if(!g_recentWorldIntro.empty())
     {
-        auto rootIntro = getIntrFile();
-        if(!rootIntro.empty())
-            intros.push_back(rootIntro);
+        if(DirMan::exists(g_recentWorldIntro)) // If path is a directory
+        {
+            if(g_recentWorldIntro.back() != '/')
+                g_recentWorldIntro.push_back('/');
+
+            if(choiceFromIntroset(choice, g_recentWorldIntro))
+                return choice;
+        }
+        else if(Files::fileExists(g_recentWorldIntro))
+            return g_recentWorldIntro;
+
+        // When found nothing
+        Strings::dealloc(g_recentWorldIntro);
     }
 
-    if(intros.empty())
-        return std::string();
+    // Find default set
+    choiceFromIntroset(choice, AppPath + "introset/", getIntrFile());
 
-    const std::string &selected = intros[iRand2T(intros.size())];
-
-    pLogDebug("Selected intro level to start: %s", selected.c_str());
-
-    return selected;
+    return choice;
 }
 
 // expand the section vertically if the top 8px of the level are empty
