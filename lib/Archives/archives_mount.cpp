@@ -103,6 +103,11 @@ void unmount_episode()
     return s_unmount(episode_mount, s_episode_archive_path);
 }
 
+const std::string& episode_archive_path()
+{
+    return s_episode_archive_path;
+}
+
 bool mount_temp(const char* archive_path)
 {
     if(s_temp_archive_path == archive_path)

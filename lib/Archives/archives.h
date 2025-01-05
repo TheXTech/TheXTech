@@ -84,6 +84,7 @@ const std::string& assets_archive_path();
 
 bool mount_episode(const char* archive_path);
 void unmount_episode();
+const std::string& episode_archive_path();
 
 void unmount_temp();
 

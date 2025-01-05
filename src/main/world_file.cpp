@@ -45,6 +45,7 @@
 #include <Utils/strings.h>
 #include <Utils/files.h>
 #include <Utils/dir_list_ci.h>
+#include <Archives/archives.h>
 #include <Logger/logger.h>
 #include <PGE_File_Formats/file_formats.h>
 
@@ -235,7 +236,12 @@ bool OpenWorld_Head(void* userdata, WorldData& wld)
                 {
                     std::string pp = p.value("intro_path", std::string());
                     if(!pp.empty())
-                        g_recentWorldIntro = FileNamePath + pp;
+                    {
+                        if(FileNamePath[0] == ':' && FileNamePath[1] == 'e')
+                            g_recentWorldIntro = "@" + Archives::episode_archive_path() + ":/" + pp;
+                        else
+                            g_recentWorldIntro = FileNamePath + pp;
+                    }
                 }
             }
 
