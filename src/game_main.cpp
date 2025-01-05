@@ -162,7 +162,13 @@ static int loadingThread(void *waiter_ptr)
 
 static std::string getIntrFile()
 {
-    auto introPath = AppPath + "intro.lvlx";
+    std::string introPath = g_recentWorldIntro;
+
+    if(introPath.empty() || !Files::fileExists(introPath))
+    {
+        g_recentWorldIntro.clear();
+        introPath = AppPath + "intro.lvlx";
+    }
 
     if(!Files::fileExists(introPath))
         introPath = AppPath + "intro.lvl";
@@ -177,42 +183,17 @@ static std::string getIntrFile()
 
 static std::string findIntroLevel()
 {
-    // Custom intro of recently played episode
-    if(!g_recentWorldIntro.empty())
-    {
-        // Check, is this a directory rather than a file
-        if(DirMan::exists(g_recentWorldIntro))
-        {
-            if(g_recentWorldIntro.back() != '/')
-                g_recentWorldIntro.push_back('/');
-
-            DirMan customSet(g_recentWorldIntro);
-            std::vector<std::string> intros;
-
-            if(!customSet.getListOfFiles(intros, {".lvl", "lvlx"}))
-                g_recentWorldIntro.clear(); // No suitable files here
-            else
-            {
-                std::sort(intros.begin(), intros.end());
-                for(auto &i : intros)
-                {
-                    i.insert(0, g_recentWorldIntro);
-                    pLogDebug("Found custom introset intro level: %s", i.c_str());
-                }
-
-                const std::string &selected = intros[iRand2T(intros.size())];
-                pLogDebug("Selected intro level to start: %s", selected.c_str());
-                return selected;
-            }
-        }
-        else if(Files::fileExists(g_recentWorldIntro))
-            return g_recentWorldIntro;
-        else
-            g_recentWorldIntro.clear(); // Continue normal intro
-    }
-
-    // std::string introPath;
     std::string introSetDir = AppPath + "introset/";
+    bool introSetCustom = false;
+
+    if(!g_recentWorldIntro.empty() && DirMan::exists(g_recentWorldIntro))
+    {
+        if(g_recentWorldIntro.back() != '/')
+            g_recentWorldIntro.push_back('/');
+
+        introSetCustom = true;
+        introSetDir = g_recentWorldIntro;
+    }
 
     if(!DirMan::exists(introSetDir))
         return getIntrFile();
@@ -231,9 +212,15 @@ static std::string findIntroLevel()
         pLogDebug("Found introset intro level: %s", i.c_str());
     }
 
-    auto rootIntro = getIntrFile();
-    if(!rootIntro.empty())
-        intros.push_back(rootIntro);
+    if(!introSetCustom || intros.empty())
+    {
+        auto rootIntro = getIntrFile();
+        if(!rootIntro.empty())
+            intros.push_back(rootIntro);
+    }
+
+    if(intros.empty())
+        return std::string();
 
     const std::string &selected = intros[iRand2T(intros.size())];
 
