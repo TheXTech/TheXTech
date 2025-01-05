@@ -82,6 +82,8 @@ std::string g_recentAssetPack;
 std::string g_recentWorld1p;
 std::string g_recentWorld2p;
 std::string g_recentWorldEditor;
+std::string g_recentWorldIntro;
+std::string g_recentWorldOutro;
 //bool ShowFPS = false;
 int PrintFPS = 0;
 bool g_VanillaCam = false;

@@ -56,6 +56,7 @@ void ConfigReloadRecentEpisodes()
         config.read((asset_pack_prefix + "episode-1p").c_str(), g_recentWorld1p, std::string());
         config.read((asset_pack_prefix + "episode-2p").c_str(), g_recentWorld2p, std::string());
         config.read((asset_pack_prefix + "episode-editor").c_str(), g_recentWorldEditor, std::string());
+        config.read((asset_pack_prefix + "episode-custom-intro").c_str(), g_recentWorldIntro, std::string());
         config.endGroup();
 
         pLogDebug("Loaded recent episodes for asset pack [id: %s] from [%s]", g_AssetPackID.c_str(), configPath.c_str());
@@ -89,6 +90,7 @@ void OpenConfig()
         config.read((asset_pack_prefix + "episode-1p").c_str(), g_recentWorld1p, std::string());
         config.read((asset_pack_prefix + "episode-2p").c_str(), g_recentWorld2p, std::string());
         config.read((asset_pack_prefix + "episode-editor").c_str(), g_recentWorldEditor, std::string());
+        config.read((asset_pack_prefix + "episode-custom-intro").c_str(), g_recentWorldIntro, std::string());
         config.endGroup();
 
         config.beginGroup("logging");
@@ -139,6 +141,7 @@ void SaveConfig()
     config.setValue((asset_pack_prefix + "episode-1p").c_str(), g_recentWorld1p);
     config.setValue((asset_pack_prefix + "episode-2p").c_str(), g_recentWorld2p);
     config.setValue((asset_pack_prefix + "episode-editor").c_str(), g_recentWorldEditor);
+    config.setValue((asset_pack_prefix + "episode-custom-intro").c_str(), g_recentWorldIntro);
     config.endGroup();
 
     g_config_game_user.SaveToIni(&config);
