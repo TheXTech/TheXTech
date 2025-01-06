@@ -33,6 +33,7 @@
 #include "core/msgbox.h"
 
 #include "sound.h"
+#include "config.h"
 
 #include <SDL2/SDL_rwops.h>
 
@@ -848,35 +849,28 @@ static int getFallbackSfx(int A)
     return A;
 }
 
+void PlaySoundInternal(int A, int loops, int volume, int l, int r);
+
 void PlaySound(int A, int loops, int volume)
 {
-    if(!g_mixerLoaded)
-        return;
-
     if(GameMenu || GameOutro) // || A == 26 || A == 27 || A == 29)
         return;
 
-    if(A > (int)g_totalSounds) // Play fallback sound for the missing SFX
-        A = getFallbackSfx(A);
-    else if(!s_useIceBallSfx && A == SFX_Iceball)
-        A = SFX_Fireball; // Fell back into fireball when iceball sound isn't preferred
-    else if(!s_useNewIceSfx && (A == SFX_Freeze || A == SFX_Icebreak))
-        A = SFX_ShellHit; // Restore the old behavior
-
-    if(g_ClonedPlayerMode)
-        SoundPause[SFX_Skid] = 1;
-
     UNUSED(volume);
-    PlaySoundMenu(A, loops);
+    PlaySoundInternal(A, loops, 128, 255, 255);
 }
 
 void PlaySoundSpatial(int A, int l, int t, int r, int b, int loops, int volume)
 {
-    UNUSED(l);
-    UNUSED(t);
-    UNUSED(r);
-    UNUSED(b);
-    PlaySound(A, loops, volume);
+    if(GameMenu || GameOutro) // || A == 26 || A == 27 || A == 29)
+        return;
+
+    uint8_t left = 255, right = 255;
+
+    if(g_config.sfx_spatial_audio)
+        Sound_ResolveSpatialMod(left, right, l, t, r, b);
+
+    PlaySoundInternal(A, loops, volume, left, right);
 }
 
 bool HasSound(int A)
@@ -886,10 +880,27 @@ bool HasSound(int A)
 
 void PlaySoundMenu(int A, int loops)
 {
+    PlaySoundInternal(A, loops, 128, 255, 255);
+}
+
+void PlaySoundInternal(int A, int loops, int volume, int l, int r)
+{
     if(!g_mixerLoaded)
         return;
 
     UNUSED(loops);
+
+    if(A > (int)g_totalSounds || !g_config.sfx_modern) // Play fallback sound for the missing SFX
+        A = getFallbackSfx(A);
+    else if(!s_useIceBallSfx && A == SFX_Iceball)
+        A = SFX_Fireball; // Fell back into fireball when iceball sound isn't preferred
+    else if(!s_useIceBallSfx && A == SFX_HeroIce)
+        A = SFX_HeroFire;
+    else if(!s_useNewIceSfx && (A == SFX_Freeze || A == SFX_Icebreak))
+        A = SFX_ShellHit; // Restore the old behavior
+
+    if(g_ClonedPlayerMode && A == SFX_Skid)
+        return;
 
     if(SoundPause[A] == 0) // if the sound wasn't just played
     {
@@ -905,7 +916,15 @@ void PlaySoundMenu(int A, int loops)
         if(!s_soundLoaded[A - 1])
             mmLoadEffect(index);
         s_soundLoaded[A - 1] = true;
-        mm_sfxhand handle = mmEffect(index);
+
+        mm_sound_effect effect_spec;
+        effect_spec.id = index;
+        effect_spec.rate = 1024;
+        effect_spec.handle = 0;
+        effect_spec.volume = volume * (l + r) / 256; // volume out of 128, l and r out of 256
+        effect_spec.panning = 128 + (r - l) * 127 / (l + r);
+
+        mm_sfxhand handle = mmEffectEx(&effect_spec);
         UNUSED(handle);
         UNUSED(loops);
         // mmEffectVolume(hand, volume);
