@@ -143,8 +143,8 @@ void OutroLoop()
     Integrator::sync();
     bool quit = SharedControls.QuitCredits;
 
-    for(int i = 0; i < maxLocalPlayers; i++)
-        quit |= Player[i + 1].Controls.Start;
+    for(int i = 0; i < l_screen->player_count; i++)
+        quit |= Controls::g_RawControls[i].Start;
 
     if(g_gameInfo.outroDeadMode)
     {

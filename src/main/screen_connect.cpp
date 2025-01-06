@@ -2156,7 +2156,7 @@ int PlayerBox::Logic()
         return 0;
     }
 
-    const Controls_t& c = Player[p+1].Controls;
+    const Controls_t& c = Controls::g_RawControls[p];
 
     if(m_just_added)
     {
