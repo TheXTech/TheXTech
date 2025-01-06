@@ -407,6 +407,8 @@ inline bool GL_DrawImage_Custom(int name, int flags,
     glBindTexture(0, name);
     if((a >> 3) < 31)
         glPolyFmt(/*POLY_ID(s_poly_id++) | */ POLY_ID(s_render_planes.m_current_plane / 8) | POLY_ALPHA((a >> 3) + 1) | POLY_CULL_NONE | POLY_FOG_Q);
+    else if(flags & 32)
+        glPolyFmt(POLY_ID(s_render_planes.m_current_plane / 8) | POLY_ALPHA(31) | POLY_CULL_NONE | POLY_FOG_Q);
 
     glBegin(GL_QUADS);
 
@@ -428,7 +430,7 @@ inline bool GL_DrawImage_Custom(int name, int flags,
 
     glEnd();
 
-    if((a >> 3) < 31)
+    if((a >> 3) < 31 || flags & 32)
         glPolyFmt(POLY_ALPHA(31) | POLY_CULL_NONE | POLY_FOG_Q);
 
     return true;
@@ -452,6 +454,8 @@ inline bool GL_DrawImage_Custom_Basic(int name, int flags,
     glBindTexture(0, name);
     if((a >> 3) < 31)
         glPolyFmt(/*POLY_ID(s_poly_id++) | */ POLY_ID(s_render_planes.m_current_plane / 8) | POLY_ALPHA((a >> 3) + 1) | POLY_CULL_NONE | POLY_FOG_Q);
+    else if(flags & 32)
+        glPolyFmt(POLY_ID(s_render_planes.m_current_plane / 8) | POLY_ALPHA(31) | POLY_CULL_NONE | POLY_FOG_Q);
 
     glBegin(GL_QUADS);
 
@@ -473,7 +477,7 @@ inline bool GL_DrawImage_Custom_Basic(int name, int flags,
 
     glEnd();
 
-    if((a >> 3) < 31)
+    if((a >> 3) < 31 || flags & 32)
         glPolyFmt(POLY_ALPHA(31) | POLY_CULL_NONE | POLY_FOG_Q);
 
     return true;
