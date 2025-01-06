@@ -178,7 +178,7 @@ bool Logic()
 
     for(int i = 0; i < l_screen->player_count; i++)
     {
-        Controls_t &c = Player[l_screen->players[i]].Controls;
+        Controls_t &c = Controls::g_RawControls[i];
 
         menuDoPress |= c.Start || c.Jump;
 

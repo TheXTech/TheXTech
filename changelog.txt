@@ -43,6 +43,7 @@ Changelog for 1.3.7-dev
 -Fix TheXTech 1.3.6 bug where some controls profiles could not be deleted. (@ds-sloth, thanks to @0lhi for the report)
 -Added support for custom main menu single intro level or introset powered by recently played episode. (@Wohlstand)
 -Added support for custom outro level powered by just completed currently playing episode. (@Wohlstand)
+-Fix TheXTech 1.3.7-beta bug where menus could become unresponsive if a player had been dropped while holding a button. (@ds-sloth, thanks to @0lhi for the report)
 
 Changelog for 1.3.7-beta
 -Add ability to trigger event layer smoke in the in-game editor (@ds-sloth)
