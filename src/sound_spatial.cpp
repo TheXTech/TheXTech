@@ -33,15 +33,20 @@ void Sound_ResolveSpatialMod(uint8_t& left, uint8_t& right, int l, int t, int r,
         const vScreen_t& vscreen = vScreen[screen.vScreen_refs[vscreen_i]];
 
         int vscreen_l = -vscreen.X;
-        int vscreen_r = -vscreen.X + vscreen.Width;
+        int vscreen_r = vscreen_l + vscreen.Width;
+        int vscreen_c = vscreen_l + vscreen.Width / 2;
         int vscreen_t = -vscreen.Y;
-        int vscreen_b = -vscreen.Y + vscreen.Height;
+        int vscreen_b = vscreen_t + vscreen.Height;
 
         int l_dist = (r < vscreen_l) ? vscreen_l - r
-                   : (l > vscreen_l) ? l - vscreen_l
+                   : (l > vscreen_c) ? l - vscreen_c
                    : 0;
 
-        int r_dist = (r < vscreen_r) ? vscreen_r - r
+        int r_dist = (r < vscreen_c) ? vscreen_c - r
+                   : (l > vscreen_r) ? l - vscreen_r
+                   : 0;
+
+        int x_dist = (r < vscreen_l) ? vscreen_l - r
                    : (l > vscreen_r) ? l - vscreen_r
                    : 0;
 
@@ -49,8 +54,9 @@ void Sound_ResolveSpatialMod(uint8_t& left, uint8_t& right, int l, int t, int r,
                    : (t > vscreen_b) ? t - vscreen_b
                    : 0;
 
-        int64_t x_num = vscreen.Width * vscreen.Width;
-        int64_t y_num = vscreen.Height * vscreen.Height;
+        // decay constant: a sound 200px away should be 10dB quieter
+        int64_t x_num = 200 * 200;
+        int64_t y_num = 200 * 200;
 
         if(x_num <= 0)
             x_num = 1;
@@ -59,15 +65,27 @@ void Sound_ResolveSpatialMod(uint8_t& left, uint8_t& right, int l, int t, int r,
 
         int64_t l_div = l_dist * l_dist;
         int64_t r_div = r_dist * r_dist;
+
+        int64_t c_div = x_dist * x_dist;
         int64_t y_div = y_dist * y_dist;
 
-        int l_calc = 255 * (x_num + y_num) / (l_div + y_div + x_num + y_num);
-        int r_calc = 255 * (x_num + y_num) / (r_div + y_div + x_num + y_num);
+        int l_calc = 127 * (x_num + y_num) / (l_div + y_div + x_num + y_num);
+        int r_calc = 127 * (x_num + y_num) / (r_div + y_div + x_num + y_num);
+
+        int c_calc = 128 * (x_num + y_num) / (c_div + y_div + x_num + y_num);
+
+        l_calc = l_calc + c_calc;
+        r_calc = r_calc + c_calc;
 
         if(l_calc > 255)
             l_calc = 255;
         if(r_calc > 255)
             r_calc = 255;
+
+        if(vscreen.ScreenLeft >= screen.W / 2)
+            l_calc = (l_calc * 3) / 4;
+        else if(vscreen.ScreenLeft + vscreen.Width <= screen.W / 2)
+            r_calc = (r_calc * 3) / 4;
 
         if(l_calc > (int)left)
             left = l_calc;
