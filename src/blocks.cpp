@@ -869,10 +869,19 @@ void BlockHitHard(int A)
 
 void SafelyKillBlock(int A)
 {
-    if(Block[A].Hidden)
+    auto& block = Block[A];
+
+    if(block.Hidden)
         return;
 
-    Block[A].Kill = 9;
+    // emulate old immediate kill behavior if it is safe to do so
+    if(g_config.playstyle == Config_t::MODE_VANILLA && block.TriggerDeath == EVENT_NONE && block.TriggerLast == EVENT_NONE)
+    {
+        KillBlock(A, true);
+        return;
+    }
+
+    block.Kill = 9;
     iBlocks++;
     iBlock[iBlocks] = A;
 }
