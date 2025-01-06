@@ -1349,7 +1349,7 @@ void ModernNPCScreenLogic(Screen_t& screen, int vscreen_i, bool fill_draw_queue,
             if(!NPC[A].Active && !FreezeNPCs)
             {
                 bool in_hidden_mode = NPC_intro_index < NPC_intro_count && NPC_intro_frame[NPC_intro_index] >= 0;
-                if(!in_hidden_mode)
+                if(NPC[A]->InactiveRender != NPCTraits_t::SHOW_STATIC && !in_hidden_mode)
                     NPCFrames(A);
             }
         }

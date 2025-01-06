@@ -107,12 +107,13 @@ struct NPCTraits_t
     {
         SHADE = 0,   // shades NPC until it becomes active
         SHOW_ALWAYS, // always show the NPC (including animation)
+        SHOW_STATIC, // always show the NPC (without animation)
         SKIP,        // skips NPC's render (assume it handles own intro animation from invisibility)
         SMOKE,       // hides the NPC and reveals it with a EFFID_SMOKE_S3 effect
     };
 
     //NEW: how should the NPC render when inactive?
-    InactiveRender_t InactiveRender : 2;
+    InactiveRender_t InactiveRender : 3;
 
     constexpr NPCTraits_t() : IsFish(false), IsACoin(false), IsABonus(false), IsAVine(false), IsAShell(false), UseDefaultCam(false), InactiveRender(SHADE) {}
 };
