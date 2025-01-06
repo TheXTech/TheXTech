@@ -2069,7 +2069,7 @@ void SetupVars()
     NPCTraits[NPCID_FLY_CANNON].InactiveRender = NPCTraits_t::SHOW_ALWAYS;
     NPCTraits[NPCID_MAGIC_DOOR].InactiveRender = NPCTraits_t::SHOW_ALWAYS;
     NPCTraits[NPCID_DOOR_MAKER].InactiveRender = NPCTraits_t::SHOW_ALWAYS;
-    NPCTraits[NPCID_SAW].InactiveRender = NPCTraits_t::SHOW_ALWAYS;
+    NPCTraits[NPCID_SAW].InactiveRender = NPCTraits_t::SHOW_STATIC;
 
     NPCTraits[NPCID_LAVABUBBLE].InactiveRender = NPCTraits_t::SKIP;
     NPCTraits[NPCID_PLANT_S3].InactiveRender = NPCTraits_t::SKIP;

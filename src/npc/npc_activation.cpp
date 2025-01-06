@@ -99,7 +99,8 @@ bool NPC_InactiveRender(const NPC_t& n)
 {
     return n.Inert
         || n.Stuck
-        || n->InactiveRender == NPCTraits_t::SHOW_ALWAYS;
+        || n->InactiveRender == NPCTraits_t::SHOW_ALWAYS
+        || n->InactiveRender == NPCTraits_t::SHOW_STATIC;
 }
 
 bool NPC_InactiveSmoke(const NPC_t& n)
