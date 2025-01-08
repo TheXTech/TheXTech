@@ -1382,13 +1382,13 @@ static inline bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool bac
     const auto &exit          = backward ? warp.Entrance    : warp.Exit;
     const auto &direction     = backward ? warp.Direction2  : warp.Direction;
 
-    if(warp.LevelEnt)
-        return false;
-
     if(!CheckCollision(plr.Location, entrance))
         return false; // continue
 
     plr.ShowWarp = B;
+
+    if(warp.LevelEnt)
+        return false;
 
     bool canWarp = false;
 
