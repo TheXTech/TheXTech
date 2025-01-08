@@ -750,7 +750,7 @@ void DrawBackground(int S, int Z)
         else
         {
             offsetY_round = level[S].Height;
-            offsetY_add = -GFXBackground2[A].h;
+            offsetY_add = camY - GFXBackground2[A].h;
         }
 
         int offsetY = SDL_round(offsetY_round) + offsetY_add;
