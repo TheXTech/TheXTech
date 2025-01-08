@@ -578,10 +578,10 @@ void DrawBackground(int S, int Z)
         for(B = 0; B <= tempVar26; B++)
         {
             tempLocation.Y = level[S].Y + ((B * GFXBackground2Height[A] - B) - (camY + Eff_Top + level[S].Y) * 0.5) - 32;
+
             if(GameMenu && level[S].Y > -camY)
-            {
                 tempLocation.Y -= level[S].Y + camY;
-            }
+
             // .X = Level(S).X
             if(level[S].Width - level[S].X > GFXBackground2Width[A])
             {
@@ -592,12 +592,13 @@ void DrawBackground(int S, int Z)
             }
             else
                 tempLocation.X = level[S].Width - GFXBackground2Width[A];
+
             tempLocation.Height = GFXBackground2Height[A];
             tempLocation.Width = GFXBackground2Width[A];
 
             while(tempLocation.Y + tempLocation.Height > -camY
-                && tempLocation.Y < -camY + vScreen[Z].Height
-                && tempLocation.X < -camX + vScreen[Z].Width)
+               && tempLocation.Y < -camY + vScreen[Z].Height
+               && tempLocation.X < -camX + vScreen[Z].Width)
             {
                 XRender::renderTexture(camX + tempLocation.X, camY + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
                 tempLocation.X += GFXBackground2Width[A];
@@ -724,6 +725,7 @@ void DrawBackground(int S, int Z)
         }
         else
             tempLocation.Y = level[S].Height - GFXBackground2Height[A];
+
         tempLocation.Height = GFXBackground2Height[A];
         tempLocation.Width = GFXBackground2Width[A];
 
@@ -902,51 +904,61 @@ void DrawBackground(int S, int Z)
     {
         DrawCenterAnchoredBackground(S, Z, A);
     }
+
     A = 42; // SMW Castle
     if(Background2[S] == 42)
     {
         // safe to tile top 546px and bottom 160px of vanilla asset
         DrawCenterAnchoredBackground(S, Z, A, 3456, 160, 546, false, 0.5, true);
     }
+
     A = 43; // SMW Castle 2
     if(Background2[S] == 43)
     {
         DrawCenterAnchoredBackground(S, Z, A);
     }
+
     A = 44; // SMB2 Castle
     if(Background2[S] == 44)
     {
         DrawCenterAnchoredBackground(S, Z, A);
     }
+
     A = 45; // Brinstar
     if(Background2[S] == 45)
     {
         DrawCenterAnchoredBackground(S, Z, A);
     }
+
     A = 46; // Transport
     if(Background2[S] == 46)
     {
         DrawCenterAnchoredBackground(S, Z, A);
     }
+
     A = 47; // Transport
     if(Background2[S] == 47)
     {
         DrawCenterAnchoredBackground(S, Z, A);
     }
+
     A = 48; // SMB2 Blouds
     if(Background2[S] == 48)
     {
         DrawCenterAnchoredBackground(S, Z, A, -1);
     }
+
     A = 49; // Desert Night
     if(Background2[S] == 49)
     {
         double Eff_ScreenH = vScreen[Z].Height;
         double Eff_Top = 0;
+
         if(screen.Type == ScreenTypes::Dynamic)
         {
             Eff_Top = vScreen[Z].Top;
             Eff_ScreenH = 0;
+
             for(int i = screen.active_begin(); i < screen.active_end(); i++)
             {
                 const auto& s = screen.vScreen(i + 1);
@@ -1080,6 +1092,7 @@ void DrawBackground(int S, int Z)
             }
         }
     }
+
     A = 50; // Shrooms
     if(Background2[S] == 50)
     {
@@ -1124,6 +1137,7 @@ void DrawBackground(int S, int Z)
         }
         else
             tempLocation.Y = level[S].Height - GFXBackground2Height[A];
+
         tempLocation.Height = GFXBackground2Height[A];
         tempLocation.Width = GFXBackground2Width[A];
 
@@ -1206,6 +1220,7 @@ void DrawBackground(int S, int Z)
         }
         else
             tempLocation.Y = level[S].Height - GFXBackground2Height[A];
+
         tempLocation.Height = GFXBackground2Height[A];
         tempLocation.Width = GFXBackground2Width[A];
 
@@ -1238,6 +1253,7 @@ void DrawBackground(int S, int Z)
             }
         }
     }
+
     A = 52; // SMB2 Desert Night
     if(Background2[S] == 52)
     {
@@ -1278,6 +1294,7 @@ void DrawBackground(int S, int Z)
         }
         else
             tempLocation.Y = level[S].Height - GFXBackground2Height[A];
+
         tempLocation.Height = GFXBackground2Height[A];
         tempLocation.Width = GFXBackground2Width[A];
 
@@ -1380,11 +1397,13 @@ void DrawBackground(int S, int Z)
             }
         }
     }
+
     A = 53; // Cliffs
     if(Background2[S] == 53)
     {
         DrawCenterAnchoredBackground(S, Z, A, -1);
     }
+
     A = 54; // Warehouse
     if(Background2[S] == 54)
     {
@@ -1402,10 +1421,12 @@ void DrawBackground(int S, int Z)
     {
         double Eff_ScreenH = vScreen[Z].Height;
         double Eff_Top = 0;
+
         if(screen.Type == ScreenTypes::Dynamic)
         {
             Eff_Top = vScreen[Z].Top;
             Eff_ScreenH = 0;
+
             for(int i = screen.active_begin(); i < screen.active_end(); i++)
             {
                 const auto& s = screen.vScreen(i + 1);
