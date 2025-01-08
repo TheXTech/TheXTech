@@ -42,7 +42,7 @@
 
 void NPCHit(int A, int B, int C)
 {
-    NPC_t tempNPC;
+    // NPC_t tempNPC;
     Location_t tempLocation;
 
     // NEWLY used to check when NPC's tree location needs to be updated
@@ -167,8 +167,8 @@ void NPCHit(int A, int B, int C)
             NewEffect(EFFID_SMOKE_S3, NPC[A].Location);
             for(C = 1; C <= 20; C++)
             {
-                tempLocation.Height = EffectHeight[80];
-                tempLocation.Width = EffectWidth[80];
+                tempLocation.Height = EffectHeight[EFFID_SPARKLE];
+                tempLocation.Width = EffectWidth[EFFID_SPARKLE];
                 tempLocation.SpeedX = 0;
                 tempLocation.SpeedY = 0;
                 tempLocation.X = NPC[A].Location.X - tempLocation.Width / 2.0 + dRand() * NPC[A].Location.Width - 4;
@@ -2217,7 +2217,7 @@ void NPCHit(int A, int B, int C)
         if(NPC[A].Type == NPCID_PLR_FIREBALL || NPC[A].Type == NPCID_COIN_SWITCH || NPC[A].Type == NPCID_TIME_SWITCH || NPC[A].Type == NPCID_TNT)
         {
         }
-        else if(oldNPC.Type == 137 || NPC[A].Type == NPCID_SLIDE_BLOCK || oldNPC.Type == 166 || NPC[A].Type == NPCID_BULLY || (oldNPC->IsAShell && B != 8))
+        else if(oldNPC.Type == NPCID_LIT_BOMB_S3 || NPC[A].Type == NPCID_SLIDE_BLOCK || oldNPC.Type == NPCID_HIT_CARRY_FODDER || NPC[A].Type == NPCID_BULLY || (oldNPC->IsAShell && B != 8))
         {
             if(B != 8) // (.Type = 45 And B = 8) Then
             {
@@ -2249,7 +2249,7 @@ void NPCHit(int A, int B, int C)
         }
     }
 
-    if((B == 2 || B == 7) && !NPC[A]->IsABonus && oldNPC.Type != 194 && NPC[A].Type != NPCID_EARTHQUAKE_BLOCK)
+    if((B == 2 || B == 7) && !NPC[A]->IsABonus && oldNPC.Type != NPCID_RAINBOW_SHELL && NPC[A].Type != NPCID_EARTHQUAKE_BLOCK)
     {
         if(NPC[A].Killed != 0 || NPC[A].Type != oldNPC.Type)
         {
