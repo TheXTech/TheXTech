@@ -740,14 +740,8 @@ void DrawBackground(int S, int Z)
         }
         else if(level[S].Height - level[S].Y > GFXBackground2[A].h)
         {
-
-
-
             // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - (screen.H - vScreen(Z).Top)) * (GFXBackground2Height(A) - (screen.H - vScreen(Z).Top))
             // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - 600) * (GFXBackground2Height(A) - 600)
-
-
-
             offsetY_round = (camY + level[S].Y) / (level[S].Height - level[S].Y - screen.H) * (GFXBackground2[A].h - screen.H);
 
             if(screen.Type == ScreenTypes::Dynamic)
@@ -761,157 +755,156 @@ void DrawBackground(int S, int Z)
 
         int offsetY = SDL_round(offsetY_round) + offsetY_add;
 
-        // ADDED A LOOP HERE, not indenting to avoid a huge diff hunk
-        do {
-
-        int offsetX = (camX_levelX * 1 - Left * 1) / 2;
-        for(; offsetX < vScreen[Z].Width; offsetX += GFXBackground2[A].w)
+        do
         {
-            if(offsetX + GFXBackground2[A].w <= 0)
-                continue;
+            int offsetX = (camX_levelX * 1 - Left * 1) / 2;
+            for(; offsetX < vScreen[Z].Width; offsetX += GFXBackground2[A].w)
+            {
+                if(offsetX + GFXBackground2[A].w <= 0)
+                    continue;
 
-            XRender::renderTextureBasic(offsetX, offsetY + 953, GFXBackground2[A].w, 47, GFXBackground2[A], 0, 953);
-        }
+                XRender::renderTextureBasic(offsetX, offsetY + 953, GFXBackground2[A].w, 47, GFXBackground2[A], 0, 953);
+            }
 
-        offsetX = (camX_levelX * 4 - Left * 6) / 10;
-        for(; offsetX < vScreen[Z].Width; offsetX += GFXBackground2[A].w)
-        {
-            if(offsetX + GFXBackground2[A].w <= 0)
-                continue;
+            offsetX = (camX_levelX * 4 - Left * 6) / 10;
+            for(; offsetX < vScreen[Z].Width; offsetX += GFXBackground2[A].w)
+            {
+                if(offsetX + GFXBackground2[A].w <= 0)
+                    continue;
 
-            XRender::renderTextureBasic(offsetX, offsetY + 916, GFXBackground2[A].w, 37, GFXBackground2[A], 0, 916);
-        }
+                XRender::renderTextureBasic(offsetX, offsetY + 916, GFXBackground2[A].w, 37, GFXBackground2[A], 0, 916);
+            }
 
-        offsetX = (camX_levelX * 3 - Left * 7) / 10;
-        for(; offsetX < vScreen[Z].Width; offsetX += GFXBackground2[A].w)
-        {
-            if(offsetX + GFXBackground2[A].w <= 0)
-                continue;
+            offsetX = (camX_levelX * 3 - Left * 7) / 10;
+            for(; offsetX < vScreen[Z].Width; offsetX += GFXBackground2[A].w)
+            {
+                if(offsetX + GFXBackground2[A].w <= 0)
+                    continue;
 
-            XRender::renderTextureBasic(offsetX, offsetY + 849, GFXBackground2[A].w, 67, GFXBackground2[A], 0, 849);
-        }
+                XRender::renderTextureBasic(offsetX, offsetY + 849, GFXBackground2[A].w, 67, GFXBackground2[A], 0, 849);
+            }
 
-        offsetX = (camX_levelX * 2 - Left * 8) / 10;
-        for(; offsetX < vScreen[Z].Width; offsetX += GFXBackground2[A].w)
-        {
-            if(offsetX + GFXBackground2[A].w <= 0)
-                continue;
+            offsetX = (camX_levelX * 2 - Left * 8) / 10;
+            for(; offsetX < vScreen[Z].Width; offsetX += GFXBackground2[A].w)
+            {
+                if(offsetX + GFXBackground2[A].w <= 0)
+                    continue;
 
-            XRender::renderTextureBasic(offsetX, offsetY + 815, GFXBackground2[A].w, 34, GFXBackground2[A], 0, 815);
-        }
+                XRender::renderTextureBasic(offsetX, offsetY + 815, GFXBackground2[A].w, 34, GFXBackground2[A], 0, 815);
+            }
 
-        offsetX = (camX_levelX * 1 - Left * 9) / 10;
-        for(; offsetX < vScreen[Z].Width; offsetX += GFXBackground2[A].w)
-        {
-            if(offsetX + GFXBackground2[A].w <= 0)
-                continue;
+            offsetX = (camX_levelX * 1 - Left * 9) / 10;
+            for(; offsetX < vScreen[Z].Width; offsetX += GFXBackground2[A].w)
+            {
+                if(offsetX + GFXBackground2[A].w <= 0)
+                    continue;
 
-            XRender::renderTextureBasic(offsetX, offsetY + 709, GFXBackground2[A].w, 106, GFXBackground2[A], 0, 709);
-        }
+                XRender::renderTextureBasic(offsetX, offsetY + 709, GFXBackground2[A].w, 106, GFXBackground2[A], 0, 709);
+            }
 
-        offsetX = (camX_levelX * 15 - Left * 85) / 100;
-        for(; offsetX < vScreen[Z].Width; offsetX += GFXBackground2[A].w)
-        {
-            if(offsetX + GFXBackground2[A].w <= 0)
-                continue;
+            offsetX = (camX_levelX * 15 - Left * 85) / 100;
+            for(; offsetX < vScreen[Z].Width; offsetX += GFXBackground2[A].w)
+            {
+                if(offsetX + GFXBackground2[A].w <= 0)
+                    continue;
 
-            XRender::renderTextureBasic(offsetX, offsetY + 664, GFXBackground2[A].w, 45, GFXBackground2[A], 0, 664);
-        }
+                XRender::renderTextureBasic(offsetX, offsetY + 664, GFXBackground2[A].w, 45, GFXBackground2[A], 0, 664);
+            }
 
-        offsetX = (camX_levelX * 2 - Left * 8) / 10;
-        for(; offsetX < vScreen[Z].Width; offsetX += GFXBackground2[A].w)
-        {
-            if(offsetX + GFXBackground2[A].w <= 0)
-                continue;
+            offsetX = (camX_levelX * 2 - Left * 8) / 10;
+            for(; offsetX < vScreen[Z].Width; offsetX += GFXBackground2[A].w)
+            {
+                if(offsetX + GFXBackground2[A].w <= 0)
+                    continue;
 
-            XRender::renderTextureBasic(offsetX, offsetY + 614, GFXBackground2[A].w, 50, GFXBackground2[A], 0, 614);
-        }
+                XRender::renderTextureBasic(offsetX, offsetY + 614, GFXBackground2[A].w, 50, GFXBackground2[A], 0, 614);
+            }
 
-        offsetX = (camX_levelX * 25 - Left * 75) / 100;
-        for(; offsetX < vScreen[Z].Width; offsetX += GFXBackground2[A].w)
-        {
-            if(offsetX + GFXBackground2[A].w <= 0)
-                continue;
+            offsetX = (camX_levelX * 25 - Left * 75) / 100;
+            for(; offsetX < vScreen[Z].Width; offsetX += GFXBackground2[A].w)
+            {
+                if(offsetX + GFXBackground2[A].w <= 0)
+                    continue;
 
-            XRender::renderTextureBasic(offsetX, offsetY + 540, GFXBackground2[A].w, 74, GFXBackground2[A], 0, 540);
-        }
+                XRender::renderTextureBasic(offsetX, offsetY + 540, GFXBackground2[A].w, 74, GFXBackground2[A], 0, 540);
+            }
 
-        offsetX = (camX_levelX * 3 - Left * 7) / 10;
-        for(; offsetX < vScreen[Z].Width; offsetX += GFXBackground2[A].w)
-        {
-            if(offsetX + GFXBackground2[A].w <= 0)
-                continue;
+            offsetX = (camX_levelX * 3 - Left * 7) / 10;
+            for(; offsetX < vScreen[Z].Width; offsetX += GFXBackground2[A].w)
+            {
+                if(offsetX + GFXBackground2[A].w <= 0)
+                    continue;
 
-            XRender::renderTextureBasic(offsetX, offsetY + 408, GFXBackground2[A].w, 132, GFXBackground2[A], 0, 408);
-        }
+                XRender::renderTextureBasic(offsetX, offsetY + 408, GFXBackground2[A].w, 132, GFXBackground2[A], 0, 408);
+            }
 
-        offsetX = (camX_levelX * 25 - Left * 75) / 100;
-        for(; offsetX < vScreen[Z].Width; offsetX += GFXBackground2[A].w)
-        {
-            if(offsetX + GFXBackground2[A].w <= 0)
-                continue;
+            offsetX = (camX_levelX * 25 - Left * 75) / 100;
+            for(; offsetX < vScreen[Z].Width; offsetX += GFXBackground2[A].w)
+            {
+                if(offsetX + GFXBackground2[A].w <= 0)
+                    continue;
 
-            XRender::renderTextureBasic(offsetX, offsetY + 333, GFXBackground2[A].w, 75, GFXBackground2[A], 0, 333);
-        }
+                XRender::renderTextureBasic(offsetX, offsetY + 333, GFXBackground2[A].w, 75, GFXBackground2[A], 0, 333);
+            }
 
-        offsetX = (camX_levelX * 2 - Left * 8) / 10;
-        for(; offsetX < vScreen[Z].Width; offsetX += GFXBackground2[A].w)
-        {
-            if(offsetX + GFXBackground2[A].w <= 0)
-                continue;
+            offsetX = (camX_levelX * 2 - Left * 8) / 10;
+            for(; offsetX < vScreen[Z].Width; offsetX += GFXBackground2[A].w)
+            {
+                if(offsetX + GFXBackground2[A].w <= 0)
+                    continue;
 
-            XRender::renderTextureBasic(offsetX, offsetY + 278, GFXBackground2[A].w, 55, GFXBackground2[A], 0, 278);
-        }
+                XRender::renderTextureBasic(offsetX, offsetY + 278, GFXBackground2[A].w, 55, GFXBackground2[A], 0, 278);
+            }
 
-        offsetX = (camX_levelX * 15 - Left * 85) / 100;
-        for(; offsetX < vScreen[Z].Width; offsetX += GFXBackground2[A].w)
-        {
-            if(offsetX + GFXBackground2[A].w <= 0)
-                continue;
+            offsetX = (camX_levelX * 15 - Left * 85) / 100;
+            for(; offsetX < vScreen[Z].Width; offsetX += GFXBackground2[A].w)
+            {
+                if(offsetX + GFXBackground2[A].w <= 0)
+                    continue;
 
-            XRender::renderTextureBasic(offsetX, offsetY + 235, GFXBackground2[A].w, 43, GFXBackground2[A], 0, 235);
-        }
+                XRender::renderTextureBasic(offsetX, offsetY + 235, GFXBackground2[A].w, 43, GFXBackground2[A], 0, 235);
+            }
 
-        offsetX = (camX_levelX * 1 - Left * 9) / 10;
-        for(; offsetX < vScreen[Z].Width; offsetX += GFXBackground2[A].w)
-        {
-            if(offsetX + GFXBackground2[A].w <= 0)
-                continue;
+            offsetX = (camX_levelX * 1 - Left * 9) / 10;
+            for(; offsetX < vScreen[Z].Width; offsetX += GFXBackground2[A].w)
+            {
+                if(offsetX + GFXBackground2[A].w <= 0)
+                    continue;
 
-            XRender::renderTextureBasic(offsetX, offsetY + 123, GFXBackground2[A].w, 112, GFXBackground2[A], 0, 123);
-        }
+                XRender::renderTextureBasic(offsetX, offsetY + 123, GFXBackground2[A].w, 112, GFXBackground2[A], 0, 123);
+            }
 
-        offsetX = (camX_levelX * 2 - Left * 8) / 10;
-        for(; offsetX < vScreen[Z].Width; offsetX += GFXBackground2[A].w)
-        {
-            if(offsetX + GFXBackground2[A].w <= 0)
-                continue;
+            offsetX = (camX_levelX * 2 - Left * 8) / 10;
+            for(; offsetX < vScreen[Z].Width; offsetX += GFXBackground2[A].w)
+            {
+                if(offsetX + GFXBackground2[A].w <= 0)
+                    continue;
 
-            XRender::renderTextureBasic(offsetX, offsetY + 85, GFXBackground2[A].w, 38, GFXBackground2[A], 0, 85);
-        }
+                XRender::renderTextureBasic(offsetX, offsetY + 85, GFXBackground2[A].w, 38, GFXBackground2[A], 0, 85);
+            }
 
-        offsetX = (camX_levelX * 3 - Left * 7) / 10;
-        for(; offsetX < vScreen[Z].Width; offsetX += GFXBackground2[A].w)
-        {
-            if(offsetX + GFXBackground2[A].w <= 0)
-                continue;
+            offsetX = (camX_levelX * 3 - Left * 7) / 10;
+            for(; offsetX < vScreen[Z].Width; offsetX += GFXBackground2[A].w)
+            {
+                if(offsetX + GFXBackground2[A].w <= 0)
+                    continue;
 
-            XRender::renderTextureBasic(offsetX, offsetY + 48, GFXBackground2[A].w, 37, GFXBackground2[A], 0, 48);
-        }
+                XRender::renderTextureBasic(offsetX, offsetY + 48, GFXBackground2[A].w, 37, GFXBackground2[A], 0, 48);
+            }
 
-        offsetX = (camX_levelX * 4 - Left * 6) / 10;
-        for(; offsetX < vScreen[Z].Width; offsetX += GFXBackground2[A].w)
-        {
-            if(offsetX + GFXBackground2[A].w <= 0)
-                continue;
+            offsetX = (camX_levelX * 4 - Left * 6) / 10;
+            for(; offsetX < vScreen[Z].Width; offsetX += GFXBackground2[A].w)
+            {
+                if(offsetX + GFXBackground2[A].w <= 0)
+                    continue;
 
-            XRender::renderTextureBasic(offsetX, offsetY + 0, GFXBackground2[A].w, 48, GFXBackground2[A], 0, 0);
-        }
+                XRender::renderTextureBasic(offsetX, offsetY + 0, GFXBackground2[A].w, 48, GFXBackground2[A], 0, 0);
+            }
 
-        offsetY -= GFXBackground2[A].h;
+            offsetY -= GFXBackground2[A].h;
 
-        if(g_config.disable_background2_tiling)
-            break;
+            if(g_config.disable_background2_tiling)
+                break;
 
         } while(offsetY + GFXBackground2[A].h > 0);
     }
