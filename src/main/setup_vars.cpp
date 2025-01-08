@@ -2036,8 +2036,8 @@ void SetupVars()
     NPCTraits[NPCID_LAVA_MONSTER].UseDefaultCam = true;
     NPCTraits[NPCID_SPIKY_THROWER].UseDefaultCam = true;
     NPCTraits[NPCID_ITEM_THROWER].UseDefaultCam = true;
-    NPCTraits[NPCID_SAW].UseDefaultCam = true;
-    NPCTraits[NPCID_BOMB].UseDefaultCam = true;
+    // NPCTraits[NPCID_SAW].UseDefaultCam = true; // held back for 1.3.7
+    // NPCTraits[NPCID_BOMB].UseDefaultCam = true; // held back for 1.3.7
 
     // Default NPCs that render differently when inactive
     for(int A = 1; A <= maxNPCType; A++)
