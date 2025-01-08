@@ -3241,7 +3241,7 @@ void SpecialNPC(int A)
     float F = 0;
     bool tempTurn = false;
     Location_t tempLocation;
-    Location_t tempLocation2;
+    // Location_t tempLocation2;
     // NPC_t tempNPC;
 
     if(NPC[A].Type == NPCID_VILLAIN_FIRE || NPC[A].Type == NPCID_QUAD_BALL || NPC[A].Type == NPCID_STATUE_FIRE ||
@@ -5342,6 +5342,7 @@ void SpecialNPC(int A)
                         NPC[numNPCs].Location.X = NPC[A].Location.X + NPC[A].Location.Width / 2.0;
                     else
                         NPC[numNPCs].Location.X = NPC[A].Location.X + NPC[A].Location.Width / 2.0 - NPC[numNPCs].Location.Width;
+
                     NPC[numNPCs].TimeLeft = 100;
                     NPC[numNPCs].Section = NPC[A].Section;
                     NPC[numNPCs].Location.SpeedX = 4 * NPC[numNPCs].Direction;
@@ -5664,8 +5665,7 @@ void SpecialNPC(int A)
                         {
                             if(NPC[B].Type >= NPCID_GRN_SHELL_S4 && NPC[B].Type <= NPCID_YEL_SHELL_S4)
                             {
-                                tempLocation2 = NPC[B].Location;
-                                if(CheckCollision(tempLocation, tempLocation2))
+                                if(CheckCollision(tempLocation, NPC[B].Location))
                                 {
                                     NPC[A].Location.Y -= Physics.NPCGravity;
                                     NPC[A].Location.SpeedY = -4;
@@ -5678,6 +5678,7 @@ void SpecialNPC(int A)
             }
         }
     }
+
     // Projectile code
     if(NPC[A]->IsAShell || (NPC[A].Type == NPCID_SLIDE_BLOCK && NPC[A].Special == 1))
     {
