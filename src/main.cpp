@@ -422,19 +422,19 @@ int main(int argc, char**argv)
         TCLAP::ValueArg<std::string> compatLevel(std::string(), "compat-level",
                                                    "Enforce the specific gameplay compatibility level. Supported values:\n"
                                                    "  modern - TheXTech native, all features and fixes enabled [Default]\n"
-                                                   "  smbx2  - Disables all features and bugfixes except fixed at SMBX2\n"
-                                                   "  smbx13 - Enforces the full compatibility with the SMBX 1.3 behaviour\n"
+                                                   "  classic - Disables all features and bugfixes except of crticial updates\n"
+                                                   "  vanilla - Enforces the full compatibility with the SMBX 1.3 behaviour\n"
                                                    "\n"
                                                    "  Deprecated: acts as an alias for speed-run mode. Will be overridden if speed-run mode is set.",
                                                     false, "modern",
-                                                   "modern, smbx2, smbx3",
+                                                   "modern, classic, vanilla",
                                                    cmd);
         TCLAP::ValueArg<unsigned int> speedRunMode(std::string(), "speed-run-mode",
                                                    "Enable the speed-runer mode: the playthrough timer will be shown, "
                                                    "and some gameplay limitations will be enabled. Supported values:\n"
                                                    "  0 - Disabled [Default]\n"
                                                    "  1 - TheXTech native\n"
-                                                   "  2 - Disable time-winning updates (SMBX2 mode)\n"
+                                                   "  2 - Disable time-winning updates (Classic mode)\n"
                                                    "  3 - Strict vanilla SMBX 1.3, enable all bugs",
                                                     false, 0u,
                                                    "0, 1, 2, or 3",
@@ -584,7 +584,7 @@ int main(int argc, char**argv)
             std::string compatModeVal = compatLevel.getValue();
             if(compatModeVal == "classic" || compatModeVal == "smbx2")
                 g_config.speedrun_mode = 2;
-            else if(compatModeVal == "smbx13")
+            else if(compatModeVal == "smbx13" || compatModeVal == "vanilla")
                 g_config.speedrun_mode = 3;
             else if(compatModeVal == "modern")
                 g_config.speedrun_mode = 1;
