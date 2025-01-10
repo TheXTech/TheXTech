@@ -221,7 +221,8 @@ void CollectMedal(const NPC_t& medal)
     if(medal_score > 14)
         medal_score = 14;
 
-    g_curLevelMedals.get(medal.Variant - 1);
+    if(!GameMenu && !GameOutro)
+        g_curLevelMedals.get(medal.Variant - 1);
 }
 
 void TouchBonus(int A, int B)
