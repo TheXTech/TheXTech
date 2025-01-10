@@ -581,7 +581,7 @@ bool OpenLevel_PlayerStart(void* userdata, PlayerPoint& p)
         // Width and height are zero in old LVLX files
         // This indicated SMBX-based values for height, not the values of the actual asset pack
         if(PlayerStart[A].Width == 0)
-            PlayerStart[A].Width = Physics.PlayerWidth[A][2];
+            PlayerStart[A].Width = 24;
 
         if(PlayerStart[A].Height == 0)
         {
@@ -589,6 +589,21 @@ bool OpenLevel_PlayerStart(void* userdata, PlayerPoint& p)
                 PlayerStart[A].Height = 54;
             else if(A == 2)
                 PlayerStart[A].Height = 60;
+            else
+                PlayerStart[A].Height = 32;
+        }
+
+        // help with migration
+        if(LevelEditor)
+        {
+            PlayerStart[A].X += PlayerStart[A].Width / 2;
+            PlayerStart[A].Y += PlayerStart[A].Height;
+
+            PlayerStart[A].Width = Physics.PlayerWidth[A][2];
+            PlayerStart[A].Height = Physics.PlayerHeight[A][2];
+
+            PlayerStart[A].X -= PlayerStart[A].Width / 2;
+            PlayerStart[A].Y -= PlayerStart[A].Height;
         }
 
         PlayerStart[A].Direction = p.direction;
