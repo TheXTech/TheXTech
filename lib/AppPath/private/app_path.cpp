@@ -48,8 +48,6 @@ std::string AppPathManager::m_assetPackPostfix;
 
 bool AppPathManager::m_isPortable = false;
 
-bool AppPathP::ignoreLegacyDebugDir = false;
-
 
 static void appendSlash(std::string &path)
 {
@@ -86,7 +84,6 @@ void AppPathManager::setGameDirName(const std::string& dirName)
 
 void AppPathManager::initAppPath()
 {
-    AppPathP::ignoreLegacyDebugDir = !m_customGameDirName.empty();
     AppPathP::initDefaultPaths(m_customGameDirName.empty() ? THEXTECH_DIRECTORY_PREFIX : m_customGameDirName);
 
     // When user directory is redefined externally
