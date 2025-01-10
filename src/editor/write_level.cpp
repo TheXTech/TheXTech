@@ -144,8 +144,17 @@ void SaveLevel(const std::string& FilePath, int format, int version)   // saves 
         player.id = i;
         player.x = p.X;
         player.y = p.Y;
-        player.w = p.Width;
-        player.h = p.Height;
+
+        // force to Moondust compatible size
+        player.w = 24;
+        player.h = (i == 1) ? 54 : 60;
+
+        player.x += PlayerStart[i].Width / 2;
+        player.x -= player.w / 2;
+
+        player.y += PlayerStart[i].Height;
+        player.y -= player.h;
+
         player.direction = p.Direction;
         out.players.push_back(player);
     }

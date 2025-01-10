@@ -560,10 +560,10 @@ bool OpenLevel_PlayerStart(void* userdata, PlayerPoint& p)
         load.numPlayerStart++;
         int A = load.numPlayerStart;
 
-        PlayerStart[A].X = double(p.x);
-        PlayerStart[A].Y = double(p.y);
-        PlayerStart[A].Width = double(p.w);
-        PlayerStart[A].Height = double(p.h);
+        PlayerStart[A].X = p.x;
+        PlayerStart[A].Y = p.y;
+        PlayerStart[A].Width = p.w;
+        PlayerStart[A].Height = p.h;
 
         // don't allow improper rects
         if(PlayerStart[A].Width < 0)
@@ -578,8 +578,8 @@ bool OpenLevel_PlayerStart(void* userdata, PlayerPoint& p)
             PlayerStart[A].Height = 0;
         }
 
-        // Width and height are zero in old LVLX files
-        // This indicated SMBX-based values for height, not the values of the actual asset pack
+        // Width and height are zero in LVLX files
+        // This indicates SMBX-based values for height, not the values of the actual asset pack
         if(PlayerStart[A].Width == 0)
             PlayerStart[A].Width = 24;
 
@@ -593,7 +593,7 @@ bool OpenLevel_PlayerStart(void* userdata, PlayerPoint& p)
                 PlayerStart[A].Height = 32;
         }
 
-        // help with migration
+        // turn into size compatible with in-game editor UI
         if(LevelEditor)
         {
             PlayerStart[A].X += PlayerStart[A].Width / 2;
