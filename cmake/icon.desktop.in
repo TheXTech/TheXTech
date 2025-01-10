@@ -27,8 +27,8 @@ Exec=@DESKTOP_EXEC@ --speed-run-mode 3 @F
 
 [Desktop Action CompatModeClassic]
 Name=Run in "Classic" compatibiltiy mode (critical bugfixes only)
-Exec=@DESKTOP_EXEC@ --compat-level smbx2 @F
+Exec=@DESKTOP_EXEC@ --compat-level classic @F
 
 [Desktop Action CompatModeVanilla]
 Name=Run in "Vanilla" strict compatibiltiy mode (no bugfixes at all)
-Exec=@DESKTOP_EXEC@ --compat-level smbx13 @F
+Exec=@DESKTOP_EXEC@ --compat-level vanilla @F
