@@ -46,6 +46,7 @@ Changelog for 1.3.7-dev
 -Fix TheXTech 1.3.7-beta bug where menus could become unresponsive if a player had been dropped while holding a button. (@ds-sloth, thanks to @0lhi for the report)
 -Add ability to keep forced character through menu quit (@ds-sloth)
 -Fix TheXTech 1.3.7-beta bug where the player start points were incorrect for some content (@ds-sloth)
+-Fix TheXTech 1.3.7-beta bug where hitting Escape at the pause menu could return to menu (@ds-sloth, thanks to @sl4cer for the report)
 
 Changelog for 1.3.7-beta
 -Add ability to trigger event layer smoke in the in-game editor (@ds-sloth)
