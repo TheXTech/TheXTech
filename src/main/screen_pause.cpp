@@ -490,6 +490,9 @@ bool Logic(int plr)
 
         if(s_cheat_menu_bits < 14)
             s_cheat_menu_bits = 0;
+
+        // fixes TheXTech 1.3.7-beta bug where hitting escape (bound to both Shared Back and P1 Do) would immediately exit
+        MenuCursorCanMove = false;
     }
     else if(upPressed)
     {
