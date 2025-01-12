@@ -1100,6 +1100,9 @@ int menuControls_Mouse_Render(bool mouse, bool render)
         }
     }
 
+    if(mouse && (SharedCursor.Primary || SharedCursor.Secondary))
+        MenuMouseRelease = false;
+
     return 0;
 }
 
