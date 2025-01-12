@@ -2391,7 +2391,7 @@ int Logic()
     /*-----------------------*\
     ||    Shared back key    ||
     \*-----------------------*/
-    if(s_context == Context::MainMenu && Controls::g_InputMethods.size() == 0)
+    if(CheckDone() || (s_context == Context::MainMenu && Controls::g_InputMethods.size() == 0))
     {
         if(!SharedControls.MenuBack)
             MenuCursorCanMove = true;
