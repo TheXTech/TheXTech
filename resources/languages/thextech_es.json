@@ -717,8 +717,7 @@
                 "batteryStatus": "Estado de Batería",
                 "rumble": "Vibración",
                 "textEntryStyle": "Estilo de entrada de texto",
-                "maxPlayers": "Max de Jugadores",
-                "groundPoundButton": ""
+                "maxPlayers": "Max de Jugadores"
             },
             "editor": {
                 "testPlay": "Juego de Prueba",

@@ -439,7 +439,6 @@
             },
             "options": {
                 "batteryStatus": "Состояние батареи",
-                "groundPoundButton": "Кнопка сотрясания земли",
                 "maxPlayers": "Макс. игроков",
                 "rumble": "Вибрация",
                 "textEntryStyle": "Тип ввода текста"

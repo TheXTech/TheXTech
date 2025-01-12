@@ -416,7 +416,6 @@
             },
             "options": {
                 "batteryStatus": "Estado da Pilha",
-                "groundPoundButton": "Botão de Ground Pound",
                 "maxPlayers": "Jogadores Máximos",
                 "rumble": "Vibrar",
                 "textEntryStyle": "Estilo de Entrada de Texto"

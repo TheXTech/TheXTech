@@ -238,7 +238,6 @@
         "controls": {
             "options": {
                 "batteryStatus": "",
-                "groundPoundButton": "",
                 "rumble": "",
                 "maxPlayers": "",
                 "textEntryStyle": ""

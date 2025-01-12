@@ -719,8 +719,7 @@
                 "textEntryStyle": "텍스트 입력 스타일",
                 "maxPlayers": "최대 플레이어",
                 "rumble": "진동",
-                "batteryStatus": "배터리 상태",
-                "groundPoundButton": "그라운드 파운드 버튼"
+                "batteryStatus": "배터리 상태"
             },
             "wordButtons": "버튼",
             "wordProfiles": "프로파일",

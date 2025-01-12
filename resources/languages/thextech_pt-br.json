@@ -511,8 +511,7 @@
                 "batteryStatus": "Estado da Bateria",
                 "maxPlayers": "Jogadores Máximos",
                 "rumble": "Vibrar",
-                "textEntryStyle": "Estilo de Entrada de Texto",
-                "groundPoundButton": "Botão de Ground Pound"
+                "textEntryStyle": "Estilo de Entrada de Texto"
             },
             "profile": {
                 "hotkeys": "Atalhos",

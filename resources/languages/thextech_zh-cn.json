@@ -439,7 +439,6 @@
             },
             "options": {
                 "batteryStatus": "电池状态",
-                "groundPoundButton": "震地按键",
                 "maxPlayers": "玩家上限",
                 "rumble": "Rumble控制器",
                 "textEntryStyle": "文字输入使用设备"
