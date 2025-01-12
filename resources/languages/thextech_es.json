@@ -318,7 +318,7 @@
             "gameBattleRandom": "Nivel aleatorio",
             "gameTargetSlot": "Ahora seleccione el objetivo",
             "gameSlotContinue": "SLOT {0} ... {1}%",
-            "gameSlotNew": "SLOT {0} ... NUEVO JUEGO",
+            "gameSlotNew": "SLOT {0} ... NUEVO",
             "phraseScore": "Puntuación: {0}",
             "gameNoEpisodesToPlay": "<Sin episodios que reproducir>",
             "phraseTime": "Tiempo: {0}",
@@ -329,7 +329,7 @@
         "editor": {
             "newWorld": "<Nuevo Mundo>",
             "errorMissingResources": "Lo sentimos. Te falta {0}, necesario para el editor del juego.",
-            "promptNewWorldName": "Nuevo nombre del mundo",
+            "promptNewWorldName": "Nombre del mundo nuevo",
             "battles": "<Niveles de Batalla>",
             "makeFor": "Hacer para:"
         },
@@ -394,7 +394,7 @@
                     "qsmbx": "1600x1200 (QSMBX)"
                 },
                 "webm-recording": "Grabación WEBM",
-                "advanced-audio": "Audio",
+                "advanced-audio": "Áudio",
                 "advanced-video": "Video",
                 "_header": "Avanzado",
                 "_tooltip": "Opciones tecnicales para las operaciones internales",
@@ -404,7 +404,7 @@
                     "_name": "Tamaño de búfer"
                 },
                 "audio-format": {
-                    "_name": "Formato de audio",
+                    "_name": "Formato de áudio",
                     "_tooltip": "Formato para controlador de sondio"
                 },
                 "audio-enable": "Activar",
@@ -419,11 +419,11 @@
                 "sfx-modern-tip": "Usar sonidos añadidos en TheXTech",
                 "audio-sfx-volume": "Volumen de sonidos",
                 "sfx-spatial-audio-tip": "Reducir el volumen de sonidos lejos",
-                "sfx-spatial-audio": "Audio espacial",
+                "sfx-spatial-audio": "Áudio espacial",
                 "sfx-pet-beat-tip": "Reproducir un ritmo especial a montar una mascota",
-                "sfx-pet-beat": "Ritmos de mascota",
+                "sfx-pet-beat": "Ritmo de mascota",
                 "audio-music-volume": "Volumen de música",
-                "_header": "Audio"
+                "_header": "Áudio"
             },
             "episode-options": {
                 "creator-compat": {
@@ -448,7 +448,7 @@
             },
             "video": {
                 "effects": "Efectos de Pantalla",
-                "enable-inter-level-fade-effect": "Transiciones de fundir",
+                "enable-inter-level-fade-effect": "Transiciones",
                 "info-meta": "Info. en pantalla de sistema",
                 "internal-res": {
                     "vga": "640x480 (VGA)",
@@ -549,7 +549,7 @@
                     "shared": "Compartida"
                 },
                 "background-work-tip": "Jugar con joystick cuando el juego está en segundo plano",
-                "background-work": "Ejecutar en fondo",
+                "background-work": "Continuar en fondo",
                 "vsync": "V-Sync",
                 "discord-rpc": "Integración con Discord",
                 "frame-skip": "Saltado de cuadro",
@@ -775,7 +775,7 @@
         "connect": {
             "phraseTestControls": "Probar Controles",
             "phraseChangeChar": "Cambiar Personaje",
-            "phrasePressAButton": "Presiona el Botón A",
+            "phrasePressAButton": "Presiona un Botón",
             "splitPressSelect_2": "Opciones de Controles",
             "dropAddTitle": "Quitar/Añadir Jugadores",
             "phraseStartToForceRes": "Presiona Comenzar para Forzar Resumir",
