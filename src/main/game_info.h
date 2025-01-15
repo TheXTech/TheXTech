@@ -27,7 +27,7 @@
 #include "global_constants.h"
 #include "range_arr.hpp"
 
-struct IniProcessing;
+class IniProcessing;
 
 struct GameInfo
 {
