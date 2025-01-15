@@ -88,6 +88,8 @@ private:
     bool m_isReady = false;
     //! The fallback TTF name to prefer to render a missing character [all unknown characters will be rendered as TTF]
     std::string m_ttfFallback;
+    //! Colour for backup ttf font render
+    XTColor m_ttfColour = {255, 255, 255, 255};
     //! Enable outline borders on backup ttf font render
     bool m_ttfOutlines = false;
     XTColor m_ttfOutlinesColour = {0, 0, 0, 255};

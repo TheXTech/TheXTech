@@ -73,6 +73,7 @@ void RasterFont::loadFont(const std::string &font_ini)
 #   define THEXTECH_USE_1X_FONT_MODE
 #endif
 
+    uint32_t ttfColourPacked = 0x000000FF;
     uint32_t ttfOutlinesColourPacked = 0x000000FF;
 
     size_t tables = 0;
@@ -80,6 +81,7 @@ void RasterFont::loadFont(const std::string &font_ini)
     font.read("tables", tables, 0);
     font.read("name", m_fontName, m_fontName);
     font.read("ttf-outlines", m_ttfOutlines, false);
+    font.read("ttf-colour", ttfColourPacked, 0xFFFFFFFF);
     font.read("ttf-outlines-colour", ttfOutlinesColourPacked, 0x000000FF);
     font.read("ttf-fallback", m_ttfFallback, "");
     font.read("ttf-size", m_ttfSize, -1);
@@ -96,6 +98,11 @@ void RasterFont::loadFont(const std::string &font_ini)
 
     std::vector<std::string> tables_list;
     tables_list.reserve(tables);
+
+    m_ttfColour.r = (ttfColourPacked >> 24) & 0xFF;
+    m_ttfColour.g = (ttfColourPacked >> 16) & 0xFF;
+    m_ttfColour.b = (ttfColourPacked >> 8) & 0xFF;
+    m_ttfColour.a = (ttfColourPacked >> 0) & 0xFF;
 
     m_ttfOutlinesColour.r = (ttfOutlinesColourPacked >> 24) & 0xFF;
     m_ttfOutlinesColour.g = (ttfOutlinesColourPacked >> 16) & 0xFF;
@@ -464,7 +471,7 @@ PGE_Size RasterFont::printText(const char* text, size_t text_size,
                                     font_size_use,
                                     (doublePixel ? 2.0 : 1.0),
                                     m_ttfOutlines,
-                                    color.with_alpha(letter_alpha),
+                                    (color * m_ttfColour).with_alpha(letter_alpha),
                                     m_ttfOutlinesColour);
                 }
 
