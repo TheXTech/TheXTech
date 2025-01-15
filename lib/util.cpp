@@ -23,6 +23,7 @@
 #include <Utils/strings.h>
 #include <algorithm>
 #include <cstdlib>
+#include <array>
 
 #include "sdl_proxy/sdl_stdinc.h"
 
@@ -30,11 +31,10 @@
 #include <windows.h>
 #endif
 
-static const std::basic_string<unsigned char> base64_chars =
-    reinterpret_cast<const unsigned char *>(
+static const std::array<unsigned char, 65> base64_chars{
         "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
         "abcdefghijklmnopqrstuvwxyz"
-        "0123456789+/");
+        "0123456789+/"};
 
 static inline bool is_base64(unsigned char c)
 {
@@ -205,7 +205,7 @@ void util::base64_decode(std::string &ret, const std::string &encoded_string)
         if(i == 4)
         {
             for(i = 0; i < 4; i++)
-                char_array_4[i] = static_cast<unsigned char>(base64_chars.find(char_array_4[i]));
+                char_array_4[i] = static_cast<unsigned char>(std::find(base64_chars.begin(), base64_chars.end(), char_array_4[i]) - base64_chars.begin());
 
             char_array_3[0] = static_cast<unsigned char>(
                                   static_cast<unsigned int>(char_array_4[0] << 2) +
@@ -233,7 +233,7 @@ void util::base64_decode(std::string &ret, const std::string &encoded_string)
             char_array_4[j] = 0;
 
         for(j = 0; j < 4; j++)
-            char_array_4[j] = static_cast<unsigned char>(base64_chars.find(char_array_4[j]));
+            char_array_4[j] = static_cast<unsigned char>(std::find(base64_chars.begin(), base64_chars.end(), char_array_4[j]) - base64_chars.begin());
 
         char_array_3[0] = static_cast<unsigned char>(
                               static_cast<unsigned int>(char_array_4[0] << 2) +
