@@ -381,6 +381,8 @@ static void s_playMusic(int mod, const char* qoa, int fadeInMs)
 
     if(qoa)
     {
+        g_stats.currentMusicFile = qoa;
+
         std::string music_path = AppPath + "music/" + qoa;
         pLogDebug("Trying to play %s from %s...", qoa, music_path.c_str());
         Sound_StreamStart(Files::open_file(music_path, "rb"));
@@ -405,6 +407,8 @@ static void s_playMusic(int mod, const char* qoa, int fadeInMs)
             }
         }
         p += ".qoa";
+
+        g_stats.currentMusicFile = p;
 
         p = g_dirEpisode.resolveFileCaseExistsAbs(p);
 
