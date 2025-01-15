@@ -130,12 +130,27 @@ int menuControls_Mouse_Render(bool mouse, bool render)
     line -= line & 1;
     if(line > 30)
         line = 30;
+
+    // check for Chinese and Korean languages
+    int min_line_size = 18;
+
+#ifdef THEXTECH_ENABLE_TTF_SUPPORT
+    if(CurrentLanguage == "zh")
+        min_line_size = 26;
+    else if(CurrentLanguage == "ko")
+        min_line_size = 22;
+#endif
+
     // (okay if we don't get 15 lines)
     int max_line = 15;
-    if(line < 18)
+    if(line < min_line_size)
     {
-        line = 18;
+        line = min_line_size;
         max_line = (int)XRender::TargetH / line;
+
+        // fix some strange offscreen issues
+        if(min_line_size > 18)
+            max_line--;
     }
 
     // horizontal start of the menu
@@ -616,10 +631,10 @@ int menuControls_Mouse_Render(bool mouse, bool render)
         if(width < 680)
         {
             double_line = true;
-            if(line > 20)
+            if(line > min_line_size + 2)
             {
-                max_line = max_line * line / 20;
-                line = 20;
+                max_line = max_line * line / (min_line_size + 2);
+                line = (min_line_size + 2);
             }
         }
         // should never happen
@@ -873,10 +888,10 @@ int menuControls_Mouse_Render(bool mouse, bool render)
         if(width < 680)
         {
             double_line = true;
-            if(line > 20)
+            if(line > min_line_size + 2)
             {
-                max_line = max_line * line / 20;
-                line = 20;
+                max_line = max_line * line / (min_line_size + 2);
+                line = (min_line_size + 2);
             }
         }
         // should never happen
