@@ -560,12 +560,27 @@ bool Mouse_Render(bool mouse, bool render)
     // max line height 30
     if(line > 30)
         line = 30;
+
+    // check for Chinese and Korean languages
+    int min_line_size = 18;
+
+#ifdef THEXTECH_ENABLE_TTF_SUPPORT
+    if(CurrentLanguage == "zh")
+        min_line_size = 26;
+    else if(CurrentLanguage == "ko")
+        min_line_size = 22;
+#endif
+
     // (it's okay if we don't get 15 lines, but we need at least 18px per line.)
     int max_line = 15;
-    if(line < 18)
+    if(line < min_line_size)
     {
-        line = 18;
+        line = min_line_size;
         max_line = (int)XRender::TargetH / line;
+
+        // fix some strange offscreen issues
+        if(min_line_size > 18)
+            max_line--;
     }
 
     // two header rows, two footer rows
