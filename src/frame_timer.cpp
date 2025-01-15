@@ -18,10 +18,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifdef __16M__
-#include <malloc.h>
-#endif
-
 #include "sdl_proxy/sdl_stdinc.h"
 #include "sdl_proxy/sdl_timer.h"
 
@@ -37,6 +33,30 @@
 #include "core/events.h"
 
 #include "npc/npc_queues.h"
+
+// heap info for min console ports
+#if defined(__16M__) || defined(__WII__) || defined(__3DS__)
+    #define STATS_SHOW_RAM
+
+    #include <malloc.h>
+
+    extern u8 *fake_heap_start;
+    extern u8 *fake_heap_end;
+#endif // #if defined(__16M__) || defined(__WII__) || defined(__3DS__)
+
+// VRAM info for 16M
+#ifdef __16M__
+    namespace XRender
+    {
+        extern uint32_t s_loadedVRAM;
+    }
+#endif
+
+// VRAM info for 3DS
+#ifdef __3DS__
+    #include <3ds.h>
+    extern u32 __ctru_linear_heap_size;
+#endif
 
 MicroStats g_microStats;
 PerformanceStats_t g_stats;
@@ -113,7 +133,12 @@ void PerformanceStats_t::next_page()
     if((XRender::TargetW >= 720 && XRender::TargetH >= 360) || (LevelSelect && !GameMenu))
         page = !page;
     else
-        page = (page + 1) % (GameMenu ? 3 : 4);
+        page = (page + 1) % (GameMenu ? 4 : 5);
+
+#ifndef STATS_SHOW_RAM
+    if(page == 3)
+        page++;
+#endif
 }
 
 void PerformanceStats_t::reset()
@@ -139,6 +164,43 @@ void PerformanceStats_t::reset()
 
 #define YLINE (y + 2 + (row++ * 18))
 
+#ifdef STATS_SHOW_RAM
+static void s_print_ram(int x, int y)
+{
+    int row = 0;
+
+    int items = 1; // RAM
+
+#   ifndef __WII__
+    items++; // VRAM
+#   endif
+
+    XRender::renderRect(x, y, 340, 12 + (18 * items), XTColorF(0.0f, 0.0f, 0.0f, 0.3f), true);
+
+    if(x < 200)
+        y += 6;
+
+    auto m = mallinfo();
+
+#   ifdef __16M__
+    SuperPrint(fmt::sprintf_ne(" RAM: %4d/%4dkb", m.uordblks/1024, (fake_heap_end - fake_heap_start)/1024),
+               3, x + 4, YLINE);
+    SuperPrint(fmt::sprintf_ne("VRAM: %4d/%4dkb", XRender::s_loadedVRAM/1024, 512),
+               3, x + 4, YLINE, XTColorF(0.5f, 1.0f, 0.5f));
+#   else
+    SuperPrint(fmt::sprintf_ne(" RAM: %5d/%5dkb", m.uordblks/1024, (fake_heap_end - fake_heap_start)/1024),
+               3, x + 4, YLINE);
+#   endif
+
+#   ifdef __3DS__
+    SuperPrint(fmt::sprintf_ne("VRAM: %5d/%5dkb", (__ctru_linear_heap_size - linearSpaceFree())/1024, __ctru_linear_heap_size / 1024),
+               3, x + 4, YLINE, XTColorF(0.5f, 1.0f, 0.5f));
+#   endif
+}
+#else
+static void s_print_ram(int, int) {}
+#endif // #ifdef STATS_SHOW_RAM
+
 void PerformanceStats_t::print_filenames(int x, int y)
 {
     int items = (GameMenu) ? 4 : 3;
@@ -148,19 +210,10 @@ void PerformanceStats_t::print_filenames(int x, int y)
 
     SuperPrint(fmt::sprintf_ne("FILE: %s", FileNameFull.empty() ? "<none>" : FileNameFull.c_str()),
                3, x + 4, YLINE, XTColorF(1.f, 0.5f, 1.f));
-
-#ifdef __16M__
-    auto m = mallinfo();
-    SuperPrint(fmt::sprintf_ne("USED: %dkb", m.uordblks/1024),
-               3, x + 4, YLINE, XTColorF(1.f, 0.5f, 1.f));
-    SuperPrint(fmt::sprintf_ne("ARENA: %dkb", m.arena/1024),
-               3, x + 4, YLINE, XTColorF(1.f, 0.5f, 1.f));
-#else
     SuperPrint(fmt::sprintf_ne("MUSK: %s", currentMusic.empty() ? "<none>" : currentMusic.c_str()),
                3, x + 4, YLINE, XTColorF(1.f, 0.5f, 1.f));
     SuperPrint(fmt::sprintf_ne("MUSF: %s", currentMusicFile.empty() ? "<none>" : currentMusicFile.c_str()),
                3, x + 4, YLINE, XTColorF(1.f, 0.5f, 1.f));
-#endif
 
     if(GameMenu)
     {
@@ -244,6 +297,8 @@ void PerformanceStats_t::print()
                                    checkedTiles, checkedScenes, checkedPaths, checkedLevels,
                                    (checkedTiles + checkedScenes + checkedPaths + checkedLevels)),
                    3, 10 + XRender::TargetOverscanX, YLINE);
+
+        s_print_ram(10 + XRender::TargetOverscanX, YLINE);
     }
     else if(XRender::TargetW >= 720 && XRender::TargetH >= 360)
     {
@@ -257,13 +312,19 @@ void PerformanceStats_t::print()
         {
             print_cpu_stats(6 + XRender::TargetOverscanX, next_y);
             print_obj_stats(6 + 340 + XRender::TargetOverscanX, next_y);
+            s_print_ram(6 + XRender::TargetOverscanX, next_y + 6 + 18 * 6);
         }
         else
+        {
             print_obj_stats(6 + XRender::TargetOverscanX, next_y);
+            s_print_ram(6 + XRender::TargetOverscanX + 320, next_y);
+        }
     }
     else if(page == 1)
         print_filenames(6 + XRender::TargetOverscanX, 6);
-    else if(page == 3 && !GameMenu)
+    else if(page == 3)
+        s_print_ram(6 + XRender::TargetOverscanX, 6);
+    else if(page == 4 && !GameMenu)
         print_cpu_stats(6 + XRender::TargetOverscanX, 6);
     else
         print_obj_stats(6 + XRender::TargetOverscanX, 6);
