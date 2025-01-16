@@ -48,7 +48,7 @@ int Run(const std::string& prompt, std::vector<std::string>&& options)
 {
     // initialize text prompt
     MessageText = prompt;
-    BuildUTF8CharMap(MessageText, MessageTextMap);
+    PrepareMessageDims();
 
     // initialize options
     s_options = options;
@@ -116,7 +116,7 @@ void Render()
     DrawBackground(1, 1);
 
     // draw message box
-    DrawMessage(MessageTextMap);
+    DrawMessage();
 
     // (from screen_pause.cpp)
     // draw menu box

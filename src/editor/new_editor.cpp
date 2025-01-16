@@ -772,7 +772,7 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
         if(EditorCursor.NPC.Inert)
         {
             MessageText = GetS(EditorCursor.NPC.Text);
-            BuildUTF8CharMap(MessageText, MessageTextMap);
+            PrepareMessageDims();
             SuperPrintRightR(mode, g_editorStrings.wordText, 3, e_ScreenW - 130, 160);
             if(UpdateButton(mode, e_ScreenW - 160 + 4, 180 + 4, GFX.EIcons, EditorCursor.NPC.Text != STRINGINDEX_NONE, 0, 32*Icon::pencil, 32, 32))
             {
@@ -1761,7 +1761,7 @@ void EditorScreen::UpdateEventSettingsScreen(CallMode mode)
     if(!GetS(Events[m_current_event].Text).empty())
     {
         MessageText = GetS(Events[m_current_event].Text);
-        BuildUTF8CharMap(MessageText, MessageTextMap);
+        PrepareMessageDims();
     }
 
     SuperPrintR(mode, g_editorStrings.wordText, 3, 54, 170);
@@ -5437,7 +5437,6 @@ void EditorScreen::UpdateEditorScreen(CallMode mode, bool second_screen)
     }
 
     MessageText.clear();
-    MessageTextMap.clear();
 
 #ifdef __3DS__
     if(mode == CallMode::Render && active)

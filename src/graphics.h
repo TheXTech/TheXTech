@@ -126,21 +126,14 @@ void SuperPrintCenter(const std::string &SuperWords, int Font, float X, float Y,
 void SuperPrintScreenCenter(const std::string &SuperWords, int Font, float Y, XTColor color = XTColor());
 
 /*!
- * \brief Builds a UTF8 character positions map to simplify the text processing.
- * \param SuperText Input text line
- * \param outMap Output character positions map
+ * \brief Prepares dimensions for drawing a message with the message box
  */
-void BuildUTF8CharMap(const std::string& SuperText, UTF8CharMap_t &outMap);
+void PrepareMessageDims();
+
 /*!
  * \brief Print the message box with a multi-line text inside using a plain string itself
- * \param SuperText The multi-line string
  */
-void DrawMessage(const std::string& SuperText);
-/*!
- * \brief Print the mssage box with a multi-line text inside using a pre-built character positions map
- * \param SuperTextMap The UTF8 character positions map of a multi-line string
- */
-void DrawMessage(const UTF8CharMap_t& SuperTextMap);
+void DrawMessage();
 
 /*!
  * \brief This is a very special function that runs only last state of the texture

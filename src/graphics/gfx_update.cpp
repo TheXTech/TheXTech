@@ -3344,12 +3344,7 @@ void UpdateGraphicsMeta()
         PauseScreen::Render();
 
     if(GamePaused == PauseCode::Message)
-    {
-        if(MessageTextMap.empty())
-            DrawMessage(MessageText);
-        else
-            DrawMessage(MessageTextMap);
-    }
+        DrawMessage();
 
     if(GamePaused == PauseCode::DropAdd)
     {

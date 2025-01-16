@@ -412,7 +412,6 @@ void UpdatePlayer()
                     preProcessMessage(MessageText, A);
                     PauseGame(PauseCode::Message, A);
                     MessageText.clear();
-                    MessageTextMap.clear();
 
                     if(NPC[MessageNPC].TriggerTalk != EVENT_NONE)
                         ProcEvent(NPC[MessageNPC].TriggerTalk, A);

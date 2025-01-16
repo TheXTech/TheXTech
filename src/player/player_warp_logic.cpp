@@ -1438,7 +1438,6 @@ static inline bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool bac
 
         PauseGame(PauseCode::Message, A);
         MessageText.clear();
-        MessageTextMap.clear();
 
         // Restore previous frame
         if(g_config.fix_visual_bugs && warp.Effect == 1 && direction == 3)
