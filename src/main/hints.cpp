@@ -489,7 +489,7 @@ void Draw(int top, int min_priority, int width)
 
     FontManager::printText(text.c_str(), text.size(),
                            hint_box_left + text_start,
-                           top + hint_box_height / 2 - text_size.h() / 2,
+                           top + hint_box_height / 2 - text_size.h() / 2 + 4,
                            FontManager::fontIdFromSmbxFont(4));
 }
 
