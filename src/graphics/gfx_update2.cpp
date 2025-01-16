@@ -578,7 +578,7 @@ void UpdateGraphics2(bool skipRepaint)
                 cache_LevelName_H = FontManager::optimizeTextPx(cache_LevelName_Split, max_width, font).h();
             }
 
-            if(g_config.world_map_lvlname_marquee || cache_LevelName_H > vScreen[Z].ScreenTop - 21 - 8)
+            if(g_config.world_map_lvlname_marquee || cache_LevelName_H > vScreen[Z].ScreenTop - 2 - 8)
             {
                 SuperPrintMarquee(WorldLevel[WorldPlayer[1].LevelIndex].LevelName, 2, lnlx, vScreen[Z].ScreenTop - 21, marquee_spec, marquee_state);
                 marquee_state.advance(marquee_spec);
@@ -586,7 +586,7 @@ void UpdateGraphics2(bool skipRepaint)
             else
             {
                 FontManager::printText(cache_LevelName_Split.c_str(), cache_LevelName_Split.size(),
-                                        lnlx, vScreen[Z].ScreenTop - 21 - cache_LevelName_H,
+                                        lnlx, vScreen[Z].ScreenTop - 2 - cache_LevelName_H,
                                         font);
             }
         }

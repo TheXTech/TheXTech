@@ -835,6 +835,9 @@ PGE_Size FontManager::optimizeTextPx(std::string& text,
     BaseFontEngine *font = nullptr;
     PGE_Size gs;
 
+    int line_h = 0;
+    int line_h_at_space = 0;
+
     if((fontId < 0) || (static_cast<size_t>(fontId) >= g_anyFonts.size()) || !g_anyFonts[fontId])
         return PGE_Size(0, 0); // Invalid font
 
@@ -851,6 +854,12 @@ PGE_Size FontManager::optimizeTextPx(std::string& text,
             gs = font->glyphSize(&text[i], x, ttf_FontSize);
             pixelWidthPrev = pixelWidth;
             pixelWidth += gs.w();
+
+            if(line_h < gs.h())
+                line_h = gs.h();
+
+            line_h_at_space = line_h;
+
             break;
 
         case '\n':
@@ -863,7 +872,13 @@ PGE_Size FontManager::optimizeTextPx(std::string& text,
             x = 0;
             pixelWidth = 0;
             pixelWidthPrev = 0;
-            height += gs.h();
+
+            if(line_h < gs.h())
+                line_h = gs.h();
+
+            height += line_h;
+            line_h = 0;
+
             count++;
             break;
 
@@ -871,6 +886,10 @@ PGE_Size FontManager::optimizeTextPx(std::string& text,
             pixelWidthPrev = pixelWidth;
             gs = font->glyphSize(&text[i], x, ttf_FontSize);
             pixelWidth += gs.w();
+
+            if(line_h < gs.h())
+                line_h = gs.h();
+
             break;
         }
 
@@ -883,6 +902,7 @@ PGE_Size FontManager::optimizeTextPx(std::string& text,
                 text[lastspace] = '\n';
                 i = lastspace - 1;
                 lastspace = 0;
+                line_h = line_h_at_space;
             }
             else
             {
@@ -891,7 +911,9 @@ PGE_Size FontManager::optimizeTextPx(std::string& text,
                 text.insert(i, 1, '\n');
                 x = 0;
                 pixelWidth = 0;
-                height += gs.h();
+
+                height += line_h;
+                line_h = 0;
                 count++;
             }
         }
@@ -900,7 +922,9 @@ PGE_Size FontManager::optimizeTextPx(std::string& text,
         i += static_cast<size_t>(trailingBytesForUTF8[uch]);
     }
 
-    if(count == 1)
+    height += line_h;
+
+    if(maxWidth < pixelWidth)
         maxWidth = pixelWidth;
 
     /****************Word wrap*end*****************/
