@@ -284,12 +284,14 @@ PGE_Size RasterFont::glyphSize(const char* utf8char, uint32_t charNum, uint32_t 
             spaceSize = 1; // Don't divide by zero
         size_t tabMult = 4 - ((charNum / spaceSize) % 4);
         ret.setWidth(static_cast<size_t>(m_spaceWidth + m_interLetterSpace / 2) * tabMult);
+        ret.setHeight(m_newlineOffset);
         break;
     }
 
     case ' ':
     {
         ret.setWidth(m_spaceWidth + m_interLetterSpace / 2);
+        ret.setHeight(m_newlineOffset);
         break;
     }
 
@@ -329,17 +331,23 @@ PGE_Size RasterFont::glyphSize(const char* utf8char, uint32_t charNum, uint32_t 
 
                 TtfFont::TheGlyphInfo glyph = font->getGlyphInfo(&cx, font_size_use);
                 uint32_t glyph_width = glyph.width > 0 ? uint32_t(glyph.advance >> 6) : (font_size_use >> 2);
+                uint32_t glyph_height = glyph.height;
                 if(doublePixel)
+                {
                     glyph_width *= 2;
+                    glyph_height *= 2;
+                }
 
                 // Raster fonts are monospace fonts. TTF glyphs shoudn't break mono-width until they are wider than a cell
                 auto lw = SDL_max(glyph_width, m_letterWidth);
                 ret.setWidth(lw + m_interLetterSpace);
+                ret.setHeight(glyph_height + 2);
             }
             else
 #endif
             {
                 ret.setWidth(m_letterWidth + m_interLetterSpace);
+                ret.setHeight(m_newlineOffset);
             }
         }
 
@@ -365,6 +373,8 @@ PGE_Size RasterFont::printText(const char* text, size_t text_size,
     uint32_t w = m_letterWidth;
     uint32_t h = m_letterHeight;
 
+    uint32_t line_offset = m_newlineOffset;
+
     int32_t  offsetX_max = 0;
 
     uint8_t letter_alpha = color.a;
@@ -383,7 +393,8 @@ PGE_Size RasterFont::printText(const char* text, size_t text_size,
                 offsetX_max = offsetX;
 
             offsetX = (crop_info) ? -crop_info->offset : 0;
-            offsetY += m_newlineOffset;
+            offsetY += line_offset;
+            line_offset = m_newlineOffset;
             continue;
 
         case '\t':
@@ -449,8 +460,15 @@ PGE_Size RasterFont::printText(const char* text, size_t text_size,
 
                 TtfFont::TheGlyphInfo glyph = font->getGlyphInfo(&cx, font_size_use);
                 uint32_t glyph_width = glyph.width > 0 ? uint32_t(glyph.advance >> 6) : (font_size_use >> 2);
+                uint32_t glyph_height = glyph.height;
                 if(doublePixel)
+                {
                     glyph_width *= 2;
+                    glyph_height *= 2;
+                }
+
+                if(glyph_height + 2 > line_offset)
+                    line_offset = glyph_height + 2;
 
                 if(m_ttfOutlines)
                     offsetX += (doublePixel ? 2 : 1);
