@@ -73,7 +73,6 @@ std::string MessageTitle;
 MessageType g_MessageType = MESSAGE_TYPE_NORMAL;
 
 std::string MessageText;
-UTF8CharMap_t MessageTextMap;
 
 // int NumSelectWorld  = 0;
 // std::vector<SelectWorld_t> SelectWorld;

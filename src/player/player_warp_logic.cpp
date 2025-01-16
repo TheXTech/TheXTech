@@ -1641,7 +1641,6 @@ void SuperWarp(const int A)
     {
         // clear message text
         MessageText.clear();
-        MessageTextMap.clear();
 
         // Restore previous frame if needed
         if(g_gameLoopInterrupt.bool4)

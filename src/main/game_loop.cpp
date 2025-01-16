@@ -468,7 +468,7 @@ void MessageScreen_Init()
 
     MenuCursorCanMove = false;
     MenuCursorCanMove_Back = false;
-    BuildUTF8CharMap(MessageText, MessageTextMap);
+    PrepareMessageDims();
 }
 
 bool MessageScreen_Logic(int plr)
@@ -543,7 +543,6 @@ bool MessageScreen_Logic(int plr)
 
         MessageTitle.clear();
         MessageText.clear();
-        MessageTextMap.clear();
         g_MessageType = MESSAGE_TYPE_NORMAL;
         return true;
     }

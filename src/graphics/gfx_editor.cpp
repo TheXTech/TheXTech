@@ -316,12 +316,7 @@ void DrawEditorLevel(int Z)
 #ifdef __3DS__
     // In-Editor message box preview (actually only useful on 3DS)
     if(editorScreen.active && !MessageText.empty())
-    {
-        if(MessageTextMap.empty())
-            DrawMessage(MessageText);
-        else
-            DrawMessage(MessageTextMap);
-    }
+        DrawMessage(MessageText);
 #endif
 
 #ifdef __3DS__

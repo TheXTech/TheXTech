@@ -456,7 +456,6 @@ resume_MessageNPC:
                     MessageNPC = g_gameLoopInterrupt.B;
 
                     MessageText.clear();
-                    MessageTextMap.clear();
 
                     if(NPC[MessageNPC].TriggerTalk != EVENT_NONE)
                     {

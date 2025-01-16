@@ -11,33 +11,36 @@
 #include "fontman/font_manager_private.h"
 #include "fontman/font_manager.h"
 
+static std::string s_opt_message;
+static int s_last_width = 0;
+static PGE_Size s_title_dims;
+static PGE_Size s_message_dims;
 
-void BuildUTF8CharMap(const std::string& SuperText, UTF8CharMap_t& outMap)
+
+void PrepareMessageDims()
 {
-    const char* mapBuildIt = SuperText.c_str();
-    const char* mapBuildEnd = mapBuildIt + SuperText.size();
+    int TextBoxW = GFX.TextBox.w;
 
-    outMap.clear();
+    if(!GFX.TextBox.inited || XRender::TargetW < GFX.TextBox.w || (g_MessageType >= MESSAGE_TYPE_SYS_INFO))
+        TextBoxW = XRender::TargetW - 50;
 
-    // Scan the whole line including the NULL terminator
-    for(; mapBuildIt <= mapBuildEnd; mapBuildIt++)
-    {
-        outMap.push_back(mapBuildIt);
-        UTF8 ucx = static_cast<unsigned char>(*mapBuildIt);
-        mapBuildIt += static_cast<size_t>(trailingBytesForUTF8[ucx]);
-    }
+    int font = FontManager::fontIdFromSmbxFont(4);
+
+    s_opt_message = MessageText;
+    s_message_dims = FontManager::optimizeTextPx(s_opt_message, TextBoxW - 20, font);
+
+    if(!MessageTitle.empty())
+        s_title_dims = FontManager::textSize(MessageTitle.c_str(), MessageTitle.size(), font);
+
+    s_last_width = XRender::TargetH;
 }
 
-void DrawMessage(const std::string& SuperText)
+// Now uses the modern systems
+void DrawMessage()
 {
-    UTF8CharMap_t SuperTextMap;
-    BuildUTF8CharMap(SuperText, SuperTextMap);
-    DrawMessage(SuperTextMap);
-}
+    if(s_last_width != XRender::TargetH)
+        PrepareMessageDims();
 
-// based on Wohlstand's improved algorithm, but screen-size aware
-void DrawMessage(const UTF8CharMap_t &SuperTextMap)
-{
     int TextBoxW = GFX.TextBox.w;
     bool UseGFX = true;
 
@@ -47,55 +50,19 @@ void DrawMessage(const UTF8CharMap_t &SuperTextMap)
         UseGFX = false;
     }
 
-    // possibly, load these data from the fonts engine
-    const int charWidth = 18;
-    const int lineHeight = 16;
-
-    int BoxY = 0;
     int BoxY_Start = XRender::TargetH / 2 - 150;
 
     if(BoxY_Start < 60)
-        BoxY_Start = 60;
-
-    // Draw background all at once:
-    // how many lines are there?
-    int lineStart = 0; // start of current line
-    int lastWord = 0; // planned start of next line
-    int numLines = 0; // n lines
-    const int maxChars = ((TextBoxW - 24) / charWidth) + 1; // 27 chars wide by default
-    // Text size without a NULL terminator
-    const int textSize = static_cast<int>(SuperTextMap.size() - 1);
-
-
-    // PASS ONE: determine the number of lines
-    // Wohlstand's updated algorithm, no substrings, reasonably fast
-    while(lineStart < textSize)
     {
-        lastWord = lineStart;
+        BoxY_Start = XRender::TargetH / 2 - s_message_dims.h() / 2 - 10;
 
-        for(int i = lineStart + 1; i <= lineStart + maxChars; i++)
-        {
-            auto c = *(SuperTextMap[size_t(i) - 1]);
-
-            if((lastWord == lineStart && i == lineStart + maxChars) || i == textSize || c == '\n')
-            {
-                lastWord = i;
-                break;
-            }
-            else if(c == ' ')
-            {
-                lastWord = i;
-            }
-        }
-
-        numLines ++;
-        lineStart = lastWord;
+        if(BoxY_Start > 60)
+            BoxY_Start = 60;
     }
 
     // Draw the background now we know how many lines there are. 10px of padding above and below.
-    int totalHeight = numLines * lineHeight + 20;
+    int totalHeight = s_message_dims.h() + 20;
 
-    int titleWidth = 0;
     XTColor messageColour = {8, 96, 168};
     XTColor titleColour = {255, 255, 255};
 
@@ -121,10 +88,8 @@ void DrawMessage(const UTF8CharMap_t &SuperTextMap)
 
     if(g_MessageType >= MESSAGE_TYPE_SYS_INFO && !MessageTitle.empty())
     {
-        titleWidth = SuperTextPixLen(MessageTitle, 4);
-
-        int titleBoxWidth = TextBoxW > titleWidth + 12 ? TextBoxW : titleWidth + 12;
-        int titleBoxHeight = lineHeight + 20;
+        int titleBoxWidth = TextBoxW > s_title_dims.w() + 12 ? TextBoxW : s_title_dims.w() + 12;
+        int titleBoxHeight = s_title_dims.h() + 20;
         int titleBoxX = (XRender::TargetW / 2) - (titleBoxWidth / 2);
         int titleBoxY = BoxY_Start - 40;
 
@@ -135,7 +100,7 @@ void DrawMessage(const UTF8CharMap_t &SuperTextMap)
         XRender::renderRect(titleBoxX + 4, titleBoxY + 4,
                             titleBoxWidth - 8, titleBoxHeight - 8, messageColour);
 
-        SuperPrintScreenCenter(MessageTitle, 4, titleBoxY + 10, titleColour);
+        SuperPrint(MessageTitle, 4, (XRender::TargetW / 2) - (s_title_dims.w() / 2), titleBoxY + 10, titleColour);
     }
 
     if(!UseGFX)
@@ -200,56 +165,16 @@ void DrawMessage(const UTF8CharMap_t &SuperTextMap)
 #endif
 
     // PASS TWO: draw the lines
-    // Wohlstand's updated algorithm
-    // modified to not allocate/copy a bunch of strings
-    bool firstLine = true;
-    BoxY = BoxY_Start + 10;
-    lineStart = 0; // start of current line
+    int font = FontManager::fontIdFromSmbxFont(4);
 
-    while(lineStart < textSize)
-    {
-        lastWord = lineStart;
+    int left = XRender::TargetW / 2 - TextBoxW / 2 + 12;
 
-        for(int i = lineStart + 1; i <= lineStart + maxChars; i++)
-        {
-            auto c = *(SuperTextMap[size_t(i) - 1]);
+    if(s_message_dims.h() < 30 && s_message_dims.w() < TextBoxW - 100)
+        left = XRender::TargetW / 2 - s_message_dims.w() / 2;
 
-            if((lastWord == lineStart && i == lineStart + maxChars) || i == textSize || c == '\n')
-            {
-                lastWord = i;
-                break;
-            }
-            else if(c == ' ')
-            {
-                lastWord = i;
-            }
-        }
-
-        intptr_t lastWordPtr = intptr_t(SuperTextMap[lastWord]);
-        intptr_t lineStartPtr = intptr_t(SuperTextMap[lineStart]);
-        std::ptrdiff_t lineLenU = lastWordPtr - lineStartPtr;
-
-        SDL_assert_release(lastWordPtr >= lineStartPtr);
-
-        if(lastWord == textSize && firstLine)
-        {
-            SuperPrint(lineLenU, SuperTextMap[lineStart],
-                       4,
-                       XRender::TargetW / 2 - ((lastWord - lineStart) * charWidth) / 2,
-                       BoxY);
-        }
-        else
-        {
-            SuperPrint(lineLenU, SuperTextMap[lineStart],
-                       4,
-                       XRender::TargetW / 2 - TextBoxW / 2 + 12,
-                       BoxY);
-        }
-
-        lineStart = lastWord;
-        BoxY += lineHeight;
-        firstLine = false;
-    }
+    FontManager::printText(s_opt_message.c_str(), s_opt_message.size(),
+                            left, BoxY_Start + totalHeight / 2 - s_message_dims.h() / 2,
+                            font);
 }
 
 void UpdateGraphicsFatalAssert()
@@ -266,10 +191,7 @@ void UpdateGraphicsFatalAssert()
     if(PrintFPS > 0 && g_config.show_fps)
         SuperPrint(std::to_string(PrintFPS), 1, XRender::TargetOverscanX + 8, 8, {0, 255, 0});
 
-    if(MessageTextMap.empty())
-        DrawMessage(MessageText);
-    else
-        DrawMessage(MessageTextMap);
+    DrawMessage();
 
     XRender::repaint();
 }
