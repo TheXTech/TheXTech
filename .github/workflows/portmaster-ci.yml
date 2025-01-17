@@ -34,7 +34,7 @@ jobs:
             extra_options: "-DPORTMASTER=ON",
 
             deps_cmdline: "apt-get update -qq \
-            && apt-get install -qq cmake ninja-build lftp \
+            && DEBIAN_FRONTEND=noninteractive apt-get install -qq cmake ninja-build lftp \
             \"^libxcb.*\" libx11-dev libx11-xcb-dev libgtk-3-dev libgegl-dev libxcursor-dev \
             libxrender-dev libxrandr-dev libxext-dev libxi-dev libxss-dev libxt-dev libxv-dev \
             libxxf86vm-dev libxinerama-dev libxkbcommon-dev libfontconfig1-dev libasound2-dev \
