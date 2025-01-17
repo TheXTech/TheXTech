@@ -19,7 +19,9 @@ jobs:
   build:
     name: "${{ matrix.config.name }} | ${{ matrix.config.build_type }}"
     runs-on: ${{ matrix.config.os }}
-    container: ${{ matrix.config.container }}
+    container:
+      image: ${{ matrix.config.container }}
+      options: ${{ matrix.config.container_options }}
     strategy:
       fail-fast: false
       matrix:
@@ -28,6 +30,7 @@ jobs:
             name: "TAR Ubuntu 16.04 x86_64",
             os: ubuntu-latest,
             container: "ghcr.io/thextech/wohlnet-ci-ubuntu1604-64bit:latest",
+            container_options: "",
 
             extra_options: "-DTHEXTECH_EXECUTABLE_NAME=thextech \
             -DUSE_STATIC_LIBC=ON \
@@ -49,6 +52,7 @@ jobs:
             name: "TAR Ubuntu 16.04 32bit",
             os: ubuntu-latest,
             container: "ghcr.io/thextech/wohlnet-ci-ubuntu1604-32bit:latest",
+            container_options: "",
 
             extra_options: "-DTHEXTECH_EXECUTABLE_NAME=thextech \
             -DUSE_STATIC_LIBC=ON \
@@ -71,6 +75,7 @@ jobs:
             name: "TAR Ubuntu 18.04 x86_64",
             os: ubuntu-latest,
             container: "ghcr.io/thextech/wohlnet-ci-ubuntu1804:latest",
+            container_options: "",
 
             extra_options: "-DTHEXTECH_EXECUTABLE_NAME=thextech \
             -DUSE_STATIC_LIBC=ON \
@@ -92,6 +97,7 @@ jobs:
             name: "TAR Ubuntu 20.04 x86_64",
             os: ubuntu-latest,
             container: "ghcr.io/thextech/wohlnet-ci-ubuntu2004:latest",
+            container_options: "",
 
             extra_options: "-DTHEXTECH_EXECUTABLE_NAME=thextech \
             -DUSE_STATIC_LIBC=ON \
@@ -112,6 +118,7 @@ jobs:
             name: "TAR Ubuntu 20.04 aarch64",
             os: ubuntu-24.04-arm,
             container: "arm64v8/ubuntu:20.04",
+            container_options: "--privileged",
 
             extra_options: "-DTHEXTECH_EXECUTABLE_NAME=thextech \
             -DUSE_STATIC_LIBC=ON \
@@ -139,6 +146,7 @@ jobs:
             name: "TAR Ubuntu 22.04 x86_64",
             os: ubuntu-latest,
             container: "ghcr.io/thextech/wohlnet-ci-ubuntu2204:latest",
+            container_options: "",
 
             extra_options: "-DTHEXTECH_EXECUTABLE_NAME=thextech \
             -DUSE_STATIC_LIBC=ON \
@@ -159,6 +167,7 @@ jobs:
             name: "TAR Ubuntu 24.04 x86_64",
             os: ubuntu-latest,
             container: "ghcr.io/thextech/wohlnet-ci-ubuntu2404:latest",
+            container_options: "",
 
             extra_options: "-DTHEXTECH_EXECUTABLE_NAME=thextech \
             -DUSE_STATIC_LIBC=ON \
