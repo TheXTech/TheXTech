@@ -57,10 +57,7 @@ jobs:
         apt update --fix-missing -y
         apt upgrade -y
 
-        apt install -y flatpak flatpak-builder qemu-user-static p7zip-full git lftp
-
-        update-binfmts --enable qemu-aarch64
-        update-binfmts --enable qemu-arm
+        apt install -y flatpak flatpak-builder p7zip-full git lftp
 
     - name: Install flatpak Dependencies
       shell: bash
