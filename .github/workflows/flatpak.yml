@@ -29,21 +29,15 @@ jobs:
             id: "x86_64",
             sdk_ver: "22.08",
             runs_on: "ubuntu-latest",
-            image: "arm64v8/ubuntu:22.04"
+            image: "ubuntu:22.04"
           }
         - {
             name: "arm64",
             id: "aarch64",
             sdk_ver: "22.08",
             runs_on: "ubuntu-24.04-arm",
-            image: "ubuntu:22.04"
+            image: "arm64v8/ubuntu:22.04"
           }
-        exclude:
-          - arch: {
-              name: "${{ (github.event_name == 'workflow_dispatch' && ' ') || 'arm64' }}",
-              id: "${{ (github.event_name == 'workflow_dispatch' && ' ') || 'aarch64' }}",
-              sdk_ver: "22.08"
-            }
     steps:
     - name: Check for the upload support
       id: upload-check
