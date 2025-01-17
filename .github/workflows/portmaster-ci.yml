@@ -1,0 +1,155 @@
+name: PortMaster CI
+
+on:
+  push:
+    branches:
+      - main
+      - stable*
+      - versus-ci
+      - versus-ci-ubuntu
+  pull_request:
+    branches:
+      - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: "${{ matrix.config.name }} | ${{ matrix.config.build_type }}"
+    runs-on: ${{ matrix.config.os }}
+    container: ${{ matrix.config.container }}
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+        - {
+            name: "TAR Ubuntu 20.04 aarch64",
+            os: ubuntu-24.04-arm,
+            container: "arm64v8/ubuntu:20.04",
+
+            extra_options: "-DPORTMASTER=ON",
+
+            deps_cmdline: "sudo apt-get update -qq \
+            && sudo apt-get install -qq cmake ninja-build lftp \
+            \"^libxcb.*\" libx11-dev libx11-xcb-dev libgtk-3-dev libgegl-dev libxcursor-dev \
+            libxrender-dev libxrandr-dev libxext-dev libxi-dev libxss-dev libxt-dev libxv-dev \
+            libxxf86vm-dev libxinerama-dev libxkbcommon-dev libfontconfig1-dev libasound2-dev \
+            libpulse-dev libdbus-1-dev udev mtdev-tools webp libudev-dev libglm-dev libwayland-dev \
+            libegl1-mesa-dev mesa-common-dev libgl1-mesa-dev libglu1-mesa-dev libgles2-mesa \
+            libgles2-mesa-dev libgles-dev libmirclient-dev libproxy-dev",
+
+            generator: "Ninja",
+            build_type: "MinSizeRel",
+            executable_name_suffix: "",
+            package_filename_suffix: "portmaster",
+            upload_directory: "www/portmaster/"
+          }
+
+    steps:
+    - name: Check for the upload support
+      id: upload-check
+      shell: bash
+      run: |
+        if [[ "${{ secrets.builds_login }}" != '' && \
+              "${{ secrets.builds_password }}" != '' && \
+              "${{ secrets.builds_host }}" != '' ]]; then
+          echo "available=true" >> $GITHUB_OUTPUT;
+        else
+          echo "available=false" >> $GITHUB_OUTPUT;
+        fi
+
+    - name: Install Dependencies
+      shell: bash
+      run: |
+        if [[ ! -z "${{ matrix.config.deps_cmdline }}" ]]; then
+          eval ${{ matrix.config.deps_cmdline }}
+        fi
+        cmake --version
+
+    - uses: TheXTech/checkout@v0.1
+
+    - uses: TheXTech/branch-name@v0.1
+
+
+    - name: Pull submodules
+      shell: bash
+      run: |
+        git submodule update --init --recursive
+
+    - name: Configure
+      shell: bash
+      run: |
+        if [[ ! -z "${{ matrix.config.extra_path }}" ]]; then
+          export PATH=${{ matrix.config.extra_path }}:${PATH}
+          echo "PATH environment: ${PATH}"
+        fi
+        if [[ "${{ secrets.DISCORD_APP_ID }}" != '' ]]; then
+          LOCAL_EXTRA_SETUP="-DTHEXTECH_ENABLE_DISCORD_RPC=ON -DTHEXTECH_DISCORD_APPID=\"${{ secrets.DISCORD_APP_ID }}\""
+        fi
+        cmake -B build -G "${{ matrix.config.generator }}" -DCMAKE_BUILD_TYPE=${{ matrix.config.build_type }} ${{ matrix.config.extra_options }} ${LOCAL_EXTRA_SETUP} .
+
+    - name: Build
+      shell: bash
+      run: |
+        if [[ ! -z "${{ matrix.config.extra_path }}" ]]; then
+          export PATH=${{ matrix.config.extra_path }}:${PATH}
+        fi
+        export MAKEFLAGS=--keep-going
+        cmake --build build --config ${{ matrix.config.build_type }} --parallel 4
+
+    - name: List dependent libraries
+      if: success() && runner.os == 'Linux'
+      shell: bash
+      run: |
+        file build/output/bin/thextech
+        ldd build/output/bin/thextech
+
+
+    - name: Create Package
+      if: success()
+      id: create_package
+      shell: bash
+      run: |
+        bash .github/ci-helper/pack-game.sh \
+            "${{ runner.os }}" \
+            "thextech-bin" \
+            "thextech${{ matrix.config.executable_name_suffix }}" \
+            "thextech-bin-${{ matrix.config.package_filename_suffix }}-${BRANCH_NAME}" \
+            "none"
+
+    - name: Upload artifact
+      if: success()
+      uses: actions/upload-artifact@v4
+      continue-on-error: true
+      with:
+        path: build/package/*.tar.gz
+        name: TheXTech PortMaster ${{ matrix.config.build_type }}
+
+    - name: Deploy to builds.wohlsoft.ru
+      if: steps.create_package.outcome == 'success' && github.event_name != 'pull_request' && steps.upload-check.outputs.available == 'true'
+      continue-on-error: true
+      shell: bash
+      run: |
+        if [[ ! -z "${{ matrix.config.extra_path }}" ]]; then
+          export PATH=${{ matrix.config.extra_path }}:${PATH}
+        fi
+        UPLOAD_LIST="set ssl:verify-certificate no;"
+        if [[ "${{ runner.os }}" == 'Windows' ]]; then
+            for q in ./build/package/*.7z; do
+                UPLOAD_LIST="${UPLOAD_LIST} put -O ${{ matrix.config.upload_directory }} $q;"
+            done
+        elif [[ "${{ runner.os }}" == 'Linux' ]]; then
+            for q in ./build/package/*.tar.gz; do
+                UPLOAD_LIST="${UPLOAD_LIST} put -O ${{ matrix.config.upload_directory }} $q;"
+            done
+        fi
+        lftp -e "${UPLOAD_LIST} exit" -u ${{ secrets.builds_login }},${{ secrets.builds_password }} ${{ secrets.builds_host }}
+
+    - name: List Build Directory
+      if: always()
+      shell: bash
+      run: |
+        git status
+        ls -lR build
