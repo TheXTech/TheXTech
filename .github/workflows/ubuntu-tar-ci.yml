@@ -30,7 +30,7 @@ jobs:
             name: "TAR Ubuntu 16.04 x86_64",
             os: ubuntu-latest,
             container: "ghcr.io/thextech/wohlnet-ci-ubuntu1604-64bit:latest",
-            container_options: "",
+            container_options: "\"\"",
 
             extra_options: "-DTHEXTECH_EXECUTABLE_NAME=thextech \
             -DUSE_STATIC_LIBC=ON \
@@ -52,7 +52,7 @@ jobs:
             name: "TAR Ubuntu 16.04 32bit",
             os: ubuntu-latest,
             container: "ghcr.io/thextech/wohlnet-ci-ubuntu1604-32bit:latest",
-            container_options: "",
+            container_options: "\"\"",
 
             extra_options: "-DTHEXTECH_EXECUTABLE_NAME=thextech \
             -DUSE_STATIC_LIBC=ON \
@@ -75,7 +75,7 @@ jobs:
             name: "TAR Ubuntu 18.04 x86_64",
             os: ubuntu-latest,
             container: "ghcr.io/thextech/wohlnet-ci-ubuntu1804:latest",
-            container_options: "",
+            container_options: "\"\"",
 
             extra_options: "-DTHEXTECH_EXECUTABLE_NAME=thextech \
             -DUSE_STATIC_LIBC=ON \
@@ -97,7 +97,7 @@ jobs:
             name: "TAR Ubuntu 20.04 x86_64",
             os: ubuntu-latest,
             container: "ghcr.io/thextech/wohlnet-ci-ubuntu2004:latest",
-            container_options: "",
+            container_options: "\"\"",
 
             extra_options: "-DTHEXTECH_EXECUTABLE_NAME=thextech \
             -DUSE_STATIC_LIBC=ON \
@@ -127,8 +127,8 @@ jobs:
             -DUSE_SHARED_FREEIMAGE=OFF \
             -DPGE_SHARED_SDLMIXER=OFF",
 
-            deps_cmdline: "sudo apt-get update -qq \
-            && sudo apt-get install -qq cmake ninja-build lftp \
+            deps_cmdline: "apt-get update -qq \
+            && apt-get install -qq cmake ninja-build lftp \
             \"^libxcb.*\" libx11-dev libx11-xcb-dev libgtk-3-dev libgegl-dev libxcursor-dev \
             libxrender-dev libxrandr-dev libxext-dev libxi-dev libxss-dev libxt-dev libxv-dev \
             libxxf86vm-dev libxinerama-dev libxkbcommon-dev libfontconfig1-dev libasound2-dev \
@@ -146,7 +146,7 @@ jobs:
             name: "TAR Ubuntu 22.04 x86_64",
             os: ubuntu-latest,
             container: "ghcr.io/thextech/wohlnet-ci-ubuntu2204:latest",
-            container_options: "",
+            container_options: "\"\"",
 
             extra_options: "-DTHEXTECH_EXECUTABLE_NAME=thextech \
             -DUSE_STATIC_LIBC=ON \
@@ -167,7 +167,7 @@ jobs:
             name: "TAR Ubuntu 24.04 x86_64",
             os: ubuntu-latest,
             container: "ghcr.io/thextech/wohlnet-ci-ubuntu2404:latest",
-            container_options: "",
+            container_options: "\"\"",
 
             extra_options: "-DTHEXTECH_EXECUTABLE_NAME=thextech \
             -DUSE_STATIC_LIBC=ON \
