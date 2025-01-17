@@ -1,7 +1,13 @@
 name: Flatpak CI
 
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - stable*
+  pull_request:
+    branches:
+      - main
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -10,9 +16,9 @@ concurrency:
 jobs:
   build:
     name: Flatpak for ${{ matrix.arch.name }}
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.arch.runs_on }}
     container:
-      image: ubuntu:22.04
+      image: ${{ matrix.arch.image }}
       options: --privileged
     strategy:
       fail-fast: true
@@ -21,12 +27,16 @@ jobs:
         - {
             name: "x86-64",
             id: "x86_64",
-            sdk_ver: "22.08"
+            sdk_ver: "22.08",
+            runs_on: "ubuntu-latest",
+            image: "arm64v8/ubuntu:22.04"
           }
         - {
             name: "arm64",
             id: "aarch64",
-            sdk_ver: "22.08"
+            sdk_ver: "22.08",
+            runs_on: "ubuntu-24.04-arm",
+            image: "ubuntu:22.04"
           }
         exclude:
           - arch: {
