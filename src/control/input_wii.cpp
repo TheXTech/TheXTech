@@ -1366,14 +1366,10 @@ InputMethod* InputMethodType_Wii::Poll(const std::vector<InputMethod*>& active_m
     // reset canPoll for next time
     this->m_canPoll = false;
 
-    printf("got button %d\n", chn);
-
     InputMethod_Wii* method = new(std::nothrow) InputMethod_Wii(chn);
 
     if(!method)
         return nullptr;
-
-    printf("allocated\n");
 
     if(expansion == WPAD_EXP_NUNCHUK)
         method->Name = g_controlsStrings.wiiTypeNunchuck;
@@ -1385,8 +1381,6 @@ InputMethod* InputMethodType_Wii::Poll(const std::vector<InputMethod*>& active_m
     method->Name += " ";
     method->Name += std::to_string(chn + 1);
     method->Type = this;
-
-    printf("it's a %s!\n", method->Name.c_str());
 
     // now, cleverly find a profile!
 
@@ -1443,7 +1437,6 @@ InputMethod* InputMethodType_Wii::Poll(const std::vector<InputMethod*>& active_m
 
     if(method->Profile)
     {
-        printf("bound profile %s!\n", method->Profile->Name.c_str());
         this->m_lastProfileByPlayerAndExp[new_index] = method->Profile;
         this->m_lastProfileByPlayerAndExp[expansion * 256] = method->Profile;
     }
