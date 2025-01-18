@@ -1254,8 +1254,12 @@ void InputMethodType_Wii::UpdateControlsPost()
         SharedCursor.Y = scr_y;
     }
 
-    // editor edge scrolling logic
-    if(LevelEditor)
+    // editor edge scrolling logic, held back for now.
+    // I'll try to rework the IR logic above, manually converting to screen coordinates using smooth_valid and sx/sy.
+    // See ir_correct_for_bounds and ir_convert_to_vres at https://github.com/devkitPro/libogc/blob/master/wiiuse/ir.c
+    // Just need to make very slightly less stringent valid conditions
+    // Try to allow up to 128px offset from screen in any direction.
+    if(LevelEditor && false)
     {
         if(scr_x < 64)
             ::EditorControls.ScrollLeft += SDL_min((64 - scr_x) / 2, 32);
