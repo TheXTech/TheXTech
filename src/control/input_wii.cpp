@@ -1216,6 +1216,14 @@ void InputMethodType_Wii::UpdateControlsPost()
     {
         WPADData* data = WPAD_Data(i);
 
+        if(!data)
+            continue;
+
+        if(data->err || !data->data_present)
+            m_chnConnected[i] = 0;
+        else if(m_chnConnected[i] < 8)
+            m_chnConnected[i]++;
+
         if(data->ir.valid)
         {
             int phys_x = data->ir.x;
@@ -1279,6 +1287,12 @@ InputMethod* InputMethodType_Wii::Poll(const std::vector<InputMethod*>& active_m
         if(data->err)
             continue;
 
+        if(!data->data_present)
+            continue;
+
+        // newly connected wiimote
+        bool newly_connected = (m_chnConnected[chn] < 8);
+
         uint32_t key = null_but;
 
         for(uint32_t but : wiimote_buttons)
@@ -1314,7 +1328,7 @@ InputMethod* InputMethodType_Wii::Poll(const std::vector<InputMethod*>& active_m
             }
         }
 
-        if(key != null_but)
+        if(key != null_but || newly_connected)
         {
             expansion = data->exp.type;
             break;
