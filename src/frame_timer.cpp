@@ -35,14 +35,10 @@
 #include "npc/npc_queues.h"
 
 // heap info for min console ports
-#if defined(__16M__) || defined(__WII__) || defined(__3DS__)
+#if defined(__16M__) || defined(__3DS__) // || defined(__WII__)
     #define STATS_SHOW_RAM
-
     #include <malloc.h>
-
-    extern u8 *fake_heap_start;
-    extern u8 *fake_heap_end;
-#endif // #if defined(__16M__) || defined(__WII__) || defined(__3DS__)
+#endif // #if defined(__16M__) || defined(__3DS__) || defined(__WII__)
 
 // VRAM info for 16M
 #ifdef __16M__
@@ -56,6 +52,18 @@
 #ifdef __3DS__
     #include <3ds.h>
     extern u32 __ctru_linear_heap_size;
+#endif
+
+// heap size for Wii
+#if defined(STATS_SHOW_RAM) && defined(__WII__)
+    extern u8 __Arena1Lo[], __Arena1Hi[];
+    extern u8 __Arena2Lo[], __Arena2Hi[];
+    static const uint32_t s_heap_size = (__Arena2Hi - __Arena2Lo) + (__Arena1Hi - __Arena1Lo);
+// heap size for other homebrew
+#elif defined(STATS_SHOW_RAM)
+    extern u8 *fake_heap_start;
+    extern u8 *fake_heap_end;
+    static const uint32_t s_heap_size = (fake_heap_end - fake_heap_start);
 #endif
 
 MicroStats g_microStats;
@@ -183,12 +191,12 @@ static void s_print_ram(int x, int y)
     auto m = mallinfo();
 
 #   ifdef __16M__
-    SuperPrint(fmt::sprintf_ne(" RAM: %4d/%4dkb", m.uordblks/1024, (fake_heap_end - fake_heap_start)/1024),
+    SuperPrint(fmt::sprintf_ne(" RAM: %4d/%4dkb", m.uordblks/1024, s_heap_size/1024),
                3, x + 4, YLINE);
     SuperPrint(fmt::sprintf_ne("VRAM: %4d/%4dkb", XRender::s_loadedVRAM/1024, 512),
                3, x + 4, YLINE, XTColorF(0.5f, 1.0f, 0.5f));
 #   else
-    SuperPrint(fmt::sprintf_ne(" RAM: %5d/%5dkb", m.uordblks/1024, (fake_heap_end - fake_heap_start)/1024),
+    SuperPrint(fmt::sprintf_ne(" RAM: %5d/%5dkb", m.uordblks/1024, s_heap_size/1024),
                3, x + 4, YLINE);
 #   endif
 
