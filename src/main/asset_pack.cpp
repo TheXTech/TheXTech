@@ -518,7 +518,7 @@ bool InitUIAssetsFrom(const std::string& id, bool skip_gfx)
     }
 
     if(pack.path.empty())
-        pack.path = ".";
+        return false;
 
     AppPathManager::setCurrentAssetPack(pack.id, pack.path);
     AppPath = AppPathManager::assetsRoot();
