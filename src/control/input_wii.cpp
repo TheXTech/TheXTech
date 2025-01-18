@@ -1252,8 +1252,20 @@ void InputMethodType_Wii::UpdateControlsPost()
         SharedCursor.Move = true;
         SharedCursor.X = scr_x;
         SharedCursor.Y = scr_y;
+    }
 
-        // TODO: put editor edge scrolling logic here
+    // editor edge scrolling logic
+    if(LevelEditor)
+    {
+        if(scr_x < 64)
+            ::EditorControls.ScrollLeft += SDL_min((64 - scr_x) / 2, 32);
+        else if(scr_x > XRender::TargetW - 64)
+            ::EditorControls.ScrollRight += SDL_min((scr_x - (XRender::TargetW - 64)) / 2, 32);
+
+        if(scr_y < 0)
+            ::EditorControls.ScrollUp += SDL_min((0 - scr_y) / 2, 32);
+        else if(scr_y > XRender::TargetH - 64)
+            ::EditorControls.ScrollDown += SDL_min((scr_y - (XRender::TargetH - 64)) / 2, 32);
     }
 }
 
