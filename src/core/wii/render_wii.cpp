@@ -879,28 +879,38 @@ void lazyLoadPicture(StdPicture_Sub& target, const std::string& path, int scaleF
 
         if(SDL_RWclose(fs))
             pLogWarning("lazyLoadPicture: Couldn't close file.");
+
+        return;
     }
-    // lazy load and unload to read dimensions if it doesn't exist.
-    // unload is essential because lazy load would save the address incorrectly.
+
+    // no fallback for tpl
+    if(Files::hasSuffix(target.l.path, ".tpl"))
+    {
+        pLogWarning("lazyLoadPicture: Couldn't open size file. Giving up.");
+        target.inited = false;
+        target.l.path.clear();
+        return;
+    }
+
+    // try to get image metrics for non-TPL
+    PGE_Size tSize;
+
+    if(!GraphicsHelps::getImageMetrics(path, &tSize))
+    {
+        pLogWarning("Error loading of image file:\n"
+                    "%s\n"
+                    "Reason: %s.",
+                    path.c_str(),
+                    (Files::fileExists(path) ? "wrong image format" : "file not exist"));
+
+        target.inited = false;
+        target.l.path.clear();
+        target.l.mask_path.clear();
+    }
     else
     {
-        pLogWarning("lazyLoadPicture: Couldn't open size file.");
-
-        PGE_Size tSize;
-
-        if(!GraphicsHelps::getImageMetrics(path, &tSize))
-        {
-            pLogWarning("Error loading of image file:\n"
-                        "%s\n"
-                        "Reason: %s.",
-                        path.c_str(),
-                        (Files::fileExists(path) ? "wrong image format" : "file not exist"));
-        }
-        else
-        {
-            target.w = tSize.w() * scaleFactor;
-            target.h = tSize.h() * scaleFactor;
-        }
+        target.w = tSize.w() * scaleFactor;
+        target.h = tSize.h() * scaleFactor;
     }
 }
 
