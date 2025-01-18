@@ -675,7 +675,7 @@ bool InitUIAssetsFrom(const std::string& id, bool skip_gfx)
     }
 
     if(pack.path.empty())
-        pack.path = ".";
+        return false;
 
     std::string target_path = s_prepare_assets_path(pack.path);
 
