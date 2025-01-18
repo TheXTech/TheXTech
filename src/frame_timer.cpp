@@ -227,7 +227,7 @@ void PerformanceStats_t::print_obj_stats(int x, int y)
     int items = 5;
     int row = 0;
 
-    XRender::renderRect(x, y, 320, 6 + (18 * items), XTColorF(0.0f, 0.0f, 0.0f, 0.3f), true);
+    XRender::renderRect(x, y, 340, 6 + (18 * items), XTColorF(0.0f, 0.0f, 0.0f, 0.3f), true);
 
     SuperPrint(fmt::sprintf_ne("   DRAW/ACTV/TOTAL"),
         3, x + 4, YLINE, XTColorF(1.f, 1.f, 1.f));
@@ -317,7 +317,7 @@ void PerformanceStats_t::print()
         else
         {
             print_obj_stats(6 + XRender::TargetOverscanX, next_y);
-            s_print_ram(6 + XRender::TargetOverscanX + 320, next_y);
+            s_print_ram(6 + XRender::TargetOverscanX, next_y + 6 + 18 * 5);
         }
     }
     else if(page == 1)
