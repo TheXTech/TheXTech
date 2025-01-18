@@ -453,6 +453,8 @@ int GameMain(const CmdLineSetup_t &setup)
 
     initAll();
 
+    UpdateInternalRes();
+
 //    Unload frmLoader
     gfxLoaderTestMode = setup.testLevelMode;
 
