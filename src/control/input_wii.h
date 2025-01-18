@@ -3,6 +3,7 @@
 
 #include <unordered_map>
 #include <utility>
+#include <array>
 
 #include "../controls.h"
 
@@ -94,6 +95,9 @@ public:
     int m_irActiveChn = -1;
     int m_irLastX = -10;
     int m_irLastY = -10;
+
+    // how many frames has the wiimote been connected?
+    std::array<uint8_t, 4> m_chnConnected{0};
 
     using InputMethodType::Name;
     using InputMethodType::m_profiles;
