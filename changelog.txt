@@ -1,6 +1,6 @@
 TheXTech Changelog.
 
-Changelog for 1.3.7-dev
+Changelog for 1.3.7
 -Fix vanilla peculiarity where medals were sometimes not collected when killed, guarded by "fix-medal-kill" [Modern Mode] (@ds-sloth, thanks to @Superbloxen for the report)
 -Implemented the in-game assert failures will be shown as in-game message box until perform an emergency close on platforms that doesn't have SDL's message box (@Wohlstand)
 -Wii: fix TheXTech 1.3.6.1 inaccuracy in how very small GIF bitmasks are rendered (@ds-sloth)
