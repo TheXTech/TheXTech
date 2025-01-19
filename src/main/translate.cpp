@@ -300,8 +300,11 @@ XTechTranslate::XTechTranslate()
 
 #if defined(CONTROLS_JOYSTICK_STRINGS)
     m_engineMap.insert({"menu.controls.phraseNewProfOldJoy",&g_controlsStrings.phraseNewProfOldJoy});
-    m_engineMap.insert({"menu.controls.joystickSimpleEditor",&g_controlsStrings.joystickSimpleEditor});
     m_engineMap.insert({"menu.controls.types.oldJoystick", &g_controlsStrings.nameOldJoy});
+#endif
+
+#if defined(CONTROLS_JOYSTICK_STRINGS) || defined(CONTROLS_WII_STRINGS)
+    m_engineMap.insert({"menu.controls.joystickSimpleEditor",&g_controlsStrings.joystickSimpleEditor});
 #endif
 
 #if defined(CONTROLS_TOUCHSCREEN_STRINGS)
@@ -387,9 +390,6 @@ XTechTranslate::XTechTranslate()
     m_engineMap.insert({"menu.controls.wii.classic.buttonRT",    &g_controlsStrings.wiiButtonRT});
     m_engineMap.insert({"menu.controls.wii.classic.buttonX",     &g_controlsStrings.wiiButtonX});
     m_engineMap.insert({"menu.controls.wii.classic.buttonY",     &g_controlsStrings.wiiButtonY});
-
-    m_engineMap.insert({"menu.controls.joystickSimpleEditor",    &g_controlsStrings.joystickSimpleEditor});
-
 #endif // #ifdef CONTROLS_WII_STRINGS
 
     m_engineMap.insert({"menu.wordNo",         &g_mainMenu.wordNo});

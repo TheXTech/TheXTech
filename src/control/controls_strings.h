@@ -72,6 +72,9 @@ struct ControlsStrings_t
 #if defined(CONTROLS_JOYSTICK_STRINGS)
     std::string nameOldJoy = "Old Joy";
     std::string phraseNewProfOldJoy = "New Profile for Old Joystick";
+#endif
+
+#if defined(CONTROLS_JOYSTICK_STRINGS) || defined(CONTROLS_WII_STRINGS)
     std::string joystickSimpleEditor = "Simple Editor Controls";
 #endif
 
@@ -165,8 +168,6 @@ struct ControlsStrings_t
     std::string wiiCaseIR = "(IR)";
 
     std::string wiiTypeGamecube = "GameCube";
-
-    std::string joystickSimpleEditor = "Simple Editor Controls";
 
 #endif // #ifdef CONTROLS_WII_STRINGS
 
