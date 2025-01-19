@@ -358,7 +358,7 @@ int menuControls_Mouse_Render(bool mouse, bool render)
                 s_controller_type_marquee[p].advance(print_spec);
                 SuperPrintMarquee(Controls::g_InputMethods[p]->Name, 5, lX, sY+(max_line-4)*line, print_spec, s_controller_type_marquee[p]);
 
-                RenderControls(p + 1, cX - 76 / 2, sY + (max_line - 3) * line - (line - 18) / 2 + 2, 76, 30, false, 255, true);
+                RenderControls(p, cX - 76 / 2, sY + (max_line - 3) * line - (line - 18) / 2 + 2, 76, 30, false, 255, true);
 
                 // should never be null
                 if(Controls::g_InputMethods[p]->Profile != nullptr)

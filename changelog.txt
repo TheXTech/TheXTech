@@ -53,6 +53,7 @@ Changelog for 1.3.7-dev
 -3DS: display system and video memory usage in Debug Info screen (@ds-sloth)
 -Add support for TTF fonts up to 24x24 (@ds-sloth)
 -Allow customization of TTF colour of fonts (@ds-sloth)
+-Fix TheXTech 1.3.7-beta bug where the controller preview on the controls menu was inaccurate (@ds-sloth)
 
 Changelog for 1.3.7-beta
 -Add ability to trigger event layer smoke in the in-game editor (@ds-sloth)
