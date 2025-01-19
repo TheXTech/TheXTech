@@ -30,6 +30,7 @@
 
 #include "control/controls_strings.h"
 #include "main/menu_main.h"
+#include "game_main.h"
 
 #include <Logger/logger.h>
 
@@ -263,7 +264,7 @@ bool InputMethod_GameCube::Update(int player, Controls_t& c, CursorControls_t& m
             key_start = 4;
             key_max = EditorControls::n_buttons;
 
-            if(p->m_simple_editor && LevelEditor)
+            if(p->m_simple_editor && LevelEditor && GamePaused == PauseCode::None)
                 continue;
         }
         else
@@ -317,7 +318,7 @@ bool InputMethod_GameCube::Update(int player, Controls_t& c, CursorControls_t& m
     }
 
     // simple editor controls
-    if(p->m_simple_editor && LevelEditor)
+    if(p->m_simple_editor && LevelEditor && GamePaused == PauseCode::None)
     {
         CursorControls::GetButton(m, CursorControls::Buttons::Primary) = PlayerControls::GetButton(c, PlayerControls::Buttons::Jump);
         CursorControls::GetButton(m, CursorControls::Buttons::Secondary) = false;
@@ -339,7 +340,7 @@ bool InputMethod_GameCube::Update(int player, Controls_t& c, CursorControls_t& m
 
     for(int i = 0; i < 4; i++)
     {
-        if(p->m_simple_editor && LevelEditor)
+        if(p->m_simple_editor && LevelEditor && GamePaused == PauseCode::None)
         {
             cursor[i] += s_get_button_dbl(data, p->m_keys[i]);
             cursor[i] += s_get_button_dbl(data, p->m_keys2[i]);
