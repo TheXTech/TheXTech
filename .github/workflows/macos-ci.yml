@@ -26,7 +26,7 @@ jobs:
         # The side game about Demo and siblings from the A2XT universe by raocow and his fan community.
         - {
             name: "macOS Universal",
-            os: macos-latest-large,
+            os: macos-13,
             extra_options: "-DTHEXTECH_PRELOAD_ENVIRONMENT_MANUALLY=ON -DTHEXTECH_EXECUTABLE_NAME=\"thextech\"",
             deps_cmdline: "brew install ninja wget p7zip lftp",
             generator: "Ninja",
