@@ -972,6 +972,7 @@ elseif(NINTENDO_WII)
     add_definitions(-DWINDOW_CUSTOM -DMSGBOX_CUSTOM -DEVENTS_CUSTOM -DRENDER_CUSTOM)
     list(APPEND THEXTECH_SRC
         src/control/input_wii.cpp
+        src/control/input_wii_gc.cpp
         src/core/minport/render_minport_shared.cpp
         src/core/wii/render_wii.cpp
         src/core/wii/window_wii.cpp

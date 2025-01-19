@@ -525,6 +525,7 @@
                 "typeClassic": "Classic",
                 "typeNunchuck": "Nunchuck",
                 "typeWiimote": "Wiimote",
+                "typeGamecube": "GameCube",
                 "wiimote": {
                     "button1": "1",
                     "button2": "2",

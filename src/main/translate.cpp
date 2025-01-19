@@ -360,6 +360,7 @@ XTechTranslate::XTechTranslate()
     m_engineMap.insert({"menu.controls.wii.typeWiimote",         &g_controlsStrings.wiiTypeWiimote});
     m_engineMap.insert({"menu.controls.wii.typeNunchuck",        &g_controlsStrings.wiiTypeNunchuck});
     m_engineMap.insert({"menu.controls.wii.typeClassic",         &g_controlsStrings.wiiTypeClassic});
+    m_engineMap.insert({"menu.controls.wii.typeGamecube",        &g_controlsStrings.wiiTypeGamecube});
     m_engineMap.insert({"menu.controls.wii.phraseNewNunchuck",   &g_controlsStrings.wiiPhraseNewNunchuck});
     m_engineMap.insert({"menu.controls.wii.phraseNewClassic",    &g_controlsStrings.wiiPhraseNewClassic});
 
@@ -386,6 +387,8 @@ XTechTranslate::XTechTranslate()
     m_engineMap.insert({"menu.controls.wii.classic.buttonRT",    &g_controlsStrings.wiiButtonRT});
     m_engineMap.insert({"menu.controls.wii.classic.buttonX",     &g_controlsStrings.wiiButtonX});
     m_engineMap.insert({"menu.controls.wii.classic.buttonY",     &g_controlsStrings.wiiButtonY});
+
+    m_engineMap.insert({"menu.controls.joystickSimpleEditor",    &g_controlsStrings.joystickSimpleEditor});
 
 #endif // #ifdef CONTROLS_WII_STRINGS
 

@@ -749,6 +749,9 @@ void Init()
 #ifdef INPUT_WII_H
     g_InputMethodTypes.push_back(new InputMethodType_Wii);
 #endif
+#ifdef INPUT_WII_GC_H
+    g_InputMethodTypes.push_back(new InputMethodType_GameCube);
+#endif
 #ifdef INPUT_16M_H
     g_InputMethodTypes.push_back(new InputMethodType_16M);
 #endif

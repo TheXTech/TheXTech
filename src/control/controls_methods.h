@@ -30,6 +30,7 @@
 #elif defined(__WII__)
 
 #include "control/input_wii.h"
+#include "control/input_wii_gc.h"
 
 #elif defined(__16M__)
 

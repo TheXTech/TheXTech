@@ -164,6 +164,10 @@ struct ControlsStrings_t
 
     std::string wiiCaseIR = "(IR)";
 
+    std::string wiiTypeGamecube = "GameCube";
+
+    std::string joystickSimpleEditor = "Simple Editor Controls";
+
 #endif // #ifdef CONTROLS_WII_STRINGS
 
 
