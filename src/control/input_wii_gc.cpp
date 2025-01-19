@@ -456,6 +456,9 @@ InputMethodProfile_GameCube::InputMethodProfile_GameCube()
     this->m_keys2[PlayerControls::Buttons::Left] = PAD_STICK_LL;
     this->m_keys2[PlayerControls::Buttons::Right] = PAD_STICK_LR;
 
+    this->m_keys2[PlayerControls::Buttons::AltJump] = PAD_BUTTON_R;
+    this->m_keys2[PlayerControls::Buttons::AltRun] = PAD_BUTTON_L;
+
     // clear all of the non-standard controls, then fill in some of them
     for(size_t i = 0; i < CursorControls::n_buttons; i++)
     {
