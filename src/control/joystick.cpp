@@ -37,6 +37,7 @@
 
 #include "main/menu_main.h"
 #include "control/controls_strings.h"
+#include "game_main.h"
 
 namespace Controls
 {
@@ -452,7 +453,7 @@ bool InputMethod_Joystick::Update(int player, Controls_t& c, CursorControls_t& m
             key_start = 4;
             key_max = EditorControls::n_buttons;
 
-            if(p->m_simple_editor && LevelEditor)
+            if(p->m_simple_editor && LevelEditor && GamePaused == PauseCode::None)
                 continue;
         }
         else
@@ -505,7 +506,7 @@ bool InputMethod_Joystick::Update(int player, Controls_t& c, CursorControls_t& m
     }
 
     // simple editor controls
-    if(p->m_simple_editor && LevelEditor)
+    if(p->m_simple_editor && LevelEditor && GamePaused == PauseCode::None)
     {
         CursorControls::GetButton(m, CursorControls::Buttons::Primary) = PlayerControls::GetButton(c, PlayerControls::Buttons::Jump);
         CursorControls::GetButton(m, CursorControls::Buttons::Secondary) = false;
@@ -529,7 +530,7 @@ bool InputMethod_Joystick::Update(int player, Controls_t& c, CursorControls_t& m
     {
         for(int i = 0; i < 4; i++)
         {
-            if(p->m_simple_editor && LevelEditor)
+            if(p->m_simple_editor && LevelEditor && GamePaused == PauseCode::None)
             {
                 s_updateCtrlAnalogue(this->m_devices->ctrl, cursor[i], p->m_keys[i], 0.5);
                 s_updateCtrlAnalogue(this->m_devices->ctrl, cursor[i], p->m_keys2[i], 0.5);
@@ -547,7 +548,7 @@ bool InputMethod_Joystick::Update(int player, Controls_t& c, CursorControls_t& m
     {
         for(int i = 0; i < 4; i++)
         {
-            if(p->m_simple_editor && LevelEditor)
+            if(p->m_simple_editor && LevelEditor && GamePaused == PauseCode::None)
             {
                 s_updateJoystickAnalogue(this->m_devices->joy, cursor[i], p->m_keys[i], 0.5);
                 s_updateJoystickAnalogue(this->m_devices->joy, cursor[i], p->m_keys2[i], 0.5);
