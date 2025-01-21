@@ -206,6 +206,8 @@ option(THEXTECH_ENABLE_NEW_USER_PATHS "Use new default paths for user directory 
 option(THEXTECH_ENABLE_WIP_FEATURES "Enable experimental and incomplete features (disabled by default)" OFF)
 mark_as_advanced(THEXTECH_ENABLE_WIP_FEATURES)
 
+option(THEXTECH_NO_BUILD_DATE "Disables the using of the build timestamp in order to make the build reproducible" OFF)
+
 option(THEXTECH_ENABLE_AUDIO_FX "Enable real-time audio effects support" ON)
 
 option(ENABLE_ADDRESS_SANITIZER "Enable the Address Sanitizer GCC feature" OFF)
@@ -1404,6 +1406,10 @@ if(THEXTECH_ENABLE_WIP_FEATURES)
 endif()
 
 target_compile_definitions(thextech PRIVATE -DTHEXTECH_DIRECTORY_PREFIX="${THEXTECH_DIRECTORY_PREFIX}")
+
+if(THEXTECH_NO_BUILD_DATE)
+    target_compile_definitions(thextech PRIVATE -DDISABLE_XTECH_BUILD_DATE)
+endif()
 
 if(THEXTECH_ENABLE_LUA)
     target_compile_definitions(thextech PRIVATE -DENABLE_XTECH_LUA)

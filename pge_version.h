@@ -201,8 +201,11 @@
 
 
 // --------------- Date and time of the build ---------------
-
-#define V_DATE_OF_BUILD __DATE__ " " __TIME__
+#ifndef DISABLE_XTECH_BUILD_DATE
+#   define V_DATE_OF_BUILD __DATE__ " " __TIME__
+#else
+#   define V_DATE_OF_BUILD "<Build timestamp disabled>"
+#endif
 
 
 
