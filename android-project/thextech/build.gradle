@@ -184,12 +184,6 @@ android {
             } else {
                 applicationIdSuffix = '.fdroid'
             }
-
-            if(project.hasProperty('versionNameSuffix')) {
-                versionNameSuffix += '-FDROID'
-            } else {
-                versionNameSuffix = '-FDROID'
-            }
         }
     }
 
