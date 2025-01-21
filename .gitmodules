@@ -26,10 +26,6 @@
 	path = 3rdparty/freetype
 	url = https://github.com/TheXTech/freetype.git
 	branch = master
-[submodule "3rdparty/harfbuzz"]
-	path = 3rdparty/harfbuzz
-	url = https://github.com/TheXTech/harfbuzz.git
-    branch = main
 [submodule "3rdparty/thextech-discord-rpc"]
 	path = 3rdparty/thextech-discord-rpc
 	url = https://github.com/TheXTech/thextech-discord-rpc.git
