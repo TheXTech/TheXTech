@@ -75,6 +75,25 @@ def cmakeToVersionCode(verNum) {
     return ret
 }
 
+def cmakeToClearVersionCode(verNum) {
+    def ret = ""
+
+    ret += verNum[0].toString()
+    ret += "." + verNum[1].toString()
+    if (verNum[2] > 0 || verNum[3] > 0) {
+        ret += "." + verNum[2].toString()
+        if (verNum[3] > 0) {
+            ret += "." + verNum[3].toString()
+        }
+    }
+
+    if (verNum[5] != "") {
+        ret += verNum[5]
+    }
+
+    return ret
+}
+
 def verNum = [
     0: 0, // major
     1: 0, // minor
@@ -86,9 +105,10 @@ def verNum = [
 
 parseVersion(verNum)
 def xTechVersionString = cmakeToVersionCode(verNum)
+def xTechVersionStringClear = cmakeToClearVersionCode(verNum)
 def xTechVersionNumber = (verNum[0] * 1000000) + (verNum[1] * 10000) + (verNum[2] * 100) + verNum[3]
 
-println "Project version: " + xTechVersionString + ", version code: " + xTechVersionNumber.toString()
+println "Project version: " + xTechVersionString + " (Clear version: " + xTechVersionStringClear + ", version code: " + xTechVersionNumber.toString()
 
 android {
     compileSdk 34
@@ -156,7 +176,8 @@ android {
         apk {}
         fdroid {
             defaultConfig.externalNativeBuild.cmake.arguments += "-DTHEXTECH_NO_BUILD_DATE=ON"
-            println "Project CMake arguments: " + defaultConfig.externalNativeBuild.cmake.arguments
+            defaultConfig.versionName = xTechVersionStringClear
+            println "Project CMake arguments: " + defaultConfig.externalNativeBuild.cmake.arguments + ", clear version string: " + defaultConfig.versionName
 
             if(project.hasProperty('applicationIdSuffix')) {
                 applicationIdSuffix += '.fdroid'
