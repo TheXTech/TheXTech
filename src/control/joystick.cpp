@@ -1735,7 +1735,6 @@ InputMethod* InputMethodType_Joystick::Poll(const std::vector<InputMethod*>& act
     for(std::pair<const int, JoystickDevices*>& p : this->m_availableJoysticks)
     {
         SDL_Joystick* joy = p.second->joy;
-        SDL_GameController* ctrl = p.second->ctrl;
         bool duplicate = false;
 
         for(InputMethod* method : active_methods)
@@ -1757,14 +1756,13 @@ InputMethod* InputMethodType_Joystick::Poll(const std::vector<InputMethod*>& act
             continue;
 
         KM_Key k;
-        if(ctrl)
-            s_bindControllerKey(ctrl, k);
-        else
-            s_bindJoystickKey(joy, k);
+        s_bindJoystickKey(joy, k);
 
         // can_poll is set as false on joystick initialization and unbinding
         if(k.type == KM_Key::NoControl)
+        {
             p.second->can_poll = true;
+        }
         else if(p.second->can_poll)
         {
             active_joystick = p.second;
