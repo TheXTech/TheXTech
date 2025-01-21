@@ -435,7 +435,8 @@
                 "phraseNewClassic": "Novo Perfil - Classic",
                 "phraseNewNunchuck": "Novo Perfil - Nunchuck",
                 "typeClassic": "Classic",
-                "typeWiimote": "Wiimote"
+                "typeWiimote": "Wiimote",
+                "typeGamecube": ""
             },
             "hotkeys": {
                 "enterCheats": "Comandos",
@@ -592,12 +593,12 @@
                 "internal-res-4p": {
                     "qhd": "2560x1440 (QHD)",
                     "fhd": "1920x1080 (FHD)",
-                    "default": "",
+                    "default": "Padrão",
                     "qsmbx": "1600x1200 (QSMBX)",
                     "_name": ""
                 },
-                "_tooltip": "",
-                "_header": "",
+                "_tooltip": "Opções técnicas para operações internas",
+                "_header": "Avançado",
                 "advanced-video": "Vídeo",
                 "advanced-audio": "Áudio",
                 "audio-buffer-size": {
@@ -618,21 +619,21 @@
                     "warning": "Aviso",
                     "none": "Nada"
                 },
-                "choose-assets-on-launch": "",
+                "choose-assets-on-launch": "Escolher assets ao iniciar",
                 "record-gameplay-data": "Gravar jogatina",
                 "scale-down-textures": {
-                    "_tooltip": "",
-                    "_name": "",
-                    "safe-tip": "",
-                    "safe": "",
-                    "none-tip": "",
+                    "_tooltip": "Armazena imagens como 1x para economizar memória",
+                    "_name": "Reduzir escala das imagens",
+                    "safe-tip": "Verifica se as imagens estão no formato 2x",
+                    "safe": "Seguro",
+                    "none-tip": "Menos travamentos",
                     "none": "Nenhum",
-                    "all-tip": "",
-                    "all": ""
+                    "all-tip": "Menos travamentos no carregamento do que 'Seguro'",
+                    "all": "Todas"
                 }
             },
             "main": {
-                "_header": "",
+                "_header": "Principal",
                 "background-work": "",
                 "four-screen-mode": {
                     "_name": "",
@@ -721,7 +722,7 @@
                 "video-system": "",
                 "show-screen-shake": "",
                 "world-map-stars-show": "",
-                "_header": "",
+                "_header": "Vídeo",
                 "show-medals-counter-tip": "",
                 "3d-compat-mode-tip": "",
                 "world-map-stars-show-tip": "",
@@ -739,7 +740,7 @@
             },
             "audio": {
                 "sfx-audio-fx": "Efeitos de eco",
-                "sfx-spatial-audio": "",
+                "sfx-spatial-audio": "Som espacial",
                 "sfx-modern": "Efeitos modernos",
                 "sfx-modern-tip": "",
                 "sfx-pet-beat": "",
@@ -747,7 +748,7 @@
                 "_header": "Áudio",
                 "audio-prefs": "Referências",
                 "audio-music-volume": "Volume da música",
-                "sfx-spatial-audio-tip": "",
+                "sfx-spatial-audio-tip": "Reduz o volume de sons fora da tela",
                 "sfx-pet-beat-tip": ""
             },
             "episode-options": {
@@ -778,7 +779,7 @@
                 "features": ""
             },
             "controls": {
-                "_header": ""
+                "_header": "Controles"
             },
             "view-credits": {
                 "_header": "Ver créditos"
