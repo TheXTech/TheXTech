@@ -1967,7 +1967,16 @@ bool InputMethodType_Joystick::OpenJoystick(int joystick_index)
         devices->ctrl = SDL_GameControllerOpen(joystick_index);
 
         if(devices->ctrl)
+        {
             pLogDebug("    successfully opened game controller!");
+
+            s_bindControllerKey(devices->ctrl, key);
+
+            if(key.type == KM_Key::NoControl)
+                pLogDebug("    No buttons held");
+            else
+                pLogDebug("    Button held: %s", s_nameButton(key));
+        }
         else
             pLogDebug("    could not open.");
     }
