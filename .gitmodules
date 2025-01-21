@@ -55,3 +55,4 @@
 [submodule "mbediso"]
 	path = 3rdparty/mbediso
 	url = https://github.com/ds-sloth/mbediso/
+	branch = main
