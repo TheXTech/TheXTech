@@ -406,13 +406,14 @@ include(cmake/library_zlib.cmake)
 add_definitions("-DMOONDUST_LOGGER_FILENAME_PREFIX=\"TheXTech\"")
 
 if(THEXTECH_ENABLE_TTF_SUPPORT)
-    option(THEXTECH_ENABLE_TTF_HARFBUZZ "Enable the HarfBuzz library use" OFF)
-    mark_as_advanced(THEXTECH_ENABLE_TTF_HARFBUZZ) # Temporarily disable
-    if(THEXTECH_ENABLE_TTF_HARFBUZZ AND NOT NINTENDO_3DS)
-        include(cmake/library_HarfBuzz.cmake)
-    else()
-        set(FT_DISABLE_HARFBUZZ ON)
-    endif()
+#    option(THEXTECH_ENABLE_TTF_HARFBUZZ "Enable the HarfBuzz library use" OFF)
+#    mark_as_advanced(THEXTECH_ENABLE_TTF_HARFBUZZ) # Temporarily disable
+#    if(THEXTECH_ENABLE_TTF_HARFBUZZ AND NOT NINTENDO_3DS)
+#        include(cmake/library_HarfBuzz.cmake)
+#    else()
+#        set(FT_DISABLE_HARFBUZZ ON)
+#    endif()
+    set(FT_DISABLE_HARFBUZZ ON)
     include(cmake/library_FreeType.cmake)
 endif()
 
