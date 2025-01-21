@@ -155,6 +155,9 @@ android {
     productFlavors {
         apk {}
         fdroid {
+            defaultConfig.externalNativeBuild.cmake.arguments += "-DTHEXTECH_NO_BUILD_DATE=ON"
+            println "Project CMake arguments: " + defaultConfig.externalNativeBuild.cmake.arguments
+
             if(project.hasProperty('applicationIdSuffix')) {
                 applicationIdSuffix += '.fdroid'
             } else {

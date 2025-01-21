@@ -199,7 +199,9 @@ static const char *g_messageToUser =
     "- Operating system:  " OPERATION_SYSTEM "\n"
     "- GIT Revision code: #" V_BUILD_VER "\n"
     "- GIT branch:        " V_BUILD_BRANCH "\n"
+#ifndef DISABLE_XTECH_BUILD_DATE
     "- Build date:        " V_DATE_OF_BUILD "\n"
+#endif
     "================================================\n"
 #ifndef THEXTECH_NO_SDL_BUILD
     "SDL2 version:        " STRR(SDL_MAJOR_VERSION) "." STRR(SDL_MINOR_VERSION) "." STRR(SDL_PATCHLEVEL) "\n"
