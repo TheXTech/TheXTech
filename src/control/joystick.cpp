@@ -1735,6 +1735,7 @@ InputMethod* InputMethodType_Joystick::Poll(const std::vector<InputMethod*>& act
     for(std::pair<const int, JoystickDevices*>& p : this->m_availableJoysticks)
     {
         SDL_Joystick* joy = p.second->joy;
+        SDL_GameController* ctrl = p.second->ctrl;
         bool duplicate = false;
 
         for(InputMethod* method : active_methods)
@@ -1756,13 +1757,14 @@ InputMethod* InputMethodType_Joystick::Poll(const std::vector<InputMethod*>& act
             continue;
 
         KM_Key k;
-        s_bindJoystickKey(joy, k);
+        if(ctrl)
+            s_bindControllerKey(ctrl, k);
+        else
+            s_bindJoystickKey(joy, k);
 
         // can_poll is set as false on joystick initialization and unbinding
         if(k.type == KM_Key::NoControl)
-        {
             p.second->can_poll = true;
-        }
         else if(p.second->can_poll)
         {
             active_joystick = p.second;
@@ -1935,6 +1937,17 @@ bool InputMethodType_Joystick::OpenJoystick(int joystick_index)
     pLogDebug("  Number of Axes: %d", SDL_JoystickNumAxes(joy));
     pLogDebug("  Number of Buttons: %d", SDL_JoystickNumButtons(joy));
     pLogDebug("  Number of Balls: %d", SDL_JoystickNumBalls(joy));
+
+    KM_Key key;
+    s_bindJoystickKey(joy, key);
+
+    if(key.type == KM_Key::NoControl)
+        pLogDebug("  No buttons held");
+    else if(key.type < 5)
+    {
+        const char* helper[] = {"Ax", "Bx", "By", "Hat", "But"};
+        pLogDebug("  Button held: %s %d %d", helper[key.type], key.id, key.val);
+    }
 
     JoystickDevices* devices = new(std::nothrow) JoystickDevices;
 
