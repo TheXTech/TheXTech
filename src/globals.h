@@ -474,6 +474,8 @@ struct NPC_t
     bool DefaultStuck : 1;
     // EXTRA (private to npc_activation.cpp): stores whether the NPC needs to use an event logic screen for activation
     bool _priv_force_canonical : 1;
+    // EXTRA (private to npc_activation.cpp): stores whether the NPC has an activation event to hide self
+    bool _priv_self_hide_event : 1;
     // EXTRA: used only for vines spawned by vine head
     bool DefaultLocationHeight_Force32 : 1;
 
@@ -512,6 +514,7 @@ struct NPC_t
     NPC_t() : TurnAround(false), onWall(false), TurnBackWipe(false), GeneratorActive(false),
         playerTemp(false), Legacy(false), Chat(false), NoLavaSplash(false),
         Bouce(false), DefaultStuck(false), _priv_force_canonical(false),
+        _priv_self_hide_event(false),
         DefaultLocationHeight_Force32(false) {}
 
 };
