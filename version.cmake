@@ -5,13 +5,13 @@ set(THEXTECH_VERSION_2 3)
 # Revision
 set(THEXTECH_VERSION_3 7)
 # Patch
-set(THEXTECH_VERSION_4 0)
+set(THEXTECH_VERSION_4 1)
 # Type of version: "-alpha","-beta","-dev", or "" aka "release"
-set(THEXTECH_VERSION_REL "")
+set(THEXTECH_VERSION_REL "-dev")
 
 # Static version values for F-Droid to parse (PLEASE KEEP IT IN SYNC WITH VERSION NUMBER PARTS FROM ABOVE)
-set(THEXTECH_ANDROID_VERSION_NAME "1.3.7")
-set(THEXTECH_ANDROID_VERSION_CODE "1030700")
+set(THEXTECH_ANDROID_VERSION_NAME "1.3.7.1-dev")
+set(THEXTECH_ANDROID_VERSION_CODE "1030701")
 
 # Defining global macros
 add_definitions(-DTHEXTECH_VERSION_1=${THEXTECH_VERSION_1})
