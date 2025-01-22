@@ -92,7 +92,8 @@ bool NPC_MustBeCanonical(NPCRef_t n)
 bool NPC_InactiveIgnore(const NPC_t& n)
 {
     return (n->IsFish && n.Special == 2)
-        || n->InactiveRender == NPCTraits_t::SKIP;
+        || n->InactiveRender == NPCTraits_t::SKIP
+        || n._priv_self_hide_event;
 }
 
 bool NPC_InactiveRender(const NPC_t& n)
@@ -119,6 +120,21 @@ void NPC_ConstructCanonicalSet()
         {
             NPC[n]._priv_force_canonical = true;
             to_check.push_back(n);
+        }
+
+        // check if NPC has a hide self event
+        if(NPC[n].TriggerActivate != EVENT_NONE && NPC[n].Layer != LAYER_NONE && NPC[n].Layer != LAYER_DEFAULT)
+        {
+            const Events_t& e = Events[NPC[n].TriggerActivate];
+
+            for(layerindex_t l : e.HideLayer)
+            {
+                if(l == NPC[n].Layer)
+                {
+                    NPC[n]._priv_self_hide_event = true;
+                    break;
+                }
+            }
         }
     }
 

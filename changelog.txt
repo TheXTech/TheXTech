@@ -10,6 +10,7 @@ Changelog for 1.3.8-dev
 
 Changelog for 1.3.7.1-dev
 -Add GameCube controller support for Wii (@ds-sloth)
+-Fix TheXTech 1.3.7 peculiarity where NPCs that hid themselves on activation would be shown before coming onscreen (@ds-sloth)
 
 Changelog for 1.3.7
 -Fix vanilla peculiarity where medals were sometimes not collected when killed, guarded by "fix-medal-kill" [Modern Mode] (@ds-sloth, thanks to @Superbloxen for the report)
