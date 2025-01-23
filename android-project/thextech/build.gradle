@@ -232,6 +232,7 @@ dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'jniLibs')
     //noinspection GradleDependency: the version 1.6.1 is last that support minSDK 16, newer version will require MinSDK 21
     implementation 'androidx.appcompat:appcompat:1.6.1'
+    //noinspection GradleDependency: the version 2.1.4 is last that support minSDK 16, newer version will require MinSDK 21
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     def lifecycle_version = "2.6.2"
     //noinspection GradleDependency: the version 2.6.2 is last that support minSDK 16, newer version will require MinSDK 19
