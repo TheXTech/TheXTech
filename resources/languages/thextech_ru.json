@@ -535,7 +535,8 @@
                     "caseIR": "(ИК)",
                     "dPad": "Крест.",
                     "shake": "Встряска"
-                }
+                },
+                "typeGamecube": "GameCube"
             },
             "wordButtons": "Кнопки",
             "wordProfiles": "Профили",
