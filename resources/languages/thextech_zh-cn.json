@@ -535,7 +535,8 @@
                     "caseIR": "（IR）",
                     "dPad": "十字键",
                     "shake": "摇晃"
-                }
+                },
+                "typeGamecube": "GC控制器"
             },
             "wordButtons": "按键",
             "wordProfiles": "配置",
