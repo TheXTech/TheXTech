@@ -30,13 +30,45 @@ namespace XMessage
 
 static std::deque<Message> s_message_vector;
 
+static Controls_t s_last_controls[maxNetplayPlayers + 1];
+
+void Handle(const Message& m)
+{
+    if(m.type == Type::press || m.type == Type::release)
+    {
+        if(m.screen >= maxNetplayClients || m.player >= maxLocalPlayers || m.message >= Controls::PlayerControls::n_buttons)
+            return;
+
+        auto& controls = s_last_controls[Screens[m.screen].players[m.player]];
+        bool& button = Controls::PlayerControls::GetButton(controls, m.message);
+        bool is_press = (m.type == Type::press);
+
+        button = is_press;
+    }
+}
+
 void Tick()
 {
     // eventually sync state with other clients here
+
+    // update player controls based on message queue
+    Message m;
+    while((m = PopMessage()))
+        Handle(m);
+
+    int numPlayers_p = numPlayers;
+
+    // fix a bug affecting main menu dead mode
+    if(GameMenu || GameOutro)
+        numPlayers_p = maxLocalPlayers;
+
+    for(int A = 1; A <= numPlayers_p && A <= maxNetplayPlayers; A++)
+        Player[A].Controls = s_last_controls[A];
 }
 
 void PushMessage(Message message)
 {
+    message.screen = l_screen - &Screens[0];
     s_message_vector.push_back(message);
 }
 
@@ -56,7 +88,6 @@ void PushControls(int l_player_i, const Controls_t& controls)
     Controls_t& last_controls = Controls::g_RawControls[l_player_i];
 
     Message m;
-    m.screen = l_screen - &Screens[0];
     m.player = l_player_i;
 
     for(uint8_t i = 0; i < Controls::PlayerControls::n_buttons; i++)

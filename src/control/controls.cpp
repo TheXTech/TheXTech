@@ -805,8 +805,6 @@ bool ProcessEvent(const SDL_Event* ev)
     return false;
 }
 
-static Controls_t s_last_controls[maxNetplayPlayers + 1];
-
 // 1. Calls the UpdateControlsPre hooks of loaded InputMethodTypes
 //    a. Syncs hardware state as needed
 // 2. Updates Player and Editor controls by calling currently bound InputMethods
@@ -864,30 +862,8 @@ bool Update(bool check_lost_devices)
     for(InputMethodType* type : g_InputMethodTypes)
         type->UpdateControlsPost();
 
-    // sync any messages
+    // sync any messages, and reset player controls to raw controls
     XMessage::Tick();
-
-    // update player controls based on message queue
-    XMessage::Message m;
-    while((m = XMessage::PopMessage()))
-    {
-        if(m.type == XMessage::Type::press || m.type == XMessage::Type::release)
-        {
-            if(m.screen >= maxNetplayClients || m.player >= maxLocalPlayers || m.message >= PlayerControls::n_buttons)
-                continue;
-
-            PlayerControls::GetButton(s_last_controls[Screens[m.screen].players[m.player]], m.message) = (m.type == XMessage::Type::press);
-        }
-    }
-
-    int numPlayers_p = numPlayers;
-
-    // fix a bug affecting main menu dead mode
-    if(GameMenu || GameOutro)
-        numPlayers_p = maxLocalPlayers;
-
-    for(int A = 1; A <= numPlayers_p && A <= maxNetplayPlayers; A++)
-        Player[A].Controls = s_last_controls[A];
 
     // check for legacy pause key
     if(g_hotkeysPressed[Hotkeys::Buttons::LegacyPause] != -1)
