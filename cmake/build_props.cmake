@@ -235,6 +235,19 @@ if(ANDROID)
         set(ANDROID_PLATFORM 16)
     endif()
 
+    if(FDROID)
+        set(FILE_PATH_OVERRIDE "-ffile-prefix-map=${CMAKE_SOURCE_DIR}=/builds/fdroid/fdroiddata/build/ru.wohlsoft.thextech.fdroid/")
+        set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} ${FILE_PATH_OVERRIDE}")
+        set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${FILE_PATH_OVERRIDE}")
+        set(CMAKE_C_FLAGS_RELWITHDEBINFO "${CMAKE_C_FLAGS_RELWITHDEBINFO} ${FILE_PATH_OVERRIDE}")
+        set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} ${FILE_PATH_OVERRIDE}")
+        set(CMAKE_C_FLAGS_MINSIZEREL "${CMAKE_C_FLAGS_MINSIZEREL} ${FILE_PATH_OVERRIDE}")
+        set(CMAKE_CXX_FLAGS_MINSIZEREL "${CMAKE_CXX_FLAGS_MINSIZEREL} ${FILE_PATH_OVERRIDE}")
+        set(CMAKE_SHARED_LINKER_FLAGS "-Wl,--build-id=none")
+        set(ENV{CFLAGS} "${FILE_PATH_OVERRIDE}")
+        set(ENV{CXXFLAGS} "${FILE_PATH_OVERRIDE}")
+    endif()
+
     set(ANDROID_CMAKE_FLAGS
         "-DANDROID_ABI=${ANDROID_ABI}"
         "-DANDROID_NDK=${ANDROID_NDK}"
@@ -246,6 +259,21 @@ if(ANDROID)
         "-DCMAKE_MAKE_PROGRAM=${CMAKE_MAKE_PROGRAM}"
         "-DANDROID_ARM_NEON=${ANDROID_ARM_NEON}"
     )
+
+    if(FDROID)
+        # Ensure reproducibility of builds by replacing build paths with a custom one
+        # So, forward all flags that was set above into dependencies
+        list(APPEND ANDROID_CMAKE_FLAGS
+            "-DCMAKE_SHARED_LINKER_FLAGS=-Wl,--build-id=none"
+            "-DCMAKE_C_FLAGS_RELEASE=${CMAKE_C_FLAGS_RELEASE}"
+            "-DCMAKE_CXX_FLAGS_RELEASE=${CMAKE_CXX_FLAGS_RELEASE}"
+            "-DCMAKE_C_FLAGS_RELWITHDEBINFO=${CMAKE_C_FLAGS_RELWITHDEBINFO}"
+            "-DCMAKE_CXX_FLAGS_RELWITHDEBINFO=${CMAKE_CXX_FLAGS_RELWITHDEBINFO}"
+            "-DCMAKE_C_FLAGS_MINSIZEREL=${CMAKE_C_FLAGS_MINSIZEREL}"
+            "-DCMAKE_CXX_FLAGS_MINSIZEREL=${CMAKE_CXX_FLAGS_MINSIZEREL}"
+            "-DFDROID=TRUE"
+        )
+    endif()
 endif()
 
 if(VITA)

@@ -175,7 +175,7 @@ android {
     productFlavors {
         apk {}
         fdroid {
-            defaultConfig.externalNativeBuild.cmake.arguments += "-DTHEXTECH_NO_BUILD_DATE=ON"
+            defaultConfig.externalNativeBuild.cmake.arguments += ["-DTHEXTECH_NO_BUILD_DATE=ON", "-DFDROID=TRUE"]
             defaultConfig.versionName = xTechVersionStringClear
             println "Project CMake arguments: " + defaultConfig.externalNativeBuild.cmake.arguments + ", clear version string: " + defaultConfig.versionName
 
