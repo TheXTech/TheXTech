@@ -637,7 +637,7 @@ void TouchBonus(int A, int B)
             s_MovePlayersToExit(A);
 
             StopMusic();
-            XEvents::doEvents();
+            // XEvents::doEvents();
             PlaySound(SFX_CardRouletteClear);
         }
         else if(NPC[B].Type == NPCID_GOALORB_S3)

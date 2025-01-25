@@ -3063,7 +3063,7 @@ void NPCSpecial(int A)
                             }
 
                             StopMusic();
-                            XEvents::doEvents();
+                            // XEvents::doEvents();
                             PlaySound(SFX_TapeExit);
                             break;
                         }
