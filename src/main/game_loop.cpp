@@ -236,7 +236,14 @@ resume_IntroEvents:
     g_microStats.start_task(MicroStats::Layers);
 
     if(LevelMacro > LEVELMACRO_OFF)
+    {
         UpdateMacro();
+
+        // was previously a nested frameloop, now that logic is still done in UpdateMacro,
+        // but per-frame -> we need to skip the rest of the frame if it didn't finish
+        if(LevelMacro == LEVELMACRO_KEYHOLE_EXIT)
+            return;
+    }
 
     if(BattleMode)
     {

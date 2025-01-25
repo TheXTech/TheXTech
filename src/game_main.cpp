@@ -1923,50 +1923,34 @@ void UpdateMacro()
     {
         const int keyholeMax = 192; // Was 300
 
-        do
+        // this was previously its own frameloop.
+        // items done earlier in the frameloop have been commented out.
+
+        speedRun_tick();
+        // Controls::Update(false);
+        UpdateGraphics();
+        UpdateSound();
+        BlockFrames();
+
+        // XEvents::doEvents();
+        // computeFrameTime2();
+
+        updateScreenFaders();
+
+        LevelMacroCounter++;
+
+        if(g_config.EnableInterLevelFade && LevelMacroCounter == (keyholeMax - 65))
+            g_levelScreenFader.setupFader(1, 0, 65, ScreenFader::S_FADE);
+
+        if(LevelMacroCounter >= keyholeMax) /*300*/
         {
-            XEvents::doEvents();
-
-            if(canProceedFrame())
-            {
-                computeFrameTime1();
-
-                speedRun_tick();
-                Controls::Update(false);
-                UpdateGraphics();
-                UpdateSound();
-                BlockFrames();
-
-                XEvents::doEvents();
-                computeFrameTime2();
-
-                updateScreenFaders();
-
-                LevelMacroCounter++;
-
-                if(g_config.EnableInterLevelFade && LevelMacroCounter == (keyholeMax - 65))
-                    g_levelScreenFader.setupFader(1, 0, 65, ScreenFader::S_FADE);
-
-                if(LevelMacroCounter >= keyholeMax) /*300*/
-                    break;
-            }
-
-            if(!GameIsActive)
-            {
-                speedRun_saveStats();
-                return;
-            }
-
-            if(!g_config.unlimited_framerate)
-                PGE_Delay(1);
-        } while(true);
-
-        LevelBeatCode = 4;
-        EndLevel = true;
-        LevelMacro = LEVELMACRO_OFF;
-        LevelMacroWhich = 0;
-        LevelMacroCounter = 0;
-        XRender::clearBuffer();
+            LevelBeatCode = 4;
+            EndLevel = true;
+            LevelMacro = LEVELMACRO_OFF;
+            LevelMacroWhich = 0;
+            LevelMacroCounter = 0;
+            XRender::clearBuffer();
+        }
     }
     else if(LevelMacro == LEVELMACRO_CRYSTAL_BALL_EXIT)
     {
