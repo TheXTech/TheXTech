@@ -2129,7 +2129,7 @@ extern int StopHit;
 //Public MouseRelease As Boolean
 extern bool MouseRelease;
 //Public TestFullscreen As Boolean
-extern bool TestFullscreen;
+// extern bool TestFullscreen;
 ////Public keyDownAlt As Boolean 'for alt/enter fullscreen
 //extern bool keyDownAlt;
 ////Public keyDownEnter As Boolean

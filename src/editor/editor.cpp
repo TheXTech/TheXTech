@@ -2545,6 +2545,8 @@ void zTestLevel(bool magicHand, bool interProcess)
     // this clears the cached medals and stars data from the level
     LevelWarpSaveEntries.clear();
 
+    // dead code, TestFullscreen never set
+#if 0
     if(TestFullscreen)
     {
 #ifndef RENDER_FULLSCREEN_ALWAYS
@@ -2553,6 +2555,7 @@ void zTestLevel(bool magicHand, bool interProcess)
         XEvents::doEvents();
         MagicHand = false;
     }
+#endif
 
     // in speedrun mode, confirm that controls are set up before game starts
     if(g_config.speedrun_mode != 0 && !Controls::Update())
