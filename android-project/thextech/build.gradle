@@ -75,7 +75,7 @@ def cmakeToVersionCode(verNum) {
     return ret
 }
 
-def cmakeToClearVersionCode(verNum) {
+static def cmakeToClearVersionCode(verNum) {
     def ret = ""
 
     ret += verNum[0].toString()
