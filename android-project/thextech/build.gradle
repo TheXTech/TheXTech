@@ -168,16 +168,25 @@ android {
         debug {
             applicationIdSuffix '.debug'
             versionNameSuffix '-DEVDEBUG'
+            debuggable true
         }
     }
 
-    flavorDimensions = ["default"]
+    flavorDimensions = ["dist"]
     productFlavors {
-        apk {}
+        apk {
+            dimension "dist"
+            isDefault true
+        }
         fdroid {
-            defaultConfig.externalNativeBuild.cmake.arguments += ["-DTHEXTECH_NO_BUILD_DATE=ON", "-DFDROID_BUILD=TRUE", "-DOVERRIDE_GIT_BRANCH=\"<fdroid>\""]
-            defaultConfig.versionName = xTechVersionStringClear
-            println "Project CMake arguments: " + defaultConfig.externalNativeBuild.cmake.arguments + ", clear version string: " + defaultConfig.versionName
+            dimension "dist"
+            externalNativeBuild {
+                cmake {
+                    arguments "-DTHEXTECH_NO_BUILD_DATE=ON", "-DFDROID_BUILD=TRUE", "-DOVERRIDE_GIT_BRANCH=\"<fdroid>\""
+                }
+            }
+
+            versionName = xTechVersionStringClear
 
             if(project.hasProperty('applicationIdSuffix')) {
                 applicationIdSuffix += '.fdroid'
