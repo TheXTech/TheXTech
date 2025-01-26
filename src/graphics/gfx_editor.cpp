@@ -773,9 +773,9 @@ void DrawEditorWorld()
 
         if(GFXLevelBig[EditorCursor.WorldLevel.Type])
         {
-            XRender::renderTexture(camX + EditorCursor.WorldLevel.Location.X - (GFXLevelWidth[EditorCursor.WorldLevel.Type] - 32) / 2.0,
-                                  camY + EditorCursor.WorldLevel.Location.Y - GFXLevelHeight[EditorCursor.WorldLevel.Type] + 32,
-                                  GFXLevelWidth[EditorCursor.WorldLevel.Type], GFXLevelHeight[EditorCursor.WorldLevel.Type],
+            XRender::renderTexture(camX + EditorCursor.WorldLevel.Location.X - (GFXLevel[EditorCursor.WorldLevel.Type].w - 32) / 2.0,
+                                  camY + EditorCursor.WorldLevel.Location.Y - GFXLevel[EditorCursor.WorldLevel.Type].h + 32,
+                                  GFXLevel[EditorCursor.WorldLevel.Type].w, GFXLevel[EditorCursor.WorldLevel.Type].h,
                                   GFXLevelBMP[EditorCursor.WorldLevel.Type], 0, 32 * LevelFrame[EditorCursor.WorldLevel.Type]);
         }
         else

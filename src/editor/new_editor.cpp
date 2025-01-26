@@ -4144,11 +4144,11 @@ void EditorScreen::UpdateLevel(CallMode mode, int x, int y, int type)
     int draw_height;
 
     if(GFXLevelBig[type])
-        draw_height = GFXLevelHeight[type];
+        draw_height = GFXLevel[type].h;
     else
         draw_height = 32;
 
-    if(UpdateButton(mode, x, y, GFXLevelBMP[type], sel, 0, 32 * LevelFrame[type], GFXLevelWidth[type], draw_height) && !sel)
+    if(UpdateButton(mode, x, y, GFXLevelBMP[type], sel, 0, 32 * LevelFrame[type], GFXLevel[type].w, draw_height) && !sel)
     {
         // printf("%d\n", type);
         EditorCursor.WorldLevel.Type = type;

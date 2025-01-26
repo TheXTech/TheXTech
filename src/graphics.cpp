@@ -953,10 +953,10 @@ Location_t WorldLevel_t::LocationGFX()
 
     if(Type >= 1 && Type <= maxLevelType && GFXLevelBig[Type])
     {
-        ret.X -= (GFXLevelWidth[Type] - ret.Width) / 2;
-        ret.Y -= (GFXLevelHeight[Type] - ret.Height);
-        ret.Width = GFXLevelWidth[Type];
-        ret.Height = GFXLevelHeight[Type];
+        ret.X -= (GFXLevel[Type].w - ret.Width) / 2;
+        ret.Y -= (GFXLevel[Type].h - ret.Height);
+        ret.Width = GFXLevel[Type].w;
+        ret.Height = GFXLevel[Type].h;
     }
 
     return ret;
