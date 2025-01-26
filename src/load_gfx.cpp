@@ -761,20 +761,22 @@ static void s_UnloadPreviewPlayers()
     s_previewPlayersBegin = 0;
     s_previewPlayersEnd = 0;
 
+#ifndef LOW_MEM
     // Restore default sizes of custom player effects (should no longer be required, now that backups are made directly)
     for(int A = 1; A < maxEffectType; ++A)
     {
         if(GFXEffectCustom[A])
         {
-            EffectWidth[A] = GFXEffectBMP[A].w;
-            EffectHeight[A] = GFXEffectBMP[A].h / EffectDefaults.EffectFrames[A];
+            SDL_assert_release(EffectWidth[A] == GFXEffectBMP[A].w);
+            SDL_assert_release(EffectHeight[A] == GFXEffectBMP[A].h / EffectDefaults.EffectFrames[A]);
         }
         else
         {
-            EffectWidth[A] = EffectDefaults.EffectWidth[A];
-            EffectHeight[A] = EffectDefaults.EffectHeight[A];
+            SDL_assert_release(EffectWidth[A] == EffectDefaults.EffectWidth[A]);
+            SDL_assert_release(EffectHeight[A] == EffectDefaults.EffectHeight[A]);
         }
     }
+#endif // #ifndef LOW_MEM
 }
 
 static void restoreLevelBackupTextures()
@@ -1540,13 +1542,6 @@ void UnloadCustomGFX()
     XRender::g_BitmaskTexturePresent = false;
 #endif
 
-    // Restore default sizes of custom effects (should no longer be required, now that backups are made directly)
-    for(int A = 1; A < maxEffectType; ++A)
-    {
-        EffectWidth[A] = EffectDefaults.EffectWidth[A];
-        EffectHeight[A] = EffectDefaults.EffectHeight[A];
-    }
-
     // unload custom frame border info
     for(auto it = g_defaultBorderInfoBackup.rbegin(); it != g_defaultBorderInfoBackup.rend(); ++it)
     {
@@ -1558,6 +1553,15 @@ void UnloadCustomGFX()
     g_defaultBorderInfoBackup.clear();
 
     restoreLevelBackupTextures();
+
+#ifndef LOW_MEM
+    // Restore default sizes of custom effects (should no longer be required, now that backups are made directly)
+    for(int A = 1; A < maxEffectType; ++A)
+    {
+        SDL_assert_release(EffectWidth[A] == EffectDefaults.EffectWidth[A]);
+        SDL_assert_release(EffectHeight[A] == EffectDefaults.EffectHeight[A]);
+    }
+#endif // #ifndef LOW_MEM
 }
 
 void UnloadPlayerPreviewGFX()

@@ -1743,10 +1743,12 @@ extern RangeArrI<vbint_t, 0, maxEffectType, 0> EffectHeight;
 //Public Type EffectDefaults
 struct EffectDefaults_t
 {
+#ifndef LOW_MEM
 //    EffectWidth(1 To maxEffectType) As Integer
     RangeArrI<vbint_t, 1, maxEffectType, 0> EffectWidth;
 //    EffectHeight(1 To maxEffectType) As Integer
     RangeArrI<vbint_t, 1, maxEffectType, 0> EffectHeight;
+#endif
 //EXTRA: count of frames (compute from the GFX height)
     RangeArrI<vbint_t, 1, maxEffectType, 0> EffectFrames;
 //End Type

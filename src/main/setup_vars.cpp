@@ -2814,8 +2814,12 @@ void SetupVars()
     }
     For(A, 1, maxEffectType)
     {
+#ifndef LOW_MEM
+        // kept only for debugging that it's safe to remove them
         EffectDefaults.EffectHeight[A] = EffectHeight[A];
         EffectDefaults.EffectWidth[A] = EffectWidth[A];
+#endif // #ifndef LOW_MEM
+
         if(EffectHeight[A] > 0)
         {
             // EffectDefaults.EffectFrames[A] = vb6Round(double(GFXEffectBMP[A].h) / EffectHeight[A]);
