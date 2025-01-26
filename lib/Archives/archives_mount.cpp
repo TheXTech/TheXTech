@@ -126,7 +126,7 @@ void unmount_temp()
 {
     if(temp_refs > 0)
     {
-        pLogCritical("Can't unmount temp archive [%s;] items still open.", s_temp_archive_path.c_str());
+        pLogCritical("Can't unmount temp archive [%s]; %d items still open.", s_temp_archive_path.c_str(), (int)temp_refs);
         return;
     }
 
