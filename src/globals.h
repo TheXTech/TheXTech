@@ -2270,9 +2270,9 @@ extern RangeArr<StdPicture, 1, maxEffectType> GFXEffectBMP;
 //Public GFXEffectMaskBMP(1 To maxEffectType) As StdPicture
 //extern RangeArr<StdPicture, 1, maxEffectType> GFXEffectMaskBMP;
 //Public GFXEffectHeight(1 To maxEffectType) As Integer
-extern RangeArrI<vbint_t, 1, maxEffectType, 0> GFXEffectHeight;
+// extern RangeArrI<vbint_t, 1, maxEffectType, 0> GFXEffectHeight;
 //Public GFXEffectWidth(1 To maxEffectType) As Integer
-extern RangeArrI<vbint_t, 1, maxEffectType, 0> GFXEffectWidth;
+// extern RangeArrI<vbint_t, 1, maxEffectType, 0> GFXEffectWidth;
 //Public GFXBackgroundCustom(1 To maxBackgroundType) As Boolean
 extern RangeArrI<bool, 1, maxBackgroundType, false> GFXBackgroundCustom;
 //Public GFXBackground(1 To maxBackgroundType) As Long
