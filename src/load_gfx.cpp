@@ -31,6 +31,7 @@
 #include "global_dirs.h"
 
 #include "blk_id.h"
+#include "eff_id.h"
 
 #include "gfx.h"
 #include "load_gfx.h"
@@ -759,6 +760,21 @@ static void s_UnloadPreviewPlayers()
 
     s_previewPlayersBegin = 0;
     s_previewPlayersEnd = 0;
+
+    // Restore default sizes of custom player effects (should no longer be required, now that backups are made directly)
+    for(int A = 1; A < maxEffectType; ++A)
+    {
+        if(GFXEffectCustom[A])
+        {
+            EffectWidth[A] = GFXEffectBMP[A].w;
+            EffectHeight[A] = GFXEffectBMP[A].h / EffectDefaults.EffectFrames[A];
+        }
+        else
+        {
+            EffectWidth[A] = EffectDefaults.EffectWidth[A];
+            EffectHeight[A] = EffectDefaults.EffectHeight[A];
+        }
+    }
 }
 
 static void restoreLevelBackupTextures()
@@ -1404,6 +1420,20 @@ void LoadCustomGFX(bool include_world, const char* preview_players_from)
         }
     }
 
+    for(int A = 1; A <= maxEffectType; ++A)
+    {
+        if(preview_players_from && A != EFFID_CHAR1_DIE && A != EFFID_CHAR2_DIE && A != EFFID_CHAR3_DIE && A != EFFID_CHAR4_DIE && A != EFFID_CHAR5_DIE)
+            continue;
+
+        loadCGFX(GfxRoot + fmt::format_ne("effect/effect-{0}.png", A),
+                 fmt::format_ne("effect-{0}", A),
+                 &EffectWidth[A], &EffectHeight[A], GFXEffectCustom[A], GFXEffectBMP[A]);
+
+        // update calculation (but still rely on backup made above)
+        if(GFXEffectCustom[A])
+            EffectHeight[A] = GFXEffectBMP[A].h / EffectDefaults.EffectFrames[A];
+    }
+
 
     if(preview_players_from)
     {
@@ -1451,17 +1481,6 @@ void LoadCustomGFX(bool include_world, const char* preview_players_from)
                      npc_fn,
                      nullptr, nullptr, GFXBlockCustom[BLKID_CONVEYOR_R_CONV], GFXBlockBMP[BLKID_CONVEYOR_R_CONV]);
         }
-    }
-
-    for(int A = 1; A <= maxEffectType; ++A)
-    {
-        loadCGFX(GfxRoot + fmt::format_ne("effect/effect-{0}.png", A),
-                 fmt::format_ne("effect-{0}", A),
-                 &EffectWidth[A], &EffectHeight[A], GFXEffectCustom[A], GFXEffectBMP[A]);
-
-        // update calculation (but still rely on backup made above)
-        if(GFXEffectCustom[A])
-            EffectHeight[A] = GFXEffectBMP[A].h / EffectDefaults.EffectFrames[A];
     }
 
     for(int A = 1; A <= maxBackgroundType; ++A)
@@ -1521,7 +1540,7 @@ void UnloadCustomGFX()
     XRender::g_BitmaskTexturePresent = false;
 #endif
 
-    // Restore default sizes of custom effects
+    // Restore default sizes of custom effects (should no longer be required, now that backups are made directly)
     for(int A = 1; A < maxEffectType; ++A)
     {
         EffectWidth[A] = EffectDefaults.EffectWidth[A];
