@@ -405,17 +405,17 @@ bool LoadingInProcess = false;
 int LoadCoins = 0;
 float LoadCoinsT = 0.0f;
 
-RangeArrI<bool, 1, maxBlockType, false> GFXBlockCustom;
+// RangeArrI<bool, 1, maxBlockType, false> GFXBlockCustom;
 //RangeArrI<long, 1, maxBlockType, 0> GFXBlock;
 //RangeArrI<long, 1, maxBlockType, 0> GFXBlockMask;
 RangeArr<StdPicture, 1, maxBlockType> GFXBlockBMP;
 //RangeArr<StdPicture, 1, maxBlockType> GFXBlockMaskBMP;
-RangeArrI<bool, 1, numBackground2, false> GFXBackground2Custom;
+// RangeArrI<bool, 1, numBackground2, false> GFXBackground2Custom;
 //RangeArrI<long, 1, numBackground2, 0> GFXBackground2;
 RangeArr<StdPicture, 1, numBackground2> GFXBackground2BMP;
 // RangeArrI<vbint_t, 1, numBackground2, 0> GFXBackground2Height;
 // RangeArrI<vbint_t, 1, numBackground2, 0> GFXBackground2Width;
-RangeArrI<bool, 1, maxNPCType, false> GFXNPCCustom;
+// RangeArrI<bool, 1, maxNPCType, false> GFXNPCCustom;
 //RangeArrI<long, 1, maxNPCType, 0> GFXNPC;
 //RangeArrI<long, 1, maxNPCType, 0> GFXNPCMask;
 RangeArr<StdPicture, 0, maxNPCType> GFXNPCBMP;
@@ -429,7 +429,7 @@ RangeArr<StdPicture, 1, maxEffectType> GFXEffectBMP;
 //RangeArr<StdPicture, 1, maxEffectType> GFXEffectMaskBMP;
 // RangeArrI<vbint_t, 1, maxEffectType, 0> GFXEffectHeight;
 // RangeArrI<vbint_t, 1, maxEffectType, 0> GFXEffectWidth;
-RangeArrI<bool, 1, maxBackgroundType, false> GFXBackgroundCustom;
+// RangeArrI<bool, 1, maxBackgroundType, false> GFXBackgroundCustom;
 //RangeArrI<long, 1, maxBackgroundType, 0> GFXBackground;
 //RangeArrI<long, 1, maxBackgroundType, 0> GFXBackgroundMask;
 RangeArr<StdPicture, 1, maxBackgroundType> GFXBackgroundBMP;
@@ -445,101 +445,101 @@ RangeArr<StdPicture, 1, 10> *GFXCharacterBMP[numCharacters] =
 {
     &GFXMarioBMP, &GFXLuigiBMP, &GFXPeachBMP, &GFXToadBMP, &GFXLinkBMP
 };
-RangeArrI<vbint_t, 1, 10, 0> *GFXCharacterWidth[numCharacters] =
-{
-    &GFXMarioWidth, &GFXLuigiWidth, &GFXPeachHeight, &GFXToadWidth, &GFXLinkWidth
-};
-RangeArrI<vbint_t, 1, 10, 0> *GFXCharacterHeight[numCharacters] =
-{
-    &GFXMarioHeight, &GFXLuigiHeight, &GFXPeachHeight, &GFXToadHeight, &GFXLinkHeight
-};
-RangeArrI<bool, 1, 10, false> *GFXCharacterCustom[numCharacters] =
-{
-    &GFXMarioCustom, &GFXLuigiCustom, &GFXPeachCustom, &GFXToadCustom, &GFXLinkCustom
-};
+// RangeArrI<vbint_t, 1, 10, 0> *GFXCharacterWidth[numCharacters] =
+// {
+//     &GFXMarioWidth, &GFXLuigiWidth, &GFXPeachHeight, &GFXToadWidth, &GFXLinkWidth
+// };
+// RangeArrI<vbint_t, 1, 10, 0> *GFXCharacterHeight[numCharacters] =
+// {
+//     &GFXMarioHeight, &GFXLuigiHeight, &GFXPeachHeight, &GFXToadHeight, &GFXLinkHeight
+// };
+// RangeArrI<bool, 1, 10, false> *GFXCharacterCustom[numCharacters] =
+// {
+//     &GFXMarioCustom, &GFXLuigiCustom, &GFXPeachCustom, &GFXToadCustom, &GFXLinkCustom
+// };
 
-RangeArrI<bool, 1, 10, false> GFXMarioCustom;
+// RangeArrI<bool, 1, 10, false> GFXMarioCustom;
 //RangeArrI<long, 1, 10, 0> GFXMario;
 //RangeArrI<long, 1, 10, 0> GFXMarioMask;
 RangeArr<StdPicture, 1, 10> GFXMarioBMP;
 //RangeArr<StdPicture, 1, 10> GFXMarioMaskBMP;
-RangeArrI<vbint_t, 1, 10, 0> GFXMarioHeight;
-RangeArrI<vbint_t, 1, 10, 0> GFXMarioWidth;
-RangeArrI<bool, 1, 10, false> GFXLuigiCustom;
+// RangeArrI<vbint_t, 1, 10, 0> GFXMarioHeight;
+// RangeArrI<vbint_t, 1, 10, 0> GFXMarioWidth;
+// RangeArrI<bool, 1, 10, false> GFXLuigiCustom;
 //RangeArrI<long, 1, 10, 0> GFXLuigi;
 //RangeArrI<long, 1, 10, 0> GFXLuigiMask;
 RangeArr<StdPicture, 1, 10> GFXLuigiBMP;
 //RangeArr<StdPicture, 1, 10> GFXLuigiMaskBMP;
-RangeArrI<vbint_t, 1, 10, 0> GFXLuigiHeight;
-RangeArrI<vbint_t, 1, 10, 0> GFXLuigiWidth;
-RangeArrI<bool, 1, 10, false> GFXPeachCustom;
+// RangeArrI<vbint_t, 1, 10, 0> GFXLuigiHeight;
+// RangeArrI<vbint_t, 1, 10, 0> GFXLuigiWidth;
+// RangeArrI<bool, 1, 10, false> GFXPeachCustom;
 //RangeArrI<long, 1, 10, 0> GFXPeach;
 //RangeArrI<long, 1, 10, 0> GFXPeachMask;
 RangeArr<StdPicture, 1, 10> GFXPeachBMP;
 //RangeArr<StdPicture, 1, 10> GFXPeachMaskBMP;
-RangeArrI<vbint_t, 1, 10, 0> GFXPeachHeight;
-RangeArrI<vbint_t, 1, 10, 0> GFXPeachWidth;
-RangeArrI<bool, 1, 10, false> GFXToadCustom;
+// RangeArrI<vbint_t, 1, 10, 0> GFXPeachHeight;
+// RangeArrI<vbint_t, 1, 10, 0> GFXPeachWidth;
+// RangeArrI<bool, 1, 10, false> GFXToadCustom;
 //RangeArrI<long, 1, 10, 0> GFXToad;
 //RangeArrI<long, 1, 10, 0> GFXToadMask;
 RangeArr<StdPicture, 1, 10> GFXToadBMP;
 //RangeArr<StdPicture, 1, 10> GFXToadMaskBMP;
-RangeArrI<vbint_t, 1, 10, 0> GFXToadHeight;
-RangeArrI<vbint_t, 1, 10, 0> GFXToadWidth;
+// RangeArrI<vbint_t, 1, 10, 0> GFXToadHeight;
+// RangeArrI<vbint_t, 1, 10, 0> GFXToadWidth;
 
-RangeArrI<bool, 1, 10, false> GFXLinkCustom;
+// RangeArrI<bool, 1, 10, false> GFXLinkCustom;
 //RangeArrI<long, 1, 10, 0> GFXLink;
 //RangeArrI<long, 1, 10, 0> GFXLinkMask;
 RangeArr<StdPicture, 1, 10> GFXLinkBMP;
 //RangeArr<StdPicture, 1, 10> GFXLinkMaskBMP;
-RangeArrI<vbint_t, 1, 10, 0> GFXLinkHeight;
-RangeArrI<vbint_t, 1, 10, 0> GFXLinkWidth;
+// RangeArrI<vbint_t, 1, 10, 0> GFXLinkHeight;
+// RangeArrI<vbint_t, 1, 10, 0> GFXLinkWidth;
 
-RangeArrI<bool, 1, maxYoshiGfx, false> GFXYoshiBCustom;
+// RangeArrI<bool, 1, maxYoshiGfx, false> GFXYoshiBCustom;
 //RangeArrI<long, 1, 10, 0> GFXYoshiB;
 //RangeArrI<long, 1, 10, 0> GFXYoshiBMask;
 RangeArr<StdPicture, 1, 10> GFXYoshiBBMP;
 //RangeArr<StdPicture, 1, 10> GFXYoshiBMaskBMP;
-RangeArrI<bool, 1, 10, false> GFXYoshiTCustom;
+// RangeArrI<bool, 1, 10, false> GFXYoshiTCustom;
 //RangeArrI<long, 1, 10, 0> GFXYoshiT;
 //RangeArrI<long, 1, 10, 0> GFXYoshiTMask;
 RangeArr<StdPicture, 1, 10> GFXYoshiTBMP;
 //RangeArr<StdPicture, 1, 10> GFXYoshiTMaskBMP;
-RangeArrI<bool, 1, maxTileType, false> GFXTileCustom;
+// RangeArrI<bool, 1, maxTileType, false> GFXTileCustom;
 //RangeArrI<long, 1, maxTileType, 0> GFXTile;
 RangeArr<StdPicture, 1, maxTileType> GFXTileBMP;
-RangeArrI<vbint_t, 1, maxTileType, 0> GFXTileHeight;
-RangeArrI<vbint_t, 1, maxTileType, 0> GFXTileWidth;
-RangeArrI<bool, 0, maxLevelType, false> GFXLevelCustom;
+// RangeArrI<vbint_t, 1, maxTileType, 0> GFXTileHeight;
+// RangeArrI<vbint_t, 1, maxTileType, 0> GFXTileWidth;
+// RangeArrI<bool, 0, maxLevelType, false> GFXLevelCustom;
 //RangeArrI<long, 0, maxLevelType, 0> GFXLevel;
 //RangeArrI<long, 0, maxLevelType, 0> GFXLevelMask;
 RangeArr<StdPicture, 0, maxLevelType> GFXLevelBMP;
 //RangeArr<StdPicture, 0, maxLevelType> GFXLevelMaskBMP;
-RangeArrI<vbint_t, 0, maxLevelType, 0> GFXLevelHeight;
-RangeArrI<vbint_t, 0, maxLevelType, 0> GFXLevelWidth;
+// RangeArrI<vbint_t, 0, maxLevelType, 0> GFXLevelHeight;
+// RangeArrI<vbint_t, 0, maxLevelType, 0> GFXLevelWidth;
 RangeArrI<bool, 0, maxLevelType, false> GFXLevelBig;
-RangeArrI<bool, 1, maxSceneType, false> GFXSceneCustom;
+// RangeArrI<bool, 1, maxSceneType, false> GFXSceneCustom;
 //RangeArrI<long, 1, maxSceneType, 0> GFXScene;
 //RangeArrI<long, 1, maxSceneType, 0> GFXSceneMask;
 RangeArr<StdPicture, 1, maxSceneType> GFXSceneBMP;
 //RangeArr<StdPicture, 1, maxSceneType> GFXSceneMaskBMP;
-RangeArrI<vbint_t, 1, maxSceneType, 0> GFXSceneHeight;
-RangeArrI<vbint_t, 1, maxSceneType, 0> GFXSceneWidth;
-RangeArrI<bool, 1, maxPathType, false> GFXPathCustom;
+// RangeArrI<vbint_t, 1, maxSceneType, 0> GFXSceneHeight;
+// RangeArrI<vbint_t, 1, maxSceneType, 0> GFXSceneWidth;
+// RangeArrI<bool, 1, maxPathType, false> GFXPathCustom;
 //RangeArrI<long, 1, maxPathType, 0> GFXPath;
 //RangeArrI<long, 1, maxPathType, 0> GFXPathMask;
 RangeArr<StdPicture, 1, maxPathType> GFXPathBMP;
 //RangeArr<StdPicture, 1, maxPathType> GFXPathMaskBMP;
-RangeArrI<vbint_t, 1, maxPathType, 0> GFXPathHeight;
-RangeArrI<vbint_t, 1, maxPathType, 0> GFXPathWidth;
+// RangeArrI<vbint_t, 1, maxPathType, 0> GFXPathHeight;
+// RangeArrI<vbint_t, 1, maxPathType, 0> GFXPathWidth;
 
-RangeArrI<bool, 1, numCharacters, false> GFXPlayerCustom;
+// RangeArrI<bool, 1, numCharacters, false> GFXPlayerCustom;
 //RangeArrI<long, 1, numCharacters, 0> GFXPlayer;
 //RangeArrI<long, 1, numCharacters, 0> GFXPlayerMask;
 RangeArr<StdPicture, 1, numCharacters> GFXPlayerBMP;
 //RangeArr<StdPicture, 1, numCharacters> GFXPlayerMaskBMP;
-RangeArrI<vbint_t, 1, numCharacters, 0> GFXPlayerHeight;
-RangeArrI<vbint_t, 1, numCharacters, 0> GFXPlayerWidth;
+// RangeArrI<vbint_t, 1, numCharacters, 0> GFXPlayerHeight;
+// RangeArrI<vbint_t, 1, numCharacters, 0> GFXPlayerWidth;
 
 int PlayerCharacter = 0;
 int PlayerCharacter2 = 0;
