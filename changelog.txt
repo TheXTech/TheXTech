@@ -3,6 +3,7 @@ TheXTech Changelog.
 Changelog for 1.3.7.1-dev
 -Add GameCube controller support for Wii (@ds-sloth)
 -Fix TheXTech 1.3.7 peculiarity where NPCs that hid themselves on activation would be shown before coming onscreen (@ds-sloth)
+-Fix TheXTech 1.3.7 peculiarity where player preview sprites in the main menu would not use the correct death effects (@ds-sloth)
 
 Changelog for 1.3.7
 -Fix vanilla peculiarity where medals were sometimes not collected when killed, guarded by "fix-medal-kill" [Modern Mode] (@ds-sloth, thanks to @Superbloxen for the report)
