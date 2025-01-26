@@ -235,7 +235,7 @@ if(ANDROID)
         set(ANDROID_PLATFORM 16)
     endif()
 
-    if(FDROID)
+    if(FDROID_BUILD)
         set(FILE_PATH_OVERRIDE "-ffile-prefix-map=${CMAKE_SOURCE_DIR}=/builds/fdroid/fdroiddata/build/ru.wohlsoft.thextech.fdroid/")
         set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} ${FILE_PATH_OVERRIDE}")
         set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${FILE_PATH_OVERRIDE}")
@@ -260,7 +260,7 @@ if(ANDROID)
         "-DANDROID_ARM_NEON=${ANDROID_ARM_NEON}"
     )
 
-    if(FDROID)
+    if(FDROID_BUILD)
         # Ensure reproducibility of builds by replacing build paths with a custom one
         # So, forward all flags that was set above into dependencies
         list(APPEND ANDROID_CMAKE_FLAGS
@@ -271,7 +271,7 @@ if(ANDROID)
             "-DCMAKE_CXX_FLAGS_RELWITHDEBINFO=${CMAKE_CXX_FLAGS_RELWITHDEBINFO}"
             "-DCMAKE_C_FLAGS_MINSIZEREL=${CMAKE_C_FLAGS_MINSIZEREL}"
             "-DCMAKE_CXX_FLAGS_MINSIZEREL=${CMAKE_CXX_FLAGS_MINSIZEREL}"
-            "-DFDROID=TRUE"
+            "-DFDROID_BUILD=TRUE"
         )
     endif()
 endif()
