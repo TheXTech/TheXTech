@@ -2818,7 +2818,7 @@ void SetupVars()
         EffectDefaults.EffectWidth[A] = EffectWidth[A];
         if(EffectHeight[A] > 0)
         {
-            EffectDefaults.EffectFrames[A] = vb6Round(double(GFXEffectHeight[A]) / EffectHeight[A]);
+            EffectDefaults.EffectFrames[A] = vb6Round(double(GFXEffectBMP[A].h) / EffectHeight[A]);
             if(EffectDefaults.EffectFrames[A] <= 0)
                 EffectDefaults.EffectFrames[A] = 1;
         }

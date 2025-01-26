@@ -554,14 +554,12 @@ bool LoadGFXFromList(std::string source_dir, bool custom, bool skip_world)
             }
 
             loadImageFromList(in, line_buf, source_dir,
-                GFXEffectBMP[A], &GFXEffectWidth[A], &GFXEffectHeight[A], GFXEffectCustom[A],
+                GFXEffectBMP[A], &EffectWidth[A], &EffectHeight[A], GFXEffectCustom[A],
                 false, custom);
 
+            // update calculation (but still rely on backup made above)
             if(GFXEffectCustom[A])
-            {
-                EffectWidth[A] = GFXEffectWidth[A];
-                EffectHeight[A] = GFXEffectHeight[A] / EffectDefaults.EffectFrames[A];
-            }
+                EffectHeight[A] = GFXEffectBMP[A].h / EffectDefaults.EffectFrames[A];
         }
         else if(type_buf[0] == 'y' && type_buf[5] == 't')
         {
@@ -909,17 +907,11 @@ void LoadGFX()
         if(!p.empty())
         {
             XRender::lazyLoadPicture(GFXEffectBMP[A], p);
-            GFXEffectWidth[A] = GFXEffectBMP[A].w;
-            GFXEffectHeight[A] = GFXEffectBMP[A].h;
             if(A % 20 == 0)
                 UpdateLoad();
         }
         else
-        {
-            GFXEffectWidth[A] = 0;
-            GFXEffectHeight[A] = 0;
             break;
-        }
     }
     UpdateLoad();
 
@@ -1419,13 +1411,11 @@ void LoadCustomGFX(bool include_world, const char* preview_players_from)
     {
         loadCGFX(GfxRoot + fmt::format_ne("effect/effect-{0}.png", A),
                  fmt::format_ne("effect-{0}", A),
-                 &GFXEffectWidth[A], &GFXEffectHeight[A], GFXEffectCustom[A], GFXEffectBMP[A]);
+                 &EffectWidth[A], &EffectHeight[A], GFXEffectCustom[A], GFXEffectBMP[A]);
 
+        // update calculation (but still rely on backup made above)
         if(GFXEffectCustom[A])
-        {
-            EffectWidth[A] = GFXEffectWidth[A];
-            EffectHeight[A] = GFXEffectHeight[A] / EffectDefaults.EffectFrames[A];
-        }
+            EffectHeight[A] = GFXEffectBMP[A].h / EffectDefaults.EffectFrames[A];
     }
 
     for(int A = 1; A <= maxBackgroundType; ++A)
