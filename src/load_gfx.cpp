@@ -92,6 +92,7 @@ struct GFXBackup_t
     StdPicture *remote_texture = nullptr;
     vbint_t width = 0;
     vbint_t height = 0;
+    bool isCustom = false;
     StdPicture_Sub texture_backup;
 };
 
@@ -259,6 +260,7 @@ static void loadCGFX(const std::string &origPath,
         backup.width = *width;
     if(height)
         backup.height = *height;
+    backup.isCustom = isCustom;
 
     bool isGif = false;
 
@@ -414,6 +416,7 @@ static void loadImageFromList(PGE_FileFormats_misc::TextInput& t, std::string& l
             backup.width = *width;
         if(height)
             backup.height = *height;
+        backup.isCustom = is_custom_loc;
         backup.texture_backup = static_cast<StdPicture_Sub&>(texture);
 
         if(world)
@@ -724,7 +727,7 @@ static void s_UnloadPreviewPlayers()
         if(t.remote_height)
             *t.remote_height = t.height;
         if(t.remote_isCustom)
-            *t.remote_isCustom = false;
+            *t.remote_isCustom = t.isCustom;
         SDL_assert_release(t.remote_texture);
         XRender::unloadTexture(*t.remote_texture);
         *static_cast<StdPicture_Sub*>(t.remote_texture) = std::move(t.texture_backup);
@@ -747,7 +750,7 @@ static void restoreLevelBackupTextures()
         if(t.remote_height)
             *t.remote_height = t.height;
         if(t.remote_isCustom)
-            *t.remote_isCustom = false;
+            *t.remote_isCustom = t.isCustom;
         SDL_assert_release(t.remote_texture);
         XRender::unloadTexture(*t.remote_texture);
         *static_cast<StdPicture_Sub*>(t.remote_texture) = std::move(t.texture_backup);
@@ -768,7 +771,7 @@ static void restoreWorldBackupTextures()
         if(t.remote_height)
             *t.remote_height = t.height;
         if(t.remote_isCustom)
-            *t.remote_isCustom = false;
+            *t.remote_isCustom = t.isCustom;
         SDL_assert_release(t.remote_texture);
         XRender::unloadTexture(*t.remote_texture);
         *static_cast<StdPicture_Sub*>(t.remote_texture) = std::move(t.texture_backup);
