@@ -1264,7 +1264,7 @@ struct WorldPlayer_t
 struct CreditLine_t
 {
 //    Location As Location
-    SpeedlessLocation_t Location;
+    IntegerLocation_t Location;
 //    Text As String
     stringindex_t Text = STRINGINDEX_NONE;
 //End Type
@@ -1520,7 +1520,7 @@ DECLREF_T(Scene);
 extern RangeArr<CreditLine_t, 1, maxCreditsLines> Credit;
 extern int numWorldCredits;
 extern double CreditOffsetY;
-extern double CreditTotalHeight;
+extern int CreditTotalHeight;
 //Public numCredits As Integer 'number of credits
 extern int numCredits;
 //Public numBlock As Integer 'number of blocks

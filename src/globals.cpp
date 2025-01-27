@@ -141,7 +141,7 @@ RangeArr<Scene_t, 1, maxScenes> Scene;
 RangeArr<CreditLine_t, 1, maxCreditsLines> Credit;
 int numWorldCredits = 0;
 double CreditOffsetY = 0.0;
-double CreditTotalHeight = 0.0;
+int CreditTotalHeight = 0;
 int numCredits = 0;
 int numBlock = 0;
 int numBackground = 0;

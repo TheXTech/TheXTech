@@ -24,7 +24,7 @@
 #include "core/render.h"
 
 
-static float s_alphaFromY(double y)
+static XTColor s_alphaFromY(int y)
 {
     const int h = 32; // An approximate height of one text line
     const int tb = 16;
@@ -33,25 +33,25 @@ static float s_alphaFromY(double y)
 
     if(t >= XRender::TargetH) // The line at bottom
     {
-        return 0.0f;
+        return XTAlpha(0);
     }
 
     if(b > XRender::TargetH) // The line enters the screen
     {
-        return 1.0f - static_cast<float>(b - XRender::TargetH) / static_cast<float>(h);
+        return XTAlpha(255 -  255 * (b - XRender::TargetH) / h);
     }
 
     if(b <= tb) // The line at the top
     {
-        return 0.0f;
+        return XTAlpha(0);
     }
 
     if(t < tb) // The line quits the screen
     {
-        return static_cast<float>(b - tb) / static_cast<float>(h);
+        return XTAlpha(255 * (b - tb) / h);
     }
 
-    return 1.0f;
+    return XTAlpha(255);
 }
 
 void DrawCredits()
@@ -77,7 +77,7 @@ void DrawCredits()
     {
         auto &c = Credit[A];
         auto &l = c.Location;
-        auto bottom = static_cast<float>(l.Y) + l.Height + CreditOffsetY;
+        auto bottom = l.Y + l.Height + int(CreditOffsetY);
         if(bottom >= 0)
             break; // found!
     }
@@ -87,7 +87,7 @@ void DrawCredits()
     {
         auto &c = Credit[A];
         auto &l = c.Location;
-        auto y = static_cast<float>(l.Y) + CreditOffsetY;
+        auto y = l.Y + int(CreditOffsetY);
 
         if(y > XRender::TargetH)
             break; // Nothing also to draw
@@ -95,8 +95,8 @@ void DrawCredits()
         // Printing lines of credits
         SuperPrint(GetS(c.Text),
                    g_gameInfo.creditsFont,
-                   static_cast<float>(l.X),
+                   l.X,
                    y,
-                   XTAlphaF(s_alphaFromY(y)));
+                   s_alphaFromY(y));
     }
 }
