@@ -129,7 +129,7 @@ void DrawInterface(int Z, int numScreens)
             XRender::renderTextureBasic(20 + plr_center - 28 - 10 + off, ScreenTop + 53,
                 GFX.Interface[1]);
             SuperPrint(std::to_string(plr.Bombs), 1,
-                       float(20 + plr_center - 28 + 12 + off),
+                       20 + plr_center - 28 + 12 + off,
                        ScreenTop + 53);
         }
 
@@ -218,7 +218,7 @@ void DrawInterface(int Z, int numScreens)
         XRender::renderTextureBasic(plr2_lives_x - GFX.Interface[7].w, ScreenTop + 16 + 10, GFX.Interface[7]);
         XRender::renderTextureBasic(plr2_lives_x + 8, ScreenTop + 16 + 11, GFX.Interface[1]);
         SuperPrint(std::to_string(BattleLives[screen.players[1]]), 1,
-                   float(plr2_lives_x + 8 + GFX.Interface[1].w + 8),
+                   plr2_lives_x + 8 + GFX.Interface[1].w + 8,
                    ScreenTop + 16 + 11);
     }
     // draw 1P battle mode lives

@@ -184,7 +184,7 @@ static void drawEnterScreen(Player_t tempPlayer[maxLocalPlayers])
     }
 
     if(TestLevel)
-        SuperPrintScreenCenter("LOADING...", 3, XRender::TargetH / 2.0f + 32);
+        SuperPrintScreenCenter("LOADING...", 3, XRender::TargetH / 2 + 32);
     else
         DrawLives(XRender::TargetW / 2 - 14, XRender::TargetH / 2 + 31, Lives, g_100s);
 

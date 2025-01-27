@@ -104,7 +104,7 @@ CropInfo MarqueeState::crop_info(MarqueeSpec spec) const
 }
 
 
-void SuperPrintMarquee(int SuperN, const char* SuperChars, int Font, float X, float Y,
+void SuperPrintMarquee(int SuperN, const char* SuperChars, int Font, int X, int Y,
                     MarqueeSpec marquee_spec, MarqueeState& marquee_state,
                     XTColor color)
 {
@@ -152,7 +152,7 @@ void SuperPrintMarquee(int SuperN, const char* SuperChars, int Font, float X, fl
     }
 }
 
-void SuperPrintMarquee(const char* SuperChars, int Font, float X, float Y,
+void SuperPrintMarquee(const char* SuperChars, int Font, int X, int Y,
                     MarqueeSpec marquee_spec, MarqueeState& marquee_state,
                     XTColor color)
 {
@@ -163,7 +163,7 @@ void SuperPrintMarquee(const char* SuperChars, int Font, float X, float Y,
         color);
 }
 
-void SuperPrintMarquee(const std::string& SuperWords, int Font, float X, float Y,
+void SuperPrintMarquee(const std::string& SuperWords, int Font, int X, int Y,
                     MarqueeSpec marquee_spec, MarqueeState& marquee_state,
                     XTColor color)
 {

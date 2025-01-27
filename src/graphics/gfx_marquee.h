@@ -25,6 +25,7 @@
 #include <cstdint>
 #include <string>
 
+#include "xt_color.h"
 #include "fontman/crop_info.h"
 
 struct MarqueeSpec
@@ -81,8 +82,8 @@ public:
     CropInfo crop_info(MarqueeSpec spec) const;
 };
 
-void SuperPrintMarquee(int SuperN, const char* SuperChars, int Font, float X, float Y, MarqueeSpec spec, MarqueeState& marquee_state, XTColor color = XTColor());
-void SuperPrintMarquee(const char* SuperChars, int Font, float X, float Y, MarqueeSpec spec, MarqueeState& marquee_state, XTColor color = XTColor());
-void SuperPrintMarquee(const std::string &SuperWords, int Font, float X, float Y, MarqueeSpec spec, MarqueeState& marquee_state, XTColor color = XTColor());
+void SuperPrintMarquee(int SuperN, const char* SuperChars, int Font, int X, int Y, MarqueeSpec spec, MarqueeState& marquee_state, XTColor color = XTColor());
+void SuperPrintMarquee(const char* SuperChars, int Font, int X, int Y, MarqueeSpec spec, MarqueeState& marquee_state, XTColor color = XTColor());
+void SuperPrintMarquee(const std::string &SuperWords, int Font, int X, int Y, MarqueeSpec spec, MarqueeState& marquee_state, XTColor color = XTColor());
 
 #endif // GFX_MARQUEE_H
