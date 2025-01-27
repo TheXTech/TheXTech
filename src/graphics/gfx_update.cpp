@@ -18,6 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "screen.h"
 #include "sdl_proxy/sdl_stdinc.h"
 
 #include <algorithm>
@@ -3131,15 +3132,18 @@ void UpdateGraphicsScreen(Screen_t& screen)
                 {
                     vScreen_t& c_vscreen = c_screen.vScreen(c_vscreen_Z);
 
-                    XRender::renderRect(camX - c_vscreen.X, camY - c_vscreen.Y, c_vscreen.Width, c_vscreen.Height,
+                    int c_vscreen_X = c_vscreen.CameraAddX();
+                    int c_vscreen_Y = c_vscreen.CameraAddY();
+
+                    XRender::renderRect(camX - c_vscreen_X, camY - c_vscreen_Y, c_vscreen.Width, c_vscreen.Height,
                         {  0,   0,   0}, false);
-                    XRender::renderRect(camX - c_vscreen.X + 1, camY - c_vscreen.Y + 1, c_vscreen.Width - 2, c_vscreen.Height - 2,
+                    XRender::renderRect(camX - c_vscreen_X + 1, camY - c_vscreen_Y + 1, c_vscreen.Width - 2, c_vscreen.Height - 2,
                         {  0,   0,   0}, false);
-                    XRender::renderRect(camX - c_vscreen.X + 2, camY - c_vscreen.Y + 2, c_vscreen.Width - 4, c_vscreen.Height - 4,
+                    XRender::renderRect(camX - c_vscreen_X + 2, camY - c_vscreen_Y + 2, c_vscreen.Width - 4, c_vscreen.Height - 4,
                         {255, 255, 255}, false);
-                    XRender::renderRect(camX - c_vscreen.X + 3, camY - c_vscreen.Y + 3, c_vscreen.Width - 6, c_vscreen.Height - 6,
+                    XRender::renderRect(camX - c_vscreen_X + 3, camY - c_vscreen_Y + 3, c_vscreen.Width - 6, c_vscreen.Height - 6,
                         {255, 255, 255}, false);
-                    SuperPrint(std::to_string(c_vscreen_Z), 1, camX - c_vscreen.X + 4, camY - c_vscreen.Y + 4);
+                    SuperPrint(std::to_string(c_vscreen_Z), 1, camX - c_vscreen_X + 4, camY - c_vscreen_Y + 4);
                 }
             }
 
@@ -3373,15 +3377,13 @@ void UpdateGraphicsMeta()
         if(XRender::TargetH >= 640 && g_config.show_episode_title == Config_t::EPISODE_TITLE_TOP)
         {
             int y = 20;
-            float alpha = 1.0f;
-            SuperPrintScreenCenter(WorldName, 3, y, XTAlphaF(alpha));
+            SuperPrintScreenCenter(WorldName, 3, y);
         }
         // display at bottom
         else if(g_config.show_episode_title == Config_t::EPISODE_TITLE_BOTTOM)
         {
             int y = XRender::TargetH - 60;
-            float alpha = 0.75f;
-            SuperPrintScreenCenter(WorldName, 3, y, XTAlphaF(alpha));
+            SuperPrintScreenCenter(WorldName, 3, y, XTAlphaF(0.75f));
         }
     }
 
