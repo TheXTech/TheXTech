@@ -89,3 +89,6 @@ CMakeSettings.json
 
 # Vendored assets packages shouldn't appear at the GIT history
 /assets/
+
+# clangd related stuff
+.cache/
