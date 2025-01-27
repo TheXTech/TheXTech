@@ -205,7 +205,7 @@ static void extSfxStopCallback(int channel);
 static const int maxSfxChannels = 91;
 
 #ifdef LOW_MEM
-static const double c_max_chunk_duration = 0.75; // max length of an in-memory chunk in seconds
+static const double c_max_chunk_duration = 1.25; // max length of an in-memory chunk in seconds
 #else
 static const double c_max_chunk_duration = 5.0;  // max length of an in-memory chunk in seconds
 #endif
