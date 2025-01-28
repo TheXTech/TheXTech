@@ -19,7 +19,7 @@ concurrency:
 
 jobs:
   build:
-    name: Syncing lagnuages
+    name: Syncing languages
     runs-on: ubuntu-latest
     container: ghcr.io/thextech/wohlnet-ci-ubuntu2404:latest
     strategy:
