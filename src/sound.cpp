@@ -194,7 +194,7 @@ struct SFX_t
 };
 
 static std::unordered_map<std::string, Music_t> music;
-static std::unordered_map<std::string, SFX_t>   sound;
+static std::unordered_map<int, SFX_t>           sound;
 
 //! Sounds played by scripts
 static SDL_atomic_t                                extSfxBusy;
@@ -485,7 +485,7 @@ static void RestoreSfx(SFX_t &u)
 
 static void AddSfx(SoundScope root,
                    IniProcessing &ini,
-                   const std::string &alias,
+                   int alias,
                    const std::string &group,
                    bool isCustom = false)
 {
@@ -591,7 +591,7 @@ static void AddSfx(SoundScope root,
                 m.path = g_dirCustom.resolveFileCaseAbs(f);
 
             m.isSilent = isSilent;
-            pLogDebug("Adding SFX [%s] '%s'", alias.c_str(), isSilent ? "<silence>" : m.path.c_str());
+            pLogDebug("Adding SFX [sound%d] '%s'", alias, isSilent ? "<silence>" : m.path.c_str());
             if(!isSilent)
             {
                 m.music = Mix_LoadMUS((m.path).c_str());
@@ -751,7 +751,7 @@ void PlayMusic(const std::string &Alias, int fadeInMs)
         pLogWarning("Unknown music alias '%s'", Alias.c_str());
 }
 
-void PlaySfx(const std::string &Alias, int loops, int volume, uint8_t left, uint8_t right)
+void PlaySfx(int Alias, int loops, int volume, uint8_t left, uint8_t right)
 {
     if(!g_mixerLoaded || (int)g_config.audio_sfx_volume == 0)
         return;
@@ -779,7 +779,7 @@ void PlaySfx(const std::string &Alias, int loops, int volume, uint8_t left, uint
     }
 }
 
-void StopSfx(const std::string &Alias)
+void StopSfx(int Alias)
 {
     auto sfx = sound.find(Alias);
     if(sfx != sound.end())
@@ -1162,7 +1162,7 @@ static void loadCustomSfxIni(SoundScope root, const std::string &path)
     IniProcessing sounds = Files::load_ini(path);
     for(unsigned int i = 1; i <= g_totalSounds; ++i)
     {
-        std::string alias = fmt::format_ne("sound{0}", i);
+        int alias = i;
         std::string group = fmt::format_ne("sound-{0}", i);
         AddSfx(root, sounds, alias, group, true);
     }
@@ -1298,7 +1298,7 @@ void InitSound()
 
     for(unsigned int i = 1; i <= g_totalSounds; ++i)
     {
-        std::string alias = fmt::format_ne("sound{0}", i);
+        int alias = i;
         std::string group = fmt::format_ne("sound-{0}", i);
         AddSfx(SoundScope::global, sounds, alias, group);
 
@@ -1471,7 +1471,7 @@ void PlaySound(int A, int loops, int volume)
 
     if(SoundPause[A] == 0) // if the sound wasn't just played
     {
-        std::string alias = fmt::format_ne("sound{0}", A);
+        int alias = A;
         PlaySfx(alias, loops, volume);
         s_resetSoundDelay(A);
     }
@@ -1504,7 +1504,7 @@ void PlaySoundSpatial(int A, int l, int t, int r, int b, int loops, int volume)
         if(g_config.sfx_spatial_audio)
             Sound_ResolveSpatialMod(left, right, l, t, r, b);
 
-        std::string alias = fmt::format_ne("sound{0}", A);
+        int alias = A;
         PlaySfx(alias, loops, volume, left, right);
         s_resetSoundDelay(A);
     }
@@ -1526,7 +1526,7 @@ void PlaySoundMenu(int A, int loops)
         return;
     }
 
-    std::string alias = fmt::format_ne("sound{0}", A);
+    int alias = A;
     PlaySfx(alias, loops);
     s_resetSoundDelay(A);
 }
