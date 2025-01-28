@@ -184,9 +184,9 @@ void SoundPauseEngine(int paused);
 // Public Sub PlayMusic(Alias As String)
 void PlayMusic(const std::string &Alias, int fadeInMs = 0);
 // Public Sub PlaySfx(Alias As String)
-void PlaySfx(const std::string &Alias, int loops = 0, int volume = 128, uint8_t left = 255, uint8_t right = 255);
+void PlaySfx(int Alias, int loops = 0, int volume = 128, uint8_t left = 255, uint8_t right = 255);
 // Public Sub StopSfx(Alias As String)
-void StopSfx(const std::string &Alias);
+void StopSfx(int Alias);
 // Public Sub StartMusic(A As Integer) 'play music
 void setMusicStartDelay();
 void delayedMusicStart();
