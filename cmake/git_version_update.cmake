@@ -20,7 +20,7 @@ endif()
 
 # Get the latest abbreviated commit hash of the working branch
 execute_process(
-        COMMAND git log -1 --format=%h
+        COMMAND git log -1 --format=%h --abbrev=8
         WORKING_DIRECTORY ${SOURCE_DIR}
         OUTPUT_VARIABLE GIT_COMMIT_HASH
         OUTPUT_STRIP_TRAILING_WHITESPACE
