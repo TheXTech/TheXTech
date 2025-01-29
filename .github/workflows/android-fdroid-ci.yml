@@ -120,19 +120,19 @@ jobs:
         if: ${{ steps.signing-check.outputs.available == 'true' }}
         shell: bash
         run: |
-          mv thextech/build/outputs/apk/fdroid/releaseci/thextech-fdroid-releaseci.apk thextech-android-fdroid-${{ steps.extract-version.ver_name }}.apk
+          mv thextech/build/outputs/apk/fdroid/releaseci/thextech-fdroid-releaseci.apk thextech-android-fdroid-${{ steps.extract-version.outputs.ver_name }}.apk
 
       - name: Rename APK (unsigned)
         if: ${{ steps.signing-check.outputs.available != 'true' }}
         shell: bash
         run: |
-          mv thextech/build/outputs/apk/fdroid/release/thextech-fdroid-release-unsigned.apk thextech-android-fdroid-${{ steps.extract-version.ver_name }}-unsigned.apk
+          mv thextech/build/outputs/apk/fdroid/release/thextech-fdroid-release-unsigned.apk thextech-android-fdroid-${{ steps.extract-version.outputs.ver_name }}-unsigned.apk
 
       - name: Upload APK
         if: success() && ${{ steps.signing-check.outputs.available == 'true' }}
         uses: actions/upload-artifact@v4
         with:
-          name: thextech-android-${{ steps.extract-version.ver_name }}
+          name: thextech-android-${{ steps.extract-version.outputs.ver_name }}
           path: android-project/thextech-android-*.apk
 
       - name: Upload APK (unsigned)
@@ -150,9 +150,9 @@ jobs:
         run: |
           UPLOAD_LIST="set ssl:verify-certificate no;"
           if [[ "${{ steps.signing-check.outputs.available }}" == 'true' ]]; then
-              UPLOAD_LIST="${UPLOAD_LIST} put -O "www/android/fdroid/" ./thextech-android-fdroid-${{ steps.extract-version.ver_name }}.apk;"
+              UPLOAD_LIST="${UPLOAD_LIST} put -O "www/android/fdroid/" ./thextech-android-fdroid-${{ steps.extract-version.outputs.ver_name }}.apk;"
           else
-              UPLOAD_LIST="${UPLOAD_LIST} put -O "www/android/fdroid/" ./thextech-android-fdroid-${{ steps.extract-version.ver_name }}-unsigned.apk;"
+              UPLOAD_LIST="${UPLOAD_LIST} put -O "www/android/fdroid/" ./thextech-android-fdroid-${{ steps.extract-version.outputs.ver_name }}-unsigned.apk;"
           fi
           lftp -e "${UPLOAD_LIST} exit" -u ${{ secrets.builds_login }},${{ secrets.builds_password }} ${{ secrets.builds_host }}
 
