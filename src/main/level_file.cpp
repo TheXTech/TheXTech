@@ -165,7 +165,6 @@ struct LevelLoad
     SaveInfoInit si;
 
     int numPlayerStart = 0;
-    bool use_new_conveyors = false;
 
     layerindex_t layers_finalized = 0;
     eventindex_t events_finalized = 0;
@@ -326,25 +325,6 @@ bool OpenLevelData(PGE_FileFormats_misc::TextInput& input, const std::string Fil
 
 
     load.si.begin(g_curLevelMedals.should_initialize());
-
-    // turn NPC conveyor belts into new conveyor belts in modern mode
-    if(g_config.new_conveyor_belts && !LevelEditor)
-    {
-        const NPCTraits_t& t = NPCTraits[NPCID_CONVEYOR];
-
-        // check all of these conditions first
-        if(t.FrameOffsetX == 0 && t.FrameOffsetY == 0
-            && (t.WidthGFX == 0 || t.WidthGFX == t.TWidth)
-            && (t.HeightGFX == 0 || t.HeightGFX == t.THeight)
-            && t.IsABlock && t.CanWalkOn && t.MovesPlayer && !t.JumpHurt
-            && t.WontHurt && t.NoYoshi && t.Speedvar == 1)
-        {
-            load.use_new_conveyors = true;
-        }
-
-        // (note: it might be possible to handle the case where MovesPlayer and IsABlock are both false but CanWalkOn and IsAHit1Block are true)
-        // (note: it might be possible to handle the case where SpeedVar is not 1 -- still risky if SpeedVar is greater than 10)
-    }
 
 #ifdef PGEFL_CALLBACK_API
     LevelLoadCallbacks callbacks = OpenLevel_SetupCallbacks(load);
@@ -893,27 +873,6 @@ bool OpenLevel_NPC(void* userdata, LevelNPC& n)
 {
     LevelLoad& load = *static_cast<LevelLoad*>(userdata);
 
-    if(n.id == NPCID_CONVEYOR && !n.friendly && load.use_new_conveyors && numBlock < maxBlocks)
-    {
-        numBlock++;
-
-        auto &block = Block[numBlock];
-
-        block = Block_t();
-
-        block.Location.X = double(n.x);
-        block.Location.Y = double(n.y);
-        block.Location.Height = double(NPCTraits[NPCID_CONVEYOR].THeight);
-        block.Location.Width = double(NPCTraits[NPCID_CONVEYOR].TWidth);
-
-        block.Type = (n.direct > 0) ? BLKID_CONVEYOR_R_CONV : BLKID_CONVEYOR_L_CONV;
-        block.Location.SpeedX = (n.direct > 0) ? 0.8 : -0.8;
-        block.DefaultType = block.Type;
-        block.Layer = load.FindLayer(n.layer);
-
-        return true;
-    }
-
     {
         bool variantHandled = false;
 
@@ -1293,8 +1252,6 @@ void OpenLevel_FixLayersEvents(const LevelLoad& load)
                     npc.Killed = 9;
             }
         }
-
-        syncLayers_NPC(A);
     }
 
     for(int A = 1; A <= numWarps; A++)
@@ -1467,8 +1424,61 @@ void OpenLevelDataPost()
             FileRecentSubHubLevel = FileNameFull;
     }
 
+    // turn NPC conveyor belts into new conveyor belts in modern mode
+    bool used_new_belts = false;
+
+    if(g_config.new_conveyor_belts && !LevelEditor)
+    {
+        const NPCTraits_t& t = NPCTraits[NPCID_CONVEYOR];
+
+        // check all of these conditions first
+        if(t.FrameOffsetX == 0 && t.FrameOffsetY == 0
+            && (t.WidthGFX == 0 || t.WidthGFX == t.TWidth)
+            && (t.HeightGFX == 0 || t.HeightGFX == t.THeight)
+            && t.IsABlock && t.CanWalkOn && t.MovesPlayer && !t.JumpHurt
+            && t.WontHurt && t.NoYoshi && t.Speedvar == 1)
+        {
+            int numNPCs_new = 0;
+
+            for(int A = 1; A <= numNPCs; A++)
+            {
+                const NPC_t& n_in = NPC[A];
+
+                if(n_in.Type == NPCID_CONVEYOR && !n_in.Inert && numBlock < maxBlocks)
+                {
+                    used_new_belts = true;
+
+                    numBlock++;
+
+                    auto &block = Block[numBlock];
+
+                    block = Block_t();
+
+                    block.Location = n_in.Location;
+
+                    block.Type = (n_in.Direction > 0) ? BLKID_CONVEYOR_R_CONV : BLKID_CONVEYOR_L_CONV;
+                    block.Location.SpeedX = (n_in.Direction > 0) ? 0.8 : -0.8;
+
+                    block.DefaultType = block.Type;
+                    block.Layer = n_in.Layer;
+
+                    continue;
+                }
+
+                numNPCs_new++;
+                if(A != numNPCs_new)
+                    NPC[numNPCs_new] = NPC[A];
+            }
+
+            numNPCs = numNPCs_new;
+        }
+
+        // (note: it might be possible to handle the case where MovesPlayer and IsABlock are both false but CanWalkOn and IsAHit1Block are true)
+        // (note: it might be possible to handle the case where SpeedVar is not 1 -- still risky if SpeedVar is greater than 10)
+    }
+
     // TODO: disable this if the file indicates that it is already sorted
-    if(g_config.emulate_classic_block_order && FileFormat == FileFormats::LVL_PGEX)
+    if(g_config.emulate_classic_block_order && (FileFormat == FileFormats::LVL_PGEX || used_new_belts))
     {
         qSortBlocksX(1, numBlock);
 
@@ -1495,6 +1505,7 @@ void OpenLevelDataPost()
     // FindSBlocks();
     syncLayersTrees_AllBlocks();
     syncLayers_AllBGOs();
+    syncLayers_AllNPCs();
 
     NPC_ConstructCanonicalSet();
 
