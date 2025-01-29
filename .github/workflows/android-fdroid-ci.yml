@@ -72,7 +72,7 @@ jobs:
         uses: actions/setup-java@v3.11.0
         with:
           java-version: 21
-          distribution: 'oracle'
+          distribution: 'temurin'
 
       - uses: nttld/setup-ndk@v1
         with:
