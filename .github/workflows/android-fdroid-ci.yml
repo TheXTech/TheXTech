@@ -96,31 +96,27 @@ jobs:
         if: ${{ steps.signing-check.outputs.available == 'true' }}
         run: echo "${{ secrets.ANDROID_KEYSTORE }}" | base64 -d > release-key.jks
 
-      - name: Build with Gradle
-        if: ${{ steps.signing-check.outputs.available == 'true' }}
-        run: ./gradlew assembleFdroidReleaseci
-        env:
-          RELEASE_STORE_PASSWORD: ${{ secrets.RELEASE_STORE_PASSWORD }}
-          RELEASE_KEY_PASSWORD: ${{ secrets.RELEASE_KEY_PASSWORD }}
-          RELEASE_KEY_ALIAS: ${{ secrets.RELEASE_KEY_ALIAS }}
-          PIN_ALIAS: ${{ secrets.PIN_ALIAS }}
-          DB_PASS_ALIAS: ${{ secrets.DB_PASS_ALIAS }}
-
-      - name: Build with Gradle (unsigned)
-        if: ${{ steps.signing-check.outputs.available != 'true' }}
+      - name: Build unsigned with Gradle
         run: ./gradlew assembleFdroidRelease
-        env:
-          RELEASE_STORE_PASSWORD: ${{ secrets.RELEASE_STORE_PASSWORD }}
-          RELEASE_KEY_PASSWORD: ${{ secrets.RELEASE_KEY_PASSWORD }}
-          RELEASE_KEY_ALIAS: ${{ secrets.RELEASE_KEY_ALIAS }}
-          PIN_ALIAS: ${{ secrets.PIN_ALIAS }}
-          DB_PASS_ALIAS: ${{ secrets.DB_PASS_ALIAS }}
 
-      - name: Rename APK
+      - name: Sign and rename APK
         if: ${{ steps.signing-check.outputs.available == 'true' }}
         shell: bash
         run: |
-          mv thextech/build/outputs/apk/fdroid/releaseci/thextech-fdroid-releaseci.apk thextech-android-fdroid-${{ steps.extract-version.outputs.ver_name }}.apk
+          apksigner sign --ks 'release-key.jks' \
+            --ks-pass env:RELEASE_STORE_PASSWORD \
+            --ks-key-alias ${{ secrets.RELEASE_KEY_ALIAS }} \
+            --min-sdk-version 16 \
+            --v1-signing-enabled \
+            --v2-signing-enabled \
+            --out thextech-android-fdroid-${{ steps.extract-version.outputs.ver_name }}.apk \
+            thextech/build/outputs/apk/fdroid/release/thextech-fdroid-release.apk
+        env:
+          RELEASE_STORE_PASSWORD: ${{ secrets.RELEASE_STORE_PASSWORD }}
+          RELEASE_KEY_PASSWORD: ${{ secrets.RELEASE_KEY_PASSWORD }}
+          RELEASE_KEY_ALIAS: ${{ secrets.RELEASE_KEY_ALIAS }}
+          PIN_ALIAS: ${{ secrets.PIN_ALIAS }}
+          DB_PASS_ALIAS: ${{ secrets.DB_PASS_ALIAS }}
 
       - name: Rename APK (unsigned)
         if: ${{ steps.signing-check.outputs.available != 'true' }}
@@ -140,7 +136,7 @@ jobs:
         uses: actions/upload-artifact@v4
         continue-on-error: true
         with:
-          name: thextech-android-${BRANCH_NAME}-unsigned
+          name: thextech-android-${{ steps.extract-version.outputs.ver_name }}-unsigned
           path: android-project/thextech-android-*.apk
 
       - name: Deploy to builds.wohlsoft.ru
