@@ -58,7 +58,7 @@ jobs:
         id: extract-version
         shell: bash
         run: |
-            ver_name=`perl -ne 'm/THEXTECH_ANDROID_VERSION_NAME\s+"([\d\w.\-]+)"/ && print "$1"' version.cmake`
+            ver_name=`perl -ne 'm/THEXTECH_ANDROID_VERSION_NAME\s+"([\d\w.\-]+)"/ && print "$1"' ../version.cmake`
             echo "Version name in version.cmake: ${ver_name}"
             echo "ver_name=${ver_name}" >> $GITHUB_OUTPUT;
 
