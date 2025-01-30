@@ -34,12 +34,6 @@
 
 #   include <SDL2/SDL_system.h>
 #   include <jni.h>
-#   if 1
-#       undef JNIEXPORT
-#       undef JNICALL
-#       define JNIEXPORT extern "C"
-#       define JNICALL
-#   endif
 
 static void s_textEntry_callDialog()
 {
@@ -763,7 +757,7 @@ bool Logic()
 
 #ifdef __ANDROID__
 
-JNIEXPORT void JNICALL
+extern "C" JNIEXPORT void JNICALL
 Java_ru_wohlsoft_thextech_thextechActivity_textentry_1setBuffer(JNIEnv *env, jclass clazz, jstring line_j)
 {
     const char *line;

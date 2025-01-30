@@ -49,18 +49,12 @@
 
 #ifdef __ANDROID__
 #   include <jni.h>
-#   if 1
-#       undef JNIEXPORT
-#       undef JNICALL
-#       define JNIEXPORT extern "C"
-#       define JNICALL
-#   endif
 
 static double s_screenSize = -1;
 static double s_screenWidth = -1;
 static double s_screenHeight = -1;
 
-JNIEXPORT void JNICALL
+extern "C" JNIEXPORT void JNICALL
 Java_ru_wohlsoft_thextech_thextechActivity_setScreenSize(
     JNIEnv* env,
     jclass type,
@@ -76,7 +70,7 @@ Java_ru_wohlsoft_thextech_thextechActivity_setScreenSize(
     s_screenHeight = screenHeight;
 }
 
-JNIEXPORT void JNICALL
+extern "C" JNIEXPORT void JNICALL
 Java_org_libsdl_app_SDLActivity_thextechDebugLog(
     JNIEnv* env,
     jclass clazz,
