@@ -243,7 +243,7 @@ if(ANDROID)
         set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} ${FILE_PATH_OVERRIDE}")
         set(CMAKE_C_FLAGS_MINSIZEREL "${CMAKE_C_FLAGS_MINSIZEREL} ${FILE_PATH_OVERRIDE}")
         set(CMAKE_CXX_FLAGS_MINSIZEREL "${CMAKE_CXX_FLAGS_MINSIZEREL} ${FILE_PATH_OVERRIDE}")
-        set(CMAKE_SHARED_LINKER_FLAGS "-Wl,--build-id=none")
+        set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,--build-id=none")
         set(ENV{CFLAGS} "${FILE_PATH_OVERRIDE}")
         set(ENV{CXXFLAGS} "${FILE_PATH_OVERRIDE}")
     endif()
@@ -259,6 +259,8 @@ if(ANDROID)
         "-DCMAKE_MAKE_PROGRAM=${CMAKE_MAKE_PROGRAM}"
         "-DANDROID_ARM_NEON=${ANDROID_ARM_NEON}"
     )
+
+    message("--Current Android STL=${ANDROID_STL} and flags: ${ANDROID_CMAKE_FLAGS}")
 
     if(FDROID_BUILD)
         # Ensure reproducibility of builds by replacing build paths with a custom one

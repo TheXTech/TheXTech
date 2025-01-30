@@ -189,7 +189,7 @@ android {
             dimension "dist"
             externalNativeBuild {
                 cmake {
-                    arguments "-DTHEXTECH_NO_BUILD_DATE=ON", "-DFDROID_BUILD=TRUE", "-DOVERRIDE_GIT_BRANCH=\"<fdroid>\""
+                    arguments += ["-DTHEXTECH_NO_BUILD_DATE=ON", "-DFDROID_BUILD=TRUE", "-DOVERRIDE_GIT_BRANCH=\"<fdroid>\"", "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON"]
                 }
             }
 
