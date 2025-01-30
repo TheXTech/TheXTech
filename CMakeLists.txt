@@ -772,6 +772,7 @@ set(THEXTECH_SRC
     src/globals.cpp
     src/npc.cpp
     src/sound.cpp
+    src/sound_thread.cpp
     src/sound_spatial.cpp
     src/sound/sound_msgsnd.cpp
     src/frame_timer.cpp
