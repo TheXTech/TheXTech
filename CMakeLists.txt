@@ -69,6 +69,8 @@ endif()
 
 if(ANDROID)
     set(DEPENDENCIES_INSTALL_DIR ${CMAKE_BINARY_DIR}/output-deps)
+    set(FDROID_BUILD OFF CACHE BOOL "Is this build a part of the F-Droid workflow?")
+    mark_as_advanced(FDROID_BUILD)
 else()
     set(DEPENDENCIES_INSTALL_DIR ${CMAKE_BINARY_DIR}/output)
 endif()

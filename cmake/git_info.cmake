@@ -43,8 +43,9 @@ execute_process(
         OUTPUT_STRIP_TRAILING_WHITESPACE
 )
 
-# flatpak-builder breaks any commands that check the git tree
-if(NOT "${GIT_DIRTY_STRING}" STREQUAL "" AND NOT FLATPAK_BUILD)
+# flatpak-builder breaks any commands that check the git tree,
+# and fdroid applies local autochanges such as gradle wrapper removal and build.gradle patching
+if(NOT "${GIT_DIRTY_STRING}" STREQUAL "" AND NOT FLATPAK_BUILD AND NOT FDROID_BUILD)
     set(GIT_COMMIT_HASH "${GIT_COMMIT_HASH}-dirty")
 endif()
 

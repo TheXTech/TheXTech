@@ -9,9 +9,11 @@ endif()
 # creates git_version.h using cmake script
 add_custom_command(TARGET git_version PRE_BUILD
     COMMAND ${CMAKE_COMMAND}
-        -DSOURCE_DIR=${CMAKE_CURRENT_SOURCE_DIR} -DOVERRIDE_GIT_BRANCH=${OVERRIDE_GIT_BRANCH}
-        -DFLATPAK_BUILD=${FLATPAK_BUILD}
-        -P ${CMAKE_CURRENT_SOURCE_DIR}/cmake/git_version_update.cmake)
+        "-DSOURCE_DIR=${CMAKE_CURRENT_SOURCE_DIR}"
+        "-DOVERRIDE_GIT_BRANCH=${OVERRIDE_GIT_BRANCH}"
+        "-DFLATPAK_BUILD=${FLATPAK_BUILD}"
+        "-DFDROID_BUILD=${FDROID_BUILD}"
+        -P "${CMAKE_CURRENT_SOURCE_DIR}/cmake/git_version_update.cmake")
 
 # attempt to force reconfigure for the build AFTER git status changes
 set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/generated-include/git_version.h")

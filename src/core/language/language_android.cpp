@@ -23,17 +23,11 @@
 #include <algorithm>
 
 #include <jni.h>
-#if 1
-#   undef JNIEXPORT
-#   undef JNICALL
-#   define JNIEXPORT extern "C"
-#   define JNICALL
-#endif
 
 static std::string s_lang;
 static std::string s_country;
 
-JNIEXPORT void JNICALL
+extern "C" JNIEXPORT void JNICALL
 Java_ru_wohlsoft_thextech_thextechActivity_setLanguageCodes(
     JNIEnv* env,
     jclass clazz,
