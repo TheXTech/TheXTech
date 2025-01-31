@@ -20,12 +20,6 @@
 #include <unistd.h>
 //#   include <md5/md5.h>
 #include <jni.h>
-#if 1
-#   undef JNIEXPORT
-#   undef JNICALL
-#   define JNIEXPORT extern "C"
-#   define JNICALL
-#endif
 
 #include <SDL2/SDL_stdinc.h>
 #include <SDL2/SDL_rwops.h>
@@ -50,7 +44,7 @@ static std::string m_androidGameAssetsPath;
 static std::string m_androidAppDataPath;
 
 
-JNIEXPORT void JNICALL
+extern "C" JNIEXPORT void JNICALL
 Java_ru_wohlsoft_thextech_thextechActivity_setSdCardPath(
     JNIEnv *env,
     jclass type,
@@ -64,7 +58,7 @@ Java_ru_wohlsoft_thextech_thextechActivity_setSdCardPath(
     env->ReleaseStringUTFChars(sdcardPath_j, sdcardPath);
 }
 
-JNIEXPORT void JNICALL
+extern "C" JNIEXPORT void JNICALL
 Java_ru_wohlsoft_thextech_thextechActivity_setAppDataPath(
     JNIEnv *env,
     jclass type,
@@ -78,7 +72,7 @@ Java_ru_wohlsoft_thextech_thextechActivity_setAppDataPath(
     env->ReleaseStringUTFChars(appDataPath_j, appDataPath);
 }
 
-JNIEXPORT void JNICALL
+extern "C" JNIEXPORT void JNICALL
 Java_ru_wohlsoft_thextech_thextechActivity_setGameAssetsPath(
     JNIEnv *env,
     jclass type,

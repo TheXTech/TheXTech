@@ -75,7 +75,7 @@ def cmakeToVersionCode(verNum) {
     return ret
 }
 
-def cmakeToClearVersionCode(verNum) {
+static def cmakeToClearVersionCode(verNum) {
     def ret = ""
 
     ret += verNum[0].toString()
@@ -120,6 +120,13 @@ android {
 
     buildFeatures {
         buildConfig true
+    }
+
+    dependenciesInfo {
+        // Disables dependency metadata when building APKs.
+        includeInApk = false
+        // Disables dependency metadata when building Android App Bundles.
+        includeInBundle = false
     }
 
     defaultConfig {
@@ -168,16 +175,25 @@ android {
         debug {
             applicationIdSuffix '.debug'
             versionNameSuffix '-DEVDEBUG'
+            debuggable true
         }
     }
 
-    flavorDimensions = ["default"]
+    flavorDimensions = ["dist"]
     productFlavors {
-        apk {}
+        apk {
+            dimension "dist"
+            isDefault true
+        }
         fdroid {
-            defaultConfig.externalNativeBuild.cmake.arguments += "-DTHEXTECH_NO_BUILD_DATE=ON"
-            defaultConfig.versionName = xTechVersionStringClear
-            println "Project CMake arguments: " + defaultConfig.externalNativeBuild.cmake.arguments + ", clear version string: " + defaultConfig.versionName
+            dimension "dist"
+            externalNativeBuild {
+                cmake {
+                    arguments += ["-DTHEXTECH_NO_BUILD_DATE=ON", "-DFDROID_BUILD=TRUE", "-DOVERRIDE_GIT_BRANCH=\"<fdroid>\"", "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON"]
+                }
+            }
+
+            versionName = xTechVersionStringClear
 
             if(project.hasProperty('applicationIdSuffix')) {
                 applicationIdSuffix += '.fdroid'

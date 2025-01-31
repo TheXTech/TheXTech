@@ -20,7 +20,7 @@ endif()
 
 # Get the latest abbreviated commit hash of the working branch
 execute_process(
-        COMMAND git log -1 --format=%h
+        COMMAND git log -1 --format=%h --abbrev=8
         WORKING_DIRECTORY ${SOURCE_DIR}
         OUTPUT_VARIABLE GIT_COMMIT_HASH
         OUTPUT_STRIP_TRAILING_WHITESPACE
@@ -35,7 +35,7 @@ execute_process(
 )
 
 # flatpak-builder breaks any commands that check the git tree
-if(NOT "${GIT_DIRTY_STRING}" STREQUAL "" AND NOT FLATPAK_BUILD)
+if(NOT "${GIT_DIRTY_STRING}" STREQUAL "" AND NOT FLATPAK_BUILD AND NOT FDROID_BUILD)
     # on CI, display the git diff in the log
     if(OVERRIDE_GIT_BRANCH OR DEFINED ENV{CI})
         message("=== git index dirty, see diff:")
