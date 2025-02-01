@@ -646,6 +646,10 @@ if(NINTENDO_DS AND CALICO_ROOT)
 endif()
 
 add_subdirectory(3rdparty/mbediso EXCLUDE_FROM_ALL)
+if(NOT USE_SYSTEM_SDL2 AND NOT THEXTECH_NO_SDL_BUILD)
+    target_include_directories(mbediso PRIVATE "${DEPENDENCIES_INSTALL_DIR}/include")
+    add_dependencies(mbediso AudioCodecs_Local)
+endif()
 target_link_libraries(A2XT_Int INTERFACE mbediso)
 target_compile_definitions(A2XT_Int INTERFACE
     -DPGE_USE_ARCHIVES  # DirMan should use the archives library
