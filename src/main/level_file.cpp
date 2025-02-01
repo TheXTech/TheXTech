@@ -1444,7 +1444,14 @@ void OpenLevelDataPost()
             {
                 const NPC_t& n_in = NPC[A];
 
-                if(n_in.Type == NPCID_CONVEYOR && !n_in.Inert && numBlock < maxBlocks)
+                if(n_in.Type == NPCID_CONVEYOR &&
+                   !n_in.Inert &&
+                   numBlock < maxBlocks &&
+                   n_in.AttLayer == LAYER_NONE &&
+                   n_in.TriggerActivate == EVENT_NONE &&
+                   n_in.TriggerDeath == EVENT_NONE &&
+                   n_in.TriggerLast == EVENT_NONE &&
+                   n_in.TriggerTalk == EVENT_NONE)
                 {
                     used_new_belts = true;
 
