@@ -1447,11 +1447,7 @@ void OpenLevelDataPost()
                 if(n_in.Type == NPCID_CONVEYOR &&
                    !n_in.Inert &&
                    numBlock < maxBlocks &&
-                   n_in.AttLayer == LAYER_NONE &&
-                   n_in.TriggerActivate == EVENT_NONE &&
-                   n_in.TriggerDeath == EVENT_NONE &&
-                   n_in.TriggerLast == EVENT_NONE &&
-                   n_in.TriggerTalk == EVENT_NONE)
+                   n_in.AttLayer == LAYER_NONE)
                 {
                     used_new_belts = true;
 
