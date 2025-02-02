@@ -13,6 +13,7 @@ Changelog for 1.3.7.1-dev
 -Fix TheXTech 1.3.7 peculiarity where NPCs that hid themselves on activation would be shown before coming onscreen (@ds-sloth)
 -Fix TheXTech 1.3.7 peculiarity where player preview sprites in the main menu would not use the correct death effects (@ds-sloth)
 -Fix TheXTech 1.3.6.1 bug where a plant on a hidden moving layer would sometimes not appear after showing the layer (@ds-sloth, @Wohlstand)
+-Fixed a bug from the TheXTech 1.3.6 where music of a wrong section gets started when player enters level by a warp into section with no music (@Wohlstand)
 
 Changelog for 1.3.7
 -Fix vanilla peculiarity where medals were sometimes not collected when killed, guarded by "fix-medal-kill" [Modern Mode] (@ds-sloth, thanks to @Superbloxen for the report)
