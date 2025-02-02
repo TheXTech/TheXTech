@@ -1859,11 +1859,20 @@ void UpdateLayers()
                             {
                                 NPC[B].Location.X = NPC[B].DefaultLocationX;
                                 NPC[B].Location.Y = NPC[B].DefaultLocationY;
+
+                                // In SMBX 1.3, these assignments undone during the next call to UpdateNPCs.
+                                // Add to NPCQueues::Unchecked to ensure that will happen still.
                                 if(NPC[B].Type == NPCID_PLANT_S3 || NPC[B].Type == NPCID_BIG_PLANT || NPC[B].Type == NPCID_PLANT_S1 ||
                                    NPC[B].Type == NPCID_LONG_PLANT_UP || NPC[B].Type == NPCID_FIRE_PLANT)
+                                {
                                     NPC[B].Location.Y += NPC[B]->THeight;
+                                    NPCQueues::Unchecked.push_back(B);
+                                }
                                 else if(NPC[B].Type == NPCID_SIDE_PLANT && NPC[B].Direction == -1)
+                                {
                                     NPC[B].Location.X += NPC[B]->TWidth;
+                                    NPCQueues::Unchecked.push_back(B);
+                                }
                             }
                             else
                             {

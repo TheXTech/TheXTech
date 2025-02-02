@@ -975,6 +975,13 @@ interrupt_Activation:
                 NPCHit(A, 9);
             }
         }
+
+        // check for inactive NPCs that got the wrong location
+        if(NPC[A].Hidden)
+        {
+            // essential part of Deactivate(A);
+            NPC[A].ResetLocation();
+        }
     }
 
     NPCQueues::Unchecked.clear();
