@@ -2756,6 +2756,7 @@ void NPCSpecial(int A)
                 } // any important BGO?
             } // for BGOs
 
+            // store current rail type in Special5
             npc.Special5 = bgo_type;
 
             if(!tempBool)
@@ -2787,7 +2788,12 @@ void NPCSpecial(int A)
 
                 // in either mode, try to "cancel" the NPC once it has fallen below everything
                 // fixes some serious memory exhaustion bugs
-                if(npc.Location.Y > level[npc.Section].Height + 128)
+                int below_section = (int)(npc.Location.Y - level[npc.Section].Height);
+
+                // kill 4096 below section in Vanilla, and 1024 below section in Classic / Modern
+                int kill_threshold = (!g_config.fix_platforms_acceleration) ? 4096 : 1024;
+
+                if(below_section >= kill_threshold)
                 {
                     bool below_all = true;
 
