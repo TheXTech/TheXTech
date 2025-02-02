@@ -857,7 +857,8 @@ void UpdateNPCs()
         if(NPC[A].Hidden)
         {
             // essential part of Deactivate(A);
-            NPC[A].ResetLocation();
+            NPC[A].Location.X = NPC[A].DefaultLocationX;
+            NPC[A].Location.Y = NPC[A].DefaultLocationY;
         }
     }
 
