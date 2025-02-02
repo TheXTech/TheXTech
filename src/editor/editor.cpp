@@ -470,10 +470,10 @@ void UpdateEditor()
                             n.generator_period = EditorCursor.NPC.GeneratorTimeMax;
                         }
 
-                        if(n.id == 91 || n.id == 96 || n.id == 283 || n.id == 284)
+                        if(n.id == NPCID_ITEM_BURIED || n.id == 96 || n.id == 283 || n.id == 284)
                             n.contents = (long)EditorCursor.NPC.Special;
 
-                        if(n.id == 288 || n.id == 289 || (n.id == 91 && int(EditorCursor.NPC.Special) == 288))
+                        if(n.id == 288 || n.id == 289 || (n.id == NPCID_ITEM_BURIED && int(EditorCursor.NPC.Special) == 288))
                             n.special_data = EditorCursor.NPC.Special2;
 
                         if(NPCIsAParaTroopa(n.id) || NPCTraits[n.id].IsFish || n.id == 260)
@@ -1243,14 +1243,13 @@ void UpdateEditor()
             }
             else if(EditorCursor.Mode == OptCursor_t::LVL_NPCS) // NPCs
             {
-                if(EditorCursor.NPC.Type != 91 && EditorCursor.NPC.Type != 259 && EditorCursor.NPC.Type != 260)
+                if(EditorCursor.NPC.Type != NPCID_ITEM_BURIED && EditorCursor.NPC.Type != NPCID_FIRE_DISK && EditorCursor.NPC.Type != NPCID_FIRE_CHAIN)
                 {
                     for(A = 1; A <= numBlock; A++)
                     {
-                        if(!BlockIsSizable[Block[A].Type])
+                        if(!BlockIsSizable[Block[A].Type] && !Block[A].Hidden && BlockSlope[Block[A].Type] == 0 && BlockSlope2[Block[A].Type] == 0)
                         {
-                            if(CursorCollision(EditorCursor.Location, Block[A].Location) &&
-                               !Block[A].Hidden && BlockSlope[Block[A].Type] == 0 && BlockSlope2[Block[A].Type] == 0)
+                            if(CursorCollision(EditorCursor.Location, Block[A].Location))
                             {
                                 CanPlace = false;
                                 break;
@@ -1261,11 +1260,11 @@ void UpdateEditor()
 
                 for(A = 1; A <= numNPCs; A++)
                 {
-                    if(CursorCollision(EditorCursor.Location, NPC[A].Location) && !NPC[A].Hidden && NPC[A].Active && (NPC[A].Type != NPCID_LIFT_SAND || EditorCursor.NPC.Type == 159))
+                    if(CursorCollision(EditorCursor.Location, NPC[A].Location) && !NPC[A].Hidden && NPC[A].Active && (NPC[A].Type != NPCID_LIFT_SAND || EditorCursor.NPC.Type == NPCID_LIFT_SAND))
                     {
                         if(!NPC[A].Generator || NPC[A].Type == EditorCursor.NPC.Type)
                         {
-                            if((EditorCursor.NPC.Type != 208 && NPC[A].Type != NPCID_BOSS_CASE) || (EditorCursor.NPC.Type == 208 && NPC[A].Type == NPCID_BOSS_CASE))
+                            if((EditorCursor.NPC.Type != NPCID_BOSS_CASE && NPC[A].Type != NPCID_BOSS_CASE) || (EditorCursor.NPC.Type == NPCID_BOSS_CASE && NPC[A].Type == NPCID_BOSS_CASE))
                             {
                                 if(!NPC[A]->IsAVine)
                                 {
@@ -1769,7 +1768,7 @@ void UpdateInterprocess()
                 EditorCursor.NPC.Special = (vbint_t)n.contents;
                 EditorCursor.NPC.DefaultSpecial = EditorCursor.NPC.Special;
             }
-            if(EditorCursor.NPC.Type == 288 || EditorCursor.NPC.Type == 289 || (EditorCursor.NPC.Type == 91 && int(EditorCursor.NPC.Special) == 288))
+            if(EditorCursor.NPC.Type == 288 || EditorCursor.NPC.Type == 289 || (EditorCursor.NPC.Type == NPCID_ITEM_BURIED && int(EditorCursor.NPC.Special) == 288))
             {
                 EditorCursor.NPC.Special2 = (vbint_t)n.special_data;
                 EditorCursor.NPC.DefaultSpecial2 = EditorCursor.NPC.Special2;
@@ -2218,9 +2217,9 @@ void SetCursor()
         // Container NPCs are handled elsewhere in new editor
         if(MagicHand)
         {
-            if(t != 91 && t != 96 && t != 283 && t != 284 && !NPCTraits[t].IsFish && !NPCIsAParaTroopa(t) && t != NPCID_FIRE_CHAIN)
+            if(t != NPCID_ITEM_BURIED && t != 96 && t != 283 && t != 284 && !NPCTraits[t].IsFish && !NPCIsAParaTroopa(t) && t != NPCID_FIRE_CHAIN)
                 EditorCursor.NPC.Special = 0;
-            if(t != 288 && t != 289 && t != 91 && t != 260)
+            if(t != 288 && t != 289 && t != NPCID_ITEM_BURIED && t != 260)
                 EditorCursor.NPC.Special2 = 0;
         }
         EditorCursor.NPC.Special3 = 0;
@@ -2383,7 +2382,7 @@ void PositionCursor()
         }
 
 //        if(frmNPCs::Buried.Caption == "Yes")
-        if(EditorCursor.NPC.Type == 91)
+        if(EditorCursor.NPC.Type == NPCID_ITEM_BURIED)
         {
             if(!enableAutoAlign)
                 EditorCursor.Location.Y += 0/*16*/;
