@@ -29,4 +29,10 @@
     <string name="launcher_no_resources_question">Das Spiel braucht ein Ressourcenpaket fürs abspielen. Bitte den Spiel-Ressourcen herunterladen, entpacke und platziere es an einem bequemen Verzeichnis. Möchtest du den entpackten Ordner aussuchen?</string>
     <string name="setup_assets_path_label">Ändere absoluten Weg der Ressourcen</string>
     <string name="managePermExplainText">Dieses Spiel verwendet Ressourcen (z. B. Niveaus, Episoden, Grafiken, Musik, Sounds, Konfigurationen usw.), die vom Benutzer direkt im lokalen Speicher platziert wurden. Mit diesem Konzept können Benutzer den Inhalt für ihre eigenen Zwecke ändern und erweitern, die in der Desktop Version dieses Spiels durchgeführt werden. Leider gibt Android 11+ nicht die Möglichkeit, die individuelle Lese-Erlaubnis für das angegebene Verzeichnis anstelle einer einzelnen Datei zu erteilen. Um dieses Spiel auszuführen, solltest du aus den erklärten Gründen Zugriff auf alle Dateien für das Spiel gewähren.</string>
+    <string name="setup_show_controller_state_label">Zeige Spiel-Kontroller Zustand</string>
+    <string name="setup_renderer_label">Rendersystem</string>
+    <string name="cheat_dialog_ok">Ausführen</string>
+    <string name="cheat_dialog_title">Befehl eingeben:</string>
+    <string name="launcher_gameSelect_clearList">Liste löschen</string>
+    <string name="launcher_gameSelect_pickTheDir">Verzeichnis auswählen...</string>
 </resources>
