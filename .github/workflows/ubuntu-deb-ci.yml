@@ -128,6 +128,31 @@ jobs:
             upload_directory: "www/ubuntu-20-04/"
           }
         - {
+            name: "DEB Ubuntu 20.04 arm64",
+            os: ubuntu-latest,
+            container: "ghcr.io/thextech/wohlnet-ci-ubuntu2004-arm64:latest",
+
+            extra_options: "-DPGE_SHARED_SDLMIXER=OFF -DUSE_SYSTEM_SDL2=ON -DUSE_FREEIMAGE_SYSTEM_LIBS=ON \
+            -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=MinSizeRel \
+            -DTHEXTECH_PACKAGE_NAME=\"thextech-bin\" \
+            -DTHEXTECH_INSTALLER_PACKAGE_NAME=\"thextech-bin\" \
+            -DCPACK_GENERATOR=DEB \
+            -DCPACK_DEBIAN_PACKAGE_HOMEPAGE=\"https://wohlsoft.ru\" \
+            -DCPACK_DEBIAN_PACKAGE_RELEASE=${GITHUB_RUN_NUMBER} \
+            -DCPACK_DEBIAN_PACKAGE_ARCHITECTURE=aarch64 \
+            -DCPACK_DEBIAN_PACKAGE_DEPENDS=\"libsdl2-2.0-0\" \
+            -DCPACK_DEBIAN_PACKAGE_DESCRIPTION=\"TheXTech - the modern C++ port and successor of the SMBX engine\"",
+
+            deps_cmdline: "echo 'Ubuntu 20 arm64, everything pre-installed'",
+
+            executable_name: "thextech",
+            generator: "Ninja",
+            build_type: "MinSizeRel",
+            executable_name_suffix: "",
+            package_filename_suffix: "ubuntu-20-04-aarch64",
+            upload_directory: "www/ubuntu-20-04/"
+          }
+        - {
             name: "DEB Ubuntu 22.04 x86_64",
             os: ubuntu-latest,
             container: "ghcr.io/thextech/wohlnet-ci-ubuntu2204:latest",
