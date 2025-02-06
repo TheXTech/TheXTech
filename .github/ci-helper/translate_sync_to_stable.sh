@@ -19,7 +19,7 @@ cd build-git
 if [[ ! -z $(git status -s) ]]; then
     echo "-- Found updated languages, commiting..."
     git add --all
-    git commit --author="${GIT_AUTHOR}" -m "Synchronized translations"
+    git commit --author="${GIT_AUTHOR}" -m "Synchronized translations with mainstream branch"
     remote_repo="https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@github.com/TheXTech/TheXTech.git"
     git push "${remote_repo}" ${STABLE_BRANCH}
 else

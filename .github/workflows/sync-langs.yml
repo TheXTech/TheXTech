@@ -23,6 +23,8 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      packages: read
+      id-token: read
     container: ghcr.io/thextech/wohlnet-ci-ubuntu2404:latest
     strategy:
       fail-fast: true
