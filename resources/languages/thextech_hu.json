@@ -259,7 +259,6 @@
             "controlsConnected": "",
             "options": {
                 "batteryStatus": "",
-                "groundPoundButton": "",
                 "maxPlayers": "",
                 "rumble": "",
                 "textEntryStyle": ""
@@ -780,7 +779,6 @@
         },
         "hint": {
             "no-lives-new": "",
-            "pound-key": "",
             "no-lives-old": "",
             "char5-bombs": "",
             "gray-bricks": "",

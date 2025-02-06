@@ -360,14 +360,15 @@
             "scanningLevels": "扫描关卡中……"
         },
         "hint": {
-            "pound-key": "按下高亮的按键，进行震地！",
-            "no-lives-old": "如果生命值为0，游戏将会结束。",
-            "no-lives-new": "如果生命值为0，得分将会清零。",
+            "no-lives-old": "注意：如果本次通关失败，游戏将会结束！",
+            "no-lives-new": "即使本次通关失败，也不会发生什么事情的；但请留意您的得分。",
             "rainbow-surf": "在拿起彩虹龟壳的时候，按下“下”键，开始冲浪吧！",
             "char5-bombs": "按下“奔跑”键可收集炸弹，按下“第二奔跑”键可投掷炸弹。",
             "gray-bricks": "神秘力量可以破坏部分砖块。",
             "heavy-duck": "玩家下蹲时，可以抵挡大多数火焰！",
-            "shoe-block": "穿上鞋子时，可以抵挡大多数火焰！"
+            "shoe-block": "穿上鞋子时，可以抵挡大多数火焰！",
+            "pound-altrun": "按下“第二奔跑”键，进行震地！",
+            "pound-down": "按下“下”键，进行震地！"
         }
     },
     "languageName": "简体中文",
@@ -438,7 +439,6 @@
             },
             "options": {
                 "batteryStatus": "电池状态",
-                "groundPoundButton": "震地按键",
                 "maxPlayers": "玩家上限",
                 "rumble": "Rumble控制器",
                 "textEntryStyle": "文字输入使用设备"
@@ -535,7 +535,8 @@
                     "caseIR": "（IR）",
                     "dPad": "十字键",
                     "shake": "摇晃"
-                }
+                },
+                "typeGamecube": "GC控制器"
             },
             "wordButtons": "按键",
             "wordProfiles": "配置",
@@ -647,7 +648,9 @@
                     "default": "默认",
                     "fhd": "1920x1080（FHD）"
                 },
-                "use-native-osk": "启用内置虚拟键盘"
+                "use-native-osk": "启用内置虚拟键盘",
+                "inaccurate-gifs-tip": "当GIF图片文件存在时，启用3D效果",
+                "inaccurate-gifs": "错误GIF图片渲染"
             },
             "audio": {
                 "_header": "音频选项",
@@ -690,7 +693,9 @@
                     "classic-tip": "开启部分游戏更新",
                     "modern-tip": "开启全部游戏更新",
                     "vanilla-tip": "关闭全部游戏更新"
-                }
+                },
+                "hub-resume": "中心关卡：传送点记忆",
+                "hub-resume-tip": "从上次进入的传送点继续游戏"
             },
             "main": {
                 "_header": "常规选项",

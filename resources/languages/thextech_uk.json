@@ -261,7 +261,6 @@
             "options": {
                 "rumble": "",
                 "maxPlayers": "",
-                "groundPoundButton": "",
                 "batteryStatus": "",
                 "textEntryStyle": ""
             },
@@ -796,7 +795,6 @@
         },
         "hint": {
             "no-lives-old": "",
-            "pound-key": "",
             "gray-bricks": "",
             "char5-bombs": "",
             "shoe-block": "",

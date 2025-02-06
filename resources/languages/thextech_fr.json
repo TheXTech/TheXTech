@@ -2,31 +2,31 @@
     "editor": {
         "file": {
             "convert": {
-                "descNew": ""
+                "descNew": "L'extension de fichier va changer mais l'ancien fichier ne vas PAS être supprimé.\n\nVeuillez vérifier des éventuelles pertes après sauvegarde."
             },
-            "actionClearWorld": "",
-            "labelCurrentFile": "",
-            "labelFormat": "",
-            "formatLegacy": "",
-            "sectionWorld": "",
-            "optionCancelConversion": "",
-            "formatModern": "",
-            "sectionLevel": "",
-            "optionCancelAction": "",
-            "optionProceedWithConversion": "",
-            "optionYesSaveThenAction": "",
-            "actionRevert": "",
-            "commandSave": "",
-            "commandNew": "",
-            "actionOpen": "",
-            "actionExit": "",
-            "commandSaveAs": "",
-            "confirmSaveBeforeAction": "",
-            "actionClearLevel": "",
-            "confirmConvertFormatTo": "",
-            "optionActionWithoutSave": "",
-            "confirmConfirmAction": "",
-            "commandOpen": ""
+            "actionClearWorld": "Écraser Monde",
+            "labelCurrentFile": "Fichier actuel :",
+            "labelFormat": "Format :",
+            "formatLegacy": "Classique",
+            "sectionWorld": "Monde",
+            "optionCancelConversion": "Annuler conversion",
+            "formatModern": "Moderne",
+            "sectionLevel": "Niveau",
+            "optionCancelAction": "Annuler : ne pas {0}",
+            "optionProceedWithConversion": "Continuer conversion",
+            "optionYesSaveThenAction": "Oui : sauvegarder puis {0}",
+            "actionRevert": "Annuler",
+            "commandSave": "Sauvegarder",
+            "commandNew": "Nouveau",
+            "actionOpen": "Ouvrir",
+            "actionExit": "Quitter",
+            "commandSaveAs": "Sauv. en tant que...",
+            "confirmSaveBeforeAction": "Sauvegarder avant d' {0} ?",
+            "actionClearLevel": "Écraser Niveau",
+            "confirmConvertFormatTo": "Convertir le format en {0} ?",
+            "optionActionWithoutSave": "{0} sans sauvegarder",
+            "confirmConfirmAction": "Êtes-vous sûr de vouloir {0} ?",
+            "commandOpen": "Ouvrir..."
         },
         "level": {
             "startPos": "",
@@ -126,75 +126,75 @@
             "hubWorld": ""
         },
         "events": {
-            "controlsForEventN": "",
+            "controlsForEventN": "Contrôles de l'événement {0}",
             "deletion": {
-                "confirm": "",
-                "deletingEvent": "",
-                "cancel": ""
+                "confirm": "Oui : supprimer l'événement",
+                "deletingEvent": "Suppression de l'évènement {0}",
+                "cancel": "Non : ne pas supprimer l'événement"
             },
-            "header": "",
+            "header": "Événements :",
             "label": {
-                "layerClear": "",
-                "next": "",
-                "activate": "",
-                "death": "",
-                "talk": "",
-                "destroy": "",
-                "enter": "",
-                "hit": ""
+                "layerClear": "Nettoyer Couche",
+                "next": "Suivant",
+                "activate": "Activation",
+                "death": "Mort",
+                "talk": "Parler",
+                "destroy": "Détruire",
+                "enter": "Entrer",
+                "hit": "Frapper"
             },
-            "headerTriggerEvent": "",
-            "itemNewEvent": "",
+            "headerTriggerEvent": "Déclencheur :",
+            "itemNewEvent": "<Nouvel Événement>",
             "letter": {
-                "death": "",
-                "enter": "",
-                "destroy": "",
-                "activate": "",
-                "layerClear": "",
-                "talk": "",
-                "hit": ""
+                "death": "M :",
+                "enter": "E :",
+                "destroy": "D :",
+                "activate": "A :",
+                "layerClear": "N :",
+                "talk": "P :",
+                "hit": "F :"
             },
             "desc": {
-                "phraseTriggersAfterTemplate": "",
-                "talk": "",
-                "activate": "",
-                "phraseTriggersWhenTemplate": "",
-                "destroy": "",
-                "layerClear": "",
-                "enter": "",
-                "hit": "",
-                "death": ""
+                "phraseTriggersAfterTemplate": "{0} se déclenche {1} ms après l'événement {2}",
+                "talk": "joueur parle à PNJ",
+                "activate": "PNJ apparaît à l'écran",
+                "phraseTriggersWhenTemplate": "{0} we déclenche quand {1}",
+                "destroy": "bloc est détruit",
+                "layerClear": "tout dans la couche objet est parti",
+                "enter": "téléport est entré",
+                "hit": "bloc est frappé",
+                "death": "PNJ meurt"
             },
             "layers": {
-                "headerMove": "",
-                "headerHide": "",
-                "headerShow": "",
-                "headerToggle": ""
+                "headerMove": "Déplacer :",
+                "headerHide": "Cacher :",
+                "headerShow": "Montrer :",
+                "headerToggle": "Activer :"
             },
             "props": {
-                "sound": "",
-                "layerSmoke": "",
-                "controls": "",
-                "endGame": "",
-                "autostart": ""
+                "sound": "Son",
+                "layerSmoke": "Fumée",
+                "controls": "Contrôles",
+                "endGame": "Fin du Jeu",
+                "autostart": "Auto-démarrage"
             },
             "bounds": {
-                "shouldEvent": "",
-                "changeAllSectionBoundsToCurrent": "",
-                "changeSectionBoundsToCurrent": ""
+                "shouldEvent": "L'Évènement {0} devrait-il",
+                "changeAllSectionBoundsToCurrent": "Changer toutes les sect. liées à l'actuel ?",
+                "changeSectionBoundsToCurrent": "Changer toutes les {0} sect. liées à l'actuel ?"
             },
             "sections": {
-                "phraseAllSections": "",
-                "propBounds": "",
-                "actionSet": "",
-                "actionReset": "",
-                "propBackground": "",
-                "propMusic": "",
-                "actionKeep": ""
+                "phraseAllSections": "Toutes Sections",
+                "propBounds": "Bords",
+                "actionSet": "Set",
+                "actionReset": "Réinit",
+                "propBackground": "Arr-Plan",
+                "propMusic": "Musique",
+                "actionKeep": "Garder"
             },
-            "promptEventText": "",
-            "promptEventName": "",
-            "settingsForEvent": ""
+            "promptEventText": "Texte de l'évènement",
+            "promptEventName": "Nom de l'évènement",
+            "settingsForEvent": "Paramètres pour l'événement {0}"
         },
         "phraseGenericIndex": "",
         "select": {
@@ -207,34 +207,34 @@
             "worldMusic": ""
         },
         "block": {
-            "invis": "",
-            "letterWidth": "",
-            "canBreakTooltip": "",
-            "pickContents": "",
-            "slick": "",
-            "canBreak": "",
-            "inside": "",
-            "letterHeight": ""
+            "invis": "Invis.",
+            "letterWidth": "L ",
+            "canBreakTooltip": "Classique : se brise une fois frappé",
+            "pickContents": "Prendre contenu du bloc",
+            "slick": "Gliss.",
+            "canBreak": "Cassable",
+            "inside": "Cont. :",
+            "letterHeight": "H "
         },
         "browser": {
-            "openFile": "",
-            "itemNewFolder": "",
-            "newFile": "",
-            "saveFile": "",
-            "askOverwriteFile": "",
-            "itemNewFile": ""
+            "openFile": "Ouvrir fichier",
+            "itemNewFolder": "<Nouveau Dossier>",
+            "newFile": "Nouveau fichier",
+            "saveFile": "Sauvegarder fichier",
+            "askOverwriteFile": "Écraser {0} ?",
+            "itemNewFile": "<Nouveau Fichier>"
         },
         "layers": {
             "deletion": {
-                "cancel": "",
-                "confirmDelete": "",
-                "confirmPreserve": "",
-                "header": "",
-                "preserveLayerContents": ""
+                "cancel": "Annuler : ne pas supprimer couche",
+                "confirmDelete": "Non : *TOUT SUPPRIMER*",
+                "confirmPreserve": "Oui : déplacer à couche par défaut",
+                "header": "Supprimer couche {0}",
+                "preserveLayerContents": "Garder contenu de la couche ?"
             },
             "header": "",
-            "default": "",
-            "abbrevAttLayer": "",
+            "default": "Par Défaut",
+            "abbrevAttLayer": "Att : ",
             "desc": {
                 "att": ""
             },
@@ -285,8 +285,8 @@
         "letterRight": "",
         "letterLeft": "",
         "wordCoins": "",
-        "labelSortLayer": "",
-        "labelSortOffset": "",
+        "labelSortLayer": "Trier Couche :",
+        "labelSortOffset": "Trier Décalage :",
         "letterCoordX": "",
         "letterDown": "",
         "letterCoordY": "",
@@ -334,7 +334,6 @@
             "scanningLevels": ""
         },
         "hint": {
-            "pound-key": "",
             "no-lives-new": "",
             "no-lives-old": "",
             "gray-bricks": "",
@@ -518,7 +517,6 @@
             "controlsTitle": "",
             "options": {
                 "rumble": "",
-                "groundPoundButton": "",
                 "batteryStatus": "",
                 "maxPlayers": "",
                 "textEntryStyle": ""

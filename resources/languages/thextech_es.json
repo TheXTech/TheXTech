@@ -7,8 +7,8 @@
             "invis": "Invis",
             "slick": "Resbala",
             "pickContents": "Elegir contenido del bloque",
-            "letterHeight": "alt. ",
-            "letterWidth": "anch. "
+            "letterHeight": "Al",
+            "letterWidth": "An"
         },
         "browser": {
             "askOverwriteFile": "Sobreescribir {0}?",
@@ -41,11 +41,11 @@
             "label": {
                 "activate": "Activar",
                 "destroy": "Destruir",
-                "death": "Muerte",
-                "enter": "Ingreso",
+                "death": "Morir",
+                "enter": "Ingresar",
                 "hit": "Golpe",
                 "next": "Siguiente",
-                "talk": "Conversación",
+                "talk": "Hablar",
                 "layerClear": "Capa limpia"
             },
             "sections": {
@@ -61,11 +61,11 @@
             "letter": {
                 "hit": "G:",
                 "death": "M:",
-                "talk": "C:",
-                "enter": "",
-                "destroy": "",
-                "layerClear": "",
-                "activate": ""
+                "talk": "H:",
+                "enter": "I:",
+                "destroy": "D:",
+                "layerClear": "C:",
+                "activate": "A:"
             },
             "promptEventText": "Texto del evento",
             "props": {
@@ -99,14 +99,14 @@
             "formatModern": "Moderno",
             "optionCancelConversion": "Cancelar conversión",
             "commandSaveAs": "Guardar como...",
-            "confirmConfirmAction": "Estás seguro de que quieres {0}?",
+            "confirmConfirmAction": "¿Estás seguro de que quieres {0}?",
             "formatLegacy": "Legado",
             "optionActionWithoutSave": "{0} sin guardar",
             "optionProceedWithConversion": "Proceder con la conversión",
             "sectionLevel": "Nivel",
             "sectionWorld": "Mundo",
             "confirmConvertFormatTo": "Convertir formato a {0}?",
-            "confirmSaveBeforeAction": "Guardar antes que tú {0}?",
+            "confirmSaveBeforeAction": "¿Guardar antes de {0}?",
             "labelFormat": "Formato:",
             "optionCancelAction": "Cancelar: no {0}",
             "optionYesSaveThenAction": "Sí: guardar entonces {0}",
@@ -189,7 +189,7 @@
             "title": "Configuración de Pasaje",
             "ride": "Montar",
             "lvlWarp": "Pasaje de Nivel",
-            "dir": ""
+            "dir": "Dir."
         },
         "letterRight": "R",
         "select": {
@@ -198,8 +198,8 @@
             "pathBlankUnlock": "Ruta {0} Desbloquear Por",
             "worldMusic": "Música del mundo",
             "sectionBlankPropBlank": "Sección {0} {1}",
-            "sectBlankPropBlankForEventN": "",
-            "allSectPropBlankForEventN": ""
+            "sectBlankPropBlankForEventN": "{1} de Secc {0} para {2}",
+            "allSectPropBlankForEventN": "{1} de Todas SS para {2}"
         },
         "tooltip": {
             "BGOs": "BGOs",
@@ -219,8 +219,8 @@
             "tiles": "Baldosas",
             "warps": "Pasajes",
             "blocks": "Bloques",
-            "area": "",
-            "NPCs": ""
+            "area": "Área",
+            "NPCs": "NPCs"
         },
         "npc": {
             "ai": {
@@ -277,7 +277,7 @@
             "offscreenExit": "Salida fuera de pantalla",
             "scroll": "Desplácese por",
             "horizWrap": "Env. Horizontal",
-            "vertWrap": ""
+            "vertWrap": "Env. Vertical"
         },
         "phraseGenericIndex": "Número {0}",
         "letterUp": "U",
@@ -299,15 +299,15 @@
             "retryOnFail": "Reintentar En Fallo",
             "allowChars": "Permitir Personajes",
             "totalStars": "Estrellas en total: ",
-            "hubWorld": ""
+            "hubWorld": "Mundo de Centro"
         },
         "wordMode": "Modo",
         "wordText": "Texto",
         "labelSortLayer": "Ordenar Capa:",
         "labelSortOffset": "Ordenar Desplazamiento:",
         "wordNPC": {
-            "genitive": "",
-            "nominative": ""
+            "genitive": "NPC",
+            "nominative": "NPC"
         }
     },
     "menu": {
@@ -318,248 +318,253 @@
             "gameBattleRandom": "Nivel aleatorio",
             "gameTargetSlot": "Ahora seleccione el objetivo",
             "gameSlotContinue": "SLOT {0} ... {1}%",
-            "gameSlotNew": "SLOT {0} ... NUEVO JUEGO",
+            "gameSlotNew": "SLOT {0} ... NUEVO",
             "phraseScore": "Puntuación: {0}",
             "gameNoEpisodesToPlay": "<Sin episodios que reproducir>",
             "phraseTime": "Tiempo: {0}",
             "gameEraseSlot": "Seleccione la ranura que desea borrar",
             "gameCopySave": "Copiar guardar",
-            "warnEpCompat": ""
+            "warnEpCompat": "Este episodio se hizo para una rama diferente de SMBX y tal vez no funcionará bien."
         },
         "editor": {
             "newWorld": "<Nuevo Mundo>",
             "errorMissingResources": "Lo sentimos. Te falta {0}, necesario para el editor del juego.",
-            "promptNewWorldName": "Nuevo nombre del mundo",
+            "promptNewWorldName": "Nombre del mundo nuevo",
             "battles": "<Niveles de Batalla>",
-            "makeFor": ""
+            "makeFor": "Hacer para:"
         },
         "wordHide": "Ocultar",
         "options": {
             "restartEngine": "Reinicie el motor para que los cambios surtan efecto.",
             "advanced": {
                 "render": {
-                    "opengl": "",
+                    "opengl": "OpenGL 3+",
                     "opengles-tip": "",
                     "sdl-tip": "",
                     "opengl11-tip": "",
-                    "sdl": "",
-                    "opengles": "",
-                    "_name": "",
-                    "opengles11": "",
+                    "sdl": "SDL2",
+                    "opengles": "OpenGL ES 2+",
+                    "_name": "Moda de renderizado",
+                    "opengles11": "OpenGL ES 1.1+",
                     "opengles11-tip": "",
-                    "sw": "",
-                    "hw": "",
+                    "sw": "Software",
+                    "hw": "Auto",
                     "opengl-tip": "",
-                    "opengl11": ""
+                    "opengl11": "OpenGL 1.1"
                 },
                 "scale-down-textures": {
-                    "all-tip": "",
-                    "none": "",
-                    "_tooltip": "",
-                    "all": "",
-                    "_name": "",
-                    "none-tip": "",
-                    "safe": "",
-                    "safe-tip": ""
+                    "all-tip": "Menos tartamudeo al cargar que 'Seguras'",
+                    "none": "Ningunas",
+                    "_tooltip": "Almacenar las imágenes a 1x para ahorrar la memoria",
+                    "all": "Todas",
+                    "_name": "Reducir imágenes",
+                    "none-tip": "Lo menos tartamudeo al cargar",
+                    "safe": "Seguras",
+                    "safe-tip": "Verifica que las imágenes estén en formato 2x"
                 },
                 "audio-sample-rate": {
-                    "48000": "",
-                    "32000": "",
-                    "11025": "",
-                    "44100": "",
-                    "_name": "",
-                    "16000": "",
-                    "22050": ""
+                    "48000": "48000 Hz",
+                    "32000": "32000 Hz",
+                    "11025": "11025 Hz",
+                    "44100": "44100 Hz",
+                    "_name": "Frecuencia de muestreo",
+                    "16000": "16000 Hz",
+                    "22050": "22050 Hz"
                 },
-                "choose-assets-on-launch": "",
+                "choose-assets-on-launch": "Seleccionar activos en lanzar",
                 "log-level": {
-                    "_name": "",
-                    "critical": "",
-                    "none": "",
-                    "info": "",
-                    "fatal": "",
-                    "warning": "",
-                    "debug": ""
+                    "_name": "Nivel de registrar",
+                    "critical": "Crítico",
+                    "none": "Nada",
+                    "info": "Info",
+                    "fatal": "Fatal",
+                    "warning": "Aviso",
+                    "debug": "Depurar"
                 },
                 "audio-channels": {
-                    "mono": "",
-                    "stereo": "",
-                    "_name": ""
+                    "mono": "Mono",
+                    "stereo": "Stereo",
+                    "_name": "Canales"
                 },
                 "internal-res-4p": {
-                    "qhd": "",
-                    "_name": "",
-                    "default": "",
-                    "fhd": "",
-                    "qsmbx": ""
+                    "qhd": "2560x1440 (QHD)",
+                    "_name": "Tamaño de pantalla dividida 4P",
+                    "default": "Por defecto",
+                    "fhd": "1920x1080 (FHD)",
+                    "qsmbx": "1600x1200 (QSMBX)"
                 },
-                "webm-recording": "",
-                "advanced-audio": "",
-                "advanced-video": "",
-                "_header": "",
-                "_tooltip": "",
-                "record-gameplay-data": "",
+                "webm-recording": "Grabación WEBM",
+                "advanced-audio": "Áudio",
+                "advanced-video": "Video",
+                "_header": "Avanzado",
+                "_tooltip": "Opciones tecnicales para las operaciones internales",
+                "record-gameplay-data": "Grabar jugación",
                 "audio-buffer-size": {
-                    "_tooltip": "",
-                    "_name": ""
+                    "_tooltip": "Aumenta para menos estallidos pero más retraso",
+                    "_name": "Tamaño de búfer"
                 },
                 "audio-format": {
-                    "_name": "",
-                    "_tooltip": ""
+                    "_name": "Formato de áudio",
+                    "_tooltip": "Formato para controlador de sondio"
                 },
-                "audio-enable": ""
+                "audio-enable": "Activar",
+                "use-native-osk": "Teclado del sistema",
+                "inaccurate-gifs-tip": "Permite efecto 3D cuando hay imagenes GIF",
+                "inaccurate-gifs": "GIF inexactos"
             },
             "audio": {
-                "sfx-audio-fx": "",
-                "sfx-modern": "",
-                "audio-prefs": "",
-                "sfx-modern-tip": "",
-                "audio-sfx-volume": "",
-                "sfx-spatial-audio-tip": "",
-                "sfx-spatial-audio": "",
-                "sfx-pet-beat-tip": "",
-                "sfx-pet-beat": "",
-                "audio-music-volume": "",
-                "_header": ""
+                "sfx-audio-fx": "Efectos de eco",
+                "sfx-modern": "Sonidos modernos",
+                "audio-prefs": "Preferencias",
+                "sfx-modern-tip": "Usar sonidos añadidos en TheXTech",
+                "audio-sfx-volume": "Volumen de sonidos",
+                "sfx-spatial-audio-tip": "Reducir el volumen de sonidos lejos",
+                "sfx-spatial-audio": "Áudio espacial",
+                "sfx-pet-beat-tip": "Reproducir un ritmo especial a montar una mascota",
+                "sfx-pet-beat": "Ritmo de mascota",
+                "audio-music-volume": "Volumen de música",
+                "_header": "Áudio"
             },
             "episode-options": {
                 "creator-compat": {
-                    "_name": "",
-                    "file-only": "",
-                    "enable": "",
-                    "disable": "",
-                    "_tooltip": ""
+                    "_name": "Compat de creador",
+                    "file-only": "Sólo archivo",
+                    "enable": "Activar",
+                    "disable": "Desactivar",
+                    "_tooltip": "Ajustes logicales por el creador del contenido"
                 },
-                "_header": "",
+                "_header": "Opciones de Episodio",
                 "playstyle": {
-                    "_name": "",
-                    "modern": "",
-                    "classic": "",
-                    "classic-tip": "",
-                    "vanilla-tip": "",
-                    "modern-tip": "",
-                    "vanilla": ""
-                }
+                    "_name": "Estilo de juego",
+                    "modern": "Moderno",
+                    "classic": "Clásico",
+                    "classic-tip": "Actualizaciones minimales",
+                    "vanilla-tip": "Ningunas actualizaciones",
+                    "modern-tip": "Todas actualizaciones",
+                    "vanilla": "Vainilla"
+                },
+                "hub-resume-tip": "Resumir el juego en la próxima pasaja ingresada",
+                "hub-resume": "Grabar pasaja en centro"
             },
             "video": {
-                "effects": "",
-                "enable-inter-level-fade-effect": "",
-                "info-meta": "",
+                "effects": "Efectos de Pantalla",
+                "enable-inter-level-fade-effect": "Transiciones",
+                "info-meta": "Info. en pantalla de sistema",
                 "internal-res": {
-                    "vga": "",
-                    "snes": "",
-                    "hd": "",
-                    "_tooltip": "",
-                    "dynamic": "",
-                    "hello": "",
-                    "gba": "",
-                    "_name": "",
-                    "3ds": "",
-                    "smbx": "",
-                    "smbx-wide": "",
-                    "nds": ""
+                    "vga": "640x480 (VGA)",
+                    "snes": "512x448 (SNES)",
+                    "hd": "1280x720 (HD)",
+                    "_tooltip": "Resolución del campo de jugación",
+                    "dynamic": "Dinámico",
+                    "hello": "768x432 (HELLO)",
+                    "gba": "480x320 (GBA)",
+                    "_name": "Tamaño de pantalla",
+                    "3ds": "800x480 (3DS)",
+                    "smbx": "800x600 (SMBX)",
+                    "smbx-wide": "SMBX (ancha)",
+                    "nds": "512x384 (NDS)"
                 },
                 "scale-mode": {
-                    "1x": "",
-                    "0_5x": "",
-                    "_name": "",
-                    "2x": "",
-                    "nearest": "",
-                    "full": "",
-                    "center": "",
-                    "linear": "",
-                    "integer": ""
+                    "1x": "1x",
+                    "0_5x": "0,5x",
+                    "_name": "Modo de escala",
+                    "2x": "2x",
+                    "nearest": "Cercana",
+                    "full": "Completa",
+                    "center": "Centrada",
+                    "linear": "Lineal",
+                    "integer": "Entera"
                 },
-                "info-game": "",
+                "info-game": "Info. en pantalla de juego",
                 "show-playtime-counter": {
-                    "off-tip": "",
-                    "_tooltip": "",
-                    "opaque": "",
-                    "_name": "",
-                    "transparent": "",
-                    "animated-tip": "",
-                    "animated": "",
-                    "off": ""
+                    "off-tip": "Muestra sólo en las carreras rápidas",
+                    "_tooltip": "Muestra el tiempo pasado en el episodio y el intento actual",
+                    "opaque": "Opaco",
+                    "_name": "Temporizador de carrera",
+                    "transparent": "Transparente",
+                    "animated-tip": "Añade un efecto arcoiris a completar un nivel",
+                    "animated": "Animado",
+                    "off": "Desactivado"
                 },
-                "3d-compat-mode-tip": "",
-                "show-fails-counter": "",
+                "3d-compat-mode-tip": "Dibuja todos objetos en un solo plano 3D",
+                "show-fails-counter": "Contador de fallos",
                 "show-episode-title": {
-                    "_name": "",
-                    "top": "",
-                    "top-tip": "",
-                    "off": "",
-                    "bottom-tip": "",
-                    "bottom": ""
+                    "_name": "Nombre del episodio",
+                    "top": "Superior",
+                    "top-tip": "Muestra sobre HUD a alta resolución",
+                    "off": "Desactivado",
+                    "bottom-tip": "Muestra sobre temporizador de carrera",
+                    "bottom": "Inferior"
                 },
-                "video-system": "",
-                "world-map-stars-show-tip": "",
-                "world-map-stars-show": "",
+                "video-system": "Sistema",
+                "world-map-stars-show-tip": "Muestra estrellas recogidas sobre los niveles",
+                "world-map-stars-show": "Estrellas en mapa mundial",
                 "battery-status": {
-                    "fullscreen": "",
-                    "_name": "",
-                    "off": "",
-                    "fullscreen-tip": "",
-                    "on": "",
-                    "low": "",
-                    "low-tip": ""
+                    "fullscreen": "Pantalla completa",
+                    "_name": "Estado de pila",
+                    "off": "Nunca",
+                    "fullscreen-tip": "Muestra cuando el juego está en pantalla completa",
+                    "on": "Siempre",
+                    "low": "Bajo",
+                    "low-tip": "Muestra cuando el nivel de la pila está bajo"
                 },
-                "_header": "",
-                "show-medals-counter": "",
-                "show-fps": "",
-                "show-medals-counter-tip": "",
-                "show-fails-counter-tip": "",
-                "info-run": "",
-                "3d-compat-mode": "",
-                "fullscreen": "",
-                "show-screen-shake": "",
-                "display-controllers": ""
+                "_header": "Video",
+                "show-medals-counter": "Contador de medallas",
+                "show-fps": "Frecuencia de cuadros",
+                "show-medals-counter-tip": "Muestra las medallas en el HUD y en las entradas de nivel",
+                "show-fails-counter-tip": "Muestra los fallos en el episodio y el nivel actual",
+                "info-run": "Info. en pantalla de carrera",
+                "3d-compat-mode": "Modo de compat 3D",
+                "fullscreen": "Pantalla completa",
+                "show-screen-shake": "Movimiento de pantalla",
+                "display-controllers": "Actividad de controles"
             },
             "view-credits": {
-                "_header": ""
+                "_header": "Ver Créditos"
             },
             "speedrun": {
                 "mode": {
-                    "_name": "",
-                    "3": "",
-                    "2": "",
-                    "0": "",
-                    "1": ""
+                    "_name": "Modo de carrera rápida",
+                    "3": "3",
+                    "2": "2",
+                    "0": "0",
+                    "1": "1"
                 }
             },
             "compatibility": {
-                "_header": "",
-                "_tooltip": "",
-                "reset-all": "",
-                "features": "",
-                "bugfixes": "",
-                "autocode": ""
+                "_header": "Ajustes de sesión",
+                "_tooltip": "Opciones para compat o depuración",
+                "reset-all": "Restablecar todo",
+                "features": "Funciones nuevas",
+                "bugfixes": "Corrección de errores",
+                "autocode": "Autocode"
             },
             "controls": {
-                "_header": ""
+                "_header": "Controles"
             },
             "main": {
                 "four-screen-mode": {
-                    "_name": "",
-                    "split": "",
-                    "shared": ""
+                    "_name": "Modo de pantalla 4P",
+                    "split": "Dividida",
+                    "shared": "Compartida"
                 },
-                "background-work-tip": "",
-                "background-work": "",
-                "vsync": "",
-                "discord-rpc": "",
-                "frame-skip": "",
-                "_header": "",
-                "language": "",
+                "background-work-tip": "Jugar con joystick cuando el juego está en segundo plano",
+                "background-work": "Continuar en fondo",
+                "vsync": "V-Sync",
+                "discord-rpc": "Integración con Discord",
+                "frame-skip": "Saltado de cuadro",
+                "_header": "Principal",
+                "language": "Idioma",
                 "two-screen-mode": {
-                    "_name": "",
-                    "split": "",
-                    "topbottom": "",
-                    "smbx": "",
-                    "shared": ""
+                    "_name": "Modo de pantalla 2P",
+                    "split": "Izq/Der",
+                    "topbottom": "Arriba/Abajo",
+                    "smbx": "SMBX",
+                    "shared": "Compartida"
                 },
-                "timing": "",
-                "multiplayer": "",
-                "unlimited-framerate": ""
+                "timing": "Sincronización de Cuadros",
+                "multiplayer": "Multijugador",
+                "unlimited-framerate": "Modo turbo"
             }
         },
         "wordWaiting": "En espera",
@@ -581,107 +586,107 @@
                     "buttonHome": "Inicio",
                     "shake": "Agitar",
                     "dPad": "D-Pad",
-                    "buttonA": "",
-                    "buttonB": "",
-                    "button1": "",
-                    "button2": ""
+                    "buttonA": "A",
+                    "buttonB": "B",
+                    "button1": "1",
+                    "button2": "2"
                 },
                 "classic": {
-                    "buttonLT": "",
-                    "buttonY": "",
-                    "rStick": "",
-                    "buttonX": "",
-                    "buttonZR": "",
-                    "buttonRT": "",
-                    "buttonZL": "",
-                    "lStick": ""
+                    "buttonLT": "LT",
+                    "buttonY": "Y",
+                    "rStick": "R-Joy",
+                    "buttonX": "X",
+                    "buttonZR": "ZR",
+                    "buttonRT": "RT",
+                    "buttonZL": "ZL",
+                    "lStick": "L-Joy"
                 },
                 "nunchuck": {
-                    "prefixN": "",
-                    "buttonZ": "",
-                    "buttonC": ""
+                    "prefixN": "N",
+                    "buttonZ": "Z",
+                    "buttonC": "C"
                 },
-                "typeClassic": "",
-                "typeNunchuck": "",
-                "phraseNewNunchuck": "",
-                "typeWiimote": "",
-                "phraseNewClassic": ""
+                "typeClassic": "Classic",
+                "typeNunchuck": "Nunchuk",
+                "phraseNewNunchuck": "Nuevo Perfil Nunchuk",
+                "typeWiimote": "Wii Remote",
+                "phraseNewClassic": "Nuevo Perfil Classic"
             },
             "wordProfiles": "Perfiles",
             "wordButtons": "Botones",
             "buttons": {
-                "altJump": "Salto Alternativo",
+                "altJump": "Salto Alt",
                 "start": "Comenzar",
                 "down": "Abajo",
                 "jump": "Saltar",
                 "drop": "Soltar Objeto",
                 "run": "Correr",
-                "altRun": "Correr Alternativo",
+                "altRun": "Correr Alt",
                 "up": "Arriba",
                 "left": "Izquierda",
                 "right": "Derecha"
             },
             "controlsInUse": "(En uso)",
             "controlsNewProfile": "<Nuevo Perfil>",
-            "controlsDeleteKey": "(Salto Alternativo para Borrar)",
+            "controlsDeleteKey": "(Salto Alt para Borrar)",
             "controlsNotInUse": "(No en uso)",
             "tDS": {
                 "buttonStart": "Comenzar",
                 "casePen": "(Lápiz)",
-                "cStick": "",
-                "buttonL": "",
-                "buttonB": "",
-                "buttonR": "",
-                "dPad": "",
-                "buttonY": "",
-                "buttonZR": "",
-                "buttonZL": "",
-                "buttonA": "",
-                "buttonSelect": "",
-                "buttonX": "",
-                "tStick": ""
+                "cStick": "Palanca C",
+                "buttonL": "L",
+                "buttonB": "B",
+                "buttonR": "R",
+                "dPad": "Cruz de control",
+                "buttonY": "Y",
+                "buttonZR": "ZR",
+                "buttonZL": "ZL",
+                "buttonA": "A",
+                "buttonSelect": "Select",
+                "buttonX": "X",
+                "tStick": "Deslizante"
             },
             "controlsDeviceTypes": "Tipos de Dispositivo",
             "caseInvalid": "(Inválido)",
-            "controlsReallyDeleteProfile": "Realmente eliminar perfil?",
+            "controlsReallyDeleteProfile": "¿Realmente eliminar perfil?",
             "controlsTitle": "Controles",
             "touchscreen": {
                 "option": {
                     "holdRun": "Mantener \"Correr\" al Comenzar",
                     "showCodeButton": "Mostrar Botón de Código",
-                    "feedbackLength": "",
-                    "interfaceStyle": "",
-                    "resetLayout": "",
-                    "layoutStyle": "",
-                    "feedbackStrength": "",
-                    "scaleButtons": "",
-                    "scaleDPad": "",
-                    "sStartSpacing": "",
-                    "scaleFactor": ""
+                    "feedbackLength": "Duración de Vibración",
+                    "interfaceStyle": "Estilo de Botones",
+                    "resetLayout": "Restablecer Diseño",
+                    "layoutStyle": "Estilo de Diseño",
+                    "feedbackStrength": "Fuerza de Vibración",
+                    "scaleButtons": "Escala de Botones",
+                    "scaleDPad": "Escala de Cruceta",
+                    "sStartSpacing": "S-Start Espaciado",
+                    "scaleFactor": "Factor de Escala"
                 },
                 "layout": {
                     "standard": "Estándar",
-                    "phabletOld": "",
-                    "tight": "",
-                    "tabletOld": "",
-                    "phoneOld": "",
-                    "tinyOld": "",
-                    "longOld": ""
+                    "phabletOld": "Phablet (Legado)",
+                    "tight": "Ajustado",
+                    "tabletOld": "Tableta (Legado)",
+                    "phoneOld": "Móbil (Legado)",
+                    "tinyOld": "Diminuto (Old)",
+                    "longOld": "Largo (Legado)"
                 },
                 "style": {
-                    "ABXY": "",
-                    "actions": "",
-                    "XODA": ""
+                    "ABXY": "ABXY",
+                    "actions": "Acciones",
+                    "XODA": "XODA"
                 }
             },
             "cursor": {
                 "secondary": "Secundario",
                 "tertiary": "Terciario",
                 "primary": "Primario",
-                "left": "",
-                "right": "",
-                "down": "",
-                "up": ""
+                "left": "Ratón Izquierdo",
+                "right": "Ratón Derecho",
+                "down": "Ratón Abajo",
+                "up": "Ratón Arriba"
             },
             "hotkeys": {
                 "screenshot": "Captura de Pantalla",
@@ -690,48 +695,47 @@
                 "fullscreen": "Pantalla Completa",
                 "toggleHUD": "Alternar HUD",
                 "recordGif": "Grabar GIF",
-                "vanillaCam": "",
-                "legacyPause": ""
+                "vanillaCam": "Vainilla Cam",
+                "legacyPause": "Pausa Legada"
             },
             "profile": {
                 "deleteProfile": "Eliminar perfil",
-                "cursorControls": "",
-                "playerControls": "",
-                "renameProfile": "",
-                "editorControls": "",
-                "hotkeys": ""
+                "cursorControls": "Controles de cursor",
+                "playerControls": "Controles del juego",
+                "renameProfile": "Renombrar perfil",
+                "editorControls": "Controles de editor",
+                "hotkeys": "Teclas rápidas"
             },
             "types": {
                 "keyboard": "Teclado",
                 "touchscreen": "Pantalla Táctil",
-                "oldJoystick": "",
-                "gamepad": ""
+                "oldJoystick": "Joy Legado",
+                "gamepad": "Joystick"
             },
             "caseTouch": "(Táctil)",
             "options": {
                 "batteryStatus": "Estado de Batería",
-                "rumble": "",
-                "textEntryStyle": "",
-                "maxPlayers": "",
-                "groundPoundButton": ""
+                "rumble": "Vibración",
+                "textEntryStyle": "Estilo de entrada de texto",
+                "maxPlayers": "Max de Jugadores"
             },
             "editor": {
                 "testPlay": "Juego de Prueba",
-                "scrollLeft": "",
-                "scrollRight": "",
-                "scrollDown": "",
-                "modeErase": "",
-                "switchScreens": "",
-                "fastScroll": "",
-                "modeSelect": "",
-                "nextSection": "",
-                "prevSection": "",
-                "scrollUp": ""
+                "scrollLeft": "Despl Izq",
+                "scrollRight": "Despl Der",
+                "scrollDown": "Despl Abajo",
+                "modeErase": "Modo Borrar",
+                "switchScreens": "Mostrar Panel",
+                "fastScroll": "Apurarse",
+                "modeSelect": "Modo Sel.",
+                "nextSection": "Secc Prox",
+                "prevSection": "Secc Ult",
+                "scrollUp": "Despl Arr"
             },
             "controlsConnected": "Conectado:",
-            "joystickSimpleEditor": "",
-            "caseMouse": "",
-            "phraseNewProfOldJoy": ""
+            "joystickSimpleEditor": "Controles de Editor Sensillos",
+            "caseMouse": "(Ratón)",
+            "phraseNewProfOldJoy": "Perfil nuevo para joystick legado"
         },
         "wordPlayer": "Jugador",
         "wordBack": "Volver",
@@ -750,7 +754,7 @@
         },
         "caseNone": "<Ninguno>",
         "wordResume": "Reanudar",
-        "abbrevMilliseconds": ""
+        "abbrevMilliseconds": "MS"
     },
     "outro": {
         "originalBy": "Código original VB6 Por:",
@@ -770,7 +774,7 @@
         "connect": {
             "phraseTestControls": "Probar Controles",
             "phraseChangeChar": "Cambiar Personaje",
-            "phrasePressAButton": "Presiona el Botón A",
+            "phrasePressAButton": "Presiona un Botón",
             "splitPressSelect_2": "Opciones de Controles",
             "dropAddTitle": "Quitar/Añadir Jugadores",
             "phraseStartToForceRes": "Presiona Comenzar para Forzar Resumir",
@@ -780,11 +784,11 @@
             "phraseHoldStart": "Mantén Comenzar",
             "phraseWaitingForInput": "Esperando un dispositivo de entrada...",
             "reconnectTitle": "Reconectar",
-            "phraseSetControls": "",
-            "phraseDropMe": "",
-            "phraseDropPX": "",
-            "phraseTestProfile": "",
-            "phraseForceResume": ""
+            "phraseSetControls": "Establecer Controles",
+            "phraseDropMe": "Soltarme",
+            "phraseDropPX": "Soltar a P{0}",
+            "phraseTestProfile": "Probar Perfil",
+            "phraseForceResume": "Forzar Resumir"
         },
         "error": {
             "errorInvalidEnterWarp": "Imposible comenzar el nivel debido a que un pasaje de entrada inválido {1} fue especificado.\nTotal Pasajes de Entrada: {2}\n\nArchivo: {0}",
@@ -802,28 +806,29 @@
             "continue": "Continuar",
             "quitTesting": "Dejar de Probar",
             "enterCode": "Introducir Código",
-            "playerSetup": ""
+            "playerSetup": "Ordenar Jugadores"
         },
         "message": {
             "scanningLevels": "Escaneando niveles..."
         },
         "hint": {
-            "pound-key": "",
-            "no-lives-old": "",
-            "gray-bricks": "",
-            "char5-bombs": "",
-            "heavy-duck": "",
-            "rainbow-surf": "",
-            "no-lives-new": "",
-            "shoe-block": ""
+            "no-lives-old": "Caución - ¡el final se acerca!",
+            "gray-bricks": "Algunos bloques se pueden romper por poderes especiales.",
+            "char5-bombs": "Presiona Correr para recogerlas y Correr Alt para tirarlas.",
+            "heavy-duck": "¡Agáchate para bloquear muchas - pero no todas - llamas!",
+            "rainbow-surf": "Cógelo, corre, mantén pulsado abajo, y déjalo para hacer surf.",
+            "no-lives-new": "¿No tienes moneda? ¡Toma un préstamo! Pero cuídate el puntaje...",
+            "shoe-block": "¡Ponerse esto bloquea muchas - pero no todas - llamas!",
+            "pound-altrun": "¡Presiona Correr Alt para golpear el suelo!",
+            "pound-down": "¡Presiona Abajo para golpear el suelo!"
         },
         "format": {
-            "minutesSeconds": ""
+            "minutesSeconds": "{0}mm{1}ss"
         },
         "msgbox": {
-            "sysInfoWarning": "",
-            "sysInfoTitle": "",
-            "sysInfoError": ""
+            "sysInfoWarning": "¡Aviso!",
+            "sysInfoTitle": "Información",
+            "sysInfoError": "¡Error!"
         }
     },
     "languageName": "Español"

@@ -360,14 +360,15 @@
             "scanningLevels": "掃描關卡中……"
         },
         "hint": {
-            "no-lives-old": "如果生命值為0，遊戲將會結束。",
-            "no-lives-new": "如果生命值為0，積分將會清零。",
-            "pound-key": "按下高亮的按鍵，進行震地！",
+            "no-lives-old": "注意：如果本次通關失敗，遊戲將會結束！",
+            "no-lives-new": "即使本次通關失敗，也沒什麼事情發生；請注意查看您的積分……",
             "char5-bombs": "按下“奔跑”鍵可收集炸彈，按下“第二奔跑”鍵可投擲炸彈。",
             "gray-bricks": "神秘力量可以破壞部分磚塊。",
             "rainbow-surf": "在拿起彩虹龜殼的時候，按下“下”鍵，開始衝浪吧！",
             "shoe-block": "穿上鞋子時，可以抵擋大多數火焰！",
-            "heavy-duck": "玩家下蹲時，可以抵擋大多數火焰！"
+            "heavy-duck": "玩家下蹲時，可以抵擋大多數火焰！",
+            "pound-altrun": "按下“第二奔跑”鍵，進行震地！",
+            "pound-down": "按下“下”鍵，進行震地！"
         }
     },
     "languageName": "繁體中文",
@@ -438,7 +439,6 @@
             },
             "options": {
                 "batteryStatus": "電池狀態",
-                "groundPoundButton": "震地按鍵",
                 "maxPlayers": "玩家上限",
                 "rumble": "Rumble控制器",
                 "textEntryStyle": "文字輸入使用設備"
@@ -535,7 +535,8 @@
                     "caseIR": "（IR）",
                     "dPad": "十字鍵",
                     "shake": "搖晃"
-                }
+                },
+                "typeGamecube": "GC控制器"
             },
             "wordButtons": "按鍵",
             "wordProfiles": "配置",
@@ -647,7 +648,9 @@
                     "_name": "四人分屏模式畫面大小",
                     "default": "缺省"
                 },
-                "use-native-osk": "啓用內置虛擬鍵盤"
+                "use-native-osk": "啓用內置虛擬鍵盤",
+                "inaccurate-gifs": "錯誤GIF圖片渲染",
+                "inaccurate-gifs-tip": "當GIF圖片檔案存在時，啟用3D效果"
             },
             "audio": {
                 "audio-sfx-volume": "聲音音量",
@@ -687,7 +690,9 @@
                     "modern-tip": "開啟全部遊戲更新",
                     "vanilla-tip": "關閉全部遊戲更新",
                     "vanilla": "懷舊模式"
-                }
+                },
+                "hub-resume": "中心關卡：傳送點記憶",
+                "hub-resume-tip": "從上次進入的傳送點繼續遊戲"
             },
             "main": {
                 "two-screen-mode": {

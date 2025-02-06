@@ -312,7 +312,6 @@
             "options": {
                 "batteryStatus": "",
                 "textEntryStyle": "",
-                "groundPoundButton": "",
                 "maxPlayers": "",
                 "rumble": ""
             },
@@ -794,7 +793,6 @@
             "errorNoStartPoint": ""
         },
         "hint": {
-            "pound-key": "",
             "no-lives-new": "",
             "no-lives-old": "",
             "char5-bombs": "",

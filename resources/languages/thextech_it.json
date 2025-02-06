@@ -700,7 +700,6 @@
             "wordProfiles": "",
             "options": {
                 "batteryStatus": "",
-                "groundPoundButton": "",
                 "textEntryStyle": "",
                 "rumble": "",
                 "maxPlayers": ""
@@ -791,7 +790,6 @@
             "errorNoStartPoint": ""
         },
         "hint": {
-            "pound-key": "",
             "no-lives-old": "",
             "no-lives-new": "",
             "char5-bombs": "",
