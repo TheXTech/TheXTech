@@ -21,6 +21,8 @@ jobs:
   build:
     name: Syncing languages
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     container: ghcr.io/thextech/wohlnet-ci-ubuntu2404:latest
     strategy:
       fail-fast: true
@@ -45,10 +47,11 @@ jobs:
         git config --global user.name "Language Sync Bot"
 
     - name: Copy updated translations to stable branch
-      continue-on-error: true
       shell: bash
       env:
         GIT_AUTHOR: ${{secrets.GITEA_SYNCBOT_AUTHOR}}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
       run: |
         bash .github/ci-helper/translate_sync_to_stable.sh
 
