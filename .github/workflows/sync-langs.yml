@@ -44,6 +44,14 @@ jobs:
         git config --global user.email "ci@example.ru"
         git config --global user.name "Language Sync Bot"
 
+    - name: Copy updated translations to stable branch
+      continue-on-error: true
+      shell: bash
+      env:
+        GIT_AUTHOR: ${{secrets.GITEA_SYNCBOT_AUTHOR}}
+      run: |
+        bash .github/ci-helper/translate_sync_to_stable.sh
+
     - name: Apply update to all the translations
       shell: bash
       env:
