@@ -775,7 +775,6 @@ set(THEXTECH_SRC
     src/globals.cpp
     src/npc.cpp
     src/sound.cpp
-    src/sound_thread.cpp
     src/sound_spatial.cpp
     src/sound/sound_msgsnd.cpp
     src/frame_timer.cpp
@@ -893,6 +892,10 @@ set(THEXTECH_SRC
     src/fontman/hardcoded_font.cpp
     src/fontman/utf8_helpers.cpp
 )
+
+if(NOT THEXTECH_NO_SDL_BUILD)
+    list(APPEND THEXTECH_SRC src/sound_thread.cpp)
+endif()
 
 if(THEXTECH_ENABLE_TTF_SUPPORT)
     add_definitions(-DTHEXTECH_ENABLE_TTF_SUPPORT)

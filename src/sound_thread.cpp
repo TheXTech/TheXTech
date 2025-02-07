@@ -18,8 +18,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef THEXTECH_NO_SDL_BUILD
-
 #include <vector>
 #include <cstdint>
 #include <exception>
@@ -147,20 +145,3 @@ void EndSfxThread()
         s_sound_thread_mutex = nullptr;
     }
 }
-
-#else // #ifndef THEXTECH_NO_SDL_BUILD
-
-// fallback: just call directly
-
-#include "sound.h"
-
-void PlaySfx(int Alias, int loops, int volume, uint8_t left, uint8_t right)
-{
-    PlaySfx_Blocking(Alias, loops, volume, left, right);
-}
-
-void StartSfxThread() {}
-
-void EndSfxThread() {}
-
-#endif // #ifndef THEXTECH_NO_SDL_BUILD

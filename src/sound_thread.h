@@ -22,13 +22,38 @@
 #ifndef SOUND_THREAD_H
 #define SOUND_THREAD_H
 
-// enqueues the SFX but does not block
+#include <stdint.h>
+
+#ifndef THEXTECH_NO_SDL_BUILD
+
+/**
+ * @brief Enqueues the SFX but does not block
+ * @param Alias The alias of the sound
+ * @param loops Number loops to play (n-1 value. When -1 - loop forever)
+ * @param volume The volume level between 0 and 128
+ * @param left The panning volume of left channel between 0 and 255
+ * @param right The panning volume of right channel between 0 and 255
+ */
 void PlaySfx(int Alias, int loops = 0, int volume = 128, uint8_t left = 255, uint8_t right = 255);
 
-// starts sound thread
+/**
+ * @brief Starts sound thread
+ */
 void StartSfxThread();
 
-// ends sound thread
+/**
+ * @brief ends sound thread
+ */
 void EndSfxThread();
+
+#else
+
+// fallback: just call directly
+#define PlaySfx PlaySfx_Blocking
+
+static inline void StartSfxThread() {}
+static inline void EndSfxThread() {}
+
+#endif
 
 #endif // #ifndef SOUND_THREAD_H
