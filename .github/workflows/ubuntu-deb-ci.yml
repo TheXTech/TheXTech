@@ -85,8 +85,8 @@ jobs:
           }
         - {
             name: "DEB Ubuntu 16.04 armhf",
-            os: ubuntu-24.04-arm,
-            container: "ghcr.io/thextech/wohlnet-ci-ubuntu1604-armhf:latest",
+            os: ubuntu-latest,
+            container: "ghcr.io/thextech/wohlnet-ci-ubuntu1604-armhf-cross:latest",
             cross: true,
 
             extra_options: "-DPGE_SHARED_SDLMIXER=OFF \
@@ -106,7 +106,7 @@ jobs:
             -DCPACK_DEBIAN_PACKAGE_DESCRIPTION=\"TheXTech - the modern C++ port and successor of the SMBX engine\" \
             -DCMAKE_TOOLCHAIN_FILE=`pwd`/cmake/ci_linux_gcc_toolchain_armhf.cmake",
 
-            deps_cmdline: "echo 'Ubuntu 16 arm64, target to armhf, everything pre-installed'",
+            deps_cmdline: "echo 'Ubuntu 16 armhf, cross from x86_64, everything pre-installed'",
 
             executable_name: "thextech",
             generator: "Ninja",
@@ -170,9 +170,9 @@ jobs:
           }
         - {
             name: "DEB Ubuntu 20.04 arm64",
-            os: ubuntu-24.04-arm,
-            container: "ghcr.io/thextech/wohlnet-ci-ubuntu2004-arm64:latest",
-            cross: false,
+            os: ubuntu-latest,
+            container: "ghcr.io/thextech/wohlnet-ci-ubuntu2004-arm64-cross:latest",
+            cross: true,
 
             extra_options: "-DPGE_SHARED_SDLMIXER=OFF -DUSE_SYSTEM_SDL2=ON -DUSE_FREEIMAGE_SYSTEM_LIBS=ON \
             -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=MinSizeRel \
@@ -183,9 +183,10 @@ jobs:
             -DCPACK_DEBIAN_PACKAGE_RELEASE=${GITHUB_RUN_NUMBER} \
             -DCPACK_DEBIAN_PACKAGE_ARCHITECTURE=aarch64 \
             -DCPACK_DEBIAN_PACKAGE_DEPENDS=\"libsdl2-2.0-0\" \
-            -DCPACK_DEBIAN_PACKAGE_DESCRIPTION=\"TheXTech - the modern C++ port and successor of the SMBX engine\"",
+            -DCPACK_DEBIAN_PACKAGE_DESCRIPTION=\"TheXTech - the modern C++ port and successor of the SMBX engine\" \
+            -DCMAKE_TOOLCHAIN_FILE=`pwd`/cmake/ci_linux_gcc_toolchain_arm64.cmake",
 
-            deps_cmdline: "echo 'Ubuntu 20 arm64, everything pre-installed'",
+            deps_cmdline: "echo 'Ubuntu 20 arm64, cross from x86_64, everything pre-installed'",
 
             executable_name: "thextech",
             generator: "Ninja",
@@ -196,8 +197,8 @@ jobs:
           }
         - {
             name: "DEB Ubuntu 20.04 armhf",
-            os: ubuntu-24.04-arm,
-            container: "ghcr.io/thextech/wohlnet-ci-ubuntu2004-armhf:latest",
+            os: ubuntu-latest,
+            container: "ghcr.io/thextech/wohlnet-ci-ubuntu2004-armhf-cross:latest",
             cross: true,
 
             extra_options: "-DPGE_SHARED_SDLMIXER=OFF -DUSE_SYSTEM_SDL2=ON -DUSE_FREEIMAGE_SYSTEM_LIBS=ON \
@@ -212,7 +213,7 @@ jobs:
             -DCPACK_DEBIAN_PACKAGE_DESCRIPTION=\"TheXTech - the modern C++ port and successor of the SMBX engine\" \
             -DCMAKE_TOOLCHAIN_FILE=`pwd`/cmake/ci_linux_gcc_toolchain_armhf.cmake",
 
-            deps_cmdline: "echo 'Ubuntu 20 arm64, target to armhf, everything pre-installed'",
+            deps_cmdline: "echo 'Ubuntu 20 armhf, cross from x86_64, everything pre-installed'",
 
             executable_name: "thextech",
             generator: "Ninja",
@@ -249,9 +250,9 @@ jobs:
           }
         - {
             name: "DEB Ubuntu 22.04 aarch64",
-            os: ubuntu-24.04-arm,
-            container: "ghcr.io/thextech/wohlnet-ci-ubuntu2204-arm64:latest",
-            cross: false,
+            os: ubuntu-latest,
+            container: "ghcr.io/thextech/wohlnet-ci-ubuntu2204-arm64-cross:latest",
+            cross: true,
 
             extra_options: "-DPGE_SHARED_SDLMIXER=OFF -DUSE_SYSTEM_SDL2=ON -DUSE_FREEIMAGE_SYSTEM_LIBS=ON \
             -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=MinSizeRel \
@@ -262,9 +263,10 @@ jobs:
             -DCPACK_DEBIAN_PACKAGE_RELEASE=${GITHUB_RUN_NUMBER} \
             -DCPACK_DEBIAN_PACKAGE_ARCHITECTURE=arm64 \
             -DCPACK_DEBIAN_PACKAGE_DEPENDS=\"libsdl2-2.0-0\" \
-            -DCPACK_DEBIAN_PACKAGE_DESCRIPTION=\"TheXTech - the modern C++ port and successor of the SMBX engine\"",
+            -DCPACK_DEBIAN_PACKAGE_DESCRIPTION=\"TheXTech - the modern C++ port and successor of the SMBX engine\" \
+            -DCMAKE_TOOLCHAIN_FILE=`pwd`/cmake/ci_linux_gcc_toolchain_arm64.cmake",
 
-            deps_cmdline: "echo 'Ubuntu 22 arm64, everything pre-installed'",
+            deps_cmdline: "echo 'Ubuntu 22 arm64, cross from x86_64, everything pre-installed'",
 
             executable_name: "thextech",
             generator: "Ninja",
