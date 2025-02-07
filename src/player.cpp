@@ -1636,7 +1636,7 @@ void CheckSection(const int A)
 
                             if(curMusic >= 0 && !GameMenu) // Dont interupt boss / switch music
                             {
-                                if(curMusic != bgMusic[B])
+                                if(curMusic != bgMusic[B] || (delayMusicIsSet() && bgMusic[B] != 24))
                                 {
                                     StartMusic(B);
                                 }
@@ -1698,7 +1698,7 @@ void CheckSection(const int A)
 
                                 if(curMusic != 6 && curMusic >= 0 && curMusic != 15) // Dont interupt boss / switch music
                                 {
-                                    if(curMusic != bgMusic[B])
+                                    if(curMusic != bgMusic[B] || (delayMusicIsSet() && bgMusic[B] != 24))
                                     {
                                         StartMusic(B);
                                     }

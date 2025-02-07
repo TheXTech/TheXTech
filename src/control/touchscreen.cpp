@@ -552,7 +552,17 @@ static struct TouchKeyMap
             SDL_assert(p.cmd >= TouchScreenController::key_BEGIN && p.cmd < TouchScreenController::key_END);
             fs.heldKey[p.cmd] = false;
 
-            if(x >= p.x1 && x <= p.x2 && y >= p.y1 && y <= p.y2)
+            bool coll_normal = (x >= p.x1 && x <= p.x2 && y >= p.y1 && y <= p.y2);
+
+            // special overlap for face buttons
+            bool is_button = (p.cmd == TouchScreenController::key_jump || p.cmd == TouchScreenController::key_altjump
+                            || p.cmd == TouchScreenController::key_run || p.cmd == TouchScreenController::key_altrun);
+
+            float w_extra = (p.x2 - p.x1) * 0.25;
+            float h_extra = (p.y2 - p.y1) * 0.1;
+            bool coll_button = (x >= p.x1 - w_extra && x <= p.x2 + w_extra && y >= p.y1 - h_extra && y <= p.y2 + h_extra);
+
+            if(coll_normal || (is_button && coll_button))
             {
                 fs.heldKey[p.cmd] = true;
                 count++;

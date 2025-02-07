@@ -529,7 +529,7 @@ int GameMain(const CmdLineSetup_t &setup)
     {
         XRender::setTargetTexture();
         XRender::clearBuffer();
-        SuperPrint("Click to start a game", 3, 230, 280);
+        SuperPrintScreenCenter("Click to start a game", 5, XRender::TargetH / 2 - 10);
         XRender::repaint();
         XRender::setTargetScreen();
         XEvents::doEvents();
