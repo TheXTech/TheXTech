@@ -171,7 +171,7 @@ jobs:
             -DCPACK_GENERATOR=DEB \
             -DCPACK_DEBIAN_PACKAGE_HOMEPAGE=\"https://wohlsoft.ru\" \
             -DCPACK_DEBIAN_PACKAGE_RELEASE=${GITHUB_RUN_NUMBER} \
-            -DCPACK_DEBIAN_PACKAGE_ARCHITECTURE=aarch64 \
+            -DCPACK_DEBIAN_PACKAGE_ARCHITECTURE=arm64 \
             -DCPACK_DEBIAN_PACKAGE_DEPENDS=\"libsdl2-2.0-0\" \
             -DCPACK_DEBIAN_PACKAGE_DESCRIPTION=\"TheXTech - the modern C++ port and successor of the SMBX engine\" \
             -DCMAKE_TOOLCHAIN_FILE=`pwd`/cmake/ci_linux_gcc_toolchain_arm64.cmake",
