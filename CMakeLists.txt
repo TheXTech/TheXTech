@@ -473,6 +473,9 @@ if(EMSCRIPTEN)
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --shell-file '${CMAKE_CURRENT_SOURCE_DIR}/resources/emscripten/shell_minimal.html'")
     # set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --use-preload-cache")
     # set(LINK_FLAGS "${LINK_FLAGS} -DIS_LINK -s USE_PTHREADS=1 -s FORCE_FILESYSTEM=1 --embed-file '${CMAKE_CURRENT_SOURCE_DIR}/@languages'")
+
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fexceptions") # bump to -fwasm-exceptions once widely supported
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fexceptions") # bump to -fwasm-exceptions once widely supported
 endif()
 
 set(A2XT_LIBS pgefl ${UTILS_LIBS})
