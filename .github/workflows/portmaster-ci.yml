@@ -26,12 +26,12 @@ jobs:
         config:
         - {
             name: "PortMaster Ubuntu 20.04 aarch64",
-            os: ubuntu-24.04-arm,
-            container: "ghcr.io/thextech/wohlnet-ci-ubuntu2004-arm64:latest",
+            os: ubuntu-latest,
+            container: "ghcr.io/thextech/wohlnet-ci-ubuntu2004-arm64-cross:latest",
 
-            extra_options: "-DPORTMASTER=ON",
+            extra_options: "-DPORTMASTER=ON -DCMAKE_TOOLCHAIN_FILE=`pwd`/cmake/ci_linux_gcc_toolchain_arm64.cmake",
 
-            deps_cmdline: "echo 'Ubuntu 20 arm64, everything pre-installed'",
+            deps_cmdline: "echo 'Ubuntu 20 arm64, cross from x86_64, everything pre-installed'",
 
             generator: "Ninja",
             build_type: "MinSizeRel",
@@ -97,7 +97,7 @@ jobs:
       shell: bash
       run: |
         file build/output/bin/thextech
-        ldd build/output/bin/thextech
+#        ldd build/output/bin/thextech # Not for cross compile!
 
 
     - name: Create Package
