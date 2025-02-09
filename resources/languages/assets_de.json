@@ -1,3 +1,35 @@
 {
-    "languageName": "Deutsch"
+    "languageName": "Deutsch",
+    "editor": {
+        "background2": {
+            "fam-misc": {
+                "bg2-40": "Geheime Mine",
+                "bg2-46": "Raumschiff",
+                "bg2-47": "Raumbasis"
+            },
+            "fam-set1": {
+                "bg2-41": "Burg",
+                "bg2-50": "Pilze",
+                "bg2-51": "Wüste",
+                "bg2-7": "Unterirdisch",
+                "bg2-8": "Nacht",
+                "bg2-9": "Nacht 2"
+            },
+            "fam-set2": {
+                "bg2-25": "Unterirdisch",
+                "bg2-44": "Burg",
+                "bg2-49": "Nacht - Hügel",
+                "bg2-5": "Bäume",
+                "bg2-52": "Nacht - Wüste",
+                "bg2-53": "Klippe",
+                "bg2-54": "Lagerhaus",
+                "bg2-57": "Kerker",
+                "bg2-48": "Wolken"
+            },
+            "fam-set3": {
+                "bg2-13": "Wolken",
+                "bg2-14": "Wüste"
+            }
+        }
+    }
 }

@@ -1,3 +1,17 @@
 {
-    "languageName": "Deutsch"
+    "languageName": "Deutsch",
+    "editor": {
+        "browser": {
+            "askOverwriteFile": "{0} überschreiben?",
+            "itemNewFile": "<Neue Datei>",
+            "itemNewFolder": "<Neuer Ordner>",
+            "newFile": "Neue Datei",
+            "openFile": "Datei öffnen",
+            "saveFile": "Datei speichern"
+        },
+        "events": {
+            "header": "Ereignisse:",
+            "itemNewEvent": "<Neues Ereignis>"
+        }
+    }
 }
