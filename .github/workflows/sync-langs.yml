@@ -50,7 +50,7 @@ jobs:
     - name: Copy updated translations to stable branch
       shell: bash
       env:
-        GIT_AUTHOR: ${{secrets.GITEA_SYNCBOT_AUTHOR}}
+        GIT_AUTHOR: "github-actions[bot] <github-actions[bot]@users.noreply.github.com>"
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
       run: |
