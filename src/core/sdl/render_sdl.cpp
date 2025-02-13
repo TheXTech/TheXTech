@@ -35,7 +35,6 @@
 
 #include "main/cheat_code.h"
 
-#include "sdl_proxy/sdl_stdinc.h"
 #include <fmt_format_ne.h>
 
 #include "graphics.h"

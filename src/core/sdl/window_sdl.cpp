@@ -28,7 +28,6 @@
 #include "window_sdl.h"
 #include "../render.h"
 #include "config.h"
-#include "screen.h"
 #include "../version.h"
 
 #ifdef __EMSCRIPTEN__
