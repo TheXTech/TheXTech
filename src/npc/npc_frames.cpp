@@ -32,9 +32,6 @@
 
 void NPCFrames(int A)
 {
-    double B = 0;
-    double C = 0;
-    double D = 0;
     Location_t tempLocation;
 
     if(NPC[A]->TFrames > 0) // custom frames
@@ -127,27 +124,34 @@ void NPCFrames(int A)
     }
     else if(NPC[A].Type == NPCID_STATUE_POWER || NPC[A].Type == NPCID_HEAVY_POWER)
     {
-        C = 0;
-        for(B = 1; B <= numPlayers; B++)
+        int new_frame = 0;
+
+        double min_dist = 0;
+        for(int B = 1; B <= numPlayers; B++)
         {
             if(!Player[B].Dead && Player[B].Section == NPC[A].Section && Player[B].TimeToLive == 0)
             {
-                if(C == 0 || std::abs(NPC[A].Location.X + NPC[A].Location.Width / 2.0 - (Player[B].Location.X + Player[B].Location.Width / 2.0)) + std::abs(NPC[A].Location.Y + NPC[A].Location.Height / 2.0 - (Player[B].Location.Y + Player[B].Location.Height / 2.0)) < C)
+                auto L1_dist = std::abs(NPC[A].Location.X + NPC[A].Location.Width / 2.0 - (Player[B].Location.X + Player[B].Location.Width / 2.0)) + std::abs(NPC[A].Location.Y + NPC[A].Location.Height / 2.0 - (Player[B].Location.Y + Player[B].Location.Height / 2.0));
+                if(min_dist == 0 || L1_dist < min_dist)
                 {
-                    C = std::abs(NPC[A].Location.X + NPC[A].Location.Width / 2.0 - (Player[B].Location.X + Player[B].Location.Width / 2.0)) + std::abs(NPC[A].Location.Y + NPC[A].Location.Height / 2.0 - (Player[B].Location.Y + Player[B].Location.Height / 2.0));
+                    min_dist = L1_dist;
+
                     if(Player[B].Character == 5)
-                        D = 1;
+                        new_frame = 1;
                     else
-                        D = 0;
+                        new_frame = 0;
                 }
             }
         }
-        if(D != NPC[A].Frame)
+
+        if(new_frame != NPC[A].Frame)
         {
             if(NPC[A].FrameCount > 0)
                 NewEffect(EFFID_SMOKE_S4, NPC[A].Location);
-            NPC[A].Frame = D;
+
+            NPC[A].Frame = new_frame;
         }
+
         NPC[A].FrameCount = 1;
     }
     else if(NPC[A].Type == NPCID_FLY_BLOCK || NPC[A].Type == NPCID_FLY_CANNON) // fly block
@@ -843,30 +847,34 @@ void NPCFrames(int A)
     else if(NPC[A].Type == NPCID_STONE_S4)
     {
         NPC[A].Frame = 0;
-        C = 0;
-        for(B = 1; B <= numPlayers; ++B)
-        {
-            if(!CanComeOut(NPC[A].Location, Player[B].Location) && Player[B].Location.Y >= NPC[A].Location.Y)
-                C = B;
-        }
-        if(C > 0)
-            NPC[A].Frame = 2;
-        else
-        {
-            for(B = 1; B <= numPlayers; ++B)
-            {
-                tempLocation = NPC[A].Location;
-                tempLocation.Width = NPC[A].Location.Width * 2;
-                tempLocation.X = NPC[A].Location.X - NPC[A].Location.Width / 2.0;
-                if(!CanComeOut(tempLocation, Player[B].Location) && Player[B].Location.Y >= NPC[A].Location.Y)
-                    C = B;
-            }
-            if(C > 0)
-                NPC[A].Frame = 1;
-        }
+
         if(NPC[A].Special == 1)
             NPC[A].Frame = 2;
 
+        for(int B = 1; B <= numPlayers; ++B)
+        {
+            if(!CanComeOut(NPC[A].Location, Player[B].Location) && Player[B].Location.Y >= NPC[A].Location.Y)
+            {
+                NPC[A].Frame = 2;
+                break;
+            }
+        }
+
+        if(NPC[A].Frame == 0)
+        {
+            tempLocation = NPC[A].Location;
+            tempLocation.Width = NPC[A].Location.Width * 2;
+            tempLocation.X = NPC[A].Location.X - NPC[A].Location.Width / 2.0;
+
+            for(int B = 1; B <= numPlayers; ++B)
+            {
+                if(!CanComeOut(tempLocation, Player[B].Location) && Player[B].Location.Y >= NPC[A].Location.Y)
+                {
+                    NPC[A].Frame = 1;
+                    break;
+                }
+            }
+        }
     }
     else if(NPC[A].Type == NPCID_CHAR4_HEAVY) // toad boomerang
     {
@@ -1648,6 +1656,8 @@ void NPCFrames(int A)
     {
         if((NPC[A].Type == NPCID_PLR_FIREBALL || NPC[A].Type == NPCID_PLR_ICEBALL) && NPC[A].Quicksand == 0)
         {
+            bool make_trail = true;
+
             if(NPC[A].Wet > 0)
             {
                 if(iRand(20) == 0)
@@ -1660,45 +1670,12 @@ void NPCFrames(int A)
                 }
 
                 if(iRand(100) >= 85)
-                {
-                    if(NPC[A].Type == NPCID_PLR_ICEBALL)
-                    {
-                        if(NPC[A].Special == 5)
-                        {
-                            NewEffect(EFFID_PLR_ICEBALL_TRAIL, NPC[A].Location, 1, 0, NPC[A].Shadow);
-                            if(iRand(5) == 0)
-                            {
-                                tempLocation.Height = EffectHeight[80];
-                                tempLocation.Width = EffectWidth[80];
-                                tempLocation.SpeedX = 0;
-                                tempLocation.SpeedY = 0;
-                                tempLocation.X = NPC[A].Location.X + dRand() * 16 - EffectWidth[80] / 2.0 - 4 - NPC[A].Location.SpeedX * 3;
-                                tempLocation.Y = NPC[A].Location.Y + dRand() * 16 - EffectHeight[80] / 2.0 - 4;
-                                NewEffect(EFFID_SPARKLE, tempLocation);
-                                Effect[numEffects].Location.SpeedX = NPC[A].Location.SpeedX * 0.5;
-                                Effect[numEffects].Location.SpeedY = NPC[A].Location.SpeedY * 0.5;
-                                Effect[numEffects].Frame = iRand(3);
-                            }
-                        }
-                        else if(iRand(5) >= 3)
-                        {
-                            tempLocation.Height = EffectHeight[80];
-                            tempLocation.Width = EffectWidth[80];
-                            tempLocation.SpeedX = 0;
-                            tempLocation.SpeedY = 0;
-                            tempLocation.X = NPC[A].Location.X - tempLocation.Width / 2.0 + dRand() * NPC[A].Location.Width - 4;
-                            tempLocation.Y = NPC[A].Location.Y - tempLocation.Height / 2.0 + dRand() * NPC[A].Location.Height - 4;
-                            NewEffect(EFFID_SPARKLE, tempLocation, 1, 0, NPC[A].Shadow);
-                            Effect[numEffects].Location.SpeedX = NPC[A].Location.SpeedX * 0.25;
-                            Effect[numEffects].Location.SpeedY = NPC[A].Location.SpeedY * 0.25;
-                            Effect[numEffects].Frame = iRand(3);
-                        }
-                    }
-                    else
-                        NewEffect(EFFID_PLR_FIREBALL_TRAIL, NPC[A].Location, NPC[A].Special, 0, NPC[A].Shadow);
-                }
+                    make_trail = true;
+                else
+                    make_trail = false;
             }
-            else
+
+            if(make_trail)
             {
                 if(NPC[A].Type == NPCID_PLR_ICEBALL)
                 {
@@ -1737,12 +1714,15 @@ void NPCFrames(int A)
                     NewEffect(EFFID_PLR_FIREBALL_TRAIL, NPC[A].Location, NPC[A].Special, 0, NPC[A].Shadow);
             }
         }
+
         NPC[A].FrameCount += 1;
+
         if(NPC[A].FrameCount >= 4)
         {
             NPC[A].FrameCount = 0;
             NPC[A].Frame += -NPC[A].Direction;
         }
+
         if(NPC[A].Special < 2 || (NPC[A].Type == NPCID_PLR_ICEBALL && NPC[A].Special != 5))
         {
             if(NPC[A].Frame >= 4)
@@ -2029,11 +2009,11 @@ void NPCFrames(int A)
                 NPC[A].Frame = 0;
             else
             {
-                C = 0;
+                int C = 0;
                 tempLocation = NPC[A].Location;
                 tempLocation.Height = 24;
                 tempLocation.Y -= 8;
-                for(B = 1; B <= numPlayers; ++B)
+                for(int B = 1; B <= numPlayers; ++B)
                 {
                     if(CheckCollision(tempLocation, Player[B].Location) && Player[B].Mount != 2 && (Player[B].Location.SpeedY > 0 || Player[B].Location.SpeedY < Physics.PlayerJumpVelocity))
                     {
@@ -2046,7 +2026,7 @@ void NPCFrames(int A)
                     tempLocation = NPC[A].Location;
                     tempLocation.Height = 32;
                     tempLocation.Y -= 16;
-                    for(B = 1; B <= numPlayers; ++B)
+                    for(int B = 1; B <= numPlayers; ++B)
                     {
                         if(CheckCollision(tempLocation, Player[B].Location) && Player[B].Mount != 2 && (Player[B].Location.SpeedY > 0 || Player[B].Location.SpeedY < Physics.PlayerJumpVelocity))
                         {
