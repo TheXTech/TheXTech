@@ -886,22 +886,12 @@ void NPCSpecialMaybeHeld(int A)
         {
             if(NPC[A].Special == 0)
             {
-                double C = 0;
-                int D = 1;
-                for(int B = 1; B <= numPlayers; B++)
-                {
-                    if(!Player[B].Dead && Player[B].Section == NPC[A].Section)
-                    {
-                        double dist = NPCPlayerTargetDist(NPC[A], Player[B]);
-                        if(C == 0.0 || dist < C)
-                        {
-                            C = dist;
-                            D = B;
-                        }
-                    }
-                }
+                int target_plr = NPCTargetPlayer(NPC[A]);
 
-                if(Player[D].Location.X + Player[D].Location.Width / 2.0 > NPC[A].Location.X + 16)
+                if(target_plr == 0)
+                    target_plr = 1;
+
+                if(Player[target_plr].Location.X + Player[target_plr].Location.Width / 2.0 > NPC[A].Location.X + 16)
                     NPC[A].Direction = 1;
                 else
                     NPC[A].Direction = -1;

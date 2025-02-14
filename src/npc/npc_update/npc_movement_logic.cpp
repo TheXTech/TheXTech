@@ -168,21 +168,12 @@ void NPCMovementLogic(int A, float& speedVar)
             NPC[A].Type == NPCID_LIFE_S1 || NPC[A].Type == NPCID_LIFE_S4 || NPC[A].Type == NPCID_BRUTE_SQUISHED ||
             NPC[A].Type == NPCID_BIG_MOLE)
     {
-        if(NPC[A].Direction == 0.0f) // Move toward the closest player
+        if(NPC[A].Direction == 0) // Move toward the closest player
         {
-            double C = 0;
-            for(int B = 1; B <= numPlayers; B++)
-            {
-                if(!Player[B].Dead && Player[B].Section == NPC[A].Section)
-                {
-                    double dist = NPCPlayerTargetDist(NPC[A], Player[B]);
-                    if(C == 0.0 || dist < C)
-                    {
-                        C = dist;
-                        NPC[A].Direction = -Player[B].Direction;
-                    }
-                }
-            }
+            int target_plr = NPCTargetPlayer(NPC[A]);
+
+            if(target_plr)
+                NPC[A].Direction = -Player[target_plr].Direction;
         }
 
         if(NPC[A].Location.SpeedX < Physics.NPCMushroomSpeed && NPC[A].Location.SpeedX > -Physics.NPCMushroomSpeed)
@@ -200,21 +191,14 @@ void NPCMovementLogic(int A, float& speedVar)
     {
         NPC[A].Projectile = true;
 
-        double C = 0;
-        for(int B = 1; B <= numPlayers; B++)
+        int target_plr = NPCTargetPlayer(NPC[A]);
+
+        if(target_plr)
         {
-            if(!Player[B].Dead && Player[B].Section == NPC[A].Section)
-            {
-                double dist = NPCPlayerTargetDist(NPC[A], Player[B]);
-                if(C == 0.0 || dist < C)
-                {
-                    C = dist;
-                    if(NPC[A].Location.X + NPC[A].Location.Width / 2.0 > Player[B].Location.X + Player[B].Location.Width / 2.0)
-                        NPC[A].Direction = -1;
-                    else
-                        NPC[A].Direction = 1;
-                }
-            }
+            if(NPC[A].Location.X + NPC[A].Location.Width / 2.0 > Player[target_plr].Location.X + Player[target_plr].Location.Width / 2.0)
+                NPC[A].Direction = -1;
+            else
+                NPC[A].Direction = 1;
         }
 
         NPC[A].Location.SpeedX += 0.1 * double(NPC[A].Direction);
@@ -237,21 +221,14 @@ void NPCMovementLogic(int A, float& speedVar)
     {
         if(!NPC[A].Projectile && NPC[A].Special2 == 0)
         {
-            double C = 0;
-            for(int B = 1; B <= numPlayers; B++)
+            int target_plr = NPCTargetPlayer(NPC[A]);
+
+            if(target_plr)
             {
-                if(!Player[B].Dead && Player[B].Section == NPC[A].Section)
-                {
-                    double dist = NPCPlayerTargetDist(NPC[A], Player[B]);
-                    if(C == 0.0 || dist < C)
-                    {
-                        C = dist;
-                        if(NPC[A].Location.X + NPC[A].Location.Width / 2.0 > Player[B].Location.X + Player[B].Location.Width / 2.0)
-                            NPC[A].Direction = -1;
-                        else
-                            NPC[A].Direction = 1;
-                    }
-                }
+                if(NPC[A].Location.X + NPC[A].Location.Width / 2.0 > Player[target_plr].Location.X + Player[target_plr].Location.Width / 2.0)
+                    NPC[A].Direction = -1;
+                else
+                    NPC[A].Direction = 1;
             }
 
             NPC[A].Location.SpeedX += 0.05 * double(NPC[A].Direction);
@@ -324,21 +301,14 @@ void NPCMovementLogic(int A, float& speedVar)
         }
         else
         {
-            double C = 0;
-            for(int B = 1; B <= numPlayers; B++)
+            int target_plr = NPCTargetPlayer(NPC[A]);
+
+            if(target_plr)
             {
-                if(!Player[B].Dead && Player[B].Section == NPC[A].Section)
-                {
-                    double dist = NPCPlayerTargetDist(NPC[A], Player[B]);
-                    if(C == 0.0 || dist < C)
-                    {
-                        C = dist;
-                        if(NPC[A].Location.X + NPC[A].Location.Width / 2.0 > Player[B].Location.X + Player[B].Location.Width / 2.0)
-                            NPC[A].Direction = -1;
-                        else
-                            NPC[A].Direction = 1;
-                    }
-                }
+                if(NPC[A].Location.X + NPC[A].Location.Width / 2.0 > Player[target_plr].Location.X + Player[target_plr].Location.Width / 2.0)
+                    NPC[A].Direction = -1;
+                else
+                    NPC[A].Direction = 1;
             }
 
             if(NPC[A].Direction == 1 && NPC[A].Location.SpeedX < 4)
@@ -735,21 +705,14 @@ void NPCMovementLogic(int A, float& speedVar)
         NPC[A].Location.SpeedX = 0;
         if(!(NPC[A].Type == NPCID_SKELETON && NPC[A].Special > 0))
         {
-            double C = 0;
-            for(int B = 1; B <= numPlayers; B++)
+            int target_plr = NPCTargetPlayer(NPC[A]);
+
+            if(target_plr)
             {
-                if(!Player[B].Dead && Player[B].Section == NPC[A].Section)
-                {
-                    double dist = NPCPlayerTargetDist(NPC[A], Player[B]);
-                    if(C == 0.0 || dist < C)
-                    {
-                        C = dist;
-                        if(NPC[A].Location.X + NPC[A].Location.Width / 2.0 > Player[B].Location.X + Player[B].Location.Width / 2.0)
-                            NPC[A].Direction = -1;
-                        else
-                            NPC[A].Direction = 1;
-                    }
-                }
+                if(NPC[A].Location.X + NPC[A].Location.Width / 2.0 > Player[target_plr].Location.X + Player[target_plr].Location.Width / 2.0)
+                    NPC[A].Direction = -1;
+                else
+                    NPC[A].Direction = 1;
             }
         }
     }

@@ -76,6 +76,30 @@ double NPCPlayerTargetDist(const NPC_t& npc, const Player_t& player)
         return SDL_fabs(dx);
 }
 
+int NPCTargetPlayer(const NPC_t& npc)
+{
+    int target_plr = 0;
+    double min_dist = 0;
+
+    for(int B = 1; B <= numPlayers; B++)
+    {
+        if(!Player[B].Dead && Player[B].Section == npc.Section)
+        {
+            if(numPlayers == 1)
+                return 1;
+
+            double dist = NPCPlayerTargetDist(npc, Player[B]);
+            if(min_dist == 0 || dist < min_dist)
+            {
+                min_dist = dist;
+                target_plr = B;
+            }
+        }
+    }
+
+    return target_plr;
+}
+
 void CheckSectionNPC(int A)
 {
     if(GameMenu)
@@ -1723,21 +1747,16 @@ void NPCSpecial(int A)
     {
         if(npc.Immune == 0)
         {
-            C = 0;
-            for(int i = 1; i <= numPlayers; i++)
+            int target = NPCTargetPlayer(npc);
+
+            if(target != 0)
             {
-                auto &p = Player[i];
-                if(!p.Dead && p.Section == npc.Section)
-                {
-                    if(C == 0 || std::abs(npc.Location.X + npc.Location.Width / 2.0 - (p.Location.X + p.Location.Width / 2.0)) < C)
-                    {
-                        C = std::abs(npc.Location.X + npc.Location.Width / 2.0 - (p.Location.X + p.Location.Width / 2.0));
-                        if(npc.Location.X + npc.Location.Width / 2.0 > p.Location.X + p.Location.Width / 2.0)
-                            npc.Direction = -1;
-                        else
-                            npc.Direction = 1;
-                    }
-                }
+                auto &p = Player[target];
+
+                if(npc.Location.X + npc.Location.Width / 2.0 > p.Location.X + p.Location.Width / 2.0)
+                    npc.Direction = -1;
+                else
+                    npc.Direction = 1;
             }
         }
         else
@@ -2091,19 +2110,8 @@ void NPCSpecial(int A)
             if(npc.Special2 > 80 + iRand(20))
             {
                 npc.Special = 1;
-                C = 0;
-                int ip = 0;
-                for(int i = 1; i <= numPlayers; i++)
-                {
-                    if(!Player[i].Dead && Player[i].Section == npc.Section)
-                    {
-                        if(C == 0 || std::abs(npc.Location.X + npc.Location.Width / 2.0 - (Player[i].Location.X + Player[i].Location.Width / 2.0)) < C)
-                        {
-                            C = std::abs(npc.Location.X + npc.Location.Width / 2.0 - (Player[i].Location.X + Player[i].Location.Width / 2.0));
-                            ip = i;
-                        }
-                    }
-                }
+
+                int ip = NPCTargetPlayer(npc);
 
                 double dist_x = (npc.Location.X + npc.Location.Width / 2.0) - (Player[ip].Location.X + Player[ip].Location.Width / 2.0);
                 double dist_y = (npc.Location.Y + npc.Location.Height / 2.0) - (Player[ip].Location.Y + Player[ip].Location.Height / 2.0);
@@ -2863,20 +2871,7 @@ void NPCSpecial(int A)
     }
     else if(npc.Type == NPCID_VILLAIN_S1) // King Koopa
     {
-        C = 0;
-        int target_plr = 0; // was D
-        for(int i = 1; i <= numPlayers; i++)
-        {
-            auto &p = Player[i];
-            if(!p.Dead && p.Section == npc.Section)
-            {
-                if(C == 0.0 || std::abs(npc.Location.X + npc.Location.Width / 2.0 - (p.Location.X + p.Location.Width / 2.0)) < C)
-                {
-                    C = std::abs(npc.Location.X + npc.Location.Width / 2.0 - (p.Location.X + p.Location.Width / 2.0));
-                    target_plr = i;
-                }
-            }
-        }
+        int target_plr = NPCTargetPlayer(npc); // was D
 
         if(Player[target_plr].Location.X + Player[target_plr].Location.Width / 2.0 > npc.Location.X + 16)
             npc.Direction = 1;
@@ -3517,20 +3512,11 @@ void SpecialNPC(int A)
         {
             if(NPC[A].Special == 0)
             {
-                C = 0;
-                int target_plr = 1;
-                for(B = 1; B <= numPlayers; B++)
-                {
-                    if(!Player[B].Dead && Player[B].Section == NPC[A].Section)
-                    {
-                        double dist = NPCPlayerTargetDist(NPC[A], Player[B]);
-                        if(C == 0 || dist < C)
-                        {
-                            C = dist;
-                            target_plr = B;
-                        }
-                    }
-                }
+                int target_plr = NPCTargetPlayer(NPC[A]);
+
+                if(target_plr == 0)
+                    target_plr = 1;
+
                 NPC[A].Special = target_plr;
             }
 
@@ -3590,21 +3576,9 @@ void SpecialNPC(int A)
             if(NPC[A].Wet == 2)
                 NPC[A].Special5 = 0;
 
-            C = 0;
-            D = 1;
-
-            for(B = 1; B <= numPlayers; B++)
-            {
-                if(!Player[B].Dead && Player[B].Section == NPC[A].Section)
-                {
-                    double dist = NPCPlayerTargetDist(NPC[A], Player[B]);
-                    if(C == 0 || dist < C)
-                    {
-                        C = (float)dist;
-                        D = (float)B;
-                    }
-                }
-            }
+            D = NPCTargetPlayer(NPC[A]);
+            if(D == 0)
+                D = 1;
 
             B = int(D);
             if(!Player[B].WetFrame && Player[B].Location.Y + Player[B].Location.Height < NPC[A].Location.Y)
@@ -3661,22 +3635,16 @@ void SpecialNPC(int A)
     // firespitting plant
     else if(NPC[A].Type == NPCID_FIRE_PLANT)
     {
-        C = 0;
-        for(B = 1; B <= numPlayers; B++)
+        int target_plr = NPCTargetPlayer(NPC[A]);
+
+        if(target_plr != 0)
         {
-            if(!Player[B].Dead && Player[B].Section == NPC[A].Section)
-            {
-                double dist = NPCPlayerTargetDist(NPC[A], Player[B]);
-                if(C == 0 || dist < C)
-                {
-                    C = (float)dist;
-                    if(NPC[A].Location.X + NPC[A].Location.Width / 2.0 > Player[B].Location.X + Player[B].Location.Width / 2.0)
-                        NPC[A].Direction = -1;
-                    else
-                        NPC[A].Direction = 1;
-                    NPC[A].Special4 = B;
-                }
-            }
+            if(NPC[A].Location.X + NPC[A].Location.Width / 2.0 > Player[target_plr].Location.X + Player[target_plr].Location.Width / 2.0)
+                NPC[A].Direction = -1;
+            else
+                NPC[A].Direction = 1;
+
+            NPC[A].Special4 = target_plr;
         }
 
         if(NPC[A].Location.X != NPC[A].DefaultLocationX)
@@ -4552,22 +4520,9 @@ void SpecialNPC(int A)
             if(NPC[A].Location.SpeedY < -2)
                 NPC[A].Location.SpeedY = -2;
 
-            C = 0;
+            int target_plr = NPCTargetPlayer(NPC[A]);
 
-            for(B = 1; B <= numPlayers; B++)
-            {
-                if(!Player[B].Dead && Player[B].Section == NPC[A].Section)
-                {
-                    double dist = NPCPlayerTargetDist(NPC[A], Player[B]);
-                    if(C == 0 || dist < C)
-                    {
-                        C = (float)dist;
-                        D = (float)B;
-                    }
-                }
-            }
-
-            if(Player[D].Location.X + Player[D].Location.Width / 2.0 > NPC[A].Location.X + 16)
+            if(Player[target_plr].Location.X + Player[target_plr].Location.Width / 2.0 > NPC[A].Location.X + 16)
                 NPC[A].Direction = 1;
             else
                 NPC[A].Direction = -1;
@@ -4600,22 +4555,16 @@ void SpecialNPC(int A)
     // Bouncy Star thing code
     else if(NPC[A].Type == NPCID_JUMPER_S3)
     {
-        C = 0;
-        for(B = 1; B <= numPlayers; B++)
+        int target_plr = NPCTargetPlayer(NPC[A]);
+
+        if(target_plr != 0)
         {
-            if(!Player[B].Dead && Player[B].Section == NPC[A].Section)
-            {
-                double dist = NPCPlayerTargetDist(NPC[A], Player[B]);
-                if(C == 0 || dist < C)
-                {
-                    C = (float)dist;
-                    if(NPC[A].Location.X + NPC[A].Location.Width / 2.0 > Player[B].Location.X + Player[B].Location.Width / 2.0)
-                        NPC[A].Direction = -1;
-                    else
-                        NPC[A].Direction = 1;
-                }
-            }
+            if(NPC[A].Location.X + NPC[A].Location.Width / 2.0 > Player[target_plr].Location.X + Player[target_plr].Location.Width / 2.0)
+                NPC[A].Direction = -1;
+            else
+                NPC[A].Direction = 1;
         }
+
         if(NPC[A].Location.SpeedY == Physics.NPCGravity || NPC[A].Slope > 0)
         {
             NPC[A].Special += 1;
@@ -4666,21 +4615,14 @@ void SpecialNPC(int A)
     // Hammer Bro
     else if(NPC[A].Type == NPCID_HEAVY_THROWER && !NPC[A].Projectile)
     {
-        C = 0;
-        for(B = 1; B <= numPlayers; B++)
+        int target_plr = NPCTargetPlayer(NPC[A]);
+
+        if(target_plr != 0)
         {
-            if(!Player[B].Dead && Player[B].Section == NPC[A].Section)
-            {
-                double dist = NPCPlayerTargetDist(NPC[A], Player[B]);
-                if(C == 0.f || dist < C)
-                {
-                    C = (float)dist;
-                    if(NPC[A].Location.X + NPC[A].Location.Width / 2.0 > Player[B].Location.X + Player[B].Location.Width / 2.0)
-                        NPC[A].Direction = -1;
-                    else
-                        NPC[A].Direction = 1;
-                }
-            }
+            if(NPC[A].Location.X + NPC[A].Location.Width / 2.0 > Player[target_plr].Location.X + Player[target_plr].Location.Width / 2.0)
+                NPC[A].Direction = -1;
+            else
+                NPC[A].Direction = 1;
         }
 
         if(NPC[A].Special > 0)
@@ -5305,22 +5247,15 @@ void SpecialNPC(int A)
         }
         if(NPC[A].Special >= 0)
         {
-            C = 0;
-            for(B = 1; B <= numPlayers; B++)
+            int target_plr = NPCTargetPlayer(NPC[A]);
+            if(target_plr != 0)
             {
-                if(!Player[B].Dead && Player[B].Section == NPC[A].Section)
-                {
-                    double dist = NPCPlayerTargetDist(NPC[A], Player[B]);
-                    if(C == 0 || dist < C)
-                    {
-                        C = (float)dist;
-                        if(NPC[A].Location.X + NPC[A].Location.Width / 2.0 > Player[B].Location.X + Player[B].Location.Width / 2.0)
-                            NPC[A].Direction = -1;
-                        else
-                            NPC[A].Direction = 1;
-                    }
-                }
+                if(NPC[A].Location.X + NPC[A].Location.Width / 2.0 > Player[target_plr].Location.X + Player[target_plr].Location.Width / 2.0)
+                    NPC[A].Direction = -1;
+                else
+                    NPC[A].Direction = 1;
             }
+
             NPC[A].Special2 += 1;
             if(NPC[A].Special2 == 125)
             {
@@ -5396,6 +5331,7 @@ void SpecialNPC(int A)
             NPC[A].TimeLeft = 100;
         if(NPC[A].CantHurt > 0)
             NPC[A].CantHurt = 100;
+
         C = 0;
         for(B = 1; B <= numPlayers; B++)
         {

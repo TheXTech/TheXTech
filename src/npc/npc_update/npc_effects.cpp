@@ -34,21 +34,12 @@
 
 static inline void NPCEffectLogic_EmergeUp(int A)
 {
-    if(NPC[A].Direction == 0.0f) // Move toward the closest player
+    if(NPC[A].Direction == 0) // Move toward the closest player
     {
-        double C = 0;
-        for(int B = 1; B <= numPlayers; B++)
-        {
-            if(!Player[B].Dead && Player[B].Section == NPC[A].Section)
-            {
-                double dist = NPCPlayerTargetDist(NPC[A], Player[B]);
-                if(C == 0.0 || dist < C)
-                {
-                    C = dist;
-                    NPC[A].Direction = -Player[B].Direction;
-                }
-            }
-        }
+        int target_plr = NPCTargetPlayer(NPC[A]);
+
+        if(target_plr)
+            NPC[A].Direction = -Player[target_plr].Direction;
     }
 
     NPC[A].Frame = EditorNPCFrame(NPC[A].Type, NPC[A].Direction, A);
@@ -82,21 +73,12 @@ static inline void NPCEffectLogic_EmergeDown(int A)
 {
     if(NPC[A].Type == NPCID_LEAF_POWER)
         NPC[A].Direction = 1;
-    else if(NPC[A].Direction == 0.f) // Move toward the closest player
+    else if(NPC[A].Direction == 0) // Move toward the closest player
     {
-        double C = 0;
-        for(int B = 1; B <= numPlayers; B++)
-        {
-            if(!Player[B].Dead && Player[B].Section == NPC[A].Section)
-            {
-                double dist = NPCPlayerTargetDist(NPC[A], Player[B]);
-                if(C == 0.0 || dist < C)
-                {
-                    C = dist;
-                    NPC[A].Direction = -Player[B].Direction;
-                }
-            }
-        }
+        int target_plr = NPCTargetPlayer(NPC[A]);
+
+        if(target_plr)
+            NPC[A].Direction = -Player[target_plr].Direction;
     }
 
     NPC[A].Effect2 += 1;

@@ -86,4 +86,7 @@ bool npcHasFloor(const struct NPC_t &npc);
 // totally new function, used for compatibility (in compat mode, horizontal distance; in modern mode, squared Euclidean distance)
 double NPCPlayerTargetDist(const NPC_t& npc, const Player_t& player);
 
+// totally new function covering old logic. returns nearest player (using NPCPlayerTargetDist) that is not Dead and is in NPC's section.
+int NPCTargetPlayer(const NPC_t& npc);
+
 #endif // NPC_H
