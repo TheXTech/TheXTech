@@ -106,33 +106,33 @@ void lazyLoadedBytesReset();
 // new functions that platforms should use when deleting textures or trying to free texture memory
 
 // increment the frame counter, and unload all textures not rendered since g_always_unload_after
-void minport_initFrame();
+static void minport_initFrame();
 
 // removes a texture from the render chain
-void minport_unlinkTexture(StdPicture* tx);
+static void minport_unlinkTexture(StdPicture* tx);
 
 // unload all textures not rendered since g_never_unload_before
-void minport_freeTextureMemory();
+static void minport_freeTextureMemory();
 
 
 // new functions that should be implemented per-platform
 
 // for widescreen stretch mode on Wii
-void minport_TransformPhysCoords();
+static void minport_TransformPhysCoords();
 // update render viewports, etc
-void minport_ApplyPhysCoords();
-void minport_ApplyViewport();
+static void minport_ApplyPhysCoords();
+static void minport_ApplyViewport();
 
-void minport_RenderBoxFilled(int x1, int y1, int x2, int y2, XTColor color);
-void minport_RenderBoxUnfilled(int x1, int y1, int x2, int y2, XTColor color);
+static void minport_RenderBoxFilled(int x1, int y1, int x2, int y2, XTColor color);
+static void minport_RenderBoxUnfilled(int x1, int y1, int x2, int y2, XTColor color);
 
-void minport_RenderTexturePrivate(int16_t xDst, int16_t yDst, int16_t wDst, int16_t hDst,
+static void minport_RenderTexturePrivate(int16_t xDst, int16_t yDst, int16_t wDst, int16_t hDst,
                              StdPicture &tx,
                              int16_t xSrc, int16_t ySrc, int16_t wSrc, int16_t hSrc,
                              float rotateAngle, FPoint_t *center, unsigned int flip,
                              XTColor color);
 
-void minport_RenderTexturePrivate_Basic(int16_t xDst, int16_t yDst, int16_t wDst, int16_t hDst,
+static void minport_RenderTexturePrivate_Basic(int16_t xDst, int16_t yDst, int16_t wDst, int16_t hDst,
                              StdPicture &tx,
                              int16_t xSrc, int16_t ySrc,
                              XTColor color);

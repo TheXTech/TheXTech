@@ -184,23 +184,23 @@ void getRenderSize(int* w, int* h)
 #endif
 }
 
-inline int FLOORDIV2(int x)
+static inline int FLOORDIV2(int x)
 {
     return (x < 0) ? (x - 1) / 2 : x / 2;
 }
 
-inline float FLOORDIV2(float x)
+static inline float FLOORDIV2(float x)
 {
     return std::floor((x + 0.5f) / 2.0f);
 }
 
-inline double FLOORDIV2(double x)
+static inline double FLOORDIV2(double x)
 {
     return std::floor((x + 0.5) / 2.0);
 }
 
 #ifndef __WII__
-void minport_RenderBoxUnfilled(int x1, int y1, int x2, int y2, XTColor color)
+static void minport_RenderBoxUnfilled(int x1, int y1, int x2, int y2, XTColor color)
 {
     minport_RenderBoxFilled(x1, y1, x1 + 1, y2, color);
     minport_RenderBoxFilled(x2 - 1, y1, x2, y2, color);
@@ -280,7 +280,7 @@ void renderCircleHole(int cx, int cy,
 // texture chain methods
 
 // increment the frame counter, and unload all textures not rendered since g_always_unload_after
-void minport_initFrame()
+static void minport_initFrame()
 {
     g_current_frame++;
 
@@ -308,7 +308,7 @@ void minport_initFrame()
 }
 
 // removes a texture from the render chain
-void minport_unlinkTexture(StdPicture* tx)
+static void minport_unlinkTexture(StdPicture* tx)
 {
     // redirect the tail and head
     if(tx == g_render_chain_tail)
@@ -329,7 +329,7 @@ void minport_unlinkTexture(StdPicture* tx)
 }
 
 // unload all textures not rendered since g_never_unload_before
-void minport_freeTextureMemory()
+static void minport_freeTextureMemory()
 {
     int num_unloaded = 0;
 
@@ -389,7 +389,7 @@ void unloadGifTextures()
 
 // intermediate draw method
 
-inline void minport_RenderTexturePrivate_2(int16_t xDst, int16_t yDst, int16_t wDst, int16_t hDst,
+static inline void minport_RenderTexturePrivate_2(int16_t xDst, int16_t yDst, int16_t wDst, int16_t hDst,
                              StdPicture &tx,
                              int16_t xSrc, int16_t ySrc, int16_t wSrc, int16_t hSrc,
                              float rotateAngle, FPoint_t *center, unsigned int flip,
@@ -445,7 +445,7 @@ inline void minport_RenderTexturePrivate_2(int16_t xDst, int16_t yDst, int16_t w
     }
 }
 
-inline void minport_RenderTexturePrivate_Basic_2(int16_t xDst, int16_t yDst, int16_t wDst, int16_t hDst,
+static inline void minport_RenderTexturePrivate_Basic_2(int16_t xDst, int16_t yDst, int16_t wDst, int16_t hDst,
                              StdPicture &tx,
                              int16_t xSrc, int16_t ySrc,
                              XTColor color)

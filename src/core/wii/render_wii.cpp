@@ -50,7 +50,7 @@
 #include "core/window.h"
 
 #include "core/render.h"
-#include "core/minport/render_minport_shared.h"
+#include "core/minport/render_minport_shared.hpp"
 
 #include "core/render_planes.h"
 
@@ -727,7 +727,7 @@ void mapFromScreen(int scr_x, int scr_y, int* window_x, int* window_y)
     *window_y = (scr_y * g_screen_phys_h / XRender::TargetH) + g_screen_phys_y;
 }
 
-void minport_TransformPhysCoords()
+static void minport_TransformPhysCoords()
 {
     g_screen_phys_x = g_rmode_w / 2 - g_screen_phys_w / 2;
     g_screen_phys_y = g_rmode_h / 2 - g_screen_phys_h / 2;
@@ -739,7 +739,7 @@ void minport_TransformPhysCoords()
         g_screen_phys_y = 0;
 }
 
-void minport_ApplyPhysCoords()
+static void minport_ApplyPhysCoords()
 {
     GXColor background = {0, 0, 0, 0xff};
     GX_SetCopyClear(background, GX_MAX_Z24);
@@ -753,7 +753,7 @@ void minport_ApplyPhysCoords()
     GX_LoadProjectionMtx(perspective, GX_ORTHOGRAPHIC);
 }
 
-void minport_ApplyViewport()
+static void minport_ApplyViewport()
 {
     int phys_offset_x = g_viewport_x * g_screen_phys_w * 2 / XRender::TargetW;
     int phys_width = g_viewport_w * g_screen_phys_w * 2 / XRender::TargetW;
@@ -1085,27 +1085,7 @@ void unloadTexture(StdPicture& tx)
         static_cast<StdPicture_Sub&>(tx) = StdPicture_Sub();
 }
 
-inline int ROUNDDIV2(int x)
-{
-    return (x < 0) ? (x - 1) / 2 : x / 2;
-}
-
-inline float ROUNDDIV2(float x)
-{
-    return std::nearbyintf(std::roundf(x) / 2.0f);
-}
-
-inline float ROUNDDIV2(double x)
-{
-    return std::nearbyintf(std::roundf((float)x / 2.0f));
-}
-
-inline float FLOORDIV2(float x)
-{
-    return std::floor(x / 2.0f);
-}
-
-void wii_RenderBox(int x1, int y1, int x2, int y2, XTColor color, bool filled)
+static void wii_RenderBox(int x1, int y1, int x2, int y2, XTColor color, bool filled)
 {
     uint8_t r = color.r;
     uint8_t g = color.g;
@@ -1145,17 +1125,17 @@ void wii_RenderBox(int x1, int y1, int x2, int y2, XTColor color, bool filled)
     GX_End();
 }
 
-void minport_RenderBoxFilled(int x1, int y1, int x2, int y2, XTColor color)
+static void minport_RenderBoxFilled(int x1, int y1, int x2, int y2, XTColor color)
 {
     wii_RenderBox(x1, y1, x2, y2, color, true);
 }
 
-void minport_RenderBoxUnfilled(int x1, int y1, int x2, int y2, XTColor color)
+static void minport_RenderBoxUnfilled(int x1, int y1, int x2, int y2, XTColor color)
 {
     wii_RenderBox(x1, y1, x2, y2, color, false);
 }
 
-inline bool GX_DrawImage_Custom(GXTexObj* img,
+static inline bool GX_DrawImage_Custom(GXTexObj* img,
                                 GXTexObj* mask,
                                 GXTlutObj* palette,
                                 int16_t x, int16_t y, uint16_t w, uint16_t h,
@@ -1256,7 +1236,7 @@ inline bool GX_DrawImage_Custom(GXTexObj* img,
     return true;
 }
 
-inline bool GX_DrawImage_Custom_Basic(GXTexObj* img,
+static inline bool GX_DrawImage_Custom_Basic(GXTexObj* img,
                                 GXTexObj* mask,
                                 GXTlutObj* palette,
                                 int16_t x, int16_t y, uint16_t w, uint16_t h,
@@ -1397,7 +1377,7 @@ inline bool GX_DrawImage_Custom_Rotated(GXTexObj* img,
     return true;
 }
 
-void minport_RenderTexturePrivate(int16_t xDst, int16_t yDst, int16_t wDst, int16_t hDst,
+static void minport_RenderTexturePrivate(int16_t xDst, int16_t yDst, int16_t wDst, int16_t hDst,
                                   StdPicture& tx,
                                   int16_t xSrc, int16_t ySrc, int16_t wSrc, int16_t hSrc,
                                   float rotateAngle, FPoint_t* center, unsigned int flip,
@@ -1619,7 +1599,7 @@ void minport_RenderTexturePrivate(int16_t xDst, int16_t yDst, int16_t wDst, int1
                             xSrc, ySrc, wSrc, hSrc, flip, color);
 }
 
-void minport_RenderTexturePrivate_Basic(int16_t xDst, int16_t yDst, int16_t wDst, int16_t hDst,
+static void minport_RenderTexturePrivate_Basic(int16_t xDst, int16_t yDst, int16_t wDst, int16_t hDst,
                                   StdPicture& tx,
                                   int16_t xSrc, int16_t ySrc,
                                   XTColor color)
