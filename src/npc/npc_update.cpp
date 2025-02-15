@@ -625,10 +625,9 @@ resume_Activation_Generator:
             NPC[A].Active = true;
             NPC[A].TimeLeft = 100;
         }
-
-        if(NPC[A].TimeLeft == 1 || NPC[A].JustActivated != 0)
+        else if(NPC[A].Type == NPCID_STATUE_POWER || NPC[A].Type == NPCID_HEAVY_POWER)
         {
-            if(NPC[A].Type == NPCID_STATUE_POWER || NPC[A].Type == NPCID_HEAVY_POWER)
+            if(NPC[A].TimeLeft == 1 || NPC[A].JustActivated != 0)
                 NPC[A].Frame = EditorNPCFrame(NPC[A].Type, NPC[A].Direction, A);
         }
 
@@ -1133,8 +1132,27 @@ interrupt_Activation:
         // Normal operations start here
 
 
+        if(NPC[A]->IsACoin && NPC[A].Special == 0 && NPC[A].HoldingPlayer == 0 && !NPC[A].Inert && NPC[A].Effect == NPCEFF_NORMAL && g_config.optimize_coins)
+        {
+            if(NPC[A].Active && NPC[A].Killed == 0 && !NPC[A].Generator)
+            {
+                if(NPC[A].TimeLeft > 10)
+                {
+                    NPC[A].TimeLeft = 10;
 
-        if(NPC[A]->IsAVine)
+                    if(NoTurnBack[NPC[A].Section])
+                       NPC[A].TurnBackWipe = true;
+                }
+
+                if(NPC[A].TimeLeft < 1)
+                    Deactivate(A);
+
+                NPC[A].TimeLeft -= 1;
+
+                NPCFrames(A);
+            }
+        }
+        else if(NPC[A]->IsAVine)
         {
             // .Location.SpeedX = 0
             // .Location.SpeedY = 0

@@ -917,6 +917,8 @@ public:
     // 1.3.8
     opt<bool> new_conveyor_belts{this, defaults(true), {CompatClass::standard_update, false}, Scope::Creator,
         "new-conveyor-belts", "New conveyor belts", "Update belts to faster and more stable logic"};
+    opt<bool> optimize_coins{this, defaults(true), {CompatClass::critical_update, false}, Scope::Creator,
+        "optimize-coins", "Optimize coins", "Speed up the game when many coins are onscreen"};
 
     /* ---- Compatibility - Speedrun ----*/
 
