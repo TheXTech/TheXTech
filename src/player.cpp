@@ -2742,10 +2742,10 @@ void TailSwipe(const int plr, bool boo, bool Stab, int StabDir)
     Location_t tailLoc;
     Location_t tempLoc;
     Location_t stabLoc;
-    NPC_t oldNPC;
-    int A = 0;
-    long long B = 0;
-    int C = 0;
+
+    // int A = 0;
+    // long long B = 0;
+    // int C = 0;
     // int64_t fBlock = 0;
     // int64_t lBlock = 0;
 
@@ -2821,7 +2821,7 @@ void TailSwipe(const int plr, bool boo, bool Stab, int StabDir)
         for(BlockRef_t block_p : treeFLBlockQuery(tailLoc, SORTMODE_COMPAT))
         {
             Block_t& block = *block_p;
-            A = (int)block_p;
+            int A = (int)block_p;
 
             if(!BlockIsSizable[block.Type] && !block.Hidden && (block.Type != 293 || Stab) && !block.Invis && !BlockNoClipping[block.Type])
             {
@@ -2928,17 +2928,16 @@ void TailSwipe(const int plr, bool boo, bool Stab, int StabDir)
 
                 if(CheckCollision(tailLoc, stabLoc) && NPC[A].Killed == 0 && NPC[A].TailCD == 0 && !(StabDir != 0 && NPC[A].Type == NPCID_ITEM_BURIED))
                 {
-                    oldNPC = NPC[A];
                     if(Stab)
                     {
-                        B = NPC[A].Damage;
-                        C = NPC[A].Type;
-
                         if(StabDir == 2 && ((NPC[A].Type >= NPCID_CARRY_BLOCK_A && NPC[A].Type <= NPCID_CARRY_BLOCK_D) || NPC[A].Type == NPCID_SPRING || NPC[A].Type == NPCID_COIN_SWITCH || NPC[A].Type == NPCID_TIME_SWITCH || NPC[A].Type == NPCID_EARTHQUAKE_BLOCK))
                         {
                         }
                         else
                         {
+                            vbint_t oldDamage = NPC[A].Damage;
+                            NPCID oldType = NPC[A].Type;
+
                             if(NPC[A].Type == NPCID_SLIDE_BLOCK && StabDir != 0)
                             {
                                 NPC[A].Special = 1;
@@ -2954,7 +2953,7 @@ void TailSwipe(const int plr, bool boo, bool Stab, int StabDir)
                                 NPCHit(A, 10, plr);
                             }
 
-                            if(StabDir == 2 && (NPC[A].Killed == 10 || NPC[A].Damage != B || NPC[A].Type != C))
+                            if(StabDir == 2 && (NPC[A].Killed == 10 || NPC[A].Damage != oldDamage || NPC[A].Type != oldType))
                             {
                                 p.Location.SpeedY = Physics.PlayerJumpVelocity;
                                 p.StandingOnNPC = 0;
@@ -2965,8 +2964,13 @@ void TailSwipe(const int plr, bool boo, bool Stab, int StabDir)
                     }
                     else
                     {
-                        NPCHit( A, 7, plr);
-                        if(NPC[A].Killed > 0 || NPC[A].Type != oldNPC.Type || NPC[A].Projectile != oldNPC.Projectile || (NPC[A].Location.SpeedY != oldNPC.Location.SpeedY))
+                        NPCID oldType = NPC[A].Type;
+                        bool oldProj = NPC[A].Projectile;
+                        double oldSpeedY = NPC[A].Location.SpeedY;
+
+                        NPCHit(A, 7, plr);
+
+                        if(NPC[A].Killed > 0 || NPC[A].Type != oldType || NPC[A].Projectile != oldProj || (NPC[A].Location.SpeedY != oldSpeedY))
                         {
 //                            if(nPlay.Online && plr - 1 == nPlay.MySlot)
 //                                Netplay::sendData Netplay::PutPlayerLoc(nPlay.MySlot) + "1g" + std::to_string(plr) + "|" + p.TailCount - 1;
@@ -2985,13 +2989,11 @@ void TailSwipe(const int plr, bool boo, bool Stab, int StabDir)
 
     if(BattleMode)
     {
-        for(A = 1; A <= numPlayers; A++)
+        for(int A = 1; A <= numPlayers; A++)
         {
             if(A != plr)
             {
-                stabLoc = Player[A].Location;
-
-                if(CheckCollision(tailLoc, stabLoc) && Player[A].Effect == PLREFF_NORMAL &&
+                if(CheckCollision(tailLoc, Player[A].Location) && Player[A].Effect == PLREFF_NORMAL &&
                     Player[A].Immune == 0 && !Player[A].Dead && Player[A].TimeToLive == 0)
                 {
                     if(Stab)
