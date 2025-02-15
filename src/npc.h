@@ -89,4 +89,7 @@ double NPCPlayerTargetDist(const NPC_t& npc, const Player_t& player);
 // totally new function covering old logic. returns nearest player (using NPCPlayerTargetDist) that is not Dead and is in NPC's section.
 int NPCTargetPlayer(const NPC_t& npc);
 
+// totally new function covering old logic. checks nearest player (using NPCTargetPlayer) then faces it.
+int NPCFaceNearestPlayer(NPC_t& npc, bool old_version = false);
+
 #endif // NPC_H

@@ -100,6 +100,34 @@ int NPCTargetPlayer(const NPC_t& npc)
     return target_plr;
 }
 
+int NPCFaceNearestPlayer(NPC_t& npc, bool old_version)
+{
+    int target = NPCTargetPlayer(npc);
+
+    double target_center = Player[target].Location.X + Player[target].Location.Width / 2.0;
+
+    // broken version of logic that appears in a few places
+    if(old_version)
+    {
+        if(target_center > npc.Location.X + 16)
+            npc.Direction = 1;
+        else
+            npc.Direction = -1;
+    }
+    else
+    {
+        if(target != 0)
+        {
+            if(npc.Location.X + npc.Location.Width / 2.0 > target_center)
+                npc.Direction = -1;
+            else
+                npc.Direction = 1;
+        }
+    }
+
+    return target;
+}
+
 void CheckSectionNPC(int A)
 {
     if(GameMenu)
@@ -1748,19 +1776,7 @@ void NPCSpecial(int A)
     else if(npc.Type == NPCID_BOMBER_BOSS) // mouser
     {
         if(npc.Immune == 0)
-        {
-            int target = NPCTargetPlayer(npc);
-
-            if(target != 0)
-            {
-                auto &p = Player[target];
-
-                if(npc.Location.X + npc.Location.Width / 2.0 > p.Location.X + p.Location.Width / 2.0)
-                    npc.Direction = -1;
-                else
-                    npc.Direction = 1;
-            }
-        }
+            NPCFaceNearestPlayer(npc);
         else
         {
             if(iRand(10) == 0)
@@ -2880,12 +2896,7 @@ void NPCSpecial(int A)
     }
     else if(npc.Type == NPCID_VILLAIN_S1) // King Koopa
     {
-        int target_plr = NPCTargetPlayer(npc); // was D
-
-        if(Player[target_plr].Location.X + Player[target_plr].Location.Width / 2.0 > npc.Location.X + 16)
-            npc.Direction = 1;
-        else
-            npc.Direction = -1;
+        int target_plr = NPCFaceNearestPlayer(npc, true); // was D
 
         npc.Special5 = target_plr;
 
@@ -3643,17 +3654,10 @@ void SpecialNPC(int A)
     // firespitting plant
     else if(NPC[A].Type == NPCID_FIRE_PLANT)
     {
-        int target_plr = NPCTargetPlayer(NPC[A]);
+        int target_plr = NPCFaceNearestPlayer(NPC[A]);
 
         if(target_plr != 0)
-        {
-            if(NPC[A].Location.X + NPC[A].Location.Width / 2.0 > Player[target_plr].Location.X + Player[target_plr].Location.Width / 2.0)
-                NPC[A].Direction = -1;
-            else
-                NPC[A].Direction = 1;
-
             NPC[A].Special4 = target_plr;
-        }
 
         if(NPC[A].Location.X != NPC[A].DefaultLocationX)
         {
@@ -4532,12 +4536,7 @@ void SpecialNPC(int A)
             if(NPC[A].Location.SpeedY < -2)
                 NPC[A].Location.SpeedY = -2;
 
-            int target_plr = NPCTargetPlayer(NPC[A]);
-
-            if(Player[target_plr].Location.X + Player[target_plr].Location.Width / 2.0 > NPC[A].Location.X + 16)
-                NPC[A].Direction = 1;
-            else
-                NPC[A].Direction = -1;
+            NPCFaceNearestPlayer(NPC[A], true);
         }
 
         if(NPC[A].Stuck && !NPC[A].Projectile)
@@ -4567,15 +4566,7 @@ void SpecialNPC(int A)
     // Bouncy Star thing code
     else if(NPC[A].Type == NPCID_JUMPER_S3)
     {
-        int target_plr = NPCTargetPlayer(NPC[A]);
-
-        if(target_plr != 0)
-        {
-            if(NPC[A].Location.X + NPC[A].Location.Width / 2.0 > Player[target_plr].Location.X + Player[target_plr].Location.Width / 2.0)
-                NPC[A].Direction = -1;
-            else
-                NPC[A].Direction = 1;
-        }
+        NPCFaceNearestPlayer(NPC[A]);
 
         if(NPC[A].Location.SpeedY == Physics.NPCGravity || NPC[A].Slope > 0)
         {
@@ -4627,15 +4618,7 @@ void SpecialNPC(int A)
     // Hammer Bro
     else if(NPC[A].Type == NPCID_HEAVY_THROWER && !NPC[A].Projectile)
     {
-        int target_plr = NPCTargetPlayer(NPC[A]);
-
-        if(target_plr != 0)
-        {
-            if(NPC[A].Location.X + NPC[A].Location.Width / 2.0 > Player[target_plr].Location.X + Player[target_plr].Location.Width / 2.0)
-                NPC[A].Direction = -1;
-            else
-                NPC[A].Direction = 1;
-        }
+        NPCFaceNearestPlayer(NPC[A]);
 
         if(NPC[A].Special > 0)
         {
@@ -5262,14 +5245,7 @@ void SpecialNPC(int A)
         }
         if(NPC[A].Special >= 0)
         {
-            int target_plr = NPCTargetPlayer(NPC[A]);
-            if(target_plr != 0)
-            {
-                if(NPC[A].Location.X + NPC[A].Location.Width / 2.0 > Player[target_plr].Location.X + Player[target_plr].Location.Width / 2.0)
-                    NPC[A].Direction = -1;
-                else
-                    NPC[A].Direction = 1;
-            }
+            NPCFaceNearestPlayer(NPC[A]);
 
             NPC[A].Special2 += 1;
             if(NPC[A].Special2 == 125)

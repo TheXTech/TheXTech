@@ -191,15 +191,7 @@ void NPCMovementLogic(int A, float& speedVar)
     {
         NPC[A].Projectile = true;
 
-        int target_plr = NPCTargetPlayer(NPC[A]);
-
-        if(target_plr)
-        {
-            if(NPC[A].Location.X + NPC[A].Location.Width / 2.0 > Player[target_plr].Location.X + Player[target_plr].Location.Width / 2.0)
-                NPC[A].Direction = -1;
-            else
-                NPC[A].Direction = 1;
-        }
+        NPCFaceNearestPlayer(NPC[A]);
 
         NPC[A].Location.SpeedX += 0.1 * double(NPC[A].Direction);
 
@@ -221,15 +213,7 @@ void NPCMovementLogic(int A, float& speedVar)
     {
         if(!NPC[A].Projectile && NPC[A].Special2 == 0)
         {
-            int target_plr = NPCTargetPlayer(NPC[A]);
-
-            if(target_plr)
-            {
-                if(NPC[A].Location.X + NPC[A].Location.Width / 2.0 > Player[target_plr].Location.X + Player[target_plr].Location.Width / 2.0)
-                    NPC[A].Direction = -1;
-                else
-                    NPC[A].Direction = 1;
-            }
+            NPCFaceNearestPlayer(NPC[A]);
 
             NPC[A].Location.SpeedX += 0.05 * double(NPC[A].Direction);
 
@@ -301,15 +285,7 @@ void NPCMovementLogic(int A, float& speedVar)
         }
         else
         {
-            int target_plr = NPCTargetPlayer(NPC[A]);
-
-            if(target_plr)
-            {
-                if(NPC[A].Location.X + NPC[A].Location.Width / 2.0 > Player[target_plr].Location.X + Player[target_plr].Location.Width / 2.0)
-                    NPC[A].Direction = -1;
-                else
-                    NPC[A].Direction = 1;
-            }
+            NPCFaceNearestPlayer(NPC[A]);
 
             if(NPC[A].Direction == 1 && NPC[A].Location.SpeedX < 4)
                 NPC[A].Location.SpeedX += 0.04;
@@ -704,17 +680,7 @@ void NPCMovementLogic(int A, float& speedVar)
     {
         NPC[A].Location.SpeedX = 0;
         if(!(NPC[A].Type == NPCID_SKELETON && NPC[A].Special > 0))
-        {
-            int target_plr = NPCTargetPlayer(NPC[A]);
-
-            if(target_plr)
-            {
-                if(NPC[A].Location.X + NPC[A].Location.Width / 2.0 > Player[target_plr].Location.X + Player[target_plr].Location.Width / 2.0)
-                    NPC[A].Direction = -1;
-                else
-                    NPC[A].Direction = 1;
-            }
-        }
+            NPCFaceNearestPlayer(NPC[A]);
     }
 
     // Actual Movement (SpeedX / SpeedY application code)
