@@ -446,43 +446,39 @@ inline bool GL_DrawImage_Custom_Basic(int name, int flags,
     uint16_t src_x, uint16_t src_y,
     XTColor color)
 {
-    uint16_t u1 = src_x >> (flags & 15);
-    uint16_t u2 = (src_x + w) >> (flags & 15);
-    uint16_t v1 = src_y >> (flags & 15);
-    uint16_t v2 = (src_y + h) >> (flags & 15);
-
-    uint8_t r = color.r;
-    uint8_t g = color.g;
-    uint8_t b = color.b;
-    uint8_t a = color.a;
+    // pre-scale u and v for efficiency
+    uint16_t u1 = (src_x >> (flags & 15)) << 4;
+    uint16_t u2 = ((src_x + w) >> (flags & 15)) << 4;
+    uint32_t v1 = ((uint32_t)src_y >> (flags & 15)) << 20;
+    uint32_t v2 = ((uint32_t)(src_y + h) >> (flags & 15)) << 20;
 
     glBindTexture(0, name);
-    if((a >> 3) < 31)
-        glPolyFmt(/*POLY_ID(s_poly_id++) | */ POLY_ID(s_render_planes.m_current_plane / 8) | POLY_ALPHA((a >> 3) + 1) | POLY_CULL_NONE | POLY_FOG_Q);
+
+    uint8_t a_5bit = color.a >> 3;
+    if(a_5bit < 31)
+        glPolyFmt(/*POLY_ID(s_poly_id++) | */ POLY_ID(s_render_planes.m_current_plane / 8) | POLY_ALPHA(a_5bit + 1) | POLY_CULL_NONE | POLY_FOG_Q);
     else if(flags & 32)
         glPolyFmt(POLY_ID(s_render_planes.m_current_plane / 8) | POLY_ALPHA(31) | POLY_CULL_NONE | POLY_FOG_Q);
 
     glBegin(GL_QUADS);
 
-    glColor3b(r, g, b);
+    // if(color != XTColor{255, 255, 255, 255})
+    glColor3b(color.r, color.g, color.b);
 
-    s_gxTexcoord2i(u1, v1);
-    s_gxVertex3i(x, y, s_render_planes.next());
-    for(int i = 0; i < 7; ++i)
-        s_render_planes.next(); // actually advance 8 slots rather than 1, to handle some imprecision of the DSi depth buffer (unknown cause)
+    GFX_TEX_COORD = u1 | v1;
+    s_gxVertex3i(x, y, s_render_planes.m_plane_depth[s_render_planes.m_current_plane]);
+    s_render_planes.m_plane_depth[s_render_planes.m_current_plane] += 4;
 
-    s_gxTexcoord2i(u1, v2);
+    GFX_TEX_COORD = u1 | v2;
     s_gxVertex2i(x, y + h);
 
-    s_gxTexcoord2i(u2, v2);
+    GFX_TEX_COORD = u2 | v2;
     s_gxVertex2i(x + w, y + h);
 
-    s_gxTexcoord2i(u2, v1);
+    GFX_TEX_COORD = u2 | v1;
     s_gxVertex2i(x + w, y);
 
-    glEnd();
-
-    if((a >> 3) < 31 || flags & 32)
+    if(a_5bit < 31 || flags & 32)
         glPolyFmt(POLY_ALPHA(31) | POLY_CULL_NONE | POLY_FOG_Q);
 
     return true;
