@@ -671,7 +671,7 @@ void NPCSpecialMaybeHeld(int A)
 
         if(NPC[A].Special >= 200)
         {
-            double C = 0;
+            bool can_come_out = true;
 
             if(NPC[A].HoldingPlayer > 0)
             {
@@ -681,7 +681,7 @@ void NPCSpecialMaybeHeld(int A)
 
             if(NPC[A].HoldingPlayer == 0 && NPC[A].vehiclePlr == 0 && NPC[A].Type == NPCID_CANNONENEMY)
             {
-                C = 0;
+                double C = 0;
                 for(int B = 1; B <= numPlayers; B++)
                 {
                     if(!Player[B].Dead && Player[B].Section == NPC[A].Section)
@@ -694,8 +694,9 @@ void NPCSpecialMaybeHeld(int A)
                                 NPC[A].Direction = -1;
                             else
                                 NPC[A].Direction = 1;
+
                             if(!CanComeOut(NPC[A].Location, Player[B].Location))
-                                C = -1;
+                                can_come_out = false;
                         }
                     }
                 }
@@ -703,7 +704,7 @@ void NPCSpecialMaybeHeld(int A)
 
             if(numNPCs < maxNPCs)
             {
-                if(fEqual(C, -1) && NPC[A].HoldingPlayer == 0 && NPC[A].vehiclePlr == 0)
+                if(!can_come_out)
                     NPC[A].Special = 0;
                 else if(Player[NPC[A].vehiclePlr].Controls.Run || NPC[A].vehiclePlr == 0)
                 {
