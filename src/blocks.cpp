@@ -201,74 +201,32 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
     }
 
 
-    if(b.Type == 170) // smw switch blocks
+    // note: these four cases were previously handled using separate code
+    NPCID switch_npc = NPCID_NULL;
+
+    if(b.Type == 170)
+        switch_npc = NPCID_YEL_PLATFORM;
+    else if(b.Type == 173)
+        switch_npc = NPCID_BLU_PLATFORM;
+    else if(b.Type == 176)
+        switch_npc = NPCID_GRN_PLATFORM;
+    else if(b.Type == 179)
+        switch_npc = NPCID_RED_PLATFORM;
+
+    if(switch_npc != NPCID_NULL) // switch blocks
     {
         PlaySoundSpatial(SFX_PSwitch, b.Location);
         for(auto B = 1; B <= numBlock; B++)
         {
-            if(Block[B].Type == 171)
-                Block[B].Type = 172;
-            else if(Block[B].Type == 172)
-                Block[B].Type = 171;
+            if(Block[B].Type == b.Type + 1)
+                Block[B].Type = b.Type + 2;
+            else if(Block[B].Type == b.Type + 2)
+                Block[B].Type = b.Type + 1;
         }
 
         for(auto B = 1; B <= numNPCs; B++)
         {
-            if(NPC[B].Type == NPCID_YEL_PLATFORM)
-                NPC[B].Direction = -NPC[B].Direction;
-        }
-    }
-
-    if(b.Type == 173) // smw switch blocks
-    {
-        PlaySoundSpatial(SFX_PSwitch, b.Location);
-        for(auto B = 1; B <= numBlock; B++)
-        {
-            if(Block[B].Type == 174)
-                Block[B].Type = 175;
-            else if(Block[B].Type == 175)
-                Block[B].Type = 174;
-        }
-
-        for(auto B = 1; B <= numNPCs; B++)
-        {
-            if(NPC[B].Type == NPCID_BLU_PLATFORM)
-                NPC[B].Direction = -NPC[B].Direction;
-        }
-    }
-
-    if(b.Type == 176) // smw switch blocks
-    {
-        PlaySoundSpatial(SFX_PSwitch, b.Location);
-        for(auto B = 1; B <= numBlock; B++)
-        {
-            if(Block[B].Type == 177)
-                Block[B].Type = 178;
-            else if(Block[B].Type == 178)
-                Block[B].Type = 177;
-        }
-
-        for(auto B = 1; B <= numNPCs; B++)
-        {
-            if(NPC[B].Type == NPCID_GRN_PLATFORM)
-                NPC[B].Direction = -NPC[B].Direction;
-        }
-    }
-
-    if(b.Type == 179) // smw switch blocks
-    {
-        PlaySoundSpatial(SFX_PSwitch, b.Location);
-        for(auto B = 1; B <= numBlock; B++)
-        {
-            if(Block[B].Type == 180)
-                Block[B].Type = 181;
-            else if(Block[B].Type == 181)
-                Block[B].Type = 180;
-        }
-
-        for(auto B = 1; B <= numNPCs; B++)
-        {
-            if(NPC[B].Type == NPCID_RED_PLATFORM)
+            if(NPC[B].Type == switch_npc)
                 NPC[B].Direction = -NPC[B].Direction;
         }
     }
