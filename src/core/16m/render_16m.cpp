@@ -288,7 +288,12 @@ static int s_loadTexture(const std::string& path, int* tex_out, int* data_size, 
             }
         }
 
+#ifdef __BLOCKS__
+        glColorTableEXT(0, 0, 16, 0, 0, nullptr);
+#else
+        // wait until libnds release after 2.0.0
         glColorTableEXT_alloc_only(0, 0, 16, 0, 0);
+#endif
 
         tex_out[i] = tex.name[i];
 
