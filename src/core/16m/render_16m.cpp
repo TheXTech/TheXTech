@@ -41,7 +41,7 @@
 #include "fontman/hardcoded_font.h"
 
 #include "core/render.h"
-#include "core/minport/render_minport_shared.h"
+#include "core/minport/render_minport_shared.hpp"
 
 #include "core/render_planes.h"
 
@@ -343,7 +343,7 @@ static inline void s_gxVertex2i(v16 x, v16 y)
     GFX_VERTEX_XY = (y << 16) | (x & 0xFFFF);
 }
 
-void minport_RenderBoxFilled( int x1, int y1, int x2, int y2, XTColor color)
+static void minport_RenderBoxFilled( int x1, int y1, int x2, int y2, XTColor color)
 {
     x2++;
     y2++;
@@ -383,7 +383,7 @@ static void s_glBoxFilledGradient( int x1, int y1, int x2, int y2,
     glEnd();
 }
 
-inline bool GL_DrawImage_Custom(int name, int flags,
+static inline bool GL_DrawImage_Custom(int name, int flags,
     int16_t x, int16_t y, uint16_t w, uint16_t h,
     uint16_t src_x, uint16_t src_y, uint16_t src_w, uint16_t src_h,
     unsigned int flip,
@@ -441,7 +441,7 @@ inline bool GL_DrawImage_Custom(int name, int flags,
     return true;
 }
 
-inline bool GL_DrawImage_Custom_Basic(int name, int flags,
+static inline bool GL_DrawImage_Custom_Basic(int name, int flags,
     int16_t x, int16_t y, uint16_t w, uint16_t h,
     uint16_t src_x, uint16_t src_y,
     XTColor color)
@@ -632,7 +632,7 @@ void mapFromScreen(int scr_x, int scr_y, int *window_x, int *window_y)
     *window_y = (scr_y * g_screen_phys_h / XRender::TargetH) + g_screen_phys_y;
 }
 
-void minport_TransformPhysCoords()
+static void minport_TransformPhysCoords()
 {
     if(g_screen_phys_x < 0)
     {
@@ -647,7 +647,7 @@ void minport_TransformPhysCoords()
     }
 }
 
-void minport_ApplyPhysCoords()
+static void minport_ApplyPhysCoords()
 {
     glViewport(g_screen_phys_x,
             g_screen_phys_y,
@@ -659,7 +659,7 @@ void minport_ApplyPhysCoords()
     glOrthof32( 0, XRender::TargetW / 2, XRender::TargetH / 2, 0, -0x7FFF, 0x7FFF );
 }
 
-void minport_ApplyViewport()
+static void minport_ApplyViewport()
 {
     int phys_offset_x = g_viewport_x * g_screen_phys_w * 2 / XRender::TargetW;
     int phys_width = g_viewport_w * g_screen_phys_w * 2 / XRender::TargetW;
@@ -856,7 +856,7 @@ void unloadTexture(StdPicture &tx)
         static_cast<StdPicture_Sub&>(tx) = StdPicture_Sub();
 }
 
-void minport_RenderTexturePrivate(int16_t xDst, int16_t yDst, int16_t wDst, int16_t hDst,
+static void minport_RenderTexturePrivate(int16_t xDst, int16_t yDst, int16_t wDst, int16_t hDst,
                              StdPicture &tx,
                              int16_t xSrc, int16_t ySrc, int16_t wSrc, int16_t hSrc,
                              float rotateAngle, FPoint_t *center, unsigned int flip,
@@ -956,7 +956,7 @@ void minport_RenderTexturePrivate(int16_t xDst, int16_t yDst, int16_t wDst, int1
         glPopMatrix(1);
 }
 
-void minport_RenderTexturePrivate_Basic(int16_t xDst, int16_t yDst, int16_t wDst, int16_t hDst,
+static void minport_RenderTexturePrivate_Basic(int16_t xDst, int16_t yDst, int16_t wDst, int16_t hDst,
                              StdPicture &tx,
                              int16_t xSrc, int16_t ySrc,
                              XTColor color)

@@ -4,7 +4,7 @@ C2D_Color32(0,0,0,255), 1.,
 C2D_Color32(0,0,0,255), 1.,
 C2D_Color32(0,0,0,255), 1.};
 
-inline bool C2D_DrawImage_Custom(C2D_Image img,
+static inline bool C2D_DrawImage_Custom(C2D_Image img,
     float x, float y, uint16_t w, uint16_t h,
     float src_x, float src_y, float src_w, float src_h,
     unsigned int flip,
@@ -47,7 +47,7 @@ inline bool C2D_DrawImage_Custom(C2D_Image img,
     return result;
 }
 
-inline bool C2D_DrawImage_Custom_Basic(C2D_Image img,
+static inline bool C2D_DrawImage_Custom_Basic(C2D_Image img,
     float x, float y, uint16_t w, uint16_t h,
     float src_x, float src_y,
     XTColor color)
@@ -83,7 +83,7 @@ inline bool C2D_DrawImage_Custom_Basic(C2D_Image img,
     return result;
 }
 
-inline bool C2D_DrawImage_Custom_Rotated(C2D_Image img,
+static inline bool C2D_DrawImage_Custom_Rotated(C2D_Image img,
     float x, float y, float w, float h,
     float src_x, float src_y, float src_w, float src_h,
     unsigned int flip, FPoint_t *center, float angle,

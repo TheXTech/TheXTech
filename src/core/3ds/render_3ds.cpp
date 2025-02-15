@@ -50,7 +50,7 @@
 #include "change_res.h"
 #include "core/3ds/should_swap_screen.h"
 
-#include "core/minport/render_minport_shared.h"
+#include "core/minport/render_minport_shared.hpp"
 
 #include "core/render_planes.h"
 
@@ -831,9 +831,9 @@ void mapFromScreen(int scr_x, int scr_y, int* window_x, int* window_y)
         *window_x -= 40;
 }
 
-void minport_TransformPhysCoords() {}
+static void minport_TransformPhysCoords() {}
 
-void minport_ApplyPhysCoords()
+static void minport_ApplyPhysCoords()
 {
     if(!s_render_inited)
         return;
@@ -847,7 +847,7 @@ void minport_ApplyPhysCoords()
     g_screen_swapped = should_swap_screen();
 }
 
-void minport_ApplyViewport()
+static void minport_ApplyViewport()
 {
     if(!g_in_frame)
         return;
@@ -1266,14 +1266,14 @@ void unloadTexture(StdPicture& tx)
         static_cast<StdPicture_Sub&>(tx) = StdPicture_Sub();
 }
 
-void minport_RenderBoxFilled(int x1, int y1, int x2, int y2, XTColor color)
+static void minport_RenderBoxFilled(int x1, int y1, int x2, int y2, XTColor color)
 {
     uint32_t clr = C2D_Color32(color.r, color.g, color.b, color.a);
 
     C2D_DrawRectSolid(x1, y1, s_render_planes.next() / (float)0x8000, x2 - x1, y2 - y1, clr);
 }
 
-void minport_RenderTexturePrivate(int16_t xDst, int16_t yDst, int16_t wDst, int16_t hDst,
+static void minport_RenderTexturePrivate(int16_t xDst, int16_t yDst, int16_t wDst, int16_t hDst,
                                   StdPicture& tx,
                                   int16_t xSrc, int16_t ySrc, int16_t wSrc, int16_t hSrc,
                                   float rotateAngle, FPoint_t* center, unsigned int flip,
@@ -1447,7 +1447,7 @@ void minport_RenderTexturePrivate(int16_t xDst, int16_t yDst, int16_t wDst, int1
         C2D_ViewRestore(&prev_view);
 }
 
-void minport_RenderTexturePrivate_Basic(int16_t xDst, int16_t yDst, int16_t wDst, int16_t hDst,
+static void minport_RenderTexturePrivate_Basic(int16_t xDst, int16_t yDst, int16_t wDst, int16_t hDst,
                                   StdPicture& tx,
                                   int16_t xSrc, int16_t ySrc,
                                   XTColor color)

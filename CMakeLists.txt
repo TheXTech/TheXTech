@@ -975,7 +975,6 @@ if(NINTENDO_3DS)
     add_definitions(-DWINDOW_CUSTOM -DMSGBOX_CUSTOM -DEVENTS_CUSTOM -DRENDER_CUSTOM)
     list(APPEND THEXTECH_SRC
         src/control/input_3ds.cpp
-        src/core/minport/render_minport_shared.cpp
         src/core/3ds/render_3ds.cpp
         src/core/3ds/window_3ds.cpp
         src/core/3ds/msgbox_3ds.cpp
@@ -989,7 +988,6 @@ elseif(NINTENDO_WII)
     list(APPEND THEXTECH_SRC
         src/control/input_wii.cpp
         src/control/input_wii_gc.cpp
-        src/core/minport/render_minport_shared.cpp
         src/core/wii/render_wii.cpp
         src/core/wii/window_wii.cpp
         src/core/wii/msgbox_wii.cpp
@@ -1003,7 +1001,6 @@ elseif(NINTENDO_DS)
 
     list(APPEND THEXTECH_SRC
         src/control/input_16m.cpp
-        src/core/minport/render_minport_shared.cpp
         src/core/16m/render_16m.cpp
         src/core/16m/msgbox_16m.cpp
         src/core/16m/window_16m.cpp
