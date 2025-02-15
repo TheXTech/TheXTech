@@ -994,8 +994,6 @@ protected:
 
     //! Basic map of addresses
     Value m_type[maxAddr];
-    //! Byte map of addresses
-    Value m_byte[maxAddr];
 
     void insert(size_t address, uint8_t T::*field)
     {
@@ -1027,7 +1025,6 @@ protected:
         for(int i = 0; i < 2; ++i)
         {
             v.offset = i;
-            m_byte[address + i] = v;
             if(i > 0)
                 m_type[address + i] = v;
         }
@@ -1050,7 +1047,6 @@ protected:
         for(int i = 0; i < 2; ++i)
         {
             v.offset = i;
-            m_byte[address + i] = v;
             if(i > 0)
                 m_type[address + i] = v;
         }
@@ -1073,7 +1069,6 @@ protected:
         for(int i = 0; i < 8; ++i)
         {
             v.offset = i;
-            m_byte[address + i] = v;
             if(i > 0)
                 m_type[address + i] = v;
         }
@@ -1096,7 +1091,6 @@ protected:
         for(int i = 0; i < 4; ++i)
         {
             v.offset = i;
-            m_byte[address + i] = v;
             if(i > 0)
                 m_type[address + i] = v;
         }
@@ -1161,22 +1155,22 @@ public:
             return 0.0;
         }
 
+        t = &m_type[address];
+        auto vtype = t->type;
+
         if(ftype == FT_BYTE) // byte hacking
         {
-            t = &m_byte[address];
-            if(t->type == VT_UNKNOWN)
-                t = &m_type[address];
+            if(vtype != VT_BOOL && vtype != VT_UINT8 && vtype != VT_UNKNOWN)
+                vtype = VT_BYTE_HACK;
         }
-        else
-            t = &m_type[address];
 
-        if(t->type == VT_UNKNOWN)
+        if(vtype == VT_UNKNOWN)
         {
             pLogWarning("MemEmu: Unknown %s::%s address to read: 0x%x", objName, FieldtypeToStr(ftype), address);
             return 0.0;
         }
 
-        switch(t->type)
+        switch(vtype)
         {
         case VT_DOUBLE:
         {
@@ -1303,22 +1297,22 @@ public:
             return;
         }
 
+        t = &m_type[address];
+        auto vtype = t->type;
+
         if(ftype == FT_BYTE) // byte hacking
         {
-            t = &m_byte[address];
-            if(t->type == VT_UNKNOWN)
-                t = &m_type[address];
+            if(vtype != VT_BOOL && vtype != VT_UINT8 && vtype != VT_UNKNOWN)
+                vtype = VT_BYTE_HACK;
         }
-        else
-            t = &m_type[address];
 
-        if(t->type == VT_UNKNOWN)
+        if(vtype == VT_UNKNOWN)
         {
             pLogWarning("MemEmu: Unknown %s::%s address to write: 0x%x", objName, FieldtypeToStr(ftype), address);
             return;
         }
 
-        switch(t->type)
+        switch(vtype)
         {
         case VT_DOUBLE:
         {
