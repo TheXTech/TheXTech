@@ -689,7 +689,7 @@ void SkullRideDone(int A, const Location_t &alignAt)
 
 void NPCSpecial(int A)
 {
-    double C = 0;
+    // double C = 0;
     // double D = 0;
     // double E = 0;
     // double F = 0;
@@ -864,12 +864,12 @@ void NPCSpecial(int A)
             npc.Killed = 9;
             NPCQueues::Killed.push_back(A);
 
-            C = npc.BattleOwner;
+            int C = npc.BattleOwner;
 
             if(npc.CantHurtPlayer > 0)
                 C = npc.CantHurtPlayer;
 
-            Bomb(npc.Location, 0, vb6Round(C));
+            Bomb(npc.Location, 0, C);
 
             for(int i = 1; i <= 5; i++)
             {
@@ -965,16 +965,18 @@ void NPCSpecial(int A)
         {
             npc.Type = NPCID_SPIKY_S4;
             npc.Special = 0;
-            C = 0;
+
+            double min_dist = 0;
 
             for(int i = 1; i <= numPlayers; i++)
             {
                 auto &p = Player[i];
                 if(!p.Dead && p.Section == npc.Section && p.TimeToLive == 0)
                 {
-                    if(C == 0.0 || std::abs(npc.Location.X + npc.Location.Width / 2.0 - (p.Location.X + p.Location.Width / 2.0)) < C)
+                    double horiz_dist = NPCPlayerTargetDist(npc, p);
+                    if(min_dist == 0.0 || horiz_dist < min_dist)
                     {
-                        C = std::abs(npc.Location.X + npc.Location.Width / 2.0 - (p.Location.X + p.Location.Width / 2.0));
+                        min_dist = horiz_dist;
                         if(npc.Location.X + npc.Location.Width / 2.0 > p.Location.X + p.Location.Width / 2.0)
                             npc.Direction = -1;
                         else
@@ -1252,7 +1254,7 @@ void NPCSpecial(int A)
     {
         if(npc.Special5 == 0) // Target a Random Player
         {
-            C = 0;
+            int C = 0;
             do
             {
                 // COMPAT BUGFIX. Should be iRand(numPlayers) + 1
@@ -1390,7 +1392,7 @@ void NPCSpecial(int A)
 
         if(npc.Special5 == 0) // Target a Random Player
         {
-            C = 0;
+            int C = 0;
             do
             {
                 // COMPAT BUGFIX. Should be iRand(numPlayers) + 1
@@ -1547,7 +1549,7 @@ void NPCSpecial(int A)
 
         if(npc.Special5 == 0) // Target a Random Player
         {
-            C = 0;
+            int C = 0;
             do
             {
                 // COMPAT BUGFIX. Should be iRand(numPlayers) + 1
@@ -2625,6 +2627,8 @@ void NPCSpecial(int A)
             // deferring tree update to end of the NPC physics update
         }
 
+        const double speed = 2; // The Speed
+
         if((npc.Direction == 1 && tempBool) || npc.Type == NPCID_SAW) // Player in same section, enabled, or, grinder
         {
             bool pausePlatforms = !AllPlayersNormal();
@@ -2663,7 +2667,6 @@ void NPCSpecial(int A)
                 break;
             }
 
-            C = 2; // The Speed
             double speed_y = 0; // D = 0;
             double speed_x = 0; // E = 0;
             vbint_t bgo_type = 0; // F = 0;
@@ -2701,10 +2704,12 @@ void NPCSpecial(int A)
                                 if(Background[i].Type == 72)
                                 {
                                     if(npc.Location.SpeedY <= 0)
-                                        npc.Location.SpeedY = -C;
+                                        npc.Location.SpeedY = -speed;
                                     else
-                                        npc.Location.SpeedY = C;
+                                        npc.Location.SpeedY = speed;
+
                                     npc.Location.SpeedX = 0;
+
                                     if(centered)
                                         speed_x = -(npc.Location.X + (npc.Location.Width / 2)) + (Background[i].Location.X + (Background[i].Location.Width / 2));
                                     else
@@ -2714,10 +2719,12 @@ void NPCSpecial(int A)
                                 else if(Background[i].Type == 71)
                                 {
                                     if(npc.Location.SpeedX >= 0)
-                                        npc.Location.SpeedX = C;
+                                        npc.Location.SpeedX = speed;
                                     else
-                                        npc.Location.SpeedX = -C;
+                                        npc.Location.SpeedX = -speed;
+
                                     npc.Location.SpeedY = 0;
+
                                     if(centered)
                                         speed_y = -(npc.Location.Y + (npc.Location.Height / 2)) + (Background[i].Location.Y + (Background[i].Location.Height / 2));
                                     else
@@ -2727,25 +2734,27 @@ void NPCSpecial(int A)
                                 else if(Background[i].Type == 73)
                                 {
                                     if(npc.Location.SpeedY < 0)
-                                        npc.Location.SpeedX = C;
+                                        npc.Location.SpeedX = speed;
                                     else if(npc.Location.SpeedY > 0)
-                                        npc.Location.SpeedX = -C;
+                                        npc.Location.SpeedX = -speed;
+
                                     if(npc.Location.SpeedX > 0)
-                                        npc.Location.SpeedY = -C;
+                                        npc.Location.SpeedY = -speed;
                                     else if(npc.Location.SpeedX < 0)
-                                        npc.Location.SpeedY = C;
+                                        npc.Location.SpeedY = speed;
                                 }
                                 // Diagonal rail left-top, right-bottom
                                 else if(Background[i].Type == 74)
                                 {
                                     if(npc.Location.SpeedY < 0)
-                                        npc.Location.SpeedX = -C;
+                                        npc.Location.SpeedX = -speed;
                                     else if(npc.Location.SpeedY > 0)
-                                        npc.Location.SpeedX = C;
+                                        npc.Location.SpeedX = speed;
+
                                     if(npc.Location.SpeedX > 0)
-                                        npc.Location.SpeedY = C;
+                                        npc.Location.SpeedY = speed;
                                     else if(npc.Location.SpeedX < 0)
-                                        npc.Location.SpeedY = -C;
+                                        npc.Location.SpeedY = -speed;
                                 }
                                 // Reverse buffer
                                 else if(Background[i].Type == 70 || Background[i].Type == 100)
@@ -2864,7 +2873,7 @@ void NPCSpecial(int A)
 
             if(npc.Location.SpeedX == 0 && fEqual((float)npc.Location.SpeedY, Physics.NPCGravity))
             {
-                npc.Location.SpeedX = C * npc.Direction;
+                npc.Location.SpeedX = speed * npc.Direction;
                 npc.SpecialX = npc.Location.SpeedX;
             }
         }
