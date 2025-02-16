@@ -141,7 +141,7 @@ NotTWL:
     str     r2, [r1]
 
     ldr     r1, =fake_heap_end      // Set heap end
-    sub     r8, r8, #0x1c000
+    sub     r8, r8, #0x14000        // Shrink heap -- this is normally #0xc000
     str     r8, [r1]
 
     // Initialize libnds
