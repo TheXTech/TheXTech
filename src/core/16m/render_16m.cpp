@@ -467,7 +467,7 @@ static inline bool GL_DrawImage_Custom_Basic(int name, int flags,
 
     GFX_TEX_COORD = u1 | v1;
     s_gxVertex3i(x, y, s_render_planes.m_plane_depth[s_render_planes.m_current_plane]);
-    s_render_planes.m_plane_depth[s_render_planes.m_current_plane] += 4;
+    s_render_planes.m_plane_depth[s_render_planes.m_current_plane] += 8;
 
     GFX_TEX_COORD = u1 | v2;
     s_gxVertex2i(x, y + h);
