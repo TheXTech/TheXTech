@@ -306,7 +306,7 @@ static uint8_t s_heavy_duck_applies()
 
     for(int A = 1; A <= numPlayers; A++)
     {
-        if(Player[A].State == 6)
+        if(Player[A].State == 6 && Player[A].Character != 5)
             return 101;
     }
 
