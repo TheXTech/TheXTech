@@ -94,6 +94,8 @@ public:
 
     bool isWorking() override;
 
+    bool hasFrameBuffer() override;
+
     bool initRender(SDL_Window *window) override;
 
     /*!
