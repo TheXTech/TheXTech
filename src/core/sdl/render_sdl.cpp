@@ -101,6 +101,11 @@ bool RenderSDL::isWorking()
     return m_gRenderer && (m_tBuffer || m_tBufferDisabled);
 }
 
+bool RenderSDL::hasFrameBuffer()
+{
+    return m_tBuffer && !m_tBufferDisabled;
+}
+
 bool RenderSDL::initRender(SDL_Window *window)
 {
     pLogDebug("Render SDL: Init...");
