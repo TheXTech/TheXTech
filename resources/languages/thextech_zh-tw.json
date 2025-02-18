@@ -650,7 +650,15 @@
                 },
                 "use-native-osk": "啓用內置虛擬鍵盤",
                 "inaccurate-gifs": "錯誤GIF圖片渲染",
-                "inaccurate-gifs-tip": "當GIF圖片檔案存在時，啟用3D效果"
+                "inaccurate-gifs-tip": "當GIF圖片檔案存在時，啟用3D效果",
+                "fullscreen-type": {
+                    "real": "物理",
+                    "real-tip": "以物理顯示器的分辨率顯示",
+                    "_name": "全屏模式顯示類型",
+                    "auto": "自動選擇",
+                    "desktop": "電腦",
+                    "desktop-tip": "以當前分辨率顯示"
+                }
             },
             "audio": {
                 "audio-sfx-volume": "聲音音量",
