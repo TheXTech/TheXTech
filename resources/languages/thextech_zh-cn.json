@@ -650,7 +650,15 @@
                 },
                 "use-native-osk": "启用内置虚拟键盘",
                 "inaccurate-gifs-tip": "当GIF图片文件存在时，启用3D效果",
-                "inaccurate-gifs": "错误GIF图片渲染"
+                "inaccurate-gifs": "错误GIF图片渲染",
+                "fullscreen-type": {
+                    "desktop-tip": "以当前分辨率显示",
+                    "real": "物理",
+                    "desktop": "电脑",
+                    "auto": "自动选择",
+                    "_name": "全屏模式显示类型",
+                    "real-tip": "以物理显示器的分辨率显示"
+                }
             },
             "audio": {
                 "_header": "音频选项",
