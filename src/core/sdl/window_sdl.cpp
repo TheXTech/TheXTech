@@ -492,16 +492,71 @@ int WindowSDL::syncFullScreenRes()
     if(m_fullscreen_type_real != SDL_WINDOW_FULLSCREEN || !m_window)
         return 0; // Nothing to do
 
-    int dst_w = XRender::TargetW;
-    int dst_h = (dst_w * m_screen_orig_h) / m_screen_orig_w;
+    int dst_h = XRender::TargetH;
+    int dst_w = XRender::TargetW;// (dst_h * m_screen_orig_w) / m_screen_orig_h;
+    SDL_DisplayMode mode;
+    SDL_DisplayMode modeDst;
+    SDL_DisplayMode *modeClose = nullptr;
 
-    SDL_SetWindowSize(m_window, dst_w, dst_h);
+    int modes = SDL_GetNumDisplayModes(0);
+    int closest_w = 0;
+    int closest_h = 0;
+    int clodest_diff_w = 100000;
+    int clodest_diff_h = 100000;
+
+    pLogDebug("List of available screen modes: (Desired resolution: %d x %d)", dst_w, dst_h);
+    for(int i = modes - 1; i >= 0; --i)
+    {
+        SDL_GetDisplayMode(0, i, &mode);
+        pLogDebug("-- C=%u (%s), W=%d, H=%d, R=%d",
+                  mode.format, SDL_GetPixelFormatName(mode.format), mode.w, mode.h, mode.refresh_rate);
+
+        int diff_w = SDL_abs(dst_w - mode.w);
+        int diff_h = SDL_abs(dst_h - mode.h);
+
+        if(diff_w < clodest_diff_w && diff_h < clodest_diff_h)
+        {
+            clodest_diff_w = diff_w;
+            clodest_diff_h = diff_h;
+            closest_w = mode.w;
+            closest_h = mode.h;
+        }
+    }
+
+    mode.format = SDL_PIXELFORMAT_BGR565;
+    mode.w = closest_w;
+    mode.h = closest_h;
+    mode.refresh_rate = 60;
+    mode.driverdata = nullptr;
+
+    modeClose = SDL_GetClosestDisplayMode(0, &mode, &modeDst);
+
+    pLogDebug("Requesting screen mode: C=%u (%s), W=%d, H=%d, R=%d",
+              mode.format, SDL_GetPixelFormatName(mode.format), mode.w, mode.h, mode.refresh_rate);
+    if(modeClose)
+    {
+        pLogDebug("Obtained screen mode: C=%u (%s), W=%d, H=%d, R=%d",
+                  modeDst.format, SDL_GetPixelFormatName(modeDst.format), modeDst.w, modeDst.h, modeDst.refresh_rate);
+    }
+    else
+    {
+        pLogDebug("Closest mode is not available, using defaults...");
+    }
+
+    SDL_SetWindowSize(m_window, closest_w, closest_h);
 
     pLogDebug("Toggling screen into %d x %d resolution", dst_w, dst_h);
 
-    if(SDL_SetWindowFullscreen(m_window, m_fullscreen_type_real) < 0)
+    if((SDL_GetWindowFlags(m_window) & SDL_WINDOW_FULLSCREEN) == 0 &&
+        SDL_SetWindowFullscreen(m_window, m_fullscreen_type_real) < 0)
     {
         pLogWarning("Setting fullscreen failed: %s", SDL_GetError());
+        return -1;
+    }
+
+    if(modeClose && SDL_SetWindowDisplayMode(m_window, &modeDst) < 0)
+    {
+        pLogWarning("Setting fullscreen display mode failed: %s", SDL_GetError());
         return -1;
     }
 
