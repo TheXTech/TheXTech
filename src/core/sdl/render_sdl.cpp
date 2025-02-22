@@ -543,14 +543,18 @@ textureTryAgain:
         {
             uint32_t newW = pow2roundup(width);
             uint32_t newH = pow2roundup(height);
-            pLogDebug("Render SDL: Converting surface into Power-2...");
-            SDL_Surface *newSurface = SDL_CreateRGBSurfaceWithFormat(0, newW, newH, 32, SDL_PIXELFORMAT_ARGB8888);
-            if(newSurface)
+
+            if(newW != width || newH != height)
             {
-                SDL_Rect rect = {0, 0, (int)width, (int)height};
-                SDL_LowerBlit(surface, &rect, newSurface, &rect);
-                SDL_FreeSurface(surface);
-                surface = newSurface;
+                pLogDebug("Render SDL: Converting surface into Power-2 (Orig: %u x %u, P2: %u x %u)...", width, height, newW, newH);
+                SDL_Surface *newSurface = SDL_CreateRGBSurfaceWithFormat(0, newW, newH, 32, SDL_PIXELFORMAT_ARGB8888);
+                if(newSurface)
+                {
+                    SDL_Rect rect = {0, 0, (int)width, (int)height};
+                    SDL_LowerBlit(surface, &rect, newSurface, &rect);
+                    SDL_FreeSurface(surface);
+                    surface = newSurface;
+                }
             }
         }
 
