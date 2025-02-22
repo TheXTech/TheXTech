@@ -221,6 +221,18 @@ bool RenderGL::initOpenGL()
         }
     }
 
+    const char* renderer = (const char*)glGetString(GL_RENDERER);
+    if(SDL_strcmp(renderer, "GDI Generic") == 0)
+    {
+        pLogWarning("Render GL: generic OpenGL software renderer detected; your graphics driver may not support OpenGL");
+
+        if(g_config.render_mode == Config_t::RENDER_ACCELERATED_AUTO)
+        {
+            pLogWarning("Falling back to SDL2...");
+            return false;
+        }
+    }
+
     pLogInfo("Render GL: successfully initialized OpenGL %d.%d (Profile %s)", m_gl_majver, m_gl_minver, get_profile_name(m_gl_profile));
     pLogInfo("OpenGL version: %s", gl_ver_string);
     pLogInfo("OpenGL renderer: %s", glGetString(GL_RENDERER));
