@@ -11,6 +11,7 @@ Changelog for 1.3.7.1-dev
 -Implemented support for Power-of-Two only textures on some platforms via SDL Render (@Wohlstand)
 -Adjusted the frame-skip behaviour to address the performance slowdown on some systems (@Wohlstand)
 -Added exclusive full-screen mode support to maintain good performance on weak devices (@Wohlstand)
+-Windows: use SDL2 renderer on video cards without OpenGL acceleration (@ds-sloth)
 
 Changelog for 1.3.7
 -Fix vanilla peculiarity where medals were sometimes not collected when killed, guarded by "fix-medal-kill" [Modern Mode] (@ds-sloth, thanks to @Superbloxen for the report)
