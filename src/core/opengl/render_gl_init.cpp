@@ -221,9 +221,10 @@ bool RenderGL::initOpenGL()
         }
     }
 
+    const char* gl_renderer = (const char*)glGetString(GL_RENDERER);
+
 #ifdef _WIN32
-    const char* renderer = (const char*)glGetString(GL_RENDERER);
-    if(SDL_strcmp(renderer, "GDI Generic") == 0)
+    if(SDL_strcmp(gl_renderer, "GDI Generic") == 0)
     {
         pLogWarning("Render GL: generic OpenGL software renderer detected; your graphics driver may not support OpenGL");
 
@@ -237,7 +238,7 @@ bool RenderGL::initOpenGL()
 
     pLogInfo("Render GL: successfully initialized OpenGL %d.%d (Profile %s)", m_gl_majver, m_gl_minver, get_profile_name(m_gl_profile));
     pLogInfo("OpenGL version: %s", gl_ver_string);
-    pLogInfo("OpenGL renderer: %s", glGetString(GL_RENDERER));
+    pLogInfo("OpenGL renderer: %s", gl_renderer);
 #ifdef RENDERGL_HAS_SHADERS
     if(m_gl_majver >= 2)
         pLogInfo("GLSL version: %s", glGetString(GL_SHADING_LANGUAGE_VERSION));
