@@ -221,6 +221,7 @@ bool RenderGL::initOpenGL()
         }
     }
 
+#ifdef _WIN32
     const char* renderer = (const char*)glGetString(GL_RENDERER);
     if(SDL_strcmp(renderer, "GDI Generic") == 0)
     {
@@ -232,6 +233,7 @@ bool RenderGL::initOpenGL()
             return false;
         }
     }
+#endif
 
     pLogInfo("Render GL: successfully initialized OpenGL %d.%d (Profile %s)", m_gl_majver, m_gl_minver, get_profile_name(m_gl_profile));
     pLogInfo("OpenGL version: %s", gl_ver_string);
