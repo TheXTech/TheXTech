@@ -5251,7 +5251,7 @@ void SpecialNPC(int A)
                 NPC[A].Special = 1;
                 NPC[A].Direction = p.Direction;
 
-                double F;
+                double F = 0.0;
                 if(NPC[A].Type == NPCID_GHOST_S3)
                     F = 0.03;
                 else if(NPC[A].Type == NPCID_GHOST_S4)
