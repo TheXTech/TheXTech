@@ -181,41 +181,41 @@ static int isDebuggerPresent()
 #include "core/msgbox.h"
 
 #define STACK_FORMAT    \
-    "====Stack trace====\n" \
-    "%s\n" \
-    "===================\n" \
+    "====Stack trace====" OS_NEWLINE \
+    "%s" OS_NEWLINE \
+    "===================" OS_NEWLINE \
     "%s"
 
 #define STR_EXPAND(tok) #tok
 #define STRR(tok) STR_EXPAND(tok)
 
 static const char *g_messageToUser =
-    "================================================\n"
-    "            Additional information:\n"
-    "================================================\n"
+    "================================================" OS_NEWLINE
+    "            Additional information:" OS_NEWLINE
+    "================================================" OS_NEWLINE
     V_FILE_DESC "\n"
-    "- Version:           " V_FILE_VERSION V_FILE_RELEASE "\n"
-    "- Architecture:      " FILE_CPU "\n"
-    "- Operating system:  " OPERATION_SYSTEM "\n"
-    "- GIT Revision code: #" V_BUILD_VER "\n"
-    "- GIT branch:        " V_BUILD_BRANCH "\n"
+    "- Version:           " V_FILE_VERSION V_FILE_RELEASE OS_NEWLINE
+    "- Architecture:      " FILE_CPU OS_NEWLINE
+    "- Operating system:  " OPERATION_SYSTEM OS_NEWLINE
+    "- GIT Revision code: #" V_BUILD_VER OS_NEWLINE
+    "- GIT branch:        " V_BUILD_BRANCH OS_NEWLINE
 #ifndef DISABLE_XTECH_BUILD_DATE
-    "- Build date:        " V_DATE_OF_BUILD "\n"
+    "- Build date:        " V_DATE_OF_BUILD OS_NEWLINE
 #endif
-    "================================================\n"
+    "================================================" OS_NEWLINE
 #ifndef THEXTECH_NO_SDL_BUILD
-    "SDL2 version:        " STRR(SDL_MAJOR_VERSION) "." STRR(SDL_MINOR_VERSION) "." STRR(SDL_PATCHLEVEL) "\n"
+    "SDL2 version:        " STRR(SDL_MAJOR_VERSION) "." STRR(SDL_MINOR_VERSION) "." STRR(SDL_PATCHLEVEL) OS_NEWLINE
 #endif
 #if !defined(THEXTECH_NO_SDL_BUILD) && !defined(THEXTECH_CLI_BUILD) && !defined(CUSTOM_AUDIO)
-    "SDL Mixer X version: " STRR(SDL_MIXER_MAJOR_VERSION) "." STRR(SDL_MIXER_MINOR_VERSION) "." STRR(SDL_MIXER_PATCHLEVEL) "\n"
+    "SDL Mixer X version: " STRR(SDL_MIXER_MAJOR_VERSION) "." STRR(SDL_MIXER_MINOR_VERSION) "." STRR(SDL_MIXER_PATCHLEVEL) OS_NEWLINE
 #endif
-    "================================================\n"
-    " Please send this log file to the developers by one of ways:\n"
-    " - Via contact form:          https://wohlsoft.ru/contacts/\n"
-    " - Official forums:           https://wohlsoft.ru/forum/\n"
-    " - Official Discord server:   https://wohlsoft.ru/chat/\n"
-    " - Make issue at GitHub repo: https://github.com/Wohlstand/TheXTech\n\n"
-    "================================================\n";
+    "================================================" OS_NEWLINE
+    " Please send this log file to the developers by one of ways:" OS_NEWLINE
+    " - Via contact form:          https://wohlsoft.ru/contacts/" OS_NEWLINE
+    " - Official forums:           https://wohlsoft.ru/forum/" OS_NEWLINE
+    " - Official Discord server:   https://wohlsoft.ru/chat/" OS_NEWLINE
+    " - Make issue at GitHub repo: https://github.com/Wohlstand/TheXTech" OS_NEWLINE OS_NEWLINE
+    "================================================" OS_NEWLINE;
 
 #ifdef _WIN32
 //
@@ -252,7 +252,7 @@ static bool GetStackWalk(std::string &outWalk)
         if(::SymFromAddr(::GetCurrentProcess(), (DWORD64)addrs[ i ], &displacement, info))
         {
             outWalk.append(info->Name, info->NameLen);
-            outWalk.append("\n");
+            outWalk.append(OS_NEWLINE);
         }
     }
 
@@ -570,14 +570,14 @@ void LLVM_ATTRIBUTE_NORETURN CrashHandler::crashByUnhandledException()
         exc.append(" caught unhandled exception. (unknown) ");
     }
 
-    pLogFatal("<Unhandled exception! %s>\n"
+    pLogFatal("<Unhandled exception! %s>" OS_NEWLINE
               STACK_FORMAT, exc.c_str(),
               stack.c_str(), g_messageToUser);
     g_msgBoxHook(
         "Unhandled exception!",
-        "The engine has crashed because of an unhandled exception!\n\n"
-        "--Exception message:----\n" +
-        exc_line + "\n"
+        "The engine has crashed because of an unhandled exception!" OS_NEWLINE OS_NEWLINE
+        "--Exception message:----" OS_NEWLINE +
+        exc_line + OS_NEWLINE
         "------------------------"
     );
     abortEngine(-1);
@@ -586,7 +586,7 @@ void LLVM_ATTRIBUTE_NORETURN CrashHandler::crashByUnhandledException()
 void LLVM_ATTRIBUTE_NORETURN CrashHandler::crashByFlood()
 {
     std::string stack = getStacktrace();
-    pLogFatal("<Out of memory!>\n"
+    pLogFatal("<Out of memory!>" OS_NEWLINE
               STACK_FORMAT,
               stack.c_str(), g_messageToUser);
     g_msgBoxHook(
@@ -740,7 +740,7 @@ static void handle_signal(int signal, siginfo_t *siginfo, void * /*context*/)
         else
 #endif // HAS_SIG_INFO
         {
-            pLogFatal("<wrong arithmetical operation>\n"
+            pLogFatal("<wrong arithmetical operation>" OS_NEWLINE
                       STACK_FORMAT,
                       stack.c_str(), g_messageToUser);
         }
@@ -754,7 +754,7 @@ static void handle_signal(int signal, siginfo_t *siginfo, void * /*context*/)
     case SIGABRT:
     {
         std::string stack = getStacktrace();
-        pLogFatal("<Aborted!>\n"
+        pLogFatal("<Aborted!>" OS_NEWLINE
                   STACK_FORMAT,
                   stack.c_str(), g_messageToUser);
         g_msgBoxHook(
@@ -765,7 +765,7 @@ static void handle_signal(int signal, siginfo_t *siginfo, void * /*context*/)
 
     case SIGSEGV:
     {
-        D_pLogDebugNA("\n===========================================================\n"
+        D_pLogDebugNA(OS_NEWLINE "===========================================================" OS_NEWLINE
                       "Attempt to take a backtrace..."
                       "(if log ends before \"DONE\" will be shown, seems also trouble in the backtracing function too...)");
         std::string stack = getStacktrace();
@@ -797,7 +797,7 @@ static void handle_signal(int signal, siginfo_t *siginfo, void * /*context*/)
         else
 #endif // HAS_SIG_INFO
         {
-            pLogFatal("<Segmentation fault crash!>\n"
+            pLogFatal("<Segmentation fault crash!>" OS_NEWLINE
                       STACK_FORMAT,
                       stack.c_str(), g_messageToUser);
         }
@@ -837,12 +837,12 @@ void CrashHandler::logAssertInfo(const void* data_p)
     const SDL_AssertData *data = reinterpret_cast<const SDL_AssertData*>(data_p);
 
     std::string stack = getStacktrace();
-    pLogFatal("<Assertion condition has failed>:\n"
-              "---------------------------------------------------------\n"
-              "File: %s(%d)\n"
-              "Function: %s\n"
-              "Condition: %s\n"
-              "---------------------------------------------------------\n"
+    pLogFatal("<Assertion condition has failed>:" OS_NEWLINE
+              "---------------------------------------------------------" OS_NEWLINE
+              "File: %s(%d)" OS_NEWLINE
+              "Function: %s" OS_NEWLINE
+              "Condition: %s" OS_NEWLINE
+              "---------------------------------------------------------" OS_NEWLINE
               STACK_FORMAT,
               data->filename, data->linenum,
               data->function,

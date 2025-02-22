@@ -24,6 +24,12 @@
 #ifdef __cplusplus
 #include <string>
 
+#ifdef _WIN32
+#   define OS_NEWLINE "\r\n"
+#else
+#   define OS_NEWLINE "\n"
+#endif
+
 #include "logger_level.h"
 
 extern struct PGE_LogSetup
