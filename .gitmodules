@@ -56,3 +56,7 @@
 	path = 3rdparty/mbediso
 	url = https://github.com/ds-sloth/mbediso/
 	branch = main
+[submodule "3rdparty/SDL_net"]
+	path = 3rdparty/SDL_net
+	url = https://github.com/TheXTech/SDL_net.git
+	branch = SDL2
