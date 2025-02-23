@@ -186,13 +186,16 @@ bool FrmMain::initSystem(const CmdLineSetup_t &setup)
 #endif
 
 
-#if !defined(RENDER_FULLSCREEN_ALWAYS) && defined(RENDER_FULLSCREEN_TYPES_SUPPORTED)
-    XWindow::setFullScreenType(g_config.fullscreen_type);
-    if(g_config.fullscreen)
+#if defined(_WIN32) && !defined(RENDER_FULLSCREEN_ALWAYS) && defined(RENDER_FULLSCREEN_TYPES_SUPPORTED)
+    if(g_config.fullscreen_type == Config_t::FULLSCREEN_TYPE_REAL)
     {
-        UpdateInternalRes();
-        XWindow::setWindowSize(XRender::TargetW, XRender::TargetH);
-        XWindow::setFullScreen(g_config.fullscreen);
+        XWindow::setFullScreenType(g_config.fullscreen_type);
+        if(g_config.fullscreen)
+        {
+            UpdateInternalRes();
+            XWindow::setWindowSize(XRender::TargetW, XRender::TargetH);
+            XWindow::setFullScreen(g_config.fullscreen);
+        }
     }
 #endif
 

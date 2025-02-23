@@ -542,15 +542,16 @@ int WindowSDL::syncFullScreenRes()
         pLogDebug("Closest mode is not available, using defaults...");
     }
 
-    SDL_SetWindowSize(m_window, closest_w, closest_h);
-
-    pLogDebug("Toggling screen into %d x %d resolution", dst_w, dst_h);
-
-    if((SDL_GetWindowFlags(m_window) & SDL_WINDOW_FULLSCREEN) == 0 &&
-        SDL_SetWindowFullscreen(m_window, m_fullscreen_type_real) < 0)
+    if((SDL_GetWindowFlags(m_window) & SDL_WINDOW_FULLSCREEN) == 0)
     {
-        pLogWarning("Setting fullscreen failed: %s", SDL_GetError());
-        return -1;
+        SDL_SetWindowSize(m_window, closest_w, closest_h);
+        pLogDebug("Toggling screen into %d x %d resolution", dst_w, dst_h);
+
+        if(SDL_SetWindowFullscreen(m_window, m_fullscreen_type_real) < 0)
+        {
+            pLogWarning("Setting fullscreen failed: %s", SDL_GetError());
+            return -1;
+        }
     }
 
     if(modeClose && SDL_SetWindowDisplayMode(m_window, &modeDst) < 0)
@@ -558,6 +559,8 @@ int WindowSDL::syncFullScreenRes()
         pLogWarning("Setting fullscreen display mode failed: %s", SDL_GetError());
         return -1;
     }
+
+    SDL_SetWindowSize(m_window, closest_w, closest_h);
 
     return 0;
 }
