@@ -20,6 +20,9 @@
 
 #ifdef _WIN32
 #   include <winternl.h>
+#   include <sysinfoapi.h>
+#   include <initguid.h>
+#   include <dxdiag.h>
 #endif
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_cpuinfo.h>
@@ -45,12 +48,192 @@ void WindowSDL::setHasFrameBuffer(bool has)
     s_hasFrameBuffer = has;
 }
 
+#ifdef _WIN32
+
+static bool s_hasWinSysInfo = false;
+static int32_t s_suggestedFullscreenType = 0;
+
+#define SAFE_RELEASE(p)      { if(p) { (p)->Release(); (p)=NULL; } }
+
+static HRESULT GetStringValue(IDxDiagContainer* pObject, const wchar_t* wstrName, char* strValue, int nStrLen)
+{
+    HRESULT hr;
+    VARIANT var;
+    VariantInit( &var );
+
+    if(FAILED(hr = pObject->GetProp(wstrName, &var)))
+        return hr;
+
+    if(var.vt != VT_BSTR)
+        return E_INVALIDARG;
+
+    wcstombs(strValue, var.bstrVal, nStrLen);
+    strValue[nStrLen - 1] = '\0';
+    VariantClear(&var);
+
+    return S_OK;
+}
+
+static uint32_t s_getVideoRam()
+{
+    unsigned int ret = 0;
+    HRESULT hr;
+
+    IDxDiagProvider* pProvider = 0;
+    IDxDiagContainer* pRoot = 0;
+    IDxDiagContainer* pObject = 0;
+    IDxDiagContainer* pContainer = 0;
+    DWORD count = 0;
+    WCHAR wszContainer[256];
+    char videoMemoryStr[128] = "";
+
+    DXDIAG_INIT_PARAMS dxDiagInitParam;
+
+    hr = CoCreateInstance(CLSID_DxDiagProvider,
+                          NULL,
+                          CLSCTX_INPROC_SERVER,
+                          IID_IDxDiagProvider,
+                          (LPVOID*)&pProvider);
+
+    if (!pProvider || FAILED(hr))
+        return 0;
+
+    SDL_memset(&dxDiagInitParam, 0, sizeof(DXDIAG_INIT_PARAMS));
+
+    dxDiagInitParam.dwSize = sizeof(DXDIAG_INIT_PARAMS);
+    dxDiagInitParam.dwDxDiagHeaderVersion = DXDIAG_DX9_SDK_VERSION;
+    dxDiagInitParam.bAllowWHQLChecks = true;
+    dxDiagInitParam.pReserved = NULL;
+
+    hr = pProvider->Initialize(&dxDiagInitParam);
+    if(SUCCEEDED(hr))
+    {
+        hr = pProvider->GetRootContainer( &pRoot);
+        if (SUCCEEDED(hr))
+        {
+            // fills in the struct from DXDIAG...
+            HRESULT hr = pRoot->GetChildContainer(L"DxDiag_DisplayDevices", &pContainer);
+            if(FAILED(hr))
+            {
+                SAFE_RELEASE(pProvider);
+                return 0;
+            }
+
+            DWORD nItem = 0;
+
+            if(SUCCEEDED(hr = pContainer->GetNumberOfChildContainers(&count)))
+            {
+                for(; nItem < count&& nItem < 16; nItem++)
+                {
+                    hr = pContainer->EnumChildContainerNames(nItem, wszContainer, 256);
+                    if(FAILED(hr))
+                    {
+                        SAFE_RELEASE(pObject);
+                        SAFE_RELEASE(pContainer);
+                        SAFE_RELEASE(pProvider);
+                        return 0;
+                    }
+
+                    hr = pContainer->GetChildContainer(wszContainer, &pObject);
+                    if(FAILED(hr) || pObject == NULL)
+                    {
+                        SAFE_RELEASE(pObject);
+                        SAFE_RELEASE(pContainer);
+                        SAFE_RELEASE(pProvider);
+                        return 0;
+                    }
+
+                    if(FAILED(hr = GetStringValue(pObject, L"szDisplayMemoryEnglish", videoMemoryStr, sizeof(videoMemoryStr))))
+                    {
+                        SAFE_RELEASE(pObject);
+                        SAFE_RELEASE(pContainer);
+                        SAFE_RELEASE(pProvider);
+                        return 0;
+                    }
+
+                    pLogDebug("Video memory value: %s", videoMemoryStr);
+
+                    char *num = videoMemoryStr;
+                    char *suff = nullptr;
+
+                    for(size_t i = 0; i < sizeof(videoMemoryStr) && videoMemoryStr[i] != '\0'; ++i)
+                    {
+                        if(videoMemoryStr[i] == ' ')
+                        {
+                            videoMemoryStr[i] = '\0';
+                            suff = videoMemoryStr + i + 1;
+                            ret = SDL_strtoul(num, nullptr, 10);
+
+                            if(SDL_strncasecmp(suff, "GB", 2) == 0)
+                                ret *= 1024;
+                            else if(SDL_strncasecmp(suff, "TB", 2) == 0)
+                                ret *= 1024 * 1024;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    SAFE_RELEASE(pProvider);
+
+    return ret;
+}
+
+static void s_updateSysInfo()
+{
+    if(s_hasWinSysInfo)
+        return;
+
+    // Try to collect various system-wide information to heuristically detect legacy computer
+    OSVERSIONINFO osvi;
+    SYSTEM_INFO sysInfo;
+    uint32_t videoMemSize = 0;
+
+    bool isWinXPorOlder = false;
+
+    SDL_memset(&osvi, 0, sizeof(OSVERSIONINFO));
+    osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+    GetVersionEx(&osvi);
+
+    GetSystemInfo(&sysInfo);
+
+    isWinXPorOlder = osvi.dwMajorVersion < 5 || (osvi.dwMajorVersion == 5 && osvi.dwMinorVersion <= 1);
+
+    videoMemSize = s_getVideoRam();
+
+    pLogDebug("Windows Version: %u.%u, CPU type: %u, Video memory: %d MB",
+              osvi.dwMajorVersion,
+              osvi.dwMinorVersion,
+              sysInfo.dwProcessorType,
+              videoMemSize
+    );
+
+    s_suggestedFullscreenType = SDL_WINDOW_FULLSCREEN_DESKTOP;
+
+    if(isWinXPorOlder && videoMemSize > 0 && videoMemSize < 128)
+        s_suggestedFullscreenType = SDL_WINDOW_FULLSCREEN;
+
+    s_hasWinSysInfo = true;
+}
+
+#endif
+
 static int s_fsTypeToSDL(int type)
 {
+#ifdef _WIN32
+    s_updateSysInfo();
+#endif
+
     switch(type)
     {
     case 0:
     {
+#ifdef _WIN32
+        if(s_suggestedFullscreenType > 0)
+            return s_suggestedFullscreenType;
+#endif
+
 #if defined(PGE_CPU_x86_32) || defined(PGE_CPU_ARM32) || defined(PGE_CPU_PPC32)
         // On 32-bit architecures
         return SDL_WINDOW_FULLSCREEN;
