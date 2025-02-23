@@ -199,7 +199,9 @@ void GameThing(int waitms, int fadeSpeed)
 
     XHints::Select();
 
-    if(waitms <= 0)
+    int wait_frames = (waitms * 10 + 155) / 156;
+
+    if(wait_frames <= 0)
     {
         XRender::setTargetTexture();
         XRender::clearBuffer();
@@ -210,12 +212,11 @@ void GameThing(int waitms, int fadeSpeed)
     else
     {
         ScreenFader fader;
-        uint32_t targetTime = SDL_GetTicks() + waitms;
 
         if(g_config.EnableInterLevelFade && fadeSpeed > 0)
             fader.setupFader(fadeSpeed, 65, 0, ScreenFader::S_FADE);
 
-        while(SDL_GetTicks() < targetTime && GameIsActive)
+        while(wait_frames > 0 && GameIsActive)
         {
             XEvents::doEvents();
 
@@ -238,6 +239,8 @@ void GameThing(int waitms, int fadeSpeed)
                 XRender::repaint();
                 XEvents::doEvents();
                 computeFrameTime2();
+
+                wait_frames--;
             }
 
             if(!g_config.unlimited_framerate)
