@@ -197,6 +197,8 @@ option(THEXTECH_ENABLE_LUA "Enable lua scripting support" OFF)
 option(THEXTECH_ENABLE_LUAU "Enable luau build testing" OFF)
 option(THEXTECH_ENABLE_LUNA_AUTOCODE "Enable LunaDLL Autocode scripting support" ON)
 
+option(THEXTECH_ENABLE_SDL_NET "Enable SDL_net build testing" ON)
+
 option(THEXTECH_ENABLE_EDITOR "Enable runtime support for editor features" ON)
 
 option(THEXTECH_ENABLE_TTF_SUPPORT "Enable TTF fonts support (FreeType required)" ${THEXTECH_ENABLE_TTF_SUPPORT_DEFAULT})
@@ -625,6 +627,13 @@ if(THEXTECH_BUILD_GL_DESKTOP_MODERN AND THEXTECH_USE_ANGLE_TRANSLATOR)
     endif()
 
     target_link_libraries(A2XT_Int INTERFACE angle_shader_translator)
+endif()
+
+if(THEXTECH_ENABLE_SDL_NET)
+    message("== Building SDL_net... but it doesn't do anything! ==")
+    set(BUILD_SHARED_LIBS OFF)
+    add_subdirectory(3rdparty/SDL_net EXCLUDE_FROM_ALL)
+    target_link_libraries(A2XT_Int INTERFACE SDL2_net)
 endif()
 
 if(THEXTECH_ENABLE_LUAU)
