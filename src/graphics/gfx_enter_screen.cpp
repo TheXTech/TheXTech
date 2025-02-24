@@ -32,6 +32,7 @@
 #include "../controls.h"
 #include "pge_delay.h"
 #include "npc_id.h"
+#include "message.h"
 
 #include "main/hints.h"
 
@@ -226,6 +227,11 @@ void GameThing(int waitms, int fadeSpeed)
 
                 Controls::Update(false);
 
+                wait_frames--;
+
+                if(XMessage::GetStatus() == XMessage::Status::replay)
+                    continue;
+
                 XRender::setTargetTexture();
                 XRender::clearBuffer();
                 drawEnterScreen(tempPlayer);
@@ -239,8 +245,6 @@ void GameThing(int waitms, int fadeSpeed)
                 XRender::repaint();
                 XEvents::doEvents();
                 computeFrameTime2();
-
-                wait_frames--;
             }
 
             if(!g_config.unlimited_framerate)

@@ -44,6 +44,7 @@
 #include "../main/screen_textentry.h"
 #include "../main/cheat_code.h"
 #include "../config.h"
+#include "message.h"
 #include "../game_main.h"
 #include "../main/game_globals.h"
 #include "main/world_globals.h"
@@ -1459,6 +1460,9 @@ void UpdateGraphics(bool skipRepaint)
         Do_FrameSkip = true;
     }
 #endif
+
+    if(XMessage::GetStatus() == XMessage::Status::replay)
+        Do_FrameSkip = true;
 
     g_microStats.start_task(MicroStats::Camera);
 

@@ -28,6 +28,7 @@
 #include "gfx.h"
 #include "rand.h"
 #include "sound.h"
+#include "message.h"
 #include "main/game_info.h"
 #include "main/speedrunner.h"
 #include "main/game_info.h"
@@ -479,6 +480,11 @@ int main(int argc, char**argv)
 
         TCLAP::UnlabeledMultiArg<std::string> inputFileNames("levelpath", "Path to level file or replay data to run the test", false, std::string(), "path to file");
 
+#ifdef THEXTECH_ENABLE_SDL_NET
+        TCLAP::ValueArg<std::string> server(std::string(), "server", "Server address", false, "", "");
+        cmd.add(&server);
+#endif
+
         cmd.add(&switchFrameSkip);
         cmd.add(&switchDisableFrameSkip);
         cmd.add(&switchNoSound);
@@ -748,6 +754,11 @@ int main(int argc, char**argv)
 
         if(lang.isSet())
             g_config.language = lang;
+
+#ifdef THEXTECH_ENABLE_SDL_NET
+        if(!setup.testLevel.empty() && server.isSet())
+            XMessage::Connect(server.getValue().c_str(), 4305);
+#endif
     }
     catch(TCLAP::ArgException &e)   // catch any exceptions
     {

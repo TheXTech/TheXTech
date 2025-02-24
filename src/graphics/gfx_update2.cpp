@@ -42,6 +42,7 @@
 #include "main/level_medals.h"
 #include "../core/render.h"
 #include "../screen_fader.h"
+#include "message.h"
 
 #include "graphics/gfx_frame.h"
 #include "graphics/gfx_marquee.h"
@@ -112,6 +113,9 @@ void UpdateGraphics2(bool skipRepaint)
         return;
     }
 #endif
+
+    if(XMessage::GetStatus() == XMessage::Status::replay)
+        return;
 
     XRender::setTargetTexture();
 
