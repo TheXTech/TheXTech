@@ -75,14 +75,17 @@
 
 struct ScreenShake_t
 {
-    double forceX = 0;
-    double forceY = 0;
+    // these are all multiplied by 0.001 pixels
+    int    forceX = 0;
+    int    forceY = 0;
+    int    forceDecay = 1000;
+
+    // these are in real pixels
     int    offsetX = 0;
     int    offsetY = 0;
-    double forceDecay = 1.0;
     int    type = SHAKE_RANDOM;
-    double duration = 0;
-    double sign = +1.0;
+    int    duration = 0;
+    int    sign = +1;
 
     bool   active = false;
 
@@ -103,8 +106,8 @@ struct ScreenShake_t
 
         if(forceX <= 0 && forceY <= 0)
         {
-            forceX = 0.0;
-            forceY = 0.0;
+            forceX = 0;
+            forceY = 0;
             active = false;
         }
         // always perform this section to keep the number of random calls consistent w/legacy sources
@@ -113,12 +116,12 @@ struct ScreenShake_t
             {
             default:
             case SHAKE_RANDOM:
-                offsetX = iRand(forceX * 4) - forceX * 2;
-                offsetY = iRand(forceY * 4) - forceY * 2;
+                offsetX = iRand(forceX / 250) - forceX / 500;
+                offsetY = iRand(forceY / 250) - forceY / 500;
                 break;
             case SHAKE_SEQUENTIAL:
-                offsetX = forceX > 0 ? (int)round(sign * forceX) : 0;
-                offsetY = forceY > 0 ? (int)round(sign * forceY) : 0;
+                offsetX = forceX > 0 ? sign * ((forceX + 500) / 1000) : 0;
+                offsetY = forceY > 0 ? sign * ((forceY + 500) / 1000) : 0;
                 sign *= -1;
                 break;
             }
@@ -137,10 +140,13 @@ struct ScreenShake_t
         XRender::offsetViewportIgnore(false);
     }
 
-    void setup(int i_forceX, int i_forceY, int i_type, int i_duration, double i_decay)
+    void setup(int i_forceX, int i_forceY, int i_type, int i_duration, int i_decay)
     {
         if(GameMenu)
             return;
+
+        i_forceX *= 1000;
+        i_forceY *= 1000;
 
         if((forceX <= 0 && forceY <= 0) || (forceDecay < i_decay))
             forceDecay = i_decay;
@@ -161,9 +167,9 @@ struct ScreenShake_t
 
     void clear()
     {
-        forceX = 0.0;
-        forceY = 0.0;
-        duration = 0.0;
+        forceX = 0;
+        forceY = 0;
+        duration = 0;
         active = false;
     }
 };
@@ -193,10 +199,10 @@ static inline int s_round2int_plr(double d)
 
 void doShakeScreen(int force, int type)
 {
-    s_shakeScreen.setup(force, force, type, 0, 1.0);
+    s_shakeScreen.setup(force, force, type, 0, 1000);
 }
 
-void doShakeScreen(int forceX, int forceY, int type, int duration, double decay)
+void doShakeScreen(int forceX, int forceY, int type, int duration, int decay)
 {
     s_shakeScreen.setup(forceX, forceY, type, duration, decay);
 }
@@ -1796,13 +1802,13 @@ void UpdateGraphicsLogic(bool Do_FrameSkip)
         if(!continue_qScreen_local && (continue_qScreen || continue_qScreen_canonical) && !s_shakeScreen.active)
         {
             s_forcedShakeScreen = true;
-            doShakeScreen(1, 1, SHAKE_RANDOM, 0, 0.0);
+            doShakeScreen(1, 1, SHAKE_RANDOM, 0, 0);
         }
         // finish forced screenshake
         else if(!(continue_qScreen || continue_qScreen_canonical) && s_forcedShakeScreen)
         {
             s_forcedShakeScreen = false;
-            doShakeScreen(1, 1, SHAKE_RANDOM, 0, 0.1);
+            doShakeScreen(1, 1, SHAKE_RANDOM, 0, 100);
         }
     }
 

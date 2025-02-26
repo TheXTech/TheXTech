@@ -3391,7 +3391,7 @@ void YoshiPound(const int A, int mount, bool BreakBlocks)
         Effect[numEffects].Location.SpeedX = 2;
         PlaySoundSpatial(SFX_Stone, p.Location);
         if(BreakBlocks && g_config.extra_screen_shake)
-            doShakeScreen(0, 4, SHAKE_SEQUENTIAL, 4, 0.2);
+            doShakeScreen(0, 4, SHAKE_SEQUENTIAL, 4, 200);
     }
 }
 
