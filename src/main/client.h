@@ -56,6 +56,8 @@ struct NetworkClient
     size_t buffer_used = 0;
     int fast_forward_to = 0;
 
+    bool sdlnet_inited = false;
+
     ~NetworkClient();
 
     void Connect(const char* host, int port);

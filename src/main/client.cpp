@@ -36,11 +36,23 @@ namespace XMessage
 NetworkClient::~NetworkClient()
 {
     Disconnect(true);
+
+    if(sdlnet_inited)
+    {
+        SDLNet_Quit();
+        sdlnet_inited = false;
+    }
 }
 
 void NetworkClient::Connect(const char* host, int port)
 {
     Disconnect();
+
+    if(!sdlnet_inited)
+    {
+        SDLNet_Init();
+        sdlnet_inited = true;
+    }
 
     IPaddress addr;
     if(SDLNet_ResolveHost(&addr, host, port) != 0)
