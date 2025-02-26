@@ -203,15 +203,7 @@ static void s_WarpFaderLogic(bool is_reverse, int A, int transitEffect, const Lo
     {
     default:
         if(transitEffect >= ScreenFader::S_CUSTOM)
-        {
-            if(normal_ready)
-                fader.setupFader(3, fade_from, fade_to, transitEffect,
-                                 true,
-                                 Maths::iRound(focus.X + focus.Width / 2),
-                                 Maths::iRound(focus.Y + focus.Height / 2),
-                                 fader_index);
-            break;
-        }
+            goto generic_fade_with_focus;
     // fallthrough
     case LevelDoor::TRANSIT_SCROLL:
     case LevelDoor::TRANSIT_NONE:
@@ -225,22 +217,24 @@ static void s_WarpFaderLogic(bool is_reverse, int A, int transitEffect, const Lo
         break;
 
     case LevelDoor::TRANSIT_CIRCLE_FADE:
+        transitEffect = ScreenFader::S_CIRCLE;
+        goto generic_fade_with_focus;
+
+    case LevelDoor::TRANSIT_FLIP_H:
+        transitEffect = ScreenFader::S_FLIP_H;
+        goto generic_fade_with_focus;
+
+    case LevelDoor::TRANSIT_FLIP_V:
+        transitEffect = ScreenFader::S_FLIP_V;
+        goto generic_fade_with_focus;
+
+    generic_fade_with_focus:
         if(normal_ready)
-            fader.setupFader(3, fade_from, fade_to, ScreenFader::S_CIRCLE,
+            fader.setupFader(3, fade_from, fade_to, transitEffect,
                              true,
                              Maths::iRound(focus.X + focus.Width / 2),
                              Maths::iRound(focus.Y + focus.Height / 2),
                              fader_index);
-        break;
-
-    case LevelDoor::TRANSIT_FLIP_H:
-        if(normal_ready)
-            fader.setupFader(3, fade_from, fade_to, ScreenFader::S_FLIP_H);
-        break;
-
-    case LevelDoor::TRANSIT_FLIP_V:
-        if(normal_ready)
-            fader.setupFader(3, fade_from, fade_to, ScreenFader::S_FLIP_V);
         break;
     }
 }
