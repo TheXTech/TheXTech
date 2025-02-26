@@ -65,6 +65,7 @@ void worldWaitForFade(int waitTicks)
         if(canProceedFrame())
         {
             computeFrameTime1();
+            Controls::Update(false);
             // FIXME: strip logic out of UpdateGraphics2
             UpdateGraphics2();
             UpdateSound();
@@ -629,6 +630,8 @@ resume_from_pause:
                             StopMusic();
                             PlaySound(SFX_LevelSelect);
 
+                            int GameThingTicks = 1000;
+
                             if(g_config.EnableInterLevelFade)
                             {
                                 g_worldScreenFader.setupFader(2, 0, 65, ScreenFader::S_RECT,
@@ -636,6 +639,8 @@ resume_from_pause:
                                                               getWorldPlayerCenterX(), getWorldPlayerCenterY(), l_screen->vScreen_refs[0]);
                                 worldWaitForFade();
                             }
+                            else
+                                GameThingTicks += (33 * 156 / 10);
 
                             SoundPause[SFX_Slide] = 200;
                             curWorldLevel = t;
@@ -652,7 +657,7 @@ resume_from_pause:
                                 ErrorQuit = true;
                             }
 
-                            GameThing(1000, 3);
+                            GameThing(GameThingTicks, 3);
 
                             break;
                         }
@@ -1204,6 +1209,7 @@ void PathWait()
         XEvents::doEvents();
         if(canProceedFrame())
         {
+            Controls::Update(false);
             speedRun_tick();
             UpdateGraphics2();
             UpdateSound();
