@@ -24,8 +24,6 @@
 
 #include <string>
 
-#include "fader.h"
-
 struct ScreenFader
 {
     enum Shape
@@ -43,8 +41,11 @@ struct ScreenFader
     bool m_full = false;
     bool m_complete = false;
     bool m_dirUp = false;
-    PGE_Fader m_fader;
-    float m_scale = 0.0f;
+
+    // each with a denominator of 65
+    int m_current_fade = 0;
+    int m_target_fade = 0;
+    int m_step = 0;
 
     XTColor color = {0, 0, 0};
 
