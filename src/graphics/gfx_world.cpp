@@ -79,7 +79,7 @@ static void s_getMargins(const Screen_t& screen, int& margin, int& marginTop, in
 void GetvScreenWorld(vScreen_t& vscreen)
 {
     const Screen_t& screen = Screens[vscreen.screen_ref];
-    const WorldPlayer_t& wp = WorldPlayer[vscreen.player];
+    const WorldPlayer_t& wp = WorldPlayer[1];
     const Location_t& wpLoc = wp.Location;
 
     int margin, marginTop, marginBottom;

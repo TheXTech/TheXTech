@@ -126,7 +126,7 @@ void UpdateGraphics2(bool skipRepaint)
 
     // int A = 0;
     // int B = 0;
-    const int Z = 1;
+    const int Z = l_screen->vScreen_refs[0];
     int WPHeight = 0;
 //    Location_t tempLocation;
     //Z = 1;
@@ -137,8 +137,8 @@ void UpdateGraphics2(bool skipRepaint)
         vScreen[Z].ScreenLeft = 0;
         vScreen[Z].Top = 0;
         vScreen[Z].ScreenTop = 0;
-        vScreen[Z].Width = Screens[0].W;
-        vScreen[Z].Height = Screens[0].H;
+        vScreen[Z].Width = l_screen->W;
+        vScreen[Z].Height = l_screen->H;
     }
     else
     {
@@ -147,7 +147,7 @@ void UpdateGraphics2(bool skipRepaint)
 
         if(qScreen)
         {
-            qScreen = Update_qScreen(1, g_worldCamSpeed, g_worldCamSpeed);
+            qScreen = Update_qScreen(Z, g_worldCamSpeed, g_worldCamSpeed);
 
             if(qScreen && g_worldPlayCamSound)
                 PlaySound(SFX_Camera);
@@ -183,12 +183,12 @@ void UpdateGraphics2(bool skipRepaint)
 
     XRender::clearBuffer();
     XRender::resetViewport();
-    DrawBackdrop(Screens[0]);
+    DrawBackdrop(*l_screen);
 
 //    if(TakeScreen == true)
 //    {
 //        if(LevelEditor == true || MagicHand == true)
-//            frmLevelWindow::vScreen[1].AutoRedraw = true;
+//            frmLevelWindow::vScreen[Z].AutoRedraw = true;
 //        else
 //            frmMain.AutoRedraw = true;
 //    }
@@ -249,10 +249,10 @@ void UpdateGraphics2(bool skipRepaint)
     int camX = vScreen[Z].CameraAddX() + XRender::TargetOverscanX;
     int camY = vScreen[Z].CameraAddY();
 
-    double sLeft = -vScreen[1].X - 2 * XRender::TargetOverscanX;
-    double sTop = -vScreen[1].Y;
-    double sRight = -vScreen[1].X + vScreen[1].Width + 2 * XRender::TargetOverscanX;
-    double sBottom = -vScreen[1].Y + vScreen[1].Height;
+    double sLeft = -vScreen[Z].X - 2 * XRender::TargetOverscanX;
+    double sTop = -vScreen[Z].Y;
+    double sRight = -vScreen[Z].X + vScreen[Z].Width + 2 * XRender::TargetOverscanX;
+    double sBottom = -vScreen[Z].Y + vScreen[Z].Height;
 
     {
         Location_t sView;
@@ -502,7 +502,7 @@ void UpdateGraphics2(bool skipRepaint)
             }
         }
 
-        XRender::setViewport(Screens[0].TargetX(), Screens[0].TargetY(), Screens[0].W, Screens[0].H);
+        XRender::setViewport(l_screen->TargetX(), l_screen->TargetY(), l_screen->W, l_screen->H);
 
 #ifdef __3DS__
         XRender::setTargetLayer(2);
@@ -523,9 +523,8 @@ void UpdateGraphics2(bool skipRepaint)
         // prepare for player draw
         vScreen[0].X = 0;
         vScreen[0].Y = 0;
-        vScreen[0].Width = XRender::TargetW;
-        vScreen[0].Height = XRender::TargetH;
 
+        // do this part for l_screen->players
         for(int A = 1; A <= numPlayers; A++)
         {
             DrawPlayerWorld(Player[A], pX, pY);

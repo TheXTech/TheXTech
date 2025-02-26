@@ -157,9 +157,11 @@ static void s_worldCheckSection(WorldPlayer_t& wp, const Location_t& loc)
         // enable a qScreen to the new section
         if(!qScreen)
         {
+            const int Z = l_screen->vScreen_refs[0];
+
             qScreen = true;
             g_worldPlayCamSound = true;
-            qScreenLoc[1] = vScreen[1];
+            qScreenLoc[Z] = vScreen[Z];
 
             // move camera quickly for transitions!
             if(g_worldCamSpeed < 4)
@@ -193,7 +195,7 @@ void worldResetSection()
 {
     worldCheckSection(WorldPlayer[1]);
     qScreen = false;
-    GetvScreenWorld(vScreen[1]);
+    GetvScreenWorld(l_screen->vScreen(1));
 }
 
 //static inline double getWorldPlayerX()
@@ -219,6 +221,7 @@ static inline double getWorldPlayerCenterY()
 void WorldLoop()
 {
     bool musicReset = false;
+    const int Z = l_screen->vScreen_refs[0];
 
     if(GamePaused != PauseCode::None)
     {
@@ -238,9 +241,9 @@ void WorldLoop()
         SingleCoop = 1;
 
     // remove any temporary path focus
-    vScreen[1].TempDelay = 0;
-    vScreen[1].tempX = 0;
-    vScreen[1].TempY = 0;
+    vScreen[Z].TempDelay = 0;
+    vScreen[Z].tempX = 0;
+    vScreen[Z].TempY = 0;
 
     // disable cloned player mode
     if(g_ClonedPlayerMode)
@@ -630,7 +633,7 @@ resume_from_pause:
                             {
                                 g_worldScreenFader.setupFader(2, 0, 65, ScreenFader::S_RECT,
                                                               true,
-                                                              getWorldPlayerCenterX(), getWorldPlayerCenterY(), 1);
+                                                              getWorldPlayerCenterX(), getWorldPlayerCenterY(), l_screen->vScreen_refs[0]);
                                 worldWaitForFade();
                             }
 
@@ -678,7 +681,7 @@ resume_from_pause:
                         {
                             g_worldScreenFader.setupFader(3, 0, 65, ScreenFader::S_RECT,
                                                           true,
-                                                          getWorldPlayerCenterX(), getWorldPlayerCenterY(), 1);
+                                                          getWorldPlayerCenterX(), getWorldPlayerCenterY(), l_screen->vScreen_refs[0]);
                             worldWaitForFade(65);
                         }
                         else
@@ -710,7 +713,7 @@ resume_from_pause:
                         {
                             g_worldScreenFader.setupFader(3, 65, 0, ScreenFader::S_RECT,
                                                           true,
-                                                          getWorldPlayerCenterX(), getWorldPlayerCenterY(), 1);
+                                                          getWorldPlayerCenterX(), getWorldPlayerCenterY(), l_screen->vScreen_refs[0]);
                         }
 //                        resetFrameTimer();
                     }
@@ -961,7 +964,10 @@ void LevelPath(const WorldLevel_t &Lvl, int Direction, bool Skp)
     if(g_config.EnableInterLevelFade && hit && !Skp)
     {
         qScreen = true;
-        qScreenLoc[1] = vScreen[1];
+
+        const int Z = l_screen->vScreen_refs[0];
+        qScreenLoc[Z] = vScreen[Z];
+
         if(g_worldCamSpeed < 8)
             g_worldCamSpeed = 8;
     }
@@ -1048,6 +1054,8 @@ void PlayerPath(WorldPlayer_t &p)
 
 void PathPath(WorldPath_t &Pth, bool Skp)
 {
+    const int Z = l_screen->vScreen_refs[0];
+
     //int A = 0;
     int B = 0;
 
@@ -1074,9 +1082,9 @@ void PathPath(WorldPath_t &Pth, bool Skp)
         Pth.Active = true;
 
         // set a temporary vScreen focus
-        vScreen[1].tempX = Pth.Location.X + Pth.Location.Width / 2.0;
-        vScreen[1].TempY = Pth.Location.Y + Pth.Location.Height / 2.0;
-        vScreen[1].TempDelay = 1;
+        vScreen[Z].tempX = Pth.Location.X + Pth.Location.Width / 2.0;
+        vScreen[Z].TempY = Pth.Location.Y + Pth.Location.Height / 2.0;
+        vScreen[Z].TempDelay = 1;
 
         // update section (no cam sound)
         s_worldCheckSection(WorldPlayer[1], static_cast<Location_t>(Pth.Location));
@@ -1086,7 +1094,7 @@ void PathPath(WorldPath_t &Pth, bool Skp)
         if(g_config.EnableInterLevelFade)
         {
             qScreen = true;
-            qScreenLoc[1] = vScreen[1];
+            qScreenLoc[Z] = vScreen[Z];
         }
         // fully disable otherwise
         else
@@ -1156,9 +1164,9 @@ void PathPath(WorldPath_t &Pth, bool Skp)
                     if(!Skp)
                     {
                         // set a temporary vScreen focus
-                        vScreen[1].tempX = lev.Location.X + lev.Location.Width / 2.0;
-                        vScreen[1].TempY = lev.Location.Y + lev.Location.Height / 2.0;
-                        vScreen[1].TempDelay = 1;
+                        vScreen[Z].tempX = lev.Location.X + lev.Location.Width / 2.0;
+                        vScreen[Z].TempY = lev.Location.Y + lev.Location.Height / 2.0;
+                        vScreen[Z].TempDelay = 1;
 
                         // update world map section (no cam sound)
                         s_worldCheckSection(WorldPlayer[1], static_cast<Location_t>(lev.Location));
@@ -1168,7 +1176,7 @@ void PathPath(WorldPath_t &Pth, bool Skp)
                         if(g_config.EnableInterLevelFade)
                         {
                             qScreen = true;
-                            qScreenLoc[1] = vScreen[1];
+                            qScreenLoc[Z] = vScreen[Z];
                         }
                         // fully disable it otherwise
                         else
