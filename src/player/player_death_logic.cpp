@@ -21,6 +21,7 @@
 #include "globals.h"
 #include "player.h"
 #include "config.h"
+#include "message.h"
 #include "script/luna/lunacounter.h"
 
 // updates the position of a player that has just died
@@ -35,7 +36,7 @@ void UpdatePlayerTimeToLive(int A)
     bool dynamic_screen = (screen.Type == ScreenTypes::Dynamic);
     bool shared_screen = (screen.Type == ScreenTypes::SharedScreen);
     bool split_screen = (screen.active_end() - screen.active_begin() > 1);
-    bool normal_multiplayer = (dynamic_screen || shared_screen || split_screen);
+    bool normal_multiplayer = (dynamic_screen || shared_screen || split_screen || XMessage::GetStatus() != XMessage::Status::local);
 
     bool player_timer_done = (Player[A].TimeToLive >= 200);
 
