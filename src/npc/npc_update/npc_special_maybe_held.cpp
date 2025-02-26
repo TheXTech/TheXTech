@@ -422,7 +422,7 @@ void NPCSpecialMaybeHeld(int A)
                     }
 
                     if(!legacy && g_config.extra_screen_shake)
-                        doShakeScreen(0, 4, SHAKE_SEQUENTIAL, 7, 150);
+                        doShakeScreen(0, 4, SHAKE_SEQUENTIAL, 7, 150, NPC[A].Location);
 
                     if(legacy) // Classic SMBX 1.0's behavior when Bowser stomps a floor
                     {

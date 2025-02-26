@@ -34,7 +34,7 @@ enum
 
 void doShakeScreen(int force, int type);
 // decay is in units of 0.001 pixels/frame (ie, 1000 is 1px decay per frame)
-void doShakeScreen(int forceX, int forceY, int type, int duration, int decay);
+void doShakeScreen(int forceX, int forceY, int type, int duration, int decay, const Location_t& source);
 void doShakeScreenClear();
 
 // Public Sub UpdateGraphics2() 'draws GFX to screen when on the world map/world map editor

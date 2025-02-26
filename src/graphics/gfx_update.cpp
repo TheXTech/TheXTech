@@ -203,10 +203,13 @@ void doShakeScreen(int force, int type)
         shake.setup(force, force, type, 0, 1000);
 }
 
-void doShakeScreen(int forceX, int forceY, int type, int duration, int decay)
+void doShakeScreen(int forceX, int forceY, int type, int duration, int decay, const Location_t& source)
 {
-    for(auto& shake : s_shakeScreen)
-        shake.setup(forceX, forceY, type, duration, decay);
+    for(int Z = 0; Z <= c_vScreenCount_visible; Z++)
+    {
+        if(Z == 0 || vScreenCollision(Z, source))
+            s_shakeScreen[Z].setup(forceX, forceY, type, duration, decay);
+    }
 }
 
 void doShakeScreenClear()

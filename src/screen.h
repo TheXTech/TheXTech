@@ -94,6 +94,7 @@ constexpr int maxNetplayClients = 8;
 constexpr int maxNetplayPlayers = maxNetplayClients * maxLocalPlayers;
 constexpr int c_screenCount = 2 * maxNetplayClients;
 constexpr int c_vScreenCount = c_screenCount * maxLocalPlayers;
+constexpr int c_vScreenCount_visible = maxNetplayClients * maxLocalPlayers;
 
 //Public vScreen(0 To 2) As vScreen 'Sets up the players screens
 extern RangeArr<vScreen_t, 0, c_vScreenCount> vScreen;
