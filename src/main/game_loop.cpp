@@ -57,6 +57,7 @@
 #include "main/record.h"
 #include "menu_main.h"
 #include "change_res.h"
+#include "message.h"
 #include "screen_pause.h"
 #include "screen_connect.h"
 #include "screen_options.h"
@@ -91,6 +92,7 @@ void updateScreenFaders()
         g_levelVScreenFader[s].update();
 }
 
+#if 0
 void levelWaitForFade()
 {
     while(!g_levelScreenFader.isComplete() && GameIsActive)
@@ -111,6 +113,7 @@ void levelWaitForFade()
             PGE_Delay(1);
     }
 }
+#endif
 
 void editorWaitForFade()
 {

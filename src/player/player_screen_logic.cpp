@@ -426,15 +426,25 @@ void PlayerLevelWrapLogic(int A)
 void PlayerOffscreenExitCheck(int A)
 {
     bool offScreenExit = false;
-    if(Player[A].Location.X + Player[A].Location.Width < level[Player[A].Section].X)
+    double nearby_left = (Player[A].Location.X + Player[A].Location.Width) - level[Player[A].Section].X;
+    double nearby_right = level[Player[A].Section].Width - Player[A].Location.X;
+    if(nearby_left < 0)
     {
         offScreenExit = true;
         for(int B = 1; B <= numPlayers; B++)
             Player[B].TailCount = 0;
     }
-    else if(Player[A].Location.X > level[Player[A].Section].Width)
+    else if(nearby_right < 0)
     {
         offScreenExit = true;
+    }
+    else if(g_config.EnableInterLevelFade)
+    {
+        int nearby = SDL_min((int)nearby_left, (int)nearby_right);
+        int fade = (32 - nearby) * 2;
+
+        if(fade > 0 && g_levelScreenFader.m_current_fade < fade && g_levelScreenFader.m_target_fade == 0 && g_levelScreenFader.m_current_fade == g_levelScreenFader.m_step)
+            g_levelScreenFader.setupFader(fade, fade, 0, ScreenFader::S_FADE);
     }
 
     if(offScreenExit)
@@ -451,13 +461,7 @@ void PlayerOffscreenExitCheck(int A)
         EndLevel = true;
         LevelMacro = LEVELMACRO_OFF;
         LevelMacroCounter = 0;
-
-        if(g_config.EnableInterLevelFade)
-            g_levelScreenFader.setupFader(4, 0, 65, ScreenFader::S_FADE);
-        else
-            g_levelScreenFader.setupFader(65, 0, 65, ScreenFader::S_FADE);
-
-        levelWaitForFade();
+        g_levelScreenFader.setupFader(65, 65, 0, ScreenFader::S_FADE);
     }
 }
 
