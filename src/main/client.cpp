@@ -64,6 +64,7 @@ void NetworkClient::Connect(const char* host, int port)
 
     tick = 0;
     buffer_used = 0;
+    num_clients = 0;
 }
 
 void NetworkClient::Disconnect(bool shutdown)
@@ -185,9 +186,17 @@ void NetworkClient::WaitAndFill()
 
             pLogInfo("Added P%d on tick %d", buffer[1] + 1, tick);
 
-            if(buffer[1] > 0)
+            // move last remaining player to new screen upon connection resumption
+            if(Screens[buffer[1]].player_count == 0 && numPlayers == 1 && num_clients == 0)
+            {
+                Screens_DropPlayer(1);
+                Screens_AssignPlayer(1, Screens[buffer[1]]);
+                SwapCharacter(1, (buffer[1] % 5) + 1);
+            }
+            else if(Screens[buffer[1]].player_count == 0)
                 AddPlayer((buffer[1] % 5) + 1, Screens[buffer[1]]);
 
+            num_clients++;
             ShiftBuffer(2);
             break;
 
@@ -195,12 +204,15 @@ void NetworkClient::WaitAndFill()
             if(!FillBufferTo(2))
                 return;
 
-            if(buffer[1] > 0)
+            for(int p = Screens[buffer[1]].player_count - 1; p >= 0; p--)
             {
-                for(int p = Screens[buffer[1]].player_count - 1; p >= 0; p--)
-                    DropPlayer(Screens[buffer[1]].players[p]);
+                if(numPlayers == 1)
+                    break;
+
+                DropPlayer(Screens[buffer[1]].players[p]);
             }
 
+            num_clients--;
             ShiftBuffer(2);
             break;
 

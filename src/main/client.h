@@ -52,6 +52,7 @@ struct NetworkClient
 {
     TCPsocket socket;
     int tick = 0;
+    int num_clients = 0;
     uint8_t buffer[network_client_buffer_size];
     size_t buffer_used = 0;
     int fast_forward_to = 0;
