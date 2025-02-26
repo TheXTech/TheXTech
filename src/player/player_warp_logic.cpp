@@ -198,39 +198,41 @@ static void s_WarpFaderLogic(bool is_reverse, int A, int transitEffect, const Lo
 
     int fade_from = (is_reverse) ? 65 :  0;
     int fade_to   = (is_reverse) ?  0 : 65;
+    int rate      = 3;
+    bool ready    = normal_ready;
 
     switch(transitEffect)
     {
     default:
         if(transitEffect >= ScreenFader::S_CUSTOM)
-            goto generic_fade_with_focus;
+            goto generic_fade;
+
     // fallthrough
     case LevelDoor::TRANSIT_SCROLL:
     case LevelDoor::TRANSIT_NONE:
-        if(none_ready)
-            fader.setupFader(g_config.EnableInterLevelFade ? 8 : 64, fade_from, fade_to, ScreenFader::S_FADE);
-        break;
+        ready = none_ready;
+        rate = (g_config.EnableInterLevelFade ? 8 : 64);
 
+    // fallthrough
     case LevelDoor::TRANSIT_FADE:
-        if(normal_ready)
-            fader.setupFader(3, fade_from, fade_to, ScreenFader::S_FADE);
-        break;
+        transitEffect = ScreenFader::S_FADE;
+        goto generic_fade;
 
     case LevelDoor::TRANSIT_CIRCLE_FADE:
         transitEffect = ScreenFader::S_CIRCLE;
-        goto generic_fade_with_focus;
+        goto generic_fade;
 
     case LevelDoor::TRANSIT_FLIP_H:
         transitEffect = ScreenFader::S_FLIP_H;
-        goto generic_fade_with_focus;
+        goto generic_fade;
 
     case LevelDoor::TRANSIT_FLIP_V:
         transitEffect = ScreenFader::S_FLIP_V;
-        goto generic_fade_with_focus;
+        goto generic_fade;
 
-    generic_fade_with_focus:
-        if(normal_ready)
-            fader.setupFader(3, fade_from, fade_to, transitEffect,
+    generic_fade:
+        if(ready)
+            fader.setupFader(rate, fade_from, fade_to, transitEffect,
                              true,
                              Maths::iRound(focus.X + focus.Width / 2),
                              Maths::iRound(focus.Y + focus.Height / 2),
