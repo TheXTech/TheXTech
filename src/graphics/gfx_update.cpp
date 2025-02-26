@@ -174,8 +174,8 @@ struct ScreenShake_t
     }
 };
 
-static ScreenShake_t s_shakeScreen;
-static bool s_forcedShakeScreen = false;
+static std::array<ScreenShake_t, c_vScreenCount_visible + 1> s_shakeScreen;
+static std::array<bool, c_vScreenCount_visible + 1> s_forcedShakeScreen{false};
 
 //static double s_shakeScreenX = 0;
 //static double s_shakeScreenY = 0;
@@ -199,17 +199,23 @@ static inline int s_round2int_plr(double d)
 
 void doShakeScreen(int force, int type)
 {
-    s_shakeScreen.setup(force, force, type, 0, 1000);
+    for(auto& shake : s_shakeScreen)
+        shake.setup(force, force, type, 0, 1000);
 }
 
 void doShakeScreen(int forceX, int forceY, int type, int duration, int decay)
 {
-    s_shakeScreen.setup(forceX, forceY, type, duration, decay);
+    for(auto& shake : s_shakeScreen)
+        shake.setup(forceX, forceY, type, duration, decay);
 }
 
 void doShakeScreenClear()
 {
-    s_shakeScreen.clear();
+    for(auto& shake : s_shakeScreen)
+        shake.clear();
+
+    for(bool& forced : s_forcedShakeScreen)
+        forced = false;
 }
 
 // some "special" logic for pet mounts, used to be in the draw code
@@ -1497,7 +1503,7 @@ void UpdateGraphicsLogic(bool Do_FrameSkip)
     CenterScreens();
 
     bool continue_qScreen = false; // will qScreen continue for any visible screen?
-    bool continue_qScreen_local = false; // will qScreen continue for a visible screen on the local machine? (NetPlay)
+    std::array<bool, maxNetplayClients> continue_qScreen_local{false}; // will qScreen continue for a visible screen on this machine? (NetPlay)
     bool continue_qScreen_canonical = false; // will qScreen continue for any canonical screen?
 
     // prepare to fill this frame's NoReset queue
@@ -1572,7 +1578,7 @@ void UpdateGraphicsLogic(bool Do_FrameSkip)
             {
                 bool continue_this_qScreen = Update_qScreen(Z);
                 continue_qScreen |= continue_this_qScreen;
-                continue_qScreen_local |= (&screen == l_screen) && continue_this_qScreen;
+                continue_qScreen_local[screen_i] |= continue_this_qScreen;
             }
 
             // the original code was badly written and made THIS happen (always exactly one frame of qScreen in 2P mode)
@@ -1766,8 +1772,10 @@ void UpdateGraphicsLogic(bool Do_FrameSkip)
             }
 
             // moved from render code because it affects the game's random state
-            // TODO: have a separate shakeScreen state per screen
-            s_shakeScreen.update();
+            s_shakeScreen[0].update();
+
+            if(g_config.fix_npc_camera_logic)
+                s_shakeScreen[Z].update();
 
         } // loop over vScreens
 
@@ -1796,19 +1804,30 @@ void UpdateGraphicsLogic(bool Do_FrameSkip)
     // use screen-shake to indicate if invisible screen is currently causing qScreen
     if(g_config.allow_multires)
     {
-        // TODO: do loop over visible screens here once s_shakeScreen, s_forcedShakeScreen, and continue_qScreen_local are separated by screen
+        for(int screen_i = 0; screen_i < maxNetplayClients; screen_i++)
+        {
+            Screen_t& screen = Screens[screen_i];
 
-        // shake screen to tell player game is currently paused (will take effect next frame)
-        if(!continue_qScreen_local && (continue_qScreen || continue_qScreen_canonical) && !s_shakeScreen.active)
-        {
-            s_forcedShakeScreen = true;
-            doShakeScreen(1, 1, SHAKE_RANDOM, 0, 0);
-        }
-        // finish forced screenshake
-        else if(!(continue_qScreen || continue_qScreen_canonical) && s_forcedShakeScreen)
-        {
-            s_forcedShakeScreen = false;
-            doShakeScreen(1, 1, SHAKE_RANDOM, 0, 100);
+            if(!screen.Visible)
+                continue;
+
+            for(int vscreen_i = screen.active_begin(); vscreen_i < screen.active_end(); vscreen_i++)
+            {
+                int Z = screen.vScreen_refs[vscreen_i];
+
+                // shake screen to tell player game is currently paused (will take effect next frame)
+                if(!continue_qScreen_local[screen_i] && (continue_qScreen || continue_qScreen_canonical) && !s_shakeScreen[Z].active)
+                {
+                    s_forcedShakeScreen[Z] = true;
+                    s_shakeScreen[Z].setup(1, 1, SHAKE_RANDOM, 0, 0);
+                }
+                // finish forced screenshake
+                else if(!(continue_qScreen || continue_qScreen_canonical) && s_forcedShakeScreen[Z])
+                {
+                    s_forcedShakeScreen[Z] = false;
+                    s_shakeScreen[Z].setup(1, 1, SHAKE_RANDOM, 0, 100);
+                }
+            }
         }
     }
 
@@ -1917,7 +1936,7 @@ void UpdateGraphicsScreen(Screen_t& screen)
         XRender::setViewport(vScreen[Z].TargetX(), vScreen[Z].TargetY(), vScreen[Z].Width, vScreen[Z].Height);
 
         // update viewport from screen shake
-        s_shakeScreen.apply();
+        s_shakeScreen[(g_config.fix_npc_camera_logic) ? Z : 0].apply();
 
         // camera offsets to add to all object positions before drawing
         int camX = vScreen[Z].CameraAddX();
