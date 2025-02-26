@@ -224,6 +224,8 @@ class Server:
                     client.sent_to += client.conn.send(self.sent_history[client.sent_to:])
                 except BlockingIOError:
                     pass
+                except ConnectionResetError:
+                    pass
 
         # increment the frame number
         self.frame_no += 1
