@@ -38,6 +38,7 @@
 #include "collision.h"
 #include "layers.h"
 #include "config.h"
+#include "message.h"
 
 #include "main/game_globals.h"
 #include "main/translate.h"
@@ -1288,7 +1289,7 @@ void PlayerEffectWarpWait(int A)
 
             const Screen_t& screen = ScreenByPlayer(A);
 
-            bool do_modern = !g_ClonedPlayerMode && (numPlayers > 2 || screen.Type == ScreenTypes::SharedScreen);
+            bool do_modern = !g_ClonedPlayerMode && (numPlayers > 2 || screen.Type == ScreenTypes::SharedScreen || XMessage::GetStatus() != XMessage::Status::local);
             if(!do_modern)
             {
                 // 2P holding condition for start warp
