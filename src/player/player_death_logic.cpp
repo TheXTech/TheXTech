@@ -222,7 +222,22 @@ void UpdatePlayerDead(int A)
         {
             Player[A].Location.X = Player[B].Location.X + Player[B].Location.Width / 2 - Player[A].Location.Width / 2;
             Player[A].Location.Y = Player[B].Location.Y + Player[B].Location.Height - Player[A].Location.Height;
-            Player[A].Section = Player[B].Section;
+
+            if(Player[B].Section != Player[A].Section)
+            {
+                int new_sect = Player[B].Section;
+
+#ifdef THEXTECH_ENABLE_SDL_NET
+                // do the music update thing here
+                if(&ScreenByPlayer(A) == l_screen && &ScreenByPlayer(B) != l_screen)
+                {
+                    if(curMusic != bgMusic[new_sect] || (curMusic == 24 && CustomMusic[new_sect] != CustomMusic[Player[A].Section]))
+                        StartMusic(new_sect);
+                }
+#endif
+
+                Player[A].Section = new_sect;
+            }
         }
     }
     else
