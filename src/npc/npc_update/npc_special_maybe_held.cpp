@@ -113,9 +113,8 @@ void NPCSpecialMaybeHeld(int A)
                 NPC[A].TimeLeft = 100;
                 if(bgMusic[NPC[A].Section] != 21)
                 {
-                    StopMusic();
                     bgMusic[NPC[A].Section] = 21;
-                    StartMusic(NPC[A].Section);
+                    StartMusicIfOnscreen(NPC[A].Section);
                 }
             }
         }

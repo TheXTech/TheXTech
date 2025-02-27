@@ -4319,8 +4319,7 @@ void SpecialNPC(int A)
             if(bgMusic[NPC[A].Section] != 6 && bgMusic[NPC[A].Section] != 15 && bgMusic[NPC[A].Section] != 21 && NPC[A].TimeLeft > 1)
             {
                 bgMusic[NPC[A].Section] = 6;
-                StopMusic();
-                StartMusic(NPC[A].Section);
+                StartMusicIfOnscreen(NPC[A].Section);
             }
         }
         if(NPC[A].Special == 0)
@@ -5341,8 +5340,7 @@ void SpecialNPC(int A)
             if(bgMusic[NPC[A].Section] != 6 && bgMusic[NPC[A].Section] != 15 && bgMusic[NPC[A].Section] != 21 && NPC[A].TimeLeft > 1)
             {
                 bgMusic[NPC[A].Section] = 15;
-                StopMusic();
-                StartMusic(NPC[A].Section);
+                StartMusicIfOnscreen(NPC[A].Section);
             }
         }
         if(NPC[A].Special >= 0)

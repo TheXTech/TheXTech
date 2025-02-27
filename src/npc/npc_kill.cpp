@@ -1181,8 +1181,7 @@ resume_TriggerLast:
                     if(!DontResetMusic)
                     {
                         bgMusic[NPC[A].Section] = bgMusicREAL[NPC[A].Section];
-                        StopMusic();
-                        StartMusic(NPC[A].Section);
+                        StartMusicIfOnscreen(NPC[A].Section);
                     }
                 }
             }
@@ -1402,8 +1401,7 @@ resume_TriggerLast:
                     if(!DontResetMusic)
                     {
                         bgMusic[NPC[A].Section] = bgMusicREAL[NPC[A].Section];
-                        StopMusic();
-                        StartMusic(Player[1].Section);
+                        StartMusicIfOnscreen(NPC[A].Section);
                     }
                 }
             }
