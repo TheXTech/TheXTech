@@ -1600,7 +1600,7 @@ void CheckSection(const int A)
     int B = 0;
     int C = 0;
     int oldSection = 0;
-    bool foundSection = false;
+    int foundSection = 0;
     auto &p = Player[A];
 
     if(LevelSelect)
@@ -1618,48 +1618,13 @@ void CheckSection(const int A)
                 {
                     if(p.Location.Y <= level[B].Height)
                     {
-                        foundSection = true;
+                        foundSection = 1;
+
                         if(oldSection != B /*&& (nPlay.Online == false || nPlay.MySlot == A - 1)*/)
                         {
-                            ClearBuffer = true;
                             p.Section = B;
 
-                            //if(nPlay.Online)
-                            //{
-                            //    if(nPlay.MySlot == A - 1)
-                            //        Netplay::sendData "1e" + std::to_string(A) + "|" + p.Section;
-                            //    else
-                            //        return;
-                            //}
-
-                            UpdateSoundFX(B);
-
-                            if(curMusic >= 0 && !GameMenu) // Dont interupt boss / switch music
-                            {
-                                if(curMusic != bgMusic[B] || (delayMusicIsSet() && bgMusic[B] != 24))
-                                {
-                                    StartMusic(B);
-                                }
-                                else if(bgMusic[B] == 24)
-                                {
-                                    if(oldSection >= 0)
-                                    {
-                                        if(CustomMusic[oldSection] != CustomMusic[p.Section])
-                                        {
-                                            StartMusic(B);
-                                        }
-                                    }
-                                }
-                            }
-
-#ifdef PGE_MIN_PORT
-                            // unload old background when changing sections (this helps prevent texture memory exhaustion)
-                            if(numPlayers == 1 && oldSection >= 0 && Background2[oldSection] != Background2[p.Section])
-                            {
-                                // (note: GFXBackground2 doesn't always line up exactly with Background2, but this solution still helps)
-                                XRender::unloadTexture(GFXBackground2[oldSection]);
-                            }
-#endif
+                            // there was a music update here that used a less strict criterion of never interrupting music tracks below 0
 
                             break;
                         }
@@ -1682,35 +1647,9 @@ void CheckSection(const int A)
                         if(p.Location.Y <= LevelREAL[B].Height)
                         {
                             p.Section = B;
+                            foundSection = 2;
 
-                            //if(nPlay.Online)
-                            //{
-                            //    if(nPlay.MySlot == A - 1)
-                            //        Netplay::sendData "1e" + std::to_string(A) + "|" + p.Section;
-                            //    else
-                            //        return;
-                            //}
-
-                            if(oldSection != B)
-                            {
-                                ClearBuffer = true;
-                                UpdateSoundFX(B);
-
-                                if(curMusic != 6 && curMusic >= 0 && curMusic != 15) // Dont interupt boss / switch music
-                                {
-                                    if(curMusic != bgMusic[B] || (delayMusicIsSet() && bgMusic[B] != 24))
-                                    {
-                                        StartMusic(B);
-                                    }
-                                    else if(bgMusic[B] == 24)
-                                    {
-                                        if(CustomMusic[B] != CustomMusic[p.Section])
-                                        {
-                                            StartMusic(B);
-                                        }
-                                    }
-                                }
-                            }
+                            // there was a music update here that used the stricter criterion of never interrupting music tracks below 0, or 6 or 15
 
                             for(C = 1; C <= numPlayers; C++)
                             {
@@ -1721,12 +1660,52 @@ void CheckSection(const int A)
                                     break;
                                 }
                             }
+
                             break;
                         }
                     }
                 }
             }
         }
+    }
+
+    // audiovisual updates
+    if(foundSection && p.Section != oldSection && !GameMenu && (&ScreenByPlayer(A) == l_screen))
+    {
+        B = p.Section;
+
+        UpdateSoundFX(B);
+
+        bool boss_track = (curMusic == 6 || curMusic == 15);
+
+        if(curMusic >= 0 && !(foundSection == 2 && boss_track)) // Dont interupt boss / switch music
+        {
+            if(curMusic != bgMusic[B] || (delayMusicIsSet() && bgMusic[B] != 24))
+            {
+                StartMusic(B);
+            }
+            else if(bgMusic[B] == 24)
+            {
+                if(oldSection >= 0)
+                {
+                    if(CustomMusic[oldSection] != CustomMusic[p.Section])
+                    {
+                        StartMusic(B);
+                    }
+                }
+            }
+        }
+
+        ClearBuffer = true;
+
+#ifdef PGE_MIN_PORT
+        // unload old background when changing sections (this helps prevent texture memory exhaustion)
+        if(numPlayers == 1 && oldSection >= 0 && Background2[oldSection] != Background2[B])
+        {
+            // (note: GFXBackground2 doesn't always line up exactly with Background2, but this solution still helps)
+            XRender::unloadTexture(GFXBackground2[oldSection]);
+        }
+#endif
     }
 }
 
