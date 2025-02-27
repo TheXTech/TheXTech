@@ -194,6 +194,7 @@ void delayedMusicReset();
 bool delayMusicIsSet();
 // play music
 void StartMusic(int A, int fadeInMs = 0);
+void StartMusicIfOnscreen(int section);
 // Public Sub StopMusic() 'stop playing music
 void PauseMusic();
 void ResumeMusic();

@@ -960,6 +960,18 @@ void StartMusic(int A, int fadeInMs)
     musicPlaying = true;
 }
 
+void StartMusicIfOnscreen(int section)
+{
+    for(int i = 0; i < l_screen->player_count; i++)
+    {
+        if(Player[l_screen->players[i]].Section == section)
+        {
+            StartMusic(section);
+            break;
+        }
+    }
+}
+
 void PauseMusic()
 {
     if(!musicPlaying || !g_mixerLoaded)

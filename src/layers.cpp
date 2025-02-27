@@ -1266,8 +1266,8 @@ eventindex_t ProcEvent_Safe(bool is_resume, eventindex_t index, int whichPlayer,
             musicChanged = true;
         }
 
-        if(musicChanged && (B == Player[1].Section || (numPlayers == 2 && B == Player[2].Section)))
-            StartMusic(B);
+        if(musicChanged)
+            StartMusicIfOnscreen(B);
 
         /* Background change */
         if(s.background_id == EventSection_t::LESet_ResetDefault)
