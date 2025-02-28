@@ -1779,8 +1779,16 @@ void NextLevel()
     XRender::repaint();
     XEvents::doEvents();
 
-    if(!TestLevel && GoToLevel.empty() && !NoMap && !g_config.unlimited_framerate)
-        PGE_Delay(500);
+    if(!TestLevel && GoToLevel.empty() && !NoMap)
+    {
+        if(XMessage::GetStatus() != XMessage::Status::local)
+        {
+            for(int i = 0; i < 32; i++)
+                Controls::Update(false);
+        }
+        else if(!g_config.unlimited_framerate)
+            PGE_Delay(500);
+    }
 
     if(BattleMode && !LevelEditor && !TestLevel)
     {
