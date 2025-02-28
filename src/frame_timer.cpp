@@ -29,6 +29,7 @@
 #include "globals.h"
 #include "config.h"
 #include "graphics.h"
+#include "message.h"
 #include "core/render.h"
 #include "core/events.h"
 
@@ -634,7 +635,9 @@ void runFrameLoop(LoopCall_t doLoopCallbackPre,
         if(preTimerExtraPre)
             preTimerExtraPre();
 
-        XEvents::doEvents();
+        if(XMessage::GetStatus() != XMessage::Status::replay)
+            XEvents::doEvents();
+
         s_currentTicks = SDL_GetTicks();
 
         if(preTimerExtraPost)
@@ -650,7 +653,9 @@ void runFrameLoop(LoopCall_t doLoopCallbackPre,
 
             if(doLoopCallbackPost)
                 doLoopCallbackPost(); // Run the loop callback
-            XEvents::doEvents();
+
+            if(XMessage::GetStatus() != XMessage::Status::replay)
+                XEvents::doEvents();
 
             COMPUTE_FRAME_TIME_2_REAL();
 

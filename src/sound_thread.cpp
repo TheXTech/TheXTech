@@ -26,6 +26,8 @@
 #include <SDL2/SDL_mutex.h>
 
 #include "sound.h"
+#include "config.h"
+#include "message.h"
 #include "sound_thread.h"
 
 struct EnqueuedSfx_t
@@ -78,6 +80,9 @@ static int s_sound_thread_main(void*)
 
 void PlaySfx(int Alias, int loops, int volume, uint8_t left, uint8_t right)
 {
+    if((int)g_config.audio_sfx_volume == 0 || XMessage::GetStatus() == XMessage::Status::replay)
+        return;
+
     if(!s_sound_thread)
     {
         PlaySfx_Blocking(Alias, loops, volume, left, right);

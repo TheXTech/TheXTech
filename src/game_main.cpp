@@ -56,6 +56,7 @@
 #include "gfx.h"
 
 #include "config.h"
+#include "message.h"
 #include "frame_timer.h"
 #include "blocks.h"
 #include "change_res.h"
@@ -1228,9 +1229,12 @@ int GameMain(const CmdLineSetup_t &setup)
 
                 LevelSelect = false;
 
-                XRender::setTargetTexture();
-                XRender::clearBuffer();
-                XRender::repaint();
+                if(XMessage::GetStatus() != XMessage::Status::replay)
+                {
+                    XRender::setTargetTexture();
+                    XRender::clearBuffer();
+                    XRender::repaint();
+                }
 
                 lunaReset();
                 ResetSoundFX();
@@ -1262,7 +1266,7 @@ int GameMain(const CmdLineSetup_t &setup)
                 {
                     GameThing(1000, 3);
                 }
-                else
+                else if(XMessage::GetStatus() != XMessage::Status::replay)
                 {
                     XRender::setTargetTexture();
                     XRender::clearBuffer();
@@ -1774,10 +1778,14 @@ void NextLevel()
     lunaReset();
     ResetSoundFX();
     ClearLevel();
-    XRender::setTargetTexture();
-    XRender::clearBuffer();
-    XRender::repaint();
-    XEvents::doEvents();
+
+    if(XMessage::GetStatus() != XMessage::Status::replay)
+    {
+        XRender::setTargetTexture();
+        XRender::clearBuffer();
+        XRender::repaint();
+        XEvents::doEvents();
+    }
 
     if(!TestLevel && GoToLevel.empty() && !NoMap)
     {
@@ -1924,7 +1932,9 @@ void UpdateMacro()
             EndLevel = true;
             LevelMacro = LEVELMACRO_OFF;
             LevelMacroCounter = 0;
-            XRender::clearBuffer();
+
+            if(XMessage::GetStatus() != XMessage::Status::replay)
+                XRender::clearBuffer();
         }
     }
     else if(LevelMacro == LEVELMACRO_KEYHOLE_EXIT)
@@ -1957,7 +1967,9 @@ void UpdateMacro()
             LevelMacro = LEVELMACRO_OFF;
             LevelMacroWhich = 0;
             LevelMacroCounter = 0;
-            XRender::clearBuffer();
+
+            if(XMessage::GetStatus() != XMessage::Status::replay)
+                XRender::clearBuffer();
         }
     }
     else if(LevelMacro == LEVELMACRO_CRYSTAL_BALL_EXIT)
@@ -1988,7 +2000,9 @@ void UpdateMacro()
             EndLevel = true;
             LevelMacro = LEVELMACRO_OFF;
             LevelMacroCounter = 0;
-            XRender::clearBuffer();
+
+            if(XMessage::GetStatus() != XMessage::Status::replay)
+                XRender::clearBuffer();
         }
     }
     else if(LevelMacro == LEVELMACRO_GAME_COMPLETE_EXIT)
@@ -2030,7 +2044,9 @@ void UpdateMacro()
                 MenuMode = MENU_INTRO;
                 MenuCursor = 0;
             }
-            XRender::clearBuffer();
+
+            if(XMessage::GetStatus() != XMessage::Status::replay)
+                XRender::clearBuffer();
         }
     }
     else if(LevelMacro == LEVELMACRO_STAR_EXIT) // Star Exit
