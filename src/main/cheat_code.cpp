@@ -859,7 +859,7 @@ static void becomeAsLuigi()
 
 static int findLivingForCheat()
 {
-    if(!g_ClonedPlayerMode && numPlayers != l_screen->player_count)
+    if(!g_ClonedPlayerMode && numPlayers != Screens[0].player_count)
     {
         PlaySound(SFX_BlockHit);
         return false;
@@ -870,8 +870,8 @@ static int findLivingForCheat()
 
 static void setScreenPlayers(int count)
 {
-    l_screen->player_count = count;
-    l_screen->players = {1, 2, 3, 4};
+    Screens[0].player_count = count;
+    Screens[0].players = {1, 2, 3, 4};
     UpdateScreenPlayers();
 }
 
