@@ -419,8 +419,10 @@ static void wetWater()
 
     PlaySound(SFX_Transform);
 
-    for(int B = 1; B <= numPlayers; B++)
+    for(int i = 0; i < l_screen->player_count; i++)
     {
+        int B = l_screen->players[i];
+
         if(!Player[B].Dead && Player[B].TimeToLive == 0)
         {
             StopMusic();
