@@ -27,6 +27,7 @@
 
 #include <cstdint>
 #include <cstddef>
+#include <climits>
 #include <SDL_net.h>
 
 #include "message.h"
@@ -55,7 +56,8 @@ struct NetworkClient
     int num_clients = 0;
     uint8_t buffer[network_client_buffer_size];
     size_t buffer_used = 0;
-    int fast_forward_to = 0;
+    int fast_forward_to = INT_MAX;
+    uint32_t start_fast_forward = 0;
 
     bool sdlnet_inited = false;
 

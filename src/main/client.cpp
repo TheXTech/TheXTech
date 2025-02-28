@@ -25,9 +25,11 @@
 #include "player.h"
 #include "config.h"
 #include "change_res.h"
+#include "sound.h"
 
 #include "message.h"
 #include "main/client.h"
+#include "main/screen_progress.h"
 
 
 namespace XMessage
@@ -255,6 +257,13 @@ void NetworkClient::WaitAndFill()
             }
 
             tick++;
+
+            // start playing music when no longer fast forwarding
+            if(tick == fast_forward_to)
+                UpdateMusicVolume();
+            else if(tick < fast_forward_to)
+                IndicateProgress(start_fast_forward, (double)tick / fast_forward_to, "Loading game history...");
+
             return;
 
         case(HEADER_YOU_ARE):
@@ -288,6 +297,7 @@ void NetworkClient::WaitAndFill()
             ShiftBuffer(4);
 
             fast_forward_to = frame_no;
+            start_fast_forward = SDL_GetTicks();
             return;
 
         default:
