@@ -1577,12 +1577,34 @@ resume_SwitchOff:
             if(PSwitch(false))
                 return true;
 
-            StopMusic();
-            StartMusic(Player[PSwitchPlayer].Section);
+            SwitchEndResumeMusic();
         }
     }
 
     return false;
+}
+
+void SwitchEndResumeMusic()
+{
+    StopMusic();
+
+    int switch_player_section = Player[PSwitchPlayer].Section;
+
+#ifndef THEXTECH_ENABLE_SDL_NET
+    // originally, just used section of the player that triggered the switch
+    StartMusic(switch_player_section);
+#else
+    // now, prefer that section if it's onscreen, but fallback to section of first onscreen player
+    for(int i = l_screen->player_count - 1; i >= 0; i--)
+    {
+        int pi_section = Player[l_screen->players[i]].Section;
+        if(i == 0 || pi_section == switch_player_section)
+        {
+            StartMusic(pi_section);
+            return;
+        }
+    }
+#endif
 }
 
 bool PSwitch(bool enabled)

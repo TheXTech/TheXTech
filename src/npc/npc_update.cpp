@@ -215,8 +215,7 @@ bool UpdateNPCs()
         if(PSwitchStop <= 0)
         {
             FreezeNPCs = false;
-            StopMusic();
-            StartMusic(Player[PSwitchPlayer].Section);
+            SwitchEndResumeMusic();
         }
     }
 
