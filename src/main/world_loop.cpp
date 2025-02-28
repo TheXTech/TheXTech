@@ -630,6 +630,7 @@ resume_from_pause:
                             StopMusic();
                             PlaySound(SFX_LevelSelect);
 
+                            // NOTE: this is TheXTech's timing. For TAS Mode 3: SMBX 1.3's timing waits 33 fewer frames (33 * 15.6 fewer ms).
                             int GameThingTicks = 1000;
 
                             if(g_config.EnableInterLevelFade)
