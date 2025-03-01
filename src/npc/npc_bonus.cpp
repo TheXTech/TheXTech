@@ -29,6 +29,7 @@
 #include "../player.h"
 #include "../game_main.h"
 #include "../core/events.h"
+#include "main/game_globals.h"
 #include "../config.h"
 #include "../layers.h"
 
@@ -208,6 +209,8 @@ static void s_MovePlayersToExit(int got_exit_A)
         p_C.Effect = PLREFF_WAITING;
         p_C.Effect2 = -got_exit_A;
     }
+
+    clearScreenFaders();
 }
 
 void CollectMedal(const NPC_t& medal)
