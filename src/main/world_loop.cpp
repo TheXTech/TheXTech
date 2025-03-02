@@ -36,11 +36,12 @@
 #include "../core/events.h"
 #include "../config.h"
 #include "gfx.h"
-#include "world_globals.h"
-#include "level_file.h"
-#include "speedrunner.h"
-#include "screen_quickreconnect.h"
-#include "screen_connect.h"
+#include "message.h"
+#include "main/world_globals.h"
+#include "main/level_file.h"
+#include "main/speedrunner.h"
+#include "main/screen_quickreconnect.h"
+#include "main/screen_connect.h"
 #include "main/game_strings.h"
 #include "graphics/gfx_world.h"
 
@@ -273,7 +274,7 @@ void WorldLoop()
     {
         QuickReconnectScreen::g_active = true;
 
-        if(g_config.allow_drop_add)
+        if(g_config.allow_drop_add && XMessage::GetStatus() == XMessage::Status::local)
             PauseGame(PauseCode::DropAdd, 0);
     }
 
