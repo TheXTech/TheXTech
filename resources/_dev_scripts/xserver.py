@@ -30,49 +30,73 @@ HEADER_FRAME_COMPLETE = 4
 HEADER_YOU_ARE = 5
 HEADER_RAND_SEED = 6
 HEADER_TIME_IS = 7
+# HEADER_ROOM_KEY = 8
 
 class Connection:
-    def __init__(self, parent, id, conn, address):
-        self.parent = parent
-        self.id = id
+    def __init__(self, server, conn, address):
+        self.server = server
         self.conn = conn
         self.address = address
 
+        # room state
+        self.room = None
+        self.id = id
         self.sent_to = -1
 
-    def read(self, conn):
+    def set_room(self, room, id):
+        self.room = room
+        self.id = id
+        self.sent_to = -1
+
+    def read_in_room(self):
         # conn is the socket object
-        header = conn.recv(4)
+        header = self.conn.recv(4)
         if len(header) != 4:
-            self.parent.kill(self, conn)
+            self.room.kill(self)
             return
 
         frame_no = header[0] * 256 * 256 + header[1] * 256 + header[2]
         event_length = header[3]
 
         if event_length > 0:
-            event_text = conn.recv(event_length)
+            event_text = self.conn.recv(event_length)
 
             if len(event_text) != event_length:
-                self.parent.kill(self, conn)
+                self.room.kill(self)
                 return
         else:
             event_text = bytes()
 
-        self.parent.enqueue_text_event(frame_no, self.id, event_text)
+        self.room.enqueue_text_event(frame_no, self.id, event_text)
 
-class Server:
-    def __init__(self, bind_address, bind_port, frame_length):
-        # this object will tell us when any network events have occurred
+    def read(self):
+        if self.room is not None:
+            self.read_in_room()
+            return
+
+class Room:
+    def __init__(self, server, room_key):
+        # reference to the main server
+        self.server = server
+        self.frame_length = self.server.frame_length
+
+        # this object will tell us when any network events have occurred for this room's clients
         self.selector = selectors.DefaultSelector()
 
-        # this is the TCP server socket
-        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.socket.bind((bind_address, bind_port))
-        self.socket.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
-        self.socket.listen(100)
-        self.socket.setblocking(False)
-        self.selector.register(self.socket, selectors.EVENT_READ, self.accept)
+        # room information
+        self.room_key = room_key
+        assert(len(room_key) == 4)
+
+        self.engine_hash = b'\0\0\0\0'
+        self.asset_hash = b'\0\0\0\0'
+        self.content_hash = b'\0\0\0\0'
+
+        # room state
+        self.frame_no = 0
+        self.sent_history = bytes([HEADER_RAND_SEED, random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)])
+
+        # this is a list of clients added by the main thread
+        self.added_clients = []
 
         # this is a list of clients
         self.clients = []
@@ -80,12 +104,7 @@ class Server:
         self.newly_freed_clients = set()
 
         # this is the current frame, and a queue of events
-        self.frame_length = frame_length
-        self.frame_no = 0
         self.event_queue = []
-
-        # this is everything that has been sent, for fast-forwarding newly-connected clients
-        self.sent_history = bytes([HEADER_RAND_SEED, random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)])
 
     def enqueue_text_event(self, frame_no, id, event_text):
         # force event to happen in future (if client has lag)
@@ -104,10 +123,12 @@ class Server:
         # add to queue
         heapq.heappush(self.event_queue, (frame_no, serialized_event))
 
-    def kill(self, client, conn):
+    def unregister(self, client):
         # free client's network state
-        self.selector.unregister(conn)
-        conn.close()
+        try:
+            self.selector.unregister(client.conn)
+        except KeyError:
+            pass
 
         # get client's ID
         dead_id = client.id
@@ -126,12 +147,11 @@ class Server:
         # mark client as newly dead (can't re-use ID this frame)
         self.newly_freed_clients.add(dead_id)
 
-    def accept(self, sock):
-        # create and set up the new socket
-        conn, address = sock.accept()
-        conn.setblocking(False)
-        conn.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
+    def kill(self, client):
+        self.unregister(client)
+        client.conn.close()
 
+    def add(self, client):
         # find an ID and slot for the client
         if self.freed_clients:
             new_id = min(self.freed_clients)
@@ -140,26 +160,36 @@ class Server:
             new_id = len(self.clients)
             self.clients.append(None)
 
-        # create the client object
-        new_client = Connection(self, new_id, conn, address)
-        self.clients[new_id] = new_client
-
-        print(f"Debug: creating new Connection with ID {new_id}")
-
-        # send the client the current history (this should not be done on the main thread in general)
-        new_client.conn.sendall(bytes([HEADER_YOU_ARE, new_id,
-            HEADER_TIME_IS, self.frame_no // (256 * 256), (self.frame_no // 256) % 256, self.frame_no % 256]))
-        new_client.sent_to = 0
-
-        # register this socket's events to go to the client
-        self.selector.register(conn, selectors.EVENT_READ, new_client.read)
+        # add the client to the room
+        client.set_room(self, new_id)
+        self.clients[new_id] = client
 
         # create join event and add to queue
         serialized_event = bytes([HEADER_CLIENT_JOIN, new_id])
         heapq.heappush(self.event_queue, (self.frame_no, serialized_event))
 
+        # tell the client who they are, what the current time is, and the room's key (may throw)
+        client.conn.sendall(bytes([HEADER_YOU_ARE, new_id,
+            HEADER_TIME_IS, self.frame_no // (256 * 256), (self.frame_no // 256) % 256, self.frame_no % 256,
+            # HEADER_ROOM_KEY]) + self.room_key)
+            ]))
+        client.sent_to = 0
+
+        # register this socket's events to go to the client
+        self.selector.register(client.conn, selectors.EVENT_READ, client.read)
+
     def process_frame(self):
         # print(f"Debug: starting processing for frame {self.frame_no}")
+
+        # thread-safe way of adopting added clients queue
+        added_clients = self.added_clients
+        self.added_clients = []
+
+        for client in added_clients:
+            try:
+                self.add(client)
+            except Exception:
+                self.kill(client)
 
         # sync all network events
         events = self.selector.select(0)
@@ -168,9 +198,9 @@ class Server:
             # mask is the event that was triggered (always selectors.EVENT_READ)
             callback = key.data
             try:
-                callback(key.fileobj)
+                callback()
             except Exception:
-                self.kill(callback.__self__, key.fileobj)
+                self.kill(callback.__self__)
 
         # combine all events from this frame
         serialized_events = bytes()
@@ -248,99 +278,80 @@ class Server:
                 time.sleep(self.frame_length - proc_time)
 
 
-class Client:
-    def __init__(self, connect_address, connect_port):
-        # this is the TCP client socket
+class Server:
+    def __init__(self, bind_address, bind_port, frame_length):
+        self.frame_length = frame_length
+
+        # this object will tell us when any network events have occurred
+        self.selector = selectors.DefaultSelector()
+
+        # this is the TCP server socket
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.socket.connect((connect_address, connect_port))
-        self.socket.setblocking(True)
+        self.socket.bind((bind_address, bind_port))
+        self.socket.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
+        self.socket.listen(100)
+        self.socket.setblocking(False)
+        self.selector.register(self.socket, selectors.EVENT_READ, self.accept)
 
-        # this is the current frame
-        self.frame_no = 0
+        # list of loaded rooms
+        self.loaded_rooms = {}
 
-        # this is a list of text events to be sent for the next frame
-        self.text_queue = []
+    def create_room(self):
+        self.loaded_rooms['\0\0\0\0'] = Room(self, '\0\0\0\0')
 
-        # this tracks whether CTRL-C has been pressed yet
-        self.quit = False
+        # daemon = True for now, eventually we'll do something nice with "shutdown"
+        threading.Thread(target=self.loaded_rooms['\0\0\0\0'].frame_loop, daemon=True).start()
 
-    def process_frame(self):
-        # send any enqueued events
-        for event_text in self.text_queue:
-            if len(event_text) > 255:
-                print(f"Warning: truncating text of length {len(event_text)} to 255 characters.")
-                event_text = event_text[:255]
+    def accept(self):
+        # create and set up the new socket
+        conn, address = self.socket.accept()
+        conn.setblocking(False)
+        conn.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
 
-            serialized_text = bytes([self.frame_no // (256 * 256), (self.frame_no // 256) % 256, self.frame_no % 256, len(event_text)]) + event_text
-            self.socket.sendall(serialized_text)
+        # add a client
+        new_client = Connection(self, conn, address)
 
-        self.text_queue = []
+        # wait for events on this client
+        # self.selector.register(new_client.conn, selectors.EVENT_READ, new_client.read)
 
-        # read events until we hit a frame end
-        while True:
-            header_byte = self.socket.recv(1)
+        # temporary half-measure
+        if not self.loaded_rooms:
+            self.create_room()
 
-            if not header_byte:
-                self.socket.close()
-                self.quit = True
-                print(f'Warning: socket closed')
-                return
+        self.loaded_rooms['\0\0\0\0'].added_clients.append(new_client)
 
-            if header_byte[0] == HEADER_FRAME_COMPLETE:
-                frame = self.socket.recv(3)
-                frame_no = frame[0] * 256 * 256 + frame[1] * 256 + frame[2]
-                break
-            elif header_byte[0] == HEADER_CLIENT_JOIN:
-                client_no = self.socket.recv(1)[0]
-                print(f'Debug: client {client_no} joined on frame {self.frame_no}')
-            elif header_byte[0] == HEADER_CLIENT_LOSS:
-                client_no = self.socket.recv(1)[0]
-                print(f'Debug: client {client_no} left on frame {self.frame_no}')
-            elif header_byte[0] == HEADER_TEXT_EVENT:
-                client_no, length = self.socket.recv(2)
-                event_text = self.socket.recv(length)
-                print(f'Info: got event {event_text} from {client_no} on frame {self.frame_no}')
-
-        if frame_no != self.frame_no:
-            print(f'Warning: expected frame_no {self.frame_no}, got {frame_no}')
-            self.frame_no = frame_no
-
-        self.frame_no += 1
-
-    def ui_thread(self):
-        while not self.quit:
-            try:
-                text = input().strip().encode()
-            except KeyboardInterrupt:
-                self.quit = True
-                break
-
-            if not text:
-                continue
-
-            self.text_queue.append(text)
-
-
-    def frame_loop(self):
-        ui_thread = threading.Thread(target=self.ui_thread, daemon=True)
-        ui_thread.start()
-
+    def unregister(self, client):
         try:
-            while not self.quit:
-                self.process_frame()
-        except KeyboardInterrupt:
-            self.quit = True
-        finally:
-            self.socket.close()
+            self.selector.unregister(client.conn)
+        except KeyError:
+            pass
+
+    def kill(self, client):
+        self.unregister(client)
+        client.conn.close()
+
+    def process(self):
+        # sync all network events
+        events = self.selector.select(None)
+
+        for key, mask in events:
+            # mask is the event that was triggered (always selectors.EVENT_READ)
+            callback = key.data
+            try:
+                callback()
+            except Exception:
+                # don't kill self on failed except, just ignore
+                if callback.__self__ is not self:
+                    self.kill(callback.__self__)
+
+    def main_loop(self):
+        while True:
+            self.process()
+
 
 # this is what happens when you run the script directly
 if __name__ == '__main__':
     import sys
 
-    if len(sys.argv) >= 2 and sys.argv[1] == 'server':
-        server = Server(sys.argv[2] if len(sys.argv) >= 3 else 'localhost', 4305, 0.015)
-        server.frame_loop()
-    else:
-        client = Client(sys.argv[1] if len(sys.argv) >= 2 else 'localhost', 4305)
-        client.frame_loop()
-        print('Program terminated')
+    server = Server(sys.argv[1] if len(sys.argv) >= 2 else '0.0.0.0', 4305, 0.0156)
+    server.main_loop()
