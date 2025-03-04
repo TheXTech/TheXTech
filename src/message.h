@@ -69,8 +69,8 @@ void PushControls(int l_player_i, const Controls_t& controls);
 
 #ifdef THEXTECH_ENABLE_SDL_NET
 
+// defined in client_methods.cpp
 Status GetStatus();
-void Connect(const char* host, int port);
 
 #else // #ifdef THEXTECH_ENABLE_SDL_NET
 

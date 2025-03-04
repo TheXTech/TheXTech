@@ -21,6 +21,7 @@ import time
 import heapq
 import threading
 import random
+import os
 
 # roughly, an enum of header bytes for events
 HEADER_CLIENT_JOIN = 1
@@ -30,7 +31,27 @@ HEADER_FRAME_COMPLETE = 4
 HEADER_YOU_ARE = 5
 HEADER_RAND_SEED = 6
 HEADER_TIME_IS = 7
-# HEADER_ROOM_KEY = 8
+HEADER_LEFT_ROOM = 8
+
+HEADER_ROOM_KEY = 9
+HEADER_ROOM_INFO = 10
+
+HEADER_CREATE_ROOM = 11
+HEADER_JOIN_ROOM = 12
+
+def display_room_key(room_key):
+    if len(room_key) != 4:
+        return ''
+
+    room_key_int = (room_key[0] << 24) + (room_key[1] << 16) + (room_key[2] << 8) + (room_key[3] << 0)
+
+    if (room_key_int & (192 << 24)):
+        return ''
+
+    chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ346789'
+
+    letters = ''.join([chars[(room_key_int >> off) % 32] for off in (25, 20, 15, 10, 5, 0)])
+    return letters[:3] + '-' + letters[3:]
 
 class Connection:
     def __init__(self, server, conn, address):
@@ -40,7 +61,7 @@ class Connection:
 
         # room state
         self.room = None
-        self.id = id
+        self.id = 0
         self.sent_to = -1
 
     def set_room(self, room, id):
@@ -53,6 +74,15 @@ class Connection:
         header = self.conn.recv(4)
         if len(header) != 4:
             self.room.kill(self)
+            return
+
+        if header == b'\0\0\0\0':
+            self.room.unregister(self)
+
+            self.room = None
+            self.server.register(self)
+
+            self.conn.sendall(bytes([HEADER_LEFT_ROOM]))
             return
 
         frame_no = header[0] * 256 * 256 + header[1] * 256 + header[2]
@@ -69,10 +99,53 @@ class Connection:
 
         self.room.enqueue_text_event(frame_no, self.id, event_text)
 
+    def read_in_lobby(self):
+        header = self.conn.recv(1)
+        if len(header) != 1:
+            self.server.kill(self)
+            return
+
+        if header[0] == HEADER_ROOM_INFO:
+            room_key = self.conn.recv(4)
+            if len(room_key) != 4:
+                self.server.kill(self)
+                return
+
+            room = self.server.load_room(room_key)
+            if not room:
+                self.conn.sendall(bytes([HEADER_ROOM_INFO]) + b'\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0')
+
+            self.conn.sendall(bytes([HEADER_ROOM_INFO]) + room.room_key + room.room_info)
+        elif header[0] == HEADER_JOIN_ROOM:
+            room_key = self.conn.recv(4)
+            if len(room_key) != 4:
+                self.server.kill(self)
+                return
+
+            room = self.server.load_room(room_key)
+            if not room:
+                self.conn.sendall(bytes([HEADER_ROOM_KEY]) + b'\0\0\0\0')
+                return
+
+            self.server.unregister(self)
+            room.add(self)
+        elif header[0] == HEADER_CREATE_ROOM:
+            room_info = self.conn.recv(12)
+
+            room = self.server.create_room(room_info)
+            if not room:
+                self.conn.sendall(bytes([HEADER_ROOM_KEY]) + b'\0\0\0\0')
+                return
+
+            self.server.unregister(self)
+            room.add(self)
+
     def read(self):
         if self.room is not None:
             self.read_in_room()
             return
+
+        self.read_in_lobby()
 
 class Room:
     def __init__(self, server, room_key):
@@ -87,9 +160,7 @@ class Room:
         self.room_key = room_key
         assert(len(room_key) == 4)
 
-        self.engine_hash = b'\0\0\0\0'
-        self.asset_hash = b'\0\0\0\0'
-        self.content_hash = b'\0\0\0\0'
+        self.room_info = b'\0\0\0\0\0\0\0\0\0\0\0\0'
 
         # room state
         self.frame_no = 0
@@ -97,6 +168,9 @@ class Room:
 
         # this is a list of clients added by the main thread
         self.added_clients = []
+        self.kill_timer = 0
+        self.killed = False
+        self.kill_lock = threading.Lock()
 
         # this is a list of clients
         self.clients = []
@@ -169,9 +243,10 @@ class Room:
         heapq.heappush(self.event_queue, (self.frame_no, serialized_event))
 
         # tell the client who they are, what the current time is, and the room's key (may throw)
-        client.conn.sendall(bytes([HEADER_YOU_ARE, new_id,
+        client.conn.sendall(bytes([
+            HEADER_ROOM_KEY, self.room_key[0], self.room_key[1], self.room_key[2], self.room_key[3],
+            HEADER_YOU_ARE, new_id,
             HEADER_TIME_IS, self.frame_no // (256 * 256), (self.frame_no // 256) % 256, self.frame_no % 256,
-            # HEADER_ROOM_KEY]) + self.room_key)
             ]))
         client.sent_to = 0
 
@@ -293,14 +368,68 @@ class Server:
         self.socket.setblocking(False)
         self.selector.register(self.socket, selectors.EVENT_READ, self.accept)
 
-        # list of loaded rooms
+        # dictionary of loaded rooms
         self.loaded_rooms = {}
+        self.room_insertion_lock = threading.Lock()
 
-    def create_room(self):
-        self.loaded_rooms['\0\0\0\0'] = Room(self, '\0\0\0\0')
+        # directory to store saved rooms
+        self.room_directory = '/tmp/py'
+        os.makedirs(self.room_directory, exist_ok=True)
 
-        # daemon = True for now, eventually we'll do something nice with "shutdown"
-        threading.Thread(target=self.loaded_rooms['\0\0\0\0'].frame_loop, daemon=True).start()
+    def insert_room(self, new_room):
+        with self.room_insertion_lock:
+            if not new_room.room_key in self.loaded_rooms:
+                self.loaded_rooms[new_room.room_key] = new_room
+                threading.Thread(target=new_room.frame_loop, daemon=True).start()
+
+    def create_room(self, room_info):
+        while True:
+            room_key = bytes([random.randint(0, 63), random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)])
+            display_key = display_room_key(room_key)
+
+            if room_key == b'\0\0\0\0':
+                continue
+
+            try:
+                open(self.room_directory + display_key, 'x').close()
+            except FileExistsError:
+                pass
+            else:
+                break
+
+        print("Creating room", display_key)
+
+        new_room = Room(self, room_key)
+        new_room.room_info = room_info
+        self.insert_room(new_room)
+
+        return new_room
+
+    def load_room(self, room_key):
+        display_key = display_room_key(room_key)
+
+        try:
+            room = self.loaded_rooms[room_key]
+
+            with room.kill_lock:
+                if not room.killed:
+                    room.kill_timer = 0
+                    return room
+
+            room = None
+        except KeyError:
+            pass
+
+        display_key = display_room_key(room_key)
+
+        if not display_key or not os.path.exists(self.room_directory + display_key) or os.path.getsize(self.room_directory + display_key) == 0:
+            return None
+
+        loading_room = Room(self, room_key)
+        loading_room.load_from_file()
+
+        self.insert_room(loading_room)
+        return self.loaded_rooms[room_key]
 
     def accept(self):
         # create and set up the new socket
@@ -312,13 +441,7 @@ class Server:
         new_client = Connection(self, conn, address)
 
         # wait for events on this client
-        # self.selector.register(new_client.conn, selectors.EVENT_READ, new_client.read)
-
-        # temporary half-measure
-        if not self.loaded_rooms:
-            self.create_room()
-
-        self.loaded_rooms['\0\0\0\0'].added_clients.append(new_client)
+        self.selector.register(new_client.conn, selectors.EVENT_READ, new_client.read)
 
     def unregister(self, client):
         try:
@@ -340,7 +463,7 @@ class Server:
             try:
                 callback()
             except Exception:
-                # don't kill self on failed except, just ignore
+                # don't kill self on failed accept, just ignore
                 if callback.__self__ is not self:
                     self.kill(callback.__self__)
 

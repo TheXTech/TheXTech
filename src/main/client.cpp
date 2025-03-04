@@ -67,6 +67,10 @@ void NetworkClient::Connect(const char* host, int port)
     tick = 0;
     buffer_used = 0;
     num_clients = 0;
+
+    room_key = 0;
+    requested_join_room_key = 0;
+    queried_room_info = nullptr;
 }
 
 void NetworkClient::Disconnect(bool shutdown)
@@ -76,6 +80,7 @@ void NetworkClient::Disconnect(bool shutdown)
 
     SDLNet_TCP_Close(socket);
     socket = nullptr;
+    room_key = 0;
 
     if(shutdown)
         return;
@@ -142,6 +147,16 @@ bool NetworkClient::ParseMessage(int client_no, const uint8_t* message, size_t l
 
     XMessage::PushMessage_Direct(got);
     return true;
+}
+
+void NetworkClient::LeaveRoom()
+{
+    if(!socket || !room_key)
+        return;
+
+    uint8_t to_send[4] = {0,0,0,0};
+
+    SDLNet_TCP_Send(socket, to_send, 4);
 }
 
 void NetworkClient::SendAll()
@@ -298,6 +313,13 @@ void NetworkClient::WaitAndFill()
 
             fast_forward_to = frame_no;
             start_fast_forward = SDL_GetTicks();
+            break;
+
+        case(HEADER_LEFT_ROOM):
+            ShiftBuffer(1);
+
+            room_key = 0;
+
             return;
 
         default:
@@ -306,6 +328,123 @@ void NetworkClient::WaitAndFill()
             return;
         }
     }
+}
+
+void NetworkClient::_FinishRequestFillRoomInfo()
+{
+    if(!queried_room_info)
+        return;
+
+    if(!FillBufferTo(1))
+        return;
+
+    if(buffer[0] != HEADER_ROOM_INFO)
+    {
+        Disconnect();
+        return;
+    }
+
+    if(!FillBufferTo(17))
+        return;
+
+    uint32_t got_room_key = ((uint32_t)buffer[1] << 24) | ((uint32_t)buffer[2] << 16) | ((uint32_t)buffer[3] << 8) | ((uint32_t)buffer[4] << 0);
+
+    if(got_room_key != queried_room_info->room_key && got_room_key != 0)
+    {
+        pLogWarning("Got room info for unexpected room");
+        Disconnect();
+    }
+
+    uint32_t engine_hash = ((uint32_t)buffer[5] << 24) | ((uint32_t)buffer[6] << 16) | ((uint32_t)buffer[7] << 8) | ((uint32_t)buffer[8] << 0);
+    uint32_t asset_hash = ((uint32_t)buffer[9] << 24) | ((uint32_t)buffer[10] << 16) | ((uint32_t)buffer[11] << 8) | ((uint32_t)buffer[12] << 0);
+    uint32_t content_hash = ((uint32_t)buffer[13] << 24) | ((uint32_t)buffer[14] << 16) | ((uint32_t)buffer[15] << 8) | ((uint32_t)buffer[16] << 0);
+
+    ShiftBuffer(17);
+
+    queried_room_info->engine_hash = engine_hash;
+    queried_room_info->asset_hash = asset_hash;
+    queried_room_info->content_hash = content_hash;
+    queried_room_info->room_key = got_room_key;
+}
+
+void NetworkClient::RequestFillRoomInfo(RoomInfo& room_info)
+{
+    if(!socket)
+        return;
+
+    std::array<uint8_t, 5> to_send =
+    {
+        HEADER_ROOM_INFO,
+        uint8_t(room_info.room_key >> 24), uint8_t(room_info.room_key >> 16), uint8_t(room_info.room_key >> 8), uint8_t(room_info.room_key >> 0),
+    };
+
+    SDLNet_TCP_Send(socket, to_send.data(), to_send.size());
+    queried_room_info = &room_info;
+
+    _FinishRequestFillRoomInfo();
+}
+
+void NetworkClient::_FinishJoinRoom()
+{
+    if(!FillBufferTo(1))
+        return;
+
+    if(buffer[0] != HEADER_ROOM_KEY)
+    {
+        Disconnect();
+        return;
+    }
+
+    if(!FillBufferTo(5))
+        return;
+
+    room_key = ((uint32_t)buffer[1] << 24) | ((uint32_t)buffer[2] << 16) | ((uint32_t)buffer[3] << 8) | ((uint32_t)buffer[4] << 0);
+
+    ShiftBuffer(5);
+
+    if(requested_join_room_key && room_key != requested_join_room_key)
+    {
+        pLogWarning("Server placed client in unexpected room");
+        Disconnect();
+    }
+
+    pLogInfo("NetPlay: joined room %s", DisplayRoom(room_key).room_name);
+}
+
+void NetworkClient::JoinNewRoom(const RoomInfo& room_info)
+{
+    if(!socket)
+        return;
+
+    std::array<uint8_t, 13> to_send =
+    {
+        HEADER_CREATE_ROOM,
+        uint8_t(room_info.engine_hash  >> 24), uint8_t(room_info.engine_hash  >> 16), uint8_t(room_info.engine_hash  >> 8), uint8_t(room_info.engine_hash  >> 0),
+        uint8_t(room_info.asset_hash   >> 24), uint8_t(room_info.asset_hash   >> 16), uint8_t(room_info.asset_hash   >> 8), uint8_t(room_info.asset_hash   >> 0),
+        uint8_t(room_info.content_hash >> 24), uint8_t(room_info.content_hash >> 16), uint8_t(room_info.content_hash >> 8), uint8_t(room_info.content_hash >> 0),
+    };
+
+    SDLNet_TCP_Send(socket, to_send.data(), to_send.size());
+    requested_join_room_key = 0;
+
+    _FinishJoinRoom();
+}
+
+void NetworkClient::JoinRoom(uint32_t room_key)
+{
+    if(!socket)
+        return;
+
+    std::array<uint8_t, 5> to_send =
+    {
+        HEADER_JOIN_ROOM,
+        uint8_t(room_key >> 24), uint8_t(room_key >> 16), uint8_t(room_key >> 8), uint8_t(room_key >> 0),
+    };
+
+    SDLNet_TCP_Send(socket, to_send.data(), to_send.size());
+    requested_join_room_key = room_key;
+
+    _FinishJoinRoom();
 }
 
 } // namespace XMessage

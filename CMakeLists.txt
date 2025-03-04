@@ -745,7 +745,8 @@ endif()
 
 if(THEXTECH_ENABLE_SDL_NET)
     list(APPEND LIB_SRC
-        src/main/client.cpp)
+        src/main/client.cpp
+        src/main/client_methods.cpp)
 endif()
 
 if(NOT NINTENDO_3DS AND NOT NINTENDO_WII AND NOT NINTENDO_WIIU AND NOT NINTENDO_SWITCH AND NOT VITA AND NOT PGE_MIN_PORT)

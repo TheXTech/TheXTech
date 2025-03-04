@@ -25,6 +25,10 @@
 #include <InterProcess/intproc.h>
 #endif // #ifdef THEXTECH_INTERPROC_SUPPORTED
 
+#ifdef THEXTECH_ENABLE_SDL_NET
+#include "main/client_methods.h"
+#endif
+
 #include <Logger/logger.h>
 
 #include "../globals.h"
@@ -368,6 +372,18 @@ void Render()
 
     int menu_left_X = XRender::TargetW / 2 - total_menu_width / 2 + 20;
     int menu_top_Y = XRender::TargetH / 2 - total_menu_height / 2;
+
+    // display room info above the pause menu
+#ifdef THEXTECH_ENABLE_SDL_NET
+    if(XMessage::GetStatus() == XMessage::Status::connected)
+    {
+        XRender::renderRect(XRender::TargetW / 2 - menu_box_width / 2 - 4, XRender::TargetH / 2 - menu_box_height / 2 - 40 - 4, menu_box_width + 8, 28 + 8, {0, 0, 0});
+        XRender::renderRect(XRender::TargetW / 2 - menu_box_width / 2 - 2, XRender::TargetH / 2 - menu_box_height / 2 - 40 - 2, menu_box_width + 4, 28 + 4, {255, 255, 255});
+        XRender::renderRect(XRender::TargetW / 2 - menu_box_width / 2, XRender::TargetH / 2 - menu_box_height / 2 - 40, menu_box_width, 28, {8, 96, 168});
+
+        SuperPrintScreenCenter(XMessage::DisplayRoom(XMessage::CurrentRoom()).room_name, 5, XRender::TargetH / 2 - menu_box_height / 2 - 36);
+    }
+#endif // #ifdef THEXTECH_ENABLE_SDL_NET
 
     switch(s_pause_type)
     {

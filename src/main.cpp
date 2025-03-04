@@ -28,7 +28,7 @@
 #include "gfx.h"
 #include "rand.h"
 #include "sound.h"
-#include "message.h"
+#include "main/client_methods.h"
 #include "main/game_info.h"
 #include "main/speedrunner.h"
 #include "main/game_info.h"
@@ -483,6 +483,9 @@ int main(int argc, char**argv)
 #ifdef THEXTECH_ENABLE_SDL_NET
         TCLAP::ValueArg<std::string> server(std::string(), "server", "Server address", false, "", "");
         cmd.add(&server);
+
+        TCLAP::ValueArg<std::string> room_key(std::string(), "room-key", "Room key", false, "", "");
+        cmd.add(&room_key);
 #endif
 
         cmd.add(&switchFrameSkip);
@@ -757,7 +760,15 @@ int main(int argc, char**argv)
 
 #ifdef THEXTECH_ENABLE_SDL_NET
         if(!setup.testLevel.empty() && server.isSet())
+        {
             XMessage::Connect(server.getValue().c_str(), 4305);
+
+            uint32_t room_key_int = XMessage::RoomFromString(room_key.getValue());
+            if(!room_key_int)
+                XMessage::JoinNewRoom(XMessage::RoomInfo{});
+            else
+                XMessage::JoinRoom(room_key_int);
+        }
 #endif
     }
     catch(TCLAP::ArgException &e)   // catch any exceptions

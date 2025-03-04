@@ -25,7 +25,7 @@
 #include "globals.h"
 
 #ifdef THEXTECH_ENABLE_SDL_NET
-#   include "main/client.h"
+#   include "main/client_methods.h"
 #endif
 
 namespace XMessage
@@ -34,30 +34,6 @@ namespace XMessage
 static std::deque<Message> s_message_vector;
 
 static Controls_t s_last_controls[maxNetplayPlayers + 1];
-
-#ifdef THEXTECH_ENABLE_SDL_NET
-
-static NetworkClient s_network_client;
-
-void Connect(const char* host, int port)
-{
-    s_network_client.Connect(host, port);
-}
-
-Status GetStatus()
-{
-    if(s_network_client.socket)
-    {
-        if(s_network_client.tick < s_network_client.fast_forward_to)
-            return Status::replay;
-        else
-            return Status::connected;
-    }
-    else
-        return Status::local;
-}
-
-#endif
 
 void Handle(const Message& m)
 {
@@ -78,11 +54,8 @@ void Tick()
 {
 #ifdef THEXTECH_ENABLE_SDL_NET
     // sync state with other clients here
-    if(s_network_client.socket)
-    {
-        s_network_client.SendAll();
-        s_network_client.WaitAndFill();
-    }
+    if(CurrentRoom())
+        ClientFrameSync();
 #endif
 
     // update player controls based on message queue

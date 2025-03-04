@@ -31,7 +31,7 @@
 #include <SDL_net.h>
 
 #include "message.h"
-
+#include "client_methods.h"
 
 namespace XMessage
 {
@@ -47,6 +47,13 @@ enum NetworkHeader
     HEADER_YOU_ARE = 5,
     HEADER_RAND_SEED = 6,
     HEADER_TIME_IS = 7,
+    HEADER_LEFT_ROOM = 8,
+
+    HEADER_ROOM_KEY = 9,
+    HEADER_ROOM_INFO = 10,
+
+    HEADER_CREATE_ROOM = 11,
+    HEADER_JOIN_ROOM = 12,
 };
 
 struct NetworkClient
@@ -59,6 +66,11 @@ struct NetworkClient
     int fast_forward_to = INT_MAX;
     uint32_t start_fast_forward = 0;
 
+    uint32_t room_key = 0;
+    uint32_t requested_join_room_key = 0;
+
+    RoomInfo* queried_room_info = nullptr;
+
     bool sdlnet_inited = false;
 
     ~NetworkClient();
@@ -66,20 +78,29 @@ struct NetworkClient
     void Connect(const char* host, int port);
     void Disconnect(bool shutdown = false);
 
-    /* returns true if something has been read from the socket */
+    // returns true if something has been read from the socket
     bool FillBuffer();
 
-    /* returns true if something has been read from the socket, false if connection is broken */
+    // returns true if something has been read from the socket, false if connection is broken
     bool FillBufferTo(size_t fill);
 
-    /* shift the buffer after reading n bytes */
+    // shift the buffer after reading n bytes
     void ShiftBuffer(size_t shift);
 
     bool ParseMessage(int client_no, const uint8_t* message, size_t length);
 
+    // misc in-game calls
+    void LeaveRoom();
     void SendAll();
-
     void WaitAndFill();
+
+    // misc lobby calls
+    void _FinishRequestFillRoomInfo();
+    void RequestFillRoomInfo(RoomInfo& room_info);
+
+    void _FinishJoinRoom();
+    void JoinNewRoom(const RoomInfo& room_info);
+    void JoinRoom(uint32_t room_key);
 };
 
 } // namespace XMessage
