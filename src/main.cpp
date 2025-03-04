@@ -28,7 +28,6 @@
 #include "gfx.h"
 #include "rand.h"
 #include "sound.h"
-#include "main/client_methods.h"
 #include "main/game_info.h"
 #include "main/speedrunner.h"
 #include "main/game_info.h"
@@ -41,6 +40,10 @@
 
 #ifdef THEXTECH_INTERPROC_SUPPORTED
 #   include "capabilities.h"
+#endif
+
+#ifdef THEXTECH_ENABLE_SDL_NET
+#   include "main/client_methods.h"
 #endif
 
 #ifndef THEXTECH_NO_ARGV_HANDLING
