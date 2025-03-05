@@ -895,7 +895,11 @@ PGE_Size FontManager::optimizeTextPx(std::string& text,
 
         if(pixelWidth >= max_pixels_lenght) //If lenght more than allowed
         {
-            if(lastspace > 0)
+            // don't line break if the last character would exactly fill the last line (this is the SMBX 1.3 logic)
+            if(pixelWidth == max_pixels_lenght && i + trailingBytesForUTF8[(UTF8)text[i]] + 1 == text.size())
+            {
+            }
+            else if(lastspace > 0)
             {
                 if(maxWidth < maxWidthAtSpace)
                     maxWidth = maxWidthAtSpace;

@@ -28,6 +28,7 @@ Changelog for 1.3.7.1-dev
 -Fix TheXTech 1.3.5.3 visual bug where P2's screen fader was not reset when P1 gets a level exit (@ds-sloth)
 -Wii: fix bug where Wiimote could get stuck in Rumble state (@ds-sloth)
 -Fix TheXTech 1.3.6.1 visual change in the width of spaces in the in-game message box (@ds-sloth)
+-Fix TheXTech 1.3.7 visual change in the line-breaking algorithm for the in-game message box (@ds-sloth)
 
 Changelog for 1.3.7
 -Fix vanilla peculiarity where medals were sometimes not collected when killed, guarded by "fix-medal-kill" [Modern Mode] (@ds-sloth, thanks to @Superbloxen for the report)
