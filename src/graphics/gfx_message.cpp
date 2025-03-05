@@ -27,7 +27,7 @@ void PrepareMessageDims()
     int font = FontManager::fontIdFromSmbxFont(4);
 
     s_opt_message = MessageText;
-    s_message_dims = FontManager::optimizeTextPx(s_opt_message, TextBoxW - 20, font);
+    s_message_dims = FontManager::optimizeTextPx(s_opt_message, TextBoxW - 14, font);
 
     if(!MessageTitle.empty())
         s_title_dims = FontManager::textSize(MessageTitle.c_str(), MessageTitle.size(), font);
