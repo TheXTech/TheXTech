@@ -279,18 +279,18 @@ PGE_Size RasterFont::glyphSize(const char* utf8char, uint32_t charNum, uint32_t 
 
     case '\t':
     {
-        size_t spaceSize = m_spaceWidth + m_interLetterSpace / 2;
+        size_t spaceSize = m_spaceWidth;
         if(spaceSize == 0)
             spaceSize = 1; // Don't divide by zero
         size_t tabMult = 4 - ((charNum / spaceSize) % 4);
-        ret.setWidth(static_cast<size_t>(m_spaceWidth + m_interLetterSpace / 2) * tabMult);
+        ret.setWidth(static_cast<size_t>(spaceSize) * tabMult);
         ret.setHeight(m_newlineOffset);
         break;
     }
 
     case ' ':
     {
-        ret.setWidth(m_spaceWidth + m_interLetterSpace / 2);
+        ret.setWidth(m_spaceWidth);
         ret.setHeight(m_newlineOffset);
         break;
     }
@@ -403,7 +403,7 @@ PGE_Size RasterFont::printText(const char* text, size_t text_size,
             continue;
 
         case ' ':
-            offsetX += m_spaceWidth + m_interLetterSpace / 2;
+            offsetX += m_spaceWidth;
             continue;
         }
 
