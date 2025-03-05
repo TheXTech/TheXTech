@@ -169,8 +169,9 @@ void DrawMessage()
 
     int left = XRender::TargetW / 2 - TextBoxW / 2 + 12;
 
-    if(s_message_dims.h() < 30 && s_message_dims.w() < TextBoxW - 100)
-        left = XRender::TargetW / 2 - s_message_dims.w() / 2;
+    // single-line centering special case
+    if(s_message_dims.h() < 30)
+        left += (TextBoxW - 14) / 2 - s_message_dims.w() / 2;
 
     FontManager::printText(s_opt_message.c_str(), s_opt_message.size(),
                             left, BoxY_Start + totalHeight / 2 - s_message_dims.h() / 2,
