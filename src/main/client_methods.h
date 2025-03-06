@@ -30,6 +30,9 @@
 
 #include "message.h"
 
+extern std::string g_netplayServer;
+extern std::string g_netplayNickname;
+
 
 namespace XMessage
 {
@@ -48,7 +51,7 @@ struct RoomName
     char room_name[8];
 };
 
-void Connect(const char* host, int port);
+void Connect(const char* host = nullptr);
 bool IsConnected();
 void Disconnect();
 

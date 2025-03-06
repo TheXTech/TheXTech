@@ -25,6 +25,10 @@
 #include "../config.h"
 #include "../controls.h"
 
+#ifdef THEXTECH_ENABLE_SDL_NET
+#include "main/client_methods.h"
+#endif
+
 #include "core/render.h"
 
 #include "speedrunner.h"
@@ -87,6 +91,10 @@ void OpenConfig()
 
         config.beginGroup("recent");
         config.read("asset-pack", g_recentAssetPack, std::string());
+#ifdef THEXTECH_ENABLE_SDL_NET
+        config.read("server", g_netplayServer, g_netplayServer);
+        config.read("nickname", g_netplayNickname, std::string());
+#endif
         config.read((asset_pack_prefix + "episode-1p").c_str(), g_recentWorld1p, std::string());
         config.read((asset_pack_prefix + "episode-2p").c_str(), g_recentWorld2p, std::string());
         config.read((asset_pack_prefix + "episode-editor").c_str(), g_recentWorldEditor, std::string());
@@ -138,6 +146,10 @@ void SaveConfig()
 
     config.beginGroup("recent");
     config.setValue("asset-pack", g_AssetPackID);
+#ifdef THEXTECH_ENABLE_SDL_NET
+    config.setValue("server", g_netplayServer);
+    config.setValue("nickname", g_netplayNickname);
+#endif
     config.setValue((asset_pack_prefix + "episode-1p").c_str(), g_recentWorld1p);
     config.setValue((asset_pack_prefix + "episode-2p").c_str(), g_recentWorld2p);
     config.setValue((asset_pack_prefix + "episode-editor").c_str(), g_recentWorldEditor);

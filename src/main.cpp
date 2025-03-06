@@ -764,7 +764,7 @@ int main(int argc, char**argv)
 #ifdef THEXTECH_ENABLE_SDL_NET
         if(!setup.testLevel.empty() && server.isSet())
         {
-            XMessage::Connect(server.getValue().c_str(), 4305);
+            XMessage::Connect(server.getValue().c_str());
 
             uint32_t room_key_int = XMessage::RoomFromString(room_key.getValue());
             if(!room_key_int)

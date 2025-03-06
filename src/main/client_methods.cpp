@@ -27,14 +27,20 @@
 #include "main/client.h"
 #include "main/client_methods.h"
 
+std::string g_netplayServer = "thextech.link";
+std::string g_netplayNickname;
+
 namespace XMessage
 {
 
 static NetworkClient s_network_client;
 
-void Connect(const char* host, int port)
+void Connect(const char* host)
 {
-    s_network_client.Connect(host, port);
+    if(host)
+        s_network_client.Connect(host, 4305);
+    else
+        s_network_client.Connect(g_netplayServer.c_str(), 4305);
 }
 
 bool IsConnected()
