@@ -839,6 +839,22 @@ static void s_handleMouseMove(int items, int x, int y, int maxWidth, int itemHei
     }
 }
 
+static int s_quitKeyPos()
+{
+    int quitKeyPos = 2;
+
+    if(s_show_separate_2P())
+        quitKeyPos++;
+
+    if(!g_gameInfo.disableBattleMode)
+        quitKeyPos++;
+
+    if(g_config.enable_editor)
+        quitKeyPos++;
+
+    return quitKeyPos;
+}
+
 
 static bool s_can_enter_ap_screen()
 {
@@ -1004,16 +1020,7 @@ bool mainMenuUpdate()
 
             if(menuBackPress && MenuCursorCanMove)
             {
-                int quitKeyPos = 2;
-
-                if(s_show_separate_2P())
-                    quitKeyPos++;
-
-                if(!g_gameInfo.disableBattleMode)
-                    quitKeyPos++;
-
-                if(g_config.enable_editor)
-                    quitKeyPos++;
+                int quitKeyPos = s_quitKeyPos();
 
                 MenuMode = MENU_MAIN;
                 MenuCursor = quitKeyPos;
@@ -1071,16 +1078,7 @@ bool mainMenuUpdate()
 
             if(menuBackPress && MenuCursorCanMove)
             {
-                int quitKeyPos = 2;
-
-                if(s_show_separate_2P())
-                    quitKeyPos++;
-
-                if(!g_gameInfo.disableBattleMode)
-                    quitKeyPos++;
-
-                if(g_config.enable_editor)
-                    quitKeyPos++;
+                int quitKeyPos = s_quitKeyPos();
 
                 if(XRender::TargetH < TinyScreenH)
                 {
@@ -1126,6 +1124,7 @@ bool mainMenuUpdate()
                     menuPlayersNum = 2;
                     menuBattleMode = false;
                     MenuCursor = 0;
+
 #ifdef THEXTECH_PRELOAD_LEVELS
                     s_findRecentEpisode();
 #elif defined(PGE_NO_THREADING)
@@ -1142,6 +1141,8 @@ bool mainMenuUpdate()
                     MenuMode = MENU_BATTLE_MODE;
                     menuPlayersNum = 2;
                     menuBattleMode = true;
+                    MenuCursor = 0;
+
 #if !defined(THEXTECH_PRELOAD_LEVELS) && defined(PGE_NO_THREADING)
                     FindLevels();
 #elif !defined(THEXTECH_PRELOAD_LEVELS)
@@ -1149,7 +1150,6 @@ bool mainMenuUpdate()
                     loadingThread = SDL_CreateThread(FindLevelsThread, "FindLevels", nullptr);
                     SDL_DetachThread(loadingThread);
 #endif
-                    MenuCursor = 0;
                 }
                 else if(g_config.enable_editor && MenuCursor == i++)
                 {
@@ -1211,17 +1211,7 @@ bool mainMenuUpdate()
 
             if(MenuMode == MENU_MAIN)
             {
-                int quitKeyPos = 2;
-
-                if(s_show_separate_2P())
-                    quitKeyPos++;
-
-                if(!g_gameInfo.disableBattleMode)
-                    quitKeyPos++;
-
-                if(g_config.enable_editor)
-                    quitKeyPos++;
-
+                int quitKeyPos = s_quitKeyPos();
 
                 if(MenuCursor > quitKeyPos)
                     MenuCursor = 0;
@@ -1557,8 +1547,7 @@ bool mainMenuUpdate()
 
                     selWorld = MenuCursor + 1;
 
-                    if((MenuMode == MENU_BATTLE_MODE && SelectBattle[selWorld].disabled) ||
-                       ((MenuMode == MENU_1PLAYER_GAME || MenuMode == MENU_2PLAYER_GAME) && SelectWorld[selWorld].disabled))
+                    if(SelectorList[selWorld].disabled)
                         disabled = true;
 
                     if(!disabled)
@@ -2527,7 +2516,6 @@ void mainMenuDraw()
         SuperPrint(g_mainMenu.mainExit, 3, MenuX, MenuY+30*(i++));
         XRender::renderTextureBasic(MenuX - 20, MenuY + (MenuCursor * 30), GFX.MCursor[0]);
     }
-
     // Character select
     else if(MenuMode == MENU_CHARACTER_SELECT_NEW ||
             MenuMode == MENU_CHARACTER_SELECT_NEW_BM)
