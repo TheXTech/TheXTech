@@ -1403,6 +1403,11 @@ struct SelectWorld_t
     bool highlight = false;
     bool disabled = false;
     bool probably_incompatible = false;
+
+#ifdef THEXTECH_ENABLE_SDL_NET
+    // content hash of packed episode
+    uint32_t lz4_content_hash = 0;
+#endif
 //End Type
 };
 

@@ -25,6 +25,11 @@
 #include <SDL2/SDL_thread.h>
 #endif
 
+#ifdef THEXTECH_ENABLE_SDL_NET
+#include <md5/md5tools.hpp>
+#include "main/client_methods.h"
+#endif
+
 #include <fmt_format_ne.h>
 #include <array>
 
@@ -520,6 +525,11 @@ static void s_LoadSingleWorld(const std::string& epDir, const std::string& fName
         SelectWorld.push_back(w);
         if(editable)
             SelectWorldEditable.push_back(w);
+
+#ifdef THEXTECH_ENABLE_SDL_NET
+        if(wPath.size() > 2 && wPath[0] == ':' && wPath[1] == 'a')
+            w.lz4_content_hash = md5::string_to_u32(wPath);
+#endif
     }
 }
 
@@ -619,6 +629,23 @@ static void s_LoadWorldArchive(const std::string& archive)
 
     // last details
     w.editable = false;
+
+#ifdef THEXTECH_ENABLE_SDL_NET
+    SDL_RWops* rw = Files::open_file(archive, "rb");
+    if(rw)
+    {
+        SDL_RWseek(rw, -4, RW_SEEK_END);
+        uint8_t hash[4];
+        if(SDL_RWread(rw, hash, 1, 4) == 4)
+        {
+            w.lz4_content_hash = (hash[0])
+                | ((uint32_t)(hash[1]) <<  8)
+                | ((uint32_t)(hash[2]) << 16)
+                | ((uint32_t)(hash[3]) << 24);
+        }
+        SDL_RWclose(rw);
+    }
+#endif
 
     // store it!
     SelectWorld.push_back(w);
