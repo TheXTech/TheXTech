@@ -47,6 +47,12 @@ enum
     MENU_2PLAYER_GAME = 2,
     // Battle mode level select
     MENU_BATTLE_MODE = 4,
+#ifdef THEXTECH_ENABLE_SDL_NET
+    // NetPlay welcome menu
+    MENU_NETPLAY = 5,
+    // NetPlay episode select
+    MENU_NETPLAY_WORLD_SELECT = 6,
+#endif
     // Options menu
     // MENU_OPTIONS = 3, // FULLY UNUSED
     // New options menu
@@ -190,6 +196,16 @@ struct MainMenuContent
     std::string wordResume;
     std::string wordWaiting;
     std::string abbrevMilliseconds;
+
+#ifdef THEXTECH_ENABLE_SDL_NET
+    // NetPlay
+    std::string mainPlayOnline;
+    std::string netplayRoomKey;
+    std::string netplayJoinRoom;
+    std::string netplayCreateRoom;
+    std::string netplayServer;
+    std::string netplayNickname;
+#endif
 };
 
 extern MainMenuContent g_mainMenu;

@@ -99,6 +99,10 @@ static SDL_atomic_t         loadingProgrssMax = {};
 static SDL_Thread*          loadingThread = nullptr;
 #endif
 
+#ifdef THEXTECH_ENABLE_SDL_NET
+static XMessage::RoomInfo   s_room_info;
+#endif
+
 static constexpr int c_menuSavesLength = maxSaveSlots + 2;
 static constexpr int c_menuSavesFooterHint = (c_menuSavesLength * 30) - 30;
 static constexpr int c_menuItemSavesEndList = maxSaveSlots - 1;
@@ -215,6 +219,16 @@ void initMainMenu()
     g_mainMenu.wordHide = "Hide";
     g_mainMenu.abbrevMilliseconds = "MS";
 
+#ifdef THEXTECH_ENABLE_SDL_NET
+    // NetPlay
+    g_mainMenu.mainPlayOnline = "Play Online";
+    g_mainMenu.netplayRoomKey = "Room key:";
+    g_mainMenu.netplayJoinRoom = "Join Room";
+    g_mainMenu.netplayCreateRoom = "Create Room";
+    g_mainMenu.netplayServer = "Server:";
+    g_mainMenu.netplayNickname = "Nickname:";
+#endif
+
     // g_mainMenu.promptDeprecatedSetting = "This file uses a deprecated compatibility flag that will be removed in version 1.3.7.\n\nOld flag: \"{0}\"\nNew flag: \"{1}\"\n\n\nReplace it with the updated flag for version 1.3.6 and newer?";
     // g_mainMenu.promptDeprecatedSettingUnwritable = "An unwritable file ({0}) uses a deprecated compatibility flag that will be removed in version 1.3.7.\n\nSection: [{1}]\nOld flag: \"{2}\"\nNew flag: \"{3}\"\n\n\nPlease update it manually and copy to your device.";
 }
@@ -246,6 +260,51 @@ static bool s_show_separate_2P()
 {
     return g_config.compatibility_mode == Config_t::COMPAT_SMBX13 && !g_gameInfo.disableTwoPlayer;
 }
+
+#ifdef THEXTECH_ENABLE_SDL_NET
+static bool s_show_online()
+{
+    return !g_gameInfo.disableTwoPlayer;
+}
+
+static void s_StartEpisodeOnline()
+{
+    selSave = 0;
+
+    if((int)Controls::g_InputMethods.size() > 1)
+        Controls::ClearInputMethods();
+
+    for(int A = 1; A <= numCharacters; A++)
+        blockCharacter[A] = (g_forceCharacter) ? false : SelectWorld[selWorld].blockChar[A];
+
+    for(int p = 0; p < maxLocalPlayers; p++)
+        l_screen->charSelect[p] = 0;
+
+    // find character for P1 (player on episode start)
+    l_screen->charSelect[0] = 1;
+
+    for(int A = 1; A <= numCharacters; A++)
+    {
+        if(blockCharacter[A])
+            continue;
+
+        l_screen->charSelect[0] = A;
+        break;
+    }
+
+    StartEpisode();
+}
+
+uint32_t s_assetPackHash()
+{
+    return 0;
+}
+
+uint32_t s_engineHash()
+{
+    return md5::string_to_u32(V_BUILD_VER);
+}
+#endif
 
 // export it, let's hope for some nice LTO here
 int mainMenuPlaystyle()
@@ -353,6 +412,11 @@ static void s_findRecentEpisode()
         {
             w.highlight = false;
         }
+
+#ifdef THEXTECH_ENABLE_SDL_NET
+        if(MenuMode == MENU_NETPLAY && w.lz4_content_hash == 0)
+            w.disabled = true;
+#endif
     }
 
     if(menuRecentEpisode >= 0)
@@ -849,6 +913,11 @@ static int s_quitKeyPos()
     if(!g_gameInfo.disableBattleMode)
         quitKeyPos++;
 
+#ifdef THEXTECH_ENABLE_SDL_NET
+    if(s_show_online())
+        quitKeyPos++;
+#endif
+
     if(g_config.enable_editor)
         quitKeyPos++;
 
@@ -1052,6 +1121,10 @@ bool mainMenuUpdate()
                             menuLen = 18 * (int)g_mainMenu.mainMultiplayerGame.size() - 2;
                         else if(!g_gameInfo.disableBattleMode && A == i++)
                             menuLen = 18 * (int)g_mainMenu.mainBattleGame.size();
+#ifdef THEXTECH_ENABLE_SDL_NET
+                        else if(s_show_online() && A == i++)
+                            menuLen = 18 * (int)g_mainMenu.mainPlayOnline.size();
+#endif
                         else if(g_config.enable_editor && A == i++)
                             menuLen = 18 * (int)g_mainMenu.mainEditor.size();
                         else if(A == i++)
@@ -1151,6 +1224,26 @@ bool mainMenuUpdate()
                     SDL_DetachThread(loadingThread);
 #endif
                 }
+#ifdef THEXTECH_ENABLE_SDL_NET
+                else if(s_show_online() && MenuCursor == i++)
+                {
+                    PlaySoundMenu(SFX_Do);
+                    MenuMode = MENU_NETPLAY;
+                    MenuCursor = 0;
+
+#ifdef THEXTECH_PRELOAD_LEVELS
+                    s_findRecentEpisode();
+#elif defined(PGE_NO_THREADING)
+                    FindWorlds();
+#else
+                    SDL_AtomicSet(&loading, 1);
+                    loadingThread = SDL_CreateThread(FindWorldsThread, "FindWorlds", nullptr);
+                    SDL_DetachThread(loadingThread);
+#endif
+
+                    XMessage::Connect();
+                }
+#endif
                 else if(g_config.enable_editor && MenuCursor == i++)
                 {
 #if 0
@@ -1275,6 +1368,129 @@ bool mainMenuUpdate()
                 }
             }
         }
+#ifdef THEXTECH_ENABLE_SDL_NET
+        else if(MenuMode == MENU_NETPLAY)
+        {
+            if(SharedCursor.Move)
+            {
+                For(A, 0, 10)
+                {
+                    if(SharedCursor.Y >= MenuY + A * 30 && SharedCursor.Y <= MenuY + A * 30 + 16)
+                    {
+                        int i = 0;
+                        if(A == i++)
+                            menuLen = 18 * (int)g_mainMenu.netplayJoinRoom.size();
+                        else if(A == i++)
+                            menuLen = 18 * (int)g_mainMenu.netplayCreateRoom.size();
+                        else if(A == i++)
+                            menuLen = 18 * (int)g_mainMenu.netplayServer.size();
+                        else if(A == i++)
+                            menuLen = 18 * (int)g_mainMenu.netplayNickname.size();
+                        else
+                            break;
+
+                        if(SharedCursor.X >= MenuX && SharedCursor.X <= MenuX + menuLen)
+                        {
+                            if(MenuMouseRelease && SharedCursor.Primary)
+                                MenuMouseClick = true;
+
+                            if(MenuCursor != A)
+                            {
+                                PlaySoundMenu(SFX_Slide);
+                                MenuCursor = A;
+                            }
+                        }
+                    }
+                }
+            }
+
+            if(menuBackPress && MenuCursorCanMove)
+            {
+                int netplayPos = 1;
+                if(s_show_separate_2P())
+                    netplayPos++;
+                if(!g_gameInfo.disableBattleMode)
+                    netplayPos++;
+
+                XMessage::Disconnect();
+                MenuMode = MENU_MAIN;
+                MenuCursor = netplayPos;
+                MenuCursorCanMove = false;
+                PlaySoundMenu(SFX_Slide);
+            }
+            else if((menuDoPress && MenuCursorCanMove) || MenuMouseClick)
+            {
+                MenuCursorCanMove = false;
+
+                if((MenuCursor == 0 || MenuCursor == 1) && !XMessage::IsConnected())
+                    PlaySoundMenu(SFX_BlockHit);
+                else if(MenuCursor == 0)
+                {
+                    PlaySoundMenu(SFX_Do);
+
+                    s_room_info = XMessage::RoomInfo();
+                    s_room_info.room_key = XMessage::RoomFromString(TextEntryScreen::Run(g_mainMenu.netplayRoomKey));
+
+                    if(s_room_info.room_key)
+                    {
+                        // this shouldn't actually happen synchronously
+                        XMessage::RequestFillRoomInfo(s_room_info);
+
+                        selWorld = -1;
+
+                        for(size_t i = 0; i < SelectWorld.size(); i++)
+                        {
+                            if(SelectWorld[i].lz4_content_hash == s_room_info.content_hash)
+                            {
+                                selWorld = i;
+                                break;
+                            }
+                        }
+
+                        if(s_room_info.room_key == 0 || s_room_info.engine_hash != s_engineHash() || s_room_info.asset_hash != s_assetPackHash() || selWorld == -1)
+                            PlaySoundMenu(SFX_BlockHit);
+                        else
+                        {
+                            PlaySoundMenu(SFX_Do);
+                            XMessage::JoinRoom(s_room_info.room_key);
+                            s_StartEpisodeOnline();
+                        }
+                    }
+                    else
+                        PlaySoundMenu(SFX_BlockHit);
+                }
+                else if(MenuCursor == 1)
+                {
+                    PlaySoundMenu(SFX_Do);
+                    MenuMode = MENU_NETPLAY_WORLD_SELECT;
+                    menuPlayersNum = 1;
+                    menuBattleMode = false;
+                    MenuCursor = 0;
+                }
+                else if(MenuCursor == 2)
+                {
+                    PlaySoundMenu(SFX_Do);
+                    XMessage::Disconnect();
+                    g_netplayServer = TextEntryScreen::Run(g_mainMenu.netplayServer);
+                    XMessage::Connect();
+                }
+                else if(MenuCursor == 3)
+                {
+                    PlaySoundMenu(SFX_Do);
+                    g_netplayNickname = TextEntryScreen::Run(g_mainMenu.netplayNickname);
+                }
+            }
+
+            if(MenuMode == MENU_NETPLAY)
+            {
+                if(MenuCursor > 3)
+                    MenuCursor = 0;
+                else if(MenuCursor < 0)
+                    MenuCursor = 3;
+            }
+        }
+#endif
+
 #if 0 // old code, no longer used
         // Character Select
         else if(MenuMode == MENU_CHARACTER_SELECT_1P ||
@@ -1463,6 +1679,9 @@ bool mainMenuUpdate()
 
         // World Select
         else if(MenuMode == MENU_1PLAYER_GAME || MenuMode == MENU_2PLAYER_GAME
+#ifdef THEXTECH_ENABLE_SDL_NET
+            || MenuMode == MENU_NETPLAY_WORLD_SELECT
+#endif
             || MenuMode == MENU_BATTLE_MODE || MenuMode == MENU_EDITOR)
         {
             const std::vector<SelectWorld_t>& SelectorList
@@ -1523,9 +1742,23 @@ bool mainMenuUpdate()
                             MenuCursor--;
                         if(g_gameInfo.disableBattleMode)
                             MenuCursor--;
+#ifdef THEXTECH_ENABLE_SDL_NET
+                        if(s_show_online())
+                            MenuCursor++;
+#endif
                     }
 
-                    MenuMode = MENU_MAIN;
+#ifdef THEXTECH_ENABLE_SDL_NET
+                    if(MenuMode == MENU_NETPLAY_WORLD_SELECT)
+                    {
+                        MenuMode = MENU_NETPLAY;
+                        MenuCursor = 1;
+                    }
+                    else
+#endif
+                    {
+                        MenuMode = MENU_MAIN;
+                    }
 //'world select back
 
                     PlaySoundMenu(SFX_Slide);
@@ -1678,6 +1911,21 @@ bool mainMenuUpdate()
                         MenuMode = MENU_CHARACTER_SELECT_NEW_BM;
                         ConnectScreen::MainMenu_Start(2);
                     }
+#ifdef THEXTECH_ENABLE_SDL_NET
+                    // new room
+                    else if(MenuMode == MENU_NETPLAY_WORLD_SELECT)
+                    {
+                        s_room_info = XMessage::RoomInfo();
+                        s_room_info.engine_hash = s_engineHash();
+                        s_room_info.asset_hash = s_assetPackHash();
+                        s_room_info.content_hash = SelectWorld[selWorld].lz4_content_hash;
+
+                        // this shouldn't actually happen synchronously
+                        XMessage::JoinNewRoom(s_room_info);
+
+                        s_StartEpisodeOnline();
+                    }
+#endif
                     // enter save select
                     else
                     {
@@ -1740,6 +1988,9 @@ bool mainMenuUpdate()
             }
 
             if(MenuMode == MENU_1PLAYER_GAME || MenuMode == MENU_2PLAYER_GAME
+#ifdef THEXTECH_ENABLE_SDL_NET
+                || MenuMode == MENU_NETPLAY_WORLD_SELECT
+#endif
                 || MenuMode == MENU_BATTLE_MODE || MenuMode == MENU_EDITOR)
             {
                 maxShow = (MenuMode == MENU_BATTLE_MODE) ? NumSelectBattle :
@@ -2086,6 +2337,10 @@ bool mainMenuUpdate()
                     optionsIndex++;
                 if(!g_gameInfo.disableBattleMode)
                     optionsIndex++;
+#ifdef THEXTECH_ENABLE_SDL_NET
+                if(s_show_online())
+                    optionsIndex++;
+#endif
                 if(g_config.enable_editor)
                     optionsIndex++;
                 MenuMode = MENU_MAIN;
@@ -2407,8 +2662,14 @@ void mainMenuDraw()
 
     int B = 0;
 
-    if(MenuMode != MENU_1PLAYER_GAME && MenuMode != MENU_2PLAYER_GAME && MenuMode != MENU_BATTLE_MODE && MenuMode != MENU_EDITOR)
+    if(MenuMode != MENU_1PLAYER_GAME && MenuMode != MENU_2PLAYER_GAME
+#ifdef THEXTECH_ENABLE_SDL_NET
+        && MenuMode != MENU_NETPLAY_WORLD_SELECT
+#endif
+        && MenuMode != MENU_BATTLE_MODE && MenuMode != MENU_EDITOR)
+    {
         worldCurs = 0;
+    }
 
 #ifdef __3DS__
     XRender::setTargetLayer(2);
@@ -2510,6 +2771,10 @@ void mainMenuDraw()
             SuperPrint(g_mainMenu.mainMultiplayerGame, 3, MenuX, MenuY+30*(i++));
         if(!g_gameInfo.disableBattleMode)
             SuperPrint(g_mainMenu.mainBattleGame, 3, MenuX, MenuY+30*(i++));
+#ifdef THEXTECH_ENABLE_SDL_NET
+        if(s_show_online())
+            SuperPrint(g_mainMenu.mainPlayOnline, 3, MenuX, MenuY+30*(i++));
+#endif
         if(g_config.enable_editor)
             SuperPrint(g_mainMenu.mainEditor, 3, MenuX, MenuY+30*(i++));
         SuperPrint(g_mainMenu.mainOptions, 3, MenuX, MenuY+30*(i++));
@@ -2526,6 +2791,29 @@ void mainMenuDraw()
 
         ConnectScreen::Render();
     }
+#ifdef THEXTECH_ENABLE_SDL_NET
+    // NetPlay main menu
+    else if(MenuMode == MENU_NETPLAY)
+    {
+        int i = 0;
+        XTColor c;
+        XTColor s;
+
+        if(XMessage::IsConnected())
+            s = {200, 255, 200};
+        else
+        {
+            s = {255, 200, 200};
+            c = {127, 127, 127};
+        }
+
+        SuperPrint(g_mainMenu.netplayJoinRoom, 3, MenuX, MenuY+30*(i++), c);
+        SuperPrint(g_mainMenu.netplayCreateRoom, 3, MenuX, MenuY+30*(i++), c);
+        SuperPrint(g_mainMenu.netplayServer + ' ' + g_netplayServer, 3, MenuX, MenuY+30*(i++), s);
+        SuperPrint(g_mainMenu.netplayNickname + ' ' + g_netplayNickname, 3, MenuX, MenuY+30*(i++));
+        XRender::renderTextureBasic(MenuX - 20, MenuY + (MenuCursor * 30), GFX.MCursor[0]);
+    }
+#endif
 #if 0 // dead now
     else if(MenuMode == MENU_CHARACTER_SELECT_1P ||
             MenuMode == MENU_CHARACTER_SELECT_2P_S1 ||
@@ -2609,7 +2897,11 @@ void mainMenuDraw()
 #endif
 
     // Episode / Level selection
-    else if(MenuMode == MENU_1PLAYER_GAME || MenuMode == MENU_2PLAYER_GAME || MenuMode == MENU_BATTLE_MODE || MenuMode == MENU_EDITOR)
+    else if(MenuMode == MENU_1PLAYER_GAME || MenuMode == MENU_2PLAYER_GAME
+#ifdef THEXTECH_ENABLE_SDL_NET
+        || MenuMode == MENU_NETPLAY_WORLD_SELECT
+#endif
+        || MenuMode == MENU_BATTLE_MODE || MenuMode == MENU_EDITOR)
     {
         s_drawGameTypeTitle(MenuX, MenuY - 70);
         // std::string tempStr;
