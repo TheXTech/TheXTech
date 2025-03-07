@@ -5839,7 +5839,16 @@ void PlayerEffects(const int A)
 
         if(p.Duck && p.Character != 5)
         {
+            int BackupGrabTime = Player[A].GrabTime;
+
+            // forces UnDuck to work, this fixes a vanilla downwards clip for Chars 3+4 and a visual bug for the other chars
+            if(g_config.fix_player_grab_clip)
+                Player[A].GrabTime = 0;
+
             UnDuck(Player[A]);
+
+            Player[A].GrabTime = BackupGrabTime;
+
             p.Frame = 1;
         }
 
