@@ -140,7 +140,7 @@ int      getFontID(std::string fontName);
  * @param Green Green color level from 0.0 to 1.0
  * @param Blue Blue color level from 0.0 to 1.0
  * @param Alpha Alpha-channel level from 0.0 to 1.0
- * @param ttf_FontSize Point size for the TTF fonts
+ * @param ttf_FontSize Point size for the TTF fonts, expected height of line (if non-zero) for raster fonts
  * @param outline Render using added outline
  * @param crop_info nullable pointer to info for crop (marquee) logic.
  * @return The size of text block in pixels
@@ -149,7 +149,7 @@ PGE_Size printText(const char* text, size_t text_size,
                    int x, int y,
                    int font = DefaultRaster,
                    XTColor color = XTColor(),
-                   uint32_t ttf_FontSize = 14, bool outline = false,
+                   uint32_t ttf_FontSize = 0, bool outline = false,
                    XTColor outline_color = {0, 0, 0},
                    CropInfo* crop_info = nullptr);
 

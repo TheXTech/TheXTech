@@ -362,7 +362,7 @@ PGE_Size RasterFont::glyphSize(const char* utf8char, uint32_t charNum, uint32_t 
 PGE_Size RasterFont::printText(const char* text, size_t text_size,
                                int32_t x, int32_t y,
                                XTColor color,
-                               uint32_t,
+                               uint32_t fontSize,
                                CropInfo* crop_info)
 {
     if(m_charMap.empty() || !text || text_size == 0)
@@ -438,7 +438,7 @@ PGE_Size RasterFont::printText(const char* text, size_t text_size,
             TtfFont *font = FontManager::getTtfFontByName(m_ttfFallback);
             if(font)
             {
-                uint32_t font_size_use = m_ttfSize > 0 ? m_ttfSize : m_letterWidth;
+                uint32_t font_size_use = (m_ttfSize > 0) ? m_ttfSize : m_letterWidth;
 
                 int y_offset = 0;
                 bool doublePixel = font->doublePixel();
@@ -448,10 +448,12 @@ PGE_Size RasterFont::printText(const char* text, size_t text_size,
                     if(font->doublePixel() || font_size_use > font->bitmapSize() * 1.5)
                         doublePixel = true;
 
-                    if(doublePixel)
-                        y_offset = ((int)m_letterWidth - (font->bitmapSize() * 2)) / 2;
+                    if(fontSize == 0)
+                        y_offset = 0;
+                    else if(doublePixel)
+                        y_offset = ((int)fontSize - (font->bitmapSize() * 2)) / 2;
                     else
-                        y_offset = ((int)m_letterWidth - font->bitmapSize()) / 2;
+                        y_offset = ((int)fontSize - font->bitmapSize()) / 2;
 
                     font_size_use = font->bitmapSize();
                 }
