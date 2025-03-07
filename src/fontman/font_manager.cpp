@@ -700,7 +700,12 @@ PGE_Size FontManager::printText(const char* text, size_t text_size,
         default:
 #ifdef THEXTECH_ENABLE_TTF_SUPPORT
             if(g_defaultTtfFont && g_defaultTtfFont->isLoaded())
+            {
                 font_engine = g_defaultTtfFont;
+
+                if(ttf_FontSize == 0)
+                    ttf_FontSize = 14;
+            }
 #endif
             break;
         }

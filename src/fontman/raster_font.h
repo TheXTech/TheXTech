@@ -68,7 +68,7 @@ public:
      * \param Green Green channel colour
      * \param Blue Blue channel colour
      * \param Alpha Alpha channel level (does not issue render calls if Alpha is 0)
-     * \param fontSize The size of the TTF font glyph (unused for raster fonts)
+     * \param fontSize The size of the TTF font glyph (used for line height if non-zero for raster fonts)
      * \param crop_info nullable pointer to info for crop (marquee) logic
      * \return Width and height of the text block in pixels
      */
