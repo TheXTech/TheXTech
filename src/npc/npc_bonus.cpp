@@ -397,15 +397,27 @@ void TouchBonus(int A, int B)
         {
             RumbleForPowerup(A);
 
-            if(Player[A].Duck)
-                UnDuck(Player[A]);
+            // UnDuck checks Duck internally, so let's call it directly
+            // if(Player[A].Duck)
+            //     UnDuck(Player[A]);
+
+            int BackupGrabTime = Player[A].GrabTime;
+
+            // force UnDuck to work, fixes a vanilla downwards clip while ducking
+            if(g_config.fix_player_grab_clip && Player[A].Character >= 3)
+                Player[A].GrabTime = 0;
+
+            UnDuck(Player[A]);
+
+            Player[A].GrabTime = BackupGrabTime;
 
             Player[A].StateNPC = NPC[B].Type;
             Player[A].Frame = 1;
             Player[A].Effect = PLREFF_TURN_BIG;
 
-            if(Player[A].Mount > 0)
-                UnDuck(Player[A]);
+            // Duck already unset above
+            // if(Player[A].Mount > 0)
+            //     UnDuck(Player[A]);
 
             PlaySoundSpatial(SFX_PlayerGrow, NPC[B].Location);
         }
@@ -463,6 +475,16 @@ void TouchBonus(int A, int B)
         if(Player[A].State != target_state)
         {
             RumbleForPowerup(A);
+
+            // fixes a vanilla downwards clip that happens even if the player is just ducking (not even digging)
+            if(g_config.fix_player_grab_clip && Player[A].State == 1 && Player[A].Character >= 3 && reset_effect2)
+            {
+                int BackupGrabTime = Player[A].GrabTime;
+                Player[A].GrabTime = 0;
+                UnDuck(Player[A]);
+                Player[A].GrabTime = BackupGrabTime;
+            }
+
             Player[A].Frame = 1;
             Player[A].Effect = target_effect;
 
