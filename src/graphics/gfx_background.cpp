@@ -54,35 +54,34 @@ void DrawBackgroundColor(int A, int Z, bool lower = false)
 }
 
 // draws backgrounds _, _, _, _, _
-void DrawTopAnchoredBackground(int S, int Z, int A, int offset = 32, int expected_height = 0, int tile_bottom = 0, double h_parallax = 0.5)
+void DrawTopAnchoredBackground(int S, int Z, int A, int offset = 32, int expected_height = 0, int tile_bottom = 0, int h_num = 1, int h_den = 2)
 {
     DrawBackgroundColor(A, Z, true);
     int camX = vScreen[Z].CameraAddX();
     int camY = vScreen[Z].CameraAddY();
 
-    const Screen_t& screen = Screens[vScreen[Z].screen_ref];
+    int levelX = SDL_round(level[S].X);
 
-    int horiz_reps = (level[S].Width - level[S].X + screen.W / h_parallax) / GFXBackground2[A].w * h_parallax + 1;
+    int camX_levelX = camX + levelX;
+    int Left = vScreen[Z].Left;
+    int offsetX = (camX_levelX * (h_den - h_num) - Left * h_num) / h_den;
 
-    IntegerLocation_t tempLocation;
+    int offsetY = SDL_round(level[S].Y) - offset + camY;
+    if(GameMenu && offsetY > 0)
+        offsetY = 0;
 
-    for(int B = 0; B <= horiz_reps; B++)
+    for(; offsetX < vScreen[Z].Width; offsetX += GFXBackground2[A].w)
     {
-        tempLocation.Width = GFXBackground2[A].w;
-        tempLocation.Height = GFXBackground2[A].h;
+        if(offsetX + GFXBackground2[A].w <= 0)
+            continue;
 
-        tempLocation.X = level[S].X + ((B * GFXBackground2[A].w) - (camX + vScreen[Z].Left + level[S].X) * h_parallax);
+        int drawH = GFXBackground2[A].h;
+        int offsetY_i = offsetY;
 
-        tempLocation.Y = level[S].Y - offset;
-        if(GameMenu && tempLocation.Y > -camY)
-            tempLocation.Y = -camY;
-
-        while(tempLocation.X + tempLocation.Width > -camX
-                && tempLocation.X < -camX + vScreen[Z].Width
-                && tempLocation.Y < -camY + vScreen[Z].Height)
+        while(offsetY_i < vScreen[Z].Height)
         {
-            XRender::renderTextureBasic(camX + tempLocation.X, camY + tempLocation.Y,
-                GFXBackground2[A].w, tempLocation.Height, GFXBackground2[A], 0, GFXBackground2[A].h - tempLocation.Height);
+            XRender::renderTextureBasic(offsetX, offsetY_i,
+                GFXBackground2[A].w, drawH, GFXBackground2[A], 0, GFXBackground2[A].h - drawH);
 
             if(g_config.disable_background2_tiling)
                 break;
@@ -90,13 +89,13 @@ void DrawTopAnchoredBackground(int S, int Z, int A, int offset = 32, int expecte
             if(expected_height != 0 && GFXBackground2[A].h != expected_height)
                 break;
 
-            tempLocation.Y += tempLocation.Height;
+            offsetY_i += drawH;
 
             if(tile_bottom != 0)
             {
                 if(GFXBackground2[A].h != expected_height)
                     break;
-                tempLocation.Height = tile_bottom;
+                drawH = tile_bottom;
             }
         }
     }
