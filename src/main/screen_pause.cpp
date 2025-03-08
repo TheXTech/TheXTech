@@ -49,6 +49,7 @@
 #include "main/screen_connect.h"
 #include "speedrunner.h"
 #include "cheat_code.h"
+#include "message.h"
 
 #include "main/game_strings.h"
 #include "main/level_medals.h"
