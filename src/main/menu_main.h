@@ -203,6 +203,7 @@ struct MainMenuContent
     std::string netplayRoomKey;
     std::string netplayJoinRoom;
     std::string netplayCreateRoom;
+    std::string netplayLeaveRoom;
     std::string netplayServer;
     std::string netplayNickname;
 #endif

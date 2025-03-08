@@ -43,6 +43,7 @@ enum class Type : uint8_t
     press,
     release,
     menu_action,
+    char_swap,
 };
 
 struct Message

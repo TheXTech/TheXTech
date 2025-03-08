@@ -25,9 +25,12 @@
 namespace PauseScreen
 {
 
+extern uint8_t g_pending_action;
+
 void Init(int plr, bool LegacyPause);
 
-bool Logic(int plr);
+void ControlsLogic();
+bool Logic();
 void Render();
 
 } // namespace PauseScreen

@@ -691,11 +691,6 @@ void PauseLoop()
         if(LevelSelect)
             qScreen = Update_qScreen(1);
     }
-    else if(GamePaused == PauseCode::PauseScreen)
-    {
-        if(PauseScreen::Logic(s_pauseLoopState.pause_player))
-            pause_done = true;
-    }
     else if(GamePaused == PauseCode::Message)
     {
         if(MessageScreen_Logic(s_pauseLoopState.pause_player))
@@ -706,20 +701,29 @@ void PauseLoop()
         if(PromptScreen::Logic())
             pause_done = true;
     }
-    else if(GamePaused == PauseCode::DropAdd)
+    else
     {
-        if(ConnectScreen::Logic())
+        // Check messages from the main pause screen first, then everything else. Important for catching delayed messages.
+        if(PauseScreen::Logic())
+        {
+            s_pauseLoopState.pause_stack_depth = 0;
             pause_done = true;
-    }
-    else if(GamePaused == PauseCode::Options)
-    {
-        if(OptionsScreen::Logic())
-            pause_done = true;
-    }
-    else if(GamePaused == PauseCode::TextEntry)
-    {
-        if(TextEntryScreen::Logic())
-            pause_done = true;
+        }
+        else if(GamePaused == PauseCode::DropAdd)
+        {
+            if(ConnectScreen::Logic())
+                pause_done = true;
+        }
+        else if(GamePaused == PauseCode::Options)
+        {
+            if(OptionsScreen::Logic())
+                pause_done = true;
+        }
+        else if(GamePaused == PauseCode::TextEntry)
+        {
+            if(TextEntryScreen::Logic())
+                pause_done = true;
+        }
     }
 
     g_microStats.end_frame();

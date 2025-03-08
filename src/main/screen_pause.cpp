@@ -65,7 +65,8 @@ struct MenuItem
 {
     std::string name;
     bool (*callback)();
-    MenuItem(const std::string &n, bool(*cb)()) : name(n), callback(cb) {}
+    bool is_private;
+    MenuItem(const std::string &n, bool(*cb)(), bool p = false) : name(n), callback(cb), is_private(p) {}
 };
 
 enum class PauseType
@@ -80,6 +81,18 @@ static int s_pause_plr = 0;
 static int s_longest_width = 0;
 static std::vector<MenuItem> s_items;
 static int s_cheat_menu_bits = 0;
+static std::array<bool, maxLocalPlayers> s_leftright_release;
+
+uint8_t g_pending_action = 255;
+static bool s_force_exit = false;
+
+static void s_push_unpause()
+{
+    XMessage::Message unpause;
+    unpause.type = XMessage::Type::menu_action;
+    unpause.message = 0;
+    XMessage::PushMessage(unpause);
+}
 
 static bool s_Continue()
 {
@@ -167,8 +180,8 @@ static void s_CheatScreen_callback()
 {
     cheats_setBuffer(TextEntryScreen::Text);
 
-    // uncomment this if you want to return to the pause menu
-    // PauseInit(PauseCode::PauseScreen);
+    // comment this if you want to return to the pause menu
+    s_push_unpause();
 }
 
 static bool s_CheatScreen()
@@ -218,6 +231,11 @@ static bool s_SaveAndContinue()
 
 static bool s_Quit()
 {
+#ifdef THEXTECH_ENABLE_SDL_NET
+    XMessage::Disconnect();
+    s_force_exit = true;
+#endif
+
     bool CanSave = (LevelSelect || IsHubLevel) && !Cheater;
 
     if(CanSave)
@@ -258,6 +276,8 @@ void Init(int plr, bool LegacyPause)
     MenuCursor = 0;
     MenuCursorCanMove = false;
     MenuCursorCanMove_Back = false;
+    g_pending_action = 255;
+    s_force_exit = false;
 
     if(LegacyPause)
         s_pause_type = PauseType::Legacy;
@@ -269,6 +289,8 @@ void Init(int plr, bool LegacyPause)
     s_pause_plr = plr;
     if(s_cheat_menu_bits < 14)
         s_cheat_menu_bits = 0;
+
+    s_leftright_release.fill(false);
 
     // do a context-aware initialization of s_items
     s_items.clear();
@@ -293,28 +315,46 @@ void Init(int plr, bool LegacyPause)
             s_items.push_back(MenuItem{g_gameStrings.pauseItemResetCheckpoints, s_ResetCheckpoints});
 
         if(g_config.allow_drop_add)
-            s_items.push_back(MenuItem{g_gameStrings.pauseItemPlayerSetup, s_DropAddScreen});
+            s_items.push_back(MenuItem{g_gameStrings.pauseItemPlayerSetup, s_DropAddScreen, true});
 
         if(!inter_screen && s_cheat_menu_bits == 14 && !BattleMode)
-            s_items.push_back(MenuItem{g_gameStrings.pauseItemEnterCode, s_CheatScreen});
+            s_items.push_back(MenuItem{g_gameStrings.pauseItemEnterCode, s_CheatScreen, true});
 
-        s_items.push_back(MenuItem{g_mainMenu.mainOptions, s_OptionsScreen});
+        s_items.push_back(MenuItem{g_mainMenu.mainOptions, s_OptionsScreen, true});
 
         s_items.push_back(MenuItem{editor_test ? g_gameStrings.pauseItemReturnToEditor : g_gameStrings.pauseItemQuitTesting, s_QuitTesting});
     }
+#ifdef THEXTECH_ENABLE_SDL_NET
+    // NetPlay pause
+    else if(XMessage::GetStatus() != XMessage::Status::local)
+    {
+        s_items.push_back(MenuItem{g_gameStrings.pauseItemContinue, s_Continue});
+
+        if(g_config.allow_drop_add && s_pause_type != PauseType::Legacy)
+            s_items.push_back(MenuItem{g_gameStrings.pauseItemPlayerSetup, s_DropAddScreen, true});
+
+        if(s_cheat_menu_bits == 14 && s_pause_type != PauseType::Legacy && !BattleMode)
+            s_items.push_back(MenuItem{g_gameStrings.pauseItemEnterCode, s_CheatScreen, true});
+
+        if(s_pause_type != PauseType::Legacy)
+            s_items.push_back(MenuItem{g_mainMenu.mainOptions, s_OptionsScreen, true});
+
+        s_items.push_back(MenuItem{g_mainMenu.netplayLeaveRoom, s_Quit, true});
+    }
+#endif
     // main game pause
     else
     {
         s_items.push_back(MenuItem{g_gameStrings.pauseItemContinue, s_Continue});
 
         if(g_config.allow_drop_add && s_pause_type != PauseType::Legacy)
-            s_items.push_back(MenuItem{g_gameStrings.pauseItemPlayerSetup, s_DropAddScreen});
+            s_items.push_back(MenuItem{g_gameStrings.pauseItemPlayerSetup, s_DropAddScreen, true});
 
         if(s_cheat_menu_bits == 14 && s_pause_type != PauseType::Legacy && !BattleMode)
-            s_items.push_back(MenuItem{g_gameStrings.pauseItemEnterCode, s_CheatScreen});
+            s_items.push_back(MenuItem{g_gameStrings.pauseItemEnterCode, s_CheatScreen, true});
 
         if(s_pause_type != PauseType::Legacy)
-            s_items.push_back(MenuItem{g_mainMenu.mainOptions, s_OptionsScreen});
+            s_items.push_back(MenuItem{g_mainMenu.mainOptions, s_OptionsScreen, true});
 
         if(CanSave)
         {
@@ -381,7 +421,7 @@ void Render()
         XRender::renderRect(XRender::TargetW / 2 - menu_box_width / 2 - 2, XRender::TargetH / 2 - menu_box_height / 2 - 40 - 2, menu_box_width + 4, 28 + 4, {255, 255, 255});
         XRender::renderRect(XRender::TargetW / 2 - menu_box_width / 2, XRender::TargetH / 2 - menu_box_height / 2 - 40, menu_box_width, 28, {8, 96, 168});
 
-        SuperPrintScreenCenter(XMessage::DisplayRoom(XMessage::CurrentRoom()).room_name, 5, XRender::TargetH / 2 - menu_box_height / 2 - 36);
+        SuperPrintScreenCenter(g_mainMenu.netplayRoomKey + ' ' + XMessage::DisplayRoom(XMessage::CurrentRoom()).room_name, 5, XRender::TargetH / 2 - menu_box_height / 2 - 36);
     }
 #endif // #ifdef THEXTECH_ENABLE_SDL_NET
 
@@ -436,7 +476,7 @@ void Render()
         XHints::Draw(XRender::TargetH / 2 + menu_box_height / 2 + 16, 100, menu_box_width);
 }
 
-bool Logic(int plr)
+void ControlsLogic()
 {
     bool upPressed = SharedControls.MenuUp;
     bool downPressed = SharedControls.MenuDown;
@@ -448,27 +488,19 @@ bool Logic(int plr)
 
     // there was previously code to copy all players' controls from the main player, but this is no longer necessary (and actively harmful in the SingleCoop case)
 
+    int plr = s_pause_plr;
+    if(plr > numPlayers)
+        plr = 1;
+
     if(!g_config.multiplayer_pause_controls && plr == 0)
         plr = 1;
 
-    if(plr == 0)
+    for(int i = 0; i < l_screen->player_count; i++)
     {
-        for(int i = 1; i <= numPlayers; i++)
-        {
-            const Controls_t& c = Player[i].Controls;
+        if(plr != 0 && l_screen->players[i] != plr)
+            continue;
 
-            menuDoPress |= (c.Start || c.Jump);
-            menuBackPress |= c.Run;
-
-            upPressed |= c.Up;
-            downPressed |= c.Down;
-            leftPressed |= c.Left;
-            rightPressed |= c.Right;
-        }
-    }
-    else
-    {
-        const Controls_t& c = Player[plr].Controls;
+        const Controls_t& c = Controls::g_RawControls[i];
 
         menuDoPress |= (c.Start || c.Jump);
         menuBackPress |= c.Run;
@@ -497,7 +529,7 @@ bool Logic(int plr)
         if(!menuDoPress && !menuBackPress && !upPressed && !downPressed && (s_pause_type == PauseType::Legacy || (!leftPressed && !rightPressed)))
             MenuCursorCanMove = true;
 
-        return false;
+        return;
     }
 
     if((s_pause_type == PauseType::Legacy || BattleMode) && s_cheat_menu_bits < 14)
@@ -547,7 +579,7 @@ bool Logic(int plr)
             if(s_cheat_menu_bits >= 5)
             {
                 PlaySound(SFX_Do);
-                return false;
+                return;
             }
         }
         else if(s_cheat_menu_bits < 14)
@@ -564,14 +596,15 @@ bool Logic(int plr)
             if(s_cheat_menu_bits == 14)
             {
                 PlaySound(SFX_MedalGet);
-                return s_CheatScreen();
+                s_CheatScreen();
+                return;
             }
 
             // don't swap char
             if(s_cheat_menu_bits >= 5)
             {
                 PlaySound(SFX_Do);
-                return false;
+                return;
             }
         }
         else if(s_cheat_menu_bits < 14)
@@ -588,35 +621,21 @@ bool Logic(int plr)
     // special char change code
     if(SwapCharAllowed())
     {
-        for(int A = 1; A <= numPlayers; A++)
+        for(int plr_i = 0; plr_i < l_screen->player_count; plr_i++)
         {
-            if(!Player[A].RunRelease)
+            int A = l_screen->players[plr_i];
+
+            if(!s_leftright_release[plr_i])
             {
-                if(!Player[A].Controls.Left && !Player[A].Controls.Right)
-                    Player[A].RunRelease = true;
+                if(!Controls::g_RawControls[plr_i].Left && !Controls::g_RawControls[plr_i].Right)
+                    s_leftright_release[plr_i] = true;
             }
-            else if(Player[A].Controls.Left || Player[A].Controls.Right)
+            else if(Controls::g_RawControls[plr_i].Left || Controls::g_RawControls[plr_i].Right)
             {
-                AllCharBlock = 0;
-
-                for(int B = 1; B <= numCharacters; B++)
-                {
-                    if(!blockCharacter[B])
-                    {
-                        if(AllCharBlock == 0)
-                            AllCharBlock = B;
-                        else
-                        {
-                            AllCharBlock = 0;
-                            break;
-                        }
-                    }
-                }
-
-                Player[A].RunRelease = false;
+                s_leftright_release[plr_i] = false;
                 auto snd = SFX_BlockHit;
 
-                if(AllCharBlock == 0 && numPlayers <= maxLocalPlayers && Player[A].Effect == PLREFF_NORMAL)
+                if(!g_ClonedPlayerMode && Player[A].Effect == PLREFF_NORMAL)
                 {
                     // replaced old character swap code with this new code,
                     // supporting arbitrary multiplayer and in-level swap.
@@ -626,7 +645,7 @@ bool Logic(int plr)
                     for(int i = 0; i < 5; i++)
                     {
                         // move the target in the direction requested by the player
-                        if(Player[A].Controls.Left)
+                        if(Controls::g_RawControls[plr_i].Left)
                         {
                             target --;
 
@@ -646,19 +665,21 @@ bool Logic(int plr)
                             continue;
 
                         // also skip the target if it's another player's character
-                        int B;
+                        bool already_used = false;
 
-                        for(B = 1; B <= numPlayers; B++)
+                        for(int B = 1; B <= numPlayers; B++)
                         {
                             if(B == A)
                                 continue;
 
                             if(target == Player[B].Character)
+                            {
+                                already_used = true;
                                 break;
+                            }
                         }
 
-                        // B <= numPlayers only if the above break was triggered
-                        if(B <= numPlayers)
+                        if(already_used)
                             continue;
 
                         // otherwise we are good and can keep the target
@@ -669,10 +690,13 @@ bool Logic(int plr)
                     if(target != Player[A].Character)
                     {
                         snd = SFX_Slide;
-                        SwapCharacter(A, target);
 
-                        if(LevelSelect)
-                            SetupPlayers();
+                        XMessage::Message swap_char;
+                        swap_char.type = XMessage::Type::char_swap;
+                        swap_char.player = plr_i;
+                        swap_char.message = target;
+
+                        XMessage::PushMessage(swap_char);
                     }
                 }
 
@@ -681,10 +705,34 @@ bool Logic(int plr)
         }
     }
 
+    if(menuDoPress && MenuCursor >= 0 && MenuCursor < (int)s_items.size())
+    {
+        if(s_items[MenuCursor].is_private)
+            s_items[MenuCursor].callback();
+        else
+        {
+            XMessage::Message menu_action;
+            menu_action.type = XMessage::Type::menu_action;
+            menu_action.message = MenuCursor;
+            XMessage::PushMessage(menu_action);
+        }
+    }
+}
+
+bool Logic()
+{
+    if(s_force_exit)
+    {
+        s_force_exit = false;
+        return true;
+    }
+
     bool stopPause = false;
 
-    if(menuDoPress && MenuCursor >= 0 && MenuCursor < (int)s_items.size())
-        stopPause = s_items[MenuCursor].callback();
+    if(g_pending_action < s_items.size() && !s_items[g_pending_action].is_private)
+        stopPause = s_items[g_pending_action].callback();
+
+    g_pending_action = 255;
 
     return stopPause;
 }

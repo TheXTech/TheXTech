@@ -24,6 +24,9 @@
 #include "message.h"
 #include "globals.h"
 
+#include "player.h"
+#include "main/screen_pause.h"
+
 #ifdef THEXTECH_ENABLE_SDL_NET
 #   include "main/client_methods.h"
 #endif
@@ -47,6 +50,22 @@ void Handle(const Message& m)
         bool is_press = (m.type == Type::press);
 
         button = is_press;
+    }
+    else if(m.type == Type::char_swap)
+    {
+        if(m.screen >= maxNetplayClients || m.player >= Screens[m.screen].player_count || m.message < 1 || m.message > numCharacters || !SwapCharAllowed())
+            return;
+
+        SwapCharacter(Screens[m.screen].players[m.player], m.message);
+
+        if(LevelSelect)
+            SetupPlayers();
+    }
+    else if(m.type == Type::menu_action)
+    {
+        // FIXME: check that screen is the one in control of the pause menu
+
+        PauseScreen::g_pending_action = m.message;
     }
 }
 

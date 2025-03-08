@@ -225,6 +225,7 @@ void initMainMenu()
     g_mainMenu.netplayRoomKey = "Room key:";
     g_mainMenu.netplayJoinRoom = "Join Room";
     g_mainMenu.netplayCreateRoom = "Create Room";
+    g_mainMenu.netplayLeaveRoom = "Leave Room";
     g_mainMenu.netplayServer = "Server:";
     g_mainMenu.netplayNickname = "Nickname:";
 #endif
