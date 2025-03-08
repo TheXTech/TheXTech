@@ -397,9 +397,17 @@ static inline bool GL_DrawImage_Custom(int name, int flags,
     uint16_t v2 = (src_y + src_h) >> (flags & 15);
 
     if(flip & X_FLIP_HORIZONTAL)
+    {
         std::swap(u1, u2);
+        u1 -= 1;
+        u2 -= 1;
+    }
     if(flip & X_FLIP_VERTICAL)
+    {
         std::swap(v1, v2);
+        v1 -= 1;
+        v2 -= 1;
+    }
 
     uint8_t r = color.r;
     uint8_t g = color.g;
@@ -907,24 +915,22 @@ static void minport_RenderTexturePrivate(int16_t xDst, int16_t yDst, int16_t wDs
         yDst = -cy;
     }
 
+    int to_draw = 0;
+    int to_draw_2 = 0;
+
+    int tex_part_height = 1024 << (tx.l.flags & 15);
+
     if(!tx.d.reallyHasTexture())
     {
+        // can't do anything
         s_glBoxFilledGradient( xDst, yDst, xDst + wDst - 1, yDst + hDst - 1,
                              RGB15( 15, 2, 1 ),
                              RGB15( 1, 15, 1 ),
                              RGB15( 1, 2, 15 ),
                              RGB15( 1, 15, 15 )
                            );
-
-        return;
     }
-
-    int to_draw = 0;
-    int to_draw_2 = 0;
-
-    int tex_part_height = 1024 << (tx.l.flags & 15);
-
-    if(ySrc + hSrc > tex_part_height)
+    else if(ySrc + hSrc > tex_part_height)
     {
         if(ySrc + hSrc > tex_part_height * 2)
         {
@@ -961,12 +967,14 @@ static void minport_RenderTexturePrivate(int16_t xDst, int16_t yDst, int16_t wDs
         to_draw = tx.d.texture[0];
     }
 
-    if(!to_draw) return;
+    if(!to_draw)
+        goto cleanup;
 
     GL_DrawImage_Custom(to_draw, tx.l.flags, xDst, yDst, wDst, hDst,
                         xSrc, ySrc, wSrc, hSrc, flip, color);
 
     // finalize rotation HERE
+cleanup:
     if(rotateAngle)
         glPopMatrix(1);
 }
