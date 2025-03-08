@@ -217,6 +217,9 @@ void renderRect(int x, int y, int w, int h, XTColor color, bool filled)
     int y_div = FLOORDIV2(y);
     int h_div = FLOORDIV2(y + h) - y_div;
 
+    if(w_div <= 0 || h_div <= 0)
+        return;
+
     if(filled)
         minport_RenderBoxFilled(x_div, y_div, x_div + w_div, y_div + h_div, color);
     else
