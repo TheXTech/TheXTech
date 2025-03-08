@@ -761,13 +761,13 @@ static void s_PauseFinish(int stack_level)
 
         if(PSwitchTime > 0)
             ResumeMusic();
-    }
 
-    // prevent unexpected button presses
-    for(int i = 1; i <= numPlayers; i++)
-    {
-        Player[i].UnStart = false;
-        Player[i].CanJump = false;
+        // prevent unexpected button presses
+        for(int i = 1; i <= numPlayers; i++)
+        {
+            Player[i].UnStart = false;
+            Player[i].CanJump = false;
+        }
     }
 
     MenuCursorCanMove = false;
