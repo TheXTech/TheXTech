@@ -134,6 +134,7 @@ static void macosReceiveOpenFile()
 
 #ifdef __3DS__
 #include <3ds.h>
+#include <malloc.h>
 int n3ds_clocked = 0; // eventually move elsewhere
 
 void InitClockSpeed()
@@ -310,6 +311,12 @@ int main(int argc, char**argv)
 #ifdef __3DS__
     InitClockSpeed();
     SwapClockSpeed();
+
+#   ifdef THEXTECH_ENABLE_SDL_NET
+    // spend 256kb on a buffer
+    uint32_t* socket_buffer = (uint32_t*)memalign(0x1000, 0x40000);
+    socInit(socket_buffer, 0x40000);
+#   endif
 #endif
 
     seedRandom(std::time(NULL));
