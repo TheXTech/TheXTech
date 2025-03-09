@@ -5,6 +5,11 @@ if(POLICY CMP0069) # Allow CMAKE_INTERPROCEDURAL_OPTIMIZATION (lto) to be set
     set(CMAKE_POLICY_DEFAULT_CMP0069 NEW)
 endif()
 
+if(POLICY CMP0079) # Allow linking subprojects against each other
+    cmake_policy(SET CMP0079 NEW)
+    set(CMAKE_POLICY_DEFAULT_CMP0079 NEW)
+endif()
+
 project(TheXTech LANGUAGES C CXX)
 
 include(CheckCCompilerFlag)
@@ -631,9 +636,9 @@ endif()
 
 if(THEXTECH_ENABLE_SDL_NET)
     message("== Building SDL_net... but it doesn't do anything! ==")
-    set(BUILD_SHARED_LIBS OFF)
+    set(SDL_NET_PGE_DEPENDENT_BUILD ON)
     add_subdirectory(3rdparty/SDL_net EXCLUDE_FROM_ALL)
-    target_link_libraries(A2XT_Int INTERFACE SDL2_net)
+    target_link_libraries(SDL2_net PRIVATE A2XT_Int)
     target_compile_definitions(A2XT_Int INTERFACE
         -DTHEXTECH_ENABLE_SDL_NET
     )
@@ -1475,6 +1480,10 @@ endif()
 
 target_include_directories(thextech PRIVATE ${A2XT_INCS})
 target_link_libraries(thextech PRIVATE A2XT_Int)
+
+if(THEXTECH_ENABLE_SDL_NET)
+    target_link_libraries(thextech PRIVATE SDL2_net)
+endif()
 
 if(RANGE_ARR_USE_HEAP)
     target_compile_definitions(thextech PRIVATE -DRANGE_ARR_USE_HEAP)
