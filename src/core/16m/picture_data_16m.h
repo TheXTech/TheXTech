@@ -37,8 +37,6 @@ struct StdPicture;
 struct StdPictureData
 {
 
-    bool attempted_load = false;
-
     int texture[3] = {0, 0, 0};
     int data_size = 0;
 
@@ -49,16 +47,12 @@ struct StdPictureData
     StdPicture* next_texture = nullptr;
 
     //! The last frame that the texture was rendered (not accessed if not in the render chain)
+    // (in unloaded textures, used for frame of load failure due to texture memory pressure)
     uint32_t last_draw_frame = 0;
-
-    inline bool reallyHasTexture()
-    {
-        return texture[0];
-    }
 
     inline bool hasTexture()
     {
-        return attempted_load;
+        return texture[0];
     }
 
     inline void destroy()
@@ -70,7 +64,7 @@ struct StdPictureData
 
         data_size = 0;
 
-        attempted_load = false;
+        last_draw_frame = 0;
     }
 
 };

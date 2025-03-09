@@ -234,7 +234,7 @@ static int s_loadTextureToRAM(tex_load_data& tex, const std::string& path, int l
     return complete_texture_count + 1;
 }
 
-static int s_loadTexture(const std::string& path, int* tex_out, int* data_size, int logical_w, int logical_h, int flags)
+static int s_loadTexture(const std::string& path, int* tex_out, int* data_size, int logical_w, int logical_h, int flags, bool& file_missing)
 {
     if(!tex_out || !data_size)
     {
@@ -247,7 +247,10 @@ static int s_loadTexture(const std::string& path, int* tex_out, int* data_size, 
     int tex_count = s_loadTextureToRAM(tex, path, logical_w, logical_h, flags);
 
     if(tex_count == 0)
+    {
+        file_missing = true;
         return false;
+    }
 
     int loaded = 0;
     uint32_t loaded_data_size = 0;
@@ -814,21 +817,32 @@ void lazyLoadPictureFromList(StdPicture_Sub& target, PGE_FileFormats_misc::TextI
 
 void lazyLoad(StdPicture &target)
 {
-    if(!target.inited || !target.l.lazyLoaded || target.d.hasTexture())
+    if(!target.inited || !target.l.lazyLoaded || target.d.hasTexture() || (target.d.last_draw_frame && g_current_frame - target.d.last_draw_frame < g_load_failure_retry_frames))
         return;
 
-    target.d.attempted_load = true;
-    s_texture_bank.insert(&target);
-
-    std::string suppPath;
-
-    if(!s_loadTexture(target.l.path, target.d.texture, &target.d.data_size, target.w, target.h, target.l.flags))
+    bool file_missing = false;
+    if(!s_loadTexture(target.l.path, target.d.texture, &target.d.data_size, target.w, target.h, target.l.flags, file_missing))
     {
-        pLogWarning("Permanently failed to load %s", target.l.path.c_str());
-        return;
+        if(file_missing)
+        {
+            pLogWarning("Permanently failed to load %s", target.l.path.c_str());
+            target.inited = false;
+            return;
+        }
+        else
+        {
+            pLogInfo("Failed to load %s", target.l.path.c_str());
+
+            // use normal timeout if it's already failed to load once
+            if(target.d.last_draw_frame)
+                target.d.last_draw_frame = g_current_frame;
+            // use fast timeout if this is the first time
+            else
+                target.d.last_draw_frame = g_current_frame - (g_load_failure_retry_frames - 65);
+        }
     }
 
-    return;
+    s_texture_bank.insert(&target);
 }
 
 void lazyPreLoad(StdPicture &target)
@@ -867,7 +881,7 @@ void unloadTexture(StdPicture &tx)
 
     minport_unlinkTexture(&tx);
 
-    if(tx.d.reallyHasTexture())
+    if(tx.d.hasTexture())
     {
         D_pLogDebug("Freeing %d bytes from %s", tx.d.data_size);
         s_loadedVRAM -= tx.d.data_size;
@@ -888,7 +902,7 @@ static void minport_RenderTexturePrivate(int16_t xDst, int16_t yDst, int16_t wDs
     if(!tx.inited)
         return;
 
-    if(tx.l.lazyLoaded && !tx.d.hasTexture() && !tx.d.reallyHasTexture())
+    if(tx.l.lazyLoaded && !tx.d.hasTexture())
         lazyLoad(tx);
 
     // handle rotation NOW
@@ -920,7 +934,7 @@ static void minport_RenderTexturePrivate(int16_t xDst, int16_t yDst, int16_t wDs
 
     int tex_part_height = 1024 << (tx.l.flags & 15);
 
-    if(!tx.d.reallyHasTexture())
+    if(!tx.d.hasTexture())
     {
         // can't do anything
         s_glBoxFilledGradient( xDst, yDst, xDst + wDst - 1, yDst + hDst - 1,
@@ -987,10 +1001,10 @@ static void minport_RenderTexturePrivate_Basic(int16_t xDst, int16_t yDst, int16
     if(!tx.inited)
         return;
 
-    if(tx.l.lazyLoaded && !tx.d.hasTexture() && !tx.d.reallyHasTexture())
+    if(tx.l.lazyLoaded && !tx.d.hasTexture())
         lazyLoad(tx);
 
-    if(!tx.d.reallyHasTexture())
+    if(!tx.d.hasTexture())
         return;
 
     if(tx.d.texture[1])
