@@ -199,7 +199,7 @@ struct MainMenuContent
 
 #ifdef THEXTECH_ENABLE_SDL_NET
     // NetPlay
-    std::string mainPlayOnline;
+    std::string mainNetplay;
     std::string netplayRoomKey;
     std::string netplayJoinRoom;
     std::string netplayCreateRoom;

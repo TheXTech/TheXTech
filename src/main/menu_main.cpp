@@ -221,7 +221,7 @@ void initMainMenu()
 
 #ifdef THEXTECH_ENABLE_SDL_NET
     // NetPlay
-    g_mainMenu.mainPlayOnline = "Play Online";
+    g_mainMenu.mainNetplay = "NetPlay";
     g_mainMenu.netplayRoomKey = "Room key:";
     g_mainMenu.netplayJoinRoom = "Join Room";
     g_mainMenu.netplayCreateRoom = "Create Room";
@@ -1124,7 +1124,7 @@ bool mainMenuUpdate()
                             menuLen = 18 * (int)g_mainMenu.mainBattleGame.size();
 #ifdef THEXTECH_ENABLE_SDL_NET
                         else if(s_show_online() && A == i++)
-                            menuLen = 18 * (int)g_mainMenu.mainPlayOnline.size();
+                            menuLen = 18 * (int)g_mainMenu.mainNetplay.size();
 #endif
                         else if(g_config.enable_editor && A == i++)
                             menuLen = 18 * (int)g_mainMenu.mainEditor.size();
@@ -2774,7 +2774,7 @@ void mainMenuDraw()
             SuperPrint(g_mainMenu.mainBattleGame, 3, MenuX, MenuY+30*(i++));
 #ifdef THEXTECH_ENABLE_SDL_NET
         if(s_show_online())
-            SuperPrint(g_mainMenu.mainPlayOnline, 3, MenuX, MenuY+30*(i++));
+            SuperPrint(g_mainMenu.mainNetplay, 3, MenuX, MenuY+30*(i++));
 #endif
         if(g_config.enable_editor)
             SuperPrint(g_mainMenu.mainEditor, 3, MenuX, MenuY+30*(i++));
