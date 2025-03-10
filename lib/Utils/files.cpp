@@ -307,10 +307,13 @@ int Files::skipBom(SDL_RWops* file, const char** charset)
 bool Files::fileExists(const std::string &path)
 {
 #if defined(_WIN32)
-    std::wstring wpath = Str2WStr(path);
-    return PathFileExistsW(wpath.c_str()) == TRUE;
+    if(!Archives::has_prefix(path))
+    {
+        std::wstring wpath = Str2WStr(path);
+        return PathFileExistsW(wpath.c_str()) == TRUE;
+    }
+#endif
 
-#else
     SDL_RWops *ops = Files::open_file(path, "rb");
     if(ops)
     {
@@ -319,7 +322,6 @@ bool Files::fileExists(const std::string &path)
     }
 
     return false;
-#endif
 }
 
 bool Files::deleteFile(const std::string &path)
@@ -444,7 +446,7 @@ bool Files::hasSuffix(const std::string &path, const std::string &suffix)
 
 bool Files::isAbsolute(const std::string& path)
 {
-    if(Archives::is_prefix(path.c_str()[0]))
+    if(Archives::has_prefix(path))
         return true;
 
     bool firstCharIsSlash = (path.size() > 0) ? path[0] == '/' : false;
