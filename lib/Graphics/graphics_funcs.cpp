@@ -614,7 +614,10 @@ FIBITMAP *GraphicsHelps::fast2xScaleDown(FIBITMAP *image)
     const uint32_t *src_pixels  = reinterpret_cast<uint32_t*>(FreeImage_GetBits(image));
     auto src_pitch_px = static_cast<uint32_t>(FreeImage_GetPitch(image)) / 4;
 
-    FIBITMAP *dest = FreeImage_Allocate(src_w / 2, src_h / 2, 32);
+    auto dest_w = src_w / 2;
+    auto dest_h = src_h / 2;
+
+    FIBITMAP *dest = FreeImage_Allocate(dest_w, dest_h, 32);
 
     if(!dest)
         return nullptr;
@@ -622,9 +625,9 @@ FIBITMAP *GraphicsHelps::fast2xScaleDown(FIBITMAP *image)
     uint32_t *dest_pixels  = reinterpret_cast<uint32_t*>(FreeImage_GetBits(dest));
     auto dest_pitch_px = static_cast<uint32_t>(FreeImage_GetPitch(dest)) / 4;
 
-    for(uint32_t src_y = 0, dest_y = 0; dest_y < src_h / 2; src_y += 2, dest_y += 1)
+    for(uint32_t src_y = 0, dest_y = 0; dest_y < dest_h; src_y += 2, dest_y += 1)
     {
-        for(uint32_t src_x = 0, dest_x = 0; dest_x < src_w / 2; src_x += 2, dest_x += 1)
+        for(uint32_t src_x = 0, dest_x = 0; dest_x < dest_w; src_x += 2, dest_x += 1)
         {
             dest_pixels[dest_y * dest_pitch_px + dest_x] = src_pixels[src_y * src_pitch_px + src_x];
         }
@@ -883,14 +886,15 @@ FIBITMAP *GraphicsHelps::fastScaleDownAnd32Bit(FIBITMAP *image, bool do_scale_do
     auto src_stride = static_cast<uint32_t>(FreeImage_GetPitch(image)) * 2;
     auto src_pixel_stride = (FreeImage_GetBPP(image) == 8) ? 2 : 1;
 
-    FIBITMAP *dest = FreeImage_Allocate(src_w / 2, src_h / 2, 32);
+    auto dest_w = src_w / 2;
+    auto dest_h = src_h / 2;
+
+    FIBITMAP *dest = FreeImage_Allocate(dest_w, dest_h, 32);
 
     if(!dest)
-    {
         return nullptr;
-    }
 
-    uint32_t *dest_pixels  = reinterpret_cast<uint32_t*>(FreeImage_GetBits(dest));
+    uint32_t *dest_pixels = reinterpret_cast<uint32_t*>(FreeImage_GetBits(dest));
     auto dest_px_stride = static_cast<uint32_t>(FreeImage_GetPitch(dest)) / 4;
 
     // special logic for 1 BPP
@@ -908,9 +912,9 @@ FIBITMAP *GraphicsHelps::fastScaleDownAnd32Bit(FIBITMAP *image, bool do_scale_do
         }
 
         // perform lookups
-        for(uint32_t y = 0; y < src_h / 2; y++)
+        for(uint32_t y = 0; y < dest_h; y++)
         {
-            for(uint32_t x = 0; x < src_w / 2; x++)
+            for(uint32_t x = 0; x < dest_w; x++)
             {
                 uint8_t which_bit = 64 >> ((x % 4) * 2);
                 bool lit = src_pixels[y * src_stride + x / 4] & which_bit;
@@ -927,9 +931,9 @@ FIBITMAP *GraphicsHelps::fastScaleDownAnd32Bit(FIBITMAP *image, bool do_scale_do
         src_pixel_stride = 6;
         uint8_t* dest_pixel_components = reinterpret_cast<uint8_t*>(dest_pixels);
 
-        for(uint32_t y = 0; y < src_h / 2; y++)
+        for(uint32_t y = 0; y < dest_h; y++)
         {
-            for(uint32_t x = 0; x < src_w / 2; x++)
+            for(uint32_t x = 0; x < dest_w; x++)
             {
                 dest_pixel_components[(y * dest_px_stride + x) * 4 + 0] = src_pixels[y * src_stride + x * src_pixel_stride + 0];
                 dest_pixel_components[(y * dest_px_stride + x) * 4 + 1] = src_pixels[y * src_stride + x * src_pixel_stride + 1];
@@ -971,9 +975,9 @@ FIBITMAP *GraphicsHelps::fastScaleDownAnd32Bit(FIBITMAP *image, bool do_scale_do
     }
 
     // perform lookups
-    for(uint32_t y = 0; y < src_h / 2; y++)
+    for(uint32_t y = 0; y < dest_h; y++)
     {
-        for(uint32_t x = 0; x < src_w / 2; x++)
+        for(uint32_t x = 0; x < dest_w; x++)
         {
             dest_pixels[y * dest_px_stride + x] = palette[src_pixels[y * src_stride + x * src_pixel_stride]];
         }
