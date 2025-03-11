@@ -557,11 +557,10 @@ void renderTexture(double xDst, double yDst, double wDst, double hDst,
     auto div_w = FLOORDIV2(xDst + wDst) - div_x;
     auto div_h = FLOORDIV2(yDst + hDst) - div_y;
 
-    minport_RenderTexturePrivate_2(
+    minport_RenderTexturePrivate_Basic_2(
         div_x, div_y, div_w, div_h,
         tx,
-        FLOORDIV2(xSrc), FLOORDIV2(ySrc), div_w, div_h,
-        0.0f, nullptr, X_FLIP_NONE,
+        FLOORDIV2(xSrc), FLOORDIV2(ySrc),
         color);
 }
 
@@ -571,11 +570,10 @@ void renderTexture(float xDst, float yDst, StdPicture &tx,
     int w = tx.w / 2;
     int h = tx.h / 2;
 
-    minport_RenderTexturePrivate_2(
+    minport_RenderTexturePrivate_Basic_2(
         FLOORDIV2(xDst), FLOORDIV2(yDst), w, h,
         tx,
-        0, 0, w, h,
-        0.0f, nullptr, X_FLIP_NONE,
+        0, 0,
         color);
 }
 
@@ -589,19 +587,6 @@ void renderTextureBasic(int xDst, int yDst, StdPicture &tx,
         FLOORDIV2(xDst), FLOORDIV2(yDst), w, h,
         tx,
         0, 0,
-        color);
-}
-
-void renderTexture(int xDst, int yDst, StdPicture &tx, XTColor color)
-{
-    int w = tx.w / 2;
-    int h = tx.h / 2;
-
-    minport_RenderTexturePrivate_2(
-        FLOORDIV2(xDst), FLOORDIV2(yDst), w, h,
-        tx,
-        0.0f, 0.0f, w, h,
-        0.0f, nullptr, X_FLIP_NONE,
         color);
 }
 
