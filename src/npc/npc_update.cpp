@@ -1304,8 +1304,10 @@ interrupt_Activation:
                 if(NPC[A].Location.SpeedY < -3)
                     NPC[A].Location.SpeedY = -3;
             }
-            else if(!(NPC[A].Type != NPCID_RAFT && !NPC[A]->IsFish))
+            // as far as I'm aware it would make absolutely no difference if this did not happen for NPCID_RAFT
+            else if(NPC[A].Type == NPCID_RAFT || NPC[A]->IsFish)
             {
+                // detect if fish is out of water for an extended period so that it can clip through walls
                 NPC[A].WallDeath += 2;
 
                 if(NPC[A].WallDeath >= 10)
@@ -1758,6 +1760,7 @@ interrupt_Activation:
                         // NPC Collision
                         NPCCollide(A);
 
+                        // reset WallDeath variable for thrown items and decay it for fish re-entering water
                         if(NPC[A].WallDeath > 0)
                         {
                             if(NPC[A]->IsFish)

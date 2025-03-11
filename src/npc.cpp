@@ -3627,6 +3627,8 @@ void SpecialNPC(int A)
                         NPC[A].Location.SpeedY = -9;
                     NPC[A].Special3 = 0;
                     NPC[A].Special5 = 1;
+
+                    // this allows the fish to go through walls after leaping
                     NPC[A].WallDeath = 10;
                 }
             }

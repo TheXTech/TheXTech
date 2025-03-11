@@ -115,6 +115,7 @@ void NPCBlockLogic(int A, double& tempHit, int& tempHitBlock, float& tempSpeedA,
                                     else
                                         HitSpot = FindCollisionBelt(NPC[A].Location, Block[B].Location, oldBeltSpeed);
 
+                                    // fish ignore block collisions while out of water (eg, jumping)
                                     if(NPC[A]->IsFish)
                                     {
                                         if(NPC[A].Wet == 0)
@@ -1111,6 +1112,7 @@ void NPCBlockLogic(int A, double& tempHit, int& tempHitBlock, float& tempSpeedA,
 
                                         NPC[A].onWall = true;
 
+                                        // item was thrown into a wall this frame (or is a fish that just re-entered water)
                                         if(NPC[A].WallDeath >= 5 && !NPC[A]->IsABonus && NPC[A].Type != NPCID_FLY_BLOCK &&
                                            NPC[A].Type != NPCID_FLY_CANNON && NPC[A].Type != NPCID_RED_BOOT && NPC[A].Type != NPCID_CANNONENEMY && NPC[A].Type != NPCID_CANNONITEM &&
                                            NPC[A].Type != NPCID_SPRING && NPC[A].Type != NPCID_HEAVY_THROWER && NPC[A].Type != NPCID_KEY && NPC[A].Type != NPCID_COIN_SWITCH &&

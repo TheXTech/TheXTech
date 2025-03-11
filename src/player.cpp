@@ -3235,6 +3235,7 @@ void YoshiSpit(const int A)
         {
             NPC[p.YoshiNPC].Direction = p.Direction;
             NPC[p.YoshiNPC].Frame = 0;
+            // this means that the NPC will be killed if it is inside a wall next frame
             NPC[p.YoshiNPC].WallDeath = 5;
             NPC[p.YoshiNPC].FrameCount = 0;
             NPC[p.YoshiNPC].Frame = EditorNPCFrame(NPC[p.YoshiNPC].Type, NPC[p.YoshiNPC].Direction);
@@ -5104,6 +5105,7 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
         {
             NPC[p.HoldingNPC].Location.SpeedX = 0;
             NPC[p.HoldingNPC].Location.SpeedY = 0;
+            // this means that the NPC will be killed if it is inside a wall next frame
             NPC[p.HoldingNPC].WallDeath = 5;
 
             if(NPC[p.HoldingNPC].Type == NPCID_HEAVY_THROWER)

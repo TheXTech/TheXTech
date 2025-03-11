@@ -148,6 +148,7 @@ void PlayerShootChar5Beam(int A)
     if(NPC[numNPCs].Type == NPCID_PLR_FIREBALL)
         NPC[numNPCs].Frame = 16;
 
+    // kill item if it is inside a wall next frame
     NPC[numNPCs].WallDeath = 5;
     NPC[numNPCs].Location.SpeedY = 0;
     NPC[numNPCs].Location.SpeedX = 5 * Player[A].Direction + (Player[A].Location.SpeedX / 3);
