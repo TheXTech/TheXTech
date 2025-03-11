@@ -310,12 +310,16 @@ inline Location_t extract_loc(NPCRef_t obj)
 
     if(ret.Height < NPCHeight(obj->Type))
         ret.Height = NPCHeight(obj->Type);
+    else if(ret.Height <= 0)
+        ret.Height = 1;
 
     if(ret.Width < NPCWidthGFX(obj->Type))
     {
         ret.X -= (NPCWidthGFX(obj->Type) - ret.Width) / 2.0;
         ret.Width = NPCWidthGFX(obj->Type);
     }
+    else if(ret.Width <= 0)
+        ret.Width = 1;
 
     // for tempBlock queries
     if(obj->Type == 26)
