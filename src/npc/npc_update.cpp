@@ -220,9 +220,11 @@ bool UpdateNPCs()
     if(FreezeNPCs) // When time is paused
     {
         StopHit = 0;
-        int A;
-        for(A = numNPCs; A >= 1; A--) // check to see if NPCs should be killed
+
+        // handle active NPCs
+        for(; activation_it != NPCQueues::Active.may_insert_erase.end(); ++activation_it)
         {
+            int A = *activation_it;
             if(NPCIsBoot(NPC[A]) || NPCIsYoshi(NPC[A]))
             {
                 if(NPC[A].CantHurt > 0)
@@ -245,13 +247,27 @@ bool UpdateNPCs()
             {
                 Deactivate(A);
                 if(g_config.fix_FreezeNPCs_no_reset)
+                {
+                    // eventually: do something to reset the NPC's state using a routine shared with the main UpdateNPCs logic
                     NPC[A].TimeLeft = -1;
+                }
             }
 
             if(NPC[A].JustActivated)
             {
                 NPC[A].JustActivated = 0;
                 NPCQueues::update(A);
+            }
+        }
+
+        // keep inactive NPCs from respawning during FreezeNPCs (SMBX 1.3 behavior)
+        for(int A : NPCQueues::Unchecked)
+        {
+            if(A <= numNPCs && NPC[A].TimeLeft == 0)
+            {
+                NPC[A].Reset[1] = false;
+                NPC[A].Reset[2] = false;
+                NPCQueues::NoReset.push_back(A);
             }
         }
 
