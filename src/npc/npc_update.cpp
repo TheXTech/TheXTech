@@ -176,8 +176,8 @@ bool UpdateNPCs()
     case GameLoopInterrupt::UpdateNPCs_Activation_Self:
     case GameLoopInterrupt::UpdateNPCs_Activation_Chain:
         goto resume_Activation;
-    case GameLoopInterrupt::UpdateNPCs_Normal_KillNPC:
-        goto resume_Normal_KillNPC;
+    case GameLoopInterrupt::UpdateNPCs_KillNPC:
+        goto resume_KillNPC;
     default:
         break;
     }
@@ -1944,7 +1944,7 @@ kill_NPCs_and_CharStuff:
 
             while(KillNPC(A, NPC[A].Killed))
             {
-                g_gameLoopInterrupt.site = GameLoopInterrupt::UpdateNPCs_Normal_KillNPC;
+                g_gameLoopInterrupt.site = GameLoopInterrupt::UpdateNPCs_KillNPC;
                 g_gameLoopInterrupt.A = i; // NOT A
                 g_gameLoopInterrupt.B = KillCode;
                 // C is reserved as the event index
@@ -1953,7 +1953,7 @@ kill_NPCs_and_CharStuff:
                 g_gameLoopInterrupt.F = KilledQueue_known;
                 return true;
 
-resume_Normal_KillNPC:
+resume_KillNPC:
                 i = g_gameLoopInterrupt.A;
                 A = NPCQueues::Killed[i];
                 KillCode = g_gameLoopInterrupt.B;

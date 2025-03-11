@@ -85,8 +85,7 @@ bool KillNPC(int A, int B)
 
     switch(g_gameLoopInterrupt.site)
     {
-    case GameLoopInterrupt::UpdateNPCs_FreezeNPCs_KillNPC:
-    case GameLoopInterrupt::UpdateNPCs_Normal_KillNPC:
+    case GameLoopInterrupt::UpdateNPCs_KillNPC:
         if(g_gameLoopInterrupt.bool1)
             goto resume_TriggerLast;
         else

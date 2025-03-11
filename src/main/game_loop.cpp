@@ -164,8 +164,7 @@ void GameLoop()
             case GameLoopInterrupt::UpdateNPCs_Activation_Generator:
             case GameLoopInterrupt::UpdateNPCs_Activation_Self:
             case GameLoopInterrupt::UpdateNPCs_Activation_Chain:
-            case GameLoopInterrupt::UpdateNPCs_FreezeNPCs_KillNPC:
-            case GameLoopInterrupt::UpdateNPCs_Normal_KillNPC:
+            case GameLoopInterrupt::UpdateNPCs_KillNPC:
                 goto resume_UpdateNPCs;
             case GameLoopInterrupt::UpdateEvents:
                 goto resume_UpdateEvents;
