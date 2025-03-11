@@ -176,8 +176,6 @@ bool UpdateNPCs()
     case GameLoopInterrupt::UpdateNPCs_Activation_Self:
     case GameLoopInterrupt::UpdateNPCs_Activation_Chain:
         goto resume_Activation;
-    case GameLoopInterrupt::UpdateNPCs_FreezeNPCs_KillNPC:
-        goto resume_FreezeNPCs_KillNPC;
     case GameLoopInterrupt::UpdateNPCs_Normal_KillNPC:
         goto resume_Normal_KillNPC;
     default:
@@ -255,39 +253,9 @@ bool UpdateNPCs()
                 NPC[A].JustActivated = 0;
                 NPCQueues::update(A);
             }
-
-            if(NPC[A].Killed > 0)
-            {
-                if(NPC[A].Location.SpeedX == 0.0)
-                {
-                    NPC[A].Location.SpeedX = dRand() * 2 - 1;
-                    if(NPC[A].Location.SpeedX < 0)
-                        NPC[A].Location.SpeedX -= 0.5;
-                    else
-                        NPC[A].Location.SpeedX += 0.5;
-                }
-
-                int KillCode;
-                KillCode = NPC[A].Killed;
-
-                while(KillNPC(A, KillCode))
-                {
-                    g_gameLoopInterrupt.site = GameLoopInterrupt::UpdateNPCs_FreezeNPCs_KillNPC;
-                    g_gameLoopInterrupt.A = A;
-                    g_gameLoopInterrupt.B = KillCode;
-                    return true;
-
-resume_FreezeNPCs_KillNPC:
-                    A = g_gameLoopInterrupt.A;
-                    KillCode = g_gameLoopInterrupt.B;
-                }
-            }
         }
 
-        NPCQueues::Killed.clear();
-
-        CharStuff();
-        return false;
+        goto kill_NPCs_and_CharStuff;
     }
 
 
@@ -1925,6 +1893,7 @@ interrupt_Activation:
 
     treeTempBlockClear();
 
+kill_NPCs_and_CharStuff:
 
     // kill the NPCs, from last to first
     std::sort(NPCQueues::Killed.begin(), NPCQueues::Killed.end(),
