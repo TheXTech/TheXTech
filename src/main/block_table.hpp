@@ -182,6 +182,7 @@ struct rect_internal
 
     class iterator
     {
+        friend struct rect_internal;
     private:
         const rect_internal& parent;
         AugLoc_t cur_loc;
@@ -201,8 +202,8 @@ struct rect_internal
 
                 if(this->cur_loc.x != this->parent.r)
                 {
-                    this->cur_loc.cont_axes |= CONT_X;
-                    this->cur_loc.cont_axes &= ~CONT_Y | (this->parent.cont_axes & CONT_Y);
+                    // CONT_X for certain, CONT_Y if it's set by the parent
+                    this->cur_loc.cont_axes = CONT_X | this->parent.cont_axes;
                     this->cur_loc.y = this->parent.t;
                 }
             }
@@ -210,9 +211,10 @@ struct rect_internal
             return *this;
         }
 
-        inline bool operator!=(const iterator& other) const
+        inline bool operator!=(const iterator& end) const
         {
-            return this->cur_loc.y != other.cur_loc.y || this->cur_loc.x != other.cur_loc.x;
+            // only check for inequality on X axis; that signals iteration is over
+            return this->cur_loc.x != end.cur_loc.x;
         }
 
         inline const AugLoc_t& operator*() const
@@ -223,13 +225,13 @@ struct rect_internal
 
     inline iterator begin() const
     {
-        // could consider an optimization where != is only properly implemented for != end(),
-        // removing this condition and replacing the `||` in != with `&&`.
+        iterator ret(*this, {l, t, cont_axes});
 
-        if(t == b || l == r)
-            return end();
+        // if range is empty, return end instead
+        if(t == b)
+            ret.cur_loc.x = r;
 
-        return iterator(*this, {l, t, cont_axes});
+        return ret;
     }
 
     inline iterator end() const
