@@ -1,2 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources></resources>
+<resources>
+    <string name="title_activity_game_settings">விளையாட்டு அமைப்புகள்</string>
+    <string name="start_game_button">விளையாட்டைத் தொடங்கவும்</string>
+    <string name="settings_button">அமைப்புகள்</string>
+    <string name="setup_sr_stopwatchSemiTransparent">ச்டாப்வாட்ச் அரை வெளிப்படையானதாக ஆக்குங்கள்</string>
+    <string name="setup_speedrunner">வேகம்-ரன்னர்</string>
+    <string name="setup_feedback_enable_vibration">அதிர்வுகளை இயக்கவும்</string>
+    <string name="setup_feedback_vibration_strength">அதிர்வு வலிமை</string>
+    <string name="setup_feedback">கருத்து</string>
+    <string name="setup_renderer_label">அமைப்பு வழங்கவும்</string>
+    <string name="setup_show_controller_state_label">விளையாட்டு கட்டுப்பாட்டு நிலையைக் காட்டு</string>
+    <string name="launcher_gameselect_toast_selected">விளையாட்டுகளை மாற்றியது</string>
+    <string name="launcher_gameselect_toast_listclean">விளையாட்டுகளின் பட்டியல் சுத்தமாக உள்ளது.</string>
+    <string name="game_logo_label">விளையாட்டு லோகோ</string>
+    <string name="settings_enable_frameskip">பிரேம் ச்கிப்பிங்கை இயக்கவும்</string>
+    <string name="setup_disable_sound">ஒலியை முடக்கு</string>
+    <string name="setup_general_cat">பொது</string>
+    <string name="setup_control_cat">தொடுதிரை கட்டுப்படுத்தி</string>
+    <string name="setup_display_cat">காட்சி</string>
+    <string name="setup_touchscreen_controller_enable">தொடு-திரை கட்டுப்படுத்தியைப் பயன்படுத்தவும்</string>
+    <string name="setup_touchscreen_alwaysshow">தொடக்கத்தில் தொடுதிரை கட்டுப்படுத்தியைக் காட்டு</string>
+    <string name="setup_show_framerate">பிரேம்-வீத மதிப்பைக் காட்டு</string>
+    <string name="setup_max_framerate_mode">அதிகபட்ச பிரேம்-வீத முறை</string>
+    <string name="setup_touchscreen_mode">கட்டுப்படுத்தி பயன்முறை</string>
+    <string name="setup_sr_speedrunMode">வேகம்-ரன் பயன்முறை</string>
+    <string name="setup_touchpad_style">கட்டுப்படுத்தி நடை</string>
+    <string name="managePermExplainTitle">அனைத்து கோப்புகள் அணுகல் இசைவு தேவை</string>
+    <string name="managePermExplainText">இந்த விளையாட்டு உள்ளக கடையில் பயனரால் நேரடியாக வைக்கப்பட்ட வளங்களை (நிலைகள், அத்தியாயங்கள், கிராபிக்ச், இசை, ஒலிகள், உள்ளமைவுகள் போன்றவை) பயன்படுத்துகிறது. இந்த கருத்து பயனர்கள் தங்கள் சொந்த நோக்கங்களுக்காக உள்ளடக்கத்தை மாற்றியமைக்கவும் நீட்டிக்கவும் இந்த விளையாட்டின் டெச்க்டாப் பதிப்பில் செய்யப்பட்டது. துரதிர்ச்டவசமாக, ஆண்ட்ராய்டு 11+ ஒரு கோப்பிற்கு பதிலாக குறிப்பிட்ட கோப்பகத்திற்கு தனிப்பட்ட வாசிப்பு அனுமதியை வழங்க வழிவகுக்காது. இந்த விளையாட்டை இயக்க நீங்கள் விளக்கப்பட்ட காரணங்களால் விளையாட்டுக்கான அனைத்து கோப்புகளுக்கும் அணுகலை வழங்க வேண்டும்.</string>
+    <string name="setup_assets_path_label">வளங்களின் முழுமையான பாதையை மாற்றவும்</string>
+    <string name="launcher_no_resources_question">விளையாட்டுக்கு வேலைக்கு ஒரு ஆதார தொகுப்பு தேவை. தயவுசெய்து விளையாட்டு வளங்களைப் பதிவிறக்கி, எந்தவொரு வசதியான கோப்பகத்திலும் அவற்றைத் திறக்கவும். ஏற்கனவே திறக்கப்படாத கோப்புறையைத் தேர்ந்தெடுக்க விரும்புகிறீர்களா?</string>
+    <string name="setup_feedback_vibration_length">அதிர்வு நீளம்</string>
+    <string name="touchscreen_vibration_test_label">சோதனை கருத்து</string>
+    <string name="setup_show_battery_status_label">சாதன பேட்டரி நிலை</string>
+    <string name="cheat_dialog_cancel">ரத்துசெய்</string>
+    <string name="cheat_dialog_ok">ஓடு</string>
+    <string name="cheat_dialog_title">கட்டளை வகை:</string>
+    <string name="launcher_gameSelect_clearList">தெளிவான பட்டியல்</string>
+    <string name="launcher_gameSelect_pickTheDir">கோப்பகத்தைத் தேர்ந்தெடுக்கவும் ...</string>
+    <string name="launcher_gameselect_clearlist_title">விளையாட்டு பட்டியலை அழிக்கவும்</string>
+    <string name="launcher_gameselect_clearlist_question">விளையாட்டுகளின் பட்டியலை நீங்கள் உண்மையில் அழிக்க விரும்புகிறீர்களா?</string>
+    <string name="launcher_openfile_indirectly">திறந்த கோப்பிற்கான நேரடி முழுமையான பாதையை மீட்டெடுக்க முடியாது, எனவே, இது விளையாட்டின் உள் சேமிப்பகத்தில் சமாளிக்கப்பட்டது. கூடுதல் ஆதாரங்களை (தனிப்பயன் கிராபிக்ச், இசை, உள்ளமைவுகள், ச்கிரிப்ட்கள் போன்றவை) ஏற்ற முடியாது. நீங்கள் எந்த வகையிலும் விளையாட்டைத் தொடங்க விரும்புகிறீர்களா?</string>
+</resources>
