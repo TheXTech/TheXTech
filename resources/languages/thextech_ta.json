@@ -1,1 +1,844 @@
-{}
+{
+    "editor": {
+        "block": {
+            "canBreak": "உடைக்க முடியும்",
+            "letterHeight": "ம",
+            "letterWidth": "W",
+            "canBreakTooltip": "மரபு: அடிக்கும்போது உடைகிறது",
+            "inside": "உள்ளே:",
+            "invis": "இன்விச்",
+            "pickContents": "தொகுதி உள்ளடக்கங்களைத் தேர்ந்தெடுங்கள்",
+            "slick": "மென்மையாய்"
+        },
+        "events": {
+            "bounds": {
+                "shouldEvent": "நிகழ்வு {0}",
+                "changeSectionBoundsToCurrent": "பிரிவு {0} வரம்புகளை மின்னோட்டத்திற்கு மாற்றவா?",
+                "changeAllSectionBoundsToCurrent": "அனைத்து பிரிவு வரம்புகளையும் மின்னோட்டத்திற்கு மாற்றவா?"
+            },
+            "headerTriggerEvent": "தூண்டுதல்:",
+            "itemNewEvent": "<புதிய நிகழ்வு>",
+            "label": {
+                "destroy": "அழிக்கவும்",
+                "enter": "உள்ளிடவும்",
+                "hit": "செய்",
+                "layerClear": "அடுக்கு தெளிவாக",
+                "next": "அடுத்தது",
+                "talk": "பேச்சு",
+                "activate": "செயல்படுத்து",
+                "death": "இறப்பு"
+            },
+            "layers": {
+                "headerHide": "மறை:",
+                "headerMove": "நகர்த்து:",
+                "headerShow": "காட்டு:",
+                "headerToggle": "தடுமாறுங்கள்:"
+            },
+            "letter": {
+                "enter": "இ:",
+                "hit": "H:",
+                "activate": "அ:",
+                "death": "D:",
+                "destroy": "D:",
+                "layerClear": "எல்:",
+                "talk": "டி:"
+            },
+            "promptEventName": "நிகழ்வு பெயர்",
+            "promptEventText": "நிகழ்வு உரை",
+            "props": {
+                "controls": "கட்டுப்பாடுகள்",
+                "endGame": "இறுதி விளையாட்டு",
+                "layerSmoke": "புகை",
+                "autostart": "ஆட்டோச்டார்ட்",
+                "sound": "ஒலி"
+            },
+            "sections": {
+                "propBackground": "பி.சி.",
+                "actionKeep": "வைத்திருங்கள்",
+                "actionReset": "மீட்டமை",
+                "actionSet": "கணம்",
+                "phraseAllSections": "அனைத்து பிரிவுகளும்",
+                "propBounds": "எல்லைகள்",
+                "propMusic": "இசை"
+            },
+            "controlsForEventN": "நிகழ்வுக்கான கட்டுப்பாடுகள் {0}",
+            "deletion": {
+                "cancel": "இல்லை: நிகழ்வை நீக்க வேண்டாம்",
+                "confirm": "ஆம்: நிகழ்வை நீக்கு",
+                "deletingEvent": "நிகழ்வை நீக்குதல் {0}"
+            },
+            "desc": {
+                "activate": "NPC திரையில் நுழைகிறது",
+                "death": "NPC இறந்துவிடுகிறது",
+                "destroy": "தொகுதி அழிக்கப்படுகிறது",
+                "enter": "வார்ப் நுழைந்தது",
+                "hit": "தொகுதி செய் பெறுகிறது",
+                "phraseTriggersAfterTemplate": "{0} தூண்டுதல்கள் {1} எம்.எச். நிகழ்வுக்குப் பிறகு {2} நிகழ்கிறது",
+                "phraseTriggersWhenTemplate": "{0} {1} போது தூண்டுகிறது",
+                "layerClear": "பொருள் அடுக்கில் உள்ள அனைத்தும் போய்விட்டன",
+                "talk": "வீரர் NPC உடன் பேசுகிறார்"
+            },
+            "header": "நிகழ்வுகள்:",
+            "settingsForEvent": "நிகழ்வுக்கான அமைப்புகள் {0}"
+        },
+        "file": {
+            "actionClearLevel": "தெளிவான நிலை",
+            "commandSave": "சேமி",
+            "actionExit": "வெளியேறு",
+            "actionOpen": "திற",
+            "actionRevert": "மாற்றியமைக்கவும்",
+            "commandNew": "புதிய",
+            "commandOpen": "திறந்த ...",
+            "commandSaveAs": "சேமி ...",
+            "confirmConfirmAction": "நீங்கள் நிச்சயமாக {0} செய்ய விரும்புகிறீர்களா?",
+            "confirmConvertFormatTo": "வடிவத்தை {0 க்கு ஆக மாற்றவா?",
+            "formatLegacy": "மரபு",
+            "optionActionWithoutSave": "{0} சேமிக்காமல்",
+            "optionYesSaveThenAction": "ஆம்: சேமி {0}",
+            "sectionLevel": "நிலை",
+            "sectionWorld": "உலகம்",
+            "actionClearWorld": "உலகத்தை அழிக்கவும்",
+            "confirmSaveBeforeAction": "உங்களுக்கு முன் சேமிக்கவும் {0}?",
+            "convert": {
+                "descNew": "கோப்பு நீட்டிப்பு மாறும், ஆனால் பழைய கோப்பு நீக்கப்படாது.\n\n சேமித்த பிறகு இழந்த அம்சங்களை சரிபார்க்கவும்."
+            },
+            "formatModern": "நவீன",
+            "labelCurrentFile": "தற்போதைய கோப்பு:",
+            "labelFormat": "வடிவம்:",
+            "optionCancelAction": "ரத்துசெய்: {0} வேண்டாம்",
+            "optionCancelConversion": "மாற்றத்தை ரத்துசெய்",
+            "optionProceedWithConversion": "மாற்றத்துடன் தொடரவும்"
+        },
+        "labelSortLayer": "வரிசை அடுக்கு:",
+        "labelSortOffset": "வரிசைப்படுத்தல் ஆஃப்செட்:",
+        "layers": {
+            "deletion": {
+                "cancel": "ரத்துசெய்: அடுக்கை நீக்க வேண்டாம்",
+                "confirmDelete": "இல்லை: *எல்லா உள்ளடக்கங்களையும் நீக்கு *",
+                "confirmPreserve": "ஆம்: இயல்புநிலை அடுக்குக்கு நகர்த்தவும்",
+                "header": "அடுக்கு நீக்குதல் {0}",
+                "preserveLayerContents": "அடுக்கு உள்ளடக்கங்களைப் பாதுகாக்கவா?"
+            },
+            "labelAttachedLayer": "இணைக்கப்பட்ட அடுக்கு:",
+            "labelMoveLayer": "அடுக்கை நகர்த்தவும்:",
+            "promptLayerName": "அடுக்கு பெயர்",
+            "abbrevAttLayer": "க்கு:",
+            "default": "இயல்புநிலை",
+            "header": "அடுக்குகள்:",
+            "itemNewLayer": "<புதிய அடுக்கு>",
+            "label": "அடுக்கு:",
+            "desc": {
+                "att": "NPC நகரும் போதெல்லாம், இணைக்கப்பட்ட அடுக்கு அதைப் பின்பற்றுகிறது"
+            },
+            "labelAttached": "இணைக்கப்பட்டுள்ளது:"
+        },
+        "letterCoordX": "ஃச்",
+        "npc": {
+            "ai": {
+                "target": "இலக்கு",
+                "use1_0Ai": "1.0 பயன்படுத்தவா?",
+                "LR": "எல்.ஆர்",
+                "UD": "Ud",
+                "aiIs": "AI: {0}",
+                "headerCustomAi": "தனிப்பயன் AI:",
+                "jump": "தாவு",
+                "leap": "பாய்ச்சல்",
+                "swim": "நீச்சல்"
+            },
+            "gen": {
+                "direction": "திசை",
+                "effectWarp": "வார்ப்",
+                "header": "செனரேட்டர் அமைப்புகள்",
+                "effectIs": "விளைவு: {0}",
+                "effectShoot": "தண்டுக் கிளை"
+            },
+            "inContainer": "இல்",
+            "abbrevGen": "கென்",
+            "inertNice": "நல்லது",
+            "props": {
+                "active": "செயலில்",
+                "attachSurface": "இணைக்கவும்",
+                "facing": "எதிர்கொள்ளும்"
+            },
+            "stuckStop": "நிறுத்து",
+            "tooltipExpandSection": "பிரிவு விரிவாக்க"
+        },
+        "phraseGenericIndex": "எண் {0}",
+        "phraseRadiusIndex": "ஆரம் {0}",
+        "phraseSectionIndex": "பிரிவு {0}",
+        "phraseTextOf": "{0} உரை",
+        "section": {
+            "scroll": "சுருள்",
+            "setBounds": "எல்லைகளை அமைக்கவும்",
+            "underwater": "நீருக்கடியில்",
+            "horizWrap": "மஞ்சள். மடக்கு",
+            "vertWrap": "வெர்ட். மடக்கு",
+            "noTurnBack": "திரும்பவில்லை",
+            "offscreenExit": "ஆஃப்ச்கிரீன் வெளியேறுதல்"
+        },
+        "select": {
+            "pathBlankUnlock": "பாதை {0} திறக்கவும்",
+            "worldMusic": "உலக இசை",
+            "allSectPropBlankForEventN": "{1 க்கு க்கு அனைத்து பிரிவு {0}",
+            "sectBlankPropBlankForEventN": "{2 க்கு க்கு பிரிவு {0} {1}",
+            "sectionBlankPropBlank": "பிரிவு {0} {1}",
+            "soundForEventN": "நிகழ்வுக்கான ஒலி {0}",
+            "warpTransitEffect": "வார்ப் மாற்றம் விளைவு"
+        },
+        "testPlay": {
+            "boot": "துவக்க",
+            "char": "சார்",
+            "magicHand": "மேசிக் கை",
+            "power": "விசை",
+            "pet": "செல்லப்பிள்ளை"
+        },
+        "tooltip": {
+            "BGOs": "BGOS",
+            "NPCs": "NPCS",
+            "scenes": "காட்சிகள்",
+            "area": "பகுதி",
+            "blocks": "தொகுதிகள்",
+            "erase": "அழிக்கவும்",
+            "eraseAll": "அனைத்தையும் அழிக்கவும்",
+            "file": "கோப்பு",
+            "events": "நிகழ்வுகள்",
+            "layers": "அடுக்குகள்",
+            "levels": "நிலைகள்",
+            "music": "இசை",
+            "paths": "பாதைகள்",
+            "select": "தேர்ந்தெடு",
+            "settings": "அமைப்புகள்",
+            "show": "காட்டு",
+            "tiles": "ஓடுகள்",
+            "warps": "வார்ப்ச்",
+            "water": "நீர்"
+        },
+        "warp": {
+            "cannonExit": "பீரங்கி வெளியேறுதல்",
+            "dir": "Dir.",
+            "item": "உருப்படி",
+            "lvlWarp": "எல்விஎல் வார்ப்",
+            "showStartScene": "தொடக்க காட்சியைக் காட்டு",
+            "speed": "விரைவு",
+            "style": {
+                "blipInstant": "தட்டச்சு",
+                "door": "கதவு",
+                "pipe": "புழம்பு",
+                "portal": "துறைமுகம்",
+                "style": "ச்டைல்:"
+            },
+            "transit": {
+                "name2": "மங்கல்",
+                "name0": "எதுவுமில்லை",
+                "name1": "சுருள்",
+                "name3": "வட்டம்",
+                "name4": "(ம) புரட்டல்",
+                "name5": "புரட்டுதல் (வி)"
+            },
+            "allow": "அனுமதிக்கவும்:",
+            "effect": "விளைவு:",
+            "in": "இல்",
+            "needFloor": "தளம் தேவை",
+            "needKey": "திறவுகோல் தேவை",
+            "needStarCount": "{0} {1} தேவை",
+            "out": "வெளியே",
+            "placing": "வைப்பது:",
+            "ride": "சவாரி",
+            "showStarCount": "நட்சத்திர எண்ணிக்கையைக் காட்டு",
+            "starLockMessage": "ச்டார் லாக் எம்.எச்.சி.",
+            "target": "இலக்கு:",
+            "title": "வார்ப் அமைப்புகள்",
+            "to": "க்கு: {0}",
+            "toMap": "வரைபடத்திற்கு",
+            "twoWay": "இரு வழி"
+        },
+        "wordEvent": {
+            "genitive": "நிகழ்வு",
+            "nominative": "நிகழ்வு",
+            "typeLabel": "{0} நிகழ்வு:"
+        },
+        "browser": {
+            "itemNewFolder": "<புதிய கோப்புறை>",
+            "newFile": "புதிய கோப்பு",
+            "askOverwriteFile": "மேலெழுதும் {0}?",
+            "itemNewFile": "<புதிய கோப்பு>",
+            "openFile": "கோப்பை திற",
+            "saveFile": "கோப்பை சேமி"
+        },
+        "letterCoordY": "ஒய்",
+        "letterDown": "டி",
+        "level": {
+            "startPos": "POS ஐத் தொடங்குங்கள்",
+            "alwaysVis": "எப்போதும் பார்வையிடவும்",
+            "bigBG": "பெரிய பி.சி.",
+            "gameStart": "விளையாட்டு தொடக்க",
+            "levelName": "நிலை பெயர்",
+            "pathBG": "பாதை பி.சி.",
+            "pathUnlocks": "பாதை திறத்தல்"
+        },
+        "mapPos": "வரைபடம் போச்:",
+        "letterLeft": "எல்",
+        "letterRight": "R",
+        "letterUp": "உ",
+        "pageBlankOfBlank": "{1 of இன் பக்கம் {0}",
+        "phraseAreYouSure": "நீங்கள் உறுதியாக இருக்கிறீர்களா?",
+        "phraseCountMore": "{0} மேலும்",
+        "phraseDelayIsMs": "தாமதம்: {0} எம்.எச்",
+        "phraseWarpIndex": "வார்ப் {0}",
+        "toggleMagicBlock": "மேசிக் தொகுதி",
+        "water": {
+            "title": "நீர் அமைப்புகள்"
+        },
+        "wordCoins": "நாணயங்கள்",
+        "wordEnabled": "இயக்கப்பட்டது",
+        "wordHeight": "உயரம்",
+        "wordInstant": "உடனடி",
+        "wordMode": "பயன்முறை",
+        "wordNPC": {
+            "genitive": "NPC",
+            "nominative": "NPC"
+        },
+        "wordText": "உரை",
+        "wordWidth": "அகலம்",
+        "world": {
+            "allowChars": "எழுத்துக்களை அனுமதிக்கவும்",
+            "hubWorld": "மைய உலகம்",
+            "introLevel": "அறிமுக நிலை",
+            "name": "உலக பெயர்",
+            "phraseCreditIndex": "உலக கடன் வரி {0}:",
+            "retryOnFail": "தோல்வியுற்றதை மீண்டும் முயற்சிக்கவும்",
+            "totalStars": "மொத்த நட்சத்திரங்கள்:"
+        }
+    },
+    "game": {
+        "connect": {
+            "phraseDropPX": "P ஐ விடுங்கள் p {0}",
+            "phraseStartToForceRes": "விண்ணப்பத்தை கட்டாயப்படுத்தத் தொடங்குங்கள்",
+            "dropAddTitle": "வீரர்களை கைவிடவும்/சேர்க்கவும்",
+            "phraseChangeChar": "கரியை மாற்றவும்",
+            "phraseDropMe": "என்னை விடுங்கள்",
+            "phraseForceResume": "படை மீண்டும் தொடங்குகிறது",
+            "phraseHoldStart": "தொடக்கத்தை வைத்திருங்கள்",
+            "phrasePressAButton": "ஒரு பொத்தானை அழுத்தவும்",
+            "phraseSetControls": "கட்டுப்பாடுகளை அமைக்கவும்",
+            "phraseTestControls": "சோதனை கட்டுப்பாடுகள்",
+            "phraseStartToResume": "மீண்டும் தொடங்கத் தொடங்குங்கள்",
+            "phraseTestProfile": "சோதனை சுயவிவரம்",
+            "phraseWaitingForInput": "உள்ளீட்டு சாதனத்திற்காக காத்திருக்கிறது ...",
+            "reconnectTitle": "மீண்டும் இணைக்கவும்",
+            "splitPressSelect_1": "தேர்வு என்பதை அழுத்தவும்",
+            "splitPressSelect_2": "விருப்பங்களை கட்டுப்படுத்துகிறது",
+            "wordDisconnect": "துண்டிக்கவும்"
+        },
+        "error": {
+            "errorNoStartPoint": "கிடைக்கக்கூடிய தொடக்க புள்ளிகள் அல்லது நுழைவு வார்ப் குறிப்பிடப்படாததால் மட்டத்தைத் தொடங்க முடியாது.\n\n கோப்பு: {0}",
+            "errorInvalidEnterWarp": "தவறான நுழைவு வார்ப் {1} குறிப்பிடப்பட்டதால் மட்டத்தைத் தொடங்க முடியாது.\n மொத்த வார்ப் உள்ளீடுகள்: {2}\n\n கோப்பு: {0}",
+            "openFileFailed": "\"{0}\" ஐ திறக்க முடியாது: கோப்பு இல்லை அல்லது சிதைக்கப்படவில்லை.",
+            "warpNeedStarCount": "நுழைய உங்களுக்கு {0} {1} தேவை."
+        },
+        "message": {
+            "scanningLevels": "அளவை ச்கேனிங் ..."
+        },
+        "format": {
+            "minutesSeconds": "{0} m {1} s"
+        },
+        "msgbox": {
+            "sysInfoError": "பிழை!",
+            "sysInfoTitle": "தகவல்",
+            "sysInfoWarning": "எச்சரிக்கை!"
+        },
+        "hint": {
+            "pound-altrun": "கீழ்நோக்கி பவுண்டுக்கு ஆல்ட் ரன் அழுத்தவும்!",
+            "pound-down": "கீழ்நோக்கி பவுண்டுக்கு கீழே அழுத்தவும்!",
+            "no-lives-new": "நாணயங்கள் எதுவும் இல்லை? கடன் எடுத்துக் கொள்ளுங்கள்! உங்கள் மதிப்பெண்ணைப் பாருங்கள் ...",
+            "no-lives-old": "கவனமாக இருங்கள் - கேம் ஓவர் உடனடி!",
+            "rainbow-surf": "பிடிக்கவும், ஓடுங்கள், பிடிக்கவும், சர்ஃப் செல்லவும்.",
+            "char5-bombs": "சேகரிக்க ரன் அழுத்தவும், வீசவும் ஆல்ட் ரன்.",
+            "heavy-duck": "பெரும்பாலானவர்களைத் தடுக்க வாத்து - ஆனால் அனைத்தும் இல்லை - தீப்பிழம்புகள்!",
+            "shoe-block": "இந்த தொகுதிகளை மிகவும் அணிந்துகொள்வது - ஆனால் அனைத்தும் இல்லை - தீப்பிழம்புகள்!",
+            "gray-bricks": "சில தொகுதிகள் சிறப்பு சக்திகளுக்கு பாதிக்கப்படக்கூடியவை."
+        },
+        "pause": {
+            "continue": "தொடரவும்",
+            "playerSetup": "பிளேயர் அமைப்பு",
+            "enterCode": "குறியீட்டை உள்ளிடவும்",
+            "quit": "வெளியேறு",
+            "quitTesting": "பரிசோதனையை விட்டுவிடுங்கள்",
+            "resetCheckpoints": "சோதனைச் சாவடிகளை மீட்டமைக்கவும்",
+            "restartLevel": "அளவை மறுதொடக்கம் செய்யுங்கள்",
+            "returnToEditor": "எடிட்டருக்குத் திரும்பு",
+            "saveAndContinue": "சேமித்து தொடரவும்",
+            "saveAndQuit": "சேமித்து வெளியேறவும்"
+        }
+    },
+    "menu": {
+        "controls": {
+            "buttons": {
+                "down": "கீழே",
+                "altJump": "ஆல்ட் சம்ப்",
+                "altRun": "அனைத்து ரன்",
+                "drop": "உருப்படியை கைவிடுங்கள்",
+                "jump": "தாவு",
+                "left": "இடது",
+                "right": "வலது",
+                "run": "ஓடு",
+                "start": "தொடங்கு",
+                "up": "மேலே"
+            },
+            "controlsReallyDeleteProfile": "உண்மையில் சுயவிவரத்தை நீக்கவா?",
+            "controlsTitle": "கட்டுப்பாடுகள்",
+            "hotkeys": {
+                "legacyPause": "பழைய இடைநிறுத்தம்",
+                "vanillaCam": "வெண்ணிலா கேம்",
+                "debugInfo": "பிழைத்திருத்த செய்தி",
+                "enterCheats": "குறியீட்டை உள்ளிடவும்",
+                "fullscreen": "முழு திரை",
+                "recordGif": "பதிவு gif",
+                "screenshot": "திரைக்காட்சி",
+                "toggleHUD": "HUD ஐ மாற்றவும்"
+            },
+            "options": {
+                "batteryStatus": "பேட்டர் நிலை",
+                "maxPlayers": "எம்எக்ச் பிளேயர்",
+                "rumble": "ரம்பிள்",
+                "textEntryStyle": "உரை நுழைவு நடை"
+            },
+            "tDS": {
+                "buttonR": "R",
+                "buttonSelect": "தேர்ந்தெடு",
+                "buttonStart": "தொடங்கு",
+                "buttonZR": "Zr",
+                "cStick": "சி-ச்டிக்",
+                "buttonA": "A",
+                "buttonB": "B",
+                "buttonL": "எல்",
+                "buttonX": "ஃச்",
+                "buttonY": "ஒய்",
+                "buttonZL": "Zl",
+                "casePen": "(பேனா)",
+                "dPad": "டி-பேட்",
+                "tStick": "கட்டைவிரல்"
+            },
+            "touchscreen": {
+                "option": {
+                    "interfaceStyle": "இடைமுக நடை",
+                    "layoutStyle": "தளவமைப்பு நடை",
+                    "resetLayout": "தளவமைப்பை மீட்டமைக்கவும்",
+                    "feedbackLength": "கருத்து நீளம்",
+                    "holdRun": "தொடக்கத்தில் ரன் வைத்திருங்கள்",
+                    "feedbackStrength": "கருத்து வலிமை",
+                    "sStartSpacing": "எச்-ச்டார்ட் இடைவெளி",
+                    "scaleButtons": "அளவிலான பொத்தான்கள்",
+                    "scaleFactor": "அளவிலான காரணி",
+                    "scaleDPad": "அளவிலான டி-பேட்",
+                    "showCodeButton": "குறியீடு பொத்தானைக் காட்டு"
+                },
+                "layout": {
+                    "phoneOld": "தொலைபேசி (பழையது)",
+                    "standard": "தரநிலை",
+                    "longOld": "நீண்ட (பழைய)",
+                    "phabletOld": "பேப்லெட் (பழைய)",
+                    "tabletOld": "டேப்லெட் (பழையது)",
+                    "tight": "இறுக்கமான",
+                    "tinyOld": "சிறிய (பழைய)"
+                },
+                "style": {
+                    "ABXY": "Abxy",
+                    "XODA": "காட்",
+                    "actions": "செயல்கள்"
+                }
+            },
+            "wii": {
+                "classic": {
+                    "buttonLT": "Lt",
+                    "lStick": "எல்-பேட்",
+                    "buttonRT": "Rt",
+                    "buttonX": "ஃச்",
+                    "buttonY": "ஒய்",
+                    "buttonZL": "Zl",
+                    "buttonZR": "Zr",
+                    "rStick": "ஆர்-பேட்"
+                },
+                "phraseNewClassic": "புதிய கிளாசிக் சுயவிவரம்",
+                "phraseNewNunchuck": "புதிய நன்சக் சுயவிவரம்",
+                "typeClassic": "கிளாசிக்",
+                "wiimote": {
+                    "buttonB": "B",
+                    "buttonHome": "வீடு",
+                    "buttonMinus": "-",
+                    "buttonPlus": "+",
+                    "button1": "1",
+                    "button2": "2",
+                    "buttonA": "A",
+                    "caseIR": "(மற்றும்)",
+                    "dPad": "டி-பேட்",
+                    "shake": "குலுக்கல்"
+                },
+                "nunchuck": {
+                    "buttonC": "C",
+                    "buttonZ": "சட்",
+                    "prefixN": "N"
+                },
+                "typeNunchuck": "Nunchuck",
+                "typeWiimote": "Wiimote",
+                "typeGamecube": "கேம்க்யூப்"
+            },
+            "caseInvalid": "(தவறானது)",
+            "caseMouse": "(சுட்டி)",
+            "caseTouch": "(தொடு)",
+            "controlsConnected": "இணைக்கப்பட்டுள்ளது:",
+            "controlsDeleteKey": "(நீக்க ஆல்ட் சம்ப்)",
+            "controlsDeviceTypes": "சாதன வகைகள்",
+            "controlsInUse": "(பயன்பாட்டில்)",
+            "controlsNewProfile": "<புதிய சுயவிவரம்>",
+            "controlsNotInUse": "(பயன்பாட்டில் இல்லை)",
+            "cursor": {
+                "down": "சுட்டி கீழே",
+                "right": "சுட்டி சரியானது",
+                "secondary": "இரண்டாம் நிலை",
+                "left": "சுட்டி இடது",
+                "primary": "முதன்மை",
+                "tertiary": "மூன்றாம் நிலை",
+                "up": "சுட்டி அப்"
+            },
+            "editor": {
+                "fastScroll": "வேகமான scrl",
+                "modeSelect": "பயன்முறை தேர்ந்தெடுக்கவும்",
+                "nextSection": "அடுத்த பிரிவு",
+                "prevSection": "முந்தைய பிரிவு",
+                "scrollDown": "Scrl கீழே",
+                "scrollLeft": "Scrl இடது",
+                "scrollRight": "Scrl சரி",
+                "modeErase": "பயன்முறை அழித்தல்",
+                "scrollUp": "Scrl மேலே",
+                "switchScreens": "பலகம் காட்டு",
+                "testPlay": "சோதனை நாடகம்"
+            },
+            "phraseNewProfOldJoy": "பழைய சாய்ச்டிக் புதிய சுயவிவரம்",
+            "profile": {
+                "cursorControls": "கர்சர் கட்டுப்பாடுகள்",
+                "deleteProfile": "சுயவிவரத்தை நீக்கு",
+                "editorControls": "ஆசிரியர் கட்டுப்பாடுகள்",
+                "hotkeys": "ஆட்கீச்",
+                "playerControls": "பிளேயர் கட்டுப்பாடுகள்",
+                "renameProfile": "சுயவிவரத்தை மறுபெயரிடுங்கள்"
+            },
+            "joystickSimpleEditor": "எளிய எடிட்டர் கட்டுப்பாடுகள்",
+            "types": {
+                "oldJoystick": "பழைய மகிழ்ச்சி",
+                "gamepad": "கேம்பேட்",
+                "keyboard": "விசைப்பலகை",
+                "touchscreen": "தொடுதிரை"
+            },
+            "wordProfiles": "சுயவிவரங்கள்",
+            "wordButtons": "பொத்தான்கள்"
+        },
+        "game": {
+            "gameBattleRandom": "சீரற்ற நிலை",
+            "gameCopySave": "சேமி நகல்",
+            "gameEraseSave": "சேமி",
+            "phraseTime": "நேரம்: {0}",
+            "gameEraseSlot": "அழிக்க ச்லாட்டைத் தேர்ந்தெடுக்கவும்",
+            "gameNoBattleLevels": "<போர் நிலைகள் இல்லை>",
+            "gameNoEpisodesToPlay": "<விளையாடுவதற்கு அத்தியாயங்கள் இல்லை>",
+            "warnEpCompat": "இந்த அத்தியாயம் SMBX இன் வேறு கிளைக்காக உருவாக்கப்பட்டது மற்றும் சரியாக வேலை செய்யாமல் போகலாம்.",
+            "gameSlotContinue": "ச்லாட் {0} ... {1}%",
+            "gameSlotNew": "ச்லாட் {0} ... புதிய விளையாட்டு",
+            "gameSourceSlot": "மூல ச்லாட்டைத் தேர்ந்தெடுக்கவும்",
+            "gameTargetSlot": "இப்போது இலக்கைத் தேர்ந்தெடுக்கவும்",
+            "phraseScore": "ச்கோர்: {0}"
+        },
+        "loading": "ஏற்றுகிறது ...",
+        "options": {
+            "advanced": {
+                "_header": "மேம்பட்ட",
+                "_tooltip": "உள் செயல்பாடுகளுக்கான தொழில்நுட்ப விருப்பங்கள்",
+                "audio-buffer-size": {
+                    "_tooltip": "குறைவான பாப்சுக்கு அதிகரிப்பு ஆனால் அதிக பின்னடைவு",
+                    "_name": "இடையக அளவு"
+                },
+                "audio-channels": {
+                    "_name": "சேனல்கள்",
+                    "mono": "மோனோ",
+                    "stereo": "ச்டீரியோ"
+                },
+                "audio-enable": "இயக்கு",
+                "audio-sample-rate": {
+                    "16000": "16000 எர்ட்ச்",
+                    "22050": "22050 எர்ட்ச்",
+                    "_name": "மாதிரி வீதம்",
+                    "11025": "11025 எர்ட்ச்",
+                    "32000": "32000 எர்ட்ச்",
+                    "44100": "44100 எர்ட்ச்",
+                    "48000": "48000 எர்ட்ச்"
+                },
+                "log-level": {
+                    "warning": "எச்சரிக்கை",
+                    "_name": "பதிவு நிலை",
+                    "critical": "விமர்சன",
+                    "debug": "பிழைத்திருத்தம்",
+                    "fatal": "அபாயகரமான",
+                    "info": "தகவல்",
+                    "none": "எதுவுமில்லை"
+                },
+                "record-gameplay-data": "விளையாட்டு விளையாட்டு",
+                "render": {
+                    "hw": "தானி",
+                    "opengl": "Opengl 3+",
+                    "opengl11": "Opengl 1.1",
+                    "_name": "பயன்முறையை வழங்கவும்",
+                    "opengl-tip": "அனைத்து புதிய காட்சி விளைவுகளுக்கும் ஆதரவுடன் டெச்க்டாப் பநிஇ மற்றும் SMBX64 க்கு முழு துல்லியம்",
+                    "opengl11-tip": "SMBX64 க்கு முழு துல்லியத்துடன் மரபு டெச்க்டாப் பநிஇ",
+                    "opengles": "ஓபன்சிஎல் 2+ ஆகும்",
+                    "opengles-tip": "அனைத்து புதிய காட்சி விளைவுகளுக்கும் ஆதரவுடன் மொபைல் பநிஇ மற்றும் SMBX64 க்கு அதிக துல்லியம்",
+                    "opengles11": "ஓபன்சிஎல் 1.1+ ஆகும்",
+                    "opengles11-tip": "SMBX64 க்கு முழு துல்லியத்துடன் மரபு மொபைல் பநிஇ",
+                    "sdl": "SDL2",
+                    "sdl-tip": "அடிப்படை குறுக்கு-தளம் வழங்கல் பநிஇ",
+                    "sw": "மென்பொருள்"
+                },
+                "scale-down-textures": {
+                    "none": "எதுவுமில்லை",
+                    "_tooltip": "நினைவகத்தை சேமிக்க படங்களை 1x ஆக சேமிக்கவும்",
+                    "all": "அனைத்தும்",
+                    "all-tip": "'பாதுகாப்பானது' என்பதை விட குறைவான ஏற்றுதல் திணறல்",
+                    "_name": "படங்களை அளவிடவும்",
+                    "none-tip": "குறைந்தது ஏற்றுதல் திணறல்",
+                    "safe": "பாதுகாப்பானது",
+                    "safe-tip": "படங்கள் 2x வடிவத்தில் இருந்தால் சரிபார்க்கிறது"
+                },
+                "inaccurate-gifs-tip": "GIF கள் இருக்கும்போது 3D விளைவை அனுமதிக்கிறது",
+                "choose-assets-on-launch": "துவக்கத்தில் சொத்துக்களைத் தேர்வுசெய்க",
+                "advanced-audio": "ஆடியோ",
+                "advanced-video": "ஒளிதோற்றம்",
+                "audio-format": {
+                    "_name": "ஆடியோ வடிவம்",
+                    "_tooltip": "ஒலி இயக்கி வடிவம்"
+                },
+                "use-native-osk": "சொந்த ஓச்க்",
+                "inaccurate-gifs": "தவறான GIF கள்",
+                "webm-recording": "வெப்எம் பதிவு",
+                "internal-res-4p": {
+                    "_name": "4p பிளவு திரை அளவு",
+                    "default": "இயல்புநிலை",
+                    "fhd": "1920x1080 (FHD)",
+                    "qhd": "2560x1440 (QHD)",
+                    "qsmbx": "1600x1200 (QSMBX)"
+                },
+                "fullscreen-type": {
+                    "_name": "முழுத்திரை வகை",
+                    "auto": "தானி",
+                    "desktop": "டெச்க்டாப்",
+                    "desktop-tip": "தற்போதைய திரை தெளிவுத்திறனை வைத்திருங்கள்",
+                    "real": "பிரத்தியேக",
+                    "real-tip": "உடல் திரை தெளிவுத்திறனை அமைக்கவும்"
+                }
+            },
+            "audio": {
+                "sfx-spatial-audio-tip": "ஆஃப்ச்கிரீன் ஒலிகளின் அளவைக் குறைக்கவும்",
+                "_header": "ஆடியோ",
+                "audio-music-volume": "இசை தொகுதி",
+                "audio-prefs": "விருப்பத்தேர்வுகள்",
+                "audio-sfx-volume": "SFX தொகுதி",
+                "sfx-audio-fx": "எதிரொலி விளைவுகள்",
+                "sfx-modern": "நவீன எச்.எஃப்.எக்ச்",
+                "sfx-modern-tip": "Textech இல் சேர்க்கப்பட்ட ஒலிகளைப் பயன்படுத்தவும்",
+                "sfx-pet-beat": "செல்லப்பிராணி பள்ளங்கள்",
+                "sfx-spatial-audio": "இடஞ்சார்ந்த ஆடியோ",
+                "sfx-pet-beat-tip": "செல்லப்பிராணியை சவாரி செய்யும் போது சிறப்பு பள்ளம் விளையாடுங்கள்"
+            },
+            "episode-options": {
+                "creator-compat": {
+                    "disable": "முடக்கு",
+                    "_name": "படைப்பாளி இணைத்தல்",
+                    "_tooltip": "உள்ளடக்க படைப்பாளரின் வழக்கு மாற்றங்கள்",
+                    "enable": "இயக்கு",
+                    "file-only": "கோப்பு மட்டுமே"
+                },
+                "playstyle": {
+                    "_name": "பிளேச்டைல்",
+                    "classic-tip": "குறைந்தபட்ச புதுப்பிப்புகள்",
+                    "classic": "கிளாசிக்",
+                    "modern": "நவீன",
+                    "modern-tip": "அனைத்து புதுப்பிப்புகளும்",
+                    "vanilla": "வெண்ணிலா",
+                    "vanilla-tip": "புதுப்பிப்புகள் இல்லை"
+                },
+                "_header": "அத்தியாயம் விருப்பங்கள்",
+                "hub-resume": "வார்ப் அப்பில் சேமிக்கவும்",
+                "hub-resume-tip": "நீங்கள் நுழைந்த கடைசி போரில் மீண்டும் விளையாடுங்கள்"
+            },
+            "main": {
+                "background-work": "பின்னணியில் இயக்கவும்",
+                "four-screen-mode": {
+                    "split": "பிளவு",
+                    "_name": "4p திரை பயன்முறை",
+                    "shared": "பகிரப்பட்டது"
+                },
+                "multiplayer": "மல்டிபிளேயர்",
+                "timing": "சட்ட நேரம்",
+                "_header": "முக்கிய",
+                "background-work-tip": "விளையாட்டு கவனம் செலுத்தாமல் இருக்கும்போது சாய்ச்டிக் உடன் விளையாடுங்கள்",
+                "frame-skip": "பிரேம்கிப்",
+                "discord-rpc": "முரண்பாடு ஒருங்கிணைப்பு",
+                "language": "மொழி",
+                "two-screen-mode": {
+                    "_name": "2p திரை பயன்முறை",
+                    "shared": "பகிரப்பட்டது",
+                    "smbx": "SMBX",
+                    "split": "இடது/வலது",
+                    "topbottom": "மேல்/கீழ்"
+                },
+                "unlimited-framerate": "வரம்பற்ற ஃப்ரேம்ரேட்",
+                "vsync": "வி-ஒத்திசைவு"
+            },
+            "video": {
+                "battery-status": {
+                    "off": "அணை",
+                    "_name": "சாதன பேட்டரி நிலை",
+                    "fullscreen": "முழு திரை",
+                    "fullscreen-tip": "விளையாட்டு முழுத்திரையாக இருக்கும்போது காண்பி",
+                    "low": "குறைந்த",
+                    "low-tip": "பேட்டரி குறைவாக இருக்கும்போது காண்பி",
+                    "on": "எப்போதும்"
+                },
+                "internal-res": {
+                    "3ds": "800x480 (3DS)",
+                    "_name": "திரை அளவு",
+                    "_tooltip": "விளையாட்டு புலத்தின் தீர்மானம்",
+                    "dynamic": "மாறும்",
+                    "gba": "480x320 (பெறுங்கள்)",
+                    "hd": "1280x720 (எச்டி)",
+                    "hello": "768x432 (அலோ)",
+                    "nds": "512x384 (என்.டி.எச்)",
+                    "smbx": "800x600 (SMBX)",
+                    "snes": "512x448 (SNES)",
+                    "smbx-wide": "SMBX (அகலம்)",
+                    "vga": "640x480 (விசிஏ)"
+                },
+                "scale-mode": {
+                    "0_5x": "0.5x",
+                    "1x": "1x",
+                    "_name": "அளவிலான பயன்முறை",
+                    "integer": "முழு எண்",
+                    "linear": "மென்மையான",
+                    "nearest": "அருகில்",
+                    "2x": "ஃச்",
+                    "full": "முழு",
+                    "center": "நடுவண்"
+                },
+                "show-episode-title": {
+                    "off": "அணை",
+                    "top": "மேலே",
+                    "top-tip": "உயர் தெளிவுத்திறனில் HUD க்கு மேலே காண்பி",
+                    "_name": "அத்தியாயம் பெயர்",
+                    "bottom": "கீழே",
+                    "bottom-tip": "ச்பீட்ரன் டைமருக்கு மேலே காட்டவும்"
+                },
+                "3d-compat-mode": "3D இணைத்தல் பயன்முறை",
+                "show-medals-counter-tip": "HUD மற்றும் நிலை நுழைவாயிலில் பதக்கங்களைக் காட்டு",
+                "show-playtime-counter": {
+                    "animated-tip": "நிலை முடிவில் வானவில் விளைவைச் சேர்க்கிறது",
+                    "_name": "பிளே டைம் கவுண்டர்",
+                    "_tooltip": "அத்தியாயம் மற்றும் தற்போதைய முயற்சியில் செலவழித்த நேரத்தைக் காட்டு",
+                    "animated": "அனிமேசன்",
+                    "off": "அணை",
+                    "off-tip": "ச்பீட்ரன்களின் போது மட்டுமே காட்டு",
+                    "opaque": "ஒளிபுகா",
+                    "transparent": "வெளிப்படையானது"
+                },
+                "_header": "ஒளிதோற்றம்",
+                "effects": "திரை விளைவுகள்",
+                "display-controllers": "செயல்பாட்டைக் கட்டுப்படுத்துகிறது",
+                "enable-inter-level-fade-effect": "மங்கலான மாற்றங்கள்",
+                "fullscreen": "முழு திரை",
+                "info-game": "திரை விளையாட்டு செய்தி",
+                "info-meta": "திரை மேவு செய்தி",
+                "info-run": "திரை ரன் செய்தி",
+                "3d-compat-mode-tip": "அனைத்து பொருட்களையும் ஒரு 3D விமானத்தில் வரையவும்",
+                "show-fails-counter": "எதிர் தோல்வி",
+                "show-fails-counter-tip": "அத்தியாயம் மற்றும் தற்போதைய மட்டத்தில் சோ தோல்வியடைகிறது",
+                "show-fps": "பிரேம்ரேட்",
+                "show-medals-counter": "பதக்கங்கள் கவுண்டர்",
+                "show-screen-shake": "திரை குலுக்கல்",
+                "video-system": "மண்டலம்",
+                "world-map-stars-show": "உலக வரைபட நட்சத்திரங்கள்",
+                "world-map-stars-show-tip": "சேகரிக்கப்பட்ட நட்சத்திரங்களை மட்டங்களுக்கு மேலே காட்டு"
+            },
+            "speedrun": {
+                "mode": {
+                    "0": "0",
+                    "1": "1",
+                    "2": "2",
+                    "3": "3",
+                    "_name": "ச்பீட்ரன் பயன்முறை"
+                }
+            },
+            "restartEngine": "மாற்றங்கள் நடைமுறைக்கு வர இயந்திரத்தை மறுதொடக்கம் செய்யுங்கள்.",
+            "compatibility": {
+                "_header": "அமர்வு மாற்றங்கள்",
+                "_tooltip": "இணைத்தல் அல்லது பிழைத்திருத்தத்திற்கான விருப்பங்கள்",
+                "autocode": "ஆட்டோகோட்",
+                "bugfixes": "பிழைத்திருத்தங்கள்",
+                "features": "நற்பொருத்தங்கள்",
+                "reset-all": "அனைத்தையும் மீட்டமைக்கவும்"
+            },
+            "controls": {
+                "_header": "கட்டுப்பாடுகள்"
+            },
+            "view-credits": {
+                "_header": "வரவுகளைக் காண்க"
+            }
+        },
+        "wordYes": "ஆம்",
+        "abbrevMilliseconds": "எம்.எச்",
+        "battle": {
+            "errorNoLevels": "எந்த நிலைகளும் கிடைக்காததால் போரைத் தொடங்க முடியாது"
+        },
+        "caseNone": "<இல்லை>",
+        "character": {
+            "selectCharacter": "{0} விளையாட்டு"
+        },
+        "editor": {
+            "errorMissingResources": "மன்னிக்கவும்! விளையாட்டு எடிட்டருக்கு தேவைப்படும் {0} ஐ நீங்கள் காணவில்லை.",
+            "battles": "<போர் நிலைகள்>",
+            "makeFor": "செய்யுங்கள்:",
+            "newWorld": "<புதிய உலகம்>",
+            "promptNewWorldName": "புதிய உலக பெயர்"
+        },
+        "main": {
+            "main1PlayerGame": "1 பிளேயர் விளையாட்டு",
+            "mainBattleGame": "போர் விளையாட்டு",
+            "mainEditor": "திருத்தி",
+            "mainExit": "வெளியேறு",
+            "mainMultiplayerGame": "2 பிளேயர் விளையாட்டு",
+            "mainOptions": "விருப்பங்கள்",
+            "mainPlayEpisode": "அத்தியாயம் விளையாடுங்கள்"
+        },
+        "wordBack": "பின்",
+        "wordHide": "மறை",
+        "wordNo": "இல்லை",
+        "wordOff": "அணை",
+        "wordOn": "ஆன்",
+        "wordPlayer": "வீரர்",
+        "wordProfile": "சுயவிவரம்",
+        "wordResume": "மீண்டும் தொடங்குங்கள்",
+        "wordShow": "காட்டு",
+        "wordWaiting": "காத்திருக்கிறது"
+    },
+    "outro": {
+        "engineCredits": "இயந்திர வரவு:",
+        "nameVitalyNovichkov": "விட்டலி நோவாச்ச்கோவ்",
+        "cppPortDevelopers": "சி ++ துறைமுகம் டெவலப்பர்கள்:",
+        "customSprites": "தனிப்பயன் உருவங்கள்:",
+        "gameCredits": "விளையாட்டு வரவு:",
+        "levelDesign": "நிலை வடிவமைப்பு:",
+        "nameAndrewSpinks": "ஆண்ட்ரூ சூரரிமாச்சிலை",
+        "originalBy": "அசல் விபி 6 குறியீடு:",
+        "psVitaPortBy": "பி.எச். வீடா போர்ட்:",
+        "qualityControl": "தரக் கட்டுப்பாடு:",
+        "specialThanks": "சிறப்பு நன்றி:"
+    },
+    "pluralRules": "ஒன்று-ஒற்றை",
+    "languageName": "ஆங்கிலம்"
+}
