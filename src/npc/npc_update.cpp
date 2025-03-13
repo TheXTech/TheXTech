@@ -585,7 +585,7 @@ resume_Activation_Generator:
             continue;
         }
 
-        // Force-active NPCs
+        // Force-active NPCs, part 1
         if(NPC[A].Type == NPCID_CONVEYOR && !NPC[A].Hidden)
         {
             CheckSectionNPC(A);
@@ -603,16 +603,12 @@ resume_Activation_Generator:
                 NPC[A].JustActivated = 0;
             }
         }
-        else if(NPC[A].Type == NPCID_YEL_PLATFORM || NPC[A].Type == NPCID_BLU_PLATFORM || NPC[A].Type == NPCID_GRN_PLATFORM || NPC[A].Type == NPCID_RED_PLATFORM)
-        {
-            NPC[A].Active = true;
-            NPC[A].TimeLeft = 100;
-        }
         else if(NPC[A].Type == NPCID_STATUE_POWER || NPC[A].Type == NPCID_HEAVY_POWER)
         {
             if(NPC[A].TimeLeft == 1 || NPC[A].JustActivated != 0)
                 NPC[A].Frame = EditorNPCFrame(NPC[A].Type, NPC[A].Direction, A);
         }
+        // platforms returned to their SMBX 1.3 position below chain activation logic to prevent mistaken chain-activations
 
         // process chain activations
         if(NPC[A].JustActivated != 0)
@@ -793,6 +789,13 @@ resume_Activation_Chain:
                 }
             } // NPCID_BOSS_CASE
         } // .JustActivated != 0
+
+        // force-activate platforms (but don't mistakenly chain-activate -- doing this logic above caused a bug from v1.3.6.1 until v1.3.7.1)
+        if(NPC[A].Type == NPCID_YEL_PLATFORM || NPC[A].Type == NPCID_BLU_PLATFORM || NPC[A].Type == NPCID_GRN_PLATFORM || NPC[A].Type == NPCID_RED_PLATFORM)
+        {
+            NPC[A].Active = true;
+            NPC[A].TimeLeft = 100;
+        }
 
 #if 0
         // this code became the function CheckNPCWidth above
