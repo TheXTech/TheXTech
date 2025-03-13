@@ -521,7 +521,7 @@ void UpdateNPCs()
             continue;
         }
 
-        // Force-active NPCs
+        // Force-active NPCs, part 1
         if(NPC[A].Type == NPCID_CONVEYOR && !NPC[A].Hidden)
         {
             CheckSectionNPC(A);
@@ -539,11 +539,7 @@ void UpdateNPCs()
                 NPC[A].JustActivated = 0;
             }
         }
-        else if(NPC[A].Type == NPCID_YEL_PLATFORM || NPC[A].Type == NPCID_BLU_PLATFORM || NPC[A].Type == NPCID_GRN_PLATFORM || NPC[A].Type == NPCID_RED_PLATFORM)
-        {
-            NPC[A].Active = true;
-            NPC[A].TimeLeft = 100;
-        }
+        // platforms returned to their SMBX 1.3 position below chain activation logic to prevent mistaken chain-activations
 
         if(NPC[A].TimeLeft == 1 || NPC[A].JustActivated != 0)
         {
@@ -700,6 +696,13 @@ void UpdateNPCs()
                 }
             } // NPCID_BOSS_CASE
         } // .JustActivated != 0
+
+        // force-activate platforms (but don't mistakenly chain-activate -- doing this logic above caused a bug from v1.3.6.1 until v1.3.7.1)
+        if(NPC[A].Type == NPCID_YEL_PLATFORM || NPC[A].Type == NPCID_BLU_PLATFORM || NPC[A].Type == NPCID_GRN_PLATFORM || NPC[A].Type == NPCID_RED_PLATFORM)
+        {
+            NPC[A].Active = true;
+            NPC[A].TimeLeft = 100;
+        }
 
 #if 0
         // this code became the function CheckNPCWidth above
