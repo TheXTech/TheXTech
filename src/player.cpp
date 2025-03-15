@@ -937,12 +937,13 @@ void PlayerHurt(const int A)
                 p.YoshiYellow = false;
                 p.Dismount = p.Immune;
                 UpdateYoshiMusic();
+
+                // was previously after numNPCs++ but will not touch numNPCs because p.YoshiRed was just set to false
+                if(p.YoshiNPC > 0 || p.YoshiPlayer > 0)
+                    YoshiSpit(A);
+
                 numNPCs++;
                 NPC[numNPCs] = NPC_t();
-                if(p.YoshiNPC > 0 || p.YoshiPlayer > 0)
-                {
-                    YoshiSpit(A);
-                }
                 // If ShadowMode = True Then .Shadow = True
                 NPC[numNPCs].Direction = p.Direction;
                 NPC[numNPCs].Active = true;
