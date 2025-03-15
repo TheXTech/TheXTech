@@ -1058,6 +1058,8 @@ void PlayerHurt(const int A)
                 else
                 {
                     PlayerDead(A);
+#if 0
+                    // dead code, p.Mount and p.HoldingNPC are guaranteed to be set to 0 in PlayerDead
                     p.HoldingNPC = 0;
                     if(p.Mount == 2)
                     {
@@ -1112,6 +1114,7 @@ void PlayerHurt(const int A)
                             }
                         }
                     }
+#endif
                 }
             }
         }
