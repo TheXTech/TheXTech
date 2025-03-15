@@ -279,6 +279,33 @@ static void s_makePetMount(int A)
     syncLayers_NPC(numNPCs);
 }
 
+static void s_makeVehicleMount(int A)
+{
+    const Player_t& p = Player[A];
+
+    numNPCs++;
+
+    NPC[numNPCs].Direction = p.Direction;
+    if(NPC[numNPCs].Direction == 1)
+        NPC[numNPCs].Frame = 4;
+
+    NPC[numNPCs].Frame += SpecialFrame[2];
+    NPC[numNPCs].Active = true;
+    NPC[numNPCs].TimeLeft = 100;
+    NPC[numNPCs].Type = NPCID_VEHICLE;
+
+    NPC[numNPCs].Location.Height = 128;
+    NPC[numNPCs].Location.Width = 128;
+    NPC[numNPCs].Location.Y = SDL_floor(p.Location.Y);
+    NPC[numNPCs].Location.X = SDL_floor(p.Location.X);
+    NPC[numNPCs].Location.SpeedY = 0;
+    NPC[numNPCs].Location.SpeedX = 0;
+
+    NPC[numNPCs].CantHurt = 10;
+    NPC[numNPCs].CantHurtPlayer = A;
+    syncLayers_NPC(numNPCs);
+}
+
 void DodgePlayers(int plr_A)
 {
     auto& pLoc = Player[plr_A].Location;
@@ -1195,24 +1222,7 @@ void PlayerDead(int A)
 
     if(p.Mount == 2)
     {
-        numNPCs++;
-        NPC[numNPCs] = NPC_t();
-        NPC[numNPCs].Direction = p.Direction;
-        if(NPC[numNPCs].Direction == 1)
-            NPC[numNPCs].Frame = 4;
-        NPC[numNPCs].Frame += SpecialFrame[2];
-        NPC[numNPCs].Active = true;
-        NPC[numNPCs].TimeLeft = 100;
-        NPC[numNPCs].Type = NPCID_VEHICLE;
-        NPC[numNPCs].Location.Height = 128;
-        NPC[numNPCs].Location.Width = 128;
-        NPC[numNPCs].Location.Y = static_cast<int>(floor(static_cast<double>(p.Location.Y)));
-        NPC[numNPCs].Location.X = static_cast<int>(floor(static_cast<double>(p.Location.X)));
-        NPC[numNPCs].Location.SpeedY = 0;
-        NPC[numNPCs].Location.SpeedX = 0;
-        NPC[numNPCs].CantHurt = 10;
-        NPC[numNPCs].CantHurtPlayer = A;
-        syncLayers_NPC(numNPCs);
+        s_makeVehicleMount(A);
 
         p.Mount = 0;
         p.Location.Y -= 32;
@@ -3463,23 +3473,8 @@ void PlayerDismount(const int A)
         if(Player[A].SpinJump)
             Player[A].Jump = Player[A].Jump - 6;
         Player[A].Mount = 0;
-        numNPCs++;
-        NPC[numNPCs].Direction = Player[A].Direction;
-        if(NPC[numNPCs].Direction == 1)
-            NPC[numNPCs].Frame = 4;
-        NPC[numNPCs].Frame = NPC[numNPCs].Frame + SpecialFrame[2];
-        NPC[numNPCs].Active = true;
-        NPC[numNPCs].TimeLeft = 100;
-        NPC[numNPCs].Type = NPCID_VEHICLE;
-        NPC[numNPCs].Location.Height = 128;
-        NPC[numNPCs].Location.Width = 128;
-        NPC[numNPCs].Location.Y = static_cast<int>(floor(static_cast<double>(Player[A].Location.Y)));
-        NPC[numNPCs].Location.X = static_cast<int>(floor(static_cast<double>(Player[A].Location.X)));
-        NPC[numNPCs].Location.SpeedY = 0;
-        NPC[numNPCs].Location.SpeedX = 0;
-        NPC[numNPCs].CantHurt = 10;
-        NPC[numNPCs].CantHurtPlayer = A;
-        syncLayers_NPC(numNPCs);
+
+        s_makeVehicleMount(A);
 
         Player[A].Location.SpeedY = double(Physics.PlayerJumpVelocity) - tempSpeed;
         Player[A].Location.Height = Physics.PlayerHeight[Player[A].Character][Player[A].State];
