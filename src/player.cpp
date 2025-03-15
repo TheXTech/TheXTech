@@ -240,6 +240,45 @@ static void s_PlacePlayerAtStart(int A, PlayerStartInfo_t& player_start_info)
     DodgePlayers(A);
 }
 
+static void s_makePetMount(int A)
+{
+    const Player_t& p = Player[A];
+
+    numNPCs++;
+    NPC[numNPCs] = NPC_t();
+
+    NPC[numNPCs].Direction = p.Direction;
+    NPC[numNPCs].Active = true;
+    NPC[numNPCs].TimeLeft = 100;
+
+    if(p.MountType == 1)
+        NPC[numNPCs].Type = NPCID_PET_GREEN;
+    else if(p.MountType == 2)
+        NPC[numNPCs].Type = NPCID_PET_BLUE;
+    else if(p.MountType == 3)
+        NPC[numNPCs].Type = NPCID_PET_YELLOW;
+    else if(p.MountType == 4)
+        NPC[numNPCs].Type = NPCID_PET_RED;
+    else if(p.MountType == 5)
+        NPC[numNPCs].Type = NPCID_PET_BLACK;
+    else if(p.MountType == 6)
+        NPC[numNPCs].Type = NPCID_PET_PURPLE;
+    else if(p.MountType == 7)
+        NPC[numNPCs].Type = NPCID_PET_PINK;
+    else if(p.MountType == 8)
+        NPC[numNPCs].Type = NPCID_PET_CYAN;
+
+    NPC[numNPCs].Location.Height = 32;
+    NPC[numNPCs].Location.Width = 32;
+    NPC[numNPCs].Location.Y = p.Location.Y + p.Location.Height - 32;
+    NPC[numNPCs].Location.X = SDL_floor(p.Location.X + p.Location.Width / 2.0 - 16);
+    NPC[numNPCs].Location.SpeedY = 0.5;
+    NPC[numNPCs].Location.SpeedX = 0;
+    NPC[numNPCs].CantHurt = 10;
+    NPC[numNPCs].CantHurtPlayer = A;
+    syncLayers_NPC(numNPCs);
+}
+
 void DodgePlayers(int plr_A)
 {
     auto& pLoc = Player[plr_A].Location;
@@ -942,38 +981,10 @@ void PlayerHurt(const int A)
                 if(p.YoshiNPC > 0 || p.YoshiPlayer > 0)
                     YoshiSpit(A);
 
-                numNPCs++;
-                NPC[numNPCs] = NPC_t();
-                // If ShadowMode = True Then .Shadow = True
-                NPC[numNPCs].Direction = p.Direction;
-                NPC[numNPCs].Active = true;
-                NPC[numNPCs].TimeLeft = 100;
-                if(p.MountType == 1)
-                    NPC[numNPCs].Type = NPCID_PET_GREEN;
-                else if(p.MountType == 2)
-                    NPC[numNPCs].Type = NPCID_PET_BLUE;
-                else if(p.MountType == 3)
-                    NPC[numNPCs].Type = NPCID_PET_YELLOW;
-                else if(p.MountType == 4)
-                    NPC[numNPCs].Type = NPCID_PET_RED;
-                else if(p.MountType == 5)
-                    NPC[numNPCs].Type = NPCID_PET_BLACK;
-                else if(p.MountType == 6)
-                    NPC[numNPCs].Type = NPCID_PET_PURPLE;
-                else if(p.MountType == 7)
-                    NPC[numNPCs].Type = NPCID_PET_PINK;
-                else if(p.MountType == 8)
-                    NPC[numNPCs].Type = NPCID_PET_CYAN;
+                s_makePetMount(A);
+
                 NPC[numNPCs].Special = 1;
-                NPC[numNPCs].Location.Height = 32;
-                NPC[numNPCs].Location.Width = 32;
-                NPC[numNPCs].Location.Y = p.Location.Y + p.Location.Height - 33;
-                NPC[numNPCs].Location.X = static_cast<int>(floor(static_cast<double>(p.Location.X + p.Location.Width / 2.0 - 16)));
-                NPC[numNPCs].Location.SpeedY = 0.5;
-                NPC[numNPCs].Location.SpeedX = 0;
-                NPC[numNPCs].CantHurt = 10;
-                NPC[numNPCs].CantHurtPlayer = A;
-                syncLayers_NPC(numNPCs);
+                NPC[numNPCs].Location.Y -= 1;
 
                 p.Location.Height = Physics.PlayerHeight[p.Character][p.State];
             }
@@ -3524,38 +3535,7 @@ void PlayerDismount(const int A)
         Player[A].Mount = 0;
         UpdateYoshiMusic();
 
-        numNPCs++;
-        NPC[numNPCs] = NPC_t();
-        NPC[numNPCs].Direction = Player[A].Direction;
-        NPC[numNPCs].Active = true;
-        NPC[numNPCs].TimeLeft = 100;
-
-        if(Player[A].MountType == 1)
-            NPC[numNPCs].Type = NPCID_PET_GREEN;
-        else if(Player[A].MountType == 2)
-            NPC[numNPCs].Type = NPCID_PET_BLUE;
-        else if(Player[A].MountType == 3)
-            NPC[numNPCs].Type = NPCID_PET_YELLOW;
-        else if(Player[A].MountType == 4)
-            NPC[numNPCs].Type = NPCID_PET_RED;
-        else if(Player[A].MountType == 5)
-            NPC[numNPCs].Type = NPCID_PET_BLACK;
-        else if(Player[A].MountType == 6)
-            NPC[numNPCs].Type = NPCID_PET_PURPLE;
-        else if(Player[A].MountType == 7)
-            NPC[numNPCs].Type = NPCID_PET_PINK;
-        else if(Player[A].MountType == 8)
-            NPC[numNPCs].Type = NPCID_PET_CYAN;
-
-        NPC[numNPCs].Location.Height = 32;
-        NPC[numNPCs].Location.Width = 32;
-        NPC[numNPCs].Location.Y = Player[A].Location.Y + Player[A].Location.Height - 32;
-        NPC[numNPCs].Location.X = static_cast<int>(floor(static_cast<double>(Player[A].Location.X + Player[A].Location.Width / 2.0 - 16)));
-        NPC[numNPCs].Location.SpeedY = 0.5;
-        NPC[numNPCs].Location.SpeedX = 0;
-        NPC[numNPCs].CantHurt = 10;
-        NPC[numNPCs].CantHurtPlayer = A;
-        syncLayers_NPC(numNPCs);
+        s_makePetMount(A);
 
         Player[A].Location.Height = Physics.PlayerHeight[Player[A].Character][Player[A].State];
         // if not swimming
