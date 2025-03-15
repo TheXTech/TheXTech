@@ -978,33 +978,36 @@ void PlayerHurt(const int A)
             }
             else
             {
-                // TODO: State-dependent moment
                 if(p.Character == 3 || p.Character == 4)
                 {
-                    if(p.Hearts == 3 && (p.State == 2 || p.State == 4 || p.State == 5 || p.State == 6))
+                    p.Hearts -= 1;
+
+                    // 2 hearts left -> lose powerup, drop to big
+                    if(p.Hearts == 2 && p.State != PLR_STATE_SMALL)
                     {
-                        p.State = 2;
-                        p.Immune = 150;
-                        p.Immune2 = true;
-                        p.Hearts -= 1;
-                        PlaySoundSpatial(SFX_PlayerHit, p.Location);
-                        return;
-                    }
-                    else
-                    {
-                        p.Hearts -= 1;
-                        if(p.Hearts == 0)
-                            p.State = 1;
-                        else if(p.Hearts == 2 && (p.State == PLR_STATE_FIRE || p.State == PLR_STATE_ICE))
+                        // TODO: State-dependent moment
+                        if(p.State == PLR_STATE_FIRE || p.State == PLR_STATE_ICE)
                         {
                             p.Effect = (PlayerEffect)(PLREFF_STATE_TO_BIG + p.State);
                             p.Effect2 = 0;
                             PlaySoundSpatial(SFX_PlayerShrink, p.Location);
-                            return;
                         }
                         else
-                            p.State = 2;
+                        {
+                            p.State = PLR_STATE_BIG;
+                            p.Immune = 150;
+                            p.Immune2 = true;
+                            PlaySoundSpatial(SFX_PlayerHit, p.Location);
+                        }
+
+                        return;
                     }
+                    // 0 hearts left -> kill the player
+                    else if(p.Hearts == 0)
+                        p.State = 1;
+                    // 1 heart (or invalid state) -> shrink to small
+                    else
+                        p.State = 2;
                 }
                 else if(p.Character == 5)
                 {
