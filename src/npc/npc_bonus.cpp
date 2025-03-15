@@ -434,40 +434,31 @@ void TouchBonus(int A, int B)
         || NPC[B].Type == NPCID_ICE_POWER_S3 || NPC[B].Type == NPCID_ICE_POWER_S4
         || NPC[B].Type == NPCID_LEAF_POWER || NPC[B].Type == NPCID_STATUE_POWER || NPC[B].Type == NPCID_HEAVY_POWER)
     {
-        int target_state = 2;
-        PlayerEffect target_effect = PLREFF_TURN_BIG;
+        int target_state = PLR_STATE_BIG;
+        PlayerEffect target_effect = PLREFF_TURN_TO_STATE;
         bool reset_effect2 = true;
         int use_sfx = sfx_transform_item;
 
         if(NPC[B].Type == NPCID_FIRE_POWER_S3 || NPC[B].Type == NPCID_FIRE_POWER_S1 || NPC[B].Type == NPCID_FIRE_POWER_S4)
         {
-            target_state = 3;
-            target_effect = PLREFF_TURN_FIRE;
+            target_state = PLR_STATE_FIRE;
+            target_effect = PLREFF_GROW_TO_STATE;
             reset_effect2 = false;
             use_sfx = sfx_grow_item;
         }
         else if(NPC[B].Type == NPCID_ICE_POWER_S3 || NPC[B].Type == NPCID_ICE_POWER_S4)
         {
-            target_state = 7;
-            target_effect = PLREFF_TURN_ICE;
+            target_state = PLR_STATE_ICE;
+            target_effect = PLREFF_GROW_TO_STATE;
             reset_effect2 = false;
             use_sfx = sfx_grow_item;
         }
         else if(NPC[B].Type == NPCID_LEAF_POWER)
-        {
-            target_state = 4;
-            target_effect = PLREFF_TURN_LEAF;
-        }
+            target_state = PLR_STATE_LEAF;
         else if(NPC[B].Type == NPCID_STATUE_POWER)
-        {
-            target_state = 5;
-            target_effect = PLREFF_TURN_STATUE;
-        }
+            target_state = PLR_STATE_STATUE;
         else if(NPC[B].Type == NPCID_HEAVY_POWER)
-        {
-            target_state = 6;
-            target_effect = PLREFF_TURN_HEAVY;
-        }
+            target_state = PLR_STATE_HEAVY;
 
         UpdatePlayerBonus(A, NPC[B].Type);
         Player[A].StateNPC = NPC[B].Type;
@@ -486,7 +477,7 @@ void TouchBonus(int A, int B)
             }
 
             Player[A].Frame = 1;
-            Player[A].Effect = target_effect;
+            Player[A].Effect = (PlayerEffect)(target_effect + target_state);
 
             if(reset_effect2)
                 Player[A].Effect2 = 0;

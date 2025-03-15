@@ -2838,7 +2838,7 @@ void UpdateGraphicsScreen(Screen_t& screen)
         For(A, 1, numPlayers) // The clown car
         {
             if(!Player[A].Dead && !Player[A].Immune2 && Player[A].TimeToLive == 0 &&
-               !(Player[A].Effect == PLREFF_WARP_PIPE || Player[A].Effect == PLREFF_TURN_LEAF) && Player[A].Mount == 2)
+               !(Player[A].Effect == PLREFF_WARP_PIPE || Player[A].Effect == (PLREFF_TURN_TO_STATE + PLR_STATE_LEAF)) && Player[A].Mount == 2)
             {
                 const Player_t& p = Player[A];
 
@@ -2964,7 +2964,7 @@ void UpdateGraphicsScreen(Screen_t& screen)
             Player_t& p = Player[A];
             bool player_door_scroll = (p.Effect == PLREFF_WARP_DOOR && p.Effect2 >= 128);
 
-            if(!p.Dead && p.TimeToLive == 0 && !(p.Effect == PLREFF_WARP_PIPE || p.Effect == PLREFF_TURN_LEAF || p.Effect == PLREFF_WAITING || p.Effect == PLREFF_PET_INSIDE || player_door_scroll))
+            if(!p.Dead && p.TimeToLive == 0 && !(p.Effect == PLREFF_WARP_PIPE || p.Effect == (PLREFF_TURN_TO_STATE + PLR_STATE_LEAF) || p.Effect == PLREFF_WAITING || p.Effect == PLREFF_PET_INSIDE || player_door_scroll))
                 DrawPlayer(p, Z);
         }
         //'normal player end

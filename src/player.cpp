@@ -995,16 +995,9 @@ void PlayerHurt(const int A)
                         p.Hearts -= 1;
                         if(p.Hearts == 0)
                             p.State = 1;
-                        else if(p.State == 3 && p.Hearts == 2)
+                        else if(p.Hearts == 2 && (p.State == PLR_STATE_FIRE || p.State == PLR_STATE_ICE))
                         {
-                            p.Effect = PLREFF_FIRE_TO_BIG;
-                            p.Effect2 = 0;
-                            PlaySoundSpatial(SFX_PlayerShrink, p.Location);
-                            return;
-                        }
-                        else if(p.State == 7 && p.Hearts == 2)
-                        {
-                            p.Effect = PLREFF_ICE_TO_BIG;
+                            p.Effect = (PlayerEffect)(PLREFF_STATE_TO_BIG + p.State);
                             p.Effect2 = 0;
                             PlaySoundSpatial(SFX_PlayerShrink, p.Location);
                             return;
@@ -2656,17 +2649,23 @@ void UpdatePlayerBonus(const int A, const NPCID B)
     // INCORRECT NOTE: I have traced all paths into this code, and it is unreachable if p.Effect != PLREFF_NORMAL
     // NOTE: this is not true if the player touches two bonuses in the same frame.
 
-    // 1 player growing
-    // 4 fire flower
-    // 5 leaf
-    if(p.State != 1 || (p.Effect == PLREFF_TURN_BIG || p.Effect == PLREFF_TURN_FIRE || p.Effect == PLREFF_TURN_LEAF))
+    int effect_state = PLR_STATE_SMALL;
+
+    if(p.Effect >= PLREFF_TURN_TO_STATE && p.Effect < PLREFF_TURN_TO_STATE_END)
+        effect_state = p.Effect - PLREFF_TURN_TO_STATE;
+    else if(p.Effect >= PLREFF_GROW_TO_STATE && p.Effect < PLREFF_GROW_TO_STATE_END)
+        effect_state = p.Effect - PLREFF_GROW_TO_STATE;
+    else if(p.Effect == PLREFF_TURN_BIG)
+        effect_state = PLR_STATE_BIG;
+
+    if(p.State != PLR_STATE_SMALL || (effect_state == PLR_STATE_BIG || effect_state == PLR_STATE_FIRE || effect_state == PLR_STATE_LEAF))
     {
         if(B == NPCID_POWER_S3 || B == NPCID_POWER_S4 || B == NPCID_POWER_S1 || B == NPCID_POWER_S5)
         {
             if(p.HeldBonus == 0)
                 p.HeldBonus = B;
         }
-        else if((p.State == 2 || p.Effect == PLREFF_TURN_BIG) && !(p.Effect == PLREFF_TURN_FIRE || p.Effect == PLREFF_TURN_LEAF))
+        else if((p.State == PLR_STATE_BIG || effect_state == PLR_STATE_BIG) && !(effect_state == PLR_STATE_FIRE || effect_state == PLR_STATE_LEAF))
         {
             if(p.HeldBonus == 0)
             {
@@ -2680,7 +2679,7 @@ void UpdatePlayerBonus(const int A, const NPCID B)
         }
         else
         {
-            if(p.State == 3 || p.Effect == PLREFF_TURN_FIRE)
+            if(p.State == PLR_STATE_FIRE || effect_state == PLR_STATE_FIRE)
             {
                 if(p.StateNPC == NPCID_FIRE_POWER_S4)
                     p.HeldBonus = NPCID_FIRE_POWER_S4;
@@ -2690,16 +2689,16 @@ void UpdatePlayerBonus(const int A, const NPCID B)
                     p.HeldBonus = NPCID_FIRE_POWER_S3;
             }
 
-            if(p.State == 4 || p.Effect == PLREFF_TURN_LEAF)
+            if(p.State == PLR_STATE_LEAF || effect_state == PLR_STATE_LEAF)
                 p.HeldBonus = NPCID_LEAF_POWER;
 
-            if(p.State == 5 || p.Effect == PLREFF_TURN_STATUE)
+            if(p.State == PLR_STATE_STATUE || effect_state == PLR_STATE_STATUE)
                 p.HeldBonus = NPCID_STATUE_POWER;
 
-            if(p.State == 6 || p.Effect == PLREFF_TURN_HEAVY)
+            if(p.State == PLR_STATE_HEAVY || effect_state == PLR_STATE_HEAVY)
                 p.HeldBonus = NPCID_HEAVY_POWER;
 
-            if(p.State == 7 || p.Effect == PLREFF_TURN_ICE)
+            if(p.State == PLR_STATE_ICE || effect_state == PLR_STATE_ICE)
             {
                 if(p.StateNPC == NPCID_ICE_POWER_S4)
                     p.HeldBonus = NPCID_ICE_POWER_S4;
@@ -5685,12 +5684,9 @@ void PlayerEffects(const int A)
         }
     }
     // logic combined across all powerup-to-big effects
-    else if(p.Effect == PLREFF_FIRE_TO_BIG || p.Effect == PLREFF_ICE_TO_BIG)
+    else if(p.Effect >= PLREFF_STATE_TO_BIG && p.Effect < PLREFF_STATE_TO_BIG_END)
     {
-        int prev_state = 7;
-
-        if(p.Effect == PLREFF_FIRE_TO_BIG)
-            prev_state = 3;
+        int prev_state = p.Effect - PLREFF_STATE_TO_BIG;
 
         if(p.Duck)
         {
@@ -5815,12 +5811,9 @@ void PlayerEffects(const int A)
             PlayerEffectWarpWait(A);
     }
     // logic combined across all "grow" powerup effects
-    else if(p.Effect == PLREFF_TURN_FIRE || p.Effect == PLREFF_TURN_ICE) // Player got fire power
+    else if(p.Effect >= PLREFF_GROW_TO_STATE && p.Effect < PLREFF_GROW_TO_STATE_END) // Player got fire power
     {
-        int target_state = 3;
-
-        if(p.Effect == PLREFF_TURN_ICE)
-            target_state = 7;
+        int target_state = p.Effect - PLREFF_GROW_TO_STATE;
 
         if(p.Duck && p.Character != 5)
         {
@@ -5982,15 +5975,12 @@ void PlayerEffects(const int A)
     }
 #endif
     // logic combined across all "transform" powerup effects
-    else if(p.Effect == PLREFF_TURN_LEAF || p.Effect == PLREFF_TURN_STATUE || p.Effect == PLREFF_TURN_HEAVY)
+    else if(p.Effect >= PLREFF_TURN_TO_STATE && p.Effect < PLREFF_TURN_TO_STATE_END)
     {
-        int target_state = 4;
+        int target_state = p.Effect - PLREFF_TURN_TO_STATE;
 
-        if(p.Effect != PLREFF_TURN_LEAF)
-        {
+        if(target_state != PLR_STATE_LEAF)
             p.Immune2 = true;
-            target_state = 5 + (p.Effect - PLREFF_TURN_STATUE);
-        }
 
         p.Frame = 1;
 
