@@ -115,31 +115,8 @@ void NPCBlockLogic(int A, double& tempHit, int& tempHitBlock, float& tempSpeedA,
                                     else
                                         HitSpot = FindCollisionBelt(NPC[A].Location, Block[B].Location, oldBeltSpeed);
 
-                                    // fish ignore block collisions while out of water (eg, jumping)
-                                    if(NPC[A]->IsFish)
-                                    {
-                                        if(NPC[A].Wet == 0)
-                                        {
-                                            if(NPC[A].WallDeath >= 9)
-                                                HitSpot = 0;
-                                        }
-                                    }
-
-                                    if(NPC[A].Type == NPCID_PLR_HEAVY || NPC[A].Type == NPCID_SWORDBEAM || NPC[A].Type == NPCID_CHAR4_HEAVY)
-                                    {
-                                        if(Block[B].Type == 457)
-                                            SafelyKillBlock(B);
-
-                                        HitSpot = 0;
-                                    }
-
-                                    if(NPC[A].Type == NPCID_SWORDBEAM)
-                                        HitSpot = 0;
-
+                                    // block-based cancellation logic (plus some type-based cancellation logic that was placed between these in SMBX 1.3)
                                     if(Block[B].tempBlockVehiclePlr > 0 && ((!NPC[A]->StandsOnPlayer && NPC[A].Type != NPCID_PLR_FIREBALL) || NPC[A].Inert))
-                                        HitSpot = 0;
-
-                                    if((NPC[A]->IsFish && NPC[A].Special == 2) && HitSpot != 3)
                                         HitSpot = 0;
 
                                     if(Block[B].Invis)
@@ -152,45 +129,27 @@ void NPCBlockLogic(int A, double& tempHit, int& tempHitBlock, float& tempSpeedA,
                                     {
                                         if(CheckHitSpot1(NPC[A].Location, Block[B].Location))
                                             HitSpot = 1;
-                                    }
-
-                                    if(NPC[A].Type == NPCID_METALBARREL || NPC[A].Type == NPCID_CANNONENEMY || NPC[A].Type == NPCID_HPIPE_SHORT || NPC[A].Type == NPCID_HPIPE_LONG || NPC[A].Type == NPCID_VPIPE_SHORT || NPC[A].Type == NPCID_VPIPE_LONG)
-                                    {
-                                        if(Block[B].tempBlockVehiclePlr > 0 || Block[B].tempBlockNpcType == NPCID_VEHICLE)
+                                        else if(Block[B].tempBlockNpcType == NPCID_CONVEYOR) // && HitSpot == 5
                                         {
-                                            HitSpot = 0;
-                                            NPC[A].Location.SpeedX = -NPC[A].Location.SpeedX;
+                                            if(NPC[A].Location.X + NPC[A].Location.Width / 2.0 < Block[B].Location.X + Block[B].Location.Width / 2.0)
+                                                HitSpot = 4;
+                                            else
+                                                HitSpot = 2;
                                         }
-                                    }
-
-                                    if(NPC[A].Type >= NPCID_TANK_TREADS && NPC[A].Type <= NPCID_SLANT_WOOD_M && HitSpot != 1)
-                                        HitSpot = 0;
-
-                                    if(NPC[A].Type == NPCID_SPIKY_BALL_S3 && (Block[B].tempBlockNpcType == NPCID_CANNONITEM || Block[B].tempBlockNpcType == NPCID_TOOTHYPIPE)) // spiney eggs don't walk on special items
-                                        HitSpot = 0;
-
-                                    if(NPC[A].Type == NPCID_RAFT) // Skull raft
-                                    {
-                                        if(Block[B].tempBlockNpcType > 0)
-                                            HitSpot = 0;
-
-                                        if(g_config.fix_skull_raft) // reached a solid wall
+                                        // after CheckHitSpot1 and NPCID_CONVEYOR check, before sizable check
+                                        else if(NPC[A].Type == NPCID_MINIBOSS) // && HitSpot == 5
                                         {
-                                            auto bt = Block[B].Type;
-                                            if(Block[B].tempBlockNpcType <= 0 && NPC[A].Special == 1 &&
-                                              (HitSpot == COLLISION_LEFT || HitSpot == COLLISION_RIGHT) &&
-                                               BlockSlope[bt] == SLOPE_FLOOR && BlockSlope2[bt] == SLOPE_CEILING &&
-                                               !BlockOnlyHitspot1[bt] && !BlockIsSizable[bt])
+                                            if(NPC[A].WallDeath >= 5)
                                             {
-                                                if(npcHasFloor(NPC[A]))
-                                                {
-                                                    SkullRideDone(A, Block[B].Location);
-                                                    NPC[A].Special = 3; // 3 - watcher, 2 - waiter
-                                                }
+                                                NPC[A].Killed = 3;
+                                                NPCQueues::Killed.push_back(A);
                                             }
+                                            else
+                                                HitSpot = 3;
                                         }
                                     }
 
+                                    // after CheckHitSpot1, before sizable check
                                     if(NPC[A].Type == NPCID_VILLAIN_S3)
                                     {
                                         if(HitSpot != 1 && NPC[A].Special > 0)
@@ -215,112 +174,151 @@ void NPCBlockLogic(int A, double& tempHit, int& tempHitBlock, float& tempSpeedA,
                                         }
                                     }
 
-                                    if(NPC[A].Type == NPCID_PLR_FIREBALL || NPC[A].Type == NPCID_PLR_ICEBALL)
-                                    {
-                                        if(Block[B].Type == 626 && NPC[A].Special == 1)
-                                            HitSpot = 0;
-                                        if(Block[B].Type == 627 && NPC[A].Special == 2)
-                                            HitSpot = 0;
-                                        if(Block[B].Type == 628 && NPC[A].Special == 3)
-                                            HitSpot = 0;
-                                        if(Block[B].Type == 629 && NPC[A].Special == 4)
-                                            HitSpot = 0;
-                                    }
-
-                                    if(NPC[A].Type == NPCID_PLR_FIREBALL || NPC[A].Type == NPCID_PET_FIRE)
-                                    {
-                                        if(Block[B].Type == 621 || Block[B].Type == 620)
-                                        {
-                                            NPCHit(A, 3, A);
-                                            if(Block[B].Type == 621)
-                                                Block[B].Type = 109;
-                                            else
-                                            {
-                                                Block[B].Layer = LAYER_DESTROYED_BLOCKS;
-                                                Block[B].Hidden = true;
-                                                syncLayersTrees_Block(B);
-                                                numNPCs++;
-                                                NPC[numNPCs] = NPC_t();
-                                                NPC[numNPCs].Location.Width = 28;
-                                                NPC[numNPCs].Location.Height = 32;
-                                                NPC[numNPCs].Type = NPCID_COIN_S3;
-                                                NPC[numNPCs].Location.Y = Block[B].Location.Y;
-                                                NPC[numNPCs].Location.X = Block[B].Location.X + 2;
-                                                NPC[numNPCs].Active = true;
-                                                NPC[numNPCs].DefaultType = NPC[numNPCs].Type;
-                                                NPC[numNPCs].DefaultLocationX = NPC[numNPCs].Location.X;
-                                                NPC[numNPCs].DefaultLocationY = NPC[numNPCs].Location.Y;
-                                                NPC[numNPCs].TimeLeft = 100;
-                                                syncLayers_NPC(numNPCs);
-                                                CheckSectionNPC(numNPCs);
-                                            }
-                                        }
-                                    }
-
-                                    if((NPC[A].Type == NPCID_STONE_S3 || NPC[A].Type == NPCID_STONE_S4) && HitSpot != 1)
-                                        HitSpot = 0;
-
-                                    if(Block[B].tempBlockNpcType == NPCID_CONVEYOR && HitSpot == 5)
-                                    {
-                                        if(NPC[A].Location.X + NPC[A].Location.Width / 2.0 < Block[B].Location.X + Block[B].Location.Width / 2.0)
-                                            HitSpot = 4;
-                                        else
-                                            HitSpot = 2;
-                                    }
-
-                                    if(NPC[A].Type == NPCID_PLR_FIREBALL || NPC[A].Type == NPCID_PLR_ICEBALL)
-                                    {
-                                        if(NPCTraits[Block[B].tempBlockNpcType].IsABonus)
-                                            HitSpot = 0;
-                                    }
-
-                                    if(NPC[A].Type == NPCID_MINIBOSS && HitSpot == 5)
-                                    {
-                                        if(NPC[A].WallDeath >= 5)
-                                        {
-                                            NPC[A].Killed = 3;
-                                            NPCQueues::Killed.push_back(A);
-                                        }
-                                        else
-                                            HitSpot = 3;
-                                    }
-
-                                    if(BlockIsSizable[Block[B].Type] && HitSpot != 1)
-                                        HitSpot = 0;
-
                                     if(BlockIsSizable[Block[B].Type] || BlockOnlyHitspot1[Block[B].Type])
                                     {
                                         if(HitSpot != 1 || (NPCIsAParaTroopa(NPC[A]) && NPC[A].Special != 1))
                                             HitSpot = 0;
                                     }
 
-                                    if(NPC[A].Type == NPCID_SPIT_GUY_BALL && HitSpot > 0)
+                                    // unified type-based cancellation / collision logic
+                                    if(NPC[A]->IsFish)
                                     {
-                                        NPC[A].Killed = 4;
-                                        NPCQueues::Killed.push_back(A);
+                                        // fish ignore block collisions while out of water (eg, jumping)
+                                        if(NPC[A].Wet == 0)
+                                        {
+                                            if(NPC[A].WallDeath >= 9)
+                                                HitSpot = 0;
+                                        }
+
+                                        // leaping fish always ignore non-ceiling collisions
+                                        if(NPC[A].Special == 2 && HitSpot != 3)
+                                            HitSpot = 0;
                                     }
+                                    else if(NPC[A].Type == NPCID_PLR_HEAVY || NPC[A].Type == NPCID_SWORDBEAM || NPC[A].Type == NPCID_CHAR4_HEAVY)
+                                    {
+                                        if(Block[B].Type == 457)
+                                            SafelyKillBlock(B);
 
-                                    if(NPC[A].Type == NPCID_BOMB && NPC[A].Projectile && HitSpot != 0)
-                                        NPC[A].Special = 1000;
-
-                                    if(NPC[A].Shadow && HitSpot != 1 && !(Block[B].Special > 0 && NPC[A].Projectile))
                                         HitSpot = 0;
+                                    }
+                                    else if(NPC[A].Type == NPCID_METALBARREL || NPC[A].Type == NPCID_CANNONENEMY || NPC[A].Type == NPCID_HPIPE_SHORT || NPC[A].Type == NPCID_HPIPE_LONG || NPC[A].Type == NPCID_VPIPE_SHORT || NPC[A].Type == NPCID_VPIPE_LONG)
+                                    {
+                                        if(Block[B].tempBlockVehiclePlr > 0 || Block[B].tempBlockNpcType == NPCID_VEHICLE)
+                                        {
+                                            HitSpot = 0;
+                                            NPC[A].Location.SpeedX = -NPC[A].Location.SpeedX;
+                                        }
+                                    }
+                                    else if(NPC[A].Type >= NPCID_TANK_TREADS && NPC[A].Type <= NPCID_SLANT_WOOD_M)
+                                    {
+                                        if(HitSpot != 1)
+                                            HitSpot = 0;
+                                    }
+                                    else if(NPC[A].Type == NPCID_SPIKY_BALL_S3)
+                                    {
+                                        if(Block[B].tempBlockNpcType == NPCID_CANNONITEM || Block[B].tempBlockNpcType == NPCID_TOOTHYPIPE) // spiney eggs don't walk on special items
+                                            HitSpot = 0;
+                                    }
+                                    else if(NPC[A].Type == NPCID_RAFT) // Skull raft
+                                    {
+                                        if(Block[B].tempBlockNpcType > 0)
+                                            HitSpot = 0;
 
+                                        if(g_config.fix_skull_raft) // reached a solid wall
+                                        {
+                                            auto bt = Block[B].Type;
+                                            if(Block[B].tempBlockNpcType <= 0 && NPC[A].Special == 1 &&
+                                              (HitSpot == COLLISION_LEFT || HitSpot == COLLISION_RIGHT) &&
+                                               BlockSlope[bt] == SLOPE_FLOOR && BlockSlope2[bt] == SLOPE_CEILING)
+                                            {
+                                                if(npcHasFloor(NPC[A]))
+                                                {
+                                                    SkullRideDone(A, Block[B].Location);
+                                                    NPC[A].Special = 3; // 3 - watcher, 2 - waiter
+                                                }
+                                            }
+                                        }
+                                    }
+                                    else if(NPC[A].Type == NPCID_PLR_FIREBALL || NPC[A].Type == NPCID_PLR_ICEBALL || NPC[A].Type == NPCID_PET_FIRE)
+                                    {
+                                        if(NPC[A].Type == NPCID_PLR_FIREBALL || NPC[A].Type == NPCID_PLR_ICEBALL)
+                                        {
+                                            if(Block[B].Type == 626 && NPC[A].Special == 1)
+                                                HitSpot = 0;
+                                            else if(Block[B].Type == 627 && NPC[A].Special == 2)
+                                                HitSpot = 0;
+                                            else if(Block[B].Type == 628 && NPC[A].Special == 3)
+                                                HitSpot = 0;
+                                            else if(Block[B].Type == 629 && NPC[A].Special == 4)
+                                                HitSpot = 0;
 
+                                            if(NPCTraits[Block[B].tempBlockNpcType].IsABonus)
+                                                HitSpot = 0;
+                                        }
+
+                                        if(NPC[A].Type == NPCID_PLR_FIREBALL || NPC[A].Type == NPCID_PET_FIRE)
+                                        {
+                                            if(Block[B].Type == 621 || Block[B].Type == 620)
+                                            {
+                                                NPCHit(A, 3, A);
+                                                if(Block[B].Type == 621)
+                                                    Block[B].Type = 109;
+                                                else
+                                                {
+                                                    Block[B].Layer = LAYER_DESTROYED_BLOCKS;
+                                                    Block[B].Hidden = true;
+                                                    syncLayersTrees_Block(B);
+                                                    numNPCs++;
+                                                    NPC[numNPCs] = NPC_t();
+                                                    NPC[numNPCs].Location.Width = 28;
+                                                    NPC[numNPCs].Location.Height = 32;
+                                                    NPC[numNPCs].Type = NPCID_COIN_S3;
+                                                    NPC[numNPCs].Location.Y = Block[B].Location.Y;
+                                                    NPC[numNPCs].Location.X = Block[B].Location.X + 2;
+                                                    NPC[numNPCs].Active = true;
+                                                    NPC[numNPCs].DefaultType = NPC[numNPCs].Type;
+                                                    NPC[numNPCs].DefaultLocationX = NPC[numNPCs].Location.X;
+                                                    NPC[numNPCs].DefaultLocationY = NPC[numNPCs].Location.Y;
+                                                    NPC[numNPCs].TimeLeft = 100;
+                                                    syncLayers_NPC(numNPCs);
+                                                    CheckSectionNPC(numNPCs);
+                                                }
+                                            }
+                                        }
+                                    }
+                                    else if(NPC[A].Type == NPCID_STONE_S3 || NPC[A].Type == NPCID_STONE_S4)
+                                    {
+                                        if(HitSpot != 1)
+                                            HitSpot = 0;
+                                    }
+                                    else if(NPC[A].Type == NPCID_SPIT_GUY_BALL)
+                                    {
+                                        if(HitSpot > 0)
+                                        {
+                                            NPC[A].Killed = 4;
+                                            NPCQueues::Killed.push_back(A);
+                                        }
+                                    }
+                                    else if(NPC[A].Type == NPCID_BOMB)
+                                    {
+                                        if(NPC[A].Projectile && HitSpot != 0)
+                                            NPC[A].Special = 1000;
+                                    }
                                     // vine makers
-                                    if(NPC[A].Type == NPCID_RED_VINE_TOP_S3 || NPC[A].Type == NPCID_GRN_VINE_TOP_S3 || NPC[A].Type == NPCID_GRN_VINE_TOP_S4)
+                                    else if(NPC[A].Type == NPCID_RED_VINE_TOP_S3 || NPC[A].Type == NPCID_GRN_VINE_TOP_S3 || NPC[A].Type == NPCID_GRN_VINE_TOP_S4)
                                     {
                                         if(HitSpot == 3)
                                             NPC[A].Special = 1;
                                     }
-
-                                    if(NPC[A].Type == NPCID_GOALTAPE && Block[B].tempBlockNpcType > 0)
-                                        HitSpot = 0;
-
-
-                                    if(NPC[A].Type == NPCID_WALL_BUG || NPC[A].Type == NPCID_WALL_SPARK || NPC[A].Type == NPCID_WALL_TURTLE)
+                                    else if(NPC[A].Type == NPCID_GOALTAPE)
+                                    {
+                                        if(Block[B].tempBlockNpcType > 0)
+                                            HitSpot = 0;
+                                    }
+                                    else if(NPC[A].Type == NPCID_WALL_BUG || NPC[A].Type == NPCID_WALL_SPARK || NPC[A].Type == NPCID_WALL_TURTLE)
                                     {
                                         NPC[A].Special5 = 0;
+
                                         if(HitSpot == 1)
                                         {
                                             if(NPC[A].Special == 4 && NPC[A].Location.X + 0.99 == Block[B].Location.X + Block[B].Location.Width)
@@ -366,11 +364,13 @@ void NPCBlockLogic(int A, double& tempHit, int& tempHitBlock, float& tempSpeedA,
                                         }
                                     }
 
-
+                                    // shadow mode cancellation
+                                    if(NPC[A].Shadow && HitSpot != 1 && !(Block[B].Special > 0 && NPC[A].Projectile))
+                                        HitSpot = 0;
 
                                     if(BlockSlope2[Block[B].Type] != 0 && HitSpot > 0 && ((NPC[A].Location.Y > Block[B].Location.Y) || ((NPC[A].Type == NPCID_WALL_BUG || NPC[A].Type == NPCID_WALL_SPARK || NPC[A].Type == NPCID_WALL_TURTLE) && NPC[A].Special == 3)))
                                     {
-                                        // the modifications to Special and Special2 here are invalid and could affect any NPC
+                                        // the modifications to Special and Special2 here are invalid and could affect any NPC. They were meant to affect wall climbers.
                                         double NPC_A_Special = NPC[A].Special;
                                         double NPC_A_Special2 = NPC[A].Special2;
 
