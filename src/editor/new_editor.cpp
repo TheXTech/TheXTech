@@ -1782,7 +1782,7 @@ void EditorScreen::UpdateEventSettingsScreen(CallMode mode)
         SuperPrintR(mode, GetE(Events[m_current_event].TriggerEvent).substr(0,19), 3, 54, 240);
 
         if(Events[m_current_event].TriggerDelay > 0)
-            SuperPrintR(mode, fmt::format_ne(g_editorStrings.phraseDelayIsMs, 100 * (int)Events[m_current_event].TriggerDelay), 3, 54, 272);
+            SuperPrintR(mode, fmt::format_ne(g_editorStrings.phraseDelayIsMs, 100 * Events[m_current_event].TriggerDelay), 3, 54, 272);
         else
             SuperPrintR(mode, g_editorStrings.wordInstant, 3, 54, 272);
 
@@ -2713,7 +2713,7 @@ void EditorScreen::UpdateEventsSubScreen(CallMode mode)
     {
         // delay selector, instead of page selector
         if(Events[m_current_event].TriggerDelay > 0)
-            SuperPrintR(mode, fmt::format_ne(g_editorStrings.phraseDelayIsMs, 100 * (int)Events[m_current_event].TriggerDelay), 3, e_ScreenW - 240 + 4, 272);
+            SuperPrintR(mode, fmt::format_ne(g_editorStrings.phraseDelayIsMs, 100 * Events[m_current_event].TriggerDelay), 3, e_ScreenW - 240 + 4, 272);
         else
             SuperPrintR(mode, g_editorStrings.wordInstant, 3, e_ScreenW - 240 + 4, 272);
 
@@ -2818,7 +2818,7 @@ void EditorScreen::UpdateEventsSubScreen(CallMode mode)
     {
         // trigger after current event is a special case
         std::string descFormatted = (m_special_page == SPECIAL_PAGE_EVENT_TRIGGER)
-            ? fmt::format(g_editorStrings.eventsDescPhraseTriggersAfterTemplate, event_name, (int)Events[m_current_event].TriggerDelay * 100, Events[m_current_event].Name)
+            ? fmt::format(g_editorStrings.eventsDescPhraseTriggersAfterTemplate, event_name, Events[m_current_event].TriggerDelay * 100, Events[m_current_event].Name)
             : fmt::format(g_editorStrings.eventsDescPhraseTriggersWhenTemplate, event_name, event_desc);
 
         FontManager::printTextOptiPx(descFormatted,

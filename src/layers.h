@@ -128,7 +128,7 @@ struct Events_t
 //    TriggerEvent As String
     eventindex_t TriggerEvent = EVENT_NONE;
 //    TriggerDelay As Double
-    double TriggerDelay = 0.0;
+    vbint_t TriggerDelay = 0;
 //    Controls As Controls
     Controls_t Controls;
 //    MoveLayer As String

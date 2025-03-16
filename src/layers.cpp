@@ -1457,7 +1457,7 @@ event_resume:
     // tempBool = false;
     if(evt.TriggerEvent != EVENT_NONE)
     {
-        if(std::round(evt.TriggerDelay) == 0.0)
+        if(evt.TriggerDelay == 0)
         {
             // for(B = 0; B <= maxEvents; B++)
             // {
@@ -1482,6 +1482,7 @@ event_resume:
         {
             newEventNum++;
             NewEvent[newEventNum] = evt.TriggerEvent;
+            // note: this should be rounded towards even, this is non-trivial to implement as integer logic even though all variables involved are integers
             newEventDelay[newEventNum] = vb6Round(evt.TriggerDelay * 6.5);
             newEventPlayer[newEventNum] = static_cast<uint8_t>(whichPlayer);
         }
