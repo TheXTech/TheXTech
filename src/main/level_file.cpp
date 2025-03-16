@@ -408,11 +408,11 @@ bool OpenLevel_Section(void*, LevelSection& s)
 
         int B = s.id;
 
-        level[B].X = double(s.size_left);
-        level[B].Y = double(s.size_top);
-        level[B].Height = double(s.size_bottom);
-        level[B].Width = double(s.size_right);
-        LevelREAL[B] = level[B];
+        LevelREAL[B].X = s.size_left;
+        LevelREAL[B].Y = s.size_top;
+        LevelREAL[B].Height = s.size_bottom;
+        LevelREAL[B].Width = s.size_right;
+        level[B] = static_cast<SpeedlessLocation_t>(LevelREAL[B]);
         bgMusic[B] = int(s.music_id);
         bgMusicREAL[B] = bgMusic[B];
         // bgColor[B] = s.bgcolor;    // unused since SMBX64, removed

@@ -74,7 +74,7 @@ struct EventSection_t
     };
 
     //! Change section borders if not (-1 - do nothing, -2 set default, any other values - set X position of left section boundary)
-    SpeedlessLocation_t position;
+    IntegerLocation_t position;
 
     //! Set new Background ID in this section (-1 - do nothing, -2 - reset to defaint, >=0 - set background ID)
     vbint_t background_id = LESet_Nothing;

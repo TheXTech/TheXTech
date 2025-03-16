@@ -128,7 +128,7 @@ RangeArrI<bool, 0, maxSections, false> OffScreenExit;
 RangeArrI<vbint_t, 0, maxSections, 0> bgMusic;
 RangeArrI<vbint_t, 0, maxSections, 0> bgMusicREAL;
 RangeArrI<vbint_t, 0, maxSections, 0> Background2REAL;
-RangeArr<SpeedlessLocation_t, 0, maxSections> LevelREAL;
+RangeArr<IntegerLocation_t, 0, maxSections> LevelREAL;
 int curMusic = 0;
 // RangeArrI<long, 0, maxSections, 0> bgColor;    // unused since SMBX64, removed
 RangeArrI<vbint_t, 0, maxSections, 0> Background2;

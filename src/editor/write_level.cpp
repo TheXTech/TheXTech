@@ -110,7 +110,7 @@ void SaveLevel(const std::string& FilePath, int format, int version)   // saves 
     // sections
     for(int i = 0; i < numSections; ++i)
     {
-        const auto &s = level[i];
+        const auto &s = LevelREAL[i];
 
         section.id = i;
         section.size_left = s.X;

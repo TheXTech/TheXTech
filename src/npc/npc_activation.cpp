@@ -58,7 +58,7 @@ inline static bool s_Event_SoundOnly(const Events_t& evt, int test_section)
     const EventSection_t& s = const_cast<Events_t&>(evt).section[test_section];
     bool section_okay = s.music_id == EventSection_t::LESet_Nothing
         && s.background_id == EventSection_t::LESet_Nothing
-        && (int)s.position.X == EventSection_t::LESet_Nothing
+        && s.position.X == EventSection_t::LESet_Nothing
         && s.autoscroll == false;
 
     return section_okay;

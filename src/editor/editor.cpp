@@ -265,7 +265,7 @@ void UpdateInteract();
 template<class LocType>
 void InteractResize(LocType& loc, int min, int snap);
 
-void InteractResizeSection(SpeedlessLocation_t& section);
+void InteractResizeSection(IntegerLocation_t& section);
 
 // this sub handles the level editor
 // it is still called when the player is testing a level in the editor in windowed mode
@@ -421,7 +421,8 @@ void UpdateEditor()
                 else if(EditorCursor.InteractMode == OptCursor_t::LVL_SECTION)
                 {
                     MouseRelease = false;
-                    InteractResizeSection(level[curSection]);
+                    InteractResizeSection(LevelREAL[curSection]);
+                    level[curSection] = static_cast<SpeedlessLocation_t>(LevelREAL[curSection]);
                     UpdateSectionOverlaps(curSection);
                 }
 
@@ -2685,7 +2686,7 @@ static inline int s_find_flags(const LocType& loc)
     return found_flags;
 }
 
-static inline int s_find_flags_section(const SpeedlessLocation_t& loc)
+static inline int s_find_flags_section(const IntegerLocation_t& loc)
 {
     // require cursor to be at least nearby
     if(    EditorCursor.Location.X < loc.X - s_resize_border
@@ -2910,7 +2911,7 @@ void UpdateInteract()
         // section borders
         if(!MagicHand && select_mode && EditorCursor.InteractFlags < 2)
         {
-            int found_flags = s_find_flags_section(level[curSection]);
+            int found_flags = s_find_flags_section(LevelREAL[curSection]);
 
             if(found_flags)
             {
@@ -3094,7 +3095,7 @@ void InteractResize(LocType& loc, int min, int snap)
     }
 }
 
-void InteractResizeSection(SpeedlessLocation_t& section)
+void InteractResizeSection(IntegerLocation_t& section)
 {
     bool resized = false;
 

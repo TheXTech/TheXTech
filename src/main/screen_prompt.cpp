@@ -110,8 +110,8 @@ void Render()
     vScreen[1].X = 0;
     vScreen[1].Y = 0;
     vScreen[1].Left = 0; vScreen[1].Top = 0; vScreen[1].Width = XRender::TargetW; vScreen[1].Height = XRender::TargetH;
-    level[1] = static_cast<SpeedlessLocation_t>(newLoc(0, 0, XRender::TargetW, XRender::TargetH));
-    LevelREAL[1] = level[1];
+    LevelREAL[1] = IntegerLocation_t(0, 0, XRender::TargetW, XRender::TargetH);
+    level[1] = static_cast<SpeedlessLocation_t>(LevelREAL[1]);
     Background2[1] = 1;
     DrawBackground(1, 1);
 

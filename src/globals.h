@@ -1498,7 +1498,7 @@ extern RangeArrI<vbint_t, 0, maxSections, 0> bgMusicREAL;
 //Public Background2REAL(0 To maxSections) As Integer 'background
 extern RangeArrI<vbint_t, 0, maxSections, 0> Background2REAL;
 //Public LevelREAL(0 To maxSections) As Location 'default background
-extern RangeArr<SpeedlessLocation_t, 0, maxSections> LevelREAL;
+extern RangeArr<IntegerLocation_t, 0, maxSections> LevelREAL;
 //Public curMusic As Integer 'current music playing
 extern int curMusic;
 //Public bgColor(0 To maxSections) As Long 'obsolete

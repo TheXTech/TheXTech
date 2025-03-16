@@ -1285,18 +1285,18 @@ eventindex_t ProcEvent_Safe(bool is_resume, eventindex_t index, int whichPlayer,
             AutoY[B] = s.autoscroll_y;
         }
 
-        bool is_reset = int(s.position.X) == EventSection_t::LESet_ResetDefault;
+        bool is_reset = (s.position.X == EventSection_t::LESet_ResetDefault);
 
         /* Resize the section boundaries */
         if(is_reset && !g_config.modern_section_change)
         {
-            level[B] = LevelREAL[B];
+            level[B] = static_cast<SpeedlessLocation_t>(LevelREAL[B]);
             UpdateSectionOverlaps(B);
         }
-        else if(int(s.position.X) != EventSection_t::LESet_Nothing)
+        else if(s.position.X != EventSection_t::LESet_Nothing)
         {
             tempLevel = level[B];
-            newLevel = (is_reset) ? LevelREAL[B] : s.position;
+            newLevel = static_cast<SpeedlessLocation_t>((is_reset) ? LevelREAL[B] : s.position);
             level[B] = newLevel;
             UpdateSectionOverlaps(B);
 

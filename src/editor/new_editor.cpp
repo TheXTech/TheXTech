@@ -1661,12 +1661,12 @@ void EditorScreen::UpdateEventSettingsScreen(CallMode mode)
         all_set = true;
         for(int s = 0; s <= maxSections; s++)
         {
-            if((int)Events[m_current_event].section[s].position.X == LESet_Nothing)
+            if(Events[m_current_event].section[s].position.X == LESet_Nothing)
             {
                 all_reset = false;
                 all_set = false;
             }
-            else if((int)Events[m_current_event].section[s].position.X == LESet_ResetDefault)
+            else if(Events[m_current_event].section[s].position.X == LESet_ResetDefault)
             {
                 all_set = false;
                 all_keep = false;
@@ -1717,14 +1717,14 @@ void EditorScreen::UpdateEventSettingsScreen(CallMode mode)
             m_special_page = SPECIAL_PAGE_EVENT_BACKGROUND;
 
         // bounds
-        if(UpdateButton(mode, 150 + 4, e_ScreenH - 40 + 4, GFX.EIcons, (int)es.position.X == LESet_Nothing, 0, 0, 1, 1))
+        if(UpdateButton(mode, 150 + 4, e_ScreenH - 40 + 4, GFX.EIcons, es.position.X == LESet_Nothing, 0, 0, 1, 1))
             es.position.X = LESet_Nothing;
 
-        if(UpdateButton(mode, 250 + 4, e_ScreenH - 40 + 4, GFX.EIcons, (int)es.position.X == LESet_ResetDefault, 0, 32*Icon::x, 32, 32))
+        if(UpdateButton(mode, 250 + 4, e_ScreenH - 40 + 4, GFX.EIcons, es.position.X == LESet_ResetDefault, 0, 32*Icon::x, 32, 32))
             es.position.X = LESet_ResetDefault;
 
-        if(UpdateButton(mode, 350 + 4, e_ScreenH - 40 + 4, GFX.EIcons, (int)es.position.X != LESet_Nothing && (int)es.position.X != LESet_ResetDefault, 0, 32*Icon::subscreen, 32, 32))
-            es.position = static_cast<SpeedlessLocation_t>(level[m_special_subpage-1]);
+        if(UpdateButton(mode, 350 + 4, e_ScreenH - 40 + 4, GFX.EIcons, es.position.X != LESet_Nothing && es.position.X != LESet_ResetDefault, 0, 32*Icon::subscreen, 32, 32))
+            es.position = LevelREAL[m_special_subpage-1];
     }
 
     // autostart (top left)
@@ -1800,7 +1800,7 @@ void EditorScreen::UpdateEventSettingsScreen(CallMode mode)
 void UpdateStartLevelEventBounds()
 {
     Events[0].AutoSection = 0;
-    Events[0].section[0].position = static_cast<SpeedlessLocation_t>(level[0]);
+    Events[0].section[0].position = LevelREAL[0];
 
     // not sure why 800 is also used for height in the default code, but I will stick with it.
     if(Events[0].AutoX < 0)
