@@ -426,26 +426,7 @@ static inline void minport_RenderTexturePrivate_2(int16_t xDst, int16_t yDst, in
                              rotateAngle, center, flip,
                              color);
 
-    if(tx.d.hasTexture() && tx.l.lazyLoaded && &tx != g_render_chain_head)
-    {
-        tx.d.last_draw_frame = g_current_frame;
-
-        // unlink
-        minport_unlinkTexture(&tx);
-
-        // insert at head
-        if(g_render_chain_head)
-        {
-            g_render_chain_head->d.next_texture = &tx;
-            tx.d.last_texture = g_render_chain_head;
-        }
-        else
-        {
-            g_render_chain_tail = &tx;
-        }
-
-        g_render_chain_head = &tx;
-    }
+    minport_usedTexture(tx);
 }
 
 static inline void minport_RenderTexturePrivate_Basic_2(int16_t xDst, int16_t yDst, int16_t wDst, int16_t hDst,
@@ -478,6 +459,11 @@ static inline void minport_RenderTexturePrivate_Basic_2(int16_t xDst, int16_t yD
                              xSrc, ySrc,
                              color);
 
+    minport_usedTexture(tx);
+}
+
+static void minport_usedTexture(StdPicture &tx)
+{
     if(tx.d.hasTexture() && tx.l.lazyLoaded && &tx != g_render_chain_head)
     {
         tx.d.last_draw_frame = g_current_frame;
