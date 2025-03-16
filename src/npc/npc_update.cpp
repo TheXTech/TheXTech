@@ -1663,10 +1663,6 @@ interrupt_Activation:
                         NPC[A].TurnAround = false;
                     }
 
-                    if(NPC[A].Type == NPCID_SAW) // play saw sound
-                        PlaySoundSpatial(SFX_Saw, NPC[A].Location);
-
-
                     // NPC Movement Code
 
                     // Probably make a single function pointer for this whole block (until RESUME UNIFIED CODE),
@@ -1703,6 +1699,13 @@ interrupt_Activation:
                        NPC[A].Type != NPCID_LIFT_SAND && NPC[A].Type != NPCID_CHECKPOINT && NPC[A].Type != NPCID_SICK_BOSS_BALL &&
                        !(NPC[A].Type == NPCID_PLANT_FIRE || NPC[A].Type == NPCID_LOCK_DOOR || NPC[A].Type == NPCID_FIRE_DISK || NPC[A].Type == NPCID_FIRE_CHAIN))
                     {
+                        // only the top half of the saw collides with blocks (gets restored after block collisions)
+                        if(NPC[A].Type == NPCID_SAW)
+                        {
+                            PlaySoundSpatial(SFX_Saw, NPC[A].Location);
+                            NPC[A].Location.Height = 24;
+                        }
+
                         double tempHit = 0; // height of block NPC is walking on
                         int tempHitBlock = 0; // index of block NPC is walking on
                         float tempSpeedA = 0; // speed of ground the NPC is possibly standing on

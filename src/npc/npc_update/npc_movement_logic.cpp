@@ -733,8 +733,4 @@ void NPCMovementLogic(int A, float& speedVar)
 
     // Special NPCs code
     SpecialNPC(A);
-
-    // only the top half of the saw collides with blocks (gets restored after block collisions)
-    if(NPC[A].Type == NPCID_SAW)
-        NPC[A].Location.Height = 24;
 }
