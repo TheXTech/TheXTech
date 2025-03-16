@@ -3272,8 +3272,8 @@ void SpecialNPC(int A)
     {
         if(NPC[A].Type == NPCID_PLR_FIREBALL || NPC[A].Type == NPCID_PLR_HEAVY || NPC[A].Type == NPCID_PLR_ICEBALL)
         {
-            if(NPC[A].Type == NPCID_PLR_FIREBALL)
-                NPC[A].Projectile = true;
+            // Projectile check, previously set immediately before calling SpecialNPC
+            NPC[A].Projectile = true;
 
             if(!BattleMode)
                 return;
@@ -3345,6 +3345,9 @@ void SpecialNPC(int A)
     }
     else if(NPC[A].Type == NPCID_CHAR4_HEAVY) // Toad Boomerang
     {
+        // Projectile check, previously set immediately before calling SpecialNPC
+        NPC[A].Projectile = true;
+
         // Special5 is player that threw NPC
         // Special4 is the direction that the player was facing when throwing (Special6 in SMBX 1.3)
 
@@ -3489,6 +3492,9 @@ void SpecialNPC(int A)
     }
     else if(NPC[A].Type == NPCID_ICE_BLOCK || NPC[A].Type == NPCID_ICE_CUBE) // Yoshi Ice
     {
+        if(NPC[A].Type == NPCID_ICE_CUBE && NPC[A].Special == 3)
+            NPC[A].BeltSpeed = 0;
+
         if(iRand(100) >= 93)
         {
             tempLocation.Height = EffectHeight[80];
@@ -5492,6 +5498,20 @@ void SpecialNPC(int A)
             NPC[A].Projectile = true;
     }
     else if(NPC[A].Type == NPCID_BULLET && NPC[A].CantHurt > 0)
+        NPC[A].Projectile = true;
+    // Projectile check, previously set immediately before calling SpecialNPC
+    else if(NPC[A].Type == NPCID_PET_FIRE || NPC[A].Type == NPCID_SWORDBEAM || NPC[A].Type == NPCID_TANK_TREADS)
+        NPC[A].Projectile = true;
+    else if(NPC[A].Type == NPCID_METALBARREL || NPC[A].Type == NPCID_CANNONENEMY || NPC[A].Type == NPCID_HPIPE_SHORT
+        || NPC[A].Type == NPCID_HPIPE_LONG || NPC[A].Type == NPCID_VPIPE_SHORT || NPC[A].Type == NPCID_VPIPE_LONG
+        || (NPC[A].Type >= NPCID_SHORT_WOOD && NPC[A].Type <= NPCID_SLANT_WOOD_M))
+    {
+        if(NPC[A].Location.SpeedY > Physics.NPCGravity * 20)
+            NPC[A].Projectile = true;
+        else
+            NPC[A].Projectile = false;
+    }
+    else if(NPC[A].Type == NPCID_EARTHQUAKE_BLOCK && (NPC[A].Location.SpeedY > 2 || NPC[A].Location.SpeedY < -2))
         NPC[A].Projectile = true;
 }
 

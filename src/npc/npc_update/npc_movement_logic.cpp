@@ -710,26 +710,7 @@ void NPCMovementLogic(int A, float& speedVar)
 
     // POSSIBLE SUBROUTINE: postMovement
 
-    if(NPC[A].Type == NPCID_ICE_CUBE && NPC[A].Special == 3)
-        NPC[A].BeltSpeed = 0;
-
-    // projectile check
-    if(NPC[A].Type == NPCID_PLR_FIREBALL || NPC[A].Type == NPCID_PET_FIRE || NPC[A].Type == NPCID_PLR_ICEBALL || NPC[A].Type == NPCID_SWORDBEAM || NPC[A].Type == NPCID_PLR_HEAVY || NPC[A].Type == NPCID_CHAR4_HEAVY)
-        NPC[A].Projectile = true;
-
-    // make things projectiles
-    if(NPC[A].Type == NPCID_METALBARREL || NPC[A].Type == NPCID_CANNONENEMY || NPC[A].Type == NPCID_HPIPE_SHORT || NPC[A].Type == NPCID_HPIPE_LONG || NPC[A].Type == NPCID_VPIPE_SHORT || NPC[A].Type == NPCID_VPIPE_LONG || (NPC[A].Type >= NPCID_TANK_TREADS && NPC[A].Type <= NPCID_SLANT_WOOD_M))
-    {
-        if(NPC[A].Location.SpeedY > Physics.NPCGravity * 20)
-            NPC[A].Projectile = true;
-        else
-            NPC[A].Projectile = false;
-    }
-
-    if(NPC[A].Type == NPCID_TANK_TREADS)
-        NPC[A].Projectile = true;
-    if(NPC[A].Type == NPCID_EARTHQUAKE_BLOCK && (NPC[A].Location.SpeedY > 2 || NPC[A].Location.SpeedY < -2))
-        NPC[A].Projectile = true;
+    // projectile checks moved into SpecialNPC
 
     // Special NPCs code
     SpecialNPC(A);
