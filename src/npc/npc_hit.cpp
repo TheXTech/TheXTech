@@ -88,71 +88,39 @@ void NPCHit(int A, int B, int C)
             if(NPC[A]->NoIceBall || NPC[A].Location.Width > 128 || NPC[A].Location.Height > 128)
                 return;
 
+            bool reset_frame = true;
+
             if(NPC[A].Type == NPCID_RED_FLY_FODDER)
-            {
                 NPC[A].Type = NPCID_RED_FODDER;
-                NPC[A].Frame = EditorNPCFrame(NPC[A].Type, NPC[A].Direction);
-            }
             else if(NPC[A].Type == NPCID_GRN_TURTLE_S3)
-            {
                 NPC[A].Type = NPCID_GRN_SHELL_S3;
-                NPC[A].Frame = EditorNPCFrame(NPC[A].Type, NPC[A].Direction);
-            }
             else if(NPC[A].Type == NPCID_RED_TURTLE_S3 || NPC[A].Type == NPCID_RED_FLY_TURTLE_S3)
-            {
                 NPC[A].Type = NPCID_RED_SHELL_S3;
-                NPC[A].Frame = EditorNPCFrame(NPC[A].Type, NPC[A].Direction);
-            }
             else if(NPC[A].Type == NPCID_BIG_TURTLE)
-            {
                 NPC[A].Type = NPCID_BIG_SHELL;
-                NPC[A].Frame = EditorNPCFrame(NPC[A].Type, NPC[A].Direction);
-            }
             else if(NPC[A].Type == NPCID_GRN_FLY_TURTLE_S3)
-            {
                 NPC[A].Type = NPCID_GRN_SHELL_S3;
-                NPC[A].Frame = EditorNPCFrame(NPC[A].Type, NPC[A].Direction);
-            }
             else if(NPC[A].Type == NPCID_GRN_TURTLE_S4 || NPC[A].Type == NPCID_GRN_FLY_TURTLE_S4)
-            {
                 NPC[A].Type = NPCID_GRN_SHELL_S4;
-                NPC[A].Frame = EditorNPCFrame(NPC[A].Type, NPC[A].Direction);
-            }
             else if(NPC[A].Type == NPCID_RED_TURTLE_S4 || NPC[A].Type == NPCID_RED_FLY_TURTLE_S4)
-            {
                 NPC[A].Type = NPCID_RED_SHELL_S4;
-                NPC[A].Frame = EditorNPCFrame(NPC[A].Type, NPC[A].Direction);
-            }
             else if(NPC[A].Type == NPCID_BLU_TURTLE_S4 || NPC[A].Type == NPCID_BLU_FLY_TURTLE_S4)
-            {
                 NPC[A].Type = NPCID_BLU_SHELL_S4;
-                NPC[A].Frame = EditorNPCFrame(NPC[A].Type, NPC[A].Direction);
-            }
             else if(NPC[A].Type == NPCID_YEL_TURTLE_S4 || NPC[A].Type == NPCID_YEL_FLY_TURTLE_S4)
-            {
                 NPC[A].Type = NPCID_YEL_SHELL_S4;
-                NPC[A].Frame = EditorNPCFrame(NPC[A].Type, NPC[A].Direction);
-            }
             else if(NPC[A].Type == NPCID_RED_TURTLE_S1 || NPC[A].Type == NPCID_RED_FLY_TURTLE_S1)
-            {
                 NPC[A].Type = NPCID_RED_SHELL_S1;
-                NPC[A].Frame = EditorNPCFrame(NPC[A].Type, NPC[A].Direction);
-            }
             else if(NPC[A].Type == NPCID_GRN_TURTLE_S1 || NPC[A].Type == NPCID_GRN_FLY_TURTLE_S1)
-            {
                 NPC[A].Type = NPCID_GRN_SHELL_S1;
-                NPC[A].Frame = EditorNPCFrame(NPC[A].Type, NPC[A].Direction);
-            }
             else if(NPC[A].Type == NPCID_FLY_FODDER_S5)
-            {
                 NPC[A].Type = NPCID_FODDER_S5;
-                NPC[A].Frame = EditorNPCFrame(NPC[A].Type, NPC[A].Direction);
-            }
             else if(NPC[A].Type == NPCID_FLY_FODDER_S3)
-            {
                 NPC[A].Type = NPCID_FODDER_S3;
+            else
+                reset_frame = false;
+
+            if(reset_frame)
                 NPC[A].Frame = EditorNPCFrame(NPC[A].Type, NPC[A].Direction);
-            }
 
             NPC[A].Special = NPC[A].Type;
             NPC[A].Special2 = NPC[A].Frame;
