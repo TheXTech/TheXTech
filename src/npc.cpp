@@ -3260,7 +3260,7 @@ void SpecialNPC(int A)
     // float D = 0;
     // float E = 0;
     // float F = 0;
-    bool tempTurn = false;
+    // bool tempTurn = false;
     Location_t tempLocation;
     // Location_t tempLocation2;
     // NPC_t tempNPC;
@@ -3268,8 +3268,17 @@ void SpecialNPC(int A)
     if(NPC[A].Type == NPCID_VILLAIN_FIRE || NPC[A].Type == NPCID_QUAD_BALL || NPC[A].Type == NPCID_STATUE_FIRE ||
        NPC[A].Type == NPCID_SPIT_GUY_BALL || NPC[A].Type == NPCID_PLANT_FIRE || NPC[A].Type == NPCID_HEAVY_THROWN ||
        NPC[A].Type == NPCID_SICK_BOSS_BALL || NPC[A].Type == NPCID_HOMING_BALL ||
-       (BattleMode && (NPC[A].Type == NPCID_PLR_FIREBALL || NPC[A].Type == NPCID_PLR_HEAVY || NPC[A].Type == NPCID_PLR_ICEBALL))) // Link shield block
+       NPC[A].Type == NPCID_PLR_FIREBALL || NPC[A].Type == NPCID_PLR_HEAVY || NPC[A].Type == NPCID_PLR_ICEBALL) // Link shield block
     {
+        if(NPC[A].Type == NPCID_PLR_FIREBALL || NPC[A].Type == NPCID_PLR_HEAVY || NPC[A].Type == NPCID_PLR_ICEBALL)
+        {
+            if(NPC[A].Type == NPCID_PLR_FIREBALL)
+                NPC[A].Projectile = true;
+
+            if(!BattleMode)
+                return;
+        }
+
         for(int B = 1; B <= numPlayers; B++)
         {
             if(Player[B].Character == 5 && !Player[B].Dead && Player[B].TimeToLive == 0 &&
@@ -3334,21 +3343,7 @@ void SpecialNPC(int A)
             }
         }
     }
-
-    if(NPC[A].Type == NPCID_STAR_COLLECT || NPC[A].Type == NPCID_STAR_EXIT)
-    {
-        if(NPC[A].Projectile)
-        {
-            NPC[A].Location.SpeedX = NPC[A].Location.SpeedX * 0.95;
-            NPC[A].Location.SpeedY = NPC[A].Location.SpeedY * 0.95;
-            if(NPC[A].Location.SpeedY < 1 && NPC[A].Location.SpeedY > -1)
-            {
-                if(NPC[A].Location.SpeedX < 1 && NPC[A].Location.SpeedX > -1)
-                    NPC[A].Projectile = false;
-            }
-        }
-    }
-    if(NPC[A].Type == NPCID_CHAR4_HEAVY) // Toad Boomerang
+    else if(NPC[A].Type == NPCID_CHAR4_HEAVY) // Toad Boomerang
     {
         // Special5 is player that threw NPC
         // Special4 is the direction that the player was facing when throwing (Special6 in SMBX 1.3)
@@ -3745,7 +3740,7 @@ void SpecialNPC(int A)
                 NPC[A].Special += 1;
                 if(NPC[A].Special >= 150)
                 {
-                    tempTurn = true;
+                    bool tempTurn = true;
                     if(!NPC[A].Inert)
                     {
                         for(int B = 1; B <= numPlayers; B++)
@@ -3802,7 +3797,7 @@ void SpecialNPC(int A)
 
                 if(NPC[A].Special2 <= -30)
                 {
-                    tempTurn = true;
+                    bool tempTurn = true;
 
                     if(!NPC[A].Inert)
                     {
@@ -3951,7 +3946,7 @@ void SpecialNPC(int A)
                 NPC[A].Special += 1;
                 if(NPC[A].Special >= 75)
                 {
-                    tempTurn = true;
+                    bool tempTurn = true;
                     if(!NPC[A].Inert)
                     {
                         for(int B = 1; B <= numPlayers; B++)
@@ -4273,6 +4268,9 @@ void SpecialNPC(int A)
         if(NPC[A].Location.Y > level[NPC[A].Section].Height + 1)
             NPC[A].Location.Y = level[NPC[A].Section].Height;
         // deferring tree update to end of the NPC physics update
+
+        // Stop the big fireballs from getting killed from tha lava
+        NPC[A].Projectile = false;
     }
     else if((NPC[A].Type == NPCID_FALL_BLOCK_RED || NPC[A].Type == NPCID_FALL_BLOCK_BROWN) && LevelMacro == LEVELMACRO_OFF)
     {
@@ -5276,6 +5274,17 @@ void SpecialNPC(int A)
     }
     else if(NPC[A].Type == NPCID_STAR_EXIT || NPC[A].Type == NPCID_STAR_COLLECT)
     {
+        if(NPC[A].Projectile)
+        {
+            NPC[A].Location.SpeedX = NPC[A].Location.SpeedX * 0.95;
+            NPC[A].Location.SpeedY = NPC[A].Location.SpeedY * 0.95;
+            if(NPC[A].Location.SpeedY < 1 && NPC[A].Location.SpeedY > -1)
+            {
+                if(NPC[A].Location.SpeedX < 1 && NPC[A].Location.SpeedX > -1)
+                    NPC[A].Projectile = false;
+            }
+        }
+
         if(NPC[A].Special == 0)
         {
             NPC[A].Special4 += 1;
@@ -5466,21 +5475,6 @@ void SpecialNPC(int A)
             }
         }
     }
-
-    // Projectile code
-    if(NPC[A]->IsAShell || (NPC[A].Type == NPCID_SLIDE_BLOCK && NPC[A].Special == 1))
-    {
-        if(NPC[A].Location.SpeedX != 0)
-            NPC[A].Projectile = true;
-    }
-
-//    if(NPC[A].Type == NPCID_PLR_FIREBALL)
-//        NPC[A].Projectile = true;
-//    else if(NPC[A].Type == NPCID_BULLET && NPC[A].CantHurt > 0)
-    if(NPC[A].Type == NPCID_PLR_FIREBALL || (NPC[A].Type == NPCID_BULLET && NPC[A].CantHurt > 0))
-        NPC[A].Projectile = true;
-    else if(NPC[A].Type == NPCID_LAVABUBBLE) // Stop the big fireballs from getting killed from tha lava
-        NPC[A].Projectile = false;
     else if(NPC[A].Type == NPCID_TOOTHY) // killer plant destroys blocks
     {
         for(int B : treeBlockQuery(NPC[A].Location, SORTMODE_COMPAT))
@@ -5491,6 +5485,14 @@ void SpecialNPC(int A)
             }
         }
     }
+    // Projectile code
+    else if(NPC[A]->IsAShell || (NPC[A].Type == NPCID_SLIDE_BLOCK && NPC[A].Special == 1))
+    {
+        if(NPC[A].Location.SpeedX != 0)
+            NPC[A].Projectile = true;
+    }
+    else if(NPC[A].Type == NPCID_BULLET && NPC[A].CantHurt > 0)
+        NPC[A].Projectile = true;
 }
 
 void CharStuff(int WhatNPC, bool CheckEggs)
