@@ -645,6 +645,75 @@ void renderTextureScaleEx(double xDst, double yDst, double wDst, double hDst,
         color);
 }
 
+void renderSizableBlock(int bLeftOnscreen, int bTopOnscreen, int wDst, int hDst, StdPicture &tx)
+{
+    int bRightOnscreen = bLeftOnscreen + wDst;
+    if(bRightOnscreen < 0)
+        return;
+
+    int bBottomOnscreen = bTopOnscreen + hDst;
+    if(bBottomOnscreen < 0)
+        return;
+
+    int left_sx = 0;
+    if(bLeftOnscreen <= -32)
+    {
+        left_sx = 32;
+        bLeftOnscreen = bLeftOnscreen % 32;
+
+        // go straight to right if less than 33 pixels in total
+        if(bRightOnscreen - bLeftOnscreen < 33)
+            left_sx = 64;
+    }
+
+    int top_sy = 0;
+    if(bTopOnscreen <= -32)
+    {
+        top_sy = 32;
+        bTopOnscreen = bTopOnscreen % 32;
+
+        // go straight to bottom if less than 33 pixels in total
+        if(bBottomOnscreen - bTopOnscreen < 33)
+            top_sy = 64;
+    }
+
+    // location of second-to-last row/column in screen coordinates
+    int colSemiLast = bRightOnscreen - 64;
+    int rowSemiLast = bBottomOnscreen - 64;
+
+    if(bRightOnscreen > g_viewport_w * 2)
+        bRightOnscreen = g_viewport_w * 2;
+
+    if(bBottomOnscreen > g_viewport_h * 2)
+        bBottomOnscreen = g_viewport_h * 2;
+
+    // first row source
+    int src_y = top_sy;
+
+    for(int dst_y = bTopOnscreen; dst_y < bBottomOnscreen; dst_y += 32)
+    {
+        // first col source
+        int src_x = left_sx;
+
+        for(int dst_x = bLeftOnscreen; dst_x < bRightOnscreen; dst_x += 32)
+        {
+            renderTextureBasic(dst_x, dst_y, 32, 32, tx, src_x, src_y);
+
+            // next col source
+            if(dst_x >= colSemiLast)
+                src_x = 64;
+            else
+                src_x = 32;
+        }
+
+        // next row source
+        if(dst_y >= rowSemiLast)
+            src_y = 64;
+        else
+            src_y = 32;
+    }
+}
+
 
 size_t lazyLoadedBytes()
 {

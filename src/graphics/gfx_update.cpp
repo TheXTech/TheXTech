@@ -2067,76 +2067,14 @@ void UpdateGraphicsScreen(Screen_t& screen)
                 int bLeftOnscreen = camX + s_round2int(b.Location.X);
                 if(bLeftOnscreen > vScreen[Z].Width)
                     continue;
-                int bRightOnscreen = bLeftOnscreen + s_round2int(b.Location.Width);
-                if(bRightOnscreen < 0)
-                    continue;
 
                 int bTopOnscreen = camY + s_round2int(b.Location.Y);
                 if(bTopOnscreen > vScreen[Z].Height)
                     continue;
-                int bBottomOnscreen = bTopOnscreen + s_round2int(b.Location.Height);
-                if(bBottomOnscreen < 0)
-                    continue;
 
                 g_stats.renderedBlocks++;
 
-                int left_sx = 0;
-                if(bLeftOnscreen <= -32)
-                {
-                    left_sx = 32;
-                    bLeftOnscreen = bLeftOnscreen % 32;
-
-                    // go straight to right if less than 33 pixels in total
-                    if(bRightOnscreen - bLeftOnscreen < 33)
-                        left_sx = 64;
-                }
-
-                int top_sy = 0;
-                if(bTopOnscreen <= -32)
-                {
-                    top_sy = 32;
-                    bTopOnscreen = bTopOnscreen % 32;
-
-                    // go straight to bottom if less than 33 pixels in total
-                    if(bBottomOnscreen - bTopOnscreen < 33)
-                        top_sy = 64;
-                }
-
-                // location of second-to-last row/column in screen coordinates
-                int colSemiLast = bRightOnscreen - 64;
-                int rowSemiLast = bBottomOnscreen - 64;
-
-                if(bRightOnscreen > vScreen[Z].Width)
-                    bRightOnscreen = vScreen[Z].Width;
-
-                if(bBottomOnscreen > vScreen[Z].Height)
-                    bBottomOnscreen = vScreen[Z].Height;
-
-                // first row source
-                int src_y = top_sy;
-
-                for(int dst_y = bTopOnscreen; dst_y < bBottomOnscreen; dst_y += 32)
-                {
-                    // first col source
-                    int src_x = left_sx;
-
-                    for(int dst_x = bLeftOnscreen; dst_x < bRightOnscreen; dst_x += 32)
-                    {
-                        XRender::renderTextureBasic(dst_x, dst_y, 32, 32, GFXBlockBMP[b.Type], src_x, src_y);
-
-                        // next col source
-                        if(dst_x >= colSemiLast)
-                            src_x = 64;
-                        else
-                            src_x = 32;
-                    }
-
-                    // next row source
-                    if(dst_y >= rowSemiLast)
-                        src_y = 64;
-                    else
-                        src_y = 32;
-                }
+                XRender::renderSizableBlock(bLeftOnscreen, bTopOnscreen, s_round2int(b.Location.Width), s_round2int(b.Location.Height), GFXBlockBMP[b.Type]);
             }
         }
 
