@@ -71,8 +71,10 @@ void NPCFrames(int A);
 // Public Sub SkullRide(A As Integer)
 void SkullRide(int A, bool reEnable = false, const Location_t *alignAt = nullptr);
 // Public Sub NPCSpecial(A As Integer)
+// called before movement is applied
 void NPCSpecial(int A);
 // Public Sub SpecialNPC(A As Integer)
+// called after movement is applied
 void SpecialNPC(int A);
 // Public Sub CharStuff(Optional WhatNPC As Integer = 0, Optional CheckEggs As Boolean = False)
 void CharStuff(int WhatNPC = 0, bool CheckEggs = false);
