@@ -554,113 +554,9 @@ void NPCMovementLogic(int A, float& speedVar)
 
     // POSSIBLE SUBROUTINE: preMovement
 
-    if(NPC[A].Type == NPCID_SPIT_BOSS_BALL)
-    {
-        if(!NPC[A].Projectile)
-        {
-            NPC[A].Location.SpeedY = 0; // egg code
-            if(NPC[A].Location.SpeedX == 0)
-                NPC[A].Projectile = true;
-        }
-    }
-
-    if((NPC[A].Type == NPCID_SLIDE_BLOCK || NPC[A].Type == NPCID_FALL_BLOCK_RED || NPC[A].Type == NPCID_FALL_BLOCK_BROWN) && NPC[A].Special == 0)
-        NPC[A].Location.SpeedY = 0;
-
-    if(NPC[A].Type == NPCID_TOOTHY || NPC[A].Type == NPCID_HOMING_BALL_GEN)
-    {
-        NPC[A].Location.SpeedX = 0;
-        NPC[A].Location.SpeedY = 0;
-    }
-
     NPCSpecial(A);
 
-    // lots of speed cancel code (and some TheXTech logic for the Raft NPC); fine to move into NPCSpecial
-    if(NPC[A].Type == NPCID_TANK_TREADS)
-    {
-        if(!AllPlayersNormal())
-            NPC[A].Location.SpeedX = 0;
-    }
-
-    if(NPC[A].Type == NPCID_ICE_CUBE)
-    {
-        if(NPC[A].Projectile || NPC[A].Wet > 0 || NPC[A].HoldingPlayer > 0)
-            NPC[A].Special3 = 0;
-        else if(NPC[A].Special3 == 1)
-        {
-            NPC[A].Location.SpeedX = 0;
-            NPC[A].Location.SpeedY = 0;
-        }
-    }
-
-    if((NPC[A].Type == NPCID_ITEM_POD && NPC[A].Special2 == 1) || NPC[A].Type == NPCID_SIGN || NPC[A].Type == NPCID_LIFT_SAND)
-    {
-        NPC[A].Location.SpeedX = 0;
-        NPC[A].Location.SpeedY = 0;
-    }
-    else if(NPC[A].Type == NPCID_ROCKET_WOOD || NPC[A].Type == NPCID_3_LIFE)
-        NPC[A].Location.SpeedY = 0;
-    if(NPC[A].Type == NPCID_CHECKPOINT)
-    {
-        NPC[A].Projectile = false;
-        NPC[A].Location.SpeedX = 0;
-        NPC[A].Location.SpeedY = 0;
-    }
-
-    if(NPC[A].Type == NPCID_RAFT) // Skull raft
-    {
-        if(!AllPlayersNormal())
-        {
-            NPC[A].Location.SpeedX = 0;
-            NPC[A].Location.SpeedY = 0;
-        }
-
-        // the following is all new code!
-
-        if((NPC[A].Special == 2 || NPC[A].Special == 3) && (NPC[A].SpecialX != 0))
-        {
-            NPC[A].Location.X = NPC[A].SpecialX; // Finish alignment
-            NPC[A].SpecialX = 0;
-        }
-
-        if(NPC[A].Special == 3) // Watch for wall collisions. If one got dissappear (hidden layer, toggled switch), resume a ride
-        {
-            auto loc = NPC[A].Location;
-            loc.X += 1 * NPC[A].Direction;
-            loc.SpeedX += 2 * NPC[A].Direction;
-
-            // int64_t fBlock;// = FirstBlock[static_cast<int>(floor(static_cast<double>(loc.X / 32))) - 1];
-            // int64_t lBlock;// = LastBlock[floor((loc.X + loc.Width) / 32.0) + 1];
-            // blockTileGet(loc, fBlock, lBlock);
-            bool stillCollide = false;
-
-            for(BlockRef_t block : treeBlockQuery(loc, SORTMODE_NONE))
-            {
-                int B = block;
-                if(!CheckCollision(loc, Block[B].Location))
-                    continue;
-
-                if(NPC[A].tempBlock == B || Block[B].tempBlockNoProjClipping() ||
-                   BlockOnlyHitspot1[Block[B].Type] || BlockIsSizable[Block[B].Type] ||
-                   BlockNoClipping[Block[B].Type] || Block[B].Hidden)
-                {
-                    continue;
-                }
-
-                int hs = NPCFindCollision(loc, Block[B].Location);
-                if(Block[B].tempBlockNpcType > 0)
-                    hs = 0;
-                if(hs == 2 || hs == 4)
-                    stillCollide = true;
-            }
-
-            if(!npcHasFloor(NPC[A]) || !stillCollide)
-            {
-                NPC[A].Special = 2;
-                SkullRide(A, true);
-            }
-        }
-    }
+    // there was lots of speed cancel code (and some TheXTech logic for the Raft NPC) here; moved into NPCSpecial
 
     if(NPC[A].Type == NPCID_STACKER && !NPC[A].Projectile)
     {
@@ -671,7 +567,6 @@ void NPCMovementLogic(int A, float& speedVar)
             NPC[A].Special2 += 1;
         }
     }
-
 
     // POSSIBLE SUBROUTINE: applyMovement
 

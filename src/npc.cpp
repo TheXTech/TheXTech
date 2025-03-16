@@ -723,23 +723,20 @@ void NPCSpecial(int A)
     // double F = 0;
     // int64_t fBlock = 0;
     // int64_t lBlock = 0;
-    bool straightLine = false; // SET BUT NOT USED
+    // bool straightLine = false; // SET BUT NOT USED
     bool tempBool = false;
     bool tempBool2 = false;
     Location_t tempLocation;
     // NPC_t tempNPC;
     auto &npc = NPC[A];
 
-    // dont despawn
-    if(npc.Type == NPCID_VILLAIN_S1 || npc.Type == NPCID_SICK_BOSS || npc.Type == NPCID_BOSS_FRAGILE ||
-       npc.Type == NPCID_BOSS_CASE || npc.Type == NPCID_BOMBER_BOSS)
+    if(npc.Type == NPCID_BOSS_CASE) // previously included many other bosses, now moved into their logic
     {
+        // dont despawn
         if(npc.TimeLeft > 1)
             npc.TimeLeft = 100;
     }
-    // '''''''''''''
-
-    if(npc.Type == NPCID_RED_VINE_TOP_S3 || npc.Type == NPCID_GRN_VINE_TOP_S3 || npc.Type == NPCID_GRN_VINE_TOP_S4) // Vine Maker
+    else if(npc.Type == NPCID_RED_VINE_TOP_S3 || npc.Type == NPCID_GRN_VINE_TOP_S3 || npc.Type == NPCID_GRN_VINE_TOP_S4) // Vine Maker
     {
         npc.Location.SpeedY = -2;
         tempLocation.Height = 28;
@@ -986,7 +983,6 @@ void NPCSpecial(int A)
     }
     else if(npc.Type == NPCID_RANDOM_POWER)
         npc.Type = RandomBonus();
-
     else if(npc.Type == NPCID_SPIKY_BALL_S4) // falling spiney
     {
         if(npc.Special != 0)
@@ -1775,6 +1771,10 @@ void NPCSpecial(int A)
     }
     else if(npc.Type == NPCID_BOMBER_BOSS) // mouser
     {
+        // don't despawn -- moved here from the top of the routine
+        if(npc.TimeLeft > 1)
+            npc.TimeLeft = 100;
+
         if(npc.Immune == 0)
             NPCFaceNearestPlayer(npc);
         else
@@ -2098,6 +2098,10 @@ void NPCSpecial(int A)
     }
     else if(npc.Type == NPCID_BOSS_FRAGILE) // Mother Brain
     {
+        // don't despawn -- moved here from the top of the routine
+        if(npc.TimeLeft > 1)
+            npc.TimeLeft = 100;
+
         if(npc.Special >= 1)
         {
             double B = 1 - (npc.Special / 45.0);
@@ -2144,6 +2148,10 @@ void NPCSpecial(int A)
     }
     else if(npc.Type == NPCID_HOMING_BALL_GEN) // Metroid O shooter thing
     {
+        // moved from pre-NPCSpecial code
+        npc.Location.SpeedX = 0;
+        npc.Location.SpeedY = 0;
+
         // was Special in SMBX 1.3
         npc.SpecialY += 1 + dRand();
         if(npc.SpecialY >= 200 + dRand() * 200)
@@ -2520,6 +2528,10 @@ void NPCSpecial(int A)
     }
     else if(npc.Type == NPCID_SICK_BOSS) // Wart
     {
+        // don't despawn -- moved from top of this routine
+        if(npc.TimeLeft > 1)
+            npc.TimeLeft = 100;
+
         npc.Direction = npc.DefaultDirection;
 
         if(npc.Immune > 0 && npc.Special != 3)
@@ -2620,8 +2632,8 @@ void NPCSpecial(int A)
         // SpecialX (prev Special2) stores the previous X speed (ignoring platform pause)
         // SpecialY (prev Special) stores the previous Y speed (ignoring platform pause)
 
-        straightLine = false; // SET BUT NOT USED
-        UNUSED(straightLine);
+        // straightLine = false; // SET BUT NOT USED
+        // UNUSED(straightLine);
         tempBool = false;
 
         for(int B = 1; B <= numPlayers; B++)
@@ -2832,9 +2844,9 @@ void NPCSpecial(int A)
 
                     for(int B = 0; B < numSections; B++)
                     {
-                        if(NPC[A].Location.Y < level[B].Height)
+                        if(npc.Location.Y < level[B].Height)
                         {
-                            if(NPC[A].Location.X >= level[B].X && NPC[A].Location.X + NPC[A].Location.Width <= level[B].Width)
+                            if(npc.Location.X >= level[B].X && npc.Location.X + npc.Location.Width <= level[B].Width)
                             {
                                 below_all = false;
                                 break;
@@ -2896,6 +2908,10 @@ void NPCSpecial(int A)
     }
     else if(npc.Type == NPCID_VILLAIN_S1) // King Koopa
     {
+        // don't despawn -- moved from top of this routine
+        if(npc.TimeLeft > 1)
+            npc.TimeLeft = 100;
+
         int target_plr = NPCFaceNearestPlayer(npc, true); // was D
 
         npc.Special5 = target_plr;
@@ -3154,7 +3170,7 @@ void NPCSpecial(int A)
         // End If
         // Sniffits
     }
-    else if(npc.Type >= 130 && npc.Type <= 132)
+    else if(npc.Type >= NPCID_RED_SPIT_GUY && npc.Type <= NPCID_GRY_SPIT_GUY)
     {
         if(npc.Projectile)
         {
@@ -3164,7 +3180,7 @@ void NPCSpecial(int A)
 
         tempBool = false;
 
-        if(npc.Type < 132)
+        if(npc.Type < NPCID_GRY_SPIT_GUY)
         {
             npc.Special += 1;
             if(npc.Special > 120)
@@ -3250,7 +3266,109 @@ void NPCSpecial(int A)
             syncLayers_NPC(numNPCs);
         }
     }
+    // code moved from pre-NPCSpecial call
+    else if(npc.Type == NPCID_SPIT_BOSS_BALL)
+    {
+        if(!npc.Projectile)
+        {
+            npc.Location.SpeedY = 0; // egg code
+            if(npc.Location.SpeedX == 0)
+                npc.Projectile = true;
+        }
+    }
+    else if(npc.Type == NPCID_SLIDE_BLOCK || npc.Type == NPCID_FALL_BLOCK_RED || npc.Type == NPCID_FALL_BLOCK_BROWN)
+    {
+        if(npc.Special == 0)
+            npc.Location.SpeedY = 0;
+    }
+    else if(npc.Type == NPCID_TOOTHY)
+    {
+        npc.Location.SpeedX = 0;
+        npc.Location.SpeedY = 0;
+    }
+    // code moved from post-NPCSpecial call
+    else if(npc.Type == NPCID_TANK_TREADS)
+    {
+        if(!AllPlayersNormal())
+            npc.Location.SpeedX = 0;
+    }
+    else if(npc.Type == NPCID_ICE_CUBE)
+    {
+        if(npc.Projectile || npc.Wet > 0 || npc.HoldingPlayer > 0)
+            npc.Special3 = 0;
+        else if(npc.Special3 == 1)
+        {
+            npc.Location.SpeedX = 0;
+            npc.Location.SpeedY = 0;
+        }
+    }
+    else if((npc.Type == NPCID_ITEM_POD && npc.Special2 == 1) || npc.Type == NPCID_SIGN || npc.Type == NPCID_LIFT_SAND)
+    {
+        npc.Location.SpeedX = 0;
+        npc.Location.SpeedY = 0;
+    }
+    else if(npc.Type == NPCID_ROCKET_WOOD || npc.Type == NPCID_3_LIFE)
+        npc.Location.SpeedY = 0;
+    else if(npc.Type == NPCID_CHECKPOINT)
+    {
+        npc.Projectile = false;
+        npc.Location.SpeedX = 0;
+        npc.Location.SpeedY = 0;
+    }
+    else if(npc.Type == NPCID_RAFT) // Skull raft
+    {
+        if(!AllPlayersNormal())
+        {
+            npc.Location.SpeedX = 0;
+            npc.Location.SpeedY = 0;
+        }
 
+        // the following is all new code!
+
+        if((npc.Special == 2 || npc.Special == 3) && (npc.SpecialX != 0))
+        {
+            npc.Location.X = npc.SpecialX; // Finish alignment
+            npc.SpecialX = 0;
+        }
+
+        if(npc.Special == 3) // Watch for wall collisions. If one got dissappear (hidden layer, toggled switch), resume a ride
+        {
+            auto loc = npc.Location;
+            loc.X += 1 * npc.Direction;
+            loc.SpeedX += 2 * npc.Direction;
+
+            // int64_t fBlock;// = FirstBlock[static_cast<int>(floor(static_cast<double>(loc.X / 32))) - 1];
+            // int64_t lBlock;// = LastBlock[floor((loc.X + loc.Width) / 32.0) + 1];
+            // blockTileGet(loc, fBlock, lBlock);
+            bool stillCollide = false;
+
+            for(BlockRef_t block : treeBlockQuery(loc, SORTMODE_NONE))
+            {
+                int B = block;
+                if(!CheckCollision(loc, Block[B].Location))
+                    continue;
+
+                if(npc.tempBlock == B || Block[B].tempBlockNoProjClipping() ||
+                   BlockOnlyHitspot1[Block[B].Type] || BlockIsSizable[Block[B].Type] ||
+                   BlockNoClipping[Block[B].Type] || Block[B].Hidden)
+                {
+                    continue;
+                }
+
+                int hs = NPCFindCollision(loc, Block[B].Location);
+                if(Block[B].tempBlockNpcType > 0)
+                    hs = 0;
+                if(hs == 2 || hs == 4)
+                    stillCollide = true;
+            }
+
+            if(!npcHasFloor(npc) || !stillCollide)
+            {
+                npc.Special = 2;
+                SkullRide(A, true);
+            }
+        }
+    }
 }
 
 void SpecialNPC(int A)
