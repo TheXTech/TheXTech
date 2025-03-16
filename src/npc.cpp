@@ -3645,51 +3645,6 @@ void SpecialNPC(int A)
         if(Player[NPC[A].Special].Dead || Player[NPC[A].Special].Section != NPC[A].Section)
             NPC[A].Special = 0;
     }
-    else if(NPC[A]->IsFish && NPC[A].Special == 1) // Red SMB3 Cheep
-    {
-        if(!NPC[A].Projectile)
-        {
-            if(NPC[A].Wet == 2)
-                NPC[A].Special5 = 0;
-
-            int B = NPCTargetPlayer(NPC[A]);
-            if(B == 0)
-                B = 1;
-
-            if(!Player[B].WetFrame && Player[B].Location.Y + Player[B].Location.Height < NPC[A].Location.Y)
-            {
-                if((NPC[A].Direction == 1 && Player[B].Location.X > NPC[A].Location.X) ||
-                   (NPC[A].Direction == -1 && Player[B].Location.X < NPC[A].Location.X))
-                {
-                    if(NPC[A].Location.X > Player[B].Location.X - 200 && NPC[A].Location.X + NPC[A].Location.Width < Player[B].Location.X + Player[B].Location.Width + 200)
-                    {
-                        if(NPC[A].Wet == 2)
-                        {
-                            if(NPC[A].Location.SpeedY > -3)
-                                NPC[A].Location.SpeedY -= 0.1;
-                            NPC[A].Special3 = 1;
-                        }
-                    }
-                    else
-                        NPC[A].Special3 = 0;
-                }
-                else
-                    NPC[A].Special3 = 0;
-
-                if(NPC[A].Special3 == 1 && NPC[A].Wet == 0)
-                {
-                    NPC[A].Location.SpeedY = -(NPC[A].Location.Y - Player[B].Location.Y + Player[B].Location.Height / 2.0) * 0.05 + dRand() * 4 - 2;
-                    if(NPC[A].Location.SpeedY < -9)
-                        NPC[A].Location.SpeedY = -9;
-                    NPC[A].Special3 = 0;
-                    NPC[A].Special5 = 1;
-
-                    // this allows the fish to go through walls after leaping
-                    NPC[A].WallDeath = 10;
-                }
-            }
-        }
-    }
     else if(NPC[A].Type == NPCID_DOOR_MAKER)
     {
         if(NPC[A].Special3 == 1)
@@ -4340,9 +4295,9 @@ void SpecialNPC(int A)
         // Stop the big fireballs from getting killed from tha lava
         NPC[A].Projectile = false;
     }
-    else if((NPC[A].Type == NPCID_FALL_BLOCK_RED || NPC[A].Type == NPCID_FALL_BLOCK_BROWN) && LevelMacro == LEVELMACRO_OFF)
+    else if(NPC[A].Type == NPCID_FALL_BLOCK_RED || NPC[A].Type == NPCID_FALL_BLOCK_BROWN)
     {
-        if(NPC[A].Special == 0)
+        if(LevelMacro == LEVELMACRO_OFF && NPC[A].Special == 0)
         {
             if(NPC[A].Special2 == 1)
             {
@@ -4360,6 +4315,7 @@ void SpecialNPC(int A)
                     NPC[A].Special3 -= 1;
                 NPC[A].Location.X = NPC[A].DefaultLocationX;
             }
+
             if((NPC[A].Special3 >= 5 && NPC[A].Type == NPCID_FALL_BLOCK_RED) || (NPC[A].Special3 >= 30 && NPC[A].Type == NPCID_FALL_BLOCK_BROWN))
             {
                 NPC[A].Special = 1;
@@ -4676,8 +4632,11 @@ void SpecialNPC(int A)
         }
     }
     // Hammer Bro
-    else if(NPC[A].Type == NPCID_HEAVY_THROWER && !NPC[A].Projectile)
+    else if(NPC[A].Type == NPCID_HEAVY_THROWER)
     {
+        if(NPC[A].Projectile)
+            return;
+
         NPCFaceNearestPlayer(NPC[A]);
 
         if(NPC[A].Special > 0)
@@ -5403,8 +5362,11 @@ void SpecialNPC(int A)
                 NPC[A].Special3 = 0;
         }
     }
-    else if(NPC[A].Type == NPCID_SPIT_BOSS && !NPC[A].Projectile) // birdo
+    else if(NPC[A].Type == NPCID_SPIT_BOSS) // birdo
     {
+        if(NPC[A].Projectile)
+            return;
+
         if(NPC[A].Legacy)
         {
             if(NPC[A].TimeLeft > 1)
@@ -5554,13 +5516,16 @@ void SpecialNPC(int A)
         }
     }
     // Projectile code
-    else if(NPC[A]->IsAShell || (NPC[A].Type == NPCID_SLIDE_BLOCK && NPC[A].Special == 1))
+    else if(NPC[A].Type == NPCID_SLIDE_BLOCK)
     {
-        if(NPC[A].Location.SpeedX != 0)
+        if(NPC[A].Special == 1 && NPC[A].Location.SpeedX != 0)
             NPC[A].Projectile = true;
     }
-    else if(NPC[A].Type == NPCID_BULLET && NPC[A].CantHurt > 0)
-        NPC[A].Projectile = true;
+    else if(NPC[A].Type == NPCID_BULLET)
+    {
+        if(NPC[A].CantHurt > 0)
+            NPC[A].Projectile = true;
+    }
     // Projectile check, previously set immediately before calling SpecialNPC
     else if(NPC[A].Type == NPCID_PET_FIRE || NPC[A].Type == NPCID_SWORDBEAM || NPC[A].Type == NPCID_TANK_TREADS)
         NPC[A].Projectile = true;
@@ -5573,8 +5538,66 @@ void SpecialNPC(int A)
         else
             NPC[A].Projectile = false;
     }
-    else if(NPC[A].Type == NPCID_EARTHQUAKE_BLOCK && (NPC[A].Location.SpeedY > 2 || NPC[A].Location.SpeedY < -2))
-        NPC[A].Projectile = true;
+    else if(NPC[A].Type == NPCID_EARTHQUAKE_BLOCK)
+    {
+        if(NPC[A].Location.SpeedY > 2 || NPC[A].Location.SpeedY < -2)
+            NPC[A].Projectile = true;
+    }
+    // NPCs selected by trait (instead of type)
+    else
+    {
+        if(NPC[A]->IsAShell)
+        {
+            if(NPC[A].Location.SpeedX != 0)
+                NPC[A].Projectile = true;
+        }
+        // moved from above
+        else if(NPC[A]->IsFish)
+        {
+            if(NPC[A].Special == 1 && !NPC[A].Projectile)
+            {
+                if(NPC[A].Wet == 2)
+                    NPC[A].Special5 = 0;
+
+                int B = NPCTargetPlayer(NPC[A]);
+                if(B == 0)
+                    B = 1;
+
+                if(!Player[B].WetFrame && Player[B].Location.Y + Player[B].Location.Height < NPC[A].Location.Y)
+                {
+                    if((NPC[A].Direction == 1 && Player[B].Location.X > NPC[A].Location.X) ||
+                       (NPC[A].Direction == -1 && Player[B].Location.X < NPC[A].Location.X))
+                    {
+                        if(NPC[A].Location.X > Player[B].Location.X - 200 && NPC[A].Location.X + NPC[A].Location.Width < Player[B].Location.X + Player[B].Location.Width + 200)
+                        {
+                            if(NPC[A].Wet == 2)
+                            {
+                                if(NPC[A].Location.SpeedY > -3)
+                                    NPC[A].Location.SpeedY -= 0.1;
+                                NPC[A].Special3 = 1;
+                            }
+                        }
+                        else
+                            NPC[A].Special3 = 0;
+                    }
+                    else
+                        NPC[A].Special3 = 0;
+
+                    if(NPC[A].Special3 == 1 && NPC[A].Wet == 0)
+                    {
+                        NPC[A].Location.SpeedY = -(NPC[A].Location.Y - Player[B].Location.Y + Player[B].Location.Height / 2.0) * 0.05 + dRand() * 4 - 2;
+                        if(NPC[A].Location.SpeedY < -9)
+                            NPC[A].Location.SpeedY = -9;
+                        NPC[A].Special3 = 0;
+                        NPC[A].Special5 = 1;
+
+                        // this allows the fish to go through walls after leaping
+                        NPC[A].WallDeath = 10;
+                    }
+                }
+            }
+        }
+    }
 }
 
 void CharStuff(int WhatNPC, bool CheckEggs)
