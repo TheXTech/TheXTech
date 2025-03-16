@@ -3400,28 +3400,7 @@ void SpecialNPC(int A)
         NPC[A].Location.SpeedY += (playerVCenter - NPC[A].Location.Y + NPC[A].Location.Height / 2.0) * 0.004;
 
 
-        for(int B : treeNPCQuery(NPC[A].Location, SORTMODE_NONE))
-        {
-            if(NPC[B].Active)
-            {
-                if(NPC[B]->IsACoin)
-                {
-                    if(CheckCollision(NPC[A].Location, NPC[B].Location))
-                    {
-                        NPC[B].Location.X = npcHCenter - NPC[B].Location.Width / 2.0;
-                        NPC[B].Location.Y = npcVCenter - NPC[B].Location.Height / 2.0;
-                        NPC[B].Special = 0;
-                        NPC[B].Projectile = false;
-
-                        // must update now because B won't be checked later
-                        treeNPCUpdate(B);
-                        if(NPC[B].tempBlock > 0)
-                            treeNPCSplitTempBlock(B);
-                    }
-                }
-            }
-        }
-
+        bool picked_up = false;
         bool atCenter = (npcHCenter > playerHCenter && NPC[A].Special4 == 1) ||
                         (npcHCenter < playerHCenter && NPC[A].Special4 == -1);
         if(!atCenter)
@@ -3433,24 +3412,38 @@ void SpecialNPC(int A)
                 NPCQueues::Killed.push_back(A);
                 Player[NPC[A].Special5].FrameCount = 115;
                 PlaySoundSpatial(SFX_Grab2, NPC[A].Location);
-                for(int B : treeNPCQuery(NPC[A].Location, SORTMODE_ID))
-                {
-                    if(NPC[B].Active)
-                    {
-                        if(NPC[B]->IsACoin)
-                        {
-                            if(CheckCollision(NPC[A].Location, NPC[B].Location))
-                            {
-                                NPC[B].Location.X = playerHCenter - NPC[B].Location.Width / 2.0;
-                                NPC[B].Location.Y = playerVCenter - NPC[B].Location.Height / 2.0;
-                                TouchBonus(vb6Round(NPC[A].Special5), B);
+                picked_up = true;
+            }
+        }
 
-                                // must update now because B won't be checked later
-                                treeNPCUpdate(B);
-                                if(NPC[B].tempBlock > 0)
-                                    treeNPCSplitTempBlock(B);
-                            }
+        // look for coins, and pick them up if needed
+        for(int B : treeNPCQuery(NPC[A].Location, (picked_up) ? SORTMODE_ID : SORTMODE_NONE))
+        {
+            if(NPC[B].Active)
+            {
+                if(NPC[B]->IsACoin)
+                {
+                    if(CheckCollision(NPC[A].Location, NPC[B].Location))
+                    {
+                        NPC[B].Special = 0;
+                        NPC[B].Projectile = false;
+
+                        if(picked_up)
+                        {
+                            NPC[B].Location.X = playerHCenter - NPC[B].Location.Width / 2.0;
+                            NPC[B].Location.Y = playerVCenter - NPC[B].Location.Height / 2.0;
+                            TouchBonus(NPC[A].Special5, B);
                         }
+                        else
+                        {
+                            NPC[B].Location.X = npcHCenter - NPC[B].Location.Width / 2.0;
+                            NPC[B].Location.Y = npcVCenter - NPC[B].Location.Height / 2.0;
+                        }
+
+                        // must update now because B won't be checked later
+                        treeNPCUpdate(B);
+                        if(NPC[B].tempBlock > 0)
+                            treeNPCSplitTempBlock(B);
                     }
                 }
             }
