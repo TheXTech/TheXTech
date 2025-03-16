@@ -2292,9 +2292,9 @@ extern RangeArr<StdPicture, 1, maxBackgroundType> GFXBackgroundBMP;
 //Public GFXBackgroundMaskBMP(1 To maxBackgroundType) As StdPicture
 //extern RangeArr<StdPicture, 1, maxBackgroundType> GFXBackgroundMaskBMP;
 //Public GFXBackgroundHeight(1 To maxBackgroundType) As Integer
-extern RangeArrI<vbint_t, 1, maxBackgroundType, 0> GFXBackgroundHeight;
+// extern RangeArrI<vbint_t, 1, maxBackgroundType, 0> GFXBackgroundHeight;
 //Public GFXBackgroundWidth(1 To maxBackgroundType) As Integer
-extern RangeArrI<vbint_t, 1, maxBackgroundType, 0> GFXBackgroundWidth;
+// extern RangeArrI<vbint_t, 1, maxBackgroundType, 0> GFXBackgroundWidth;
 
 extern const char *GFXPlayerNames[numCharacters];
 extern RangeArr<StdPicture, 1, 10> *GFXCharacterBMP[numCharacters];

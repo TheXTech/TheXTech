@@ -3371,7 +3371,7 @@ void EditorScreen::UpdateBlockScreen(CallMode mode)
 
 bool EditorScreen::UpdateBGOButton(CallMode mode, int x, int y, int type, bool sel)
 {
-    return UpdateButton(mode, x, y, GFXBackgroundBMP[type], sel, 0, BackgroundFrame[type] * BackgroundHeight[type], GFXBackgroundWidth[type], BackgroundHeight[type]);
+    return UpdateButton(mode, x, y, GFXBackgroundBMP[type], sel, 0, BackgroundFrame[type] * BackgroundHeight[type], GFXBackground[type].w, BackgroundHeight[type]);
 }
 
 void EditorScreen::UpdateBGO(CallMode mode, int x, int y, int type)

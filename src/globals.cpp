@@ -434,8 +434,8 @@ RangeArr<StdPicture, 1, maxEffectType> GFXEffectBMP;
 //RangeArrI<long, 1, maxBackgroundType, 0> GFXBackgroundMask;
 RangeArr<StdPicture, 1, maxBackgroundType> GFXBackgroundBMP;
 //RangeArr<StdPicture, 1, maxBackgroundType> GFXBackgroundMaskBMP;
-RangeArrI<vbint_t, 1, maxBackgroundType, 0> GFXBackgroundHeight;
-RangeArrI<vbint_t, 1, maxBackgroundType, 0> GFXBackgroundWidth;
+// RangeArrI<vbint_t, 1, maxBackgroundType, 0> GFXBackgroundHeight;
+// RangeArrI<vbint_t, 1, maxBackgroundType, 0> GFXBackgroundWidth;
 
 const char *GFXPlayerNames[numCharacters] =
 {

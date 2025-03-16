@@ -2016,7 +2016,7 @@ void UpdateGraphicsScreen(Screen_t& screen)
                     g_stats.renderedBGOs++;
                     XRender::renderTextureBasic(camX + s_round2int(Background[A].Location.X),
                                           camY + s_round2int(Background[A].Location.Y),
-                                          GFXBackgroundWidth[Background[A].Type],
+                                          GFXBackground[Background[A].Type].w,
                                           BackgroundHeight[Background[A].Type],
                                           GFXBackgroundBMP[Background[A].Type], 0,
                                           BackgroundHeight[Background[A].Type] *
@@ -2043,12 +2043,12 @@ void UpdateGraphicsScreen(Screen_t& screen)
                 if(sY > vScreen[Z].Height)
                     continue;
 
-                if(sX + GFXBackgroundWidth[Background[A].Type] >= 0 && sY + BackgroundHeight[Background[A].Type] >= 0 /*&& !Background[A].Hidden*/)
+                if(sX + GFXBackground[Background[A].Type].w >= 0 && sY + BackgroundHeight[Background[A].Type] >= 0 /*&& !Background[A].Hidden*/)
                 {
                     g_stats.renderedBGOs++;
                     XRender::renderTextureBasic(sX,
                                           sY,
-                                          GFXBackgroundWidth[Background[A].Type],
+                                          GFXBackground[Background[A].Type].w,
                                           BackgroundHeight[Background[A].Type],
                                           GFXBackgroundBMP[Background[A].Type],
                                           0,
@@ -2160,7 +2160,7 @@ void UpdateGraphicsScreen(Screen_t& screen)
                     g_stats.renderedBGOs++;
                     XRender::renderTextureBasic(camX + s_round2int(Background[A].Location.X),
                                           camY + s_round2int(Background[A].Location.Y),
-                                          GFXBackgroundWidth[Background[A].Type],
+                                          GFXBackground[Background[A].Type].w,
                                           BackgroundHeight[Background[A].Type],
                                           GFXBackgroundBMP[Background[A].Type], 0,
                                           BackgroundHeight[Background[A].Type] * BackgroundFrame[Background[A].Type]);
@@ -2988,7 +2988,7 @@ void UpdateGraphicsScreen(Screen_t& screen)
                     g_stats.renderedBGOs++;
                     XRender::renderTextureBasic(camX + s_round2int(Background[A].Location.X),
                                           camY + s_round2int(Background[A].Location.Y),
-                                          GFXBackgroundWidth[Background[A].Type],
+                                          GFXBackground[Background[A].Type].w,
                                           BackgroundHeight[Background[A].Type],
                                           GFXBackgroundBMP[Background[A].Type], 0,
                                           BackgroundHeight[Background[A].Type] * BackgroundFrame[Background[A].Type]);
@@ -3014,10 +3014,10 @@ void UpdateGraphicsScreen(Screen_t& screen)
                 if(sY > vScreen[Z].Height)
                     continue;
 
-                if(sX + GFXBackgroundWidth[Background[A].Type] >= 0 && sY + BackgroundHeight[Background[A].Type] >= 0 /*&& !Background[A].Hidden*/)
+                if(sX + GFXBackground[Background[A].Type].w >= 0 && sY + BackgroundHeight[Background[A].Type] >= 0 /*&& !Background[A].Hidden*/)
                 {
                     g_stats.renderedBGOs++;
-                    XRender::renderTextureBasic(sX, sY, GFXBackgroundWidth[Background[A].Type], BackgroundHeight[Background[A].Type], GFXBackground[Background[A].Type], 0, BackgroundHeight[Background[A].Type] * BackgroundFrame[Background[A].Type]);
+                    XRender::renderTextureBasic(sX, sY, GFXBackground[Background[A].Type].w, BackgroundHeight[Background[A].Type], GFXBackground[Background[A].Type], 0, BackgroundHeight[Background[A].Type] * BackgroundFrame[Background[A].Type]);
                 }
             }
         }

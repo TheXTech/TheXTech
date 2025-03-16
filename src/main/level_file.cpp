@@ -860,7 +860,7 @@ bool OpenLevel_Background(void* userdata, LevelBGO& b)
         }
 
         bgo.Layer = load.FindLayer(b.layer);
-        bgo.Location.Width = GFXBackgroundWidth[bgo.Type];
+        bgo.Location.Width = GFXBackground[bgo.Type].w;
         bgo.Location.Height = BackgroundHeight[bgo.Type];
 
         bgo.SetSortPriority(b.z_mode, std::round(b.z_offset));
