@@ -771,18 +771,6 @@ void NPCBlockLogic(int A, double& tempHit, int& tempHitBlock, float& tempSpeedA,
                                         }
                                     }
 
-                                    if(HitSpot == 1 && NPC[A].Type == NPCID_EARTHQUAKE_BLOCK && NPC[A].Location.SpeedY > 2)
-                                        NPCHit(A, 4, A);
-
-                                    // If a Pokey head stands on a top of another Pokey segment
-                                    // FIXME: need a compat guard for below condition
-                                    if(HitSpot == 1 && NPC[A].Type == NPCID_STACKER && Block[B].tempBlockNpcType == NPCID_STACKER
-                                        && NPC[Block[B].tempBlockNpcIdx].Type == NPCID_STACKER) // Make sure Pokey didn't transformed into ice cube or anything also
-                                    {
-                                        NPC[Block[B].tempBlockNpcIdx].Special = -3;
-                                        NPC[A].Special2 = 0;
-                                    }
-
                                     if((NPC[A].Type == NPCID_PLR_FIREBALL || NPC[A].Type == NPCID_PLR_ICEBALL) && NPC[A].Special == 5 && HitSpot > 0)
                                         NPCHit(A, 3, A);
 
@@ -791,15 +779,6 @@ void NPCBlockLogic(int A, double& tempHit, int& tempHitBlock, float& tempSpeedA,
 
                                     if(NPC[A].Type == NPCID_ITEM_BUBBLE && !BlockIsSizable[Block[B].Type])
                                         NPCHit(A, 3, A);
-
-                                    if(NPC[A].Type == NPCID_SPIKY_BALL_S4 && HitSpot == 1)
-                                        NPC[A].Special = 1;
-
-                                    if(NPC[A].Type == NPCID_DOOR_MAKER && HitSpot == 1)
-                                    {
-                                        NPC[A].Special3 = 1;
-                                        NPC[A].Projectile = false;
-                                    }
 
                                     if(NPC[A].Type == NPCID_CHAR3_HEAVY && HitSpot > 0)
                                         NPCHit(A, 3, A);
@@ -817,15 +796,6 @@ void NPCBlockLogic(int A, double& tempHit, int& tempHitBlock, float& tempSpeedA,
                                     // hitspot 1
                                     if(HitSpot == 1) // Hitspot 1
                                     {
-                                        if((NPC[A].Type == NPCID_PLR_FIREBALL || NPC[A].Type == NPCID_PLR_ICEBALL) && NPC[A].Location.SpeedX == 0)
-                                            NPCHit(A, 4, A);
-
-                                        if(NPC[A].Type == NPCID_GOALTAPE)
-                                            NPC[A].Special = 1;
-
-                                        if(NPC[A].Type == NPCID_SQUID_S3 || NPC[A].Type == NPCID_SQUID_S1)
-                                            NPC[A].Special4 = 1;
-
                                         tempSpeedA = Block[B].Location.SpeedY;
                                         if(tempSpeedA < 0)
                                             tempSpeedA = 0;
@@ -839,17 +809,56 @@ void NPCBlockLogic(int A, double& tempHit, int& tempHitBlock, float& tempSpeedA,
                                                 NPC[A].TimeLeft = NPC[Block[B].tempBlockNpcIdx].TimeLeft - 1;
                                         }
 
-                                        if(NPC[A].Type == NPCID_SLIDE_BLOCK && NPC[A].Special == 1 && NPC[A].Location.SpeedX == 0 && NPC[A].Location.SpeedY > 7.95)
-                                            NPCHit(A, 4, A);
-
-                                        if(NPC[A].Type == NPCID_STONE_S3 || NPC[A].Type == NPCID_STONE_S4)
+                                        // type-based logic for floor collisions
+                                        if(NPC[A].Type == NPCID_STACKER)
+                                        {
+                                            // If a Pokey head stands on a top of another Pokey segment
+                                            // FIXME: need a compat guard for second condition
+                                            if(Block[B].tempBlockNpcType == NPCID_STACKER
+                                                && NPC[Block[B].tempBlockNpcIdx].Type == NPCID_STACKER) // Make sure Pokey didn't transformed into ice cube or anything also
+                                            {
+                                                NPC[Block[B].tempBlockNpcIdx].Special = -3;
+                                                NPC[A].Special2 = 0;
+                                            }
+                                        }
+                                        else if(NPC[A].Type == NPCID_SPIKY_BALL_S4)
+                                            NPC[A].Special = 1;
+                                        else if(NPC[A].Type == NPCID_GOALTAPE)
+                                            NPC[A].Special = 1;
+                                        else if(NPC[A].Type == NPCID_SQUID_S3 || NPC[A].Type == NPCID_SQUID_S1)
+                                            NPC[A].Special4 = 1;
+                                        else if(NPC[A].Type == NPCID_STONE_S3 || NPC[A].Type == NPCID_STONE_S4)
                                             NPC[A].Special = 2;
-
-                                        if((NPC[A].Type == NPCID_METALBARREL || NPC[A].Type == NPCID_CANNONENEMY || NPC[A].Type == NPCID_HPIPE_SHORT || NPC[A].Type == NPCID_HPIPE_LONG || NPC[A].Type == NPCID_VPIPE_SHORT || NPC[A].Type == NPCID_VPIPE_LONG) && NPC[A].Location.SpeedY > Physics.NPCGravity * 20)
-                                            PlaySoundSpatial(SFX_Stone, NPC[A].Location);
-
-                                        if(NPC[A].Type == NPCID_TANK_TREADS && NPC[A].Location.SpeedY > Physics.NPCGravity * 10)
-                                            PlaySoundSpatial(SFX_Stone, NPC[A].Location);
+                                        else if(NPC[A].Type == NPCID_DOOR_MAKER)
+                                        {
+                                            NPC[A].Special3 = 1;
+                                            NPC[A].Projectile = false;
+                                        }
+                                        else if(NPC[A].Type == NPCID_EARTHQUAKE_BLOCK)
+                                        {
+                                            if(NPC[A].Location.SpeedY > 2)
+                                                NPCHit(A, 4, A);
+                                        }
+                                        else if(NPC[A].Type == NPCID_PLR_FIREBALL || NPC[A].Type == NPCID_PLR_ICEBALL)
+                                        {
+                                            if(NPC[A].Location.SpeedX == 0)
+                                                NPCHit(A, 4, A);
+                                        }
+                                        else if(NPC[A].Type == NPCID_SLIDE_BLOCK)
+                                        {
+                                            if(NPC[A].Special == 1 && NPC[A].Location.SpeedX == 0 && NPC[A].Location.SpeedY > 7.95)
+                                                NPCHit(A, 4, A);
+                                        }
+                                        else if(NPC[A].Type == NPCID_METALBARREL || NPC[A].Type == NPCID_CANNONENEMY || NPC[A].Type == NPCID_HPIPE_SHORT || NPC[A].Type == NPCID_HPIPE_LONG || NPC[A].Type == NPCID_VPIPE_SHORT || NPC[A].Type == NPCID_VPIPE_LONG)
+                                        {
+                                            if(NPC[A].Location.SpeedY > Physics.NPCGravity * 20)
+                                                PlaySoundSpatial(SFX_Stone, NPC[A].Location);
+                                        }
+                                        else if(NPC[A].Type == NPCID_TANK_TREADS)
+                                        {
+                                            if(NPC[A].Location.SpeedY > Physics.NPCGravity * 10)
+                                                PlaySoundSpatial(SFX_Stone, NPC[A].Location);
+                                        }
 
                                         if(WalkingCollision3(NPC[A].Location, Block[B].Location, oldBeltSpeed) || NPC[A].Location.Width > 32)
                                         {
