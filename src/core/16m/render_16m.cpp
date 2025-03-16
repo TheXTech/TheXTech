@@ -1023,4 +1023,130 @@ static void minport_RenderTexturePrivate_Basic(int16_t xDst, int16_t yDst, int16
     GL_DrawImage_Custom_Basic(to_draw, tx.l.flags, xDst, yDst, wDst, hDst, xSrc, ySrc, color);
 }
 
+void renderSizableBlock(int bLeftOnscreen, int bTopOnscreen, int wDst, int hDst, StdPicture &tx)
+{
+    // initial bounds check
+    int bRightOnscreen = bLeftOnscreen + wDst;
+    if(bRightOnscreen < 0)
+        return;
+
+    int bBottomOnscreen = bTopOnscreen + hDst;
+    if(bBottomOnscreen < 0)
+        return;
+
+    bTopOnscreen = FLOORDIV2(bTopOnscreen);
+    bBottomOnscreen = bBottomOnscreen / 2;
+    bLeftOnscreen = FLOORDIV2(bLeftOnscreen);
+    bRightOnscreen = bRightOnscreen / 2;
+
+    // load texture
+    if(!tx.inited)
+        return;
+
+    if(tx.l.lazyLoaded && !tx.d.hasTexture())
+        lazyLoad(tx);
+
+    if(!tx.d.hasTexture())
+        return;
+
+    glBindTexture(0, tx.d.texture[0]);
+
+    if(tx.l.flags & 32)
+        glPolyFmt(POLY_ID(s_render_planes.m_current_plane / 8) | POLY_ALPHA(31) | POLY_CULL_NONE | POLY_FOG_Q);
+
+    glBegin(GL_QUADS);
+
+    glColor3b(255, 255, 255);
+
+    // pre-scale u and v for efficiency
+    uint32_t left_u1 = ( 0 << 4);
+
+    if(bLeftOnscreen <= -16)
+    {
+        left_u1 = (16 << 4);
+        bLeftOnscreen = bLeftOnscreen % 16;
+
+        // go straight to right if less than 17 pixels in total
+        if(bRightOnscreen - bLeftOnscreen < 17)
+        {
+            left_u1 = (32 << 4);
+        }
+    }
+
+    uint32_t top_v1 = ( 0 << 20);
+
+    if(bTopOnscreen <= -16)
+    {
+        top_v1 = (16 << 20);
+        bTopOnscreen = bTopOnscreen % 16;
+
+        // go straight to bottom if less than 33 pixels in total
+        if(bBottomOnscreen - bTopOnscreen < 17)
+        {
+            top_v1 = (32 << 20);
+        }
+    }
+
+    // location of second-to-last row/column in screen coordinates
+    int colSemiLast = bRightOnscreen - 32;
+    int rowSemiLast = bBottomOnscreen - 32;
+
+    if(bRightOnscreen > g_viewport_w)
+        bRightOnscreen = g_viewport_w;
+
+    if(bBottomOnscreen > g_viewport_h)
+        bBottomOnscreen = g_viewport_h;
+
+    // first row source
+    uint32_t src_v1 = top_v1;
+
+    for(int dst_y = bTopOnscreen; dst_y < bBottomOnscreen; dst_y += 16)
+    {
+        // first col source
+        int src_u1 = left_u1;
+
+        for(int dst_x = bLeftOnscreen; dst_x < bRightOnscreen; dst_x += 16)
+        {
+            // add vertices
+            {
+                // u1, v1
+                GFX_TEX_COORD = (src_u1 | src_v1);
+                s_gxVertex3i(dst_x, dst_y, s_render_planes.m_plane_depth[s_render_planes.m_current_plane]);
+
+                // u1, v2
+                GFX_TEX_COORD = (src_u1 | src_v1) + (16 << 20);
+                s_gxVertex2i(dst_x, dst_y + 16);
+
+                // u2, v2
+                GFX_TEX_COORD = (src_u1 | src_v1) + (16 << 4) + (16 << 20);
+                s_gxVertex2i(dst_x + 16, dst_y + 16);
+
+                // u2, v1
+                GFX_TEX_COORD = (src_u1 | src_v1) + (16 << 4);
+                s_gxVertex2i(dst_x + 16, dst_y);
+            }
+
+            // next col source
+            if(dst_x >= colSemiLast)
+                src_u1 = (32 << 4);
+            else
+                src_u1 = (16 << 4);
+        }
+
+        // next row source
+        if(dst_y >= rowSemiLast)
+            src_v1 = (32 << 20);
+        else
+            src_v1 = (16 << 20);
+    }
+
+    // finalize
+    s_render_planes.m_plane_depth[s_render_planes.m_current_plane] += 8;
+
+    if(tx.l.flags & 32)
+        glPolyFmt(POLY_ALPHA(31) | POLY_CULL_NONE | POLY_FOG_Q);
+
+    minport_usedTexture(tx);
+}
+
 }; // namespace XRender

@@ -631,6 +631,7 @@ void renderTextureScaleEx(double xDst, double yDst, double wDst, double hDst,
         color);
 }
 
+#ifndef __16M__
 void renderSizableBlock(int bLeftOnscreen, int bTopOnscreen, int wDst, int hDst, StdPicture &tx)
 {
     int bRightOnscreen = bLeftOnscreen + wDst;
@@ -699,6 +700,7 @@ void renderSizableBlock(int bLeftOnscreen, int bTopOnscreen, int wDst, int hDst,
             src_y = 32;
     }
 }
+#endif
 
 
 size_t lazyLoadedBytes()
