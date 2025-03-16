@@ -1018,9 +1018,9 @@ void NPCBlockLogic(int A, double& tempHit, int& tempHitBlock, float& tempSpeedA,
                                             }
                                         }
                                     }
-                                    else if(HitSpot == 2) // Hitspot 2
+                                    else if(HitSpot == 2 || HitSpot == 4) // Horizontal collisions
                                     {
-                                        if(BlockSlope[Block[oldSlope].Type] == 1 && Block[oldSlope].Location.Y == Block[B].Location.Y)
+                                        if(HitSpot == 2 && BlockSlope[Block[oldSlope].Type] == 1 && Block[oldSlope].Location.Y == Block[B].Location.Y)
                                         {
                                         }
                                         else
@@ -1045,7 +1045,12 @@ void NPCBlockLogic(int A, double& tempHit, int& tempHitBlock, float& tempSpeedA,
                                             if(NPC[A].Type == NPCID_SLIDE_BLOCK && NPC[A].Special == 1)
                                                 NPCHit(A, 4, A);
                                             if(NPC[A].Slope == 0 && !SlopeTurn)
-                                                NPC[A].Location.X = Block[B].Location.X + Block[B].Location.Width + 0.01;
+                                            {
+                                                if(HitSpot == 2)
+                                                    NPC[A].Location.X = Block[B].Location.X + Block[B].Location.Width + 0.01;
+                                                else
+                                                    NPC[A].Location.X = Block[B].Location.X - NPC[A].Location.Width - 0.01;
+                                            }
                                             if(!(NPC[A].Type == NPCID_PLR_FIREBALL || NPC[A].Type == NPCID_TANK_TREADS || NPC[A].Type == NPCID_BULLET))
                                                 NPC[A].TurnAround = true;
                                             if(NPCIsAParaTroopa(NPC[A]))
@@ -1054,37 +1059,6 @@ void NPCBlockLogic(int A, double& tempHit, int& tempHitBlock, float& tempSpeedA,
                                                 NPC[A].Location.SpeedX = -NPC[A].Location.SpeedX;
                                             addBelt = NPC[A].Location.X - addBelt;
                                         }
-                                    }
-                                    else if(HitSpot == 4) // Hitspot 4
-                                    {
-                                        beltClear = true;
-                                        if(NPC[A].Type == NPCID_VILLAIN_S3)
-                                            NPC[A].Location.SpeedX = 0;
-                                        resetBeltSpeed = true;
-                                        addBelt = NPC[A].Location.X;
-                                        if(NPC[A].Type == NPCID_PLR_FIREBALL && NPC[A].Special == 3)
-                                        {
-                                            if(NPC[A].Special2 == 0)
-                                            {
-                                                NPC[A].Special2 = 1;
-                                                NPC[A].Location.SpeedX = -NPC[A].Location.SpeedX;
-                                            }
-                                            else
-                                                NPCHit(A, 4, A);
-                                        }
-                                        else if(NPC[A].Type == NPCID_PLR_FIREBALL || NPC[A].Type == NPCID_SPIT_BOSS_BALL)
-                                            NPCHit(A, 4, A);
-                                        if(NPC[A].Type == NPCID_SLIDE_BLOCK && NPC[A].Special == 1)
-                                            NPCHit(A, 4, A);
-                                        if(NPC[A].Slope == 0 && !SlopeTurn)
-                                            NPC[A].Location.X = Block[B].Location.X - NPC[A].Location.Width - 0.01;
-                                        if(!(NPC[A].Type == NPCID_PLR_FIREBALL || NPC[A].Type == NPCID_TANK_TREADS || NPC[A].Type == NPCID_BULLET))
-                                            NPC[A].TurnAround = true;
-                                        if(NPCIsAParaTroopa(NPC[A]))
-                                            NPC[A].Location.SpeedX += -Block[B].Location.SpeedX * 1.2;
-                                        if(NPC[A]->IsAShell)
-                                            NPC[A].Location.SpeedX = -NPC[A].Location.SpeedX;
-                                        addBelt = NPC[A].Location.X - addBelt;
                                     }
                                     else if(HitSpot == 3) // Hitspot 3
                                     {
