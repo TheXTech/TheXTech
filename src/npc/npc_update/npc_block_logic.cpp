@@ -233,7 +233,7 @@ void NPCBlockLogic(int A, double& tempHit, int& tempHitBlock, float& tempSpeedA,
                                             {
                                                 if(npcHasFloor(NPC[A]))
                                                 {
-                                                    SkullRideDone(A, Block[B].Location);
+                                                    SkullRide(A, false, &Block[B].Location);
                                                     NPC[A].Special = 3; // 3 - watcher, 2 - waiter
                                                 }
                                             }

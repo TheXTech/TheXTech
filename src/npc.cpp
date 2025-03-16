@@ -514,75 +514,6 @@ void SkullRide(int A, bool reEnable)
 }
 #endif
 
-
-// this mimics the above function and should match it in all cases
-void SkullRide(int A, bool reEnable)
-{
-    int spec = reEnable ? 2 : 0;
-
-    // allocates and guards a vector of BaseRef_t in its i_vec.
-    TreeResult_Sentinel<NPCRef_t> frontier;
-
-    // LIFO stack of NPCs to trigger, imitates recursion from old SkullRide
-    std::vector<BaseRef_t>& vec = *frontier.i_vec;
-
-    vec.push_back(A);
-
-    while(!vec.empty())
-    {
-        // pop from top of stack
-        const NPC_t& npc_A = static_cast<NPCRef_t>(vec.back());
-        vec.pop_back();
-
-        // construct location query (head of original SkullRide)
-        Location_t loc = npc_A.Location;
-        loc.Width += 16;
-        loc.X -= 8;
-
-        if(g_config.fix_skull_raft) // Detect by height in condition skull ruft cells were on slopes
-        {
-            loc.Height += 30;
-            loc.Y -= 15;
-        }
-
-        // add all queried NPCs to the frontier's internal vector (but check them, and remove them if invalid)
-        size_t current_frontier_size = vec.size();
-
-        treeNPCQuery(vec, loc, SORTMODE_NONE);
-
-        size_t unchecked = current_frontier_size;
-        while(unchecked < vec.size())
-        {
-            NPC_t& npc = static_cast<NPCRef_t>(vec[unchecked]);
-
-            // conditions from inside of loop in original SkullRide
-            if(npc.Type == NPCID_RAFT && npc.Active && npc.Special == spec && CheckCollision(loc, npc.Location))
-            {
-                // set active flag
-                npc.Special = 1;
-
-                // previously, used recursion
-                // SkullRide(B, reEnable);
-
-                // this will preserve the NPC in the stack
-                unchecked++;
-                continue;
-            }
-
-            // remove the NPC from the stack if conditions fail
-            vec[unchecked] = vec[vec.size() - 1];
-            vec.pop_back();
-        }
-
-        // reverse sort the frontier of the stack because this is a depth-first approach
-        std::sort(vec.begin() + current_frontier_size, vec.end(),
-        [](BaseRef_t a, BaseRef_t b)
-        {
-            return a.index > b.index;
-        });
-    }
-}
-
 static void s_alignRuftCell(NPC_t &me, const Location_t &alignAt)
 {
     double w = me.Location.Width;
@@ -651,13 +582,15 @@ void SkullRideDone(int A, const Location_t &alignAt)
 #endif
 
 
-// this mimics the above function and should match it in all cases
-void SkullRideDone(int A, const Location_t &alignAt)
+// this mimics the above functions and should match it in all cases
+void SkullRide(int A, bool reEnable, const Location_t *alignAt)
 {
+    int spec = (alignAt) ? 1 : (reEnable ? 2 : 0);
+
     // allocates and guards a vector of BaseRef_t in its i_vec.
     TreeResult_Sentinel<NPCRef_t> frontier;
 
-    // LIFO stack of NPCs to trigger, imitates recursion from old SkullRideDone
+    // LIFO stack of NPCs to trigger, imitates recursion from old SkullRide
     std::vector<BaseRef_t>& vec = *frontier.i_vec;
 
     vec.push_back(A);
@@ -668,13 +601,16 @@ void SkullRideDone(int A, const Location_t &alignAt)
         const NPC_t& me = static_cast<NPCRef_t>(vec.back());
         vec.pop_back();
 
-        // construct location query (head of original SkullRideDone)
+        // construct location query (head of original SkullRide)
         Location_t loc = me.Location;
         loc.Width += 16;
         loc.X -= 8;
-        loc.Height += 30;
-        loc.Y -= 15;
 
+        if(g_config.fix_skull_raft) // Detect by height in condition skull ruft cells were on slopes
+        {
+            loc.Height += 30;
+            loc.Y -= 15;
+        }
 
         // add all queried NPCs to the frontier's internal vector (but check them, and remove them if invalid)
         size_t current_frontier_size = vec.size();
@@ -686,15 +622,23 @@ void SkullRideDone(int A, const Location_t &alignAt)
         {
             NPC_t& npc = static_cast<NPCRef_t>(vec[unchecked]);
 
-            // conditions from inside of loop in original SkullRideDone
-            if(npc.Type == NPCID_RAFT && npc.Active && npc.Special == 1 && CheckCollision(loc, npc.Location))
+            // conditions from inside of loop in original SkullRide
+            if(npc.Type == NPCID_RAFT && npc.Active && npc.Special == spec && CheckCollision(loc, npc.Location))
             {
-                npc.Special = 2;
-                npc.Location.SpeedX = 0.0;
-                s_alignRuftCell(npc, alignAt);
+                if(alignAt)
+                {
+                    npc.Special = 2;
+                    npc.Location.SpeedX = 0.0;
+                    s_alignRuftCell(npc, *alignAt);
+                }
+                else
+                {
+                    // set active flag
+                    npc.Special = 1;
+                }
 
                 // previously, used recursion
-                // SkullRideDone(B, alignAt);
+                // SkullRide(B, reEnable);
 
                 // this will preserve the NPC in the stack
                 unchecked++;
