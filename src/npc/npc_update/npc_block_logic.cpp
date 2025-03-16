@@ -254,6 +254,9 @@ void NPCBlockLogic(int A, double& tempHit, int& tempHitBlock, float& tempSpeedA,
 
                                             if(NPCTraits[Block[B].tempBlockNpcType].IsABonus)
                                                 HitSpot = 0;
+
+                                            if(NPC[A].Type == NPCID_PLR_FIREBALL && Block[B].tempBlockNpcType == NPCID_ICE_CUBE)
+                                                HitSpot = 0;
                                         }
 
                                         if(NPC[A].Type == NPCID_PLR_FIREBALL || NPC[A].Type == NPCID_PET_FIRE)
@@ -354,14 +357,20 @@ void NPCBlockLogic(int A, double& tempHit, int& tempHitBlock, float& tempSpeedA,
 
                                         if(NPC[A].Special == 3)
                                         {
-                                            if(BlockSlope2[Block[B].Type] != 0)
-                                            {
-                                                if(HitSpot == 2 || HitSpot == 4)
-                                                    HitSpot = 0;
-                                            }
-                                            else if(HitSpot == 2 || HitSpot == 4)
+                                            // if(BlockSlope2[Block[B].Type] != 0)
+                                            // {
+                                            //     if(HitSpot == 2 || HitSpot == 4)
+                                            //         HitSpot = 0;
+                                            // }
+                                            // else
+                                            if(HitSpot == 2 || HitSpot == 4)
                                                 HitSpot = 0;
                                         }
+                                    }
+                                    else if(NPC[A].Type == NPCID_SAW)
+                                    {
+                                        if(Block[B].tempBlockNpcType > 0)
+                                            HitSpot = 0;
                                     }
 
                                     // shadow mode cancellation
@@ -606,9 +615,6 @@ void NPCBlockLogic(int A, double& tempHit, int& tempHitBlock, float& tempSpeedA,
                                     if(BlockKills[Block[B].Type] && (HitSpot > 0 || NPC[A].Slope == B))
                                         NPCHit(A, 6, B);
 
-                                    if(NPC[A].Type == NPCID_PLR_FIREBALL && Block[B].tempBlockNpcType == NPCID_ICE_CUBE)
-                                        HitSpot = 0;
-
                                     if(NPC[A].Type == NPCID_ITEM_POD && HitSpot == 1)
                                     {
                                         if((NPC[A].Location.SpeedY > 2 && HitSpot == 1) || (NPC[A].Location.SpeedY < -2 && HitSpot == 3) || (NPC[A].Location.SpeedX > 2 && HitSpot == 4) || (NPC[A].Location.SpeedX < -2 && HitSpot == 2))
@@ -643,9 +649,6 @@ void NPCBlockLogic(int A, double& tempHit, int& tempHitBlock, float& tempSpeedA,
                                         }
                                     }
 
-                                    if(NPC[A].Type == NPCID_SAW && Block[B].tempBlockNpcType > 0)
-                                        HitSpot = 0;
-
                                     if(Block[B].tempBlockNpcType == NPCID_BOSS_CASE || Block[B].tempBlockNpcType == NPCID_BOSS_FRAGILE)
                                     {
                                         if(NPC[A].Projectile)
@@ -678,9 +681,11 @@ void NPCBlockLogic(int A, double& tempHit, int& tempHitBlock, float& tempSpeedA,
                                         }
                                     }
 
-                                    if(NPC[A]->IsACoin && NPC[A].Special == 0 && HitSpot > 0)
-                                        NPCHit(A, 3, A);
+                                    // dead code: this procedure isn't called for coins with NPC[A].Special == 0
+                                    // if(NPC[A]->IsACoin && NPC[A].Special == 0 && HitSpot > 0)
+                                    //     NPCHit(A, 3, A);
 
+                                    // NPC pinch logic
                                     if(Block[B].Location.SpeedX != 0 && (HitSpot == 2 || HitSpot == 4))
                                         NPC[A].Pinched.Moving = 2;
 
