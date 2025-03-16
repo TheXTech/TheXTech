@@ -205,9 +205,7 @@ void NPCHit(int A, int B, int C)
         if(Player[C].Wet > 0)
             return;
     }
-    if(NPC[A].Inert || StopHit > 2 || NPC[A].Immune > 0 || NPC[A].Killed > 0 || NPC[A].Effect == NPCEFF_ENCASED || NPC[A].Generator)
-        return;
-    if(B == 6 && NPC[A].Killed == 6)
+    if(NPC[A].Inert || StopHit > 2 || NPC[A].Immune > 0 || NPC[A].Effect == NPCEFF_ENCASED || NPC[A].Generator)
         return;
     if(B == 3 || B == 4 || B == 5) // Things immune to fire
     {
@@ -222,14 +220,12 @@ void NPCHit(int A, int B, int C)
     if(B == 1 && NPC[A]->JumpHurt && NPC[A].Type != NPCID_ITEM_BUBBLE) // Things that don't die from jumping
         return;
 
-    // Add it to the queue, no matter whether it will happen. Reduces code size and increases maintainability.
-    NPCQueues::Killed.push_back(A);
-
     if(B == 10 && NPC[A].Type == NPCID_KEY)
     {
         if(Player[C].Character == 5 && !Player[C].HasKey)
         {
             NPC[A].Killed = 9;
+            NPCQueues::Killed.push_back(A);
             Player[C].HasKey = true;
             PlaySoundSpatial(SFX_HeroKey, NPC[A].Location);
             return;
@@ -2048,7 +2044,7 @@ void NPCHit(int A, int B, int C)
             NPC[A].Location.SpeedY = 0;
             NPC[A].Location.SpeedX = 0;
         }
-        else if(B == 1 && !NPC[A]->CanWalkOn && !NPC[A]->JumpHurt)
+        else if(B == 1 && !NPC[A]->CanWalkOn /*&& !NPC[A]->JumpHurt*/) // JumpHurt checked at the top
         {
             NPC[A].Killed = B;
             NPC[A].Location.SpeedY = 0.123;
@@ -2072,6 +2068,7 @@ void NPCHit(int A, int B, int C)
             NPCQueues::Unchecked.push_back(A);
         }
     }
+    // non type-based logic
     // Coins
     else if(NPC[A]->IsACoin)
     {
@@ -2313,6 +2310,9 @@ void NPCHit(int A, int B, int C)
 
     if(NPC[A].Killed == 0 && NPC[A].Location.SpeedX == 0.0 && oldNPC.Location.SpeedX != 0.0)
         NPC[A].RealSpeedX = 0;
+
+    if(NPC[A].Killed != 0 && oldNPC.Killed == 0)
+        NPCQueues::Killed.push_back(A);
 
     if(NPC[A].Type != oldNPC.Type)
     {
