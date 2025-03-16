@@ -68,7 +68,22 @@ void NPCHit(int A, int B, int C)
         if(NPC[C].Type == NPCID_PLR_ICEBALL && NPC[A].Location.Width > 8 && NPC[A].Location.Height > 8)
         {
             if(NPC[A].Type == NPCID_ITEM_BUBBLE)
-                NPCHit(A, 3, B);
+            {
+                if(NPC[3].Type == NPCID_PLR_ICEBALL)
+                {
+                    // FIXME: warn user that game would have crashed
+
+                    if(NPC[0].Type == NPCID_PLR_ICEBALL)
+                        NPC[0].Type = NPCID_PLR_FIREBALL;
+
+                    NPCHit(A, 3, 0);
+                }
+                else
+                {
+                    // B is always 3, this caused a crash if NPC[3].Type was NPCID_PLR_ICEBALL
+                    NPCHit(A, 3, B);
+                }
+            }
 
             if(NPC[A]->NoIceBall || NPC[A].Location.Width > 128 || NPC[A].Location.Height > 128)
                 return;
