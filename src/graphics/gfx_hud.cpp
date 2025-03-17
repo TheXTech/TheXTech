@@ -27,6 +27,7 @@
 #include "../core/power.h"
 #include "../gfx.h"
 #include "npc_traits.h"
+#include "eff_id.h"
 
 #include "main/speedrunner.h"
 
@@ -383,13 +384,13 @@ static inline void s_DrawMedal(int i, int x, int y, int coin_width, int coin_hei
             int sparkle_X = (9 * sparkle_idx) % (coin_width - 8) + 4;
             int sparkle_Y = (13 * (sparkle_idx % 16) + 29 * (sparkle_idx / 16)) % (coin_height - 8) + 4;
 
-            sparkle_X -= EffectWidth[78] / 2;
-            sparkle_Y -= EffectHeight[78] / 2;
+            sparkle_X -= EffectWidth[EFFID_COIN_COLLECT] / 2;
+            sparkle_Y -= EffectHeight[EFFID_COIN_COLLECT] / 2;
 
             sparkle_X &= ~1;
             sparkle_Y &= ~1;
 
-            XRender::renderTextureBasic(x + sparkle_X, y + sparkle_Y, EffectWidth[78], EffectHeight[78], GFXEffect[78], 0, EffectHeight[78] * sparkle_frame, XTAlphaF(0.8f));
+            XRender::renderTextureBasic(x + sparkle_X, y + sparkle_Y, EffectWidth[EFFID_COIN_COLLECT], EffectHeight[EFFID_COIN_COLLECT], GFXEffect[EFFID_COIN_COLLECT], 0, EffectHeight[EFFID_COIN_COLLECT] * sparkle_frame, XTAlphaF(0.8f));
         }
     }
 }

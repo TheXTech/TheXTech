@@ -541,7 +541,7 @@ resume_TriggerLast:
             if(B == 1)
             {
                 NPC[A].Location.Y += 2;
-                NewEffect(124 , NPC[A].Location);
+                NewEffect(EFFID_TNT_PRESS, NPC[A].Location);
             }
             else if(B == 2)
             {

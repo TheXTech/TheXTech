@@ -1666,12 +1666,12 @@ void NPCFrames(int A)
                         NewEffect(EFFID_PLR_ICEBALL_TRAIL, NPC[A].Location, 1, 0, NPC[A].Shadow);
                         if(iRand(5) == 0)
                         {
-                            tempLocation.Height = EffectHeight[80];
-                            tempLocation.Width = EffectWidth[80];
+                            tempLocation.Height = EffectHeight[EFFID_SPARKLE];
+                            tempLocation.Width = EffectWidth[EFFID_SPARKLE];
                             tempLocation.SpeedX = 0;
                             tempLocation.SpeedY = 0;
-                            tempLocation.X = NPC[A].Location.X + dRand() * 16 - EffectWidth[80] / 2.0 - 4 - NPC[A].Location.SpeedX * 3;
-                            tempLocation.Y = NPC[A].Location.Y + dRand() * 16 - EffectHeight[80] / 2.0 - 4;
+                            tempLocation.X = NPC[A].Location.X + dRand() * 16 - EffectWidth[EFFID_SPARKLE] / 2.0 - 4 - NPC[A].Location.SpeedX * 3;
+                            tempLocation.Y = NPC[A].Location.Y + dRand() * 16 - EffectHeight[EFFID_SPARKLE] / 2.0 - 4;
                             NewEffect(EFFID_SPARKLE, tempLocation);
                             Effect[numEffects].Location.SpeedX = NPC[A].Location.SpeedX * 0.5;
                             Effect[numEffects].Location.SpeedY = NPC[A].Location.SpeedY * 0.5;
@@ -1680,8 +1680,8 @@ void NPCFrames(int A)
                     }
                     else if(iRand(5) >= 3)
                     {
-                        tempLocation.Height = EffectHeight[80];
-                        tempLocation.Width = EffectWidth[80];
+                        tempLocation.Height = EffectHeight[EFFID_SPARKLE];
+                        tempLocation.Width = EffectWidth[EFFID_SPARKLE];
                         tempLocation.SpeedX = 0;
                         tempLocation.SpeedY = 0;
                         tempLocation.X = NPC[A].Location.X - tempLocation.Width / 2.0 + dRand() * NPC[A].Location.Width - 4;

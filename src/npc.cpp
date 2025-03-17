@@ -1684,12 +1684,12 @@ void NPCSpecial(int A)
 
             for(int i = 1; i <= 4; i++)
             {
-                tempLocation.Height = EffectHeight[80];
-                tempLocation.Width = EffectWidth[80];
+                tempLocation.Height = EffectHeight[EFFID_SPARKLE];
+                tempLocation.Width = EffectWidth[EFFID_SPARKLE];
                 tempLocation.SpeedX = 0;
                 tempLocation.SpeedY = 0;
-                tempLocation.X = npc.Location.X + dRand() * 16 - EffectWidth[80] / 2.0 - 4; // + .Location.SpeedX
-                tempLocation.Y = npc.Location.Y + dRand() * 4 - EffectHeight[80] / 2.0 - 2;
+                tempLocation.X = npc.Location.X + dRand() * 16 - EffectWidth[EFFID_SPARKLE] / 2.0 - 4; // + .Location.SpeedX
+                tempLocation.Y = npc.Location.Y + dRand() * 4 - EffectHeight[EFFID_SPARKLE] / 2.0 - 2;
                 NewEffect(EFFID_SPARKLE, tempLocation);
                 Effect[numEffects].Location.SpeedX = npc.Location.SpeedX * 0.3 + dRand() * 2 - 1;
                 Effect[numEffects].Location.SpeedY = dRand() * 1 - 0.5;
@@ -1699,12 +1699,12 @@ void NPCSpecial(int A)
 
         if(iRand(2) == 0)
         {
-            tempLocation.Height = EffectHeight[80];
-            tempLocation.Width = EffectWidth[80];
+            tempLocation.Height = EffectHeight[EFFID_SPARKLE];
+            tempLocation.Width = EffectWidth[EFFID_SPARKLE];
             tempLocation.SpeedX = 0;
             tempLocation.SpeedY = 0;
-            tempLocation.X = npc.Location.X + dRand() * 16 - EffectWidth[80] / 2.0 - 4; // + .Location.SpeedX
-            tempLocation.Y = npc.Location.Y + dRand() * 4 - EffectHeight[80] / 2.0 - 2;
+            tempLocation.X = npc.Location.X + dRand() * 16 - EffectWidth[EFFID_SPARKLE] / 2.0 - 4; // + .Location.SpeedX
+            tempLocation.Y = npc.Location.Y + dRand() * 4 - EffectHeight[EFFID_SPARKLE] / 2.0 - 2;
             NewEffect(EFFID_SPARKLE, tempLocation);
             Effect[numEffects].Location.SpeedX = npc.Location.SpeedX * 0.15;
             Effect[numEffects].Location.SpeedY = npc.Location.SpeedY; // + Rnd * 2 - 1
@@ -3412,8 +3412,8 @@ void SpecialNPC(int A)
 
                         if(NPC[A].Type != NPCID_PLR_FIREBALL && NPC[A].Type != NPCID_PLR_ICEBALL)
                         {
-                            NPC[A].Location.X += NPC[A].Location.Width / 2.0 - EffectWidth[10] / 2.0;
-                            NPC[A].Location.Y += NPC[A].Location.Height / 2.0 - EffectHeight[10] / 2.0;
+                            NPC[A].Location.X += NPC[A].Location.Width / 2.0 - EffectWidth[EFFID_SMOKE_S3] / 2.0;
+                            NPC[A].Location.Y += NPC[A].Location.Height / 2.0 - EffectHeight[EFFID_SMOKE_S3] / 2.0;
                             NewEffect(EFFID_SMOKE_S3, NPC[A].Location);
                             // deferring tree update to end of the NPC physics update
                         }
@@ -3579,8 +3579,8 @@ void SpecialNPC(int A)
 
         if(iRand(100) >= 93)
         {
-            tempLocation.Height = EffectHeight[80];
-            tempLocation.Width = EffectWidth[80];
+            tempLocation.Height = EffectHeight[EFFID_SPARKLE];
+            tempLocation.Width = EffectWidth[EFFID_SPARKLE];
             tempLocation.SpeedX = 0;
             tempLocation.SpeedY = 0;
             tempLocation.X = NPC[A].Location.X - tempLocation.Width / 2.0 + dRand() * NPC[A].Location.Width - 4;
@@ -3592,8 +3592,8 @@ void SpecialNPC(int A)
         {
             if(iRand(5) == 0)
             {
-                tempLocation.Height = EffectHeight[80];
-                tempLocation.Width = EffectWidth[80];
+                tempLocation.Height = EffectHeight[EFFID_SPARKLE];
+                tempLocation.Width = EffectWidth[EFFID_SPARKLE];
                 tempLocation.SpeedX = 0;
                 tempLocation.SpeedY = 0;
                 tempLocation.X = NPC[A].Location.X - tempLocation.Width / 2.0 + dRand() * NPC[A].Location.Width - 4;
@@ -5184,8 +5184,8 @@ void SpecialNPC(int A)
                     NewEffect(EFFID_SMOKE_S3, tempLocation);
                     Effect[numEffects].Location.SpeedX = -1.5;
 
-//                    tempLocation.X += tempLocation.Width - EffectWidth[10];
-                    tempLocation.X = (NPC[A].Location.X + NPC[A].Location.Width - EffectWidth[10]) - (NPC[A].Location.Width / 8);
+//                    tempLocation.X += tempLocation.Width - EffectWidth[EFFID_SMOKE_S3];
+                    tempLocation.X = (NPC[A].Location.X + NPC[A].Location.Width - EffectWidth[EFFID_SMOKE_S3]) - (NPC[A].Location.Width / 8);
                     NewEffect(EFFID_SMOKE_S3, tempLocation);
                     Effect[numEffects].Location.SpeedX = 1.5;
 

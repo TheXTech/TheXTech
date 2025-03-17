@@ -848,8 +848,8 @@ void UpdateEditor()
                     int type = Background[A].Type;
 
                     auto &b = Background[A];
-                    b.Location.X += b.Location.Width / 2.0 - EffectWidth[10] / 2;
-                    b.Location.Y += b.Location.Height / 2.0 - EffectHeight[10] / 2;
+                    b.Location.X += b.Location.Width / 2.0 - EffectWidth[EFFID_SMOKE_S3] / 2;
+                    b.Location.Y += b.Location.Height / 2.0 - EffectHeight[EFFID_SMOKE_S3] / 2;
                     NewEffect(EFFID_SMOKE_S3, static_cast<Location_t>(b.Location));
                     PlaySound(SFX_Smash);
 
@@ -897,8 +897,8 @@ void UpdateEditor()
                         for(int Y = 16; Y < WorldArea[A].Location.Height; Y += 32)
                         {
                             tempLocation = static_cast<Location_t>(WorldArea[A].Location);
-                            tempLocation.X += X - EffectWidth[10] / 2;
-                            tempLocation.Y += Y - EffectHeight[10] / 2;
+                            tempLocation.X += X - EffectWidth[EFFID_SMOKE_S3] / 2;
+                            tempLocation.Y += Y - EffectHeight[EFFID_SMOKE_S3] / 2;
                             NewEffect(EFFID_SMOKE_S3, tempLocation);
                         }
                     }
@@ -916,8 +916,8 @@ void UpdateEditor()
                 {
                     int A = EditorCursor.InteractIndex;
                     tempLocation = static_cast<Location_t>(WorldMusic[A].Location);
-                    tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[10] / 2;
-                    tempLocation.Y += tempLocation.Height / 2.0 - EffectHeight[10] / 2;
+                    tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[EFFID_SMOKE_S3] / 2;
+                    tempLocation.Y += tempLocation.Height / 2.0 - EffectHeight[EFFID_SMOKE_S3] / 2;
                     NewEffect(EFFID_SMOKE_S3, tempLocation);
                     PlaySound(SFX_ShellHit);
                     if(A != numWorldMusic)
@@ -936,8 +936,8 @@ void UpdateEditor()
                 {
                     int A = EditorCursor.InteractIndex;
                     tempLocation = static_cast<Location_t>(WorldPath[A].Location);
-                    tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[10] / 2;
-                    tempLocation.Y += tempLocation.Height / 2.0 - EffectHeight[10] / 2;
+                    tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[EFFID_SMOKE_S3] / 2;
+                    tempLocation.Y += tempLocation.Height / 2.0 - EffectHeight[EFFID_SMOKE_S3] / 2;
                     NewEffect(EFFID_SMOKE_S3, tempLocation);
                     PlaySound(SFX_ShellHit);
                     if(A != numWorldPaths)
@@ -956,8 +956,8 @@ void UpdateEditor()
                 {
                     int A = EditorCursor.InteractIndex;
                     tempLocation = static_cast<Location_t>(Scene[A].Location);
-                    tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[10] / 2;
-                    tempLocation.Y += tempLocation.Height / 2.0 - EffectHeight[10] / 2;
+                    tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[EFFID_SMOKE_S3] / 2;
+                    tempLocation.Y += tempLocation.Height / 2.0 - EffectHeight[EFFID_SMOKE_S3] / 2;
                     NewEffect(EFFID_SMOKE_S3, tempLocation);
                     PlaySound(SFX_ShellHit);
                     for(int B = A; B < numScenes; B++)
@@ -976,8 +976,8 @@ void UpdateEditor()
                 {
                     int A = EditorCursor.InteractIndex;
                     tempLocation = static_cast<Location_t>(WorldLevel[A].Location);
-                    tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[10] / 2;
-                    tempLocation.Y += tempLocation.Height / 2.0 - EffectHeight[10] / 2;
+                    tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[EFFID_SMOKE_S3] / 2;
+                    tempLocation.Y += tempLocation.Height / 2.0 - EffectHeight[EFFID_SMOKE_S3] / 2;
                     NewEffect(EFFID_SMOKE_S3, tempLocation);
                     PlaySound(SFX_ShellHit);
                     if(A != numWorldLevels)
@@ -996,8 +996,8 @@ void UpdateEditor()
                 {
                     int A = EditorCursor.InteractIndex;
                     tempLocation = static_cast<Location_t>(Tile[A].Location);
-                    tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[10] / 2;
-                    tempLocation.Y += tempLocation.Height / 2.0 - EffectHeight[10] / 2;
+                    tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[EFFID_SMOKE_S3] / 2;
+                    tempLocation.Y += tempLocation.Height / 2.0 - EffectHeight[EFFID_SMOKE_S3] / 2;
                     NewEffect(EFFID_SMOKE_S3, tempLocation);
                     PlaySound(SFX_ShellHit);
 

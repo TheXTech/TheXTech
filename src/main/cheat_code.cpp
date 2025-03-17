@@ -483,8 +483,8 @@ static void needATanookiSuit()
             Player[B].State = 5;
             SizeCheck(Player[B]);
             NewEffect(EFFID_SMOKE_S3,
-                      newLoc(Player[B].Location.X + Player[B].Location.Width / 2.0 - EffectWidth[10] / 2.0,
-                      Player[B].Location.Y + Player[B].Location.Height / 2.0 - EffectHeight[10] / 2.0));
+                      newLoc(Player[B].Location.X + Player[B].Location.Width / 2.0 - EffectWidth[EFFID_SMOKE_S3] / 2.0,
+                      Player[B].Location.Y + Player[B].Location.Height / 2.0 - EffectHeight[EFFID_SMOKE_S3] / 2.0));
         }
 
         if(Player[B].Character >= 3 && Player[B].Hearts < 3)
@@ -509,8 +509,8 @@ static void needAHammerSuit()
             Player[B].State = 6;
             SizeCheck(Player[B]);
             NewEffect(EFFID_SMOKE_S3,
-                      newLoc(Player[B].Location.X + Player[B].Location.Width / 2.0 - EffectWidth[10] / 2.0,
-                      Player[B].Location.Y + Player[B].Location.Height / 2.0 - EffectHeight[10] / 2.0));
+                      newLoc(Player[B].Location.X + Player[B].Location.Width / 2.0 - EffectWidth[EFFID_SMOKE_S3] / 2.0,
+                      Player[B].Location.Y + Player[B].Location.Height / 2.0 - EffectHeight[EFFID_SMOKE_S3] / 2.0));
         }
 
         if(Player[B].Character >= 3 && Player[B].Hearts < 3)
@@ -535,8 +535,8 @@ static void needAMushroom()
             Player[B].State = 2;
             SizeCheck(Player[B]);
             NewEffect(EFFID_SMOKE_S3,
-                      newLoc(Player[B].Location.X + Player[B].Location.Width / 2.0 - EffectWidth[10] / 2.0,
-                      Player[B].Location.Y + Player[B].Location.Height / 2.0 - EffectHeight[10] / 2.0));
+                      newLoc(Player[B].Location.X + Player[B].Location.Width / 2.0 - EffectWidth[EFFID_SMOKE_S3] / 2.0,
+                      Player[B].Location.Y + Player[B].Location.Height / 2.0 - EffectHeight[EFFID_SMOKE_S3] / 2.0));
         }
 
         if(Player[B].Character >= 3 && Player[B].Hearts < 3)
@@ -561,8 +561,8 @@ static void needAFlower()
             Player[B].State = 3;
             SizeCheck(Player[B]);
             NewEffect(EFFID_SMOKE_S3,
-                      newLoc(Player[B].Location.X + Player[B].Location.Width / 2.0 - EffectWidth[10] / 2.0,
-                      Player[B].Location.Y + Player[B].Location.Height / 2.0 - EffectHeight[10] / 2.0));
+                      newLoc(Player[B].Location.X + Player[B].Location.Width / 2.0 - EffectWidth[EFFID_SMOKE_S3] / 2.0,
+                      Player[B].Location.Y + Player[B].Location.Height / 2.0 - EffectHeight[EFFID_SMOKE_S3] / 2.0));
         }
 
         if(Player[B].Character >= 3 && Player[B].Hearts < 3)
@@ -587,8 +587,8 @@ static void needAnIceFlower()
             Player[B].State = 7;
             SizeCheck(Player[B]);
             NewEffect(EFFID_SMOKE_S3,
-                      newLoc(Player[B].Location.X + Player[B].Location.Width / 2.0 - EffectWidth[10] / 2.0,
-                      Player[B].Location.Y + Player[B].Location.Height / 2.0 - EffectHeight[10] / 2.0));
+                      newLoc(Player[B].Location.X + Player[B].Location.Width / 2.0 - EffectWidth[EFFID_SMOKE_S3] / 2.0,
+                      Player[B].Location.Y + Player[B].Location.Height / 2.0 - EffectHeight[EFFID_SMOKE_S3] / 2.0));
         }
 
         if(Player[B].Character >= 3 && Player[B].Hearts < 3)
@@ -612,8 +612,8 @@ static void needALeaf()
             Player[B].State = 4;
             SizeCheck(Player[B]);
             NewEffect(EFFID_SMOKE_S3,
-                      newLoc(Player[B].Location.X + Player[B].Location.Width / 2.0 - EffectWidth[10] / 2.0,
-                      Player[B].Location.Y + Player[B].Location.Height / 2.0 - EffectHeight[10] / 2.0));
+                      newLoc(Player[B].Location.X + Player[B].Location.Width / 2.0 - EffectWidth[EFFID_SMOKE_S3] / 2.0,
+                      Player[B].Location.Y + Player[B].Location.Height / 2.0 - EffectHeight[EFFID_SMOKE_S3] / 2.0));
         }
 
         if(Player[B].Character >= 3 && Player[B].Hearts < 3)

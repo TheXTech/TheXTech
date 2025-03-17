@@ -628,9 +628,9 @@ void PlayerMovementY(int A)
             Player[A].Jump = 10;
             Player[A].DoubleJump = false;
             Location_t tempLocation = Player[A].Location;
-            tempLocation.Y = Player[A].Location.Y + Player[A].Location.Height - EffectHeight[80] / 2.0 + Player[A].Location.SpeedY;
-            tempLocation.Height = EffectHeight[80];
-            tempLocation.Width = EffectWidth[80];
+            tempLocation.Y = Player[A].Location.Y + Player[A].Location.Height - EffectHeight[EFFID_SPARKLE] / 2.0 + Player[A].Location.SpeedY;
+            tempLocation.Height = EffectHeight[EFFID_SPARKLE];
+            tempLocation.Width = EffectWidth[EFFID_SPARKLE];
             tempLocation.X = Player[A].Location.X;
 
             for(int B = 1; B <= 10; B++)

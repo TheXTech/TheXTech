@@ -1306,7 +1306,7 @@ bool UpdateBlocks()
                                 syncLayersTrees_Block_SetHidden(A);
 
                                 if(!b.Hidden) // -V547 // False positive: the b.Hidden gets changed inside syncLayersTrees_Block_SetHidden() call
-                                    NewEffect(EFFID_SMOKE_S3, newLoc(b.Location.X + b.Location.Width / 2.0 - EffectWidth[10] / 2, b.Location.Y + b.Location.Height / 2.0 - EffectHeight[10] / 2));
+                                    NewEffect(EFFID_SMOKE_S3, newLoc(b.Location.X + b.Location.Width / 2.0 - EffectWidth[EFFID_SMOKE_S3] / 2, b.Location.Y + b.Location.Height / 2.0 - EffectHeight[EFFID_SMOKE_S3] / 2));
                             }
                             else
                             {
@@ -1316,7 +1316,7 @@ bool UpdateBlocks()
                             if(b.Type != b.DefaultType || b.Special != b.DefaultSpecial)
                             {
                                 if(b.Type != b.DefaultType)
-                                    NewEffect(EFFID_SMOKE_S3, newLoc(b.Location.X + b.Location.Width / 2.0 - EffectWidth[10] / 2, b.Location.Y + b.Location.Height / 2.0 - EffectHeight[10] / 2));
+                                    NewEffect(EFFID_SMOKE_S3, newLoc(b.Location.X + b.Location.Width / 2.0 - EffectWidth[EFFID_SMOKE_S3] / 2, b.Location.Y + b.Location.Height / 2.0 - EffectHeight[EFFID_SMOKE_S3] / 2));
                                 b.Special = b.DefaultSpecial;
                                 b.Type = b.DefaultType;
                             }

@@ -387,8 +387,8 @@ void UpdateEffects()
         {
             if(e.Life == 1)
             {
-                e.Location.X += e.Location.Width / 2.0 - EffectWidth[10] / 2.0;
-                e.Location.Y += e.Location.Height / 2.0 - EffectHeight[10] / 2.0;
+                e.Location.X += e.Location.Width / 2.0 - EffectWidth[EFFID_SMOKE_S3] / 2.0;
+                e.Location.Y += e.Location.Height / 2.0 - EffectHeight[EFFID_SMOKE_S3] / 2.0;
                 NewEffect(EFFID_SMOKE_S3, e.Location);
             }
         }
@@ -1693,8 +1693,8 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
         numEffects++;
         auto &ne = Effect[numEffects];
         ne.Shadow = Shadow;
-        ne.Location.Width = EffectWidth[13];
-        ne.Location.Height = EffectHeight[13];
+        ne.Location.Width = EffectWidth[EFFID_LAVA_SPLASH];
+        ne.Location.Height = EffectHeight[EFFID_LAVA_SPLASH];
         ne.Location.X = Location.X + Location.Width / 2.0 - ne.Location.Width / 2.0;
         ne.Location.Y = Location.Y + 24;
         ne.Location.SpeedY = -8;
