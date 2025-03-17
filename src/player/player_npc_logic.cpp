@@ -993,33 +993,22 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
         if(tempSpring)
         {
             Player[A].Jump = Physics.PlayerSpringJumpHeight;
-
-            if(Player[A].Character == 2)
-                Player[A].Jump += 3;
-
-            if(Player[A].SpinJump)
-                Player[A].Jump -= 6;
-
             Player[A].Location.SpeedY = Physics.PlayerJumpVelocity - 4;
-
-            if(Player[A].Wet > 0)
-                Player[A].Location.SpeedY = Player[A].Location.SpeedY * 0.3;
         }
         else
         {
             Player[A].Jump = Physics.PlayerNPCJumpHeight;
-
-            if(Player[A].Character == 2)
-                Player[A].Jump += 3;
-
-            if(Player[A].SpinJump)
-                Player[A].Jump -= 6;
-
             Player[A].Location.SpeedY = Physics.PlayerJumpVelocity;
-
-            if(Player[A].Wet > 0)
-                Player[A].Location.SpeedY = Player[A].Location.SpeedY * 0.3;
         }
+
+        if(Player[A].Character == 2)
+            Player[A].Jump += 3;
+
+        if(Player[A].SpinJump)
+            Player[A].Jump -= 6;
+
+        if(Player[A].Wet > 0)
+            Player[A].Location.SpeedY *= 0.3;
 
         // this is very likely but not certain to be the y value stored when tempHit was set
         Player[A].Location.Y = tempLocation.Y;
@@ -1148,31 +1137,19 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
 
     if(B != 0)
     {
-        if(Player[A].StandingOnNPC == 0)
+        if(Player[A].StandingOnNPC == 0 && (Player[A].GroundPound || Player[A].YoshiYellow))
         {
-            if(Player[A].GroundPound)
-            {
-                numBlock++;
-                Block[numBlock].Location.Y = NPC[B].Location.Y;
-                // seems weird but I'll sync it since we don't know what could happen inside YoshiPound
-                syncLayersTrees_Block(numBlock);
-                YoshiPound(A, Player[A].Mount, true);
-                Block[numBlock].Location.Y = 0;
-                numBlock--;
-                syncLayersTrees_Block(numBlock + 1);
-                Player[A].GroundPound = false;
-            }
-            else if(Player[A].YoshiYellow)
-            {
-                numBlock++;
-                Block[numBlock].Location.Y = NPC[B].Location.Y;
-                // seems weird but I'll sync it since we don't know what could happen inside YoshiPound
-                syncLayersTrees_Block(numBlock);
-                YoshiPound(A, Player[A].Mount);
-                Block[numBlock].Location.Y = 0;
-                numBlock--;
-                syncLayersTrees_Block(numBlock + 1);
-            }
+            numBlock++;
+            Block[numBlock].Location.Y = NPC[B].Location.Y;
+            // seems weird but I'll sync it since we don't know what could happen inside YoshiPound
+            syncLayersTrees_Block(numBlock);
+
+            YoshiPound(A, Player[A].Mount, Player[A].GroundPound);
+            Player[A].GroundPound = false;
+
+            Block[numBlock].Location.Y = 0;
+            numBlock--;
+            syncLayersTrees_Block(numBlock + 1);
         }
 
         if(NPC[B].playerTemp == 0)
