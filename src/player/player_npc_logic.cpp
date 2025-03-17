@@ -562,19 +562,21 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                                     }
                                 }
                             }
-                            else if(NPC[B].Type != NPCID_CANNONITEM && NPC[B].Type != NPCID_KEY &&
-                                    NPC[B].Type != NPCID_TOOTHYPIPE && NPC[B].Type != NPCID_TOOTHY &&
-                                    (!Player[A].SlideKill || NPC[B]->WontHurt)) // NPCs that cannot be walked on
+                            else if(NPC[B].Type == NPCID_CANNONITEM || NPC[B].Type == NPCID_KEY ||
+                                    NPC[B].Type == NPCID_TOOTHYPIPE || NPC[B].Type == NPCID_TOOTHY ||
+                                    (Player[A].SlideKill && !NPC[B]->WontHurt)) // NPCs that cannot be walked on
                             {
+                                // cancel jump
+                            }
 #if 0
-                                // dead code since SMBX 1.3, because NoShellKick was never set
-                                if(NPC[B].CantHurtPlayer == A && Player[A].NoShellKick > 0)
-                                {
-                                    // Do nothing!
-                                }
-                                else
-                                // (the remainder of this section was previously guarded by the above)
+                            // dead code since SMBX 1.3, because NoShellKick was never set
+                            else if(NPC[B].CantHurtPlayer == A && Player[A].NoShellKick > 0)
+                            {
+                                // Do nothing!
+                            }
 #endif
+                            else
+                            {
                                 if(NPC[B]->IsABonus) // Bonus
                                     TouchBonus(A, B);
                                 else if(NPC[B]->IsAShell && NPC[B].Location.SpeedX == 0 && Player[A].HoldingNPC == 0 && Player[A].Controls.Run)
