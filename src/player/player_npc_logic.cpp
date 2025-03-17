@@ -350,6 +350,9 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                             NPCQueues::Killed.push_back(B);
                         }
 
+                        if(NPC[B].Type == NPCID_MINIBOSS && NPC[B].Special == 4 && HitSpot > 1)
+                            HitSpot = 0;
+
                         // END type-based "onCollidePlayer" logic
 
                         if(Player[A].Stoned && HitSpot != 1) // if you are a statue then SLAM into the npc
@@ -358,11 +361,40 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                                 NPCHit(B, 3, B);
                         }
 
-                        // the following code is for spin jumping and landing on things as yoshi/shoe
-                        if(Player[A].Mount == 1 || Player[A].Mount == 3 || Player[A].SpinJump ||
-                           (Player[A].Stoned && !NPC[B]->CanWalkOn))
+                        // kill things with the vehicle
+                        if(Player[A].Mount == 2 && !Player[A].SpinJump && !(Player[A].Stoned && !NPC[B]->CanWalkOn))
                         {
-                            if(HitSpot == 1)
+                            // already checked at top
+                            // if(NPC[B].vehiclePlr == A)
+                            //     HitSpot = 0;
+                            // else
+                            if(!(NPC[B].Type == NPCID_BULLET && NPC[B].CantHurt > 0))
+                            {
+                                if((NPC[B].Location.Y + NPC[B].Location.Height > Player[A].Location.Y + 18 && HitSpot != 3) || HitSpot == 1)
+                                {
+                                    NPCHit(B, 8, A);
+                                    if(NPC[B].Killed == 8)
+                                        HitSpot = 0;
+
+                                    if(NPC[B].Type == NPCID_WALK_BOMB_S2 || NPC[B].Type == NPCID_WALK_BOMB_S3 || NPC[B].Type == NPCID_LIT_BOMB_S3)
+                                    {
+                                        NPCHit(B, 3, B);
+                                        if(NPC[B].Killed == 3)
+                                            HitSpot = 0;
+                                    }
+                                }
+                            }
+                        }
+
+                        // prevented player from grabbing active slide blocks; logic moved to side grab code
+                        // if(NPC[B].Type == NPCID_SLIDE_BLOCK && NPC[B].Projectile != 0 && HitSpot > 1)
+                        //     HitSpot = 5;
+
+                        if(HitSpot == 1) // Player landed on a NPC
+                        {
+                            // the following code is for spin jumping and landing on things as yoshi/shoe
+                            if(Player[A].Mount == 1 || Player[A].Mount == 3 || Player[A].SpinJump ||
+                               (Player[A].Stoned && !NPC[B]->CanWalkOn))
                             {
                                 if(Player[A].Mount == 1 || Player[A].Mount == 2 || Player[A].Stoned)
                                     NPCHit(B, 8, A);
@@ -443,44 +475,16 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                                                 PlaySoundSpatial(SFX_Stomp, Player[A].Location);
                                         }
                                     }
-                                    HitSpot = 0;
+
+                                    continue;
                                 }
                             }
-                        }
-                        else if(Player[A].Mount == 2)
-                        {
-                            // already checked at top
-                            // if(NPC[B].vehiclePlr == A)
-                            //     HitSpot = 0;
-                            // else
-                            if(!(NPC[B].Type == NPCID_BULLET && NPC[B].CantHurt > 0))
-                            {
-                                if((NPC[B].Location.Y + NPC[B].Location.Height > Player[A].Location.Y + 18 && HitSpot != 3) || HitSpot == 1)
-                                {
-                                    NPCHit(B, 8, A);
-                                    if(NPC[B].Killed == 8)
-                                        HitSpot = 0;
 
-                                    if(NPC[B].Type == NPCID_WALK_BOMB_S2 || NPC[B].Type == NPCID_WALK_BOMB_S3 || NPC[B].Type == NPCID_LIT_BOMB_S3)
-                                    {
-                                        NPCHit(B, 3, B);
-                                        if(NPC[B].Killed == 3)
-                                            HitSpot = 0;
-                                    }
-
-                                }
-                            }
-                        }
-
-                        if(HitSpot == 1 && (NPC[B].Type == NPCID_COIN_SWITCH || NPC[B].Type == NPCID_TIME_SWITCH || NPC[B].Type == NPCID_TNT) && NPC[B].Projectile != 0)
-                            HitSpot = 0;
-
-                        if(NPC[B].Type == NPCID_SLIDE_BLOCK && NPC[B].Projectile != 0 && HitSpot > 1)
-                            HitSpot = 5;
-
-                        if(HitSpot == 1) // Player landed on a NPC
-                        {
-                            if(NPC[B]->CanWalkOn || (Player[A].ShellSurf && NPC[B]->IsAShell)) // NPCs that can be walked on
+                            // moved from above
+                            if(/* HitSpot == 1 && */ (NPC[B].Type == NPCID_COIN_SWITCH || NPC[B].Type == NPCID_TIME_SWITCH || NPC[B].Type == NPCID_TNT) && NPC[B].Projectile != 0)
+                                HitSpot = 0;
+                            // NPCs that can be walked on
+                            else if(NPC[B]->CanWalkOn || (Player[A].ShellSurf && NPC[B]->IsAShell))
                             {
                                 // the player landed on an NPC he can stand on
                                 if(floorNpc1 == 0)
@@ -508,9 +512,8 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                                 }
                                 else
                                     floorNpc2 = B;
-
-                                // if landing on a yoshi or boot, mount up!
                             }
+                            // if landing on a yoshi or boot, mount up!
                             else if((NPCIsYoshi(NPC[B]) || NPCIsBoot(NPC[B])) && Player[A].Character != 5 && !Player[A].Fairy)
                             {
                                 if(Player[A].Mount == 0 && NPC[B].CantHurtPlayer != A && Player[A].Dismount == 0)
@@ -673,17 +676,18 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                                 }
                             }
                         }
-                        else if(HitSpot == 0) // if hitspot = 0 then do nothing
+                        else if(HitSpot == 0)
                         {
-
-                            // player touched an npc anywhere except from the top
+                            // if hitspot = 0 then do nothing
                         }
-                        else if(!(NPC[B].Type == NPCID_MINIBOSS && NPC[B].Special == 4)) // Player touched an NPC
+                        // player touched an npc anywhere except from the top
+                        else // Player touched an NPC
                         {
 
 /* If (.CanGrabNPCs = True Or NPCIsGrabbable(NPC(B).Type) = True Or (NPC(B).Effect = 2 And NPCIsABonus(NPC(B).Type) = False)) And (NPC(B).Effect = 0 Or NPC(B).Effect = 2) Or (NPCIsAShell(NPC(B).Type) And FreezeNPCs = True) Then      'GRAB EVERYTHING
 */
-                            // grab code
+
+                            // grab from side
                             if(
                                 ((Player[A].CanGrabNPCs || NPC[B]->IsGrabbable || (NPC[B].Effect == NPCEFF_DROP_ITEM && !NPC[B]->IsABonus)) && (NPC[B].Effect == NPCEFF_NORMAL || NPC[B].Effect == NPCEFF_DROP_ITEM)) ||
                                  (NPC[B]->IsAShell && FreezeNPCs)
@@ -695,7 +699,11 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                                        (HitSpot == 4 && Player[A].Direction == 1) ||
                                        (NPC[B].Type == NPCID_CANNONITEM || NPC[B].Type == NPCID_TOOTHYPIPE || NPC[B].Effect == NPCEFF_DROP_ITEM || (NPCIsVeggie(NPC[B]) && NPC[B].CantHurtPlayer != A)))
                                     {
-                                        if(Player[A].HoldingNPC == 0)
+                                        if(NPC[B].Type == NPCID_SLIDE_BLOCK && NPC[B].Projectile != 0)
+                                        {
+                                            // don't grab active slide blocks
+                                        }
+                                        else if(Player[A].HoldingNPC == 0)
                                         {
                                             if(!NPC[B]->IsAShell || Player[A].Character >= 3)
                                             {
