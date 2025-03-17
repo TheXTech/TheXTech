@@ -396,13 +396,22 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                             if(Player[A].Mount == 1 || Player[A].Mount == 3 || Player[A].SpinJump ||
                                (Player[A].Stoned && !NPC[B]->CanWalkOn))
                             {
-                                if(Player[A].Mount == 1 || Player[A].Mount == 2 || Player[A].Stoned)
-                                    NPCHit(B, 8, A);
-                                else if(!(NPC[B].Type == NPCID_FIRE_PLANT || NPC[B].Type == NPCID_QUAD_SPITTER || NPC[B].Type == NPCID_PLANT_S3 || NPC[B].Type == NPCID_LAVABUBBLE ||
+                                // these types were not hit during spin bounces in SMBX 1.3 (but may be vulnerable to stomps by mounts)
+                                bool dont_hit_spin_bounce = (NPC[B].Type == NPCID_FIRE_PLANT || NPC[B].Type == NPCID_QUAD_SPITTER || NPC[B].Type == NPCID_PLANT_S3 || NPC[B].Type == NPCID_LAVABUBBLE ||
                                           NPC[B].Type == NPCID_SPIKY_S3 || NPC[B].Type == NPCID_SPIKY_S4 || NPC[B].Type == NPCID_SPIKY_BALL_S4 || NPC[B].Type == NPCID_BOTTOM_PLANT ||
                                           NPC[B].Type == NPCID_SIDE_PLANT || NPC[B].Type == NPCID_CRAB || NPC[B].Type == NPCID_FLY || NPC[B].Type == NPCID_BIG_PLANT ||
                                           NPC[B].Type == NPCID_PLANT_S1 || NPC[B].Type == NPCID_VILLAIN_S1 || NPC[B].Type == NPCID_WALL_BUG || NPC[B].Type == NPCID_WALL_TURTLE ||
-                                          NPC[B].Type == NPCID_SICK_BOSS || NPC[B].Type == NPCID_WALK_PLANT || NPC[B].Type == NPCID_JUMP_PLANT) && !NPC[B]->CanWalkOn)
+                                          NPC[B].Type == NPCID_SICK_BOSS || NPC[B].Type == NPCID_WALK_PLANT || NPC[B].Type == NPCID_JUMP_PLANT);
+
+                                // these types are immune to spin bounces and were hit (with no effect) in SMBX 1.3 but are no longer hit
+                                bool immune_to_spin_bounce = (NPC[B].Type == NPCID_SAW || NPC[B].Type == NPCID_STONE_S3 || NPC[B].Type == NPCID_STONE_S4 || NPC[B].Type == NPCID_GHOST_S3 ||
+                                   NPC[B].Type == NPCID_GHOST_FAST || NPC[B].Type == NPCID_GHOST_S4 || NPC[B].Type == NPCID_BIG_GHOST || NPC[B].Type == NPCID_LAVA_MONSTER || NPC[B].Type == NPCID_LONG_PLANT_UP);
+
+                                bool force_bounce = (dont_hit_spin_bounce | immune_to_spin_bounce);
+
+                                if(Player[A].Mount == 1 || Player[A].Mount == 2 || Player[A].Stoned)
+                                    NPCHit(B, 8, A);
+                                else if(!force_bounce && !NPC[B]->CanWalkOn)
                                 {
                                     if(Player[A].Wet > 0 && (NPC[B]->IsFish || NPC[B].Type == NPCID_SQUID_S3 || NPC[B].Type == NPCID_SQUID_S1))
                                     {
@@ -411,16 +420,7 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                                         NPCHit(B, 8, A);
                                 }
 
-                                if(NPC[B].Killed == 8 || NPC[B]->IsFish || NPC[B].Type == NPCID_SAW ||
-                                   NPC[B].Type == NPCID_STONE_S3 || NPC[B].Type == NPCID_STONE_S4 || NPC[B].Type == NPCID_GHOST_S3 ||
-                                   NPC[B].Type == NPCID_GHOST_FAST || NPC[B].Type == NPCID_GHOST_S4 || NPC[B].Type == NPCID_BIG_GHOST ||
-                                   NPC[B].Type == NPCID_PLANT_S3 || NPC[B].Type == NPCID_LAVABUBBLE || NPC[B].Type == NPCID_SPIKY_S3 ||
-                                   NPC[B].Type == NPCID_BOTTOM_PLANT || NPC[B].Type == NPCID_SIDE_PLANT || NPC[B].Type == NPCID_CRAB ||
-                                   NPC[B].Type == NPCID_FLY || NPC[B].Type == NPCID_BIG_PLANT || NPC[B].Type == NPCID_PLANT_S1 ||
-                                   NPC[B].Type == NPCID_VILLAIN_S1 || NPC[B].Type == NPCID_WALL_BUG || NPC[B].Type == NPCID_WALL_TURTLE ||
-                                   NPC[B].Type == NPCID_SICK_BOSS || NPC[B].Type == NPCID_LAVA_MONSTER || NPC[B].Type == NPCID_FIRE_PLANT ||
-                                   NPC[B].Type == NPCID_LONG_PLANT_UP || NPC[B].Type == NPCID_WALK_PLANT || NPC[B].Type == NPCID_QUAD_SPITTER ||
-                                   NPC[B].Type == NPCID_SPIKY_S4 || NPC[B].Type == NPCID_SPIKY_BALL_S4 || NPC[B].Type == NPCID_JUMP_PLANT) // tap
+                                if(NPC[B].Killed == 8 || NPC[B]->IsFish || force_bounce) // tap
                                 {
                                     if(NPC[B].Killed == 8 && Player[A].Mount == 1 && Player[A].MountType == 2)
                                     {
@@ -454,25 +454,20 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                                         syncLayers_NPC(numNPCs);
                                     }
 
-                                    if(NPC[B].Killed == 0 && Player[A].SpinJump == 0)
-                                        PlaySoundSpatial(SFX_Stomp, Player[A].Location);
-
                                     Player[A].ForceHitSpot3 = true;
-                                    if(HitSpot == 1 && !(Player[A].GroundPound && NPC[B].Killed == 8))
+                                    if(/*HitSpot == 1 && */ !(Player[A].GroundPound && NPC[B].Killed == 8))
                                     {
                                         tempHit = true;
                                         tempLocation.Y = NPC[B].Location.Y - Player[A].Location.Height;
-                                        if(Player[A].SpinJump)
+
+                                        if(NPC[B].Killed == 0)
+                                            PlaySoundSpatial(SFX_Stomp, Player[A].Location);
+                                        else if(Player[A].SpinJump)
                                         {
-                                            if(NPC[B].Killed > 0)
-                                            {
-                                                if(Player[A].Controls.Down)
-                                                    tempHit = false;
-                                                else
-                                                    spinKill = true;
-                                            }
+                                            if(Player[A].Controls.Down)
+                                                tempHit = false;
                                             else
-                                                PlaySoundSpatial(SFX_Stomp, Player[A].Location);
+                                                spinKill = true;
                                         }
                                     }
 
