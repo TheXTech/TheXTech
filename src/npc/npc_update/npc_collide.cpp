@@ -64,6 +64,9 @@ void NPCCollide(int A)
     //     return;
     // }
 
+    // These NPC types prevent all physics updates and make it so that NPCCollide can never be called. They are removed now.
+    // NPC[A].Type == NPCID_LIFT_SAND || NPC[A].Type == NPCID_PLANT_FIRE || NPC[A].Type == NPCID_FIRE_CHAIN
+
     // NPC properties that block collision query
     if(NPC[A].Inert || NPC[A].Generator)
         return;
@@ -73,13 +76,12 @@ void NPCCollide(int A)
         return;
 
     // NPC types that prevent collision query
-    if(NPC[A].Type == NPCID_LIFT_SAND || NPC[A].Type == NPCID_CANNONITEM || NPC[A].Type == NPCID_SPRING || NPC[A].Type == NPCID_COIN_SWITCH || NPC[A].Type == NPCID_GRN_BOOT
+    if(NPC[A].Type == NPCID_CANNONITEM || NPC[A].Type == NPCID_SPRING || NPC[A].Type == NPCID_COIN_SWITCH || NPC[A].Type == NPCID_GRN_BOOT
         || NPC[A].Type == NPCID_TOOTHYPIPE || NPC[A].Type == NPCID_FALL_BLOCK_RED || NPC[A].Type == NPCID_VEHICLE || NPC[A].Type == NPCID_CONVEYOR
         || (NPC[A].Type >= NPCID_TANK_TREADS && NPC[A].Type <= NPCID_SLANT_WOOD_M) || NPC[A].Type == NPCID_SPIT_GUY_BALL
         || NPC[A].Type == NPCID_TIMER_S2 || NPC[A].Type == NPCID_FALL_BLOCK_BROWN
         || NPC[A].Type == NPCID_WALL_BUG || NPC[A].Type == NPCID_WALL_SPARK || NPC[A].Type == NPCID_WALL_TURTLE
-        || NPC[A].Type == NPCID_RED_BOOT || NPC[A].Type == NPCID_BLU_BOOT
-        || NPC[A].Type == NPCID_PLANT_FIRE || NPC[A].Type == NPCID_FIRE_CHAIN || NPC[A].Type == NPCID_QUAD_BALL
+        || NPC[A].Type == NPCID_RED_BOOT || NPC[A].Type == NPCID_BLU_BOOT || NPC[A].Type == NPCID_QUAD_BALL
         || NPC[A].Type == NPCID_FLY_BLOCK || NPC[A].Type == NPCID_FLY_CANNON || NPC[A].Type == NPCID_FIRE_BOSS_FIRE
         || NPC[A].Type == NPCID_DOOR_MAKER || NPC[A].Type == NPCID_MAGIC_DOOR)
     {
