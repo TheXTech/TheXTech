@@ -730,7 +730,7 @@ void UpdateEffects()
             else if(e.FrameCount == 30)
             {
                 e.Life = 0;
-                if(!LevelEditor && e.NewNpc != 96)
+                if(!LevelEditor && e.NewNpc != NPCID_ITEM_POD)
                 {
                     if(NPCIsYoshi(e.NewNpc))
                         NewEffect(EFFID_PET_BIRTH, e.Location, 1, e.NewNpc);
@@ -812,19 +812,19 @@ void UpdateEffects()
                 CheckSectionNPC(numNPCs);
             }
 
-            if(e.NewNpc == 98)
+            if(e.NewNpc == NPCID_PET_BLUE)
                 e.Frame += 2;
-            else if(e.NewNpc == 99)
+            else if(e.NewNpc == NPCID_PET_YELLOW)
                 e.Frame += 4;
-            else if(e.NewNpc == 100)
+            else if(e.NewNpc == NPCID_PET_RED)
                 e.Frame += 6;
-            else if(e.NewNpc == 148)
+            else if(e.NewNpc == NPCID_PET_BLACK)
                 e.Frame += 8;
-            else if(e.NewNpc == 149)
+            else if(e.NewNpc == NPCID_PET_PURPLE)
                 e.Frame += 10;
-            else if(e.NewNpc == 150)
+            else if(e.NewNpc == NPCID_PET_PINK)
                 e.Frame += 12;
-            else if(e.NewNpc == 228)
+            else if(e.NewNpc == NPCID_PET_CYAN)
                 e.Frame += 14;
         }
         else if(e.Type == EFFID_SCORE)
