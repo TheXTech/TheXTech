@@ -38,6 +38,7 @@
 void NPCSpecialMaybeHeld(int A)
 {
     // Special Code for things that work while held
+    // perfectly factored by NPC Type
     if(NPC[A].Type == NPCID_BOMB) // SMB2 Bomb
     {
         // If .Location.SpeedX < -2 Or .Location.SpeedX > 2 Or .Location.SpeedY < -2 Or .Location.SpeedY > 5 Then .Projectile = True
@@ -579,33 +580,36 @@ void NPCSpecialMaybeHeld(int A)
                 NPC[A].Special4 = 0;
         }
     }
-    else if(NPC[A].Type == NPCID_HEAVY_THROWER && NPC[A].HoldingPlayer > 0)
+    else if(NPC[A].Type == NPCID_HEAVY_THROWER)
     {
-        // the throw counter was previously Special3, but it uses a double in the non-held logic, so it has been moved to SpecialX
-        if(Player[NPC[A].HoldingPlayer].Effect == PLREFF_NORMAL)
-            NPC[A].SpecialX += 1;
-
-        if(NPC[A].SpecialX >= 20)
+        if(NPC[A].HoldingPlayer > 0)
         {
-            PlaySoundSpatial(SFX_HeavyToss, NPC[A].Location);
-            NPC[A].SpecialX = 0; // -15
-            numNPCs++;
-            NPC[numNPCs] = NPC_t();
-            NPC[numNPCs].Location.Height = 32;
-            NPC[numNPCs].Location.Width = 32;
-            NPC[numNPCs].Location.X = NPC[A].Location.X;
-            NPC[numNPCs].Location.Y = NPC[A].Location.Y;
-            NPC[numNPCs].Direction = NPC[A].Direction;
-            NPC[numNPCs].Type = NPCID_HEAVY_THROWN;
-            NPC[numNPCs].Shadow = NPC[A].Shadow;
-            NPC[numNPCs].CantHurt = 200;
-            NPC[numNPCs].CantHurtPlayer = NPC[A].HoldingPlayer;
-            NPC[numNPCs].Active = true;
-            NPC[numNPCs].Projectile = true;
-            NPC[numNPCs].TimeLeft = 50;
-            NPC[numNPCs].Location.SpeedY = -8;
-            NPC[numNPCs].Location.SpeedX = 3 * Player[NPC[A].HoldingPlayer].Direction + Player[NPC[A].HoldingPlayer].Location.SpeedX * 0.8;
-            syncLayers_NPC(numNPCs);
+            // the throw counter was previously Special3, but it uses a double in the non-held logic, so it has been moved to SpecialX
+            if(Player[NPC[A].HoldingPlayer].Effect == PLREFF_NORMAL)
+                NPC[A].SpecialX += 1;
+
+            if(NPC[A].SpecialX >= 20)
+            {
+                PlaySoundSpatial(SFX_HeavyToss, NPC[A].Location);
+                NPC[A].SpecialX = 0; // -15
+                numNPCs++;
+                NPC[numNPCs] = NPC_t();
+                NPC[numNPCs].Location.Height = 32;
+                NPC[numNPCs].Location.Width = 32;
+                NPC[numNPCs].Location.X = NPC[A].Location.X;
+                NPC[numNPCs].Location.Y = NPC[A].Location.Y;
+                NPC[numNPCs].Direction = NPC[A].Direction;
+                NPC[numNPCs].Type = NPCID_HEAVY_THROWN;
+                NPC[numNPCs].Shadow = NPC[A].Shadow;
+                NPC[numNPCs].CantHurt = 200;
+                NPC[numNPCs].CantHurtPlayer = NPC[A].HoldingPlayer;
+                NPC[numNPCs].Active = true;
+                NPC[numNPCs].Projectile = true;
+                NPC[numNPCs].TimeLeft = 50;
+                NPC[numNPCs].Location.SpeedY = -8;
+                NPC[numNPCs].Location.SpeedX = 3 * Player[NPC[A].HoldingPlayer].Direction + Player[NPC[A].HoldingPlayer].Location.SpeedX * 0.8;
+                syncLayers_NPC(numNPCs);
+            }
         }
     }
     else if(NPC[A].Type == NPCID_CANNONENEMY || NPC[A].Type == NPCID_CANNONITEM) // Bullet Bill Shooter
