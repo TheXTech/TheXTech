@@ -3245,8 +3245,25 @@ void NPCSpecial(int A)
             npc.Location.SpeedX = 0;
             npc.Location.SpeedY = 0;
         }
+
+        // this part was from SpecialNPC
+        if(npc.Special == 3)
+            npc.BeltSpeed = 0;
     }
-    else if((npc.Type == NPCID_ITEM_POD && npc.Special2 == 1) || npc.Type == NPCID_SIGN || npc.Type == NPCID_LIFT_SAND)
+    else if(npc.Type == NPCID_ITEM_POD)
+    {
+        if(npc.Special2 == 1)
+        {
+            // this part was from the below section
+            npc.Location.SpeedX = 0;
+            npc.Location.SpeedY = 0;
+
+            // this part was from SpecialNPC
+            npc.Killed = 1;
+            NPCQueues::Killed.push_back(A);
+        }
+    }
+    else if(npc.Type == NPCID_SIGN || npc.Type == NPCID_LIFT_SAND)
     {
         npc.Location.SpeedX = 0;
         npc.Location.SpeedY = 0;
@@ -3537,11 +3554,13 @@ void SpecialNPC(int A)
     {
         if(NPC[A].Location.SpeedY > 2)
             NPC[A].Projectile = true;
-        if(NPC[A].Special2 == 1)
-        {
-            NPC[A].Killed = 1;
-            NPCQueues::Killed.push_back(A);
-        }
+
+        // moved to NPCSpecial
+        // if(NPC[A].Special2 == 1)
+        // {
+        //     NPC[A].Killed = 1;
+        //     NPCQueues::Killed.push_back(A);
+        // }
     }
     else if(NPC[A].Type == NPCID_GEM_1 || NPC[A].Type == NPCID_GEM_5 || NPC[A].Type == NPCID_GEM_20) // Rupee
     {
@@ -3554,8 +3573,9 @@ void SpecialNPC(int A)
     }
     else if(NPC[A].Type == NPCID_ICE_BLOCK || NPC[A].Type == NPCID_ICE_CUBE) // Yoshi Ice
     {
-        if(NPC[A].Type == NPCID_ICE_CUBE && NPC[A].Special == 3)
-            NPC[A].BeltSpeed = 0;
+        // moved to NPCSpecial
+        // if(NPC[A].Type == NPCID_ICE_CUBE && NPC[A].Special == 3)
+        //     NPC[A].BeltSpeed = 0;
 
         if(iRand(100) >= 93)
         {
