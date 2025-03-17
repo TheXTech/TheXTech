@@ -424,34 +424,23 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                                 {
                                     if(NPC[B].Killed == 8 && Player[A].Mount == 1 && Player[A].MountType == 2)
                                     {
-                                        numNPCs++;
-                                        NPC[numNPCs] = NPC_t();
-                                        NPC[numNPCs].Active = true;
-                                        NPC[numNPCs].TimeLeft = 100;
-                                        NPC[numNPCs].Section = Player[A].Section;
-                                        NPC[numNPCs].Type = NPCID_PLR_FIREBALL;
-                                        NPC[numNPCs].Special = Player[A].Character;
-                                        NPC[numNPCs].Location.Height = NPC[numNPCs]->THeight;
-                                        NPC[numNPCs].Location.Width = NPC[numNPCs]->TWidth;
-                                        NPC[numNPCs].Location.Y = Player[A].Location.Height + Player[A].Location.Y - NPC[numNPCs].Location.Height;
-                                        NPC[numNPCs].Location.X = Player[A].Location.X + Player[A].Location.Width / 2.0 - NPC[numNPCs].Location.Width / 2.0;
-                                        NPC[numNPCs].Location.SpeedX = 4;
-                                        NPC[numNPCs].Location.SpeedY = 10;
-                                        syncLayers_NPC(numNPCs);
-                                        numNPCs++;
-                                        NPC[numNPCs] = NPC_t();
-                                        NPC[numNPCs].Active = true;
-                                        NPC[numNPCs].TimeLeft = 100;
-                                        NPC[numNPCs].Section = Player[A].Section;
-                                        NPC[numNPCs].Type = NPCID_PLR_FIREBALL;
-                                        NPC[numNPCs].Special = Player[A].Character;
-                                        NPC[numNPCs].Location.Height = NPC[numNPCs]->THeight;
-                                        NPC[numNPCs].Location.Width = NPC[numNPCs]->TWidth;
-                                        NPC[numNPCs].Location.Y = Player[A].Location.Height + Player[A].Location.Y - NPC[numNPCs].Location.Height;
-                                        NPC[numNPCs].Location.X = Player[A].Location.X + Player[A].Location.Width / 2.0 - NPC[numNPCs].Location.Width / 2.0;
-                                        NPC[numNPCs].Location.SpeedX = -4;
-                                        NPC[numNPCs].Location.SpeedY = 10;
-                                        syncLayers_NPC(numNPCs);
+                                        for(int i = 0; i < 2; i++)
+                                        {
+                                            numNPCs++;
+                                            NPC[numNPCs] = NPC_t();
+                                            NPC[numNPCs].Active = true;
+                                            NPC[numNPCs].TimeLeft = 100;
+                                            NPC[numNPCs].Section = Player[A].Section;
+                                            NPC[numNPCs].Type = NPCID_PLR_FIREBALL;
+                                            NPC[numNPCs].Special = Player[A].Character;
+                                            NPC[numNPCs].Location.Height = NPC[numNPCs]->THeight;
+                                            NPC[numNPCs].Location.Width = NPC[numNPCs]->TWidth;
+                                            NPC[numNPCs].Location.Y = Player[A].Location.Height + Player[A].Location.Y - NPC[numNPCs].Location.Height;
+                                            NPC[numNPCs].Location.X = Player[A].Location.X + Player[A].Location.Width / 2.0 - NPC[numNPCs].Location.Width / 2.0;
+                                            NPC[numNPCs].Location.SpeedX = (i == 0) ? -4 : 4;
+                                            NPC[numNPCs].Location.SpeedY = 10;
+                                            syncLayers_NPC(numNPCs);
+                                        }
                                     }
 
                                     Player[A].ForceHitSpot3 = true;
