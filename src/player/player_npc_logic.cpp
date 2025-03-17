@@ -1235,7 +1235,7 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                 if(Player[A].Location.SpeedY > 4.1)
                 {
                     Player[A].Location.Y += -Player[A].Location.SpeedY;
-                    Player[A].Location.SpeedY = NPC[Player[A].StandingOnNPC].Location.SpeedY;
+                    Player[A].Location.SpeedY = NPC[0 /*Player[A].StandingOnNPC*/].Location.SpeedY; // SMBX 1.3 bug
 
                     if(Player[A].Location.SpeedY > Physics.PlayerTerminalVelocity)
                         Player[A].Location.SpeedY = Physics.PlayerTerminalVelocity;
@@ -1248,10 +1248,11 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
     else if(Player[A].Mount == 1 && Player[A].Jump > 0)
     {
         // confusing logic, but safe, because StandingOnNPC gets set in ClownCar()
-        if(B == 0 && Player[A].StandingOnVehiclePlr > 0)
+        // NOTE: we know that B == 0!
+        if(/*B == 0 &&*/ Player[A].StandingOnVehiclePlr > 0)
             Player[A].Location.SpeedX += (NPC[Player[A].StandingOnNPC].Location.SpeedX + NPC[Player[A].StandingOnNPC].BeltSpeed);
-        else if(B > 0 && Player[A].StandingOnNPC == 0 && NPC[B].playerTemp)
-            Player[A].Location.SpeedX += -(NPC[B].Location.SpeedX + NPC[B].BeltSpeed);
+        // else if(B > 0 && Player[A].StandingOnNPC == 0 && NPC[B].playerTemp)
+        //     Player[A].Location.SpeedX += -(NPC[B].Location.SpeedX + NPC[B].BeltSpeed);
 
         Player[A].StandingOnNPC = 0;
         Player[A].StandingOnVehiclePlr = 0;
