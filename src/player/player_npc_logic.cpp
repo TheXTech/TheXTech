@@ -1160,55 +1160,62 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
 
         Player[A].Location.Y = NPC[B].Location.Y - Player[A].Location.Height;
 
+        // NPC has been stood on (condition over NPC types)
         if(NPC[B].Type == NPCID_FALL_BLOCK_RED || NPC[B].Type == NPCID_FALL_BLOCK_BROWN)
             NPC[B].Special2 = 1;
-
-        if(NPC[B].Type == NPCID_CHECKER_PLATFORM)
+        else if(NPC[B].Type == NPCID_CHECKER_PLATFORM)
             NPC[B].Special = 1;
-
-        if(NPC[B].Type == NPCID_PLATFORM_S3 && Player[A].Location.SpeedY > 0)
-            NPC[B].Direction = 1;
-
-        if(NPC[B].Type == NPCID_RAFT && NPC[B].Special == 0)
+        else if(NPC[B].Type == NPCID_PLATFORM_S3)
         {
-            NPC[B].Special = 1;
-            SkullRide(B);
+            if(Player[A].Location.SpeedY > 0)
+                NPC[B].Direction = 1;
         }
-
-        if(NPC[B].Type == NPCID_CONVEYOR)
+        else if(NPC[B].Type == NPCID_RAFT)
+        {
+            if(NPC[B].Special == 0)
+            {
+                NPC[B].Special = 1;
+                SkullRide(B);
+            }
+        }
+        else if(NPC[B].Type == NPCID_CONVEYOR)
             Player[A].Location.SpeedY = 0;
-
-
-        if(NPC[B].Type == NPCID_VEHICLE && Player[A].Controls.Down && Player[A].Mount == 0 &&
-           !NPC[B].playerTemp && Player[A].DuckRelease &&
-           (Player[A].HoldingNPC == 0 || Player[A].Character == 5))
+        else if(NPC[B].Type == NPCID_VEHICLE)
         {
-            UnDuck(Player[A]);
-
-            if(g_config.fix_char5_vehicle_climb && Player[A].Fairy) // Avoid the mortal glitch
+            if(Player[A].Controls.Down && Player[A].Mount == 0 &&
+               !NPC[B].playerTemp && Player[A].DuckRelease &&
+               (Player[A].HoldingNPC == 0 || Player[A].Character == 5))
             {
-                Player[A].Fairy = false;
-                PlaySoundSpatial(SFX_HeroFairy, Player[A].Location);
-                NewEffect(EFFID_SMOKE_S5, Player[A].Location);
-            }
+                UnDuck(Player[A]);
 
-            if(g_config.fix_vehicle_altjump_bug)
-                Player[A].SpinJump = false;
+                if(g_config.fix_char5_vehicle_climb && Player[A].Fairy) // Avoid the mortal glitch
+                {
+                    Player[A].Fairy = false;
+                    PlaySoundSpatial(SFX_HeroFairy, Player[A].Location);
+                    NewEffect(EFFID_SMOKE_S5, Player[A].Location);
+                }
 
-            Player[A].Location = NPC[B].Location;
-            Player[A].Mount = 2;
-            NPC[B].Killed = 9;
-            NPCQueues::Killed.push_back(B);
-            Player[A].HoldingNPC = 0;
-            Player[A].StandingOnNPC = 0;
-            PlaySoundSpatial(SFX_Stomp, Player[A].Location);
-            for(int C = 1; C <= numPlayers; ++C)
-            {
-                if(Player[C].StandingOnNPC == B)
-                    Player[C].StandingOnVehiclePlr = A;
+                if(g_config.fix_vehicle_altjump_bug)
+                    Player[A].SpinJump = false;
+
+                Player[A].Location = NPC[B].Location;
+                Player[A].Mount = 2;
+                NPC[B].Killed = 9;
+                NPCQueues::Killed.push_back(B);
+                Player[A].HoldingNPC = 0;
+                Player[A].StandingOnNPC = 0;
+                PlaySoundSpatial(SFX_Stomp, Player[A].Location);
+                for(int C = 1; C <= numPlayers; ++C)
+                {
+                    if(Player[C].StandingOnNPC == B)
+                        Player[C].StandingOnVehiclePlr = A;
+                }
+
+                B = 0;
             }
         }
-        else if(Player[A].Mount == 2)
+
+        if(Player[A].Mount == 2 && B != 0)
         {
             Player[A].StandingOnNPC = 0;
             if(Player[A].Location.SpeedY > 4 + NPC[B].Location.SpeedY)
