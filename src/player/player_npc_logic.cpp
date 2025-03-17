@@ -1062,20 +1062,17 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
             else
                 B = floorNpc2;
         }
+        else if(NPC[floorNpc1].Location.Y < NPC[floorNpc2].Location.Y)
+            B = floorNpc1;
         else
-        {
-            if(NPC[floorNpc1].Location.Y < NPC[floorNpc2].Location.Y)
-                B = floorNpc1;
-            else
-                B = floorNpc2;
-        }
+            B = floorNpc2;
     }
     else if(floorNpc1 != 0)
         B = floorNpc1;
 
-    if(NPC[floorNpc1].Type >= 60 && NPC[floorNpc1].Type <= 66)
+    if(NPC[floorNpc1].Type >= NPCID_YEL_PLATFORM && NPC[floorNpc1].Type <= NPCID_RED_PLATFORM)
         B = floorNpc1;
-    else if(NPC[floorNpc2].Type >= 60 && NPC[floorNpc2].Type <= 66)
+    else if(NPC[floorNpc2].Type >= NPCID_YEL_PLATFORM && NPC[floorNpc2].Type <= NPCID_RED_PLATFORM)
         B = floorNpc2;
 
     if(NPC[B].Effect == NPCEFF_DROP_ITEM)
