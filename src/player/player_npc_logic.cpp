@@ -849,48 +849,55 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                                                 PlayerHurt(A);
                                         }
                                     }
+                                    // player gets pushed left/right by NPC
                                     else
                                     {
+                                        tempHit2 = true;
+                                        tempHitSpeed = NPC[B].Location.SpeedX + NPC[B].BeltSpeed;
+
+                                        // reset player speed if not on conveyor belt
                                         bool tempBool = false;
                                         if(Player[A].StandingOnNPC != 0)
                                         {
-                                            if(NPC[Player[A].StandingOnNPC].Type == 57)
+                                            if(NPC[Player[A].StandingOnNPC].Type == NPCID_CONVEYOR)
                                                 tempBool = true;
                                         }
 
+                                        if(!tempBool && NPC[B].Type != NPCID_BULLY)
+                                            Player[A].Location.SpeedX = 0.2 * Player[A].Direction;
+
+                                        // reset player run count
+                                        Player[A].RunCount = 0;
+
+                                        // mark moving pinched (if needed)
+                                        if(NPC[B].Type != NPCID_KEY && NPC[B].Type != NPCID_COIN_SWITCH && NPC[B].Type != NPCID_CONVEYOR && (NPC[B].Location.SpeedX != 0 || NPC[B].Location.SpeedY != 0 || NPC[B].BeltSpeed))
+                                        {
+                                            Player[A].Pinched.Moving = 2;
+
+                                            if(NPC[B].Location.SpeedX != 0 || NPC[B].BeltSpeed)
+                                                Player[A].Pinched.MovingLR = true;
+                                        }
+
+                                        // save current X location (for NPCs riding player's vehicle)
                                         float D = Player[A].Location.X;
+
+                                        // actually move the player
                                         if(Player[A].Location.X + Player[A].Location.Width / 2.0 < NPC[B].Location.X + NPC[B].Location.Width / 2.0)
                                         {
                                             Player[A].Pinched.Right4 = 2;
 
-                                            if(NPC[B].Type != NPCID_KEY && NPC[B].Type != NPCID_COIN_SWITCH && NPC[B].Type != NPCID_CONVEYOR && (NPC[B].Location.SpeedX != 0 || NPC[B].Location.SpeedY != 0 || NPC[B].BeltSpeed))
+                                            if(floorBlock != 0 && std::abs(Block[floorBlock].Location.X - NPC[B].Location.X) < 1)
                                             {
-                                                Player[A].Pinched.Moving = 2;
-
-                                                if(NPC[B].Location.SpeedX != 0 || NPC[B].BeltSpeed)
-                                                    Player[A].Pinched.MovingLR = true;
+                                                Player[A].Location.X = NPC[B].Location.X - Player[A].Location.Width - 1;
+                                                Player[A].Location.SpeedY = oldSpeedY;
                                             }
+                                            else
+                                                Player[A].Location.X = NPC[B].Location.X - Player[A].Location.Width - 0.1;
 
-                                            Player[A].Location.X = NPC[B].Location.X - Player[A].Location.Width - 0.1;
-                                            tempHit2 = true;
-                                            Player[A].RunCount = 0;
-                                            tempHitSpeed = NPC[B].Location.SpeedX + NPC[B].BeltSpeed;
-
-                                            if(floorBlock != 0)
-                                            {
-                                                if(std::abs(Block[floorBlock].Location.X - NPC[B].Location.X) < 1)
-                                                {
-                                                    Player[A].Location.X = NPC[B].Location.X - Player[A].Location.Width - 1;
-                                                    Player[A].Location.SpeedY = oldSpeedY;
-                                                }
-                                            }
-
-                                            if(!tempBool && NPC[B].Type != NPCID_BULLY)
-                                                Player[A].Location.SpeedX = 0.2 * Player[A].Direction;
-
-                                            if(NPC[Player[A].StandingOnNPC].Type == 57)
+                                            if(NPC[Player[A].StandingOnNPC].Type == NPCID_CONVEYOR)
                                                 Player[A].Location.X -= 1;
 
+                                            // forget about floors no longer supporting player
                                             if(floorNpc1 > 0)
                                             {
                                                 if(NPC[B].Location.X >= NPC[floorNpc1].Location.X - 2 && NPC[B].Location.X <= NPC[floorNpc1].Location.X + 2)
@@ -907,31 +914,15 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                                         {
                                             Player[A].Pinched.Left2 = 2;
 
-                                            if(NPC[B].Type != NPCID_KEY && NPC[B].Type != NPCID_COIN_SWITCH && NPC[B].Type != NPCID_CONVEYOR && (NPC[B].Location.SpeedX != 0 || NPC[B].Location.SpeedY != 0 || NPC[B].BeltSpeed))
+                                            if(floorBlock != 0 && std::abs(Block[floorBlock].Location.X + Block[floorBlock].Location.Width - NPC[B].Location.X - NPC[B].Location.Width) < 1)
                                             {
-                                                Player[A].Pinched.Moving = 2;
-
-                                                if(NPC[B].Location.SpeedX != 0 || NPC[B].BeltSpeed)
-                                                    Player[A].Pinched.MovingLR = true;
+                                                Player[A].Location.X = NPC[B].Location.X + NPC[B].Location.Width + 1;
+                                                Player[A].Location.SpeedY = oldSpeedY;
                                             }
+                                            else
+                                                Player[A].Location.X = NPC[B].Location.X + NPC[B].Location.Width + 0.01;
 
-                                            Player[A].Location.X = NPC[B].Location.X + NPC[B].Location.Width + 0.01;
-                                            tempHit2 = true;
-                                            Player[A].RunCount = 0;
-                                            tempHitSpeed = NPC[B].Location.SpeedX + NPC[B].BeltSpeed;
-
-                                            if(floorBlock != 0)
-                                            {
-                                                if(std::abs(Block[floorBlock].Location.X + Block[floorBlock].Location.Width - NPC[B].Location.X - NPC[B].Location.Width) < 1)
-                                                {
-                                                    Player[A].Location.X = NPC[B].Location.X + NPC[B].Location.Width + 1;
-                                                    Player[A].Location.SpeedY = oldSpeedY;
-                                                }
-                                            }
-
-                                            if(!tempBool && NPC[B].Type != NPCID_BULLY)
-                                                Player[A].Location.SpeedX = 0.2 * Player[A].Direction;
-
+                                            // forget about floors no longer supporting player
                                             if(floorNpc1 > 0)
                                             {
                                                 if(NPC[B].Location.X + NPC[B].Location.Width >= NPC[floorNpc1].Location.X + NPC[floorNpc1].Location.Width - 2 && NPC[B].Location.X + NPC[B].Location.Width <= NPC[floorNpc1].Location.X + NPC[floorNpc1].Location.Width + 2)
@@ -945,6 +936,7 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                                             }
                                         }
 
+                                        // apply speed to vehicle riders if needed
                                         if(Player[A].Mount == 2)
                                         {
                                             D = Player[A].Location.X - D;
