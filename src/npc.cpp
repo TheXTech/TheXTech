@@ -3650,7 +3650,9 @@ void SpecialNPC(int A)
             {
                 NPC[A].Special += 1;
                 NPC[A].Location.Y -= 1.5;
-                if(NPC[A].Special >= NPC[A]->THeight * 0.65 + 1)
+
+                // NPC[A].Special >= NPC[A]->THeight * 0.65 + 1
+                if(NPC[A].Special * 100 >= NPC[A]->THeight * 65 + 100)
                 {
                     NPC[A].Special2 = 2;
                     NPC[A].Special = 0;
@@ -3713,7 +3715,9 @@ void SpecialNPC(int A)
             {
                 NPC[A].Special += 1;
                 NPC[A].Location.Y += 1.5;
-                if(NPC[A].Special >= NPC[A]->THeight * 0.65 + 1)
+
+                // NPC[A].Special >= NPC[A]->THeight * 0.65 + 1
+                if(NPC[A].Special * 100 >= NPC[A]->THeight * 65 + 100)
                     NPC[A].Special2 = 4;
             }
             else if(NPC[A].Special2 == 4)
@@ -3889,7 +3893,9 @@ void SpecialNPC(int A)
             {
                 NPC[A].Special += 1;
                 NPC[A].Location.Y -= 1.5;
-                if(NPC[A].Special >= NPC[A]->THeight * 0.65 + 1)
+
+                // NPC[A].Special >= NPC[A]->THeight * 0.65 + 1
+                if(NPC[A].Special * 100 >= NPC[A]->THeight * 65 + 100)
                 {
                     if(g_config.fix_plant_wobble)
                     {
@@ -3915,7 +3921,9 @@ void SpecialNPC(int A)
             {
                 NPC[A].Special += 1;
                 NPC[A].Location.Y += 1.5;
-                if(NPC[A].Special >= NPC[A]->THeight * 0.65 + 1)
+
+                // NPC[A].Special >= NPC[A]->THeight * 0.65 + 1
+                if(NPC[A].Special * 100 >= NPC[A]->THeight * 65 + 100)
                 {
                     NPC[A].Special2 = 4;
                     if(NPC[A].Type == NPCID_LONG_PLANT_UP)
@@ -3993,7 +4001,9 @@ void SpecialNPC(int A)
                 NPC[A].Special += 1;
                 // .Location.Y += 1.5
                 NPC[A].Location.Height += 1.5;
-                if(NPC[A].Special >= NPC[A]->THeight * 0.65 + 1)
+
+                // NPC[A].Special >= NPC[A]->THeight * 0.65 + 1
+                if(NPC[A].Special * 100 >= NPC[A]->THeight * 65 + 100)
                 {
                     if(g_config.fix_plant_wobble)
                         NPC[A].Location.Height = NPC[A]->THeight;
@@ -4018,7 +4028,9 @@ void SpecialNPC(int A)
                 NPC[A].Special += 1;
                 // .Location.Y += -1.5
                 NPC[A].Location.Height -= 1.5;
-                if(NPC[A].Special >= NPC[A]->THeight * 0.65 + 1)
+
+                // NPC[A].Special >= NPC[A]->THeight * 0.65 + 1
+                if(NPC[A].Special * 100 >= NPC[A]->THeight * 65 + 100)
                 {
                     if(g_config.fix_plant_wobble)
                         NPC[A].Location.Height = 0;
@@ -4076,7 +4088,8 @@ void SpecialNPC(int A)
                 else
                     NPC[A].Location.Width += 1.5 * NPC[A].Direction;
 
-                if(NPC[A].Special >= NPC[A]->TWidth * 0.65 + 1)
+                // NPC[A].Special >= NPC[A]->TWidth * 0.65 + 1
+                if(NPC[A].Special * 100 >= NPC[A]->TWidth * 65 + 100)
                 {
                     if(g_config.fix_plant_wobble)
                     {
@@ -4107,7 +4120,8 @@ void SpecialNPC(int A)
                 else
                     NPC[A].Location.Width -= 1.5 * NPC[A].Direction;
 
-                if(NPC[A].Special >= NPC[A]->TWidth * 0.65 + 1)
+                // NPC[A].Special >= NPC[A]->TWidth * 0.65 + 1
+                if(NPC[A].Special * 100 >= NPC[A]->TWidth * 65 + 100)
                 {
                     NPC[A].Special2 = 4;
 
