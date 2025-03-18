@@ -799,7 +799,7 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
                 std::string ai_invalid;
                 const std::string* ai_name = &ai_invalid;
 
-                int index = (int)EditorCursor.NPC.Special;
+                int index = EditorCursor.NPC.Special;
 
                 if(index >= 0 && index < 4)
                 {
@@ -838,7 +838,7 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
                 std::string ai_invalid;
                 const std::string* ai_name = &ai_invalid;
 
-                int index = (int)EditorCursor.NPC.Special;
+                int index = EditorCursor.NPC.Special;
 
                 if(index >= 0 && index < 5)
                 {
@@ -886,7 +886,7 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
 
         if(EditorCursor.NPC.Type == NPCID_FIRE_CHAIN)
         {
-            SuperPrintR(mode, fmt::format_ne(g_editorStrings.phraseRadiusIndex, (int)EditorCursor.NPC.Special), 3, e_ScreenW - 200, 220);
+            SuperPrintR(mode, fmt::format_ne(g_editorStrings.phraseRadiusIndex, EditorCursor.NPC.Special), 3, e_ScreenW - 200, 220);
 
             if(EditorCursor.NPC.Special > 0 && UpdateButton(mode, e_ScreenW - 160 + 4, 240 + 4, GFX.EIcons, false, 0, 32*Icon::left, 32, 32))
                 EditorCursor.NPC.Special --;
@@ -3968,10 +3968,10 @@ void EditorScreen::UpdateWarpScreen(CallMode mode)
             // map warp!
             SuperPrintR(mode, g_editorStrings.mapPos, 3, 44, 302);
 
-            if((int)EditorCursor.Warp.MapX != -1 || (int)EditorCursor.Warp.MapY != -1)
+            if(EditorCursor.Warp.MapX != -1 || EditorCursor.Warp.MapY != -1)
             {
-                SuperPrintR(mode, g_editorStrings.letterCoordX + ": " + std::to_string((int)EditorCursor.Warp.MapX), 3, 4, 320);
-                SuperPrintR(mode, g_editorStrings.letterCoordY + ": " + std::to_string((int)EditorCursor.Warp.MapY), 3, 4, 340);
+                SuperPrintR(mode, g_editorStrings.letterCoordX + ": " + std::to_string(EditorCursor.Warp.MapX), 3, 4, 320);
+                SuperPrintR(mode, g_editorStrings.letterCoordY + ": " + std::to_string(EditorCursor.Warp.MapY), 3, 4, 340);
             }
             else
             {
@@ -3980,29 +3980,29 @@ void EditorScreen::UpdateWarpScreen(CallMode mode)
 
             if(UpdateButton(mode, 4, 360 + 4, GFX.EIcons, false, 0, 32*Icon::up, 32, 32))
             {
-                EditorCursor.Warp.MapY = 32*((int)EditorCursor.Warp.MapY/32 - 1);
-                if((int)EditorCursor.Warp.MapX == -1)
+                EditorCursor.Warp.MapY = 32*(EditorCursor.Warp.MapY/32 - 1);
+                if(EditorCursor.Warp.MapX == -1)
                     EditorCursor.Warp.MapX = 0.;
             }
 
             if(UpdateButton(mode, 40 + 4, 360 + 4, GFX.EIcons, false, 0, 32*Icon::down, 32, 32))
             {
-                EditorCursor.Warp.MapY = 32*((int)EditorCursor.Warp.MapY/32 + 1);
-                if((int)EditorCursor.Warp.MapX == -1)
+                EditorCursor.Warp.MapY = 32*(EditorCursor.Warp.MapY/32 + 1);
+                if(EditorCursor.Warp.MapX == -1)
                     EditorCursor.Warp.MapX = 0.;
             }
 
             if(UpdateButton(mode, 80 + 4, 360 + 4, GFX.EIcons, false, 0, 32*Icon::left, 32, 32))
             {
-                EditorCursor.Warp.MapX = 32*((int)EditorCursor.Warp.MapX/32 - 1);
-                if((int)EditorCursor.Warp.MapY == -1)
+                EditorCursor.Warp.MapX = 32*(EditorCursor.Warp.MapX/32 - 1);
+                if(EditorCursor.Warp.MapY == -1)
                     EditorCursor.Warp.MapY = 0.;
             }
 
             if(UpdateButton(mode, 120 + 4, 360 + 4, GFX.EIcons, false, 0, 32*Icon::right, 32, 32))
             {
-                EditorCursor.Warp.MapX = 32*((int)EditorCursor.Warp.MapX/32 + 1);
-                if((int)EditorCursor.Warp.MapY == -1)
+                EditorCursor.Warp.MapX = 32*(EditorCursor.Warp.MapX/32 + 1);
+                if(EditorCursor.Warp.MapY == -1)
                     EditorCursor.Warp.MapY = 0.;
             }
         }
@@ -4207,10 +4207,10 @@ void EditorScreen::UpdateLevelScreen(CallMode mode)
     // map warp!
     SuperPrintR(mode, g_editorStrings.mapPos, 3, e_ScreenW - 240 + 44, 302);
 
-    if((int)EditorCursor.WorldLevel.WarpX != -1 || (int)EditorCursor.WorldLevel.WarpY != -1)
+    if(EditorCursor.WorldLevel.WarpX != -1 || EditorCursor.WorldLevel.WarpY != -1)
     {
-        SuperPrintR(mode, g_editorStrings.letterCoordX + ": " + std::to_string((int)EditorCursor.WorldLevel.WarpX), 3, e_ScreenW - 240 + 4, 320);
-        SuperPrintR(mode, g_editorStrings.letterCoordY + ": " + std::to_string((int)EditorCursor.WorldLevel.WarpY), 3, e_ScreenW - 240 + 4, 340);
+        SuperPrintR(mode, g_editorStrings.letterCoordX + ": " + std::to_string(EditorCursor.WorldLevel.WarpX), 3, e_ScreenW - 240 + 4, 320);
+        SuperPrintR(mode, g_editorStrings.letterCoordY + ": " + std::to_string(EditorCursor.WorldLevel.WarpY), 3, e_ScreenW - 240 + 4, 340);
         if(UpdateButton(mode, e_ScreenW - 240 + 160 + 4, 320 + 4, GFX.EIcons, false, 0, 32*Icon::x, 32, 32))
         {
             EditorCursor.WorldLevel.WarpX = -1;
@@ -4224,29 +4224,29 @@ void EditorScreen::UpdateLevelScreen(CallMode mode)
 
     if(UpdateButton(mode, e_ScreenW - 240 + 4, 360 + 4, GFX.EIcons, false, 0, 32*Icon::up, 32, 32))
     {
-        EditorCursor.WorldLevel.WarpY = 32*((int)EditorCursor.WorldLevel.WarpY/32 - 1);
-        if((int)EditorCursor.WorldLevel.WarpX == -1)
+        EditorCursor.WorldLevel.WarpY = 32*(EditorCursor.WorldLevel.WarpY/32 - 1);
+        if(EditorCursor.WorldLevel.WarpX == -1)
             EditorCursor.WorldLevel.WarpX = 0.;
     }
 
     if(UpdateButton(mode, e_ScreenW - 240 + 40 + 4, 360 + 4, GFX.EIcons, false, 0, 32*Icon::down, 32, 32))
     {
-        EditorCursor.WorldLevel.WarpY = 32*((int)EditorCursor.WorldLevel.WarpY/32 + 1);
-        if((int)EditorCursor.WorldLevel.WarpX == -1)
+        EditorCursor.WorldLevel.WarpY = 32*(EditorCursor.WorldLevel.WarpY/32 + 1);
+        if(EditorCursor.WorldLevel.WarpX == -1)
             EditorCursor.WorldLevel.WarpX = 0.;
     }
 
     if(UpdateButton(mode, e_ScreenW - 240 + 80 + 4, 360 + 4, GFX.EIcons, false, 0, 32*Icon::left, 32, 32))
     {
-        EditorCursor.WorldLevel.WarpX = 32*((int)EditorCursor.WorldLevel.WarpX/32 - 1);
-        if((int)EditorCursor.WorldLevel.WarpY == -1)
+        EditorCursor.WorldLevel.WarpX = 32*(EditorCursor.WorldLevel.WarpX/32 - 1);
+        if(EditorCursor.WorldLevel.WarpY == -1)
             EditorCursor.WorldLevel.WarpY = 0.;
     }
 
     if(UpdateButton(mode, e_ScreenW - 240 + 120 + 4, 360 + 4, GFX.EIcons, false, 0, 32*Icon::right, 32, 32))
     {
-        EditorCursor.WorldLevel.WarpX = 32*((int)EditorCursor.WorldLevel.WarpX/32 + 1);
-        if((int)EditorCursor.WorldLevel.WarpY == -1)
+        EditorCursor.WorldLevel.WarpX = 32*(EditorCursor.WorldLevel.WarpX/32 + 1);
+        if(EditorCursor.WorldLevel.WarpY == -1)
             EditorCursor.WorldLevel.WarpY = 0.;
     }
 
