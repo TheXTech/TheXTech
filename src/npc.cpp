@@ -1849,15 +1849,37 @@ void NPCSpecial(int A)
                 }
             }
         }
-
-
-
-
     }
-    else if(npc.Type == NPCID_FIRE_CHAIN) // Firebar
+    // newly combined (note that Special was previously the stage counter for FIRE_DISK; now Special2 is the counter for both)
+    else if(npc.Type == NPCID_FIRE_CHAIN || npc.Type == NPCID_FIRE_DISK)
     {
-        double C = 0.03 * npc.DefaultSpecial;
-        double B = 0.98 * npc.DefaultSpecial;
+        double C;
+        double B;
+        double thresh;
+
+        if(npc.Type == NPCID_FIRE_DISK)
+        {
+            npc.Special4 += 1;
+
+            if(npc.Special4 == 4)
+            {
+                NewEffect(EFFID_FIRE_DISK_DIE, npc.Location);
+                Effect[numEffects].Frame = npc.Frame;
+                Effect[numEffects].Location.SpeedX = 0;
+                Effect[numEffects].Location.SpeedY = 0;
+                npc.Special4 = 0;
+            }
+
+            C = 0.2;
+            B = 6.05;
+            thresh = 0;
+        }
+        else
+        {
+            C = 0.03 * npc.DefaultSpecial;
+            B = 0.98 * npc.DefaultSpecial;
+            thresh = 0.001;
+        }
 
         if(npc.Special2 == 0)
         {
@@ -1871,11 +1893,13 @@ void NPCSpecial(int A)
                 npc.Location.SpeedY = 0;
             }
 
-            if(npc.Location.SpeedX >= -0.001)
+            if(npc.Location.SpeedX >= -thresh)
             {
-                npc.Special2 += 1 * npc.DefaultDirection;
-                if(npc.Special2 <= 0)
+                if(npc.DefaultDirection > 0)
+                    npc.Special2 = 1;
+                else if(npc.DefaultDirection < 0 || npc.Type == NPCID_FIRE_CHAIN)
                     npc.Special2 = 3;
+
                 npc.Special5 = 0;
             }
         }
@@ -1891,9 +1915,9 @@ void NPCSpecial(int A)
                 npc.Location.SpeedX = 0;
             }
 
-            if(npc.Location.SpeedY <= 0.001)
+            if(npc.Location.SpeedY <= thresh)
             {
-                npc.Special2 += 1 * npc.DefaultDirection;
+                npc.Special2 += npc.DefaultDirection;
                 npc.Special5 = 0;
             }
         }
@@ -1909,9 +1933,9 @@ void NPCSpecial(int A)
                 npc.Location.SpeedY = 0;
             }
 
-            if(npc.Location.SpeedX <= 0.001)
+            if(npc.Location.SpeedX <= thresh)
             {
-                npc.Special2 += 1 * npc.DefaultDirection;
+                npc.Special2 += npc.DefaultDirection;
                 npc.Special5 = 0;
             }
         }
@@ -1927,103 +1951,16 @@ void NPCSpecial(int A)
                 npc.Location.SpeedX = 0;
             }
 
-            if(npc.Location.SpeedY >= -0.001)
+            if(npc.Location.SpeedY >= -thresh)
             {
-                npc.Special2 += 1 * npc.DefaultDirection;
-                if(npc.Special2 > 3)
+                if(npc.DefaultDirection > 0)
                     npc.Special2 = 0;
+                else
+                    npc.Special2 += npc.DefaultDirection;
+
                 npc.Special5 = 0;
             }
         }
-
-    }
-    else if(npc.Type == NPCID_FIRE_DISK) // Roto-Disk
-    {
-        double C = 0.2; // * .DefaultDirection
-        double B = 6.05; // * .DefaultDirection
-
-        npc.Special4 += 1;
-
-        if(npc.Special4 == 4)
-        {
-            NewEffect(EFFID_FIRE_DISK_DIE, npc.Location);
-            Effect[numEffects].Frame = npc.Frame;
-            Effect[numEffects].Location.SpeedX = 0;
-            Effect[numEffects].Location.SpeedY = 0;
-            npc.Special4 = 0;
-        }
-
-        if(npc.Special == 0)
-        {
-            npc.Location.SpeedX += C;
-            npc.Location.SpeedY += C * npc.DefaultDirection;
-            if(npc.Special5 == 0)
-            {
-                npc.Special5 = 1;
-                npc.Location.SpeedX = -B;
-                npc.Location.SpeedY = 0;
-            }
-            if(npc.Location.SpeedX >= 0)
-            {
-                npc.Special += 1 * npc.DefaultDirection;
-                if(npc.Special < 0)
-                    npc.Special = 3;
-                npc.Special5 = 0;
-            }
-        }
-        else if(npc.Special == 1)
-        {
-            npc.Location.SpeedX += C * npc.DefaultDirection;
-            npc.Location.SpeedY += -C;
-            if(npc.Special5 == 0)
-            {
-                npc.Special5 = 1;
-                npc.Location.SpeedY = B;
-                npc.Location.SpeedX = 0;
-            }
-            if(npc.Location.SpeedY <= 0)
-            {
-                npc.Special += 1 * npc.DefaultDirection;
-                npc.Special5 = 0;
-            }
-        }
-        else if(npc.Special == 2)
-        {
-            npc.Location.SpeedX += -C;
-            npc.Location.SpeedY += -C * npc.DefaultDirection;
-            if(npc.Special5 == 0)
-            {
-                npc.Special5 = 1;
-                npc.Location.SpeedX = B;
-                npc.Location.SpeedY = 0;
-            }
-            if(npc.Location.SpeedX <= 0)
-            {
-                npc.Special += 1 * npc.DefaultDirection;
-                npc.Special5 = 0;
-            }
-        }
-        else if(npc.Special == 3)
-        {
-            npc.Location.SpeedX += -C * npc.DefaultDirection;
-            npc.Location.SpeedY += C;
-
-            if(npc.Special5 == 0)
-            {
-                npc.Special5 = 1;
-                npc.Location.SpeedY = -B;
-                npc.Location.SpeedX = 0;
-            }
-            if(npc.Location.SpeedY >= 0)
-            {
-                npc.Special += 1 * npc.DefaultDirection;
-                if(npc.Special > 3)
-                    npc.Special = 0;
-                npc.Special5 = 0;
-            }
-        }
-
-
     }
     else if(npc.Type == NPCID_LOCK_DOOR)
     {
