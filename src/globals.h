@@ -1021,9 +1021,9 @@ struct WorldLevel_t
     bool Visible = false;
 
 //    WarpX As Double 'for warping to another location on the world map
-    double WarpX = 0.0;
+    int32_t WarpX = 0;
 //    WarpY As Double
-    double WarpY = 0.0;
+    int32_t WarpY = 0;
 
 //End Type
 

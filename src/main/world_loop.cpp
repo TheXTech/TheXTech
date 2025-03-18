@@ -674,7 +674,7 @@ resume_from_pause:
                             );
                         }
                     }
-                    else if(int(lvl.WarpX) != -1 || int(lvl.WarpY) != -1)
+                    else if(lvl.WarpX != -1 || lvl.WarpY != -1)
                     {
                         musicReset = true;
                         StopMusic();
@@ -695,9 +695,9 @@ resume_from_pause:
                             worldWaitForFade(65);
 
                         // Moved from above
-                        if(int(lvl.WarpX) != -1)
+                        if(lvl.WarpX != -1)
                             WorldPlayer[1].Location.X = lvl.WarpX;
-                        if(int(lvl.WarpY) != -1)
+                        if(lvl.WarpY != -1)
                             WorldPlayer[1].Location.Y = lvl.WarpY;
 
                         worldResetSection();
