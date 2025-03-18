@@ -48,8 +48,6 @@ void DrawEditorLevel(int Z)
     int A = 0;
     int B = 0;
     int C = 0;
-    int D;
-    int E;
     Location_t tempLocation;
     int S = curSection; // Level section to display
 
@@ -343,38 +341,7 @@ void DrawEditorLevel(int Z)
             if(BlockIsSizable[b.Type])
             {
                 if(vScreenCollision(Z, b.Location))
-                {
-                    for(B = 0; B <= (b.Location.Height / 32) - 1; B++)
-                    {
-                        for(C = 0; C <= (b.Location.Width / 32) - 1; C++)
-                        {
-                            D = C;
-                            E = B;
-
-                            if(D != 0)
-                            {
-                                if(fEqual(D, (b.Location.Width / 32) - 1))
-                                    D = 2;
-                                else
-                                {
-                                    D = 1;
-                                }
-                            }
-
-                            if(E != 0)
-                            {
-                                if(fEqual(E, (b.Location.Height / 32) - 1))
-                                    E = 2;
-                                else
-                                    E = 1;
-                            }
-
-                            XRender::renderTexture(camX + b.Location.X + C * 32,
-                                                  camY + b.Location.Y + B * 32,
-                                                  32, 32, GFXBlock[b.Type], D * 32, E * 32);
-                        }
-                    }
-                }
+                    XRender::renderSizableBlock(camX + b.Location.X, camY + b.Location.Y, b.Location.Width, b.Location.Height, GFXBlockBMP[b.Type]);
             }
             else
             {
