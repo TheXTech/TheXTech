@@ -347,7 +347,7 @@ void SaveLevel(const std::string& FilePath, int format, int version)   // saves 
         pez.y = p.Location.Y;
         pez.w = p.Location.Width;
         pez.h = p.Location.Height;
-        pez.buoy = p.Buoy;
+        // pez.buoy = p.Buoy;
         pez.env_type = p.Quicksand ? LevelPhysEnv::ENV_QUICKSAND : LevelPhysEnv::ENV_WATER;
         pez.layer = GetL(p.Layer);
 

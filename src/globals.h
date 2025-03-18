@@ -832,7 +832,7 @@ struct Water_t
 //    Location As Location
     SpeedlessLocation_t Location;
 //    Buoy As Single 'not used
-    float Buoy = 0.0f;
+    // float Buoy = 0.0f;
 //    Layer As String
     layerindex_t Layer = LAYER_NONE;
 //    Hidden As Boolean

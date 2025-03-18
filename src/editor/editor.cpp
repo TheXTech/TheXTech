@@ -2134,7 +2134,7 @@ void SetCursor()
         EditorCursor.Location.Width = EditorCursor.Water.Location.Width;
         EditorCursor.Water.Location.X = EditorCursor.Location.X;
         EditorCursor.Water.Location.Y = EditorCursor.Location.Y;
-        EditorCursor.Water.Buoy = 0; // frmWater.scrBuoy / 100
+        // EditorCursor.Water.Buoy = 0; // frmWater.scrBuoy / 100
         EditorCursor.Water.Layer = EditorCursor.Layer;
 //        if(frmWater::Quicksand.Caption == "Yes")
             // EditorCursor.Water.Quicksand = false;
