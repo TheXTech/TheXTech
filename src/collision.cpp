@@ -82,6 +82,7 @@ bool n00bCollision(const Location_t &Loc1, const Location_t &Loc2)
     return tempn00bCollision;
 }
 
+#if 0
 // Used when a NPC is activated to see if it should spawn
 bool NPCStartCollision(const Location_t &Loc1, const Location_t &Loc2)
 {
@@ -101,6 +102,7 @@ bool NPCStartCollision(const Location_t &Loc1, const Location_t &Loc2)
     }
     return tempNPCStartCollision;
 }
+#endif
 
 // Warp point collisions
 bool WarpCollision(const Location_t &Loc1, const SpeedlessLocation_t &entrance, int direction)
@@ -441,6 +443,7 @@ bool vScreenCollision(int A, const TinyLocation_t &Loc2)
            (-vScreen[A].Y + vScreen[A].Height >= Loc2.Y);
 }
 
+#if 0
 // vScreen collisions 2
 bool vScreenCollision2(int A, const Location_t &Loc2)
 {
@@ -465,6 +468,7 @@ bool vScreenCollision2(int A, const TinyLocation_t &Loc2)
            (-vScreen[A].Y + 96 <= Loc2.Y + Loc2.Height) &&
            (-vScreen[A].Y + vScreen[A].Height - 64 >= Loc2.Y);
 }
+#endif
 
 // Collision detection for blocks. Prevents walking on walls.
 bool WalkingCollision(const Location_t &Loc1, const Location_t &Loc2)
@@ -483,6 +487,7 @@ bool WalkingCollision(const Location_t &Loc1, const Location_t &Loc2)
 }
 
 // Collision detection for blocks. Lets NPCs fall through cracks.
+#if 0
 bool WalkingCollision2(const Location_t &Loc1, const Location_t &Loc2)
 {
     bool tempWalkingCollision2 = false;
@@ -497,6 +502,7 @@ bool WalkingCollision2(const Location_t &Loc1, const Location_t &Loc2)
 
     return tempWalkingCollision2;
 }
+#endif
 
 // Factors in beltspeed
 bool WalkingCollision3(const Location_t &Loc1, const Location_t &Loc2, float BeltSpeed)
@@ -544,6 +550,7 @@ int FindRunningCollision(const Location_t &Loc1, const Location_t &Loc2, double 
 }
 
 // Determines if an NPC should turnaround
+#if 0
 bool ShouldTurnAround(const Location_t &Loc1, const Location_t &Loc2, float Direction)
 {
     bool tempShouldTurnAround = false;
@@ -568,6 +575,7 @@ bool ShouldTurnAround(const Location_t &Loc1, const Location_t &Loc2, float Dire
 
     return tempShouldTurnAround;
 }
+#endif
 
 // Determines if an NPC can come out of a pipe
 bool CanComeOut(const Location_t &Loc1, const Location_t &Loc2)

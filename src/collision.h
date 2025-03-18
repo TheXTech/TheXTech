@@ -54,7 +54,7 @@ bool CheckCollisionIntersect(const Location_t &Loc1, const Location_t &Loc2);
 bool n00bCollision(const Location_t &Loc1, const Location_t &Loc2);
 // Public Function NPCStartCollision(Loc1 As Location, Loc2 As Location) As Boolean 'Used when a NPC is activated to see if it should spawn
 // Used when a NPC is activated to see if it should spawn
-bool NPCStartCollision(const Location_t &Loc1, const Location_t &Loc2);
+// bool NPCStartCollision(const Location_t &Loc1, const Location_t &Loc2);
 // Public Function WarpCollision(Loc1 As Location, A As Integer) As Boolean  'Warp point collisions
 // Warp point collisions
 bool WarpCollision(const Location_t &Loc1, const SpeedlessLocation_t &entrance, int direction);
@@ -88,15 +88,15 @@ bool vScreenCollision(int A, const SpeedlessLocation_t &Loc2);
 bool vScreenCollision(int A, const TinyLocation_t &Loc2);
 // Public Function vScreenCollision2(A As Integer, Loc2 As Location) As Boolean  'vScreen collisions 2
 // vScreen collisions 2
-bool vScreenCollision2(int A, const Location_t &Loc2);
-bool vScreenCollision2(int A, const SpeedlessLocation_t &Loc2);
-bool vScreenCollision2(int A, const TinyLocation_t &Loc2);
+// bool vScreenCollision2(int A, const Location_t &Loc2);
+// bool vScreenCollision2(int A, const SpeedlessLocation_t &Loc2);
+// bool vScreenCollision2(int A, const TinyLocation_t &Loc2);
 // Public Function WalkingCollision(Loc1 As Location, Loc2 As Location) As Boolean 'Collision detection for blocks. Prevents walking on walls.
 // Collision detection for blocks. Prevents walking on walls.
 bool WalkingCollision(const Location_t &Loc1, const Location_t &Loc2);
 // Public Function WalkingCollision2(Loc1 As Location, Loc2 As Location) As Boolean 'Collision detection for blocks. Lets NPCs fall through cracks.
 // Collision detection for blocks. Lets NPCs fall through cracks.
-bool WalkingCollision2(const Location_t &Loc1, const Location_t &Loc2);
+// bool WalkingCollision2(const Location_t &Loc1, const Location_t &Loc2);
 // Public Function WalkingCollision3(Loc1 As Location, Loc2 As Location, BeltSpeed As Single) As Boolean 'Factors in beltspeed
 // Factors in beltspeed
 bool WalkingCollision3(const Location_t &Loc1, const Location_t &Loc2, float BeltSpeed);
@@ -106,7 +106,7 @@ bool WalkingCollision3(const Location_t &Loc1, const Location_t &Loc2, float Bel
 int FindRunningCollision(const Location_t &Loc1, const Location_t &Loc2, double BeltSpeedX);
 // Public Function ShouldTurnAround(Loc1 As Location, Loc2 As Location, Direction As Single) As Boolean  'Determines if an NPC should turnaround
 // Determines if an NPC should turnaround
-bool ShouldTurnAround(const Location_t &Loc1, const Location_t &Loc2, float Direction);
+// bool ShouldTurnAround(const Location_t &Loc1, const Location_t &Loc2, float Direction);
 // Public Function CanComeOut(Loc1 As Location, Loc2 As Location) As Boolean  'Determines if an NPC can come out of a pipe
 // Determines if an NPC can come out of a pipe
 bool CanComeOut(const Location_t &Loc1, const Location_t &Loc2);
