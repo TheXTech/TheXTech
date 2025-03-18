@@ -4783,23 +4783,19 @@ void SpecialNPC(int A)
         {
             // this direction indicator used Special (for spiky throwers) and Special6 (for item throwers) in SMBX 1.3
             // now it uses SpecialX (as a simple boolean flag)
+            double speed_bound = SDL_fabs(NPC[A].Location.X + NPC[A].Location.Width / 2 - p.Location.X + p.Location.Width / 2) / 100 + SDL_fabs(p.Location.SpeedX) / 2 + 5;
+
             if(NPC[A].SpecialX == 0)
             {
-                NPC[A].Location.SpeedX -= 0.2;
-                float D = (float)SDL_fabs(NPC[A].Location.X + NPC[A].Location.Width / 2.0 - p.Location.X + p.Location.Width / 2.0) / 100;
-                D += (float)SDL_fabs(p.Location.SpeedX) / 2;
-                if(NPC[A].Location.SpeedX < -5 - D)
-                    NPC[A].Location.SpeedX += 0.2;
+                if(NPC[A].Location.SpeedX >= -speed_bound)
+                    NPC[A].Location.SpeedX -= 0.2;
                 if(NPC[A].Location.X + NPC[A].Location.Width / 2.0 < p.Location.X + p.Location.Width / 2.0 - 50 + (p.Location.SpeedX * 15))
                     NPC[A].SpecialX = 1;
             }
             else
             {
-                NPC[A].Location.SpeedX += 0.2;
-                float D = (float)SDL_fabs(NPC[A].Location.X + NPC[A].Location.Width / 2.0 - p.Location.X + p.Location.Width / 2.0) / 100;
-                D += (float)SDL_fabs(p.Location.SpeedX) / 2;
-                if(NPC[A].Location.SpeedX > 5 + D)
-                    NPC[A].Location.SpeedX -= 0.2;
+                if(NPC[A].Location.SpeedX <= speed_bound)
+                    NPC[A].Location.SpeedX += 0.2;
                 if(NPC[A].Location.X + NPC[A].Location.Width / 2.0 > p.Location.X + p.Location.Width / 2.0 + 50 + (p.Location.SpeedX * 15))
                     NPC[A].SpecialX = 0;
             }
