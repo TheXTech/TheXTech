@@ -110,7 +110,7 @@ std::string StartLevel;
 bool NoMap = false;
 bool RestartLevel = false;
 int WorldStarsShowPolicy = -1;
-float LevelChop[maxSections + 1];
+// float LevelChop[maxSections + 1];
 // RangeArr<int, -FLBlocks, FLBlocks> FirstBlock;
 // RangeArr<int, -FLBlocks, FLBlocks> LastBlock;
 int MidBackground = 1;

@@ -1628,7 +1628,7 @@ void UpdateGraphicsLogic(bool Do_FrameSkip)
 
                 if(is_last && A != 0 && -vScreen[A].X > level[S].X)
                 {
-                    LevelChop[S] += float(-vScreen[A].X - level[S].X);
+                    // LevelChop[S] += float(-vScreen[A].X - level[S].X); // unused since SMBX64, removed
                     level[S].X = -vScreen[A].X;
 
                     // mark that section has shrunk
@@ -1661,7 +1661,7 @@ void UpdateGraphicsLogic(bool Do_FrameSkip)
 
                 if(-screen.vScreen(A).X > level[S].X)
                 {
-                    LevelChop[S] += float(-screen.vScreen(A).X - level[S].X);
+                    // LevelChop[S] += float(-screen.vScreen(A).X - level[S].X); // unused since SMBX64, removed
                     level[S].X = -screen.vScreen(A).X;
 
                     // mark that section has shrunk

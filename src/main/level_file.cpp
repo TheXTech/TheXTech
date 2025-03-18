@@ -1772,7 +1772,7 @@ void ClearLevel()
         level[A] = BlankSpeedless;
         LevelWrap[A] = false;
         LevelVWrap[A] = false;
-        LevelChop[A] = 0;
+        // LevelChop[A] = 0; // unused since SMBX64, removed
         NoTurnBack[A] = false;
         UnderWater[A] = false;
         OffScreenExit[A] = false;

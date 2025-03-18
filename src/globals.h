@@ -1455,7 +1455,7 @@ extern bool RestartLevel;
 //! Per-level stars showing policy
 extern int WorldStarsShowPolicy;
 //Public LevelChop(0 To maxSections) As Single 'for drawing backgrounds when the level has been shrunk
-extern float LevelChop[maxSections + 1];
+// extern float LevelChop[maxSections + 1];
 
 //'collision detection optimization. creates a table of contents for blocks
 // removed in favor of new block quadtree
