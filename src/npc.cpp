@@ -996,7 +996,7 @@ void NPCSpecial(int A)
             if(npc->IsACoin)
             {
                 npc.Special = 1;
-                npc.Location.SpeedX = dRand() * 1 - 0.5;
+                npc.Location.SpeedX = dRand() - 0.5;
             }
 
             if(npc.Direction == 0)
@@ -1053,20 +1053,20 @@ void NPCSpecial(int A)
 
                     if(i == 1 || i == 4)
                     {
-                        NPC[numNPCs].Location.SpeedX = -2.5;
-                        NPC[numNPCs].Location.SpeedY = -1.5;
+                        NPC[numNPCs].Location.SpeedX = -4.0; // -2.5 * 1.6
+                        NPC[numNPCs].Location.SpeedY = -2.4; // -1.5 * 1.6
                     }
                     else
                     {
-                        NPC[numNPCs].Location.SpeedX = -1;
-                        NPC[numNPCs].Location.SpeedY = -2;
+                        NPC[numNPCs].Location.SpeedX = -1.6; // -1.0 * 1.6
+                        NPC[numNPCs].Location.SpeedY = -3.2; // -2 * 1.6
                     }
 
                     if(i == 3 || i == 4)
                         NPC[numNPCs].Location.SpeedX = -NPC[numNPCs].Location.SpeedX;
 
-                    NPC[numNPCs].Location.SpeedX = NPC[numNPCs].Location.SpeedX * 1.6;
-                    NPC[numNPCs].Location.SpeedY = NPC[numNPCs].Location.SpeedY * 1.6;
+                    // NPC[numNPCs].Location.SpeedX = NPC[numNPCs].Location.SpeedX * 1.6;
+                    // NPC[numNPCs].Location.SpeedY = NPC[numNPCs].Location.SpeedY * 1.6;
 
                     syncLayers_NPC(numNPCs);
                 }
@@ -5276,8 +5276,8 @@ void SpecialNPC(int A)
             {
                 NPC[A].Special4 = 0;
                 NewEffect(EFFID_SPARKLE, newLoc(NPC[A].Location.X + dRand() * NPC[A].Location.Width - 2, NPC[A].Location.Y + dRand() * NPC[A].Location.Height));
-                Effect[numEffects].Location.SpeedX = dRand() * 1.0 - 0.5;
-                Effect[numEffects].Location.SpeedY = dRand() * 1.0 - 0.5;
+                Effect[numEffects].Location.SpeedX = dRand() - 0.5;
+                Effect[numEffects].Location.SpeedY = dRand() - 0.5;
             }
         }
         else
@@ -5287,8 +5287,8 @@ void SpecialNPC(int A)
             {
                 NPC[A].Special4 = 0;
                 NewEffect(EFFID_SPARKLE, newLoc(NPC[A].Location.X + dRand() * NPC[A].Location.Width - 2, NPC[A].Location.Y + dRand() * NPC[A].Location.Height));
-                Effect[numEffects].Location.SpeedX = dRand() * 1.0 - 0.5;
-                Effect[numEffects].Location.SpeedY = dRand() * 1.0 - 0.5;
+                Effect[numEffects].Location.SpeedX = dRand() - 0.5;
+                Effect[numEffects].Location.SpeedY = dRand() - 0.5;
                 Effect[numEffects].Frame = 1;
             }
         }
