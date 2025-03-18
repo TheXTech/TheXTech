@@ -277,7 +277,7 @@ void Deactivate(int A)
 
 void Bomb(Location_t Location, int Game, int ImmunePlayer)
 {
-    float Radius = 0;
+    double Radius = 0;
     // int i = 0;
     double X = 0;
     double Y = 0;
@@ -307,8 +307,8 @@ void Bomb(Location_t Location, int Game, int ImmunePlayer)
         Radius = 64;
     }
 
-    X = Location.X + Location.Width / 2.0;
-    Y = Location.Y + Location.Height / 2.0;
+    X = Location.X + Location.Width / 2;
+    Y = Location.Y + Location.Height / 2;
 
     for(int i : treeNPCQuery(newLoc(X - Radius, Y - Radius, Radius * 2, Radius * 2), SORTMODE_ID))
     {
@@ -316,11 +316,11 @@ void Bomb(Location_t Location, int Game, int ImmunePlayer)
         {
             if(NPC[i].Type != NPCID_PLR_FIREBALL && NPC[i].Type != NPCID_CHAR3_HEAVY)
             {
-                A = std::abs(NPC[i].Location.X + NPC[i].Location.Width / 2.0 - X);
-                B = std::abs(NPC[i].Location.Y + NPC[i].Location.Height / 2.0 - Y);
+                A = NPC[i].Location.X + NPC[i].Location.Width / 2 - X;
+                B = NPC[i].Location.Y + NPC[i].Location.Height / 2 - Y;
                 C = std::sqrt(std::pow(A, 2) + std::pow(B, 2));
 
-                if(static_cast<float>(C) <= static_cast<float>(Radius) + static_cast<float>(NPC[i].Location.Width / 4.0 + NPC[i].Location.Height / 4.0))
+                if(C <= Radius + NPC[i].Location.Width / 4 + NPC[i].Location.Height / 4)
                 {
                     NPC[0].Location = NPC[i].Location;
                     NPCHit(i, 3, 0);
@@ -339,10 +339,10 @@ void Bomb(Location_t Location, int Game, int ImmunePlayer)
     {
         if(!Block[i].Hidden && !BlockNoClipping[Block[i].Type])
         {
-            A = std::abs(Block[i].Location.X + Block[i].Location.Width / 2.0 - X);
-            B = std::abs(Block[i].Location.Y + Block[i].Location.Height / 2.0 - Y);
+            A = Block[i].Location.X + Block[i].Location.Width / 2 - X;
+            B = Block[i].Location.Y + Block[i].Location.Height / 2 - Y;
             C = std::sqrt(std::pow(A, 2) + std::pow(B, 2));
-            if((float)C <= Radius + (Block[i].Location.Width / 4.0 + Block[i].Location.Height / 4.0))
+            if(C <= Radius + Block[i].Location.Width / 4 + Block[i].Location.Height / 4)
             {
                 BlockHit(i);
                 BlockHitHard(i);
@@ -352,27 +352,16 @@ void Bomb(Location_t Location, int Game, int ImmunePlayer)
         }
     }
 
-    if(Game != 0)
+    if(Game != 0 || BattleMode)
     {
         for(int i = 1; i <= numPlayers; i++)
         {
-            A = std::abs(Player[i].Location.X + Player[i].Location.Width / 2.0 - X);
-            B = std::abs(Player[i].Location.Y + Player[i].Location.Height / 2.0 - Y);
-            C = std::sqrt(std::pow(A, 2) + std::pow(B, 2));
-            if((float)C <= Radius + (Player[i].Location.Width / 4.0 + Player[i].Location.Height / 4.0))
-                PlayerHurt(i);
-        }
-    }
-    else if(BattleMode)
-    {
-        for(int i = 1; i <= numPlayers; i++)
-        {
-            if(i != ImmunePlayer)
+            if(Game != 0 || i != ImmunePlayer)
             {
-                A = std::abs(Player[i].Location.X + Player[i].Location.Width / 2.0 - X);
-                B = std::abs(Player[i].Location.Y + Player[i].Location.Height / 2.0 - Y);
+                A = Player[i].Location.X + Player[i].Location.Width / 2.0 - X;
+                B = Player[i].Location.Y + Player[i].Location.Height / 2.0 - Y;
                 C = std::sqrt(std::pow(A, 2) + std::pow(B, 2));
-                if((float)C <= Radius + (Player[i].Location.Width / 4.0 + Player[i].Location.Height / 4.0))
+                if(C <= Radius + Player[i].Location.Width / 4 + Player[i].Location.Height / 4)
                     PlayerHurt(i);
             }
         }
