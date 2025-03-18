@@ -1549,7 +1549,7 @@ void EveryonesDead()
     else
         Lives--;
 
-    if(g_config.modern_lives_system || Lives >= 0.f)
+    if(g_config.modern_lives_system || Lives >= 0)
     {
         LevelMacro = LEVELMACRO_OFF;
         LevelMacroCounter = 0;

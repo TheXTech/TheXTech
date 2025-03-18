@@ -1904,7 +1904,7 @@ extern bool IsHubLevel;
 //Public Coins As Integer 'number of coins
 extern int Coins;
 //Public Lives As Single 'number of lives
-extern float Lives;
+extern int Lives;
 //NEW: tracker of number of hundreds of coins that have been obtained
 extern int g_100s;
 //Public EndIntro As Boolean

@@ -288,7 +288,7 @@ void SaveGame()
                                                         fmt::format_ne("save{0}.nosave", selSave));
 
 //    Open SelectWorld[selWorld].WorldPath + "save" + selSave + ".sav" For Output As #1;
-    sav.lives = int(Lives);
+    sav.lives = Lives;
     sav.hundreds = (g_100s >= 0) ? g_100s + 1 : g_100s;
     sav.coins = uint32_t(Coins);
     sav.points = uint32_t(Score);
@@ -385,7 +385,7 @@ void LoadGame()
     // load settings from save file here
     g_config.LoadEpisodeConfig(sav.userData);
 
-    Lives = float(sav.lives);
+    Lives = sav.lives;
     g_100s = (sav.hundreds == 0) ? sav.lives : ((sav.hundreds > 0) ? sav.hundreds - 1 : sav.hundreds);
     Coins = int(sav.coins);
     Score = int(sav.points);
