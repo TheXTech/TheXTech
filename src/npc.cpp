@@ -2972,8 +2972,9 @@ void NPCSpecial(int A)
                                 if(i == j) // And DScreenType <> 5 Then
                                     continue;
                                 Player[j].Section = p.Section;
-                                Player[j].Location.Y = p.Location.Y + p.Location.Height - p.Location.Height;
-                                Player[j].Location.X = p.Location.X + p.Location.Width / 2.0 - p.Location.Width / 2.0;
+                                // yes, it's a VB6 bug
+                                Player[j].Location.Y = p.Location.Y /* + p.Location.Height - p.Location.Height*/;
+                                Player[j].Location.X = p.Location.X /* + p.Location.Width / 2.0 - p.Location.Width / 2.0*/;
                                 Player[j].Location.SpeedX = 0;
                                 Player[j].Location.SpeedY = 0;
                                 Player[j].Effect = PLREFF_WAITING;
