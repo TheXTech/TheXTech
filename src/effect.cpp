@@ -1283,8 +1283,8 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
                 // ne.Location.SpeedX = 0; // Assigned below
                 ne.Life = 15;
 
-                ne.Location.SpeedX = 3 * 0.8;
-                ne.Location.SpeedY = 1.5 * 0.8;
+                ne.Location.SpeedX = 2.4; // 3 * 0.8;
+                ne.Location.SpeedY = 1.2; // 1.5 * 0.8;
 
                 if(B == 1 || B == 2)
                     ne.Location.SpeedY = -ne.Location.SpeedY;
@@ -1356,14 +1356,14 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
                 ne.Life = 10;
                 if(B == 1 || B == 3 || B == 4 || B == 6)
                 {
-                    ne.Location.SpeedY = 3.5;
-                    ne.Location.SpeedX = 2;
+                    ne.Location.SpeedY = 1.75; // 3.5 * 0.5
+                    ne.Location.SpeedX = 1; // 2 * 0.5
                 }
                 else
                 {
                     ne.Life = 11;
                     ne.Location.SpeedY = 0;
-                    ne.Location.SpeedX = 4;
+                    ne.Location.SpeedX = 2; // 4 * 0.5
                 }
 
                 if(B <= 3)
@@ -1376,8 +1376,8 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
                     ne.Location.SpeedX = ne.Location.SpeedY;
                     ne.Location.SpeedY = tempDoub;
                 }
-                ne.Location.SpeedX = ne.Location.SpeedX * 0.5;
-                ne.Location.SpeedY = ne.Location.SpeedY * 0.5;
+                // ne.Location.SpeedX = ne.Location.SpeedX * 0.5;
+                // ne.Location.SpeedY = ne.Location.SpeedY * 0.5;
 
                 ne.Location.X += ne.Location.SpeedX * 3;
                 ne.Location.Y += ne.Location.SpeedY * 3;
@@ -1407,14 +1407,14 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
                 ne.Life = 13;
                 if(B == 1 || B == 3 || B == 4 || B == 6)
                 {
-                    ne.Location.SpeedY = 3;
-                    ne.Location.SpeedX = 2;
+                    ne.Location.SpeedY = 4.5; // 3 * 1.5
+                    ne.Location.SpeedX = 3; // 2 * 1.5
                     ne.Life = 14;
                 }
                 else
                 {
                     ne.Location.SpeedY = 0;
-                    ne.Location.SpeedX = 4;
+                    ne.Location.SpeedX = 6; // 4 * 1.5
                 }
 
                 if(B <= 3)
@@ -1427,8 +1427,8 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
                     ne.Location.SpeedX = ne.Location.SpeedY;
                     ne.Location.SpeedY = tempDoub;
                 }
-                ne.Location.SpeedX = ne.Location.SpeedX * 1.5;
-                ne.Location.SpeedY = ne.Location.SpeedY * 1.5;
+                // ne.Location.SpeedX = ne.Location.SpeedX * 1.5;
+                // ne.Location.SpeedY = ne.Location.SpeedY * 1.5;
                 ne.Frame = Direction;
                 ne.Type = A;
             }
