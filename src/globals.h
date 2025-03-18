@@ -1524,7 +1524,7 @@ DECLREF_T(Scene);
 //Public Credit(1 To 200) As CreditLine 'for end game credits
 extern RangeArr<CreditLine_t, 1, maxCreditsLines> Credit;
 extern int numWorldCredits;
-extern double CreditOffsetY;
+extern int CreditOffsetY;
 extern int CreditTotalHeight;
 //Public numCredits As Integer 'number of credits
 extern int numCredits;
@@ -2156,7 +2156,7 @@ extern bool g_ClonedPlayerMode;
 extern bool GameOutro;
 extern bool GameOutroDoQuit;
 //Public CreditChop As Single
-extern float CreditChop;
+extern int CreditChop;
 //Public EndCredits As Integer
 extern int EndCredits;
 //Public curStars As Integer 'number of stars
@@ -2222,7 +2222,7 @@ extern bool LoadingInProcess;
 //Public LoadCoins As Integer
 extern int LoadCoins;
 //Public LoadCoinsT As Single
-extern float LoadCoinsT;
+extern unsigned int LoadCoinsT;
 
 //'Game Graphics
 //Public GFXBlockCustom(1 To maxBlockType) As Boolean

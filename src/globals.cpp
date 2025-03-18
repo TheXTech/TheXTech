@@ -140,7 +140,7 @@ RangeArr<Tile_t, 1, maxTiles> Tile;
 RangeArr<Scene_t, 1, maxScenes> Scene;
 RangeArr<CreditLine_t, 1, maxCreditsLines> Credit;
 int numWorldCredits = 0;
-double CreditOffsetY = 0.0;
+int CreditOffsetY = 0;
 int CreditTotalHeight = 0;
 int numCredits = 0;
 int numBlock = 0;
@@ -372,7 +372,7 @@ bool g_ClonedPlayerMode = false;
 //std::string CheatString;
 bool GameOutro = false;
 bool GameOutroDoQuit = false;
-float CreditChop = 0.0f;
+int CreditChop = 0;
 int EndCredits = 0;
 int curStars = 0;
 int maxStars = 0;
@@ -403,7 +403,7 @@ RangeArr<SavedChar_t, 0, 10> SavedChar;
 
 bool LoadingInProcess = false;
 int LoadCoins = 0;
-float LoadCoinsT = 0.0f;
+unsigned int LoadCoinsT = 0;
 
 // RangeArrI<bool, 1, maxBlockType, false> GFXBlockCustom;
 //RangeArrI<long, 1, maxBlockType, 0> GFXBlock;

@@ -361,8 +361,8 @@ void Do()
             PlaySoundMenu(SFX_Do);
             GameMenu = false;
             GameOutro = true;
-            CreditChop = XRender::TargetH / 2;
-            EndCredits = 0;
+
+            // these is here only to prevent the screen from looking strange
             SetupCredits();
             return;
         }
