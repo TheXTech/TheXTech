@@ -2147,27 +2147,6 @@ void UpdateMacro()
 // main_config.cpp
 
 
-void NPCyFix()
-{
-    int A = 0;
-    float XnH = 0;
-    float XnHfix = 0;
-
-    for(A = 1; A <= numNPCs; A++)
-    {
-        XnH = NPC[A].Location.Y + NPC[A].Location.Height;
-        if((int(XnH * 100) % 800) / 100 != 0)
-        {
-            if((int(XnH + std::abs((int(XnH * 100) % 800) / 100)) * 100) % 800 == 0)
-                XnHfix = std::abs((int(XnH * 100) % 800) / 100);
-            else
-                XnHfix = std::abs(8 - ((int(XnH * 100) % 800) / 100));
-            NPC[A].Location.Y += XnHfix;
-            treeNPCUpdate(A);
-        }
-    }
-}
-
 void CheckActive()
 {
     // It's useless on Emscripten as no way to check activity (or just differently)

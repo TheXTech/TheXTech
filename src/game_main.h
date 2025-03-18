@@ -110,7 +110,8 @@ void OpenConfig();
 
 void SaveConfig();
 
-void NPCyFix();
+// dead since 1.3
+// void NPCyFix();
 
 // void CheatCode(char NewKey);// Moved into "main/cheat_code.h"
 
