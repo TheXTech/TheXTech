@@ -452,7 +452,6 @@ void ShowLayer(layerindex_t L, bool NoEffect)
 
     int A = 0;
     int B = 0;
-    Location_t tempLocation;
 
     Layer[L].Hidden = false;
     if(L == LAYER_DESTROYED_BLOCKS)
@@ -466,12 +465,7 @@ void ShowLayer(layerindex_t L, bool NoEffect)
         if(NPC[A].Hidden)
         {
             if(!NoEffect && !NPC[A].Generator)
-            {
-                tempLocation = NPC[A].Location;
-                tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[EFFID_SMOKE_S3] / 2.0;
-                tempLocation.Y += tempLocation.Height / 2.0 - EffectHeight[EFFID_SMOKE_S3] / 2.0;
-                NewEffect(EFFID_SMOKE_S3, tempLocation);
-            }
+                NewEffect(EFFID_SMOKE_S3_CENTER, NPC[A].Location);
 
             if(!LevelEditor)
             {
@@ -544,12 +538,7 @@ void ShowLayer(layerindex_t L, bool NoEffect)
         if(Block[A].Hidden)
         {
             if(!NoEffect && !Block[A].Invis)
-            {
-                tempLocation = Block[A].Location;
-                tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[EFFID_SMOKE_S3] / 2.0;
-                tempLocation.Y += tempLocation.Height / 2.0 - EffectHeight[EFFID_SMOKE_S3] / 2.0;
-                NewEffect(EFFID_SMOKE_S3, tempLocation);
-            }
+                NewEffect(EFFID_SMOKE_S3_CENTER, Block[A].Location);
         }
         Block[A].Hidden = false;
 
@@ -564,12 +553,7 @@ void ShowLayer(layerindex_t L, bool NoEffect)
         if(Background[A].Hidden)
         {
             if(!NoEffect)
-            {
-                tempLocation = static_cast<Location_t>(Background[A].Location);
-                tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[EFFID_SMOKE_S3] / 2.0;
-                tempLocation.Y += tempLocation.Height / 2.0 - EffectHeight[EFFID_SMOKE_S3] / 2.0;
-                NewEffect(EFFID_SMOKE_S3, tempLocation);
-            }
+                NewEffect(EFFID_SMOKE_S3_CENTER, static_cast<Location_t>(Background[A].Location));
         }
         Background[A].Hidden = false;
     }
@@ -606,8 +590,6 @@ void HideLayer(layerindex_t L, bool NoEffect)
     if(L == LAYER_NONE)
         return;
 
-    Location_t tempLocation;
-
     Layer[L].Hidden = true;
 
     for(int A : Layer[L].NPCs)
@@ -615,12 +597,7 @@ void HideLayer(layerindex_t L, bool NoEffect)
         if(!NPC[A].Hidden)
         {
             if(!NoEffect && !NPC[A].Generator)
-            {
-                tempLocation = NPC[A].Location;
-                tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[EFFID_SMOKE_S3] / 2.0;
-                tempLocation.Y += tempLocation.Height / 2.0 - EffectHeight[EFFID_SMOKE_S3] / 2.0;
-                NewEffect(EFFID_SMOKE_S3, tempLocation);
-            }
+                NewEffect(EFFID_SMOKE_S3_CENTER, NPC[A].Location);
         }
 
         NPC[A].Hidden = true;
@@ -637,12 +614,7 @@ void HideLayer(layerindex_t L, bool NoEffect)
         if(!Block[A].Hidden)
         {
             if(!NoEffect && !Block[A].Invis)
-            {
-                tempLocation = Block[A].Location;
-                tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[EFFID_SMOKE_S3] / 2.0;
-                tempLocation.Y += tempLocation.Height / 2.0 - EffectHeight[EFFID_SMOKE_S3] / 2.0;
-                NewEffect(EFFID_SMOKE_S3, tempLocation);
-            }
+                NewEffect(EFFID_SMOKE_S3_CENTER, Block[A].Location);
         }
         Block[A].Hidden = true;
     }
@@ -655,12 +627,7 @@ void HideLayer(layerindex_t L, bool NoEffect)
         if(!Background[A].Hidden)
         {
             if(!NoEffect)
-            {
-                tempLocation = static_cast<Location_t>(Background[A].Location);
-                tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[EFFID_SMOKE_S3] / 2.0;
-                tempLocation.Y += tempLocation.Height / 2.0 - EffectHeight[EFFID_SMOKE_S3] / 2.0;
-                NewEffect(EFFID_SMOKE_S3, tempLocation);
-            }
+                NewEffect(EFFID_SMOKE_S3_CENTER, static_cast<Location_t>(Background[A].Location));
         }
         Background[A].Hidden = true;
     }

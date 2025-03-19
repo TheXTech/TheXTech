@@ -1292,10 +1292,7 @@ void ModernNPCScreenLogic(Screen_t& screen, int vscreen_i, bool fill_draw_queue,
         // if in "poof" mode, render the smoke effect on the first frame of the intro for an active NPC, then cancel the intro
         if(NPC_intro_index < NPC_intro_count && NPC_intro_frame[NPC_intro_index] > 0 && NPC[A].Active && NPC_InactiveSmoke(NPC[A]))
         {
-            Location_t tempLocation = NPC[A].Location;
-            tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[EFFID_SMOKE_S3] / 2.0;
-            tempLocation.Y += tempLocation.Height / 2.0 - EffectHeight[EFFID_SMOKE_S3] / 2.0;
-            NewEffect(EFFID_SMOKE_S3, tempLocation);
+            NewEffect(EFFID_SMOKE_S3_CENTER, NPC[A].Location);
 
             // disable the NPC intro
             s_RemoveIntroNPC(NPC_intro_index);

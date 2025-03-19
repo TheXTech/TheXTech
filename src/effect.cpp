@@ -386,11 +386,7 @@ void UpdateEffects()
         else if(e.Type == EFFID_COIN_SWITCH_PRESS || e.Type == EFFID_TIME_SWITCH_PRESS || e.Type == EFFID_TNT_PRESS) // P Switch
         {
             if(e.Life == 1)
-            {
-                e.Location.X += e.Location.Width / 2.0 - EffectWidth[EFFID_SMOKE_S3] / 2.0;
-                e.Location.Y += e.Location.Height / 2.0 - EffectHeight[EFFID_SMOKE_S3] / 2.0;
-                NewEffect(EFFID_SMOKE_S3, e.Location);
-            }
+                NewEffect(EFFID_SMOKE_S3_CENTER, e.Location);
         }
         else if(e.Type == EFFID_SKID_DUST) // Slide Smoke
         {
@@ -1519,22 +1515,28 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
             ne.Type = A;
         }
     }
-    else if(A == 10 || A == 73 || A == 74 || A == 75 || A == 131 || A == 132 || A == 147) // Puff of smoke
+    else if(A == EFFID_SMOKE_S3_CENTER || A == EFFID_SMOKE_S3 || A == EFFID_WHIP || A == EFFID_SKID_DUST || A == EFFID_WHACK || A == EFFID_SMOKE_S4 || A == EFFID_STOMP_INIT || A == EFFID_SMOKE_S2) // Puff of smoke
     {
         numEffects++;
         auto &ne = Effect[numEffects];
         ne.Shadow = Shadow;
-        ne.Location.Width = EffectWidth[A];
-        ne.Location.Height = EffectHeight[A];
         ne.Location.X = Location.X;
         ne.Location.Y = Location.Y;
+
+        if(A == EFFID_SMOKE_S3_CENTER || A == EFFID_SMOKE_S4)
+        {
+            if(A == EFFID_SMOKE_S3_CENTER)
+                A = EFFID_SMOKE_S3;
+
+            ne.Location.X += (Location.Width - EffectWidth[A]) / 2;
+            ne.Location.Y += (Location.Height - EffectHeight[A]) / 2;
+        }
+
+        ne.Location.Width = EffectWidth[A];
+        ne.Location.Height = EffectHeight[A];
         ne.Location.SpeedY = 0;
         ne.Location.SpeedX = 0;
-        if(A == 132)
-        {
-            ne.Location.Y += dRand() * 16 - 8;
-            ne.Location.X += dRand() * 16 - 8;
-        }
+
         ne.Frame = 0;
         ne.Life = 12;
         ne.Type = A;
@@ -1542,12 +1544,12 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
         if(ne.Type == EFFID_SMOKE_S2)
             ne.Life = 24;
 
-        if(A == 73 || A == 75)
+        if(A == EFFID_STOMP_INIT || A == EFFID_WHIP || A == EFFID_WHACK)
         {
             ne.Location.X += dRand() * 16 - 8;
             ne.Location.Y += dRand() * 16 - 8;
         }
-        else if(A == 74)
+        else if(A == EFFID_SKID_DUST)
         {
             ne.Location.X += dRand() * 4 - 2;
             ne.Location.Y += dRand() * 4 - 2;

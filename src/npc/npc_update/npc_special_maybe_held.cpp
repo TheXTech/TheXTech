@@ -760,9 +760,9 @@ void NPCSpecialMaybeHeld(int A)
                         NPC[numNPCs].Location.Y = NPC[A].Location.Y + NPC[A].Location.Height / 2.0 - NPC[numNPCs].Location.Height / 2.0;
                         syncLayers_NPC(numNPCs);
 
-                        Location_t tempLocation = NPC[numNPCs].Location;
-                        tempLocation.X = NPC[numNPCs].Location.X + (NPC[numNPCs].Location.Width / 2.0) * NPC[numNPCs].Direction;
-                        tempLocation.Y = NPC[numNPCs].Location.Y + NPC[numNPCs].Location.Height / 2.0 - EffectHeight[EFFID_SMOKE_S3] / 2.0;
+                        Location_t tempLocation;
+                        tempLocation.X = NPC[numNPCs].Location.X + (NPC[numNPCs].Location.Width / 2) * NPC[numNPCs].Direction;
+                        tempLocation.Y = NPC[numNPCs].Location.Y + NPC[numNPCs].Location.Height / 2 - EffectHeight[EFFID_SMOKE_S3] / 2;
                         NewEffect(EFFID_SMOKE_S3, tempLocation);
 
                         PlaySoundSpatial(SFX_Bullet, NPC[A].Location);

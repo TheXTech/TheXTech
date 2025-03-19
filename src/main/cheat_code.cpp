@@ -482,9 +482,7 @@ static void needATanookiSuit()
             Player[B].Effect2 = 4;
             Player[B].State = 5;
             SizeCheck(Player[B]);
-            NewEffect(EFFID_SMOKE_S3,
-                      newLoc(Player[B].Location.X + Player[B].Location.Width / 2.0 - EffectWidth[EFFID_SMOKE_S3] / 2.0,
-                      Player[B].Location.Y + Player[B].Location.Height / 2.0 - EffectHeight[EFFID_SMOKE_S3] / 2.0));
+            NewEffect(EFFID_SMOKE_S3_CENTER, Player[B].Location);
         }
 
         if(Player[B].Character >= 3 && Player[B].Hearts < 3)
@@ -508,9 +506,7 @@ static void needAHammerSuit()
             Player[B].Effect2 = 4;
             Player[B].State = 6;
             SizeCheck(Player[B]);
-            NewEffect(EFFID_SMOKE_S3,
-                      newLoc(Player[B].Location.X + Player[B].Location.Width / 2.0 - EffectWidth[EFFID_SMOKE_S3] / 2.0,
-                      Player[B].Location.Y + Player[B].Location.Height / 2.0 - EffectHeight[EFFID_SMOKE_S3] / 2.0));
+            NewEffect(EFFID_SMOKE_S3_CENTER, Player[B].Location);
         }
 
         if(Player[B].Character >= 3 && Player[B].Hearts < 3)
@@ -534,9 +530,7 @@ static void needAMushroom()
             Player[B].Effect2 = 4;
             Player[B].State = 2;
             SizeCheck(Player[B]);
-            NewEffect(EFFID_SMOKE_S3,
-                      newLoc(Player[B].Location.X + Player[B].Location.Width / 2.0 - EffectWidth[EFFID_SMOKE_S3] / 2.0,
-                      Player[B].Location.Y + Player[B].Location.Height / 2.0 - EffectHeight[EFFID_SMOKE_S3] / 2.0));
+            NewEffect(EFFID_SMOKE_S3_CENTER, Player[B].Location);
         }
 
         if(Player[B].Character >= 3 && Player[B].Hearts < 3)
@@ -560,9 +554,7 @@ static void needAFlower()
             Player[B].Effect2 = 4;
             Player[B].State = 3;
             SizeCheck(Player[B]);
-            NewEffect(EFFID_SMOKE_S3,
-                      newLoc(Player[B].Location.X + Player[B].Location.Width / 2.0 - EffectWidth[EFFID_SMOKE_S3] / 2.0,
-                      Player[B].Location.Y + Player[B].Location.Height / 2.0 - EffectHeight[EFFID_SMOKE_S3] / 2.0));
+            NewEffect(EFFID_SMOKE_S3_CENTER, Player[B].Location);
         }
 
         if(Player[B].Character >= 3 && Player[B].Hearts < 3)
@@ -586,9 +578,7 @@ static void needAnIceFlower()
             Player[B].Effect2 = 4;
             Player[B].State = 7;
             SizeCheck(Player[B]);
-            NewEffect(EFFID_SMOKE_S3,
-                      newLoc(Player[B].Location.X + Player[B].Location.Width / 2.0 - EffectWidth[EFFID_SMOKE_S3] / 2.0,
-                      Player[B].Location.Y + Player[B].Location.Height / 2.0 - EffectHeight[EFFID_SMOKE_S3] / 2.0));
+            NewEffect(EFFID_SMOKE_S3_CENTER, Player[B].Location);
         }
 
         if(Player[B].Character >= 3 && Player[B].Hearts < 3)
@@ -611,9 +601,7 @@ static void needALeaf()
             Player[B].Effect2 = 4;
             Player[B].State = 4;
             SizeCheck(Player[B]);
-            NewEffect(EFFID_SMOKE_S3,
-                      newLoc(Player[B].Location.X + Player[B].Location.Width / 2.0 - EffectWidth[EFFID_SMOKE_S3] / 2.0,
-                      Player[B].Location.Y + Player[B].Location.Height / 2.0 - EffectHeight[EFFID_SMOKE_S3] / 2.0));
+            NewEffect(EFFID_SMOKE_S3_CENTER, Player[B].Location);
         }
 
         if(Player[B].Character >= 3 && Player[B].Hearts < 3)
@@ -686,17 +674,12 @@ static void blueShoe()
 
 static void shadowStar()
 {
-    Location_t tempLocation;
-
     PlaySound(SFX_Transform);
 
     for(int B = 1; B <= numPlayers; B++)
     {
         Player[B].Immune = 50;
-        tempLocation = Player[B].Location;
-        tempLocation.Y = Player[B].Location.Y + Player[B].Location.Height / 2.0 - 16;
-        tempLocation.X = Player[B].Location.X + Player[B].Location.Width / 2.0 - 16;
-        NewEffect(EFFID_SMOKE_S3, tempLocation);
+        NewEffect(EFFID_SMOKE_S3_CENTER, Player[B].Location);
     }
 
     ShadowMode = !ShadowMode;
@@ -709,8 +692,6 @@ static void shadowStar()
 
 static void becomeAsPeach()
 {
-    Location_t tempLocation;
-
     PlaySound(SFX_Transform);
 
     for(int B = 1; B <= numPlayers; B++)
@@ -728,10 +709,7 @@ static void becomeAsPeach()
             Player[B].StandUp = true;
         }
 
-        tempLocation = Player[B].Location;
-        tempLocation.Y = Player[B].Location.Y + Player[B].Location.Height / 2.0 - 16;
-        tempLocation.X = Player[B].Location.X + Player[B].Location.Width / 2.0 - 16;
-        NewEffect(EFFID_SMOKE_S3, tempLocation);
+        NewEffect(EFFID_SMOKE_S3_CENTER, Player[B].Location);
     }
 
     UpdateYoshiMusic();
@@ -739,8 +717,6 @@ static void becomeAsPeach()
 
 static void becomeAsToad()
 {
-    Location_t tempLocation;
-
     PlaySound(SFX_Transform);
 
     for(int B = 1; B <= numPlayers; B++)
@@ -758,10 +734,7 @@ static void becomeAsToad()
             Player[B].StandUp = true;
         }
 
-        tempLocation = Player[B].Location;
-        tempLocation.Y = Player[B].Location.Y + Player[B].Location.Height / 2.0 - 16;
-        tempLocation.X = Player[B].Location.X + Player[B].Location.Width / 2.0 - 16;
-        NewEffect(EFFID_SMOKE_S3, tempLocation);
+        NewEffect(EFFID_SMOKE_S3_CENTER, Player[B].Location);
     }
 
     UpdateYoshiMusic();
@@ -769,8 +742,6 @@ static void becomeAsToad()
 
 static void becomeAsLink()
 {
-    Location_t tempLocation;
-
     PlaySound(SFX_Transform);
 
     for(int B = 1; B <= numPlayers; B++)
@@ -788,10 +759,7 @@ static void becomeAsLink()
             Player[B].StandUp = true;
         }
 
-        tempLocation = Player[B].Location;
-        tempLocation.Y = Player[B].Location.Y + Player[B].Location.Height / 2.0 - 16;
-        tempLocation.X = Player[B].Location.X + Player[B].Location.Width / 2.0 - 16;
-        NewEffect(EFFID_SMOKE_S3, tempLocation);
+        NewEffect(EFFID_SMOKE_S3_CENTER, Player[B].Location);
     }
 
     UpdateYoshiMusic();
@@ -799,8 +767,6 @@ static void becomeAsLink()
 
 static void becomeAsMario()
 {
-    Location_t tempLocation;
-
     PlaySound(SFX_Transform);
 
     for(int B = 1; B <= numPlayers; B++)
@@ -818,10 +784,7 @@ static void becomeAsMario()
             Player[B].StandUp = true;
         }
 
-        tempLocation = Player[B].Location;
-        tempLocation.Y = Player[B].Location.Y + Player[B].Location.Height / 2.0 - 16;
-        tempLocation.X = Player[B].Location.X + Player[B].Location.Width / 2.0 - 16;
-        NewEffect(EFFID_SMOKE_S3, tempLocation);
+        NewEffect(EFFID_SMOKE_S3_CENTER, Player[B].Location);
     }
 
     UpdateYoshiMusic();
@@ -829,8 +792,6 @@ static void becomeAsMario()
 
 static void becomeAsLuigi()
 {
-    Location_t tempLocation;
-
     PlaySound(SFX_Transform);
 
     for(int B = 1; B <= numPlayers; B++)
@@ -848,10 +809,7 @@ static void becomeAsLuigi()
             Player[B].StandUp = true;
         }
 
-        tempLocation = Player[B].Location;
-        tempLocation.Y = Player[B].Location.Y + Player[B].Location.Height / 2.0 - 16;
-        tempLocation.X = Player[B].Location.X + Player[B].Location.Width / 2.0 - 16;
-        NewEffect(EFFID_SMOKE_S3, tempLocation);
+        NewEffect(EFFID_SMOKE_S3_CENTER, Player[B].Location);
     }
 
     UpdateYoshiMusic();
@@ -1316,8 +1274,6 @@ static void fourSplit()
 
 static void warioTime()
 {
-    Location_t tempLocation;
-
     for(int B : NPCQueues::Active.no_change)
     {
         if(NPC[B].Active)
@@ -1332,13 +1288,10 @@ static void warioTime()
             )
             {
                 PlaySound(SFX_Transform);
-                NPC[B].Location.Y += NPC[B].Location.Height / 2.0;
-                NPC[B].Location.X += NPC[B].Location.Width / 2.0;
-                tempLocation = NPC[B].Location;
-                tempLocation.Y -= 16;
-                tempLocation.X -= 16;
-                NewEffect(EFFID_SMOKE_S3, tempLocation);
+                NewEffect(EFFID_SMOKE_S3_CENTER, NPC[B].Location);
                 NPC[B].Type = NPCID_COIN_S3;
+                NPC[B].Location.Y += NPC[B].Location.Height / 2;
+                NPC[B].Location.X += NPC[B].Location.Width / 2;
                 NPC[B].Location.Width = NPC[B]->TWidth;
                 NPC[B].Location.Height = NPC[B]->THeight;
                 NPC[B].Location.Y += -NPC[B].Location.Height / 2.0;
@@ -1971,17 +1924,12 @@ static void getMeOuttaHere()
 
 static void holyTrinity()
 {
-    Location_t tempLocation;
-
     PlaySound(SFX_Transform);
 
     for(int B = 1; B <= numPlayers; B++)
     {
         Player[B].Immune = 50;
-        tempLocation = Player[B].Location;
-        tempLocation.Y = Player[B].Location.Y + Player[B].Location.Height / 2.0 - 16;
-        tempLocation.X = Player[B].Location.X + Player[B].Location.Width / 2.0 - 16;
-        NewEffect(EFFID_SMOKE_S3, tempLocation);
+        NewEffect(EFFID_SMOKE_S3_CENTER, Player[B].Location);
     }
 
     if(ShadowMode && GodMode && MultiHop)
@@ -2000,17 +1948,12 @@ static void holyTrinity()
 
 static void essentials()
 {
-    Location_t tempLocation;
-
     PlaySound(SFX_Transform);
 
     for(int B = 1; B <= numPlayers; B++)
     {
         Player[B].Immune = 50;
-        tempLocation = Player[B].Location;
-        tempLocation.Y = Player[B].Location.Y + Player[B].Location.Height / 2.0 - 16;
-        tempLocation.X = Player[B].Location.X + Player[B].Location.Width / 2.0 - 16;
-        NewEffect(EFFID_SMOKE_S3, tempLocation);
+        NewEffect(EFFID_SMOKE_S3_CENTER, Player[B].Location);
     }
 
     if(ShadowMode && GodMode && MultiHop && SuperSpeed)

@@ -1253,7 +1253,6 @@ void PlayerDead(int A)
 
 void KillPlayer(const int A)
 {
-    Location_t tempLocation;
     auto &p = Player[A];
 
     p.Location.SpeedX = 0;
@@ -1349,11 +1348,7 @@ void KillPlayer(const int A)
             if(p.Location.X + p.Location.Width / 2.0 > level[p.Section].X + (level[p.Section].Width - level[p.Section].X) / 2)
                 p.Direction = -1;
             p.Immune = 300;
-            tempLocation.Width = 32;
-            tempLocation.Height = 32;
-            tempLocation.X = p.Location.X + p.Location.Width / 2.0 - tempLocation.Width / 2.0;
-            tempLocation.Y = p.Location.Y + p.Location.Height / 2.0 - tempLocation.Height / 2.0;
-            NewEffect(EFFID_SMOKE_S4, tempLocation);
+            NewEffect(EFFID_SMOKE_S4, p.Location);
             UpdateYoshiMusic();
         }
     }
@@ -5987,11 +5982,7 @@ void PlayerEffects(const int A)
             }
 
             p.State = target_state;
-            tempLocation.Width = 32;
-            tempLocation.Height = 32;
-            tempLocation.X = p.Location.X + p.Location.Width / 2.0 - tempLocation.Width / 2.0;
-            tempLocation.Y = p.Location.Y + p.Location.Height / 2.0 - tempLocation.Height / 2.0;
-            NewEffect(EFFID_SMOKE_S4, tempLocation, 1, 0, ShadowMode);
+            NewEffect(EFFID_SMOKE_S4, p.Location, 1, 0, ShadowMode);
         }
 
         p.Effect2 += 1;
@@ -6152,11 +6143,7 @@ void PlayerEffects(const int A)
         {
             UnDuck(Player[A]);
             PlaySoundSpatial(SFX_Transform, p.Location);
-            tempLocation.Width = 32;
-            tempLocation.Height = 32;
-            tempLocation.X = p.Location.X + p.Location.Width / 2.0 - tempLocation.Width / 2.0;
-            tempLocation.Y = p.Location.Y + p.Location.Height / 2.0 - tempLocation.Height / 2.0;
-            NewEffect(EFFID_SMOKE_S3, tempLocation, 1, 0, ShadowMode);
+            NewEffect(EFFID_SMOKE_S3_CENTER, p.Location, 1, 0, ShadowMode);
 
             if(!p.Stoned)
             {
@@ -6764,12 +6751,7 @@ void SwapCharacter(int A, int Character, bool FromBlock)
     }
 
     if(!LevelSelect)
-    {
-        Location_t tempLocation = p.Location;
-        tempLocation.Y = p.Location.Y + p.Location.Height / 2.0 - 16;
-        tempLocation.X = p.Location.X + p.Location.Width / 2.0 - 16;
-        NewEffect(EFFID_SMOKE_S3, tempLocation);
-    }
+        NewEffect(EFFID_SMOKE_S3_CENTER, p.Location);
 
     UpdateYoshiMusic();
 }
