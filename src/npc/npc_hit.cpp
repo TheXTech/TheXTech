@@ -1056,7 +1056,7 @@ void NPCHit(int A, int B, int C)
             NPC[A].CantHurtPlayer = NPC[A].HoldingPlayer;
             NPC[A].HoldingPlayer = 0;
             NPC[A].CantHurt = 1000;
-            NPC[A].Location.SpeedX = double(3 * -NPC[A].Direction);
+            NPC[A].Location.SpeedX = 3 * -NPC[A].Direction;
             NPC[A].Location.SpeedY = -3;
             NPC[A].Projectile = true;
         }
@@ -1326,7 +1326,7 @@ void NPCHit(int A, int B, int C)
                 NPC[numNPCs].Projectile = true;
                 NPC[numNPCs].Direction = Player[C].Direction;
                 NPC[numNPCs].Location.SpeedY = 0;
-                NPC[numNPCs].Location.SpeedX = double(Physics.NPCShellSpeed * NPC[numNPCs].Direction);
+                NPC[numNPCs].Location.SpeedX = Physics.NPCShellSpeed * NPC[numNPCs].Direction;
                 NPC[numNPCs].Location.X += -16.0 + NPC[numNPCs].Location.SpeedX;
                 CheckSectionNPC(numNPCs);
                 NPC[numNPCs].CantHurtPlayer = C;
@@ -1342,7 +1342,7 @@ void NPCHit(int A, int B, int C)
             NPCQueues::Unchecked.push_back(A);
 
             NPC[A].Location.Y -= NPC[A].Location.Height;
-            NPC[A].Location.X += -(NPC[A].Location.Width / 2.0) - double(NPC[A].Direction * 2.f);
+            NPC[A].Location.X += -(NPC[A].Location.Width / 2.0) - NPC[A].Direction * 2;
             NPC[A].Location.SpeedX = 0;
             NPC[A].Location.SpeedY = 0;
             NPC[A].RealSpeedX = 0;
@@ -1406,8 +1406,8 @@ void NPCHit(int A, int B, int C)
                 NPC[numNPCs].Projectile = true;
                 NPC[numNPCs].Direction = Player[C].Direction;
                 NPC[numNPCs].Location.SpeedY = 0;
-                NPC[numNPCs].Location.SpeedX = double(Physics.NPCShellSpeed * NPC[numNPCs].Direction);
-                NPC[numNPCs].Location.X += -(16.0 + double(32.0f * NPC[numNPCs].Direction));
+                NPC[numNPCs].Location.SpeedX = Physics.NPCShellSpeed * NPC[numNPCs].Direction;
+                NPC[numNPCs].Location.X += -(16 + 32 * NPC[numNPCs].Direction);
                 CheckSectionNPC(numNPCs);
                 NPC[numNPCs].CantHurtPlayer = C;
                 NPC[numNPCs].CantHurt = 6;
@@ -1419,7 +1419,7 @@ void NPCHit(int A, int B, int C)
             NPC[A].Location.Height = NPC[A]->THeight;
             NPC[A].Location.Width = NPC[A]->TWidth;
             NPC[A].Location.Y -= NPC[A].Location.Height;
-            NPC[A].Location.X += -(NPC[A].Location.Width / 2.0) - double(NPC[A].Direction * 2.f);
+            NPC[A].Location.X += -(NPC[A].Location.Width / 2.0) - NPC[A].Direction * 2;
             NPC[A].Location.SpeedX = 0;
 
             NPCQueues::Unchecked.push_back(A);
@@ -1494,7 +1494,7 @@ void NPCHit(int A, int B, int C)
         if(NPC[A].Damage >= 200)
         {
             NPC[A].Location.SpeedY = -13;
-            NPC[A].Location.SpeedX = double(4 * NPC[C].Direction);
+            NPC[A].Location.SpeedX = 4 * NPC[C].Direction;
             NPC[A].Killed = B;
             if(NPC[A].Legacy)
             {
@@ -1544,7 +1544,7 @@ void NPCHit(int A, int B, int C)
                 if(NPC[A].Location.SpeedX == 0.0 && NPC[A].CantHurtPlayer != C)
                 {
                     PlaySoundSpatial(SFX_ShellHit, NPC[A].Location);
-                    NPC[A].Location.SpeedX = double(Physics.NPCShellSpeed * Player[C].Direction);
+                    NPC[A].Location.SpeedX = Physics.NPCShellSpeed * Player[C].Direction;
                     NPC[A].CantHurt = Physics.NPCCanHurtWait;
                     NPC[A].CantHurtPlayer = C;
                     NPC[A].Projectile = true;
@@ -2156,7 +2156,7 @@ void NPCHit(int A, int B, int C)
                (NPC[A].Type >= NPCID_FIRE_POWER_S1 && NPC[A].Type <= NPCID_3_LIFE) || NPC[A].Type == NPCID_HEAVY_POWER)
             {
                 NPC[A].Direction = Player[C].Direction;
-                NPC[A].Location.SpeedX = std::abs(NPC[A].Location.SpeedX) * double(NPC[A].Direction);
+                NPC[A].Location.SpeedX = std::abs(NPC[A].Location.SpeedX) * NPC[A].Direction;
                 NPC[A].TurnAround = false;
                 NPC[A].Location.SpeedY = -6;
                 PlaySoundSpatial(SFX_Stomp, NPC[A].Location);
