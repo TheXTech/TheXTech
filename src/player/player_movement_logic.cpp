@@ -137,101 +137,66 @@ void PlayerMovementX(int A, float& cursed_value_C)
     // If .Character = 5 Then C = 0.94
     if(Player[A].Character == 5)
         cursed_value_C = 0.95F;
-    if(Player[A].Controls.Left &&
+
+    // deduplicated (was previously separate sections for holding Left and Right)
+    if((Player[A].Controls.Left || Player[A].Controls.Right) &&
        ((!Player[A].Duck && Player[A].GrabTime == 0) ||
         (Player[A].Location.SpeedY != 0.0 && Player[A].StandingOnNPC == 0 && Player[A].Slope == 0) ||
         Player[A].Mount == 1)
     )
     {
+        int dir = (Player[A].Controls.Left) ? -1 : 1;
         Player[A].Bumped = false;
-        if(Player[A].Controls.Run || Player[A].Location.SpeedX > -Physics.PlayerWalkSpeed * speedVar || Player[A].Character == 5)
-        {
-            if(Player[A].Location.SpeedX > -Physics.PlayerWalkSpeed * speedVar * cursed_value_C)
-            {
-                if(Player[A].Character == 2) // LUIGI
-                    Player[A].Location.SpeedX += 0.1 * 0.175;
-                if(Player[A].Character == 3) // PEACH
-                    Player[A].Location.SpeedX += 0.05 * 0.175;
-                if(Player[A].Character == 4) // toad
-                    Player[A].Location.SpeedX += -0.05 * 0.175;
-                Player[A].Location.SpeedX += -0.1 * speedVar;
-            }
-            else // Running
-            {
-                if(Player[A].Character == 2) // LUIGI
-                    Player[A].Location.SpeedX += 0.05 * 0.175;
-                if(Player[A].Character == 3) // PEACH
-                    Player[A].Location.SpeedX += 0.025 * 0.175;
-                if(Player[A].Character == 4) // toad
-                    Player[A].Location.SpeedX += -0.025 * 0.175;
-                if(Player[A].Character == 5) // Link
-                    Player[A].Location.SpeedX += -0.025 * speedVar;
-                else // Mario
-                    Player[A].Location.SpeedX += -0.05 * speedVar;
-            }
 
-            if(Player[A].Location.SpeedX > 0)
-            {
-                Player[A].Location.SpeedX -= 0.18;
-                if(Player[A].Character == 2) // LUIGI
-                    Player[A].Location.SpeedX += 0.18 * 0.29;
-                if(Player[A].Character == 3) // PEACH
-                    Player[A].Location.SpeedX += 0.09 * 0.29;
-                if(Player[A].Character == 4) // toad
-                    Player[A].Location.SpeedX += -0.09 * 0.29;
-                if(SuperSpeed)
-                    Player[A].Location.SpeedX = Player[A].Location.SpeedX * 0.95;
-            }
-        }
-
-        if(SuperSpeed && Player[A].Controls.Run)
-            Player[A].Location.SpeedX -= 0.1;
-    }
-    else if(Player[A].Controls.Right && ((!Player[A].Duck && Player[A].GrabTime == 0) || (Player[A].Location.SpeedY != 0 && Player[A].StandingOnNPC == 0 && Player[A].Slope == 0) || Player[A].Mount == 1))
-    {
-        Player[A].Bumped = false;
-        if(Player[A].Controls.Run || Player[A].Location.SpeedX < Physics.PlayerWalkSpeed * speedVar || Player[A].Character == 5)
+        if(Player[A].Controls.Run || dir * Player[A].Location.SpeedX < Physics.PlayerWalkSpeed * speedVar || Player[A].Character == 5)
         {
-            if(Player[A].Location.SpeedX < Physics.PlayerWalkSpeed * speedVar * cursed_value_C)
+            // turning around or not yet walking
+            if(dir * Player[A].Location.SpeedX < Physics.PlayerWalkSpeed * speedVar * cursed_value_C)
             {
                 if(Player[A].Character == 2) // LUIGI
-                    Player[A].Location.SpeedX += -0.1 * 0.175;
-                if(Player[A].Character == 3) // PEACH
-                    Player[A].Location.SpeedX += -0.05 * 0.175;
-                if(Player[A].Character == 4) // toad
-                    Player[A].Location.SpeedX += 0.05 * 0.175;
-                Player[A].Location.SpeedX += 0.1 * speedVar;
+                    Player[A].Location.SpeedX += dir * (-0.1 * 0.175);
+                else if(Player[A].Character == 3) // PEACH
+                    Player[A].Location.SpeedX += dir * (-0.05 * 0.175);
+                else if(Player[A].Character == 4) // toad
+                    Player[A].Location.SpeedX += dir * (0.05 * 0.175);
+
+                Player[A].Location.SpeedX += dir * 0.1 * speedVar;
             }
+            // running
             else
             {
                 if(Player[A].Character == 2) // LUIGI
-                    Player[A].Location.SpeedX += -0.05 * 0.175;
-                if(Player[A].Character == 3) // PEACH
-                    Player[A].Location.SpeedX += -0.025 * 0.175;
-                if(Player[A].Character == 4) // toad
-                    Player[A].Location.SpeedX += 0.025 * 0.175;
+                    Player[A].Location.SpeedX += dir * (-0.05 * 0.175);
+                else if(Player[A].Character == 3) // PEACH
+                    Player[A].Location.SpeedX += dir * (-0.025 * 0.175);
+                else if(Player[A].Character == 4) // toad
+                    Player[A].Location.SpeedX += dir * (0.025 * 0.175);
+
                 if(Player[A].Character == 5) // Link
-                    Player[A].Location.SpeedX += 0.025 * speedVar;
+                    Player[A].Location.SpeedX += dir * 0.025 * speedVar;
                 else // Mario
-                    Player[A].Location.SpeedX += 0.05 * speedVar;
+                    Player[A].Location.SpeedX += dir * 0.05 * speedVar;
             }
 
-            if(Player[A].Location.SpeedX < 0)
+            // turning around
+            if(dir * Player[A].Location.SpeedX < 0)
             {
-                Player[A].Location.SpeedX += 0.18;
                 if(Player[A].Character == 2) // LUIGI
-                    Player[A].Location.SpeedX += -0.18 * 0.29;
-                if(Player[A].Character == 3) // PEACH
-                    Player[A].Location.SpeedX += -0.09 * 0.29;
-                if(Player[A].Character == 4) // toad
-                    Player[A].Location.SpeedX += 0.09 * 0.29;
+                    Player[A].Location.SpeedX += dir * (-0.18 * 0.29 + 0.18);
+                else if(Player[A].Character == 3) // PEACH
+                    Player[A].Location.SpeedX += dir * (-0.09 * 0.29 + 0.18);
+                else if(Player[A].Character == 4) // toad
+                    Player[A].Location.SpeedX += dir * (0.09 * 0.29 + 0.18);
+                else
+                    Player[A].Location.SpeedX += dir * 0.18;
+
                 if(SuperSpeed)
                     Player[A].Location.SpeedX = Player[A].Location.SpeedX * 0.95;
             }
         }
 
         if(SuperSpeed && Player[A].Controls.Run)
-            Player[A].Location.SpeedX += 0.1;
+            Player[A].Location.SpeedX += dir * 0.1;
     }
     else
     {
@@ -258,6 +223,7 @@ void PlayerMovementX(int A, float& cursed_value_C)
         }
     }
 
+    // hard speed cap
     if(Player[A].Location.SpeedX < -16)
         Player[A].Location.SpeedX = -16;
     else if(Player[A].Location.SpeedX > 16)
@@ -270,6 +236,7 @@ void PlayerMovementX(int A, float& cursed_value_C)
         Player[A].WarpShooted = false;
     }
 
+    // soft speed cap
     if(!Player[A].WarpShooted && (Player[A].Controls.Run || Player[A].Character == 5))
     {
         if(Player[A].Location.SpeedX >= Physics.PlayerRunSpeed * speedVar)
@@ -288,6 +255,8 @@ void PlayerMovementX(int A, float& cursed_value_C)
     }
     else
     {
+        // smooth run->walk deceleration
+        // (note: this is an SMBX 1.3 bug, the correct expression would be Physics.PlayerWalkSpeed * speedVar + 0.1)
         if(Player[A].Location.SpeedX > Physics.PlayerWalkSpeed + 0.1 * speedVar)
             Player[A].Location.SpeedX -= 0.1;
         else if(Player[A].Location.SpeedX < -Physics.PlayerWalkSpeed - 0.1 * speedVar)
