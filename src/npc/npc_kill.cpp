@@ -844,7 +844,7 @@ resume_TriggerLast:
             CharStuff(A, true);
             if(NPC[A].Special == NPCID_RANDOM_POWER)
                 NPC[A].Special = RandomBonus();
-            NewEffect(EFFID_ITEM_POD_OPEN, NPC[A].Location, 1, (int)SDL_floor(NPC[A].Special), false, NPC[A].Variant);
+            NewEffect(EFFID_ITEM_POD_OPEN, NPC[A].Location, 1, NPC[A].Special, false, NPC[A].Variant);
             if(C == 98)
                 Effect[numEffects].Frame += 3;
             else if(C == 99)
