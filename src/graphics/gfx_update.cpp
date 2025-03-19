@@ -490,131 +490,115 @@ static inline void s_get_NPC_tint(int A, XTColor& cn)
 }
 
 // draws a warning icon for offscreen active NPC A on vScreen Z
-void DrawWarningNPC(int Z, int A)
+void DrawWarningNPC(int Z, int camX, int camY, int A)
 {
     XTColor cn;
     s_get_NPC_tint(A, cn);
 
-    double scr_x, scr_y, w, h, frame_h;
-    double frame_x = 0, frame_y = 0;
+    int scr_x = camX + s_round2int(NPC[A].Location.X) + NPC[A]->FrameOffsetX;
+    int scr_y = camY + s_round2int(NPC[A].Location.Y) + NPC[A]->FrameOffsetY;
+    int w = s_round2int(NPC[A].Location.Width);
+    int h = s_round2int(NPC[A].Location.Height);
+    int frame_h = NPC[A]->THeight;
+
+    int frame_x = 0, frame_y = 0;
 
     // some special cases: plants that come from below
-    if(NPC[A].Type == 8 || NPC[A].Type == 74 || NPC[A].Type == 93 || NPC[A].Type == 245 || NPC[A].Type == 256 || NPC[A].Type == 270)
+    if(NPC[A].Type == NPCID_PLANT_S3 || NPC[A].Type == NPCID_BIG_PLANT || NPC[A].Type == NPCID_PLANT_S1 || NPC[A].Type == NPCID_FIRE_PLANT || NPC[A].Type == NPCID_LONG_PLANT_UP || NPC[A].Type == NPCID_JUMP_PLANT)
     {
-        scr_x = vScreen[Z].X + NPC[A].Location.X + NPC[A]->FrameOffsetX;
-        scr_y = vScreen[Z].Y + NPC[A].Location.Y + NPC[A]->FrameOffsetY;
-        w = NPC[A].Location.Width;
-        h = NPC[A].Location.Height;
-        frame_h = NPC[A]->THeight;
+        // these are actually normal but don't have WidthGFX set to 0
     }
     // plants from above
-    else if(NPC[A].Type == 51 || NPC[A].Type == 257)
+    else if(NPC[A].Type == NPCID_BOTTOM_PLANT || NPC[A].Type == NPCID_LONG_PLANT_DOWN)
     {
-        scr_x = vScreen[Z].X + NPC[A].Location.X + NPC[A]->FrameOffsetX;
-        scr_y = vScreen[Z].Y + NPC[A].Location.Y + NPC[A]->FrameOffsetY,
-        w = NPC[A].Location.Width;
-        h = NPC[A].Location.Height;
-        frame_h = NPC[A]->THeight;
-        frame_y = NPC[A]->THeight - NPC[A].Location.Height;
+        frame_y = frame_h - h;
     }
     // plants from side
-    else if(NPC[A].Type == 52)
+    else if(NPC[A].Type == NPCID_SIDE_PLANT)
     {
-        if(NPC[A].Direction == -1)
-        {
-            scr_x = vScreen[Z].X + NPC[A].Location.X + NPC[A]->FrameOffsetX;
-            scr_y = vScreen[Z].Y + NPC[A].Location.Y + NPC[A]->FrameOffsetY;
-            w = NPC[A].Location.Width;
-            frame_h = h = NPC[A].Location.Height;
-        }
-        else
-        {
-            scr_x = vScreen[Z].X + NPC[A].Location.X + NPC[A]->FrameOffsetX;
-            scr_y = vScreen[Z].Y + NPC[A].Location.Y + NPC[A]->FrameOffsetY;
-            w = NPC[A].Location.Width;
-            frame_x = NPC[A]->TWidth - NPC[A].Location.Width;
-            frame_h = h = NPC[A].Location.Height;
-        }
+        if(NPC[A].Direction != -1)
+            frame_x = NPC[A]->TWidth - w;
     }
     else if(NPC[A]->WidthGFX == 0)
     {
-        scr_x = vScreen[Z].X + NPC[A].Location.X + NPC[A]->FrameOffsetX;
-        scr_y = vScreen[Z].Y + NPC[A].Location.Y + NPC[A]->FrameOffsetY;
-        w = NPC[A].Location.Width;
-        frame_h = h = NPC[A].Location.Height;
+        // this is the most normal case
     }
     else
     {
-        scr_x = vScreen[Z].X + NPC[A].Location.X + (NPC[A]->FrameOffsetX * -NPC[A].Direction) - NPC[A]->WidthGFX / 2.0 + NPC[A].Location.Width / 2.0;
-        scr_y = vScreen[Z].Y + NPC[A].Location.Y + NPC[A]->FrameOffsetY - NPC[A]->HeightGFX + NPC[A].Location.Height;
+        if(NPC[A].Direction == 1)
+            scr_x -= NPC[A]->FrameOffsetX * 2;
+
+        scr_x += (w - NPC[A]->WidthGFX) / 2;
+        scr_y += (h - NPC[A]->HeightGFX);
+
         w = NPC[A]->WidthGFX;
         frame_h = h = NPC[A]->HeightGFX;
     }
 
-    double left_x = -scr_x;
-    double right_x = scr_x + w - vScreen[Z].Width;
+    int left_x = -scr_x;
+    int right_x = scr_x + w - vScreen[Z].Width;
 
-    double add_x = (left_x > 0 ? left_x : (right_x > 0 ? -right_x : 0));
+    int add_x = (left_x > 0 ? left_x : (right_x > 0 ? -right_x : 0));
 
-    double top_y = -scr_y;
-    double bottom_y = scr_y + h - vScreen[Z].Height;
+    int top_y = -scr_y;
+    int bottom_y = scr_y + h - vScreen[Z].Height;
 
-    double add_y = (top_y > 0 ? top_y : (bottom_y > 0 ? -bottom_y : 0));
+    int add_y = (top_y > 0 ? top_y : (bottom_y > 0 ? -bottom_y : 0));
 
     int total_off = (add_x > 0 ? add_x : -add_x)
         + (add_y > 0 ? add_y : -add_y);
 
-    if(total_off >= 250)
+    if(total_off >= 256)
         return;
 
-    int a_scale = (int(cn.a) * (250 - total_off)) / 500;
+    int a_scale = (int(cn.a) * (256 - total_off)) / 512;
     if(a_scale > 255)
         a_scale = 255;
 
     cn.a = uint8_t(a_scale);
 
-    double scale = 0.25 + (250.0 - total_off) / 500.0;
+    int scale = 128 + (256 - total_off);
 
-    scr_x += w * (1 - scale) / 2;
-    scr_y += h * (1 - scale);
+    scr_x += w * (512 - scale) / 1024;
+    scr_y += h * (512 - scale) / 512;
 
-    double exclam_x = 0.5;
-    double exclam_y = 0.5;
+    int exclam_x = 2;
+    int exclam_y = 2;
 
     // push it onto the screen
     if(scr_x < 0)
     {
         scr_x = 0;
-        exclam_x = 0.25;
+        exclam_x = 1;
     }
-    else if(scr_x + w * scale > vScreen[Z].Width)
+    else if(scr_x + w * scale / 512 > vScreen[Z].Width)
     {
-        scr_x = vScreen[Z].Width - w * scale;
-        exclam_x = 0.75;
+        scr_x = vScreen[Z].Width - w * scale / 512;
+        exclam_x = 3;
     }
 
     if(scr_y < 0)
     {
         scr_y = 0;
-        exclam_y = 0.25;
+        exclam_y = 1;
     }
-    else if(scr_y + h * scale > vScreen[Z].Height)
+    else if(scr_y + h * scale / 512 > vScreen[Z].Height)
     {
-        scr_y = vScreen[Z].Height - h * scale;
-        exclam_y = 0.75;
+        scr_y = vScreen[Z].Height - h * scale / 512;
+        exclam_y = 3;
     }
 
     XRender::renderTextureScaleEx(scr_x,
         scr_y,
-        w * scale, h * scale,
+        w * scale / 512, h * scale / 512,
         GFXNPC[NPC[A].Type],
         frame_x, NPC[A].Frame * frame_h + frame_y,
         w, h,
         0, nullptr, X_FLIP_NONE,
         cn);
 
-    XRender::renderTexture(scr_x + (w * scale - GFX.Chat.w) * exclam_x,
-        scr_y + (h * scale - GFX.Chat.h) * exclam_y,
+    XRender::renderTextureBasic(scr_x + (w * scale / 512 - GFX.Chat.w) * exclam_x / 4,
+        scr_y + (h * scale / 512 - GFX.Chat.h) * exclam_y / 4,
         GFX.Chat,
         {255, 0, 0, cn.a});
 }
@@ -3060,7 +3044,7 @@ void UpdateGraphicsScreen(Screen_t& screen)
         for(size_t i = 0; i < NPC_Draw_Queue_p.Warning_n; i++)
         {
             int A = NPC_Draw_Queue_p.Warning[i];
-            DrawWarningNPC(Z, A);
+            DrawWarningNPC(Z, camX, camY, A);
         }
 
         // water
