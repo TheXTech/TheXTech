@@ -608,7 +608,7 @@ void initAll()
     // PowerUpUnlock.fill(false);
     vScreen.fill(vScreen_t());
     qScreenLoc.fill(vScreen_t());
-    PlayerStart.fill(Location_t());
+    PlayerStart.fill(PlayerStart_t());
     blockCharacter.fill(false);
     OwedMount.fill(0);
     OwedMountType.fill(0);

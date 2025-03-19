@@ -120,13 +120,13 @@ struct SpeedlessLocation_t
 struct PlayerStart_t
 {
 //    X As Double
-    double X = 0.0;
+    int32_t X = 0;
 //    Y As Double
-    double Y = 0.0;
+    int32_t Y = 0;
 //    Height As Double
-    double Height = 0.0;
+    int32_t Height = 0;
 //    Width As Double
-    double Width = 0.0;
+    int32_t Width = 0;
 //! Initial direction [New-added]
     int Direction = 1;
 //End Type
@@ -136,10 +136,10 @@ struct PlayerStart_t
 
     inline bool isNull() const
     {
-        return int(X * 100000) == 0 &&
-               int(Y * 100000) == 0 &&
-               int(Width * 100000) == 0 &&
-               int(Height * 100000) == 0;
+        return X == 0 &&
+               Y == 0 &&
+               Width == 0 &&
+               Height == 0;
     }
 
     inline operator Location_t() const

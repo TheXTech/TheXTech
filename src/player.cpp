@@ -221,7 +221,7 @@ static void s_PlacePlayerAtStart(int A, PlayerStartInfo_t& player_start_info)
     const auto& ps = PlayerStart[use_start + 1];
     auto& pLoc = Player[A].Location;
 
-    double ps_X = ps.X + ps.Width * 0.5 - pLoc.Width * 0.5;
+    double ps_X = ps.X + ps.Width / 2 - pLoc.Width / 2;
     double ps_Y = ps.Y + ps.Height - pLoc.Height;
 
     pLoc.X = ps_X;
@@ -709,15 +709,15 @@ void SetupPlayers()
             else
                 B = 1;
 
-            if(A == 2 && PlayerStart[B].X == 0.0 && PlayerStart[B].Y == 0.0)
+            if(A == 2 && PlayerStart[B].X == 0 && PlayerStart[B].Y == 0)
             {
-                Player[A].Location.X = PlayerStart[1].X + PlayerStart[1].Width * 0.5 - Player[A].Location.Width * 0.5;
+                Player[A].Location.X = PlayerStart[1].X + PlayerStart[1].Width / 2 - Player[A].Location.Width / 2;
                 Player[A].Location.Y = PlayerStart[1].Y + PlayerStart[1].Height - Player[A].Location.Height; // - 2
                 Player[A].Direction = PlayerStart[1].Direction; // manually defined direction of player
             }
             else
             {
-                Player[A].Location.X = PlayerStart[B].X + PlayerStart[B].Width * 0.5 - Player[A].Location.Width * 0.5;
+                Player[A].Location.X = PlayerStart[B].X + PlayerStart[B].Width / 2 - Player[A].Location.Width / 2;
                 Player[A].Location.Y = PlayerStart[B].Y + PlayerStart[B].Height - Player[A].Location.Height; // - 2
                 Player[A].Direction = PlayerStart[B].Direction; // manually defined direction of player
             }
@@ -1340,7 +1340,7 @@ void KillPlayer(const int A)
             constexpr int valid_start_count = 2;
             int use_start = (A - 1) % valid_start_count + 1;
 
-            p.Location.X = PlayerStart[use_start].X + PlayerStart[use_start].Width * 0.5 - p.Location.Width * 0.5;
+            p.Location.X = PlayerStart[use_start].X + PlayerStart[use_start].Width / 2 - p.Location.Width / 2;
             p.Location.Y = PlayerStart[use_start].Y + PlayerStart[use_start].Height - p.Location.Height;
             p.Direction = 1;
 
