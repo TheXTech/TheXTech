@@ -1069,8 +1069,8 @@ static inline bool s_initModernQScreen(Screen_t& screen, const int B, const Spee
             // the next code is designed to avoid needing a qScreen if it wouldn't have occurred in the original game
             bool use_new_resize = true;
 
-            double old_w = qScreenLoc[Z_i].Width;
-            double old_h = qScreenLoc[Z_i].Height;
+            int old_w = qScreenLoc[Z_i].Width;
+            int old_h = qScreenLoc[Z_i].Height;
             double old_x = qScreenLoc[Z_i].X;
             double old_y = qScreenLoc[Z_i].Y;
 
