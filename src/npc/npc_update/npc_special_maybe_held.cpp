@@ -557,7 +557,7 @@ void NPCSpecialMaybeHeld(int A)
                     else
                         NPC[numNPCs].Location.X = NPC[A].Location.X + 54;
                     NPC[numNPCs].Location.Y = NPC[A].Location.Y + 19;
-                    NPC[numNPCs].Location.SpeedX = 4 * double(NPC[numNPCs].Direction);
+                    NPC[numNPCs].Location.SpeedX = 4 * NPC[numNPCs].Direction;
                     double C = (NPC[numNPCs].Location.X + NPC[numNPCs].Location.Width / 2.0) - (Player[NPC[A].Special5].Location.X + Player[NPC[A].Special5].Location.Width / 2.0);
                     double D = (NPC[numNPCs].Location.Y + NPC[numNPCs].Location.Height / 2.0) - (Player[NPC[A].Special5].Location.Y + Player[NPC[A].Special5].Location.Height / 2.0);
                     NPC[numNPCs].Location.SpeedY = D / C * NPC[numNPCs].Location.SpeedX;

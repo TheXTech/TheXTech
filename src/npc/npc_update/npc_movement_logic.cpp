@@ -193,7 +193,7 @@ void NPCMovementLogic(int A, float& speedVar)
 
         NPCFaceNearestPlayer(NPC[A]);
 
-        NPC[A].Location.SpeedX += 0.1 * double(NPC[A].Direction);
+        NPC[A].Location.SpeedX += 0.1 * NPC[A].Direction;
 
         if(NPC[A].Location.SpeedX < -4)
             NPC[A].Location.SpeedX = -4;
@@ -215,7 +215,7 @@ void NPCMovementLogic(int A, float& speedVar)
         {
             NPCFaceNearestPlayer(NPC[A]);
 
-            NPC[A].Location.SpeedX += 0.05 * double(NPC[A].Direction);
+            NPC[A].Location.SpeedX += 0.05 * NPC[A].Direction;
 
             if(NPC[A].Location.SpeedX >= 3)
                 NPC[A].Location.SpeedX = 3;
@@ -299,7 +299,7 @@ void NPCMovementLogic(int A, float& speedVar)
             NPC[A].Location.SpeedX = 4 * NPC[A].Direction;
     }
     else if(NPC[A].Type == NPCID_GHOST_FAST)
-        NPC[A].Location.SpeedX = 2 * double(NPC[A].Direction);
+        NPC[A].Location.SpeedX = 2 * NPC[A].Direction;
 
     // yoshi
     if(NPCIsYoshi(NPC[A]))
