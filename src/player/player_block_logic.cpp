@@ -575,48 +575,44 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
                                 }
 
                             }
-                            else if(HitSpot == 2) // hit the block from the right <----
+                            else if(HitSpot == 2 || HitSpot == 4) // hit the block from the right <---- (or left now! -------.)
                             {
-
-                                if(BlockSlope[Block[oldSlope].Type] == 1 && Block[oldSlope].Location.Y <= Block[B].Location.Y)
+                                if(HitSpot == 2 && BlockSlope[Block[oldSlope].Type] == 1 && Block[oldSlope].Location.Y <= Block[B].Location.Y)
                                 {
                                     // Just a blank block :-P
                                 }
                                 else
                                 {
-                                    if(Player[A].Mount == 2)
-                                        Player[A].mountBump = Player[A].Location.X;
                                     tempSlope2X = Player[A].Location.X;
-                                    Player[A].Location.X = Block[B].Location.X + Block[B].Location.Width + 0.01;
-                                    tempSlope2 = B;
-                                    tempHit2 = true;
-                                    blockPushX = Block[B].Location.SpeedX;
-                                    if(Player[A].Mount == 2)
-                                        Player[A].mountBump = -Player[A].mountBump + Player[A].Location.X;
-                                    Player[A].Pinched.Left2 = 2;
+
+                                    if(HitSpot == 4)
+                                    {
+                                        Player[A].Location.X = Block[B].Location.X - Player[A].Location.Width - 0.01;
+                                        Player[A].Pinched.Right4 = 2;
+                                    }
+                                    else
+                                    {
+                                        Player[A].Location.X = Block[B].Location.X + Block[B].Location.Width + 0.01;
+                                        Player[A].Pinched.Left2 = 2;
+                                    }
+
                                     if(Block[B].Location.SpeedX != 0)
                                     {
                                         Player[A].Pinched.Moving = 2;
                                         Player[A].Pinched.MovingLR = true;
                                     }
-                                }
-                            }
-                            else if(HitSpot == 4) // hit the block from the left -------.
-                            {
-                                if(Player[A].Mount == 2)
-                                    Player[A].mountBump = Player[A].Location.X;
-                                tempSlope2X = Player[A].Location.X;
-                                Player[A].Location.X = Block[B].Location.X - Player[A].Location.Width - 0.01;
-                                tempSlope2 = B;
-                                tempHit2 = true;
-                                blockPushX = Block[B].Location.SpeedX;
-                                if(Player[A].Mount == 2)
-                                    Player[A].mountBump = -Player[A].mountBump + Player[A].Location.X;
-                                Player[A].Pinched.Right4 = 2;
-                                if(Block[B].Location.SpeedX != 0)
-                                {
-                                    Player[A].Pinched.Moving = 2;
-                                    Player[A].Pinched.MovingLR = true;
+
+                                    if(Player[A].Mount == 2)
+                                    {
+                                        // cast to float because in VB6 the old X location was temporarily stored in mountBump, which is a float
+                                        Player[A].mountBump = Player[A].Location.X - (float)tempSlope2X;
+                                    }
+
+                                    tempSlope2 = B;
+                                    tempHit2 = true;
+
+                                    // FIXME: is truncation really the correct behavior here? that's what TheXTech has always done.
+                                    blockPushX = (int)(Block[B].Location.SpeedX);
                                 }
                             }
                             else if(HitSpot == 3) // hit the block from below
