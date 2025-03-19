@@ -121,12 +121,12 @@ void ResetSectionScrolls()
     for(int i = 0; i <= maxSections; i++)
     {
         // initialize the section
-        if(level[i].Height == level[i].Y)
+        if(LevelREAL[i].Height == LevelREAL[i].Y)
         {
-            level[i].Height = (-200000 + 20000 * i);
-            level[i].Y = level[i].Height - 600;
-            level[i].X = (-200000 + 20000 * i);
-            level[i].Width = level[i].X + 800;
+            LevelREAL[i].Height = (-200000 + 20000 * i);
+            LevelREAL[i].Y = LevelREAL[i].Height - 600;
+            LevelREAL[i].X = (-200000 + 20000 * i);
+            LevelREAL[i].Width = LevelREAL[i].X + 800;
 
             // initialize player positions
             if(i == 0)
@@ -135,36 +135,38 @@ void ResetSectionScrolls()
                 {
                     PlayerStart[p].Width = Physics.PlayerWidth[p][2];
                     PlayerStart[p].Height = Physics.PlayerHeight[p][2];
-                    PlayerStart[p].X = level[i].X + 128 - 64 * (p - 1);
-                    PlayerStart[p].Y = level[i].Height - 32 - PlayerStart[p].Height;
+                    PlayerStart[p].X = LevelREAL[i].X + 128 - 64 * (p - 1);
+                    PlayerStart[p].Y = LevelREAL[i].Height - 32 - PlayerStart[p].Height;
                 }
             }
+
+            level[i] = static_cast<SpeedlessLocation_t>(LevelREAL[i]);
         }
 
         // normally start at bottom-left
-        last_vScreenY[i] = -(level[i].Height - screen.H);
-        last_vScreenX[i] = -(level[i].X);
+        last_vScreenY[i] = -(LevelREAL[i].Height - screen.H);
+        last_vScreenX[i] = -(LevelREAL[i].X);
 
         // if player start is in section, start there instead
         for(int p = 1; p <= 2; p++)
         {
-            if(PlayerStart[p].X >= level[i].X && PlayerStart[p].X + PlayerStart[p].Width <= level[i].Width
-                && PlayerStart[p].Y >= level[i].Y && PlayerStart[p].Y + PlayerStart[p].Height <= level[i].Height)
+            if(PlayerStart[p].X >= LevelREAL[i].X && PlayerStart[p].X + PlayerStart[p].Width <= LevelREAL[i].Width
+                && PlayerStart[p].Y >= LevelREAL[i].Y && PlayerStart[p].Y + PlayerStart[p].Height <= LevelREAL[i].Height)
             {
                 // center on player
                 last_vScreenX[i] = -(PlayerStart[p].X + PlayerStart[p].Width / 2 - screen.W / 2);
                 last_vScreenY[i] = -(PlayerStart[p].Y + PlayerStart[p].Height / 2 - screen.H / 2);
 
                 // check section bounds
-                if(-last_vScreenX[i] < level[i].X)
-                    last_vScreenX[i] = -level[i].X;
-                else if(-last_vScreenX[i] + screen.W > level[i].Width)
-                    last_vScreenX[i] = -(level[i].Width - screen.W);
+                if(-last_vScreenX[i] < LevelREAL[i].X)
+                    last_vScreenX[i] = -LevelREAL[i].X;
+                else if(-last_vScreenX[i] + screen.W > LevelREAL[i].Width)
+                    last_vScreenX[i] = -(LevelREAL[i].Width - screen.W);
 
-                if(-last_vScreenY[i] < level[i].Y)
-                    last_vScreenY[i] = -level[i].Y;
-                else if(-last_vScreenY[i] + screen.H > level[i].Height)
-                    last_vScreenY[i] = -(level[i].Height - screen.H);
+                if(-last_vScreenY[i] < LevelREAL[i].Y)
+                    last_vScreenY[i] = -LevelREAL[i].Y;
+                else if(-last_vScreenY[i] + screen.H > LevelREAL[i].Height)
+                    last_vScreenY[i] = -(LevelREAL[i].Height - screen.H);
 
                 // save P1 section
                 if(p == 1)
@@ -176,16 +178,14 @@ void ResetSectionScrolls()
         }
 
         // center on section if screen bigger
-        if(level[i].Width - level[i].X < screen.W)
-            last_vScreenX[i] += screen.W / 2 - (level[i].Width - level[i].X) / 2;
-        if(level[i].Height - level[i].Y < screen.H)
-            last_vScreenY[i] = -level[i].Y + screen.H / 2 - (level[i].Height - level[i].Y) / 2;
+        if(LevelREAL[i].Width - LevelREAL[i].X < screen.W)
+            last_vScreenX[i] += screen.W / 2 - (LevelREAL[i].Width - LevelREAL[i].X) / 2;
+        if(LevelREAL[i].Height - LevelREAL[i].Y < screen.H)
+            last_vScreenY[i] = -LevelREAL[i].Y + screen.H / 2 - (LevelREAL[i].Height - LevelREAL[i].Y) / 2;
 
         // align to grid
-        if(std::fmod((last_vScreenY[i] + 8), 32) != 0.0)
-            last_vScreenY[i] = static_cast<int>(round((last_vScreenY[i] + 8) / 32)) * 32 - 8;
-        if(std::fmod(last_vScreenX[i], 32) != 0.0)
-            last_vScreenX[i] = static_cast<int>(round(last_vScreenX[i] / 32)) * 32;
+        last_vScreenY[i] = ((last_vScreenY[i] + 8 + 16) / 32) * 32 - 8;
+        last_vScreenX[i] = ((last_vScreenX[i] + 16) / 32) * 32;
     }
 
     curSection = p1_section;
