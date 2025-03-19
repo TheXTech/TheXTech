@@ -37,9 +37,9 @@ void PlayerMovementX(int A, float& cursed_value_C)
                 (Player[A].Location.SpeedX > 0 && BlockSlope[Block[Player[A].Slope].Type] == -1) ||
                 (Player[A].Location.SpeedX < 0 && BlockSlope[Block[Player[A].Slope].Type] == 1)
                 )
-            speedVar = (float)(1 - Block[Player[A].Slope].Location.Height / Block[Player[A].Slope].Location.Width * 0.5);
+            speedVar = (float)(1 - Block[Player[A].Slope].Location.Height / Block[Player[A].Slope].Location.Width / 2);
         else if(!Player[A].Slide)
-            speedVar = (float)(1 + (Block[Player[A].Slope].Location.Height / Block[Player[A].Slope].Location.Width * 0.5) * 0.5);
+            speedVar = (float)(1 + (Block[Player[A].Slope].Location.Height / Block[Player[A].Slope].Location.Width / 4));
     }
 
     if(Player[A].Stoned) // if statue form reset to normal
@@ -395,7 +395,8 @@ void PlayerSlideMovementX(int A)
 {
     if(Player[A].Slope > 0)
     {
-        double Angle = 1 / (Block[Player[A].Slope].Location.Width / static_cast<double>(Block[Player[A].Slope].Location.Height));
+        // Angle = 1 / (Block[Player[A].Slope].Location.Width / Block[Player[A].Slope].Location.Height);
+        double Angle = Block[Player[A].Slope].Location.Height / Block[Player[A].Slope].Location.Width;
         double slideSpeed = 0.1 * Angle * BlockSlope[Block[Player[A].Slope].Type];
 
         if(slideSpeed > 0 && Player[A].Location.SpeedX < 0)
@@ -517,7 +518,7 @@ void PlayerMovementY(int A)
                 if(Player[A].CanJump)
                 {
                     PlaySoundSpatial(SFX_Whip, Player[A].Location); // Jump sound
-                    Player[A].Jump = Physics.PlayerJumpHeight * 0.6;
+                    Player[A].Jump = Physics.PlayerJumpHeight * 3 / 5;
                     NPC[Player[A].StandingOnNPC].Location.SpeedY = Physics.PlayerJumpVelocity * 0.9;
                 }
             }
@@ -545,7 +546,7 @@ void PlayerMovementY(int A)
 
                 if(Player[A].StandingOnNPC > 0 && !FreezeNPCs)
                 {
-                    if(NPC[Player[A].StandingOnNPC].Type != 91)
+                    if(NPC[Player[A].StandingOnNPC].Type != NPCID_ITEM_BURIED)
                         Player[A].Location.SpeedX += -NPC[Player[A].StandingOnNPC].Location.SpeedX;
                 }
 
@@ -717,7 +718,7 @@ void PlayerMovementY(int A)
 
                 if(Player[A].StandingOnNPC > 0 && !FreezeNPCs)
                 {
-                    if(NPC[Player[A].StandingOnNPC].Type != 91)
+                    if(NPC[Player[A].StandingOnNPC].Type != NPCID_ITEM_BURIED)
                         Player[A].Location.SpeedX += -NPC[Player[A].StandingOnNPC].Location.SpeedX;
                 }
 
