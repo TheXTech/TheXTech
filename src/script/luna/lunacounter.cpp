@@ -411,24 +411,6 @@ void DeathCounter::Draw(int screenZ)
     }
 }
 
-// PRINT DEBUG - Prints all death records to the screen
-void DeathCounter::PrintDebug() const
-{
-    if(!g_config.luna_enable_engine)
-        return;
-
-    if(!mDeathRecords.empty())
-    {
-        float y = 300;
-        for(const auto &iter : mDeathRecords)
-        {
-            Renderer::Get().AddOp(new RenderStringOp(fmt::format_ne("{0}", iter.m_deaths), 2, 50, y));
-            Renderer::Get().AddOp(new RenderStringOp(iter.m_levelName, 2, 80, y));
-            y += 30;
-        }
-    }
-}
-
 void DeathCounter::CachedPrint::syncCache(int curLevel, int total)
 {
     if(curLevel != counterLevel || total != counterTotal)
