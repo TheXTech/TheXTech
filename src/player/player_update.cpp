@@ -516,7 +516,7 @@ resume_SuperWarp:
                 // shell surf
                 if(Player[A].ShellSurf && Player[A].StandingOnNPC != 0)
                 {
-                    Player[A].Location.X = NPC[Player[A].StandingOnNPC].Location.X + NPC[Player[A].StandingOnNPC].Location.Width / 2.0 - Player[A].Location.Width / 2.0;
+                    Player[A].Location.X = NPC[Player[A].StandingOnNPC].Location.X + (NPC[Player[A].StandingOnNPC].Location.Width - Player[A].Location.Width) / 2;
                     Player[A].Location.SpeedX = 0; // 1 * .Direction
 
                     if(NPC[Player[A].StandingOnNPC].Location.SpeedX == 0)

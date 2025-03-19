@@ -84,7 +84,7 @@ void UpdatePlayerTimeToLive(int A)
 
         // NOTE, there is a bugfix here without a compat flag, previously the * 0.5 did not exist
         constexpr bool do_bugfix = true;
-        Player[B].Location.X = PlayerStart[use_start].X + PlayerStart[use_start].Width * 0.5 - Player[A].Location.Width * (do_bugfix ? 0.5 : 1.0);
+        Player[B].Location.X = PlayerStart[use_start].X + PlayerStart[use_start].Width / 2 - Player[A].Location.Width / (do_bugfix ? 2 : 1);
         Player[B].Location.Y = PlayerStart[use_start].Y + PlayerStart[use_start].Height - Player[A].Location.Height;
         CheckSection(B);
         if(Player[A].Section != Player[B].Section)
@@ -100,7 +100,7 @@ void UpdatePlayerTimeToLive(int A)
         if(shared_screen)
         {
             const vScreen_t& vscreen = screen.vScreen(screen.active_begin() + 1);
-            A1 = (Player[B].Location.X + Player[B].Location.Width * 0.5) - (Player[A].Location.X + Player[A].Location.Width * 0.5);
+            A1 = (Player[B].Location.X - Player[A].Location.X) + (Player[B].Location.Width - Player[A].Location.Width) / 2;
             if(!g_config.multiplayer_pause_controls)
                 B1 = (float)((-vscreen.Y + vscreen.Height * 0.5) - Player[A].Location.Y);
             else
@@ -108,7 +108,7 @@ void UpdatePlayerTimeToLive(int A)
         }
         else if(normal_multiplayer)
         {
-            A1 = (Player[B].Location.X + Player[B].Location.Width * 0.5) - (Player[A].Location.X + Player[A].Location.Width * 0.5);
+            A1 = (Player[B].Location.X - Player[A].Location.X) + (Player[B].Location.Width - Player[A].Location.Width) / 2;
             if(!g_config.multiplayer_pause_controls)
                 B1 = Player[B].Location.Y - Player[A].Location.Y;
             else
@@ -117,7 +117,7 @@ void UpdatePlayerTimeToLive(int A)
         else
         {
             const vScreen_t& vscreen = screen.vScreen(screen.active_begin() + 1);
-            A1 = (float)((-vscreen.X + vscreen.Width * 0.5) - (Player[A].Location.X + Player[A].Location.Width * 0.5));
+            A1 = (float)((-vscreen.X + vscreen.Width * 0.5) - (Player[A].Location.X + Player[A].Location.Width / 2));
             if(!g_config.multiplayer_pause_controls)
                 B1 = (float)((-vscreen.Y + vscreen.Height * 0.5) - Player[A].Location.Y);
             else
@@ -162,7 +162,7 @@ void UpdatePlayerTimeToLive(int A)
                 // new logic: fix player's location
                 if(g_config.multiplayer_pause_controls)
                 {
-                    Player[A].Location.X = Player[B].Location.X + Player[B].Location.Width / 2 - Player[A].Location.Width / 2;
+                    Player[A].Location.X = Player[B].Location.X + (Player[B].Location.Width - Player[A].Location.Width) / 2;
                     Player[A].Location.Y = Player[B].Location.Y + Player[B].Location.Height - Player[A].Location.Height;
                 }
             }
@@ -220,7 +220,7 @@ void UpdatePlayerDead(int A)
 
         if(B)
         {
-            Player[A].Location.X = Player[B].Location.X + Player[B].Location.Width / 2 - Player[A].Location.Width / 2;
+            Player[A].Location.X = Player[B].Location.X + (Player[B].Location.Width - Player[A].Location.Width) / 2;
             Player[A].Location.Y = Player[B].Location.Y + Player[B].Location.Height - Player[A].Location.Height;
 
             if(Player[B].Section != Player[A].Section)

@@ -556,7 +556,7 @@ void UpdateEffects()
 
                     nn.Location.Height = nn->THeight;
                     nn.Location.Width = nn->TWidth;
-                    nn.Location.X = e.Location.X + e.Location.Width / 2.0 - NPC[numNPCs].Location.Width / 2.0;
+                    nn.Location.X = e.Location.X + (e.Location.Width - NPC[numNPCs].Location.Width) / 2;
                     nn.Location.Y = e.Location.Y - 1;
                     nn.Location.SpeedY = -6;
 
@@ -920,7 +920,7 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
         ne.FrameCount = 0;
         ne.Life = 160;
         ne.Type = A;
-        ne.Location.X = Location.X + Location.Width / 2.0 - ne.Location.Width / 2.0;
+        ne.Location.X = Location.X + (Location.Width - ne.Location.Width) / 2;
         ne.Location.Y = Location.Y + Location.Height - ne.Location.Height;
         PlaySoundSpatial(SFX_MagicBossKilled, Location);
     }
@@ -1002,7 +1002,7 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
         ne.NewNpc = NewNpc;
         ne.Location.Width = EffectWidth[A];
         ne.Location.Height = EffectHeight[A];
-        ne.Location.X = Location.X + Location.Width / 2.0 - ne.Location.Width / 2.0;
+        ne.Location.X = Location.X + (Location.Width - ne.Location.Width) / 2;
         ne.Location.Y = Location.Y + Location.Height - ne.Location.Height;
         ne.Location.SpeedX = 0;
         ne.Location.SpeedY = 0;
@@ -1120,7 +1120,7 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
         ne.Shadow = Shadow;
         ne.Location.Width = EffectWidth[A];
         ne.Location.Height = EffectHeight[A];
-        ne.Location.X = Location.X + Location.Width / 2.0 - ne.Location.Width / 2.0;
+        ne.Location.X = Location.X + (Location.Width - ne.Location.Width) / 2;
         ne.Location.Y = Location.Y + Location.Height - ne.Location.Height;
         ne.Location.SpeedY = 0;
         ne.Location.SpeedX = 0;
@@ -1200,8 +1200,8 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
         ne.Shadow = Shadow;
         ne.Location.Width = 64;
         ne.Location.Height = 64;
-        ne.Location.X = Location.X + Location.Width / 2.0 - ne.Location.Width / 2.0;
-        ne.Location.Y = Location.Y + Location.Height / 2.0 - ne.Location.Height / 2.0;
+        ne.Location.X = Location.X + (Location.Width - ne.Location.Width) / 2;
+        ne.Location.Y = Location.Y + (Location.Height - ne.Location.Height) / 2;
         ne.Location.SpeedY = 0;
         ne.Location.SpeedX = 0;
         ne.Frame = 0;
@@ -1231,8 +1231,8 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
         ne.Shadow = Shadow;
         ne.Location.Width = EffectWidth[A];
         ne.Location.Height = EffectHeight[A];
-        ne.Location.X = Location.X - ne.Location.Width * 0.5 + Location.Width * 0.5;
-        ne.Location.Y = Location.Y - ne.Location.Height * 0.5 + Location.Height * 0.5;
+        ne.Location.X = Location.X + (Location.Width - ne.Location.Width) / 2;
+        ne.Location.Y = Location.Y + (Location.Height - ne.Location.Height) / 2;
         ne.Location.SpeedY = -11;
         ne.Location.SpeedX = 0;
         ne.Frame = 0;
@@ -1252,8 +1252,8 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
         ne.Shadow = Shadow;
         ne.Location.Width = EffectWidth[ne.Type];
         ne.Location.Height = EffectHeight[ne.Type];
-        ne.Location.X = Location.X - ne.Location.Width * 0.5 + Location.Width * 0.5;
-        ne.Location.Y = Location.Y - ne.Location.Height * 0.5 + Location.Height * 0.5;
+        ne.Location.X = Location.X + (Location.Width - ne.Location.Width) / 2;
+        ne.Location.Y = Location.Y + (Location.Height - ne.Location.Height) / 2;
         ne.Location.X += dRand() * 32 - 16;
         ne.Location.Y += dRand() * 32 - 16;
         ne.Location.SpeedY = -2;
@@ -1273,8 +1273,8 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
                 ne.Type = A;
                 ne.Location.Width = EffectWidth[A];
                 ne.Location.Height = EffectHeight[A];
-                ne.Location.X = Location.X + Location.Width / 2.0 - ne.Location.Width / 2.0;
-                ne.Location.Y = Location.Y + Location.Height / 2.0 - ne.Location.Height / 2.0;
+                ne.Location.X = Location.X + (Location.Width - ne.Location.Width) / 2;
+                ne.Location.Y = Location.Y + (Location.Height - ne.Location.Height) / 2;
                 // ne.Location.SpeedY = -0; // Assigned below
                 // ne.Location.SpeedX = 0; // Assigned below
                 ne.Life = 15;
@@ -1303,8 +1303,8 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
                 ne.Type = A;
                 ne.Location.Width = EffectWidth[A];
                 ne.Location.Height = EffectHeight[A];
-                ne.Location.X = Location.X + Location.Width / 2.0 - ne.Location.Width / 2.0;
-                ne.Location.Y = Location.Y + Location.Height / 2.0 - ne.Location.Height / 2.0;
+                ne.Location.X = Location.X + (Location.Width - ne.Location.Width) / 2;
+                ne.Location.Y = Location.Y + (Location.Height - ne.Location.Height) / 2;
                 ne.Life = 8;
                 ne.Location.SpeedX = 2;
                 ne.Location.SpeedY = 2;
@@ -1325,8 +1325,8 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
         ne.Shadow = Shadow;
         ne.Location.Width = 16;
         ne.Location.Height = 16;
-        ne.Location.X = Location.X - ne.Location.Width * 0.5 + Location.Width * 0.5;
-        ne.Location.Y = Location.Y - ne.Location.Height * 0.5 + Location.Height * 0.5;
+        ne.Location.X = Location.X + (Location.Width - ne.Location.Width) / 2;
+        ne.Location.Y = Location.Y + (Location.Height - ne.Location.Height) / 2;
         ne.Location.SpeedY = -0;
         ne.Location.SpeedX = 0;
         ne.Frame = 0;
@@ -1345,8 +1345,8 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
                 ne.Shadow = Shadow;
                 ne.Location.Width = EffectWidth[A];
                 ne.Location.Height = EffectHeight[A];
-                ne.Location.X = Location.X + Location.Width / 2.0 - ne.Location.Width / 2.0;
-                ne.Location.Y = Location.Y + Location.Height / 2.0 - ne.Location.Height / 2.0;
+                ne.Location.X = Location.X + (Location.Width - ne.Location.Width) / 2;
+                ne.Location.Y = Location.Y + (Location.Height - ne.Location.Height) / 2;
                 ne.Location.SpeedY = -0;
                 ne.Location.SpeedX = 0;
                 ne.Life = 10;
@@ -1459,7 +1459,7 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
         ne.Shadow = Shadow;
         ne.Location.Width = EffectWidth[A];
         ne.Location.Height = EffectHeight[A];
-        ne.Location.X = Location.X + Location.Width / 2.0 - ne.Location.Width / 2.0;
+        ne.Location.X = Location.X + (Location.Width - ne.Location.Width) / 2;
         ne.Location.Y = Location.Y + Location.Height - ne.Location.Height;
 
         if(fEqual(Location.SpeedY, 0.123))
@@ -1498,8 +1498,8 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
             ne.Shadow = Shadow;
             ne.Location.Width = EffectWidth[A];
             ne.Location.Height = EffectHeight[A];
-            ne.Location.X = Location.X + Location.Width / 2.0 - ne.Location.Width / 2.0;
-            ne.Location.Y = Location.Y + Location.Height / 2.0 - ne.Location.Height / 2.0;
+            ne.Location.X = Location.X + (Location.Width - ne.Location.Width) / 2;
+            ne.Location.Y = Location.Y + (Location.Height - ne.Location.Height) / 2;
             ne.Location.SpeedY = 0;
             ne.Location.SpeedX = 0;
             if(B == 1)
@@ -1562,8 +1562,8 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
         ne.Shadow = Shadow;
         ne.Location.Width = EffectWidth[A];
         ne.Location.Height = EffectHeight[A];
-        ne.Location.X = Location.X + Location.Width / 2.0 - ne.Location.Width / 2.0;
-        ne.Location.Y = Location.Y + Location.Height / 2.0 - ne.Location.Height / 2.0;
+        ne.Location.X = Location.X + (Location.Width - ne.Location.Width) / 2;
+        ne.Location.Y = Location.Y + (Location.Height - ne.Location.Height) / 2;
         ne.Location.SpeedY = 0;
         ne.Location.SpeedX = 0;
         ne.Frame = 0;
@@ -1577,8 +1577,8 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
         ne.Shadow = Shadow;
         ne.Location.Width = 48;
         ne.Location.Height = 48;
-        ne.Location.X = Location.X + Location.Width / 2.0 - ne.Location.Width / 2.0;
-        ne.Location.Y = Location.Y + Location.Height / 2.0 - ne.Location.Height / 2.0;
+        ne.Location.X = Location.X + (Location.Width - ne.Location.Width) / 2;
+        ne.Location.Y = Location.Y + (Location.Height - ne.Location.Height) / 2;
         ne.Location.SpeedY = 0;
         ne.Location.SpeedX = 0;
         ne.Frame = 0;
@@ -1592,7 +1592,7 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
         ne.Shadow = Shadow;
         ne.Location.Width = 32;
         ne.Location.Height = 32;
-        ne.Location.X = Location.X + Location.Width / 2.0 - ne.Location.Width / 2.0;
+        ne.Location.X = Location.X + (Location.Width - ne.Location.Width) / 2;
         ne.Location.Y = Location.Y - 32;
         ne.Location.SpeedY = -8;
         ne.Location.SpeedX = 0;
@@ -1657,8 +1657,8 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
         ne.Shadow = Shadow;
         ne.Location.Width = EffectWidth[A];
         ne.Location.Height = EffectHeight[A];
-        ne.Location.X = Location.X + Location.Width / 2.0 - EffectWidth[A] / 2.0 + dRand() * 4 - 2;
-        ne.Location.Y = Location.Y + Location.Height / 2.0 - EffectHeight[A] / 2.0 + dRand() * 4 - 2;
+        ne.Location.X = Location.X + (Location.Width - EffectWidth[A]) / 2 + dRand() * 4 - 2;
+        ne.Location.Y = Location.Y + (Location.Height - EffectHeight[A]) / 2 + dRand() * 4 - 2;
         ne.Location.SpeedY = 0;
         ne.Location.SpeedX = 0;
         ne.Frame = 0;
@@ -1697,7 +1697,7 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
         ne.Shadow = Shadow;
         ne.Location.Width = EffectWidth[EFFID_LAVA_SPLASH];
         ne.Location.Height = EffectHeight[EFFID_LAVA_SPLASH];
-        ne.Location.X = Location.X + Location.Width / 2.0 - ne.Location.Width / 2.0;
+        ne.Location.X = Location.X + (Location.Width - ne.Location.Width) / 2;
         ne.Location.Y = Location.Y + 24;
         ne.Location.SpeedY = -8;
         ne.Location.SpeedX = 0;
@@ -1712,7 +1712,7 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
         ne.Shadow = Shadow;
         ne.Location.Width = EffectWidth[A];
         ne.Location.Height = EffectHeight[A];
-        ne.Location.X = Location.X + Location.Width / 2.0 - ne.Location.Width / 2.0;
+        ne.Location.X = Location.X + (Location.Width - ne.Location.Width) / 2;
         ne.Location.Y = Location.Y + 22;
         ne.Location.SpeedY = 0;
         ne.Location.SpeedX = 0;
@@ -1839,7 +1839,7 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
         ne.Shadow = Shadow;
         ne.Location.Width = EffectWidth[A];
         ne.Location.Height = EffectHeight[A];
-        ne.Location.X = Location.X + Location.Width / 2.0 - ne.Location.Width / 2.0;
+        ne.Location.X = Location.X + (Location.Width - ne.Location.Width) / 2;
         ne.Location.Y = Location.Y + Location.Height - ne.Location.Height;
         ne.Frame = 0;
 
@@ -1916,7 +1916,7 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
 
         ne.Location.Width = EffectWidth[A];
         ne.Location.Height = EffectHeight[A];
-        ne.Location.X = Location.X + Location.Width / 2.0 - ne.Location.Width / 2.0;
+        ne.Location.X = Location.X + (Location.Width - ne.Location.Width) / 2;
         ne.Location.Y = Location.Y + Location.Height - ne.Location.Height;
 
         ne.Location.X = Location.X;
@@ -1943,7 +1943,7 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
         ne.Shadow = Shadow;
         ne.Location.Width = EffectWidth[A];
         ne.Location.Height = EffectHeight[A];
-        ne.Location.X = Location.X + Location.Width / 2.0 - ne.Location.Width / 2.0;
+        ne.Location.X = Location.X + (Location.Width - ne.Location.Width) / 2;
         ne.Location.Y = Location.Y + Location.Height - ne.Location.Height;
         ne.Location.X = Location.X;
         ne.Location.Y = Location.Y;

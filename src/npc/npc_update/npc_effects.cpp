@@ -164,7 +164,7 @@ static inline void NPCEffectLogic_DropItem(int A)
         vScreen_t& vscreen = vScreenByPlayer(NPC[A].Effect3);
 
         // put above player
-        double target_X = pLoc.X + pLoc.Width / 2 - nLoc.Width / 2;
+        double target_X = pLoc.X + (pLoc.Width - nLoc.Width) / 2;
         double target_Y = pLoc.Y + pLoc.Height - 192;
 
         // anticipate player movement

@@ -182,7 +182,7 @@ void PlayerThrowBomb(int A)
 
     if(p.Duck && (p.Location.SpeedY == 0 || p.Slope > 0 || p.StandingOnNPC != 0))
     {
-        NPC[numNPCs].Location.X = p.Location.X + p.Location.Width / 2.0 - NPC[numNPCs].Location.Width / 2.0;
+        NPC[numNPCs].Location.X = p.Location.X + (p.Location.Width - NPC[numNPCs].Location.Width) / 2;
         NPC[numNPCs].Location.Y = p.Location.Y + p.Location.Height - NPC[numNPCs].Location.Height;
         NPC[numNPCs].Location.SpeedX = 0;
         NPC[numNPCs].Location.SpeedY = 0;
@@ -190,7 +190,7 @@ void PlayerThrowBomb(int A)
     }
     else
     {
-        NPC[numNPCs].Location.X = p.Location.X + p.Location.Width / 2.0 - NPC[numNPCs].Location.Width / 2.0;
+        NPC[numNPCs].Location.X = p.Location.X + (p.Location.Width - NPC[numNPCs].Location.Width) / 2;
         NPC[numNPCs].Location.Y = p.Location.Y;
         NPC[numNPCs].Location.SpeedX = 5 * p.Direction;
         NPC[numNPCs].Location.SpeedY = -6;
@@ -326,7 +326,7 @@ void PlayerThrowHeavy(const int A)
     }
 
     if(p.Character == 4)
-        NPC[numNPCs].Location.X = p.Location.X + p.Location.Width / 2.0 - NPC[numNPCs].Location.Width / 2.0;
+        NPC[numNPCs].Location.X = p.Location.X + (p.Location.Width - NPC[numNPCs].Location.Width) / 2;
 
     syncLayers_NPC(numNPCs);
     CheckSectionNPC(numNPCs);

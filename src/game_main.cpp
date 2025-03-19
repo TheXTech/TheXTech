@@ -1373,7 +1373,7 @@ int GameMain(const CmdLineSetup_t &setup)
                         if(warp.Direction2 == 1) // DOWN
                         {
 //                                .Location.X = Warp(.Warp).Exit.X + Warp(.Warp).Exit.Width / 2 - .Location.Width / 2
-                            p.Location.X = warp.Exit.X + (warp.Exit.Width / 2) - (p.Location.Width / 2);
+                            p.Location.X = warp.Exit.X + (warp.Exit.Width - p.Location.Width) / 2;
 //                                .Location.Y = Warp(.Warp).Exit.Y - .Location.Height - 8
                             p.Location.Y = warp.Exit.Y - p.Location.Height - 8;
                         }
@@ -1381,7 +1381,7 @@ int GameMain(const CmdLineSetup_t &setup)
                         if(warp.Direction2 == 3) // UP
                         {
 //                                .Location.X = Warp(.Warp).Exit.X + Warp(.Warp).Exit.Width / 2 - .Location.Width / 2
-                            p.Location.X = warp.Exit.X + (warp.Exit.Width / 2) - (p.Location.Width / 2);
+                            p.Location.X = warp.Exit.X + (warp.Exit.Width - p.Location.Width) / 2;
 //                                .Location.Y = Warp(.Warp).Exit.Y + Warp(.Warp).Exit.Height + 8
                             p.Location.Y = warp.Exit.Y + warp.Exit.Height + 8;
                         }
@@ -1416,7 +1416,7 @@ int GameMain(const CmdLineSetup_t &setup)
                     else if(warp.Effect == 2)
                     {
 //                            .Location.X = Warp(.Warp).Exit.X + Warp(.Warp).Exit.Width / 2 - .Location.Width / 2
-                        p.Location.X = warp.Exit.X + warp.Exit.Width / 2 - p.Location.Width / 2;
+                        p.Location.X = warp.Exit.X + (warp.Exit.Width - p.Location.Width) / 2;
 //                            .Location.Y = Warp(.Warp).Exit.Y + Warp(.Warp).Exit.Height - .Location.Height
                         p.Location.Y = warp.Exit.Y + warp.Exit.Height - p.Location.Height;
 
@@ -1426,7 +1426,7 @@ int GameMain(const CmdLineSetup_t &setup)
                     }
                     else if(warp.Effect == 3) // Portal warp
                     {
-                        p.Location.X = warp.Exit.X + warp.Exit.Width / 2 - p.Location.Width / 2;
+                        p.Location.X = warp.Exit.X + (warp.Exit.Width - p.Location.Width) / 2;
                         p.Location.Y = warp.Exit.Y + warp.Exit.Height - p.Location.Height;
                         CheckSection(A);
                         p.WarpCD = 50;

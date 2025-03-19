@@ -757,7 +757,7 @@ void NPCSpecialMaybeHeld(int A)
                             NPC[numNPCs].Frame = 1;
                         else
                             NPC[numNPCs].Frame = 0;
-                        NPC[numNPCs].Location.Y = NPC[A].Location.Y + NPC[A].Location.Height / 2.0 - NPC[numNPCs].Location.Height / 2.0;
+                        NPC[numNPCs].Location.Y = NPC[A].Location.Y + (NPC[A].Location.Height - NPC[numNPCs].Location.Height) / 2;
                         syncLayers_NPC(numNPCs);
 
                         Location_t tempLocation;

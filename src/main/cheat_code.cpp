@@ -1994,7 +1994,7 @@ static void foundMyCarKey()
 
         bgo.Location.Width = BackgroundWidth[35];
         bgo.Location.Height = BackgroundHeight[35];
-        bgo.Location.X = pLoc.X + pLoc.Width / 2 - bgo.Location.Width / 2;
+        bgo.Location.X = pLoc.X + (pLoc.Width - bgo.Location.Width) / 2;
         bgo.Location.Y = pLoc.Y + pLoc.Height - bgo.Location.Height;
 
         LevelMacroWhich = numBackground + numLocked + 1;

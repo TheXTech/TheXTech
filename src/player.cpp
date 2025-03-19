@@ -96,7 +96,7 @@ static void setupPlayerAtCheckpoints(NPC_t &npc, Checkpoint_t &cp)
     for(B = 1; B <= numPlayers; B++)
     {
         Player[B].Location.Y = Block[C].Location.Y - Player[B].Location.Height;
-        Player[B].Location.X = npc.Location.X + npc.Location.Width / 2.0 - Player[B].Location.Width / 2.0;
+        Player[B].Location.X = npc.Location.X + (npc.Location.Width - Player[B].Location.Width) / 2;
         CheckSection(B);
         pLogDebug("Restore player %d at checkpoint ID=%d by X=%g, Y=%g",
                   B, cp.id, Player[B].Location.X, Player[B].Location.Y);
@@ -221,7 +221,7 @@ static void s_PlacePlayerAtStart(int A, PlayerStartInfo_t& player_start_info)
     const auto& ps = PlayerStart[use_start + 1];
     auto& pLoc = Player[A].Location;
 
-    double ps_X = ps.X + ps.Width / 2 - pLoc.Width / 2;
+    double ps_X = ps.X + (ps.Width - pLoc.Width) / 2;
     double ps_Y = ps.Y + ps.Height - pLoc.Height;
 
     pLoc.X = ps_X;
@@ -711,13 +711,13 @@ void SetupPlayers()
 
             if(A == 2 && PlayerStart[B].X == 0 && PlayerStart[B].Y == 0)
             {
-                Player[A].Location.X = PlayerStart[1].X + PlayerStart[1].Width / 2 - Player[A].Location.Width / 2;
+                Player[A].Location.X = PlayerStart[1].X + (PlayerStart[1].Width - Player[A].Location.Width) / 2;
                 Player[A].Location.Y = PlayerStart[1].Y + PlayerStart[1].Height - Player[A].Location.Height; // - 2
                 Player[A].Direction = PlayerStart[1].Direction; // manually defined direction of player
             }
             else
             {
-                Player[A].Location.X = PlayerStart[B].X + PlayerStart[B].Width / 2 - Player[A].Location.Width / 2;
+                Player[A].Location.X = PlayerStart[B].X + (PlayerStart[B].Width - Player[A].Location.Width) / 2;
                 Player[A].Location.Y = PlayerStart[B].Y + PlayerStart[B].Height - Player[A].Location.Height; // - 2
                 Player[A].Direction = PlayerStart[B].Direction; // manually defined direction of player
             }
@@ -1339,7 +1339,7 @@ void KillPlayer(const int A)
             constexpr int valid_start_count = 2;
             int use_start = (A - 1) % valid_start_count + 1;
 
-            p.Location.X = PlayerStart[use_start].X + PlayerStart[use_start].Width / 2 - p.Location.Width / 2;
+            p.Location.X = PlayerStart[use_start].X + (PlayerStart[use_start].Width - p.Location.Width) / 2;
             p.Location.Y = PlayerStart[use_start].Y + PlayerStart[use_start].Height - p.Location.Height;
             p.Direction = 1;
 
@@ -1671,7 +1671,7 @@ void CheckSection(const int A)
                             {
                                 if(Player[C].Section == p.Section && C != A)
                                 {
-                                    p.Location.X = Player[C].Location.X + Player[C].Location.Width / 2.0 - p.Location.Width / 2.0;
+                                    p.Location.X = Player[C].Location.X + (Player[C].Location.Width - p.Location.Width) / 2;
                                     p.Location.Y = Player[C].Location.Y + Player[C].Location.Height - p.Location.Height - 0.01;
                                     break;
                                 }
@@ -3341,7 +3341,7 @@ void YoshiPound(const int A, int mount, bool BreakBlocks)
     {
 
         tempLocation.Width = 128;
-        tempLocation.X = p.Location.X + p.Location.Width / 2.0 - tempLocation.Width / 2.0;
+        tempLocation.X = p.Location.X + (p.Location.Width - tempLocation.Width) / 2;
         tempLocation.Height = 32;
         tempLocation.Y = p.Location.Y + p.Location.Height - 16;
 
@@ -3969,8 +3969,8 @@ void YoshiEatCode(const int A)
             {
                 Player[p.YoshiPlayer].Effect = PLREFF_NO_COLLIDE;
                 Player[p.YoshiPlayer].Effect2 = A;
-                Player[p.YoshiPlayer].Location.X = p.YoshiTongue.X + p.YoshiTongue.Width / 2.0 - Player[p.YoshiPlayer].Location.Width / 2.0;
-                Player[p.YoshiPlayer].Location.Y = p.YoshiTongue.Y + p.YoshiTongue.Height / 2.0 - Player[p.YoshiPlayer].Location.Height / 2.0;
+                Player[p.YoshiPlayer].Location.X = p.YoshiTongue.X + (p.YoshiTongue.Width - Player[p.YoshiPlayer].Location.Width) / 2;
+                Player[p.YoshiPlayer].Location.Y = p.YoshiTongue.Y + (p.YoshiTongue.Height - Player[p.YoshiPlayer].Location.Height) / 2;
                 if(Player[p.YoshiPlayer].Location.Y + Player[p.YoshiPlayer].Location.Height > p.Location.Y + p.Location.Height)
                     Player[p.YoshiPlayer].Location.Y = p.Location.Y + p.Location.Height - Player[p.YoshiPlayer].Location.Height;
             }
@@ -4113,8 +4113,8 @@ void YoshiEatCode(const int A)
         {
             Player[p.YoshiPlayer].Effect = PLREFF_PET_INSIDE;
             Player[p.YoshiPlayer].Effect2 = A;
-            Player[p.YoshiPlayer].Location.X = p.Location.X + p.Location.Width / 2.0 - Player[p.YoshiPlayer].Location.Width / 2.0;
-            Player[p.YoshiPlayer].Location.Y = p.Location.Y + p.Location.Height / 2.0 - Player[p.YoshiPlayer].Location.Height / 2.0;
+            Player[p.YoshiPlayer].Location.X = p.Location.X + (p.Location.Width - Player[p.YoshiPlayer].Location.Width) / 2;
+            Player[p.YoshiPlayer].Location.Y = p.Location.Y + (p.Location.Height - Player[p.YoshiPlayer].Location.Height) / 2;
             p.YoshiTFrameCount = 1;
         }
     }
@@ -4178,7 +4178,7 @@ void RespawnPlayerTo(int A, int TargetPlayer)
             const auto& warp_exit = (Player[TargetPlayer].WarpBackward) ? warp.Entrance : warp.Exit;
             const auto warp_exit_dir = (Player[TargetPlayer].WarpBackward) ? warp.Direction : warp.Direction2;
 
-            Player[A].Location.X = warp_exit.X + warp_exit.Width / 2 - Player[A].Location.Width / 2;
+            Player[A].Location.X = warp_exit.X + (warp_exit.Width - Player[A].Location.Width) / 2;
 
             if(Player[TargetPlayer].Effect == PLREFF_WARP_PIPE && warp_exit_dir == 1)
                 Player[A].RespawnY = warp_exit.Y;
@@ -4492,7 +4492,7 @@ void WaterCheck(const int A)
             p.WetFrame = false;
             tempLocation.Width = 32;
             tempLocation.Height = 32;
-            tempLocation.X = p.Location.X + p.Location.Width / 2.0 - tempLocation.Width / 2.0;
+            tempLocation.X = p.Location.X + (p.Location.Width - tempLocation.Width) / 2;
             tempLocation.Y = p.Location.Y + p.Location.Height - tempLocation.Height;
             NewEffect(EFFID_WATER_SPLASH, tempLocation);
         }
@@ -4532,7 +4532,7 @@ void WaterCheck(const int A)
                     {
                         tempLocation.Width = 32;
                         tempLocation.Height = 32;
-                        tempLocation.X = p.Location.X + p.Location.Width / 2.0 - tempLocation.Width / 2.0;
+                        tempLocation.X = p.Location.X + (p.Location.Width - tempLocation.Width) / 2;
                         tempLocation.Y = p.Location.Y + p.Location.Height - tempLocation.Height;
                         NewEffect(EFFID_WATER_SPLASH, tempLocation);
                     }
@@ -5004,7 +5004,7 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
             if(p.Character == 3 || p.Character == 4 || (p.Duck))
             {
                 NPC[p.HoldingNPC].Bouce = true;
-                NPC[p.HoldingNPC].Location.X = p.Location.X + p.Location.Width / 2.0 - use_w / 2.0;
+                NPC[p.HoldingNPC].Location.X = p.Location.X + (p.Location.Width - use_w) / 2;
 
                 if(p.Character == 3) // princess peach
                 {
@@ -5021,7 +5021,7 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
                     {
                         if(NPC[p.HoldingNPC].Type == NPCID_PLR_FIREBALL || NPC[p.HoldingNPC].Type == NPCID_PLR_ICEBALL)
                         {
-                            NPC[p.HoldingNPC].Location.X = p.Location.X + p.Location.Width / 2.0 - use_w / 2.0 + dRand() * 4 - 2;
+                            NPC[p.HoldingNPC].Location.X += dRand() * 4 - 2;
                             NPC[p.HoldingNPC].Location.Y = p.Location.Y - NPC[p.HoldingNPC].Location.Height - 4 + dRand() * 4 - 2;
                         }
                         else
@@ -5162,7 +5162,7 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
                     NPC[p.HoldingNPC].HoldingPlayer = 0;
                     PlaySoundSpatial(SFX_ShellHit, p.Location);
                     NewEffect(EFFID_WHIP, newLoc(NPC[p.HoldingNPC].Location.X, NPC[p.HoldingNPC].Location.Y + NPC[p.HoldingNPC].Location.Height - 16));
-                    NPC[p.HoldingNPC].Location.X = p.Location.X + p.Location.Width / 2.0 - NPC[p.HoldingNPC].Location.Width / 2.0;
+                    NPC[p.HoldingNPC].Location.X = p.Location.X + (p.Location.Width - NPC[p.HoldingNPC].Location.Width) / 2;
                     NPC[p.HoldingNPC].Location.Y = p.Location.Y + p.Location.Height - NPC[p.HoldingNPC].Location.Height;
                     p.Location.Y = NPC[p.HoldingNPC].Location.Y - p.Location.Height;
                     NPC[p.HoldingNPC].Location.SpeedY = p.Location.SpeedY;
@@ -5186,7 +5186,7 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
                 }
                 if(NPC[p.HoldingNPC].Type == NPCID_PLR_FIREBALL || NPC[p.HoldingNPC].Type == NPCID_PLR_ICEBALL || NPC[p.HoldingNPC].Type == NPCID_CHAR3_HEAVY)
                 {
-                    NPC[p.HoldingNPC].Location.X = p.Location.X + p.Location.Width / 2.0 - NPC[p.HoldingNPC].Location.Width / 2.0;
+                    NPC[p.HoldingNPC].Location.X = p.Location.X + (p.Location.Width - NPC[p.HoldingNPC].Location.Width) / 2;
                     if(p.State == 1)
                         NPC[p.HoldingNPC].Location.Y = p.Location.Y - NPC[p.HoldingNPC].Location.Height;
                     else
@@ -6024,8 +6024,8 @@ void PlayerEffects(const int A)
             p.State = 4;
             tempLocation.Width = 32;
             tempLocation.Height = 32;
-            tempLocation.X = p.Location.X + p.Location.Width / 2.0 - tempLocation.Width / 2.0;
-            tempLocation.Y = p.Location.Y + p.Location.Height / 2.0 - tempLocation.Height / 2.0;
+            tempLocation.X = p.Location.X + (p.Location.Width - tempLocation.Width) / 2;
+            tempLocation.Y = p.Location.Y + (p.Location.Height - tempLocation.Height) / 2;
             NewEffect(EFFID_SMOKE_S4, tempLocation, 1, 0, ShadowMode);
         }
 
@@ -6068,8 +6068,8 @@ void PlayerEffects(const int A)
             p.State = 5;
             tempLocation.Width = 32;
             tempLocation.Height = 32;
-            tempLocation.X = p.Location.X + p.Location.Width / 2.0 - tempLocation.Width / 2.0;
-            tempLocation.Y = p.Location.Y + p.Location.Height / 2.0 - tempLocation.Height / 2.0;
+            tempLocation.X = p.Location.X + (p.Location.Width - tempLocation.Width) / 2;
+            tempLocation.Y = p.Location.Y + (p.Location.Height - tempLocation.Height) / 2;
             NewEffect(EFFID_SMOKE_S4, tempLocation, 1, 0, ShadowMode);
         }
 
@@ -6112,8 +6112,8 @@ void PlayerEffects(const int A)
             p.State = 6;
             tempLocation.Width = 32;
             tempLocation.Height = 32;
-            tempLocation.X = p.Location.X + p.Location.Width / 2.0 - tempLocation.Width / 2.0;
-            tempLocation.Y = p.Location.Y + p.Location.Height / 2.0 - tempLocation.Height / 2.0;
+            tempLocation.X = p.Location.X + (p.Location.Width - tempLocation.Width) / 2;
+            tempLocation.Y = p.Location.Y + (p.Location.Height - tempLocation.Height) / 2;
             NewEffect(EFFID_SMOKE_S4, tempLocation, 1, 0, ShadowMode);
         }
 
@@ -6231,7 +6231,7 @@ void PlayerEffects(const int A)
                 p.Effect2 = 0;
 
             p.Immune2 = true;
-            p.Location.X = Player[D].Location.X + Player[D].Location.Width / 2.0 - p.Location.Width / 2.0;
+            p.Location.X = Player[D].Location.X + (Player[D].Location.Width - p.Location.Width) / 2;
             p.Location.Y = Player[D].Location.Y + Player[D].Location.Height - p.Location.Height;
         }
     }
@@ -6253,8 +6253,8 @@ void PlayerEffects(const int A)
         p.HoldingNPC = 0;
         p.StandingOnNPC = 0;
         p.Section = Player[p.Effect2].Section;
-        p.Location.X = Player[p.Effect2].Location.X + Player[p.Effect2].Location.Width / 2.0 - p.Location.Width / 2.0;
-        p.Location.Y = Player[p.Effect2].Location.Y + Player[p.Effect2].Location.Height / 2.0 - p.Location.Height / 2.0;
+        p.Location.X = Player[p.Effect2].Location.X + (Player[p.Effect2].Location.Width - p.Location.Width) / 2;
+        p.Location.Y = Player[p.Effect2].Location.Y + (Player[p.Effect2].Location.Height - p.Location.Height) / 2;
 
         if(Player[p.Effect2].YoshiPlayer != A)
         {
@@ -6470,7 +6470,7 @@ void PlayersEnsureNearby(const Screen_t& screen)
 
         p.Section = pClosest.Section;
 
-        pLoc.X = pClosestLoc.X + pClosestLoc.Width / 2 - pLoc.Width / 2;
+        pLoc.X = pClosestLoc.X + (pClosestLoc.Width - pLoc.Width) / 2;
         pLoc.Y = pClosestLoc.Y + pClosestLoc.Height - pLoc.Height;
     }
 

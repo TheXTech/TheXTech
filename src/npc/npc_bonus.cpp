@@ -202,8 +202,8 @@ static void s_MovePlayersToExit(int got_exit_A)
         auto& p_C = Player[C];
 
         p_C.Section = p_A.Section;
-        p_C.Location.Y = p_A.Location.Y + p_A.Location.Height      - p_C.Location.Height;
-        p_C.Location.X = p_A.Location.X + p_A.Location.Width / 2.0 - p_C.Location.Width / 2.0;
+        p_C.Location.Y = p_A.Location.Y + p_A.Location.Height - p_C.Location.Height;
+        p_C.Location.X = p_A.Location.X + (p_A.Location.Width - p_C.Location.Width) / 2;
         p_C.Location.SpeedX = 0;
         p_C.Location.SpeedY = 0;
         p_C.Effect = PLREFF_WAITING;
@@ -298,10 +298,10 @@ void TouchBonus(int A, int B)
             // swap location
             double touched_X = p_touched.Location.X;
             double touched_Y = p_touched.Location.Y;
-            p_touched.Location.X = p_target.Location.X + p_target.Location.Width / 2.0  - p_touched.Location.Width / 2.0;
-            p_touched.Location.Y = p_target.Location.Y + p_target.Location.Height       - p_touched.Location.Height;
-            p_target.Location.X  = touched_X           + p_touched.Location.Width / 2.0 - p_target.Location.Width / 2.0;
-            p_target.Location.Y  = touched_Y           + p_touched.Location.Height      - p_target.Location.Height;
+            p_touched.Location.X = p_target.Location.X + (p_target.Location.Width  - p_touched.Location.Width) / 2;
+            p_touched.Location.Y = p_target.Location.Y + p_target.Location.Height  - p_touched.Location.Height;
+            p_target.Location.X  = touched_X           + (p_touched.Location.Width - p_target.Location.Width) / 2;
+            p_target.Location.Y  = touched_Y           + p_touched.Location.Height - p_target.Location.Height;
 
             // swap some variables
             std::swap(p_touched.Direction, p_target.Direction);

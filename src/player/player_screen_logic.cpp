@@ -193,8 +193,8 @@ void PlayerEffectWings(int A)
                 target_SpeedY *= 8.0 / target_speed;
             }
 
-            p.Location.SpeedX = p.Location.SpeedX * 0.5 + target_SpeedX * 0.5;
-            p.Location.SpeedY = p.Location.SpeedY * 0.5 + target_SpeedY * 0.5;
+            p.Location.SpeedX = (p.Location.SpeedX + target_SpeedX) / 2;
+            p.Location.SpeedY = (p.Location.SpeedY + target_SpeedY) / 2;
 
             if(SoundPause[SFX_Swim] == 0)
             {
@@ -379,7 +379,7 @@ void PlayerLevelWrapLogic(int A)
                 continue;
 
             // center on player that wrapped
-            o_p.Location.X = pLoc.X + pLoc.Width / 2 - o_p.Location.Width / 2;
+            o_p.Location.X = pLoc.X + (pLoc.Width - o_p.Location.Width) / 2;
             o_p.Location.Y = target_Y - ((o_p.Mount != 2) ? o_p.Location.Height : 0);
 
             // make sure fully in section

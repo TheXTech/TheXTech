@@ -329,7 +329,7 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                                 Player[A].Location.SpeedX = 0;
                                 Player[A].Location.SpeedY = 0;
                                 // Stop
-                                Player[A].Location.X = Warp[Player[A].Warp].Entrance.X + Warp[Player[A].Warp].Entrance.Width / 2.0 - Player[A].Location.Width / 2.0;
+                                Player[A].Location.X = Warp[Player[A].Warp].Entrance.X + (Warp[Player[A].Warp].Entrance.Width - Player[A].Location.Width) / 2;
                                 Player[A].Location.Y = Warp[Player[A].Warp].Entrance.Y + Warp[Player[A].Warp].Entrance.Height - Player[A].Location.Height;
                                 tempLocation = static_cast<Location_t>(Warp[numWarps + 1].Entrance);
                                 tempLocation.Y -= 32;
@@ -436,7 +436,7 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                                             NPC[numNPCs].Location.Height = NPC[numNPCs]->THeight;
                                             NPC[numNPCs].Location.Width = NPC[numNPCs]->TWidth;
                                             NPC[numNPCs].Location.Y = Player[A].Location.Height + Player[A].Location.Y - NPC[numNPCs].Location.Height;
-                                            NPC[numNPCs].Location.X = Player[A].Location.X + Player[A].Location.Width / 2.0 - NPC[numNPCs].Location.Width / 2.0;
+                                            NPC[numNPCs].Location.X = Player[A].Location.X + (Player[A].Location.Width - NPC[numNPCs].Location.Width) / 2;
                                             NPC[numNPCs].Location.SpeedX = (i == 0) ? -4 : 4;
                                             NPC[numNPCs].Location.SpeedY = 10;
                                             syncLayers_NPC(numNPCs);
@@ -1281,7 +1281,7 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
         if(NPC[Player[A].StandingOnNPC].Type == NPCID_COCKPIT)
         {
             Player[A].Driving = true;
-            Player[A].Location.X = NPC[Player[A].StandingOnNPC].Location.X + NPC[Player[A].StandingOnNPC].Location.Width / 2.0 - Player[A].Location.Width / 2.0;
+            Player[A].Location.X = NPC[Player[A].StandingOnNPC].Location.X + (NPC[Player[A].StandingOnNPC].Location.Width - Player[A].Location.Width) / 2;
             Player[A].Direction = NPC[Player[A].StandingOnNPC].DefaultDirection;
         }
     }

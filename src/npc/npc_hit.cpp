@@ -2295,8 +2295,8 @@ void NPCHit(int A, int B, int C)
             else
             {
                 tempLocation = NPC[A].Location;
-                tempLocation.Y = (NPC[C].Location.Y + tempLocation.Y + NPC[C].Location.Height / 2.0 + tempLocation.Height / 2.0) / 2 - 16;
-                tempLocation.X = (NPC[C].Location.X + tempLocation.X + NPC[C].Location.Width / 2.0 + tempLocation.Width / 2.0) / 2 - 16;
+                tempLocation.Y = (NPC[C].Location.Y + tempLocation.Y + (NPC[C].Location.Height + tempLocation.Height) / 2) / 2 - 16;
+                tempLocation.X = (NPC[C].Location.X + tempLocation.X + (NPC[C].Location.Width + tempLocation.Width) / 2) / 2 - 16;
             }
             NewEffect(EFFID_WHACK, tempLocation);
         }

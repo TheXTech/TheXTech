@@ -388,12 +388,12 @@ void DropNPC(int A, int NPCType)
                 B = -40;
             if(A == 2)
                 B = 40;
-            NPC[numNPCs].Location.X = -vScreen[1].X + vScreen[1].Width / 2.0 - NPC[numNPCs].Location.Width / 2.0 + B;
+            NPC[numNPCs].Location.X = -vScreen[1].X + vScreen[1].Width / 2 - NPC[numNPCs].Location.Width / 2 + B;
             NPC[numNPCs].Location.Y = -vScreen[1].Y + 16 + 12;
         }
         else
         {
-            NPC[numNPCs].Location.X = -vScreen[A].X + vScreen[A].Width / 2.0 - NPC[numNPCs].Location.Width / 2.0;
+            NPC[numNPCs].Location.X = -vScreen[A].X + vScreen[A].Width / 2 - NPC[numNPCs].Location.Width / 2;
             NPC[numNPCs].Location.Y = -vScreen[A].Y + 16 + 12;
         }
         NPC[numNPCs].Location.SpeedX = 0;
@@ -674,8 +674,8 @@ void NPCSpecial(int A)
         npc.Location.SpeedY = -2;
         tempLocation.Height = 28;
         tempLocation.Width = 30;
-        tempLocation.Y = npc.Location.Y + npc.Location.Height / 2.0 - tempLocation.Height / 2.0;
-        tempLocation.X = npc.Location.X + npc.Location.Width / 2.0 - tempLocation.Width / 2.0;
+        tempLocation.Y = npc.Location.Y + (npc.Location.Height - tempLocation.Height) / 2;
+        tempLocation.X = npc.Location.X + (npc.Location.Width - tempLocation.Width) / 2;
         tempBool = false;
 
         for(int i : treeNPCQuery(tempLocation, SORTMODE_NONE))
@@ -723,7 +723,7 @@ void NPCSpecial(int A)
             NPC[numNPCs].Location.Y = vb6Round(npc.Location.Y / 32) * 32;
             NPC[numNPCs].Location.Height = 32;
             NPC[numNPCs].Location.Width = NPC[numNPCs]->TWidth;
-            NPC[numNPCs].Location.X = npc.Location.X + npc.Location.Width / 2.0 - NPC[numNPCs].Location.Width / 2.0;
+            NPC[numNPCs].Location.X = npc.Location.X + (npc.Location.Width - NPC[numNPCs].Location.Width) / 2;
             NPC[numNPCs].Active = true;
             NPC[numNPCs].TimeLeft = 100;
             NPC[numNPCs].Section = npc.Section;
@@ -1046,7 +1046,7 @@ void NPCSpecial(int A)
                     NPC[numNPCs].Location.Width = NPC[numNPCs]->TWidth;
                     NPC[numNPCs].Section = npc.Section;
                     NPC[numNPCs].TimeLeft = npc.TimeLeft;
-                    NPC[numNPCs].Location.X = npc.Location.X + npc.Location.Width / 2.0 - NPC[numNPCs].Location.Width / 2.0;
+                    NPC[numNPCs].Location.X = npc.Location.X + (npc.Location.Width - NPC[numNPCs].Location.Width) / 2;
                     NPC[numNPCs].Location.Y = npc.Location.Y - NPC[numNPCs].Location.Height;
                     NPC[numNPCs].Active = true;
                     NPC[numNPCs].Layer = npc.Layer;
@@ -1766,7 +1766,7 @@ void NPCSpecial(int A)
                 NPC[numNPCs].Location.Height = NPC[numNPCs]->THeight;
                 NPC[numNPCs].Location.Width = NPC[numNPCs]->TWidth;
                 NPC[numNPCs].Location.Y = npc.Location.Y + npc.Location.Height - 48;
-                NPC[numNPCs].Location.X = npc.Location.X + npc.Location.Width / 2.0 - NPC[numNPCs].Location.Width / 2.0 - 12 * NPC[numNPCs].Direction;
+                NPC[numNPCs].Location.X = npc.Location.X + (npc.Location.Width - NPC[numNPCs].Location.Width) / 2 - 12 * NPC[numNPCs].Direction;
                 NPC[numNPCs].TimeLeft = 100;
                 NPC[numNPCs].Section = npc.Section;
                 NPC[numNPCs].Location.SpeedX = (5 + dRand() * 3) * NPC[numNPCs].Direction;
@@ -2963,7 +2963,7 @@ void NPCSpecial(int A)
                                 Player[j].Section = p.Section;
                                 // yes, it's a VB6 bug
                                 Player[j].Location.Y = p.Location.Y /* + p.Location.Height - p.Location.Height*/;
-                                Player[j].Location.X = p.Location.X /* + p.Location.Width / 2.0 - p.Location.Width / 2.0*/;
+                                Player[j].Location.X = p.Location.X /* + (p.Location.Width - p.Location.Width) / 2*/;
                                 Player[j].Location.SpeedX = 0;
                                 Player[j].Location.SpeedY = 0;
                                 Player[j].Effect = PLREFF_WAITING;
@@ -4894,7 +4894,8 @@ void SpecialNPC(int A)
                 }
             }
 
-            if(SDL_fabs(NPC[A].Location.X + NPC[A].Location.Width / 2.0 - p.Location.X + p.Location.Width / 2.0) < 100)
+            // yes, it's a VB6 bug, p.Location.Width / 2 should be subtracted, not added
+            if(SDL_fabs(NPC[A].Location.X - p.Location.X + (NPC[A].Location.Width + p.Location.Width) / 2) < 100)
             {
                 if(NPC[A].Special4 == 0)
                 {
@@ -5025,7 +5026,7 @@ void SpecialNPC(int A)
 
                     NPC[numNPCs].Location.Height = NPC[numNPCs]->THeight;
                     NPC[numNPCs].Location.Width = NPC[numNPCs]->TWidth;
-                    NPC[numNPCs].Location.X = NPC[A].Location.X + NPC[A].Location.Width / 2.0 - NPC[numNPCs].Location.Width / 2.0;
+                    NPC[numNPCs].Location.X = NPC[A].Location.X + (NPC[A].Location.Width - NPC[numNPCs].Location.Width) / 2;
                     NPC[numNPCs].Location.Y = NPC[A].Location.Y + 8;
 
                     NPC[numNPCs].Location.SpeedX = (1 + dRand() * 2) * double(NPC[numNPCs].Direction);
@@ -5619,7 +5620,7 @@ void CharStuff(int WhatNPC, bool CheckEggs)
                     NPC[A].Type = NPCID_POWER_S5;
                     NPC[A].Location.SpeedX = 0;
                     NPC[A].Location.Y += NPC[A].Location.Height - NPC[A]->THeight - 1;
-                    NPC[A].Location.X += NPC[A].Location.Width / 2.0 - NPC[A]->TWidth / 2.0;
+                    NPC[A].Location.X += (NPC[A].Location.Width - NPC[A]->TWidth) / 2;
                     NPC[A].Location.Width = 32;
                     NPC[A].Location.Height = 32;
 
@@ -5633,7 +5634,7 @@ void CharStuff(int WhatNPC, bool CheckEggs)
                     else
                         NPC[A].Type = NPCID_GEM_1;
                     NPC[A].Location.Y += NPC[A].Location.Height - NPC[A]->THeight;
-                    NPC[A].Location.X += NPC[A].Location.Width / 2.0 - NPC[A]->TWidth / 2.0;
+                    NPC[A].Location.X += (NPC[A].Location.Width - NPC[A]->TWidth) / 2;
                     NPC[A].Location.Width = NPC[A]->TWidth;
                     NPC[A].Location.Height = NPC[A]->THeight;
                     NPC[A].Frame = 0;

@@ -322,7 +322,7 @@ void PlayerEffectWarpPipe(int A)
         if(warp_dir_enter == 3)
         {
             p.Location.Y += 1;
-            p.Location.X = warp_enter.X + warp_enter.Width / 2.0 - p.Location.Width / 2.0;
+            p.Location.X = warp_enter.X + (warp_enter.Width - p.Location.Width) / 2;
 
             leftToGoal = ((warp_enter.Y + warp_enter.Height) - p.Location.Y) + 0.5;
 
@@ -340,13 +340,13 @@ void PlayerEffectWarpPipe(int A)
             if(p.HoldingNPC > 0)
             {
                 NPC[p.HoldingNPC].Location.Y = p.Location.Y + Physics.PlayerGrabSpotY[p.Character][p.State] + 32 - NPC[p.HoldingNPC].Location.Height;
-                NPC[p.HoldingNPC].Location.X = p.Location.X + p.Location.Width / 2.0 - NPC[p.HoldingNPC].Location.Width / 2.0;
+                NPC[p.HoldingNPC].Location.X = p.Location.X + (p.Location.Width - NPC[p.HoldingNPC].Location.Width) / 2;
             }
         }
         else if(warp_dir_enter == 1)
         {
             p.Location.Y -= 1;
-            p.Location.X = warp_enter.X + warp_enter.Width / 2.0 - p.Location.Width / 2.0;
+            p.Location.X = warp_enter.X + (warp_enter.Width - p.Location.Width) / 2;
 
             leftToGoal = ((p.Location.Y + p.Location.Height) - warp_enter.Y) + 0.5;
 
@@ -361,7 +361,7 @@ void PlayerEffectWarpPipe(int A)
             if(p.HoldingNPC > 0)
             {
                 NPC[p.HoldingNPC].Location.Y = p.Location.Y + Physics.PlayerGrabSpotY[p.Character][p.State] + 32 - NPC[p.HoldingNPC].Location.Height;
-                NPC[p.HoldingNPC].Location.X = p.Location.X + p.Location.Width / 2.0 - NPC[p.HoldingNPC].Location.Width / 2.0;
+                NPC[p.HoldingNPC].Location.X = p.Location.X + (p.Location.Width - NPC[p.HoldingNPC].Location.Width) / 2;
             }
             if(p.Mount == 0)
                 p.Frame = 15;
@@ -475,8 +475,8 @@ void PlayerEffectWarpPipe(int A)
                         o_p.Effect = p.Effect;
                         // make other player behind so that this player will exit first
                         o_p.Effect2 = 0;
-                        o_p.Location.X = warp_enter.X + warp_enter.Width / 2.0 - o_p.Location.Width / 2.0;
-                        o_p.Location.Y = warp_enter.Y + warp_enter.Height / 2.0 - o_p.Location.Height / 2.0;
+                        o_p.Location.X = warp_enter.X + (warp_enter.Width - o_p.Location.Width) / 2;
+                        o_p.Location.Y = warp_enter.Y + (warp_enter.Height - o_p.Location.Height) / 2;
                         o_p.Location.SpeedX = 0.0;
                         o_p.Location.SpeedY = 0.0;
                     }
@@ -501,7 +501,7 @@ void PlayerEffectWarpPipe(int A)
 
         if(warp_dir_exit == 1)
         {
-            p.Location.X = warp_exit.X + warp_exit.Width / 2.0 - p.Location.Width / 2.0;
+            p.Location.X = warp_exit.X + (warp_exit.Width - p.Location.Width) / 2;
             p.Location.Y = warp_exit.Y - p.Location.Height - 8;
 
             if(p.Mount == 0)
@@ -510,12 +510,12 @@ void PlayerEffectWarpPipe(int A)
             if(p.HoldingNPC > 0)
             {
                 NPC[p.HoldingNPC].Location.Y = p.Location.Y + Physics.PlayerGrabSpotY[p.Character][p.State] + 32 - NPC[p.HoldingNPC].Location.Height;
-                NPC[p.HoldingNPC].Location.X = p.Location.X + p.Location.Width / 2.0 - NPC[p.HoldingNPC].Location.Width / 2.0;
+                NPC[p.HoldingNPC].Location.X = p.Location.X + (p.Location.Width - NPC[p.HoldingNPC].Location.Width) / 2;
             }
         }
         else if(warp_dir_exit == 3)
         {
-            p.Location.X = warp_exit.X + warp_exit.Width / 2.0 - p.Location.Width / 2.0;
+            p.Location.X = warp_exit.X + (warp_exit.Width - p.Location.Width) / 2;
             p.Location.Y = warp_exit.Y + warp_exit.Height + 8;
 
             if(p.Mount == 0)
@@ -524,7 +524,7 @@ void PlayerEffectWarpPipe(int A)
             if(p.HoldingNPC > 0)
             {
                 NPC[p.HoldingNPC].Location.Y = p.Location.Y + Physics.PlayerGrabSpotY[p.Character][p.State] + 32 - NPC[p.HoldingNPC].Location.Height;
-                NPC[p.HoldingNPC].Location.X = p.Location.X + p.Location.Width / 2.0 - NPC[p.HoldingNPC].Location.Width / 2.0;
+                NPC[p.HoldingNPC].Location.X = p.Location.X + (p.Location.Width - NPC[p.HoldingNPC].Location.Width) / 2;
             }
         }
         else if(warp_dir_exit == 2)
@@ -616,7 +616,7 @@ void PlayerEffectWarpPipe(int A)
                 Player_t& o_p = Player[o_A];
                 if(!o_p.Dead && o_p.TimeToLive == 0 && o_p.Effect == PLREFF_WARP_PIPE && o_p.Effect2 == 0 && o_p.Warp == Player[A].Warp && o_p.WarpBackward == Player[A].WarpBackward)
                 {
-                    o_p.Location.X = p.Location.X + p.Location.Width / 2.0 - o_p.Location.Width / 2.0;
+                    o_p.Location.X = p.Location.X + (p.Location.Width - o_p.Location.Width) / 2;
                     o_p.Location.Y = p.Location.Y + p.Location.Height - o_p.Location.Height;
 
                     CheckSection(o_A);
@@ -649,7 +649,7 @@ void PlayerEffectWarpPipe(int A)
                     else
                         Player[B].Location.Y = p.Location.Y;
 
-                    Player[B].Location.X = p.Location.X + p.Location.Width / 2.0 - Player[B].Location.Width / 2.0;
+                    Player[B].Location.X = p.Location.X + (p.Location.Width - Player[B].Location.Width) / 2;
                     Player[B].Location.SpeedY = dRand() * 24 - 12;
                     Player[B].Effect = PLREFF_WAITING;
                     Player[B].Effect2 = 0;
@@ -689,12 +689,12 @@ void PlayerEffectWarpPipe(int A)
 
         if(warp_dir_exit == 1)
         {
-            targetX = warp_exit.X + warp_exit.Width / 2.0 - p.Location.Width / 2.0;
+            targetX = warp_exit.X + (warp_exit.Width - p.Location.Width) / 2;
             targetY = warp_exit.Y - p.Location.Height - 8;
         }
         else if(warp_dir_exit == 3)
         {
-            targetX = warp_exit.X + warp_exit.Width / 2.0 - p.Location.Width / 2.0;
+            targetX = warp_exit.X + (warp_exit.Width - p.Location.Width) / 2;
             targetY = warp_exit.Y + warp_exit.Height + 8;
         }
         else if(warp_dir_exit == 2)
@@ -774,7 +774,7 @@ void PlayerEffectWarpPipe(int A)
             if(p.HoldingNPC > 0)
             {
                 NPC[p.HoldingNPC].Location.Y = p.Location.Y + Physics.PlayerGrabSpotY[p.Character][p.State] + 32 - NPC[p.HoldingNPC].Location.Height;
-                NPC[p.HoldingNPC].Location.X = p.Location.X + p.Location.Width / 2.0 - NPC[p.HoldingNPC].Location.Width / 2.0;
+                NPC[p.HoldingNPC].Location.X = p.Location.X + (p.Location.Width - NPC[p.HoldingNPC].Location.Width) / 2;
             }
 
             if(p.Mount == 0)
@@ -790,7 +790,7 @@ void PlayerEffectWarpPipe(int A)
             if(p.HoldingNPC > 0)
             {
                 NPC[p.HoldingNPC].Location.Y = p.Location.Y + Physics.PlayerGrabSpotY[p.Character][p.State] + 32 - NPC[p.HoldingNPC].Location.Height;
-                NPC[p.HoldingNPC].Location.X = p.Location.X + p.Location.Width / 2.0 - NPC[p.HoldingNPC].Location.Width / 2.0;
+                NPC[p.HoldingNPC].Location.X = p.Location.X + (p.Location.Width - NPC[p.HoldingNPC].Location.Width) / 2;
             }
 
             if(p.Mount == 0)
@@ -976,7 +976,7 @@ void PlayerEffectWarpPipe(int A)
                     else
                         Player[B].Location.Y = p.Location.Y;
 
-                    Player[B].Location.X = p.Location.X + p.Location.Width / 2.0 - Player[B].Location.Width / 2.0;
+                    Player[B].Location.X = p.Location.X + (p.Location.Width - Player[B].Location.Width) / 2;
                     Player[B].Location.SpeedY = dRand() * 24 - 12;
                     Player[B].Effect = PLREFF_NORMAL;
                     Player[B].Effect2 = 0;
@@ -1006,7 +1006,7 @@ void PlayerEffectWarpDoor(int A)
     if(p.HoldingNPC > 0)
     {
         NPC[p.HoldingNPC].Location.Y = p.Location.Y + Physics.PlayerGrabSpotY[p.Character][p.State] + 32 - NPC[p.HoldingNPC].Location.Height;
-        NPC[p.HoldingNPC].Location.X = p.Location.X + p.Location.Width / 2.0 - NPC[p.HoldingNPC].Location.Width / 2.0;
+        NPC[p.HoldingNPC].Location.X = p.Location.X + (p.Location.Width - NPC[p.HoldingNPC].Location.Width) / 2;
         treeNPCUpdate(p.HoldingNPC);
     }
 
@@ -1061,7 +1061,7 @@ void PlayerEffectWarpDoor(int A)
                     o_p.Effect = p.Effect;
                     // 1 frame behind so that this player will exit first
                     o_p.Effect2 = 14;
-                    o_p.Location.X = warp_enter.X + warp_enter.Width / 2.0 - o_p.Location.Width / 2.0;
+                    o_p.Location.X = warp_enter.X + (warp_enter.Width - o_p.Location.Width) / 2;
                     o_p.Location.Y = warp_enter.Y + warp_enter.Height - o_p.Location.Height;
                     o_p.Location.SpeedX = 0.0;
                     o_p.Location.SpeedY = 0.0;
@@ -1081,7 +1081,7 @@ void PlayerEffectWarpDoor(int A)
     // process the scroll effect
     else if(p.Effect2 >= 128)
     {
-        double targetX = warp_exit.X + warp_exit.Width / 2.0 - p.Location.Width / 2.0;
+        double targetX = warp_exit.X + (warp_exit.Width - p.Location.Width) / 2;
         double targetY = warp_exit.Y + warp_exit.Height - p.Location.Height;
 
         // += 1 above
@@ -1113,7 +1113,7 @@ void PlayerEffectWarpDoor(int A)
             p.Frame = 1;
         }
 
-        p.Location.X = warp_exit.X + warp_exit.Width / 2.0 - p.Location.Width / 2.0;
+        p.Location.X = warp_exit.X + (warp_exit.Width - p.Location.Width) / 2;
         p.Location.Y = warp_exit.Y + warp_exit.Height - p.Location.Height;
 
         // set any other players warping to the same door into the door holding pattern (needed to avoid splitting a shared screen)
@@ -1128,7 +1128,7 @@ void PlayerEffectWarpDoor(int A)
                 Player_t& o_p = Player[o_A];
                 if(!o_p.Dead && o_p.TimeToLive == 0 && o_p.Effect == PLREFF_WARP_DOOR && o_p.Warp == Player[A].Warp && o_p.WarpBackward == Player[A].WarpBackward)
                 {
-                    o_p.Location.X = warp_exit.X + warp_exit.Width / 2.0 - o_p.Location.Width / 2.0;
+                    o_p.Location.X = warp_exit.X + (warp_exit.Width - o_p.Location.Width) / 2;
                     o_p.Location.Y = warp_exit.Y + warp_exit.Height - o_p.Location.Height;
 
                     CheckSection(o_A);
@@ -1183,7 +1183,7 @@ void PlayerEffectWarpDoor(int A)
                 if(B != A)
                 {
                     Player[B].Location.Y = p.Location.Y + p.Location.Height - Player[B].Location.Height;
-                    Player[B].Location.X = p.Location.X + p.Location.Width / 2.0 - Player[B].Location.Width / 2.0;
+                    Player[B].Location.X = p.Location.X + (p.Location.Width - Player[B].Location.Width) / 2;
                     Player[B].Location.SpeedY = dRand() * 24 - 12;
                     CheckSection(B);
 
@@ -1521,7 +1521,7 @@ static inline bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool bac
             return true;
         }
 
-        plr.Location.X = exit.X + exit.Width / 2.0 - plr.Location.Width / 2.0;
+        plr.Location.X = exit.X + (exit.Width - plr.Location.Width) / 2;
         plr.Location.Y = exit.Y + exit.Height - plr.Location.Height - 0.1;
         CheckSection(A);
         plr.WarpCD = (warp.Effect == 3) ? 10 : 50;
@@ -1553,7 +1553,7 @@ static inline bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool bac
                 {
                     RemoveFromPet(o_A);
 
-                    o_p.Location.X = exit.X + exit.Width / 2.0 - o_p.Location.Width / 2.0;
+                    o_p.Location.X = exit.X + (exit.Width - o_p.Location.Width) / 2;
                     o_p.Location.Y = exit.Y + exit.Height - o_p.Location.Height - 0.1;
                     CheckSection(o_A);
 
@@ -1606,7 +1606,7 @@ static inline bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool bac
         plr.WarpBackward = backward;
 //                        if(nPlay.Online && A == nPlay.MySlot + 1)
 //                            Netplay::sendData Netplay::PutPlayerLoc(nPlay.MySlot) + "1j" + std::to_string(A) + "|" + plr.Warp + LB;
-        plr.Location.X = entrance.X + entrance.Width / 2.0 - plr.Location.Width / 2.0;
+        plr.Location.X = entrance.X + (entrance.Width - plr.Location.Width) / 2;
         plr.Location.Y = entrance.Y + entrance.Height - plr.Location.Height;
 
         bool same_section = SectionCollision(plr.Section, static_cast<Location_t>(exit));

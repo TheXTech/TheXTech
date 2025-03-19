@@ -862,7 +862,7 @@ static inline void s_testPlayersInSection(const Screen_t& screen, int B, bool do
                                     warped_plr = C;
 
                                     Player[C].Section = B;
-                                    Player[C].Location.X = Player[D].Location.X + Player[D].Location.Width / 2.0 - Player[C].Location.Width / 2.0;
+                                    Player[C].Location.X = Player[D].Location.X + (Player[D].Location.Width - Player[C].Location.Width) / 2;
                                     Player[C].Location.Y = Player[D].Location.Y + Player[D].Location.Height - Player[C].Location.Height;
                                     Player[C].Effect = PLREFF_NO_COLLIDE;
                                     Player[C].Effect2 = D;

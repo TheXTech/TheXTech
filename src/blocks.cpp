@@ -313,7 +313,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
                     auto &nLoc = nn.Location;
                     nLoc.Width = nn->TWidth;
                     nLoc.Height = nn->THeight;
-                    nLoc.X = b.Location.X + b.Location.Width / 2.0 - nLoc.Width / 2.0;
+                    nLoc.X = b.Location.X + (b.Location.Width - nLoc.Width) / 2;
                     nLoc.Y = b.Location.Y - nLoc.Height - 0.01;
                     nLoc.SpeedX = dRand() * 3 - 1.5;
                     nLoc.SpeedY = -(dRand() * 4) - 3;
@@ -389,7 +389,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
 
                 nn.Location.Width = nn->TWidth;
                 nn.Location.Height = nn->THeight;
-                nn.Location.X = b.Location.X + b.Location.Width / 2.0 - nn.Location.Width / 2.0;
+                nn.Location.X = b.Location.X + (b.Location.Width - nn.Location.Width) / 2;
                 nn.Location.Y = b.Location.Y - nn.Location.Height - 0.01;
                 nn.Location.SpeedX = dRand() * 3.0 - 1.5;
                 nn.Location.SpeedY = -(dRand() * 4) - 3;
@@ -582,7 +582,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
             }
 
             nn.Location.Height = 0;
-            nn.Location.X = (b.Location.X + b.Location.Width / 2.0 - nn.Location.Width / 2.0);
+            nn.Location.X = (b.Location.X + (b.Location.Width - nn.Location.Width) / 2);
             nn.Location.SpeedX = 0;
             nn.Location.SpeedY = 0;
 
@@ -688,7 +688,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
             Player[tempPlayer].Location.Height = Physics.PlayerHeight[Player[tempPlayer].Character][Player[tempPlayer].State];
             Player[tempPlayer].Frame = 1;
             Player[tempPlayer].Dead = false;
-            Player[tempPlayer].Location.X = b.Location.X + b.Location.Width * 0.5 - Player[tempPlayer].Location.Width * 0.5;
+            Player[tempPlayer].Location.X = b.Location.X + (b.Location.Width - Player[tempPlayer].Location.Width) / 2;
             if(!HitDown)
             {
                 Player[tempPlayer].Location.Y = b.Location.Y - 0.1 - Player[tempPlayer].Location.Height;
@@ -720,7 +720,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
         nn.Location = b.Location;
         nn.Location.Width = nn->TWidth;
         nn.Location.Height = nn->THeight;
-        nn.Location.X += (b.Location.Width - nn.Location.Width) / 2.0;
+        nn.Location.X += (b.Location.Width - nn.Location.Width) / 2;
         nn.Location.Y -= 0.01;
         nn.DefaultLocationX = nn.Location.X;
         nn.DefaultLocationY = nn.Location.Y;
@@ -1657,7 +1657,7 @@ bool PSwitch(bool enabled)
                     nb.Location = NPC[A].Location;
                     nb.Location.Width = BlockWidth[nb.Type];
                     nb.Location.Height = BlockHeight[nb.Type];
-                    nb.Location.X += (NPC[A].Location.Width - nb.Location.Width) / 2.0;
+                    nb.Location.X += (NPC[A].Location.Width - nb.Location.Width) / 2;
                     nb.Location.SpeedX = 0;
                     nb.Location.SpeedY = 0;
                     nb.Special = 0;
@@ -1719,7 +1719,7 @@ bool PSwitch(bool enabled)
                     nn.Location.SpeedY = 0;
                     nn.Location.Width = nn->TWidth;
                     nn.Location.Height = nn->THeight;
-                    nn.Location.X += (Block[A].Location.Width - nn.Location.Width) / 2.0;
+                    nn.Location.X += (Block[A].Location.Width - nn.Location.Width) / 2;
                     nn.DefaultLocationX = nn.Location.X;
                     nn.DefaultLocationY = nn.Location.Y;
                     nn.DefaultType = nn.Type;
@@ -1777,7 +1777,7 @@ bool PSwitch(bool enabled)
                     nb.Location.SpeedY = 0;
                     nb.Location.Width = BlockWidth[nb.Type];
                     nb.Location.Height = BlockHeight[nb.Type];
-                    nb.Location.X += (NPC[A].Location.Width - nb.Location.Width) / 2.0;
+                    nb.Location.X += (NPC[A].Location.Width - nb.Location.Width) / 2;
                     nb.Special = 0;
                     nb.Kill = false;
 
@@ -1825,7 +1825,7 @@ bool PSwitch(bool enabled)
                     nn.Location.SpeedY = 0;
                     nn.Location.Width = nn->TWidth;
                     nn.Location.Height = nn->THeight;
-                    nn.Location.X += (Block[A].Location.Width - nn.Location.Width) / 2.0;
+                    nn.Location.X += (Block[A].Location.Width - nn.Location.Width) / 2;
                     nn.DefaultLocationX = nn.Location.X;
                     nn.DefaultLocationY = nn.Location.Y;
                     nn.DefaultType = nn.Type;

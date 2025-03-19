@@ -1694,7 +1694,7 @@ void UpdateGraphicsLogic(bool Do_FrameSkip)
                                 }
                             }
 
-                            Player[A].Location.X = Player[D].Location.X + Player[D].Location.Width / 2.0 - Player[A].Location.Width / 2.0;
+                            Player[A].Location.X = Player[D].Location.X + (Player[D].Location.Width - Player[A].Location.Width) / 2;
                             Player[A].Location.Y = Player[D].Location.Y + Player[D].Location.Height - Player[A].Location.Height;
                             Player[A].Section = Player[D].Section;
                             Player[A].Location.SpeedX = Player[D].Location.SpeedX;

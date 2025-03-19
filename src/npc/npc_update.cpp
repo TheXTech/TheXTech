@@ -1227,7 +1227,7 @@ interrupt_Activation:
                                     Location_t tempLocation;
                                     tempLocation.Width = 32;
                                     tempLocation.Height = 32;
-                                    tempLocation.X = NPC[A].Location.X + NPC[A].Location.Width / 2.0 - tempLocation.Width / 2.0;
+                                    tempLocation.X = NPC[A].Location.X + (NPC[A].Location.Width - tempLocation.Width) / 2;
                                     tempLocation.Y = NPC[A].Location.Y + NPC[A].Location.Height - tempLocation.Height;
                                     NewEffect(EFFID_WATER_SPLASH, tempLocation);
                                 }
@@ -1266,7 +1266,7 @@ interrupt_Activation:
                 Location_t tempLocation;
                 tempLocation.Width = 32;
                 tempLocation.Height = 32;
-                tempLocation.X = NPC[A].Location.X + NPC[A].Location.Width / 2.0 - tempLocation.Width / 2.0;
+                tempLocation.X = NPC[A].Location.X + (NPC[A].Location.Width - tempLocation.Width) / 2;
                 tempLocation.Y = NPC[A].Location.Y + NPC[A].Location.Height - tempLocation.Height;
                 NewEffect(EFFID_WATER_SPLASH, tempLocation);
             }
