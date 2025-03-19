@@ -315,18 +315,16 @@ void PlayerEffectWarpPipe(int A)
     Screen_t& screen = ScreenByPlayer(A);
     bool is_shared_screen = (screen.Type == 3);
 
-    if(p.Effect2 == 0.0) // Entering pipe
+    if(p.Effect2 == 0) // Entering pipe
     {
-        double leftToGoal = 0.0;
-        double sign = +1.0;
+        int leftToGoal = 0;
 
         if(warp_dir_enter == 3)
         {
             p.Location.Y += 1;
             p.Location.X = warp_enter.X + warp_enter.Width / 2.0 - p.Location.Width / 2.0;
 
-            sign = (warp_enter.Y + warp_enter.Height) > p.Location.Y ? +1.0 : -1.0;
-            leftToGoal = SDL_fabs((warp_enter.Y + warp_enter.Height) - p.Location.Y) * sign;
+            leftToGoal = ((warp_enter.Y + warp_enter.Height) - p.Location.Y) + 0.5;
 
             if(p.Location.Y > warp_enter.Y + warp_enter.Height + 8)
             {
@@ -350,8 +348,7 @@ void PlayerEffectWarpPipe(int A)
             p.Location.Y -= 1;
             p.Location.X = warp_enter.X + warp_enter.Width / 2.0 - p.Location.Width / 2.0;
 
-            sign = (p.Location.Y + p.Location.Height) > warp_enter.Y ? +1.0 : -1.0;
-            leftToGoal = SDL_fabs(warp_enter.Y - (p.Location.Y + p.Location.Height)) * sign;
+            leftToGoal = ((p.Location.Y + p.Location.Height) - warp_enter.Y) + 0.5;
 
             if(p.Location.Y + p.Location.Height + 8 < warp_enter.Y)
             {
@@ -381,8 +378,7 @@ void PlayerEffectWarpPipe(int A)
             p.Location.Y = warp_enter.Y + warp_enter.Height - p.Location.Height - 2;
             p.Location.X -= 0.5;
 
-            sign = (p.Location.X + p.Location.Width) > warp_enter.X ? +1.0 : -1.0;
-            leftToGoal = SDL_fabs((warp_enter.X - (p.Location.X + p.Location.Width)) * 2) * sign;
+            leftToGoal = (((p.Location.X + p.Location.Width) - warp_enter.X) * 2) + 0.5;
 
             if(p.Location.X + p.Location.Width + 8 < warp_enter.X)
             {
@@ -415,16 +411,12 @@ void PlayerEffectWarpPipe(int A)
             p.Location.Y = warp_enter.Y + warp_enter.Height - p.Location.Height - 2;
             p.Location.X += 0.5;
 
-            sign = p.Location.X < (warp_enter.X + warp_enter.Width) ? +1.0 : -1.0;
-            leftToGoal = SDL_fabs(((warp_enter.X + warp_enter.Width) - p.Location.X) * 2) * sign;
+            leftToGoal = (((warp_enter.X + warp_enter.Width) - p.Location.X) * 2) + 0.5;
 
             if(p.Location.X > warp_enter.X + warp_enter.Width + 8)
             {
                 if(do_scroll)
-                {
-                    int warp_dist = SDL_sqrt((warp_enter.X - warp_exit.X) * (warp_enter.X - warp_exit.X) + (warp_enter.Y - warp_exit.Y) * (warp_enter.Y - warp_exit.Y));
-                    p.Effect2 = 128 + SDL_min(warp_dist / plr_warp_scroll_speed, plr_warp_scroll_max_frames);
-                }
+                    s_InitWarpScroll(p, warp_enter, warp_exit);
                 else
                     p.Effect2 = 1;
             }
@@ -446,7 +438,7 @@ void PlayerEffectWarpPipe(int A)
             treeNPCUpdate(p.HoldingNPC);
 
         // teleport other players into the pipe warp
-        if(is_shared_screen && Maths::iRound(leftToGoal) == 8)
+        if(is_shared_screen && leftToGoal == 8)
         {
             int vscreen_A = vScreenIdxByPlayer(A);
             bool do_tele = !vScreenCollision(vscreen_A, warp_exit);
@@ -497,7 +489,7 @@ void PlayerEffectWarpPipe(int A)
         // D_pLogDebug("Warping: %g (same section? %s!)", leftToGoal, SectionCollision(p.Section, warp_exit) ? "yes" : "no");
 
         // trigger fader when there are 16 pixels left (for normal effects) or 0 pixels left (for none or scroll)
-        s_WarpFaderLogic(false, A, warp.transitEffect, warp_enter, Maths::iRound(leftToGoal) == 16, !is_level_quit && !same_section && Maths::iRound(leftToGoal) == 0);
+        s_WarpFaderLogic(false, A, warp.transitEffect, warp_enter, leftToGoal == 16, !is_level_quit && !same_section && leftToGoal == 0);
     }
     else if(p.Effect2 == 1)  // Exiting pipe (initialization)
     {
