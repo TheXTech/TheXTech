@@ -3825,12 +3825,12 @@ void EditorScreen::UpdateWarpScreen(CallMode mode)
             {
                 EditorCursor.Warp.cannonExit = !EditorCursor.Warp.cannonExit;
                 if(!EditorCursor.Warp.cannonExit)
-                    EditorCursor.Warp.cannonExitSpeed = Warp_t().cannonExitSpeed;
+                    EditorCursor.Warp.cannonExitSpeed = 0;
             }
 
             if(EditorCursor.Warp.cannonExit)
             {
-                SuperPrintR(mode, g_editorStrings.warpSpeed + std::to_string(vb6Round(EditorCursor.Warp.cannonExitSpeed)), 3, 26, 394);
+                SuperPrintR(mode, g_editorStrings.warpSpeed + std::to_string(EditorCursor.Warp.cannonExitSpeed), 3, 26, 394);
                 if(EditorCursor.Warp.cannonExitSpeed > 1 && UpdateButton(mode, 180 + 4, 380 + 4, GFX.EIcons, false, 0, 32*Icon::left, 32, 32))
                     EditorCursor.Warp.cannonExitSpeed --;
                 if(EditorCursor.Warp.cannonExitSpeed <= 31 && UpdateButton(mode, 220 + 4, 380 + 4, GFX.EIcons, false, 0, 32*Icon::right, 32, 32))

@@ -1096,7 +1096,7 @@ struct Warp_t
     bool noPrintStars = false;
     bool noEntranceScene = false;
     bool cannonExit = false;
-    float cannonExitSpeed = 10.0;
+    vbint_t cannonExitSpeed = 10;
     bool stoodRequired = false; // Require player stood on the ground to enter this warp
     eventindex_t eventEnter = EVENT_NONE;
     eventindex_t eventExit = EVENT_NONE;
