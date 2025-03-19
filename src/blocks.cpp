@@ -1486,15 +1486,9 @@ resume_TriggerHit:
                     {
                         if(ShakeCollision(Player[B].Location, ib))
                         {
-                            if(!BlockIsSizable[ib.Type] && !BlockOnlyHitspot1[ib.Type])
+                            if((!BlockIsSizable[ib.Type] && !BlockOnlyHitspot1[ib.Type]) || (ib.Location.Y + 1 >= Player[B].Location.Y + Player[B].Location.Height - 1))
                             {
-                                Player[B].Location.SpeedY = double(Physics.PlayerJumpVelocity);
-                                Player[B].StandUp = true;
-                                PlaySoundSpatial(SFX_Stomp, Player[B].Location);
-                            }
-                            else if(ib.Location.Y + 1 >= Player[B].Location.Y + Player[B].Location.Height - 1)
-                            {
-                                Player[B].Location.SpeedY = double(Physics.PlayerJumpVelocity);
+                                Player[B].Location.SpeedY = Physics.PlayerJumpVelocity;
                                 Player[B].StandUp = true;
                                 PlaySoundSpatial(SFX_Stomp, Player[B].Location);
                             }
