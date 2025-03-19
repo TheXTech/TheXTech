@@ -1177,6 +1177,9 @@ interrupt_Activation:
                 NPC[A].TimeLeft = 100;
 
             float speedVar = 1; // percent of the NPC it should actually moved. this helps when underwater
+
+            // dead code in VB6
+#if 0
             if(NPC[A].Slope > 0 && !(NPC[A]->IsAShell || (NPC[A].Type == NPCID_SLIDE_BLOCK && NPC[A].Special == 1)))
             {
                 if((NPC[A].Location.SpeedX > 0 && BlockSlope[Block[NPC[A].Slope].Type] == -1) ||
@@ -1187,6 +1190,7 @@ interrupt_Activation:
                 }
             }
             speedVar = 1;
+#endif
 
             if(!NPC[A].Projectile)
                 speedVar = speedVar * NPC[A]->Speedvar;
