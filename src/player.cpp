@@ -3030,9 +3030,9 @@ void TailSwipe(const int plr, bool boo, bool Stab, int StabDir)
     {
         if(((p.TailCount) % 10 == 0 && !p.SpinJump) || ((p.TailCount) % 5 == 0 && p.SpinJump))
         {
-            NewEffect (80, newLoc(tailLoc.X + (dRand() * tailLoc.Width) - 4, tailLoc.Y + (dRand() * tailLoc.Height)), 1, 0, ShadowMode);
-            Effect[numEffects].Location.SpeedX = (0.5 + dRand() * 1) * p.Direction;
-            Effect[numEffects].Location.SpeedY = dRand() * 1 - 0.5;
+            NewEffect(EFFID_SPARKLE, newLoc(tailLoc.X + (dRand() * tailLoc.Width) - 4, tailLoc.Y + (dRand() * tailLoc.Height)), 1, 0, ShadowMode);
+            Effect[numEffects].Location.SpeedX = (0.5 + dRand()) * p.Direction;
+            Effect[numEffects].Location.SpeedY = dRand() - 0.5;
         }
     }
 }
@@ -4125,7 +4125,7 @@ void YoshiEatCode(const int A)
     }
 }
 
-void RespawnPlayer(int A, double Direction, double CenterX, double StopY, const vScreen_t& target_screen)
+void RespawnPlayer(int A, int Direction, double CenterX, double StopY, const vScreen_t& target_screen)
 {
     Player[A].Location.Width = Physics.PlayerWidth[Player[A].Character][Player[A].State];
     Player[A].Location.Height = Physics.PlayerHeight[Player[A].Character][Player[A].State];
