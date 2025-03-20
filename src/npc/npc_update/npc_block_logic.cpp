@@ -704,28 +704,27 @@ void NPCBlockLogic(int A, double& tempHit, int& tempHitBlock, float& tempSpeedA,
                                             NPC[A].Pinched.Right4 = 2;
                                         else if(HitSpot == 5)
                                         {
-                                            double C = 0;
+                                            double dx = Block[B].Location.minus_center_x(NPC[A].Location);
+                                            double dy = Block[B].Location.minus_center_y(NPC[A].Location);
+
                                             int D = 0;
 
-                                            if(NPC[A].Location.X + NPC[A].Location.Width / 2 < Block[B].Location.X + Block[B].Location.Width / 2)
-                                            {
-                                                C = (Block[B].Location.X + Block[B].Location.Width / 2) - (NPC[A].Location.X + NPC[A].Location.Width / 2);
+                                            if(dx > 0)
                                                 D = 2;
-                                            }
                                             else
                                             {
-                                                C = (NPC[A].Location.X + NPC[A].Location.Width / 2) - (Block[B].Location.X + Block[B].Location.Width / 2);
+                                                dx = -dx;
                                                 D = 4;
                                             }
 
-                                            if(NPC[A].Location.Y + NPC[A].Location.Height / 2 < Block[B].Location.Y + Block[B].Location.Height / 2)
+                                            if(dy > 0)
                                             {
-                                                if(C < (Block[B].Location.Y + Block[B].Location.Height / 2) - (NPC[A].Location.Y + NPC[A].Location.Height / 2))
+                                                if(dx < dy)
                                                     D = 1;
                                             }
                                             else
                                             {
-                                                if(C < (NPC[A].Location.Y + NPC[A].Location.Height / 2) - (Block[B].Location.Y + Block[B].Location.Height / 2))
+                                                if(dx < -dy)
                                                     D = 3;
                                             }
 
