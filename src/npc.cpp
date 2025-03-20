@@ -4756,20 +4756,30 @@ void SpecialNPC(int A)
         {
             // this direction indicator used Special (for spiky throwers) and Special6 (for item throwers) in SMBX 1.3
             // now it uses SpecialX (as a simple boolean flag)
-            double speed_bound = SDL_fabs(NPC[A].Location.X + NPC[A].Location.Width / 2 - p.Location.X + p.Location.Width / 2) / 100 + SDL_fabs(p.Location.SpeedX) / 2 + 5;
 
+            // speed control code: check distance to player
+            double dx = NPC[A].Location.minus_center_x(p.Location);
+            double speed_bound = SDL_fabs(dx) / 100 + SDL_fabs(p.Location.SpeedX) / 2 + 5;
+
+            // adjust expected distance by player's speed
+            dx -= p.Location.SpeedX * 15;
+
+            // movement left
             if(NPC[A].SpecialX == 0)
             {
                 if(NPC[A].Location.SpeedX >= -speed_bound)
                     NPC[A].Location.SpeedX -= 0.2;
-                if(NPC[A].Location.X + NPC[A].Location.Width / 2 < p.Location.X + p.Location.Width / 2 - 50 + (p.Location.SpeedX * 15))
+                // if we are more than 50px to the left of the player's expected location
+                if(dx < -50)
                     NPC[A].SpecialX = 1;
             }
+            // movement right
             else
             {
                 if(NPC[A].Location.SpeedX <= speed_bound)
                     NPC[A].Location.SpeedX += 0.2;
-                if(NPC[A].Location.X + NPC[A].Location.Width / 2 > p.Location.X + p.Location.Width / 2 + 50 + (p.Location.SpeedX * 15))
+                // if we are more than 50px to the right of the player's expected location
+                if(dx > 50)
                     NPC[A].SpecialX = 0;
             }
 
