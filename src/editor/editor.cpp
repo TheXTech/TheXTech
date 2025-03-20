@@ -2016,9 +2016,7 @@ void GetEditorControls()
     }
 
     if(SharedCursor.Move)
-    {
-        MouseMove(SharedCursor.X, SharedCursor.Y);
-    }
+        MouseMove((int)SharedCursor.X, (int)SharedCursor.Y);
 
     if(SharedCursor.Secondary || (EditorControls.ModeSelect && !MagicHand))
     {
@@ -2393,9 +2391,9 @@ void HideCursor()
 {
     // printf("Hiding cursor...\n");
     EditorCursor.Location.X = vScreen[1].X - 800;
-    EditorCursor.X = EditorCursor.Location.X;
+    EditorCursor.X = (int)EditorCursor.Location.X;
     EditorCursor.Location.Y = vScreen[1].Y - 600;
-    EditorCursor.Y = EditorCursor.Location.Y;
+    EditorCursor.Y = (int)EditorCursor.Location.Y;
     HasCursor = false;
     EditorControls.ScrollDown = false;
     EditorControls.ScrollRight = false;
@@ -3139,7 +3137,7 @@ void InteractResizeSection(IntegerLocation_t& section)
         PlaySound(SFX_Saw);
 }
 
-void MouseMove(float X, float Y, bool /*nCur*/)
+void MouseMove(int X, int Y, bool /*nCur*/)
 {
     EditorCursor.X = X;
     EditorCursor.Y = Y;
@@ -3176,8 +3174,8 @@ void MouseMove(float X, float Y, bool /*nCur*/)
     // translate into layer coordinates to snap to layer's grid
     if(MagicHand && EditorCursor.Layer != LAYER_NONE)
     {
-        X -= Layer[EditorCursor.Layer].OffsetX;
-        Y -= Layer[EditorCursor.Layer].OffsetY;
+        X -= (int)Layer[EditorCursor.Layer].OffsetX;
+        Y -= (int)Layer[EditorCursor.Layer].OffsetY;
     }
 
     if(EditorCursor.Mode == OptCursor_t::LVL_ERASER || EditorCursor.Mode == OptCursor_t::LVL_SELECT /*|| frmLevelEditor::chkAlign.Value == 0*/)
@@ -3220,43 +3218,43 @@ void MouseMove(float X, float Y, bool /*nCur*/)
                 EditorCursor.NPC.Type == 257 || EditorCursor.NPC.Type == 260))
         )
         {
-            if(!(ffEqual(EditorCursor.Location.X, double(std::floor(X / 16)) * 16 - vScreen[A].X) &&
-                 ffEqual(EditorCursor.Location.Y + 8, double(std::floor(Y / 16)) * 16 - vScreen[A].Y)) )
+            if(!(ffEqual(EditorCursor.Location.X, (X / 16) * 16 - vScreen[A].X) &&
+                 ffEqual(EditorCursor.Location.Y + 8, (Y / 16) * 16 - vScreen[A].Y)) )
             {
-                EditorCursor.Location.X = double(std::floor(X / 16)) * 16 - vScreen[A].X;
-                EditorCursor.Location.Y = double(std::floor(Y / 16)) * 16 - vScreen[A].Y;
+                EditorCursor.Location.X = (X / 16) * 16 - vScreen[A].X;
+                EditorCursor.Location.Y = (Y / 16) * 16 - vScreen[A].Y;
                 EditorCursor.Location.Y -= 8;
                 PositionCursor();
             }
         }
         else if(EditorCursor.Mode == OptCursor_t::LVL_PLAYERSTART)
         {
-            if(!(EditorCursor.Location.X == static_cast<float>(floor(X / 8)) * 8 - vScreen[A].X && EditorCursor.Location.Y + 8 == static_cast<float>(floor(Y / 8)) * 8 - vScreen[A].Y))
+            if(!(EditorCursor.Location.X == (X / 8) * 8 - vScreen[A].X && EditorCursor.Location.Y + 8 == (Y / 8) * 8 - vScreen[A].Y))
             {
-                EditorCursor.Location.X = static_cast<float>(floor(X / 8)) * 8 - vScreen[A].X;
-                EditorCursor.Location.Y = static_cast<float>(floor(Y / 8)) * 8 - vScreen[A].Y;
+                EditorCursor.Location.X = (X / 8) * 8 - vScreen[A].X;
+                EditorCursor.Location.Y = (Y / 8) * 8 - vScreen[A].Y;
                 EditorCursor.Location.Y -= 8;
                 PositionCursor();
             }
         }
         else if(EditorCursor.Mode == OptCursor_t::WLD_SCENES)
         {
-            EditorCursor.Location.X = double(std::floor(X / 16)) * 16 - vScreen[A].X;
-            EditorCursor.Location.Y = double(std::floor(Y / 16)) * 16 - vScreen[A].Y;
+            EditorCursor.Location.X = (X / 16) * 16 - vScreen[A].X;
+            EditorCursor.Location.Y = (Y / 16) * 16 - vScreen[A].Y;
             EditorCursor.Location.Y -= 8;
             PositionCursor();
         }
         else if(EditorCursor.Mode == OptCursor_t::LVL_WATER)
         {
-            EditorCursor.Location.X = double(std::floor(X / 16)) * 16 - vScreen[A].X;
-            EditorCursor.Location.Y = double(std::floor(Y / 16)) * 16 - vScreen[A].Y;
+            EditorCursor.Location.X = (X / 16) * 16 - vScreen[A].X;
+            EditorCursor.Location.Y = (Y / 16) * 16 - vScreen[A].Y;
             EditorCursor.Location.Y -= 8;
             PositionCursor();
         }
         else // Everything also align as 32x32
         {
-            EditorCursor.Location.X = double(std::floor(X / 32)) * 32 - vScreen[A].X;
-            EditorCursor.Location.Y = double(std::floor(Y / 32)) * 32 - vScreen[A].Y;
+            EditorCursor.Location.X = (X / 32) * 32 - vScreen[A].X;
+            EditorCursor.Location.Y = (Y / 32) * 32 - vScreen[A].Y;
             EditorCursor.Location.Y -= 8;
             PositionCursor();
         }

@@ -1176,9 +1176,9 @@ struct WorldArea_t
 struct EditorCursor_t
 {
 //    X As Single
-    float X = -50.0f;
+    int X = -50;
 //    Y As Single
-    float Y = -50.0f;
+    int Y = -50;
 //    SelectedMode As Integer 'cursor mode. eraser/npc/block/background
 
     // class of object (uses same enum as Mode)

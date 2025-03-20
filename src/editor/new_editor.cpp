@@ -140,13 +140,18 @@ int e_CursorX, e_CursorY;
 void DisableCursorNew()
 {
     EditorCursor.Location.X = vScreen[1].X - 800;
-    EditorCursor.X = EditorCursor.Location.X;
+    EditorCursor.X = (int)EditorCursor.Location.X;
     EditorCursor.Location.Y = vScreen[1].Y - 600;
-    EditorCursor.Y = EditorCursor.Location.Y;
+    EditorCursor.Y = (int)EditorCursor.Location.Y;
     HasCursor = false;
 
     e_CursorX = -50;
     e_CursorY = -50;
+}
+
+static void s_fix_mouse_pos()
+{
+    MouseMove((int)SharedCursor.X, (int)SharedCursor.Y);
 }
 
 // static const std::vector<std::string> list_backgrounds_names = {"None", "Set 1", "Underground", "Night", "Night 2", "Overworld", "Castle", "Mushrooms", "Desert", "", "Set 2", "Trees", "Underground", "Castle", "Clouds", "Night - Hills", "Night - Desert", "Cliff", "Warehouse", "Dungeon", "Set 3", "Blocks", "Hills", "Dungeon", "Pipes", "Bonus", "Clouds", "Desert", "Dungeon 2", "Ship", "Forest", "Battle", "Waterfall", "Tanks", "Final Boss", "Shroom Dealer", "Castle", "Snow Trees", "Clouds 2", "Snow Hills", "Cave", "Cave 2", "Underwater", "World", "Trees", "Mansion", "Forest", "Bonus", "Night", "Cave", "Clouds", "Hills", "Hills 2", "Hills 4", "Hills 3", "Castle", "Castle 2", "Underwater", "Desert Night", "", "Misc.", "Space Base", "Space Ship", "Space Swamp", "Space Crater", "Secret Mine"};
@@ -781,7 +786,7 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
                 std::string&& prompt = fmt::format_ne(g_editorStrings.phraseTextOf, g_editorStrings.wordNPCGenitive);
                 SetS(EditorCursor.NPC.Text, TextEntryScreen::Run(prompt, GetS(EditorCursor.NPC.Text)));
 
-                MouseMove(SharedCursor.X, SharedCursor.Y);
+                s_fix_mouse_pos();
             }
         }
 
@@ -1276,7 +1281,7 @@ void EditorScreen::UpdateEventsScreen(CallMode mode)
                 std::string new_name = TextEntryScreen::Run(g_editorStrings.eventsPromptEventName, Events[e].Name);
                 if(!new_name.empty())
                     RenameEvent((eventindex_t)e, new_name);
-                MouseMove(SharedCursor.X, SharedCursor.Y);
+                s_fix_mouse_pos();
             }
 
             // shift up
@@ -1304,7 +1309,7 @@ void EditorScreen::UpdateEventsScreen(CallMode mode)
             {
                 DisableCursorNew();
                 std::string new_name = TextEntryScreen::Run(g_editorStrings.eventsPromptEventName, "");
-                MouseMove(SharedCursor.X, SharedCursor.Y);
+                s_fix_mouse_pos();
                 if(!new_name.empty() && FindEvent(new_name) == EVENT_NONE)
                 {
                     InitializeEvent(Events[e]);
@@ -1769,7 +1774,7 @@ void EditorScreen::UpdateEventSettingsScreen(CallMode mode)
     {
         DisableCursorNew();
         SetS(Events[m_current_event].Text, TextEntryScreen::Run(g_editorStrings.eventsPromptEventText, GetS(Events[m_current_event].Text)));
-        MouseMove(SharedCursor.X, SharedCursor.Y);
+        s_fix_mouse_pos();
     }
 
     // trigger event (full width, below all)
@@ -1821,7 +1826,7 @@ void EditorScreen::UpdateSectionsScreen(CallMode mode)
     {
         DisableCursorNew();
         LevelName = TextEntryScreen::Run(g_editorStrings.levelName, LevelName);
-        MouseMove(SharedCursor.X, SharedCursor.Y);
+        s_fix_mouse_pos();
     }
 
     SuperPrintR(mode, g_editorStrings.levelName, 3, 54, 42);
@@ -2217,7 +2222,7 @@ void EditorScreen::UpdateWorldSettingsScreen(CallMode mode)
     {
         DisableCursorNew();
         WorldName = TextEntryScreen::Run(g_editorStrings.worldName, WorldName);
-        MouseMove(SharedCursor.X, SharedCursor.Y);
+        s_fix_mouse_pos();
     }
 
     SuperPrintR(mode, g_editorStrings.worldName, 3, 54, 42);
@@ -2289,7 +2294,7 @@ void EditorScreen::UpdateWorldSettingsScreen(CallMode mode)
     {
         DisableCursorNew();
         WorldCredits[m_special_subpage + 1] = TextEntryScreen::Run(fmt::format_ne(g_editorStrings.worldCreditIndex, m_special_subpage + 1), WorldCredits[m_special_subpage + 1]);
-        MouseMove(SharedCursor.X, SharedCursor.Y);
+        s_fix_mouse_pos();
         for(int i = SDL_max(numWorldCredits, m_special_subpage + 1); i > 0; --i) // Find the last non-empty line
         {
             if(!WorldCredits[m_special_subpage + 1].empty())
@@ -3082,7 +3087,7 @@ void EditorScreen::UpdateLayersScreen(CallMode mode)
                     std::string new_name = TextEntryScreen::Run(g_editorStrings.layersPromptLayerName, Layer[l].Name);
                     if(!new_name.empty())
                         RenameLayer(l, new_name);
-                    MouseMove(SharedCursor.X, SharedCursor.Y);
+                    s_fix_mouse_pos();
                 }
 
                 // shift up
@@ -3164,7 +3169,7 @@ void EditorScreen::UpdateLayersScreen(CallMode mode)
                     numLayers ++;
                 }
 
-                MouseMove(SharedCursor.X, SharedCursor.Y);
+                s_fix_mouse_pos();
             }
         }
     }
@@ -3864,7 +3869,7 @@ void EditorScreen::UpdateWarpScreen(CallMode mode)
             {
                 DisableCursorNew();
                 SetS(EditorCursor.Warp.StarsMsg, TextEntryScreen::Run(g_editorStrings.warpStarLockMessage, GetS(EditorCursor.Warp.StarsMsg)));
-                MouseMove(SharedCursor.X, SharedCursor.Y);
+                s_fix_mouse_pos();
             }
         }
 
@@ -4264,7 +4269,7 @@ void EditorScreen::UpdateLevelScreen(CallMode mode)
     {
         DisableCursorNew();
         EditorCursor.WorldLevel.LevelName = TextEntryScreen::Run(g_editorStrings.levelName, EditorCursor.WorldLevel.LevelName);
-        MouseMove(SharedCursor.X, SharedCursor.Y);
+        s_fix_mouse_pos();
     }
 
     // level filename - FileName
@@ -4953,7 +4958,7 @@ void EditorScreen::UpdateBrowserScreen(CallMode mode)
             {
                 DisableCursorNew();
                 std::string folder_name = TextEntryScreen::Run(g_editorStrings.browserItemNewFolder, "");
-                MouseMove(SharedCursor.X, SharedCursor.Y);
+                s_fix_mouse_pos();
 
                 if(!folder_name.empty() && !m_dirman.exists(folder_name))
                 {
@@ -4987,7 +4992,7 @@ void EditorScreen::UpdateBrowserScreen(CallMode mode)
             {
                 DisableCursorNew();
                 std::string file_name = TextEntryScreen::Run(g_editorStrings.fileCommandSaveAs, "");
-                MouseMove(SharedCursor.X, SharedCursor.Y);
+                s_fix_mouse_pos();
 
                 if(!file_name.empty())
                 {
