@@ -34,20 +34,16 @@ void ResetCameraPanning()
         vScreen[i].small_screen_features = vScreen_t::SmallScreenFeatures_t();
 }
 
-void ProcessSmallScreenCam(vScreen_t& vscreen)
+static inline double s_small_screen_rate(const Screen_t& screen, const Screen_t& c_screen)
 {
-    const Screen_t& screen = Screens[vscreen.screen_ref];
-    const Screen_t& c_screen = screen.canonical_screen();
-    const Player_t& p = Player[vscreen.player];
-
     // slowly disable small screen camera features as player cameras approach each other
-    double rate = 1.0;
+    double rate = 1;
     if(screen.Type == ScreenTypes::Dynamic && (screen.W < c_screen.W || screen.H < c_screen.H))
     {
         double dx = std::abs(screen.vScreen(1).X - screen.vScreen(2).X);
         double dy = std::abs(screen.vScreen(1).Y - screen.vScreen(2).Y);
         double d = dx + dy;
-        const double screen_join = (screen.W + screen.H) / 2;
+        const int screen_join = (screen.W + screen.H) / 2;
 
         rate = (d - screen_join) / screen_join;
         if(rate < 0)
@@ -55,6 +51,18 @@ void ProcessSmallScreenCam(vScreen_t& vscreen)
         if(rate > 1)
             rate = 1;
     }
+
+    return rate;
+}
+
+void ProcessSmallScreenCam(vScreen_t& vscreen)
+{
+    const Screen_t& screen = Screens[vscreen.screen_ref];
+    const Screen_t& c_screen = screen.canonical_screen();
+    const Player_t& p = Player[vscreen.player];
+
+    // slowly disable small screen camera features as player cameras approach each other
+    double rate = s_small_screen_rate(screen, c_screen);
 
     if(g_config.small_screen_cam && screen.W < c_screen.W && !NoTurnBack[p.Section])
     {
@@ -65,7 +73,7 @@ void ProcessSmallScreenCam(vScreen_t& vscreen)
         if(max_offsetX > c_screen.W - screen.W)
             max_offsetX = c_screen.W - screen.W;
 
-        int16_t lookX_target = (int)(max_offsetX * p.Location.SpeedX * 1.5 / Physics.PlayerRunSpeed);
+        int16_t lookX_target = (int)(max_offsetX * p.Location.SpeedX) / 4;
         if(lookX_target > max_offsetX)
             lookX_target = max_offsetX;
         if(lookX_target < -max_offsetX)
@@ -205,20 +213,7 @@ void DrawSmallScreenCam(vScreen_t& vscreen)
         CamX -= XRender::TargetOverscanX;
 
     // scale the opacity by the current effectiveness of the camera features
-    double rate = 1.0;
-    if(screen.Type == ScreenTypes::Dynamic)
-    {
-        double dx = std::abs(screen.vScreen(1).X - screen.vScreen(2).X);
-        double dy = std::abs(screen.vScreen(1).Y - screen.vScreen(2).Y);
-        double d = dx + dy;
-        const double screen_join = (screen.W + screen.H) / 2;
-
-        rate = (d - screen_join) / screen_join;
-        if(rate < 0)
-            rate = 0;
-        if(rate > 1)
-            rate = 1;
-    }
+    double rate = s_small_screen_rate(screen, c_screen);
 
     int16_t max_offsetY = 200;
     if(max_offsetY > (c_screen.H - screen.H) + 50)
