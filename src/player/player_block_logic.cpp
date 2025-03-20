@@ -1085,7 +1085,11 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
     if(Player[A].Slide && oldSlope > 0 && Player[A].Slope == 0 && Player[A].Location.SpeedY < 0)
     {
         if(Player[A].NoGravity == 0)
-            Player[A].NoGravity = static_cast<int>(floor(static_cast<double>(Player[A].Location.SpeedY / Physics.PlayerJumpVelocity * 8)));
+        {
+            // Player[A].NoGravity = static_cast<int>(floor(static_cast<double>(Player[A].Location.SpeedY / Physics.PlayerJumpVelocity * 8)));
+            // PlayerJumpVelocity is -5.7, SpeedY is negative
+            Player[A].NoGravity = (int)(Player[A].Location.SpeedY * -80) / 57;
+        }
     }
     else if(Player[A].Slope > 0 || oldSlope > 0 || !Player[A].Slide)
         Player[A].NoGravity = 0;
