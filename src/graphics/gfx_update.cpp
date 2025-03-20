@@ -1936,28 +1936,28 @@ void UpdateGraphicsScreen(Screen_t& screen)
         // don't show background outside of the current section!
         if(LevelEditor)
         {
-            if(camX + level[S].X > 0)
+            if(camX + LevelREAL[S].X > 0)
             {
                 XRender::renderRect(0, 0,
-                                    camX + level[S].X - XRender::TargetOverscanX, screen.H, {63, 63, 63}, true);
+                                    camX + LevelREAL[S].X - XRender::TargetOverscanX, screen.H, {63, 63, 63}, true);
             }
 
-            if(screen.W > level[S].Width + camX)
+            if(screen.W > LevelREAL[S].Width + camX)
             {
-                XRender::renderRect(level[S].Width + camX + XRender::TargetOverscanX, 0,
-                                    screen.W - (level[S].Width + camX), screen.H, {63, 63, 63}, true);
+                XRender::renderRect(LevelREAL[S].Width + camX + XRender::TargetOverscanX, 0,
+                                    screen.W - (LevelREAL[S].Width + camX), screen.H, {63, 63, 63}, true);
             }
 
-            if(camY + level[S].Y > 0)
+            if(camY + LevelREAL[S].Y > 0)
             {
                 XRender::renderRect(0, 0,
-                                    screen.W, camY + level[S].Y, {63, 63, 63}, true);
+                                    screen.W, camY + LevelREAL[S].Y, {63, 63, 63}, true);
             }
 
-            if(screen.H > level[S].Height + camY)
+            if(screen.H > LevelREAL[S].Height + camY)
             {
-                XRender::renderRect(0, level[S].Height + camY,
-                                    screen.W, screen.H - (level[S].Height + camY), {63, 63, 63}, true);
+                XRender::renderRect(0, LevelREAL[S].Height + camY,
+                                    screen.W, screen.H - (LevelREAL[S].Height + camY), {63, 63, 63}, true);
             }
         }
 
