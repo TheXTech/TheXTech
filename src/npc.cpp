@@ -1177,12 +1177,10 @@ void NPCSpecial(int A)
             if(npc.Special2 >= 30 && npc.Special != 2)
             {
                 npc.Location.X += npc.Location.Width;
-                npc.Location.Y += npc.Location.Height;
                 npc.Location.Width = 16;
-                npc.Location.Height = 32;
+                npc.Location.set_height_floor(32);
                 npc.Special = 2;
                 npc.Location.X += -npc.Location.Width;
-                npc.Location.Y += -npc.Location.Height;
                 npc.Special2 = 21;
 
                 NPCQueues::Unchecked.push_back(A);
@@ -1191,12 +1189,10 @@ void NPCSpecial(int A)
             else if(npc.Special2 >= 15 && npc.Special != 1)
             {
                 npc.Location.X += npc.Location.Width;
-                npc.Location.Y += npc.Location.Height;
                 npc.Location.Width = 10;
-                npc.Location.Height = 20;
+                npc.Location.set_height_floor(20);
                 npc.Special = 1;
                 npc.Location.X += -npc.Location.Width;
-                npc.Location.Y += -npc.Location.Height;
 
                 NPCQueues::Unchecked.push_back(A);
                 // deferring tree update to end of the NPC physics update
@@ -1312,11 +1308,9 @@ void NPCSpecial(int A)
                 npc.Special4 = 0;
                 npc.Special5 = 0;
                 // npc.Special6 = 0;
-                npc.Location.Y += npc.Location.Height;
                 npc.Type = NPCID(npc.Type - 1);
                 npc.Location.set_width_center(npc->TWidth);
-                npc.Location.Height = npc->THeight;
-                npc.Location.Y -= npc.Location.Height;
+                npc.Location.set_height_floor(npc->THeight);
 
                 NPCQueues::Unchecked.push_back(A);
                 // deferring tree update to end of the NPC physics update
@@ -1578,11 +1572,9 @@ void NPCSpecial(int A)
                 npc.Special5 = 0;
                 // npc.Special6 = 0;
                 npc.SpecialX = 0;
-                npc.Location.Y += npc.Location.Height;
                 npc.Type = NPCID_FIRE_BOSS_SHELL;
                 npc.Location.set_width_center(npc->TWidth);
-                npc.Location.Height = npc->THeight;
-                npc.Location.Y -= npc.Location.Height;
+                npc.Location.set_height_floor(npc->THeight);
 
                 NPCQueues::Unchecked.push_back(A);
                 // deferring tree update to end of the NPC physics update

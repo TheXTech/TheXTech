@@ -53,9 +53,7 @@ static inline void NPCEffectLogic_EmergeUp(int A)
         {
             NPC[A].Effect = NPCEFF_NORMAL;
             NPC[A].Effect2 = 0;
-            NPC[A].Location.Y += NPC[A].Location.Height;
-            NPC[A].Location.Height = NPC[A]->THeight;
-            NPC[A].Location.Y += -NPC[A].Location.Height;
+            NPC[A].Location.set_height_floor(NPC[A]->THeight);
         }
     }
     else

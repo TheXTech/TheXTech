@@ -87,9 +87,7 @@ void PlayerMovementX(int A, float& cursed_value_C)
                 {
                     if(!Player[A].Duck)
                     {
-                        Player[A].Location.Y += Player[A].Location.Height;
-                        Player[A].Location.Height = 31;
-                        Player[A].Location.Y += -Player[A].Location.Height;
+                        Player[A].Location.set_height_floor(31);
                         Player[A].Duck = true;
                         // If nPlay.Online = True And A = nPlay.MySlot + 1 Then Netplay.sendData Netplay.PutPlayerLoc(nPlay.MySlot) & "1q" & A & LB
 //                                        if(nPlay.Online == true && A == nPlay.MySlot + 1)
@@ -105,9 +103,7 @@ void PlayerMovementX(int A, float& cursed_value_C)
                             if(Player[A].Character == 5)
                                 Player[A].SwordPoke = 0;
                             Player[A].Duck = true;
-                            Player[A].Location.Y += Player[A].Location.Height;
-                            Player[A].Location.Height = Physics.PlayerDuckHeight[Player[A].Character][Player[A].State];
-                            Player[A].Location.Y += -Player[A].Location.Height;
+                            Player[A].Location.set_height_floor(Physics.PlayerDuckHeight[Player[A].Character][Player[A].State]);
 //                                            if(nPlay.Online == true && A == nPlay.MySlot + 1)
 //                                                Netplay::sendData "1q" + std::to_string(A) + LB;
                         }

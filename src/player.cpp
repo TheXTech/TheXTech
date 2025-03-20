@@ -978,9 +978,7 @@ void PlayerHurt(const int A)
                     NewEffect(EFFID_RED_BOOT_DIE, tempLocation);
                 else
                     NewEffect(EFFID_BLU_BOOT_DIE, tempLocation);
-                p.Location.Y += p.Location.Height;
-                p.Location.Height = Physics.PlayerHeight[p.Character][p.State];
-                p.Location.Y += -p.Location.Height;
+                p.Location.set_height_floor(Physics.PlayerHeight[p.Character][p.State]);
                 p.Immune = 150;
                 p.Immune2 = true;
             }
@@ -1584,12 +1582,7 @@ void UnDuck(Player_t &p)
 
         if(p.Mount == 3)
         {
-            p.Location.Y += p.Location.Height;
-            if(p.State == 1)
-                p.Location.Height = 54;
-            else
-                p.Location.Height = 60;
-            p.Location.Y += -p.Location.Height;
+            p.Location.set_height_floor((p.State == 1) ? 54 : 60);
         }
         else
         {
@@ -1600,9 +1593,7 @@ void UnDuck(Player_t &p)
             }
             else
             {
-                p.Location.Y += p.Location.Height;
-                p.Location.Height = Physics.PlayerHeight[p.Character][p.State];
-                p.Location.Y += -p.Location.Height;
+                p.Location.set_height_floor(Physics.PlayerHeight[p.Character][p.State]);
             }
         }
 
@@ -2922,9 +2913,7 @@ void TailSwipe(const int plr, bool boo, bool Stab, int StabDir)
                     NPC[A].Type != NPCID_WALL_BUG && NPC[A].Type != NPCID_POWER_S3 && NPC[A].Type != NPCID_BOTTOM_PLANT && NPC[A].Type != NPCID_SIDE_PLANT &&
                     NPC[A].Type != NPCID_BIG_PLANT && NPC[A].Type != NPCID_PLANT_S1 && NPC[A].Type != NPCID_FIRE_PLANT)
                 {
-                    stabLoc.Y += stabLoc.Height;
-                    stabLoc.Height = NPC[A]->HeightGFX;
-                    stabLoc.Y += -stabLoc.Height;
+                    stabLoc.set_height_floor(NPC[A]->HeightGFX);
                 }
 
                 if(NPC[A].Type == NPCID_ITEM_BURIED && Stab)
@@ -3040,15 +3029,7 @@ void YoshiHeight(const int A)
     auto &p = Player[A];
 
     if(p.Mount == 3)
-    {
-        p.Location.Y += p.Location.Height;
-        p.Location.Height = (p.State == 1) ? 54 : 60;
-        //if(p.State == 1)
-        //    p.Location.Height = 54;
-        //else
-        //    p.Location.Height = 60;
-        p.Location.Y += -p.Location.Height;
-    }
+        p.Location.set_height_floor((p.State == 1) ? 54 : 60);
 }
 
 void YoshiEat(const int A)
@@ -3648,33 +3629,24 @@ void SizeCheck(Player_t &p)
         {
             UnDuck(p);
         }
+
         if(p.Location.Width != 22)
             p.Location.set_width_center(22);
+
         if(p.Location.Height != 26)
-        {
-            p.Location.Y += p.Location.Height - 26;
-            p.Location.Height = 26;
-        }
+            p.Location.set_height_floor(26);
     }
     else if(p.Mount == 0)
     {
         if(!p.Duck)
         {
             if(p.Location.Height != Physics.PlayerHeight[p.Character][p.State])
-            {
-                p.Location.Y += p.Location.Height;
-                p.Location.Height = Physics.PlayerHeight[p.Character][p.State];
-                p.Location.Y += -p.Location.Height;
-            }
+                p.Location.set_height_floor(Physics.PlayerHeight[p.Character][p.State]);
         }
         else
         {
             if(p.Location.Height != Physics.PlayerDuckHeight[p.Character][p.State])
-            {
-                p.Location.Y += p.Location.Height;
-                p.Location.Height = Physics.PlayerDuckHeight[p.Character][p.State];
-                p.Location.Y += -p.Location.Height;
-            }
+                p.Location.set_height_floor(Physics.PlayerDuckHeight[p.Character][p.State]);
         }
     }
     else if(p.Mount == 1)
@@ -3682,39 +3654,23 @@ void SizeCheck(Player_t &p)
         if(p.Duck)
         {
             if(p.Location.Height != Physics.PlayerDuckHeight[p.Character][2])
-            {
-                p.Location.Y += p.Location.Height;
-                p.Location.Height = Physics.PlayerDuckHeight[p.Character][2];
-                p.Location.Y += -p.Location.Height;
-            }
+                p.Location.set_height_floor(Physics.PlayerDuckHeight[p.Character][2]);
         }
         else if(p.Character == 2 && p.State > 1)
         {
             if(p.Location.Height != Physics.PlayerHeight[1][2])
-            {
-                p.Location.Y += p.Location.Height;
-                p.Location.Height = Physics.PlayerHeight[p.Character][p.State];
-                p.Location.Y += -p.Location.Height;
-            }
+                p.Location.set_height_floor(Physics.PlayerHeight[p.Character][p.State]);
         }
         else
         {
             if(p.Location.Height != Physics.PlayerHeight[1][2])
-            {
-                p.Location.Y += p.Location.Height;
-                p.Location.Height = Physics.PlayerHeight[1][2];
-                p.Location.Y += -p.Location.Height;
-            }
+                p.Location.set_height_floor(Physics.PlayerHeight[1][2]);
         }
     }
     else if(p.Mount == 2)
     {
         if(p.Location.Height != 128)
-        {
-            p.Location.Y += p.Location.Height;
-            p.Location.Height = 128;
-            p.Location.Y += -p.Location.Height;
-        }
+            p.Location.set_height_floor(128);
     }
     else if(p.Mount == 3)
     {
@@ -3723,30 +3679,18 @@ void SizeCheck(Player_t &p)
             if(p.State == 1)
             {
                 if(p.Location.Height != Physics.PlayerHeight[1][2])
-                {
-                    p.Location.Y += p.Location.Height;
-                    p.Location.Height = Physics.PlayerHeight[1][2];
-                    p.Location.Y += -p.Location.Height;
-                }
+                    p.Location.set_height_floor(Physics.PlayerHeight[1][2]);
             }
             else
             {
                 if(p.Location.Height != Physics.PlayerHeight[2][2])
-                {
-                    p.Location.Y += p.Location.Height;
-                    p.Location.Height = Physics.PlayerHeight[2][2];
-                    p.Location.Y += -p.Location.Height;
-                }
+                    p.Location.set_height_floor(Physics.PlayerHeight[2][2]);
             }
         }
         else
         {
             if(p.Location.Height != 31)
-            {
-                p.Location.Y += p.Location.Height;
-                p.Location.Height = 31;
-                p.Location.Y += -p.Location.Height;
-            }
+                p.Location.set_height_floor(31);
         }
     }
 // width

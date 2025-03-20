@@ -365,10 +365,8 @@ void NPCHit(int A, int B, int C)
                 NPC[A].Type = NPCID_GEM_5;
             if(iRand(40) < 3)
                 NPC[A].Type = NPCID_GEM_20;
-            NPC[A].Location.Y += NPC[A].Location.Height;
             NPC[A].Location.set_width_center(NPC[A]->TWidth);
-            NPC[A].Location.Height = NPC[A]->THeight;
-            NPC[A].Location.Y += -NPC[A].Location.Height;
+            NPC[A].Location.set_height_floor(NPC[A]->THeight);
         }
         if(NPC[A]->IsAShell)
             NPC[A].Location.SpeedX = Physics.NPCShellSpeed * Player[C].Direction;
@@ -448,14 +446,12 @@ void NPCHit(int A, int B, int C)
             // NPC[A].Special6 = 0;
             NPC[A].SpecialX = 0;
             NPC[A].SpecialY = 0;
-            NPC[A].Location.Y += NPC[A].Location.Height;
             if(NPC[A].Type == NPCID_MAGIC_BOSS)
                 NPC[A].Type = NPCID_MAGIC_BOSS_SHELL;
             else
                 NPC[A].Type = NPCID_FIRE_BOSS_SHELL;
             NPC[A].Location.set_width_center(NPC[A]->TWidth);
-            NPC[A].Location.Height = NPC[A]->THeight;
-            NPC[A].Location.Y += -NPC[A].Location.Height;
+            NPC[A].Location.set_height_floor(NPC[A]->THeight);
             NPC[A].Location.SpeedX = 0;
             NPC[A].Location.SpeedY = 0;
 
@@ -536,10 +532,8 @@ void NPCHit(int A, int B, int C)
         {
             if(NPC[A].Type == NPCID_BRUTE)
             {
-                NPC[A].Location.Y += NPC[A].Location.Height;
-                NPC[A].Location.Height = 32;
+                NPC[A].Location.set_height_floor(32);
                 NPC[A].Type = NPCID_BRUTE_SQUISHED;
-                NPC[A].Location.Y += -NPC[A].Location.Height;
                 PlaySoundSpatial(SFX_Stomp, NPC[A].Location);
             }
             else if(NPC[A].Type != NPCID_BONE_FISH)
@@ -2092,10 +2086,9 @@ void NPCHit(int A, int B, int C)
             }
             else
             {
-                NPC[A].Location.Y += NPC[A].Location.Height;
                 // useless self-assignment code [PVS-Studio]
                 //NPC[A].Location.X = NPC[A].Location.X; // - (32 - .Location.Width) / 2
-                NPC[A].Location.Height = 0;
+                NPC[A].Location.set_height_floor(0);
                 PlaySoundSpatial(SFX_Coin, NPC[A].Location);
                 NewEffect(EFFID_COIN_BLOCK_S3, NPC[A].Location);
             }
@@ -2312,9 +2305,7 @@ void NPCHit(int A, int B, int C)
 
     if(NPC[A].Type != oldNPC.Type)
     {
-        NPC[A].Location.Y += NPC[A].Location.Height;
-        NPC[A].Location.Height = NPC[A]->THeight;
-        NPC[A].Location.Y -= NPC[A].Location.Height;
+        NPC[A].Location.set_height_floor(NPC[A]->THeight);
         NPC[A].Location.set_width_center(NPC[A]->TWidth);
     }
 

@@ -60,6 +60,13 @@ struct Location_t
         Y += (Height - new_height) / 2;
         Height = new_height;
     }
+
+    // sets the height, maintaining location floor
+    inline void set_height_floor(double new_height)
+    {
+        Y += Height - new_height;
+        Height = new_height;
+    }
 };
 
 //NEW: 'Holds location information for an object without speed at integer coordinates, with width / height values below 32767

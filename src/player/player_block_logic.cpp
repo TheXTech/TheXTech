@@ -59,11 +59,7 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
     double tempSlope2X = 0; // The old X before player was moved
 
     if(Player[A].Character == 5 && Player[A].Duck && (Player[A].Location.SpeedY == Physics.PlayerGravity || Player[A].StandingOnNPC != 0 || Player[A].Slope != 0))
-    {
-        Player[A].Location.Y += Player[A].Location.Height;
-        Player[A].Location.Height = 30;
-        Player[A].Location.Y += -Player[A].Location.Height;
-    }
+        Player[A].Location.set_height_floor(30);
 
 
     // block collision optimization
@@ -744,11 +740,7 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
     }
 
     if(Player[A].Character == 5 && Player[A].Duck)
-    {
-        Player[A].Location.Y += Player[A].Location.Height;
-        Player[A].Location.Height = Physics.PlayerDuckHeight[Player[A].Character][Player[A].State];
-        Player[A].Location.Y += -Player[A].Location.Height;
-    }
+        Player[A].Location.set_height_floor(Physics.PlayerDuckHeight[Player[A].Character][Player[A].State]);
 
 
     // helps the player run down slopes at different angles

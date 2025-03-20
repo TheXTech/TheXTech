@@ -690,6 +690,19 @@ static void shadowStar()
     //    ShadowMode = true;
 }
 
+static void s_heightFix(Player_t& p)
+{
+    if(p.Mount <= 1)
+    {
+        int new_height = Physics.PlayerHeight[p.Character][p.State];
+        if(p.Mount == 1 && p.State == 1)
+            new_height = Physics.PlayerHeight[1][2];
+
+        p.Location.set_height_floor(new_height);
+        p.StandUp = true;
+    }
+}
+
 static void becomeAsPeach()
 {
     PlaySound(SFX_Transform);
@@ -699,15 +712,7 @@ static void becomeAsPeach()
         Player[B].Character = 3;
         Player[B].Immune = 50;
 
-        if(Player[B].Mount <= 1)
-        {
-            Player[B].Location.Y += Player[B].Location.Height;
-            Player[B].Location.Height = Physics.PlayerHeight[Player[B].Character][Player[B].State];
-            if(Player[B].Mount == 1 && Player[B].State == 1)
-                Player[B].Location.Height = Physics.PlayerHeight[1][2];
-            Player[B].Location.Y += -Player[B].Location.Height;
-            Player[B].StandUp = true;
-        }
+        s_heightFix(Player[B]);
 
         NewEffect(EFFID_SMOKE_S3_CENTER, Player[B].Location);
     }
@@ -724,15 +729,7 @@ static void becomeAsToad()
         Player[B].Character = 4;
         Player[B].Immune = 50;
 
-        if(Player[B].Mount <= 1)
-        {
-            Player[B].Location.Y += Player[B].Location.Height;
-            Player[B].Location.Height = Physics.PlayerHeight[Player[B].Character][Player[B].State];
-            if(Player[B].Mount == 1 && Player[B].State == 1)
-                Player[B].Location.Height = Physics.PlayerHeight[1][2];
-            Player[B].Location.Y += -Player[B].Location.Height;
-            Player[B].StandUp = true;
-        }
+        s_heightFix(Player[B]);
 
         NewEffect(EFFID_SMOKE_S3_CENTER, Player[B].Location);
     }
@@ -749,15 +746,7 @@ static void becomeAsLink()
         Player[B].Character = 5;
         Player[B].Immune = 50;
 
-        if(Player[B].Mount <= 1)
-        {
-            Player[B].Location.Y += Player[B].Location.Height;
-            Player[B].Location.Height = Physics.PlayerHeight[Player[B].Character][Player[B].State];
-            if(Player[B].Mount == 1 && Player[B].State == 1)
-                Player[B].Location.Height = Physics.PlayerHeight[1][2];
-            Player[B].Location.Y += -Player[B].Location.Height;
-            Player[B].StandUp = true;
-        }
+        s_heightFix(Player[B]);
 
         NewEffect(EFFID_SMOKE_S3_CENTER, Player[B].Location);
     }
@@ -774,15 +763,7 @@ static void becomeAsMario()
         Player[B].Character = 1;
         Player[B].Immune = 50;
 
-        if(Player[B].Mount <= 1)
-        {
-            Player[B].Location.Y += Player[B].Location.Height;
-            Player[B].Location.Height = Physics.PlayerHeight[Player[B].Character][Player[B].State];
-            if(Player[B].Mount == 1 && Player[B].State == 1)
-                Player[B].Location.Height = Physics.PlayerHeight[1][2];
-            Player[B].Location.Y += -Player[B].Location.Height;
-            Player[B].StandUp = true;
-        }
+        s_heightFix(Player[B]);
 
         NewEffect(EFFID_SMOKE_S3_CENTER, Player[B].Location);
     }
@@ -799,15 +780,7 @@ static void becomeAsLuigi()
         Player[B].Character = 2;
         Player[B].Immune = 50;
 
-        if(Player[B].Mount <= 1)
-        {
-            Player[B].Location.Y += Player[B].Location.Height;
-            Player[B].Location.Height = Physics.PlayerHeight[Player[B].Character][Player[B].State];
-            if(Player[B].Mount == 1 && Player[B].State == 1)
-                Player[B].Location.Height = Physics.PlayerHeight[1][2];
-            Player[B].Location.Y += -Player[B].Location.Height;
-            Player[B].StandUp = true;
-        }
+        s_heightFix(Player[B]);
 
         NewEffect(EFFID_SMOKE_S3_CENTER, Player[B].Location);
     }
@@ -1060,28 +1033,12 @@ static void superbDemo2()
             if(C == 1)
             {
                 Player[C].Character = 1;
-                if(Player[C].Mount <= 1)
-                {
-                    Player[C].Location.Y += Player[C].Location.Height;
-                    Player[C].Location.Height = Physics.PlayerHeight[Player[C].Character][Player[C].State];
-                    if(Player[C].Mount == 1 && Player[C].State == 1)
-                        Player[C].Location.Height = Physics.PlayerHeight[1][2];
-                    Player[C].Location.Y += -Player[C].Location.Height;
-                    Player[C].StandUp = true;
-                }
+                s_heightFix(Player[C]);
             }
             else
             {
                 Player[C].Character = 2;
-                if(Player[C].Mount <= 1)
-                {
-                    Player[C].Location.Y += Player[C].Location.Height;
-                    Player[C].Location.Height = Physics.PlayerHeight[Player[C].Character][Player[C].State];
-                    if(Player[C].Mount == 1 && Player[C].State == 1)
-                        Player[C].Location.Height = Physics.PlayerHeight[1][2];
-                    Player[C].Location.Y += -Player[C].Location.Height;
-                    Player[C].StandUp = true;
-                }
+                s_heightFix(Player[C]);
             }
         }
 
@@ -1127,15 +1084,7 @@ static void onePlayer()
         int C = 1;
         Player[C] = Player[B];
         Player[C].Character = 1;
-        if(Player[C].Mount <= 1)
-        {
-            Player[C].Location.Y += Player[C].Location.Height;
-            Player[C].Location.Height = Physics.PlayerHeight[Player[C].Character][Player[C].State];
-            if(Player[C].Mount == 1 && Player[C].State == 1)
-                Player[C].Location.Height = Physics.PlayerHeight[1][2];
-            Player[C].Location.Y += -Player[C].Location.Height;
-            Player[C].StandUp = true;
-        }
+        s_heightFix(Player[C]);
 
         Player[C].Immune = 1;
         Player[C].Immune2 = true;
@@ -1179,15 +1128,7 @@ static void twoPlayer()
             }
 
             Player[C].Character = C;
-            if(Player[C].Mount <= 1)
-            {
-                Player[C].Location.Y += Player[C].Location.Height;
-                Player[C].Location.Height = Physics.PlayerHeight[Player[C].Character][Player[C].State];
-                if(Player[C].Mount == 1 && Player[C].State == 1)
-                    Player[C].Location.Height = Physics.PlayerHeight[1][2];
-                Player[C].Location.Y += -Player[C].Location.Height;
-                Player[C].StandUp = true;
-            }
+            s_heightFix(Player[C]);
         }
 
         Bomb(Player[B].Location, iRand(2) + 2);
@@ -1237,15 +1178,7 @@ static void fourPlayer()
                 Player[C].MountType = 1;
             }
 
-            if(Player[C].Mount <= 1)
-            {
-                Player[C].Location.Y += Player[C].Location.Height;
-                Player[C].Location.Height = Physics.PlayerHeight[Player[C].Character][Player[C].State];
-                if(Player[C].Mount == 1 && Player[C].State == 1)
-                    Player[C].Location.Height = Physics.PlayerHeight[1][2];
-                Player[C].Location.Y += -Player[C].Location.Height;
-                Player[C].StandUp = true;
-            }
+            s_heightFix(Player[C]);
         }
 
         Bomb(Player[B].Location, iRand(2) + 2);

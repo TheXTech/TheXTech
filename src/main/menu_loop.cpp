@@ -318,9 +318,8 @@ static void updateIntroLevelActivity()
                 {
                     p.Mount = 3;
                     p.MountType = iRand(7) + 1;
-                    p.Location.Y += p.Location.Height;
-                    p.Location.Height = Physics.PlayerHeight[2][2];
-                    p.Location.Y += -p.Location.Height - 0.01;
+                    p.Location.set_height_floor(Physics.PlayerHeight[2][2]);
+                    p.Location.Y -= 0.01;
                 }
             }
 
