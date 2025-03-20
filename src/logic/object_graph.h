@@ -34,8 +34,8 @@ namespace ObjectGraph
 
 struct Loc
 {
-    double x;
-    double y;
+    int x;
+    int y;
 };
 
 //! represents a single game object (does not attempt to track a single NPC if its ID changes)
@@ -105,7 +105,7 @@ class Graph
 {
 public:
     // map of distances to/from objects
-    using DistMap = std::unordered_map<const Object*, double>;
+    using DistMap = std::unordered_map<const Object*, unsigned int>;
 
     Level level;
 
@@ -116,21 +116,21 @@ public:
     DistMap start_dist_map;
 
     //! furthest distance of anything from player start
-    double furthest_dist = 0.0;
+    unsigned int furthest_dist = 0;
 
     //! update the object graph's nodes and start_dist_map based on its level substruct
     void update();
 
     //! get the distance (using warps if needed) from P1 start to loc
-    double distance_from_start(Loc loc);
+    unsigned int distance_from_start(Loc loc);
 
 private:
     // search algorithm support functions
-    using QueueEntry = std::pair<double, const Object*>;
+    using QueueEntry = std::pair<unsigned int, const Object*>;
     using SearchPriorityQueue = std::priority_queue<QueueEntry, std::vector<QueueEntry>, std::greater<QueueEntry>>;
 
     // Expand a single object in the queue, updating the dist_map and adding new queue entries to additional objects.
-    void expand(SearchPriorityQueue& queue, DistMap& dist_map, const Object* node, double distance, bool warps_reverse) const;
+    void expand(SearchPriorityQueue& queue, DistMap& dist_map, const Object* node, unsigned int distance, bool warps_reverse) const;
 
     // Fill dist_map with distances from origin. If warps_reverse is true, then find paths from objects to origin.
     void search(DistMap& dist_map, const Object* origin, bool warps_reverse) const;

@@ -33,18 +33,17 @@ namespace ObjectGraph
 template<class LocType>
 Loc get_center(const LocType& loc)
 {
-    return {loc.X + loc.Width / 2, loc.Y + loc.Height / 2};
+    return {(int)(loc.X + loc.Width / 2), (int)(loc.Y + loc.Height / 2)};
 }
 
-static double s_get_distance(const Loc& loc_1, const Loc& loc_2)
+static unsigned int s_get_distance(const Loc& loc_1, const Loc& loc_2)
 {
-    double dx = loc_1.x - loc_2.x;
-    double dy = loc_1.y - loc_2.y;
+    int dx = loc_1.x - loc_2.x;
+    int dy = loc_1.y - loc_2.y;
     return SDL_abs(dx) + SDL_abs(dy);
-    return SDL_sqrt(dx*dx + dy*dy);
 }
 
-void Graph::expand(SearchPriorityQueue& queue, DistMap& dist_map, const Object* node, double distance, bool warps_reverse) const
+void Graph::expand(SearchPriorityQueue& queue, DistMap& dist_map, const Object* node, unsigned int distance, bool warps_reverse) const
 {
     if(dist_map.find(node) != dist_map.end())
         return;
@@ -84,7 +83,7 @@ void Graph::search(DistMap& dist_map, const Object* origin, bool warps_reverse) 
         QueueEntry entry = queue.top();
         queue.pop();
 
-        double distance = entry.first;
+        unsigned int distance = entry.first;
         const Object* node = entry.second;
 
         expand(queue, dist_map, node, distance, warps_reverse);
@@ -106,28 +105,28 @@ void Graph::update()
     search(start_dist_map, &this->level.player_start, false);
 
     // check the furthest distance
-    this->furthest_dist = 0.0;
+    this->furthest_dist = 0;
     for(const Object* node : this->all_nodes)
     {
-        double node_dist = this->start_dist_map[node];
+        unsigned int node_dist = this->start_dist_map[node];
         if(node_dist > this->furthest_dist)
             this->furthest_dist = node_dist;
     }
 }
 
-double Graph::distance_from_start(Loc loc)
+unsigned int Graph::distance_from_start(Loc loc)
 {
-    double best_distance = s_get_distance(loc, this->level.player_start.loc);
+    unsigned int best_distance = s_get_distance(loc, this->level.player_start.loc);
 
     for(const Object* node : this->all_nodes)
     {
-        double start_to_node = start_dist_map[node];
-        if(start_to_node == 0.0 || start_to_node >= best_distance)
+        unsigned int start_to_node = start_dist_map[node];
+        if(start_to_node == 0 || start_to_node >= best_distance)
             continue;
 
         const Loc& node_loc = (node->type == Object::Warp) ? node->dest : node->loc;
 
-        double node_to_loc = s_get_distance(loc, node_loc);
+        unsigned int node_to_loc = s_get_distance(loc, node_loc);
 
         if(start_to_node + node_to_loc < best_distance)
             best_distance = start_to_node + node_to_loc;
@@ -205,11 +204,13 @@ void FillGraph(Graph& graph)
         int cur_section = n.Section;
         n.Section = old_section;
 
-        double targetX = n.Location.X + n.Location.Width / 2 - level[cur_section].X + level[n.Special2].X;
-        double targetY = n.Location.Y + n.Location.Height / 2 - level[cur_section].Y + level[n.Special2].Y;
+        Loc npc_center = get_center(n.Location);
+
+        int targetX = npc_center.x - LevelREAL[cur_section].X + LevelREAL[n.Special2].X;
+        int targetY = npc_center.y - LevelREAL[cur_section].Y + LevelREAL[n.Special2].Y;
 
         graph.level.warps.push_back(o(ObjectGraph::Object::Warp,
-            get_center(n.Location),
+            npc_center,
             ObjectGraph::Object::G_NPC, i,
             {targetX, targetY}));
     }
