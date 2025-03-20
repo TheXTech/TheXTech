@@ -3171,11 +3171,15 @@ void MouseMove(int X, int Y, bool /*nCur*/)
     if(XRender::TargetOverscanX && WorldEditor)
         X -= XRender::TargetOverscanX;
 
+    double lX = 0, lY = 0;
+
     // translate into layer coordinates to snap to layer's grid
     if(MagicHand && EditorCursor.Layer != LAYER_NONE)
     {
-        X -= (int)Layer[EditorCursor.Layer].OffsetX;
-        Y -= (int)Layer[EditorCursor.Layer].OffsetY;
+        lX = 32 - (Layer[EditorCursor.Layer].OffsetX - SDL_floor(Layer[EditorCursor.Layer].OffsetX / 32) * 32);
+        lY = 32 - (Layer[EditorCursor.Layer].OffsetY - SDL_floor(Layer[EditorCursor.Layer].OffsetY / 32) * 32);
+        X += (int)lX;
+        Y += (int)lY;
     }
 
     if(EditorCursor.Mode == OptCursor_t::LVL_ERASER || EditorCursor.Mode == OptCursor_t::LVL_SELECT /*|| frmLevelEditor::chkAlign.Value == 0*/)
@@ -3186,11 +3190,11 @@ void MouseMove(int X, int Y, bool /*nCur*/)
     }
     else
     {
-        if(MagicHand)
-        {
-            vScreen[A].Y = SDL_floor((((vScreen[A].Y + 8) / 32))) * 32 - 8;
-            vScreen[A].X = SDL_floor(((vScreen[A].X / 32))) * 32;
-        }
+        int vScreenX = SDL_floor(((vScreen[A].X / 32))) * 32;
+        int vScreenY = SDL_floor((((vScreen[A].Y + 8) / 32))) * 32 - 8;
+
+        X += (int)(vScreenX - vScreen[A].X);
+        Y += (int)(vScreenY - vScreen[A].Y);
 
         // 16x16 alignment
         if(
@@ -3218,44 +3222,39 @@ void MouseMove(int X, int Y, bool /*nCur*/)
                 EditorCursor.NPC.Type == 257 || EditorCursor.NPC.Type == 260))
         )
         {
-            if(!(ffEqual(EditorCursor.Location.X, (X / 16) * 16 - vScreen[A].X) &&
-                 ffEqual(EditorCursor.Location.Y + 8, (Y / 16) * 16 - vScreen[A].Y)) )
+            if(!(ffEqual(EditorCursor.Location.X, (X / 16) * 16 - vScreenX) &&
+                 ffEqual(EditorCursor.Location.Y, ((Y + 8) / 16) * 16 - vScreenY - 8)) )
             {
-                EditorCursor.Location.X = (X / 16) * 16 - vScreen[A].X;
-                EditorCursor.Location.Y = (Y / 16) * 16 - vScreen[A].Y;
-                EditorCursor.Location.Y -= 8;
+                EditorCursor.Location.X = (X / 16) * 16 - vScreenX;
+                EditorCursor.Location.Y = ((Y + 8) / 16) * 16 - vScreenY - 8;
                 PositionCursor();
             }
         }
         else if(EditorCursor.Mode == OptCursor_t::LVL_PLAYERSTART)
         {
-            if(!(EditorCursor.Location.X == (X / 8) * 8 - vScreen[A].X && EditorCursor.Location.Y + 8 == (Y / 8) * 8 - vScreen[A].Y))
+            if(!(EditorCursor.Location.X == (X / 8) * 8 - vScreenX && EditorCursor.Location.Y == (Y / 8) * 8 - vScreenY))
             {
-                EditorCursor.Location.X = (X / 8) * 8 - vScreen[A].X;
-                EditorCursor.Location.Y = (Y / 8) * 8 - vScreen[A].Y;
-                EditorCursor.Location.Y -= 8;
+                EditorCursor.Location.X = (X / 8) * 8 - vScreenX;
+                EditorCursor.Location.Y = (Y / 8) * 8 - vScreenY;
                 PositionCursor();
             }
         }
         else if(EditorCursor.Mode == OptCursor_t::WLD_SCENES)
         {
-            EditorCursor.Location.X = (X / 16) * 16 - vScreen[A].X;
-            EditorCursor.Location.Y = (Y / 16) * 16 - vScreen[A].Y;
-            EditorCursor.Location.Y -= 8;
+            EditorCursor.Location.X = (X / 16) * 16 - vScreenX;
+            EditorCursor.Location.Y = ((Y + 8) / 16) * 16 - vScreenY - 8;
             PositionCursor();
         }
         else if(EditorCursor.Mode == OptCursor_t::LVL_WATER)
         {
-            EditorCursor.Location.X = (X / 16) * 16 - vScreen[A].X;
-            EditorCursor.Location.Y = (Y / 16) * 16 - vScreen[A].Y;
-            EditorCursor.Location.Y -= 8;
+            EditorCursor.Location.X = (X / 16) * 16 - vScreenX;
+            EditorCursor.Location.Y = ((Y + 8) / 16) * 16 - vScreenY - 8;
             PositionCursor();
         }
         else // Everything also align as 32x32
         {
-            EditorCursor.Location.X = (X / 32) * 32 - vScreen[A].X;
-            EditorCursor.Location.Y = (Y / 32) * 32 - vScreen[A].Y;
-            EditorCursor.Location.Y -= 8;
+            EditorCursor.Location.X = (X / 32) * 32 - vScreenX;
+            EditorCursor.Location.Y = ((Y + 8) / 32) * 32 - vScreenY - 8;
             PositionCursor();
         }
     }
@@ -3273,8 +3272,8 @@ void MouseMove(int X, int Y, bool /*nCur*/)
     // translate from layer coordinates to screen coordinates
     if(MagicHand && EditorCursor.Layer != LAYER_NONE)
     {
-        EditorCursor.Location.X += Layer[EditorCursor.Layer].OffsetX;
-        EditorCursor.Location.Y += Layer[EditorCursor.Layer].OffsetY;
+        EditorCursor.Location.X -= lX;
+        EditorCursor.Location.Y -= lY;
     }
 }
 
