@@ -4962,23 +4962,26 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
                         NPC[numNPCs].Layer = LAYER_SPAWNED_NPCS;
                         NPC[numNPCs].Location.Y = NPC[p.HoldingNPC].Location.Y + NPC[p.HoldingNPC].Location.Height - NPC[numNPCs].Location.Height;
                         NPC[numNPCs].Direction = p.Direction;
+
                         if(NPC[numNPCs].Direction == 1)
                             NPC[numNPCs].Location.X = NPC[p.HoldingNPC].Location.X + NPC[p.HoldingNPC].Location.Width * 2 - 8;
                         else
                             NPC[numNPCs].Location.X = NPC[p.HoldingNPC].Location.X - NPC[numNPCs].Location.Width - NPC[p.HoldingNPC].Location.Width + 8;
 
                         if(B == 1)
-                            NPC[numNPCs].Location.SpeedX = 7 * NPC[numNPCs].Direction + (p.Location.SpeedX / 3.5);
+                            NPC[numNPCs].Location.SpeedX = 7 * NPC[numNPCs].Direction;
                         else if(B == 2)
                         {
-                            NPC[numNPCs].Location.SpeedX = 6.5 * NPC[numNPCs].Direction + (p.Location.SpeedX / 3.5);
+                            NPC[numNPCs].Location.SpeedX = 6.5 * NPC[numNPCs].Direction;
                             NPC[numNPCs].Location.SpeedY = -1.5;
                         }
                         else
                         {
-                            NPC[numNPCs].Location.SpeedX = 6.5 * NPC[numNPCs].Direction + (p.Location.SpeedX / 3.5);
+                            NPC[numNPCs].Location.SpeedX = 6.5 * NPC[numNPCs].Direction;
                             NPC[numNPCs].Location.SpeedY = 1.5;
                         }
+
+                        NPC[numNPCs].Location.SpeedX += p.Location.SpeedX / 3.5;
 
                         NPC[numNPCs].Projectile = true;
                         NPC[numNPCs].Frame = EditorNPCFrame(NPC[numNPCs].Type, NPC[numNPCs].Direction);
