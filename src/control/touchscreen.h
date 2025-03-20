@@ -229,9 +229,9 @@ public:
 
     bool m_cursorActive = false;
     SDL_FingerID m_cursorFinger = -1;
-    double m_cursorX = 0.0, m_cursorY = 0.0;
-    double m_lastCursorX = -32.;
-    double m_lastCursorY = -32.;
+    int m_cursorX = 0, m_cursorY = 0;
+    int m_lastCursorX = -32;
+    int m_lastCursorY = -32;
 
     bool m_scrollActive = false;
     bool m_wasScrolling = false;
