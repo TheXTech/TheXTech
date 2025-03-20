@@ -171,6 +171,12 @@ void s_drawNpcExtra(int Z, int camX, int camY, const NPC_t& n)
     }
 }
 
+void s_drawWaterBox(int camX, int camY, const Water_t& w)
+{
+    XRender::renderRect(camX + s_round2int(w.Location.X), camY + s_round2int(w.Location.Y), (int)(w.Location.Width), (int)(w.Location.Height),
+        (w.Quicksand) ? XTColor{255, 255, 0} : XTColor{0, 255, 255}, false);
+}
+
 void DrawEditorLevel(int Z)
 {
     int A = 0;
@@ -255,6 +261,15 @@ void DrawEditorLevel(int Z)
 
                 DrawPlayer(p, Z);
             }
+        }
+
+        // render water
+        for(int B : treeWaterQuery(-camX, -camY,
+            -camX + vScreen[Z].Width, -camY + vScreen[Z].Height,
+            SORTMODE_ID))
+        {
+            if(!Water[B].Hidden && vScreenCollision(Z, Water[B].Location))
+                s_drawWaterBox(camX, camY, Water[B]);
         }
 
         // render warps
@@ -504,10 +519,7 @@ void DrawEditorLevel(int Z)
             s_drawNpcExtra(Z, camX, camY, n);
         }
         else if(EditorCursor.Mode == OptCursor_t::LVL_WATER) // Water
-        {
-            XRender::renderRect(camX + s_round2int(EditorCursor.Location.X), camY + s_round2int(EditorCursor.Location.Y), (int)EditorCursor.Location.Width, (int)EditorCursor.Location.Height,
-                (EditorCursor.Water.Quicksand) ? XTColorF(1.f, 1.f, 0.f, 1.f) : XTColorF(0.f, 1.f, 1.f, 1.f), false);
-        }
+            s_drawWaterBox(camX, camY, EditorCursor.Water);
         else if(EditorCursor.Mode == OptCursor_t::LVL_WARPS)
         {
             XRender::renderRect(camX + s_round2int(EditorCursor.Location.X), camY + s_round2int(EditorCursor.Location.Y), (int)EditorCursor.Location.Width, (int)EditorCursor.Location.Height,

@@ -3047,25 +3047,6 @@ void UpdateGraphicsScreen(Screen_t& screen)
             DrawWarningNPC(Z, camX, camY, A);
         }
 
-        // water
-        if(LevelEditor)
-        {
-            for(int B : treeWaterQuery(-camX, -camY,
-                -camX + vScreen[Z].Width, -camY + vScreen[Z].Height,
-                SORTMODE_ID))
-            {
-                if(!Water[B].Hidden && vScreenCollision(Z, Water[B].Location))
-                {
-                    if(Water[B].Quicksand)
-                        XRender::renderRect(camX + Water[B].Location.X, camY + Water[B].Location.Y, Water[B].Location.Width, Water[B].Location.Height,
-                            {255, 255, 0}, false);
-                    else
-                        XRender::renderRect(camX + Water[B].Location.X, camY + Water[B].Location.Y, Water[B].Location.Width, Water[B].Location.Height,
-                            {0, 255, 255}, false);
-                }
-            }
-        }
-
         if(!LevelEditor) // Graphics for the main game.
         {
             // moved vScreen divider below
