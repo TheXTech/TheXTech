@@ -317,7 +317,7 @@ inline Location_t extract_loc(NPCRef_t obj)
 
     if(ret.Width < NPCWidthGFX(obj->Type))
     {
-        ret.X -= (NPCWidthGFX(obj->Type) - ret.Width) / 2.0;
+        ret.X -= (NPCWidthGFX(obj->Type) - ret.Width) / 2;
         ret.Width = NPCWidthGFX(obj->Type);
     }
     else if(ret.Width <= 0)

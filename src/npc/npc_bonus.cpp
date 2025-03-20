@@ -137,7 +137,7 @@ void DropBonus(int A)
     double CenterX = -vscreen.X + vscreen.Width / 2;
 
     // place NPC at HUD
-    NPC[numNPCs].Location.X = CenterX + hud_offset - NPC[numNPCs].Location.Width / 2.0;
+    NPC[numNPCs].Location.X = CenterX + hud_offset - NPC[numNPCs].Location.Width / 2;
     NPC[numNPCs].Location.Y = ScreenTop + 16 + 12;
 
     // finish initializing the NPC

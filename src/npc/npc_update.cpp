@@ -1326,12 +1326,12 @@ interrupt_Activation:
                 NPC[A].Type = NPCID(NPCID_VEGGIE_2 + B);
                 if(NPC[A].Type == NPCID_VEGGIE_RANDOM)
                     NPC[A].Type = NPCID_VEGGIE_1;
-                NPC[A].Location.X += NPC[A].Location.Width / 2.0;
-                NPC[A].Location.Y += NPC[A].Location.Height / 2.0;
+                NPC[A].Location.X += NPC[A].Location.Width / 2;
+                NPC[A].Location.Y += NPC[A].Location.Height / 2;
                 NPC[A].Location.Width = NPC[A]->TWidth;
                 NPC[A].Location.Height = NPC[A]->THeight;
-                NPC[A].Location.X += -NPC[A].Location.Width / 2.0;
-                NPC[A].Location.Y += -NPC[A].Location.Height / 2.0;
+                NPC[A].Location.X += -NPC[A].Location.Width / 2;
+                NPC[A].Location.Y += -NPC[A].Location.Height / 2;
                 NPCQueues::Unchecked.push_back(A);
             }
 
@@ -1477,12 +1477,12 @@ interrupt_Activation:
                                 if(NPC[A].Type == NPCID_VEGGIE_RANDOM)
                                     NPC[A].Type = NPCID_VEGGIE_1;
 
-                                NPC[A].Location.X += NPC[A].Location.Width / 2.0;
-                                NPC[A].Location.Y += NPC[A].Location.Height / 2.0;
+                                NPC[A].Location.X += NPC[A].Location.Width / 2;
+                                NPC[A].Location.Y += NPC[A].Location.Height / 2;
                                 NPC[A].Location.Width = NPC[A]->TWidth;
                                 NPC[A].Location.Height = NPC[A]->THeight;
-                                NPC[A].Location.X += -NPC[A].Location.Width / 2.0;
-                                NPC[A].Location.Y += -NPC[A].Location.Height / 2.0;
+                                NPC[A].Location.X += -NPC[A].Location.Width / 2;
+                                NPC[A].Location.Y += -NPC[A].Location.Height / 2;
                             }
 
                             NPCQueues::Unchecked.push_back(A);
@@ -1493,13 +1493,13 @@ interrupt_Activation:
 
                         if(NPC[A].Type == NPCID_SPIT_GUY_BALL)
                         {
-                            NPC[A].Location.X += NPC[A].Location.Width / 2.0;
-                            NPC[A].Location.Y += NPC[A].Location.Height / 2.0;
+                            NPC[A].Location.X += NPC[A].Location.Width / 2;
+                            NPC[A].Location.Y += NPC[A].Location.Height / 2;
                             NPC[A].Type = NPCID_COIN_S2;
                             NPC[A].Location.Height = NPC[A]->THeight;
                             NPC[A].Location.Width = NPC[A]->TWidth;
-                            NPC[A].Location.X += -NPC[A].Location.Width / 2.0;
-                            NPC[A].Location.Y += -NPC[A].Location.Height / 2.0;
+                            NPC[A].Location.X += -NPC[A].Location.Width / 2;
+                            NPC[A].Location.Y += -NPC[A].Location.Height / 2;
 
                             NPCQueues::Unchecked.push_back(A);
                         }
@@ -1524,8 +1524,8 @@ interrupt_Activation:
                                 Location_t tempLocation;
                                 tempLocation.Height = EffectHeight[EFFID_SPARKLE];
                                 tempLocation.Width = EffectWidth[EFFID_SPARKLE];
-                                tempLocation.X = NPC[A].Location.X - tempLocation.Width / 2.0 + dRand() * NPC[A].Location.Width - 4;
-                                tempLocation.Y = NPC[A].Location.Y - tempLocation.Height / 2.0 + dRand() * NPC[A].Location.Height - 4;
+                                tempLocation.X = NPC[A].Location.X - tempLocation.Width / 2 + dRand() * NPC[A].Location.Width - 4;
+                                tempLocation.Y = NPC[A].Location.Y - tempLocation.Height / 2 + dRand() * NPC[A].Location.Height - 4;
                                 NewEffect(EFFID_SPARKLE, tempLocation);
                             }
                         }
@@ -1618,7 +1618,7 @@ interrupt_Activation:
                     {
                         if((NPC[A].Type == NPCID_MAGIC_BOSS || NPC[A].Type == NPCID_FIRE_BOSS) && NPC[A].Special == 0) // larry koopa
                         {
-                            if(Player[NPC[A].Special5].Location.X + Player[NPC[A].Special5].Location.Width / 2.0 < NPC[A].Location.X + NPC[A].Location.Width / 2.0)
+                            if(Player[NPC[A].Special5].Location.X + Player[NPC[A].Special5].Location.Width / 2 < NPC[A].Location.X + NPC[A].Location.Width / 2)
                             {
                                 if(NPC[A].Special2 < 0)
                                     NPC[A].Special3 += 30;
@@ -1642,7 +1642,7 @@ interrupt_Activation:
                             Location_t tempLocation;
                             tempLocation.Height = 0;
                             tempLocation.Width = 0;
-                            tempLocation.Y = NPC[A].Location.Y + NPC[A].Location.Height / 2.0 - 16;
+                            tempLocation.Y = NPC[A].Location.Y + NPC[A].Location.Height / 2 - 16;
                             tempLocation.X = NPC[A].Location.X - 16;
                             if(NPC[A].Direction == 1)
                                 tempLocation.X = NPC[A].Location.X + NPC[A].Location.Width - 16;

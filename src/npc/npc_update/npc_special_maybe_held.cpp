@@ -157,7 +157,7 @@ void NPCSpecialMaybeHeld(int A)
         bool tempBool = false;
         if(NPC[A].Special5 > 0)
         {
-            if(Player[NPC[A].Special5].Location.X + Player[NPC[A].Special5].Location.Width / 2.0 < NPC[A].Location.X + NPC[A].Location.Width / 2.0)
+            if(Player[NPC[A].Special5].Location.X + Player[NPC[A].Special5].Location.Width / 2 < NPC[A].Location.X + NPC[A].Location.Width / 2)
             {
                 if(NPC[A].Direction < 0)
                     tempBool = true;
@@ -285,7 +285,7 @@ void NPCSpecialMaybeHeld(int A)
         }
         else if(NPC[A].Special4 == 2) // hops
         {
-            if(NPC[A].Location.SpeedY == 0.0 || NPC[A].Slope > 0)
+            if(NPC[A].Location.SpeedY == 0 || NPC[A].Slope > 0)
             {
                 if(NPC[A].Special3 < 5)
                 {
@@ -345,8 +345,8 @@ void NPCSpecialMaybeHeld(int A)
                 NPC[A].Location.Y -= 0.1;
                 // This formula got been compacted: If something will glitch, feel free to restore back this crap
                 //NPC[A].Location.SpeedX = (static_cast<int>(std::floor(static_cast<double>(((Player[NPC[A].Special5].Location.X + Player[NPC[A].Special5].Location.Width / 2.0 - 16) + 1) / 32))) * 32 + 1 - NPC[A].Location.X) / 50;
-                double pCenter = pl.X + pl.Width / 2.0;
-                sx = std::floor((pCenter - 16.0 + 1.0) / 32.0) * 32.0 + 1.0;
+                double pCenter = pl.X + pl.Width / 2;
+                sx = std::floor((pCenter - 15) / 32) * 32 + 1;
                 sx -= NPC[A].Location.X;
                 sx /= 50;
                 if(sx > 15)
@@ -393,7 +393,7 @@ void NPCSpecialMaybeHeld(int A)
             }
             else if(NPC[A].Special3 == 21)
             {
-                if(NPC[A].Location.SpeedY != 0.0)
+                if(NPC[A].Location.SpeedY != 0)
                     NPC[A].Location.SpeedY = 10;
                 else
                 {
@@ -512,10 +512,10 @@ void NPCSpecialMaybeHeld(int A)
             }
             else
             {
-                if(NPC[A].Location.SpeedY == 0.0 || NPC[A].Slope > 0)
+                if(NPC[A].Location.SpeedY == 0 || NPC[A].Slope > 0)
                 {
                     NPC[A].Special3 = 0;
-                    if(Player[NPC[A].Special5].Location.X + Player[NPC[A].Special5].Location.Width / 2.0 < NPC[A].Location.X + NPC[A].Location.Width / 2.0)
+                    if(Player[NPC[A].Special5].Location.X + Player[NPC[A].Special5].Location.Width / 2 < NPC[A].Location.X + NPC[A].Location.Width / 2)
                         NPC[A].Special4 = -10;
                     else
                         NPC[A].Special4 = 10;
@@ -558,8 +558,8 @@ void NPCSpecialMaybeHeld(int A)
                         NPC[numNPCs].Location.X = NPC[A].Location.X + 54;
                     NPC[numNPCs].Location.Y = NPC[A].Location.Y + 19;
                     NPC[numNPCs].Location.SpeedX = 4 * NPC[numNPCs].Direction;
-                    double C = (NPC[numNPCs].Location.X + NPC[numNPCs].Location.Width / 2.0) - (Player[NPC[A].Special5].Location.X + Player[NPC[A].Special5].Location.Width / 2.0);
-                    double D = (NPC[numNPCs].Location.Y + NPC[numNPCs].Location.Height / 2.0) - (Player[NPC[A].Special5].Location.Y + Player[NPC[A].Special5].Location.Height / 2.0);
+                    double C = (NPC[numNPCs].Location.X + NPC[numNPCs].Location.Width / 2) - (Player[NPC[A].Special5].Location.X + Player[NPC[A].Special5].Location.Width / 2);
+                    double D = (NPC[numNPCs].Location.Y + NPC[numNPCs].Location.Height / 2) - (Player[NPC[A].Special5].Location.Y + Player[NPC[A].Special5].Location.Height / 2);
                     NPC[numNPCs].Location.SpeedY = D / C * NPC[numNPCs].Location.SpeedX;
                     if(NPC[numNPCs].Location.SpeedY > 1)
                         NPC[numNPCs].Location.SpeedY = 1;
@@ -693,7 +693,7 @@ void NPCSpecialMaybeHeld(int A)
                         if(C == 0.0 || dist < C)
                         {
                             C = dist;
-                            if(NPC[A].Location.X + NPC[A].Location.Width / 2.0 > Player[B].Location.X + Player[B].Location.Width / 2.0)
+                            if(NPC[A].Location.X + NPC[A].Location.Width / 2 > Player[B].Location.X + Player[B].Location.Width / 2)
                                 NPC[A].Direction = -1;
                             else
                                 NPC[A].Direction = 1;
@@ -749,9 +749,9 @@ void NPCSpecialMaybeHeld(int A)
                         NPC[numNPCs].Location.Height = NPC[numNPCs]->THeight;
 
                         if(NPC[numNPCs].Direction > 0)
-                            NPC[numNPCs].Location.X = NPC[A].Location.X + NPC[A].Location.Width / 2.0;
+                            NPC[numNPCs].Location.X = NPC[A].Location.X + NPC[A].Location.Width / 2;
                         else
-                            NPC[numNPCs].Location.X = NPC[A].Location.X + NPC[A].Location.Width / 2.0 - NPC[numNPCs].Location.Width;
+                            NPC[numNPCs].Location.X = NPC[A].Location.X + NPC[A].Location.Width / 2 - NPC[numNPCs].Location.Width;
 
                         if(NPC[numNPCs].Direction > 0)
                             NPC[numNPCs].Frame = 1;
@@ -828,7 +828,7 @@ void NPCSpecialMaybeHeld(int A)
         // In original game, this is a dead code because of "And 0" condition at end.
         // In this sample, the "& false" was been commented
         // This code makes Toothy shown off the pipe when the pipe is a projectile, shooted by generator
-        if(NPC[A].Projectile && NPC[A].Special2 == 0.0 && NPC[A].Special == 0.0 /*&& false*/)
+        if(NPC[A].Projectile && NPC[A].Special2 == 0 && NPC[A].Special == 0 /*&& false*/)
         {
             numNPCs++;
             NPC[numNPCs] = NPC_t();
@@ -895,13 +895,13 @@ void NPCSpecialMaybeHeld(int A)
                 if(target_plr == 0)
                     target_plr = 1;
 
-                if(Player[target_plr].Location.X + Player[target_plr].Location.Width / 2.0 > NPC[A].Location.X + 16)
+                if(Player[target_plr].Location.X + Player[target_plr].Location.Width / 2 > NPC[A].Location.X + 16)
                     NPC[A].Direction = 1;
                 else
                     NPC[A].Direction = -1;
             }
 
-            if(NPC[A].Location.SpeedY == 0.0 || NPC[A].Slope > 0)
+            if(NPC[A].Location.SpeedY == 0 || NPC[A].Slope > 0)
             {
                 NPC[A].Location.SpeedX = 0;
 

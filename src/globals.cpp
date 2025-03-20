@@ -612,8 +612,8 @@ void initAll()
     blockCharacter.fill(false);
     OwedMount.fill(0);
     OwedMountType.fill(0);
-    AutoX.fill(0.f);
-    AutoY.fill(0.f);
+    AutoX.fill(0);
+    AutoY.fill(0);
     Water.fill(Water_t());
     // FirstBlock.fill(0);
     // LastBlock.fill(0);

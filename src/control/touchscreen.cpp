@@ -1446,20 +1446,20 @@ void TouchScreenController::update()
 
     m_wasScrolling = m_scrollActive;
 
-    if(!m_scrollActive && m_scrollMomentumX != 0.)
+    if(!m_scrollActive && m_scrollMomentumX != 0)
     {
         m_scrollMomentumX *= 0.97;
         m_scrollX += m_scrollMomentumX;
         if(m_scrollMomentumX > -0.1 && m_scrollMomentumX < 0.1)
-            m_scrollMomentumX = 0.;
+            m_scrollMomentumX = 0;
     }
 
-    if(!m_scrollActive && m_scrollMomentumY != 0.)
+    if(!m_scrollActive && m_scrollMomentumY != 0)
     {
         m_scrollMomentumY *= 0.97;
         m_scrollY += m_scrollMomentumY;
         if(m_scrollMomentumY > -0.1 && m_scrollMomentumY < 0.1)
-            m_scrollMomentumY = 0.;
+            m_scrollMomentumY = 0;
     }
 
     // handle special keys

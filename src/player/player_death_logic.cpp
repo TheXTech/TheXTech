@@ -126,7 +126,7 @@ void UpdatePlayerTimeToLive(int A)
 
         float C1 = std::sqrt((A1 * A1) + (B1 * B1));
         float X, Y;
-        if(C1 != 0.0f)
+        if(C1 != 0)
         {
             X = A1 / C1;
             Y = B1 / C1;

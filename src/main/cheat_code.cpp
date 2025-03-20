@@ -1294,8 +1294,8 @@ static void warioTime()
                 NPC[B].Location.X += NPC[B].Location.Width / 2;
                 NPC[B].Location.Width = NPC[B]->TWidth;
                 NPC[B].Location.Height = NPC[B]->THeight;
-                NPC[B].Location.Y += -NPC[B].Location.Height / 2.0;
-                NPC[B].Location.X += -NPC[B].Location.Width / 2.0;
+                NPC[B].Location.Y += -NPC[B].Location.Height / 2;
+                NPC[B].Location.X += -NPC[B].Location.Width / 2;
                 NPC[B].Location.SpeedX = 0;
                 NPC[B].Location.SpeedY = 0;
 

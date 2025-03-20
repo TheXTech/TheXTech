@@ -1089,8 +1089,8 @@ void PathPath(WorldPath_t &Pth, bool Skp)
         Pth.Active = true;
 
         // set a temporary vScreen focus
-        vScreen[Z].tempX = Pth.Location.X + Pth.Location.Width / 2.0;
-        vScreen[Z].TempY = Pth.Location.Y + Pth.Location.Height / 2.0;
+        vScreen[Z].tempX = Pth.Location.X + Pth.Location.Width / 2;
+        vScreen[Z].TempY = Pth.Location.Y + Pth.Location.Height / 2;
         vScreen[Z].TempDelay = 1;
 
         // update section (no cam sound)
@@ -1171,8 +1171,8 @@ void PathPath(WorldPath_t &Pth, bool Skp)
                     if(!Skp)
                     {
                         // set a temporary vScreen focus
-                        vScreen[Z].tempX = lev.Location.X + lev.Location.Width / 2.0;
-                        vScreen[Z].TempY = lev.Location.Y + lev.Location.Height / 2.0;
+                        vScreen[Z].tempX = lev.Location.X + lev.Location.Width / 2;
+                        vScreen[Z].TempY = lev.Location.Y + lev.Location.Height / 2;
                         vScreen[Z].TempDelay = 1;
 
                         // update world map section (no cam sound)

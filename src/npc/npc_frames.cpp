@@ -595,9 +595,9 @@ void NPCFrames(int A)
     else if(NPC[A].Type == NPCID_FIRE_PLANT)
     {
         NPC[A].Frame = 0;
-        if(Player[NPC[A].Special4].Location.X + Player[NPC[A].Special4].Location.Width / 2.0 > NPC[A].Location.X + NPC[A].Location.Width / 2.0)
+        if(Player[NPC[A].Special4].Location.X + Player[NPC[A].Special4].Location.Width / 2 > NPC[A].Location.X + NPC[A].Location.Width / 2)
             NPC[A].Frame = 2;
-        if(Player[NPC[A].Special4].Location.Y + Player[NPC[A].Special4].Location.Height / 2.0 < NPC[A].Location.Y + 16)
+        if(Player[NPC[A].Special4].Location.Y + Player[NPC[A].Special4].Location.Height / 2 < NPC[A].Location.Y + 16)
             NPC[A].Frame += 1;
     }
     else if(NPC[A].Type == NPCID_FLY_FODDER_S5)
@@ -870,7 +870,7 @@ void NPCFrames(int A)
         {
             tempLocation = NPC[A].Location;
             tempLocation.Width = NPC[A].Location.Width * 2;
-            tempLocation.X = NPC[A].Location.X - NPC[A].Location.Width / 2.0;
+            tempLocation.X = NPC[A].Location.X - NPC[A].Location.Width / 2;
 
             for(int B = 1; B <= numPlayers; ++B)
             {
@@ -926,9 +926,9 @@ void NPCFrames(int A)
 
         if(iRand(4) == 0)
         {
-            NewEffect(EFFID_SPARKLE, newLoc(NPC[A].Location.X + NPC[A].Location.Width / 2.0 - 4, NPC[A].Location.Y + NPC[A].Location.Height / 2.0 - 4), 1, 0, NPC[A].Shadow);
-            Effect[numEffects].Location.SpeedX = dRand() * 1 - 0.5;
-            Effect[numEffects].Location.SpeedY = dRand() * 1 - 0.5;
+            NewEffect(EFFID_SPARKLE, newLoc(NPC[A].Location.X + NPC[A].Location.Width / 2 - 4, NPC[A].Location.Y + NPC[A].Location.Height / 2 - 4), 1, 0, NPC[A].Shadow);
+            Effect[numEffects].Location.SpeedX = dRand() - 0.5;
+            Effect[numEffects].Location.SpeedY = dRand() - 0.5;
         }
 
 
@@ -968,9 +968,9 @@ void NPCFrames(int A)
                 NPC[A].Frame = 0;
             else if(NPC[A].Frame < 0)
                 NPC[A].Frame = 3;
-            NewEffect(EFFID_SPARKLE, newLoc(NPC[A].Location.X + NPC[A].Location.Width / 2.0 - 8, NPC[A].Location.Y + NPC[A].Location.Height / 2.0 - 8), 1, 0, NPC[A].Shadow);
-            Effect[numEffects].Location.SpeedX = dRand() * 1 - 0.5;
-            Effect[numEffects].Location.SpeedY = dRand() * 1 - 0.5;
+            NewEffect(EFFID_SPARKLE, newLoc(NPC[A].Location.X + NPC[A].Location.Width / 2 - 8, NPC[A].Location.Y + NPC[A].Location.Height / 2 - 8), 1, 0, NPC[A].Shadow);
+            Effect[numEffects].Location.SpeedX = dRand() - 0.5;
+            Effect[numEffects].Location.SpeedY = dRand() - 0.5;
         }
 
         treeNPCUpdate(A);
@@ -1090,9 +1090,9 @@ void NPCFrames(int A)
             NPC[A].Special3 = 0;
         if(iRand(100) >= 92)
         {
-            NewEffect(EFFID_SPARKLE, newLoc(NPC[A].Location.X + NPC[A].Location.Width / 2.0 - 4, NPC[A].Location.Y + NPC[A].Location.Height / 2.0 - 6), 1, 0, NPC[A].Shadow);
-            Effect[numEffects].Location.SpeedX = dRand() * 1 - 0.5;
-            Effect[numEffects].Location.SpeedY = dRand() * 1 - 0.5;
+            NewEffect(EFFID_SPARKLE, newLoc(NPC[A].Location.X + NPC[A].Location.Width / 2 - 4, NPC[A].Location.Y + NPC[A].Location.Height / 2 - 6), 1, 0, NPC[A].Shadow);
+            Effect[numEffects].Location.SpeedX = dRand() - 0.5;
+            Effect[numEffects].Location.SpeedY = dRand() - 0.5;
         }
     }
     else if(NPC[A].Type == NPCID_ITEM_BURIED)
@@ -1684,8 +1684,8 @@ void NPCFrames(int A)
                         tempLocation.Width = EffectWidth[EFFID_SPARKLE];
                         tempLocation.SpeedX = 0;
                         tempLocation.SpeedY = 0;
-                        tempLocation.X = NPC[A].Location.X - tempLocation.Width / 2.0 + dRand() * NPC[A].Location.Width - 4;
-                        tempLocation.Y = NPC[A].Location.Y - tempLocation.Height / 2.0 + dRand() * NPC[A].Location.Height - 4;
+                        tempLocation.X = NPC[A].Location.X - tempLocation.Width / 2 + dRand() * NPC[A].Location.Width - 4;
+                        tempLocation.Y = NPC[A].Location.Y - tempLocation.Height / 2 + dRand() * NPC[A].Location.Height - 4;
                         NewEffect(EFFID_SPARKLE, tempLocation, 1, 0, NPC[A].Shadow);
                         Effect[numEffects].Location.SpeedX = NPC[A].Location.SpeedX * 0.25;
                         Effect[numEffects].Location.SpeedY = NPC[A].Location.SpeedY * 0.25;

@@ -2211,8 +2211,8 @@ void SetCursor()
         EditorCursor.NPC.Special4 = 0;
         EditorCursor.NPC.Special5 = 0;
         // EditorCursor.NPC.Special6 = 0;
-        EditorCursor.NPC.SpecialX = 0.0;
-        EditorCursor.NPC.SpecialY = 0.0;
+        EditorCursor.NPC.SpecialX = 0;
+        EditorCursor.NPC.SpecialY = 0;
         EditorCursor.NPC.Layer = EditorCursor.Layer;
         EditorCursor.NPC.Location = EditorCursor.Location;
 
@@ -2227,8 +2227,8 @@ void SetCursor()
         EditorCursor.Location.Width = EditorCursor.NPC.Location.Width;
         EditorCursor.Location.Height = EditorCursor.NPC.Location.Height;
 
-        EditorCursor.Location.SpeedX = 0.0;
-        EditorCursor.Location.SpeedY = 0.0;
+        EditorCursor.Location.SpeedX = 0;
+        EditorCursor.Location.SpeedY = 0;
 
         EditorCursor.NPC.Frame = EditorNPCFrame(EditorCursor.NPC.Type, EditorCursor.NPC.Direction);
         EditorCursor.NPC.Active = true;
@@ -2547,7 +2547,7 @@ void zTestLevel(bool magicHand, bool interProcess)
         ClearLevel();
         // force players offscreen
         for(int i = 1; i <= maxLocalPlayers; i++)
-            Player[i].Location.X = -20000.0;
+            Player[i].Location.X = -20000;
 
         LevelBeatCode = -3;
         QuickReconnectScreen::g_active = true;

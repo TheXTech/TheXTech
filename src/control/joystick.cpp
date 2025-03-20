@@ -579,8 +579,8 @@ bool InputMethod_Joystick::Update(int player, Controls_t& c, CursorControls_t& m
         if(m.Y < 0)
             m.Y = XRender::TargetH / 2;
 
-        m.X += (cursor[3] - cursor[2]) * 16.;
-        m.Y += (cursor[1] - cursor[0]) * 16.;
+        m.X += (cursor[3] - cursor[2]) * 16;
+        m.Y += (cursor[1] - cursor[0]) * 16;
 
         if(m.X < 0)
         {

@@ -163,7 +163,7 @@ bool UpdatePlayer()
                         UnDuck(Player[A]);
                     Player[A].Slide = true;
                 }
-                else if(Player[A].Location.SpeedX == 0.0)
+                else if(Player[A].Location.SpeedX == 0)
                     Player[A].Slide = false;
 
                 if(Player[A].Mount > 0 || Player[A].HoldingNPC > 0)
@@ -182,7 +182,7 @@ bool UpdatePlayer()
 
                 if(Player[A].StandingOnNPC > 0)
                 {
-                    if(NPC[Player[A].StandingOnNPC].Type == NPCID_ICE_CUBE && NPC[Player[A].StandingOnNPC].Location.SpeedX == 0.0)
+                    if(NPC[Player[A].StandingOnNPC].Type == NPCID_ICE_CUBE && NPC[Player[A].StandingOnNPC].Location.SpeedX == 0)
                         Player[A].Slippy = true;
                 }
 
@@ -218,7 +218,7 @@ bool UpdatePlayer()
                 // stop link when stabbing
                 if(Player[A].Character == 5)
                 {
-                    if(Player[A].FireBallCD > 0 && (Player[A].Location.SpeedY == 0.0 || Player[A].Slope != 0 || Player[A].StandingOnNPC != 0))
+                    if(Player[A].FireBallCD > 0 && (Player[A].Location.SpeedY == 0 || Player[A].Slope != 0 || Player[A].StandingOnNPC != 0))
                     {
                         if(Player[A].Slippy)
                             Player[A].Location.SpeedX = Player[A].Location.SpeedX * 0.75;
@@ -283,7 +283,7 @@ bool UpdatePlayer()
 
 
                 // Players Y movement.
-                if(Block[Player[A].Slope].Location.SpeedY != 0.0 && Player[A].Slope != 0)
+                if(Block[Player[A].Slope].Location.SpeedY != 0 && Player[A].Slope != 0)
                     Player[A].Location.Y += Block[Player[A].Slope].Location.SpeedY;
 
                 if(Player[A].Fairy) // the player is a fairy

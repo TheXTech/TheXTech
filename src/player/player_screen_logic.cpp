@@ -187,10 +187,10 @@ void PlayerEffectWings(int A)
 
             double target_speed = SDL_sqrt(target_SpeedX * target_SpeedX + target_SpeedY * target_SpeedY);
 
-            if(target_speed != 0.0)
+            if(target_speed != 0)
             {
-                target_SpeedX *= 8.0 / target_speed;
-                target_SpeedY *= 8.0 / target_speed;
+                target_SpeedX *= 8 / target_speed;
+                target_SpeedY *= 8 / target_speed;
             }
 
             p.Location.SpeedX = (p.Location.SpeedX + target_SpeedX) / 2;
@@ -208,7 +208,7 @@ void PlayerEffectWings(int A)
             double sq_speed = p.Location.SpeedX * p.Location.SpeedX + p.Location.SpeedY * p.Location.SpeedY;
             double decelerate_rate = (sq_speed > 4.0) ? 0.95 : (sq_speed > 1.0) ? 0.99 : 0.999;
 
-            if(sq_speed <= 4.0)
+            if(sq_speed <= 4)
             {
                 WingsFrame = 1;
 
@@ -479,7 +479,7 @@ void PlayerLevelEdgeCheck(int A, bool check_X)
 
             Player[A].Pinched.Left2 = 2;
 
-            if(AutoX[Player[A].Section] != 0.0f)
+            if(AutoX[Player[A].Section] != 0)
             {
                 Player[A].Pinched.Moving = 2;
                 Player[A].Pinched.MovingLR = true;
@@ -494,7 +494,7 @@ void PlayerLevelEdgeCheck(int A, bool check_X)
 
             Player[A].Pinched.Right4 = 2;
 
-            if(AutoX[Player[A].Section] != 0.f)
+            if(AutoX[Player[A].Section] != 0)
             {
                 Player[A].Pinched.Moving = 2;
                 Player[A].Pinched.MovingLR = true;
@@ -506,7 +506,7 @@ void PlayerLevelEdgeCheck(int A, bool check_X)
     {
         Player[A].Location.Y = level[Player[A].Section].Y - Player[A].Location.Height - 32;
 
-        if(AutoY[Player[A].Section] != 0.f)
+        if(AutoY[Player[A].Section] != 0)
         {
             Player[A].Pinched.Moving = 3;
             Player[A].Pinched.MovingUD = true;

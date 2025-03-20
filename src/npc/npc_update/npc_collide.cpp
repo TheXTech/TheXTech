@@ -333,7 +333,7 @@ void NPCCollide(int A)
 
                         if(NPC[A].CantHurt < 25)
                             NPC[A].Special = 1;
-                        if(NPC[A].Location.X + NPC[A].Location.Width / 2.0 > NPC[B].Location.X + NPC[B].Location.Width / 2.0)
+                        if(NPC[A].Location.X + NPC[A].Location.Width / 2 > NPC[B].Location.X + NPC[B].Location.Width / 2)
                         {
                             NPC[B].Location.X = NPC[A].Location.X - NPC[B].Location.Width - 1;
                             NPC[B].Direction = 1;
@@ -515,7 +515,7 @@ void NPCCollide(int A)
                         if((NPC[A].Direction == 1  && NPC[A].Location.X + NPC[A].Location.Width < NPC[B].Location.X + 4) ||
                            (NPC[A].Direction == -1 && NPC[A].Location.X > NPC[B].Location.X + NPC[B].Location.Width - 4))
                         {
-                            if(NPC[B].Location.SpeedX == 0.0 && NPC[B].Effect == NPCEFF_NORMAL)
+                            if(NPC[B].Location.SpeedX == 0 && NPC[B].Effect == NPCEFF_NORMAL)
                             {
                                 NPC[A].Special = 10;
                                 Player[numPlayers + 1].Direction = NPC[A].Direction;

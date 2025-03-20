@@ -390,7 +390,7 @@ void SetLayerSpeed(layerindex_t L, double SpeedX, double SpeedY, bool EffectStop
         Defective = false;
 
     // relatively simple code to set the layer's speed
-    if(SpeedX != 0.0 || SpeedY != 0.0 || Defective)
+    if(SpeedX != 0 || SpeedY != 0 || Defective)
     {
         Layer[L].SpeedX = SpeedX;
         Layer[L].SpeedY = SpeedY;
@@ -403,7 +403,7 @@ void SetLayerSpeed(layerindex_t L, double SpeedX, double SpeedY, bool EffectStop
 
 
     // relatively more complex code to stop the layer -- first check that it's necessary (note: this check prevents an infinite recursion)
-    if(Layer[L].SpeedX == 0.0f && Layer[L].SpeedY == 0.0f)
+    if(Layer[L].SpeedX == 0 && Layer[L].SpeedY == 0)
         return;
 
 
@@ -1331,7 +1331,7 @@ eventindex_t ProcEvent_Safe(bool is_resume, eventindex_t index, int whichPlayer,
 
         SetLayerSpeed(B, evt.SpeedX, evt.SpeedY, true);
 
-        if(Layer[B].SpeedX == 0.f && Layer[B].SpeedY == 0.f)
+        if(Layer[B].SpeedX == 0 && Layer[B].SpeedY == 0)
         {
             // eventually, only re-join tables the first time the event has been triggered in a level
             treeBlockJoinLayer(B);
@@ -1359,7 +1359,7 @@ eventindex_t ProcEvent_Safe(bool is_resume, eventindex_t index, int whichPlayer,
             if(!autoScrollerChanged)
             {
                 // Do set the autoscrool when non-zero values only, don't zero by other autoruns
-                if((evt.AutoX != 0.0 || evt.AutoY != 0.0) && IF_INRANGE(evt.AutoSection, 0, maxSections))
+                if((evt.AutoX != 0 || evt.AutoY != 0) && IF_INRANGE(evt.AutoSection, 0, maxSections))
                 {
                     AutoX[evt.AutoSection] = evt.AutoX;
                     AutoY[evt.AutoSection] = evt.AutoY;
@@ -1569,7 +1569,7 @@ resume:
 
     for(int A = 0; A < numSections; A++)
     {
-        if(AutoX[A] != 0.0f || AutoY[A] != 0.0f)
+        if(AutoX[A] != 0 || AutoY[A] != 0)
         {
             level[A].X += AutoX[A];
             level[A].Width += AutoX[A];
@@ -1677,7 +1677,7 @@ void UpdateLayers()
         Layer[A].ApplySpeedY = 0;
 
         // only consider non-empty, moving layers
-        if(Layer[A].Name.empty() || (Layer[A].SpeedX == 0.f && Layer[A].SpeedY == 0.f))
+        if(Layer[A].Name.empty() || (Layer[A].SpeedX == 0 && Layer[A].SpeedY == 0))
             continue;
 
         // the layer does not move
@@ -1722,7 +1722,7 @@ void UpdateLayers()
 
                 // no longer needed thanks to block quadtree, but used to reproduce some buggy behaviors
                 // move the sort invalidation out of the loop over blocks
-                if(!Layer[A].blocks.empty() && Layer[A].SpeedX != 0.f && g_config.emulate_classic_block_order)
+                if(!Layer[A].blocks.empty() && Layer[A].SpeedX != 0 && g_config.emulate_classic_block_order)
                 {
                     if(BlocksSorted)
                         BlocksSorted = false;

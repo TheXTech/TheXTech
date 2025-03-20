@@ -885,7 +885,7 @@ bool Update(bool check_lost_devices)
 
     if(SharedCursor.Move)
     {
-        if(SharedCursor.X >= 0. && SharedCursor.Y >= 0.)
+        if(SharedCursor.X >= 0 && SharedCursor.Y >= 0)
         {
             int window_x, window_y;
             XRender::mapFromScreen(SharedCursor.X, SharedCursor.Y, &window_x, &window_y);

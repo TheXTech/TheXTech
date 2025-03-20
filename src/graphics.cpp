@@ -110,7 +110,7 @@ void GetvScreenAverage(vScreen_t& vscreen)
     {
         if(!Player[A].Dead && (Player[A].Effect != PLREFF_RESPAWN || g_config.multiplayer_pause_controls))
         {
-            vscreen.X += -Player[A].Location.X - Player[A].Location.Width / 2.0;
+            vscreen.X += -Player[A].Location.X - Player[A].Location.Width / 2;
 
             double pLocY = (Player[A].Effect == PLREFF_RESPAWN) ? Player[A].RespawnY : Player[A].Location.Y;
 
@@ -193,7 +193,7 @@ void GetvScreenAverage2(vScreen_t& vscreen)
     {
         if(!Player[A].Dead)
         {
-            vscreen.X += -Player[A].Location.X - Player[A].Location.Width / 2.0;
+            vscreen.X += -Player[A].Location.X - Player[A].Location.Width / 2;
             if(Player[A].Mount == 2)
                 vscreen.Y += -Player[A].Location.Y;
             else
@@ -767,7 +767,7 @@ void GetvScreenCredits(vScreen_t& vscreen)
     {
         if((!Player[A].Dead || g_gameInfo.outroDeadMode) && Player[A].Effect != PLREFF_RESPAWN)
         {
-            vscreen.X += -Player[A].Location.X - Player[A].Location.Width / 2.0;
+            vscreen.X += -Player[A].Location.X - Player[A].Location.Width / 2;
 
             if(Player[A].Mount == 2)
                 vscreen.Y += -Player[A].Location.Y;

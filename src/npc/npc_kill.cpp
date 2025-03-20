@@ -111,7 +111,7 @@ bool KillNPC(int A, int B)
 
         NPC[A].Location.SpeedX = NPC[A].Location.SpeedX * 0.4;
         if(NPC[A].Location.SpeedX < 2 && NPC[A].Location.SpeedX > -2)
-            NPC[A].Location.SpeedX = double(2 * NPC[A].Direction);
+            NPC[A].Location.SpeedX = 2 * NPC[A].Direction;
     }
 
     if(NPC[A].Killed == 8 && NPC[A].Type != NPCID_PLR_FIREBALL && NPC[A].Type != NPCID_KNIGHT && !NPCIsABot(NPC[A]) && NPC[A].Type != NPCID_FLIER && NPC[A].Type != NPCID_ROCKET_FLIER && NPC[A].Type != NPCID_WALL_BUG && NPC[A].Type != NPCID_HOMING_BALL)
@@ -292,10 +292,10 @@ resume_TriggerLast:
                 if(iRand(40) < 3)
                     NPC[numNPCs].Type = NPCID_GEM_20;
                 NPC[numNPCs].Location.Width = NPC[numNPCs]->TWidth;
-                NPC[numNPCs].Location.X = NPC_CenterX - NPC[numNPCs].Location.Width / 2.0;
+                NPC[numNPCs].Location.X = NPC_CenterX - NPC[numNPCs].Location.Width / 2;
                 NPC[numNPCs].Location.Height = NPC[numNPCs]->THeight;
                 if(NPC[A].Location.Height >= 32)
-                    NPC[numNPCs].Location.Y = NPC_CenterY - NPC[numNPCs].Location.Height / 2.0;
+                    NPC[numNPCs].Location.Y = NPC_CenterY - NPC[numNPCs].Location.Height / 2;
                 else if(NPC[A].Type == NPCID_BOTTOM_PLANT || NPC[A].Type == NPCID_LONG_PLANT_DOWN) // Stops the rupees from spawning in blocks
                     NPC[numNPCs].Location.Y = NPC[A].Location.Y + 1;
                 else // Stops the rupees from spawning in blocks
@@ -1160,8 +1160,8 @@ resume_TriggerLast:
                 }
             }
 
-            NPC[A].Location.Y += -NPC[A].Location.Height / 2.0 + 32;
-            NPC[A].Location.X += -NPC[A].Location.Width / 2.0 + 20;
+            NPC[A].Location.Y += -NPC[A].Location.Height / 2 + 32;
+            NPC[A].Location.X += -NPC[A].Location.Width / 2 + 20;
             NewEffect(EFFID_SPIT_BOSS_DIE, NPC[A].Location, NPC[A].Direction);
         }
         else if(NPC[A].Type == NPCID_SPIT_BOSS_BALL) // Egg

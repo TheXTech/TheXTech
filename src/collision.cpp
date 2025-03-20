@@ -649,9 +649,9 @@ double blockGetTopYTouching(const Block_t &block, const Location_t& loc)
 
     // Get how far along the slope we are in the x direction
     double slope = (refX - block.Location.X) / block.Location.Width;
-    if(slopeDirection < 0) slope = 1.0 - slope;
-    if(slope < 0.0) slope = 0.0;
-    if(slope > 1.0) slope = 1.0;
+    if(slopeDirection < 0) slope = 1 - slope;
+    if(slope < 0) slope = 0;
+    if(slope > 1) slope = 1;
 
     // Determine the y coordinate
     return block.Location.Y + block.Location.Height * slope;
@@ -799,7 +799,7 @@ void CompareNpcWalkBlock(int &tempHitBlock, int &tempHitOldBlock,
 bool SectionCollision(const int section, const Location_t &loc)
 {
     const auto &sec = level[section];
-    const double gap = 64.0;
+    const double gap = 64;
 
     if(loc.X + loc.Width < sec.X - gap)
         return false;

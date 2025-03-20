@@ -188,9 +188,9 @@ bool InputMethod_Keyboard::Update(int player, Controls_t& c, CursorControls_t& m
         int key2 = p->m_editor_keys2[i];
 
         if(key != null_key && k->m_keyboardState[key] != 0)
-            *scroll[i] += 10.0;
+            *scroll[i] += 10;
         else if(key2 != null_key && k->m_keyboardState[key2] != 0)
-            *scroll[i] += 10.0;
+            *scroll[i] += 10;
     }
 
     bool cursor[4];
@@ -213,16 +213,16 @@ bool InputMethod_Keyboard::Update(int player, Controls_t& c, CursorControls_t& m
             m.Y = XRender::TargetH / 2;
 
         if(cursor[3])
-            m.X += 16.0;
+            m.X += 16;
 
         if(cursor[2])
-            m.X -= 16.0;
+            m.X -= 16;
 
         if(cursor[1])
-            m.Y += 16.0;
+            m.Y += 16;
 
         if(cursor[0])
-            m.Y -= 16.0;
+            m.Y -= 16;
 
         if(m.X < 0)
         {

@@ -82,8 +82,8 @@ void ScreenFader::clearFader()
     m_focusSet = false;
     m_focusTrackX = nullptr;
     m_focusTrackY = nullptr;
-    m_focusOffsetX = 0.0;
-    m_focusOffsetY = 0.0;
+    m_focusOffsetX = 0;
+    m_focusOffsetY = 0;
 }
 
 void ScreenFader::setupFader(int step, int start, int goal, int shape, bool useFocus, int focusX, int focusY, int screen)
@@ -102,8 +102,8 @@ void ScreenFader::setupFader(int step, int start, int goal, int shape, bool useF
     m_focusScreen = screen;
     m_focusTrackX = nullptr;
     m_focusTrackY = nullptr;
-    m_focusOffsetX = 0.0;
-    m_focusOffsetY = 0.0;
+    m_focusOffsetX = 0;
+    m_focusOffsetY = 0;
 
 #ifdef THEXTECH_BUILD_GL_MODERN
     if(m_shape >= S_CUSTOM && m_shape - S_CUSTOM < (int)s_loaded_effects.size() && s_loaded_effects[m_shape - S_CUSTOM]->get())

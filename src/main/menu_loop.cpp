@@ -103,7 +103,7 @@ static void updateIntroLevelActivity()
         if(p.Location.SpeedX < 0.5)
         {
             p.Controls.Jump = true;
-            if(p.Slope > 0 || p.StandingOnNPC > 0 || p.Location.SpeedY == 0.0)
+            if(p.Slope > 0 || p.StandingOnNPC > 0 || p.Location.SpeedY == 0)
                 p.CanJump = true;
         }
 
@@ -391,9 +391,9 @@ static void updateIntroLevelActivity()
 
         if(p.WetFrame)
         {
-            if(p.Location.SpeedY == 0.0 || p.Slope > 0)
+            if(p.Location.SpeedY == 0 || p.Slope > 0)
                 p.CanJump = true;
-            if(iRand(100) >= 98 || p.Location.SpeedY == 0.0 || p.Slope > 0)
+            if(iRand(100) >= 98 || p.Location.SpeedY == 0 || p.Slope > 0)
                 p.Controls.Jump = true;
         }
 
@@ -436,7 +436,7 @@ static void updateIntroLevelActivity()
                 Player[A].Controls.Right = false;
         }
 
-        if(!Player[A].Slide && (Player[A].Slope > 0 || Player[A].StandingOnNPC > 0 || Player[A].Location.SpeedY == 0.0))
+        if(!Player[A].Slide && (Player[A].Slope > 0 || Player[A].StandingOnNPC > 0 || Player[A].Location.SpeedY == 0))
         {
             tempLocation = Player[A].Location;
             tempLocation.Width = 95;
@@ -458,7 +458,7 @@ static void updateIntroLevelActivity()
             }
         }
 
-        if(Player[A].Slope == 0 && !Player[A].Slide && Player[A].StandingOnNPC == 0 && (Player[A].Slope > 0 || Player[A].Location.SpeedY == 0.0))
+        if(Player[A].Slope == 0 && !Player[A].Slide && Player[A].StandingOnNPC == 0 && (Player[A].Slope > 0 || Player[A].Location.SpeedY == 0))
         {
             tempBool = false;
             tempLocation = Player[A].Location;

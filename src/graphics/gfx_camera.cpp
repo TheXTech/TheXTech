@@ -50,10 +50,10 @@ void ProcessSmallScreenCam(vScreen_t& vscreen)
         const double screen_join = (screen.W + screen.H) / 2;
 
         rate = (d - screen_join) / screen_join;
-        if(rate < 0.0)
-            rate = 0.0;
-        if(rate > 1.0)
-            rate = 1.0;
+        if(rate < 0)
+            rate = 0;
+        if(rate > 1)
+            rate = 1;
     }
 
     if(g_config.small_screen_cam && screen.W < c_screen.W && !NoTurnBack[p.Section])
@@ -214,10 +214,10 @@ void DrawSmallScreenCam(vScreen_t& vscreen)
         const double screen_join = (screen.W + screen.H) / 2;
 
         rate = (d - screen_join) / screen_join;
-        if(rate < 0.0)
-            rate = 0.0;
-        if(rate > 1.0)
-            rate = 1.0;
+        if(rate < 0)
+            rate = 0;
+        if(rate > 1)
+            rate = 1;
     }
 
     int16_t max_offsetY = 200;

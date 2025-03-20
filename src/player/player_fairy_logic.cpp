@@ -69,7 +69,7 @@ void PlayerFairyTimerUpdate(int A)
     else
         Player[A].FairyTime = 0;
 
-    if(Player[A].FairyCD != 0 && (Player[A].Location.SpeedY == 0.0 || Player[A].Slope != 0 || Player[A].StandingOnNPC != 0 || Player[A].WetFrame))
+    if(Player[A].FairyCD != 0 && (Player[A].Location.SpeedY == 0 || Player[A].Slope != 0 || Player[A].StandingOnNPC != 0 || Player[A].WetFrame))
         Player[A].FairyCD -= 1;
 }
 

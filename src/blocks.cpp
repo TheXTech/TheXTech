@@ -391,7 +391,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
                 nn.Location.Height = nn->THeight;
                 nn.Location.X = b.Location.X + (b.Location.Width - nn.Location.Width) / 2;
                 nn.Location.Y = b.Location.Y - nn.Location.Height - 0.01;
-                nn.Location.SpeedX = dRand() * 3.0 - 1.5;
+                nn.Location.SpeedX = dRand() * 3 - 1.5;
                 nn.Location.SpeedY = -(dRand() * 4) - 3;
                 nn.Special = 1;
                 nn.Immune = 20;
@@ -2019,7 +2019,7 @@ void PowBlock()
             if(NPC[A]->IsACoin)
             {
                 NPC[A].Special = 1;
-                NPC[A].Location.SpeedX = (dRand() * 1.0) - 0.5;
+                NPC[A].Location.SpeedX = dRand() - 0.5;
             }
         }
     }

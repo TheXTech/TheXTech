@@ -131,7 +131,7 @@ void NPCBlockLogic(int A, double& tempHit, int& tempHitBlock, float& tempSpeedA,
                                             HitSpot = 1;
                                         else if(Block[B].tempBlockNpcType == NPCID_CONVEYOR) // && HitSpot == 5
                                         {
-                                            if(NPC[A].Location.X + NPC[A].Location.Width / 2.0 < Block[B].Location.X + Block[B].Location.Width / 2.0)
+                                            if(NPC[A].Location.X + NPC[A].Location.Width / 2 < Block[B].Location.X + Block[B].Location.Width / 2)
                                                 HitSpot = 4;
                                             else
                                                 HitSpot = 2;
@@ -636,7 +636,7 @@ void NPCBlockLogic(int A, double& tempHit, int& tempHitBlock, float& tempSpeedA,
                                         if(HitSpot == 2 || HitSpot == 4)
                                         {
                                             if(NPC[A].Location.SpeedY == Physics.NPCGravity ||
-                                               NPC[A].Location.SpeedY == 0.0 || NPC[A].Slope > 0 ||
+                                               NPC[A].Location.SpeedY == 0 || NPC[A].Slope > 0 ||
                                                (oldSlope > 0 && !NPC[Block[B].tempBlockNpcIdx].Projectile))
                                             {
                                                 NPC[Block[B].tempBlockNpcIdx].Special = 1;
@@ -707,25 +707,25 @@ void NPCBlockLogic(int A, double& tempHit, int& tempHitBlock, float& tempSpeedA,
                                             double C = 0;
                                             int D = 0;
 
-                                            if(NPC[A].Location.X + NPC[A].Location.Width / 2.0 < Block[B].Location.X + Block[B].Location.Width / 2.0)
+                                            if(NPC[A].Location.X + NPC[A].Location.Width / 2 < Block[B].Location.X + Block[B].Location.Width / 2)
                                             {
-                                                C = (Block[B].Location.X + Block[B].Location.Width / 2.0) - (NPC[A].Location.X + NPC[A].Location.Width / 2.0);
+                                                C = (Block[B].Location.X + Block[B].Location.Width / 2) - (NPC[A].Location.X + NPC[A].Location.Width / 2);
                                                 D = 2;
                                             }
                                             else
                                             {
-                                                C = (NPC[A].Location.X + NPC[A].Location.Width / 2.0) - (Block[B].Location.X + Block[B].Location.Width / 2.0);
+                                                C = (NPC[A].Location.X + NPC[A].Location.Width / 2) - (Block[B].Location.X + Block[B].Location.Width / 2);
                                                 D = 4;
                                             }
 
-                                            if(NPC[A].Location.Y + NPC[A].Location.Height / 2.0 < Block[B].Location.Y + Block[B].Location.Height / 2.0)
+                                            if(NPC[A].Location.Y + NPC[A].Location.Height / 2 < Block[B].Location.Y + Block[B].Location.Height / 2)
                                             {
-                                                if(C < (Block[B].Location.Y + Block[B].Location.Height / 2.0) - (NPC[A].Location.Y + NPC[A].Location.Height / 2.0))
+                                                if(C < (Block[B].Location.Y + Block[B].Location.Height / 2) - (NPC[A].Location.Y + NPC[A].Location.Height / 2))
                                                     D = 1;
                                             }
                                             else
                                             {
-                                                if(C < (NPC[A].Location.Y + NPC[A].Location.Height / 2.0) - (Block[B].Location.Y + Block[B].Location.Height / 2.0))
+                                                if(C < (NPC[A].Location.Y + NPC[A].Location.Height / 2) - (Block[B].Location.Y + Block[B].Location.Height / 2))
                                                     D = 3;
                                             }
 
@@ -738,9 +738,9 @@ void NPCBlockLogic(int A, double& tempHit, int& tempHitBlock, float& tempSpeedA,
                                             if(D == 4)
                                                 NPC[A].Pinched.Right4 = 2;
 
-                                            if(Block[B].Location.SpeedX != 0.0 && (D == 2 || D == 4))
+                                            if(Block[B].Location.SpeedX != 0 && (D == 2 || D == 4))
                                                 NPC[A].Pinched.Moving = 2;
-                                            if(Block[B].Location.SpeedY != 0.0 && (D == 1 || D == 3))
+                                            if(Block[B].Location.SpeedY != 0 && (D == 1 || D == 3))
                                                 NPC[A].Pinched.Moving = 2;
 
                                             // If Not (.Location.Y + .Location.Height - .Location.SpeedY <= Block(B).Location.Y - Block(B).Location.SpeedY) Then .Pinched1 = 2
@@ -1374,7 +1374,7 @@ void NPCBlockLogic(int A, double& tempHit, int& tempHitBlock, float& tempSpeedA,
         }
     }
 
-    if(NPC[A].BeltSpeed != 0.0f)
+    if(NPC[A].BeltSpeed != 0)
     {
         Location_t preBeltLoc = NPC[A].Location;
         NPC[A].BeltSpeed = NPC[A].BeltSpeed / beltCount;

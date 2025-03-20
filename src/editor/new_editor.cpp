@@ -341,15 +341,15 @@ void SetEditorBlockType(int type)
 {
     if(BlockIsSizable[type])
     {
-        if(EditorCursor.Block.Location.Width < 64.)
-            EditorCursor.Block.Location.Width = 64.;
-        if(EditorCursor.Block.Location.Height < 64.)
-            EditorCursor.Block.Location.Height = 64.;
+        if(EditorCursor.Block.Location.Width < 64)
+            EditorCursor.Block.Location.Width = 64;
+        if(EditorCursor.Block.Location.Height < 64)
+            EditorCursor.Block.Location.Height = 64;
     }
     else
     {
-        EditorCursor.Block.Location.Width = 0.;
-        EditorCursor.Block.Location.Height = 0.;
+        EditorCursor.Block.Location.Width = 0;
+        EditorCursor.Block.Location.Height = 0;
     }
 
     if(type == 5 || type == 88 || type == 193 || type == 224)

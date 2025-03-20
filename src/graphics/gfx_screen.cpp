@@ -270,7 +270,7 @@ void DynamicScreen(Screen_t& screen, bool mute)
             //       (vScreen(2).Visible = True  And Player(2).Location.X + vScreenX(1) >= ScreenW * 0.75 - Player(2).Location.Width / 2))
             //   And (Player(1).Location.X < level(Player(1).Section).Width - ScreenW * 0.75 - Player(1).Location.Width / 2)) Then
 
-            if(section_wide && (p2.Location.X + p2_compare_vscreen.X >= check_W * 0.75 - p2.Location.Width / 2.0) && (p1.Location.X < section.Width - check_W * 0.75 - p1.Location.Width / 2.0))
+            if(section_wide && (p2.Location.X + p2_compare_vscreen.X >= check_W * 0.75 - p2.Location.Width / 2) && (p1.Location.X < section.Width - check_W * 0.75 - p1.Location.Width / 2))
             {
                 vscreen2.Height = screen.H;
                 vscreen2.Width = screen.W / 2;
@@ -302,7 +302,7 @@ void DynamicScreen(Screen_t& screen, bool mute)
             //   (vScreen(2).Visible = True  And Player(1).Location.X + vScreenX(2) >= ScreenW * 0.75 - Player(1).Location.Width / 2))
             // And (Player(2).Location.X < level(Player(1).Section).Width - ScreenW * 0.75 - Player(2).Location.Width / 2)) Then
 
-            else if(section_wide && (p1.Location.X + p1_compare_vscreen.X >= check_W * 0.75 - p1.Location.Width / 2.0) && (p2.Location.X < section.Width - check_W * 0.75 - p2.Location.Width / 2.0))
+            else if(section_wide && (p1.Location.X + p1_compare_vscreen.X >= check_W * 0.75 - p1.Location.Width / 2) && (p2.Location.X < section.Width - check_W * 0.75 - p2.Location.Width / 2))
             {
                 vscreen1.Height = screen.H;
                 vscreen1.Width = screen.W / 2;

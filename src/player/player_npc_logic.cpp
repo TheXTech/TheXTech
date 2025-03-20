@@ -771,7 +771,7 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                                     {
                                         NPC[B].TailCD = 12;
                                         if(NPC[B].Type != NPCID_HIT_CARRY_FODDER && NPC[B].Type != NPCID_LIT_BOMB_S3)
-                                            NewEffect(EFFID_WHACK, newLoc((Player[A].Location.X + NPC[B].Location.X + (Player[A].Location.Width + NPC[B].Location.Width) / 2.0) / 2, (Player[A].Location.Y + NPC[B].Location.Y + (Player[A].Location.Height + NPC[B].Location.Height) / 2.0) / 2));
+                                            NewEffect(EFFID_WHACK, newLoc((Player[A].Location.X + NPC[B].Location.X + (Player[A].Location.Width + NPC[B].Location.Width) / 2) / 2, (Player[A].Location.Y + NPC[B].Location.Y + (Player[A].Location.Height + NPC[B].Location.Height) / 2) / 2));
                                         NPCHit(B, 1, A);
                                     }
                                 }
@@ -882,7 +882,7 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                                         float D = Player[A].Location.X;
 
                                         // actually move the player
-                                        if(Player[A].Location.X + Player[A].Location.Width / 2.0 < NPC[B].Location.X + NPC[B].Location.Width / 2.0)
+                                        if(Player[A].Location.X + Player[A].Location.Width / 2 < NPC[B].Location.X + NPC[B].Location.Width / 2)
                                         {
                                             Player[A].Pinched.Right4 = 2;
 
@@ -1016,7 +1016,7 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
         if(tempShell)
             NewEffect(EFFID_STOMP_INIT, newLoc(Player[A].Location.X + Player[A].Location.Width / 2.0 - EffectWidth[EFFID_STOMP_INIT] / 2.0, Player[A].Location.Y + Player[A].Location.Height - EffectHeight[EFFID_STOMP_INIT] / 2.0));
         else if(!tempSpring)
-            NewEffect(EFFID_WHACK, newLoc(Player[A].Location.X + Player[A].Location.Width / 2.0 - 16, Player[A].Location.Y + Player[A].Location.Height - 16));
+            NewEffect(EFFID_WHACK, newLoc(Player[A].Location.X + Player[A].Location.Width / 2 - 16, Player[A].Location.Y + Player[A].Location.Height - 16));
         else
             tempSpring = false;
 

@@ -66,9 +66,9 @@ static void s_TriggerDoorEffects(const Location_t& loc, bool do_big_door = true)
             else if(do_big_door && bgo.Type == 141)
             {
                 Location_t bLoc = static_cast<Location_t>(bgo.Location);
-                bLoc.X += bLoc.Width / 2.0;
+                bLoc.X += bLoc.Width / 2;
                 bLoc.Width = 104;
-                bLoc.X += -bLoc.Width / 2.0;
+                bLoc.X += -bLoc.Width / 2;
                 NewEffect(EFFID_BIG_DOOR_OPEN, bLoc);
             }
         }
@@ -477,8 +477,8 @@ void PlayerEffectWarpPipe(int A)
                         o_p.Effect2 = 0;
                         o_p.Location.X = warp_enter.X + (warp_enter.Width - o_p.Location.Width) / 2;
                         o_p.Location.Y = warp_enter.Y + (warp_enter.Height - o_p.Location.Height) / 2;
-                        o_p.Location.SpeedX = 0.0;
-                        o_p.Location.SpeedY = 0.0;
+                        o_p.Location.SpeedX = 0;
+                        o_p.Location.SpeedY = 0;
                     }
                 }
 
@@ -1063,8 +1063,8 @@ void PlayerEffectWarpDoor(int A)
                     o_p.Effect2 = 14;
                     o_p.Location.X = warp_enter.X + (warp_enter.Width - o_p.Location.Width) / 2;
                     o_p.Location.Y = warp_enter.Y + warp_enter.Height - o_p.Location.Height;
-                    o_p.Location.SpeedX = 0.0;
-                    o_p.Location.SpeedY = 0.0;
+                    o_p.Location.SpeedX = 0;
+                    o_p.Location.SpeedY = 0;
                 }
             }
 

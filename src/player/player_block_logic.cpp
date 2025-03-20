@@ -95,7 +95,7 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
                             // 2 is from the right
                             // 3 is from the bottom
                             // 4 is from the left
-                            double block_belt_speed = 0.0;
+                            double block_belt_speed = 0;
                             if(Block[B].Type >= BLKID_CONVEYOR_L_START && Block[B].Type <= BLKID_CONVEYOR_L_END)
                                 block_belt_speed = -0.8;
                             else if(Block[B].Type >= BLKID_CONVEYOR_R_START && Block[B].Type <= BLKID_CONVEYOR_R_END)
@@ -387,7 +387,7 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
 
                                             if(Player[A].Location.SpeedY < 0 && !Player[A].Slide && !SuperSpeed && !Player[A].Stoned)
                                                 Player[A].Location.SpeedY = 0;
-                                            if(Block[B].Location.SpeedX != 0.0 || Block[B].Location.SpeedY != 0.0)
+                                            if(Block[B].Location.SpeedX != 0 || Block[B].Location.SpeedY != 0)
                                             {
                                                 NPC[-A] = NPC_t();
                                                 NPC[-A].Location = Block[B].Location;
@@ -657,7 +657,7 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
                                 else
                                 {
                                     tempSlope3 = B;
-                                    if(Player[A].Location.X + Player[A].Location.Width / 2.0 < Block[B].Location.X + Block[B].Location.Width / 2.0)
+                                    if(Player[A].Location.X + Player[A].Location.Width / 2 < Block[B].Location.X + Block[B].Location.Width / 2)
                                         Player[A].Pinched.Right4 = 2;
                                     else
                                         Player[A].Pinched.Left2 = 2;
@@ -820,7 +820,7 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
                     YoshiPound(A, Player[A].Mount);
 
                 Player[A].Location.SpeedY = 0;
-                if(floorLocation.SpeedX != 0.0 || floorLocation.SpeedY != 0.0)
+                if(floorLocation.SpeedX != 0 || floorLocation.SpeedY != 0)
                 {
                     NPC[-A] = NPC_t();
                     NPC[-A].Location = floorLocation;
@@ -893,7 +893,7 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
             if(Player[A].Slope == 0 || Player[A].Slide)
                 Player[A].Location.SpeedY = 0;
 
-            if(floorLocation.SpeedX != 0.0 || floorLocation.SpeedY != 0.0)
+            if(floorLocation.SpeedX != 0 || floorLocation.SpeedY != 0)
             {
                 NPC[-A] = NPC_t();
                 NPC[-A].Location = floorLocation;

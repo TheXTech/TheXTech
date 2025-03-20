@@ -368,8 +368,8 @@ void UpdatableQuery<BlockRef_t>::update(const Location_t& loc, const UpdatableQu
     // in compat mode, use a special formula for the FLBlock bounds
     if(use_fl_block && g_config.emulate_classic_block_order)
     {
-        bounds.X = vb6Round(loc.X / 32.0 - 1) * 32;
-        bounds.Width = vb6Round((loc.X + loc.Width) / 32.0 + 1) * 32 - bounds.X;
+        bounds.X = vb6Round(loc.X / 32 - 1) * 32;
+        bounds.Width = vb6Round((loc.X + loc.Width) / 32 + 1) * 32 - bounds.X;
     }
     else
     {

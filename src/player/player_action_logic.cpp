@@ -122,7 +122,7 @@ void PlayerShootChar5Beam(int A)
     NPC[numNPCs].Projectile = true;
     NPC[numNPCs].Location.Height = NPC[numNPCs]->THeight;
     NPC[numNPCs].Location.Width = NPC[numNPCs]->TWidth;
-    NPC[numNPCs].Location.X = Player[A].Location.X + Player[A].Location.Width / 2.0 + (40 * Player[A].Direction) - 8;
+    NPC[numNPCs].Location.X = Player[A].Location.X + Player[A].Location.Width / 2 + (40 * Player[A].Direction) - 8;
 
     if(!Player[A].Duck)
     {

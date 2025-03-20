@@ -916,7 +916,7 @@ void ClassicNPCScreenLogic(int Z, int numScreens, bool fill_draw_queue, NPC_Draw
                                    NPC[A].Type == NPCID_CANNONITEM || NPC[A].Type == NPCID_TOOTHYPIPE || NPC[A].Type == NPCID_ITEM_BURIED || NPC[A].Type == NPCID_ROCKET_WOOD ||
                                    NPC[A].Type == NPCID_FIRE_BOSS_FIRE || NPC[A]->IsACoin) && (!NPC[A].Generator || LevelEditor))))
         {
-            npcALoc = newLoc(NPC[A].Location.X - (NPC[A]->WidthGFX - NPC[A].Location.Width) / 2.0,
+            npcALoc = newLoc(NPC[A].Location.X - (NPC[A]->WidthGFX - NPC[A].Location.Width) / 2,
                                   NPC[A].Location.Y,
                                   NPC[A]->WidthGFX,
                                   NPC[A]->THeight);
@@ -926,7 +926,7 @@ void ClassicNPCScreenLogic(int Z, int numScreens, bool fill_draw_queue, NPC_Draw
 
         if(NPC[A].Type == NPCID_ICE_CUBE && NPC[A].Effect == NPCEFF_NORMAL && NPC[A].HoldingPlayer == 0)
         {
-            npcALoc = newLoc(NPC[A].Location.X - (NPC[A]->WidthGFX - NPC[A].Location.Width) / 2.0,
+            npcALoc = newLoc(NPC[A].Location.X - (NPC[A]->WidthGFX - NPC[A].Location.Width) / 2,
                                   NPC[A].Location.Y,
                                   NPC[A]->WidthGFX,
                                   NPC[A]->THeight);
@@ -1171,7 +1171,7 @@ void ModernNPCScreenLogic(Screen_t& screen, int vscreen_i, bool fill_draw_queue,
                     || NPC[A].Type == 282 || NPC[A]->IsACoin || NPC[A].Type == 263))
         {
             loc2_exists = true;
-            loc2 = newLoc(NPC[A].Location.X - (NPC[A]->WidthGFX - NPC[A].Location.Width) / 2.0,
+            loc2 = newLoc(NPC[A].Location.X - (NPC[A]->WidthGFX - NPC[A].Location.Width) / 2,
                 NPC[A].Location.Y,
                 NPC[A]->WidthGFX,
                 NPC[A]->THeight);
@@ -1734,7 +1734,7 @@ void UpdateGraphicsLogic(bool Do_FrameSkip)
                     if(NPC[A].Hidden)
                         continue;
 
-                    const Location_t loc2 = newLoc(NPC[A].Location.X - (NPC[A]->WidthGFX - NPC[A].Location.Width) / 2.0,
+                    const Location_t loc2 = newLoc(NPC[A].Location.X - (NPC[A]->WidthGFX - NPC[A].Location.Width) / 2,
                         NPC[A].Location.Y,
                         NPC[A]->WidthGFX, NPC[A]->THeight);
 
@@ -2246,7 +2246,7 @@ void UpdateGraphicsScreen(Screen_t& screen)
                     {
                         const NPC_t& hNpc = NPC[p.HoldingNPC];
 
-                        auto warpNpcLoc = newLoc(hNpc.Location.X - (hNpc->WidthGFX - hNpc.Location.Width) / 2.0,
+                        auto warpNpcLoc = newLoc(hNpc.Location.X - (hNpc->WidthGFX - hNpc.Location.Width) / 2,
                                                  hNpc.Location.Y,
                                                  hNpc->WidthGFX,
                                                  hNpc->THeight);
@@ -2961,7 +2961,7 @@ void UpdateGraphicsScreen(Screen_t& screen)
             }
             else
             {
-                XRender::renderTextureBasic(camX + s_round2int(NPC[A].Location.X + NPC[A].Location.Width / 2.0) + (NPC[A]->FrameOffsetX * -NPC[A].Direction) - NPC[A]->WidthGFX / 2, camY + s_round2int(NPC[A].Location.Y + NPC[A].Location.Height) + NPC[A]->FrameOffsetY - NPC[A]->HeightGFX,
+                XRender::renderTextureBasic(camX + s_round2int(NPC[A].Location.X + NPC[A].Location.Width / 2) + (NPC[A]->FrameOffsetX * -NPC[A].Direction) - NPC[A]->WidthGFX / 2, camY + s_round2int(NPC[A].Location.Y + NPC[A].Location.Height) + NPC[A]->FrameOffsetY - NPC[A]->HeightGFX,
                     NPC[A]->WidthGFX,
                     NPC[A]->HeightGFX,
                     GFXNPC[NPC[A].Type], 0, NPC[A].Frame * NPC[A]->HeightGFX, cn);
@@ -3196,7 +3196,7 @@ void UpdateGraphicsScreen(Screen_t& screen)
                 }
                 else
                 {
-                    XRender::renderTextureBasic(camX + s_round2int(NPC[A].Location.X + NPC[A].Location.Width / 2.0) + NPC[A]->FrameOffsetX - NPC[A]->WidthGFX / 2,
+                    XRender::renderTextureBasic(camX + s_round2int(NPC[A].Location.X + NPC[A].Location.Width / 2) + NPC[A]->FrameOffsetX - NPC[A]->WidthGFX / 2,
                         camY + s_round2int(NPC[A].Location.Y + NPC[A].Location.Height) + NPC[A]->FrameOffsetY - NPC[A]->HeightGFX,
                         NPC[A]->WidthGFX, NPC[A]->HeightGFX,
                         GFXNPC[NPC[A].Type], 0, NPC[A].Frame * NPC[A]->HeightGFX, cn);
