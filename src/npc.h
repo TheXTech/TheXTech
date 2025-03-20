@@ -93,4 +93,11 @@ int NPCTargetPlayer(const NPC_t& npc);
 // totally new function covering old logic. checks nearest player (using NPCTargetPlayer) then faces it.
 int NPCFaceNearestPlayer(NPC_t& npc, bool old_version = false);
 
+// totally new function covering old logic. sets SpeedY (based on SpeedX) such that the NPC is approaching a target location at a constant X speed.
+void NPCSetSpeedTarget_FixedX(NPC_t& npc, const Location_t& target, int speed_x, int speed_y_cap);
+void NPCSetSpeedTarget_FixedX(NPC_t& npc, double target_x, double target_y, int speed_x, int speed_y_cap);
+
+// totally new function covering old logic. sets SpeedY (based on SpeedX) such that the NPC is approaching a target location at a constant speed.
+void NPCSetSpeedTarget_FixedSpeed(NPC_t& npc, const Location_t& target, int speed);
+
 #endif // NPC_H

@@ -128,6 +128,48 @@ int NPCFaceNearestPlayer(NPC_t& npc, bool old_version)
     return target;
 }
 
+static void s_NPCSetSpeedTarget_FixedX_dist(NPC_t& npc, double dist_x, double dist_y, int speed_x, int speed_y_cap)
+{
+    // originally only applied to plant, but good to apply in all cases (and was UB in VB6)
+    if(dist_x == 0)
+        dist_x = -0.00001;
+
+    npc.Location.SpeedX = speed_x * npc.Direction;
+    npc.Location.SpeedY = speed_x * npc.Direction * dist_y / dist_x;
+
+    if(NPC[numNPCs].Location.SpeedY > speed_y_cap)
+        NPC[numNPCs].Location.SpeedY = speed_y_cap;
+    else if(NPC[numNPCs].Location.SpeedY < -speed_y_cap)
+        NPC[numNPCs].Location.SpeedY = -speed_y_cap;
+}
+
+void NPCSetSpeedTarget_FixedX(NPC_t& npc, const Location_t& target, int speed_x, int speed_y_cap)
+{
+    double dist_x = target.minus_center_x(npc.Location);
+    double dist_y = target.minus_center_y(npc.Location);
+
+    s_NPCSetSpeedTarget_FixedX_dist(npc, dist_x, dist_y, speed_x, speed_y_cap);
+}
+
+void NPCSetSpeedTarget_FixedX(NPC_t& npc, double target_x, double target_y, int speed_x, int speed_y_cap)
+{
+    double dist_x = target_x - (npc.Location.X + npc.Location.Width / 2);
+    double dist_y = target_y - (npc.Location.Y + npc.Location.Height / 2);
+
+    s_NPCSetSpeedTarget_FixedX_dist(npc, dist_x, dist_y, speed_x, speed_y_cap);
+}
+
+void NPCSetSpeedTarget_FixedSpeed(NPC_t& npc, const Location_t& target, int speed)
+{
+    double dist_x = target.minus_center_x(npc.Location);
+    double dist_y = target.minus_center_y(npc.Location);
+
+    double dist = SDL_sqrt(dist_x * dist_x + dist_y * dist_y);
+
+    npc.Location.SpeedX = speed * dist_x / dist;
+    npc.Location.SpeedY = speed * dist_y / dist;
+}
+
 void CheckSectionNPC(int A)
 {
     if(GameMenu)
@@ -1446,15 +1488,8 @@ void NPCSpecial(int A)
                     NPC[numNPCs].Location.X = npc.Location.X + npc.Location.Width - NPC[numNPCs].Location.Width + 20;
 
                 NPC[numNPCs].Location.Y = npc.Location.Y + 47;
-                NPC[numNPCs].Location.SpeedX = 3 * NPC[numNPCs].Direction;
-                double dist_x = (NPC[numNPCs].Location.X + NPC[numNPCs].Location.Width / 2) - npc.SpecialX;
-                double dist_y = (NPC[numNPCs].Location.Y + NPC[numNPCs].Location.Height / 2) - npc.SpecialY;
-                NPC[numNPCs].Location.SpeedY = dist_y / dist_x * NPC[numNPCs].Location.SpeedX;
 
-                if(NPC[numNPCs].Location.SpeedY > 3)
-                    NPC[numNPCs].Location.SpeedY = 3;
-                else if(NPC[numNPCs].Location.SpeedY < -3)
-                    NPC[numNPCs].Location.SpeedY = -3;
+                NPCSetSpeedTarget_FixedX(NPC[numNPCs], npc.SpecialX, npc.SpecialY, 3, 3);
 
                 syncLayers_NPC(numNPCs);
             }
@@ -1618,16 +1653,7 @@ void NPCSpecial(int A)
                     NPC[numNPCs].Location.X = npc.Location.X + npc.Location.Width - NPC[numNPCs].Location.Width + 24;
                 NPC[numNPCs].Location.Y = npc.Location.Y + 4;
 
-                NPC[numNPCs].Location.SpeedX = 4 * NPC[numNPCs].Direction;
-
-                double dist_x = NPC[numNPCs].Location.minus_center_x(Player[npc.Special5].Location);
-                double dist_y = NPC[numNPCs].Location.minus_center_y(Player[npc.Special5].Location);
-
-                NPC[numNPCs].Location.SpeedY = dist_y / dist_x * NPC[numNPCs].Location.SpeedX;
-                if(NPC[numNPCs].Location.SpeedY > 2)
-                    NPC[numNPCs].Location.SpeedY = 2;
-                else if(NPC[numNPCs].Location.SpeedY < -2)
-                    NPC[numNPCs].Location.SpeedY = -2;
+                NPCSetSpeedTarget_FixedX(NPC[numNPCs], Player[npc.Special5].Location, 4, 2);
 
                 syncLayers_NPC(numNPCs);
             }
@@ -1988,14 +2014,7 @@ void NPCSpecial(int A)
                 npc.Special = 1;
 
                 int ip = NPCTargetPlayer(npc);
-
-                double dist_x = npc.Location.minus_center_x(Player[ip].Location);
-                double dist_y = npc.Location.minus_center_y(Player[ip].Location);
-                double dist = std::sqrt(std::pow(dist_x, 2) + std::pow(dist_y, 2));
-                dist_x = -dist_x / dist;
-                dist_y = -dist_y / dist;
-                npc.Location.SpeedX = dist_x * 3;
-                npc.Location.SpeedY = dist_y * 3;
+                NPCSetSpeedTarget_FixedSpeed(npc, Player[ip].Location, 3);
             }
         }
 
@@ -2833,15 +2852,8 @@ void NPCSpecial(int A)
                     else
                         NPC[numNPCs].Location.X = npc.Location.X + 54;
                     NPC[numNPCs].Location.Y = npc.Location.Y + 19;
-                    NPC[numNPCs].Location.SpeedX = 4 * NPC[numNPCs].Direction;
 
-                    double dist_x = NPC[numNPCs].Location.minus_center_x(Player[npc.Special5].Location);
-                    double dist_y = NPC[numNPCs].Location.minus_center_y(Player[npc.Special5].Location);
-                    NPC[numNPCs].Location.SpeedY = dist_y / dist_x * NPC[numNPCs].Location.SpeedX;
-                    if(NPC[numNPCs].Location.SpeedY > 1)
-                        NPC[numNPCs].Location.SpeedY = 1;
-                    else if(NPC[numNPCs].Location.SpeedY < -1)
-                        NPC[numNPCs].Location.SpeedY = -1;
+                    NPCSetSpeedTarget_FixedX(NPC[numNPCs], Player[npc.Special5].Location, 4, 1);
 
                     PlaySoundSpatial(SFX_BigFireball, npc.Location);
 
@@ -3663,20 +3675,7 @@ void SpecialNPC(int A)
                         NPC[numNPCs].Location.Y = NPC[A].Location.Y;
                     }
 
-                    NPC[numNPCs].Location.SpeedX = 3 * NPC[numNPCs].Direction;
-                    double C = (NPC[numNPCs].Location.X + NPC[numNPCs].Location.Width / 2) -
-                        (Player[NPC[A].Special4].Location.X + Player[NPC[A].Special4].Location.Width / 2);
-                    double D = (NPC[numNPCs].Location.Y + NPC[numNPCs].Location.Height / 2) -
-                        (Player[NPC[A].Special4].Location.Y + Player[NPC[A].Special4].Location.Height / 2);
-
-                    if(C == 0)
-                        C = -0.00001;
-                    NPC[numNPCs].Location.SpeedY = (D / C) * NPC[numNPCs].Location.SpeedX;
-
-                    if(NPC[numNPCs].Location.SpeedY > 2)
-                        NPC[numNPCs].Location.SpeedY = 2;
-                    else if(NPC[numNPCs].Location.SpeedY < -2)
-                        NPC[numNPCs].Location.SpeedY = -2;
+                    NPCSetSpeedTarget_FixedX(NPC[numNPCs], Player[NPC[A].Special4].Location, 3, 2);
 
                     NPC[numNPCs].Location.X += NPC[numNPCs].Location.SpeedX * 4;
                     NPC[numNPCs].Location.Y += NPC[numNPCs].Location.SpeedY * 4;
