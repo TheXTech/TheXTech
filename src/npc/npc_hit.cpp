@@ -365,11 +365,9 @@ void NPCHit(int A, int B, int C)
                 NPC[A].Type = NPCID_GEM_5;
             if(iRand(40) < 3)
                 NPC[A].Type = NPCID_GEM_20;
-            NPC[A].Location.X += NPC[A].Location.Width / 2;
             NPC[A].Location.Y += NPC[A].Location.Height;
-            NPC[A].Location.Width = NPC[A]->TWidth;
+            NPC[A].Location.set_width_center(NPC[A]->TWidth);
             NPC[A].Location.Height = NPC[A]->THeight;
-            NPC[A].Location.X += -NPC[A].Location.Width / 2;
             NPC[A].Location.Y += -NPC[A].Location.Height;
         }
         if(NPC[A]->IsAShell)
@@ -450,15 +448,13 @@ void NPCHit(int A, int B, int C)
             // NPC[A].Special6 = 0;
             NPC[A].SpecialX = 0;
             NPC[A].SpecialY = 0;
-            NPC[A].Location.X += NPC[A].Location.Width / 2;
             NPC[A].Location.Y += NPC[A].Location.Height;
             if(NPC[A].Type == NPCID_MAGIC_BOSS)
                 NPC[A].Type = NPCID_MAGIC_BOSS_SHELL;
             else
                 NPC[A].Type = NPCID_FIRE_BOSS_SHELL;
-            NPC[A].Location.Width = NPC[A]->TWidth;
+            NPC[A].Location.set_width_center(NPC[A]->TWidth);
             NPC[A].Location.Height = NPC[A]->THeight;
-            NPC[A].Location.X += -NPC[A].Location.Width / 2;
             NPC[A].Location.Y += -NPC[A].Location.Height;
             NPC[A].Location.SpeedX = 0;
             NPC[A].Location.SpeedY = 0;
@@ -2319,9 +2315,7 @@ void NPCHit(int A, int B, int C)
         NPC[A].Location.Y += NPC[A].Location.Height;
         NPC[A].Location.Height = NPC[A]->THeight;
         NPC[A].Location.Y -= NPC[A].Location.Height;
-        NPC[A].Location.X += NPC[A].Location.Width / 2;
-        NPC[A].Location.Width = NPC[A]->TWidth;
-        NPC[A].Location.X -= NPC[A].Location.Width / 2;
+        NPC[A].Location.set_width_center(NPC[A]->TWidth);
     }
 
     if(NPC[A].Location.Width != oldNPC.Location.Width)

@@ -3142,12 +3142,8 @@ void YoshiEat(const int A)
                     if(n.Type == NPCID_VEGGIE_RANDOM)
                         n.Type = NPCID_VEGGIE_1;
 
-                    n.Location.X += n.Location.Width / 2;
-                    n.Location.Y += n.Location.Height / 2;
-                    n.Location.Width = n->TWidth;
-                    n.Location.Height = n->THeight;
-                    n.Location.X += -n.Location.Width / 2;
-                    n.Location.Y += -n.Location.Height / 2;
+                    n.Location.set_width_center(n->TWidth);
+                    n.Location.set_height_center(n->THeight);
 
                     NPCQueues::Unchecked.push_back(B);
                     treeNPCUpdate(B);
@@ -3653,10 +3649,7 @@ void SizeCheck(Player_t &p)
             UnDuck(p);
         }
         if(p.Location.Width != 22)
-        {
-            p.Location.X += p.Location.Width / 2 - 11;
-            p.Location.Width = 22;
-        }
+            p.Location.set_width_center(22);
         if(p.Location.Height != 26)
         {
             p.Location.Y += p.Location.Height - 26;
@@ -3760,20 +3753,12 @@ void SizeCheck(Player_t &p)
     if(p.Mount == 2)
     {
         if(p.Location.Width != 127.9)
-        {
-            p.Location.X += p.Location.Width / 2;
-            p.Location.Width = 127.9;
-            p.Location.X += -p.Location.Width / 2;
-        }
+            p.Location.set_width_center(127.9);
     }
     else
     {
         if(p.Location.Width != Physics.PlayerWidth[p.Character][p.State])
-        {
-            p.Location.X += p.Location.Width / 2;
-            p.Location.Width = Physics.PlayerWidth[p.Character][p.State];
-            p.Location.X += -p.Location.Width / 2;
-        }
+            p.Location.set_width_center(Physics.PlayerWidth[p.Character][p.State]);
     }
 }
 
@@ -4043,12 +4028,8 @@ void YoshiEatCode(const int A)
                 NPC[p.YoshiNPC].Type = NPCID(NPCID_VEGGIE_2 + B);
                 if(NPC[p.YoshiNPC].Type == NPCID_VEGGIE_RANDOM)
                     NPC[p.YoshiNPC].Type = NPCID_VEGGIE_1;
-                NPC[p.YoshiNPC].Location.X += NPC[p.YoshiNPC].Location.Width / 2;
-                NPC[p.YoshiNPC].Location.Y += NPC[p.YoshiNPC].Location.Height / 2;
-                NPC[p.YoshiNPC].Location.Width = NPC[p.YoshiNPC]->TWidth;
-                NPC[p.YoshiNPC].Location.Height = NPC[p.YoshiNPC]->THeight;
-                NPC[p.YoshiNPC].Location.X += -NPC[p.YoshiNPC].Location.Width / 2;
-                NPC[p.YoshiNPC].Location.Y += -NPC[p.YoshiNPC].Location.Height / 2;
+                NPC[p.YoshiNPC].Location.set_width_center(NPC[p.YoshiNPC]->TWidth);
+                NPC[p.YoshiNPC].Location.set_height_center(NPC[p.YoshiNPC]->THeight);
                 NPC[p.YoshiNPC].Effect = NPCEFF_PET_INSIDE;
                 NPC[p.YoshiNPC].Effect2 = A;
 
@@ -4063,12 +4044,8 @@ void YoshiEatCode(const int A)
             else if(p.MountType == 8 && !NPC[p.YoshiNPC]->IsABonus)
             {
                 NPC[p.YoshiNPC].Type = NPCID_ICE_BLOCK;
-                NPC[p.YoshiNPC].Location.X += NPC[p.YoshiNPC].Location.Width / 2;
-                NPC[p.YoshiNPC].Location.Y += NPC[p.YoshiNPC].Location.Height / 2;
-                NPC[p.YoshiNPC].Location.Width = NPC[p.YoshiNPC]->TWidth;
-                NPC[p.YoshiNPC].Location.Height = NPC[p.YoshiNPC]->THeight;
-                NPC[p.YoshiNPC].Location.X += -NPC[p.YoshiNPC].Location.Width / 2;
-                NPC[p.YoshiNPC].Location.Y += -NPC[p.YoshiNPC].Location.Height / 2;
+                NPC[p.YoshiNPC].Location.set_width_center(NPC[p.YoshiNPC]->TWidth);
+                NPC[p.YoshiNPC].Location.set_height_center(NPC[p.YoshiNPC]->THeight);
                 NPC[p.YoshiNPC].Effect = NPCEFF_PET_INSIDE;
                 NPC[p.YoshiNPC].Effect2 = A;
 
@@ -4855,12 +4832,8 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
                             NPC[p.StandingOnNPC].Type = NPCID(NPCID_VEGGIE_2 + B);
                             if(NPC[p.StandingOnNPC].Type == NPCID_VEGGIE_RANDOM)
                                 NPC[p.StandingOnNPC].Type = NPCID_VEGGIE_1;
-                            NPC[p.StandingOnNPC].Location.X += NPC[p.StandingOnNPC].Location.Width / 2;
-                            NPC[p.StandingOnNPC].Location.Y += NPC[p.StandingOnNPC].Location.Height / 2;
-                            NPC[p.StandingOnNPC].Location.Width = NPC[p.StandingOnNPC]->TWidth;
-                            NPC[p.StandingOnNPC].Location.Height = NPC[p.StandingOnNPC]->THeight;
-                            NPC[p.StandingOnNPC].Location.X += -NPC[p.StandingOnNPC].Location.Width / 2;
-                            NPC[p.StandingOnNPC].Location.Y += -NPC[p.StandingOnNPC].Location.Height / 2;
+                            NPC[p.StandingOnNPC].Location.set_width_center(NPC[p.StandingOnNPC]->TWidth);
+                            NPC[p.StandingOnNPC].Location.set_height_center(NPC[p.StandingOnNPC]->THeight);
                         }
 
                         NPCFrames(p.StandingOnNPC);

@@ -46,6 +46,20 @@ struct Location_t
     {
         return X - o.X + (Width - o.Width) / 2 > 0;
     }
+
+    // sets the width, maintaining location center
+    inline void set_width_center(double new_width)
+    {
+        X += (Width - new_width) / 2;
+        Width = new_width;
+    }
+
+    // sets the height, maintaining location center
+    inline void set_height_center(double new_height)
+    {
+        Y += (Height - new_height) / 2;
+        Height = new_height;
+    }
 };
 
 //NEW: 'Holds location information for an object without speed at integer coordinates, with width / height values below 32767

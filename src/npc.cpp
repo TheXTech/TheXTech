@@ -979,12 +979,8 @@ void NPCSpecial(int A)
             npc.Special = 0;
             npc.Frame = EditorNPCFrame(npc.Type, npc.Direction);
             npc.FrameCount = 0;
-            npc.Location.X += npc.Location.Width / 2;
-            npc.Location.Y += npc.Location.Height / 2;
-            npc.Location.Width = npc->TWidth;
-            npc.Location.Height = npc->THeight;
-            npc.Location.X += -npc.Location.Width / 2;
-            npc.Location.Y += -npc.Location.Height / 2;
+            npc.Location.set_width_center(npc->TWidth);
+            npc.Location.set_height_center(npc->THeight);
             npc.Location.SpeedX = 0;
             npc.Location.SpeedY = 0;
             npc.Direction = npc.DefaultDirection;
@@ -1316,12 +1312,10 @@ void NPCSpecial(int A)
                 npc.Special4 = 0;
                 npc.Special5 = 0;
                 // npc.Special6 = 0;
-                npc.Location.X += npc.Location.Width / 2;
                 npc.Location.Y += npc.Location.Height;
                 npc.Type = NPCID(npc.Type - 1);
-                npc.Location.Width = npc->TWidth;
+                npc.Location.set_width_center(npc->TWidth);
                 npc.Location.Height = npc->THeight;
-                npc.Location.X -= npc.Location.Width / 2;
                 npc.Location.Y -= npc.Location.Height;
 
                 NPCQueues::Unchecked.push_back(A);
@@ -1584,12 +1578,10 @@ void NPCSpecial(int A)
                 npc.Special5 = 0;
                 // npc.Special6 = 0;
                 npc.SpecialX = 0;
-                npc.Location.X += npc.Location.Width / 2;
                 npc.Location.Y += npc.Location.Height;
                 npc.Type = NPCID_FIRE_BOSS_SHELL;
-                npc.Location.Width = npc->TWidth;
+                npc.Location.set_width_center(npc->TWidth);
                 npc.Location.Height = npc->THeight;
-                npc.Location.X -= npc.Location.Width / 2;
                 npc.Location.Y -= npc.Location.Height;
 
                 NPCQueues::Unchecked.push_back(A);
@@ -3001,9 +2993,7 @@ void NPCSpecial(int A)
             tempLocation = npc.Location;
             tempLocation.Height = 400;
             tempLocation.Y -= tempLocation.Height;
-            tempLocation.X += tempLocation.Width / 2;
-            tempLocation.Width = 600;
-            tempLocation.X -= tempLocation.Width / 2;
+            tempLocation.set_width_center(600);
 
             for(int i = 1; i <= numPlayers; i++)
             {

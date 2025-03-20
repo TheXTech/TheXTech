@@ -1326,12 +1326,8 @@ interrupt_Activation:
                 NPC[A].Type = NPCID(NPCID_VEGGIE_2 + B);
                 if(NPC[A].Type == NPCID_VEGGIE_RANDOM)
                     NPC[A].Type = NPCID_VEGGIE_1;
-                NPC[A].Location.X += NPC[A].Location.Width / 2;
-                NPC[A].Location.Y += NPC[A].Location.Height / 2;
-                NPC[A].Location.Width = NPC[A]->TWidth;
-                NPC[A].Location.Height = NPC[A]->THeight;
-                NPC[A].Location.X += -NPC[A].Location.Width / 2;
-                NPC[A].Location.Y += -NPC[A].Location.Height / 2;
+                NPC[A].Location.set_width_center(NPC[A]->TWidth);
+                NPC[A].Location.set_height_center(NPC[A]->THeight);
                 NPCQueues::Unchecked.push_back(A);
             }
 
@@ -1477,12 +1473,8 @@ interrupt_Activation:
                                 if(NPC[A].Type == NPCID_VEGGIE_RANDOM)
                                     NPC[A].Type = NPCID_VEGGIE_1;
 
-                                NPC[A].Location.X += NPC[A].Location.Width / 2;
-                                NPC[A].Location.Y += NPC[A].Location.Height / 2;
-                                NPC[A].Location.Width = NPC[A]->TWidth;
-                                NPC[A].Location.Height = NPC[A]->THeight;
-                                NPC[A].Location.X += -NPC[A].Location.Width / 2;
-                                NPC[A].Location.Y += -NPC[A].Location.Height / 2;
+                                NPC[A].Location.set_width_center(NPC[A]->TWidth);
+                                NPC[A].Location.set_height_center(NPC[A]->THeight);
                             }
 
                             NPCQueues::Unchecked.push_back(A);
@@ -1493,13 +1485,9 @@ interrupt_Activation:
 
                         if(NPC[A].Type == NPCID_SPIT_GUY_BALL)
                         {
-                            NPC[A].Location.X += NPC[A].Location.Width / 2;
-                            NPC[A].Location.Y += NPC[A].Location.Height / 2;
                             NPC[A].Type = NPCID_COIN_S2;
-                            NPC[A].Location.Height = NPC[A]->THeight;
-                            NPC[A].Location.Width = NPC[A]->TWidth;
-                            NPC[A].Location.X += -NPC[A].Location.Width / 2;
-                            NPC[A].Location.Y += -NPC[A].Location.Height / 2;
+                            NPC[A].Location.set_height_center(NPC[A]->THeight);
+                            NPC[A].Location.set_width_center(NPC[A]->TWidth);
 
                             NPCQueues::Unchecked.push_back(A);
                         }

@@ -66,9 +66,7 @@ static void s_TriggerDoorEffects(const Location_t& loc, bool do_big_door = true)
             else if(do_big_door && bgo.Type == 141)
             {
                 Location_t bLoc = static_cast<Location_t>(bgo.Location);
-                bLoc.X += bLoc.Width / 2;
-                bLoc.Width = 104;
-                bLoc.X += -bLoc.Width / 2;
+                bLoc.set_width_center(104);
                 NewEffect(EFFID_BIG_DOOR_OPEN, bLoc);
             }
         }

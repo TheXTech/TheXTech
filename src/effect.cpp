@@ -1889,12 +1889,8 @@ void NewEffect(int A, const Location_t &Location, int Direction, int NewNpc, boo
 
         if(A == 91)
         {
-            ne.Location.X += ne.Location.Width / 2;
-            ne.Location.Y += ne.Location.Height / 2;
-            ne.Location.Width = EffectWidth[A];
-            ne.Location.Height = EffectHeight[A];
-            ne.Location.X += -ne.Location.Width / 2;
-            ne.Location.Y += -ne.Location.Height / 2;
+            ne.Location.set_width_center(EffectWidth[A]);
+            ne.Location.set_height_center(EffectHeight[A]);
         }
 
         if(ne.Location.SpeedX != 0 && ne.Location.SpeedX > -2 && ne.Location.SpeedX < 2)
