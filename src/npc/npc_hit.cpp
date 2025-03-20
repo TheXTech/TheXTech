@@ -483,7 +483,7 @@ void NPCHit(int A, int B, int C)
             if(B == 1 || B == 8)
             {
 
-                if(Player[C].Location.X + Player[C].Location.Width / 2 < NPC[A].Location.X + NPC[A].Location.Width / 2)
+                if(NPC[A].Location.to_right_of(Player[C].Location))
                     Player[C].Location.SpeedX -= 3;
                 else
                     Player[C].Location.SpeedX += 3;
@@ -936,7 +936,7 @@ void NPCHit(int A, int B, int C)
                     NPC[A].CantHurt = 10;
                     PlaySoundSpatial(SFX_ShellHit, NPC[A].Location);
                     NPC[A].Projectile = true;
-                    if(Player[C].Location.X + Player[C].Location.Width / 2 > NPC[A].Location.X + NPC[A].Location.Width / 2)
+                    if(Player[C].Location.to_right_of(NPC[A].Location))
                         NPC[A].Direction = -1;
                     else
                         NPC[A].Direction = 1;
@@ -1091,7 +1091,7 @@ void NPCHit(int A, int B, int C)
                 NPC[A].CantHurtPlayer = C;
                 PlaySoundSpatial(SFX_Stomp, NPC[A].Location);
                 NPC[A].Projectile = true;
-                if(Player[C].Location.X + Player[C].Location.Width / 2 > NPC[A].Location.X + NPC[A].Location.Width / 2)
+                if(Player[C].Location.to_right_of(NPC[A].Location))
                     NPC[A].Direction = -1;
                 else
                     NPC[A].Direction = 1;

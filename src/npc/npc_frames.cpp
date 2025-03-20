@@ -595,7 +595,7 @@ void NPCFrames(int A)
     else if(NPC[A].Type == NPCID_FIRE_PLANT)
     {
         NPC[A].Frame = 0;
-        if(Player[NPC[A].Special4].Location.X + Player[NPC[A].Special4].Location.Width / 2 > NPC[A].Location.X + NPC[A].Location.Width / 2)
+        if(Player[NPC[A].Special4].Location.to_right_of(NPC[A].Location))
             NPC[A].Frame = 2;
         if(Player[NPC[A].Special4].Location.Y + Player[NPC[A].Special4].Location.Height / 2 < NPC[A].Location.Y + 16)
             NPC[A].Frame += 1;

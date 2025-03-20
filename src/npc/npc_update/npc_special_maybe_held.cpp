@@ -157,7 +157,7 @@ void NPCSpecialMaybeHeld(int A)
         bool tempBool = false;
         if(NPC[A].Special5 > 0)
         {
-            if(Player[NPC[A].Special5].Location.X + Player[NPC[A].Special5].Location.Width / 2 < NPC[A].Location.X + NPC[A].Location.Width / 2)
+            if(NPC[A].Location.to_right_of(Player[NPC[A].Special5].Location))
             {
                 if(NPC[A].Direction < 0)
                     tempBool = true;
@@ -515,7 +515,7 @@ void NPCSpecialMaybeHeld(int A)
                 if(NPC[A].Location.SpeedY == 0 || NPC[A].Slope > 0)
                 {
                     NPC[A].Special3 = 0;
-                    if(Player[NPC[A].Special5].Location.X + Player[NPC[A].Special5].Location.Width / 2 < NPC[A].Location.X + NPC[A].Location.Width / 2)
+                    if(NPC[A].Location.to_right_of(Player[NPC[A].Special5].Location))
                         NPC[A].Special4 = -10;
                     else
                         NPC[A].Special4 = 10;
@@ -693,7 +693,7 @@ void NPCSpecialMaybeHeld(int A)
                         if(C == 0.0 || dist < C)
                         {
                             C = dist;
-                            if(NPC[A].Location.X + NPC[A].Location.Width / 2 > Player[B].Location.X + Player[B].Location.Width / 2)
+                            if(NPC[A].Location.to_right_of(Player[B].Location))
                                 NPC[A].Direction = -1;
                             else
                                 NPC[A].Direction = 1;

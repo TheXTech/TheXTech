@@ -4732,12 +4732,12 @@ void PlayerCollide(const int A)
                 }
                 else if(HitSpot == 5)
                 {
-                    if(p1.Location.X + p1.Location.Width / 2 > p2.Location.X + p2.Location.Width / 2)
+                    if(p1.Location.to_right_of(p2.Location))
                     {
                         p1.Bumped2 = 1;
                         p2.Bumped2 = -1;
                     }
-                    else if(p1.Location.X + p1.Location.Width / 2 < p2.Location.X + p2.Location.Width / 2)
+                    else if(p2.Location.to_right_of(p1.Location))
                     {
                         p1.Bumped2 = -1;
                         p2.Bumped2 = 1;

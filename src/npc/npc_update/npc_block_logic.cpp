@@ -131,7 +131,7 @@ void NPCBlockLogic(int A, double& tempHit, int& tempHitBlock, float& tempSpeedA,
                                             HitSpot = 1;
                                         else if(Block[B].tempBlockNpcType == NPCID_CONVEYOR) // && HitSpot == 5
                                         {
-                                            if(NPC[A].Location.X + NPC[A].Location.Width / 2 < Block[B].Location.X + Block[B].Location.Width / 2)
+                                            if(Block[B].Location.to_right_of(NPC[A].Location))
                                                 HitSpot = 4;
                                             else
                                                 HitSpot = 2;

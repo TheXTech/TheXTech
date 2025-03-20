@@ -934,7 +934,7 @@ void NPCSpecial(int A)
                     if(min_dist == 0.0 || horiz_dist < min_dist)
                     {
                         min_dist = horiz_dist;
-                        if(npc.Location.X + npc.Location.Width / 2 > p.Location.X + p.Location.Width / 2)
+                        if(npc.Location.to_right_of(p.Location))
                             npc.Direction = -1;
                         else
                             npc.Direction = 1;
@@ -1225,7 +1225,7 @@ void NPCSpecial(int A)
             while(npc.Special5 <= 0);
         }
 
-        if(Player[npc.Special5].Location.X + Player[npc.Special5].Location.Width / 2 < npc.Location.X + npc.Location.Width / 2)
+        if(npc.Location.to_right_of(Player[npc.Special5].Location))
             npc.Direction = -1;
         else
             npc.Direction = 1;
@@ -1364,7 +1364,7 @@ void NPCSpecial(int A)
             while(npc.Special5 <= 0);
         }
 
-        if(Player[npc.Special5].Location.X + Player[npc.Special5].Location.Width / 2 < npc.Location.X + npc.Location.Width / 2)
+        if(npc.Location.to_right_of(Player[npc.Special5].Location))
             npc.Direction = -1;
         else
             npc.Direction = 1;
@@ -1410,7 +1410,7 @@ void NPCSpecial(int A)
         }
         else if(npc.Special == 1)
         {
-            if(Player[npc.Special5].Location.X + Player[npc.Special5].Location.Width / 2 < npc.Location.X + npc.Location.Width / 2)
+            if(npc.Location.to_right_of(Player[npc.Special5].Location))
                 npc.Direction = -1;
             else
                 npc.Direction = 1;
@@ -1520,7 +1520,7 @@ void NPCSpecial(int A)
             while(npc.Special5 <= 0); // TESTME: !(npc.Special5 > 0)
         }
 
-        if(Player[npc.Special5].Location.X + Player[npc.Special5].Location.Width / 2 < npc.Location.X + npc.Location.Width / 2)
+        if(npc.Location.to_right_of(Player[npc.Special5].Location))
             npc.Direction = -1;
         else
             npc.Direction = 1;
@@ -1606,7 +1606,7 @@ void NPCSpecial(int A)
         }
         else if(npc.Special == 1 || npc.Special == 2)
         {
-            if(Player[npc.Special5].Location.X + Player[npc.Special5].Location.Width / 2 < npc.Location.X + npc.Location.Width / 2)
+            if(npc.Location.to_right_of(Player[npc.Special5].Location))
                 npc.Direction = -1;
             else
                 npc.Direction = 1;
@@ -3009,7 +3009,7 @@ void NPCSpecial(int A)
             {
                 if(CheckCollision(tempLocation, Player[i].Location))
                 {
-                    if(Player[i].Location.X + Player[i].Location.Width / 2 < npc.Location.X + npc.Location.Width / 2)
+                    if(npc.Location.to_right_of(Player[i].Location))
                         npc.Direction = -1;
                     else
                         npc.Direction = 1;
@@ -3550,7 +3550,7 @@ void SpecialNPC(int A)
                 if(NPC[A].Location.Y + NPC[A].Location.Height >= Player[NPC[A].Special].Location.Y - 24 || NPC[A].Special4 == 1)
                 {
                     NPC[A].Special2 = 60;
-                    if(NPC[A].Location.X + NPC[A].Location.Width / 2 < Player[NPC[A].Special].Location.X + Player[NPC[A].Special].Location.Width / 2)
+                    if(Player[NPC[A].Special].Location.to_right_of(NPC[A].Location))
                         NPC[A].Location.SpeedX = 4;
                     else
                         NPC[A].Location.SpeedX = -4;
@@ -4394,7 +4394,7 @@ void SpecialNPC(int A)
             if(target_plr > 0)
             {
                 int D;
-                if(NPC[A].Location.X + NPC[A].Location.Width / 2 > Player[target_plr].Location.X + Player[target_plr].Location.Width / 2)
+                if(NPC[A].Location.to_right_of(Player[target_plr].Location))
                     D = -1;
                 else
                     D = 1;
@@ -5004,7 +5004,7 @@ void SpecialNPC(int A)
                 numNPCs++;
                 NPC[numNPCs] = NPC_t();
 
-                if(NPC[A].Location.X + NPC[A].Location.Width / 2 > p.Location.X + p.Location.Width / 2)
+                if(NPC[A].Location.to_right_of(p.Location))
                     NPC[numNPCs].Direction = -1;
                 else
                     NPC[numNPCs].Direction = 1;

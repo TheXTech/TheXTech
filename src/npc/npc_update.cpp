@@ -1618,7 +1618,7 @@ interrupt_Activation:
                     {
                         if((NPC[A].Type == NPCID_MAGIC_BOSS || NPC[A].Type == NPCID_FIRE_BOSS) && NPC[A].Special == 0) // larry koopa
                         {
-                            if(Player[NPC[A].Special5].Location.X + Player[NPC[A].Special5].Location.Width / 2 < NPC[A].Location.X + NPC[A].Location.Width / 2)
+                            if(NPC[A].Location.to_right_of(Player[NPC[A].Special5].Location))
                             {
                                 if(NPC[A].Special2 < 0)
                                     NPC[A].Special3 += 30;

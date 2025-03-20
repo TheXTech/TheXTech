@@ -657,10 +657,12 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
                                 else
                                 {
                                     tempSlope3 = B;
-                                    if(Player[A].Location.X + Player[A].Location.Width / 2 < Block[B].Location.X + Block[B].Location.Width / 2)
+
+                                    if(Block[B].Location.to_right_of(Player[A].Location))
                                         Player[A].Pinched.Right4 = 2;
                                     else
                                         Player[A].Pinched.Left2 = 2;
+
                                     if(Block[B].Location.SpeedX != 0 || Block[B].Location.SpeedY != 0)
                                     {
                                         Player[A].Pinched.Moving = 2;
@@ -671,6 +673,7 @@ void PlayerBlockLogic(int A, int& floorBlock, bool& movingBlock, bool& DontReset
                                         if(Block[B].Location.SpeedY != 0)
                                             Player[A].Pinched.MovingUD = true;
                                     }
+
                                     Location_t tempLocation;
                                     tempLocation.X = Player[A].Location.X;
                                     tempLocation.Width = Player[A].Location.Width;

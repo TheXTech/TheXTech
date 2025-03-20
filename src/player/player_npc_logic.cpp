@@ -882,7 +882,7 @@ void PlayerNPCLogic(int A, bool& tempSpring, bool& tempShell, int& MessageNPC, c
                                         float D = Player[A].Location.X;
 
                                         // actually move the player
-                                        if(Player[A].Location.X + Player[A].Location.Width / 2 < NPC[B].Location.X + NPC[B].Location.Width / 2)
+                                        if(NPC[B].Location.to_right_of(Player[A].Location))
                                         {
                                             Player[A].Pinched.Right4 = 2;
 

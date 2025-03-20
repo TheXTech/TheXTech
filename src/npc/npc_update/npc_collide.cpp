@@ -333,7 +333,7 @@ void NPCCollide(int A)
 
                         if(NPC[A].CantHurt < 25)
                             NPC[A].Special = 1;
-                        if(NPC[A].Location.X + NPC[A].Location.Width / 2 > NPC[B].Location.X + NPC[B].Location.Width / 2)
+                        if(NPC[A].Location.to_right_of(NPC[B].Location))
                         {
                             NPC[B].Location.X = NPC[A].Location.X - NPC[B].Location.Width - 1;
                             NPC[B].Direction = 1;
@@ -490,7 +490,7 @@ void NPCCollide(int A)
 
             if(NPCIsAParaTroopa(NPC[A]) && NPCIsAParaTroopa(NPC[B]))
             {
-                if(NPC[A].Location.X + NPC[A].Location.Width / 2.0 > NPC[B].Location.X + NPC[B].Location.Width / 2.0)
+                if(NPC[A].Location.to_right_of(NPC[B].Location))
                     NPC[A].Location.SpeedX += 0.05;
                 else
                     NPC[A].Location.SpeedX -= 0.05;

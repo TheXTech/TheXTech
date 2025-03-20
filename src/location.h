@@ -40,6 +40,12 @@ struct Location_t
 //    SpeedY As Double
     double SpeedY = 0.0;
 //End Type
+
+    // checks if the center is strictly to the right of the other location's center
+    inline bool to_right_of(const Location_t& o) const
+    {
+        return X - o.X + (Width - o.Width) / 2 > 0;
+    }
 };
 
 //NEW: 'Holds location information for an object without speed at integer coordinates, with width / height values below 32767
