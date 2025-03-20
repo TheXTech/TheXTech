@@ -89,6 +89,11 @@ static inline int computeStarsShowingPolicy(int ll, int cur)
 }
 
 
+static inline int s_round2int(double d)
+{
+    return std::floor(d + 0.5);
+}
+
 // draws GFX to screen when on the world map/world map editor
 void UpdateGraphics2(bool skipRepaint)
 {
@@ -361,9 +366,9 @@ void UpdateGraphics2(bool skipRepaint)
                                           GFXLevelBMP[29], 0, 0);
                 }
 
-                XRender::renderTexture(camX + locGFX.X,
-                                      camY + locGFX.Y,
-                                      locGFX.Width, locGFX.Height,
+                XRender::renderTextureBasic(camX + s_round2int(locGFX.X),
+                                      camY + s_round2int(locGFX.Y),
+                                      (int)locGFX.Width, (int)locGFX.Height,
                                       GFXLevelBMP[lvlP.Type], 0, 32 * LevelFrame[lvlP.Type]);
             }
         }
@@ -377,9 +382,9 @@ void UpdateGraphics2(bool skipRepaint)
         {
             if(vScreenCollision(Z, Effect[A].Location))
             {
-                XRender::renderTexture(camX + Effect[A].Location.X,
-                    camY + Effect[A].Location.Y,
-                    Effect[A].Location.Width, Effect[A].Location.Height,
+                XRender::renderTextureBasic(camX + s_round2int(Effect[A].Location.X),
+                    camY + s_round2int(Effect[A].Location.Y),
+                    (int)Effect[A].Location.Width, (int)Effect[A].Location.Height,
                     GFXEffect[Effect[A].Type], 0, Effect[A].Frame * EffectHeight[Effect[A].Type]);
             }
         }
@@ -459,9 +464,9 @@ void UpdateGraphics2(bool skipRepaint)
 
 //        XRender::renderTexture(camX + WorldPlayer[1].Location.X, camY + WorldPlayer[1].Location.Y - 10 + WorldPlayer[1].Location.Height - WPHeight, WorldPlayer[1].Location.Width, WPHeight, GFXPlayerMask[WorldPlayer[1].Type], 0, WPHeight * WorldPlayer[1].Frame);
 //        XRender::renderTexture(camX + WorldPlayer[1].Location.X, camY + WorldPlayer[1].Location.Y - 10 + WorldPlayer[1].Location.Height - WPHeight, WorldPlayer[1].Location.Width, WPHeight, GFXPlayer[WorldPlayer[1].Type], 0, WPHeight * WorldPlayer[1].Frame);
-        XRender::renderTexture(camX + WorldPlayer[1].Location.X,
-                              camY + WorldPlayer[1].Location.Y - 10 + WorldPlayer[1].Location.Height - WPHeight,
-                              WorldPlayer[1].Location.Width, WPHeight,
+        XRender::renderTextureBasic(camX + s_round2int(WorldPlayer[1].Location.X),
+                              camY + s_round2int(WorldPlayer[1].Location.Y + WorldPlayer[1].Location.Height) - 10 - WPHeight,
+                              (int)WorldPlayer[1].Location.Width, WPHeight,
                               GFXPlayerBMP[WorldPlayer[1].Type], 0, WPHeight * WorldPlayer[1].Frame);
 
         if(WorldPlayer[1].LevelIndex)
@@ -472,8 +477,8 @@ void UpdateGraphics2(bool skipRepaint)
 
             auto policy = computeStarsShowingPolicy(l.starsShowPolicy, l.curStars);
 
-            int p_center_x = camX + WorldPlayer[1].Location.X + (WorldPlayer[1].Location.Width / 2);
-            int info_y = camY + WorldPlayer[1].Location.Y - 32;
+            int p_center_x = camX + s_round2int(WorldPlayer[1].Location.X + (WorldPlayer[1].Location.Width / 2));
+            int info_y = camY + s_round2int(WorldPlayer[1].Location.Y) - 32;
 
             if(l.save_info.inited() && l.save_info.max_stars > 0 && policy > Config_t::MAP_STARS_HIDE)
             {
